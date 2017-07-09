@@ -686,9 +686,7 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	PRINT_FIELD_INET_ADDR("{", mreq, ipv6mr_multiaddr, AF_INET6);
-
-	tprints(", ipv6mr_interface=");
-	print_ifindex(mreq.ipv6mr_interface);
+	PRINT_FIELD_IFINDEX(", ", mreq, ipv6mr_interface);
 	tprints("}");
 }
 #endif /* IPV6_ADD_MEMBERSHIP */

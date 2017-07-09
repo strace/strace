@@ -483,8 +483,7 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 	uint16_t alen = dml->pdmc_alen > sizeof(dml->pdmc_addr) ?
 		sizeof(dml->pdmc_addr) : dml->pdmc_alen;
 
-	tprints("{pdmc_index=");
-	print_ifindex(dml->pdmc_index);
+	PRINT_FIELD_IFINDEX("{", *dml, pdmc_index);
 	PRINT_FIELD_U(", ", *dml, pdmc_count);
 	PRINT_FIELD_U(", ", *dml, pdmc_type);
 	PRINT_FIELD_U(", ", *dml, pdmc_alen);
@@ -609,12 +608,8 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 
 	PRINT_FIELD_INET_ADDR(", ", *id, idiag_src, family);
 	PRINT_FIELD_INET_ADDR(", ", *id, idiag_dst, family);
-
-	tprints(", idiag_if=");
-	print_ifindex(id->idiag_if);
-
+	PRINT_FIELD_IFINDEX(", ", *id, idiag_if);
 	PRINT_FIELD_COOKIE(", ", *id, idiag_cookie);
-
 	tprints("}");
 }
 

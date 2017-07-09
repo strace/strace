@@ -30,6 +30,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include "msghdr.h"
 #include <limits.h>
 #include <arpa/inet.h>
@@ -122,8 +123,7 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 {
 	const struct in_pktinfo *info = cmsg_data;
 
-	tprints("{ipi_ifindex=");
-	print_ifindex(info->ipi_ifindex);
+	PRINT_FIELD_IFINDEX("{", *info, ipi_ifindex);
 	tprintf(", ipi_spec_dst=inet_addr(\"%s\")",
 		inet_ntoa(info->ipi_spec_dst));
 	tprintf(", ipi_addr=inet_addr(\"%s\")}",

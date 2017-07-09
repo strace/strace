@@ -134,14 +134,13 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 	if (addrlen <= (int) SIN6_MIN_LEN)
 		return;
 
-	tprints(", sin6_scope_id=");
 #if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
 	if (IN6_IS_ADDR_LINKLOCAL(&sa_in6->sin6_addr)
 	    || IN6_IS_ADDR_MC_LINKLOCAL(&sa_in6->sin6_addr))
-		print_ifindex(sa_in6->sin6_scope_id);
+		PRINT_FIELD_IFINDEX(", ", *sa_in6, sin6_scope_id);
 	else
 #endif
-		tprintf("%u", sa_in6->sin6_scope_id);
+		PRINT_FIELD_U(", ", *sa_in6, sin6_scope_id);
 }
 
 static void
@@ -178,8 +177,7 @@ print_sockaddr_data_ll(const void *const buf, const int addrlen)
 
 	tprints("sll_protocol=htons(");
 	printxval(ethernet_protocols, ntohs(sa_ll->sll_protocol), "ETH_P_???");
-	tprints("), sll_ifindex=");
-	print_ifindex(sa_ll->sll_ifindex);
+	PRINT_FIELD_IFINDEX("), ", *sa_ll, sll_ifindex);
 	tprints(", sll_hatype=");
 	printxval(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");
 	tprints(", sll_pkttype=");

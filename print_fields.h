@@ -87,4 +87,10 @@
 				sizeof((where_).field_), #field_);	\
 	} while (0)
 
+#define PRINT_FIELD_IFINDEX(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_ifindex((where_).field_);				\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */
