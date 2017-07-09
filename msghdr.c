@@ -185,10 +185,10 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 	const struct sock_ee *const err = cmsg_data;
 
 	tprintf("{ee_errno=%u, ee_origin=%u, ee_type=%u, ee_code=%u"
-		", ee_info=%u, ee_data=%u, offender=",
+		", ee_info=%u, ee_data=%u",
 		err->ee_errno, err->ee_origin, err->ee_type,
 		err->ee_code, err->ee_info, err->ee_data);
-	print_sockaddr(&err->offender, sizeof(err->offender));
+	PRINT_FIELD_SOCKADDR(", ", *err, offender);
 	tprints("}");
 }
 
