@@ -124,10 +124,9 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 	const struct in_pktinfo *info = cmsg_data;
 
 	PRINT_FIELD_IFINDEX("{", *info, ipi_ifindex);
-	tprintf(", ipi_spec_dst=inet_addr(\"%s\")",
-		inet_ntoa(info->ipi_spec_dst));
-	tprintf(", ipi_addr=inet_addr(\"%s\")}",
-		inet_ntoa(info->ipi_addr));
+	PRINT_FIELD_INET4_ADDR(", ", *info, ipi_spec_dst);
+	PRINT_FIELD_INET4_ADDR(", ", *info, ipi_addr);
+	tprints("}");
 }
 
 static void

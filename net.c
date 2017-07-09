@@ -664,10 +664,9 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &mreq))
 		return;
 
-	tprintf("{imr_multiaddr=inet_addr(\"%s\")",
-		inet_ntoa(mreq.imr_multiaddr));
-	tprintf(", imr_interface=inet_addr(\"%s\")}",
-		inet_ntoa(mreq.imr_interface));
+	PRINT_FIELD_INET4_ADDR("{", mreq, imr_multiaddr);
+	PRINT_FIELD_INET4_ADDR(", ", mreq, imr_interface);
+	tprints("}");
 }
 #endif /* IP_ADD_MEMBERSHIP */
 
