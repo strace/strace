@@ -80,4 +80,11 @@
 		print_quoted_string((const char *)(where_).field_, len_, style_);	\
 	} while (0)
 
+#define PRINT_FIELD_INET_ADDR(prefix_, where_, field_, af_)		\
+	do {								\
+		STRACE_PRINTF(prefix_);					\
+		print_inet_addr((af_), &(where_).field_,		\
+				sizeof((where_).field_), #field_);	\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */

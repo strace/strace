@@ -607,12 +607,8 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	tprintf("{idiag_sport=htons(%u), idiag_dport=htons(%u)",
 		ntohs(id->idiag_sport), ntohs(id->idiag_dport));
 
-	tprints(", ");
-	print_inet_addr(family, id->idiag_src,
-			sizeof(id->idiag_src), "idiag_src");
-	tprints(", ");
-	print_inet_addr(family, id->idiag_dst,
-			sizeof(id->idiag_dst), "idiag_dst");
+	PRINT_FIELD_INET_ADDR(", ", *id, idiag_src, family);
+	PRINT_FIELD_INET_ADDR(", ", *id, idiag_dst, family);
 
 	tprints(", idiag_if=");
 	print_ifindex(id->idiag_if);

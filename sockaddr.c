@@ -30,6 +30,8 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
+
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>
@@ -125,9 +127,8 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
-	tprintf("sin6_port=htons(%u), ", ntohs(sa_in6->sin6_port));
-	print_inet_addr(AF_INET6, &sa_in6->sin6_addr,
-			sizeof(sa_in6->sin6_addr), "sin6_addr");
+	tprintf("sin6_port=htons(%u)", ntohs(sa_in6->sin6_port));
+	PRINT_FIELD_INET_ADDR(", ", *sa_in6, sin6_addr, AF_INET6);
 	tprintf(", sin6_flowinfo=htonl(%u)", ntohl(sa_in6->sin6_flowinfo));
 
 	if (addrlen <= (int) SIN6_MIN_LEN)
