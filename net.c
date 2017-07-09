@@ -443,19 +443,17 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 
 static void
 print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
-		 const unsigned int len)
+		 const int len)
 {
 	struct linger linger;
 
-	if (len < sizeof(linger) ||
-	    umove(tcp, addr, &linger) < 0) {
+	if (len < (int) sizeof(linger)) {
 		printaddr(addr);
-		return;
+	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
+		PRINT_FIELD_D("{", linger, l_onoff);
+		PRINT_FIELD_D(", ", linger, l_linger);
+		tprints("}");
 	}
-
-	PRINT_FIELD_D("{", linger, l_onoff);
-	PRINT_FIELD_D(", ", linger, l_linger);
-	tprints("}");
 }
 
 static void

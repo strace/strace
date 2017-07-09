@@ -83,6 +83,11 @@ main(void)
 	       fd, linger->l_onoff, linger->l_linger,
 	       (unsigned int) sizeof(*linger) + 1, errstr);
 
+	/* setsockopt with optlen < 0 - EINVAL */
+	set_linger(fd, linger, -1U);
+	printf("setsockopt(%d, SOL_SOCKET, SO_LINGER, %p, -1) = %s\n",
+	       fd, linger, errstr);
+
 	/* setsockopt with optlen smaller than necessary - EINVAL */
 	set_linger(fd, linger, sizeof(linger->l_onoff));
 	printf("setsockopt(%d, SOL_SOCKET, SO_LINGER, %p, %d) = %s\n",
