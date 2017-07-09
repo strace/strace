@@ -167,6 +167,7 @@ net-yy-inet
 net-yy-netlink
 net-yy-unix
 netlink_audit
+netlink_crypto
 netlink_generic
 netlink_netfilter
 netlink_protocol

@@ -362,6 +362,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	inttypes.h
 	linux/bsg.h
+	linux/cryptouser.h
 	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
 	linux/falloc.h
