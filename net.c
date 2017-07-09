@@ -89,22 +89,6 @@
 # include "xlat/bt_protocols.h"
 #endif
 
-void
-print_ifindex(unsigned int ifindex)
-{
-#ifdef HAVE_IF_INDEXTONAME
-	char buf[IFNAMSIZ + 1];
-
-	if (if_indextoname(ifindex, buf)) {
-		tprints("if_nametoindex(");
-		print_quoted_string(buf, sizeof(buf), QUOTE_0_TERMINATED);
-		tprints(")");
-		return;
-	}
-#endif
-	tprintf("%u", ifindex);
-}
-
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
 	       const kernel_ulong_t addrlen)
