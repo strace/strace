@@ -92,6 +92,7 @@ getsockname
 getuid
 getuid32
 getxxid
+group_req
 inet-cmsg
 init_module
 inotify
