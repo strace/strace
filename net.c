@@ -168,26 +168,6 @@ SYS_FUNC(socket)
 	return RVAL_DECODED | RVAL_FD;
 }
 
-SYS_FUNC(bind)
-{
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	const int addrlen = tcp->u_arg[2];
-	decode_sockaddr(tcp, tcp->u_arg[1], addrlen);
-	tprintf(", %d", addrlen);
-
-	return RVAL_DECODED;
-}
-
-SYS_FUNC(listen)
-{
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	tprintf("%" PRI_klu, tcp->u_arg[1]);
-
-	return RVAL_DECODED;
-}
-
 static bool
 fetch_socklen(struct tcb *const tcp, int *const plen,
 	      const kernel_ulong_t sockaddr, const kernel_ulong_t socklen)
@@ -347,17 +327,6 @@ SYS_FUNC(recvfrom)
 			tprintf(", [%d]", rlen);
 	}
 	return 0;
-}
-
-#include "xlat/shutdown_modes.h"
-
-SYS_FUNC(shutdown)
-{
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	printxval(shutdown_modes, tcp->u_arg[1], "SHUT_???");
-
-	return RVAL_DECODED;
 }
 
 SYS_FUNC(getsockname)

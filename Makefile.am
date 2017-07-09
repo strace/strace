@@ -86,6 +86,7 @@ strace_SOURCES =	\
 	affinity.c	\
 	aio.c		\
 	alpha.c		\
+	bind.c		\
 	bjm.c		\
 	block.c		\
 	bpf.c		\
@@ -161,6 +162,7 @@ strace_SOURCES =	\
 	linux/asm_stat.h \
 	linux/x32/asm_stat.h \
 	linux/x86_64/asm_stat.h \
+	listen.c	\
 	lookup_dcookie.c \
 	loop.c		\
 	lseek.c		\
@@ -235,6 +237,7 @@ strace_SOURCES =	\
 	sendfile.c	\
 	sg_io_v3.c	\
 	sg_io_v4.c	\
+	shutdown.c	\
 	sigaltstack.c	\
 	sigevent.h	\
 	signal.c	\
