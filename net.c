@@ -525,9 +525,9 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 	    umove(tcp, addr, &stats) < 0) {
 		printaddr(addr);
 	} else {
-		tprintf("{packets=%u, drops=%u}",
-			stats.tp_packets,
-			stats.tp_drops);
+		PRINT_FIELD_U("{", stats, tp_packets);
+		PRINT_FIELD_U("{", stats, tp_drops);
+		tprints("}");
 	}
 }
 #endif /* PACKET_STATISTICS */
@@ -702,7 +702,8 @@ print_group_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		return;
 	}
 
-	tprintf("{gr_interface=%u, gr_group=", greq.gr_interface);
+	PRINT_FIELD_IFINDEX("{", greq, gr_interface);
+	tprints(", gr_group=");
 	print_sockaddr(tcp, &greq.gr_group, sizeof(greq.gr_group));
 	tprints("}");
 
@@ -719,12 +720,11 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	    umove(tcp, addr, &req) < 0) {
 		printaddr(addr);
 	} else {
-		tprintf("{block_size=%u, block_nr=%u, "
-			"frame_size=%u, frame_nr=%u}",
-			req.tp_block_size,
-			req.tp_block_nr,
-			req.tp_frame_size,
-			req.tp_frame_nr);
+		PRINT_FIELD_U("{", req, tp_block_size);
+		PRINT_FIELD_U(", ", req, tp_block_nr);
+		PRINT_FIELD_U(", ", req, tp_frame_size);
+		PRINT_FIELD_U(", ", req, tp_frame_nr);
+		tprints("}");
 	}
 }
 #endif /* PACKET_RX_RING */
@@ -743,9 +743,11 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	} else {
 		unsigned int i;
 
-		tprintf("{mr_ifindex=%u, mr_type=", mreq.mr_ifindex);
-		printxval(packet_mreq_type, mreq.mr_type, "PACKET_MR_???");
-		tprintf(", mr_alen=%u, mr_address=", mreq.mr_alen);
+		PRINT_FIELD_IFINDEX("{", mreq, mr_ifindex);
+		PRINT_FIELD_XVAL(", ", mreq, mr_type, packet_mreq_type,
+				 "PACKET_MR_???");
+		PRINT_FIELD_U(", ", mreq, mr_alen);
+		tprints(", mr_address=");
 		if (mreq.mr_alen > ARRAY_SIZE(mreq.mr_address))
 			mreq.mr_alen = ARRAY_SIZE(mreq.mr_address);
 		for (i = 0; i < mreq.mr_alen; ++i)
