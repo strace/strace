@@ -651,40 +651,34 @@ SYS_FUNC(getsockopt)
 #ifdef IP_ADD_MEMBERSHIP
 static void
 print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
-	   const unsigned int len)
+	   const int len)
 {
 	struct ip_mreq mreq;
 
-	if (len < sizeof(mreq)) {
-		printstrn(tcp, addr, len);
-		return;
+	if (len < (int) sizeof(mreq)) {
+		printaddr(addr);
+	} else if (!umove_or_printaddr(tcp, addr, &mreq)) {
+		PRINT_FIELD_INET4_ADDR("{", mreq, imr_multiaddr);
+		PRINT_FIELD_INET4_ADDR(", ", mreq, imr_interface);
+		tprints("}");
 	}
-	if (umove_or_printaddr(tcp, addr, &mreq))
-		return;
-
-	PRINT_FIELD_INET4_ADDR("{", mreq, imr_multiaddr);
-	PRINT_FIELD_INET4_ADDR(", ", mreq, imr_interface);
-	tprints("}");
 }
 #endif /* IP_ADD_MEMBERSHIP */
 
 #ifdef IPV6_ADD_MEMBERSHIP
 static void
 print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
-	    const unsigned int len)
+	    const int len)
 {
 	struct ipv6_mreq mreq;
 
-	if (len < sizeof(mreq)) {
-		printstrn(tcp, addr, len);
-		return;
+	if (len < (int) sizeof(mreq)) {
+		printaddr(addr);
+	} else if (!umove_or_printaddr(tcp, addr, &mreq)) {
+		PRINT_FIELD_INET_ADDR("{", mreq, ipv6mr_multiaddr, AF_INET6);
+		PRINT_FIELD_IFINDEX(", ", mreq, ipv6mr_interface);
+		tprints("}");
 	}
-	if (umove_or_printaddr(tcp, addr, &mreq))
-		return;
-
-	PRINT_FIELD_INET_ADDR("{", mreq, ipv6mr_multiaddr, AF_INET6);
-	PRINT_FIELD_IFINDEX(", ", mreq, ipv6mr_interface);
-	tprints("}");
 }
 #endif /* IPV6_ADD_MEMBERSHIP */
 

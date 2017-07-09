@@ -3,8 +3,11 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Enhanced decoding of optlen argument of getsockopt syscall.
-  * Enhanced decoding of SO_LINGER and SO_PEERCRED options
-    of getsockopt and setsockopt syscalls.
+  * Enhanced decoding of SO_LINGER option of getsockopt and setsockopt syscalls.
+  * Enhanced decoding of SO_PEERCRED option of getsockopt syscall.
+  * Enhanced decoding of IP_ADD_MEMBERSHIP, IP_DROP_MEMBERSHIP,
+    IPV6_ADD_MEMBERSHIP, IPV6_DROP_MEMBERSHIP, IPV6_JOIN_ANYCAST,
+    and IPV6_LEAVE_ANYCAST options of setsockopt syscall.
   * Implemented decoding of linux socket filter programs specified
     for SO_ATTACH_FILTER and SO_ATTACH_REUSEPORT_CBPF socket options.
 
