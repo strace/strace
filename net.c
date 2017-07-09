@@ -682,23 +682,6 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 }
 #endif /* IPV6_ADD_MEMBERSHIP */
 
-#ifdef MCAST_JOIN_GROUP
-static void
-print_group_req(struct tcb *const tcp, const kernel_ulong_t addr,
-		const int len)
-{
-	struct group_req greq;
-
-	if (len < (int) sizeof(greq)) {
-		printaddr(addr);
-	} else if (!umove_or_printaddr(tcp, addr, &greq)) {
-		PRINT_FIELD_IFINDEX("{", greq, gr_interface);
-		PRINT_FIELD_SOCKADDR(", ", greq, gr_group);
-		tprints("}");
-	}
-}
-#endif /* MCAST_JOIN_GROUP */
-
 #ifdef PACKET_RX_RING
 static void
 print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
