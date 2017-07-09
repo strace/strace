@@ -611,6 +611,12 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	tprints("}");
 }
 
+#define PRINT_FIELD_INET_DIAG_SOCKID(prefix_, where_, field_, af_)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_inet_diag_sockid(&(where_).field_, (af_));	\
+	} while (0)
+
 static void
 decode_inet_diag_req_compat(struct tcb *const tcp,
 			    const struct nlmsghdr *const nlmsghdr,
@@ -633,8 +639,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
 					  inet_diag_extended_flags,
 					  "1<<INET_DIAG_\?\?\?-1");
-			tprints(", id=");
-			print_inet_diag_sockid(&req.id, req.idiag_family);
+			PRINT_FIELD_INET_DIAG_SOCKID(", ", req, id,
+						     req.idiag_family);
 			PRINT_FIELD_FLAGS(", ", req, idiag_states,
 					  tcp_state_flags, "1<<TCP_???");
 			PRINT_FIELD_U(", ", req, idiag_dbs);
@@ -677,8 +683,8 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 					  "1<<INET_DIAG_\?\?\?-1");
 			PRINT_FIELD_FLAGS(", ", req, idiag_states,
 					  tcp_state_flags, "1<<TCP_???");
-			tprints(", id=");
-			print_inet_diag_sockid(&req.id, req.sdiag_family);
+			PRINT_FIELD_INET_DIAG_SOCKID(", ", req, id,
+						     req.sdiag_family);
 			decode_nla = true;
 		}
 	} else
@@ -840,8 +846,8 @@ decode_inet_diag_msg(struct tcb *const tcp,
 					 tcp_states, "TCP_???");
 			PRINT_FIELD_U(", ", msg, idiag_timer);
 			PRINT_FIELD_U(", ", msg, idiag_retrans);
-			tprints(", id=");
-			print_inet_diag_sockid(&msg.id, msg.idiag_family);
+			PRINT_FIELD_INET_DIAG_SOCKID(", ", msg, id,
+						     msg.idiag_family);
 			PRINT_FIELD_U(", ", msg, idiag_expires);
 			PRINT_FIELD_U(", ", msg, idiag_rqueue);
 			PRINT_FIELD_U(", ", msg, idiag_wqueue);
@@ -883,12 +889,11 @@ decode_smc_diag_req(struct tcb *const tcp,
 			PRINT_FIELD_FLAGS("", req, diag_ext,
 					  smc_diag_extended_flags,
 					  "1<<SMC_DIAG_\?\?\?-1");
-			tprints(", id=");
 			/*
 			 * AF_SMC protocol family socket handler
 			 * keeping the AF_INET sock address.
 			 */
-			print_inet_diag_sockid(&req.id, AF_INET);
+			PRINT_FIELD_INET_DIAG_SOCKID(", ", req, id, AF_INET);
 		}
 	} else
 		tprints("...");
@@ -916,12 +921,11 @@ decode_smc_diag_msg(struct tcb *const tcp,
 					 smc_states, "SMC_???");
 			PRINT_FIELD_U(", ", msg, diag_fallback);
 			PRINT_FIELD_U(", ", msg, diag_shutdown);
-			tprints(", id=");
 			/*
 			 * AF_SMC protocol family socket handler
 			 * keeping the AF_INET sock address.
 			 */
-			print_inet_diag_sockid(&msg.id, AF_INET);
+			PRINT_FIELD_INET_DIAG_SOCKID(", ", msg, id, AF_INET);
 			PRINT_FIELD_U(", ", msg, diag_uid);
 			PRINT_FIELD_U(", ", msg, diag_inode);
 			decode_nla = true;
