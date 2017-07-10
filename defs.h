@@ -1041,10 +1041,12 @@ scno_is_valid(kernel_ulong_t scno)
  * kernel-userspace ABI and now must be maintained forever.  This matches
  * what the kernel exports for each architecture so we don't need to cast
  * every printing of __u64 or __s64 to stdint types.
+ * The exception is Android, where for MIPS64 unsigned long long is used.
  */
 #if SIZEOF_LONG == 4
 # define PRI__64 "ll"
-#elif defined ALPHA || defined IA64 || defined MIPS || defined POWERPC
+#elif defined ALPHA || defined IA64 || defined POWERPC || \
+      (defined MIPS && !defined __ANDROID__)
 # define PRI__64 "l"
 #else
 # define PRI__64 "ll"
