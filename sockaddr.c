@@ -158,7 +158,7 @@ print_sockaddr_data_ipx(const void *const buf, const int addrlen)
 		tprintf("%s%#02x", i ? ", " : "",
 			sa_ipx->sipx_node[i]);
 	}
-	tprintf("], sipx_type=%#02x", sa_ipx->sipx_type);
+	PRINT_FIELD_0X("], ", *sa_ipx, sipx_type);
 }
 
 static void
@@ -166,8 +166,8 @@ print_sockaddr_data_nl(const void *const buf, const int addrlen)
 {
 	const struct sockaddr_nl *const sa_nl = buf;
 
-	tprintf("nl_pid=%d, nl_groups=%#08x",
-		sa_nl->nl_pid, sa_nl->nl_groups);
+	PRINT_FIELD_D("", *sa_nl, nl_pid);
+	PRINT_FIELD_0X(", ", *sa_nl, nl_groups);
 }
 
 static void

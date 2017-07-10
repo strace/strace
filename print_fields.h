@@ -48,6 +48,11 @@
 	STRACE_PRINTF("%s%s=%#llx", (prefix_), #field_,			\
 		      zero_extend_signed_to_ull((where_).field_))
 
+#define PRINT_FIELD_0X(prefix_, where_, field_)				\
+	STRACE_PRINTF("%s%s=%#0*llx", (prefix_), #field_,		\
+		      (int) sizeof((where_).field_) * 2,		\
+		      zero_extend_signed_to_ull((where_).field_))
+
 #define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
 	STRACE_PRINTF("%s%s=[%llu, %llu]", (prefix_), #field_,		\
 		      zero_extend_signed_to_ull((where_).field_[0]),	\
