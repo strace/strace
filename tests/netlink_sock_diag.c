@@ -939,8 +939,8 @@ test_inet_diag_sockid(const int fd)
 	       ", {sdiag_family=AF_INET, sdiag_protocol=IPPROTO_TCP"
 	       ", idiag_ext=1<<(INET_DIAG_CONG-1)"
 	       ", idiag_states=1<<TCP_CLOSE, id={idiag_sport=htons(%u)"
-	       ", idiag_dport=htons(%u), inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst), idiag_if=%u"
+	       ", idiag_dport=htons(%u), idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\"), idiag_if=%u"
 	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
 	       ntohs(0xfacd), ntohs(0xdead), address, address,
@@ -1065,8 +1065,8 @@ test_inet_diag_req(const int fd)
 	       ", {idiag_family=AF_INET, idiag_src_len=%u"
 	       ", idiag_dst_len=%u, idiag_ext=1<<(INET_DIAG_TOS-1)"
 	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\")"
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
 	       ", idiag_states=1<<TCP_LAST_ACK, idiag_dbs=%u}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
@@ -1185,8 +1185,8 @@ test_inet_diag_req_v2(const int fd)
 	       ", {sdiag_family=AF_INET, sdiag_protocol=IPPROTO_TCP"
 	       ", idiag_ext=1<<(INET_DIAG_CONG-1)"
 	       ", idiag_states=1<<TCP_CLOSE, id={idiag_sport=htons(%u)"
-	       ", idiag_dport=htons(%u), inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst), idiag_if=%u"
+	       ", idiag_dport=htons(%u), idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\"), idiag_if=%u"
 	       ", idiag_cookie=[%u, %u]}}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
 	       ntohs(0xfacd), ntohs(0xdead), address, address,
@@ -1307,8 +1307,8 @@ test_inet_diag_msg(const int fd)
 	       ", {idiag_family=AF_INET, idiag_state=TCP_LISTEN"
 	       ", idiag_timer=%u, idiag_retrans=%u"
 	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\")"
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
 	       ", idiag_expires=%u, idiag_rqueue=%u, idiag_wqueue=%u"
 	       ", idiag_uid=%u, idiag_inode=%u}}"
@@ -1426,8 +1426,8 @@ test_smc_diag_req(const int fd)
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}, {diag_family=AF_SMC"
 	       ", diag_ext=1<<(SMC_DIAG_CONNINFO-1)"
 	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\")"
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, NLMSG_HDRLEN + (unsigned int) sizeof(*req),
@@ -1545,8 +1545,8 @@ test_smc_diag_msg(const int fd)
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {diag_family=AF_SMC"
 	       ", diag_state=SMC_ACTIVE, diag_fallback=%u, diag_shutdown=%u"
 	       ", id={idiag_sport=htons(%u), idiag_dport=htons(%u)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\")"
 	       ", idiag_if=%u, idiag_cookie=[%u, %u]}"
 	       ", diag_uid=%u, diag_inode=%u}}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",

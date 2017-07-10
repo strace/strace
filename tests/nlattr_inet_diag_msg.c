@@ -73,8 +73,8 @@ print_inet_diag_msg(const unsigned int msg_len)
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {idiag_family=AF_INET"
 	       ", idiag_state=TCP_LISTEN, idiag_timer=0, idiag_retrans=0"
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\")"
 	       ", idiag_if=if_nametoindex(\"lo\"), idiag_cookie=[0, 0]}"
 	       ", idiag_expires=0, idiag_rqueue=0, idiag_wqueue=0"
 	       ", idiag_uid=0, idiag_inode=0}",

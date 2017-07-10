@@ -89,26 +89,27 @@ print_inet_addr(const int af,
 		const unsigned int len,
 		const char *const var_name)
 {
-	const char *af_name = NULL;
 	char buf[INET6_ADDRSTRLEN];
 
 	switch (af) {
 	case AF_INET:
-		af_name = "AF_INET";
+		if (inet_ntop(af, addr, buf, sizeof(buf))) {
+			tprintf("%s=inet_addr(\"%s\")", var_name, buf);
+			return true;
+		}
 		break;
 	case AF_INET6:
-		af_name = "AF_INET6";
+		if (inet_ntop(af, addr, buf, sizeof(buf))) {
+			tprintf("inet_pton(%s, \"%s\", &%s)",
+				"AF_INET6", buf, var_name);
+			return true;
+		}
 		break;
 	}
 
-	if (af_name && inet_ntop(af, addr, buf, sizeof(buf))) {
-		tprintf("inet_pton(%s, \"%s\", &%s)", af_name, buf, var_name);
-		return true;
-	} else {
-		tprintf("%s=", var_name);
-		print_quoted_string(addr, len, 0);
-		return false;
-	}
+	tprintf("%s=", var_name);
+	print_quoted_string(addr, len, 0);
+	return false;
 }
 
 static void

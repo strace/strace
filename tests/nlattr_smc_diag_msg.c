@@ -77,8 +77,8 @@ print_smc_diag_msg(const unsigned int msg_len)
 	       ", {diag_family=AF_SMC, diag_state=SMC_ACTIVE"
 	       ", diag_fallback=0, diag_shutdown=0"
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_src)"
-	       ", inet_pton(AF_INET, \"%s\", &idiag_dst)"
+	       ", idiag_src=inet_addr(\"%s\")"
+	       ", idiag_dst=inet_addr(\"%s\")"
 	       ", idiag_if=0, idiag_cookie=[0, 0]}"
 	       ", diag_uid=0, diag_inode=0}",
 	       msg_len, address, address);
