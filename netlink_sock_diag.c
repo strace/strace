@@ -487,7 +487,7 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 	PRINT_FIELD_U(", ", *dml, pdmc_count);
 	PRINT_FIELD_U(", ", *dml, pdmc_type);
 	PRINT_FIELD_U(", ", *dml, pdmc_alen);
-	PRINT_FIELD_QUOTED_STRING(", ", *dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
+	PRINT_FIELD_STRING(", ", *dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
 	tprints("}");
 
 	return true;
@@ -964,16 +964,16 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 
 	tprints("{lnk[0]={");
 	PRINT_FIELD_U("", linfo.lnk[0], link_id);
-	PRINT_FIELD_QUOTED_STRING(", ", linfo.lnk[0], ibname,
-				  sizeof(linfo.lnk[0].ibname),
-				  QUOTE_0_TERMINATED);
+	PRINT_FIELD_STRING(", ", linfo.lnk[0], ibname,
+			   sizeof(linfo.lnk[0].ibname),
+			   QUOTE_0_TERMINATED);
 	PRINT_FIELD_U(", ", linfo.lnk[0], ibport);
-	PRINT_FIELD_QUOTED_STRING(", ", linfo.lnk[0], gid,
-				  sizeof(linfo.lnk[0].gid),
-				  QUOTE_0_TERMINATED);
-	PRINT_FIELD_QUOTED_STRING(", ", linfo.lnk[0], peer_gid,
-				  sizeof(linfo.lnk[0].peer_gid),
-				  QUOTE_0_TERMINATED);
+	PRINT_FIELD_STRING(", ", linfo.lnk[0], gid,
+			   sizeof(linfo.lnk[0].gid),
+			   QUOTE_0_TERMINATED);
+	PRINT_FIELD_STRING(", ", linfo.lnk[0], peer_gid,
+			   sizeof(linfo.lnk[0].peer_gid),
+			   QUOTE_0_TERMINATED);
 	PRINT_FIELD_XVAL("}, ", linfo, role, smc_link_group_roles, "SMC_???");
 	tprints("}");
 
