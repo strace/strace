@@ -32,10 +32,10 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #ifdef HAVE_LINUX_DM_IOCTL_H
 
+# include "print_fields.h"
 # include <linux/dm-ioctl.h>
 # include <linux/ioctl.h>
 
@@ -63,19 +63,15 @@ dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
 	case DM_LIST_VERSIONS:
 		break;
 	default:
-		if (ioc->dev) {
+		if (ioc->dev)
 			PRINT_FIELD_DEV(", ", *ioc, dev);
-		}
-		if (ioc->name[0]) {
-			tprints(", name=");
-			print_quoted_string(ioc->name, DM_NAME_LEN,
-					    QUOTE_0_TERMINATED);
-		}
-		if (ioc->uuid[0]) {
-			tprints(", uuid=");
-			print_quoted_string(ioc->uuid, DM_UUID_LEN,
-					    QUOTE_0_TERMINATED);
-		}
+
+		if (ioc->name[0])
+			PRINT_FIELD_CSTRING(", ", *ioc, name);
+
+		if (ioc->uuid[0])
+			PRINT_FIELD_CSTRING(", ", *ioc, uuid);
+
 		break;
 	}
 }
@@ -177,9 +173,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (exiting(tcp))
 			tprintf(", status=%" PRId32, s.status);
 
-		tprints(", target_type=");
-		print_quoted_string(s.target_type, DM_MAX_TYPE_NAME,
-				    QUOTE_0_TERMINATED);
+		PRINT_FIELD_CSTRING(", ", s, target_type);
 
 		tprints(", string=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,

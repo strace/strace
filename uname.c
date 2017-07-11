@@ -30,7 +30,7 @@
  */
 
 #include "defs.h"
-
+#include "print_fields.h"
 #include <sys/utsname.h>
 
 SYS_FUNC(uname)
@@ -41,24 +41,17 @@ SYS_FUNC(uname)
 		return 0;
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &uname)) {
-#define PRINT_UTS_MEMBER(prefix, member)				\
-	do {								\
-		tprints(prefix #member "=");				\
-		print_quoted_string(uname.member, sizeof(uname.member),	\
-				    QUOTE_0_TERMINATED);		\
-	} while (0)
-
-		PRINT_UTS_MEMBER("{", sysname);
-		PRINT_UTS_MEMBER(", ", nodename);
+		PRINT_FIELD_CSTRING("{", uname, sysname);
+		PRINT_FIELD_CSTRING(", ", uname, nodename);
 		if (abbrev(tcp)) {
 			tprints(", ...}");
 			return 0;
 		}
-		PRINT_UTS_MEMBER(", ", release);
-		PRINT_UTS_MEMBER(", ", version);
-		PRINT_UTS_MEMBER(", ", machine);
+		PRINT_FIELD_CSTRING(", ", uname, release);
+		PRINT_FIELD_CSTRING(", ", uname, version);
+		PRINT_FIELD_CSTRING(", ", uname, machine);
 #ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
-		PRINT_UTS_MEMBER(", ", domainname);
+		PRINT_FIELD_CSTRING(", ", uname, domainname);
 #endif
 		tprints("}");
 	}

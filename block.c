@@ -66,6 +66,8 @@ typedef struct blk_user_trace_setup {
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
+
 #ifndef BLKPG
 # define BLKPG      _IO(0x12, 105)
 #endif
@@ -131,13 +133,10 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 
 	if (!umove_or_printaddr(tcp, ptr_to_kulong(blkpg->data), &p)) {
 		tprintf("{start=%" PRId64 ", length=%" PRId64
-			", pno=%d, devname=",
+			", pno=%d",
 			p.start, p.length, p.pno);
-		print_quoted_string(p.devname, sizeof(p.devname),
-				    QUOTE_0_TERMINATED);
-		tprints(", volname=");
-		print_quoted_string(p.volname, sizeof(p.volname),
-				    QUOTE_0_TERMINATED);
+		PRINT_FIELD_CSTRING(", ", p, devname);
+		PRINT_FIELD_CSTRING(", ", p, volname);
 		tprints("}");
 	}
 	tprints("}");
@@ -250,11 +249,8 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		} else {
 			struct_blk_user_trace_setup buts;
 
-			if (!syserror(tcp) && !umove(tcp, arg, &buts)) {
-				tprints(", name=");
-				print_quoted_string(buts.name, sizeof(buts.name),
-						    QUOTE_0_TERMINATED);
-			}
+			if (!syserror(tcp) && !umove(tcp, arg, &buts))
+				PRINT_FIELD_CSTRING(", ", buts, name);
 			tprints("}");
 			break;
 		}

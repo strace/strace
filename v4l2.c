@@ -57,6 +57,8 @@ typedef struct v4l2_standard struct_v4l2_standard;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
+
 /* some historical constants */
 #ifndef V4L2_CID_HCENTER
 #define V4L2_CID_HCENTER (V4L2_CID_BASE+22)
@@ -145,15 +147,9 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", ");
 	if (umove_or_printaddr(tcp, arg, &caps))
 		return 1;
-	tprints("{driver=");
-	print_quoted_string((const char *) caps.driver,
-			    sizeof(caps.driver), QUOTE_0_TERMINATED);
-	tprints(", card=");
-	print_quoted_string((const char *) caps.card,
-			    sizeof(caps.card), QUOTE_0_TERMINATED);
-	tprints(", bus_info=");
-	print_quoted_string((const char *) caps.bus_info,
-			    sizeof(caps.bus_info), QUOTE_0_TERMINATED);
+	PRINT_FIELD_CSTRING("{", caps, driver);
+	PRINT_FIELD_CSTRING(", ", caps, card);
+	PRINT_FIELD_CSTRING(", ", caps, bus_info);
 	tprintf(", version=%u.%u.%u, capabilities=",
 		(caps.version >> 16) & 0xFF,
 		(caps.version >> 8) & 0xFF,
@@ -190,10 +186,7 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", flags=");
 		printflags(v4l2_format_description_flags, f.flags,
 			   "V4L2_FMT_FLAG_???");
-		tprints(", description=");
-		print_quoted_string((const char *) f.description,
-				    sizeof(f.description),
-				    QUOTE_0_TERMINATED);
+		PRINT_FIELD_CSTRING(", ", f, description);
 		tprints(", pixelformat=");
 		print_pixelformat(f.pixelformat);
 	}
@@ -562,10 +555,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprintf("{index=%u", s.index);
 	} else {
 		if (!syserror(tcp) && !umove(tcp, arg, &s)) {
-			tprints(", name=");
-			print_quoted_string((const char *) s.name,
-					    sizeof(s.name),
-					    QUOTE_0_TERMINATED);
+			PRINT_FIELD_CSTRING(", ", s, name);
 			tprintf(", frameperiod=" FMT_FRACT,
 				ARGS_FRACT(s.frameperiod));
 			tprintf(", framelines=%d", s.framelines);
@@ -589,10 +579,7 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprintf("{index=%u", i.index);
 	} else {
 		if (!syserror(tcp) && !umove(tcp, arg, &i)) {
-			tprints(", name=");
-			print_quoted_string((const char *) i.name,
-					    sizeof(i.name),
-					    QUOTE_0_TERMINATED);
+			PRINT_FIELD_CSTRING(", ", i, name);
 			tprints(", type=");
 			printxval(v4l2_input_types, i.type,
 				  "V4L2_INPUT_TYPE_???");
@@ -656,9 +643,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(is_get ? ", " : " => ");
 	}
 
-	tprints("name=");
-	print_quoted_string((const char *) c.name, sizeof(c.name),
-			    QUOTE_0_TERMINATED);
+	PRINT_FIELD_CSTRING("", c, name);
 	tprints(", type=");
 	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_TYPE_???");
 	tprints(", capability=");
@@ -715,10 +700,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (exiting(tcp)) {
 		tprints(", type=");
 		printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
-		tprints(", name=");
-		print_quoted_string((const char *) c.name,
-				    sizeof(c.name),
-				    QUOTE_0_TERMINATED);
+		PRINT_FIELD_CSTRING(", ", c, name);
 		tprintf(", minimum=%d, maximum=%d, step=%d"
 			", default_value=%d, flags=",
 			c.minimum, c.maximum, c.step, c.default_value);
