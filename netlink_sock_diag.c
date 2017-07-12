@@ -120,6 +120,13 @@ print_meminfo(struct tcb *const tcp,
 	      const size_t elem_size,
 	      void *const opaque_data)
 {
+	unsigned int *const count = opaque_data;
+
+	if ((*count)++ >= SK_MEMINFO_VARS) {
+		tprints("...");
+		return false;
+	}
+
 	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
 
 	return true;
@@ -137,11 +144,9 @@ decode_meminfo(struct tcb *const tcp,
 	if (!nmemb)
 		return false;
 
-	if (nmemb > SK_MEMINFO_VARS)
-		nmemb = SK_MEMINFO_VARS;
-
+	unsigned int count = 0;
 	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
-		    umoven_or_printaddr, print_meminfo, 0);
+		    umoven_or_printaddr, print_meminfo, &count);
 
 	return true;
 }
