@@ -275,7 +275,7 @@ static void
 test_netlink_diag_req(const int fd)
 {
 	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
-	static const struct netlink_diag_req req = {
+	struct netlink_diag_req req = {
 		.sdiag_family = AF_NETLINK,
 		.sdiag_protocol = NDIAG_PROTO_ALL,
 		.ndiag_ino = 0xfacefeed,
@@ -288,6 +288,17 @@ test_netlink_diag_req(const int fd)
 		       printf(", sdiag_protocol=NDIAG_PROTO_ALL");
 		       PRINT_FIELD_U(", ", req, ndiag_ino);
 		       printf(", ndiag_show=NDIAG_SHOW_MEMINFO");
+		       PRINT_FIELD_COOKIE(", ", req, ndiag_cookie);
+		       printf("}"));
+
+	req.sdiag_protocol = NETLINK_ROUTE;
+	req.ndiag_show = NDIAG_SHOW_GROUPS;
+	TEST_SOCK_DIAG(fd, nlh0, AF_NETLINK,
+		       SOCK_DIAG_BY_FAMILY, NLM_F_REQUEST, req,
+		       printf("{sdiag_family=AF_NETLINK"),
+		       printf(", sdiag_protocol=NETLINK_ROUTE");
+		       PRINT_FIELD_U(", ", req, ndiag_ino);
+		       printf(", ndiag_show=NDIAG_SHOW_GROUPS");
 		       PRINT_FIELD_COOKIE(", ", req, ndiag_cookie);
 		       printf("}"));
 }
