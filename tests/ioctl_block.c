@@ -154,7 +154,7 @@ main(void)
 	blkpg->data = (void *) (unsigned long) 0xcafef00dfffffeedULL;
 
 	ioctl(-1, BLKPG, blkpg);
-	printf("ioctl(-1, BLKPG, {%s, flags=%d, datalen=%d"
+	printf("ioctl(-1, BLKPG, {op=%s, flags=%d, datalen=%d"
 	       ", data=%#lx}) = -1 EBADF (%m)\n",
 	       "BLKPG_RESIZE_PARTITION", blkpg->flags, blkpg->datalen,
 	       (unsigned long) blkpg->data);
@@ -169,7 +169,7 @@ main(void)
 	blkpg->data = bp;
 
 	ioctl(-1, BLKPG, blkpg);
-	printf("ioctl(-1, BLKPG, {%s, flags=%d, datalen=%d"
+	printf("ioctl(-1, BLKPG, {op=%s, flags=%d, datalen=%d"
 	       ", data={start=%lld, length=%lld, pno=%d"
 	       ", devname=\"%.*s\", volname=\"%.*s\"}})"
 	       " = -1 EBADF (%m)\n",
