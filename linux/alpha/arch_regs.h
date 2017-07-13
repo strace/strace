@@ -3,3 +3,5 @@
 #define REG_A3 19
 #define REG_FP 30
 #define REG_PC 64
+
+#define ARCH_USE_NEGATED_ERRNO

@@ -1,3 +1,4 @@
+
 struct mips_regs {
 	uint64_t uregs[38];
 };
@@ -16,3 +17,5 @@ extern struct mips_regs mips_regs;
 #define mips_REG_A5 mips_regs.uregs[REG_A0 + 5]
 #define mips_REG_SP mips_regs.uregs[29]
 #define mips_REG_EPC mips_regs.uregs[34]
+
+#define ARCH_USE_NEGATED_ERRNO
