@@ -1047,26 +1047,6 @@ restore_cleared_syserror(struct tcb *tcp)
 	tcp->u_error = saved_u_error;
 }
 
-/*
- * Check the syscall return value register value for whether it is
- * a negated errno code indicating an error, or a success return value.
- */
-static inline bool
-is_negated_errno(kernel_ulong_t val)
-{
-	/* Linux kernel defines MAX_ERRNO to 4095. */
-	kernel_ulong_t max = -(kernel_long_t) 4095;
-
-#ifndef current_klongsize
-	if (current_klongsize < sizeof(val)) {
-		val = (uint32_t) val;
-		max = (uint32_t) max;
-	}
-#endif /* !current_klongsize */
-
-	return val >= max;
-}
-
 #include "arch_regs.c"
 
 #ifdef HAVE_GETRVAL2

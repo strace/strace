@@ -1,3 +1,5 @@
+#include "negated_errno.h"
+
 #define get_error arm_get_error
 #include "arm/get_error.c"
 #undef get_error
