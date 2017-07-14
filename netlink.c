@@ -327,6 +327,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 }
 
 static const netlink_decoder_t netlink_decoders[] = {
+	[NETLINK_SELINUX] = decode_netlink_selinux,
 	[NETLINK_SOCK_DIAG] = decode_netlink_sock_diag
 };
 
