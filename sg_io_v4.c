@@ -30,6 +30,7 @@
 
 #ifdef HAVE_LINUX_BSG_H
 
+# include "print_fields.h"
 # include <linux/bsg.h>
 # include "xlat/bsg_protocol.h"
 # include "xlat/bsg_subprotocol.h"
@@ -47,6 +48,12 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
+#define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
+	do {									\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		print_sg_io_buffer((tcp_), (where_).field_, (size_), (count_));	\
+	} while (0)
+
 static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -60,30 +67,28 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_DECODED | 1;
 	}
 
-	tprints("protocol=");
-	printxval(bsg_protocol, sg_io.protocol, "BSG_PROTOCOL_???");
-	tprints(", subprotocol=");
-	printxval(bsg_subprotocol, sg_io.subprotocol, "BSG_SUB_PROTOCOL_???");
-	tprintf(", request_len=%u, request=", sg_io.request_len);
-	print_sg_io_buffer(tcp, sg_io.request, sg_io.request_len, 0);
-	tprintf(", request_tag=%#" PRI__x64, sg_io.request_tag);
-	tprintf(", request_attr=%u", sg_io.request_attr);
-	tprintf(", request_priority=%u", sg_io.request_priority);
-	tprintf(", request_extra=%u", sg_io.request_extra);
-	tprintf(", max_response_len=%u", sg_io.max_response_len);
+	PRINT_FIELD_XVAL("", sg_io, protocol, bsg_protocol, "BSG_PROTOCOL_???");
+	PRINT_FIELD_XVAL(", ", sg_io, subprotocol, bsg_subprotocol,
+			 "BSG_SUB_PROTOCOL_???");
+	PRINT_FIELD_U(", ", sg_io, request_len);
+	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, request, sg_io.request_len,
+				 0, tcp);
+	PRINT_FIELD_X(", ", sg_io, request_tag);
+	PRINT_FIELD_U(", ", sg_io, request_attr);
+	PRINT_FIELD_U(", ", sg_io, request_priority);
+	PRINT_FIELD_U(", ", sg_io, request_extra);
+	PRINT_FIELD_U(", ", sg_io, max_response_len);
 
-	tprintf(", dout_iovec_count=%u", sg_io.dout_iovec_count);
-	tprintf(", dout_xfer_len=%u", sg_io.dout_xfer_len);
-	tprintf(", din_iovec_count=%u", sg_io.din_iovec_count);
-	tprintf(", din_xfer_len=%u", sg_io.din_xfer_len);
-	tprints(", dout_xferp=");
-	print_sg_io_buffer(tcp, sg_io.dout_xferp, sg_io.dout_xfer_len,
-			   sg_io.dout_iovec_count);
+	PRINT_FIELD_U(", ", sg_io, dout_iovec_count);
+	PRINT_FIELD_U(", ", sg_io, dout_xfer_len);
+	PRINT_FIELD_U(", ", sg_io, din_iovec_count);
+	PRINT_FIELD_U(", ", sg_io, din_xfer_len);
+	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, dout_xferp, sg_io.dout_xfer_len,
+				 sg_io.dout_iovec_count, tcp);
 
-	tprintf(", timeout=%u", sg_io.timeout);
-	tprints(", flags=");
-	printflags(bsg_flags, sg_io.flags, "BSG_FLAG_???");
-	tprintf(", usr_ptr=%#" PRI__x64, sg_io.usr_ptr);
+	PRINT_FIELD_U(", ", sg_io, timeout);
+	PRINT_FIELD_FLAGS(", ", sg_io, flags, bsg_flags, "BSG_FLAG_???");
+	PRINT_FIELD_X(", ", sg_io, usr_ptr);
 
 	struct sg_io_v4 *entering_sg_io = malloc(sizeof(*entering_sg_io));
 	if (entering_sg_io) {
@@ -104,37 +109,34 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (umove(tcp, arg, &sg_io) < 0) {
 		/* print i/o fields fetched on entering syscall */
-		tprints(", response=");
-		printaddr(entering_sg_io->response);
-		tprints(", din_xferp=");
-		printaddr(entering_sg_io->din_xferp);
+		PRINT_FIELD_X(", ", *entering_sg_io, response);
+		PRINT_FIELD_X(", ", *entering_sg_io, din_xferp);
 		return RVAL_DECODED | 1;
 	}
 
 	if (sg_io.guard != entering_sg_io->guard) {
-		tprintf(" => guard=%u", sg_io.guard);
+		PRINT_FIELD_U(" => ", sg_io, guard);
 		return RVAL_DECODED | 1;
 	}
 
-	tprintf(", response_len=%u, response=", sg_io.response_len);
-	print_sg_io_buffer(tcp, sg_io.response, sg_io.response_len, 0);
+	PRINT_FIELD_U(", ", sg_io, response_len);
+	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, response, sg_io.response_len,
+				 0, tcp);
 	din_len = sg_io.din_xfer_len;
 	if (sg_io.din_resid > 0 && (unsigned int) sg_io.din_resid <= din_len)
 		din_len -= sg_io.din_resid;
-	tprints(", din_xferp=");
-	print_sg_io_buffer(tcp, sg_io.din_xferp, din_len,
-			   sg_io.din_iovec_count);
-	tprintf(", driver_status=%#x", sg_io.driver_status);
-	tprintf(", transport_status=%#x", sg_io.transport_status);
-	tprintf(", device_status=%#x", sg_io.device_status);
-	tprintf(", retry_delay=%u", sg_io.retry_delay);
-	tprints(", info=");
-	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
-	tprintf(", duration=%u", sg_io.duration);
-	tprintf(", response_len=%u", sg_io.response_len);
-	tprintf(", din_resid=%d", sg_io.din_resid);
-	tprintf(", dout_resid=%d", sg_io.dout_resid);
-	tprintf(", generated_tag=%#" PRI__x64, sg_io.generated_tag);
+	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, din_xferp, din_len,
+				 sg_io.din_iovec_count, tcp);
+	PRINT_FIELD_X(", ", sg_io, driver_status);
+	PRINT_FIELD_X(", ", sg_io, transport_status);
+	PRINT_FIELD_X(", ", sg_io, device_status);
+	PRINT_FIELD_U(", ", sg_io, retry_delay);
+	PRINT_FIELD_FLAGS(", ", sg_io, info, sg_io_info, "SG_INFO_???");
+	PRINT_FIELD_U(", ", sg_io, duration);
+	PRINT_FIELD_U(", ", sg_io, response_len);
+	PRINT_FIELD_D(", ", sg_io, din_resid);
+	PRINT_FIELD_D(", ", sg_io, dout_resid);
+	PRINT_FIELD_X(", ", sg_io, generated_tag);
 
 	return RVAL_DECODED | 1;
 }
