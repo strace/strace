@@ -49,6 +49,7 @@
 # else
 #  define MPERS_DEFS "native_defs.h"
 # endif
+typedef unsigned long mpers_ptr_t;
 #endif
 
 #endif /* !STRACE_MPERS_TYPE_H */
