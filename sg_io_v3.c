@@ -44,6 +44,7 @@ typedef struct sg_io_hdr struct_sg_io_hdr;
 #include "xlat/sg_io_info.h"
 
 #ifdef HAVE_SCSI_SG_H
+# include "print_fields.h"
 # include "xlat/sg_io_dxfer_direction.h"
 # include "xlat/sg_io_flags.h"
 
@@ -59,6 +60,13 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
+#define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
+	do {									\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		print_sg_io_buffer((tcp_), (mpers_ptr_t)((where_).field_),	\
+				   (size_), (count_));				\
+	} while (0)
+
 static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -73,23 +81,19 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_DECODED | 1;
 	}
 
-	tprints("dxfer_direction=");
-	printxval(sg_io_dxfer_direction, sg_io.dxfer_direction,
-		  "SG_DXFER_???");
-	tprintf(", cmd_len=%u, cmdp=", sg_io.cmd_len);
-	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.cmdp), sg_io.cmd_len, 0);
-	tprintf(", mx_sb_len=%d", sg_io.mx_sb_len);
-	tprintf(", iovec_count=%d", sg_io.iovec_count);
-	tprintf(", dxfer_len=%u", sg_io.dxfer_len);
-	tprintf(", timeout=%u", sg_io.timeout);
-	tprints(", flags=");
-	printflags(sg_io_flags, sg_io.flags, "SG_FLAG_???");
+	PRINT_FIELD_XVAL("", sg_io, dxfer_direction, sg_io_dxfer_direction,
+			 "SG_DXFER_???");
+	PRINT_FIELD_U(", ", sg_io, cmd_len);
+	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, cmdp, sg_io.cmd_len, 0, tcp);
+	PRINT_FIELD_U(", ", sg_io, mx_sb_len);
+	PRINT_FIELD_U(", ", sg_io, iovec_count);
+	PRINT_FIELD_U(", ", sg_io, dxfer_len);
+	PRINT_FIELD_U(", ", sg_io, timeout);
+	PRINT_FIELD_FLAGS(", ", sg_io, flags, sg_io_flags, "SG_FLAG_???");
 
 	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
-		tprints(", dxferp=");
-		print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-				   sg_io.dxfer_len, sg_io.iovec_count);
+		PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, dxferp, sg_io.dxfer_len, sg_io.iovec_count, tcp);
 	}
 
 	struct_sg_io_hdr *entering_sg_io = malloc(sizeof(*entering_sg_io));
@@ -110,47 +114,46 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (umove(tcp, arg, &sg_io) < 0) {
 		/* print i/o fields fetched on entering syscall */
-		if (entering_sg_io->dxfer_direction == SG_DXFER_FROM_DEV) {
-			tprints(", dxferp=");
-			printaddr(ptr_to_kulong(entering_sg_io->dxferp));
-		}
-		tprints(", sbp=");
-		printaddr(ptr_to_kulong(entering_sg_io->sbp));
+		if (entering_sg_io->dxfer_direction == SG_DXFER_FROM_DEV)
+			PRINT_FIELD_PTR(", ", *entering_sg_io, dxferp);
+		PRINT_FIELD_PTR(", ", *entering_sg_io, sbp);
 		return RVAL_DECODED | 1;
 	}
 
 	if (sg_io.interface_id != entering_sg_io->interface_id) {
-		tprintf(" => interface_id=%u", sg_io.interface_id);
+		PRINT_FIELD_U(" => ", sg_io, interface_id);
 		return RVAL_DECODED | 1;
 	}
 
 	if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
 		uint32_t din_len = sg_io.dxfer_len;
+		const char *prefix = NULL;
 
 		if (sg_io.resid > 0 && (unsigned int) sg_io.resid <= din_len)
 			din_len -= sg_io.resid;
-		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV) {
-			tprints(", dxferp=");
-		} else if (din_len) {
-			tprints(" => dxferp=");
-		}
-		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV || din_len) {
-			print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.dxferp),
-					   din_len, sg_io.iovec_count);
+
+		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV)
+			prefix = ", ";
+		else if (din_len)
+			prefix = " => ";
+
+		if (prefix) {
+			tprints(prefix);
+			PRINT_FIELD_SG_IO_BUFFER("", sg_io, dxferp, din_len,
+						 sg_io.iovec_count, tcp);
 		}
 	}
-	tprintf(", status=%#x", sg_io.status);
-	tprintf(", masked_status=%#x", sg_io.masked_status);
-	tprintf(", msg_status=%#x", sg_io.msg_status);
-	tprintf(", sb_len_wr=%u, sbp=", sg_io.sb_len_wr);
-	print_sg_io_buffer(tcp, ptr_to_kulong(sg_io.sbp), sg_io.sb_len_wr, 0);
-	tprintf(", host_status=%#x", sg_io.host_status);
-	tprintf(", driver_status=%#x", sg_io.driver_status);
-	tprintf(", resid=%d", sg_io.resid);
-	tprintf(", duration=%u", sg_io.duration);
-	tprints(", info=");
-	printflags(sg_io_info, sg_io.info, "SG_INFO_???");
+	PRINT_FIELD_X(", ", sg_io, status);
+	PRINT_FIELD_X(", ", sg_io, masked_status);
+	PRINT_FIELD_X(", ", sg_io, msg_status);
+	PRINT_FIELD_U(", ", sg_io, sb_len_wr);
+	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, sbp, sg_io.sb_len_wr, 0, tcp);
+	PRINT_FIELD_X(", ", sg_io, host_status);
+	PRINT_FIELD_X(", ", sg_io, driver_status);
+	PRINT_FIELD_D(", ", sg_io, resid);
+	PRINT_FIELD_U(", ", sg_io, duration);
+	PRINT_FIELD_FLAGS(", ", sg_io, info, sg_io_info, "SG_INFO_???");
 
 	return RVAL_DECODED | 1;
 }
