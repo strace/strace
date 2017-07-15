@@ -30,7 +30,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include "netlink.h"
+#include "test_netlink.h"
 #include <linux/selinux_netlink.h>
 
 static void
@@ -50,6 +50,46 @@ test_nlmsg_type(const int fd)
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
 
+static void
+test_selnl_msg_unspec(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* SELNL_MSG_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      4, "1234", 4,
+		      printf("\"\\x31\\x32\\x33\\x34\""));
+}
+
+static void
+test_selnl_msg_setenforce(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+
+	static const struct selnl_msg_setenforce msg = {
+		.val = 0xfbdcdfab
+	};
+	TEST_NETLINK_OBJECT(fd, nlh0,
+			    SELNL_MSG_SETENFORCE, NLM_F_REQUEST, msg,
+			    PRINT_FIELD_D("{", msg, val);
+			    printf("}"));
+}
+
+static void
+test_selnl_msg_policyload(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+
+	static const struct selnl_msg_policyload msg = {
+		.seqno = 0xabdcfabc
+	};
+	TEST_NETLINK_OBJECT(fd, nlh0,
+			    SELNL_MSG_POLICYLOAD, NLM_F_REQUEST, msg,
+			    PRINT_FIELD_U("{", msg, seqno);
+			    printf("}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -57,6 +97,9 @@ int main(void)
 	int fd = create_nl_socket(NETLINK_SELINUX);
 
 	test_nlmsg_type(fd);
+	test_selnl_msg_unspec(fd);
+	test_selnl_msg_setenforce(fd);
+	test_selnl_msg_policyload(fd);
 
 	printf("+++ exited with 0 +++\n");
 
