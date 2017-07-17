@@ -30,6 +30,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include <linux/aio_abi.h>
 
 SYS_FUNC(io_setup)
@@ -84,12 +85,11 @@ print_common_flags(struct tcb *tcp, const struct iocb *cb)
 {
 /* IOCB_FLAG_RESFD is available since v2.6.22-rc1~47 */
 #ifdef IOCB_FLAG_RESFD
-	if (cb->aio_flags & IOCB_FLAG_RESFD) {
-		tprints(", resfd=");
-		printfd(tcp, cb->aio_resfd);
-	}
+	if (cb->aio_flags & IOCB_FLAG_RESFD)
+		PRINT_FIELD_FD(", ", *cb, aio_resfd, tcp);
+
 	if (cb->aio_flags & ~IOCB_FLAG_RESFD)
-		tprintf(", flags=%#x", cb->aio_flags);
+		PRINT_FIELD_X(", ", *cb, aio_flags);
 #endif
 }
 
@@ -106,19 +106,22 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 {
 	enum iocb_sub sub;
 
-	if (cb->aio_data)
-		tprintf("data=%#" PRIx64 ", ",
-			(uint64_t) cb->aio_data);
+	if (cb->aio_data){
+		PRINT_FIELD_X("", *cb, aio_data);
+		tprints(", ");
+	}
 
-	if (cb->aio_key)
-		tprintf("key=%u, ", cb->aio_key);
+	if (cb->aio_key) {
+		PRINT_FIELD_U("", *cb, aio_key);
+		tprints(", ");
+	}
 
+	tprints("aio_lio_opcode=");
 	sub = tprint_lio_opcode(cb->aio_lio_opcode);
 	if (cb->aio_reqprio)
-		tprintf(", reqprio=%hd", cb->aio_reqprio);
+		PRINT_FIELD_D(", ", *cb, aio_reqprio);
 
-	tprints(", fildes=");
-	printfd(tcp, cb->aio_fildes);
+	PRINT_FIELD_FD(", ", *cb, aio_fildes, tcp);
 
 	return sub;
 }
@@ -131,28 +134,27 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 	switch (sub) {
 	case SUB_COMMON:
 		if (cb->aio_lio_opcode == 1 && iocb_is_valid(cb)) {
-			tprints(", str=");
-			printstrn(tcp, cb->aio_buf, cb->aio_nbytes);
+			PRINT_FIELD_STRN(", ", *cb, aio_buf,
+					 cb->aio_nbytes, tcp);
 		} else {
-			tprintf(", buf=%#" PRIx64, (uint64_t) cb->aio_buf);
+			PRINT_FIELD_X(", ", *cb, aio_buf);
 		}
-		tprintf(", nbytes=%" PRIu64 ", offset=%" PRId64,
-			(uint64_t) cb->aio_nbytes, (int64_t) cb->aio_offset);
+		PRINT_FIELD_U(", ", *cb, aio_nbytes);
+		PRINT_FIELD_D(", ", *cb, aio_offset);
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_VECTOR:
 		if (iocb_is_valid(cb)) {
-			tprints(", iovec=");
+			tprints(", aio_buf=");
 			tprint_iov(tcp, cb->aio_nbytes, cb->aio_buf,
 				   cb->aio_lio_opcode == 8
 				   ? IOV_DECODE_STR
 				   : IOV_DECODE_ADDR);
 		} else {
-			tprintf(", buf=%#" PRIx64 ", nbytes=%" PRIu64,
-				(uint64_t) cb->aio_buf,
-				(uint64_t) cb->aio_nbytes);
+			PRINT_FIELD_X(", ", *cb, aio_buf);
+			PRINT_FIELD_U(", ", *cb, aio_nbytes);
 		}
-		tprintf(", offset=%" PRId64, (int64_t) cb->aio_offset);
+		PRINT_FIELD_D(", ", *cb, aio_offset);
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_NONE:
@@ -204,10 +206,11 @@ print_io_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	struct io_event *event = elem_buf;
 
-	tprintf("{data=%#" PRIx64 ", obj=%#" PRIx64
-		", res=%" PRId64 ", res2=%" PRId64 "}",
-		(uint64_t) event->data, (uint64_t) event->obj,
-		(int64_t) event->res, (int64_t) event->res2);
+	PRINT_FIELD_X("{", *event, data);
+	PRINT_FIELD_X(", ", *event, obj);
+	PRINT_FIELD_D(", ", *event, res);
+	PRINT_FIELD_D(", ", *event, res2);
+	tprints("}");
 
 	return true;
 }
