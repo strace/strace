@@ -134,4 +134,16 @@
 		printaddr((mpers_ptr_t) (where_).field_);		\
 	} while (0)
 
+#define PRINT_FIELD_FD(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printfd((tcp_), (where_).field_);			\
+	} while (0)
+
+#define PRINT_FIELD_STRN(prefix_, where_, field_, len_, tcp_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printstrn((tcp_), (where_).field_, (len_));		\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */
