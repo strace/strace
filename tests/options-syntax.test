@@ -28,57 +28,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/init.sh"
-
-check_exit_status_and_stderr()
-{
-	$STRACE "$@" 2> "$LOG" &&
-		dump_log_and_fail_with \
-			"strace $* failed to handle the error properly"
-	match_diff "$LOG" "$EXP" ||
-		dump_log_and_fail_with \
-			"strace $* failed to print expected diagnostics"
-}
-
-check_exit_status_and_stderr_using_grep()
-{
-	$STRACE "$@" 2> "$LOG" &&
-		dump_log_and_fail_with \
-			"strace $* failed to handle the error properly"
-	match_grep "$LOG" "$EXP" ||
-		dump_log_and_fail_with \
-			"strace $* failed to print expected diagnostics"
-}
-
-strace_exp="${STRACE##* }"
-
-check_e()
-{
-	local pattern="$1"; shift
-	cat > "$EXP" << __EOF__
-$strace_exp: $pattern
-__EOF__
-	check_exit_status_and_stderr "$@"
-}
-
-check_e_using_grep()
-{
-	local pattern="$1"; shift
-	cat > "$EXP" << __EOF__
-$strace_exp: $pattern
-__EOF__
-	check_exit_status_and_stderr_using_grep "$@"
-}
-
-check_h()
-{
-	local pattern="$1"; shift
-	cat > "$EXP" << __EOF__
-$strace_exp: $pattern
-Try '$strace_exp -h' for more information.
-__EOF__
-	check_exit_status_and_stderr "$@"
-}
+. "${srcdir=.}/syntax.sh"
 
 check_e "Invalid process id: '0'" -p 0
 check_e "Invalid process id: '-42'" -p -42

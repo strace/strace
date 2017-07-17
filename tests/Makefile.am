@@ -358,6 +358,7 @@ EXTRA_DIST = \
 	strace.supp \
 	struct_flock.c \
 	sun_path.expected \
+	syntax.sh \
 	trace_fstat.in \
 	trace_fstatfs.in \
 	trace_lstat.in \
