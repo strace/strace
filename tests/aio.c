@@ -239,12 +239,12 @@ main(void)
 	if (rc != (long) nr)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%#lx, %u, ["
-	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=pread, aio_reqprio=11"
-	       ", aio_fildes=0, aio_buf=%p, aio_nbytes=%u, aio_offset=%"
-		PRI__d64 "}, "
-	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=pread, aio_reqprio=22"
-	       ", aio_fildes=0, aio_buf=%p, aio_nbytes=%u, aio_offset=%"
-		PRI__d64 "}]) = %s\n",
+	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=IOCB_CMD_PREAD"
+		", aio_reqprio=11, aio_fildes=0, aio_buf=%p, aio_nbytes=%u"
+		", aio_offset=%" PRI__d64
+	       "}, {aio_data=%#" PRI__x64 ", aio_lio_opcode=IOCB_CMD_PREAD"
+		", aio_reqprio=22, aio_fildes=0, aio_buf=%p, aio_nbytes=%u"
+		", aio_offset=%" PRI__d64 "}]) = %s\n",
 	       *ctx, nr,
 	       cb[0].aio_data, data0, sizeof_data0, cb[0].aio_offset,
 	       cb[1].aio_data, data1, sizeof_data1, cb[1].aio_offset,
@@ -300,8 +300,9 @@ main(void)
 	       sprintrc(rc));
 
 	rc = syscall(__NR_io_cancel, *ctx, cbc, ev);
-	printf("io_cancel(%#lx, {aio_data=%#" PRI__x64 ", aio_lio_opcode=pread"
-	       ", aio_reqprio=99, aio_fildes=-42}, %p) = %s\n",
+	printf("io_cancel(%#lx, {aio_data=%#" PRI__x64
+		", aio_lio_opcode=IOCB_CMD_PREAD, aio_reqprio=99"
+		", aio_fildes=-42}, %p) = %s\n",
 	       *ctx, cbc->aio_data, ev, sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, (unsigned long) 0xfacef157beeff00dULL,
@@ -317,21 +318,22 @@ main(void)
 	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
 	printf("io_submit(%#lx, %ld, ["
 	       "{aio_data=%#" PRI__x64 ", aio_key=%u"
-		", aio_lio_opcode=%hu /* SUB_??? */, aio_fildes=%d}"
-		", {aio_key=%u, aio_lio_opcode=pwrite, aio_reqprio=%hd"
+		", aio_lio_opcode=%hu /* IOCB_CMD_??? */, aio_fildes=%d}"
+		", {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE, aio_reqprio=%hd"
 		", aio_fildes=%d, aio_buf=NULL"
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
 # ifdef IOCB_FLAG_RESFD
 		", aio_resfd=%d, aio_flags=%#x"
 # endif
-	       "}, {aio_key=%u, aio_lio_opcode=pwrite, aio_reqprio=%hd"
-		", aio_fildes=%d, aio_buf=%#" PRI__x64
+	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {aio_key=%u, aio_lio_opcode=pwrite, aio_reqprio=%hd"
-		", aio_fildes=%d, aio_buf=\"\\0\\1\\2\\3%.28s\"..."
+	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+		", aio_reqprio=%hd, aio_fildes=%d"
+		", aio_buf=\"\\0\\1\\2\\3%.28s\"..."
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {aio_key=%u, aio_lio_opcode=pwritev, aio_reqprio=%hd"
-		", aio_fildes=%d, aio_buf=%#" PRI__x64
+	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
+		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
 	       "}, {NULL}, {%#lx}, %p]) = %s\n",
 	       *ctx, 1057L,
@@ -354,11 +356,11 @@ main(void)
 	if (rc != (long) nr)
 		perror_msg_and_skip("io_submit");
 	printf("io_submit(%#lx, %u, ["
-	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=preadv"
+	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=IOCB_CMD_PREADV"
 		", aio_reqprio=%hd, aio_fildes=0, "
 		"aio_buf=[{iov_base=%p, iov_len=%u}"
 	       ", {iov_base=%p, iov_len=%u}], aio_offset=%" PRI__d64 "}, "
-	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=preadv"
+	       "{aio_data=%#" PRI__x64 ", aio_lio_opcode=IOCB_CMD_PREADV"
 		", aio_reqprio=%hd, aio_fildes=0"
 		", aio_buf=[{iov_base=%p, iov_len=%u}"
 		", {iov_base=%p, iov_len=%u}], aio_offset=%" PRI__d64 "}"

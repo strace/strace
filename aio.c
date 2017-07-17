@@ -54,21 +54,21 @@ enum iocb_sub {
 };
 
 static enum iocb_sub
-tprint_lio_opcode(unsigned cmd)
+tprint_lio_opcode(unsigned int cmd)
 {
 	static const struct {
 		const char *name;
 		enum iocb_sub sub;
 	} cmds[] = {
-		{ "pread", SUB_COMMON },
-		{ "pwrite", SUB_COMMON },
-		{ "fsync", SUB_NONE },
-		{ "fdsync", SUB_NONE },
-		{ "preadx", SUB_NONE },
-		{ "poll", SUB_NONE },
-		{ "noop", SUB_NONE },
-		{ "preadv", SUB_VECTOR },
-		{ "pwritev", SUB_VECTOR },
+		{ "IOCB_CMD_PREAD", SUB_COMMON },
+		{ "IOCB_CMD_PWRITE", SUB_COMMON },
+		{ "IOCB_CMD_FSYNC", SUB_NONE },
+		{ "IOCB_CMD_FDSYNC", SUB_NONE },
+		{ "IOCB_CMD_PREADX", SUB_NONE },
+		{ "IOCB_CMD_POLL", SUB_NONE },
+		{ "IOCB_CMD_NOOP", SUB_NONE },
+		{ "IOCB_CMD_PREADV", SUB_VECTOR },
+		{ "IOCB_CMD_PWRITEV", SUB_VECTOR },
 	};
 
 	if (cmd < ARRAY_SIZE(cmds)) {
@@ -76,7 +76,7 @@ tprint_lio_opcode(unsigned cmd)
 		return cmds[cmd].sub;
 	}
 	tprintf("%u", cmd);
-	tprints_comment("SUB_???");
+	tprints_comment("IOCB_CMD_???");
 	return SUB_NONE;
 }
 
