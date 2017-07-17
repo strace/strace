@@ -11,6 +11,14 @@ Noteworthy changes in release ?.?? (????-??-??)
     of setsockopt syscall.
   * Implemented decoding of linux socket filter programs specified
     for SO_ATTACH_FILTER and SO_ATTACH_REUSEPORT_CBPF socket options.
+  * Implemented decoding of inet_diag_req_v2, inet_diag_req_compat,
+    packet_diag_msg, and smc_diag_msg netlink attributes of NETLINK_SOCK_DIAG.
+  * Implemented NETLINK_SELINUX protocol specific decoding.
+  * Updated lists of BPF_*, RWF_*, SCM_*, and SO_* constants.
+
+* Bug fixes
+  * Fixed output formatting of blkpg_ioctl_arg, dm_name_list, and iocb
+    structures.
 
 Noteworthy changes in release 4.18 (2017-07-05)
 ===============================================
