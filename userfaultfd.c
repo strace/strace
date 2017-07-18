@@ -27,6 +27,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include <fcntl.h>
 
 #include "xlat/uffd_flags.h"
@@ -51,9 +52,16 @@ SYS_FUNC(userfaultfd)
 static void
 tprintf_uffdio_range(const struct uffdio_range *range)
 {
-	tprintf("{start=%#" PRI__x64 ", len=%#" PRI__x64 "}",
-		range->start, range->len);
+	PRINT_FIELD_X("{", *range, start);
+	PRINT_FIELD_X(", ", *range, len);
+	tprints("}");
 }
+
+#define PRINT_FIELD_UFFDIO_RANGE(prefix_, where_, field_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprintf_uffdio_range(&(where_).field_);			\
+	} while (0)
 
 int
 uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -69,15 +77,14 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			/* Features is intended to contain some flags, but
 			 * there aren't any defined yet.
 			 */
-			tprintf("{api=%#" PRI__x64
-				", features=%#" PRI__x64,
-				ua.api, ua.features);
+			PRINT_FIELD_X("{", ua, api);
+			PRINT_FIELD_X(", ", ua, features);
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &ua)) {
-				tprintf(", features.out=%#" PRI__x64
-					", ioctls=", ua.features);
-				printflags64(uffd_api_flags, ua.ioctls,
-					     "_UFFDIO_???");
+				PRINT_FIELD_X(" => ", ua, features);
+				PRINT_FIELD_FLAGS64(", ", ua, ioctls,
+						    uffd_api_flags,
+						    "_UFFDIO_???");
 			}
 			tprints("}");
 		}
@@ -90,14 +97,14 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uc))
 				return RVAL_DECODED | 1;
-			tprintf("{dst=%#" PRI__x64 ", src=%#" PRI__x64
-				", len=%#" PRI__x64 ", mode=",
-				uc.dst, uc.src, uc.len);
-			printflags64(uffd_copy_flags, uc.mode,
-				     "UFFDIO_COPY_???");
+			PRINT_FIELD_X("{", uc, dst);
+			PRINT_FIELD_X(", ", uc, src);
+			PRINT_FIELD_X(", ", uc, len);
+			PRINT_FIELD_FLAGS64(", ", uc, mode, uffd_copy_flags,
+					    "UFFDIO_COPY_???");
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &uc))
-				tprintf(", copy=%#" PRI__x64, uc.copy);
+				PRINT_FIELD_X(", ", uc, copy);
 			tprints("}");
 		}
 		return 1;
@@ -109,16 +116,15 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ur))
 				return RVAL_DECODED | 1;
-			tprints("{range=");
-			tprintf_uffdio_range(&ur.range);
-			tprints(", mode=");
-			printflags64(uffd_register_mode_flags, ur.mode,
-				     "UFFDIO_REGISTER_MODE_???");
+			PRINT_FIELD_UFFDIO_RANGE("{", ur, range);
+			PRINT_FIELD_FLAGS64(", ", ur, mode,
+					    uffd_register_mode_flags,
+					    "UFFDIO_REGISTER_MODE_???");
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &ur)) {
-				tprints(", ioctls=");
-				printflags64(uffd_register_ioctl_flags,
-					     ur.ioctls, "UFFDIO_???");
+				PRINT_FIELD_FLAGS64(", ", ur, ioctls,
+						    uffd_register_ioctl_flags,
+						    "UFFDIO_???");
 			}
 			tprints("}");
 		}
@@ -140,14 +146,12 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uz))
 				return RVAL_DECODED | 1;
-			tprints("{range=");
-			tprintf_uffdio_range(&uz.range);
-			tprints(", mode=");
-			printflags64(uffd_zeropage_flags, uz.mode,
-				     "UFFDIO_ZEROPAGE_???");
+			PRINT_FIELD_UFFDIO_RANGE("{", uz, range);
+			PRINT_FIELD_FLAGS64(", ", uz, mode, uffd_zeropage_flags,
+					    "UFFDIO_ZEROPAGE_???");
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &uz))
-				tprintf(", zeropage=%#" PRI__x64, uz.zeropage);
+				PRINT_FIELD_X(", ", uz, zeropage);
 			tprints("}");
 		}
 		return 1;
