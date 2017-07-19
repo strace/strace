@@ -32,6 +32,7 @@
 #include <linux/audit.h>
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
+#include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_flags.h"
 #include "xlat/netlink_get_flags.h"
 #include "xlat/netlink_new_flags.h"
@@ -196,8 +197,11 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
 {
 	const struct xlat *table = NULL;
 
-	if (type == NLMSG_DONE)
+	if (type < NLMSG_MIN_TYPE) {
+		if (type == NLMSG_ERROR)
+			table = netlink_ack_flags;
 		goto end;
+	}
 
 	switch (family) {
 	case NETLINK_CRYPTO:
