@@ -69,6 +69,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case UFFDIO_API: {
+		uint64_t *entering_features;
 		struct uffdio_api ua;
 		if (entering(tcp)) {
 			tprints(", ");
@@ -79,9 +80,18 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			 */
 			PRINT_FIELD_X("{", ua, api);
 			PRINT_FIELD_X(", ", ua, features);
+			entering_features = malloc(sizeof(*entering_features));
+			if (entering_features) {
+				*entering_features = ua.features;
+				set_tcb_priv_data(tcp, entering_features, free);
+			}
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &ua)) {
-				PRINT_FIELD_X(" => ", ua, features);
+				entering_features = get_tcb_priv_data(tcp);
+				if (!entering_features
+				    || *entering_features != ua.features) {
+					PRINT_FIELD_X(" => ", ua, features);
+				}
 				PRINT_FIELD_FLAGS64(", ", ua, ioctls,
 						    uffd_api_flags,
 						    "_UFFDIO_???");

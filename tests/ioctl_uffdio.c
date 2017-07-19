@@ -70,10 +70,12 @@ main(void)
 	api_struct->api = UFFD_API;
 	api_struct->features = 0;
 	rc = ioctl(fd, UFFDIO_API, api_struct);
-	printf("ioctl(%d, UFFDIO_API, {api=0xaa, features=0"
-	       " => features=%#" PRIx64 ", ioctls=1<<_UFFDIO_REGISTER|"
-	       "1<<_UFFDIO_UNREGISTER|1<<_UFFDIO_API",
-	       fd, (uint64_t)api_struct->features);
+	printf("ioctl(%d, UFFDIO_API, {api=0xaa, features=0", fd);
+	if (api_struct->features)
+		printf(" => features=%#" PRIx64,
+		       (uint64_t) api_struct->features);
+	printf(", ioctls=1<<_UFFDIO_REGISTER|"
+	       "1<<_UFFDIO_UNREGISTER|1<<_UFFDIO_API");
 	api_struct->ioctls &= ~(1ull<<_UFFDIO_REGISTER|
 				1ull<<_UFFDIO_UNREGISTER|
 				1ull<<_UFFDIO_API);
