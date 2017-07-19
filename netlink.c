@@ -300,7 +300,7 @@ print_cookie(struct tcb *const tcp,
 static bool
 decode_nlmsgerr_attr_cookie(struct tcb *const tcp,
 			    const kernel_ulong_t addr,
-			    const kernel_ulong_t len,
+			    const unsigned int len,
 			    const void *const opaque_data)
 {
 	uint8_t cookie;
@@ -331,7 +331,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 		const int fd,
 		const int family,
 		kernel_ulong_t addr,
-		kernel_ulong_t len,
+		unsigned int len,
 		const bool capped)
 {
 	struct nlmsgerr err;
@@ -390,7 +390,7 @@ decode_payload(struct tcb *const tcp,
 	       const int family,
 	       const struct nlmsghdr *const nlmsghdr,
 	       const kernel_ulong_t addr,
-	       const kernel_ulong_t len)
+	       const unsigned int len)
 {
 	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
 		decode_nlmsgerr(tcp, fd, family, addr, len,

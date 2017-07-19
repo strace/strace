@@ -33,7 +33,7 @@
 
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
-	     const kernel_ulong_t addr, const kernel_ulong_t len)
+	     const kernel_ulong_t addr, const unsigned int len)
 {
 	if (len < sizeof(struct nlattr)) {
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
@@ -64,7 +64,7 @@ static void
 decode_nlattr_with_data(struct tcb *const tcp,
 			const struct nlattr *const nla,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len,
+			const unsigned int len,
 			const struct xlat *const table,
 			const char *const dflt,
 			const nla_decoder_t *const decoders,
@@ -95,7 +95,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 void
 decode_nlattr(struct tcb *const tcp,
 	      kernel_ulong_t addr,
-	      kernel_ulong_t len,
+	      unsigned int len,
 	      const struct xlat *const table,
 	      const char *const dflt,
 	      const nla_decoder_t *const decoders,
@@ -112,9 +112,9 @@ decode_nlattr(struct tcb *const tcp,
 			break;
 		}
 
-		const unsigned long nla_len = NLA_ALIGN(nla.nla_len);
+		const unsigned int nla_len = NLA_ALIGN(nla.nla_len);
 		kernel_ulong_t next_addr = 0;
-		kernel_ulong_t next_len = 0;
+		unsigned int next_len = 0;
 
 		if (nla.nla_len >= NLA_HDRLEN) {
 			next_len = (len >= nla_len) ? len - nla_len : 0;
@@ -147,7 +147,7 @@ decode_nlattr(struct tcb *const tcp,
 bool
 decode_nla_str(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
-	       const kernel_ulong_t len,
+	       const unsigned int len,
 	       const void *const opaque_data)
 {
 	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
@@ -158,7 +158,7 @@ decode_nla_str(struct tcb *const tcp,
 bool
 decode_nla_strn(struct tcb *const tcp,
 		const kernel_ulong_t addr,
-		const kernel_ulong_t len,
+		const unsigned int len,
 		const void *const opaque_data)
 {
 	printstrn(tcp, addr, len);
@@ -170,7 +170,7 @@ decode_nla_strn(struct tcb *const tcp,
 bool							\
 decode_nla_ ## name(struct tcb *const tcp,		\
 		    const kernel_ulong_t addr,		\
-		    const kernel_ulong_t len,		\
+		    const unsigned int len,		\
 		    const void *const opaque_data)	\
 {							\
 	type num;					\

@@ -703,12 +703,12 @@ extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
 struct nlmsghdr;
 
 typedef bool (*netlink_decoder_t)(struct tcb *, const struct nlmsghdr *,
-				  kernel_ulong_t addr, kernel_ulong_t len);
+				  kernel_ulong_t addr, unsigned int len);
 
 #define DECL_NETLINK(name)						\
 extern bool								\
 decode_netlink_ ## name(struct tcb *, const struct nlmsghdr *,		\
-			kernel_ulong_t addr, kernel_ulong_t len)
+			kernel_ulong_t addr, unsigned int len)
 DECL_NETLINK(selinux);
 DECL_NETLINK(sock_diag);
 

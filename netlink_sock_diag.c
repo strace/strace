@@ -73,7 +73,7 @@
 
 static void
 decode_family(struct tcb *const tcp, const uint8_t family,
-	      const kernel_ulong_t addr, const kernel_ulong_t len)
+	      const kernel_ulong_t addr, const unsigned int len)
 {
 	tprints("{family=");
 	printxval(addrfams, family, "AF_???");
@@ -90,7 +90,7 @@ decode_unix_diag_req(struct tcb *const tcp,
 		     const struct nlmsghdr *const nlmsghdr,
 		     const uint8_t family,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len)
+		     const unsigned int len)
 {
 	struct unix_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
@@ -135,11 +135,11 @@ print_meminfo(struct tcb *const tcp,
 static bool
 decode_meminfo(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
-	       const kernel_ulong_t len,
+	       const unsigned int len,
 	       const void *const opaque_data)
 {
 	uint32_t mem;
-	size_t nmemb = len / sizeof(mem);
+	const size_t nmemb = len / sizeof(mem);
 
 	if (!nmemb)
 		return false;
@@ -154,7 +154,7 @@ decode_meminfo(struct tcb *const tcp,
 static bool
 decode_unix_diag_vfs(struct tcb *const tcp,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len,
+		     const unsigned int len,
 		     const void *const opaque_data)
 {
 	struct unix_diag_vfs uv;
@@ -185,7 +185,7 @@ print_inode(struct tcb *const tcp,
 static bool
 decode_unix_diag_inode(struct tcb *const tcp,
 		       const kernel_ulong_t addr,
-		       const kernel_ulong_t len,
+		       const unsigned int len,
 		       const void *const opaque_data)
 {
 	uint32_t inode;
@@ -203,7 +203,7 @@ decode_unix_diag_inode(struct tcb *const tcp,
 static bool
 decode_unix_diag_rqlen(struct tcb *const tcp,
 		       const kernel_ulong_t addr,
-		       const kernel_ulong_t len,
+		       const unsigned int len,
 		       const void *const opaque_data)
 {
 	struct unix_diag_rqlen rql;
@@ -235,7 +235,7 @@ decode_unix_diag_msg(struct tcb *const tcp,
 		     const struct nlmsghdr *const nlmsghdr,
 		     const uint8_t family,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len)
+		     const unsigned int len)
 {
 	struct unix_diag_msg msg = { .udiag_family = family };
 	size_t offset = sizeof(msg.udiag_family);
@@ -274,7 +274,7 @@ decode_netlink_diag_req(struct tcb *const tcp,
 			const struct nlmsghdr *const nlmsghdr,
 			const uint8_t family,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len)
+			const unsigned int len)
 {
 	struct netlink_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
@@ -321,7 +321,7 @@ print_group(struct tcb *const tcp,
 static bool
 decode_netlink_diag_groups(struct tcb *const tcp,
 			   const kernel_ulong_t addr,
-			   const kernel_ulong_t len,
+			   const unsigned int len,
 			   const void *const opaque_data)
 {
 	kernel_ulong_t buf;
@@ -339,7 +339,7 @@ decode_netlink_diag_groups(struct tcb *const tcp,
 static bool
 decode_netlink_diag_ring(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
-			 const kernel_ulong_t len,
+			 const unsigned int len,
 			 const void *const opaque_data)
 {
 	struct netlink_diag_ring ndr;
@@ -361,7 +361,7 @@ decode_netlink_diag_ring(struct tcb *const tcp,
 static bool
 decode_netlink_diag_flags(struct tcb *const tcp,
 			  const kernel_ulong_t addr,
-			  const kernel_ulong_t len,
+			  const unsigned int len,
 			  const void *const opaque_data)
 {
 	uint32_t flags;
@@ -389,7 +389,7 @@ decode_netlink_diag_msg(struct tcb *const tcp,
 			const struct nlmsghdr *const nlmsghdr,
 			const uint8_t family,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len)
+			const unsigned int len)
 {
 	struct netlink_diag_msg msg = { .ndiag_family = family };
 	size_t offset = sizeof(msg.ndiag_family);
@@ -433,7 +433,7 @@ decode_packet_diag_req(struct tcb *const tcp,
 		       const struct nlmsghdr *const nlmsghdr,
 		       const uint8_t family,
 		       const kernel_ulong_t addr,
-		       const kernel_ulong_t len)
+		       const unsigned int len)
 {
 	struct packet_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
@@ -459,7 +459,7 @@ decode_packet_diag_req(struct tcb *const tcp,
 static bool
 decode_packet_diag_info(struct tcb *const tcp,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len,
+			const unsigned int len,
 			const void *const opaque_data)
 {
 	struct packet_diag_info pinfo;
@@ -502,7 +502,7 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 static bool
 decode_packet_diag_mclist(struct tcb *const tcp,
 			  const kernel_ulong_t addr,
-			  const kernel_ulong_t len,
+			  const unsigned int len,
 			  const void *const opaque_data)
 {
 	struct packet_diag_mclist dml;
@@ -520,7 +520,7 @@ decode_packet_diag_mclist(struct tcb *const tcp,
 static bool
 decode_packet_diag_ring(struct tcb *const tcp,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len,
+			const unsigned int len,
 			const void *const opaque_data)
 {
 	struct packet_diag_ring pdr;
@@ -545,10 +545,10 @@ decode_packet_diag_ring(struct tcb *const tcp,
 static bool
 decode_packet_diag_filter(struct tcb *const tcp,
 			  const kernel_ulong_t addr,
-			  const kernel_ulong_t len,
+			  const unsigned int len,
 			  const void *const opaque_data)
 {
-	const kernel_ulong_t nmemb = len / sizeof(struct sock_filter);
+	const unsigned int nmemb = len / sizeof(struct sock_filter);
 	if (!nmemb || (unsigned short) nmemb != nmemb)
 		return false;
 
@@ -573,7 +573,7 @@ decode_packet_diag_msg(struct tcb *const tcp,
 		       const struct nlmsghdr *const nlmsghdr,
 		       const uint8_t family,
 		       const kernel_ulong_t addr,
-		       const kernel_ulong_t len)
+		       const unsigned int len)
 {
 	struct packet_diag_msg msg = { .pdiag_family = family };
 	size_t offset = sizeof(msg.pdiag_family);
@@ -627,7 +627,7 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 static void
 decode_inet_addr(struct tcb *const tcp,
 		 const kernel_ulong_t addr,
-		 const kernel_ulong_t len,
+		 const unsigned int len,
 		 const int family)
 {
 	union {
@@ -663,7 +663,7 @@ decode_inet_addr(struct tcb *const tcp,
 static void
 decode_inet_diag_hostcond(struct tcb *const tcp,
 			  const kernel_ulong_t addr,
-			  const kernel_ulong_t len)
+			  const unsigned int len)
 {
 	struct inet_diag_hostcond cond;
 
@@ -699,7 +699,7 @@ print_inet_diag_bc_op(const struct inet_diag_bc_op *const op)
 static void
 decode_inet_diag_markcond(struct tcb *const tcp,
 			  const kernel_ulong_t addr,
-			  const kernel_ulong_t len)
+			  const unsigned int len)
 {
 	struct inet_diag_markcond markcond;
 
@@ -715,7 +715,7 @@ decode_inet_diag_markcond(struct tcb *const tcp,
 static void
 decode_bytecode_data(struct tcb *const tcp,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len,
+		     const unsigned int len,
 		     const unsigned char code)
 {
 	switch (code) {
@@ -759,7 +759,7 @@ decode_bytecode_data(struct tcb *const tcp,
 static bool
 decode_inet_diag_bc_op(struct tcb *const tcp,
 		       const kernel_ulong_t addr,
-		       const kernel_ulong_t len,
+		       const unsigned int len,
 		       const void *const opaque_data)
 {
 	struct inet_diag_bc_op op;
@@ -793,7 +793,7 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 			    const struct nlmsghdr *const nlmsghdr,
 			    const uint8_t family,
 			    const kernel_ulong_t addr,
-			    const kernel_ulong_t len)
+			    const unsigned int len)
 {
 	struct inet_diag_req req = { .idiag_family = family };
 	size_t offset = sizeof(req.idiag_family);
@@ -836,7 +836,7 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 			const struct nlmsghdr *const nlmsghdr,
 			const uint8_t family,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len)
+			const unsigned int len)
 {
 	struct inet_diag_req_v2 req = { .sdiag_family = family };
 	size_t offset = sizeof(req.sdiag_family);
@@ -878,7 +878,7 @@ decode_inet_diag_req(struct tcb *const tcp,
 		     const struct nlmsghdr *const nlmsghdr,
 		     const uint8_t family,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len)
+		     const unsigned int len)
 {
 	if (nlmsghdr->nlmsg_type == TCPDIAG_GETSOCK
 	    || nlmsghdr->nlmsg_type == DCCPDIAG_GETSOCK)
@@ -892,7 +892,7 @@ decode_inet_diag_req(struct tcb *const tcp,
 static bool
 decode_inet_diag_meminfo(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
-			 const kernel_ulong_t len,
+			 const unsigned int len,
 			 const void *const opaque_data)
 {
 	struct inet_diag_meminfo minfo;
@@ -914,7 +914,7 @@ decode_inet_diag_meminfo(struct tcb *const tcp,
 static bool
 decode_tcpvegas_info(struct tcb *const tcp,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len,
+		     const unsigned int len,
 		     const void *const opaque_data)
 {
 	struct tcpvegas_info vegas;
@@ -936,7 +936,7 @@ decode_tcpvegas_info(struct tcb *const tcp,
 static bool
 decode_tcp_dctcp_info(struct tcb *const tcp,
 		      const kernel_ulong_t addr,
-		      const kernel_ulong_t len,
+		      const unsigned int len,
 		      const void *const opaque_data)
 {
 	struct tcp_dctcp_info dctcp;
@@ -959,7 +959,7 @@ decode_tcp_dctcp_info(struct tcb *const tcp,
 static bool
 decode_tcp_bbr_info(struct tcb *const tcp,
 		    const kernel_ulong_t addr,
-		    const kernel_ulong_t len,
+		    const unsigned int len,
 		    const void *const opaque_data)
 {
 	struct tcp_bbr_info bbr;
@@ -1003,7 +1003,7 @@ decode_inet_diag_msg(struct tcb *const tcp,
 		     const struct nlmsghdr *const nlmsghdr,
 		     const uint8_t family,
 		     const kernel_ulong_t addr,
-		     const kernel_ulong_t len)
+		     const unsigned int len)
 {
 	struct inet_diag_msg msg = { .idiag_family = family };
 	size_t offset = sizeof(msg.idiag_family);
@@ -1048,7 +1048,7 @@ decode_smc_diag_req(struct tcb *const tcp,
 		    const struct nlmsghdr *const nlmsghdr,
 		    const uint8_t family,
 		    const kernel_ulong_t addr,
-		    const kernel_ulong_t len)
+		    const unsigned int len)
 {
 	struct smc_diag_req req = { .diag_family = family };
 	const size_t offset = sizeof(req.diag_family);
@@ -1091,7 +1091,7 @@ print_smc_diag_cursor(const struct smc_diag_cursor *const cursor)
 static bool
 decode_smc_diag_conninfo(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
-			 const kernel_ulong_t len,
+			 const unsigned int len,
 			 const void *const opaque_data)
 {
 	struct smc_diag_conninfo cinfo;
@@ -1124,7 +1124,7 @@ decode_smc_diag_conninfo(struct tcb *const tcp,
 static bool
 decode_smc_diag_lgrinfo(struct tcb *const tcp,
 			const kernel_ulong_t addr,
-			const kernel_ulong_t len,
+			const unsigned int len,
 			const void *const opaque_data)
 {
 	struct smc_diag_lgrinfo linfo;
@@ -1157,7 +1157,7 @@ decode_smc_diag_msg(struct tcb *const tcp,
 		    const struct nlmsghdr *const nlmsghdr,
 		    const uint8_t family,
 		    const kernel_ulong_t addr,
-		    const kernel_ulong_t len)
+		    const unsigned int len)
 {
 	struct smc_diag_msg msg = { .diag_family = family };
 	size_t offset = sizeof(msg.diag_family);
@@ -1201,7 +1201,7 @@ typedef void (*netlink_diag_decoder_t)(struct tcb *,
 				       const struct nlmsghdr *,
 				       uint8_t family,
 				       kernel_ulong_t addr,
-				       kernel_ulong_t len);
+				       unsigned int len);
 
 static const struct {
 	const netlink_diag_decoder_t request, response;
@@ -1220,7 +1220,7 @@ bool
 decode_netlink_sock_diag(struct tcb *const tcp,
 			 const struct nlmsghdr *const nlmsghdr,
 			 const kernel_ulong_t addr,
-			 const kernel_ulong_t len)
+			 const unsigned int len)
 {
 	uint8_t family;
 

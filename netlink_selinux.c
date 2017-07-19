@@ -36,7 +36,7 @@ bool
 decode_netlink_selinux(struct tcb *const tcp,
 		       const struct nlmsghdr *const nlmsghdr,
 		       const kernel_ulong_t addr,
-		       const kernel_ulong_t len)
+		       const unsigned int len)
 {
 	switch (nlmsghdr->nlmsg_type) {
 	case SELNL_MSG_SETENFORCE: {
