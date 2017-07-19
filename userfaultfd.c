@@ -43,6 +43,7 @@ SYS_FUNC(userfaultfd)
 # include <linux/ioctl.h>
 # include <linux/userfaultfd.h>
 
+# include "xlat/uffd_api_features.h"
 # include "xlat/uffd_api_flags.h"
 # include "xlat/uffd_copy_flags.h"
 # include "xlat/uffd_register_ioctl_flags.h"
@@ -75,11 +76,10 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ua))
 				return RVAL_DECODED | 1;
-			/* Features is intended to contain some flags, but
-			 * there aren't any defined yet.
-			 */
 			PRINT_FIELD_X("{", ua, api);
-			PRINT_FIELD_X(", ", ua, features);
+			PRINT_FIELD_FLAGS64(", ", ua, features,
+					    uffd_api_features,
+					    "UFFD_FEATURE_???");
 			entering_features = malloc(sizeof(*entering_features));
 			if (entering_features) {
 				*entering_features = ua.features;
@@ -90,7 +90,9 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 				entering_features = get_tcb_priv_data(tcp);
 				if (!entering_features
 				    || *entering_features != ua.features) {
-					PRINT_FIELD_X(" => ", ua, features);
+					PRINT_FIELD_FLAGS64(" => ", ua, features,
+							    uffd_api_features,
+							    "UFFD_FEATURE_???");
 				}
 				PRINT_FIELD_FLAGS64(", ", ua, ioctls,
 						    uffd_api_flags,
