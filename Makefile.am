@@ -183,8 +183,14 @@ strace_SOURCES =	\
 	net.c		\
 	netlink.c       \
 	netlink.h	\
+	netlink_sock_diag.h \
+	netlink_inet_diag.c \
+	netlink_netlink_diag.c \
+	netlink_packet_diag.c \
 	netlink_selinux.c \
+	netlink_smc_diag.c \
 	netlink_sock_diag.c \
+	netlink_unix_diag.c \
 	nlattr.c	\
 	nlattr.h	\
 	nsfs.c          \

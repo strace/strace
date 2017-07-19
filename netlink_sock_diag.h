@@ -1,5 +1,4 @@
 /*
- * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
  * Copyright (c) 2016-2017 The strace developers.
  * All rights reserved.
@@ -27,35 +26,38 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_NLATTR_H
-#define STRACE_NLATTR_H
+#ifndef STRACE_NETLINK_SOCK_DIAG_H
+#define STRACE_NETLINK_SOCK_DIAG_H
 
-typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,
-			      unsigned int len, const void *opaque_data);
+#define DECL_NETLINK_DIAG_DECODER(diag_decode_name)	\
+void							\
+diag_decode_name(struct tcb *tcp,			\
+		 const struct nlmsghdr *nlmsghdr,	\
+		 uint8_t family,			\
+		 kernel_ulong_t addr,			\
+		 unsigned int len)
+
+extern DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg);
+extern DECL_NETLINK_DIAG_DECODER(decode_inet_diag_req);
+extern DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg);
+extern DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req);
+extern DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg);
+extern DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req);
+extern DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg);
+extern DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req);
+extern DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg);
+extern DECL_NETLINK_DIAG_DECODER(decode_unix_diag_req);
+
+struct inet_diag_sockid;
+
 extern void
-decode_nlattr(struct tcb *,
-	      kernel_ulong_t addr,
-	      unsigned int len,
-	      const struct xlat *,
-	      const char *dflt,
-	      const nla_decoder_t *,
-	      unsigned int size,
-	      const void *opaque_data);
+print_inet_diag_sockid(const struct inet_diag_sockid *, const uint8_t family);
 
-#define DECL_NLA(name)					\
-extern bool						\
-decode_nla_ ## name(struct tcb *, kernel_ulong_t addr,	\
-		    unsigned int len, const void *)
-DECL_NLA(u8);
-DECL_NLA(u16);
-DECL_NLA(u32);
-DECL_NLA(u64);
-DECL_NLA(s8);
-DECL_NLA(s16);
-DECL_NLA(s32);
-DECL_NLA(s64);
-DECL_NLA(str);
-DECL_NLA(strn);
-DECL_NLA(meminfo);
+#define PRINT_FIELD_INET_DIAG_SOCKID(prefix_, where_, field_, af_)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_inet_diag_sockid(&(where_).field_, (af_));	\
+	} while (0)
 
-#endif /* !STRACE_NLATTR_H */
+
+#endif /* !STRACE_NETLINK_SOCK_DIAG_H */

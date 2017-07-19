@@ -302,6 +302,8 @@ extern const struct xlat setns_types[];
 extern const struct xlat sg_io_info[];
 extern const struct xlat socketlayers[];
 extern const struct xlat socktypes[];
+extern const struct xlat tcp_state_flags[];
+extern const struct xlat tcp_states[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */

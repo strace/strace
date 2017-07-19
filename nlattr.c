@@ -30,6 +30,7 @@
 #include "defs.h"
 #include "netlink.h"
 #include "nlattr.h"
+#include <linux/sock_diag.h>
 
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
@@ -162,6 +163,43 @@ decode_nla_strn(struct tcb *const tcp,
 		const void *const opaque_data)
 {
 	printstrn(tcp, addr, len);
+
+	return true;
+}
+
+static bool
+print_meminfo(struct tcb *const tcp,
+	      void *const elem_buf,
+	      const size_t elem_size,
+	      void *const opaque_data)
+{
+	unsigned int *const count = opaque_data;
+
+	if ((*count)++ >= SK_MEMINFO_VARS) {
+		tprints("...");
+		return false;
+	}
+
+	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+bool
+decode_nla_meminfo(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	uint32_t mem;
+	const size_t nmemb = len / sizeof(mem);
+
+	if (!nmemb)
+		return false;
+
+	unsigned int count = 0;
+	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
+		    umoven_or_printaddr, print_meminfo, &count);
 
 	return true;
 }
