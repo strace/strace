@@ -1,10 +1,8 @@
 #!/bin/sh
 #
-# Check mmap/mmap2, madvise, mlockall, mprotect, mremap, msync, and munmap
-# syscalls decoding.
+# Define mmap testing helper function.
 #
-# Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2015-2017 The strace developers.
+# Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,15 +27,25 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/mmap_name.sh"
+. "${srcdir=.}/init.sh"
 
-check_prog sed
+get_mmap_name()
+{
+	check_prog grep
+	run_prog > /dev/null
 
-get_mmap_name ""
+	local filter="$1"; shift
+	local syscall=
+	for n in mmap mmap2; do
+		$STRACE -e$n -h > /dev/null && syscall=$syscall,$n
+	done
+	run_strace -e "trace(syscall $syscall $filter)" $args > /dev/null
 
-syscall=$mmap,madvise,mlockall,mprotect,mremap,msync,munmap
-
-run_prog "../$NAME" $mmap > /dev/null
-run_strace -a20 -e$syscall $args > "$EXP"
-sed -n "/^$mmap(NULL, 0, PROT_NONE,/,\$p" < "$LOG" > "$OUT"
-match_diff "$OUT" "$EXP"
+	if grep '^mmap(NULL, 0, PROT_NONE,' < "$LOG" > /dev/null; then
+		mmap=mmap
+	elif grep '^mmap2(NULL, 0, PROT_NONE,' < "$LOG" > /dev/null; then
+		mmap=mmap2
+	else
+		dump_log_and_fail_with "mmap/mmap2 not found in $STRACE $args output"
+	fi
+}

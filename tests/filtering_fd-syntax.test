@@ -1,10 +1,8 @@
 #!/bin/sh
 #
-# Check mmap/mmap2, madvise, mlockall, mprotect, mremap, msync, and munmap
-# syscalls decoding.
+# Check fd set parsing syntax.
 #
-# Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2015-2017 The strace developers.
+# Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,15 +27,50 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/mmap_name.sh"
+. "${srcdir=.}/syntax.sh"
 
-check_prog sed
+check_fd_new()
+{
+	[ -z "$2" ] || check_e "invalid descriptor '$1'" -e "trace(fd $2)"
+	[ -z "$2" ] || check_e "invalid descriptor '$1'" -e "fd $2"
+	[ -z "$2" ] || check_e "invalid descriptor '$1'" -e"fd $2"
+}
 
-get_mmap_name ""
+check_fd_qualify()
+{
+	check_e "invalid descriptor '$1'" -e "read=$2"
+	check_e "invalid descriptor '$1'" -e "write=$2"
+}
 
-syscall=$mmap,madvise,mlockall,mprotect,mremap,msync,munmap
+for arg in '' , ,, ,,, ; do
+	check_fd_new "$arg" "$arg"
+	check_fd_new "!" "!$arg"
+	check_fd_qualify "$arg" "$arg"
+	check_fd_qualify "!$arg" "!$arg"
+done
 
-run_prog "../$NAME" $mmap > /dev/null
-run_strace -a20 -e$syscall $args > "$EXP"
-sed -n "/^$mmap(NULL, 0, PROT_NONE,/,\$p" < "$LOG" > "$OUT"
-match_diff "$OUT" "$EXP"
+for arg in -1 -42 \
+	   not_fd \
+	   2147483648 \
+	   4294967296 \
+	   ; do
+	check_fd_new "$arg" "$arg"
+	check_fd_new "$arg" "1,$arg"
+	check_fd_new "$arg" "$arg,1"
+	check_fd_new "!$arg" "!$arg"
+	check_fd_qualify "$arg" "$arg"
+	check_fd_qualify "$arg" "1,$arg"
+	check_fd_qualify "$arg" "$arg,1"
+	check_fd_qualify "$arg" "!$arg"
+done
+
+for arg in ! all none; do
+	check_fd_qualify "$arg" "1,$arg"
+	check_fd_qualify "!$arg" "1,!$arg"
+	check_fd_new "$arg" "1,$arg"
+	check_fd_new "!$arg" "1,!$arg"
+done
+
+for arg in 1 2 all none; do
+	check_fd_new "!$arg" "!$arg"
+done

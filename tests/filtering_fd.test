@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Check fd filtering
+
+. "${srcdir=.}/mmap_name.sh"
+
+fd_base=5
+
+get_mmap_name "&& fd $fd_base"
+
+for arg in "trace(fd $fd_base)" \
+	   "trace(syscall %desc,%network and fd $fd_base)" \
+	   ; do
+	run_prog "../$NAME" "$mmap" "$fd_base" > /dev/null
+	run_strace -a12 -e "$arg" $args > "$EXP"
+	match_diff "$LOG" "$EXP"
+done

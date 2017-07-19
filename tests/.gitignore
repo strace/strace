@@ -72,6 +72,7 @@ fflush
 file_handle
 file_ioctl
 filter-unavailable
+filtering_fd
 finit_module
 flock
 fork-f
