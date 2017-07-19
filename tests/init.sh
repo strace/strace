@@ -45,7 +45,7 @@ check_prog()
 
 dump_log_and_fail_with()
 {
-	cat < "$LOG"
+	cat < "$LOG" >&2
 	fail_ "$*"
 }
 
