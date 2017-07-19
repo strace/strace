@@ -297,7 +297,8 @@ decode_nlmsgerr(struct tcb *const tcp,
 		const int fd,
 		const int family,
 		kernel_ulong_t addr,
-		kernel_ulong_t len)
+		kernel_ulong_t len,
+		const bool capped)
 {
 	struct nlmsgerr err;
 
@@ -322,8 +323,13 @@ decode_nlmsgerr(struct tcb *const tcp,
 	if (len) {
 		tprints(", msg=");
 		if (fetch_nlmsghdr(tcp, &err.msg, addr, len)) {
+			unsigned int payload =
+				capped ? sizeof(err.msg) : err.msg.nlmsg_len;
+			if (payload > len)
+				payload = len;
+
 			decode_nlmsghdr_with_payload(tcp, fd, family,
-						     &err.msg, addr, len);
+						     &err.msg, addr, payload);
 		}
 	}
 
@@ -344,7 +350,8 @@ decode_payload(struct tcb *const tcp,
 	       const kernel_ulong_t len)
 {
 	if (nlmsghdr->nlmsg_type == NLMSG_ERROR) {
-		decode_nlmsgerr(tcp, fd, family, addr, len);
+		decode_nlmsgerr(tcp, fd, family, addr, len,
+				nlmsghdr->nlmsg_flags & NLM_F_CAPPED);
 		return;
 	}
 

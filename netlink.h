@@ -36,6 +36,10 @@
 # define NETLINK_SOCK_DIAG 4
 #endif
 
+#ifndef NLM_F_CAPPED
+# define NLM_F_CAPPED	0x100
+#endif
+
 #undef NLMSG_HDRLEN
 #define NLMSG_HDRLEN ((unsigned int) NLMSG_ALIGN(sizeof(struct nlmsghdr)))
 
