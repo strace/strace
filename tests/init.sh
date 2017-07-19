@@ -361,6 +361,8 @@ if [ -n "$NAME" ]; then
 			;;
 		esac
 	}
+
+	trap 'dump_log_and_fail_with "time limit ($TIMEOUT_DURATION) exceeded"' XCPU
 else
 	[ -n "${STRACE-}" ] ||
 		STRACE=../strace
