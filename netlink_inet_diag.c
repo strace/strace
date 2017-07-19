@@ -255,7 +255,7 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 		tprints("...");
 	tprints("}");
 
-	offset = NLA_ALIGN(sizeof(req));
+	offset = NLMSG_ALIGN(sizeof(req));
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
@@ -297,7 +297,7 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 		tprints("...");
 	tprints("}");
 
-	offset = NLA_ALIGN(sizeof(req));
+	offset = NLMSG_ALIGN(sizeof(req));
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
@@ -456,7 +456,7 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 		tprints("...");
 	tprints("}");
 
-	offset = NLA_ALIGN(sizeof(msg));
+	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,

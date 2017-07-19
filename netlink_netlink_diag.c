@@ -180,7 +180,7 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 		tprints("...");
 	tprints("}");
 
-	offset = NLA_ALIGN(sizeof(msg));
+	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
