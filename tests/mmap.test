@@ -29,30 +29,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/init.sh"
+. "${srcdir=.}/mmap_name.sh"
 
-check_prog grep
 check_prog sed
-run_prog > /dev/null
 
 xlat_opt=""
 [ "$#" -gt 0 ] && xlat_opt="-X$1"
 align=20
 [ "$#" -gt 1 ] && align="$2"
 
-syscall=
-for n in mmap mmap2; do
-	$STRACE -e$n -h > /dev/null && syscall=$syscall,$n
-done
-run_strace -e$syscall $args > /dev/null
-
-if grep '^mmap(NULL, 0, \(0 /* PROT_NONE */\|0\|PROT_NONE\),' < "$LOG" > /dev/null; then
-	mmap=mmap
-elif grep '^mmap2(NULL, 0, \(0 \/\* PROT_NONE \*\/\|0\|PROT_NONE\),' < "$LOG" > /dev/null; then
-	mmap=mmap2
-else
-	dump_log_and_fail_with "mmap/mmap2 not found in $STRACE $args output"
-fi
+get_mmap_name ""
 
 syscall=$mmap,madvise,mlockall,mprotect,mremap,msync,munmap
 

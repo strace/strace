@@ -1,9 +1,8 @@
 #!/bin/sh
 #
-# Check descriptor set parsing syntax.
+# Define mmap testing helper function.
 #
-# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2016-2018 The strace developers.
+# Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,52 +27,25 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/syntax.sh"
+. "${srcdir=.}/init.sh"
 
-check_fd_new()
+get_mmap_name()
 {
-	[ -z "$2" ] || check_e "invalid descriptor '$1'" -e "trace(fd $2)"
-	[ -z "$2" ] || check_e "invalid descriptor '$1'" -e "fd $2"
-	[ -z "$2" ] || check_e "invalid descriptor '$1'" -e"fd $2"
+	check_prog grep
+	run_prog > /dev/null
+
+	local filter="$1"; shift
+	local syscall=
+	for n in mmap mmap2; do
+		$STRACE -e$n -h > /dev/null && syscall=$syscall,$n
+	done
+	run_strace -e "trace(syscall $syscall $filter)" $args > /dev/null
+
+	if grep '^mmap(NULL, 0, \(0 /* PROT_NONE */\|0\|PROT_NONE\),' < "$LOG" > /dev/null; then
+		mmap=mmap
+	elif grep '^mmap2(NULL, 0, \(0 \/\* PROT_NONE \*\/\|0\|PROT_NONE\),' < "$LOG" > /dev/null; then
+		mmap=mmap2
+	else
+		dump_log_and_fail_with "mmap/mmap2 not found in $STRACE $args output"
+	fi
 }
-
-check_fd_qualify()
-{
-	check_e "invalid descriptor '$1'" -e"read=$2"
-	check_e "invalid descriptor '$1'" -e "read=$2"
-	check_e "invalid descriptor '$1'" -e"write=$2"
-	check_e "invalid descriptor '$1'" -e "write=$2"
-}
-
-for arg in '' , ,, ,,, ; do
-	check_fd_new "$arg" "$arg"
-	check_fd_new "!" "!$arg"
-	check_fd_qualify "$arg" "$arg"
-	check_fd_qualify "!$arg" "!$arg"
-done
-
-for arg in -1 -42 \
-	   not_fd \
-	   2147483648 \
-	   4294967296 \
-	   ; do
-	check_fd_new "$arg" "$arg"
-	check_fd_new "$arg" "1,$arg"
-	check_fd_new "$arg" "$arg,1"
-	check_fd_new "!$arg" "!$arg"
-	check_fd_qualify "$arg" "$arg"
-	check_fd_qualify "$arg" "1,$arg"
-	check_fd_qualify "$arg" "$arg,1"
-	check_fd_qualify "$arg" "!$arg"
-done
-
-for arg in ! all none; do
-	check_fd_qualify "$arg" "1,$arg"
-	check_fd_qualify "!$arg" "1,!$arg"
-	check_fd_new "$arg" "1,$arg"
-	check_fd_new "!$arg" "1,!$arg"
-done
-
-for arg in 1 2 all none; do
-	check_fd_new "!$arg" "!$arg"
-done
