@@ -308,7 +308,7 @@ CODE_COVERAGE_GENHTML_OPTIONS = $(CODE_COVERAGE_GENHTML_OPTIONS_DEFAULT) \
 CODE_COVERAGE_IGNORE_PATTERN = '/usr/include/*'
 strace_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS)
 strace_CFLAGS += $(CODE_COVERAGE_CFLAGS)
-strace_LDADD += $(CODE_COVERAGE_LDFLAGS)
+strace_LDADD += $(CODE_COVERAGE_LIBS)
 
 # Enable this to get link map generated
 #strace_LDFLAGS += -Wl,-Map=strace.mapfile
