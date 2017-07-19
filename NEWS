@@ -16,6 +16,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     packet_diag_msg, and smc_diag_msg netlink attributes of NETLINK_SOCK_DIAG.
   * Implemented NETLINK_SELINUX protocol specific decoding.
   * Implemented decoding of netlink message ack flags.
+  * Implemented decoding of nlmsgerr netlink attributes.
   * Updated lists of BPF_*, RWF_*, SCM_*, and SO_* constants.
 
 * Bug fixes

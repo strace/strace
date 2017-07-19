@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink.h"
+#include "nlattr.h"
 #include <linux/audit.h>
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
@@ -46,6 +47,7 @@
 #include "xlat/nl_selinux_types.h"
 #include "xlat/nl_sock_diag_types.h"
 #include "xlat/nl_xfrm_types.h"
+#include "xlat/nlmsgerr_attrs.h"
 
 /*
  * Fetch a struct nlmsghdr from the given address.
@@ -284,6 +286,38 @@ print_nlmsghdr(struct tcb *tcp,
 	return family != NL_FAMILY_DEFAULT ? family : hdr_family;
 }
 
+static bool
+print_cookie(struct tcb *const tcp,
+	    void *const elem_buf,
+	    const size_t elem_size,
+	    void *const opaque_data)
+{
+	tprintf("%" PRIu8, *(uint8_t *) elem_buf);
+
+	return true;
+}
+
+static bool
+decode_nlmsgerr_attr_cookie(struct tcb *const tcp,
+			    const kernel_ulong_t addr,
+			    const kernel_ulong_t len,
+			    const void *const opaque_data)
+{
+	uint8_t cookie;
+	const size_t nmemb = len / sizeof(cookie);
+
+	print_array(tcp, addr, nmemb, &cookie, sizeof(cookie),
+		    umoven_or_printaddr, print_cookie, 0);
+
+	return true;
+}
+
+static const nla_decoder_t nlmsgerr_nla_decoders[] = {
+	[NLMSGERR_ATTR_MSG]	= decode_nla_str,
+	[NLMSGERR_ATTR_OFFS]	= decode_nla_u32,
+	[NLMSGERR_ATTR_COOKIE]	= decode_nlmsgerr_attr_cookie
+};
+
 static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int fd,
@@ -330,6 +364,15 @@ decode_nlmsgerr(struct tcb *const tcp,
 
 			decode_nlmsghdr_with_payload(tcp, fd, family,
 						     &err.msg, addr, payload);
+			if (len > payload) {
+				tprints(", ");
+				decode_nlattr(tcp, addr + payload,
+					      len - payload, nlmsgerr_attrs,
+					      "NLMSGERR_ATTR_???",
+					      nlmsgerr_nla_decoders,
+					      ARRAY_SIZE(nlmsgerr_nla_decoders),
+					      NULL);
+			}
 		}
 	}
 
