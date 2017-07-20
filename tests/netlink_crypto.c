@@ -34,7 +34,7 @@
 # include <unistd.h>
 # include <sys/socket.h>
 # include <linux/cryptouser.h>
-# include "netlink.h"
+# include "test_netlink.h"
 
 static void
 test_nlmsg_type(const int fd)
@@ -87,6 +87,68 @@ test_nlmsg_flags(const int fd)
 	       (unsigned) sizeof(nlh), sprintrc(rc));
 }
 
+static void
+test_crypto_msg_newalg(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+
+	struct crypto_user_alg alg = {
+		.cru_name = "abcd",
+		.cru_driver_name = "efgh",
+		.cru_module_name = "dcba",
+		.cru_type = 0xabcdfabc,
+		.cru_mask = 0xfedabacd,
+		.cru_refcnt = 0xbcacfacd,
+		.cru_flags = 0xefacdbad
+	};
+	TEST_NETLINK_OBJECT_EX(fd, nlh0,
+			       CRYPTO_MSG_NEWALG, NLM_F_REQUEST,
+			       alg, print_quoted_memory,
+			       printf("{cru_name=\"abcd\""
+				      ", cru_driver_name=\"efgh\""
+				      ", cru_module_name=\"dcba\"");
+			       PRINT_FIELD_X(", ", alg, cru_type);
+			       PRINT_FIELD_X(", ", alg, cru_mask);
+			       PRINT_FIELD_U(", ", alg, cru_refcnt);
+			       PRINT_FIELD_X(", ", alg, cru_flags);
+			       printf("}"));
+
+	fill_memory_ex(alg.cru_name, sizeof(alg.cru_name), '0', 10);
+	fill_memory_ex(alg.cru_driver_name, sizeof(alg.cru_driver_name),
+		       'a', 'z' - 'a' + 1);
+	fill_memory_ex(alg.cru_module_name, sizeof(alg.cru_module_name),
+		       'A', 'Z' - 'A' + 1);
+
+	TEST_NETLINK_OBJECT_EX(fd, nlh0,
+			       CRYPTO_MSG_NEWALG, NLM_F_REQUEST,
+			       alg, print_quoted_memory,
+			       printf("{cru_name=");
+			       print_quoted_memory(alg.cru_name,
+				       sizeof(alg.cru_name) - 1);
+			       printf(", cru_driver_name=");
+			       print_quoted_memory(alg.cru_driver_name,
+				       sizeof(alg.cru_driver_name) - 1);
+			       printf(", cru_module_name=");
+			       print_quoted_memory(alg.cru_module_name,
+				       sizeof(alg.cru_module_name) - 1);
+			       PRINT_FIELD_X(", ", alg, cru_type);
+			       PRINT_FIELD_X(", ", alg, cru_mask);
+			       PRINT_FIELD_U(", ", alg, cru_refcnt);
+			       PRINT_FIELD_X(", ", alg, cru_flags);
+			       printf("}"));
+}
+
+static void
+test_crypto_msg_unspec(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+
+	TEST_NETLINK_(fd, nlh0,
+		      0xffff, "0xffff /* CRYPTO_MSG_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      4, "abcd", 4, printf("\"\\x61\\x62\\x63\\x64\""));
+}
+
 int
 main(void)
 {
@@ -96,6 +158,8 @@ main(void)
 
 	test_nlmsg_type(fd);
 	test_nlmsg_flags(fd);
+	test_crypto_msg_newalg(fd);
+	test_crypto_msg_unspec(fd);
 
 	printf("+++ exited with 0 +++\n");
 
