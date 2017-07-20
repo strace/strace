@@ -46,9 +46,10 @@
 		      (flags_), #flags_,				\
 		      (data_len_), (src_), (slen_), __VA_ARGS__)
 
-#define TEST_NETLINK_OBJECT(fd_, nlh0_,					\
-			    type_, flags_,				\
-			    obj_, ...)					\
+#define TEST_NETLINK_OBJECT_EX_(fd_, nlh0_,				\
+				type_, type_str_,			\
+				flags_, flags_str_,			\
+				obj_, fallback_func, ...)		\
 	do {								\
 		char pattern[DEFAULT_STRLEN];				\
 		fill_memory_ex(pattern, sizeof(pattern),		\
@@ -58,23 +59,39 @@
 			? DEFAULT_STRLEN : (int) sizeof(obj_) - 1;	\
 		/* len < sizeof(obj_) */				\
 		TEST_NETLINK_((fd_), (nlh0_),				\
-			      (type_), #type_,				\
-			      (flags_), #flags_,			\
+			      (type_), (type_str_),			\
+			      (flags_), (flags_str_),			\
 			      plen, pattern, plen,			\
-			      print_quoted_hex(pattern, plen));		\
+			      (fallback_func)(pattern, plen));		\
 		/* short read of sizeof(obj_) */			\
 		TEST_NETLINK_((fd_), (nlh0_),				\
-			      (type_), #type_,				\
-			      (flags_), #flags_,			\
+			      (type_), (type_str_),			\
+			      (flags_), (flags_str_),			\
 			      sizeof(obj_),				\
 			      pattern, plen,				\
 			      printf("%p",				\
 				     NLMSG_DATA(TEST_NETLINK_nlh)));	\
 		/* sizeof(obj_) */					\
 		TEST_NETLINK_((fd_), (nlh0_),				\
-			      (type_), #type_,				\
-			      (flags_), #flags_,			\
+			      (type_), (type_str_),			\
+			      (flags_), (flags_str_),			\
 			      sizeof(obj_),				\
 			      &(obj_), sizeof(obj_),			\
 			      __VA_ARGS__);				\
 	} while (0)
+
+#define TEST_NETLINK_OBJECT_EX(fd_, nlh0_,				\
+			       type_, flags_,				\
+			       obj_, fallback_func, ...)		\
+	TEST_NETLINK_OBJECT_EX_((fd_), (nlh0),				\
+				(type_), #type_,			\
+				(flags_), #flags_,			\
+				(obj_), (fallback_func), __VA_ARGS__)
+
+#define TEST_NETLINK_OBJECT(fd_, nlh0_,					\
+			    type_, flags_,				\
+			    obj_, ...)					\
+	TEST_NETLINK_OBJECT_EX_((fd_), (nlh0),				\
+				(type_), #type_,			\
+				(flags_), #flags_,			\
+				(obj_), print_quoted_hex, __VA_ARGS__)
