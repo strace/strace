@@ -387,6 +387,9 @@ clean-local: clean-local-check
 clean-local-check:
 	-rm -rf -- $(TESTS:.test=.dir) $(GEN_TESTS:.gen.test=.dir)
 
+.PHONY: check-valgrind-local
+check-valgrind-local: $(check_LIBRARIES) $(check_PROGRAMS)
+
 BUILT_SOURCES = ksysent.h
 CLEANFILES = ksysent.h
 
