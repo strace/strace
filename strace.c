@@ -134,7 +134,7 @@ static int exit_code;
 static int strace_child;
 static int strace_tracer_pid;
 
-static char *username;
+static const char *username;
 static uid_t run_uid;
 static gid_t run_gid;
 
@@ -142,7 +142,7 @@ unsigned int max_strlen = DEFAULT_STRLEN;
 static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 
-static char *outfname;
+static const char *outfname;
 /* If -ff, points to stderr. Else, it's our common output log */
 static FILE *shared_log;
 
@@ -1727,7 +1727,7 @@ init(int argc, char *argv[])
 			qualify(optarg);
 			break;
 		case 'o':
-			outfname = xstrdup(optarg);
+			outfname = optarg;
 			break;
 		case 'O':
 			i = string_to_uint(optarg);
@@ -1751,7 +1751,7 @@ init(int argc, char *argv[])
 			set_sortby(optarg);
 			break;
 		case 'u':
-			username = xstrdup(optarg);
+			username = optarg;
 			break;
 #ifdef USE_LIBUNWIND
 		case 'k':
