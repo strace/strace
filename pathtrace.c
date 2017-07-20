@@ -328,10 +328,12 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		if (nfds == 0 || end < start)
 			return false;
 
-		for (cur = start; cur < end; cur += sizeof(fds))
-			if ((umove(tcp, cur, &fds) == 0)
-			    && fdmatch(tcp, fds.fd, set))
+		for (cur = start; cur < end; cur += sizeof(fds)) {
+			if (umove(tcp, cur, &fds))
+				break;
+			if (fdmatch(tcp, fds.fd, set))
 				return true;
+		}
 
 		return false;
 	}
