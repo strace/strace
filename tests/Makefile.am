@@ -293,7 +293,7 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) MIPS_ABI=$(MIPS_ABI) $(srcdir)/run.sh
 
 @VALGRIND_CHECK_RULES@
 VALGRIND_FLAGS = --quiet
-VALGRIND_SUPPRESSIONS_FILES = $(srcdir)/strace.supp
+VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 
 EXTRA_DIST = \
 	caps-abbrev.awk \
