@@ -102,6 +102,7 @@ AC_DEFUN([AX_VALGRIND_CHECK],[
 
 	AM_CONDITIONAL([VALGRIND_ENABLED],[test "$enable_valgrind" = "yes"])
 	AC_SUBST([VALGRIND_ENABLED],[$enable_valgrind])
+	AM_EXTRA_RECURSIVE_TARGETS([check-valgrind])
 
 	# Check for Valgrind tools we care about.
 	[valgrind_enabled_tools=]
@@ -140,6 +141,7 @@ m4_if(m4_defn([en_dflt_valgrind_]vgtool), [off], [= "yes"], [!= "no"]),[
 			valgrind_enabled_tools="$valgrind_enabled_tools ]m4_bpatsubst(vgtool,[^exp-])["
 		])
 		AC_SUBST([ENABLE_VALGRIND_]vgtool,[$enable_valgrind_]vgtool)
+		AM_EXTRA_RECURSIVE_TARGETS([check-valgrind-]vgtool)
 	])
 	AC_SUBST([valgrind_tools],["]m4_join([ ], valgrind_tool_list)["])
 	AC_SUBST([valgrind_enabled_tools],[$valgrind_enabled_tools])
