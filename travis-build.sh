@@ -37,7 +37,19 @@ case "${CHECK-}" in
 		;;
 esac
 
-$CC --version
+echo 'BEGIN OF BUILD ENVIRONMENT INFORMATION'
+uname -a |head -1
+libc="$(ldd /bin/sh |sed -n 's|^[^/]*\(/[^ ]*/libc\.so[^ ]*\).*|\1|p' |head -1)"
+$libc |head -1
+file -L /bin/sh
+$CC --version |head -1
+make --version |head -1
+autoconf --version |head -1
+automake --version |head -1
+kver="$(printf '%s\n%s\n' '#include <linux/version.h>' 'LINUX_VERSION_CODE' | $CC -E -P -)"
+printf 'kernel-headers %s.%s.%s\n' $(($kver/65536)) $(($kver/256%256)) $(($kver%256))
+echo 'END OF BUILD ENVIRONMENT INFORMATION'
+
 export CC_FOR_BUILD="$CC"
 
 [ -z "${DISTCHECK_CONFIGURE_FLAGS-}" ] ||
