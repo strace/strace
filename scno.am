@@ -41,4 +41,5 @@ scno.h: $(top_srcdir)/scno.head syscallent.i
 	LC_ALL=C sed -n '$(SCNO_SED)' $(filter-out $<,$^) >> $@-t
 	mv $@-t $@
 
+BUILT_SOURCES += scno.h
 CLEANFILES += syscallent.i scno.h

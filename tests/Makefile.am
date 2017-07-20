@@ -387,6 +387,7 @@ clean-local: clean-local-check
 clean-local-check:
 	-rm -rf -- $(TESTS:.test=.dir) $(GEN_TESTS:.gen.test=.dir)
 
+BUILT_SOURCES = ksysent.h
 CLEANFILES = ksysent.h
 
 include ../scno.am
