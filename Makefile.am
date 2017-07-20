@@ -183,6 +183,7 @@ strace_SOURCES =	\
 	net.c		\
 	netlink.c       \
 	netlink.h	\
+	netlink_crypto.c \
 	netlink_sock_diag.h \
 	netlink_inet_diag.c \
 	netlink_netlink_diag.c \

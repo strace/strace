@@ -711,6 +711,7 @@ typedef bool (*netlink_decoder_t)(struct tcb *, const struct nlmsghdr *,
 extern bool								\
 decode_netlink_ ## name(struct tcb *, const struct nlmsghdr *,		\
 			kernel_ulong_t addr, unsigned int len)
+DECL_NETLINK(crypto);
 DECL_NETLINK(selinux);
 DECL_NETLINK(sock_diag);
 
