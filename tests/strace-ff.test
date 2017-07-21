@@ -7,7 +7,7 @@
 run_prog_skip_if_failed \
 	kill -0 $$
 
-../set_ptracer_any ../sleep 1 > "$OUT" &
+../set_ptracer_any ../sleep 3 > "$OUT" &
 tracee_pid=$!
 
 while ! [ -s "$OUT" ]; do
