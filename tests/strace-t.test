@@ -4,15 +4,26 @@
 
 . "${srcdir=.}/init.sh"
 
-run_prog_skip_if_failed date +%T > /dev/null
+run_prog_skip_if_failed date +%s > "$LOG"
+run_prog_skip_if_failed date +%T --date "@$(cat "$LOG")" > /dev/null
 run_prog ../sleep 0
 
-t0="$(date +%T)"
+s0="$(date +%s)"
 run_strace -t -eexecve $args
-t1="$(date +%T)"
+s1="$(date +%s)"
+
+s="$s0"
+t_reg=
+while [ "$s" -le "$s1" ]; do
+	t="$(date +%T --date "@$s")"
+	[ -z "$t_reg" ] && t_reg="$t" || t_reg="$t_reg|$t"
+	s=$(($s + 1))
+done
+t_reg="($t_reg)"
 
 cat > "$EXP" << __EOF__
-($t0|$t1) execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], 0x[[:xdigit:]]* /\\* [[:digit:]]* vars \\*/\\) = 0
+$t_reg execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], 0x[[:xdigit:]]* /\\* [[:digit:]]* vars \\*/\\) = 0
+$t_reg \\+\\+\\+ exited with 0 \\+\\+\\+
 __EOF__
 
 match_grep "$LOG" "$EXP"
