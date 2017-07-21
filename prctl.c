@@ -350,8 +350,7 @@ SYS_FUNC(prctl)
 	return 0;
 }
 
-#if defined X86_64 || defined X32
-# include <asm/prctl.h>
+#if defined X86_64 || defined X32 || defined I386
 # include "xlat/archvals.h"
 
 SYS_FUNC(arch_prctl)
@@ -375,4 +374,4 @@ SYS_FUNC(arch_prctl)
 	tprintf(", %#" PRI_klx, addr);
 	return RVAL_DECODED;
 }
-#endif /* X86_64 || X32 */
+#endif /* X86_64 || X32 || I386 */

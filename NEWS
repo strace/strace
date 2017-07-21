@@ -18,6 +18,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of netlink message ack flags.
   * Implemented decoding of nlmsgerr netlink attributes.
   * Updated lists of BPF_*, KEY_*, RWF_*, SCM_*, SO_*, and *_MAGIC constants.
+  * Added decoding of arch_prctl syscall on x86.
 
 * Bug fixes
   * Fixed output formatting of blkpg_ioctl_arg, dm_name_list, and iocb
