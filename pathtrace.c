@@ -323,6 +323,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		start = tcp->u_arg[0];
 		nfds = tcp->u_arg[1];
 
+		if (nfds > 1024 * 1024)
+			nfds = 1024 * 1024;
 		end = start + sizeof(fds) * nfds;
 
 		if (nfds == 0 || end < start)
