@@ -5,3 +5,13 @@
    fun:sched_getaffinity*
    fun:get_cpuset_size
 }
+
+{
+   qualify_tokens: memleak before error_msg_and_die
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:strdup
+   fun:xstrdup
+   fun:qualify_tokens
+}
