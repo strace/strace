@@ -263,6 +263,19 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 	}
 }
 
+static void
+keyctl_restrict_keyring(struct tcb *const tcp,
+			const key_serial_t id,
+			const kernel_ulong_t addr1,
+			const kernel_ulong_t addr2)
+{
+	print_keyring_serial_number(id);
+	tprints(", ");
+	printstr(tcp, addr1);
+	tprints(", ");
+	printstr(tcp, addr2);
+}
+
 #include "xlat/key_reqkeys.h"
 #include "xlat/keyctl_commands.h"
 
@@ -362,6 +375,10 @@ SYS_FUNC(keyctl)
 	case KEYCTL_DH_COMPUTE:
 		keyctl_dh_compute(tcp, arg2, arg3, arg4);
 		return 0;
+
+	case KEYCTL_RESTRICT_KEYRING:
+		keyctl_restrict_keyring(tcp, arg2, arg3, arg4);
+		break;
 
 	default:
 		tprintf("%#" PRI_klx ", %#" PRI_klx

@@ -506,6 +506,34 @@ main(void)
 		  sizeof(long_type_str), long_desc, NULL, NULL,
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL);
 
+	/* KEYCTL_RESTRICT_KEYRING */
+
+	do_keyctl(ARG_STR(KEYCTL_RESTRICT_KEYRING),
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
+		  sizeof(char *), ARG_STR(NULL), NULL,
+		  sizeof(char *), ARG_STR(NULL), NULL,
+			  NULL);
+	do_keyctl(ARG_STR(KEYCTL_RESTRICT_KEYRING),
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  sizeof(char *), (char *) 0xfffffacefffffeedULL, NULL, ptr_fmt,
+		  sizeof(char *), (char *) 0xfffff00dfffff157ULL, NULL, ptr_fmt,
+			  NULL);
+	do_keyctl(ARG_STR(KEYCTL_RESTRICT_KEYRING),
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  sizeof(char *), bogus_str, NULL, ptr_fmt,
+		  sizeof(char *), bogus_desc, NULL, ptr_fmt,
+			  NULL);
+	do_keyctl(ARG_STR(KEYCTL_RESTRICT_KEYRING),
+		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
+		  sizeof(short_type_str), short_type, NULL, NULL,
+		  sizeof(short_desc_str), short_desc, NULL, NULL,
+			  NULL);
+	do_keyctl(ARG_STR(KEYCTL_RESTRICT_KEYRING),
+		  sizeof(int32_t), 0, NULL, "%d",
+		  sizeof(long_type_str), long_type, NULL, NULL,
+		  sizeof(long_type_str), long_desc, NULL, NULL,
+			  NULL);
+
 	buf_in_arg = false;
 
 
