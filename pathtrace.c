@@ -119,7 +119,7 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 
 /*
  * Add a path to the set we're tracing.  Also add the canonicalized
- * version of the path.  Secifying NULL will delete all paths.
+ * version of the path.  Specifying NULL will delete all paths.
  */
 void
 pathtrace_select_set(const char *path, struct path_set *set)
