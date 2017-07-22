@@ -1,5 +1,8 @@
 #!/bin/sh -ex
 
+DISTCHECK_CONFIGURE_FLAGS='--disable-dependency-tracking'
+export DISTCHECK_CONFIGURE_FLAGS
+
 case "$CC" in
 	gcc*)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-gcc-Werror"
@@ -51,9 +54,6 @@ printf 'kernel-headers %s.%s.%s\n' $(($kver/65536)) $(($kver/256%256)) $(($kver%
 echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
 export CC_FOR_BUILD="$CC"
-
-[ -z "${DISTCHECK_CONFIGURE_FLAGS-}" ] ||
-	export DISTCHECK_CONFIGURE_FLAGS
 
 ./git-set-file-times
 ./bootstrap
