@@ -177,6 +177,7 @@ netlink_sock_diag
 netlink_xfrm
 newfstatat
 nlattr
+nlattr_crypto_user_alg
 nlattr_inet_diag_msg
 nlattr_inet_diag_req_compat
 nlattr_inet_diag_req_v2

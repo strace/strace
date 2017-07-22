@@ -195,6 +195,7 @@ netlink_selinux	+netlink_sock_diag.test
 netlink_xfrm	+netlink_sock_diag.test
 newfstatat	-a32 -v -P stat.sample -P /dev/full
 nlattr		+netlink_sock_diag.test
+nlattr_crypto_user_alg		+netlink_sock_diag.test
 nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_inet_diag_req_compat	+netlink_sock_diag.test
 nlattr_inet_diag_req_v2		+netlink_sock_diag.test
