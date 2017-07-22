@@ -36,6 +36,160 @@
 
 # include <linux/cryptouser.h>
 
+# include "xlat/crypto_nl_attrs.h"
+
+static bool
+decode_crypto_report_generic(struct tcb *const tcp,
+			     const kernel_ulong_t addr,
+			     const unsigned int len,
+			     const void *const opaque_data)
+{
+	tprints("{type=");
+	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
+	tprints("}");
+
+	return true;
+}
+
+static bool
+decode_crypto_report_hash(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
+{
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
+	struct crypto_report_hash rhash;
+
+	if (len < sizeof(rhash))
+		printstrn(tcp, addr, len);
+	else if (!umove_or_printaddr(tcp, addr, &rhash)) {
+		PRINT_FIELD_CSTRING("{", rhash, type);
+		PRINT_FIELD_U(", ", rhash, blocksize);
+		PRINT_FIELD_U(", ", rhash, digestsize);
+		tprints("}");
+	}
+# else
+	printstrn(tcp, addr, len);
+# endif
+
+	return true;
+}
+
+static bool
+decode_crypto_report_blkcipher(struct tcb *const tcp,
+			       const kernel_ulong_t addr,
+			       const unsigned int len,
+			       const void *const opaque_data)
+{
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
+	struct crypto_report_blkcipher rblkcipher;
+
+	if (len < sizeof(rblkcipher))
+		printstrn(tcp, addr, len);
+	else if (!umove_or_printaddr(tcp, addr, &rblkcipher)) {
+		PRINT_FIELD_CSTRING("{", rblkcipher, type);
+		PRINT_FIELD_CSTRING(", ", rblkcipher, geniv);
+		PRINT_FIELD_U(", ", rblkcipher, blocksize);
+		PRINT_FIELD_U(", ", rblkcipher, min_keysize);
+		PRINT_FIELD_U(", ", rblkcipher, max_keysize);
+		PRINT_FIELD_U(", ", rblkcipher, ivsize);
+		tprints("}");
+	}
+# else
+	printstrn(tcp, addr, len);
+# endif
+
+	return true;
+}
+
+static bool
+decode_crypto_report_aead(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
+{
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
+	struct crypto_report_aead raead;
+
+	if (len < sizeof(raead))
+		printstrn(tcp, addr, len);
+	else if (!umove_or_printaddr(tcp, addr, &raead)) {
+		PRINT_FIELD_CSTRING("{", raead, type);
+		PRINT_FIELD_CSTRING(", ", raead, geniv);
+		PRINT_FIELD_U(", ", raead, blocksize);
+		PRINT_FIELD_U(", ", raead, maxauthsize);
+		PRINT_FIELD_U(", ", raead, ivsize);
+		tprints("}");
+	}
+# else
+	printstrn(tcp, addr, len);
+# endif
+
+	return true;
+}
+
+static bool
+decode_crypto_report_rng(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
+	struct crypto_report_rng rrng;
+
+	if (len < sizeof(rrng))
+		printstrn(tcp, addr, len);
+	else if (!umove_or_printaddr(tcp, addr, &rrng)) {
+		PRINT_FIELD_CSTRING("{", rrng, type);
+		PRINT_FIELD_U(", ", rrng, seedsize);
+		tprints("}");
+	}
+# else
+	printstrn(tcp, addr, len);
+# endif
+
+	return true;
+}
+
+static bool
+decode_crypto_report_cipher(struct tcb *const tcp,
+			    const kernel_ulong_t addr,
+			    const unsigned int len,
+			    const void *const opaque_data)
+{
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
+	struct crypto_report_cipher rcipher;
+
+	if (len < sizeof(rcipher))
+		printstrn(tcp, addr, len);
+	else if (!umove_or_printaddr(tcp, addr, &rcipher)) {
+		PRINT_FIELD_CSTRING("{", rcipher, type);
+		PRINT_FIELD_U(", ", rcipher, blocksize);
+		PRINT_FIELD_U(", ", rcipher, min_keysize);
+		PRINT_FIELD_U(", ", rcipher, max_keysize);
+		tprints("}");
+	}
+# else
+	printstrn(tcp, addr, len);
+# endif
+
+	return true;
+}
+
+static const nla_decoder_t crypto_user_alg_nla_decoders[] = {
+	[CRYPTOCFGA_PRIORITY_VAL]	= decode_nla_u32,
+	[CRYPTOCFGA_REPORT_LARVAL]	= decode_crypto_report_generic,
+	[CRYPTOCFGA_REPORT_HASH]	= decode_crypto_report_hash,
+	[CRYPTOCFGA_REPORT_BLKCIPHER]	= decode_crypto_report_blkcipher,
+	[CRYPTOCFGA_REPORT_AEAD]	= decode_crypto_report_aead,
+	[CRYPTOCFGA_REPORT_COMPRESS]	= decode_crypto_report_generic,
+	[CRYPTOCFGA_REPORT_RNG]		= decode_crypto_report_rng,
+	[CRYPTOCFGA_REPORT_CIPHER]	= decode_crypto_report_cipher,
+	[CRYPTOCFGA_REPORT_AKCIPHER]	= decode_crypto_report_generic,
+	[CRYPTOCFGA_REPORT_KPP]		= decode_crypto_report_generic,
+	[CRYPTOCFGA_REPORT_ACOMP]	= decode_crypto_report_generic
+};
+
 static void
 decode_crypto_user_alg(struct tcb *const tcp,
 		       const kernel_ulong_t addr,
@@ -54,6 +208,16 @@ decode_crypto_user_alg(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", alg, cru_refcnt);
 		PRINT_FIELD_X(", ", alg, cru_flags);
 		tprints("}");
+
+		const size_t offset = NLMSG_ALIGN(sizeof(alg));
+		if (len > offset) {
+			tprints(", ");
+			decode_nlattr(tcp, addr + offset, len - offset,
+				      crypto_nl_attrs, "CRYPTOCFGA_???",
+				      crypto_user_alg_nla_decoders,
+				      ARRAY_SIZE(crypto_user_alg_nla_decoders),
+				      NULL);
+		}
 	}
 }
 

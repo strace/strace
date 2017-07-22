@@ -19,6 +19,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of netlink message ack flags.
   * Implemented decoding of nlmsgerr netlink attributes.
   * Implemented basic protocol specific decoding of NETLINK_CRYPTO.
+  * Implemented decoding of crypto_user_alg netlink attributes
+    of NETLINK_CRYPTO.
   * Updated lists of BPF_*, KEY_*, RWF_*, SCM_*, SO_*, and *_MAGIC constants.
   * Added decoding of arch_prctl syscall on x86.
 

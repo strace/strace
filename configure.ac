@@ -320,6 +320,14 @@ AC_CHECK_TYPES(m4_normalize([
 [#include <sys/types.h>
 #include <linux/fcntl.h>])
 
+AC_CHECK_TYPES(m4_normalize([
+	struct crypto_report_aead,
+	struct crypto_report_blkcipher,
+	struct crypto_report_cipher,
+	struct crypto_report_hash,
+	struct crypto_report_rng
+]),,, [#include <linux/cryptouser.h>])
+
 AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
