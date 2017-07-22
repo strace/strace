@@ -67,4 +67,7 @@ case "${CHECK-}" in
 		apt_get_install lcov
 		pip install --user codecov
 		;;
+	valgrind)
+		apt_get_install valgrind
+		;;
 esac

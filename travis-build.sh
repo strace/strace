@@ -38,6 +38,9 @@ case "${CHECK-}" in
 		CFLAGS_FOR_BUILD="$CFLAGS"
 		export CFLAGS CFLAGS_FOR_BUILD
 		;;
+	valgrind)
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-valgrind"
+		;;
 esac
 
 echo 'BEGIN OF BUILD ENVIRONMENT INFORMATION'
@@ -71,6 +74,20 @@ case "${CHECK-}" in
 		echo 'BEGIN OF TEST SUITE INFORMATION'
 		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
 		echo 'END OF TEST SUITE INFORMATION'
+		;;
+	valgrind)
+		make -k $j all VERBOSE=${VERBOSE-}
+		rc=$?
+		for n in ${VALGRIND_TOOLS:-memcheck helgrind drd}; do
+			make -k $j -C "${VALGRIND_TESTDIR:-.}" \
+				check-valgrind-$n VERBOSE=${VERBOSE-} ||
+					rc=$?
+		done
+		echo 'BEGIN OF TEST SUITE INFORMATION'
+		tail -n 99999 -- tests*/test-suite*.log tests*/ksysent.log ||
+			rc=$?
+		echo 'END OF TEST SUITE INFORMATION'
+		[ "$rc" -eq 0 ]
 		;;
 	*)
 		make -k $j distcheck VERBOSE=${VERBOSE-}
