@@ -241,10 +241,13 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 
 
 	case SEN_fanotify_mark:
-		/* x, x, x, fd, path */
-		return fdmatch(tcp, tcp->u_arg[3], set) ||
-			upathmatch(tcp, tcp->u_arg[4], set);
-
+	{
+		/* x, x, mask (64 bit), fd, path */
+		unsigned long long mask = 0;
+		int argn = getllval(tcp, &mask, 2);
+		return fdmatch(tcp, tcp->u_arg[argn], set) ||
+			upathmatch(tcp, tcp->u_arg[argn + 1], set);
+	}
 	case SEN_oldselect:
 	case SEN_pselect6:
 	case SEN_select:
