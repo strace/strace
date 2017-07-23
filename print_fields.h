@@ -69,13 +69,9 @@
 #define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printxval((xlat_), (where_).field_, (dflt_));		\
-	} while (0)
-
-#define PRINT_FIELD_XVAL64(prefix_, where_, field_, xlat_, dflt_)	\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printxval64((xlat_), (where_).field_, (dflt_));		\
+		printxval64((xlat_),					\
+			    zero_extend_signed_to_ull((where_).field_),	\
+			    (dflt_));		\
 	} while (0)
 
 #define PRINT_FIELD_UID(prefix_, where_, field_)					\
