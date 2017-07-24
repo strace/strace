@@ -556,6 +556,7 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 
 extern int string_quote(const char *, char *, unsigned int, unsigned int);
 extern int print_quoted_string(const char *, unsigned int, unsigned int);
+extern int print_quoted_cstring(const char *, unsigned int);
 
 /* a refers to the lower numbered u_arg,
  * b refers to the higher numbered u_arg

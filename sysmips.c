@@ -59,8 +59,7 @@ SYS_FUNC(sysmips)
 			     nodename) < 0) {
 			printaddr(tcp->u_arg[1]);
 		} else {
-			print_quoted_string(nodename, __NEW_UTS_LEN + 1,
-					    QUOTE_0_TERMINATED);
+			print_quoted_cstring(nodename, __NEW_UTS_LEN + 1);
 		}
 		return RVAL_DECODED;
 	}

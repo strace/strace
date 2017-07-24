@@ -171,7 +171,7 @@ main(void)
 	ioctl(-1, BLKPG, blkpg);
 	printf("ioctl(-1, BLKPG, {op=%s, flags=%d, datalen=%d"
 	       ", data={start=%lld, length=%lld, pno=%d"
-	       ", devname=\"%.*s\", volname=\"%.*s\"}})"
+	       ", devname=\"%.*s\"..., volname=\"%.*s\"...}})"
 	       " = -1 EBADF (%m)\n",
 	       "BLKPG_ADD_PARTITION",
 	       blkpg->flags, blkpg->datalen,

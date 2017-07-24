@@ -16,6 +16,18 @@ print_quoted_string(const char *instr)
 }
 
 void
+print_quoted_cstring(const char *instr, const size_t size)
+{
+	const size_t len = strnlen(instr, size);
+	if (len < size) {
+		print_quoted_memory(instr, len);
+	} else {
+		print_quoted_memory(instr, size - 1);
+		printf("...");
+	}
+}
+
+void
 print_quoted_memory(const void *const instr, const size_t len)
 {
 	const unsigned char *str = (const unsigned char *) instr;

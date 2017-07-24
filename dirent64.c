@@ -105,10 +105,7 @@ SYS_FUNC(getdents64)
 			printxval(dirent_types, d->d_type, "DT_???");
 
 			tprints(", d_name=");
-			if (print_quoted_string(d->d_name, d_name_len,
-						QUOTE_0_TERMINATED) > 0) {
-				tprints("...");
-			}
+			print_quoted_cstring(d->d_name, d_name_len);
 
 			tprints("}");
 		}

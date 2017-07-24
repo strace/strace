@@ -680,14 +680,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				   (uint64_t) args.start.cont_reading_from_srcdev_mode);
 
 				str = (const char *) args.start.srcdev_name;
-				print_quoted_string(str,
-						sizeof(args.start.srcdev_name),
-						QUOTE_0_TERMINATED);
+				print_quoted_cstring(str,
+						sizeof(args.start.srcdev_name));
 				tprints(", tgtdev_name=");
 				str = (const char *) args.start.tgtdev_name;
-				print_quoted_string(str,
-						sizeof(args.start.tgtdev_name),
-						QUOTE_0_TERMINATED);
+				print_quoted_cstring(str,
+						sizeof(args.start.tgtdev_name));
 				tprints("}");
 
 			}
@@ -1327,7 +1325,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &label))
 			break;
-		print_quoted_string(label, sizeof(label), QUOTE_0_TERMINATED);
+		print_quoted_cstring(label, sizeof(label));
 		break;
 	}
 

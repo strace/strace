@@ -36,7 +36,7 @@ print_ifindex(const unsigned int ifindex)
 
 	if (if_indextoname(ifindex, buf)) {
 		tprints("if_nametoindex(");
-		print_quoted_string(buf, sizeof(buf), QUOTE_0_TERMINATED);
+		print_quoted_cstring(buf, sizeof(buf));
 		tprints(")");
 		return;
 	}

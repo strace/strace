@@ -134,6 +134,12 @@ unsigned long inode_of_sockfd(int);
 /* Print string in a quoted form. */
 void print_quoted_string(const char *);
 
+/*
+ * Print a NUL-terminated string `str' of length up to `size' - 1
+ * in a quoted form.
+ */
+void print_quoted_cstring(const char *str, size_t size);
+
 /* Print memory in a quoted form. */
 void print_quoted_memory(const void *, size_t);
 

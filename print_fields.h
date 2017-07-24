@@ -93,9 +93,8 @@
 #define PRINT_FIELD_CSTRING(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_quoted_string((const char *)(where_).field_,	\
-				    sizeof((where_).field_),		\
-				    QUOTE_0_TERMINATED);		\
+		print_quoted_cstring((const char *)(where_).field_,	\
+				     sizeof((where_).field_));		\
 	} while (0)
 
 #define PRINT_FIELD_INET_ADDR(prefix_, where_, field_, af_)		\

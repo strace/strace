@@ -696,6 +696,24 @@ print_quoted_string(const char *str, unsigned int size,
 }
 
 /*
+ * Quote a NUL-terminated string `str' of length up to `size' - 1
+ * and print the result.
+ *
+ * Returns 0 if NUL was seen, 1 otherwise.
+ */
+int
+print_quoted_cstring(const char *str, unsigned int size)
+{
+	int unterminated =
+		print_quoted_string(str, size, QUOTE_0_TERMINATED);
+
+	if (unterminated)
+		tprints("...");
+
+	return unterminated;
+}
+
+/*
  * Print path string specified by address `addr' and length `n'.
  * If path length exceeds `n', append `...' to the output.
  */
@@ -719,10 +737,8 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 	if (nul_seen < 0)
 		printaddr(addr);
 	else {
-		path[n++] = '\0';
-		print_quoted_string(path, n, QUOTE_0_TERMINATED);
-		if (!nul_seen)
-			tprints("...");
+		path[n++] = !nul_seen;
+		print_quoted_cstring(path, n);
 	}
 }
 

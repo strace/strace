@@ -251,7 +251,7 @@ main(void)
 	strncpy(dm_arg->uuid, str129, sizeof(dm_arg->uuid));
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, {version=4.1.2, data_size=%zu, "
-	       "dev=makedev(18, 52), name=\"%.127s\", uuid=\"%.128s\", "
+	       "dev=makedev(18, 52), name=\"%.127s\"..., uuid=\"%.128s\"..., "
 	       "flags=0}) = -1 EBADF (%m)\n",
 	       min_sizeof_dm_ioctl, str129, str129);
 

@@ -125,13 +125,13 @@ test_crypto_msg_newalg(const int fd)
 			       printf("{cru_name=");
 			       print_quoted_memory(alg.cru_name,
 				       sizeof(alg.cru_name) - 1);
-			       printf(", cru_driver_name=");
+			       printf("..., cru_driver_name=");
 			       print_quoted_memory(alg.cru_driver_name,
 				       sizeof(alg.cru_driver_name) - 1);
-			       printf(", cru_module_name=");
+			       printf("..., cru_module_name=");
 			       print_quoted_memory(alg.cru_module_name,
 				       sizeof(alg.cru_module_name) - 1);
-			       PRINT_FIELD_X(", ", alg, cru_type);
+			       PRINT_FIELD_X("..., ", alg, cru_type);
 			       PRINT_FIELD_X(", ", alg, cru_mask);
 			       PRINT_FIELD_U(", ", alg, cru_refcnt);
 			       PRINT_FIELD_X(", ", alg, cru_flags);
