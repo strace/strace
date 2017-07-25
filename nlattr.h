@@ -45,7 +45,9 @@ decode_nlattr(struct tcb *,
 #define DECL_NLA(name)					\
 extern bool						\
 decode_nla_ ## name(struct tcb *, kernel_ulong_t addr,	\
-		    unsigned int len, const void *)
+		    unsigned int len, const void *)	\
+/* End of DECL_NLA definition. */
+
 DECL_NLA(u8);
 DECL_NLA(u16);
 DECL_NLA(u32);

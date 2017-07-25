@@ -35,7 +35,8 @@ diag_decode_name(struct tcb *tcp,			\
 		 const struct nlmsghdr *nlmsghdr,	\
 		 uint8_t family,			\
 		 kernel_ulong_t addr,			\
-		 unsigned int len)
+		 unsigned int len)			\
+/* End of DECL_NETLINK_DIAG_DECODER definition. */
 
 extern DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg);
 extern DECL_NETLINK_DIAG_DECODER(decode_inet_diag_req);

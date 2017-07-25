@@ -689,7 +689,9 @@ extern unsigned int qual_flags(const unsigned int);
 
 #define DECL_IOCTL(name)						\
 extern int								\
-name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)
+name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)	\
+/* End of DECL_IOCTL definition. */
+
 DECL_IOCTL(dm);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
@@ -711,7 +713,9 @@ typedef bool (*netlink_decoder_t)(struct tcb *, const struct nlmsghdr *,
 #define DECL_NETLINK(name)						\
 extern bool								\
 decode_netlink_ ## name(struct tcb *, const struct nlmsghdr *,		\
-			kernel_ulong_t addr, unsigned int len)
+			kernel_ulong_t addr, unsigned int len)		\
+/* End of DECL_NETLINK definition. */
+
 DECL_NETLINK(crypto);
 DECL_NETLINK(selinux);
 DECL_NETLINK(sock_diag);
@@ -850,7 +854,9 @@ extern unsigned current_klongsize;
 #define DECL_PRINTNUM(name)						\
 extern bool								\
 printnum_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
-	ATTRIBUTE_FORMAT((printf, 3, 0))
+	ATTRIBUTE_FORMAT((printf, 3, 0))				\
+/* End of DECL_PRINTNUM definition. */
+
 DECL_PRINTNUM(short);
 DECL_PRINTNUM(int);
 DECL_PRINTNUM(int64);
@@ -858,7 +864,9 @@ DECL_PRINTNUM(int64);
 
 #define DECL_PRINTNUM_ADDR(name)					\
 extern bool								\
-printnum_addr_ ## name(struct tcb *, kernel_ulong_t addr)
+printnum_addr_ ## name(struct tcb *, kernel_ulong_t addr)		\
+/* End of DECL_PRINTNUM_ADDR definition. */
+
 DECL_PRINTNUM_ADDR(int);
 DECL_PRINTNUM_ADDR(int64);
 #undef DECL_PRINTNUM_ADDR
@@ -907,7 +915,9 @@ extern bool printnum_addr_klong_int(struct tcb *, kernel_ulong_t addr);
 #define DECL_PRINTPAIR(name)						\
 extern bool								\
 printpair_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
-	ATTRIBUTE_FORMAT((printf, 3, 0))
+	ATTRIBUTE_FORMAT((printf, 3, 0))				\
+/* End of DECL_PRINTPAIR definition. */
+
 DECL_PRINTPAIR(int);
 DECL_PRINTPAIR(int64);
 #undef DECL_PRINTPAIR
