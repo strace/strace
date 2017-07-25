@@ -27,6 +27,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #ifdef HAVE_LINUX_BPF_H
 # include <linux/bpf.h>
@@ -56,10 +57,11 @@ bpf_map_create(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED | RVAL_FD;
 
-	tprints("{map_type=");
-	printxval(bpf_map_types, attr.map_type, "BPF_MAP_TYPE_???");
-	tprintf(", key_size=%u, value_size=%u, max_entries=%u}",
-		attr.key_size, attr.value_size, attr.max_entries);
+	PRINT_FIELD_XVAL("{", attr, map_type, bpf_map_types, "BPF_MAP_TYPE_???");
+	PRINT_FIELD_U(", ", attr, key_size);
+	PRINT_FIELD_U(", ", attr, value_size);
+	PRINT_FIELD_U(", ", attr, max_entries);
+	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;
 }
@@ -84,11 +86,11 @@ bpf_map_update_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return;
 
-	tprints("{map_fd=");
-	printfd(tcp, attr.map_fd);
-	tprintf(", key=%#" PRIx64 ", value=%#" PRIx64 ", flags=",
-		attr.key, attr.value);
-	printxval64(bpf_map_update_elem_flags, attr.flags, "BPF_???");
+	PRINT_FIELD_FD("{", attr, map_fd, tcp);
+	PRINT_FIELD_X(", ", attr, key);
+	PRINT_FIELD_X(", ", attr, value);
+	PRINT_FIELD_XVAL(", ", attr, flags, bpf_map_update_elem_flags,
+			 "BPF_???");
 	tprints("}");
 }
 
@@ -110,9 +112,9 @@ bpf_map_delete_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return;
 
-	tprints("{map_fd=");
-	printfd(tcp, attr.map_fd);
-	tprintf(", key=%#" PRIx64 "}", attr.key);
+	PRINT_FIELD_FD("{", attr, map_fd, tcp);
+	PRINT_FIELD_X(", ", attr, key);
+	tprints("}");
 }
 
 static int
@@ -141,9 +143,8 @@ bpf_map_io(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int size,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED;
 
-	tprints("{map_fd=");
-	printfd(tcp, attr.map_fd);
-	tprintf(", key=%#" PRIx64, attr.key);
+	PRINT_FIELD_FD("{", attr, map_fd, tcp);
+	PRINT_FIELD_X(", ", attr, key);
 
 	return 0;
 }
@@ -169,13 +170,15 @@ bpf_prog_load(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED | RVAL_FD;
 
-	tprints("{prog_type=");
-	printxval(bpf_prog_types, attr.prog_type, "BPF_PROG_TYPE_???");
-	tprintf(", insn_cnt=%u, insns=%#" PRIx64 ", license=",
-		attr.insn_cnt, attr.insns);
-	printstr(tcp, attr.license);
-	tprintf(", log_level=%u, log_size=%u, log_buf=%#" PRIx64 ", kern_version=%u}",
-		attr.log_level, attr.log_size, attr.log_buf, attr.kern_version);
+	PRINT_FIELD_XVAL("{", attr, prog_type, bpf_prog_types, "BPF_PROG_TYPE_???");
+	PRINT_FIELD_U(", ", attr, insn_cnt);
+	PRINT_FIELD_X(", ", attr, insns);
+	PRINT_FIELD_STR(", ", attr, license, tcp);
+	PRINT_FIELD_U(", ", attr, log_level);
+	PRINT_FIELD_U(", ", attr, log_size);
+	PRINT_FIELD_X(", ", attr, log_buf);
+	PRINT_FIELD_U(", ", attr, kern_version);
+	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;
 }
@@ -198,10 +201,8 @@ bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED | RVAL_FD;
 
-	tprints("{pathname=");
-	printpath(tcp, attr.pathname);
-	tprints(", bpf_fd=");
-	printfd(tcp, attr.bpf_fd);
+	PRINT_FIELD_PATH("{", attr, pathname, tcp);
+	PRINT_FIELD_FD(", ", attr, bpf_fd, tcp);
 	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;
@@ -224,18 +225,13 @@ bpf_prog_attach_detach(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
 		return RVAL_DECODED;
 
-	tprints("{target_fd=");
-	printfd(tcp, attr.target_fd);
-	if (print_attach) {
-		tprints(", attach_bpf_fd=");
-		printfd(tcp, attr.attach_bpf_fd);
-	}
-	tprints(", attach_type=");
-	printxval(bpf_attach_type, attr.attach_type, "BPF_???");
-	if (print_attach) {
-		tprints(", attach_flags=");
-		printflags(bpf_attach_flags, attr.attach_flags, "BPF_F_???");
-	}
+	PRINT_FIELD_FD("{", attr, target_fd, tcp);
+	if (print_attach)
+		PRINT_FIELD_FD(", ", attr, attach_bpf_fd, tcp);
+	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	if (print_attach)
+		PRINT_FIELD_FLAGS(", ", attr, attach_flags, bpf_attach_flags,
+				  "BPF_F_???");
 	tprints("}");
 
 	return RVAL_DECODED;

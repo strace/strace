@@ -149,4 +149,17 @@
 		printstrn((tcp_), (where_).field_, (len_));		\
 	} while (0)
 
+
+#define PRINT_FIELD_STR(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printstr((tcp_), (where_).field_);			\
+	} while (0)
+
+#define PRINT_FIELD_PATH(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printpath((tcp_), (where_).field_);			\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */
