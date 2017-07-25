@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2017 Quentin Monnet <quentin.monnet@6wind.com>
  * All rights reserved.
  *
@@ -40,9 +40,22 @@
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
 
-static int
-bpf_map_create(struct tcb *const tcp, const kernel_ulong_t addr,
-	       unsigned int size)
+#define DECL_BPF_CMD_DECODER(bpf_cmd_decoder)				\
+int									\
+bpf_cmd_decoder(struct tcb *const tcp,					\
+		const kernel_ulong_t addr,				\
+		unsigned int size)					\
+/* End of DECL_BPF_CMD_DECODER definition. */
+
+#define DEF_BPF_CMD_DECODER(bpf_cmd)					\
+	static DECL_BPF_CMD_DECODER(decode_ ## bpf_cmd)
+
+#define BPF_CMD_ENTRY(bpf_cmd)						\
+	[bpf_cmd] = decode_ ## bpf_cmd
+
+typedef DECL_BPF_CMD_DECODER((*bpf_cmd_decoder_t));
+
+DEF_BPF_CMD_DECODER(BPF_MAP_CREATE)
 {
 	struct {
 		uint32_t map_type, key_size, value_size, max_entries;
@@ -66,9 +79,7 @@ bpf_map_create(struct tcb *const tcp, const kernel_ulong_t addr,
 	return RVAL_DECODED | RVAL_FD;
 }
 
-static void
-bpf_map_update_elem(struct tcb *const tcp, const kernel_ulong_t addr,
-		    unsigned int size)
+DEF_BPF_CMD_DECODER(BPF_MAP_UPDATE_ELEM)
 {
 	struct {
 		uint32_t map_fd;
@@ -79,12 +90,12 @@ bpf_map_update_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (!size) {
 		printaddr(addr);
-		return;
+		return RVAL_DECODED;
 	}
 	if (size > sizeof(attr))
 		size = sizeof(attr);
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
-		return;
+		return RVAL_DECODED;
 
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
 	PRINT_FIELD_X(", ", attr, key);
@@ -92,11 +103,10 @@ bpf_map_update_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_XVAL(", ", attr, flags, bpf_map_update_elem_flags,
 			 "BPF_???");
 	tprints("}");
+	return RVAL_DECODED;
 }
 
-static void
-bpf_map_delete_elem(struct tcb *const tcp, const kernel_ulong_t addr,
-		    unsigned int size)
+DEF_BPF_CMD_DECODER(BPF_MAP_DELETE_ELEM)
 {
 	struct {
 		uint32_t map_fd;
@@ -105,16 +115,17 @@ bpf_map_delete_elem(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (!size) {
 		printaddr(addr);
-		return;
+		return RVAL_DECODED;
 	}
 	if (size > sizeof(attr))
 		size = sizeof(attr);
 	if (umoven_or_printaddr(tcp, addr, size, &attr))
-		return;
+		return RVAL_DECODED;
 
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
 	PRINT_FIELD_X(", ", attr, key);
 	tprints("}");
+	return RVAL_DECODED;
 }
 
 static int
@@ -149,9 +160,17 @@ bpf_map_io(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int size,
 	return 0;
 }
 
-static int
-bpf_prog_load(struct tcb *const tcp, const kernel_ulong_t addr,
-	      unsigned int size)
+DEF_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
+{
+	return bpf_map_io(tcp, addr, size, "value");
+}
+
+DEF_BPF_CMD_DECODER(BPF_MAP_GET_NEXT_KEY)
+{
+	return bpf_map_io(tcp, addr, size, "next_key");
+}
+
+DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
 {
 	struct {
 		uint32_t prog_type, insn_cnt;
@@ -183,9 +202,7 @@ bpf_prog_load(struct tcb *const tcp, const kernel_ulong_t addr,
 	return RVAL_DECODED | RVAL_FD;
 }
 
-static int
-bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
-	       unsigned int size)
+static DECL_BPF_CMD_DECODER(bpf_obj_manage)
 {
 	struct {
 		uint64_t ATTRIBUTE_ALIGNED(8) pathname;
@@ -206,6 +223,16 @@ bpf_obj_manage(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;
+}
+
+DEF_BPF_CMD_DECODER(BPF_OBJ_PIN)
+{
+	return bpf_obj_manage(tcp, addr, size);
+}
+
+DEF_BPF_CMD_DECODER(BPF_OBJ_GET)
+{
+	return bpf_obj_manage(tcp, addr, size);
 }
 
 static int
@@ -237,66 +264,46 @@ bpf_prog_attach_detach(struct tcb *const tcp, const kernel_ulong_t addr,
 	return RVAL_DECODED;
 }
 
-static int
-bpf_prog_attach(struct tcb *const tcp, const kernel_ulong_t addr,
-		unsigned int size)
+DEF_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 {
 	return bpf_prog_attach_detach(tcp, addr, size, true);
 }
 
-static int
-bpf_prog_detach(struct tcb *const tcp, const kernel_ulong_t addr,
-		unsigned int size)
+DEF_BPF_CMD_DECODER(BPF_PROG_DETACH)
 {
 	return bpf_prog_attach_detach(tcp, addr, size, false);
 }
 
 SYS_FUNC(bpf)
 {
+	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
+		BPF_CMD_ENTRY(BPF_MAP_CREATE),
+		BPF_CMD_ENTRY(BPF_MAP_LOOKUP_ELEM),
+		BPF_CMD_ENTRY(BPF_MAP_UPDATE_ELEM),
+		BPF_CMD_ENTRY(BPF_MAP_DELETE_ELEM),
+		BPF_CMD_ENTRY(BPF_MAP_GET_NEXT_KEY),
+		BPF_CMD_ENTRY(BPF_PROG_LOAD),
+		BPF_CMD_ENTRY(BPF_OBJ_PIN),
+		BPF_CMD_ENTRY(BPF_OBJ_GET),
+		BPF_CMD_ENTRY(BPF_PROG_ATTACH),
+		BPF_CMD_ENTRY(BPF_PROG_DETACH),
+	};
+
 	const unsigned int cmd = tcp->u_arg[0];
 	const kernel_ulong_t addr = tcp->u_arg[1];
 	const unsigned int size = tcp->u_arg[2];
-	int rc = RVAL_DECODED;
+	int rc;
 
 	if (entering(tcp)) {
 		printxval(bpf_commands, cmd, "BPF_???");
 		tprints(", ");
 	}
 
-	switch (cmd) {
-	case BPF_MAP_CREATE:
-		rc = bpf_map_create(tcp, addr, size);
-		break;
-	case BPF_MAP_LOOKUP_ELEM:
-		rc = bpf_map_io(tcp, addr, size, "value");
-		break;
-	case BPF_MAP_UPDATE_ELEM:
-		bpf_map_update_elem(tcp, addr, size);
-		break;
-	case BPF_MAP_DELETE_ELEM:
-		bpf_map_delete_elem(tcp, addr, size);
-		break;
-	case BPF_MAP_GET_NEXT_KEY:
-		rc = bpf_map_io(tcp, addr, size, "next_key");
-		break;
-	case BPF_PROG_LOAD:
-		rc = bpf_prog_load(tcp, addr, size);
-		break;
-	case BPF_OBJ_PIN:
-		rc = bpf_obj_manage(tcp, addr, size);
-		break;
-	case BPF_OBJ_GET:
-		rc = bpf_obj_manage(tcp, addr, size);
-		break;
-	case BPF_PROG_ATTACH:
-		rc = bpf_prog_attach(tcp, addr, size);
-		break;
-	case BPF_PROG_DETACH:
-		rc = bpf_prog_detach(tcp, addr, size);
-		break;
-	default:
+	if (cmd < ARRAY_SIZE(bpf_cmd_decoders) && bpf_cmd_decoders[cmd]) {
+		rc = bpf_cmd_decoders[cmd](tcp, addr, size);
+	} else {
 		printaddr(addr);
-		break;
+		rc = RVAL_DECODED;
 	}
 
 	if (rc & RVAL_DECODED)
