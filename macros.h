@@ -35,4 +35,9 @@
 #define STRINGIFY(...)		#__VA_ARGS__
 #define STRINGIFY_VAL(...)	STRINGIFY(__VA_ARGS__)
 
+#ifndef offsetofend
+# define offsetofend(type_, member_)	\
+	(offsetof(type_, member_) + sizeof(((type_ *)0)->member_))
+#endif
+
 #endif /* !STRACE_MACROS_H */
