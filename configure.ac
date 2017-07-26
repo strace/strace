@@ -428,39 +428,9 @@ AC_CHECK_HEADERS([linux/input.h], [
 ])
 
 AC_CHECK_HEADERS([linux/bpf.h], [
-	AC_CACHE_CHECK([whether union bpf_attr.log_buf initialization works],
-		       [st_cv_have_union_bpf_attr_log_buf],
-		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <linux/bpf.h>]],
-					 [[union bpf_attr a = { .log_buf = 0 };]])],
-			[st_cv_have_union_bpf_attr_log_buf=yes],
-			[st_cv_have_union_bpf_attr_log_buf=no])])
-	if test $st_cv_have_union_bpf_attr_log_buf = yes; then
-		AC_DEFINE(HAVE_UNION_BPF_ATTR_LOG_BUF, [1],
-			  [Define to 1 if union bpf_attr.log_buf initialization works])
-	fi
-	AC_CACHE_CHECK([whether union bpf_attr.bpf_fd initialization works],
-		       [st_cv_have_union_bpf_attr_bpf_fd],
-		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <linux/bpf.h>]],
-					 [[union bpf_attr a = { .bpf_fd = 0 };]])],
-			[st_cv_have_union_bpf_attr_bpf_fd=yes],
-			[st_cv_have_union_bpf_attr_bpf_fd=no])])
-	if test $st_cv_have_union_bpf_attr_bpf_fd = yes; then
-		AC_DEFINE(HAVE_UNION_BPF_ATTR_BPF_FD, [1],
-			  [Define to 1 if union bpf_attr.bpf_fd initialization works])
-	fi
-	AC_CACHE_CHECK([whether union bpf_attr.attach_flags initialization works],
-		       [st_cv_have_union_bpf_attr_attach_flags],
-		[AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([[#include <linux/bpf.h>]],
-					 [[union bpf_attr a = { .attach_flags = 0 };]])],
-			[st_cv_have_union_bpf_attr_attach_flags=yes],
-			[st_cv_have_union_bpf_attr_attach_flags=no])])
-	if test $st_cv_have_union_bpf_attr_attach_flags = yes; then
-		AC_DEFINE(HAVE_UNION_BPF_ATTR_ATTACH_FLAGS, [1],
-			  [Define to 1 if union bpf_attr.attach_flags initialization works])
-	fi
+	st_CHECK_UNION_BPF_ATTR([log_buf])
+	st_CHECK_UNION_BPF_ATTR([bpf_fd])
+	st_CHECK_UNION_BPF_ATTR([attach_flags])
 ])
 
 AC_CHECK_TYPES([struct statfs], [
