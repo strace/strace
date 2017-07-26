@@ -74,6 +74,18 @@ map_any(int cmd)
 }
 
 static int
+map_delete_elem(void)
+{
+	union bpf_attr attr = {
+		.map_fd = -1,
+		.key = 0xdeadbeef,
+	};
+	void *const t_attr = tail_memdup(&attr, sizeof(attr));
+	return sys_bpf(BPF_MAP_DELETE_ELEM,
+		       (unsigned long) t_attr, sizeof(attr));
+}
+
+static int
 prog_load(void)
 {
 	union bpf_attr attr = {
@@ -172,7 +184,7 @@ main(void)
 	       (unsigned) sizeof(union bpf_attr), errstr);
 	BOGUS_BPF(BPF_MAP_UPDATE_ELEM);
 
-	map_any(BPF_MAP_DELETE_ELEM);
+	map_delete_elem();
 	printf("bpf(BPF_MAP_DELETE_ELEM"
 	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
 	       (unsigned) sizeof(union bpf_attr), errstr);
