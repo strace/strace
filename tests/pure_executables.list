@@ -9,6 +9,7 @@ adjtimex
 aio
 alarm
 bpf
+bpf-v
 brk
 btrfs
 caps

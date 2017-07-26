@@ -1,4 +1,6 @@
 /*
+ * Check bpf syscall decoding.
+ *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
@@ -28,18 +30,25 @@
 #include "tests.h"
 #include <asm/unistd.h>
 
-#if defined HAVE_UNION_BPF_ATTR_LOG_BUF && defined __NR_bpf
+#if defined __NR_bpf				\
+ && (defined HAVE_UNION_BPF_ATTR_ATTACH_FLAGS	\
+  || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
+  || defined HAVE_UNION_BPF_ATTR_FLAGS		\
+  || defined HAVE_UNION_BPF_ATTR_KERN_VERSION	\
+  || defined HAVE_UNION_BPF_ATTR_MAX_ENTRIES)
+
+# include <stddef.h>
 # include <stdio.h>
 # include <stdint.h>
+# include <string.h>
 # include <unistd.h>
 # include <linux/bpf.h>
 
-static const struct bpf_insn insns[] = {
-	{ .code = BPF_JMP | BPF_EXIT }
-};
-
+static const kernel_ulong_t long_bits = (kernel_ulong_t) 0xfacefeed00000000ULL;
 static const char *errstr;
-static char log_buf[4096];
+static unsigned int sizeof_attr = sizeof(union bpf_attr);
+static unsigned int page_size;
+static unsigned long end_of_page;
 
 static long
 sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
@@ -49,56 +58,351 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 	return rc;
 }
 
-static int
-map_create(void)
+# if VERBOSE
+#  define print_extra_data(addr_, size_) print_quoted_hex((addr_), (size_))
+# else
+#  define print_extra_data(addr_, size_) printf("...")
+#endif
+
+# define TEST_BPF_(cmd_, cmd_str_,					\
+		  init_first_, print_first_,				\
+		  init_attr_, print_attr_)				\
+	do {								\
+		/* zero addr */						\
+		sys_bpf(cmd_, 0, long_bits | sizeof(union bpf_attr));	\
+		printf("bpf(%s, NULL, %u) = %s\n",			\
+		       cmd_str_, sizeof_attr, errstr);			\
+									\
+		/* zero size */						\
+		unsigned long addr = end_of_page - sizeof_attr;		\
+		sys_bpf(cmd_, addr, long_bits);				\
+		printf("bpf(%s, %#lx, 0) = %s\n",			\
+		       cmd_str_, addr, errstr);				\
+									\
+		/* the first field only */				\
+		unsigned int offset = init_first_(end_of_page);		\
+		addr = end_of_page - offset;				\
+		sys_bpf(cmd_, addr, offset);				\
+		printf("bpf(%s, {", cmd_str_);				\
+		print_first_(addr);					\
+		printf("}, %u) = %s\n", offset, errstr);		\
+									\
+		/* efault after the first field */			\
+		sys_bpf(cmd_, addr, offset + 1);			\
+		printf("bpf(%s, %#lx, %u) = %s\n",			\
+		       cmd_str_, addr, offset + 1, errstr);		\
+									\
+		/* the relevant part of union bpf_attr */		\
+		offset = init_attr_(end_of_page);			\
+		addr = end_of_page - offset;				\
+		sys_bpf(cmd_, addr, offset);				\
+		printf("bpf(%s, {", cmd_str_);				\
+		print_attr_(addr);					\
+		printf("}, %u) = %s\n", offset, errstr);		\
+									\
+		/* short read of the relevant part of union bpf_attr */	\
+		sys_bpf(cmd_, addr + 1, offset);			\
+		printf("bpf(%s, %#lx, %u) = %s\n",			\
+		       cmd_str_, addr + 1, offset, errstr);		\
+									\
+		if (offset < sizeof_attr) {				\
+			/* short read of the whole union bpf_attr */	\
+			memmove((void *) end_of_page - sizeof_attr + 1,	\
+				(void *) addr, offset);			\
+			addr = end_of_page - sizeof_attr + 1;		\
+			memset((void *) addr + offset, 0,		\
+			       sizeof_attr - offset - 1);		\
+			sys_bpf(cmd_, addr, sizeof_attr);		\
+			printf("bpf(%s, %#lx, %u) = %s\n",		\
+			       cmd_str_, addr, sizeof_attr, errstr);	\
+									\
+			/* the whole union bpf_attr */			\
+			memmove((void *) end_of_page - sizeof_attr,	\
+				(void *) addr, offset);			\
+			addr = end_of_page - sizeof_attr;		\
+			memset((void *) addr + offset, 0,		\
+			       sizeof_attr - offset);			\
+			sys_bpf(cmd_, addr, sizeof_attr);		\
+			printf("bpf(%s, {", cmd_str_);			\
+			print_attr_(addr);				\
+			printf("}, %u) = %s\n", sizeof_attr, errstr);	\
+									\
+			/* non-zero bytes after the relevant part */	\
+			fill_memory_ex((void *) addr + offset,		\
+				       sizeof_attr - offset, '0', 10);	\
+			sys_bpf(cmd_, addr, sizeof_attr);		\
+			printf("bpf(%s, {", cmd_str_);			\
+			print_attr_(addr);				\
+			printf(", ");					\
+			print_extra_data((void *) addr + offset,	\
+					 sizeof_attr - offset);		\
+			printf("}, %u) = %s\n", sizeof_attr, errstr);	\
+		}							\
+									\
+		/* short read of the whole page */			\
+		memmove((void *) end_of_page - page_size + 1,		\
+			(void *) addr, offset);				\
+		addr = end_of_page - page_size + 1;			\
+		memset((void *) addr + offset, 0,			\
+		       page_size - offset - 1);				\
+		sys_bpf(cmd_, addr, page_size);				\
+		printf("bpf(%s, %#lx, %u) = %s\n",			\
+		       cmd_str_, addr, page_size, errstr);		\
+									\
+		/* the whole page */					\
+		memmove((void *) end_of_page - page_size,		\
+			(void *) addr, offset);				\
+		addr = end_of_page - page_size;				\
+		memset((void *) addr + offset, 0, page_size - offset);	\
+		sys_bpf(cmd_, addr, page_size);				\
+		printf("bpf(%s, {", cmd_str_);				\
+		print_attr_(addr);					\
+		printf("}, %u) = %s\n", page_size, errstr);		\
+									\
+		/* non-zero bytes after the whole union bpf_attr */	\
+		fill_memory_ex((void *) addr + offset,			\
+			       page_size - offset, '0', 10);		\
+		sys_bpf(cmd_, addr, page_size);				\
+		printf("bpf(%s, {", cmd_str_);				\
+		print_attr_(addr);					\
+		printf(", ");						\
+		print_extra_data((void *) addr + offset,		\
+				 page_size - offset);			\
+		printf("}, %u) = %s\n", page_size, errstr);		\
+									\
+		/* more than a page */					\
+		sys_bpf(cmd_, addr, page_size + 1);			\
+		printf("bpf(%s, %#lx, %u) = %s\n",			\
+		       cmd_str_, addr, page_size + 1, errstr);		\
+	} while (0)							\
+	/* End of TEST_BPF_ definition. */
+
+# define TEST_BPF(cmd_)							\
+	TEST_BPF_((cmd_), #cmd_,					\
+		  init_ ## cmd_ ## _first, print_ ## cmd_ ## _first,	\
+		  init_ ## cmd_ ## _attr, print_ ## cmd_ ## _attr)	\
+	/* End of TEST_BPF definition. */
+
+# ifdef HAVE_UNION_BPF_ATTR_MAX_ENTRIES
+
+static unsigned int
+init_BPF_MAP_CREATE_first(const unsigned long eop)
 {
-	union bpf_attr attr = {
+	static const union bpf_attr attr = { .map_type = 2 };
+	static const unsigned int offset = sizeof(attr.map_type);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.map_type, offset);
+	return offset;
+}
+
+static void
+print_BPF_MAP_CREATE_first(const unsigned long addr)
+{
+	printf("map_type=BPF_MAP_TYPE_ARRAY, key_size=0"
+	       ", value_size=0, max_entries=0");
+}
+
+static unsigned int
+init_BPF_MAP_CREATE_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
+		.map_type = 1,
 		.key_size = 4,
 		.value_size = 8,
 		.max_entries = 256
 	};
-	void *const t_attr = tail_memdup(&attr, sizeof(attr));
-	return sys_bpf(BPF_MAP_CREATE, (unsigned long) t_attr, sizeof(attr));
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, max_entries);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
 }
 
-static int
-map_any(int cmd)
+static void
+print_BPF_MAP_CREATE_attr(const unsigned long addr)
 {
-	union bpf_attr attr = {
+	printf("map_type=BPF_MAP_TYPE_HASH, key_size=4"
+	       ", value_size=8, max_entries=256");
+}
+
+# endif /* HAVE_UNION_BPF_ATTR_MAX_ENTRIES */
+
+# ifdef HAVE_UNION_BPF_ATTR_FLAGS
+
+static unsigned int
+init_BPF_MAP_LOOKUP_ELEM_first(const unsigned long eop)
+{
+	static const union bpf_attr attr = { .map_fd = -1 };
+	static const unsigned int offset = sizeof(attr.map_fd);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.map_fd, offset);
+	return offset;
+}
+
+static void
+print_BPF_MAP_LOOKUP_ELEM_first(const unsigned long addr)
+{
+	printf("map_fd=-1, key=0");
+}
+
+static unsigned int
+init_BPF_MAP_LOOKUP_ELEM_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
 		.map_fd = -1,
 		.key = 0xdeadbeef,
 		.value = 0xbadc0ded
 	};
-	void *const t_attr = tail_memdup(&attr, sizeof(attr));
-	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, value);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
 }
 
-static int
-map_delete_elem(void)
+static void
+print_BPF_MAP_LOOKUP_ELEM_attr(const unsigned long addr)
 {
-	union bpf_attr attr = {
+	printf("map_fd=-1, key=0xdeadbeef");
+}
+
+#  define init_BPF_MAP_UPDATE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
+
+static void
+print_BPF_MAP_UPDATE_ELEM_first(const unsigned long addr)
+{
+	printf("map_fd=-1, key=0, value=0, flags=BPF_ANY");
+}
+
+static unsigned int
+init_BPF_MAP_UPDATE_ELEM_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
 		.map_fd = -1,
 		.key = 0xdeadbeef,
+		.value = 0xbadc0ded,
+		.flags = 2
 	};
-	void *const t_attr = tail_memdup(&attr, sizeof(attr));
-	return sys_bpf(BPF_MAP_DELETE_ELEM,
-		       (unsigned long) t_attr, sizeof(attr));
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, flags);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
 }
 
-static int
-prog_load(void)
+static void
+print_BPF_MAP_UPDATE_ELEM_attr(const unsigned long addr)
 {
-	union bpf_attr attr = {
-		.insn_cnt = sizeof(insns) / sizeof(insns[0]),
-		.insns = (unsigned long) insns,
-		.license = (unsigned long) "GPL",
+	printf("map_fd=-1, key=0xdeadbeef, value=0xbadc0ded, flags=BPF_EXIST");
+}
+
+#  define init_BPF_MAP_DELETE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
+#  define print_BPF_MAP_DELETE_ELEM_first print_BPF_MAP_LOOKUP_ELEM_first
+
+static unsigned int
+init_BPF_MAP_DELETE_ELEM_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
+		.map_fd = -1,
+		.key = 0xdeadbeef
+	};
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, key);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
+}
+
+#  define print_BPF_MAP_DELETE_ELEM_attr print_BPF_MAP_LOOKUP_ELEM_attr
+
+#  define init_BPF_MAP_GET_NEXT_KEY_first init_BPF_MAP_LOOKUP_ELEM_first
+#  define print_BPF_MAP_GET_NEXT_KEY_first print_BPF_MAP_LOOKUP_ELEM_first
+
+static unsigned int
+init_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
+		.map_fd = -1,
+		.key = 0xdeadbeef,
+		.next_key = 0xbadc0ded
+	};
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, next_key);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
+}
+
+#  define print_BPF_MAP_GET_NEXT_KEY_attr print_BPF_MAP_LOOKUP_ELEM_attr
+
+# endif /* HAVE_UNION_BPF_ATTR_FLAGS */
+
+# ifdef HAVE_UNION_BPF_ATTR_KERN_VERSION
+
+static unsigned int
+init_BPF_PROG_LOAD_first(const unsigned long eop)
+{
+	static const union bpf_attr attr = { .prog_type = 1 };
+	static const unsigned int offset = sizeof(attr.prog_type);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.prog_type, offset);
+	return offset;
+}
+
+static void
+print_BPF_PROG_LOAD_first(const unsigned long addr)
+{
+
+	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=0, insns=0"
+	       ", license=NULL, log_level=0, log_size=0, log_buf=0"
+	       ", kern_version=0");
+}
+
+static const struct bpf_insn insns[] = {
+	{ .code = BPF_JMP | BPF_EXIT }
+};
+static char log_buf[4096];
+
+static unsigned int
+init_BPF_PROG_LOAD_attr(const unsigned long eop)
+{
+	const union bpf_attr attr = {
+		.prog_type = 1,
+		.insn_cnt = ARRAY_SIZE(insns),
+		.insns = (uintptr_t) insns,
+		.license = (uintptr_t) "GPL",
 		.log_level = 42,
 		.log_size = sizeof(log_buf),
-		.log_buf = (unsigned long) log_buf
+		.log_buf = (uintptr_t) log_buf,
+		.kern_version = 0xcafef00d
 	};
-	void *const t_attr = tail_memdup(&attr, sizeof(attr));
-	return sys_bpf(BPF_PROG_LOAD, (unsigned long) t_attr, sizeof(attr));
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, kern_version);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
 }
+
+static void
+print_BPF_PROG_LOAD_attr(const unsigned long addr)
+{
+	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u, insns=%p"
+	       ", license=\"GPL\", log_level=42, log_size=4096, log_buf=%p"
+	       ", kern_version=%u",
+	       (unsigned int) ARRAY_SIZE(insns), insns,
+	       log_buf, 0xcafef00d);
+}
+
+# endif /* HAVE_UNION_BPF_ATTR_KERN_VERSION */
 
 /*
  * bpf() syscall and its first six commands were introduced in Linux kernel
@@ -108,134 +412,165 @@ prog_load(void)
  * BPF_OBJ_PIN and BPF_OBJ_GET commands appear in kernel 4.4.
  */
 # ifdef HAVE_UNION_BPF_ATTR_BPF_FD
-static int
-obj_manage(int cmd)
+
+static unsigned int
+init_BPF_OBJ_PIN_first(const unsigned long eop)
 {
-	union bpf_attr attr = {
-		.pathname = (unsigned long) "/sys/fs/bpf/foo/bar",
+	static const union bpf_attr attr = {};
+	static const unsigned int offset = sizeof(attr.pathname);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.pathname, offset);
+	return offset;
+}
+
+static void
+print_BPF_OBJ_PIN_first(const unsigned long addr)
+{
+
+	printf("pathname=NULL, bpf_fd=0");
+}
+
+static unsigned int
+init_BPF_OBJ_PIN_attr(const unsigned long eop)
+{
+	const union bpf_attr attr = {
+		.pathname = (uintptr_t) "/sys/fs/bpf/foo/bar",
 		.bpf_fd = -1
 	};
-	void *const t_attr = tail_memdup(&attr, sizeof(attr));
-	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, bpf_fd);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
 }
-# endif
+
+static void
+print_BPF_OBJ_PIN_attr(const unsigned long addr)
+{
+	printf("pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1");
+}
+
+#  define init_BPF_OBJ_GET_first init_BPF_OBJ_PIN_first
+#  define print_BPF_OBJ_GET_first print_BPF_OBJ_PIN_first
+#  define init_BPF_OBJ_GET_attr init_BPF_OBJ_PIN_attr
+#  define print_BPF_OBJ_GET_attr print_BPF_OBJ_PIN_attr
+
+# endif /* HAVE_UNION_BPF_ATTR_BPF_FD */
 
 /* BPF_PROG_ATTACH and BPF_PROG_DETACH commands appear in kernel 4.10. */
 # ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
-static int
-prog_cgroup(int cmd)
-{
-	union bpf_attr attr = {
-		.target_fd = -1,
-		.attach_bpf_fd = -1,
-		.attach_type = 0,
-		.attach_flags = 1
-	};
-	void *const t_attr = tail_memdup(&attr, sizeof(attr));
-	return sys_bpf(cmd, (unsigned long) t_attr, sizeof(attr));
-}
-# endif
 
-static unsigned long efault;
+static unsigned int
+init_BPF_PROG_ATTACH_first(const unsigned long eop)
+{
+	static const union bpf_attr attr = { .target_fd = -1 };
+	static const unsigned int offset = sizeof(attr.target_fd);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.target_fd, offset);
+	return offset;
+}
 
 static void
-bogus_bpf(int cmd, const char *name)
+print_BPF_PROG_ATTACH_first(const unsigned long addr)
 {
-	const unsigned long bogus_size = 1024;
-	const unsigned long bogus_addr = efault - bogus_size;
-
-	sys_bpf(cmd, efault, 4);
-	printf("bpf(%s, %#lx, %lu) = %s\n",
-	       name, efault, 4UL, errstr);
-
-	sys_bpf(cmd, efault, bogus_size);
-	printf("bpf(%s, %#lx, %lu) = %s\n",
-	       name, efault, bogus_size, errstr);
-
-	sys_bpf(cmd, bogus_addr, 0);
-	printf("bpf(%s, %#lx, %lu) = %s\n",
-	       name, bogus_addr, 0UL, errstr);
+	printf("target_fd=-1, attach_bpf_fd=0"
+	       ", attach_type=BPF_CGROUP_INET_INGRESS, attach_flags=0");
 }
 
-#define BOGUS_BPF(cmd)	bogus_bpf(cmd, #cmd)
+static unsigned int
+init_BPF_PROG_ATTACH_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
+		.target_fd = -1,
+		.attach_bpf_fd = -2,
+		.attach_type = 2,
+		.attach_flags = 1
+	};
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, attach_flags);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
+}
+
+static void
+print_BPF_PROG_ATTACH_attr(const unsigned long addr)
+{
+	printf("target_fd=-1, attach_bpf_fd=-2"
+	       ", attach_type=BPF_CGROUP_INET_SOCK_CREATE"
+	       ", attach_flags=BPF_F_ALLOW_OVERRIDE");
+}
+
+#  define init_BPF_PROG_DETACH_first init_BPF_PROG_ATTACH_first
+
+static unsigned int
+init_BPF_PROG_DETACH_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
+		.target_fd = -1,
+		.attach_type = 2
+	};
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, attach_type);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
+}
+
+
+static void
+print_BPF_PROG_DETACH_first(const unsigned long addr)
+{
+	printf("target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS");
+}
+
+static void
+print_BPF_PROG_DETACH_attr(const unsigned long addr)
+{
+	printf("target_fd=-1, attach_type=BPF_CGROUP_INET_SOCK_CREATE");
+}
+
+# endif /* HAVE_UNION_BPF_ATTR_ATTACH_FLAGS */
 
 int
 main(void)
 {
-	efault = (unsigned long) tail_alloc(1) + 1;
+	page_size = get_page_size();
+	end_of_page = (unsigned long) tail_alloc(1) + 1;
 
-	map_create();
-	printf("bpf(BPF_MAP_CREATE"
-	       ", {map_type=BPF_MAP_TYPE_UNSPEC, key_size=4"
-	       ", value_size=8, max_entries=256}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_MAP_CREATE);
+# ifdef HAVE_UNION_BPF_ATTR_MAX_ENTRIES
+	TEST_BPF(BPF_MAP_CREATE);
+# endif
 
-	map_any(BPF_MAP_LOOKUP_ELEM);
-	printf("bpf(BPF_MAP_LOOKUP_ELEM"
-	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_MAP_LOOKUP_ELEM);
+# ifdef HAVE_UNION_BPF_ATTR_FLAGS
+	TEST_BPF(BPF_MAP_LOOKUP_ELEM);
+	TEST_BPF(BPF_MAP_UPDATE_ELEM);
+	TEST_BPF(BPF_MAP_DELETE_ELEM);
+	TEST_BPF(BPF_MAP_GET_NEXT_KEY);
+# endif
 
-	map_any(BPF_MAP_UPDATE_ELEM);
-	printf("bpf(BPF_MAP_UPDATE_ELEM"
-	       ", {map_fd=-1, key=0xdeadbeef"
-	       ", value=0xbadc0ded, flags=BPF_ANY}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_MAP_UPDATE_ELEM);
-
-	map_delete_elem();
-	printf("bpf(BPF_MAP_DELETE_ELEM"
-	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_MAP_DELETE_ELEM);
-
-	map_any(BPF_MAP_GET_NEXT_KEY);
-	printf("bpf(BPF_MAP_GET_NEXT_KEY"
-	       ", {map_fd=-1, key=0xdeadbeef}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_MAP_GET_NEXT_KEY);
-
-	prog_load();
-	printf("bpf(BPF_PROG_LOAD"
-	       ", {prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=1, insns=%p"
-	       ", license=\"GPL\", log_level=42, log_size=4096, log_buf=%p"
-	       ", kern_version=0}, %u) = %s\n",
-	       insns, log_buf, (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_PROG_LOAD);
+# ifdef HAVE_UNION_BPF_ATTR_KERN_VERSION
+	TEST_BPF(BPF_PROG_LOAD);
+# endif
 
 # ifdef HAVE_UNION_BPF_ATTR_BPF_FD
-	obj_manage(BPF_OBJ_PIN);
-	printf("bpf(BPF_OBJ_PIN"
-	       ", {pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_OBJ_PIN);
-
-	obj_manage(BPF_OBJ_GET);
-	printf("bpf(BPF_OBJ_GET"
-	       ", {pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_OBJ_GET);
+	TEST_BPF(BPF_OBJ_PIN);
+	TEST_BPF(BPF_OBJ_GET);
 # endif
 
 # ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
-	prog_cgroup(BPF_PROG_ATTACH);
-	printf("bpf(BPF_PROG_ATTACH"
-	       ", {target_fd=-1, attach_bpf_fd=-1"
-	       ", attach_type=BPF_CGROUP_INET_INGRESS"
-	       ", attach_flags=BPF_F_ALLOW_OVERRIDE}, %u) = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_PROG_ATTACH);
-
-	prog_cgroup(BPF_PROG_DETACH);
-	printf("bpf(BPF_PROG_DETACH"
-	       ", {target_fd=-1, attach_type=BPF_CGROUP_INET_INGRESS}, %u)"
-	       " = %s\n",
-	       (unsigned) sizeof(union bpf_attr), errstr);
-	BOGUS_BPF(BPF_PROG_DETACH);
+	TEST_BPF(BPF_PROG_ATTACH);
+	TEST_BPF(BPF_PROG_DETACH);
 # endif
 
-	bogus_bpf(0xfacefeed, "0xfacefeed /* BPF_??? */");
+	sys_bpf(0xfacefeed, end_of_page, 40);
+	printf("bpf(0xfacefeed /* BPF_??? */, %#lx, 40) = %s\n",
+	       end_of_page, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -243,6 +578,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_bpf")
+SKIP_MAIN_UNDEFINED("__NR_bpf && HAVE_UNION_BPF_ATTR_*")
 
 #endif
