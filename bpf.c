@@ -36,6 +36,7 @@
 #include "xlat/bpf_commands.h"
 #include "xlat/bpf_map_types.h"
 #include "xlat/bpf_prog_types.h"
+#include "xlat/bpf_prog_flags.h"
 #include "xlat/bpf_map_update_elem_flags.h"
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
@@ -202,11 +203,9 @@ DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		uint64_t ATTRIBUTE_ALIGNED(8) insns, license;
 		uint32_t log_level, log_size;
 		uint64_t ATTRIBUTE_ALIGNED(8) log_buf;
-		uint32_t kern_version;
+		uint32_t kern_version, prog_flags;
 	} attr = {};
-	const size_t attr_size =
-		offsetofend(struct bpf_prog_load, kern_version);
-	const unsigned int len = size < attr_size ? size : attr_size;
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
 
 	memcpy(&attr, data, len);
 
@@ -219,7 +218,8 @@ DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	PRINT_FIELD_U(", ", attr, log_size);
 	PRINT_FIELD_X(", ", attr, log_buf);
 	PRINT_FIELD_U(", ", attr, kern_version);
-	decode_attr_extra_data(tcp, data, size, attr_size);
+	PRINT_FIELD_FLAGS(", ", attr, prog_flags, bpf_prog_flags, "BPF_F_???");
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
 	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;

@@ -431,8 +431,8 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_CHECK_UNION_BPF_ATTR([attach_flags])
 	st_CHECK_UNION_BPF_ATTR([bpf_fd])
 	st_CHECK_UNION_BPF_ATTR([flags])
-	st_CHECK_UNION_BPF_ATTR([kern_version])
 	st_CHECK_UNION_BPF_ATTR([max_entries])
+	st_CHECK_UNION_BPF_ATTR([prog_flags])
 ])
 
 AC_CHECK_TYPES([struct statfs], [
