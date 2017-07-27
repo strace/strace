@@ -248,7 +248,7 @@ init_BPF_MAP_LOOKUP_ELEM_first(const unsigned long eop)
 static void
 print_BPF_MAP_LOOKUP_ELEM_first(const unsigned long addr)
 {
-	printf("map_fd=-1, key=0");
+	printf("map_fd=-1, key=0, value=0");
 }
 
 static unsigned int
@@ -270,7 +270,7 @@ init_BPF_MAP_LOOKUP_ELEM_attr(const unsigned long eop)
 static void
 print_BPF_MAP_LOOKUP_ELEM_attr(const unsigned long addr)
 {
-	printf("map_fd=-1, key=0xdeadbeef");
+	printf("map_fd=-1, key=0xdeadbeef, value=0xbadc0ded");
 }
 
 #  define init_BPF_MAP_UPDATE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
@@ -305,7 +305,12 @@ print_BPF_MAP_UPDATE_ELEM_attr(const unsigned long addr)
 }
 
 #  define init_BPF_MAP_DELETE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
-#  define print_BPF_MAP_DELETE_ELEM_first print_BPF_MAP_LOOKUP_ELEM_first
+
+static void
+print_BPF_MAP_DELETE_ELEM_first(const unsigned long addr)
+{
+	printf("map_fd=-1, key=0");
+}
 
 static unsigned int
 init_BPF_MAP_DELETE_ELEM_attr(const unsigned long eop)
@@ -322,10 +327,19 @@ init_BPF_MAP_DELETE_ELEM_attr(const unsigned long eop)
 	return offset;
 }
 
-#  define print_BPF_MAP_DELETE_ELEM_attr print_BPF_MAP_LOOKUP_ELEM_attr
+static void
+print_BPF_MAP_DELETE_ELEM_attr(const unsigned long addr)
+{
+	printf("map_fd=-1, key=0xdeadbeef");
+}
 
 #  define init_BPF_MAP_GET_NEXT_KEY_first init_BPF_MAP_LOOKUP_ELEM_first
-#  define print_BPF_MAP_GET_NEXT_KEY_first print_BPF_MAP_LOOKUP_ELEM_first
+
+static void
+print_BPF_MAP_GET_NEXT_KEY_first(const unsigned long addr)
+{
+	printf("map_fd=-1, key=0, next_key=0");
+}
 
 static unsigned int
 init_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long eop)
@@ -343,7 +357,11 @@ init_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long eop)
 	return offset;
 }
 
-#  define print_BPF_MAP_GET_NEXT_KEY_attr print_BPF_MAP_LOOKUP_ELEM_attr
+static void
+print_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long addr)
+{
+	printf("map_fd=-1, key=0xdeadbeef, next_key=0xbadc0ded");
+}
 
 # endif /* HAVE_UNION_BPF_ATTR_FLAGS */
 

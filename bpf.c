@@ -109,6 +109,26 @@ DEF_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	return RVAL_DECODED | RVAL_FD;
 }
 
+DEF_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
+{
+	struct bpf_io_elem_struct {
+		uint32_t map_fd;
+		uint64_t ATTRIBUTE_ALIGNED(8) key, value;
+	} attr = {};
+
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
+
+	memcpy(&attr, data, len);
+
+	PRINT_FIELD_FD("{", attr, map_fd, tcp);
+	PRINT_FIELD_X(", ", attr, key);
+	PRINT_FIELD_X(", ", attr, value);
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
+
+	return RVAL_DECODED;
+}
+
 DEF_BPF_CMD_DECODER(BPF_MAP_UPDATE_ELEM)
 {
 	struct {
@@ -150,31 +170,12 @@ DEF_BPF_CMD_DECODER(BPF_MAP_DELETE_ELEM)
 	return RVAL_DECODED;
 }
 
-static int
-bpf_map_io(struct tcb *const tcp,
-	   const kernel_ulong_t addr,
-	   const unsigned int size,
-	   void *const data,
-	   const char *const text)
+DEF_BPF_CMD_DECODER(BPF_MAP_GET_NEXT_KEY)
 {
 	struct bpf_io_elem_struct {
 		uint32_t map_fd;
-		uint64_t ATTRIBUTE_ALIGNED(8) key;
-		uint64_t ATTRIBUTE_ALIGNED(8) value;
+		uint64_t ATTRIBUTE_ALIGNED(8) key, next_key;
 	} attr = {};
-	const size_t value_offset = offsetof(struct bpf_io_elem_struct, value);
-
-	if (exiting(tcp)) {
-		if (!syserror(tcp)) {
-			tprints(", ");
-			if (!umove_or_printaddr(tcp, addr + value_offset,
-						&attr.value))
-				tprintf("%s=%#" PRIx64, text, attr.value);
-		}
-		tprints("}");
-
-		return RVAL_DECODED;
-	}
 
 	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
 
@@ -182,22 +183,11 @@ bpf_map_io(struct tcb *const tcp,
 
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
 	PRINT_FIELD_X(", ", attr, key);
+	PRINT_FIELD_X(", ", attr, next_key);
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
 
-	int rc = decode_attr_extra_data(tcp, data, size, sizeof(attr));
-	if (rc & RVAL_DECODED)
-		tprints("}");
-
-	return rc;
-}
-
-DEF_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
-{
-	return bpf_map_io(tcp, addr, size, data, "value");
-}
-
-DEF_BPF_CMD_DECODER(BPF_MAP_GET_NEXT_KEY)
-{
-	return bpf_map_io(tcp, addr, size, data, "next_key");
+	return RVAL_DECODED;
 }
 
 DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
