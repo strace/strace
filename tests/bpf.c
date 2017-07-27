@@ -34,7 +34,7 @@
  && (defined HAVE_UNION_BPF_ATTR_ATTACH_FLAGS	\
   || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
   || defined HAVE_UNION_BPF_ATTR_FLAGS		\
-  || defined HAVE_UNION_BPF_ATTR_MAX_ENTRIES	\
+  || defined HAVE_UNION_BPF_ATTR_INNER_MAP_FD	\
   || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS)
 
 # include <stddef.h>
@@ -183,7 +183,7 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 		  init_ ## cmd_ ## _attr, print_ ## cmd_ ## _attr)	\
 	/* End of TEST_BPF definition. */
 
-# ifdef HAVE_UNION_BPF_ATTR_MAX_ENTRIES
+# ifdef HAVE_UNION_BPF_ATTR_INNER_MAP_FD
 
 static unsigned int
 init_BPF_MAP_CREATE_first(const unsigned long eop)
@@ -199,8 +199,8 @@ init_BPF_MAP_CREATE_first(const unsigned long eop)
 static void
 print_BPF_MAP_CREATE_first(const unsigned long addr)
 {
-	printf("map_type=BPF_MAP_TYPE_ARRAY, key_size=0"
-	       ", value_size=0, max_entries=0");
+	printf("map_type=BPF_MAP_TYPE_ARRAY, key_size=0, value_size=0"
+	       ", max_entries=0, map_flags=0, inner_map_fd=0");
 }
 
 static unsigned int
@@ -210,10 +210,12 @@ init_BPF_MAP_CREATE_attr(const unsigned long eop)
 		.map_type = 1,
 		.key_size = 4,
 		.value_size = 8,
-		.max_entries = 256
+		.max_entries = 256,
+		.map_flags = 1,
+		.inner_map_fd = -1
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, max_entries);
+		offsetofend(union bpf_attr, inner_map_fd);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -224,10 +226,11 @@ static void
 print_BPF_MAP_CREATE_attr(const unsigned long addr)
 {
 	printf("map_type=BPF_MAP_TYPE_HASH, key_size=4"
-	       ", value_size=8, max_entries=256");
+	       ", value_size=8, max_entries=256"
+	       ", map_flags=BPF_F_NO_PREALLOC, inner_map_fd=-1");
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_MAX_ENTRIES */
+# endif /* HAVE_UNION_BPF_ATTR_INNER_MAP_FD */
 
 # ifdef HAVE_UNION_BPF_ATTR_FLAGS
 
@@ -544,7 +547,7 @@ main(void)
 	page_size = get_page_size();
 	end_of_page = (unsigned long) tail_alloc(1) + 1;
 
-# ifdef HAVE_UNION_BPF_ATTR_MAX_ENTRIES
+# ifdef HAVE_UNION_BPF_ATTR_INNER_MAP_FD
 	TEST_BPF(BPF_MAP_CREATE);
 # endif
 
