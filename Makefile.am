@@ -277,6 +277,7 @@ strace_SOURCES =	\
 	times.c		\
 	truncate.c	\
 	ubi.c		\
+	ucopy.c		\
 	uid.c		\
 	uid16.c		\
 	umask.c		\
