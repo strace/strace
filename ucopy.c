@@ -67,10 +67,12 @@ vm_read_mem(const pid_t pid, void *const laddr,
 {
 	const unsigned long truncated_raddr = raddr;
 
+#if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
 	if (raddr != (kernel_ulong_t) truncated_raddr) {
 		errno = EIO;
 		return -1;
 	}
+#endif
 
 	const struct iovec local = {
 		.iov_base = laddr,
