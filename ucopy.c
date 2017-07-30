@@ -120,6 +120,7 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		}
 		switch (errno) {
 			case ENOSYS:
+				/* never try it again */
 				process_vm_readv_not_supported = 1;
 				break;
 			case EPERM:
@@ -133,7 +134,8 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("process_vm_readv");
+				perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
+					    pid, addr);
 				return -1;
 		}
 	}
@@ -263,6 +265,7 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 			}
 			switch (errno) {
 				case ENOSYS:
+					/* never try it again */
 					process_vm_readv_not_supported = 1;
 					goto vm_readv_didnt_work;
 				case ESRCH:
@@ -282,7 +285,8 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 					return -1;
 				default:
 					/* all the rest is strange and should be reported */
-					perror_msg("process_vm_readv");
+					perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
+						    pid, addr);
 					return -1;
 			}
 		}
