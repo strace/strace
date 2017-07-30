@@ -86,6 +86,17 @@ vm_read_mem(const pid_t pid, void *const laddr,
 	return process_vm_readv(pid, &local, 1, &remote, 1, 0);
 }
 
+static bool
+tracee_addr_is_invalid(kernel_ulong_t addr)
+{
+	return
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+		current_wordsize < sizeof(addr) && addr & ~(kernel_ulong_t) -1U;
+#else
+		false;
+#endif
+}
+
 /*
  * Copy `len' bytes of data from process `pid'
  * at address `addr' to our space at `our_addr'.
@@ -102,12 +113,8 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		char x[sizeof(long)];
 	} u;
 
-#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-	if (current_wordsize < sizeof(addr)
-	    && (addr & (~(kernel_ulong_t) -1U))) {
+	if (tracee_addr_is_invalid(addr))
 		return -1;
-	}
-#endif
 
 	if (!process_vm_readv_not_supported) {
 		int r = vm_read_mem(pid, laddr, addr, len);
@@ -227,12 +234,8 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 		char x[sizeof(long)];
 	} u;
 
-#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-	if (current_wordsize < sizeof(addr)
-	    && (addr & (~(kernel_ulong_t) -1U))) {
+	if (tracee_addr_is_invalid(addr))
 		return -1;
-	}
-#endif
 
 	nread = 0;
 	if (!process_vm_readv_not_supported) {
