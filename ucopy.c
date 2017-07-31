@@ -83,7 +83,11 @@ vm_read_mem(const pid_t pid, void *const laddr,
 		.iov_len = len
 	};
 
-	return process_vm_readv(pid, &local, 1, &remote, 1, 0);
+	const ssize_t rc = process_vm_readv(pid, &local, 1, &remote, 1, 0);
+	if (rc < 0 && errno == ENOSYS)
+		process_vm_readv_not_supported = true;
+
+	return rc;
 }
 
 static bool
@@ -127,11 +131,8 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		}
 		switch (errno) {
 			case ENOSYS:
-				/* never try it again */
-				process_vm_readv_not_supported = 1;
-				break;
 			case EPERM:
-				/* operation not permitted, try PTRACE_PEEKDATA */
+				/* try PTRACE_PEEKDATA */
 				break;
 			case ESRCH:
 				/* the process is gone */
@@ -268,14 +269,8 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 			}
 			switch (errno) {
 				case ENOSYS:
-					/* never try it again */
-					process_vm_readv_not_supported = 1;
-					goto vm_readv_didnt_work;
-				case ESRCH:
-					/* the process is gone */
-					return -1;
 				case EPERM:
-					/* operation not permitted, try PTRACE_PEEKDATA */
+					/* try PTRACE_PEEKDATA */
 					if (!nread)
 						goto vm_readv_didnt_work;
 					/* fall through */
@@ -285,6 +280,9 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 						perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
 							   nread, nread + len, addr - nread);
 					}
+					return -1;
+				case ESRCH:
+					/* the process is gone */
 					return -1;
 				default:
 					/* all the rest is strange and should be reported */
