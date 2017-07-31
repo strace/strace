@@ -101,52 +101,16 @@ tracee_addr_is_invalid(kernel_ulong_t addr)
 #endif
 }
 
-/*
- * Copy `len' bytes of data from process `pid'
- * at address `addr' to our space at `our_addr'.
- */
-int
-umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
-       void *const our_addr)
+/* legacy method of copying from tracee */
+static int
+umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
+		void *laddr)
 {
-	char *laddr = our_addr;
-	int pid = tcp->pid;
 	unsigned int n, m, nread;
 	union {
 		long val;
 		char x[sizeof(long)];
 	} u;
-
-	if (tracee_addr_is_invalid(addr))
-		return -1;
-
-	if (!process_vm_readv_not_supported) {
-		int r = vm_read_mem(pid, laddr, addr, len);
-		if ((unsigned int) r == len)
-			return 0;
-		if (r >= 0) {
-			error_msg("umoven: short read (%u < %u) @0x%" PRI_klx,
-				  (unsigned int) r, len, addr);
-			return -1;
-		}
-		switch (errno) {
-			case ENOSYS:
-			case EPERM:
-				/* try PTRACE_PEEKDATA */
-				break;
-			case ESRCH:
-				/* the process is gone */
-				return -1;
-			case EFAULT: case EIO:
-				/* address space is inaccessible */
-				return -1;
-			default:
-				/* all the rest is strange and should be reported */
-				perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
-					    pid, addr);
-				return -1;
-		}
-	}
 
 	nread = 0;
 	if (addr & (sizeof(long) - 1)) {
@@ -211,90 +175,66 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 }
 
 /*
- * Like `umove' but make the additional effort of looking
- * for a terminating zero byte.
- *
- * Returns < 0 on error, > 0 if NUL was seen,
- * (TODO if useful: return count of bytes including NUL),
- * else 0 if len bytes were read but no NUL byte seen.
- *
- * Note: there is no guarantee we won't overwrite some bytes
- * in laddr[] _after_ terminating NUL (but, of course,
- * we never write past laddr[len-1]).
+ * Copy `len' bytes of data from process `pid'
+ * at address `addr' to our space at `our_addr'.
  */
 int
-umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *laddr)
+umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
+       void *const our_addr)
+{
+	if (tracee_addr_is_invalid(addr))
+		return -1;
+
+	const int pid = tcp->pid;
+
+	if (process_vm_readv_not_supported)
+		return umoven_peekdata(pid, addr, len, our_addr);
+
+	int r = vm_read_mem(pid, our_addr, addr, len);
+	if ((unsigned int) r == len)
+		return 0;
+	if (r >= 0) {
+		error_msg("umoven: short read (%u < %u) @0x%" PRI_klx,
+			  (unsigned int) r, len, addr);
+		return -1;
+	}
+	switch (errno) {
+		case ENOSYS:
+		case EPERM:
+			/* try PTRACE_PEEKDATA */
+			return umoven_peekdata(pid, addr, len, our_addr);
+		case ESRCH:
+			/* the process is gone */
+			return -1;
+		case EFAULT: case EIO:
+			/* address space is inaccessible */
+			return -1;
+		default:
+			/* all the rest is strange and should be reported */
+			perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
+				    pid, addr);
+			return -1;
+	}
+}
+
+/*
+ * Like umoven_peekdata but make the additional effort of looking
+ * for a terminating zero byte.
+ */
+static int
+umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
+		  void *laddr)
 {
 	const unsigned long x01010101 = (unsigned long) 0x0101010101010101ULL;
 	const unsigned long x80808080 = (unsigned long) 0x8080808080808080ULL;
 
-	int pid = tcp->pid;
 	unsigned int n, m, nread;
 	union {
 		unsigned long val;
 		char x[sizeof(long)];
 	} u;
 
-	if (tracee_addr_is_invalid(addr))
-		return -1;
-
 	nread = 0;
-	if (!process_vm_readv_not_supported) {
-		const size_t page_size = get_pagesize();
-		const size_t page_mask = page_size - 1;
-
-		while (len > 0) {
-			unsigned int chunk_len;
-			unsigned int end_in_page;
-
-			/*
-			 * Don't cross pages, otherwise we can get EFAULT
-			 * and fail to notice that terminating NUL lies
-			 * in the existing (first) page.
-			 */
-			chunk_len = len > page_size ? page_size : len;
-			end_in_page = (addr + chunk_len) & page_mask;
-			if (chunk_len > end_in_page) /* crosses to the next page */
-				chunk_len -= end_in_page;
-
-			int r = vm_read_mem(pid, laddr, addr, chunk_len);
-			if (r > 0) {
-				if (memchr(laddr, '\0', r))
-					return 1;
-				addr += r;
-				laddr += r;
-				nread += r;
-				len -= r;
-				continue;
-			}
-			switch (errno) {
-				case ENOSYS:
-				case EPERM:
-					/* try PTRACE_PEEKDATA */
-					if (!nread)
-						goto vm_readv_didnt_work;
-					/* fall through */
-				case EFAULT: case EIO:
-					/* address space is inaccessible */
-					if (nread) {
-						perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
-							   nread, nread + len, addr - nread);
-					}
-					return -1;
-				case ESRCH:
-					/* the process is gone */
-					return -1;
-				default:
-					/* all the rest is strange and should be reported */
-					perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
-						    pid, addr);
-					return -1;
-			}
-		}
-		return 0;
-	}
- vm_readv_didnt_work:
-
 	if (addr & (sizeof(long) - 1)) {
 		/* addr not a multiple of sizeof(long) */
 		n = addr & (sizeof(long) - 1);	/* residue */
@@ -359,5 +299,83 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len, char *lad
 		nread += m;
 		len -= m;
 	}
+
+	return 0;
+}
+
+/*
+ * Like `umove' but make the additional effort of looking
+ * for a terminating zero byte.
+ *
+ * Returns < 0 on error, > 0 if NUL was seen,
+ * (TODO if useful: return count of bytes including NUL),
+ * else 0 if len bytes were read but no NUL byte seen.
+ *
+ * Note: there is no guarantee we won't overwrite some bytes
+ * in laddr[] _after_ terminating NUL (but, of course,
+ * we never write past laddr[len-1]).
+ */
+int
+umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
+	 char *laddr)
+{
+	if (tracee_addr_is_invalid(addr))
+		return -1;
+
+	const int pid = tcp->pid;
+
+	if (process_vm_readv_not_supported)
+		return umovestr_peekdata(pid, addr, len, laddr);
+
+	const size_t page_size = get_pagesize();
+	const size_t page_mask = page_size - 1;
+	unsigned int nread = 0;
+
+	while (len) {
+		/*
+		 * Don't cross pages, otherwise we can get EFAULT
+		 * and fail to notice that terminating NUL lies
+		 * in the existing (first) page.
+		 */
+		unsigned int chunk_len = len > page_size ? page_size : len;
+		unsigned int end_in_page = (addr + chunk_len) & page_mask;
+		if (chunk_len > end_in_page) /* crosses to the next page */
+			chunk_len -= end_in_page;
+
+		int r = vm_read_mem(pid, laddr, addr, chunk_len);
+		if (r > 0) {
+			if (memchr(laddr, '\0', r))
+				return 1;
+			addr += r;
+			laddr += r;
+			nread += r;
+			len -= r;
+			continue;
+		}
+		switch (errno) {
+			case ENOSYS:
+			case EPERM:
+				/* try PTRACE_PEEKDATA */
+				if (!nread)
+					return umovestr_peekdata(pid, addr,
+								 len, laddr);
+				/* fall through */
+			case EFAULT: case EIO:
+				/* address space is inaccessible */
+				if (nread)
+					perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
+						   nread, nread + len, addr - nread);
+				return -1;
+			case ESRCH:
+				/* the process is gone */
+				return -1;
+			default:
+				/* all the rest is strange and should be reported */
+				perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
+					    pid, addr);
+				return -1;
+		}
+	}
+
 	return 0;
 }
