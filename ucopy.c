@@ -106,44 +106,18 @@ static int
 umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		void *laddr)
 {
-	unsigned int n, m, nread;
-	union {
-		long val;
-		char x[sizeof(long)];
-	} u;
+	unsigned int nread = 0;
+	unsigned int residue = addr & (sizeof(long) - 1);
 
-	nread = 0;
-	if (addr & (sizeof(long) - 1)) {
-		/* addr not a multiple of sizeof(long) */
-		n = addr & (sizeof(long) - 1);	/* residue */
-		addr &= -sizeof(long);		/* aligned address */
-		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
-		switch (errno) {
-			case 0:
-				break;
-			case ESRCH: case EINVAL:
-				/* these could be seen if the process is gone */
-				return -1;
-			case EFAULT: case EIO: case EPERM:
-				/* address space is inaccessible */
-				return -1;
-			default:
-				/* all the rest is strange and should be reported */
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%" PRI_klx,
-					    pid, addr);
-				return -1;
-		}
-		m = MIN(sizeof(long) - n, len);
-		memcpy(laddr, &u.x[n], m);
-		addr += sizeof(long);
-		laddr += m;
-		nread += m;
-		len -= m;
-	}
 	while (len) {
+		addr &= -sizeof(long);		/* aligned address */
+
 		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
+		union {
+			long val;
+			char x[sizeof(long)];
+		} u = { .val = ptrace(PTRACE_PEEKDATA, pid, addr, 0) };
+
 		switch (errno) {
 			case 0:
 				break;
@@ -163,8 +137,10 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 					    pid, addr);
 				return -1;
 		}
-		m = MIN(sizeof(long), len);
-		memcpy(laddr, u.x, m);
+
+		unsigned int m = MIN(sizeof(long) - residue, len);
+		memcpy(laddr, &u.x[residue], m);
+		residue = 0;
 		addr += sizeof(long);
 		laddr += m;
 		nread += m;
@@ -225,51 +201,18 @@ static int
 umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		  void *laddr)
 {
-	const unsigned long x01010101 = (unsigned long) 0x0101010101010101ULL;
-	const unsigned long x80808080 = (unsigned long) 0x8080808080808080ULL;
-
-	unsigned int n, m, nread;
-	union {
-		unsigned long val;
-		char x[sizeof(long)];
-	} u;
-
-	nread = 0;
-	if (addr & (sizeof(long) - 1)) {
-		/* addr not a multiple of sizeof(long) */
-		n = addr & (sizeof(long) - 1);	/* residue */
-		addr &= -sizeof(long);		/* aligned address */
-		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
-		switch (errno) {
-			case 0:
-				break;
-			case ESRCH: case EINVAL:
-				/* these could be seen if the process is gone */
-				return -1;
-			case EFAULT: case EIO: case EPERM:
-				/* address space is inaccessible */
-				return -1;
-			default:
-				/* all the rest is strange and should be reported */
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%" PRI_klx,
-					    pid, addr);
-				return -1;
-		}
-		m = MIN(sizeof(long) - n, len);
-		memcpy(laddr, &u.x[n], m);
-		while (n & (sizeof(long) - 1))
-			if (u.x[n++] == '\0')
-				return 1;
-		addr += sizeof(long);
-		laddr += m;
-		nread += m;
-		len -= m;
-	}
+	unsigned int nread = 0;
+	unsigned int residue = addr & (sizeof(long) - 1);
 
 	while (len) {
+		addr &= -sizeof(long);		/* aligned address */
+
 		errno = 0;
-		u.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
+		union {
+			unsigned long val;
+			char x[sizeof(long)];
+		} u = { .val = ptrace(PTRACE_PEEKDATA, pid, addr, 0) };
+
 		switch (errno) {
 			case 0:
 				break;
@@ -289,11 +232,13 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 					   pid, addr);
 				return -1;
 		}
-		m = MIN(sizeof(long), len);
-		memcpy(laddr, u.x, m);
-		/* "If a NUL char exists in this word" */
-		if ((u.val - x01010101) & ~u.val & x80808080)
-			return 1;
+
+		unsigned int m = MIN(sizeof(long) - residue, len);
+		memcpy(laddr, &u.x[residue], m);
+		while (residue < sizeof(long))
+			if (u.x[residue++] == '\0')
+				return 1;
+		residue = 0;
 		addr += sizeof(long);
 		laddr += m;
 		nread += m;
