@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "macros.h"
 #include "number_set.h"
 #include "xmalloc.h"
 
@@ -103,6 +104,44 @@ invert_number_set_array(struct number_set *const set, const unsigned int nmemb)
 
 	for (i = 0; i < nmemb; ++i)
 		set[i].not = !set[i].not;
+}
+
+/**
+ * Returns index of the next non-zero bit (starting at bit number) in number set
+ * or limit.
+ */
+unsigned int
+next_set_bit_in_set_array(unsigned int number,
+			  const struct number_set *const set,
+			  const unsigned int idx, const unsigned limit)
+{
+	unsigned pos;
+	unsigned limit_slots = MIN(set[idx].nslots,
+				   (limit + BITS_PER_SLOT - 1) / BITS_PER_SLOT);
+	number_slot_t bitmask;
+	number_slot_t cur_slot;
+
+
+	for (pos = number / BITS_PER_SLOT; pos < limit_slots; pos++) {
+		cur_slot = set[idx].vec[pos] ^ (-1U * set[idx].not);
+
+		if (cur_slot == 0) {
+			number = (number + BITS_PER_SLOT) & (-BITS_PER_SLOT);
+			continue;
+		}
+		bitmask = 1 << (number & (BITS_PER_SLOT - 1));
+		for (;;) {
+			if (cur_slot & bitmask)
+				return MIN(number, limit);
+			number++;
+			bitmask <<= 1;
+			/* This check *can't be* optimized out: */
+			if (bitmask == 0)
+				break;
+		}
+	}
+
+	return limit;
 }
 
 struct number_set *

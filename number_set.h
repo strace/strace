@@ -33,6 +33,11 @@ clear_number_set_array(struct number_set *, unsigned int nmemb);
 extern void
 invert_number_set_array(struct number_set *, unsigned int nmemb);
 
+extern unsigned int
+next_set_bit_in_set_array(unsigned int number,
+			  const struct number_set * const set,
+			  const unsigned int idx, const unsigned limit);
+
 extern struct number_set *
 alloc_number_set_array(unsigned int nmemb) ATTRIBUTE_MALLOC;
 

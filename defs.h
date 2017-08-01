@@ -972,6 +972,8 @@ extern void print_ifindex(unsigned int);
 
 extern void print_bpf_filter_code(const uint16_t code, bool extended);
 
+extern unsigned int next_set_qual_scno(const unsigned int scno,
+				       unsigned qual_flg);
 extern void qualify(const char *);
 extern unsigned int qual_flags(const unsigned int);
 

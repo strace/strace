@@ -467,3 +467,35 @@ qual_flags(const unsigned int scno)
 		| (is_number_in_set_array(scno, inject_set, current_personality)
 		   ? QUAL_INJECT : 0);
 }
+
+unsigned int
+next_set_qual_scno(const unsigned int scno, unsigned qual_flg)
+{
+	static const struct qual_set {
+		unsigned qual;
+		struct number_set ** const set;
+	} sets[] = {
+		{ QUAL_TRACE,   &trace_set },
+		{ QUAL_ABBREV,  &abbrev_set },
+		{ QUAL_VERBOSE, &verbose_set },
+		{ QUAL_RAW,     &raw_set },
+		{ QUAL_INJECT,  &inject_set },
+		{ 0,            NULL }
+	};
+
+	const struct qual_set *pos = sets;
+	unsigned res = nsyscalls;
+	unsigned ret;
+
+	while (qual_flg && pos->qual) {
+		ret = next_set_bit_in_set_array(scno, *(pos->set),
+						current_personality,
+						nsyscalls);
+
+		res = MIN(res, ret);
+		qual_flg &= ~pos->qual;
+		pos++;
+	}
+
+	return res;
+}
