@@ -715,7 +715,7 @@ print_quoted_cstring(const char *str, unsigned int size)
 void
 printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 {
-	char path[PATH_MAX + 1];
+	char path[PATH_MAX];
 	int nul_seen;
 
 	if (!addr) {
@@ -741,7 +741,7 @@ void
 printpath(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
-	printpathn(tcp, addr, PATH_MAX);
+	printpathn(tcp, addr, PATH_MAX - 1);
 }
 
 /*
