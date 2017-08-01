@@ -260,6 +260,9 @@ preadv
 preadv-pwritev
 preadv2-pwritev2
 print_maxfd
+printpath-umovestr
+printpath-umovestr-peekdata
+printpath-umovestr-undumpable
 printstr
 prlimit64
 process_vm_readv

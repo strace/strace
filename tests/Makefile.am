@@ -257,6 +257,7 @@ MISC_TESTS = \
 	opipe.test \
 	options-syntax.test \
 	pc.test \
+	printpath-umovestr-legacy.test \
 	qual_fault-syntax.test \
 	qual_fault.test \
 	qual_inject-error-signal.test \
