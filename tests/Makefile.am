@@ -65,6 +65,8 @@ libtests_a_SOURCES = \
 	tail_alloc.c \
 	test_netlink.h \
 	test_nlattr.h \
+	test_ucopy.c \
+	test_ucopy.h \
 	tests.h \
 	tprintf.c \
 	# end of libtests_a_SOURCES
