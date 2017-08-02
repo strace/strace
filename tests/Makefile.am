@@ -66,6 +66,7 @@ libtests_a_SOURCES = \
 	test_netlink.h \
 	test_nlattr.h \
 	test_printpath.c \
+	test_printstrn.c \
 	test_ucopy.c \
 	test_ucopy.h \
 	tests.h \
