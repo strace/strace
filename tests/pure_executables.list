@@ -221,6 +221,9 @@ printpath-umovestr
 printpath-umovestr-peekdata
 printpath-umovestr-undumpable
 printstr
+printstrn-umoven
+printstrn-umoven-peekdata
+printstrn-umoven-undumpable
 prlimit64
 process_vm_readv
 process_vm_writev

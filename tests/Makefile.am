@@ -259,6 +259,7 @@ MISC_TESTS = \
 	options-syntax.test \
 	pc.test \
 	printpath-umovestr-legacy.test \
+	printstrn-umoven-legacy.test \
 	qual_fault-syntax.test \
 	qual_fault.test \
 	qual_inject-error-signal.test \

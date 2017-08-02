@@ -230,6 +230,9 @@ printstr	-e trace=writev
 printpath-umovestr	-a11 -e signal=none -e trace=chdir
 printpath-umovestr-peekdata	-a11 -e signal=none -e trace=chdir
 printpath-umovestr-undumpable	-a11 -e signal=none -e trace=chdir
+printstrn-umoven	-s4096 -e signal=none -e trace=add_key
+printstrn-umoven-peekdata	-e signal=none -e trace=add_key
+printstrn-umoven-undumpable	-e signal=none -e trace=add_key
 prlimit64
 process_vm_readv	-s5 -a37
 process_vm_writev	-s5 -a38
