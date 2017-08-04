@@ -189,8 +189,12 @@ build_mmap_cache(struct tcb *tcp)
 			}
 			if (start_addr <= entry->start_addr ||
 			    start_addr < entry->end_addr) {
-				error_msg("%s: overlapping memory region",
-					  filename);
+				debug_msg("%s: overlapping memory region: "
+					  "\"%s\" [%08lx-%08lx] overlaps with "
+					  "\"%s\" [%08lx-%08lx]",
+					  filename, binary_path, start_addr,
+					  end_addr, entry->binary_filename,
+					  entry->start_addr, entry->end_addr);
 				continue;
 			}
 		}
