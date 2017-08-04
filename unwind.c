@@ -39,12 +39,6 @@
 # define fopen_for_input fopen
 #endif
 
-#define DPRINTF(F, A, ...)						\
-	do {								\
-		if (debug_flag)						\
-			error_msg("[unwind(" A ")] " F, __VA_ARGS__);	\
-	} while (0)
-
 /*
  * Keep a sorted array of cache entries,
  * so that we can binary search through it.
@@ -216,11 +210,10 @@ build_mmap_cache(struct tcb *tcp)
 	tcp->mmap_cache = cache_head;
 	tcp->mmap_cache_generation = mmap_cache_generation;
 
-	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p",
-		"cache-build",
-		tcp->mmap_cache_generation,
-		mmap_cache_generation,
-		tcp, tcp->mmap_cache);
+	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
+		       tcp->mmap_cache_generation,
+		       mmap_cache_generation,
+		       tcp, tcp->mmap_cache);
 }
 
 /* deleting the cache */
@@ -229,11 +222,10 @@ delete_mmap_cache(struct tcb *tcp, const char *caller)
 {
 	unsigned int i;
 
-	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p, caller=%s",
-		"cache-delete",
-		tcp->mmap_cache_generation,
-		mmap_cache_generation,
-		tcp, tcp->mmap_cache, caller);
+	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p, caller=%s",
+		       tcp->mmap_cache_generation,
+		       mmap_cache_generation,
+		       tcp, tcp->mmap_cache, caller);
 
 	for (i = 0; i < tcp->mmap_cache_size; i++) {
 		free(tcp->mmap_cache[i].binary_filename);
@@ -267,11 +259,10 @@ unwind_cache_invalidate(struct tcb *tcp)
 	}
 #endif
 	mmap_cache_generation++;
-	DPRINTF("tgen=%u, ggen=%u, tcp=%p, cache=%p", "increment",
-		tcp->mmap_cache_generation,
-		mmap_cache_generation,
-		tcp,
-		tcp->mmap_cache);
+	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
+		       tcp->mmap_cache_generation,
+		       mmap_cache_generation,
+		       tcp, tcp->mmap_cache);
 }
 
 static void
@@ -557,10 +548,10 @@ unwind_print_stacktrace(struct tcb *tcp)
 	}
 #endif
 	if (tcp->queue->head) {
-		DPRINTF("tcp=%p, queue=%p", "queueprint", tcp, tcp->queue->head);
+		debug_func_msg("head: tcp=%p, queue=%p", tcp, tcp->queue->head);
 		queue_print(tcp->queue);
 	} else if (rebuild_cache_if_invalid(tcp, __func__)) {
-		DPRINTF("tcp=%p, queue=%p", "stackprint", tcp, tcp->queue->head);
+		debug_func_msg("walk: tcp=%p, queue=%p", tcp, tcp->queue->head);
 		stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
 	}
 }
@@ -583,6 +574,6 @@ unwind_capture_stacktrace(struct tcb *tcp)
 	if (rebuild_cache_if_invalid(tcp, __func__)) {
 		stacktrace_walk(tcp, queue_put_call, queue_put_error,
 				tcp->queue);
-		DPRINTF("tcp=%p, queue=%p", "captured", tcp, tcp->queue->head);
+		debug_func_msg("tcp=%p, queue=%p", tcp, tcp->queue->head);
 	}
 }
