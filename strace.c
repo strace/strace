@@ -837,14 +837,14 @@ detach(struct tcb *tcp)
 	}
 	if (errno != ESRCH) {
 		/* Shouldn't happen. */
-		perror_msg("detach: ptrace(PTRACE_DETACH,%u)", tcp->pid);
+		perror_func_msg("ptrace(PTRACE_DETACH,%u)", tcp->pid);
 		goto drop;
 	}
 	/* ESRCH: process is either not stopped or doesn't exist. */
 	if (my_tkill(tcp->pid, 0) < 0) {
 		if (errno != ESRCH)
 			/* Shouldn't happen. */
-			perror_msg("detach: tkill(%u,0)", tcp->pid);
+			perror_func_msg("tkill(%u,0)", tcp->pid);
 		/* else: process doesn't exist. */
 		goto drop;
 	}
@@ -860,13 +860,13 @@ detach(struct tcb *tcp)
 		if (!error)
 			goto wait_loop;
 		if (errno != ESRCH)
-			perror_msg("detach: ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
+			perror_func_msg("ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
 	} else {
 		error = my_tkill(tcp->pid, SIGSTOP);
 		if (!error)
 			goto wait_loop;
 		if (errno != ESRCH)
-			perror_msg("detach: tkill(%u,SIGSTOP)", tcp->pid);
+			perror_func_msg("tkill(%u,SIGSTOP)", tcp->pid);
 	}
 	/* Either process doesn't exist, or some weird error. */
 	goto drop;
@@ -887,7 +887,7 @@ detach(struct tcb *tcp)
 			 * ^^^  WRONG! We expect this PID to exist,
 			 * and want to emit a message otherwise:
 			 */
-			perror_msg("detach: waitpid(%u)", tcp->pid);
+			perror_func_msg("waitpid(%u)", tcp->pid);
 			break;
 		}
 		if (!WIFSTOPPED(status)) {
@@ -1069,9 +1069,9 @@ startup_attach(void)
 
 	if (daemonized_tracer) {
 		pid_t pid = fork();
-		if (pid < 0) {
-			perror_msg_and_die("fork");
-		}
+		if (pid < 0)
+			perror_func_msg_and_die("fork");
+
 		if (pid) { /* parent */
 			/*
 			 * Wait for grandchild to attach to straced process
@@ -1210,7 +1210,7 @@ open_dummy_desc(void)
 	int fds[2];
 
 	if (pipe(fds))
-		perror_msg_and_die("pipe");
+		perror_func_msg_and_die("pipe");
 	close(fds[1]);
 	set_cloexec_flag(fds[0]);
 	return fds[0];
@@ -1348,9 +1348,9 @@ startup_child(char **argv)
 #endif
 
 	pid = fork();
-	if (pid < 0) {
-		perror_msg_and_die("fork");
-	}
+	if (pid < 0)
+		perror_func_msg_and_die("fork");
+
 	if ((pid != 0 && daemonized_tracer)
 	 || (pid == 0 && !daemonized_tracer)
 	) {
@@ -1458,7 +1458,7 @@ test_ptrace_seize(void)
 
 	pid = fork();
 	if (pid < 0)
-		perror_msg_and_die("fork");
+		perror_func_msg_and_die("fork");
 
 	if (pid == 0) {
 		pause();
@@ -1485,14 +1485,14 @@ test_ptrace_seize(void)
 		if (tracee_pid <= 0) {
 			if (errno == EINTR)
 				continue;
-			perror_msg_and_die("%s: unexpected wait result %d",
-					 __func__, tracee_pid);
+			perror_func_msg_and_die("unexpected wait result %d",
+						tracee_pid);
 		}
 		if (WIFSIGNALED(status)) {
 			return;
 		}
-		error_msg_and_die("%s: unexpected wait status %#x",
-				  __func__, status);
+
+		error_func_msg_and_die("unexpected wait status %#x", status);
 	}
 }
 #else /* !USE_SEIZE */
