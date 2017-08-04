@@ -90,6 +90,8 @@ static void delete_mmap_cache(struct tcb *tcp, const char *caller);
 static unw_addr_space_t libunwind_as;
 static unsigned int mmap_cache_generation;
 
+static const char asprintf_error_str[] = "???";
+
 void
 unwind_init(void)
 {
@@ -454,8 +456,10 @@ sprint_call_or_error(const char *binary_filename,
 	else
 		n = asprintf(&output_line, STACK_ENTRY_BUG_FMT, __func__);
 
-	if (n < 0)
-		error_msg_and_die("error in asprintf");
+	if (n < 0) {
+		perror_func_msg("asprintf");
+		output_line = (char *) asprintf_error_str;
+	}
 
 	return output_line;
 }
@@ -528,7 +532,9 @@ queue_print(struct queue_t *queue)
 		tprints(tmp->output_line);
 		line_ended();
 
-		free(tmp->output_line);
+		if (tmp->output_line != asprintf_error_str)
+			free(tmp->output_line);
+
 		tmp->output_line = NULL;
 		tmp->next = NULL;
 		free(tmp);
