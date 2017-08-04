@@ -55,10 +55,10 @@ init_packet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 	);
 
 	struct packet_diag_msg *const msg = NLMSG_DATA(nlh);
-	*msg = (struct packet_diag_msg) {
+	SET_STRUCT(struct packet_diag_msg, msg,
 		.pdiag_family = AF_PACKET,
 		.pdiag_type = SOCK_STREAM
-	};
+	);
 }
 
 static void
