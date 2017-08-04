@@ -144,10 +144,10 @@ test_nlattr(const int fd)
 	msg = tail_memdup(&c_msg, msg_len);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
 	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
-	*nla = (struct nlattr) {
+	SET_STRUCT(struct nlattr, nla,
 		.nla_len = NLA_HDRLEN,
 		.nla_type = UNIX_DIAG_NAME
-	};
+	);
 	memcpy(nla + 1, "12", 2);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
@@ -156,17 +156,17 @@ test_nlattr(const int fd)
 	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
 	       ", nla_type=UNIX_DIAG_NAME}, \"\\x31\\x32\"]}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
+	       fd, msg_len, NLA_HDRLEN, msg_len, sprintrc(rc));
 
 	/* print one struct nlattr and short read of second struct nlattr */
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN * 2;
 	msg = tail_memdup(&c_msg, msg_len - 1);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
 	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
-	*nla = (struct nlattr) {
+	SET_STRUCT(struct nlattr, nla,
 		.nla_len = NLA_HDRLEN,
 		.nla_type = UNIX_DIAG_NAME
-	};
+	);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
@@ -174,7 +174,7 @@ test_nlattr(const int fd)
 	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
 	       ", nla_type=UNIX_DIAG_NAME}, %p]}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, msg_len, nla->nla_len, nla + 1, msg_len, sprintrc(rc));
+	       fd, msg_len, NLA_HDRLEN, nla + 1, msg_len, sprintrc(rc));
 
 	/* print two struct nlattr */
 	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN * 2;
