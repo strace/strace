@@ -2082,11 +2082,19 @@ maybe_allocate_tcb(const int pid, int status)
 			error_msg("Process %d attached", pid);
 		return tcp;
 	} else {
-		/* This can happen if a clone call used
-		 * CLONE_PTRACE itself.
+		/*
+		 * This can happen if a clone call misused CLONE_PTRACE itself.
 		 */
-		ptrace(PTRACE_CONT, pid, NULL, 0);
-		error_msg("Stop of unknown pid %u seen, PTRACE_CONTed it", pid);
+		unsigned int sig = WSTOPSIG(status);
+		unsigned int event = (unsigned int) status >> 16;
+
+		if (event == PTRACE_EVENT_STOP || sig == syscall_trap_sig)
+			sig = 0;
+
+		ptrace(PTRACE_DETACH, pid, NULL, (unsigned long) sig);
+		error_msg("Detached unknown pid %d%s%s", pid,
+			  sig ? " with signal " : "",
+			  sig ? signame(sig) : "");
 		return NULL;
 	}
 }
