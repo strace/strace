@@ -254,10 +254,7 @@ rebuild_cache_if_invalid(struct tcb *tcp, const char *caller)
 	if (!tcp->mmap_cache)
 		build_mmap_cache(tcp);
 
-	if (!tcp->mmap_cache || !tcp->mmap_cache_size)
-		return false;
-	else
-		return true;
+	return tcp->mmap_cache && tcp->mmap_cache_size;
 }
 
 void
