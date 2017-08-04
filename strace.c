@@ -1009,12 +1009,13 @@ attach_tcb(struct tcb *const tcp)
 	newoutf(tcp);
 	debug_msg("attach to pid %d (main) succeeded", tcp->pid);
 
-	char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
+	static const char task_path[] = "/proc/%d/task";
+	char procdir[sizeof(task_path) + sizeof(int) * 3];
 	DIR *dir;
 	unsigned int ntid = 0, nerr = 0;
 
 	if (followfork && tcp->pid != strace_child &&
-	    xsprintf(procdir, "/proc/%d/task", tcp->pid) > 0 &&
+	    xsprintf(procdir, task_path, tcp->pid) > 0 &&
 	    (dir = opendir(procdir)) != NULL) {
 		struct_dirent *de;
 
