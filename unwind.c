@@ -265,7 +265,7 @@ unwind_cache_invalidate(struct tcb *tcp)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
-		/* disable strack trace */
+		/* disable stack trace */
 		return;
 	}
 #endif
@@ -555,7 +555,7 @@ unwind_print_stacktrace(struct tcb *tcp)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
-		/* disable strack trace */
+		/* disable stack trace */
 		return;
 	}
 #endif
@@ -576,7 +576,7 @@ unwind_capture_stacktrace(struct tcb *tcp)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
-		/* disable strack trace */
+		/* disable stack trace */
 		return;
 	}
 #endif
