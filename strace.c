@@ -723,9 +723,8 @@ alloctcb(int pid)
 #endif
 
 			nprocs++;
-			if (debug_flag)
-				error_msg("new tcb for pid %d, active tcbs:%d",
-					  tcp->pid, nprocs);
+			debug_msg("new tcb for pid %d, active tcbs:%d",
+				  tcp->pid, nprocs);
 			return tcp;
 		}
 	}
@@ -782,9 +781,7 @@ droptcb(struct tcb *tcp)
 #endif
 
 	nprocs--;
-	if (debug_flag)
-		error_msg("dropped tcb for pid %d, %d remain",
-			  tcp->pid, nprocs);
+	debug_msg("dropped tcb for pid %d, %d remain", tcp->pid, nprocs);
 
 	if (tcp->outf) {
 		if (followfork >= 2) {
@@ -907,9 +904,8 @@ detach(struct tcb *tcp)
 			break;
 		}
 		sig = WSTOPSIG(status);
-		if (debug_flag)
-			error_msg("detach wait: event:%d sig:%d",
-				  (unsigned)status >> 16, sig);
+		debug_msg("detach wait: event:%d sig:%d",
+			  (unsigned) status >> 16, sig);
 		if (use_seize) {
 			unsigned event = (unsigned)status >> 16;
 			if (event == PTRACE_EVENT_STOP /*&& sig == SIGTRAP*/) {
@@ -1007,8 +1003,7 @@ attach_tcb(struct tcb *const tcp)
 
 	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
 	newoutf(tcp);
-	if (debug_flag)
-		error_msg("attach to pid %d (main) succeeded", tcp->pid);
+	debug_msg("attach to pid %d (main) succeeded", tcp->pid);
 
 	char procdir[sizeof("/proc/%d/task") + sizeof(int) * 3];
 	DIR *dir;
@@ -1030,13 +1025,11 @@ attach_tcb(struct tcb *const tcp)
 			++ntid;
 			if (ptrace_attach_or_seize(tid) < 0) {
 				++nerr;
-				if (debug_flag)
-					perror_msg("attach: ptrace(%s, %d)",
-						   ptrace_attach_cmd, tid);
+				debug_perror_msg("attach: ptrace(%s, %d)",
+						 ptrace_attach_cmd, tid);
 				continue;
 			}
-			if (debug_flag)
-				error_msg("attach to pid %d succeeded", tid);
+			debug_msg("attach to pid %d succeeded", tid);
 
 			struct tcb *tid_tcp = alloctcb(tid);
 			tid_tcp->flags |= TCB_ATTACHED | TCB_STARTUP |
@@ -1478,8 +1471,8 @@ test_ptrace_seize(void)
 	 */
 	if (ptrace(PTRACE_SEIZE, pid, 0, 0) == 0) {
 		post_attach_sigstop = 0; /* this sets use_seize to 1 */
-	} else if (debug_flag) {
-		error_msg("PTRACE_SEIZE doesn't work");
+	} else {
+		debug_msg("PTRACE_SEIZE doesn't work");
 	}
 
 	kill(pid, SIGKILL);
@@ -1801,8 +1794,7 @@ init(int argc, char *argv[])
 		ptrace_setoptions |= PTRACE_O_TRACECLONE |
 				     PTRACE_O_TRACEFORK |
 				     PTRACE_O_TRACEVFORK;
-	if (debug_flag)
-		error_msg("ptrace_setoptions = %#x", ptrace_setoptions);
+	debug_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
 
 	/*
@@ -1930,8 +1922,7 @@ cleanup(void)
 		tcp = tcbtab[i];
 		if (!tcp->pid)
 			continue;
-		if (debug_flag)
-			error_msg("cleanup: looking at pid %u", tcp->pid);
+		debug_func_msg("looking at pid %u", tcp->pid);
 		if (tcp->pid == strace_child) {
 			kill(tcp->pid, SIGCONT);
 			kill(tcp->pid, fatal_sig);
@@ -2136,15 +2127,13 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 static void
 startup_tcb(struct tcb *tcp)
 {
-	if (debug_flag)
-		error_msg("pid %d has TCB_STARTUP, initializing it", tcp->pid);
+	debug_msg("pid %d has TCB_STARTUP, initializing it", tcp->pid);
 
 	tcp->flags &= ~TCB_STARTUP;
 
 	if (!use_seize) {
-		if (debug_flag)
-			error_msg("setting opts 0x%x on pid %d",
-				  ptrace_setoptions, tcp->pid);
+		debug_msg("setting opts 0x%x on pid %d",
+			  ptrace_setoptions, tcp->pid);
 		if (ptrace(PTRACE_SETOPTIONS, tcp->pid, NULL, ptrace_setoptions) < 0) {
 			if (errno != ESRCH) {
 				/* Should never happen, really */
@@ -2364,8 +2353,7 @@ next_event(int *pstatus, siginfo_t *si)
 		 * just before the process takes a signal.
 		 */
 		if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
-			if (debug_flag)
-				error_msg("ignored SIGSTOP on pid %d", tcp->pid);
+			debug_func_msg("ignored SIGSTOP on pid %d", tcp->pid);
 			tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
 			return TE_RESTART;
 		} else if (sig == syscall_trap_sig) {
