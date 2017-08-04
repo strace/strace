@@ -33,7 +33,11 @@
 #ifndef STRACE_ERROR_PRINTS_H
 #define STRACE_ERROR_PRINTS_H
 
+#include <stdbool.h>
+
 #include "gcc_compat.h"
+
+extern bool debug_flag;
 
 void die(void) ATTRIBUTE_NORETURN;
 
@@ -45,5 +49,17 @@ void error_msg_and_help(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 void error_msg_and_die(const char *fmt, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
+
+/* Wrappers for if (debug_flag) error_msg(...) */
+#define debug_msg(...) \
+	do { \
+		if (debug_flag) \
+			error_msg(__VA_ARGS__); \
+	} while (0)
+#define debug_perror_msg(...) \
+	do { \
+		if (debug_flag) \
+			perror_msg(__VA_ARGS__); \
+	} while (0)
 
 #endif /* !STRACE_ERROR_PRINTS_H */
