@@ -273,6 +273,8 @@ strace_SOURCES =	\
 	syscall.c	\
 	sysctl.c	\
 	sysent.h	\
+	sysent_shorthand_defs.h \
+	sysent_shorthand_undefs.h \
 	sysinfo.c	\
 	syslog.c	\
 	sysmips.c	\
