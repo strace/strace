@@ -53,11 +53,13 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "kernel_types.h"
+#include "error_prints.h"
 #include "gcc_compat.h"
+#include "kernel_types.h"
 #include "macros.h"
 #include "mpers_type.h"
 #include "sysent.h"
+#include "xmalloc.h"
 
 #ifndef HAVE_STRERROR
 const char *strerror(int);
@@ -383,23 +385,6 @@ extern unsigned max_strlen;
 extern unsigned os_release;
 #undef KERNEL_VERSION
 #define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
-
-void error_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
-void perror_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
-void error_msg_and_die(const char *fmt, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
-void error_msg_and_help(const char *fmt, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
-void perror_msg_and_die(const char *fmt, ...)
-	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
-
-void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
-void *xcalloc(size_t nmemb, size_t size)
-	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));
-void *xreallocarray(void *ptr, size_t nmemb, size_t size)
-	ATTRIBUTE_ALLOC_SIZE((2, 3));
-char *xstrdup(const char *str) ATTRIBUTE_MALLOC;
-char *xstrndup(const char *str, size_t n) ATTRIBUTE_MALLOC;
 
 extern int read_int_from_file(const char *, int *);
 

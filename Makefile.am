@@ -114,6 +114,8 @@ strace_SOURCES =	\
 	dyxlat.c	\
 	empty.h		\
 	epoll.c		\
+	error_prints.c	\
+	error_prints.h	\
 	evdev.c		\
 	eventfd.c	\
 	execve.c	\
@@ -296,6 +298,7 @@ strace_SOURCES =	\
 	xlat.c		\
 	xlat.h		\
 	xmalloc.c	\
+	xmalloc.h	\
 	# end of strace_SOURCES
 
 if USE_LIBUNWIND
