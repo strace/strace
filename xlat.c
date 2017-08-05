@@ -94,6 +94,20 @@ printxvals(const uint64_t val, const char *dflt, const struct xlat *xlat, ...)
 	return 0;
 }
 
+int
+sprintxval(char *const buf, const size_t size, const struct xlat *const x,
+	   const unsigned int val, const char *const dflt)
+{
+	const char *const str = xlookup(x, val);
+
+	if (str)
+		return xsnprintf(buf, size, "%s", str);
+	if (dflt)
+		return xsnprintf(buf, size, "%#x /* %s */", val, dflt);
+
+	return xsnprintf(buf, size, "%#x", val);
+}
+
 /**
  * Print entry in sorted struct xlat table, if it is there.
  *

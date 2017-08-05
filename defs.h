@@ -546,6 +546,8 @@ extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
 	uint64_t val, const char *dflt);
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
+extern int sprintxval(char *buf, size_t size, const struct xlat *,
+	unsigned int val, const char *dflt);
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
