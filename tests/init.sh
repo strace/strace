@@ -341,6 +341,7 @@ case "$ME_" in
 	*) NAME=
 esac
 
+STRACE_EXE=
 if [ -n "$NAME" ]; then
 	TESTDIR="$NAME.dir"
 	rm -rf -- "$TESTDIR"
@@ -356,6 +357,7 @@ if [ -n "$NAME" ]; then
 		STRACE=../../strace
 		case "${LOG_COMPILER-} ${LOG_FLAGS-}" in
 			*--suppressions=*--error-exitcode=*--tool=*)
+			STRACE_EXE="$STRACE"
 			# add valgrind command prefix
 			STRACE="${LOG_COMPILER-} ${LOG_FLAGS-} $STRACE"
 			;;
@@ -364,9 +366,12 @@ if [ -n "$NAME" ]; then
 
 	trap 'dump_log_and_fail_with "time limit ($TIMEOUT_DURATION) exceeded"' XCPU
 else
-	[ -n "${STRACE-}" ] ||
-		STRACE=../strace
+	: "${STRACE:=../strace}"
 fi
+
+# Export $STRACE_EXE to check_PROGRAMS.
+: "${STRACE_EXE:=$STRACE}"
+export STRACE_EXE
 
 : "${TIMEOUT_DURATION:=600}"
 : "${SLEEP_A_BIT:=sleep 1}"
