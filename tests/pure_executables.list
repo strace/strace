@@ -50,6 +50,7 @@ fchownat
 fcntl
 fcntl64
 fdatasync
+fflush
 file_handle
 file_ioctl
 finit_module

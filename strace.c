@@ -591,6 +591,7 @@ tvprintf(const char *const fmt, va_list args)
 	if (current_tcp) {
 		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
+			/* very unlikely due to vfprintf buffering */
 			if (current_tcp->outf != stderr)
 				perror_msg("%s", outfname);
 		} else
@@ -620,6 +621,7 @@ tprints(const char *str)
 			current_tcp->curcol += strlen(str);
 			return;
 		}
+		/* very unlikely due to fputs_unlocked buffering */
 		if (current_tcp->outf != stderr)
 			perror_msg("%s", outfname);
 	}
@@ -646,12 +648,19 @@ tprintf_comment(const char *fmt, ...)
 	va_end(args);
 }
 
+static void
+flush_tcp_output(const struct tcb *const tcp)
+{
+	if (fflush(tcp->outf) && tcp->outf != stderr)
+		perror_msg("%s", outfname);
+}
+
 void
 line_ended(void)
 {
 	if (current_tcp) {
 		current_tcp->curcol = 0;
-		fflush(current_tcp->outf);
+		flush_tcp_output(current_tcp);
 	}
 	if (printing_tcp) {
 		printing_tcp->curcol = 0;
@@ -861,7 +870,7 @@ droptcb(struct tcb *tcp)
 		} else {
 			if (printing_tcp == tcp && tcp->curcol != 0)
 				fprintf(tcp->outf, " <detached ...>\n");
-			fflush(tcp->outf);
+			flush_tcp_output(tcp);
 		}
 	}
 
@@ -2240,7 +2249,7 @@ print_event_exit(struct tcb *tcp)
 	    && printing_tcp->curcol != 0) {
 		current_tcp = printing_tcp;
 		tprints(" <unfinished ...>\n");
-		fflush(printing_tcp->outf);
+		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
 		current_tcp = tcp;
 	}
