@@ -2095,10 +2095,15 @@ maybe_allocate_tcb(const int pid, int status)
 		 * This can happen if a clone call misused CLONE_PTRACE itself.
 		 */
 		unsigned int sig = WSTOPSIG(status);
-		unsigned int event = (unsigned int) status >> 16;
 
-		if (event == PTRACE_EVENT_STOP || sig == syscall_trap_sig)
-			sig = 0;
+		if (use_seize) {
+			unsigned int event = (unsigned int) status >> 16;
+			if (event == PTRACE_EVENT_STOP)
+				sig = 0;
+		} else {
+			if (sig == SIGSTOP)
+				sig = 0;
+		}
 
 		ptrace(PTRACE_DETACH, pid, NULL, (unsigned long) sig);
 		error_msg("Detached unknown pid %d%s%s", pid,
