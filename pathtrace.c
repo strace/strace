@@ -200,6 +200,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 			upathmatch(tcp, tcp->u_arg[1], set);
 
 	case SEN_quotactl:
+	case SEN_symlink:
 		/* x, path */
 		return upathmatch(tcp, tcp->u_arg[1], set);
 
@@ -341,6 +342,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_eventfd2:
 	case SEN_eventfd:
 	case SEN_fanotify_init:
+	case SEN_inotify_init:
 	case SEN_inotify_init1:
 	case SEN_memfd_create:
 	case SEN_perf_event_open:
