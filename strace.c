@@ -2093,22 +2093,13 @@ maybe_allocate_tcb(const int pid, int status)
 	} else {
 		/*
 		 * This can happen if a clone call misused CLONE_PTRACE itself.
+		 *
+		 * There used to be a dance around possible re-injection of
+		 * WSTOPSIG(status), but it was later removed as the only
+		 * observable stop here is the initial ptrace-stop.
 		 */
-		unsigned int sig = WSTOPSIG(status);
-
-		if (use_seize) {
-			unsigned int event = (unsigned int) status >> 16;
-			if (event == PTRACE_EVENT_STOP)
-				sig = 0;
-		} else {
-			if (sig == SIGSTOP)
-				sig = 0;
-		}
-
-		ptrace(PTRACE_DETACH, pid, NULL, (unsigned long) sig);
-		error_msg("Detached unknown pid %d%s%s", pid,
-			  sig ? " with signal " : "",
-			  sig ? signame(sig) : "");
+		ptrace(PTRACE_DETACH, pid, NULL, 0L);
+		error_msg("Detached unknown pid %d", pid);
 		return NULL;
 	}
 }
