@@ -225,9 +225,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return fdmatch(tcp, tcp->u_arg[4], set);
 
 	case SEN_symlinkat:
-		/* path, fd, path */
+		/* x, fd, path */
 		return fdmatch(tcp, tcp->u_arg[1], set) ||
-			upathmatch(tcp, tcp->u_arg[0], set) ||
 			upathmatch(tcp, tcp->u_arg[2], set);
 
 	case SEN_copy_file_range:
