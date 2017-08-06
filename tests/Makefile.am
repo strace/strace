@@ -86,6 +86,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	attach-p-cmd-p \
 	block_reset_raise_run \
 	caps-abbrev \
+	clone_parent \
+	clone_ptrace \
 	count-f \
 	execve-v \
 	execveat-v \
@@ -246,6 +248,8 @@ MISC_TESTS = \
 	attach-f-p.test \
 	attach-p-cmd.test \
 	bexecve.test \
+	clone_parent.test \
+	clone_ptrace.test \
 	count-f.test \
 	count.test \
 	detach-running.test \

@@ -1,0 +1,3 @@
+#!/bin/sh -efu
+# Check handling of CLONE_PARENT'ed processes.
+. "${srcdir=.}/clone_ptrace.test"

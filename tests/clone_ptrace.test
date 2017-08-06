@@ -1,0 +1,17 @@
+#!/bin/sh -efu
+# Check handling of CLONE_PTRACE'ed processes.
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null 3>&1
+args="-e trace=none $args"
+> "$LOG" || fail_ "failed to write $LOG"
+
+$STRACE -o "$LOG" $args > "$EXP" 2> "$OUT"-err 3> "$EXP"-err || {
+	msg="$STRACE $args failed with code $?"
+	cat "$OUT"-err "$LOG" >&2
+	fail_ "$msg"
+}
+
+cat "$OUT"-err >&2
+match_diff "$LOG" "$EXP"
+match_diff "$OUT"-err "$EXP"-err
