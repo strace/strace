@@ -1,4 +1,3 @@
-#undef SEN
 #undef TD
 #undef TF
 #undef TI
@@ -18,3 +17,4 @@
 #undef SI
 #undef SE
 #undef CST
+#undef SEN

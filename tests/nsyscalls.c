@@ -35,30 +35,13 @@
 #include <unistd.h>
 #include <asm/unistd.h>
 
-#define TD 0
-#define TF 0
-#define TI 0
-#define TN 0
-#define TP 0
-#define TS 0
-#define TM 0
-#define TST 0
-#define TLST 0
-#define TFST 0
-#define TSTA 0
-#define TSF 0
-#define TFSF 0
-#define TSFA 0
-#define NF 0
-#define MA 0
-#define SI 0
-#define SE 0
-#define CST 0
-#define SEN(arg) 0, 0
+#include "sysent_shorthand_defs.h"
 
 static const struct_sysent syscallent[] = {
 #include "syscallent.h"
 };
+
+#include "sysent_shorthand_undefs.h"
 
 #if defined __X32_SYSCALL_BIT && defined __NR_read \
  && (__X32_SYSCALL_BIT & __NR_read) != 0
