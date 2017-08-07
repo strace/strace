@@ -287,10 +287,8 @@ print_nlmsghdr(struct tcb *tcp,
 }
 
 static bool
-print_cookie(struct tcb *const tcp,
-	    void *const elem_buf,
-	    const size_t elem_size,
-	    void *const opaque_data)
+print_cookie(struct tcb *const tcp, void *const elem_buf,
+	     const size_t elem_size, void *const opaque_data)
 {
 	tprintf("%" PRIu8, *(uint8_t *) elem_buf);
 
