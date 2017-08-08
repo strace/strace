@@ -206,6 +206,7 @@ netlink_audit
 netlink_crypto
 netlink_generic
 netlink_inet_diag
+netlink_kobject_uevent
 netlink_netfilter
 netlink_netlink_diag
 netlink_protocol

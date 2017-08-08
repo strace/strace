@@ -171,6 +171,7 @@ net-yy-unix
 netlink_audit
 netlink_crypto
 netlink_generic
+netlink_kobject_uevent
 netlink_netfilter
 netlink_protocol
 netlink_route
