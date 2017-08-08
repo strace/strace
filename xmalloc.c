@@ -89,6 +89,28 @@ xreallocarray(void *ptr, size_t nmemb, size_t size)
 	return p;
 }
 
+void *
+xgrowarray(void *const ptr, size_t *const nmemb, const size_t memb_size)
+{
+	/* this is the same value as glibc DEFAULT_MXFAST */
+	enum { DEFAULT_ALLOC_SIZE = 64 * SIZEOF_LONG / 4 };
+
+	size_t grow_memb;
+
+	if (ptr == NULL)
+		grow_memb = *nmemb ? 0 :
+			(DEFAULT_ALLOC_SIZE + memb_size - 1) / memb_size;
+	else
+		grow_memb = (*nmemb >> 1) + 1;
+
+	if ((*nmemb + grow_memb) < *nmemb)
+		die_out_of_memory();
+
+	*nmemb += grow_memb;
+
+	return xreallocarray(ptr, *nmemb, memb_size);
+}
+
 char *
 xstrdup(const char *str)
 {
