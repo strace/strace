@@ -197,6 +197,15 @@ int create_nl_socket_ext(int proto, const char *name);
 /* Create a pipe with maximized descriptor numbers. */
 void pipe_maxfd(int pipefd[2]);
 
+/* if_nametoindex("lo") */
+unsigned int ifindex_lo(void);
+
+#ifdef HAVE_IF_INDEXTONAME
+# define IFINDEX_LO_STR "if_nametoindex(\"lo\")"
+#else
+# define IFINDEX_LO_STR "1"
+#endif
+
 #define F8ILL_KULONG_SUPPORTED	(sizeof(void *) < sizeof(kernel_ulong_t))
 #define F8ILL_KULONG_MASK	((kernel_ulong_t) 0xffffffff00000000ULL)
 

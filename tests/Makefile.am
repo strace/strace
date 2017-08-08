@@ -50,6 +50,7 @@ libtests_a_SOURCES = \
 	get_sigset_size.c \
 	hexdump_strdup.c \
 	hexquote_strndup.c \
+	ifindex.c \
 	inode_of_sockfd.c \
 	libmmsg.c \
 	libsocketcall.c \
