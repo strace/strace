@@ -151,7 +151,8 @@ struct tcb *printing_tcp;
 static struct tcb *current_tcp;
 
 static struct tcb **tcbtab;
-static unsigned int nprocs, tcbtabsize;
+static unsigned int nprocs;
+static size_t tcbtabsize;
 
 #ifndef HAVE_PROGRAM_INVOCATION_NAME
 char *program_invocation_name;
@@ -683,20 +684,18 @@ expand_tcbtab(void)
 	   callers have pointers and it would be a pain.
 	   So tcbtab is a table of pointers.  Since we never
 	   free the TCBs, we allocate a single chunk of many.  */
-	unsigned int new_tcbtabsize, alloc_tcbtabsize;
+	size_t old_tcbtabsize;
 	struct tcb *newtcbs;
+	struct tcb **tcb_ptr;
 
-	if (tcbtabsize) {
-		alloc_tcbtabsize = tcbtabsize;
-		new_tcbtabsize = tcbtabsize * 2;
-	} else {
-		new_tcbtabsize = alloc_tcbtabsize = 1;
-	}
+	old_tcbtabsize = tcbtabsize;
 
-	newtcbs = xcalloc(alloc_tcbtabsize, sizeof(newtcbs[0]));
-	tcbtab = xreallocarray(tcbtab, new_tcbtabsize, sizeof(tcbtab[0]));
-	while (tcbtabsize < new_tcbtabsize)
-		tcbtab[tcbtabsize++] = newtcbs++;
+	tcbtab = xgrowarray(tcbtab, &tcbtabsize, sizeof(tcbtab[0]));
+	newtcbs = xcalloc(tcbtabsize - old_tcbtabsize, sizeof(newtcbs[0]));
+
+	for (tcb_ptr = tcbtab + old_tcbtabsize;
+	    tcb_ptr < tcbtab + tcbtabsize; tcb_ptr++, newtcbs++)
+		*tcb_ptr = newtcbs;
 }
 
 static struct tcb *
