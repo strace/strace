@@ -67,25 +67,20 @@ fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
 	return true;
 }
 
-enum {
-	NL_FAMILY_ERROR = -1,
-	NL_FAMILY_DEFAULT = -2
-};
-
 static int
 get_fd_nl_family(struct tcb *const tcp, const int fd)
 {
 	const unsigned long inode = getfdinode(tcp, fd);
 	if (!inode)
-		return NL_FAMILY_ERROR;
+		return -1;
 
 	const char *const details = get_sockaddr_by_inode(tcp, fd, inode);
 	if (!details)
-		return NL_FAMILY_ERROR;
+		return -1;
 
 	const char *const nl_details = STR_STRIP_PREFIX(details, "NETLINK:[");
 	if (nl_details == details)
-		return NL_FAMILY_ERROR;
+		return -1;
 
 	const struct xlat *xlats = netlink_protocols;
 	for (; xlats->str; ++xlats) {
@@ -97,7 +92,7 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 	if (*nl_details >= '0' && *nl_details <= '9')
 		return atoi(nl_details);
 
-	return NL_FAMILY_ERROR;
+	return -1;
 }
 
 static void
@@ -173,7 +168,7 @@ static const struct {
 
 /*
  * As all valid netlink families are positive integers, use unsigned int
- * for family here to filter out NL_FAMILY_ERROR and NL_FAMILY_DEFAULT.
+ * for family here to filter out -1.
  */
 static void
 decode_nlmsg_type(const uint16_t type, const unsigned int family)
@@ -182,7 +177,11 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 	const struct xlat *xlat = netlink_types;
 	const char *dflt = "NLMSG_???";
 
-	if (type != NLMSG_DONE && family < ARRAY_SIZE(nlmsg_types)) {
+	/*
+	 * type < NLMSG_MIN_TYPE are reserved control messages
+	 * that need no family-specific decoding.
+	 */
+	if (type >= NLMSG_MIN_TYPE && family < ARRAY_SIZE(nlmsg_types)) {
 		if (nlmsg_types[family].decoder)
 			decoder = nlmsg_types[family].decoder;
 		if (nlmsg_types[family].xlat)
@@ -258,32 +257,24 @@ end:
 	printflags_ex(flags, "NLM_F_???", netlink_flags, table, NULL);
 }
 
-static int
+static void
 print_nlmsghdr(struct tcb *tcp,
 	       const int fd,
-	       int family,
+	       const int family,
 	       const struct nlmsghdr *const nlmsghdr)
 {
 	/* print the whole structure regardless of its nlmsg_len */
 
 	tprintf("{len=%u, type=", nlmsghdr->nlmsg_len);
 
-	const int hdr_family = (nlmsghdr->nlmsg_type < NLMSG_MIN_TYPE
-				&& nlmsghdr->nlmsg_type != NLMSG_DONE)
-			       ? NL_FAMILY_DEFAULT
-			       : (family != NL_FAMILY_DEFAULT
-				  ? family : get_fd_nl_family(tcp, fd));
-
-	decode_nlmsg_type(nlmsghdr->nlmsg_type, hdr_family);
+	decode_nlmsg_type(nlmsghdr->nlmsg_type, family);
 
 	tprints(", flags=");
 	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,
-			   nlmsghdr->nlmsg_type, hdr_family);
+			   nlmsghdr->nlmsg_type, family);
 
 	tprintf(", seq=%u, pid=%u}", nlmsghdr->nlmsg_seq,
 		nlmsghdr->nlmsg_pid);
-
-	return family != NL_FAMILY_DEFAULT ? family : hdr_family;
 }
 
 static bool
@@ -319,7 +310,7 @@ static const nla_decoder_t nlmsgerr_nla_decoders[] = {
 static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int fd,
-			     int family,
+			     const int family,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len);
@@ -399,7 +390,18 @@ decode_payload(struct tcb *const tcp,
 		return;
 	}
 
-	if ((unsigned int) family < ARRAY_SIZE(netlink_decoders)
+	/*
+	 * While most of NLMSG_DONE messages indeed have payloads
+	 * containing just a single integer, there are few exceptions,
+	 * so pass payloads of NLMSG_DONE messages to family-specific
+	 * netlink payload decoders.
+	 *
+	 * Other types of reserved control messages need no family-specific
+	 * netlink payload decoding.
+	 */
+	if ((nlmsghdr->nlmsg_type >= NLMSG_MIN_TYPE
+	    || nlmsghdr->nlmsg_type == NLMSG_DONE)
+	    && (unsigned int) family < ARRAY_SIZE(netlink_decoders)
 	    && netlink_decoders[family]
 	    && netlink_decoders[family](tcp, nlmsghdr, addr, len)) {
 		return;
@@ -419,7 +421,7 @@ decode_payload(struct tcb *const tcp,
 static void
 decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const int fd,
-			     int family,
+			     const int family,
 			     const struct nlmsghdr *const nlmsghdr,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len)
@@ -430,7 +432,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	if (nlmsg_len > NLMSG_HDRLEN)
 		tprints("{");
 
-	family = print_nlmsghdr(tcp, fd, family, nlmsghdr);
+	print_nlmsghdr(tcp, fd, family, nlmsghdr);
 
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprints(", ");
@@ -446,6 +448,7 @@ decode_netlink(struct tcb *const tcp,
 	       kernel_ulong_t addr,
 	       kernel_ulong_t len)
 {
+	const int family = get_fd_nl_family(tcp, fd);
 	struct nlmsghdr nlmsghdr;
 	bool print_array = false;
 	unsigned int elt;
@@ -472,7 +475,7 @@ decode_netlink(struct tcb *const tcp,
 			print_array = true;
 		}
 
-		decode_nlmsghdr_with_payload(tcp, fd, NL_FAMILY_DEFAULT,
+		decode_nlmsghdr_with_payload(tcp, fd, family,
 					     &nlmsghdr, addr, len);
 
 		if (!next_addr)
