@@ -449,6 +449,12 @@ decode_netlink(struct tcb *const tcp,
 	       kernel_ulong_t len)
 {
 	const int family = get_fd_nl_family(tcp, fd);
+
+	if (family == NETLINK_KOBJECT_UEVENT) {
+		printstrn(tcp, addr, len);
+		return;
+	}
+
 	struct nlmsghdr nlmsghdr;
 	bool print_array = false;
 	unsigned int elt;
