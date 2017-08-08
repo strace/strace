@@ -139,9 +139,8 @@ static void
 build_mmap_cache(struct tcb *tcp)
 {
 	FILE *fp;
-	struct mmap_cache_t *cache_head;
-	/* start with a small dynamically-allocated array and then expand it */
-	size_t cur_array_size = 10;
+	struct mmap_cache_t *cache_head = NULL;
+	size_t cur_array_size = 0;
 	char filename[sizeof("/proc/4294967296/maps")];
 	char buffer[PATH_MAX + 80];
 
@@ -153,8 +152,6 @@ build_mmap_cache(struct tcb *tcp)
 		perror_msg("fopen: %s", filename);
 		return;
 	}
-
-	cache_head = xcalloc(cur_array_size, sizeof(*cache_head));
 
 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 		struct mmap_cache_t *entry;
@@ -199,11 +196,9 @@ build_mmap_cache(struct tcb *tcp)
 			}
 		}
 
-		if (tcp->mmap_cache_size >= cur_array_size) {
-			cur_array_size *= 2;
-			cache_head = xreallocarray(cache_head, cur_array_size,
-						   sizeof(*cache_head));
-		}
+		if (tcp->mmap_cache_size >= cur_array_size)
+			cache_head = xgrowarray(cache_head, &cur_array_size,
+						sizeof(*cache_head));
 
 		entry = &cache_head[tcp->mmap_cache_size];
 		entry->start_addr = start_addr;
