@@ -31,6 +31,7 @@
 #include "netlink_route.h"
 #include "print_fields.h"
 
+#include "netlink.h"
 #include <linux/rtnetlink.h>
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
