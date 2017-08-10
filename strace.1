@@ -35,33 +35,65 @@
 .fi
 .sp
 ..
+.\" Like .OP, but with ellipsis at the end in order to signify that option
+.\" can be provided multiple times. Based on .OP definition in groff's
+.\" an-ext.tmac.
+.de OM
+.  ie \\n(.$-1 \
+.    RI "[\fB\\$1\fP" "\ \\$2" "]...\&"
+.  el \
+.    RB "[" "\\$1" "]...\&"
+..
+.\" Required option.
+.de OR
+.  ie \\n(.$-1 \
+.    RI "\fB\\$1\fP" "\ \\$2"
+.  el \
+.    BR "\\$1"
+..
 .TH STRACE 1
 .SH NAME
 strace \- trace system calls and signals
 .SH SYNOPSIS
-.B strace
-[\fB-CdffhikqrtttTvVxxy\fR]
-[\fB-I\fIn\fR]
-[\fB-b\fIexecve\fR]
-[\fB-e\fIexpr\fR]...
-[\fB-a\fIcolumn\fR]
-[\fB-o\fIfile\fR]
-[\fB-s\fIstrsize\fR]
-[\fB-P\fIpath\fR]... \fB-p\fIpid\fR... /
-[\fB-D\fR]
-[\fB-E\fIvar\fR[=\fIval\fR]]... [\fB-u\fIusername\fR]
-\fIcommand\fR [\fIargs\fR]
-.sp
-.B strace
-\fB-c\fR[\fBdf\fR]
-[\fB-I\fIn\fR]
-[\fB-b\fIexecve\fR]
-[\fB-e\fIexpr\fR]...
-[\fB-O\fIoverhead\fR]
-[\fB-S\fIsortby\fR] \fB-p\fIpid\fR... /
-[\fB-D\fR]
-[\fB-E\fIvar\fR[=\fIval\fR]]... [\fB-u\fIusername\fR]
-\fIcommand\fR [\fIargs\fR]
+.SY strace
+.OP \-CdffhikqrtttTvVxxy
+.OP \-I n
+.OP \-b execve
+.OM \-e expr
+.OP \-a column
+.OP \-o file
+.OP \-s strsize
+.OM \-P path
+.OM \-p pid
+.BR "" {
+.OR \-p pid
+.BR "" |
+.OP \-D
+.OM \-E var\fR[=\fIval\fR]
+.OP \-u username
+.IR command " [" args ]
+.BR "" }
+.YS
+.SY strace
+.B \-c
+.OP \-df
+.OP \-I n
+.OP \-b execve
+.OM \-e expr
+.OP \-O overhead
+.OP \-S sortby
+.OM \-P path
+.OM \-p pid
+.BR "" {
+.OR \-p pid
+.BR "" |
+.OP \-D
+.OM \-E var\fR[=\fIval\fR]
+.OP -u username
+.IR command " [" args ]
+.BR "" }
+.YS
+
 .SH DESCRIPTION
 .IX "strace command" "" "\fLstrace\fR command"
 .LP
