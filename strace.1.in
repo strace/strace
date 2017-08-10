@@ -51,7 +51,7 @@
 .  el \
 .    BR "\\$1"
 ..
-.TH STRACE 1
+.TH STRACE 1 "@MANPAGE_DATE@" "strace @VERSION@"
 .SH NAME
 strace \- trace system calls and signals
 .SH SYNOPSIS
