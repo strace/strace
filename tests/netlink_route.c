@@ -129,6 +129,17 @@ test_nlmsg_flags(const int fd)
 }
 
 static void
+test_nlmsg_done(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const int num = 0xabcdefad;
+
+	TEST_NETLINK(fd, nlh0, NLMSG_DONE, NLM_F_REQUEST,
+		     sizeof(num), &num, sizeof(num),
+		     printf("%d", num));
+}
+
+static void
 test_rtnl_unspec(const int fd)
 {
 	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
@@ -207,6 +218,7 @@ int main(void)
 
 	test_nlmsg_type(fd);
 	test_nlmsg_flags(fd);
+	test_nlmsg_done(fd);
 	test_rtnl_unspec(fd);
 	test_rtnl_link(fd);
 
