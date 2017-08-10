@@ -1,0 +1,35 @@
+#! /bin/sh
+
+if [ "$1" = "-f" ]; then
+	shift
+	DATE_FORMAT="$1"
+	shift
+fi
+
+: ${FILE:=$1}
+: ${DATE_FILE:=$(dirname "$FILE")/.$(basename "${FILE}").date}
+: ${DEFAULT_DATE:=$2}
+: ${DATE_FORMAT:=%Y-%m-%d}
+
+date=
+
+[ -n "${FILE}" ] || {
+	echo >&2 "$0 $(dirname "$0")/file [$(dirname "$0")/file.date [DEFAULT_DATE]]"
+	exit 1
+}
+
+[ -f "${DATE_FILE}" ] && date="$(cat "${DATE_FILE}")"
+
+[ -n "${date}" ] ||
+	date="$(git log -n 1 --format=format:%cD --no-patch "${FILE}")"
+
+[ -n "${date}" ] || year="${DEFAULT_DATE}"
+
+[ -n "${date}" ] || date="$(date -u)"
+
+[ -n "${date}" ] || {
+	echo >&2 'Undefined date.'
+	exit 1
+}
+
+exec printf "%s" $(date "+${DATE_FORMAT}" -d "${date}")
