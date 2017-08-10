@@ -27,12 +27,14 @@
 .\" THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 .de CW
 .sp
+.in +4n
 .nf
 .ft CW
 ..
 .de CE
 .ft R
 .fi
+.in
 .sp
 ..
 .\" Like .OP, but with ellipsis at the end in order to signify that option
