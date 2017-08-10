@@ -31,8 +31,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 
-#if defined HAVE_IF_INDEXTONAME \
- && defined MCAST_JOIN_GROUP && defined MCAST_LEAVE_GROUP
+#if defined MCAST_JOIN_GROUP && defined MCAST_LEAVE_GROUP
 
 # include <stdio.h>
 # include <unistd.h>
@@ -61,7 +60,7 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct group_req, greq6);
 	unsigned int i;
 
-	greq6->gr_interface = greq4->gr_interface = if_nametoindex("lo");
+	greq6->gr_interface = greq4->gr_interface = ifindex_lo();
 	if (!greq4->gr_interface)
 		perror_msg_and_skip("lo");
 
@@ -136,18 +135,18 @@ main(void)
 		set_opt(0, opts[i].level, opts[i].name,
 			opts[i].val, sizeof(*opts[i].val));
 		printf("setsockopt(0, %s, %s"
-		       ", {gr_interface=if_nametoindex(\"lo\")"
-		       ", %s}, %u) = %s\n",
-		       opts[i].str_level, opts[i].str_name, opts[i].addr,
+		       ", {gr_interface=%s, %s}, %u) = %s\n",
+		       opts[i].str_level, opts[i].str_name,
+		       IFINDEX_LO_STR, opts[i].addr,
 		       (unsigned int) sizeof(*opts[i].val), errstr);
 
 		/* optlen > sizeof(struct group_req), shortened */
 		set_opt(0, opts[i].level, opts[i].name, opts[i].val, INT_MAX);
 		printf("setsockopt(0, %s, %s"
-		       ", {gr_interface=if_nametoindex(\"lo\")"
-		       ", %s}, %u) = %s\n",
+		       ", {gr_interface=%s, %s}, %u) = %s\n",
 		       opts[i].str_level, opts[i].str_name,
-		       opts[i].addr, INT_MAX, errstr);
+		       IFINDEX_LO_STR, opts[i].addr,
+		       INT_MAX, errstr);
 	}
 
 	puts("+++ exited with 0 +++");
@@ -156,6 +155,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_IF_INDEXTONAME && MCAST_JOIN_GROUP && MCAST_LEAVE_GROUP")
+SKIP_MAIN_UNDEFINED("MCAST_JOIN_GROUP && MCAST_LEAVE_GROUP")
 
 #endif
