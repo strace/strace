@@ -173,6 +173,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return fdmatch(tcp, tcp->u_arg[0], set) ||
 			fdmatch(tcp, tcp->u_arg[1], set);
 
+	case SEN_execveat:
 	case SEN_faccessat:
 	case SEN_fchmodat:
 	case SEN_fchownat:
