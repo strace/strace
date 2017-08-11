@@ -285,7 +285,7 @@
 [4282] = { 5,	0,		SEN(keyctl),			"keyctl"		},
 [4283] = { 1,	0,		SEN(set_thread_area),		"set_thread_area"	},
 [4284] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[4285] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[4285] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [4286] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [4287] = { 4,	TM,		SEN(migrate_pages),		"migrate_pages"		},
 [4288] = { 4,	TD|TF,		SEN(openat),			"openat"		},

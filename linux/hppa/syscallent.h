@@ -273,7 +273,7 @@
 [267] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},
 [268] = { 2,	0,		SEN(ioprio_get),		"ioprio_get"		},
 [269] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[270] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[270] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [271] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [272] = { 4,	TM,		SEN(migrate_pages),		"migrate_pages"		},
 [273] = { 6,	TD,		SEN(pselect6),			"pselect6"		},

@@ -267,7 +267,7 @@
 [274] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
 [275] = { 1,	TD,		SEN(epoll_create1),		"epoll_create1"		},
 [276] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[277] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[277] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [278] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [279] = { 1,	TD,		SEN(inotify_init1),		"inotify_init1"		},
 [280] = { 3,	0,		SEN(getcpu),			"getcpu"		},

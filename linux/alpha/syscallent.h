@@ -408,7 +408,7 @@
 [442] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},
 [443] = { 2,	0,		SEN(ioprio_get),		"ioprio_get"		},
 [444] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[445] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[445] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [446] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [447] = { 1,	TD,		SEN(fdatasync),			"fdatasync"		},
 [448] = { 4,	0,		SEN(kexec_load),		"kexec_load"		},

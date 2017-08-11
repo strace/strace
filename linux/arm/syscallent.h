@@ -342,7 +342,7 @@
 [314] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},
 [315] = { 2,	0,		SEN(ioprio_get),		"ioprio_get"		},
 [316] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[317] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[317] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [318] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [319] = { 6,	TM,		SEN(mbind),			"mbind"			},
 [320] = { 5,	TM,		SEN(get_mempolicy),		"get_mempolicy"		},

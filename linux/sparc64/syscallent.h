@@ -148,7 +148,7 @@
 [149] = { 5,	0,		SEN(printargs),			"pciconfig_write"	},
 [150] = { 3,	TN,		SEN(getsockname),		"getsockname"		},
 [151] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[152] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[152] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [153] = { 3,	TD,		SEN(poll),			"poll"			},
 [154] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
 [155] = { },

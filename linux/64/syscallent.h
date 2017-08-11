@@ -25,7 +25,7 @@
 [ 24] = { 3,	TD,		SEN(dup3),			"dup3"			},
 [ 25] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
 [ 26] = { 1,	TD,		SEN(inotify_init1),		"inotify_init1"		},
-[ 27] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[ 27] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [ 28] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [ 29] = { 3,	TD,		SEN(ioctl),			"ioctl"			},
 [ 30] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},

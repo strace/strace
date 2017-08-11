@@ -248,7 +248,7 @@
 [6245] = { 5,	0,		SEN(keyctl),			"keyctl"		},
 [6246] = { 1,	0,		SEN(set_thread_area),		"set_thread_area"	},
 [6247] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[6248] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[6248] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [6249] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [6250] = { 4,	TM,		SEN(migrate_pages),		"migrate_pages"		},
 [6251] = { 4,	TD|TF,		SEN(openat),			"openat"		},

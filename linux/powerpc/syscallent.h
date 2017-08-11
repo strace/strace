@@ -303,7 +303,7 @@
 [273] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},
 [274] = { 2,	0,		SEN(ioprio_get),		"ioprio_get"		},
 [275] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
-[276] = { 3,	TD,		SEN(inotify_add_watch),		"inotify_add_watch"	},
+[276] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [277] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [278] = { 3,	0,		SEN(printargs),			"spu_run"		},
 [279] = { 4,	0,		SEN(printargs),			"spu_create"		},
