@@ -30,7 +30,7 @@
 #include <netinet/in.h>
 
 #if defined IP_ADD_MEMBERSHIP && defined IPV6_ADD_MEMBERSHIP \
- && defined IPV6_JOIN_ANYCAST && defined HAVE_IF_INDEXTONAME
+ && defined IPV6_JOIN_ANYCAST
 
 # include <stdio.h>
 # include <unistd.h>
@@ -55,7 +55,7 @@ main(void)
 	inet_pton(AF_INET, interface, &m4->imr_interface);
 	inet_pton(AF_INET6, multi6addr, &m6->ipv6mr_multiaddr);
 
-	m6->ipv6mr_interface = if_nametoindex("lo");
+	m6->ipv6mr_interface = ifindex_lo();
 	if (!m6->ipv6mr_interface)
 		perror_msg_and_skip("lo");
 
@@ -89,28 +89,28 @@ main(void)
 			m6, sizeof(*m6),
 			"{inet_pton(AF_INET6, \"" multi6addr
 			"\", &ipv6mr_multiaddr)"
-			", ipv6mr_interface=if_nametoindex(\"lo\")}"
+			", ipv6mr_interface=" IFINDEX_LO_STR "}"
 		},
 		{
 			ARG_STR(SOL_IPV6), ARG_STR(IPV6_DROP_MEMBERSHIP),
 			m6, sizeof(*m6),
 			"{inet_pton(AF_INET6, \"" multi6addr
 			"\", &ipv6mr_multiaddr)"
-			", ipv6mr_interface=if_nametoindex(\"lo\")}"
+			", ipv6mr_interface=" IFINDEX_LO_STR "}"
 		},
 		{
 			ARG_STR(SOL_IPV6), ARG_STR(IPV6_JOIN_ANYCAST),
 			m6, sizeof(*m6),
 			"{inet_pton(AF_INET6, \"" multi6addr
 			"\", &ipv6mr_multiaddr)"
-			", ipv6mr_interface=if_nametoindex(\"lo\")}"
+			", ipv6mr_interface=" IFINDEX_LO_STR "}"
 		},
 		{
 			ARG_STR(SOL_IPV6), ARG_STR(IPV6_LEAVE_ANYCAST),
 			m6, sizeof(*m6),
 			"{inet_pton(AF_INET6, \"" multi6addr
 			"\", &ipv6mr_multiaddr)"
-			", ipv6mr_interface=if_nametoindex(\"lo\")}"
+			", ipv6mr_interface=" IFINDEX_LO_STR "}"
 		}
 	};
 
@@ -158,6 +158,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("IP_ADD_MEMBERSHIP && IPV6_ADD_MEMBERSHIP"
-		    " && IPV6_JOIN_ANYCAST && HAVE_IF_INDEXTONAME")
+		    " && IPV6_JOIN_ANYCAST")
 
 #endif
