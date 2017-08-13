@@ -36,6 +36,7 @@
 # include <linux/if_addr.h>
 #endif
 #include <linux/if_arp.h>
+#include <linux/ip.h>
 #include <linux/rtnetlink.h>
 
 #ifdef HAVE_IF_INDEXTONAME
@@ -234,6 +235,34 @@ test_rtnl_addr(const int fd)
 		      printf("}"));
 }
 
+static void
+test_rtnl_route(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	static const struct rtmsg msg = {
+		.rtm_family = AF_UNIX,
+		.rtm_dst_len = 0xaf,
+		.rtm_src_len = 0xda,
+		.rtm_tos = IPTOS_LOWDELAY,
+		.rtm_table = RT_TABLE_DEFAULT,
+		.rtm_protocol = RTPROT_KERNEL,
+		.rtm_scope = RT_SCOPE_UNIVERSE,
+		.rtm_type = RTN_LOCAL,
+		.rtm_flags = RTM_F_NOTIFY
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETROUTE, msg,
+		      printf("{rtm_family=AF_UNIX"),
+		      PRINT_FIELD_U(", ", msg, rtm_dst_len);
+		      PRINT_FIELD_U(", ", msg, rtm_src_len);
+		      printf(", rtm_tos=IPTOS_LOWDELAY"
+			     ", rtm_table=RT_TABLE_DEFAULT"
+			     ", rtm_protocol=RTPROT_KERNEL"
+			     ", rtm_scope=RT_SCOPE_UNIVERSE"
+			     ", rtm_type=RTN_LOCAL"
+			     ", rtm_flags=RTM_F_NOTIFY}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -246,6 +275,7 @@ int main(void)
 	test_rtnl_unspec(fd);
 	test_rtnl_link(fd);
 	test_rtnl_addr(fd);
+	test_rtnl_route(fd);
 
 	printf("+++ exited with 0 +++\n");
 
