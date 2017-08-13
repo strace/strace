@@ -351,6 +351,20 @@ test_rtnl_tc(const int fd)
 		      printf("}"));
 }
 
+static void
+test_rtnl_tca(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	struct tcamsg msg = {
+		.tca_family = AF_INET
+	};
+
+	TEST_NETLINK(fd, nlh0,
+		     RTM_GETACTION, NLM_F_REQUEST,
+		     sizeof(msg), &msg, sizeof(msg),
+		     printf("{tca_family=AF_INET}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -370,6 +384,7 @@ int main(void)
 	test_rtnl_neigh(fd);
 	test_rtnl_neightbl(fd);
 	test_rtnl_tc(fd);
+	test_rtnl_tca(fd);
 
 	printf("+++ exited with 0 +++\n");
 
