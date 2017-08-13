@@ -101,7 +101,13 @@ static const netlink_route_decoder_t route_decoders[] = {
 
 #ifdef HAVE_STRUCT_DCBMSG
 	[RTM_GETDCB - RTM_BASE] = decode_dcbmsg,
-	[RTM_SETDCB - RTM_BASE] = decode_dcbmsg
+	[RTM_SETDCB - RTM_BASE] = decode_dcbmsg,
+#endif
+
+#ifdef HAVE_STRUCT_NETCONFMSG
+	[RTM_DELNETCONF - RTM_BASE] = decode_netconfmsg,
+	[RTM_GETNETCONF - RTM_BASE] = decode_netconfmsg,
+	[RTM_NEWNETCONF - RTM_BASE] = decode_netconfmsg
 #endif
 };
 

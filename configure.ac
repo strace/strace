@@ -445,6 +445,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
+AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS([struct statfs.f_frsize],,, [#include <linux/types.h>
