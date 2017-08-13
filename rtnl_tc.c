@@ -27,25 +27,31 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_NETLINK_ROUTE_H
-#define STRACE_NETLINK_ROUTE_H
+#include "defs.h"
+#include "netlink_route.h"
+#include "print_fields.h"
 
-#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
-void							\
-route_decode_name(struct tcb *tcp,			\
-		  const struct nlmsghdr *nlmsghdr,	\
-		  uint8_t family,			\
-		  kernel_ulong_t addr,			\
-		  unsigned int len)			\
-/* End of DECL_NETLINK_ROUTE_DECODER definition. */
+#include "netlink.h"
+#include <linux/rtnetlink.h>
 
-extern DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ndmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_tcmsg);
+DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
+{
+	struct tcmsg tcmsg = { .tcm_family = family };
+	const size_t offset = sizeof(tcmsg.tcm_family);
 
-#endif /* !STRACE_NETLINK_ROUTE_H */
+	PRINT_FIELD_XVAL("{", tcmsg, tcm_family, addrfams, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(tcmsg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(tcmsg) - offset,
+					 (void *) &tcmsg + offset)) {
+			PRINT_FIELD_IFINDEX("", tcmsg, tcm_ifindex);
+			PRINT_FIELD_U(", ", tcmsg, tcm_handle);
+			PRINT_FIELD_U(", ", tcmsg, tcm_parent);
+			PRINT_FIELD_U(", ", tcmsg, tcm_info);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
