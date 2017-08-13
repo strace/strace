@@ -49,6 +49,9 @@
 #ifdef HAVE_LINUX_NEIGHBOUR_H
 # include <linux/neighbour.h>
 #endif
+#ifdef HAVE_STRUCT_NETCONFMSG
+# include <linux/netconf.h>
+#endif
 #include <linux/rtnetlink.h>
 
 #ifdef HAVE_IF_INDEXTONAME
@@ -410,6 +413,22 @@ test_rtnl_dcb(const int fd)
 }
 #endif
 
+#ifdef HAVE_STRUCT_NETCONFMSG
+static void
+test_rtnl_netconf(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	static const struct netconfmsg msg = {
+		.ncm_family = AF_INET
+	};
+
+	TEST_NETLINK(fd, nlh0,
+		     RTM_GETNETCONF, NLM_F_REQUEST,
+		     sizeof(msg), &msg, sizeof(msg),
+		     printf("{ncm_family=AF_INET}"));
+}
+#endif
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -435,6 +454,9 @@ int main(void)
 #endif
 #ifdef HAVE_STRUCT_DCBMSG
 	test_rtnl_dcb(fd);
+#endif
+#ifdef HAVE_STRUCT_NETCONFMSG
+	test_rtnl_netconf(fd);
 #endif
 
 	printf("+++ exited with 0 +++\n");
