@@ -32,6 +32,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include "test_netlink.h"
+#ifdef HAVE_LINUX_DCBNL_H
+# include <linux/dcbnl.h>
+#endif
 #ifdef HAVE_LINUX_FIB_RULES_H
 # include <linux/fib_rules.h>
 #endif
@@ -391,6 +394,22 @@ test_rtnl_addrlabel(const int fd)
 }
 #endif
 
+#ifdef HAVE_STRUCT_DCBMSG
+static void
+test_rtnl_dcb(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	static const struct dcbmsg msg = {
+		.dcb_family = AF_UNIX,
+		.cmd = DCB_CMD_UNDEFINED
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETDCB, msg,
+		      printf("{dcb_family=AF_UNIX"),
+		      printf(", cmd=DCB_CMD_UNDEFINED}"));
+}
+#endif
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -413,6 +432,9 @@ int main(void)
 	test_rtnl_tca(fd);
 #ifdef HAVE_STRUCT_IFADDRLBLMSG
 	test_rtnl_addrlabel(fd);
+#endif
+#ifdef HAVE_STRUCT_DCBMSG
+	test_rtnl_dcb(fd);
 #endif
 
 	printf("+++ exited with 0 +++\n");
