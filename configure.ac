@@ -442,6 +442,8 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_CHECK_UNION_BPF_ATTR([prog_flags])
 ])
 
+AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
+
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS([struct statfs.f_frsize],,, [#include <linux/types.h>
 #include <asm/statfs.h>])

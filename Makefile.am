@@ -248,6 +248,7 @@ strace_SOURCES =	\
 	rt_sigreturn.c	\
 	rtc.c		\
 	rtnl_addr.c	\
+	rtnl_addrlabel.c \
 	rtnl_link.c	\
 	rtnl_neigh.c	\
 	rtnl_neightbl.c	\
