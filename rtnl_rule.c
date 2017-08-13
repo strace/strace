@@ -27,21 +27,52 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_NETLINK_ROUTE_H
-#define STRACE_NETLINK_ROUTE_H
+#include "defs.h"
 
-#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
-void							\
-route_decode_name(struct tcb *tcp,			\
-		  const struct nlmsghdr *nlmsghdr,	\
-		  uint8_t family,			\
-		  kernel_ulong_t addr,			\
-		  unsigned int len)			\
-/* End of DECL_NETLINK_ROUTE_DECODER definition. */
+#include "netlink_route.h"
+#include "print_fields.h"
 
-extern DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtmsg);
+#include "netlink.h"
+#include <linux/rtnetlink.h>
+#ifdef HAVE_LINUX_FIB_RULES_H
+# include <linux/fib_rules.h>
+#endif
 
-#endif /* !STRACE_NETLINK_ROUTE_H */
+#include "xlat/fib_rule_actions.h"
+#include "xlat/fib_rule_flags.h"
+
+DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
+{
+	/*
+	 * struct rtmsg and struct fib_rule_hdr are essentially
+	 * the same structure, use struct rtmsg but treat it as
+	 * struct fib_rule_hdr.
+	 */
+	struct rtmsg msg = { .rtm_family = family };
+	const size_t offset = sizeof(msg.rtm_family);
+
+	tprints("{family=");
+	printxval(addrfams, msg.rtm_family, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(msg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(msg) - offset,
+					 (void *) &msg + offset)) {
+			tprintf("dst_len=%u, src_len=%u",
+				msg.rtm_dst_len, msg.rtm_src_len);
+			tprints(", tos=");
+			printflags(ip_type_of_services, msg.rtm_tos,
+				   "IPTOS_TOS_???");
+			tprints(", table=");
+			printxval(routing_table_ids, msg.rtm_table, NULL);
+			tprints(", action=");
+			printxval(fib_rule_actions, msg.rtm_type, "FR_ACT_???");
+			tprints(", flags=");
+			printflags(fib_rule_flags, msg.rtm_flags,
+				   "FIB_RULE_???");
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
