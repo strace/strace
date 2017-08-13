@@ -27,20 +27,48 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_NETLINK_ROUTE_H
-#define STRACE_NETLINK_ROUTE_H
+#include "defs.h"
+#include "netlink_route.h"
+#include "print_fields.h"
 
-#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
-void							\
-route_decode_name(struct tcb *tcp,			\
-		  const struct nlmsghdr *nlmsghdr,	\
-		  uint8_t family,			\
-		  kernel_ulong_t addr,			\
-		  unsigned int len)			\
-/* End of DECL_NETLINK_ROUTE_DECODER definition. */
+#include <linux/ip.h>
+#include "netlink.h"
+#include <linux/rtnetlink.h>
 
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtmsg);
+#include "xlat/ip_type_of_services.h"
+#include "xlat/routing_flags.h"
+#include "xlat/routing_protocols.h"
+#include "xlat/routing_table_ids.h"
+#include "xlat/routing_types.h"
 
-#endif /* !STRACE_NETLINK_ROUTE_H */
+DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
+{
+	struct rtmsg rtmsg = { .rtm_family = family };
+	const size_t offset = sizeof(rtmsg.rtm_family);
+
+	PRINT_FIELD_XVAL("{", rtmsg, rtm_family, addrfams, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(rtmsg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(rtmsg) - offset,
+					 (void *) &rtmsg + offset)) {
+			PRINT_FIELD_U("", rtmsg, rtm_dst_len);
+			PRINT_FIELD_U(", ", rtmsg, rtm_src_len);
+			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_tos,
+					  ip_type_of_services, "IPTOS_TOS_???");
+			PRINT_FIELD_XVAL(", ", rtmsg, rtm_table,
+					 routing_table_ids, NULL);
+			PRINT_FIELD_XVAL(", ", rtmsg, rtm_protocol,
+					 routing_protocols, "RTPROT_???");
+			PRINT_FIELD_XVAL(", ", rtmsg, rtm_scope,
+					 routing_scopes, NULL);
+			PRINT_FIELD_XVAL(", ", rtmsg, rtm_type,
+					 routing_types, "RTN_???");
+			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_flags,
+					  routing_flags, "RTM_F_???");
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}

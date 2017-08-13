@@ -61,7 +61,11 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_GETADDR - RTM_BASE] = decode_ifaddrmsg,
 	[RTM_GETANYCAST - RTM_BASE] = decode_ifaddrmsg,
 	[RTM_GETMULTICAST - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_NEWADDR - RTM_BASE] = decode_ifaddrmsg
+	[RTM_NEWADDR - RTM_BASE] = decode_ifaddrmsg,
+
+	[RTM_DELROUTE - RTM_BASE] = decode_rtmsg,
+	[RTM_GETROUTE - RTM_BASE] = decode_rtmsg,
+	[RTM_NEWROUTE - RTM_BASE] = decode_rtmsg
 };
 
 bool

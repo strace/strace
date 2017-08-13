@@ -249,6 +249,7 @@ strace_SOURCES =	\
 	rtc.c		\
 	rtnl_addr.c	\
 	rtnl_link.c	\
+	rtnl_route.c	\
 	sched.c		\
 	sched_attr.h	\
 	scsi.c		\
