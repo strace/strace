@@ -330,6 +330,27 @@ test_rtnl_neightbl(const int fd)
 		     printf("{ndtm_family=AF_NETLINK}"));
 }
 
+static void
+test_rtnl_tc(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const struct tcmsg msg = {
+		.tcm_family = AF_UNIX,
+		.tcm_ifindex = IFINDEX_LO,
+		.tcm_handle = 0xfadcdafb,
+		.tcm_parent = 0xafbcadab,
+		.tcm_info = 0xbcaedafa
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETQDISC, msg,
+		      printf("{tcm_family=AF_UNIX"),
+		      printf(", tcm_ifindex=if_nametoindex(\"lo\")");
+		      PRINT_FIELD_U(", ", msg, tcm_handle);
+		      PRINT_FIELD_U(", ", msg, tcm_parent);
+		      PRINT_FIELD_U(", ", msg, tcm_info);
+		      printf("}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -348,6 +369,7 @@ int main(void)
 #endif
 	test_rtnl_neigh(fd);
 	test_rtnl_neightbl(fd);
+	test_rtnl_tc(fd);
 
 	printf("+++ exited with 0 +++\n");
 
