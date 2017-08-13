@@ -38,6 +38,9 @@
 #ifdef HAVE_LINUX_IF_ADDR_H
 # include <linux/if_addr.h>
 #endif
+#ifdef HAVE_STRUCT_IFADDRLBLMSG
+# include <linux/if_addrlabel.h>
+#endif
 #include <linux/if_arp.h>
 #include <linux/ip.h>
 #ifdef HAVE_LINUX_NEIGHBOUR_H
@@ -365,6 +368,29 @@ test_rtnl_tca(const int fd)
 		     printf("{tca_family=AF_INET}"));
 }
 
+#ifdef HAVE_STRUCT_IFADDRLBLMSG
+static void
+test_rtnl_addrlabel(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const struct ifaddrlblmsg msg = {
+		.ifal_family = AF_UNIX,
+		.ifal_prefixlen = 0xaf,
+		.ifal_flags = 0xbd,
+		.ifal_index = IFINDEX_LO,
+		.ifal_seq = 0xfadcdafb
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDRLABEL, msg,
+		      printf("{ifal_family=AF_UNIX"),
+		      PRINT_FIELD_U(", ", msg, ifal_prefixlen);
+		      PRINT_FIELD_U(", ", msg, ifal_flags);
+		      printf(", ifal_index=if_nametoindex(\"lo\")");
+		      PRINT_FIELD_U(", ", msg, ifal_seq);
+		      printf("}"));
+}
+#endif
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -385,6 +411,9 @@ int main(void)
 	test_rtnl_neightbl(fd);
 	test_rtnl_tc(fd);
 	test_rtnl_tca(fd);
+#ifdef HAVE_STRUCT_IFADDRLBLMSG
+	test_rtnl_addrlabel(fd);
+#endif
 
 	printf("+++ exited with 0 +++\n");
 
