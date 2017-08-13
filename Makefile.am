@@ -255,6 +255,7 @@ strace_SOURCES =	\
 	rtnl_neigh.c	\
 	rtnl_neightbl.c	\
 	rtnl_netconf.c	\
+	rtnl_nsid.c	\
 	rtnl_route.c	\
 	rtnl_rule.c	\
 	rtnl_tc.c	\
