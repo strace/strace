@@ -374,6 +374,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	inttypes.h
 	linux/bsg.h
 	linux/cryptouser.h
+	linux/dcbnl.h
 	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
 	linux/falloc.h
@@ -442,6 +443,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_CHECK_UNION_BPF_ATTR([prog_flags])
 ])
 
+AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 
 AC_CHECK_TYPES([struct statfs], [
