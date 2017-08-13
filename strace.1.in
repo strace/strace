@@ -859,14 +859,15 @@ sometimes possible to make deductive inferences about process
 behavior using inputs and outputs as propositions.
 .LP
 In some cases, a system call will differ from the documented behavior
-or have a different name.  For example, on System V-derived systems
-the true
-.BR time (2)
-system call does not take an argument and the
-.B stat
-function is called
-.B xstat
-and takes an extra leading argument.  These
+or have a different name.  For example, the
+.BR faccessat (2)
+system call does not have
+.I flags
+argument, and the
+.BR setrlimit (2)
+library function uses
+.BR prlimit (2)
+system call on modern (2.6.38+) kernels.  These
 discrepancies are normal but idiosyncratic characteristics of the
 system call interface and are accounted for by C library wrapper
 functions.
