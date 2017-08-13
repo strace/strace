@@ -73,7 +73,11 @@ static const netlink_route_decoder_t route_decoders[] = {
 
 	[RTM_DELNEIGH - RTM_BASE] = decode_ndmsg,
 	[RTM_GETNEIGH - RTM_BASE] = decode_rtm_getneigh,
-	[RTM_NEWNEIGH - RTM_BASE] = decode_ndmsg
+	[RTM_NEWNEIGH - RTM_BASE] = decode_ndmsg,
+
+	[RTM_GETNEIGHTBL - RTM_BASE] = decode_ndtmsg,
+	[RTM_NEWNEIGHTBL - RTM_BASE] = decode_ndtmsg,
+	[RTM_SETNEIGHTBL - RTM_BASE] = decode_ndtmsg
 };
 
 bool
