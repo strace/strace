@@ -447,6 +447,22 @@ test_rtnl_mdb(const int fd)
 }
 #endif
 
+#ifdef RTM_NEWNSID
+static void
+test_rtnl_nsid(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	static const struct rtgenmsg msg = {
+		.rtgen_family = AF_UNIX
+	};
+
+	TEST_NETLINK(fd, nlh0,
+		     RTM_GETNSID, NLM_F_REQUEST,
+		     sizeof(msg), &msg, sizeof(msg),
+		     printf("{rtgen_family=AF_UNIX}"));
+}
+#endif
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -478,6 +494,9 @@ int main(void)
 #endif
 #ifdef HAVE_STRUCT_BR_PORT_MSG
 	test_rtnl_mdb(fd);
+#endif
+#ifdef RTM_NEWNSID
+	test_rtnl_nsid(fd);
 #endif
 
 	printf("+++ exited with 0 +++\n");
