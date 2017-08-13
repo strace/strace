@@ -316,6 +316,20 @@ test_rtnl_neigh(const int fd)
 			     ", ndm_type=NDA_UNSPEC}"));
 }
 
+static void
+test_rtnl_neightbl(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	static const struct ndtmsg msg = {
+		.ndtm_family = AF_NETLINK
+	};
+
+	TEST_NETLINK(fd, nlh0,
+		     RTM_GETNEIGHTBL, NLM_F_REQUEST,
+		     sizeof(msg), &msg, sizeof(msg),
+		     printf("{ndtm_family=AF_NETLINK}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -333,6 +347,7 @@ int main(void)
 	test_rtnl_rule(fd);
 #endif
 	test_rtnl_neigh(fd);
+	test_rtnl_neightbl(fd);
 
 	printf("+++ exited with 0 +++\n");
 
