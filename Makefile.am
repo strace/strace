@@ -249,6 +249,7 @@ strace_SOURCES =	\
 	rtc.c		\
 	rtnl_addr.c	\
 	rtnl_link.c	\
+	rtnl_neigh.c	\
 	rtnl_route.c	\
 	rtnl_rule.c	\
 	sched.c		\

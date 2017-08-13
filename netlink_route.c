@@ -69,7 +69,11 @@ static const netlink_route_decoder_t route_decoders[] = {
 
 	[RTM_DELRULE - RTM_BASE] = decode_fib_rule_hdr,
 	[RTM_GETRULE - RTM_BASE] = decode_fib_rule_hdr,
-	[RTM_NEWRULE - RTM_BASE] = decode_fib_rule_hdr
+	[RTM_NEWRULE - RTM_BASE] = decode_fib_rule_hdr,
+
+	[RTM_DELNEIGH - RTM_BASE] = decode_ndmsg,
+	[RTM_GETNEIGH - RTM_BASE] = decode_rtm_getneigh,
+	[RTM_NEWNEIGH - RTM_BASE] = decode_ndmsg
 };
 
 bool

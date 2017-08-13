@@ -386,6 +386,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/ipc.h
 	linux/mmtimer.h
 	linux/msg.h
+	linux/neighbour.h
 	linux/netfilter/nfnetlink.h
 	linux/nsfs.h
 	linux/perf_event.h

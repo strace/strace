@@ -27,23 +27,51 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_NETLINK_ROUTE_H
-#define STRACE_NETLINK_ROUTE_H
+#include "defs.h"
+#include "netlink_route.h"
+#include "print_fields.h"
 
-#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
-void							\
-route_decode_name(struct tcb *tcp,			\
-		  const struct nlmsghdr *nlmsghdr,	\
-		  uint8_t family,			\
-		  kernel_ulong_t addr,			\
-		  unsigned int len)			\
-/* End of DECL_NETLINK_ROUTE_DECODER definition. */
+#include "netlink.h"
+#include <linux/rtnetlink.h>
+#ifdef HAVE_LINUX_NEIGHBOUR_H
+# include <linux/neighbour.h>
+#endif
 
-extern DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ndmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtmsg);
+#include "xlat/nda_types.h"
+#include "xlat/neighbor_cache_entry_flags.h"
+#include "xlat/neighbor_cache_entry_states.h"
 
-#endif /* !STRACE_NETLINK_ROUTE_H */
+DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
+{
+	struct ndmsg ndmsg = { .ndm_family = family };
+	const size_t offset = sizeof(ndmsg.ndm_family);
+
+	PRINT_FIELD_XVAL("{", ndmsg, ndm_family, addrfams, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(ndmsg)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(ndmsg) - offset,
+					 (void *) &ndmsg + offset)) {
+			PRINT_FIELD_IFINDEX("", ndmsg, ndm_ifindex);
+			PRINT_FIELD_FLAGS(", ", ndmsg, ndm_state,
+					  neighbor_cache_entry_states,
+					  "NUD_???");
+			PRINT_FIELD_FLAGS(", ", ndmsg, ndm_flags,
+					  neighbor_cache_entry_flags,
+					  "NTF_???");
+			PRINT_FIELD_XVAL(", ", ndmsg, ndm_type,
+					 nda_types, "NDA_???");
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh)
+{
+	if (family == AF_BRIDGE)
+		decode_ifinfomsg(tcp, nlmsghdr, family, addr, len);
+	else
+		decode_ndmsg(tcp, nlmsghdr, family, addr, len);
+}
