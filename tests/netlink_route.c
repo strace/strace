@@ -32,6 +32,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include "test_netlink.h"
+#ifdef HAVE_LINUX_FIB_RULES_H
+# include <linux/fib_rules.h>
+#endif
 #ifdef HAVE_LINUX_IF_ADDR_H
 # include <linux/if_addr.h>
 #endif
@@ -263,6 +266,33 @@ test_rtnl_route(const int fd)
 			     ", rtm_flags=RTM_F_NOTIFY}"));
 }
 
+#ifdef HAVE_LINUX_FIB_RULES_H
+static void
+test_rtnl_rule(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	struct rtmsg msg = {
+		.rtm_family = AF_UNIX,
+		.rtm_dst_len = 0xaf,
+		.rtm_src_len = 0xda,
+		.rtm_tos = IPTOS_LOWDELAY,
+		.rtm_table = RT_TABLE_UNSPEC,
+		.rtm_type = FR_ACT_TO_TBL,
+		.rtm_flags = FIB_RULE_INVERT
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETRULE, msg,
+		      printf("{family=AF_UNIX"),
+		      printf(", dst_len=%u, src_len=%u"
+			     ", tos=IPTOS_LOWDELAY"
+			     ", table=RT_TABLE_UNSPEC"
+			     ", action=FR_ACT_TO_TBL"
+			     ", flags=FIB_RULE_INVERT}",
+			     msg.rtm_dst_len,
+			     msg.rtm_src_len));
+}
+#endif
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -276,6 +306,9 @@ int main(void)
 	test_rtnl_link(fd);
 	test_rtnl_addr(fd);
 	test_rtnl_route(fd);
+#ifdef HAVE_LINUX_FIB_RULES_H
+	test_rtnl_rule(fd);
+#endif
 
 	printf("+++ exited with 0 +++\n");
 
