@@ -31,6 +31,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include "test_netlink.h"
 #ifdef HAVE_LINUX_DCBNL_H
 # include <linux/dcbnl.h>
@@ -45,6 +46,7 @@
 # include <linux/if_addrlabel.h>
 #endif
 #include <linux/if_arp.h>
+#include <linux/if_bridge.h>
 #include <linux/ip.h>
 #ifdef HAVE_LINUX_NEIGHBOUR_H
 # include <linux/neighbour.h>
@@ -429,6 +431,22 @@ test_rtnl_netconf(const int fd)
 }
 #endif
 
+#ifdef HAVE_STRUCT_BR_PORT_MSG
+static void
+test_rtnl_mdb(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const struct br_port_msg msg = {
+		.family = AF_UNIX,
+		.ifindex = IFINDEX_LO
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETMDB, msg,
+		      printf("{family=AF_UNIX"),
+		      printf(", ifindex=if_nametoindex(\"lo\")}"));
+}
+#endif
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -457,6 +475,9 @@ int main(void)
 #endif
 #ifdef HAVE_STRUCT_NETCONFMSG
 	test_rtnl_netconf(fd);
+#endif
+#ifdef HAVE_STRUCT_BR_PORT_MSG
+	test_rtnl_mdb(fd);
 #endif
 
 	printf("+++ exited with 0 +++\n");
