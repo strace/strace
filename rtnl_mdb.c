@@ -27,30 +27,33 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_NETLINK_ROUTE_H
-#define STRACE_NETLINK_ROUTE_H
+#include "defs.h"
 
-#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
-void							\
-route_decode_name(struct tcb *tcp,			\
-		  const struct nlmsghdr *nlmsghdr,	\
-		  uint8_t family,			\
-		  kernel_ulong_t addr,			\
-		  unsigned int len)			\
-/* End of DECL_NETLINK_ROUTE_DECODER definition. */
+#ifdef HAVE_STRUCT_BR_PORT_MSG
 
-extern DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ndmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_tcamsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_tcmsg);
+# include "netlink_route.h"
+# include "print_fields.h"
 
-#endif /* !STRACE_NETLINK_ROUTE_H */
+# include <netinet/in.h>
+# include <linux/if_bridge.h>
+
+DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
+{
+	struct br_port_msg bpm = { .family = family };
+	const size_t offset = sizeof(bpm.family);
+
+	PRINT_FIELD_XVAL("{", bpm, family, addrfams, "AF_???");
+
+	tprints(", ");
+	if (len >= sizeof(bpm)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(bpm) - offset,
+					 (void *) &bpm + offset)) {
+			PRINT_FIELD_IFINDEX("", bpm, ifindex);
+		}
+	} else
+		tprints("...");
+	tprints("}");
+}
+
+#endif

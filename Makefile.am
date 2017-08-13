@@ -251,6 +251,7 @@ strace_SOURCES =	\
 	rtnl_addrlabel.c \
 	rtnl_dcb.c	\
 	rtnl_link.c	\
+	rtnl_mdb.c	\
 	rtnl_neigh.c	\
 	rtnl_neightbl.c	\
 	rtnl_netconf.c	\

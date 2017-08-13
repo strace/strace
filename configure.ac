@@ -443,6 +443,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_CHECK_UNION_BPF_ATTR([prog_flags])
 ])
 
+AC_CHECK_TYPES([struct br_port_msg],,, [#include <linux/if_bridge.h>])
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
