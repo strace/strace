@@ -32,6 +32,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include "test_netlink.h"
+#ifdef HAVE_LINUX_IF_ADDR_H
+# include <linux/if_addr.h>
+#endif
 #include <linux/if_arp.h>
 #include <linux/rtnetlink.h>
 
@@ -210,6 +213,27 @@ test_rtnl_link(const int fd)
 		      printf("}"));
 }
 
+static void
+test_rtnl_addr(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const struct ifaddrmsg msg = {
+		.ifa_family = AF_UNIX,
+		.ifa_prefixlen = 0xde,
+		.ifa_flags = IFA_F_SECONDARY,
+		.ifa_scope = RT_SCOPE_UNIVERSE,
+		.ifa_index = IFINDEX_LO
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDR, msg,
+		      printf("{ifa_family=AF_UNIX"),
+		      PRINT_FIELD_U(", ", msg, ifa_prefixlen);
+		      printf(", ifa_flags=IFA_F_SECONDARY"
+			     ", ifa_scope=RT_SCOPE_UNIVERSE"
+			     ", ifa_index=if_nametoindex(\"lo\")");
+		      printf("}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -221,6 +245,7 @@ int main(void)
 	test_nlmsg_done(fd);
 	test_rtnl_unspec(fd);
 	test_rtnl_link(fd);
+	test_rtnl_addr(fd);
 
 	printf("+++ exited with 0 +++\n");
 
