@@ -380,6 +380,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/fiemap.h
 	linux/genetlink.h
 	linux/hiddev.h
+	linux/if_addr.h
 	linux/ip_vs.h
 	linux/ipc.h
 	linux/mmtimer.h

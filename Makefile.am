@@ -247,6 +247,7 @@ strace_SOURCES =	\
 	rt_sigframe.c	\
 	rt_sigreturn.c	\
 	rtc.c		\
+	rtnl_addr.c	\
 	rtnl_link.c	\
 	sched.c		\
 	sched_attr.h	\

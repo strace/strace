@@ -39,6 +39,7 @@ route_decode_name(struct tcb *tcp,			\
 		  unsigned int len)			\
 /* End of DECL_NETLINK_ROUTE_DECODER definition. */
 
+extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
 
 #endif /* !STRACE_NETLINK_ROUTE_H */

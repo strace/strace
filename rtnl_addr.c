@@ -28,63 +28,38 @@
  */
 
 #include "defs.h"
-#include "netlink.h"
 #include "netlink_route.h"
+#include "print_fields.h"
 
+#include "netlink.h"
 #include <linux/rtnetlink.h>
+#ifdef HAVE_LINUX_IF_ADDR_H
+# include <linux/if_addr.h>
+#endif
 
-#include "xlat/nl_route_types.h"
+#include "xlat/ifaddrflags.h"
+#include "xlat/routing_scopes.h"
 
-static void
-decode_family(struct tcb *const tcp, const uint8_t family,
-	      const kernel_ulong_t addr, const unsigned int len)
+DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 {
-	tprints("{family=");
-	printxval(addrfams, family, "AF_???");
-	if (len > sizeof(family)) {
-		tprints(", ");
-		printstr_ex(tcp, addr + sizeof(family),
-			    len - sizeof(family), QUOTE_FORCE_HEX);
-	}
-	tprints("}");
-}
+	struct ifaddrmsg ifaddr = { .ifa_family = family };
+	const size_t offset = sizeof(ifaddr.ifa_family);
 
-typedef DECL_NETLINK_ROUTE_DECODER((*netlink_route_decoder_t));
+	PRINT_FIELD_XVAL("{", ifaddr, ifa_family, addrfams, "AF_???");
 
-static const netlink_route_decoder_t route_decoders[] = {
-	[RTM_DELLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_GETLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_NEWLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_SETLINK - RTM_BASE] = decode_ifinfomsg,
-
-	[RTM_DELADDR - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_GETADDR - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_GETANYCAST - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_GETMULTICAST - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_NEWADDR - RTM_BASE] = decode_ifaddrmsg
-};
-
-bool
-decode_netlink_route(struct tcb *const tcp,
-		     const struct nlmsghdr *const nlmsghdr,
-		     const kernel_ulong_t addr,
-		     const unsigned int len)
-{
-	uint8_t family;
-
-	if (nlmsghdr->nlmsg_type == NLMSG_DONE)
-		return false;
-
-	if (!umove_or_printaddr(tcp, addr, &family)) {
-		const unsigned int index = nlmsghdr->nlmsg_type - RTM_BASE;
-
-		if (index < ARRAY_SIZE(route_decoders)
-		    && route_decoders[index]) {
-			route_decoders[index](tcp, nlmsghdr, family, addr, len);
-		} else {
-			decode_family(tcp, family, addr, len);
+	tprints(", ");
+	if (len >= sizeof(ifaddr)) {
+		if (!umoven_or_printaddr(tcp, addr + offset,
+					 sizeof(ifaddr) - offset,
+					 (void *) &ifaddr + offset)) {
+			PRINT_FIELD_U("", ifaddr, ifa_prefixlen);
+			PRINT_FIELD_FLAGS(", ", ifaddr, ifa_flags,
+					  ifaddrflags, "IFA_F_???");
+			PRINT_FIELD_XVAL(", ", ifaddr, ifa_scope,
+					 routing_scopes, NULL);
+			PRINT_FIELD_IFINDEX(", ", ifaddr, ifa_index);
 		}
-	}
-
-	return true;
+	} else
+		tprints("...");
+	tprints("}");
 }
