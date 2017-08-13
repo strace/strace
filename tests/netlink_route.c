@@ -40,6 +40,9 @@
 #endif
 #include <linux/if_arp.h>
 #include <linux/ip.h>
+#ifdef HAVE_LINUX_NEIGHBOUR_H
+# include <linux/neighbour.h>
+#endif
 #include <linux/rtnetlink.h>
 
 #ifdef HAVE_IF_INDEXTONAME
@@ -293,6 +296,26 @@ test_rtnl_rule(const int fd)
 }
 #endif
 
+static void
+test_rtnl_neigh(const int fd)
+{
+	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	const struct ndmsg msg = {
+		.ndm_family = AF_UNIX,
+		.ndm_ifindex = IFINDEX_LO,
+		.ndm_state = NUD_PERMANENT,
+		.ndm_flags = NTF_PROXY,
+		.ndm_type = NDA_UNSPEC
+	};
+
+	TEST_NL_ROUTE(fd, nlh0, RTM_GETNEIGH, msg,
+		      printf("{ndm_family=AF_UNIX"),
+		      printf(", ndm_ifindex=if_nametoindex(\"lo\")"
+			     ", ndm_state=NUD_PERMANENT"
+			     ", ndm_flags=NTF_PROXY"
+			     ", ndm_type=NDA_UNSPEC}"));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -309,6 +332,7 @@ int main(void)
 #ifdef HAVE_LINUX_FIB_RULES_H
 	test_rtnl_rule(fd);
 #endif
+	test_rtnl_neigh(fd);
 
 	printf("+++ exited with 0 +++\n");
 
