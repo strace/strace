@@ -227,28 +227,31 @@ ioctl_decode_command_number(struct tcb *tcp)
 /**
  * Decode arg parameter of the ioctl call.
  *
- * @return There are two bits of the return value important for the purposes of
+ * @return There are two flags of the return value important for the purposes of
  *         processing by SYS_FUNC(ioctl):
- *          - 1 - indicates that ioctl decoder code has printed arg parameter.
+ *          - RVAL_IOCTL_PARSED - indicates that ioctl decoder code has printed
+ *                                arg parameter.
  *          - RVAL_DECODED - indicates that decoding is done.
  *         As a result, the following behaviour is expected:
  *          - on entering:
  *            - 0 - decoding should be continued on exiting;
  *            - RVAL_DECODED - decoding on exiting is not needed and generic
  *                             handler should print arg value;
- *            - 1 | RVAL_DECODED - decoding on exiting is not needed and decoder
- *                                 has printed arg value.
+ *            - RVAL_IOCTL_PARSED | RVAL_DECODED - decoding on exiting is not
+ *	                                           needed and decoder
+ *	                                           has printed arg value.
  *          - on exiting:
  *            - 0 - generic handler should print arg value.
- *            - 1 - decoder has printed arg value.
+ *            - RVAL_IOCTL_PARSED - decoder has printed arg value.
  *
- *         Note that it makes no sense to return just 1 (without RVAL_DECODED)
- *         on entering, or 1 | RVAL_DECODED on exiting, but, of course, it is
- *         not prohibited (for example, it may be useful in cases where the
- *         return path is common on entering and on exiting the syscall).
+ *         Note that it makes no sense to return just RVAL_IOCTL_PARSED
+ *         on entering, or RVAL_IOCTL_PARSED | RVAL_DECODED on exiting, but,
+ *         of course, it is not prohibited (for example, it may be useful
+ *         in cases where the return path is common on entering and on exiting
+ *         the syscall).
  *
- *         SYS_FUNC(ioctl) clears bit 0 and passes all other bits of
- *         ioctl_decode return value unchanged.
+ *         SYS_FUNC(ioctl) clears RVAL_IOCTL_PARSED flag and passes all other
+ *         bits of ioctl_decode return value unchanged.
  */
 static int
 ioctl_decode(struct tcb *tcp)
@@ -345,10 +348,10 @@ SYS_FUNC(ioctl)
 		ret = ioctl_decode(tcp) | RVAL_DECODED;
 	}
 
-	if ((ret & RVAL_DECODED) && !(ret & 1))
+	if ((ret & RVAL_DECODED) && !(ret & RVAL_IOCTL_PARSED))
 		tprintf(", %#" PRI_klx, tcp->u_arg[2]);
 
-	ret &= ~1;
+	ret &= ~RVAL_IOCTL_PARSED;
 
 	return ret;
 }

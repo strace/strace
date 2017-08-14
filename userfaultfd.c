@@ -114,7 +114,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp)) {
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uc))
-				return RVAL_DECODED | 1;
+				return RVAL_DECODED | RVAL_IOCTL_PARSED;
 			PRINT_FIELD_X("{", uc, dst);
 			PRINT_FIELD_X(", ", uc, src);
 			PRINT_FIELD_X(", ", uc, len);
@@ -138,7 +138,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp)) {
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ur))
-				return RVAL_DECODED | 1;
+				return RVAL_DECODED | RVAL_IOCTL_PARSED;
 			PRINT_FIELD_UFFDIO_RANGE("{", ur, range);
 			PRINT_FIELD_FLAGS(", ", ur, mode,
 					  uffd_register_mode_flags,
@@ -176,7 +176,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp)) {
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uz))
-				return RVAL_DECODED | 1;
+				return RVAL_DECODED | RVAL_IOCTL_PARSED;
 			PRINT_FIELD_UFFDIO_RANGE("{", uz, range);
 			PRINT_FIELD_FLAGS(", ", uz, mode, uffd_zeropage_flags,
 					  "UFFDIO_ZEROPAGE_???");
@@ -196,6 +196,6 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_DECODED;
 	}
 
-	return RVAL_DECODED | 1;
+	return RVAL_DECODED | RVAL_IOCTL_PARSED;
 }
 #endif /* HAVE_LINUX_USERFAULTFD_H */

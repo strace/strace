@@ -78,7 +78,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.dxfer_direction)) {
 		tprints("}");
-		return RVAL_DECODED | 1;
+		return RVAL_DECODED | RVAL_IOCTL_PARSED;
 	}
 
 	PRINT_FIELD_XVAL("", sg_io, dxfer_direction, sg_io_dxfer_direction,
@@ -117,12 +117,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (entering_sg_io->dxfer_direction == SG_DXFER_FROM_DEV)
 			PRINT_FIELD_PTR(", ", *entering_sg_io, dxferp);
 		PRINT_FIELD_PTR(", ", *entering_sg_io, sbp);
-		return 1;
+		return RVAL_IOCTL_PARSED;
 	}
 
 	if (sg_io.interface_id != entering_sg_io->interface_id) {
 		PRINT_FIELD_U(" => ", sg_io, interface_id);
-		return 1;
+		return RVAL_IOCTL_PARSED;
 	}
 
 	if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV ||
@@ -155,7 +155,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(", ", sg_io, duration);
 	PRINT_FIELD_FLAGS(", ", sg_io, info, sg_io_info, "SG_INFO_???");
 
-	return 1;
+	return RVAL_IOCTL_PARSED;
 }
 
 #else /* !HAVE_SCSI_SG_H */
@@ -164,7 +164,7 @@ static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints("{interface_id='S', ...}");
-	return RVAL_DECODED | 1;
+	return RVAL_DECODED | RVAL_IOCTL_PARSED;
 }
 
 static int

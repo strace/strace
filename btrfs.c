@@ -1345,6 +1345,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	default:
 		return RVAL_DECODED;
 	};
-	return RVAL_DECODED | 1;
+	return RVAL_DECODED | RVAL_IOCTL_PARSED;
 }
 #endif /* HAVE_LINUX_BTRFS_H */

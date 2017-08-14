@@ -60,5 +60,5 @@ MPERS_PRINTER_DECL(int, hdio_ioctl, struct tcb *const tcp,
 		return RVAL_DECODED;
 	}
 
-	return RVAL_DECODED | 1;
+	return RVAL_DECODED | RVAL_IOCTL_PARSED;
 }

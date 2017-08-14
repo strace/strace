@@ -46,7 +46,7 @@ decode_sg_io(struct tcb *const tcp, const uint32_t iid,
 			return decode_sg_io_v4(tcp, arg);
 		default:
 			tprintf("[%u]", iid);
-			return RVAL_DECODED | 1;
+			return RVAL_DECODED | RVAL_IOCTL_PARSED;
 	}
 
 }
@@ -78,7 +78,7 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 			id.h_cmd_per_lun,
 			id.d_queue_depth);
 	}
-	return 1;
+	return RVAL_IOCTL_PARSED;
 }
 
 #endif /* HAVE_SCSI_SG_H */
@@ -179,5 +179,5 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_DECODED;
 	}
 
-	return RVAL_DECODED | 1;
+	return RVAL_DECODED | RVAL_IOCTL_PARSED;
 }
