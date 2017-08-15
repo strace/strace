@@ -32,14 +32,19 @@
 #ifdef HAVE_STRUCT_IFADDRLBLMSG
 
 # include "netlink_route.h"
+# include "nlattr.h"
 # include "print_fields.h"
 
 # include <linux/if_addrlabel.h>
+# include "netlink.h"
+
+# include "xlat/rtnl_addrlabel_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 {
 	struct ifaddrlblmsg ifal = { .ifal_family = family };
-	const size_t offset = sizeof(ifal.ifal_family);
+	size_t offset = sizeof(ifal.ifal_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", ifal, ifal_family, addrfams, "AF_???");
 
@@ -52,10 +57,18 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 			PRINT_FIELD_U(", ", ifal, ifal_flags);
 			PRINT_FIELD_IFINDEX(", ", ifal, ifal_index);
 			PRINT_FIELD_U(", ", ifal, ifal_seq);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(ifal));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_addrlabel_attrs, "IFAL_???", NULL, 0, NULL);
+	}
 }
 
 #endif
