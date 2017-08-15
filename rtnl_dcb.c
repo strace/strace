@@ -32,16 +32,20 @@
 #ifdef HAVE_STRUCT_DCBMSG
 
 # include "netlink_route.h"
+# include "nlattr.h"
 # include "print_fields.h"
 
 # include <linux/dcbnl.h>
+# include "netlink.h"
 
 # include "xlat/dcb_commands.h"
+# include "xlat/rtnl_dcb_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 {
 	struct dcbmsg dcb = { .dcb_family = family };
-	const size_t offset = sizeof(dcb.dcb_family);
+	size_t offset = sizeof(dcb.dcb_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", dcb, dcb_family, addrfams, "AF_???");
 
@@ -52,10 +56,18 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 					 (void *) &dcb + offset)) {
 			PRINT_FIELD_XVAL("", dcb, cmd,
 					 dcb_commands, "DCB_CMD_???");
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(dcb));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_dcb_attrs, "DCB_ATTR_???", NULL, 0, NULL);
+	}
 }
 
 #endif
