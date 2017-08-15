@@ -194,6 +194,7 @@ nlattr_nlmsgerr
 nlattr_packet_diag_msg
 nlattr_rtmsg
 nlattr_smc_diag_msg
+nlattr_tcmsg
 nlattr_unix_diag_msg
 old_mmap
 oldfstat
