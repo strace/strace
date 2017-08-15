@@ -56,14 +56,6 @@
 #endif
 #include <linux/rtnetlink.h>
 
-#ifdef HAVE_IF_INDEXTONAME
-/* <linux/if.h> used to conflict with <net/if.h> */
-extern unsigned int if_nametoindex(const char *);
-# define IFINDEX_LO	(if_nametoindex("lo"))
-#else
-# define IFINDEX_LO	1
-#endif
-
 #define TEST_NL_ROUTE(fd_, nlh0_, type_, obj_, print_family_, ...)	\
 	do {								\
 		/* family and string */					\
@@ -217,7 +209,7 @@ test_rtnl_link(const int fd)
 	const struct ifinfomsg ifinfo = {
 		.ifi_family = AF_UNIX,
 		.ifi_type = ARPHRD_LOOPBACK,
-		.ifi_index = IFINDEX_LO,
+		.ifi_index = ifindex_lo(),
 		.ifi_flags = IFF_UP,
 		.ifi_change = 0xfabcdeba
 	};
@@ -225,7 +217,7 @@ test_rtnl_link(const int fd)
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETLINK, ifinfo,
 		      printf("{ifi_family=AF_UNIX"),
 		      printf(", ifi_type=ARPHRD_LOOPBACK"
-			     ", ifi_index=if_nametoindex(\"lo\")"
+			     ", ifi_index=" IFINDEX_LO_STR
 			     ", ifi_flags=IFF_UP");
 		      PRINT_FIELD_X(", ", ifinfo, ifi_change);
 		      printf("}"));
@@ -240,7 +232,7 @@ test_rtnl_addr(const int fd)
 		.ifa_prefixlen = 0xde,
 		.ifa_flags = IFA_F_SECONDARY,
 		.ifa_scope = RT_SCOPE_UNIVERSE,
-		.ifa_index = IFINDEX_LO
+		.ifa_index = ifindex_lo()
 	};
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDR, msg,
@@ -248,7 +240,7 @@ test_rtnl_addr(const int fd)
 		      PRINT_FIELD_U(", ", msg, ifa_prefixlen);
 		      printf(", ifa_flags=IFA_F_SECONDARY"
 			     ", ifa_scope=RT_SCOPE_UNIVERSE"
-			     ", ifa_index=if_nametoindex(\"lo\")");
+			     ", ifa_index=" IFINDEX_LO_STR);
 		      printf("}"));
 }
 
@@ -313,7 +305,7 @@ test_rtnl_neigh(const int fd)
 	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	const struct ndmsg msg = {
 		.ndm_family = AF_UNIX,
-		.ndm_ifindex = IFINDEX_LO,
+		.ndm_ifindex = ifindex_lo(),
 		.ndm_state = NUD_PERMANENT,
 		.ndm_flags = NTF_PROXY,
 		.ndm_type = NDA_UNSPEC
@@ -321,7 +313,7 @@ test_rtnl_neigh(const int fd)
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETNEIGH, msg,
 		      printf("{ndm_family=AF_UNIX"),
-		      printf(", ndm_ifindex=if_nametoindex(\"lo\")"
+		      printf(", ndm_ifindex=" IFINDEX_LO_STR
 			     ", ndm_state=NUD_PERMANENT"
 			     ", ndm_flags=NTF_PROXY"
 			     ", ndm_type=NDA_UNSPEC}"));
@@ -347,7 +339,7 @@ test_rtnl_tc(const int fd)
 	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	const struct tcmsg msg = {
 		.tcm_family = AF_UNIX,
-		.tcm_ifindex = IFINDEX_LO,
+		.tcm_ifindex = ifindex_lo(),
 		.tcm_handle = 0xfadcdafb,
 		.tcm_parent = 0xafbcadab,
 		.tcm_info = 0xbcaedafa
@@ -355,7 +347,7 @@ test_rtnl_tc(const int fd)
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETQDISC, msg,
 		      printf("{tcm_family=AF_UNIX"),
-		      printf(", tcm_ifindex=if_nametoindex(\"lo\")");
+		      printf(", tcm_ifindex=" IFINDEX_LO_STR);
 		      PRINT_FIELD_U(", ", msg, tcm_handle);
 		      PRINT_FIELD_U(", ", msg, tcm_parent);
 		      PRINT_FIELD_U(", ", msg, tcm_info);
@@ -385,7 +377,7 @@ test_rtnl_addrlabel(const int fd)
 		.ifal_family = AF_UNIX,
 		.ifal_prefixlen = 0xaf,
 		.ifal_flags = 0xbd,
-		.ifal_index = IFINDEX_LO,
+		.ifal_index = ifindex_lo(),
 		.ifal_seq = 0xfadcdafb
 	};
 
@@ -393,7 +385,7 @@ test_rtnl_addrlabel(const int fd)
 		      printf("{ifal_family=AF_UNIX"),
 		      PRINT_FIELD_U(", ", msg, ifal_prefixlen);
 		      PRINT_FIELD_U(", ", msg, ifal_flags);
-		      printf(", ifal_index=if_nametoindex(\"lo\")");
+		      printf(", ifal_index=" IFINDEX_LO_STR);
 		      PRINT_FIELD_U(", ", msg, ifal_seq);
 		      printf("}"));
 }
@@ -438,12 +430,12 @@ test_rtnl_mdb(const int fd)
 	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	const struct br_port_msg msg = {
 		.family = AF_UNIX,
-		.ifindex = IFINDEX_LO
+		.ifindex = ifindex_lo()
 	};
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETMDB, msg,
 		      printf("{family=AF_UNIX"),
-		      printf(", ifindex=if_nametoindex(\"lo\")}"));
+		      printf(", ifindex=" IFINDEX_LO_STR "}"));
 }
 #endif
 

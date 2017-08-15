@@ -48,14 +48,6 @@
 
 #define SMC_ACTIVE 1
 
-#ifdef HAVE_IF_INDEXTONAME
-/* <linux/if.h> used to conflict with <net/if.h> */
-extern unsigned int if_nametoindex(const char *);
-# define IFINDEX_LO	(if_nametoindex("lo"))
-#else
-# define IFINDEX_LO	1
-#endif
-
 #define TEST_SOCK_DIAG(fd_, nlh0_,					\
 		       family_, type_, flags_,				\
 		       obj_, print_family_, ...)			\
@@ -388,7 +380,7 @@ test_inet_diag_sockid(const int fd)
 		.id = {
 			.idiag_sport = 0xfacd,
 			.idiag_dport = 0xdead,
-			.idiag_if = IFINDEX_LO,
+			.idiag_if = ifindex_lo(),
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 		},
 	};
@@ -411,7 +403,7 @@ test_inet_diag_sockid(const int fd)
 			    ntohs(req.id.idiag_sport),
 			    ntohs(req.id.idiag_dport),
 			    address, address);
-		     printf(", idiag_if=if_nametoindex(\"lo\")");
+		     printf(", idiag_if=" IFINDEX_LO_STR);
 		     PRINT_FIELD_COOKIE(", ", req.id, idiag_cookie);
 		     printf("}}"));
 
@@ -434,7 +426,7 @@ test_inet_diag_sockid(const int fd)
 			    ntohs(req.id.idiag_sport),
 			    ntohs(req.id.idiag_dport),
 			    address6, address6);
-		     printf(", idiag_if=if_nametoindex(\"lo\")");
+		     printf(", idiag_if=" IFINDEX_LO_STR);
 		     PRINT_FIELD_COOKIE(", ", req.id, idiag_cookie);
 		     printf("}}"));
 }
@@ -452,7 +444,7 @@ test_inet_diag_req(const int fd)
 		.id = {
 			.idiag_sport = 0xdead,
 			.idiag_dport = 0xadcd,
-			.idiag_if = IFINDEX_LO,
+			.idiag_if = ifindex_lo(),
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 		},
 		.idiag_states = 1 << TCP_LAST_ACK,
@@ -476,7 +468,7 @@ test_inet_diag_req(const int fd)
 			      ntohs(req.id.idiag_sport),
 			      ntohs(req.id.idiag_dport),
 			      address, address);
-		       printf(", idiag_if=if_nametoindex(\"lo\")");
+		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       PRINT_FIELD_COOKIE(", ", req.id, idiag_cookie);
 		       printf("}, idiag_states=1<<TCP_LAST_ACK");
 		       PRINT_FIELD_U(", ", req, idiag_dbs);
@@ -496,7 +488,7 @@ test_inet_diag_req_v2(const int fd)
 		.id = {
 			.idiag_sport = 0xfacd,
 			.idiag_dport = 0xdead,
-			.idiag_if = IFINDEX_LO,
+			.idiag_if = ifindex_lo(),
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 		},
 	};
@@ -518,7 +510,7 @@ test_inet_diag_req_v2(const int fd)
 			      ntohs(req.id.idiag_sport),
 			      ntohs(req.id.idiag_dport),
 			      address, address);
-		       printf(", idiag_if=if_nametoindex(\"lo\")");
+		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       PRINT_FIELD_COOKIE(", ", req.id, idiag_cookie);
 		       printf("}}"));
 }
@@ -536,7 +528,7 @@ test_inet_diag_msg(const int fd)
 		.id = {
 			.idiag_sport = 0xfacf,
 			.idiag_dport = 0xdead,
-			.idiag_if = IFINDEX_LO,
+			.idiag_if = ifindex_lo(),
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 		},
 		.idiag_expires = 0xfacefeed,
@@ -563,7 +555,7 @@ test_inet_diag_msg(const int fd)
 			      ntohs(msg.id.idiag_sport),
 			      ntohs(msg.id.idiag_dport),
 			      address, address);
-		       printf(", idiag_if=if_nametoindex(\"lo\")");
+		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       PRINT_FIELD_COOKIE(", ", msg.id, idiag_cookie);
 		       PRINT_FIELD_U("}, ", msg, idiag_expires);
 		       PRINT_FIELD_U(", ", msg, idiag_rqueue);
@@ -585,7 +577,7 @@ test_smc_diag_req(const int fd)
 		.id = {
 			.idiag_sport = 0xdead,
 			.idiag_dport = 0xadcd,
-			.idiag_if = IFINDEX_LO,
+			.idiag_if = ifindex_lo(),
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded },
 		},
 	};
@@ -605,7 +597,7 @@ test_smc_diag_req(const int fd)
 			      ntohs(req.id.idiag_sport),
 			      ntohs(req.id.idiag_dport),
 			      address, address);
-		       printf(", idiag_if=if_nametoindex(\"lo\")");
+		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       PRINT_FIELD_COOKIE(", ", req.id, idiag_cookie);
 		       printf("}}"));
 }
@@ -623,7 +615,7 @@ test_smc_diag_msg(const int fd)
 		.id = {
 			.idiag_sport = 0xdead,
 			.idiag_dport = 0xadcd,
-			.idiag_if = IFINDEX_LO,
+			.idiag_if = ifindex_lo(),
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded },
 		},
 		.diag_uid = 0xadcdfafc,
@@ -647,7 +639,7 @@ test_smc_diag_msg(const int fd)
 			      ntohs(msg.id.idiag_sport),
 			      ntohs(msg.id.idiag_dport),
 			      address, address);
-		       printf(", idiag_if=if_nametoindex(\"lo\")");
+		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       PRINT_FIELD_COOKIE(", ", msg.id, idiag_cookie);
 		       PRINT_FIELD_U("}, ", msg, diag_uid);
 		       PRINT_FIELD_U(", ", msg, diag_inode);

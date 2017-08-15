@@ -39,12 +39,6 @@
 #include <linux/rtnetlink.h>
 #include <linux/sock_diag.h>
 
-#ifdef HAVE_IF_INDEXTONAME
-# define IFINDEX_LO	(if_nametoindex("lo"))
-#else
-# define IFINDEX_LO	1
-#endif
-
 static const char address[] = "10.11.12.13";
 static const unsigned int hdrlen = sizeof(struct inet_diag_req_v2);
 static void *nlh0;
@@ -65,7 +59,7 @@ init_inet_diag_req_v2(struct nlmsghdr *const nlh, const unsigned int msg_len)
 		.idiag_ext = 1 << (INET_DIAG_CONG - 1),
 		.sdiag_protocol = IPPROTO_TCP,
 		.idiag_states = 1 << TCP_CLOSE,
-		.id.idiag_if = IFINDEX_LO
+		.id.idiag_if = ifindex_lo()
 	);
 
 	if (!inet_pton(AF_INET, address, req->id.idiag_src) ||
@@ -84,7 +78,8 @@ print_inet_diag_req_v2(const unsigned int msg_len)
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
 	       ", idiag_src=inet_addr(\"%s\")"
 	       ", idiag_dst=inet_addr(\"%s\")"
-	       ", idiag_if=if_nametoindex(\"lo\"), idiag_cookie=[0, 0]}}",
+	       ", idiag_if=" IFINDEX_LO_STR
+	       ", idiag_cookie=[0, 0]}}",
 	       msg_len, address, address);
 }
 
@@ -268,7 +263,7 @@ test_inet_diag_bc_dev_cond(const int fd)
 	static const struct inet_diag_bc_op op = {
 		.code = INET_DIAG_BC_DEV_COND,
 	};
-	const uint32_t ifindex = IFINDEX_LO;
+	const uint32_t ifindex = ifindex_lo();
 	char buf[sizeof(op) + sizeof(ifindex)];
 	memcpy(buf, &op, sizeof(op));
 	memcpy(buf + sizeof(op), pattern, sizeof(ifindex));
@@ -294,7 +289,7 @@ test_inet_diag_bc_dev_cond(const int fd)
 		    INET_DIAG_REQ_BYTECODE,
 		    sizeof(buf), buf, sizeof(buf),
 		    print_inet_diag_bc_op("INET_DIAG_BC_DEV_COND");
-		    printf("if_nametoindex(\"lo\")}"));
+		    printf(IFINDEX_LO_STR "}"));
 }
 
 static void

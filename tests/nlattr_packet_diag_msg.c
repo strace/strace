@@ -39,12 +39,6 @@
 #include <linux/rtnetlink.h>
 #include <linux/sock_diag.h>
 
-#ifdef HAVE_IF_INDEXTONAME
-# define IFINDEX_LO	(if_nametoindex("lo"))
-#else
-# define IFINDEX_LO	1
-#endif
-
 static void
 init_packet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 {
@@ -75,7 +69,7 @@ print_packet_diag_msg(const unsigned int msg_len)
 static void
 print_packet_diag_mclist(const struct packet_diag_mclist *const dml)
 {
-	printf("{pdmc_index=if_nametoindex(\"lo\")");
+	printf("{pdmc_index=" IFINDEX_LO_STR);
 	PRINT_FIELD_U(", ", *dml, pdmc_count);
 	PRINT_FIELD_U(", ", *dml, pdmc_type);
 	PRINT_FIELD_U(", ", *dml, pdmc_alen);
@@ -131,14 +125,14 @@ main(void)
 
 	const struct packet_diag_mclist dml[] = {
 		{
-			.pdmc_index = IFINDEX_LO,
+			.pdmc_index = ifindex_lo(),
 			.pdmc_count = 0xabcdaefc,
 			.pdmc_type = 0xcdaf,
 			.pdmc_alen = 4,
 			.pdmc_addr = "1234"
 		},
 		{
-			.pdmc_index = IFINDEX_LO,
+			.pdmc_index = ifindex_lo(),
 			.pdmc_count = 0xdaefeafc,
 			.pdmc_type = 0xadef,
 			.pdmc_alen = 4,

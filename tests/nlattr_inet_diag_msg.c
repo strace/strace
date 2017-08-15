@@ -39,12 +39,6 @@
 
 static const char address[] = "10.11.12.13";
 
-#ifdef HAVE_IF_INDEXTONAME
-# define IFINDEX_LO	(if_nametoindex("lo"))
-#else
-# define IFINDEX_LO	1
-#endif
-
 static void
 init_inet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 {
@@ -58,7 +52,7 @@ init_inet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 	SET_STRUCT(struct inet_diag_msg, msg,
 		.idiag_family = AF_INET,
 		.idiag_state = TCP_LISTEN,
-		.id.idiag_if = IFINDEX_LO
+		.id.idiag_if = ifindex_lo()
 	);
 
 	if (!inet_pton(AF_INET, address, msg->id.idiag_src) ||
@@ -75,7 +69,8 @@ print_inet_diag_msg(const unsigned int msg_len)
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
 	       ", idiag_src=inet_addr(\"%s\")"
 	       ", idiag_dst=inet_addr(\"%s\")"
-	       ", idiag_if=if_nametoindex(\"lo\"), idiag_cookie=[0, 0]}"
+	       ", idiag_if=" IFINDEX_LO_STR
+	       ", idiag_cookie=[0, 0]}"
 	       ", idiag_expires=0, idiag_rqueue=0, idiag_wqueue=0"
 	       ", idiag_uid=0, idiag_inode=0}",
 	       msg_len, address, address);
