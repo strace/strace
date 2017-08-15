@@ -29,15 +29,19 @@
 
 #include "defs.h"
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include "netlink.h"
 #include <linux/rtnetlink.h>
 
+#include "xlat/rtnl_link_attrs.h"
+
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 {
 	struct ifinfomsg ifinfo = { .ifi_family = family };
-	const size_t offset = sizeof(ifinfo.ifi_family);
+	size_t offset = sizeof(ifinfo.ifi_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", ifinfo, ifi_family, addrfams, "AF_???");
 
@@ -52,8 +56,16 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 			PRINT_FIELD_FLAGS(", ", ifinfo, ifi_flags,
 					  iffflags, "IFF_???");
 			PRINT_FIELD_X(", ", ifinfo, ifi_change);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(ifinfo));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_link_attrs, "IFLA_???", NULL, 0, NULL);
+	}
 }
