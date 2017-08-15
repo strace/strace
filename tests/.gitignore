@@ -233,6 +233,7 @@ nlattr_netconfmsg
 nlattr_netlink_diag_msg
 nlattr_nlmsgerr
 nlattr_packet_diag_msg
+nlattr_rtgenmsg
 nlattr_rtmsg
 nlattr_smc_diag_msg
 nlattr_tcamsg
