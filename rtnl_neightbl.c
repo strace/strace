@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include "netlink.h"
@@ -37,10 +38,19 @@
 # include <linux/neighbour.h>
 #endif
 
+#include "xlat/rtnl_neightbl_attrs.h"
+
 DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg)
 {
 	struct ndtmsg ndtmsg = { .ndtm_family = family };
 
 	PRINT_FIELD_XVAL("{", ndtmsg, ndtm_family, addrfams, "AF_???");
 	tprints("}");
+
+	const size_t offset = NLMSG_ALIGN(sizeof(ndtmsg));
+	if (len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_neightbl_attrs, "NDTA_???", NULL, 0, NULL);
+	}
 }
