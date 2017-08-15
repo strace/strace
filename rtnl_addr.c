@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include "netlink.h"
@@ -39,11 +40,13 @@
 
 #include "xlat/ifaddrflags.h"
 #include "xlat/routing_scopes.h"
+#include "xlat/rtnl_addr_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 {
 	struct ifaddrmsg ifaddr = { .ifa_family = family };
-	const size_t offset = sizeof(ifaddr.ifa_family);
+	size_t offset = sizeof(ifaddr.ifa_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", ifaddr, ifa_family, addrfams, "AF_???");
 
@@ -58,8 +61,16 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 			PRINT_FIELD_XVAL(", ", ifaddr, ifa_scope,
 					 routing_scopes, NULL);
 			PRINT_FIELD_IFINDEX(", ", ifaddr, ifa_index);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(ifaddr));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_addr_attrs, "IFA_???", NULL, 0, NULL);
+	}
 }
