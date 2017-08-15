@@ -29,15 +29,19 @@
 
 #include "defs.h"
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include "netlink.h"
 #include <linux/rtnetlink.h>
 
+#include "xlat/rtnl_tc_attrs.h"
+
 DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 {
 	struct tcmsg tcmsg = { .tcm_family = family };
-	const size_t offset = sizeof(tcmsg.tcm_family);
+	size_t offset = sizeof(tcmsg.tcm_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", tcmsg, tcm_family, addrfams, "AF_???");
 
@@ -50,8 +54,16 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 			PRINT_FIELD_U(", ", tcmsg, tcm_handle);
 			PRINT_FIELD_U(", ", tcmsg, tcm_parent);
 			PRINT_FIELD_U(", ", tcmsg, tcm_info);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(tcmsg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_tc_attrs, "TCA_???", NULL, 0, NULL);
+	}
 }
