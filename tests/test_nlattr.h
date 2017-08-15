@@ -29,6 +29,7 @@
 #include "print_fields.h"
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <sys/socket.h>
 #include "netlink.h"
