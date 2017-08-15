@@ -30,6 +30,7 @@
 #include "defs.h"
 
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include "netlink.h"
@@ -40,6 +41,7 @@
 
 #include "xlat/fib_rule_actions.h"
 #include "xlat/fib_rule_flags.h"
+#include "xlat/rtnl_rule_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 {
@@ -49,7 +51,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 	 * struct fib_rule_hdr.
 	 */
 	struct rtmsg msg = { .rtm_family = family };
-	const size_t offset = sizeof(msg.rtm_family);
+	size_t offset = sizeof(msg.rtm_family);
+	bool decode_nla = false;
 
 	tprints("{family=");
 	printxval(addrfams, msg.rtm_family, "AF_???");
@@ -71,8 +74,16 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 			tprints(", flags=");
 			printflags(fib_rule_flags, msg.rtm_flags,
 				   "FIB_RULE_???");
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(msg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_rule_attrs, "FRA_???", NULL, 0, NULL);
+	}
 }
