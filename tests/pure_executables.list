@@ -182,6 +182,7 @@ newfstatat
 nlattr
 nlattr_crypto_user_alg
 nlattr_fib_rule_hdr
+nlattr_ifaddrlblmsg
 nlattr_ifaddrmsg
 nlattr_ifinfomsg
 nlattr_inet_diag_msg
