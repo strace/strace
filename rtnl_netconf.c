@@ -32,9 +32,13 @@
 #ifdef HAVE_STRUCT_NETCONFMSG
 
 # include "netlink_route.h"
+# include "nlattr.h"
 # include "print_fields.h"
 
 # include <linux/netconf.h>
+# include "netlink.h"
+
+# include "xlat/rtnl_netconf_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 {
@@ -42,6 +46,14 @@ DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 
 	PRINT_FIELD_XVAL("{", ncm, ncm_family, addrfams, "AF_???");
 	tprints("}");
+
+	const size_t offset = NLMSG_ALIGN(sizeof(ncm));
+	if (len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_netconf_attrs, "NETCONFA_???",
+			      NULL, 0, NULL);
+	}
 }
 
 #endif
