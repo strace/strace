@@ -198,6 +198,7 @@ netlink_xfrm	+netlink_sock_diag.test
 newfstatat	-a32 -v -P stat.sample -P /dev/full
 nlattr		+netlink_sock_diag.test
 nlattr_crypto_user_alg		+netlink_sock_diag.test
+nlattr_br_port_msg		+netlink_sock_diag.test
 nlattr_dcbmsg			+netlink_sock_diag.test
 nlattr_fib_rule_hdr		+netlink_sock_diag.test
 nlattr_ifaddrlblmsg		+netlink_sock_diag.test

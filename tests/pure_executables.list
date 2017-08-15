@@ -181,6 +181,7 @@ netlink_xfrm
 newfstatat
 nlattr
 nlattr_crypto_user_alg
+nlattr_br_port_msg
 nlattr_dcbmsg
 nlattr_fib_rule_hdr
 nlattr_ifaddrlblmsg
