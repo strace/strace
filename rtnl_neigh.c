@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include "netlink.h"
@@ -40,11 +41,13 @@
 #include "xlat/nda_types.h"
 #include "xlat/neighbor_cache_entry_flags.h"
 #include "xlat/neighbor_cache_entry_states.h"
+#include "xlat/rtnl_neigh_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 {
 	struct ndmsg ndmsg = { .ndm_family = family };
-	const size_t offset = sizeof(ndmsg.ndm_family);
+	size_t offset = sizeof(ndmsg.ndm_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", ndmsg, ndm_family, addrfams, "AF_???");
 
@@ -62,10 +65,18 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 					  "NTF_???");
 			PRINT_FIELD_XVAL(", ", ndmsg, ndm_type,
 					 nda_types, "NDA_???");
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(ndmsg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_neigh_attrs, "NDA_???", NULL, 0, NULL);
+	}
 }
 
 DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh)
