@@ -191,6 +191,7 @@ nlattr_inet_diag_req_compat
 nlattr_inet_diag_req_v2
 nlattr_ndmsg
 nlattr_ndtmsg
+nlattr_netconfmsg
 nlattr_netlink_diag_msg
 nlattr_nlmsgerr
 nlattr_packet_diag_msg
