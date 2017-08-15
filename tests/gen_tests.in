@@ -204,6 +204,7 @@ nlattr_ifinfomsg		+netlink_sock_diag.test
 nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_inet_diag_req_compat	+netlink_sock_diag.test
 nlattr_inet_diag_req_v2		+netlink_sock_diag.test
+nlattr_ndmsg			+netlink_sock_diag.test
 nlattr_netlink_diag_msg		+netlink_sock_diag.test
 nlattr_nlmsgerr			+netlink_sock_diag.test
 nlattr_packet_diag_msg		+netlink_sock_diag-v.sh
