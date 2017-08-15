@@ -181,6 +181,7 @@ netlink_xfrm
 newfstatat
 nlattr
 nlattr_crypto_user_alg
+nlattr_ifaddrmsg
 nlattr_ifinfomsg
 nlattr_inet_diag_msg
 nlattr_inet_diag_req_compat
