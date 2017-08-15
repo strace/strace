@@ -32,15 +32,20 @@
 #ifdef HAVE_STRUCT_BR_PORT_MSG
 
 # include "netlink_route.h"
+# include "nlattr.h"
 # include "print_fields.h"
 
 # include <netinet/in.h>
 # include <linux/if_bridge.h>
+# include "netlink.h"
+
+# include "xlat/rtnl_mdb_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 {
 	struct br_port_msg bpm = { .family = family };
-	const size_t offset = sizeof(bpm.family);
+	size_t offset = sizeof(bpm.family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", bpm, family, addrfams, "AF_???");
 
@@ -50,10 +55,18 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 					 sizeof(bpm) - offset,
 					 (void *) &bpm + offset)) {
 			PRINT_FIELD_IFINDEX("", bpm, ifindex);
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(bpm));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_mdb_attrs, "MDBA_???", NULL, 0, NULL);
+	}
 }
 
 #endif
