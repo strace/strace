@@ -33,7 +33,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "test_netlink.h"
-#ifdef HAVE_LINUX_DCBNL_H
+#ifdef HAVE_STRUCT_DCBMSG
 # include <linux/dcbnl.h>
 #endif
 #ifdef HAVE_LINUX_FIB_RULES_H

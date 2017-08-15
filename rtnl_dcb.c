@@ -29,7 +29,7 @@
 
 #include "defs.h"
 
-#ifdef HAVE_LINUX_DCBNL_H
+#ifdef HAVE_STRUCT_DCBMSG
 
 # include "netlink_route.h"
 # include "print_fields.h"
