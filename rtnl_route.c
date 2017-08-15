@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include "netlink_route.h"
+#include "nlattr.h"
 #include "print_fields.h"
 
 #include <linux/ip.h>
@@ -40,11 +41,13 @@
 #include "xlat/routing_protocols.h"
 #include "xlat/routing_table_ids.h"
 #include "xlat/routing_types.h"
+#include "xlat/rtnl_route_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 {
 	struct rtmsg rtmsg = { .rtm_family = family };
-	const size_t offset = sizeof(rtmsg.rtm_family);
+	size_t offset = sizeof(rtmsg.rtm_family);
+	bool decode_nla = false;
 
 	PRINT_FIELD_XVAL("{", rtmsg, rtm_family, addrfams, "AF_???");
 
@@ -67,8 +70,16 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 					 routing_types, "RTN_???");
 			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_flags,
 					  routing_flags, "RTM_F_???");
+			decode_nla = true;
 		}
 	} else
 		tprints("...");
 	tprints("}");
+
+	offset = NLMSG_ALIGN(sizeof(rtmsg));
+	if (decode_nla && len > offset) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + offset, len - offset,
+			      rtnl_route_attrs, "RTA_???", NULL, 0, NULL);
+	}
 }
