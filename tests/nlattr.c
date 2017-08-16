@@ -210,18 +210,22 @@ test_nlattr(const int fd)
 	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
-	/* abbreviated output */
+	/* unrecognized attribute data, abbreviated output */
 #define ABBREV_LEN (DEFAULT_STRLEN + 1)
-	msg_len = NLA_HDRLEN * ABBREV_LEN + NLMSG_SPACE(sizeof(msg->udm));
-	msg = tail_memdup(&c_msg, msg_len);
-	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
+	msg_len = NLMSG_SPACE(sizeof(msg->udm)) + NLA_HDRLEN * ABBREV_LEN * 2;
+	msg = tail_alloc(msg_len);
+	memcpy(msg, &c_msg, sizeof(c_msg));
+	msg->nlh.nlmsg_len = msg_len;
 	unsigned int i;
 	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
-	for (i = 0; i < ABBREV_LEN; ++i)
-		nla[i] = (struct nlattr) {
-			.nla_len = NLA_HDRLEN,
+	for (i = 0; i < ABBREV_LEN; ++i) {
+		nla[i * 2] = (struct nlattr) {
+			.nla_len = NLA_HDRLEN * 2 - 1,
 			.nla_type = UNIX_DIAG_SHUTDOWN + 1 + i
 		};
+		fill_memory_ex(&nla[i * 2 + 1], NLA_HDRLEN,
+			       '0' + i, '~' - '0' - i);
+	}
 
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
@@ -233,8 +237,10 @@ test_nlattr(const int fd)
 	for (i = 0; i < DEFAULT_STRLEN; ++i) {
 		if (i)
 			printf(", ");
-		printf("{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}",
+		printf("{{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}, ",
 		       nla->nla_len, UNIX_DIAG_SHUTDOWN + 1 + i);
+		print_quoted_hex(&nla[i * 2 + 1], NLA_HDRLEN - 1);
+		printf("}");
 	}
 	printf(", ...]}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       msg_len, sprintrc(rc));
