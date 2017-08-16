@@ -91,7 +91,7 @@ int main(void)
 	FD_SET(fds[0], set);
 	FD_SET(fds[1], set);
 	tv->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
-	tv->tv_usec = (long) 0xbadc0dedfacefeedLL;
+	tv->tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 	memcpy(&tv_in, tv, sizeof(tv_in));
 	rc = syscall(TEST_SYSCALL_NR, fds[1] + 1, set, set, set, tv);
 	if (rc < 0) {

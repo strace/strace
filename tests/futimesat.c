@@ -118,7 +118,7 @@ main(void)
 	tv[0].tv_sec = 0xdeadbeefU;
 	tv[0].tv_usec = 0xfacefeedU;
 	tv[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
-	tv[1].tv_usec = (long) 0xbadc0dedfacefeedLL;
+	tv[1].tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 
 	k_futimesat(kfdcwd, kfname, (uintptr_t) tv);
 	printf("futimesat(AT_FDCWD, %s, [", qname);
