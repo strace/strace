@@ -85,20 +85,26 @@ k_sigaction(const kernel_ulong_t signum, const kernel_ulong_t new_act,
 }
 
 #if defined SPARC || defined SPARC64
-static const kernel_ulong_t signo =
-	(kernel_ulong_t) 0xbadc0ded00000000ULL | (unsigned int) -SIGUSR1;
+/*
+ * See arch/sparc/kernel/sys_sparc_32.c:sys_sparc_sigaction
+ * and arch/sparc/kernel/sys_sparc32.c:compat_sys_sparc_sigaction
+ */
+# define ADDR_INT ((unsigned int) -0xdefaced)
+# define SIGNO_INT ((unsigned int) -SIGUSR1)
 # define SIG_STR "-SIGUSR1"
 #else
-static const kernel_ulong_t signo =
-	(kernel_ulong_t) 0xbadc0ded00000000ULL | SIGUSR1;
+# define ADDR_INT ((unsigned int) 0xdefaced)
+# define SIGNO_INT ((unsigned int) SIGUSR1)
 # define SIG_STR "SIGUSR1"
 #endif
+static const kernel_ulong_t signo =
+	(kernel_ulong_t) 0xbadc0ded00000000ULL | SIGNO_INT;
+static const kernel_ulong_t addr =
+	(kernel_ulong_t) 0xfacefeed00000000ULL | ADDR_INT;
 
 int
 main(void)
 {
-	static const kernel_ulong_t addr =
-		(kernel_ulong_t) 0xfacefeed0defacedULL;
 	union {
 		sigset_t libc[1];
 		unsigned long old[1];
@@ -131,7 +137,7 @@ main(void)
 	       (unsigned long) old_act + 2);
 
 	k_sigaction(addr, 0, 0);
-	printf("sigaction(%d, NULL, NULL) = -1 EINVAL (%m)\n", (int) addr);
+	printf("sigaction(%d, NULL, NULL) = -1 EINVAL (%m)\n", ADDR_INT);
 
 	memset(new_act, 0, sizeof(*new_act));
 
