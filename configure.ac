@@ -448,25 +448,23 @@ AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 
 AC_CHECK_TYPES([struct statfs], [
-	AC_CHECK_MEMBERS([struct statfs.f_frsize],,, [#include <linux/types.h>
-#include <asm/statfs.h>])
-	AC_CHECK_MEMBERS([struct statfs.f_flags],,, [#include <linux/types.h>
-#include <asm/statfs.h>])
-	AC_CHECK_MEMBERS([struct statfs.f_fsid.val],,, [#include <linux/types.h>
-#include <asm/statfs.h>])
-	AC_CHECK_MEMBERS([struct statfs.f_fsid.__val],,, [#include <linux/types.h>
+	AC_CHECK_MEMBERS(m4_normalize([
+		struct statfs.f_frsize,
+		struct statfs.f_flags,
+		struct statfs.f_fsid.val,
+		struct statfs.f_fsid.__val
+	]),,, [#include <linux/types.h>
 #include <asm/statfs.h>])
 ],, [#include <linux/types.h>
 #include <asm/statfs.h>])
 
 AC_CHECK_TYPES([struct statfs64], [
-	AC_CHECK_MEMBERS([struct statfs64.f_frsize],,, [#include <linux/types.h>
-#include <asm/statfs.h>])
-	AC_CHECK_MEMBERS([struct statfs64.f_flags],,, [#include <linux/types.h>
-#include <asm/statfs.h>])
-	AC_CHECK_MEMBERS([struct statfs64.f_fsid.val],,, [#include <linux/types.h>
-#include <asm/statfs.h>])
-	AC_CHECK_MEMBERS([struct statfs64.f_fsid.__val],,, [#include <linux/types.h>
+	AC_CHECK_MEMBERS(m4_normalize([
+		struct statfs64.f_frsize,
+		struct statfs64.f_flags,
+		struct statfs64.f_fsid.val,
+		struct statfs64.f_fsid.__val
+	]),,, [#include <linux/types.h>
 #include <asm/statfs.h>])
 ],, [#include <linux/types.h>
 #include <asm/statfs.h>])
