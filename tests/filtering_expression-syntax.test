@@ -1,0 +1,77 @@
+#!/bin/sh
+#
+# Check filter-based expression syntax.
+#
+# Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/syntax.sh"
+
+check_expression()
+{
+	for action in trace \
+		      inject \
+		      fault \
+		      read \
+		      write \
+		      raw \
+		      abbrev \
+		      verbose \
+		      ; do
+		check_e "$1" -e "$action($2)"
+	done
+}
+
+check_expression "invalid operator at 'or (syscall open)':1" "or (syscall open)"
+check_expression "invalid operator at '||(syscall open)':1" "||(syscall open)"
+check_expression "invalid operator at 'and (syscall open)':2" "and (syscall open)"
+check_expression "invalid operator at '&&(syscall open)':1" "&&(syscall open)"
+check_expression "invalid operator at 'syscall open not syscall close':12" \
+	"syscall open not syscall close"
+check_expression "invalid operator at 'syscall open ! syscall close':10" \
+	"syscall open ! syscall close"
+
+for arg in notsyscall \
+	   not_syscall \
+	   notSyscall \
+	   invalid \
+	   ; do
+	check_expression "invalid filter '$arg'" "$arg open"
+	check_expression "invalid filter '$arg'" "syscall open and $arg open"
+	check_expression "invalid filter '$arg'" "syscall open or $arg open"
+done
+check_expression "invalid filter 'not_'" "not_ syscall open"
+
+for arg in "syscall " \
+	   "(syscall)" \
+	   "syscall open or" \
+	   "syscall open or not" \
+	   "syscall open or syscall" \
+	   ; do
+	check_expression "unfinished filter expression '$arg'" "$arg"
+done
+
+check_expression "stack overflow (expression is too complex)" \
+	"(((((((((((((((((((((((((((((((((syscall open)))))))))))))))))))))))))))))))))"
