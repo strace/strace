@@ -108,7 +108,7 @@ print_inet_addr(const int af,
 	}
 
 	tprintf("%s=", var_name);
-	print_quoted_string(addr, len, 0);
+	print_quoted_string(addr, len, QUOTE_FORCE_HEX);
 	return false;
 }
 
