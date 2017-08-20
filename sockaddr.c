@@ -94,20 +94,27 @@ print_inet_addr(const int af,
 	switch (af) {
 	case AF_INET:
 		if (inet_ntop(af, addr, buf, sizeof(buf))) {
-			tprintf("%s=inet_addr(\"%s\")", var_name, buf);
+			if (var_name)
+				tprintf("%s=inet_addr(\"%s\")", var_name, buf);
+			else
+				tprints(buf);
 			return true;
 		}
 		break;
 	case AF_INET6:
 		if (inet_ntop(af, addr, buf, sizeof(buf))) {
-			tprintf("inet_pton(%s, \"%s\", &%s)",
-				"AF_INET6", buf, var_name);
+			if (var_name)
+				tprintf("inet_pton(%s, \"%s\", &%s)",
+					"AF_INET6", buf, var_name);
+			else
+				tprints(buf);
 			return true;
 		}
 		break;
 	}
 
-	tprintf("%s=", var_name);
+	if (var_name)
+		tprintf("%s=", var_name);
 	print_quoted_string(addr, len, QUOTE_FORCE_HEX);
 	return false;
 }
