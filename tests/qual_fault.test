@@ -48,29 +48,46 @@ check_fault_injection()
 	procs=$1; shift
 	extra="$*"
 
-	local when=
+	local when_qualify=
+	local when_new=
 	if [ -z "$first$step" ]; then
 		first=1
 		step=1
 	else
 		case "$step" in
-			'') when=":when=$first"; step=0 ;;
-			+) when=":when=$first+"; step=1 ;;
-			*) when=":when=$first+$step" ;;
+			'')
+			when_qualify=":when=$first"
+			when_new=";when=$first"
+			step=0
+			;;
+			+)
+			when_qualify=":when=$first+"
+			when_new=";when=$first+"
+			step=1
+			;;
+			*)
+			when_qualify=":when=$first+$step"
+			when_new=";when=$first+$step"
+			;;
 		esac
 	fi
 
-	local error=
+	local error_qualify=
+	local error_new=
 	local raw=reg
 	set --
 	case "$err" in
 		'') ;;
 		[123456789]*)
-			error=":error=$err"
+			error_qualify=":error=$err"
+			error_new=";error=$err"
 			raw=raw
 			set -- -e raw=all
 			;;
-		*) error=":error=$err" ;;
+		*)
+		error_qualify=":error=$err"
+		error_new=";error=$err"
+		;;
 	esac
 
 	outexp="$NAME.out.exp"
@@ -79,7 +96,21 @@ check_fault_injection()
 	outpid="$NAME.pid"
 
 	run_strace -a11 -ff -e trace=$trace \
-		"$@" -e fault=$fault$when$error $extra \
+		"$@" -e fault=$fault$when_qualify$error_qualify $extra \
+		../$NAME $raw "$err" "$first" "$step" $N \
+		"$procs" "$outexp" "$outgot" "$outout" "$outpid"
+
+	for i in $(seq 0 $((procs - 1)) )
+	do
+		pid=$(cat "$outpid.$i")
+
+		match_diff "$outout.$i" "$LOG.$pid"
+		match_diff "$outexp.$i" "$outgot.$i"
+	done
+
+	# New syntax
+	run_strace -a11 -ff -e "trace(syscall $trace)" \
+		"$@" -e "fault(syscall $fault$when_new$error_new)" $extra \
 		../$NAME $raw "$err" "$first" "$step" $N \
 		"$procs" "$outexp" "$outgot" "$outout" "$outpid"
 
@@ -93,7 +124,7 @@ check_fault_injection()
 }
 
 for err in '' ENOSYS 22 einval; do
-	for fault in writev desc,51; do
+	for fault in writev %desc,51; do
 		check_fault_injection \
 			writev $fault "$err" '' '' 1 -efault=chdir
 		check_fault_injection \

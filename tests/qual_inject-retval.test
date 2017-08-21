@@ -14,6 +14,11 @@ check_injection()
 	run_strace -a12 -e$syscall -einject="$syscall:retval=$rval" "$@" \
 		../qual_inject-retval "$rval" > "$EXP"
 	match_diff "$LOG" "$EXP"
+
+	run_strace -a12 -e "syscall $syscall" \
+		   -e "inject(syscall $syscall;retval=$rval)" "$@" \
+		../qual_inject-retval "$rval" > "$EXP"
+	match_diff "$LOG" "$EXP"
 }
 
 check_injection 0

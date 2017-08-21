@@ -377,6 +377,7 @@ EXTRA_DIST = \
 	struct_flock.c \
 	sun_path.expected \
 	syntax.sh \
+	tampering-syntax.sh \
 	trace_fstat.in \
 	trace_fstatfs.in \
 	trace_lstat.in \
