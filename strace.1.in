@@ -354,10 +354,15 @@ and
 Summarise the time difference between the beginning and end of
 each system call.  The default is to summarise the system time.
 .SS Filtering
+.LP
+.B strace
+has two types of expressions with different syntax: set-based
+expressions and filter-based expressions.
+.SS Set-based expression
 .TP 12
 .BI "\-e " expr
-A qualifying expression which modifies which events to trace
-or how to trace them.  The format of the expression is:
+Set-based expression modifies which events to trace
+or how to trace them. The format of the expression is:
 .RS 15
 .IP
 [\,\fIqualifier\/\fB=\fR][\fB!\fR][\fB?\fR]\,\fIvalue1\/\fR[\fB,\fR[\fB?\fR]\,\fIvalue2\/\fR]...
@@ -677,6 +682,269 @@ This is equivalent to more generic
 option set to
 .IR ENOSYS .
 
+.SS Filter-based expression
+.TP 12
+.BI "\-e " expr
+Filter-based expression modifies which actions are applied
+to syscalls and conditions when actions
+are applied.  The format of the expression is:
+.RS 15
+.IP
+[\,\fIaction\/\fB(\fR]\fIfilter_expression\/\fR[\fB;\fR\fIarg1\/\fR[\fB;\fR\fIarg2\/\fR...]][\fB)\fR]
+.RE
+.IP
+where
+.I action
+is one of
+.BR trace ,
+.BR abbrev ,
+.BR verbose ,
+.BR raw ,
+.BR read ,
+.BR write ,
+.BR fault ,
+.BR inject ,
+or
+.B stacktrace
+and
+.I arg
+is an action-dependent argument.  The default action is
+.BR trace .
+.I arg
+can be specified only when action is specified.
+.I arg
+is ignored if the action does not take any arguments.
+.TP
+\,\fIfilter_expression\fR
+The filter expression consits of one or more \fIfilters\fR.
+\fIFilters\fR consist of a \fIfilter_name\fR and filter-dependent argument.
+Complex expressions are built up by using
+the operators \fBand, or\fR and \fBnot\fR
+(or their short versions: \fB&&, ||\fR and \fB!\fR)
+to combine \fIfilters\fR. Allowable filters are:
+.TP
+\fBsyscall\fR \fIsyscall-specifier-set\fR
+Match system calls by name or syscall number.  The format of
+\fIsyscall-specifier-set\fR is:
+.RS 15
+.IP
+\fIsyscall-specifier1\fR[\fB,\fR\fIsyscall-specifier2\fR...]
+.RE
+.IP
+where \fIsyscall-specifier\fR can be a system call name,
+a class of system calls or
+regular expression.
+In addition, the special values
+.B all
+and
+.B none
+have the obvious meanings.
+.TP
+\fBsyscall\fR \fIsyscall1\fR[\fB,\fR\fIsyscall2\fR...]
+Match only the specified set of system calls.  For example,
+.BR syscall\ open,close,read,write
+means to only match those four system calls.
+.TP
+\fBsyscall\fR %\fIclass\fR
+where
+.I class
+is one of
+.BR file ,
+.BR process ,
+.BR network ,
+.BR signal ,
+.BR ipc ,
+.BR desc ,
+.BR memory ,
+.BR stat ,
+.BR lstat ,
+.BR fstat ,
+.BR %stat ,
+.BR statfs ,
+.BR fstatfs ,
+.BR %statfs .
+These classes are similar to classes, defined in set-based expression's
+section (\fB-e trace=%\fR\fIclass\fR).
+.TP
+\fBsyscall\fR /\fIregex\fR
+Match only those system calls that match the
+.IR regex .
+You can use
+.B POSIX
+Extended Regular Expression syntax (see
+.BR regex (7)).
+.TP
+\fBfd\fR \fIfd1\fR[\fB,\fR\fIfd2\fR...]
+Match system calls by file descriptor. Only system calls that have fd argument
+are matched (system calls from \fB%desc\fR, \fB%network\fR classes and
+mq_timedsend and mq_timedreceive system calls).
+.TP
+\fBpath\fR \fIpath\fR
+Match system calls by path. Only system calls that have fd or path argument
+are matched (system calls from \fB%desc\fR, \fB%network\fR, \fB%file\fR classes
+and mq_timedsend and mq_timedreceive system calls).
+.IP
+Special characters (spaces, parentheses, operator characters) in filter
+arguments can be escaped with \'\fB\\\fR\'.
+.TP
+\fB\-e\ trace(\fR\,\fIfilter_expression\fB)\fR
+Trace only those system calls that match the \fIfilter_expression\fR.
+.TP
+\fB\-e\ abbrev(\fR\,\fIfilter_expression\fB)\fR
+Abbreviate the output from printing each member of large structures
+for those system calls that match the \fIfilter_expression\fR.
+.TP
+\fB\-e\ verbose(\fR\,\fIfilter_expression\fB)\fR
+Dereference structures for those system calls
+that match the \fIfilter_expression\fR.
+.TP
+\fB\-e\ raw(\fR\,\fIfilter_expression\fB)\fR
+Print raw, undecoded arguments for those system calls
+that match the \fIfilter_expression\fR.
+This option has the effect of causing all arguments to be printed
+in hexadecimal.  This is mostly useful if you don't trust the
+decoding or you need to know the actual numeric value of an
+argument.
+.TP
+\fB\-e\ read(\fR\,\fIfilter_expression\fB)\fR
+Perform a full hexadecimal and ASCII dump of all the data read by
+those system calls that match the \fIfilter_expression\fR.
+.TP
+\fB\-e\ write(\fR\,\fIfilter_expression\fB)\fR
+Perform a full hexadecimal and ASCII dump of all the data written by
+those system calls that match the \fIfilter_expression\fR.
+.TP
+\fB\-e\ stacktrace(\fR\,\fIfilter_expression\fB)\fR
+Print the execution stack trace of the traced processes after
+those system calls that match the \fIfilter_expression\fR.
+This action is available only if
+.B strace
+is built with libunwind.
+.TP
+\fB\-e\ inject(\fR\,\fIfilter_expression\fR[;\fBerror\fR=\,\fIerrno\/\fR|;\fBretval\fR=\,\fIvalue\/\fR][;\fBsignal\fR=\,\fIsig\/\fR][;\fBwhen\fR=\,\fIexpr\/\fR]\fB)\fR
+Perform syscall tampering for those system calls
+that match the \fIfilter_expression\fR.
+
+At least one of
+.BR error ,
+.BR retval ,
+or
+.B signal
+options has to be specified.
+.B error
+and
+.B retval
+are mutually exclusive.
+
+If ;\fBerror\fR=\,\fIerrno\/\fR option is specified,
+a fault is injected into a syscall invocation:
+the syscall number is replaced by -1 which corresponds to an invalid syscall,
+and the error code is specified using a symbolic
+.I errno
+value like
+.B ENOSYS
+or a numeric value within 1..4095 range.
+
+If ;\fBretval\fR=\,\fIvalue\/\fR option is specified,
+success injection is performed: the syscall number is replaced by -1,
+but a bogus success value is returned to the callee.
+
+If ;\fBsignal\fR=\,\fIsig\/\fR option is specified with either a symbolic value
+like
+.B SIGSEGV
+or a numeric value within 1..\fBSIGRTMAX\fR range,
+that signal is delivered on entering every syscall
+that match the \fIfilter_expression\fR.
+
+If ;\fBsignal\fR=\,\fIsig\/\fR option is specified without
+;\fBerror\fR=\,\fIerrno\/\fR or ;\fBretval\fR=\,\fIvalue\/\fR options,
+then only a signal
+.I sig
+is delivered without a syscall fault injection.
+Conversely, ;\fBerror\fR=\,\fIerrno\/\fR or
+;\fBretval\fR=\,\fIvalue\/\fR option without
+;\fBsignal\fR=\,\fIsig\/\fR option injects a fault without delivering a signal.
+
+If both ;\fBerror\fR=\,\fIerrno\/\fR or ;\fBretval\fR=\,\fIvalue\/\fR
+and ;\fBsignal\fR=\,\fIsig\/\fR options are specified, then both
+a fault or success is injected and a signal is delivered.
+
+Unless a ;\fBwhen\fR=\,\fIexpr\fR subexpression is specified,
+an injection is being made into every invocation of each syscall
+that match the \fIfilter_expression\fR.
+
+The format of the subexpression is one of the following:
+.RS
+.IP "" 2
+.I first
+.RS 4
+For every syscall from the
+.IR set ,
+perform an injection for the syscall invocation number
+.I first
+only.
+.RE
+.IP "" 2
+\fIfirst\/\fB+\fR
+.RS 4
+For every syscall from the
+.IR set ,
+perform injections for the syscall invocation number
+.I first
+and all subsequent invocations.
+.RE
+.IP "" 2
+\fIfirst\/\fB+\fIstep\fR
+.RS 4
+For every syscall from the
+.IR set ,
+perform injections for syscall invocations number
+.IR first ,
+.IR first + step ,
+.IR first + step + step ,
+and so on.
+.RE
+.RE
+.IP
+For example, to fail each third and subsequent chdir syscalls with
+.BR ENOENT ,
+use
+\fB\-e\ inject\fR\fB(\fR\,\fIsyscall chdir\/\fR;\fBerror\fR=\,\fIENOENT\/\fR;\fBwhen\fR=\,\fI3\/\fB+\fR\fB)\fR.
+
+The valid range for numbers
+.I first
+and
+.I step
+is 1..65535.
+
+An injection expression can contain only one
+.BR error =
+or
+.BR retval =
+specification.
+If an injection expression contains multiple
+.BR when =
+specifications, the last one takes precedence.
+
+Accounting of syscalls that are subject to injection
+is done per syscall and per tracee.
+.TP
+\fB\-e\ fault(\fR\,\fIfilter_expression\fR[;\fBerror\fR=\,\fIerrno\/\fR][;\fBwhen\fR=\,\fIexpr\/\fR]\fB)\fR
+Perform syscall fault injection for those system calls
+that match the \fIfilter_expression\fR.
+
+This is equivalent to more generic
+\fB\-e\ inject\fR= expression with default value of
+.I errno
+option set to
+.IR ENOSYS .
+.IP
+Multiple actions of the same type(except \fBinject\fR and \fBfault\fR actions)
+are combined into one action with \fBor\fR operator. For example,
+\fB\-e trace(syscall open) \-e trace(syscall close)\fR is equal to
+\fB\-e trace(syscall open or syscall close)\fR.
+Only one inject or fault action can be applied to one syscall. If two or more
+actions try to tamper the same syscall, last of them is applied.
 .TP
 .BI "\-P " path
 Trace only system calls accessing
