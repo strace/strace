@@ -1,6 +1,10 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in command line syntax
+  * New syntax for -e option for filter-based expressions.
+    Traditional syntax is also supported.
+
 * Changes in behaviour
   * On x32 personality, 64-bit syscalls (such as readv) are now shown with "#64"
     suffix instead of "64:" prefix.  Unlike the old names, these new names
