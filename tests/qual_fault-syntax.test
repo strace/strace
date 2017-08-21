@@ -3,6 +3,7 @@
 # Check -e fault= syntax.
 #
 # Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2017 The strace developers.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,70 +28,49 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/init.sh"
+. "${srcdir=.}/tampering-syntax.sh"
 
 #
 # F
 # F+
 # F+S
 
-fail_with()
-{
-	dump_log_and_fail_with \
-		"strace -e fault=$* failed to handle an argument error properly"
-}
-
-for arg in chdir:42 \!chdir:42 \
-	   chdir:42:when=7 \
-	   chdir:invalid \
-	   chdir:invalid:when=8 \
-	   chdir:error= \
-	   chdir:error=:when=10 \
-	   chdir:error=invalid_error_name \
-	   chdir:error=invalid_error_name:when=11 \
-	   chdir:error=-1 \
-	   chdir:error=-1:when=12 \
-	   chdir:error=-2 \
-	   chdir:error=-2:when=13 \
-	   chdir:error=3+ \
-	   chdir:error=3+:when=14 \
-	   chdir:error=4096 \
-	   chdir:error=4096:when=15 \
-	   chdir:when=7:error=invalid_error_name \
-	   chdir:when= \
-	   chdir:when=:error=19 \
-	   chdir:when=0 \
-	   chdir:when=0:error=20 \
-	   chdir:when=-1 \
-	   chdir:when=-1:error=21 \
-	   chdir:when=-2+ \
-	   chdir:when=-2+:error=22 \
-	   chdir:when=-3+0 \
-	   chdir:when=-3+0:error=23 \
-	   chdir:when=4- \
-	   chdir:when=4-:error=24 \
-	   chdir:when=5+- \
-	   chdir:when=5+-:error=25 \
-	   chdir:when=6++ \
-	   chdir:when=6++:error=26 \
-	   chdir:when=7+0 \
-	   chdir:when=7+0:error=27 \
-	   chdir:when=8+-1 \
-	   chdir:when=8+-1:error=28 \
-	   chdir:when=9+1+ \
-	   chdir:when=9+1+:error=29 \
-	   chdir:when=65536 \
-	   chdir:when=65536:error=30 \
-	   chdir:when=1+65536 \
-	   chdir:when=1+65536:error=31 \
-	   chdir:retval=0 \
-	   chdir:signal=1 \
-	   chdir:error=1:error=2 \
+counter=7
+for arg in 42 \
+	   invalid \
+	   error= \
+	   error=invalid_error_name \
+	   error=-1 \
+	   error=-2 \
+	   error=3+ \
+	   error=4096 \
 	   ; do
-	$STRACE -e fault="$arg" true 2> "$LOG" &&
-		fail_with "$arg"
-	LC_ALL=C grep -F 'invalid fault argument' < "$LOG" > /dev/null ||
-		fail_with "$arg"
+	check_tampering_syntax fault chdir "$arg"
+	check_tampering_syntax fault chdir "$arg" "when=$counter"
+	counter=$((counter + 1))
 done
+
+for arg in when= \
+	   when=0 \
+	   when=-1 \
+	   when=-2+ \
+	   when=-3+0 \
+	   when=4- \
+	   when=5+- \
+	   when=6++ \
+	   when=7+0 \
+	   when=8+-1 \
+	   when=9+1+ \
+	   when=65536 \
+	   when=1+65536 \
+	   ; do
+	check_tampering_syntax fault chdir "$arg"
+	check_tampering_syntax fault chdir "$arg" "error=$counter"
+	counter=$((counter + 1))
+done
+
+check_tampering_syntax fault chdir "retval=0"
+check_tampering_syntax fault chdir "signal=1"
+check_tampering_syntax fault chdir "error=1" "error=2"
 
 exit 0

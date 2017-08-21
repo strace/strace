@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check decoding of fault injected exit_group syscall.
+# Define inject/fault syntax testing primitives.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
 # Copyright (c) 2016-2017 The strace developers.
@@ -28,38 +28,37 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/scno_tampering.sh"
+. "${srcdir=.}/syntax.sh"
 
-test_with()
+check_tampering_syntax()
 {
-	> "$LOG" || fail_ "failed to write $LOG"
+	local action syscall argument_qualify argument_new
+	action=$1; shift
+	syscall=$1; shift
 
-	$STRACE -o "$LOG" "$@"
-	rc=$?
-	[ $rc -eq 42 ] ||
-		dump_log_and_fail_with "$STRACE $* failed with code $rc"
+	if [ -n "$1" ]; then
+		argument_qualify="$1"
+		argument_new="$1"
+		shift
+	else
+		check_e "invalid $action argument ''" \
+			-e "$action=$syscall" true
+		check_e "invalid $action argument ''" \
+			-e "$action(syscall $syscall)" true
+		return
+	fi
 
-	match_diff
+	for arg in "$@"
+	do
+		[ -z "$arg" ] && break
+		argument_qualify="$argument_qualify:$arg"
+		argument_new="$argument_new;$arg"
+		shift
+	done
+	check_e "invalid $action argument '$argument_qualify'" \
+		-e "$action=$syscall:$argument_qualify" \
+		true
+	check_e "invalid $action argument '$argument_new'" \
+		-e "$action(syscall $syscall;$argument_new)" \
+		true
 }
-
-test_with -eexit,exit_group -efault=exit_group:error=ENOSYS ../answer
-test_with -e "trace(syscall exit,exit_group)" \
-	  -e "fault(syscall exit_group;error=ENOSYS)" ../answer
-
-test_with -eexit,exit_group -efault=exit_group:error=ENOSYS \
-	  -efault=\!process:error=1 ../answer
-test_with -e "trace(syscall exit,exit_group)" \
-	  -e "fault(syscall exit_group;error=ENOSYS)" \
-	  -e "fault(!syscall %process;error=1)" ../answer
-
-test_with -eexit,exit_group -efault=all:error=ENOSYS \
-	  -efault=exit:error=1:when=2+ ../answer
-test_with -e "trace(syscall exit,exit_group)" \
-	  -e "fault(syscall all;error=ENOSYS)" \
-	  -e "fault(syscall exit;error=1;when=2+)" ../answer
-
-test_with -eexit,exit_group -efault=exit_group:error=ENOSYS \
-	  -efault=\!%desc,%file,%memory,%process,%signal,%network,%ipc:error=1 ../answer
-test_with -e "trace(syscall exit,exit_group)" \
-	  -e "fault(syscall exit_group;error=ENOSYS)" \
-	  -e "fault(!syscall %desc,%file,%memory,%process,%signal,%network,%ipc;error=1)" ../answer
