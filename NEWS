@@ -1,6 +1,10 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in command line syntax
+  * New syntax for -e option for filter-based expressions.
+    Old syntax is still supported.
+
 * Improvements
   * Implemented decoding of netlink descriptor attributes as file descriptors.
   * Implemented decoding of hugetlb page size selection flags.
