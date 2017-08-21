@@ -58,11 +58,12 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	tprints("}");
 }
 
-static void
+static bool
 decode_inet_addr(struct tcb *const tcp,
 		 const kernel_ulong_t addr,
 		 const unsigned int len,
-		 const int family)
+		 const int family,
+		 const char *const var_name)
 {
 	union {
 		struct in_addr  a4;
@@ -80,18 +81,20 @@ decode_inet_addr(struct tcb *const tcp,
 	}
 
 	if (!size || len < size) {
-		tprints("addr=");
+		if (var_name)
+			tprintf("%s=", var_name);
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
-		return;
+		return false;
 	}
 
 	if (umoven(tcp, addr, size, &addrbuf) < 0) {
-		tprints("addr=");
+		if (var_name)
+			tprintf("%s=", var_name);
 		printaddr(addr);
-		return;
+		return false;
 	}
 
-	print_inet_addr(family, &addrbuf, size, "addr");
+	return print_inet_addr(family, &addrbuf, size, var_name);
 }
 
 static void
@@ -115,7 +118,7 @@ decode_inet_diag_hostcond(struct tcb *const tcp,
 	if (len > sizeof(cond)) {
 		tprints(", ");
 		decode_inet_addr(tcp, addr + sizeof(cond),
-				 len - sizeof(cond), cond.family);
+				 len - sizeof(cond), cond.family, "addr");
 	}
 	tprints("}");
 }
