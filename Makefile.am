@@ -286,6 +286,7 @@ strace_SOURCES =	\
 	strace.c	\
 	string_to_uint.h \
 	string_to_uint.c \
+	supported_personalities.h \
 	swapon.c	\
 	syscall.c	\
 	sysctl.c	\

@@ -59,6 +59,7 @@
 #include "macros.h"
 #include "mpers_type.h"
 #include "string_to_uint.h"
+#include "supported_personalities.h"
 #include "sysent.h"
 #include "xmalloc.h"
 
@@ -137,27 +138,6 @@ extern char *stpcpy(char *dst, const char *src);
 # define ERESTART_RESTARTBLOCK 516
 #endif
 
-#if defined X86_64
-# define SUPPORTED_PERSONALITIES 3
-# define PERSONALITY2_WORDSIZE  4
-# define PERSONALITY2_KLONGSIZE PERSONALITY0_KLONGSIZE
-#elif defined AARCH64 \
-   || defined POWERPC64 \
-   || defined RISCV \
-   || defined SPARC64 \
-   || defined TILE \
-   || defined X32
-# define SUPPORTED_PERSONALITIES 2
-#else
-# define SUPPORTED_PERSONALITIES 1
-#endif
-
-#if defined TILE && defined __tilepro__
-# define DEFAULT_PERSONALITY 1
-#else
-# define DEFAULT_PERSONALITY 0
-#endif
-
 #define PERSONALITY0_WORDSIZE  SIZEOF_LONG
 #define PERSONALITY0_KLONGSIZE SIZEOF_KERNEL_LONG_T
 #define PERSONALITY0_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
@@ -166,6 +146,11 @@ extern char *stpcpy(char *dst, const char *src);
 #if SUPPORTED_PERSONALITIES > 1
 # define PERSONALITY1_WORDSIZE  4
 # define PERSONALITY1_KLONGSIZE PERSONALITY1_WORDSIZE
+#endif
+
+#if SUPPORTED_PERSONALITIES > 2
+# define PERSONALITY2_WORDSIZE  4
+# define PERSONALITY2_KLONGSIZE PERSONALITY0_KLONGSIZE
 #endif
 
 #if SUPPORTED_PERSONALITIES > 1 && defined HAVE_M32_MPERS
