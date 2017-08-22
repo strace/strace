@@ -28,15 +28,8 @@
 
 #include "defs.h"
 #include "nsig.h"
+#include "number_set.h"
 #include "filter.h"
-
-typedef unsigned int number_slot_t;
-
-struct number_set {
-	number_slot_t *vec;
-	unsigned int nslots;
-	bool not;
-};
 
 struct number_set read_set;
 struct number_set write_set;

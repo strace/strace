@@ -644,12 +644,6 @@ print_struct_statfs64(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size);
 
 extern void print_ifindex(unsigned int);
 
-struct number_set;
-extern struct number_set read_set;
-extern struct number_set write_set;
-extern struct number_set signal_set;
-
-extern bool is_number_in_set(unsigned int number, const struct number_set *);
 extern void qualify(const char *);
 extern unsigned int qual_flags(const unsigned int);
 

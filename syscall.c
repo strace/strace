@@ -35,6 +35,7 @@
 #include "defs.h"
 #include "native_defs.h"
 #include "nsig.h"
+#include "number_set.h"
 #include <sys/param.h>
 
 /* for struct iovec */

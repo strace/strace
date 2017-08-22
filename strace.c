@@ -46,6 +46,7 @@
 #endif
 #include <asm/unistd.h>
 
+#include "number_set.h"
 #include "scno.h"
 #include "ptrace.h"
 #include "printsiginfo.h"

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +25,51 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_FILTER_H
-#define STRACE_FILTER_H
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-struct number_set;
-typedef int (*string_to_uint_func)(const char *);
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include "number_set.h"
+#include "xmalloc.h"
 
-void qualify_tokens(const char *str, struct number_set *set,
-		    string_to_uint_func func, const char *name);
-void qualify_syscall_tokens(const char *str, struct number_set *set,
-			    const char *name);
+#define BITS_PER_SLOT (sizeof(number_slot_t) * 8)
 
-#endif /* !STRACE_FILTER_H */
+static void
+number_setbit(const unsigned int i, number_slot_t *const vec)
+{
+	vec[i / BITS_PER_SLOT] |= (number_slot_t) 1 << (i % BITS_PER_SLOT);
+}
+
+static bool
+number_isset(const unsigned int i, const number_slot_t *const vec)
+{
+	return vec[i / BITS_PER_SLOT] & ((number_slot_t) 1 << (i % BITS_PER_SLOT));
+}
+
+static void
+reallocate_number_set(struct number_set *const set, const unsigned int new_nslots)
+{
+	if (new_nslots <= set->nslots)
+		return;
+	set->vec = xreallocarray(set->vec, new_nslots, sizeof(*set->vec));
+	memset(set->vec + set->nslots, 0,
+	       sizeof(*set->vec) * (new_nslots - set->nslots));
+	set->nslots = new_nslots;
+}
+
+bool
+is_number_in_set(const unsigned int number, const struct number_set *const set)
+{
+	return set && ((number / BITS_PER_SLOT < set->nslots)
+		&& number_isset(number, set->vec)) ^ set->not;
+}
+
+void
+add_number_to_set(const unsigned int number, struct number_set *const set)
+{
+	reallocate_number_set(set, number / BITS_PER_SLOT + 1);
+	number_setbit(number, set->vec);
+}

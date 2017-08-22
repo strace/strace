@@ -27,54 +27,9 @@
  */
 
 #include "defs.h"
+#include "number_set.h"
 #include "filter.h"
 #include <regex.h>
-
-typedef unsigned int number_slot_t;
-#define BITS_PER_SLOT (sizeof(number_slot_t) * 8)
-
-struct number_set {
-	number_slot_t *vec;
-	unsigned int nslots;
-	bool not;
-};
-
-static void
-number_setbit(const unsigned int i, number_slot_t *const vec)
-{
-	vec[i / BITS_PER_SLOT] |= (number_slot_t) 1 << (i % BITS_PER_SLOT);
-}
-
-static bool
-number_isset(const unsigned int i, const number_slot_t *const vec)
-{
-	return vec[i / BITS_PER_SLOT] & ((number_slot_t) 1 << (i % BITS_PER_SLOT));
-}
-
-static void
-reallocate_number_set(struct number_set *const set, const unsigned int new_nslots)
-{
-	if (new_nslots <= set->nslots)
-		return;
-	set->vec = xreallocarray(set->vec, new_nslots, sizeof(*set->vec));
-	memset(set->vec + set->nslots, 0,
-	       sizeof(*set->vec) * (new_nslots - set->nslots));
-	set->nslots = new_nslots;
-}
-
-void
-add_number_to_set(const unsigned int number, struct number_set *const set)
-{
-	reallocate_number_set(set, number / BITS_PER_SLOT + 1);
-	number_setbit(number, set->vec);
-}
-
-bool
-is_number_in_set(const unsigned int number, const struct number_set *const set)
-{
-	return ((number / BITS_PER_SLOT < set->nslots)
-		&& number_isset(number, set->vec)) ^ set->not;
-}
 
 static bool
 qualify_syscall_number(const char *s, struct number_set *set)

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,15 +25,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef STRACE_FILTER_H
-#define STRACE_FILTER_H
+#ifndef STRACE_NUMBER_SET_H
+#define STRACE_NUMBER_SET_H
 
-struct number_set;
-typedef int (*string_to_uint_func)(const char *);
+typedef unsigned int number_slot_t;
 
-void qualify_tokens(const char *str, struct number_set *set,
-		    string_to_uint_func func, const char *name);
-void qualify_syscall_tokens(const char *str, struct number_set *set,
-			    const char *name);
+struct number_set {
+	number_slot_t *vec;
+	unsigned int nslots;
+	bool not;
+};
 
-#endif /* !STRACE_FILTER_H */
+extern bool
+is_number_in_set(unsigned int number, const struct number_set *);
+
+extern void
+add_number_to_set(unsigned int number, struct number_set *);
+
+extern struct number_set read_set;
+extern struct number_set write_set;
+extern struct number_set signal_set;
+
+#endif /* !STRACE_NUMBER_SET_H */

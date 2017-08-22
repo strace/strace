@@ -205,6 +205,8 @@ strace_SOURCES =	\
 	nsfs.h          \
 	nsig.h		\
 	numa.c		\
+	number_set.c	\
+	number_set.h	\
 	oldstat.c	\
 	open.c		\
 	or1k_atomic.c	\
