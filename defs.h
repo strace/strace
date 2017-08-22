@@ -610,6 +610,9 @@ extern void printfd(struct tcb *, int);
 extern void print_sockaddr(const void *sa, int len);
 extern bool
 print_inet_addr(int af, const void *addr, unsigned int len, const char *var_name);
+extern bool
+decode_inet_addr(struct tcb *, kernel_ulong_t addr,
+		 unsigned int len, int family, const char *var_name);
 extern const char *get_sockaddr_by_inode(struct tcb *, int fd, unsigned long inode);
 extern bool print_sockaddr_by_inode(struct tcb *, int fd, unsigned long inode);
 extern void print_dirfd(struct tcb *, int);

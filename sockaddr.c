@@ -119,6 +119,45 @@ print_inet_addr(const int af,
 	return false;
 }
 
+bool
+decode_inet_addr(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const int family,
+		 const char *const var_name)
+{
+	union {
+		struct in_addr  a4;
+		struct in6_addr a6;
+	} addrbuf;
+	size_t size = 0;
+
+	switch (family) {
+	case AF_INET:
+		size = sizeof(addrbuf.a4);
+		break;
+	case AF_INET6:
+		size = sizeof(addrbuf.a6);
+		break;
+	}
+
+	if (!size || len < size) {
+		if (var_name)
+			tprintf("%s=", var_name);
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return false;
+	}
+
+	if (umoven(tcp, addr, size, &addrbuf) < 0) {
+		if (var_name)
+			tprintf("%s=", var_name);
+		printaddr(addr);
+		return false;
+	}
+
+	return print_inet_addr(family, &addrbuf, size, var_name);
+}
+
 static void
 print_sockaddr_data_in(const void *const buf, const int addrlen)
 {
