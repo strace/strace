@@ -35,7 +35,14 @@
 #include "number_set.h"
 #include "xmalloc.h"
 
+typedef unsigned int number_slot_t;
 #define BITS_PER_SLOT (sizeof(number_slot_t) * 8)
+
+struct number_set {
+	number_slot_t *vec;
+	unsigned int nslots;
+	bool not;
+};
 
 static void
 number_setbit(const unsigned int i, number_slot_t *const vec)

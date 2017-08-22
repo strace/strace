@@ -31,15 +31,15 @@
 #include "number_set.h"
 #include "filter.h"
 
-struct number_set read_set;
-struct number_set write_set;
-struct number_set signal_set;
+struct number_set *read_set;
+struct number_set *write_set;
+struct number_set *signal_set;
 
-static struct number_set abbrev_set[SUPPORTED_PERSONALITIES];
-static struct number_set inject_set[SUPPORTED_PERSONALITIES];
-static struct number_set raw_set[SUPPORTED_PERSONALITIES];
-static struct number_set trace_set[SUPPORTED_PERSONALITIES];
-static struct number_set verbose_set[SUPPORTED_PERSONALITIES];
+static struct number_set *abbrev_set;
+static struct number_set *inject_set;
+static struct number_set *raw_set;
+static struct number_set *trace_set;
+static struct number_set *verbose_set;
 
 static int
 sigstr_to_uint(const char *s)
@@ -178,42 +178,56 @@ parse_error:
 static void
 qualify_read(const char *const str)
 {
-	qualify_tokens(str, &read_set, string_to_uint, "descriptor");
+	if (!read_set)
+		read_set = alloc_number_set_array(1);
+	qualify_tokens(str, read_set, string_to_uint, "descriptor");
 }
 
 static void
 qualify_write(const char *const str)
 {
-	qualify_tokens(str, &write_set, string_to_uint, "descriptor");
+	if (!write_set)
+		write_set = alloc_number_set_array(1);
+	qualify_tokens(str, write_set, string_to_uint, "descriptor");
 }
 
 static void
 qualify_signals(const char *const str)
 {
-	qualify_tokens(str, &signal_set, sigstr_to_uint, "signal");
+	if (!signal_set)
+		signal_set = alloc_number_set_array(1);
+	qualify_tokens(str, signal_set, sigstr_to_uint, "signal");
 }
 
 static void
 qualify_trace(const char *const str)
 {
+	if (!trace_set)
+		trace_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
 	qualify_syscall_tokens(str, trace_set, "system call");
 }
 
 static void
 qualify_abbrev(const char *const str)
 {
+	if (!abbrev_set)
+		abbrev_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
 	qualify_syscall_tokens(str, abbrev_set, "system call");
 }
 
 static void
 qualify_verbose(const char *const str)
 {
+	if (!verbose_set)
+		verbose_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
 	qualify_syscall_tokens(str, verbose_set, "system call");
 }
 
 static void
 qualify_raw(const char *const str)
 {
+	if (!raw_set)
+		raw_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
 	qualify_syscall_tokens(str, raw_set, "system call");
 }
 
@@ -260,6 +274,10 @@ qualify_inject_common(const char *const str,
 		if (number_set_array_is_empty(tmp_set, p))
 			continue;
 
+		if (!inject_set) {
+			inject_set =
+				alloc_number_set_array(SUPPORTED_PERSONALITIES);
+		}
 		if (!inject_vec[p]) {
 			inject_vec[p] = xcalloc(nsyscall_vec[p],
 					       sizeof(*inject_vec[p]));

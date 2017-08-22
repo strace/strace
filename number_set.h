@@ -28,13 +28,7 @@
 #ifndef STRACE_NUMBER_SET_H
 #define STRACE_NUMBER_SET_H
 
-typedef unsigned int number_slot_t;
-
-struct number_set {
-	number_slot_t *vec;
-	unsigned int nslots;
-	bool not;
-};
+struct number_set;
 
 extern bool
 number_set_array_is_empty(const struct number_set *, unsigned int idx);
@@ -63,8 +57,8 @@ alloc_number_set_array(unsigned int nmemb);
 extern void
 free_number_set_array(struct number_set *, unsigned int nmemb);
 
-extern struct number_set read_set;
-extern struct number_set write_set;
-extern struct number_set signal_set;
+extern struct number_set *read_set;
+extern struct number_set *write_set;
+extern struct number_set *signal_set;
 
 #endif /* !STRACE_NUMBER_SET_H */
