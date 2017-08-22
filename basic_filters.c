@@ -45,7 +45,7 @@ qualify_syscall_number(const char *s, struct number_set *set)
 		if ((unsigned) n >= nsyscall_vec[p]) {
 			continue;
 		}
-		add_number_to_set(n, &set[p]);
+		add_number_to_set_array(n, set, p);
 		done = true;
 	}
 
@@ -85,7 +85,7 @@ qualify_syscall_regex(const char *s, struct number_set *set)
 				continue;
 			else if (rc)
 				regerror_msg_and_die(rc, &preg, "regexec", s);
-			add_number_to_set(i, &set[p]);
+			add_number_to_set_array(i, set, p);
 			found = true;
 		}
 	}
@@ -150,7 +150,7 @@ qualify_syscall_class(const char *s, struct number_set *set)
 			    || (sysent_vec[p][i].sys_flags & n) != n) {
 				continue;
 			}
-			add_number_to_set(i, &set[p]);
+			add_number_to_set_array(i, set, p);
 		}
 	}
 
@@ -171,7 +171,7 @@ qualify_syscall_name(const char *s, struct number_set *set)
 			    || strcmp(s, sysent_vec[p][i].sys_name)) {
 				continue;
 			}
-			add_number_to_set(i, &set[p]);
+			add_number_to_set_array(i, set, p);
 			found = true;
 		}
 	}
@@ -206,13 +206,7 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set,
 		       const char *const name)
 {
 	/* Clear all sets. */
-	unsigned int p;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		if (set[p].nslots)
-			memset(set[p].vec, 0,
-			       sizeof(*set[p].vec) * set[p].nslots);
-		set[p].not = false;
-	}
+	clear_number_set_array(set, SUPPORTED_PERSONALITIES);
 
 	/*
 	 * Each leading ! character means inversion
@@ -221,16 +215,14 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set,
 	const char *s = str;
 handle_inversion:
 	while (*s == '!') {
-		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-			set[p].not = !set[p].not;
-		}
+		invert_number_set_array(set, SUPPORTED_PERSONALITIES);
 		++s;
 	}
 
 	if (strcmp(s, "none") == 0) {
 		/*
 		 * No syscall numbers are added to sets.
-		 * Subsequent is_number_in_set invocations
+		 * Subsequent is_number_in_set* invocations
 		 * will return set[p]->not.
 		 */
 		return;
@@ -274,9 +266,7 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	       string_to_uint_func func, const char *const name)
 {
 	/* Clear the set. */
-	if (set->nslots)
-		memset(set->vec, 0, sizeof(*set->vec) * set->nslots);
-	set->not = false;
+	clear_number_set_array(set, 1);
 
 	/*
 	 * Each leading ! character means inversion
@@ -285,14 +275,15 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	const char *s = str;
 handle_inversion:
 	while (*s == '!') {
-		set->not = !set->not;
+		invert_number_set_array(set, 1);
 		++s;
 	}
 
 	if (strcmp(s, "none") == 0) {
 		/*
 		 * No numbers are added to the set.
-		 * Subsequent is_number_in_set invocations will return set->not.
+		 * Subsequent is_number_in_set* invocations
+		 * will return set->not.
 		 */
 		return;
 	} else if (strcmp(s, "all") == 0) {

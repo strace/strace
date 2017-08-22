@@ -245,8 +245,8 @@ qualify_inject_common(const char *const str,
 		}
 	}
 
-	struct number_set tmp_set[SUPPORTED_PERSONALITIES];
-	memset(tmp_set, 0, sizeof(tmp_set));
+	struct number_set *tmp_set =
+		alloc_number_set_array(SUPPORTED_PERSONALITIES);
 	qualify_syscall_tokens(name, tmp_set, description);
 
 	free(buf);
@@ -257,9 +257,8 @@ qualify_inject_common(const char *const str,
 	 */
 	unsigned int p;
 	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		if (!tmp_set[p].nslots && !tmp_set[p].not) {
+		if (number_set_array_is_empty(tmp_set, p))
 			continue;
-		}
 
 		if (!inject_vec[p]) {
 			inject_vec[p] = xcalloc(nsyscall_vec[p],
@@ -268,14 +267,14 @@ qualify_inject_common(const char *const str,
 
 		unsigned int i;
 		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (is_number_in_set(i, &tmp_set[p])) {
-				add_number_to_set(i, &inject_set[p]);
+			if (is_number_in_set_array(i, tmp_set, p)) {
+				add_number_to_set_array(i, inject_set, p);
 				inject_vec[p][i] = opts;
 			}
 		}
-
-		free(tmp_set[p].vec);
 	}
+
+	free_number_set_array(tmp_set, SUPPORTED_PERSONALITIES);
 }
 
 static void
@@ -339,14 +338,14 @@ qualify(const char *str)
 unsigned int
 qual_flags(const unsigned int scno)
 {
-	return	(is_number_in_set(scno, &trace_set[current_personality])
+	return	(is_number_in_set_array(scno, trace_set, current_personality)
 		   ? QUAL_TRACE : 0)
-		| (is_number_in_set(scno, &abbrev_set[current_personality])
+		| (is_number_in_set_array(scno, abbrev_set, current_personality)
 		   ? QUAL_ABBREV : 0)
-		| (is_number_in_set(scno, &verbose_set[current_personality])
+		| (is_number_in_set_array(scno, verbose_set, current_personality)
 		   ? QUAL_VERBOSE : 0)
-		| (is_number_in_set(scno, &raw_set[current_personality])
+		| (is_number_in_set_array(scno, raw_set, current_personality)
 		   ? QUAL_RAW : 0)
-		| (is_number_in_set(scno, &inject_set[current_personality])
+		| (is_number_in_set_array(scno, inject_set, current_personality)
 		   ? QUAL_INJECT : 0);
 }

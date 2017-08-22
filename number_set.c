@@ -61,10 +61,25 @@ reallocate_number_set(struct number_set *const set, const unsigned int new_nslot
 }
 
 bool
+number_set_array_is_empty(const struct number_set *const set,
+			  const unsigned int idx)
+{
+	return !(set && (set[idx].nslots || set[idx].not));
+}
+
+bool
 is_number_in_set(const unsigned int number, const struct number_set *const set)
 {
 	return set && ((number / BITS_PER_SLOT < set->nslots)
 		&& number_isset(number, set->vec)) ^ set->not;
+}
+
+bool
+is_number_in_set_array(const unsigned int number, const struct number_set *const set,
+		       const unsigned int idx)
+{
+	return set && ((number / BITS_PER_SLOT < set[idx].nslots)
+		&& number_isset(number, set[idx].vec)) ^ set[idx].not;
 }
 
 void
@@ -72,4 +87,50 @@ add_number_to_set(const unsigned int number, struct number_set *const set)
 {
 	reallocate_number_set(set, number / BITS_PER_SLOT + 1);
 	number_setbit(number, set->vec);
+}
+
+void
+add_number_to_set_array(const unsigned int number, struct number_set *const set,
+			const unsigned int idx)
+{
+	add_number_to_set(number, &set[idx]);
+}
+
+void
+clear_number_set_array(struct number_set *const set, const unsigned int nmemb)
+{
+	unsigned int i;
+
+	for (i = 0; i < nmemb; ++i) {
+		if (set[i].nslots)
+			memset(set[i].vec, 0,
+			       sizeof(*set[i].vec) * set[i].nslots);
+		set[i].not = false;
+	}
+}
+
+void
+invert_number_set_array(struct number_set *const set, const unsigned int nmemb)
+{
+	unsigned int i;
+
+	for (i = 0; i < nmemb; ++i)
+		set[i].not = !set[i].not;
+}
+
+struct number_set *
+alloc_number_set_array(const unsigned int nmemb)
+{
+	return xcalloc(nmemb, sizeof(struct number_set));
+}
+
+void
+free_number_set_array(struct number_set *const set, unsigned int nmemb)
+{
+	while (nmemb) {
+		--nmemb;
+		free(set[nmemb].vec);
+		set[nmemb].vec = NULL;
+	}
+	free(set);
 }

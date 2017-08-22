@@ -37,10 +37,31 @@ struct number_set {
 };
 
 extern bool
+number_set_array_is_empty(const struct number_set *, unsigned int idx);
+
+extern bool
 is_number_in_set(unsigned int number, const struct number_set *);
+
+extern bool
+is_number_in_set_array(unsigned int number, const struct number_set *, unsigned int idx);
 
 extern void
 add_number_to_set(unsigned int number, struct number_set *);
+
+extern void
+add_number_to_set_array(unsigned int number, struct number_set *, unsigned int idx);
+
+extern void
+clear_number_set_array(struct number_set *, unsigned int nmemb);
+
+extern void
+invert_number_set_array(struct number_set *, unsigned int nmemb);
+
+extern struct number_set *
+alloc_number_set_array(unsigned int nmemb);
+
+extern void
+free_number_set_array(struct number_set *, unsigned int nmemb);
 
 extern struct number_set read_set;
 extern struct number_set write_set;
