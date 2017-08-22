@@ -284,6 +284,8 @@ strace_SOURCES =	\
 	statx.c		\
 	statx.h		\
 	strace.c	\
+	string_to_uint.h \
+	string_to_uint.c \
 	swapon.c	\
 	syscall.c	\
 	sysctl.c	\

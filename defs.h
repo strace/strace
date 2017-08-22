@@ -58,6 +58,7 @@
 #include "kernel_types.h"
 #include "macros.h"
 #include "mpers_type.h"
+#include "string_to_uint.h"
 #include "sysent.h"
 #include "xmalloc.h"
 
@@ -510,15 +511,6 @@ void dyxlat_add_pair(struct dyxlat *, uint64_t val, const char *str, size_t len)
 const struct xlat *genl_families_xlat(void);
 
 extern unsigned long get_pagesize(void);
-extern int
-string_to_uint_ex(const char *str, char **endptr,
-		  unsigned int max_val, const char *accepted_ending);
-extern int string_to_uint(const char *str);
-static inline int
-string_to_uint_upto(const char *const str, unsigned int max_val)
-{
-	return string_to_uint_ex(str, NULL, max_val, NULL);
-}
 extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
 
 /*
