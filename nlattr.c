@@ -204,6 +204,22 @@ decode_nla_meminfo(struct tcb *const tcp,
 	return true;
 }
 
+bool
+decode_nla_ifindex(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const unsigned int len,
+	       const void *const opaque_data)
+{
+	uint32_t ifindex;
+
+	if (len < sizeof(ifindex))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &ifindex))
+		print_ifindex(ifindex);
+
+	return true;
+}
+
 #define DECODE_NLA_INTEGER(name, type, fmt)		\
 bool							\
 decode_nla_ ## name(struct tcb *const tcp,		\

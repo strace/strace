@@ -58,6 +58,7 @@ DECL_NLA(s32);
 DECL_NLA(s64);
 DECL_NLA(str);
 DECL_NLA(strn);
+DECL_NLA(ifindex);
 DECL_NLA(meminfo);
 
 #endif /* !STRACE_NLATTR_H */
