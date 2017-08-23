@@ -104,6 +104,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_loop-v \
 	ioctl_nsfs \
 	ioctl_rtc-v \
+	is_linux_mips_n64 \
 	ksysent \
 	mmsg-silent \
 	mmsg_name-v \
