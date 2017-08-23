@@ -70,9 +70,23 @@ check_syscall()
 	check_e "invalid system call '$1'" -e fault="$2:when=4"
 }
 
+# Check different variations of new syntax.
+check_syscall_new()
+{
+	if [ -n "$2" ]; then
+		check_e "invalid system call '$1'" -e "syscall $2"
+		check_e "invalid system call '$1'" -e "(syscall $2)"
+		check_e "invalid system call '$1'" -e "((syscall $2))"
+		check_e "invalid system call '$1'" -e "((syscall none) or syscall $2)"
+		check_e "invalid system call '$1'" -e "((syscall  all) and syscall $2)"
+		check_e "invalid system call '$1'" -e "trace(syscall $2)"
+	fi
+}
+
 for arg in '' , ,, ,,, ; do
 	check_syscall "$arg" "$arg"
 	check_syscall "!$arg" "!$arg"
+	check_syscall_new "$arg" "$arg"
 done
 
 for arg in -1 -2 -3 -4 -5 \
@@ -89,10 +103,21 @@ for arg in -1 -2 -3 -4 -5 \
 	check_syscall "$arg" "$arg"
 	check_syscall "$arg" "!$arg"
 	check_syscall "$arg" "1,$arg"
+	check_syscall_new "$arg" "$arg"
 done
 
 for arg in '!chdir' none all; do
 	check_syscall "$arg" "1,$arg"
+	check_syscall_new "$arg" "1,$arg"
+done
+
+for arg in desc \
+	   file \
+	   memory \
+	   process \
+	   network \
+	   ; do
+	check_syscall_new "$arg" "$arg"
 done
 
 # invalid syscall, multiple syscalls
@@ -112,6 +137,8 @@ for arg in %desc \
 	check_syscall nonsense "!$arg,nonsense"
 	check_syscall nonsense "nonsense,$arg"
 	check_syscall nonsense "!nonsense,$arg"
+	check_syscall_new nonsense "$arg,nonsense"
+	check_syscall_new nonsense "nonsense,$arg"
 done
 
 check_e_using_grep 'regcomp: \+id: [[:alpha:]].+' -e trace='/+id'
@@ -119,3 +146,8 @@ check_e_using_grep 'regcomp: \*id: [[:alpha:]].+' -e trace='/*id'
 check_e_using_grep 'regcomp: \{id: [[:alpha:]].+' -e trace='/{id'
 check_e_using_grep 'regcomp: \(id: [[:alpha:]].+' -e trace='/(id'
 check_e_using_grep 'regcomp: \[id: [[:alpha:]].+' -e trace='/[id'
+check_e_using_grep 'regcomp: \+id: [[:alpha:]].+' -e 'trace(syscall /+id)'
+check_e_using_grep 'regcomp: \*id: [[:alpha:]].+' -e 'trace(syscall /*id)'
+check_e_using_grep 'regcomp: \{id: [[:alpha:]].+' -e 'trace(syscall /{id)'
+check_e_using_grep 'regcomp: \(id: [[:alpha:]].+' -e 'trace(syscall /\(id)'
+check_e_using_grep 'regcomp: \[id: [[:alpha:]].+' -e 'trace(syscall /[id)'
