@@ -40,10 +40,6 @@ fail_with()
 		"strace -e fault=$* failed to handle an argument error properly"
 }
 
-for arg in : :: ::: ; do
-	check_e "invalid system call ''" -e fault="$arg"
-done
-
 for arg in chdir:42 \!chdir:42 \
 	   chdir:42:when=7 \
 	   chdir:invalid \
