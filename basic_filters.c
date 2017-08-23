@@ -29,6 +29,7 @@
 #include "defs.h"
 #include "number_set.h"
 #include "filter.h"
+#include "syscall.h"
 #include <regex.h>
 
 static bool
@@ -356,15 +357,31 @@ parse_fd_filter(const char *str)
 	return set;
 }
 
-bool
-run_fd_filter(struct tcb *tcp, void *priv_data)
-{
-	int fd = tcp->u_arg[0];
-	struct number_set *set = priv_data;
+static bool
+is_fd_in_set(struct tcb *tcp, int fd, void *data) {
+	struct number_set *set = data;
 
 	if (fd < 0)
 		return false;
 	return is_number_in_set(fd, set);
+}
+
+bool
+run_fd_filter(struct tcb *tcp, void *priv_data)
+{
+	struct number_set *set = priv_data;
+
+	/*
+	 * mq_timedsend and mq_timedreceive are not marked as descriptor
+	 * syscalls, but they can be dumped with -e read/write.
+	*/
+	switch (tcp->s_ent->sen) {
+	case SEN_mq_timedsend:
+	case SEN_mq_timedreceive:
+		return is_fd_in_set(tcp, tcp->u_arg[0], set);
+	}
+
+	return match_fd_common(tcp, &is_fd_in_set, set);
 }
 
 void
