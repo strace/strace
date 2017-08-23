@@ -342,19 +342,21 @@ parse_fd_filter(const char *str)
 	return set;
 }
 
+static bool
+is_fd_in_set(struct tcb *tcp, int fd, void *data) {
+	return fd < 0 ? false : is_number_in_set(fd, data);
+}
+
 bool
 run_fd_filter(struct tcb *tcp, void *priv_data)
 {
-	int fd = tcp->u_arg[0];
-
-	return fd < 0 ? false : is_number_in_set(fd, priv_data);
+	return match_fd_common(tcp, &is_fd_in_set, priv_data);
 }
 
 void
 free_fd_filter(void *priv_data)
 {
 	free_number_set_array(priv_data, 1);
-	return;
 }
 
 void *
@@ -369,9 +371,7 @@ parse_path_filter(const char *path)
 bool
 run_path_filter(struct tcb *tcp, void *priv_data)
 {
-	struct path_set *set = priv_data;
-
-	return pathtrace_match_set(tcp, set);
+	return pathtrace_match_set(tcp, priv_data);
 }
 
 void

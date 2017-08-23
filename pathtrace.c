@@ -70,6 +70,8 @@ upathmatch(struct tcb *const tcp, const kernel_ulong_t upath,
 static bool
 fdmatch(struct tcb *tcp, int fd, struct path_set *set)
 {
+	if (fd < 0)
+		return false;
 	char path[PATH_MAX + 1];
 	int n = getfdpath(tcp, fd, path, sizeof(path));
 
@@ -143,9 +145,17 @@ pathtrace_select_set(const char *path, struct path_set *set)
 	storepath(rpath, set);
 }
 
+typedef bool (*match_fd_func)(struct tcb *, int, void *);
+
+static
+bool fdmatch_fd_func(struct tcb *tcp, int fd, void *data)
+{
+	return fdmatch(tcp, fd, (struct path_set *) data);
+}
+
 static bool
-match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
-		   struct path_set *set)
+match_xselect_args(struct tcb *tcp, match_fd_func func,
+		   const kernel_ulong_t *args, struct path_set *set)
 {
 	/* Kernel truncates arg[0] to int, we do the same. */
 	int nfds = (int) args[0];
@@ -167,7 +177,7 @@ match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
 			j = next_set_bit(fds, j, nfds);
 			if (j < 0)
 				break;
-			if (fdmatch(tcp, j, set)) {
+			if (func(tcp, j, set)) {
 				free(fds);
 				return true;
 			}
@@ -178,24 +188,14 @@ match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
 	return false;
 }
 
-/*
- * Return true if syscall accesses a selected path
- * (or if no paths have been specified for tracing).
- */
+/* Match fd with func. */
 bool
-pathtrace_match_set(struct tcb *tcp, struct path_set *set)
+match_fd_common(struct tcb *tcp, match_fd_func func, void *data)
 {
-	const struct_sysent *s;
+	const struct_sysent *s = tcp->s_ent;
 
-	s = tcp->s_ent;
-
-	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC | TRACE_NETWORK)))
+	if (!(s->sys_flags & (TRACE_DESC | TRACE_NETWORK)))
 		return false;
-
-	/*
-	 * Check for special cases where we need to do something
-	 * other than test arg[0].
-	 */
 
 	switch (s->sen) {
 	case SEN_dup2:
@@ -205,49 +205,17 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_sendfile64:
 	case SEN_tee:
 		/* fd, fd */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			fdmatch(tcp, tcp->u_arg[1], set);
+		return func(tcp, tcp->u_arg[0], data) ||
+			func(tcp, tcp->u_arg[1], data);
 
-	case SEN_execveat:
-	case SEN_faccessat:
-	case SEN_fchmodat:
-	case SEN_fchownat:
-	case SEN_fstatat64:
-	case SEN_futimesat:
-	case SEN_inotify_add_watch:
-	case SEN_mkdirat:
-	case SEN_mknodat:
-	case SEN_name_to_handle_at:
-	case SEN_newfstatat:
-	case SEN_openat:
-	case SEN_readlinkat:
-	case SEN_statx:
-	case SEN_unlinkat:
-	case SEN_utimensat:
-		/* fd, path */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			upathmatch(tcp, tcp->u_arg[1], set);
-
-	case SEN_link:
-	case SEN_mount:
-	case SEN_pivotroot:
-		/* path, path */
-		return upathmatch(tcp, tcp->u_arg[0], set) ||
-			upathmatch(tcp, tcp->u_arg[1], set);
-
-	case SEN_quotactl:
-	case SEN_symlink:
-		/* x, path */
-		return upathmatch(tcp, tcp->u_arg[1], set);
-
+	case SEN_copy_file_range:
 	case SEN_linkat:
 	case SEN_renameat2:
 	case SEN_renameat:
-		/* fd, path, fd, path */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			fdmatch(tcp, tcp->u_arg[2], set) ||
-			upathmatch(tcp, tcp->u_arg[1], set) ||
-			upathmatch(tcp, tcp->u_arg[3], set);
+	case SEN_splice:
+		/* fd, x, fd */
+		return func(tcp, tcp->u_arg[0], data) ||
+			func(tcp, tcp->u_arg[2], data);
 
 #if HAVE_ARCH_OLD_MMAP
 	case SEN_old_mmap:
@@ -258,7 +226,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		kernel_ulong_t *args =
 			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 6);
 
-		return args && fdmatch(tcp, args[4], set);
+		return args && func(tcp, args[4], data);
 	}
 #endif /* HAVE_ARCH_OLD_MMAP */
 
@@ -267,22 +235,15 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_mmap_pgoff:
 	case SEN_ARCH_mmap:
 		/* x, x, x, x, fd */
-		return fdmatch(tcp, tcp->u_arg[4], set);
+		return func(tcp, tcp->u_arg[4], data);
 
 	case SEN_symlinkat:
-		/* x, fd, path */
-		return fdmatch(tcp, tcp->u_arg[1], set) ||
-			upathmatch(tcp, tcp->u_arg[2], set);
-
-	case SEN_copy_file_range:
-	case SEN_splice:
-		/* fd, x, fd, x, x, x */
-		return fdmatch(tcp, tcp->u_arg[0], set) ||
-			fdmatch(tcp, tcp->u_arg[2], set);
+		/* x, fd, x */
+		return func(tcp, tcp->u_arg[1], data);
 
 	case SEN_epoll_ctl:
 		/* x, x, fd, x */
-		return fdmatch(tcp, tcp->u_arg[2], set);
+		return func(tcp, tcp->u_arg[2], data);
 
 
 	case SEN_fanotify_mark:
@@ -290,21 +251,22 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		/* x, x, mask (64 bit), fd, path */
 		unsigned long long mask = 0;
 		int argn = getllval(tcp, &mask, 2);
-		return fdmatch(tcp, tcp->u_arg[argn], set) ||
-			upathmatch(tcp, tcp->u_arg[argn + 1], set);
+
+		return func(tcp, tcp->u_arg[argn], data);
 	}
+
 #if HAVE_ARCH_OLD_SELECT
 	case SEN_oldselect:
 	{
 		kernel_ulong_t *args =
 			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 5);
 
-		return args && match_xselect_args(tcp, args, set);
+		return args && match_xselect_args(tcp, func, args, data);
 	}
 #endif
 	case SEN_pselect6:
 	case SEN_select:
-		return match_xselect_args(tcp, tcp->u_arg, set);
+		return match_xselect_args(tcp, func, tcp->u_arg, data);
 	case SEN_poll:
 	case SEN_ppoll:
 	{
@@ -325,16 +287,21 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		for (cur = start; cur < end; cur += sizeof(fds)) {
 			if (umove(tcp, cur, &fds))
 				break;
-			if (fdmatch(tcp, fds.fd, set))
+			if (func(tcp, fds.fd, data))
 				return true;
 		}
 
 		return false;
 	}
 
+	/*
+	 * These have TRACE_DESCRIPTOR or TRACE_NETWORK set,
+	 * but they don't have any file descriptor to test.
+	 */
 	case SEN_accept4:
 	case SEN_accept:
 	case SEN_bpf:
+	case SEN_creat:
 	case SEN_epoll_create:
 	case SEN_epoll_create1:
 	case SEN_eventfd2:
@@ -346,8 +313,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_mq_getsetattr:
 	case SEN_mq_notify:
 	case SEN_mq_open:
-	case SEN_mq_timedreceive:
-	case SEN_mq_timedsend:
+	case SEN_open:
 	case SEN_perf_event_open:
 	case SEN_pipe:
 	case SEN_pipe2:
@@ -360,10 +326,84 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_timerfd_gettime:
 	case SEN_timerfd_settime:
 	case SEN_userfaultfd:
-		/*
-		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,
-		 * but they don't have any file descriptor or path args to test.
-		 */
+		return false;
+	}
+	return func(tcp, tcp->u_arg[0], data);
+}
+
+/*
+ * Return true if syscall accesses a selected path
+ * (or if no paths have been specified for tracing).
+ */
+bool
+pathtrace_match_set(struct tcb *tcp, struct path_set *set)
+{
+	const struct_sysent *s;
+
+	s = tcp->s_ent;
+
+	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC | TRACE_NETWORK)))
+		return false;
+
+	if (match_fd_common(tcp, fdmatch_fd_func, set))
+		return true;
+
+	if (!(s->sys_flags & TRACE_FILE))
+		return false;
+	/*
+	 * Check for special cases where we need to do something
+	 * other than test arg[0].
+	 */
+	switch (s->sen) {
+	case SEN_execveat:
+	case SEN_faccessat:
+	case SEN_fchmodat:
+	case SEN_fchownat:
+	case SEN_fstatat64:
+	case SEN_futimesat:
+	case SEN_inotify_add_watch:
+	case SEN_mkdirat:
+	case SEN_mknodat:
+	case SEN_name_to_handle_at:
+	case SEN_newfstatat:
+	case SEN_openat:
+	case SEN_quotactl:
+	case SEN_readlinkat:
+	case SEN_symlink:
+	case SEN_statx:
+	case SEN_unlinkat:
+	case SEN_utimensat:
+		/* x, path */
+		return upathmatch(tcp, tcp->u_arg[1], set);
+
+	case SEN_link:
+	case SEN_mount:
+	case SEN_pivotroot:
+		/* path, path */
+		return upathmatch(tcp, tcp->u_arg[0], set) ||
+			upathmatch(tcp, tcp->u_arg[1], set);
+
+	case SEN_linkat:
+	case SEN_renameat2:
+	case SEN_renameat:
+		/* x, path, x, path */
+		return upathmatch(tcp, tcp->u_arg[1], set) ||
+			upathmatch(tcp, tcp->u_arg[3], set);
+
+	case SEN_symlinkat:
+		/* x, x, path */
+		return upathmatch(tcp, tcp->u_arg[2], set);
+
+	case SEN_fanotify_mark:
+	{
+		/* x, x, mask (64 bit), fd, path */
+		unsigned long long mask = 0;
+		int argn = getllval(tcp, &mask, 2);
+
+		return upathmatch(tcp, tcp->u_arg[argn + 1], set);
+	}
+
+	case SEN_printargs:
 		return false;
 	}
 
@@ -371,12 +411,5 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	 * Our fallback position for calls that haven't already
 	 * been handled is to just check arg[0].
 	 */
-
-	if (s->sys_flags & TRACE_FILE)
-		return upathmatch(tcp, tcp->u_arg[0], set);
-
-	if (s->sys_flags & (TRACE_DESC | TRACE_NETWORK))
-		return fdmatch(tcp, tcp->u_arg[0], set);
-
-	return false;
+	return upathmatch(tcp, tcp->u_arg[0], set);
 }

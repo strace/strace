@@ -47,6 +47,9 @@ void parse_inject_common_args(char *, struct inject_opts *,
 bool is_traced(struct tcb *);
 bool not_injected(struct tcb *);
 
+typedef bool (*match_fd_func)(struct tcb *, int, void *);
+int match_fd_common(struct tcb *, match_fd_func, void *);
+
 /* filter api */
 struct filter* add_filter_to_array(struct filter **, unsigned int *nfilters,
 				   const char *name);
