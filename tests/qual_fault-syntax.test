@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-. "${srcdir=.}/init.sh"
+. "${srcdir=.}/syntax.sh"
 
 #
 # F
@@ -40,16 +40,11 @@ fail_with()
 		"strace -e fault=$* failed to handle an argument error properly"
 }
 
-for arg in '' , ,, ,,, : :: ::: \! \!, \!: \
-	   invalid_syscall_name \
-	   invalid_syscall_name:when=3 \
-	   -1 \!-1 \
-	   -1:when=4 \
-	   -2 \
-	   -2:when=5 \
-	   32767 \!32767 \
-	   32767:when=6 \
-	   chdir:42 \!chdir:42 \
+for arg in : :: ::: ; do
+	check_e "invalid system call ''" -e fault="$arg"
+done
+
+for arg in chdir:42 \!chdir:42 \
 	   chdir:42:when=7 \
 	   chdir:invalid \
 	   chdir:invalid:when=8 \
@@ -92,12 +87,6 @@ for arg in '' , ,, ,,, : :: ::: \! \!, \!: \
 	   chdir:when=65536:error=30 \
 	   chdir:when=1+65536 \
 	   chdir:when=1+65536:error=31 \
-	   file,nonsense \
-	   \!desc,nonsense \
-	   chdir,nonsense \
-	   \!chdir,nonsense \
-	   1,nonsense \
-	   \!1,nonsense \
 	   chdir:retval=0 \
 	   chdir:signal=1 \
 	   chdir:error=1:error=2 \
