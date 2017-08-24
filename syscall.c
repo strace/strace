@@ -681,9 +681,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 			break;
 	}
 
-	if (!(tcp->qual_flg & QUAL_TRACE)
-	 || (tracing_paths && !pathtrace_match(tcp))
-	) {
+	if (!traced(tcp) || (tracing_paths && !pathtrace_match(tcp))) {
 		tcp->flags |= TCB_FILTERED;
 		return 0;
 	}
@@ -694,7 +692,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		return 0;
 	}
 
-	if (tcp->qual_flg & QUAL_INJECT)
+	if (inject(tcp))
 		tamper_with_syscall_entering(tcp, sig);
 
 	if (cflag == CFLAG_ONLY_STATS) {
@@ -710,8 +708,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 
 	printleader(tcp);
 	tprintf("%s(", tcp->s_ent->sys_name);
-	int res = (tcp->qual_flg & QUAL_RAW)
-		? printargs(tcp) : tcp->s_ent->sys_func(tcp);
+	int res = raw(tcp) ? printargs(tcp) : tcp->s_ent->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;
 }
@@ -805,7 +802,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 	tcp->s_prev_ent = tcp->s_ent;
 
 	int sys_res = 0;
-	if (tcp->qual_flg & QUAL_RAW) {
+	if (raw(tcp)) {
 		/* sys_res = printargs(tcp); - but it's nop on sysexit */
 	} else {
 	/* FIXME: not_failing_only (IOW, option -z) is broken:
@@ -828,7 +825,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 	tabto();
 	unsigned long u_error = tcp->u_error;
 
-	if (tcp->qual_flg & QUAL_RAW) {
+	if (raw(tcp)) {
 		if (u_error) {
 			tprintf("= -1 (errno %lu)", u_error);
 		} else {
