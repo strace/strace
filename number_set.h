@@ -28,6 +28,8 @@
 #ifndef STRACE_NUMBER_SET_H
 #define STRACE_NUMBER_SET_H
 
+#include "gcc_compat.h"
+
 struct number_set;
 
 extern bool
@@ -52,7 +54,7 @@ extern void
 invert_number_set_array(struct number_set *, unsigned int nmemb);
 
 extern struct number_set *
-alloc_number_set_array(unsigned int nmemb);
+alloc_number_set_array(unsigned int nmemb) ATTRIBUTE_MALLOC;
 
 extern void
 free_number_set_array(struct number_set *, unsigned int nmemb);
