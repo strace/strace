@@ -41,6 +41,13 @@ void *xcalloc(size_t nmemb, size_t size)
 void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
 void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 	ATTRIBUTE_ALLOC_SIZE((2, 3));
+
+/*
+ * Note that the following two functions return NULL when NULL is specified
+ * and not when allocation is failed, since, as the "x" prefix implies,
+ * the allocation failure leads to program termination, so we may re-purpose
+ * this return value and simplify the idiom "str ? xstrdup(str) : NULL".
+ */
 char *xstrdup(const char *str) ATTRIBUTE_MALLOC;
 char *xstrndup(const char *str, size_t n) ATTRIBUTE_MALLOC;
 

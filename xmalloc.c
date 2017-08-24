@@ -91,6 +91,9 @@ xreallocarray(void *ptr, size_t nmemb, size_t size)
 char *
 xstrdup(const char *str)
 {
+	if (!str)
+		return NULL;
+
 	char *p = strdup(str);
 
 	if (!p)
@@ -103,6 +106,9 @@ char *
 xstrndup(const char *str, size_t n)
 {
 	char *p;
+
+	if (!str)
+		return NULL;
 
 #ifdef HAVE_STRNDUP
 	p = strndup(str, n);
