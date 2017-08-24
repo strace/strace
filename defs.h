@@ -253,9 +253,6 @@ struct tcb {
 #define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
 #define QUAL_RAW	0x008	/* print all args in hex for this syscall */
 #define QUAL_INJECT	0x010	/* tamper with this system call on purpose */
-#define QUAL_SIGNAL	0x100	/* report events with this signal */
-#define QUAL_READ	0x200	/* dump data read from this file descriptor */
-#define QUAL_WRITE	0x400	/* dump data written to this file descriptor */
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
