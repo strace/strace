@@ -391,7 +391,7 @@
 [375] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [376] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [377] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
-[378] = { },
+[378] = { 2,	0,		SEN(printargs),			"s390_guarded_storage"	},
 [379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 
 #define SYS_socket_subcall	400
