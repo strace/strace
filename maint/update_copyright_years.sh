@@ -111,10 +111,10 @@ process_file()
 		continue
 	fi
 
-	last_commit_year=$(git log -n1 --format=format:%ad \
-		--date=format:%Y -- "$f")
-	first_commit_year=$(git log --reverse --format=format:%ad \
-		--date=format:%Y -- "$f" | head -n 1)
+	last_commit_year=$(date +%Y -d "$(git log -n1 --format=format:%aD \
+		-- "$f")")
+	first_commit_year=$(date +%Y -d "$(git log --reverse --format=format:%aD \
+		-- "$f" | head -n 1)")
 	copyright_year=$(printf '%s' "$copyright_year_raw" |
 		sort -r -n | head -n 1)
 	start_note='from git log'
