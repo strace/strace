@@ -578,7 +578,7 @@ dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t ar
 	case DM_DEV_SET_GEOMETRY:
 		return dm_known_ioctl(tcp, code, arg);
 	default:
-		return 0;
+		return RVAL_DECODED;
 	}
 }
 
@@ -587,7 +587,7 @@ dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t ar
 int
 dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
-	return 0;
+	return RVAL_DECODED;
 }
 
 # endif /* DM_VERSION_MAJOR == 4 */
