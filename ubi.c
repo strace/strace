@@ -67,7 +67,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 					CLAMP(mkvol.name_len, 0,
 					      UBI_MAX_VOLUME_NAME));
 			tprints("}");
-			return 1;
+			return 0;
 		}
 		if (!syserror(tcp)) {
 			tprints(" => ");
@@ -135,7 +135,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 				", max_beb_per1024=%" PRIi16 "}",
 				attach.ubi_num, attach.mtd_num,
 				attach.vid_hdr_offset, attach.max_beb_per1024);
-			return 1;
+			return 0;
 		}
 		if (!syserror(tcp)) {
 			tprints(" => ");

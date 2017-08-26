@@ -208,7 +208,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 
 		set_tcb_priv_data(tcp, ifc, free);
 
-		return 1;
+		return 0;
 	}
 
 	/* exiting */
@@ -344,7 +344,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 				tprints("{ifr_name=");
 				print_ifname(ifr.ifr_name);
 			}
-			return 1;
+			return 0;
 		} else {
 			if (syserror(tcp)) {
 				tprints("}");

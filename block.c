@@ -244,7 +244,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 			PRINT_FIELD_U(", ", buts, start_lba);
 			PRINT_FIELD_U(", ", buts, end_lba);
 			PRINT_FIELD_U(", ", buts, pid);
-			return 1;
+			return 0;
 		} else {
 			struct_blk_user_trace_setup buts;
 

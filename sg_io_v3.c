@@ -103,7 +103,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		set_tcb_priv_data(tcp, entering_sg_io, free);
 	}
 
-	return 1;
+	return 0;
 }
 
 static int

@@ -85,7 +85,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 				break;
 
 			tprintf("{n_samples=%u", sysoff.n_samples);
-			return 1;
+			return 0;
 		} else {
 			unsigned int n_samples, i;
 

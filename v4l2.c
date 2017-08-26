@@ -825,7 +825,9 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints("}");
 		return RVAL_DECODED | 1;
 	}
-	return 1;
+
+	/* entering */
+	return 0;
 }
 #endif /* VIDIOC_S_EXT_CTRLS */
 
