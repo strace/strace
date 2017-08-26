@@ -37,11 +37,7 @@ struct number_set *read_set;
 struct number_set *write_set;
 struct number_set *signal_set;
 
-static struct number_set *abbrev_set;
 static struct number_set *inject_set;
-static struct number_set *raw_set;
-static struct number_set *trace_set;
-static struct number_set *verbose_set;
 
 static int
 sigstr_to_uint(const char *s)
@@ -265,35 +261,38 @@ qualify_signals(const char *const str)
 }
 
 static void
+qualify_filter(const char *const str, const char *const action_name,
+	       const char *const filter_type)
+{
+	struct filter_action *action = find_or_add_action(action_name);
+	struct filter *filter = create_filter(action, filter_type);
+
+	parse_filter(filter, str);
+	set_qualify_mode(action);
+}
+
+static void
 qualify_trace(const char *const str)
 {
-	if (!trace_set)
-		trace_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, trace_set);
+	qualify_filter(str, "trace", "syscall");
 }
 
 static void
 qualify_abbrev(const char *const str)
 {
-	if (!abbrev_set)
-		abbrev_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, abbrev_set);
+	qualify_filter(str, "abbrev", "syscall");
 }
 
 static void
 qualify_verbose(const char *const str)
 {
-	if (!verbose_set)
-		verbose_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, verbose_set);
+	qualify_filter(str, "verbose", "syscall");
 }
 
 static void
 qualify_raw(const char *const str)
 {
-	if (!raw_set)
-		raw_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, raw_set);
+	qualify_filter(str, "raw", "syscall");
 }
 
 static void
@@ -420,14 +419,6 @@ qualify(const char *str)
 unsigned int
 qual_flags(const unsigned int scno)
 {
-	return	(is_number_in_set_array(scno, trace_set, current_personality)
-		   ? QUAL_TRACE : 0)
-		| (is_number_in_set_array(scno, abbrev_set, current_personality)
-		   ? QUAL_ABBREV : 0)
-		| (is_number_in_set_array(scno, verbose_set, current_personality)
-		   ? QUAL_VERBOSE : 0)
-		| (is_number_in_set_array(scno, raw_set, current_personality)
-		   ? QUAL_RAW : 0)
-		| (is_number_in_set_array(scno, inject_set, current_personality)
-		   ? QUAL_INJECT : 0);
+	return is_number_in_set_array(scno, inject_set, current_personality)
+	       ? QUAL_INJECT : 0;
 }

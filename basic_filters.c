@@ -255,6 +255,26 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set)
 		error_msg_and_die("invalid system call '%s'", str);
 }
 
+void *
+parse_syscall_filter(const char *str)
+{
+	struct number_set *set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
+	qualify_syscall_tokens(str, set);
+	return set;
+}
+
+bool
+run_syscall_filter(struct tcb *tcp, void *priv_data)
+{
+	return is_number_in_set_array(tcp->scno, priv_data, current_personality);
+}
+
+void
+free_syscall_filter(void *priv_data)
+{
+	free_number_set_array(priv_data, SUPPORTED_PERSONALITIES);
+}
+
 /*
  * Add numbers to SET according to STR specification.
  */
