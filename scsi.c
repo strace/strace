@@ -78,7 +78,7 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 			id.h_cmd_per_lun,
 			id.d_queue_depth);
 	}
-	return RVAL_DECODED | 1;
+	return 1;
 }
 
 #endif /* HAVE_SCSI_SG_H */

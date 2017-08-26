@@ -111,12 +111,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 		/* print i/o fields fetched on entering syscall */
 		PRINT_FIELD_X(", ", *entering_sg_io, response);
 		PRINT_FIELD_X(", ", *entering_sg_io, din_xferp);
-		return RVAL_DECODED | 1;
+		return 1;
 	}
 
 	if (sg_io.guard != entering_sg_io->guard) {
 		PRINT_FIELD_U(" => ", sg_io, guard);
-		return RVAL_DECODED | 1;
+		return 1;
 	}
 
 	PRINT_FIELD_U(", ", sg_io, response_len);
@@ -138,7 +138,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_D(", ", sg_io, dout_resid);
 	PRINT_FIELD_X(", ", sg_io, generated_tag);
 
-	return RVAL_DECODED | 1;
+	return 1;
 }
 
 #else /* !HAVE_LINUX_BSG_H */

@@ -117,12 +117,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (entering_sg_io->dxfer_direction == SG_DXFER_FROM_DEV)
 			PRINT_FIELD_PTR(", ", *entering_sg_io, dxferp);
 		PRINT_FIELD_PTR(", ", *entering_sg_io, sbp);
-		return RVAL_DECODED | 1;
+		return 1;
 	}
 
 	if (sg_io.interface_id != entering_sg_io->interface_id) {
 		PRINT_FIELD_U(" => ", sg_io, interface_id);
-		return RVAL_DECODED | 1;
+		return 1;
 	}
 
 	if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV ||
@@ -155,7 +155,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(", ", sg_io, duration);
 	PRINT_FIELD_FLAGS(", ", sg_io, info, sg_io_info, "SG_INFO_???");
 
-	return RVAL_DECODED | 1;
+	return 1;
 }
 
 #else /* !HAVE_SCSI_SG_H */
