@@ -363,13 +363,15 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_DECODED | 1;
 		}
-	} else {
-		if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-			const char *delim = is_get ? ", " : " => ";
-			print_v4l2_format_fmt(tcp, delim, &f);
-		}
-		tprints("}");
+
+		return 0;
 	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &f))
+		print_v4l2_format_fmt(tcp, is_get ? ", " : " => ", &f);
+
+	tprints("}");
+
 	return 1;
 }
 
@@ -425,31 +427,35 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		printxval(v4l2_buf_types, b.type, "V4L2_BUF_TYPE_???");
 		if (code != VIDIOC_DQBUF)
 			tprintf(", index=%u", b.index);
-	} else {
-		if (!syserror(tcp) && umove(tcp, arg, &b) == 0) {
-			if (code == VIDIOC_DQBUF)
-				tprintf(", index=%u", b.index);
-			tprints(", memory=");
-			printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
 
-			if (b.memory == V4L2_MEMORY_MMAP) {
-				tprintf(", m.offset=%#x", b.m.offset);
-			} else if (b.memory == V4L2_MEMORY_USERPTR) {
-				tprints(", m.userptr=");
-				printaddr(b.m.userptr);
-			}
-
-			tprintf(", length=%u, bytesused=%u, flags=",
-				b.length, b.bytesused);
-			printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
-			if (code == VIDIOC_DQBUF) {
-				tprints(", timestamp = ");
-				MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
-			}
-			tprints(", ...");
-		}
-		tprints("}");
+		return 0;
 	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &b)) {
+		if (code == VIDIOC_DQBUF)
+			tprintf(", index=%u", b.index);
+		tprints(", memory=");
+		printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
+
+		if (b.memory == V4L2_MEMORY_MMAP) {
+			tprintf(", m.offset=%#x", b.m.offset);
+		} else if (b.memory == V4L2_MEMORY_USERPTR) {
+			tprints(", m.userptr=");
+			printaddr(b.m.userptr);
+		}
+
+		tprintf(", length=%u, bytesused=%u, flags=",
+			b.length, b.bytesused);
+		printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
+		if (code == VIDIOC_DQBUF) {
+			tprints(", timestamp = ");
+			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
+		}
+		tprints(", ...");
+	}
+
+	tprints("}");
+
 	return 1;
 }
 
@@ -561,15 +567,19 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_DECODED | 1;
 		tprintf("{index=%u", s.index);
-	} else {
-		if (!syserror(tcp) && !umove(tcp, arg, &s)) {
-			PRINT_FIELD_CSTRING(", ", s, name);
-			tprintf(", frameperiod=" FMT_FRACT,
-				ARGS_FRACT(s.frameperiod));
-			tprintf(", framelines=%d", s.framelines);
-		}
-		tprints("}");
+
+		return 0;
 	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
+		PRINT_FIELD_CSTRING(", ", s, name);
+		tprintf(", frameperiod=" FMT_FRACT,
+			ARGS_FRACT(s.frameperiod));
+		tprintf(", framelines=%d", s.framelines);
+	}
+
+	tprints("}");
+
 	return 1;
 }
 
@@ -585,15 +595,18 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &i))
 			return RVAL_DECODED | 1;
 		tprintf("{index=%u", i.index);
-	} else {
-		if (!syserror(tcp) && !umove(tcp, arg, &i)) {
-			PRINT_FIELD_CSTRING(", ", i, name);
-			tprints(", type=");
-			printxval(v4l2_input_types, i.type,
-				  "V4L2_INPUT_TYPE_???");
-		}
-		tprints("}");
+
+		return 0;
 	}
+
+	if (!syserror(tcp) && !umove(tcp, arg, &i)) {
+		PRINT_FIELD_CSTRING(", ", i, name);
+		tprints(", type=");
+		printxval(v4l2_input_types, i.type, "V4L2_INPUT_TYPE_???");
+	}
+
+	tprints("}");
+
 	return 1;
 }
 
@@ -622,6 +635,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	tprints("}");
+
 	return 1;
 }
 
@@ -729,8 +743,10 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 			return RVAL_DECODED | 1;
 		tprints("{type=");
 		printxval(v4l2_buf_types, c.type, "V4L2_BUF_TYPE_???");
+
 		return 0;
 	}
+
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
 		tprintf(", bounds=" FMT_RECT
 			", defrect=" FMT_RECT
@@ -739,7 +755,9 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 			ARGS_RECT(c.defrect),
 			ARGS_FRACT(c.pixelaspect));
 	}
+
 	tprints("}");
+
 	return 1;
 }
 
@@ -764,6 +782,7 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	tprints("}");
+
 	return RVAL_DECODED | 1;
 }
 
@@ -896,6 +915,7 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprintf(", width=%u, height=%u", f.width, f.height);
 		return 0;
 	}
+
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
 		tprints(", type=");
 		printxval(v4l2_frameinterval_types, f.type,
@@ -915,7 +935,9 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 			break;
 		}
 	}
+
 	tprints("}");
+
 	return 1;
 }
 #endif /* VIDIOC_ENUM_FRAMEINTERVALS */
@@ -924,6 +946,9 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 {
+	static const char fmt[] = "{index=%u, count=%u}";
+	static char outstr[sizeof(fmt) + sizeof(int) * 6];
+
 	struct_v4l2_create_buffers b;
 
 	if (entering(tcp)) {
@@ -939,16 +964,15 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 				      (struct_v4l2_format *) &b.format);
 		tprints("}}");
 		return 0;
-	} else {
-		static const char fmt[] = "{index=%u, count=%u}";
-		static char outstr[sizeof(fmt) + sizeof(int) * 6];
-
-		if (syserror(tcp) || umove(tcp, arg, &b) < 0)
-			return 1;
-		sprintf(outstr, fmt, b.index, b.count);
-		tcp->auxstr = outstr;
-		return 1 + RVAL_STR;
 	}
+
+	if (syserror(tcp) || umove(tcp, arg, &b))
+		return 1;
+
+	sprintf(outstr, fmt, b.index, b.count);
+	tcp->auxstr = outstr;
+
+	return 1 | RVAL_STR;
 }
 #endif /* VIDIOC_CREATE_BUFS */
 
@@ -1000,7 +1024,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_STD: /* W */
 		tprints(", ");
 		printnum_int64(tcp, arg, "%#" PRIx64);
-		return RVAL_DECODED | 1;
+		break;
 
 	case VIDIOC_ENUMSTD: /* RW */
 		return print_v4l2_standard(tcp, arg);
@@ -1026,7 +1050,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_INPUT: /* RW */
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
-		return RVAL_DECODED | 1;
+		break;
 
 	case VIDIOC_CROPCAP: /* RW */
 		return print_v4l2_cropcap(tcp, arg);
@@ -1061,4 +1085,6 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	default:
 		return RVAL_DECODED;
 	}
+
+	return RVAL_DECODED | 1;
 }
