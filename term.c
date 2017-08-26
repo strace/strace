@@ -42,7 +42,6 @@ static void
 decode_termios(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct termios tios;
-	int i;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &tios))
@@ -65,10 +64,9 @@ decode_termios(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!(tios.c_lflag & ICANON))
 		tprintf("c_cc[VMIN]=%d, c_cc[VTIME]=%d, ",
 			tios.c_cc[VMIN], tios.c_cc[VTIME]);
-	tprints("c_cc=\"");
-	for (i = 0; i < NCCS; i++)
-		tprintf("\\x%02x", tios.c_cc[i]);
-	tprints("\"}");
+	tprints("c_cc=");
+	print_quoted_string((char *) tios.c_cc, NCCS, QUOTE_FORCE_HEX);
+	tprints("}");
 }
 
 static void
