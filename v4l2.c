@@ -382,23 +382,31 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (entering(tcp)) {
 		tprints(", ");
+
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_DECODED | 1;
-		tprintf("{count=%u, type=", reqbufs.count);
+
+		tprintf("{type=");
 		printxval(v4l2_buf_types, reqbufs.type, "V4L2_BUF_TYPE_???");
 		tprints(", memory=");
 		printxval(v4l2_memories, reqbufs.memory, "V4L2_MEMORY_???");
-		tprints("}");
-		return 0;
-	} else {
-		static char outstr[sizeof("{count=}") + sizeof(int) * 3];
+		tprintf(", count=%u", reqbufs.count);
 
-		if (syserror(tcp) || umove(tcp, arg, &reqbufs) < 0)
-			return 1;
-		sprintf(outstr, "{count=%u}", reqbufs.count);
-		tcp->auxstr = outstr;
-		return 1 + RVAL_STR;
+		return 0;
 	}
+
+	if (!syserror(tcp)) {
+		tprints(" => ");
+
+		if (!umove(tcp, arg, &reqbufs))
+			tprintf("%u", reqbufs.count);
+		else
+			tprints("???");
+	}
+
+	tprints("}");
+
+	return 1;
 }
 
 #include "xlat/v4l2_buf_flags.h"

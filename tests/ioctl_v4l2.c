@@ -502,12 +502,12 @@ main(void)
 	struct v4l2_requestbuffers *const p_v4l2_requestbuffers =
 		page + size - sizeof(*p_v4l2_requestbuffers);
 	ioctl(-1, VIDIOC_REQBUFS, p_v4l2_requestbuffers);
-	printf("ioctl(-1, VIDIOC_REQBUFS, {count=%u, type=%#x"
-	       " /* V4L2_BUF_TYPE_??? */, memory=%#x /* V4L2_MEMORY_??? */})"
+	printf("ioctl(-1, VIDIOC_REQBUFS, {type=%#x /* V4L2_BUF_TYPE_??? */, "
+	       "memory=%#x /* V4L2_MEMORY_??? */, count=%u})"
 	       " = -1 EBADF (%m)\n",
-	       p_v4l2_requestbuffers->count,
 	       p_v4l2_requestbuffers->type,
-	       p_v4l2_requestbuffers->memory);
+	       p_v4l2_requestbuffers->memory,
+	       p_v4l2_requestbuffers->count);
 
 	/* VIDIOC_QUERYBUF */
 	ioctl(-1, VIDIOC_QUERYBUF, 0);
