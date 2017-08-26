@@ -308,16 +308,12 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	tcp->currpers = personality;
 
 # undef PERSONALITY_NAMES
-# if defined POWERPC64
+# if defined POWERPC64 || defined AARCH64 || defined TILE
 #  define PERSONALITY_NAMES {"64 bit", "32 bit"}
 # elif defined X86_64
 #  define PERSONALITY_NAMES {"64 bit", "32 bit", "x32"}
 # elif defined X32
 #  define PERSONALITY_NAMES {"x32", "32 bit"}
-# elif defined AARCH64
-#  define PERSONALITY_NAMES {"64 bit", "32 bit"}
-# elif defined TILE
-#  define PERSONALITY_NAMES {"64-bit", "32-bit"}
 # endif
 # ifdef PERSONALITY_NAMES
 	if (!qflag) {
