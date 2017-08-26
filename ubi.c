@@ -61,9 +61,11 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 				mkvol.alignment, (int64_t)mkvol.bytes);
 			printxval(ubi_volume_types,
 				    (uint8_t) mkvol.vol_type, "UBI_???_VOLUME");
-			tprintf(", name_len=%" PRIi16 ", name=", mkvol.name_len);
+			tprintf(", name_len=%" PRIi16 ", name=",
+				mkvol.name_len);
 			print_quoted_cstring(mkvol.name,
-					CLAMP(mkvol.name_len, 0, UBI_MAX_VOLUME_NAME));
+					CLAMP(mkvol.name_len, 0,
+					      UBI_MAX_VOLUME_NAME));
 			tprints("}");
 			return 1;
 		}
@@ -101,7 +103,8 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 				", name=", rnvol.ents[c].vol_id,
 				rnvol.ents[c].name_len);
 			print_quoted_cstring(rnvol.ents[c].name,
-					CLAMP(rnvol.ents[c].name_len, 0, UBI_MAX_VOLUME_NAME));
+					CLAMP(rnvol.ents[c].name_len, 0,
+					      UBI_MAX_VOLUME_NAME));
 			tprints("}");
 		}
 		tprints("]}");
