@@ -88,6 +88,7 @@ strace_SOURCES =	\
 	affinity.c	\
 	aio.c		\
 	alpha.c		\
+	basic_actions.c	\
 	basic_filters.c	\
 	bind.c		\
 	bjm.c		\
@@ -136,7 +137,10 @@ strace_SOURCES =	\
 	fetch_struct_statfs.c \
 	file_handle.c	\
 	file_ioctl.c	\
+	filter_action.c	\
+	filter_expression.c \
 	filter_qualify.c \
+	filter.c	\
 	filter.h	\
 	flock.c		\
 	flock.h		\

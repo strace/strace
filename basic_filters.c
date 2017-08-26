@@ -258,6 +258,32 @@ handle_inversion:
 	}
 }
 
+void *
+parse_syscall_filter(const char *str)
+{
+	struct number_set *set;
+
+	set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
+	qualify_syscall_tokens(str, set, "system call");
+	return set;
+}
+
+bool
+run_syscall_filter(struct tcb *tcp, void *priv_data)
+{
+	struct number_set *set = priv_data;
+
+	return is_number_in_set_array(tcp->scno, set, current_personality);
+}
+
+void
+free_syscall_filter(void *priv_data)
+{
+	struct number_set *set = priv_data;
+
+	free_number_set_array(set, SUPPORTED_PERSONALITIES);
+}
+
 /*
  * Add numbers to SET according to STR specification.
  */
