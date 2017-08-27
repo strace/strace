@@ -333,3 +333,26 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	if (number < 0)
 		error_msg_and_die("invalid %s '%s'", name, str);
 }
+
+void *
+parse_fd_filter(const char *str)
+{
+	struct number_set *set = alloc_number_set_array(1);
+	qualify_tokens(str, set, string_to_uint, "descriptor");
+	return set;
+}
+
+bool
+run_fd_filter(struct tcb *tcp, void *priv_data)
+{
+	int fd = tcp->u_arg[0];
+
+	return fd < 0 ? false : is_number_in_set(fd, priv_data);
+}
+
+void
+free_fd_filter(void *priv_data)
+{
+	free_number_set_array(priv_data, 1);
+	return;
+}

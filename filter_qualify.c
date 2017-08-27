@@ -33,8 +33,6 @@
 #include "delay.h"
 #include "retval.h"
 
-struct number_set *read_set;
-struct number_set *write_set;
 struct number_set *signal_set;
 
 static int
@@ -252,22 +250,6 @@ parse_inject_common_args(char *const str, struct inject_opts *const opts,
 }
 
 static void
-qualify_read(const char *const str)
-{
-	if (!read_set)
-		read_set = alloc_number_set_array(1);
-	qualify_tokens(str, read_set, string_to_uint, "descriptor");
-}
-
-static void
-qualify_write(const char *const str)
-{
-	if (!write_set)
-		write_set = alloc_number_set_array(1);
-	qualify_tokens(str, write_set, string_to_uint, "descriptor");
-}
-
-static void
 qualify_signals(const char *const str)
 {
 	if (!signal_set)
@@ -284,6 +266,18 @@ qualify_filter(const char *const str, const char *const action_name,
 
 	parse_filter(filter, str);
 	set_qualify_mode(action);
+}
+
+static void
+qualify_read(const char *const str)
+{
+	qualify_filter(str, "read", "fd");
+}
+
+static void
+qualify_write(const char *const str)
+{
+	qualify_filter(str, "write", "fd");
 }
 
 static void

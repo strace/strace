@@ -110,3 +110,15 @@ parse_fault(const char *str)
 {
 	return parse_inject_common(str, true, "fault");
 }
+
+void
+apply_read(struct tcb *tcp, void *_priv_data)
+{
+	tcp->qual_flg |= QUAL_READ;
+}
+
+void
+apply_write(struct tcb *tcp, void *_priv_data)
+{
+	tcp->qual_flg |= QUAL_WRITE;
+}

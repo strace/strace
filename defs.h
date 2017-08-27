@@ -268,6 +268,8 @@ struct tcb {
 #define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
 #define QUAL_RAW	0x008	/* print all args in hex for this syscall */
 #define QUAL_INJECT	0x010	/* tamper with this system call on purpose */
+#define QUAL_READ	0x020	/* dump data read in this syscall */
+#define QUAL_WRITE	0x040	/* dump data written in this syscall */
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
@@ -277,6 +279,8 @@ struct tcb {
 #define traced(tcp)	((tcp)->qual_flg & QUAL_TRACE)
 #define verbose(tcp)	((tcp)->qual_flg & QUAL_VERBOSE)
 #define abbrev(tcp)	((tcp)->qual_flg & QUAL_ABBREV)
+#define dump_read(tcp)	((tcp)->qual_flg & QUAL_READ)
+#define dump_write(tcp)	((tcp)->qual_flg & QUAL_WRITE)
 #define raw(tcp)	((tcp)->qual_flg & QUAL_RAW)
 #define inject(tcp)	((tcp)->qual_flg & QUAL_INJECT)
 #define filtered(tcp)	((tcp)->flags & TCB_FILTERED)

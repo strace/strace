@@ -47,6 +47,8 @@ static const struct filter_action_type {
 	FILTER_ACTION_TYPE(raw,		2, QUAL_RAW,		NULL,	is_traced),
 	FILTER_ACTION_TYPE(abbrev,	2, QUAL_ABBREV,		NULL,	is_traced),
 	FILTER_ACTION_TYPE(verbose,	2, QUAL_VERBOSE,	NULL,	is_traced),
+	FILTER_ACTION_TYPE(read,	2, QUAL_READ,		NULL,	is_traced),
+	FILTER_ACTION_TYPE(write,	2, QUAL_WRITE,		NULL,	is_traced),
 };
 #undef FILTER_ACTION_TYPE
 
