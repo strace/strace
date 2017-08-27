@@ -37,6 +37,12 @@
 
 #include "xlat/rtnl_nsid_attrs.h"
 
+static const nla_decoder_t rtgenmsg_nla_decoders[] = {
+	[NETNSA_NSID]	= decode_nla_s32,
+	[NETNSA_PID]	= decode_nla_u32,
+	[NETNSA_FD]	= decode_nla_u32
+};
+
 DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg)
 {
 	struct rtgenmsg rtgenmsg = { .rtgen_family = family };
@@ -48,6 +54,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg)
 	if (len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      rtnl_nsid_attrs, "NETNSA_???", NULL, 0, NULL);
+			      rtnl_nsid_attrs, "NETNSA_???",
+			      rtgenmsg_nla_decoders,
+			      ARRAY_SIZE(rtgenmsg_nla_decoders), NULL);
 	}
 }
