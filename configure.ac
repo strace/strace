@@ -382,6 +382,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/genetlink.h
 	linux/hiddev.h
 	linux/if_addr.h
+	linux/if_link.h
 	linux/ip_vs.h
 	linux/ipc.h
 	linux/mmtimer.h
@@ -451,6 +452,12 @@ AC_CHECK_TYPES(m4_normalize([
 	struct rta_mfc_stats,
 	struct rtvia
 ]),,, [#include <linux/rtnetlink.h>])
+
+AC_CHECK_TYPES([struct rtnl_link_stats64],,, [#include <linux/if_link.h>])
+AC_CHECK_MEMBERS(m4_normalize([
+	struct rtnl_link_stats.rx_nohandler,
+	struct rtnl_link_stats64.rx_nohandler
+]),,, [#include <linux/if_link.h>])
 
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS(m4_normalize([
