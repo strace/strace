@@ -42,7 +42,10 @@ typedef int (*string_to_uint_func)(const char *);
 void qualify_tokens(const char *str, struct number_set *set,
 		    string_to_uint_func func, const char *name);
 void qualify_syscall_tokens(const char *str, struct number_set *set);
+void parse_inject_common_args(char *, struct inject_opts *,
+			      const bool fault_tokens_only, bool qualify_mode);
 bool is_traced(struct tcb *);
+bool not_injected(struct tcb *);
 
 /* filter api */
 struct filter* add_filter_to_array(struct filter **, unsigned int *nfilters,
@@ -56,6 +59,7 @@ void set_filters_qualify_mode(struct filter **, unsigned int *nfilters);
 struct filter *create_filter(struct filter_action *, const char *name);
 struct filter_action *find_or_add_action(const char *);
 void set_qualify_mode(struct filter_action *);
+void set_filter_action_priv_data(struct filter_action *, void *);
 
 /* filter expression api */
 struct bool_expression *create_expression();
@@ -83,6 +87,8 @@ DECL_FILTER_ACTION(trace);
 DECL_FILTER_ACTION(raw);
 DECL_FILTER_ACTION(abbrev);
 DECL_FILTER_ACTION(verbose);
+DECL_FILTER_ACTION(inject);
+DECL_FILTER_ACTION(fault);
 #undef DECL_FILTER_ACTION
 
 #define DECL_FILTER_ACTION_PARSER(name)					\
@@ -91,6 +97,8 @@ parse_ ## name(const char *);						\
 /* End of DECL_FILTER_ACTION_PARSER definition. */
 
 #define parse_NULL NULL
+DECL_FILTER_ACTION_PARSER(inject);
+DECL_FILTER_ACTION_PARSER(fault);
 #undef DECL_FILTER_ACTION_PARSER
 
 #endif /* !STRACE_FILTER_H */

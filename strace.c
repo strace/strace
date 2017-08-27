@@ -2415,7 +2415,8 @@ trace_syscall(struct tcb *tcp, unsigned int *sig)
 		case 0:
 			return 0;
 		case 1:
-			filter_syscall(tcp);
+			if (!tcp->qual_flg)
+				filter_syscall(tcp);
 			res = syscall_entering_trace(tcp, sig);
 		}
 		syscall_entering_finish(tcp, res);

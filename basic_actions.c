@@ -34,6 +34,12 @@ is_traced(struct tcb *tcp)
 	return traced(tcp);
 }
 
+bool
+not_injected(struct tcb *tcp)
+{
+	return !inject(tcp);
+}
+
 void
 apply_trace(struct tcb *tcp, void *priv_data)
 {
@@ -56,4 +62,51 @@ void
 apply_verbose(struct tcb *tcp, void *priv_data)
 {
 	tcp->qual_flg |= QUAL_VERBOSE;
+}
+
+void
+apply_inject(struct tcb *tcp, void *priv_data)
+{
+	struct inject_opts *opts = priv_data;
+
+	tcp->qual_flg |= QUAL_INJECT;
+	if (!tcp->inject_vec[current_personality])
+		tcp->inject_vec[current_personality] =
+			xcalloc(nsyscalls, sizeof(struct inject_opts));
+	if (scno_in_range(tcp->scno)
+	    && !tcp->inject_vec[current_personality][tcp->scno].data.flags)
+		tcp->inject_vec[current_personality][tcp->scno] = *opts;
+}
+
+static void *
+parse_inject_common(const char *str, bool fault_tokens_only,
+		    const char *description)
+{
+	struct inject_opts *opts = xmalloc(sizeof(struct inject_opts));
+	char *copy = xstrdup(str);
+
+	parse_inject_common_args(copy, opts, fault_tokens_only, false);
+	if (!opts->data.flags)
+		error_msg_and_die("invalid %s argument '%s'",
+				  description, str ? str : "");
+	free(copy);
+	return opts;
+}
+
+void *
+parse_inject(const char *str)
+{
+	return parse_inject_common(str, false, "inject");
+}
+
+void
+apply_fault(struct tcb *tcp, void *priv_data)
+{
+	apply_inject(tcp, priv_data);
+}
+
+void *
+parse_fault(const char *str)
+{
+	return parse_inject_common(str, true, "fault");
 }

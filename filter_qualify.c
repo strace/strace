@@ -37,8 +37,6 @@ struct number_set *read_set;
 struct number_set *write_set;
 struct number_set *signal_set;
 
-static struct number_set *inject_set;
-
 static int
 sigstr_to_uint(const char *s)
 {
@@ -216,24 +214,41 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 	return true;
 }
 
-static const char *
-parse_inject_expression(char *const str,
-			struct inject_opts *const fopts,
-			const bool fault_tokens_only)
+void
+parse_inject_common_args(char *const str, struct inject_opts *const opts,
+			 const bool fault_tokens_only, const bool qualify_mode)
 {
-	if (str[0] == '\0' || str[0] == ':')
-		return "";
-
 	char *saveptr = NULL;
-	const char *name = strtok_r(str, ":", &saveptr);
+	const char *delim = qualify_mode ? ":" : ";";
 
-	char *token;
-	while ((token = strtok_r(NULL, ":", &saveptr))) {
-		if (!parse_inject_token(token, fopts, fault_tokens_only))
-			return NULL;
+	*opts = (struct inject_opts) {
+		.first = 1,
+		.step = 1,
+		.data = {
+			.delay_idx = -1
+		}
+	};
+
+	for (char *token = str ? strtok_r(str, delim, &saveptr) : NULL;
+	     token; token = strtok_r(NULL, delim, &saveptr)) {
+		if (!parse_inject_token(token, opts, fault_tokens_only)) {
+			/* return an error by resetting inject flags */
+			opts->data.flags = 0;
+			return;
+		}
 	}
 
-	return name;
+	/* If neither of retval, error, signal or delay is specified, then ... */
+	if (!opts->data.flags) {
+		if (fault_tokens_only) {
+			/* in fault= syntax the default error code is ENOSYS. */
+			opts->data.rval_idx = retval_new(ENOSYS);
+			opts->data.flags |= INJECT_F_ERROR;
+		} else {
+			/* in inject= syntax this is not allowed. */
+			return;
+		}
+	}
 }
 
 static void
@@ -300,75 +315,39 @@ qualify_inject_common(const char *const str,
 		      const bool fault_tokens_only,
 		      const char *const description)
 {
-	struct inject_opts opts = {
-		.first = 1,
-		.step = 1,
-		.data = {
-			.delay_idx = -1
-		}
-	};
+	struct inject_opts *opts = xmalloc(sizeof(struct inject_opts));
 	char *copy = xstrdup(str);
-	const char *name =
-		parse_inject_expression(copy, &opts, fault_tokens_only);
-	if (!name)
-		error_msg_and_die("invalid %s '%s'", description, str);
+	char *args = strchr(copy, ':');
+	struct filter_action *action;
+	struct filter *filter;
 
-	struct number_set *tmp_set =
-		alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(name, tmp_set);
+	if (args)
+		*(args++) = '\0';
 
+	action = find_or_add_action(fault_tokens_only ? "fault" : "inject");
+	filter = create_filter(action, "syscall");
+	parse_filter(filter, copy);
+	set_qualify_mode(action);
+	parse_inject_common_args(args, opts, fault_tokens_only, true);
+
+	if (!opts->data.flags)
+		error_msg_and_die("invalid %s argument '%s'", description,
+				  args ? args : "");
 	free(copy);
 
-	/* If neither of retval, error, signal or delay is specified, then ... */
-	if (!opts.data.flags) {
-		if (fault_tokens_only) {
-			/* in fault= syntax the default error code is ENOSYS. */
-			opts.data.rval_idx = retval_new(ENOSYS);
-			opts.data.flags |= INJECT_F_ERROR;
-		} else {
-			/* in inject= syntax this is not allowed. */
-			error_msg_and_die("invalid %s '%s'", description, str);
-		}
-	}
-
-	/*
-	 * Initialize inject_vec according to tmp_set.
-	 * Merge tmp_set into inject_set.
-	 */
-	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		if (number_set_array_is_empty(tmp_set, p))
-			continue;
-
-		if (!inject_set) {
-			inject_set =
-				alloc_number_set_array(SUPPORTED_PERSONALITIES);
-		}
-		if (!inject_vec[p]) {
-			inject_vec[p] = xcalloc(nsyscall_vec[p],
-						sizeof(*inject_vec[p]));
-		}
-
-		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
-			if (is_number_in_set_array(i, tmp_set, p)) {
-				add_number_to_set_array(i, inject_set, p);
-				inject_vec[p][i] = opts;
-			}
-		}
-	}
-
-	free_number_set_array(tmp_set, SUPPORTED_PERSONALITIES);
+	set_filter_action_priv_data(action, opts);
 }
 
 static void
 qualify_fault(const char *const str)
 {
-	qualify_inject_common(str, true, "fault argument");
+	qualify_inject_common(str, true, "fault");
 }
 
 static void
 qualify_inject(const char *const str)
 {
-	qualify_inject_common(str, false, "inject argument");
+	qualify_inject_common(str, false, "inject");
 }
 
 static const struct qual_options {
@@ -414,11 +393,4 @@ qualify(const char *str)
 	}
 
 	opt->qualify(str);
-}
-
-unsigned int
-qual_flags(const unsigned int scno)
-{
-	return is_number_in_set_array(scno, inject_set, current_personality)
-	       ? QUAL_INJECT : 0;
 }

@@ -914,7 +914,6 @@ extern void print_ifindex(unsigned int);
 extern void print_bpf_filter_code(const uint16_t code, bool extended);
 
 extern void qualify(const char *);
-extern unsigned int qual_flags(const unsigned int);
 extern void filtering_parsing_finish(void);
 extern void filter_syscall(struct tcb *);
 
