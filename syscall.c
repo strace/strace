@@ -342,7 +342,6 @@ decode_socket_subcall(struct tcb *tcp)
 		return;
 
 	tcp->scno = scno;
-	tcp->qual_flg = qual_flags(scno);
 	tcp->s_ent = &sysent[scno];
 
 	unsigned int i;
@@ -382,7 +381,6 @@ decode_ipc_subcall(struct tcb *tcp)
 	}
 
 	tcp->scno = SYS_ipc_subcall + call;
-	tcp->qual_flg = qual_flags(tcp->scno);
 	tcp->s_ent = &sysent[tcp->scno];
 
 	const unsigned int n = tcp->s_ent->nargs;
@@ -399,7 +397,6 @@ decode_mips_subcall(struct tcb *tcp)
 	if (!scno_is_valid(tcp->u_arg[0]))
 		return;
 	tcp->scno = tcp->u_arg[0];
-	tcp->qual_flg = qual_flags(tcp->scno);
 	tcp->s_ent = &sysent[tcp->scno];
 	memmove(&tcp->u_arg[0], &tcp->u_arg[1],
 		sizeof(tcp->u_arg) - sizeof(tcp->u_arg[0]));
@@ -537,8 +534,6 @@ static void get_error(struct tcb *, const bool);
 static int arch_set_error(struct tcb *);
 static int arch_set_success(struct tcb *);
 
-struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
-
 static struct inject_opts *
 tcb_inject_opts(struct tcb *tcp)
 {
@@ -550,14 +545,6 @@ tcb_inject_opts(struct tcb *tcp)
 static long
 tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 {
-	if (!tcp->inject_vec[current_personality]) {
-		tcp->inject_vec[current_personality] =
-			xcalloc(nsyscalls, sizeof(**inject_vec));
-		memcpy(tcp->inject_vec[current_personality],
-		       inject_vec[current_personality],
-		       nsyscalls * sizeof(**inject_vec));
-	}
-
 	struct inject_opts *opts = tcb_inject_opts(tcp);
 
 	if (!opts || opts->first == 0)
@@ -1195,7 +1182,8 @@ get_scno(struct tcb *tcp)
 
 	if (scno_is_valid(tcp->scno)) {
 		tcp->s_ent = &sysent[tcp->scno];
-		tcp->qual_flg = qual_flags(tcp->scno);
+		/* Clear qual_flg to distinguish valid syscall from printargs */
+		tcp->qual_flg = 0;
 	} else {
 		struct sysent_buf *s = xcalloc(1, sizeof(*s));
 

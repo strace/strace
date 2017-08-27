@@ -42,6 +42,8 @@ static const struct filter_action_type {
 	void (*apply)(struct tcb *, void *);
 } action_types[] = {
 	FILTER_ACTION_TYPE(trace,	0, QUAL_TRACE,		null,	NULL),
+	FILTER_ACTION_TYPE(inject,	1, QUAL_INJECT,		inject,	not_injected),
+	FILTER_ACTION_TYPE(fault,	1, QUAL_INJECT,		fault,	not_injected),
 	FILTER_ACTION_TYPE(raw,		2, QUAL_RAW,		null,	is_traced),
 	FILTER_ACTION_TYPE(abbrev,	2, QUAL_ABBREV,		null,	is_traced),
 	FILTER_ACTION_TYPE(verbose,	2, QUAL_VERBOSE,	null,	is_traced),
@@ -180,4 +182,11 @@ filter_syscall(struct tcb *tcp)
 
 	for (i = 0; i < nfilter_actions; ++i)
 		run_filter_action(tcp, &filter_actions[i]);
+}
+
+void
+set_filter_action_priv_data(struct filter_action *action, void *priv_data)
+{
+	if (action)
+		action->priv_data = priv_data;
 }

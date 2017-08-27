@@ -648,7 +648,6 @@ print_struct_statfs64(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size);
 extern void print_ifindex(unsigned int);
 
 extern void qualify(const char *);
-extern unsigned int qual_flags(const unsigned int);
 extern void filtering_parsing_finish(void);
 extern void filter_syscall(struct tcb *);
 
