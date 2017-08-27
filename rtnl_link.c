@@ -38,6 +38,7 @@
 #endif
 #include <linux/rtnetlink.h>
 
+#include "xlat/rtnl_ifla_brport_attrs.h"
 #include "xlat/rtnl_link_attrs.h"
 
 static bool
@@ -86,6 +87,76 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 #endif
 		tprints("}");
 	}
+
+	return true;
+}
+
+static bool
+decode_ifla_bridge_id(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+#ifdef HAVE_STRUCT_IFLA_BRIDGE_ID
+	struct ifla_bridge_id id;
+
+	if (len < sizeof(id))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &id)) {
+		tprintf("{prio=[%u, %u], addr=%02x:%02x:%02x:%02x:%02x:%02x}",
+			id.prio[0], id.prio[1],
+			id.addr[0], id.addr[1], id.addr[2],
+			id.addr[3], id.addr[4], id.addr[5]);
+	}
+
+	return true;
+#else
+	return false;
+#endif
+}
+
+static const nla_decoder_t ifla_brport_nla_decoders[] = {
+	[IFLA_BRPORT_STATE]			= decode_nla_u8,
+	[IFLA_BRPORT_PRIORITY]			= decode_nla_u16,
+	[IFLA_BRPORT_COST]			= decode_nla_u32,
+	[IFLA_BRPORT_MODE]			= decode_nla_u8,
+	[IFLA_BRPORT_GUARD]			= decode_nla_u8,
+	[IFLA_BRPORT_PROTECT]			= decode_nla_u8,
+	[IFLA_BRPORT_FAST_LEAVE]		= decode_nla_u8,
+	[IFLA_BRPORT_LEARNING]			= decode_nla_u8,
+	[IFLA_BRPORT_UNICAST_FLOOD]		= decode_nla_u8,
+	[IFLA_BRPORT_PROXYARP]			= decode_nla_u8,
+	[IFLA_BRPORT_LEARNING_SYNC]		= decode_nla_u8,
+	[IFLA_BRPORT_PROXYARP_WIFI]		= decode_nla_u8,
+	[IFLA_BRPORT_ROOT_ID]			= decode_ifla_bridge_id,
+	[IFLA_BRPORT_BRIDGE_ID]			= decode_ifla_bridge_id,
+	[IFLA_BRPORT_DESIGNATED_PORT]		= decode_nla_u16,
+	[IFLA_BRPORT_DESIGNATED_COST]		= decode_nla_u16,
+	[IFLA_BRPORT_ID]			= decode_nla_u16,
+	[IFLA_BRPORT_NO]			= decode_nla_u16,
+	[IFLA_BRPORT_TOPOLOGY_CHANGE_ACK]	= decode_nla_u8,
+	[IFLA_BRPORT_CONFIG_PENDING]		= decode_nla_u8,
+	[IFLA_BRPORT_MESSAGE_AGE_TIMER]		= decode_nla_u64,
+	[IFLA_BRPORT_FORWARD_DELAY_TIMER]	= decode_nla_u64,
+	[IFLA_BRPORT_HOLD_TIMER]		= decode_nla_u64,
+	[IFLA_BRPORT_FLUSH]			= NULL,
+	[IFLA_BRPORT_MULTICAST_ROUTER]		= decode_nla_u8,
+	[IFLA_BRPORT_PAD]			= NULL,
+	[IFLA_BRPORT_MCAST_FLOOD]		= decode_nla_u8,
+	[IFLA_BRPORT_MCAST_TO_UCAST]		= decode_nla_u8,
+	[IFLA_BRPORT_VLAN_TUNNEL]		= decode_nla_u8,
+	[IFLA_BRPORT_BCAST_FLOOD]		= decode_nla_u8
+};
+
+static bool
+decode_ifla_protinfo(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_brport_attrs,
+		      "IFLA_BRPORT_???", ifla_brport_nla_decoders,
+		      ARRAY_SIZE(ifla_brport_nla_decoders), opaque_data);
 
 	return true;
 }
@@ -181,7 +252,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_PRIORITY]		= NULL, /* unused */
 	[IFLA_MASTER]		= decode_nla_u32,
 	[IFLA_WIRELESS]		= NULL, /* unimplemented */
-	[IFLA_PROTINFO]		= NULL, /* unimplemented */
+	[IFLA_PROTINFO]		= decode_ifla_protinfo,
 	[IFLA_TXQLEN]		= decode_nla_u32,
 	[IFLA_MAP]		= decode_rtnl_link_ifmap,
 	[IFLA_WEIGHT]		= decode_nla_u32,

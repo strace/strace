@@ -460,7 +460,10 @@ AC_CHECK_TYPES(m4_normalize([
 	struct ndt_stats
 ]),,, [#include <linux/neighbour.h>])
 
-AC_CHECK_TYPES([struct rtnl_link_stats64],,, [#include <linux/if_link.h>])
+AC_CHECK_TYPES(m4_normalize([
+	struct ifla_bridge_id,
+	struct rtnl_link_stats64
+]),,, [#include <linux/if_link.h>])
 AC_CHECK_MEMBERS(m4_normalize([
 	struct rtnl_link_stats.rx_nohandler,
 	struct rtnl_link_stats64.rx_nohandler
