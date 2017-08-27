@@ -42,6 +42,54 @@
 #include "xlat/neighbor_cache_entry_states.h"
 #include "xlat/rtnl_neigh_attrs.h"
 
+static bool
+decode_neigh_addr(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	const struct ndmsg *const ndmsg = opaque_data;
+
+	decode_inet_addr(tcp, addr, len, ndmsg->ndm_family, NULL);
+
+	return true;
+}
+
+static bool
+decode_nda_cacheinfo(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	struct nda_cacheinfo ci;
+
+	if (len < sizeof(ci))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &ci)) {
+		PRINT_FIELD_U("{", ci, ndm_confirmed);
+		PRINT_FIELD_U(", ", ci, ndm_used);
+		PRINT_FIELD_U(", ", ci, ndm_updated);
+		PRINT_FIELD_U(", ", ci, ndm_refcnt);
+		tprints("}");
+	}
+
+	return true;
+}
+
+static const nla_decoder_t ndmsg_nla_decoders[] = {
+	[NDA_DST]		= decode_neigh_addr,
+	[NDA_LLADDR]		= decode_neigh_addr,
+	[NDA_CACHEINFO]		= decode_nda_cacheinfo,
+	[NDA_PROBES]		= decode_nla_u32,
+	[NDA_VLAN]		= decode_nla_u16,
+	[NDA_PORT]		= decode_nla_be16,
+	[NDA_VNI]		= decode_nla_u32,
+	[NDA_IFINDEX]		= decode_nla_ifindex,
+	[NDA_MASTER]		= decode_nla_ifindex,
+	[NDA_LINK_NETNSID]	= decode_nla_u32,
+	[NDA_SRC_VNI]		= NULL,
+};
+
 DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 {
 	struct ndmsg ndmsg = { .ndm_family = family };
@@ -74,7 +122,9 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      rtnl_neigh_attrs, "NDA_???", NULL, 0, NULL);
+			      rtnl_neigh_attrs, "NDA_???",
+			      ndmsg_nla_decoders,
+			      ARRAY_SIZE(ndmsg_nla_decoders), &ndmsg);
 	}
 }
 

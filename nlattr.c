@@ -31,6 +31,8 @@
 #include <endian.h>
 #include "netlink.h"
 #include "nlattr.h"
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <linux/sock_diag.h>
 
 static bool
@@ -217,6 +219,22 @@ decode_nla_ifindex(struct tcb *const tcp,
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ifindex))
 		print_ifindex(ifindex);
+
+	return true;
+}
+
+bool
+decode_nla_be16(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+	uint16_t num;
+
+	if (len < sizeof(num))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &num))
+		tprintf("htons(%u)", ntohs(num));
 
 	return true;
 }
