@@ -31,10 +31,14 @@
 #ifdef HAVE_LINUX_FIB_RULES_H
 
 # include <stdio.h>
+# include <inttypes.h>
 # include "test_nlattr.h"
 # include <linux/fib_rules.h>
 # include <linux/ip.h>
 # include <linux/rtnetlink.h>
+
+#define FRA_TUN_ID 12
+#define FRA_UID_RANGE 20
 
 static void
 init_rtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -88,6 +92,31 @@ main(void)
 		     nla_type, nla_type_str,
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
+
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_rtmsg, print_rtmsg,
+		    FRA_DST, 4, pattern, 4,
+		    print_quoted_hex(pattern, 4));
+
+#ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
+	static const struct fib_rule_uid_range range = {
+		.start = 0xabcdedad,
+		.end = 0xbcdeadba
+	};
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_UID_RANGE, pattern, range,
+			   PRINT_FIELD_U("{", range, start);
+			   PRINT_FIELD_U(", ", range, end);
+			   printf("}"));
+#endif
+#if defined HAVE_BE64TOH || defined be64toh
+	const uint64_t tun_id = 0xabcdcdbeedabadef;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_TUN_ID, pattern, tun_id,
+			   printf("htobe64(%" PRIu64 ")", be64toh(tun_id)));
+#endif
 
 	puts("+++ exited with 0 +++");
 	return 0;
