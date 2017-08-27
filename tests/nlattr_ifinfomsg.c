@@ -29,11 +29,17 @@
 #include "tests.h"
 
 #include <stdio.h>
+#include <stddef.h>
 #include "test_nlattr.h"
 
 #include <linux/if.h>
 #include <linux/if_arp.h>
+#ifdef HAVE_LINUX_IF_LINK_H
+# include <linux/if_link.h>
+#endif
 #include <linux/rtnetlink.h>
+
+#define IFLA_LINK_NETNSID 37
 
 static void
 init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -84,6 +90,227 @@ main(void)
 		     nla_type, nla_type_str,
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
+
+	const int32_t netnsid = 0xacbdabda;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_ifinfomsg, print_ifinfomsg,
+			   IFLA_LINK_NETNSID, pattern, netnsid,
+			   printf("%d", netnsid));
+
+	static const struct rtnl_link_stats st = {
+		.rx_packets = 0xabcdefac,
+		.tx_packets = 0xbcdacdab,
+		.rx_bytes = 0xcdbafaab,
+		.tx_bytes = 0xdafabadb,
+		.rx_errors = 0xeabcdaeb,
+		.tx_errors = 0xfefabeab,
+		.rx_dropped = 0xadbafafb,
+		.tx_dropped = 0xbdffabda,
+		.multicast = 0xcdabdfea,
+		.collisions = 0xefadbaeb,
+		.rx_length_errors = 0xfabffabd,
+		.rx_over_errors = 0xafbafabc,
+		.rx_crc_errors = 0xbfdabdad,
+		.rx_frame_errors = 0xcfdabfad,
+		.rx_fifo_errors = 0xddfdebad,
+		.rx_missed_errors = 0xefabdcba,
+		.tx_aborted_errors = 0xefdadbfa,
+		.tx_carrier_errors = 0xfaefbada,
+		.tx_fifo_errors = 0xaebdffab,
+		.tx_heartbeat_errors = 0xbadebaaf,
+		.tx_window_errors = 0xcdafbada,
+		.rx_compressed = 0xdeffadbd,
+		.tx_compressed = 0xefdadfab
+	};
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_ifinfomsg, print_ifinfomsg,
+			   IFLA_STATS, pattern, st,
+			   PRINT_FIELD_U("{", st, rx_packets);
+			   PRINT_FIELD_U(", ", st, tx_packets);
+			   PRINT_FIELD_U(", ", st, rx_bytes);
+			   PRINT_FIELD_U(", ", st, tx_bytes);
+			   PRINT_FIELD_U(", ", st, rx_errors);
+			   PRINT_FIELD_U(", ", st, tx_errors);
+			   PRINT_FIELD_U(", ", st, rx_dropped);
+			   PRINT_FIELD_U(", ", st, tx_dropped);
+			   PRINT_FIELD_U(", ", st, multicast);
+			   PRINT_FIELD_U(", ", st, collisions);
+			   PRINT_FIELD_U(", ", st, rx_length_errors);
+			   PRINT_FIELD_U(", ", st, rx_over_errors);
+			   PRINT_FIELD_U(", ", st, rx_crc_errors);
+			   PRINT_FIELD_U(", ", st, rx_frame_errors);
+			   PRINT_FIELD_U(", ", st, rx_fifo_errors);
+			   PRINT_FIELD_U(", ", st, rx_missed_errors);
+			   PRINT_FIELD_U(", ", st, tx_aborted_errors);
+			   PRINT_FIELD_U(", ", st, tx_carrier_errors);
+			   PRINT_FIELD_U(", ", st, tx_fifo_errors);
+			   PRINT_FIELD_U(", ", st, tx_heartbeat_errors);
+			   PRINT_FIELD_U(", ", st, tx_window_errors);
+			   PRINT_FIELD_U(", ", st, rx_compressed);
+			   PRINT_FIELD_U(", ", st, tx_compressed);
+#ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
+			   PRINT_FIELD_U(", ", st, rx_nohandler);
+#endif
+			   printf("}"));
+
+#ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
+	const unsigned int sizeof_stats =
+		offsetofend(struct rtnl_link_stats, tx_compressed);
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_STATS, sizeof_stats, &st, sizeof_stats,
+		    PRINT_FIELD_U("{", st, rx_packets);
+		    PRINT_FIELD_U(", ", st, tx_packets);
+		    PRINT_FIELD_U(", ", st, rx_bytes);
+		    PRINT_FIELD_U(", ", st, tx_bytes);
+		    PRINT_FIELD_U(", ", st, rx_errors);
+		    PRINT_FIELD_U(", ", st, tx_errors);
+		    PRINT_FIELD_U(", ", st, rx_dropped);
+		    PRINT_FIELD_U(", ", st, tx_dropped);
+		    PRINT_FIELD_U(", ", st, multicast);
+		    PRINT_FIELD_U(", ", st, collisions);
+		    PRINT_FIELD_U(", ", st, rx_length_errors);
+		    PRINT_FIELD_U(", ", st, rx_over_errors);
+		    PRINT_FIELD_U(", ", st, rx_crc_errors);
+		    PRINT_FIELD_U(", ", st, rx_frame_errors);
+		    PRINT_FIELD_U(", ", st, rx_fifo_errors);
+		    PRINT_FIELD_U(", ", st, rx_missed_errors);
+		    PRINT_FIELD_U(", ", st, tx_aborted_errors);
+		    PRINT_FIELD_U(", ", st, tx_carrier_errors);
+		    PRINT_FIELD_U(", ", st, tx_fifo_errors);
+		    PRINT_FIELD_U(", ", st, tx_heartbeat_errors);
+		    PRINT_FIELD_U(", ", st, tx_window_errors);
+		    PRINT_FIELD_U(", ", st, rx_compressed);
+		    PRINT_FIELD_U(", ", st, tx_compressed);
+		    printf("}"));
+#endif /* HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER */
+
+	static const struct rtnl_link_ifmap map = {
+		.mem_start = 0xadcbefedefbcdedb,
+		.mem_end = 0xefcbeabdecdcdefa,
+		.base_addr = 0xaddbeabdfaacdbae,
+		.irq = 0xefaf,
+		.dma = 0xab,
+		.port = 0xcd
+	};
+	const unsigned int sizeof_ifmap =
+		offsetofend(struct rtnl_link_ifmap, port);
+	const unsigned int plen = sizeof_ifmap - 1 > DEFAULT_STRLEN
+				  ? DEFAULT_STRLEN
+				  : (int) sizeof_ifmap - 1;
+	/* len < sizeof_ifmap */
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_MAP, plen, pattern, plen,
+		    print_quoted_hex(pattern, plen));
+
+	/* short read of sizeof_ifmap */
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_MAP, sizeof_ifmap, &map, sizeof_ifmap - 1,
+		    printf("%p", RTA_DATA(TEST_NLATTR_nla)));
+
+	/* sizeof_ifmap */
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_MAP, sizeof_ifmap, &map, sizeof_ifmap,
+		    PRINT_FIELD_X("{", map, mem_start);
+		    PRINT_FIELD_X(", ", map, mem_end);
+		    PRINT_FIELD_X(", ", map, base_addr);
+		    PRINT_FIELD_U(", ", map, irq);
+		    PRINT_FIELD_U(", ", map, dma);
+		    PRINT_FIELD_U(", ", map, port);
+		    printf("}"));
+
+#ifdef HAVE_STRUCT_RTNL_LINK_STATS64
+	static const struct rtnl_link_stats64 st64 = {
+		.rx_packets = 0xadcbefedefbcdedb,
+		.tx_packets = 0xbdabdedabdcdeabd,
+		.rx_bytes = 0xcdbaefbaeadfabec,
+		.tx_bytes = 0xdbaedbafabbeacdb,
+		.rx_errors = 0xefabfdaefabaefab,
+		.tx_errors = 0xfaebfabfabbaeabf,
+		.rx_dropped = 0xacdbaedbadbabeba,
+		.tx_dropped = 0xbcdeffebdabeadbe,
+		.multicast = 0xeeffbaeabaeffabe,
+		.collisions = 0xffbaefcefbafacef,
+		.rx_length_errors = 0xaabbdeabceffdecb,
+		.rx_over_errors = 0xbbdcdadebadeaeed,
+		.rx_crc_errors= 0xccdeabecefaedbef,
+		.rx_frame_errors = 0xddbedaedebcedaef,
+		.rx_fifo_errors = 0xeffbadefafdaeaab,
+		.rx_missed_errors = 0xfefaebccceadeecd,
+		.tx_aborted_errors = 0xabcdadefcdadef,
+		.tx_carrier_errors = 0xbccdafaeeaaefe,
+		.tx_fifo_errors = 0xcddefdbedeadce,
+		.tx_heartbeat_errors = 0xedaededdadcdea,
+		.tx_window_errors = 0xfdacdeaccedcda,
+		.rx_compressed = 0xacdbbcacdbccef,
+		.tx_compressed = 0xbcdadefcdedfea
+	};
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_ifinfomsg, print_ifinfomsg,
+			   IFLA_STATS64, pattern, st64,
+			   PRINT_FIELD_U("{", st64, rx_packets);
+			   PRINT_FIELD_U(", ", st64, tx_packets);
+			   PRINT_FIELD_U(", ", st64, rx_bytes);
+			   PRINT_FIELD_U(", ", st64, tx_bytes);
+			   PRINT_FIELD_U(", ", st64, rx_errors);
+			   PRINT_FIELD_U(", ", st64, tx_errors);
+			   PRINT_FIELD_U(", ", st64, rx_dropped);
+			   PRINT_FIELD_U(", ", st64, tx_dropped);
+			   PRINT_FIELD_U(", ", st64, multicast);
+			   PRINT_FIELD_U(", ", st64, collisions);
+			   PRINT_FIELD_U(", ", st64, rx_length_errors);
+			   PRINT_FIELD_U(", ", st64, rx_over_errors);
+			   PRINT_FIELD_U(", ", st64, rx_crc_errors);
+			   PRINT_FIELD_U(", ", st64, rx_frame_errors);
+			   PRINT_FIELD_U(", ", st64, rx_fifo_errors);
+			   PRINT_FIELD_U(", ", st64, rx_missed_errors);
+			   PRINT_FIELD_U(", ", st64, tx_aborted_errors);
+			   PRINT_FIELD_U(", ", st64, tx_carrier_errors);
+			   PRINT_FIELD_U(", ", st64, tx_fifo_errors);
+			   PRINT_FIELD_U(", ", st64, tx_heartbeat_errors);
+			   PRINT_FIELD_U(", ", st64, tx_window_errors);
+			   PRINT_FIELD_U(", ", st64, rx_compressed);
+			   PRINT_FIELD_U(", ", st64, tx_compressed);
+#ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
+			   PRINT_FIELD_U(", ", st64, rx_nohandler);
+#endif
+			   printf("}"));
+
+#ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
+	const unsigned int sizeof_stats64 =
+		offsetofend(struct rtnl_link_stats64, tx_compressed);
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_STATS64, sizeof_stats64, &st64, sizeof_stats64,
+		    PRINT_FIELD_U("{", st64, rx_packets);
+		    PRINT_FIELD_U(", ", st64, tx_packets);
+		    PRINT_FIELD_U(", ", st64, rx_bytes);
+		    PRINT_FIELD_U(", ", st64, tx_bytes);
+		    PRINT_FIELD_U(", ", st64, rx_errors);
+		    PRINT_FIELD_U(", ", st64, tx_errors);
+		    PRINT_FIELD_U(", ", st64, rx_dropped);
+		    PRINT_FIELD_U(", ", st64, tx_dropped);
+		    PRINT_FIELD_U(", ", st64, multicast);
+		    PRINT_FIELD_U(", ", st64, collisions);
+		    PRINT_FIELD_U(", ", st64, rx_length_errors);
+		    PRINT_FIELD_U(", ", st64, rx_over_errors);
+		    PRINT_FIELD_U(", ", st64, rx_crc_errors);
+		    PRINT_FIELD_U(", ", st64, rx_frame_errors);
+		    PRINT_FIELD_U(", ", st64, rx_fifo_errors);
+		    PRINT_FIELD_U(", ", st64, rx_missed_errors);
+		    PRINT_FIELD_U(", ", st64, tx_aborted_errors);
+		    PRINT_FIELD_U(", ", st64, tx_carrier_errors);
+		    PRINT_FIELD_U(", ", st64, tx_fifo_errors);
+		    PRINT_FIELD_U(", ", st64, tx_heartbeat_errors);
+		    PRINT_FIELD_U(", ", st64, tx_window_errors);
+		    PRINT_FIELD_U(", ", st64, rx_compressed);
+		    PRINT_FIELD_U(", ", st64, tx_compressed);
+		    printf("}"));
+#endif /* HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER */
+#endif /* HAVE_STRUCT_RTNL_LINK_STATS64 */
 
 	puts("+++ exited with 0 +++");
 	return 0;
