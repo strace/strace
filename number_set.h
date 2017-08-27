@@ -59,8 +59,6 @@ alloc_number_set_array(unsigned int nmemb) ATTRIBUTE_MALLOC;
 extern void
 free_number_set_array(struct number_set *, unsigned int nmemb);
 
-extern struct number_set *read_set;
-extern struct number_set *write_set;
 extern struct number_set *signal_set;
 
 #endif /* !STRACE_NUMBER_SET_H */

@@ -345,3 +345,33 @@ handle_inversion:
 		error_msg_and_die("invalid %s '%s'", name, str);
 	}
 }
+
+void *
+parse_fd_filter(const char *str)
+{
+	struct number_set *set;
+
+	set = alloc_number_set_array(1);
+	qualify_tokens(str, set, string_to_uint, "descriptor");
+	return set;
+}
+
+bool
+run_fd_filter(struct tcb *tcp, void *priv_data)
+{
+	int fd = tcp->u_arg[0];
+	struct number_set *set = priv_data;
+
+	if (fd < 0)
+		return false;
+	return is_number_in_set(fd, set);
+}
+
+void
+free_fd_filter(void *priv_data)
+{
+	struct number_set *set = priv_data;
+
+	free_number_set_array(set, 1);
+	return;
+}

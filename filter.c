@@ -40,6 +40,7 @@ static const struct filter_type {
 	void (*free_priv_data)(void *);
 } filter_types[] = {
 	FILTER_TYPE(syscall),
+	FILTER_TYPE(fd),
 };
 #undef FILTER_TYPE
 

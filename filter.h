@@ -78,6 +78,7 @@ free_ ## name ## _filter(void *)					\
 /* End of DECL_FILTER definition. */
 
 DECL_FILTER(syscall);
+DECL_FILTER(fd);
 #undef DECL_FILTER
 
 #define DECL_FILTER_ACTION(name)					\
@@ -91,6 +92,8 @@ DECL_FILTER_ACTION(abbrev);
 DECL_FILTER_ACTION(verbose);
 DECL_FILTER_ACTION(inject);
 DECL_FILTER_ACTION(fault);
+DECL_FILTER_ACTION(read);
+DECL_FILTER_ACTION(write);
 #undef DECL_FILTER_ACTION
 
 #define DECL_FILTER_ACTION_PARSER(name)					\
