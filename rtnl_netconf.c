@@ -40,6 +40,16 @@
 
 # include "xlat/rtnl_netconf_attrs.h"
 
+static const nla_decoder_t netconfmsg_nla_decoders[] = {
+	[NETCONFA_IFINDEX]			= decode_nla_ifindex,
+	[NETCONFA_FORWARDING]			= decode_nla_s32,
+	[NETCONFA_RP_FILTER]			= decode_nla_s32,
+	[NETCONFA_MC_FORWARDING]		= decode_nla_s32,
+	[NETCONFA_PROXY_NEIGH]			= decode_nla_s32,
+	[NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN]	= decode_nla_s32,
+	[NETCONFA_INPUT]			= decode_nla_s32
+};
+
 DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 {
 	struct netconfmsg ncm = { .ncm_family = family };
@@ -52,7 +62,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_netconf_attrs, "NETCONFA_???",
-			      NULL, 0, NULL);
+			      netconfmsg_nla_decoders,
+			      ARRAY_SIZE(netconfmsg_nla_decoders), NULL);
 	}
 }
 
