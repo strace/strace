@@ -29,11 +29,15 @@
 #include "tests.h"
 
 #include <stdio.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include "test_nlattr.h"
 #ifdef HAVE_LINUX_NEIGHBOUR_H
 # include <linux/neighbour.h>
 #endif
 #include <linux/rtnetlink.h>
+
+#define NDA_PORT 6
 
 static void
 init_ndmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -86,6 +90,33 @@ main(void)
 		     nla_type, nla_type_str,
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
+
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ndmsg, print_ndmsg,
+		    NDA_DST, 4, pattern, 4,
+		    print_quoted_hex(pattern, 4));
+
+	static const struct nda_cacheinfo ci = {
+		.ndm_confirmed = 0xabcdedad,
+		.ndm_used = 0xbcdaedad,
+		.ndm_updated = 0xcdbadeda,
+		.ndm_refcnt = 0xdeadbeda
+	};
+
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_ndmsg, print_ndmsg,
+			   NDA_CACHEINFO, pattern, ci,
+			   PRINT_FIELD_U("{", ci, ndm_confirmed);
+			   PRINT_FIELD_U(", ", ci, ndm_used);
+			   PRINT_FIELD_U(", ", ci, ndm_updated);
+			   PRINT_FIELD_U(", ", ci, ndm_refcnt);
+			   printf("}"));
+
+	const uint16_t port = 0xabcd;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_ndmsg, print_ndmsg,
+			   NDA_PORT, pattern, port,
+			   printf("htons(%u)", ntohs(port)));
 
 	puts("+++ exited with 0 +++");
 	return 0;
