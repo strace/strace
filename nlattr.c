@@ -28,6 +28,7 @@
  */
 
 #include "defs.h"
+#include <endian.h>
 #include "netlink.h"
 #include "nlattr.h"
 #include <linux/sock_diag.h>
@@ -218,6 +219,26 @@ decode_nla_ifindex(struct tcb *const tcp,
 		print_ifindex(ifindex);
 
 	return true;
+}
+
+bool
+decode_nla_be64(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+#if defined HAVE_BE64TOH || defined be64toh
+	uint64_t num;
+
+	if (len < sizeof(num))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &num))
+		tprintf("htobe64(%" PRIu64 ")", be64toh(num));
+
+	return true;
+#else
+	return false;
+#endif
 }
 
 #define DECODE_NLA_INTEGER(name, type, fmt)		\

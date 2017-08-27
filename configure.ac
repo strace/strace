@@ -268,6 +268,7 @@ AC_TYPE_UID_T
 
 AC_CHECK_FUNCS(m4_normalize([
 	accept4
+	be64toh
 	fallocate
 	fanotify_mark
 	fopen64
@@ -458,6 +459,8 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct rtnl_link_stats.rx_nohandler,
 	struct rtnl_link_stats64.rx_nohandler
 ]),,, [#include <linux/if_link.h>])
+
+AC_CHECK_TYPES([struct fib_rule_uid_range],,, [#include <linux/fib_rules.h>])
 
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS(m4_normalize([

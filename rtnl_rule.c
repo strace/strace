@@ -43,6 +43,61 @@
 #include "xlat/fib_rule_flags.h"
 #include "xlat/rtnl_rule_attrs.h"
 
+static bool
+decode_rule_addr(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const void *const opaque_data)
+{
+	const struct rtmsg *const rtmsg = opaque_data;
+
+	decode_inet_addr(tcp, addr, len, rtmsg->rtm_family, NULL);
+
+	return true;
+}
+
+static bool
+decode_fib_rule_uid_range(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
+{
+#ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
+	struct fib_rule_uid_range range;
+
+	if (len < sizeof(range))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &range)) {
+		PRINT_FIELD_U("{", range, start);
+		PRINT_FIELD_U(", ", range, end);
+		tprints("}");
+	}
+
+	return true;
+#else
+	return false;
+#endif
+}
+
+static const nla_decoder_t fib_rule_hdr_nla_decoders[] = {
+	[FRA_DST]			= decode_rule_addr,
+	[FRA_SRC]			= decode_rule_addr,
+	[FRA_IIFNAME]			= decode_nla_str,
+	[FRA_GOTO]			= decode_nla_u32,
+	[FRA_PRIORITY]			= decode_nla_u32,
+	[FRA_FWMARK]			= decode_nla_u32,
+	[FRA_FLOW]			= decode_nla_u32,
+	[FRA_TUN_ID]			= decode_nla_be64,
+	[FRA_SUPPRESS_IFGROUP]		= decode_nla_u32,
+	[FRA_SUPPRESS_PREFIXLEN]	= decode_nla_u32,
+	[FRA_TABLE]			= decode_nla_u32,
+	[FRA_FWMASK]			= decode_nla_u32,
+	[FRA_OIFNAME]			= decode_nla_str,
+	[FRA_PAD]			= NULL,
+	[FRA_L3MDEV]			= decode_nla_u8,
+	[FRA_UID_RANGE]			= decode_fib_rule_uid_range
+};
+
 DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 {
 	/*
@@ -84,6 +139,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      rtnl_rule_attrs, "FRA_???", NULL, 0, NULL);
+			      rtnl_rule_attrs, "FRA_???",
+			      fib_rule_hdr_nla_decoders,
+			      ARRAY_SIZE(fib_rule_hdr_nla_decoders), &msg);
 	}
 }
