@@ -1570,9 +1570,6 @@ init(int argc, char *argv[])
 	shared_log = stderr;
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
-	qualify("trace=all");
-	qualify("abbrev=all");
-	qualify("verbose=all");
 #if DEFAULT_QUAL_FLAGS != (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
