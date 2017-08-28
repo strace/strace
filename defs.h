@@ -307,8 +307,8 @@ extern const struct xlat whence_codes[];
 #define RVAL_NONE	040	/* Print nothing */
 
 #define RVAL_DECODED	0100	/* syscall decoding finished */
-/* ioctl sub-parser successfully parsed (and printed) the argument */
-#define RVAL_IOCTL_PARSED 0200
+#define RVAL_IOCTL_DECODED 0200	/* ioctl sub-parser successfully decoded
+				   the argument */
 
 #define IOCTL_NUMBER_UNKNOWN 0
 #define IOCTL_NUMBER_HANDLED 1

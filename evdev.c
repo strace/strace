@@ -83,7 +83,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_ff_effect ffe;
 
 	if (umove_or_printaddr(tcp, arg, &ffe))
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 
 	tprints("{type=");
 	printxval(evdev_ff_types, ffe.type, "FF_???");
@@ -94,7 +94,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (abbrev(tcp)) {
 		tprints("...}");
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	}
 
 	tprintf("trigger={button=%" PRIu16
@@ -150,7 +150,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints("}");
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 static int
@@ -184,7 +184,7 @@ abs_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints("}");
 	}
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 static int
@@ -200,7 +200,7 @@ keycode_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints("]");
 	}
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 # ifdef EVIOCGKEYCODE_V2
@@ -212,7 +212,7 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct input_keymap_entry ike;
 
 	if (umove_or_printaddr(tcp, arg, &ike))
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 
 	tprintf("{flags=%" PRIu8
 		", len=%" PRIu8 ", ",
@@ -237,7 +237,7 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints("}");
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 # endif /* EVIOCGKEYCODE_V2 */
 
@@ -258,7 +258,7 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 			id.product,
 			id.version);
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 static int
@@ -276,7 +276,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	char decoded_arg[size];
 
 	if (umove_or_printaddr(tcp, arg, &decoded_arg))
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 
 	tprints("[");
 
@@ -300,7 +300,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	tprints("]");
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 # ifdef EVIOCGMTSLOTS
@@ -313,13 +313,13 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 	const size_t size = _IOC_SIZE(code) / sizeof(int);
 	if (!size) {
 		printaddr(arg);
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	}
 
 	int buffer[size];
 
 	if (umove_or_printaddr(tcp, arg, &buffer))
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 
 	tprints("{code=");
 	printxval(evdev_mtslots, buffer[0], "ABS_MT_???");
@@ -332,7 +332,7 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	tprints("]}");
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 # endif /* EVIOCGMTSLOTS */
 
@@ -342,7 +342,7 @@ repeat_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 	printpair_int(tcp, arg, "%u");
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 # endif /* EVIOCGREP || EVIOCSREP */
 
@@ -386,14 +386,14 @@ bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
 		case EV_PWR:
 			tprints(", ");
 			printnum_int(tcp, arg, "%d");
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 		case EV_FF_STATUS:
 			return decode_bitset(tcp, arg, evdev_ff_status,
 					     FF_STATUS_MAX, "FF_STATUS_???");
 		default:
 			tprints(", ");
 			printaddr(arg);
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 	}
 }
 
@@ -406,11 +406,11 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 		case EVIOCGVERSION:
 			tprints(", ");
 			printnum_int(tcp, arg, "%#x");
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 		case EVIOCGEFFECTS:
 			tprints(", ");
 			printnum_int(tcp, arg, "%u");
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 		case EVIOCGID:
 			return getid_ioctl(tcp, arg);
 # ifdef EVIOCGREP
@@ -439,7 +439,7 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 				printaddr(arg);
 			else
 				printstrn(tcp, arg, tcp->u_rval);
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 # ifdef EVIOCGPROP
 		case _IOC_NR(EVIOCGPROP(0)):
 			return decode_bitset(tcp, arg, evdev_prop,
@@ -492,18 +492,18 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 			return ff_effect_ioctl(tcp, arg);
 		case EVIOCRMFF:
 			tprintf(", %d", (int) arg);
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 		case EVIOCGRAB:
 # ifdef EVIOCREVOKE
 		case EVIOCREVOKE:
 # endif
 			tprintf(", %" PRI_klu, arg);
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 # ifdef EVIOCSCLOCKID
 		case EVIOCSCLOCKID:
 			tprints(", ");
 			printnum_int(tcp, arg, "%u");
-			return RVAL_IOCTL_PARSED;
+			return RVAL_IOCTL_DECODED;
 # endif
 	}
 

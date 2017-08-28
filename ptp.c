@@ -136,5 +136,5 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_DECODED;
 	}
 
-	return RVAL_DECODED | RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }

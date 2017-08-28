@@ -68,7 +68,7 @@ MPERS_PRINTER_DECL(int, decode_sg_req_info,
 		tprintf(", duration=%u}", info.duration);
 	}
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 #endif /* HAVE_SCSI_SG_H */

@@ -479,7 +479,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	if (exiting(tcp) && syserror(tcp) && !ioc_changed)
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 
 	/*
 	 * device mapper code uses %d in some places and %u in another, but
@@ -553,7 +553,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 
  skip:
 	tprints("}");
-	return RVAL_IOCTL_PARSED;
+	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
 }
 
 int

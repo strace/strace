@@ -64,7 +64,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.protocol)) {
 		tprints("}");
-		return RVAL_DECODED | RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	}
 
 	PRINT_FIELD_XVAL("", sg_io, protocol, bsg_protocol, "BSG_PROTOCOL_???");
@@ -111,12 +111,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 		/* print i/o fields fetched on entering syscall */
 		PRINT_FIELD_X(", ", *entering_sg_io, response);
 		PRINT_FIELD_X(", ", *entering_sg_io, din_xferp);
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	}
 
 	if (sg_io.guard != entering_sg_io->guard) {
 		PRINT_FIELD_U(" => ", sg_io, guard);
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	}
 
 	PRINT_FIELD_U(", ", sg_io, response_len);
@@ -138,7 +138,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_D(", ", sg_io, dout_resid);
 	PRINT_FIELD_X(", ", sg_io, generated_tag);
 
-	return RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 #else /* !HAVE_LINUX_BSG_H */
@@ -147,7 +147,7 @@ static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints("{guard='Q', ...}");
-	return RVAL_DECODED | RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 static int

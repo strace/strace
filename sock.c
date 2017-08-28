@@ -198,7 +198,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 			tprints("}");
 		}
 
-		return RVAL_DECODED | RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	}
 
 	if (entering(tcp)) {
@@ -237,7 +237,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprints("}");
 
-	return RVAL_DECODED | RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }
 
 MPERS_PRINTER_DECL(int, sock_ioctl,
@@ -371,5 +371,5 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		return RVAL_DECODED;
 	}
 
-	return RVAL_DECODED | RVAL_IOCTL_PARSED;
+	return RVAL_IOCTL_DECODED;
 }

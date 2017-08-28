@@ -37,7 +37,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 	switch (code) {
 	case NS_GET_USERNS:
 	case NS_GET_PARENT:
-		return RVAL_IOCTL_PARSED | RVAL_FD | RVAL_DECODED;
+		return RVAL_IOCTL_DECODED | RVAL_FD;
 	case NS_GET_NSTYPE:
 		if (entering(tcp))
 			return 0;
@@ -46,10 +46,10 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 			outstr = xlookup(setns_types, tcp->u_rval);
 			if (outstr) {
 				tcp->auxstr = outstr;
-				return RVAL_IOCTL_PARSED | RVAL_STR;
+				return RVAL_IOCTL_DECODED | RVAL_STR;
 			}
 		}
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	case NS_GET_OWNER_UID:
 		if (entering(tcp))
 			return 0;
@@ -58,7 +58,7 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 			printuid("[", uid);
 			tprints("]");
 		}
-		return RVAL_IOCTL_PARSED;
+		return RVAL_IOCTL_DECODED;
 	default:
 		return RVAL_DECODED;
 	}
