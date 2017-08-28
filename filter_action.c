@@ -62,6 +62,7 @@ struct filter_action {
 	void *priv_data;
 };
 
+static unsigned int default_flags = DEFAULT_QUAL_FLAGS;
 static struct filter_action *filter_actions;
 static unsigned int nfilter_actions;
 
@@ -138,6 +139,10 @@ add_action(const struct filter_action_type *type)
 {
 	struct filter_action *action;
 
+	/* Update default_flags */
+	if (default_flags & type->qual_flg)
+		default_flags &= ~type->qual_flg;
+
 	filter_actions = xreallocarray(filter_actions, ++nfilter_actions,
 				       sizeof(struct filter_action));
 	action = &filter_actions[nfilter_actions - 1];
@@ -193,6 +198,7 @@ set_qualify_mode(struct filter_action *action)
 void
 filter_syscall(struct tcb *tcp)
 {
+	tcp->qual_flg |= default_flags;
 	for (unsigned int i = 0; i < nfilter_actions; ++i)
 		run_filter_action(tcp, &filter_actions[i]);
 }
