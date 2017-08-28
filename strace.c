@@ -66,7 +66,7 @@ extern int optind;
 extern char *optarg;
 
 #ifdef ENABLE_STACKTRACE
-/* if this is true do the stack trace for every system call */
+/* if this is true do the initialization of stack tracing mechanism */
 bool stack_trace_enabled;
 #endif
 
@@ -1654,7 +1654,7 @@ init(int argc, char *argv[])
 			break;
 #ifdef ENABLE_STACKTRACE
 		case 'k':
-			stack_trace_enabled = true;
+			filtering_parse("stacktrace(syscall all)");
 			break;
 #endif
 		case 'o':

@@ -656,7 +656,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled) {
+	if (stacktrace(tcp)) {
 		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
 			unwind_tcb_capture(tcp);
 	}
@@ -899,7 +899,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	line_ended();
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
+	if (stacktrace(tcp))
 		unwind_tcb_print(tcp);
 #endif
 	return 0;
