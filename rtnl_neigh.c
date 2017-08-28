@@ -38,7 +38,6 @@
 # include <linux/neighbour.h>
 #endif
 
-#include "xlat/nda_types.h"
 #include "xlat/neighbor_cache_entry_flags.h"
 #include "xlat/neighbor_cache_entry_states.h"
 #include "xlat/rtnl_neigh_attrs.h"
@@ -64,7 +63,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 					  neighbor_cache_entry_flags,
 					  "NTF_???");
 			PRINT_FIELD_XVAL(", ", ndmsg, ndm_type,
-					 nda_types, "NDA_???");
+					 routing_types, "RTN_???");
 			decode_nla = true;
 		}
 	} else

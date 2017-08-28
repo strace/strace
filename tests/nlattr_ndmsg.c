@@ -50,7 +50,7 @@ init_ndmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 		.ndm_ifindex = ifindex_lo(),
 		.ndm_state = NUD_PERMANENT,
 		.ndm_flags = NTF_PROXY,
-		.ndm_type = NDA_UNSPEC
+		.ndm_type = RTN_UNSPEC
 	);
 }
 
@@ -62,7 +62,7 @@ print_ndmsg(const unsigned int msg_len)
 	       ", ndm_ifindex=" IFINDEX_LO_STR
 	       ", ndm_state=NUD_PERMANENT"
 	       ", ndm_flags=NTF_PROXY"
-	       ", ndm_type=NDA_UNSPEC}",
+	       ", ndm_type=RTN_UNSPEC}",
 	       msg_len);
 }
 

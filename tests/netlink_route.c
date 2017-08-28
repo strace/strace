@@ -308,7 +308,7 @@ test_rtnl_neigh(const int fd)
 		.ndm_ifindex = ifindex_lo(),
 		.ndm_state = NUD_PERMANENT,
 		.ndm_flags = NTF_PROXY,
-		.ndm_type = NDA_UNSPEC
+		.ndm_type = RTN_UNSPEC
 	};
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETNEIGH, msg,
@@ -316,7 +316,7 @@ test_rtnl_neigh(const int fd)
 		      printf(", ndm_ifindex=" IFINDEX_LO_STR
 			     ", ndm_state=NUD_PERMANENT"
 			     ", ndm_flags=NTF_PROXY"
-			     ", ndm_type=NDA_UNSPEC}"));
+			     ", ndm_type=RTN_UNSPEC}"));
 }
 
 static void
