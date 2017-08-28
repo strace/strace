@@ -26,6 +26,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     of NETLINK_ROUTE.
   * Updated lists of BPF_*, KEY_*, RWF_*, SCM_*, SO_*, and *_MAGIC constants.
   * Added decoding of arch_prctl syscall on x86.
+  * Updated lists of ioctl commands from Linux 4.13.
 
 * Bug fixes
   * Fixed output formatting of blkpg_ioctl_arg, dm_name_list, and iocb
