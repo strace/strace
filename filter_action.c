@@ -49,6 +49,9 @@ static const struct filter_action_type {
 	FILTER_ACTION_TYPE(verbose,	2, QUAL_VERBOSE,	null,	is_traced),
 	FILTER_ACTION_TYPE(read,	2, QUAL_READ,		null,	is_traced),
 	FILTER_ACTION_TYPE(write,	2, QUAL_WRITE,		null,	is_traced),
+# ifdef USE_LIBUNWIND
+	FILTER_ACTION_TYPE(stacktrace,	2, QUAL_STACKTRACE,	null,	is_traced),
+# endif
 };
 #undef FILTER_ACTION_TYPE
 
@@ -145,6 +148,12 @@ add_action(const struct filter_action_type *type)
 	/* Update default_flags */
 	if (default_flags & type->qual_flg)
 		default_flags &= ~type->qual_flg;
+
+	/* Enable stack tracing. */
+#ifdef USE_LIBUNWIND
+	if (type->qual_flg & QUAL_STACKTRACE)
+		stack_trace_enabled = true;
+#endif
 
 	filter_actions = xreallocarray(filter_actions, ++nfilter_actions,
 				       sizeof(struct filter_action));

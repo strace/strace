@@ -581,3 +581,9 @@ unwind_capture_stacktrace(struct tcb *tcp)
 		debug_func_msg("tcp=%p, queue=%p", tcp, tcp->queue->head);
 	}
 }
+
+void
+apply_stacktrace(struct tcb *tcp, void *_priv_data)
+{
+	tcp->qual_flg |= QUAL_STACKTRACE;
+}
