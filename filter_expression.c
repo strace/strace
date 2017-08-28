@@ -29,6 +29,9 @@
 #include <stdarg.h>
 #include "filter.h"
 
+extern bool is_space_ascii(char);
+extern bool is_allowed_in_name(char);
+
 struct expression_token {
 	enum token_type {
 		TOK_VARIABLE,
@@ -43,6 +46,9 @@ struct expression_token {
 		} operator_id;
 	} data;
 };
+
+/* Pseudo-operator used for parsing */
+#define OP_PARENTHESIS 3
 
 struct bool_expression {
 	unsigned int ntokens;
@@ -269,4 +275,184 @@ run_expression(struct bool_expression *expr, bool *variables,
 		handle_corrupted_expression(expr, stack, stack_size, i,
 					    variables, variables_num);
 	return stack[0];
+}
+
+/*
+ * Parse operator and add operator length to str and pos.
+ * Return -1 if no operator found.
+ */
+static int
+parse_operator(char **str, unsigned int *pos)
+{
+#define _OP(s, op) { s, sizeof(s) - 1, op }
+	struct {
+		const char *str;
+		int len;
+		enum operator_type op;
+	} ops[] = {
+		_OP("!",	OP_NOT),
+		_OP("not",	OP_NOT),
+		_OP("&&",	OP_AND),
+		_OP("and",	OP_AND),
+		_OP("||",	OP_OR),
+		_OP("or",	OP_OR),
+	};
+#undef _OP
+	char *p = *str;
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(ops); i++) {
+		if (!strncmp(p, ops[i].str, ops[i].len) &&
+		    (!is_allowed_in_name(ops[i].str[0]) ||
+		    !is_allowed_in_name(p[ops[i].len]))) {
+			*str += ops[i].len - 1;
+			*pos += ops[i].len - 1;
+			return ops[i].op;
+		}
+	}
+	return -1;
+}
+
+static char *
+unescape_argument(char **str)
+{
+	char *p;
+	char *p_new;
+	bool escaped = false;
+	unsigned int size = 1;
+	char *new_str = xcalloc(strlen(*str) + 1, 1);
+
+	for (p = *str, p_new = new_str; *p; ++p) {
+		if (!escaped) {
+			if (*p == '\\') {
+				escaped = true;
+				continue;
+			} else if (is_space_ascii(*p) || *p == ')' || *p == '|'
+			           || *p == '&') {
+				break;
+			}
+		}
+		escaped = false;
+		*(p_new++) = *p;
+		size++;
+	}
+	*str = p - 1;
+	return xreallocarray(new_str, size, 1);
+}
+
+static void
+push_operator(int *stack, unsigned int *stack_size, int op)
+{
+	if (*stack_size == MAX_STACK_SIZE)
+		error_msg_and_die("stack overflow (expression is too complex)");
+	stack[*stack_size] = op;
+	(*stack_size)++;
+}
+
+static bool
+is_higher_priority(int op_a, int op_b)
+{
+	bool op_priority[] = {
+		[OP_NOT] = 2,
+		[OP_AND] = 1,
+		[OP_OR]  = 0,
+	};
+	return op_priority[op_a] > op_priority[op_b];
+}
+
+void
+parse_filter_expression(struct bool_expression *expr, const char *str,
+			struct filter_action *action, unsigned int start_id)
+{
+	enum {
+		WAIT_FILTER,
+		FILTER_NAME,
+		FILTER_ARG,
+		WAIT_OPERATOR,
+	} state = WAIT_FILTER;
+	unsigned int variable_id = start_id;
+	/* Current stack stack_size */
+	unsigned int st_size = 0;
+	int stack[MAX_STACK_SIZE];
+	char *copy = xstrdup(str);
+	struct filter *cur_filter = NULL;
+	char *filter_name = NULL;
+	char *filter_arg = NULL;
+	int op;
+	unsigned int pos = 0;
+
+	for (char *p = copy; *p; ++p, ++pos) {
+		switch (state) {
+		case WAIT_FILTER:
+			if (*p == '(') {
+				push_operator(stack, &st_size, OP_PARENTHESIS);
+			} else if ((op = parse_operator(&p, &pos)) >= 0) {
+				if (op == OP_NOT) {
+					push_operator(stack, &st_size, op);
+				} else {
+					error_msg_and_die("invalid operator "
+							  "at '%s':%u",
+							  str, pos);
+				}
+			} else if (!is_space_ascii(*p)) {
+				filter_name = p;
+				state = FILTER_NAME;
+			}
+			break;
+
+		case FILTER_NAME:
+			if (is_space_ascii(*p)) {
+				*p = '\0';
+				cur_filter = create_filter(action, filter_name);
+				filter_arg = NULL;
+				state = FILTER_ARG;
+			}
+			break;
+
+		case FILTER_ARG:
+			if (!filter_arg && is_space_ascii(*p))
+				break;
+			filter_arg = unescape_argument(&p);
+			parse_filter(cur_filter, filter_arg, false);
+			free(filter_arg);
+			add_variable_token(expr, variable_id++);
+			state = WAIT_OPERATOR;
+			break;
+
+		case WAIT_OPERATOR:
+			if (is_space_ascii(*p))
+				break;
+			if (*p == ')') {
+				while ((st_size > 0) &&
+				       (stack[st_size - 1] != OP_PARENTHESIS)) {
+						op = stack[--st_size];
+						add_operator_token(expr, op);
+					}
+				--st_size;
+				break;
+			}
+			op = parse_operator(&p, &pos);
+			if (op < 0 || op == OP_NOT)
+				error_msg_and_die("invalid operator at '%s':%u",
+						  str, pos);
+
+			/* Pop operators with higher priority. */
+			while ((st_size > 0) &&
+			       (stack[st_size - 1] != OP_PARENTHESIS) &&
+			       is_higher_priority(stack[st_size - 1], op))
+				add_operator_token(expr, stack[--st_size]);
+
+			push_operator(stack, &st_size, op);
+			state = WAIT_FILTER;
+			break;
+		}
+	}
+
+	free(copy);
+	if (state != WAIT_OPERATOR)
+		error_msg_and_die("unfinished filter expression '%s'", str);
+
+	while (st_size > 0)
+		add_operator_token(expr, stack[--st_size]);
+	if (start_id > 0)
+		add_operator_token(expr, OP_OR);
 }

@@ -94,7 +94,7 @@ inject_path_tracing(void)
 	struct filter *path_filter;
 
 	if (!action->nfilters)
-		qualify("trace=all");
+		filtering_parse("trace=all");
 	path_filter = add_filter_to_array(&action->filters, &action->nfilters,
 					  "path");
 	set_filter_priv_data(path_filter, &global_path_set);
@@ -170,6 +170,20 @@ find_or_add_action(const char *name)
 	}
 	return add_action(type);
 }
+
+void
+parse_filter_action(const char *action_name, const char *expr, const char *args)
+{
+	struct filter_action *action = find_or_add_action(action_name);
+
+	parse_filter_expression(action->expr, expr, action, action->nfilters);
+	if (args && !action->type->parse_args)
+		error_msg("%s action takes no arguments, ignored arguments "
+			  "'%s'", action->type->name, args);
+	action->priv_data = action->type->parse_args
+			    ? action->type->parse_args(args) : NULL;
+}
+
 
 static void
 run_filter_action(struct tcb *tcp, struct filter_action *action)

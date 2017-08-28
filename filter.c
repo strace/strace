@@ -35,7 +35,7 @@
 
 static const struct filter_type {
 	const char *name;
-	void *(*parse_filter)(const char *);
+	void *(*parse_filter)(const char *, bool);
 	bool (*run_filter)(struct tcb *, void *);
 	void (*free_priv_data)(void *);
 } filter_types[] = {
@@ -77,9 +77,9 @@ add_filter_to_array(struct filter **filters, unsigned int *nfilters,
 }
 
 void
-parse_filter(struct filter *filter, const char *str)
+parse_filter(struct filter *filter, const char *str, bool qualify_mode)
 {
-	filter->priv_data = filter->type->parse_filter(str);
+	filter->priv_data = filter->type->parse_filter(str, qualify_mode);
 }
 
 static bool

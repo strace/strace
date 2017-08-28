@@ -1589,7 +1589,7 @@ init(int argc, char *argv[])
 #if DEFAULT_QUAL_FLAGS != (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
-	qualify("signal=all");
+	filtering_parse("signal=all");
 	while ((c = getopt(argc, argv, "+"
 #ifdef ENABLE_STACKTRACE
 	    "k"
@@ -1629,7 +1629,7 @@ init(int argc, char *argv[])
 			daemonized_tracer = 1;
 			break;
 		case 'e':
-			qualify(optarg);
+			filtering_parse(optarg);
 			break;
 		case 'E':
 			if (putenv(optarg) < 0)
@@ -1697,7 +1697,7 @@ init(int argc, char *argv[])
 			username = optarg;
 			break;
 		case 'v':
-			qualify("abbrev=none");
+			filtering_parse("abbrev=none");
 			break;
 		case 'V':
 			print_version();

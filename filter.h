@@ -40,8 +40,10 @@ struct bool_expression;
 typedef int (*string_to_uint_func)(const char *);
 
 void qualify_tokens(const char *str, struct number_set *set,
-		    string_to_uint_func func, const char *name);
-void qualify_syscall_tokens(const char *str, struct number_set *set);
+		    string_to_uint_func func, const char *name,
+		    bool qualify_mode);
+void qualify_syscall_tokens(const char *str, struct number_set *set,
+			    bool qualify_mode);
 void parse_inject_common_args(char *, struct inject_opts *,
 			      const bool fault_tokens_only, bool qualify_mode);
 bool is_traced(struct tcb *);
@@ -53,7 +55,7 @@ int match_fd_common(struct tcb *, match_fd_func, void *);
 /* filter api */
 struct filter* add_filter_to_array(struct filter **, unsigned int *nfilters,
 				   const char *name);
-void parse_filter(struct filter *, const char *str);
+void parse_filter(struct filter *, const char *str, bool qualify_mode);
 void run_filters(struct tcb *, struct filter *, unsigned int, bool *);
 void free_filter(struct filter *);
 void set_filters_qualify_mode(struct filter **, unsigned int *nfilters);
@@ -63,6 +65,7 @@ void set_filter_priv_data(struct filter *, void *);
 struct filter *create_filter(struct filter_action *, const char *name);
 struct filter_action *find_or_add_action(const char *);
 void set_qualify_mode(struct filter_action *);
+void parse_filter_action(const char *, const char *, const char *);
 void set_filter_action_priv_data(struct filter_action *, void *);
 
 /* filter expression api */
@@ -70,10 +73,14 @@ struct bool_expression *create_expression();
 bool run_expression(struct bool_expression *, bool *, unsigned int);
 void set_expression_qualify_mode(struct bool_expression *);
 void expression_add_filter_and(struct bool_expression *, unsigned int);
+void parse_filter_expression(struct bool_expression *, const char *,
+			      struct filter_action *, unsigned int);
+
+void parse_qualify_action(const char *, const char *, const char *);
 
 #define DECL_FILTER(name)						\
 extern void *								\
-parse_ ## name ## _filter(const char *);				\
+parse_ ## name ## _filter(const char *, bool);				\
 extern bool								\
 run_ ## name ## _filter(struct tcb *, void *);				\
 extern void								\

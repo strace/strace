@@ -91,7 +91,7 @@ qualify_syscall_regex(const char *s, struct number_set *set)
 }
 
 static unsigned int
-lookup_class(const char *s)
+lookup_class(const char *s, bool qualify_mode)
 {
 	static const struct {
 		const char *name;
@@ -123,6 +123,8 @@ lookup_class(const char *s)
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
+		if (!qualify_mode && *s != '%')
+			break;
 		if (strcmp(s, syscall_class[i].name) == 0)
 			return syscall_class[i].value;
 	}
@@ -131,9 +133,9 @@ lookup_class(const char *s)
 }
 
 static bool
-qualify_syscall_class(const char *s, struct number_set *set)
+qualify_syscall_class(const char *s, struct number_set *set, bool qualify_mode)
 {
-	const unsigned int n = lookup_class(s);
+	const unsigned int n = lookup_class(s, qualify_mode);
 	if (!n)
 		return false;
 
@@ -181,7 +183,7 @@ qualify_syscall_name(const char *s, struct number_set *set)
 }
 
 static bool
-qualify_syscall(const char *token, struct number_set *set)
+qualify_syscall(const char *token, struct number_set *set, bool qualify_mode)
 {
 	bool ignore_fail = false;
 
@@ -193,7 +195,7 @@ qualify_syscall(const char *token, struct number_set *set)
 		return qualify_syscall_number(token, set) || ignore_fail;
 	if (*token == '/')
 		return qualify_syscall_regex(token + 1, set) || ignore_fail;
-	return qualify_syscall_class(token, set)
+	return qualify_syscall_class(token, set, qualify_mode)
 	       || qualify_syscall_name(token, set)
 	       || ignore_fail;
 }
@@ -203,7 +205,8 @@ qualify_syscall(const char *token, struct number_set *set)
  * according to STR specification.
  */
 void
-qualify_syscall_tokens(const char *const str, struct number_set *const set)
+qualify_syscall_tokens(const char *const str, struct number_set *const set,
+		       bool qualify_mode)
 {
 	/* Clear all sets. */
 	clear_number_set_array(set, SUPPORTED_PERSONALITIES);
@@ -213,9 +216,15 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set)
 	 * of the remaining specification.
 	 */
 	const char *s = str;
-	while (*s == '!') {
-		invert_number_set_array(set, SUPPORTED_PERSONALITIES);
-		++s;
+	if (qualify_mode) {
+		/*
+		 * Each leading ! character means inversion
+		 * of the remaining specification.
+		 */
+		while (*s == '!') {
+			invert_number_set_array(set, SUPPORTED_PERSONALITIES);
+			++s;
+		}
 	}
 
 	if (strcmp(s, "none") == 0) {
@@ -244,7 +253,7 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set)
 
 	for (const char *token = strtok_r(copy, ",", &saveptr);
 	     token; token = strtok_r(NULL, ",", &saveptr)) {
-		done = qualify_syscall(token, set);
+		done = qualify_syscall(token, set, qualify_mode);
 		if (!done)
 			error_msg_and_die("invalid system call '%s'", token);
 	}
@@ -256,10 +265,10 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set)
 }
 
 void *
-parse_syscall_filter(const char *str)
+parse_syscall_filter(const char *str, bool qualify_mode)
 {
 	struct number_set *set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, set);
+	qualify_syscall_tokens(str, set, qualify_mode);
 	return set;
 }
 
@@ -280,7 +289,8 @@ free_syscall_filter(void *priv_data)
  */
 void
 qualify_tokens(const char *const str, struct number_set *const set,
-	       string_to_uint_func func, const char *const name)
+	       string_to_uint_func func, const char *const name,
+	       bool qualify_mode)
 {
 	/* Clear the set. */
 	clear_number_set_array(set, 1);
@@ -290,9 +300,15 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	 * of the remaining specification.
 	 */
 	const char *s = str;
-	while (*s == '!') {
-		invert_number_set_array(set, 1);
-		++s;
+	if (qualify_mode) {
+		/*
+		 * Each leading ! character means inversion
+		 * of the remaining specification.
+		 */
+		while (*s == '!') {
+			invert_number_set_array(set, 1);
+			++s;
+		}
 	}
 
 	if (strcmp(s, "none") == 0) {
@@ -335,10 +351,10 @@ qualify_tokens(const char *const str, struct number_set *const set,
 }
 
 void *
-parse_fd_filter(const char *str)
+parse_fd_filter(const char *str, bool qualify_mode)
 {
 	struct number_set *set = alloc_number_set_array(1);
-	qualify_tokens(str, set, string_to_uint, "descriptor");
+	qualify_tokens(str, set, string_to_uint, "descriptor", qualify_mode);
 	return set;
 }
 
@@ -360,7 +376,7 @@ free_fd_filter(void *priv_data)
 }
 
 void *
-parse_path_filter(const char *path)
+parse_path_filter(const char *path, bool qualify_mode)
 {
 	struct path_set *set = xcalloc(1, sizeof(struct path_set));
 
