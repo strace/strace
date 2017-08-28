@@ -120,7 +120,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			fopts->step = 0;
 		}
 	} else if ((val = STR_STRIP_PREFIX(token, "error=")) != token) {
-		if (fopts->data.rval != INJECT_OPTS_RVAL_DEFAULT)
+		if (fopts->data.flags & INJECT_F_RETVAL)
 			return false;
 		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
 		if (intval < 0)
@@ -128,20 +128,23 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		if (intval < 1)
 			return false;
 		fopts->data.rval = -intval;
+		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
-		if (fopts->data.rval != INJECT_OPTS_RVAL_DEFAULT)
+		if (fopts->data.flags & INJECT_F_RETVAL)
 			return false;
 		intval = string_to_uint(val);
 		if (intval < 0)
 			return false;
 		fopts->data.rval = intval;
+		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
 		intval = sigstr_to_uint(val);
 		if (intval < 1 || intval > NSIG_BYTES * 8)
 			return false;
 		fopts->data.signo = intval;
+		fopts->data.flags |= INJECT_F_SIGNAL;
 	} else {
 		return false;
 	}
@@ -238,11 +241,7 @@ qualify_inject_common(const char *const str,
 {
 	struct inject_opts opts = {
 		.first = 1,
-		.step = 1,
-		.data = {
-			.rval = INJECT_OPTS_RVAL_DEFAULT,
-			.signo = 0
-		}
+		.step = 1
 	};
 	char *buf = NULL;
 	char *name = parse_inject_expression(str, &buf, &opts, fault_tokens_only);
@@ -251,10 +250,11 @@ qualify_inject_common(const char *const str,
 	}
 
 	/* If neither of retval, error, or signal is specified, then ... */
-	if (opts.data.rval == INJECT_OPTS_RVAL_DEFAULT && !opts.data.signo) {
+	if (!opts.data.flags) {
 		if (fault_tokens_only) {
 			/* in fault= syntax the default error code is ENOSYS. */
 			opts.data.rval = -ENOSYS;
+			opts.data.flags |= INJECT_F_RETVAL;
 		} else {
 			/* in inject= syntax this is not allowed. */
 			error_msg_and_die("invalid %s '%s'", description, str);

@@ -180,7 +180,11 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
+#define INJECT_F_SIGNAL 1
+#define INJECT_F_RETVAL 2
+
 struct inject_data {
+	uint16_t flags;
 	uint16_t signo;
 	int rval;
 };
@@ -192,7 +196,6 @@ struct inject_opts {
 };
 
 #define MAX_ERRNO_VALUE			4095
-#define INJECT_OPTS_RVAL_DEFAULT	(-(MAX_ERRNO_VALUE + 1))
 
 /* Trace Control Block */
 struct tcb {
