@@ -41,6 +41,7 @@ static const struct filter_type {
 } filter_types[] = {
 	FILTER_TYPE(syscall),
 	FILTER_TYPE(fd),
+	FILTER_TYPE(path),
 };
 #undef FILTER_TYPE
 
@@ -111,4 +112,11 @@ set_filters_qualify_mode(struct filter **filters, unsigned int *nfilters)
 	(*filters)[0] = (*filters)[*nfilters - 1];
 	*filters = xreallocarray(*filters, 1, sizeof(struct filter));
 	*nfilters = 1;
+}
+
+void
+set_filter_priv_data(struct filter *filter, void *priv_data)
+{
+	if (filter)
+		filter->priv_data = priv_data;
 }

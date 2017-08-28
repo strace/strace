@@ -356,3 +356,32 @@ free_fd_filter(void *priv_data)
 	free_number_set_array(priv_data, 1);
 	return;
 }
+
+void *
+parse_path_filter(const char *path)
+{
+	struct path_set *set = xcalloc(1, sizeof(struct path_set));
+
+	pathtrace_select_set(path, set);
+	return set;
+}
+
+bool
+run_path_filter(struct tcb *tcp, void *priv_data)
+{
+	struct path_set *set = priv_data;
+
+	return pathtrace_match_set(tcp, set);
+}
+
+void
+free_path_filter(void *priv_data)
+{
+	struct path_set *set = priv_data;
+
+	for (unsigned int i = 0; i < set->num_selected; ++i)
+		free((char *) set->paths_selected[i]);
+	free(set->paths_selected);
+	free(set);
+	return;
+}

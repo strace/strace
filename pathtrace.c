@@ -91,7 +91,7 @@ storepath(const char *path, struct path_set *set)
 			xgrowarray(set->paths_selected, &set->size,
 				   sizeof(set->paths_selected[0]));
 
-	set->paths_selected[set->num_selected++] = path;
+	set->paths_selected[set->num_selected++] = xstrdup(path);
 }
 
 /*

@@ -86,10 +86,28 @@ compare_action_priority(const void *a, const void *b)
 	}
 }
 
+static void
+inject_path_tracing(void)
+{
+	struct filter_action *action = find_or_add_action("trace");
+	struct filter *path_filter;
+
+	if (!action->nfilters)
+		qualify("trace=all");
+	path_filter = add_filter_to_array(&action->filters, &action->nfilters,
+					  "path");
+	set_filter_priv_data(path_filter, &global_path_set);
+	expression_add_filter_and(action->expr, action->nfilters - 1);
+}
+
 void
 filtering_parsing_finish(void)
 {
 	unsigned int maxfilters = 0;
+
+	/* Inject path filter into trace action. */
+	if (tracing_paths)
+		inject_path_tracing();
 
 	/* Sort actions by priority */
 	if (nfilter_actions == 0)

@@ -54,6 +54,7 @@ void parse_filter(struct filter *, const char *str);
 void run_filters(struct tcb *, struct filter *, unsigned int, bool *);
 void free_filter(struct filter *);
 void set_filters_qualify_mode(struct filter **, unsigned int *nfilters);
+void set_filter_priv_data(struct filter *, void *);
 
 /* filter action api */
 struct filter *create_filter(struct filter_action *, const char *name);
@@ -65,6 +66,7 @@ void set_filter_action_priv_data(struct filter_action *, void *);
 struct bool_expression *create_expression();
 bool run_expression(struct bool_expression *, bool *, unsigned int);
 void set_expression_qualify_mode(struct bool_expression *);
+void expression_add_filter_and(struct bool_expression *, unsigned int);
 
 #define DECL_FILTER(name)						\
 extern void *								\
@@ -77,6 +79,7 @@ free_ ## name ## _filter(void *)					\
 
 DECL_FILTER(syscall);
 DECL_FILTER(fd);
+DECL_FILTER(path);
 #undef DECL_FILTER
 
 #define DECL_FILTER_ACTION(name)					\

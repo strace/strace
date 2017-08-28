@@ -69,6 +69,32 @@ reallocate_expression(struct bool_expression *const expr,
 	expr->ntokens = new_ntokens;
 }
 
+static void
+add_variable_token(struct bool_expression *expr, unsigned int id)
+{
+	struct expression_token token;
+	token.type = TOK_VARIABLE;
+	token.data.variable_id = id;
+	reallocate_expression(expr, expr->ntokens + 1);
+	expr->tokens[expr->ntokens - 1] = token;
+}
+
+static void
+add_operator_token(struct bool_expression *expr, int op) {
+	struct expression_token token;
+	token.type = TOK_OPERATOR;
+	token.data.operator_id = op;
+	reallocate_expression(expr, expr->ntokens + 1);
+	expr->tokens[expr->ntokens - 1] = token;
+}
+
+void
+expression_add_filter_and(struct bool_expression *expr, unsigned int filter_id)
+{
+	add_variable_token(expr, filter_id);
+	add_operator_token(expr, OP_AND);
+}
+
 void
 set_expression_qualify_mode(struct bool_expression *expr)
 {
