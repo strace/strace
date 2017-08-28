@@ -180,11 +180,15 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
+struct inject_data {
+	uint16_t signo;
+	int rval;
+};
+
 struct inject_opts {
 	uint16_t first;
 	uint16_t step;
-	uint16_t signo;
-	int rval;
+	struct inject_data data;
 };
 
 #define MAX_ERRNO_VALUE			4095

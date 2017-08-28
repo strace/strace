@@ -570,9 +570,9 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 
 	opts->first = opts->step;
 
-	if (opts->signo > 0)
-		*signo = opts->signo;
-	if (opts->rval != INJECT_OPTS_RVAL_DEFAULT && !arch_set_scno(tcp, -1))
+	if (opts->data.signo > 0)
+		*signo = opts->data.signo;
+	if (opts->data.rval != INJECT_OPTS_RVAL_DEFAULT && !arch_set_scno(tcp, -1))
 		tcp->flags |= TCB_TAMPERED;
 
 	return 0;
@@ -586,17 +586,17 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 	if (!opts)
 		return 0;
 
-	if (opts->rval >= 0) {
+	if (opts->data.rval >= 0) {
 		kernel_long_t u_rval = tcp->u_rval;
 
-		tcp->u_rval = opts->rval;
+		tcp->u_rval = opts->data.rval;
 		if (arch_set_success(tcp)) {
 			tcp->u_rval = u_rval;
 		} else {
 			tcp->u_error = 0;
 		}
 	} else {
-		unsigned long new_error = -opts->rval;
+		unsigned long new_error = -opts->data.rval;
 
 		if (new_error != tcp->u_error && new_error <= MAX_ERRNO_VALUE) {
 			unsigned long u_error = tcp->u_error;

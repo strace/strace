@@ -120,28 +120,28 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			fopts->step = 0;
 		}
 	} else if ((val = STR_STRIP_PREFIX(token, "error=")) != token) {
-		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
+		if (fopts->data.rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
 		if (intval < 0)
 			intval = find_errno_by_name(val);
 		if (intval < 1)
 			return false;
-		fopts->rval = -intval;
+		fopts->data.rval = -intval;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
-		if (fopts->rval != INJECT_OPTS_RVAL_DEFAULT)
+		if (fopts->data.rval != INJECT_OPTS_RVAL_DEFAULT)
 			return false;
 		intval = string_to_uint(val);
 		if (intval < 0)
 			return false;
-		fopts->rval = intval;
+		fopts->data.rval = intval;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
 		intval = sigstr_to_uint(val);
 		if (intval < 1 || intval > NSIG_BYTES * 8)
 			return false;
-		fopts->signo = intval;
+		fopts->data.signo = intval;
 	} else {
 		return false;
 	}
@@ -239,8 +239,10 @@ qualify_inject_common(const char *const str,
 	struct inject_opts opts = {
 		.first = 1,
 		.step = 1,
-		.rval = INJECT_OPTS_RVAL_DEFAULT,
-		.signo = 0
+		.data = {
+			.rval = INJECT_OPTS_RVAL_DEFAULT,
+			.signo = 0
+		}
 	};
 	char *buf = NULL;
 	char *name = parse_inject_expression(str, &buf, &opts, fault_tokens_only);
@@ -249,10 +251,10 @@ qualify_inject_common(const char *const str,
 	}
 
 	/* If neither of retval, error, or signal is specified, then ... */
-	if (opts.rval == INJECT_OPTS_RVAL_DEFAULT && !opts.signo) {
+	if (opts.data.rval == INJECT_OPTS_RVAL_DEFAULT && !opts.data.signo) {
 		if (fault_tokens_only) {
 			/* in fault= syntax the default error code is ENOSYS. */
-			opts.rval = -ENOSYS;
+			opts.data.rval = -ENOSYS;
 		} else {
 			/* in inject= syntax this is not allowed. */
 			error_msg_and_die("invalid %s '%s'", description, str);
