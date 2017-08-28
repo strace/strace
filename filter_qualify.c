@@ -140,6 +140,8 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
+		if (fopts->data.flags & INJECT_F_SIGNAL)
+			return false;
 		intval = sigstr_to_uint(val);
 		if (intval < 1 || intval > NSIG_BYTES * 8)
 			return false;

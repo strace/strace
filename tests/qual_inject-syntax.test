@@ -103,6 +103,8 @@ for arg in '' , ,, ,,, : :: ::: \! \!, \!: \
 	   chdir:retval=-1 \
 	   chdir:signal=0 \
 	   chdir:signal=129 \
+	   chdir:signal=1:signal=2 \
+	   chdir:signal=1:retval=0:signal=2 \
 	   chdir:retval=0:retval=1 \
 	   chdir:error=1:error=2 \
 	   chdir:retval=0:error=1 \

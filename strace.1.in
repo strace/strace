@@ -654,8 +654,9 @@ An injection expression can contain only one
 .BR error =
 or
 .BR retval =
-specification.
-If an injection expression contains multiple
+specification, and only one
+.BR signal =
+specification.  If an injection expression contains multiple
 .BR when =
 specifications, the last one takes precedence.
 
