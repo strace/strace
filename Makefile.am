@@ -139,6 +139,7 @@ strace_SOURCES =	\
 	file_ioctl.c	\
 	filter_action.c	\
 	filter_expression.c \
+	filter_parse.c	\
 	filter_qualify.c \
 	filter.c	\
 	filter.h	\

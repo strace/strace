@@ -182,92 +182,110 @@ parse_inject_common_args(char *str, struct inject_opts *const opts,
 }
 
 static void
-qualify_read(const char *const str)
+qualify_read(const char *const main_part, const char *const args)
 {
 	struct filter_action *action = find_or_add_action("read");
 	struct filter *filter = create_filter(action, "fd");
 
-	parse_filter(filter, str);
+	parse_filter(filter, main_part, true);
+	if (args)
+		error_msg("read action takes no arguments, ignored arguments "
+			  "'%s'", args);
 	set_qualify_mode(action, 1);
 }
 
 static void
-qualify_write(const char *const str)
+qualify_write(const char *const main_part, const char *const args)
 {
 	struct filter_action *action = find_or_add_action("write");
 	struct filter *filter = create_filter(action, "fd");
 
-	parse_filter(filter, str);
+	parse_filter(filter, main_part, true);
+	if (args)
+		error_msg("write action takes no arguments, ignored arguments "
+			  "'%s'", args);
 	set_qualify_mode(action, 1);
 }
 
 static void
-qualify_signals(const char *const str)
+qualify_signals(const char *const main_part, const char *const args)
 {
 	if (!signal_set)
 		signal_set = alloc_number_set_array(1);
-	qualify_tokens(str, signal_set, sigstr_to_uint, "signal");
+
+	qualify_tokens(main_part, signal_set, sigstr_to_uint, "signal", true);
+	if (args)
+		error_msg("signal action takes no arguments, ignored arguments "
+			  "'%s'", args);
 }
 
 static void
-qualify_trace(const char *const str)
+qualify_trace(const char *const main_part, const char *const args)
 {
 	struct filter_action *action = find_or_add_action("trace");
 	struct filter *filter = create_filter(action, "syscall");
 
-	parse_filter(filter, str);
+	parse_filter(filter, main_part, true);
+	if (args)
+		error_msg("trace action takes no arguments, ignored arguments "
+			  "'%s'", args);
 	set_qualify_mode(action, 1);
 }
 
 static void
-qualify_abbrev(const char *const str)
+qualify_abbrev(const char *const main_part, const char *const args)
 {
 	struct filter_action *action = find_or_add_action("abbrev");
 	struct filter *filter = create_filter(action, "syscall");
 
-	parse_filter(filter, str);
+	parse_filter(filter, main_part, true);
+	if (args)
+		error_msg("abbrev action takes no arguments, ignored arguments "
+			  "'%s'", args);
 	set_qualify_mode(action, 1);
 }
 
 static void
-qualify_verbose(const char *const str)
+qualify_verbose(const char *const main_part, const char *const args)
 {
 	struct filter_action *action = find_or_add_action("verbose");
 	struct filter *filter = create_filter(action, "syscall");
 
-	parse_filter(filter, str);
+	parse_filter(filter, main_part, true);
+	if (args)
+		error_msg("verbose action takes no arguments, ignored arguments"
+			  " '%s'", args);
 	set_qualify_mode(action, 1);
 }
 
 static void
-qualify_raw(const char *const str)
+qualify_raw(const char *const main_part, const char *const args)
 {
 	struct filter_action *action = find_or_add_action("raw");
 	struct filter *filter = create_filter(action, "syscall");
 
-	parse_filter(filter, str);
+	parse_filter(filter, main_part, true);
+	if (args)
+		error_msg("raw action takes no arguments, ignored arguments "
+			  "'%s'", args);
 	set_qualify_mode(action, 1);
 }
 
 static void
-qualify_inject_common(const char *const str,
+qualify_inject_common(const char *const main_part, const char *const args,
 		      const bool fault_tokens_only,
 		      const char *const description)
 {
 	struct inject_opts *opts = xmalloc(sizeof(struct inject_opts));
-	char *buf = xstrdup(str);
-	char *args = strchr(buf, ':');
+	char *buf = xstrdup(args);
 	struct filter_action *action;
 	struct filter *filter;
 
-	if (args)
-		*(args++) = '\0';
-
 	action = find_or_add_action(fault_tokens_only ? "fault" : "inject");
 	filter = create_filter(action, "syscall");
-	parse_filter(filter, buf);
+	parse_filter(filter, main_part, true);
 	set_qualify_mode(action, 1);
-	parse_inject_common_args(args, opts, fault_tokens_only, true);
+	parse_inject_common_args(buf, opts, fault_tokens_only, true);
 
 	if (!opts->data.flags)
 		error_msg_and_die("invalid %s argument '%s'", description,
@@ -278,20 +296,20 @@ qualify_inject_common(const char *const str,
 }
 
 static void
-qualify_fault(const char *const str)
+qualify_fault(const char *const main_part, const char *const args)
 {
-	qualify_inject_common(str, true, "fault");
+	qualify_inject_common(main_part, args, true, "fault");
 }
 
 static void
-qualify_inject(const char *const str)
+qualify_inject(const char *const main_part, const char *const args)
 {
-	qualify_inject_common(str, false, "inject");
+	qualify_inject_common(main_part, args, false, "inject");
 }
 
 static const struct qual_options {
 	const char *name;
-	void (*qualify)(const char *);
+	void (*qualify)(const char *, const char *);
 } qual_options[] = {
 	{ "trace",	qualify_trace	},
 	{ "t",		qualify_trace	},
@@ -315,22 +333,20 @@ static const struct qual_options {
 };
 
 void
-qualify(const char *str)
+parse_qualify_action(const char *action_name, const char *main_part,
+		     const char *args)
 {
-	const struct qual_options *opt = qual_options;
+	const struct qual_options *opt = NULL;
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(qual_options); ++i) {
-		const char *name = qual_options[i].name;
-		const size_t len = strlen(name);
-		const char *val = str_strip_prefix_len(str, name, len);
-
-		if (val == str || *val != '=')
-			continue;
-		str = val + 1;
-		opt = &qual_options[i];
-		break;
+		if (!strcmp(action_name, qual_options[i].name)) {
+			opt = &qual_options[i];
+			break;
+		}
 	}
 
-	opt->qualify(str);
+	if (!opt)
+		error_msg_and_die("invalid filter action '%s'", action_name);
+	opt->qualify(main_part ? main_part : "", args);
 }
