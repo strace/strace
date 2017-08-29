@@ -38,6 +38,7 @@
 # include <linux/rtnetlink.h>
 
 #define FRA_TUN_ID 12
+#define FRA_TABLE 15
 #define FRA_UID_RANGE 20
 
 static void
@@ -97,6 +98,12 @@ main(void)
 		    init_rtmsg, print_rtmsg,
 		    FRA_DST, 4, pattern, 4,
 		    print_quoted_hex(pattern, 4));
+
+	const uint32_t table_id = RT_TABLE_DEFAULT;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_TABLE, pattern, table_id,
+			   printf("RT_TABLE_DEFAULT"));
 
 #ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
 	static const struct fib_rule_uid_range range = {
