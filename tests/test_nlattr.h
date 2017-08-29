@@ -202,3 +202,38 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			}						\
 			printf("]"));					\
 	} while (0)
+
+#define TEST_NESTED_NLATTR_OBJECT(fd_, nlh0_, hdrlen_,			\
+				  init_msg_, print_msg_,		\
+				  nla_type_, pattern_, obj_, ...)	\
+	do {								\
+		const unsigned int plen =				\
+			sizeof(obj_) - 1 > DEFAULT_STRLEN		\
+			? DEFAULT_STRLEN : (int) sizeof(obj_) - 1;	\
+		/* len < sizeof(obj_) */				\
+		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN,		\
+			(hdrlen_) + NLA_HDRLEN,				\
+			(init_msg_), (print_msg_),			\
+			(nla_type_), #nla_type_,			\
+			plen, (pattern_), plen,				\
+			print_quoted_hex((pattern_), plen);		\
+			printf("}"));					\
+		/* short read of sizeof(obj_) */			\
+		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN,		\
+			(hdrlen_) + NLA_HDRLEN,				\
+			(init_msg_), (print_msg_),			\
+			(nla_type_), #nla_type_,			\
+			sizeof(obj_),					\
+			(pattern_), sizeof(obj_) - 1,			\
+			printf("%p}",					\
+			       RTA_DATA(TEST_NLATTR_nla)));		\
+		/* sizeof(obj_) */					\
+		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN,		\
+			(hdrlen_) + NLA_HDRLEN,				\
+			(init_msg_), (print_msg_),			\
+			(nla_type_), #nla_type_,			\
+			sizeof(obj_),					\
+			&(obj_), sizeof(obj_),				\
+			__VA_ARGS__,					\
+			printf("}"));					\
+	} while (0)

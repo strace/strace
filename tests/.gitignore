@@ -225,6 +225,7 @@ nlattr_fib_rule_hdr
 nlattr_ifaddrlblmsg
 nlattr_ifaddrmsg
 nlattr_ifinfomsg
+nlattr_ifla_brport
 nlattr_inet_diag_msg
 nlattr_inet_diag_req_compat
 nlattr_inet_diag_req_v2
