@@ -106,6 +106,12 @@ main(void)
 			   RTA_OIF, pattern, ifindex,
 			   printf(IFINDEX_LO_STR));
 
+	const uint32_t rt_class_id = RT_TABLE_DEFAULT;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   RTA_TABLE, pattern, rt_class_id,
+			   printf("RT_TABLE_DEFAULT"));
+
 	struct nlattr nla = {
 		.nla_type = RTAX_LOCK,
 		.nla_len = sizeof(nla)

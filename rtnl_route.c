@@ -46,6 +46,21 @@
 #include "xlat/rtnl_route_attrs.h"
 #include "xlat/rtnl_rta_metrics_attrs.h"
 
+bool
+decode_nla_rt_class(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	uint32_t num;
+
+	if (len < sizeof(num))
+		return false;
+	if (!umove_or_printaddr(tcp, addr, &num))
+		printxval(routing_table_ids, num, NULL);
+	return true;
+}
+
 static bool
 decode_route_addr(struct tcb *const tcp,
 		  const kernel_ulong_t addr,
@@ -207,7 +222,7 @@ static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_CACHEINFO]		= decode_rta_cacheinfo,
 	[RTA_SESSION]		= NULL, /* unused */
 	[RTA_MP_ALGO]		= decode_nla_u32,
-	[RTA_TABLE]		= decode_nla_u32,
+	[RTA_TABLE]		= decode_nla_rt_class,
 	[RTA_MARK]		= decode_nla_u32,
 	[RTA_MFC_STATS]		= decode_rta_mfc_stats,
 	[RTA_VIA]		= decode_rtvia,
