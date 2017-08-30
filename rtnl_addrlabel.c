@@ -40,6 +40,24 @@
 
 # include "xlat/rtnl_addrlabel_attrs.h"
 
+static bool
+decode_ifal_address(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	const struct ifaddrlblmsg *const ifal = opaque_data;
+
+	decode_inet_addr(tcp, addr, len, ifal->ifal_family, NULL);
+
+	return true;
+}
+
+static const nla_decoder_t ifaddrlblmsg_nla_decoders[] = {
+	[IFAL_ADDRESS]	= decode_ifal_address,
+	[IFAL_LABEL]	= decode_nla_u32
+};
+
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 {
 	struct ifaddrlblmsg ifal = { .ifal_family = family };
@@ -67,7 +85,9 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 	if (decode_nla && len > offset) {
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
-			      rtnl_addrlabel_attrs, "IFAL_???", NULL, 0, NULL);
+			      rtnl_addrlabel_attrs, "IFAL_???",
+			      ifaddrlblmsg_nla_decoders,
+			      ARRAY_SIZE(ifaddrlblmsg_nla_decoders), &ifal);
 	}
 }
 
