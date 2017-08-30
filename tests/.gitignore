@@ -148,6 +148,7 @@ ipc_msg
 ipc_msgbuf
 ipc_sem
 ipc_shm
+is_linux_mips_n64
 kcmp
 kexec_file_load
 kexec_load
