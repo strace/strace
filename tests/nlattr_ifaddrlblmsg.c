@@ -83,6 +83,11 @@ main(void)
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
 
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifaddrlblmsg, print_ifaddrlblmsg,
+		    IFAL_ADDRESS, 4, pattern, 4,
+		    print_quoted_hex(pattern, 4));
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
