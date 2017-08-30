@@ -34,7 +34,8 @@ function compare_indices(i1, v1, i2, v2) {
 		return -1
 	return (c1 != c2)
 }
-function array_get(array_idx, array_member, array_return)
+function array_get(array_idx, array_member, \
+		   array_return)
 {
 	array_return = array[array_idx][array_member]
 	if ("" == array_return) {
@@ -68,7 +69,8 @@ function leave(array_idx, to_return)
 	delete called[array_idx]
 	return to_return
 }
-function update_upper_bound(idx, val, count)
+function update_upper_bound(idx, val, \
+			    count)
 {
 	count = array[idx]["count"]
 	if (count == "")
