@@ -50,11 +50,15 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 	struct rtnl_link_stats st;
 	const unsigned int min_size =
 		offsetofend(struct rtnl_link_stats, tx_compressed);
-	const unsigned int size = len < sizeof(st) ? min_size : sizeof(st);
+	const unsigned int def_size = sizeof(st);
+	const unsigned int size =
+		(len >= def_size) ? def_size :
+				    ((len == min_size) ? min_size : 0);
 
-	if (len < min_size)
+	if (!size)
 		return false;
-	else if (!umoven_or_printaddr(tcp, addr, size, &st)) {
+
+	if (!umoven_or_printaddr(tcp, addr, size, &st)) {
 		PRINT_FIELD_U("{", st, rx_packets);
 		PRINT_FIELD_U(", ", st, tx_packets);
 		PRINT_FIELD_U(", ", st, rx_bytes);
@@ -82,7 +86,7 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", st, rx_compressed);
 		PRINT_FIELD_U(", ", st, tx_compressed);
 #ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
-		if (len >= sizeof(st))
+		if (len >= def_size)
 			PRINT_FIELD_U(", ", st, rx_nohandler);
 #endif
 		tprints("}");
@@ -196,11 +200,15 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 	struct rtnl_link_stats64 st;
 	const unsigned int min_size =
 		offsetofend(struct rtnl_link_stats64, tx_compressed);
-	const unsigned int size = len < sizeof(st) ? min_size : sizeof(st);
+	const unsigned int def_size = sizeof(st);
+	const unsigned int size =
+		(len >= def_size) ? def_size :
+				    ((len == min_size) ? min_size : 0);
 
-	if (len < min_size)
+	if (!size)
 		return false;
-	else if (!umoven_or_printaddr(tcp, addr, size, &st)) {
+
+	if (!umoven_or_printaddr(tcp, addr, size, &st)) {
 		PRINT_FIELD_U("{", st, rx_packets);
 		PRINT_FIELD_U(", ", st, tx_packets);
 		PRINT_FIELD_U(", ", st, rx_bytes);
@@ -228,7 +236,7 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", st, rx_compressed);
 		PRINT_FIELD_U(", ", st, tx_compressed);
 #ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
-		if (len >= sizeof(st))
+		if (len >= def_size)
 			PRINT_FIELD_U(", ", st, rx_nohandler);
 #endif
 		tprints("}");
