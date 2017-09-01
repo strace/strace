@@ -645,6 +645,7 @@ struct strace_stat;
 extern void print_struct_stat(struct tcb *, const struct strace_stat *const st);
 
 struct strace_statfs;
+struct strace_keyctl_kdf_params;
 
 extern void
 print_struct_statfs(struct tcb *, kernel_ulong_t addr);

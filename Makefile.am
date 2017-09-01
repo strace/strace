@@ -126,6 +126,7 @@ strace_SOURCES =	\
 	fcntl.c		\
 	fetch_bpf_fprog.c \
 	fetch_struct_flock.c \
+	fetch_struct_keyctl_kdf_params.c \
 	fetch_struct_mmsghdr.c \
 	fetch_struct_msghdr.c \
 	fetch_struct_stat.c \
@@ -162,6 +163,7 @@ strace_SOURCES =	\
 	kernel_types.h	\
 	kexec.c		\
 	keyctl.c	\
+	keyctl_kdf_params.h \
 	ldt.c		\
 	link.c		\
 	linux/asm_stat.h \

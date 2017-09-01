@@ -28,6 +28,9 @@
 
 #include "defs.h"
 
+#include "keyctl_kdf_params.h"
+#include "print_fields.h"
+
 typedef int32_t key_serial_t;
 
 #include "xlat/key_spec.h"
@@ -245,12 +248,14 @@ print_dh_params(struct tcb *tcp, kernel_ulong_t addr)
 
 static void
 keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
-		  kernel_ulong_t len)
+		  kernel_ulong_t len, kernel_ulong_t kdf_addr)
 {
 	if (entering(tcp)) {
 		print_dh_params(tcp, params);
 		tprints(", ");
 	} else {
+		struct strace_keyctl_kdf_params kdf;
+
 		if (syserror(tcp)) {
 			printaddr(buf);
 		} else {
@@ -259,7 +264,48 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 				(kernel_ulong_t) tcp->u_rval;
 			printstrn(tcp, buf, rval);
 		}
-		tprintf(", %llu", zero_extend_signed_to_ull(len));
+		tprintf(", %llu, ", zero_extend_signed_to_ull(len));
+
+		if (fetch_keyctl_kdf_params(tcp, kdf_addr, &kdf)) {
+			printaddr(kdf_addr);
+		} else {
+			size_t i;
+
+			PRINT_FIELD_STR("{", kdf, hashname, tcp);
+
+			/*
+			 * Kernel doesn't touch otherinfo
+			 * if otherinfolen is zero.
+			 */
+			if (kdf.otherinfolen)
+				PRINT_FIELD_STRN(", ", kdf, otherinfo,
+						 kdf.otherinfolen, tcp);
+			else
+				PRINT_FIELD_PTR(", ", kdf, otherinfo);
+
+			PRINT_FIELD_U(", ", kdf, otherinfolen);
+
+			/* Some future-proofing */
+			for (i = 0; i < ARRAY_SIZE(kdf.__spare); i++) {
+				if (kdf.__spare[i])
+					break;
+			}
+
+			if (i < ARRAY_SIZE(kdf.__spare)) {
+				tprints(", __spare=[");
+
+				for (i = 0; i < ARRAY_SIZE(kdf.__spare); i++) {
+					if (i)
+						tprints(", ");
+
+					tprintf("%#x", kdf.__spare[i]);
+				}
+
+				tprints("]");
+			}
+
+			tprints("}");
+		}
 	}
 }
 
@@ -373,7 +419,7 @@ SYS_FUNC(keyctl)
 		break;
 
 	case KEYCTL_DH_COMPUTE:
-		keyctl_dh_compute(tcp, arg2, arg3, arg4);
+		keyctl_dh_compute(tcp, arg2, arg3, arg4, arg5);
 		return 0;
 
 	case KEYCTL_RESTRICT_KEYRING:

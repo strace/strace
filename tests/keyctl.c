@@ -36,6 +36,7 @@
 # include <linux/types.h>
 # include <linux/keyctl.h>
 
+# include <assert.h>
 # include <errno.h>
 # include <inttypes.h>
 # include <stdarg.h>
@@ -52,6 +53,15 @@ struct keyctl_dh_params {
 	int32_t private;
 	int32_t prime;
 	int32_t base;
+};
+# endif
+
+# ifndef HAVE_STRUCT_KEYCTL_KDF_PARAMS
+struct keyctl_kdf_params {
+	char *hashname;
+	char *otherinfo;
+	uint32_t otherinfolen;
+	uint32_t __spare[8];
 };
 # endif
 
@@ -75,6 +85,9 @@ static const size_t limit = 10;
  */
 bool nul_terminated_buf = true;
 bool buf_in_arg;
+
+/* From ioctl_dm.c */
+# define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
 
 /*
  * When this is called with positive size, the buffer provided is an "out"
@@ -183,6 +196,85 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 }
 
 int
+append_str(char **buf, size_t *left, const char *fmt, ...)
+{
+	int ret;
+	va_list ap;
+
+	va_start(ap, fmt);
+	ret = vsnprintf(*buf, *left, fmt, ap);
+	va_end(ap);
+
+	assert((ret >= 0) && ((unsigned) ret < *left));
+
+	*left -= ret;
+	*buf += ret;
+
+	return ret;
+}
+
+const char *
+kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
+	       bool print_spare, const char *hash_str, const char *oi_str)
+{
+	static char buf[4096];
+
+	size_t left = sizeof(buf);
+	char *pos = buf;
+
+	append_str(&pos, &left, "{hashname=");
+
+	if (deref_hash && hash_str) {
+		append_str(&pos, &left, "%s", hash_str);
+	} else if (!kdf->hashname) {
+		append_str(&pos, &left, "NULL");
+	} else if (deref_hash) {
+		append_str(&pos, &left, "\"%.*s\"", limit, kdf->hashname);
+
+		if (strnlen(kdf->hashname, limit + 1) > limit)
+			append_str(&pos, &left, "...");
+	} else {
+		append_str(&pos, &left, "%p", kdf->hashname);
+	}
+
+	append_str(&pos, &left, ", otherinfo=");
+
+	if (deref_oi && oi_str) {
+		append_str(&pos, &left, "%s", oi_str);
+	} else if (!kdf->otherinfo) {
+		append_str(&pos, &left, "NULL");
+	} else if (deref_oi) {
+		append_str(&pos, &left, "\"%.*s\"", limit, kdf->otherinfo);
+
+		if (strnlen(kdf->otherinfo, limit + 1) > limit)
+			append_str(&pos, &left, "...");
+	} else {
+		append_str(&pos, &left, "%p", kdf->otherinfo);
+	}
+
+	append_str(&pos, &left, ", otherinfolen=%u", kdf->otherinfolen);
+
+	if (print_spare) {
+		size_t i;
+
+		append_str(&pos, &left, ", __spare=[");
+
+		for (i = 0; i < ARRAY_SIZE(kdf->__spare); i++) {
+			if  (i)
+				append_str(&pos, &left, ", ");
+
+			append_str(&pos, &left, "%#x", kdf->__spare[i]);
+		}
+
+		append_str(&pos, &left, "]");
+	}
+
+	append_str(&pos, &left, "}");
+
+	return buf;
+}
+
+int
 main(void)
 {
 	enum { PR_LIMIT = 10, IOV_SIZE = 11, IOV_STR_SIZE = 4096 };
@@ -210,6 +302,32 @@ main(void)
 	static const char *kcdhp_str = "{private=KEY_SPEC_GROUP_KEYRING, "
 		"prime=1234567890, base=-1153374643}";
 
+	/*
+	 * It's bigger than current hash name size limit, but since it's
+	 * implementation-dependent and totally internal, we do not rely
+	 * on it much.
+	 */
+	static const char long_hash_data[] = STR32 STR32 STR32 STR32 "xxx";
+	static const char short_hash_data[] = "hmac(aes)";
+	static const char otherinfo1_data[] = "\1\2 OH HAI THAR\255\0\1";
+	static const char otherinfo2_data[] = "\1\2\n\255\0\1";
+	static const struct keyctl_kdf_params kckdfp_data[] = {
+		[0] = { NULL, NULL, 0, { 0 } },
+		[1] = { NULL /* Changed to unaccessible address in copy */,
+			NULL, 0xbadc0dedU, { [7] = 0xdeadfeedU } },
+		[2] = { NULL /* long_hash_data */,
+			NULL /* Changed to unaccessible address in copy */,
+			0, { 0 } },
+		[3] = { NULL /* unterminated1 */,
+			NULL /* otherinfo_data */, 0, { 1 } },
+		[4] = { NULL /* short_hash_data */,
+			NULL /* otherinfo1_data */, sizeof(otherinfo1_data),
+			{ 0, 0xfacebeef, 0, 0xba5e1ead } },
+		[5] = { NULL /* short_hash_data */,
+			NULL /* otherinfo2_data */, sizeof(otherinfo2_data),
+			{ 0 } },
+	};
+
 	char *bogus_str = tail_memdup(unterminated1, sizeof(unterminated1));
 	char *bogus_desc = tail_memdup(unterminated2, sizeof(unterminated2));
 	char *short_type = tail_memdup(short_type_str, sizeof(short_type_str));
@@ -217,6 +335,15 @@ main(void)
 	char *long_type = tail_memdup(long_type_str, sizeof(long_type_str));
 	char *long_desc = tail_memdup(long_desc_str, sizeof(long_desc_str));
 	char *kcdhp = tail_memdup(&kcdhp_data, sizeof(kcdhp_data));
+	char *kckdfp_long_hash = tail_memdup(long_hash_data,
+					     sizeof(long_hash_data));
+	char *kckdfp_short_hash = tail_memdup(short_hash_data,
+					      sizeof(short_hash_data));
+	char *kckdfp_otherinfo1 = tail_memdup(otherinfo1_data,
+					      sizeof(otherinfo1_data));
+	char *kckdfp_otherinfo2 = tail_memdup(otherinfo2_data,
+					      sizeof(otherinfo2_data));
+	char *kckdfp_char = tail_alloc(sizeof(kckdfp_data[0]));
 	struct iovec *key_iov = tail_alloc(sizeof(*key_iov) * IOV_SIZE);
 	char *bogus_buf1 = tail_alloc(9);
 	char *bogus_buf2 = tail_alloc(256);
@@ -224,7 +351,7 @@ main(void)
 	char *key_iov_str2 = tail_alloc(4096);
 	ssize_t ret;
 	ssize_t kis_size = 0;
-	int i;
+	size_t i;
 
 	key_iov[0].iov_base = short_type;
 	key_iov[0].iov_len = sizeof(short_type_str);
@@ -845,28 +972,85 @@ main(void)
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
 			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
-		  0UL);
+		  sizeof(char *), ARG_STR(NULL), ptr_fmt);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(char *), kcdhp + 1, NULL, ptr_fmt,
 		  sizeof(char *), (char *) 0xfffff157ffffdeadULL, NULL, ptr_fmt,
 		  sizeof(kernel_ulong_t),
 			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
-		  0UL);
+		  sizeof(char *), ARG_STR(NULL), ptr_fmt);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
 		  (size_t) 9, (uintptr_t) bogus_buf1, NULL, NULL,
 		  sizeof(kernel_ulong_t), (kernel_ulong_t) 9, NULL, ksize_fmt,
-		  0UL);
+		  sizeof(char *), ARG_STR(NULL), ptr_fmt);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
 		  (size_t) 256, (uintptr_t) bogus_buf2, NULL, NULL,
 		  sizeof(kernel_ulong_t), (kernel_ulong_t) 256, NULL, ksize_fmt,
-		  0UL);
+		  sizeof(char *), ARG_STR(NULL), ptr_fmt);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
 		  (size_t) -1, (uintptr_t) bogus_buf2, NULL, NULL,
 		  sizeof(kernel_ulong_t), (kernel_ulong_t) -1, NULL, ksize_fmt,
-		  0UL);
+		  sizeof(char *), kckdfp_char + 1, NULL, ptr_fmt);
+
+	/* KEYCTL_DH_COMPUTE + KDF */
+
+	for (i = 0; i < ARRAY_SIZE(kckdfp_data); i++) {
+		struct keyctl_kdf_params *kckdfp =
+			(struct keyctl_kdf_params *) kckdfp_char;
+		bool deref_hash = true;
+		bool deref_opts = true;
+		bool print_spare = false;
+		const char *hash_str = NULL;
+		const char *oi_str = NULL;
+
+		memcpy(kckdfp, kckdfp_data + i, sizeof(kckdfp_data[i]));
+
+		switch (i) {
+		case 1:
+			deref_hash = false;
+			print_spare = true;
+			kckdfp->hashname =
+				kckdfp_short_hash + sizeof(short_hash_data);
+			break;
+		case 2:
+			deref_opts = false;
+			kckdfp->hashname = kckdfp_long_hash;
+			kckdfp->otherinfo =
+				kckdfp_otherinfo1 + sizeof(otherinfo1_data);
+			break;
+		case 3:
+			deref_opts = false;
+			deref_hash = false;
+			print_spare = true;
+			kckdfp->hashname = bogus_str;
+			kckdfp->otherinfo = kckdfp_otherinfo1;
+			break;
+		case 4:
+			oi_str = "\"\\1\\2 OH HAI \"...";
+			print_spare = true;
+			kckdfp->hashname = kckdfp_short_hash;
+			kckdfp->otherinfo = kckdfp_otherinfo1;
+			break;
+		case 5:
+			oi_str = "\"\\1\\2\\n\\255\\0\\1\\0\"";
+			kckdfp->hashname = kckdfp_short_hash;
+			kckdfp->otherinfo = kckdfp_otherinfo2;
+			break;
+		}
+
+		do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
+			  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
+			  (size_t) -1, (uintptr_t) bogus_buf2, NULL, NULL,
+			  sizeof(kernel_ulong_t), (kernel_ulong_t) -1, NULL,
+				ksize_fmt,
+			  sizeof(kckdfp), kckdfp_char,
+				kckdfp_to_str(kckdfp, deref_hash, deref_opts,
+					      print_spare, hash_str, oi_str),
+				NULL);
+	}
 
 	nul_terminated_buf = true;
 
