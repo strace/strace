@@ -83,7 +83,7 @@ function update_upper_bound(idx, val, \
 }
 function what_is(what_idx, \
 		 item, loc_diff, location, prev_location, prev_returned_size, \
-		 returned_size, special, to_return, type_idx)
+		 special, to_return, type_idx)
 {
 	enter(what_idx)
 	special = array_get(what_idx, "special")
