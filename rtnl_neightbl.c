@@ -113,10 +113,17 @@ decode_ndt_stats(struct tcb *const tcp,
 {
 #ifdef HAVE_STRUCT_NDT_STATS
 	struct ndt_stats ndtst;
+	const unsigned int min_size =
+		offsetofend(struct ndt_stats, ndts_forced_gc_runs);
+	const unsigned int def_size = sizeof(ndtst);
+	const unsigned int size =
+		(len >= def_size) ? def_size :
+				    ((len == min_size) ? min_size : 0);
 
-	if (len < sizeof(ndtst))
+	if (!size)
 		return false;
-	else if (!umove_or_printaddr(tcp, addr, &ndtst)) {
+
+	if (!umoven_or_printaddr(tcp, addr, size, &ndtst)) {
 		PRINT_FIELD_U("{", ndtst, ndts_allocs);
 		PRINT_FIELD_U(", ", ndtst, ndts_destroys);
 		PRINT_FIELD_U(", ", ndtst, ndts_hash_grows);
@@ -128,7 +135,8 @@ decode_ndt_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", ndtst, ndts_periodic_gc_runs);
 		PRINT_FIELD_U(", ", ndtst, ndts_forced_gc_runs);
 #ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
-		PRINT_FIELD_U(", ", ndtst, ndts_table_fulls);
+		if (len >= def_size)
+			PRINT_FIELD_U(", ", ndtst, ndts_table_fulls);
 #endif
 		tprints("}");
 	}
