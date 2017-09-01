@@ -115,9 +115,9 @@ print_arg(kernel_ulong_t arg, const char *str, const char *fmt, size_t size,
 		printf("%s", str);
 	} else {
 		if (size == sizeof(uint64_t))
-			printf(fmt, (uint64_t)arg);
+			printf(fmt, (uint64_t) arg);
 		else if (size == sizeof(uint32_t))
-			printf(fmt, (uint32_t)arg);
+			printf(fmt, (uint32_t) arg);
 		else
 			print_quoted_string_limit((void *) (uintptr_t) arg,
 						  size, rc);
@@ -293,40 +293,48 @@ main(void)
 	do_keyctl((kernel_ulong_t) 0xbadc0dedfacefeedULL,
 		  "0xfacefeed /* KEYCTL_??? */",
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfee1badc0de5ULL, NULL, kulong_fmt,
+			(kernel_ulong_t) 0xdeadfee1badc0de5ULL, NULL,
+			kulong_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfee2badc0de6ULL, NULL, kulong_fmt,
+			(kernel_ulong_t) 0xdeadfee2badc0de6ULL, NULL,
+			kulong_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfee3badc0de7ULL, NULL, kulong_fmt,
+			(kernel_ulong_t) 0xdeadfee3badc0de7ULL, NULL,
+			kulong_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfee4badc0de8ULL, NULL, kulong_fmt);
+			(kernel_ulong_t) 0xdeadfee4badc0de8ULL, NULL,
+			kulong_fmt);
 
 
 	/* GET_KEYRING_ID */
 	do_keyctl(ARG_STR(KEYCTL_GET_KEYRING_ID),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xbadc0dedffffffffLLU, "-1",
-		  NULL, 0UL);
+			(kernel_ulong_t) 0xbadc0dedffffffffLLU, "-1", NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_KEYRING_ID),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), "%d",
-		  sizeof(int), 3141592653U, NULL, "%d",
-		  NULL, 0UL);
+		  sizeof(int), 3141592653U, NULL, "%d", NULL,
+		  0UL);
 
 
 	/* KEYCTL_JOIN_SESSION_KEYRING */
 	do_keyctl(ARG_STR(KEYCTL_JOIN_SESSION_KEYRING),
-		  sizeof(char *), ARG_STR(NULL), NULL, 0UL);
+		  sizeof(char *), ARG_STR(NULL), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_JOIN_SESSION_KEYRING),
 		  sizeof(char *), (char *) 0xfffffacefffffeedULL, NULL, ptr_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_JOIN_SESSION_KEYRING),
-		  sizeof(char *), bogus_str, NULL, ptr_fmt, 0UL);
+		  sizeof(char *), bogus_str, NULL, ptr_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_JOIN_SESSION_KEYRING),
-		  sizeof(char *), ARG_STR("bogus name"), NULL, 0UL);
+		  sizeof(char *), ARG_STR("bogus name"), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_JOIN_SESSION_KEYRING),
 		  sizeof(char *), "very long keyring name", "\"very long \"...",
-		  NULL, 0UL);
+			NULL,
+		  0UL);
 
 
 	/* KEYCTL_UPDATE */
@@ -336,19 +344,19 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_UPDATE),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
 		  sizeof(char *), ARG_STR(NULL), NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 0, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_UPDATE),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(char *), (char *) 0xfffffacefffffeedULL, NULL, ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfee4badc0de8ULL, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xdeadfee4badc0de8ULL, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_UPDATE),
 		  sizeof(int32_t), bogus_key2, NULL, "%d",
 		  sizeof(char *), bogus_str, NULL, ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfee4badc0de8ULL, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xdeadfee4badc0de8ULL, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_UPDATE),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
@@ -363,11 +371,14 @@ main(void)
 
 	/* KEYCTL_REVOKE */
 	do_keyctl(ARG_STR(KEYCTL_REVOKE),
-		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL, 0UL);
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_REVOKE),
-		  sizeof(int32_t), bogus_key1, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_REVOKE),
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_REVOKE),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  0UL);
@@ -377,29 +388,33 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_CHOWN),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
 		  sizeof(uid_t), ARG_STR(-1), NULL,
-		  sizeof(gid_t), ARG_STR(-1), NULL, 0UL);
+		  sizeof(gid_t), ARG_STR(-1), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_CHOWN),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(uid_t), 2718281828U, NULL, "%u",
-		  sizeof(gid_t), 3141592653U, NULL, "%u", 0UL);
+		  sizeof(gid_t), 3141592653U, NULL, "%u",
+		  0UL);
 
 
 	/* KEYCTL_SETPERM */
 	do_keyctl(ARG_STR(KEYCTL_SETPERM),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQKEY_AUTH_KEY), NULL,
 		  sizeof(uint32_t), 0xffffffffU,
-		  "KEY_POS_VIEW|KEY_POS_READ|KEY_POS_WRITE|"
-		  "KEY_POS_SEARCH|KEY_POS_LINK|KEY_POS_SETATTR|"
-		  "KEY_USR_VIEW|KEY_USR_READ|KEY_USR_WRITE|"
-		  "KEY_USR_SEARCH|KEY_USR_LINK|KEY_USR_SETATTR|"
-		  "KEY_GRP_VIEW|KEY_GRP_READ|KEY_GRP_WRITE|"
-		  "KEY_GRP_SEARCH|KEY_GRP_LINK|KEY_GRP_SETATTR|"
-		  "KEY_OTH_VIEW|KEY_OTH_READ|KEY_OTH_WRITE|"
-		  "KEY_OTH_SEARCH|KEY_OTH_LINK|KEY_OTH_SETATTR|"
-		  "0xc0c0c0c0", NULL, 0UL);
+			"KEY_POS_VIEW|KEY_POS_READ|KEY_POS_WRITE|"
+			"KEY_POS_SEARCH|KEY_POS_LINK|KEY_POS_SETATTR|"
+			"KEY_USR_VIEW|KEY_USR_READ|KEY_USR_WRITE|"
+			"KEY_USR_SEARCH|KEY_USR_LINK|KEY_USR_SETATTR|"
+			"KEY_GRP_VIEW|KEY_GRP_READ|KEY_GRP_WRITE|"
+			"KEY_GRP_SEARCH|KEY_GRP_LINK|KEY_GRP_SETATTR|"
+			"KEY_OTH_VIEW|KEY_OTH_READ|KEY_OTH_WRITE|"
+			"KEY_OTH_SEARCH|KEY_OTH_LINK|KEY_OTH_SETATTR|"
+			"0xc0c0c0c0", NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_SETPERM),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
-		  sizeof(uint32_t), 0, NULL, "%#x", 0UL);
+		  sizeof(uint32_t), 0, NULL, "%#x",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_SETPERM),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(uint32_t), 0xc0c0c0c0, "0xc0c0c0c0 /* KEY_??? */",
@@ -412,38 +427,41 @@ main(void)
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DESCRIBE),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DESCRIBE),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) 9, (uintptr_t) bogus_buf1, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 9, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 9, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DESCRIBE),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) 256, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 256, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 256, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DESCRIBE),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) -4, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) -4, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) -4, NULL, ksize_fmt,
+		  0UL);
 
 
 	/* KEYCTL_CLEAR */
 	do_keyctl(ARG_STR(KEYCTL_CLEAR),
-		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL, 0UL);
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_CLEAR),
-		  sizeof(int32_t), bogus_key1, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_CLEAR),
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_CLEAR),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  0UL);
@@ -452,10 +470,12 @@ main(void)
 	/* KEYCTL_LINK */
 	do_keyctl(ARG_STR(KEYCTL_LINK),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
-		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL, 0UL);
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_LINK),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_LINK),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
@@ -469,7 +489,8 @@ main(void)
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_UNLINK),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_UNLINK),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_REQUESTOR_KEYRING), NULL,
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
@@ -554,23 +575,23 @@ main(void)
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_READ),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) 9, (uintptr_t) bogus_buf1, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 9, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 9, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_READ),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) 256, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 256, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 256, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_READ),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) -4, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) -4, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) -4, NULL, ksize_fmt,
+		  0UL);
 
 	nul_terminated_buf = true;
 
@@ -581,32 +602,32 @@ main(void)
 		  sizeof(int32_t), 0, NULL, "%d",
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  sizeof(int32_t), 0, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(char *), (char *) 0xfffffacefffffeedULL, NULL, ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfeedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xdeadfeedLLU, NULL, ksize_fmt,
 		  sizeof(int32_t), bogus_key1, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE),
 		  sizeof(int32_t), bogus_key2, NULL, "%d",
 		  sizeof(char *), bogus_str, NULL, ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 32LLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 32LLU, NULL, ksize_fmt,
 		  sizeof(int32_t), bogus_key2, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(short_type_str), short_desc, NULL, NULL,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) sizeof(short_type_str) - 1, NULL,
-			  ksize_fmt,
+			(kernel_ulong_t) sizeof(short_type_str) - 1, NULL,
+			ksize_fmt,
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL);
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
 		  sizeof(long_type_str), long_desc, NULL, NULL,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) sizeof(long_type_str), NULL, ksize_fmt,
+			(kernel_ulong_t) sizeof(long_type_str), NULL, ksize_fmt,
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL);
 
 	buf_in_arg = false;
@@ -616,16 +637,20 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_NEGATE),
 		  sizeof(int32_t), 0, NULL, "%d",
 		  sizeof(uint32_t), 0, NULL, "%u",
-		  sizeof(int32_t), 0, NULL, "%d", 0UL);
+		  sizeof(int32_t), 0, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_NEGATE),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(uint32_t), 3141592653U, NULL, "%u",
-		  sizeof(int32_t), bogus_key1, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_NEGATE),
 		  sizeof(int32_t), bogus_key2, NULL, "%d",
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661", NULL,
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661",
+			NULL,
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_NEGATE),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(kernel_ulong_t),
@@ -654,24 +679,30 @@ main(void)
 	/* KEYCTL_SET_TIMEOUT */
 	do_keyctl(ARG_STR(KEYCTL_SET_TIMEOUT),
 		  sizeof(int32_t), 0, NULL, "%d",
-		  sizeof(uint32_t), 0, NULL, "%u", 0UL);
+		  sizeof(uint32_t), 0, NULL, "%u",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_SET_TIMEOUT),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
-		  sizeof(uint32_t), 3141592653U, NULL, "%u", 0UL);
+		  sizeof(uint32_t), 3141592653U, NULL, "%u",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_SET_TIMEOUT),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661", NULL,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661",
+			NULL,
 		  0UL);
 
 
 	/* KEYCTL_ASSUME_AUTHORITY */
 	do_keyctl(ARG_STR(KEYCTL_ASSUME_AUTHORITY),
-		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL, 0UL);
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_ASSUME_AUTHORITY),
-		  sizeof(int32_t), bogus_key1, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_ASSUME_AUTHORITY),
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_ASSUME_AUTHORITY),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  0UL);
@@ -681,28 +712,29 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_GET_SECURITY),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
-		  sizeof(uint32_t), 0xbadc0dedU, NULL, "%u", 0UL);
+		  sizeof(uint32_t), 0xbadc0dedU, NULL, "%u",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_SECURITY),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_SECURITY),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) 9, (uintptr_t) bogus_buf1, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 9, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 9, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_SECURITY),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) 256, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 256, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 256, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_SECURITY),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_THREAD_KEYRING), NULL,
 		  (size_t) -4, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) -4, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) -4, NULL, ksize_fmt,
+		  0UL);
 
 
 	/* KEYCTL_SESSION_TO_PARENT */
@@ -723,14 +755,17 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_REJECT),
 		  sizeof(int32_t), bogus_key2, NULL, "%d",
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadca75facef157LLU, "4207866199", NULL,
+			(kernel_ulong_t) 0xdeadca75facef157LLU, "4207866199",
+			NULL,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661", NULL,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661",
+			NULL,
 		  sizeof(int32_t), bogus_key2, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_REJECT),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661", NULL,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, "3134983661",
+			NULL,
 		  sizeof(uint32_t), ARG_STR(ENODEV), NULL,
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL);
 
@@ -740,19 +775,19 @@ main(void)
 		  sizeof(int32_t), 0, NULL, "%d",
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  sizeof(int32_t), 0, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE_IOV),
 		  sizeof(int32_t), bogus_key1, NULL, "%d",
 		  sizeof(char *), (char *) 0xfffffacefffffeedULL, NULL, ptr_fmt,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xdeadfeedLLU, NULL, ksize_fmt,
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 0xdeadfeedLLU, NULL,
+			ksize_fmt,
 		  sizeof(int32_t), bogus_key1, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE_IOV),
 		  sizeof(int32_t), bogus_key2, NULL, "%d",
 		  sizeof(char *), key_iov + IOV_SIZE, NULL, ptr_fmt,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 32LLU, NULL, ksize_fmt,
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 32LLU, NULL,
+			ksize_fmt,
 		  sizeof(int32_t), bogus_key2, NULL, "%d");
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE_IOV),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
@@ -763,18 +798,21 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_INSTANTIATE_IOV),
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
 		  sizeof(key_iov), key_iov, key_iov_str2, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) IOV_SIZE, NULL, ksize_fmt,
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) IOV_SIZE, NULL,
+			ksize_fmt,
 		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL);
 
 
 	/* KEYCTL_INVALIDATE */
 	do_keyctl(ARG_STR(KEYCTL_INVALIDATE),
-		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL, 0UL);
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_INVALIDATE),
-		  sizeof(int32_t), bogus_key1, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_INVALIDATE),
-		  sizeof(int32_t), bogus_key2, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_INVALIDATE),
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
 		  0UL);
@@ -783,10 +821,12 @@ main(void)
 	/* KEYCTL_GET_PERSISTENT */
 	do_keyctl(ARG_STR(KEYCTL_GET_PERSISTENT),
 		  sizeof(uid_t), ARG_STR(-1), NULL,
-		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL, 0UL);
+		  sizeof(int32_t), ARG_STR(KEY_SPEC_GROUP_KEYRING), NULL,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_PERSISTENT),
 		  sizeof(uid_t), 2718281828U, NULL, "%u",
-		  sizeof(int32_t), bogus_key1, NULL, "%d", 0UL);
+		  sizeof(int32_t), bogus_key1, NULL, "%d",
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_GET_PERSISTENT),
 		  sizeof(uid_t), 2718281828U, NULL, "%u",
 		  sizeof(kernel_ulong_t), bogus_key3, bogus_key3_str, NULL,
@@ -804,29 +844,29 @@ main(void)
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(char *), kcdhp + 1, NULL, ptr_fmt,
 		  sizeof(char *), (char *) 0xfffff157ffffdeadULL, NULL, ptr_fmt,
 		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL, ksize_fmt,
 		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
 		  (size_t) 9, (uintptr_t) bogus_buf1, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 9, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 9, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
 		  (size_t) 256, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) 256, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 256, NULL, ksize_fmt,
+		  0UL);
 	do_keyctl(ARG_STR(KEYCTL_DH_COMPUTE),
 		  sizeof(kcdhp), kcdhp, kcdhp_str, NULL,
 		  (size_t) -1, (uintptr_t) bogus_buf2, NULL, NULL,
-		  sizeof(kernel_ulong_t),
-		  (kernel_ulong_t) -1, NULL, ksize_fmt, 0UL);
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) -1, NULL, ksize_fmt,
+		  0UL);
 
 	nul_terminated_buf = true;
 
