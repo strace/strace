@@ -466,6 +466,7 @@ AC_CHECK_TYPES(m4_normalize([
 
 AC_CHECK_TYPES(m4_normalize([
 	struct ifla_bridge_id,
+	struct ifla_port_vsi,
 	struct rtnl_link_stats64
 ]),,, [#include <linux/if_link.h>])
 AC_CHECK_MEMBERS(m4_normalize([

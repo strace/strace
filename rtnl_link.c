@@ -39,7 +39,12 @@
 #include <linux/rtnetlink.h>
 
 #include "xlat/rtnl_ifla_brport_attrs.h"
+#include "xlat/rtnl_ifla_info_attrs.h"
+#include "xlat/rtnl_ifla_port_attrs.h"
+#include "xlat/rtnl_ifla_vf_port_attrs.h"
+#include "xlat/rtnl_ifla_xdp_attrs.h"
 #include "xlat/rtnl_link_attrs.h"
+#include "xlat/xdp_flags.h"
 
 static bool
 decode_rtnl_link_stats(struct tcb *const tcp,
@@ -190,6 +195,27 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 	return true;
 }
 
+static const nla_decoder_t ifla_linkinfo_nla_decoders[] = {
+	[IFLA_INFO_KIND]	= decode_nla_str,
+	[IFLA_INFO_DATA]	= NULL, /* unimplemented */
+	[IFLA_INFO_XSTATS]	= NULL, /* unimplemented */
+	[IFLA_INFO_SLAVE_KIND]	= decode_nla_str,
+	[IFLA_INFO_SLAVE_DATA]	= NULL, /* unimplemented */
+};
+
+static bool
+decode_ifla_linkinfo(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_info_attrs,
+		      "IFLA_INFO_???", ifla_linkinfo_nla_decoders,
+		      ARRAY_SIZE(ifla_linkinfo_nla_decoders), opaque_data);
+
+	return true;
+}
+
 static bool
 decode_rtnl_link_stats64(struct tcb *const tcp,
 		         const kernel_ulong_t addr,
@@ -248,6 +274,107 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 #endif
 }
 
+static bool
+decode_ifla_port_vsi(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+#ifdef HAVE_STRUCT_IFLA_PORT_VSI
+	struct ifla_port_vsi vsi;
+
+	if (len < sizeof(vsi))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &vsi)) {
+		PRINT_FIELD_U("{", vsi, vsi_mgr_id);
+		PRINT_FIELD_STRING(", ", vsi, vsi_type_id,
+				   sizeof(vsi.vsi_type_id), QUOTE_FORCE_HEX);
+		PRINT_FIELD_U(", ", vsi, vsi_type_version);
+		tprints("}");
+	}
+
+	return true;
+#else
+	return false;
+#endif
+}
+
+static const nla_decoder_t ifla_port_nla_decoders[] = {
+	[IFLA_PORT_VF]			= decode_nla_u32,
+	[IFLA_PORT_PROFILE]		= decode_nla_str,
+	[IFLA_PORT_VSI_TYPE]		= decode_ifla_port_vsi,
+	[IFLA_PORT_INSTANCE_UUID]	= NULL, /* default parser */
+	[IFLA_PORT_HOST_UUID]		= NULL, /* default parser */
+	[IFLA_PORT_REQUEST]		= decode_nla_u8,
+	[IFLA_PORT_RESPONSE]		= decode_nla_u16
+};
+
+static bool
+decode_ifla_port(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_port_attrs,
+		      "IFLA_VF_PORT_???", ifla_port_nla_decoders,
+		      ARRAY_SIZE(ifla_port_nla_decoders), opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t ifla_vf_port_nla_decoders[] = {
+	[IFLA_VF_PORT] = decode_ifla_port
+};
+
+static bool
+decode_ifla_vf_ports(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_vf_port_attrs,
+		      "IFLA_VF_PORT_???", ifla_vf_port_nla_decoders,
+		      ARRAY_SIZE(ifla_vf_port_nla_decoders), opaque_data);
+
+	return true;
+}
+
+static bool
+decode_ifla_xdp_flags(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+	uint32_t flags;
+
+	if (len < sizeof(flags))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &flags))
+		printflags(xdp_flags, flags, "XDP_FLAGS_???");
+
+	return true;
+}
+
+static const nla_decoder_t ifla_xdp_nla_decoders[] = {
+	[IFLA_XDP_FD]		= decode_nla_s32,
+	[IFLA_XDP_ATTACHED]	= decode_nla_u8,
+	[IFLA_XDP_FLAGS]	= decode_ifla_xdp_flags,
+	[IFLA_XDP_PROG_ID]	= decode_nla_u32
+};
+
+static bool
+decode_ifla_xdp(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_xdp_attrs,
+		      "IFLA_XDP_???", ifla_xdp_nla_decoders,
+		      ARRAY_SIZE(ifla_xdp_nla_decoders), opaque_data);
+
+	return true;
+}
+
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_ADDRESS]		= NULL, /* unimplemented */
 	[IFLA_BROADCAST]	= NULL, /* unimplemented */
@@ -266,14 +393,14 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_WEIGHT]		= decode_nla_u32,
 	[IFLA_OPERSTATE]	= decode_nla_u8,
 	[IFLA_LINKMODE]		= decode_nla_u8,
-	[IFLA_LINKINFO]		= NULL, /* unimplemented */
+	[IFLA_LINKINFO]		= decode_ifla_linkinfo,
 	[IFLA_NET_NS_PID]	= decode_nla_u32,
 	[IFLA_IFALIAS]		= decode_nla_str,
 	[IFLA_NUM_VF]		= decode_nla_u32,
 	[IFLA_VFINFO_LIST]	= NULL, /* unimplemented */
 	[IFLA_STATS64]		= decode_rtnl_link_stats64,
-	[IFLA_VF_PORTS]		= NULL, /* unimplemented */
-	[IFLA_PORT_SELF]	= NULL, /* unimplemented */
+	[IFLA_VF_PORTS]		= decode_ifla_vf_ports,
+	[IFLA_PORT_SELF]	= decode_ifla_port,
 	[IFLA_AF_SPEC]		= NULL, /* unimplemented */
 	[IFLA_GROUP]		= decode_nla_u32,
 	[IFLA_NET_NS_FD]	= decode_nla_u32,
@@ -291,7 +418,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_GSO_MAX_SEGS]	= decode_nla_u32,
 	[IFLA_GSO_MAX_SIZE]	= decode_nla_u32,
 	[IFLA_PAD]		= NULL,
-	[IFLA_XDP]		= NULL, /* unimplemented */
+	[IFLA_XDP]		= decode_ifla_xdp,
 	[IFLA_EVENT]		= decode_nla_u32
 };
 
