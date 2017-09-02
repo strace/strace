@@ -39,7 +39,21 @@
 #endif
 #include <linux/rtnetlink.h>
 
+#ifndef IFLA_LINKINFO
+# define IFLA_LINKINFO 18
+#endif
+#ifndef IFLA_VF_PORTS
+# define IFLA_VF_PORTS 24
+#endif
 #define IFLA_LINK_NETNSID 37
+
+#ifndef IFLA_INFO_KIND
+# define IFLA_INFO_KIND 1
+#endif
+
+#ifndef IFLA_VF_PORT
+# define IFLA_VF_PORT 1
+#endif
 
 static void
 init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -311,6 +325,23 @@ main(void)
 		    printf("}"));
 #endif /* HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER */
 #endif /* HAVE_STRUCT_RTNL_LINK_STATS64 */
+
+	struct nlattr nla = {
+		.nla_len = sizeof(nla),
+		.nla_type = IFLA_INFO_KIND,
+	};
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_LINKINFO, sizeof(nla), &nla, sizeof(nla),
+		    printf("{nla_len=%u, nla_type=IFLA_INFO_KIND}",
+			   nla.nla_len));
+
+	nla.nla_type = IFLA_VF_PORT;
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_VF_PORTS, sizeof(nla), &nla, sizeof(nla),
+		    printf("{nla_len=%u, nla_type=IFLA_VF_PORT}",
+			   nla.nla_len));
 
 	puts("+++ exited with 0 +++");
 	return 0;
