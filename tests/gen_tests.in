@@ -205,6 +205,7 @@ nlattr_ifaddrlblmsg		+netlink_sock_diag.test
 nlattr_ifaddrmsg		+netlink_sock_diag.test
 nlattr_ifinfomsg		+netlink_sock_diag.test
 nlattr_ifla_brport		+netlink_sock_diag.test
+nlattr_ifla_port		+netlink_sock_diag.test
 nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_inet_diag_req_compat	+netlink_sock_diag.test
 nlattr_inet_diag_req_v2		+netlink_sock_diag.test
