@@ -220,6 +220,7 @@ nlattr_rtgenmsg			+netlink_sock_diag.test
 nlattr_rtmsg			+netlink_sock_diag.test
 nlattr_smc_diag_msg		+netlink_sock_diag.test
 nlattr_tc_stats			+netlink_sock_diag.test
+nlattr_tca_stab			+netlink_sock_diag.test
 nlattr_tcamsg			+netlink_sock_diag.test
 nlattr_tcmsg			+netlink_sock_diag.test
 nlattr_unix_diag_msg		+netlink_sock_diag.test

@@ -241,6 +241,7 @@ nlattr_rtgenmsg
 nlattr_rtmsg
 nlattr_smc_diag_msg
 nlattr_tc_stats
+nlattr_tca_stab
 nlattr_tcamsg
 nlattr_tcmsg
 nlattr_unix_diag_msg
