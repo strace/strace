@@ -37,6 +37,15 @@
 
 #include "xlat/rtnl_tc_action_attrs.h"
 
+static const nla_decoder_t tcamsg_nla_decoders[] = {
+	[TCA_ACT_KIND]		= decode_nla_str,
+	[TCA_ACT_OPTIONS]	= NULL, /* unimplemented */
+	[TCA_ACT_INDEX]		= decode_nla_u32,
+	[TCA_ACT_STATS]		= decode_nla_tc_stats,
+	[TCA_ACT_PAD]		= NULL,
+	[TCA_ACT_COOKIE]	= NULL /* default parser */
+};
+
 DECL_NETLINK_ROUTE_DECODER(decode_tcamsg)
 {
 	struct tcamsg tca = { .tca_family = family };
@@ -49,6 +58,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcamsg)
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_tc_action_attrs, "TCA_ACT_???",
-			      NULL, 0, NULL);
+			      tcamsg_nla_decoders,
+			      ARRAY_SIZE(tcamsg_nla_decoders), NULL);
 	}
 }
