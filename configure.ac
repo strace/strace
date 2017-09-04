@@ -448,7 +448,15 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_CHECK_UNION_BPF_ATTR([prog_flags])
 ])
 
-AC_CHECK_TYPES([struct br_port_msg],,, [#include <linux/if_bridge.h>])
+AC_CHECK_TYPES(m4_normalize([
+	struct br_mdb_entry,
+	struct br_port_msg
+]),,, [#include <linux/if_bridge.h>])
+AC_CHECK_MEMBERS(m4_normalize([
+	struct br_mdb_entry.flags,
+	struct br_mdb_entry.vid
+]),,, [#include <linux/if_bridge.h>])
+
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
