@@ -474,6 +474,15 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct rtnl_link_stats64.rx_nohandler
 ]),,, [#include <linux/if_link.h>])
 
+AC_CHECK_TYPES(m4_normalize([
+	struct gnet_stats_basic,
+	struct gnet_stats_queue,
+	struct gnet_stats_rate_est,
+	struct gnet_stats_rate_est64
+]),,, [#include <linux/gen_stats.h>])
+
+AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/pkt_sched.h>])
+
 AC_CHECK_TYPES([struct fib_rule_uid_range],,, [#include <linux/fib_rules.h>])
 
 AC_CHECK_TYPES([struct statfs], [
