@@ -1,6 +1,15 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behaviour
+  * Changed formatting of personality names on tile architecture in order
+    to make it in line with other multi-personality architectures.
+  * Changed field output order in struct v4l2_requestbuffers to improve in/out
+    field formatting.
+  * Changed handling of multiple signal= specifications in an injection
+    expression: multiple specification now leads to error instead of implicit
+    usage the last specification.
+
 * Improvements
   * Enhanced decoding of optlen argument of getsockopt syscall.
   * Enhanced decoding of SO_LINGER option of getsockopt and setsockopt syscalls.
@@ -9,8 +18,12 @@ Noteworthy changes in release ?.?? (????-??-??)
     IPV6_ADD_MEMBERSHIP, IPV6_DROP_MEMBERSHIP, IPV6_JOIN_ANYCAST,
     IPV6_LEAVE_ANYCAST, MCAST_JOIN_GROUP, and MCAST_LEAVE_GROUP options
     of setsockopt syscall.
+  * Enhanced decoding of KEYCTL_DH_COMPUTE operation of keyctl syscall
+    (KDF parameters decoding).
   * Implemented decoding of KEYCTL_RESTRICT_KEYRING operation of keyctl syscall.
   * Enhanced decoding of UFFDIO_API ioctl command.
+  * Enhanced decoding of BPF_PROG_LOAD, BPF_MAP_CREATE, BPF_MAP_LOOKUP_ELEM,
+    and BPF_MAP_GET_NEXT_KEY commands of bpf syscall.
   * Implemented decoding of linux socket filter programs specified
     for SO_ATTACH_FILTER and SO_ATTACH_REUSEPORT_CBPF socket options.
   * Implemented decoding of inet_diag_req_v2, inet_diag_req_compat,
@@ -24,13 +37,36 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented basic protocol specific decoding of addr, addrlabel, dcb, link,
     mdb, neigh, neightbl, netconf, nsid, route, rule, tc, and tca messages
     of NETLINK_ROUTE.
+  * Implemented decoding of NETLINK_KOBJECT_UEVENT messages.
+  * Improved handling of unexpected tracees (the ones that cloned with
+    CLONE_PARENT/CLONE_PTRACE or called PTRACE_TRACEME on themselves): they
+    are now PTRACE_DETACH'ed instead of PTRACE_CONT'ed.
   * Updated lists of BPF_*, KEY_*, RWF_*, SCM_*, SO_*, and *_MAGIC constants.
   * Added decoding of arch_prctl syscall on x86.
+  * Added decoding of seccomp, bpf, userfaultfd, membarrier, mlock2,
+    copy_file_range, preadv2, pwritev2, and statx on alpha.
+  * Added decoding of statx syscall on microblaze.
+  * Added decoding of s390_guarded_storage syscall on s390.
   * Updated lists of ioctl commands from Linux 4.13.
+  * Enhanced manual page.
 
 * Bug fixes
+  * Fixed printing of group_req structure on non-native personalities.
   * Fixed output formatting of blkpg_ioctl_arg, dm_name_list, and iocb
     structures.
+  * Fixed formatting of nul-terminated strings which have kernel-imposed size
+    limit.
+  * Fixed printing of paths that hit PATM_MAX limit in order to match kernel's
+    behaviour.
+  * Fixed build warnings on Android mips64.
+  * Fixed unused function "is_negated_errno" build warning when built
+    with clang.
+  * Fixed syscall number and arguments retrieval behaviour on sparc64 and
+    mips o32 after prctl(PR_SET_DUMPABLE, 0) makes PTRACE_PEEKTEXT impossible
+    to use if Linux kernel has commit v4.10-rc1~114^2~2.
+  * Fixed path tracing for execveat, symlink, symlinkat, inotify_add_watch,
+    and inotify_init syscalls.
+  * Fixed personality switch printing on sparc64 and risc-v.
 
 Noteworthy changes in release 4.18 (2017-07-05)
 ===============================================
