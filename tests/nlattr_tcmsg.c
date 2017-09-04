@@ -29,7 +29,9 @@
 #include "tests.h"
 
 #include <stdio.h>
+#include <stddef.h>
 #include "test_nlattr.h"
+#include <linux/pkt_sched.h>
 #include <linux/rtnetlink.h>
 
 static void
@@ -79,6 +81,42 @@ main(void)
 		     nla_type, nla_type_str,
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
+
+	static const struct tc_stats st = {
+		.bytes = 0xabcdcdbefeadefac,
+		.packets = 0xbcdeaefd,
+		.drops = 0xcdedafed,
+		.overlimits = 0xdcdbefad,
+		.bps = 0xefaebfad,
+		.pps = 0xfefbaedb,
+		.qlen = 0xabcdefab,
+		.backlog = 0xbdeabeab
+	};
+	char buf[offsetofend(struct tc_stats, backlog)];
+	memcpy(buf, &st, sizeof(buf));
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_tcmsg, print_tcmsg,
+			   TCA_STATS, pattern, buf,
+			   PRINT_FIELD_U("{", st, bytes);
+			   PRINT_FIELD_U(", ", st, packets);
+			   PRINT_FIELD_U(", ", st, drops);
+			   PRINT_FIELD_U(", ", st, overlimits);
+			   PRINT_FIELD_U(", ", st, bps);
+			   PRINT_FIELD_U(", ", st, pps);
+			   PRINT_FIELD_U(", ", st, qlen);
+			   PRINT_FIELD_U(", ", st, backlog);
+			   printf("}"));
+
+	static const struct tc_estimator est = {
+		.interval = 0xcd,
+		.ewma_log = 0xab
+	};
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_tcmsg, print_tcmsg,
+			   TCA_RATE, pattern, est,
+			   PRINT_FIELD_D("{", est, interval);
+			   PRINT_FIELD_U(", ", est, ewma_log);
+			   printf("}"));
 
 	puts("+++ exited with 0 +++");
 	return 0;
