@@ -61,6 +61,7 @@
 # LICENSE
 #
 #   Copyright (c) 2014, 2015, 2016 Philip Withnall <philip.withnall@collabora.co.uk>
+#   Copyright (c) 2016-2017 The strace developers.
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice

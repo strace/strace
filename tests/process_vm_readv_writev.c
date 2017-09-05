@@ -2,6 +2,7 @@
  * Check decoding of process_vm_readv/process_vm_writev syscall.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2016-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

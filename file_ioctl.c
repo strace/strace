@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016 Jeff Mahoney <jeffm@suse.com>
+ * Copyright (c) 2016-2017 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

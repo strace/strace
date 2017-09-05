@@ -61,6 +61,7 @@
 #   Copyright (c) 2012 Paolo Borelli
 #   Copyright (c) 2012 Dan Winship
 #   Copyright (c) 2015 Bastien ROUCARIES
+#   Copyright (c) 2016-2017 The strace developers.
 #
 #   This library is free software; you can redistribute it and/or modify it
 #   under the terms of the GNU Lesser General Public License as published by
