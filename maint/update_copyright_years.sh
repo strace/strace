@@ -27,11 +27,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+DEFAULT_GIT_COMMIT_TEMPLATE="Update copyright headers
+
+Headers updated automatically with
+
+    $0 $*"
+
 : ${COPYRIGHT_NOTICE='The strace developers.'}
 : ${COPYRIGHT_MARKER='Copyright'}
 : ${COPYRIGHT_PREFIX="${COPYRIGHT_MARKER} (c)"}
 : ${VERBOSE=1}
 : ${CALL_GIT_ADD=0}
+: ${CALL_GIT_COMMIT=0}
+: ${GIT_COMMIT_TEMPLATE=$DEFAULT_GIT_COMMIT_TEMPLATE}
 
 # These files are only imported into strace and not changed.
 # Remove them from the list once they have been changed.
@@ -57,6 +65,7 @@ Script implements hard-coded logic for extracting comments in files:
 
 Options:
   -a  Invoke git add for the changed files.
+  -c  Call git commit with message provided in $$GIT_COMMIT_TEMPLATE (implies -a).
   -v  Increase verbosity.
   -q  Decrease verbosity.
   -h  Show this help.
@@ -189,6 +198,10 @@ while [ -n "$1" ]; do
 	"-a")
 		CALL_GIT_ADD=1
 		;;
+	"-c")
+		CALL_GIT_ADD=1
+		CALL_GIT_COMMIT=1
+		;;
 	*)
 		break
 		;;
@@ -200,3 +213,5 @@ done
 git ls-files -- "$@" | grep -vFx "$IGNORED_FILES" | while read f; do
 	process_file "$f"
 done
+
+[ "$CALL_GIT_COMMIT" = 0 ] || git commit -m "$GIT_COMMIT_TEMPLATE"
