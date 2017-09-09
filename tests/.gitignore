@@ -224,6 +224,7 @@ nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
 nfnetlink_cttimeout
 nfnetlink_ipset
+nfnetlink_nftables
 nfnetlink_osf
 nfnetlink_queue
 nfnetlink_ulog
