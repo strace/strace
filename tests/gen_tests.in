@@ -200,6 +200,7 @@ newfstatat	-a32 -v -P stat.sample -P /dev/full
 nlattr		+netlink_sock_diag.test
 nfnetlink_ctnetlink		+netlink_sock_diag.test
 nfnetlink_ctnetlink_exp		+netlink_sock_diag.test
+nfnetlink_osf			+netlink_sock_diag.test
 nfnetlink_queue			+netlink_sock_diag.test
 nfnetlink_ulog			+netlink_sock_diag.test
 nlattr_crypto_user_alg		+netlink_sock_diag.test

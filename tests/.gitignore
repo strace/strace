@@ -220,6 +220,7 @@ netlink_xfrm
 newfstatat
 nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
+nfnetlink_osf
 nfnetlink_queue
 nfnetlink_ulog
 nlattr
