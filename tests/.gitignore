@@ -231,6 +231,7 @@ nlattr_ifla_xdp
 nlattr_inet_diag_msg
 nlattr_inet_diag_req_compat
 nlattr_inet_diag_req_v2
+nlattr_mdba_mdb_entry
 nlattr_ndmsg
 nlattr_ndtmsg
 nlattr_netconfmsg
