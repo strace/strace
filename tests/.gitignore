@@ -218,6 +218,7 @@ netlink_sock_diag
 netlink_unix_diag
 netlink_xfrm
 newfstatat
+nfnetlink_acct
 nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
 nfnetlink_ipset
