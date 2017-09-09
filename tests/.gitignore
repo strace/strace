@@ -220,6 +220,7 @@ netlink_xfrm
 newfstatat
 nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
+nfnetlink_queue
 nlattr
 nlattr_br_port_msg
 nlattr_crypto_user_alg
