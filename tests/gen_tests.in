@@ -204,6 +204,7 @@ nfnetlink_ctnetlink		+netlink_sock_diag.test
 nfnetlink_ctnetlink_exp		+netlink_sock_diag.test
 nfnetlink_cttimeout		+netlink_sock_diag.test
 nfnetlink_ipset			+netlink_sock_diag.test
+nfnetlink_nft_compat		+netlink_sock_diag.test
 nfnetlink_nftables		+netlink_sock_diag.test
 nfnetlink_osf			+netlink_sock_diag.test
 nfnetlink_queue			+netlink_sock_diag.test

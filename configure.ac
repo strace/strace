@@ -400,6 +400,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/neighbour.h
 	linux/netfilter/ipset/ip_set.h
 	linux/netfilter/nf_tables.h
+	linux/netfilter/nf_tables_compat.h
 	linux/netfilter/nfnetlink.h
 	linux/netfilter/nfnetlink_acct.h
 	linux/netfilter/nfnetlink_conntrack.h
