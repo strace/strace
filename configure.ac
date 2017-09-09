@@ -400,6 +400,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/neighbour.h
 	linux/netfilter/nfnetlink.h
 	linux/netfilter/nfnetlink_conntrack.h
+	linux/netfilter/nfnetlink_log.h
 	linux/netfilter/nfnetlink_queue.h
 	linux/nsfs.h
 	linux/perf_event.h

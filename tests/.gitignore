@@ -221,6 +221,7 @@ newfstatat
 nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
 nfnetlink_queue
+nfnetlink_ulog
 nlattr
 nlattr_br_port_msg
 nlattr_crypto_user_alg
