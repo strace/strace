@@ -219,6 +219,7 @@ netlink_unix_diag
 netlink_xfrm
 newfstatat
 nfnetlink_acct
+nfnetlink_cthelper
 nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
 nfnetlink_cttimeout
