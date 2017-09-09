@@ -236,67 +236,86 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 	decoder(xlat, type, dflt);
 }
 
+static const struct xlat *
+decode_nlmsg_flags_crypto(const uint16_t type)
+{
+	switch (type) {
+	case CRYPTO_MSG_NEWALG:
+		return netlink_new_flags;
+	case CRYPTO_MSG_GETALG:
+		return netlink_get_flags;
+	}
+
+	return NULL;
+}
+
+static const struct xlat *
+decode_nlmsg_flags_route(const uint16_t type)
+{
+	if (type == RTM_DELACTION)
+		return netlink_get_flags;
+	switch (type & 3) {
+	case  0:
+		return netlink_new_flags;
+	case  2:
+		return netlink_get_flags;
+	}
+
+	return NULL;
+}
+
+static const struct xlat *
+decode_nlmsg_flags_sock_diag(const uint16_t type)
+{
+	return netlink_get_flags;
+}
+
+static const struct xlat *
+decode_nlmsg_flags_xfrm(const uint16_t type)
+{
+	switch (type) {
+	case XFRM_MSG_NEWSA:
+	case XFRM_MSG_NEWPOLICY:
+	case XFRM_MSG_NEWAE:
+	case XFRM_MSG_NEWSADINFO:
+	case XFRM_MSG_NEWSPDINFO:
+		return netlink_new_flags;
+	case XFRM_MSG_GETSA:
+	case XFRM_MSG_GETPOLICY:
+	case XFRM_MSG_GETAE:
+	case XFRM_MSG_GETSADINFO:
+	case XFRM_MSG_GETSPDINFO:
+		return netlink_get_flags;
+	}
+
+	return NULL;
+}
+
+typedef const struct xlat *(*nlmsg_flags_decoder_t)(const uint16_t type);
+
+static const nlmsg_flags_decoder_t nlmsg_flags[] = {
+	[NETLINK_CRYPTO] = decode_nlmsg_flags_crypto,
+	[NETLINK_ROUTE] = decode_nlmsg_flags_route,
+	[NETLINK_SOCK_DIAG] = decode_nlmsg_flags_sock_diag,
+	[NETLINK_XFRM] = decode_nlmsg_flags_xfrm
+};
+
+/*
+ * As all valid netlink families are positive integers, use unsigned int
+ * for family here to filter out -1.
+ */
 static void
-decode_nlmsg_flags(const uint16_t flags, const uint16_t type, const int family)
+decode_nlmsg_flags(const uint16_t flags, const uint16_t type,
+		   const unsigned int family)
 {
 	const struct xlat *table = NULL;
 
 	if (type < NLMSG_MIN_TYPE) {
 		if (type == NLMSG_ERROR)
 			table = netlink_ack_flags;
-		goto end;
-	}
+	} else if (family < ARRAY_SIZE(nlmsg_flags) && nlmsg_flags[family])
+		table = nlmsg_flags[family](type);
 
-	switch (family) {
-	case NETLINK_CRYPTO:
-		switch (type) {
-		case CRYPTO_MSG_NEWALG:
-			table = netlink_new_flags;
-			break;
-		case CRYPTO_MSG_GETALG:
-			table = netlink_get_flags;
-			break;
-		}
-		break;
-	case NETLINK_SOCK_DIAG:
-		table = netlink_get_flags;
-		break;
-	case NETLINK_ROUTE:
-		if (type == RTM_DELACTION) {
-			table = netlink_get_flags;
-			break;
-		}
-		switch (type & 3) {
-		case  0:
-			table = netlink_new_flags;
-			break;
-		case  2:
-			table = netlink_get_flags;
-			break;
-		}
-		break;
-	case NETLINK_XFRM:
-		switch (type) {
-		case XFRM_MSG_NEWSA:
-		case XFRM_MSG_NEWPOLICY:
-		case XFRM_MSG_NEWAE:
-		case XFRM_MSG_NEWSADINFO:
-		case XFRM_MSG_NEWSPDINFO:
-			table = netlink_new_flags;
-			break;
-
-		case XFRM_MSG_GETSA:
-		case XFRM_MSG_GETPOLICY:
-		case XFRM_MSG_GETAE:
-		case XFRM_MSG_GETSADINFO:
-		case XFRM_MSG_GETSPDINFO:
-			table = netlink_get_flags;
-			break;
-		}
-		break;
-	}
-
-end:
 	printflags_ex(flags, "NLM_F_???", netlink_flags, table, NULL);
 }
 
