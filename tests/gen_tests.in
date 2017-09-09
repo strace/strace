@@ -211,6 +211,7 @@ nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_inet_diag_req_compat	+netlink_sock_diag.test
 nlattr_inet_diag_req_v2		+netlink_sock_diag.test
 nlattr_mdba_mdb_entry		+netlink_sock_diag.test
+nlattr_mdba_router_port		+netlink_sock_diag.test
 nlattr_ndmsg			+netlink_sock_diag.test
 nlattr_ndtmsg			+netlink_sock_diag.test
 nlattr_netconfmsg		+netlink_sock_diag.test
