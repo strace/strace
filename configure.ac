@@ -402,6 +402,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter/nfnetlink.h
 	linux/netfilter/nfnetlink_acct.h
 	linux/netfilter/nfnetlink_conntrack.h
+	linux/netfilter/nfnetlink_cttimeout.h
 	linux/netfilter/nfnetlink_log.h
 	linux/netfilter/nfnetlink_queue.h
 	linux/netfilter/xt_osf.h

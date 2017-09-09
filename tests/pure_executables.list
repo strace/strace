@@ -183,6 +183,7 @@ newfstatat
 nfnetlink_acct
 nfnetlink_ctnetlink
 nfnetlink_ctnetlink_exp
+nfnetlink_cttimeout
 nfnetlink_ipset
 nfnetlink_osf
 nfnetlink_queue
