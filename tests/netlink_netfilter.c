@@ -52,19 +52,19 @@ test_nlmsg_type(const int fd)
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-
-	nlh.nlmsg_type = (NFNL_SUBSYS_CTNETLINK << 8) | NFNL_MSG_BATCH_BEGIN;
-	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=NFNL_SUBSYS_CTNETLINK<<8|%#x"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh.nlmsg_len, NFNL_MSG_BATCH_BEGIN,
-	       (unsigned) sizeof(nlh), sprintrc(rc));
 # endif
 
-	nlh.nlmsg_type = (NFNL_SUBSYS_CTNETLINK << 8);
+	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK << 8 | 0xff;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=NFNL_SUBSYS_CTNETLINK<<8|0"
+	printf("sendto(%d, {len=%u"
+	       ", type=NFNL_SUBSYS_CTNETLINK<<8|0xff /* IPCTNL_MSG_CT_??? */"
+	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
+
+	nlh.nlmsg_type = 0xffff;
+	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {len=%u, type=0xff /* NFNL_SUBSYS_??? */<<8|0xff"
 	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));

@@ -39,6 +39,17 @@
 #include "xlat/netlink_new_flags.h"
 #include "xlat/netlink_protocols.h"
 #include "xlat/netlink_types.h"
+#include "xlat/nf_acct_msg_types.h"
+#include "xlat/nf_cthelper_msg_types.h"
+#include "xlat/nf_ctnetlink_exp_msg_types.h"
+#include "xlat/nf_ctnetlink_msg_types.h"
+#include "xlat/nf_cttimeout_msg_types.h"
+#include "xlat/nf_ipset_msg_types.h"
+#include "xlat/nf_nft_compat_msg_types.h"
+#include "xlat/nf_nftables_msg_types.h"
+#include "xlat/nf_osf_msg_types.h"
+#include "xlat/nf_queue_msg_types.h"
+#include "xlat/nf_ulog_msg_types.h"
 #include "xlat/nl_audit_types.h"
 #include "xlat/nl_crypto_types.h"
 #include "xlat/nl_netfilter_msg_types.h"
@@ -110,6 +121,38 @@ decode_nlmsg_type_generic(const struct xlat *const xlat,
 	printxval(genl_families_xlat(), type, dflt);
 }
 
+static const struct {
+	const struct xlat *const xlat;
+	const char *const dflt;
+} nf_nlmsg_types[] = {
+	[NFNL_SUBSYS_CTNETLINK] = {
+		nf_ctnetlink_msg_types,
+		"IPCTNL_MSG_CT_???"
+	},
+	[NFNL_SUBSYS_CTNETLINK_EXP] = {
+		nf_ctnetlink_exp_msg_types,
+		"IPCTNL_MSG_EXP_???"
+	},
+	[NFNL_SUBSYS_QUEUE] = { nf_queue_msg_types, "NFQNL_MSG_???" },
+	[NFNL_SUBSYS_ULOG] = { nf_ulog_msg_types, "NFULNL_MSG_???" },
+	[NFNL_SUBSYS_OSF] = { nf_osf_msg_types, "OSF_MSG_???" },
+	[NFNL_SUBSYS_IPSET] = { nf_ipset_msg_types, "IPSET_CMD_???" },
+	[NFNL_SUBSYS_ACCT] = { nf_acct_msg_types, "NFNL_MSG_ACCT_???" },
+	[NFNL_SUBSYS_CTNETLINK_TIMEOUT] = {
+		nf_cttimeout_msg_types,
+		"IPCTNL_MSG_TIMEOUT_???"
+	},
+	[NFNL_SUBSYS_CTHELPER] = {
+		nf_cthelper_msg_types,
+		"NFNL_MSG_CTHELPER_???"
+	},
+	[NFNL_SUBSYS_NFTABLES] = { nf_nftables_msg_types, "NFT_MSG_???" },
+	[NFNL_SUBSYS_NFT_COMPAT] = {
+		nf_nft_compat_msg_types,
+		"NFNL_MSG_COMPAT_???"
+	}
+};
+
 static void
 decode_nlmsg_type_netfilter(const struct xlat *const xlat,
 			    const uint16_t type,
@@ -131,11 +174,12 @@ decode_nlmsg_type_netfilter(const struct xlat *const xlat,
 
 	printxval(xlat, subsys_id, dflt);
 
-	/*
-	 * The type is subsystem specific,
-	 * print it in numeric format for now.
-	 */
-	tprintf("<<8|%#x", msg_type);
+	tprints("<<8|");
+	if (subsys_id < ARRAY_SIZE(nf_nlmsg_types))
+		printxval(nf_nlmsg_types[subsys_id].xlat,
+			  msg_type, nf_nlmsg_types[subsys_id].dflt);
+	else
+		tprintf("%#x", msg_type);
 }
 
 typedef void (*nlmsg_types_decoder_t)(const struct xlat *,
