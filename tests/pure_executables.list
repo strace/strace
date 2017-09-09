@@ -180,6 +180,7 @@ netlink_selinux
 netlink_sock_diag
 netlink_xfrm
 newfstatat
+nfnetlink_ctnetlink
 nlattr
 nlattr_crypto_user_alg
 nlattr_br_port_msg
