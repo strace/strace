@@ -2,7 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of MADV_*, SO_*, SOL_* and TCP_* constants.
+  * Updated lists of BPF_*, MADV_*, SO_*, SOL_* and TCP_* constants.
 
 Noteworthy changes in release 4.19 (2017-09-05)
 ===============================================
