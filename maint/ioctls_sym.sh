@@ -27,6 +27,8 @@
 
 set -efu
 
+export LC_ALL=C
+
 # This script processes header files containing ioctl command definitions in
 # symbolic form, assuming that these definitions match the following regular
 # expressions:
@@ -37,7 +39,7 @@ r_io='\([A-Z]\+\)\?_S\?\(IO\|IOW\|IOR\|IOWR\|IOC\)'
 r_value='[[:space:]]\+'"$r_io"'[[:space:]]*([^)]'
 regexp="${r_define}${r_cmd_name}${r_value}"
 
-uname_m="$(uname -m)"
+: "${uname_m:=$(uname -m)}"
 me="${0##*/}"
 msg()
 {
@@ -89,19 +91,27 @@ failed=0
 CC="${CC:-gcc}"
 CPP="${CPP:-cpp}"
 CPPFLAGS="${CPPFLAGS-} -D__EXPORTED_HEADERS__"
-CFLAGS="${CFLAGS:--Wall -O2} -D__EXPORTED_HEADERS__"
-LDFLAGS="${LDFLAGS-}"
+CFLAGS="${CFLAGS:--Wall -O2} -gdwarf-2 -D__EXPORTED_HEADERS__"
 INCLUDES="-I$inc_dir/uapi -I$inc_dir ${INCLUDES-}"
-
-$CC $INCLUDES $CFLAGS -c -o "$tmpdir"/print_ioctlent.o "${0%/*}"/print_ioctlent.c
 
 # Hook onto <asm-generic/ioctl.h> and <asm/ioctl.h>
 for d in asm-generic asm; do
 	mkdir "$tmpdir/$d"
 	cat > "$tmpdir/$d"/ioctl.h <<__EOF__
 #include_next <$d/ioctl.h>
+#undef _IOC_NONE
+#define _IOC_NONE (2<<7)
+#undef _IOC_READ
+#define _IOC_READ (2<<8)
+#undef _IOC_WRITE
+#define _IOC_WRITE (2<<9)
 #undef _IOC
-#define _IOC(dir,type,nr,size) dir, type, nr, size
+#define _IOC(dir, type, nr, size) \
+	char \
+		d[1 + (dir)], \
+		n[1 + (((unsigned) (type) << _IOC_TYPESHIFT) | \
+			((unsigned) (nr) << _IOC_NRSHIFT))], \
+		s[1 + (size)]
 __EOF__
 done
 
@@ -158,15 +168,8 @@ typedef unsigned long long u64;
 
 #include "$f"
 
-void print_ioctlent(const char *, const char *, unsigned short, unsigned short, unsigned short, unsigned short);
-
-int main(void)
-{
-
 #include "defs.h"
 
-return 0;
-}
 __EOF__
 
 	# Soft pre-include workarounds for some processed files.  Fragile.
@@ -412,17 +415,27 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 	# Keep this in sync with $regexp by replacing $r_cmd_name with $r_local_names.
 	defs_regexp="${r_define}\($r_local_names\)${r_value}"
 
-	qf="$(echo "$prefix$f" | sed 's/[&\/]/\\&/g')"
 	# This outputs lines in the following format:
-	# print_ioctlent("filename.h", "IOCTL_CMD_NAME", IOCTL_CMD_NAME);
-	sed -n 's/'"$defs_regexp"'.*/print_ioctlent("'"$qf"'", "\1", \1);/p' \
+	# struct {IOCTL_CMD_NAME;} ioc_IOCTL_CMD_NAME;
+	sed -n 's/'"$defs_regexp"'.*/struct {\1;} ioc_\1;/p' \
 		< "$tmpdir"/header.out > "$tmpdir"/defs.h
 
 	# If something is wrong with the file, this will fail.
 	$CC $INCLUDES $CFLAGS -c -o "$tmpdir"/printents.o "$tmpdir"/printents.c
-	$CC $LDFLAGS -o "$tmpdir"/print_ioctlents \
-		"$tmpdir"/printents.o "$tmpdir"/print_ioctlent.o
-	"$tmpdir"/print_ioctlents > "$tmpdir"/ioctlents
+
+	readelf --wide --debug-dump=info "$tmpdir"/printents.o \
+		> "$tmpdir"/debug-dump
+
+	sed -r -n '
+		/^[[:space:]]*<1>/,/^[[:space:]]*<1><[^>]+>: Abbrev Number: 0/!d
+		/^[[:space:]]*<[^>]*><[^>]*>: Abbrev Number: 0/d
+		s/^[[:space:]]*<[[:xdigit:]]+>[[:space:]]+//
+		s/^[[:space:]]*((<[[:xdigit:]]+>){2}):[[:space:]]+/\1\n/
+		s/[[:space:]]+$//
+		p' "$tmpdir"/debug-dump > "$tmpdir"/debug-info
+	gawk -v HEADER_NAME="$prefix$f" -f "${0%/*}"/ioctls_sym.awk \
+		"$tmpdir"/debug-info > "$tmpdir"/ioctlents
+
 	cat "$tmpdir"/ioctlents
 	msg "$f: fetched $(grep -c '^{' "$tmpdir"/ioctlents) ioctl entries"
 }
