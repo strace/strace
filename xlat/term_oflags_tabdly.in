@@ -1,0 +1,8 @@
+#ifndef ALPHA
+XTABS /* required by POSIX to == TAB3; but not on Alpha! */
+#endif
+
+TAB0
+TAB1
+TAB2
+TAB3

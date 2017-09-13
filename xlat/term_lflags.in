@@ -1,0 +1,18 @@
+ISIG         /* Enable signals.  */
+ICANON       /* Do erase and kill processing.  */
+XCASE
+ECHO         /* Enable echo.  */
+ECHOE        /* Visual erase for ERASE.  */
+ECHOK        /* Echo NL after KILL.  */
+ECHONL       /* Echo NL even if ECHO is off.  */
+NOFLSH       /* Disable flush after interrupt.  */
+IEXTEN       /* Enable DISCARD and LNEXT.  */
+ECHOCTL      /* Echo control characters as ^X.  */
+ECHOPRT      /* Hardcopy visual erase.  */
+ECHOKE       /* Visual erase for KILL.  */
+FLUSHO
+PENDIN       /* Retype pending input (state).  */
+TOSTOP       /* Send SIGTTOU for background output.  */
+EXTPROC      /* External processing on pty */
+
+DEFECHO      /* SUNOS thing, what is it? */

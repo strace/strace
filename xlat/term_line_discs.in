@@ -1,0 +1,28 @@
+N_TTY		0
+N_SLIP		1
+N_MOUSE		2
+N_PPP		3
+N_STRIP		4
+N_AX25		5
+N_X25		6	/* X.25 async */
+N_6PACK		7
+N_MASC		8	/* Reserved for Mobitex module <kaz@cafe.net> */
+N_R3964		9	/* Reserved for Simatic R3964 module */
+N_PROFIBUS_FDL	10	/* Reserved for Profibus */
+N_IRDA		11	/* Linux IrDa - http://irda.sourceforge.net/ */
+N_SMSBLOCK	12	/* SMS block mode - for talking to GSM data cards about SMS messages */
+N_HDLC		13	/* synchronous HDLC */
+N_SYNC_PPP	14	/* synchronous PPP */
+N_HCI		15	/* Bluetooth HCI UART */
+N_GIGASET_M101	16	/* Siemens Gigaset M101 serial DECT adapter */
+N_SLCAN		17	/* Serial / USB serial CAN Adaptors */
+N_PPS		18	/* Pulse per Second */
+N_V253		19	/* Codec control over voice modem */
+N_CAIF		20      /* CAIF protocol for talking to modems */
+N_GSM0710	21	/* GSM 0710 Mux */
+N_TI_WL		22	/* for TI's WL BT, FM, GPS combo chips */
+N_TRACESINK	23	/* Trace data routing for MIPI P1149.7 */
+N_TRACEROUTER	24	/* Trace data routing for MIPI P1149.7 */
+N_NCI		25	/* NFC NCI UART */
+N_SPEAKUP	26	/* Speakup communication with synths */
+N_NULL		27	/* Null ldisc used for error handling */
