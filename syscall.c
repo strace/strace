@@ -160,12 +160,32 @@ enum {
 #endif
 };
 
+const char *const *errnoent_vec[SUPPORTED_PERSONALITIES] = {
+	errnoent0,
+#if SUPPORTED_PERSONALITIES > 1
+	errnoent1,
+# if SUPPORTED_PERSONALITIES > 2
+	errnoent2,
+# endif
+#endif
+};
+
 enum {
 	nerrnos0 = ARRAY_SIZE(errnoent0)
 #if SUPPORTED_PERSONALITIES > 1
 	, nerrnos1 = ARRAY_SIZE(errnoent1)
 # if SUPPORTED_PERSONALITIES > 2
 	, nerrnos2 = ARRAY_SIZE(errnoent2)
+# endif
+#endif
+};
+
+const unsigned int nerrnoent_vec[] = {
+	nerrnos0,
+#if SUPPORTED_PERSONALITIES > 1
+	nerrnos1,
+# if SUPPORTED_PERSONALITIES > 2
+	nerrnos2,
 # endif
 #endif
 };
@@ -180,12 +200,52 @@ enum {
 #endif
 };
 
+const char *const *signalent_vec[SUPPORTED_PERSONALITIES] = {
+	signalent0,
+#if SUPPORTED_PERSONALITIES > 1
+	signalent1,
+# if SUPPORTED_PERSONALITIES > 2
+	signalent2,
+# endif
+#endif
+};
+
+const unsigned int nsignalent_vec[] = {
+	nsignals0,
+#if SUPPORTED_PERSONALITIES > 1
+	nsignals1,
+# if SUPPORTED_PERSONALITIES > 2
+	nsignals2,
+# endif
+#endif
+};
+
 enum {
 	nioctlents0 = ARRAY_SIZE(ioctlent0)
 #if SUPPORTED_PERSONALITIES > 1
 	, nioctlents1 = ARRAY_SIZE(ioctlent1)
 # if SUPPORTED_PERSONALITIES > 2
 	, nioctlents2 = ARRAY_SIZE(ioctlent2)
+# endif
+#endif
+};
+
+const unsigned int nioctlent_vec[] = {
+	nioctlents0,
+#if SUPPORTED_PERSONALITIES > 1
+	nioctlents1,
+# if SUPPORTED_PERSONALITIES > 2
+	nioctlents2,
+# endif
+#endif
+};
+
+const struct_ioctlent *const ioctlent_vec[SUPPORTED_PERSONALITIES] = {
+	ioctlent0,
+#if SUPPORTED_PERSONALITIES > 1
+	ioctlent1,
+# if SUPPORTED_PERSONALITIES > 2
+	ioctlent2,
 # endif
 #endif
 };
@@ -222,29 +282,51 @@ const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 #endif
 };
 
+const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
+	PERSONALITY0_WORDSIZE,
 #if SUPPORTED_PERSONALITIES > 1
+	PERSONALITY1_WORDSIZE,
+#endif
+#if SUPPORTED_PERSONALITIES > 2
+	PERSONALITY2_WORDSIZE,
+#endif
+};
+
+const int personality_klongsize[SUPPORTED_PERSONALITIES] = {
+	PERSONALITY0_KLONGSIZE,
+#if SUPPORTED_PERSONALITIES > 1
+	PERSONALITY1_KLONGSIZE,
+#endif
+#if SUPPORTED_PERSONALITIES > 2
+	PERSONALITY2_KLONGSIZE,
+#endif
+};
+
+const char *const personality_names[] =
+# if defined X86_64
+	{"64 bit", "32 bit", "x32"}
+# elif defined X32
+	{"x32", "32 bit"}
+# elif SUPPORTED_PERSONALITIES == 2
+	{"64 bit", "32 bit"}
+# else
+	{STRINGIFY_VAL(__WORDSIZE) " bit"}
+# endif
+	;
+
+#if SUPPORTED_PERSONALITIES > 1
+
 unsigned current_personality;
 
 # ifndef current_wordsize
 unsigned current_wordsize;
-static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
-	PERSONALITY0_WORDSIZE,
-	PERSONALITY1_WORDSIZE,
-# if SUPPORTED_PERSONALITIES > 2
-	PERSONALITY2_WORDSIZE,
 # endif
-};
+# ifndef current_klongsize
+unsigned current_klongsize;
 # endif
 
 # ifndef current_klongsize
 unsigned current_klongsize;
-static const int personality_klongsize[SUPPORTED_PERSONALITIES] = {
-	PERSONALITY0_KLONGSIZE,
-	PERSONALITY1_KLONGSIZE,
-#  if SUPPORTED_PERSONALITIES > 2
-	PERSONALITY2_KLONGSIZE,
-#  endif
-};
 # endif
 
 void
@@ -307,21 +389,10 @@ update_personality(struct tcb *tcp, unsigned int personality)
 		return;
 	tcp->currpers = personality;
 
-# undef PERSONALITY_NAMES
-# if defined X86_64
-#  define PERSONALITY_NAMES {"64 bit", "32 bit", "x32"}
-# elif defined X32
-#  define PERSONALITY_NAMES {"x32", "32 bit"}
-# elif SUPPORTED_PERSONALITIES == 2
-#  define PERSONALITY_NAMES {"64 bit", "32 bit"}
-# endif
-# ifdef PERSONALITY_NAMES
 	if (!qflag) {
-		static const char *const names[] = PERSONALITY_NAMES;
 		error_msg("[ Process PID=%d runs in %s mode. ]",
-			  tcp->pid, names[personality]);
+			  tcp->pid, personality_names[personality]);
 	}
-# endif
 }
 #endif
 
@@ -539,18 +610,11 @@ static int arch_set_success(struct tcb *);
 
 struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
-static struct inject_opts *
-tcb_inject_opts(struct tcb *tcp)
+static struct inject_data
+tcb_inject_data(struct tcb *tcp, bool step)
 {
-	return (scno_in_range(tcp->scno) && tcp->inject_vec[current_personality])
-	       ? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
-}
-
-
-static long
-tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
-{
-	if (!tcp->inject_vec[current_personality]) {
+	if (step && !tcp->inject_vec[current_personality] &&
+	    inject_vec[current_personality]) {
 		tcp->inject_vec[current_personality] =
 			xcalloc(nsyscalls, sizeof(**inject_vec));
 		memcpy(tcp->inject_vec[current_personality],
@@ -558,21 +622,31 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 		       nsyscalls * sizeof(**inject_vec));
 	}
 
-	struct inject_opts *opts = tcb_inject_opts(tcp);
+	struct inject_opts *opts =
+		scno_in_range(tcp->scno) && tcp->inject_vec[current_personality]
+		? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
+	struct inject_data res = {};
+	if (opts) {
+		if (step) {
+			if (opts->first != 0 && --opts->first == 0) {
+				res = opts->data;
+				opts->first = opts->step;
+			}
+		} else {
+			res = opts->data;
+		}
+	}
+	return res;
+}
 
-	if (!opts || opts->first == 0)
-		return 0;
+static long
+tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
+{
+	struct inject_data data = tcb_inject_data(tcp, true);
 
-	--opts->first;
-
-	if (opts->first != 0)
-		return 0;
-
-	opts->first = opts->step;
-
-	if (opts->data.flags & INJECT_F_SIGNAL)
-		*signo = opts->data.signo;
-	if (opts->data.flags & INJECT_F_RETVAL && !arch_set_scno(tcp, -1))
+	if (data.flags & INJECT_F_SIGNAL)
+		*signo = data.signo;
+	if ((data.flags & INJECT_F_RETVAL) && !arch_set_scno(tcp, -1))
 		tcp->flags |= TCB_TAMPERED;
 
 	return 0;
@@ -581,22 +655,22 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 static long
 tamper_with_syscall_exiting(struct tcb *tcp)
 {
-	struct inject_opts *opts = tcb_inject_opts(tcp);
+	struct inject_data data = tcb_inject_data(tcp, false);
 
-	if (!opts)
+	if (!(data.flags & INJECT_F_RETVAL))
 		return 0;
 
-	if (opts->data.rval >= 0) {
+	if (data.rval >= 0) {
 		kernel_long_t u_rval = tcp->u_rval;
 
-		tcp->u_rval = opts->data.rval;
+		tcp->u_rval = data.rval;
 		if (arch_set_success(tcp)) {
 			tcp->u_rval = u_rval;
 		} else {
 			tcp->u_error = 0;
 		}
 	} else {
-		unsigned long new_error = -opts->data.rval;
+		unsigned long new_error = -data.rval;
 
 		if (new_error != tcp->u_error && new_error <= MAX_ERRNO_VALUE) {
 			unsigned long u_error = tcp->u_error;
@@ -659,6 +733,12 @@ syscall_entering_decode(struct tcb *tcp)
 	return 1;
 }
 
+static bool
+syscall_ad_hoc_injected(struct tcb *tcp)
+{
+	return (tcp->qual_flg & QUAL_INJECT) && (tcp->flags & TCB_AD_HOC_INJECT);
+}
+
 int
 syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 {
@@ -679,20 +759,20 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 
 	if (!traced(tcp) || (tracing_paths && !pathtrace_match(tcp))) {
 		tcp->flags |= TCB_FILTERED;
-		return 0;
+		goto maybe_ad_hoc_tamper;
 	}
 
 	tcp->flags &= ~TCB_FILTERED;
 
 	if (hide_log(tcp)) {
-		return 0;
+		goto maybe_ad_hoc_tamper;
 	}
 
 	if (inject(tcp))
 		tamper_with_syscall_entering(tcp, sig);
 
 	if (cflag == CFLAG_ONLY_STATS) {
-		return 0;
+		goto maybe_ad_hoc_tamper;
 	}
 
 #ifdef USE_LIBUNWIND
@@ -707,6 +787,11 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	int res = raw(tcp) ? printargs(tcp) : tcp->s_ent->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;
+
+maybe_ad_hoc_tamper:
+	if (syscall_ad_hoc_injected(tcp))
+		tamper_with_syscall_entering(tcp, sig);
+	return 0;
 }
 
 void
@@ -747,21 +832,28 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 	}
 #endif
 
-	if (filtered(tcp) || hide_log(tcp))
+	if ((filtered(tcp) || hide_log(tcp))
+	 && !(tcp->qual_flg & QUAL_HOOK_EXIT) && !syscall_ad_hoc_injected(tcp))
 		return 0;
 
 	get_regs(tcp->pid);
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
-	return get_regs_error ? -1 : get_syscall_result(tcp);
+	if (get_regs_error || get_syscall_result(tcp) == -1)
+		return -1;
+
+	if (syserror(tcp) && syscall_tampered(tcp))
+		tamper_with_syscall_exiting(tcp);
+
+	return 1;
 }
 
 int
 syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 {
-	if (syserror(tcp) && syscall_tampered(tcp))
-		tamper_with_syscall_exiting(tcp);
+	if (filtered(tcp) || hide_log(tcp))
+		return 0;
 
 	if (cflag) {
 		count_syscall(tcp, &tv);
@@ -970,7 +1062,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 void
 syscall_exiting_finish(struct tcb *tcp)
 {
-	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
+	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_AD_HOC_INJECT);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 }

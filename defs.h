@@ -175,11 +175,6 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY2_INCLUDE_FUNCS "empty.h"
 #endif
 
-typedef struct ioctlent {
-	const char *symbol;
-	unsigned int code;
-} struct_ioctlent;
-
 #define INJECT_F_SIGNAL 1
 #define INJECT_F_RETVAL 2
 
@@ -197,39 +192,7 @@ struct inject_opts {
 
 #define MAX_ERRNO_VALUE			4095
 
-/* Trace Control Block */
-struct tcb {
-	int flags;		/* See below for TCB_ values */
-	int pid;		/* If 0, this tcb is free */
-	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
-	unsigned long u_error;	/* Error code */
-	kernel_ulong_t scno;	/* System call number */
-	kernel_ulong_t u_arg[MAX_ARGS];	/* System call arguments */
-	kernel_long_t u_rval;	/* Return value */
-#if SUPPORTED_PERSONALITIES > 1
-	unsigned int currpers;	/* Personality at the time of scno update */
-#endif
-	int sys_func_rval;	/* Syscall entry parser's return value */
-	int curcol;		/* Output column for this process */
-	FILE *outf;		/* Output file for this process */
-	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
-	void *_priv_data;	/* Private data for syscall decoding functions */
-	void (*_free_priv_data)(void *); /* Callback for freeing priv_data */
-	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
-	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
-	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
-	struct timeval stime;	/* System time usage as of last process wait */
-	struct timeval dtime;	/* Delta for system time usage */
-	struct timeval etime;	/* Syscall entry time */
-
-#ifdef USE_LIBUNWIND
-	struct UPT_info *libunwind_ui;
-	struct mmap_cache_t *mmap_cache;
-	unsigned int mmap_cache_size;
-	unsigned int mmap_cache_generation;
-	struct queue_t *queue;
-#endif
-};
+#include "defs_shared.h"
 
 /* TCB flags */
 /* We have attached to this process, but did not see it stopping yet */
@@ -253,6 +216,8 @@ struct tcb {
 #define TCB_TAMPERED	0x40	/* A syscall has been tampered with */
 #define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
 #define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x100	/* -b execve should skip detach on first execve */
+#define TCB_AD_HOC_INJECT	0x200	/* an ad hoc injection was performed by Lua script */
+#define TCB_HOOK	0x400	/* there is Lua hook for this syscall entry or exit */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -260,6 +225,8 @@ struct tcb {
 #define QUAL_VERBOSE	0x004	/* decode the structures of this syscall */
 #define QUAL_RAW	0x008	/* print all args in hex for this syscall */
 #define QUAL_INJECT	0x010	/* tamper with this system call on purpose */
+#define QUAL_HOOK_ENTRY	0x800	/* return this syscall on entry from next_sc() */
+#define QUAL_HOOK_EXIT	0x1000	/* return this syscall on exit from next_sc() */
 
 #define DEFAULT_QUAL_FLAGS (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 
@@ -318,6 +285,8 @@ extern const struct xlat whence_codes[];
 #define RVAL_IOCTL_DECODED 0200	/* ioctl sub-parser successfully decoded
 				   the argument */
 
+#define RVAL_HOOKED	0400	/* there is Lua hook for this syscall entry or exit */
+
 #define IOCTL_NUMBER_UNKNOWN 0
 #define IOCTL_NUMBER_HANDLED 1
 #define IOCTL_NUMBER_STOP_LOOKUP 010
@@ -362,6 +331,7 @@ typedef enum {
 	CFLAG_ONLY_STATS,
 	CFLAG_BOTH
 } cflag_t;
+extern const struct syscall_class syscall_classes[];
 extern cflag_t cflag;
 extern bool debug_flag;
 extern bool Tflag;
@@ -949,6 +919,17 @@ extern const struct_sysent sysent0[];
 extern const char *const errnoent0[];
 extern const char *const signalent0[];
 extern const struct_ioctlent ioctlent0[];
+
+extern const char *const *errnoent_vec[SUPPORTED_PERSONALITIES];
+extern const char *const *signalent_vec[SUPPORTED_PERSONALITIES];
+extern const struct_ioctlent *const ioctlent_vec[SUPPORTED_PERSONALITIES];
+extern const unsigned int nerrnoent_vec[SUPPORTED_PERSONALITIES];
+extern const unsigned int nsignalent_vec[SUPPORTED_PERSONALITIES];
+extern const unsigned int nioctlent_vec[SUPPORTED_PERSONALITIES];
+
+extern const int personality_wordsize[SUPPORTED_PERSONALITIES];
+extern const int personality_klongsize[SUPPORTED_PERSONALITIES];
+extern const char *const personality_names[];
 
 #if SUPPORTED_PERSONALITIES > 1
 extern const struct_sysent *sysent;

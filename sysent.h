@@ -1,13 +1,31 @@
-#ifndef STRACE_SYSENT_H
-#define STRACE_SYSENT_H
+#if !defined(STRACE_SYSENT_H) || defined(FFI_CDEF)
+#ifndef FFI_CDEF
+# define STRACE_SYSENT_H
+#endif
 
+#include "ffi.h"
+
+FFI_CONTENT(
 typedef struct sysent {
 	unsigned nargs;
 	int	sys_flags;
+)
+/* We don't want to expose sen and sys_func to LuaJIT */
+#ifdef FFI_CDEF
+FFI_CONTENT(
+	int priv1;
+	void *priv2;
+)
+#else
+FFI_CONTENT(
 	int	sen;
 	int	(*sys_func)();
+)
+#endif
+FFI_CONTENT(
 	const char *sys_name;
 } struct_sysent;
+)
 
 #define TRACE_FILE			00000001	/* Trace file-related syscalls. */
 #define TRACE_IPC			00000002	/* Trace IPC-related syscalls. */
@@ -29,4 +47,4 @@ typedef struct sysent {
 #define TRACE_FSTAT			00400000	/* Trace *fstat{,at}{,64} syscalls. */
 #define TRACE_STAT_LIKE			01000000	/* Trace *{,l,f}stat{,x,at}{,64} syscalls. */
 
-#endif /* !STRACE_SYSENT_H */
+#endif /* !defined(STRACE_SYSENT_H) || defined(FFI_CDEF) */

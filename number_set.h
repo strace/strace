@@ -45,6 +45,22 @@ extern void
 add_number_to_set(unsigned int number, struct number_set *);
 
 extern void
+remove_number_from_set(unsigned int number, struct number_set *);
+
+extern void
+extend_set_with_number(unsigned int number, struct number_set *);
+
+extern void
+make_number_set_universal(struct number_set *);
+
+extern void
+make_number_set_array_universal(struct number_set *, unsigned int nmemb);
+
+extern void
+extend_set_array_with_number(const unsigned int number,
+	struct number_set *const set, const unsigned int idx);
+
+extern void
 add_number_to_set_array(unsigned int number, struct number_set *, unsigned int idx);
 
 extern void

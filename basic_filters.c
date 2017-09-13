@@ -94,40 +94,38 @@ qualify_syscall_regex(const char *s, struct number_set *set)
 	return found;
 }
 
+const struct syscall_class syscall_classes[] = {
+	{ "desc",	TRACE_DESC	},
+	{ "file",	TRACE_FILE	},
+	{ "memory",	TRACE_MEMORY	},
+	{ "process",	TRACE_PROCESS	},
+	{ "signal",	TRACE_SIGNAL	},
+	{ "ipc",	TRACE_IPC	},
+	{ "network",	TRACE_NETWORK	},
+	{ "%desc",	TRACE_DESC	},
+	{ "%file",	TRACE_FILE	},
+	{ "%memory",	TRACE_MEMORY	},
+	{ "%process",	TRACE_PROCESS	},
+	{ "%signal",	TRACE_SIGNAL	},
+	{ "%ipc",	TRACE_IPC	},
+	{ "%network",	TRACE_NETWORK	},
+	{ "%stat",	TRACE_STAT	},
+	{ "%lstat",	TRACE_LSTAT	},
+	{ "%fstat",	TRACE_FSTAT	},
+	{ "%%stat",	TRACE_STAT_LIKE	},
+	{ "%statfs",	TRACE_STATFS	},
+	{ "%fstatfs",	TRACE_FSTATFS	},
+	{ "%%statfs",	TRACE_STATFS_LIKE	},
+	{}
+};
+
 static unsigned int
 lookup_class(const char *s)
 {
-	static const struct {
-		const char *name;
-		unsigned int value;
-	} syscall_class[] = {
-		{ "desc",	TRACE_DESC	},
-		{ "file",	TRACE_FILE	},
-		{ "memory",	TRACE_MEMORY	},
-		{ "process",	TRACE_PROCESS	},
-		{ "signal",	TRACE_SIGNAL	},
-		{ "ipc",	TRACE_IPC	},
-		{ "network",	TRACE_NETWORK	},
-		{ "%desc",	TRACE_DESC	},
-		{ "%file",	TRACE_FILE	},
-		{ "%memory",	TRACE_MEMORY	},
-		{ "%process",	TRACE_PROCESS	},
-		{ "%signal",	TRACE_SIGNAL	},
-		{ "%ipc",	TRACE_IPC	},
-		{ "%network",	TRACE_NETWORK	},
-		{ "%stat",	TRACE_STAT	},
-		{ "%lstat",	TRACE_LSTAT	},
-		{ "%fstat",	TRACE_FSTAT	},
-		{ "%%stat",	TRACE_STAT_LIKE	},
-		{ "%statfs",	TRACE_STATFS	},
-		{ "%fstatfs",	TRACE_FSTATFS	},
-		{ "%%statfs",	TRACE_STATFS_LIKE	},
-	};
-
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
-		if (strcmp(s, syscall_class[i].name) == 0) {
-			return syscall_class[i].value;
+	const struct syscall_class *c;
+	for (c = syscall_classes; c->name; ++c) {
+		if (strcmp(s, c->name) == 0) {
+			return c->value;
 		}
 	}
 

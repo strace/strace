@@ -50,6 +50,12 @@ number_setbit(const unsigned int i, number_slot_t *const vec)
 	vec[i / BITS_PER_SLOT] |= (number_slot_t) 1 << (i % BITS_PER_SLOT);
 }
 
+static void
+number_unsetbit(const unsigned int i, number_slot_t *const vec)
+{
+	vec[i / BITS_PER_SLOT] &= ~((number_slot_t) 1 << (i % BITS_PER_SLOT));
+}
+
 static bool
 number_isset(const unsigned int i, const number_slot_t *const vec)
 {
@@ -97,10 +103,41 @@ add_number_to_set(const unsigned int number, struct number_set *const set)
 }
 
 void
+remove_number_from_set(const unsigned int number, struct number_set *const set)
+{
+	if (number / BITS_PER_SLOT < set->nslots)
+		number_unsetbit(number, set->vec);
+}
+
+void
+extend_set_with_number(const unsigned int number, struct number_set *const set)
+{
+	if (set->not)
+		remove_number_from_set(number, set);
+	else
+		add_number_to_set(number, set);
+}
+
+void
+make_number_set_universal(struct number_set *const set)
+{
+	free(set->vec);
+	*set = (struct number_set) { .not = true };
+}
+
+void
 add_number_to_set_array(const unsigned int number, struct number_set *const set,
 			const unsigned int idx)
 {
 	add_number_to_set(number, &set[idx]);
+}
+
+void
+extend_set_array_with_number(const unsigned int number,
+			     struct number_set *const set,
+			     const unsigned int idx)
+{
+	extend_set_with_number(number, &set[idx]);
 }
 
 void
@@ -123,6 +160,16 @@ invert_number_set_array(struct number_set *const set, const unsigned int nmemb)
 
 	for (i = 0; i < nmemb; ++i)
 		set[i].not = !set[i].not;
+}
+
+void
+make_number_set_array_universal(struct number_set *set,
+				const unsigned int nmemb)
+{
+	unsigned int i;
+
+	for (i = 0; i < nmemb; ++i)
+		make_number_set_universal(&set[i]);
 }
 
 struct number_set *

@@ -360,14 +360,14 @@ qualify(const char *str)
 unsigned int
 qual_flags(const unsigned int scno)
 {
-	return	(is_number_in_set_array(scno, trace_set, current_personality)
-		   ? QUAL_TRACE : 0)
-		| (is_number_in_set_array(scno, abbrev_set, current_personality)
-		   ? QUAL_ABBREV : 0)
-		| (is_number_in_set_array(scno, verbose_set, current_personality)
-		   ? QUAL_VERBOSE : 0)
-		| (is_number_in_set_array(scno, raw_set, current_personality)
-		   ? QUAL_RAW : 0)
-		| (is_number_in_set_array(scno, inject_set, current_personality)
-		   ? QUAL_INJECT : 0);
+#define QUALBIT(set, qualbit) \
+	(is_number_in_set_array(scno, set, current_personality) ? qualbit : 0)
+
+	return	  QUALBIT(trace_set, QUAL_TRACE)
+		| QUALBIT(abbrev_set, QUAL_ABBREV)
+		| QUALBIT(verbose_set, QUAL_VERBOSE)
+		| QUALBIT(raw_set, QUAL_RAW)
+		| QUALBIT(inject_set, QUAL_INJECT)
+		;
+#undef QUALBIT
 }

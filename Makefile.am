@@ -107,6 +107,7 @@ strace_SOURCES =	\
 	copy_file_range.c \
 	count.c		\
 	defs.h		\
+	defs_shared.h	\
 	desc.c		\
 	dirent.c	\
 	dirent64.c	\
@@ -132,6 +133,7 @@ strace_SOURCES =	\
 	fetch_struct_stat.c \
 	fetch_struct_stat64.c \
 	fetch_struct_statfs.c \
+	ffi.h		\
 	file_handle.c	\
 	file_ioctl.c	\
 	filter_qualify.c \
