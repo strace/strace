@@ -135,6 +135,9 @@ gen_header()
 	# 1st pass: output directives.
 	while read line; do
 		LC_COLLATE=C
+		line=$(printf "%s" "$line" | \
+			sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+
 		case $line in
 		'#stop')
 			exit 0
@@ -196,6 +199,9 @@ gen_header()
 	# 2nd pass: output everything.
 	while read line; do
 		LC_COLLATE=C
+		line=$(printf "%s" "$line" | \
+			sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+
 		case ${line} in
 		'#conditional')
 			unconditional=
