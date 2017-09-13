@@ -351,6 +351,10 @@ function strace.read_path(addr)
 	return strace.read_str(addr, strace.path_max - 1, strace.path_max)
 end
 
+function strace.write_obj(addr, obj)
+	return call_ufunc_on(strace.C.upoke, addr, obj) == 0
+end
+
 local function parse_when(when)
 	if type(when) == 'table' then
 		return unpack(when)

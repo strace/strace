@@ -429,6 +429,9 @@ umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
 extern int upeek(int pid, unsigned long, kernel_ulong_t *);
 extern int upoke(int pid, unsigned long, kernel_ulong_t);
 
+extern int upoken(struct tcb *, kernel_ulong_t addr, unsigned int len,
+		  const void *laddr);
+
 extern bool
 print_array(struct tcb *,
 	    kernel_ulong_t start_addr,

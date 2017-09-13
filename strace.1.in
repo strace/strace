@@ -1002,6 +1002,20 @@ Note: there is no guarantee it won't overwrite some bytes in \fIladdr\fR after
 terminating NUL (but, of course, it never writes past
 .IR laddr[len-1] ).
 .TP
+\fIstatus\fR = \fBstrace.C.upoke\fR(\fIaddr\fR, \fIlen\fR, \fIladdr\fR)
+C type:
+.B int (*)(kernel_ulong_t, size_t, const void *)
+.IP
+Copies ("pokes")
+.I len
+bytes of data from the local address
+.I laddr
+to the address
+.I addr
+of the current tracee process' address space.
+.IP
+Returns 0 on success and \-1 on failure.
+.TP
 \fIstatus\fR = \fBstrace.C.path_match\fR(\fIset\fR, \fInset\fR)
 C type:
 .B bool (*)(const char **, size_t)
@@ -1434,6 +1448,22 @@ bytes.
 Returns a Lua string on success and
 .B nil
 and an error message string on failure.
+.TP
+\fIstatus\fR = \fBstrace.write_obj\fR(\fIaddr\fR, \fIobj\fR)
+Writes a FFI cdata object
+.I obj
+to the address
+.I addr
+of the current tracee process's address space.
+.IP
+Returns
+.B true
+on success and
+.B false
+on failure.
+.IP
+See the note for
+.BR strace.read_obj .
 .TP
 \fIstatus\fR = \fBstrace.hook\fR(\fIscname\fR, \fIwhen\fR, \fIcb\fR)
 .TQ

@@ -95,6 +95,12 @@ func_umove_str(kernel_ulong_t addr, size_t len, char *laddr)
 	return current_tcp ? umovestr(current_tcp, addr, len, laddr) : -1;
 }
 
+static int
+func_upoke(kernel_ulong_t addr, size_t len, const void *laddr)
+{
+	return current_tcp ? upoken(current_tcp, addr, len, laddr) : -1;
+}
+
 static bool
 func_path_match(const char **set, size_t nset)
 {
@@ -267,6 +273,8 @@ init_luajit(const char *scriptfile)
 		kernel_ulong_t, size_t, void *);
 	EXPOSE_FUNC(int, func_umove_str, "umove_str",
 		kernel_ulong_t, size_t, char *);
+	EXPOSE_FUNC(int, func_upoke, "upoke",
+		kernel_ulong_t, size_t, const void *);
 	EXPOSE_FUNC(bool, func_path_match, "path_match",
 		const char **, size_t);
 

@@ -282,6 +282,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	prctl
 	preadv
 	process_vm_readv
+	process_vm_writev
 	pwritev
 	readahead
 	signalfd
