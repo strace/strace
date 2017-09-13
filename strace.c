@@ -45,6 +45,9 @@
 # include <sys/prctl.h>
 #endif
 #include <asm/unistd.h>
+#ifdef USE_LUAJIT
+# include <lua.h>
+#endif
 
 #include "number_set.h"
 #include "scno.h"
@@ -170,6 +173,11 @@ static volatile sig_atomic_t interrupted;
 static volatile int interrupted;
 #endif
 
+#ifdef USE_LUAJIT
+static lua_State *script_L = NULL;
+static void init_luajit(const char *scriptfile);
+#endif
+
 #ifndef HAVE_STRERROR
 
 #if !HAVE_DECL_SYS_ERRLIST
@@ -226,6 +234,11 @@ Output format:\n\
 #ifdef USE_LIBUNWIND
 "\
   -k             obtain stack trace between each syscall (experimental)\n\
+"
+#endif
+#ifdef USE_LUAJIT
+"\
+  -l file        run a Lua script from FILE\n\
 "
 #endif
 "\
@@ -713,7 +726,7 @@ alloctcb(int pid)
 		if (!tcp->pid) {
 			memset(tcp, 0, sizeof(*tcp));
 			tcp->pid = pid;
-#if SUPPORTED_PERSONALITIES > 1
+#if defined(USE_LUAJIT) || SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
 
@@ -1589,6 +1602,9 @@ init(int argc, char *argv[])
 #ifdef USE_LIBUNWIND
 		"k"
 #endif
+#ifdef USE_LUAJIT
+		"l:"
+#endif
 		"D"
 		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
 		switch (c) {
@@ -1697,6 +1713,11 @@ init(int argc, char *argv[])
 #ifdef USE_LIBUNWIND
 		case 'k':
 			stack_trace_enabled = true;
+			break;
+#endif
+#ifdef USE_LUAJIT
+		case 'l':
+			init_luajit(optarg);
 			break;
 #endif
 		case 'E':
@@ -2621,12 +2642,21 @@ terminate(void)
 	exit(exit_code);
 }
 
+#ifdef USE_LUAJIT
+# include "luajit.h"
+#endif
+
 int
 main(int argc, char *argv[])
 {
 	init(argc, argv);
 
 	exit_code = !nprocs;
+
+#ifdef USE_LUAJIT
+	if (script_L)
+		run_luajit();
+#endif
 
 	int status;
 	siginfo_t si;

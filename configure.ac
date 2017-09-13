@@ -754,6 +754,42 @@ AC_SUBST(dl_LIBS)
 
 AC_PATH_PROG([PERL], [perl])
 
+dnl LuaJIT scripting support
+use_luajit=no
+force_luajit=no
+luajit_lib=luajit
+LUAJIT_LIBS=
+LUAJIT_CFLAGS=
+AC_ARG_WITH([luajit],
+	    [AS_HELP_STRING([--with-luajit],
+			    [build with LuaJIT scripting support, or use use Lua library with provided name])],
+			    [case "${withval}" in
+			     yes)   force_luajit=yes ;;
+			     check) ;;
+			     *)     force_luajit=yes; luajit_lib="${withval}" ;;
+		     esac],
+		     [:]
+		     )
+AS_IF([test "x$luajit_lib" != xno],
+      [PKG_CHECK_MODULES([LUAJIT],
+			 [$luajit_lib],
+			 [use_luajit=yes],
+			 [AS_IF([test "x$force_luajit" = xyes],
+				[AC_MSG_ERROR([cannot find luajit library: $luajit_lib])]
+				)]
+			 )]
+      )
+
+dnl enable LuaJIT
+AC_MSG_CHECKING([whether to enable Lua scripting])
+if test "x$use_luajit" = xyes; then
+	AC_DEFINE([USE_LUAJIT], 1, [Enable Lua scripting support])
+	AC_SUBST(LUAJIT_LIBS)
+	AC_SUBST(LUAJIT_CFLAGS)
+fi
+AM_CONDITIONAL([USE_LUAJIT], [test "x$use_luajit" = xyes])
+AC_MSG_RESULT([$use_luajit])
+
 dnl stack trace with libunwind
 libunwind_CPPFLAGS=
 libunwind_LDFLAGS=

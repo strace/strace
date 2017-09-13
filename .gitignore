@@ -32,6 +32,7 @@
 /libmpers-m32.a
 /libmpers-mx32.a
 /libstrace.a
+/luajit_lib.h
 /m32_funcs.h
 /m32_printer_decls.h
 /m32_printer_defs.h

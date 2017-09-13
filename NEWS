@@ -3,6 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Updated lists of SOL_* and TCP_* constants.
+  * Added support for LuaJIT scripting (-l FILE option); see the LUA SCRIPTING
+    section of the manual page for documentation.
 
 Noteworthy changes in release 4.19 (2017-09-05)
 ===============================================

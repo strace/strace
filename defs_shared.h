@@ -30,7 +30,7 @@ struct tcb {
 	kernel_long_t u_rval;	/* Return value */
 )
 
-#if SUPPORTED_PERSONALITIES > 1
+#if defined(USE_LUAJIT) || SUPPORTED_PERSONALITIES > 1
 FFI_CONTENT(
 	unsigned int currpers;	/* Personality at the time of scno update */
 )
@@ -46,6 +46,9 @@ FFI_CONTENT(
 	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
 	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
+#ifdef USE_LUAJIT
+	struct inject_data ad_hoc_inject_data;
+#endif
 	struct timeval stime;	/* System time usage as of last process wait */
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */

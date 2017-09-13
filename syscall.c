@@ -636,6 +636,19 @@ tcb_inject_data(struct tcb *tcp, bool step)
 			res = opts->data;
 		}
 	}
+#ifdef USE_LUAJIT
+	if (tcp->flags & TCB_AD_HOC_INJECT) {
+		struct inject_data ad_hoc_data = tcp->ad_hoc_inject_data;
+		if (ad_hoc_data.flags & INJECT_F_SIGNAL) {
+			res.flags |= INJECT_F_SIGNAL;
+			res.signo = ad_hoc_data.signo;
+		}
+		if (ad_hoc_data.flags & INJECT_F_RETVAL) {
+			res.flags |= INJECT_F_RETVAL;
+			res.rval = ad_hoc_data.rval;
+		}
+	}
+#endif
 	return res;
 }
 

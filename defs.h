@@ -628,6 +628,12 @@ extern void print_ifindex(unsigned int);
 extern void qualify(const char *);
 extern unsigned int qual_flags(const unsigned int);
 
+#ifdef USE_LUAJIT
+extern void set_hook_qual(unsigned int scno, unsigned int pers, bool entry_hook,
+	bool exit_hook);
+extern void set_hook_qual_all(bool entry_hook, bool exit_hook);
+#endif
+
 #define DECL_IOCTL(name)						\
 extern int								\
 name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)	\

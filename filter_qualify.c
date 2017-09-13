@@ -40,6 +40,10 @@ static struct number_set *inject_set;
 static struct number_set *raw_set;
 static struct number_set *trace_set;
 static struct number_set *verbose_set;
+#ifdef USE_LUAJIT
+static struct number_set *hook_entry_set;
+static struct number_set *hook_exit_set;
+#endif
 
 static int
 sigstr_to_uint(const char *s)
@@ -357,6 +361,42 @@ qualify(const char *str)
 	opt->qualify(str);
 }
 
+#ifdef USE_LUAJIT
+static void
+alloc_hook_sets(void)
+{
+	if (!hook_entry_set)
+		hook_entry_set = alloc_number_set_array(
+			SUPPORTED_PERSONALITIES);
+	if (!hook_exit_set)
+		hook_exit_set = alloc_number_set_array(
+			SUPPORTED_PERSONALITIES);
+}
+
+void
+set_hook_qual(unsigned int scno, unsigned int pers, bool entry_hook,
+	      bool exit_hook)
+{
+	alloc_hook_sets();
+	if (entry_hook)
+		extend_set_array_with_number(scno, hook_entry_set, pers);
+	if (exit_hook)
+		extend_set_array_with_number(scno, hook_exit_set, pers);
+}
+
+void
+set_hook_qual_all(bool entry_hook, bool exit_hook)
+{
+	alloc_hook_sets();
+	if (entry_hook)
+		make_number_set_array_universal(hook_entry_set,
+			SUPPORTED_PERSONALITIES);
+	if (exit_hook)
+		make_number_set_array_universal(hook_exit_set,
+			SUPPORTED_PERSONALITIES);
+}
+#endif
+
 unsigned int
 qual_flags(const unsigned int scno)
 {
@@ -368,6 +408,10 @@ qual_flags(const unsigned int scno)
 		| QUALBIT(verbose_set, QUAL_VERBOSE)
 		| QUALBIT(raw_set, QUAL_RAW)
 		| QUALBIT(inject_set, QUAL_INJECT)
+#ifdef USE_LUAJIT
+		| QUALBIT(hook_entry_set, QUAL_HOOK_ENTRY)
+		| QUALBIT(hook_exit_set, QUAL_HOOK_EXIT)
+#endif
 		;
 #undef QUALBIT
 }

@@ -53,6 +53,10 @@
 .  el \
 .    BR "\\$1"
 ..
+.de URL
+\\$2 \(laURL: \\$1 \(ra\\$3
+..
+.if \n[.g] .mso www.tmac
 .TH STRACE 1 "@MANPAGE_DATE@" "strace @VERSION@"
 .SH NAME
 strace \- trace system calls and signals
@@ -796,6 +800,873 @@ Print the help summary.
 .B \-V
 Print the version number of
 .BR strace .
+.SH LUA SCRIPTING
+If built with Lua support,
+.B strace
+can execute Lua scripts.
+A script file is passed to the
+.B -l
+option.
+.PP
+.B strace
+provides the built-in module
+.B strace
+to the Lua execution environment, which contains various functions and
+constants.
+.PP
+Before any tracing takes place, the script is run.
+At this stage, it can do one of the following two things:
+.RS
+.IP \(bu 3
+Implement its own tracing loop by selecting syscalls it wants to be notified
+about with
+.BR strace.C.monitor / strace.C.monitor_all
+and calling
+.B strace.next_sc
+in a loop until it returns
+.B nil
+(or return earlier; in this case, the installed hooks for the remaining syscalls
+are run).
+.IP \(bu
+Install syscall and at-exit hooks with
+.BR strace.hook ", " strace.hook_class ", " strace.hook_scno " and " strace.at_exit .
+.RE
+.PP
+Then,
+.B strace
+enters its own tracing loop, and all the installed hooks are run.
+.SS Personalities
+A personality is an execution domain with its own sets of syscalls, signals and
+errors.
+A
+.I personality number
+is strace-specific 0-based index in the architecture-dependent list of
+personalities.
+.SS FFI
+.URL http://luajit.org/ext_ffi.html "FFI library"
+is an extension provided by LuaJIT;
+.URL https://github.com/jmckaskill/luaffi luaffi
+and
+.URL https://github.com/facebook/luaffifb luaffifb
+standalone implementations are also supported, but only for Lua 5.2.
+.PP
+.B strace
+provides the following FFI definitions:
+.CW
+typedef /* implementation-defined signed integer type   */ kernel_long_t;
+typedef /* implementation-defined unsigned integer type */ kernel_ulong_t;
+
+typedef struct sysent {
+    unsigned nargs;          /* Number of arguments */
+    int sys_flags;           /* Flags.  Currently, only meaningful in the
+                              * context of struct syscall_class::value field:
+                              * a syscall belongs to a class iff
+                              * (class.value & syscall.sys_flags) != 0. */
+    const char *sys_name;    /* Name */
+} struct_sysent;
+
+struct syscall_class {
+    const char *name;        /* Name */
+    unsigned int value;      /* Flag bit, see the comment on struct
+                              * sysent::sys_flags field. */
+};
+
+typedef struct ioctlent {
+    const char *symbol;
+    unsigned int code;
+} struct_ioctlent;
+
+/* Trace control block */
+struct tcb {
+    int pid;                              /* Tracee's PID */
+    unsigned long u_error;                /* Error code */
+    kernel_ulong_t scno;                  /* System call number */
+    kernel_ulong_t u_arg[/* MAX_ARGS */]; /* System call arguments */
+    kernel_ulong_t u_rval;                /* Return value */
+    unsigned int currpers;                /* Current personality */
+};
+.CE
+.SS strace module: C submodule: functions
+Note: be careful with boxed boolean values and use
+.B not not
+.I boxed_bool
+when in doubt.
+In particular, an
+.B assert
+on a boxed boolean will never raise an error.
+.TP
+\fIstatus\fR = \fBstrace.C.monitor\fR(\fIscno\fR, \fIpers\fR, \fIon_entry\fR, \fIon_exit\fR)
+C type:
+.B bool (*)(unsigned int, unsigned int, bool, bool)
+.IP
+Marks the syscall with number
+.I scno
+on personality
+.I pers
+as to be returned from
+.BR strace.next_sc .
+If
+.I on_entry
+is
+.BR true ,
+it is marked as to be returned on syscall entry, and if
+.I on_exit
+is
+.BR true ,
+it is marked as to be returned on syscall exit.
+.IP
+Note that this "marking" is a one-way process, and specifying
+.B false
+as any of the flags does not undo any previous calls to
+.BR strace.C.monitor / strace.C.monitor_all .
+.IP
+Returns
+.B true
+on success and
+.B false
+on failure.
+.TP
+\fBstrace.C.monitor_all\fR(\fIon_entry\fR, \fIon_exit\fR)
+C type:
+.B void (*)(bool, bool)
+.IP
+Marks all syscalls on all personalities as to be returned from
+.BR strace.next_sc :
+on syscall entry if
+.I on_entry
+is
+.BR true ,
+and on syscall exit if
+.I on_exit
+is
+.BR true .
+See the note for
+.BR strace.C.monitor .
+.TP
+\fIstatus\fR = \fBstrace.C.inject_signo\fR(\fIsigno\fR)
+C type:
+.B bool (*)(int)
+.IP
+Delivers a signal with number
+.I signo
+to the current tracee.
+.IP
+Note that this must be done on syscall entry.
+.IP
+Returns
+.B true
+on success and
+.B false
+on failure.
+.TP
+\fIstatus\fR = \fBstrace.C.inject_retval\fR(\fIval\fR)
+C type:
+.B bool (*)(int)
+.IP
+Injects a return value to the current syscall invocation.
+.IP
+Note that this must be done on syscall entry.
+.IP
+Returns
+.B true
+on success and
+.B false
+on failure.
+.TP
+\fIstatus\fR = \fBstrace.C.umove\fR(\fIaddr\fR, \fIlen\fR, \fIladdr\fR)
+C type:
+.B int (*)(kernel_ulong_t, size_t, void *)
+.IP
+Copies ("moves")
+.I len
+bytes of data from the current tracee process at address
+.I addr
+to a local address
+.IR laddr .
+.IP
+Returns 0 on success and \-1 on failure.
+.TP
+\fIstatus\fR = \fBstrace.C.umove_str\fR(\fIaddr\fR, \fIlen\fR, \fIladdr\fR)
+C type:
+.B int (*)(kernel_ulong_t, size_t, char *)
+.IP
+Like
+.BR strace.C.umove ,
+but makes the additional effort of looking for a terminating zero byte.
+Returns a negative value on failure, a positive value if a NUL was seen, and 0
+if
+.I len
+bytes were read but no NUL seen.
+.IP
+Note: there is no guarantee it won't overwrite some bytes in \fIladdr\fR after
+terminating NUL (but, of course, it never writes past
+.IR laddr[len-1] ).
+.TP
+\fIstatus\fR = \fBstrace.C.path_match\fR(\fIset\fR, \fInset\fR)
+C type:
+.B bool (*)(const char **, size_t)
+.IP
+Returns
+.B true
+if the current syscall accesses one of the paths from a given set of paths, and
+.B false
+otherwise.
+.IP
+Note: for string path arguments, the path is compared against the set; for file
+descriptor arguments, the absolute path to the file behind the file descriptor
+is compared against the set.
+.SS strace module: C submodule: constants
+.TP
+.B strace.C.sysent_vec
+Array of syscall tables for each of the supported personalities.
+\fBstrace.C.sysent_vec\fR[\fIpers\fR][\fIscno\fR] is a
+.B struct_sysent
+for syscall number
+.I scno
+on personality
+.IR pers .
+May contain null entries (which have a NULL
+.B sys_name
+field).
+.TP
+.B strace.C.errnoent_vec
+Array of error name tables for each of the supported personalities.
+\fBstrace.C.errnoent_vec\fR[\fIpers\fR][\fIerrno\fR] is either a null pointer or
+a C string with the name of error
+.I errno
+on personality
+.IR pers .
+.TP
+.B strace.C.signalent_vec
+Array of signal name tables for each of the supported personalities.
+\fBstrace.C.signalent_vec\fR[\fIpers\fR][\fIsigno\fR] is either a null pointer
+or a C string with the name of signal
+.I signo
+on personality
+.IR pers .
+.TP
+.B strace.C.ioctlent_vec
+Arrays of sorted known ioctl symbols, sorted by code, for each of the supported
+personalities.
+\fBstrace.C.ioctlent_vec\fR[\fIpers\fR][\fIi\fR] is the
+.IR i \-th,
+ranked by code,
+.B struct_ioctlent
+for personality
+.IR pers .
+.TP
+.B strace.C.nsysent_vec
+.TQ
+.B strace.C.nerrnoent_vec
+.TQ
+.B strace.C.nsignalent_vec
+.TQ
+.B strace.C.nioctlent_vec
+These are
+.BR strace.npersonalities \-sized
+arrays containing sizes of subarrays of
+.BR strace.C.sysent_vec ,
+.BR strace.C.errnoent_vec ,
+.BR strace.C.signalent_vec " and"
+.BR strace.C.ioctlent_vec ,
+respectively.
+.TP
+.B strace.C.syscall_classes
+Array of
+.BR "struct syscall_class" ,
+with a terminating null entry (which has a NULL
+.B name
+field).
+.TP
+.B strace.C.pers_name
+A
+.BR strace.npersonalities \-sized
+array of C strings with names for each personality.
+.TP
+.B strace.C.pers_wordsize
+.TQ
+.B strace.C.pers_klongsize
+These are
+.BR strace.npersonalities \-sized
+arrays with word and
+.I __kernel_long_t
+sizes for each personality.
+.SS strace module: functions
+Glossary:
+.RS
+.IP \(bu 3
+an
+.I integer
+means either an integer Lua number or a cdata integer type;
+.IP \(bu
+a
+.I boolean
+means either a Lua boolean or a cdata
+.BR bool ;
+.IP \(bu
+a
+.I string
+means either a Lua string or a cdata C string.
+.RE
+.PP
+General conventions:
+.RS
+.IP \(bu 3
+a
+.I pers
+argument is an
+.I integer
+specifying personality number;
+.IP \(bu
+an
+.I addr
+argument is a cdata
+.IR kernel_ulong_t .
+.RE
+.TP
+\fItcp\fR = \fBstrace.next_sc\fR()
+If this is not the first call to this function, performs tracing and tampering
+of the previously returned syscall.
+.IP
+Waits for the next monitored syscall to happen, and returns a pointer to its
+trace control block.
+This pointer is not persistent across different calls to this function and/or
+hook calls.
+.IP
+If
+.B strace
+needs to be terminated (e.g. last tracee has been terminated, or
+.B strace
+has been interrupted), returns
+.BR nil .
+Once it returned
+.BR nil ,
+all subsequent calls to it will also return
+.BR nil .
+.TP
+\fIstatus\fR = \fBstrace.entering\fR()
+Returns
+.B true
+if this is a syscall entry, and
+.B false
+otherwise.
+.TP
+\fIstatus\fR = \fBstrace.exiting\fR()
+Returns
+.B true
+if this is a syscall exit, and
+.B false
+otherwise.
+.TP
+\fBstrace.trace\fR([\fIflag\fR])
+.TQ
+\fBstrace.abbrev\fR([\fIflag\fR])
+.TQ
+\fBstrace.verbose\fR([\fIflag\fR])
+.TQ
+\fBstrace.raw\fR([\fIflag\fR])
+These functions alter corresponding trace options.
+.I flag
+is a
+.IR boolean ,
+defaults to
+.BR true .
+.TP
+\fIaddr\fR = \fBstrace.ptr_to_kulong\fR(\fIptr\fR)
+Converts a cdata pointer to a
+.B kernel_ulong_t
+variable.
+.TP
+\fBstrace.at_exit\fR(\fIfunc\fR)
+Registers a function
+.I func
+to be run when
+.B strace
+is going to terminate its execution.
+.IP
+If multiple exit callback functions are registered, they are run in the order
+they were registered.
+.TP
+\fIname\fR = \fBstrace.get_sc_name\fR(\fIscno\fR, \fIpers\fR)
+Returns syscall name as Lua string by its number for personality
+.IR pers ,
+or
+.B nil
+if
+.I scno
+is invalid.
+.IP
+.I scno
+is an
+.IR integer .
+.TP
+\fIname\fR = \fBstrace.get_sig_name\fR(\fIsigno\fR, \fIpers\fR)
+Returns signal name (.e.g \fB"SIGSEGV"\fR) as Lua string by its number
+.I signo
+for personality
+.IR pers ,
+or
+.B nil
+if
+.I signo
+is invalid.
+.TP
+\fIname\fR = \fBstrace.get_err_name\fR(\fIerrno\fR, \fIpers\fR)
+Returns error name (e.g. \fB"ENOENT"\fR) as Lua string by its error number
+.I errno
+for personality
+.IR pers ,
+or
+.B nil
+if
+.I errno
+is invalid.
+.IP
+.I errno
+is an
+.IR integer .
+.TP
+\fIname\fR = \fBstrace.get_ioctl_name\fR(\fIreqcode\fR, \fIpers\fR)
+Returns ioctl symbol name (e.g. \fB"TIOCGWINSZ"\fR) as Lua string by its request
+code
+.I reqcode
+for personality
+.IR pers ,
+or
+.B nil
+if
+.I reqcode
+is invalid.
+.IP
+.I reqcode
+is an
+.IR integer .
+.TP
+\fIscno\fR = \fBstrace.get_scno\fR(\fIscname\fR, \fIpers\fR)
+Returns syscall number by its name for personality
+.IR pers ,
+or
+.B nil
+if no such syscall was found.
+.IP
+.I scname
+is a
+.IR string .
+.TP
+\fIsigno\fR = \fBstrace.get_signo\fR(\fIsigname\fR, \fIpers\fR)
+Returns signal number by its name (e.g. \fB"SIGSEGV"\fR) for personality
+.IR pers ,
+or
+.B nil
+if no such signal was found.
+.IP
+.I signame
+is
+.IR string .
+.TP
+\fIerrno\fR = \fBstrace.get_errno\fR(\fIerrname\fR, \fIpers\fR)
+Returns error number by its name (e.g. \fB"ENOENT"\fR) for personality
+.IR pers ,
+or
+.B nil
+if no such error was found.
+.IP
+.I errname
+is a
+.IR string .
+.TP
+\fIcode\fR = \fBstrace.get_ioctl_code\fR(\fIname\fR, \fIpers\fR)
+Returns ioctl request code by its symbol name (e.g. \fB"TIOCGWINSZ"\fR) for
+personality
+.IR pers ,
+or
+.B nil
+if no such ioctl request was found.
+.IP
+.I name
+is a
+.IR string .
+.TP
+\fIflagbit\fR = \fBstrace.get_class_flagbit\fR(\fIclsname\fR)
+Returns the
+.I value
+field of the
+.I struct syscall_class
+structure
+(see its definition in the
+.B FFI
+section above) corresponding to the syscall class with name
+.IR clsname ,
+or
+.B nil
+if such syscall class is invalid.
+.I clsname
+is a
+.IR string .
+.TP
+\fIflags\fR = \fBstrace.get_sc_flags\fR(\fIscno\fR, \fIpers\fR)
+Returns the
+.I sys_flags
+field of the
+.I struct sysent
+structure
+(see its definition in the
+.B FFI
+section above)
+corresponding to the syscall with number
+.I scno
+on personality
+.IR pers ,
+or
+.B nil
+if no such syscall exists.
+.I scno
+is an
+.IR integer .
+.TP
+\fIstatus\fR[, \fIerr_msg\fR] = \fBstrace.inject_signal\fR(\fIsig\fR)
+Delivers a signal to the tracee.
+.I sig
+is either signal number (an
+.IR integer )
+or name (a
+.IR string ).
+.IP
+Returns
+.B true
+on success and
+.B false
+and an error message string on failure.
+.IP
+Note that this must be done on syscall entry.
+.TP
+\fIstatus\fR[, \fIerr_msg\fR] = \fBstrace.inject_retval\fR(\fIval\fR)
+Injects a return value to the current syscall invocation.
+.I val
+is an
+.IR integer .
+.IP
+Returns
+.B true
+on success and
+.B false
+and an error message string on failure.
+.IP
+Note that this must be done on syscall entry.
+.TP
+\fIstatus\fR[, \fIerr_msg\fR] = \fBstrace.inject_error\fR(\fIerr\fR)
+Injects an error into a current syscall invocation.
+.I err
+is either error number (an
+.IR integer )
+or error name (a
+.IR string ).
+.IP
+Returns
+.B true
+on success and
+.B false
+and an error message string on failure.
+.IP
+Note that this must be done on syscall entry.
+.TP
+\fIobj\fR = \fBstrace.read_obj\fR(\fIaddr\fR, \fIct\fR[, \fInelem\fR])
+Reads an object of type
+.I ct
+from the current tracee process at address
+.IR addr .
+.I ct
+is either a
+.I cdecl
+(a Lua string), a
+.I cdata
+serving as a template type, or a
+.I ctype
+(special kind of
+.I cdata
+returned by
+.BR ffi.typeof ).
+.IP
+VLA/VLS types require the
+.I nelem
+argument (an
+.IR integer ).
+.IP
+Returns an object on success and
+.B nil
+on failure.
+.IP
+Note that type sizes and structure paddings may differ from FFI's ones if
+tracee's personality differs from
+.BR strace 's
+one.
+.TP
+\fIstr\fR[, \fIerr_msg\fR] = \fBstrace.read_str\fR(\fIaddr\fR[, \fImaxsz\fR[, \fIbufsz\fR]])
+Reads a C string from the current tracee process at address
+.I addr
+using an intermediate buffer of size
+.I bufsz
+and stopping at
+.I maxsz
+bytes.
+.IP
+.I maxsz
+and
+.I bufsz
+are
+.IR integers .
+.I maxsz
+defaults to 4 Mb,
+.I bufsz
+to 1 Kb.
+.IP
+Returns a Lua string on success and
+.B nil
+and an error message string on failure.
+.TP
+\fIstr\fR[, \fIerr_msg\fR] = \fBstrace.read_path\fR(\fIaddr\fR)
+Reads a path C string from the current tracee process at address
+.IR addr ,
+stopping at
+.B PATH_MAX
+bytes.
+.IP
+Returns a Lua string on success and
+.B nil
+and an error message string on failure.
+.TP
+\fIstatus\fR = \fBstrace.hook\fR(\fIscname\fR, \fIwhen\fR, \fIcb\fR)
+.TQ
+\fIstatus\fR = \fBstrace.hook_class\fR(\fIclsname\fR, \fIwhen\fR, \fIcb\fR)
+.TQ
+\fIstatus\fR = \fBstrace.hook_scno\fR(\fIscno\fR, \fIpers\fR, \fIwhen\fR, \fIcb\fR)
+These functions register a function
+.I cb
+to be run when a syscall with the given name (or with a name from a given set
+thereof), belonging to a class with the given name (or with a name from a given
+set thereof), or with the given number (or with a number from a given set
+thereof) on personality
+.IR pers ,
+happens.
+.IP
+.I when
+is either a two-element array (that is, a table with keys 1 and 2) with boolean
+values, or a Lua string.
+.I cb
+is registered to be run:
+.RS
+.IP \(bu 3
+on syscall entry if
+.I when
+is either
+.B {true, false}
+or \fB"entering"\fR;
+.IP \(bu
+on syscall exit if
+.I when
+is either
+.B {false, true}
+or \fB"exiting"\fR;
+.IP \(bu
+both on syscall entry and exit if
+.I when
+is either
+.B {true, true}
+or \fB"both"\fR;
+.IP \(bu
+at no time if
+.I when
+is
+.B "{false, false}"
+(in this case, a call is effectively ignored).
+.RE
+.IP
+A pointer to the trace control block is passed as the only argument to
+.IR cb .
+This pointer is not persistent across
+.B strace.next_sc
+and/or another hook calls.
+.IP
+If multiple callback functions are registered for the same event (syscall entry
+or exit), they are run in the order they were registered.
+.IP
+.IR scname " and " clsname
+are either
+.I strings
+or tables thereof.
+.I scno
+is either an
+.I integer
+or a table thereof.
+.IP
+Return
+.B true
+on success and
+.B false
+on failure.
+.TP
+\fIstatus\fR = \fBstrace.path_match\fR(\fIset\fR)
+Returns
+.B true
+if the current syscall accesses a given path, or one of the paths from the given
+set of paths; and
+.B false
+otherwise (see the note for
+.BR strace.C.path_match ).
+.IP
+.I set
+is either a
+.I string
+or a table thereof.
+.SS strace module: constants
+.TP
+.B strace.npersonalities
+Number of supported personalities (an integer Lua number).
+.TP
+.B strace.max_args
+Size of
+.B struct tcb::u_arg
+array (an integer Lua number).
+.TP
+.B strace.path_max
+Value of
+.B PATH_MAX
+constant (an integer Lua number).
+.SS Examples
+The following script counts the number of processes (including threads) spawned
+by the tracee.
+Note that you would probably want to launch
+.B strace
+with
+.B -f
+option, so that children also be traced.
+.CW
+n = 0
+assert(strace.hook({'clone', 'fork', 'vfork'}, 'exiting', function(tcp)
+    if tcp.u_rval ~= -1 then
+        n = n + 1
+    end
+end))
+strace.at_exit(function() print('Processes spawned:', n) end)
+.CE
+If you have a C preprocessor installed, you can invoke it to pre-process local
+and/or system headers.
+However, using it this way, the only type of macros you can access is integer
+constant macros (possibly expanding to a constant arithmetic expression: the FFI
+library is able to evaluate them).
+To do so, declare an enumeration member or a static constant of an appropriate
+type with value being the result of expansion of the macro (see the following
+example).
+.PP
+The following script injects the
+.B EPERM
+error to each
+.B fcntl
+(and
+.BR fcntl64 )
+syscall invocation with
+.B F_SETPIPE_SZ
+command.
+.CW
+ffi = require 'ffi'
+f = assert(io.popen([[cpp - <<EOF | grep -v '^#'
+
+#define _GNU_SOURCE
+#include <fcntl.h>
+enum { f_setpipe_sz = F_SETPIPE_SZ };
+
+EOF]], 'r'))
+ffi.cdef(f:read('*a'))
+f:close()
+
+assert(strace.hook({'fcntl', 'fcntl64'}, 'entering', function(tcp)
+    if tcp.u_arg[1] == ffi.C.f_setpipe_sz then
+        assert(strace.inject_error('EPERM'))
+    end
+end))
+.CE
+The following script reads the definition of a structure from a system header
+file, and modifies one of its fields so that
+.BR uname (1)
+always prints out
+.IR Windows .
+.CW
+ffi = require 'ffi'
+f = assert(io.popen([[cpp - <<EOF | grep -v '^#'
+
+#include <sys/utsname.h>
+
+EOF]], 'r'))
+ffi.cdef(f:read('*a'))
+f:close()
+
+assert(strace.hook('uname', 'exiting', function(tcp)
+    if tcp.u_rval == -1 then
+        return
+    end
+
+    local u = assert(strace.read_obj(tcp.u_arg[0], 'struct utsname'))
+
+    local s = 'Windows'
+    assert(ffi.sizeof(u.sysname) >= #s + 1)
+    ffi.copy(u.sysname, s)
+
+    assert(strace.write_obj(tcp.u_arg[0], u))
+end))
+.CE
+Note that this does not work if the name of the structure or one of its field is
+defined to something else.
+In the case of the first, however, something like
+.CW
+typedef struct utsname struct_utsname;
+.CE
+should work.
+.PP
+To access other types of macros (namely, floating-point and strings constants,
+and function macros), the
+.URL https://github.com/umegaya/ffiex "ffiex library"
+can be used.
+The following example gathers statistics on exit codes of child processes that
+have been waited for by the tracee with one of the appropriate syscalls with
+non-NULL
+.I status
+argument.
+.CW
+ffiex = require 'ffiex'
+ffiex.cdef[[
+#include <sys/wait.h>
+]]
+
+function is_truthy(x)
+    return x and x ~= 0
+end
+
+stats = {}
+
+assert(strace.hook({'waitpid', 'wait4', 'osf_wait4'}, 'exiting', function(tcp)
+    if tcp.u_rval == -1 or tcp.u_rval == 0 or tcp.u_arg[1] == 0 then
+        return
+    end
+    local status = tonumber(assert(strace.read_obj(tcp.u_arg[1], 'int')))
+    if is_truthy(ffiex.defs.WIFEXITED(status)) then
+        local c = ffiex.defs.WEXITSTATUS(status)
+        stats[c] = (stats[c] or 0) + 1
+    end
+end))
+
+strace.at_exit(function()
+    print('Exit codes:')
+    for k, v in pairs(stats) do
+        print(k .. ':', v)
+    end
+end)
+.CE
+Note that this does not work if the result of the expansion of the macro
+contains something that can not be evaluated by
+.BR ffiex ,
+e.g. a call to a
+.I static inline
+function defined in the header.
 .SH DIAGNOSTICS
 When
 .I command
