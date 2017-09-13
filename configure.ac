@@ -397,6 +397,12 @@ AC_CHECK_TYPES([struct stat64, struct __old_kernel_stat],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 
+AC_CHECK_TYPES([struct termios2],,,
+[#include <linux/termios.h>])
+
+AC_CHECK_MEMBERS([struct termios.c_ispeed, struct termios.c_ospeed],,,
+[#include <linux/termios.h>])
+
 AC_CHECK_TYPES([struct user_desc],
 	       [AC_CHECK_MEMBERS([struct user_desc.lm],,,
 				 [#include <asm/ldt.h>])],,
