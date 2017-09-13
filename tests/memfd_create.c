@@ -11,10 +11,11 @@ int
 main(void)
 {
 	static const char text[] = "strace";
-	int rc = syscall(__NR_memfd_create, text, 7);
+	int rc = syscall(__NR_memfd_create, text, 0xf);
 
-	printf("memfd_create(\"%s\", %s) = %d %s (%m)\n",
-	       text, "MFD_CLOEXEC|MFD_ALLOW_SEALING|0x4", rc, errno2name());
+	printf("memfd_create(\"%s\", %s) = %s\n",
+	       text, "MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB|0x8",
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
