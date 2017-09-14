@@ -1,0 +1,199 @@
+#!/bin/sh
+
+. "${srcdir=.}/lua.sh"
+
+run_with_script_and_opts()
+{
+	local opts; opts="$1"
+	shift
+	run_strace_with_script $opts -e trace=readv,writev ../lua "$@" > "$EXP"
+	match_diff "$LOG" "$EXP"
+}
+
+run_with_script()
+{
+	run_with_script_and_opts '' "$@"
+}
+
+DATA=0123abcdefghijklnmop
+
+check_prog awk
+
+iovec_decls="\
+----- start of 'iovec_decls' -----
+ffi.cdef[[
+struct iovec {
+	void *iov_base;
+	size_t iov_len;
+};
+]]
+function decode_iovec(addr, pers)
+	local kulong = ffi.typeof('kernel_ulong_t')
+	if strace.C.pers_wordsize[pers] < ffi.sizeof(kulong) then
+		local v = strace.read_obj(addr, 'unsigned int [2]')
+		return kulong(v[0]), kulong(v[1])
+	else
+		local v = assert(strace.read_obj(addr, 'struct iovec'))
+		return strace.ptr_to_kulong(v.iov_base), kulong(v.iov_len)
+	end
+end
+----- end of 'iovec_decls' -----"
+
+run_with_script $DATA $DATA <<EOF
+ffi = require 'ffi'
+$iovec_decls
+function check_vecs(tcp, realsz)
+	assert(tcp.u_arg[2] == 1)
+	local v_base, v_len = decode_iovec(tcp.u_arg[1], tcp.currpers)
+	local n = realsz or v_len
+	assert(n == ${#DATA})
+	local buf = assert(strace.read_obj(v_base, 'char [?]', n))
+	assert(ffi.string(buf, n) == '$DATA')
+end
+strace.hook('writev', 'entering', check_vecs)
+strace.hook('readv', 'exiting', function(tcp)
+	assert(tcp.u_rval ~= -1)
+	check_vecs(tcp, tcp.u_rval)
+end)
+EOF
+
+for s in '' A AB ABC ABCD ABCDEFGH ABCDEFGHIJK; do
+	run_with_script $DATA "$s" <<EOF
+ffi = require 'ffi'
+$iovec_decls
+s = '$s'
+strace.hook('readv', 'entering', function(tcp)
+	assert(tcp.u_arg[2] == 1)
+	local v_base, v_len = decode_iovec(tcp.u_arg[1], tcp.currpers)
+	assert(v_len >= #s)
+	assert(strace.C.upoke(v_base, #s, s) == 0)
+	assert(strace.inject_retval(#s))
+end)
+EOF
+done
+
+for off in 1 2 3; do
+	for str in A ABC ABCD ABCDEFGH; do
+		expected=$(echo | awk -v d="$DATA" -v s="$str" -v off="$off" \
+			"{print substr(d,1,off) s substr(d,1+off+length(s))}")
+		run_with_script $DATA $expected <<EOF
+ffi = require 'ffi'
+$iovec_decls
+ins_str, ins_off = '$str', $off
+strace.hook('readv', 'exiting', function(tcp)
+	assert(tcp.u_arg[2] == 1)
+	local v_base, v_len = decode_iovec(tcp.u_arg[1], tcp.currpers)
+	assert(v_len >= #ins_str + ins_off)
+	assert(strace.write_obj(v_base + ins_off,
+		ffi.new('char [?]', #ins_str, ins_str)))
+end)
+EOF
+	done
+done
+
+run_with_script -EPIPE $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_error('EPIPE')
+		first = false
+	end
+end)
+EOF
+
+# check overwriting command-line fault injection options
+run_with_script_and_opts '-e inject=writev:error=ENOSYS:when=1' -EPIPE $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_error('EPIPE')
+		first = false
+	end
+end)
+EOF
+
+run_with_script -SIGUSR1 $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_signal('SIGUSR1')
+		first = false
+	end
+end)
+EOF
+
+# check overwriting command-line signal injection options
+run_with_script_and_opts '-e inject=writev:signal=SIGUSR2:when=1' -SIGUSR1 $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_signal('SIGUSR1')
+		first = false
+	end
+end)
+EOF
+
+run_with_script -EPIPE -SIGUSR1 $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_signal('SIGUSR1')
+		strace.inject_error('EPIPE')
+		first = false
+	end
+end)
+EOF
+
+run_with_script -EPIPE -SIGUSR1 $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_error('EPIPE')
+		strace.inject_signal('SIGUSR1')
+		first = false
+	end
+end)
+EOF
+
+# check playing nice with command-line injection options
+run_with_script_and_opts '-e inject=writev:signal=SIGUSR1:when=1' -EPIPE -SIGUSR1 $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_error('EPIPE')
+		first = false
+	end
+end)
+EOF
+
+run_with_script_and_opts '-e inject=writev:error=EPIPE:when=1' -EPIPE -SIGUSR1 $DATA $DATA <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_signal('SIGUSR1')
+		first = false
+	end
+end)
+EOF
+
+expected=tESt
+run_with_script -EPIPE -SIGUSR1 $DATA $expected <<EOF
+first = true
+strace.hook('writev', 'entering', function(tcp)
+	if first then
+		strace.inject_error('EPIPE')
+		strace.inject_signal('SIGUSR1')
+		first = false
+	end
+end)
+ffi = require 'ffi'
+$iovec_decls
+s = '$expected'
+strace.hook('readv', 'entering', function(tcp)
+	assert(strace.inject_retval(#s))
+	assert(tcp.u_arg[2] == 1)
+	local v_base, v_len = decode_iovec(tcp.u_arg[1], tcp.currpers)
+	assert(v_len >= #s)
+	assert(strace.C.upoke(v_base, #s, s) == 0)
+end)
+EOF

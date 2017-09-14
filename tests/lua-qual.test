@@ -1,0 +1,58 @@
+#!/bin/sh
+set -e
+
+. "${srcdir=.}/lua.sh"
+
+run_prog ../umovestr
+pattern_abbrev_verbose='execve("\.\./umovestr", \["\.\./umovestr"\], 0x[[:xdigit:]]* /\* [[:digit:]]* vars \*/) = 0'
+pattern_nonabbrev_verbose='execve("\.\./umovestr", \["\.\./umovestr"\], \[".*\"\(\.\.\.\)\?\]) = 0'
+pattern_nonverbose='execve("\.\./umovestr", 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
+pattern_raw='execve(0x[[:xdigit:]]*, 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
+
+check_output_mismatch()
+{
+	local pattern
+	pattern="$1"; shift
+	run_strace_with_script "$@" ../umovestr
+	LC_ALL=C grep -x "$pattern" "$LOG" > /dev/null || {
+		printf '%s\n%s\n' \
+			'Failed patterns of expected output:' "$pattern"
+		dump_log_and_fail_with "output mismatch"
+	}
+}
+
+gen_script()
+{
+	local not=
+	if [ "$1" = '!' ]; then
+		not=not
+		shift
+	fi
+	echo "\
+strace.C.monitor_all(true, false)
+while true do
+	tcp = strace.next_sc()
+	if tcp == nil then
+		break
+	end
+	strace.$1($not strace.get_sc_name(tcp.scno, tcp.currpers) == 'execve')
+end"
+}
+
+gen_script trace | check_output_mismatch "$pattern_abbrev_verbose"
+
+LC_ALL=C grep -v -x "$pattern_abbrev_verbose" "$LOG" |
+LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
+	dump_log_and_fail_with "unexpected output"
+
+gen_script \! abbrev | check_output_mismatch "$pattern_nonabbrev_verbose"
+gen_script \! verbose | check_output_mismatch "$pattern_nonverbose"
+gen_script raw | check_output_mismatch "$pattern_raw"
+
+check_output_mismatch "$pattern_abbrev_verbose" -e trace=none <<EOF
+strace.hook_class('%process', 'entering', function(tcp) strace.trace() end)
+EOF
+LC_ALL=C grep '^chdir' "$LOG" > /dev/null &&
+	dump_log_and_fail_with "unexpected output"
+
+exit 0

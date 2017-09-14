@@ -1,0 +1,301 @@
+#!/bin/sh
+
+. "${srcdir=.}/lua.sh"
+
+run_with_script()
+{
+	run_strace_with_script -e trace=readv,writev ../lua "$@" > "$EXP"
+	match_diff "$LOG" "$EXP"
+}
+
+DATA=0123abcdefghijklnmop
+
+run_with_script $DATA $DATA <<EOF
+EOF
+
+run_with_script $DATA $DATA <<EOF
+-- check that callbacks are run in order they were registered
+ntotal = 10
+ncur = 0
+for i = 0, ntotal - 1 do
+	strace.at_exit(function()
+		assert(ncur == i)
+		ncur = ncur + 1
+		if ncur == ntotal then
+			assert(io.open('at-exit-marker', 'w'))
+		end
+	end)
+end
+EOF
+if ! [ -f at-exit-marker ]; then
+	fail_ "'at-exit-marker' does not exist"
+fi
+
+run_with_script $DATA $DATA <<EOF
+for i = 1, 10 do assert(strace.next_sc() == nil) end
+EOF
+
+run_with_script $DATA $DATA <<EOF
+ffi = require 'ffi'
+function check()
+	assert(not strace.C.inject_signo(1))
+	assert(not strace.C.inject_retval(0))
+	assert(strace.C.umove(0, 1, ffi.new('char [1]')) == -1)
+	assert(strace.C.umove_str(0, 1, ffi.new('char [1]')) < 0)
+	assert(strace.C.upoke(0, 1, 'x') == -1)
+	assert(not strace.C.path_match(ffi.new('const char *[1]', {'aaa'}), 1))
+end
+
+check()
+assert(strace.next_sc() == nil)
+check()
+EOF
+
+when_decls()
+{
+	echo "----- start of 'when_decls $*' -----"
+	case "$1" in
+	entering)
+		echo "\
+hooks_per_syscall = 1
+function make_state_checker()
+	return function(tcp)
+		assert(tcp ~= nil)
+		assert(strace.entering(tcp))
+		assert(not strace.exiting(tcp))
+	end
+end"
+		case "$2" in
+			s) echo "when_obj = 'entering'" ;;
+			t) echo "when_obj = {true, false}" ;;
+		esac
+	;;
+	exiting)
+		echo "\
+hooks_per_syscall = 1
+function make_state_checker()
+	return function(tcp)
+		assert(tcp ~= nil)
+		assert(strace.exiting(tcp))
+		assert(not strace.entering(tcp))
+	end
+end"
+		case "$2" in
+			s) echo "when_obj = 'exiting'" ;;
+			t) echo "when_obj = {false, true}" ;;
+		esac
+	;;
+	both)
+		echo "\
+hooks_per_syscall = 2
+function make_state_checker()
+	local expect_entry = true
+	return function(tcp)
+		assert(tcp ~= nil)
+		if expect_entry then
+			assert(strace.entering(tcp))
+			assert(not strace.exiting(tcp))
+		else
+			assert(strace.exiting(tcp))
+			assert(not strace.entering(tcp))
+		end
+		expect_entry = not expect_entry
+	end
+end"
+		case "$2" in
+			s) echo "when_obj = 'both'" ;;
+			t) echo "when_obj = {true, true}" ;;
+		esac
+	;;
+	esac
+	echo "----- end of 'when_decls $*' -----"
+}
+
+make_hook_decl="\
+----- start of 'make_hook_decl' -----
+function make_hook(no_at_exit_hook, state_checker)
+	state_checker = state_checker or make_state_checker()
+	local nwritev, nreadv = 0, 0
+	local function check_nreadv()
+		assert(nreadv == hooks_per_syscall)
+	end
+	local function hook(tcp, kind)
+		state_checker(tcp)
+		local name = strace.get_sc_name(tcp.scno, tcp.currpers)
+		if kind == 'writev' or kind == 'readv' then
+			assert(name == kind)
+		elseif kind == '|' then
+			assert(name == 'writev' or name == 'readv')
+		else
+			assert(kind == '*', 'unknown \"kind\" value')
+		end
+		if name == 'writev' then
+			assert(nreadv == 0)
+			nwritev = nwritev + 1
+		elseif name == 'readv' then
+			assert(nwritev == hooks_per_syscall)
+			nreadv = nreadv + 1
+		end
+	end
+	if no_at_exit_hook then
+		return hook, check_nreadv
+	else
+		strace.at_exit(check_nreadv)
+		return hook
+	end
+end
+----- end of 'make_hook_decl' -----"
+
+for when in entering exiting both; do
+	run_with_script $DATA $DATA <<EOF
+$(when_decls $when t)
+$make_hook_decl
+strace.C.monitor_all(when_obj[1], when_obj[2])
+check_state = make_state_checker()
+tcp = strace.next_sc()
+check_state(tcp)
+assert(strace.get_sc_name(tcp.scno, tcp.currpers) == 'execve')
+if strace.entering(tcp) then
+	assert(strace.read_path(tcp.u_arg[0]) == '../lua')
+	assert(strace.path_match '../lua')
+	assert(strace.path_match{'aaa', '../lua', 'bbb'})
+	assert(not strace.path_match{'aaa', 'bbb'})
+	assert(not strace.path_match 'aaa')
+end
+hook, final_check = make_hook(true, check_state)
+while true do
+	tcp = strace.next_sc()
+	if tcp == nil then
+		break
+	end
+	hook(tcp, '*')
+end
+final_check()
+for i = 1, 10 do assert(strace.next_sc() == nil) end
+EOF
+
+	run_with_script $DATA $DATA <<EOF
+$(when_decls $when t)
+check_state = make_state_checker()
+for _, scname in ipairs{'writev', 'readv'} do
+	for p = 0, strace.npersonalities - 1 do
+		local scno = strace.get_scno(scname, p)
+		if scno then
+			assert(not not strace.C.monitor(scno, p, when_obj[1],
+				when_obj[2]))
+		end
+	end
+	for i = 1, hooks_per_syscall do
+		tcp = strace.next_sc()
+		check_state(tcp)
+		assert(strace.get_sc_name(tcp.scno, tcp.currpers) == scname)
+	end
+end
+for i = 1, 10 do assert(strace.next_sc() == nil) end
+EOF
+
+	for objtype in s t; do
+		for n in 1 5; do
+			run_with_script $DATA $DATA <<EOF
+$(when_decls $when $objtype)
+$make_hook_decl
+for i = 1, $n do
+	local hook = make_hook()
+	strace.hook('writev', when_obj, function(tcp) hook(tcp, 'writev') end)
+	strace.hook('readv', when_obj, function(tcp) hook(tcp, 'readv') end)
+end
+EOF
+		done
+
+		run_with_script $DATA $DATA <<EOF
+$(when_decls $when $objtype)
+$make_hook_decl
+hook = make_hook()
+strace.hook({'readv', 'writev'}, when_obj, function(tcp) hook(tcp, '|') end)
+EOF
+
+		run_with_script $DATA $DATA <<EOF
+$(when_decls $when $objtype)
+$make_hook_decl
+hook = make_hook()
+for p = 0, strace.npersonalities - 1 do
+	local t = {}
+	t[#t + 1] = strace.get_scno('writev', p)
+	t[#t + 1] = strace.get_scno('readv', p)
+	strace.hook_scno(t, p, when_obj, function(tcp) hook(tcp, '|') end)
+end
+EOF
+
+		run_with_script $DATA $DATA <<EOF
+$(when_decls $when $objtype)
+$make_hook_decl
+hook = make_hook()
+strace.hook_class({'%desc', '%network'}, when_obj,
+	function(tcp) hook(tcp, '*') end)
+EOF
+
+	done
+done
+
+run_with_script $DATA $DATA <<EOF
+ffi = require 'ffi'
+int  = ffi.typeof('int')
+cstr = ffi.typeof('const char *')
+read_scno = assert(strace.get_scno('read', 0))
+
+assert(strace.get_sc_name(    -1 , 0) == nil)
+assert(strace.get_sc_name(int(-1), 0) == nil)
+assert(strace.get_sc_name(    strace.C.nsysent_vec[0] , 0) == nil)
+assert(strace.get_sc_name(int(strace.C.nsysent_vec[0]), 0) == nil)
+assert(strace.get_sc_name(int(read_scno), 0) == 'read')
+
+assert(strace.get_scno('' , 0) == nil)
+assert(strace.get_scno(     'some nonsense' , 0) == nil)
+assert(strace.get_scno(cstr('some nonsense'), 0) == nil)
+assert(strace.get_scno(cstr('read'), 0) == read_scno)
+
+assert(strace.get_err_name(    1 , 0) == 'EPERM')
+assert(strace.get_err_name(int(1), 0) == 'EPERM')
+assert(strace.get_err_name(    -1 , 0) == nil)
+assert(strace.get_err_name(int(-1), 0) == nil)
+assert(strace.get_err_name(    strace.C.nerrnoent_vec[0] , 0) == nil)
+assert(strace.get_err_name(int(strace.C.nerrnoent_vec[0]), 0) == nil)
+
+assert(strace.get_errno(     '' , 0) == nil)
+assert(strace.get_errno(cstr(''), 0) == nil)
+assert(strace.get_errno('some nonsense', 0) == nil)
+assert(strace.get_errno(     'EPERM' , 0) == 1)
+assert(strace.get_errno(cstr('EPERM'), 0) == 1)
+
+assert(strace.get_sig_name(    -1 , 0) == nil)
+assert(strace.get_sig_name(int(-1), 0) == nil)
+assert(strace.get_sig_name(    9 , 0) == 'SIGKILL')
+assert(strace.get_sig_name(int(9), 0) == 'SIGKILL')
+
+assert(strace.get_signo('', 0) == nil)
+assert(strace.get_signo(     'some nonsense' , 0) == nil)
+assert(strace.get_signo(cstr('some nonsense'), 0) == nil)
+assert(strace.get_signo(     'SIGKILL' , 0) == 9)
+assert(strace.get_signo(cstr('SIGKILL'), 0) == 9)
+
+assert(strace.get_class_flagbit('some nonsense') == nil)
+
+assert(strace.get_sc_flags(read_scno, 0) > 0)
+assert(strace.get_sc_flags(-1, 0) == nil)
+
+function check_ioctl_for(index, pers)
+	local entry = strace.C.ioctlent_vec[pers][index]
+	local s = ffi.string(entry.symbol)
+	assert(strace.get_ioctl_name(         entry.code , pers) == s)
+	assert(strace.get_ioctl_name(tonumber(entry.code), pers) == s)
+	assert(strace.get_ioctl_code(entry.symbol, pers) == entry.code)
+	assert(strace.get_ioctl_code(s,            pers) == entry.code)
+end
+check_ioctl_for(0, 0)
+n = strace.C.nioctlent_vec[0]
+check_ioctl_for(n / 2, 0)
+check_ioctl_for(n - 1, 0)
+assert(strace.get_ioctl_name(
+	strace.C.ioctlent_vec[0][n - 1].code + 1, 0) == nil)
+assert(strace.get_ioctl_code('some nonsense', 0) == nil)
+EOF
