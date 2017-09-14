@@ -3,7 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Updated lists of ARPHRD_*, BPF_*, ETH_P_*, MADV_*, MFD_*, SO_*, SOL_*,
-    and TCP_* constants.
+    TCP_*, and UFFD_FEATURE_* constants.
 
 Noteworthy changes in release 4.19 (2017-09-05)
 ===============================================
