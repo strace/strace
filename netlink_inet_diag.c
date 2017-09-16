@@ -388,7 +388,8 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_PEERS]	= NULL,			/* unimplemented */
 	[INET_DIAG_PAD]		= NULL,
 	[INET_DIAG_MARK]	= decode_nla_u32,
-	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info
+	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info,
+	[INET_DIAG_CLASS_ID]	= decode_nla_u32
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)

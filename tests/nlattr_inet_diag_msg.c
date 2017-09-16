@@ -182,6 +182,11 @@ main(void)
 			   INET_DIAG_MARK, pattern, mark,
 			   printf("%u", mark));
 
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_inet_diag_msg, print_inet_diag_msg,
+			   INET_DIAG_CLASS_ID, pattern, mark,
+			   printf("%u", mark));
+
 	static const uint8_t shutdown = 0xcd;
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_SHUTDOWN,
