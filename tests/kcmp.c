@@ -34,9 +34,13 @@
 
 #ifdef __NR_kcmp
 
+# include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
 
+# ifndef VERBOSE_FD
+#  define VERBOSE_FD 0
+# endif
 
 /*
  * We prefer to use system headers in order to catch some possible deviations in
@@ -54,6 +58,12 @@
 #  define KCMP_IO	5
 #  define KCMP_SYSVSEM	6
 # endif
+
+static const char null_path[] = "/dev/null";
+static const char zero_path[] = "/dev/zero";
+
+# define NULL_FD 23
+# define ZERO_FD 42
 
 static void
 printpidfd(const char *prefix, pid_t pid, unsigned fd)
@@ -103,6 +113,27 @@ main(void)
 	static const kernel_ulong_t bogus_idx2 =
 		(kernel_ulong_t) 0xba5e1e55deadc0deULL;
 
+	int fd;
+
+	/* Open some files to test printpidfd */
+	fd = open(null_path, O_RDONLY);
+	if (fd < 0)
+		perror_msg_and_fail("open(\"%s\")", null_path);
+	if (fd != NULL_FD) {
+		if (dup2(fd, NULL_FD) < 0)
+			perror_msg_and_fail("dup2(fd, NULL_FD)");
+		close(fd);
+	}
+
+	fd = open(zero_path, O_RDONLY);
+	if (fd < 0)
+		perror_msg_and_fail("open(\"%s\")", zero_path);
+	if (fd != ZERO_FD) {
+		if (dup2(fd, ZERO_FD) < 0)
+			perror_msg_and_fail("dup2(fd, ZERO_FD)");
+		close(fd);
+	}
+
 	/* Invalid values */
 	do_kcmp(bogus_pid1, bogus_pid2, bogus_type, NULL, bogus_idx1,
 		bogus_idx2);
@@ -112,6 +143,7 @@ main(void)
 	/* KCMP_FILE is the only type which has additional args */
 	do_kcmp(3141592653U, 2718281828U, ARG_STR(KCMP_FILE), bogus_idx1,
 		bogus_idx2);
+	do_kcmp(-1, -1, ARG_STR(KCMP_FILE), NULL_FD, ZERO_FD);
 
 	/* Types without additional args */
 	do_kcmp(-1, -1, ARG_STR(KCMP_VM), bogus_idx1, bogus_idx2);

@@ -122,6 +122,7 @@ ipc_msgbuf
 ipc_sem
 ipc_shm
 kcmp
+kcmp-y
 kexec_file_load
 kexec_load
 keyctl
