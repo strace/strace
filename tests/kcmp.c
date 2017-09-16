@@ -47,6 +47,11 @@
 #  include <linux/kcmp.h>
 # else
 #  define KCMP_FILE	0
+#  define KCMP_VM	1
+#  define KCMP_FILES	2
+#  define KCMP_FS	3
+#  define KCMP_SIGHAND	4
+#  define KCMP_IO	5
 #  define KCMP_SYSVSEM	6
 # endif
 
@@ -93,12 +98,19 @@ main(void)
 	/* Invalid values */
 	do_kcmp(bogus_pid1, bogus_pid2, bogus_type, NULL, bogus_idx1,
 		bogus_idx2);
-	do_kcmp(0, 0, KCMP_SYSVSEM + 1, NULL, 0, 0);
+	do_kcmp(F8ILL_KULONG_MASK, F8ILL_KULONG_MASK, KCMP_SYSVSEM + 1, NULL,
+		0, 0);
 
 	/* KCMP_FILE is the only type which has additional args */
 	do_kcmp(3141592653U, 2718281828U, ARG_STR(KCMP_FILE), bogus_idx1,
 		bogus_idx2);
-	/* Some type without additional args */
+
+	/* Types without additional args */
+	do_kcmp(-1, -1, ARG_STR(KCMP_VM), bogus_idx1, bogus_idx2);
+	do_kcmp(-1, -1, ARG_STR(KCMP_FILES), bogus_idx1, bogus_idx2);
+	do_kcmp(-1, -1, ARG_STR(KCMP_FS), bogus_idx1, bogus_idx2);
+	do_kcmp(-1, -1, ARG_STR(KCMP_SIGHAND), bogus_idx1, bogus_idx2);
+	do_kcmp(-1, -1, ARG_STR(KCMP_IO), bogus_idx1, bogus_idx2);
 	do_kcmp(-1, -1, ARG_STR(KCMP_SYSVSEM), bogus_idx1, bogus_idx2);
 
 	puts("+++ exited with 0 +++");

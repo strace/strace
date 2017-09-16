@@ -143,7 +143,7 @@ ipc	-a19
 ipc_msg	+ipc.sh
 ipc_sem	+ipc.sh
 ipc_shm	+ipc.sh
-kcmp	-a27
+kcmp	-a22
 kexec_file_load	-s9
 kexec_load	-s9
 keyctl	-a31 -s10
