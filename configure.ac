@@ -334,6 +334,10 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <linux/cryptouser.h>])
 
 AC_CHECK_TYPES(m4_normalize([
+	struct kcmp_epoll_slot
+]),,, [#include <linux/kcmp.h>])
+
+AC_CHECK_TYPES(m4_normalize([
 	struct keyctl_kdf_params
 ]),,, [#include <linux/keyctl.h>])
 
