@@ -390,6 +390,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/if_link.h
 	linux/ip_vs.h
 	linux/ipc.h
+	linux/kcmp.h
 	linux/mmtimer.h
 	linux/msg.h
 	linux/neighbour.h

@@ -37,8 +37,18 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# define KCMP_FILE     0
-# define KCMP_SYSVSEM  6
+
+/*
+ * We prefer to use system headers in order to catch some possible deviations in
+ * system's headers from our perception of reality, but happy to include our own
+ * definitions as well.
+ */
+# ifdef HAVE_LINUX_KCMP_H
+#  include <linux/kcmp.h>
+# else
+#  define KCMP_FILE	0
+#  define KCMP_SYSVSEM	6
+# endif
 
 static void
 do_kcmp(kernel_ulong_t pid1, kernel_ulong_t pid2, kernel_ulong_t type,
