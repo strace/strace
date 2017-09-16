@@ -56,6 +56,12 @@
 # endif
 
 static void
+printpidfd(const char *prefix, pid_t pid, unsigned fd)
+{
+	printf("%s%d", prefix, fd);
+}
+
+static void
 do_kcmp(kernel_ulong_t pid1, kernel_ulong_t pid2, kernel_ulong_t type,
 	const char *type_str, kernel_ulong_t idx1, kernel_ulong_t idx2)
 {
@@ -72,11 +78,13 @@ do_kcmp(kernel_ulong_t pid1, kernel_ulong_t pid2, kernel_ulong_t type,
 	else
 		printf("%#x /* KCMP_??? */", (int) type);
 
-	if (type == KCMP_FILE)
-		printf(", %u, %u", (unsigned) idx1, (unsigned) idx2);
-	else if (type > KCMP_SYSVSEM)
+	if (type == KCMP_FILE) {
+		printpidfd(", ", pid1, idx1);
+		printpidfd(", ", pid2, idx2);
+	} else if (type > KCMP_SYSVSEM) {
 		printf(", %#llx, %#llx",
 		       (unsigned long long) idx1, (unsigned long long) idx2);
+	}
 
 	printf(") = %s\n", errstr);
 }
