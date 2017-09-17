@@ -54,6 +54,10 @@
 # define ALIGNED_OFFSET(t_, m_) \
 	ALIGNED_SIZE(offsetof(t_, m_), t_)
 
+#  ifndef DM_DEV_ARM_POLL
+#   define DM_DEV_ARM_POLL     _IOWR(DM_IOCTL, 0x10, struct dm_ioctl)
+#  endif
+
 static const char str129[] = STR32 STR32 STR32 STR32 "6";
 
 static const __u64 dts_sector_base = (__u64) 0xdeadca75facef157ULL;
@@ -182,6 +186,7 @@ main(void)
 		{ ARG_STR(DM_TABLE_CLEAR),   false },
 		{ ARG_STR(DM_TABLE_DEPS),    true  },
 		{ ARG_STR(DM_TABLE_STATUS),  true  },
+		{ ARG_STR(DM_DEV_ARM_POLL),  false },
 	};
 
 	struct dm_ioctl *unaligned_dm_arg =

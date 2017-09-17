@@ -44,13 +44,16 @@
 /* Definitions for command which have been added later */
 
 #  ifndef DM_LIST_VERSIONS
-#   define DM_LIST_VERSIONS    _IOWR(DM_IOCTL, 0xd, struct dm_ioctl)
+#   define DM_LIST_VERSIONS    _IOWR(DM_IOCTL, 0x0d, struct dm_ioctl)
 #  endif
 #  ifndef DM_TARGET_MSG
-#   define DM_TARGET_MSG       _IOWR(DM_IOCTL, 0xe, struct dm_ioctl)
+#   define DM_TARGET_MSG       _IOWR(DM_IOCTL, 0x0e, struct dm_ioctl)
 #  endif
 #  ifndef DM_DEV_SET_GEOMETRY
-#   define DM_DEV_SET_GEOMETRY _IOWR(DM_IOCTL, 0xf, struct dm_ioctl)
+#   define DM_DEV_SET_GEOMETRY _IOWR(DM_IOCTL, 0x0f, struct dm_ioctl)
+#  endif
+#  ifndef DM_DEV_ARM_POLL
+#   define DM_DEV_ARM_POLL     _IOWR(DM_IOCTL, 0x10, struct dm_ioctl)
 #  endif
 
 
@@ -429,6 +432,7 @@ dm_ioctl_has_params(const unsigned int code)
 	case DM_DEV_SUSPEND:
 	case DM_DEV_STATUS:
 	case DM_TABLE_CLEAR:
+	case DM_DEV_ARM_POLL:
 		return false;
 	}
 
@@ -576,6 +580,7 @@ dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t ar
 	case DM_LIST_VERSIONS:
 	case DM_TARGET_MSG:
 	case DM_DEV_SET_GEOMETRY:
+	case DM_DEV_ARM_POLL:
 		return dm_known_ioctl(tcp, code, arg);
 	default:
 		return RVAL_DECODED;
