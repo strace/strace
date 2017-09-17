@@ -14,7 +14,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     and BPF_OBJ_GET_INFO_BY_FD commands of bpf syscall.
   * Enhanced decoding of get_thread_area, memfd_create, modify_ldt,
     perf_event_open, reboot, set_thread_area, and shmget syscalls.
-  * Implemented decoding of KVM_* ioctl commands.
+  * Implemented decoding of KVM_* and DM_LIST_DEVICES ioctl commands.
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
