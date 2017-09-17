@@ -674,8 +674,10 @@ print_quoted_cstring(const char *str, unsigned int size)
 /*
  * Print path string specified by address `addr' and length `n'.
  * If path length exceeds `n', append `...' to the output.
+ *
+ * Returns the result of umovenstr.
  */
-void
+int
 printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 {
 	char path[PATH_MAX];
@@ -683,7 +685,7 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 
 	if (!addr) {
 		tprints("NULL");
-		return;
+		return -1;
 	}
 
 	/* Cap path length to the path buffer size */
@@ -698,13 +700,15 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 		path[n++] = !nul_seen;
 		print_quoted_cstring(path, n);
 	}
+
+	return nul_seen;
 }
 
-void
+int
 printpath(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
-	printpathn(tcp, addr, PATH_MAX - 1);
+	return printpathn(tcp, addr, PATH_MAX - 1);
 }
 
 /*
@@ -714,8 +718,11 @@ printpath(struct tcb *const tcp, const kernel_ulong_t addr)
  * Pass `user_style' on to `string_quote'.
  * Append `...' to the output if either the string length exceeds `max_strlen',
  * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
+ *
+ * Returns the result of umovenstr if style has QUOTE_0_TERMINATED,
+ * or the result of umoven otherwise.
  */
-void
+int
 printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	    const kernel_ulong_t len, const unsigned int user_style)
 {
@@ -729,7 +736,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (!addr) {
 		tprints("NULL");
-		return;
+		return -1;
 	}
 	/* Allocate static buffers if they are not allocated yet. */
 	if (!str) {
@@ -756,7 +763,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (rc < 0) {
 		printaddr(addr);
-		return;
+		return rc;
 	}
 
 	if (size > max_strlen)
@@ -775,6 +782,8 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints(outstr);
 	if (ellipsis)
 		tprints("...");
+
+	return rc;
 }
 
 void

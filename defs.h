@@ -591,14 +591,14 @@ dumpiov_upto(struct tcb *, int len, kernel_ulong_t addr, kernel_ulong_t data_siz
 extern void
 dumpstr(struct tcb *, kernel_ulong_t addr, int len);
 
-extern void
+extern int
 printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
 	    unsigned int user_style);
 
-extern void
+extern int
 printpathn(struct tcb *, kernel_ulong_t addr, unsigned int n);
 
-extern void
+extern int
 printpath(struct tcb *, kernel_ulong_t addr);
 
 #define TIMESPEC_TEXT_BUFSIZE \
@@ -720,16 +720,16 @@ extern void unwind_print_stacktrace(struct tcb *);
 extern void unwind_capture_stacktrace(struct tcb *);
 #endif
 
-static inline void
+static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
 {
-	printstr_ex(tcp, addr, len, 0);
+	return printstr_ex(tcp, addr, len, 0);
 }
 
-static inline void
+static inline int
 printstr(struct tcb *tcp, kernel_ulong_t addr)
 {
-	printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
+	return printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
 }
 
 static inline int
