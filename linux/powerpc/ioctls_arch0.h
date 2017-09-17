@@ -88,7 +88,6 @@
 { "asm/ps3fb.h", "PS3FB_IOCTL_SCREENINFO", _IOC_READ, 0x7203, 0x04 },
 { "asm/ps3fb.h", "PS3FB_IOCTL_SETMODE", _IOC_WRITE, 0x7201, 0x04 },
 { "linux/kvm.h", "KVM_ALLOCATE_RMA", _IOC_READ, 0xaea9, 0x08 },
-{ "linux/kvm.h", "KVM_ARM_SET_DEVICE_ADDR", _IOC_WRITE, 0xaeab, 0x10 },
 { "linux/kvm.h", "KVM_ASSIGN_DEV_IRQ", _IOC_WRITE, 0xae70, 0x40 },
 { "linux/kvm.h", "KVM_ASSIGN_PCI_DEVICE", _IOC_READ, 0xae69, 0x40 },
 { "linux/kvm.h", "KVM_ASSIGN_SET_INTX_MASK", _IOC_WRITE, 0xaea4, 0x40 },
@@ -181,5 +180,3 @@
 { "linux/kvm.h", "KVM_TPR_ACCESS_REPORTING", _IOC_READ|_IOC_WRITE, 0xae92, 0x28 },
 { "linux/kvm.h", "KVM_TRANSLATE", _IOC_READ|_IOC_WRITE, 0xae85, 0x18 },
 { "linux/kvm.h", "KVM_UNREGISTER_COALESCED_MMIO", _IOC_WRITE, 0xae68, 0x10 },
-{ "linux/kvm.h", "KVM_X86_GET_MCE_CAP_SUPPORTED", _IOC_READ, 0xae9d, 0x08 },
-{ "linux/kvm.h", "KVM_X86_SETUP_MCE", _IOC_WRITE, 0xae9c, 0x08 },
