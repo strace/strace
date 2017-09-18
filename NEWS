@@ -2,7 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Implemented decoding of NETLINK_NETFILTER netlink message types.
+  * Implemented decoding of NETLINK_NETFILTER netlink message types and flags.
   * Updated lists of ARPHRD_*, BPF_*, ETH_P_*, LOOP_*, MADV_*,
     MEMBARRIER_CMD_*, MFD_*, SO_*, SOL_*, TCP_*, and UFFD_FEATURE_* constants.
   * Updated lists of ioctl commands from Linux 4.14.

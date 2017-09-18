@@ -254,6 +254,109 @@ decode_nlmsg_flags_crypto(const uint16_t type)
 }
 
 static const struct xlat *
+decode_nlmsg_flags_netfilter(const uint16_t type)
+{
+	const uint8_t subsys_id = (uint8_t) (type >> 8);
+	const uint8_t msg_type = (uint8_t) type;
+
+	switch (subsys_id) {
+	case NFNL_SUBSYS_CTNETLINK:
+		switch (msg_type) {
+		case IPCTNL_MSG_CT_NEW:
+			return netlink_new_flags;
+		case IPCTNL_MSG_CT_GET:
+		case IPCTNL_MSG_CT_GET_CTRZERO:
+		case IPCTNL_MSG_CT_GET_STATS_CPU:
+		case IPCTNL_MSG_CT_GET_STATS:
+		case IPCTNL_MSG_CT_GET_DYING:
+		case IPCTNL_MSG_CT_GET_UNCONFIRMED:
+			return netlink_get_flags;
+		case IPCTNL_MSG_CT_DELETE:
+			return netlink_delete_flags;
+		}
+		break;
+	case NFNL_SUBSYS_CTNETLINK_EXP:
+		switch (msg_type) {
+		case IPCTNL_MSG_EXP_NEW:
+			return netlink_new_flags;
+		case IPCTNL_MSG_EXP_GET:
+		case IPCTNL_MSG_EXP_GET_STATS_CPU:
+			return netlink_get_flags;
+		case IPCTNL_MSG_EXP_DELETE:
+			return netlink_delete_flags;
+		}
+		break;
+	case NFNL_SUBSYS_ACCT:
+		switch (msg_type) {
+		case NFNL_MSG_ACCT_NEW:
+			return netlink_new_flags;
+		case NFNL_MSG_ACCT_GET:
+		case NFNL_MSG_ACCT_GET_CTRZERO:
+			return netlink_get_flags;
+		case NFNL_MSG_ACCT_DEL:
+			return netlink_delete_flags;
+		}
+		break;
+	case NFNL_SUBSYS_CTNETLINK_TIMEOUT:
+		switch (msg_type) {
+		case IPCTNL_MSG_TIMEOUT_NEW:
+			return netlink_new_flags;
+		case IPCTNL_MSG_TIMEOUT_GET:
+			return netlink_get_flags;
+		case IPCTNL_MSG_TIMEOUT_DELETE:
+			return netlink_delete_flags;
+		}
+		break;
+	case NFNL_SUBSYS_CTHELPER:
+		switch (msg_type) {
+		case NFNL_MSG_CTHELPER_NEW:
+			return netlink_new_flags;
+		case NFNL_MSG_CTHELPER_GET:
+			return netlink_get_flags;
+		case NFNL_MSG_CTHELPER_DEL:
+			return netlink_delete_flags;
+		}
+		break;
+	case NFNL_SUBSYS_NFTABLES:
+		switch (msg_type) {
+		case NFT_MSG_NEWTABLE:
+		case NFT_MSG_NEWCHAIN:
+		case NFT_MSG_NEWRULE:
+		case NFT_MSG_NEWSET:
+		case NFT_MSG_NEWSETELEM:
+		case NFT_MSG_NEWGEN:
+		case NFT_MSG_NEWOBJ:
+			return netlink_new_flags;
+		case NFT_MSG_GETTABLE:
+		case NFT_MSG_GETCHAIN:
+		case NFT_MSG_GETRULE:
+		case NFT_MSG_GETSET:
+		case NFT_MSG_GETSETELEM:
+		case NFT_MSG_GETGEN:
+		case NFT_MSG_GETOBJ:
+		case NFT_MSG_GETOBJ_RESET:
+			return netlink_get_flags;
+		case NFT_MSG_DELTABLE:
+		case NFT_MSG_DELCHAIN:
+		case NFT_MSG_DELRULE:
+		case NFT_MSG_DELSET:
+		case NFT_MSG_DELSETELEM:
+		case NFT_MSG_DELOBJ:
+			return netlink_delete_flags;
+		}
+		break;
+	case NFNL_SUBSYS_NFT_COMPAT:
+		switch (msg_type) {
+		case NFNL_MSG_COMPAT_GET:
+			return netlink_get_flags;
+		}
+		break;
+	}
+
+	return NULL;
+}
+
+static const struct xlat *
 decode_nlmsg_flags_route(const uint16_t type)
 {
 	/* RTM_DELACTION uses NLM_F_ROOT flags */
@@ -305,6 +408,7 @@ typedef const struct xlat *(*nlmsg_flags_decoder_t)(const uint16_t type);
 
 static const nlmsg_flags_decoder_t nlmsg_flags[] = {
 	[NETLINK_CRYPTO] = decode_nlmsg_flags_crypto,
+	[NETLINK_NETFILTER] = decode_nlmsg_flags_netfilter,
 	[NETLINK_ROUTE] = decode_nlmsg_flags_route,
 	[NETLINK_SOCK_DIAG] = decode_nlmsg_flags_sock_diag,
 	[NETLINK_XFRM] = decode_nlmsg_flags_xfrm
