@@ -189,6 +189,7 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 		break;
 
 	case LOOP_SET_DIRECT_IO:
+	case LOOP_SET_BLOCK_SIZE:
 		tprintf(", %" PRI_klu, arg);
 		break;
 

@@ -303,6 +303,11 @@ main(void)
 	printf("ioctl(-1, LOOP_SET_DIRECT_IO, %lu) = -1 EBADF (%m)\n",
 	       (unsigned long) magic);
 
+	/* LOOP_SET_BLOCK_SIZE */
+	ioctl(-1, LOOP_SET_BLOCK_SIZE, magic);
+	printf("ioctl(-1, LOOP_SET_BLOCK_SIZE, %lu) = -1 EBADF (%m)\n",
+	       (unsigned long) magic);
+
 	/* LOOP_CTL_ADD */
 	ioctl(-1, LOOP_CTL_ADD, magic);
 	printf("ioctl(-1, LOOP_CTL_ADD, %d) = -1 EBADF (%m)\n",
