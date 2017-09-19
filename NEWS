@@ -2,8 +2,9 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of ARPHRD_*, BPF_*, ETH_P_*, MADV_*, MEMBARRIER_CMD_*, MFD_*,
-    SO_*, SOL_*, TCP_*, and UFFD_FEATURE_* constants.
+  * Updated lists of ARPHRD_*, BPF_*, ETH_P_*, LOOP_*, MADV_*,
+    MEMBARRIER_CMD_*, MFD_*, SO_*, SOL_*, TCP_*, and UFFD_FEATURE_* constants.
+  * Updated lists of ioctl commands from Linux 4.14.
 
 Noteworthy changes in release 4.19 (2017-09-05)
 ===============================================
