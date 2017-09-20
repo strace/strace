@@ -76,7 +76,7 @@ typedef struct {
  */
 #if SIZEOF_LONG == 4
 # define PRI__64 "ll"
-#elif defined ALPHA || defined IA64 || defined POWERPC \
+#elif defined ALPHA || defined IA64 || defined __powerpc64__ \
       || (defined MIPS && !defined __ANDROID__)
 # define PRI__64 "l"
 #else
