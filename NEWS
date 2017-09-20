@@ -6,6 +6,9 @@ Noteworthy changes in release ?.?? (????-??-??)
     MEMBARRIER_CMD_*, MFD_*, SO_*, SOL_*, TCP_*, and UFFD_FEATURE_* constants.
   * Updated lists of ioctl commands from Linux 4.14.
 
+* Bug fixes
+  * Fixed powerpc personality support on powerpc64.
+
 Noteworthy changes in release 4.19 (2017-09-05)
 ===============================================
 
