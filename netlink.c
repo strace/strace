@@ -34,6 +34,7 @@
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
 #include "xlat/netlink_ack_flags.h"
+#include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
 #include "xlat/netlink_get_flags.h"
 #include "xlat/netlink_new_flags.h"
@@ -242,6 +243,9 @@ decode_nlmsg_flags_crypto(const uint16_t type)
 	switch (type) {
 	case CRYPTO_MSG_NEWALG:
 		return netlink_new_flags;
+	case CRYPTO_MSG_DELALG:
+	case CRYPTO_MSG_DELRNG:
+		return netlink_delete_flags;
 	case CRYPTO_MSG_GETALG:
 		return netlink_get_flags;
 	}
@@ -252,11 +256,14 @@ decode_nlmsg_flags_crypto(const uint16_t type)
 static const struct xlat *
 decode_nlmsg_flags_route(const uint16_t type)
 {
+	/* RTM_DELACTION uses NLM_F_ROOT flags */
 	if (type == RTM_DELACTION)
 		return netlink_get_flags;
 	switch (type & 3) {
 	case  0:
 		return netlink_new_flags;
+	case  1:
+		return netlink_delete_flags;
 	case  2:
 		return netlink_get_flags;
 	}
@@ -280,6 +287,9 @@ decode_nlmsg_flags_xfrm(const uint16_t type)
 	case XFRM_MSG_NEWSADINFO:
 	case XFRM_MSG_NEWSPDINFO:
 		return netlink_new_flags;
+	case XFRM_MSG_DELSA:
+	case XFRM_MSG_DELPOLICY:
+		return netlink_delete_flags;
 	case XFRM_MSG_GETSA:
 	case XFRM_MSG_GETPOLICY:
 	case XFRM_MSG_GETAE:

@@ -78,9 +78,17 @@ test_nlmsg_flags(const int fd)
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = CRYPTO_MSG_DELALG;
-	nlh.nlmsg_flags = NLM_F_REPLACE;
+	nlh.nlmsg_flags = NLM_F_ECHO | NLM_F_NONREC;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_DELALG"
+	       ", flags=NLM_F_ECHO|NLM_F_NONREC, seq=0, pid=0}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
+
+	nlh.nlmsg_type = CRYPTO_MSG_UPDATEALG;
+	nlh.nlmsg_flags = NLM_F_REPLACE;
+	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_UPDATEALG"
 	       ", flags=%#x /* NLM_F_??? */, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, NLM_F_REPLACE,

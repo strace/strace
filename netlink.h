@@ -36,6 +36,9 @@
 # define NETLINK_SOCK_DIAG 4
 #endif
 
+#ifndef NLM_F_NONREC
+# define NLM_F_NONREC	0x100
+#endif
 #ifndef NLM_F_CAPPED
 # define NLM_F_CAPPED	0x100
 #endif
