@@ -408,7 +408,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter/nfnetlink_cttimeout.h
 	linux/netfilter/nfnetlink_log.h
 	linux/netfilter/nfnetlink_queue.h
-	linux/netfilter/xt_osf.h
 	linux/nsfs.h
 	linux/perf_event.h
 	linux/quota.h
@@ -442,6 +441,9 @@ AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
 AC_CHECK_HEADERS([linux/mqueue.h],,, [#include <linux/types.h>])
+
+AC_CHECK_HEADERS([linux/netfilter/xt_osf.h],,, [#include <linux/ip.h>
+#include <linux/tcp.h>])
 
 AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter_arp/arp_tables.h

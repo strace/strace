@@ -33,6 +33,8 @@
 # include <stdio.h>
 # include <sys/socket.h>
 # include "netlink.h"
+# include <linux/ip.h>
+# include <linux/tcp.h>
 # include <linux/netfilter/nfnetlink.h>
 # include <linux/netfilter/xt_osf.h>
 
