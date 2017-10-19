@@ -78,6 +78,15 @@ SYS_FUNC(modify_ldt)
 	return RVAL_DECODED;
 }
 
+#if defined(M68K) || defined(MIPS)
+SYS_FUNC(set_thread_area)
+{
+	printaddr(tcp->u_arg[0]);
+
+	return RVAL_DECODED;
+
+}
+#else /* defined(M68K) || defined(MIPS) */
 SYS_FUNC(set_thread_area)
 {
 	if (entering(tcp)) {
@@ -98,29 +107,20 @@ SYS_FUNC(set_thread_area)
 	}
 	return 0;
 }
-
-SYS_FUNC(get_thread_area)
-{
-	if (exiting(tcp))
-		print_user_desc(tcp, tcp->u_arg[0]);
-	return 0;
-}
-
-#endif /* HAVE_STRUCT_USER_DESC */
-
-#if defined(M68K) || defined(MIPS)
-SYS_FUNC(set_thread_area)
-{
-	printaddr(tcp->u_arg[0]);
-
-	return RVAL_DECODED;
-
-}
-#endif
+#endif /* defined(M68K) || defined(MIPS) */
 
 #if defined(M68K)
 SYS_FUNC(get_thread_area)
 {
 	return RVAL_DECODED | RVAL_HEX;
 }
-#endif
+#else /* defined(M68K) */
+SYS_FUNC(get_thread_area)
+{
+	if (exiting(tcp))
+		print_user_desc(tcp, tcp->u_arg[0]);
+	return 0;
+}
+#endif /* defined(M68K) */
+
+#endif /* HAVE_STRUCT_USER_DESC */
