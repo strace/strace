@@ -516,8 +516,8 @@ main(int argc, char *argv[])
 			"FUTEX_OP_CMP_EQ<<24|0", ENOSYS, "ENOSYS" },
 		{ 0x80000000, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_SET<<28|0<<12|"
 			"FUTEX_OP_CMP_EQ<<24|0" },
-		{ 0xa0caffee, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_OR<<28|"
-			"0xcaf<<12|FUTEX_OP_CMP_EQ<<24|0xfee" },
+		{ 0xa000ffee, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_OR<<28|"
+			"0xf<<12|FUTEX_OP_CMP_EQ<<24|0xfee" },
 		{ 0x01000000, "FUTEX_OP_SET<<28|0<<12|FUTEX_OP_CMP_NE<<24|0" },
 		{ 0x01234567, "FUTEX_OP_SET<<28|0x234<<12|FUTEX_OP_CMP_NE<<24|"
 			"0x567" },
@@ -533,11 +533,11 @@ main(int argc, char *argv[])
 			"0x8<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS, "ENOSYS" },
 		{ 0x0f000000, "FUTEX_OP_SET<<28|0<<12|"
 			"0xf<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS, "ENOSYS" },
-		{ 0xbadfaced, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_ANDN<<28|"
-			"0xdfa<<12|0xa<<24 /* FUTEX_OP_CMP_??? */|0xced",
+		{ 0xba00aced, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_ANDN<<28|"
+			"0xa<<12|0xa<<24 /* FUTEX_OP_CMP_??? */|0xced",
 			ENOSYS, "ENOSYS" },
-		{ 0xffffffff, "FUTEX_OP_OPARG_SHIFT<<28|"
-			"0x7<<28 /* FUTEX_OP_??? */|0xfff<<12|"
+		{ 0xff01ffff, "FUTEX_OP_OPARG_SHIFT<<28|"
+			"0x7<<28 /* FUTEX_OP_??? */|0x1f<<12|"
 			"0xf<<24 /* FUTEX_OP_CMP_??? */|0xfff",
 			ENOSYS, "ENOSYS" },
 	};
