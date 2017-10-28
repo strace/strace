@@ -63,6 +63,45 @@ test_nlmsg_type(const int fd)
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 }
 
+static void
+test_nlmsg_flags(const int fd)
+{
+	long rc;
+	struct nlmsghdr nlh = {
+		.nlmsg_len = sizeof(nlh),
+	};
+
+	nlh.nlmsg_type =
+		NFNL_SUBSYS_CTNETLINK_TIMEOUT << 8 | IPCTNL_MSG_TIMEOUT_NEW;
+	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_APPEND;
+	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {len=%u"
+	       ", type=NFNL_SUBSYS_CTNETLINK_TIMEOUT<<8|IPCTNL_MSG_TIMEOUT_NEW"
+	       ", flags=NLM_F_REQUEST|NLM_F_APPEND, seq=0, pid=0}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
+
+	nlh.nlmsg_type =
+		NFNL_SUBSYS_CTNETLINK_TIMEOUT << 8 | IPCTNL_MSG_TIMEOUT_GET;
+	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_ATOMIC;
+	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {len=%u"
+	       ", type=NFNL_SUBSYS_CTNETLINK_TIMEOUT<<8|IPCTNL_MSG_TIMEOUT_GET"
+	       ", flags=NLM_F_REQUEST|NLM_F_ATOMIC, seq=0, pid=0}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
+
+	nlh.nlmsg_type =
+		NFNL_SUBSYS_CTNETLINK_TIMEOUT << 8 | IPCTNL_MSG_TIMEOUT_DELETE;
+	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_NONREC;
+	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, {len=%u"
+	       ", type=NFNL_SUBSYS_CTNETLINK_TIMEOUT<<8|IPCTNL_MSG_TIMEOUT_DELETE"
+	       ", flags=NLM_F_REQUEST|NLM_F_NONREC, seq=0, pid=0}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
+}
+
 int
 main(void)
 {
@@ -71,6 +110,7 @@ main(void)
 	int fd = create_nl_socket(NETLINK_NETFILTER);
 
 	test_nlmsg_type(fd);
+	test_nlmsg_flags(fd);
 
 	puts("+++ exited with 0 +++");
 
