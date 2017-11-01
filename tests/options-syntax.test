@@ -80,16 +80,21 @@ check_h "invalid -s argument: '-42'" -s -42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
 check_h "invalid -I argument: '5'" -I 5
 
-cat > "$EXP" << '__EOF__'
-strace: must have PROG [ARGS] or -p PID
-Try 'strace -h' for more information.
-__EOF__
 ../zeroargc "$strace_exp" /bin/true 2> "$LOG" &&
 	dump_log_and_fail_with \
 		'zeroargc strace failed to handle the error properly'
-match_diff "$LOG" "$EXP" ||
-	dump_log_and_fail_with \
-		'zeroargc strace failed to print expected diagnostics'
+cat > "$EXP" << __EOF__
+$strace_exp: must have PROG [ARGS] or -p PID
+Try '$strace_exp -h' for more information.
+__EOF__
+diff -u -- "$EXP" "$LOG" > /dev/null || {
+	cat > "$EXP" <<- '__EOF__'
+	strace: must have PROG [ARGS] or -p PID
+	Try 'strace -h' for more information.
+	__EOF__
+	match_diff "$LOG" "$EXP" \
+		"zeroargc $STRACE $args output mismatch"
+}
 
 if [ -n "${UID-}" ]; then
 	if [ "${UID-}" = 0 ]; then
