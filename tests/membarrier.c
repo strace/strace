@@ -55,6 +55,11 @@ main(void)
 			text = "MEMBARRIER_CMD_SHARED|"
 			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED";
 			break;
+		case 1|8|16:
+			text = "MEMBARRIER_CMD_SHARED|"
+			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED";
+			break;
 		default:
 			error_msg_and_fail("membarrier returned %#x, does"
 					   " the test have to be updated?", rc);
