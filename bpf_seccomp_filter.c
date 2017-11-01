@@ -35,8 +35,8 @@
 #ifdef HAVE_LINUX_SECCOMP_H
 # include <linux/seccomp.h>
 #endif
-#ifndef SECCOMP_RET_ACTION
-# define SECCOMP_RET_ACTION 0x7fff0000U
+#ifndef SECCOMP_RET_ACTION_FULL
+# define SECCOMP_RET_ACTION_FULL 0xffff0000U
 #endif
 #include "xlat/seccomp_ret_action.h"
 
@@ -44,7 +44,7 @@ static bool
 print_seccomp_filter_k(const struct bpf_filter_block *const fp)
 {
 	if (BPF_CLASS(fp->code) == BPF_RET) {
-		unsigned int action = SECCOMP_RET_ACTION & fp->k;
+		unsigned int action = SECCOMP_RET_ACTION_FULL & fp->k;
 		unsigned int data = fp->k & ~action;
 
 		printxval(seccomp_ret_action, action, "SECCOMP_RET_???");
