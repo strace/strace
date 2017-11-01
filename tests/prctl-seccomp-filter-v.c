@@ -114,7 +114,7 @@ main(void)
 	PRINT_DENY_SYSCALL(sync, EBUSY),
 	PRINT_DENY_SYSCALL(setsid, EPERM),
 
-	printf("BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)");
+	printf("BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL_THREAD)");
 
 	puts("]}) = 0");
 	puts("+++ exited with 0 +++");

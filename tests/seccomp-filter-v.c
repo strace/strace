@@ -95,7 +95,7 @@ main(void)
 	tprintf("%s", "");
 
 	static const char kill_stmt_txt[] =
-		"BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)";
+		"BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL_THREAD)";
 	struct sock_filter *const filter =
 		tail_memdup(filter_c, sizeof(filter_c));
 	struct sock_filter *const big_filter =
