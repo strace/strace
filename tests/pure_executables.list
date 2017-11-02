@@ -298,6 +298,7 @@ sched_xetparam
 sched_xetscheduler
 sched_yield
 seccomp-filter
+seccomp_get_action_avail
 select
 semop
 sendfile

@@ -359,6 +359,7 @@ scno.h
 seccomp-filter
 seccomp-filter-v
 seccomp-strict
+seccomp_get_action_avail
 select
 semop
 sendfile

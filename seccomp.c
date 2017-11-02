@@ -33,29 +33,37 @@
 #include "xlat/seccomp_ops.h"
 #include "xlat/seccomp_filter_flags.h"
 
-static void
-decode_seccomp_set_mode_strict(const unsigned int flags,
-			       const kernel_ulong_t addr)
-{
-	tprintf("%u, ", flags);
-	printaddr(addr);
-}
-
 SYS_FUNC(seccomp)
 {
 	unsigned int op = tcp->u_arg[0];
+	unsigned int flags = tcp->u_arg[1];
+	unsigned int act;
 
 	printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
 	tprints(", ");
 
-	if (op == SECCOMP_SET_MODE_FILTER) {
-		printflags(seccomp_filter_flags, tcp->u_arg[1],
+	switch (op) {
+	case SECCOMP_GET_ACTION_AVAIL:
+		tprintf("%u, ", flags);
+		if (!umove_or_printaddr(tcp, tcp->u_arg[2], &act)) {
+			tprints("[");
+			printxval(seccomp_ret_action, act, "SECCOMP_RET_???");
+			tprints("]");
+		}
+		break;
+
+	case SECCOMP_SET_MODE_FILTER:
+		printflags(seccomp_filter_flags, flags,
 			   "SECCOMP_FILTER_FLAG_???");
 		tprints(", ");
 		decode_seccomp_fprog(tcp, tcp->u_arg[2]);
-	} else {
-		decode_seccomp_set_mode_strict(tcp->u_arg[1],
-					       tcp->u_arg[2]);
+		break;
+
+	case SECCOMP_SET_MODE_STRICT:
+	default:
+		tprintf("%u, ", flags);
+		printaddr(tcp->u_arg[2]);
+		break;
 	}
 
 	return RVAL_DECODED;
