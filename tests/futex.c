@@ -497,7 +497,6 @@ main(int argc, char *argv[])
 		uint32_t val;
 		const char *str;
 		int err;
-		const char *errstr;
 	} wake_ops[] = {
 		{ 0x00000000, "FUTEX_OP_SET<<28|0<<12|FUTEX_OP_CMP_EQ<<24|0" },
 		{ 0x00fff000, "FUTEX_OP_SET<<28|0xfff<<12|FUTEX_OP_CMP_EQ<<24|"
@@ -511,9 +510,9 @@ main(int argc, char *argv[])
 		{ 0x30000000, "FUTEX_OP_ANDN<<28|0<<12|FUTEX_OP_CMP_EQ<<24|0" },
 		{ 0x40000000, "FUTEX_OP_XOR<<28|0<<12|FUTEX_OP_CMP_EQ<<24|0" },
 		{ 0x50000000, "0x5<<28 /* FUTEX_OP_??? */|0<<12|"
-			"FUTEX_OP_CMP_EQ<<24|0", ENOSYS, "ENOSYS" },
+			"FUTEX_OP_CMP_EQ<<24|0", ENOSYS },
 		{ 0x70000000, "0x7<<28 /* FUTEX_OP_??? */|0<<12|"
-			"FUTEX_OP_CMP_EQ<<24|0", ENOSYS, "ENOSYS" },
+			"FUTEX_OP_CMP_EQ<<24|0", ENOSYS },
 		{ 0x80000000, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_SET<<28|0<<12|"
 			"FUTEX_OP_CMP_EQ<<24|0" },
 		{ 0xa0caffee, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_OR<<28|"
@@ -526,20 +525,20 @@ main(int argc, char *argv[])
 		{ 0x04000000, "FUTEX_OP_SET<<28|0<<12|FUTEX_OP_CMP_GT<<24|0" },
 		{ 0x05000000, "FUTEX_OP_SET<<28|0<<12|FUTEX_OP_CMP_GE<<24|0" },
 		{ 0x06000000, "FUTEX_OP_SET<<28|0<<12|"
-			"0x6<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS, "ENOSYS" },
+			"0x6<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS },
 		{ 0x07000000, "FUTEX_OP_SET<<28|0<<12|"
-			"0x7<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS, "ENOSYS" },
+			"0x7<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS },
 		{ 0x08000000, "FUTEX_OP_SET<<28|0<<12|"
-			"0x8<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS, "ENOSYS" },
+			"0x8<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS },
 		{ 0x0f000000, "FUTEX_OP_SET<<28|0<<12|"
-			"0xf<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS, "ENOSYS" },
+			"0xf<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS },
 		{ 0xbadfaced, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_ANDN<<28|"
 			"0xdfa<<12|0xa<<24 /* FUTEX_OP_CMP_??? */|0xced",
-			ENOSYS, "ENOSYS" },
+			ENOSYS },
 		{ 0xffffffff, "FUTEX_OP_OPARG_SHIFT<<28|"
 			"0x7<<28 /* FUTEX_OP_??? */|0xfff<<12|"
 			"0xf<<24 /* FUTEX_OP_CMP_??? */|0xfff",
-			ENOSYS, "ENOSYS" },
+			ENOSYS },
 	};
 
 	for (i = 0; i < ARRAY_SIZE(wake_ops); i++) {
