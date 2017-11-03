@@ -66,6 +66,7 @@ void futex_error(int *uaddr, int op, unsigned long val, unsigned long timeout,
 # define CHECK_FUTEX_GENERIC(uaddr, op, val, timeout, uaddr2, val3, check, \
 	enosys) \
 	do { \
+		errno = 0; \
 		rc = syscall(__NR_futex, (uaddr), (op), (val), (timeout), \
 			(uaddr2), (val3)); \
 		/* It is here due to EPERM on WAKE_OP on AArch64 */ \
@@ -496,7 +497,16 @@ main(int argc, char *argv[])
 	static const struct {
 		uint32_t val;
 		const char *str;
+
+		/*
+		 * Peculiar semantics:
+		 *  * err == 0 and err2 != 0 => expect both either the absence
+		 *    of error or presence of err2
+		 *  * err != 0 and err2 == 0 => expect err only, no success
+		 *    expected.
+		 */
 		int err;
+		int err2;
 	} wake_ops[] = {
 		{ 0x00000000, "FUTEX_OP_SET<<28|0<<12|FUTEX_OP_CMP_EQ<<24|0" },
 		{ 0x00fff000, "FUTEX_OP_SET<<28|0xfff<<12|FUTEX_OP_CMP_EQ<<24|"
@@ -516,7 +526,7 @@ main(int argc, char *argv[])
 		{ 0x80000000, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_SET<<28|0<<12|"
 			"FUTEX_OP_CMP_EQ<<24|0" },
 		{ 0xa0caffee, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_OR<<28|"
-			"0xcaf<<12|FUTEX_OP_CMP_EQ<<24|0xfee" },
+			"0xcaf<<12|FUTEX_OP_CMP_EQ<<24|0xfee", 0, EINVAL },
 		{ 0x01000000, "FUTEX_OP_SET<<28|0<<12|FUTEX_OP_CMP_NE<<24|0" },
 		{ 0x01234567, "FUTEX_OP_SET<<28|0x234<<12|FUTEX_OP_CMP_NE<<24|"
 			"0x567" },
@@ -534,18 +544,29 @@ main(int argc, char *argv[])
 			"0xf<<24 /* FUTEX_OP_CMP_??? */|0", ENOSYS },
 		{ 0xbadfaced, "FUTEX_OP_OPARG_SHIFT<<28|FUTEX_OP_ANDN<<28|"
 			"0xdfa<<12|0xa<<24 /* FUTEX_OP_CMP_??? */|0xced",
-			ENOSYS },
+			ENOSYS, EINVAL },
 		{ 0xffffffff, "FUTEX_OP_OPARG_SHIFT<<28|"
 			"0x7<<28 /* FUTEX_OP_??? */|0xfff<<12|"
 			"0xf<<24 /* FUTEX_OP_CMP_??? */|0xfff",
-			ENOSYS },
+			ENOSYS, EINVAL },
 	};
 
 	for (i = 0; i < ARRAY_SIZE(wake_ops); i++) {
 		for (j = 0; j < 2; j++) {
 			CHECK_FUTEX_ENOSYS(uaddr,
 				j ? FUTEX_WAKE_OP_PRIVATE : FUTEX_WAKE_OP,
-				VAL, i, uaddr2, wake_ops[i].val, (rc == 0));
+				VAL, i, uaddr2, wake_ops[i].val,
+				/*
+				 * Either one of errs is 0 or rc == 0 is not
+				 * allowed.
+				 */
+				((!wake_ops[i].err || !wake_ops[i].err2 ||
+					(rc != 0)) &&
+				((!wake_ops[i].err && (rc == 0)) ||
+				(wake_ops[i].err  && (rc == -1) &&
+					(errno == wake_ops[i].err)) ||
+				(wake_ops[i].err2 && (rc == -1) &&
+					(errno == wake_ops[i].err2)))));
 			printf("futex(%p, FUTEX_WAKE_OP%s, %u, %u, %p, %s)"
 			       " = %s\n", uaddr, j ? "_PRIVATE" : "", VAL_PR,
 			       i, uaddr2, wake_ops[i].str, sprintrc(rc));
