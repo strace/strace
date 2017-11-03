@@ -87,6 +87,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	attach-p-cmd-p \
 	block_reset_raise_run \
 	caps-abbrev \
+	check_sigign \
 	clone_parent \
 	clone_ptrace \
 	count-f \
@@ -106,6 +107,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_rtc-v \
 	is_linux_mips_n64 \
 	ksysent \
+	list_sigaction_signum \
 	mmsg-silent \
 	mmsg_name-v \
 	msg_control-v \
@@ -135,6 +137,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	seccomp-filter-v \
 	seccomp-strict \
 	set_ptracer_any \
+	set_sigign \
 	signal_receive \
 	sleep \
 	stack-fcall \
@@ -278,6 +281,7 @@ MISC_TESTS = \
 	redirect-fds.test \
 	redirect.test \
 	restart_syscall.test \
+	sigign.test \
 	strace-C.test \
 	strace-E.test \
 	strace-S.test \
