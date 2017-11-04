@@ -1,6 +1,5 @@
 /*
- * Check that the signal handler for the specified signal number is set
- * to SIG_IGN/SIG_DFL.
+ * Execute a command with the specified signal blocked/unblocked.
  *
  * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
@@ -31,19 +30,24 @@
 #include "tests.h"
 #include <signal.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int
 main(int ac, char **av)
 {
-	if (ac != 3)
-		error_msg_and_fail("usage: check_sigign 0|1 signum");
+	if (ac < 4)
+		error_msg_and_fail("usage: set_sigblock 0|1 signum path...");
 
-	const int ign = !!atoi(av[1]);
+	const int block = atoi(av[1]);
 	const int signum = atoi(av[2]);
-	struct sigaction act;
+	sigset_t mask;
 
-	if (sigaction(signum, NULL, &act))
-		perror_msg_and_fail("sigaction: %s", av[2]);
+	sigemptyset(&mask);
+	if (sigaddset(&mask, signum))
+		perror_msg_and_fail("sigaddset: %s", av[2]);
+	if (sigprocmask(block ? SIG_BLOCK : SIG_UNBLOCK, &mask, NULL))
+		perror_msg_and_fail("sigprocmask");
 
-	return ign ^ (act.sa_handler == SIG_IGN);
+	execvp(av[3], av + 3);
+	perror_msg_and_fail("execvp: %s", av[3]);
 }

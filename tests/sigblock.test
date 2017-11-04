@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Check signal mask transparency.
+# Starting with commit v4.17-5-gf83b49b strace is expected
+# to forward the signal mask to tracees unchanged.
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../list_sigaction_signum > /dev/null
+saved_STRACE="$STRACE"
+
+for sig in $(../list_sigaction_signum); do
+	for block in 0 1; do
+		set_cmd="../set_sigblock $block $sig"
+		check_cmd="../check_sigblock $block $sig"
+		run_prog $set_cmd $check_cmd
+		STRACE="$set_cmd $saved_STRACE"
+		for i in '' -I1 -I2 -I3 -I4; do
+			run_strace $i -enone $check_cmd
+		done
+	done
+done

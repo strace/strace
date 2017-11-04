@@ -87,6 +87,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	attach-p-cmd-p \
 	block_reset_raise_run \
 	caps-abbrev \
+	check_sigblock \
 	check_sigign \
 	clone_parent \
 	clone_ptrace \
@@ -137,6 +138,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	seccomp-filter-v \
 	seccomp-strict \
 	set_ptracer_any \
+	set_sigblock \
 	set_sigign \
 	signal_receive \
 	sleep \
@@ -281,6 +283,7 @@ MISC_TESTS = \
 	redirect-fds.test \
 	redirect.test \
 	restart_syscall.test \
+	sigblock.test \
 	sigign.test \
 	strace-C.test \
 	strace-E.test \

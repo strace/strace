@@ -24,6 +24,7 @@ brk
 btrfs
 caps
 caps-abbrev
+check_sigblock
 check_sigign
 chmod
 chown
@@ -368,6 +369,7 @@ sendfile
 sendfile64
 set_mempolicy
 set_ptracer_any
+set_sigblock
 set_sigign
 setdomainname
 setfsgid

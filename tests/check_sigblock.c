@@ -1,6 +1,5 @@
 /*
- * Check that the signal handler for the specified signal number is set
- * to SIG_IGN/SIG_DFL.
+ * Check that the specified signal number is blocked/unblocked.
  *
  * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
@@ -36,14 +35,15 @@ int
 main(int ac, char **av)
 {
 	if (ac != 3)
-		error_msg_and_fail("usage: check_sigign 0|1 signum");
+		error_msg_and_fail("usage: check_sigblock 0|1 signum");
 
-	const int ign = !!atoi(av[1]);
+	const int block = !!atoi(av[1]);
 	const int signum = atoi(av[2]);
-	struct sigaction act;
+	sigset_t mask;
 
-	if (sigaction(signum, NULL, &act))
-		perror_msg_and_fail("sigaction: %s", av[2]);
+	sigemptyset(&mask);
+	if (sigprocmask(SIG_SETMASK, NULL, &mask))
+		perror_msg_and_fail("sigprocmask");
 
-	return ign ^ (act.sa_handler == SIG_IGN);
+	return block ^ sigismember(&mask, signum);
 }
