@@ -126,6 +126,23 @@ case "$arch" in
 				  [Define to 1 if you have CFLAG mpers support])
 			st_MPERS_STRUCT_STAT([])
 			st_MPERS_STRUCT_STAT([64])
+
+			if test $st_cv_runtime = yes; then
+				pushdef([SIZEOF_LONG],
+					MPERS_NAME[_SIZEOF_LONG])
+				st_MPERS_LOAD_AC_CV([sizeof_long])
+				AC_CHECK_SIZEOF([long])
+				st_MPERS_SAVE_AC_CV([sizeof_long])
+				popdef([SIZEOF_LONG])
+
+				pushdef([SIZEOF_KERNEL_LONG_T],
+					MPERS_NAME[_SIZEOF_KERNEL_LONG_T])
+				st_MPERS_LOAD_AC_CV([sizeof_kernel_long_t])
+				AC_CHECK_SIZEOF([kernel_long_t],,
+						[#include "$srcdir/kernel_types.h"])
+				st_MPERS_SAVE_AC_CV([sizeof_kernel_long_t])
+				popdef([SIZEOF_KERNEL_LONG_T])
+			fi
 		fi
 	fi
 	CFLAGS="$saved_CFLAGS"
