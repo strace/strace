@@ -384,6 +384,7 @@ seccomp-filter
 seccomp-filter-v
 seccomp-strict
 seccomp_get_action_avail
+seccomp_ret_trap
 select
 select-P
 semop

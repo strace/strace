@@ -374,6 +374,7 @@ EXTRA_DIST = \
 	run.sh \
 	sched.in \
 	scno_tampering.sh \
+	seccomp_ret_trap.expected \
 	setfsugid.c \
 	setresugid.c \
 	setreugid.c \

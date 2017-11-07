@@ -335,6 +335,7 @@ sched_yield	-a14
 seccomp-filter	-e trace=seccomp
 seccomp-filter-v	-v -e trace=seccomp
 seccomp_get_action_avail	-e trace=seccomp
+seccomp_ret_trap	run_prog; run_strace -a11 -esignal=none -echdir $args; match_diff
 select	-a36
 select-P	-a36 -e trace=select -P /dev/full 9>>/dev/full
 semop	-a32 -e trace=semop,semtimedop
