@@ -35,6 +35,14 @@
 #define STRINGIFY(...)		#__VA_ARGS__
 #define STRINGIFY_VAL(...)	STRINGIFY(__VA_ARGS__)
 
+#ifndef MAX
+# define MAX(a, b)		(((a) > (b)) ? (a) : (b))
+#endif
+#ifndef MIN
+# define MIN(a, b)		(((a) < (b)) ? (a) : (b))
+#endif
+#define CLAMP(val, min, max)	MIN(MAX(min, val), max)
+
 #ifndef offsetofend
 # define offsetofend(type_, member_)	\
 	(offsetof(type_, member_) + sizeof(((type_ *)0)->member_))
