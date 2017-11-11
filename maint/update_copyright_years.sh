@@ -52,7 +52,7 @@ debug() { [ "$VERBOSE" -ge 2 ] && printf '%s\n' "$*"; }
 
 print_help()
 {
-	cat <<EOF
+	cat <<'EOF'
 Usage: update_copyright_notices [-v]* [-q]* [-a] [-h] [FILES]
 
 If no files provided, process all files in current directory, recursively.
@@ -65,7 +65,7 @@ Script implements hard-coded logic for extracting comments in files:
 
 Options:
   -a  Invoke git add for the changed files.
-  -c  Call git commit with message provided in $$GIT_COMMIT_TEMPLATE (implies -a).
+  -c  Call git commit with message provided in $GIT_COMMIT_TEMPLATE (implies -a).
   -v  Increase verbosity.
   -q  Decrease verbosity.
   -h  Show this help.
