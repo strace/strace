@@ -1,6 +1,6 @@
 #!/usr/bin/m4
 #
-# Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
 # All rights reserved.
 #
