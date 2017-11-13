@@ -19,7 +19,6 @@ strace-devel@lists.sourceforge.net mailing list.
 ##>
 Aaron Ucko                      ucko@vax1.rockhurst.edu
 Adrien Kunysz                   adrien@kunysz.be
-Anton Blanchard                 anton@samba.org
 Arkadiusz Miskiewicz            misiek@pld.org.pl
 Bai Weidong                     baiwd@cn.fujitsu.com
 Bo Kullmar                      bk@kullmar.se
@@ -29,7 +28,6 @@ David Mosberger-Tang            davidm@hpl.hp.com
 David S. Miller                 davem@caip.rutgers.edu
 David Wilder                    wilder@us.ibm.com
 David Woodhouse                 dwmw2@redhat.com
-Douglas Mencken                 dougmencken@gmail.com
 Fernando Luis Vazquez Cao       fernando@oss.ntt.co.jp
 Florian Lohoff                  flo@rfc822.org
 Gabor Gombas                    gombasg@sztaki.hu
@@ -38,7 +36,6 @@ Gaël Roualland                  gael.roualland@iname.com
 Greg Banks                      gbanks@pocketpenguins.com
 Henrik Storner                  storner@osiris.ping.dk
 Jakub Jelinek                   jj@ultra.linux.cz
-Jeff Mahoney                    jeffm@suse.com
 Jian Zhen                       zhenjl@gmail.com
 Jiri Slaby                      jirislaby@gmail.com
 Joe Ilacqua                     spike@world.std.com
@@ -76,7 +73,6 @@ Scott Tsai                      scottt958@yahoo.com.tw
 Simon Murray                    simon@transitive.com
 Solar Designer                  solar@openwall.com
 Srinivasa Ds                    srinivasa@in.ibm.com
-Steve Bennett                   steveb@workware.net.au
 Thanh Ma                        tma@encore.com
 Thiemo Seufer                   ths@networkno.de
 Thomas Bogendoerfer             tsbogend@bigbug.franken.de
@@ -86,7 +82,5 @@ Tom Dyas                        tdyas@eden.rutgers.edu
 Tommi Rantala                   ext-tommi.1.rantala@nokia.com
 Topi Miettinen                  Topi.Miettinen@nic.fi
 Xiaoning Ding                   dingxn@gmail.com
-Yang Zhiguo                     yzgcsu@cn.fujitsu.com
 Zach Brown                      zach.brown@oracle.com
 Zhang Le                        zhilg@users.sourceforge.net
-Марк Коренберг                  socketpair@gmail.com
