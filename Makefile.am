@@ -1102,10 +1102,9 @@ $(srcdir)/CREDITS: $(srcdir)/CREDITS.in $(srcdir)/.mailmap \
 	(								\
 	  cd $(srcdir);							\
 	  sed '/^##/,$$d' CREDITS.in;					\
-	  { sed -n '1,/^##>/d; s/   */\t/; s/^./&/p' CREDITS.in;	\
-	    git log --pretty=format:'%aN	%aE';			\
-	  } | LC_ALL=C sort -u						\
-	    | awk -F'\t' '{printf("\t%s <%s>\n",$$1,$$2)}';		\
+	  sed -n '1,/^##>/d; s/   */\t/; s/^./&/p' CREDITS.in		\
+	    | maint/gen-contributors-list.sh - -e HEAD --initial	\
+	    | sed 's/\t/ /g; s/^/\t/'					\
 	) > $@-t && mv $@-t $@
 
 export TAR_OPTIONS = --owner=0 --group=0 --numeric-owner --mode=go-w,go+rX
