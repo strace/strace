@@ -1,4 +1,4 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
 
 * Improvements
@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of ARPHRD_*, BPF_*, ETH_P_*, LOOP_*, MADV_*,
     MEMBARRIER_CMD_*, MFD_*, SECCOMP_*, SO_*, SOL_*, TCP_*, and UFFD_FEATURE_*
     constants.
+  * Added decoding of statx syscall on hppa.
   * Updated lists of ioctl commands from Linux 4.14.
 
 * Bug fixes
