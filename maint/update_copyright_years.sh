@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -efu
 #
 # Update copyright notices for source files.
 #
@@ -45,10 +45,10 @@ Headers updated automatically with
 # Remove them from the list once they have been changed.
 IGNORED_FILES="git-set-file-times
 gitlog-to-changelog
-${ADDITIONAL_IGNORED_FILES}"
+${ADDITIONAL_IGNORED_FILES-}"
 
-log()   { [ "$VERBOSE" -ge 1 ] && printf '%s\n' "$*"; }
-debug() { [ "$VERBOSE" -ge 2 ] && printf '%s\n' "$*"; }
+log()   { [ "$VERBOSE" -lt 1 ] || printf '%s\n' "$*"; }
+debug() { [ "$VERBOSE" -lt 2 ] || printf '%s\n' "$*"; }
 
 print_help()
 {
@@ -183,7 +183,7 @@ process_file()
 	[ "$CALL_GIT_ADD" = 0 ] || git add "$f"
 }
 
-while [ -n "$1" ]; do
+while [ -n "${1-}" ]; do
 	case "$1" in
 	"-v")
 		VERBOSE=$(($VERBOSE + 1))
