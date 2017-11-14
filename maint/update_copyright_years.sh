@@ -53,7 +53,7 @@ debug() { [ "$VERBOSE" -lt 2 ] || printf '%s\n' "$*"; }
 print_help()
 {
 	cat <<'EOF'
-Usage: update_copyright_notices [-v]* [-q]* [-a] [-h] [FILES]
+Usage: update_copyright_notices [-v]* [-q]* [-a] [-h] [-j JOBS] [FILES]
 
 If no files provided, process all files in current directory, recursively.
 Only git-tracked files are processed.
@@ -70,6 +70,7 @@ Options:
   -q  Decrease verbosity.
   -h  Show this help.
   -b  Overwrite beginning year too on update of existing notice.
+  -j  Maximum concurrent jobs.
 
 Environment:
   COPYRIGHT_NOTICE  Copyright ownership string.
@@ -183,6 +184,9 @@ process_file()
 	[ "$CALL_GIT_ADD" = 0 ] || git add "$f"
 }
 
+MAX_JOBS="$(getconf _NPROCESSORS_ONLN)"
+: $(( MAX_JOBS *= 2 ))
+
 while [ -n "${1-}" ]; do
 	case "$1" in
 	"-v")
@@ -202,6 +206,10 @@ while [ -n "${1-}" ]; do
 		CALL_GIT_ADD=1
 		CALL_GIT_COMMIT=1
 		;;
+	"-j")
+		shift
+		MAX_JOBS="$1"
+		;;
 	*)
 		break
 		;;
@@ -210,8 +218,24 @@ while [ -n "${1-}" ]; do
 	shift
 done
 
+jobs=0
+pids=
+[ 1 -le "${MAX_JOBS}" ] || MAX_JOBS=2
+
 git ls-files -- "$@" | grep -vFx "$IGNORED_FILES" | while read f; do
-	process_file "$f"
+	process_file "$f" &
+	pids="$pids $!"
+	: $(( jobs += 1 ))
+	if [ "${jobs}" -gt "$MAX_JOBS" ]; then
+		read wait_pid rest
+		pids="$rest"
+		wait -n 2>/dev/null || wait "$wait_pid"
+		: $(( jobs -= 1 ))
+	fi <<- EOF
+	$pids
+	EOF
 done
+
+wait
 
 [ "$CALL_GIT_COMMIT" = 0 ] || git commit -m "$GIT_COMMIT_TEMPLATE"
