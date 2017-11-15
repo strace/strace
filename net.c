@@ -390,8 +390,9 @@ SYS_FUNC(socketpair)
 #include "xlat/getsockipv6options.h"
 #include "xlat/setsockipv6options.h"
 #include "xlat/sockipxoptions.h"
-#include "xlat/sockrawoptions.h"
+#include "xlat/socknetlinkoptions.h"
 #include "xlat/sockpacketoptions.h"
+#include "xlat/sockrawoptions.h"
 #include "xlat/socksctpoptions.h"
 #include "xlat/socktcpoptions.h"
 
@@ -430,6 +431,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_RAW:
 		printxval(sockrawoptions, name, "RAW_???");
+		break;
+	case SOL_NETLINK:
+		printxval(socknetlinkoptions, name, "NETLINK_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
