@@ -60,6 +60,7 @@ DECL_NLA(be16);
 DECL_NLA(be64);
 DECL_NLA(str);
 DECL_NLA(strn);
+DECL_NLA(fd);
 DECL_NLA(ifindex);
 DECL_NLA(meminfo);
 DECL_NLA(rt_class);

@@ -40,7 +40,7 @@
 static const nla_decoder_t rtgenmsg_nla_decoders[] = {
 	[NETNSA_NSID]	= decode_nla_s32,
 	[NETNSA_PID]	= decode_nla_u32,
-	[NETNSA_FD]	= decode_nla_u32
+	[NETNSA_FD]	= decode_nla_fd
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg)
