@@ -410,6 +410,7 @@ so_linger
 so_peercred
 sock_filter-v
 socketcall
+sockopt-sol_netlink
 splice
 stack-fcall
 stat

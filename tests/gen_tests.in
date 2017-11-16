@@ -352,6 +352,7 @@ so_linger	-e trace=getsockopt,setsockopt
 so_peercred	-e trace=getsockopt
 sock_filter-v	-v -e trace=getsockopt,setsockopt
 socketcall	-a20
+sockopt-sol_netlink	-e trace=getsockopt,setsockopt
 splice
 stat	-a32 -v -P stat.sample -P /dev/full
 stat64	-a32 -v -P stat.sample -P /dev/full
