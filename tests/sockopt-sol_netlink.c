@@ -85,6 +85,9 @@ main(void)
 #ifdef NETLINK_LISTEN_ALL_NSID
 		{ ARG_STR(NETLINK_LISTEN_ALL_NSID) },
 #endif
+#ifdef NETLINK_LIST_MEMBERSHIPS
+		{ ARG_STR(NETLINK_LIST_MEMBERSHIPS) },
+#endif
 #ifdef NETLINK_CAP_ACK
 		{ ARG_STR(NETLINK_CAP_ACK) },
 #endif
@@ -136,14 +139,34 @@ main(void)
 			printf("->%d", *len);
 		printf("]) = %s\n", errstr);
 
-		/* optlen shorter than necessary - print address */
-		*len = sizeof(*val) - 1;
-		get_sockopt(fd, names[i].val, val, len);
-		printf("getsockopt(%d, SOL_NETLINK, %s, %p, [%d",
-		       fd, names[i].str, val, (int) sizeof(*val) - 1);
-		if ((int) sizeof(*val) - 1 != *len)
-			printf("->%d", *len);
-		printf("]) = %s\n", errstr);
+#ifdef NETLINK_LIST_MEMBERSHIPS
+		if (names[i].val != NETLINK_LIST_MEMBERSHIPS) {
+#endif
+			/* optlen shorter than necessary - print address */
+			*len = sizeof(*val) - 1;
+			get_sockopt(fd, names[i].val, val, len);
+			printf("getsockopt(%d, SOL_NETLINK, %s, %p, [%d",
+			       fd, names[i].str, val, (int) sizeof(*val) - 1);
+			if ((int) sizeof(*val) - 1 != *len)
+				printf("->%d", *len);
+			printf("]) = %s\n", errstr);
+#ifdef NETLINK_LIST_MEMBERSHIPS
+		} else {
+			/* optlen shorter than required for the first element */
+			*len = sizeof(*val) - 1;
+			get_sockopt(fd, names[i].val, efault, len);
+			printf("getsockopt(%d, SOL_NETLINK, %s, ",
+			       fd, names[i].str);
+			if (rc)
+				printf("%p", efault);
+			else
+				printf("[]");
+			printf(", [%d", (int) sizeof(*val) - 1);
+			if ((int) sizeof(*val) - 1 != *len)
+				printf("->%d", *len);
+			printf("]) = %s\n", errstr);
+		}
+#endif
 
 		/* optval EFAULT - print address */
 		*len = sizeof(*val);
