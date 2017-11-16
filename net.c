@@ -601,6 +601,13 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 		}
 		break;
+
+	case SOL_NETLINK:
+		if (len < (int) sizeof(int))
+			printaddr(addr);	/* unlikely */
+		else
+			printnum_int(tcp, addr, "%d");
+		return;
 	}
 
 	/* default arg printing */
@@ -825,6 +832,13 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 		}
 		break;
+
+	case SOL_NETLINK:
+		if (len < (int) sizeof(int))
+			printaddr(addr);
+		else
+			printnum_int(tcp, addr, "%d");
+		return;
 	}
 
 	/* default arg printing */
