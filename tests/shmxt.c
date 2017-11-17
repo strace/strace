@@ -34,8 +34,8 @@ main(void)
 	atexit(cleanup);
 
 	rc = (long) shmat(bogus_shmid, bogus_shmaddr, bogus_shmflg);
-	printf("%s(%d, %p, SHM_REMAP|SHM_RDONLY|SHM_RND|%#x) = %s\n",
-	       SHMAT, bogus_shmid, bogus_shmaddr, bogus_shmflg & ~0x7000,
+	printf("%s(%d, %p, SHM_RDONLY|SHM_RND|SHM_REMAP|SHM_EXEC|%#x) = %s\n",
+	       SHMAT, bogus_shmid, bogus_shmaddr, bogus_shmflg & ~0xf000,
 	       sprintrc(rc));
 
 	shmat(id, NULL, SHM_REMAP);
@@ -50,18 +50,31 @@ main(void)
 	rc = shmdt(NULL);
 	printf("shmdt(NULL) = %s\n", sprintrc(rc));
 
-	if (shmdt(shmaddr))
-		perror_msg_and_skip("shmdt");
-	printf("shmdt(%p) = 0\n", shmaddr);
+	rc = shmdt(shmaddr);
+	printf("shmdt(%p) = %s\n", shmaddr, sprintrc(rc));
 
 	++shmaddr;
 	void *shmaddr2 = shmat(id, shmaddr, SHM_RND);
 	if (shmaddr2 == (void *)(-1))
 		printf("%s(%d, %p, SHM_RND) = -1 %s (%m)\n",
 		       SHMAT, id, shmaddr, errno2name());
-	else
+	else {
 		printf("%s(%d, %p, SHM_RND) = %p\n",
 		       SHMAT, id, shmaddr, shmaddr2);
+		rc = shmdt(shmaddr2);
+		printf("shmdt(%p) = %s\n", shmaddr2, sprintrc(rc));
+	}
+
+	shmaddr = shmat(id, NULL, SHM_RDONLY|SHM_EXEC);
+	if (shmaddr == (void *)(-1))
+		printf("%s(%d, NULL, SHM_RDONLY|SHM_EXEC) = %s\n",
+		       SHMAT, id, sprintrc(-1));
+	else {
+		printf("%s(%d, NULL, SHM_RDONLY|SHM_EXEC) = %p\n",
+		       SHMAT, id, shmaddr);
+		rc = shmdt(shmaddr);
+		printf("shmdt(%p) = %s\n", shmaddr, sprintrc(rc));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -70,12 +70,14 @@ main(void)
 	struct shmid_ds ds;
 
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %s%s%s%#x\\|%#04o\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, %s%s%s%s%#x\\|%#04o\\) += %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       IPC_CREAT & bogus_flags ? "IPC_CREAT\\|" : "",
 	       IPC_EXCL & bogus_flags ? "IPC_EXCL\\|" : "",
 	       SHM_HUGETLB & bogus_flags ? "SHM_HUGETLB\\|" : "",
-	       bogus_flags & ~(0777 | IPC_CREAT | IPC_EXCL | SHM_HUGETLB),
+	       SHM_NORESERVE & bogus_flags ? "SHM_NORESERVE\\|" : "",
+	       bogus_flags & ~(0777 | IPC_CREAT | IPC_EXCL
+				    | SHM_HUGETLB | SHM_NORESERVE),
 	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	id = shmget(private_key, 1, 0600);

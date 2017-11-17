@@ -5,7 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of netlink descriptor attributes as file descriptors.
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
-  * Updated the list of MSG_* constants.
+  * Updated lists of MSG_* and SHM_* constants.
 
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
