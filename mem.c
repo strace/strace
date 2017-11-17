@@ -32,7 +32,7 @@
  */
 
 #include "defs.h"
-#include <asm/mman.h>
+#include <linux/mman.h>
 #include <sys/mman.h>
 
 unsigned long
@@ -55,11 +55,29 @@ SYS_FUNC(brk)
 #include "xlat/mmap_prot.h"
 #include "xlat/mmap_flags.h"
 
+#ifndef MAP_HUGE_SHIFT
+# define MAP_HUGE_SHIFT 26
+#endif
+
+#ifndef MAP_HUGE_MASK
+# define MAP_HUGE_MASK 0x3f
+#endif
+
 static void
 print_mmap_flags(kernel_ulong_t flags)
 {
 	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
-	addflags(mmap_flags, flags & ~MAP_TYPE);
+	flags &= ~MAP_TYPE;
+
+	const unsigned int mask = MAP_HUGE_MASK << MAP_HUGE_SHIFT;
+	const unsigned int hugetlb_value = flags & mask;
+
+	flags &= ~mask;
+	addflags(mmap_flags, flags);
+
+	if (hugetlb_value)
+		tprintf("|%u<<MAP_HUGE_SHIFT",
+			hugetlb_value >> MAP_HUGE_SHIFT);
 }
 
 static void
