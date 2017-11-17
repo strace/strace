@@ -18,6 +18,10 @@ cleanup(void)
 # define SHMAT "shmat"
 #endif
 
+#ifndef SHM_EXEC
+# define SHM_EXEC 0100000
+#endif
+
 int
 main(void)
 {
