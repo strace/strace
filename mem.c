@@ -56,6 +56,17 @@ SYS_FUNC(brk)
 #include "xlat/mmap_flags.h"
 
 static void
+print_mmap_flags(kernel_ulong_t flags)
+{
+#ifdef MAP_TYPE
+	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
+	addflags(mmap_flags, flags & ~MAP_TYPE);
+#else
+	printflags64(mmap_flags, flags, "MAP_???");
+#endif
+}
+
+static void
 print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 {
 	const kernel_ulong_t addr = u_arg[0];
@@ -68,12 +79,7 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
 	tprintf(", %" PRI_klu ", ", len);
 	printflags64(mmap_prot, prot, "PROT_???");
 	tprints(", ");
-#ifdef MAP_TYPE
-	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
-	addflags(mmap_flags, flags & ~MAP_TYPE);
-#else
-	printflags64(mmap_flags, flags, "MAP_???");
-#endif
+	print_mmap_flags(flags);
 	tprints(", ");
 	printfd(tcp, fd);
 	tprintf(", %#llx", offset);
@@ -317,12 +323,7 @@ SYS_FUNC(remap_file_pages)
 	tprintf(", %" PRI_klu ", ", size);
 	printflags64(mmap_prot, prot, "PROT_???");
 	tprintf(", %" PRI_klu ", ", pgoff);
-#ifdef MAP_TYPE
-	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
-	addflags(mmap_flags, flags & ~MAP_TYPE);
-#else
-	printflags64(mmap_flags, flags, "MAP_???");
-#endif
+	print_mmap_flags(flags);
 
 	return RVAL_DECODED;
 }
