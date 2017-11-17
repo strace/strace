@@ -58,12 +58,8 @@ SYS_FUNC(brk)
 static void
 print_mmap_flags(kernel_ulong_t flags)
 {
-#ifdef MAP_TYPE
 	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
 	addflags(mmap_flags, flags & ~MAP_TYPE);
-#else
-	printflags64(mmap_flags, flags, "MAP_???");
-#endif
 }
 
 static void
