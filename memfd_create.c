@@ -28,13 +28,37 @@
 
 #include "defs.h"
 
+#ifdef HAVE_LINUX_MEMFD_H
+# include <linux/memfd.h>
+#endif
+
 #include "xlat/memfd_create_flags.h"
+
+#ifndef MFD_HUGE_SHIFT
+# define MFD_HUGE_SHIFT 26
+#endif
+
+#ifndef MFD_HUGE_MASK
+# define MFD_HUGE_MASK 0x3f
+#endif
 
 SYS_FUNC(memfd_create)
 {
 	printpathn(tcp, tcp->u_arg[0], 255 - (sizeof("memfd:") - 1));
 	tprints(", ");
-	printflags(memfd_create_flags, tcp->u_arg[1], "MFD_???");
+
+	unsigned int flags = tcp->u_arg[1];
+	const unsigned int mask = MFD_HUGE_MASK << MFD_HUGE_SHIFT;
+	const unsigned int hugetlb_value = flags & mask;
+	flags &= ~mask;
+
+	if (flags || !hugetlb_value)
+		printflags(memfd_create_flags, flags, "MFD_???");
+
+	if (hugetlb_value)
+		tprintf("%s%u<<MFD_HUGE_SHIFT",
+			flags ? "|" : "",
+			hugetlb_value >> MFD_HUGE_SHIFT);
 
 	return RVAL_DECODED | RVAL_FD;
 }

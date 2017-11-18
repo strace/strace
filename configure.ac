@@ -395,6 +395,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/ip_vs.h
 	linux/ipc.h
 	linux/kcmp.h
+	linux/memfd.h
 	linux/mmtimer.h
 	linux/msg.h
 	linux/neighbour.h

@@ -37,6 +37,18 @@
 # include <stdint.h>
 # include <unistd.h>
 
+# ifdef HAVE_LINUX_MEMFD_H
+#  include <linux/memfd.h>
+# endif
+
+# ifndef MFD_HUGE_SHIFT
+#  define MFD_HUGE_SHIFT 26
+# endif
+
+# ifndef MFD_HUGE_MASK
+#  define MFD_HUGE_MASK 0x3f
+# endif
+
 static const char *errstr;
 
 static long
@@ -51,16 +63,33 @@ int
 main(void)
 {
 	const size_t size = 255 - (sizeof("memfd:") - 1) + 1;
-	char *const pattern = tail_alloc(size);
+	char *pattern = tail_alloc(size);
 	fill_memory_ex(pattern, size, '0', 10);
 
-	const kernel_ulong_t flags = (kernel_ulong_t) 0xfacefeed0000000fULL;
-	k_memfd_create((uintptr_t) pattern, flags);
+	k_memfd_create((uintptr_t) pattern, 0);
+	printf("memfd_create(\"%.*s\"..., 0) = %s\n",
+	       (int) size - 1, pattern, errstr);
 
+	kernel_ulong_t flags = (kernel_ulong_t) 0xfacefeed00000007ULL;
+	k_memfd_create((uintptr_t) pattern, flags);
 	printf("memfd_create(\"%.*s\"..., %s) = %s\n",
 	       (int) size - 1, pattern,
-	       "MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB|0x8",
+	       "MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB",
 	       errstr);
+
+	pattern[size - 1] = '\0';
+	flags = 30 << MFD_HUGE_SHIFT;
+	k_memfd_create((uintptr_t) pattern, flags);
+	printf("memfd_create(\"%s\", 30<<MFD_HUGE_SHIFT) = %s\n",
+	       pattern, errstr);
+
+	pattern += size - 1;
+	flags = (kernel_ulong_t) -1ULL;
+	k_memfd_create(0, flags);
+	flags = -1U & ~(7 | (MFD_HUGE_MASK << MFD_HUGE_SHIFT));
+	printf("memfd_create(NULL, MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB"
+	       "|%#x|%u<<MFD_HUGE_SHIFT) = %s\n",
+	       (unsigned int) flags, MFD_HUGE_MASK, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
