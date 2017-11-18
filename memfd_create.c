@@ -32,7 +32,7 @@
 
 SYS_FUNC(memfd_create)
 {
-	printstr(tcp, tcp->u_arg[0]);
+	printpathn(tcp, tcp->u_arg[0], 255 - (sizeof("memfd:") - 1));
 	tprints(", ");
 	printflags(memfd_create_flags, tcp->u_arg[1], "MFD_???");
 
