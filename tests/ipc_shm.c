@@ -32,6 +32,14 @@
 #include <stdlib.h>
 #include <sys/shm.h>
 
+#ifndef SHM_HUGE_SHIFT
+# define SHM_HUGE_SHIFT 26
+#endif
+
+#ifndef SHM_HUGE_MASK
+# define SHM_HUGE_MASK 0x3f
+#endif
+
 #include "xlat.h"
 #include "xlat/shm_resource_flags.h"
 
@@ -64,20 +72,54 @@ main(void)
 	#else
 		(size_t) 0x1e55c0de5dec0dedULL;
 	#endif
-	static const int bogus_flags = 0xface1e55;
-
+	static const unsigned int bogus_ipc_shm_flags =
+		IPC_CREAT | IPC_EXCL | SHM_HUGETLB | SHM_NORESERVE;
+	static const unsigned int huge_mask = SHM_HUGE_MASK << SHM_HUGE_SHIFT;
+	static const unsigned int huge_flags = 21 << SHM_HUGE_SHIFT;
+	int bogus_flags;
 	int rc;
 	struct shmid_ds ds;
 
-	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %s%s%s%s%#x\\|%#04o\\) += %s\n",
+	rc = shmget(bogus_key, bogus_size, 0);
+	printf("shmget\\(%#llx, %zu, 000\\) += %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
-	       IPC_CREAT & bogus_flags ? "IPC_CREAT\\|" : "",
-	       IPC_EXCL & bogus_flags ? "IPC_EXCL\\|" : "",
-	       SHM_HUGETLB & bogus_flags ? "SHM_HUGETLB\\|" : "",
-	       SHM_NORESERVE & bogus_flags ? "SHM_NORESERVE\\|" : "",
-	       bogus_flags & ~(0777 | IPC_CREAT | IPC_EXCL
-				    | SHM_HUGETLB | SHM_NORESERVE),
+	       sprintrc_grep(rc));
+
+	rc = shmget(bogus_key, bogus_size, huge_flags);
+	printf("shmget\\(%#llx, %zu, %s\\|%#03o\\) += %s\n",
+	       zero_extend_signed_to_ull(bogus_key), bogus_size,
+	       "21<<SHM_HUGE_SHIFT", 0, sprintrc_grep(rc));
+
+	bogus_flags = 0xface1e55 & ~(bogus_ipc_shm_flags | huge_mask);
+	rc = shmget(bogus_key, bogus_size, bogus_flags);
+	printf("shmget\\(%#llx, %zu, %#x\\|%#03o\\) += %s\n",
+	       zero_extend_signed_to_ull(bogus_key), bogus_size,
+	       bogus_flags & ~0777,
+	       bogus_flags & 0777, sprintrc_grep(rc));
+
+	bogus_flags |= bogus_ipc_shm_flags;
+	rc = shmget(bogus_key, bogus_size, bogus_flags);
+	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%#03o\\) += %s\n",
+	       zero_extend_signed_to_ull(bogus_key), bogus_size,
+	       "IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE",
+	       bogus_flags & ~(0777 | bogus_ipc_shm_flags),
+	       bogus_flags & 0777, sprintrc_grep(rc));
+
+	bogus_flags |= huge_flags;
+	rc = shmget(bogus_key, bogus_size, bogus_flags);
+	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%s\\|%#03o\\) += %s\n",
+	       zero_extend_signed_to_ull(bogus_key), bogus_size,
+	       "IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE",
+	       bogus_flags & ~(0777 | bogus_ipc_shm_flags | huge_mask),
+	       "21<<SHM_HUGE_SHIFT",
+	       bogus_flags & 0777, sprintrc_grep(rc));
+
+	bogus_flags &= ~bogus_ipc_shm_flags;
+	rc = shmget(bogus_key, bogus_size, bogus_flags);
+	printf("shmget\\(%#llx, %zu, %#x\\|%s\\|%#03o\\) += %s\n",
+	       zero_extend_signed_to_ull(bogus_key), bogus_size,
+	       bogus_flags & ~(0777 | huge_mask),
+	       "21<<SHM_HUGE_SHIFT",
 	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	id = shmget(private_key, 1, 0600);
