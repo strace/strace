@@ -462,7 +462,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_CHECK_UNION_BPF_ATTR([attach_flags])
 	st_CHECK_UNION_BPF_ATTR([bpf_fd])
 	st_CHECK_UNION_BPF_ATTR([flags])
-	st_CHECK_UNION_BPF_ATTR([inner_map_fd])
+	st_CHECK_UNION_BPF_ATTR([numa_node])
 	st_CHECK_UNION_BPF_ATTR([prog_flags])
 ])
 

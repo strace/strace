@@ -90,7 +90,7 @@ DEF_BPF_CMD_DECODER(BPF_MAP_CREATE)
 {
 	struct {
 		uint32_t map_type, key_size, value_size, max_entries,
-			 map_flags, inner_map_fd;
+			 map_flags, inner_map_fd, numa_node;
 	} attr = {};
 	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
 
@@ -103,6 +103,8 @@ DEF_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	PRINT_FIELD_U(", ", attr, max_entries);
 	PRINT_FIELD_FLAGS(", ", attr, map_flags, bpf_map_flags, "BPF_F_???");
 	PRINT_FIELD_FD(", ", attr, inner_map_fd, tcp);
+	if (attr.map_flags & BPF_F_NUMA_NODE)
+		PRINT_FIELD_U(", ", attr, numa_node);
 	decode_attr_extra_data(tcp, data, size, sizeof(attr));
 	tprints("}");
 

@@ -34,7 +34,7 @@
  && (defined HAVE_UNION_BPF_ATTR_ATTACH_FLAGS	\
   || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
   || defined HAVE_UNION_BPF_ATTR_FLAGS		\
-  || defined HAVE_UNION_BPF_ATTR_INNER_MAP_FD	\
+  || defined HAVE_UNION_BPF_ATTR_NUMA_NODE	\
   || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS)
 
 # include <stddef.h>
@@ -183,7 +183,7 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 		  init_ ## cmd_ ## _attr, print_ ## cmd_ ## _attr)	\
 	/* End of TEST_BPF definition. */
 
-# ifdef HAVE_UNION_BPF_ATTR_INNER_MAP_FD
+# ifdef HAVE_UNION_BPF_ATTR_NUMA_NODE
 
 static unsigned int
 init_BPF_MAP_CREATE_first(const unsigned long eop)
@@ -211,11 +211,12 @@ init_BPF_MAP_CREATE_attr(const unsigned long eop)
 		.key_size = 4,
 		.value_size = 8,
 		.max_entries = 256,
-		.map_flags = 1,
-		.inner_map_fd = -1
+		.map_flags = 7,
+		.inner_map_fd = -1,
+		.numa_node = 42
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, inner_map_fd);
+		offsetofend(union bpf_attr, numa_node);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -227,10 +228,11 @@ print_BPF_MAP_CREATE_attr(const unsigned long addr)
 {
 	printf("map_type=BPF_MAP_TYPE_HASH, key_size=4"
 	       ", value_size=8, max_entries=256"
-	       ", map_flags=BPF_F_NO_PREALLOC, inner_map_fd=-1");
+	       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
+	       "|BPF_F_NUMA_NODE, inner_map_fd=-1, numa_node=42");
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_INNER_MAP_FD */
+# endif /* HAVE_UNION_BPF_ATTR_NUMA_NODE */
 
 # ifdef HAVE_UNION_BPF_ATTR_FLAGS
 
@@ -565,7 +567,7 @@ main(void)
 	page_size = get_page_size();
 	end_of_page = (unsigned long) tail_alloc(1) + 1;
 
-# ifdef HAVE_UNION_BPF_ATTR_INNER_MAP_FD
+# ifdef HAVE_UNION_BPF_ATTR_NUMA_NODE
 	TEST_BPF(BPF_MAP_CREATE);
 # endif
 
