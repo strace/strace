@@ -35,7 +35,8 @@
   || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
   || defined HAVE_UNION_BPF_ATTR_FLAGS		\
   || defined HAVE_UNION_BPF_ATTR_NUMA_NODE	\
-  || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS)
+  || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS	\
+  || defined HAVE_UNION_BPF_ATTR_TEST_DURATION)
 
 # include <stddef.h>
 # include <stdio.h>
@@ -43,6 +44,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <linux/bpf.h>
+# include "print_fields.h"
 
 static const kernel_ulong_t long_bits = (kernel_ulong_t) 0xfacefeed00000000ULL;
 static const char *errstr;
@@ -561,6 +563,66 @@ print_BPF_PROG_DETACH_attr(const unsigned long addr)
 
 # endif /* HAVE_UNION_BPF_ATTR_ATTACH_FLAGS */
 
+/* BPF_PROG_TEST_RUN command appears in kernel 4.12. */
+# ifdef HAVE_UNION_BPF_ATTR_TEST_DURATION
+
+static unsigned int
+init_BPF_PROG_TEST_RUN_first(const unsigned long eop)
+{
+	static const union bpf_attr attr = { .test.prog_fd = -1 };
+	static const unsigned int offset = sizeof(attr.test.prog_fd);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.test.prog_fd, offset);
+	return offset;
+}
+
+static void
+print_BPF_PROG_TEST_RUN_first(const unsigned long addr)
+{
+	printf("test={prog_fd=-1, retval=0, data_size_in=0, data_size_out=0"
+	       ", data_in=0, data_out=0, repeat=0, duration=0}");
+}
+
+static const union bpf_attr sample_BPF_PROG_TEST_RUN_attr = {
+	.test = {
+		.prog_fd = -1,
+		.retval = 0xfac1fed2,
+		.data_size_in = 0xfac3fed4,
+		.data_size_out = 0xfac5fed6,
+		.data_in = (uint64_t) 0xfacef11dbadc2ded,
+		.data_out = (uint64_t) 0xfacef33dbadc4ded,
+		.repeat = 0xfac7fed8,
+		.duration = 0xfac9feda
+	}
+};
+static unsigned int
+init_BPF_PROG_TEST_RUN_attr(const unsigned long eop)
+{
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, test);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &sample_BPF_PROG_TEST_RUN_attr, offset);
+	return offset;
+}
+
+static void
+print_BPF_PROG_TEST_RUN_attr(const unsigned long addr)
+{
+	PRINT_FIELD_D("test={", sample_BPF_PROG_TEST_RUN_attr.test, prog_fd);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, retval);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_size_in);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_size_out);
+	PRINT_FIELD_X(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_in);
+	PRINT_FIELD_X(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_out);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, repeat);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, duration);
+	printf("}");
+}
+
+# endif /* HAVE_UNION_BPF_ATTR_TEST_DURATION */
+
 int
 main(void)
 {
@@ -590,6 +652,10 @@ main(void)
 # ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
 	TEST_BPF(BPF_PROG_ATTACH);
 	TEST_BPF(BPF_PROG_DETACH);
+# endif
+
+# ifdef HAVE_UNION_BPF_ATTR_TEST_DURATION
+	TEST_BPF(BPF_PROG_TEST_RUN);
 # endif
 
 	sys_bpf(0xfacefeed, end_of_page, 40);

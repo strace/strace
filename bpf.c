@@ -280,6 +280,32 @@ DEF_BPF_CMD_DECODER(BPF_PROG_DETACH)
 	return RVAL_DECODED;
 }
 
+DEF_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
+{
+	struct {
+		uint32_t prog_fd, retval, data_size_in, data_size_out;
+		uint64_t ATTRIBUTE_ALIGNED(8) data_in, data_out;
+		uint32_t repeat, duration;
+	} attr = {};
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
+
+	memcpy(&attr, data, len);
+
+	PRINT_FIELD_FD("{test={", attr, prog_fd, tcp);
+	PRINT_FIELD_U(", ", attr, retval);
+	PRINT_FIELD_U(", ", attr, data_size_in);
+	PRINT_FIELD_U(", ", attr, data_size_out);
+	PRINT_FIELD_X(", ", attr, data_in);
+	PRINT_FIELD_X(", ", attr, data_out);
+	PRINT_FIELD_U(", ", attr, repeat);
+	PRINT_FIELD_U(", ", attr, duration);
+	tprints("}");
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -293,6 +319,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_OBJ_GET),
 		BPF_CMD_ENTRY(BPF_PROG_ATTACH),
 		BPF_CMD_ENTRY(BPF_PROG_DETACH),
+		BPF_CMD_ENTRY(BPF_PROG_TEST_RUN),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];
