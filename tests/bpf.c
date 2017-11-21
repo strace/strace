@@ -34,6 +34,7 @@
  && (defined HAVE_UNION_BPF_ATTR_ATTACH_FLAGS	\
   || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
   || defined HAVE_UNION_BPF_ATTR_FLAGS		\
+  || defined HAVE_UNION_BPF_ATTR_NEXT_ID	\
   || defined HAVE_UNION_BPF_ATTR_NUMA_NODE	\
   || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS	\
   || defined HAVE_UNION_BPF_ATTR_TEST_DURATION)
@@ -623,6 +624,83 @@ print_BPF_PROG_TEST_RUN_attr(const unsigned long addr)
 
 # endif /* HAVE_UNION_BPF_ATTR_TEST_DURATION */
 
+# ifdef HAVE_UNION_BPF_ATTR_NEXT_ID
+
+static unsigned int
+init_BPF_PROG_GET_NEXT_ID_first(const unsigned long eop)
+{
+	static const union bpf_attr attr = { .start_id = 0xdeadbeef };
+	static const unsigned int offset = sizeof(attr.start_id);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.start_id, offset);
+	return offset;
+}
+
+static void
+print_BPF_PROG_GET_NEXT_ID_first(const unsigned long addr)
+{
+	printf("start_id=%u, next_id=0", 0xdeadbeef);
+}
+
+static unsigned int
+init_BPF_PROG_GET_NEXT_ID_attr(const unsigned long eop)
+{
+	static const union bpf_attr attr = {
+		.start_id = 0xbadc0ded,
+		.next_id = 0xcafef00d
+	};
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, next_id);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr, offset);
+	return offset;
+}
+
+static void
+print_BPF_PROG_GET_NEXT_ID_attr(const unsigned long addr)
+{
+	printf("start_id=%u, next_id=%u", 0xbadc0ded, 0xcafef00d);
+}
+
+#  define init_BPF_MAP_GET_NEXT_ID_first init_BPF_PROG_GET_NEXT_ID_first
+#  define print_BPF_MAP_GET_NEXT_ID_first print_BPF_PROG_GET_NEXT_ID_first
+#  define init_BPF_MAP_GET_NEXT_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
+#  define print_BPF_MAP_GET_NEXT_ID_attr print_BPF_PROG_GET_NEXT_ID_attr
+
+#  define init_BPF_PROG_GET_FD_BY_ID_first init_BPF_PROG_GET_NEXT_ID_first
+#  define init_BPF_PROG_GET_FD_BY_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
+
+static void
+print_BPF_PROG_GET_FD_BY_ID_first(const unsigned long addr)
+{
+	printf("prog_id=%u, next_id=0", 0xdeadbeef);
+}
+
+static void
+print_BPF_PROG_GET_FD_BY_ID_attr(const unsigned long addr)
+{
+	printf("prog_id=%u, next_id=%u", 0xbadc0ded, 0xcafef00d);
+}
+
+#  define init_BPF_MAP_GET_FD_BY_ID_first init_BPF_PROG_GET_NEXT_ID_first
+#  define init_BPF_MAP_GET_FD_BY_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
+
+static void
+print_BPF_MAP_GET_FD_BY_ID_first(const unsigned long addr)
+{
+	printf("map_id=%u, next_id=0", 0xdeadbeef);
+}
+
+static void
+print_BPF_MAP_GET_FD_BY_ID_attr(const unsigned long addr)
+{
+	printf("map_id=%u, next_id=%u", 0xbadc0ded, 0xcafef00d);
+}
+
+# endif /* HAVE_UNION_BPF_ATTR_NEXT_ID */
+
 int
 main(void)
 {
@@ -656,6 +734,13 @@ main(void)
 
 # ifdef HAVE_UNION_BPF_ATTR_TEST_DURATION
 	TEST_BPF(BPF_PROG_TEST_RUN);
+# endif
+
+# ifdef HAVE_UNION_BPF_ATTR_NEXT_ID
+	TEST_BPF(BPF_PROG_GET_NEXT_ID);
+	TEST_BPF(BPF_MAP_GET_NEXT_ID);
+	TEST_BPF(BPF_PROG_GET_FD_BY_ID);
+	TEST_BPF(BPF_MAP_GET_FD_BY_ID);
 # endif
 
 	sys_bpf(0xfacefeed, end_of_page, 40);

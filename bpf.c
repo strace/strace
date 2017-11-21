@@ -306,6 +306,59 @@ DEF_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
 	return RVAL_DECODED;
 }
 
+DEF_BPF_CMD_DECODER(BPF_PROG_GET_NEXT_ID)
+{
+	struct {
+		uint32_t start_id, next_id;
+	} attr = {};
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
+
+	memcpy(&attr, data, len);
+
+	PRINT_FIELD_U("{", attr, start_id);
+	PRINT_FIELD_U(", ", attr, next_id);
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
+
+	return RVAL_DECODED;
+}
+
+#define decode_BPF_MAP_GET_NEXT_ID decode_BPF_PROG_GET_NEXT_ID
+
+DEF_BPF_CMD_DECODER(BPF_PROG_GET_FD_BY_ID)
+{
+	struct {
+		uint32_t prog_id, next_id;
+	} attr = {};
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
+
+	memcpy(&attr, data, len);
+
+	PRINT_FIELD_U("{", attr, prog_id);
+	PRINT_FIELD_U(", ", attr, next_id);
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
+
+	return RVAL_DECODED;
+}
+
+DEF_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
+{
+	struct {
+		uint32_t map_id, next_id;
+	} attr = {};
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
+
+	memcpy(&attr, data, len);
+
+	PRINT_FIELD_U("{", attr, map_id);
+	PRINT_FIELD_U(", ", attr, next_id);
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -320,6 +373,10 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_PROG_ATTACH),
 		BPF_CMD_ENTRY(BPF_PROG_DETACH),
 		BPF_CMD_ENTRY(BPF_PROG_TEST_RUN),
+		BPF_CMD_ENTRY(BPF_PROG_GET_NEXT_ID),
+		BPF_CMD_ENTRY(BPF_MAP_GET_NEXT_ID),
+		BPF_CMD_ENTRY(BPF_PROG_GET_FD_BY_ID),
+		BPF_CMD_ENTRY(BPF_MAP_GET_FD_BY_ID),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];
