@@ -459,13 +459,15 @@ AC_CHECK_HEADERS([linux/input.h], [
 ])
 
 AC_CHECK_HEADERS([linux/bpf.h], [
-	st_CHECK_UNION_BPF_ATTR([attach_flags])
-	st_CHECK_UNION_BPF_ATTR([bpf_fd])
-	st_CHECK_UNION_BPF_ATTR([flags])
-	st_CHECK_UNION_BPF_ATTR([next_id])
-	st_CHECK_UNION_BPF_ATTR([numa_node])
-	st_CHECK_UNION_BPF_ATTR([prog_flags])
-	AC_CHECK_MEMBERS([union bpf_attr.test.duration],,, [#include <linux/bpf.h>])
+	AC_CHECK_MEMBERS(m4_normalize([
+		union bpf_attr.attach_flags,
+		union bpf_attr.bpf_fd,
+		union bpf_attr.flags,
+		union bpf_attr.next_id,
+		union bpf_attr.numa_node,
+		union bpf_attr.prog_flags,
+		union bpf_attr.test.duration
+	]),,, [#include <linux/bpf.h>])
 ])
 
 AC_CHECK_TYPES(m4_normalize([
