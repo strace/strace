@@ -463,6 +463,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 		union bpf_attr.attach_flags,
 		union bpf_attr.bpf_fd,
 		union bpf_attr.flags,
+		union bpf_attr.info.info,
 		union bpf_attr.next_id,
 		union bpf_attr.numa_node,
 		union bpf_attr.prog_flags,

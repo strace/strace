@@ -34,6 +34,7 @@
  && (defined HAVE_UNION_BPF_ATTR_ATTACH_FLAGS	\
   || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
   || defined HAVE_UNION_BPF_ATTR_FLAGS		\
+  || defined HAVE_UNION_BPF_ATTR_INFO_INFO	\
   || defined HAVE_UNION_BPF_ATTR_NEXT_ID	\
   || defined HAVE_UNION_BPF_ATTR_NUMA_NODE	\
   || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS	\
@@ -701,6 +702,54 @@ print_BPF_MAP_GET_FD_BY_ID_attr(const unsigned long addr)
 
 # endif /* HAVE_UNION_BPF_ATTR_NEXT_ID */
 
+# ifdef HAVE_UNION_BPF_ATTR_INFO_INFO
+
+static unsigned int
+init_BPF_OBJ_GET_INFO_BY_FD_first(const unsigned long eop)
+{
+	static const union bpf_attr attr = { .info.bpf_fd = -1 };
+	static const unsigned int offset = sizeof(attr.info.bpf_fd);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &attr.info.bpf_fd, offset);
+	return offset;
+}
+
+static void
+print_BPF_OBJ_GET_INFO_BY_FD_first(const unsigned long addr)
+{
+	printf("info={bpf_fd=-1, info_len=0, info=0}");
+}
+
+static const union bpf_attr sample_BPF_OBJ_GET_INFO_BY_FD_attr = {
+	.info = {
+		.bpf_fd = -1,
+		.info_len = 0xdeadbeef,
+		.info = (uint64_t) 0xfacefeedbadc0ded
+	}
+};
+static unsigned int
+init_BPF_OBJ_GET_INFO_BY_FD_attr(const unsigned long eop)
+{
+	static const unsigned int offset =
+		offsetofend(union bpf_attr, info);
+	const unsigned long addr = eop - offset;
+
+	memcpy((void *) addr, &sample_BPF_OBJ_GET_INFO_BY_FD_attr, offset);
+	return offset;
+}
+
+static void
+print_BPF_OBJ_GET_INFO_BY_FD_attr(const unsigned long addr)
+{
+	PRINT_FIELD_D("info={", sample_BPF_OBJ_GET_INFO_BY_FD_attr.info, bpf_fd);
+	PRINT_FIELD_U(", ", sample_BPF_OBJ_GET_INFO_BY_FD_attr.info, info_len);
+	PRINT_FIELD_X(", ", sample_BPF_OBJ_GET_INFO_BY_FD_attr.info, info);
+	printf("}");
+}
+
+# endif /* HAVE_UNION_BPF_ATTR_INFO_INFO */
+
 int
 main(void)
 {
@@ -741,6 +790,10 @@ main(void)
 	TEST_BPF(BPF_MAP_GET_NEXT_ID);
 	TEST_BPF(BPF_PROG_GET_FD_BY_ID);
 	TEST_BPF(BPF_MAP_GET_FD_BY_ID);
+# endif
+
+# ifdef HAVE_UNION_BPF_ATTR_INFO_INFO
+	TEST_BPF(BPF_OBJ_GET_INFO_BY_FD);
 # endif
 
 	sys_bpf(0xfacefeed, end_of_page, 40);

@@ -5,8 +5,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of netlink descriptor attributes as file descriptors.
   * Implemented decoding of hugetlb page size selection flags.
   * Implemented decoding of BPF_PROG_TEST_RUN, BPF_PROG_GET_NEXT_ID,
-    BPF_MAP_GET_NEXT_ID, BPF_PROG_GET_FD_BY_ID, and BPF_MAP_GET_FD_BY_ID
-    commands of bpf syscall.
+    BPF_MAP_GET_NEXT_ID, BPF_PROG_GET_FD_BY_ID, BPF_MAP_GET_FD_BY_ID,
+    and BPF_OBJ_GET_INFO_BY_FD commands of bpf syscall.
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.

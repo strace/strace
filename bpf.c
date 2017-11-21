@@ -359,6 +359,26 @@ DEF_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 	return RVAL_DECODED;
 }
 
+DEF_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
+{
+	struct {
+		uint32_t bpf_fd, info_len;
+		uint64_t ATTRIBUTE_ALIGNED(8) info;
+	} attr = {};
+	const unsigned int len = size < sizeof(attr) ? size : sizeof(attr);
+
+	memcpy(&attr, data, len);
+
+	PRINT_FIELD_FD("{info={", attr, bpf_fd, tcp);
+	PRINT_FIELD_U(", ", attr, info_len);
+	PRINT_FIELD_X(", ", attr, info);
+	tprints("}");
+	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	tprints("}");
+
+	return RVAL_DECODED | RVAL_FD;
+}
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -377,6 +397,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_MAP_GET_NEXT_ID),
 		BPF_CMD_ENTRY(BPF_PROG_GET_FD_BY_ID),
 		BPF_CMD_ENTRY(BPF_MAP_GET_FD_BY_ID),
+		BPF_CMD_ENTRY(BPF_OBJ_GET_INFO_BY_FD),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];
