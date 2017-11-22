@@ -7,5 +7,5 @@
 check_prog grep
 run_prog > /dev/null
 run_strace -e_llseek $args > "$EXP"
-grep -v '^lseek([0-9]' < "$LOG" > "$OUT"
+grep -v '^_llseek([0-9]' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
