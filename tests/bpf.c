@@ -187,18 +187,22 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 		  init_ ## cmd_ ## _attr, print_ ## cmd_ ## _attr)	\
 	/* End of TEST_BPF definition. */
 
+#define DEF_BPF_INIT_FIRST(cmd_, field_, value_)			\
+	static unsigned int						\
+	init_ ## cmd_ ## _first(const unsigned long eop)		\
+	{								\
+		static const union bpf_attr attr = { .field_ = value_ };\
+		static const unsigned int offset = sizeof(attr.field_);	\
+		const unsigned long addr = eop - offset;		\
+									\
+		memcpy((void *) addr, &attr.field_, offset);		\
+		return offset;						\
+	}								\
+	/* End of DEF_INIT_FIRST definition. */
+
 # ifdef HAVE_UNION_BPF_ATTR_NUMA_NODE
 
-static unsigned int
-init_BPF_MAP_CREATE_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .map_type = 2 };
-	static const unsigned int offset = sizeof(attr.map_type);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.map_type, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_MAP_CREATE, map_type, 2)
 
 static void
 print_BPF_MAP_CREATE_first(const unsigned long addr)
@@ -240,16 +244,7 @@ print_BPF_MAP_CREATE_attr(const unsigned long addr)
 
 # ifdef HAVE_UNION_BPF_ATTR_FLAGS
 
-static unsigned int
-init_BPF_MAP_LOOKUP_ELEM_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .map_fd = -1 };
-	static const unsigned int offset = sizeof(attr.map_fd);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.map_fd, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_MAP_LOOKUP_ELEM, map_fd, -1)
 
 static void
 print_BPF_MAP_LOOKUP_ELEM_first(const unsigned long addr)
@@ -373,16 +368,7 @@ print_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long addr)
 
 # ifdef HAVE_UNION_BPF_ATTR_PROG_FLAGS
 
-static unsigned int
-init_BPF_PROG_LOAD_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .prog_type = 1 };
-	static const unsigned int offset = sizeof(attr.prog_type);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.prog_type, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_PROG_LOAD, prog_type, 1)
 
 static void
 print_BPF_PROG_LOAD_first(const unsigned long addr)
@@ -441,16 +427,7 @@ print_BPF_PROG_LOAD_attr(const unsigned long addr)
  */
 # ifdef HAVE_UNION_BPF_ATTR_BPF_FD
 
-static unsigned int
-init_BPF_OBJ_PIN_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = {};
-	static const unsigned int offset = sizeof(attr.pathname);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.pathname, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_OBJ_PIN, pathname, 0)
 
 static void
 print_BPF_OBJ_PIN_first(const unsigned long addr)
@@ -490,16 +467,7 @@ print_BPF_OBJ_PIN_attr(const unsigned long addr)
 /* BPF_PROG_ATTACH and BPF_PROG_DETACH commands appear in kernel 4.10. */
 # ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
 
-static unsigned int
-init_BPF_PROG_ATTACH_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .target_fd = -1 };
-	static const unsigned int offset = sizeof(attr.target_fd);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.target_fd, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_PROG_ATTACH, target_fd, -1)
 
 static void
 print_BPF_PROG_ATTACH_first(const unsigned long addr)
@@ -568,16 +536,7 @@ print_BPF_PROG_DETACH_attr(const unsigned long addr)
 /* BPF_PROG_TEST_RUN command appears in kernel 4.12. */
 # ifdef HAVE_UNION_BPF_ATTR_TEST_DURATION
 
-static unsigned int
-init_BPF_PROG_TEST_RUN_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .test.prog_fd = -1 };
-	static const unsigned int offset = sizeof(attr.test.prog_fd);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.test.prog_fd, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_PROG_TEST_RUN, test.prog_fd, -1)
 
 static void
 print_BPF_PROG_TEST_RUN_first(const unsigned long addr)
@@ -627,16 +586,7 @@ print_BPF_PROG_TEST_RUN_attr(const unsigned long addr)
 
 # ifdef HAVE_UNION_BPF_ATTR_NEXT_ID
 
-static unsigned int
-init_BPF_PROG_GET_NEXT_ID_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .start_id = 0xdeadbeef };
-	static const unsigned int offset = sizeof(attr.start_id);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.start_id, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_PROG_GET_NEXT_ID, start_id, 0xdeadbeef)
 
 static void
 print_BPF_PROG_GET_NEXT_ID_first(const unsigned long addr)
@@ -704,16 +654,7 @@ print_BPF_MAP_GET_FD_BY_ID_attr(const unsigned long addr)
 
 # ifdef HAVE_UNION_BPF_ATTR_INFO_INFO
 
-static unsigned int
-init_BPF_OBJ_GET_INFO_BY_FD_first(const unsigned long eop)
-{
-	static const union bpf_attr attr = { .info.bpf_fd = -1 };
-	static const unsigned int offset = sizeof(attr.info.bpf_fd);
-	const unsigned long addr = eop - offset;
-
-	memcpy((void *) addr, &attr.info.bpf_fd, offset);
-	return offset;
-}
+DEF_BPF_INIT_FIRST(BPF_OBJ_GET_INFO_BY_FD, info.bpf_fd, -1)
 
 static void
 print_BPF_OBJ_GET_INFO_BY_FD_first(const unsigned long addr)
