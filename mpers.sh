@@ -32,6 +32,7 @@ MPERS_AWK="${0%/*}/mpers.awk"
 ARCH_FLAG=$1
 PARSER_FILE=$2
 
+READELF="${READELF:-readelf}"
 CC="${CC-gcc}"
 CFLAGS="$CFLAGS -gdwarf-2 -c"
 CPP="${CPP-$CC -E}"
@@ -62,7 +63,7 @@ for m_type; do
 		continue
 	sed -i -e '/DEF_MPERS_TYPE/d' "${f_c}"
 	$CC $CFLAGS $ARCH_FLAG "${f_c}" -o "${f_o}"
-	readelf --debug-dump=info "${f_o}" > "${f_d1}"
+	$READELF --debug-dump=info "${f_o}" > "${f_d1}"
 	sed -r -n '
 		/^[[:space:]]*<1>/,/^[[:space:]]*<1><[^>]+>: Abbrev Number: 0/!d
 		/^[[:space:]]*<[^>]*><[^>]*>: Abbrev Number: 0/d

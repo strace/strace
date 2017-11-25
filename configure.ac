@@ -785,6 +785,8 @@ AC_SUBST(dl_LIBS)
 
 AC_PATH_PROG([PERL], [perl])
 
+AC_CHECK_TOOL([READELF], [readelf])
+
 dnl stack trace with libunwind
 libunwind_CPPFLAGS=
 libunwind_LDFLAGS=

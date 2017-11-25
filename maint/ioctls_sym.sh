@@ -88,6 +88,7 @@ LC_COLLATE=C sort -u -o "$tmpdir"/headers.list "$tmpdir"/headers.list
 msg "processing $(wc -l < "$tmpdir"/headers.list) header files from $inc_dir"
 failed=0
 
+READELF="${READELF:-readelf}"
 CC="${CC:-gcc}"
 CPP="${CPP:-cpp}"
 CPPFLAGS="${CPPFLAGS-} -D__EXPORTED_HEADERS__"
@@ -423,7 +424,7 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 	# If something is wrong with the file, this will fail.
 	$CC $INCLUDES $CFLAGS -c -o "$tmpdir"/printents.o "$tmpdir"/printents.c
 
-	readelf --wide --debug-dump=info "$tmpdir"/printents.o \
+	$READELF --wide --debug-dump=info "$tmpdir"/printents.o \
 		> "$tmpdir"/debug-dump
 
 	sed -r -n '

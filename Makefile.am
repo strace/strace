@@ -45,6 +45,8 @@ OS		= linux
 # ARCH is `i386', `m68k', `sparc', etc.
 ARCH		= @arch@
 
+READELF		= @READELF@
+
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
@@ -987,8 +989,11 @@ libmpers_CFLAGS = $(strace_CFLAGS)
 
 mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 	for f in $^; do \
-		CC="$(CC)" CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
-		CPP="$(CPP)" CPPFLAGS="$(mpers_sh_opts) -DIN_MPERS -DMPERS_IS_$(mpers_NAME)" \
+		READELF="$(READELF)" \
+		CC="$(CC)" \
+		CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
+		CPP="$(CPP)" \
+		CPPFLAGS="$(mpers_sh_opts) -DIN_MPERS -DMPERS_IS_$(mpers_NAME)" \
 		$(srcdir)/mpers.sh -$(mpers_NAME) $$f || exit; \
 	done
 	> $@

@@ -12,6 +12,9 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
   * Updated lists of MSG_* and SHM_* constants.
 
+* Bug fixes
+  * Fixed multi-personality support in cross builds.
+
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
 
