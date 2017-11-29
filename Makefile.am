@@ -38,7 +38,7 @@ endif
 SUBDIRS = . tests $(TESTS_M32) $(TESTS_MX32)
 
 bin_PROGRAMS = strace
-man_MANS = strace.1
+man_MANS = strace.1 strace-log-merge.1
 bin_SCRIPTS = strace-graph strace-log-merge
 
 OS		= linux
