@@ -1,0 +1,37 @@
+image: "ubuntu:17.10"
+
+before_script:
+  - ./travis-install.sh
+
+variables:
+  GIT_DEPTH: "2147483647"
+  SLEEP_A_BIT: "sleep 0.2"
+  VERBOSE: "1"
+
+gcc-x86_64:
+  stage: test
+  script: ./travis-build.sh
+  variables:
+    CC: "gcc"
+    TARGET: "x86_64"
+
+gcc-x86:
+  stage: test
+  script: ./travis-build.sh
+  variables:
+    CC: "gcc"
+    TARGET: "x86"
+
+clang-x86_64:
+  stage: test
+  script: ./travis-build.sh
+  variables:
+    CC: "clang"
+    TARGET: "x86_64"
+
+clang-x86:
+  stage: test
+  script: ./travis-build.sh
+  variables:
+    CC: "clang"
+    TARGET: "x86"

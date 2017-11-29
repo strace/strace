@@ -49,6 +49,7 @@ libc="$(ldd /bin/sh |sed -n 's|^[^/]*\(/[^ ]*/libc\.so[^ ]*\).*|\1|p' |head -1)"
 $libc |head -1
 file -L /bin/sh
 $CC --version |head -1
+$CC -print-multi-lib ||:
 make --version |head -1
 autoconf --version |head -1
 automake --version |head -1
@@ -62,7 +63,11 @@ export CC_FOR_BUILD="$CC"
 ./bootstrap
 ./configure --enable-maintainer-mode \
 	${DISTCHECK_CONFIGURE_FLAGS-} \
-	#
+	|| {
+	rc=$?
+	cat config.log
+	exit $rc
+}
 
 j=-j`getconf _NPROCESSORS_ONLN 2> /dev/null` || j=
 
