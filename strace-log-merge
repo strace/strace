@@ -40,6 +40,9 @@ option which prints timestamps (otherwise sorting won't do any good).
 __EOF__
 }
 
+dd='\([0-9][0-9]\)'
+ds='\([0-9][0-9]*\)'
+
 if [ $# -ne 1 ]; then
 	show_usage >&2
 	exit 1
@@ -59,10 +62,10 @@ for file in "$logfile".*; do
 	# Some strace logs have last line which is not '\n' terminated,
 	# so add extra newline to every file.
 	# grep -v '^$' removes empty lines which may result.
-	sed "s/^/$pid /" < "$file"
+	sed -n "s/^\($dd:\)\?\($dd:\)\?\($ds\.\)\?$ds /\2\4\6\7 $pid \0/p" < "$file"
 	echo
 done \
-| sort -s -k2,2 | grep -v '^$'
+| sort -s -n -k1,1 | sed -n 's/^[0-9][0-9]* //p'
 
 rc=$?
 [ $rc -eq 1 ] &&
