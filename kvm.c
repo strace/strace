@@ -37,6 +37,9 @@ int
 kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
 	switch (code) {
+	case KVM_RUN:
+	case KVM_GET_VCPU_MMAP_SIZE:
+	case KVM_GET_API_VERSION:
 	default:
 		return RVAL_DECODED;
 	}
