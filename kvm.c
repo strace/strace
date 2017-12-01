@@ -33,10 +33,21 @@
 #ifdef HAVE_LINUX_KVM_H
 # include <linux/kvm.h>
 
+static int
+kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	uint32_t cpuid = arg;
+
+	tprintf(", %u", cpuid);
+	return RVAL_IOCTL_DECODED | RVAL_FD;
+}
+
 int
 kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
 	switch (code) {
+	case KVM_CREATE_VCPU:
+		return kvm_ioctl_create_vcpu(tcp, arg);
 	case KVM_CREATE_VM:
 		return RVAL_DECODED | RVAL_FD;
 	case KVM_RUN:
