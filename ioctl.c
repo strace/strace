@@ -314,6 +314,10 @@ ioctl_decode(struct tcb *tcp)
 	case 0xfd:
 		return dm_ioctl(tcp, code, arg);
 #endif
+#ifdef HAVE_LINUX_KVM_H
+	case 0xae:
+		return kvm_ioctl(tcp, code, arg);
+#endif
 	default:
 		break;
 	}
