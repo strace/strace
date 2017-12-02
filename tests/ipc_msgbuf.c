@@ -38,11 +38,16 @@
 
 static int msqid = -1;
 
-static void
+static int
 cleanup(void)
 {
-	msgctl(msqid, IPC_RMID, 0);
-	msqid = -1;
+	if (msqid != -1) {
+		int rc = msgctl(msqid, IPC_RMID, 0);
+		msqid = -1;
+		if (rc == -1)
+			return 77;
+	}
+	return 0;
 }
 
 int
@@ -59,10 +64,11 @@ main(void)
 	msqid = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
 	if (msqid == -1)
 		perror_msg_and_skip("msgget");
-	atexit(cleanup);
+	typedef void (*atexit_func)(void);
+	atexit((atexit_func) cleanup);
 	if (msgsnd(msqid, &msg, msgsz, 0) == -1)
 		perror_msg_and_skip("msgsnd");
 	if (msgrcv(msqid, &msg, msgsz, mtype, 0) != msgsz)
 		perror_msg_and_skip("msgrcv");
-	return 0;
+	return cleanup();
 }
