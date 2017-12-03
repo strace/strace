@@ -1,7 +1,7 @@
 /*
  * This file is part of attach-p-cmd strace test.
  *
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,19 +32,41 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "attach-p-cmd.h"
 
-int
-main(void)
+static void
+write_pidfile(const pid_t pid)
 {
-	static const char lockdir[] = "attach-p-cmd.test-lock";
+	FILE *fp = fopen(pidfile, "w");
+	if (!fp)
+		perror_msg_and_fail("fopen: %s", pidfile);
+
+	if (fprintf(fp, "%d", pid) < 0)
+		perror_msg_and_fail("fprintf: %s", pidfile);
+
+	if (fclose(fp))
+		perror_msg_and_fail("fclose: %s", pidfile);
+}
+
+static void
+wait_for_peer_invocation(void)
+{
 	/* wait for the lock directory to be created by peer */
 	while (rmdir(lockdir)) {
 		if (ENOENT != errno)
 			perror_msg_and_fail("rmdir: %s", lockdir);
 	}
+}
+
+int
+main(void)
+{
+	const pid_t pid = getpid();
+	write_pidfile(pid);
+
+	wait_for_peer_invocation();
 
 	static const char dir[] = "attach-p-cmd.test cmd";
-	pid_t pid = getpid();
 	int rc = chdir(dir);
 
 	printf("%-5d chdir(\"%s\") = %s\n"

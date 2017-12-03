@@ -316,6 +316,7 @@ VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 
 EXTRA_DIST = \
+	attach-p-cmd.h \
 	caps-abbrev.awk \
 	caps.awk \
 	clock.in \
