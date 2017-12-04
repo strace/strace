@@ -206,6 +206,7 @@ DECODER_TESTS = \
 	ioctl.test \
 	ioctl_dm-v.test \
 	ioctl_dm.test \
+	ioctl_kvm_run.test \
 	ioctl_loop-nv.test \
 	ioctl_nsfs.test \
 	ioctl_sock_gifconf.test \

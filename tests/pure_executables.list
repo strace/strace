@@ -103,6 +103,7 @@ ioctl
 ioctl_block
 ioctl_dm
 ioctl_evdev
+ioctl_kvm_run
 ioctl_loop
 ioctl_mtd
 ioctl_rtc
