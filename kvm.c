@@ -32,6 +32,7 @@
 
 #ifdef HAVE_LINUX_KVM_H
 # include <linux/kvm.h>
+# include "print_fields.h"
 
 static int
 kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -42,12 +43,41 @@ kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED | RVAL_FD;
 }
 
+# ifdef HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION
+#  include "xlat/kvm_mem_flags.h"
+static int
+kvm_ioctl_set_user_memory_region(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct kvm_userspace_memory_region u_memory_region;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, arg, &u_memory_region))
+		return RVAL_IOCTL_DECODED;
+
+	PRINT_FIELD_U("{", u_memory_region, slot);
+	PRINT_FIELD_FLAGS(", ", u_memory_region, flags, kvm_mem_flags,
+			  "KVM_MEM_???");
+	PRINT_FIELD_X(", ", u_memory_region, guest_phys_addr);
+	PRINT_FIELD_U(", ", u_memory_region, memory_size);
+	PRINT_FIELD_X(", ", u_memory_region, userspace_addr);
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+# endif /* HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION */
+
 int
 kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
 	switch (code) {
 	case KVM_CREATE_VCPU:
 		return kvm_ioctl_create_vcpu(tcp, arg);
+
+# ifdef HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION
+	case KVM_SET_USER_MEMORY_REGION:
+		return kvm_ioctl_set_user_memory_region(tcp, arg);
+# endif
+
 	case KVM_CREATE_VM:
 		return RVAL_DECODED | RVAL_FD;
 	case KVM_RUN:
