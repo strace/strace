@@ -33,6 +33,7 @@
 #ifdef HAVE_LINUX_KVM_H
 # include <linux/kvm.h>
 # include "print_fields.h"
+# include "arch_kvm.c"
 
 static int
 kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -66,6 +67,24 @@ kvm_ioctl_set_user_memory_region(struct tcb *const tcp, const kernel_ulong_t arg
 }
 # endif /* HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION */
 
+# ifdef HAVE_STRUCT_KVM_REGS
+static int
+kvm_ioctl_decode_regs(struct tcb *const tcp, const unsigned int code,
+		      const kernel_ulong_t arg)
+{
+	struct kvm_regs regs;
+
+	if (code == KVM_GET_REGS && entering(tcp))
+		return 0;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, arg, &regs))
+		arch_print_kvm_regs(tcp, arg, &regs);
+
+	return RVAL_IOCTL_DECODED;
+}
+# endif /* HAVE_STRUCT_KVM_REGS */
+
 int
 kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
@@ -76,6 +95,12 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 # ifdef HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION
 	case KVM_SET_USER_MEMORY_REGION:
 		return kvm_ioctl_set_user_memory_region(tcp, arg);
+# endif
+
+# ifdef HAVE_STRUCT_KVM_REGS
+	case KVM_SET_REGS:
+	case KVM_GET_REGS:
+		return kvm_ioctl_decode_regs(tcp, code, arg);
 # endif
 
 	case KVM_CREATE_VM:

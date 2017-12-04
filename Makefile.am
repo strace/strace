@@ -424,6 +424,7 @@ EXTRA_DIST =				\
 	linux/arc/set_error.c		\
 	linux/arc/set_scno.c		\
 	linux/arc/syscallent.h		\
+	linux/arch_kvm.c		\
 	linux/arch_regs.h		\
 	linux/arch_sigreturn.c		\
 	linux/arm/arch_regs.c		\
@@ -506,6 +507,7 @@ EXTRA_DIST =				\
 	linux/hppa/set_scno.c		\
 	linux/hppa/signalent.h		\
 	linux/hppa/syscallent.h		\
+	linux/i386/arch_kvm.c		\
 	linux/i386/arch_regs.c		\
 	linux/i386/arch_regs.h		\
 	linux/i386/arch_rt_sigframe.c	\
@@ -805,6 +807,7 @@ EXTRA_DIST =				\
 	linux/unix_diag.h		\
 	linux/userent.h			\
 	linux/userent0.h		\
+	linux/x32/arch_kvm.c		\
 	linux/x32/arch_regs.c		\
 	linux/x32/arch_regs.h		\
 	linux/x32/arch_rt_sigframe.c	\
@@ -824,6 +827,7 @@ EXTRA_DIST =				\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
 	linux/x32/userent.h		\
+	linux/x86_64/arch_kvm.c		\
 	linux/x86_64/arch_regs.c	\
 	linux/x86_64/arch_regs.h	\
 	linux/x86_64/arch_rt_sigframe.c	\
