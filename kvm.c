@@ -85,6 +85,24 @@ kvm_ioctl_decode_regs(struct tcb *const tcp, const unsigned int code,
 }
 # endif /* HAVE_STRUCT_KVM_REGS */
 
+# ifdef HAVE_STRUCT_KVM_SREGS
+static int
+kvm_ioctl_decode_sregs(struct tcb *const tcp, const unsigned int code,
+		       const kernel_ulong_t arg)
+{
+	struct kvm_sregs sregs;
+
+	if (code == KVM_GET_SREGS && entering(tcp))
+		return 0;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, arg, &sregs))
+		arch_print_kvm_sregs(tcp, arg, &sregs);
+
+	return RVAL_IOCTL_DECODED;
+}
+# endif /* HAVE_STRUCT_KVM_SREGS */
+
 int
 kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
@@ -101,6 +119,12 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 	case KVM_SET_REGS:
 	case KVM_GET_REGS:
 		return kvm_ioctl_decode_regs(tcp, code, arg);
+# endif
+
+# ifdef HAVE_STRUCT_KVM_SREGS
+	case KVM_SET_SREGS:
+	case KVM_GET_SREGS:
+		return kvm_ioctl_decode_sregs(tcp, code, arg);
 # endif
 
 	case KVM_CREATE_VM:

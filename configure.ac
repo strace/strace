@@ -543,6 +543,7 @@ AC_CHECK_TYPES([struct blk_user_trace_setup],,, [#include <linux/blktrace_api.h>
 
 AC_CHECK_TYPES(m4_normalize([
 	struct kvm_regs,
+	struct kvm_sregs,
 	struct kvm_userspace_memory_region
 ]),,, [#include <linux/kvm.h>])
 
