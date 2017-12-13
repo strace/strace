@@ -73,6 +73,8 @@ strace_SOURCES =	\
 	aio.c		\
 	alpha.c		\
 	arch_defs.h	\
+	aux_children.c	\
+	aux_children.h	\
 	basic_filters.c	\
 	bind.c		\
 	bjm.c		\
