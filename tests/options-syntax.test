@@ -65,6 +65,8 @@ check_e_using_grep 'regcomp: \{id: [[:alpha:]].+' -e trace='/{id'
 check_e_using_grep 'regcomp: \(id: [[:alpha:]].+' -e trace='/(id'
 check_e_using_grep 'regcomp: \[id: [[:alpha:]].+' -e trace='/[id'
 
+check_e_using_grep 'exec: File *name too long' "$(printf '%4096s' ' ')"
+
 check_h 'must have PROG [ARGS] or -p PID'
 check_h 'PROG [ARGS] must be specified with -D' -D -p $$
 check_h '-c and -C are mutually exclusive' -c -C true
