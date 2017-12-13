@@ -364,7 +364,8 @@ extern unsigned int show_fd_path;
 /* are we filtering traces based on paths? */
 extern struct path_set {
 	const char **paths_selected;
-	unsigned int num_selected;
+	size_t num_selected;
+	size_t size;
 } global_path_set;
 #define tracing_paths (global_path_set.num_selected != 0)
 extern unsigned xflag;

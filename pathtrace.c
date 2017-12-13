@@ -82,16 +82,15 @@ fdmatch(struct tcb *tcp, int fd, struct path_set *set)
 static void
 storepath(const char *path, struct path_set *set)
 {
-	unsigned i;
-
 	if (pathmatch(path, set))
 		return; /* already in table */
 
-	i = set->num_selected++;
-	set->paths_selected = xreallocarray(set->paths_selected,
-					    set->num_selected,
-					    sizeof(set->paths_selected[0]));
-	set->paths_selected[i] = path;
+	if (set->num_selected >= set->size)
+		set->paths_selected =
+			xgrowarray(set->paths_selected, &set->size,
+				   sizeof(set->paths_selected[0]));
+
+	set->paths_selected[set->num_selected++] = path;
 }
 
 /*
