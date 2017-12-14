@@ -279,8 +279,7 @@ get_symbol_name(unw_cursor_t *cursor, char **name,
 			*offset = 0;
 			break;
 		}
-		*name = xreallocarray(*name, 2, *size);
-		*size *= 2;
+		*name = xgrowarray(*name, size, 1);
 	}
 }
 
