@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include "ptrace.h"
 #include <signal.h>
+#include <spawn.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #ifdef HAVE_PATHS_H
@@ -449,6 +450,101 @@ static int popen_pid;
 # define _PATH_BSHELL "/bin/sh"
 #endif
 
+#define ZERO_OR_DIE(f, ...) \
+	do { \
+		int ret = f(__VA_ARGS__); \
+		if (ret) { \
+			errno = ret; \
+			perror_func_msg_and_die(#f); \
+		} \
+	} while (0)
+
+/**
+ * Create a child and set up pipes for communication with it. It utilises
+ * posix_spawn in an attempt to handle non-MMU systems correctly.
+ *
+ * @param[in]  command Command to execute (using _PATH_BSHELL -c).
+ * @param[out] in_fd   Where to store file descriptor for writing to child's
+ *                     stdin. If NULL, no stdin pipe is set up.
+ * @param[out] out_fd  Where to store file descriptor for reading from child's
+ *                     stdout. If NULL, no stdout pipe is set up.
+ * @return             Child's PID.
+ */
+int
+strace_pipe_exec(const char *command, int *in_fd, int *out_fd)
+{
+	pid_t pid;
+	posix_spawn_file_actions_t file_actions;
+	const char * const argv[] = { "sh", "-c", command, NULL };
+	int in_fds[2];
+	int out_fds[2];
+
+	swap_uid();
+
+	if (in_fd) {
+		if (pipe(in_fds) < 0)
+			perror_func_msg_and_die("pipe");
+
+		set_cloexec_flag(in_fds[1]); /* never fails */
+	}
+
+	if (out_fd) {
+		if (pipe(out_fds) < 0)
+			perror_func_msg_and_die("pipe");
+
+		set_cloexec_flag(out_fds[0]); /* never fails */
+	}
+
+	ZERO_OR_DIE(posix_spawn_file_actions_init, &file_actions);
+
+	/* Close our end in the child */
+	if (in_fd)
+		ZERO_OR_DIE(posix_spawn_file_actions_addclose, &file_actions,
+			    in_fds[1]);
+	if (out_fd)
+		ZERO_OR_DIE(posix_spawn_file_actions_addclose, &file_actions,
+			    out_fds[0]);
+
+	/* Setting up child's stdin */
+	if (in_fd && (in_fds[0] != STDIN_FILENO)) {
+		ZERO_OR_DIE(posix_spawn_file_actions_adddup2,
+			    &file_actions, in_fds[0], STDIN_FILENO);
+		ZERO_OR_DIE(posix_spawn_file_actions_addclose,
+			    &file_actions, in_fds[0]);
+	}
+
+	/* Setting up child's stdout */
+	if (out_fd && (out_fds[1] != STDOUT_FILENO)) {
+		ZERO_OR_DIE(posix_spawn_file_actions_adddup2,
+			    &file_actions, out_fds[1], STDOUT_FILENO);
+		ZERO_OR_DIE(posix_spawn_file_actions_addclose,
+			    &file_actions, out_fds[1]);
+	}
+
+	/* Spawn the actual command */
+	ZERO_OR_DIE(posix_spawn, &pid, _PATH_BSHELL, &file_actions, NULL,
+		    (char * const *) argv, environ);
+
+	/* Cleanup */
+	ZERO_OR_DIE(posix_spawn_file_actions_destroy, &file_actions);
+
+	/* Parent */
+
+	if (in_fd) {
+		close(in_fds[0]);
+		*in_fd = in_fds[1];
+	}
+
+	if (out_fd) {
+		close(out_fds[1]);
+		*out_fd = out_fds[0];
+	}
+
+	swap_uid();
+
+	return pid;
+}
+
 /*
  * We cannot use standard popen(3) here because we have to distinguish
  * popen child process from other processes we trace, and standard popen(3)
@@ -458,38 +554,14 @@ static FILE *
 strace_popen(const char *command)
 {
 	FILE *fp;
-	int pid;
-	int fds[2];
+	int fd;
 
-	swap_uid();
-	if (pipe(fds) < 0)
-		perror_msg_and_die("pipe");
+	popen_pid = strace_pipe_exec(command, &fd, NULL);
 
-	set_cloexec_flag(fds[1]); /* never fails */
-
-	pid = vfork();
-	if (pid < 0)
-		perror_msg_and_die("vfork");
-
-	if (pid == 0) {
-		/* child */
-		close(fds[1]);
-		if (fds[0] != 0) {
-			if (dup2(fds[0], 0))
-				perror_msg_and_die("dup2");
-			close(fds[0]);
-		}
-		execl(_PATH_BSHELL, "sh", "-c", command, NULL);
-		perror_msg_and_die("Can't execute '%s'", _PATH_BSHELL);
-	}
-
-	/* parent */
-	popen_pid = pid;
-	close(fds[0]);
-	swap_uid();
-	fp = fdopen(fds[1], "w");
+	fp = fdopen(fd, "w");
 	if (!fp)
 		perror_msg_and_die("fdopen");
+
 	return fp;
 }
 
