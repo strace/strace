@@ -44,8 +44,8 @@ dyxlat_alloc(const size_t nmemb)
 	struct dyxlat *const dyxlat = xmalloc(sizeof(*dyxlat));
 
 	dyxlat->used = 1;
-	dyxlat->allocated = nmemb ? nmemb : 16;
-	dyxlat->xlat = xcalloc(dyxlat->allocated, sizeof(struct xlat));
+	dyxlat->allocated = nmemb;
+	dyxlat->xlat = xgrowarray(NULL, &dyxlat->allocated, sizeof(struct xlat));
 	MARK_END(dyxlat->xlat[0]);
 
 	return dyxlat;
@@ -90,11 +90,9 @@ dyxlat_add_pair(struct dyxlat *const dyxlat, const uint64_t val,
 		}
 	}
 
-	if (dyxlat->used >= dyxlat->allocated) {
-		dyxlat->allocated *= 2;
-		dyxlat->xlat = xreallocarray(dyxlat->xlat, dyxlat->allocated,
-					     sizeof(struct xlat));
-	}
+	if (dyxlat->used >= dyxlat->allocated)
+		dyxlat->xlat = xgrowarray(dyxlat->xlat, &dyxlat->allocated,
+					  sizeof(struct xlat));
 
 	dyxlat->xlat[dyxlat->used - 1].val = val;
 	dyxlat->xlat[dyxlat->used - 1].str = xstrndup(str, len);
