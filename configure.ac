@@ -422,6 +422,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	mqueue.h
 	netinet/sctp.h
 	netipx/ipx.h
+	paths.h
 	scsi/sg.h
 	stropts.h
 	sys/conf.h
