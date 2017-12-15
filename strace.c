@@ -31,6 +31,7 @@
 #endif
 #include <asm/unistd.h>
 
+#include "aux_children.h"
 #include "kill_save_errno.h"
 #include "largefile_wrappers.h"
 #include "mmap_cache.h"
@@ -444,8 +445,6 @@ strace_fopen(const char *path)
 	return fp;
 }
 
-static int popen_pid;
-
 #ifndef _PATH_BSHELL
 # define _PATH_BSHELL "/bin/sh"
 #endif
@@ -556,7 +555,7 @@ strace_popen(const char *command)
 	FILE *fp;
 	int fd;
 
-	popen_pid = strace_pipe_exec(command, &fd, NULL);
+	register_aux_child(strace_pipe_exec(command, &fd, NULL));
 
 	fp = fdopen(fd, "w");
 	if (!fp)
@@ -2359,7 +2358,7 @@ next_event(void)
 	 *  19923 +++ exited with 1 +++
 	 * Exiting only when wait() returns ECHILD works better.
 	 */
-	if (popen_pid != 0) {
+	if (have_aux_children()) {
 		/* However, if -o|logger is in use, we can't do that.
 		 * Can work around that by double-forking the logger,
 		 * but that loses the ability to wait for its completion
@@ -2441,14 +2440,22 @@ next_event(void)
 		if (!pid)
 			break;
 
-		if (pid == popen_pid) {
-			if (!WIFSTOPPED(status))
-				popen_pid = 0;
-			break;
-		}
-
 		if (debug_flag)
 			print_debug_info(pid, status);
+
+		enum aux_child_sig acs = aux_children_signal(pid, status);
+		switch (acs) {
+		case ACS_CONTINUE:
+			goto next_event_wait_next;
+		case ACS_TERMINATE:
+			return NULL;
+		case ACS_NONE:
+			break;
+		default:
+			error_func_msg("Unknown aux_children_signal"
+				       " return code: %d", acs);
+			break;
+		}
 
 		/* Look up 'pid' in our table. */
 		tcp = pid2tcb(pid, false);
@@ -2911,10 +2918,11 @@ terminate(void)
 	fflush(NULL);
 	if (shared_log != stderr)
 		fclose(shared_log);
-	if (popen_pid) {
-		while (waitpid(popen_pid, NULL, 0) < 0 && errno == EINTR)
-			;
-	}
+
+	aux_children_exit_notify(exit_code);
+	while (aux_children_exit_wait(exit_code))
+		;
+
 	if (sig) {
 		exit_code = 0x100 | sig;
 	}
