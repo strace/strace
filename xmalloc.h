@@ -36,6 +36,9 @@
 #include <stddef.h>
 #include "gcc_compat.h"
 
+#define xcalloc strace_calloc
+#define xmalloc strace_malloc
+
 void *xcalloc(size_t nmemb, size_t size)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));
 void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
