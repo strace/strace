@@ -891,6 +891,60 @@ fi
 AM_CONDITIONAL([USE_LIBUNWIND], [test "x$use_libunwind" = xyes])
 AC_MSG_RESULT([$use_libunwind])
 
+dnl demangling symbols in the stack trace
+libiberty_CPPFLAGS=
+libiberty_LDFLAGS=
+libiberty_LIBS=
+AC_ARG_WITH([libiberty],
+	    [AS_HELP_STRING([--with-libiberty],
+			    [use libiberty to demangle symbols in stack trace])],
+	    [case "${withval}" in
+	     yes|no|check) ;;
+	     *) with_libiberty=yes
+		libiberty_CPPFLAGS="-I${withval}/include"
+		libiberty_LDFLAGS="-L${withval}/lib" ;;
+	     esac],
+	    [with_libiberty=check]
+)
+
+use_libiberty=no
+AS_IF([test "x$use_libunwind" = xyes && test "x$with_libiberty" != xno],
+      [saved_CPPFLAGS="$CPPFLAGS"
+       CPPFALGS="$CPPFLAGS $libiberty_CPPFLAGS"
+       AC_CHECK_HEADERS([demangle.h],
+	 [saved_LDFLAGS="$LDFLAGS"
+	  LDFLAGS="$LDFLAGS $libiberty_LDFLAGS"
+	  AC_CHECK_LIB([iberty],[cplus_demangle],
+	    [libiberty_LIBS="-liberty"
+	     use_libiberty=yes
+	    ],
+	    [if test "x$with_libiberty" != xcheck; then
+	       AC_MSG_FAILURE([failed to find cplus_demangle in libiberty])
+	     fi
+	    ]
+	  )
+	  LDFLAGS="$saved_LDFLAGS"
+	 ],
+	 [if test "x$with_libiberty" != xcheck; then
+	      AC_MSG_FAILURE([failed to find demangle.h])
+	  fi
+	 ]
+       )
+       CPPFLAGS="$saved_CPPFLAGS"
+      ]
+)
+
+dnl enable libiberty
+AC_MSG_CHECKING([whether to enable demangling symbols in stack trace])
+if test "x$use_libiberty" = xyes; then
+	AC_DEFINE([USE_DEMANGLE], 1, [Do demangling symbols in stack trace])
+	AC_SUBST(libiberty_LIBS)
+	AC_SUBST(libiberty_LDFLAGS)
+	AC_SUBST(libiberty_CPPFLAGS)
+fi
+AM_CONDITIONAL([USE_DEMANGLE], [test "x$use_libiberty" = xyes])
+AC_MSG_RESULT([$use_libiberty])
+
 if test "$arch" = mips && test "$no_create" != yes; then
 	mkdir -p linux/mips
 	if $srcdir/linux/mips/genstub.sh linux/mips; then

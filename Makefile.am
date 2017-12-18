@@ -333,6 +333,11 @@ strace_SOURCES += unwind.c
 strace_CPPFLAGS += $(libunwind_CPPFLAGS)
 strace_LDFLAGS += $(libunwind_LDFLAGS)
 strace_LDADD += $(libunwind_LIBS)
+if USE_DEMANGLE
+strace_CPPFLAGS += $(libiberty_CPPFLAGS)
+strace_LDFLAGS += $(libiberty_LDFLAGS)
+strace_LDADD += $(libiberty_LIBS)
+endif
 endif
 
 @CODE_COVERAGE_RULES@

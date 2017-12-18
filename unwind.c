@@ -29,6 +29,10 @@
 #include <limits.h>
 #include <libunwind-ptrace.h>
 
+#ifdef USE_DEMANGLE
+# include <demangle.h>
+#endif
+
 #ifdef _LARGEFILE64_SOURCE
 # ifdef HAVE_FOPEN64
 #  define fopen_for_input fopen64
@@ -316,11 +320,23 @@ print_stack_frame(struct tcb *tcp,
 					&function_offset);
 			true_offset = ip - cur_mmap_cache->start_addr +
 				cur_mmap_cache->mmap_offset;
+
+#ifdef USE_DEMANGLE
+			char *demangled_name = cplus_demangle(*symbol_name, 0);
+#endif
+
 			call_action(data,
 				    cur_mmap_cache->binary_filename,
+#ifdef USE_DEMANGLE
+				    demangled_name ? demangled_name :
+#endif
 				    *symbol_name,
 				    function_offset,
 				    true_offset);
+#ifdef USE_DEMANGLE
+			free(demangled_name);
+#endif
+
 			return 0;
 		} else if (ip < cur_mmap_cache->start_addr)
 			upper = mid - 1;
