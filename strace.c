@@ -1716,8 +1716,15 @@ init(int argc, char *argv[])
 		error_msg_and_help("PROG [ARGS] must be specified with -D");
 	}
 
-	if (!followfork)
-		followfork = optF;
+	if (optF) {
+		if (followfork) {
+			error_msg("deprecated option -F ignored");
+		} else {
+			error_msg("option -F is deprecated, "
+				  "please use -f instead");
+			followfork = optF;
+		}
+	}
 
 	if (followfork >= 2 && cflag) {
 		error_msg_and_help("(-c or -C) and -ff are mutually exclusive");
