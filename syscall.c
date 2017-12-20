@@ -1211,9 +1211,8 @@ get_scno(struct tcb *tcp)
 
 		set_tcb_priv_data(tcp, s, free_sysent_buf);
 
-		if (debug_flag)
-			error_msg("pid %d invalid syscall %" PRI_kld,
-				  tcp->pid, tcp->scno);
+		debug_msg("pid %d invalid syscall %" PRI_kld,
+			  tcp->pid, tcp->scno);
 	}
 	return 1;
 }
