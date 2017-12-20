@@ -1,0 +1,4 @@
+#!/bin/sh
+
+debug_flag=
+. "${srcdir=.}"/nsyscalls-d.test

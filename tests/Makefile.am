@@ -117,6 +117,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	netlink_netlink_diag \
 	netlink_unix_diag \
 	nsyscalls \
+	nsyscalls-d \
 	pc \
 	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \
@@ -221,6 +222,8 @@ DECODER_TESTS = \
 	net.test \
 	netlink_sock_diag.test \
 	nsyscalls.test \
+	nsyscalls-d.test \
+	nsyscalls-nd.test \
 	oldselect.test \
 	personality.test \
 	pipe.test \

@@ -264,6 +264,7 @@ nlattr_tcamsg
 nlattr_tcmsg
 nlattr_unix_diag_msg
 nsyscalls
+nsyscalls-d
 old_mmap
 oldfstat
 oldlstat
