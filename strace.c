@@ -1577,13 +1577,11 @@ init(int argc, char *argv[])
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
 	qualify("signal=all");
-	while ((c = getopt(argc, argv,
-		"+b:cCdfFhiqrtTvVwxyz"
+	while ((c = getopt(argc, argv, "+"
 #ifdef USE_LIBUNWIND
-		"k"
+	    "k"
 #endif
-		"D"
-		"a:e:o:O:p:s:S:u:E:P:I:")) != EOF) {
+	    "a:b:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxyz")) != EOF) {
 		switch (c) {
 		case 'b':
 			if (strcmp(optarg, "execve") != 0)
