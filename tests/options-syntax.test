@@ -82,12 +82,12 @@ check_h "invalid -s argument: '-42'" -s -42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
 check_h "invalid -I argument: '5'" -I 5
 
-../zeroargc "$strace_exp" /bin/true 2> "$LOG" &&
+../zeroargc "$STRACE_EXE" /bin/true 2> "$LOG" &&
 	dump_log_and_fail_with \
 		'zeroargc strace failed to handle the error properly'
 cat > "$EXP" << __EOF__
-$strace_exp: must have PROG [ARGS] or -p PID
-Try '$strace_exp -h' for more information.
+$STRACE_EXE: must have PROG [ARGS] or -p PID
+Try '$STRACE_EXE -h' for more information.
 __EOF__
 diff -u -- "$EXP" "$LOG" > /dev/null || {
 	cat > "$EXP" <<- '__EOF__'
@@ -109,17 +109,17 @@ if [ -n "${UID-}" ]; then
 
 	for c in i r t T y; do
 		check_e "-$c has no effect with -c
-$strace_exp: $umsg" -u :nosuchuser: -c -$c true
+$STRACE_EXE: $umsg" -u :nosuchuser: -c -$c true
 	done
 		check_e "-i has no effect with -c
-$strace_exp: -r has no effect with -c
-$strace_exp: -t has no effect with -c
-$strace_exp: -T has no effect with -c
-$strace_exp: -y has no effect with -c
-$strace_exp: $umsg" -u :nosuchuser: -cirtTy true
+$STRACE_EXE: -r has no effect with -c
+$STRACE_EXE: -t has no effect with -c
+$STRACE_EXE: -T has no effect with -c
+$STRACE_EXE: -y has no effect with -c
+$STRACE_EXE: $umsg" -u :nosuchuser: -cirtTy true
 
 	check_e "-tt has no effect with -r
-$strace_exp: $umsg" -u :nosuchuser: -r -tt true
+$STRACE_EXE: $umsg" -u :nosuchuser: -r -tt true
 fi
 
 args='-p 2147483647'
@@ -129,7 +129,7 @@ $STRACE $args 2> "$LOG" &&
 
 for cmd in PTRACE_SEIZE PTRACE_ATTACH; do
 	cat > "$EXP" << __EOF__
-$strace_exp: attach: ptrace($cmd, 2147483647): No such process
+$STRACE_EXE: attach: ptrace($cmd, 2147483647): No such process
 __EOF__
 	diff -- "$EXP" "$LOG" ||
 		continue

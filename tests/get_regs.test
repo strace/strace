@@ -36,7 +36,7 @@ run_prog ../gettid > /dev/null
 run_strace -qq -esignal=none -eraw=all -etrace=none ../gettid > /dev/null
 
 run_strace -qq -esignal=none -eraw=all -eptrace -o '|grep -c ^ptrace > less' \
-	-- ${STRACE##* } -o "$LOG" $args > /dev/null
+	-- "$STRACE_EXE" -o "$LOG" $args > /dev/null
 
 [ "$(cat less)" -gt 0 ] ||
 	fail_ "$STRACE $args failed to catch any ptrace syscalls"
@@ -44,7 +44,7 @@ run_strace -qq -esignal=none -eraw=all -eptrace -o '|grep -c ^ptrace > less' \
 run_strace -qq -esignal=none -eraw=all -etrace=all ../gettid > /dev/null
 
 run_strace -qq -esignal=none -eraw=all -eptrace -o '|grep -c ^ptrace > more' \
-	-- ${STRACE##* } -o "$LOG" $args > /dev/null
+	-- "$STRACE_EXE" -o "$LOG" $args > /dev/null
 
 [ "$(cat more)" -gt 0 ] ||
 	fail_ "$STRACE $args failed to catch any ptrace syscalls"

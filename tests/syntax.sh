@@ -50,13 +50,11 @@ check_exit_status_and_stderr_using_grep()
 			"strace $* failed to print expected diagnostics"
 }
 
-strace_exp="${STRACE##* }"
-
 check_e()
 {
 	local pattern="$1"; shift
 	cat > "$EXP" << __EOF__
-$strace_exp: $pattern
+$STRACE_EXE: $pattern
 __EOF__
 	check_exit_status_and_stderr "$@"
 }
@@ -65,7 +63,7 @@ check_e_using_grep()
 {
 	local pattern="$1"; shift
 	cat > "$EXP" << __EOF__
-$strace_exp: $pattern
+$STRACE_EXE: $pattern
 __EOF__
 	check_exit_status_and_stderr_using_grep "$@"
 }
@@ -74,8 +72,8 @@ check_h()
 {
 	local pattern="$1"; shift
 	cat > "$EXP" << __EOF__
-$strace_exp: $pattern
-Try '$strace_exp -h' for more information.
+$STRACE_EXE: $pattern
+Try '$STRACE_EXE -h' for more information.
 __EOF__
 	check_exit_status_and_stderr "$@"
 }
