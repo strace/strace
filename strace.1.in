@@ -787,8 +787,15 @@ Show some debugging output of
 itself on the standard error.
 .TP
 .B \-F
-This option is now obsolete and it has the same functionality as
-.BR \-f .
+This option is deprecated.  It is retained for backward compatibility only
+and may be removed in future releases.
+Usage of multiple instances of
+.B \-F
+option is still equivalent to a single
+.BR \-f ,
+and it is ignored at all if used along with one or more instances of
+.B \-f
+option.
 .TP
 .B \-h
 Print the help summary.
