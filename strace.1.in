@@ -953,6 +953,8 @@ should be reported to the
 mailing list at <strace\-devel@lists.sourceforge.net>.
 .SH "SEE ALSO"
 .BR ltrace (1),
+.BR perf-trace (1),
+.BR trace-cmd (1),
 .BR time (1),
 .BR ptrace (2),
 .BR proc (5)
