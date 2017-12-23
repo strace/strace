@@ -9,6 +9,8 @@ NAME=nsyscalls-d
 
 if [ "$MIPS_ABI" = "o32" ]; then
 	syscall=syscall
+	[ -z "$debug_flag" ] ||
+		skip_ "mips $MIPS_ABI is not supported by this test yet"
 else
 	syscall=none
 fi
