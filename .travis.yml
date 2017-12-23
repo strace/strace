@@ -2,6 +2,8 @@ language: c
 
 dist: trusty
 
+group: deprecated-2017Q4
+
 before_install: ./travis-install.sh
 
 script: ./travis-build.sh
