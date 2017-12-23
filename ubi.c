@@ -27,18 +27,13 @@
 
 #include "defs.h"
 
-#include <linux/ioctl.h>
+#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 
-/* The UBI api changes, so we have to keep a local copy */
-#include <linux/version.h>
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 7, 0)
-# include "ubi-user.h"
-#else
+# include <linux/ioctl.h>
 # include <mtd/ubi-user.h>
-#endif
 
-#include "xlat/ubi_volume_types.h"
-#include "xlat/ubi_volume_props.h"
+# include "xlat/ubi_volume_types.h"
+# include "xlat/ubi_volume_props.h"
 
 int
 ubi_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -183,12 +178,12 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 		printnum_int(tcp, arg, "%d");
 		break;
 
-#ifdef UBI_IOCVOLCRBLK
+# ifdef UBI_IOCVOLCRBLK
 	case UBI_IOCVOLCRBLK:
-#endif
-#ifdef UBI_IOCVOLRMBLK
+# endif
+# ifdef UBI_IOCVOLRMBLK
 	case UBI_IOCVOLRMBLK:
-#endif
+# endif
 		/* no arguments */
 		break;
 
@@ -198,3 +193,5 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	return RVAL_IOCTL_DECODED;
 }
+
+#endif /* HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024 */

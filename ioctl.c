@@ -291,9 +291,11 @@ ioctl_decode(struct tcb *tcp)
 	case 'M':
 		return mtd_ioctl(tcp, code, arg);
 #endif
+#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 	case 'o':
 	case 'O':
 		return ubi_ioctl(tcp, code, arg);
+#endif
 	case 'V':
 		return v4l2_ioctl(tcp, code, arg);
 	case '=':
