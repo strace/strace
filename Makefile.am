@@ -661,7 +661,6 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
-	linux/ptp_clock.h		\
 	linux/riscv/arch_regs.c		\
 	linux/riscv/arch_regs.h		\
 	linux/riscv/arch_rt_sigframe.c	\

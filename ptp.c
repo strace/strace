@@ -28,10 +28,13 @@
  */
 
 #include "defs.h"
-#include <linux/ioctl.h>
-#include <linux/ptp_clock.h>
 
-#include "xlat/ptp_flags_options.h"
+#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
+
+# include <linux/ioctl.h>
+# include <linux/ptp_clock.h>
+
+# include "xlat/ptp_flags_options.h"
 
 int
 ptp_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -138,3 +141,5 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	return RVAL_IOCTL_DECODED;
 }
+
+#endif /* HAVE_STRUCT_PTP_SYS_OFFSET */

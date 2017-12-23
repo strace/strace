@@ -298,8 +298,10 @@ ioctl_decode(struct tcb *tcp)
 #endif
 	case 'V':
 		return v4l2_ioctl(tcp, code, arg);
+#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
 	case '=':
 		return ptp_ioctl(tcp, code, arg);
+#endif
 #ifdef HAVE_LINUX_INPUT_H
 	case 'E':
 		return evdev_ioctl(tcp, code, arg);
