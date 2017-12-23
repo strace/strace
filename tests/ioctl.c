@@ -86,8 +86,13 @@ main(void)
 	       " = -1 EBADF (%m)\n", &data);
 
 	(void) ioctl(-1, _IOR('M', 13, int), &data);
+# ifdef HAVE_STRUCT_MTD_WRITE_REQ
 	printf("ioctl(-1, MIXER_READ(13) or OTPSELECT, [MTD_OTP_OFF])"
 	       " = -1 EBADF (%m)\n");
+# else
+	printf("ioctl(-1, MIXER_READ(13) or OTPSELECT, %p)"
+	       " = -1 EBADF (%m)\n", &data);
+# endif
 
 	(void) ioctl(-1, _IOC(_IOC_WRITE, 0xde, 0, 0), (kernel_ulong_t) -1ULL);
 	printf("ioctl(-1, _IOC(_IOC_WRITE, 0xde, 0, 0), %#lx)"

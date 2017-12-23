@@ -30,22 +30,20 @@
 
 #include "tests.h"
 
-#include <errno.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <linux/ioctl.h>
-#include <linux/version.h>
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 3, 0)
-# include "mtd-abi.h"
-#else
+#ifdef HAVE_STRUCT_MTD_WRITE_REQ
+
+# include <errno.h>
+# include <inttypes.h>
+# include <stdio.h>
+# include <string.h>
+# include <sys/ioctl.h>
+# include <linux/ioctl.h>
+# include <linux/version.h>
 # include <mtd/mtd-abi.h>
-#endif
 
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
-#define TEST_NULL_ARG(cmd) \
+# define TEST_NULL_ARG(cmd) \
 	do { \
 		ioctl(-1, cmd, 0); \
 		if (_IOC_DIR(cmd) == _IOC_WRITE) \
@@ -60,7 +58,7 @@ static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 			printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd); \
 	} while (0)
 
-#define TEST_erase_info_user(cmd, eiu)						\
+# define TEST_erase_info_user(cmd, eiu)						\
 	do {									\
 		ioctl(-1, cmd, eiu);						\
 		printf("ioctl(-1, MIXER_%s(%u) or %s, {start=%#x, length=%#x})"	\
@@ -122,9 +120,9 @@ main(void)
 	ioctl(-1, MEMGETREGIONINFO, riu);
 	printf("ioctl(-1, %s, {regionindex=%#x}) = -1 EBADF (%m)\n",
 	       "MEMGETREGIONINFO"
-#ifdef __i386__
+# ifdef __i386__
 	       " or MTRRIOC_GET_PAGE_ENTRY"
-#endif
+# endif
 	       , riu->regionindex);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct erase_info_user, eiu);
@@ -198,3 +196,9 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("HAVE_STRUCT_MTD_WRITE_REQ")
+
+#endif

@@ -287,8 +287,10 @@ ioctl_decode(struct tcb *tcp)
 		return scsi_ioctl(tcp, code, arg);
 	case 'L':
 		return loop_ioctl(tcp, code, arg);
+#ifdef HAVE_STRUCT_MTD_WRITE_REQ
 	case 'M':
 		return mtd_ioctl(tcp, code, arg);
+#endif
 	case 'o':
 	case 'O':
 		return ubi_ioctl(tcp, code, arg);
