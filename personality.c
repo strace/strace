@@ -26,9 +26,8 @@
  */
 
 #include "defs.h"
-#include <linux/personality.h>
-#include "xlat/personality_types.h"
 #include "xlat/personality_flags.h"
+#include "xlat/personality_types.h"
 
 
 SYS_FUNC(personality)
