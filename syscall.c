@@ -755,7 +755,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 	update_personality(tcp, tcp->currpers);
 #endif
 
-	return get_regs(tcp->pid) < 0 ? -1 : get_syscall_result(tcp);
+	return get_syscall_result(tcp);
 }
 
 int
@@ -1236,7 +1236,10 @@ static int get_syscall_result_regs(struct tcb *);
 static int
 get_syscall_result(struct tcb *tcp)
 {
-#ifndef ptrace_getregset_or_getregs
+#ifdef ptrace_getregset_or_getregs
+	if (get_regs(tcp->pid) < 0)
+		return -1;
+#else
 	if (get_syscall_result_regs(tcp))
 		return -1;
 #endif
