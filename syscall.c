@@ -520,15 +520,7 @@ err_name(unsigned long err)
 	return NULL;
 }
 
-static long get_regs_error;
-
-void
-clear_regs(void)
-{
-	get_regs_error = -1;
-}
-
-static void get_regs(pid_t pid);
+static long get_regs(pid_t pid);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static int arch_get_scno(struct tcb *tcp);
@@ -750,11 +742,11 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 	if (filtered(tcp) || hide_log(tcp))
 		return 0;
 
-	get_regs(tcp->pid);
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
-	return get_regs_error ? -1 : get_syscall_result(tcp);
+
+	return get_regs(tcp->pid) < 0 ? -1 : get_syscall_result(tcp);
 }
 
 int
@@ -1022,8 +1014,7 @@ print_pc(struct tcb *tcp)
 #else
 # error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
 #endif
-	get_regs(tcp->pid);
-	if (get_regs_error || ARCH_GET_PC)
+	if (get_regs(tcp->pid) < 0 || ARCH_GET_PC)
 		tprints(current_wordsize == 4 ? "[????????] "
 					      : "[????????????????] ");
 	else
@@ -1108,14 +1099,25 @@ ptrace_setregs(pid_t pid)
 
 #endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 
-static void
+#ifdef ptrace_getregset_or_getregs
+static long get_regs_error;
+#endif
+
+void
+clear_regs(void)
+{
+#ifdef ptrace_getregset_or_getregs
+	get_regs_error = -1;
+#endif
+}
+
+static long
 get_regs(pid_t pid)
 {
-#undef USE_GET_SYSCALL_RESULT_REGS
 #ifdef ptrace_getregset_or_getregs
 
 	if (get_regs_error != -1)
-		return;
+		return get_regs_error;
 
 # ifdef HAVE_GETREGS_OLD
 	/*
@@ -1124,29 +1126,27 @@ get_regs(pid_t pid)
 	 */
 	static int use_getregs_old;
 	if (use_getregs_old < 0) {
-		get_regs_error = ptrace_getregset_or_getregs(pid);
-		return;
+		return get_regs_error = ptrace_getregset_or_getregs(pid);
 	} else if (use_getregs_old == 0) {
 		get_regs_error = ptrace_getregset_or_getregs(pid);
 		if (get_regs_error >= 0) {
 			use_getregs_old = -1;
-			return;
+			return get_regs_error;
 		}
 		if (errno == EPERM || errno == ESRCH)
-			return;
+			return get_regs_error;
 		use_getregs_old = 1;
 	}
-	get_regs_error = getregs_old(pid);
+	return get_regs_error = getregs_old(pid);
 # else /* !HAVE_GETREGS_OLD */
 	/* Assume that PTRACE_GETREGSET/PTRACE_GETREGS works. */
-	get_regs_error = ptrace_getregset_or_getregs(pid);
+	return get_regs_error = ptrace_getregset_or_getregs(pid);
 # endif /* !HAVE_GETREGS_OLD */
 
 #else /* !ptrace_getregset_or_getregs */
 
-# define USE_GET_SYSCALL_RESULT_REGS 1
 # warning get_regs is not implemented for this architecture yet
-	get_regs_error = 0;
+	return 0;
 
 #endif /* !ptrace_getregset_or_getregs */
 }
@@ -1184,9 +1184,7 @@ free_sysent_buf(void *ptr)
 int
 get_scno(struct tcb *tcp)
 {
-	get_regs(tcp->pid);
-
-	if (get_regs_error)
+	if (get_regs(tcp->pid) < 0)
 		return -1;
 
 	int rc = arch_get_scno(tcp);
@@ -1217,7 +1215,7 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-#ifdef USE_GET_SYSCALL_RESULT_REGS
+#ifndef ptrace_getregset_or_getregs
 static int get_syscall_result_regs(struct tcb *);
 #endif
 
@@ -1229,7 +1227,7 @@ static int get_syscall_result_regs(struct tcb *);
 static int
 get_syscall_result(struct tcb *tcp)
 {
-#ifdef USE_GET_SYSCALL_RESULT_REGS
+#ifndef ptrace_getregset_or_getregs
 	if (get_syscall_result_regs(tcp))
 		return -1;
 #endif
@@ -1242,7 +1240,7 @@ get_syscall_result(struct tcb *tcp)
 #include "get_scno.c"
 #include "set_scno.c"
 #include "get_syscall_args.c"
-#ifdef USE_GET_SYSCALL_RESULT_REGS
+#ifndef ptrace_getregset_or_getregs
 # include "get_syscall_result.c"
 #endif
 #include "get_error.c"
