@@ -1,5 +1,6 @@
 #if defined LINUX_MIPSO32
 /* For an O32 strace, decode the o32 syscalls.  */
+# define SYS_syscall_subcall	4000
 [4000] = { MA,	0,		SEN(syscall),			"syscall"		}, /* start of Linux o32 */
 [4001] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [4002] = { 0,	TP,		SEN(fork),			"fork"			},

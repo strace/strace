@@ -350,7 +350,7 @@ decode_socket_subcall(struct tcb *tcp)
 		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
 				? ((uint32_t *) (void *) buf)[i] : buf[i];
 }
-#endif
+#endif /* SYS_socket_subcall */
 
 #ifdef SYS_ipc_subcall
 static void
@@ -390,11 +390,11 @@ decode_ipc_subcall(struct tcb *tcp)
 	for (i = 0; i < n; i++)
 		tcp->u_arg[i] = tcp->u_arg[i + 1];
 }
-#endif
+#endif /* SYS_ipc_subcall */
 
-#ifdef LINUX_MIPSO32
+#ifdef SYS_syscall_subcall
 static void
-decode_mips_subcall(struct tcb *tcp)
+decode_syscall_subcall(struct tcb *tcp)
 {
 	if (!scno_is_valid(tcp->u_arg[0]))
 		return;
@@ -403,6 +403,7 @@ decode_mips_subcall(struct tcb *tcp)
 	tcp->s_ent = &sysent[tcp->scno];
 	memmove(&tcp->u_arg[0], &tcp->u_arg[1],
 		sizeof(tcp->u_arg) - sizeof(tcp->u_arg[0]));
+# ifdef LINUX_MIPSO32
 	/*
 	 * Fetching the last arg of 7-arg syscalls (fadvise64_64
 	 * and sync_file_range) requires additional code,
@@ -415,8 +416,9 @@ decode_mips_subcall(struct tcb *tcp)
 			   &tcp->u_arg[MAX_ARGS - 1]) < 0)
 		tcp->u_arg[MAX_ARGS - 1] = 0;
 	}
+# endif /* LINUX_MIPSO32 */
 }
-#endif /* LINUX_MIPSO32 */
+#endif /* SYS_syscall_subcall */
 
 static void
 dumpio(struct tcb *tcp)
@@ -628,23 +630,30 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	}
 
-#ifdef LINUX_MIPSO32
-	if (SEN_syscall == tcp->s_ent->sen)
-		decode_mips_subcall(tcp);
-#endif
-
-#if defined(SYS_socket_subcall) || defined(SYS_ipc_subcall)
-	switch (tcp->s_ent->sen) {
-# ifdef SYS_socket_subcall
-		case SEN_socketcall:
-			decode_socket_subcall(tcp);
-			break;
-# endif
+#if defined SYS_ipc_subcall	\
+ || defined SYS_socket_subcall	\
+ || defined SYS_syscall_subcall
+	for (;;) {
+		switch (tcp->s_ent->sen) {
 # ifdef SYS_ipc_subcall
 		case SEN_ipc:
 			decode_ipc_subcall(tcp);
 			break;
 # endif
+# ifdef SYS_socket_subcall
+		case SEN_socketcall:
+			decode_socket_subcall(tcp);
+			break;
+# endif
+# ifdef SYS_syscall_subcall
+		case SEN_syscall:
+			decode_syscall_subcall(tcp);
+			if (tcp->s_ent->sen != SEN_syscall)
+				continue;
+			break;
+# endif
+		}
+		break;
 	}
 #endif
 
