@@ -522,7 +522,7 @@ err_name(unsigned long err)
 	return NULL;
 }
 
-static long get_regs(pid_t pid);
+static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static int arch_get_scno(struct tcb *tcp);
@@ -1023,7 +1023,7 @@ print_pc(struct tcb *tcp)
 #else
 # error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
 #endif
-	if (get_regs(tcp->pid) < 0 || ARCH_GET_PC)
+	if (get_regs(tcp) < 0 || ARCH_GET_PC)
 		tprints(current_wordsize == 4 ? "[????????] "
 					      : "[????????????????] ");
 	else
@@ -1121,7 +1121,7 @@ clear_regs(void)
 }
 
 static long
-get_regs(pid_t pid)
+get_regs(struct tcb *const tcp)
 {
 #ifdef ptrace_getregset_or_getregs
 
@@ -1135,9 +1135,9 @@ get_regs(pid_t pid)
 	 */
 	static int use_getregs_old;
 	if (use_getregs_old < 0) {
-		return get_regs_error = ptrace_getregset_or_getregs(pid);
+		return get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
 	} else if (use_getregs_old == 0) {
-		get_regs_error = ptrace_getregset_or_getregs(pid);
+		get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
 		if (get_regs_error >= 0) {
 			use_getregs_old = -1;
 			return get_regs_error;
@@ -1146,10 +1146,10 @@ get_regs(pid_t pid)
 			return get_regs_error;
 		use_getregs_old = 1;
 	}
-	return get_regs_error = getregs_old(pid);
+	return get_regs_error = getregs_old(tcp->pid);
 # else /* !HAVE_GETREGS_OLD */
 	/* Assume that PTRACE_GETREGSET/PTRACE_GETREGS works. */
-	return get_regs_error = ptrace_getregset_or_getregs(pid);
+	return get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
 # endif /* !HAVE_GETREGS_OLD */
 
 #else /* !ptrace_getregset_or_getregs */
@@ -1193,7 +1193,7 @@ free_sysent_buf(void *ptr)
 int
 get_scno(struct tcb *tcp)
 {
-	if (get_regs(tcp->pid) < 0)
+	if (get_regs(tcp) < 0)
 		return -1;
 
 	int rc = arch_get_scno(tcp);
@@ -1237,7 +1237,7 @@ static int
 get_syscall_result(struct tcb *tcp)
 {
 #ifdef ptrace_getregset_or_getregs
-	if (get_regs(tcp->pid) < 0)
+	if (get_regs(tcp) < 0)
 		return -1;
 #else
 	if (get_syscall_result_regs(tcp))
