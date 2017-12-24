@@ -483,7 +483,7 @@ dumpio(struct tcb *tcp)
 static kernel_ulong_t
 shuffle_scno(kernel_ulong_t scno)
 {
-#if defined(ARM) || defined(AARCH64) /* So far only 32-bit ARM needs this */
+#ifdef ARM_FIRST_SHUFFLED_SYSCALL	/* So far only 32-bit ARM needs this */
 	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
 		return scno;
 
@@ -506,7 +506,7 @@ shuffle_scno(kernel_ulong_t scno)
 	if (scno <= ARM_SECOND_SHUFFLED_SYSCALL + ARM_LAST_SPECIAL_SYSCALL) {
 		return scno + 0x000f0000 - ARM_SECOND_SHUFFLED_SYSCALL;
 	}
-#endif /* ARM || AARCH64 */
+#endif /* ARM_FIRST_SHUFFLED_SYSCALL */
 
 	return scno;
 }
