@@ -54,12 +54,6 @@
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif
 
-#if defined SPARC64
-# include <asm/psrcompat.h>
-#elif defined SPARC
-# include <asm/psr.h>
-#endif
-
 #ifndef NT_PRSTATUS
 # define NT_PRSTATUS 1
 #endif

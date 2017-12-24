@@ -1,3 +1,5 @@
+#include <asm/psr.h>
+
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
