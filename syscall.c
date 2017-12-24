@@ -1224,7 +1224,9 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-#ifndef ptrace_getregset_or_getregs
+#ifdef ptrace_getregset_or_getregs
+# define get_syscall_result_regs get_regs
+#else
 static int get_syscall_result_regs(struct tcb *);
 #endif
 
@@ -1236,13 +1238,8 @@ static int get_syscall_result_regs(struct tcb *);
 static int
 get_syscall_result(struct tcb *tcp)
 {
-#ifdef ptrace_getregset_or_getregs
-	if (get_regs(tcp) < 0)
+	if (get_syscall_result_regs(tcp) < 0)
 		return -1;
-#else
-	if (get_syscall_result_regs(tcp))
-		return -1;
-#endif
 	tcp->u_error = 0;
 	get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
 
