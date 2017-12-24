@@ -60,10 +60,6 @@
 # include <asm/psr.h>
 #endif
 
-#ifdef IA64
-# include <asm/rse.h>
-#endif
-
 #ifndef NT_PRSTATUS
 # define NT_PRSTATUS 1
 #endif
