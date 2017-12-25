@@ -433,13 +433,6 @@ print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 		tprintf("= %" PRI_kld " (errno %lu)", ret, u_error);
 }
 
-static long get_regs(struct tcb *);
-static int get_syscall_args(struct tcb *);
-static int get_syscall_result(struct tcb *);
-static void get_error(struct tcb *, bool);
-int set_scno(struct tcb *, kernel_ulong_t);
-static void set_error(struct tcb *, unsigned long);
-static void set_success(struct tcb *, kernel_long_t);
 static int arch_get_scno(struct tcb *);
 static int arch_check_scno(struct tcb *);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
@@ -1050,14 +1043,14 @@ ptrace_setregs(pid_t pid)
 static long get_regs_error = -1;
 
 void
-clear_regs(struct tcb *tcp)
+ptrace_clear_regs(struct tcb *tcp)
 {
 	ptrace_sci.op = 0xff;
 	get_regs_error = -1;
 }
 
-static long
-get_regs(struct tcb *const tcp)
+long
+ptrace_get_regs(struct tcb *const tcp)
 {
 #ifdef ptrace_getregset_or_getregs
 
@@ -1189,7 +1182,7 @@ ptrace_get_syscall_info(struct tcb *tcp)
 }
 
 bool
-get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
+ptrace_get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 {
 	if (get_regs_error < -1)
 		return false;
@@ -1201,6 +1194,12 @@ get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 		return true;
 	}
 
+	return generic_get_instruction_pointer(tcp, ip);
+}
+
+bool
+generic_get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
+{
 #if defined ARCH_PC_REG
 	if (get_regs(tcp) < 0)
 		return false;
@@ -1216,7 +1215,7 @@ get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 }
 
 bool
-get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
+ptrace_get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 {
 	if (get_regs_error < -1)
 		return false;
@@ -1228,6 +1227,12 @@ get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 		return true;
 	}
 
+	return generic_get_stack_pointer(tcp, sp);
+}
+
+bool
+generic_get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
+{
 #if defined ARCH_SP_REG
 	if (get_regs(tcp) < 0)
 		return false;
@@ -1243,7 +1248,7 @@ get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 }
 
 static int
-get_syscall_regs(struct tcb *tcp)
+ptrace_get_syscall_regs(struct tcb *tcp)
 {
 	if (get_regs_error != -1)
 		return get_regs_error;
@@ -1271,13 +1276,13 @@ const struct_sysent stub_sysent = {
  *    ("????" etc) and return an appropriate code.
  */
 int
-get_scno(struct tcb *tcp)
+ptrace_get_scno(struct tcb *tcp)
 {
 	tcp->scno = -1;
 	tcp->s_ent = NULL;
 	tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
 
-	if (get_syscall_regs(tcp) < 0)
+	if (ptrace_get_syscall_regs(tcp) < 0)
 		return -1;
 
 	if (ptrace_syscall_info_is_valid()) {
@@ -1327,8 +1332,8 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
-static int
-get_syscall_args(struct tcb *tcp)
+int
+ptrace_get_syscall_args(struct tcb *tcp)
 {
 	if (ptrace_syscall_info_is_valid()) {
 		const unsigned int n =
@@ -1355,29 +1360,31 @@ get_syscall_args(struct tcb *tcp)
 }
 
 int
-set_scno(struct tcb *tcp, kernel_ulong_t scno)
+ptrace_set_scno(struct tcb *tcp, kernel_ulong_t scno)
 {
 	return arch_set_scno(tcp, scno);
 }
 
 
 #ifdef ptrace_getregset_or_getregs
-# define get_syscall_result_regs get_syscall_regs
+# define get_syscall_result_regs ptrace_get_syscall_regs
 #else
 static int get_syscall_result_regs(struct tcb *);
 #endif
+
+static void ptrace_get_error(struct tcb *tcp, const bool check_errno);
 
 /* Returns:
  * 1: ok, continue in syscall_exiting_trace().
  * -1: error, syscall_exiting_trace() should print error indicator
  *    ("????" etc) and bail out.
  */
-static int
-get_syscall_result(struct tcb *tcp)
+int
+ptrace_get_syscall_result(struct tcb *tcp)
 {
 	if (get_syscall_result_regs(tcp) < 0)
 		return -1;
-	get_error(tcp,
+	ptrace_get_error(tcp,
 		  (!(tcp_sysent(tcp)->sys_flags & SYSCALL_NEVER_FAILS)
 			|| syscall_tampered(tcp))
                   && !syscall_tampered_nofail(tcp));
@@ -1385,8 +1392,8 @@ get_syscall_result(struct tcb *tcp)
 	return 1;
 }
 
-static void
-get_error(struct tcb *tcp, const bool check_errno)
+void
+ptrace_get_error(struct tcb *tcp, const bool check_errno)
 {
 	if (ptrace_syscall_info_is_valid()) {
 		if (ptrace_sci.exit.is_error) {
@@ -1402,8 +1409,8 @@ get_error(struct tcb *tcp, const bool check_errno)
 	}
 }
 
-static void
-set_error(struct tcb *tcp, unsigned long new_error)
+void
+ptrace_set_error(struct tcb *tcp, unsigned long new_error)
 {
 	const unsigned long old_error = tcp->u_error;
 
@@ -1424,13 +1431,13 @@ set_error(struct tcb *tcp, unsigned long new_error)
 		if (ptrace_syscall_info_is_valid())
 			tcp->u_rval = -1;
 		else
-			get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
-					 SYSCALL_NEVER_FAILS));
+			ptrace_get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
+						SYSCALL_NEVER_FAILS));
 	}
 }
 
-static void
-set_success(struct tcb *tcp, kernel_long_t new_rval)
+void
+ptrace_set_success(struct tcb *tcp, kernel_long_t new_rval)
 {
 	const kernel_long_t old_rval = tcp->u_rval;
 
@@ -1448,8 +1455,8 @@ set_success(struct tcb *tcp, kernel_long_t new_rval)
 		if (ptrace_syscall_info_is_valid())
 			tcp->u_error = 0;
 		else
-			get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
-					 SYSCALL_NEVER_FAILS));
+			ptrace_get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
+						SYSCALL_NEVER_FAILS));
 	}
 }
 

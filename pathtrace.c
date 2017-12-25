@@ -87,7 +87,7 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 		return -1;
 
 	xsprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
-	n = readlink(linkpath, buf, bufsize - 1);
+	n = tracee_readlink(tcp, linkpath, buf, bufsize - 1);
 	/*
 	 * NB: if buf is too small, readlink doesn't fail,
 	 * it returns truncated result (IOW: n == bufsize - 1).
@@ -108,7 +108,7 @@ pathtrace_select_set(struct tcb *tcp, const char *path, struct path_set *set)
 
 	storepath(path, set);
 
-	rpath = realpath(path, NULL);
+	rpath = tracee_realpath(tcp, path, NULL);
 
 	if (rpath == NULL)
 		return;

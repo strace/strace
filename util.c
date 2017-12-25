@@ -403,7 +403,8 @@ getfdproto(struct tcb *tcp, int fd)
 		return SOCK_PROTO_UNKNOWN;
 
 	xsprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
-	r = getxattr(path, "system.sockprotoname", buf, bufsize - 1);
+	r = tracee_getxattr(tcp, path, "system.sockprotoname", buf,
+			    bufsize - 1);
 	if (r <= 0)
 		return SOCK_PROTO_UNKNOWN;
 	else {
@@ -460,7 +461,7 @@ printdev(struct tcb *tcp, int fd, const char *path)
 	if (path[0] != '/')
 		return false;
 
-	if (stat_file(path, &st)) {
+	if (tracee_stat(tcp, path, &st)) {
 		debug_func_perror_msg("stat(\"%s\")", path);
 		return false;
 	}
@@ -1354,15 +1355,15 @@ print_abnormal_hi(const kernel_ulong_t val)
 int
 read_int_from_file(struct tcb *tcp, const char *const fname, int *const pvalue)
 {
-	const int fd = open_file(fname, O_RDONLY);
+	const int fd = tracee_open(tcp, fname, O_RDONLY, 0);
 	if (fd < 0)
 		return -1;
 
 	long lval;
 	char buf[sizeof(lval) * 3];
-	int n = read(fd, buf, sizeof(buf) - 1);
+	int n = tracee_pread(tcp, fd, buf, sizeof(buf) - 1, 0);
 	int saved_errno = errno;
-	close(fd);
+	tracee_close(tcp, fd);
 
 	if (n < 0) {
 		errno = saved_errno;

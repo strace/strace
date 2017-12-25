@@ -16,7 +16,7 @@
 #include "ptrace.h"
 
 int
-upeek(struct tcb *tcp, unsigned long off, kernel_ulong_t *res)
+ptrace_upeek(struct tcb *tcp, unsigned long off, kernel_ulong_t *res)
 {
 	long val;
 

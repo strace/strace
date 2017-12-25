@@ -26,6 +26,7 @@
 #  endif
 #  define strace_stat_t struct stat64
 #  define stat_file stat64
+#  define fstat_file fstat64
 #  define struct_dirent struct dirent64
 #  define read_dir readdir64
 #  define struct_rlimit struct rlimit64
@@ -35,6 +36,7 @@
 #  define fopen_stream fopen
 #  define strace_stat_t struct stat
 #  define stat_file stat
+#  define fstat_file fstat
 #  define struct_dirent struct dirent
 #  define read_dir readdir
 #  define struct_rlimit struct rlimit

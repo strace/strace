@@ -135,8 +135,8 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
  * at address `addr' to our space at `our_addr'.
  */
 int
-umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
-       void *const our_addr)
+ptrace_umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
+	      void *const our_addr)
 {
 	if (tracee_addr_is_invalid(addr))
 		return -1;
@@ -241,8 +241,8 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
  * we never write past laddr[len-1]).
  */
 int
-umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
-	 char *laddr)
+ptrace_umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
+	        char *laddr)
 {
 	if (tracee_addr_is_invalid(addr))
 		return -1;

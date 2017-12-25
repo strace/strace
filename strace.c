@@ -39,10 +39,13 @@
 #include "ptrace_syscall_info.h"
 #include "scno.h"
 #include "printsiginfo.h"
+#include "tcb_wait_data.h"
 #include "trace_event.h"
 #include "xstring.h"
 #include "delay.h"
 #include "wait.h"
+
+#include "ptrace_wait_data.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -142,34 +145,10 @@ static bool open_append;
 struct tcb *printing_tcp;
 static struct tcb *current_tcp;
 
-/**
- * Tracing-backend-agnostic data. Embedded inside tracing-backend-specific
- * structure.
- */
-struct tcb_wait_data {
-	enum trace_event te; /**< Event passed to dispatch_event() */
-	union {
-		unsigned int sig;  /**< Signal tracee got. */
-		unsigned int exit; /**< Tracee's exit code. */
-	};
-	bool core_dumped;    /**< Wether core was dumped on termination. */
-	siginfo_t si;        /**< siginfo, returned by PTRACE_GETSIGINFO */
-};
-
 static struct tcb **tcbtab;
 static unsigned int nprocs;
 static size_t tcbtabsize;
 
-
-/** ptrace-specific trace data */
-struct ptrace_wait_data {
-	struct tcb_wait_data wd; /**< Backend-agnostic data. */
-	unsigned int status;     /**< status, as returned by wait4(). */
-	unsigned int restart_op; /**< ptrace operation to restart tracee. */
-	unsigned long msg;       /**< Value returned by PTRACE_GETEVENTMSG. */
-};
-
-#define to_ptrace_wait_data(p_) containerof((p_), struct ptrace_wait_data, wd)
 
 /**
  * (ptrace-specific) storage for queued wait4() responses.
@@ -187,8 +166,7 @@ char *program_invocation_name;
 
 unsigned os_release; /* generated from uname()'s u.release */
 
-static void detach(struct tcb *tcp);
-static void cleanup(int sig);
+static void cleanup(int fatal_sig);
 static void interrupt(int sig);
 
 #ifdef HAVE_SIG_ATOMIC_T
@@ -933,8 +911,8 @@ droptcb(struct tcb *tcp)
  * attached-unstopped processes give the same ESRCH.  For unattached process we
  * would SIGSTOP it and wait for its SIGSTOP notification forever.
  */
-static void
-detach(struct tcb *tcp)
+void
+ptrace_detach(struct tcb *tcp)
 {
 	int error;
 	int status;
@@ -1116,8 +1094,8 @@ process_opt_p_list(char *opt)
 	}
 }
 
-static void
-attach_tcb(struct tcb *const tcp)
+void
+ptrace_attach_tcb(struct tcb *const tcp)
 {
 	if (ptrace_attach_or_seize(tcp->pid) < 0) {
 		perror_msg("attach: ptrace(%s, %d)",
@@ -1369,8 +1347,8 @@ redirect_standard_fds(void)
 	}
 }
 
-static void
-startup_child(char **argv, char **env)
+void
+ptrace_startup_child(char **argv, char **env)
 {
 	strace_stat_t statbuf;
 	const char *filename;
@@ -1646,7 +1624,7 @@ set_sighandler(int signo, void (*sighandler)(int), struct sigaction *oldact)
 }
 
 bool
-tracing_backend_init(int argc, char *argv[])
+ptrace_init(int argc, char *argv[])
 {
 	os_release = get_os_release();
 
@@ -1769,8 +1747,6 @@ make_env(char **orig_env, char **env_changes, size_t env_change_count)
 
 	return new_env;
 }
-
-#define tracing_backend_name() "ptrace"
 
 /*
  * Initialization part of main() was eating much stack (~0.5k),
@@ -2168,6 +2144,8 @@ init(int argc, char *argv[])
 	 * -p PID1,PID2: yes (there are already more than one pid)
 	 */
 	print_pid_pfx = (outfname && followfork < 2 && (followfork == 1 || nprocs > 1));
+
+	tracing_backend_post_init();
 }
 
 static struct tcb *
@@ -2216,12 +2194,18 @@ cleanup(int fatal_sig)
 		if (!tcp->pid)
 			continue;
 		debug_func_msg("looking at pid %u", tcp->pid);
+
+		/*
+		 * Terminating the child we created with the signal we received.
+		 */
 		if (tcp->pid == strace_child) {
-			kill(tcp->pid, SIGCONT);
-			kill(tcp->pid, fatal_sig);
+			tracee_kill(tcp, SIGCONT);
+			tracee_kill(tcp, fatal_sig);
 		}
 		detach(tcp);
 	}
+
+	tracing_backend_cleanup(fatal_sig);
 }
 
 static void
@@ -2471,14 +2455,8 @@ print_event_exit(struct tcb *tcp)
 	line_ended();
 }
 
-size_t
-trace_wait_data_size(struct tcb *tcp)
-{
-	return sizeof(struct ptrace_wait_data);
-}
-
 struct tcb_wait_data *
-init_trace_wait_data(void *p)
+ptrace_init_trace_wait_data(void *p)
 {
 	struct ptrace_wait_data *ptrace_wd = p;
 
@@ -2489,7 +2467,7 @@ init_trace_wait_data(void *p)
 }
 
 struct tcb_wait_data *
-copy_trace_wait_data(const struct tcb_wait_data *wd)
+ptrace_copy_trace_wait_data(struct tcb_wait_data *wd)
 {
 	struct ptrace_wait_data *ptrace_wd = to_ptrace_wait_data(wd);
 	struct ptrace_wait_data *new_wd = xmalloc(sizeof(*new_wd));
@@ -2500,7 +2478,7 @@ copy_trace_wait_data(const struct tcb_wait_data *wd)
 }
 
 void
-free_trace_wait_data(struct tcb_wait_data *wd)
+ptrace_free_trace_wait_data(struct tcb_wait_data *wd)
 {
 	if (wd)
 		free(to_ptrace_wait_data(wd));
@@ -2552,7 +2530,7 @@ classify_ptrace_stop(int pid, int status, struct ptrace_wait_data *wd)
 }
 
 struct tcb_wait_data *
-next_event(void)
+ptrace_next_event(void)
 {
 	if (interrupted)
 		return NULL;
@@ -2890,7 +2868,7 @@ trace_syscall(struct tcb *tcp, unsigned int *sig)
 }
 
 void
-handle_exec(struct tcb **current_tcp, struct tcb_wait_data *wd)
+ptrace_handle_exec(struct tcb **current_tcp, struct tcb_wait_data *wd)
 {
 	/* The syscall succeeded, clear the flag.  */
 	(*current_tcp)->flags &= ~TCB_CHECK_EXEC_SYSCALL;
@@ -2939,7 +2917,7 @@ handle_exec(struct tcb **current_tcp, struct tcb_wait_data *wd)
 }
 
 bool
-restart_process(struct tcb *current_tcp, struct tcb_wait_data *wd)
+ptrace_restart_process(struct tcb *current_tcp, struct tcb_wait_data *wd)
 {
 	struct ptrace_wait_data *ptrace_wd = to_ptrace_wait_data(wd);
 
