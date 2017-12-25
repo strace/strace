@@ -441,6 +441,7 @@ static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static void get_error(struct tcb *, bool);
+int set_scno(struct tcb *, kernel_ulong_t);
 static void set_error(struct tcb *, unsigned long);
 static void set_success(struct tcb *, kernel_long_t);
 static int arch_get_scno(struct tcb *);
@@ -496,7 +497,7 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 				? (kernel_long_t) shuffle_scno(opts->data.scno)
 				: -1;
 
-			if (!arch_set_scno(tcp, scno)) {
+			if (!set_scno(tcp, scno)) {
 				tcp->flags |= TCB_TAMPERED;
 				if (scno != -1)
 					tcp->flags |= TCB_TAMPERED_NO_FAIL;
@@ -1356,6 +1357,13 @@ get_syscall_args(struct tcb *tcp)
 	}
 	return arch_get_syscall_args(tcp);
 }
+
+int
+set_scno(struct tcb *tcp, kernel_ulong_t scno)
+{
+	return arch_set_scno(tcp, scno);
+}
+
 
 #ifdef ptrace_getregset_or_getregs
 # define get_syscall_result_regs get_syscall_regs
