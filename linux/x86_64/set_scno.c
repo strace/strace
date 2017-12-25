@@ -8,7 +8,7 @@ static int
 arch_set_scno(struct tcb *tcp, kernel_ulong_t scno)
 {
 #ifdef HAVE_GETREGS_OLD
-	return upoke(tcp->pid, 8 * ORIG_RAX, scno);
+	return upoke(tcp, 8 * ORIG_RAX, scno);
 #else
 	if (x86_io.iov_len == sizeof(i386_regs))
 		return i386_set_scno(tcp, scno);

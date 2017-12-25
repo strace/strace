@@ -29,11 +29,12 @@
 #include "ptrace.h"
 
 int
-upoke(int pid, unsigned long off, kernel_ulong_t val)
+upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val)
 {
-	if (ptrace(PTRACE_POKEUSER, pid, off, val)) {
+	if (ptrace(PTRACE_POKEUSER, tcp->pid, off, val)) {
 		if (errno != ESRCH)
-			perror_msg("upoke: PTRACE_POKEUSER pid:%d @%#lx)", pid, off);
+			perror_msg("upoke: PTRACE_POKEUSER pid:%d @%#lx)",
+				   tcp->pid, off);
 		return -1;
 	}
 	return 0;
