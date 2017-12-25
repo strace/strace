@@ -1,0 +1,3 @@
+#value_indexed
+KVM_EXIT_IO_IN  0
+KVM_EXIT_IO_OUT 1

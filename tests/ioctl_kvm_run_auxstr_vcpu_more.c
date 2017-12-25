@@ -26,6 +26,18 @@ print_KVM_RUN_MORE(const int fd, const char *const dev, const char *str,
 	printf(", apic_base=%#016llx", run_before->apic_base);
 	if (run_before->apic_base != run_after->apic_base)
 		printf(" => %#016llx", run_after->apic_base);
+
+	switch (run_after->exit_reason) {
+	case KVM_EXIT_IO:
+		printf(", {io={direction=%s"
+		       ", size=%u, port=%#04x, count=%u, data_offset=%#016llx}}",
+		       run_after->io.direction == KVM_EXIT_IO_IN
+		       ? "KVM_EXIT_IO_IN" : "KVM_EXIT_IO_OUT",
+		       run_after->io.size, run_after->io.port,
+		       run_after->io.count, run_after->io.data_offset);
+		break;
+	}
+
 	puts("}");
 }
 #endif

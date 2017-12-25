@@ -16,6 +16,7 @@
 # include "arch_kvm.c"
 # include "xmalloc.h"
 # include "mmap_cache.h"
+# include "xlat/kvm_exit_io.h"
 
 struct vcpu_info {
 	struct vcpu_info *next;
@@ -451,6 +452,24 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 }
 
 static void
+kvm_run_structure_decode_io(struct tcb *tcp,
+			      struct kvm_run *state)
+{
+	tprints_field_name("io");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(state->io, direction, kvm_exit_io, "KVM_EXIT_IO_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(state->io, size);
+	tprint_struct_next();
+	PRINT_FIELD_0X(state->io, port);
+	tprint_struct_next();
+	PRINT_FIELD_U(state->io, count);
+	tprint_struct_next();
+	PRINT_FIELD_0X(state->io, data_offset);
+	tprint_struct_end();
+}
+
+static void
 kvm_run_structure_decode_main(struct tcb *tcp,
 			      struct kvm_run *state_in,
 			      struct kvm_run *state_out)
@@ -503,6 +522,20 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 	PRINT_FIELD_BEFORE_AFTER(0X, *state_in, *state_out, cr8);
 	tprint_struct_next();
 	PRINT_FIELD_BEFORE_AFTER(0X, *state_in, *state_out, apic_base);
+
+#define DECODE_UNION(...)			\
+	do {					\
+		tprint_struct_next();		\
+		tprint_union_begin();		\
+		__VA_ARGS__;			\
+		tprint_union_end();		\
+	} while (0)
+
+	switch (state_out->exit_reason) {
+	case KVM_EXIT_IO:
+		DECODE_UNION(kvm_run_structure_decode_io(tcp, state_out));
+		break;
+	}
 
 	tprint_struct_end();
 	tprint_newline();
