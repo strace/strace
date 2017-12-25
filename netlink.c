@@ -107,7 +107,7 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 }
 
 static void
-decode_nlmsg_type_default(const struct xlat *const xlat,
+decode_nlmsg_type_default(struct tcb *tcp, const struct xlat *const xlat,
 			  const uint16_t type,
 			  const char *const dflt)
 {
@@ -115,11 +115,11 @@ decode_nlmsg_type_default(const struct xlat *const xlat,
 }
 
 static void
-decode_nlmsg_type_generic(const struct xlat *const xlat,
+decode_nlmsg_type_generic(struct tcb *tcp, const struct xlat *const xlat,
 			  const uint16_t type,
 			  const char *const dflt)
 {
-	printxval(genl_families_xlat(), type, dflt);
+	printxval(genl_families_xlat(tcp), type, dflt);
 }
 
 static const struct {
@@ -155,7 +155,7 @@ static const struct {
 };
 
 static void
-decode_nlmsg_type_netfilter(const struct xlat *const xlat,
+decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 			    const uint16_t type,
 			    const char *const dflt)
 {
@@ -183,7 +183,7 @@ decode_nlmsg_type_netfilter(const struct xlat *const xlat,
 		tprintf("%#x", msg_type);
 }
 
-typedef void (*nlmsg_types_decoder_t)(const struct xlat *,
+typedef void (*nlmsg_types_decoder_t)(struct tcb *, const struct xlat *,
 				      uint16_t type,
 				      const char *dflt);
 
@@ -215,7 +215,8 @@ static const struct {
  * for family here to filter out -1.
  */
 static void
-decode_nlmsg_type(const uint16_t type, const unsigned int family)
+decode_nlmsg_type(struct tcb *tcp, const uint16_t type,
+		  const unsigned int family)
 {
 	nlmsg_types_decoder_t decoder = decode_nlmsg_type_default;
 	const struct xlat *xlat = netlink_types;
@@ -234,7 +235,7 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 			dflt = nlmsg_types[family].dflt;
 	}
 
-	decoder(xlat, type, dflt);
+	decoder(tcp, xlat, type, dflt);
 }
 
 static const struct xlat *
@@ -443,7 +444,7 @@ print_nlmsghdr(struct tcb *tcp,
 
 	tprintf("{len=%u, type=", nlmsghdr->nlmsg_len);
 
-	decode_nlmsg_type(nlmsghdr->nlmsg_type, family);
+	decode_nlmsg_type(tcp, nlmsghdr->nlmsg_type, family);
 
 	tprints(", flags=");
 	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,

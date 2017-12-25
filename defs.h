@@ -498,7 +498,7 @@ void dyxlat_free(struct dyxlat *);
 const struct xlat *dyxlat_get(const struct dyxlat *);
 void dyxlat_add_pair(struct dyxlat *, uint64_t val, const char *str, size_t len);
 
-const struct xlat *genl_families_xlat(void);
+const struct xlat *genl_families_xlat(struct tcb *tcp);
 
 extern unsigned long get_pagesize(void);
 extern int next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits);
