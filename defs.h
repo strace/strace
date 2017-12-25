@@ -606,13 +606,13 @@ extern long getrval2(struct tcb *);
 
 extern const char *signame(const int);
 extern const char *sprintsigname(const int);
-extern void pathtrace_select_set(const char *, struct path_set *);
+extern void pathtrace_select_set(struct tcb *, const char *, struct path_set *);
 extern bool pathtrace_match_set(struct tcb *, struct path_set *);
 
 static inline void
-pathtrace_select(const char *path)
+pathtrace_select(struct tcb *tcp, const char *path)
 {
-	return pathtrace_select_set(path, &global_path_set);
+	return pathtrace_select_set(tcp, path, &global_path_set);
 }
 
 static inline bool

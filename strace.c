@@ -1902,7 +1902,7 @@ init(int argc, char *argv[])
 				  tracing_backend_name());
 
 	for (cnt = 0; cnt < pathtrace_count; cnt++)
-		pathtrace_select(pathtrace_paths[cnt]);
+		pathtrace_select(current_tcp, pathtrace_paths[cnt]);
 	free(pathtrace_paths);
 
 	acolumn_spaces = xmalloc(acolumn + 1);
