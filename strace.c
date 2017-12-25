@@ -1859,6 +1859,17 @@ init(int argc, char *argv[])
 	bool columns_set = false;
 	bool sortby_set = false;
 
+	/*
+	 * We can initialise global_path_set only after tracing backend
+	 * initialisation, so we store pointers to all the paths from
+	 * command-line arguments during parsing in this array and then,
+	 * after the successful backend initialisation, iterate over it
+	 * in order to add them to global_path_set.
+	 */
+	const char **pathtrace_paths = NULL;
+	size_t pathtrace_size = 0;
+	size_t pathtrace_count = 0;
+
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
 		program_invocation_name =
@@ -2069,7 +2080,12 @@ init(int argc, char *argv[])
 			process_opt_p_list(optarg);
 			break;
 		case 'P':
-			pathtrace_select(optarg);
+			if (pathtrace_count >= pathtrace_size)
+				pathtrace_paths = xgrowarray(pathtrace_paths,
+					&pathtrace_size,
+					sizeof(pathtrace_paths[0]));
+
+			pathtrace_paths[pathtrace_count++] = optarg;
 			break;
 		case 'q':
 			qflag_short++;
@@ -2360,6 +2376,10 @@ init(int argc, char *argv[])
 			  "-z/--successful-only/-Z/--failed-only options will "
 			  "take effect. "
 			  "See status qualifier for more complex filters.");
+
+	for (size_t cnt = 0; cnt < pathtrace_count; ++cnt)
+		pathtrace_select(pathtrace_paths[cnt]);
+	free(pathtrace_paths);
 
 	acolumn_spaces = xmalloc(acolumn + 1);
 	memset(acolumn_spaces, ' ', acolumn);

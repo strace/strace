@@ -145,6 +145,14 @@ check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
 
+check_h 'must have PROG [ARGS] or -p PID' -P .
+check_h 'must have PROG [ARGS] or -p PID' -P . -P..
+check_h 'must have PROG [ARGS] or -p PID' --trace-path=.
+check_h 'must have PROG [ARGS] or -p PID' --trace-path=. --trace-path ..
+check_e "Requested path \"///\" resolved into \"/\"
+$STRACE_EXE: Requested path \"/.\" resolved into \"/\"
+$STRACE_EXE: -q and -e quiet/--quiet cannot be provided simultaneously" -q --quiet -P /// -P/. .
+
 for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg calls count error errors name syscall syscall_name syscall-name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
