@@ -400,7 +400,7 @@ extern void syscall_exiting_finish(struct tcb *);
 extern void count_syscall(struct tcb *, const struct timeval *);
 extern void call_summary(FILE *);
 
-extern void clear_regs(void);
+extern void clear_regs(struct tcb *tcp);
 extern int get_scno(struct tcb *);
 extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
 

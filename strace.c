@@ -2273,7 +2273,7 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_NEXT;
 	}
 
-	clear_regs();
+	clear_regs(tcp);
 
 	/* Set current output file */
 	current_tcp = tcp;
