@@ -262,12 +262,12 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 }
 
 static unsigned int
-get_optmem_max(void)
+get_optmem_max(struct tcb *tcp)
 {
 	static int optmem_max;
 
 	if (!optmem_max) {
-		if (read_int_from_file("/proc/sys/net/core/optmem_max",
+		if (read_int_from_file(tcp, "/proc/sys/net/core/optmem_max",
 				       &optmem_max) || optmem_max <= 0) {
 			optmem_max = sizeof(long long) * (2 * IOV_MAX + 512);
 		} else {
@@ -293,8 +293,8 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 #endif
 			sizeof(struct cmsghdr);
 
-	unsigned int control_len = in_control_len > get_optmem_max()
-				   ? get_optmem_max() : in_control_len;
+	unsigned int control_len = in_control_len > get_optmem_max(tcp)
+				   ? get_optmem_max(tcp) : in_control_len;
 	unsigned int buf_len = control_len;
 	char *buf = buf_len < cmsg_size ? NULL : malloc(buf_len);
 	if (!buf || umoven(tcp, addr, buf_len, buf) < 0) {
