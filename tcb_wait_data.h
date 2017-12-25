@@ -28,6 +28,8 @@ struct tcb_wait_data {
 	siginfo_t si;        /**< siginfo, returned by PTRACE_GETSIGINFO */
 };
 
+#if ADDITIONAL_TRACING_BACKENDS
+
 static inline size_t
 trace_wait_data_size(struct tcb *tcp)
 {
@@ -73,5 +75,16 @@ free_trace_wait_data(struct tcb_wait_data *wd)
 		free(wd);
 	}
 }
+
+#else /* !ADDITIONAL_TRACING_BACKENDS */
+
+# include "ptrace_wait_data.h"
+
+# define trace_wait_data_size(tcp_)  sizeof(struct ptrace_wait_data)
+# define init_trace_wait_data        ptrace_init_trace_wait_data
+# define copy_trace_wait_data        ptrace_copy_trace_wait_data
+# define free_trace_wait_data        ptrace_free_trace_wait_data
+
+#endif /* ADDITIONAL_TRACING_BACKENDS */
 
 #endif /* !STRACE_TCB_WAIT_DATA_H */

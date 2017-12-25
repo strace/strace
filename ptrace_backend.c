@@ -12,6 +12,8 @@
 #include "ptrace_backend.h"
 #include "ptrace_wait_data.h"
 
+#if ADDITIONAL_TRACING_BACKENDS
+
 const struct tracing_backend ptrace_backend = {
 	.name                    = "ptrace",
 
@@ -60,3 +62,5 @@ const struct tracing_backend ptrace_backend = {
 	.sendmsg                 = local_sendmsg,
 	.recvmsg                 = local_recvmsg,
 };
+
+#endif /* ADDITIONAL_TRACING_BACKENDS */
