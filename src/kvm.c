@@ -470,6 +470,22 @@ kvm_run_structure_decode_io(struct tcb *tcp,
 }
 
 static void
+kvm_run_structure_decode_mmio(struct tcb *tcp,
+			      struct kvm_run *state)
+{
+	tprints_field_name("mmio");
+	tprint_struct_begin();
+	PRINT_FIELD_0X(state->mmio, phys_addr);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(state->mmio, data, tcp, print_xint_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_U(state->mmio, len);
+	tprint_struct_next();
+	PRINT_FIELD_U(state->mmio, is_write);
+	tprint_struct_end();
+}
+
+static void
 kvm_run_structure_decode_main(struct tcb *tcp,
 			      struct kvm_run *state_in,
 			      struct kvm_run *state_out)
@@ -534,6 +550,9 @@ kvm_run_structure_decode_main(struct tcb *tcp,
 	switch (state_out->exit_reason) {
 	case KVM_EXIT_IO:
 		DECODE_UNION(kvm_run_structure_decode_io(tcp, state_out));
+		break;
+	case KVM_EXIT_MMIO:
+		DECODE_UNION(kvm_run_structure_decode_mmio(tcp, state_out));
 		break;
 	}
 

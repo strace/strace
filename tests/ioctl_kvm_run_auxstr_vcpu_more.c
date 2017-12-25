@@ -36,6 +36,18 @@ print_KVM_RUN_MORE(const int fd, const char *const dev, const char *str,
 		       run_after->io.size, run_after->io.port,
 		       run_after->io.count, run_after->io.data_offset);
 		break;
+	case KVM_EXIT_MMIO:
+		printf(", {mmio={phys_addr=%#016llx"
+		       ", data=[%#0x, %#0x, %#0x, %#0x, %#0x, %#0x, %#0x, %#0x]"
+		       ", len=%u, is_write=%u}}",
+		       run_after->mmio.phys_addr,
+		       run_after->mmio.data[0], run_after->mmio.data[1],
+		       run_after->mmio.data[2], run_after->mmio.data[3],
+		       run_after->mmio.data[4], run_after->mmio.data[5],
+		       run_after->mmio.data[6], run_after->mmio.data[7],
+		       run_after->mmio.len,
+		       run_after->mmio.is_write);
+		break;
 	}
 
 	puts("}");
