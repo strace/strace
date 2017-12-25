@@ -31,10 +31,10 @@
  * a PTRACE_GETREGS based fallback is provided for old kernels.
  */
 static int
-getregs_old(pid_t pid)
+getregs_old(struct tcb *tcp)
 {
 	/* Use old method, with unreliable heuristical detection of 32-bitness. */
-	long r = ptrace(PTRACE_GETREGS, pid, NULL, &x86_64_regs);
+	long r = ptrace(PTRACE_GETREGS, tcp->pid, NULL, &x86_64_regs);
 	if (r)
 		return r;
 

@@ -1136,7 +1136,7 @@ get_regs(struct tcb *const tcp)
 			return get_regs_error;
 		use_getregs_old = 1;
 	}
-	return get_regs_error = getregs_old(tcp->pid);
+	return get_regs_error = getregs_old(tcp);
 # else /* !HAVE_GETREGS_OLD */
 	/* Assume that PTRACE_GETREGSET/PTRACE_GETREGS works. */
 	return get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
