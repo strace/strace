@@ -50,6 +50,7 @@
 #include "scno.h"
 #include "ptrace.h"
 #include "printsiginfo.h"
+#include "trace_event.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -2190,64 +2191,6 @@ print_event_exit(struct tcb *tcp)
 	tprints("= ?\n");
 	line_ended();
 }
-
-enum trace_event {
-	/* Break the main loop. */
-	TE_BREAK,
-
-	/* Call next_event() again. */
-	TE_NEXT,
-
-	/* Restart the tracee with signal 0 and call next_event() again. */
-	TE_RESTART,
-
-	/*
-	 * For all the events below, current_tcp is set to current tracee's
-	 * tcb.  All the suggested actions imply that you want to continue
-	 * tracing of the current tracee; alternatively, you can detach it.
-	 */
-
-	/*
-	 * Syscall entry or exit.
-	 * Restart the tracee with signal 0, or with an injected signal number.
-	 */
-	TE_SYSCALL_STOP,
-
-	/*
-	 * Tracee received signal with number WSTOPSIG(*pstatus); signal info
-	 * is written to *si.  Restart the tracee (with that signal number
-	 * if you want to deliver it).
-	 */
-	TE_SIGNAL_DELIVERY_STOP,
-
-	/*
-	 * Tracee was killed by a signal with number WTERMSIG(*pstatus).
-	 */
-	TE_SIGNALLED,
-
-	/*
-	 * Tracee was stopped by a signal with number WSTOPSIG(*pstatus).
-	 * Restart the tracee with that signal number.
-	 */
-	TE_GROUP_STOP,
-
-	/*
-	 * Tracee exited with status WEXITSTATUS(*pstatus).
-	 */
-	TE_EXITED,
-
-	/*
-	 * Tracee is going to perform execve().
-	 * Restart the tracee with signal 0.
-	 */
-	TE_STOP_BEFORE_EXECVE,
-
-	/*
-	 * Tracee is going to terminate.
-	 * Restart the tracee with signal 0.
-	 */
-	TE_STOP_BEFORE_EXIT,
-};
 
 static enum trace_event
 next_event(int *pstatus, siginfo_t *si)

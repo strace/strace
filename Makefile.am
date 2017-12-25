@@ -306,6 +306,7 @@ strace_SOURCES =	\
 	term.c		\
 	time.c		\
 	times.c		\
+	trace_event.h	\
 	truncate.c	\
 	ubi.c		\
 	ucopy.c		\
