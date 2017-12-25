@@ -8,7 +8,7 @@ get_syscall_args(struct tcb *tcp)
 	unsigned int i;
 
 	for (i = 0; i < tcp->s_ent->nargs; ++i)
-		if (upeek(tcp->pid, argreg[i], &tcp->u_arg[i]) < 0)
+		if (upeek(tcp, argreg[i], &tcp->u_arg[i]) < 0)
 			return -1;
 	return 1;
 }

@@ -36,6 +36,6 @@ FUNC_GET_RT_SIGFRAME_ADDR
 {
 	unsigned long addr;
 
-	return upeek(tcp->pid, 4 * 30, &addr)
+	return upeek(tcp, 4 * 30, &addr)
 		? 0 : (addr & ~1UL) - RT_SIGFRAME_SIZE;
 }

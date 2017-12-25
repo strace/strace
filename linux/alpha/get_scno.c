@@ -4,9 +4,9 @@ arch_get_scno(struct tcb *tcp)
 {
 	kernel_ulong_t scno = 0;
 
-	if (upeek(tcp->pid, REG_A3, &alpha_a3) < 0)
+	if (upeek(tcp, REG_A3, &alpha_a3) < 0)
 		return -1;
-	if (upeek(tcp->pid, REG_R0, &scno) < 0)
+	if (upeek(tcp, REG_R0, &scno) < 0)
 		return -1;
 
 	/*

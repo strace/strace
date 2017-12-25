@@ -2,5 +2,5 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	return upeek(tcp->pid, 4 * PT_R9, &tcp->scno) < 0 ? -1 : 1;
+	return upeek(tcp, 4 * PT_R9, &tcp->scno) < 0 ? -1 : 1;
 }

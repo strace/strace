@@ -29,5 +29,5 @@ FUNC_GET_RT_SIGFRAME_ADDR
 {
 	unsigned long addr;
 
-	return upeek(tcp->pid, REG_A_BASE + 3, &addr) ? 0 : addr;
+	return upeek(tcp, REG_A_BASE + 3, &addr) ? 0 : addr;
 }

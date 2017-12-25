@@ -7,7 +7,7 @@ arch_get_scno(struct tcb *tcp)
 	/*
 	 * In the new syscall ABI, the system call number is in R3.
 	 */
-	if (upeek(tcp->pid, 4*(REG_REG0+3), &scno) < 0)
+	if (upeek(tcp, 4*(REG_REG0+3), &scno) < 0)
 		return -1;
 
 	if ((long) scno < 0) {

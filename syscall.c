@@ -1009,7 +1009,7 @@ print_pc(struct tcb *tcp)
 #elif defined ARCH_PC_PEEK_ADDR
 	kernel_ulong_t pc;
 # define ARCH_PC_REG pc
-# define ARCH_GET_PC upeek(tcp->pid, ARCH_PC_PEEK_ADDR, &pc)
+# define ARCH_GET_PC upeek(tcp, ARCH_PC_PEEK_ADDR, &pc)
 #else
 # error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
 #endif

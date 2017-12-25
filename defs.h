@@ -450,7 +450,7 @@ umoven_or_printaddr_ignore_syserror(struct tcb *, kernel_ulong_t addr,
 extern int
 umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
 
-extern int upeek(int pid, unsigned long, kernel_ulong_t *);
+extern int upeek(struct tcb *tcp, unsigned long, kernel_ulong_t *);
 extern int upoke(struct tcb *tcp, unsigned long, kernel_ulong_t);
 
 extern bool

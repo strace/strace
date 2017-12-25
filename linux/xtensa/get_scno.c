@@ -2,5 +2,5 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	return upeek(tcp->pid, SYSCALL_NR, &tcp->scno) < 0 ? -1 : 1;
+	return upeek(tcp, SYSCALL_NR, &tcp->scno) < 0 ? -1 : 1;
 }
