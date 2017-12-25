@@ -49,6 +49,10 @@ extern int ptrace_upeek(struct tcb *tcp, unsigned long off,
 			kernel_ulong_t *res);
 extern int ptrace_upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val);
 
+#if ADDITIONAL_TRACING_BACKENDS
+
 extern const struct tracing_backend ptrace_backend;
+
+#endif /* ADDITIONAL_TRACING_BACKENDS */
 
 #endif /* !STRACE_PTRACE_BACKEND_H */

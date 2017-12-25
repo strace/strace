@@ -9,19 +9,25 @@
 
 #include "defs.h"
 
-#include <assert.h>
 #include <fcntl.h>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include "tracing_backend.h"
+
+
+#if ADDITIONAL_TRACING_BACKENDS
+
+#include <assert.h>
 #include <limits.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/xattr.h>
 
-#include "tracing_backend.h"
 #include "ptrace_backend.h"
 
 /* Tracing backeng management functions */
@@ -164,3 +170,5 @@ local_recvmsg(struct tcb *tcp, int fd, struct msghdr *msg, int flags)
 {
 	return recvmsg(fd, msg, flags);
 }
+
+#endif  /* ADDITIONAL_TRACING_BACKENDS */

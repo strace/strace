@@ -48,6 +48,8 @@ AC_SUBST([COPYRIGHT_YEAR], [copyright_year])
 AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
 AC_SUBST([MANPAGE_DATE], [manpage_date])
 
+m4_define([additional_tracing_backends], [0])
+
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
 arch_mx32=
@@ -923,6 +925,9 @@ st_MPERS([mx32], [x86_64])
 
 AX_VALGRIND_DFLT([sgcheck], [off])
 AX_VALGRIND_CHECK
+
+AC_DEFINE([ADDITIONAL_TRACING_BACKENDS], additional_tracing_backends,
+          [Whether additional tracing backends are available])
 
 AC_CONFIG_FILES([Makefile
 		 tests/Makefile
