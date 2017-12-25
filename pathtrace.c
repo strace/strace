@@ -102,7 +102,7 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
  * version of the path.  Specifying NULL will delete all paths.
  */
 void
-pathtrace_select_set(const char *path, struct path_set *set)
+pathtrace_select_set(struct tcb *tcp, const char *path, struct path_set *set)
 {
 	char *rpath;
 
