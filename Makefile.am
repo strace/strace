@@ -264,8 +264,11 @@ strace_SOURCES =	\
 	process_vm.c	\
 	ptp.c		\
 	ptrace.h	\
+	ptrace_backend.c \
+	ptrace_backend.h \
 	ptrace_syscall_info.c \
 	ptrace_syscall_info.h \
+	ptrace_wait_data.h \
 	quota.c		\
 	random_ioctl.c	\
 	readahead.c	\
@@ -331,10 +334,13 @@ strace_SOURCES =	\
 	sysinfo.c	\
 	syslog.c	\
 	sysmips.c	\
+	tcb_wait_data.h	\
 	term.c		\
 	time.c		\
 	times.c		\
 	trace_event.h	\
+	tracing_backend.c \
+	tracing_backend.h \
 	truncate.c	\
 	ubi.c		\
 	ucopy.c		\

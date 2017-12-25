@@ -86,7 +86,7 @@ send_query(struct tcb *tcp, const int fd, void *req, size_t req_size)
 	};
 
 	for (;;) {
-		if (sendmsg(fd, &msg, 0) < 0) {
+		if (tracee_sendmsg(tcp, fd, &msg, 0) < 0) {
 			if (errno == EINTR)
 				continue;
 			return false;
@@ -207,7 +207,7 @@ receive_responses(struct tcb *tcp, const int fd, const unsigned long inode,
 			.msg_iovlen = 1
 		};
 
-		ssize_t ret = recvmsg(fd, &msg, flags);
+		ssize_t ret = tracee_recvmsg(tcp, fd, &msg, flags);
 		if (ret < 0) {
 			if (errno == EINTR)
 				continue;
@@ -502,7 +502,8 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].get))
 		return NULL;
 
-	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
+	const int fd = tracee_socket(tcp, AF_NETLINK, SOCK_RAW,
+				     NETLINK_SOCK_DIAG);
 	if (fd < 0)
 		return NULL;
 	const char *details = NULL;
@@ -654,7 +655,8 @@ genl_families_xlat(struct tcb *tcp)
 	if (!dyxlat) {
 		dyxlat = dyxlat_alloc(32);
 
-		int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+		int fd = tracee_socket(tcp, AF_NETLINK, SOCK_RAW,
+				       NETLINK_GENERIC);
 		if (fd < 0)
 			goto out;
 

@@ -11,7 +11,7 @@
 #include "ptrace_pokeuser.c"
 
 int
-upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val)
+ptrace_upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val)
 {
 	if (ptrace_pokeuser(tcp->pid, off, val) < 0) {
 		if (errno != ESRCH)

@@ -189,6 +189,8 @@ struct inject_opts {
 
 # define MAX_ERRNO_VALUE			4095
 
+struct tcb_wait_data;
+
 /* Trace Control Block */
 struct tcb {
 	int flags;		/* See below for TCB_ values */
@@ -447,8 +449,8 @@ extern int read_int_from_file(struct tcb *, const char *, int *);
 extern void set_sortby(const char *);
 extern void set_overhead(int);
 
-extern bool get_instruction_pointer(struct tcb *, kernel_ulong_t *);
-extern bool get_stack_pointer(struct tcb *, kernel_ulong_t *);
+extern bool generic_get_instruction_pointer(struct tcb *, kernel_ulong_t *);
+extern bool generic_get_stack_pointer(struct tcb *, kernel_ulong_t *);
 extern void print_instruction_pointer(struct tcb *);
 
 extern void print_syscall_resume(struct tcb *tcp);
@@ -464,8 +466,6 @@ extern void syscall_exiting_finish(struct tcb *);
 extern void count_syscall(struct tcb *, const struct timespec *);
 extern void call_summary(FILE *);
 
-extern void clear_regs(struct tcb *tcp);
-extern int get_scno(struct tcb *);
 extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
 
 /**
@@ -519,8 +519,6 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 /**
  * @return 0 on success, -1 on error.
  */
-extern int
-umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 # define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
@@ -590,15 +588,6 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,
 # define umove_or_printaddr_ignore_syserror(pid, addr, objp)	\
 	umoven_or_printaddr_ignore_syserror((pid), (addr), sizeof(*(objp)), \
 					    (void *) (objp))
-
-/**
- * @return strlen + 1 on success, 0 on success and no NUL seen, -1 on error.
- */
-extern int
-umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
-
-extern int upeek(struct tcb *tcp, unsigned long, kernel_ulong_t *);
-extern int upoke(struct tcb *tcp, unsigned long, kernel_ulong_t);
 
 # if HAVE_ARCH_GETRVAL2
 extern long getrval2(struct tcb *);
@@ -1046,6 +1035,8 @@ extern void unwind_tcb_capture(struct tcb *);
 extern void kvm_run_structure_decoder_init(void);
 extern void kvm_vcpu_info_free(struct tcb *);
 # endif
+
+# include "tracing_backend.h"
 
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
