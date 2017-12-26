@@ -730,6 +730,10 @@ where pid is the numeric process id of each process.
 This is incompatible with
 .BR \-c ,
 since no per-process counts are kept.
+
+One might want to consider using
+.BR strace-log-merge (1)
+to obtain a combined strace log view.
 .TP
 .BI "\-I " interruptible
 When strace can be interrupted by signals (such as pressing ^C).
@@ -952,6 +956,7 @@ should be reported to the
 .B strace
 mailing list at <strace\-devel@lists.sourceforge.net>.
 .SH "SEE ALSO"
+.BR strace-log-merge (1),
 .BR ltrace (1),
 .BR perf-trace (1),
 .BR trace-cmd (1),
