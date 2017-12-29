@@ -1,0 +1,7 @@
+#!/bin/sh
+# Check strace -k symbol names demangling.
+
+test_prog=../stack-fcall-mangled
+expected='getpid ns::f3 ns::f2 ns::f1 ns::f0 main '
+
+. "${srcdir=.}"/strace-k.test

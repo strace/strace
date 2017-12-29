@@ -415,6 +415,7 @@ socketcall
 sockopt-sol_netlink
 splice
 stack-fcall
+stack-fcall-mangled
 stat
 stat64
 statfs

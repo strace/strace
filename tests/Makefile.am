@@ -144,6 +144,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	signal_receive \
 	sleep \
 	stack-fcall \
+	stack-fcall-mangled \
 	threads-execve \
 	unblock_reset_raise \
 	unix-pair-send-recv \
@@ -183,10 +184,17 @@ uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
 
+stack_fcall_mangled_SOURCES = stack-fcall-mangled.c \
+	stack-fcall-mangled-0.c stack-fcall-mangled-1.c \
+	stack-fcall-mangled-2.c stack-fcall-mangled-3.c
+
 include gen_tests.am
 
 if USE_LIBUNWIND
 LIBUNWIND_TESTS = strace-k.test
+if USE_DEMANGLE
+LIBUNWIND_TESTS += strace-k-demangle.test
+endif
 else
 LIBUNWIND_TESTS =
 endif
@@ -368,6 +376,7 @@ EXTRA_DIST = \
 	strace-E.expected \
 	strace-T.expected \
 	strace-ff.expected \
+	strace-k-demangle.test \
 	strace-k.test \
 	strace-r.expected \
 	strace.supp \
