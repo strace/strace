@@ -322,7 +322,9 @@ print_stack_frame(struct tcb *tcp,
 				cur_mmap_cache->mmap_offset;
 
 #ifdef USE_DEMANGLE
-			char *demangled_name = cplus_demangle(*symbol_name, 0);
+			char *demangled_name =
+				cplus_demangle(*symbol_name,
+					       DMGL_AUTO | DMGL_PARAMS);
 #endif
 
 			call_action(data,
