@@ -1,4 +1,4 @@
-int f3(int i);
+#include "stack-fcall.h"
 
 int f2(int i)
 {

@@ -363,6 +363,7 @@ EXTRA_DIST = \
 	setugid.c \
 	sigaltstack.expected \
 	sockname.c \
+	stack-fcall.h \
 	strace-C.expected \
 	strace-E.expected \
 	strace-T.expected \

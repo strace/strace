@@ -38,10 +38,12 @@
 check_prog sed
 check_prog tr
 
-run_prog ../stack-fcall
+: ${test_prog=../stack-fcall}
+: ${expected='getpid f3 f2 f1 f0 main '}
+
+run_prog "$test_prog"
 run_strace -e getpid -k $args
 
-expected='getpid f3 f2 f1 f0 main '
 result=$(sed -r -n '1,/\(main\+0x[a-f0-9]+\) .*/ s/^.*\(([^+]+)\+0x[a-f0-9]+\) .*/\1/p' "$LOG" |
 	tr '\n' ' ')
 
@@ -50,5 +52,3 @@ test "$result" = "$expected" || {
 	echo "result: \"$result\""
 	dump_log_and_fail_with "$STRACE $args output mismatch"
 }
-
-exit 0
