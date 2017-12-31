@@ -1560,7 +1560,7 @@ init(int argc, char *argv[])
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
 		program_invocation_name =
-			(argv[0] && *argv[0]) ? argv[0] : name;
+			(argc > 0 && argv[0] && *argv[0]) ? argv[0] : name;
 	}
 
 	strace_tracer_pid = getpid();
@@ -1708,11 +1708,11 @@ init(int argc, char *argv[])
 	argv += optind;
 	argc -= optind;
 
-	if (argc < 0 || (!argv[0] && !nprocs)) {
+	if (argc < 0 || (!nprocs && !argc)) {
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
 
-	if (!argv[0] && daemonized_tracer) {
+	if (!argc && daemonized_tracer) {
 		error_msg_and_help("PROG [ARGS] must be specified with -D");
 	}
 
@@ -1848,7 +1848,7 @@ init(int argc, char *argv[])
 	 * no		1	1	INTR_WHILE_WAIT
 	 */
 
-	if (outfname && argv[0]) {
+	if (outfname && argc) {
 		if (!opt_intr)
 			opt_intr = INTR_NEVER;
 		if (!qflag)
@@ -1863,7 +1863,7 @@ init(int argc, char *argv[])
 	 * Also we do not need to be protected by them as during interruption
 	 * in the startup_child() mode we kill the spawned process anyway.
 	 */
-	if (argv[0]) {
+	if (argc) {
 		startup_child(argv);
 	}
 
