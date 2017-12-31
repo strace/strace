@@ -76,12 +76,12 @@ esac
 	dump_log_and_fail_with \
 		'zeroargc strace failed to handle the error properly'
 cat > "$EXP" << __EOF__
-$STRACE_EXE: must have PROG [ARGS] or -p PID
+$STRACE_EXE: must have command line arguments
 Try '$STRACE_EXE -h' for more information.
 __EOF__
 diff -u -- "$EXP" "$LOG" > /dev/null || {
 	cat > "$EXP" <<- '__EOF__'
-	strace: must have PROG [ARGS] or -p PID
+	strace: must have command line arguments
 	Try 'strace -h' for more information.
 	__EOF__
 	match_diff "$LOG" "$EXP" \
