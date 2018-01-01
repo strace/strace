@@ -1583,6 +1583,11 @@ init(int argc, char *argv[])
 #endif
 	    "a:b:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxyz")) != EOF) {
 		switch (c) {
+		case 'a':
+			acolumn = string_to_uint(optarg);
+			if (acolumn < 0)
+				error_opt_arg(c, optarg);
+			break;
 		case 'b':
 			if (strcmp(optarg, "execve") != 0)
 				error_msg_and_die("Syscall '%s' for -b isn't supported",
@@ -1607,11 +1612,18 @@ init(int argc, char *argv[])
 		case 'D':
 			daemonized_tracer = 1;
 			break;
-		case 'F':
-			optF = 1;
+		case 'e':
+			qualify(optarg);
+			break;
+		case 'E':
+			if (putenv(optarg) < 0)
+				perror_msg_and_die("putenv");
 			break;
 		case 'f':
 			followfork++;
+			break;
+		case 'F':
+			optF = 1;
 			break;
 		case 'h':
 			usage();
@@ -1619,45 +1631,16 @@ init(int argc, char *argv[])
 		case 'i':
 			iflag = 1;
 			break;
-		case 'q':
-			qflag++;
-			break;
-		case 'r':
-			rflag = 1;
-			break;
-		case 't':
-			tflag++;
-			break;
-		case 'T':
-			Tflag = 1;
-			break;
-		case 'w':
-			count_wallclock = 1;
-			break;
-		case 'x':
-			xflag++;
-			break;
-		case 'y':
-			show_fd_path++;
-			break;
-		case 'v':
-			qualify("abbrev=none");
-			break;
-		case 'V':
-			print_version();
-			exit(0);
-			break;
-		case 'z':
-			not_failing_only = 1;
-			break;
-		case 'a':
-			acolumn = string_to_uint(optarg);
-			if (acolumn < 0)
+		case 'I':
+			opt_intr = string_to_uint_upto(optarg, NUM_INTR_OPTS - 1);
+			if (opt_intr <= 0)
 				error_opt_arg(c, optarg);
 			break;
-		case 'e':
-			qualify(optarg);
+#ifdef USE_LIBUNWIND
+		case 'k':
+			stack_trace_enabled = true;
 			break;
+#endif
 		case 'o':
 			outfname = optarg;
 			break;
@@ -1673,6 +1656,12 @@ init(int argc, char *argv[])
 		case 'P':
 			pathtrace_select(optarg);
 			break;
+		case 'q':
+			qflag++;
+			break;
+		case 'r':
+			rflag = 1;
+			break;
 		case 's':
 			i = string_to_uint(optarg);
 			if (i < 0 || (unsigned int) i > -1U / 4)
@@ -1682,22 +1671,33 @@ init(int argc, char *argv[])
 		case 'S':
 			set_sortby(optarg);
 			break;
+		case 't':
+			tflag++;
+			break;
+		case 'T':
+			Tflag = 1;
+			break;
 		case 'u':
 			username = optarg;
 			break;
-#ifdef USE_LIBUNWIND
-		case 'k':
-			stack_trace_enabled = true;
+		case 'v':
+			qualify("abbrev=none");
 			break;
-#endif
-		case 'E':
-			if (putenv(optarg) < 0)
-				perror_msg_and_die("putenv");
+		case 'V':
+			print_version();
+			exit(0);
 			break;
-		case 'I':
-			opt_intr = string_to_uint_upto(optarg, NUM_INTR_OPTS - 1);
-			if (opt_intr <= 0)
-				error_opt_arg(c, optarg);
+		case 'w':
+			count_wallclock = 1;
+			break;
+		case 'x':
+			xflag++;
+			break;
+		case 'y':
+			show_fd_path++;
+			break;
+		case 'z':
+			not_failing_only = 1;
 			break;
 		default:
 			error_msg_and_help(NULL);
