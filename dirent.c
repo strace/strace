@@ -75,6 +75,7 @@ SYS_FUNC(readdir)
 SYS_FUNC(getdents)
 {
 	unsigned int i, len, dents = 0;
+	bool len_was_capped = false;
 	unsigned char *buf;
 
 	if (entering(tcp)) {
@@ -92,8 +93,10 @@ SYS_FUNC(getdents)
 	}
 
 	/* Beware of insanely large or too small values in tcp->u_rval */
-	if (tcp->u_rval > 1024*1024)
+	if (tcp->u_rval > 1024*1024) {
 		len = 1024*1024;
+		len_was_capped = true;
+	}
 	else if (tcp->u_rval < (int) sizeof(kernel_dirent))
 		len = 0;
 	else
@@ -150,8 +153,11 @@ SYS_FUNC(getdents)
 	}
 	if (!abbrev(tcp))
 		tprints("]");
-	else
-		tprintf_comment("%u entries", dents);
+	else {
+		tprintf_comment("%s%u entries",
+			len_was_capped ? "more than " : "",
+			dents);
+	}
 	tprintf(", %u", count);
 	free(buf);
 	return 0;
