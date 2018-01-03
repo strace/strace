@@ -1002,7 +1002,8 @@ attach_tcb(struct tcb *const tcp)
 		return;
 	}
 
-	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
+	tcp->flags |= TCB_ATTACHED | TCB_GRABBED | TCB_STARTUP |
+		      post_attach_sigstop;
 	newoutf(tcp);
 	debug_msg("attach to pid %d (main) succeeded", tcp->pid);
 
@@ -1033,8 +1034,8 @@ attach_tcb(struct tcb *const tcp)
 			debug_msg("attach to pid %d succeeded", tid);
 
 			struct tcb *tid_tcp = alloctcb(tid);
-			tid_tcp->flags |= TCB_ATTACHED | TCB_STARTUP |
-					  post_attach_sigstop;
+			tid_tcp->flags |= TCB_ATTACHED | TCB_GRABBED |
+					  TCB_STARTUP | post_attach_sigstop;
 			newoutf(tid_tcp);
 		}
 
@@ -2149,7 +2150,7 @@ startup_tcb(struct tcb *tcp)
 		}
 	}
 
-	if (get_scno(tcp) == 1)
+	if ((tcp->flags & TCB_GRABBED) && (get_scno(tcp) == 1))
 		tcp->s_prev_ent = tcp->s_ent;
 }
 

@@ -244,6 +244,8 @@ struct tcb {
 #define TCB_TAMPERED	0x40	/* A syscall has been tampered with */
 #define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
 #define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x100	/* -b execve should skip detach on first execve */
+#define TCB_GRABBED	0x200 /* We grab the process and can catch it
+			       * in the middle of a syscall */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
