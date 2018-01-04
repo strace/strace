@@ -673,8 +673,8 @@ newoutf(struct tcb *tcp)
 {
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
-		char name[520 + sizeof(int) * 3];
-		sprintf(name, "%.512s.%u", outfname, tcp->pid);
+		char name[PATH_MAX];
+		sprintf(name, "%s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
 	}
 }
@@ -1831,6 +1831,9 @@ init(int argc, char *argv[])
 			shared_log = strace_popen(outfname + 1);
 		} else if (followfork < 2) {
 			shared_log = strace_fopen(outfname);
+		} else if (strlen(outfname) >= PATH_MAX - sizeof(int) * 3) {
+			errno = ENAMETOOLONG;
+			perror_msg_and_die("%s", outfname);
 		}
 	} else {
 		/* -ff without -o FILE is the same as single -f */
