@@ -58,6 +58,13 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_U_CAST(", ", desc, limit_in_pages, unsigned int);
 	PRINT_FIELD_U_CAST(", ", desc, seg_not_present, unsigned int);
 	PRINT_FIELD_U_CAST(", ", desc, useable, unsigned int);
+
+# ifdef HAVE_STRUCT_USER_DESC_LM
+	/* lm is totally ignored for 32-bit processes */
+	if (current_klongsize == 8)
+		PRINT_FIELD_U_CAST(", ", desc, lm, unsigned int);
+# endif /* HAVE_STRUCT_USER_DESC_LM */
+
 	tprints("}");
 }
 
