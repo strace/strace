@@ -945,6 +945,8 @@ extern const char *const errnoent0[];
 extern const char *const signalent0[];
 extern const struct_ioctlent ioctlent0[];
 
+extern const char *const personality_names[];
+
 #if SUPPORTED_PERSONALITIES > 1
 extern const struct_sysent *sysent;
 extern const char *const *errnoent;

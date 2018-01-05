@@ -212,7 +212,20 @@ const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 #endif
 };
 
+const char *const personality_names[] =
+# if defined X86_64
+	{"64 bit", "32 bit", "x32"}
+# elif defined X32
+	{"x32", "32 bit"}
+# elif SUPPORTED_PERSONALITIES == 2
+	{"64 bit", "32 bit"}
+# else
+	{STRINGIFY_VAL(__WORDSIZE) " bit"}
+# endif
+	;
+
 #if SUPPORTED_PERSONALITIES > 1
+
 unsigned current_personality;
 
 # ifndef current_wordsize
@@ -297,21 +310,10 @@ update_personality(struct tcb *tcp, unsigned int personality)
 		return;
 	tcp->currpers = personality;
 
-# undef PERSONALITY_NAMES
-# if defined X86_64
-#  define PERSONALITY_NAMES {"64 bit", "32 bit", "x32"}
-# elif defined X32
-#  define PERSONALITY_NAMES {"x32", "32 bit"}
-# elif SUPPORTED_PERSONALITIES == 2
-#  define PERSONALITY_NAMES {"64 bit", "32 bit"}
-# endif
-# ifdef PERSONALITY_NAMES
 	if (!qflag) {
-		static const char *const names[] = PERSONALITY_NAMES;
 		error_msg("[ Process PID=%d runs in %s mode. ]",
-			  tcp->pid, names[personality]);
+			  tcp->pid, personality_names[personality]);
 	}
-# endif
 }
 #endif
 
