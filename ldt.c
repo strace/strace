@@ -38,6 +38,7 @@
 
 # include <asm/ldt.h>
 
+# include "print_fields.h"
 # include "xstring.h"
 
 void
@@ -48,24 +49,16 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &desc))
 		return;
 
-	tprintf("{entry_number:%d, "
-		"base_addr:%#08x, "
-		"limit:%d, "
-		"seg_32bit:%d, "
-		"contents:%d, "
-		"read_exec_only:%d, "
-		"limit_in_pages:%d, "
-		"seg_not_present:%d, "
-		"useable:%d}",
-		desc.entry_number,
-		desc.base_addr,
-		desc.limit,
-		desc.seg_32bit,
-		desc.contents,
-		desc.read_exec_only,
-		desc.limit_in_pages,
-		desc.seg_not_present,
-		desc.useable);
+	PRINT_FIELD_ID("{",  desc, entry_number);
+	PRINT_FIELD_0X(", ", desc, base_addr);
+	PRINT_FIELD_0X(", ", desc, limit);
+	PRINT_FIELD_U_CAST(", ", desc, seg_32bit, unsigned int);
+	PRINT_FIELD_U_CAST(", ", desc, contents, unsigned int);
+	PRINT_FIELD_U_CAST(", ", desc, read_exec_only, unsigned int);
+	PRINT_FIELD_U_CAST(", ", desc, limit_in_pages, unsigned int);
+	PRINT_FIELD_U_CAST(", ", desc, seg_not_present, unsigned int);
+	PRINT_FIELD_U_CAST(", ", desc, useable, unsigned int);
+	tprints("}");
 }
 
 SYS_FUNC(modify_ldt)
@@ -93,7 +86,7 @@ SYS_FUNC(set_thread_area)
 		} else {
 			static char outstr[32];
 
-			xsprintf(outstr, "entry_number:%d", desc.entry_number);
+			xsprintf(outstr, "entry_number=%u", desc.entry_number);
 			tcp->auxstr = outstr;
 			return RVAL_STR;
 		}
