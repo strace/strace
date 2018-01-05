@@ -51,6 +51,7 @@
 #include "ptrace.h"
 #include "printsiginfo.h"
 #include "trace_event.h"
+#include "xstring.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -185,7 +186,7 @@ strerror(int err_no)
 	static char buf[sizeof("Unknown error %d") + sizeof(int)*3];
 
 	if (err_no < 1 || err_no >= sys_nerr) {
-		sprintf(buf, "Unknown error %d", err_no);
+		xsprintf(buf, "Unknown error %d", err_no);
 		return buf;
 	}
 	return sys_errlist[err_no];
@@ -674,7 +675,7 @@ newoutf(struct tcb *tcp)
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
 		char name[PATH_MAX];
-		sprintf(name, "%s.%u", outfname, tcp->pid);
+		xsprintf(name, "%s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
 	}
 }
@@ -1013,7 +1014,7 @@ attach_tcb(struct tcb *const tcp)
 	unsigned int ntid = 0, nerr = 0;
 
 	if (followfork && tcp->pid != strace_child &&
-	    sprintf(procdir, "/proc/%d/task", tcp->pid) > 0 &&
+	    xsprintf(procdir, "/proc/%d/task", tcp->pid) > 0 &&
 	    (dir = opendir(procdir)) != NULL) {
 		struct_dirent *de;
 
@@ -1961,17 +1962,17 @@ print_debug_info(const int pid, int status)
 	strcpy(buf, "???");
 	if (WIFSIGNALED(status))
 #ifdef WCOREDUMP
-		sprintf(buf, "WIFSIGNALED,%ssig=%s",
+		xsprintf(buf, "WIFSIGNALED,%ssig=%s",
 				WCOREDUMP(status) ? "core," : "",
 				signame(WTERMSIG(status)));
 #else
-		sprintf(buf, "WIFSIGNALED,sig=%s",
+		xsprintf(buf, "WIFSIGNALED,sig=%s",
 				signame(WTERMSIG(status)));
 #endif
 	if (WIFEXITED(status))
-		sprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
+		xsprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 	if (WIFSTOPPED(status))
-		sprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
+		xsprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
 	evbuf[0] = '\0';
 	if (event != 0) {
 		static const char *const event_names[] = {
@@ -1988,7 +1989,7 @@ print_debug_info(const int pid, int status)
 			e = event_names[event];
 		else if (event == PTRACE_EVENT_STOP)
 			e = "STOP";
-		sprintf(evbuf, ",EVENT_%s (%u)", e, event);
+		xsprintf(evbuf, ",EVENT_%s (%u)", e, event);
 	}
 	error_msg("[wait(0x%06x) = %u] %s%s", status, pid, buf, evbuf);
 }
