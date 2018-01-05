@@ -236,8 +236,8 @@ call_summary(FILE *outf)
 			set_personality(i);
 		if (i)
 			fprintf(outf,
-				"System call usage summary for %d bit mode:\n",
-				current_wordsize * 8);
+				"System call usage summary for %s mode:\n",
+				personality_names[i]);
 		call_summary_pers(outf);
 	}
 
