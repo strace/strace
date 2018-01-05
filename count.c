@@ -40,7 +40,7 @@
 struct call_counts {
 	/* time may be total latency or system time */
 	struct timeval time;
-	int calls, errors;
+	unsigned int calls, errors;
 };
 
 static struct call_counts *countv[SUPPORTED_PERSONALITIES];
@@ -155,12 +155,11 @@ static void
 call_summary_pers(FILE *outf)
 {
 	unsigned int i;
-	int     call_cum, error_cum;
+	unsigned int call_cum, error_cum;
 	struct timeval tv_cum, dtv;
 	double  float_tv_cum;
 	double  percent;
 	const char *dashes = "----------------";
-	char    error_str[sizeof(int)*3];
 	int    *sorted_count;
 
 	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
@@ -196,31 +195,25 @@ call_summary_pers(FILE *outf)
 			if (cc->calls == 0)
 				continue;
 			tv_div(&dtv, &cc->time, cc->calls);
-			error_str[0] = '\0';
-			if (cc->errors)
-				sprintf(error_str, "%u", cc->errors);
 			float_syscall_time = tv_float(&cc->time);
 			percent = (100.0 * float_syscall_time);
 			if (percent != 0.0)
 				   percent /= float_tv_cum;
 			/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
-			fprintf(outf, "%6.2f %11.6f %11lu %9u %9.9s %s\n",
+			fprintf(outf, "%6.2f %11.6f %11lu %9u %9.u %s\n",
 				percent, float_syscall_time,
 				(long) (1000000 * dtv.tv_sec + dtv.tv_usec),
 				cc->calls,
-				error_str, sysent[idx].sys_name);
+				cc->errors, sysent[idx].sys_name);
 		}
 	}
 	free(sorted_count);
 
 	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
 		dashes, dashes, dashes, dashes, dashes, dashes);
-	error_str[0] = '\0';
-	if (error_cum)
-		sprintf(error_str, "%u", error_cum);
-	fprintf(outf, "%6.6s %11.6f %11.11s %9u %9.9s %s\n",
+	fprintf(outf, "%6.6s %11.6f %11.11s %9u %9.u %s\n",
 		"100.00", float_tv_cum, "",
-		call_cum, error_str, "total");
+		call_cum, error_cum, "total");
 }
 
 void
