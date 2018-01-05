@@ -70,7 +70,7 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr)
 
 SYS_FUNC(modify_ldt)
 {
-	tprintf("%" PRI_kld ", ", tcp->u_arg[0]);
+	tprintf("%d, ", (int) tcp->u_arg[0]);
 	if (tcp->u_arg[2] != sizeof(struct user_desc))
 		printaddr(tcp->u_arg[1]);
 	else
