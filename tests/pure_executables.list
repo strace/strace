@@ -154,6 +154,7 @@ mmap
 mmap64
 mmsg
 mmsg_name
+modify_ldt
 mount
 move_pages
 mq

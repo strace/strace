@@ -190,6 +190,7 @@ mmsg
 mmsg-silent
 mmsg_name
 mmsg_name-v
+modify_ldt
 mount
 move_pages
 mq
