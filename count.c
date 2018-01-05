@@ -154,19 +154,22 @@ void set_overhead(int n)
 static void
 call_summary_pers(FILE *outf)
 {
+	static const char dashes[]  = "----------------";
+	static const char header[]  = "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n";
+	static const char data[]    = "%6.2f %11.6f %11lu %9u %9.u %s\n";
+	static const char summary[] = "%6.6s %11.6f %11.11s %9u %9.u %s\n";
+
 	unsigned int i;
 	unsigned int call_cum, error_cum;
 	struct timeval tv_cum, dtv;
 	double  float_tv_cum;
 	double  percent;
-	const char *dashes = "----------------";
 	int    *sorted_count;
 
-	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
+	fprintf(outf, header,
 		"% time", "seconds", "usecs/call",
 		"calls", "errors", "syscall");
-	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
-		dashes, dashes, dashes, dashes, dashes, dashes);
+	fprintf(outf, header, dashes, dashes, dashes, dashes, dashes, dashes);
 
 	sorted_count = xcalloc(sizeof(int), nsyscalls);
 	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
@@ -200,7 +203,7 @@ call_summary_pers(FILE *outf)
 			if (percent != 0.0)
 				   percent /= float_tv_cum;
 			/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
-			fprintf(outf, "%6.2f %11.6f %11lu %9u %9.u %s\n",
+			fprintf(outf, data,
 				percent, float_syscall_time,
 				(long) (1000000 * dtv.tv_sec + dtv.tv_usec),
 				cc->calls,
@@ -209,9 +212,8 @@ call_summary_pers(FILE *outf)
 	}
 	free(sorted_count);
 
-	fprintf(outf, "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n",
-		dashes, dashes, dashes, dashes, dashes, dashes);
-	fprintf(outf, "%6.6s %11.6f %11.11s %9u %9.u %s\n",
+	fprintf(outf, header, dashes, dashes, dashes, dashes, dashes, dashes);
+	fprintf(outf, summary,
 		"100.00", float_tv_cum, "",
 		call_cum, error_cum, "total");
 }
