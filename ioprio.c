@@ -27,6 +27,7 @@
  */
 
 #include "defs.h"
+#include "xstring.h"
 
 enum {
 	IOPRIO_WHO_PROCESS = 1,
@@ -62,10 +63,10 @@ sprint_ioprio(unsigned int ioprio)
 	data = IOPRIO_PRIO_DATA(ioprio);
 	str = xlookup(ioprio_class, class);
 	if (str)
-		sprintf(outstr, "IOPRIO_PRIO_VALUE(%s, %d)", str, data);
+		xsprintf(outstr, "IOPRIO_PRIO_VALUE(%s, %d)", str, data);
 	else
-		sprintf(outstr, "IOPRIO_PRIO_VALUE(%#x /* %s */, %d)",
-			class, "IOPRIO_CLASS_???", data);
+		xsprintf(outstr, "IOPRIO_PRIO_VALUE(%#x /* %s */, %d)",
+			 class, "IOPRIO_CLASS_???", data);
 
 	return outstr;
 }
