@@ -38,6 +38,8 @@
 
 # include <asm/ldt.h>
 
+# include "xstring.h"
+
 void
 print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -91,7 +93,7 @@ SYS_FUNC(set_thread_area)
 		} else {
 			static char outstr[32];
 
-			sprintf(outstr, "entry_number:%d", desc.entry_number);
+			xsprintf(outstr, "entry_number:%d", desc.entry_number);
 			tcp->auxstr = outstr;
 			return RVAL_STR;
 		}
