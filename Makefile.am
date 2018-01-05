@@ -327,6 +327,7 @@ strace_SOURCES =	\
 	xlat.h		\
 	xmalloc.c	\
 	xmalloc.h	\
+	xstring.h	\
 	# end of strace_SOURCES
 
 if USE_LIBUNWIND
