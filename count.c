@@ -164,14 +164,14 @@ call_summary_pers(FILE *outf)
 	struct timeval tv_cum, dtv;
 	double  float_tv_cum;
 	double  percent;
-	int    *sorted_count;
+	unsigned int *sorted_count;
 
 	fprintf(outf, header,
 		"% time", "seconds", "usecs/call",
 		"calls", "errors", "syscall");
 	fprintf(outf, header, dashes, dashes, dashes, dashes, dashes, dashes);
 
-	sorted_count = xcalloc(sizeof(int), nsyscalls);
+	sorted_count = xcalloc(sizeof(sorted_count[0]), nsyscalls);
 	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
 	if (overhead.tv_sec == -1) {
 		tv_mul(&overhead, &shortest, 8);
@@ -190,10 +190,11 @@ call_summary_pers(FILE *outf)
 	float_tv_cum = tv_float(&tv_cum);
 	if (counts) {
 		if (sortfun)
-			qsort((void *) sorted_count, nsyscalls, sizeof(int), sortfun);
+			qsort((void *) sorted_count, nsyscalls,
+			      sizeof(sorted_count[0]), sortfun);
 		for (i = 0; i < nsyscalls; i++) {
 			double float_syscall_time;
-			int idx = sorted_count[i];
+			unsigned int idx = sorted_count[i];
 			struct call_counts *cc = &counts[idx];
 			if (cc->calls == 0)
 				continue;
