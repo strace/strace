@@ -70,14 +70,28 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr)
 
 SYS_FUNC(modify_ldt)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
-	if (tcp->u_arg[2] != sizeof(struct user_desc))
-		printaddr(tcp->u_arg[1]);
-	else
-		print_user_desc(tcp, tcp->u_arg[1]);
-	tprintf(", %" PRI_klu, tcp->u_arg[2]);
+	if (entering(tcp)) {
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+		if (tcp->u_arg[2] != sizeof(struct user_desc))
+			printaddr(tcp->u_arg[1]);
+		else
+			print_user_desc(tcp, tcp->u_arg[1]);
+		tprintf(", %" PRI_klu, tcp->u_arg[2]);
 
-	return RVAL_DECODED;
+		return 0;
+	}
+
+	/*
+	 * For some reason ("tht ABI for sys_modify_ldt() expects
+	 * 'int'"), modify_ldt clips higher bits on x86_64.
+	 */
+
+	if (syserror(tcp) || (kernel_ulong_t) tcp->u_rval < 0xfffff000)
+		return 0;
+
+	tcp->u_error = -(unsigned int) tcp->u_rval;
+
+	return RVAL_PRINT_ERR_VAL;
 }
 
 SYS_FUNC(set_thread_area)
