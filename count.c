@@ -207,8 +207,7 @@ call_summary_pers(FILE *outf)
 			fprintf(outf, data,
 				percent, float_syscall_time,
 				(long) (1000000 * dtv.tv_sec + dtv.tv_usec),
-				cc->calls,
-				cc->errors, sysent[idx].sys_name);
+				cc->calls, cc->errors, sysent[idx].sys_name);
 		}
 	}
 	free(sorted_count);
