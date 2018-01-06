@@ -34,6 +34,7 @@
  */
 
 #include "defs.h"
+#include "xstring.h"
 
 #include <fcntl.h>
 
@@ -110,7 +111,7 @@ sprint_open_modes(unsigned int flags)
 	}
 	/* flags is still nonzero */
 	*p++ = sep;
-	sprintf(p, "%#x", flags);
+	xsnprintf(p, sizeof(outstr) - (p - outstr), "%#x", flags);
 	return outstr;
 }
 
