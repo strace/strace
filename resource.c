@@ -32,6 +32,8 @@
 #include "defs.h"
 #include <sys/resource.h>
 
+#include "xstring.h"
+
 #include "xlat/resources.h"
 
 static const char *
@@ -43,9 +45,9 @@ sprint_rlim64(uint64_t lim)
 		return "RLIM64_INFINITY";
 
 	if (lim > 1024 && lim % 1024 == 0)
-		sprintf(buf, "%" PRIu64 "*1024", lim / 1024);
+		xsprintf(buf, "%" PRIu64 "*1024", lim / 1024);
 	else
-		sprintf(buf, "%" PRIu64, lim);
+		xsprintf(buf, "%" PRIu64, lim);
 	return buf;
 }
 
@@ -74,9 +76,9 @@ sprint_rlim32(uint32_t lim)
 		return "RLIM_INFINITY";
 
 	if (lim > 1024 && lim % 1024 == 0)
-		sprintf(buf, "%" PRIu32 "*1024", lim / 1024);
+		xsprintf(buf, "%" PRIu32 "*1024", lim / 1024);
 	else
-		sprintf(buf, "%" PRIu32, lim);
+		xsprintf(buf, "%" PRIu32, lim);
 	return buf;
 }
 
