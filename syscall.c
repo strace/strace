@@ -59,6 +59,7 @@
 #endif
 
 #include "syscall.h"
+#include "xstring.h"
 
 /* Define these shorthand notations to simplify the syscallent files. */
 #include "sysent_shorthand_defs.h"
@@ -1203,7 +1204,7 @@ get_scno(struct tcb *tcp)
 		s->ent.sen = SEN_printargs;
 		s->ent.sys_func = printargs;
 		s->ent.sys_name = s->buf;
-		sprintf(s->buf, "syscall_%" PRI_klu, shuffle_scno(tcp->scno));
+		xsprintf(s->buf, "syscall_%" PRI_klu, shuffle_scno(tcp->scno));
 
 		tcp->s_ent = &s->ent;
 		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
