@@ -32,6 +32,7 @@
 #include <poll.h>
 
 #include "syscall.h"
+#include "xstring.h"
 
 struct path_set global_path_set;
 
@@ -105,7 +106,7 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 	if (fd < 0)
 		return -1;
 
-	sprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
+	xsprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
 	n = readlink(linkpath, buf, bufsize - 1);
 	/*
 	 * NB: if buf is too small, readlink doesn't fail,
