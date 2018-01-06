@@ -46,6 +46,8 @@
 # define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
 #endif
 
+#include "xstring.h"
+
 typedef struct {
 	unsigned long inode;
 	char *details;
@@ -310,7 +312,7 @@ unix_parse_response(const void *data, const int data_len,
 
 	char peer_str[3 + sizeof(peer) * 3];
 	if (peer)
-		snprintf(peer_str, sizeof(peer_str), "->%u", peer);
+		xsprintf(peer_str, "->%u", peer);
 	else
 		peer_str[0] = '\0';
 
