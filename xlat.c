@@ -30,6 +30,7 @@
  */
 
 #include "defs.h"
+#include "xstring.h"
 #include <stdarg.h>
 
 const char *
@@ -175,7 +176,8 @@ sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
 	if (flags) {
 		if (found)
 			*outptr++ = '|';
-		outptr += sprintf(outptr, "%#" PRIx64, flags);
+		outptr += xsnprintf(outptr, sizeof(outstr) - (outptr - outstr),
+				    "%#" PRIx64, flags);
 	}
 
 	return outstr;
