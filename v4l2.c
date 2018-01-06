@@ -58,6 +58,7 @@ typedef struct v4l2_standard struct_v4l2_standard;
 #include MPERS_DEFS
 
 #include "print_fields.h"
+#include "xstring.h"
 
 /* some historical constants */
 #ifndef V4L2_CID_HCENTER
@@ -975,7 +976,7 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (syserror(tcp) || umove(tcp, arg, &b))
 		return RVAL_IOCTL_DECODED;
 
-	sprintf(outstr, fmt, b.index, b.count);
+	xsprintf(outstr, fmt, b.index, b.count);
 	tcp->auxstr = outstr;
 
 	return RVAL_IOCTL_DECODED | RVAL_STR;
