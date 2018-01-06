@@ -30,6 +30,7 @@
  */
 
 #include "defs.h"
+#include "xstring.h"
 
 SYS_FUNC(close)
 {
@@ -157,7 +158,9 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 				/* +2 chars needed at the end: ']',NUL */
 				if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
 					if (first) {
-						outptr += sprintf(outptr, "%s%s [%u",
+						outptr += xsnprintf(outptr,
+							sizeof(outstr) - (outptr - outstr),
+							"%s%s [%u",
 							sep,
 							i == 0 ? "in" : i == 1 ? "out" : "except",
 							j
@@ -165,7 +168,9 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 						first = 0;
 						sep = ", ";
 					} else {
-						outptr += sprintf(outptr, " %u", j);
+						outptr += xsnprintf(outptr,
+							sizeof(outstr) - (outptr - outstr),
+							" %u", j);
 					}
 				}
 				if (--ready_fds == 0)
@@ -179,7 +184,9 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 		if (args[4]) {
 			const char *str = sprint_tv_ts(tcp, args[4]);
 			if (outptr + sizeof("left ") + strlen(sep) + strlen(str) < end_outstr) {
-				outptr += sprintf(outptr, "%sleft %s", sep, str);
+				outptr += xsnprintf(outptr,
+					sizeof(outstr) - (outptr - outstr),
+					"%sleft %s", sep, str);
 			}
 		}
 		*outptr = '\0';
