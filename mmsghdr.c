@@ -30,6 +30,7 @@
 
 #include "defs.h"
 #include "msghdr.h"
+#include "xstring.h"
 #include <limits.h>
 
 static int
@@ -240,8 +241,7 @@ SYS_FUNC(recvmmsg)
 			return 0;
 		/* timeout on exit */
 		static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
-		snprintf(str, sizeof(str), "left %s",
-			 sprint_timespec(tcp, tcp->u_arg[4]));
+		xsprintf(str, "left %s", sprint_timespec(tcp, tcp->u_arg[4]));
 		tcp->auxstr = str;
 		return RVAL_STR;
 	}
