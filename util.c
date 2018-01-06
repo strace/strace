@@ -40,6 +40,7 @@
 # include <sys/xattr.h>
 #endif
 #include <sys/uio.h>
+#include "xstring.h"
 
 int
 tv_nz(const struct timeval *a)
@@ -344,15 +345,9 @@ sprinttime_ex(const long long sec, const unsigned long long part_sec,
 	if (!pos)
 		return NULL;
 
-	if (part_sec > 0) {
-		int ret = snprintf(buf + pos, sizeof(buf) - pos, ".%0*llu",
-				   width, part_sec);
-
-		if (ret < 0 || (size_t) ret >= sizeof(buf) - pos)
-			return NULL;
-
-		pos += ret;
-	}
+	if (part_sec > 0)
+		pos += xsnprintf(buf + pos, sizeof(buf) - pos, ".%0*llu",
+				 width, part_sec);
 
 	return strftime(buf + pos, sizeof(buf) - pos, "%z", tmp) ? buf : NULL;
 }
@@ -387,7 +382,7 @@ getfdproto(struct tcb *tcp, int fd)
 	if (fd < 0)
 		return SOCK_PROTO_UNKNOWN;
 
-	sprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
+	xsprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
 	r = getxattr(path, "system.sockprotoname", buf, bufsize - 1);
 	if (r <= 0)
 		return SOCK_PROTO_UNKNOWN;
