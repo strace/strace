@@ -33,6 +33,8 @@ typedef struct timeval timeval_t;
 
 #include MPERS_DEFS
 
+#include "xstring.h"
+
 static const char timeval_fmt[]  = "{tv_sec=%lld, tv_usec=%llu}";
 
 static void
@@ -103,9 +105,9 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 		strcpy(buf, "NULL");
 	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 		   umove(tcp, addr, &t)) {
-		snprintf(buf, sizeof(buf), "%#" PRI_klx, addr);
+		xsprintf(buf, "%#" PRI_klx, addr);
 	} else {
-		snprintf(buf, sizeof(buf), timeval_fmt,
+		xsprintf(buf, timeval_fmt,
 			 (long long) t.tv_sec,
 			 zero_extend_signed_to_ull(t.tv_usec));
 	}
@@ -196,9 +198,9 @@ sprint_timeval32(struct tcb *const tcp, const kernel_ulong_t addr)
 		strcpy(buf, "NULL");
 	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 		   umove(tcp, addr, &t)) {
-		snprintf(buf, sizeof(buf), "%#" PRI_klx, addr);
+		xsprintf(buf, "%#" PRI_klx, addr);
 	} else {
-		snprintf(buf, sizeof(buf), timeval_fmt,
+		xsprintf(buf, timeval_fmt,
 			 (long long) t.tv_sec,
 			 zero_extend_signed_to_ull(t.tv_usec));
 	}
