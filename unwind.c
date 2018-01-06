@@ -33,6 +33,8 @@
 # include <demangle.h>
 #endif
 
+#include "xstring.h"
+
 #ifdef _LARGEFILE64_SOURCE
 # ifdef HAVE_FOPEN64
 #  define fopen_for_input fopen64
@@ -150,7 +152,7 @@ build_mmap_cache(struct tcb *tcp)
 
 	unw_flush_cache(libunwind_as, 0, 0);
 
-	sprintf(filename, "/proc/%u/maps", tcp->pid);
+	xsprintf(filename, "/proc/%u/maps", tcp->pid);
 	fp = fopen_for_input(filename, "r");
 	if (!fp) {
 		perror_msg("fopen: %s", filename);
