@@ -34,6 +34,7 @@
 
 #include "defs.h"
 #include "nsig.h"
+#include "xstring.h"
 
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */
@@ -137,12 +138,12 @@ signame(const int sig)
 			return signalent[s];
 #ifdef ASM_SIGRTMAX
 		if (s >= ASM_SIGRTMIN && s <= (unsigned int) ASM_SIGRTMAX) {
-			sprintf(buf, "SIGRT_%u", s - ASM_SIGRTMIN);
+			xsprintf(buf, "SIGRT_%u", s - ASM_SIGRTMIN);
 			return buf;
 		}
 #endif
 	}
-	sprintf(buf, "%d", sig);
+	xsprintf(buf, "%d", sig);
 	return buf;
 }
 
@@ -209,11 +210,13 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 		}
 #ifdef ASM_SIGRTMAX
 		else if (i >= ASM_SIGRTMIN && i <= ASM_SIGRTMAX) {
-			s += sprintf(s, "RT_%u", i - ASM_SIGRTMIN);
+			s += xsnprintf(s, sizeof(outstr) - (s - outstr),
+				       "RT_%u", i - ASM_SIGRTMIN);
 		}
 #endif
 		else {
-			s += sprintf(s, "%u", i);
+			s += xsnprintf(s, sizeof(outstr) - (s - outstr),
+				       "%u", i);
 		}
 		sep = ' ';
 	}
