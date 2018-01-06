@@ -29,6 +29,8 @@
 
 #ifdef ALPHA
 
+# include "xstring.h"
+
 static int
 decode_getxxid(struct tcb *tcp, const char *what)
 {
@@ -40,7 +42,7 @@ decode_getxxid(struct tcb *tcp, const char *what)
 		return 0;
 	static const char const fmt[] = "%s %ld";
 	static char outstr[sizeof(fmt) + 3 * sizeof(rval)];
-	snprintf(outstr, sizeof(outstr), fmt, what, rval);
+	xsprintf(outstr, fmt, what, rval);
 	tcp->auxstr = outstr;
 	return RVAL_STR;
 }
