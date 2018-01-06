@@ -29,6 +29,7 @@
 
 #include "defs.h"
 #include <poll.h>
+#include "xstring.h"
 
 #include "xlat/pollflags.h"
 
@@ -96,7 +97,9 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 				*outptr++ = '[';
 			else
 				outptr = stpcpy(outptr, ", ");
-			outptr += sprintf(outptr, "%#" PRI_klx, cur);
+			outptr += xsnprintf(outptr,
+					    sizeof(outstr) - (outptr - outstr),
+					    "%#" PRI_klx, cur);
 			break;
 		}
 		if (!fds.revents)
@@ -112,7 +115,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 
 		static const char fmt[] = "{fd=%d, revents=";
 		char fdstr[sizeof(fmt) + sizeof(int) * 3];
-		sprintf(fdstr, fmt, fds.fd);
+		xsprintf(fdstr, fmt, fds.fd);
 
 		const char *flagstr = sprintflags("", pollflags,
 						  (unsigned short) fds.revents);
