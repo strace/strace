@@ -1536,7 +1536,7 @@ get_os_release(void)
 }
 
 static void
-set_sigaction(int signo, void (*sighandler)(int), struct sigaction *oldact)
+set_sighandler(int signo, void (*sighandler)(int), struct sigaction *oldact)
 {
 	/* if signal handler is a function, add the signal to blocked_set */
 	if (sighandler != SIG_IGN && sighandler != SIG_DFL)
@@ -1767,7 +1767,7 @@ init(int argc, char *argv[])
 	sigprocmask(SIG_SETMASK, NULL, &start_set);
 	memcpy(&blocked_set, &start_set, sizeof(blocked_set));
 
-	set_sigaction(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
+	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled) {
@@ -1873,22 +1873,22 @@ init(int argc, char *argv[])
 		startup_child(argv);
 	}
 
-	set_sigaction(SIGTTOU, SIG_IGN, NULL);
-	set_sigaction(SIGTTIN, SIG_IGN, NULL);
+	set_sighandler(SIGTTOU, SIG_IGN, NULL);
+	set_sighandler(SIGTTIN, SIG_IGN, NULL);
 	if (opt_intr != INTR_ANYWHERE) {
 		if (opt_intr == INTR_BLOCK_TSTP_TOO)
-			set_sigaction(SIGTSTP, SIG_IGN, NULL);
+			set_sighandler(SIGTSTP, SIG_IGN, NULL);
 		/*
 		 * In interactive mode (if no -o OUTFILE, or -p PID is used),
 		 * fatal signals are blocked while syscall stop is processed,
 		 * and acted on in between, when waiting for new syscall stops.
 		 * In non-interactive mode, signals are ignored.
 		 */
-		set_sigaction(SIGHUP, interactive ? interrupt : SIG_IGN, NULL);
-		set_sigaction(SIGINT, interactive ? interrupt : SIG_IGN, NULL);
-		set_sigaction(SIGQUIT, interactive ? interrupt : SIG_IGN, NULL);
-		set_sigaction(SIGPIPE, interactive ? interrupt : SIG_IGN, NULL);
-		set_sigaction(SIGTERM, interactive ? interrupt : SIG_IGN, NULL);
+		set_sighandler(SIGHUP, interactive ? interrupt : SIG_IGN, NULL);
+		set_sighandler(SIGINT, interactive ? interrupt : SIG_IGN, NULL);
+		set_sighandler(SIGQUIT, interactive ? interrupt : SIG_IGN, NULL);
+		set_sighandler(SIGPIPE, interactive ? interrupt : SIG_IGN, NULL);
+		set_sighandler(SIGTERM, interactive ? interrupt : SIG_IGN, NULL);
 	}
 
 	if (nprocs != 0 || daemonized_tracer)
