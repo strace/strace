@@ -646,7 +646,7 @@ out:
 #else /* !HAVE_LINUX_GENETLINK_H */
 
 const struct xlat *
-genl_families_xlat(void)
+genl_families_xlat(struct tcb *tcp)
 {
 	return NULL;
 }
