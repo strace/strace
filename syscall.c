@@ -808,6 +808,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 	tprints(") ");
 	tabto();
 	unsigned long u_error = tcp->u_error;
+	kernel_long_t u_rval;
 
 	if (raw(tcp)) {
 		if (u_error) {
@@ -875,13 +876,15 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
 			break;
 		default:
+			u_rval = sys_res & RVAL_PRINT_ERR_VAL ?
+				 tcp->u_rval : -1;
 			u_error_str = err_name(u_error);
 			if (u_error_str)
-				tprintf("= -1 %s (%s)",
-					u_error_str, strerror(u_error));
+				tprintf("= %" PRI_kld " %s (%s)",
+					u_rval, u_error_str, strerror(u_error));
 			else
-				tprintf("= -1 %lu (%s)",
-					u_error, strerror(u_error));
+				tprintf("= %" PRI_kld " %lu (%s)",
+					u_rval, u_error, strerror(u_error));
 			break;
 		}
 		if (syscall_tampered(tcp))
