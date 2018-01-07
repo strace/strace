@@ -53,13 +53,9 @@ SYS_FUNC(personality)
 		return 0;
 
 	pers = tcp->u_rval;
-	const char *type = xlookup(personality_types, pers & PER_MASK);
-	char *p;
 	static char outstr[1024];
-	if (type)
-		p = stpcpy(outstr, type);
-	else
-		p = outstr + sprintf(outstr, "%#x /* %s */", pers & PER_MASK, "PER_???");
+	char *p = outstr + sprintxval(outstr, sizeof(outstr), personality_types,
+				      pers & PER_MASK, "PER_???");
 	pers &= ~PER_MASK;
 	if (pers)
 		strcpy(p, sprintflags("|", personality_flags, pers));
