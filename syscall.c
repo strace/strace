@@ -713,12 +713,6 @@ syscall_entering_finish(struct tcb *tcp, int res)
 		gettimeofday(&tcp->etime, NULL);
 }
 
-static bool
-syscall_tampered(struct tcb *tcp)
-{
-	return tcp->flags & TCB_TAMPERED;
-}
-
 /* Returns:
  * 0: "bail out".
  * 1: ok.

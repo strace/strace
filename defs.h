@@ -266,6 +266,7 @@ struct tcb {
 #define inject(tcp)	((tcp)->qual_flg & QUAL_INJECT)
 #define filtered(tcp)	((tcp)->flags & TCB_FILTERED)
 #define hide_log(tcp)	((tcp)->flags & TCB_HIDE_LOG)
+#define syscall_tampered(tcp)	((tcp)->flags & TCB_TAMPERED)
 
 #include "xlat.h"
 
