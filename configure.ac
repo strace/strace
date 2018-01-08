@@ -367,6 +367,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct perf_event_attr.use_clockid,
 	struct perf_event_attr.context_switch,
 	struct perf_event_attr.write_backward,
+	struct perf_event_attr.namespaces,
 	struct perf_event_attr.bp_type,
 	struct perf_event_attr.config1,
 	struct perf_event_attr.config2,

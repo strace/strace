@@ -40,7 +40,8 @@ struct perf_event_attr {
 		 use_clockid			:1,
 		 context_switch			:1,
 		 write_backward			:1,
-		 __reserved_1			:36;
+		 namespaces			:1,
+		 __reserved_1			:35;
 	union {
 		uint32_t wakeup_events;
 		uint32_t wakeup_watermark;

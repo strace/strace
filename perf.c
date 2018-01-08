@@ -304,7 +304,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		", comm_exec=%u"
 		", use_clockid=%u"
 		", context_switch=%u"
-		", write_backward=%u",
+		", write_backward=%u"
+		", namespaces=%u",
 		attr->mmap_data,
 		attr->sample_id_all,
 		attr->exclude_host,
@@ -315,7 +316,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		attr->comm_exec,
 		attr->use_clockid,
 		attr->context_switch,
-		attr->write_backward);
+		attr->write_backward,
+		attr->namespaces);
 
 	/*
 	 * Print it only in case it is non-zero, since it may contain flags we
@@ -324,7 +326,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (attr->__reserved_1) {
 		tprintf(", __reserved_1=%#" PRIx64,
 			(uint64_t) attr->__reserved_1);
-		tprints_comment("Bits 63..28");
+		tprints_comment("Bits 63..29");
 	}
 
 	if (attr->watermark)
