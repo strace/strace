@@ -68,6 +68,7 @@ main(void)
 		(kernel_ulong_t) 0xdeadfacefa57beefULL;
 
 	struct user_desc *us = tail_alloc(sizeof(*us));
+	unsigned int *bogus_int = tail_alloc(sizeof(*bogus_int));
 	long rc;
 
 	fill_memory(us, sizeof(*us));
@@ -95,6 +96,16 @@ main(void)
 	rc = syscall(__NR_modify_ldt, bogus_func, us + 1, sizeof(*us));
 	printf("modify_ldt(%d, %p, %zu) = ",
 	       (int) bogus_func, us + 1, sizeof(*us));
+	printrc(rc);
+
+	/*
+	 * print_user_desc handles entry_number field in a special way for
+	 * get_thread_area syscall, so let's also check here that we don't
+	 * retrieve it accidentally.
+	 */
+	rc = syscall(__NR_modify_ldt, bogus_func, bogus_int, sizeof(*us));
+	printf("modify_ldt(%d, %p, %zu) = ",
+	       (int) bogus_func, bogus_int, sizeof(*us));
 	printrc(rc);
 
 	rc = syscall(__NR_modify_ldt, bogus_func, us, sizeof(*us));
