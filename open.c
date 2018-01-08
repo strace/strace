@@ -111,7 +111,7 @@ sprint_open_modes(unsigned int flags)
 	}
 	/* flags is still nonzero */
 	*p++ = sep;
-	xsnprintf(p, sizeof(outstr) - (p - outstr), "%#x", flags);
+	p = xappendstr(outstr, p, "%#x", flags);
 	return outstr;
 }
 

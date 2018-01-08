@@ -190,8 +190,7 @@ sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
 	if (flags) {
 		if (found)
 			*outptr++ = '|';
-		outptr += xsnprintf(outptr, sizeof(outstr) - (outptr - outstr),
-				    "%#" PRIx64, flags);
+		outptr = xappendstr(outstr, outptr, "%#" PRIx64, flags);
 	}
 
 	return outstr;

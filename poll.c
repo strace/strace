@@ -97,9 +97,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 				*outptr++ = '[';
 			else
 				outptr = stpcpy(outptr, ", ");
-			outptr += xsnprintf(outptr,
-					    sizeof(outstr) - (outptr - outstr),
-					    "%#" PRI_klx, cur);
+			outptr = xappendstr(outstr, outptr, "%#" PRI_klx, cur);
 			break;
 		}
 		if (!fds.revents)

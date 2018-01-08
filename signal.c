@@ -210,13 +210,11 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 		}
 #ifdef ASM_SIGRTMAX
 		else if (i >= ASM_SIGRTMIN && i <= ASM_SIGRTMAX) {
-			s += xsnprintf(s, sizeof(outstr) - (s - outstr),
-				       "RT_%u", i - ASM_SIGRTMIN);
+			s = xappendstr(outstr, s, "RT_%u", i - ASM_SIGRTMIN);
 		}
 #endif
 		else {
-			s += xsnprintf(s, sizeof(outstr) - (s - outstr),
-				       "%u", i);
+			s = xappendstr(outstr, s, "%u", i);
 		}
 		sep = ' ';
 	}

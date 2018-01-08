@@ -158,8 +158,8 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 				/* +2 chars needed at the end: ']',NUL */
 				if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
 					if (first) {
-						outptr += xsnprintf(outptr,
-							sizeof(outstr) - (outptr - outstr),
+						outptr = xappendstr(outstr,
+							outptr,
 							"%s%s [%u",
 							sep,
 							i == 0 ? "in" : i == 1 ? "out" : "except",
@@ -168,8 +168,8 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 						first = 0;
 						sep = ", ";
 					} else {
-						outptr += xsnprintf(outptr,
-							sizeof(outstr) - (outptr - outstr),
+						outptr = xappendstr(outstr,
+							outptr,
 							" %u", j);
 					}
 				}
@@ -184,9 +184,8 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 		if (args[4]) {
 			const char *str = sprint_tv_ts(tcp, args[4]);
 			if (outptr + sizeof("left ") + strlen(sep) + strlen(str) < end_outstr) {
-				outptr += xsnprintf(outptr,
-					sizeof(outstr) - (outptr - outstr),
-					"%sleft %s", sep, str);
+				outptr = xappendstr(outstr, outptr,
+						    "%sleft %s", sep, str);
 			}
 		}
 		*outptr = '\0';
