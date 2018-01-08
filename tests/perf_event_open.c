@@ -532,7 +532,8 @@ end:
 	"PERF_SAMPLE_BRANCH_IND_JUMP|" \
 	"PERF_SAMPLE_BRANCH_CALL|" \
 	"PERF_SAMPLE_BRANCH_NO_FLAGS|" \
-	"PERF_SAMPLE_BRANCH_NO_CYCLES"
+	"PERF_SAMPLE_BRANCH_NO_CYCLES|" \
+	"PERF_SAMPLE_BRANCH_TYPE_SAVE"
 
 int
 main(void)
@@ -617,7 +618,7 @@ main(void)
 	static const struct u64_val_str sample_types[] = {
 		{ ARG_STR(0) },
 		{ 0x800, "PERF_SAMPLE_BRANCH_STACK" },
-		{ ARG_ULL_STR(0xdeadc0deda780000) " /* PERF_SAMPLE_??? */" },
+		{ ARG_ULL_STR(0xdeadc0deda700000) " /* PERF_SAMPLE_??? */" },
 		{ 0xffffffffffffffffULL,
 			"PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_TIME|"
 			"PERF_SAMPLE_ADDR|PERF_SAMPLE_READ|"
@@ -627,7 +628,8 @@ main(void)
 			"PERF_SAMPLE_REGS_USER|PERF_SAMPLE_STACK_USER|"
 			"PERF_SAMPLE_WEIGHT|PERF_SAMPLE_DATA_SRC|"
 			"PERF_SAMPLE_IDENTIFIER|PERF_SAMPLE_TRANSACTION|"
-			"PERF_SAMPLE_REGS_INTR|0xfffffffffff80000" },
+			"PERF_SAMPLE_REGS_INTR|PERF_SAMPLE_PHYS_ADDR|"
+			"0xfffffffffff00000" },
 	};
 	static const struct u64_val_str read_formats[] = {
 		{ ARG_STR(0) },
@@ -659,11 +661,11 @@ main(void)
 	static const struct u64_val_str branch_sample_types[] = {
 		{ ARG_STR(0) },
 		{ 0x80, "PERF_SAMPLE_BRANCH_ABORT_TX" },
-		{ 0xffff, BRANCH_TYPE_ALL },
-		{ ARG_ULL_STR(0xdeadcaffeeed0000)
+		{ 0x1ffff, BRANCH_TYPE_ALL },
+		{ ARG_ULL_STR(0xdeadcaffeeec0000)
 			" /* PERF_SAMPLE_BRANCH_??? */" },
 		{ 0xffffffffffffffffULL,
-			BRANCH_TYPE_ALL "|0xffffffffffff0000" }
+			BRANCH_TYPE_ALL "|0xfffffffffffe0000" }
 	};
 	static const struct s32_val_str clockids[] = {
 		{ 11, "CLOCK_TAI" },
