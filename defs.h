@@ -768,7 +768,21 @@ extern void print_itimerval32(struct tcb *, kernel_ulong_t addr);
 #endif
 
 #ifdef HAVE_STRUCT_USER_DESC
-extern void print_user_desc(struct tcb *, kernel_ulong_t addr);
+/**
+ * Filter what to print from the point of view of the get_thread_area syscall.
+ * Kernel copies only entry_number field at first and then tries to write the
+ * whole structure.
+ */
+enum user_desc_print_filter {
+	/* Print the "entering" part of struct user_desc - entry_number.  */
+	USER_DESC_ENTERING = 1,
+	/* Print the "exiting" part of the structure.  */
+	USER_DESC_EXITING  = 2,
+	USER_DESC_BOTH     = USER_DESC_ENTERING | USER_DESC_EXITING,
+};
+
+extern void print_user_desc(struct tcb *, kernel_ulong_t addr,
+			    enum user_desc_print_filter filter);
 #endif
 
 /* Strace log generation machinery.

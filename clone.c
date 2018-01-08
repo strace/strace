@@ -84,7 +84,7 @@ print_tls_arg(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (current_personality == 1)
 # endif
 	{
-		print_user_desc(tcp, tcp->u_arg[ARG_TLS]);
+		print_user_desc(tcp, tcp->u_arg[ARG_TLS], USER_DESC_BOTH);
 	}
 # if SUPPORTED_PERSONALITIES > 1
 	else
