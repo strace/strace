@@ -354,6 +354,7 @@ EXTRA_DIST = \
 	netlink_sock_diag-v.sh \
 	oldselect.expected \
 	pipe.expected \
+	print_user_desc.c \
 	process_vm_readv_writev.c \
 	pure_executables.list \
 	qual_fault-exit_group.expected \

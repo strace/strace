@@ -36,41 +36,8 @@
 # include <errno.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <asm/ldt.h>
 
-void
-print_user_desc(struct user_desc *us, const char *entry_str)
-{
-	if (entry_str)
-		printf("{entry_number=%s", entry_str);
-	else
-		printf("{entry_number=%u", us->entry_number);
-
-	printf(", base_addr=%#08x"
-	       ", limit=%#08x"
-	       ", seg_32bit=%u"
-	       ", contents=%u"
-	       ", read_exec_only=%u"
-	       ", limit_in_pages=%u"
-	       ", seg_not_present=%u"
-	       ", useable=%u"
-#ifdef __x86_64__
-	       ", lm=%u"
-#endif
-	       "}",
-	       us->base_addr,
-	       us->limit,
-	       us->seg_32bit,
-	       us->contents,
-	       us->read_exec_only,
-	       us->limit_in_pages,
-	       us->seg_not_present,
-	       us->useable
-#ifdef __x86_64__
-	       , us->lm
-#endif
-	       );
-}
+# include "print_user_desc.c"
 
 void
 printrc(long rc)
