@@ -475,6 +475,7 @@ waitpid
 xattr
 xattr-strings
 xet_robust_list
+xet_thread_area_x86
 xetitimer
 xetpgid
 xetpriority

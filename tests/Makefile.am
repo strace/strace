@@ -253,6 +253,7 @@ DECODER_TESTS = \
 	seccomp-strict.test \
 	sigaltstack.test \
 	sun_path.test \
+	xet_thread_area_x86.test \
 	uio.test \
 	umount.test \
 	umount2.test \
