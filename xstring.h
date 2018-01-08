@@ -64,4 +64,43 @@ xsnprintf_(char *str, size_t size, const char *func, const char *argstr,
 	xsnprintf((str_), sizeof(str_) + MUST_BE_ARRAY(str_), (fmt_), \
 		  __VA_ARGS__)
 
+static inline size_t
+get_pos_diff_(char *str, size_t size, char *pos, const char *func,
+	   const char *call)
+{
+	if ((str + size) < str)
+		error_msg_and_die("%s: string size overflow (%p+%zu) in %s",
+				  func, str, size, call);
+
+	if (pos > (str + size))
+		error_msg_and_die("%s: got position (%p) beyond string "
+				  "(%p+%zu) in %s",
+				  func, pos, str, size, call);
+
+	if (pos < str)
+		error_msg_and_die("%s: got position %p before string %p in %s",
+				  func, pos, str, call);
+
+	return pos - str;
+}
+
+/**
+ * Helper function for constructing string in a character array by appending
+ * new formatted parts.  Returns new position.  In aligment with the rest of x*
+ * functions, fails on error or buffer overflow.  Obtains buffer size via
+ * sizeof(str_).
+ *
+ * @param str_  Character array buffer to print into.
+ * @param pos_  Current position.
+ * @param fmt_  Format string.
+ * @param ...   Format arguments.
+ * @return      New position.
+ */
+#define xappendstr(str_, pos_, fmt_, ...) \
+	(xsnprintf((pos_), sizeof(str_) + MUST_BE_ARRAY(str_) - \
+		   get_pos_diff_((str_), sizeof(str_), (pos_), __func__, \
+				 "xappendstr(" #str_ ", " #pos_ ", " #fmt_ ", " \
+				 #__VA_ARGS__ ")"), \
+		   (fmt_), ##__VA_ARGS__) + (pos_))
+
 #endif /* !STRACE_XSTRING_H */
