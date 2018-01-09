@@ -212,6 +212,8 @@ riscv*)
 esac
 AC_MSG_RESULT($arch)
 
+arch_native=$arch
+
 test -n "$arch_m32" ||
 	arch_m32=$arch
 test -n "$arch_mx32" ||
@@ -219,6 +221,7 @@ test -n "$arch_mx32" ||
 AC_SUBST(arch)
 AC_SUBST(arch_m32)
 AC_SUBST(arch_mx32)
+AC_SUBST(arch_native)
 
 MIPS_ABI=
 if test "$arch" = mips; then
