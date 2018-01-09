@@ -39,8 +39,9 @@ config_year=$(getstr COPYRIGHT_YEAR)
 }
 
 option_unwind=$(getoption USE_LIBUNWIND " stack-unwind")
+option_demangle=$(getoption USE_DEMANGLE " stack-demangle")
 
-features="${option_unwind}"
+features="${option_unwind}${option_demangle}"
 [ -n "$features" ] || features=" (none)"
 
 cat > "$EXP" << __EOF__

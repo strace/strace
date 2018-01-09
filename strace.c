@@ -204,6 +204,9 @@ print_version(void)
 #ifdef USE_LIBUNWIND
 		" stack-unwind"
 #endif /* USE_LIBUNWIND */
+#ifdef USE_DEMANGLE
+		" stack-demangle"
+#endif /* USE_DEMANGLE */
 		"";
 
 	printf("%s -- version %s\n"
