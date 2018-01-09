@@ -30,7 +30,11 @@
 #include <libunwind-ptrace.h>
 
 #ifdef USE_DEMANGLE
-# include <demangle.h>
+# if defined HAVE_DEMANGLE_H
+#  include <demangle.h>
+# elif defined HAVE_LIBIBERTY_DEMANGLE_H
+#  include <libiberty/demangle.h>
+# endif
 #endif
 
 #include "xstring.h"

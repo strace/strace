@@ -919,7 +919,7 @@ use_libiberty=no
 AS_IF([test "x$use_libunwind" = xyes && test "x$with_libiberty" != xno],
       [saved_CPPFLAGS="$CPPFLAGS"
        CPPFLAGS="$CPPFLAGS $libiberty_CPPFLAGS"
-       AC_CHECK_HEADERS([demangle.h],
+       AC_CHECK_HEADERS([demangle.h libiberty/demangle.h],
 	 [saved_LDFLAGS="$LDFLAGS"
 	  LDFLAGS="$LDFLAGS $libiberty_LDFLAGS"
 	  AC_CHECK_LIB([iberty],[cplus_demangle],
