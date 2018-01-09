@@ -860,6 +860,64 @@ If you do use this feature, please remember to install
 a non-setuid version of
 .B strace
 for ordinary lusers to use.
+.SH "MULTIPLE PERSONALITY SUPPORT"
+On some architectures,
+.B strace
+supports decoding of syscalls for processes that use different ABI rather than
+the one
+.B strace
+uses.
+Specifically, in addition to decoding native ABI,
+.B strace
+can decode the following ABIs on the following architectures:
+.TS H
+allbox;
+lb lb
+l l.
+Architecture	ABIs supported
+x86_64	i386, x32 (when built as an x86_64 application); i386 (when built as an x32 application)
+AArch64	ARM 32-bit EABI
+PowerPC 64-bit	PowerPC 32-bit
+RISC-V 64-bit	RISC-V 32-bit
+SPARC 64-bit	SPARC 32-bit
+TILE 64-bit	TILE 32-bit
+.TE
+.PP
+This support is optional and relies on ability to generate and parse structure
+definitions during the build time.
+Please refer to the output of the
+.B strace \-V
+command in order to figure out what support is available in your strace build
+("non-native" refers to an ABI that differs from the ABI strace has):
+.TP 15
+.B m32-mpers
+.B strace
+can trace and properly decode non-native 32-bit binaries.
+.TP
+.B no-m32-mpers
+.B strace
+can trace, but cannot properly decode non-native 32-bit binaries.
+.TP
+.B no-m32
+.B strace
+cannot trace non-native 32-bit binaries.
+.TP
+.B mx32-mpers
+.B strace
+can trace and properly decode non-native 32-on-64-bit binaries.
+.TP
+.B no-mx32-mpers
+.B strace
+can trace, but cannot properly decode non-native 32-on-64-bit binaries.
+.TP
+.B no-mx32
+.B strace
+cannot trace non-native 32-on-64-bit binaries.
+.PP
+Note that these flags refer only to the binaries in the non-native ABI;
+.B strace
+is expected to be able to trace and properly decode applications that use its
+native ABI.
 .SH NOTES
 It is a pity that so much tracing clutter is produced by systems
 employing shared libraries.
