@@ -207,6 +207,20 @@ print_version(void)
 #ifdef USE_DEMANGLE
 		" stack-demangle"
 #endif /* USE_DEMANGLE */
+#if SUPPORTED_PERSONALITIES > 1
+# if defined HAVE_M32_MPERS
+		" m32-mpers"
+# else
+		" no-m32-mpers"
+# endif
+#endif /* SUPPORTED_PERSONALITIES > 1 */
+#if SUPPORTED_PERSONALITIES > 2
+# if defined HAVE_MX32_MPERS
+		" mx32-mpers"
+# else
+		" no-mx32-mpers"
+# endif
+#endif /* SUPPORTED_PERSONALITIES > 2 */
 		"";
 
 	printf("%s -- version %s\n"

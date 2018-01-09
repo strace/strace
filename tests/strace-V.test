@@ -41,7 +41,19 @@ config_year=$(getstr COPYRIGHT_YEAR)
 option_unwind=$(getoption USE_LIBUNWIND " stack-unwind")
 option_demangle=$(getoption USE_DEMANGLE " stack-demangle")
 
-features="${option_unwind}${option_demangle}"
+option_m32=
+option_mx32=
+case "$STRACE_NATIVE_ARCH" in
+x86_64)
+	option_m32=$(getoption HAVE_M32_MPERS ' m32-mpers' ' no-m32-mpers')
+	option_mx32=$(getoption HAVE_MX32_MPERS ' mx32-mpers' ' no-mx32-mpers')
+	;;
+aarch64|powerpc64|riscv|sparc64|tile|x32)
+	option_m32=$(getoption HAVE_M32_MPERS ' m32-mpers' ' no-m32-mpers')
+	;;
+esac
+
+features="${option_unwind}${option_demangle}${option_m32}${option_mx32}"
 [ -n "$features" ] || features=" (none)"
 
 cat > "$EXP" << __EOF__
