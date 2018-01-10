@@ -24,6 +24,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of MSG_*, NT_*, and SHM_* constants.
   * Added manual page for the strace-log-merge command.
   * Updated lists of ioctl commands from Linux 4.15.
+  * Implemented biarch support for s390x.
   * Implemented an optional support for symbol demangling in strace -k output
     (activated by --with-libiberty configure option).
   * Information about availability of demangling and reliable personality

@@ -712,15 +712,20 @@ EXTRA_DIST =				\
 	linux/s390x/arch_regs.h		\
 	linux/s390x/arch_rt_sigframe.c	\
 	linux/s390x/arch_sigreturn.c	\
+	linux/s390x/errnoent1.h		\
 	linux/s390x/get_error.c		\
 	linux/s390x/get_scno.c		\
 	linux/s390x/get_syscall_args.c	\
 	linux/s390x/ioctls_arch0.h	\
+	linux/s390x/ioctls_arch1.h	\
 	linux/s390x/ioctls_inc0.h	\
+	linux/s390x/ioctls_inc1.h	\
 	linux/s390x/rt_sigframe.h	\
 	linux/s390x/set_error.c		\
 	linux/s390x/set_scno.c		\
+	linux/s390x/signalent1.h	\
 	linux/s390x/syscallent.h	\
+	linux/s390x/syscallent1.h	\
 	linux/s390x/userent.h		\
 	linux/sh/arch_getrval2.c	\
 	linux/sh/arch_regs.c		\

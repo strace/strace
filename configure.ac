@@ -145,6 +145,8 @@ s390)
 	;;
 s390x)
 	arch=s390x
+	arch_m32=s390
+	cc_flags_m32=-m31
 	AC_DEFINE([S390X], 1, [Define for the S390x architecture.])
 	;;
 hppa*|parisc*)
@@ -980,7 +982,7 @@ AC_ARG_ENABLE([mpers],
 	 esac],
 	[enable_mpers=yes])
 
-st_MPERS([m32], [aarch64|powerpc64|riscv|sparc64|tile|x32|x86_64])
+st_MPERS([m32], [aarch64|powerpc64|riscv|s390x|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
 
 AX_VALGRIND_DFLT([sgcheck], [off])

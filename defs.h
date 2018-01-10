@@ -335,7 +335,7 @@ extern const struct xlat whence_codes[];
  || defined(M68K) \
  || defined(MICROBLAZE) \
  || defined(RISCV) \
- || defined(S390) \
+ || defined(S390) || defined(S390X) \
  || defined(SH) || defined(SH64) \
  || defined(SPARC) || defined(SPARC64) \
  /**/

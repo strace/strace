@@ -1,1 +1,2 @@
 #define HAVE_ARCH_OLD_MMAP 1
+#define HAVE_ARCH_OLD_MMAP_PGOFF 1

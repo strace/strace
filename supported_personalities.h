@@ -33,6 +33,7 @@
 #elif defined AARCH64 \
    || defined POWERPC64 \
    || defined RISCV \
+   || defined S390X \
    || defined SPARC64 \
    || defined TILE \
    || defined X32

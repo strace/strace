@@ -216,7 +216,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 
 #ifdef HAVE_ARCH_OLD_MMAP
 	case SEN_old_mmap:
-# if defined(S390)
+# ifdef HAVE_ARCH_OLD_MMAP_PGOFF
 	case SEN_old_mmap_pgoff:
 # endif
 	{

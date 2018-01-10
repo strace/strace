@@ -144,7 +144,7 @@ SYS_FUNC(old_mmap)
 	return RVAL_DECODED | RVAL_HEX;
 }
 
-# ifdef S390
+# ifdef HAVE_ARCH_OLD_MMAP_PGOFF
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {
@@ -163,7 +163,7 @@ SYS_FUNC(old_mmap_pgoff)
 
 	return RVAL_DECODED | RVAL_HEX;
 }
-# endif /* S390 */
+# endif /* HAVE_ARCH_OLD_MMAP_PGOFF */
 #endif /* HAVE_ARCH_OLD_MMAP */
 
 /* Params are passed directly, offset is in bytes */
