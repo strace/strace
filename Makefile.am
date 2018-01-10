@@ -1002,7 +1002,7 @@ mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 		CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
 		CPP="$(CPP)" \
 		CPPFLAGS="$(mpers_sh_opts) -DIN_MPERS -DMPERS_IS_$(mpers_NAME)" \
-		$(srcdir)/mpers.sh -$(mpers_NAME) $$f || exit; \
+		$(srcdir)/mpers.sh $(mpers_NAME) $(mpers_CC_FLAGS) $$f || exit; \
 	done
 	> $@
 
@@ -1073,6 +1073,7 @@ BUILT_SOURCES += $(mpers_m32_targets)
 CLEANFILES    += $(mpers_m32_targets)
 
 $(mpers_m32_targets): mpers_NAME = m32
+$(mpers_m32_targets): mpers_CC_FLAGS = @cc_flags_m32@
 
 endif # HAVE_M32_MPERS
 
@@ -1089,6 +1090,7 @@ BUILT_SOURCES += $(mpers_mx32_targets)
 CLEANFILES    += $(mpers_mx32_targets)
 
 $(mpers_mx32_targets): mpers_NAME = mx32
+$(mpers_mx32_targets): mpers_CC_FLAGS = @cc_flags_mx32@
 
 endif # HAVE_MX32_MPERS
 

@@ -28,6 +28,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 mpers_name="$1"; shift
+mpers_cc_flags="$1"; shift
 size="$(printf %s "$mpers_name" |tr -cd '[0-9]')"
 [ "$size" -gt 0 ]
 
@@ -124,5 +125,5 @@ EOF
 
 CFLAGS="$CPPFLAGS -I${srcdir} -DMPERS_IS_${mpers_name}" \
 CPPFLAGS="$CPPFLAGS -I${srcdir} -DIN_MPERS -DMPERS_IS_${mpers_name}" \
-"$mpers_sh" "-$mpers_name" "$sample"
+"$mpers_sh" "$mpers_name" "$mpers_cc_flags" "$sample"
 cmp "$expected" "$mpers_dir"/sample_struct.h > /dev/null

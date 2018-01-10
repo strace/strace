@@ -71,6 +71,8 @@ AC_SUBST([MANPAGE_DATE], [manpage_date])
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
 arch_mx32=
+cc_flags_m32=-m32
+cc_flags_mx32=-mx32
 case "$host_cpu" in
 bfin)
 	arch=bfin
@@ -222,6 +224,8 @@ test -n "$arch_mx32" ||
 AC_SUBST(arch)
 AC_SUBST(arch_m32)
 AC_SUBST(arch_mx32)
+AC_SUBST(cc_flags_m32)
+AC_SUBST(cc_flags_mx32)
 AC_SUBST(arch_native)
 
 MIPS_ABI=

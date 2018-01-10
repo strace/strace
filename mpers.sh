@@ -30,7 +30,8 @@ export LC_ALL=C
 
 MPERS_AWK="${0%/*}/mpers.awk"
 ARCH_FLAG=$1
-PARSER_FILE=$2
+CC_ARCH_FLAG=$2
+PARSER_FILE=$3
 
 READELF="${READELF:-readelf}"
 CC="${CC-gcc}"
@@ -39,7 +40,7 @@ CPP="${CPP-$CC -E}"
 CPPFLAGS="$CPPFLAGS -MM -MG"
 
 VAR_NAME='mpers_target_var'
-BITS_DIR="mpers${ARCH_FLAG}"
+BITS_DIR="mpers-${ARCH_FLAG}"
 
 mkdir -p ${BITS_DIR}
 set -- $(sed -r -n \
@@ -62,7 +63,7 @@ for m_type; do
 	grep -F -q "${m_type}.h" "${f_i}" ||
 		continue
 	sed -i -e '/DEF_MPERS_TYPE/d' "${f_c}"
-	$CC $CFLAGS $ARCH_FLAG "${f_c}" -o "${f_o}"
+	$CC $CFLAGS $CC_ARCH_FLAG "${f_c}" -o "${f_o}"
 	$READELF --debug-dump=info "${f_o}" > "${f_d1}"
 	sed -r -n '
 		/^[[:space:]]*<1>/,/^[[:space:]]*<1><[^>]+>: Abbrev Number: 0/!d
@@ -71,6 +72,6 @@ for m_type; do
 		s/^[[:space:]]*((<[[:xdigit:]]+>){2}):[[:space:]]+/\1\n/
 		s/[[:space:]]+$//
 		p' "${f_d1}" > "${f_d2}"
-	gawk -v VAR_NAME="$VAR_NAME" -v ARCH_FLAG="${ARCH_FLAG#-}" \
+	gawk -v VAR_NAME="$VAR_NAME" -v ARCH_FLAG="${ARCH_FLAG}" \
 		-f "$MPERS_AWK" "${f_d2}" > "${f_h}"
 done

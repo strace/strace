@@ -12,7 +12,8 @@ for m in m32 mx32; do
 	s='[[:space:]]*'
 	sed "s/@arch@/@arch_$m@/;
 	     s/^MPERS_NAME$s=.*/& $m/;
-	     s/^ARCH_MFLAGS$s=.*/& -DMPERS_IS_\$(MPERS_NAME) -$m/" \
+	     s/^MPERS_CC_FLAGS$s=.*/& @cc_flags_$m@/;
+	     s/^ARCH_MFLAGS$s=.*/& -DMPERS_IS_\$(MPERS_NAME) \$(MPERS_CC_FLAGS)/" \
 		tests/Makefile.am > $tests/Makefile.am
 	for f in tests/*; do
 		case "${f##*/}" in
