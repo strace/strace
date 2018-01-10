@@ -282,7 +282,7 @@ readahead	-a1
 readdir	-a16
 readlink	-xx
 readlinkat	-xx
-reboot
+reboot		-s 256
 recvfrom	-a35
 recvmmsg-timeout	-a25 -e trace=recvmmsg
 recvmsg	-eread=0 -ewrite=1 -e trace=recvmsg,sendmsg
