@@ -17,14 +17,14 @@ main(void)
 	long rc = syscall(__NR_reboot, LINUX_REBOOT_MAGIC1,
 			  INVALID_MAGIC, LINUX_REBOOT_CMD_RESTART2, buf);
 	printf("reboot(LINUX_REBOOT_MAGIC1, %#x /* LINUX_REBOOT_MAGIC_??? */,"
-	       " LINUX_REBOOT_CMD_RESTART2, \"%s\") = %ld %s (%m)\n",
-	       INVALID_MAGIC, buf, rc, errno2name());
+	       " LINUX_REBOOT_CMD_RESTART2, \"%s\") = %s\n",
+	       INVALID_MAGIC, buf, sprintrc(rc));
 
 	rc = syscall(__NR_reboot, LINUX_REBOOT_MAGIC1,
 		     LINUX_REBOOT_MAGIC2, INVALID_CMD);
 	printf("reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,"
-	       " %#x /* LINUX_REBOOT_CMD_??? */) = %ld %s (%m)\n",
-	       INVALID_CMD, rc, errno2name());
+	       " %#x /* LINUX_REBOOT_CMD_??? */) = %s\n",
+	       INVALID_CMD, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
