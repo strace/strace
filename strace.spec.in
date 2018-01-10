@@ -65,7 +65,7 @@ kver="$(echo -e '#include <linux/version.h>\nLINUX_VERSION_CODE' | gcc -E -P -)"
 printf 'kernel-headers %%s.%%s.%%s\n' $(($kver/65536)) $(($kver/256%%256)) $(($kver%%256))
 echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
-%configure
+%configure --enable-mpers=check
 make %{?_smp_mflags}
 
 %install
