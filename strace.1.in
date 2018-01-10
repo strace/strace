@@ -936,7 +936,7 @@ system call does not have
 argument, and the
 .BR setrlimit (2)
 library function uses
-.BR prlimit (2)
+.BR prlimit64 (2)
 system call on modern (2.6.38+) kernels.  These
 discrepancies are normal but idiosyncratic characteristics of the
 system call interface and are accounted for by C library wrapper
