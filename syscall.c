@@ -303,6 +303,9 @@ set_personality(int personality)
 static void
 update_personality(struct tcb *tcp, unsigned int personality)
 {
+	static bool need_mpers_warning[] =
+		{ false, !HAVE_PERSONALITY_1_MPERS, !HAVE_PERSONALITY_2_MPERS };
+
 	if (personality == current_personality)
 		return;
 	set_personality(personality);
@@ -314,6 +317,13 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	if (!qflag) {
 		error_msg("[ Process PID=%d runs in %s mode. ]",
 			  tcp->pid, personality_names[personality]);
+	}
+
+	if (need_mpers_warning[personality]) {
+		error_msg("WARNING: Proper structure decoding for this "
+			  "personality is not supported, please consider "
+			  "building strace with mpers support enabled.");
+		need_mpers_warning[personality] = false;
 	}
 }
 #endif

@@ -149,10 +149,12 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY1_INCLUDE_PRINTERS_DEFS "m32_printer_defs.h"
 # define PERSONALITY1_INCLUDE_FUNCS "m32_funcs.h"
 # define MPERS_m32_IOCTL_MACROS "ioctl_redefs1.h"
+# define HAVE_PERSONALITY_1_MPERS 1
 #else
 # define PERSONALITY1_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
 # define PERSONALITY1_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
 # define PERSONALITY1_INCLUDE_FUNCS "empty.h"
+# define HAVE_PERSONALITY_1_MPERS 0
 #endif
 
 #if SUPPORTED_PERSONALITIES > 2 && defined HAVE_MX32_MPERS
@@ -160,10 +162,12 @@ extern char *stpcpy(char *dst, const char *src);
 # define PERSONALITY2_INCLUDE_PRINTERS_DECLS "mx32_printer_decls.h"
 # define PERSONALITY2_INCLUDE_PRINTERS_DEFS "mx32_printer_defs.h"
 # define MPERS_mx32_IOCTL_MACROS "ioctl_redefs2.h"
+# define HAVE_PERSONALITY_2_MPERS 1
 #else
 # define PERSONALITY2_INCLUDE_PRINTERS_DECLS "native_printer_decls.h"
 # define PERSONALITY2_INCLUDE_PRINTERS_DEFS "native_printer_defs.h"
 # define PERSONALITY2_INCLUDE_FUNCS "empty.h"
+# define HAVE_PERSONALITY_2_MPERS 0
 #endif
 
 typedef struct ioctlent {
