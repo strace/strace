@@ -12,6 +12,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
   * Updated lists of MSG_* and SHM_* constants.
   * Added manual page for the strace-log-merge command.
+  * Updated lists of ioctl commands from Linux 4.15.
 
 * Bug fixes
   * Fixed multi-personality support in cross builds.
