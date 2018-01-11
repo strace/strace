@@ -497,6 +497,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 		}
 	}
 
+	if (style & QUOTE_EMIT_COMMENT)
+		s = stpcpy(s, " /* ");
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 
@@ -576,6 +578,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
+	if (style & QUOTE_EMIT_COMMENT)
+		s = stpcpy(s, " */");
 	*s = '\0';
 
 	/* Return zero if we printed entire ASCIZ string (didn't truncate it) */
@@ -591,6 +595,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
  asciz_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
+	if (style & QUOTE_EMIT_COMMENT)
+		s = stpcpy(s, " */");
 	*s = '\0';
 	/* Return zero: we printed entire ASCIZ string (didn't truncate it) */
 	return 0;
@@ -632,7 +638,8 @@ print_quoted_string(const char *str, unsigned int size,
 		tprints("???");
 		return -1;
 	}
-	alloc_size += 1 + (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES ? 0 : 2);
+	alloc_size += 1 + (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES ? 0 : 2) +
+		(style & QUOTE_EMIT_COMMENT ? 7 : 0);
 
 	if (use_alloca(alloc_size)) {
 		outstr = alloca(alloc_size);
