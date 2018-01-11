@@ -107,6 +107,15 @@
 				     sizeof((where_).field_));		\
 	} while (0)
 
+#define PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_quoted_string((const char *)(where_).field_,	\
+				     sizeof((where_).field_) +		\
+					    MUST_BE_ARRAY((where_).field_), \
+				    QUOTE_FORCE_HEX); \
+	} while (0)
+
 #define PRINT_FIELD_INET_ADDR(prefix_, where_, field_, af_)		\
 	do {								\
 		STRACE_PRINTF(prefix_);					\
