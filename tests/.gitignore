@@ -362,6 +362,8 @@ rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
 run_expect_termsig
+s390_guarded_storage
+s390_guarded_storage-v
 s390_sthyi
 s390_sthyi-v
 sched_get_priority_mxx
