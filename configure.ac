@@ -227,7 +227,7 @@ MIPS_ABI=
 if test "$arch" = mips; then
 	AC_CACHE_CHECK([for _MIPS_SIM], [st_cv__MIPS_SIM],
 		       [AC_COMPUTE_INT([st_cv__MIPS_SIM], [_MIPS_SIM], ,
-				       [AC_MSG_ERROR([_MIPS_SIM cannot be determined])])])
+				       [AC_MSG_FAILURE([_MIPS_SIM cannot be determined])])])
 
 	# requires GCC >= 3.4
 	AC_CACHE_CHECK([for MIPS ABI], [st_cv_mips_abi],
@@ -958,7 +958,7 @@ if test "$arch" = mips && test "$no_create" != yes; then
 	if $srcdir/linux/mips/genstub.sh linux/mips; then
 		AC_MSG_RESULT([Generated MIPS syscallent stubs])
 	else
-		AC_MSG_FAILURE([Failed to generate syscallent stubs])
+		AC_MSG_ERROR([Failed to generate syscallent stubs])
 	fi
 fi
 
