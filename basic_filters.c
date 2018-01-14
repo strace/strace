@@ -208,7 +208,6 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set,
 	 * of the remaining specification.
 	 */
 	const char *s = str;
-handle_inversion:
 	while (*s == '!') {
 		invert_number_set_array(set, SUPPORTED_PERSONALITIES);
 		++s;
@@ -222,8 +221,9 @@ handle_inversion:
 		 */
 		return;
 	} else if (strcmp(s, "all") == 0) {
-		s = "!none";
-		goto handle_inversion;
+		/* "all" == "!none" */
+		invert_number_set_array(set, SUPPORTED_PERSONALITIES);
+		return;
 	}
 
 	/*
@@ -266,7 +266,6 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	 * of the remaining specification.
 	 */
 	const char *s = str;
-handle_inversion:
 	while (*s == '!') {
 		invert_number_set_array(set, 1);
 		++s;
@@ -280,8 +279,9 @@ handle_inversion:
 		 */
 		return;
 	} else if (strcmp(s, "all") == 0) {
-		s = "!none";
-		goto handle_inversion;
+		/* "all" == "!none" */
+		invert_number_set_array(set, 1);
+		return;
 	}
 
 	/*
