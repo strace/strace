@@ -364,6 +364,7 @@ rt_tgsigqueueinfo
 run_expect_termsig
 s390_guarded_storage
 s390_guarded_storage-v
+s390_pci_mmio_read_write
 s390_runtime_instr
 s390_sthyi
 s390_sthyi-v
