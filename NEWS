@@ -10,7 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
-  * Updated lists of MSG_* and SHM_* constants.
+  * Updated lists of MSG_*, NT_*, and SHM_* constants.
   * Added manual page for the strace-log-merge command.
   * Updated lists of ioctl commands from Linux 4.15.
 
