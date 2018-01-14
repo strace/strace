@@ -1241,4 +1241,37 @@ SYS_FUNC(s390_runtime_instr)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(s390_pci_mmio_write)
+{
+	kernel_ulong_t mmio_addr = tcp->u_arg[0];
+	kernel_ulong_t user_buf  = tcp->u_arg[1];
+	kernel_ulong_t length    = tcp->u_arg[2];
+
+	tprintf("%#" PRI_klx ", ", mmio_addr);
+	printstr_ex(tcp, user_buf, length, QUOTE_FORCE_HEX);
+	tprintf(", %" PRI_klu, length);
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(s390_pci_mmio_read)
+{
+	kernel_ulong_t mmio_addr = tcp->u_arg[0];
+	kernel_ulong_t user_buf  = tcp->u_arg[1];
+	kernel_ulong_t length    = tcp->u_arg[2];
+
+	if (entering(tcp)) {
+		tprintf("%#" PRI_klx ", ", mmio_addr);
+	} else {
+		if (!syserror(tcp))
+			printstr_ex(tcp, user_buf, length, QUOTE_FORCE_HEX);
+		else
+			printaddr(user_buf);
+
+		tprintf(", %" PRI_klu, length);
+	}
+
+	return 0;
+}
+
 #endif /* defined S390 || defined S390X */
