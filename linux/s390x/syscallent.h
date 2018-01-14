@@ -355,7 +355,7 @@
 [339] = { 2,	TD,		SEN(setns),			"setns"			},
 [340] = { 6,	0,		SEN(process_vm_readv),		"process_vm_readv"	},
 [341] = { 6,	0,		SEN(process_vm_writev),		"process_vm_writev"	},
-[342] = { 2,	0,		SEN(printargs),			"s390_runtime_instr"	},
+[342] = { 2,	0,		SEN(s390_runtime_instr),	"s390_runtime_instr"	},
 [343] = { 5,	0,		SEN(kcmp),			"kcmp"			},
 [344] = { 3,	TD,		SEN(finit_module),		"finit_module"		},
 [345] = { 3,	0,		SEN(sched_setattr),		"sched_setattr"		},

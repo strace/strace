@@ -36,6 +36,7 @@
 #include "print_fields.h"
 
 #include "xlat/s390_guarded_storage_commands.h"
+#include "xlat/s390_runtime_instr_commands.h"
 #include "xlat/s390_sthyi_function_codes.h"
 
 /*
@@ -1205,6 +1206,36 @@ SYS_FUNC(s390_guarded_storage)
 	default:
 		tprints(", ");
 		printaddr(gs_cb);
+	}
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(s390_runtime_instr)
+{
+	int command = (int) tcp->u_arg[0];
+	int signum = (int) tcp->u_arg[1];
+
+	const char *command_descr =
+		xlookup(s390_runtime_instr_commands, command);
+
+	tprintf("%d", command);
+	tprints_comment(command_descr ? command_descr :
+			"S390_RUNTIME_INSTR_???");
+
+	/*
+	 * signum is ignored since Linux 4.4, but let's print it for start
+	 * command anyway.
+	 */
+	switch (command) {
+	case S390_RUNTIME_INSTR_START:
+		tprints(", ");
+		tprints(signame(signum));
+		break;
+
+	case S390_RUNTIME_INSTR_STOP:
+	default:
+		break;
 	}
 
 	return RVAL_DECODED;
