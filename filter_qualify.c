@@ -241,9 +241,8 @@ qualify_inject_common(const char *const str,
 	};
 	char *copy = xstrdup(str);
 	char *name = parse_inject_expression(copy, &opts, fault_tokens_only);
-	if (!name) {
+	if (!name)
 		error_msg_and_die("invalid %s '%s'", description, str);
-	}
 
 	/* If neither of retval, error, or signal is specified, then ... */
 	if (!opts.data.flags) {
@@ -264,7 +263,7 @@ qualify_inject_common(const char *const str,
 	free(copy);
 
 	/*
-	 * Initialize inject_vec accourding to tmp_set.
+	 * Initialize inject_vec according to tmp_set.
 	 * Merge tmp_set into inject_set.
 	 */
 	unsigned int p;
@@ -278,7 +277,7 @@ qualify_inject_common(const char *const str,
 		}
 		if (!inject_vec[p]) {
 			inject_vec[p] = xcalloc(nsyscall_vec[p],
-					       sizeof(*inject_vec[p]));
+						sizeof(*inject_vec[p]));
 		}
 
 		unsigned int i;

@@ -42,9 +42,8 @@ qualify_syscall_number(const char *s, struct number_set *set)
 	bool done = false;
 
 	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		if ((unsigned) n >= nsyscall_vec[p]) {
+		if ((unsigned) n >= nsyscall_vec[p])
 			continue;
-		}
 		add_number_to_set_array(n, set, p);
 		done = true;
 	}
@@ -126,9 +125,8 @@ lookup_class(const char *s)
 
 	unsigned int i;
 	for (i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
-		if (strcmp(s, syscall_class[i].name) == 0) {
+		if (strcmp(s, syscall_class[i].name) == 0)
 			return syscall_class[i].value;
-		}
 	}
 
 	return 0;
@@ -146,11 +144,9 @@ qualify_syscall_class(const char *s, struct number_set *set)
 		unsigned int i;
 
 		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name
-			    || (sysent_vec[p][i].sys_flags & n) != n) {
-				continue;
-			}
-			add_number_to_set_array(i, set, p);
+			if (sysent_vec[p][i].sys_name &&
+			    (sysent_vec[p][i].sys_flags & n) == n)
+				add_number_to_set_array(i, set, p);
 		}
 	}
 
@@ -167,12 +163,11 @@ qualify_syscall_name(const char *s, struct number_set *set)
 		unsigned int i;
 
 		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name
-			    || strcmp(s, sysent_vec[p][i].sys_name)) {
-				continue;
+			if (sysent_vec[p][i].sys_name &&
+			    strcmp(s, sysent_vec[p][i].sys_name) == 0) {
+				add_number_to_set_array(i, set, p);
+				found = true;
 			}
-			add_number_to_set_array(i, set, p);
-			found = true;
 		}
 	}
 
@@ -246,16 +241,14 @@ handle_inversion:
 	for (token = strtok_r(copy, ",", &saveptr); token;
 	     token = strtok_r(NULL, ",", &saveptr)) {
 		done = qualify_syscall(token, set);
-		if (!done) {
+		if (!done)
 			error_msg_and_die("invalid %s '%s'", name, token);
-		}
 	}
 
 	free(copy);
 
-	if (!done) {
+	if (!done)
 		error_msg_and_die("invalid %s '%s'", name, str);
-	}
 }
 
 /*
@@ -306,16 +299,14 @@ handle_inversion:
 	for (token = strtok_r(copy, ",", &saveptr); token;
 	     token = strtok_r(NULL, ",", &saveptr)) {
 		number = func(token);
-		if (number < 0) {
+		if (number < 0)
 			error_msg_and_die("invalid %s '%s'", name, token);
-		}
 
 		add_number_to_set(number, set);
 	}
 
 	free(copy);
 
-	if (number < 0) {
+	if (number < 0)
 		error_msg_and_die("invalid %s '%s'", name, str);
-	}
 }
