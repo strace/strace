@@ -340,6 +340,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return false;
 	}
 
+	case SEN_accept4:
+	case SEN_accept:
 	case SEN_bpf:
 	case SEN_epoll_create:
 	case SEN_epoll_create1:
@@ -358,6 +360,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_pipe:
 	case SEN_pipe2:
 	case SEN_printargs:
+	case SEN_signalfd4:
+	case SEN_signalfd:
 	case SEN_socket:
 	case SEN_socketpair:
 	case SEN_timerfd_create:
