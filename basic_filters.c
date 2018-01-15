@@ -100,13 +100,6 @@ lookup_class(const char *s)
 		const char *name;
 		unsigned int value;
 	} syscall_class[] = {
-		{ "desc",	TRACE_DESC	},
-		{ "file",	TRACE_FILE	},
-		{ "memory",	TRACE_MEMORY	},
-		{ "process",	TRACE_PROCESS	},
-		{ "signal",	TRACE_SIGNAL	},
-		{ "ipc",	TRACE_IPC	},
-		{ "network",	TRACE_NETWORK	},
 		{ "%desc",	TRACE_DESC	},
 		{ "%file",	TRACE_FILE	},
 		{ "%memory",	TRACE_MEMORY	},
@@ -121,6 +114,14 @@ lookup_class(const char *s)
 		{ "%statfs",	TRACE_STATFS	},
 		{ "%fstatfs",	TRACE_FSTATFS	},
 		{ "%%statfs",	TRACE_STATFS_LIKE	},
+		/* legacy class names */
+		{ "desc",	TRACE_DESC	},
+		{ "file",	TRACE_FILE	},
+		{ "memory",	TRACE_MEMORY	},
+		{ "process",	TRACE_PROCESS	},
+		{ "signal",	TRACE_SIGNAL	},
+		{ "ipc",	TRACE_IPC	},
+		{ "network",	TRACE_NETWORK	},
 	};
 
 	unsigned int i;
