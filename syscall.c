@@ -306,9 +306,8 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	static bool need_mpers_warning[] =
 		{ false, !HAVE_PERSONALITY_1_MPERS, !HAVE_PERSONALITY_2_MPERS };
 
-	if (personality == current_personality)
-		return;
-	set_personality(personality);
+	if (personality != current_personality)
+		set_personality(personality);
 
 	if (personality == tcp->currpers)
 		return;
