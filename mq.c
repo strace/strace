@@ -43,12 +43,13 @@ SYS_FUNC(mq_open)
 		tprints(", ");
 		printmqattr(tcp, tcp->u_arg[3], false);
 	}
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(mq_timedsend)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu ", %u, ", tcp->u_arg[2],
 		(unsigned int) tcp->u_arg[3]);
@@ -59,7 +60,8 @@ SYS_FUNC(mq_timedsend)
 SYS_FUNC(mq_timedreceive)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
@@ -82,7 +84,8 @@ SYS_FUNC(mq_timedreceive)
 
 SYS_FUNC(mq_notify)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	print_sigevent(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -90,7 +93,8 @@ SYS_FUNC(mq_notify)
 SYS_FUNC(mq_getsetattr)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printmqattr(tcp, tcp->u_arg[1], true);
 		tprints(", ");
 	} else {

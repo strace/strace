@@ -395,12 +395,12 @@
 [429] = { 6,	TM,		SEN(mbind),			"mbind"			}, /* not implemented */
 [430] = { 5,	TM,		SEN(get_mempolicy),		"get_mempolicy"		}, /* not implemented */
 [431] = { 3,	TM,		SEN(set_mempolicy),		"set_mempolicy"		}, /* not implemented */
-[432] = { 4,	0,		SEN(mq_open),			"mq_open"		},
+[432] = { 4,	TD,		SEN(mq_open),			"mq_open"		},
 [433] = { 1,	0,		SEN(mq_unlink),			"mq_unlink"		},
-[434] = { 5,	0,		SEN(mq_timedsend),		"mq_timedsend"		},
-[435] = { 5,	0,		SEN(mq_timedreceive),		"mq_timedreceive"	},
-[436] = { 2,	0,		SEN(mq_notify),			"mq_notify"		},
-[437] = { 3,	0,		SEN(mq_getsetattr),		"mq_getsetattr"		},
+[434] = { 5,	TD,		SEN(mq_timedsend),		"mq_timedsend"		},
+[435] = { 5,	TD,		SEN(mq_timedreceive),		"mq_timedreceive"	},
+[436] = { 2,	TD,		SEN(mq_notify),			"mq_notify"		},
+[437] = { 3,	TD,		SEN(mq_getsetattr),		"mq_getsetattr"		},
 [438] = { 5,	TP,		SEN(waitid),			"waitid"		},
 [439] = { 5,	0,		SEN(add_key),			"add_key"		},
 [440] = { 4,	0,		SEN(request_key),		"request_key"		},

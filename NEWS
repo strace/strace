@@ -10,12 +10,17 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
+  * Print values returned by mq_open syscall and first arguments
+    of mq_getsetattr, mq_notify, mq_timedreceive, and mq_timedsend syscalls
+    as file descriptors.
   * Updated lists of MSG_*, NT_*, and SHM_* constants.
   * Added manual page for the strace-log-merge command.
   * Updated lists of ioctl commands from Linux 4.15.
 
 * Bug fixes
   * Fixed multi-personality support in cross builds.
+  * Added mq_getsetattr, mq_notify, mq_open, mq_timedreceive, and mq_timedsend
+    syscalls to %desc tracing set.
 
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================

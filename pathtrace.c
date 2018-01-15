@@ -349,6 +349,11 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_inotify_init:
 	case SEN_inotify_init1:
 	case SEN_memfd_create:
+	case SEN_mq_getsetattr:
+	case SEN_mq_notify:
+	case SEN_mq_open:
+	case SEN_mq_timedreceive:
+	case SEN_mq_timedsend:
 	case SEN_perf_event_open:
 	case SEN_pipe:
 	case SEN_pipe2:
