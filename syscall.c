@@ -1154,7 +1154,37 @@ get_regs(struct tcb *const tcp)
 	return get_regs_error = getregs_old(tcp);
 # else /* !HAVE_GETREGS_OLD */
 	/* Assume that PTRACE_GETREGSET/PTRACE_GETREGS works. */
-	return get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
+	get_regs_error = ptrace_getregset_or_getregs(tcp->pid);
+
+#  if defined ARCH_PERSONALITY_0_IOV_SIZE
+	if (get_regs_error)
+		return get_regs_error;
+
+	switch (ARCH_IOVEC_FOR_GETREGSET.iov_len) {
+	case ARCH_PERSONALITY_0_IOV_SIZE:
+		update_personality(tcp, 0);
+		break;
+	case ARCH_PERSONALITY_1_IOV_SIZE:
+		update_personality(tcp, 1);
+		break;
+	default: {
+		static bool printed = false;
+
+		if (!printed) {
+			error_msg("Unsupported regset size returned by "
+				  "PTRACE_GETREGSET: %zu",
+				  ARCH_IOVEC_FOR_GETREGSET.iov_len);
+
+			printed = true;
+		}
+
+		update_personality(tcp, 0);
+	}
+	}
+#  endif /* ARCH_PERSONALITY_0_IOV_SIZE */
+
+	return get_regs_error;
+
 # endif /* !HAVE_GETREGS_OLD */
 
 #else /* !ptrace_getregset_or_getregs */
