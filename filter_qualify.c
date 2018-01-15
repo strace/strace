@@ -203,7 +203,7 @@ qualify_trace(const char *const str)
 {
 	if (!trace_set)
 		trace_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, trace_set, "system call");
+	qualify_syscall_tokens(str, trace_set);
 }
 
 static void
@@ -211,7 +211,7 @@ qualify_abbrev(const char *const str)
 {
 	if (!abbrev_set)
 		abbrev_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, abbrev_set, "system call");
+	qualify_syscall_tokens(str, abbrev_set);
 }
 
 static void
@@ -219,7 +219,7 @@ qualify_verbose(const char *const str)
 {
 	if (!verbose_set)
 		verbose_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, verbose_set, "system call");
+	qualify_syscall_tokens(str, verbose_set);
 }
 
 static void
@@ -227,7 +227,7 @@ qualify_raw(const char *const str)
 {
 	if (!raw_set)
 		raw_set = alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(str, raw_set, "system call");
+	qualify_syscall_tokens(str, raw_set);
 }
 
 static void
@@ -258,7 +258,7 @@ qualify_inject_common(const char *const str,
 
 	struct number_set *tmp_set =
 		alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(name, tmp_set, description);
+	qualify_syscall_tokens(name, tmp_set);
 
 	free(copy);
 

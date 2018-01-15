@@ -197,8 +197,7 @@ qualify_syscall(const char *token, struct number_set *set)
  * according to STR specification.
  */
 void
-qualify_syscall_tokens(const char *const str, struct number_set *const set,
-		       const char *const name)
+qualify_syscall_tokens(const char *const str, struct number_set *const set)
 {
 	/* Clear all sets. */
 	clear_number_set_array(set, SUPPORTED_PERSONALITIES);
@@ -242,13 +241,13 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set,
 	     token = strtok_r(NULL, ",", &saveptr)) {
 		done = qualify_syscall(token, set);
 		if (!done)
-			error_msg_and_die("invalid %s '%s'", name, token);
+			error_msg_and_die("invalid system call '%s'", token);
 	}
 
 	free(copy);
 
 	if (!done)
-		error_msg_and_die("invalid %s '%s'", name, str);
+		error_msg_and_die("invalid system call '%s'", str);
 }
 
 /*
