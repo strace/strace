@@ -230,7 +230,7 @@ const char *const personality_names[] =
 unsigned current_personality;
 
 # ifndef current_wordsize
-unsigned current_wordsize;
+unsigned current_wordsize = PERSONALITY0_WORDSIZE;
 static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 	PERSONALITY0_WORDSIZE,
 	PERSONALITY1_WORDSIZE,
@@ -241,7 +241,7 @@ static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 # endif
 
 # ifndef current_klongsize
-unsigned current_klongsize;
+unsigned current_klongsize = PERSONALITY0_KLONGSIZE;
 static const int personality_klongsize[SUPPORTED_PERSONALITIES] = {
 	PERSONALITY0_KLONGSIZE,
 	PERSONALITY1_KLONGSIZE,
@@ -254,6 +254,9 @@ static const int personality_klongsize[SUPPORTED_PERSONALITIES] = {
 void
 set_personality(int personality)
 {
+	if (personality == current_personality)
+		return;
+
 	nsyscalls = nsyscall_vec[personality];
 	sysent = sysent_vec[personality];
 
@@ -306,8 +309,7 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	static bool need_mpers_warning[] =
 		{ false, !HAVE_PERSONALITY_1_MPERS, !HAVE_PERSONALITY_2_MPERS };
 
-	if (personality != current_personality)
-		set_personality(personality);
+	set_personality(personality);
 
 	if (personality == tcp->currpers)
 		return;
