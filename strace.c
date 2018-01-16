@@ -618,6 +618,16 @@ line_ended(void)
 }
 
 void
+set_current_tcp(const struct tcb *tcp)
+{
+	current_tcp = (struct tcb *) tcp;
+
+	/* Sync current_personality and stuff */
+	if (current_tcp)
+		set_personality(current_tcp->currpers);
+}
+
+void
 printleader(struct tcb *tcp)
 {
 	/* If -ff, "previous tcb we printed" is always the same as current,
@@ -627,7 +637,7 @@ printleader(struct tcb *tcp)
 		printing_tcp = tcp;
 
 	if (printing_tcp) {
-		current_tcp = printing_tcp;
+		set_current_tcp(printing_tcp);
 		if (printing_tcp->curcol != 0 && (followfork < 2 || printing_tcp == tcp)) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
@@ -641,7 +651,7 @@ printleader(struct tcb *tcp)
 	}
 
 	printing_tcp = tcp;
-	current_tcp = tcp;
+	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
 	if (print_pid_pfx)
@@ -819,7 +829,7 @@ droptcb(struct tcb *tcp)
 	}
 
 	if (current_tcp == tcp)
-		current_tcp = NULL;
+		set_current_tcp(NULL);
 	if (printing_tcp == tcp)
 		printing_tcp = NULL;
 
@@ -2190,11 +2200,11 @@ print_event_exit(struct tcb *tcp)
 
 	if (followfork < 2 && printing_tcp && printing_tcp != tcp
 	    && printing_tcp->curcol != 0) {
-		current_tcp = printing_tcp;
+		set_current_tcp(printing_tcp);
 		tprints(" <unfinished ...>\n");
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
-		current_tcp = tcp;
+		set_current_tcp(tcp);
 	}
 
 	if ((followfork < 2 && printing_tcp != tcp)
@@ -2293,7 +2303,7 @@ next_event(int *pstatus, siginfo_t *si)
 	clear_regs(tcp);
 
 	/* Set current output file */
-	current_tcp = tcp;
+	set_current_tcp(tcp);
 
 	if (cflag) {
 		tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
@@ -2475,7 +2485,8 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 		 * On 2.6 and earlier, it can return garbage.
 		 */
 		if (os_release >= KERNEL_VERSION(3, 0, 0))
-			current_tcp = maybe_switch_tcbs(current_tcp, current_tcp->pid);
+			set_current_tcp(maybe_switch_tcbs(current_tcp,
+							  current_tcp->pid));
 
 		if (detach_on_execve) {
 			if (current_tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {
