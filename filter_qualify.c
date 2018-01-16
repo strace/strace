@@ -150,19 +150,20 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 	return true;
 }
 
-static char *
+static const char *
 parse_inject_expression(char *const str,
 			struct inject_opts *const fopts,
 			const bool fault_tokens_only)
 {
-	char *saveptr = NULL;
-	char *name = NULL;
+	if (str[0] == '\0' || str[0] == ':')
+		return "";
 
-	for (char *token = strtok_r(str, ":", &saveptr);
-	     token; token = strtok_r(NULL, ":", &saveptr)) {
-		if (!name)
-			name = token;
-		else if (!parse_inject_token(token, fopts, fault_tokens_only))
+	char *saveptr = NULL;
+	const char *name = strtok_r(str, ":", &saveptr);
+
+	char *token;
+	while ((token = strtok_r(NULL, ":", &saveptr))) {
+		if (!parse_inject_token(token, fopts, fault_tokens_only))
 			return NULL;
 	}
 
@@ -235,9 +236,16 @@ qualify_inject_common(const char *const str,
 		.step = 1
 	};
 	char *copy = xstrdup(str);
-	char *name = parse_inject_expression(copy, &opts, fault_tokens_only);
+	const char *name =
+		parse_inject_expression(copy, &opts, fault_tokens_only);
 	if (!name)
 		error_msg_and_die("invalid %s '%s'", description, str);
+
+	struct number_set *tmp_set =
+		alloc_number_set_array(SUPPORTED_PERSONALITIES);
+	qualify_syscall_tokens(name, tmp_set);
+
+	free(copy);
 
 	/* If neither of retval, error, or signal is specified, then ... */
 	if (!opts.data.flags) {
@@ -250,12 +258,6 @@ qualify_inject_common(const char *const str,
 			error_msg_and_die("invalid %s '%s'", description, str);
 		}
 	}
-
-	struct number_set *tmp_set =
-		alloc_number_set_array(SUPPORTED_PERSONALITIES);
-	qualify_syscall_tokens(name, tmp_set);
-
-	free(copy);
 
 	/*
 	 * Initialize inject_vec according to tmp_set.

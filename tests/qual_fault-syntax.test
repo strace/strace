@@ -40,7 +40,7 @@ fail_with()
 		"strace -e fault=$* failed to handle an argument error properly"
 }
 
-for arg in , ,, ,,, \! \!, \!: \
+for arg in '' : :: ::: , ,, ,,, \! \!, \!: \
 	   invalid_syscall_name \
 	   invalid_syscall_name:when=3 \
 	   -1 \!-1 \
@@ -62,7 +62,7 @@ for arg in , ,, ,,, \! \!, \!: \
 		fail_with "$arg"
 done
 
-for arg in '' : :: ::: chdir:42 \!chdir:42 \
+for arg in chdir:42 \!chdir:42 \
 	   chdir:42:when=7 \
 	   chdir:invalid \
 	   chdir:invalid:when=8 \
