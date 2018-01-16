@@ -252,10 +252,14 @@ static const int personality_klongsize[SUPPORTED_PERSONALITIES] = {
 # endif
 
 void
-set_personality(int personality)
+set_personality(unsigned int personality)
 {
 	if (personality == current_personality)
 		return;
+
+	if (personality >= SUPPORTED_PERSONALITIES)
+		error_msg_and_die("Requested switch to unsupported personality "
+				  "%u", personality);
 
 	nsyscalls = nsyscall_vec[personality];
 	sysent = sysent_vec[personality];

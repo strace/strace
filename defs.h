@@ -816,7 +816,7 @@ extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2
 extern void tprints_comment(const char *str);
 
 #if SUPPORTED_PERSONALITIES > 1
-extern void set_personality(int personality);
+extern void set_personality(unsigned int personality);
 extern unsigned current_personality;
 #else
 # define set_personality(personality) ((void)0)
