@@ -22,6 +22,11 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added mq_getsetattr, mq_notify, mq_open, mq_timedreceive, and mq_timedsend
     syscalls to %desc tracing set.
 
+* Portability
+  * A C compiler that can compile ISO Standard C (currently C99) is required.
+    Older versions without support of "for" loop initial declarations
+    will not work.
+
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
 
