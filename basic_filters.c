@@ -38,10 +38,9 @@ qualify_syscall_number(const char *s, struct number_set *set)
 	if (n < 0)
 		return false;
 
-	unsigned int p;
 	bool done = false;
 
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
 		if ((unsigned) n >= nsyscall_vec[p])
 			continue;
 		add_number_to_set_array(n, set, p);
@@ -70,12 +69,10 @@ qualify_syscall_regex(const char *s, struct number_set *set)
 	if ((rc = regcomp(&preg, s, REG_EXTENDED | REG_NOSUB)) != 0)
 		regerror_msg_and_die(rc, &preg, "regcomp", s);
 
-	unsigned int p;
 	bool found = false;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
 
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (!sysent_vec[p][i].sys_name)
 				continue;
 			rc = regexec(&preg, sysent_vec[p][i].sys_name,
@@ -124,8 +121,7 @@ lookup_class(const char *s)
 		{ "network",	TRACE_NETWORK	},
 	};
 
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
 		if (strcmp(s, syscall_class[i].name) == 0)
 			return syscall_class[i].value;
 	}
@@ -140,11 +136,8 @@ qualify_syscall_class(const char *s, struct number_set *set)
 	if (!n)
 		return false;
 
-	unsigned int p;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
-
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (sysent_vec[p][i].sys_name &&
 			    (sysent_vec[p][i].sys_flags & n) == n)
 				add_number_to_set_array(i, set, p);
@@ -157,13 +150,10 @@ qualify_syscall_class(const char *s, struct number_set *set)
 static bool
 qualify_syscall_name(const char *s, struct number_set *set)
 {
-	unsigned int p;
 	bool found = false;
 
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
-
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (sysent_vec[p][i].sys_name &&
 			    strcmp(s, sysent_vec[p][i].sys_name) == 0) {
 				add_number_to_set_array(i, set, p);
@@ -235,11 +225,10 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set)
 	 */
 	char *copy = xstrdup(s);
 	char *saveptr = NULL;
-	const char *token;
 	bool done = false;
 
-	for (token = strtok_r(copy, ",", &saveptr); token;
-	     token = strtok_r(NULL, ",", &saveptr)) {
+	for (const char *token = strtok_r(copy, ",", &saveptr);
+	     token; token = strtok_r(NULL, ",", &saveptr)) {
 		done = qualify_syscall(token, set);
 		if (!done)
 			error_msg_and_die("invalid system call '%s'", token);
@@ -293,11 +282,10 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	 */
 	char *copy = xstrdup(s);
 	char *saveptr = NULL;
-	const char *token;
 	int number = -1;
 
-	for (token = strtok_r(copy, ",", &saveptr); token;
-	     token = strtok_r(NULL, ",", &saveptr)) {
+	for (const char *token = strtok_r(copy, ",", &saveptr);
+	     token; token = strtok_r(NULL, ",", &saveptr)) {
 		number = func(token);
 		if (number < 0)
 			error_msg_and_die("invalid %s '%s'", name, token);
