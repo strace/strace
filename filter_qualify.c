@@ -44,15 +44,13 @@ static struct number_set *verbose_set;
 static int
 sigstr_to_uint(const char *s)
 {
-	int i;
-
 	if (*s >= '0' && *s <= '9')
 		return string_to_uint_upto(s, 255);
 
 	if (strncasecmp(s, "SIG", 3) == 0)
 		s += 3;
 
-	for (i = 0; i <= 255; ++i) {
+	for (int i = 0; i <= 255; ++i) {
 		const char *name = signame(i);
 
 		if (strncasecmp(name, "SIG", 3) != 0)
@@ -72,9 +70,7 @@ sigstr_to_uint(const char *s)
 static int
 find_errno_by_name(const char *name)
 {
-	unsigned int i;
-
-	for (i = 1; i < nerrnos; ++i) {
+	for (unsigned int i = 1; i < nerrnos; ++i) {
 		if (errnoent[i] && (strcasecmp(name, errnoent[i]) == 0))
 			return i;
 	}
@@ -161,10 +157,9 @@ parse_inject_expression(char *const str,
 {
 	char *saveptr = NULL;
 	char *name = NULL;
-	char *token;
 
-	for (token = strtok_r(str, ":", &saveptr); token;
-	     token = strtok_r(NULL, ":", &saveptr)) {
+	for (char *token = strtok_r(str, ":", &saveptr);
+	     token; token = strtok_r(NULL, ":", &saveptr)) {
 		if (!name)
 			name = token;
 		else if (!parse_inject_token(token, fopts, fault_tokens_only))
@@ -266,8 +261,7 @@ qualify_inject_common(const char *const str,
 	 * Initialize inject_vec according to tmp_set.
 	 * Merge tmp_set into inject_set.
 	 */
-	unsigned int p;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
 		if (number_set_array_is_empty(tmp_set, p))
 			continue;
 
@@ -280,8 +274,7 @@ qualify_inject_common(const char *const str,
 						sizeof(*inject_vec[p]));
 		}
 
-		unsigned int i;
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
+		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (is_number_in_set_array(i, tmp_set, p)) {
 				add_number_to_set_array(i, inject_set, p);
 				inject_vec[p][i] = opts;
@@ -333,9 +326,8 @@ void
 qualify(const char *str)
 {
 	const struct qual_options *opt = qual_options;
-	unsigned int i;
 
-	for (i = 0; i < ARRAY_SIZE(qual_options); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(qual_options); ++i) {
 		const char *name = qual_options[i].name;
 		const size_t len = strlen(name);
 		const char *val = str_strip_prefix_len(str, name, len);
