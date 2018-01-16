@@ -533,6 +533,19 @@ strace_popen(const char *command)
 	return fp;
 }
 
+static void
+outf_perror(const struct tcb * const tcp)
+{
+	if (tcp->outf == stderr)
+		return;
+
+	/* This is ugly, but we don't store separate file names */
+	if (followfork >= 2)
+		perror_msg("%s.%u", outfname, tcp->pid);
+	else
+		perror_msg("%s", outfname);
+}
+
 ATTRIBUTE_FORMAT((printf, 1, 0))
 static void
 tvprintf(const char *const fmt, va_list args)
@@ -541,8 +554,7 @@ tvprintf(const char *const fmt, va_list args)
 		int n = vfprintf(current_tcp->outf, fmt, args);
 		if (n < 0) {
 			/* very unlikely due to vfprintf buffering */
-			if (current_tcp->outf != stderr)
-				perror_msg("%s", outfname);
+			outf_perror(current_tcp);
 		} else
 			current_tcp->curcol += n;
 	}
@@ -571,8 +583,7 @@ tprints(const char *str)
 			return;
 		}
 		/* very unlikely due to fputs_unlocked buffering */
-		if (current_tcp->outf != stderr)
-			perror_msg("%s", outfname);
+		outf_perror(current_tcp);
 	}
 }
 
@@ -600,8 +611,8 @@ tprintf_comment(const char *fmt, ...)
 static void
 flush_tcp_output(const struct tcb *const tcp)
 {
-	if (fflush(tcp->outf) && tcp->outf != stderr)
-		perror_msg("%s", outfname);
+	if (fflush(tcp->outf))
+		outf_perror(tcp);
 }
 
 void
