@@ -36,11 +36,10 @@
  * it would require additional efforts to filter out mmap calls made by glibc.
  */
 
-#if defined __NR_mmap && \
-(   defined __arm__ \
- || defined __i386__ \
- || (defined __s390__ && !defined __s390x__) \
-)
+#if defined __NR_mmap \
+	&& (defined __arm__ || defined __i386__ || defined __m68k__ \
+		|| defined __s390__ || defined __s390x__) \
+	&& (defined PATH_TRACING || !(defined __s390x__ || defined __m68k__))
 
 # include <stdio.h>
 # include <string.h>
@@ -48,7 +47,7 @@
 # include <unistd.h>
 
 # ifndef TEST_FD
-#  define TEST_FD -2U
+#  define TEST_FD -2LU
 # endif
 
 int
@@ -59,42 +58,42 @@ main(void)
 	printf("mmap(NULL) = %ld %s (%m)\n", rc, errno2name());
 # endif
 
-	const unsigned int args1_c[6] = {
-		0xdeadbeef,		/* addr */
-		0xfacefeed,		/* len */
+	const unsigned long args1_c[6] = {
+		(unsigned long) 0xbadc0deddeadbeefULL,	/* addr */
+		(unsigned long) 0xdeefacedfacefeedULL,	/* len */
 		PROT_READ|PROT_EXEC,	/* prot */
 		MAP_FILE|MAP_FIXED,	/* flags */
 		TEST_FD,		/* fd */
-		0xbadc0ded		/* offset */
+		(unsigned long) 0xdecaffedbadc0dedULL	/* offset */
 	};
-	const unsigned int page_size = get_page_size();
-	const unsigned int args2_c[6] = {
+	const unsigned long page_size = get_page_size();
+	const unsigned long args2_c[6] = {
 		0,
 		page_size,
 		PROT_READ|PROT_WRITE,
 		MAP_PRIVATE|MAP_ANONYMOUS,
-		-1U,
-		0xfaced000 & -page_size
+		-1LU,
+		(unsigned long) 0xda7a1057faced000ULL & -page_size
 	};
 	void *args = tail_memdup(args1_c, sizeof(args1_c));
 
 	rc = syscall(__NR_mmap, args);
-	printf("mmap(%#x, %u, PROT_READ|PROT_EXEC, MAP_FILE|MAP_FIXED"
-	       ", %d, %#x) = %ld %s (%m)\n",
-	       args1_c[0], args1_c[1], args1_c[4], args1_c[5],
+	printf("mmap(%#lx, %lu, PROT_READ|PROT_EXEC, MAP_FILE|MAP_FIXED"
+	       ", %d, %#lx) = %ld %s (%m)\n",
+	       args1_c[0], args1_c[1], (int) args1_c[4], args1_c[5],
 	       rc, errno2name());
 
 	memcpy(args, args2_c, sizeof(args2_c));
 	rc = syscall(__NR_mmap, args);
 # ifndef PATH_TRACING
-	printf("mmap(NULL, %u, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS"
-	       ", %d, %#x) = %#lx\n",
-	       args2_c[1], args2_c[4], args2_c[5], rc);
+	printf("mmap(NULL, %lu, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS"
+	       ", %d, %#lx) = %#lx\n",
+	       args2_c[1], (int) args2_c[4], args2_c[5], rc);
 # endif
 
 	void *addr = (void *) rc;
 	if (mprotect(addr, page_size, PROT_NONE))
-		perror_msg_and_fail("mprotect(%p, %u, PROT_NONE)",
+		perror_msg_and_fail("mprotect(%p, %lu, PROT_NONE)",
 				    addr, page_size);
 
 	puts("+++ exited with 0 +++");
@@ -103,7 +102,9 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_mmap && (__arm__ || __i386__"
-		    " || (__s390__ && !__s390x__))")
+SKIP_MAIN_UNDEFINED("defined __NR_mmap "
+	"&& (defined __arm__ || defined __i386__ || defined __m68k__ "
+		"|| defined __s390__ || defined __s390x__) "
+	"&& (defined PATH_TRACING || !(defined __s390x__ || defined __m68k__))")
 
 #endif
