@@ -214,10 +214,18 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 			upathmatch(tcp, tcp->u_arg[1], set) ||
 			upathmatch(tcp, tcp->u_arg[3], set);
 
+#ifdef HAVE_ARCH_OLD_MMAP
 	case SEN_old_mmap:
-#if defined(S390)
+# if defined(S390)
 	case SEN_old_mmap_pgoff:
-#endif
+# endif
+	{
+		kernel_ulong_t *args = fetch_old_mmap_args(tcp);
+
+		return args && fdmatch(tcp, args[4], set);
+	}
+#endif /* HAVE_ARCH_OLD_MMAP */
+
 	case SEN_mmap:
 	case SEN_mmap_4koff:
 	case SEN_mmap_pgoff:
