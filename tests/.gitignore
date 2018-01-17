@@ -290,6 +290,7 @@ pkey_mprotect
 poll
 poll-P
 ppoll
+ppoll-P
 ppoll-v
 prctl-arg2-intptr
 prctl-dumpable

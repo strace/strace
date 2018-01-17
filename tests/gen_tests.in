@@ -257,6 +257,7 @@ pkey_alloc	-a17
 pkey_free	-a13
 pkey_mprotect	-a37
 ppoll	-s2
+ppoll-P	-s2 -e trace=ppoll -P /dev/full 9>>/dev/full
 ppoll-v	-v -s2 -e trace=ppoll
 pread64-pwrite64	-a21 -eread=0 -ewrite=1 -e trace=pread64,pwrite64 -P pread64-pwrite64-tmpfile -P /dev/zero -P /dev/null
 preadv	-a21

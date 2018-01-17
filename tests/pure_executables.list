@@ -244,6 +244,7 @@ pkey_mprotect
 poll
 poll-P
 ppoll
+ppoll-P
 prctl-arg2-intptr
 prctl-dumpable
 prctl-name
