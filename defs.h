@@ -53,6 +53,7 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include "arch_defs.h"
 #include "error_prints.h"
 #include "gcc_compat.h"
 #include "kernel_types.h"

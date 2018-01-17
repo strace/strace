@@ -107,10 +107,7 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
  * Confused? Me too!
  */
 
-#if defined AARCH64 || defined ARM \
- || defined I386 || defined X86_64 || defined X32 \
- || defined M68K \
- || defined S390 || defined S390X
+#ifdef HAVE_ARCH_OLD_MMAP
 /* Params are pointed to by u_arg[0], offset is in bytes */
 SYS_FUNC(old_mmap)
 {
@@ -131,7 +128,7 @@ SYS_FUNC(old_mmap)
 
 	return RVAL_DECODED | RVAL_HEX;
 }
-#endif /* old_mmap architectures */
+#endif /* HAVE_ARCH_OLD_MMAP */
 
 #ifdef S390
 /* Params are pointed to by u_arg[0], offset is in pages */

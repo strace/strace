@@ -1,0 +1,1 @@
+#define HAVE_ARCH_OLD_MMAP 1
