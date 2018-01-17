@@ -108,47 +108,64 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
  */
 
 #ifdef HAVE_ARCH_OLD_MMAP
-/* Params are pointed to by u_arg[0], offset is in bytes */
-SYS_FUNC(old_mmap)
+/**
+ * Fetch old_mmap/old_mmap_pgoff arguments that are provided as a 6-element
+ * array.  Return pointer to a static array or NULL in case of fetch failure.
+ */
+kernel_ulong_t *
+fetch_old_mmap_args(struct tcb *tcp)
 {
-	kernel_ulong_t u_arg[6];
+	static kernel_ulong_t u_arg[6];
+
 # if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 	/* We are here only in a 32-bit personality. */
 	unsigned int narrow_arg[6];
-	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))
-		return RVAL_DECODED | RVAL_HEX;
-	unsigned int i;
-	for (i = 0; i < 6; i++)
+	if (umove(tcp, tcp->u_arg[0], &narrow_arg))
+		return NULL;
+	for (unsigned int i = 0; i < 6; i++)
 		u_arg[i] = narrow_arg[i];
 # else
-	if (umove_or_printaddr(tcp, tcp->u_arg[0], &u_arg))
-		return RVAL_DECODED | RVAL_HEX;
+	if (umove(tcp, tcp->u_arg[0], &u_arg))
+		return NULL;
 # endif
-	print_mmap(tcp, u_arg, u_arg[5]);
+
+	return u_arg;
+}
+
+/* Params are pointed to by u_arg[0], offset is in bytes */
+SYS_FUNC(old_mmap)
+{
+	kernel_ulong_t *args = fetch_old_mmap_args(tcp);
+
+	if (args)
+		print_mmap(tcp, args, args[5]);
+	else
+		printaddr(tcp->u_arg[0]);
 
 	return RVAL_DECODED | RVAL_HEX;
 }
-#endif /* HAVE_ARCH_OLD_MMAP */
 
-#ifdef S390
+# ifdef S390
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {
-	kernel_ulong_t u_arg[5];
-	int i;
-	unsigned int narrow_arg[6];
-	unsigned long long offset;
-	if (umove_or_printaddr(tcp, tcp->u_arg[0], &narrow_arg))
-		return RVAL_DECODED | RVAL_HEX;
-	for (i = 0; i < 5; i++)
-		u_arg[i] = narrow_arg[i];
-	offset = narrow_arg[5];
-	offset *= get_pagesize();
-	print_mmap(tcp, u_arg, offset);
+	kernel_ulong_t *args = fetch_old_mmap_args(tcp);
+
+	if (args) {
+		unsigned long long offset;
+
+		offset = args[5];
+		offset *= get_pagesize();
+
+		print_mmap(tcp, args, offset);
+	} else {
+		printaddr(tcp->u_arg[0]);
+	}
 
 	return RVAL_DECODED | RVAL_HEX;
 }
-#endif /* S390 */
+# endif /* S390 */
+#endif /* HAVE_ARCH_OLD_MMAP */
 
 /* Params are passed directly, offset is in bytes */
 SYS_FUNC(mmap)
