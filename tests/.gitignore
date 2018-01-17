@@ -267,6 +267,7 @@ nlattr_unix_diag_msg
 nsyscalls
 nsyscalls-d
 old_mmap
+old_mmap-v-none
 oldfstat
 oldlstat
 oldselect

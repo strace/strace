@@ -240,6 +240,7 @@ nlattr_tcamsg			+netlink_sock_diag.test
 nlattr_tcmsg			+netlink_sock_diag.test
 nlattr_unix_diag_msg		+netlink_sock_diag.test
 old_mmap	-a11 -e trace=mmap
+old_mmap-v-none	-a11 -e trace=mmap -e verbose=none
 oldfstat	-a18 -v -P stat.sample
 oldlstat	-a32 -v -P stat.sample -P /dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full

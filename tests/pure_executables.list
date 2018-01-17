@@ -224,6 +224,7 @@ nlattr_tcamsg
 nlattr_tcmsg
 nlattr_unix_diag_msg
 old_mmap
+old_mmap-v-none
 oldfstat
 oldlstat
 oldselect
