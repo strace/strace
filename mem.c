@@ -117,17 +117,16 @@ fetch_old_mmap_args(struct tcb *tcp)
 {
 	static kernel_ulong_t u_arg[6];
 
-# if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-	/* We are here only in a 32-bit personality. */
-	unsigned int narrow_arg[6];
-	if (umove(tcp, tcp->u_arg[0], &narrow_arg))
-		return NULL;
-	for (unsigned int i = 0; i < 6; i++)
-		u_arg[i] = narrow_arg[i];
-# else
-	if (umove(tcp, tcp->u_arg[0], &u_arg))
-		return NULL;
-# endif
+	if (current_wordsize == 4) {
+		unsigned int narrow_arg[6];
+		if (umove(tcp, tcp->u_arg[0], &narrow_arg))
+			return NULL;
+		for (unsigned int i = 0; i < 6; i++)
+			u_arg[i] = narrow_arg[i];
+	} else {
+		if (umove(tcp, tcp->u_arg[0], &u_arg))
+			return NULL;
+	}
 
 	return u_arg;
 }
