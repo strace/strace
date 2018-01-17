@@ -288,6 +288,7 @@ pkey_alloc
 pkey_free
 pkey_mprotect
 poll
+poll-P
 ppoll
 ppoll-v
 prctl-arg2-intptr

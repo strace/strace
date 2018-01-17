@@ -242,6 +242,7 @@ pkey_alloc
 pkey_free
 pkey_mprotect
 poll
+poll-P
 ppoll
 prctl-arg2-intptr
 prctl-dumpable

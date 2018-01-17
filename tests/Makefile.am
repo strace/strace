@@ -237,6 +237,7 @@ DECODER_TESTS = \
 	oldselect.test \
 	personality.test \
 	pipe.test \
+	poll-P.test \
 	poll.test \
 	prctl-arg2-intptr.test \
 	prctl-dumpable.test \
