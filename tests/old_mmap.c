@@ -47,18 +47,24 @@
 # include <sys/mman.h>
 # include <unistd.h>
 
+# ifndef TEST_FD
+#  define TEST_FD -2U
+# endif
+
 int
 main(void)
 {
 	long rc = syscall(__NR_mmap, 0);
+# ifndef PATH_TRACING
 	printf("mmap(NULL) = %ld %s (%m)\n", rc, errno2name());
+# endif
 
 	const unsigned int args1_c[6] = {
 		0xdeadbeef,		/* addr */
 		0xfacefeed,		/* len */
 		PROT_READ|PROT_EXEC,	/* prot */
 		MAP_FILE|MAP_FIXED,	/* flags */
-		-2U,			/* fd */
+		TEST_FD,		/* fd */
 		0xbadc0ded		/* offset */
 	};
 	const unsigned int page_size = get_page_size();
@@ -80,9 +86,11 @@ main(void)
 
 	memcpy(args, args2_c, sizeof(args2_c));
 	rc = syscall(__NR_mmap, args);
+# ifndef PATH_TRACING
 	printf("mmap(NULL, %u, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS"
 	       ", %d, %#x) = %#lx\n",
 	       args2_c[1], args2_c[4], args2_c[5], rc);
+# endif
 
 	void *addr = (void *) rc;
 	if (mprotect(addr, page_size, PROT_NONE))
