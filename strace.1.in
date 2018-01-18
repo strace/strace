@@ -899,10 +899,6 @@ can trace and properly decode non-native 32-bit binaries.
 .B strace
 can trace, but cannot properly decode non-native 32-bit binaries.
 .TP
-.B no-m32
-.B strace
-cannot trace non-native 32-bit binaries.
-.TP
 .B mx32-mpers
 .B strace
 can trace and properly decode non-native 32-on-64-bit binaries.
@@ -910,15 +906,20 @@ can trace and properly decode non-native 32-on-64-bit binaries.
 .B no-mx32-mpers
 .B strace
 can trace, but cannot properly decode non-native 32-on-64-bit binaries.
-.TP
-.B no-mx32
-.B strace
-cannot trace non-native 32-on-64-bit binaries.
 .PP
-Note that these flags refer only to the binaries in the non-native ABI;
-.B strace
-is expected to be able to trace and properly decode applications that use its
-native ABI.
+If the output contains neither
+.B m32-mpers
+nor
+.BR no-m32-mpers ,
+then decoding of non-native 32-bit binaries is not implemented at all
+or not applicable.
+.PP
+Likewise, if the output contains neither
+.B mx32-mpers
+nor
+.BR no-mx32-mpers ,
+then decoding of non-native 32-on-64-bit binaries is not implemented at all
+or not applicable.
 .SH NOTES
 It is a pity that so much tracing clutter is produced by systems
 employing shared libraries.
