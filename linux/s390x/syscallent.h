@@ -393,6 +393,7 @@
 [377] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [378] = { 2,	0,		SEN(printargs),			"s390_guarded_storage"	},
 [379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[380] = { 4,	0,		SEN(s390_sthyi),		"s390_sthyi"		},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"

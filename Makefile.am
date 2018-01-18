@@ -271,6 +271,7 @@ strace_SOURCES =	\
 	rtnl_rule.c	\
 	rtnl_tc.c	\
 	rtnl_tc_action.c \
+	s390.c		\
 	sched.c		\
 	sched_attr.h	\
 	scsi.c		\
