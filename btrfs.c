@@ -787,7 +787,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		char uuid[UUID_STRING_SIZE+1];
 		uint32_t nodesize, sectorsize, clone_alignment;
 #ifndef HAVE_STRUCT_BTRFS_IOCTL_FS_INFO_ARGS_NODESIZE
-		__u32 *reserved32;
+		uint32_t *reserved32;
 #endif
 
 		if (entering(tcp))
@@ -802,7 +802,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		sectorsize = args.sectorsize,
 		clone_alignment = args.clone_alignment;
 #else
-		reserved32 = (__u32 *) (void *) args.reserved;
+		reserved32 = (void *) args.reserved;
 		nodesize = reserved32[0];
 		sectorsize = reserved32[1];
 		clone_alignment = reserved32[2];
