@@ -48,6 +48,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Inability to configure multiple personality support on architectures where
     multiple personalities are supported leads to configuration failure during
     build now.  Use --enable-mpers=check to revert to the old behaviour.
+  * Build-time requirement for the mpers support has been lowered from gawk 4
+    to gawk 3.
 
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
