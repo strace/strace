@@ -275,6 +275,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	fstatat
 	ftruncate
 	futimens
+	iconv_open
 	if_indextoname
 	open64
 	prctl
@@ -382,6 +383,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	asm/sysmips.h
 	bluetooth/bluetooth.h
 	elf.h
+	iconv.h
 	inttypes.h
 	linux/bsg.h
 	linux/cryptouser.h

@@ -298,6 +298,8 @@ rt_sigreturn
 rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
+s390_sthyi
+s390_sthyi-v
 sched_get_priority_mxx
 sched_rr_get_interval
 sched_xetaffinity
