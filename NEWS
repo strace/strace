@@ -1,12 +1,20 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behaviour
+  * Warning is now issued when -F option is used.
+  * Warning is now issued when a tracee with unsupported personality
+    is attached.
+
 * Improvements
   * Implemented decoding of netlink descriptor attributes as file descriptors.
   * Implemented decoding of hugetlb page size selection flags.
   * Implemented decoding of BPF_PROG_TEST_RUN, BPF_PROG_GET_NEXT_ID,
     BPF_MAP_GET_NEXT_ID, BPF_PROG_GET_FD_BY_ID, BPF_MAP_GET_FD_BY_ID,
     and BPF_OBJ_GET_INFO_BY_FD commands of bpf syscall.
+  * Enhanced decoding of get_thread_area, memfd_create, modify_ldt,
+    perf_event_open, reboot, set_thread_area, and shmget syscalls.
+  * Implemented decoding of KVM_* ioctl commands.
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
@@ -16,16 +24,29 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of MSG_*, NT_*, and SHM_* constants.
   * Added manual page for the strace-log-merge command.
   * Updated lists of ioctl commands from Linux 4.15.
+  * Implemented an optional support for symbol demangling in strace -k output
+    (activated by --with-libiberty configure option).
+  * Information about availability of demangling and reliable personality
+    decoding (on architectures with multiple personalities) is now available
+    in strace -V output.
+  * Enhanced manual page.
 
 * Bug fixes
   * Fixed multi-personality support in cross builds.
   * Added mq_getsetattr, mq_notify, mq_open, mq_timedreceive, and mq_timedsend
     syscalls to %desc tracing set.
+  * Fixed path tracing support for mmap syscalls with indirect arguments.
+  * Fixed corner cases in handling of strace -ff -ttt logs by strace-log-merge.
+  * Error counts that exceed one billion are now printed correctly in call
+    summary output.
+  * Fixed call summary header for x32 personality.
+  * Changes of tracee personalities are reported more reliably.
 
 * Portability
-  * A C compiler that can compile ISO Standard C (currently C99) is required.
-    Older versions without support of "for" loop initial declarations
-    will not work.
+  * A C compiler that supports "for" loop initial declarations is now required.
+  * Inability to configure multiple personality support on architectures where
+    multiple personalities are supported leads to configuration failure during
+    build now.  Use --enable-mpers=check to revert to the old behaviour.
 
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
