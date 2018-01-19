@@ -81,9 +81,13 @@ typedef struct {
 EOF
 
 expected="$mpers_dir/sample.expected"
+mpers_ptr_t="uint${size}_t"
 cat > "$expected" <<EOF
 #include <inttypes.h>
-typedef uint${size}_t mpers_ptr_t;
+#ifndef mpers_ptr_t_is_${mpers_ptr_t}
+typedef ${mpers_ptr_t} mpers_ptr_t;
+#define mpers_ptr_t_is_${mpers_ptr_t}
+#endif
 typedef
 struct {
 struct {

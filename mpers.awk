@@ -234,8 +234,12 @@ END {
 	PROCINFO["sorted_in"] = "compare_indices"
 	for (item in array) {
 		if (array[item]["special"] == "pointer_type") {
-			print "typedef uint" \
-				8 * array_get(item, "byte_size") "_t mpers_ptr_t;"
+			mpers_ptr_t = \
+				"uint" 8 * array_get(item, "byte_size") "_t"
+			print "#ifndef mpers_ptr_t_is_" mpers_ptr_t
+			print "typedef " mpers_ptr_t " mpers_ptr_t;"
+			print "#define mpers_ptr_t_is_" mpers_ptr_t
+			print "#endif"
 			break
 		}
 	}
