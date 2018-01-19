@@ -89,10 +89,8 @@ pushdef([st_cv_mpers], [st_cv_$1_mpers])
 
 case "$arch" in
 	[$2])
-	if test "$enable_mpers" = no; then
-		st_cv_runtime=no
-		st_cv_mpers=no
-	else
+	case "$enable_mpers" in
+	yes|check|[$1])
 
 	AH_TEMPLATE([HAVE_GNU_STUBS_32_H],
 		    [Define to 1 if you have the <gnu/stubs-32.h> header file.])
@@ -154,19 +152,27 @@ case "$arch" in
 		fi
 	fi
 	CFLAGS="$saved_CFLAGS"
+	;;
 
-	fi
+	*) # case "$enable_mpers"
+	st_cv_runtime=no
+	st_cv_mpers=no
+	;;
+	esac
 
 	test "$st_cv_mpers" = yes ||
 		st_cv_mpers=no
 	AC_MSG_CHECKING([whether to enable $1 personality support])
 	AC_MSG_RESULT([$st_cv_mpers])
-	if test "$enable_mpers" = yes && test "$st_cv_mpers" != yes; then
+
+	case "$enable_mpers,$st_cv_mpers" in
+	yes,no|[$1],no)
 		AC_MSG_ERROR([Cannot enable $1 personality support])
-	fi
+		;;
+	esac
 	;;
 
-	*)
+	*) # case "$arch"
 	st_cv_runtime=no
 	st_cv_mpers=no
 	;;

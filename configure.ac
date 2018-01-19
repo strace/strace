@@ -970,15 +970,16 @@ if test "$arch" = mips && test "$no_create" != yes; then
 fi
 
 AC_ARG_ENABLE([mpers],
-	[AS_HELP_STRING([--enable-mpers=yes|no|check],
+	[AS_HELP_STRING([--enable-mpers=yes|no|check|m32|mx32],
 		[whether to enable multiple personalities support required
 		 for proper decoding of structures used by tracees with
 		 personalities that differ from the personality of strace,
 		 default is yes.])],
 	[case "$enableval" in
-		yes|no|check) enable_mpers="$enableval" ;;
+		yes|no|check|m32|mx32) enable_mpers="$enableval" ;;
 		*) AC_MSG_ERROR([bad value $enableval for enable-mpers option.
-				 Valid options are: yes, no, check.]) ;;
+				 Valid options are: yes, no, check, m32, mx32.])
+		;;
 	 esac],
 	[enable_mpers=yes])
 
