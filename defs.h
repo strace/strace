@@ -844,9 +844,12 @@ extern unsigned current_klongsize;
 # endif
 #endif
 
-#define ANY_WORDSIZE_LESS_THAN_KERNEL_LONG	\
-	(SIZEOF_KERNEL_LONG_T > 4		\
-	 && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined(current_wordsize)))
+#if SIZEOF_KERNEL_LONG_T > 4		\
+ && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined(current_wordsize))
+# define ANY_WORDSIZE_LESS_THAN_KERNEL_LONG	1
+#else
+# define ANY_WORDSIZE_LESS_THAN_KERNEL_LONG	0
+#endif
 
 #define DECL_PRINTNUM(name)						\
 extern bool								\
