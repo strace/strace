@@ -61,6 +61,8 @@ main(void)
 		const unsigned int num = (unsigned UGID_TYPE) tests[i];
 		long expected;
 
+		errno = 0;
+
 		if (num == ugid)
 			expected = 0;
 		else if ((UGID_TYPE) num == (UGID_TYPE) -1U)
@@ -77,8 +79,9 @@ main(void)
 				       SYSCALL_NAME, ugid, errstr);
 				break;
 			}
-			perror_msg_and_fail("%s(%#lx) != %ld",
-					    SYSCALL_NAME, tests[i], expected);
+			perror_msg_and_fail("%s(%#lx) = %ld != %ld",
+					    SYSCALL_NAME, tests[i],
+					    rc, expected);
 		}
 
 		printf("%s(", SYSCALL_NAME);
