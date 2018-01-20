@@ -505,6 +505,7 @@ EXTRA_DIST =				\
 	linux/dummy.h			\
 	linux/errnoent.h		\
 	linux/getregs_old.h		\
+	linux/hppa/arch_defs_.h		\
 	linux/hppa/arch_regs.c		\
 	linux/hppa/arch_regs.h		\
 	linux/hppa/arch_rt_sigframe.c	\
