@@ -354,7 +354,7 @@ do_pipe(struct tcb *tcp, int flags_arg)
 
 SYS_FUNC(pipe)
 {
-#ifdef HAVE_GETRVAL2
+#if HAVE_ARCH_GETRVAL2
 	if (exiting(tcp) && !syserror(tcp))
 		printpair_fd(tcp, tcp->u_rval, getrval2(tcp));
 	return 0;

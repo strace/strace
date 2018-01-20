@@ -479,12 +479,8 @@ print_array(struct tcb *,
 				     void *opaque_data),
 	    void *opaque_data);
 
-#if defined ALPHA || defined IA64 || defined MIPS \
- || defined SH || defined SPARC || defined SPARC64
-# define HAVE_GETRVAL2
+#if HAVE_ARCH_GETRVAL2
 extern long getrval2(struct tcb *);
-#else
-# undef HAVE_GETRVAL2
 #endif
 
 extern const char *signame(const int);

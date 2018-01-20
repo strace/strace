@@ -405,6 +405,7 @@ EXTRA_DIST =				\
 	linux/aarch64/signalent1.h	\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
+	linux/alpha/arch_defs_.h		\
 	linux/alpha/arch_getrval2.c	\
 	linux/alpha/arch_regs.c		\
 	linux/alpha/arch_regs.h		\
@@ -535,6 +536,7 @@ EXTRA_DIST =				\
 	linux/i386/syscallent.h		\
 	linux/i386/userent.h		\
 	linux/i386/userent0.h		\
+	linux/ia64/arch_defs_.h		\
 	linux/ia64/arch_getrval2.c	\
 	linux/ia64/arch_regs.c		\
 	linux/ia64/arch_regs.h		\
@@ -589,6 +591,7 @@ EXTRA_DIST =				\
 	linux/microblaze/set_scno.c	\
 	linux/microblaze/syscallent.h	\
 	linux/microblaze/userent.h	\
+	linux/mips/arch_defs_.h		\
 	linux/mips/arch_getrval2.c	\
 	linux/mips/arch_regs.c		\
 	linux/mips/arch_regs.h		\
@@ -728,6 +731,7 @@ EXTRA_DIST =				\
 	linux/s390x/syscallent.h	\
 	linux/s390x/syscallent1.h	\
 	linux/s390x/userent.h		\
+	linux/sh/arch_defs_.h		\
 	linux/sh/arch_getrval2.c	\
 	linux/sh/arch_regs.c		\
 	linux/sh/arch_rt_sigframe.c	\
@@ -759,6 +763,7 @@ EXTRA_DIST =				\
 	linux/signalent.h		\
 	linux/smc_diag.h		\
 	linux/sock_diag.h		\
+	linux/sparc/arch_defs_.h		\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_regs.c		\
 	linux/sparc/arch_regs.h		\
@@ -777,6 +782,7 @@ EXTRA_DIST =				\
 	linux/sparc/signalent.h		\
 	linux/sparc/syscallent.h	\
 	linux/sparc/userent.h		\
+	linux/sparc64/arch_defs_.h	\
 	linux/sparc64/arch_getrval2.c	\
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_regs.h	\

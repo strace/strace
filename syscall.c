@@ -1012,7 +1012,7 @@ restore_cleared_syserror(struct tcb *tcp)
 
 #include "arch_regs.c"
 
-#ifdef HAVE_GETRVAL2
+#if HAVE_ARCH_GETRVAL2
 # include "arch_getrval2.c"
 #endif
 

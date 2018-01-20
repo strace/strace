@@ -1,0 +1,1 @@
+#define HAVE_ARCH_GETRVAL2 1
