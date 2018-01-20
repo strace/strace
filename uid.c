@@ -55,7 +55,7 @@
 #include "defs.h"
 
 #ifdef STRACE_UID_SIZE
-# if !NEED_UID16_PARSERS
+# if !HAVE_ARCH_UID16_SYSCALLS
 #  undef STRACE_UID_SIZE
 # endif
 #else

@@ -464,6 +464,7 @@ EXTRA_DIST =				\
 	linux/avr32/set_scno.c		\
 	linux/avr32/syscallent.h	\
 	linux/avr32/userent.h		\
+	linux/bfin/arch_defs_.h		\
 	linux/bfin/arch_regs.c		\
 	linux/bfin/arch_rt_sigframe.c	\
 	linux/bfin/get_error.c		\
@@ -578,6 +579,7 @@ EXTRA_DIST =				\
 	linux/metag/set_error.c		\
 	linux/metag/set_scno.c		\
 	linux/metag/syscallent.h	\
+	linux/microblaze/arch_defs_.h	\
 	linux/microblaze/arch_regs.c	\
 	linux/microblaze/arch_rt_sigframe.c\
 	linux/microblaze/arch_sigreturn.c	\
@@ -677,6 +679,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
+	linux/riscv/arch_defs_.h		\
 	linux/riscv/arch_regs.c		\
 	linux/riscv/arch_regs.h		\
 	linux/riscv/arch_rt_sigframe.c	\
@@ -746,6 +749,7 @@ EXTRA_DIST =				\
 	linux/sh/syscallent.h		\
 	linux/sh/userent.h		\
 	linux/sh/userent0.h		\
+	linux/sh64/arch_defs_.h		\
 	linux/sh64/arch_regs.c		\
 	linux/sh64/arch_regs.h		\
 	linux/sh64/arch_rt_sigframe.c	\
