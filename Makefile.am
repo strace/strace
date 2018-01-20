@@ -294,7 +294,6 @@ strace_SOURCES =	\
 	strace.c	\
 	string_to_uint.h \
 	string_to_uint.c \
-	supported_personalities.h \
 	swapon.c	\
 	syscall.c	\
 	sysctl.c	\
@@ -658,6 +657,7 @@ EXTRA_DIST =				\
 	linux/powerpc/set_scno.c	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/userent.h		\
+	linux/powerpc64/arch_defs_.h	\
 	linux/powerpc64/arch_regs.c	\
 	linux/powerpc64/arch_regs.h	\
 	linux/powerpc64/arch_rt_sigframe.c\
@@ -812,6 +812,7 @@ EXTRA_DIST =				\
 	linux/sparc64/userent.h		\
 	linux/subcall.h			\
 	linux/syscall.h			\
+	linux/tile/arch_defs_.h		\
 	linux/tile/arch_regs.c		\
 	linux/tile/arch_regs.h		\
 	linux/tile/arch_rt_sigframe.c	\

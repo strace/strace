@@ -60,7 +60,6 @@
 #include "macros.h"
 #include "mpers_type.h"
 #include "string_to_uint.h"
-#include "supported_personalities.h"
 #include "sysent.h"
 #include "xmalloc.h"
 
