@@ -88,6 +88,7 @@ strace_SOURCES =	\
 	affinity.c	\
 	aio.c		\
 	alpha.c		\
+	arch_defs.h	\
 	basic_filters.c	\
 	bind.c		\
 	bjm.c		\
@@ -386,7 +387,7 @@ EXTRA_DIST =				\
 	linux/32/syscallent.h		\
 	linux/64/ioctls_inc.h		\
 	linux/64/syscallent.h		\
-	linux/aarch64/arch_defs.h	\
+	linux/aarch64/arch_defs_.h	\
 	linux/aarch64/arch_regs.c	\
 	linux/aarch64/arch_regs.h	\
 	linux/aarch64/arch_rt_sigframe.c\
@@ -432,11 +433,11 @@ EXTRA_DIST =				\
 	linux/arc/set_error.c		\
 	linux/arc/set_scno.c		\
 	linux/arc/syscallent.h		\
-	linux/arch_defs.h		\
+	linux/arch_defs_.h		\
 	linux/arch_kvm.c		\
 	linux/arch_regs.h		\
 	linux/arch_sigreturn.c		\
-	linux/arm/arch_defs.h		\
+	linux/arm/arch_defs_.h		\
 	linux/arm/arch_regs.c		\
 	linux/arm/arch_regs.h		\
 	linux/arm/arch_rt_sigframe.c	\
@@ -518,7 +519,7 @@ EXTRA_DIST =				\
 	linux/hppa/signalent.h		\
 	linux/hppa/syscallent.h		\
 	linux/i386/arch_kvm.c		\
-	linux/i386/arch_defs.h		\
+	linux/i386/arch_defs_.h		\
 	linux/i386/arch_regs.c		\
 	linux/i386/arch_regs.h		\
 	linux/i386/arch_rt_sigframe.c	\
@@ -549,7 +550,7 @@ EXTRA_DIST =				\
 	linux/ia64/syscallent.h		\
 	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
-	linux/m68k/arch_defs.h		\
+	linux/m68k/arch_defs_.h		\
 	linux/m68k/arch_regs.c		\
 	linux/m68k/arch_regs.h		\
 	linux/m68k/arch_rt_sigframe.c	\
@@ -690,7 +691,7 @@ EXTRA_DIST =				\
 	linux/riscv/syscallent.h	\
 	linux/riscv/syscallent1.h	\
 	linux/rt_sigframe.h		\
-	linux/s390/arch_defs.h		\
+	linux/s390/arch_defs_.h		\
 	linux/s390/arch_regs.c		\
 	linux/s390/arch_regs.h		\
 	linux/s390/arch_rt_sigframe.c	\
@@ -707,7 +708,7 @@ EXTRA_DIST =				\
 	linux/s390/userent.h		\
 	linux/s390/userent0.h		\
 	linux/s390/userent1.h		\
-	linux/s390x/arch_defs.h		\
+	linux/s390x/arch_defs_.h		\
 	linux/s390x/arch_regs.c		\
 	linux/s390x/arch_regs.h		\
 	linux/s390x/arch_rt_sigframe.c	\
@@ -822,7 +823,7 @@ EXTRA_DIST =				\
 	linux/unix_diag.h		\
 	linux/userent.h			\
 	linux/userent0.h		\
-	linux/x32/arch_defs.h		\
+	linux/x32/arch_defs_.h		\
 	linux/x32/arch_kvm.c		\
 	linux/x32/arch_regs.c		\
 	linux/x32/arch_regs.h		\
@@ -843,7 +844,7 @@ EXTRA_DIST =				\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
 	linux/x32/userent.h		\
-	linux/x86_64/arch_defs.h	\
+	linux/x86_64/arch_defs_.h	\
 	linux/x86_64/arch_kvm.c		\
 	linux/x86_64/arch_regs.c	\
 	linux/x86_64/arch_regs.h	\
