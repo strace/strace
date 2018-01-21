@@ -214,9 +214,9 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 			upathmatch(tcp, tcp->u_arg[1], set) ||
 			upathmatch(tcp, tcp->u_arg[3], set);
 
-#ifdef HAVE_ARCH_OLD_MMAP
+#if HAVE_ARCH_OLD_MMAP
 	case SEN_old_mmap:
-# ifdef HAVE_ARCH_OLD_MMAP_PGOFF
+# if HAVE_ARCH_OLD_MMAP_PGOFF
 	case SEN_old_mmap_pgoff:
 # endif
 	{

@@ -107,7 +107,7 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
  * Confused? Me too!
  */
 
-#ifdef HAVE_ARCH_OLD_MMAP
+#if HAVE_ARCH_OLD_MMAP
 /**
  * Fetch old_mmap/old_mmap_pgoff arguments that are provided as a 6-element
  * array.  Return pointer to a static array or NULL in case of fetch failure.
@@ -144,7 +144,7 @@ SYS_FUNC(old_mmap)
 	return RVAL_DECODED | RVAL_HEX;
 }
 
-# ifdef HAVE_ARCH_OLD_MMAP_PGOFF
+# if HAVE_ARCH_OLD_MMAP_PGOFF
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {

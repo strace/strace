@@ -575,7 +575,7 @@ extern void print_numeric_long_umask(unsigned long);
 extern void print_dev_t(unsigned long long dev);
 extern void print_abnormal_hi(kernel_ulong_t);
 
-#ifdef HAVE_ARCH_OLD_MMAP
+#if HAVE_ARCH_OLD_MMAP
 extern kernel_ulong_t *fetch_old_mmap_args(struct tcb *tcp);
 #endif
 
