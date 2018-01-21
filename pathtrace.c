@@ -220,7 +220,8 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_old_mmap_pgoff:
 # endif
 	{
-		kernel_ulong_t *args = fetch_old_mmap_args(tcp);
+		kernel_ulong_t *args =
+			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 6);
 
 		return args && fdmatch(tcp, args[4], set);
 	}

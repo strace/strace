@@ -70,6 +70,7 @@ noinst_LIBRARIES = libstrace.a
 libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
 libstrace_a_CFLAGS = $(strace_CFLAGS)
 libstrace_a_SOURCES =	\
+	fetch_indirect_syscall_args.c \
 	fstatfs.c \
 	fstatfs64.c \
 	getpagesize.c \

@@ -108,33 +108,11 @@ print_mmap(struct tcb *tcp, kernel_ulong_t *u_arg, unsigned long long offset)
  */
 
 #if HAVE_ARCH_OLD_MMAP
-/**
- * Fetch old_mmap/old_mmap_pgoff arguments that are provided as a 6-element
- * array.  Return pointer to a static array or NULL in case of fetch failure.
- */
-kernel_ulong_t *
-fetch_old_mmap_args(struct tcb *tcp)
-{
-	static kernel_ulong_t u_arg[6];
-
-	if (current_wordsize == 4) {
-		unsigned int narrow_arg[6];
-		if (umove(tcp, tcp->u_arg[0], &narrow_arg))
-			return NULL;
-		for (unsigned int i = 0; i < 6; i++)
-			u_arg[i] = narrow_arg[i];
-	} else {
-		if (umove(tcp, tcp->u_arg[0], &u_arg))
-			return NULL;
-	}
-
-	return u_arg;
-}
-
 /* Params are pointed to by u_arg[0], offset is in bytes */
 SYS_FUNC(old_mmap)
 {
-	kernel_ulong_t *args = fetch_old_mmap_args(tcp);
+	kernel_ulong_t *args =
+		fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 6);
 
 	if (args)
 		print_mmap(tcp, args, args[5]);
@@ -148,7 +126,8 @@ SYS_FUNC(old_mmap)
 /* Params are pointed to by u_arg[0], offset is in pages */
 SYS_FUNC(old_mmap_pgoff)
 {
-	kernel_ulong_t *args = fetch_old_mmap_args(tcp);
+	kernel_ulong_t *args =
+		fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 6);
 
 	if (args) {
 		unsigned long long offset;
