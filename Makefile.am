@@ -72,6 +72,7 @@ libstrace_a_CFLAGS = $(strace_CFLAGS)
 libstrace_a_SOURCES =	\
 	fstatfs.c \
 	fstatfs64.c \
+	getpagesize.c \
 	ipc.c \
 	sigreturn.c	\
 	socketcall.c \

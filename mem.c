@@ -330,14 +330,6 @@ SYS_FUNC(mincore)
 	return 0;
 }
 
-#if defined ALPHA || defined IA64 || defined M68K \
- || defined SPARC || defined SPARC64
-SYS_FUNC(getpagesize)
-{
-	return RVAL_DECODED | RVAL_HEX;
-}
-#endif
-
 SYS_FUNC(remap_file_pages)
 {
 	const kernel_ulong_t addr = tcp->u_arg[0];
