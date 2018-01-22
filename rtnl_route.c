@@ -283,7 +283,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 	if (len >= sizeof(rtmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(rtmsg) - offset,
-					 (void *) &rtmsg + offset)) {
+					 (char *) &rtmsg + offset)) {
 			PRINT_FIELD_U("", rtmsg, rtm_dst_len);
 			PRINT_FIELD_U(", ", rtmsg, rtm_src_len);
 			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_tos,

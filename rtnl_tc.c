@@ -308,7 +308,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 	if (len >= sizeof(tcmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(tcmsg) - offset,
-					 (void *) &tcmsg + offset)) {
+					 (char *) &tcmsg + offset)) {
 			PRINT_FIELD_IFINDEX("", tcmsg, tcm_ifindex);
 			PRINT_FIELD_U(", ", tcmsg, tcm_handle);
 			PRINT_FIELD_U(", ", tcmsg, tcm_parent);

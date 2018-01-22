@@ -53,7 +53,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 	if (len >= sizeof(dcb)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(dcb) - offset,
-					 (void *) &dcb + offset)) {
+					 (char *) &dcb + offset)) {
 			PRINT_FIELD_XVAL("", dcb, cmd,
 					 dcb_commands, "DCB_CMD_???");
 			decode_nla = true;

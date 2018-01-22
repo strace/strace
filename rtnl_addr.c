@@ -115,7 +115,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 	if (len >= sizeof(ifaddr)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifaddr) - offset,
-					 (void *) &ifaddr + offset)) {
+					 (char *) &ifaddr + offset)) {
 			PRINT_FIELD_U("", ifaddr, ifa_prefixlen);
 			PRINT_FIELD_FLAGS(", ", ifaddr, ifa_flags,
 					  ifaddrflags, "IFA_F_???");

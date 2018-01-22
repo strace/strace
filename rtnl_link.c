@@ -434,7 +434,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 	if (len >= sizeof(ifinfo)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifinfo) - offset,
-					 (void *) &ifinfo + offset)) {
+					 (char *) &ifinfo + offset)) {
 			PRINT_FIELD_XVAL("", ifinfo, ifi_type,
 					 arp_hardware_types, "ARPHRD_???");
 			PRINT_FIELD_IFINDEX(", ", ifinfo, ifi_index);

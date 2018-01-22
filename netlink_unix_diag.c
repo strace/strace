@@ -49,7 +49,7 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_req)
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
-					 (void *) &req + offset)) {
+					 (char *) &req + offset)) {
 			PRINT_FIELD_U("", req, sdiag_protocol);
 			PRINT_FIELD_FLAGS(", ", req, udiag_states,
 					  tcp_state_flags, "1<<TCP_???");
@@ -153,7 +153,7 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg)
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
-					 (void *) &msg + offset)) {
+					 (char *) &msg + offset)) {
 			PRINT_FIELD_XVAL("", msg, udiag_type,
 					 socktypes, "SOCK_???");
 			PRINT_FIELD_XVAL(", ", msg, udiag_state,

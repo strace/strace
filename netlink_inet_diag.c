@@ -202,7 +202,7 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
-					 (void *) &req + offset)) {
+					 (char *) &req + offset)) {
 			PRINT_FIELD_U("", req, idiag_src_len);
 			PRINT_FIELD_U(", ", req, idiag_dst_len);
 			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
@@ -245,7 +245,7 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
-					 (void *) &req + offset)) {
+					 (char *) &req + offset)) {
 			PRINT_FIELD_XVAL("", req, sdiag_protocol,
 					 inet_protocols, "IPPROTO_???");
 			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
@@ -401,7 +401,7 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
-					 (void *) &msg + offset)) {
+					 (char *) &msg + offset)) {
 			PRINT_FIELD_XVAL("", msg, idiag_state,
 					 tcp_states, "TCP_???");
 			PRINT_FIELD_U(", ", msg, idiag_timer);

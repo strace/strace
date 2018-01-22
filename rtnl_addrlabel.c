@@ -70,7 +70,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 	if (len >= sizeof(ifal)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifal) - offset,
-					 (void *) &ifal + offset)) {
+					 (char *) &ifal + offset)) {
 			PRINT_FIELD_U("", ifal, ifal_prefixlen);
 			PRINT_FIELD_U(", ", ifal, ifal_flags);
 			PRINT_FIELD_IFINDEX(", ", ifal, ifal_index);

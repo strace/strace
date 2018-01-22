@@ -215,7 +215,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 	if (len >= sizeof(bpm)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(bpm) - offset,
-					 (void *) &bpm + offset)) {
+					 (char *) &bpm + offset)) {
 			PRINT_FIELD_IFINDEX("", bpm, ifindex);
 			decode_nla = true;
 		}

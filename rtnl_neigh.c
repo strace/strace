@@ -102,7 +102,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 	if (len >= sizeof(ndmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ndmsg) - offset,
-					 (void *) &ndmsg + offset)) {
+					 (char *) &ndmsg + offset)) {
 			PRINT_FIELD_IFINDEX("", ndmsg, ndm_ifindex);
 			PRINT_FIELD_FLAGS(", ", ndmsg, ndm_state,
 					  neighbor_cache_entry_states,
