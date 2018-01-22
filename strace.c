@@ -2232,6 +2232,8 @@ print_event_exit(struct tcb *tcp)
 		 */
 		tprints(" <unfinished ...>");
 	}
+
+	printing_tcp = tcp;
 	tprints(") ");
 	tabto();
 	tprints("= ?\n");
