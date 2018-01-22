@@ -572,10 +572,13 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 
 	opts->first = opts->step;
 
-	if (opts->data.flags & INJECT_F_SIGNAL)
-		*signo = opts->data.signo;
-	if (opts->data.flags & INJECT_F_RETVAL && !arch_set_scno(tcp, -1))
-		tcp->flags |= TCB_TAMPERED;
+	if (!recovering(tcp)) {
+		if (opts->data.flags & INJECT_F_SIGNAL)
+			*signo = opts->data.signo;
+		if (opts->data.flags & INJECT_F_RETVAL &&
+		    !arch_set_scno(tcp, -1))
+			tcp->flags |= TCB_TAMPERED;
+	}
 
 	return 0;
 }
@@ -1256,6 +1259,15 @@ get_scno(struct tcb *tcp)
 		debug_msg("pid %d invalid syscall %" PRI_kld,
 			  tcp->pid, tcp->scno);
 	}
+
+	/*
+	 * We refrain from argument decoding during recovering
+	 * as tracee memory mappings has changed and the registers
+	 * are very likely pointing to garbage already.
+	 */
+	if (recovering(tcp))
+		tcp->qual_flg |= QUAL_RAW;
+
 	return 1;
 }
 

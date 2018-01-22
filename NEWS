@@ -42,6 +42,9 @@ Noteworthy changes in release ?.?? (????-??-??)
     summary output.
   * Fixed call summary header for x32 personality.
   * Changes of tracee personalities are reported more reliably.
+  * Fixed the case when strace attaches to a tracee being inside exec and its
+    first syscall stop is syscall-exit-stop instead of syscall-enter-stop,
+    which messed up all the syscall state tracking.
 
 * Portability
   * A C compiler that supports "for" loop initial declarations is now required.

@@ -248,8 +248,10 @@ struct tcb {
 #define TCB_TAMPERED	0x40	/* A syscall has been tampered with */
 #define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
 #define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x100	/* -b execve should skip detach on first execve */
-#define TCB_GRABBED	0x200 /* We grab the process and can catch it
-			       * in the middle of a syscall */
+#define TCB_GRABBED	0x200	/* We grab the process and can catch it
+				 * in the middle of a syscall */
+#define TCB_RECOVERING	0x400	/* We try to recover after detecting incorrect
+				 * syscall entering/exiting state */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -271,6 +273,7 @@ struct tcb {
 #define filtered(tcp)	((tcp)->flags & TCB_FILTERED)
 #define hide_log(tcp)	((tcp)->flags & TCB_HIDE_LOG)
 #define syscall_tampered(tcp)	((tcp)->flags & TCB_TAMPERED)
+#define recovering(tcp)	((tcp)->flags & TCB_RECOVERING)
 
 #include "xlat.h"
 

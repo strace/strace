@@ -2483,6 +2483,31 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 
 	case TE_STOP_BEFORE_EXECVE:
 		/*
+		 * Check that we are inside syscall now (next event after
+		 * PTRACE_EVENT_EXEC should be for syscall exiting).  If it is
+		 * not the case, we might have a situation when we attach to a
+		 * process and the first thing we see is a PTRACE_EVENT_EXEC
+		 * and all the following syscall state tracking is screwed up
+		 * otherwise.
+		 */
+		if (entering(current_tcp)) {
+			int ret;
+
+			error_msg("Stray PTRACE_EVENT_EXEC from pid %d"
+				  ", trying to recover...",
+				  current_tcp->pid);
+
+			current_tcp->flags |= TCB_RECOVERING;
+			ret = trace_syscall(current_tcp, &restart_sig);
+			current_tcp->flags &= ~TCB_RECOVERING;
+
+			if (ret < 0) {
+				/* The reason is described in TE_SYSCALL_STOP */
+				return true;
+			}
+		}
+
+		/*
 		 * Under Linux, execve changes pid to thread leader's pid,
 		 * and we see this changed pid on EVENT_EXEC and later,
 		 * execve sysexit. Leader "disappears" without exit
