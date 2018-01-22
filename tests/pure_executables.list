@@ -288,6 +288,7 @@ rename
 renameat
 renameat2
 request_key
+riscv_flush_icache
 rmdir
 rt_sigaction
 rt_sigpending
