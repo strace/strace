@@ -254,6 +254,7 @@ strace_SOURCES =	\
 	regs.h		\
 	renameat.c	\
 	resource.c	\
+	riscv.c		\
 	rt_sigframe.c	\
 	rt_sigreturn.c	\
 	rtc.c		\
