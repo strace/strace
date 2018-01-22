@@ -196,29 +196,21 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	return 0;
 }
 
+#if HAVE_ARCH_OLD_SELECT
 SYS_FUNC(oldselect)
 {
-	kernel_ulong_t select_args[5];
-	unsigned int oldselect_args[5];
+	kernel_ulong_t *args =
+		fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 5);
 
-	if (sizeof(*select_args) == sizeof(*oldselect_args)) {
-		if (umove_or_printaddr(tcp, tcp->u_arg[0], &select_args)) {
-			return 0;
-		}
+	if (args) {
+		return decode_select(tcp, args, print_timeval, sprint_timeval);
 	} else {
-		unsigned int i;
-
-		if (umove_or_printaddr(tcp, tcp->u_arg[0], &oldselect_args)) {
-			return 0;
-		}
-
-		for (i = 0; i < 5; ++i) {
-			select_args[i] = oldselect_args[i];
-		}
+		if (entering(tcp))
+			printaddr(tcp->u_arg[0]);
+		return RVAL_DECODED;
 	}
-
-	return decode_select(tcp, select_args, print_timeval, sprint_timeval);
 }
+#endif /* HAVE_ARCH_OLD_SELECT */
 
 #ifdef ALPHA
 SYS_FUNC(osf_select)

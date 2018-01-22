@@ -143,6 +143,41 @@ pathtrace_select_set(const char *path, struct path_set *set)
 	storepath(rpath, set);
 }
 
+static bool
+match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
+		   struct path_set *set)
+{
+	/* Kernel truncates arg[0] to int, we do the same. */
+	int nfds = (int) args[0];
+	/* Kernel rejects negative nfds, so we don't parse it either. */
+	if (nfds <= 0)
+		return false;
+	/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
+	if (nfds > 1024*1024)
+		nfds = 1024*1024;
+	unsigned int fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
+	fd_set *fds = xmalloc(fdsize);
+
+	for (unsigned int i = 1; i <= 3; ++i) {
+		if (args[i] == 0)
+			continue;
+		if (umoven(tcp, args[i], fdsize, fds) < 0)
+			continue;
+		for (int j = 0;; ++j) {
+			j = next_set_bit(fds, j, nfds);
+			if (j < 0)
+				break;
+			if (fdmatch(tcp, j, set)) {
+				free(fds);
+				return true;
+			}
+		}
+	}
+
+	free(fds);
+	return false;
+}
+
 /*
  * Return true if syscall accesses a selected path
  * (or if no paths have been specified for tracing).
@@ -258,70 +293,18 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return fdmatch(tcp, tcp->u_arg[argn], set) ||
 			upathmatch(tcp, tcp->u_arg[argn + 1], set);
 	}
+#if HAVE_ARCH_OLD_SELECT
 	case SEN_oldselect:
+	{
+		kernel_ulong_t *args =
+			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 5);
+
+		return args && match_xselect_args(tcp, args, set);
+	}
+#endif
 	case SEN_pselect6:
 	case SEN_select:
-	{
-		int     i, j;
-		int     nfds;
-		kernel_ulong_t *args;
-		kernel_ulong_t select_args[5];
-		unsigned int oldselect_args[5];
-		unsigned int fdsize;
-		fd_set *fds;
-
-		if (SEN_oldselect == s->sen) {
-			if (sizeof(*select_args) == sizeof(*oldselect_args)) {
-				if (umove(tcp, tcp->u_arg[0], &select_args)) {
-					return false;
-				}
-			} else {
-				unsigned int n;
-
-				if (umove(tcp, tcp->u_arg[0], &oldselect_args)) {
-					return false;
-				}
-
-				for (n = 0; n < 5; ++n) {
-					select_args[n] = oldselect_args[n];
-				}
-			}
-			args = select_args;
-		} else {
-			args = tcp->u_arg;
-		}
-
-		/* Kernel truncates arg[0] to int, we do the same. */
-		nfds = (int) args[0];
-		/* Kernel rejects negative nfds, so we don't parse it either. */
-		if (nfds <= 0)
-			return false;
-		/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
-		if (nfds > 1024*1024)
-			nfds = 1024*1024;
-		fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
-		fds = xmalloc(fdsize);
-
-		for (i = 1; i <= 3; ++i) {
-			if (args[i] == 0)
-				continue;
-			if (umoven(tcp, args[i], fdsize, fds) < 0) {
-				continue;
-			}
-			for (j = 0;; j++) {
-				j = next_set_bit(fds, j, nfds);
-				if (j < 0)
-					break;
-				if (fdmatch(tcp, j, set)) {
-					free(fds);
-					return true;
-				}
-			}
-		}
-		free(fds);
-		return false;
-	}
-
+		return match_xselect_args(tcp, tcp->u_arg, set);
 	case SEN_poll:
 	case SEN_ppoll:
 	{

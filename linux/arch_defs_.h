@@ -12,6 +12,10 @@
 # define HAVE_ARCH_OLD_MMAP_PGOFF 0
 #endif
 
+#ifndef HAVE_ARCH_OLD_SELECT
+# define HAVE_ARCH_OLD_SELECT 0
+#endif
+
 #ifndef HAVE_ARCH_UID16_SYSCALLS
 # define HAVE_ARCH_UID16_SYSCALLS 0
 #endif
