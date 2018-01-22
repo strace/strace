@@ -679,7 +679,7 @@ SYS_FUNC(rt_sigtimedwait)
 		}
 	}
 	return 0;
-};
+}
 
 SYS_FUNC(restart_syscall)
 {
