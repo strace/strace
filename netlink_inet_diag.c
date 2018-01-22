@@ -275,11 +275,9 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_req)
 {
 	if (nlmsghdr->nlmsg_type == TCPDIAG_GETSOCK
 	    || nlmsghdr->nlmsg_type == DCCPDIAG_GETSOCK)
-		return decode_inet_diag_req_compat(tcp, nlmsghdr,
-						   family, addr, len);
+		decode_inet_diag_req_compat(tcp, nlmsghdr, family, addr, len);
 	else
-		return decode_inet_diag_req_v2(tcp, nlmsghdr,
-					       family, addr, len);
+		decode_inet_diag_req_v2(tcp, nlmsghdr, family, addr, len);
 }
 
 static bool
