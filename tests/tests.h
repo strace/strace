@@ -75,6 +75,15 @@ void error_msg_and_skip(const char *, ...)
 void perror_msg_and_skip(const char *, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 
+#ifndef perror_msg_and_fail
+# define perror_msg_and_fail(fmt_, ...) \
+	perror_msg_and_fail("%s:%d: " fmt_, __FILE__, __LINE__, ##__VA_ARGS__)
+#endif
+#ifndef perror_msg_and_fail
+# define error_msg_and_fail(fmt_, ...) \
+	error_msg_and_fail("%s:%d: " fmt_, __FILE__, __LINE__, ##__VA_ARGS__)
+#endif
+
 /* Stat the specified file and skip the test if the stat call failed. */
 void skip_if_unavailable(const char *);
 

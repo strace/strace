@@ -25,6 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define perror_msg_and_fail perror_msg_and_fail
+#define error_msg_and_fail error_msg_and_fail
+
 #include "tests.h"
 #include <errno.h>
 #include <stdarg.h>
