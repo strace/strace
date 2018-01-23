@@ -444,9 +444,9 @@
  * Remapped by shuffle_scno() to be directly after __ARM_NR_cmpxchg.
  */
 [ARM_FIRST_SHUFFLED_SYSCALL+1+0] = { },
-[ARM_FIRST_SHUFFLED_SYSCALL+1+1] = { 5,	0,	SEN(printargs),	"breakpoint"		},
-[ARM_FIRST_SHUFFLED_SYSCALL+1+2] = { 5,	0,	SEN(printargs),	"cacheflush"		},
-[ARM_FIRST_SHUFFLED_SYSCALL+1+3] = { 5,	0,	SEN(printargs),	"usr26"			},
-[ARM_FIRST_SHUFFLED_SYSCALL+1+4] = { 5,	0,	SEN(printargs),	"usr32"			},
-[ARM_FIRST_SHUFFLED_SYSCALL+1+5] = { 5,	0,	SEN(printargs),	"set_tls"		},
+[ARM_FIRST_SHUFFLED_SYSCALL+1+1] = { 0,	0,	SEN(printargs),	"breakpoint"		},
+[ARM_FIRST_SHUFFLED_SYSCALL+1+2] = { 3,	TM,	SEN(printargs),	"cacheflush"		},
+[ARM_FIRST_SHUFFLED_SYSCALL+1+3] = { 0,	0,	SEN(printargs),	"usr26"			},
+[ARM_FIRST_SHUFFLED_SYSCALL+1+4] = { 0,	0,	SEN(printargs),	"usr32"			},
+[ARM_FIRST_SHUFFLED_SYSCALL+1+5] = { 1,	0,	SEN(printargs),	"set_tls"		},
 #define ARM_LAST_SPECIAL_SYSCALL 5
