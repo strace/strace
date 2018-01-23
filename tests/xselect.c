@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Check decoding of select/_newselect syscalls.
+ *
+ * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2015-2017 The strace developers.
  * All rights reserved.
  *
@@ -30,82 +32,156 @@
  * Based on test by Dr. David Alan Gilbert <dave@treblig.org>
  */
 
-#include <assert.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/select.h>
 
-static fd_set set[0x1000000 / sizeof(fd_set)];
+static const char *errstr;
 
-int main(void)
+static long
+xselect(const kernel_ulong_t nfds,
+	const kernel_ulong_t rs,
+	const kernel_ulong_t ws,
+	const kernel_ulong_t es,
+	const kernel_ulong_t tv)
 {
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timeval, tv);
-	struct timeval tv_in;
-	int fds[2];
-	long rc;
+	long rc = syscall(TEST_SYSCALL_NR,
+			  F8ILL_KULONG_MASK | nfds, rs, ws, es, tv);
+	errstr = sprintrc(rc);
+	return rc;
+}
 
+#define XSELECT(expected_, ...)						\
+	do {								\
+		long rc = xselect(__VA_ARGS__);				\
+		if (rc != (expected_))					\
+			perror_msg_and_fail(TEST_SYSCALL_STR		\
+					    ": expected %d"		\
+					    ", returned %ld",		\
+					    (expected_), rc);		\
+	} while (0)							\
+/* End of XSELECT definition. */
+
+int
+main(void)
+{
+	for (int i = 3; i < FD_SETSIZE; ++i) {
+		(void) close(i);
+	}
+
+	int fds[2];
 	if (pipe(fds))
 		perror_msg_and_fail("pipe");
 
+	static const int smallset_size = sizeof(kernel_ulong_t) * 8;
+	const int nfds = fds[1] + 1;
+	if (nfds > smallset_size)
+		error_msg_and_fail("nfds[%d] > smallset_size[%d]\n",
+				   nfds, smallset_size);
+
+	struct timeval tv_in = { 0, 123 };
+	struct timeval *const tv = tail_memdup(&tv_in, sizeof(tv_in));
+	const uintptr_t a_tv = (uintptr_t) tv;
+
+	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_rs);
+	fd_set *const rs = (void *) l_rs;
+	const uintptr_t a_rs = (uintptr_t) rs;
+
+	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_ws);
+	fd_set *const ws = (void *) l_ws;
+	const uintptr_t a_ws = (uintptr_t) ws;
+
+	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_es);
+	fd_set *const es = (void *) l_es;
+	const uintptr_t a_es = (uintptr_t) es;
+
+	long rc;
+
 	/*
-	 * Start with a nice simple select.
+	 * An equivalent of nanosleep.
 	 */
-	FD_ZERO(set);
-	FD_SET(fds[0], set);
-	FD_SET(fds[1], set);
-	rc = syscall(TEST_SYSCALL_NR, fds[1] + 1, set, set, set, NULL);
-	if (rc < 0)
-		perror_msg_and_skip(TEST_SYSCALL_STR);
-	assert(rc == 1);
-	printf("%s(%d, [%d %d], [%d %d], [%d %d], NULL) = 1 ()\n",
-	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-	       fds[0], fds[1], fds[0], fds[1]);
+	if (xselect(0, 0, 0, 0, a_tv)) {
+		if (errno == ENOSYS)
+			perror_msg_and_skip(TEST_SYSCALL_STR);
+		else
+			perror_msg_and_fail(TEST_SYSCALL_STR);
+	}
+	printf("%s(0, NULL, NULL, NULL, {tv_sec=%lld, tv_usec=%llu})"
+	       " = 0 (Timeout)\n",
+	       TEST_SYSCALL_STR, (long long) tv_in.tv_sec,
+	       zero_extend_signed_to_ull(tv_in.tv_usec));
+
+	/* EFAULT on tv argument */
+	XSELECT(-1, 0, 0, 0, 0, a_tv + 1);
+	printf("%s(0, NULL, NULL, NULL, %#lx) = %s\n",
+	       TEST_SYSCALL_STR, (unsigned long) a_tv + 1, errstr);
+
+	/*
+	 * Start with a nice simple select with the same set.
+	 */
+	for (int i = nfds; i <= smallset_size; ++i) {
+		*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+		XSELECT(1, i, a_rs, a_rs, a_rs, 0);
+		printf("%s(%d, [%d %d], [%d %d], [%d %d], NULL) = 1 ()\n",
+		       TEST_SYSCALL_STR, i, fds[0], fds[1],
+		       fds[0], fds[1], fds[0], fds[1]);
+	}
 
 	/*
 	 * Odd timeout.
 	 */
-	FD_SET(fds[0], set);
-	FD_SET(fds[1], set);
-	tv->tv_sec = 0xdeadbeefU;
-	tv->tv_usec = 0xfacefeedU;
-	memcpy(&tv_in, tv, sizeof(tv_in));
-	rc = syscall(TEST_SYSCALL_NR, fds[1] + 1, set, set, set, tv);
+	*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+	tv_in.tv_sec = 0xdeadbeefU;
+	tv_in.tv_usec = 0xfacefeedU;
+	memcpy(tv, &tv_in, sizeof(tv_in));
+	rc = xselect(nfds, a_rs, a_rs, a_rs, a_tv);
 	if (rc < 0) {
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %s\n",
-		       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-		       fds[0], fds[1], fds[0], fds[1], (long long) tv->tv_sec,
-		       zero_extend_signed_to_ull(tv->tv_usec), sprintrc(rc));
+		       TEST_SYSCALL_STR, nfds, fds[0], fds[1],
+		       fds[0], fds[1], fds[0], fds[1],
+		       (long long) tv_in.tv_sec,
+		       zero_extend_signed_to_ull(tv_in.tv_usec),
+		       errstr);
 	} else {
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %ld"
 		       " (left {tv_sec=%lld, tv_usec=%llu})\n",
-		       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-		       fds[0], fds[1], fds[0], fds[1], (long long) tv_in.tv_sec,
+		       TEST_SYSCALL_STR, nfds, fds[0], fds[1],
+		       fds[0], fds[1], fds[0], fds[1],
+		       (long long) tv_in.tv_sec,
 		       zero_extend_signed_to_ull(tv_in.tv_usec),
 		       rc, (long long) tv->tv_sec,
 		       zero_extend_signed_to_ull(tv->tv_usec));
 	}
 
-	FD_SET(fds[0], set);
-	FD_SET(fds[1], set);
-	tv->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
-	tv->tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
-	memcpy(&tv_in, tv, sizeof(tv_in));
-	rc = syscall(TEST_SYSCALL_NR, fds[1] + 1, set, set, set, tv);
+	/*
+	 * Very odd timeout.
+	 */
+	*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+	tv_in.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv_in.tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
+	memcpy(tv, &tv_in, sizeof(tv_in));
+	rc = xselect(nfds, a_rs, a_rs, a_rs, a_tv);
 	if (rc < 0) {
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %s\n",
-		       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-		       fds[0], fds[1], fds[0], fds[1], (long long) tv->tv_sec,
-		       zero_extend_signed_to_ull(tv->tv_usec), sprintrc(rc));
+		       TEST_SYSCALL_STR, nfds, fds[0], fds[1],
+		       fds[0], fds[1], fds[0], fds[1],
+		       (long long) tv_in.tv_sec,
+		       zero_extend_signed_to_ull(tv_in.tv_usec),
+		       errstr);
 	} else {
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %ld"
 		       " (left {tv_sec=%lld, tv_usec=%llu})\n",
-		       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-		       fds[0], fds[1], fds[0], fds[1], (long long) tv_in.tv_sec,
+		       TEST_SYSCALL_STR, nfds, fds[0], fds[1],
+		       fds[0], fds[1], fds[0], fds[1],
+		       (long long) tv_in.tv_sec,
 		       zero_extend_signed_to_ull(tv_in.tv_usec),
 		       rc, (long long) tv->tv_sec,
 		       zero_extend_signed_to_ull(tv->tv_usec));
@@ -114,43 +190,123 @@ int main(void)
 	/*
 	 * Another simple one, with a timeout.
 	 */
-	FD_SET(1, set);
-	FD_SET(2, set);
-	FD_SET(fds[0], set);
-	FD_SET(fds[1], set);
-	tv->tv_sec = 0xc0de1;
-	tv->tv_usec = 0xc0de2;
-	memcpy(&tv_in, tv, sizeof(tv_in));
-	assert(syscall(TEST_SYSCALL_NR, fds[1] + 1, NULL, set, NULL, tv) == 3);
-	printf("%s(%d, NULL, [1 2 %d %d], NULL, {tv_sec=%lld, tv_usec=%llu})"
-	       " = 3 (out [1 2 %d], left {tv_sec=%lld, tv_usec=%llu})\n",
-	       TEST_SYSCALL_STR, fds[1] + 1, fds[0], fds[1],
-	       (long long) tv_in.tv_sec,
-	       zero_extend_signed_to_ull(tv_in.tv_usec),
-	       fds[1],
-	       (long long) tv->tv_sec,
-	       zero_extend_signed_to_ull(tv->tv_usec));
+	for (int i = nfds; i <= smallset_size; ++i) {
+		*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+		*l_ws = (1UL << 1) | (1UL << 2) |
+			(1UL << fds[0]) | (1UL << fds[1]);
+		*l_es = 0;
+		tv_in.tv_sec = 0xc0de1;
+		tv_in.tv_usec = 0xc0de2;
+		memcpy(tv, &tv_in, sizeof(tv_in));
+		XSELECT(3, i, a_rs, a_ws, a_es, a_tv);
+		printf("%s(%d, [%d %d], [%d %d %d %d], []"
+		       ", {tv_sec=%lld, tv_usec=%llu}) = 3 (out [1 2 %d]"
+		       ", left {tv_sec=%lld, tv_usec=%llu})\n",
+		       TEST_SYSCALL_STR, i, fds[0], fds[1],
+		       1, 2, fds[0], fds[1],
+		       (long long) tv_in.tv_sec,
+		       zero_extend_signed_to_ull(tv_in.tv_usec),
+		       fds[1],
+		       (long long) tv->tv_sec,
+		       zero_extend_signed_to_ull(tv->tv_usec));
+	}
 
 	/*
 	 * Now the crash case that trinity found, negative nfds
 	 * but with a pointer to a large chunk of valid memory.
 	 */
-	FD_ZERO(set);
+	static fd_set set[0x1000000 / sizeof(fd_set)];
 	FD_SET(fds[1], set);
-	assert(syscall(TEST_SYSCALL_NR, -1, NULL, set, NULL, NULL) == -1);
-	printf("%s(-1, NULL, %p, NULL, NULL) = -1 EINVAL (%m)\n",
-	       TEST_SYSCALL_STR, set);
+	XSELECT(-1, -1U, 0, (uintptr_t) set, 0, 0);
+	printf("%s(-1, NULL, %p, NULL, NULL) = %s\n",
+	       TEST_SYSCALL_STR, set, errstr);
 
 	/*
-	 * Another variant, with nfds exceeding FD_SETSIZE limit.
+	 * Big sets, nfds exceeds FD_SETSIZE limit.
 	 */
-	FD_ZERO(set);
+	const size_t big_size = sizeof(fd_set) + sizeof(long);
+	fd_set *const big_rs = tail_alloc(big_size);
+	const uintptr_t a_big_rs = (uintptr_t) big_rs;
+
+	fd_set *const big_ws = tail_alloc(big_size);
+	const uintptr_t a_big_ws = (uintptr_t) big_ws;
+
+	for (unsigned int i = FD_SETSIZE; i <= big_size * 8; ++i) {
+		memset(big_rs, 0, big_size);
+		memset(big_ws, 0, big_size);
+		FD_SET(fds[0], big_rs);
+		tv->tv_sec = 0;
+		tv->tv_usec = 10 + (i - FD_SETSIZE);
+		XSELECT(0, i, a_big_rs, a_big_ws, 0, a_tv);
+		printf("%s(%d, [%d], [], NULL, {tv_sec=0, tv_usec=%d})"
+		       " = 0 (Timeout)\n",
+		       TEST_SYSCALL_STR, i, fds[0], 10 + (i - FD_SETSIZE));
+	}
+
+	/*
+	 * Huge sets, nfds equals to INT_MAX.
+	 */
 	FD_SET(fds[0], set);
+	FD_SET(fds[1], set);
 	tv->tv_sec = 0;
 	tv->tv_usec = 123;
-	assert(syscall(TEST_SYSCALL_NR, FD_SETSIZE + 1, set, set + 1, NULL, tv) == 0);
-	printf("%s(%d, [%d], [], NULL, {tv_sec=0, tv_usec=123}) = 0 (Timeout)\n",
-	       TEST_SYSCALL_STR, FD_SETSIZE + 1, fds[0]);
+	XSELECT(0, INT_MAX, (uintptr_t) set, (uintptr_t) &set[1],
+		(uintptr_t) &set[2], a_tv);
+	printf("%s(%d, [%d %d], [], [], {tv_sec=0, tv_usec=123})"
+	       " = 0 (Timeout)\n",
+	       TEST_SYSCALL_STR, INT_MAX, fds[0], fds[1]);
+
+	/*
+	 * Small sets, nfds exceeds FD_SETSIZE limit.
+	 * The kernel seems to be fine with it but strace cannot follow.
+	 */
+	*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+	*l_ws = (1UL << fds[0]);
+	*l_es = (1UL << fds[0]) | (1UL << fds[1]);
+	tv->tv_sec = 0;
+	tv->tv_usec = 123;
+	rc = xselect(FD_SETSIZE + 1, a_rs, a_ws, a_es, a_tv);
+	if (rc < 0) {
+		printf("%s(%d, %p, %p, %p, {tv_sec=0, tv_usec=123}) = %s\n",
+		       TEST_SYSCALL_STR, FD_SETSIZE + 1, rs, ws, es, errstr);
+	} else {
+		printf("%s(%d, %p, %p, %p, {tv_sec=0, tv_usec=123})"
+		       " = 0 (Timeout)\n",
+		       TEST_SYSCALL_STR, FD_SETSIZE + 1, rs, ws, es);
+	}
+
+	/*
+	 * Small sets, one of allocated descriptors exceeds smallset_size.
+	 */
+	if (dup2(fds[1], smallset_size) != smallset_size)
+		perror_msg_and_fail("dup2");
+	XSELECT(-1, smallset_size + 1, a_rs, a_ws, a_es, 0);
+	printf("%s(%d, %p, %p, %p, NULL) = %s\n",
+	       TEST_SYSCALL_STR, smallset_size + 1, rs, ws, es, errstr);
+
+	/*
+	 * Small and big sets,
+	 * one of allocated descriptors exceeds smallset_size.
+	 */
+	memset(big_rs, 0, big_size);
+	FD_SET(fds[0], big_rs);
+	FD_SET(smallset_size, big_rs);
+	memset(big_ws, 0, big_size);
+	FD_SET(fds[1], big_ws);
+	FD_SET(smallset_size, big_ws);
+	XSELECT(-1, smallset_size + 1, a_big_rs, a_big_ws, a_es, 0);
+	printf("%s(%d, [%d %d], [%d %d], %p, NULL) = %s\n",
+	       TEST_SYSCALL_STR, smallset_size + 1,
+	       fds[0], smallset_size,
+	       fds[1], smallset_size,
+	       es, errstr);
+	XSELECT(-1, smallset_size + 1, a_es, a_big_ws, a_big_rs, 0);
+	printf("%s(%d, %p, [%d %d], [%d %d], NULL) = %s\n",
+	       TEST_SYSCALL_STR, smallset_size + 1,
+	       es,
+	       fds[1], smallset_size,
+	       fds[0], smallset_size,
+	       errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
