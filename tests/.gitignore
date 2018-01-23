@@ -4,6 +4,7 @@
 *.o
 *.trs
 _newselect
+_newselect-P
 accept
 accept4
 access
@@ -371,6 +372,7 @@ seccomp-filter-v
 seccomp-strict
 seccomp_get_action_avail
 select
+select-P
 semop
 sendfile
 sendfile64

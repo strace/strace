@@ -82,6 +82,7 @@ LDADD = libtests.a
 include pure_executables.am
 
 check_PROGRAMS = $(PURE_EXECUTABLES) \
+	_newselect-P \
 	answer \
 	attach-f-p \
 	attach-f-p-cmd \
@@ -140,6 +141,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	scm_rights \
 	seccomp-filter-v \
 	seccomp-strict \
+	select-P \
 	set_ptracer_any \
 	set_sigblock \
 	set_sigign \

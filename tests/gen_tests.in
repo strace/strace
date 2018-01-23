@@ -26,6 +26,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _newselect
+_newselect-P	 -e trace=_newselect -P /dev/full 9>>/dev/full
 accept	-a22
 accept4	-a37
 access	-a30 -P access_sample
@@ -315,6 +316,7 @@ seccomp-filter	-e trace=seccomp
 seccomp-filter-v	-v -e trace=seccomp
 seccomp_get_action_avail	-e trace=seccomp
 select	-a36
+select-P	-a36 -e trace=select -P /dev/full 9>>/dev/full
 semop	-a32 -e trace=semop,semtimedop
 sendfile	-a27
 sendfile64	-a29

@@ -69,7 +69,15 @@ xselect(const kernel_ulong_t nfds,
 int
 main(void)
 {
+#ifdef PATH_TRACING_FD
+	skip_if_unavailable("/proc/self/fd/");
+#endif
+
 	for (int i = 3; i < FD_SETSIZE; ++i) {
+#ifdef PATH_TRACING_FD
+		if (i == PATH_TRACING_FD)
+			continue;
+#endif
 		(void) close(i);
 	}
 
@@ -110,15 +118,19 @@ main(void)
 		else
 			perror_msg_and_fail(TEST_SYSCALL_STR);
 	}
+#ifndef PATH_TRACING_FD
 	printf("%s(0, NULL, NULL, NULL, {tv_sec=%lld, tv_usec=%llu})"
 	       " = 0 (Timeout)\n",
 	       TEST_SYSCALL_STR, (long long) tv_in.tv_sec,
 	       zero_extend_signed_to_ull(tv_in.tv_usec));
+#endif
 
 	/* EFAULT on tv argument */
 	XSELECT(-1, 0, 0, 0, 0, a_tv + 1);
+#ifndef PATH_TRACING_FD
 	printf("%s(0, NULL, NULL, NULL, %#lx) = %s\n",
 	       TEST_SYSCALL_STR, (unsigned long) a_tv + 1, errstr);
+#endif
 
 	/*
 	 * Start with a nice simple select with the same set.
@@ -126,9 +138,23 @@ main(void)
 	for (int i = nfds; i <= smallset_size; ++i) {
 		*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
 		XSELECT(1, i, a_rs, a_rs, a_rs, 0);
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d %d], [%d %d], [%d %d], NULL) = 1 ()\n",
 		       TEST_SYSCALL_STR, i, fds[0], fds[1],
 		       fds[0], fds[1], fds[0], fds[1]);
+#else
+		*l_rs = (1UL << fds[0]) | (1UL << fds[1]) |
+			(1UL << PATH_TRACING_FD);
+		XSELECT(i > PATH_TRACING_FD ? 3 : 1, i, a_rs, a_rs, a_rs, 0);
+		if (i > PATH_TRACING_FD) {
+			printf("%s(%d, [%d %d %d], [%d %d %d], [%d %d %d]"
+			       ", NULL) = 3 ()\n",
+			       TEST_SYSCALL_STR, i,
+			       fds[0], fds[1], PATH_TRACING_FD,
+			       fds[0], fds[1], PATH_TRACING_FD,
+			       fds[0], fds[1], PATH_TRACING_FD);
+		}
+#endif
 	}
 
 	/*
@@ -140,6 +166,7 @@ main(void)
 	memcpy(tv, &tv_in, sizeof(tv_in));
 	rc = xselect(nfds, a_rs, a_rs, a_rs, a_tv);
 	if (rc < 0) {
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %s\n",
 		       TEST_SYSCALL_STR, nfds, fds[0], fds[1],
@@ -147,7 +174,9 @@ main(void)
 		       (long long) tv_in.tv_sec,
 		       zero_extend_signed_to_ull(tv_in.tv_usec),
 		       errstr);
+#endif /* !PATH_TRACING_FD */
 	} else {
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %ld"
 		       " (left {tv_sec=%lld, tv_usec=%llu})\n",
@@ -157,6 +186,7 @@ main(void)
 		       zero_extend_signed_to_ull(tv_in.tv_usec),
 		       rc, (long long) tv->tv_sec,
 		       zero_extend_signed_to_ull(tv->tv_usec));
+#endif /* !PATH_TRACING_FD */
 	}
 
 	/*
@@ -168,6 +198,7 @@ main(void)
 	memcpy(tv, &tv_in, sizeof(tv_in));
 	rc = xselect(nfds, a_rs, a_rs, a_rs, a_tv);
 	if (rc < 0) {
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %s\n",
 		       TEST_SYSCALL_STR, nfds, fds[0], fds[1],
@@ -175,7 +206,9 @@ main(void)
 		       (long long) tv_in.tv_sec,
 		       zero_extend_signed_to_ull(tv_in.tv_usec),
 		       errstr);
+#endif /* PATH_TRACING_FD */
 	} else {
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d %d], [%d %d], [%d %d]"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = %ld"
 		       " (left {tv_sec=%lld, tv_usec=%llu})\n",
@@ -185,6 +218,7 @@ main(void)
 		       zero_extend_signed_to_ull(tv_in.tv_usec),
 		       rc, (long long) tv->tv_sec,
 		       zero_extend_signed_to_ull(tv->tv_usec));
+#endif /* PATH_TRACING_FD */
 	}
 
 	/*
@@ -199,6 +233,7 @@ main(void)
 		tv_in.tv_usec = 0xc0de2;
 		memcpy(tv, &tv_in, sizeof(tv_in));
 		XSELECT(3, i, a_rs, a_ws, a_es, a_tv);
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d %d], [%d %d %d %d], []"
 		       ", {tv_sec=%lld, tv_usec=%llu}) = 3 (out [1 2 %d]"
 		       ", left {tv_sec=%lld, tv_usec=%llu})\n",
@@ -209,6 +244,76 @@ main(void)
 		       fds[1],
 		       (long long) tv->tv_sec,
 		       zero_extend_signed_to_ull(tv->tv_usec));
+#else
+		*l_rs = (1UL << fds[0]) | (1UL << fds[1]) |
+			(1UL << PATH_TRACING_FD);
+		*l_ws = (1UL << 1) | (1UL << 2) |
+			(1UL << fds[0]) | (1UL << fds[1]);
+		tv_in.tv_sec = 0xc0de1;
+		tv_in.tv_usec = 0xc0de2;
+		memcpy(tv, &tv_in, sizeof(tv_in));
+		XSELECT(3 + (i > PATH_TRACING_FD), i, a_rs, a_ws, a_es, a_tv);
+		if (i > PATH_TRACING_FD) {
+			printf("%s(%d, [%d %d %d], [%d %d %d %d], []"
+			       ", {tv_sec=%lld, tv_usec=%llu})"
+			       " = 4 (in [%d], out [1 2 %d]"
+			       ", left {tv_sec=%lld, tv_usec=%llu})\n",
+			       TEST_SYSCALL_STR, i,
+			       fds[0], fds[1], PATH_TRACING_FD,
+			       1, 2, fds[0], fds[1],
+			       (long long) tv_in.tv_sec,
+			       zero_extend_signed_to_ull(tv_in.tv_usec),
+			       PATH_TRACING_FD, fds[1],
+			       (long long) tv->tv_sec,
+			       zero_extend_signed_to_ull(tv->tv_usec));
+		}
+
+		*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+		*l_ws = (1UL << 1) | (1UL << 2) |
+			(1UL << fds[0]) | (1UL << fds[1]) |
+			(1UL << PATH_TRACING_FD);
+		tv_in.tv_sec = 0xc0de1;
+		tv_in.tv_usec = 0xc0de2;
+		memcpy(tv, &tv_in, sizeof(tv_in));
+		XSELECT(3 + (i > PATH_TRACING_FD), i, a_rs, a_ws, a_es, a_tv);
+		if (i > PATH_TRACING_FD) {
+			printf("%s(%d, [%d %d], [%d %d %d %d %d], []"
+			       ", {tv_sec=%lld, tv_usec=%llu})"
+			       " = 4 (out [1 2 %d %d]"
+			       ", left {tv_sec=%lld, tv_usec=%llu})\n",
+			       TEST_SYSCALL_STR, i,
+			       fds[0], fds[1],
+			       1, 2, fds[0], fds[1], PATH_TRACING_FD,
+			       (long long) tv_in.tv_sec,
+			       zero_extend_signed_to_ull(tv_in.tv_usec),
+			       fds[1], PATH_TRACING_FD,
+			       (long long) tv->tv_sec,
+			       zero_extend_signed_to_ull(tv->tv_usec));
+		}
+
+		*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+		*l_ws = (1UL << 1) | (1UL << 2) |
+			(1UL << fds[0]) | (1UL << fds[1]);
+		*l_es = (1UL << PATH_TRACING_FD);
+		tv_in.tv_sec = 0xc0de1;
+		tv_in.tv_usec = 0xc0de2;
+		memcpy(tv, &tv_in, sizeof(tv_in));
+		XSELECT(3, i, a_rs, a_ws, a_es, a_tv);
+		if (i > PATH_TRACING_FD) {
+		printf("%s(%d, [%d %d], [%d %d %d %d], [%d]"
+		       ", {tv_sec=%lld, tv_usec=%llu}) = 3 (out [1 2 %d]"
+		       ", left {tv_sec=%lld, tv_usec=%llu})\n",
+		       TEST_SYSCALL_STR, i,
+		       fds[0], fds[1],
+		       1, 2, fds[0], fds[1], PATH_TRACING_FD,
+		       (long long) tv_in.tv_sec,
+		       zero_extend_signed_to_ull(tv_in.tv_usec),
+		       fds[1],
+		       (long long) tv->tv_sec,
+		       zero_extend_signed_to_ull(tv->tv_usec));
+		}
+
+#endif /* PATH_TRACING_FD */
 	}
 
 	/*
@@ -218,8 +323,10 @@ main(void)
 	static fd_set set[0x1000000 / sizeof(fd_set)];
 	FD_SET(fds[1], set);
 	XSELECT(-1, -1U, 0, (uintptr_t) set, 0, 0);
+#ifndef PATH_TRACING_FD
 	printf("%s(-1, NULL, %p, NULL, NULL) = %s\n",
 	       TEST_SYSCALL_STR, set, errstr);
+#endif
 
 	/*
 	 * Big sets, nfds exceeds FD_SETSIZE limit.
@@ -238,9 +345,22 @@ main(void)
 		tv->tv_sec = 0;
 		tv->tv_usec = 10 + (i - FD_SETSIZE);
 		XSELECT(0, i, a_big_rs, a_big_ws, 0, a_tv);
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, [%d], [], NULL, {tv_sec=0, tv_usec=%d})"
 		       " = 0 (Timeout)\n",
 		       TEST_SYSCALL_STR, i, fds[0], 10 + (i - FD_SETSIZE));
+#else
+		FD_SET(fds[0], big_rs);
+		FD_SET(PATH_TRACING_FD, big_rs);
+		tv->tv_sec = 0;
+		tv->tv_usec = 10 + (i - FD_SETSIZE);
+		XSELECT(1, i, a_big_rs, a_big_ws, 0, a_tv);
+		printf("%s(%d, [%d %d], [], NULL, {tv_sec=0, tv_usec=%d})"
+		       " = 1 (in [%d], left {tv_sec=0, tv_usec=%llu})\n",
+		       TEST_SYSCALL_STR, i, fds[0], PATH_TRACING_FD,
+		       10 + (i - FD_SETSIZE), PATH_TRACING_FD,
+		       zero_extend_signed_to_ull(tv->tv_usec));
+#endif /* PATH_TRACING_FD */
 	}
 
 	/*
@@ -252,27 +372,53 @@ main(void)
 	tv->tv_usec = 123;
 	XSELECT(0, INT_MAX, (uintptr_t) set, (uintptr_t) &set[1],
 		(uintptr_t) &set[2], a_tv);
+#ifndef PATH_TRACING_FD
 	printf("%s(%d, [%d %d], [], [], {tv_sec=0, tv_usec=123})"
 	       " = 0 (Timeout)\n",
 	       TEST_SYSCALL_STR, INT_MAX, fds[0], fds[1]);
+#else
+	FD_SET(fds[0], set);
+	FD_SET(fds[1], set);
+	FD_SET(PATH_TRACING_FD, set);
+	tv->tv_sec = 0;
+	tv->tv_usec = 123;
+	XSELECT(1, INT_MAX, (uintptr_t) set, (uintptr_t) &set[1],
+		(uintptr_t) &set[2], a_tv);
+	printf("%s(%d, [%d %d %d], [], [], {tv_sec=0, tv_usec=123})"
+	       " = 1 (in [%d], left {tv_sec=0, tv_usec=%llu})\n",
+	       TEST_SYSCALL_STR, INT_MAX, fds[0], fds[1], PATH_TRACING_FD,
+	       PATH_TRACING_FD, zero_extend_signed_to_ull(tv->tv_usec));
+#endif /* PATH_TRACING_FD */
 
 	/*
 	 * Small sets, nfds exceeds FD_SETSIZE limit.
 	 * The kernel seems to be fine with it but strace cannot follow.
 	 */
-	*l_rs = (1UL << fds[0]) | (1UL << fds[1]);
+	*l_rs = (1UL << fds[0]) | (1UL << fds[1])
+#ifdef PATH_TRACING_FD
+		| (1UL << PATH_TRACING_FD)
+#endif
+		;
 	*l_ws = (1UL << fds[0]);
-	*l_es = (1UL << fds[0]) | (1UL << fds[1]);
+	*l_es = (1UL << fds[0]) | (1UL << fds[1])
+#ifdef PATH_TRACING_FD
+		| (1UL << PATH_TRACING_FD)
+#endif
+		;
 	tv->tv_sec = 0;
 	tv->tv_usec = 123;
 	rc = xselect(FD_SETSIZE + 1, a_rs, a_ws, a_es, a_tv);
 	if (rc < 0) {
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, %p, %p, %p, {tv_sec=0, tv_usec=123}) = %s\n",
 		       TEST_SYSCALL_STR, FD_SETSIZE + 1, rs, ws, es, errstr);
+#endif
 	} else {
+#ifndef PATH_TRACING_FD
 		printf("%s(%d, %p, %p, %p, {tv_sec=0, tv_usec=123})"
 		       " = 0 (Timeout)\n",
 		       TEST_SYSCALL_STR, FD_SETSIZE + 1, rs, ws, es);
+#endif
 	}
 
 	/*
@@ -280,9 +426,16 @@ main(void)
 	 */
 	if (dup2(fds[1], smallset_size) != smallset_size)
 		perror_msg_and_fail("dup2");
+#ifdef PATH_TRACING_FD
+	FD_SET(PATH_TRACING_FD, rs);
+	FD_SET(PATH_TRACING_FD, ws);
+	FD_SET(PATH_TRACING_FD, es);
+#endif
 	XSELECT(-1, smallset_size + 1, a_rs, a_ws, a_es, 0);
+#ifndef PATH_TRACING_FD
 	printf("%s(%d, %p, %p, %p, NULL) = %s\n",
 	       TEST_SYSCALL_STR, smallset_size + 1, rs, ws, es, errstr);
+#endif
 
 	/*
 	 * Small and big sets,
@@ -295,18 +448,22 @@ main(void)
 	FD_SET(fds[1], big_ws);
 	FD_SET(smallset_size, big_ws);
 	XSELECT(-1, smallset_size + 1, a_big_rs, a_big_ws, a_es, 0);
+#ifndef PATH_TRACING_FD
 	printf("%s(%d, [%d %d], [%d %d], %p, NULL) = %s\n",
 	       TEST_SYSCALL_STR, smallset_size + 1,
 	       fds[0], smallset_size,
 	       fds[1], smallset_size,
 	       es, errstr);
+#endif /* !PATH_TRACING_FD */
 	XSELECT(-1, smallset_size + 1, a_es, a_big_ws, a_big_rs, 0);
+#ifndef PATH_TRACING_FD
 	printf("%s(%d, %p, [%d %d], [%d %d], NULL) = %s\n",
 	       TEST_SYSCALL_STR, smallset_size + 1,
 	       es,
 	       fds[1], smallset_size,
 	       fds[0], smallset_size,
 	       errstr);
+#endif /* !PATH_TRACING_FD */
 
 	puts("+++ exited with 0 +++");
 	return 0;
