@@ -449,4 +449,5 @@
 [ARM_FIRST_SHUFFLED_SYSCALL+1+3] = { 0,	0,	SEN(printargs),	"usr26"			},
 [ARM_FIRST_SHUFFLED_SYSCALL+1+4] = { 0,	0,	SEN(printargs),	"usr32"			},
 [ARM_FIRST_SHUFFLED_SYSCALL+1+5] = { 1,	0,	SEN(printargs),	"set_tls"		},
-#define ARM_LAST_SPECIAL_SYSCALL 5
+[ARM_FIRST_SHUFFLED_SYSCALL+1+6] = { 0,	0,	SEN(printargs),	"get_tls"		},
+#define ARM_LAST_SPECIAL_SYSCALL 6
