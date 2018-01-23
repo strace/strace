@@ -121,6 +121,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	netlink_unix_diag \
 	nsyscalls \
 	nsyscalls-d \
+	oldselect-P \
+	oldselect-efault-P \
 	pc \
 	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \
@@ -236,7 +238,6 @@ DECODER_TESTS = \
 	nsyscalls.test \
 	nsyscalls-d.test \
 	nsyscalls-nd.test \
-	oldselect.test \
 	personality.test \
 	pipe.test \
 	poll-P.test \
@@ -361,7 +362,6 @@ EXTRA_DIST = \
 	match.awk \
 	net.expected \
 	netlink_sock_diag-v.sh \
-	oldselect.expected \
 	pipe.expected \
 	print_user_desc.c \
 	process_vm_readv_writev.c \

@@ -229,6 +229,7 @@ old_mmap-v-none
 oldfstat
 oldlstat
 oldselect
+oldselect-efault
 oldstat
 open
 openat

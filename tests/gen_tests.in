@@ -245,6 +245,10 @@ old_mmap-P	-e trace=mmap -P "/dev/full" 9>>/dev/full
 old_mmap-v-none	-a11 -e trace=mmap -e verbose=none
 oldfstat	-a18 -v -P stat.sample
 oldlstat	-a32 -v -P stat.sample -P /dev/full
+oldselect	-a13 -e trace=select
+oldselect-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
+oldselect-efault	-a13 -e trace=select
+oldselect-efault-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full
 open	-a30 -P $NAME.sample
 openat	-P $NAME.sample

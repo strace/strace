@@ -48,12 +48,16 @@ xselect(const kernel_ulong_t nfds,
 	const kernel_ulong_t ws,
 	const kernel_ulong_t es,
 	const kernel_ulong_t tv)
+#ifndef xselect
 {
 	long rc = syscall(TEST_SYSCALL_NR,
 			  F8ILL_KULONG_MASK | nfds, rs, ws, es, tv);
 	errstr = sprintrc(rc);
 	return rc;
 }
+#else
+	;
+#endif
 
 #define XSELECT(expected_, ...)						\
 	do {								\

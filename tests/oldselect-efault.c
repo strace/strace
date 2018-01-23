@@ -32,30 +32,41 @@
  && __NR_select != __NR__newselect \
  && !defined __sparc__
 
-# define TEST_SYSCALL_NR __NR_select
-# define TEST_SYSCALL_STR "select"
-# define xselect xselect
-# include "xselect.c"
+# include <stdint.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/select.h>
 
-static uint32_t *args;
+static const char *errstr;
 
 static long
-xselect(const kernel_ulong_t nfds,
-	const kernel_ulong_t rs,
-	const kernel_ulong_t ws,
-	const kernel_ulong_t es,
-	const kernel_ulong_t tv)
+xselect(const kernel_ulong_t args)
 {
-	if (!args)
-		args = tail_alloc(sizeof(*args) * 5);
-	args[0] = nfds;
-	args[1] = rs;
-	args[2] = ws;
-	args[3] = es;
-	args[4] = tv;
-	long rc = syscall(TEST_SYSCALL_NR, args);
+	static const kernel_ulong_t dummy = F8ILL_KULONG_MASK | 0xfacefeed;
+	long rc = syscall(__NR_select, args, dummy, dummy, dummy, dummy, dummy);
 	errstr = sprintrc(rc);
 	return rc;
+}
+
+int
+main(void)
+{
+	unsigned long *const args = tail_alloc(sizeof(*args) * 4);
+	memset(args, 0, sizeof(*args) * 4);
+
+	xselect(0);
+#ifndef PATH_TRACING_FD
+	printf("select(NULL) = %s\n", errstr);
+#endif
+
+	xselect((uintptr_t) args);
+#ifndef PATH_TRACING_FD
+	printf("select(%p) = %s\n", args, errstr);
+#endif
+
+	puts("+++ exited with 0 +++");
+	return 0;
 }
 
 #else
