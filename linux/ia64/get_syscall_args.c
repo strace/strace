@@ -15,8 +15,12 @@ get_syscall_args(struct tcb *tcp)
 		for (i = 0; i < tcp->s_ent->nargs; ++i) {
 			if (umove(tcp,
 				  (unsigned long) ia64_rse_skip_regs(out0, i),
-				  &tcp->u_arg[i]) < 0)
-				return -1;
+				  &tcp->u_arg[i]) < 0) {
+				if (errno == EPERM)
+					tcp->u_arg[i] = 0;
+				else
+					return -1;
+			}
 		}
 	} else {
 		/* truncate away IVE sign-extension */
