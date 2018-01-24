@@ -230,16 +230,14 @@ decode_termio(struct tcb *const tcp, const kernel_ulong_t addr)
 				tio.c_cc[_VMIN], tio.c_cc[_VTIME]);
 
 		tprints(", c_cc=");
-		decode_term_cc(termio_cc, tio.c_cc,
-			       MIN(NCC, sizeof(tio.c_cc)));
+		decode_term_cc(termio_cc, tio.c_cc, sizeof(tio.c_cc));
 #else /* !_VMIN */
 		if (!(tio.c_lflag & ICANON))
 			tprintf(", c_cc[VMIN]=%d, c_cc[VTIME]=%d",
 				tio.c_cc[VMIN], tio.c_cc[VTIME]);
 
 		tprints(", c_cc=");
-		decode_term_cc(termios_cc, tio.c_cc,
-			       MIN(NCC, sizeof(tio.c_cc)));
+		decode_term_cc(termio_cc, tio.c_cc, sizeof(tio.c_cc));
 #endif /* !_VMIN */
 	}
 

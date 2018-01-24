@@ -378,6 +378,8 @@ ioctl_sg_io_v4
 ioctl_sock
 ioctl_sock_gifconf
 ioctl_tee
+ioctl_termios
+ioctl_termios-v
 ioctl_tiocm
 ioctl_ubi
 ioctl_ubi-success
