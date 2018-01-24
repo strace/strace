@@ -57,10 +57,11 @@
 # include "xlat/futexwakecmps.h"
 
 void futex_error(int *uaddr, int op, unsigned long val, unsigned long timeout,
-	int *uaddr2, unsigned long val3, int rc)
+	int *uaddr2, unsigned long val3, int rc, const char *func, int line)
 {
-	perror_msg_and_fail("futex(%p, %#x, %#x, %#lx, %p, %#x) = %d",
-		uaddr, op, (unsigned) val, timeout, uaddr, (unsigned) val3, rc);
+	perror_msg_and_fail("%s:%d: futex(%p, %#x, %#x, %#lx, %p, %#x) = %d",
+		func, line, uaddr, op, (unsigned) val, timeout, uaddr,
+		(unsigned) val3, rc);
 }
 
 # define CHECK_FUTEX_GENERIC(uaddr, op, val, timeout, uaddr2, val3, check, \
@@ -77,7 +78,7 @@ void futex_error(int *uaddr, int op, unsigned long val, unsigned long timeout,
 		if (!(check)) \
 			futex_error((uaddr), (op), (val), \
 				(unsigned long) (timeout), (int *) (uaddr2), \
-				(val3), rc); \
+				(val3), rc, __func__, __LINE__); \
 	} while (0)
 
 # define CHECK_FUTEX_ENOSYS(uaddr, op, val, timeout, uaddr2, val3, check) \
