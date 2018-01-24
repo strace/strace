@@ -74,9 +74,34 @@ arch_mx32=
 cc_flags_m32=-m32
 cc_flags_mx32=-mx32
 case "$host_cpu" in
+aarch64*)
+	arch=aarch64
+	arch_m32=arm
+	AC_DEFINE([AARCH64], 1, [Define for the AArch64 architecture.])
+	;;
+alpha*)
+	arch=alpha
+	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
+	;;
+arc*)
+	arch=arc
+	AC_DEFINE([ARC], 1, [Define for the ARC architecture.])
+	;;
+arm*)
+	arch=arm
+	AC_DEFINE([ARM], 1, [Define for the ARM architecture.])
+	;;
+avr32*)
+	arch=avr32
+	AC_DEFINE([AVR32], 1, [Define for the AVR32 architecture.])
+	;;
 bfin)
 	arch=bfin
 	AC_DEFINE([BFIN], 1, [Define for the Blackfin architecture.])
+	;;
+hppa*|parisc*)
+	arch=hppa
+	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
 	;;
 i[[3456]]86|pentium)
 	arch=i386
@@ -90,26 +115,25 @@ m68k)
 	arch=m68k
 	AC_DEFINE([M68K], 1, [Define for the m68k architecture.])
 	;;
-sparc64*)
-	arch=sparc64
-	arch_m32=sparc
-	AC_DEFINE([SPARC64], 1, [Define for the SPARC64 architecture.])
-	;;
-sparc*)
-	arch=sparc
-	AC_DEFINE([SPARC], 1, [Define for the SPARC architecture.])
-	;;
 metag*)
 	arch=metag
 	AC_DEFINE([METAG], 1, [Define for the Meta architecture.])
+	;;
+microblaze*)
+	arch=microblaze
+	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
 	;;
 mips*)
 	arch=mips
 	AC_DEFINE([MIPS], 1, [Define for the MIPS architecture.])
 	;;
-alpha*)
-	arch=alpha
-	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
+nios2*)
+	arch=nios2
+	AC_DEFINE([NIOS2], 1, [Define for the Nios-II architecture.])
+	;;
+or1k*)
+	arch=or1k
+	AC_DEFINE([OR1K], 1, [Define for the OpenRISC 1000 architecture.])
 	;;
 powerpc*)
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
@@ -122,22 +146,9 @@ powerpc*)
 		AC_DEFINE([POWERPC64], 1, [Define for the PowerPC64 architecture.])
 	fi
 	;;
-arm*)
-	arch=arm
-	AC_DEFINE([ARM], 1, [Define for the ARM architecture.])
-	;;
-aarch64*)
-	arch=aarch64
-	arch_m32=arm
-	AC_DEFINE([AARCH64], 1, [Define for the AArch64 architecture.])
-	;;
-avr32*)
-	arch=avr32
-	AC_DEFINE([AVR32], 1, [Define for the AVR32 architecture.])
-	;;
-arc*)
-	arch=arc
-	AC_DEFINE([ARC], 1, [Define for the ARC architecture.])
+riscv*)
+	arch=riscv
+	AC_DEFINE([RISCV], 1, [Define for the RISC-V architecture])
 	;;
 s390)
 	arch=s390
@@ -149,10 +160,6 @@ s390x)
 	cc_flags_m32=-m31
 	AC_DEFINE([S390X], 1, [Define for the S390x architecture.])
 	;;
-hppa*|parisc*)
-	arch=hppa
-	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
-	;;
 sh64*)
 	arch=sh64
 	AC_DEFINE([SH64], 1, [Define for the SH64 architecture.])
@@ -160,6 +167,19 @@ sh64*)
 sh*)
 	arch=sh
 	AC_DEFINE([SH], 1, [Define for the SH architecture.])
+	;;
+sparc64*)
+	arch=sparc64
+	arch_m32=sparc
+	AC_DEFINE([SPARC64], 1, [Define for the SPARC64 architecture.])
+	;;
+sparc*)
+	arch=sparc
+	AC_DEFINE([SPARC], 1, [Define for the SPARC architecture.])
+	;;
+tile*)
+	arch=tile
+	AC_DEFINE([TILE], 1, [Define for the Tile architecture])
 	;;
 x86?64*)
 	arch_m32=i386
@@ -174,34 +194,10 @@ x86?64*)
 		AC_DEFINE([X32], 1, [Define for the 32bit AMD x86-64 architecture.])
 	fi
 	;;
-tile*)
-	arch=tile
-	AC_DEFINE([TILE], 1, [Define for the Tile architecture])
-	;;
-microblaze*)
-	arch=microblaze
-	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
-	;;
-nios2*)
-	arch=nios2
-	AC_DEFINE([NIOS2], 1, [Define for the Nios-II architecture.])
-	;;
-
-or1k*)
-	arch=or1k
-	AC_DEFINE([OR1K], 1, [Define for the OpenRISC 1000 architecture.])
-	;;
-
 xtensa*)
 	arch=xtensa
 	AC_DEFINE([XTENSA], 1, [Define for the Xtensa architecture])
 	;;
-
-riscv*)
-	arch=riscv
-	AC_DEFINE([RISCV], 1, [Define for the RISC-V architecture])
-	;;
-
 *)
 	AC_MSG_RESULT([NO!])
 	AC_MSG_ERROR([architecture $host_cpu is not supported by strace])
