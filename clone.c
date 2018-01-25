@@ -49,7 +49,7 @@
 # define ARG_PTID	(tcp->scno == __NR_clone2 ? 3 : 2)
 # define ARG_CTID	(tcp->scno == __NR_clone2 ? 4 : 3)
 # define ARG_TLS	(tcp->scno == __NR_clone2 ? 5 : 4)
-#elif defined S390 || defined S390X || defined CRISV10 || defined CRISV32
+#elif defined S390 || defined S390X
 # define ARG_STACK	0
 # define ARG_FLAGS	1
 # define ARG_PTID	2

@@ -480,30 +480,6 @@ EXTRA_DIST =				\
 	linux/bfin/set_scno.c		\
 	linux/bfin/syscallent.h		\
 	linux/bfin/userent.h		\
-	linux/crisv10/arch_regs.c	\
-	linux/crisv10/arch_rt_sigframe.c\
-	linux/crisv10/arch_sigreturn.c	\
-	linux/crisv10/get_error.c	\
-	linux/crisv10/get_scno.c	\
-	linux/crisv10/get_syscall_args.c	\
-	linux/crisv10/get_syscall_result.c	\
-	linux/crisv10/rt_sigframe.h	\
-	linux/crisv10/set_error.c	\
-	linux/crisv10/set_scno.c	\
-	linux/crisv10/syscallent.h	\
-	linux/crisv10/userent.h		\
-	linux/crisv32/arch_regs.c	\
-	linux/crisv32/arch_rt_sigframe.c\
-	linux/crisv32/arch_sigreturn.c	\
-	linux/crisv32/get_error.c	\
-	linux/crisv32/get_scno.c	\
-	linux/crisv32/get_syscall_args.c	\
-	linux/crisv32/get_syscall_result.c	\
-	linux/crisv32/rt_sigframe.h	\
-	linux/crisv32/set_error.c	\
-	linux/crisv32/set_scno.c	\
-	linux/crisv32/syscallent.h	\
-	linux/crisv32/userent.h		\
 	linux/dummy.h			\
 	linux/errnoent.h		\
 	linux/getregs_old.h		\

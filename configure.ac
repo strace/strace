@@ -174,14 +174,6 @@ x86?64*)
 		AC_DEFINE([X32], 1, [Define for the 32bit AMD x86-64 architecture.])
 	fi
 	;;
-cris|crisv10)
-	arch=crisv10
-	AC_DEFINE([CRISV10], 1, [Define for the CRISv10 architecture.])
-	;;
-crisv32)
-	arch=crisv32
-	AC_DEFINE([CRISV32], 1, [Define for the CRISv32 architecture.])
-	;;
 tile*)
 	arch=tile
 	AC_DEFINE([TILE], 1, [Define for the Tile architecture])
