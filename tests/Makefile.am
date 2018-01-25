@@ -219,12 +219,6 @@ DECODER_TESTS = \
 	futex.test \
 	getuid.test \
 	ioctl.test \
-	ioctl_dm-v.test \
-	ioctl_dm.test \
-	ioctl_kvm_run.test \
-	ioctl_loop-nv.test \
-	ioctl_nsfs.test \
-	ioctl_sock_gifconf.test \
 	ipc_msgbuf.test \
 	llseek.test \
 	lseek.test \
@@ -354,7 +348,6 @@ EXTRA_DIST = \
 	getresugid.c \
 	init.sh \
 	init_delete_module.h \
-	ioctl-v.sh \
 	ipc.sh \
 	ipc_msgbuf.expected \
 	ksysent.sed \

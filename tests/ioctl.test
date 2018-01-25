@@ -6,6 +6,6 @@
 
 check_prog grep
 run_prog > /dev/null
-run_strace -a16 -eioctl $args > "$EXP"
+run_strace -a16 -eioctl "$@" $args > "$EXP"
 grep -v '^ioctl([012],' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

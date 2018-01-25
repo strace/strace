@@ -124,16 +124,22 @@ inotify	-a23 -e trace=inotify_add_watch,inotify_rm_watch
 inotify_init1	-a27
 int_0x80	-a11 -e trace=getgid32
 ioctl_block	+ioctl.test
+ioctl_dm	+ioctl.test -s9
+ioctl_dm-v	+ioctl.test -v -s9
 ioctl_evdev	+ioctl.test
-ioctl_evdev-v	+ioctl-v.sh
+ioctl_evdev-v	+ioctl.test -v
+ioctl_kvm_run	+ioctl.test -a36 -y
 ioctl_loop	+ioctl.test
-ioctl_loop-v	+ioctl-v.sh
+ioctl_loop-nv	+ioctl.test -a22 -e verbose=none
+ioctl_loop-v	+ioctl.test -v
 ioctl_mtd	+ioctl.test
+ioctl_nsfs	+ioctl.test -esignal=none
 ioctl_rtc	+ioctl.test
-ioctl_rtc-v	+ioctl-v.sh
+ioctl_rtc-v	+ioctl.test -v
 ioctl_scsi	+ioctl.test
 ioctl_sg_io_v3	+ioctl.test
 ioctl_sg_io_v4	+ioctl.test
+ioctl_sock_gifconf	+ioctl.test -a28 -s1
 ioctl_uffdio	+ioctl.test
 ioctl_v4l2	+ioctl.test
 ioperm	-a27
