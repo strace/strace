@@ -318,7 +318,8 @@ Print all strings in hexadecimal string format.
 Print paths associated with file descriptor arguments.
 .TP
 .B \-yy
-Print protocol specific information associated with socket file descriptors.
+Print protocol specific information associated with socket file descriptors,
+and block/character device number associated with device file descriptors.
 .SS Statistics
 .TP 12
 .B \-c

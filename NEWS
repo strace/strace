@@ -5,7 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * The mailing list was moved to strace-devel@lists.strace.io.
 
 * Changes in behaviour
-  * Closing angle bracket is now printed as an octal number escape sequence
+  * Angle brackets are now printed as octal number escape sequences
     in the output of paths associated with file descriptors.
 
 * Improvements
@@ -14,6 +14,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced NETLINK_ROUTE protocol decoding.
   * Updated lists of signal codes.
   * Updated lists of INET_DIAG_BC_*, POLL*, RWF_*, and SCHED_FLAG_* constants.
+  * Implemented block/character device number printing in -yy mode.
 
 * Bug fixes
   * Fixed build on m68k.

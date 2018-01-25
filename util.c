@@ -36,10 +36,14 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <sys/stat.h>
+#include <sys/sysmacros.h>
 #ifdef HAVE_SYS_XATTR_H
 # include <sys/xattr.h>
 #endif
 #include <sys/uio.h>
+
+#include "largefile_wrappers.h"
 #include "xstring.h"
 
 int
@@ -418,24 +422,59 @@ getfdinode(struct tcb *tcp, int fd)
 	return 0;
 }
 
+static bool
+printsocket(struct tcb *tcp, int fd, const char *path)
+{
+	const char *str = STR_STRIP_PREFIX(path, "socket:[");
+	size_t len;
+	unsigned long inode;
+
+	return (str != path)
+		&& (len = strlen(str))
+		&& (str[len - 1] == ']')
+		&& (inode = strtoul(str, NULL, 10))
+		&& print_sockaddr_by_inode(tcp, fd, inode);
+}
+
+static bool
+printdev(struct tcb *tcp, int fd, const char *path)
+{
+	struct_stat st;
+
+	if (path[0] != '/')
+		return false;
+
+	if (stat_file(path, &st)) {
+		debug_func_perror_msg("stat(\"%s\")", path);
+		return false;
+	}
+
+	switch (st.st_mode & S_IFMT) {
+	case S_IFBLK:
+	case S_IFCHR:
+		print_quoted_string_ex(path, strlen(path),
+				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+				       "<>");
+		tprintf("<%s %u:%u>",
+			S_ISBLK(st.st_mode)? "block" : "char",
+			major(st.st_rdev), minor(st.st_rdev));
+		return true;
+	}
+
+	return false;
+}
+
 void
 printfd(struct tcb *tcp, int fd)
 {
 	char path[PATH_MAX + 1];
 	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
-		const char *str;
-		size_t len;
-		unsigned long inode;
-
 		tprintf("%d<", fd);
 		if (show_fd_path <= 1
-		    || (str = STR_STRIP_PREFIX(path, "socket:[")) == path
-		    || !(len = strlen(str))
-		    || str[len - 1] != ']'
-		    || !(inode = strtoul(str, NULL, 10))
-		    || !print_sockaddr_by_inode(tcp, fd, inode)) {
+		    || (!printsocket(tcp, fd, path)
+		         && !printdev(tcp, fd, path))) {
 			print_quoted_string_ex(path, strlen(path),
-				QUOTE_OMIT_LEADING_TRAILING_QUOTES, ">");
+				QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
 		}
 		tprints(">");
 	} else
