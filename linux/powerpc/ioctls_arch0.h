@@ -130,6 +130,7 @@
 { "linux/kvm.h", "KVM_NMI", _IOC_NONE, 0xae9a, 0x00 },
 { "linux/kvm.h", "KVM_PPC_ALLOCATE_HTAB", _IOC_READ|_IOC_WRITE, 0xaea7, 0x04 },
 { "linux/kvm.h", "KVM_PPC_CONFIGURE_V3_MMU", _IOC_WRITE, 0xaeaf, 0x10 },
+{ "linux/kvm.h", "KVM_PPC_GET_CPU_CHAR", _IOC_READ, 0xaeb1, 0x20 },
 { "linux/kvm.h", "KVM_PPC_GET_HTAB_FD", _IOC_WRITE, 0xaeaa, 0x20 },
 { "linux/kvm.h", "KVM_PPC_GET_PVINFO", _IOC_WRITE, 0xaea1, 0x80 },
 { "linux/kvm.h", "KVM_PPC_GET_RMMU_INFO", _IOC_WRITE, 0xaeb0, 0x60 },
