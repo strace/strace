@@ -23,6 +23,7 @@ clock_xettime
 copy_file_range
 creat
 delete_module
+dev-yy
 dup
 dup2
 dup3

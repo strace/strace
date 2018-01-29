@@ -49,6 +49,7 @@ clock_xettime	-a36 -e trace=clock_getres,clock_gettime,clock_settime
 copy_file_range
 creat	-a20
 delete_module	-a23
+dev-yy	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -yy
 dup	-a8
 dup2	-a13
 dup3	-a24

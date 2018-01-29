@@ -40,6 +40,7 @@ copy_file_range
 count-f
 creat
 delete_module
+dev-yy
 dup
 dup2
 dup3
