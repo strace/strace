@@ -857,9 +857,9 @@ where members of the
 .B trace
 group are trusted users.
 If you do use this feature, please remember to install
-a non-setuid version of
+a regular non-setuid version of
 .B strace
-for ordinary lusers to use.
+for ordinary users to use.
 .SH "MULTIPLE PERSONALITY SUPPORT"
 On some architectures,
 .B strace
