@@ -1209,6 +1209,8 @@ get_scno(struct tcb *tcp)
 	if (rc != 1)
 		return rc;
 
+	tcp->scno = shuffle_scno(tcp->scno);
+
 	if (scno_is_valid(tcp->scno)) {
 		tcp->s_ent = &sysent[tcp->scno];
 		tcp->qual_flg = qual_flags(tcp->scno);
@@ -1228,7 +1230,7 @@ get_scno(struct tcb *tcp)
 		set_tcb_priv_data(tcp, s, free_sysent_buf);
 
 		debug_msg("pid %d invalid syscall %#" PRI_klx,
-			  tcp->pid, tcp->scno);
+			  tcp->pid, shuffle_scno(tcp->scno));
 	}
 
 	/*

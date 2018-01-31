@@ -13,7 +13,6 @@ arch_get_scno(struct tcb *tcp)
 			/* We are in 32-bit mode */
 			/* Note: we don't support OABI, unlike 32-bit ARM build */
 			scno = arm_regs.ARM_r7;
-			scno = shuffle_scno(scno);
 			break;
 	}
 

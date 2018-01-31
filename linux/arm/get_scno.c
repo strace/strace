@@ -67,8 +67,6 @@ scno_in_r7:
 
 #endif
 
-	scno = shuffle_scno(scno);
-
 	/*
 	 * Do some sanity checks to figure out
 	 * whether it's really a syscall entry.
@@ -77,8 +75,7 @@ scno_in_r7:
 		if (debug_flag)
 			error_msg("pid %d stray syscall exit:"
 				  " ARM_ip = %ld, scno = %ld",
-				  tcp->pid, arm_regs.ARM_ip,
-				  shuffle_scno(scno));
+				  tcp->pid, arm_regs.ARM_ip, scno);
 		return 0;
 	}
 
