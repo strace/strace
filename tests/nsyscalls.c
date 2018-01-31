@@ -77,7 +77,7 @@ test_syscall(const unsigned long nr)
 
 #if DEBUG_PRINT
 	fprintf(debug_out, "%s: pid %d invalid syscall %#lx\n",
-		strace_name, getpid(), nr);
+		strace_name, getpid(), nr | SYSCALL_BIT);
 #endif
 
 #ifdef LINUX_MIPSO32
@@ -86,7 +86,7 @@ test_syscall(const unsigned long nr)
 	       a[0], a[1], a[2], a[3], a[4], a[5], rc);
 #else
 	printf("syscall_%#lx(%#llx, %#llx, %#llx, %#llx, %#llx, %#llx)"
-	       " = %ld (errno %d)\n", nr,
+	       " = %ld (errno %d)\n", nr | SYSCALL_BIT,
 	       (unsigned long long) a[0],
 	       (unsigned long long) a[1],
 	       (unsigned long long) a[2],

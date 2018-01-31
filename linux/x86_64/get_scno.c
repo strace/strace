@@ -75,7 +75,6 @@ arch_get_scno(struct tcb *tcp)
 			 * __X32_SYSCALL_BIT logic does not apply.
 			 */
 			if ((long long) x86_64_regs.orig_rax != -1) {
-				scno -= __X32_SYSCALL_BIT;
 				currpers = 2;
 			} else {
 # ifdef X32
@@ -99,7 +98,6 @@ arch_get_scno(struct tcb *tcp)
 		case 0x33:
 			if (x86_64_regs.ds == 0x2b) {
 				currpers = 2;
-				scno &= ~__X32_SYSCALL_BIT;
 			} else
 				currpers = 0;
 			break;

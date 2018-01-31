@@ -837,6 +837,7 @@ EXTRA_DIST =				\
 	linux/x32/rt_sigframe.h		\
 	linux/x32/set_error.c		\
 	linux/x32/set_scno.c		\
+	linux/x32/shuffle_scno.c	\
 	linux/x32/signalent1.h		\
 	linux/x32/syscallent.h		\
 	linux/x32/syscallent1.h		\
@@ -864,6 +865,7 @@ EXTRA_DIST =				\
 	linux/x86_64/rt_sigframe.h	\
 	linux/x86_64/set_error.c	\
 	linux/x86_64/set_scno.c		\
+	linux/x86_64/shuffle_scno.c	\
 	linux/x86_64/signalent1.h	\
 	linux/x86_64/signalent2.h	\
 	linux/x86_64/syscallent.h	\
