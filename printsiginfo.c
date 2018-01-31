@@ -42,6 +42,8 @@
 
 #include MPERS_DEFS
 
+#include "nr_prefix.c"
+
 #ifndef IN_MPERS
 #include "printsiginfo.h"
 #endif
@@ -214,7 +216,8 @@ print_si_info(const siginfo_t *sip)
 			printaddr(ptr_to_kulong(sip->si_call_addr));
 			tprints(", si_syscall=");
 			if (scname)
-				tprintf("__NR_%s", scname);
+				tprintf("%s%s",
+					nr_prefix(sip->si_syscall), scname);
 			else
 				tprintf("%u", (unsigned) sip->si_syscall);
 			tprints(", si_arch=");

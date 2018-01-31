@@ -404,6 +404,7 @@ EXTRA_DIST =				\
 	linux/aarch64/ioctls_arch1.h	\
 	linux/aarch64/ioctls_inc0.h	\
 	linux/aarch64/ioctls_inc1.h	\
+	linux/aarch64/nr_prefix.c	\
 	linux/aarch64/set_error.c	\
 	linux/aarch64/set_scno.c	\
 	linux/aarch64/shuffle_scno.c	\
@@ -453,6 +454,7 @@ EXTRA_DIST =				\
 	linux/arm/get_syscall_args.c	\
 	linux/arm/ioctls_arch0.h	\
 	linux/arm/ioctls_inc0.h		\
+	linux/arm/nr_prefix.c		\
 	linux/arm/set_error.c		\
 	linux/arm/set_scno.c		\
 	linux/arm/shuffle_scno.c	\
@@ -611,6 +613,7 @@ EXTRA_DIST =				\
 	linux/nios2/set_error.c		\
 	linux/nios2/set_scno.c		\
 	linux/nios2/syscallent.h	\
+	linux/nr_prefix.c		\
 	linux/or1k/arch_regs.c		\
 	linux/or1k/arch_regs.h		\
 	linux/or1k/arch_rt_sigframe.c	\
