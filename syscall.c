@@ -490,36 +490,7 @@ dumpio(struct tcb *tcp)
  * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
  * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
  */
-static kernel_ulong_t
-shuffle_scno(kernel_ulong_t scno)
-{
-#ifdef ARM_FIRST_SHUFFLED_SYSCALL	/* So far only 32-bit ARM needs this */
-	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
-		return scno;
-
-	/* __ARM_NR_cmpxchg? Swap with LAST_ORDINARY+1 */
-	if (scno == ARM_FIRST_SHUFFLED_SYSCALL)
-		return 0x000ffff0;
-	if (scno == 0x000ffff0)
-		return ARM_FIRST_SHUFFLED_SYSCALL;
-
-# define ARM_SECOND_SHUFFLED_SYSCALL (ARM_FIRST_SHUFFLED_SYSCALL + 1)
-	/*
-	 * Is it ARM specific syscall?
-	 * Swap [0x000f0000, 0x000f0000 + LAST_SPECIAL] range
-	 * with [SECOND_SHUFFLED, SECOND_SHUFFLED + LAST_SPECIAL] range.
-	 */
-	if (scno >= 0x000f0000 &&
-	    scno <= 0x000f0000 + ARM_LAST_SPECIAL_SYSCALL) {
-		return scno - 0x000f0000 + ARM_SECOND_SHUFFLED_SYSCALL;
-	}
-	if (scno <= ARM_SECOND_SHUFFLED_SYSCALL + ARM_LAST_SPECIAL_SYSCALL) {
-		return scno + 0x000f0000 - ARM_SECOND_SHUFFLED_SYSCALL;
-	}
-#endif /* ARM_FIRST_SHUFFLED_SYSCALL */
-
-	return scno;
-}
+static kernel_ulong_t shuffle_scno(kernel_ulong_t scno);
 
 const char *
 err_name(unsigned long err)
@@ -1304,6 +1275,7 @@ get_syscall_result(struct tcb *tcp)
 #ifdef HAVE_GETREGS_OLD
 # include "getregs_old.c"
 #endif
+#include "shuffle_scno.c"
 
 const char *
 syscall_name(kernel_ulong_t scno)

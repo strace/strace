@@ -406,6 +406,7 @@ EXTRA_DIST =				\
 	linux/aarch64/ioctls_inc1.h	\
 	linux/aarch64/set_error.c	\
 	linux/aarch64/set_scno.c	\
+	linux/aarch64/shuffle_scno.c	\
 	linux/aarch64/signalent1.h	\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
@@ -454,6 +455,7 @@ EXTRA_DIST =				\
 	linux/arm/ioctls_inc0.h		\
 	linux/arm/set_error.c		\
 	linux/arm/set_scno.c		\
+	linux/arm/shuffle_scno.c	\
 	linux/arm/syscallent.h		\
 	linux/arm/userent.h		\
 	linux/avr32/arch_regs.c		\
@@ -747,6 +749,7 @@ EXTRA_DIST =				\
 	linux/sh64/set_scno.c		\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
+	linux/shuffle_scno.c		\
 	linux/signalent.h		\
 	linux/smc_diag.h		\
 	linux/sock_diag.h		\
