@@ -1282,9 +1282,7 @@ get_syscall_result(struct tcb *tcp)
 const char *
 syscall_name(kernel_ulong_t scno)
 {
-#if defined X32_PERSONALITY_NUMBER && defined __X32_SYSCALL_BIT
-	if (current_personality == X32_PERSONALITY_NUMBER)
-		scno &= ~__X32_SYSCALL_BIT;
-#endif
+	scno = shuffle_scno(scno);
+
 	return scno_is_valid(scno) ? sysent[scno].sys_name : NULL;
 }
