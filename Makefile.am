@@ -394,12 +394,12 @@ EXTRA_DIST =				\
 	linux/aarch64/arch_defs_.h	\
 	linux/aarch64/arch_regs.c	\
 	linux/aarch64/arch_regs.h	\
-	linux/aarch64/arch_rt_sigframe.c\
+	linux/aarch64/arch_rt_sigframe.c	\
 	linux/aarch64/arch_sigreturn.c	\
 	linux/aarch64/errnoent1.h	\
 	linux/aarch64/get_error.c	\
 	linux/aarch64/get_scno.c	\
-	linux/aarch64/get_syscall_args.c\
+	linux/aarch64/get_syscall_args.c	\
 	linux/aarch64/ioctls_arch0.h	\
 	linux/aarch64/ioctls_arch1.h	\
 	linux/aarch64/ioctls_inc0.h	\
@@ -409,7 +409,7 @@ EXTRA_DIST =				\
 	linux/aarch64/signalent1.h	\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
-	linux/alpha/arch_defs_.h		\
+	linux/alpha/arch_defs_.h	\
 	linux/alpha/arch_getrval2.c	\
 	linux/alpha/arch_regs.c		\
 	linux/alpha/arch_regs.h		\
@@ -419,7 +419,7 @@ EXTRA_DIST =				\
 	linux/alpha/get_error.c		\
 	linux/alpha/get_scno.c		\
 	linux/alpha/get_syscall_args.c	\
-	linux/alpha/get_syscall_result.c\
+	linux/alpha/get_syscall_result.c	\
 	linux/alpha/ioctls_arch0.h	\
 	linux/alpha/ioctls_inc0.h	\
 	linux/alpha/set_error.c		\
@@ -562,7 +562,7 @@ EXTRA_DIST =				\
 	linux/metag/syscallent.h	\
 	linux/microblaze/arch_defs_.h	\
 	linux/microblaze/arch_regs.c	\
-	linux/microblaze/arch_rt_sigframe.c\
+	linux/microblaze/arch_rt_sigframe.c	\
 	linux/microblaze/arch_sigreturn.c	\
 	linux/microblaze/get_error.c	\
 	linux/microblaze/get_scno.c	\
@@ -625,7 +625,7 @@ EXTRA_DIST =				\
 	linux/powerpc/arch_defs_.h	\
 	linux/powerpc/arch_regs.c	\
 	linux/powerpc/arch_regs.h	\
-	linux/powerpc/arch_rt_sigframe.c\
+	linux/powerpc/arch_rt_sigframe.c	\
 	linux/powerpc/arch_sigreturn.c	\
 	linux/powerpc/errnoent.h	\
 	linux/powerpc/get_error.c	\
@@ -642,7 +642,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/arch_defs_.h	\
 	linux/powerpc64/arch_regs.c	\
 	linux/powerpc64/arch_regs.h	\
-	linux/powerpc64/arch_rt_sigframe.c\
+	linux/powerpc64/arch_rt_sigframe.c	\
 	linux/powerpc64/arch_sigreturn.c	\
 	linux/powerpc64/errnoent.h	\
 	linux/powerpc64/errnoent1.h	\
@@ -662,7 +662,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
-	linux/riscv/arch_defs_.h		\
+	linux/riscv/arch_defs_.h	\
 	linux/riscv/arch_regs.c		\
 	linux/riscv/arch_regs.h		\
 	linux/riscv/arch_rt_sigframe.c	\
@@ -697,7 +697,7 @@ EXTRA_DIST =				\
 	linux/s390/userent.h		\
 	linux/s390/userent0.h		\
 	linux/s390/userent1.h		\
-	linux/s390x/arch_defs_.h		\
+	linux/s390x/arch_defs_.h	\
 	linux/s390x/arch_regs.c		\
 	linux/s390x/arch_regs.h		\
 	linux/s390x/arch_rt_sigframe.c	\
@@ -750,7 +750,7 @@ EXTRA_DIST =				\
 	linux/signalent.h		\
 	linux/smc_diag.h		\
 	linux/sock_diag.h		\
-	linux/sparc/arch_defs_.h		\
+	linux/sparc/arch_defs_.h	\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_regs.c		\
 	linux/sparc/arch_regs.h		\
@@ -773,13 +773,13 @@ EXTRA_DIST =				\
 	linux/sparc64/arch_getrval2.c	\
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_regs.h	\
-	linux/sparc64/arch_rt_sigframe.c\
+	linux/sparc64/arch_rt_sigframe.c	\
 	linux/sparc64/arch_sigreturn.c	\
 	linux/sparc64/errnoent.h	\
 	linux/sparc64/errnoent1.h	\
 	linux/sparc64/get_error.c	\
 	linux/sparc64/get_scno.c	\
-	linux/sparc64/get_syscall_args.c\
+	linux/sparc64/get_syscall_args.c	\
 	linux/sparc64/ioctls_arch0.h	\
 	linux/sparc64/ioctls_arch1.h	\
 	linux/sparc64/ioctls_inc0.h	\
@@ -890,7 +890,8 @@ EXTRA_DIST =				\
 	$(XLAT_INPUT_FILES)		\
 	$(XLAT_HEADER_FILES)		\
 	xlat/gen.sh			\
-	xlate.el
+	xlate.el			\
+	# end of EXTRA_DIST
 
 .PHONY: check-valgrind-local
 check-valgrind-local:
