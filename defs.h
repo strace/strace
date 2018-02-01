@@ -408,6 +408,17 @@ extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
  */
 extern const char *syscall_name(kernel_ulong_t scno);
 /**
+ * Convert a syscall name to the corresponding (shuffled) syscall number.
+ *
+ * @param s     Syscall name.
+ * @param p     Personality.
+ * @param start From which position in syscall entry table resume the search.
+ * @return      Shuffled syscall number (ready to use against sysent_vec)
+ *              if syscall name is found; -1 otherwise.
+ */
+extern kernel_long_t scno_by_name(const char *s, unsigned p,
+				  kernel_long_t start);
+/**
  * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
  * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
  *
