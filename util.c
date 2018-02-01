@@ -524,54 +524,53 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			    (style & QUOTE_OMIT_TRAILING_0) && (c == '\0'))
 				goto asciz_ended;
 			switch (c) {
-				case '\"': case '\\':
-					*s++ = '\\';
+			case '\"': case '\\':
+				*s++ = '\\';
+				*s++ = c;
+				break;
+			case '\f':
+				*s++ = '\\';
+				*s++ = 'f';
+				break;
+			case '\n':
+				*s++ = '\\';
+				*s++ = 'n';
+				break;
+			case '\r':
+				*s++ = '\\';
+				*s++ = 'r';
+				break;
+			case '\t':
+				*s++ = '\\';
+				*s++ = 't';
+				break;
+			case '\v':
+				*s++ = '\\';
+				*s++ = 'v';
+				break;
+			default:
+				if (c >= ' ' && c <= 0x7e)
 					*s++ = c;
-					break;
-				case '\f':
+				else {
+					/* Print \octal */
 					*s++ = '\\';
-					*s++ = 'f';
-					break;
-				case '\n':
-					*s++ = '\\';
-					*s++ = 'n';
-					break;
-				case '\r':
-					*s++ = '\\';
-					*s++ = 'r';
-					break;
-				case '\t':
-					*s++ = '\\';
-					*s++ = 't';
-					break;
-				case '\v':
-					*s++ = '\\';
-					*s++ = 'v';
-					break;
-				default:
-					if (c >= ' ' && c <= 0x7e)
-						*s++ = c;
-					else {
-						/* Print \octal */
-						*s++ = '\\';
-						if (i + 1 < size
-						    && ustr[i + 1] >= '0'
-						    && ustr[i + 1] <= '9'
-						) {
-							/* Print \ooo */
-							*s++ = '0' + (c >> 6);
+					if (i + 1 < size
+					    && ustr[i + 1] >= '0'
+					    && ustr[i + 1] <= '9'
+					) {
+						/* Print \ooo */
+						*s++ = '0' + (c >> 6);
+						*s++ = '0' + ((c >> 3) & 0x7);
+					} else {
+						/* Print \[[o]o]o */
+						if ((c >> 3) != 0) {
+							if ((c >> 6) != 0)
+								*s++ = '0' + (c >> 6);
 							*s++ = '0' + ((c >> 3) & 0x7);
-						} else {
-							/* Print \[[o]o]o */
-							if ((c >> 3) != 0) {
-								if ((c >> 6) != 0)
-									*s++ = '0' + (c >> 6);
-								*s++ = '0' + ((c >> 3) & 0x7);
-							}
 						}
-						*s++ = '0' + (c & 0x7);
 					}
-					break;
+					*s++ = '0' + (c & 0x7);
+				}
 			}
 		}
 	}
