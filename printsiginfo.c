@@ -209,8 +209,8 @@ print_si_info(const siginfo_t *sip)
 			 *  - Looks like there are no other cases where SIGSYS
 			 *    is delivered from the kernel so far.
 			 */
-			const char *scname =
-				syscall_name((unsigned) sip->si_syscall);
+			const char *scname = syscall_name(shuffle_scno(
+				(unsigned) sip->si_syscall));
 
 			tprints(", si_call_addr=");
 			printaddr(ptr_to_kulong(sip->si_call_addr));

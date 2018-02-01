@@ -1276,7 +1276,5 @@ get_syscall_result(struct tcb *tcp)
 const char *
 syscall_name(kernel_ulong_t scno)
 {
-	scno = shuffle_scno(scno);
-
 	return scno_is_valid(scno) ? sysent[scno].sys_name : NULL;
 }

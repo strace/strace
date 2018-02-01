@@ -400,7 +400,7 @@ extern int get_scno(struct tcb *);
 extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
 
 /**
- * Convert syscall number to syscall name.
+ * Convert a (shuffled) syscall number to the corresponding syscall name.
  *
  * @param scno Syscall number.
  * @return     String literal corresponding to the syscall number in case latter
