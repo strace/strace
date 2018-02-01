@@ -181,7 +181,7 @@ typedef struct ioctlent {
 struct inject_data {
 	uint16_t flags;
 	uint16_t signo;
-	int rval;
+	kernel_long_t rval;
 };
 
 struct inject_opts {

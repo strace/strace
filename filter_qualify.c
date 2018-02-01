@@ -83,7 +83,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		   const bool fault_tokens_only)
 {
 	const char *val;
-	int intval;
+	kernel_long_t intval;
 
 	if ((val = STR_STRIP_PREFIX(token, "when=")) != token) {
 		/*
@@ -129,9 +129,23 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
 		if (fopts->data.flags & INJECT_F_RETVAL)
 			return false;
-		intval = string_to_uint(val);
+		intval = string_to_kulong(val);
 		if (intval < 0)
 			return false;
+
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG && !HAVE_ARCH_DEDICATED_ERR_REG
+		if ((int) intval != intval)
+			error_msg("Injected return value %" PRI_kld " will be"
+				  " clipped to %d in compat personality",
+				  intval, (int) intval);
+
+		if ((int) intval < 0 && (int) intval >= -4095)
+			error_msg("Inadvertent injection of error %d is"
+				  " possible in compat personality for"
+				  " retval=%" PRI_kld,
+				  -(int) intval, intval);
+#endif
+
 		fopts->data.rval = intval;
 		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
