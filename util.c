@@ -514,67 +514,70 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = "0123456789abcdef"[c >> 4];
 			*s++ = "0123456789abcdef"[c & 0xf];
 		}
-	} else {
-		for (i = 0; i < size; ++i) {
-			c = ustr[i];
-			/* Check for NUL-terminated string. */
-			if (c == eol)
-				goto asciz_ended;
-			if ((i == (size - 1)) &&
-			    (style & QUOTE_OMIT_TRAILING_0) && (c == '\0'))
-				goto asciz_ended;
-			switch (c) {
-			case '\"': case '\\':
-				*s++ = '\\';
+
+		goto string_ended;
+	}
+
+	for (i = 0; i < size; ++i) {
+		c = ustr[i];
+		/* Check for NUL-terminated string. */
+		if (c == eol)
+			goto asciz_ended;
+		if ((i == (size - 1)) &&
+		    (style & QUOTE_OMIT_TRAILING_0) && (c == '\0'))
+			goto asciz_ended;
+		switch (c) {
+		case '\"': case '\\':
+			*s++ = '\\';
+			*s++ = c;
+			break;
+		case '\f':
+			*s++ = '\\';
+			*s++ = 'f';
+			break;
+		case '\n':
+			*s++ = '\\';
+			*s++ = 'n';
+			break;
+		case '\r':
+			*s++ = '\\';
+			*s++ = 'r';
+			break;
+		case '\t':
+			*s++ = '\\';
+			*s++ = 't';
+			break;
+		case '\v':
+			*s++ = '\\';
+			*s++ = 'v';
+			break;
+		default:
+			if (c >= ' ' && c <= 0x7e)
 				*s++ = c;
-				break;
-			case '\f':
+			else {
+				/* Print \octal */
 				*s++ = '\\';
-				*s++ = 'f';
-				break;
-			case '\n':
-				*s++ = '\\';
-				*s++ = 'n';
-				break;
-			case '\r':
-				*s++ = '\\';
-				*s++ = 'r';
-				break;
-			case '\t':
-				*s++ = '\\';
-				*s++ = 't';
-				break;
-			case '\v':
-				*s++ = '\\';
-				*s++ = 'v';
-				break;
-			default:
-				if (c >= ' ' && c <= 0x7e)
-					*s++ = c;
-				else {
-					/* Print \octal */
-					*s++ = '\\';
-					if (i + 1 < size
-					    && ustr[i + 1] >= '0'
-					    && ustr[i + 1] <= '9'
-					) {
-						/* Print \ooo */
-						*s++ = '0' + (c >> 6);
+				if (i + 1 < size
+				    && ustr[i + 1] >= '0'
+				    && ustr[i + 1] <= '9'
+				) {
+					/* Print \ooo */
+					*s++ = '0' + (c >> 6);
+					*s++ = '0' + ((c >> 3) & 0x7);
+				} else {
+					/* Print \[[o]o]o */
+					if ((c >> 3) != 0) {
+						if ((c >> 6) != 0)
+							*s++ = '0' + (c >> 6);
 						*s++ = '0' + ((c >> 3) & 0x7);
-					} else {
-						/* Print \[[o]o]o */
-						if ((c >> 3) != 0) {
-							if ((c >> 6) != 0)
-								*s++ = '0' + (c >> 6);
-							*s++ = '0' + ((c >> 3) & 0x7);
-						}
 					}
-					*s++ = '0' + (c & 0x7);
 				}
+				*s++ = '0' + (c & 0x7);
 			}
 		}
 	}
 
+ string_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 	if (style & QUOTE_EMIT_COMMENT)
