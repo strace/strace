@@ -191,6 +191,22 @@ print_si_info(const siginfo_t *sip)
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS: {
+			/*
+			 * Note that we can safely use the personlity set in
+			 * current_personality  here (and don't have to guess it
+			 * based on X32_SYSCALL_BIT and si_arch, for example):
+			 *  - The signal is delivered as a result of seccomp
+			 *    filtering to the process executing forbidden
+			 *    syscall.
+			 *  - We have set the personality for the tracee during
+			 *    the syscall entering.
+			 *  - The current_personality is reliably switched in
+			 *    the next_event routine, it is set to the
+			 *    personality of the last call made (the one that
+			 *    triggered the signal delivery).
+			 *  - Looks like there are no other cases where SIGSYS
+			 *    is delivered from the kernel so far.
+			 */
 			const char *scname =
 				syscall_name((unsigned) sip->si_syscall);
 
