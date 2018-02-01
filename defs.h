@@ -407,6 +407,14 @@ extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
  *             is valid; NULL otherwise.
  */
 extern const char *syscall_name(kernel_ulong_t scno);
+/**
+ * Shuffle syscall numbers so that we don't have huge gaps in syscall table.
+ * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
+ *
+ * @param scno Raw or shuffled syscall number.
+ * @return     Shuffled or raw syscall number, respectively.
+ */
+extern kernel_ulong_t shuffle_scno(kernel_ulong_t scno);
 extern const char *err_name(unsigned long err);
 
 extern bool is_erestart(struct tcb *);
