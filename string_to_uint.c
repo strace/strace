@@ -30,27 +30,27 @@
 #endif
 
 #include <errno.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "string_to_uint.h"
 
-int
+long long
 string_to_uint_ex(const char *const str, char **const endptr,
-		  const unsigned int max_val, const char *const accepted_ending)
+		  const unsigned long long max_val,
+		  const char *const accepted_ending)
 {
 	char *end;
-	long val;
+	long long val;
 
 	if (!*str)
 		return -1;
 
 	errno = 0;
-	val = strtol(str, &end, 10);
+	val = strtoll(str, &end, 10);
 
-	if (str == end || val < 0 || (unsigned long) val > max_val
-	    || (val == LONG_MAX && errno == ERANGE))
+	if (str == end || val < 0 || (unsigned long long) val > max_val
+	    || (val == LLONG_MAX && errno == ERANGE))
 		return -1;
 
 	if (*end && (!accepted_ending || !strchr(accepted_ending, *end)))
@@ -59,11 +59,5 @@ string_to_uint_ex(const char *const str, char **const endptr,
 	if (endptr)
 		*endptr = end;
 
-	return (int) val;
-}
-
-int
-string_to_uint(const char *const str)
-{
-	return string_to_uint_upto(str, INT_MAX);
+	return val;
 }

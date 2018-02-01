@@ -28,17 +28,42 @@
 #ifndef STRACE_STRING_TO_UINT_H
 #define STRACE_STRING_TO_UINT_H
 
-extern int
-string_to_uint(const char *str);
+#include <limits.h>
 
-extern int
+#include "kernel_types.h"
+
+extern long long
 string_to_uint_ex(const char *str, char **endptr,
-		  unsigned int max_val, const char *accepted_ending);
+		  unsigned long long max_val, const char *accepted_ending);
 
-static inline int
-string_to_uint_upto(const char *const str, const unsigned int max_val)
+static inline long long
+string_to_uint_upto(const char *const str, const unsigned long long max_val)
 {
 	return string_to_uint_ex(str, NULL, max_val, NULL);
+}
+
+static inline int
+string_to_uint(const char *str)
+{
+	return string_to_uint_upto(str, INT_MAX);
+}
+
+static inline long
+string_to_ulong(const char *str)
+{
+	return string_to_uint_upto(str, LONG_MAX);
+}
+
+static inline kernel_long_t
+string_to_kulong(const char *str)
+{
+	return string_to_uint_upto(str, ((kernel_ulong_t) -1ULL) >> 1);
+}
+
+static inline long long
+string_to_ulonglong(const char *str)
+{
+	return string_to_uint_upto(str, LLONG_MAX);
 }
 
 #endif /* !STRACE_STRING_TO_UINT_H */
