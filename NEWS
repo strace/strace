@@ -19,6 +19,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     using --enable-stacktrace option.
   * Added -X option for configuring xlat output formatting (addresses
     Debian bug #692915).
+  * Implemented injection of syscalls with no side effects as an alternative
+    to injection of an invalid syscall (-e inject=SET:syscall= expression).
   * Improved support for reproducible builds (addresses Debian bug #896016).
   * Implemented decoding of BPF_PROG_QUERY and BPF_RAW_TRACEPOINT_OPEN bpf
     syscall commands.

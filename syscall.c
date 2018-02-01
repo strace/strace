@@ -507,9 +507,18 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 	if (!recovering(tcp)) {
 		if (opts->data.flags & INJECT_F_SIGNAL)
 			*signo = opts->data.signo;
-		if (opts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL) &&
-		    !arch_set_scno(tcp, -1))
-			tcp->flags |= TCB_TAMPERED;
+		if (opts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL)) {
+			kernel_long_t scno =
+				(opts->data.flags & INJECT_F_SYSCALL)
+				? (kernel_long_t) shuffle_scno(opts->data.scno)
+				: -1;
+
+			if (!arch_set_scno(tcp, scno)) {
+				tcp->flags |= TCB_TAMPERED;
+				if (scno != -1)
+					tcp->flags |= TCB_TAMPERED_NO_FAIL;
+			}
+		}
 		if (opts->data.flags & INJECT_F_DELAY_ENTER)
 			delay_tcb(tcp, opts->data.delay_idx, true);
 		if (opts->data.flags & INJECT_F_DELAY_EXIT)
@@ -532,10 +541,11 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 	if (!syscall_tampered(tcp))
 		return 0;
 
-	if (!syserror(tcp)) {
-		error_msg("Failed to tamper with process %d: got no error "
-			  "(return value %#" PRI_klx ")",
-			  tcp->pid, tcp->u_rval);
+	if (!syserror(tcp) ^ !!syscall_tampered_nofail(tcp)) {
+		error_msg("Failed to tamper with process %d: unexpectedly got"
+			  " %serror (return value %#" PRI_klx ", error %lu)",
+			  tcp->pid, syscall_tampered_nofail(tcp) ? "" : "no ",
+			  tcp->u_rval, tcp->u_error);
 
 		return 1;
 	}
@@ -1237,8 +1247,9 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	tcp->u_error = 0;
 	get_error(tcp,
-		  !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS)
-			|| syscall_tampered(tcp));
+		  (!(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS)
+			|| syscall_tampered(tcp))
+                  && !syscall_tampered_nofail(tcp));
 
 	return 1;
 }

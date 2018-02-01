@@ -43,6 +43,11 @@ static struct number_set *raw_set;
 static struct number_set *trace_set;
 static struct number_set *verbose_set;
 
+/* Only syscall numbers are personality-specific so far.  */
+struct inject_personality_data {
+	uint16_t scno;
+};
+
 static int
 sigstr_to_uint(const char *s)
 {
@@ -102,6 +107,7 @@ parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
 
 static bool
 parse_inject_token(const char *const token, struct inject_opts *const fopts,
+		   struct inject_personality_data *const pdata,
 		   const bool fault_tokens_only)
 {
 	const char *val;
@@ -137,6 +143,27 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			/* F == F+0 */
 			fopts->step = 0;
 		}
+	} else if ((val = STR_STRIP_PREFIX(token, "syscall=")) != token) {
+		if (fopts->data.flags & INJECT_F_SYSCALL)
+			return false;
+
+		for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+			kernel_long_t scno = scno_by_name(val, p, 0);
+
+			if (scno < 0)
+				return false;
+
+			/*
+			 * We want to inject only pure system calls with no side
+			 * effects.
+			 */
+			if (!(sysent_vec[p][scno].sys_flags & TRACE_PURE))
+				return false;
+
+			pdata[p].scno = scno;
+		}
+
+		fopts->data.flags |= INJECT_F_SYSCALL;
 	} else if ((val = STR_STRIP_PREFIX(token, "error=")) != token) {
 		if (fopts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL))
 			return false;
@@ -223,6 +250,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 static const char *
 parse_inject_expression(char *const str,
 			struct inject_opts *const fopts,
+			struct inject_personality_data *const pdata,
 			const bool fault_tokens_only)
 {
 	if (str[0] == '\0' || str[0] == ':')
@@ -233,7 +261,7 @@ parse_inject_expression(char *const str,
 
 	char *token;
 	while ((token = strtok_r(NULL, ":", &saveptr))) {
-		if (!parse_inject_token(token, fopts, fault_tokens_only))
+		if (!parse_inject_token(token, fopts, pdata, fault_tokens_only))
 			return NULL;
 	}
 
@@ -308,9 +336,10 @@ qualify_inject_common(const char *const str,
 			.delay_idx = -1
 		}
 	};
+	struct inject_personality_data pdata[SUPPORTED_PERSONALITIES] = { { 0 } };
 	char *copy = xstrdup(str);
 	const char *name =
-		parse_inject_expression(copy, &opts, fault_tokens_only);
+		parse_inject_expression(copy, &opts, pdata, fault_tokens_only);
 	if (!name)
 		error_msg_and_die("invalid %s '%s'", description, str);
 
@@ -321,7 +350,7 @@ qualify_inject_common(const char *const str,
 	free(copy);
 
 	/* If neither of retval, error, signal or delay is specified, then ... */
-	if (!opts.data.flags) {
+	if (!(opts.data.flags & INJECT_ACTION_FLAGS)) {
 		if (fault_tokens_only) {
 			/* in fault= syntax the default error code is ENOSYS. */
 			opts.data.rval_idx = retval_new(ENOSYS);
@@ -353,6 +382,10 @@ qualify_inject_common(const char *const str,
 			if (is_number_in_set_array(i, tmp_set, p)) {
 				add_number_to_set_array(i, inject_set, p);
 				inject_vec[p][i] = opts;
+
+				/* Copy per-personality data.  */
+				inject_vec[p][i].data.scno =
+					pdata[p].scno;
 			}
 		}
 	}

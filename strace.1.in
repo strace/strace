@@ -626,7 +626,7 @@ Note that this is independent from the normal tracing of the
 system call which is controlled by the option
 .BR -e "\ " trace = write .
 .TP
-\fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBdelay_enter\fR=\,\fIusecs\/\fR][:\fBdelay_exit\fR=\,\fIusecs\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIusecs\/\fR][:\fBdelay_exit\fR=\,\fIusecs\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.
 
 At least one of
@@ -644,7 +644,8 @@ are mutually exclusive.
 
 If :\fBerror\fR=\,\fIerrno\/\fR option is specified,
 a fault is injected into a syscall invocation:
-the syscall number is replaced by -1 which corresponds to an invalid syscall,
+the syscall number is replaced by -1 which corresponds to an invalid syscall
+(unless a syscall is specified with :\fBsyscall=\fR option),
 and the error code is specified using a symbolic
 .I errno
 value like
@@ -684,6 +685,12 @@ or injecting a delay, etc.
 If both :\fBerror\fR=\,\fIerrno\/\fR or :\fBretval\fR=\,\fIvalue\/\fR
 and :\fBsignal\fR=\,\fIsig\/\fR options are specified, then both
 a fault or success is injected and a signal is delivered.
+
+if :\fBsyscall\fR=\fIsyscall\fR option is specified, the corresponding syscall
+with no side effects is injected instead of -1.
+Currently, only "pure" (see
+.BR "-e trace" = "%pure"
+description) syscalls can be specified there.
 
 Unless a :\fBwhen\fR=\,\fIexpr\fR subexpression is specified,
 an injection is being made into every invocation of each syscall from the

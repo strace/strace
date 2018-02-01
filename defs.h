@@ -182,12 +182,22 @@ typedef struct ioctlent {
 #define INJECT_F_RETVAL		0x04
 #define INJECT_F_DELAY_ENTER	0x08
 #define INJECT_F_DELAY_EXIT	0x10
+#define INJECT_F_SYSCALL	0x20
+
+#define INJECT_ACTION_FLAGS	\
+	(INJECT_F_SIGNAL	\
+	|INJECT_F_ERROR		\
+	|INJECT_F_RETVAL	\
+	|INJECT_F_DELAY_ENTER	\
+	|INJECT_F_DELAY_EXIT	\
+	)
 
 struct inject_data {
-	uint8_t flags;		/* 5 of 8 flags are used so far */
+	uint8_t flags;		/* 6 of 8 flags are used so far */
 	uint8_t signo;		/* NSIG <= 128 */
 	uint16_t rval_idx;	/* index in retval_vec */
 	uint16_t delay_idx;	/* index in delay_data_vec */
+	uint16_t scno;		/* syscall to be injected instead of -1 */
 };
 
 struct inject_opts {
@@ -261,6 +271,8 @@ struct tcb {
 #define TCB_INJECT_DELAY_EXIT	0x800	/* Current syscall needs to be delayed
 					   on exit */
 #define TCB_DELAYED	0x1000	/* Current syscall has been delayed */
+#define TCB_TAMPERED_NO_FAIL 0x2000	/* We tamper tcb with syscall
+					   that should not fail. */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -285,6 +297,7 @@ struct tcb {
 #define recovering(tcp)	((tcp)->flags & TCB_RECOVERING)
 #define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
 #define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
+#define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
 
 #include "xlat.h"
 
