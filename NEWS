@@ -4,6 +4,10 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Changes in infrastructure
   * The mailing list was moved to strace-devel@lists.strace.io.
 
+* Changes in behaviour
+  * Closing angle bracket is now printed as an octal number escape sequence
+    in the output of paths associated with file descriptors.
+
 * Improvements
   * IPv6 addresses shown in socket information in -yy mode are now printed
     in brackets.

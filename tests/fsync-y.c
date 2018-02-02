@@ -46,7 +46,7 @@ main(void)
 	} checks[] = {
 		{ ARG_STR("\1\0020\v\0047\f\58\t\79\n\10\0171\r\0167\218\37 \\\'\"<<0::0>>1~\177\200\377"),
 			"\\1\\0020\\v\\0047\\f\\58\\t\\79\\n\\10\\0171\\r\\0167"
-			"\\218\\37 \\\\\'\\\"<<0::0>>1~\\177\\200\\377" },
+			"\\218\\37 \\\\\'\\\"<<0::0\\76\\0761~\\177\\200\\377" },
 	};
 
 	if (!getcwd(dir, sizeof(dir)))
@@ -60,7 +60,7 @@ main(void)
 		int rc = fsync(fd);
 
 		printf("fsync(%ld<", fd);
-		print_quoted_string_ex(dir, false, NULL);
+		print_quoted_string_ex(dir, false, ">");
 		printf("/%s>) = %s\n", checks[i].fdstr, sprintrc(rc));
 
 		close(fd);

@@ -434,8 +434,8 @@ printfd(struct tcb *tcp, int fd)
 		    || str[len - 1] != ']'
 		    || !(inode = strtoul(str, NULL, 10))
 		    || !print_sockaddr_by_inode(tcp, fd, inode)) {
-			print_quoted_string(path, strlen(path),
-					    QUOTE_OMIT_LEADING_TRAILING_QUOTES);
+			print_quoted_string_ex(path, strlen(path),
+				QUOTE_OMIT_LEADING_TRAILING_QUOTES, ">");
 		}
 		tprints(">");
 	} else
