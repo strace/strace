@@ -70,7 +70,7 @@ print_quoted_memory(const void *const instr, const size_t len)
 
 					if (i < (len - 1) &&
 					    str[i + 1] >= '0' &&
-					    str[i + 1] <= '9') {
+					    str[i + 1] <= '7') {
 						/* Print \octal */
 						putchar(c3);
 						putchar(c2);

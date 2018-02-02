@@ -559,7 +559,7 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 				*s++ = '\\';
 				if (i + 1 < size
 				    && ustr[i + 1] >= '0'
-				    && ustr[i + 1] <= '9'
+				    && ustr[i + 1] <= '7'
 				) {
 					/* Print \ooo */
 					*s++ = '0' + (c >> 6);
