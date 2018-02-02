@@ -68,7 +68,9 @@ print_quoted_memory(const void *const instr, const size_t len)
 					char c2 = '0' + ((c >> 3) & 0x7);
 					char c3 = '0' + (c >> 6);
 
-					if (*str >= '0' && *str <= '9') {
+					if (i < (len - 1) &&
+					    str[i + 1] >= '0' &&
+					    str[i + 1] <= '9') {
 						/* Print \octal */
 						putchar(c3);
 						putchar(c2);
