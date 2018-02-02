@@ -33,6 +33,8 @@
 #  include "config.h"
 # endif
 
+# include <stdbool.h>
+
 # include <sys/types.h>
 # include "kernel_types.h"
 # include "gcc_compat.h"
@@ -141,6 +143,9 @@ const char *hexquote_strndup(const char *, size_t);
 unsigned long inode_of_sockfd(int);
 
 /* Print string in a quoted form. */
+void print_quoted_string_ex(const char *, bool quote);
+
+/* Print string in a quoted form. */
 void print_quoted_string(const char *);
 
 /*
@@ -148,6 +153,9 @@ void print_quoted_string(const char *);
  * in a quoted form.
  */
 void print_quoted_cstring(const char *str, size_t size);
+
+/* Print memory in a quoted form. */
+void print_quoted_memory_ex(const void *, size_t, bool quote);
 
 /* Print memory in a quoted form. */
 void print_quoted_memory(const void *, size_t);

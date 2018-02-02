@@ -10,6 +10,12 @@
  */
 
 void
+print_quoted_string_ex(const char *instr, bool quote)
+{
+	print_quoted_memory_ex(instr, strlen(instr), quote);
+}
+
+void
 print_quoted_string(const char *instr)
 {
 	print_quoted_memory(instr, strlen(instr));
@@ -28,12 +34,15 @@ print_quoted_cstring(const char *instr, const size_t size)
 }
 
 void
-print_quoted_memory(const void *const instr, const size_t len)
+print_quoted_memory_ex(const void *const instr, const size_t len,
+		       bool quote)
 {
 	const unsigned char *str = (const unsigned char *) instr;
 	size_t i;
 
-	putchar('"');
+	if (quote)
+		putchar('"');
+
 	for (i = 0; i < len; ++i) {
 		const int c = str[i];
 		switch (c) {
@@ -87,7 +96,14 @@ print_quoted_memory(const void *const instr, const size_t len)
 		}
 	}
 
-	putchar('"');
+	if (quote)
+		putchar('"');
+}
+
+void
+print_quoted_memory(const void *const instr, const size_t len)
+{
+	print_quoted_memory_ex(instr, len, true);
 }
 
 void
