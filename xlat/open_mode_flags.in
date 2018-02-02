@@ -4,7 +4,9 @@ O_NOCTTY
 O_TRUNC
 O_APPEND
 O_NONBLOCK
+/* O_SYNC should be listed before O_DSYNC and __O_SYNC */
 O_SYNC
+__O_SYNC
 O_ASYNC
 O_DSYNC
 O_RSYNC
@@ -14,15 +16,14 @@ O_NDELAY
 O_PRIV
 O_DIRECT
 O_LARGEFILE
-O_DIRECTORY
 O_NOFOLLOW
 O_NOATIME
 O_CLOEXEC
 O_PATH
-#if defined(O_TMPFILE) && defined(O_DIRECTORY)
-/* The kernel & C libraries often inline O_DIRECTORY */
-{ O_TMPFILE & ~O_DIRECTORY, "O_TMPFILE" },
-#endif
+/* O_TMPFILE should be listed before O_DIRECTORY and __O_TMPFILE */
+O_TMPFILE
+__O_TMPFILE
+O_DIRECTORY
 FNDELAY
 FAPPEND
 FMARK

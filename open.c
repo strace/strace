@@ -36,7 +36,7 @@
 #include "defs.h"
 #include "xstring.h"
 
-#include <fcntl.h>
+#include <asm/fcntl.h>
 
 /* some libcs are guilty of messing up with O_ACCMODE */
 #undef O_ACCMODE
@@ -45,11 +45,6 @@
 #ifdef O_LARGEFILE
 # if O_LARGEFILE == 0		/* biarch platforms in 64-bit mode */
 #  undef O_LARGEFILE
-#  ifdef SPARC64
-#   define O_LARGEFILE 0x40000
-#  elif defined X86_64 || defined S390X
-#   define O_LARGEFILE 0100000
-#  endif
 # endif
 #endif
 
