@@ -82,6 +82,7 @@ fstatat64
 fstatfs
 fstatfs64
 fsync
+fsync-y
 ftruncate
 ftruncate64
 futex

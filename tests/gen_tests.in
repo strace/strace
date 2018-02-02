@@ -85,6 +85,7 @@ fstatat64	-a32 -v -P stat.sample -P /dev/full
 fstatfs	-a18
 fstatfs64	-a24
 fsync	-a10
+fsync-y -y -e trace=fsync
 ftruncate	-a24
 ftruncate64	-a36
 futimesat	-a28

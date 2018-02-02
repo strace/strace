@@ -101,6 +101,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	execveat-v \
 	filter-unavailable \
 	fork-f \
+	fsync-y \
 	getpid	\
 	getppid	\
 	gettid \
