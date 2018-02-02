@@ -60,7 +60,7 @@ main(void)
 		int rc = fsync(fd);
 
 		printf("fsync(%ld<", fd);
-		print_quoted_string_ex(dir, false);
+		print_quoted_string_ex(dir, false, NULL);
 		printf("/%s>) = %s\n", checks[i].fdstr, sprintrc(rc));
 
 		close(fd);

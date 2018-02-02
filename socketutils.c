@@ -331,10 +331,10 @@ unix_parse_response(const void *data, const int data_len,
 		if (path[0] == '\0') {
 			outstr[1] = '@';
 			string_quote(path + 1, outstr + 2,
-				     path_len - 1, QUOTE_0_TERMINATED);
+				     path_len - 1, QUOTE_0_TERMINATED, NULL);
 		} else {
 			string_quote(path, outstr + 1,
-				     path_len, QUOTE_0_TERMINATED);
+				     path_len, QUOTE_0_TERMINATED, NULL);
 		}
 		path_str = outstr;
 	} else {

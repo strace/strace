@@ -534,7 +534,10 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 #define QUOTE_FORCE_HEX				0x10
 #define QUOTE_EMIT_COMMENT			0x20
 
-extern int string_quote(const char *, char *, unsigned int, unsigned int);
+extern int string_quote(const char *, char *, unsigned int, unsigned int,
+			const char *escape_chars);
+extern int print_quoted_string_ex(const char *, unsigned int, unsigned int,
+				  const char *escape_chars);
 extern int print_quoted_string(const char *, unsigned int, unsigned int);
 extern int print_quoted_cstring(const char *, unsigned int);
 

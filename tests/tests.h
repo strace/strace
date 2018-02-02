@@ -142,8 +142,8 @@ const char *hexquote_strndup(const char *, size_t);
 /* Return inode number of socket descriptor. */
 unsigned long inode_of_sockfd(int);
 
-/* Print string in a quoted form. */
-void print_quoted_string_ex(const char *, bool quote);
+/* Print string in a quoted form with optional escape characters. */
+void print_quoted_string_ex(const char *, bool quote, const char *escape_str);
 
 /* Print string in a quoted form. */
 void print_quoted_string(const char *);
@@ -154,8 +154,9 @@ void print_quoted_string(const char *);
  */
 void print_quoted_cstring(const char *str, size_t size);
 
-/* Print memory in a quoted form. */
-void print_quoted_memory_ex(const void *, size_t, bool quote);
+/* Print memory in a quoted form with optional escape characters. */
+void print_quoted_memory_ex(const void *, size_t, bool quote,
+			    const char *escape_chars);
 
 /* Print memory in a quoted form. */
 void print_quoted_memory(const void *, size_t);

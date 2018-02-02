@@ -446,6 +446,9 @@ printfd(struct tcb *tcp, int fd)
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
  *
+ * `escape_chars' specifies characters (in addition to characters with
+ * codes 0..31, 127..255, single and double quotes) that should be escaped.
+ *
  * If QUOTE_0_TERMINATED `style' flag is set,
  * treat `instr' as a NUL-terminated string,
  * checking up to (`size' + 1) bytes of `instr'.
@@ -458,12 +461,13 @@ printfd(struct tcb *tcp, int fd)
  */
 int
 string_quote(const char *instr, char *outstr, const unsigned int size,
-	     const unsigned int style)
+	     const unsigned int style, const char *escape_chars)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;
 	char *s = outstr;
 	unsigned int i;
 	int usehex, c, eol;
+	bool escape;
 
 	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
@@ -552,9 +556,14 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = 'v';
 			break;
 		default:
-			if (c >= ' ' && c <= 0x7e)
+			escape = (c < ' ') || (c > 0x7e);
+
+			if (!escape && escape_chars)
+				escape = !!strchr(escape_chars, c);
+
+			if (!escape) {
 				*s++ = c;
-			else {
+			} else {
 				/* Print \octal */
 				*s++ = '\\';
 				if (i + 1 < size
@@ -623,8 +632,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
  * Note that if QUOTE_0_TERMINATED is not set, always returns 1.
  */
 int
-print_quoted_string(const char *str, unsigned int size,
-		    const unsigned int style)
+print_quoted_string_ex(const char *str, unsigned int size,
+		       const unsigned int style, const char *escape_chars)
 {
 	char *buf;
 	char *outstr;
@@ -655,11 +664,18 @@ print_quoted_string(const char *str, unsigned int size,
 		}
 	}
 
-	rc = string_quote(str, outstr, size, style);
+	rc = string_quote(str, outstr, size, style, escape_chars);
 	tprints(outstr);
 
 	free(buf);
 	return rc;
+}
+
+inline int
+print_quoted_string(const char *str, unsigned int size,
+		    const unsigned int style)
+{
+	return print_quoted_string_ex(str, size, style, NULL);
 }
 
 /*
@@ -783,7 +799,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...
 	 */
-	ellipsis = string_quote(str, outstr, size, style)
+	ellipsis = string_quote(str, outstr, size, style, NULL)
 		   && len
 		   && ((style & QUOTE_0_TERMINATED)
 		       || len > max_strlen);
