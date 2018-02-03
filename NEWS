@@ -25,7 +25,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     of mq_getsetattr, mq_notify, mq_timedreceive, and mq_timedsend syscalls
     as file descriptors.
   * Added decoding of get_tls syscall on arm.
-  * Updated lists of MAP_*, MSG_*, NT_*, and SHM_* constants.
+  * Updated lists of IPV6_*, MAP_*, MSG_*, NT_*, and SHM_* constants.
   * Added manual page for the strace-log-merge command.
   * Updated lists of ioctl commands from Linux 4.15.
   * Implemented biarch support for s390x.
