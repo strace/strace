@@ -143,7 +143,7 @@ init_dm_target_spec(struct dm_target_spec *ptr, uint32_t id)
 	ptr->length       = dts_length_base + dts_length_step * id;
 	ptr->status       = dts_status_base + dts_status_step * id;
 
-	strncpy(ptr->target_type, str129 +
+	memcpy(ptr->target_type, str129 +
 		id % (sizeof(str129) - sizeof(ptr->target_type)),
 		id % (sizeof(ptr->target_type) + 1));
 	if (id % (sizeof(ptr->target_type) + 1) < sizeof(ptr->target_type))
@@ -252,8 +252,8 @@ main(void)
 
 	/* Unterminated name/uuid */
 	init_s(dm_arg, min_sizeof_dm_ioctl, 0);
-	strncpy(dm_arg->name, str129, sizeof(dm_arg->name));
-	strncpy(dm_arg->uuid, str129, sizeof(dm_arg->uuid));
+	memcpy(dm_arg->name, str129, sizeof(dm_arg->name));
+	memcpy(dm_arg->uuid, str129, sizeof(dm_arg->uuid));
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, {version=4.1.2, data_size=%zu, "
 	       "dev=makedev(18, 52), name=\"%.127s\"..., uuid=\"%.128s\"..., "
@@ -511,7 +511,7 @@ main(void)
 					 target##id_next) - \
 				offsetof(struct dm_table_open_test, \
 					 target##id); \
-			strncpy(dm_arg_open3->param##id, str129 + id * 2, id); \
+			memcpy(dm_arg_open3->param##id, str129 + id * 2, id); \
 			dm_arg_open3->param##id[id] = '\0'; \
 		} while (0)
 	#define PRINT_DM_TARGET(id) \
