@@ -916,7 +916,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-				if (current_wordsize < sizeof(tcp->u_rval)) {
+				if (current_klongsize < sizeof(tcp->u_rval)) {
 					tprintf("= %#x",
 						(unsigned int) tcp->u_rval);
 				} else
@@ -931,7 +931,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 				break;
 			case RVAL_UDECIMAL:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-				if (current_wordsize < sizeof(tcp->u_rval)) {
+				if (current_klongsize < sizeof(tcp->u_rval)) {
 					tprintf("= %u",
 						(unsigned int) tcp->u_rval);
 				} else
