@@ -165,33 +165,35 @@ read(0, 0x7ffff72cf5cf, 1)              = ? ERESTARTSYS (To be restarted)
 rt_sigreturn(0xe)                       = 0
 read(0, "", 1)                          = 0
 .CE
-Arguments are printed in symbolic form with a passion.
+Arguments are printed in symbolic form with passion.
 This example shows the shell performing ">>xyzzy" output redirection:
 .CW
 open("xyzzy", O_WRONLY|O_APPEND|O_CREAT, 0666) = 3
 .CE
-Here the third argument of open is decoded by breaking down the
+Here, the third argument of open is decoded by breaking down the
 flag argument into its three bitwise-OR constituents and printing the
-mode value in octal by tradition.  Where traditional or native
+mode value in octal by tradition.  Where the traditional or native
 usage differs from ANSI or POSIX, the latter forms are preferred.
 In some cases,
 .B strace
-output has proven to be more readable than the source.
+output is proven to be more readable than the source.
 .LP
 Structure pointers are dereferenced and the members are displayed
-as appropriate.  In all cases arguments are formatted in the most C-like
+as appropriate.  In most cases, arguments are formatted in the most C-like
 fashion possible.
 For example, the essence of the command "ls \-l /dev/null" is captured as:
 .CW
 lstat("/dev/null", {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 3), ...}) = 0
 .CE
 Notice how the 'struct stat' argument is dereferenced and how each member is
-displayed symbolically.  In particular, observe how the st_mode member
-is carefully decoded into a bitwise-OR of symbolic and numeric values.
-Also notice in this example that the first argument to lstat is an input
-to the system call and the second argument is an output.  Since output
-arguments are not modified if the system call fails, arguments may not
-always be dereferenced.  For example, retrying the "ls \-l" example
+displayed symbolically.  In particular, observe how the
+.B st_mode
+member is carefully decoded into a bitwise-OR of symbolic and numeric values.
+Also notice in this example that the first argument to
+.B lstat
+is an input to the system call and the second argument is an output.
+Since output arguments are not modified if the system call fails, arguments may
+not always be dereferenced.  For example, retrying the "ls \-l" example
 with a non-existent file produces the following line:
 .CW
 lstat("/foo/bar", 0xb004) = \-1 ENOENT (No such file or directory)
@@ -219,19 +221,20 @@ supplementary group ids:
 getgroups(32, [100, 0]) = 2
 .CE
 On the other hand, bit-sets are also shown using square brackets
-but set elements are separated only by a space.  Here is the shell
+but set elements are separated only by a space.  Here is the shell,
 preparing to execute an external command:
 .CW
 sigprocmask(SIG_BLOCK, [CHLD TTOU], []) = 0
 .CE
-Here the second argument is a bit-set of two signals, SIGCHLD and SIGTTOU.
-In some cases the bit-set is so full that printing out the unset
+Here, the second argument is a bit-set of two signals,
+.BR SIGCHLD " and " SIGTTOU .
+In some cases, the bit-set is so full that printing out the unset
 elements is more valuable.  In that case, the bit-set is prefixed by
 a tilde like this:
 .CW
 sigprocmask(SIG_UNBLOCK, ~[], NULL) = 0
 .CE
-Here the second argument represents the full set of all signals.
+Here, the second argument represents the full set of all signals.
 .SH OPTIONS
 .SS Output format
 .TP 12
@@ -251,15 +254,17 @@ is built with libunwind.
 Write the trace output to the file
 .I filename
 rather than to stderr.
-Use
-.I filename.pid
-if
+.IR filename . pid
+form is used if
 .B \-ff
-is used.
-If the argument begins with '|' or with '!' then the rest of the
+option is supplied.
+If the argument begins with '|' or '!', the rest of the
 argument is treated as a command and all output is piped to it.
 This is convenient for piping the debugging output to a program
 without affecting the redirections of executed programs.
+The latter is not compatible with
+.B \-ff
+option currently.
 .TP
 .B \-q
 Suppress messages about attaching, detaching etc.  This happens
@@ -280,7 +285,7 @@ that filenames are not considered strings and are always printed in
 full.
 .TP
 .B \-t
-Prefix each line of the trace with the time of day.
+Prefix each line of the trace with the wall clock time.
 .TP
 .B \-tt
 If given twice, the time printed will include the microseconds.
@@ -309,14 +314,12 @@ Print protocol specific information associated with socket file descriptors.
 .TP 12
 .B \-c
 Count time, calls, and errors for each system call and report a summary on
-program exit.  On Linux, this attempts to show system time (CPU time spent
-running in the kernel) independent of wall clock time.  If
+program exit.  This attempts to show system time (CPU time spent running
+in the kernel) independent of wall clock time.  If
 .B \-c
 is used with
-.B \-f
-or
-.B \-F
-, only aggregate totals for all traced processes are kept.
+.BR \-f ,
+only aggregate totals for all traced processes are kept.
 .TP
 .B \-C
 Like
