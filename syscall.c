@@ -1209,7 +1209,7 @@ set_regs(pid_t pid)
 struct sysent_buf {
 	struct tcb *tcp;
 	struct_sysent ent;
-	char buf[sizeof("syscall_%lu") + sizeof(kernel_ulong_t) * 3];
+	char buf[sizeof("syscall_0x") + sizeof(kernel_ulong_t) * 2];
 };
 
 static void
@@ -1249,14 +1249,14 @@ get_scno(struct tcb *tcp)
 		s->ent.sen = SEN_printargs;
 		s->ent.sys_func = printargs;
 		s->ent.sys_name = s->buf;
-		xsprintf(s->buf, "syscall_%" PRI_klu, shuffle_scno(tcp->scno));
+		xsprintf(s->buf, "syscall_%#" PRI_klx, shuffle_scno(tcp->scno));
 
 		tcp->s_ent = &s->ent;
 		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
 
 		set_tcb_priv_data(tcp, s, free_sysent_buf);
 
-		debug_msg("pid %d invalid syscall %" PRI_kld,
+		debug_msg("pid %d invalid syscall %#" PRI_klx,
 			  tcp->pid, tcp->scno);
 	}
 

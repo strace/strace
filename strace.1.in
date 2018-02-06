@@ -200,6 +200,15 @@ lstat("/foo/bar", 0xb004) = \-1 ENOENT (No such file or directory)
 .CE
 In this case the porch light is on but nobody is home.
 .LP
+Syscalls unknown to
+.B strace
+are printed raw, with the unknown system call number printed in hexadecimal form
+and prefixed with "syscall_":
+.CW
+syscall_0xbad(0xfedcba9876543210, 0xfedcba9876543211, 0xfedcba9876543212,
+0xfedcba9876543213, 0xfedcba9876543214, 0xfedcba9876543215) = -1 (errno 38)
+.CE
+.LP
 Character pointers are dereferenced and printed as C strings.
 Non-printing characters in strings are normally represented by
 ordinary C escape codes.

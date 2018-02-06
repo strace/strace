@@ -5,6 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Warning is now issued when -F option is used.
   * Warning is now issued when a tracee with unsupported personality
     is attached.
+  * Unknown syscall numbers are now printed in hexadecimal form.
 
 * Improvements
   * Implemented decoding of netlink descriptor attributes as file descriptors.
