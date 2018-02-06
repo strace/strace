@@ -986,7 +986,9 @@ may be left running after an interrupt signal (\c
 The original
 .B strace
 was written by Paul Kranenburg
-for SunOS and was inspired by its trace utility.
+for SunOS and was inspired by its
+.B trace
+utility.
 The SunOS version of
 .B strace
 was ported to Linux and enhanced
@@ -1012,6 +1014,45 @@ automatic configuration support.  In 1995 he ported
 .B strace
 to Irix
 and tired of writing about himself in the third person.
+.PP
+Beginning with 1996,
+.B strace
+was maintained by Wichert Akkerman.
+During his tenure,
+.B strace
+development migrated to CVS; ports to FreeBSD and many architectures on Linux
+(including ARM, IA-64, MIPS, PA-RISC, PowerPC, s390, SPARC) were introduced.
+In 2002, the burden of
+.B strace
+maintainership was transferred to Ronald McGrath.
+Since then,
+.B strace
+gained support for several new Linux architectures (AMD64, s390x, SuperH),
+bi-architecture support for some of them, and received numerous additions and
+improvements in syscalls decoders on Linux;
+.B strace
+development migrated to
+.B git
+during that period.
+Since 2009,
+.B strace
+is actively maintained by Dmitry Levin.
+.B strace
+gained support for AArch64, ARC, AVR32, Blackfin, Meta, Nios II, OpenSISC 1000,
+RISC-V, Tile/TileGx, Xtensa architectures since that time.
+In 2012, unmaintained and apparently broken support for non-Linux operating
+systems was removed.
+Also, in 2012
+.B strace
+gained support for path tracing and file descriptor path decoding.
+In 2014, support for stack traces printing was added.
+In 2016, syscall fault injection was implemented.
+.PP
+For the additional information, please refer to the
+.B NEWS
+file and
+.B strace
+repository commit log.
 .SH REPORTING BUGS
 Problems with
 .B strace
