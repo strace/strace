@@ -424,10 +424,11 @@ SYS_FUNC(perf_event_open)
 		print_perf_event_attr(tcp, tcp->u_arg[0]);
 	}
 
-	tprintf(", %d, %d, %d, ",
+	tprintf(", %d, %d, ",
 		(int) tcp->u_arg[1],
-		(int) tcp->u_arg[2],
-		(int) tcp->u_arg[3]);
+		(int) tcp->u_arg[2]);
+	printfd(tcp, tcp->u_arg[3]);
+	tprints(", ");
 	printflags64(perf_event_open_flags, tcp->u_arg[4], "PERF_FLAG_???");
 
 	return RVAL_DECODED | RVAL_FD;
