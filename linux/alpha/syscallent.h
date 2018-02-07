@@ -90,7 +90,7 @@
 [ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
-[ 63] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
+[ 63] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
 [ 64] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
 [ 65] = { 5,	TM,		SEN(printargs),			"osf_mremap"		}, /* not implemented */
 [ 66] = { 0,	TP,		SEN(vfork),			"vfork"			},

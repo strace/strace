@@ -144,7 +144,7 @@
 [148] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [149] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [150] = { 0,	NF,		SEN(getppid),			"getppid"		},
-[151] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
+[151] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
 [152 ... 153] = { },
 [154] = { 1,	0,		SEN(times),			"times"			},
 [155] = { 1,	TF,		SEN(acct),			"acct"			},

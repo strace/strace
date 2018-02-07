@@ -79,7 +79,7 @@
 [ 78] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [ 79] = { 2,	0,		SEN(getgroups16),		"getgroups"		},
 [ 80] = { 2,	0,		SEN(setgroups16),		"setgroups"		},
-[ 81] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
+[ 81] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
 [ 82] = { 2,	0,		SEN(setgroups),			"setgroups32"		},
 [ 83] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [ 84] = { 3,	TD,		SEN(ftruncate64),		"ftruncate64"		},

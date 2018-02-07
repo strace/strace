@@ -68,7 +68,7 @@
 [ 62] = { 2,	TSFA,		SEN(ustat),			"ustat"			},
 [ 63] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [ 64] = { 0,	NF,		SEN(getppid),			"getppid"		},
-[ 65] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
+[ 65] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
 [ 66] = { 0,	0,		SEN(setsid),			"setsid"		},
 [ 67] = { 2,	TF,		SEN(pivotroot),			"pivot_root"		},
 [ 68] = { 0,	TS,		SEN(sgetmask),			"sgetmask"		},
