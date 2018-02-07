@@ -154,6 +154,7 @@ ipc_sem	+ipc.sh
 ipc_shm	+ipc.sh
 kcmp	-a22
 kcmp-y	-a22 -y -e trace=kcmp
+kern_features -a16
 kexec_file_load	-s9
 kexec_load	-s9
 keyctl	-a31 -s10

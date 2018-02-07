@@ -159,6 +159,7 @@ ipc_shm
 is_linux_mips_n64
 kcmp
 kcmp-y
+kern_features
 kexec_file_load
 kexec_load
 keyctl

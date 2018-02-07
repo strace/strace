@@ -125,6 +125,7 @@ ipc_sem
 ipc_shm
 kcmp
 kcmp-y
+kern_features
 kexec_file_load
 kexec_load
 keyctl

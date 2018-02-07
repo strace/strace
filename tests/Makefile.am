@@ -222,6 +222,7 @@ DECODER_TESTS = \
 	getuid.test \
 	ioctl.test \
 	ipc_msgbuf.test \
+	kern_features-fault.test \
 	llseek.test \
 	lseek.test \
 	mmap.test \
