@@ -1255,7 +1255,9 @@ get_syscall_result(struct tcb *tcp)
 	if (get_syscall_result_regs(tcp) < 0)
 		return -1;
 	tcp->u_error = 0;
-	get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+	get_error(tcp,
+		  !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS)
+			|| syscall_tampered(tcp));
 
 	return 1;
 }
