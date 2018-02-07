@@ -111,6 +111,7 @@ lookup_class(const char *s)
 		{ "%statfs",	TRACE_STATFS	},
 		{ "%fstatfs",	TRACE_FSTATFS	},
 		{ "%%statfs",	TRACE_STATFS_LIKE	},
+		{ "%pure",	TRACE_PURE	},
 		/* legacy class names */
 		{ "desc",	TRACE_DESC	},
 		{ "file",	TRACE_FILE	},

@@ -49,7 +49,7 @@
 [1057] = { 3,	TD,		SEN(lseek),		"lseek"		},
 [1058] = { 6,	TD|TM|SI,	SEN(mmap),		"mmap"		},
 [1059] = { 1,	0,		SEN(alarm),		"alarm"		},
-[1060] = { 0,	NF,		SEN(getpgrp),		"getpgrp"	},
+[1060] = { 0,	PU|NF,		SEN(getpgrp),		"getpgrp"	},
 [1061] = { 0,	TS,		SEN(pause),		"pause"		},
 [1062] = { 1,	0,		SEN(time),		"time"		},
 [1063] = { 2,	TF,		SEN(utime),		"utime"		},

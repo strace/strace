@@ -47,11 +47,11 @@
 [ 17] = { 1,	TM|SI,		SEN(brk),			"brk"			},
 [ 18] = { 5,	TSFA,		SEN(printargs),			"osf_getfsstat"		}, /* not implemented */
 [ 19] = { 3,	TD,		SEN(lseek),			"lseek"			},
-[ 20] = { 0,	NF,		SEN(getxpid),			"getxpid"		},
+[ 20] = { 0,	PU|NF,		SEN(getxpid),			"getxpid"		},
 [ 21] = { 4,	0,		SEN(printargs),			"osf_mount"		},
 [ 22] = { 2,	TF,		SEN(umount2),			"umount"		},
 [ 23] = { 1,	0,		SEN(setuid),			"setuid"		},
-[ 24] = { 0,	NF,		SEN(getxuid),			"getxuid"		},
+[ 24] = { 0,	PU|NF,		SEN(getxuid),			"getxuid"		},
 [ 25] = { 5,	0,		SEN(printargs),			"exec_with_loader"	}, /* not implemented */
 [ 26] = { 4,	0,		SEN(ptrace),			"ptrace"		},
 [ 27] = { 5,	0,		SEN(printargs),			"osf_nrecvmsg"		}, /* not implemented */
@@ -74,7 +74,7 @@
 [ 44] = { 5,	0,		SEN(printargs),			"osf_profil"		}, /* not implemented */
 [ 45] = { 3,	TD|TF,		SEN(open),			"open"			},
 [ 46] = { 5,	0,		SEN(printargs),			"osf_old_sigaction"	}, /* not implemented */
-[ 47] = { 0,	NF,		SEN(getxgid),			"getxgid"		},
+[ 47] = { 0,	PU|NF,		SEN(getxgid),			"getxgid"		},
 [ 48] = { 2,	TS,		SEN(osf_sigprocmask),		"osf_sigprocmask"	},
 [ 49] = { 5,	0,		SEN(printargs),			"osf_getlogin"		}, /* not implemented */
 [ 50] = { 5,	0,		SEN(printargs),			"osf_setlogin"		}, /* not implemented */
@@ -90,8 +90,8 @@
 [ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
-[ 63] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
-[ 64] = { 0,	NF,		SEN(getpagesize),		"getpagesize"		},
+[ 63] = { 0,	PU|NF,		SEN(getpgrp),			"getpgrp"		},
+[ 64] = { 0,	PU|NF,		SEN(getpagesize),		"getpagesize"		},
 [ 65] = { 5,	TM,		SEN(printargs),			"osf_mremap"		}, /* not implemented */
 [ 66] = { 0,	TP,		SEN(vfork),			"vfork"			},
 [ 67] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
@@ -116,7 +116,7 @@
 [ 86] = { 2,	0,		SEN(osf_getitimer),		"osf_getitimer"		},
 [ 87] = { 2,	0,		SEN(gethostname),		"gethostname"		},
 [ 88] = { 2,	0,		SEN(sethostname),		"sethostname"		},
-[ 89] = { 0,	NF,		SEN(getdtablesize),		"getdtablesize"		},
+[ 89] = { 0,	PU|NF,		SEN(getdtablesize),		"getdtablesize"		},
 [ 90] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [ 91] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [ 92] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
@@ -342,7 +342,7 @@
 [375] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [376] = { 3,	0,		SEN(printargs),			"pciconfig_iobase"	},
 [377] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[378] = { 0,	NF,		SEN(gettid),			"gettid"		},
+[378] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [379] = { 3,	TD,		SEN(readahead),			"readahead"		},
 [380] = { },
 [381] = { 2,	TS,		SEN(kill),			"tkill"			},

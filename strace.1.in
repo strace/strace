@@ -509,6 +509,19 @@ and ustat).  The same effect can be achieved with
 .BR "\-e\ trace" = /statv?fs|fsstat|ustat
 regular expression.
 .TP
+.BR "\-e\ trace" = %pure
+Trace syscalls that always succeed and have no arguments.
+Currently, this list includes
+.BR arc_gettls "(2), " getdtablesize "(2), " getegid "(2), " getegid32 "(2),"
+.BR geteuid "(2), " geteuid32 "(2), " getgid "(2), " getgid32 "(2),"
+.BR getpagesize "(2), " getpgrp "(2), " getpid "(2), " getppid "(2),"
+.BR get_thread_area (2)
+(on architectures other than x86),
+.BR gettid "(2), " get_tls "(2), " getuid "(2), " getuid32 "(2),"
+.BR getxgid "(2), " getxpid "(2), " getxuid "(2), " kern_features "(2), and"
+.BR metag_get_tls "(2)"
+syscalls.
+.TP
 \fB\-e\ abbrev\fR=\,\fIset\fR
 Abbreviate the output from printing each member of large structures.
 The default is

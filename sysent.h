@@ -28,5 +28,6 @@ typedef struct sysent {
 #define TRACE_STATFS_LIKE		00200000	/* Trace statfs-like, fstatfs-like and ustat syscalls. */
 #define TRACE_FSTAT			00400000	/* Trace *fstat{,at}{,64} syscalls. */
 #define TRACE_STAT_LIKE			01000000	/* Trace *{,l,f}stat{,x,at}{,64} syscalls. */
+#define TRACE_PURE			02000000	/* Trace getter syscalls with no arguments. */
 
 #endif /* !STRACE_SYSENT_H */
