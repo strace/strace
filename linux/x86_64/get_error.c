@@ -20,6 +20,9 @@ get_error(struct tcb *tcp, const bool check_errno)
 		tcp->u_rval = -1;
 		tcp->u_error = -rax;
 	} else {
-		tcp->u_rval = rax;
+		if (x86_io.iov_len == sizeof(i386_regs))
+			tcp->u_rval = (uint32_t) rax;
+		else
+			tcp->u_rval = rax;
 	}
 }
