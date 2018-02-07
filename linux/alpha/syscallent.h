@@ -91,7 +91,7 @@
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
 [ 63] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
-[ 64] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
+[ 64] = { 0,	NF,		SEN(getpagesize),		"getpagesize"		},
 [ 65] = { 5,	TM,		SEN(printargs),			"osf_mremap"		}, /* not implemented */
 [ 66] = { 0,	TP,		SEN(vfork),			"vfork"			},
 [ 67] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
@@ -116,7 +116,7 @@
 [ 86] = { 2,	0,		SEN(osf_getitimer),		"osf_getitimer"		},
 [ 87] = { 2,	0,		SEN(gethostname),		"gethostname"		},
 [ 88] = { 2,	0,		SEN(sethostname),		"sethostname"		},
-[ 89] = { 0,	0,		SEN(getdtablesize),		"getdtablesize"		},
+[ 89] = { 0,	NF,		SEN(getdtablesize),		"getdtablesize"		},
 [ 90] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [ 91] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [ 92] = { 3,	TD,		SEN(fcntl),			"fcntl"			},

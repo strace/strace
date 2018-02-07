@@ -62,7 +62,7 @@
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [ 63] = { 2,	TD|TFST|TSTA,	SEN(fstat64),			"fstat64"		},
-[ 64] = { 0,	0,		SEN(getpagesize),		"getpagesize"		},
+[ 64] = { 0,	NF,		SEN(getpagesize),		"getpagesize"		},
 [ 65] = { 3,	TM,		SEN(msync),			"msync"			},
 [ 66] = { 0,	TP,		SEN(vfork),			"vfork"			},
 [ 67] = { 5,	TD,		SEN(pread),			"pread64"		},
