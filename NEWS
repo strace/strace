@@ -23,6 +23,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented block/character device number printing in -yy mode.
   * Known pixel/SDR format names are printed as comments for pixelformat fields
     in v4l2 structures.
+  * Enhanced decoding of kern_features syscall.
 
 * Bug fixes
   * Fixed build on m68k.

@@ -336,7 +336,7 @@
 [337] = { 2,	TD,		SEN(setns),			"setns"			},
 [338] = { 6,	0,		SEN(process_vm_readv),		"process_vm_readv"	},
 [339] = { 6,	0,		SEN(process_vm_writev),		"process_vm_writev"	},
-[340] = { 0,	PU|NF,		SEN(printargs),			"kern_features"		},
+[340] = { 0,	PU,		SEN(kern_features),		"kern_features"		},
 [341] = { 5,	0,		SEN(kcmp),			"kcmp"			},
 [342] = { 3,	TD,		SEN(finit_module),		"finit_module"		},
 [343] = { 3,	0,		SEN(sched_setattr),		"sched_setattr"		},
