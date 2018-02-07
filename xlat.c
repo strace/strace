@@ -160,7 +160,8 @@ addflags(const struct xlat *xlat, uint64_t flags)
 /*
  * Interpret `xlat' as an array of flags.
  * Print to static string the entries whose bits are on in `flags'
- * Return static string.
+ * Return static string.  If 0 is provided as flags, and there is no flag that
+ * has the value of 0 (it should be the first in xlat table), return NULL.
  */
 const char *
 sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
@@ -187,10 +188,14 @@ sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
 				break;
 		}
 	}
+
 	if (flags) {
 		if (found)
 			*outptr++ = '|';
 		outptr = xappendstr(outstr, outptr, "%#" PRIx64, flags);
+	} else {
+		if (!found)
+			return NULL;
 	}
 
 	return outstr;
