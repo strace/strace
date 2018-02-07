@@ -551,6 +551,14 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 static long
 tamper_with_syscall_exiting(struct tcb *tcp)
 {
+	if (!syserror(tcp)) {
+		error_msg("Failed to tamper with process %d: got no error "
+			  "(return value %#" PRI_klx ")",
+			  tcp->pid, tcp->u_rval);
+
+		return 1;
+	}
+
 	struct inject_opts *opts = tcb_inject_opts(tcp);
 
 	if (!opts)
@@ -731,7 +739,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 int
 syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 {
-	if (syserror(tcp) && syscall_tampered(tcp))
+	if (syscall_tampered(tcp))
 		tamper_with_syscall_exiting(tcp);
 
 	if (cflag) {
