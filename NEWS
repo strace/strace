@@ -4,6 +4,10 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Changes in infrastructure
   * The mailing list was moved to strace-devel@lists.strace.io.
 
+* Improvements
+  * IPv6 addresses shown in socket information in -yy mode are now printed
+    in brackets.
+
 * Bug fixes
   * Fixed build on m68k.
 

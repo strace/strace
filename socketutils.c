@@ -165,6 +165,10 @@ inet_parse_response(const void *const data, const int data_len,
 	char src_buf[text_size];
 	char *details;
 
+	/* open/closing brackets for IPv6 addresses */
+	const char *ob = diag_msg->idiag_family == AF_INET6 ? "[" : "";
+	const char *cb = diag_msg->idiag_family == AF_INET6 ? "]" : "";
+
 	if (!inet_ntop(diag_msg->idiag_family, diag_msg->id.idiag_src,
 		       src_buf, text_size))
 		return -1;
@@ -177,12 +181,14 @@ inet_parse_response(const void *const data, const int data_len,
 			       dst_buf, text_size))
 			return -1;
 
-		if (asprintf(&details, "%s:[%s:%u->%s:%u]", proto_name,
-			     src_buf, ntohs(diag_msg->id.idiag_sport),
-			     dst_buf, ntohs(diag_msg->id.idiag_dport)) < 0)
+		if (asprintf(&details, "%s:[%s%s%s:%u->%s%s%s:%u]", proto_name,
+			     ob, src_buf, cb, ntohs(diag_msg->id.idiag_sport),
+			     ob, dst_buf, cb, ntohs(diag_msg->id.idiag_dport))
+		    < 0)
 			return false;
 	} else {
-		if (asprintf(&details, "%s:[%s:%u]", proto_name, src_buf,
+		if (asprintf(&details, "%s:[%s%s%s:%u]",
+			     proto_name, ob, src_buf, cb,
 			     ntohs(diag_msg->id.idiag_sport)) < 0)
 			return false;
 	}
