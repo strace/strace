@@ -208,6 +208,7 @@ net-icmp_filter
 net-sockaddr
 net-y-unix
 net-yy-inet
+net-yy-inet6
 net-yy-netlink
 net-yy-unix
 netlink_audit
