@@ -560,6 +560,7 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 	}
 
 	struct inject_opts *opts = tcb_inject_opts(tcp);
+	bool update_tcb = false;
 
 	if (!opts)
 		return 0;
@@ -571,6 +572,7 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 		if (arch_set_success(tcp)) {
 			tcp->u_rval = u_rval;
 		} else {
+			update_tcb = true;
 			tcp->u_error = 0;
 		}
 	} else {
@@ -582,8 +584,15 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 			tcp->u_error = new_error;
 			if (arch_set_error(tcp)) {
 				tcp->u_error = u_error;
+			} else {
+				update_tcb = true;
 			}
 		}
+	}
+
+	if (update_tcb) {
+		tcp->u_error = 0;
+		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
 	}
 
 	return 0;
