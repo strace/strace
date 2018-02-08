@@ -49,17 +49,36 @@ main(void)
 
 		switch (rc) {
 		case 1:
-			text = "MEMBARRIER_CMD_SHARED";
+			text = "MEMBARRIER_CMD_GLOBAL";
 			break;
 		case 1|8:
-			text = "MEMBARRIER_CMD_SHARED|"
+			text = "MEMBARRIER_CMD_GLOBAL|"
 			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED";
 			break;
 		case 1|8|16:
-			text = "MEMBARRIER_CMD_SHARED|"
+			text = "MEMBARRIER_CMD_GLOBAL|"
 			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED|"
 			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED";
 			break;
+
+		case 1|2|4|8|16:
+			text = "MEMBARRIER_CMD_GLOBAL|"
+			       "MEMBARRIER_CMD_GLOBAL_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_GLOBAL_EXPEDITED|"
+			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED";
+			break;
+
+		case 1|2|4|8|16|32|64:
+			text = "MEMBARRIER_CMD_GLOBAL|"
+			       "MEMBARRIER_CMD_GLOBAL_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_GLOBAL_EXPEDITED|"
+			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED|"
+			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED_SYNC_CORE|"
+			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_SYNC_CORE";
+			break;
+
 		default:
 			error_msg_and_fail("membarrier returned %#x, does"
 					   " the test have to be updated?", rc);
