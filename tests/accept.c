@@ -27,9 +27,34 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TEST_SYSCALL_NAME
-# define TEST_SYSCALL_NAME accept
-#endif
+#include "tests.h"
+
+#include <unistd.h>
+
+#include <asm/unistd.h>
+
+#if defined __NR_accept
+
+# ifndef TEST_SYSCALL_NAME
+#  define TEST_SYSCALL_NAME do_accept
+
+#  ifndef TEST_SYSCALL_STR
+#   define TEST_SYSCALL_STR "accept"
+#  endif
+
+int do_accept(int sockfd, void *addr, void *addrlen)
+{
+	return syscall(__NR_accept, sockfd, addr, addrlen);
+}
+# endif /* !TEST_SYSCALL_NAME */
+
+#else /* !__NR_accept */
+
+# ifndef TEST_SYSCALL_NAME
+#  define TEST_SYSCALL_NAME accept
+# endif
+
+#endif /* __NR_accept */
 
 #define TEST_SYSCALL_PREPARE connect_un()
 static void connect_un(void);
