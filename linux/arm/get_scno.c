@@ -72,10 +72,8 @@ scno_in_r7:
 	 * whether it's really a syscall entry.
 	 */
 	if (arm_regs.ARM_ip && !scno_in_range(scno)) {
-		if (debug_flag)
-			error_msg("pid %d stray syscall exit:"
-				  " ARM_ip = %ld, scno = %ld",
-				  tcp->pid, arm_regs.ARM_ip, scno);
+		debug_msg("pid %d stray syscall exit: ARM_ip = %ld, scno = %ld",
+			  tcp->pid, arm_regs.ARM_ip, scno);
 		return 0;
 	}
 
