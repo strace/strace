@@ -22,5 +22,5 @@ run_strace $debug_flag -e trace=$syscall ../$NAME "$STRACE_EXE" 9 \
 
 grep "invalid syscall" "$LOG-err-all" > "$LOG-err"
 
-match_diff "$EXP" "$LOG"
-match_diff "$EXP-err" "$LOG-err"
+match_diff "$LOG" "$EXP"
+match_diff "$LOG-err" "$EXP-err"
