@@ -86,8 +86,8 @@ get_pos_diff_(char *str, size_t size, char *pos, const char *func,
 
 /**
  * Helper function for constructing string in a character array by appending
- * new formatted parts.  Returns new position.  In aligment with the rest of x*
- * functions, fails on error or buffer overflow.  Obtains buffer size via
+ * new formatted parts.  Returns new position.  Fails on error or buffer
+ * overflow, in line with the rest of x* functions.  Obtains buffer size via
  * sizeof(str_).
  *
  * @param str_  Character array buffer to print into.
