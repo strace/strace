@@ -602,6 +602,7 @@ EXTRA_DIST =				\
 	linux/mips/syscallent.h		\
 	linux/mips/userent.h		\
 	linux/netlink_diag.h		\
+	linux/nios2/arch_defs_.h	\
 	linux/nios2/arch_regs.c		\
 	linux/nios2/arch_regs.h		\
 	linux/nios2/arch_rt_sigframe.c	\
