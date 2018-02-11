@@ -29,11 +29,11 @@
 
 #include "tests.h"
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 
 unsigned long
 inode_of_sockfd(const int fd)

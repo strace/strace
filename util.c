@@ -33,7 +33,7 @@
  */
 
 #include "defs.h"
-#include <sys/param.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #ifdef HAVE_SYS_XATTR_H

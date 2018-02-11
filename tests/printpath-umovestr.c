@@ -29,8 +29,8 @@
 
 #include "tests.h"
 #include "test_ucopy.h"
+#include <limits.h>
 #include <stdio.h>
-#include <sys/param.h>
 
 int
 main(void)

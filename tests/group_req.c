@@ -33,9 +33,9 @@
 
 #if defined MCAST_JOIN_GROUP && defined MCAST_LEAVE_GROUP
 
+# include <limits.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <sys/param.h>
 # include <sys/socket.h>
 # include <arpa/inet.h>
 

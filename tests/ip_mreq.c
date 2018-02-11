@@ -32,9 +32,9 @@
 #if defined IP_ADD_MEMBERSHIP && defined IPV6_ADD_MEMBERSHIP \
  && defined IPV6_JOIN_ANYCAST
 
+# include <limits.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <sys/param.h>
 # include <sys/socket.h>
 # include <arpa/inet.h>
 # include <net/if.h>

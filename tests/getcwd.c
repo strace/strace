@@ -4,9 +4,9 @@
 
 #ifdef __NR_getcwd
 
+# include <limits.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <sys/param.h>
 
 int
 main(void)

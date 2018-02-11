@@ -28,7 +28,7 @@
  */
 
 #include "defs.h"
-#include <sys/param.h>
+#include <limits.h>
 #include <poll.h>
 
 #include "syscall.h"

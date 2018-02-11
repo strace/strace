@@ -26,9 +26,9 @@
  */
 
 #include "tests.h"
+#include <limits.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/param.h>
 
 int
 main(void)
