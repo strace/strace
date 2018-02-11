@@ -61,6 +61,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     build now.  Use --enable-mpers=check to revert to the old behaviour.
   * Build-time requirement for the mpers support has been lowered from gawk 4
     to gawk 3.
+  * Removed incomplete and unused support for IA-32 mode on the IA-64
+    architecture.
 
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================
