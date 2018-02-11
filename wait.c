@@ -34,6 +34,7 @@
  */
 
 #include "defs.h"
+#include "ptrace.h"
 
 #include <sys/wait.h>
 
@@ -58,7 +59,6 @@
 # define W_CONTINUED 0xffff
 #endif
 
-#include "ptrace.h"
 #include "xlat/ptrace_events.h"
 
 static int

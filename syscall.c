@@ -34,6 +34,7 @@
 
 #include "defs.h"
 #include "native_defs.h"
+#include "ptrace.h"
 #include "nsig.h"
 #include "number_set.h"
 #include <limits.h>
@@ -45,7 +46,6 @@
 #include <asm/unistd.h>
 
 #include "regs.h"
-#include "ptrace.h"
 
 #if defined(SPARC64)
 # undef PTRACE_GETREGS

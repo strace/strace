@@ -41,10 +41,10 @@
 # include <elf.h>
 #endif
 
-#include "xlat/nt_descriptor_types.h"
-
-#include "regs.h"
 #include "ptrace.h"
+#include "regs.h"
+
+#include "xlat/nt_descriptor_types.h"
 #include "xlat/ptrace_cmds.h"
 #include "xlat/ptrace_setoptions_flags.h"
 #include "xlat/ptrace_peeksiginfo_flags.h"

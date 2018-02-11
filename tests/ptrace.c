@@ -32,12 +32,12 @@
 #include <asm/unistd.h>
 
 #include <errno.h>
+#include "ptrace.h"
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "ptrace.h"
 #include <linux/audit.h>
 
 static const char *errstr;

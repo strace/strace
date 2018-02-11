@@ -33,6 +33,7 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <fcntl.h>
+#include "ptrace.h"
 #include <signal.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
@@ -52,7 +53,6 @@
 #include "largefile_wrappers.h"
 #include "number_set.h"
 #include "scno.h"
-#include "ptrace.h"
 #include "printsiginfo.h"
 #include "trace_event.h"
 #include "xstring.h"

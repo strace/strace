@@ -30,10 +30,10 @@
 #include "tests.h"
 
 #include <errno.h>
+#include <sys/ptrace.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/ptrace.h>
 #include <sys/uio.h>
 #include <sys/wait.h>
 
