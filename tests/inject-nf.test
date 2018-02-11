@@ -1,0 +1,42 @@
+#!/bin/sh -efu
+
+# Check decoding of return values injected into a syscall that "never fails".
+
+. "${srcdir=.}/scno_tampering.sh"
+
+case "$STRACE_ARCH" in
+alpha)
+	SYSCALL=getpgrp
+	;;
+*)
+	SYSCALL=getpid
+	;;
+esac
+
+run_prog
+prog="$args"
+fault_args="-a9 -e trace=${SYSCALL} -e inject=${SYSCALL}:retval="
+
+test_rval()
+{
+	local rval
+	rval="$1"; shift
+
+	run_strace $fault_args$rval $prog $rval > "$EXP"
+	match_diff "$LOG" "$EXP"
+}
+
+test_rval 0
+test_rval 1
+test_rval 2147483647 # 0x7fffffff
+
+case "$SIZEOF_KERNEL_LONG_T" in
+8)
+	test_rval 2147483648 # 0x80000000
+	test_rval 4294963200 # 0xfffff000
+	test_rval 4294967294 # 0xfffffffe
+	test_rval 4294967295 # 0xffffffff
+	test_rval 4294967296 # 0x100000000
+	test_rval 9223372036854775807 # 0x7fffffffffffffff
+	;;
+esac

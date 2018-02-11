@@ -123,6 +123,7 @@ getxxid
 group_req
 inet-cmsg
 init_module
+inject-nf
 inotify
 inotify_init1
 int_0x80

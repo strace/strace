@@ -106,6 +106,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	getpid	\
 	getppid	\
 	gettid \
+	inject-nf \
 	int_0x80 \
 	ioctl_dm-v \
 	ioctl_evdev-v \
@@ -282,6 +283,7 @@ MISC_TESTS = \
 	filtering_syscall-syntax.test \
 	fflush.test \
 	get_regs.test \
+	inject-nf.test \
 	interactive_block.test \
 	ksysent.test \
 	opipe.test \
