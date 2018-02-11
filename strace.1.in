@@ -547,10 +547,12 @@ argument.
 Trace only the specified subset of signals.  The default is
 .BR signal = all .
 For example,
-.B signal "=!" SIGIO
+.BR signal "=!" SIGIO
 (or
 .BR signal "=!" io )
-causes SIGIO signals not to be traced.
+causes
+.B SIGIO
+signals not to be traced.
 .TP
 \fB\-e\ read\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data read from
