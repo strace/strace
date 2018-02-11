@@ -27,25 +27,82 @@
  */
 
 #include "defs.h"
-#include "number_set.h"
-#include "filter.h"
+
 #include <regex.h>
+
+#include "filter.h"
+#include "number_set.h"
+#include "xstring.h"
+
+
+/**
+ * Checks whether a @-separated personality specification suffix is present.
+ * Personality suffix is a one of strings stored in personality_designators
+ * array.
+ *
+ * @param[in]  s Specification string to check.
+ * @param[out] p Where to store personality number if it is found.
+ * @return       If personality is found, the provided string is copied without
+ *               suffix and returned as a result (callee should de-alllocate it
+ *               with free() after use), and personality number is written to p.
+ *               Otherwise, NULL is returned and p is untouched.
+ */
+static char *
+qualify_syscall_separate_personality(const char *s, unsigned int *p)
+{
+	char *pos = strchr(s, '@');
+
+	if (!pos)
+		return NULL;
+
+	for (unsigned int i = 0; i < SUPPORTED_PERSONALITIES; i++) {
+		if (!strcmp(pos + 1, personality_designators[i])) {
+			*p = i;
+			return xstrndup(s, pos - s);
+		}
+	}
+
+	error_msg_and_help("incorrect personality designator '%s'"
+			   " in qualification '%s'", pos + 1, s);
+}
+
+static bool
+qualify_syscall_number_personality(int n, unsigned int p,
+				   struct number_set *set)
+{
+	if ((unsigned int) n >= nsyscall_vec[p])
+		return false;
+
+	add_number_to_set_array(n, set, p);
+
+	return true;
+}
 
 static bool
 qualify_syscall_number(const char *s, struct number_set *set)
 {
-	int n = string_to_uint(s);
+	unsigned int p;
+	char *num_str = qualify_syscall_separate_personality(s, &p);
+	int n;
+
+	if (num_str) {
+		n = string_to_uint(num_str);
+		free(num_str);
+
+		if (n < 0)
+			return false;
+
+		return qualify_syscall_number_personality(n, p, set);
+	}
+
+	n = string_to_uint(s);
 	if (n < 0)
 		return false;
 
 	bool done = false;
 
-	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		if ((unsigned) n >= nsyscall_vec[p])
-			continue;
-		add_number_to_set_array(n, set, p);
-		done = true;
-	}
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+		done |= qualify_syscall_number_personality(n, p, set);
 
 	return done;
 }
@@ -164,18 +221,36 @@ scno_by_name(const char *s, unsigned int p, kernel_long_t start)
 }
 
 static bool
-qualify_syscall_name(const char *s, struct number_set *set)
+qualify_syscall_name_personality(const char *s, unsigned int p,
+				 struct number_set *set)
 {
 	bool found = false;
 
-	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		for (kernel_long_t scno = 0;
-		     (scno = scno_by_name(s, p, scno)) >= 0;
-		     ++scno) {
-			add_number_to_set_array(scno, set, p);
-			found = true;
-		}
+	for (kernel_long_t scno = 0; (scno = scno_by_name(s, p, scno)) >= 0;
+	     ++scno) {
+		add_number_to_set_array(scno, set, p);
+		found = true;
 	}
+
+	return found;
+}
+
+static bool
+qualify_syscall_name(const char *s, struct number_set *set)
+{
+	unsigned int p;
+	char *name_str = qualify_syscall_separate_personality(s, &p);
+	bool found = false;
+
+	if (name_str) {
+		found = qualify_syscall_name_personality(name_str, p, set);
+		free(name_str);
+
+		return found;
+	}
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+		found |= qualify_syscall_name_personality(s, p, set);
 
 	return found;
 }

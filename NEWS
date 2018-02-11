@@ -19,6 +19,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     using --enable-stacktrace option.
   * Added -X option for configuring xlat output formatting (addresses
     Debian bug #692915).
+  * Added support for personality designation ("64", "32", or "x32") to syscall
+    qualifications in -e trace expressions.
   * Implemented injection of syscalls with no side effects as an alternative
     to injection of an invalid syscall (-e inject=SET:syscall= expression).
   * Improved support for reproducible builds (addresses Debian bug #896016).

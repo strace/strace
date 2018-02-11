@@ -446,6 +446,9 @@ means to trace every system call except
 .BR open .
 Question mark before the syscall qualification allows suppression of error
 in case no syscalls matched the qualification provided.
+Appending one of "@64", "@32", or "@x32" suffixes to the syscall qualification
+allows specifying syscalls only for the 64-bit, 32-bit, or 32-on-64-bit
+personality, respectively.
 In addition, the special values
 .B all
 and

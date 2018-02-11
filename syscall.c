@@ -191,6 +191,18 @@ const char *const personality_names[] =
 # endif
 	;
 
+const char *const personality_designators[] =
+# if defined X86_64
+	{ "64", "32", "x32" }
+# elif defined X32
+	{ "x32", "32" }
+# elif SUPPORTED_PERSONALITIES == 2
+	{ "64", "32" }
+# else
+	{ STRINGIFY_VAL(__WORDSIZE) }
+# endif
+	;
+
 #if SUPPORTED_PERSONALITIES > 1
 
 unsigned current_personality;
