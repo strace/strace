@@ -84,7 +84,9 @@ for arg in 42 chdir \
 	   chdir:when=65536:error=30 \
 	   chdir:when=1+65536 \
 	   chdir:when=1+65536:error=31 \
-	   chdir:retval=-1 \
+	   chdir:retval=a \
+	   chdir:retval=0b \
+	   chdir:retval=0x10000000000000000 \
 	   chdir:signal=0 \
 	   chdir:signal=129 \
 	   chdir:signal=1:signal=2 \

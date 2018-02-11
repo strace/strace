@@ -543,7 +543,7 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 	if (!recovering(tcp)) {
 		if (opts->data.flags & INJECT_F_SIGNAL)
 			*signo = opts->data.signo;
-		if (opts->data.flags & INJECT_F_RETVAL &&
+		if (opts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL) &&
 		    !arch_set_scno(tcp, -1))
 			tcp->flags |= TCB_TAMPERED;
 		if (opts->data.flags & INJECT_F_DELAY_ENTER)
@@ -578,8 +578,9 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 
 	bool update_tcb = false;
 
-	const kernel_long_t inject_rval = retval_get(opts->data.rval_idx);
-	if (inject_rval >= 0) {
+	if (opts->data.flags & INJECT_F_RETVAL) {
+		kernel_long_t inject_rval =
+			retval_get(opts->data.rval_idx);
 		kernel_long_t u_rval = tcp->u_rval;
 
 		tcp->u_rval = inject_rval;
@@ -590,7 +591,7 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 			tcp->u_error = 0;
 		}
 	} else {
-		unsigned long new_error = -inject_rval;
+		unsigned long new_error = retval_get(opts->data.rval_idx);
 
 		if (new_error != tcp->u_error && new_error <= MAX_ERRNO_VALUE) {
 			unsigned long u_error = tcp->u_error;
@@ -935,7 +936,14 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				}
 				break;
 			case RVAL_DECIMAL:
-				tprintf("= %" PRI_kld, tcp->u_rval);
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+				if (current_klongsize < sizeof(tcp->u_rval)) {
+					tprintf("= %d", (int) tcp->u_rval);
+				} else
+#endif
+				{
+					tprintf("= %" PRI_kld, tcp->u_rval);
+				}
 				break;
 			case RVAL_FD:
 				if (show_fd_path) {

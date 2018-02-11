@@ -77,7 +77,7 @@ main(int ac, char **av)
 
 	if (ac == 2) {
 		printf("%s() = %lld (INJECTED)\n",
-		       SC_NAME, (unsigned long long) rc);
+		       SC_NAME, sign_extend_unsigned_to_ll(rc));
 
 		puts("+++ exited with 0 +++");
 	}

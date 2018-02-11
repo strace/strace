@@ -105,7 +105,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		   const bool fault_tokens_only)
 {
 	const char *val;
-	kernel_long_t intval;
+	int intval;
 
 	if ((val = STR_STRIP_PREFIX(token, "when=")) != token) {
 		/*
@@ -138,37 +138,63 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			fopts->step = 0;
 		}
 	} else if ((val = STR_STRIP_PREFIX(token, "error=")) != token) {
-		if (fopts->data.flags & INJECT_F_RETVAL)
+		if (fopts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL))
 			return false;
 		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
 		if (intval < 0)
 			intval = find_errno_by_name(val);
 		if (intval < 1)
 			return false;
-		fopts->data.rval_idx = retval_new(-intval);
-		fopts->data.flags |= INJECT_F_RETVAL;
+		fopts->data.rval_idx = retval_new(intval);
+		fopts->data.flags |= INJECT_F_ERROR;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
-		if (fopts->data.flags & INJECT_F_RETVAL)
-			return false;
-		intval = string_to_kulong(val);
-		if (intval < 0)
+
+		if (fopts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL))
 			return false;
 
-#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG && !HAVE_ARCH_DEDICATED_ERR_REG
-		if ((int) intval != intval)
-			error_msg("Injected return value %" PRI_kld " will be"
-				  " clipped to %d in compat personality",
-				  intval, (int) intval);
+		errno = 0;
+		char *endp;
+		unsigned long long ullval = strtoull(val, &endp, 0);
+		if (endp == val || *endp || (kernel_ulong_t) ullval != ullval
+		    || ((ullval == 0 || ullval == ULLONG_MAX) && errno))
+			return false;
 
-		if ((int) intval < 0 && (int) intval >= -MAX_ERRNO_VALUE)
-			error_msg("Inadvertent injection of error %d is"
-				  " possible in compat personality for"
-				  " retval=%" PRI_kld,
-				  -(int) intval, intval);
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+		bool inadvertent_fault_injection = false;
 #endif
 
-		fopts->data.rval_idx = retval_new(intval);
+#if !HAVE_ARCH_DEDICATED_ERR_REG
+		if ((kernel_long_t) ullval < 0
+		    && (kernel_long_t) ullval >= -MAX_ERRNO_VALUE) {
+# if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+			inadvertent_fault_injection = true;
+# endif
+			error_msg("Inadvertent injection of error %" PRI_kld
+				  " is possible for retval=%llu",
+				  -(kernel_long_t) ullval, ullval);
+		}
+# if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+		else if ((int) ullval < 0 && (int) ullval >= -MAX_ERRNO_VALUE) {
+			inadvertent_fault_injection = true;
+			error_msg("Inadvertent injection of error %d is"
+				  " possible in compat personality for"
+				  " retval=%llu",
+				  -(int) ullval, ullval);
+		}
+# endif
+#endif
+
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+		if (!inadvertent_fault_injection
+		    && (unsigned int) ullval != ullval) {
+			error_msg("Injected return value %llu will be"
+				  " clipped to %u in compat personality",
+				  ullval, (unsigned int) ullval);
+		}
+#endif
+
+		fopts->data.rval_idx = retval_new(ullval);
 		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
@@ -298,8 +324,8 @@ qualify_inject_common(const char *const str,
 	if (!opts.data.flags) {
 		if (fault_tokens_only) {
 			/* in fault= syntax the default error code is ENOSYS. */
-			opts.data.rval_idx = retval_new(-ENOSYS);
-			opts.data.flags |= INJECT_F_RETVAL;
+			opts.data.rval_idx = retval_new(ENOSYS);
+			opts.data.flags |= INJECT_F_ERROR;
 		} else {
 			/* in inject= syntax this is not allowed. */
 			error_msg_and_die("invalid %s '%s'", description, str);

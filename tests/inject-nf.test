@@ -28,15 +28,23 @@ test_rval()
 
 test_rval 0
 test_rval 1
-test_rval 2147483647 # 0x7fffffff
+test_rval 0x7fffffff
+test_rval 0x80000000
+test_rval 0xfffff000
+test_rval 0xfffffffe
+test_rval 0xffffffff
 
 case "$SIZEOF_KERNEL_LONG_T" in
 8)
-	test_rval 2147483648 # 0x80000000
-	test_rval 4294963200 # 0xfffff000
-	test_rval 4294967294 # 0xfffffffe
-	test_rval 4294967295 # 0xffffffff
-	test_rval 4294967296 # 0x100000000
-	test_rval 9223372036854775807 # 0x7fffffffffffffff
+	test_rval         0x80000000
+	test_rval         0xfffff000
+	test_rval         0xfffffffe
+	test_rval         0xffffffff
+	test_rval        0x100000000
+	test_rval 0x7fffffffffffffff
+	test_rval 0x8000000000000000
+	test_rval 0xfffffffffffff000
+	test_rval 0xfffffffffffffffe
+	test_rval 0xffffffffffffffff
 	;;
 esac

@@ -171,13 +171,14 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
-#define INJECT_F_SIGNAL 1
-#define INJECT_F_RETVAL 2
-#define INJECT_F_DELAY_ENTER 4
-#define INJECT_F_DELAY_EXIT 8
+#define INJECT_F_SIGNAL		0x01
+#define INJECT_F_ERROR		0x02
+#define INJECT_F_RETVAL		0x04
+#define INJECT_F_DELAY_ENTER	0x08
+#define INJECT_F_DELAY_EXIT	0x10
 
 struct inject_data {
-	uint8_t flags;		/* only 4 of 8 flags are used so far */
+	uint8_t flags;		/* 5 of 8 flags are used so far */
 	uint8_t signo;		/* NSIG <= 128 */
 	uint16_t rval_idx;	/* index in retval_vec */
 	uint16_t delay_idx;	/* index in delay_data_vec */
