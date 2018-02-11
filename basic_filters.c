@@ -132,12 +132,26 @@ qualify_syscall_regex(const char *s, struct number_set *set)
 		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (!sysent_vec[p][i].sys_name)
 				continue;
+
 			rc = regexec(&preg, sysent_vec[p][i].sys_name,
 				     0, NULL, 0);
+
+			if (rc == REG_NOMATCH) {
+				char name_buf[128];
+				char *pos = stpcpy(name_buf,
+						   sysent_vec[p][i].sys_name);
+
+				(void) xappendstr(name_buf, pos, "@%s",
+						  personality_designators[p]);
+
+				rc = regexec(&preg, name_buf, 0, NULL, 0);
+			}
+
 			if (rc == REG_NOMATCH)
 				continue;
 			else if (rc)
 				regerror_msg_and_die(rc, &preg, "regexec", s);
+
 			add_number_to_set_array(i, set, p);
 			found = true;
 		}
