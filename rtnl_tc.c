@@ -293,7 +293,10 @@ static const nla_decoder_t tcmsg_nla_decoders[] = {
 	[TCA_STAB]		= decode_tca_stab,
 	[TCA_PAD]		= NULL,
 	[TCA_DUMP_INVISIBLE]	= NULL,
-	[TCA_CHAIN]		= decode_nla_u32
+	[TCA_CHAIN]		= decode_nla_u32,
+	[TCA_HW_OFFLOAD]	= decode_nla_u8,
+	[TCA_INGRESS_BLOCK]	= decode_nla_u32,
+	[TCA_EGRESS_BLOCK]	= decode_nla_u32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
