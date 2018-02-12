@@ -44,7 +44,10 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed multi-personality support in cross builds.
   * Added mq_getsetattr, mq_notify, mq_open, mq_timedreceive, and mq_timedsend
     syscalls to %desc tracing set.
-  * Fixed path tracing support for mmap syscalls with indirect arguments.
+  * Fixed path tracing support for mmap syscalls with indirect arguments and
+    for old select syscall.
+  * Fixed decoding of arm-specific (__ARM_NR_*) syscalls.
+  * Fixed open mode flags decoding.
   * Fixed corner cases in handling of strace -ff -ttt logs by strace-log-merge.
   * Error counts that exceed one billion are now printed correctly in call
     summary output.
@@ -53,6 +56,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed the case when strace attaches to a tracee being inside exec and its
     first syscall stop is syscall-exit-stop instead of syscall-enter-stop,
     which messed up all the syscall state tracking.
+  * Fixed printing of higher 32 bits of the return value for x32 personality.
 
 * Portability
   * A C compiler that supports "for" loop initial declarations is now required.
@@ -61,6 +65,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     build now.  Use --enable-mpers=check to revert to the old behaviour.
   * Build-time requirement for the mpers support has been lowered from gawk 4
     to gawk 3.
+  * Removed incomplete and non-functional support for the CRIS architecture.
   * Removed incomplete and unused support for IA-32 mode on the IA-64
     architecture.
 
