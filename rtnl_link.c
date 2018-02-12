@@ -39,6 +39,7 @@
 #include <linux/rtnetlink.h>
 
 #include "xlat/rtnl_ifla_brport_attrs.h"
+#include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
@@ -375,6 +376,22 @@ decode_ifla_xdp(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_ifla_event(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	uint32_t ev;
+
+	if (len < sizeof(ev))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &ev))
+		printxval(rtnl_ifla_events, ev, "IFLA_EVENT_???");
+
+	return true;
+}
+
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_ADDRESS]		= NULL, /* unimplemented */
 	[IFLA_BROADCAST]	= NULL, /* unimplemented */
@@ -419,7 +436,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_GSO_MAX_SIZE]	= decode_nla_u32,
 	[IFLA_PAD]		= NULL,
 	[IFLA_XDP]		= decode_ifla_xdp,
-	[IFLA_EVENT]		= decode_nla_u32
+	[IFLA_EVENT]		= decode_ifla_event,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
