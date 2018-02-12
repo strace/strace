@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * IPv6 addresses shown in socket information in -yy mode are now printed
     in brackets.
   * Enhanced NETLINK_ROUTE protocol decoding.
+  * Updated lists of signal codes.
   * Updated the list of RWF_* constants.
 
 * Bug fixes

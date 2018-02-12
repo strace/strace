@@ -1,4 +1,8 @@
+TRAP_STEP /* 1 - bfin */
 TRAP_BRKPT 1
+TRAP_TRACEFLOW /* 2 - bfin */
 TRAP_TRACE 2
+TRAP_WATCHPT /* 3 - bfin */
 TRAP_BRANCH 3
+TRAP_ILLTRAP /* 4 - bfin */
 TRAP_HWBKPT 4
