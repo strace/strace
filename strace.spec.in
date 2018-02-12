@@ -86,6 +86,7 @@ rm -f %{buildroot}%{_bindir}/strace-graph
 %endif
 
 %check
+%{buildroot}%{_bindir}/strace -V
 make %{?_smp_mflags} -k check VERBOSE=1
 echo 'BEGIN OF TEST SUITE INFORMATION'
 tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
