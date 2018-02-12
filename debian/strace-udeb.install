@@ -1,1 +1,1 @@
-build/strace usr/bin
+build-udeb/strace usr/bin
