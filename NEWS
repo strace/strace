@@ -38,6 +38,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Information about availability of demangling and reliable personality
     decoding (on architectures with multiple personalities) is now available
     in strace -V output.
+  * Added decoding of pkey_alloc, pkey_free, and pkey_mprotect syscalls on
+    powerpc and powerpc64.
   * Enhanced manual page.
 
 * Bug fixes
