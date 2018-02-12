@@ -10,7 +10,7 @@ Source: https://downloads.sourceforge.net/strace/%{name}-%{version}.tar.xz
 BuildRequires: pkgconfig(bluez)
 %endif
 %if 0%{?fedora} >= 20 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1300
-%define buildrequires_libunwind_devel BuildRequires: libunwind-devel
+%define buildrequires_libunwind_devel BuildRequires: libunwind-devel binutils-devel
 %endif
 %ifarch x86_64
 # for experimental -k option
