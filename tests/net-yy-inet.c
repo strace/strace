@@ -39,6 +39,8 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
+#include "accept_compat.h"
+
 int
 main(void)
 {
@@ -105,7 +107,7 @@ main(void)
 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
 	memset(accept_sa, 0, sizeof(addr));
 	*len = sizeof(addr);
-	const int accept_fd = accept(listen_fd, accept_sa, len);
+	const int accept_fd = do_accept(listen_fd, accept_sa, len);
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	const unsigned int connect_port =

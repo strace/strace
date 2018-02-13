@@ -37,6 +37,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#include "accept_compat.h"
+
 #define TEST_SOCKET "net-yy-unix.socket"
 
 int
@@ -106,7 +108,7 @@ main(void)
 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
 	memset(accept_sa, 0, sizeof(addr));
 	*len = sizeof(addr);
-	int accept_fd = accept(listen_fd, accept_sa, len);
+	int accept_fd = do_accept(listen_fd, accept_sa, len);
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
@@ -179,7 +181,7 @@ main(void)
 
 	memset(accept_sa, 0, sizeof(addr));
 	*len = sizeof(addr);
-	accept_fd = accept(listen_fd, accept_sa, len);
+	accept_fd = do_accept(listen_fd, accept_sa, len);
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	accept_inode = inode_of_sockfd(accept_fd);

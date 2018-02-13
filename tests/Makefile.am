@@ -332,6 +332,7 @@ VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 
 EXTRA_DIST = \
+	accept_compat.h \
 	attach-p-cmd.h \
 	caps-abbrev.awk \
 	caps.awk \
