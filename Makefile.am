@@ -764,7 +764,6 @@ EXTRA_DIST =				\
 	linux/sparc/arch_rt_sigframe.c	\
 	linux/sparc/arch_sigreturn.c	\
 	linux/sparc/errnoent.h		\
-	linux/sparc/gen.pl		\
 	linux/sparc/get_error.c		\
 	linux/sparc/get_scno.c		\
 	linux/sparc/get_syscall_args.c	\
@@ -854,7 +853,6 @@ EXTRA_DIST =				\
 	linux/x86_64/arch_sigreturn.c	\
 	linux/x86_64/errnoent1.h	\
 	linux/x86_64/errnoent2.h	\
-	linux/x86_64/gentab.pl		\
 	linux/x86_64/get_error.c	\
 	linux/x86_64/get_scno.c		\
 	linux/x86_64/get_syscall_args.c	\
@@ -899,7 +897,6 @@ EXTRA_DIST =				\
 	$(XLAT_INPUT_FILES)		\
 	$(XLAT_HEADER_FILES)		\
 	xlat/gen.sh			\
-	xlate.el			\
 	# end of EXTRA_DIST
 
 .PHONY: check-valgrind-local
