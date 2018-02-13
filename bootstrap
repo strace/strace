@@ -10,7 +10,9 @@ for m in m32 mx32; do
 	rm -rf $tests
 	mkdir $tests
 	s='[[:space:]]*'
+	[ "$m" = m32 ] && k="s/^\\(SIZEOF_KERNEL_LONG_T$s=\\).*/\\1 4/;" || k=
 	sed "s/@arch@/@arch_$m@/;
+	     s/^\\(SIZEOF_LONG$s=\\).*/\\1 4/; $k
 	     s/^MPERS_NAME$s=.*/& $m/;
 	     s/^MPERS_CC_FLAGS$s=.*/& @cc_flags_$m@/;
 	     s/^ARCH_MFLAGS$s=.*/& -DMPERS_IS_\$(MPERS_NAME) \$(MPERS_CC_FLAGS)/" \

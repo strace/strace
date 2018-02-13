@@ -755,10 +755,15 @@ AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
 	fi)
 
 AC_CHECK_SIZEOF([long])
+SIZEOF_LONG="$ac_cv_sizeof_long"
+AC_SUBST(SIZEOF_LONG)
 AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([off_t],,[#include <sys/types.h>])
 AC_CHECK_SIZEOF([kernel_long_t],,[#include "$srcdir/kernel_types.h"])
+SIZEOF_KERNEL_LONG_T="$ac_cv_sizeof_kernel_long_t"
+AC_SUBST(SIZEOF_KERNEL_LONG_T)
 AC_CHECK_SIZEOF([struct i64_i32],,[struct i64_i32 {long long i64; int i32;};])
+
 
 AC_CACHE_CHECK([for SIGRTMIN], [st_cv_SIGRTMIN],
 	       [[st_cv_SIGRTMIN="$(echo SIGRTMIN |
