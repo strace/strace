@@ -35,8 +35,7 @@
 static inline bool
 is_negated_errno(kernel_ulong_t val)
 {
-	/* Linux kernel defines MAX_ERRNO to 4095. */
-	kernel_ulong_t max = -(kernel_long_t) 4095;
+	kernel_ulong_t max = -(kernel_long_t) MAX_ERRNO_VALUE;
 
 #ifndef current_klongsize
 	if (current_klongsize < sizeof(val)) {

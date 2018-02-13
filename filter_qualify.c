@@ -139,7 +139,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 				  " clipped to %d in compat personality",
 				  intval, (int) intval);
 
-		if ((int) intval < 0 && (int) intval >= -4095)
+		if ((int) intval < 0 && (int) intval >= -MAX_ERRNO_VALUE)
 			error_msg("Inadvertent injection of error %d is"
 				  " possible in compat personality for"
 				  " retval=%" PRI_kld,
