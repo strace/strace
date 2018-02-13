@@ -3,6 +3,7 @@
  * Copyright (c) 2012-2013 Denys Vlasenko <vda.linux@googlemail.com>
  * Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
  * Copyright (c) 2010-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

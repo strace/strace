@@ -6,7 +6,7 @@
  * Copyright (c) 2002-2004 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2010 Andreas Schwab <schwab@linux-m68k.org>
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2014-2017 The strace developers.
+ * Copyright (c) 2014-2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

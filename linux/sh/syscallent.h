@@ -3,7 +3,7 @@
  * Copyright (c) 1993, 1994, 1995 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
  *                    port by Greg Banks <gbanks@pocketpenguins.com>
- * Copyright (c) 2000-2017 The strace developers.
+ * Copyright (c) 2000-2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
