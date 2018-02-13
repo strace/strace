@@ -59,11 +59,23 @@ static const char vm_dev[] = "anon_inode:kvm-vm";
 static const char vcpu_dev[] = "anon_inode:kvm-vcpu";
 static size_t page_size;
 
-static void
-code(void)
-{
-	__asm__("mov $0xd80003f8, %edx; mov $'\n', %al; out %al, (%dx); hlt");
-}
+extern const char code[];
+extern const unsigned short code_size;
+
+__asm__(
+	".type code, @object		\n"
+	"code:				\n"
+	"	mov $0xd80003f8, %edx	\n"
+	"	mov $'\n', %al		\n"
+	"	out %al, (%dx)		\n"
+	"	hlt			\n"
+	".size code, . - code		\n"
+	".type code_size, @object	\n"
+	"code_size:			\n"
+	"	.short . - code		\n"
+	".size code_size, . - code_size	\n"
+	);
+
 
 static void
 run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
@@ -107,10 +119,7 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 	       (uintmax_t) regs.rsp, (uintmax_t) regs.rbp,
 	       (uintmax_t) regs.rip, (uintmax_t) regs.rflags);
 
-	/* Copy the code till the end of page */
-	size_t code_size = page_size - ((uintptr_t) code & (page_size - 1));
-	if (code_size < 16)
-		code_size = 16;
+	/* Copy the code */
 	memcpy(mem, code, code_size);
 
 	const char *p = "\n";
