@@ -768,7 +768,7 @@ main(void)
 
 	rc = syscall(__NR_s390_sthyi, 0, buf, ret, 0);
 	if (rc)
-		error_msg_and_fail("syscall(__NR_s390_sthyi, 0, buf, ret, 0) "
+		error_msg_and_skip("syscall(__NR_s390_sthyi, 0, buf, ret, 0) "
 				   "returned unexpected value of %ld", rc);
 
 	printf("s390_sthyi(STHYI_FC_CP_IFL_CAP, ");
