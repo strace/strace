@@ -9,7 +9,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     in brackets.
   * Enhanced NETLINK_ROUTE protocol decoding.
   * Updated lists of signal codes.
-  * Updated the list of RWF_* constants.
+  * Updated lists of POLL* and RWF_* constants.
 
 * Bug fixes
   * Fixed build on m68k.
