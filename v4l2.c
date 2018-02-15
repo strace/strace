@@ -75,14 +75,22 @@ typedef struct v4l2_standard struct_v4l2_standard;
 #define V4L2_CID_BAND_STOP_FILTER (V4L2_CID_BASE+33)
 #endif
 
+/* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
+#ifndef v4l2_fourcc_be
+# define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1 << 31))
+#endif
+
 #define FMT_FRACT "%u/%u"
 #define ARGS_FRACT(x) ((x).numerator), ((x).denominator)
 
 #define FMT_RECT "{left=%d, top=%d, width=%u, height=%u}"
 #define ARGS_RECT(x) (x).left, (x).top, (x).width, (x).height
 
+#include "xlat/v4l2_pix_fmts.h"
+#include "xlat/v4l2_sdr_fmts.h"
+
 static void
-print_pixelformat(uint32_t fourcc)
+print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 {
 	unsigned char a[] = {
 		(unsigned char) fourcc,
@@ -129,6 +137,13 @@ print_pixelformat(uint32_t fourcc)
 		}
 	}
 	tprints(")");
+
+	if (xlat) {
+		const char *pixfmt_name = xlookup(xlat, fourcc);
+
+		if (pixfmt_name)
+			tprints_comment(pixfmt_name);
+	}
 }
 
 #include "xlat/v4l2_device_capabilities_flags.h"
@@ -184,7 +199,7 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 			   "V4L2_FMT_FLAG_???");
 		PRINT_FIELD_CSTRING(", ", f, description);
 		tprints(", pixelformat=");
-		print_pixelformat(f.pixelformat);
+		print_pixelformat(f.pixelformat, v4l2_pix_fmts);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
@@ -214,7 +229,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprintf("fmt.pix={width=%u, height=%u, pixelformat=",
 			f->fmt.pix.width, f->fmt.pix.height);
-		print_pixelformat(f->fmt.pix.pixelformat);
+		print_pixelformat(f->fmt.pix.pixelformat, v4l2_pix_fmts);
 		tprints(", field=");
 		printxval(v4l2_fields, f->fmt.pix.field, "V4L2_FIELD_???");
 		tprintf(", bytesperline=%u, sizeimage=%u, colorspace=",
@@ -231,7 +246,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprintf("fmt.pix_mp={width=%u, height=%u, pixelformat=",
 			f->fmt.pix_mp.width, f->fmt.pix_mp.height);
-		print_pixelformat(f->fmt.pix_mp.pixelformat);
+		print_pixelformat(f->fmt.pix_mp.pixelformat, v4l2_pix_fmts);
 		tprints(", field=");
 		printxval(v4l2_fields, f->fmt.pix_mp.field, "V4L2_FIELD_???");
 		tprints(", colorspace=");
@@ -282,7 +297,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			"samples_per_line=%u, sample_format=",
 			f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
 			f->fmt.vbi.samples_per_line);
-		print_pixelformat(f->fmt.vbi.sample_format);
+		print_pixelformat(f->fmt.vbi.sample_format, v4l2_pix_fmts);
 		tprintf(", start=[%u, %u], count=[%u, %u], ",
 			f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 			f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
@@ -329,7 +344,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
 		tprints(prefix);
 		tprints("fmt.sdr={pixelformat=");
-		print_pixelformat(f->fmt.sdr.pixelformat);
+		print_pixelformat(f->fmt.sdr.pixelformat, v4l2_sdr_fmts);
 #ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		tprintf(", buffersize=%u",
 			f->fmt.sdr.buffersize);
@@ -873,7 +888,7 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
 		tprintf("{index=%u, pixel_format=", s.index);
-		print_pixelformat(s.pixel_format);
+		print_pixelformat(s.pixel_format, v4l2_pix_fmts);
 		return 0;
 	}
 
@@ -913,7 +928,7 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 		tprintf("{index=%u, pixel_format=", f.index);
-		print_pixelformat(f.pixel_format);
+		print_pixelformat(f.pixel_format, v4l2_pix_fmts);
 		tprintf(", width=%u, height=%u", f.width, f.height);
 		return 0;
 	}

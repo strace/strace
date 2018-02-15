@@ -27,6 +27,7 @@
  */
 
 #include "tests.h"
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -44,6 +45,10 @@
 	 ((unsigned int)(a3) << 24))
 
 static const unsigned int magic = 0xdeadbeef;
+static const unsigned int pf_magic = fourcc('S', '5', '0', '8');
+#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+static const unsigned int sf_magic = fourcc('R', 'U', '1', '2');
+#endif
 
 static void
 init_v4l2_format(struct v4l2_format *const f,
@@ -56,7 +61,10 @@ init_v4l2_format(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
 		f->fmt.pix.width = 0x657b8160;
 		f->fmt.pix.height = 0x951c0047;
-		f->fmt.pix.pixelformat = magic;
+		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+			f->fmt.pix.pixelformat = magic;
+		else
+			f->fmt.pix.pixelformat = pf_magic;
 		f->fmt.pix.field = V4L2_FIELD_NONE;
 		f->fmt.pix.bytesperline = 0xdf20d185;
 		f->fmt.pix.sizeimage = 0x0cf7be41;
@@ -70,7 +78,10 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
 		f->fmt.pix_mp.width = 0x1f3b774b;
 		f->fmt.pix_mp.height = 0xab96a8d6;
-		f->fmt.pix_mp.pixelformat = magic;
+		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
+			f->fmt.pix_mp.pixelformat = magic;
+		else
+			f->fmt.pix_mp.pixelformat = pf_magic;
 		f->fmt.pix_mp.field = V4L2_FIELD_NONE;
 		f->fmt.pix_mp.colorspace = V4L2_COLORSPACE_JPEG;
 		struct v4l2_plane_pix_format *cur_pix =
@@ -117,7 +128,10 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.vbi.sampling_rate = 0x3d9b5b79;
 		f->fmt.vbi.offset = 0x055b3a09;
 		f->fmt.vbi.samples_per_line = 0xf176d436;
-		f->fmt.vbi.sample_format = magic;
+		if (buf_type == V4L2_BUF_TYPE_VBI_CAPTURE)
+			f->fmt.vbi.sample_format = magic;
+		else
+			f->fmt.vbi.sample_format = pf_magic;
 		f->fmt.vbi.start[0] = 0x9858e2eb;
 		f->fmt.vbi.start[1] = 0x8a4dc8c1;
 		f->fmt.vbi.count[0] = 0x4bcf36a3;
@@ -142,10 +156,12 @@ init_v4l2_format(struct v4l2_format *const f,
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
+		f->fmt.sdr.pixelformat = sf_magic;
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
-		f->fmt.sdr.pixelformat = magic;
+		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
+			f->fmt.sdr.pixelformat = magic;
 #ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		f->fmt.sdr.buffersize = 0x25afabfb;
 #endif
@@ -159,18 +175,30 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		  const char *request, const unsigned int buf_type,
 		  const char *buf_type_string)
 {
+	int saved_errno;
+
 	switch (buf_type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
+		saved_errno = errno;
 		printf("ioctl(-1, %s, {type=%s"
-		       ", fmt.pix={width=%u, height=%u, pixelformat="
-		       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
-		       ", field=V4L2_FIELD_NONE, bytesperline=%u, sizeimage=%u"
-		       ", colorspace=V4L2_COLORSPACE_JPEG}}) = -1 EBADF (%m)\n",
+		       ", fmt.pix={width=%u, height=%u, pixelformat=",
 		       request,
 		       buf_type_string,
-		       f->fmt.pix.width, f->fmt.pix.height,
-		       cc0(magic), cc1(magic), cc2(magic), cc3(magic),
+		       f->fmt.pix.width, f->fmt.pix.height);
+
+		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+		else
+			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
+			       "/* V4L2_PIX_FMT_SPCA508 */",
+			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
+			       cc3(pf_magic));
+
+		errno = saved_errno;
+		printf(", field=V4L2_FIELD_NONE, bytesperline=%u, sizeimage=%u"
+		       ", colorspace=V4L2_COLORSPACE_JPEG}}) = -1 EBADF (%m)\n",
 		       f->fmt.pix.bytesperline,
 		       f->fmt.pix.sizeimage);
 		break;
@@ -179,16 +207,25 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
 		unsigned int i;
 
+		saved_errno = errno;
 		printf("ioctl(-1, %s"
 		       ", {type=%s"
-		       ", fmt.pix_mp={width=%u, height=%u, pixelformat="
-		       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
-		       ", field=V4L2_FIELD_NONE, colorspace="
-		       "V4L2_COLORSPACE_JPEG, plane_fmt=[",
+		       ", fmt.pix_mp={width=%u, height=%u, pixelformat=",
 		       request,
 		       buf_type_string,
-		       f->fmt.pix_mp.width, f->fmt.pix_mp.height,
-		       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+		       f->fmt.pix_mp.width, f->fmt.pix_mp.height);
+
+		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
+			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+		else
+			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
+			       "/* V4L2_PIX_FMT_SPCA508 */",
+			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
+			       cc3(pf_magic));
+
+		printf(", field=V4L2_FIELD_NONE, colorspace="
+		       "V4L2_COLORSPACE_JPEG, plane_fmt=[");
 		for (i = 0;
 		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
 		     ++i) {
@@ -198,6 +235,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			f->fmt.pix_mp.plane_fmt[i].sizeimage,
 			f->fmt.pix_mp.plane_fmt[i].bytesperline);
 		}
+		errno = saved_errno;
 		printf("], num_planes=%u}}) = -1 EBADF (%m)\n",
 		f->fmt.pix_mp.num_planes);
 		break;
@@ -238,18 +276,28 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		break;
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
+		saved_errno = errno;
 		printf("ioctl(-1, %s, {type=%s"
 		       ", fmt.vbi={sampling_rate=%u, offset=%u"
-		       ", samples_per_line=%u, sample_format="
-		       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
-		       ", start=[%u, %u], count=[%u, %u]"
-		       ", flags=V4L2_VBI_INTERLACED}})"
-		       " = -1 EBADF (%m)\n",
+		       ", samples_per_line=%u, sample_format=",
 		       request,
 		       buf_type_string,
 		       f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
-		       f->fmt.vbi.samples_per_line,
-		       cc0(magic), cc1(magic), cc2(magic), cc3(magic),
+		       f->fmt.vbi.samples_per_line);
+
+		if (buf_type == V4L2_BUF_TYPE_VBI_CAPTURE)
+			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+		else
+			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
+			       "/* V4L2_PIX_FMT_SPCA508 */",
+			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
+			       cc3(pf_magic));
+
+		errno = saved_errno;
+		printf(", start=[%u, %u], count=[%u, %u]"
+		       ", flags=V4L2_VBI_INTERLACED}})"
+		       " = -1 EBADF (%m)\n",
 		       f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 		       f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
 		break;
@@ -289,16 +337,29 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
+		saved_errno = errno;
 		printf("ioctl(-1, %s, {type=%s"
-		       ", fmt.sdr={pixelformat=v4l2_fourcc('\\x%x', '\\x%x',"
-		       " '\\x%x', '\\x%x')"
+		       ", fmt.sdr={pixelformat=",
+		       request,
+		       buf_type_string);
+
+		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
+			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+# if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+		else
+			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
+			       "/* V4L2_SDR_FMT_RU12LE */",
+			       cc0(sf_magic), cc1(sf_magic), cc2(sf_magic),
+			       cc3(sf_magic));
+# endif
+
+		errno = saved_errno;
+		printf(
 #ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		       ", buffersize=%u"
 #endif
-		       "}}) = -1 EBADF (%m)\n",
-		       request,
-		       buf_type_string,
-		       cc0(magic), cc1(magic), cc2(magic), cc3(magic)
+		       "}}) = -1 EBADF (%m)\n"
 #ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		       , f->fmt.sdr.buffersize
 #endif
