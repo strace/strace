@@ -1,7 +1,7 @@
 This is the Debian packaged version of strace. For a complete list of
 changes from the upstream version please see the changelog.
 
-The upstream sources can be found at http://sourceforge.net/projects/strace/
+The upstream sources can be found at https://github.com/strace/strace/
 
 This is the copyright as found in the upstream sources:
 
