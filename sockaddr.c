@@ -66,6 +66,8 @@
 
 #define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
 
+const size_t ethernet_protocols_size = ARRAY_SIZE(ethernet_protocols) - 1;
+
 static void
 print_sockaddr_data_un(const void *const buf, const int addrlen)
 {
@@ -223,7 +225,8 @@ print_sockaddr_data_ll(const void *const buf, const int addrlen)
 	const struct sockaddr_ll *const sa_ll = buf;
 
 	tprints("sll_protocol=htons(");
-	printxval(ethernet_protocols, ntohs(sa_ll->sll_protocol), "ETH_P_???");
+	printxval_search(ethernet_protocols, ntohs(sa_ll->sll_protocol),
+			 "ETH_P_???");
 	PRINT_FIELD_IFINDEX("), ", *sa_ll, sll_ifindex);
 	tprints(", sll_hatype=");
 	printxval(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");

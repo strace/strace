@@ -52,8 +52,10 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
-			PRINT_FIELD_XVAL("", req, sdiag_protocol,
-					 ethernet_protocols, "ETH_P_???");
+			tprints("sdiag_protocol=");
+			printxval_searchn(ethernet_protocols,
+					  ethernet_protocols_size,
+					  req.sdiag_protocol, "ETH_P_???");
 			PRINT_FIELD_U(", ", req, pdiag_ino);
 			PRINT_FIELD_FLAGS(", ", req, pdiag_show,
 					  packet_diag_show, "PACKET_SHOW_???");
