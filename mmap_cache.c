@@ -68,16 +68,26 @@ build_mmap_cache(struct tcb *tcp)
 	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 		struct mmap_cache_t *entry;
 		unsigned long start_addr, end_addr, mmap_offset;
+		char read_bit;
+		char write_bit;
 		char exec_bit;
+		char shared_bit;
 		char binary_path[sizeof(buffer)];
 
-		if (sscanf(buffer, "%lx-%lx %*c%*c%c%*c %lx %*x:%*x %*d %[^\n]",
-			   &start_addr, &end_addr, &exec_bit,
-			   &mmap_offset, binary_path) != 5)
+		if (sscanf(buffer, "%lx-%lx %c%c%c%c %lx %*x:%*x %*d %[^\n]",
+			   &start_addr, &end_addr,
+			   &read_bit, &write_bit, &exec_bit, &shared_bit,
+			   &mmap_offset, binary_path) != 8)
 			continue;
 
-		/* ignore mappings that have no PROT_EXEC bit set */
-		if (exec_bit != 'x')
+		/* skip mappings that have unknown protection */
+		if (!(read_bit == '-' || read_bit == 'r'))
+			continue;
+		if (!(write_bit == '-' || write_bit == 'w'))
+			continue;
+		if (!(exec_bit == '-' || exec_bit == 'x'))
+			continue;
+		if (!(shared_bit == 'p' || shared_bit == 's'))
 			continue;
 
 		if (end_addr < start_addr) {
@@ -116,6 +126,13 @@ build_mmap_cache(struct tcb *tcp)
 		entry->start_addr = start_addr;
 		entry->end_addr = end_addr;
 		entry->mmap_offset = mmap_offset;
+		entry->protections = (
+			0
+			| ((read_bit   == 'r')? MMAP_CACHE_PROT_READABLE  : 0)
+			| ((write_bit  == 'w')? MMAP_CACHE_PROT_WRITABLE  : 0)
+			| ((exec_bit   == 'x')? MMAP_CACHE_PROT_EXECUTABLE: 0)
+			| ((shared_bit == 's')? MMAP_CACHE_PROT_SHARED    : 0)
+			);
 		entry->binary_filename = xstrdup(binary_path);
 		tcp->mmap_cache_size++;
 	}

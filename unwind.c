@@ -139,7 +139,9 @@ print_stack_frame(struct tcb *tcp,
 	}
 
 	cur_mmap_cache = mmap_cache_search(tcp, ip);
-	if (cur_mmap_cache) {
+	if (cur_mmap_cache
+	    /* ignore mappings that have no PROT_EXEC bit set */
+	    && (cur_mmap_cache->protections & MMAP_CACHE_PROT_EXECUTABLE)) {
 		unsigned long true_offset;
 		unw_word_t function_offset;
 

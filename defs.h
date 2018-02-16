@@ -733,12 +733,21 @@ struct mmap_cache_t {
 	 * start_addr  is 0x7fabbb09b000
 	 * end_addr    is 0x7fabbb09f000
 	 * mmap_offset is 0x179000
+	 * protections is MMAP_CACHE_PROT_READABLE|MMAP_CACHE_PROT_EXECUTABLE
 	 * binary_filename is "/lib/libc-2.11.1.so"
 	 */
 	unsigned long start_addr;
 	unsigned long end_addr;
 	unsigned long mmap_offset;
+	unsigned char protections;
 	char *binary_filename;
+};
+
+enum mmap_cache_protection {
+	MMAP_CACHE_PROT_READABLE   = 1 << 0,
+	MMAP_CACHE_PROT_WRITABLE   = 1 << 1,
+	MMAP_CACHE_PROT_EXECUTABLE = 1 << 2,
+	MMAP_CACHE_PROT_SHARED     = 1 << 3,
 };
 
 enum mmap_cache_rebuild_result {
