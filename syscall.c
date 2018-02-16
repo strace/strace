@@ -731,7 +731,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled) {
 		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
-			unwind_cache_invalidate(tcp);
+			mmap_cache_invalidate(tcp);
 	}
 #endif
 

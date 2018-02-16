@@ -26,7 +26,6 @@
  */
 
 #include "defs.h"
-#include <limits.h>
 #include <libunwind-ptrace.h>
 
 #ifdef USE_DEMANGLE
@@ -36,38 +35,6 @@
 #  include <libiberty/demangle.h>
 # endif
 #endif
-
-#include "xstring.h"
-
-#ifdef _LARGEFILE64_SOURCE
-# ifdef HAVE_FOPEN64
-#  define fopen_for_input fopen64
-# else
-#  define fopen_for_input fopen
-# endif
-#else
-# define fopen_for_input fopen
-#endif
-
-/*
- * Keep a sorted array of cache entries,
- * so that we can binary search through it.
- */
-struct mmap_cache_t {
-	/**
-	 * example entry:
-	 * 7fabbb09b000-7fabbb09f000 r-xp 00179000 fc:00 1180246 /lib/libc-2.11.1.so
-	 *
-	 * start_addr  is 0x7fabbb09b000
-	 * end_addr    is 0x7fabbb09f000
-	 * mmap_offset is 0x179000
-	 * binary_filename is "/lib/libc-2.11.1.so"
-	 */
-	unsigned long start_addr;
-	unsigned long end_addr;
-	unsigned long mmap_offset;
-	char *binary_filename;
-};
 
 /*
  * Type used in stacktrace walker
@@ -95,10 +62,8 @@ struct queue_t {
 };
 
 static void queue_print(struct queue_t *queue);
-static void delete_mmap_cache(struct tcb *tcp, const char *caller);
 
 static unw_addr_space_t libunwind_as;
-static unsigned int mmap_cache_generation;
 
 static const char asprintf_error_str[] = "???";
 
@@ -133,157 +98,10 @@ unwind_tcb_fin(struct tcb *tcp)
 	free(tcp->queue);
 	tcp->queue = NULL;
 
-	delete_mmap_cache(tcp, __func__);
+	mmap_cache_delete(tcp, __func__);
 
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
-}
-
-/*
- * caching of /proc/ID/maps for each process to speed up stack tracing
- *
- * The cache must be refreshed after syscalls that affect memory mappings,
- * e.g. mmap, mprotect, munmap, execve.
- */
-static void
-build_mmap_cache(struct tcb *tcp)
-{
-	FILE *fp;
-	struct mmap_cache_t *cache_head = NULL;
-	size_t cur_array_size = 0;
-	char filename[sizeof("/proc/4294967296/maps")];
-	char buffer[PATH_MAX + 80];
-
-	xsprintf(filename, "/proc/%u/maps", tcp->pid);
-	fp = fopen_for_input(filename, "r");
-	if (!fp) {
-		perror_msg("fopen: %s", filename);
-		return;
-	}
-
-	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-		struct mmap_cache_t *entry;
-		unsigned long start_addr, end_addr, mmap_offset;
-		char exec_bit;
-		char binary_path[sizeof(buffer)];
-
-		if (sscanf(buffer, "%lx-%lx %*c%*c%c%*c %lx %*x:%*x %*d %[^\n]",
-			   &start_addr, &end_addr, &exec_bit,
-			   &mmap_offset, binary_path) != 5)
-			continue;
-
-		/* ignore mappings that have no PROT_EXEC bit set */
-		if (exec_bit != 'x')
-			continue;
-
-		if (end_addr < start_addr) {
-			error_msg("%s: unrecognized file format", filename);
-			break;
-		}
-
-		/*
-		 * sanity check to make sure that we're storing
-		 * non-overlapping regions in ascending order
-		 */
-		if (tcp->mmap_cache_size > 0) {
-			entry = &cache_head[tcp->mmap_cache_size - 1];
-			if (entry->start_addr == start_addr &&
-			    entry->end_addr == end_addr) {
-				/* duplicate entry, e.g. [vsyscall] */
-				continue;
-			}
-			if (start_addr <= entry->start_addr ||
-			    start_addr < entry->end_addr) {
-				debug_msg("%s: overlapping memory region: "
-					  "\"%s\" [%08lx-%08lx] overlaps with "
-					  "\"%s\" [%08lx-%08lx]",
-					  filename, binary_path, start_addr,
-					  end_addr, entry->binary_filename,
-					  entry->start_addr, entry->end_addr);
-				continue;
-			}
-		}
-
-		if (tcp->mmap_cache_size >= cur_array_size)
-			cache_head = xgrowarray(cache_head, &cur_array_size,
-						sizeof(*cache_head));
-
-		entry = &cache_head[tcp->mmap_cache_size];
-		entry->start_addr = start_addr;
-		entry->end_addr = end_addr;
-		entry->mmap_offset = mmap_offset;
-		entry->binary_filename = xstrdup(binary_path);
-		tcp->mmap_cache_size++;
-	}
-	fclose(fp);
-	tcp->mmap_cache = cache_head;
-	tcp->mmap_cache_generation = mmap_cache_generation;
-
-	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
-		       tcp->mmap_cache_generation,
-		       mmap_cache_generation,
-		       tcp, tcp->mmap_cache);
-}
-
-/* deleting the cache */
-static void
-delete_mmap_cache(struct tcb *tcp, const char *caller)
-{
-	unsigned int i;
-
-	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p, caller=%s",
-		       tcp->mmap_cache_generation,
-		       mmap_cache_generation,
-		       tcp, tcp->mmap_cache, caller);
-
-	for (i = 0; i < tcp->mmap_cache_size; i++) {
-		free(tcp->mmap_cache[i].binary_filename);
-		tcp->mmap_cache[i].binary_filename = NULL;
-	}
-	free(tcp->mmap_cache);
-	tcp->mmap_cache = NULL;
-	tcp->mmap_cache_size = 0;
-}
-
-enum mmap_cache_rebuild_result {
-	MMAP_CACHE_REBUILD_NOCACHE,
-	MMAP_CACHE_REBUILD_READY,
-	MMAP_CACHE_REBUILD_RENEWED,
-};
-
-static enum mmap_cache_rebuild_result
-rebuild_cache_if_invalid(struct tcb *tcp, const char *caller)
-{
-	enum mmap_cache_rebuild_result r = MMAP_CACHE_REBUILD_READY;
-	if ((tcp->mmap_cache_generation != mmap_cache_generation)
-	    && tcp->mmap_cache)
-		delete_mmap_cache(tcp, caller);
-
-	if (!tcp->mmap_cache) {
-		r = MMAP_CACHE_REBUILD_RENEWED;
-		build_mmap_cache(tcp);
-	}
-
-	if (!(tcp->mmap_cache && tcp->mmap_cache_size))
-		r = MMAP_CACHE_REBUILD_NOCACHE;
-
-	return r;
-}
-
-void
-unwind_cache_invalidate(struct tcb *tcp)
-{
-#if SUPPORTED_PERSONALITIES > 1
-	if (tcp->currpers != DEFAULT_PERSONALITY) {
-		/* disable stack trace */
-		return;
-	}
-#endif
-	mmap_cache_generation++;
-	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
-		       tcp->mmap_cache_generation,
-		       mmap_cache_generation,
-		       tcp, tcp->mmap_cache);
 }
 
 static void
@@ -588,7 +406,7 @@ unwind_print_stacktrace(struct tcb *tcp)
 	if (tcp->queue->head) {
 		debug_func_msg("head: tcp=%p, queue=%p", tcp, tcp->queue->head);
 		queue_print(tcp->queue);
-	} else switch (rebuild_cache_if_invalid(tcp, __func__)) {
+	} else switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
 		case MMAP_CACHE_REBUILD_RENEWED:
 			unw_flush_cache(libunwind_as, 0, 0);
 			/* Fall through */
@@ -617,7 +435,7 @@ unwind_capture_stacktrace(struct tcb *tcp)
 	if (tcp->queue->head)
 		error_msg_and_die("bug: unprinted entries in queue");
 
-	switch (rebuild_cache_if_invalid(tcp, __func__)) {
+	switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
 	case MMAP_CACHE_REBUILD_RENEWED:
 		unw_flush_cache(libunwind_as, 0, 0);
 		/* Fall through */

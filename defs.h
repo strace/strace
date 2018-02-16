@@ -217,11 +217,12 @@ struct tcb {
 	struct timeval dtime;	/* Delta for system time usage */
 	struct timeval etime;	/* Syscall entry time */
 
-#ifdef USE_LIBUNWIND
-	struct UPT_info *libunwind_ui;
 	struct mmap_cache_t *mmap_cache;
 	unsigned int mmap_cache_size;
 	unsigned int mmap_cache_generation;
+
+#ifdef USE_LIBUNWIND
+	struct UPT_info *libunwind_ui;
 	struct queue_t *queue;
 #endif
 };
@@ -716,10 +717,39 @@ extern void tv_div(struct timeval *, const struct timeval *, int);
 extern void unwind_init(void);
 extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
-extern void unwind_cache_invalidate(struct tcb *);
 extern void unwind_print_stacktrace(struct tcb *);
 extern void unwind_capture_stacktrace(struct tcb *);
 #endif
+
+/*
+ * Keep a sorted array of cache entries,
+ * so that we can binary search through it.
+ */
+struct mmap_cache_t {
+	/**
+	 * example entry:
+	 * 7fabbb09b000-7fabbb09f000 r-xp 00179000 fc:00 1180246 /lib/libc-2.11.1.so
+	 *
+	 * start_addr  is 0x7fabbb09b000
+	 * end_addr    is 0x7fabbb09f000
+	 * mmap_offset is 0x179000
+	 * binary_filename is "/lib/libc-2.11.1.so"
+	 */
+	unsigned long start_addr;
+	unsigned long end_addr;
+	unsigned long mmap_offset;
+	char *binary_filename;
+};
+
+enum mmap_cache_rebuild_result {
+	MMAP_CACHE_REBUILD_NOCACHE,
+	MMAP_CACHE_REBUILD_READY,
+	MMAP_CACHE_REBUILD_RENEWED,
+};
+
+extern void mmap_cache_invalidate(struct tcb *tcp);
+extern void mmap_cache_delete(struct tcb *tcp, const char *caller);
+extern enum mmap_cache_rebuild_result mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller);
 
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
