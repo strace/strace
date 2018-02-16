@@ -750,6 +750,7 @@ enum mmap_cache_rebuild_result {
 extern void mmap_cache_invalidate(struct tcb *tcp);
 extern void mmap_cache_delete(struct tcb *tcp, const char *caller);
 extern enum mmap_cache_rebuild_result mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller);
+extern struct mmap_cache_t *mmap_cache_search(struct tcb *tcp, unsigned long ip);
 
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)

@@ -131,53 +131,40 @@ print_stack_frame(struct tcb *tcp,
 		  size_t *symbol_name_size)
 {
 	unw_word_t ip;
-	int lower = 0;
-	int upper = (int) tcp->mmap_cache_size - 1;
+	struct mmap_cache_t *cur_mmap_cache;
 
 	if (unw_get_reg(cursor, UNW_REG_IP, &ip) < 0) {
 		perror_msg("Can't walk the stack of process %d", tcp->pid);
 		return -1;
 	}
 
-	while (lower <= upper) {
-		struct mmap_cache_t *cur_mmap_cache;
-		int mid = (upper + lower) / 2;
+	cur_mmap_cache = mmap_cache_search(tcp, ip);
+	if (cur_mmap_cache) {
+		unsigned long true_offset;
+		unw_word_t function_offset;
 
-		cur_mmap_cache = &tcp->mmap_cache[mid];
-
-		if (ip >= cur_mmap_cache->start_addr &&
-		    ip < cur_mmap_cache->end_addr) {
-			unsigned long true_offset;
-			unw_word_t function_offset;
-
-			get_symbol_name(cursor, symbol_name, symbol_name_size,
-					&function_offset);
-			true_offset = ip - cur_mmap_cache->start_addr +
-				cur_mmap_cache->mmap_offset;
-
+		get_symbol_name(cursor, symbol_name, symbol_name_size,
+				&function_offset);
+		true_offset = ip - cur_mmap_cache->start_addr +
+			cur_mmap_cache->mmap_offset;
 #ifdef USE_DEMANGLE
-			char *demangled_name =
-				cplus_demangle(*symbol_name,
-					       DMGL_AUTO | DMGL_PARAMS);
+		char *demangled_name =
+			cplus_demangle(*symbol_name,
+				       DMGL_AUTO | DMGL_PARAMS);
+#endif
+		call_action(data,
+			    cur_mmap_cache->binary_filename,
+#ifdef USE_DEMANGLE
+			    demangled_name ? demangled_name :
+#endif
+			    *symbol_name,
+			    function_offset,
+			    true_offset);
+#ifdef USE_DEMANGLE
+		free(demangled_name);
 #endif
 
-			call_action(data,
-				    cur_mmap_cache->binary_filename,
-#ifdef USE_DEMANGLE
-				    demangled_name ? demangled_name :
-#endif
-				    *symbol_name,
-				    function_offset,
-				    true_offset);
-#ifdef USE_DEMANGLE
-			free(demangled_name);
-#endif
-
-			return 0;
-		} else if (ip < cur_mmap_cache->start_addr)
-			upper = mid - 1;
-		else
-			lower = mid + 1;
+		return 0;
 	}
 
 	/*
