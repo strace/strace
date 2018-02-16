@@ -98,8 +98,6 @@ unwind_tcb_fin(struct tcb *tcp)
 	free(tcp->queue);
 	tcp->queue = NULL;
 
-	mmap_cache_delete(tcp, __func__);
-
 	_UPT_destroy(tcp->libunwind_ui);
 	tcp->libunwind_ui = NULL;
 }

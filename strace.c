@@ -803,6 +803,8 @@ droptcb(struct tcb *tcp)
 	}
 #endif
 
+	mmap_cache_delete(tcp, __func__);
+
 	nprocs--;
 	debug_msg("dropped tcb for pid %d, %d remain", tcp->pid, nprocs);
 
