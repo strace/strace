@@ -154,8 +154,6 @@ build_mmap_cache(struct tcb *tcp)
 	char filename[sizeof("/proc/4294967296/maps")];
 	char buffer[PATH_MAX + 80];
 
-	unw_flush_cache(libunwind_as, 0, 0);
-
 	xsprintf(filename, "/proc/%u/maps", tcp->pid);
 	fp = fopen_for_input(filename, "r");
 	if (!fp) {
@@ -247,17 +245,29 @@ delete_mmap_cache(struct tcb *tcp, const char *caller)
 	tcp->mmap_cache_size = 0;
 }
 
-static bool
+enum mmap_cache_rebuild_result {
+	MMAP_CACHE_REBUILD_NOCACHE,
+	MMAP_CACHE_REBUILD_READY,
+	MMAP_CACHE_REBUILD_RENEWED,
+};
+
+static enum mmap_cache_rebuild_result
 rebuild_cache_if_invalid(struct tcb *tcp, const char *caller)
 {
+	enum mmap_cache_rebuild_result r = MMAP_CACHE_REBUILD_READY;
 	if ((tcp->mmap_cache_generation != mmap_cache_generation)
 	    && tcp->mmap_cache)
 		delete_mmap_cache(tcp, caller);
 
-	if (!tcp->mmap_cache)
+	if (!tcp->mmap_cache) {
+		r = MMAP_CACHE_REBUILD_RENEWED;
 		build_mmap_cache(tcp);
+	}
 
-	return tcp->mmap_cache && tcp->mmap_cache_size;
+	if (!(tcp->mmap_cache && tcp->mmap_cache_size))
+		r = MMAP_CACHE_REBUILD_NOCACHE;
+
+	return r;
 }
 
 void
@@ -578,9 +588,17 @@ unwind_print_stacktrace(struct tcb *tcp)
 	if (tcp->queue->head) {
 		debug_func_msg("head: tcp=%p, queue=%p", tcp, tcp->queue->head);
 		queue_print(tcp->queue);
-	} else if (rebuild_cache_if_invalid(tcp, __func__)) {
-		debug_func_msg("walk: tcp=%p, queue=%p", tcp, tcp->queue->head);
-		stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
+	} else switch (rebuild_cache_if_invalid(tcp, __func__)) {
+		case MMAP_CACHE_REBUILD_RENEWED:
+			unw_flush_cache(libunwind_as, 0, 0);
+			/* Fall through */
+		case MMAP_CACHE_REBUILD_READY:
+			debug_func_msg("walk: tcp=%p, queue=%p", tcp, tcp->queue->head);
+			stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
+			break;
+		default:
+			/* Do nothing */
+			;
 	}
 }
 
@@ -599,9 +617,17 @@ unwind_capture_stacktrace(struct tcb *tcp)
 	if (tcp->queue->head)
 		error_msg_and_die("bug: unprinted entries in queue");
 
-	if (rebuild_cache_if_invalid(tcp, __func__)) {
+	switch (rebuild_cache_if_invalid(tcp, __func__)) {
+	case MMAP_CACHE_REBUILD_RENEWED:
+		unw_flush_cache(libunwind_as, 0, 0);
+		/* Fall through */
+	case MMAP_CACHE_REBUILD_READY:
 		stacktrace_walk(tcp, queue_put_call, queue_put_error,
 				tcp->queue);
 		debug_func_msg("tcp=%p, queue=%p", tcp, tcp->queue->head);
+		break;
+	default:
+		/* Do nothing */
+		;
 	}
 }
