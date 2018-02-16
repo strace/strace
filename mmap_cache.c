@@ -41,6 +41,17 @@
 #endif
 
 static unsigned int mmap_cache_generation;
+static bool use_mmap_cache;
+
+extern void mmap_cache_enable(void)
+{
+	use_mmap_cache = true;
+}
+
+extern bool mmap_cache_is_enabled(void)
+{
+	return use_mmap_cache;
+}
 
 /*
  * caching of /proc/ID/maps for each process to speed up stack tracing

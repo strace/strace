@@ -756,6 +756,8 @@ enum mmap_cache_rebuild_result {
 	MMAP_CACHE_REBUILD_RENEWED,
 };
 
+extern void mmap_cache_enable(void);
+extern bool mmap_cache_is_enabled(void);
 extern void mmap_cache_invalidate(struct tcb *tcp);
 extern void mmap_cache_delete(struct tcb *tcp, const char *caller);
 extern enum mmap_cache_rebuild_result mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller);

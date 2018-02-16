@@ -728,12 +728,10 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
 		gettimeofday(ptv, NULL);
 
-#ifdef USE_LIBUNWIND
-	if (stack_trace_enabled) {
+	if (mmap_cache_is_enabled()) {
 		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
 			mmap_cache_invalidate(tcp);
 	}
-#endif
 
 	if (filtered(tcp) || hide_log(tcp))
 		return 0;

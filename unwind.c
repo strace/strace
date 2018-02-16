@@ -74,6 +74,7 @@ unwind_init(void)
 	if (!libunwind_as)
 		error_msg_and_die("failed to create address space for stack tracing");
 	unw_set_caching_policy(libunwind_as, UNW_CACHE_GLOBAL);
+	mmap_cache_enable();
 }
 
 void
