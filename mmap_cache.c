@@ -83,12 +83,15 @@ build_mmap_cache(struct tcb *tcp)
 		char write_bit;
 		char exec_bit;
 		char shared_bit;
+		unsigned long major, minor;
 		char binary_path[sizeof(buffer)];
 
-		if (sscanf(buffer, "%lx-%lx %c%c%c%c %lx %*x:%*x %*d %[^\n]",
+		if (sscanf(buffer, "%lx-%lx %c%c%c%c %lx %lx:%lx %*d %[^\n]",
 			   &start_addr, &end_addr,
 			   &read_bit, &write_bit, &exec_bit, &shared_bit,
-			   &mmap_offset, binary_path) != 8)
+			   &mmap_offset,
+			   &major, &minor,
+			   binary_path) != 10)
 			continue;
 
 		/* skip mappings that have unknown protection */
@@ -144,6 +147,8 @@ build_mmap_cache(struct tcb *tcp)
 			| ((exec_bit   == 'x')? MMAP_CACHE_PROT_EXECUTABLE: 0)
 			| ((shared_bit == 's')? MMAP_CACHE_PROT_SHARED    : 0)
 			);
+		entry->major = major;
+		entry->minor = minor;
 		entry->binary_filename = xstrdup(binary_path);
 		tcp->mmap_cache_size++;
 	}

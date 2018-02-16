@@ -734,12 +734,15 @@ struct mmap_cache_t {
 	 * end_addr    is 0x7fabbb09f000
 	 * mmap_offset is 0x179000
 	 * protections is MMAP_CACHE_PROT_READABLE|MMAP_CACHE_PROT_EXECUTABLE
+	 * major       is 0xfc
+	 * minor       is 0x00
 	 * binary_filename is "/lib/libc-2.11.1.so"
 	 */
 	unsigned long start_addr;
 	unsigned long end_addr;
 	unsigned long mmap_offset;
 	unsigned char protections;
+	unsigned long major, minor;
 	char *binary_filename;
 };
 
