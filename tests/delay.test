@@ -1,0 +1,10 @@
+#!/bin/sh
+# Check delay injection.
+
+. "${srcdir=.}/init.sh"
+
+delay_enter=800000
+delay_exit=1600000
+run_strace -f -r -egettimeofday \
+	-einject=gettimeofday:delay_enter=$delay_enter:delay_exit=$delay_exit \
+	../delay 4 $delay_enter $delay_exit

@@ -97,6 +97,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone_parent \
 	clone_ptrace \
 	count-f \
+	delay \
 	execve-v \
 	execveat-v \
 	filter-unavailable \
@@ -166,6 +167,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 
 attach_f_p_LDADD = -lpthread $(LDADD)
 count_f_LDADD = -lpthread $(LDADD)
+delay_LDADD = $(clock_LIBS) $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -271,6 +273,7 @@ MISC_TESTS = \
 	clone_ptrace.test \
 	count-f.test \
 	count.test \
+	delay.test \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \

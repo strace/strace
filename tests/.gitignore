@@ -39,6 +39,7 @@ clone_ptrace
 copy_file_range
 count-f
 creat
+delay
 delete_module
 dev-yy
 dup
