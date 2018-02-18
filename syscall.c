@@ -544,6 +544,10 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 		if (opts->data.flags & INJECT_F_RETVAL &&
 		    !arch_set_scno(tcp, -1))
 			tcp->flags |= TCB_TAMPERED;
+		if (opts->data.flags & INJECT_F_DELAY_ENTER)
+			delay_tcb(tcp, opts->data.delay_idx, true);
+		if (opts->data.flags & INJECT_F_DELAY_EXIT)
+			tcp->flags |= TCB_INJECT_DELAY_EXIT;
 	}
 
 	return 0;
@@ -552,6 +556,16 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 static long
 tamper_with_syscall_exiting(struct tcb *tcp)
 {
+	struct inject_opts *opts = tcb_inject_opts(tcp);
+	if (!opts)
+		return 0;
+
+	if (inject_delay_exit(tcp))
+		delay_tcb(tcp, opts->data.delay_idx, false);
+
+	if (!syscall_tampered(tcp))
+		return 0;
+
 	if (!syserror(tcp)) {
 		error_msg("Failed to tamper with process %d: got no error "
 			  "(return value %#" PRI_klx ")",
@@ -560,11 +574,7 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 		return 1;
 	}
 
-	struct inject_opts *opts = tcb_inject_opts(tcp);
 	bool update_tcb = false;
-
-	if (!opts)
-		return 0;
 
 	if (opts->data.rval >= 0) {
 		kernel_long_t u_rval = tcp->u_rval;
@@ -747,7 +757,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 int
 syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 {
-	if (syscall_tampered(tcp))
+	if (syscall_tampered(tcp) || inject_delay_exit(tcp))
 		tamper_with_syscall_exiting(tcp);
 
 	if (cflag) {
@@ -960,7 +970,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 void
 syscall_exiting_finish(struct tcb *tcp)
 {
-	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED);
+	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 }

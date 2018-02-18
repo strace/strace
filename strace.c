@@ -34,6 +34,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include "ptrace.h"
+#include <setjmp.h>
 #include <signal.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
@@ -171,6 +172,10 @@ static volatile sig_atomic_t interrupted;
 #else
 static volatile int interrupted;
 #endif
+
+static jmp_buf timer_jmp_buf;
+static sigset_t timer_set;
+static void timer_sighandler(int);
 
 #ifndef HAVE_STRERROR
 
@@ -1881,6 +1886,11 @@ init(int argc, char *argv[])
 		set_sighandler(SIGTERM, interactive ? interrupt : SIG_IGN, NULL);
 	}
 
+	sigemptyset(&timer_set);
+	sigaddset(&timer_set, SIGALRM);
+	sigprocmask(SIG_BLOCK, &timer_set, NULL);
+	set_sighandler(SIGALRM, timer_sighandler, NULL);
+
 	if (nprocs != 0 || daemonized_tracer)
 		startup_attach();
 
@@ -2228,16 +2238,55 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_BREAK;
 	}
 
+	if (sigsetjmp(timer_jmp_buf, 1)) {
+		/*
+		 * restart_delayed_tcbs() forwarded an error
+		 * from dispatch_event().
+		 */
+		return TE_BREAK;
+	}
+
+	/*
+	 * The window of opportunity to handle expirations
+	 * of the delay timer opens here.
+	 *
+	 * Unblock the signal handler for the delay timer
+	 * iff the delay timer is already created.
+	 */
+	if (is_delay_timer_created())
+		sigprocmask(SIG_UNBLOCK, &timer_set, NULL);
+
+	/*
+	 * If the delay timer has expired, then its expiration
+	 * has been handled already by the signal handler.
+	 *
+	 * If the delay timer expires during wait4(),
+	 * then the system call will be interrupted and
+	 * the expiration will be handled by the signal handler.
+	 */
 	pid = wait4(-1, pstatus, __WALL, (cflag ? &ru : NULL));
+	const int wait_errno = errno;
+
+	/*
+	 * The window of opportunity to handle expirations
+	 * of the delay timer closes here.
+	 *
+	 * Block the signal handler for the delay timer
+	 * iff the delay timer is already created.
+	 */
+	if (is_delay_timer_created())
+		sigprocmask(SIG_BLOCK, &timer_set, NULL);
+
 	if (pid < 0) {
-		if (errno == EINTR)
+		if (wait_errno == EINTR)
 			return TE_NEXT;
-		if (nprocs == 0 && errno == ECHILD)
+		if (nprocs == 0 && wait_errno == ECHILD)
 			return TE_BREAK;
 		/*
 		 * If nprocs > 0, ECHILD is not expected,
 		 * treat it as any other error here:
 		 */
+		errno = wait_errno;
 		perror_msg_and_die("wait4(__WALL)");
 	}
 
@@ -2495,12 +2544,79 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 	if (interrupted)
 		return false;
 
+	/* If the process is being delayed, do not ptrace_restart just yet */
+	if (syscall_delayed(current_tcp))
+		return true;
+
 	if (ptrace_restart(restart_op, current_tcp, restart_sig) < 0) {
 		/* Note: ptrace_restart emitted error message */
 		exit_code = 1;
 		return false;
 	}
 	return true;
+}
+
+static bool
+restart_delayed_tcb(struct tcb *const tcp)
+{
+	debug_func_msg("pid %d", tcp->pid);
+
+	tcp->flags &= ~TCB_DELAYED;
+
+	struct tcb *const prev_tcp = current_tcp;
+	current_tcp = tcp;
+	bool ret = dispatch_event(TE_RESTART, NULL, NULL);
+	current_tcp = prev_tcp;
+
+	return ret;
+}
+
+static bool
+restart_delayed_tcbs(void)
+{
+	struct tcb *tcp_next = NULL;
+	struct timespec ts_now;
+
+	clock_gettime(CLOCK_MONOTONIC, &ts_now);
+
+	for (size_t i = 0; i < tcbtabsize; i++) {
+		struct tcb *tcp = tcbtab[i];
+
+		if (tcp->pid && syscall_delayed(tcp)) {
+			if (ts_cmp(&ts_now, &tcp->delay_expiration_time) > 0) {
+				if (!restart_delayed_tcb(tcp))
+					return false;
+			} else {
+				/* Check whether this tcb is the next.  */
+				if (!tcp_next ||
+				    ts_cmp(&tcp_next->delay_expiration_time,
+					   &tcp->delay_expiration_time) > 0) {
+					tcp_next = tcp;
+				}
+			}
+		}
+	}
+
+	if (tcp_next)
+		arm_delay_timer(tcp_next);
+
+	return true;
+}
+
+/*
+ * As this signal handler does a lot of work that is not suitable
+ * for signal handlers, extra care must be taken to ensure that
+ * it is enabled only in those places where it's safe.
+ */
+static void
+timer_sighandler(int sig)
+{
+	int saved_errno = errno;
+
+	if (!restart_delayed_tcbs())
+		siglongjmp(timer_jmp_buf, 1);
+
+	errno = saved_errno;
 }
 
 #ifdef ENABLE_COVERAGE_GCOV

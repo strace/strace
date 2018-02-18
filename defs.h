@@ -173,11 +173,13 @@ typedef struct ioctlent {
 
 #define INJECT_F_SIGNAL 1
 #define INJECT_F_RETVAL 2
+#define INJECT_F_DELAY_ENTER 4
+#define INJECT_F_DELAY_EXIT 8
 
 struct inject_data {
 	uint8_t flags;		/* only 2 of 8 flags are used so far */
 	uint8_t signo;		/* NSIG <= 128 */
-	uint16_t reserved;
+	uint16_t delay_idx;	/* index in delay_data_vec */
 	kernel_long_t rval;
 };
 
@@ -213,6 +215,7 @@ struct tcb {
 	struct timespec stime;	/* System time usage as of last process wait */
 	struct timespec dtime;	/* Delta for system time usage */
 	struct timespec etime;	/* Syscall entry time */
+	struct timespec delay_expiration_time; /* When does the delay end */
 
 	struct mmap_cache_t *mmap_cache;
 	unsigned int mmap_cache_size;
@@ -250,6 +253,9 @@ struct tcb {
 				 * in the middle of a syscall */
 #define TCB_RECOVERING	0x400	/* We try to recover after detecting incorrect
 				 * syscall entering/exiting state */
+#define TCB_INJECT_DELAY_EXIT	0x800	/* Current syscall needs to be delayed
+					   on exit */
+#define TCB_DELAYED	0x1000	/* Current syscall has been delayed */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -272,6 +278,8 @@ struct tcb {
 #define hide_log(tcp)	((tcp)->flags & TCB_HIDE_LOG)
 #define syscall_tampered(tcp)	((tcp)->flags & TCB_TAMPERED)
 #define recovering(tcp)	((tcp)->flags & TCB_RECOVERING)
+#define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
+#define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
 
 #include "xlat.h"
 
@@ -1015,6 +1023,12 @@ extern unsigned nioctlents;
 extern const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES];
 extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
 extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
+
+uint16_t alloc_delay_data(void);
+void fill_delay_data(uint16_t delay_idx, int intval, bool isenter);
+bool is_delay_timer_created(void);
+void arm_delay_timer(const struct tcb *);
+void delay_tcb(struct tcb *, uint16_t delay_idx, bool isenter);
 
 #ifdef IN_MPERS_BOOTSTRAP
 /* Transform multi-line MPERS_PRINTER_DECL statements to one-liners.  */

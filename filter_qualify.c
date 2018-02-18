@@ -79,6 +79,26 @@ find_errno_by_name(const char *name)
 }
 
 static bool
+parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
+{
+       unsigned flag = isenter ? INJECT_F_DELAY_ENTER : INJECT_F_DELAY_EXIT;
+
+       if (fopts->data.flags & flag) /* duplicate */
+               return false;
+       long long intval = string_to_ulonglong(input);
+       if (intval < 0) /* couldn't parse */
+               return false;
+
+       if (fopts->data.delay_idx == (uint16_t) -1)
+               fopts->data.delay_idx = alloc_delay_data();
+       /* populate .ts_enter or .ts_exit */
+       fill_delay_data(fopts->data.delay_idx, intval, isenter);
+       fopts->data.flags |= flag;
+
+       return true;
+}
+
+static bool
 parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		   const bool fault_tokens_only)
 {
@@ -157,6 +177,14 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			return false;
 		fopts->data.signo = intval;
 		fopts->data.flags |= INJECT_F_SIGNAL;
+	} else if (!fault_tokens_only
+		&& (val = STR_STRIP_PREFIX(token, "delay_enter=")) != token) {
+		if (!parse_delay_token(val, fopts, true))
+			return false;
+	} else if (!fault_tokens_only
+		&& (val = STR_STRIP_PREFIX(token, "delay_exit=")) != token) {
+		if (!parse_delay_token(val, fopts, false))
+			return false;
 	} else {
 		return false;
 	}
@@ -247,7 +275,10 @@ qualify_inject_common(const char *const str,
 {
 	struct inject_opts opts = {
 		.first = 1,
-		.step = 1
+		.step = 1,
+		.data = {
+			.delay_idx = -1
+		}
 	};
 	char *copy = xstrdup(str);
 	const char *name =
@@ -261,7 +292,7 @@ qualify_inject_common(const char *const str,
 
 	free(copy);
 
-	/* If neither of retval, error, or signal is specified, then ... */
+	/* If neither of retval, error, signal or delay is specified, then ... */
 	if (!opts.data.flags) {
 		if (fault_tokens_only) {
 			/* in fault= syntax the default error code is ENOSYS. */

@@ -584,14 +584,16 @@ Note that this is independent from the normal tracing of the
 system call which is controlled by the option
 .BR -e "\ " trace = write .
 .TP
-\fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBdelay_enter\fR=\,\fIusecs\/\fR][:\fBdelay_exit\fR=\,\fIusecs\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.
 
 At least one of
 .BR error ,
 .BR retval ,
+.BR signal ,
+.BR delay_enter ,
 or
-.B signal
+.B delay_exit
 options has to be specified.
 .B error
 and
@@ -618,14 +620,24 @@ or a numeric value within 1..\fBSIGRTMAX\fR range,
 that signal is delivered on entering every syscall specified by the
 .IR set .
 
+If :\fBdelay_enter\fR=\,\fIusecs\/\fR or :\fBdelay_exit\fR=\,\fIusecs\/\fR
+options are specified, delay injection is performed: the tracee is delayed
+by at least
+.IR usecs
+microseconds on entering or exiting the syscall.
+
 If :\fBsignal\fR=\,\fIsig\/\fR option is specified without
-:\fBerror\fR=\,\fIerrno\/\fR or :\fBretval\fR=\,\fIvalue\/\fR options,
+:\fBerror\fR=\,\fIerrno\/\fR, :\fBretval\fR=\,\fIvalue\/\fR or
+:\fBdelay_{enter,exit}\fR=\,\fIusecs\/\fR options,
 then only a signal
 .I sig
-is delivered without a syscall fault injection.
+is delivered without a syscall fault or delay injection.
 Conversely, :\fBerror\fR=\,\fIerrno\/\fR or
 :\fBretval\fR=\,\fIvalue\/\fR option without
-:\fBsignal\fR=\,\fIsig\/\fR option injects a fault without delivering a signal.
+:\fBdelay_enter\fR=\,\fIusecs\/\fR,
+:\fBdelay_exit\fR=\,\fIusecs\/\fR or
+:\fBsignal\fR=\,\fIsig\/\fR options injects a fault without delivering a signal
+or injecting a delay, etc.
 
 If both :\fBerror\fR=\,\fIerrno\/\fR or :\fBretval\fR=\,\fIvalue\/\fR
 and :\fBsignal\fR=\,\fIsig\/\fR options are specified, then both

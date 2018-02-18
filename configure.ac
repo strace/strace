@@ -810,6 +810,16 @@ fi
 AC_SUBST(dl_LIBS)
 
 saved_LIBS="$LIBS"
+AC_SEARCH_LIBS([timer_create], [rt])
+LIBS="$saved_LIBS"
+case "$ac_cv_search_timer_create" in
+	no) AC_MSG_FAILURE([failed to find timer_create]) ;;
+	-l*) timer_LIBS="$ac_cv_search_timer_create" ;;
+	*) timer_LIBS= ;;
+esac
+AC_SUBST(timer_LIBS)
+
+saved_LIBS="$LIBS"
 AC_SEARCH_LIBS([clock_gettime], [rt])
 LIBS="$saved_LIBS"
 case "$ac_cv_search_clock_gettime" in
