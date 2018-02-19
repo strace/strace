@@ -13,8 +13,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     in brackets.
   * Enhanced NETLINK_ROUTE protocol decoding.
   * Updated lists of signal codes.
-  * Updated lists of ETH_P_*, INET_DIAG_BC_*, POLL*, RWF_*, SCHED_FLAG_*, and
-    SCTP_* constants.
+  * Updated lists of BTN_*, ETH_P_*, INET_DIAG_BC_*, KEY_*, POLL*, RWF_*,
+    SCHED_FLAG_*, and SCTP_* constants.
   * Implemented block/character device number printing in -yy mode.
   * Known pixel/SDR format names are printed as comments for pixelformat fields
     in v4l2 structures.
