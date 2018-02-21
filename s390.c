@@ -451,18 +451,6 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 	} while (0)
 
 
-static bool
-is_filled(char *ptr, char fill, size_t size)
-{
-	while (size--)
-		if (*ptr++ != fill)
-			return false;
-
-	return true;
-}
-
-#define IS_ZERO(arr_) \
-	is_filled(arr_, '\0', sizeof(arr_) + MUST_BE_ARRAY(arr_))
 #define IS_BLANK(arr_) /* 0x40 is space in EBCDIC */ \
 	is_filled(arr_, '\x40', sizeof(arr_) + MUST_BE_ARRAY(arr_))
 
@@ -541,13 +529,13 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 		if (name_val || hdr->infmname)
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmname);
 
-		if (id_val || !IS_ZERO(hdr->infmtype))
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmtype))
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmtype);
-		if (id_val || !IS_ZERO(hdr->infmmanu))
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmmanu))
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmmanu);
-		if (id_val || !IS_ZERO(hdr->infmseq))
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmseq))
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmseq);
-		if (id_val || !IS_ZERO(hdr->infmpman))
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmpman))
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmpman);
 
 		PRINT_UNKNOWN_TAIL(hdr, size);
@@ -615,10 +603,10 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 	if (cnt_val || hdr->infpdifl)
 		PRINT_FIELD_U(", ", *hdr, infpdifl);
 
-	if (!abbrev(tcp) && !IS_ZERO(hdr->reserved_1__))
+	if (!abbrev(tcp) && !IS_ARRAY_ZERO(hdr->reserved_1__))
 		PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
 
-	if (id_val || !IS_ZERO(hdr->infppnam))
+	if (id_val || !IS_ARRAY_ZERO(hdr->infppnam))
 		PRINT_FIELD_EBCDIC(", ", *hdr, infppnam);
 
 	if (!abbrev(tcp)) {
@@ -631,7 +619,7 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 		if (acap_val || hdr->infpabif)
 			PRINT_FIELD_WEIGHT(", ", *hdr, infpabif);
 
-		if (!IS_ZERO(hdr->infplgnm)) {
+		if (!IS_ARRAY_ZERO(hdr->infplgnm)) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infplgnm);
 
 			PRINT_FIELD_WEIGHT(", ", *hdr, infplgcp);
@@ -693,7 +681,7 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 			tprints_comment("unknown hypervisor type");
 		}
 
-		if (!IS_ZERO(hdr->reserved_1__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_1__))
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
 
 		if (mt || hdr->infycpt)
@@ -792,7 +780,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			tprints_comment("unknown");
 		}
 
-		if (!IS_ZERO(hdr->reserved_1__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_1__))
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
 	}
 
@@ -817,7 +805,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			tprints_comment("unknown");
 		}
 
-		if (!IS_ZERO(hdr->reserved_2__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_2__))
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_2__);
 	}
 
@@ -855,7 +843,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			hdr->infgpflg & 0x07 ? " - ???" : "");
 
 	if (!abbrev(tcp)) {
-		if (!IS_ZERO(hdr->reserved_3__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_3__))
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_3__);
 
 		if (!IS_BLANK(hdr->infgpnam))
@@ -946,7 +934,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	if (hdr->infhval2) /* Reserved */
 		PRINT_FIELD_0X(", ", *hdr, infhval2);
 
-	if (!IS_ZERO(hdr->reserved_1__))
+	if (!IS_ARRAY_ZERO(hdr->reserved_1__))
 		PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
 
 	PRINT_FIELD_U(", ", *hdr, infhygct);

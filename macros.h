@@ -28,6 +28,9 @@
 #ifndef STRACE_MACROS_H
 #define STRACE_MACROS_H
 
+#include <stdbool.h>
+#include <sys/types.h>
+
 #include "gcc_compat.h"
 
 #define ARRAY_SIZE(a_)	(sizeof(a_) / sizeof((a_)[0]) + MUST_BE_ARRAY(a_))
@@ -47,5 +50,18 @@
 # define offsetofend(type_, member_)	\
 	(offsetof(type_, member_) + sizeof(((type_ *)0)->member_))
 #endif
+
+static inline bool
+is_filled(const char *ptr, char fill, size_t size)
+{
+	while (size--)
+		if (*ptr++ != fill)
+			return false;
+
+	return true;
+}
+
+#define IS_ARRAY_ZERO(arr_)	\
+	is_filled((const char *) (arr_), 0, sizeof(arr_) + MUST_BE_ARRAY(arr_))
 
 #endif /* !STRACE_MACROS_H */
