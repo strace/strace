@@ -11,6 +11,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * IPv6 addresses shown in socket information in -yy mode are now printed
     in brackets.
+  * Enhanced decoding of ptrace syscall.
   * Enhanced NETLINK_ROUTE protocol decoding.
   * Updated lists of signal codes.
   * Updated lists of BPF_*, BTN_*, ETH_P_*, INET_DIAG_BC_*, KEY_*, POLL*, RWF_*,

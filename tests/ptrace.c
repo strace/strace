@@ -33,7 +33,9 @@
 
 #include <errno.h>
 #include "ptrace.h"
+#include <inttypes.h>
 #include <signal.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -177,6 +179,8 @@ main(void)
 	const unsigned long pid =
 		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
 
+	uint64_t *filter_off = tail_alloc(sizeof(*filter_off));
+
 	const unsigned int sigset_size = get_sigset_size();
 
 	void *const k_set = tail_alloc(sigset_size);
@@ -245,6 +249,22 @@ main(void)
 	do_ptrace(PTRACE_SECCOMP_GET_FILTER, pid, 42, 0);
 	printf("ptrace(PTRACE_SECCOMP_GET_FILTER, %u, 42, NULL) = %s\n",
 	       (unsigned) pid, errstr);
+
+	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data, 0);
+	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %u, %lu, NULL) = %s\n",
+	       (unsigned) pid, bad_data, errstr);
+
+	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, 7,
+		  (unsigned long) filter_off);
+	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %u, 7, %p) = %s\n",
+	       (unsigned) pid, filter_off, errstr);
+
+	*filter_off = 0xfacefeeddeadc0deULL;
+	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data,
+		  (unsigned long) filter_off);
+	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %u, %lu, "
+	       "{filter_off=%" PRIu64 "}) = %s\n",
+	       (unsigned) pid, bad_data, *filter_off, errstr);
 
 	do_ptrace(PTRACE_GETEVENTMSG, pid, bad_request, bad_data);
 	printf("ptrace(PTRACE_GETEVENTMSG, %u, %#lx, %#lx) = %s\n",

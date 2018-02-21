@@ -122,6 +122,7 @@ SYS_FUNC(ptrace)
 		case PTRACE_GETSIGMASK:
 		case PTRACE_SETSIGMASK:
 		case PTRACE_SECCOMP_GET_FILTER:
+		case PTRACE_SECCOMP_GET_METADATA:
 			tprintf(", %" PRI_klu, addr);
 			break;
 		case PTRACE_PEEKSIGINFO: {
@@ -204,6 +205,21 @@ SYS_FUNC(ptrace)
 		case PTRACE_SETREGSET:
 			tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
 			break;
+		case PTRACE_SECCOMP_GET_METADATA:
+			if (verbose(tcp)) {
+				uint64_t filter_off;
+				if (addr < sizeof(filter_off) ||
+				    umove(tcp, data, &filter_off)) {
+					printaddr(data);
+					return RVAL_DECODED;
+				}
+
+				tprintf("{filter_off=%" PRIu64, filter_off);
+				return 0;
+			}
+
+			printaddr(data);
+			break;
 #ifndef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
@@ -253,6 +269,32 @@ SYS_FUNC(ptrace)
 		case PTRACE_SECCOMP_GET_FILTER:
 			print_seccomp_fprog(tcp, data, tcp->u_rval);
 			break;
+		case PTRACE_SECCOMP_GET_METADATA: {
+			const size_t offset = sizeof(uint64_t);
+			uint64_t flags = 0;
+			size_t ret_size = MIN((kernel_ulong_t) tcp->u_rval,
+					      offset + sizeof(flags));
+
+			if (syserror(tcp) || ret_size <= offset) {
+				tprints("}");
+				return 0;
+			}
+
+			if (umoven(tcp, data + offset, ret_size - offset,
+				   &flags)) {
+				tprints(", ...}");
+				return 0;
+			}
+
+			tprints(", flags=");
+			printflags64(seccomp_filter_flags, flags,
+				     "SECCOMP_FILTER_FLAG_???");
+
+			if ((kernel_ulong_t) tcp->u_rval > ret_size)
+				tprints(", ...");
+
+			tprints("}");
+		}
 		}
 	}
 	return 0;
