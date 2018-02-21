@@ -922,7 +922,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			tprintf("inum=%" PRI__u64 ", size=%" PRI__u64,
 				args.inum, args.size);
-			tprintf(", fspath=0x%" PRI__x64 "}", args.fspath);
+			tprints(", fspath=");
+			printaddr64(args.fspath);
+			tprints("}");
 			return 0;
 		}
 
@@ -951,7 +953,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			tprintf("logical=%" PRI__u64 ", size=%" PRI__u64,
 				args.logical, args.size);
-			tprintf(", inodes=0x%" PRI__x64 "}", args.inodes);
+			tprints(", inodes=");
+			printaddr64(args.inodes);
+			tprints("}");
 			return 0;
 		}
 

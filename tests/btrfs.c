@@ -1160,7 +1160,7 @@ btrfs_test_ino_path_ioctls(void)
 	struct btrfs_ioctl_ino_path_args args = {
 		.inum = 256,
 		.size = sizeof(buf),
-		.fspath = (unsigned long)buf,
+		.fspath = 0,
 	};
 
 	ioctl(-1, BTRFS_IOC_INO_PATHS, NULL);
@@ -1172,9 +1172,23 @@ btrfs_test_ino_path_ioctls(void)
 	ioctl(-1, BTRFS_IOC_INO_PATHS, &args);
 	printf("ioctl(-1, BTRFS_IOC_INO_PATHS, "
 	       "{inum=%" PRI__u64", size=%" PRI__u64
+	       ", fspath=NULL}) = -1 EBADF (%m)\n",
+	       args.inum, args.size);
+
+	args.fspath = (uintptr_t) buf;
+	ioctl(-1, BTRFS_IOC_INO_PATHS, &args);
+	printf("ioctl(-1, BTRFS_IOC_INO_PATHS, "
+	       "{inum=%" PRI__u64", size=%" PRI__u64
 	       ", fspath=0x%" PRI__x64 "}) = -1 EBADF (%m)\n",
 	       args.inum, args.size, args.fspath);
 
+	args.fspath = 0;
+	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
+	printf("ioctl(-1, BTRFS_IOC_LOGICAL_INO, {logical=%" PRI__u64
+	       ", size=%" PRI__u64", inodes=NULL}) = -1 EBADF (%m)\n",
+	       args.inum, args.size);
+
+	args.fspath = (uintptr_t) buf;
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
 	printf("ioctl(-1, BTRFS_IOC_LOGICAL_INO, {logical=%" PRI__u64
 	       ", size=%" PRI__u64", inodes=0x%" PRI__x64
