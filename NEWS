@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Bug fixes
+  * Fixed build on m68k.
+
 Noteworthy changes in release 4.21 (2018-02-13)
 ===============================================
 

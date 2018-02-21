@@ -436,7 +436,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/ipc.h
 	sys/msg.h
 	sys/quota.h
-	sys/reg.h
 	sys/sem.h
 	sys/shm.h
 	sys/signalfd.h
