@@ -955,6 +955,15 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprintf("logical=%" PRI__u64 ", size=%" PRI__u64,
 				args.logical, args.size);
 
+			if (!IS_ARRAY_ZERO(args.reserved)) {
+				tprints(", reserved=[");
+				for (size_t i = 0; i < 3; ++i)
+					tprintf("%s%#" PRI__x64,
+						i ? ", " : "",
+						args.reserved[i]);
+				tprints("]");
+			}
+
 			tprintf(", flags=");
 			printflags64(btrfs_logical_ino_args_flags,
 #ifdef HAVE_STRUCT_BTRFS_IOCTL_LOGICAL_INO_ARGS_FLAGS
