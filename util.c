@@ -228,12 +228,18 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 }
 
 void
-printaddr(const kernel_ulong_t addr)
+printaddr64(const uint64_t addr)
 {
 	if (!addr)
 		tprints("NULL");
 	else
-		tprintf("%#" PRI_klx, addr);
+		tprintf("%#" PRIx64, addr);
+}
+
+void
+printaddr(const kernel_ulong_t addr)
+{
+	printaddr64(addr);
 }
 
 #define DEF_PRINTNUM(name, type) \
@@ -258,7 +264,7 @@ printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr)	\
 	if (umove_or_printaddr(tcp, addr, &num))			\
 		return false;						\
 	tprints("[");							\
-	printaddr(num);							\
+	printaddr64(num);						\
 	tprints("]");							\
 	return true;							\
 }
