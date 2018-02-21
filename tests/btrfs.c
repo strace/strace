@@ -1163,6 +1163,14 @@ btrfs_test_ino_path_ioctls(void)
 		.fspath = 0,
 	};
 
+#ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
+	args.flags =
+#else
+	args.reserved[3] =
+#endif
+			0xdeadc0defacefeeeULL;
+
+
 	ioctl(-1, BTRFS_IOC_INO_PATHS, NULL);
 	printf("ioctl(-1, BTRFS_IOC_INO_PATHS, NULL) = -1 EBADF (%m)\n");
 
@@ -1185,13 +1193,36 @@ btrfs_test_ino_path_ioctls(void)
 	args.fspath = 0;
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
 	printf("ioctl(-1, BTRFS_IOC_LOGICAL_INO, {logical=%" PRI__u64
-	       ", size=%" PRI__u64", inodes=NULL}) = -1 EBADF (%m)\n",
+	       ", size=%" PRI__u64
+	       ", flags=0xdeadc0defacefeee /* BTRFS_LOGICAL_INO_ARGS_??? */"
+	       ", inodes=NULL}) = -1 EBADF (%m)\n",
 	       args.inum, args.size);
 
 	args.fspath = (uintptr_t) buf;
+#ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
+	args.flags =
+#else
+	args.reserved[3] =
+#endif
+			1;
+
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
 	printf("ioctl(-1, BTRFS_IOC_LOGICAL_INO, {logical=%" PRI__u64
-	       ", size=%" PRI__u64", inodes=0x%" PRI__x64
+	       ", size=%" PRI__u64
+	       ", flags=BTRFS_LOGICAL_INO_ARGS_IGNORE_OFFSET"
+	       ", inodes=0x%" PRI__x64 "}) = -1 EBADF (%m)\n",
+	       args.inum, args.size, args.fspath);
+
+#ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
+	args.flags =
+#else
+	args.reserved[3] =
+#endif
+			0;
+
+	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
+	printf("ioctl(-1, BTRFS_IOC_LOGICAL_INO, {logical=%" PRI__u64
+	       ", size=%" PRI__u64", flags=0, inodes=0x%" PRI__x64
 	       "}) = -1 EBADF (%m)\n", args.inum, args.size, args.fspath);
 
 #ifdef HAVE_LINUX_FIEMAP_H
@@ -1287,7 +1318,7 @@ btrfs_test_ino_path_ioctls(void)
 
 		args.inum = fiemap->fm_extents[0].fe_physical;
 		printf("ioctl(%d, BTRFS_IOC_LOGICAL_INO, {logical=%" PRI__u64
-		       ", size=%" PRI__u64", inodes=0x%" PRI__x64"}",
+		       ", size=%" PRI__u64", flags=0, inodes=0x%" PRI__x64"}",
 		       fd, args.inum, args.size, args.fspath);
 		ioctl(fd, BTRFS_IOC_LOGICAL_INO, &args);
 		printf(" => {inodes={bytes_left=%u, bytes_missing=%u, elem_cnt=%u, elem_missed=%u, val=",
