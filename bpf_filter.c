@@ -34,6 +34,7 @@
 #include "bpf_fprog.h"
 
 #include <linux/filter.h>
+
 #include "xlat/bpf_class.h"
 #include "xlat/bpf_miscop.h"
 #include "xlat/bpf_mode.h"
@@ -43,56 +44,84 @@
 #include "xlat/bpf_size.h"
 #include "xlat/bpf_src.h"
 
-static void
-print_bpf_filter_code(const uint16_t code)
+#include "xlat/ebpf_class.h"
+#include "xlat/ebpf_mode.h"
+#include "xlat/ebpf_op_alu.h"
+#include "xlat/ebpf_op_jmp.h"
+#include "xlat/ebpf_size.h"
+
+void
+print_bpf_filter_code(const uint16_t code, bool extended)
 {
+	const struct xlat *class = extended ? ebpf_class : bpf_class;
+	const struct xlat *mode = extended ? ebpf_mode : bpf_mode;
+
 	uint16_t i = code & ~BPF_CLASS(code);
 
-	printxval(bpf_class, BPF_CLASS(code), "BPF_???");
+	printxval(class, BPF_CLASS(code), "BPF_???");
 	switch (BPF_CLASS(code)) {
+	case BPF_ST:
+	case BPF_STX:
+		if (!extended) {
+			if (i) {
+				tprintf("|%#x", i);
+				tprints_comment("BPF_???");
+			}
+			break;
+		}
+		ATTRIBUTE_FALLTHROUGH; /* extended == true */
+
 	case BPF_LD:
 	case BPF_LDX:
 		tprints("|");
-		printxval(bpf_size, BPF_SIZE(code), "BPF_???");
+		printxvals(BPF_SIZE(code), "BPF_???",
+			   bpf_size, extended ? ebpf_size : NULL, NULL);
 		tprints("|");
-		printxval(bpf_mode, BPF_MODE(code), "BPF_???");
+		printxval(mode, BPF_MODE(code), "BPF_???");
 		break;
-	case BPF_ST:
-	case BPF_STX:
-		if (i) {
-			tprintf("|%#x", i);
-			tprints_comment("BPF_???");
+
+	case BPF_MISC: /* BPF_ALU64 in eBPF */
+		if (!extended) {
+			tprints("|");
+			printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
+			i &= ~BPF_MISCOP(code);
+			if (i) {
+				tprintf("|%#x", i);
+				tprints_comment("BPF_???");
+			}
+			break;
 		}
-		break;
+		ATTRIBUTE_FALLTHROUGH; /* extended == true */
+
 	case BPF_ALU:
 		tprints("|");
 		printxval(bpf_src, BPF_SRC(code), "BPF_???");
 		tprints("|");
-		printxval(bpf_op_alu, BPF_OP(code), "BPF_???");
+		printxvals(BPF_OP(code), "BPF_???",
+			   bpf_op_alu,
+			   extended ? ebpf_op_alu : NULL, NULL);
 		break;
+
 	case BPF_JMP:
 		tprints("|");
 		printxval(bpf_src, BPF_SRC(code), "BPF_???");
 		tprints("|");
-		printxval(bpf_op_jmp, BPF_OP(code), "BPF_???");
+		printxvals(BPF_OP(code), "BPF_???",
+			   bpf_op_jmp, extended ? ebpf_op_jmp : NULL, NULL);
 		break;
-	case BPF_RET:
-		tprints("|");
-		printxval(bpf_rval, BPF_RVAL(code), "BPF_???");
-		i &= ~BPF_RVAL(code);
+
+	case BPF_RET: /* Reserved in eBPF */
+		if (!extended) {
+			tprints("|");
+			printxval(bpf_rval, BPF_RVAL(code), "BPF_???");
+			i &= ~BPF_RVAL(code);
+		}
+
 		if (i) {
 			tprintf("|%#x", i);
 			tprints_comment("BPF_???");
 		}
-		break;
-	case BPF_MISC:
-		tprints("|");
-		printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
-		i &= ~BPF_MISCOP(code);
-		if (i) {
-			tprintf("|%#x", i);
-			tprints_comment("BPF_???");
-		}
+
 		break;
 	}
 }
@@ -102,7 +131,7 @@ print_bpf_filter_stmt(const struct bpf_filter_block *const filter,
 		      const print_bpf_filter_fn print_k)
 {
 	tprints("BPF_STMT(");
-	print_bpf_filter_code(filter->code);
+	print_bpf_filter_code(filter->code, false);
 	tprints(", ");
 	if (!print_k || !print_k(filter))
 		tprintf("%#x", filter->k);
@@ -113,7 +142,7 @@ static void
 print_bpf_filter_jump(const struct bpf_filter_block *const filter)
 {
 	tprints("BPF_JUMP(");
-	print_bpf_filter_code(filter->code);
+	print_bpf_filter_code(filter->code, false);
 	tprintf(", %#x, %#x, %#x)", filter->k, filter->jt, filter->jf);
 }
 
