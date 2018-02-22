@@ -375,8 +375,7 @@ print_BPF_PROG_LOAD_first(const unsigned long addr)
 {
 
 	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=0, insns=0"
-	       ", license=NULL, log_level=0, log_size=0, log_buf=0"
-	       ", kern_version=KERNEL_VERSION(0, 0, 0), prog_flags=0");
+	       ", license=NULL");
 }
 
 static const struct bpf_insn insns[] = {
