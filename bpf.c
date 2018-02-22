@@ -33,6 +33,7 @@
 #ifdef HAVE_LINUX_BPF_H
 # include <linux/bpf.h>
 #endif
+#include <linux/filter.h>
 
 #include "bpf_attr.h"
 
@@ -46,6 +47,7 @@
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
 #include "xlat/bpf_query_flags.h"
+#include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
 /** Storage for all the data that is needed to be stored on entering. */
@@ -124,6 +126,61 @@ decode_attr_extra_data(struct tcb *const tcp,
 	}
 
 	return 0;
+}
+
+struct ebpf_insn {
+	uint8_t code;
+	uint8_t dst_reg:4;
+	uint8_t src_reg:4;
+	int16_t off;
+	int32_t imm;
+};
+
+struct ebpf_insns_data {
+	unsigned int count;
+};
+
+static bool
+print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
+		const size_t elem_size, void * const data)
+{
+	struct ebpf_insns_data *eid = data;
+	struct ebpf_insn *insn = elem_buf;
+
+	if (eid->count++ >= BPF_MAXINSNS) {
+		tprints("...");
+		return false;
+	}
+
+	tprints("{code=");
+	print_bpf_filter_code(insn->code, true);
+
+	/* We can't use PRINT_FIELD_XVAL on bit fields */
+	tprints(", dst_reg=");
+	printxval_index(ebpf_regs, insn->dst_reg, "BPF_REG_???");
+	tprints(", src_reg=");
+	printxval_index(ebpf_regs, insn->src_reg, "BPF_REG_???");
+
+	PRINT_FIELD_D(", ", *insn, off);
+	PRINT_FIELD_X(", ", *insn, imm);
+	tprints("}");
+
+	return true;
+}
+
+void
+print_ebpf_prog(struct tcb *const tcp, const kernel_ulong_t addr,
+		const uint32_t len)
+{
+	if (abbrev(tcp)) {
+		printaddr(addr);
+	} else {
+		struct ebpf_insns_data eid = {};
+		struct ebpf_insn insn;
+
+		print_array(tcp, addr, len, &insn, sizeof(insn),
+			    umoven_or_printaddr, print_ebpf_insn, &eid);
+	}
 }
 
 BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
@@ -223,7 +280,9 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	PRINT_FIELD_XVAL_INDEX("{", attr, prog_type, bpf_prog_types,
 			       "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
-	PRINT_FIELD_ADDR64(", ", attr, insns);
+	tprints(", insns=");
+	print_big_u64_addr(attr.insns);
+	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt);
 
 	tprintf(", license=");
 	print_big_u64_addr(attr.license);

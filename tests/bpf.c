@@ -476,11 +476,27 @@ static const struct bpf_attr_check BPF_MAP_GET_NEXT_KEY_checks[] = {
 };
 
 static const struct bpf_insn insns[] = {
-	{ .code = 0x95 }
+	{
+		.code = 0x95,
+		.dst_reg = 10,
+		.src_reg = 11,
+		.off = 0xdead,
+		.imm = 0xbadc0ded,
+	},
 };
 static const char license[] = "GPL";
 static char log_buf[4096];
 static const char pathname[] = "/sys/fs/bpf/foo/bar";
+
+#if VERBOSE
+# define INSNS_FMT \
+	"[{code=BPF_JMP|BPF_K|BPF_EXIT, dst_reg=BPF_REG_10" \
+	", src_reg=0xb /* BPF_REG_??? */, off=%d, imm=%#x}]"
+# define INSNS_ARG insns[0].off, insns[0].imm
+#else
+# define INSNS_FMT "%p"
+# define INSNS_ARG insns
+#endif
 
 static void
 init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check)
@@ -494,13 +510,13 @@ init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check)
 static void
 print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check, unsigned long addr)
 {
-	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u, insns=%p"
-	       ", license=\"%s\", log_level=2718281828, log_size=4096"
-	       ", log_buf=%p, kern_version=KERNEL_VERSION(51966, 240, 13)"
+	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u"
+	       ", insns=" INSNS_FMT ", license=\"%s\", log_level=2718281828"
+	       ", log_size=4096, log_buf=%p"
+	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
 	       ", prog_flags=0x2 /* BPF_F_??? */"
 	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=3203399405",
-	       (unsigned int) ARRAY_SIZE(insns), insns,
-	       license, log_buf);
+	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG, license, log_buf);
 }
 
 static void
@@ -516,13 +532,13 @@ init_BPF_PROG_LOAD_attr4(struct bpf_attr_check *check)
 static void
 print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr)
 {
-	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=%u, insns=%p"
+	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=%u, insns=" INSNS_FMT
 	       ", license=\"%s\", log_level=2718281828, log_size=4096"
 	       ", log_buf=%p, kern_version=KERNEL_VERSION(51966, 240, 13)"
 	       ", prog_flags=BPF_F_STRICT_ALIGNMENT|0x2"
 	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=%s"
 	       ", expected_attach_type=BPF_CGROUP_INET6_BIND",
-	       (unsigned int) ARRAY_SIZE(insns), insns,
+	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG,
 	       license, log_buf, IFINDEX_LO_STR);
 }
 
@@ -567,7 +583,8 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
 		.str = "prog_type=BPF_PROG_TYPE_RAW_TRACEPOINT"
-		       ", insn_cnt=3134983661, insns=0xffffffff00000000"
+		       ", insn_cnt=3134983661"
+		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", log_level=2718281828, log_size=4096"
 		       ", log_buf=0xffffffff00000000"
