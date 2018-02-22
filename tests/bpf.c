@@ -376,7 +376,7 @@ print_BPF_PROG_LOAD_first(const unsigned long addr)
 
 	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=0, insns=0"
 	       ", license=NULL, log_level=0, log_size=0, log_buf=0"
-	       ", kern_version=0, prog_flags=0");
+	       ", kern_version=KERNEL_VERSION(0, 0, 0), prog_flags=0");
 }
 
 static const struct bpf_insn insns[] = {
@@ -411,9 +411,10 @@ print_BPF_PROG_LOAD_attr(const unsigned long addr)
 {
 	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u, insns=%p"
 	       ", license=\"GPL\", log_level=42, log_size=4096, log_buf=%p"
-	       ", kern_version=%u, prog_flags=BPF_F_STRICT_ALIGNMENT",
+	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
+	       ", prog_flags=BPF_F_STRICT_ALIGNMENT",
 	       (unsigned int) ARRAY_SIZE(insns), insns,
-	       log_buf, 0xcafef00d);
+	       log_buf);
 }
 
 # endif /* HAVE_UNION_BPF_ATTR_PROG_FLAGS */

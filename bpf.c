@@ -213,7 +213,10 @@ DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	PRINT_FIELD_U(", ", attr, log_level);
 	PRINT_FIELD_U(", ", attr, log_size);
 	PRINT_FIELD_X(", ", attr, log_buf);
-	PRINT_FIELD_U(", ", attr, kern_version);
+	tprintf(", kern_version=KERNEL_VERSION(%u, %u, %u)",
+		attr.kern_version >> 16,
+		(attr.kern_version >> 8) & 0xFF,
+		attr.kern_version & 0xFF);
 	PRINT_FIELD_FLAGS(", ", attr, prog_flags, bpf_prog_flags, "BPF_F_???");
 	decode_attr_extra_data(tcp, data, size, sizeof(attr));
 	tprints("}");
