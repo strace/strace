@@ -28,6 +28,14 @@
 #ifndef STRACE_BPF_ATTR_H
 #define STRACE_BPF_ATTR_H
 
+#ifndef BPF_OBJ_NAME_LEN
+# define BPF_OBJ_NAME_LEN 16U
+#else
+# if BPF_OBJ_NAME_LEN != 16U
+#  error "Unexpected value of BPF_OBJ_NAME_LEN"
+# endif
+#endif
+
 struct BPF_MAP_CREATE_struct {
 	uint32_t map_type;
 	uint32_t key_size;
@@ -92,11 +100,13 @@ struct BPF_PROG_LOAD_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) log_buf;
 	uint32_t kern_version;
 	uint32_t prog_flags;
+	char     prog_name[BPF_OBJ_NAME_LEN];
+	uint32_t prog_ifindex;
 };
 
 #define BPF_PROG_LOAD_struct_size \
-	sizeof(struct BPF_PROG_LOAD_struct)
-#define expected_BPF_PROG_LOAD_struct_size 48
+	offsetofend(struct BPF_PROG_LOAD_struct, prog_ifindex)
+#define expected_BPF_PROG_LOAD_struct_size 68
 
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;

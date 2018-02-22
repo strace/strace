@@ -334,7 +334,7 @@ static char log_buf[4096];
 static const char pathname[] = "/sys/fs/bpf/foo/bar";
 
 static void
-init_BPF_PROG_LOAD_attr(struct bpf_attr_check *check)
+init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check)
 {
 	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
 	attr->insns = (uintptr_t) insns;
@@ -343,14 +343,37 @@ init_BPF_PROG_LOAD_attr(struct bpf_attr_check *check)
 }
 
 static void
-print_BPF_PROG_LOAD_attr(const struct bpf_attr_check *check, unsigned long addr)
+print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check, unsigned long addr)
 {
 	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u, insns=%p"
-	       ", license=\"%s\", log_level=42, log_size=4096, log_buf=%p"
-	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
-	       ", prog_flags=BPF_F_STRICT_ALIGNMENT",
+	       ", license=\"%s\", log_level=2718281828, log_size=4096"
+	       ", log_buf=%p, kern_version=KERNEL_VERSION(51966, 240, 13)"
+	       ", prog_flags=0x2 /* BPF_F_??? */"
+	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=3203399405",
 	       (unsigned int) ARRAY_SIZE(insns), insns,
 	       license, log_buf);
+}
+
+static void
+init_BPF_PROG_LOAD_attr4(struct bpf_attr_check *check)
+{
+	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
+	attr->insns = (uintptr_t) insns;
+	attr->license = (uintptr_t) license;
+	attr->log_buf = (uintptr_t) log_buf;
+	attr->prog_ifindex = ifindex_lo();
+}
+
+static void
+print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr)
+{
+	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=%u, insns=%p"
+	       ", license=\"%s\", log_level=2718281828, log_size=4096"
+	       ", log_buf=%p, kern_version=KERNEL_VERSION(51966, 240, 13)"
+	       ", prog_flags=BPF_F_STRICT_ALIGNMENT|0x2"
+	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=%s",
+	       (unsigned int) ARRAY_SIZE(insns), insns,
+	       license, log_buf, IFINDEX_LO_STR);
 }
 
 static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
@@ -360,19 +383,85 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		.str = "prog_type=BPF_PROG_TYPE_SOCKET_FILTER"
 		       ", insn_cnt=0, insns=0, license=NULL"
 	},
-	{
+	{ /* 1 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.prog_type = 16,
+			.insn_cnt = 0xbadc0ded,
+			.insns = 0,
+			.license = 0,
+			.log_level = 42,
+			.log_size = 3141592653U,
+			.log_buf = 0,
+			.kern_version = 0xcafef00d,
+			.prog_flags = 0,
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
+		.str = "prog_type=0x10 /* BPF_PROG_TYPE_??? */"
+		       ", insn_cnt=3134983661, insns=0, license=NULL"
+		       ", log_level=42, log_size=3141592653, log_buf=0"
+		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
+		       ", prog_flags=0",
+	},
+	{ /* 2 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.prog_type = 15,
+			.insn_cnt = 0xbadc0ded,
+			.insns = 0xffffffff00000000,
+			.license = 0xffffffff00000000,
+			.log_level = 2718281828U,
+			.log_size = sizeof(log_buf),
+			.log_buf = 0xffffffff00000000,
+			.kern_version = 0xcafef00d,
+			.prog_flags = 1,
+			.prog_name = "fedcba987654321",
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
+		.str = "prog_type=BPF_PROG_TYPE_CGROUP_DEVICE"
+		       ", insn_cnt=3134983661, insns=0xffffffff00000000"
+#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+		       ", license=0xffffffff00000000"
+#elif defined __arm__ || defined __i386__ || defined __mips__ || \
+      defined __powerpc__ || defined __riscv__ || defined __s390__ \
+      || defined __sparc__ || defined __tile__
+		       ", license=0xffffffff00000000 or NULL"
+#else
+		       ", license=NULL"
+#endif
+		       ", log_level=2718281828, log_size=4096"
+		       ", log_buf=0xffffffff00000000"
+		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
+		       ", prog_flags=BPF_F_STRICT_ALIGNMENT"
+		       ", prog_name=\"fedcba987654321\"",
+	},
+	{ /* 3 */
 		.data = { .BPF_PROG_LOAD_data = {
 			.prog_type = 1,
 			.insn_cnt = ARRAY_SIZE(insns),
-			.log_level = 42,
+			.log_level = 2718281828U,
 			.log_size = sizeof(log_buf),
 			.kern_version = 0xcafef00d,
-			.prog_flags = 1
+			.prog_flags = 2,
+			.prog_name = "0123456789abcdef",
+			.prog_ifindex = 0xbeeffeed,
 		} },
-		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.init_fn = init_BPF_PROG_LOAD_attr,
-		.print_fn = print_BPF_PROG_LOAD_attr
-	}
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_ifindex),
+		.init_fn = init_BPF_PROG_LOAD_attr3,
+		.print_fn = print_BPF_PROG_LOAD_attr3
+	},
+	{ /* 4 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.prog_type = 0,
+			.insn_cnt = ARRAY_SIZE(insns),
+			.log_level = 2718281828U,
+			.log_size = sizeof(log_buf),
+			.kern_version = 0xcafef00d,
+			.prog_flags = 3,
+			.prog_name = "0123456789abcdef",
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_ifindex),
+		.init_fn = init_BPF_PROG_LOAD_attr4,
+		.print_fn = print_BPF_PROG_LOAD_attr4
+	},
 };
 
 static void

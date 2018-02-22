@@ -194,6 +194,23 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_flags))
 		break;
 	PRINT_FIELD_FLAGS(", ", attr, prog_flags, bpf_prog_flags, "BPF_F_???");
+
+	/* prog_name field was added in Linux commit v4.15-rc1~84^2~605^2~4. */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_name))
+		break;
+	PRINT_FIELD_CSTRING_SZ(", ", attr, prog_name,
+			       MIN(sizeof(attr.prog_name),
+				   len - offsetof(struct BPF_PROG_LOAD_struct,
+						   prog_name)));
+
+	/*
+	 * prog_ifindex field was added as prog_target_ifindex in Linux commit
+	 * v4.15-rc1~84^2~127^2~13 and renamed to its current name in
+	 * v4.15-rc1~15^2~5^2~3^2~7.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_ifindex))
+		break;
+	PRINT_FIELD_IFINDEX(", ", attr, prog_ifindex);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
