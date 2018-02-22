@@ -49,50 +49,50 @@ print_bpf_filter_code(const uint16_t code)
 
 	printxval(bpf_class, BPF_CLASS(code), "BPF_???");
 	switch (BPF_CLASS(code)) {
-		case BPF_LD:
-		case BPF_LDX:
-			tprints("|");
-			printxval(bpf_size, BPF_SIZE(code), "BPF_???");
-			tprints("|");
-			printxval(bpf_mode, BPF_MODE(code), "BPF_???");
-			break;
-		case BPF_ST:
-		case BPF_STX:
-			if (i) {
-				tprintf("|%#x", i);
-				tprints_comment("BPF_???");
-			}
-			break;
-		case BPF_ALU:
-			tprints("|");
-			printxval(bpf_src, BPF_SRC(code), "BPF_???");
-			tprints("|");
-			printxval(bpf_op_alu, BPF_OP(code), "BPF_???");
-			break;
-		case BPF_JMP:
-			tprints("|");
-			printxval(bpf_src, BPF_SRC(code), "BPF_???");
-			tprints("|");
-			printxval(bpf_op_jmp, BPF_OP(code), "BPF_???");
-			break;
-		case BPF_RET:
-			tprints("|");
-			printxval(bpf_rval, BPF_RVAL(code), "BPF_???");
-			i &= ~BPF_RVAL(code);
-			if (i) {
-				tprintf("|%#x", i);
-				tprints_comment("BPF_???");
-			}
-			break;
-		case BPF_MISC:
-			tprints("|");
-			printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
-			i &= ~BPF_MISCOP(code);
-			if (i) {
-				tprintf("|%#x", i);
-				tprints_comment("BPF_???");
-			}
-			break;
+	case BPF_LD:
+	case BPF_LDX:
+		tprints("|");
+		printxval(bpf_size, BPF_SIZE(code), "BPF_???");
+		tprints("|");
+		printxval(bpf_mode, BPF_MODE(code), "BPF_???");
+		break;
+	case BPF_ST:
+	case BPF_STX:
+		if (i) {
+			tprintf("|%#x", i);
+			tprints_comment("BPF_???");
+		}
+		break;
+	case BPF_ALU:
+		tprints("|");
+		printxval(bpf_src, BPF_SRC(code), "BPF_???");
+		tprints("|");
+		printxval(bpf_op_alu, BPF_OP(code), "BPF_???");
+		break;
+	case BPF_JMP:
+		tprints("|");
+		printxval(bpf_src, BPF_SRC(code), "BPF_???");
+		tprints("|");
+		printxval(bpf_op_jmp, BPF_OP(code), "BPF_???");
+		break;
+	case BPF_RET:
+		tprints("|");
+		printxval(bpf_rval, BPF_RVAL(code), "BPF_???");
+		i &= ~BPF_RVAL(code);
+		if (i) {
+			tprintf("|%#x", i);
+			tprints_comment("BPF_???");
+		}
+		break;
+	case BPF_MISC:
+		tprints("|");
+		printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
+		i &= ~BPF_MISCOP(code);
+		if (i) {
+			tprintf("|%#x", i);
+			tprints_comment("BPF_???");
+		}
+		break;
 	}
 }
 
