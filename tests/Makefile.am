@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 OS = linux
+CC = @CC@
 ARCH = @arch@
 NATIVE_ARCH = @arch_native@
 SIZEOF_KERNEL_LONG_T = @SIZEOF_KERNEL_LONG_T@

@@ -1082,8 +1082,8 @@ mpers_NAME =
 mpers_PREFIX = $(mpers_NAME)_
 mpers_DEFS = $(DEFS)
 mpers_INCLUDES = $(DEFAULT_INCLUDES) $(INCLUDES)
-mpers_CPPFLAGS = $(strace_CPPFLAGS) $(CPPFLAGS)
-mpers_sh_opts = $(mpers_DEFS) $(mpers_INCLUDES) $(mpers_CPPFLAGS)
+mpers_CPPFLAGS = $(CPPFLAGS)
+mpers_sh_opts = $(mpers_DEFS) $(mpers_INCLUDES) $(strace_CPPFLAGS) $(mpers_CPPFLAGS)
 libmpers_CPPFLAGS = $(strace_CPPFLAGS) -DIN_MPERS
 libmpers_CFLAGS = $(strace_CFLAGS)
 
@@ -1093,11 +1093,11 @@ mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 	for f in $^; do \
 		D="$(D)" \
 		READELF="$(READELF)" \
-		CC="$(CC)" \
+		CC="$(mpers_CC)" \
 		CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
 		CPP="$(CPP)" \
 		CPPFLAGS="$(mpers_sh_opts) -DIN_MPERS -DMPERS_IS_$(mpers_NAME)" \
-		$(srcdir)/mpers.sh $(mpers_NAME) $(mpers_CC_FLAGS) $$f || exit; \
+		$(srcdir)/mpers.sh $(mpers_NAME) "$(mpers_CC_FLAGS)" $$f || exit; \
 	done
 	> $@
 
@@ -1168,7 +1168,9 @@ BUILT_SOURCES += $(mpers_m32_targets)
 CLEANFILES    += $(mpers_m32_targets)
 
 $(mpers_m32_targets): mpers_NAME = m32
-$(mpers_m32_targets): mpers_CC_FLAGS = @cc_flags_m32@
+$(mpers_m32_targets): mpers_CC_FLAGS = @CFLAGS_FOR_M32@ @cc_flags_m32@
+$(mpers_m32_targets): mpers_CPPFLAGS = @CPPFLAGS_FOR_M32@
+$(mpers_m32_targets): mpers_CC = @CC_FOR_M32@
 
 endif # HAVE_M32_MPERS
 
@@ -1185,7 +1187,9 @@ BUILT_SOURCES += $(mpers_mx32_targets)
 CLEANFILES    += $(mpers_mx32_targets)
 
 $(mpers_mx32_targets): mpers_NAME = mx32
-$(mpers_mx32_targets): mpers_CC_FLAGS = @cc_flags_mx32@
+$(mpers_mx32_targets): mpers_CC_FLAGS = @CFLAGS_FOR_MX32@ @cc_flags_mx32@
+$(mpers_mx32_targets): mpers_CPPFLAGS = @CPPFLAGS_FOR_MX32@
+$(mpers_mx32_targets): mpers_CC = @CC_FOR_MX32@
 
 endif # HAVE_MX32_MPERS
 
