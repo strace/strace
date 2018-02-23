@@ -62,7 +62,7 @@ AC_DEFUN([st_MPERS_STRUCT_STAT], [
 st_MPERS_LOAD_AC_CV([type_struct_stat$1])
 AC_CHECK_TYPE([struct stat$1],
 	      AC_DEFINE([HAVE_]MPERS_NAME[_STRUCT_STAT$1], [1],
-			[Define to 1 if MPERS_NAME has the type 'struct stat$1'.]),,
+			[Define to 1 if ]mpers_name[ has the type 'struct stat$1'.]),,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 st_MPERS_SAVE_AC_CV([type_struct_stat$1])
@@ -70,7 +70,7 @@ st_MPERS_SAVE_AC_CV([type_struct_stat$1])
 st_MPERS_LOAD_AC_CV([member_struct_stat$1_st_mtime_nsec])
 AC_CHECK_MEMBER([struct stat$1.st_mtime_nsec],
 		AC_DEFINE([HAVE_]MPERS_NAME[_STRUCT_STAT$1_ST_MTIME_NSEC], [1],
-			  [Define to 1 if 'st_mtime_nsec' is a member of MPERS_NAME 'struct stat$1'.]),,
+			  [Define to 1 if 'st_mtime_nsec' is a member of ]mpers_name[ 'struct stat$1'.]),,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 st_MPERS_SAVE_AC_CV([member_struct_stat$1_st_mtime_nsec])
