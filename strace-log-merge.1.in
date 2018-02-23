@@ -140,7 +140,7 @@ Problems with
 .B strace-log-merge
 should be reported to the
 .B strace
-mailing list at <strace\-devel@lists.sourceforge.net>.
+mailing list at <strace\-devel@lists.strace.io>.
 .\"
 .SH "SEE ALSO"
 .BR strace (1)

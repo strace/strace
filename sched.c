@@ -183,7 +183,7 @@ SYS_FUNC(sched_getattr)
 		 * Due to a subtle gcc bug that leads to miscompiled aarch64
 		 * kernels, the 3rd argument of sched_getattr is not quite 32-bit
 		 * as on other architectures.  For more details see
-		 * https://sourceforge.net/p/strace/mailman/message/35721703/
+		 * https://lists.strace.io/pipermail/strace-devel/2017-March/006085.html
 		 */
 		if (syserror(tcp))
 			print_abnormal_hi(tcp->u_arg[2]);

@@ -9,7 +9,7 @@ See the file [NEWS](NEWS) for information on what has changed in recent versions
 
 Please read the file [INSTALL-git](INSTALL-git.md) for installation instructions.
 
-The user discussion and development of strace take place on [the strace mailing list](https://lists.sourceforge.net/lists/listinfo/strace-devel) -- everyone is welcome to post bug reports, feature requests, comments and patches to strace-devel@lists.sourceforge.net.  The mailing list archives are available at https://sourceforge.net/p/strace/mailman/strace-devel/  and other archival sites.
+The user discussion and development of strace take place on [the strace mailing list](https://lists.strace.io/mailman/listinfo/strace-devel) -- everyone is welcome to post bug reports, feature requests, comments and patches to strace-devel@lists.strace.io.  The mailing list archives are available at https://lists.strace.io/pipermail/strace-devel/ and other archival sites.
 
 The GIT repository of strace is available at [GitHub](https://github.com/strace/strace/) and [GitLab](https://gitlab.com/strace/strace/).
 

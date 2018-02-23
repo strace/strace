@@ -2,8 +2,7 @@ How to test strace build using Aboriginal Linux's system images.
 
 * Put a autoconf'ed strace source tree into hdc.dir/strace dir.
 For example, this should work:
-git clone git://strace.git.sourceforge.net/gitroot/strace/strace &&
-cd strace && ./bootstrap
+git clone https://github.com/strace/strace && cd strace && ./bootstrap
 
 * Run ./make-hdc-img.sh: it will generate ext2 image file,
 hdc.img, from hdc.dir/* data. This requires root for loop mount.

@@ -11,7 +11,7 @@ The project's homepage is at
 	https://strace.io
 
 strace has a mailing list:
-	strace-devel@lists.sourceforge.net.
+	strace-devel@lists.strace.io
 
 System requirements:
 	* Linux kernel >= 2.6.18 is recommended.  Older versions might still work

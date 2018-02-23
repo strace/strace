@@ -1082,7 +1082,7 @@ Problems with
 .B strace
 should be reported to the
 .B strace
-mailing list at <strace\-devel@lists.sourceforge.net>.
+mailing list at <strace\-devel@lists.strace.io>.
 .SH "SEE ALSO"
 .BR strace-log-merge (1),
 .BR ltrace (1),

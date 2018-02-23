@@ -33,7 +33,7 @@
 AC_PREREQ(2.57)
 AC_INIT([strace],
 	m4_esyscmd([./git-version-gen .tarball-version]),
-	[strace-devel@lists.sourceforge.net],
+	[strace-devel@lists.strace.io],
 	[strace],
 	[https://strace.io])
 m4_define([copyright_year], m4_esyscmd([./copyright-year-gen .year]))
