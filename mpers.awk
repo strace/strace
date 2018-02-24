@@ -161,7 +161,7 @@ function what_is(what_idx, \
 BEGIN {
 	match(ARCH_FLAG, /[[:digit:]]+/, temparray)
 	default_pointer_size = temparray[0] / 8
-	print "#include <inttypes.h>"
+	print "#include <stdint.h>"
 }
 /^<[[:xdigit:]]+>/ {
 	match($0, /([[:alnum:]]+)><([[:alnum:]]+)/, matches)
