@@ -935,23 +935,24 @@ strace (3.1-4) unstable; urgency=low
 
   * Fixed changestemplate
 
- -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>, Thu Sep 12 14:59:44 MET DST 1996
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Thu, 12 Sep 1996 14:59:44 +0200
 
 strace (3.1-3) unstable; urgency=low
 
   * Revamped debian files
 
- -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>, Thu Jul 11 20:19:11 MET DST 1996
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Thu, 11 Jul 1996 20:19:11 +0200
 
 
 strace (3.1-2) unstable; urgency=low
+
   * Added some #ifdef's around IPX stuff to make it compilable on non-Linux
     systems.
   * changed debian.control and debian.rules to conform to new debian naming
     schemes
   * added architecture-option to debian.rules and debian.control
 
- -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Thu, 1 Jul 1996 00:00:00 +0000
 
 strace (3.1-1) unstable; urgency=low
 
@@ -964,4 +965,4 @@ strace (3.1-1) unstable; urgency=low
   * added IP, IPX and TCP support to get-/setsockopt()
   * added IPX support
 
- -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>
+ -- Wichert Akkerman <wakkerma@wi.leidenuniv.nl>  Thu, 1 Jun 1996 00:00:00 +0000

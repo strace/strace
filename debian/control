@@ -2,14 +2,14 @@ Source: strace
 Maintainer: Steve McIntyre <93sam@debian.org>
 Section: utils
 Priority: optional
-Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [amd64 i386 powerpc ppc64 s390 sparc sparc64 x32], debhelper (>= 7.0.0), gawk, libunwind-dev [amd64], libiberty-dev [amd64]
-Standards-Version: 3.9.8
+Build-Depends: libc6-dev (>= 2.2.2) [!alpha !ia64], libc6.1-dev (>= 2.2.2) [alpha ia64], gcc-multilib [amd64 i386 powerpc ppc64 s390 sparc sparc64 x32], debhelper (>= 7.0.0), gawk, libunwind-dev [amd64], libiberty-dev [amd64], libbluetooth-dev
+Standards-Version: 4.1.3
 Homepage: https://strace.io
-Vcs-Git: https://anonscm.debian.org/git/collab-maint/strace.git
-Vcs-Browser: https://anonscm.debian.org/git/collab-maint/strace.git
+Vcs-Git: https://salsa.debian.org/debian/strace.git
+Vcs-Browser: https://salsa.debian.org/debian/strace
 
 Package: strace
-Architecture: alpha amd64 arm64 armeb armel armhf hppa i386 ia64 m68k mips mipsel mips64 mips64el or1k powerpc powerpcspe ppc64 ppc64el s390 s390x sh4 sparc sparc64 x32
+Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out
@@ -23,7 +23,7 @@ Description: System call tracer
 
 Package: strace64
 Architecture: i386 powerpc s390 sparc
-Priority: extra
+Priority: optional
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer for 64bit binaries
  strace is a system call tracer, i.e. a debugging tool which prints out
@@ -41,8 +41,8 @@ Description: System call tracer for 64bit binaries
 Package: strace-udeb
 Section: debian-installer
 XC-Package-Type: udeb
-Priority: extra
-Architecture: alpha amd64 arm64 armeb armel armhf hppa i386 ia64 m68k mips mipsel mips64 mips64el or1k powerpc powerpcspe ppc64 ppc64el s390 sh4 sparc sparc64 x32
+Priority: optional
+Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: System call tracer
  strace is a system call tracer, i.e. a debugging tool which prints out

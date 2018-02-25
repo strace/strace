@@ -5,6 +5,7 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
+include /usr/share/dpkg/architecture.mk
 
 CFLAGS += -Wall -g
 
@@ -18,10 +19,6 @@ ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
   NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
   MAKEFLAGS += -j$(NUMJOBS)
 endif
-
-DEB_BUILD_GNU_TYPE := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-DEB_HOST_GNU_TYPE := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 extra_build_targets += build-udeb-stamp
 
@@ -46,6 +43,9 @@ build: build-arch build-indep
 build-arch: build-stamp $(extra_build_targets)
 build-indep: build-stamp $(extra_build_targets)
 
+configure:
+	./bootstrap
+
 %-stamp: %/Makefile
 	$(MAKE) -C $*
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
@@ -54,16 +54,16 @@ ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
 endif
 	touch $@
 
-build/Makefile:
+build/Makefile: configure
 	mkdir -p $(@D)
 	cd $(@D); sh ../configure --enable-mpers=check --prefix=/usr $(CONFIG_OPTS)
 
-build-udeb/Makefile:
+build-udeb/Makefile: configure
 	mkdir -p $(@D)
 	cd $(@D); sh ../configure --enable-mpers=check --prefix=/usr \
 		--without-libunwind --without-libiberty $(CONFIG_OPTS)
 
-build64/Makefile:
+build64/Makefile: configure
 	mkdir -p $(@D)
 	cd $(@D); CC="$(CC64)" sh ../configure --enable-mpers=check --prefix=/usr --build=$(DEB_BUILD_GNU_TYPE) --host=$(HOST64)
 
@@ -82,7 +82,7 @@ binary-arch: build
 
 	# prepare 64bit executable and manpage, if it has been built
 	test -f build64-stamp && ( mv build64/strace build64/strace64 ; \
-		cp strace.1 strace64.1 ) || true
+		mv build64/strace.1 build64/strace64.1 ) || true
 
 	dh_testdir -a
 	dh_testroot -a

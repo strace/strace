@@ -1,2 +1,2 @@
-strace.1
-strace-log-merge.1
+build/strace.1
+build/strace-log-merge.1
