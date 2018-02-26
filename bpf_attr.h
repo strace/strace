@@ -101,11 +101,12 @@ struct BPF_PROG_LOAD_struct {
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;
 	uint32_t bpf_fd;
+	uint32_t file_flags;
 };
 
 #define BPF_OBJ_PIN_struct_size \
-	offsetofend(struct BPF_OBJ_PIN_struct, bpf_fd)
-#define expected_BPF_OBJ_PIN_struct_size 12
+	sizeof(struct BPF_OBJ_PIN_struct)
+#define expected_BPF_OBJ_PIN_struct_size 16
 
 #define BPF_OBJ_GET_struct BPF_OBJ_PIN_struct
 #define BPF_OBJ_GET_struct_size BPF_OBJ_PIN_struct_size
@@ -149,11 +150,12 @@ struct BPF_PROG_TEST_RUN_struct /* test */ {
 struct BPF_PROG_GET_NEXT_ID_struct {
 	uint32_t start_id;
 	uint32_t next_id;
+	uint32_t open_flags;
 };
 
 #define BPF_PROG_GET_NEXT_ID_struct_size \
 	sizeof(struct BPF_PROG_GET_NEXT_ID_struct)
-#define expected_BPF_PROG_GET_NEXT_ID_struct_size 8
+#define expected_BPF_PROG_GET_NEXT_ID_struct_size 12
 
 #define BPF_MAP_GET_NEXT_ID_struct BPF_PROG_GET_NEXT_ID_struct
 #define BPF_MAP_GET_NEXT_ID_struct_size BPF_PROG_GET_NEXT_ID_struct_size
@@ -161,20 +163,22 @@ struct BPF_PROG_GET_NEXT_ID_struct {
 struct BPF_PROG_GET_FD_BY_ID_struct {
 	uint32_t prog_id;
 	uint32_t next_id;
+	uint32_t open_flags;
 };
 
 #define BPF_PROG_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_PROG_GET_FD_BY_ID_struct)
-#define expected_BPF_PROG_GET_FD_BY_ID_struct_size 8
+#define expected_BPF_PROG_GET_FD_BY_ID_struct_size 12
 
 struct BPF_MAP_GET_FD_BY_ID_struct {
 	uint32_t map_id;
 	uint32_t next_id;
+	uint32_t open_flags;
 };
 
 #define BPF_MAP_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_MAP_GET_FD_BY_ID_struct)
-#define expected_BPF_MAP_GET_FD_BY_ID_struct_size 8
+#define expected_BPF_MAP_GET_FD_BY_ID_struct_size 12
 
 struct BPF_OBJ_GET_INFO_BY_FD_struct /* info */ {
 	uint32_t bpf_fd;
