@@ -33,6 +33,7 @@
  */
 
 #include "defs.h"
+#include "mmap_cache.h"
 #include "native_defs.h"
 #include "ptrace.h"
 #include "nsig.h"

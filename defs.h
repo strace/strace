@@ -721,51 +721,6 @@ extern void unwind_print_stacktrace(struct tcb *);
 extern void unwind_capture_stacktrace(struct tcb *);
 #endif
 
-/*
- * Keep a sorted array of cache entries,
- * so that we can binary search through it.
- */
-struct mmap_cache_t {
-	/**
-	 * example entry:
-	 * 7fabbb09b000-7fabbb09f000 r-xp 00179000 fc:00 1180246 /lib/libc-2.11.1.so
-	 *
-	 * start_addr  is 0x7fabbb09b000
-	 * end_addr    is 0x7fabbb09f000
-	 * mmap_offset is 0x179000
-	 * protections is MMAP_CACHE_PROT_READABLE|MMAP_CACHE_PROT_EXECUTABLE
-	 * major       is 0xfc
-	 * minor       is 0x00
-	 * binary_filename is "/lib/libc-2.11.1.so"
-	 */
-	unsigned long start_addr;
-	unsigned long end_addr;
-	unsigned long mmap_offset;
-	unsigned char protections;
-	unsigned long major, minor;
-	char *binary_filename;
-};
-
-enum mmap_cache_protection {
-	MMAP_CACHE_PROT_READABLE   = 1 << 0,
-	MMAP_CACHE_PROT_WRITABLE   = 1 << 1,
-	MMAP_CACHE_PROT_EXECUTABLE = 1 << 2,
-	MMAP_CACHE_PROT_SHARED     = 1 << 3,
-};
-
-enum mmap_cache_rebuild_result {
-	MMAP_CACHE_REBUILD_NOCACHE,
-	MMAP_CACHE_REBUILD_READY,
-	MMAP_CACHE_REBUILD_RENEWED,
-};
-
-extern void mmap_cache_enable(void);
-extern bool mmap_cache_is_enabled(void);
-extern void mmap_cache_invalidate(struct tcb *tcp);
-extern void mmap_cache_delete(struct tcb *tcp, const char *caller);
-extern enum mmap_cache_rebuild_result mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller);
-extern struct mmap_cache_t *mmap_cache_search(struct tcb *tcp, unsigned long ip);
-
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
 {

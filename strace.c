@@ -51,6 +51,7 @@
 #include <asm/unistd.h>
 
 #include "largefile_wrappers.h"
+#include "mmap_cache.h"
 #include "number_set.h"
 #include "scno.h"
 #include "printsiginfo.h"

@@ -26,6 +26,7 @@
  */
 
 #include "defs.h"
+#include "mmap_cache.h"
 #include <libunwind-ptrace.h>
 
 #ifdef USE_DEMANGLE

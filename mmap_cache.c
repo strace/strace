@@ -28,6 +28,7 @@
 #include "defs.h"
 #include <limits.h>
 
+#include "mmap_cache.h"
 #include "xstring.h"
 
 #ifdef _LARGEFILE64_SOURCE
