@@ -28,18 +28,9 @@
 #include "defs.h"
 #include <limits.h>
 
+#include "largefile_wrappers.h"
 #include "mmap_cache.h"
 #include "xstring.h"
-
-#ifdef _LARGEFILE64_SOURCE
-# ifdef HAVE_FOPEN64
-#  define fopen_for_input fopen64
-# else
-#  define fopen_for_input fopen
-# endif
-#else
-# define fopen_for_input fopen
-#endif
 
 static unsigned int mmap_cache_generation;
 static bool use_mmap_cache;

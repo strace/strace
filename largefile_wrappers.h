@@ -35,8 +35,10 @@
 
 #ifdef _LARGEFILE64_SOURCE
 # ifdef HAVE_FOPEN64
+#  define fopen_for_input fopen64
 #  define fopen_for_output fopen64
 # else
+#  define fopen_for_input fopen
 #  define fopen_for_output fopen
 # endif
 # define struct_stat struct stat64
@@ -46,6 +48,7 @@
 # define struct_rlimit struct rlimit64
 # define set_rlimit setrlimit64
 #else
+# define fopen_for_input fopen
 # define fopen_for_output fopen
 # define struct_stat struct stat
 # define stat_file stat
