@@ -62,7 +62,7 @@ build_mmap_cache(struct tcb *tcp)
 	char buffer[PATH_MAX + 80];
 
 	xsprintf(filename, "/proc/%u/maps", tcp->pid);
-	fp = fopen_for_input(filename, "r");
+	fp = fopen_stream(filename, "r");
 	if (!fp) {
 		perror_msg("fopen: %s", filename);
 		return;

@@ -455,7 +455,7 @@ strace_fopen(const char *path)
 	FILE *fp;
 
 	swap_uid();
-	fp = fopen_for_output(path, "w");
+	fp = fopen_stream(path, "w");
 	if (!fp)
 		perror_msg_and_die("Can't fopen '%s'", path);
 	swap_uid();
