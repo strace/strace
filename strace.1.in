@@ -324,7 +324,8 @@ and block/character device number associated with device file descriptors.
 .TP 12
 .B \-c
 Count time, calls, and errors for each system call and report a summary on
-program exit.  This attempts to show system time (CPU time spent running
+program exit, suppressing the regular output.
+This attempts to show system time (CPU time spent running
 in the kernel) independent of wall clock time.  If
 .B \-c
 is used with
