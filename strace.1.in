@@ -994,6 +994,18 @@ to the traced process, but a few system calls aren't.
 Arguably, every instance of such behavior is a kernel bug.)
 This may have an unpredictable effect on the process
 if the process takes no action to restart the system call.
+.LP
+As
+.B strace
+executes the specified
+.I command
+directly and does not employ a shell for that, scripts without shebang
+that usually run just fine when invoked by shell fail to execute with
+.B ENOEXEC
+error.
+It is advisable to manually supply a shell as a
+.I command
+with the script as its argument.
 .SH BUGS
 Programs that use the
 .I setuid
