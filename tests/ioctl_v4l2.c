@@ -33,27 +33,15 @@
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
-#if WORDS_BIGENDIAN
-# define cc0(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 24))
-# define cc1(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 16))
-# define cc2(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 8))
-# define cc3(arg) ((unsigned int) (unsigned char) (arg))
-# define fourcc(a0, a1, a2, a3) \
-	((unsigned int)(a3) | \
-	 ((unsigned int)(a2) << 8) | \
-	 ((unsigned int)(a1) << 16) | \
-	 ((unsigned int)(a0) << 24))
-#else
-# define cc0(arg) ((unsigned int) (unsigned char) (arg))
-# define cc1(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 8))
-# define cc2(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 16))
-# define cc3(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 24))
-# define fourcc(a0, a1, a2, a3) \
+#define cc0(arg) ((unsigned int) (unsigned char) (arg))
+#define cc1(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 8))
+#define cc2(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 16))
+#define cc3(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 24))
+#define fourcc(a0, a1, a2, a3) \
 	((unsigned int)(a0) | \
 	 ((unsigned int)(a1) << 8) | \
 	 ((unsigned int)(a2) << 16) | \
 	 ((unsigned int)(a3) << 24))
-#endif
 
 static const unsigned int magic = 0xdeadbeef;
 

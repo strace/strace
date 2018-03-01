@@ -84,26 +84,17 @@ typedef struct v4l2_standard struct_v4l2_standard;
 static void
 print_pixelformat(uint32_t fourcc)
 {
-	const union {
-		uint32_t pixelformat;
-		unsigned char cc[sizeof(uint32_t)];
-	} u = {
-#if WORDS_BIGENDIAN
-		.cc = {
-			(unsigned char) (fourcc >> 24),
-			(unsigned char) (fourcc >> 16),
-			(unsigned char) (fourcc >> 8),
-			(unsigned char) fourcc
-		}
-#else
-		.pixelformat = fourcc
-#endif
+	unsigned char a[] = {
+		(unsigned char) fourcc,
+		(unsigned char) (fourcc >> 8),
+		(unsigned char) (fourcc >> 16),
+		(unsigned char) (fourcc >> 24),
 	};
 	unsigned int i;
 
 	tprints("v4l2_fourcc(");
-	for (i = 0; i < sizeof(u.cc); ++i) {
-		unsigned char c = u.cc[i];
+	for (i = 0; i < ARRAY_SIZE(a); ++i) {
+		unsigned char c = a[i];
 
 		if (i)
 			tprints(", ");
