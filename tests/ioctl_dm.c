@@ -35,7 +35,6 @@
 
 # include <errno.h>
 # include <inttypes.h>
-# include <stdbool.h>
 # include <stdio.h>
 # include <stddef.h>
 # include <string.h>

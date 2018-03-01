@@ -32,7 +32,6 @@
 
 #include "tests.h"
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <inttypes.h>
 #include <sys/ioctl.h>

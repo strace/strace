@@ -33,7 +33,6 @@
 #if defined __NR_s390_guarded_storage && defined HAVE_ASM_GUARDED_STORAGE_H
 
 # include <inttypes.h>
-# include <stdbool.h>
 # include <stdint.h>
 # include <stdio.h>
 # include <unistd.h>

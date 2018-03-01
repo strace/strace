@@ -33,7 +33,6 @@
 #if defined __NR_s390_pci_mmio_read && defined __NR_s390_pci_mmio_write
 
 # include <errno.h>
-# include <stdbool.h>
 # include <stdint.h>
 # include <stdio.h>
 # include <unistd.h>

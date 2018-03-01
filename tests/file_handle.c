@@ -39,7 +39,6 @@
 # include <inttypes.h>
 # include <fcntl.h>
 # include <stdio.h>
-# include <stdbool.h>
 # include <unistd.h>
 
 enum assert_rc {
