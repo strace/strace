@@ -200,4 +200,17 @@ struct BPF_OBJ_GET_INFO_BY_FD_struct /* info */ {
 	sizeof(struct BPF_OBJ_GET_INFO_BY_FD_struct)
 #define expected_BPF_OBJ_GET_INFO_BY_FD_struct_size 16
 
+struct BPF_PROG_QUERY_struct /* query */ {
+	uint32_t target_fd;
+	uint32_t attach_type;
+	uint32_t query_flags;
+	uint32_t attach_flags;
+	uint64_t ATTRIBUTE_ALIGNED(8) prog_ids;
+	uint32_t prog_cnt;
+};
+
+#define BPF_PROG_QUERY_struct_size \
+	offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt)
+#define expected_BPF_PROG_QUERY_struct_size 28
+
 #endif /* !STRACE_BPF_ATTR_H */

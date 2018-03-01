@@ -76,6 +76,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_PROG_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_MAP_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_OBJ_GET_INFO_BY_FD);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_QUERY);
 	char char_data[256];
 };
 
@@ -697,6 +698,65 @@ static const struct bpf_attr_check BPF_OBJ_GET_INFO_BY_FD_checks[] = {
 	}
 };
 
+
+/* TODO: This is a read/write cmd and we do not check exiting path yet */
+static const struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
+	{
+		.data = { .BPF_PROG_QUERY_data = { .target_fd = -1 } },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, target_fd),
+		.str = "query={target_fd=-1"
+		       ", attach_type=BPF_CGROUP_INET_INGRESS, query_flags=0"
+		       ", attach_flags=0, prog_ids=NULL, prog_cnt=0}",
+	},
+	{ /* 1 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_fd = 3141592653U,
+			.attach_type = 6,
+			.query_flags = 1,
+			.attach_flags = 3,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, attach_flags),
+		.str = "query={target_fd=-1153374643"
+		       ", attach_type=BPF_CGROUP_DEVICE"
+		       ", query_flags=BPF_F_QUERY_EFFECTIVE"
+		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
+		       ", prog_ids=NULL, prog_cnt=0}",
+	},
+	{ /* 2 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_fd = 3141592653U,
+			.attach_type = 7,
+			.query_flags = 0xfffffffe,
+			.attach_flags = 0xfffffffc,
+			.prog_ids = 0xffffffffffffffffULL,
+			.prog_cnt = 2718281828,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
+		.str = "query={target_fd=-1153374643"
+		       ", attach_type=0x7 /* BPF_??? */"
+		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
+		       ", attach_flags=0xfffffffc /* BPF_F_??? */"
+		       ", prog_ids=0xffffffffffffffff, prog_cnt=2718281828}",
+	},
+	{ /* 3 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_fd = 3141592653U,
+			.attach_type = 0xfeedface,
+			.query_flags = 0xdeadf00d,
+			.attach_flags = 0xbeefcafe,
+			.prog_ids = 0xffffffffffffffffULL,
+			.prog_cnt = 0,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
+		.str = "query={target_fd=-1153374643"
+		       ", attach_type=0xfeedface /* BPF_??? */"
+		       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
+		       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
+		       ", prog_ids=0xffffffffffffffff, prog_cnt=0}",
+	},
+};
+
+
 #define CHK(cmd_) \
 	{ \
 		cmd_, #cmd_, \
@@ -724,6 +784,7 @@ main(void)
 		CHK(BPF_PROG_GET_FD_BY_ID),
 		CHK(BPF_MAP_GET_FD_BY_ID),
 		CHK(BPF_OBJ_GET_INFO_BY_FD),
+		CHK(BPF_PROG_QUERY),
 	};
 
 	page_size = get_page_size();
