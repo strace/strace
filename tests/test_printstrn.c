@@ -111,7 +111,7 @@ test_printstrn(const unsigned int test_max)
 
 	fill_memory_ex(p, test_max + page_size, 0x00, 0xFF);
 	/* Test corner cases when octal quoting goes before digit */
-	for (int i = 0; i < 11; i++)
+	for (i = 0; i < 11; i++)
 		p[2 + 3 * i] = '0' + i - 1;
 
 	test_print_memory(p, test_max);
