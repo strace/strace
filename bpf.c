@@ -46,6 +46,7 @@
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
 #include "xlat/bpf_query_flags.h"
+#include "xlat/numa_node.h"
 
 /** Storage for all the data that is needed to be stored on entering. */
 struct bpf_priv_data {
@@ -134,8 +135,22 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	PRINT_FIELD_U(", ", attr, max_entries);
 	PRINT_FIELD_FLAGS(", ", attr, map_flags, bpf_map_flags, "BPF_F_???");
 	PRINT_FIELD_FD(", ", attr, inner_map_fd, tcp);
-	if (attr.map_flags & BPF_F_NUMA_NODE)
-		PRINT_FIELD_U(", ", attr, numa_node);
+	if (attr.map_flags & BPF_F_NUMA_NODE) {
+		/*
+		 * Kernel uses the value of -1 as a designation for "no NUMA
+		 * node specified", and even uses NUMA_NO_NODE constant;
+		 * however, the constant definition is not a part of UAPI
+		 * headers, thus we can't simply print this named constant
+		 * instead of the value. Let's force verbose xlat style instead
+		 * in order to provide the information for the user while
+		 * not hampering the availability to derive the actual value
+		 * without the access to the kernel headers.
+		 */
+		tprints(", numa_node=");
+		printxvals_ex(attr.numa_node, NULL,
+			      XLAT_STYLE_FMT_U | XLAT_STYLE_VERBOSE,
+			      numa_node, NULL);
+	}
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
