@@ -63,10 +63,14 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 }
 
 # if VERBOSE
-#  define print_extra_data(addr_, size_) print_quoted_hex((addr_), (size_))
+#  define print_extra_data(addr_, offs_, size_) \
+	do { \
+		printf("/* bytes %u..%u */ ", (offs_), (size_) + (offs_) - 1); \
+		print_quoted_hex((addr_) + (offs_), (size_)); \
+	} while (0)
 # else
-#  define print_extra_data(addr_, size_) printf("...")
-#endif
+#  define print_extra_data(addr_, offs_, size_) printf("...")
+# endif
 
 static void
 test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
@@ -141,7 +145,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 		printf("bpf(%s, {", cmd_str);
 		print_attr(addr);
 		printf(", ");
-		print_extra_data((void *) addr + offset,
+		print_extra_data((char *) addr, offset,
 				 sizeof_attr - offset);
 		printf("}, %u) = %s\n", sizeof_attr, errstr);
 	}
@@ -173,7 +177,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	printf("bpf(%s, {", cmd_str);
 	print_attr(addr);
 	printf(", ");
-	print_extra_data((void *) addr + offset,
+	print_extra_data((char *) addr, offset,
 			 page_size - offset);
 	printf("}, %u) = %s\n", page_size, errstr);
 
