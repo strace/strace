@@ -204,6 +204,8 @@ strace_SOURCES =	\
 	netlink.c       \
 	netlink.h	\
 	netlink_crypto.c \
+	netlink_kobject_uevent.c \
+	netlink_kobject_uevent.h \
 	netlink_sock_diag.h \
 	netlink_inet_diag.c \
 	netlink_netfilter.c \

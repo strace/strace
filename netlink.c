@@ -631,7 +631,7 @@ decode_netlink(struct tcb *const tcp,
 	const int family = get_fd_nl_family(tcp, fd);
 
 	if (family == NETLINK_KOBJECT_UEVENT) {
-		printstrn(tcp, addr, len);
+		decode_netlink_kobject_uevent(tcp, addr, len);
 		return;
 	}
 

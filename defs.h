@@ -744,6 +744,10 @@ DECL_NETLINK(route);
 DECL_NETLINK(selinux);
 DECL_NETLINK(sock_diag);
 
+extern void
+decode_netlink_kobject_uevent(struct tcb *, kernel_ulong_t addr,
+			      kernel_ulong_t len);
+
 extern int ts_nz(const struct timespec *);
 extern int ts_cmp(const struct timespec *, const struct timespec *);
 extern double ts_float(const struct timespec *);
