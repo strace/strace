@@ -76,6 +76,15 @@ bpf_cmd_decoder(struct tcb *const tcp,					\
 
 typedef DECL_BPF_CMD_DECODER((*bpf_cmd_decoder_t));
 
+/*
+ * A note about bpf syscall decoder: it doesn't perform any size sanity checks,
+ * so even if it leads to partial copying of one of the fields, the command
+ * handler will still use the (partially-copied-from-userspace, partially
+ * zeroed) field value.  That's why we stop decoding and check for known sizes
+ * that correspond to released versions of the structure used by the specific
+ * command - it looks like the most sensible way to parse this insanity.
+ */
+
 static int
 decode_attr_extra_data(struct tcb *const tcp,
 		       const char *data,
