@@ -421,14 +421,199 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
+typedef bool (*print_bpf_obj_info_fn)(struct tcb *,
+				      uint32_t bpf_fd,
+				      const char *info_buf,
+				      uint32_t size);
+
+static bool
+print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
+		   const char *info_buf, uint32_t size)
+{
+	struct bpf_map_info_struct info = { 0 };
+	const unsigned int len = MIN(size, bpf_map_info_struct_size);
+
+	if (entering(tcp))
+		return false;
+
+	memcpy(&info, info_buf, len);
+
+	PRINT_FIELD_XVAL("{", info, type, bpf_map_types, "BPF_MAP_TYPE_???");
+	PRINT_FIELD_U(", ", info, id);
+	PRINT_FIELD_U(", ", info, key_size);
+	PRINT_FIELD_U(", ", info, value_size);
+	PRINT_FIELD_U(", ", info, max_entries);
+	PRINT_FIELD_FLAGS(", ", info, map_flags, bpf_map_flags, "BPF_F_???");
+	PRINT_FIELD_CSTRING(", ", info, name);
+	PRINT_FIELD_IFINDEX(", ", info, ifindex);
+	PRINT_FIELD_DEV(", ", info, netns_dev);
+	PRINT_FIELD_U(", ", info, netns_ino);
+
+	decode_attr_extra_data(tcp, info_buf, size, bpf_map_info_struct_size);
+	tprints("}");
+
+	return true;
+}
+
+static bool
+print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
+		    const char *info_buf, uint32_t size)
+{
+	struct bpf_prog_info_struct info = { 0 };
+	const unsigned int len = MIN(size, bpf_prog_info_struct_size);
+	uint64_t map_id_buf;
+
+	memcpy(&info, info_buf, len);
+
+	struct {
+		print_bpf_obj_info_fn print_fn;
+		uint32_t jited_prog_len;
+		uint32_t xlated_prog_len;
+		uint32_t nr_map_ids;
+	} *saved;
+
+	if (entering(tcp)) {
+		saved = xcalloc(1, sizeof(*saved));
+		saved->print_fn = print_bpf_prog_info;
+		saved->jited_prog_len = info.jited_prog_len;
+		saved->xlated_prog_len = info.xlated_prog_len;
+		saved->nr_map_ids = info.nr_map_ids;
+
+		return false;
+	}
+
+	saved = get_tcb_priv_data(tcp);
+
+	PRINT_FIELD_XVAL("{", info, type, bpf_prog_types, "BPF_PROG_TYPE_???");
+	PRINT_FIELD_U(", ", info, id);
+	PRINT_FIELD_HEX_ARRAY(", ", info, tag);
+
+	tprints(", jited_prog_len=");
+	if (saved->jited_prog_len != info.jited_prog_len)
+		tprintf("%" PRIu32 " => ", saved->jited_prog_len);
+	tprintf("%" PRIu32, info.jited_prog_len);
+
+	tprints(", jited_prog_insns=");
+	print_big_u64_addr(info.jited_prog_insns);
+	printstr_ex(tcp, info.jited_prog_insns, info.jited_prog_len,
+		    QUOTE_FORCE_HEX);
+
+	tprints(", xlated_prog_len=");
+	if (saved->xlated_prog_len != info.xlated_prog_len)
+		tprintf("%" PRIu32 " => ", saved->xlated_prog_len);
+	tprintf("%" PRIu32, info.xlated_prog_len);
+
+	tprints(", xlated_prog_insns=");
+	print_big_u64_addr(info.xlated_prog_insns);
+	print_ebpf_prog(tcp, info.xlated_prog_insns, info.xlated_prog_len / 8);
+
+	PRINT_FIELD_U(", ", info, load_time);
+	PRINT_FIELD_UID(", ", info, created_by_uid);
+
+	tprints(", nr_map_ids=");
+	if (saved->nr_map_ids != info.nr_map_ids)
+		tprintf("%" PRIu32 " => ", saved->nr_map_ids);
+	tprintf("%" PRIu32, info.nr_map_ids);
+
+	tprints(", map_ids=");
+	print_big_u64_addr(info.map_ids);
+	print_array(tcp, info.map_ids, info.nr_map_ids,
+		    &map_id_buf, sizeof(map_id_buf),
+		    umoven_or_printaddr, print_uint64_array_member, 0);
+
+	PRINT_FIELD_IFINDEX(", ", info, ifindex);
+	PRINT_FIELD_DEV(", ", info, netns_dev);
+	PRINT_FIELD_U(", ", info, netns_ino);
+
+	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
+	tprints("}");
+
+	return true;
+}
+
+static const char *
+fetch_bpf_obj_info(struct tcb * const tcp, uint64_t info, uint32_t size)
+{
+	static char *info_buf;
+
+	if (!info_buf)
+		info_buf = xmalloc(get_pagesize());
+
+	memset(info_buf, 0, get_pagesize());
+
+	if (size > 0 && size <= get_pagesize()
+	    && !umoven(tcp, info, size, info_buf))
+		return info_buf;
+
+	return NULL;
+}
+
+static bool
+print_bpf_obj_info_addr(uint64_t addr)
+{
+	printaddr64(addr);
+	return true;
+}
+
+static bool
+print_bpf_obj_info(struct tcb * const tcp, uint32_t bpf_fd, uint64_t info,
+		   uint32_t size)
+{
+	if (abbrev(tcp))
+		return print_bpf_obj_info_addr(info);
+
+	static struct {
+		const char *id;
+		print_bpf_obj_info_fn print_fn;
+	} obj_printers[] = {
+		{ "anon_inode:bpf-map", print_bpf_map_info },
+		{ "anon_inode:bpf-prog", print_bpf_prog_info }
+	};
+
+	print_bpf_obj_info_fn print_fn = NULL;
+	unsigned long i;
+
+	if (exiting(tcp)) {
+		i = get_tcb_priv_ulong(tcp);
+		print_fn = i < ARRAY_SIZE(obj_printers)
+			   ? obj_printers[i].print_fn
+			   : * (print_bpf_obj_info_fn *) get_tcb_priv_data(tcp);
+	} else {
+		char path[PATH_MAX + 1];
+
+		if (getfdpath(tcp, bpf_fd, path, sizeof(path)) > 0) {
+			for (i = 0; i < ARRAY_SIZE(obj_printers); ++i) {
+				if (!strcmp(path, obj_printers[i].id)) {
+					print_fn = obj_printers[i].print_fn;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!print_fn)
+		return print_bpf_obj_info_addr(info);
+
+	const char *info_buf = fetch_bpf_obj_info(tcp, info, size);
+
+	return info_buf ? print_fn(tcp, bpf_fd, info_buf, size)
+			: print_bpf_obj_info_addr(info);
+}
+
 BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 {
-	PRINT_FIELD_FD("{info={", attr, bpf_fd, tcp);
-	PRINT_FIELD_U(", ", attr, info_len);
-	PRINT_FIELD_X(", ", attr, info);
+	if (entering(tcp)) {
+		PRINT_FIELD_FD("{info={", attr, bpf_fd, tcp);
+		PRINT_FIELD_U(", ", attr, info_len);
+		tprintf(", info=");
+	}
+
+	if (!print_bpf_obj_info(tcp, attr.bpf_fd, attr.info, attr.info_len))
+		return 0;
+
 	tprints("}");
 }
-END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 {

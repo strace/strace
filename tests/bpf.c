@@ -851,7 +851,7 @@ static const struct bpf_attr_check BPF_OBJ_GET_INFO_BY_FD_checks[] = {
 	{
 		.data = { .BPF_OBJ_GET_INFO_BY_FD_data = { .bpf_fd = -1 } },
 		.size = offsetofend(struct BPF_OBJ_GET_INFO_BY_FD_struct, bpf_fd),
-		.str = "info={bpf_fd=-1, info_len=0, info=0}"
+		.str = "info={bpf_fd=-1, info_len=0, info=NULL}"
 	},
 	{
 		.data = { .BPF_OBJ_GET_INFO_BY_FD_data = {

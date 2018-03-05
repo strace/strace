@@ -36,6 +36,14 @@
 # endif
 #endif
 
+#ifndef BPF_TAG_SIZE
+# define BPF_TAG_SIZE 8
+#else
+# if BPF_TAG_SIZE != 8
+#  error "Unexpected value of BPF_TAG_SIZE"
+# endif
+#endif
+
 struct BPF_MAP_CREATE_struct {
 	uint32_t map_type;
 	uint32_t key_size;
@@ -224,5 +232,44 @@ struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 #define BPF_RAW_TRACEPOINT_OPEN_struct_size \
 	offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct, prog_fd)
 #define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 12
+
+struct bpf_map_info_struct {
+	uint32_t type;
+	uint32_t id;
+	uint32_t key_size;
+	uint32_t value_size;
+	uint32_t max_entries;
+	uint32_t map_flags;
+	char     name[BPF_OBJ_NAME_LEN];
+	uint32_t ifindex;
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* kernel UAPI is buggy, skip check */
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* kernel UAPI is buggy, skip check */
+};
+
+#define bpf_map_info_struct_size \
+	sizeof(struct bpf_map_info_struct)
+#define expected_bpf_map_info_struct_size 64
+
+struct bpf_prog_info_struct {
+	uint32_t type;
+	uint32_t id;
+	uint8_t  tag[BPF_TAG_SIZE];
+	uint32_t jited_prog_len;
+	uint32_t xlated_prog_len;
+	uint64_t ATTRIBUTE_ALIGNED(8) jited_prog_insns;
+	uint64_t ATTRIBUTE_ALIGNED(8) xlated_prog_insns;
+	uint64_t load_time;
+	uint32_t created_by_uid;
+	uint32_t nr_map_ids;
+	uint64_t ATTRIBUTE_ALIGNED(8) map_ids;
+	char     name[BPF_OBJ_NAME_LEN];
+	uint32_t ifindex;
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* kernel UAPI is buggy, skip check */
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* kernel UAPI is buggy, skip check */
+};
+
+#define bpf_prog_info_struct_size \
+	sizeof(struct bpf_prog_info_struct)
+#define expected_bpf_prog_info_struct_size 104
 
 #endif /* !STRACE_BPF_ATTR_H */
