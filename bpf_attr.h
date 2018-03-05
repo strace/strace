@@ -44,11 +44,13 @@ struct BPF_MAP_CREATE_struct {
 	uint32_t map_flags;
 	uint32_t inner_map_fd;
 	uint32_t numa_node;
+	char     map_name[BPF_OBJ_NAME_LEN];
+	uint32_t map_ifindex;
 };
 
 #define BPF_MAP_CREATE_struct_size \
 	sizeof(struct BPF_MAP_CREATE_struct)
-#define expected_BPF_MAP_CREATE_struct_size 28
+#define expected_BPF_MAP_CREATE_struct_size 48
 
 struct BPF_MAP_LOOKUP_ELEM_struct {
 	uint32_t map_fd;

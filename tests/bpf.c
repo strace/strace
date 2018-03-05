@@ -233,7 +233,14 @@ test_bpf(const struct bpf_check *cmd_check)
 	       cmd_check->cmd_str, addr, page_size + 1, errstr);
 }
 
-static const struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
+static void
+init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check)
+{
+	struct BPF_MAP_CREATE_struct *attr = &check->data.BPF_MAP_CREATE_data;
+	attr->map_ifindex = ifindex_lo();
+}
+
+static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	{
 		.data = { .BPF_MAP_CREATE_data = { .map_type = 2 } },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_type),
@@ -249,13 +256,16 @@ static const struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_flags = 7,
 			.inner_map_fd = -1,
 			.numa_node = 3141592653,
+			.map_name = "0123456789abcde",
 		} },
-		.size = offsetofend(struct BPF_MAP_CREATE_struct, numa_node),
+		.size = offsetof(struct BPF_MAP_CREATE_struct, map_name) + 8,
 		.str = "map_type=BPF_MAP_TYPE_CPUMAP, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
 		       "|BPF_F_NUMA_NODE, inner_map_fd=-1"
-		       ", numa_node=3141592653",
+		       ", numa_node=3141592653"
+		       ", map_name=\"0123456\"...",
+
 	},
 	{ /* 2 */
 		.data = { .BPF_MAP_CREATE_data = {
@@ -266,13 +276,17 @@ static const struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_flags = 0xfffffff8,
 			.inner_map_fd = 2718281828,
 			.numa_node = -1,
+			.map_name = "",
+			.map_ifindex = 3141592653,
 		} },
-		.size = offsetofend(struct BPF_MAP_CREATE_struct, numa_node),
+		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
 		.str = "map_type=0x11 /* BPF_MAP_TYPE_??? */"
 		       ", key_size=4207812181, value_size=3134983661"
 		       ", max_entries=3203386110"
 		       ", map_flags=0xfffffff8 /* BPF_F_??? */"
-		       ", inner_map_fd=-1576685468",
+		       ", inner_map_fd=-1576685468"
+		       ", map_name=\"\", map_ifindex=3141592653",
+
 	},
 	{ /* 3 */
 		.data = { .BPF_MAP_CREATE_data = {
@@ -327,6 +341,50 @@ static const struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 				   "|0xc0dedea8"
 		       ", inner_map_fd=-1576685468"
 		       ", numa_node=4294967295 /* NUMA_NO_NODE */",
+	},
+	{ /* 6 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.map_type = 0xdeadf00d,
+			.key_size = 0xface1e55,
+			.value_size = 0xbadc0ded,
+			.max_entries = 0xbeefcafe,
+			.map_flags = 0xc0dedead,
+			.inner_map_fd = 2718281828,
+			.numa_node = -1,
+			.map_name = "fedcba9876543210",
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_name),
+		.str = "map_type=0xdeadf00d /* BPF_MAP_TYPE_??? */"
+		       ", key_size=4207812181, value_size=3134983661"
+		       ", max_entries=3203386110"
+		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NUMA_NODE"
+				   "|0xc0dedea8"
+		       ", inner_map_fd=-1576685468"
+		       ", numa_node=4294967295 /* NUMA_NO_NODE */"
+		       ", map_name=\"fedcba987654321\"...",
+	},
+	{ /* 7 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.map_type = 0xdeadf00d,
+			.key_size = 0xface1e55,
+			.value_size = 0xbadc0ded,
+			.max_entries = 0xbeefcafe,
+			.map_flags = 0xc0dedead,
+			.inner_map_fd = 2718281828,
+			.numa_node = -1,
+			.map_name = "0123456789abcde",
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
+		.str = "map_type=0xdeadf00d /* BPF_MAP_TYPE_??? */"
+		       ", key_size=4207812181, value_size=3134983661"
+		       ", max_entries=3203386110"
+		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NUMA_NODE"
+				   "|0xc0dedea8"
+		       ", inner_map_fd=-1576685468"
+		       ", numa_node=4294967295 /* NUMA_NO_NODE */"
+		       ", map_name=\"0123456789abcde\""
+		       ", map_ifindex=" IFINDEX_LO_STR,
+		.init_fn = init_BPF_MAP_CREATE_attr7,
 	},
 };
 

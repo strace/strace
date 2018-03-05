@@ -166,6 +166,22 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 			      XLAT_STYLE_FMT_U | XLAT_STYLE_VERBOSE,
 			      numa_node, NULL);
 	}
+
+	/* map_name field was added in Linux commit v4.15-rc1~84^2~605^2~3. */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_name))
+		break;
+	PRINT_FIELD_CSTRING_SZ(", ", attr, map_name,
+			       MIN(sizeof(attr.map_name),
+				   len - offsetof(struct BPF_MAP_CREATE_struct,
+						  map_name)));
+
+	/*
+	 * map_ifindex field was added in Linux commit
+	 * v4.16-rc1~123^2~145^2~5^2~8.
+	 */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_ifindex))
+		break;
+	PRINT_FIELD_IFINDEX(", ", attr, map_ifindex);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
