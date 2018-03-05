@@ -409,13 +409,10 @@ SYS_FUNC(bpf)
 	int rc;
 
 	if (entering(tcp)) {
-		static size_t page_size;
 		static char *buf;
 
-		if (!buf) {
-			page_size = get_pagesize();
-			buf = xmalloc(page_size);
-		}
+		if (!buf)
+			buf = xmalloc(get_pagesize());
 
 		printxval(bpf_commands, cmd, "BPF_???");
 		tprints(", ");
