@@ -1008,6 +1008,15 @@ umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
 	return 0;
 }
 
+bool
+print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
+
+	return true;
+}
+
 /*
  * Iteratively fetch and print up to nmemb elements of elem_size size
  * from the array that starts at tracee's address start_addr.

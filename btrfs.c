@@ -366,14 +366,6 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 	btrfs_print_data_container_footer();
 }
 
-static bool
-print_uint64(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
-{
-	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
-
-	return true;
-}
-
 static void
 btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 {
@@ -400,7 +392,7 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 		uint64_t record;
 		print_array(tcp, qgi_addr + offsetof(typeof(inherit), qgroups),
 			    inherit.num_qgroups, &record, sizeof(record),
-			    umoven_or_printaddr, print_uint64, 0);
+			    umoven_or_printaddr, print_uint64_array_member, 0);
 	}
 	tprints("}");
 }
