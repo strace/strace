@@ -133,8 +133,23 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	PRINT_FIELD_U(", ", attr, key_size);
 	PRINT_FIELD_U(", ", attr, value_size);
 	PRINT_FIELD_U(", ", attr, max_entries);
+
+	/* map_flags field was added in Linux commit v4.6-rc1~91^2~108^2~6. */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_flags))
+		break;
 	PRINT_FIELD_FLAGS(", ", attr, map_flags, bpf_map_flags, "BPF_F_???");
+
+	/*
+	 * inner_map_fd field was added in Linux commit
+	 * v4.12-rc1~64^3~373^2~2.
+	 */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, inner_map_fd))
+		break;
 	PRINT_FIELD_FD(", ", attr, inner_map_fd, tcp);
+
+	/* numa_node field was added in Linux commit v4.14-rc1~130^2~196^2~1. */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, numa_node))
+		break;
 	if (attr.map_flags & BPF_F_NUMA_NODE) {
 		/*
 		 * Kernel uses the value of -1 as a designation for "no NUMA
