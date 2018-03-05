@@ -112,7 +112,7 @@
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		print_quoted_string((const char *)(where_).field_,	\
-				     sizeof((where_).field_) +		\
+				    sizeof((where_).field_) +		\
 					    MUST_BE_ARRAY((where_).field_), \
 				    QUOTE_FORCE_HEX); \
 	} while (0)
