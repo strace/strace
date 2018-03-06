@@ -168,7 +168,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKALIGNOFF:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	/* take a signed int */
 	case BLKROSET:
 	case BLKBSZSET:

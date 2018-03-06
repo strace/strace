@@ -274,7 +274,7 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 	case OTPGETREGIONINFO:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case OTPLOCK:
 		decode_otp_info(tcp, arg);
 		break;

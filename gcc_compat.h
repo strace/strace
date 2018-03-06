@@ -93,4 +93,10 @@
 # define ATTRIBUTE_ALLOC_SIZE(args)	/* empty */
 #endif
 
+#if GNUC_PREREQ(7, 0)
+# define ATTRIBUTE_FALLTHROUGH	__attribute__((__fallthrough__))
+#else
+# define ATTRIBUTE_FALLTHROUGH	((void) 0)
+#endif
+
 #endif /* !STRACE_GCC_COMPAT_H */

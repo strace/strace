@@ -156,7 +156,7 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 	case LOOP_GET_STATUS:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS:
 		decode_loop_info(tcp, arg);
 		break;
@@ -164,7 +164,7 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 	case LOOP_GET_STATUS64:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS64:
 		decode_loop_info64(tcp, arg);
 		break;

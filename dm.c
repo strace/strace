@@ -91,7 +91,7 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 		case DM_DEV_SUSPEND:
 			if (ioc->flags & DM_SUSPEND_FLAG)
 				break;
-			/* Fall through */
+			ATTRIBUTE_FALLTHROUGH;
 		case DM_DEV_RENAME:
 		case DM_DEV_REMOVE:
 		case DM_DEV_WAIT:

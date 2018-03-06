@@ -263,6 +263,7 @@ ioctl_decode(struct tcb *tcp)
 		int ret = file_ioctl(tcp, code, arg);
 		if (ret != RVAL_DECODED)
 			return ret;
+		ATTRIBUTE_FALLTHROUGH;
 	}
 	case 't':
 	case 'T':

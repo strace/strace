@@ -306,7 +306,7 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 				if (!nread)
 					return umovestr_peekdata(pid, addr,
 								 len, laddr);
-				/* fall through */
+				ATTRIBUTE_FALLTHROUGH;
 			case EFAULT: case EIO:
 				/* address space is inaccessible */
 				if (nread)

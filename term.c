@@ -160,6 +160,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TIOCGLCKTRMIOS:
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
 	case TCSETS:
 #ifdef TCSETS2
 	case TCSETS2:
@@ -180,6 +181,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TCGETA:
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
 	case TCSETA:
 	case TCSETAW:
 	case TCSETAF:
@@ -190,6 +192,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TIOCGWINSZ:
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
 	case TIOCSWINSZ:
 		decode_winsize(tcp, arg);
 		break;
@@ -199,6 +202,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TIOCGSIZE:
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
 	case TIOCSSIZE:
 		decode_ttysize(tcp, arg);
 		break;
@@ -223,6 +227,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	case TIOCMGET:
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
 	case TIOCMBIS:
 	case TIOCMBIC:
 	case TIOCMSET:
@@ -245,6 +250,7 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 #endif
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
 	case TIOCSPGRP:
 	case TIOCSETD:
 	case FIONBIO:

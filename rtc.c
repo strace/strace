@@ -93,7 +93,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_RD_TIME:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case RTC_ALM_SET:
 	case RTC_SET_TIME:
 		tprints(", ");
@@ -113,7 +113,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_WKALM_RD:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case RTC_WKALM_SET:
 		tprints(", ");
 		decode_rtc_wkalrm(tcp, arg);
@@ -121,7 +121,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_PLL_GET:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case RTC_PLL_SET:
 		tprints(", ");
 		decode_rtc_pll_info(tcp, arg);

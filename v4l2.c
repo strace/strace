@@ -1022,7 +1022,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_FBUF: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_FBUF: /* W */
 		return print_v4l2_framebuffer(tcp, arg);
 
@@ -1037,7 +1037,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_STD: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_STD: /* W */
 		tprints(", ");
 		printnum_int64(tcp, arg, "%#" PRIx64);
@@ -1063,7 +1063,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_INPUT: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_INPUT: /* RW */
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");

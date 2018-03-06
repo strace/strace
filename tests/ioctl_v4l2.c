@@ -157,14 +157,17 @@ init_v4l2_format(struct v4l2_format *const f,
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
 		f->fmt.sdr.pixelformat = sf_magic;
+# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+		f->fmt.sdr.buffersize = 0x25afabfb;
+# endif
+		break;
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
-		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
-			f->fmt.sdr.pixelformat = magic;
-#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+		f->fmt.sdr.pixelformat = magic;
+# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		f->fmt.sdr.buffersize = 0x25afabfb;
-#endif
+# endif
 		break;
 #endif
 	}

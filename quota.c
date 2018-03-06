@@ -177,7 +177,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			return 0;
 		}
 
-		/* Fall-through */
+		ATTRIBUTE_FALLTHROUGH;
 	case Q_SETQUOTA:
 	{
 		struct if_dqblk dq;
@@ -247,7 +247,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			return 0;
 		}
 
-		/* Fall-through */
+		ATTRIBUTE_FALLTHROUGH;
 	case Q_XSETQLIM:
 	{
 		struct xfs_dqblk dq;
@@ -310,7 +310,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			return 0;
 		}
 
-		/* Fall-through */
+		ATTRIBUTE_FALLTHROUGH;
 	case Q_SETINFO:
 	{
 		struct if_dqinfo dq;

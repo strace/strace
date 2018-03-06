@@ -219,7 +219,7 @@ SYS_FUNC(ptrace)
 				/* print data on exiting syscall */
 				return 0;
 			}
-			/* fall through */
+			ATTRIBUTE_FALLTHROUGH;
 		default:
 			printaddr(data);
 			break;

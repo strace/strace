@@ -538,7 +538,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_START_SYNC: /* R */
 		if (entering(tcp))
 			return 0;
-	/* fall through */
+	ATTRIBUTE_FALLTHROUGH;
 	/* takes a u64 */
 	case BTRFS_IOC_DEFAULT_SUBVOL: /* W */
 	case BTRFS_IOC_WAIT_SYNC: /* W */
@@ -1318,7 +1318,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_GET_FSLABEL: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case BTRFS_IOC_SET_FSLABEL: { /* W */
 		char label[BTRFS_LABEL_SIZE];
 
