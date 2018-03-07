@@ -562,8 +562,13 @@ extern int printxvals(const uint64_t, const char *, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
 	uint64_t val, const char *dflt);
+/**
+ * Wrapper around printxval_searchn that passes ARRAY_SIZE - 1
+ * as the array size, as all arrays are XLAT_END-terminated and
+ * printxval_searchn expects a size without the terminating record.
+ */
 #define printxval_search(xlat__, val__, dflt__) \
-	printxval_searchn(xlat__, ARRAY_SIZE(xlat__), val__, dflt__)
+	printxval_searchn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
 extern int sprintxval(char *buf, size_t size, const struct xlat *,
 	unsigned int val, const char *dflt);
 extern int printargs(struct tcb *);
