@@ -8,50 +8,23 @@ MAP_RENAME
 MAP_NORESERVE
 MAP_POPULATE
 MAP_NONBLOCK
-/*
- * XXX - this was introduced in SunOS 4.x to distinguish between
- * the old pre-4.x "mmap()", which:
- *
- *	only let you map devices with an "mmap" routine (e.g.,
- *	frame buffers) in;
- *
- *	required you to specify the mapping address;
- *
- *	returned 0 on success and -1 on failure;
- *
- * memory and which, and the 4.x "mmap()" which:
- *
- *	can map plain files;
- *
- *	can be asked to pick where to map the file;
- *
- *	returns the address where it mapped the file on success
- *	and -1 on failure.
- *
- * It's not actually used in source code that calls "mmap()"; the
- * "mmap()" routine adds it for you.
- *
- * It'd be nice to come up with some way of eliminating it from
- * the flags, e.g. reporting calls *without* it as "old_mmap()"
- * and calls with it as "mmap()".
- */
-_MAP_NEW
+_MAP_NEW /* sparc */
 MAP_GROWSDOWN
+MAP_GROWSUP /* ia64 */
 MAP_DENYWRITE
 MAP_EXECUTABLE
-MAP_INHERIT
+MAP_INHERIT /* sparc */
+_MAP_INHERIT /* alpha */
 MAP_FILE
 MAP_LOCKED
-/* FreeBSD ones */
-#if defined(MAP_ANON) && (!defined(MAP_ANONYMOUS) || MAP_ANON != MAP_ANONYMOUS)
-MAP_ANON
-#endif
-MAP_HASSEMAPHORE
+_MAP_HASSEMAPHORE /* alpha */
 MAP_STACK
 MAP_HUGETLB
 MAP_SYNC
 #if defined MAP_UNINITIALIZED && MAP_UNINITIALIZED > 0
 MAP_UNINITIALIZED
 #endif
-MAP_NOSYNC
-MAP_NOCORE
+MAP_AUTOGROW /* MIPS, xtensa */
+MAP_AUTORSRV /* MIPS, xtensa */
+MAP_LOCAL /* MIPS, xtensa */
+_MAP_UNALIGNED /* alpha */
