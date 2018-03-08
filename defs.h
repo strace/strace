@@ -717,6 +717,7 @@ decode_netlink_ ## name(struct tcb *, const struct nlmsghdr *,		\
 /* End of DECL_NETLINK definition. */
 
 DECL_NETLINK(crypto);
+DECL_NETLINK(netfilter);
 DECL_NETLINK(route);
 DECL_NETLINK(selinux);
 DECL_NETLINK(sock_diag);

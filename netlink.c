@@ -549,6 +549,9 @@ static const netlink_decoder_t netlink_decoders[] = {
 #ifdef HAVE_LINUX_CRYPTOUSER_H
 	[NETLINK_CRYPTO] = decode_netlink_crypto,
 #endif
+#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
+	[NETLINK_NETFILTER] = decode_netlink_netfilter,
+#endif
 	[NETLINK_ROUTE] = decode_netlink_route,
 	[NETLINK_SELINUX] = decode_netlink_selinux,
 	[NETLINK_SOCK_DIAG] = decode_netlink_sock_diag
