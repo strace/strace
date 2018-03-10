@@ -75,10 +75,12 @@ SYS_FUNC(fanotify_mark)
 #endif
 	printflags64(fan_event_flags, mask, "FAN_???");
 	tprints(", ");
-	if ((int) tcp->u_arg[argn] == FAN_NOFD)
-		tprints("FAN_NOFD, ");
-	else
+	if ((int) tcp->u_arg[argn] == FAN_NOFD) {
+		print_xlat_d(FAN_NOFD);
+		tprints(", ");
+	} else {
 		print_dirfd(tcp, tcp->u_arg[argn]);
+	}
 	printpath(tcp, tcp->u_arg[argn + 1]);
 
 	return RVAL_DECODED;
