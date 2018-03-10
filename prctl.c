@@ -319,10 +319,12 @@ SYS_FUNC(prctl)
 
 	case PR_SET_PTRACER:
 		tprints(", ");
-		if ((int) arg2 == -1)
-			tprints("PR_SET_PTRACER_ANY");
-		else
+		if ((int) arg2 == -1) {
+			print_xlat_ex(arg2, "PR_SET_PTRACER_ANY",
+				      XLAT_STYLE_DEFAULT);
+		} else {
 			tprintf("%" PRI_klu, arg2);
+		}
 		return RVAL_DECODED;
 
 	case PR_SET_SECCOMP:
