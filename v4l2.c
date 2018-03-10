@@ -729,7 +729,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		const unsigned long next = c.id & V4L2_CTRL_FLAG_NEXT_CTRL;
 		set_tcb_priv_ulong(tcp, next);
 		if (next) {
-			tprints("V4L2_CTRL_FLAG_NEXT_CTRL|");
+			print_xlat(V4L2_CTRL_FLAG_NEXT_CTRL);
+			tprints("|");
 			c.id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
 		}
 #endif
