@@ -73,7 +73,10 @@ print_mmap_flags(kernel_ulong_t flags)
 	const unsigned int hugetlb_value = flags & mask;
 
 	flags &= ~mask;
-	addflags(mmap_flags, flags);
+	if (flags) {
+		tprints("|");
+		printflags64(mmap_flags, flags, NULL);
+	}
 
 	if (hugetlb_value)
 		tprintf("|%u<<MAP_HUGE_SHIFT",

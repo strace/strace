@@ -140,24 +140,6 @@ printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 }
 
 /*
- * Interpret `xlat' as an array of flags
- * print the entries whose bits are on in `flags'
- */
-void
-addflags(const struct xlat *xlat, uint64_t flags)
-{
-	for (; xlat->str; xlat++) {
-		if (xlat->val && (flags & xlat->val) == xlat->val) {
-			tprintf("|%s", xlat->str);
-			flags &= ~xlat->val;
-		}
-	}
-	if (flags) {
-		tprintf("|%#" PRIx64, flags);
-	}
-}
-
-/*
  * Interpret `xlat' as an array of flags.
  * Print to static string the entries whose bits are on in `flags'
  * Return static string.  If 0 is provided as flags, and there is no flag that
