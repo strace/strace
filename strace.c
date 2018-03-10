@@ -147,6 +147,9 @@ unsigned int max_strlen = DEFAULT_STRLEN;
 static int acolumn = DEFAULT_ACOLUMN;
 static char *acolumn_spaces;
 
+/* Default output style for xlat entities */
+enum xlat_style xlat_verbosity = XLAT_STYLE_ABBREV;
+
 static const char *outfname;
 /* If -ff, points to stderr. Else, it's our common output log */
 static FILE *shared_log;

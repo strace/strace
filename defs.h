@@ -584,7 +584,16 @@ extern int printllval(struct tcb *, const char *, int)
 extern void printaddr64(uint64_t addr);
 extern void printaddr(kernel_ulong_t addr);
 
+#define XLAT_STYLE_VERBOSITY_MASK (XLAT_STYLE_RAW | XLAT_STYLE_ABBREV)
+
 enum xlat_style {
+	/**
+	 * Special value that is used for passing to *print{xval,flags}*_ex
+	 * routines that indicates that no overriding of user-supplied xlat
+	 * verbosity/formatting configuration is intended.
+	 */
+	XLAT_STYLE_DEFAULT = 0,
+
 	/** Print xlat value as is without xlat processing */
 	XLAT_STYLE_RAW     = 1 << 0,
 	/**
@@ -597,17 +606,19 @@ enum xlat_style {
 	XLAT_STYLE_VERBOSE = XLAT_STYLE_RAW | XLAT_STYLE_ABBREV,
 };
 
+extern enum xlat_style xlat_verbosity;
+
 extern int printxvals_ex(uint64_t val, const char *dflt,
 			 enum xlat_style style, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 #define printxvals(val_, dflt_, ...) \
-	printxvals_ex((val_), (dflt_), XLAT_STYLE_ABBREV, __VA_ARGS__)
+	printxvals_ex((val_), (dflt_), XLAT_STYLE_DEFAULT, __VA_ARGS__)
 extern int printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size,
 				uint64_t val, const char *dflt,
 				enum xlat_style style);
 #define printxval_searchn(xlat_, xlat_size_, val_, dflt_) \
 	printxval_searchn_ex((xlat_), (xlat_size_), (val_), (dflt_), \
-			     XLAT_STYLE_ABBREV)
+			     XLAT_STYLE_DEFAULT)
 /**
  * Wrapper around printxval_searchn that passes ARRAY_SIZE - 1
  * as the array size, as all arrays are XLAT_END-terminated and
@@ -617,13 +628,13 @@ extern int printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size,
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
 #define printxval_search_ex(xlat__, val__, dflt__) \
 	printxval_searchn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
-			     (dflt__), XLAT_STYLE_ABBREV)
+			     (dflt__), XLAT_STYLE_DEFAULT)
 extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
 			 unsigned int val, const char *dflt,
 			 enum xlat_style style);
 #define sprintxval(buf_, size_, xlat_, val_, dflt_) \
 	sprintxval_ex((buf_), (size_), (xlat_), (val_), (dflt_), \
-		      XLAT_STYLE_ABBREV)
+		      XLAT_STYLE_DEFAULT)
 
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
@@ -635,7 +646,7 @@ extern int printflags_ex(uint64_t flags, const char *dflt,
 extern const char *sprintflags_ex(const char *prefix, const struct xlat *xlat,
 				  uint64_t flags, enum xlat_style style);
 #define sprintflags(prefix_, xlat_, flags_) \
-	sprintflags_ex((prefix_), (xlat_), (flags_), XLAT_STYLE_ABBREV)
+	sprintflags_ex((prefix_), (xlat_), (flags_), XLAT_STYLE_DEFAULT)
 extern const char *sprinttime(long long sec);
 extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
 extern const char *sprinttime_usec(long long sec, unsigned long long usec);
@@ -812,7 +823,7 @@ printstr(struct tcb *tcp, kernel_ulong_t addr)
 static inline int
 printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
 {
-	return printflags_ex(flags, dflt, XLAT_STYLE_ABBREV, x, NULL);
+	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
 }
 
 static inline int

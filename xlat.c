@@ -33,6 +33,15 @@
 #include "xstring.h"
 #include <stdarg.h>
 
+static inline enum xlat_style
+get_xlat_style(enum xlat_style style)
+{
+	if ((style & XLAT_STYLE_VERBOSITY_MASK) == XLAT_STYLE_DEFAULT)
+		return style | xlat_verbosity;
+
+	return style;
+}
+
 const char *
 xlookup(const struct xlat *xlat, const uint64_t val)
 {
@@ -75,6 +84,8 @@ int
 printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 	      const struct xlat *xlat, ...)
 {
+	style = get_xlat_style(style);
+
 	if (style == XLAT_STYLE_RAW) {
 		tprintf("%#" PRIx64, val);
 		return 0;
@@ -112,6 +123,8 @@ sprintxval_ex(char *const buf, const size_t size, const struct xlat *const x,
 	      const unsigned int val, const char *const dflt,
 	      enum xlat_style style)
 {
+	style = get_xlat_style(style);
+
 	if (style == XLAT_STYLE_RAW)
 		return xsnprintf(buf, size, "%#x", val);
 
@@ -148,6 +161,8 @@ int
 printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 		     const char *dflt, enum xlat_style style)
 {
+	style = get_xlat_style(style);
+
 	if (style == XLAT_STYLE_RAW) {
 		tprintf("%#" PRIx64, val);
 		return 0;
@@ -202,6 +217,7 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	int found = 0;
 
 	outptr = stpcpy(outstr, prefix);
+	style = get_xlat_style(style);
 
 	if (style == XLAT_STYLE_RAW) {
 		if (!flags)
@@ -283,6 +299,8 @@ int
 printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 	      const struct xlat *xlat, ...)
 {
+	style = get_xlat_style(style);
+
 	if (style == XLAT_STYLE_RAW) {
 		if (flags || dflt) {
 			tprintf("%#" PRIx64, flags);
