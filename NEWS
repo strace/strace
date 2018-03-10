@@ -6,6 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     using --with-libdw option.
     Whether -k option is compiled is now configured at build time
     using --enable-stacktrace option.
+  * Added -X option for configuring xlat output formatting.
 
 Noteworthy changes in release 4.22 (2018-04-05)
 ===============================================

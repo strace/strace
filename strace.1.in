@@ -65,6 +65,7 @@ strace \- trace system calls and signals
 .OP \-a column
 .OP \-o file
 .OP \-s strsize
+.OP \-X format
 .OM \-P path
 .OM \-p pid
 .BR "" {
@@ -324,6 +325,27 @@ Print all non-ASCII strings in hexadecimal string format.
 .TP
 .B \-xx
 Print all strings in hexadecimal string format.
+.TP
+.BI "\-X " format
+Set the format for printing of named constants and flags.
+Supported
+.I format
+values are:
+.RS
+.TP 10
+.B raw
+Raw number output, without decoding.
+.TP
+.B abbrev
+Output a named constant or a set of flags instead of the raw number if they are
+found.
+This is the default
+.B strace
+behaviour.
+.TP
+.B verbose
+Output both the raw value and the decoded string (as a comment).
+.RE
 .TP
 .B \-y
 Print paths associated with file descriptor arguments.
