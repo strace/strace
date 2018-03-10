@@ -358,3 +358,27 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 
 	return n;
 }
+
+void
+print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
+{
+	style = get_xlat_style(style);
+
+	switch (style) {
+	case XLAT_STYLE_RAW:
+		tprintf("%#" PRIx64, val);
+		break;
+
+	case XLAT_STYLE_ABBREV:
+		tprints(str);
+		break;
+
+	default:
+		error_func_msg("Unexpected style value of %#x", style);
+		ATTRIBUTE_FALLTHROUGH;
+
+	case XLAT_STYLE_VERBOSE:
+		tprintf("%#" PRIx64, val);
+		tprints_comment(str);
+	}
+}

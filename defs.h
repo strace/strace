@@ -635,6 +635,10 @@ extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
 #define sprintxval(buf_, size_, xlat_, val_, dflt_) \
 	sprintxval_ex((buf_), (size_), (xlat_), (val_), (dflt_), \
 		      XLAT_STYLE_DEFAULT)
+/** Print a value in accordance with xlat formatting settings. */
+extern void print_xlat_ex(uint64_t val, const char *str, enum xlat_style style);
+#define print_xlat(val_) \
+	print_xlat_ex((val_), #val_, XLAT_STYLE_DEFAULT)
 
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
