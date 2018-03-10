@@ -38,6 +38,7 @@
 # include <linux/netfilter/nfnetlink.h>
 
 # include "xlat/netfilter_versions.h"
+# include "xlat/nl_netfilter_msg_types.h"
 # include "xlat/nl_netfilter_subsys_ids.h"
 
 bool
