@@ -34,6 +34,7 @@
 # include <linux/ioctl.h>
 # include <linux/ptp_clock.h>
 
+# include "print_fields.h"
 # include "xlat/ptp_flags_options.h"
 
 int
@@ -51,8 +52,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &extts))
 			break;
 
-		tprintf("{index=%d, flags=", extts.index);
-		printflags(ptp_flags_options, extts.flags, "PTP_???");
+		PRINT_FIELD_D("{", extts, index);
+		PRINT_FIELD_FLAGS(", ", extts, flags, ptp_flags_options, "PTP_???");
 		tprints("}");
 		break;
 	}
@@ -64,13 +65,12 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &perout))
 			break;
 
-		tprintf("{start={%" PRId64 ", %" PRIu32 "}"
-			   ", period={%" PRId64 ", %" PRIu32 "}"
-			   ", index=%d, flags=",
-			(int64_t)perout.start.sec, perout.start.nsec,
-			(int64_t)perout.period.sec, perout.period.nsec,
-			perout.index);
-		printflags(ptp_flags_options, perout.flags, "PTP_???");
+		PRINT_FIELD_D("{start={", perout.start, sec);
+		PRINT_FIELD_U(", ", perout.start, nsec);
+		PRINT_FIELD_D("}, period={", perout.period, sec);
+		PRINT_FIELD_U(", ", perout.period, nsec);
+		PRINT_FIELD_D("}, ", perout, index);
+		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_flags_options, "PTP_???");
 		tprints("}");
 		break;
 	}
@@ -87,7 +87,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 			if (umove_or_printaddr(tcp, arg, &sysoff))
 				break;
 
-			tprintf("{n_samples=%u", sysoff.n_samples);
+			PRINT_FIELD_U("{", sysoff, n_samples);
 			return 0;
 		} else {
 			unsigned int n_samples, i;
@@ -109,9 +109,9 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 			for (i = 0; i < 2 * n_samples + 1; ++i) {
 				if (i > 0)
 					tprints(", ");
-				tprintf("{%" PRId64 ", %" PRIu32 "}",
-					(int64_t)sysoff.ts[i].sec,
-					sysoff.ts[i].nsec);
+				PRINT_FIELD_D("{", sysoff.ts[i], sec);
+				PRINT_FIELD_U(", ", sysoff.ts[i], nsec);
+				tprints("}");
 			}
 			if (sysoff.n_samples > PTP_MAX_SAMPLES)
 				tprints(", ...");
@@ -129,9 +129,12 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &caps))
 			break;
 
-		tprintf("{max_adj=%d, n_alarm=%d, n_ext_ts=%d, n_per_out=%d, pps=%d}",
-			caps.max_adj, caps.n_alarm, caps.n_ext_ts,
-			caps.n_per_out, caps.pps);
+		PRINT_FIELD_D("{", caps, max_adj);
+		PRINT_FIELD_D(", ", caps, n_alarm);
+		PRINT_FIELD_D(", ", caps, n_ext_ts);
+		PRINT_FIELD_D(", ", caps, n_per_out);
+		PRINT_FIELD_D(", ", caps, pps);
+		tprints("}");
 		break;
 	}
 
