@@ -583,10 +583,31 @@ extern int printllval(struct tcb *, const char *, int)
 
 extern void printaddr64(uint64_t addr);
 extern void printaddr(kernel_ulong_t addr);
-extern int printxvals(const uint64_t, const char *, const struct xlat *, ...)
+
+enum xlat_style {
+	/** Print xlat value as is without xlat processing */
+	XLAT_STYLE_RAW     = 1 << 0,
+	/**
+	 * Historic strace style, process xlat and print the result (xlat
+	 * constant name/combination of flags), raw number only if nothing is
+	 * found.
+	 */
+	XLAT_STYLE_ABBREV  = 1 << 1,
+	/** Always print both raw number and xlat processing result. */
+	XLAT_STYLE_VERBOSE = XLAT_STYLE_RAW | XLAT_STYLE_ABBREV,
+};
+
+extern int printxvals_ex(uint64_t val, const char *dflt,
+			 enum xlat_style style, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
-extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
-	uint64_t val, const char *dflt);
+#define printxvals(val_, dflt_, ...) \
+	printxvals_ex((val_), (dflt_), XLAT_STYLE_ABBREV, __VA_ARGS__)
+extern int printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size,
+				uint64_t val, const char *dflt,
+				enum xlat_style style);
+#define printxval_searchn(xlat_, xlat_size_, val_, dflt_) \
+	printxval_searchn_ex((xlat_), (xlat_size_), (val_), (dflt_), \
+			     XLAT_STYLE_ABBREV)
 /**
  * Wrapper around printxval_searchn that passes ARRAY_SIZE - 1
  * as the array size, as all arrays are XLAT_END-terminated and
@@ -594,15 +615,27 @@ extern int printxval_searchn(const struct xlat *xlat, size_t xlat_size,
  */
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
-extern int sprintxval(char *buf, size_t size, const struct xlat *,
-	unsigned int val, const char *dflt);
+#define printxval_search_ex(xlat__, val__, dflt__) \
+	printxval_searchn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
+			     (dflt__), XLAT_STYLE_ABBREV)
+extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
+			 unsigned int val, const char *dflt,
+			 enum xlat_style style);
+#define sprintxval(buf_, size_, xlat_, val_, dflt_) \
+	sprintxval_ex((buf_), (size_), (xlat_), (val_), (dflt_), \
+		      XLAT_STYLE_ABBREV)
+
 extern int printargs(struct tcb *);
 extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
 
-extern int printflags_ex(uint64_t, const char *, const struct xlat *, ...)
+extern int printflags_ex(uint64_t flags, const char *dflt,
+			 enum xlat_style style, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
-extern const char *sprintflags(const char *, const struct xlat *, uint64_t);
+extern const char *sprintflags_ex(const char *prefix, const struct xlat *xlat,
+				  uint64_t flags, enum xlat_style style);
+#define sprintflags(prefix_, xlat_, flags_) \
+	sprintflags_ex((prefix_), (xlat_), (flags_), XLAT_STYLE_ABBREV)
 extern const char *sprinttime(long long sec);
 extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
 extern const char *sprinttime_usec(long long sec, unsigned long long usec);
@@ -779,7 +812,7 @@ printstr(struct tcb *tcp, kernel_ulong_t addr)
 static inline int
 printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
 {
-	return printflags_ex(flags, dflt, x, NULL);
+	return printflags_ex(flags, dflt, XLAT_STYLE_ABBREV, x, NULL);
 }
 
 static inline int
