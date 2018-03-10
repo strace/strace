@@ -179,8 +179,9 @@ typedef struct ioctlent {
 #define INJECT_F_RETVAL 2
 
 struct inject_data {
-	uint16_t flags;
-	uint16_t signo;
+	uint8_t flags;		/* only 2 of 8 flags are used so far */
+	uint8_t signo;		/* NSIG <= 128 */
+	uint16_t reserved;
 	kernel_long_t rval;
 };
 
