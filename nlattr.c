@@ -34,6 +34,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <linux/sock_diag.h>
+#include "static_assert.h"
 
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
@@ -55,6 +56,9 @@ print_nlattr(const struct nlattr *const nla,
 	     const struct xlat *const table,
 	     const char *const dflt)
 {
+	static_assert(NLA_TYPE_MASK == ~(NLA_F_NESTED | NLA_F_NET_BYTEORDER),
+		      "wrong NLA_TYPE_MASK");
+
 	tprintf("{nla_len=%u, nla_type=", nla->nla_len);
 	if (nla->nla_type & NLA_F_NESTED)
 		tprints("NLA_F_NESTED|");
