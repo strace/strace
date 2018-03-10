@@ -156,14 +156,7 @@ SYS_FUNC(poll)
 {
 	if (entering(tcp)) {
 		decode_poll_entering(tcp);
-		int timeout = tcp->u_arg[2];
-
-#ifdef INFTIM
-		if (INFTIM == timeout)
-			tprints("INFTIM");
-		else
-#endif
-			tprintf("%d", timeout);
+		tprintf("%d", (int) tcp->u_arg[2]);
 
 		return 0;
 	} else {
