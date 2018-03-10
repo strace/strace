@@ -62,11 +62,11 @@ void
 print_dirfd(struct tcb *tcp, int fd)
 {
 	if (fd == AT_FDCWD)
-		tprints("AT_FDCWD, ");
-	else {
+		print_xlat_d(AT_FDCWD);
+	else
 		printfd(tcp, fd);
-		tprints(", ");
-	}
+
+	tprints(", ");
 }
 
 /*
