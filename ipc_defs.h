@@ -43,8 +43,10 @@
 
 #define PRINTCTL(flagset, arg, dflt)				\
 	do {							\
-		if ((arg) & IPC_64)				\
-			tprints("IPC_64|");			\
+		if ((arg) & IPC_64) {				\
+			print_xlat(IPC_64);			\
+			tprints("|");				\
+		}						\
 		printxval((flagset), (arg) & ~IPC_64, dflt);	\
 	} while (0)
 
