@@ -70,7 +70,7 @@ SYS_FUNC(mount)
 	tprints(", ");
 
 	if (old_magic) {
-		tprints("MS_MGC_VAL");
+		print_xlat(MS_MGC_VAL);
 		if (flags)
 			tprints("|");
 	}
