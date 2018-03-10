@@ -52,11 +52,7 @@
 
 SYS_FUNC(shmget)
 {
-	const int key = (int) tcp->u_arg[0];
-	if (key)
-		tprintf("%#x", key);
-	else
-		tprints("IPC_PRIVATE");
+	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
 
 	unsigned int flags = tcp->u_arg[2] & ~0777;

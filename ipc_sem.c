@@ -103,11 +103,7 @@ SYS_FUNC(semtimedop)
 
 SYS_FUNC(semget)
 {
-	const int key = (int) tcp->u_arg[0];
-	if (key)
-		tprintf("%#x", key);
-	else
-		tprints("IPC_PRIVATE");
+	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
 	tprintf(", %d, ", (int) tcp->u_arg[1]);
 	if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprints("|");

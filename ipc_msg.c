@@ -41,15 +41,12 @@
 #endif
 
 #include "xlat/ipc_msg_flags.h"
+#include "xlat/ipc_private.h"
 #include "xlat/resource_flags.h"
 
 SYS_FUNC(msgget)
 {
-	const int key = (int) tcp->u_arg[0];
-	if (key)
-		tprintf("%#x", key);
-	else
-		tprints("IPC_PRIVATE");
+	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
 	tprints(", ");
 	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprints("|");

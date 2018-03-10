@@ -299,6 +299,7 @@ extern const struct xlat evdev_abs[];
 extern const struct xlat iffflags[];
 extern const struct xlat inet_protocols[];
 extern const struct xlat ip_type_of_services[];
+extern const struct xlat ipc_private[];
 extern const struct xlat msg_flags[];
 extern const struct xlat netlink_protocols[];
 extern const struct xlat nl_netfilter_msg_types[];
