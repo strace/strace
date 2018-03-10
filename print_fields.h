@@ -104,8 +104,9 @@
 #define PRINT_FIELD_CSTRING(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_quoted_cstring((const char *)(where_).field_,	\
-				     sizeof((where_).field_));		\
+		print_quoted_cstring((const char *) (where_).field_,	\
+				     sizeof((where_).field_) +		\
+					MUST_BE_ARRAY((where_).field_)); \
 	} while (0)
 
 #define PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_)			\
