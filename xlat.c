@@ -33,13 +33,40 @@
 #include "xstring.h"
 #include <stdarg.h>
 
+#define xlat_verbose(style_) ((style_) & XLAT_STYLE_VERBOSITY_MASK)
+#define xlat_format(style_)  ((style_) & XLAT_STYLE_FORMAT_MASK)
+
 static inline enum xlat_style
 get_xlat_style(enum xlat_style style)
 {
-	if ((style & XLAT_STYLE_VERBOSITY_MASK) == XLAT_STYLE_DEFAULT)
+	if (xlat_verbose(style) == XLAT_STYLE_DEFAULT)
 		return style | xlat_verbosity;
 
 	return style;
+}
+
+static inline const char *
+sprint_xlat_val(uint64_t val, enum xlat_style style)
+{
+	static char buf[sizeof(val) * 3];
+
+	switch (xlat_format(style)) {
+	case XLAT_STYLE_FMT_U:
+		xsprintf(buf, "%" PRIu64, val);
+		break;
+
+	case XLAT_STYLE_FMT_X:
+		xsprintf(buf, "%#" PRIx64, val);
+		break;
+	}
+
+	return buf;
+}
+
+static inline void
+print_xlat_val(uint64_t val, enum xlat_style style)
+{
+	tprints(sprint_xlat_val(val, style));
 }
 
 const char *
@@ -86,8 +113,8 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 {
 	style = get_xlat_style(style);
 
-	if (style == XLAT_STYLE_RAW) {
-		tprintf("%#" PRIx64, val);
+	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
+		print_xlat_val(val, style);
 		return 0;
 	}
 
@@ -98,8 +125,8 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 		const char *str = xlookup(xlat, val);
 
 		if (str) {
-			if (style == XLAT_STYLE_VERBOSE) {
-				tprintf("%#" PRIx64, val);
+			if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
+				print_xlat_val(val, style);
 				tprints_comment(str);
 			} else {
 				tprints(str);
@@ -110,7 +137,7 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 		}
 	}
 	/* No hits -- print raw # instead. */
-	tprintf("%#" PRIx64, val);
+	print_xlat_val(val, style);
 	tprints_comment(dflt);
 
 	va_end(args);
@@ -125,21 +152,23 @@ sprintxval_ex(char *const buf, const size_t size, const struct xlat *const x,
 {
 	style = get_xlat_style(style);
 
-	if (style == XLAT_STYLE_RAW)
-		return xsnprintf(buf, size, "%#x", val);
+	if (xlat_verbose(style) == XLAT_STYLE_RAW)
+		return xsnprintf(buf, size, "%s", sprint_xlat_val(val, style));
 
 	const char *const str = xlookup(x, val);
 
 	if (str) {
-		if (style == XLAT_STYLE_VERBOSE)
-			return xsnprintf(buf, size, "%#x /* %s */", val, str);
+		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE)
+			return xsnprintf(buf, size, "%s /* %s */",
+					 sprint_xlat_val(val, style), str);
 		else
 			return xsnprintf(buf, size, "%s", str);
 	}
 	if (dflt)
-		return xsnprintf(buf, size, "%#x /* %s */", val, dflt);
+		return xsnprintf(buf, size, "%s /* %s */",
+				 sprint_xlat_val(val, style), dflt);
 
-	return xsnprintf(buf, size, "%#x", val);
+	return xsnprintf(buf, size, "%s", sprint_xlat_val(val, style));
 }
 
 /**
@@ -163,16 +192,16 @@ printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 {
 	style = get_xlat_style(style);
 
-	if (style == XLAT_STYLE_RAW) {
-		tprintf("%#" PRIx64, val);
+	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
+		print_xlat_val(val, style);
 		return 0;
 	}
 
 	const char *s = xlat_search(xlat, xlat_size, val);
 
 	if (s) {
-		if (style == XLAT_STYLE_VERBOSE) {
-			tprintf("%#" PRIx64, val);
+		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
+			print_xlat_val(val, style);
 			tprints_comment(s);
 		} else {
 			tprints(s);
@@ -180,7 +209,7 @@ printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 		return 1;
 	}
 
-	tprintf("%#" PRIx64, val);
+	print_xlat_val(val, style);
 	tprints_comment(dflt);
 
 	return 0;
@@ -219,17 +248,18 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	outptr = stpcpy(outstr, prefix);
 	style = get_xlat_style(style);
 
-	if (style == XLAT_STYLE_RAW) {
+	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
 		if (!flags)
 			return NULL;
 
-		outptr = xappendstr(outstr, outptr, "%#" PRIx64, flags);
+		outptr = xappendstr(outstr, outptr, "%s",
+				    sprint_xlat_val(flags, style));
 
 		return outstr;
 	}
 
 	if (flags == 0 && xlat->val == 0 && xlat->str) {
-		if (style == XLAT_STYLE_VERBOSE) {
+		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
 			outptr = xappendstr(outstr, outptr, "0 /* %s */",
 					    xlat->str);
 		} else {
@@ -239,14 +269,15 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 		return outstr;
 	}
 
-	if (style == XLAT_STYLE_VERBOSE && flags)
-		outptr = xappendstr(outstr, outptr, "%#" PRIx64, flags);
+	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE && flags)
+		outptr = xappendstr(outstr, outptr, "%s",
+				    sprint_xlat_val(flags, style));
 
 	for (; flags && xlat->str; xlat++) {
 		if (xlat->val && (flags & xlat->val) == xlat->val) {
 			if (found)
 				*outptr++ = '|';
-			else if (style == XLAT_STYLE_VERBOSE)
+			else if (xlat_verbose(style) == XLAT_STYLE_VERBOSE)
 				outptr = stpcpy(outptr, " /* ");
 
 			outptr = stpcpy(outptr, xlat->str);
@@ -258,14 +289,15 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	if (flags) {
 		if (found)
 			*outptr++ = '|';
-		if (found || style != XLAT_STYLE_VERBOSE)
-			outptr = xappendstr(outstr, outptr, "%#" PRIx64, flags);
+		if (found || xlat_verbose(style) != XLAT_STYLE_VERBOSE)
+			outptr = xappendstr(outstr, outptr, "%s",
+					    sprint_xlat_val(flags, style));
 	} else {
 		if (!found)
 			return NULL;
 	}
 
-	if (found && style == XLAT_STYLE_VERBOSE)
+	if (found && xlat_verbose(style) == XLAT_STYLE_VERBOSE)
 		outptr = stpcpy(outptr, " */");
 
 	return outstr;
@@ -301,9 +333,9 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 {
 	style = get_xlat_style(style);
 
-	if (style == XLAT_STYLE_RAW) {
+	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
 		if (flags || dflt) {
-			tprintf("%#" PRIx64, flags);
+			print_xlat_val(flags, style);
 			return 1;
 		}
 
@@ -314,10 +346,10 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 	unsigned int n = 0;
 	va_list args;
 
-	if (style == XLAT_STYLE_VERBOSE) {
+	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
 		init_sep = " /* ";
 		if (flags)
-			tprintf("%#" PRIx64, flags);
+			print_xlat_val(flags, style);
 	}
 
 	va_start(args, xlat);
@@ -325,7 +357,8 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 		for (; (flags || !n) && xlat->str; ++xlat) {
 			if ((flags == xlat->val) ||
 			    (xlat->val && (flags & xlat->val) == xlat->val)) {
-				if (style == XLAT_STYLE_VERBOSE && !flags)
+				if (xlat_verbose(style) == XLAT_STYLE_VERBOSE
+				    && !flags)
 					tprints("0");
 				tprintf("%s%s",
 					(n++ ? "|" : init_sep), xlat->str);
@@ -339,16 +372,17 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 
 	if (n) {
 		if (flags) {
-			tprintf("|%#" PRIx64, flags);
+			tprints("|");
+			print_xlat_val(flags, style);
 			n++;
 		}
 
-		if (style == XLAT_STYLE_VERBOSE)
+		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE)
 			tprints(" */");
 	} else {
 		if (flags) {
-			if (style != XLAT_STYLE_VERBOSE)
-				tprintf("%#" PRIx64, flags);
+			if (xlat_verbose(style) != XLAT_STYLE_VERBOSE)
+				print_xlat_val(flags, style);
 			tprints_comment(dflt);
 		} else {
 			if (dflt)
@@ -364,9 +398,9 @@ print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
 {
 	style = get_xlat_style(style);
 
-	switch (style) {
+	switch (xlat_verbose(style)) {
 	case XLAT_STYLE_RAW:
-		tprintf("%#" PRIx64, val);
+		print_xlat_val(val, style);
 		break;
 
 	case XLAT_STYLE_ABBREV:
@@ -378,7 +412,7 @@ print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
 		ATTRIBUTE_FALLTHROUGH;
 
 	case XLAT_STYLE_VERBOSE:
-		tprintf("%#" PRIx64, val);
+		print_xlat_val(val, style);
 		tprints_comment(str);
 	}
 }

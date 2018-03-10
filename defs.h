@@ -586,6 +586,8 @@ extern void printaddr64(uint64_t addr);
 extern void printaddr(kernel_ulong_t addr);
 
 #define XLAT_STYLE_VERBOSITY_MASK (XLAT_STYLE_RAW | XLAT_STYLE_ABBREV)
+#define XLAT_STYLE_FORMAT_SHIFT   2
+#define XLAT_STYLE_FORMAT_MASK    (1 << XLAT_STYLE_FORMAT_SHIFT)
 
 enum xlat_style {
 	/**
@@ -605,6 +607,9 @@ enum xlat_style {
 	XLAT_STYLE_ABBREV  = 1 << 1,
 	/** Always print both raw number and xlat processing result. */
 	XLAT_STYLE_VERBOSE = XLAT_STYLE_RAW | XLAT_STYLE_ABBREV,
+
+	XLAT_STYLE_FMT_X   = 0 << XLAT_STYLE_FORMAT_SHIFT,
+	XLAT_STYLE_FMT_U   = 1 << XLAT_STYLE_FORMAT_SHIFT,
 };
 
 extern enum xlat_style xlat_verbosity;
