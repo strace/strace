@@ -164,6 +164,27 @@ test_nfgenmsg(const int fd)
 		     printf(", res_id=htons(%d)"
 			    ", \"\\x31\\x32\\x33\\x34\"", 0xabcd));
 # endif /* NFNL_MSG_BATCH_BEGIN */
+
+	static const struct nlattr nla = {
+		.nla_len = sizeof(nla),
+		.nla_type = 0x0bcd
+	};
+	char nla_buf[NLMSG_ALIGN(sizeof(msg)) + sizeof(nla)];
+
+	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
+	memcpy(nla_buf, &msg, sizeof(msg));
+	memcpy(nla_buf + NLMSG_ALIGN(sizeof(msg)), &nla, sizeof(nla));
+
+	TEST_NETLINK_(fd, nlh0,
+		      NFNL_SUBSYS_NFTABLES << 8 | 0xff,
+		      "NFNL_SUBSYS_NFTABLES<<8|0xff /* NFT_MSG_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(nla_buf), nla_buf, sizeof(nla_buf),
+		      printf("{nfgen_family=AF_UNIX");
+		      printf(", version=NFNETLINK_V0");
+		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)"
+			     ", {nla_len=%d, nla_type=%#x}",
+			     nla.nla_len, nla.nla_type));
 }
 
 int main(void)
