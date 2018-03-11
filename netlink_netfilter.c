@@ -31,6 +31,7 @@
 #ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
 
 # include "print_fields.h"
+# include "nlattr.h"
 
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -80,8 +81,14 @@ decode_netlink_netfilter(struct tcb *const tcp,
 		const size_t offset = NLMSG_ALIGN(sizeof(nfmsg));
 		if (len > offset) {
 			tprints(", ");
-			printstr_ex(tcp, addr + offset,
-				    len - offset, QUOTE_FORCE_HEX);
+			if ((nlmsghdr->nlmsg_type >= NFNL_MSG_BATCH_BEGIN
+			     && nlmsghdr->nlmsg_type <= NFNL_MSG_BATCH_END)
+			    || nlmsghdr->nlmsg_type < NLMSG_MIN_TYPE)
+				printstr_ex(tcp, addr + offset,
+					    len - offset, QUOTE_FORCE_HEX);
+			else
+				decode_nlattr(tcp, addr + offset, len - offset,
+					      NULL, NULL, NULL, 0, NULL);
 		}
 	}
 
