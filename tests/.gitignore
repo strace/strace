@@ -139,6 +139,7 @@ ioctl_loop-nv
 ioctl_loop-v
 ioctl_mtd
 ioctl_nsfs
+ioctl_ptp
 ioctl_rtc
 ioctl_rtc-v
 ioctl_scsi

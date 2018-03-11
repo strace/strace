@@ -108,6 +108,7 @@ ioctl_kvm_run
 ioctl_loop
 ioctl_mtd
 ioctl_rtc
+ioctl_ptp
 ioctl_scsi
 ioctl_sg_io_v3
 ioctl_sg_io_v4

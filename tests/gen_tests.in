@@ -136,6 +136,7 @@ ioctl_loop-nv	+ioctl.test -a22 -e verbose=none
 ioctl_loop-v	+ioctl.test -v
 ioctl_mtd	+ioctl.test
 ioctl_nsfs	+ioctl.test -esignal=none
+ioctl_ptp 	+ioctl.test
 ioctl_rtc	+ioctl.test
 ioctl_rtc-v	+ioctl.test -v
 ioctl_scsi	+ioctl.test
