@@ -1,7 +1,7 @@
 image: "ubuntu:17.10"
 
 before_script:
-  - ./travis-install.sh
+  - ci/install-dependencies.sh
 
 variables:
   GIT_DEPTH: "2147483647"
@@ -10,28 +10,28 @@ variables:
 
 gcc-x86_64:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "gcc"
     TARGET: "x86_64"
 
 gcc-x86:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "gcc"
     TARGET: "x86"
 
 clang-x86_64:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "clang"
     TARGET: "x86_64"
 
 clang-x86:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "clang"
     TARGET: "x86"

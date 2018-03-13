@@ -2,9 +2,9 @@ language: c
 
 dist: trusty
 
-before_install: ./travis-install.sh
+before_install: ci/install-dependencies.sh
 
-script: ./travis-build.sh
+script: ci/run-build-and-tests.sh
 
 sudo: required
 
