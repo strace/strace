@@ -708,7 +708,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled) {
 		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
-			unwind_capture_stacktrace(tcp);
+			unwind_tcb_capture(tcp);
 	}
 #endif
 
@@ -961,7 +961,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 
 #ifdef USE_LIBUNWIND
 	if (stack_trace_enabled)
-		unwind_print_stacktrace(tcp);
+		unwind_tcb_print(tcp);
 #endif
 	return 0;
 }

@@ -736,8 +736,8 @@ extern void ts_div(struct timespec *, const struct timespec *, int);
 extern void unwind_init(void);
 extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
-extern void unwind_print_stacktrace(struct tcb *);
-extern void unwind_capture_stacktrace(struct tcb *);
+extern void unwind_tcb_print(struct tcb *);
+extern void unwind_tcb_capture(struct tcb *);
 #endif
 
 static inline int

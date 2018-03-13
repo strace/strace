@@ -384,7 +384,7 @@ queue_print(struct unwind_queue_t *queue)
  * printing stack
  */
 void
-unwind_print_stacktrace(struct tcb *tcp)
+unwind_tcb_print(struct tcb *tcp)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
@@ -415,7 +415,7 @@ unwind_print_stacktrace(struct tcb *tcp)
  * capturing stack
  */
 void
-unwind_capture_stacktrace(struct tcb *tcp)
+unwind_tcb_capture(struct tcb *tcp)
 {
 #if SUPPORTED_PERSONALITIES > 1
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
