@@ -66,6 +66,8 @@ export CC_FOR_BUILD="$CC"
 	|| {
 	rc=$?
 	cat config.log
+	echo "$CC -dumpspecs follows"
+	$CC -dumpspecs
 	exit $rc
 }
 
