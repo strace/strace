@@ -14,9 +14,24 @@ apt_get_install()
 		install -y "$@"
 }
 
+git_installed=
+clone_repo()
+{
+	local src dst
+	src="$1"; shift
+	dst="$1"; shift
+
+	[ -n "$git_installed" ] || {
+		apt_get_install git ca-certificates
+		git_installed=1
+	}
+	git clone --depth=1 "$src" "$dst"
+}
+
 case "$KHEADERS" in
 	*/*)
-		git clone --depth=1 https://github.com/"$KHEADERS" kernel
+		clone_repo https://github.com/"$KHEADERS" kernel
+		apt_get_install $common_packages
 		$sudo make -C kernel headers_install INSTALL_HDR_PATH=/opt/kernel
 		$sudo rm -rf kernel
 		KHEADERS_INC=/opt/kernel/include
@@ -38,8 +53,8 @@ case "$CC" in
 		apt_get_install $common_packages "$CC"
 		;;
 	musl-gcc)
-		apt_get_install $common_packages ca-certificates
-		git clone --depth=1 https://github.com/strace/musl
+		clone_repo https://github.com/strace/musl musl
+		apt_get_install $common_packages
 		cd musl
 			CC=gcc
 			build=
