@@ -25,6 +25,16 @@ clone_repo()
 		apt_get_install git ca-certificates
 		git_installed=1
 	}
+
+	case "$src" in
+		*://*)	;;
+		*)	local url path
+			url="$(git config remote.origin.url)"
+			path="${url#*://*/}"
+			src="${url%$path}$src"
+			;;
+	esac
+
 	git clone --depth=1 "$src" "$dst"
 }
 
@@ -53,7 +63,7 @@ case "$CC" in
 		apt_get_install $common_packages "$CC"
 		;;
 	musl-gcc)
-		clone_repo https://github.com/strace/musl musl
+		clone_repo strace/musl musl
 		apt_get_install $common_packages
 		cd musl
 			CC=gcc
