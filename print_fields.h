@@ -106,6 +106,16 @@
 
 #define PRINT_FIELD_UID PRINT_FIELD_ID
 
+#define PRINT_FIELD_U64(prefix_, where_, field_)					\
+	do {										\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);				\
+		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX)		\
+			print_xlat_ex(UINT64_MAX, "UINT64_MAX", XLAT_STYLE_FMT_U);	\
+		else									\
+			STRACE_PRINTF("%llu",						\
+				      zero_extend_signed_to_ull((where_).field_));	\
+	} while (0)
+
 #define PRINT_FIELD_STRING(prefix_, where_, field_, len_, style_)	\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
