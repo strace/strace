@@ -179,28 +179,18 @@ btrfs_unparse_uuid(unsigned char *uuid, char *out)
 }
 
 static void
-print_u64(const char *name, uint64_t value)
-{
-	tprintf(", %s=%" PRIu64, name, value);
-	if (value == UINT64_MAX)
-		tprints_comment("UINT64_MAX");
-}
-
-#define print_member_u64(obj, name) print_u64(#name, obj->name)
-
-static void
 btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 {
 	tprintf(", %s={profiles=", name);
 	printflags64(btrfs_space_info_flags, bba->profiles,
 		     "BTRFS_BLOCK_GROUP_???");
-	print_member_u64(bba, usage);
-	print_member_u64(bba, devid);
-	print_member_u64(bba, pstart);
-	print_member_u64(bba, pend);
-	print_member_u64(bba, vstart);
-	print_member_u64(bba, vend);
-	print_member_u64(bba, target);
+	PRINT_FIELD_U64(", ", *bba, usage);
+	PRINT_FIELD_U64(", ", *bba, devid);
+	PRINT_FIELD_U64(", ", *bba, pstart);
+	PRINT_FIELD_U64(", ", *bba, pend);
+	PRINT_FIELD_U64(", ", *bba, vstart);
+	PRINT_FIELD_U64(", ", *bba, vend);
+	PRINT_FIELD_U64(", ", *bba, target);
 	tprints(", flags=");
 	printflags64(btrfs_balance_args, bba->flags, "BTRFS_BALANCE_ARGS_???");
 	tprints("}");
@@ -391,16 +381,6 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 }
 
 static void
-print_key_value_internal(struct tcb *tcp, const char *name, uint64_t value)
-{
-	tprintf(", %s=%" PRIu64, name, value);
-	if (value == UINT64_MAX)
-		tprints_comment("UINT64_MAX");
-}
-#define print_key_value(tcp, key, name)					\
-	print_key_value_internal((tcp), #name, (key)->name)
-
-static void
 btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 			uint64_t buf_addr, uint64_t buf_size, bool print_size)
 {
@@ -415,10 +395,10 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 		    !abbrev(tcp))
 			btrfs_print_objectid(", ", *key, max_objectid);
 
-		print_key_value(tcp, key, min_offset);
-		print_key_value(tcp, key, max_offset);
-		print_key_value(tcp, key, min_transid);
-		print_key_value(tcp, key, max_transid);
+		PRINT_FIELD_U64(", ", *key, min_offset);
+		PRINT_FIELD_U64(", ", *key, max_offset);
+		PRINT_FIELD_U64(", ", *key, min_transid);
+		PRINT_FIELD_U64(", ", *key, max_transid);
 
 		btrfs_print_key_type(", ", *key, min_type);
 		btrfs_print_key_type(", ", *key, max_type);
@@ -588,11 +568,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{start=%" PRIu64 ", len=", (uint64_t)args.start);
-
-		tprintf("%" PRIu64, (uint64_t) args.len);
-		if (args.len == UINT64_MAX)
-			tprints_comment("UINT64_MAX");
+		tprintf("{start=%" PRIu64, (uint64_t)args.start);
+		PRINT_FIELD_U64(", ", args, len);
 
 		tprints(", flags=");
 		printflags64(btrfs_defrag_flags, args.flags,
@@ -1090,11 +1067,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			tprintf("{devid=%" PRI__u64, args.devid);
 			if (code == BTRFS_IOC_SCRUB) {
-				tprintf(", start=%" PRI__u64 ", end=",
+				tprintf(", start=%" PRI__u64,
 					args.start);
-				tprintf("%" PRI__u64, args.end);
-				if (args.end == UINT64_MAX)
-					tprints_comment("UINT64_MAX");
+				PRINT_FIELD_U64(", ", args, end);
 				tprints(", flags=");
 				printflags64(btrfs_scrub_flags, args.flags,
 					     "BTRFS_SCRUB_???");

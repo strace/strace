@@ -178,12 +178,17 @@ prxval_btrfs(const struct xlat *xlat, const unsigned long long val,
 		printf(" */");
 }
 
-static const char *
-maybe_print_uint64max(uint64_t val)
+static void
+print_uint64(const char *prefix, uint64_t val)
 {
-	if (val == UINT64_MAX)
-		return " /* UINT64_MAX */";
-	return "";
+	if (val == UINT64_MAX) {
+		if (verbose_xlat)
+			printf("%s%" PRIu64 " /* UINT64_MAX */", prefix, val);
+		else
+			printf("%sUINT64_MAX", prefix);
+	} else {
+		printf("%s%" PRIu64, prefix, val);
+	}
 }
 
 /* takes highest valid flag bit */
@@ -512,16 +517,14 @@ btrfs_print_balance_args(struct btrfs_balance_args *args)
 	printf("{profiles=");
 	prfl_btrfs(btrfs_space_info_flags, args->profiles,
 		   "BTRFS_BLOCK_GROUP_???");
-	printf(", usage=%"PRI__u64 "%s, devid=%"PRI__u64 "%s, pstart=%"PRI__u64
-	       "%s, pend=%"PRI__u64 "%s, vstart=%"PRI__u64 "%s, vend=%"PRI__u64
-	       "%s, target=%"PRI__u64 "%s, flags=",
-		args->usage, maybe_print_uint64max(args->usage),
-		args->devid, maybe_print_uint64max(args->devid),
-		args->pstart, maybe_print_uint64max(args->pstart),
-		args->pend, maybe_print_uint64max(args->pend),
-		args->vstart, maybe_print_uint64max(args->vstart),
-		args->vend, maybe_print_uint64max(args->vend),
-		args->target, maybe_print_uint64max(args->target));
+	print_uint64(", usage=", args->usage);
+	print_uint64(", devid=", args->devid);
+	print_uint64(", pstart=", args->pstart);
+	print_uint64(", pend=", args->pend);
+	print_uint64(", vstart=", args->vstart);
+	print_uint64(", vend=", args->vend);
+	print_uint64(", target=", args->target);
+	printf(", flags=");
 	prfl_btrfs(btrfs_balance_args, args->flags, "BTRFS_BALANCE_ARGS_???");
 	printf("}");
 }
@@ -738,10 +741,10 @@ static void
 btrfs_print_defrag_range_args(struct btrfs_ioctl_defrag_range_args *args,
 			      bool compress_type_known)
 {
-	printf("{start=%" PRIu64 ", len=%" PRIu64 "%s, flags=",
-		(uint64_t) args->start, (uint64_t) args->len,
-		maybe_print_uint64max(args->len));
+	printf("{start=%" PRIu64, (uint64_t) args->start);
+	print_uint64(", len=", args->len);
 
+	printf(", flags=");
 	prfl_btrfs(btrfs_defrag_flags, args->flags, "BTRFS_DEFRAG_RANGE_???");
 	printf(", extent_thresh=%u, compress_type=", args->extent_thresh);
 	prxval_btrfs(btrfs_compress_types, args->compress_type,
@@ -848,14 +851,10 @@ btrfs_print_search_key(struct btrfs_ioctl_search_key *key)
 		printf(", max_objectid=");
 		btrfs_print_objectid(key->max_objectid);
 	}
-	printf(", min_offset=%" PRI__u64 "%s",
-	       key->min_offset, maybe_print_uint64max(key->min_offset));
-	printf(", max_offset=%" PRI__u64 "%s",
-	       key->max_offset, maybe_print_uint64max(key->max_offset));
-	printf(", min_transid=%" PRI__u64 "%s", key->min_transid,
-	       maybe_print_uint64max(key->min_transid));
-	printf(", max_transid=%" PRI__u64 "%s", key->max_transid,
-	       maybe_print_uint64max(key->max_transid));
+	print_uint64(", min_offset=", key->min_offset);
+	print_uint64(", max_offset=", key->max_offset);
+	print_uint64(", min_transid=", key->min_transid);
+	print_uint64(", max_transid=", key->max_transid);
 	printf(", min_type=");
 	btrfs_print_key_type(key->min_type);
 	printf(", max_type=");
@@ -1167,10 +1166,10 @@ btrfs_test_scrub_ioctls(void)
 	ioctl(-1, BTRFS_IOC_SCRUB_CANCEL, NULL);
 	printf("ioctl(-1, BTRFS_IOC_SCRUB_CANCEL) = -1 EBADF (%m)\n");
 
-	printf("ioctl(-1, BTRFS_IOC_SCRUB, {devid=%" PRI__u64 ", start=%"
-		PRI__u64 "%s, end=%" PRI__u64 "%s, flags=",
-		args.devid, args.start, maybe_print_uint64max(args.start),
-		args.end, maybe_print_uint64max(args.end));
+	printf("ioctl(-1, BTRFS_IOC_SCRUB, {devid=%" PRI__u64, args.devid);
+	print_uint64(", start=", args.start);
+	print_uint64(", end=", args.end);
+	printf(", flags=");
 	prfl_btrfs(btrfs_scrub_flags, args.flags, "BTRFS_SCRUB_???");
 	ioctl(-1, BTRFS_IOC_SCRUB, &args);
 	printf("}) = -1 EBADF (%m)\n");
