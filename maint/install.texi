@@ -1,5 +1,5 @@
 @c This file is imported from GNU Autoconf and edited to produce
-@c the INSTALL file.
+@c the README-configure file.
 
 @ifclear autoconf
 
@@ -24,8 +24,8 @@ should configure, build, and install this package.  The following
 more-detailed instructions are generic; see the @file{README} file for
 instructions specific to this package.
 @ifclear autoconf
-Some packages provide this @file{INSTALL} file but do not implement all
-of the features documented below.  The lack of an optional feature in a
+Some packages provide this @file{README-configure} file but do not implement
+all of the features documented below.  The lack of an optional feature in a
 given package is not necessarily a bug.
 @end ifclear
 More recommendations for GNU packages can be found in
