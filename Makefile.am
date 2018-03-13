@@ -350,7 +350,7 @@ strace_SOURCES =	\
 strace_SOURCES_check = bpf_attr_check.c
 
 if USE_LIBUNWIND
-strace_SOURCES += unwind.c
+strace_SOURCES += unwind.c unwind.h unwind-libunwind.c
 strace_CPPFLAGS += $(libunwind_CPPFLAGS)
 strace_LDFLAGS += $(libunwind_LDFLAGS)
 strace_LDADD += $(libunwind_LIBS)

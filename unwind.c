@@ -27,7 +27,7 @@
 
 #include "defs.h"
 #include "mmap_cache.h"
-#include <libunwind-ptrace.h>
+#include "unwind.h"
 
 #ifdef USE_DEMANGLE
 # if defined HAVE_DEMANGLE_H
@@ -36,18 +36,6 @@
 #  include <libiberty/demangle.h>
 # endif
 #endif
-
-/*
- * Type used in stacktrace walker
- */
-typedef void (*call_action_fn)(void *data,
-			       const char *binary_filename,
-			       const char *symbol_name,
-			       unw_word_t function_offset,
-			       unsigned long true_offset);
-typedef void (*error_action_fn)(void *data,
-				const char *error,
-				unsigned long true_offset);
 
 /*
  * Type used in stacktrace capturing
@@ -64,33 +52,27 @@ struct unwind_queue_t {
 
 static void queue_print(struct unwind_queue_t *queue);
 
-static unw_addr_space_t libunwind_as;
-
 static const char asprintf_error_str[] = "???";
 
 void
 unwind_init(void)
 {
-	libunwind_as = unw_create_addr_space(&_UPT_accessors, 0);
-	if (!libunwind_as)
-		error_msg_and_die("failed to create address space for stack tracing");
-	unw_set_caching_policy(libunwind_as, UNW_CACHE_GLOBAL);
+	if (unwinder.init)
+		unwinder.init();
 	mmap_cache_enable();
 }
 
 void
 unwind_tcb_init(struct tcb *tcp)
 {
-	if (tcp->unwind_ctx)
+	if (tcp->unwind_queue)
 		return;
-
-	tcp->unwind_ctx = _UPT_create(tcp->pid);
-	if (!tcp->unwind_ctx)
-		perror_msg_and_die("_UPT_create");
 
 	tcp->unwind_queue = xmalloc(sizeof(*tcp->unwind_queue));
 	tcp->unwind_queue->head = NULL;
 	tcp->unwind_queue->tail = NULL;
+
+	tcp->unwind_ctx = unwinder.tcb_init(tcp);
 }
 
 void
@@ -100,120 +82,8 @@ unwind_tcb_fin(struct tcb *tcp)
 	free(tcp->unwind_queue);
 	tcp->unwind_queue = NULL;
 
-	_UPT_destroy(tcp->unwind_ctx);
+	unwinder.tcb_fin(tcp);
 	tcp->unwind_ctx = NULL;
-}
-
-static void
-get_symbol_name(unw_cursor_t *cursor, char **name,
-		size_t *size, unw_word_t *offset)
-{
-	for (;;) {
-		int rc = unw_get_proc_name(cursor, *name, *size, offset);
-		if (rc == 0)
-			break;
-		if (rc != -UNW_ENOMEM) {
-			**name = '\0';
-			*offset = 0;
-			break;
-		}
-		*name = xgrowarray(*name, size, 1);
-	}
-}
-
-static int
-print_stack_frame(struct tcb *tcp,
-		  call_action_fn call_action,
-		  error_action_fn error_action,
-		  void *data,
-		  unw_cursor_t *cursor,
-		  char **symbol_name,
-		  size_t *symbol_name_size)
-{
-	unw_word_t ip;
-	struct mmap_cache_t *cur_mmap_cache;
-
-	if (unw_get_reg(cursor, UNW_REG_IP, &ip) < 0) {
-		perror_msg("Can't walk the stack of process %d", tcp->pid);
-		return -1;
-	}
-
-	cur_mmap_cache = mmap_cache_search(tcp, ip);
-	if (cur_mmap_cache
-	    /* ignore mappings that have no PROT_EXEC bit set */
-	    && (cur_mmap_cache->protections & MMAP_CACHE_PROT_EXECUTABLE)) {
-		unsigned long true_offset;
-		unw_word_t function_offset;
-
-		get_symbol_name(cursor, symbol_name, symbol_name_size,
-				&function_offset);
-		true_offset = ip - cur_mmap_cache->start_addr +
-			cur_mmap_cache->mmap_offset;
-#ifdef USE_DEMANGLE
-		char *demangled_name =
-			cplus_demangle(*symbol_name,
-				       DMGL_AUTO | DMGL_PARAMS);
-#endif
-		call_action(data,
-			    cur_mmap_cache->binary_filename,
-#ifdef USE_DEMANGLE
-			    demangled_name ? demangled_name :
-#endif
-			    *symbol_name,
-			    function_offset,
-			    true_offset);
-#ifdef USE_DEMANGLE
-		free(demangled_name);
-#endif
-
-		return 0;
-	}
-
-	/*
-	 * there is a bug in libunwind >= 1.0
-	 * after a set_tid_address syscall
-	 * unw_get_reg returns IP == 0
-	 */
-	if (ip)
-		error_action(data, "unexpected_backtracing_error", ip);
-	return -1;
-}
-
-/*
- * walking the stack
- */
-static void
-stacktrace_walk(struct tcb *tcp,
-		call_action_fn call_action,
-		error_action_fn error_action,
-		void *data)
-{
-	char *symbol_name;
-	size_t symbol_name_size = 40;
-	unw_cursor_t cursor;
-	int stack_depth;
-
-	if (!tcp->mmap_cache)
-		error_msg_and_die("bug: mmap_cache is NULL");
-	if (tcp->mmap_cache_size == 0)
-		error_msg_and_die("bug: mmap_cache is empty");
-
-	symbol_name = xmalloc(symbol_name_size);
-
-	if (unw_init_remote(&cursor, libunwind_as, tcp->unwind_ctx) < 0)
-		perror_msg_and_die("Can't initiate libunwind");
-
-	for (stack_depth = 0; stack_depth < 256; ++stack_depth) {
-		if (print_stack_frame(tcp, call_action, error_action, data,
-				&cursor, &symbol_name, &symbol_name_size) < 0)
-			break;
-		if (unw_step(&cursor) <= 0)
-			break;
-	}
-	if (stack_depth >= 256)
-		error_action(data, "too many stack frames", 0);
-
-	free(symbol_name);
 }
 
 /*
@@ -228,10 +98,10 @@ stacktrace_walk(struct tcb *tcp,
  * /lib64/libc.so.6(__libc_start_main+0xed) [0x7fa2f8a5976d]
  * ./a.out() [0x400569]
  */
-#define STACK_ENTRY_SYMBOL_FMT			\
+#define STACK_ENTRY_SYMBOL_FMT(SYM)		\
 	" > %s(%s+0x%lx) [0x%lx]\n",		\
 	binary_filename,			\
-	symbol_name,				\
+	(SYM),					\
 	(unsigned long) function_offset,	\
 	true_offset
 #define STACK_ENTRY_NOSYMBOL_FMT		\
@@ -248,11 +118,24 @@ static void
 print_call_cb(void *dummy,
 	      const char *binary_filename,
 	      const char *symbol_name,
-	      unw_word_t function_offset,
+	      unwind_function_offset_t function_offset,
 	      unsigned long true_offset)
 {
-	if (symbol_name && (symbol_name[0] != '\0'))
-		tprintf(STACK_ENTRY_SYMBOL_FMT);
+	if (symbol_name && (symbol_name[0] != '\0')) {
+#ifdef USE_DEMANGLE
+		char *demangled_name =
+			cplus_demangle(symbol_name,
+				       DMGL_AUTO | DMGL_PARAMS);
+#endif
+		tprintf(STACK_ENTRY_SYMBOL_FMT(
+#ifdef USE_DEMANGLE
+					       demangled_name ? demangled_name :
+#endif
+					       symbol_name));
+#ifdef USE_DEMANGLE
+		free(demangled_name);
+#endif
+	}
 	else if (binary_filename)
 		tprintf(STACK_ENTRY_NOSYMBOL_FMT);
 	else
@@ -277,15 +160,29 @@ print_error_cb(void *dummy,
 static char *
 sprint_call_or_error(const char *binary_filename,
 		     const char *symbol_name,
-		     unw_word_t function_offset,
+		     unwind_function_offset_t function_offset,
 		     unsigned long true_offset,
 		     const char *error)
 {
 	char *output_line = NULL;
 	int n;
 
-	if (symbol_name)
-		n = asprintf(&output_line, STACK_ENTRY_SYMBOL_FMT);
+	if (symbol_name) {
+#ifdef USE_DEMANGLE
+		char *demangled_name =
+			cplus_demangle(symbol_name,
+				       DMGL_AUTO | DMGL_PARAMS);
+#endif
+		n = asprintf(&output_line,
+			     STACK_ENTRY_SYMBOL_FMT(
+#ifdef USE_DEMANGLE
+						    demangled_name ? demangled_name :
+#endif
+						    symbol_name));
+#ifdef USE_DEMANGLE
+		free(demangled_name);
+#endif
+	}
 	else if (binary_filename)
 		n = asprintf(&output_line, STACK_ENTRY_NOSYMBOL_FMT);
 	else if (error)
@@ -310,7 +207,7 @@ static void
 queue_put(struct unwind_queue_t *queue,
 	  const char *binary_filename,
 	  const char *symbol_name,
-	  unw_word_t function_offset,
+	  unwind_function_offset_t function_offset,
 	  unsigned long true_offset,
 	  const char *error)
 {
@@ -337,7 +234,7 @@ static void
 queue_put_call(void *queue,
 	       const char *binary_filename,
 	       const char *symbol_name,
-	       unw_word_t function_offset,
+	       unwind_function_offset_t function_offset,
 	       unsigned long true_offset)
 {
 	queue_put(queue,
@@ -398,12 +295,12 @@ unwind_tcb_print(struct tcb *tcp)
 		queue_print(tcp->unwind_queue);
 	} else switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
 		case MMAP_CACHE_REBUILD_RENEWED:
-			unw_flush_cache(libunwind_as, 0, 0);
+			unwinder.tcb_flush_cache(tcp);
 			ATTRIBUTE_FALLTHROUGH;
 		case MMAP_CACHE_REBUILD_READY:
 			debug_func_msg("walk: tcp=%p, queue=%p",
 				       tcp, tcp->unwind_queue->head);
-			stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
+			unwinder.tcb_walk(tcp, print_call_cb, print_error_cb, NULL);
 			break;
 		default:
 			/* Do nothing */
@@ -428,11 +325,11 @@ unwind_tcb_capture(struct tcb *tcp)
 
 	switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
 	case MMAP_CACHE_REBUILD_RENEWED:
-		unw_flush_cache(libunwind_as, 0, 0);
+		unwinder.tcb_flush_cache(tcp);
 		ATTRIBUTE_FALLTHROUGH;
 	case MMAP_CACHE_REBUILD_READY:
-		stacktrace_walk(tcp, queue_put_call, queue_put_error,
-				tcp->unwind_queue);
+		unwinder.tcb_walk(tcp, queue_put_call, queue_put_error,
+				   tcp->unwind_queue);
 		debug_func_msg("tcp=%p, queue=%p",
 			       tcp, tcp->unwind_queue->head);
 		break;
