@@ -81,11 +81,11 @@ unwind_init(void)
 void
 unwind_tcb_init(struct tcb *tcp)
 {
-	if (tcp->libunwind_ui)
+	if (tcp->unwind_ctx)
 		return;
 
-	tcp->libunwind_ui = _UPT_create(tcp->pid);
-	if (!tcp->libunwind_ui)
+	tcp->unwind_ctx = _UPT_create(tcp->pid);
+	if (!tcp->unwind_ctx)
 		perror_msg_and_die("_UPT_create");
 
 	tcp->queue = xmalloc(sizeof(*tcp->queue));
@@ -100,8 +100,8 @@ unwind_tcb_fin(struct tcb *tcp)
 	free(tcp->queue);
 	tcp->queue = NULL;
 
-	_UPT_destroy(tcp->libunwind_ui);
-	tcp->libunwind_ui = NULL;
+	_UPT_destroy(tcp->unwind_ctx);
+	tcp->unwind_ctx = NULL;
 }
 
 static void
@@ -200,7 +200,7 @@ stacktrace_walk(struct tcb *tcp,
 
 	symbol_name = xmalloc(symbol_name_size);
 
-	if (unw_init_remote(&cursor, libunwind_as, tcp->libunwind_ui) < 0)
+	if (unw_init_remote(&cursor, libunwind_as, tcp->unwind_ctx) < 0)
 		perror_msg_and_die("Can't initiate libunwind");
 
 	for (stack_depth = 0; stack_depth < 256; ++stack_depth) {

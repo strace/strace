@@ -223,7 +223,7 @@ struct tcb {
 	unsigned int mmap_cache_generation;
 
 #ifdef USE_LIBUNWIND
-	struct UPT_info *libunwind_ui;
+	void *unwind_ctx;
 	struct queue_t *queue;
 #endif
 };
