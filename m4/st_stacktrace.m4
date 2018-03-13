@@ -42,13 +42,24 @@ use_unwinder=
 dnl Whether to enable stack tracing support?
 
 AS_IF([test x"$enable_stacktrace" != xno],
-      [st_ARG_LIBUNWIND
+      [st_ARG_LIBDW
+       st_ARG_LIBUNWIND
+       AS_IF([test "x$with_libdw" = xyes && test "x$with_libunwind" = xyes],
+	     [AC_MSG_ERROR([--with-libdw=yes and --with-libunwind=yes are mutually exclusive])],
+	     [test "x$with_libdw" = xyes], [with_libunwind=no],
+	     [test "x$with_libunwind" = xyes], [with_libdw=no]
+	    )
+       AS_IF([test "x$use_unwinder" = x], [st_LIBDW])
        AS_IF([test "x$use_unwinder" = x], [st_LIBUNWIND])
        AS_IF([test x"$enable_stacktrace$use_unwinder" = xyes],
-	     [AC_MSG_ERROR([stack tracing support requires an unwinder])])])
+	     [AC_MSG_ERROR([stack tracing support requires an unwinder])]
+	    )
+      ]
+     )
 
 AC_MSG_CHECKING([whether to enable stack tracing support])
 AM_CONDITIONAL([ENABLE_STACKTRACE], [test "x$use_unwinder" != x])
+AM_CONDITIONAL([USE_LIBDW], [test "x$use_unwinder" = xlibdw])
 AM_CONDITIONAL([USE_LIBUNWIND], [test "x$use_unwinder" = xlibunwind])
 
 use_libiberty=

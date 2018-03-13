@@ -1,6 +1,12 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Implemented libdw backend for -k option, configured at build time
+    using --with-libdw option.
+    Whether -k option is compiled is now configured at build time
+    using --enable-stacktrace option.
+
 Noteworthy changes in release 4.22 (2018-04-05)
 ===============================================
 

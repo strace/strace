@@ -353,6 +353,13 @@ strace_SOURCES_check = bpf_attr_check.c
 
 if ENABLE_STACKTRACE
 strace_SOURCES += unwind.c unwind.h
+if USE_LIBDW
+strace_SOURCES += unwind-libdw.c
+strace_CPPFLAGS += $(libdw_CPPFLAGS)
+strace_CFLAGS += $(libdw_CFLAGS)
+strace_LDFLAGS += $(libdw_LDFLAGS)
+strace_LDADD += $(libdw_LIBS)
+endif
 if USE_LIBUNWIND
 strace_SOURCES += unwind-libunwind.c
 strace_CPPFLAGS += $(libunwind_CPPFLAGS)
