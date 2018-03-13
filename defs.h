@@ -224,7 +224,7 @@ struct tcb {
 
 #ifdef USE_LIBUNWIND
 	void *unwind_ctx;
-	struct queue_t *queue;
+	struct unwind_queue_t *unwind_queue;
 #endif
 };
 

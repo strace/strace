@@ -57,12 +57,12 @@ struct call_t {
 	char *output_line;
 };
 
-struct queue_t {
+struct unwind_queue_t {
 	struct call_t *tail;
 	struct call_t *head;
 };
 
-static void queue_print(struct queue_t *queue);
+static void queue_print(struct unwind_queue_t *queue);
 
 static unw_addr_space_t libunwind_as;
 
@@ -88,17 +88,17 @@ unwind_tcb_init(struct tcb *tcp)
 	if (!tcp->unwind_ctx)
 		perror_msg_and_die("_UPT_create");
 
-	tcp->queue = xmalloc(sizeof(*tcp->queue));
-	tcp->queue->head = NULL;
-	tcp->queue->tail = NULL;
+	tcp->unwind_queue = xmalloc(sizeof(*tcp->unwind_queue));
+	tcp->unwind_queue->head = NULL;
+	tcp->unwind_queue->tail = NULL;
 }
 
 void
 unwind_tcb_fin(struct tcb *tcp)
 {
-	queue_print(tcp->queue);
-	free(tcp->queue);
-	tcp->queue = NULL;
+	queue_print(tcp->unwind_queue);
+	free(tcp->unwind_queue);
+	tcp->unwind_queue = NULL;
 
 	_UPT_destroy(tcp->unwind_ctx);
 	tcp->unwind_ctx = NULL;
@@ -307,7 +307,7 @@ sprint_call_or_error(const char *binary_filename,
  * queue manipulators
  */
 static void
-queue_put(struct queue_t *queue,
+queue_put(struct unwind_queue_t *queue,
 	  const char *binary_filename,
 	  const char *symbol_name,
 	  unw_word_t function_offset,
@@ -357,7 +357,7 @@ queue_put_error(void *queue,
 }
 
 static void
-queue_print(struct queue_t *queue)
+queue_print(struct unwind_queue_t *queue)
 {
 	struct call_t *call, *tmp;
 
@@ -392,15 +392,17 @@ unwind_print_stacktrace(struct tcb *tcp)
 		return;
 	}
 #endif
-	if (tcp->queue->head) {
-		debug_func_msg("head: tcp=%p, queue=%p", tcp, tcp->queue->head);
-		queue_print(tcp->queue);
+	if (tcp->unwind_queue->head) {
+		debug_func_msg("head: tcp=%p, queue=%p",
+			       tcp, tcp->unwind_queue->head);
+		queue_print(tcp->unwind_queue);
 	} else switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
 		case MMAP_CACHE_REBUILD_RENEWED:
 			unw_flush_cache(libunwind_as, 0, 0);
 			ATTRIBUTE_FALLTHROUGH;
 		case MMAP_CACHE_REBUILD_READY:
-			debug_func_msg("walk: tcp=%p, queue=%p", tcp, tcp->queue->head);
+			debug_func_msg("walk: tcp=%p, queue=%p",
+				       tcp, tcp->unwind_queue->head);
 			stacktrace_walk(tcp, print_call_cb, print_error_cb, NULL);
 			break;
 		default:
@@ -421,7 +423,7 @@ unwind_capture_stacktrace(struct tcb *tcp)
 		return;
 	}
 #endif
-	if (tcp->queue->head)
+	if (tcp->unwind_queue->head)
 		error_msg_and_die("bug: unprinted entries in queue");
 
 	switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
@@ -430,8 +432,9 @@ unwind_capture_stacktrace(struct tcb *tcp)
 		ATTRIBUTE_FALLTHROUGH;
 	case MMAP_CACHE_REBUILD_READY:
 		stacktrace_walk(tcp, queue_put_call, queue_put_error,
-				tcp->queue);
-		debug_func_msg("tcp=%p, queue=%p", tcp, tcp->queue->head);
+				tcp->unwind_queue);
+		debug_func_msg("tcp=%p, queue=%p",
+			       tcp, tcp->unwind_queue->head);
 		break;
 	default:
 		/* Do nothing */
