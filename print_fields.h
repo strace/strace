@@ -91,6 +91,14 @@
 			    (dflt_));		\
 	} while (0)
 
+#define PRINT_FIELD_XVAL_U(prefix_, where_, field_, xlat_, dflt_)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printxvals_ex(zero_extend_signed_to_ull((where_).field_), \
+			      (dflt_), XLAT_STYLE_FMT_U,		\
+			      (xlat_), NULL);				\
+	} while (0)
+
 /*
  * Generic "ID" printing. ID is considered unsigned except for the special value
  * of -1.
