@@ -789,18 +789,28 @@ static void
 btrfs_print_objectid(uint64_t objectid)
 {
 	const char *str = xlookup(btrfs_tree_objectids, objectid);
-	printf("%" PRIu64, objectid);
-	if (str)
-		printf(" /* %s */", str);
+	if (str) {
+		if (verbose_xlat)
+			printf("%" PRIu64 " /* %s */", objectid, str);
+		else
+			printf("%s", str);
+	} else {
+		printf("%" PRIu64, objectid);
+	}
 }
 
 static void
 btrfs_print_key_type(uint32_t type)
 {
 	const char *str = xlookup(btrfs_key_types, type);
-	printf("%u", type);
-	if (str)
-		printf(" /* %s */", str);
+	if (str) {
+		if (verbose_xlat)
+			printf("%u /* %s */", type, str);
+		else
+			printf("%s", str);
+	} else {
+		printf("%u", type);
+	}
 }
 
 static void

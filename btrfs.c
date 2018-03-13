@@ -261,19 +261,11 @@ btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 		lim->rsv_rfer, lim->rsv_excl);
 }
 
-static void
-btrfs_print_key_type(uint32_t type)
-{
-	tprintf("%u", type);
-	tprints_comment(xlookup(btrfs_key_types, type));
-}
-
-static void
-btrfs_print_objectid(uint64_t objectid)
-{
-	tprintf("%" PRIu64, objectid);
-	tprints_comment(xlookup(btrfs_tree_objectids, objectid));
-}
+#define btrfs_print_key_type(prefix_, where_, field_) \
+	PRINT_FIELD_XVAL_U((prefix_), (where_), field_, btrfs_key_types, NULL)
+#define btrfs_print_objectid(prefix_, where_, field_) \
+	PRINT_FIELD_XVAL_U((prefix_), (where_), field_, btrfs_tree_objectids, \
+			   NULL)
 
 static void
 btrfs_print_data_container_header(const struct btrfs_data_container *container)
@@ -414,30 +406,23 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 			uint64_t buf_addr, uint64_t buf_size, bool print_size)
 {
 	if (entering(tcp)) {
-		tprints("{key={tree_id=");
-		btrfs_print_objectid(key->tree_id);
+		btrfs_print_objectid("{key={", *key, tree_id);
 
 		if (key->min_objectid != BTRFS_FIRST_FREE_OBJECTID ||
-		    !abbrev(tcp)) {
-			tprints(", min_objectid=");
-			btrfs_print_objectid(key->min_objectid);
-		}
+		    !abbrev(tcp))
+			btrfs_print_objectid(", ", *key, min_objectid);
 
 		if (key->max_objectid != BTRFS_LAST_FREE_OBJECTID ||
-		    !abbrev(tcp)) {
-			tprints(", max_objectid=");
-			btrfs_print_objectid(key->max_objectid);
-		}
+		    !abbrev(tcp))
+			btrfs_print_objectid(", ", *key, max_objectid);
 
 		print_key_value(tcp, key, min_offset);
 		print_key_value(tcp, key, max_offset);
 		print_key_value(tcp, key, min_transid);
 		print_key_value(tcp, key, max_transid);
 
-		tprints(", min_type=");
-		btrfs_print_key_type(key->min_type);
-		tprints(", max_type=");
-		btrfs_print_key_type(key->max_type);
+		btrfs_print_key_type(", ", *key, min_type);
+		btrfs_print_key_type(", ", *key, max_type);
 		tprintf(", nr_items=%u}", key->nr_items);
 		if (print_size)
 			tprintf(", buf_size=%" PRIu64, buf_size);
@@ -463,11 +448,11 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 					tprints("...");
 					break;
 				}
-				tprintf("{transid=%" PRI__u64 ", objectid=",
+				tprintf("{transid=%" PRI__u64,
 					sh.transid);
-				btrfs_print_objectid(sh.objectid);
-				tprintf(", offset=%" PRI__u64 ", type=", sh.offset);
-				btrfs_print_key_type(sh.type);
+				btrfs_print_objectid(", ", sh, objectid);
+				tprintf(", offset=%" PRI__u64, sh.offset);
+				btrfs_print_key_type(", ", sh, type);
 				tprintf(", len=%u}", sh.len);
 				off += sizeof(sh) + sh.len;
 
@@ -482,7 +467,8 @@ static bool
 print_objectid_callback(struct tcb *tcp, void *elem_buf,
 			size_t elem_size, void *data)
 {
-	btrfs_print_objectid(*(uint64_t *) elem_buf);
+	printxvals_ex(*(uint64_t *) elem_buf, NULL, XLAT_STYLE_FMT_U,
+		      btrfs_tree_objectids, NULL);
 
 	return true;
 }
@@ -877,18 +863,15 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (args.treeid == 0)
 				set_tcb_priv_ulong(tcp, 1);
 
-			tprints("{treeid=");
-			btrfs_print_objectid(args.treeid);
-			tprints(", objectid=");
-			btrfs_print_objectid(args.objectid);
+			btrfs_print_objectid("{", args, treeid);
+			btrfs_print_objectid(", ", args, objectid);
 			tprints("}");
 			return 0;
 		}
 
 		tprints("{");
 		if (get_tcb_priv_ulong(tcp)) {
-			tprints("treeid=");
-			btrfs_print_objectid(args.treeid);
+			btrfs_print_objectid("", args, treeid);
 			tprints(", ");
 		}
 
@@ -1053,8 +1036,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{flags=%" PRIu64 ", progress=", (uint64_t) args.flags);
-		btrfs_print_objectid(args.progress);
+		tprintf("{flags=%" PRIu64, (uint64_t) args.flags);
+		btrfs_print_objectid(", ", args, progress);
 		tprints("}");
 		break;
 	}
@@ -1223,8 +1206,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				    umoven_or_printaddr,
 				    print_objectid_callback, 0);
 		}
-		tprints(", parent_root=");
-		btrfs_print_objectid(args.parent_root);
+		btrfs_print_objectid(", ", args, parent_root);
 		tprints(", flags=");
 		printflags64(btrfs_send_flags, args.flags,
 			     "BTRFS_SEND_FLAGS_???");
