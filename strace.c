@@ -122,13 +122,8 @@ static int opt_intr;
  */
 static bool daemonized_tracer;
 
-#if USE_SEIZE
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
-# define use_seize (post_attach_sigstop == 0)
-#else
-# define post_attach_sigstop TCB_IGNORE_ONE_SIGSTOP
-# define use_seize 0
-#endif
+#define use_seize (post_attach_sigstop == 0)
 
 /* Sometimes we want to print only succeeding syscalls. */
 bool not_failing_only;
@@ -335,7 +330,6 @@ static const char *ptrace_attach_cmd;
 static int
 ptrace_attach_or_seize(int pid)
 {
-#if USE_SEIZE
 	int r;
 	if (!use_seize)
 		return ptrace_attach_cmd = "PTRACE_ATTACH",
@@ -345,10 +339,6 @@ ptrace_attach_or_seize(int pid)
 		return ptrace_attach_cmd = "PTRACE_SEIZE", r;
 	r = ptrace(PTRACE_INTERRUPT, pid, 0L, 0L);
 	return ptrace_attach_cmd = "PTRACE_INTERRUPT", r;
-#else
-		return ptrace_attach_cmd = "PTRACE_ATTACH",
-		       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
-#endif
 }
 
 /*
@@ -1472,7 +1462,6 @@ startup_child(char **argv)
 	redirect_standard_fds();
 }
 
-#if USE_SEIZE
 static void
 test_ptrace_seize(void)
 {
@@ -1522,9 +1511,6 @@ test_ptrace_seize(void)
 		error_func_msg_and_die("unexpected wait status %#x", status);
 	}
 }
-#else /* !USE_SEIZE */
-# define test_ptrace_seize() ((void)0)
-#endif
 
 static unsigned
 get_os_release(void)
@@ -2351,7 +2337,6 @@ next_event(int *pstatus, siginfo_t *si)
 			return stopped ? TE_GROUP_STOP : TE_SIGNAL_DELIVERY_STOP;
 		}
 		break;
-#if USE_SEIZE
 	case PTRACE_EVENT_STOP:
 		/*
 		 * PTRACE_INTERRUPT-stop or group-stop.
@@ -2365,7 +2350,6 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_GROUP_STOP;
 		}
 		return TE_RESTART;
-#endif
 	case PTRACE_EVENT_EXEC:
 		return TE_STOP_BEFORE_EXECVE;
 	case PTRACE_EVENT_EXIT:

@@ -108,11 +108,7 @@ extern char *stpcpy(char *dst, const char *src);
 #ifndef DEFAULT_SORTBY
 # define DEFAULT_SORTBY "time"
 #endif
-/*
- * Experimental code using PTRACE_SEIZE can be enabled here.
- * This needs Linux kernel 3.4.x or later to work.
- */
-#define USE_SEIZE 1
+
 /* To force NOMMU build, set to 1 */
 #define NOMMU_SYSTEM 0
 
