@@ -809,6 +809,25 @@ if test "x$ac_cv_lib_dl_dladdr" = xyes; then
 fi
 AC_SUBST(dl_LIBS)
 
+saved_LIBS="$LIBS"
+AC_SEARCH_LIBS([clock_gettime], [rt])
+LIBS="$saved_LIBS"
+case "$ac_cv_search_clock_gettime" in
+	no) AC_MSG_FAILURE([failed to find clock_gettime]) ;;
+	-l*) clock_LIBS="$ac_cv_search_clock_gettime" ;;
+	*) clock_LIBS= ;;
+esac
+AC_SUBST(clock_LIBS)
+
+saved_LIBS="$LIBS"
+AC_SEARCH_LIBS([mq_open], [rt])
+LIBS="$saved_LIBS"
+case "$ac_cv_search_mq_open" in
+	-l*) mq_LIBS="$ac_cv_search_mq_open" ;;
+	*) mq_LIBS= ;;
+esac
+AC_SUBST(mq_LIBS)
+
 AC_PATH_PROG([PERL], [perl])
 
 AC_CHECK_TOOL([READELF], [readelf])
