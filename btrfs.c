@@ -252,7 +252,7 @@ btrfs_print_features(const struct btrfs_ioctl_feature_flags *flags)
 static void
 btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 {
-	tprints("{flags=");
+	tprints(", lim={flags=");
 	printflags64(btrfs_qgroup_limit_flags, lim->flags,
 		     "BTRFS_QGROUP_LIMIT_???");
 	tprintf(", max_rfer=%" PRI__u64 ", max_excl=%" PRI__u64
@@ -370,7 +370,7 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 	printflags64(btrfs_qgroup_inherit_flags, inherit.flags,
 		     "BTRFS_QGROUP_INHERIT_???");
 	tprintf(", num_qgroups=%" PRI__u64 ", num_ref_copies=%" PRI__u64
-		", num_excl_copies=%" PRI__u64 ", lim=",
+		", num_excl_copies=%" PRI__u64,
 		inherit.num_qgroups, inherit.num_ref_copies,
 		inherit.num_excl_copies);
 
@@ -995,7 +995,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{qgroupid=%" PRI__u64 ", lim=", args.qgroupid);
+		tprintf("{qgroupid=%" PRI__u64, args.qgroupid);
 		btrfs_print_qgroup_limit(&args.lim);
 		tprints("}");
 		break;
