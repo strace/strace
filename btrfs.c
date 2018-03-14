@@ -1181,11 +1181,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		else if (syserror(tcp)) {
 			if (tcp->u_error == EOVERFLOW) {
 				tprints(" => ");
-				tcp->u_error = 0;
-				if (!umove_or_printaddr(tcp, arg, &args))
+				if (!umove_or_printaddr_ignore_syserror(tcp,
+				    arg, &args))
 					tprintf("{buf_size=%" PRIu64 "}",
 						(uint64_t)args.buf_size);
-				tcp->u_error = EOVERFLOW;
 			}
 			break;
 		} else
