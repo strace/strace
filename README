@@ -1,7 +1,11 @@
-This is strace, a system call tracer for Linux.
+This is strace - a diagnostic, debugging and instructional userspace utility
+with a traditional command-line interface for Linux.  It is used to monitor
+and tamper with interactions between processes and the Linux kernel, which
+include system calls, signal deliveries, and changes of process state.
+The operation of strace is made possible by the kernel feature known as ptrace.
 
 strace is released under a Berkeley-style license at the request
-of Paul Kranenburg.
+of Paul Kranenburg; see the file COPYING for details.
 
 See the file CREDITS for a list of authors and other contributors.
 See the file INSTALL for compilation and installation instructions.
