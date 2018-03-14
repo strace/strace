@@ -164,8 +164,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	zeroargc \
 	# end of check_PROGRAMS
 
-attach_f_p_LDADD = -lrt -lpthread $(LDADD)
-clock_xettime_LDADD = -lrt $(LDADD)
+attach_f_p_LDADD = -lpthread $(LDADD)
 count_f_LDADD = -lpthread $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -174,9 +173,6 @@ ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = -lrt $(LDADD)
-mq_sendrecv_LDADD = -lrt $(LDADD)
-mq_sendrecv_read_LDADD = -lrt $(LDADD)
-mq_sendrecv_write_LDADD = -lrt $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pc_LDADD = $(dl_LIBS) $(LDADD)
 pread64_pwrite64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
