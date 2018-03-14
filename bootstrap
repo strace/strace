@@ -25,4 +25,8 @@ for m in m32 mx32; do
 	done
 done
 
-exec autoreconf -f -i "$@"
+autoreconf -f -i "$@"
+
+for f in README; do
+	cp "dist/$f" "$f"
+done
