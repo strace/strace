@@ -271,7 +271,7 @@ static void
 btrfs_print_data_container_header(const struct btrfs_data_container *container)
 {
 	tprintf("{bytes_left=%u, bytes_missing=%u"
-		", elem_cnt=%u, elem_missed=%u, val=",
+		", elem_cnt=%u, elem_missed=%u",
 		container->bytes_left, container->bytes_missing,
 		container->elem_cnt, container->elem_missed);
 }
@@ -306,11 +306,12 @@ btrfs_print_logical_ino_container(struct tcb *tcp,
 	btrfs_print_data_container_header(&container);
 
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprints(", ...");
 	} else {
 		const uint64_t val_addr =
 			inodes_addr + offsetof(typeof(container), val);
 		uint64_t record[3];
+		tprints(", val=");
 		print_array(tcp, val_addr, container.elem_cnt / 3,
 			    record, sizeof(record),
 			    umoven_or_printaddr,
@@ -344,11 +345,12 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 	btrfs_print_data_container_header(&container);
 
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprints(", ...");
 	} else {
 		uint64_t val_addr =
 			fspath_addr + offsetof(typeof(container), val);
 		uint64_t offset;
+		tprints(", val=");
 		print_array(tcp, val_addr, container.elem_cnt,
 			    &offset, sizeof(offset),
 			    umoven_or_printaddr,
@@ -376,12 +378,11 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 
 	btrfs_print_qgroup_limit(&inherit.lim);
 
-	tprints(", qgroups=");
-
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprints(", ...");
 	} else {
 		uint64_t record;
+		tprints(", qgroups=");
 		print_array(tcp, qgi_addr + offsetof(typeof(inherit), qgroups),
 			    inherit.num_qgroups, &record, sizeof(record),
 			    umoven_or_printaddr, print_uint64_array_member, 0);
@@ -431,13 +432,12 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 		tprintf("{key={nr_items=%u}", key->nr_items);
 		if (print_size)
 			tprintf(", buf_size=%" PRIu64, buf_size);
-		tprints(", buf=");
-		if (abbrev(tcp))
-			tprints("...");
-		else {
+		if (abbrev(tcp)) {
+			tprints(", ...");
+		} else {
 			uint64_t i;
 			uint64_t off = 0;
-			tprints("[");
+			tprints(", buf=[");
 			for (i = 0; i < key->nr_items; i++) {
 				struct btrfs_ioctl_search_header sh;
 				uint64_t addr = buf_addr + off;
@@ -1193,11 +1193,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		tprints("{send_fd=");
 		printfd(tcp, args.send_fd);
-		tprintf(", clone_sources_count=%" PRIu64 ", clone_sources=",
+		tprintf(", clone_sources_count=%" PRIu64,
 			(uint64_t) args.clone_sources_count);
 
+		tprints(", clone_sources=");
 		if (abbrev(tcp))
-			tprints("...");
+			printaddr((uintptr_t) args.clone_sources);
 		else {
 			uint64_t record;
 			print_array(tcp, ptr_to_kulong(args.clone_sources),
@@ -1240,12 +1241,11 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 		}
 
-		tprints(", spaces=");
-
-		if (abbrev(tcp))
-			tprints("...");
-		else {
+		if (abbrev(tcp)) {
+			tprints(", ...");
+		} else {
 			struct btrfs_ioctl_space_info info;
+			tprints(", spaces=");
 			print_array(tcp, arg + offsetof(typeof(args), spaces),
 				    args.total_spaces,
 				    &info, sizeof(info), umoven_or_printaddr,

@@ -255,12 +255,12 @@ btrfs_print_qgroup_inherit(struct btrfs_qgroup_inherit *inherit)
 		   "BTRFS_QGROUP_LIMIT_???");
 	printf(", max_rfer=%" PRI__u64 ", max_excl=%" PRI__u64
 	       ", rsv_rfer=%" PRI__u64 ", rsv_excl=%" PRI__u64
-	       "}, qgroups=",
+	       "}, ",
 	       inherit->lim.max_rfer, inherit->lim.max_excl,
 	       inherit->lim.rsv_rfer, inherit->lim.rsv_excl);
 	if (verbose) {
 		unsigned int i;
-		printf("[");
+		printf("qgroups=[");
 		for (i = 0; i < inherit->num_qgroups; i++) {
 			if (i > 0)
 				printf(", ");
@@ -852,7 +852,7 @@ btrfs_print_tree_search_buf(struct btrfs_ioctl_search_key *key,
 	if (verbose) {
 		uint64_t i;
 		uint64_t off = 0;
-		printf("[");
+		printf("buf=[");
 		for (i = 0; i < key->nr_items; i++) {
 			struct btrfs_ioctl_search_header *sh;
 			sh = (typeof(sh))(buf + off);
@@ -992,7 +992,7 @@ btrfs_test_search_ioctls(void)
 			btrfs_test_dir_fd);
 		btrfs_print_search_key(&search_args.key);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_TREE_SEARCH, &search_args);
-		printf("} => {key={nr_items=%u}, buf=",
+		printf("} => {key={nr_items=%u}, ",
 			search_args.key.nr_items);
 		btrfs_print_tree_search_buf(&search_args.key, search_args.buf,
 					    sizeof(search_args.buf));
@@ -1009,7 +1009,7 @@ btrfs_test_search_ioctls(void)
 		btrfs_print_search_key(&key_reference);
 		printf(", buf_size=%" PRIu64 "}", (uint64_t) args->buf_size);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_TREE_SEARCH_V2, args);
-		printf(" => {key={nr_items=%u}, buf_size=%" PRIu64 ", buf=",
+		printf(" => {key={nr_items=%u}, buf_size=%" PRIu64 ", ",
 			args->key.nr_items, (uint64_t)args->buf_size);
 		btrfs_print_tree_search_buf(&args->key, args->buf,
 					    args->buf_size);
@@ -1100,11 +1100,11 @@ btrfs_test_space_info_ioctl(void)
 		       "{space_slots=%" PRI__u64 "}",
 		       btrfs_test_dir_fd, argsp->space_slots);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_SPACE_INFO, argsp);
-		printf(" => {total_spaces=%" PRI__u64 ", spaces=",
+		printf(" => {total_spaces=%" PRI__u64 ", ",
 			argsp->total_spaces);
 		if (verbose) {
 			unsigned int i;
-			printf("[");
+			printf("spaces=[");
 			for (i = 0; i < argsp->total_spaces; i++) {
 				struct btrfs_ioctl_space_info *info;
 				info = &argsp->spaces[i];
@@ -1294,11 +1294,11 @@ btrfs_test_ino_path_ioctls(void)
 		       btrfs_test_dir_fd, args.inum, args.size,
 		       args.fspath);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_INO_PATHS, &args);
-		printf(" => {fspath={bytes_left=%u, bytes_missing=%u, elem_cnt=%u, elem_missed=%u, val=",
+		printf(" => {fspath={bytes_left=%u, bytes_missing=%u, elem_cnt=%u, elem_missed=%u, ",
 			data->bytes_left, data->bytes_missing, data->elem_cnt,
 			data->elem_missed);
 		if (verbose) {
-			printf("[\"strace-test\"]");
+			printf("val=[\"strace-test\"]");
 		} else
 			printf("...");
 		printf("}}) = 0\n");
@@ -1370,11 +1370,11 @@ btrfs_test_ino_path_ioctls(void)
 		       ", size=%" PRI__u64 ", flags=0, inodes=0x%" PRI__x64 "}",
 		       fd, args.inum, args.size, args.fspath);
 		ioctl(fd, BTRFS_IOC_LOGICAL_INO, &args);
-		printf(" => {inodes={bytes_left=%u, bytes_missing=%u, elem_cnt=%u, elem_missed=%u, val=",
+		printf(" => {inodes={bytes_left=%u, bytes_missing=%u, elem_cnt=%u, elem_missed=%u, ",
 			data->bytes_left, data->bytes_missing, data->elem_cnt,
 			data->elem_missed);
 		if (verbose) {
-			printf("[{inum=%llu, offset=0, root=5}]",
+			printf("val=[{inum=%llu, offset=0, root=5}]",
 			       (unsigned long long) si.st_ino);
 		} else
 			printf("...");
@@ -1432,12 +1432,8 @@ btrfs_test_send_ioctl(void)
 
 	printf("ioctl(-1, BTRFS_IOC_SEND, "
 	       "{send_fd=%d, clone_sources_count=%" PRI__u64
-	       ", clone_sources=",
+	       ", clone_sources=NULL",
 	       (int) args.send_fd, args.clone_sources_count);
-	if (verbose)
-		printf("NULL");
-	else
-		printf("...");
 	printf(", parent_root=");
 	btrfs_print_objectid(args.parent_root);
 	printf(", flags=");
@@ -1459,7 +1455,7 @@ btrfs_test_send_ioctl(void)
 		btrfs_print_objectid(u64_array[1]);
 		printf("]");
 	} else
-		printf("...");
+		printf("%p", args.clone_sources);
 	printf(", parent_root=");
 	btrfs_print_objectid(args.parent_root);
 	printf(", flags=");
