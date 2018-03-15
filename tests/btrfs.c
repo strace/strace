@@ -1399,6 +1399,8 @@ btrfs_test_set_received_subvol_ioctl(void)
 			.nsec = 12345,
 		},
 	};
+	int saved_errno;
+
 	memcpy(&args.uuid, uuid_reference, BTRFS_UUID_SIZE);
 
 	ioctl(-1, BTRFS_IOC_SET_RECEIVED_SUBVOL, NULL);
@@ -1406,11 +1408,15 @@ btrfs_test_set_received_subvol_ioctl(void)
 	       "NULL) = -1 EBADF (%m)\n");
 
 	ioctl(-1, BTRFS_IOC_SET_RECEIVED_SUBVOL, &args);
+	saved_errno = errno;
 	printf("ioctl(-1, BTRFS_IOC_SET_RECEIVED_SUBVOL, "
-	       "{uuid=%s, stransid=%" PRI__u64 ", stime=%" PRI__u64
-	       ".%u, flags=0}) = -1 EBADF (%m)\n",
+	       "{uuid=%s, stransid=%" PRI__u64 ", stime={sec=%" PRI__u64
+	       ", nsec=%u}",
 	       uuid_reference_string, args.stransid, args.stime.sec,
 	       args.stime.nsec);
+	print_time_t_nsec(args.stime.sec, args.stime.nsec, true);
+	errno = saved_errno;
+	printf(", flags=0}) = -1 EBADF (%m)\n");
 }
 
 /*

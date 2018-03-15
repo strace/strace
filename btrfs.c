@@ -488,6 +488,13 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 	return true;
 }
 
+static void
+print_btrfs_timespec(const char *prefix, uint64_t sec, uint32_t nsec)
+{
+	tprintf("%s{sec=%" PRIu64 ", nsec=%u}", prefix, sec, nsec);
+	tprints_comment(sprinttime_nsec(sec, nsec));
+}
+
 MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		   struct tcb *const tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
@@ -1058,16 +1065,18 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		if (entering(tcp)) {
 			btrfs_unparse_uuid((unsigned char *)args.uuid, uuid);
-			tprintf("{uuid=%s, stransid=%" PRIu64
-				", stime=%" PRIu64 ".%u, flags=%" PRIu64
-				"}", uuid, (uint64_t) args.stransid,
-				(uint64_t) args.stime.sec, args.stime.nsec,
+			tprintf("{uuid=%s, stransid=%" PRIu64,
+				uuid, (uint64_t) args.stransid);
+			print_btrfs_timespec(", stime=",
+					     args.stime.sec, args.stime.nsec);
+			tprintf(", flags=%" PRIu64 "}",
 				(uint64_t) args.flags);
 			return 0;
 		}
-		tprintf("{rtransid=%" PRIu64 ", rtime=%" PRIu64 ".%u}",
-			(uint64_t) args.rtransid, (uint64_t) args.rtime.sec,
-			args.rtime.nsec);
+		tprintf("{rtransid=%" PRIu64, (uint64_t) args.rtransid);
+		print_btrfs_timespec(", rtime=",
+				     args.rtime.sec, args.rtime.nsec);
+		tprints("}");
 		break;
 	}
 
