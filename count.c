@@ -39,17 +39,17 @@
 /* Per-syscall stats structure */
 struct call_counts {
 	/* time may be total latency or system time */
-	struct timeval time;
+	struct timespec time;
 	unsigned int calls, errors;
 };
 
 static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 #define counts (countv[current_personality])
 
-static struct timeval overhead;
+static struct timespec overhead;
 
 void
-count_syscall(struct tcb *tcp, const struct timeval *syscall_exiting_tv)
+count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 {
 	if (!scno_in_range(tcp->scno))
 		return;
@@ -64,20 +64,20 @@ count_syscall(struct tcb *tcp, const struct timeval *syscall_exiting_tv)
 
 	if (count_wallclock) {
 		/* wall clock time spent while in syscall */
-		struct timeval wtv;
-		tv_sub(&wtv, syscall_exiting_tv, &tcp->etime);
+		struct timespec wts;
+		ts_sub(&wts, syscall_exiting_ts, &tcp->etime);
 
-		tv_add(&cc->time, &cc->time, &wtv);
+		ts_add(&cc->time, &cc->time, &wts);
 	} else {
 		/* system CPU time spent while in syscall */
-		tv_add(&cc->time, &cc->time, &tcp->dtime);
+		ts_add(&cc->time, &cc->time, &tcp->dtime);
 	}
 }
 
 static int
 time_cmp(void *a, void *b)
 {
-	return -tv_cmp(&counts[*((int *) a)].time,
+	return -ts_cmp(&counts[*((int *) a)].time,
 		       &counts[*((int *) b)].time);
 }
 
@@ -119,7 +119,7 @@ set_sortby(const char *sortby)
 void set_overhead(int n)
 {
 	overhead.tv_sec = n / 1000000;
-	overhead.tv_usec = n % 1000000;
+	overhead.tv_nsec = n % 1000000 * 1000;
 }
 
 static void
@@ -132,7 +132,7 @@ call_summary_pers(FILE *outf)
 
 	unsigned int i;
 	unsigned int call_cum, error_cum;
-	struct timeval tv_cum, dtv;
+	struct timespec tv_cum, dtv;
 	double  float_tv_cum;
 	double  percent;
 	unsigned int *sorted_count;
@@ -143,20 +143,20 @@ call_summary_pers(FILE *outf)
 	fprintf(outf, header, dashes, dashes, dashes, dashes, dashes, dashes);
 
 	sorted_count = xcalloc(sizeof(sorted_count[0]), nsyscalls);
-	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_usec = 0;
+	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_nsec = 0;
 	for (i = 0; i < nsyscalls; i++) {
 		sorted_count[i] = i;
 		if (counts == NULL || counts[i].calls == 0)
 			continue;
-		tv_mul(&dtv, &overhead, counts[i].calls);
-		tv_sub(&counts[i].time, &counts[i].time, &dtv);
-		if (counts[i].time.tv_sec < 0 || counts[i].time.tv_usec < 0)
-			counts[i].time.tv_sec = counts[i].time.tv_usec = 0;
+		ts_mul(&dtv, &overhead, counts[i].calls);
+		ts_sub(&counts[i].time, &counts[i].time, &dtv);
+		if (counts[i].time.tv_sec < 0 || counts[i].time.tv_nsec < 0)
+			counts[i].time.tv_sec = counts[i].time.tv_nsec = 0;
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
-		tv_add(&tv_cum, &tv_cum, &counts[i].time);
+		ts_add(&tv_cum, &tv_cum, &counts[i].time);
 	}
-	float_tv_cum = tv_float(&tv_cum);
+	float_tv_cum = ts_float(&tv_cum);
 	if (counts) {
 		if (sortfun)
 			qsort((void *) sorted_count, nsyscalls,
@@ -167,15 +167,15 @@ call_summary_pers(FILE *outf)
 			struct call_counts *cc = &counts[idx];
 			if (cc->calls == 0)
 				continue;
-			tv_div(&dtv, &cc->time, cc->calls);
-			float_syscall_time = tv_float(&cc->time);
+			ts_div(&dtv, &cc->time, cc->calls);
+			float_syscall_time = ts_float(&cc->time);
 			percent = (100.0 * float_syscall_time);
 			if (percent != 0.0)
 				   percent /= float_tv_cum;
 			/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
 			fprintf(outf, data,
 				percent, float_syscall_time,
-				(long) (1000000 * dtv.tv_sec + dtv.tv_usec),
+				(long) (1000000 * dtv.tv_sec + dtv.tv_nsec / 1000),
 				cc->calls, cc->errors, sysent[idx].sys_name);
 		}
 	}

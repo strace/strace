@@ -641,30 +641,31 @@ printleader(struct tcb *tcp)
 		tprintf("[pid %5u] ", tcp->pid);
 
 	if (tflag) {
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
+		struct timespec ts;
+		clock_gettime(rflag ? CLOCK_MONOTONIC : CLOCK_REALTIME, &ts);
 
 		if (rflag) {
-			static struct timeval otv;
-			if (otv.tv_sec == 0)
-				otv = tv;
+			static struct timespec ots;
+			if (ots.tv_sec == 0)
+				ots = ts;
 
-			struct timeval dtv;
-			tv_sub(&dtv, &tv, &otv);
-			otv = tv;
+			struct timespec dts;
+			ts_sub(&dts, &ts, &ots);
+			ots = ts;
 
 			tprintf("%6ld.%06ld ",
-				(long) dtv.tv_sec, (long) dtv.tv_usec);
+				(long) dts.tv_sec, (long) dts.tv_nsec / 1000);
 		} else if (tflag > 2) {
-			tprintf("%ld.%06ld ",
-				(long) tv.tv_sec, (long) tv.tv_usec);
+			tprintf("%lld.%06ld ",
+				(long long) ts.tv_sec, (long) ts.tv_nsec / 1000);
 		} else {
-			time_t local = tv.tv_sec;
+			time_t local = ts.tv_sec;
 			char str[sizeof("HH:MM:SS")];
 
 			strftime(str, sizeof(str), "%T", localtime(&local));
 			if (tflag > 1)
-				tprintf("%s.%06ld ", str, (long) tv.tv_usec);
+				tprintf("%s.%06ld ",
+					str, (long) ts.tv_nsec / 1000);
 			else
 				tprintf("%s ", str);
 		}
@@ -2299,8 +2300,12 @@ next_event(int *pstatus, siginfo_t *si)
 	set_current_tcp(tcp);
 
 	if (cflag) {
-		tv_sub(&tcp->dtime, &ru.ru_stime, &tcp->stime);
-		tcp->stime = ru.ru_stime;
+		struct timespec stime = {
+			.tv_sec = ru.ru_stime.tv_sec,
+			.tv_nsec = ru.ru_stime.tv_usec * 1000
+		};
+		ts_sub(&tcp->dtime, &stime, &tcp->stime);
+		tcp->stime = stime;
 	}
 
 	if (WIFSIGNALED(status))
@@ -2385,10 +2390,10 @@ trace_syscall(struct tcb *tcp, unsigned int *sig)
 		syscall_entering_finish(tcp, res);
 		return res;
 	} else {
-		struct timeval tv = {};
-		int res = syscall_exiting_decode(tcp, &tv);
+		struct timespec ts = {};
+		int res = syscall_exiting_decode(tcp, &ts);
 		if (res != 0) {
-			res = syscall_exiting_trace(tcp, tv, res);
+			res = syscall_exiting_trace(tcp, &ts, res);
 		}
 		syscall_exiting_finish(tcp);
 		return res;

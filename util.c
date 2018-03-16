@@ -47,65 +47,65 @@
 #include "xstring.h"
 
 int
-tv_nz(const struct timeval *a)
+ts_nz(const struct timespec *a)
 {
-	return a->tv_sec || a->tv_usec;
+	return a->tv_sec || a->tv_nsec;
 }
 
 int
-tv_cmp(const struct timeval *a, const struct timeval *b)
+ts_cmp(const struct timespec *a, const struct timespec *b)
 {
 	if (a->tv_sec < b->tv_sec
-	    || (a->tv_sec == b->tv_sec && a->tv_usec < b->tv_usec))
+	    || (a->tv_sec == b->tv_sec && a->tv_nsec < b->tv_nsec))
 		return -1;
 	if (a->tv_sec > b->tv_sec
-	    || (a->tv_sec == b->tv_sec && a->tv_usec > b->tv_usec))
+	    || (a->tv_sec == b->tv_sec && a->tv_nsec > b->tv_nsec))
 		return 1;
 	return 0;
 }
 
 double
-tv_float(const struct timeval *tv)
+ts_float(const struct timespec *tv)
 {
-	return tv->tv_sec + tv->tv_usec/1000000.0;
+	return tv->tv_sec + tv->tv_nsec/1000000000.0;
 }
 
 void
-tv_add(struct timeval *tv, const struct timeval *a, const struct timeval *b)
+ts_add(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 {
 	tv->tv_sec = a->tv_sec + b->tv_sec;
-	tv->tv_usec = a->tv_usec + b->tv_usec;
-	if (tv->tv_usec >= 1000000) {
+	tv->tv_nsec = a->tv_nsec + b->tv_nsec;
+	if (tv->tv_nsec >= 1000000000) {
 		tv->tv_sec++;
-		tv->tv_usec -= 1000000;
+		tv->tv_nsec -= 1000000000;
 	}
 }
 
 void
-tv_sub(struct timeval *tv, const struct timeval *a, const struct timeval *b)
+ts_sub(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 {
 	tv->tv_sec = a->tv_sec - b->tv_sec;
-	tv->tv_usec = a->tv_usec - b->tv_usec;
-	if (((long) tv->tv_usec) < 0) {
+	tv->tv_nsec = a->tv_nsec - b->tv_nsec;
+	if (tv->tv_nsec < 0) {
 		tv->tv_sec--;
-		tv->tv_usec += 1000000;
+		tv->tv_nsec += 1000000000;
 	}
 }
 
 void
-tv_div(struct timeval *tv, const struct timeval *a, int n)
+ts_div(struct timespec *tv, const struct timespec *a, int n)
 {
-	tv->tv_usec = (a->tv_sec % n * 1000000 + a->tv_usec + n / 2) / n;
-	tv->tv_sec = a->tv_sec / n + tv->tv_usec / 1000000;
-	tv->tv_usec %= 1000000;
+	long long nsec = (a->tv_sec % n * 1000000000LL + a->tv_nsec + n / 2) / n;
+	tv->tv_sec = a->tv_sec / n + nsec / 1000000000;
+	tv->tv_nsec = nsec % 1000000000;
 }
 
 void
-tv_mul(struct timeval *tv, const struct timeval *a, int n)
+ts_mul(struct timespec *tv, const struct timespec *a, int n)
 {
-	tv->tv_usec = a->tv_usec * n;
-	tv->tv_sec = a->tv_sec * n + tv->tv_usec / 1000000;
-	tv->tv_usec %= 1000000;
+	long long nsec = a->tv_nsec * n;
+	tv->tv_sec = a->tv_sec * n + nsec / 1000000000;
+	tv->tv_nsec = nsec % 1000000000;
 }
 
 #if !defined HAVE_STPCPY

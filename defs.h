@@ -210,9 +210,9 @@ struct tcb {
 	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
 	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
-	struct timeval stime;	/* System time usage as of last process wait */
-	struct timeval dtime;	/* Delta for system time usage */
-	struct timeval etime;	/* Syscall entry time */
+	struct timespec stime;	/* System time usage as of last process wait */
+	struct timespec dtime;	/* Delta for system time usage */
+	struct timespec etime;	/* Syscall entry time */
 
 	struct mmap_cache_t *mmap_cache;
 	unsigned int mmap_cache_size;
@@ -393,11 +393,11 @@ extern int syscall_entering_decode(struct tcb *);
 extern int syscall_entering_trace(struct tcb *, unsigned int *);
 extern void syscall_entering_finish(struct tcb *, int);
 
-extern int syscall_exiting_decode(struct tcb *, struct timeval *);
-extern int syscall_exiting_trace(struct tcb *, struct timeval, int);
+extern int syscall_exiting_decode(struct tcb *, struct timespec *);
+extern int syscall_exiting_trace(struct tcb *, struct timespec *, int);
 extern void syscall_exiting_finish(struct tcb *);
 
-extern void count_syscall(struct tcb *, const struct timeval *);
+extern void count_syscall(struct tcb *, const struct timespec *);
 extern void call_summary(FILE *);
 
 extern void clear_regs(struct tcb *tcp);
@@ -719,13 +719,13 @@ DECL_NETLINK(route);
 DECL_NETLINK(selinux);
 DECL_NETLINK(sock_diag);
 
-extern int tv_nz(const struct timeval *);
-extern int tv_cmp(const struct timeval *, const struct timeval *);
-extern double tv_float(const struct timeval *);
-extern void tv_add(struct timeval *, const struct timeval *, const struct timeval *);
-extern void tv_sub(struct timeval *, const struct timeval *, const struct timeval *);
-extern void tv_mul(struct timeval *, const struct timeval *, int);
-extern void tv_div(struct timeval *, const struct timeval *, int);
+extern int ts_nz(const struct timespec *);
+extern int ts_cmp(const struct timespec *, const struct timespec *);
+extern double ts_float(const struct timespec *);
+extern void ts_add(struct timespec *, const struct timespec *, const struct timespec *);
+extern void ts_sub(struct timespec *, const struct timespec *, const struct timespec *);
+extern void ts_mul(struct timespec *, const struct timespec *, int);
+extern void ts_div(struct timespec *, const struct timespec *, int);
 
 #ifdef USE_LIBUNWIND
 extern void unwind_init(void);

@@ -711,7 +711,7 @@ syscall_entering_finish(struct tcb *tcp, int res)
 	tcp->sys_func_rval = res;
 	/* Measure the entrance time as late as possible to avoid errors. */
 	if ((Tflag || cflag) && !filtered(tcp))
-		gettimeofday(&tcp->etime, NULL);
+		clock_gettime(CLOCK_MONOTONIC, &tcp->etime);
 }
 
 /* Returns:
@@ -723,11 +723,11 @@ syscall_entering_finish(struct tcb *tcp, int res)
  *    value. Anyway, call syscall_exiting_finish(tcp) then.
  */
 int
-syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
+syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 {
 	/* Measure the exit time as early as possible to avoid errors. */
 	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
-		gettimeofday(ptv, NULL);
+		clock_gettime(CLOCK_MONOTONIC, pts);
 
 	if (mmap_cache_is_enabled()) {
 		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
@@ -745,13 +745,13 @@ syscall_exiting_decode(struct tcb *tcp, struct timeval *ptv)
 }
 
 int
-syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
+syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 {
 	if (syscall_tampered(tcp))
 		tamper_with_syscall_exiting(tcp);
 
 	if (cflag) {
-		count_syscall(tcp, &tv);
+		count_syscall(tcp, ts);
 		if (cflag == CFLAG_ONLY_STATS) {
 			return 0;
 		}
@@ -942,9 +942,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timeval tv, int res)
 			tprints(" (INJECTED)");
 	}
 	if (Tflag) {
-		tv_sub(&tv, &tv, &tcp->etime);
+		ts_sub(ts, ts, &tcp->etime);
 		tprintf(" <%ld.%06ld>",
-			(long) tv.tv_sec, (long) tv.tv_usec);
+			(long) ts->tv_sec, (long) ts->tv_nsec / 1000);
 	}
 	tprints("\n");
 	dumpio(tcp);

@@ -64,7 +64,7 @@ include xlat/Makemodule.am
 strace_CPPFLAGS = $(AM_CPPFLAGS)
 strace_CFLAGS = $(AM_CFLAGS)
 strace_LDFLAGS =
-strace_LDADD = libstrace.a
+strace_LDADD = libstrace.a $(clock_LIBS)
 noinst_LIBRARIES = libstrace.a
 
 libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
