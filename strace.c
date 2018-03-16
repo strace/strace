@@ -641,23 +641,27 @@ printleader(struct tcb *tcp)
 		tprintf("[pid %5u] ", tcp->pid);
 
 	if (tflag) {
-		char str[sizeof("HH:MM:SS")];
-		struct timeval tv, dtv;
-		static struct timeval otv;
-
+		struct timeval tv;
 		gettimeofday(&tv, NULL);
+
 		if (rflag) {
+			static struct timeval otv;
 			if (otv.tv_sec == 0)
 				otv = tv;
+
+			struct timeval dtv;
 			tv_sub(&dtv, &tv, &otv);
+			otv = tv;
+
 			tprintf("%6ld.%06ld ",
 				(long) dtv.tv_sec, (long) dtv.tv_usec);
-			otv = tv;
 		} else if (tflag > 2) {
 			tprintf("%ld.%06ld ",
 				(long) tv.tv_sec, (long) tv.tv_usec);
 		} else {
 			time_t local = tv.tv_sec;
+			char str[sizeof("HH:MM:SS")];
+
 			strftime(str, sizeof(str), "%T", localtime(&local));
 			if (tflag > 1)
 				tprintf("%s.%06ld ", str, (long) tv.tv_usec);
