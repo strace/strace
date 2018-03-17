@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check verbose xlat decoding of btrfs ioctl
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+run_prog ../btrfs -X > /dev/null
+run_strace -a16 -Xverbose -eioctl $args > "$EXP"
+grep -v '^ioctl([012],' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"

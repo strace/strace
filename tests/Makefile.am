@@ -215,7 +215,11 @@ DECODER_TESTS = \
 	brk.test \
 	btrfs-v.test \
 	btrfs-vw.test \
+	btrfs-vwX.test \
+	btrfs-vX.test \
 	btrfs-w.test \
+	btrfs-wX.test \
+	btrfs-X.test \
 	caps-abbrev.test \
 	caps.test \
 	eventfd.test \
