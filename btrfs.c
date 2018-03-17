@@ -620,11 +620,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints(" => ");
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
-		tprints("{");
 
 		valid = btrfs_unparse_uuid(args.uuid, uuid);
 		if (entering(tcp)) {
-			tprintf("devid=%" PRI__u64, args.devid);
+			tprintf("{devid=%" PRI__u64, args.devid);
 			if (valid)
 				tprintf(", uuid=%s", uuid);
 			tprints("}");
@@ -900,10 +899,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{");
-
 		if (entering(tcp)) {
-			tprintf("inum=%" PRI__u64 ", size=%" PRI__u64,
+			tprintf("{inum=%" PRI__u64 ", size=%" PRI__u64,
 				args.inum, args.size);
 			tprints(", fspath=");
 			printaddr64(args.fspath);
@@ -911,7 +908,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("fspath=");
+		tprints("{fspath=");
 		btrfs_print_ino_path_container(tcp, args.fspath);
 
 		tprints("}");
@@ -931,10 +928,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{");
-
 		if (entering(tcp)) {
-			tprintf("logical=%" PRI__u64 ", size=%" PRI__u64,
+			tprintf("{logical=%" PRI__u64 ", size=%" PRI__u64,
 				args.logical, args.size);
 
 			if (!IS_ARRAY_ZERO(args.reserved)) {
@@ -960,7 +955,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("inodes=");
+		tprints("{inodes=");
 		btrfs_print_logical_ino_container(tcp, args.inodes);
 
 		tprints("}");
@@ -1237,13 +1232,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{");
 		if (entering(tcp)) {
-			tprintf("space_slots=%" PRI__u64 "}", args.space_slots);
+			tprintf("{space_slots=%" PRI__u64 "}", args.space_slots);
 			return 0;
 		}
 
-		tprintf("total_spaces=%" PRI__u64, args.total_spaces);
+		tprintf("{total_spaces=%" PRI__u64, args.total_spaces);
 
 		if (args.space_slots == 0 && args.total_spaces) {
 			tprints("}");
