@@ -848,18 +848,14 @@ btrfs_print_search_key(struct btrfs_ioctl_search_key *key)
 		printf(", max_objectid=");
 		btrfs_print_objectid(key->max_objectid);
 	}
-	if (key->min_offset)
-		printf(", min_offset=%" PRI__u64 "%s",
-		       key->min_offset, maybe_print_uint64max(key->min_offset));
-	if (key->max_offset)
-		printf(", max_offset=%" PRI__u64 "%s",
-		       key->max_offset, maybe_print_uint64max(key->max_offset));
-	if (key->min_transid)
-		printf(", min_transid=%" PRI__u64 "%s", key->min_transid,
-		       maybe_print_uint64max(key->min_transid));
-	if (key->max_transid)
-		printf(", max_transid=%" PRI__u64 "%s", key->max_transid,
-		       maybe_print_uint64max(key->max_transid));
+	printf(", min_offset=%" PRI__u64 "%s",
+	       key->min_offset, maybe_print_uint64max(key->min_offset));
+	printf(", max_offset=%" PRI__u64 "%s",
+	       key->max_offset, maybe_print_uint64max(key->max_offset));
+	printf(", min_transid=%" PRI__u64 "%s", key->min_transid,
+	       maybe_print_uint64max(key->min_transid));
+	printf(", max_transid=%" PRI__u64 "%s", key->max_transid,
+	       maybe_print_uint64max(key->max_transid));
 	printf(", min_type=");
 	btrfs_print_key_type(key->min_type);
 	printf(", max_type=");

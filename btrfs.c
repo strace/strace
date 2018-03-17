@@ -393,11 +393,9 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 static void
 print_key_value_internal(struct tcb *tcp, const char *name, uint64_t value)
 {
-	if (value) {
-		tprintf(", %s=%" PRIu64, name, value);
-		if (value == UINT64_MAX)
-			tprints_comment("UINT64_MAX");
-	}
+	tprintf(", %s=%" PRIu64, name, value);
+	if (value == UINT64_MAX)
+		tprints_comment("UINT64_MAX");
 }
 #define print_key_value(tcp, key, name)					\
 	print_key_value_internal((tcp), #name, (key)->name)
