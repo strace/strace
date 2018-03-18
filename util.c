@@ -330,11 +330,14 @@ printnum_addr_klong_int(struct tcb *tcp, const kernel_ulong_t addr)
 
 /**
  * Prints time to a (static internal) buffer and returns pointer to it.
+ * Returns NULL if the provided time specification is not correct.
  *
  * @param sec		Seconds since epoch.
  * @param part_sec	Amount of second parts since the start of a second.
  * @param max_part_sec	Maximum value of a valid part_sec.
  * @param width		1 + floor(log10(max_part_sec)).
+ * @return		Pointer to a statically allocated string on success,
+ *			NULL on error.
  */
 static const char *
 sprinttime_ex(const long long sec, const unsigned long long part_sec,
