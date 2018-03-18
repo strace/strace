@@ -64,6 +64,10 @@ static bool verbose;
 static bool write_ok;
 static bool verbose_xlat;
 
+static const char *path;
+static const char dir_name_fmt[] = "strace-test-%d";
+static char dir_name[sizeof(dir_name_fmt) + sizeof(int) * 3];
+
 const unsigned char uuid_reference[BTRFS_UUID_SIZE] = {
 	0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
 	0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
@@ -1298,7 +1302,7 @@ btrfs_test_ino_path_ioctls(void)
 			data->bytes_left, data->bytes_missing, data->elem_cnt,
 			data->elem_missed);
 		if (verbose) {
-			printf("val=[\"strace-test\"]");
+			printf("val=[\"%s\"]", dir_name);
 		} else
 			printf("...");
 		printf("}}) = 0\n");
@@ -1934,13 +1938,20 @@ btrfs_test_read_ioctls(void)
 	}
 }
 
+static void
+rm_test_dir(void)
+{
+	int rootfd = open(path, O_RDONLY|O_DIRECTORY);
+
+	unlinkat(rootfd, dir_name, AT_REMOVEDIR);
+}
+
 int
 main(int argc, char *argv[])
 {
 
 	int opt;
 	int ret;
-	const char *path;
 
 	while ((opt = getopt(argc, argv, "wvX")) != -1) {
 		switch (opt) {
@@ -1961,6 +1972,10 @@ main(int argc, char *argv[])
 			error_msg_and_fail("usage: btrfs [-vwX] [path]");
 		}
 	}
+
+	ret = snprintf(dir_name, sizeof(dir_name), dir_name_fmt, getpid());
+	if (ret < 0)
+		perror_msg_and_fail("snprintf(dir_name)");
 
 	/*
 	 * This will enable optional tests that require a valid file descriptor
@@ -1983,14 +1998,18 @@ main(int argc, char *argv[])
 		if (rootfd < 0)
 			perror_msg_and_fail("open(%s) failed", path);
 
-		ret = mkdirat(rootfd, "strace-test", 0755);
+		ret = mkdirat(rootfd, dir_name, 0755);
 		if (ret < 0 && errno != EEXIST)
-			perror_msg_and_fail("mkdirat(strace-test) failed");
+			perror_msg_and_fail("mkdirat(%s) failed", dir_name);
 
-		btrfs_test_dir_fd = openat(rootfd, "strace-test",
+		/* Register removal of the created directory.  */
+		if (ret == 0)
+			atexit(rm_test_dir);
+
+		btrfs_test_dir_fd = openat(rootfd, dir_name,
 					   O_RDONLY|O_DIRECTORY);
 		if (btrfs_test_dir_fd < 0)
-			perror_msg_and_fail("openat(strace-test) failed");
+			perror_msg_and_fail("openat(%s) failed", dir_name);
 		close(rootfd);
 	} else
 		write_ok = false;
