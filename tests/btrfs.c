@@ -446,6 +446,7 @@ btrfs_test_subvol_ioctls(void)
 
 	if (write_ok) {
 		struct btrfs_ioctl_vol_args_v2 args_passed;
+		long ret;
 		/*
 		 * Returns transid if flags & BTRFS_SUBVOL_CREATE_ASYNC
 		 * - BTRFS_IOC_SNAP_CREATE_V2
@@ -462,8 +463,11 @@ btrfs_test_subvol_ioctls(void)
 		printf("ioctl(%d, BTRFS_IOC_SUBVOL_CREATE_V2, ",
 			btrfs_test_dir_fd);
 		btrfs_print_vol_args_v2(&vol_args_v2, 1);
-		ioctl(btrfs_test_dir_fd, BTRFS_IOC_SUBVOL_CREATE_V2,
+		ret = ioctl(btrfs_test_dir_fd, BTRFS_IOC_SUBVOL_CREATE_V2,
 		      &args_passed);
+		if (ret < 0)
+			perror_msg_and_fail("ioctl(BTRFS_IOC_SUBVOL_CREATE_V2) "
+					    "failed");
 		printf(" => {transid=%" PRI__u64 "}) = 0\n",
 			args_passed.transid);
 
