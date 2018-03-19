@@ -603,6 +603,14 @@ btrfs_test_balance_ioctls(void)
 		args.meta.profiles = 0;
 		args.sys.flags = 0;
 		args.sys.profiles = 0;
+
+		/*
+		 * We should keep args the same for data in meta in case
+		 * volume-under-tests uses mixed groups data and metadata.
+		 */
+		args.meta.pend = -1ULL;
+		args.meta.vend = -1ULL;
+
 		printf("ioctl(%d, BTRFS_IOC_BALANCE_V2, {flags=",
 			btrfs_test_dir_fd);
 
