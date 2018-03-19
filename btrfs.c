@@ -985,6 +985,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
+		tprints("{cmd=");
 		printxval64(btrfs_qgroup_ctl_cmds, args.cmd,
 			    "BTRFS_QUOTA_CTL_???");
 		tprints("}");

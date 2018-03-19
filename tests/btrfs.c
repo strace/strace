@@ -1503,28 +1503,28 @@ btrfs_test_quota_ctl_ioctl(void)
 
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, BTRFS_IOC_QUOTA_CTL, "
-	       "%sBTRFS_QUOTA_CTL_ENABLE%s}) = -1 EBADF (%m)\n",
+	       "{cmd=%sBTRFS_QUOTA_CTL_ENABLE%s}) = -1 EBADF (%m)\n",
 	       verbose_xlat ? "0x1 /* " : "",
 	       verbose_xlat ? " */" : "");
 
 	args.cmd = 2;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, BTRFS_IOC_QUOTA_CTL, "
-	       "%sBTRFS_QUOTA_CTL_DISABLE%s}) = -1 EBADF (%m)\n",
+	       "{cmd=%sBTRFS_QUOTA_CTL_DISABLE%s}) = -1 EBADF (%m)\n",
 	       verbose_xlat ? "0x2 /* " : "",
 	       verbose_xlat ? " */" : "");
 
 	args.cmd = 3;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, BTRFS_IOC_QUOTA_CTL, "
-	       "%sBTRFS_QUOTA_CTL_RESCAN__NOTUSED%s}) = -1 EBADF (%m)\n",
+	       "{cmd=%sBTRFS_QUOTA_CTL_RESCAN__NOTUSED%s}) = -1 EBADF (%m)\n",
 	       verbose_xlat ? "0x3 /* " : "",
 	       verbose_xlat ? " */" : "");
 
 	args.cmd = 4;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, BTRFS_IOC_QUOTA_CTL, "
-	       "0x4 /* BTRFS_QUOTA_CTL_??? */}) = -1 EBADF (%m)\n");
+	       "{cmd=0x4 /* BTRFS_QUOTA_CTL_??? */}) = -1 EBADF (%m)\n");
 }
 
 /*
