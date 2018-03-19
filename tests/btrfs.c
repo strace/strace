@@ -595,6 +595,8 @@ btrfs_test_balance_ioctls(void)
 	printf("}) = -1 EBADF (%m)\n");
 
 	if (write_ok) {
+		long ret;
+
 		args.flags = BTRFS_BALANCE_DATA | BTRFS_BALANCE_METADATA |
 			     BTRFS_BALANCE_SYSTEM;
 		args.data.flags = 0;
@@ -622,20 +624,24 @@ btrfs_test_balance_ioctls(void)
 		btrfs_print_balance_args(&args.meta);
 		printf(", sys=");
 		btrfs_print_balance_args(&args.sys);
-		ioctl(btrfs_test_dir_fd, BTRFS_IOC_BALANCE_V2,  &args);
-		printf("} => {flags=");
-		prfl_btrfs(btrfs_balance_flags, args.flags,
-			   "BTRFS_BALANCE_???");
-		printf(", state=");
-		prfl_btrfs(btrfs_balance_state, args.state,
-			   "BTRFS_BALANCE_STATE_???");
-		printf(", data=");
-		btrfs_print_balance_args(&args.data);
-		printf(", meta=");
-		btrfs_print_balance_args(&args.meta);
-		printf(", sys=");
-		btrfs_print_balance_args(&args.sys);
-		printf("}) = 0\n");
+		ret = ioctl(btrfs_test_dir_fd, BTRFS_IOC_BALANCE_V2,  &args);
+		if (ret < 0) {
+			printf("}) = %s\n", sprintrc(ret));
+		} else {
+			printf("} => {flags=");
+			prfl_btrfs(btrfs_balance_flags, args.flags,
+				   "BTRFS_BALANCE_???");
+			printf(", state=");
+			prfl_btrfs(btrfs_balance_state, args.state,
+				   "BTRFS_BALANCE_STATE_???");
+			printf(", data=");
+			btrfs_print_balance_args(&args.data);
+			printf(", meta=");
+			btrfs_print_balance_args(&args.meta);
+			printf(", sys=");
+			btrfs_print_balance_args(&args.sys);
+			printf("}) = %ld\n", ret);
+		}
 	}
 }
 
