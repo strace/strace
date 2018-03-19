@@ -1717,9 +1717,13 @@ btrfs_test_get_dev_stats_ioctl(void)
 			const char *name = xlookup(btrfs_dev_stats_values, i);
 			if (i)
 				printf(", ");
-			printf("%" PRI__u64, args.values[i]);
+
 			if (name)
-				printf(" /* %s */", name);
+				printf("[%s] = ", name);
+			else
+				printf("[%u] = ", i);
+
+			printf("%" PRI__u64, args.values[i]);
 		}
 		printf("]}) = 0\n");
 	}

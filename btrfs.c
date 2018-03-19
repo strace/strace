@@ -819,8 +819,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				tprints("...");
 				break;
 			}
+
+			const char *err_type =
+				xlookup(btrfs_dev_stats_values, i);
+			if (err_type)
+				tprintf("[%s] = ", err_type);
+			else
+				tprintf("[%" PRIu64 "] = ", i);
 			tprintf("%" PRI__u64, args.values[i]);
-			tprints_comment(xlookup(btrfs_dev_stats_values, i));
 		}
 		tprints("]}");
 		break;
