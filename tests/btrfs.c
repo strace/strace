@@ -1357,10 +1357,10 @@ btrfs_test_ino_path_ioctls(void)
 		ioctl(fd, FS_IOC_FIEMAP, fiemap);
 		printf(" => {fm_flags=");
 		prfl_btrfs(fiemap_flags, fiemap->fm_flags, "FIEMAP_FLAG_???");
-		printf(", fm_mapped_extents=%u, fm_extents=",
+		printf(", fm_mapped_extents=%u, ",
 			fiemap->fm_mapped_extents);
 		if (verbose) {
-			printf("[");
+			printf("fm_extents=[");
 			unsigned int i;
 			for (i = 0; i < fiemap->fm_mapped_extents; i++) {
 				struct fiemap_extent *fe;

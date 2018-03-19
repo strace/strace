@@ -225,11 +225,11 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 			     "FIEMAP_FLAG_???");
 		tprintf(", fm_mapped_extents=%u",
 			args.fm_mapped_extents);
-		tprints(", fm_extents=");
 		if (abbrev(tcp)) {
-			tprints("...");
+			tprints(", ...");
 		} else {
 			struct fiemap_extent fe;
+			tprints(", fm_extents=");
 			print_array(tcp,
 				    arg + offsetof(typeof(args), fm_extents),
 				    args.fm_mapped_extents, &fe, sizeof(fe),
