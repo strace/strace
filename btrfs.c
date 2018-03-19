@@ -181,9 +181,9 @@ btrfs_unparse_uuid(unsigned char *uuid, char *out)
 static void
 btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 {
-	tprintf(", %s={profiles=", name);
-	printflags64(btrfs_space_info_flags, bba->profiles,
-		     "BTRFS_BLOCK_GROUP_???");
+	tprintf(", %s=", name);
+	PRINT_FIELD_FLAGS("{", *bba, profiles, btrfs_space_info_flags,
+			  "BTRFS_BLOCK_GROUP_???");
 	PRINT_FIELD_U64(", ", *bba, usage);
 	PRINT_FIELD_U64(", ", *bba, devid);
 	PRINT_FIELD_U64(", ", *bba, pstart);
@@ -191,8 +191,8 @@ btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 	PRINT_FIELD_U64(", ", *bba, vstart);
 	PRINT_FIELD_U64(", ", *bba, vend);
 	PRINT_FIELD_U64(", ", *bba, target);
-	tprints(", flags=");
-	printflags64(btrfs_balance_args, bba->flags, "BTRFS_BALANCE_ARGS_???");
+	PRINT_FIELD_FLAGS(", ", *bba, flags, btrfs_balance_args,
+			  "BTRFS_BALANCE_ARGS_???");
 	tprints("}");
 }
 
@@ -204,14 +204,12 @@ btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 	if (umove_or_printaddr(tcp, arg, &balance_args))
 		return;
 
-	tprints("{flags=");
-	printflags64(btrfs_balance_flags, balance_args.flags,
-		     "BTRFS_BALANCE_???");
-	if (out) {
-		tprints(", state=");
-		printflags64(btrfs_balance_state, balance_args.state,
-			     "BTRFS_BALANCE_STATE_???");
-	}
+	PRINT_FIELD_FLAGS("{", balance_args, flags, btrfs_balance_flags,
+			  "BTRFS_BALANCE_???");
+	if (out)
+		PRINT_FIELD_FLAGS(", ", balance_args, state,
+				  btrfs_balance_state,
+				  "BTRFS_BALANCE_STATE_???");
 
 	if (balance_args.flags & BTRFS_BALANCE_DATA)
 		btrfs_print_balance_args("data", &balance_args.data);
@@ -225,30 +223,26 @@ btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 static void
 btrfs_print_features(const struct btrfs_ioctl_feature_flags *flags)
 {
-	tprints("{compat_flags=");
-	printflags64(btrfs_features_compat, flags->compat_flags,
-		     "BTRFS_FEATURE_COMPAT_???");
-
-	tprints(", compat_ro_flags=");
-	printflags64(btrfs_features_compat_ro, flags->compat_ro_flags,
-		     "BTRFS_FEATURE_COMPAT_RO_???");
-
-	tprints(", incompat_flags=");
-	printflags64(btrfs_features_incompat, flags->incompat_flags,
-		     "BTRFS_FEATURE_INCOMPAT_???");
+	PRINT_FIELD_FLAGS("{", *flags, compat_flags, btrfs_features_compat,
+			  "BTRFS_FEATURE_COMPAT_???");
+	PRINT_FIELD_FLAGS(", ", *flags, compat_ro_flags,
+			  btrfs_features_compat_ro,
+			  "BTRFS_FEATURE_COMPAT_RO_???");
+	PRINT_FIELD_FLAGS(", ", *flags, incompat_flags, btrfs_features_incompat,
+			  "BTRFS_FEATURE_INCOMPAT_???");
 	tprints("}");
 }
 
 static void
 btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 {
-	tprints(", lim={flags=");
-	printflags64(btrfs_qgroup_limit_flags, lim->flags,
-		     "BTRFS_QGROUP_LIMIT_???");
-	tprintf(", max_rfer=%" PRI__u64 ", max_excl=%" PRI__u64
-		", rsv_rfer=%" PRI__u64 ", rsv_excl=%" PRI__u64 "}",
-		lim->max_rfer, lim->max_excl,
-		lim->rsv_rfer, lim->rsv_excl);
+	PRINT_FIELD_FLAGS(", lim={", *lim, flags, btrfs_qgroup_limit_flags,
+			  "BTRFS_QGROUP_LIMIT_???");
+	PRINT_FIELD_U(", ", *lim, max_rfer);
+	PRINT_FIELD_U(", ", *lim, max_excl);
+	PRINT_FIELD_U(", ", *lim, rsv_rfer);
+	PRINT_FIELD_U(", ", *lim, rsv_excl);
+	tprints("}");
 }
 
 #define btrfs_print_key_type(prefix_, where_, field_) \
@@ -260,10 +254,10 @@ btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 static void
 btrfs_print_data_container_header(const struct btrfs_data_container *container)
 {
-	tprintf("{bytes_left=%u, bytes_missing=%u"
-		", elem_cnt=%u, elem_missed=%u",
-		container->bytes_left, container->bytes_missing,
-		container->elem_cnt, container->elem_missed);
+	PRINT_FIELD_U("{", *container, bytes_left);
+	PRINT_FIELD_U(", ", *container, bytes_missing);
+	PRINT_FIELD_U(", ", *container, elem_cnt);
+	PRINT_FIELD_U(", ", *container, elem_missed);
 }
 
 static void
@@ -276,10 +270,16 @@ static bool
 print_btrfs_data_container_logical_ino(struct tcb *tcp, void *elem_buf,
 				       size_t elem_size, void *data)
 {
-	const uint64_t *const record = elem_buf;
+	const struct {
+		uint64_t inum;
+		uint64_t offset;
+		uint64_t root;
+	} *const record = elem_buf;
 
-	tprintf("{inum=%" PRIu64 ", offset=%" PRIu64 ", root=%" PRIu64 "}",
-		record[0], record[1], record[2]);
+	PRINT_FIELD_U("{", *record, inum);
+	PRINT_FIELD_U(", ", *record, offset);
+	PRINT_FIELD_U(", ", *record, root);
+	tprints("}");
 
 	return true;
 }
@@ -358,13 +358,11 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 	if (umove_or_printaddr(tcp, qgi_addr, &inherit))
 		return;
 
-	tprints("{flags=");
-	printflags64(btrfs_qgroup_inherit_flags, inherit.flags,
-		     "BTRFS_QGROUP_INHERIT_???");
-	tprintf(", num_qgroups=%" PRI__u64 ", num_ref_copies=%" PRI__u64
-		", num_excl_copies=%" PRI__u64,
-		inherit.num_qgroups, inherit.num_ref_copies,
-		inherit.num_excl_copies);
+	PRINT_FIELD_FLAGS("{", inherit, flags, btrfs_qgroup_inherit_flags,
+			  "BTRFS_QGROUP_INHERIT_???");
+	PRINT_FIELD_U(", ", inherit, num_qgroups);
+	PRINT_FIELD_U(", ", inherit, num_ref_copies);
+	PRINT_FIELD_U(", ", inherit, num_excl_copies);
 
 	btrfs_print_qgroup_limit(&inherit.lim);
 
@@ -402,12 +400,14 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 
 		btrfs_print_key_type(", ", *key, min_type);
 		btrfs_print_key_type(", ", *key, max_type);
-		tprintf(", nr_items=%u}", key->nr_items);
+		PRINT_FIELD_U(", ", *key, nr_items);
+		tprints("}");
 		if (print_size)
 			tprintf(", buf_size=%" PRIu64, buf_size);
 		tprints("}");
 	} else {
-		tprintf("{key={nr_items=%u}", key->nr_items);
+		PRINT_FIELD_U("{key={", *key, nr_items);
+		tprints("}");
 		if (print_size)
 			tprintf(", buf_size=%" PRIu64, buf_size);
 		if (abbrev(tcp)) {
@@ -426,12 +426,12 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 					tprints("...");
 					break;
 				}
-				tprintf("{transid=%" PRI__u64,
-					sh.transid);
+				PRINT_FIELD_U("{", sh, transid);
 				btrfs_print_objectid(", ", sh, objectid);
-				tprintf(", offset=%" PRI__u64, sh.offset);
+				PRINT_FIELD_U(", ", sh, offset);
 				btrfs_print_key_type(", ", sh, type);
-				tprintf(", len=%u}", sh.len);
+				PRINT_FIELD_U(", ", sh, len);
+				tprints("}");
 				off += sizeof(sh) + sh.len;
 
 			}
@@ -457,11 +457,11 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 {
 	const struct btrfs_ioctl_space_info *info = elem_buf;
 
-	tprints("{flags=");
-	printflags64(btrfs_space_info_flags, info->flags,
-		     "BTRFS_SPACE_INFO_???");
-	tprintf(", total_bytes=%" PRI__u64 ", used_bytes=%" PRI__u64 "}",
-		info->total_bytes, info->used_bytes);
+	PRINT_FIELD_FLAGS("{", *info, flags, btrfs_space_info_flags,
+			  "BTRFS_SPACE_INFO_???");
+	PRINT_FIELD_U(", ", *info, total_bytes);
+	PRINT_FIELD_U(", ", *info, used_bytes);
+	tprints("}");
 
 	return true;
 }
@@ -568,16 +568,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{start=%" PRIu64, (uint64_t)args.start);
+		PRINT_FIELD_U("{", args, start);
 		PRINT_FIELD_U64(", ", args, len);
 
-		tprints(", flags=");
-		printflags64(btrfs_defrag_flags, args.flags,
-			     "BTRFS_DEFRAG_RANGE_???");
-		tprintf(", extent_thresh=%u, compress_type=",
-			args.extent_thresh);
-		printxval(btrfs_compress_types, args.compress_type,
-			  "BTRFS_COMPRESS_???");
+		PRINT_FIELD_FLAGS(", ", args, flags, btrfs_defrag_flags,
+				  "BTRFS_DEFRAG_RANGE_???");
+		PRINT_FIELD_U(", ", args, extent_thresh);
+		PRINT_FIELD_XVAL(", ", args, compress_type,
+				 btrfs_compress_types, "BTRFS_COMPRESS_???");
 		tprints("}");
 		break;
 	}
@@ -598,19 +596,22 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		valid = btrfs_unparse_uuid(args.uuid, uuid);
 		if (entering(tcp)) {
-			tprintf("{devid=%" PRI__u64, args.devid);
+			PRINT_FIELD_U("{", args, devid);
 			if (valid)
 				tprintf(", uuid=%s", uuid);
 			tprints("}");
 			return 0;
 		}
+
+		tprints("{");
 		if (valid)
 			tprintf("uuid=%s, ", uuid);
-		tprintf("bytes_used=%" PRI__u64
-			", total_bytes=%" PRI__u64,
-			args.bytes_used, args.total_bytes);
+
+		PRINT_FIELD_U("", args, bytes_used);
+		PRINT_FIELD_U(", ", args, total_bytes);
 		PRINT_FIELD_CSTRING(", ", args, path);
 		tprints("}");
+
 		break;
 	}
 
@@ -628,24 +629,17 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprints("{cmd=");
-			printxval64(btrfs_dev_replace_cmds, args.cmd,
-				    "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
+			PRINT_FIELD_XVAL("{", args, cmd, btrfs_dev_replace_cmds,
+					 "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
-				const char *str;
-				tprintf(", start={srcdevid=%" PRIu64
-				   ", cont_reading_from_srcdev_mode=%" PRIu64
-				   ", srcdev_name=",
-				   (uint64_t) args.start.srcdevid,
-				   (uint64_t) args.start.cont_reading_from_srcdev_mode);
-
-				str = (const char *) args.start.srcdev_name;
-				print_quoted_cstring(str,
-						sizeof(args.start.srcdev_name));
-				tprints(", tgtdev_name=");
-				str = (const char *) args.start.tgtdev_name;
-				print_quoted_cstring(str,
-						sizeof(args.start.tgtdev_name));
+				PRINT_FIELD_U(", start={", args.start,
+					      srcdevid);
+				PRINT_FIELD_U(", ", args.start,
+					      cont_reading_from_srcdev_mode);
+				PRINT_FIELD_CSTRING(", ", args.start,
+						    srcdev_name);
+				PRINT_FIELD_CSTRING(", ", args.start,
+						    tgtdev_name);
 				tprints("}");
 
 			}
@@ -653,34 +647,28 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("{result=");
-		printxval64(btrfs_dev_replace_results, args.result,
-			    "BTRFS_IOCTL_DEV_REPLACE_RESULT_???");
+		PRINT_FIELD_XVAL("{", args, result, btrfs_dev_replace_results,
+				 "BTRFS_IOCTL_DEV_REPLACE_RESULT_???");
 		if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_STATUS) {
-			tprints(", ");
-			printxval64(btrfs_dev_replace_state,
-				   args.status.replace_state,
-				   "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
-			tprintf(", progress_1000=%" PRIu64,
-				(uint64_t) args.status.progress_1000);
+			PRINT_FIELD_XVAL(", status={", args.status,
+					 replace_state, btrfs_dev_replace_state,
+					 "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
 
+			PRINT_FIELD_U(", ", args.status, progress_1000);
 			if (args.status.progress_1000 <= 1000)
 				tprintf_comment("%u.%u%%",
 					(unsigned) args.status.progress_1000 / 10,
 					(unsigned) args.status.progress_1000 % 10);
 
-			tprintf(", time_started=%" PRIu64,
-				(uint64_t) args.status.time_started);
+			PRINT_FIELD_U(", ", args.status, time_started);
 			tprints_comment(sprinttime(args.status.time_started));
 
-			tprintf(", time_stopped=%" PRIu64,
-				(uint64_t) args.status.time_stopped);
+			PRINT_FIELD_U(", ", args.status, time_stopped);
 			tprints_comment(sprinttime(args.status.time_stopped));
 
-			tprintf(", num_write_errors=%" PRIu64
-				", num_uncorrectable_read_errors=%" PRIu64,
-				(uint64_t) args.status.num_write_errors,
-				(uint64_t) args.status.num_uncorrectable_read_errors);
+			PRINT_FIELD_U(", ", args.status, num_write_errors);
+			PRINT_FIELD_U(", ", args.status,
+				      num_uncorrectable_read_errors);
 		}
 		tprints("}");
 		break;
@@ -769,12 +757,11 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 #endif
 		btrfs_unparse_uuid(args.fsid, uuid);
 
-		tprints("{");
-		tprintf("max_id=%" PRI__u64 ", num_devices=%" PRI__u64
-			", fsid=%s, nodesize=%u, sectorsize=%u"
+		PRINT_FIELD_U("{", args, max_id);
+		PRINT_FIELD_U(", ", args, num_devices);
+		tprintf(", fsid=%s, nodesize=%u, sectorsize=%u"
 			", clone_alignment=%u",
-			args.max_id, args.num_devices, uuid,
-			nodesize, sectorsize, clone_alignment);
+			uuid, nodesize, sectorsize, clone_alignment);
 		tprints("}");
 		break;
 	}
@@ -794,12 +781,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		tprints("{");
 
-		if (entering(tcp))
-			tprintf("devid=%" PRI__u64 ", ", args.devid);
+		if (entering(tcp)) {
+			PRINT_FIELD_U("", args, devid);
+			tprints(", ");
+		}
 
-		tprintf("nr_items=%" PRI__u64 ", flags=", args.nr_items);
-		printflags64(btrfs_dev_stats_flags, args.flags,
-			     "BTRFS_DEV_STATS_???");
+		PRINT_FIELD_U("", args, nr_items);
+		PRINT_FIELD_FLAGS(", ", args, flags, btrfs_dev_stats_flags,
+				  "BTRFS_DEV_STATS_???");
 
 		if (entering(tcp)) {
 			tprints("}");
@@ -881,10 +870,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprintf("{inum=%" PRI__u64 ", size=%" PRI__u64,
-				args.inum, args.size);
-			tprints(", fspath=");
-			printaddr64(args.fspath);
+			PRINT_FIELD_U("{", args, inum);
+			PRINT_FIELD_U(", ", args, size);
+			PRINT_FIELD_ADDR64(", ", args, fspath);
 			tprints("}");
 			return 0;
 		}
@@ -910,8 +898,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprintf("{logical=%" PRI__u64 ", size=%" PRI__u64,
-				args.logical, args.size);
+			PRINT_FIELD_U("{", args, logical);
+			PRINT_FIELD_U(", ", args, size);
 
 			if (!IS_ARRAY_ZERO(args.reserved)) {
 				tprints(", reserved=[");
@@ -930,8 +918,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				     args.reserved[3]
 #endif
 				     , "BTRFS_LOGICAL_INO_ARGS_???");
-			tprints(", inodes=");
-			printaddr64(args.inodes);
+			PRINT_FIELD_ADDR64(", ", args, inodes);
 			tprints("}");
 			return 0;
 		}
@@ -950,9 +937,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{assign=%" PRI__u64 ", src=%" PRI__u64
-			", dst=%" PRI__u64 "}",
-			args.assign, args.src, args.dst);
+		PRINT_FIELD_U("{", args, assign);
+		PRINT_FIELD_U(", ", args, src);
+		PRINT_FIELD_U(", ", args, dst);
+		tprints("}");
 		break;
 	}
 
@@ -963,8 +951,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{create=%" PRI__u64 ", qgroupid=%" PRI__u64 "}",
-			args.create, args.qgroupid);
+		PRINT_FIELD_U("{", args, create);
+		PRINT_FIELD_U(", ", args, qgroupid);
+		tprints("}");
 		break;
 	}
 
@@ -978,7 +967,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{qgroupid=%" PRI__u64, args.qgroupid);
+		PRINT_FIELD_U("{", args, qgroupid);
 		btrfs_print_qgroup_limit(&args.lim);
 		tprints("}");
 		break;
@@ -991,9 +980,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{cmd=");
-		printxval64(btrfs_qgroup_ctl_cmds, args.cmd,
-			    "BTRFS_QUOTA_CTL_???");
+		PRINT_FIELD_XVAL("{", args, cmd, btrfs_qgroup_ctl_cmds,
+				 "BTRFS_QUOTA_CTL_???");
 		tprints("}");
 
 		break;
@@ -1006,7 +994,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{flags=%" PRIu64 "}", (uint64_t) args.flags);
+		PRINT_FIELD_U("{", args, flags);
+		tprints("}");
 		break;
 	}
 
@@ -1020,7 +1009,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprintf("{flags=%" PRIu64, (uint64_t) args.flags);
+		PRINT_FIELD_U("{", args, flags);
 		btrfs_print_objectid(", ", args, progress);
 		tprints("}");
 		break;
@@ -1042,15 +1031,15 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		if (entering(tcp)) {
 			btrfs_unparse_uuid((unsigned char *)args.uuid, uuid);
-			tprintf("{uuid=%s, stransid=%" PRIu64,
-				uuid, (uint64_t) args.stransid);
+			tprintf("{uuid=%s", uuid);
+			PRINT_FIELD_U(", ", args, stransid);
 			print_btrfs_timespec(", stime=",
 					     args.stime.sec, args.stime.nsec);
-			tprintf(", flags=%" PRIu64 "}",
-				(uint64_t) args.flags);
+			PRINT_FIELD_U(", ", args, flags);
+			tprints("}");
 			return 0;
 		}
-		tprintf("{rtransid=%" PRIu64, (uint64_t) args.rtransid);
+		PRINT_FIELD_U("{", args, rtransid);
 		print_btrfs_timespec(", rtime=",
 				     args.rtime.sec, args.rtime.nsec);
 		tprints("}");
@@ -1072,48 +1061,34 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprintf("{devid=%" PRI__u64, args.devid);
+			PRINT_FIELD_U("{", args, devid);
 			if (code == BTRFS_IOC_SCRUB) {
-				tprintf(", start=%" PRI__u64,
-					args.start);
+				PRINT_FIELD_U(", ", args, start);
 				PRINT_FIELD_U64(", ", args, end);
-				tprints(", flags=");
-				printflags64(btrfs_scrub_flags, args.flags,
-					     "BTRFS_SCRUB_???");
+				PRINT_FIELD_FLAGS(", ", args, flags,
+						  btrfs_scrub_flags,
+						  "BTRFS_SCRUB_???");
 			}
 			tprints("}");
 			return 0;
 		}
-		tprintf("{data_extents_scrubbed=%" PRI__u64
-			", tree_extents_scrubbed=%" PRI__u64
-			", data_bytes_scrubbed=%" PRI__u64
-			", tree_bytes_scrubbed=%" PRI__u64
-			", read_errors=%" PRI__u64
-			", csum_errors=%" PRI__u64
-			", verify_errors=%" PRI__u64
-			", no_csum=%" PRI__u64
-			", csum_discards=%" PRI__u64
-			", super_errors=%" PRI__u64
-			", malloc_errors=%" PRI__u64
-			", uncorrectable_errors=%" PRI__u64
-			", corrected_errors=%" PRI__u64
-			", last_physical=%" PRI__u64
-			", unverified_errors=%" PRI__u64 "}",
-			args.progress.data_extents_scrubbed,
-			args.progress.tree_extents_scrubbed,
-			args.progress.data_bytes_scrubbed,
-			args.progress.tree_bytes_scrubbed,
-			args.progress.read_errors,
-			args.progress.csum_errors,
-			args.progress.verify_errors,
-			args.progress.no_csum,
-			args.progress.csum_discards,
-			args.progress.super_errors,
-			args.progress.malloc_errors,
-			args.progress.uncorrectable_errors,
-			args.progress.corrected_errors,
-			args.progress.last_physical,
-			args.progress.unverified_errors);
+		PRINT_FIELD_U("{progress={", args.progress,
+			      data_extents_scrubbed);
+		PRINT_FIELD_U(", ", args.progress, tree_extents_scrubbed);
+		PRINT_FIELD_U(", ", args.progress, data_bytes_scrubbed);
+		PRINT_FIELD_U(", ", args.progress, tree_bytes_scrubbed);
+		PRINT_FIELD_U(", ", args.progress, read_errors);
+		PRINT_FIELD_U(", ", args.progress, csum_errors);
+		PRINT_FIELD_U(", ", args.progress, verify_errors);
+		PRINT_FIELD_U(", ", args.progress, no_csum);
+		PRINT_FIELD_U(", ", args.progress, csum_discards);
+		PRINT_FIELD_U(", ", args.progress, super_errors);
+		PRINT_FIELD_U(", ", args.progress, malloc_errors);
+		PRINT_FIELD_U(", ", args.progress, uncorrectable_errors);
+		PRINT_FIELD_U(", ", args.progress, corrected_errors);
+		PRINT_FIELD_U(", ", args.progress, last_physical);
+		PRINT_FIELD_U(", ", args.progress, unverified_errors);
+		tprints("}}");
 		break;
 	}
 
@@ -1150,8 +1125,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				tprints(" => ");
 				if (!umove_or_printaddr_ignore_syserror(tcp,
 				    arg, &args))
-					tprintf("{buf_size=%" PRIu64 "}",
-						(uint64_t)args.buf_size);
+					PRINT_FIELD_U("{", args, buf_size);
+					tprints("}");
 			}
 			break;
 		} else
@@ -1175,10 +1150,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{send_fd=");
-		printfd(tcp, args.send_fd);
-		tprintf(", clone_sources_count=%" PRIu64,
-			(uint64_t) args.clone_sources_count);
+		PRINT_FIELD_FD("{", args, send_fd, tcp);
+		PRINT_FIELD_U(", ", args, clone_sources_count);
 
 		tprints(", clone_sources=");
 		if (abbrev(tcp))
@@ -1192,9 +1165,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				    print_objectid_callback, 0);
 		}
 		btrfs_print_objectid(", ", args, parent_root);
-		tprints(", flags=");
-		printflags64(btrfs_send_flags, args.flags,
-			     "BTRFS_SEND_FLAGS_???");
+		PRINT_FIELD_FLAGS(", ", args, flags, btrfs_send_flags,
+				  "BTRFS_SEND_FLAGS_???");
 		tprints("}");
 		break;
 	}
@@ -1213,11 +1185,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprintf("{space_slots=%" PRI__u64 "}", args.space_slots);
+			PRINT_FIELD_U("{", args, space_slots);
+			tprints("}");
 			return 0;
 		}
 
-		tprintf("{total_spaces=%" PRI__u64, args.total_spaces);
+		PRINT_FIELD_U("{", args, total_spaces);
 
 		if (args.space_slots == 0 && args.total_spaces) {
 			tprints("}");
@@ -1252,8 +1225,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{fd=");
-		printfd(tcp, args.fd);
+		PRINT_FIELD_FD("{", args, fd, tcp);
 		PRINT_FIELD_CSTRING(", ", args, name);
 		tprints("}");
 		break;
@@ -1274,15 +1246,13 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			tprints("{fd=");
-			printfd(tcp, args.fd);
-			tprints(", flags=");
-			printflags64(btrfs_snap_flags_v2, args.flags,
-				     "BTRFS_SUBVOL_???");
+			PRINT_FIELD_FD("{", args, fd, tcp);
+			PRINT_FIELD_FLAGS(", ", args, flags,
+					  btrfs_snap_flags_v2,
+					  "BTRFS_SUBVOL_???");
 			if (args.flags & BTRFS_SUBVOL_QGROUP_INHERIT) {
-				tprintf(", size=%" PRIu64 ", qgroup_inherit=",
-					(uint64_t) args.size);
-
+				PRINT_FIELD_U(", ", args, size);
+				tprints(", qgroup_inherit=");
 				btrfs_print_qgroup_inherit(tcp,
 					ptr_to_kulong(args.qgroup_inherit));
 			}
@@ -1290,7 +1260,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints("}");
 			return 0;
 		}
-		tprintf("{transid=%" PRIu64 "}", (uint64_t) args.transid);
+		PRINT_FIELD_U("{", args, transid);
+		tprints("}");
 		break;
 	}
 
