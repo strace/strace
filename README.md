@@ -13,4 +13,9 @@ The user discussion and development of strace take place on [the strace mailing 
 
 The GIT repository of strace is available at [GitHub](https://github.com/strace/strace/) and [GitLab](https://gitlab.com/strace/strace/).
 
+The latest binary strace packages are available in many repositories, including
+[OBS](https://build.opensuse.org/package/show/home:ldv_alt/strace/),
+[Fedora rawhide](https://apps.fedoraproject.org/packages/strace), and
+[Sisyphus](https://packages.altlinux.org/en/Sisyphus/srpms/strace).
+
 [![Build Status](https://travis-ci.org/strace/strace.svg?branch=master)](https://travis-ci.org/strace/strace) [![Code Coverage](https://codecov.io/github/strace/strace/coverage.svg?branch=master)](https://codecov.io/github/strace/strace?branch=master)
