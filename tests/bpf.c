@@ -68,121 +68,123 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 #  define print_extra_data(addr_, size_) printf("...")
 #endif
 
-# define TEST_BPF_(cmd_, cmd_str_,					\
-		  init_first_, print_first_,				\
-		  init_attr_, print_attr_)				\
-	do {								\
-		/* zero addr */						\
-		sys_bpf(cmd_, 0, long_bits | sizeof(union bpf_attr));	\
-		printf("bpf(%s, NULL, %u) = %s\n",			\
-		       cmd_str_, sizeof_attr, errstr);			\
-									\
-		/* zero size */						\
-		unsigned long addr = end_of_page - sizeof_attr;		\
-		sys_bpf(cmd_, addr, long_bits);				\
-		printf("bpf(%s, %#lx, 0) = %s\n",			\
-		       cmd_str_, addr, errstr);				\
-									\
-		/* the first field only */				\
-		unsigned int offset = init_first_(end_of_page);		\
-		addr = end_of_page - offset;				\
-		sys_bpf(cmd_, addr, offset);				\
-		printf("bpf(%s, {", cmd_str_);				\
-		print_first_(addr);					\
-		printf("}, %u) = %s\n", offset, errstr);		\
-									\
-		/* efault after the first field */			\
-		sys_bpf(cmd_, addr, offset + 1);			\
-		printf("bpf(%s, %#lx, %u) = %s\n",			\
-		       cmd_str_, addr, offset + 1, errstr);		\
-									\
-		/* the relevant part of union bpf_attr */		\
-		offset = init_attr_(end_of_page);			\
-		addr = end_of_page - offset;				\
-		sys_bpf(cmd_, addr, offset);				\
-		printf("bpf(%s, {", cmd_str_);				\
-		print_attr_(addr);					\
-		printf("}, %u) = %s\n", offset, errstr);		\
-									\
-		/* short read of the relevant part of union bpf_attr */	\
-		sys_bpf(cmd_, addr + 1, offset);			\
-		printf("bpf(%s, %#lx, %u) = %s\n",			\
-		       cmd_str_, addr + 1, offset, errstr);		\
-									\
-		if (offset < sizeof_attr) {				\
-			/* short read of the whole union bpf_attr */	\
-			memmove((void *) end_of_page - sizeof_attr + 1,	\
-				(void *) addr, offset);			\
-			addr = end_of_page - sizeof_attr + 1;		\
-			memset((void *) addr + offset, 0,		\
-			       sizeof_attr - offset - 1);		\
-			sys_bpf(cmd_, addr, sizeof_attr);		\
-			printf("bpf(%s, %#lx, %u) = %s\n",		\
-			       cmd_str_, addr, sizeof_attr, errstr);	\
-									\
-			/* the whole union bpf_attr */			\
-			memmove((void *) end_of_page - sizeof_attr,	\
-				(void *) addr, offset);			\
-			addr = end_of_page - sizeof_attr;		\
-			memset((void *) addr + offset, 0,		\
-			       sizeof_attr - offset);			\
-			sys_bpf(cmd_, addr, sizeof_attr);		\
-			printf("bpf(%s, {", cmd_str_);			\
-			print_attr_(addr);				\
-			printf("}, %u) = %s\n", sizeof_attr, errstr);	\
-									\
-			/* non-zero bytes after the relevant part */	\
-			fill_memory_ex((void *) addr + offset,		\
-				       sizeof_attr - offset, '0', 10);	\
-			sys_bpf(cmd_, addr, sizeof_attr);		\
-			printf("bpf(%s, {", cmd_str_);			\
-			print_attr_(addr);				\
-			printf(", ");					\
-			print_extra_data((void *) addr + offset,	\
-					 sizeof_attr - offset);		\
-			printf("}, %u) = %s\n", sizeof_attr, errstr);	\
-		}							\
-									\
-		/* short read of the whole page */			\
-		memmove((void *) end_of_page - page_size + 1,		\
-			(void *) addr, offset);				\
-		addr = end_of_page - page_size + 1;			\
-		memset((void *) addr + offset, 0,			\
-		       page_size - offset - 1);				\
-		sys_bpf(cmd_, addr, page_size);				\
-		printf("bpf(%s, %#lx, %u) = %s\n",			\
-		       cmd_str_, addr, page_size, errstr);		\
-									\
-		/* the whole page */					\
-		memmove((void *) end_of_page - page_size,		\
-			(void *) addr, offset);				\
-		addr = end_of_page - page_size;				\
-		memset((void *) addr + offset, 0, page_size - offset);	\
-		sys_bpf(cmd_, addr, page_size);				\
-		printf("bpf(%s, {", cmd_str_);				\
-		print_attr_(addr);					\
-		printf("}, %u) = %s\n", page_size, errstr);		\
-									\
-		/* non-zero bytes after the whole union bpf_attr */	\
-		fill_memory_ex((void *) addr + offset,			\
-			       page_size - offset, '0', 10);		\
-		sys_bpf(cmd_, addr, page_size);				\
-		printf("bpf(%s, {", cmd_str_);				\
-		print_attr_(addr);					\
-		printf(", ");						\
-		print_extra_data((void *) addr + offset,		\
-				 page_size - offset);			\
-		printf("}, %u) = %s\n", page_size, errstr);		\
-									\
-		/* more than a page */					\
-		sys_bpf(cmd_, addr, page_size + 1);			\
-		printf("bpf(%s, %#lx, %u) = %s\n",			\
-		       cmd_str_, addr, page_size + 1, errstr);		\
-	} while (0)							\
-	/* End of TEST_BPF_ definition. */
+static void
+test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
+	  unsigned int (*init_first)(const unsigned long eop),
+	  void (*print_first)(const unsigned long eop),
+	  unsigned int (*init_attr)(const unsigned long eop),
+	  void (*print_attr)(const unsigned long eop))
+{
+	/* zero addr */
+	sys_bpf(cmd, 0, long_bits | sizeof(union bpf_attr));
+	printf("bpf(%s, NULL, %u) = %s\n",
+	       cmd_str, sizeof_attr, errstr);
+
+	/* zero size */
+	unsigned long addr = end_of_page - sizeof_attr;
+	sys_bpf(cmd, addr, long_bits);
+	printf("bpf(%s, %#lx, 0) = %s\n",
+	       cmd_str, addr, errstr);
+
+	/* the first field only */
+	unsigned int offset = init_first(end_of_page);
+	addr = end_of_page - offset;
+	sys_bpf(cmd, addr, offset);
+	printf("bpf(%s, {", cmd_str);
+	print_first(addr);
+	printf("}, %u) = %s\n", offset, errstr);
+
+	/* efault after the first field */
+	sys_bpf(cmd, addr, offset + 1);
+	printf("bpf(%s, %#lx, %u) = %s\n",
+	       cmd_str, addr, offset + 1, errstr);
+
+	/* the relevant part of union bpf_attr */
+	offset = init_attr(end_of_page);
+	addr = end_of_page - offset;
+	sys_bpf(cmd, addr, offset);
+	printf("bpf(%s, {", cmd_str);
+	print_attr(addr);
+	printf("}, %u) = %s\n", offset, errstr);
+
+	/* short read of the relevant part of union bpf_attr */
+	sys_bpf(cmd, addr + 1, offset);
+	printf("bpf(%s, %#lx, %u) = %s\n",
+	       cmd_str, addr + 1, offset, errstr);
+
+	if (offset < sizeof_attr) {
+		/* short read of the whole union bpf_attr */
+		memmove((void *) end_of_page - sizeof_attr + 1,
+			(void *) addr, offset);
+		addr = end_of_page - sizeof_attr + 1;
+		memset((void *) addr + offset, 0,
+		       sizeof_attr - offset - 1);
+		sys_bpf(cmd, addr, sizeof_attr);
+		printf("bpf(%s, %#lx, %u) = %s\n",
+		       cmd_str, addr, sizeof_attr, errstr);
+
+		/* the whole union bpf_attr */
+		memmove((void *) end_of_page - sizeof_attr,
+			(void *) addr, offset);
+		addr = end_of_page - sizeof_attr;
+		memset((void *) addr + offset, 0,
+		       sizeof_attr - offset);
+		sys_bpf(cmd, addr, sizeof_attr);
+		printf("bpf(%s, {", cmd_str);
+		print_attr(addr);
+		printf("}, %u) = %s\n", sizeof_attr, errstr);
+
+		/* non-zero bytes after the relevant part */
+		fill_memory_ex((void *) addr + offset,
+			       sizeof_attr - offset, '0', 10);
+		sys_bpf(cmd, addr, sizeof_attr);
+		printf("bpf(%s, {", cmd_str);
+		print_attr(addr);
+		printf(", ");
+		print_extra_data((void *) addr + offset,
+				 sizeof_attr - offset);
+		printf("}, %u) = %s\n", sizeof_attr, errstr);
+	}
+
+	/* short read of the whole page */
+	memmove((void *) end_of_page - page_size + 1,
+		(void *) addr, offset);
+	addr = end_of_page - page_size + 1;
+	memset((void *) addr + offset, 0,
+	       page_size - offset - 1);
+	sys_bpf(cmd, addr, page_size);
+	printf("bpf(%s, %#lx, %u) = %s\n",
+	       cmd_str, addr, page_size, errstr);
+
+	/* the whole page */
+	memmove((void *) end_of_page - page_size,
+		(void *) addr, offset);
+	addr = end_of_page - page_size;
+	memset((void *) addr + offset, 0, page_size - offset);
+	sys_bpf(cmd, addr, page_size);
+	printf("bpf(%s, {", cmd_str);
+	print_attr(addr);
+	printf("}, %u) = %s\n", page_size, errstr);
+
+	/* non-zero bytes after the whole union bpf_attr */
+	fill_memory_ex((void *) addr + offset,
+		       page_size - offset, '0', 10);
+	sys_bpf(cmd, addr, page_size);
+	printf("bpf(%s, {", cmd_str);
+	print_attr(addr);
+	printf(", ");
+	print_extra_data((void *) addr + offset,
+			 page_size - offset);
+	printf("}, %u) = %s\n", page_size, errstr);
+
+	/* more than a page */
+	sys_bpf(cmd, addr, page_size + 1);
+	printf("bpf(%s, %#lx, %u) = %s\n",
+	       cmd_str, addr, page_size + 1, errstr);
+}
 
 # define TEST_BPF(cmd_)							\
-	TEST_BPF_((cmd_), #cmd_,					\
+	test_bpf_((cmd_), #cmd_,					\
 		  init_ ## cmd_ ## _first, print_ ## cmd_ ## _first,	\
 		  init_ ## cmd_ ## _attr, print_ ## cmd_ ## _attr)	\
 	/* End of TEST_BPF definition. */
