@@ -122,7 +122,7 @@ case "$arch" in
 		AC_CACHE_CHECK([whether mpers.sh mpers_name MPERS_CFLAGS works],
 			[st_cv_mpers],
 			[if READELF="$READELF" \
-			    CC="$CC" CPP="$CPP" CPPFLAGS="$CPPFLAGS" \
+			    CC="$CC" CPP="$CPP" CPPFLAGS="$CPPFLAGS $IFLAG" \
 			    $srcdir/mpers_test.sh [$1] MPERS_CFLAGS; then
 				st_cv_mpers=yes
 			 else
