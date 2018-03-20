@@ -25,6 +25,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Bug fixes
   * Fixed build on m68k.
   * Fixed v4l2 pixelformat decoding on big-endian architectures.
+  * Fixed -O option.
 
 Noteworthy changes in release 4.21 (2018-02-13)
 ===============================================

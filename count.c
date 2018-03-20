@@ -150,6 +150,8 @@ call_summary_pers(FILE *outf)
 			continue;
 		tv_mul(&dtv, &overhead, counts[i].calls);
 		tv_sub(&counts[i].time, &counts[i].time, &dtv);
+		if (counts[i].time.tv_sec < 0 || counts[i].time.tv_usec < 0)
+			counts[i].time.tv_sec = counts[i].time.tv_usec = 0;
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
 		tv_add(&tv_cum, &tv_cum, &counts[i].time);
