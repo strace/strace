@@ -743,6 +743,10 @@ main(void)
 	TEST_BPF(BPF_OBJ_GET_INFO_BY_FD);
 # endif
 
+	sys_bpf(0xfacefeed, 0, (kernel_ulong_t) 0xfacefeedbadc0dedULL);
+	printf("bpf(0xfacefeed /* BPF_??? */, NULL, %u) = %s\n",
+	       0xbadc0dedu, errstr);
+
 	sys_bpf(0xfacefeed, end_of_page, 40);
 	printf("bpf(0xfacefeed /* BPF_??? */, %#lx, 40) = %s\n",
 	       end_of_page, errstr);
