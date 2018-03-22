@@ -165,7 +165,6 @@ unsigned os_release; /* generated from uname()'s u.release */
 static void detach(struct tcb *tcp);
 static void cleanup(void);
 static void interrupt(int sig);
-static sigset_t start_set, blocked_set;
 
 #ifdef HAVE_SIG_ATOMIC_T
 static volatile sig_atomic_t interrupted;
@@ -1081,15 +1080,6 @@ startup_attach(void)
 	unsigned int tcbi;
 	struct tcb *tcp;
 
-	/*
-	 * Block user interruptions as we would leave the traced
-	 * process stopped (process state T) if we would terminate in
-	 * between PTRACE_ATTACH and wait4() on SIGSTOP.
-	 * We rely on cleanup() from this point on.
-	 */
-	if (interactive)
-		sigprocmask(SIG_SETMASK, &blocked_set, NULL);
-
 	if (daemonized_tracer) {
 		pid_t pid = fork();
 		if (pid < 0)
@@ -1129,12 +1119,8 @@ startup_attach(void)
 
 		attach_tcb(tcp);
 
-		if (interactive) {
-			sigprocmask(SIG_SETMASK, &start_set, NULL);
-			if (interrupted)
-				goto ret;
-			sigprocmask(SIG_SETMASK, &blocked_set, NULL);
-		}
+		if (interrupted)
+			return;
 	} /* for each tcbtab[] */
 
 	if (daemonized_tracer) {
@@ -1145,10 +1131,6 @@ startup_attach(void)
 		kill(parent_pid, SIGKILL);
 		strace_child = 0;
 	}
-
- ret:
-	if (interactive)
-		sigprocmask(SIG_SETMASK, &start_set, NULL);
 }
 
 /* Stack-o-phobic exec helper, in the hope to work around
@@ -1553,10 +1535,6 @@ get_os_release(void)
 static void
 set_sighandler(int signo, void (*sighandler)(int), struct sigaction *oldact)
 {
-	/* if signal handler is a function, add the signal to blocked_set */
-	if (sighandler != SIG_IGN && sighandler != SIG_DFL)
-		sigaddset(&blocked_set, signo);
-
 	const struct sigaction sa = { .sa_handler = sighandler };
 	sigaction(signo, &sa, oldact);
 }
@@ -1779,9 +1757,6 @@ init(int argc, char *argv[])
 	memset(acolumn_spaces, ' ', acolumn);
 	acolumn_spaces[acolumn] = '\0';
 
-	sigprocmask(SIG_SETMASK, NULL, &start_set);
-	memcpy(&blocked_set, &start_set, sizeof(blocked_set));
-
 	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
 #ifdef USE_LIBUNWIND
@@ -1895,9 +1870,9 @@ init(int argc, char *argv[])
 			set_sighandler(SIGTSTP, SIG_IGN, NULL);
 		/*
 		 * In interactive mode (if no -o OUTFILE, or -p PID is used),
-		 * fatal signals are blocked while syscall stop is processed,
-		 * and acted on in between, when waiting for new syscall stops.
-		 * In non-interactive mode, signals are ignored.
+		 * fatal signals are handled asynchronously and acted
+		 * when waiting for process state changes.
+		 * In non-interactive mode these signals are ignored.
 		 */
 		set_sighandler(SIGHUP, interactive ? interrupt : SIG_IGN, NULL);
 		set_sighandler(SIGINT, interactive ? interrupt : SIG_IGN, NULL);
@@ -2225,7 +2200,6 @@ static enum trace_event
 next_event(int *pstatus, siginfo_t *si)
 {
 	int pid;
-	int wait_errno;
 	int status;
 	struct tcb *tcp;
 	struct rusage ru;
@@ -2254,23 +2228,16 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_BREAK;
 	}
 
-	if (interactive)
-		sigprocmask(SIG_SETMASK, &start_set, NULL);
 	pid = wait4(-1, pstatus, __WALL, (cflag ? &ru : NULL));
-	wait_errno = errno;
-	if (interactive)
-		sigprocmask(SIG_SETMASK, &blocked_set, NULL);
-
 	if (pid < 0) {
-		if (wait_errno == EINTR)
+		if (errno == EINTR)
 			return TE_NEXT;
-		if (nprocs == 0 && wait_errno == ECHILD)
+		if (nprocs == 0 && errno == ECHILD)
 			return TE_BREAK;
 		/*
 		 * If nprocs > 0, ECHILD is not expected,
 		 * treat it as any other error here:
 		 */
-		errno = wait_errno;
 		perror_msg_and_die("wait4(__WALL)");
 	}
 
