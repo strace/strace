@@ -37,6 +37,7 @@ static size_t delay_data_vec_capacity; /* size of the arena */
 static size_t delay_data_vec_size;     /* size of the used arena */
 
 static timer_t delay_timer = (timer_t) -1;
+static bool delay_timer_is_armed;
 
 static void
 expand_delay_data_vec(void)
@@ -80,10 +81,22 @@ fill_delay_data(uint16_t delay_idx, int intval, bool isenter)
 	ts->tv_nsec = intval % 1000000 * 1000;
 }
 
-bool
+static bool
 is_delay_timer_created(void)
 {
 	return delay_timer != (timer_t) -1;
+}
+
+bool
+is_delay_timer_armed(void)
+{
+	return delay_timer_is_armed;
+}
+
+void
+delay_timer_expired(void)
+{
+	delay_timer_is_armed = false;
 }
 
 void
@@ -95,6 +108,8 @@ arm_delay_timer(const struct tcb *const tcp)
 
 	if (timer_settime(delay_timer, TIMER_ABSTIME, &its, NULL))
 		perror_msg_and_die("timer_settime");
+
+	delay_timer_is_armed = true;
 
 	debug_func_msg("timer set to %lld.%09ld for pid %d",
 		       (long long) tcp->delay_expiration_time.tv_sec,

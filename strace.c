@@ -2236,7 +2236,7 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_BREAK;
 	}
 
-	const bool unblock_delay_timer = is_delay_timer_created();
+	const bool unblock_delay_timer = is_delay_timer_armed();
 
 	/*
 	 * The window of opportunity to handle expirations
@@ -2607,6 +2607,8 @@ restart_delayed_tcbs(void)
 static void
 timer_sighandler(int sig)
 {
+	delay_timer_expired();
+
 	if (restart_failed)
 		return;
 

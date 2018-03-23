@@ -1026,7 +1026,8 @@ extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
 uint16_t alloc_delay_data(void);
 void fill_delay_data(uint16_t delay_idx, int intval, bool isenter);
-bool is_delay_timer_created(void);
+bool is_delay_timer_armed(void);
+void delay_timer_expired(void);
 void arm_delay_timer(const struct tcb *);
 void delay_tcb(struct tcb *, uint16_t delay_idx, bool isenter);
 
