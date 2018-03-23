@@ -34,7 +34,6 @@
 #include <limits.h>
 #include <fcntl.h>
 #include "ptrace.h"
-#include <setjmp.h>
 #include <signal.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
@@ -168,12 +167,11 @@ static void cleanup(void);
 static void interrupt(int sig);
 
 #ifdef HAVE_SIG_ATOMIC_T
-static volatile sig_atomic_t interrupted;
+static volatile sig_atomic_t interrupted, restart_failed;
 #else
-static volatile int interrupted;
+static volatile int interrupted, restart_failed;
 #endif
 
-static jmp_buf timer_jmp_buf;
 static sigset_t timer_set;
 static void timer_sighandler(int);
 
@@ -2238,6 +2236,8 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_BREAK;
 	}
 
+	const bool unblock_delay_timer = is_delay_timer_created();
+
 	/*
 	 * The window of opportunity to handle expirations
 	 * of the delay timer opens here.
@@ -2245,16 +2245,8 @@ next_event(int *pstatus, siginfo_t *si)
 	 * Unblock the signal handler for the delay timer
 	 * iff the delay timer is already created.
 	 */
-	if (is_delay_timer_created()) {
-		if (sigsetjmp(timer_jmp_buf, 1)) {
-			/*
-			 * restart_delayed_tcbs() forwarded an error
-			 * from dispatch_event().
-			 */
-			return TE_BREAK;
-		}
+	if (unblock_delay_timer)
 		sigprocmask(SIG_UNBLOCK, &timer_set, NULL);
-	}
 
 	/*
 	 * If the delay timer has expired, then its expiration
@@ -2272,10 +2264,14 @@ next_event(int *pstatus, siginfo_t *si)
 	 * of the delay timer closes here.
 	 *
 	 * Block the signal handler for the delay timer
-	 * iff the delay timer is already created.
+	 * iff it was unblocked earlier.
 	 */
-	if (is_delay_timer_created())
+	if (unblock_delay_timer) {
 		sigprocmask(SIG_BLOCK, &timer_set, NULL);
+
+		if (restart_failed)
+			return TE_BREAK;
+	}
 
 	if (pid < 0) {
 		if (wait_errno == EINTR)
@@ -2611,10 +2607,13 @@ restart_delayed_tcbs(void)
 static void
 timer_sighandler(int sig)
 {
+	if (restart_failed)
+		return;
+
 	int saved_errno = errno;
 
 	if (!restart_delayed_tcbs())
-		siglongjmp(timer_jmp_buf, 1);
+		restart_failed = 1;
 
 	errno = saved_errno;
 }
