@@ -2238,14 +2238,6 @@ next_event(int *pstatus, siginfo_t *si)
 			return TE_BREAK;
 	}
 
-	if (sigsetjmp(timer_jmp_buf, 1)) {
-		/*
-		 * restart_delayed_tcbs() forwarded an error
-		 * from dispatch_event().
-		 */
-		return TE_BREAK;
-	}
-
 	/*
 	 * The window of opportunity to handle expirations
 	 * of the delay timer opens here.
@@ -2253,8 +2245,16 @@ next_event(int *pstatus, siginfo_t *si)
 	 * Unblock the signal handler for the delay timer
 	 * iff the delay timer is already created.
 	 */
-	if (is_delay_timer_created())
+	if (is_delay_timer_created()) {
+		if (sigsetjmp(timer_jmp_buf, 1)) {
+			/*
+			 * restart_delayed_tcbs() forwarded an error
+			 * from dispatch_event().
+			 */
+			return TE_BREAK;
+		}
 		sigprocmask(SIG_UNBLOCK, &timer_set, NULL);
+	}
 
 	/*
 	 * If the delay timer has expired, then its expiration
