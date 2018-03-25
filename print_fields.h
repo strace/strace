@@ -109,6 +109,13 @@
 					MUST_BE_ARRAY((where_).field_)); \
 	} while (0)
 
+#define PRINT_FIELD_CSTRING_SZ(prefix_, where_, field_, size_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_quoted_cstring((const char *) (where_).field_,	\
+				     (size_));				\
+	} while (0)
+
 #define PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
