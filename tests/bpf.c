@@ -240,22 +240,59 @@ static const struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 		.str = "map_type=BPF_MAP_TYPE_ARRAY, key_size=0, value_size=0"
 		       ", max_entries=0, map_flags=0, inner_map_fd=0"
 	},
-	{
+	{ /* 1 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 1,
+			.map_type = 16,
 			.key_size = 4,
 			.value_size = 8,
 			.max_entries = 256,
 			.map_flags = 7,
 			.inner_map_fd = -1,
-			.numa_node = 42
+			.numa_node = 3141592653,
 		} },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, numa_node),
-		.str = "map_type=BPF_MAP_TYPE_HASH, key_size=4"
+		.str = "map_type=BPF_MAP_TYPE_CPUMAP, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
-		       "|BPF_F_NUMA_NODE, inner_map_fd=-1, numa_node=42"
-	}
+		       "|BPF_F_NUMA_NODE, inner_map_fd=-1"
+		       ", numa_node=3141592653",
+	},
+	{ /* 2 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.map_type = 17,
+			.key_size = 0xface1e55,
+			.value_size = 0xbadc0ded,
+			.max_entries = 0xbeefcafe,
+			.map_flags = 0xfffffff8,
+			.inner_map_fd = 2718281828,
+			.numa_node = -1,
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct, numa_node),
+		.str = "map_type=0x11 /* BPF_MAP_TYPE_??? */"
+		       ", key_size=4207812181, value_size=3134983661"
+		       ", max_entries=3203386110"
+		       ", map_flags=0xfffffff8 /* BPF_F_??? */"
+		       ", inner_map_fd=-1576685468",
+	},
+	{ /* 3 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.map_type = 0xdeadf00d,
+			.key_size = 0xface1e55,
+			.value_size = 0xbadc0ded,
+			.max_entries = 0xbeefcafe,
+			.map_flags = 0xc0dedead,
+			.inner_map_fd = 2718281828,
+			.numa_node = -1,
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct, numa_node),
+		.str = "map_type=0xdeadf00d /* BPF_MAP_TYPE_??? */"
+		       ", key_size=4207812181, value_size=3134983661"
+		       ", max_entries=3203386110"
+		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NUMA_NODE"
+				   "|0xc0dedea8"
+		       ", inner_map_fd=-1576685468"
+		       ", numa_node=4294967295 /* NUMA_NO_NODE */",
+	},
 };
 
 static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
