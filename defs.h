@@ -864,6 +864,9 @@ extern unsigned current_klongsize;
 # endif
 #endif
 
+#define max_addr() (~0ULL >> ((8 - current_wordsize) * 8))
+#define max_kaddr() (~0ULL >> ((8 - current_klongsize) * 8))
+
 #if SIZEOF_KERNEL_LONG_T > 4		\
  && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined(current_wordsize))
 # define ANY_WORDSIZE_LESS_THAN_KERNEL_LONG	1
