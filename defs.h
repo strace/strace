@@ -462,14 +462,30 @@ umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 extern int
-umoven_or_printaddr(struct tcb *, kernel_ulong_t addr,
-		    unsigned int len, void *laddr);
+umoven_or_printaddr64(struct tcb *, uint64_t addr,
+		      unsigned int len, void *laddr);
+#define umove_or_printaddr64(pid, addr, objp)	\
+	umoven_or_printaddr64((pid), (addr), sizeof(*(objp)), (void *) (objp))
+
+static inline int
+umoven_or_printaddr(struct tcb *tcp, const kernel_ulong_t addr,
+		    unsigned int len, void *laddr)
+{
+	return umoven_or_printaddr64(tcp, addr, len, laddr);
+}
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 extern int
-umoven_or_printaddr_ignore_syserror(struct tcb *, kernel_ulong_t addr,
-				    unsigned int len, void *laddr);
+umoven_or_printaddr64_ignore_syserror(struct tcb *, uint64_t addr,
+				      unsigned int len, void *laddr);
+
+static inline int
+umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,
+				    unsigned int len, void *laddr)
+{
+	return umoven_or_printaddr64_ignore_syserror(tcp, addr, len, laddr);
+}
 
 extern int
 umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);

@@ -984,25 +984,25 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 }
 
 int
-umoven_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr,
-		    const unsigned int len, void *const our_addr)
+umoven_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
+		      const unsigned int len, void *const our_addr)
 {
 	if (!addr || !verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
 	    umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr(addr);
+		printaddr64(addr);
 		return -1;
 	}
 	return 0;
 }
 
 int
-umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
-				    const kernel_ulong_t addr,
+umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
+				    const uint64_t addr,
 				    const unsigned int len,
 				    void *const our_addr)
 {
 	if (!addr || !verbose(tcp) || umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr(addr);
+		printaddr64(addr);
 		return -1;
 	}
 	return 0;
