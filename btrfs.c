@@ -128,6 +128,7 @@ struct btrfs_ioctl_search_args_v2 {
 #include "xlat/btrfs_balance_flags.h"
 #include "xlat/btrfs_balance_state.h"
 #include "xlat/btrfs_compress_types.h"
+#include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
 #include "xlat/btrfs_defrag_flags.h"
 #include "xlat/btrfs_dev_replace_cmds.h"
 #include "xlat/btrfs_dev_replace_results.h"
@@ -634,8 +635,11 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
 				PRINT_FIELD_U(", start={", args.start,
 					      srcdevid);
-				PRINT_FIELD_U(", ", args.start,
-					      cont_reading_from_srcdev_mode);
+				PRINT_FIELD_XVAL(", ", args.start,
+					cont_reading_from_srcdev_mode,
+					btrfs_cont_reading_from_srcdev_mode,
+					"BTRFS_IOCTL_DEV_REPLACE_CONT_READING"
+					"_FROM_SRCDEV_MODE_???");
 				PRINT_FIELD_CSTRING(", ", args.start,
 						    srcdev_name);
 				PRINT_FIELD_CSTRING(", ", args.start,

@@ -23,6 +23,7 @@
 #include "xlat/btrfs_balance_flags.h"
 #include "xlat/btrfs_balance_state.h"
 #include "xlat/btrfs_compress_types.h"
+#include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
 #include "xlat/btrfs_defrag_flags.h"
 #include "xlat/btrfs_dev_stats_values.h"
 #include "xlat/btrfs_dev_stats_flags.h"
@@ -1749,17 +1750,29 @@ btrfs_test_dev_replace_ioctl(void)
 	ioctl(-1, BTRFS_IOC_DEV_REPLACE, NULL);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_DEV_REPLACE));
 
-	ioctl(-1, BTRFS_IOC_DEV_REPLACE, &args);
-	printf("ioctl(-1, %s, "
-	       "{cmd=%sBTRFS_IOCTL_DEV_REPLACE_CMD_START%s, start={srcdevid=%"
-	       PRI__u64 ", cont_reading_from_srcdev_mode=%" PRI__u64
-	       ", srcdev_name=\"%s\", tgtdev_name=\"%s\"}}) = -1 EBADF (%m)\n",
-	       ioc(BTRFS_IOC_DEV_REPLACE),
-	       verbose_xlat ? "0 /* " : "", verbose_xlat ? " */" : "",
-	       args.start.srcdevid,
-	       args.start.cont_reading_from_srcdev_mode,
-	       (char *)args.start.srcdev_name,
-	       (char *)args.start.tgtdev_name);
+	for (unsigned long i = 0; i < 3; i++) {
+		int saved_errno;
+
+		args.start.cont_reading_from_srcdev_mode = i;
+		ioctl(-1, BTRFS_IOC_DEV_REPLACE, &args);
+		saved_errno = errno;
+		printf("ioctl(-1, %s, "
+		       "{cmd=%sBTRFS_IOCTL_DEV_REPLACE_CMD_START%s"
+		       ", start={srcdevid=%" PRI__u64
+		       ", cont_reading_from_srcdev_mode=",
+		       ioc(BTRFS_IOC_DEV_REPLACE),
+		       verbose_xlat ? "0 /* " : "", verbose_xlat ? " */" : "",
+		       args.start.srcdevid);
+		prxval_btrfs(btrfs_cont_reading_from_srcdev_mode,
+			     args.start.cont_reading_from_srcdev_mode,
+			     "BTRFS_IOCTL_DEV_REPLACE_CONT_READING_FROM_SRCDEV"
+			     "_MODE_???", i < 2);
+		errno = saved_errno;
+		printf(", srcdev_name=\"%s\", tgtdev_name=\"%s\"}}) "
+		       "= -1 EBADF (%m)\n",
+		       (char *)args.start.srcdev_name,
+		       (char *)args.start.tgtdev_name);
+	}
 
 	args.cmd = 1;
 	ioctl(-1, BTRFS_IOC_DEV_REPLACE, &args);
