@@ -186,7 +186,7 @@ btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 	PRINT_FIELD_FLAGS("{", *bba, profiles, btrfs_space_info_flags,
 			  "BTRFS_BLOCK_GROUP_???");
 	PRINT_FIELD_U64(", ", *bba, usage);
-	PRINT_FIELD_U64(", ", *bba, devid);
+	PRINT_FIELD_DEV(", ", *bba, devid);
 	PRINT_FIELD_U64(", ", *bba, pstart);
 	PRINT_FIELD_U64(", ", *bba, pend);
 	PRINT_FIELD_U64(", ", *bba, vstart);
@@ -597,7 +597,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		valid = btrfs_unparse_uuid(args.uuid, uuid);
 		if (entering(tcp)) {
-			PRINT_FIELD_U("{", args, devid);
+			PRINT_FIELD_DEV("{", args, devid);
 			if (valid)
 				tprintf(", uuid=%s", uuid);
 			tprints("}");
@@ -633,7 +633,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_XVAL("{", args, cmd, btrfs_dev_replace_cmds,
 					 "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
-				PRINT_FIELD_U(", start={", args.start,
+				PRINT_FIELD_DEV(", start={", args.start,
 					      srcdevid);
 				PRINT_FIELD_XVAL(", ", args.start,
 					cont_reading_from_srcdev_mode,
@@ -786,7 +786,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprints("{");
 
 		if (entering(tcp)) {
-			PRINT_FIELD_U("", args, devid);
+			PRINT_FIELD_DEV("", args, devid);
 			tprints(", ");
 		}
 
@@ -1065,7 +1065,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			PRINT_FIELD_U("{", args, devid);
+			PRINT_FIELD_DEV("{", args, devid);
 			if (code == BTRFS_IOC_SCRUB) {
 				PRINT_FIELD_U(", ", args, start);
 				PRINT_FIELD_U64(", ", args, end);
