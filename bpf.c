@@ -160,7 +160,10 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 			 "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
 	PRINT_FIELD_X(", ", attr, insns);
-	PRINT_FIELD_STR(", ", attr, license, tcp);
+
+	tprintf(", license=");
+	print_big_u64_addr(attr.license);
+	printstr(tcp, attr.license);
 
 	/* log_* fields were added in Linux commit v3.18-rc1~52^2~1^2~4.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, log_level))
@@ -186,7 +189,10 @@ END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 {
-	PRINT_FIELD_PATH("{", attr, pathname, tcp);
+	tprintf("{pathname=");
+	print_big_u64_addr(attr.pathname);
+	printpath(tcp, attr.pathname);
+
 	PRINT_FIELD_FD(", ", attr, bpf_fd, tcp);
 	if (len <= offsetofend(struct BPF_OBJ_PIN_struct, bpf_fd))
 		break;

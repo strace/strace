@@ -388,6 +388,23 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 		.str = "pathname=NULL, bpf_fd=0"
 	},
 	{
+		.data = { .BPF_OBJ_PIN_data = {
+			.pathname = 0xFFFFFFFFFFFFFFFFULL
+		} },
+		.size = offsetofend(struct BPF_OBJ_PIN_struct, pathname),
+		.str = "pathname="
+#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+		       "0xffffffffffffffff"
+#elif defined __arm__ || defined __i386__ || defined __mips__ || \
+      defined __powerpc__ || defined __riscv__ || defined __s390__ \
+      || defined __sparc__ || defined __tile__
+		       "0xffffffffffffffff or 0xffffffff"
+#else
+		       "0xffffffff"
+#endif
+		       ", bpf_fd=0",
+	},
+	{
 		.data = { .BPF_OBJ_PIN_data = { .bpf_fd = -1 } },
 		.size = offsetofend(struct BPF_OBJ_PIN_struct, bpf_fd),
 		.init_fn = init_BPF_OBJ_PIN_attr,
