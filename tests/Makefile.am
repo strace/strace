@@ -119,6 +119,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	is_linux_mips_n64 \
 	ksysent \
 	list_sigaction_signum \
+	localtime \
 	mmsg-silent \
 	mmsg_name-v \
 	msg_control-v \
@@ -175,6 +176,7 @@ filter_unavailable_LDADD = -lpthread $(LDADD)
 fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+localtime_LDADD = $(clock_LIBS) $(LDADD)
 lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = $(mq_LIBS) $(LDADD)
@@ -289,6 +291,7 @@ MISC_TESTS = \
 	inject-nf.test \
 	interactive_block.test \
 	ksysent.test \
+	localtime.test \
 	opipe.test \
 	options-syntax.test \
 	pc.test \

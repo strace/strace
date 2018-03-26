@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
-common_packages='autoconf automake file gawk gcc-multilib git gzip libunwind8-dev make xz-utils'
+common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libunwind8-dev make xz-utils'
 
 updated=
 apt_get_install()

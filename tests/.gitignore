@@ -173,6 +173,7 @@ link
 linkat
 list_sigaction_signum
 llseek
+localtime
 lookup_dcookie
 lseek
 lstat

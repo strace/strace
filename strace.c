@@ -664,9 +664,13 @@ printleader(struct tcb *tcp)
 				(long long) ts.tv_sec, (long) ts.tv_nsec / 1000);
 		} else {
 			time_t local = ts.tv_sec;
-			char str[sizeof("HH:MM:SS")];
+			char str[MAX(sizeof("HH:MM:SS"), sizeof(ts.tv_sec) * 3)];
+			struct tm *tm = localtime(&local);
 
-			strftime(str, sizeof(str), "%T", localtime(&local));
+			if (tm)
+				strftime(str, sizeof(str), "%T", tm);
+			else
+				xsprintf(str, "%lld", (long long) local);
 			if (tflag > 1)
 				tprintf("%s.%06ld ",
 					str, (long) ts.tv_nsec / 1000);
