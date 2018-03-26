@@ -188,16 +188,16 @@ END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
 {
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
-	PRINT_FIELD_X(", ", attr, key);
-	PRINT_FIELD_X(", ", attr, value);
+	PRINT_FIELD_ADDR64(", ", attr, key);
+	PRINT_FIELD_ADDR64(", ", attr, value);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_ELEM)
 {
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
-	PRINT_FIELD_X(", ", attr, key);
-	PRINT_FIELD_X(", ", attr, value);
+	PRINT_FIELD_ADDR64(", ", attr, key);
+	PRINT_FIELD_ADDR64(", ", attr, value);
 	PRINT_FIELD_XVAL(", ", attr, flags, bpf_map_update_elem_flags,
 			 "BPF_???");
 }
@@ -206,15 +206,15 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_ELEM)
 {
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
-	PRINT_FIELD_X(", ", attr, key);
+	PRINT_FIELD_ADDR64(", ", attr, key);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_NEXT_KEY)
 {
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
-	PRINT_FIELD_X(", ", attr, key);
-	PRINT_FIELD_X(", ", attr, next_key);
+	PRINT_FIELD_ADDR64(", ", attr, key);
+	PRINT_FIELD_ADDR64(", ", attr, next_key);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -223,7 +223,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	PRINT_FIELD_XVAL("{", attr, prog_type, bpf_prog_types,
 			 "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
-	PRINT_FIELD_X(", ", attr, insns);
+	PRINT_FIELD_ADDR64(", ", attr, insns);
 
 	tprintf(", license=");
 	print_big_u64_addr(attr.license);
@@ -234,7 +234,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		break;
 	PRINT_FIELD_U(", ", attr, log_level);
 	PRINT_FIELD_U(", ", attr, log_size);
-	PRINT_FIELD_X(", ", attr, log_buf);
+	PRINT_FIELD_ADDR64(", ", attr, log_buf);
 
 	/* kern_version field was added in Linux commit v4.1-rc1~84^2~50.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, kern_version))
@@ -309,8 +309,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
 	PRINT_FIELD_U(", ", attr, retval);
 	PRINT_FIELD_U(", ", attr, data_size_in);
 	PRINT_FIELD_U(", ", attr, data_size_out);
-	PRINT_FIELD_X(", ", attr, data_in);
-	PRINT_FIELD_X(", ", attr, data_out);
+	PRINT_FIELD_ADDR64(", ", attr, data_in);
+	PRINT_FIELD_ADDR64(", ", attr, data_out);
 	PRINT_FIELD_U(", ", attr, repeat);
 	PRINT_FIELD_U(", ", attr, duration);
 	tprints("}");

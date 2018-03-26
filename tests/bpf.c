@@ -392,7 +392,7 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
 	{
 		.data = { .BPF_MAP_LOOKUP_ELEM_data = { .map_fd = -1 } },
 		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, map_fd),
-		.str = "map_fd=-1, key=0, value=0"
+		.str = "map_fd=-1, key=NULL, value=NULL"
 	},
 	{
 		.data = { .BPF_MAP_LOOKUP_ELEM_data = {
@@ -409,7 +409,7 @@ static const struct bpf_attr_check BPF_MAP_UPDATE_ELEM_checks[] = {
 	{
 		.data = { .BPF_MAP_UPDATE_ELEM_data = { .map_fd = -1 } },
 		.size = offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, map_fd),
-		.str = "map_fd=-1, key=0, value=0, flags=BPF_ANY"
+		.str = "map_fd=-1, key=NULL, value=NULL, flags=BPF_ANY"
 	},
 	{
 		.data = { .BPF_MAP_UPDATE_ELEM_data = {
@@ -428,7 +428,7 @@ static const struct bpf_attr_check BPF_MAP_DELETE_ELEM_checks[] = {
 	{
 		.data = { .BPF_MAP_DELETE_ELEM_data = { .map_fd = -1 } },
 		.size = offsetofend(struct BPF_MAP_DELETE_ELEM_struct, map_fd),
-		.str = "map_fd=-1, key=0"
+		.str = "map_fd=-1, key=NULL"
 	},
 	{
 		.data = { .BPF_MAP_DELETE_ELEM_data = {
@@ -444,7 +444,7 @@ static const struct bpf_attr_check BPF_MAP_GET_NEXT_KEY_checks[] = {
 	{
 		.data = { .BPF_MAP_GET_NEXT_KEY_data = { .map_fd = -1 } },
 		.size = offsetofend(struct BPF_MAP_GET_NEXT_KEY_struct, map_fd),
-		.str = "map_fd=-1, key=0, next_key=0"
+		.str = "map_fd=-1, key=NULL, next_key=NULL"
 	},
 	{
 		.data = { .BPF_MAP_GET_NEXT_KEY_data = {
@@ -512,7 +512,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		.data = { .BPF_PROG_LOAD_data = { .prog_type = 1 } },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_type),
 		.str = "prog_type=BPF_PROG_TYPE_SOCKET_FILTER"
-		       ", insn_cnt=0, insns=0, license=NULL"
+		       ", insn_cnt=0, insns=NULL, license=NULL"
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
@@ -528,8 +528,8 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
 		.str = "prog_type=0x10 /* BPF_PROG_TYPE_??? */"
-		       ", insn_cnt=3134983661, insns=0, license=NULL"
-		       ", log_level=42, log_size=3141592653, log_buf=0"
+		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
+		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
 		       ", prog_flags=0",
 	},
@@ -688,7 +688,7 @@ static const struct bpf_attr_check BPF_PROG_TEST_RUN_checks[] = {
 		.data = { .BPF_PROG_TEST_RUN_data = { .prog_fd = -1 } },
 		.size = offsetofend(struct BPF_PROG_TEST_RUN_struct, prog_fd),
 		.str = "test={prog_fd=-1, retval=0, data_size_in=0"
-		       ", data_size_out=0, data_in=0, data_out=0"
+		       ", data_size_out=0, data_in=NULL, data_out=NULL"
 		       ", repeat=0, duration=0}"
 	},
 	{
