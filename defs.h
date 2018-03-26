@@ -867,6 +867,31 @@ extern unsigned current_klongsize;
 #define max_addr() (~0ULL >> ((8 - current_wordsize) * 8))
 #define max_kaddr() (~0ULL >> ((8 - current_klongsize) * 8))
 
+/*
+ * When u64 is interpreted by the kernel as an address, there is a difference
+ * in behaviour between 32-bit and 64-bit kernel in the way u64_to_user_ptr
+ * works (32-bit kernel trims higher bits during conversion which may result
+ * to a valid address).  Since 32-bit strace cannot figure out what kind of
+ * kernel the tracee is running on, it has to account for both possibilities.
+ */
+#if CAN_ARCH_BE_COMPAT_ON_64BIT_KERNEL
+
+/**
+ * Print raw 64-bit value as an address if it's too big to fit in strace's
+ * kernel_long_t.
+ */
+static inline void
+print_big_u64_addr(const uint64_t addr)
+{
+	if (sizeof(kernel_long_t) < 8 && addr > max_kaddr()) {
+		printaddr64(addr);
+		tprints(" or ");
+	}
+}
+#else /* !CAN_ARCH_BE_COMPAT_ON_64BIT_KERNEL */
+# define print_big_u64_addr(addr_) ((void) 0)
+#endif /* CAN_ARCH_BE_COMPAT_ON_64BIT_KERNEL */
+
 #if SIZEOF_KERNEL_LONG_T > 4		\
  && (SIZEOF_LONG < SIZEOF_KERNEL_LONG_T || !defined(current_wordsize))
 # define ANY_WORDSIZE_LESS_THAN_KERNEL_LONG	1
