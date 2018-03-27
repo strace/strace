@@ -177,7 +177,7 @@ typedef struct ioctlent {
 #define INJECT_F_DELAY_EXIT 8
 
 struct inject_data {
-	uint8_t flags;		/* only 2 of 8 flags are used so far */
+	uint8_t flags;		/* only 4 of 8 flags are used so far */
 	uint8_t signo;		/* NSIG <= 128 */
 	uint16_t delay_idx;	/* index in delay_data_vec */
 	kernel_long_t rval;
