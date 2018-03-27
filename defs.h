@@ -697,6 +697,7 @@ name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)	\
 /* End of DECL_IOCTL definition. */
 
 DECL_IOCTL(dm);
+DECL_IOCTL(evdev);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
 DECL_IOCTL(kvm);
@@ -709,6 +710,7 @@ DECL_IOCTL(uffdio);
 #undef DECL_IOCTL
 
 extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
+extern void print_evdev_ff_type(const kernel_ulong_t val);
 
 struct nlmsghdr;
 

@@ -123,6 +123,7 @@ strace_SOURCES =	\
 	error_prints.c	\
 	error_prints.h	\
 	evdev.c		\
+	evdev_mpers.c	\
 	eventfd.c	\
 	execve.c	\
 	fadvise.c	\
