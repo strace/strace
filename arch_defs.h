@@ -1,4 +1,4 @@
-/* Aarch-specific definitions.  */
+/* Architecture-specific definitions.  */
 #ifndef STRACE_ARCH_DEFS_H
 #define STRACE_ARCH_DEFS_H
 
