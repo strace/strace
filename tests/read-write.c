@@ -39,7 +39,15 @@
 static void
 dump_str(const char *str, const unsigned int len)
 {
-	static const char dots[16] = "................";
+	static const char chars[256] =
+		"................................"
+		" !\"#$%&'()*+,-./0123456789:;<=>?"
+		"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+		"`abcdefghijklmnopqrstuvwxyz{|}~."
+		"................................"
+		"................................"
+		"................................"
+		"................................";
 	unsigned int i;
 
 	for (i = 0; i < len; i += 16) {
@@ -47,7 +55,7 @@ dump_str(const char *str, const unsigned int len)
 		const char *dump = hexdump_memdup(str + i, n);
 
 		tprintf(" | %05x %-49s  %-16.*s |\n",
-			i, dump, n, dots);
+			i, dump, n, chars + i);
 
 		free((void *) dump);
 	}
@@ -59,8 +67,15 @@ print_hex(const char *str, const unsigned int len)
 	const unsigned char *ustr = (const unsigned char *) str;
 	unsigned int i;
 
+	tprintf("\"");
+
 	for (i = 0; i < len; ++i) {
 		unsigned int c = ustr[i];
+
+		if (i >= DEFAULT_STRLEN) {
+			tprintf("\"...");
+			return;
+		}
 
 		switch (c) {
 		case '\t':
@@ -77,6 +92,8 @@ print_hex(const char *str, const unsigned int len)
 			tprintf("\\%o", ustr[i]);
 		}
 	}
+
+	tprintf("\"");
 }
 
 static long
@@ -94,9 +111,12 @@ k_write(unsigned int fd, const void *buf, size_t count)
 }
 
 static void
-test_dump(const unsigned int len)
+test_dump(const unsigned int len, bool err_desc)
 {
 	static char *buf;
+	const char *rc_str;
+	int in_fd = err_desc ? 5 : 0;
+	int out_fd = err_desc ? 4 : 1;
 
 	if (buf) {
 		size_t ps1 = get_page_size() - 1;
@@ -105,28 +125,34 @@ test_dump(const unsigned int len)
 		buf = tail_alloc(len);
 	}
 
-	long rc = k_read(0, buf, len);
-	if (rc != (int) len)
+	long rc = k_read(in_fd, buf, len);
+	rc_str = sprintrc(rc);
+	if (err_desc ^ (rc != (int) len))
 		perror_msg_and_fail("read: expected %d, returned %ld",
-				    len, rc);
+				    err_desc ? -1 : (int) len, rc);
 
-	tprintf("%s(%d, \"", "read", 0);
-	print_hex(buf, len);
-	tprintf("\", %d) = %ld\n", len, rc);
-	dump_str(buf, len);
+	tprintf("%s(%d, ", "read", in_fd);
+	if (!err_desc)
+		print_hex(buf, len);
+	else
+		tprintf("%p", buf);
+	tprintf(", %d) = %s\n", len, rc_str);
+	if (!err_desc)
+		dump_str(buf, len);
 
 	unsigned int i;
 	for (i = 0; i < len; ++i)
 		buf[i] = i;
 
-	rc = k_write(1, buf, len);
-	if (rc != (int) len)
+	rc = k_write(out_fd, buf, len);
+	rc_str = sprintrc(rc);
+	if (err_desc ^ (rc != (int) len))
 		perror_msg_and_fail("write: expected %d, returned %ld",
-				    len, rc);
+				    err_desc ? -1 : (int) len, rc);
 
-	tprintf("%s(%d, \"", "write", 1);
+	tprintf("%s(%d, ", "write", out_fd);
 	print_hex(buf, len);
-	tprintf("\", %d) = %ld\n", len, rc);
+	tprintf(", %d) = %s\n", len, rc_str);
 	dump_str(buf, len);
 
 	if (!len)
@@ -218,9 +244,17 @@ main(void)
 	if (open("/dev/null", O_WRONLY) != 1)
 		perror_msg_and_fail("open");
 
+	if (open("/dev/zero", O_RDONLY) != 4)
+		perror_msg_and_fail("open");
+
+	if (open("/dev/null", O_WRONLY) != 5)
+		perror_msg_and_fail("open");
+
 	unsigned int i;
-	for (i = 0; i <= 32; ++i)
-		test_dump(i);
+	for (i = 0; i <= DEFAULT_STRLEN; ++i)
+		test_dump(i, false);
+
+	test_dump(256, true);
 
 	tprintf("+++ exited with 0 +++\n");
 	return 0;

@@ -295,7 +295,7 @@ quotactl
 quotactl-v	-v -e trace=quotactl
 quotactl-xfs	-e trace=quotactl
 quotactl-xfs-v	-v -e trace=quotactl
-read-write	-a15 -eread=0 -ewrite=1 -e trace=read,write -P read-write-tmpfile -P /dev/zero -P /dev/null
+read-write	-a15 -eread=0,5 -ewrite=1,4 -e trace=read,write -P read-write-tmpfile -P /dev/zero -P /dev/null
 readahead	-a1
 readdir	-a16
 readlink	-xx

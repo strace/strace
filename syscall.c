@@ -434,11 +434,35 @@ decode_syscall_subcall(struct tcb *tcp)
 static void
 dumpio(struct tcb *tcp)
 {
-	if (syserror(tcp))
-		return;
-
 	int fd = tcp->u_arg[0];
 	if (fd < 0)
+		return;
+
+	if (is_number_in_set(fd, write_set)) {
+		switch (tcp->s_ent->sen) {
+		case SEN_write:
+		case SEN_pwrite:
+		case SEN_send:
+		case SEN_sendto:
+		case SEN_mq_timedsend:
+			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+			break;
+		case SEN_writev:
+		case SEN_pwritev:
+		case SEN_pwritev2:
+		case SEN_vmsplice:
+			dumpiov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], -1);
+			break;
+		case SEN_sendmsg:
+			dumpiov_in_msghdr(tcp, tcp->u_arg[1], -1);
+			break;
+		case SEN_sendmmsg:
+			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
+			break;
+		}
+	}
+
+	if (syserror(tcp))
 		return;
 
 	if (is_number_in_set(fd, read_set)) {
@@ -462,29 +486,6 @@ dumpio(struct tcb *tcp)
 		case SEN_recvmmsg:
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 			return;
-		}
-	}
-	if (is_number_in_set(fd, write_set)) {
-		switch (tcp->s_ent->sen) {
-		case SEN_write:
-		case SEN_pwrite:
-		case SEN_send:
-		case SEN_sendto:
-		case SEN_mq_timedsend:
-			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
-			break;
-		case SEN_writev:
-		case SEN_pwritev:
-		case SEN_pwritev2:
-		case SEN_vmsplice:
-			dumpiov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], -1);
-			break;
-		case SEN_sendmsg:
-			dumpiov_in_msghdr(tcp, tcp->u_arg[1], -1);
-			break;
-		case SEN_sendmmsg:
-			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
-			break;
 		}
 	}
 }

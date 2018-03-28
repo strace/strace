@@ -169,6 +169,7 @@ main(void)
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1, returned %ld", rc);
 	tprintf("pwrite64(1, \"\\0\", 1, -3) = -1 EINVAL (%m)\n");
+	dump_str(nil, 1);
 
 	rc = pwrite(1, w, w_len, 0);
 	if (rc != (int) w_len)
