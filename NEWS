@@ -15,6 +15,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented delay injection (-e inject=SET:delay_enter= and
     -e inject=SET:delay_exit= options).
+  * Added -A option for opening output files in append mode
+    (addresses Debian bug #528488).
   * IPv6 addresses shown in socket information in -yy mode are now printed
     in brackets.
   * Enhanced decoding of prctl and ptrace syscalls.

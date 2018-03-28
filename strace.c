@@ -150,6 +150,7 @@ static char *acolumn_spaces;
 static const char *outfname;
 /* If -ff, points to stderr. Else, it's our common output log */
 static FILE *shared_log;
+static bool open_append;
 
 struct tcb *printing_tcp;
 static struct tcb *current_tcp;
@@ -449,7 +450,7 @@ strace_fopen(const char *path)
 	FILE *fp;
 
 	swap_uid();
-	fp = fopen_stream(path, "w");
+	fp = fopen_stream(path, open_append ? "a" : "w");
 	if (!fp)
 		perror_msg_and_die("Can't fopen '%s'", path);
 	swap_uid();
@@ -1594,12 +1595,15 @@ init(int argc, char *argv[])
 #ifdef USE_LIBUNWIND
 	    "k"
 #endif
-	    "a:b:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxyz")) != EOF) {
+	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxyz")) != EOF) {
 		switch (c) {
 		case 'a':
 			acolumn = string_to_uint(optarg);
 			if (acolumn < 0)
 				error_opt_arg(c, optarg);
+			break;
+		case 'A':
+			open_append = true;
 			break;
 		case 'b':
 			if (strcmp(optarg, "execve") != 0)
