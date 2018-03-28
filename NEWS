@@ -9,6 +9,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     in the output of paths associated with file descriptors.
   * Data dump for write syscalls (-e write) is performed regardless
     of successfulness of these syscall (addresses Debian bug #436284).
+  * -r and -t options are now affect output independently.  Previously,
+    -r option led to ignoring of the -t option (addresses Debian bug #466195).
 
 * Improvements
   * Implemented delay injection (-e inject=SET:delay_enter= and

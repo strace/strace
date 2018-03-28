@@ -287,6 +287,13 @@ If given twice, suppress messages about process exit status.
 Print a relative timestamp upon entry to each system call.  This
 records the time difference between the beginning of successive
 system calls.
+Note that since
+.B \-r
+option uses the monotonic clock time for measuring time difference and not the
+wall clock time, its measurements can differ from the difference in time
+reported by the
+.B \-t
+option.
 .TP
 .BI "\-s " strsize
 Specify the maximum string size to print (the default is 32).  Note

@@ -646,20 +646,9 @@ printleader(struct tcb *tcp)
 
 	if (tflag) {
 		struct timespec ts;
-		clock_gettime(rflag ? CLOCK_MONOTONIC : CLOCK_REALTIME, &ts);
+		clock_gettime(CLOCK_REALTIME, &ts);
 
-		if (rflag) {
-			static struct timespec ots;
-			if (ots.tv_sec == 0)
-				ots = ts;
-
-			struct timespec dts;
-			ts_sub(&dts, &ts, &ots);
-			ots = ts;
-
-			tprintf("%6ld.%06ld ",
-				(long) dts.tv_sec, (long) dts.tv_nsec / 1000);
-		} else if (tflag > 2) {
+		if (tflag > 2) {
 			tprintf("%lld.%06ld ",
 				(long long) ts.tv_sec, (long) ts.tv_nsec / 1000);
 		} else {
@@ -678,6 +667,25 @@ printleader(struct tcb *tcp)
 				tprintf("%s ", str);
 		}
 	}
+
+	if (rflag) {
+		struct timespec ts;
+		clock_gettime(CLOCK_MONOTONIC, &ts);
+
+		static struct timespec ots;
+		if (ots.tv_sec == 0)
+			ots = ts;
+
+		struct timespec dts;
+		ts_sub(&dts, &ts, &ots);
+		ots = ts;
+
+		tprintf("%s%6ld.%06ld%s ",
+			tflag ? "(+" : "",
+			(long) dts.tv_sec, (long) dts.tv_nsec / 1000,
+			tflag ? ")" : "");
+	}
+
 	if (iflag)
 		print_pc(tcp);
 }
@@ -1754,12 +1762,6 @@ init(int argc, char *argv[])
 			error_msg("-%c has no effect with -c", 'T');
 		if (show_fd_path)
 			error_msg("-%c has no effect with -c", 'y');
-	}
-
-	if (rflag) {
-		if (tflag > 1)
-			error_msg("-tt has no effect with -r");
-		tflag = 1;
 	}
 
 	acolumn_spaces = xmalloc(acolumn + 1);

@@ -92,9 +92,6 @@ $STRACE_EXE: -t has no effect with -c
 $STRACE_EXE: -T has no effect with -c
 $STRACE_EXE: -y has no effect with -c
 $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTy true
-
-	check_e "-tt has no effect with -r
-$STRACE_EXE: $umsg" -u :nosuchuser: -r -tt true
 fi
 
 args='-p 2147483647'
