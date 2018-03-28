@@ -113,6 +113,7 @@ strace_SOURCES =	\
 	count.c		\
 	defs.h		\
 	delay.c		\
+	delay.h		\
 	desc.c		\
 	dirent.c	\
 	dirent64.c	\

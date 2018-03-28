@@ -57,6 +57,7 @@
 #include "printsiginfo.h"
 #include "trace_event.h"
 #include "xstring.h"
+#include "delay.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;

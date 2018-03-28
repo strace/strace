@@ -30,6 +30,7 @@
 #include "nsig.h"
 #include "number_set.h"
 #include "filter.h"
+#include "delay.h"
 #include "retval.h"
 
 struct number_set *read_set;

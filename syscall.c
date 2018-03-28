@@ -38,6 +38,7 @@
 #include "ptrace.h"
 #include "nsig.h"
 #include "number_set.h"
+#include "delay.h"
 #include "retval.h"
 #include <limits.h>
 
