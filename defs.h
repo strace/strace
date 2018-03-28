@@ -179,8 +179,8 @@ typedef struct ioctlent {
 struct inject_data {
 	uint8_t flags;		/* only 4 of 8 flags are used so far */
 	uint8_t signo;		/* NSIG <= 128 */
+	uint16_t rval_idx;	/* index in retval_vec */
 	uint16_t delay_idx;	/* index in delay_data_vec */
-	kernel_long_t rval;
 };
 
 struct inject_opts {

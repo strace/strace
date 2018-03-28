@@ -38,6 +38,7 @@
 #include "ptrace.h"
 #include "nsig.h"
 #include "number_set.h"
+#include "retval.h"
 #include <limits.h>
 
 /* for struct iovec */
@@ -576,10 +577,11 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 
 	bool update_tcb = false;
 
-	if (opts->data.rval >= 0) {
+	const kernel_long_t inject_rval = retval_get(opts->data.rval_idx);
+	if (inject_rval >= 0) {
 		kernel_long_t u_rval = tcp->u_rval;
 
-		tcp->u_rval = opts->data.rval;
+		tcp->u_rval = inject_rval;
 		if (arch_set_success(tcp)) {
 			tcp->u_rval = u_rval;
 		} else {
@@ -587,7 +589,7 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 			tcp->u_error = 0;
 		}
 	} else {
-		unsigned long new_error = -opts->data.rval;
+		unsigned long new_error = -inject_rval;
 
 		if (new_error != tcp->u_error && new_error <= MAX_ERRNO_VALUE) {
 			unsigned long u_error = tcp->u_error;

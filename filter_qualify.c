@@ -30,6 +30,7 @@
 #include "nsig.h"
 #include "number_set.h"
 #include "filter.h"
+#include "retval.h"
 
 struct number_set *read_set;
 struct number_set *write_set;
@@ -143,7 +144,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 			intval = find_errno_by_name(val);
 		if (intval < 1)
 			return false;
-		fopts->data.rval = -intval;
+		fopts->data.rval_idx = retval_new(-intval);
 		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
@@ -166,7 +167,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 				  -(int) intval, intval);
 #endif
 
-		fopts->data.rval = intval;
+		fopts->data.rval_idx = retval_new(intval);
 		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
@@ -296,7 +297,7 @@ qualify_inject_common(const char *const str,
 	if (!opts.data.flags) {
 		if (fault_tokens_only) {
 			/* in fault= syntax the default error code is ENOSYS. */
-			opts.data.rval = -ENOSYS;
+			opts.data.rval_idx = retval_new(-ENOSYS);
 			opts.data.flags |= INJECT_F_RETVAL;
 		} else {
 			/* in inject= syntax this is not allowed. */
