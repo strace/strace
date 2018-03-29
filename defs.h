@@ -332,10 +332,6 @@ extern const struct xlat whence_codes[];
 #define RVAL_DECODED	0100	/* syscall decoding finished */
 #define RVAL_IOCTL_DECODED 0200	/* ioctl sub-parser successfully decoded
 				   the argument */
-#define RVAL_PRINT_ERR_VAL 0400 /* Print decoded error code along with
-				   syscall return value.  Needed for modify_ldt
-				   that for some reason decides to return
-				   an error with higher bits set to 0.  */
 
 #define IOCTL_NUMBER_UNKNOWN 0
 #define IOCTL_NUMBER_HANDLED 1

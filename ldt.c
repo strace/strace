@@ -155,7 +155,7 @@ SYS_FUNC(modify_ldt)
 
 	tcp->u_error = -(unsigned int) tcp->u_rval;
 
-	return RVAL_PRINT_ERR_VAL;
+	return 0;
 }
 
 SYS_FUNC(set_thread_area)
