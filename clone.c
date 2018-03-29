@@ -161,5 +161,5 @@ SYS_FUNC(unshare)
 
 SYS_FUNC(fork)
 {
-	return RVAL_DECODED | RVAL_UDECIMAL;
+	return RVAL_DECODED;
 }

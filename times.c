@@ -42,10 +42,7 @@ SYS_FUNC(times)
 {
 	tms_t tbuf;
 
-	if (entering(tcp))
-		return 0;
-
-	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
+	if (exiting(tcp) && !umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
 		tprintf("{tms_utime=%llu, tms_stime=%llu, ",
 			zero_extend_signed_to_ull(tbuf.tms_utime),
 			zero_extend_signed_to_ull(tbuf.tms_stime));
@@ -54,5 +51,5 @@ SYS_FUNC(times)
 			zero_extend_signed_to_ull(tbuf.tms_cstime));
 	}
 
-	return syserror(tcp) ? RVAL_DECIMAL : RVAL_UDECIMAL;
+	return 0;
 }

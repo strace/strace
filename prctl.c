@@ -373,7 +373,7 @@ SYS_FUNC(prctl)
 			return 0;
 		tcp->auxstr = xlookup(pr_mce_kill_policy,
 				      (kernel_ulong_t) tcp->u_rval);
-		return tcp->auxstr ? RVAL_STR : RVAL_UDECIMAL;
+		return RVAL_STR;
 
 	case PR_SET_FP_MODE:
 		tprints(", ");

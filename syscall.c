@@ -935,16 +935,6 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 					tprintf("= %" PRI_klu, tcp->u_rval);
 				}
 				break;
-			case RVAL_DECIMAL:
-#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-				if (current_klongsize < sizeof(tcp->u_rval)) {
-					tprintf("= %d", (int) tcp->u_rval);
-				} else
-#endif
-				{
-					tprintf("= %" PRI_kld, tcp->u_rval);
-				}
-				break;
 			case RVAL_FD:
 				if (show_fd_path) {
 					tprints("= ");

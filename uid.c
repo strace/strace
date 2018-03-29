@@ -71,14 +71,14 @@
 
 SYS_FUNC(getuid)
 {
-	return RVAL_UDECIMAL | RVAL_DECODED;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(setfsuid)
 {
 	printuid("", tcp->u_arg[0]);
 
-	return RVAL_UDECIMAL | RVAL_DECODED;
+	return RVAL_DECODED;
 }
 
 SYS_FUNC(setuid)

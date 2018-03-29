@@ -320,10 +320,9 @@ extern const struct xlat tcp_states[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
-#define RVAL_DECIMAL	000	/* decimal format */
+#define RVAL_UDECIMAL	000	/* unsigned decimal format */
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
-#define RVAL_UDECIMAL	003	/* unsigned decimal format */
 #define RVAL_FD		010	/* file descriptor */
 #define RVAL_MASK	013	/* mask for these values */
 

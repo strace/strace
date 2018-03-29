@@ -62,7 +62,7 @@ SYS_FUNC(lseek)
 
 	printxval(whence_codes, tcp->u_arg[2], "SEEK_???");
 
-	return RVAL_DECODED | RVAL_UDECIMAL;
+	return RVAL_DECODED;
 }
 
 /* llseek syscall takes explicitly two ulong arguments hi, lo,
