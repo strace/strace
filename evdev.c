@@ -264,11 +264,9 @@ bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
 		case EV_MSC:
 			return decode_bitset(tcp, arg, evdev_misc,
 					     MSC_MAX, "MSC_???");
-# ifdef EV_SW
 		case EV_SW:
 			return decode_bitset(tcp, arg, evdev_switch,
 					     SW_MAX, "SW_???");
-# endif
 		case EV_LED:
 			return decode_bitset(tcp, arg, evdev_leds,
 					     LED_MAX, "LED_???");

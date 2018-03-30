@@ -39,6 +39,10 @@
 # include <sys/ioctl.h>
 # include <linux/input.h>
 
+# ifndef EV_SW
+#  define EV_SW 5
+# endif
+
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
@@ -122,9 +126,7 @@ main(void)
 	TEST_NULL_ARG(EVIOCGBIT(EV_REL, 2));
 	TEST_NULL_ARG(EVIOCGBIT(EV_ABS, 3));
 	TEST_NULL_ARG(EVIOCGBIT(EV_MSC, 4));
-# ifdef EV_SW
 	TEST_NULL_ARG(EVIOCGBIT(EV_SW, 5));
-# endif
 	TEST_NULL_ARG(EVIOCGBIT(EV_LED, 6));
 	TEST_NULL_ARG(EVIOCGBIT(EV_SND, 7));
 	TEST_NULL_ARG(EVIOCGBIT(EV_REP, 8));
