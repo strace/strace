@@ -464,18 +464,7 @@ AC_CHECK_HEADERS([linux/input.h], [
 	AC_CHECK_MEMBERS([struct input_absinfo.resolution],,, [#include <linux/input.h>])
 ])
 
-AC_CHECK_HEADERS([linux/bpf.h], [
-	AC_CHECK_MEMBERS(m4_normalize([
-		union bpf_attr.attach_flags,
-		union bpf_attr.bpf_fd,
-		union bpf_attr.flags,
-		union bpf_attr.info.info,
-		union bpf_attr.next_id,
-		union bpf_attr.numa_node,
-		union bpf_attr.prog_flags,
-		union bpf_attr.test.duration
-	]),,, [#include <linux/bpf.h>])
-])
+AC_CHECK_HEADERS([linux/bpf.h], [st_BPF_ATTR])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct br_mdb_entry,
