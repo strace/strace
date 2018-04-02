@@ -1,3 +1,4 @@
+#value_indexed
 LED_NUML	0x00
 LED_CAPSL	0x01
 LED_SCROLLL	0x02

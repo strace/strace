@@ -1,3 +1,4 @@
+#value_indexed
 SW_LID			0x00
 SW_TABLET_MODE		0x01
 SW_HEADPHONE_INSERT	0x02

@@ -1,3 +1,4 @@
+#value_indexed
 MSC_SERIAL	0x00
 MSC_PULSELED	0x01
 MSC_GESTURE	0x02

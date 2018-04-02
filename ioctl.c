@@ -87,7 +87,8 @@ evdev_decode_number(const unsigned int code)
 	if (_IOC_DIR(code) == _IOC_WRITE) {
 		if (nr >= 0xc0 && nr <= 0xc0 + 0x3f) {
 			tprints("EVIOCSABS(");
-			printxval(evdev_abs, nr - 0xc0, "ABS_???");
+			printxval_indexn(evdev_abs, evdev_abs_size, nr - 0xc0,
+					 "ABS_???");
 			tprints(")");
 			return 1;
 		}
@@ -103,7 +104,8 @@ evdev_decode_number(const unsigned int code)
 		return 1;
 	} else if (nr >= 0x40 && nr <= 0x40 + 0x3f) {
 		tprints("EVIOCGABS(");
-		printxval(evdev_abs, nr - 0x40, "ABS_???");
+		printxval_indexn(evdev_abs, evdev_abs_size, nr - 0x40,
+				 "ABS_???");
 		tprints(")");
 		return 1;
 	}

@@ -1,3 +1,4 @@
+#value_indexed
 /* awk '{if (NF>1) {n=strtonum($2)}; printf("%d %s\n", n, $0)}' |sort -s -k1,1n |sed 's/^[0-9]* //' */
 KEY_RESERVED		0
 KEY_ESC			1
