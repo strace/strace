@@ -42,6 +42,9 @@
 # ifndef EV_SW
 #  define EV_SW 5
 # endif
+# ifndef ABS_MT_TOOL_Y
+#  define ABS_MT_TOOL_Y 0x3d
+# endif
 
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
@@ -71,11 +74,13 @@ print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 # endif /* VERBOSE */
 }
 
-# define TEST_NULL_ARG(cmd)						\
+# define TEST_NULL_ARG_EX(cmd, str)						\
 	do {								\
 		ioctl(-1, cmd, 0);					\
-		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd);	\
+		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", str);	\
 	} while (0)
+
+# define TEST_NULL_ARG(cmd) TEST_NULL_ARG_EX(cmd, #cmd)
 
 int
 main(void)
@@ -121,6 +126,18 @@ main(void)
 	TEST_NULL_ARG(EVIOCGABS(ABS_X));
 	TEST_NULL_ARG(EVIOCSABS(ABS_X));
 
+	TEST_NULL_ARG_EX(EVIOCGABS(0xe), "EVIOCGABS(0xe /* ABS_??? */)");
+	TEST_NULL_ARG_EX(EVIOCSABS(0xe), "EVIOCSABS(0xe /* ABS_??? */)");
+
+	TEST_NULL_ARG(EVIOCGABS(ABS_MT_TOOL_Y));
+	TEST_NULL_ARG(EVIOCSABS(ABS_MT_TOOL_Y));
+
+	TEST_NULL_ARG_EX(EVIOCGABS(0x3e), "EVIOCGABS(0x3e /* ABS_??? */)");
+	TEST_NULL_ARG_EX(EVIOCSABS(0x3e), "EVIOCSABS(0x3e /* ABS_??? */)");
+
+	TEST_NULL_ARG_EX(EVIOCGABS(0x3f), "EVIOCGABS(0x3f /* ABS_??? */)");
+	TEST_NULL_ARG_EX(EVIOCSABS(0x3f), "EVIOCSABS(0x3f /* ABS_??? */)");
+
 	TEST_NULL_ARG(EVIOCGBIT(EV_SYN, 0));
 	TEST_NULL_ARG(EVIOCGBIT(EV_KEY, 1));
 	TEST_NULL_ARG(EVIOCGBIT(EV_REL, 2));
@@ -133,6 +150,12 @@ main(void)
 	TEST_NULL_ARG(EVIOCGBIT(EV_FF, 9));
 	TEST_NULL_ARG(EVIOCGBIT(EV_PWR, 10));
 	TEST_NULL_ARG(EVIOCGBIT(EV_FF_STATUS, 11));
+
+	TEST_NULL_ARG_EX(EVIOCGBIT(0x6, 12), "EVIOCGBIT(0x6 /* EV_??? */, 12)");
+	TEST_NULL_ARG_EX(EVIOCGBIT(0x18, 13),
+			 "EVIOCGBIT(0x18 /* EV_??? */, 13)");
+	TEST_NULL_ARG_EX(EVIOCGBIT(0x1f, 14),
+			 "EVIOCGBIT(0x1f /* EV_??? */, 14)");
 
 	ioctl(-1, EVIOCGBIT(EV_MAX, 42), 0);
 	printf("ioctl(-1, EVIOCGBIT(%#x /* EV_??? */, 42), NULL)"
