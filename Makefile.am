@@ -96,6 +96,7 @@ strace_SOURCES =	\
 	bjm.c		\
 	block.c		\
 	bpf.c		\
+	bpf_attr.h	\
 	bpf_filter.c	\
 	bpf_filter.h	\
 	bpf_fprog.h 	\
