@@ -344,7 +344,10 @@ strace_SOURCES =	\
 	xmalloc.c	\
 	xmalloc.h	\
 	xstring.h	\
+	$(strace_SOURCES_check) \
 	# end of strace_SOURCES
+
+strace_SOURCES_check = bpf_attr_check.c
 
 if USE_LIBUNWIND
 strace_SOURCES += unwind.c
@@ -392,6 +395,7 @@ EXTRA_DIST =				\
 	debian/strace64.install		\
 	debian/strace64.manpages	\
 	debian/watch			\
+	gen_bpf_attr_check.sh		\
 	generate_sen.sh			\
 	ioctl_iocdef.c			\
 	ioctlsort.c			\
@@ -949,10 +953,15 @@ srpm: dist-xz
 $(srcdir)/.version:
 	$(AM_V_GEN)echo $(VERSION) > $@-t && mv $@-t $@
 
+bpf_attr_check.c: $(srcdir)/bpf_attr.h $(srcdir)/gen_bpf_attr_check.sh
+	$(srcdir)/gen_bpf_attr_check.sh $< > $@-t && mv $@-t $@
+
 strace_SOURCES_c = \
 	$(filter %.c,$(strace_SOURCES)) $(filter %.c,$(libstrace_a_SOURCES))
 
-sys_func.h: $(patsubst %,$(srcdir)/%,$(strace_SOURCES_c))
+sys_func_h_sources = $(filter-out $(strace_SOURCES_check),$(strace_SOURCES_c))
+
+sys_func.h: $(patsubst %,$(srcdir)/%,$(sys_func_h_sources))
 	for f in $^; do \
 		sed -n 's/^SYS_FUNC(.*/extern &;/p' $$f; \
 	done | sort -u > $@
@@ -1025,10 +1034,12 @@ ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioc
 	cat $^ > $@
 
 BUILT_SOURCES = $(ioctl_redefs_h) $(ioctlent_h) \
-		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h .version
+		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
+		printers.h sen.h sys_func.h .version
 CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
 		ioctl_iocdef.h ioctl_iocdef.i \
-		native_printer_decls.h native_printer_defs.h printers.h sen.h sys_func.h
+		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
+		printers.h sen.h sys_func.h
 DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h
 
 include scno.am
