@@ -163,10 +163,35 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+enum xlat_type {
+	XT_NORMAL,
+	XT_SORTED,
+	XT_INDEXED,
+};
+
+static void
+printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		   const char *dflt, enum xlat_type xt)
+{
+	switch (xt) {
+	case XT_NORMAL:
+		printxval64(xlat, val, dflt);
+		break;
+
+	case XT_SORTED:
+		printxval_searchn(xlat, xlat_size, val, dflt);
+		break;
+
+	case XT_INDEXED:
+		printxval_indexn(xlat, xlat_size, val, dflt);
+		break;
+	}
+}
+
 static int
-decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
-	      const struct xlat decode_nr[], const unsigned int max_nr,
-	      const char *const dflt)
+decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
+	       const struct xlat decode_nr[], const unsigned int max_nr,
+	       const char *const dflt, size_t decode_nr_size, enum xlat_type xt)
 {
 	tprints(", ");
 
@@ -187,7 +212,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (i < 0) {
 		tprints(" 0 ");
 	} else {
-		printxval(decode_nr, i, dflt);
+		printxval_dispatch(decode_nr, decode_nr_size, i, dflt, xt);
 
 		while ((i = next_set_bit(decoded_arg, i + 1, size)) > 0) {
 			if (abbrev(tcp) && bit_displayed >= 3) {
@@ -195,7 +220,8 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 				break;
 			}
 			tprints(", ");
-			printxval(decode_nr, i, dflt);
+			printxval_dispatch(decode_nr, decode_nr_size, i, dflt,
+					   xt);
 			bit_displayed++;
 		}
 	}
@@ -204,6 +230,10 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	return RVAL_IOCTL_DECODED;
 }
+
+#define decode_bitset(tcp_, arg_, decode_nr_, max_nr_, dflt_, xt_) \
+	decode_bitset_((tcp_), (arg_), (decode_nr_), (max_nr_), \
+		       (dflt_), ARRAY_SIZE(decode_nr_), (xt_))
 
 # ifdef EVIOCGMTSLOTS
 static int
@@ -255,41 +285,42 @@ bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
 	switch (ev_nr) {
 		case EV_SYN:
 			return decode_bitset(tcp, arg, evdev_sync,
-					     SYN_MAX, "SYN_???");
+					     SYN_MAX, "SYN_???", XT_NORMAL);
 		case EV_KEY:
 			return decode_bitset(tcp, arg, evdev_keycode,
-					     KEY_MAX, "KEY_???");
+					     KEY_MAX, "KEY_???", XT_NORMAL);
 		case EV_REL:
 			return decode_bitset(tcp, arg, evdev_relative_axes,
-					     REL_MAX, "REL_???");
+					     REL_MAX, "REL_???", XT_NORMAL);
 		case EV_ABS:
 			return decode_bitset(tcp, arg, evdev_abs,
-					     ABS_MAX, "ABS_???");
+					     ABS_MAX, "ABS_???", XT_NORMAL);
 		case EV_MSC:
 			return decode_bitset(tcp, arg, evdev_misc,
-					     MSC_MAX, "MSC_???");
+					     MSC_MAX, "MSC_???", XT_NORMAL);
 		case EV_SW:
 			return decode_bitset(tcp, arg, evdev_switch,
-					     SW_MAX, "SW_???");
+					     SW_MAX, "SW_???", XT_NORMAL);
 		case EV_LED:
 			return decode_bitset(tcp, arg, evdev_leds,
-					     LED_MAX, "LED_???");
+					     LED_MAX, "LED_???", XT_NORMAL);
 		case EV_SND:
 			return decode_bitset(tcp, arg, evdev_snd,
-					     SND_MAX, "SND_???");
+					     SND_MAX, "SND_???", XT_NORMAL);
 		case EV_REP:
 			return decode_bitset(tcp, arg, evdev_autorepeat,
-					     REP_MAX, "REP_???");
+					     REP_MAX, "REP_???", XT_NORMAL);
 		case EV_FF:
 			return decode_bitset(tcp, arg, evdev_ff_types,
-					     FF_MAX, "FF_???");
+					     FF_MAX, "FF_???", XT_NORMAL);
 		case EV_PWR:
 			tprints(", ");
 			printnum_int(tcp, arg, "%d");
 			return RVAL_IOCTL_DECODED;
 		case EV_FF_STATUS:
 			return decode_bitset(tcp, arg, evdev_ff_status,
-					     FF_STATUS_MAX, "FF_STATUS_???");
+					     FF_STATUS_MAX, "FF_STATUS_???",
+					     XT_NORMAL);
 		default:
 			tprints(", ");
 			printaddr(arg);
@@ -343,22 +374,23 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 # ifdef EVIOCGPROP
 		case _IOC_NR(EVIOCGPROP(0)):
 			return decode_bitset(tcp, arg, evdev_prop,
-					     INPUT_PROP_MAX, "PROP_???");
+					     INPUT_PROP_MAX, "PROP_???",
+					     XT_NORMAL);
 # endif
 		case _IOC_NR(EVIOCGSND(0)):
 			return decode_bitset(tcp, arg, evdev_snd,
-					     SND_MAX, "SND_???");
+					     SND_MAX, "SND_???", XT_NORMAL);
 # ifdef EVIOCGSW
 		case _IOC_NR(EVIOCGSW(0)):
 			return decode_bitset(tcp, arg, evdev_switch,
-					     SW_MAX, "SW_???");
+					     SW_MAX, "SW_???", XT_NORMAL);
 # endif
 		case _IOC_NR(EVIOCGKEY(0)):
 			return decode_bitset(tcp, arg, evdev_keycode,
-					     KEY_MAX, "KEY_???");
+					     KEY_MAX, "KEY_???", XT_NORMAL);
 		case _IOC_NR(EVIOCGLED(0)):
 			return decode_bitset(tcp, arg, evdev_leds,
-					     LED_MAX, "LED_???");
+					     LED_MAX, "LED_???", XT_NORMAL);
 	}
 
 	/* multi-number fixed-length commands */
