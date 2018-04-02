@@ -33,10 +33,6 @@
 #include <linux/ioctl.h>
 #include "xlat/ioctl_dirs.h"
 
-#ifdef HAVE_LINUX_INPUT_H
-# include <linux/input.h>
-#endif
-
 #include "xlat/evdev_abs.h"
 #include "xlat/evdev_ev.h"
 
