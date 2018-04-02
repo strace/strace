@@ -33,7 +33,6 @@
 #include <linux/ioctl.h>
 #include "xlat/ioctl_dirs.h"
 
-#include "xlat/evdev_abs.h"
 #include "xlat/evdev_ev.h"
 
 static int

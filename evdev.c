@@ -29,6 +29,8 @@
 
 #include "defs.h"
 
+#include "xlat/evdev_abs.h"
+
 #ifdef HAVE_LINUX_INPUT_H
 
 # include <linux/ioctl.h>
@@ -50,6 +52,8 @@
 # ifndef SYN_MAX
 #  define SYN_MAX 0xf
 # endif
+
+const size_t evdev_abs_size = ARRAY_SIZE(evdev_abs) - 1;
 
 static int
 abs_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)

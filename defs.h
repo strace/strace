@@ -296,6 +296,9 @@ extern const struct xlat ethernet_protocols[];
 extern const size_t ethernet_protocols_size;
 
 extern const struct xlat evdev_abs[];
+/** Number of elements in evdev_abs array without the terminating record. */
+extern const size_t evdev_abs_size;
+
 extern const struct xlat iffflags[];
 extern const struct xlat inet_protocols[];
 extern const struct xlat ip_type_of_services[];
