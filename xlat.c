@@ -184,12 +184,14 @@ sprintxval_ex(char *const buf, const size_t size, const struct xlat *const x,
  * @param dflt      String (abbreviated in comment syntax) which should be
  *                  emitted if no appropriate xlat value has been found.
  * @param style     Style in which xlat value should be printed.
+ * @param fn        Search function.
  * @return          1 if appropriate xlat value has been found, 0
  *                  otherwise.
  */
-int
-printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
-		     const char *dflt, enum xlat_style style)
+static int
+printxval_sized(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		const char *dflt, enum xlat_style style,
+		const char *(* fn)(const struct xlat *, size_t, uint64_t))
 {
 	style = get_xlat_style(style);
 
@@ -198,7 +200,7 @@ printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 		return 0;
 	}
 
-	const char *s = xlat_search(xlat, xlat_size, val);
+	const char *s = fn(xlat, xlat_size, val);
 
 	if (s) {
 		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
@@ -214,6 +216,37 @@ printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 	tprints_comment(dflt);
 
 	return 0;
+}
+
+int
+printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		     const char *dflt, enum xlat_style style)
+{
+	return printxval_sized(xlat, xlat_size, val, dflt, style,
+				  xlat_search);
+}
+
+static const char *
+xlat_idx(const struct xlat *xlat, size_t nmemb, uint64_t val)
+{
+	if (val >= nmemb)
+		return NULL;
+
+	if (val != xlat[val].val) {
+		error_func_msg("Unexpected xlat value %" PRIu64
+			       " at index %" PRIu64,
+			       xlat[val].val, val);
+		return NULL;
+	}
+
+	return xlat[val].str;
+}
+
+int
+printxval_indexn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		    const char *dflt, enum xlat_style style)
+{
+	return printxval_sized(xlat, xlat_size, val, dflt, style, xlat_idx);
 }
 
 /*

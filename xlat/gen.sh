@@ -65,6 +65,7 @@ print_xlat()
 	local val
 	val="$1"; shift
 
+	[ 1 = "$value_indexed" ] && printf " [%s] =" "${val}"
 	if [ -z "${val_type-}" ]; then
 		echo " XLAT(${val}),"
 	else
@@ -78,6 +79,7 @@ print_xlat_pair()
 	val="$1"; shift
 	str="$1"; shift
 
+	[ 1 = "$value_indexed" ] && printf " [%s] =" "${val}"
 	if [ -z "${val_type-}" ]; then
 		echo " XLAT_PAIR(${val}, \"${str}\"),"
 	else
@@ -123,6 +125,8 @@ gen_header()
 	local decl="extern const struct xlat ${name}[];"
 	local in_defs= in_mpers=
 
+	value_indexed=0
+
 	if grep -F -x "$decl" "$defs" > /dev/null; then
 		in_defs=1
 	elif grep -F -x "$decl" "$mpers" > /dev/null; then
@@ -150,6 +154,9 @@ gen_header()
 			;;
 		'#val_type '*)
 			# to be processed during 2nd pass
+			;;
+		'#value_indexed')
+			value_indexed=1
 			;;
 		'#'*)
 			echo "${line}"
@@ -205,6 +212,8 @@ gen_header()
 			;;
 		'#unconditional')
 			unconditional=1
+			;;
+		'#value_indexed')
 			;;
 		'#val_type '*)
 			val_type="${line#\#val_type }"

@@ -645,6 +645,16 @@ extern int printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size,
 #define printxval_search_ex(xlat__, val__, dflt__) \
 	printxval_searchn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
 			     (dflt__), XLAT_STYLE_DEFAULT)
+extern int printxval_indexn_ex(const struct xlat *xlat, size_t xlat_size,
+	uint64_t val, const char *dflt, enum xlat_style style);
+#define printxval_indexn(xlat_, xlat_size_, val_, dflt_) \
+	printxval_indexn_ex((xlat_), (xlat_size_), (val_), (dflt_), \
+			    XLAT_STYLE_DEFAULT)
+#define printxval_index(xlat__, val__, dflt__) \
+	printxval_indexn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
+#define printxval_index_ex(xlat__, val__, dflt__) \
+	printxval_indexn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
+			    (dflt__), XLAT_STYLE_DEFAULT)
 extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
 			 unsigned int val, const char *dflt,
 			 enum xlat_style style);
