@@ -42,7 +42,9 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(top_builddir)/$(OS) \
 	      -I$(top_srcdir)/$(OS) \
 	      -I$(top_builddir) \
-	      -I$(top_srcdir)
+	      -I$(top_srcdir) \
+	      -DTESTS_SIZEOF_KERNEL_LONG_T=$(SIZEOF_KERNEL_LONG_T) \
+	      -DTESTS_SIZEOF_LONG=$(SIZEOF_LONG)
 AM_LDFLAGS = $(ARCH_MFLAGS)
 
 libtests_a_SOURCES = \

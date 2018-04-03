@@ -33,6 +33,16 @@
 # include "config.h"
 #endif
 
+#ifdef TESTS_SIZEOF_KERNEL_LONG_T
+# undef SIZEOF_KERNEL_LONG_T
+# define SIZEOF_KERNEL_LONG_T TESTS_SIZEOF_KERNEL_LONG_T
+#endif
+
+#ifdef TESTS_SIZEOF_LONG
+# undef SIZEOF_LONG
+# define SIZEOF_LONG TESTS_SIZEOF_LONG
+#endif
+
 #include <stdbool.h>
 #include <sys/types.h>
 #include "kernel_types.h"
