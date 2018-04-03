@@ -29,16 +29,15 @@
 #ifndef STRACE_TESTS_H
 #define STRACE_TESTS_H
 
-# ifdef HAVE_CONFIG_H
-#  include "config.h"
-# endif
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
 
-# include <stdbool.h>
-
-# include <sys/types.h>
-# include "kernel_types.h"
-# include "gcc_compat.h"
-# include "macros.h"
+#include <stdbool.h>
+#include <sys/types.h>
+#include "kernel_types.h"
+#include "gcc_compat.h"
+#include "macros.h"
 
 /*
  * The printf-like function to use in header files
@@ -258,19 +257,19 @@ f8ill_ptr_to_kulong(const void *const ptr)
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
 	 (long long) (v))
 
-# define SKIP_MAIN_UNDEFINED(arg) \
+#define SKIP_MAIN_UNDEFINED(arg) \
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
 
-# if WORDS_BIGENDIAN
-#  define LL_PAIR(HI, LO) (HI), (LO)
-# else
-#  define LL_PAIR(HI, LO) (LO), (HI)
-# endif
-# define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
+#if WORDS_BIGENDIAN
+# define LL_PAIR(HI, LO) (HI), (LO)
+#else
+# define LL_PAIR(HI, LO) (LO), (HI)
+#endif
+#define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
 
-# define _STR(_arg) #_arg
-# define ARG_STR(_arg) (_arg), #_arg
-# define ARG_ULL_STR(_arg) _arg##ULL, #_arg
+#define _STR(_arg) #_arg
+#define ARG_STR(_arg) (_arg), #_arg
+#define ARG_ULL_STR(_arg) _arg##ULL, #_arg
 
 /*
  * Assign an object of type DEST_TYPE at address DEST_ADDR
