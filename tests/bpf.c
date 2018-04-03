@@ -28,29 +28,59 @@
  */
 
 #include "tests.h"
+
+#include <stddef.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
+
 #include <asm/unistd.h>
+#include "scno.h"
 
-#if defined __NR_bpf				\
- && (defined HAVE_UNION_BPF_ATTR_ATTACH_FLAGS	\
-  || defined HAVE_UNION_BPF_ATTR_BPF_FD		\
-  || defined HAVE_UNION_BPF_ATTR_FLAGS		\
-  || defined HAVE_UNION_BPF_ATTR_INFO_INFO	\
-  || defined HAVE_UNION_BPF_ATTR_NEXT_ID	\
-  || defined HAVE_UNION_BPF_ATTR_NUMA_NODE	\
-  || defined HAVE_UNION_BPF_ATTR_PROG_FLAGS	\
-  || defined HAVE_UNION_BPF_ATTR_TEST_DURATION)
-
-# include <stddef.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <string.h>
-# include <unistd.h>
+#ifdef HAVE_LINUX_BPF_H
 # include <linux/bpf.h>
-# include "print_fields.h"
+#endif
+
+#include "bpf_attr.h"
+#include "print_fields.h"
+
+#include "xlat.h"
+#include "xlat/bpf_commands.h"
+
+#ifndef HAVE_STRUCT_BPF_INSN
+struct bpf_insn {
+	uint8_t	code;
+	uint8_t	dst_reg:4;
+	uint8_t	src_reg:4;
+	int16_t	off;
+	int32_t	imm;
+};
+#endif
+
+#define BPF_ATTR_DATA_FIELD(cmd_) struct cmd_ ## _struct cmd_ ## _data
+
+union bpf_attr_data {
+	BPF_ATTR_DATA_FIELD(BPF_MAP_CREATE);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_LOOKUP_ELEM);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_UPDATE_ELEM);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_DELETE_ELEM);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_GET_NEXT_KEY);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_LOAD);
+	BPF_ATTR_DATA_FIELD(BPF_OBJ_PIN);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_ATTACH);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_DETACH);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_TEST_RUN);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_GET_NEXT_ID);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_GET_FD_BY_ID);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_GET_FD_BY_ID);
+	BPF_ATTR_DATA_FIELD(BPF_OBJ_GET_INFO_BY_FD);
+	char char_data[256];
+};
 
 static const kernel_ulong_t long_bits = (kernel_ulong_t) 0xfacefeed00000000ULL;
 static const char *errstr;
-static unsigned int sizeof_attr = sizeof(union bpf_attr);
+static unsigned int sizeof_attr = sizeof(union bpf_attr_data);
 static unsigned int page_size;
 static unsigned long end_of_page;
 
@@ -62,15 +92,15 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 	return rc;
 }
 
-# if VERBOSE
-#  define print_extra_data(addr_, offs_, size_) \
+#if VERBOSE
+# define print_extra_data(addr_, offs_, size_) \
 	do { \
 		printf("/* bytes %u..%u */ ", (offs_), (size_) + (offs_) - 1); \
 		print_quoted_hex((addr_) + (offs_), (size_)); \
 	} while (0)
-# else
-#  define print_extra_data(addr_, offs_, size_) printf("...")
-# endif
+#else
+# define print_extra_data(addr_, offs_, size_) printf("...")
+#endif
 
 static void
 test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
@@ -80,7 +110,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	  void (*print_attr)(const unsigned long eop))
 {
 	/* zero addr */
-	sys_bpf(cmd, 0, long_bits | sizeof(union bpf_attr));
+	sys_bpf(cmd, 0, long_bits | sizeof(union bpf_attr_data));
 	printf("bpf(%s, NULL, %u) = %s\n",
 	       cmd_str, sizeof_attr, errstr);
 
@@ -103,7 +133,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	printf("bpf(%s, %#lx, %u) = %s\n",
 	       cmd_str, addr, offset + 1, errstr);
 
-	/* the relevant part of union bpf_attr */
+	/* the relevant part of bpf_attr_data */
 	offset = init_attr(end_of_page);
 	addr = end_of_page - offset;
 	sys_bpf(cmd, addr, offset);
@@ -111,13 +141,13 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	print_attr(addr);
 	printf("}, %u) = %s\n", offset, errstr);
 
-	/* short read of the relevant part of union bpf_attr */
+	/* short read of the relevant part of bpf_attr_data */
 	sys_bpf(cmd, addr + 1, offset);
 	printf("bpf(%s, %#lx, %u) = %s\n",
 	       cmd_str, addr + 1, offset, errstr);
 
 	if (offset < sizeof_attr) {
-		/* short read of the whole union bpf_attr */
+		/* short read of the whole bpf_attr_data */
 		memmove((void *) end_of_page - sizeof_attr + 1,
 			(void *) addr, offset);
 		addr = end_of_page - sizeof_attr + 1;
@@ -127,7 +157,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 		printf("bpf(%s, %#lx, %u) = %s\n",
 		       cmd_str, addr, sizeof_attr, errstr);
 
-		/* the whole union bpf_attr */
+		/* the whole bpf_attr_data */
 		memmove((void *) end_of_page - sizeof_attr,
 			(void *) addr, offset);
 		addr = end_of_page - sizeof_attr;
@@ -170,7 +200,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	print_attr(addr);
 	printf("}, %u) = %s\n", page_size, errstr);
 
-	/* non-zero bytes after the whole union bpf_attr */
+	/* non-zero bytes after the whole bpf_attr_data */
 	fill_memory_ex((void *) addr + offset,
 		       page_size - offset, '0', 10);
 	sys_bpf(cmd, addr, page_size);
@@ -187,7 +217,7 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	       cmd_str, addr, page_size + 1, errstr);
 }
 
-# define TEST_BPF(cmd_)							\
+#define TEST_BPF(cmd_)							\
 	test_bpf_((cmd_), #cmd_,					\
 		  init_ ## cmd_ ## _first, print_ ## cmd_ ## _first,	\
 		  init_ ## cmd_ ## _attr, print_ ## cmd_ ## _attr)	\
@@ -197,7 +227,9 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 	static unsigned int						\
 	init_ ## cmd_ ## _first(const unsigned long eop)		\
 	{								\
-		static const union bpf_attr attr = { .field_ = value_ };\
+		static const struct cmd_ ## _struct attr = {		\
+			.field_ = value_				\
+		};							\
 		static const unsigned int offset = sizeof(attr.field_);	\
 		const unsigned long addr = eop - offset;		\
 									\
@@ -205,8 +237,6 @@ test_bpf_(kernel_ulong_t cmd, const char *cmd_str,
 		return offset;						\
 	}								\
 	/* End of DEF_INIT_FIRST definition. */
-
-# ifdef HAVE_UNION_BPF_ATTR_NUMA_NODE
 
 DEF_BPF_INIT_FIRST(BPF_MAP_CREATE, map_type, 2)
 
@@ -220,7 +250,7 @@ print_BPF_MAP_CREATE_first(const unsigned long addr)
 static unsigned int
 init_BPF_MAP_CREATE_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_MAP_CREATE_struct attr = {
 		.map_type = 1,
 		.key_size = 4,
 		.value_size = 8,
@@ -230,7 +260,7 @@ init_BPF_MAP_CREATE_attr(const unsigned long eop)
 		.numa_node = 42
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, numa_node);
+		offsetofend(struct BPF_MAP_CREATE_struct, numa_node);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -246,10 +276,6 @@ print_BPF_MAP_CREATE_attr(const unsigned long addr)
 	       "|BPF_F_NUMA_NODE, inner_map_fd=-1, numa_node=42");
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_NUMA_NODE */
-
-# ifdef HAVE_UNION_BPF_ATTR_FLAGS
-
 DEF_BPF_INIT_FIRST(BPF_MAP_LOOKUP_ELEM, map_fd, -1)
 
 static void
@@ -261,13 +287,13 @@ print_BPF_MAP_LOOKUP_ELEM_first(const unsigned long addr)
 static unsigned int
 init_BPF_MAP_LOOKUP_ELEM_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_MAP_LOOKUP_ELEM_struct attr = {
 		.map_fd = -1,
 		.key = 0xdeadbeef,
 		.value = 0xbadc0ded
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, value);
+		offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, value);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -280,7 +306,7 @@ print_BPF_MAP_LOOKUP_ELEM_attr(const unsigned long addr)
 	printf("map_fd=-1, key=0xdeadbeef, value=0xbadc0ded");
 }
 
-#  define init_BPF_MAP_UPDATE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
+#define init_BPF_MAP_UPDATE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
 
 static void
 print_BPF_MAP_UPDATE_ELEM_first(const unsigned long addr)
@@ -291,14 +317,14 @@ print_BPF_MAP_UPDATE_ELEM_first(const unsigned long addr)
 static unsigned int
 init_BPF_MAP_UPDATE_ELEM_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_MAP_UPDATE_ELEM_struct attr = {
 		.map_fd = -1,
 		.key = 0xdeadbeef,
 		.value = 0xbadc0ded,
 		.flags = 2
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, flags);
+		offsetofend(struct BPF_MAP_UPDATE_ELEM_struct, flags);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -311,7 +337,7 @@ print_BPF_MAP_UPDATE_ELEM_attr(const unsigned long addr)
 	printf("map_fd=-1, key=0xdeadbeef, value=0xbadc0ded, flags=BPF_EXIST");
 }
 
-#  define init_BPF_MAP_DELETE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
+#define init_BPF_MAP_DELETE_ELEM_first init_BPF_MAP_LOOKUP_ELEM_first
 
 static void
 print_BPF_MAP_DELETE_ELEM_first(const unsigned long addr)
@@ -322,12 +348,12 @@ print_BPF_MAP_DELETE_ELEM_first(const unsigned long addr)
 static unsigned int
 init_BPF_MAP_DELETE_ELEM_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_MAP_DELETE_ELEM_struct attr = {
 		.map_fd = -1,
 		.key = 0xdeadbeef
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, key);
+		offsetofend(struct BPF_MAP_DELETE_ELEM_struct, key);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -340,7 +366,7 @@ print_BPF_MAP_DELETE_ELEM_attr(const unsigned long addr)
 	printf("map_fd=-1, key=0xdeadbeef");
 }
 
-#  define init_BPF_MAP_GET_NEXT_KEY_first init_BPF_MAP_LOOKUP_ELEM_first
+#define init_BPF_MAP_GET_NEXT_KEY_first init_BPF_MAP_LOOKUP_ELEM_first
 
 static void
 print_BPF_MAP_GET_NEXT_KEY_first(const unsigned long addr)
@@ -351,13 +377,13 @@ print_BPF_MAP_GET_NEXT_KEY_first(const unsigned long addr)
 static unsigned int
 init_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_MAP_GET_NEXT_KEY_struct attr = {
 		.map_fd = -1,
 		.key = 0xdeadbeef,
 		.next_key = 0xbadc0ded
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, next_key);
+		offsetofend(struct BPF_MAP_GET_NEXT_KEY_struct, next_key);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -370,10 +396,6 @@ print_BPF_MAP_GET_NEXT_KEY_attr(const unsigned long addr)
 	printf("map_fd=-1, key=0xdeadbeef, next_key=0xbadc0ded");
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_FLAGS */
-
-# ifdef HAVE_UNION_BPF_ATTR_PROG_FLAGS
-
 DEF_BPF_INIT_FIRST(BPF_PROG_LOAD, prog_type, 1)
 
 static void
@@ -385,14 +407,14 @@ print_BPF_PROG_LOAD_first(const unsigned long addr)
 }
 
 static const struct bpf_insn insns[] = {
-	{ .code = BPF_JMP | BPF_EXIT }
+	{ .code = 0x95 }
 };
 static char log_buf[4096];
 
 static unsigned int
 init_BPF_PROG_LOAD_attr(const unsigned long eop)
 {
-	const union bpf_attr attr = {
+	const struct BPF_PROG_LOAD_struct attr = {
 		.prog_type = 1,
 		.insn_cnt = ARRAY_SIZE(insns),
 		.insns = (uintptr_t) insns,
@@ -404,7 +426,7 @@ init_BPF_PROG_LOAD_attr(const unsigned long eop)
 		.prog_flags = 1
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, prog_flags);
+		offsetofend(struct BPF_PROG_LOAD_struct, prog_flags);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -422,17 +444,6 @@ print_BPF_PROG_LOAD_attr(const unsigned long addr)
 	       log_buf);
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_PROG_FLAGS */
-
-/*
- * bpf() syscall and its first six commands were introduced in Linux kernel
- * 3.18. Some additional commands were added afterwards, so we need to take
- * precautions to make sure the tests compile.
- *
- * BPF_OBJ_PIN and BPF_OBJ_GET commands appear in kernel 4.4.
- */
-# ifdef HAVE_UNION_BPF_ATTR_BPF_FD
-
 DEF_BPF_INIT_FIRST(BPF_OBJ_PIN, pathname, 0)
 
 static void
@@ -445,12 +456,12 @@ print_BPF_OBJ_PIN_first(const unsigned long addr)
 static unsigned int
 init_BPF_OBJ_PIN_attr(const unsigned long eop)
 {
-	const union bpf_attr attr = {
+	const struct BPF_OBJ_PIN_struct attr = {
 		.pathname = (uintptr_t) "/sys/fs/bpf/foo/bar",
 		.bpf_fd = -1
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, bpf_fd);
+		offsetofend(struct BPF_OBJ_PIN_struct, bpf_fd);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -463,15 +474,10 @@ print_BPF_OBJ_PIN_attr(const unsigned long addr)
 	printf("pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1");
 }
 
-#  define init_BPF_OBJ_GET_first init_BPF_OBJ_PIN_first
-#  define print_BPF_OBJ_GET_first print_BPF_OBJ_PIN_first
-#  define init_BPF_OBJ_GET_attr init_BPF_OBJ_PIN_attr
-#  define print_BPF_OBJ_GET_attr print_BPF_OBJ_PIN_attr
-
-# endif /* HAVE_UNION_BPF_ATTR_BPF_FD */
-
-/* BPF_PROG_ATTACH and BPF_PROG_DETACH commands appear in kernel 4.10. */
-# ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
+#define init_BPF_OBJ_GET_first init_BPF_OBJ_PIN_first
+#define print_BPF_OBJ_GET_first print_BPF_OBJ_PIN_first
+#define init_BPF_OBJ_GET_attr init_BPF_OBJ_PIN_attr
+#define print_BPF_OBJ_GET_attr print_BPF_OBJ_PIN_attr
 
 DEF_BPF_INIT_FIRST(BPF_PROG_ATTACH, target_fd, -1)
 
@@ -485,14 +491,14 @@ print_BPF_PROG_ATTACH_first(const unsigned long addr)
 static unsigned int
 init_BPF_PROG_ATTACH_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_PROG_ATTACH_struct attr = {
 		.target_fd = -1,
 		.attach_bpf_fd = -2,
 		.attach_type = 2,
 		.attach_flags = 1
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, attach_flags);
+		offsetofend(struct BPF_PROG_ATTACH_struct, attach_flags);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -507,17 +513,17 @@ print_BPF_PROG_ATTACH_attr(const unsigned long addr)
 	       ", attach_flags=BPF_F_ALLOW_OVERRIDE");
 }
 
-#  define init_BPF_PROG_DETACH_first init_BPF_PROG_ATTACH_first
+#define init_BPF_PROG_DETACH_first init_BPF_PROG_ATTACH_first
 
 static unsigned int
 init_BPF_PROG_DETACH_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_PROG_DETACH_struct attr = {
 		.target_fd = -1,
 		.attach_type = 2
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, attach_type);
+		offsetofend(struct BPF_PROG_DETACH_struct, attach_type);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -537,12 +543,7 @@ print_BPF_PROG_DETACH_attr(const unsigned long addr)
 	printf("target_fd=-1, attach_type=BPF_CGROUP_INET_SOCK_CREATE");
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_ATTACH_FLAGS */
-
-/* BPF_PROG_TEST_RUN command appears in kernel 4.12. */
-# ifdef HAVE_UNION_BPF_ATTR_TEST_DURATION
-
-DEF_BPF_INIT_FIRST(BPF_PROG_TEST_RUN, test.prog_fd, -1)
+DEF_BPF_INIT_FIRST(BPF_PROG_TEST_RUN, prog_fd, -1)
 
 static void
 print_BPF_PROG_TEST_RUN_first(const unsigned long addr)
@@ -551,23 +552,21 @@ print_BPF_PROG_TEST_RUN_first(const unsigned long addr)
 	       ", data_in=0, data_out=0, repeat=0, duration=0}");
 }
 
-static const union bpf_attr sample_BPF_PROG_TEST_RUN_attr = {
-	.test = {
-		.prog_fd = -1,
-		.retval = 0xfac1fed2,
-		.data_size_in = 0xfac3fed4,
-		.data_size_out = 0xfac5fed6,
-		.data_in = (uint64_t) 0xfacef11dbadc2ded,
-		.data_out = (uint64_t) 0xfacef33dbadc4ded,
-		.repeat = 0xfac7fed8,
-		.duration = 0xfac9feda
-	}
+static const struct BPF_PROG_TEST_RUN_struct sample_BPF_PROG_TEST_RUN_attr = {
+	.prog_fd = -1,
+	.retval = 0xfac1fed2,
+	.data_size_in = 0xfac3fed4,
+	.data_size_out = 0xfac5fed6,
+	.data_in = (uint64_t) 0xfacef11dbadc2ded,
+	.data_out = (uint64_t) 0xfacef33dbadc4ded,
+	.repeat = 0xfac7fed8,
+	.duration = 0xfac9feda
 };
 static unsigned int
 init_BPF_PROG_TEST_RUN_attr(const unsigned long eop)
 {
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, test);
+		offsetofend(struct BPF_PROG_TEST_RUN_struct, duration);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &sample_BPF_PROG_TEST_RUN_attr, offset);
@@ -577,20 +576,16 @@ init_BPF_PROG_TEST_RUN_attr(const unsigned long eop)
 static void
 print_BPF_PROG_TEST_RUN_attr(const unsigned long addr)
 {
-	PRINT_FIELD_D("test={", sample_BPF_PROG_TEST_RUN_attr.test, prog_fd);
-	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, retval);
-	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_size_in);
-	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_size_out);
-	PRINT_FIELD_X(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_in);
-	PRINT_FIELD_X(", ", sample_BPF_PROG_TEST_RUN_attr.test, data_out);
-	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, repeat);
-	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr.test, duration);
+	PRINT_FIELD_D("test={", sample_BPF_PROG_TEST_RUN_attr, prog_fd);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr, retval);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr, data_size_in);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr, data_size_out);
+	PRINT_FIELD_X(", ", sample_BPF_PROG_TEST_RUN_attr, data_in);
+	PRINT_FIELD_X(", ", sample_BPF_PROG_TEST_RUN_attr, data_out);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr, repeat);
+	PRINT_FIELD_U(", ", sample_BPF_PROG_TEST_RUN_attr, duration);
 	printf("}");
 }
-
-# endif /* HAVE_UNION_BPF_ATTR_TEST_DURATION */
-
-# ifdef HAVE_UNION_BPF_ATTR_NEXT_ID
 
 DEF_BPF_INIT_FIRST(BPF_PROG_GET_NEXT_ID, start_id, 0xdeadbeef)
 
@@ -603,12 +598,12 @@ print_BPF_PROG_GET_NEXT_ID_first(const unsigned long addr)
 static unsigned int
 init_BPF_PROG_GET_NEXT_ID_attr(const unsigned long eop)
 {
-	static const union bpf_attr attr = {
+	static const struct BPF_PROG_GET_NEXT_ID_struct attr = {
 		.start_id = 0xbadc0ded,
 		.next_id = 0xcafef00d
 	};
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, next_id);
+		offsetofend(struct BPF_PROG_GET_NEXT_ID_struct, next_id);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &attr, offset);
@@ -621,13 +616,13 @@ print_BPF_PROG_GET_NEXT_ID_attr(const unsigned long addr)
 	printf("start_id=%u, next_id=%u", 0xbadc0ded, 0xcafef00d);
 }
 
-#  define init_BPF_MAP_GET_NEXT_ID_first init_BPF_PROG_GET_NEXT_ID_first
-#  define print_BPF_MAP_GET_NEXT_ID_first print_BPF_PROG_GET_NEXT_ID_first
-#  define init_BPF_MAP_GET_NEXT_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
-#  define print_BPF_MAP_GET_NEXT_ID_attr print_BPF_PROG_GET_NEXT_ID_attr
+#define init_BPF_MAP_GET_NEXT_ID_first init_BPF_PROG_GET_NEXT_ID_first
+#define print_BPF_MAP_GET_NEXT_ID_first print_BPF_PROG_GET_NEXT_ID_first
+#define init_BPF_MAP_GET_NEXT_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
+#define print_BPF_MAP_GET_NEXT_ID_attr print_BPF_PROG_GET_NEXT_ID_attr
 
-#  define init_BPF_PROG_GET_FD_BY_ID_first init_BPF_PROG_GET_NEXT_ID_first
-#  define init_BPF_PROG_GET_FD_BY_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
+#define init_BPF_PROG_GET_FD_BY_ID_first init_BPF_PROG_GET_NEXT_ID_first
+#define init_BPF_PROG_GET_FD_BY_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
 
 static void
 print_BPF_PROG_GET_FD_BY_ID_first(const unsigned long addr)
@@ -641,8 +636,8 @@ print_BPF_PROG_GET_FD_BY_ID_attr(const unsigned long addr)
 	printf("prog_id=%u, next_id=%u", 0xbadc0ded, 0xcafef00d);
 }
 
-#  define init_BPF_MAP_GET_FD_BY_ID_first init_BPF_PROG_GET_NEXT_ID_first
-#  define init_BPF_MAP_GET_FD_BY_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
+#define init_BPF_MAP_GET_FD_BY_ID_first init_BPF_PROG_GET_NEXT_ID_first
+#define init_BPF_MAP_GET_FD_BY_ID_attr init_BPF_PROG_GET_NEXT_ID_attr
 
 static void
 print_BPF_MAP_GET_FD_BY_ID_first(const unsigned long addr)
@@ -656,11 +651,7 @@ print_BPF_MAP_GET_FD_BY_ID_attr(const unsigned long addr)
 	printf("map_id=%u, next_id=%u", 0xbadc0ded, 0xcafef00d);
 }
 
-# endif /* HAVE_UNION_BPF_ATTR_NEXT_ID */
-
-# ifdef HAVE_UNION_BPF_ATTR_INFO_INFO
-
-DEF_BPF_INIT_FIRST(BPF_OBJ_GET_INFO_BY_FD, info.bpf_fd, -1)
+DEF_BPF_INIT_FIRST(BPF_OBJ_GET_INFO_BY_FD, bpf_fd, -1)
 
 static void
 print_BPF_OBJ_GET_INFO_BY_FD_first(const unsigned long addr)
@@ -668,18 +659,17 @@ print_BPF_OBJ_GET_INFO_BY_FD_first(const unsigned long addr)
 	printf("info={bpf_fd=-1, info_len=0, info=0}");
 }
 
-static const union bpf_attr sample_BPF_OBJ_GET_INFO_BY_FD_attr = {
-	.info = {
+static const struct BPF_OBJ_GET_INFO_BY_FD_struct
+	sample_BPF_OBJ_GET_INFO_BY_FD_attr = {
 		.bpf_fd = -1,
 		.info_len = 0xdeadbeef,
 		.info = (uint64_t) 0xfacefeedbadc0ded
-	}
-};
+	};
 static unsigned int
 init_BPF_OBJ_GET_INFO_BY_FD_attr(const unsigned long eop)
 {
 	static const unsigned int offset =
-		offsetofend(union bpf_attr, info);
+		offsetofend(struct BPF_OBJ_GET_INFO_BY_FD_struct, info);
 	const unsigned long addr = eop - offset;
 
 	memcpy((void *) addr, &sample_BPF_OBJ_GET_INFO_BY_FD_attr, offset);
@@ -689,13 +679,11 @@ init_BPF_OBJ_GET_INFO_BY_FD_attr(const unsigned long eop)
 static void
 print_BPF_OBJ_GET_INFO_BY_FD_attr(const unsigned long addr)
 {
-	PRINT_FIELD_D("info={", sample_BPF_OBJ_GET_INFO_BY_FD_attr.info, bpf_fd);
-	PRINT_FIELD_U(", ", sample_BPF_OBJ_GET_INFO_BY_FD_attr.info, info_len);
-	PRINT_FIELD_X(", ", sample_BPF_OBJ_GET_INFO_BY_FD_attr.info, info);
+	PRINT_FIELD_D("info={", sample_BPF_OBJ_GET_INFO_BY_FD_attr, bpf_fd);
+	PRINT_FIELD_U(", ", sample_BPF_OBJ_GET_INFO_BY_FD_attr, info_len);
+	PRINT_FIELD_X(", ", sample_BPF_OBJ_GET_INFO_BY_FD_attr, info);
 	printf("}");
 }
-
-# endif /* HAVE_UNION_BPF_ATTR_INFO_INFO */
 
 int
 main(void)
@@ -703,45 +691,22 @@ main(void)
 	page_size = get_page_size();
 	end_of_page = (unsigned long) tail_alloc(1) + 1;
 
-# ifdef HAVE_UNION_BPF_ATTR_NUMA_NODE
 	TEST_BPF(BPF_MAP_CREATE);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_FLAGS
 	TEST_BPF(BPF_MAP_LOOKUP_ELEM);
 	TEST_BPF(BPF_MAP_UPDATE_ELEM);
 	TEST_BPF(BPF_MAP_DELETE_ELEM);
 	TEST_BPF(BPF_MAP_GET_NEXT_KEY);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_PROG_FLAGS
 	TEST_BPF(BPF_PROG_LOAD);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_BPF_FD
 	TEST_BPF(BPF_OBJ_PIN);
 	TEST_BPF(BPF_OBJ_GET);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_ATTACH_FLAGS
 	TEST_BPF(BPF_PROG_ATTACH);
 	TEST_BPF(BPF_PROG_DETACH);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_TEST_DURATION
 	TEST_BPF(BPF_PROG_TEST_RUN);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_NEXT_ID
 	TEST_BPF(BPF_PROG_GET_NEXT_ID);
 	TEST_BPF(BPF_MAP_GET_NEXT_ID);
 	TEST_BPF(BPF_PROG_GET_FD_BY_ID);
 	TEST_BPF(BPF_MAP_GET_FD_BY_ID);
-# endif
-
-# ifdef HAVE_UNION_BPF_ATTR_INFO_INFO
 	TEST_BPF(BPF_OBJ_GET_INFO_BY_FD);
-# endif
 
 	sys_bpf(0xfacefeed, 0, (kernel_ulong_t) 0xfacefeedbadc0dedULL);
 	printf("bpf(0xfacefeed /* BPF_??? */, NULL, %u) = %s\n",
@@ -754,9 +719,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_bpf && HAVE_UNION_BPF_ATTR_*")
-
-#endif

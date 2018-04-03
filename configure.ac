@@ -464,7 +464,10 @@ AC_CHECK_HEADERS([linux/input.h], [
 	AC_CHECK_MEMBERS([struct input_absinfo.resolution],,, [#include <linux/input.h>])
 ])
 
-AC_CHECK_HEADERS([linux/bpf.h], [st_BPF_ATTR])
+AC_CHECK_HEADERS([linux/bpf.h], [
+	AC_CHECK_TYPES([struct bpf_insn],,, [#include <linux/bpf.h>])
+	st_BPF_ATTR
+])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct br_mdb_entry,
