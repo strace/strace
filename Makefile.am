@@ -303,6 +303,7 @@ strace_SOURCES =	\
 	stat64.c	\
 	statfs.c	\
 	statfs.h	\
+	static_assert.h	\
 	statx.c		\
 	statx.h		\
 	strace.c	\
