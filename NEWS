@@ -25,6 +25,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     in v4l2 structures.
   * Enhanced decoding of kern_features syscall.
   * Added i18n support.
+  * Updated lists of ioctl commands from Linux 4.16.
 
 * Bug fixes
   * Fixed build on m68k.
