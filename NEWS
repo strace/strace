@@ -3,8 +3,15 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Changes in infrastructure
   * The mailing list was moved to strace-devel@lists.strace.io.
+  * SourceForge git repository
+    (https://sourceforge.net/p/strace/code/ci/master/tree/) is no longer
+    maintained.  Please use GitLab (https://gitlab.com/strace/strace/)
+    or GitHub (https://github.com/strace/strace/) repository instead.
 
 * Changes in behaviour
+  * When printing string data, '8' and '9' following an octal escape sequence
+    no longer lead to unabbreviated octal escape sequence output, as they used
+    to do.
   * Angle brackets are now printed as octal number escape sequences
     in the output of paths associated with file descriptors.
   * Data dump for write syscalls (-e write) is performed regardless
@@ -19,19 +26,25 @@ Noteworthy changes in release ?.?? (????-??-??)
     (addresses Debian bug #528488).
   * IPv6 addresses shown in socket information in -yy mode are now printed
     in brackets.
-  * Enhanced decoding of prctl and ptrace syscalls.
-  * Enhanced decoding of BTRFS_IOC_INO_PATHS and BTRFS_IOC_LOGICAL_INO ioctl
-    commands.
+  * Enhanced decoding of bpf, prctl and ptrace syscalls.
+  * Enhanced decoding of BTRFS_IOC_INO_PATHS, BTRFS_IOC_LOGICAL_INO, and PTP_*
+    ioctl commands.
   * Enhanced NETLINK_ROUTE protocol decoding.
   * Updated lists of signal codes.
   * Updated lists of BPF_*, BTN_*, ETH_P_*, INET_DIAG_BC_*, KEY_*, POLL*, RWF_*,
-    SCHED_FLAG_*, and SCTP_* constants.
+    SCHED_FLAG_*, SCTP_* and error constants.
   * Implemented block/character device number printing in -yy mode.
   * Known pixel/SDR format names are printed as comments for pixelformat fields
     in v4l2 structures.
   * Enhanced decoding of kern_features syscall.
+  * Enhanced NETLINK_NETFILTER netlink protocol decoder.
+  * Optimized handling of large number of tracees.
+  * Improved wall clock time measurement in syscall count statistics
+    (-c -w option).
+  * Extended the range of allowed values in -e inject=...:retval= expression.
   * Added i18n support.
   * Updated lists of ioctl commands from Linux 4.16.
+  * Enhanced manual page.
 
 * Bug fixes
   * Fixed build on m68k.
