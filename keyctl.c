@@ -44,12 +44,7 @@ struct keyctl_dh_params {
 static void
 print_keyring_serial_number(key_serial_t id)
 {
-	const char *str = xlookup(key_spec, (unsigned int) id);
-
-	if (str)
-		tprints(str);
-	else
-		tprintf("%d", id);
+	printxval_d(key_spec, id, NULL);
 }
 
 SYS_FUNC(add_key)
