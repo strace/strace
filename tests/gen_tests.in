@@ -192,10 +192,10 @@ mmsg-silent	-a25 -e verbose=none -e trace=sendmmsg,recvmmsg
 mmsg_name	-a25 -e trace=sendmmsg,recvmmsg
 mmsg_name-v	-v -a25 -e trace=sendmmsg,recvmmsg
 modify_ldt	-a23
-mount
-mount-Xabbrev	-e trace=mount -Xabbrev
-mount-Xraw	-e trace=mount -Xraw
-mount-Xverbose	-e trace=mount -Xverbose
+mount		-a33
+mount-Xabbrev	-a33 -e trace=mount -Xabbrev
+mount-Xraw	-a33 -e trace=mount -Xraw
+mount-Xverbose	-a33 -e trace=mount -Xverbose
 move_pages	-s3
 mq	-a32 -e trace=mq_getsetattr,mq_open,mq_unlink
 mq_sendrecv	-a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
