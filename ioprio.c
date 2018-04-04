@@ -56,17 +56,14 @@ static const char *
 sprint_ioprio(unsigned int ioprio)
 {
 	static char outstr[256];
-	const char *str;
+	char class_buf[64];
 	unsigned int class, data;
 
 	class = IOPRIO_PRIO_CLASS(ioprio);
 	data = IOPRIO_PRIO_DATA(ioprio);
-	str = xlookup(ioprio_class, class);
-	if (str)
-		xsprintf(outstr, "IOPRIO_PRIO_VALUE(%s, %d)", str, data);
-	else
-		xsprintf(outstr, "IOPRIO_PRIO_VALUE(%#x /* %s */, %d)",
-			 class, "IOPRIO_CLASS_???", data);
+	sprintxval(class_buf, sizeof(class_buf), ioprio_class, class,
+		   "IOPRIO_CLASS_???");
+	xsprintf(outstr, "IOPRIO_PRIO_VALUE(%s, %d)", class_buf, data);
 
 	return outstr;
 }
