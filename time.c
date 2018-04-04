@@ -173,9 +173,7 @@ do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (print_timex(tcp, addr))
 		return 0;
 	tcp->auxstr = xlookup(adjtimex_state, (kernel_ulong_t) tcp->u_rval);
-	if (tcp->auxstr)
-		return RVAL_STR;
-	return 0;
+	return RVAL_STR;
 }
 
 SYS_FUNC(adjtimex)
