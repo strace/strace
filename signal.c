@@ -117,7 +117,7 @@ print_sa_handler(kernel_ulong_t handler)
 	const char *sa_handler_str = get_sa_handler_str(handler);
 
 	if (sa_handler_str)
-		tprints(sa_handler_str);
+		print_xlat_ex(handler, sa_handler_str, XLAT_STYLE_DEFAULT);
 	else
 		printaddr(handler);
 }
