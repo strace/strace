@@ -30,14 +30,7 @@
 
 SYS_FUNC(socketcall)
 {
-	const unsigned int call = tcp->u_arg[0];
-	const char *str = xlookup(socketcalls, call);
-
-	if (str)
-		tprints(str);
-	else
-		tprintf("%d", call);
-
+	printxval_d(socketcalls, tcp->u_arg[0], NULL);
 	tprints(", ");
 	printaddr(tcp->u_arg[1]);
 
