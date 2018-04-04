@@ -284,6 +284,9 @@ nsyscalls-d
 old_mmap
 old_mmap-P
 old_mmap-v-none
+old_mmap-Xabbrev
+old_mmap-Xraw
+old_mmap-Xverbose
 oldfstat
 oldlstat
 oldselect

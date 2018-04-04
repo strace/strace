@@ -260,6 +260,9 @@ nlattr_unix_diag_msg		+netlink_sock_diag.test
 old_mmap	-a11 -e trace=mmap
 old_mmap-P	-e trace=mmap -P "/dev/full" 9>>/dev/full
 old_mmap-v-none	-a11 -e trace=mmap -e verbose=none
+old_mmap-Xabbrev	-a11 -e trace=mmap -Xabbrev
+old_mmap-Xraw	-a11 -e trace=mmap -Xraw
+old_mmap-Xverbose	-a11 -e trace=mmap -Xverbose
 oldfstat	-a18 -v -P stat.sample
 oldlstat	-a32 -v -P stat.sample -P /dev/full
 oldselect	-a13 -e trace=select
