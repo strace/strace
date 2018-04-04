@@ -126,10 +126,7 @@ print_si_code(int si_signo, unsigned int si_code)
 		}
 	}
 
-	if (code)
-		tprints(code);
-	else
-		tprintf("%#x", si_code);
+	print_xlat_ex(si_code, code, XLAT_STYLE_DEFAULT);
 }
 
 static void
