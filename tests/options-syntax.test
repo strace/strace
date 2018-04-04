@@ -56,6 +56,9 @@ check_h "invalid -O argument: '-42'" -O -42
 check_h "invalid -s argument: '-42'" -s -42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
 check_h "invalid -I argument: '5'" -I 5
+check_h "invalid -X argument: 'test'" -Xtest
+check_h "invalid -X argument: 'a'" -Xa
+check_h "invalid -X argument: 'abbreviated'" -X abbreviated
 
 ../zeroargc "$STRACE_EXE" /bin/true 2> "$LOG" &&
 	dump_log_and_fail_with \
