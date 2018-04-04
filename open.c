@@ -113,7 +113,8 @@ sprint_open_modes(unsigned int flags)
 void
 tprint_open_modes(unsigned int flags)
 {
-	tprints(sprint_open_modes(flags) + sizeof("flags"));
+	print_xlat_ex(flags, sprint_open_modes(flags) + sizeof("flags"),
+		      XLAT_STYLE_DEFAULT);
 }
 
 #ifdef O_TMPFILE
