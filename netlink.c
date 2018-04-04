@@ -161,7 +161,7 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 	/* Reserved control nfnetlink messages first. */
 	const char *const text = xlookup(nl_netfilter_msg_types, type);
 	if (text) {
-		tprints(text);
+		print_xlat_ex(type, text, XLAT_STYLE_DEFAULT);
 		return;
 	}
 
