@@ -51,6 +51,10 @@ sprint_xlat_val(uint64_t val, enum xlat_style style)
 	static char buf[sizeof(val) * 3];
 
 	switch (xlat_format(style)) {
+	case XLAT_STYLE_FMT_D:
+		xsprintf(buf, "%" PRId64, val);
+		break;
+
 	case XLAT_STYLE_FMT_U:
 		xsprintf(buf, "%" PRIu64, val);
 		break;

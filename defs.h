@@ -587,7 +587,7 @@ extern void printaddr(kernel_ulong_t addr);
 
 #define XLAT_STYLE_VERBOSITY_MASK (XLAT_STYLE_RAW | XLAT_STYLE_ABBREV)
 #define XLAT_STYLE_FORMAT_SHIFT   2
-#define XLAT_STYLE_FORMAT_MASK    (1 << XLAT_STYLE_FORMAT_SHIFT)
+#define XLAT_STYLE_FORMAT_MASK    (3 << XLAT_STYLE_FORMAT_SHIFT)
 
 enum xlat_style {
 	/**
@@ -610,6 +610,7 @@ enum xlat_style {
 
 	XLAT_STYLE_FMT_X   = 0 << XLAT_STYLE_FORMAT_SHIFT,
 	XLAT_STYLE_FMT_U   = 1 << XLAT_STYLE_FORMAT_SHIFT,
+	XLAT_STYLE_FMT_D   = 2 << XLAT_STYLE_FORMAT_SHIFT,
 };
 
 extern enum xlat_style xlat_verbosity;
@@ -864,6 +865,18 @@ static inline int
 printxval_u(const struct xlat *x, const unsigned int val, const char *dflt)
 {
 	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
+}
+
+static inline int
+printxval64_d(const struct xlat *x, const int64_t val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
+}
+
+static inline int
+printxval_d(const struct xlat *x, const int val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
 }
 
 static inline void
