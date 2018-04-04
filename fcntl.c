@@ -198,17 +198,13 @@ SYS_FUNC(fcntl)
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		const unsigned int cmd = tcp->u_arg[1];
-		const char *str = xlookup(fcntlcmds, cmd);
-		if (str) {
-			tprints(str);
-		} else {
-			/*
-			 * fcntl syscall does not recognize these
-			 * constants, but we would like to show them
-			 * for better debugging experience.
-			 */
-			printxval(fcntl64cmds, cmd, "F_???");
-		}
+
+		/*
+		 * fcntl syscall does not recognize fcntl64 command constants,
+		 * but we would like to show them for better debugging
+		 * experience.
+		 */
+		printxvals(cmd, "F_???", fcntlcmds, fcntl64cmds, NULL);
 	}
 	return print_fcntl(tcp);
 }
@@ -219,12 +215,7 @@ SYS_FUNC(fcntl64)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		const char *str = xlookup(fcntl64cmds, cmd);
-		if (str) {
-			tprints(str);
-		} else {
-			printxval(fcntlcmds, cmd, "F_???");
-		}
+		printxvals(cmd, "F_???", fcntl64cmds, fcntlcmds, NULL);
 	}
 	switch (cmd) {
 		case F_SETLK64:
