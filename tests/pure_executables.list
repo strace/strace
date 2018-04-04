@@ -154,7 +154,13 @@ mlock
 mlock2
 mlockall
 mmap
+mmap-Xabbrev
+mmap-Xraw
+mmap-Xverbose
 mmap64
+mmap64-Xabbrev
+mmap64-Xraw
+mmap64-Xverbose
 mmsg
 mmsg_name
 modify_ldt

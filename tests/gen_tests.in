@@ -180,7 +180,13 @@ mknodat	-a35
 mlock	-a20 -e trace=mlock,munlock
 mlock2
 mlockall	-a12
+mmap-Xabbrev	+mmap.test abbrev
+mmap-Xraw	+mmap.test raw 14
+mmap-Xverbose	+mmap.test verbose
 mmap64	+mmap.test
+mmap64-Xabbrev	+mmap.test abbrev
+mmap64-Xraw	+mmap.test raw 14
+mmap64-Xverbose	+mmap.test verbose
 mmsg	-e read=0 -e write=1 -e trace=recvmmsg,sendmmsg
 mmsg-silent	-a25 -e verbose=none -e trace=sendmmsg,recvmmsg
 mmsg_name	-a25 -e trace=sendmmsg,recvmmsg

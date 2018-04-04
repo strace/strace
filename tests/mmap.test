@@ -35,15 +35,20 @@ check_prog grep
 check_prog sed
 run_prog > /dev/null
 
+xlat_opt=""
+[ "$#" -gt 0 ] && xlat_opt="-X$1"
+align=20
+[ "$#" -gt 1 ] && align="$2"
+
 syscall=
 for n in mmap mmap2; do
 	$STRACE -e$n -h > /dev/null && syscall=$syscall,$n
 done
 run_strace -e$syscall $args > /dev/null
 
-if grep '^mmap(NULL, 0, PROT_NONE,' < "$LOG" > /dev/null; then
+if grep '^mmap(NULL, 0, \(0 /* PROT_NONE */\|0\|PROT_NONE\),' < "$LOG" > /dev/null; then
 	mmap=mmap
-elif grep '^mmap2(NULL, 0, PROT_NONE,' < "$LOG" > /dev/null; then
+elif grep '^mmap2(NULL, 0, \(0 \/\* PROT_NONE \*\/\|0\|PROT_NONE\),' < "$LOG" > /dev/null; then
 	mmap=mmap2
 else
 	dump_log_and_fail_with "mmap/mmap2 not found in $STRACE $args output"
@@ -52,6 +57,6 @@ fi
 syscall=$mmap,madvise,mlockall,mprotect,mremap,msync,munmap
 
 run_prog "../$NAME" $mmap > /dev/null
-run_strace -a20 -e$syscall $args > "$EXP"
-sed -n "/^$mmap(NULL, 0, PROT_NONE,/,\$p" < "$LOG" > "$OUT"
+run_strace -a$align -e$syscall $xlat_opt $args > "$EXP"
+sed -n "/^$mmap(NULL, 0, \(0 \/\* PROT_NONE \*\/\|0\|PROT_NONE\),/,\$p" < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

@@ -62,6 +62,14 @@
 # define VERBOSE 0
 #endif
 
+/* xlat verbosity defaults */
+#ifndef XLAT_RAW
+# define XLAT_RAW 0
+#endif
+#ifndef XLAT_VERBOSE
+# define XLAT_VERBOSE 0
+#endif
+
 #ifndef DEFAULT_STRLEN
 /* Default maximum # of bytes printed in printstr et al. */
 # define DEFAULT_STRLEN 32
