@@ -73,8 +73,9 @@ diff -u -- "$EXP" "$LOG" > /dev/null || {
 		"zeroargc $STRACE $args output mismatch"
 }
 
-if [ -n "${UID-}" ]; then
-	if [ "${UID-}" = 0 ]; then
+uid="${UID:-`id -u`}"
+if [ "$uid" -ge 0 ]; then
+	if [ "$uid" -eq 0 ]; then
 		umsg="Cannot find user ':nosuchuser:'"
 	else
 		umsg='You must be root to use the -u option'
