@@ -31,12 +31,21 @@
 #include <sys/socket.h>
 #include "netlink.h"
 
+static const char *errstr;
+
+static ssize_t
+sys_send(const int fd, const void *const buf, const size_t len)
+{
+	const ssize_t rc = sendto(fd, buf, len, MSG_DONTWAIT, NULL, 0);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
 int
 main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	long rc;
 	int fd = create_nl_socket(NETLINK_KOBJECT_UEVENT);
 
 	/* test using data that looks like a zero-length C string */
@@ -44,17 +53,17 @@ main(void)
 	buf[0] = '=';
 	fill_memory_ex(buf + 1, DEFAULT_STRLEN, 0, DEFAULT_STRLEN);
 
-	rc = sendto(fd, buf + 1, DEFAULT_STRLEN, MSG_DONTWAIT, NULL, 0);
+	sys_send(fd, buf + 1, DEFAULT_STRLEN);
 	printf("sendto(%d, ", fd);
 	print_quoted_memory(buf + 1, DEFAULT_STRLEN);
 	printf(", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       DEFAULT_STRLEN, sprintrc(rc));
+	       DEFAULT_STRLEN, errstr);
 
-	rc = sendto(fd, buf, DEFAULT_STRLEN + 1, MSG_DONTWAIT, NULL, 0);
+	sys_send(fd, buf, DEFAULT_STRLEN + 1);
 	printf("sendto(%d, ", fd);
 	print_quoted_memory(buf, DEFAULT_STRLEN);
 	printf("..., %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       DEFAULT_STRLEN + 1, sprintrc(rc));
+	       DEFAULT_STRLEN + 1, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
