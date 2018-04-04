@@ -33,9 +33,6 @@
 #include "xstring.h"
 #include <stdarg.h>
 
-#define xlat_verbose(style_) ((style_) & XLAT_STYLE_VERBOSITY_MASK)
-#define xlat_format(style_)  ((style_) & XLAT_STYLE_FORMAT_MASK)
-
 static inline enum xlat_style
 get_xlat_style(enum xlat_style style)
 {

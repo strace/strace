@@ -595,6 +595,9 @@ extern void printaddr(kernel_ulong_t addr);
 #define XLAT_STYLE_FORMAT_SHIFT   2
 #define XLAT_STYLE_FORMAT_MASK    (3 << XLAT_STYLE_FORMAT_SHIFT)
 
+#define xlat_verbose(style_) ((style_) & XLAT_STYLE_VERBOSITY_MASK)
+#define xlat_format(style_)  ((style_) & XLAT_STYLE_FORMAT_MASK)
+
 enum xlat_style {
 	/**
 	 * Special value that is used for passing to *print{xval,flags}*_ex
