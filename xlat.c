@@ -400,12 +400,15 @@ print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
 	style = get_xlat_style(style);
 
 	switch (xlat_verbose(style)) {
+	case XLAT_STYLE_ABBREV:
+		if (str) {
+			tprints(str);
+			break;
+		}
+		ATTRIBUTE_FALLTHROUGH;
+
 	case XLAT_STYLE_RAW:
 		print_xlat_val(val, style);
-		break;
-
-	case XLAT_STYLE_ABBREV:
-		tprints(str);
 		break;
 
 	default:
