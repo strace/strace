@@ -113,7 +113,7 @@ tprint_sock_type(unsigned int flags)
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 
 	if (str) {
-		tprints(str);
+		print_xlat_ex(flags & SOCK_TYPE_MASK, str, XLAT_STYLE_DEFAULT);
 		flags &= ~SOCK_TYPE_MASK;
 		if (!flags)
 			return;
