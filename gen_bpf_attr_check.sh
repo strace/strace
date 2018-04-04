@@ -57,6 +57,12 @@ for struct in $(sed -n 's/^struct \(BPF_[^[:space:]]\+_struct\) .*/\1/p' < "$inp
 # endif /* HAVE_UNION_BPF_ATTR_$ENUM$FIELD */
 EOF
 	done
+		cat <<EOF
+
+static_assert(${struct}_size == expected_${struct}_size,
+	      "${struct}_size mismatch");
+EOF
+
 done
 
 cat <<'EOF'
