@@ -40,7 +40,28 @@
 # define MS_RELATIME (1ul << 21)
 #endif
 
-#define str_ro_nosuid_nodev_noexec "MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC"
+#if XLAT_RAW
+# define str_mgc_val "0xc0ed0000"
+# define str_remount "0x20"
+# define str_bind "0x1000"
+# define str_ro_nosuid_nodev_noexec "0xf"
+# define str_ro_nosuid_nodev_noexec_relatime "0x20000f"
+#elif XLAT_VERBOSE
+# define str_mgc_val "0xc0ed0000 /* MS_MGC_VAL */"
+# define str_remount "0x20 /* MS_REMOUNT */"
+# define str_bind "0x1000 /* MS_BIND */"
+# define str_ro_nosuid_nodev_noexec \
+	"0xf /* MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC */"
+# define str_ro_nosuid_nodev_noexec_relatime \
+	"0x20000f /* MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_RELATIME */"
+#else /* !XLAT_RAW && !XLAT_VERBOSE */
+# define str_mgc_val "MS_MGC_VAL"
+# define str_remount "MS_REMOUNT"
+# define str_bind "MS_BIND"
+# define str_ro_nosuid_nodev_noexec "MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC"
+# define str_ro_nosuid_nodev_noexec_relatime \
+	"MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_RELATIME"
+#endif /* XLAT_RAW, XLAT_VERBOSE */
 
 int
 main(void)
@@ -58,26 +79,26 @@ main(void)
 	rc = mount(source, target, fstype, MS_RELATIME | 15, data);
 	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
 	       source, target, fstype,
-	       str_ro_nosuid_nodev_noexec "|MS_RELATIME",
+	       str_ro_nosuid_nodev_noexec_relatime,
 	       data, rc, errno2name());
 
 	rc = mount(source, target, fstype, MS_MGC_VAL, data);
 	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
-	       source, target, fstype, "MS_MGC_VAL", data, rc, errno2name());
+	       source, target, fstype, str_mgc_val, data, rc, errno2name());
 
 	rc = mount(source, target, fstype, MS_MGC_VAL | 15, data);
 	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
 	       source, target, fstype,
-	       "MS_MGC_VAL|" str_ro_nosuid_nodev_noexec,
+	       str_mgc_val "|" str_ro_nosuid_nodev_noexec,
 	       data, rc, errno2name());
 
 	rc = mount(source, target, fstype, MS_REMOUNT, data);
 	printf("mount(\"%s\", \"%s\", %p, %s, \"%s\") = %d %s (%m)\n",
-	       source, target, fstype, "MS_REMOUNT", data, rc, errno2name());
+	       source, target, fstype, str_remount, data, rc, errno2name());
 
 	rc = mount(source, target, fstype, MS_BIND, data);
 	printf("mount(\"%s\", \"%s\", %p, %s, %p) = %d %s (%m)\n",
-	       source, target, fstype, "MS_BIND", data, rc, errno2name());
+	       source, target, fstype, str_bind, data, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
 	return 0;

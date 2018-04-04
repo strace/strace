@@ -165,6 +165,9 @@ mmsg
 mmsg_name
 modify_ldt
 mount
+mount-Xabbrev
+mount-Xraw
+mount-Xverbose
 move_pages
 mq
 mq_sendrecv
