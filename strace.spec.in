@@ -5,7 +5,7 @@ Release: 1%{?dist}
 License: BSD
 Group: Development/Debuggers
 URL: https://strace.io
-Source: https://github.com/strace/strace/releases/download/v%{version}/strace-%{version}.tar.xz
+Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
 BuildRequires: gcc
 %if 0%{?fedora} >= 18 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
 BuildRequires: pkgconfig(bluez)
