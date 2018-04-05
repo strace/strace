@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012 The Chromium OS Authors.
- * Copyright (c) 2012-2017 The strace developers.
+ * Copyright (c) 2012-2018 The strace developers.
  * Written by Mike Frysinger <vapier@gentoo.org>.
  *
  * Redistribution and use in source and binary forms, with or without
