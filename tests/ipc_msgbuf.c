@@ -28,6 +28,7 @@
  */
 
 #include "tests.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -43,9 +44,12 @@ cleanup(void)
 {
 	if (msqid != -1) {
 		int rc = msgctl(msqid, IPC_RMID, 0);
+		printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) = 0\n",
+		       msqid);
 		msqid = -1;
 		if (rc == -1)
 			return 77;
+		puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
 	}
 	return 0;
 }
@@ -64,11 +68,21 @@ main(void)
 	msqid = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
 	if (msqid == -1)
 		perror_msg_and_skip("msgget");
+	printf("msgget\\(IPC_PRIVATE, IPC_CREAT\\|0700\\) = %d\n", msqid);
+
 	typedef void (*atexit_func)(void);
 	atexit((atexit_func) cleanup);
+
+	printf("msgsnd\\(%d, \\{%lld, \"" text_string "\\\\0\"\\}, 14, 0\\)"
+	       " = 0\n",
+	       msqid, (long long) mtype);
 	if (msgsnd(msqid, &msg, msgsz, 0) == -1)
 		perror_msg_and_skip("msgsnd");
 	if (msgrcv(msqid, &msg, msgsz, mtype, 0) != msgsz)
 		perror_msg_and_skip("msgrcv");
+	printf("msgrcv\\(%d, \\{%lld, \"" text_string "\\\\0\"\\}, 14, %lld"
+	       ", 0\\) = 14\n",
+	       msqid, (long long) mtype, (long long) mtype);
+
 	return cleanup();
 }

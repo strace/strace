@@ -369,7 +369,6 @@ EXTRA_DIST = \
 	init.sh \
 	init_delete_module.h \
 	ipc.sh \
-	ipc_msgbuf.expected \
 	ksysent.sed \
 	lstatx.c \
 	match.awk \
