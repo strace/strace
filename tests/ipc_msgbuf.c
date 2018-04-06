@@ -30,6 +30,8 @@
 #include "tests.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <asm/unistd.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/stat.h>
@@ -55,9 +57,21 @@ cleanup(void)
 }
 
 int
+sys_msgrcv(int msqid, void *msgp, size_t sz, kernel_long_t msgtyp,
+	   int msgflg)
+{
+#if defined __x86_64__ && defined __ILP32__
+	return syscall(__NR_msgrcv, msqid, msgp, sz, msgtyp, msgflg);
+#else
+	return msgrcv(msqid, msgp, sz, msgtyp, msgflg);
+#endif
+}
+
+int
 main(void)
 {
-	const long mtype = 0xdefaced;
+	/* mtype has to be positive */
+	const kernel_long_t mtype = (kernel_long_t) 0x7facefed5adc0dedULL;
 	struct {
 		kernel_long_t mtype;
 		char mtext[msgsz];
@@ -78,11 +92,12 @@ main(void)
 	       msqid, (long long) mtype);
 	if (msgsnd(msqid, &msg, msgsz, 0) == -1)
 		perror_msg_and_skip("msgsnd");
-	if (msgrcv(msqid, &msg, msgsz, mtype, 0) != msgsz)
+
+	if (sys_msgrcv(msqid, &msg, msgsz, -mtype, 0) != msgsz)
 		perror_msg_and_skip("msgrcv");
 	printf("msgrcv\\(%d, \\{%lld, \"" text_string "\\\\0\"\\}, 14, %lld"
 	       ", 0\\) = 14\n",
-	       msqid, (long long) mtype, (long long) mtype);
+	       msqid, (long long) mtype, -(long long) mtype);
 
 	return cleanup();
 }
