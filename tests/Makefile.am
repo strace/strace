@@ -392,7 +392,9 @@ EXTRA_DIST = \
 	strace-E.expected \
 	strace-T.expected \
 	strace-ff.expected \
+	strace-k-demangle.expected \
 	strace-k-demangle.test \
+	strace-k.expected \
 	strace-k.test \
 	strace-r.expected \
 	strace.supp \

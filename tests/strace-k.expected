@@ -1,0 +1,1 @@
+(__kernel_vsyscall )?(__)?getpid f3 f2 f1 f0 main

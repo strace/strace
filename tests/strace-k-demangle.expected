@@ -1,0 +1,1 @@
+(__kernel_vsyscall )?(__)?getpid ns::f3\(int\) ns::f2\(int\) ns::f1\(int\) ns::f0\(int\) main
