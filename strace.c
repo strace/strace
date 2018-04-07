@@ -65,7 +65,7 @@ extern char **environ;
 extern int optind;
 extern char *optarg;
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
 bool stack_trace_enabled;
 #endif
@@ -203,12 +203,12 @@ static void
 print_version(void)
 {
 	static const char features[] =
-#ifdef USE_LIBUNWIND
-		" stack-unwind"
-#endif /* USE_LIBUNWIND */
+#ifdef ENABLE_STACKTRACE
+		" stack-trace=" USE_UNWINDER
+#endif
 #ifdef USE_DEMANGLE
 		" stack-demangle"
-#endif /* USE_DEMANGLE */
+#endif
 #if SUPPORTED_PERSONALITIES > 1
 # if defined HAVE_M32_MPERS
 		" m32-mpers"
@@ -248,7 +248,7 @@ Output format:\n\
   -a column      alignment COLUMN for printing syscall results (default %d)\n\
   -i             print instruction pointer at time of syscall\n\
 "
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 "\
   -k             obtain stack trace between each syscall (experimental)\n\
 "
@@ -753,7 +753,7 @@ alloctcb(int pid)
 			tcp->currpers = current_personality;
 #endif
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 			if (stack_trace_enabled)
 				unwind_tcb_init(tcp);
 #endif
@@ -810,7 +810,7 @@ droptcb(struct tcb *tcp)
 
 	free_tcb_priv_data(tcp);
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 	if (stack_trace_enabled) {
 		unwind_tcb_fin(tcp);
 	}
@@ -1592,7 +1592,7 @@ init(int argc, char *argv[])
 #endif
 	qualify("signal=all");
 	while ((c = getopt(argc, argv, "+"
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 	    "k"
 #endif
 	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxyz")) != EOF) {
@@ -1653,7 +1653,7 @@ init(int argc, char *argv[])
 			if (opt_intr <= 0)
 				error_opt_arg(c, optarg);
 			break;
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 		case 'k':
 			stack_trace_enabled = true;
 			break;
@@ -1754,7 +1754,7 @@ init(int argc, char *argv[])
 	if (cflag == CFLAG_ONLY_STATS) {
 		if (iflag)
 			error_msg("-%c has no effect with -c", 'i');
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 		if (stack_trace_enabled)
 			error_msg("-%c has no effect with -c", 'k');
 #endif
@@ -1774,7 +1774,7 @@ init(int argc, char *argv[])
 
 	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 	if (stack_trace_enabled) {
 		unsigned int tcbi;
 

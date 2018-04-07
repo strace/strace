@@ -257,7 +257,7 @@ Print the instruction pointer at the time of the system call.
 Print the execution stack trace of the traced processes after each system call (experimental).
 This option is available only if
 .B strace
-is built with libunwind.
+is built using \-\-enable\-stacktrace configure option.
 .TP
 .BI "\-o " filename
 Write the trace output to the file

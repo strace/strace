@@ -222,7 +222,7 @@ struct tcb {
 	unsigned int mmap_cache_size;
 	unsigned int mmap_cache_generation;
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 	void *unwind_ctx;
 	struct unwind_queue_t *unwind_queue;
 #endif
@@ -377,7 +377,7 @@ extern struct path_set {
 #define tracing_paths (global_path_set.num_selected != 0)
 extern unsigned xflag;
 extern unsigned followfork;
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
 extern bool stack_trace_enabled;
 #endif
@@ -732,7 +732,7 @@ extern void ts_sub(struct timespec *, const struct timespec *, const struct time
 extern void ts_mul(struct timespec *, const struct timespec *, int);
 extern void ts_div(struct timespec *, const struct timespec *, int);
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 extern void unwind_init(void);
 extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);

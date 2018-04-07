@@ -705,7 +705,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		return 0;
 	}
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 	if (stack_trace_enabled) {
 		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
 			unwind_tcb_capture(tcp);
@@ -959,7 +959,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	dumpio(tcp);
 	line_ended();
 
-#ifdef USE_LIBUNWIND
+#ifdef ENABLE_STACKTRACE
 	if (stack_trace_enabled)
 		unwind_tcb_print(tcp);
 #endif
