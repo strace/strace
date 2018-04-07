@@ -63,10 +63,12 @@ SYS_FUNC(shmget)
 	if (flags || !hugetlb_value)
 		printflags(shm_resource_flags, flags, NULL);
 
-	if (hugetlb_value)
-		tprintf("%s%u<<SHM_HUGE_SHIFT",
+	if (hugetlb_value) {
+		tprintf("%s%u<<",
 			flags ? "|" : "",
 			hugetlb_value >> SHM_HUGE_SHIFT);
+		print_xlat_u(SHM_HUGE_SHIFT);
+	}
 
 	if (flags || hugetlb_value)
 		tprints("|");
