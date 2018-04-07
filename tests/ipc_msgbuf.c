@@ -41,13 +41,30 @@
 
 static int msqid = -1;
 
+#if XLAT_RAW
+# define str_ipc_creat "0x200"
+# define str_ipc_private "0"
+# define str_ipc_rmid "0"
+# define str_ipc_64 "0x100"
+#elif XLAT_VERBOSE
+# define str_ipc_creat "0x200 /\\* IPC_CREAT \\*/"
+# define str_ipc_private "0 /\\* IPC_PRIVATE \\*/"
+# define str_ipc_rmid "0 /\\* IPC_RMID \\*/"
+# define str_ipc_64 "0x100 /\\* IPC_64 \\*/"
+#else
+# define str_ipc_creat "IPC_CREAT"
+# define str_ipc_private "IPC_PRIVATE"
+# define str_ipc_rmid "IPC_RMID"
+# define str_ipc_64 "IPC_64"
+#endif
+
 static int
 cleanup(void)
 {
 	if (msqid != -1) {
 		int rc = msgctl(msqid, IPC_RMID, 0);
-		printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) = 0\n",
-		       msqid);
+		printf("msgctl\\(%d, (%s\\|)?%s, NULL\\) = 0\n",
+		       msqid, str_ipc_64, str_ipc_rmid);
 		msqid = -1;
 		if (rc == -1)
 			return 77;
@@ -82,7 +99,8 @@ main(void)
 	msqid = msgget(IPC_PRIVATE, IPC_CREAT | S_IRWXU);
 	if (msqid == -1)
 		perror_msg_and_skip("msgget");
-	printf("msgget\\(IPC_PRIVATE, IPC_CREAT\\|0700\\) = %d\n", msqid);
+	printf("msgget\\(%s, %s\\|0700\\) = %d\n",
+	       str_ipc_private, str_ipc_creat, msqid);
 
 	typedef void (*atexit_func)(void);
 	atexit((atexit_func) cleanup);

@@ -151,8 +151,20 @@ ioprio	-a18 -e trace=ioprio_get,ioprio_set
 ip_mreq	-e trace=setsockopt
 ipc	-a19
 ipc_msg	+ipc.sh -a26
+ipc_msg-Xabbrev	+ipc.sh -Xabbrev -a26
+ipc_msg-Xraw	+ipc.sh -Xraw -a16
+ipc_msg-Xverbose	+ipc.sh -Xverbose -a34
+ipc_msgbuf-Xabbrev	+ipc_msgbuf.test -Xabbrev
+ipc_msgbuf-Xraw	+ipc_msgbuf.test -Xraw -a22
+ipc_msgbuf-Xverbose	+ipc_msgbuf.test -Xverbose
 ipc_sem	+ipc.sh -a29
+ipc_sem-Xabbrev	+ipc.sh -Xabbrev -a29
+ipc_sem-Xraw	+ipc.sh -Xraw -a19
+ipc_sem-Xverbose	+ipc.sh -Xverbose -a36
 ipc_shm	+ipc.sh -a29
+ipc_shm-Xabbrev	+ipc.sh -Xabbrev -a29
+ipc_shm-Xraw	+ipc.sh -Xraw -a19
+ipc_shm-Xverbose	+ipc.sh -Xverbose -a36
 kcmp	-a22
 kcmp-y	-a22 -y -e trace=kcmp
 kern_features -a16

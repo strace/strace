@@ -44,13 +44,52 @@
 #include "xlat.h"
 #include "xlat/shm_resource_flags.h"
 
+#if XLAT_RAW
+# define str_ipc_flags "0x2ce1e00"
+# define str_shm_huge "21<<26"
+# define str_ipc_private "0"
+# define str_ipc_rmid "0"
+# define str_ipc_set "0x1"
+# define str_ipc_stat "0x2"
+# define str_shm_stat "0xd"
+# define str_shm_info "0xe"
+# define str_ipc_64 "0x100"
+# define str_bogus_cmd "0xdefaced2"
+#elif XLAT_VERBOSE
+# define str_ipc_flags \
+	"0x2ce1e00 /\\* IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE" \
+	"\\|0x2ce0000 \\*/"
+# define str_shm_huge "21<<26 /\\* SHM_HUGE_SHIFT \\*/"
+# define str_ipc_private "0 /\\* IPC_PRIVATE \\*/"
+# define str_ipc_rmid "0 /\\* IPC_RMID \\*/"
+# define str_ipc_set "0x1 /\\* IPC_SET \\*/"
+# define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
+# define str_shm_stat "0xd /\\* SHM_STAT \\*/"
+# define str_shm_info "0xe /\\* SHM_INFO \\*/"
+# define str_ipc_64 "0x100 /\\* IPC_64 \\*/"
+# define str_bogus_cmd "0xdefaced2 /\\* SHM_\\?\\?\\? \\*/"
+#else
+# define str_ipc_flags \
+	"IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE\\|0x2ce0000"
+# define str_shm_huge "21<<SHM_HUGE_SHIFT"
+# define str_ipc_private "IPC_PRIVATE"
+# define str_ipc_rmid "IPC_RMID"
+# define str_ipc_set "IPC_SET"
+# define str_ipc_stat "IPC_STAT"
+# define str_shm_stat "SHM_STAT"
+# define str_shm_info "SHM_INFO"
+# define str_ipc_64 "IPC_64"
+# define str_bogus_cmd "0xdefaced2 /\\* SHM_\\?\\?\\? \\*/"
+#endif
+
 static int id = -1;
 
 static void
 cleanup(void)
 {
 	shmctl(id, IPC_RMID, NULL);
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) = 0\n", id);
+	printf("shmctl\\(%d, (%s\\|)?%s, NULL\\) = 0\n",
+	       id, str_ipc_64, str_ipc_rmid);
 	id = -1;
 }
 
@@ -89,7 +128,7 @@ main(void)
 	rc = shmget(bogus_key, bogus_size, huge_flags);
 	printf("shmget\\(%#llx, %zu, %s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
-	       "21<<SHM_HUGE_SHIFT", 0, sprintrc_grep(rc));
+	       str_shm_huge, 0, sprintrc_grep(rc));
 
 	bogus_flags = 0xface1e55 & ~(bogus_ipc_shm_flags | huge_mask);
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
@@ -100,19 +139,16 @@ main(void)
 
 	bogus_flags |= bogus_ipc_shm_flags;
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%#03o\\) = %s\n",
+	printf("shmget\\(%#llx, %zu, %s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
-	       "IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE",
-	       bogus_flags & ~(0777 | bogus_ipc_shm_flags),
+	       str_ipc_flags,
 	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	bogus_flags |= huge_flags;
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%s\\|%#03o\\) = %s\n",
+	printf("shmget\\(%#llx, %zu, %s\\|%s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
-	       "IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE",
-	       bogus_flags & ~(0777 | bogus_ipc_shm_flags | huge_mask),
-	       "21<<SHM_HUGE_SHIFT",
+	       str_ipc_flags, str_shm_huge,
 	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	bogus_flags &= ~bogus_ipc_shm_flags;
@@ -120,30 +156,32 @@ main(void)
 	printf("shmget\\(%#llx, %zu, %#x\\|%s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       bogus_flags & ~(0777 | huge_mask),
-	       "21<<SHM_HUGE_SHIFT",
+	       str_shm_huge,
 	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	id = shmget(private_key, 1, 0600);
 	if (id < 0)
 		perror_msg_and_skip("shmget");
-	printf("shmget\\(IPC_PRIVATE, 1, 0600\\) = %d\n", id);
+	printf("shmget\\(%s, 1, 0600\\) = %d\n", str_ipc_private, id);
 	atexit(cleanup);
 
 	rc = shmctl(bogus_id, bogus_cmd, NULL);
-	printf("shmctl\\(%d, (IPC_64\\|)?%#x /\\* SHM_\\?\\?\\? \\*/, NULL\\)"
-	       " = %s\n", bogus_id, bogus_cmd, sprintrc_grep(rc));
+	printf("shmctl\\(%d, (%s\\|)?%s, NULL\\) = %s\n",
+	       bogus_id, str_ipc_64, str_bogus_cmd, sprintrc_grep(rc));
 
 	rc = shmctl(bogus_id, IPC_STAT, bogus_addr);
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, %p\\) = %s\n",
-	       bogus_id, bogus_addr, sprintrc_grep(rc));
+	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+	       bogus_id, str_ipc_64, str_ipc_stat, bogus_addr,
+	       sprintrc_grep(rc));
 
 	if (shmctl(id, IPC_STAT, &ds))
 		perror_msg_and_skip("shmctl IPC_STAT");
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, \\{shm_perm=\\{uid=%u, gid=%u, "
+	printf("shmctl\\(%d, (%s\\|)?%s, \\{shm_perm=\\{uid=%u, gid=%u, "
 		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u, shm_cpid=%u, "
 		"shm_lpid=%u, shm_nattch=%u, shm_atime=%u, shm_dtime=%u, "
 		"shm_ctime=%u\\}\\) = 0\n",
-		id, (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
+		id, str_ipc_64, str_ipc_stat,
+		(unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
 		(unsigned) ds.shm_perm.mode, (unsigned) ds.shm_perm.__key,
 		(unsigned) ds.shm_perm.cuid, (unsigned) ds.shm_perm.cgid,
 		(unsigned) ds.shm_segsz, (unsigned) ds.shm_cpid,
@@ -153,18 +191,19 @@ main(void)
 
 	if (shmctl(id, IPC_SET, &ds))
 		perror_msg_and_skip("shmctl IPC_SET");
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_SET, \\{shm_perm=\\{uid=%u, gid=%u"
+	printf("shmctl\\(%d, (%s\\|)?%s, \\{shm_perm=\\{uid=%u, gid=%u"
 	       ", mode=%#o\\}, ...\\}\\) = 0\n",
-	       id, (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
+	       id, str_ipc_64, str_ipc_set,
+	       (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
 	       (unsigned) ds.shm_perm.mode);
 
 	rc = shmctl(0, SHM_INFO, &ds);
-	printf("shmctl\\(0, (IPC_64\\|)?SHM_INFO, %p\\) = %s\n",
-	       &ds, sprintrc_grep(rc));
+	printf("shmctl\\(0, (%s\\|)?%s, %p\\) = %s\n",
+	       str_ipc_64, str_shm_info, &ds, sprintrc_grep(rc));
 
 	rc = shmctl(id, SHM_STAT, &ds);
-	printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) = %s\n",
-	       id, &ds, sprintrc_grep(rc));
+	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+	       id, str_ipc_64, str_shm_stat, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
