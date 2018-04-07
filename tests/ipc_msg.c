@@ -58,7 +58,7 @@ static void
 cleanup(void)
 {
 	msgctl(id, IPC_RMID, NULL);
-	printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) += 0\n", id);
+	printf("msgctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) = 0\n", id);
 	id = -1;
 }
 
@@ -79,7 +79,7 @@ main(void)
 	struct msqid_ds ds;
 
 	rc = msgget(bogus_key, bogus_flags);
-	printf("msgget\\(%#llx, %s%s%s%#x\\|%#04o\\) += %s\n",
+	printf("msgget\\(%#llx, %s%s%s%#x\\|%#04o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key),
 	       IPC_CREAT & bogus_flags ? "IPC_CREAT\\|" : "",
 	       IPC_EXCL & bogus_flags ? "IPC_EXCL\\|" : "",
@@ -90,16 +90,16 @@ main(void)
 	id = msgget(private_key, 0600);
 	if (id < 0)
 		perror_msg_and_skip("msgget");
-	printf("msgget\\(IPC_PRIVATE, 0600\\) += %d\n", id);
+	printf("msgget\\(IPC_PRIVATE, 0600\\) = %d\n", id);
 	atexit(cleanup);
 
 	rc = msgctl(bogus_msgid, bogus_cmd, NULL);
 	printf("msgctl\\(%d, (IPC_64\\|)?%#x /\\* MSG_\\?\\?\\? \\*/, NULL\\)"
-	       " += %s\n", bogus_msgid, bogus_cmd, sprintrc_grep(rc));
+	       " = %s\n", bogus_msgid, bogus_cmd, sprintrc_grep(rc));
 
 #if TEST_MSGCTL_BOGUS_ADDR
 	rc = msgctl(bogus_msgid, IPC_SET, bogus_addr);
-	printf("msgctl\\(%d, (IPC_64\\|)?IPC_SET, %p\\) += %s\n",
+	printf("msgctl\\(%d, (IPC_64\\|)?IPC_SET, %p\\) = %s\n",
 	       bogus_msgid, bogus_addr, sprintrc_grep(rc));
 #endif
 
@@ -108,7 +108,7 @@ main(void)
 	printf("msgctl\\(%d, (IPC_64\\|)?IPC_STAT, \\{msg_perm=\\{uid=%u"
 	       ", gid=%u, mode=%#o, key=%u, cuid=%u, cgid=%u\\}, msg_stime=%u"
 	       ", msg_rtime=%u, msg_ctime=%u, msg_qnum=%u, msg_qbytes=%u"
-	       ", msg_lspid=%u, msg_lrpid=%u\\}\\) += 0\n",
+	       ", msg_lspid=%u, msg_lrpid=%u\\}\\) = 0\n",
 	       id, (unsigned) ds.msg_perm.uid, (unsigned) ds.msg_perm.gid,
 	       (unsigned) ds.msg_perm.mode, (unsigned) ds.msg_perm.__key,
 	       (unsigned) ds.msg_perm.cuid, (unsigned) ds.msg_perm.cgid,
@@ -120,16 +120,16 @@ main(void)
 	if (msgctl(id, IPC_SET, &ds))
 		perror_msg_and_skip("msgctl IPC_SET");
 	printf("msgctl\\(%d, (IPC_64\\|)?IPC_SET, \\{msg_perm=\\{uid=%u"
-	       ", gid=%u, mode=%#o\\}, ...\\}\\) += 0\n",
+	       ", gid=%u, mode=%#o\\}, ...\\}\\) = 0\n",
 	       id, (unsigned) ds.msg_perm.uid, (unsigned) ds.msg_perm.gid,
 	       (unsigned) ds.msg_perm.mode);
 
 	rc = msgctl(0, MSG_INFO, &ds);
-	printf("msgctl\\(0, (IPC_64\\|)?MSG_INFO, %p\\) += %s\n",
+	printf("msgctl\\(0, (IPC_64\\|)?MSG_INFO, %p\\) = %s\n",
 	       &ds, sprintrc_grep(rc));
 
 	rc = msgctl(id, MSG_STAT, &ds);
-	printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) += %s\n",
+	printf("msgctl\\(%d, (IPC_64\\|)?MSG_STAT, %p\\) = %s\n",
 	       id, &ds, sprintrc_grep(rc));
 
 	return 0;

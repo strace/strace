@@ -150,9 +150,9 @@ iopl	-a8
 ioprio	-a18 -e trace=ioprio_get,ioprio_set
 ip_mreq	-e trace=setsockopt
 ipc	-a19
-ipc_msg	+ipc.sh
-ipc_sem	+ipc.sh
-ipc_shm	+ipc.sh
+ipc_msg	+ipc.sh -a26
+ipc_sem	+ipc.sh -a29
+ipc_shm	+ipc.sh -a29
 kcmp	-a22
 kcmp-y	-a22 -y -e trace=kcmp
 kern_features -a16

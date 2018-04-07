@@ -50,7 +50,7 @@ static void
 cleanup(void)
 {
 	shmctl(id, IPC_RMID, NULL);
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) += 0\n", id);
+	printf("shmctl\\(%d, (IPC_64\\|)?IPC_RMID, NULL\\) = 0\n", id);
 	id = -1;
 }
 
@@ -82,25 +82,25 @@ main(void)
 	struct shmid_ds ds;
 
 	rc = shmget(bogus_key, bogus_size, 0);
-	printf("shmget\\(%#llx, %zu, 000\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, 000\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       sprintrc_grep(rc));
 
 	rc = shmget(bogus_key, bogus_size, huge_flags);
-	printf("shmget\\(%#llx, %zu, %s\\|%#03o\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, %s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       "21<<SHM_HUGE_SHIFT", 0, sprintrc_grep(rc));
 
 	bogus_flags = 0xface1e55 & ~(bogus_ipc_shm_flags | huge_mask);
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %#x\\|%#03o\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, %#x\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       bogus_flags & ~0777,
 	       bogus_flags & 0777, sprintrc_grep(rc));
 
 	bogus_flags |= bogus_ipc_shm_flags;
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%#03o\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       "IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE",
 	       bogus_flags & ~(0777 | bogus_ipc_shm_flags),
@@ -108,7 +108,7 @@ main(void)
 
 	bogus_flags |= huge_flags;
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%s\\|%#03o\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, %s\\|%#x\\|%s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       "IPC_CREAT\\|IPC_EXCL\\|SHM_HUGETLB\\|SHM_NORESERVE",
 	       bogus_flags & ~(0777 | bogus_ipc_shm_flags | huge_mask),
@@ -117,7 +117,7 @@ main(void)
 
 	bogus_flags &= ~bogus_ipc_shm_flags;
 	rc = shmget(bogus_key, bogus_size, bogus_flags);
-	printf("shmget\\(%#llx, %zu, %#x\\|%s\\|%#03o\\) += %s\n",
+	printf("shmget\\(%#llx, %zu, %#x\\|%s\\|%#03o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
 	       bogus_flags & ~(0777 | huge_mask),
 	       "21<<SHM_HUGE_SHIFT",
@@ -126,15 +126,15 @@ main(void)
 	id = shmget(private_key, 1, 0600);
 	if (id < 0)
 		perror_msg_and_skip("shmget");
-	printf("shmget\\(IPC_PRIVATE, 1, 0600\\) += %d\n", id);
+	printf("shmget\\(IPC_PRIVATE, 1, 0600\\) = %d\n", id);
 	atexit(cleanup);
 
 	rc = shmctl(bogus_id, bogus_cmd, NULL);
 	printf("shmctl\\(%d, (IPC_64\\|)?%#x /\\* SHM_\\?\\?\\? \\*/, NULL\\)"
-	       " += %s\n", bogus_id, bogus_cmd, sprintrc_grep(rc));
+	       " = %s\n", bogus_id, bogus_cmd, sprintrc_grep(rc));
 
 	rc = shmctl(bogus_id, IPC_STAT, bogus_addr);
-	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, %p\\) += %s\n",
+	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, %p\\) = %s\n",
 	       bogus_id, bogus_addr, sprintrc_grep(rc));
 
 	if (shmctl(id, IPC_STAT, &ds))
@@ -142,7 +142,7 @@ main(void)
 	printf("shmctl\\(%d, (IPC_64\\|)?IPC_STAT, \\{shm_perm=\\{uid=%u, gid=%u, "
 		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u, shm_cpid=%u, "
 		"shm_lpid=%u, shm_nattch=%u, shm_atime=%u, shm_dtime=%u, "
-		"shm_ctime=%u\\}\\) += 0\n",
+		"shm_ctime=%u\\}\\) = 0\n",
 		id, (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
 		(unsigned) ds.shm_perm.mode, (unsigned) ds.shm_perm.__key,
 		(unsigned) ds.shm_perm.cuid, (unsigned) ds.shm_perm.cgid,
@@ -154,16 +154,16 @@ main(void)
 	if (shmctl(id, IPC_SET, &ds))
 		perror_msg_and_skip("shmctl IPC_SET");
 	printf("shmctl\\(%d, (IPC_64\\|)?IPC_SET, \\{shm_perm=\\{uid=%u, gid=%u"
-	       ", mode=%#o\\}, ...\\}\\) += 0\n",
+	       ", mode=%#o\\}, ...\\}\\) = 0\n",
 	       id, (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
 	       (unsigned) ds.shm_perm.mode);
 
 	rc = shmctl(0, SHM_INFO, &ds);
-	printf("shmctl\\(0, (IPC_64\\|)?SHM_INFO, %p\\) += %s\n",
+	printf("shmctl\\(0, (IPC_64\\|)?SHM_INFO, %p\\) = %s\n",
 	       &ds, sprintrc_grep(rc));
 
 	rc = shmctl(id, SHM_STAT, &ds);
-	printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) += %s\n",
+	printf("shmctl\\(%d, (IPC_64\\|)?SHM_STAT, %p\\) = %s\n",
 	       id, &ds, sprintrc_grep(rc));
 
 	return 0;
