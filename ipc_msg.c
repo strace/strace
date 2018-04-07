@@ -99,7 +99,7 @@ fetch_msgrcv_args(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr, &tmp))
 			return -1;
 		pair[0] = tmp[0];
-		pair[1] = tmp[1];
+		pair[1] = (int) tmp[1];
 	}
 	return 0;
 }
