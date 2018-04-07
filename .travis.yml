@@ -21,35 +21,35 @@ matrix:
     - compiler: gcc
       env:
         - TARGET=x86_64
-    - compiler: gcc
-      env:
-        - TARGET=x32
-    - compiler: gcc
-      env:
-        - TARGET=x86
-    - compiler: clang
-      env:
-        - TARGET=x86_64
-    - compiler: musl-gcc
-      env:
-        - TARGET=x86_64
-    - compiler: clang
-      env:
-        - TARGET=x86
-    - compiler: musl-gcc
-      env:
-        - TARGET=x86
-    - compiler: gcc-7
-      env:
-        - TARGET=x86_64
-    - compiler: gcc-7
-      env:
-        - TARGET=x32
-    - compiler: gcc-7
-      env:
-        - TARGET=x86
-    - compiler: gcc
-      env:
-        - TARGET=x86_64
         - CHECK=coverage
         - KHEADERS=torvalds/linux
+    - compiler: gcc
+      env:
+        - TARGET=x86_64
+    - compiler: gcc
+      env:
+        - TARGET=x32
+    - compiler: gcc
+      env:
+        - TARGET=x86
+    - compiler: clang
+      env:
+        - TARGET=x86_64
+    - compiler: musl-gcc
+      env:
+        - TARGET=x86_64
+    - compiler: clang
+      env:
+        - TARGET=x86
+    - compiler: musl-gcc
+      env:
+        - TARGET=x86
+    - compiler: gcc-7
+      env:
+        - TARGET=x86_64
+    - compiler: gcc-7
+      env:
+        - TARGET=x32
+    - compiler: gcc-7
+      env:
+        - TARGET=x86
