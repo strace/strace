@@ -61,7 +61,7 @@ build/Makefile: configure
 build-udeb/Makefile: configure
 	mkdir -p $(@D)
 	cd $(@D); sh ../configure --enable-mpers=check --prefix=/usr \
-		--without-libunwind --without-libiberty $(CONFIG_OPTS)
+		--without-stacktrace --without-libiberty $(CONFIG_OPTS)
 
 build64/Makefile: configure
 	mkdir -p $(@D)

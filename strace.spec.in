@@ -10,12 +10,15 @@ BuildRequires: gcc
 %if 0%{?fedora} >= 18 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
 BuildRequires: pkgconfig(bluez)
 %endif
-%if 0%{?fedora} >= 20 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1300
-%define buildrequires_libunwind_devel BuildRequires: libunwind-devel binutils-devel
+%if 0%{?fedora} >= 20 || 0%{?centos} >= 6 || 0%{?rhel} >= 6
+%define buildrequires_stacktrace BuildRequires: elfutils-devel binutils-devel
+%endif
+%if 0%{?suse_version} >= 1100
+%define buildrequires_stacktrace BuildRequires: libdw-devel binutils-devel
 %endif
 %ifarch x86_64
 # for experimental -k option
-%{?buildrequires_libunwind_devel}
+%{?buildrequires_stacktrace}
 %endif
 %define strace64_arches ppc64 sparc64
 %{?!buildroot:BuildRoot: %_tmppath/buildroot-%name-%version-%release}
