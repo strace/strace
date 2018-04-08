@@ -4,3 +4,6 @@ SEGV_STACKFLOW /* 3 - bfin */
 SEGV_BNDERR 3
 __SEGV_PSTKOVF /* 4 - ia64 */
 SEGV_PKUERR 4
+SEGV_ACCADI 5	/* sparc */
+SEGV_ADIDERR 6	/* sparc */
+SEGV_ADIPERR 7	/* sparc */
