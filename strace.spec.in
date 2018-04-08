@@ -16,10 +16,8 @@ BuildRequires: pkgconfig(bluez)
 %if 0%{?suse_version} >= 1100
 %define buildrequires_stacktrace BuildRequires: libdw-devel binutils-devel
 %endif
-%ifarch x86_64
-# for experimental -k option
+# for -k option
 %{?buildrequires_stacktrace}
-%endif
 %define strace64_arches ppc64 sparc64
 %{?!buildroot:BuildRoot: %_tmppath/buildroot-%name-%version-%release}
 
