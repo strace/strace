@@ -50,7 +50,7 @@ filter_entries()
 	local subtype=
 	[ -z "$name" ] ||
 		subtype=".$name"
-	local search='^[[:space:]]\+[^;]*[[:space:]]\([^[:space:];]\+\);$'
+	local search='^[[:space:]]\+[^][;]*[[:space:]]\([^][[:space:];]\+\)\(\[[^;]*\]\)\?;$'
 	local replacement='\t\tunion bpf_attr'"$subtype"'.\1,'
 	sed -n "s/$search/$replacement/p" |
 		sort -u

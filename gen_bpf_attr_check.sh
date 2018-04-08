@@ -44,7 +44,7 @@ for struct in $(sed -n 's/^struct \(BPF_[^[:space:]]\+_struct\) .*/\1/p' < "$inp
 	enum="$enum${enum:+.}"
 	ENUM="$ENUM${ENUM:+_}"
 	sed -n '/^struct '"$struct"' [^{]*{/,/^};$/p' < "$input" |
-	sed -n 's/^[[:space:]]\+[^;]*[[:space:]]\([^[:space:];]\+\);$/\1/p' |
+	sed -n 's/^[[:space:]]\+[^][;]*[[:space:]]\([^][[:space:];]\+\)\(\[[^;]*\]\)\?;$/\1/p' |
 	while read field; do
 		FIELD="$(printf %s "$field" |tr '[:lower:]' '[:upper:]')"
 		cat <<EOF
