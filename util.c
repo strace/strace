@@ -693,7 +693,8 @@ print_quoted_string_ex(const char *str, unsigned int size,
 
 	alloc_size = 4 * size;
 	if (alloc_size / 4 != size) {
-		error_func_msg("Out of memory");
+		error_func_msg("requested %u bytes exceeds %u bytes limit",
+			       size, -1U / 4);
 		tprints("???");
 		return -1;
 	}
@@ -706,7 +707,8 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	} else {
 		outstr = buf = malloc(alloc_size);
 		if (!buf) {
-			error_func_msg("Out of memory");
+			error_func_msg("memory exhausted when tried to allocate"
+				       " %u bytes", alloc_size);
 			tprints("???");
 			return -1;
 		}
@@ -870,25 +872,30 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 	} iovu;
 #define iov iovu.iov64
 #define sizeof_iov \
-	(current_wordsize == 4 ? sizeof(*iovu.iov32) : sizeof(*iovu.iov64))
+	(current_wordsize == 4 ? (unsigned int) sizeof(*iovu.iov32)	\
+			       : (unsigned int) sizeof(*iovu.iov64))
 #define iov_iov_base(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].base : iovu.iov64[i].base)
 #define iov_iov_len(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].len : iovu.iov64[i].len)
 #else
 	struct iovec *iov;
-#define sizeof_iov sizeof(*iov)
+#define sizeof_iov ((unsigned int) sizeof(*iov))
 #define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
 #define iov_iov_len(i) iov[i].iov_len
 #endif
 	int i;
-	unsigned size;
+	unsigned int size = sizeof_iov * len;
+	if (size / sizeof_iov != (unsigned int) len) {
+		error_func_msg("requested %u iovec elements exceeds"
+			       " %u iovec limit", len, -1U / sizeof_iov);
+		return;
+	}
 
-	size = sizeof_iov * len;
-	/* Assuming no sane program has millions of iovs */
-	if ((unsigned)len > 1024*1024 /* insane or negative size? */
-	    || (iov = malloc(size)) == NULL) {
-		error_func_msg("Out of memory");
+	iov = malloc(size);
+	if (!iov) {
+		error_func_msg("memory exhausted when tried to allocate"
+			       " %u bytes", size);
 		return;
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
@@ -938,7 +945,8 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		str = malloc(len + 16);
 		if (!str) {
 			strsize = -1;
-			error_func_msg("Out of memory");
+			error_func_msg("memory exhausted when tried to allocate"
+				       " %zu bytes", (size_t) (len + 16));
 			return;
 		}
 		strsize = len + 16;
