@@ -693,7 +693,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 
 	alloc_size = 4 * size;
 	if (alloc_size / 4 != size) {
-		error_msg("Out of memory");
+		error_func_msg("Out of memory");
 		tprints("???");
 		return -1;
 	}
@@ -706,7 +706,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	} else {
 		outstr = buf = malloc(alloc_size);
 		if (!buf) {
-			error_msg("Out of memory");
+			error_func_msg("Out of memory");
 			tprints("???");
 			return -1;
 		}
@@ -888,7 +888,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 	/* Assuming no sane program has millions of iovs */
 	if ((unsigned)len > 1024*1024 /* insane or negative size? */
 	    || (iov = malloc(size)) == NULL) {
-		error_msg("Out of memory");
+		error_func_msg("Out of memory");
 		return;
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
@@ -935,7 +935,7 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		str = malloc(len + 16);
 		if (!str) {
 			strsize = -1;
-			error_msg("Out of memory");
+			error_func_msg("Out of memory");
 			return;
 		}
 		strsize = len + 16;
