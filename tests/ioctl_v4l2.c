@@ -842,6 +842,21 @@ main(void)
 	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_USER"
 	       ", count=%u}) = -1 EBADF (%m)\n", p_ext_controls->count);
 
+	p_ext_controls->ctrl_class = 0x00a30000;
+	p_ext_controls->count = magic;
+	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
+	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_DETECT"
+	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       p_ext_controls->count, p_ext_controls->controls);
+
+	p_ext_controls->ctrl_class = 0x00a40000;
+	p_ext_controls->count = magic;
+	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
+	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS"
+	       ", {ctrl_class=0xa40000 /* V4L2_CTRL_CLASS_??? */"
+	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       p_ext_controls->count, p_ext_controls->controls);
+
 	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_MPEG;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
