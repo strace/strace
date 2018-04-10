@@ -64,17 +64,6 @@ typedef struct v4l2_standard struct_v4l2_standard;
 #include "print_fields.h"
 #include "xstring.h"
 
-/* some historical constants */
-#ifndef V4L2_CID_HCENTER
-#define V4L2_CID_HCENTER (V4L2_CID_BASE+22)
-#endif
-#ifndef V4L2_CID_VCENTER
-#define V4L2_CID_VCENTER (V4L2_CID_BASE+23)
-#endif
-#ifndef V4L2_CID_BAND_STOP_FILTER
-#define V4L2_CID_BAND_STOP_FILTER (V4L2_CID_BASE+33)
-#endif
-
 /* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
 #ifndef v4l2_fourcc_be
 # define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1 << 31))
@@ -624,6 +613,12 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+/*
+ * We include it here and not before print_v4l2_ext_controls as we need
+ * V4L2_CTRL_CLASS_* definitions for V4L2_CID_*_BASE ones.
+ */
+#include "xlat/v4l2_control_classes.h"
+#include "xlat/v4l2_control_id_bases.h"
 #include "xlat/v4l2_control_ids.h"
 
 static int
@@ -824,8 +819,6 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 
 	return true;
 }
-
-#include "xlat/v4l2_control_classes.h"
 
 static int
 print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
