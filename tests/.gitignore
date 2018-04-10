@@ -62,6 +62,9 @@ fadvise64_64
 fallocate
 fanotify_init
 fanotify_mark
+fanotify_mark-Xabbrev
+fanotify_mark-Xraw
+fanotify_mark-Xverbose
 fchdir
 fchmod
 fchmodat

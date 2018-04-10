@@ -66,6 +66,9 @@ fadvise64_64	+fadvise64.test
 fallocate	-a18
 fanotify_init
 fanotify_mark	-a32
+fanotify_mark-Xabbrev	-a32 -Xabbrev -e trace=fanotify_mark
+fanotify_mark-Xraw	-a32 -Xraw -e trace=fanotify_mark
+fanotify_mark-Xverbose	-a32 -Xverbose -e trace=fanotify_mark
 fchdir	-a11
 fchmod	-a15
 fchmodat
