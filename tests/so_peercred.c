@@ -46,6 +46,28 @@ get_peercred(int fd, void *val, socklen_t *len)
 	return rc;
 }
 
+static const char *
+so_str(void)
+{
+	static char buf[256];
+
+	if (!buf[0]) {
+#if XLAT_RAW
+		snprintf(buf, sizeof(buf),
+			 "%#x, %#x", SOL_SOCKET, SO_PEERCRED);
+#elif XLAT_VERBOSE
+		snprintf(buf, sizeof(buf),
+			 "%#x /* SOL_SOCKET */, %#x /* SO_PEERCRED */",
+			 SOL_SOCKET, SO_PEERCRED);
+#else
+		snprintf(buf, sizeof(buf),
+			 "SOL_SOCKET, SO_PEERCRED");
+#endif
+	}
+
+	return buf;
+}
+
 int
 main(void)
 {
@@ -59,7 +81,7 @@ main(void)
 	/* classic getsockopt */
 	*len = sizeof(*peercred);
 	get_peercred(sv[0], peercred, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED", sv[0]);
+	printf("getsockopt(%d, %s", sv[0], so_str());
 	PRINT_FIELD_D(", {", *peercred, pid);
 	PRINT_FIELD_UID(", ", *peercred, uid);
 	PRINT_FIELD_UID(", ", *peercred, gid);
@@ -72,7 +94,7 @@ main(void)
 	/* getsockopt with optlen larger than necessary - shortened */
 	*len = sizeof(*peercred) + 1;
 	get_peercred(fd, peercred, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED", fd);
+	printf("getsockopt(%d, %s", fd, so_str());
 	PRINT_FIELD_D(", {", *peercred, pid);
 	PRINT_FIELD_UID(", ", *peercred, uid);
 	PRINT_FIELD_UID(", ", *peercred, gid);
@@ -82,14 +104,14 @@ main(void)
 	/* getsockopt with optlen smaller than usual - truncated to ucred.pid */
 	*len = sizeof(peercred->pid);
 	get_peercred(fd, peercred, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED", fd);
+	printf("getsockopt(%d, %s", fd, so_str());
 	PRINT_FIELD_D(", {", *peercred, pid);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/* getsockopt with optlen smaller than usual - truncated to ucred.uid */
 	*len = offsetof(struct ucred, gid);
 	get_peercred(fd, peercred, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED", fd);
+	printf("getsockopt(%d, %s", fd, so_str());
 	PRINT_FIELD_D(", {", *peercred, pid);
 	PRINT_FIELD_UID(", ", *peercred, uid);
 	printf("}, [%d]) = %s\n", *len, errstr);
@@ -97,20 +119,20 @@ main(void)
 	/* getsockopt with optlen larger than usual - truncated to raw */
 	*len = sizeof(*peercred) - 1;
 	get_peercred(fd, peercred, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED, ", fd);
+	printf("getsockopt(%d, %s, ", fd, so_str());
 	print_quoted_hex(peercred, *len);
 	printf(", [%d]) = %s\n", *len, errstr);
 
 	/* getsockopt optval EFAULT */
 	*len = sizeof(*peercred);
 	get_peercred(fd, &peercred->uid, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED, %p, [%d]) = %s\n",
-	       fd, &peercred->uid, *len, errstr);
+	printf("getsockopt(%d, %s, %p, [%d]) = %s\n",
+	       fd, so_str(), &peercred->uid, *len, errstr);
 
 	/* getsockopt optlen EFAULT */
 	get_peercred(fd, peercred, len + 1);
-	printf("getsockopt(%d, SOL_SOCKET, SO_PEERCRED, %p, %p) = %s\n",
-	       fd, peercred, len + 1, errstr);
+	printf("getsockopt(%d, %s, %p, %p) = %s\n",
+	       fd, so_str(), peercred, len + 1, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

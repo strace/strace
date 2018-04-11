@@ -387,6 +387,9 @@ sigreturn
 sigsuspend
 so_linger
 so_peercred
+so_peercred-Xabbrev
+so_peercred-Xraw
+so_peercred-Xverbose
 sock_filter-v
 socketcall
 sockopt-sol_netlink

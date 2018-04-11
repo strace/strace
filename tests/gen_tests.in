@@ -408,6 +408,9 @@ sigreturn	-esignal='!USR1'
 sigsuspend	-a19 -esignal=none
 so_linger	-e trace=getsockopt,setsockopt
 so_peercred	-e trace=getsockopt
+so_peercred-Xabbrev	-e trace=getsockopt -Xabbrev
+so_peercred-Xraw	-e trace=getsockopt -Xraw -a39
+so_peercred-Xverbose	-e trace=getsockopt -Xverbose
 sock_filter-v	-v -e trace=getsockopt,setsockopt
 socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
