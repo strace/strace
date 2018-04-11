@@ -250,7 +250,7 @@ Output format:\n\
 "
 #ifdef ENABLE_STACKTRACE
 "\
-  -k             obtain stack trace between each syscall (experimental)\n\
+  -k             obtain stack trace between each syscall\n\
 "
 #endif
 "\

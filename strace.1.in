@@ -254,7 +254,7 @@ Align return values in a specific column (default column 40).
 Print the instruction pointer at the time of the system call.
 .TP
 .B \-k
-Print the execution stack trace of the traced processes after each system call (experimental).
+Print the execution stack trace of the traced processes after each system call.
 This option is available only if
 .B strace
 is built using \-\-enable\-stacktrace configure option.
