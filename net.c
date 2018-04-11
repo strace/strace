@@ -84,10 +84,10 @@
 
 #include "xlat/inet_protocols.h"
 
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
-# include <bluetooth/bluetooth.h>
-# include "xlat/bt_protocols.h"
+#ifndef AF_BLUETOOTH
+# define AF_BLUETOOTH 31
 #endif
+#include "xlat/bt_protocols.h"
 
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
@@ -138,11 +138,9 @@ SYS_FUNC(socket)
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
 
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	case AF_BLUETOOTH:
-		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
+		printxval_index(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
 		break;
-#endif
 
 	default:
 		tprintf("%" PRI_klu, tcp->u_arg[2]);

@@ -1,3 +1,4 @@
+#value_indexed
 BTPROTO_L2CAP	0
 BTPROTO_HCI	1
 BTPROTO_SCO	2
