@@ -51,5 +51,25 @@ LC_ALL=C grep -E -x -f "$expected" < "$OUT" > /dev/null || {
 Failed pattern of expected output: $(cat "$expected")
 Actual output: $(cat "$OUT")
 __EOF__
+
+	pattern=
+	case "$STRACE_ARCH" in
+		aarch64|i386|ppc*|s390*|sparc*|x32|x86*)
+			# These architectures are supported by elfutils libdw,
+			# see grep '\<HOOK\>.*\<abi_cfi\>' elfutils/backends
+			;;
+		arm) pattern='No DWARF information found'
+			# This is also supported by elfutils libdw
+			# but the latter needs debuginfo for unwinding.
+			;;
+		*) pattern='Unwinding not supported for this architecture'
+			;;
+	esac
+	if [ -n "$pattern" ] &&
+	   LC_ALL=C grep -x " > $pattern" < "$LOG" > /dev/null; then
+		cat < "$LOG" >&2
+		skip_ "stack tracing is not fully supported on $STRACE_ARCH yet"
+	fi
+
 	dump_log_and_fail_with "$STRACE $args output mismatch"
 }
