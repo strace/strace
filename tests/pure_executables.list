@@ -268,6 +268,9 @@ osf_utimes
 pause
 perf_event_open
 personality
+personality-Xabbrev
+personality-Xraw
+personality-Xverbose
 pipe
 pipe2
 pkey_alloc

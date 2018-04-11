@@ -321,6 +321,9 @@ perf_event_open
 perf_event_open_nonverbose
 perf_event_open_unabbrev
 personality
+personality-Xabbrev
+personality-Xraw
+personality-Xverbose
 pipe
 pipe2
 pkey_alloc

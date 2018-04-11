@@ -295,6 +295,9 @@ pause	-a8 -esignal=none
 perf_event_open	-a1
 perf_event_open_nonverbose	-a34 -e verbose=none -e trace=perf_event_open
 perf_event_open_unabbrev	-a1 -v -e trace=perf_event_open
+personality-Xabbrev	+personality.test -Xabbrev
+personality-Xraw	+personality.test -a15 -Xraw
+personality-Xverbose	+personality.test -Xverbose
 pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
