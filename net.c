@@ -400,7 +400,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 {
 	printfd(tcp, fd);
 	tprints(", ");
-	printxval(socketlayers, level, "SOL_??");
+	printxval_search(socketlayers, level, "SOL_??");
 	tprints(", ");
 
 	switch (level) {
