@@ -47,7 +47,7 @@ sys_send(const int fd, const void *const buf, const size_t len)
 static void
 test_nlmsg_type_udev(const int fd)
 {
-	unsigned int offset = 8;
+	static const char extra[] = "12345678";
 	struct udev_monitor_netlink_header uh = {
 		.prefix = "libudev",
 		.magic = htonl(0xfeedcafe),
@@ -59,12 +59,13 @@ test_nlmsg_type_udev(const int fd)
 		.filter_tag_bloom_hi = htonl(0x2000400),
 		.filter_tag_bloom_lo = htonl(0x10800000),
 	};
-	unsigned int len = sizeof(uh);
-	char buf[len + offset];
-	memcpy(buf, &uh, len);
-	memcpy(buf + len, "12345678", offset);
+	const unsigned int extra_len = LENGTH_OF(extra);
+	const unsigned int uh_len = sizeof(uh);
 
-	sys_send(fd, &uh, len);
+	char *const buf = tail_alloc(uh_len + extra_len);
+	memcpy(buf + extra_len, &uh, uh_len);
+
+	sys_send(fd, buf + extra_len, uh_len);
 	printf("sendto(%d, {{prefix=\"%s\", magic=htonl(%#x)"
 	       ", header_size=%u, properties_off=%u, properties_len=%u"
 	       ", filter_subsystem_hash=htonl(%#x)"
@@ -76,9 +77,11 @@ test_nlmsg_type_udev(const int fd)
 	       ntohl(uh.magic), uh.header_size, uh.properties_off,
 	       uh.properties_len, ntohl(uh.filter_subsystem_hash),
 	       ntohl(uh.filter_devtype_hash), ntohl(uh.filter_tag_bloom_hi),
-	       ntohl(uh.filter_tag_bloom_lo), len, errstr);
+	       ntohl(uh.filter_tag_bloom_lo), uh_len, errstr);
 
-	sys_send(fd, &buf, len + offset);
+	memcpy(buf, &uh, uh_len);
+	memcpy(buf + uh_len, extra, extra_len);
+	sys_send(fd, buf, uh_len + extra_len);
 	printf("sendto(%d, {{prefix=\"%s\", magic=htonl(%#x)"
 	       ", header_size=%u, properties_off=%u, properties_len=%u"
 	       ", filter_subsystem_hash=htonl(%#x)"
@@ -90,10 +93,17 @@ test_nlmsg_type_udev(const int fd)
 	       uh.properties_len, ntohl(uh.filter_subsystem_hash),
 	       ntohl(uh.filter_devtype_hash), ntohl(uh.filter_tag_bloom_hi),
 	       ntohl(uh.filter_tag_bloom_lo));
-	print_quoted_memory(buf + len, offset);
+	print_quoted_memory(buf + uh_len, extra_len);
 	printf("}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       len + offset, errstr);
+	       uh_len + extra_len, errstr);
 
+	memcpy(buf + extra_len + 1, &uh, uh_len - 1);
+	sys_send(fd, buf + extra_len + 1, uh_len);
+	printf("sendto(%d, ", fd);
+	print_quoted_memory(&uh, MIN(uh_len - 1, DEFAULT_STRLEN));
+	printf("%s, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       (uh_len - 1 > DEFAULT_STRLEN ? "..." : ""),
+	       uh_len, errstr);
 }
 
 static void
@@ -109,12 +119,17 @@ test_nlmsg_type_kernel(const int fd)
 		.filter_devtype_hash = htonl(0x10000000),
 		.filter_tag_bloom_hi = htonl(0x2000400),
 	};
+	const unsigned int uh_len = sizeof(uh);
 
-	sys_send(fd, &uh, sizeof(uh));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct udev_monitor_netlink_header, p);
+	memcpy(p, &uh, uh_len);
+
+	sys_send(fd, p, uh_len);
 	printf("sendto(%d, ", fd);
-	print_quoted_memory(&uh, DEFAULT_STRLEN);
-	printf("..., %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       (unsigned) sizeof(uh), errstr);
+	print_quoted_memory(&uh, MIN(uh_len, DEFAULT_STRLEN));
+	printf("%s, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       (uh_len > DEFAULT_STRLEN ? "..." : ""),
+	       uh_len, errstr);
 }
 
 int
