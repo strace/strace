@@ -275,10 +275,10 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 	printpath(tcp, attr.pathname);
 
 	PRINT_FIELD_FD(", ", attr, bpf_fd, tcp);
-	if (len <= offsetofend(struct BPF_OBJ_PIN_struct, bpf_fd))
-		break;
 
 	/* file_flags field was added in Linux v4.15-rc1~84^2~384^2~4 */
+	if (len <= offsetof(struct BPF_OBJ_PIN_struct, file_flags))
+		break;
 	PRINT_FIELD_FLAGS(", ", attr, file_flags, bpf_file_mode_flags,
 			  "BPF_F_???");
 }
@@ -321,10 +321,10 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_NEXT_ID)
 {
 	PRINT_FIELD_U("{", attr, start_id);
 	PRINT_FIELD_U(", ", attr, next_id);
-	if (len <= offsetofend(struct BPF_PROG_GET_NEXT_ID_struct, next_id))
-		break;
 
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
+	if (len <= offsetof(struct BPF_PROG_GET_NEXT_ID_struct, open_flags))
+		break;
 	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
 			  "BPF_F_???");
 }
@@ -336,10 +336,10 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_FD_BY_ID)
 {
 	PRINT_FIELD_U("{", attr, prog_id);
 	PRINT_FIELD_U(", ", attr, next_id);
-	if (len <= offsetofend(struct BPF_PROG_GET_FD_BY_ID_struct, next_id))
-		break;
 
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
+	if (len <= offsetof(struct BPF_PROG_GET_FD_BY_ID_struct, open_flags))
+		break;
 	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
 			  "BPF_F_???");
 }
@@ -349,10 +349,10 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 {
 	PRINT_FIELD_U("{", attr, map_id);
 	PRINT_FIELD_U(", ", attr, next_id);
-	if (len <= offsetofend(struct BPF_MAP_GET_FD_BY_ID_struct, next_id))
-		break;
 
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
+	if (len <= offsetof(struct BPF_MAP_GET_FD_BY_ID_struct, open_flags))
+		break;
 	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
 			  "BPF_F_???");
 }
