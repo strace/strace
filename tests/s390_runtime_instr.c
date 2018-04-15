@@ -44,10 +44,11 @@ main(void)
 		kernel_ulong_t cmd;
 		const char * cmd_str;
 	} cmd_args[] = {
-		{ 0, "???" },
-		{ 4, "???" },
-		{ (kernel_ulong_t) 0xdeafbeefdeadc0deULL, "???" },
-		{ 2, "STOP",  },
+		{ 0, "0 /* S390_RUNTIME_INSTR_??? */" },
+		{ 4, "4 /* S390_RUNTIME_INSTR_??? */" },
+		{ (kernel_ulong_t) 0xdeafbeefdeadc0deULL,
+			"-559038242 /* S390_RUNTIME_INSTR_??? */" },
+		{ 2, "S390_RUNTIME_INSTR_STOP"  },
 	};
 
 	static struct {
@@ -66,10 +67,8 @@ main(void)
 
 	for (i = 0; i < ARRAY_SIZE(cmd_args); i++) {
 		rc = syscall(__NR_s390_runtime_instr, cmd_args[i].cmd, 0xdead);
-		printf("s390_runtime_instr(%d /* S390_RUNTIME_INSTR_%s */) = "
-		       "%s\n",
-		       (int) cmd_args[i].cmd, cmd_args[i].cmd_str,
-		       sprintrc(rc));
+		printf("s390_runtime_instr(%s) = %s\n",
+		       cmd_args[i].cmd_str, sprintrc(rc));
 	}
 
 	for (i = 0; i < ARRAY_SIZE(start_sig_args); i++) {
@@ -77,7 +76,7 @@ main(void)
 
 		rc = syscall(__NR_s390_runtime_instr, 1, start_sig_args[i].sig);
 		saved_errno = errno;
-		printf("s390_runtime_instr(1 /* S390_RUNTIME_INSTR_START */, ");
+		printf("s390_runtime_instr(S390_RUNTIME_INSTR_START, ");
 
 		if (start_sig_args[i].sig_str)
 			printf("%s", start_sig_args[i].sig_str);

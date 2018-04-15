@@ -1205,9 +1205,8 @@ SYS_FUNC(s390_runtime_instr)
 	int signum = (int) tcp->u_arg[1];
 
 
-	printxvals_ex(command, "S390_RUNTIME_INSTR_???",
-		      XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D,
-		      s390_runtime_instr_commands, NULL);
+	printxval_d(s390_runtime_instr_commands, command,
+		    "S390_RUNTIME_INSTR_???");
 
 	/*
 	 * signum is ignored since Linux 4.4, but let's print it for start

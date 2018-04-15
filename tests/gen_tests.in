@@ -353,7 +353,7 @@ rt_tgsigqueueinfo	-esignal=none
 s390_guarded_storage	-a32
 s390_guarded_storage-v	-e trace=s390_guarded_storage -a32 -v
 s390_pci_mmio_read_write	-e trace=s390_pci_mmio_read,s390_pci_mmio_write -a30
-s390_runtime_instr	-a50
+s390_runtime_instr	-a44
 s390_sthyi	-a47
 s390_sthyi-v	-e trace=s390_sthyi -a47 -v
 sched	test_trace_expr times -e/sched
