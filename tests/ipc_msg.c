@@ -35,6 +35,10 @@
 #include "xlat.h"
 #include "xlat/resource_flags.h"
 
+#ifndef MSG_STAT_ANY
+# define MSG_STAT_ANY 13
+#endif
+
 /*
  * Before glibc-2.22-122-gbe48165, ppc64 code tried to retrieve data
  * provided in third argument of msgctl call (in case of IPC_SET cmd)
@@ -60,6 +64,7 @@
 # define str_ipc_stat "0x2"
 # define str_msg_stat "0xb"
 # define str_msg_info "0xc"
+# define str_msg_stat_any "0xd"
 # define str_ipc_64 "0x100"
 # define str_bogus_cmd "0xdeadbeef"
 #elif XLAT_VERBOSE
@@ -71,6 +76,7 @@
 # define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
 # define str_msg_stat "0xb /\\* MSG_STAT \\*/"
 # define str_msg_info "0xc /\\* MSG_INFO \\*/"
+# define str_msg_stat_any "0xd /\\* MSG_STAT_ANY \\*/"
 # define str_ipc_64 "0x100 /\\* IPC_64 \\*/"
 # define str_bogus_cmd "0xdeadbeef /\\* MSG_\\?\\?\\? \\*/"
 #else
@@ -81,6 +87,7 @@
 # define str_ipc_stat "IPC_STAT"
 # define str_msg_stat "MSG_STAT"
 # define str_msg_info "MSG_INFO"
+# define str_msg_stat_any "MSG_STAT_ANY"
 # define str_ipc_64 "IPC_64"
 # define str_bogus_cmd "0xdeadbeef /\\* MSG_\\?\\?\\? \\*/"
 #endif
@@ -164,6 +171,10 @@ main(void)
 	rc = msgctl(id, MSG_STAT, &ds);
 	printf("msgctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
 	       id, str_ipc_64, str_msg_stat, &ds, sprintrc_grep(rc));
+
+	rc = msgctl(id, MSG_STAT_ANY, &ds);
+	printf("msgctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+	       id, str_ipc_64, str_msg_stat_any, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
