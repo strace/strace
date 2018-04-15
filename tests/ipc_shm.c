@@ -41,6 +41,10 @@
 # define SHM_HUGE_MASK 0x3f
 #endif
 
+#ifndef SHM_STAT_ANY
+# define SHM_STAT_ANY 15
+#endif
+
 #include "xlat.h"
 #include "xlat/shm_resource_flags.h"
 
@@ -53,6 +57,7 @@
 # define str_ipc_stat "0x2"
 # define str_shm_stat "0xd"
 # define str_shm_info "0xe"
+# define str_shm_stat_any "0xf"
 # define str_ipc_64 "0x100"
 # define str_bogus_cmd "0xdefaced2"
 #elif XLAT_VERBOSE
@@ -66,6 +71,7 @@
 # define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
 # define str_shm_stat "0xd /\\* SHM_STAT \\*/"
 # define str_shm_info "0xe /\\* SHM_INFO \\*/"
+# define str_shm_stat_any "0xf /\\* SHM_STAT_ANY \\*/"
 # define str_ipc_64 "0x100 /\\* IPC_64 \\*/"
 # define str_bogus_cmd "0xdefaced2 /\\* SHM_\\?\\?\\? \\*/"
 #else
@@ -78,6 +84,7 @@
 # define str_ipc_stat "IPC_STAT"
 # define str_shm_stat "SHM_STAT"
 # define str_shm_info "SHM_INFO"
+# define str_shm_stat_any "SHM_STAT_ANY"
 # define str_ipc_64 "IPC_64"
 # define str_bogus_cmd "0xdefaced2 /\\* SHM_\\?\\?\\? \\*/"
 #endif
@@ -204,6 +211,10 @@ main(void)
 	rc = shmctl(id, SHM_STAT, &ds);
 	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
 	       id, str_ipc_64, str_shm_stat, &ds, sprintrc_grep(rc));
+
+	rc = shmctl(id, SHM_STAT_ANY, &ds);
+	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+	       id, str_ipc_64, str_shm_stat_any, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
