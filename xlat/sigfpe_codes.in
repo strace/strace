@@ -12,3 +12,5 @@ __FPE_DECDIV /* 10 - ia64 */
 __FPE_DECERR /* 11 - ia64 */
 __FPE_INVASC /* 12 - ia64 */
 __FPE_INVDEC /* 13 - ia64 */
+FPE_FLTUNK 14
+FPE_CONDTRAP 15
