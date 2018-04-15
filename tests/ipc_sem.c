@@ -36,6 +36,10 @@
 #include "xlat.h"
 #include "xlat/resource_flags.h"
 
+#ifndef SEM_STAT_ANY
+# define SEM_STAT_ANY 20
+#endif
+
 #if XLAT_RAW
 # define str_ipc_flags "0xface1e00"
 # define str_ipc_private "0"
@@ -43,6 +47,7 @@
 # define str_ipc_stat "0x2"
 # define str_sem_stat "0x12"
 # define str_sem_info "0x13"
+# define str_sem_stat_any "0x14"
 # define str_ipc_64 "0x100"
 # define str_bogus_cmd "0xdeadbeef"
 #elif XLAT_VERBOSE
@@ -53,6 +58,7 @@
 # define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
 # define str_sem_stat "0x12 /\\* SEM_STAT \\*/"
 # define str_sem_info "0x13 /\\* SEM_INFO \\*/"
+# define str_sem_stat_any "0x14 /\\* SEM_STAT_ANY \\*/"
 # define str_ipc_64 "0x100 /\\* IPC_64 \\*/"
 # define str_bogus_cmd "0xdeadbeef /\\* SEM_\\?\\?\\? \\*/"
 #else
@@ -62,6 +68,7 @@
 # define str_ipc_stat "IPC_STAT"
 # define str_sem_stat "SEM_STAT"
 # define str_sem_info "SEM_INFO"
+# define str_sem_stat_any "SEM_STAT_ANY"
 # define str_ipc_64 "IPC_64"
 # define str_bogus_cmd "0xdeadbeef /\\* SEM_\\?\\?\\? \\*/"
 #endif
@@ -136,6 +143,10 @@ main(void)
 	rc = semctl(id, 0, SEM_STAT, un);
 	printf("semctl\\(%d, 0, (%s\\|)?%s, \\[?%p\\]?\\) = %s\n",
 	       id, str_ipc_64, str_sem_stat, &ds, sprintrc_grep(rc));
+
+	rc = semctl(id, 0, SEM_STAT_ANY, un);
+	printf("semctl\\(%d, 0, (%s\\|)?%s, (%p|\\[(%p|NULL)\\]|NULL)\\) = %s\n",
+	       id, str_ipc_64, str_sem_stat_any, &ds, &ds, sprintrc_grep(rc));
 
 	return 0;
 }
