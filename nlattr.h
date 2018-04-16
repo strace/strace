@@ -73,8 +73,10 @@ DECL_NLA(str);
 DECL_NLA(strn);
 DECL_NLA(fd);
 DECL_NLA(ifindex);
+DECL_NLA(ip_proto);
 DECL_NLA(meminfo);
 DECL_NLA(rt_class);
+DECL_NLA(rt_proto);
 DECL_NLA(tc_stats);
 
 #endif /* !STRACE_NLATTR_H */

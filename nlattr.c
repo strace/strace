@@ -268,6 +268,19 @@ decode_nla_xval(struct tcb *const tcp,
 }
 
 bool
+decode_nla_ip_proto(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = inet_protocols, .dflt = "IPPROTO_???",
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+bool
 decode_nla_be16(struct tcb *const tcp,
 		const kernel_ulong_t addr,
 		const unsigned int len,

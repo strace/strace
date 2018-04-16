@@ -61,6 +61,21 @@ decode_nla_rt_class(struct tcb *const tcp,
 	return true;
 }
 
+bool
+decode_nla_rt_proto(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	uint8_t num;
+
+	if (len < sizeof(num))
+		return false;
+	if (!umove_or_printaddr(tcp, addr, &num))
+		printxval_search(routing_protocols, num, "RTPROT_???");
+	return true;
+}
+
 static bool
 decode_route_addr(struct tcb *const tcp,
 		  const kernel_ulong_t addr,
