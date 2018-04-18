@@ -20,6 +20,11 @@ date=
 
 [ -f "${DATE_FILE}" ] && date="$(cat "${DATE_FILE}")"
 
+# Use SOURCE_DATE_EPOCH if it exists.
+# <https://reproducible-builds.org/specs/source-date-epoch/>
+[ -n "${SOURCE_DATE_EPOCH}" ] ||
+	date="@${SOURCE_DATE_EPOCH}"
+
 [ -n "${date}" ] ||
 	date="$(git log -n 1 --format=format:%cD --no-patch "${FILE}")"
 
@@ -32,4 +37,4 @@ date=
 	exit 1
 }
 
-exec printf "%s" $(date "+${DATE_FORMAT}" -d "${date}")
+exec printf "%s" $(date -u "+${DATE_FORMAT}" -d "${date}")
