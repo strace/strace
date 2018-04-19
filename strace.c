@@ -715,6 +715,11 @@ after_successful_attach(struct tcb *tcp, const unsigned int flags)
 		xsprintf(name, "%s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
 	}
+
+#ifdef ENABLE_STACKTRACE
+	if (stack_trace_enabled)
+		unwind_tcb_init(tcp);
+#endif
 }
 
 static void
@@ -756,12 +761,6 @@ alloctcb(int pid)
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
-
-#ifdef ENABLE_STACKTRACE
-			if (stack_trace_enabled)
-				unwind_tcb_init(tcp);
-#endif
-
 			nprocs++;
 			debug_msg("new tcb for pid %d, active tcbs:%d",
 				  tcp->pid, nprocs);
@@ -815,9 +814,8 @@ droptcb(struct tcb *tcp)
 	free_tcb_priv_data(tcp);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled) {
+	if (stack_trace_enabled)
 		unwind_tcb_fin(tcp);
-	}
 #endif
 
 	mmap_cache_delete(tcp, __func__);
@@ -1777,16 +1775,8 @@ init(int argc, char *argv[])
 	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled) {
-		unsigned int tcbi;
-
+	if (stack_trace_enabled)
 		unwind_init();
-		for (tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
-			if (!tcbtab[tcbi]->pid)
-				continue;
-			unwind_tcb_init(tcbtab[tcbi]);
-		}
-	}
 #endif
 
 	/* See if they want to run as another user. */

@@ -78,6 +78,9 @@ unwind_tcb_init(struct tcb *tcp)
 void
 unwind_tcb_fin(struct tcb *tcp)
 {
+	if (!tcp->unwind_queue)
+		return;
+
 	queue_print(tcp->unwind_queue);
 	free(tcp->unwind_queue);
 	tcp->unwind_queue = NULL;
