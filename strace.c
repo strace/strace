@@ -706,8 +706,9 @@ tabto(void)
  * may create bogus empty FILE.<nonexistant_pid>, and then die.
  */
 static void
-after_successful_attach(struct tcb *tcp)
+after_successful_attach(struct tcb *tcp, const unsigned int flags)
 {
+	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | flags;
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
 		char name[PATH_MAX];
@@ -1042,9 +1043,7 @@ attach_tcb(struct tcb *const tcp)
 		return;
 	}
 
-	tcp->flags |= TCB_ATTACHED | TCB_GRABBED | TCB_STARTUP |
-		      post_attach_sigstop;
-	after_successful_attach(tcp);
+	after_successful_attach(tcp, TCB_GRABBED | post_attach_sigstop);
 	debug_msg("attach to pid %d (main) succeeded", tcp->pid);
 
 	static const char task_path[] = "/proc/%d/task";
@@ -1072,12 +1071,10 @@ attach_tcb(struct tcb *const tcp)
 						 ptrace_attach_cmd, tid);
 				continue;
 			}
-			debug_msg("attach to pid %d succeeded", tid);
 
-			struct tcb *tid_tcp = alloctcb(tid);
-			tid_tcp->flags |= TCB_ATTACHED | TCB_GRABBED |
-					  TCB_STARTUP | post_attach_sigstop;
-			after_successful_attach(tid_tcp);
+			after_successful_attach(alloctcb(tid),
+						TCB_GRABBED | post_attach_sigstop);
+			debug_msg("attach to pid %d succeeded", tid);
 		}
 
 		closedir(dir);
@@ -1422,10 +1419,10 @@ startup_child(char **argv)
 				kill(pid, SIGCONT);
 		}
 		tcp = alloctcb(pid);
-		tcp->flags |= TCB_ATTACHED | TCB_STARTUP
-			    | TCB_SKIP_DETACH_ON_FIRST_EXEC
-			    | (NOMMU_SYSTEM ? 0 : (TCB_HIDE_LOG | post_attach_sigstop));
-		after_successful_attach(tcp);
+		after_successful_attach(tcp, TCB_SKIP_DETACH_ON_FIRST_EXEC
+					     | (NOMMU_SYSTEM ? 0
+						: (TCB_HIDE_LOG
+						   | post_attach_sigstop)));
 	} else {
 		/* With -D, we are *child* here, the tracee is our parent. */
 		strace_child = strace_tracer_pid;
@@ -2038,8 +2035,7 @@ maybe_allocate_tcb(const int pid, int status)
 	if (followfork) {
 		/* We assume it's a fork/vfork/clone child */
 		struct tcb *tcp = alloctcb(pid);
-		tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
-		after_successful_attach(tcp);
+		after_successful_attach(tcp, post_attach_sigstop);
 		if (!qflag)
 			error_msg("Process %d attached", pid);
 		return tcp;
