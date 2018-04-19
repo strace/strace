@@ -49,7 +49,7 @@ tcb_init(struct tcb *tcp)
 
 	Dwfl *dwfl = dwfl_begin(&proc_callbacks);
 	if (dwfl == NULL) {
-		error_msg("dwfl_begin: %s\n", dwfl_errmsg(-1));
+		error_msg("dwfl_begin: %s", dwfl_errmsg(-1));
 		return NULL;
 	}
 
@@ -63,7 +63,7 @@ tcb_init(struct tcb *tcp)
 			msg = strerror(r);
 
 		error_msg("dwfl_linux_proc_attach returned an error"
-			  " for process %d: %s\n", tcp->pid, msg);
+			  " for process %d: %s", tcp->pid, msg);
 		dwfl_end(dwfl);
 		return NULL;
 	}
