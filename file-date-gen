@@ -10,6 +10,7 @@ fi
 : ${DATE_FILE:=$(dirname "$FILE")/.$(basename "${FILE}").date}
 : ${DEFAULT_DATE:=$2}
 : ${DATE_FORMAT:=%Y-%m-%d}
+LC_TIME=C; export LC_TIME
 
 date=
 
@@ -23,13 +24,19 @@ date=
 [ -n "${date}" ] ||
 	date="$(git log -n 1 --format=format:%cD --no-patch "${FILE}")"
 
-[ -n "${date}" ] || year="${DEFAULT_DATE}"
+[ -n "${date}" ] ||
+	date="${DEFAULT_DATE}"
 
-[ -n "${date}" ] || date="$(date -u)"
+[ -n "${date}" ] ||
+	[ -z "${SOURCE_DATE_EPOCH-}" ] ||
+	date="$(date -u -d "@${SOURCE_DATE_EPOCH}")"
+
+[ -n "${date}" ] ||
+	date="$(date -u)"
 
 [ -n "${date}" ] || {
 	echo >&2 'Undefined date.'
 	exit 1
 }
 
-exec printf "%s" $(date "+${DATE_FORMAT}" -d "${date}")
+exec printf "%s" $(date -u "+${DATE_FORMAT}" -d "${date}")
