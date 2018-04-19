@@ -1783,6 +1783,8 @@ init(int argc, char *argv[])
 
 		unwind_init();
 		for (tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
+			if (!tcbtab[tcbi]->pid)
+				continue;
 			unwind_tcb_init(tcbtab[tcbi]);
 		}
 	}
