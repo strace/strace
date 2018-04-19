@@ -706,7 +706,7 @@ tabto(void)
  * may create bogus empty FILE.<nonexistant_pid>, and then die.
  */
 static void
-newoutf(struct tcb *tcp)
+after_successful_attach(struct tcb *tcp)
 {
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
@@ -1044,7 +1044,7 @@ attach_tcb(struct tcb *const tcp)
 
 	tcp->flags |= TCB_ATTACHED | TCB_GRABBED | TCB_STARTUP |
 		      post_attach_sigstop;
-	newoutf(tcp);
+	after_successful_attach(tcp);
 	debug_msg("attach to pid %d (main) succeeded", tcp->pid);
 
 	static const char task_path[] = "/proc/%d/task";
@@ -1077,7 +1077,7 @@ attach_tcb(struct tcb *const tcp)
 			struct tcb *tid_tcp = alloctcb(tid);
 			tid_tcp->flags |= TCB_ATTACHED | TCB_GRABBED |
 					  TCB_STARTUP | post_attach_sigstop;
-			newoutf(tid_tcp);
+			after_successful_attach(tid_tcp);
 		}
 
 		closedir(dir);
@@ -1425,15 +1425,17 @@ startup_child(char **argv)
 		tcp->flags |= TCB_ATTACHED | TCB_STARTUP
 			    | TCB_SKIP_DETACH_ON_FIRST_EXEC
 			    | (NOMMU_SYSTEM ? 0 : (TCB_HIDE_LOG | post_attach_sigstop));
-		newoutf(tcp);
+		after_successful_attach(tcp);
 	} else {
 		/* With -D, we are *child* here, the tracee is our parent. */
 		strace_child = strace_tracer_pid;
 		strace_tracer_pid = getpid();
 		tcp = alloctcb(strace_child);
 		tcp->flags |= TCB_SKIP_DETACH_ON_FIRST_EXEC | TCB_HIDE_LOG;
-		/* attaching will be done later, by startup_attach */
-		/* note: we don't do newoutf(tcp) here either! */
+		/*
+		 * Attaching will be done later, by startup_attach.
+		 * Note: we don't do after_successful_attach() here either!
+		 */
 
 		/* NOMMU BUG! -D mode is active, we (child) return,
 		 * and we will scribble over parent's stack!
@@ -2037,7 +2039,7 @@ maybe_allocate_tcb(const int pid, int status)
 		/* We assume it's a fork/vfork/clone child */
 		struct tcb *tcp = alloctcb(pid);
 		tcp->flags |= TCB_ATTACHED | TCB_STARTUP | post_attach_sigstop;
-		newoutf(tcp);
+		after_successful_attach(tcp);
 		if (!qflag)
 			error_msg("Process %d attached", pid);
 		return tcp;
