@@ -992,7 +992,7 @@ dist-hook:
 	${AM_V_GEN}echo $(COPYRIGHT_YEAR) > $(distdir)/.year
 	${AM_V_GEN}echo $(MANPAGE_DATE) > $(distdir)/.strace.1.in.date
 
-today = $(shell date +%Y-%m-%d)
+today = $(shell LC_TIME=C date -u +%Y-%m-%d)
 version_regexp = $(subst .,\.,$(VERSION))
 news_check_regexp = 'Noteworthy changes in release $(version_regexp) ($(today))'
 

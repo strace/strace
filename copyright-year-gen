@@ -2,6 +2,7 @@
 
 : ${YEAR_FILE:=$1}
 : ${DEFAULT_YEAR:=$2}
+LC_TIME=C; export LC_TIME
 
 year=
 
@@ -13,11 +14,17 @@ year=
 [ -f "${YEAR_FILE}" ] && year="$(cat "${YEAR_FILE}")"
 
 [ -n "${year}" ] ||
-	year="$(date +%Y -d "$(git show --format=format:%cD --no-patch)")"
+	year="$(date -u +%Y -d "$(git show --format=format:%cD --no-patch)")"
 
-[ -n "${year}" ] || year="${DEFAULT_YEAR}"
+[ -n "${year}" ] ||
+	year="${DEFAULT_YEAR}"
 
-[ -n "${year}" ] || year="$(date "+%Y")"
+[ -n "${year}" ] ||
+	[ -z "${SOURCE_DATE_EPOCH-}" ] ||
+	year="$(date -u +%Y -d "@${SOURCE_DATE_EPOCH}")"
+
+[ -n "${year}" ] ||
+	year="$(date -u +%Y)"
 
 [ -n "${year}" ] || {
 	echo >&2 'Undefined year.'

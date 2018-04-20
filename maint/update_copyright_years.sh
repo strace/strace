@@ -40,6 +40,7 @@ Headers updated automatically with
 : ${CALL_GIT_ADD=0}
 : ${CALL_GIT_COMMIT=0}
 : ${GIT_COMMIT_TEMPLATE=$DEFAULT_GIT_COMMIT_TEMPLATE}
+LC_TIME=C; export LC_TIME
 
 # These files are only imported into strace and not changed.
 # Remove them from the list once they have been changed.
@@ -121,9 +122,9 @@ process_file()
 		continue
 	fi
 
-	last_commit_year=$(date +%Y -d "$(git log -n1 --format=format:%aD \
+	last_commit_year=$(date -u +%Y -d "$(git log -n1 --format=format:%aD \
 		-- "$f")")
-	first_commit_year=$(date +%Y -d "$(git log --reverse --format=format:%aD \
+	first_commit_year=$(date -u +%Y -d "$(git log --reverse --format=format:%aD \
 		-- "$f" | head -n 1)")
 	copyright_year=$(printf '%s' "$copyright_year_raw" |
 		sort -r -n | head -n 1)
