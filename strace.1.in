@@ -1107,7 +1107,7 @@ development migrated to CVS; ports to FreeBSD and many architectures on Linux
 (including ARM, IA-64, MIPS, PA-RISC, PowerPC, s390, SPARC) were introduced.
 In 2002, the burden of
 .B strace
-maintainership was transferred to Ronald McGrath.
+maintainership was transferred to Roland McGrath.
 Since then,
 .B strace
 gained support for several new Linux architectures (AMD64, s390x, SuperH),
