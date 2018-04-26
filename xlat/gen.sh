@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 #
 # Copyright (c) 2014-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
