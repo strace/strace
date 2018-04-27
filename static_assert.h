@@ -30,7 +30,16 @@
 
 #include "assert.h"
 
-#ifndef HAVE_STATIC_ASSERT
+#if defined HAVE_STATIC_ASSERT
+
+/* static_assert is already available */
+
+#elif defined HAVE__STATIC_ASSERT
+
+# undef static_assert
+# define static_assert _Static_assert
+
+#else /* !HAVE_STATIC_ASSERT && !HAVE__STATIC_ASSERT */
 
 # define static_assert(expr, message) \
 	extern int (*strace_static_assert(int))[sizeof(int[2 * !!(expr) - 1])]

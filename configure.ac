@@ -797,13 +797,31 @@ fi
 
 AC_CACHE_CHECK([for static_assert], [st_cv_have_static_assert],
 	       [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <assert.h>]],
-						[[static_assert(1,"")]])],
+						[[static_assert(1,"")]]
+					       )
+			       ],
 			       [st_cv_have_static_assert=yes],
-			       [st_cv_have_static_assert=no])])
-if test "x$st_cv_have_static_assert" = xyes; then
-	AC_DEFINE([HAVE_STATIC_ASSERT], [1],
-		  [Define to 1 if the system provides static_assert])
-fi
+			       [AC_LINK_IFELSE([AC_LANG_PROGRAM([],
+								[[_Static_assert(1,"")]]
+							       )
+					       ],
+					       [st_cv_have_static_assert=_Static_assert],
+					       [st_cv_have_static_assert=no]
+					      )
+			       ]
+			      )
+	       ]
+	      )
+case "x$st_cv_have_static_assert" in
+	xyes)
+		AC_DEFINE([HAVE_STATIC_ASSERT], [1],
+			  [Define to 1 if the system provides static_assert])
+		;;
+	x_Static_assert)
+		AC_DEFINE([HAVE__STATIC_ASSERT], [1],
+			  [Define to 1 if the system provides _Static_assert])
+		;;
+esac
 
 AC_CHECK_LIB([dl], [dladdr], [dl_LIBS='-ldl'], [dl_LIBS=])
 if test "x$ac_cv_lib_dl_dladdr" = xyes; then
