@@ -72,33 +72,33 @@ main(void)
 	static const char data[] = "mount_data";
 
 	int rc = mount(source, target, fstype, 15, data);
-	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
+	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %s\n",
 	       source, target, fstype, str_ro_nosuid_nodev_noexec,
-	       data, rc, errno2name());
+	       data, sprintrc(rc));
 
 	rc = mount(source, target, fstype, MS_RELATIME | 15, data);
-	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
+	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %s\n",
 	       source, target, fstype,
 	       str_ro_nosuid_nodev_noexec_relatime,
-	       data, rc, errno2name());
+	       data, sprintrc(rc));
 
 	rc = mount(source, target, fstype, MS_MGC_VAL, data);
-	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
-	       source, target, fstype, str_mgc_val, data, rc, errno2name());
+	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %s\n",
+	       source, target, fstype, str_mgc_val, data, sprintrc(rc));
 
 	rc = mount(source, target, fstype, MS_MGC_VAL | 15, data);
-	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %d %s (%m)\n",
+	printf("mount(\"%s\", \"%s\", \"%s\", %s, \"%s\") = %s\n",
 	       source, target, fstype,
 	       str_mgc_val "|" str_ro_nosuid_nodev_noexec,
-	       data, rc, errno2name());
+	       data, sprintrc(rc));
 
 	rc = mount(source, target, fstype, MS_REMOUNT, data);
-	printf("mount(\"%s\", \"%s\", %p, %s, \"%s\") = %d %s (%m)\n",
-	       source, target, fstype, str_remount, data, rc, errno2name());
+	printf("mount(\"%s\", \"%s\", %p, %s, \"%s\") = %s\n",
+	       source, target, fstype, str_remount, data, sprintrc(rc));
 
 	rc = mount(source, target, fstype, MS_BIND, data);
-	printf("mount(\"%s\", \"%s\", %p, %s, %p) = %d %s (%m)\n",
-	       source, target, fstype, str_bind, data, rc, errno2name());
+	printf("mount(\"%s\", \"%s\", %p, %s, %p) = %s\n",
+	       source, target, fstype, str_bind, data, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
