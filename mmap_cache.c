@@ -30,14 +30,35 @@
 
 #include "largefile_wrappers.h"
 #include "mmap_cache.h"
+#include "mmap_notify.h"
 #include "xstring.h"
 
 static unsigned int mmap_cache_generation;
 static bool use_mmap_cache;
 
-extern void mmap_cache_enable(void)
+static void
+mmap_cache_invalidate(struct tcb *tcp, void *unused)
 {
-	use_mmap_cache = true;
+#if SUPPORTED_PERSONALITIES > 1
+	if (tcp->currpers != DEFAULT_PERSONALITY) {
+		/* disable stack trace */
+		return;
+	}
+#endif
+	mmap_cache_generation++;
+	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
+		       tcp->mmap_cache_generation,
+		       mmap_cache_generation,
+		       tcp, tcp->mmap_cache);
+}
+
+void
+mmap_cache_enable(void)
+{
+	if (!use_mmap_cache) {
+		mmap_notify_register_client(mmap_cache_invalidate, NULL);
+		use_mmap_cache = true;
+	}
 }
 
 extern bool mmap_cache_is_enabled(void)
@@ -193,22 +214,6 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 		r = MMAP_CACHE_REBUILD_NOCACHE;
 
 	return r;
-}
-
-void
-mmap_cache_invalidate(struct tcb *tcp)
-{
-#if SUPPORTED_PERSONALITIES > 1
-	if (tcp->currpers != DEFAULT_PERSONALITY) {
-		/* disable stack trace */
-		return;
-	}
-#endif
-	mmap_cache_generation++;
-	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
-		       tcp->mmap_cache_generation,
-		       mmap_cache_generation,
-		       tcp, tcp->mmap_cache);
 }
 
 struct mmap_cache_t *

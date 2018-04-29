@@ -72,9 +72,6 @@ extern bool
 mmap_cache_is_enabled(void);
 
 extern void
-mmap_cache_invalidate(struct tcb *);
-
-extern void
 mmap_cache_delete(struct tcb *, const char *caller);
 
 extern enum mmap_cache_rebuild_result

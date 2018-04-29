@@ -33,7 +33,7 @@
  */
 
 #include "defs.h"
-#include "mmap_cache.h"
+#include "mmap_notify.h"
 #include "native_defs.h"
 #include "ptrace.h"
 #include "nsig.h"
@@ -744,10 +744,8 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
 		clock_gettime(CLOCK_MONOTONIC, pts);
 
-	if (mmap_cache_is_enabled()) {
-		if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
-			mmap_cache_invalidate(tcp);
-	}
+	if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
+		mmap_notify_report(tcp);
 
 	if (filtered(tcp) || hide_log(tcp))
 		return 0;
