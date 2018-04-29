@@ -36,12 +36,27 @@
 
 #include "defs.h"
 #include "unwind.h"
-#include "mmap_cache.h"
+#include "mmap_notify.h"
 #include <elfutils/libdwfl.h>
 
 struct ctx {
 	Dwfl *dwfl;
+	unsigned int last_proc_updating;
 };
+
+static unsigned int mapping_generation;
+
+static void
+update_mapping_generation(struct tcb *tcp, void *unused)
+{
+	mapping_generation++;
+}
+
+static void
+init(void)
+{
+	mmap_notify_register_client(update_mapping_generation, NULL);
+}
 
 static void *
 tcb_init(struct tcb *tcp)
@@ -74,6 +89,7 @@ tcb_init(struct tcb *tcp)
 
 	struct ctx *ctx = xmalloc(sizeof(*ctx));
 	ctx->dwfl = dwfl;
+	ctx->last_proc_updating = 0;
 	return ctx;
 }
 
@@ -85,6 +101,31 @@ tcb_fin(struct tcb *tcp)
 		dwfl_end(ctx->dwfl);
 		free(ctx);
 	}
+}
+
+static void
+flush_cache_maybe(struct tcb *tcp)
+{
+	struct ctx *ctx = tcp->unwind_ctx;
+	if (!ctx)
+		return;
+
+	if (ctx->last_proc_updating == mapping_generation)
+		return;
+
+	int r = dwfl_linux_proc_report(ctx->dwfl, tcp->pid);
+
+	if (r < 0)
+		error_msg("dwfl_linux_proc_report returned an error"
+			  " for pid %d: %s", tcp->pid, dwfl_errmsg(-1));
+	else if (r > 0)
+		error_msg("dwfl_linux_proc_report returned an error"
+			  " for pid %d", tcp->pid);
+	else if (dwfl_report_end(ctx->dwfl, NULL, NULL) != 0)
+		error_msg("dwfl_report_end returned an error"
+			  " for pid %d: %s", tcp->pid, dwfl_errmsg(-1));
+
+	ctx->last_proc_updating = mapping_generation;
 }
 
 struct frame_user_data {
@@ -150,6 +191,9 @@ tcb_walk(struct tcb *tcp,
 		.data = data,
 		.stack_depth = 256,
 	};
+
+	flush_cache_maybe(tcp);
+
 	int r = dwfl_getthread_frames(ctx->dwfl, tcp->pid, frame_callback,
 				      &user_data);
 	if (r)
@@ -158,31 +202,10 @@ tcb_walk(struct tcb *tcp,
 			     0);
 }
 
-static void
-tcb_flush_cache(struct tcb *tcp)
-{
-	struct ctx *ctx = tcp->unwind_ctx;
-	if (!ctx)
-		return;
-
-	int r = dwfl_linux_proc_report(ctx->dwfl, tcp->pid);
-
-	if (r < 0)
-		error_msg("dwfl_linux_proc_report returned an error"
-			  " for pid %d: %s", tcp->pid, dwfl_errmsg(-1));
-	else if (r > 0)
-		error_msg("dwfl_linux_proc_report returned an error"
-			  " for pid %d", tcp->pid);
-	else if (dwfl_report_end(ctx->dwfl, NULL, NULL) != 0)
-		error_msg("dwfl_report_end returned an error"
-			  " for pid %d: %s", tcp->pid, dwfl_errmsg(-1));
-}
-
 const struct unwind_unwinder_t unwinder = {
 	.name = "libdw",
-	.init = NULL,
+	.init = init,
 	.tcb_init = tcb_init,
 	.tcb_fin = tcb_fin,
 	.tcb_walk = tcb_walk,
-	.tcb_flush_cache = tcb_flush_cache,
 };

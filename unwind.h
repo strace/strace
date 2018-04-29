@@ -63,12 +63,6 @@ struct unwind_unwinder_t {
 			   unwind_call_action_fn,
 			   unwind_error_action_fn,
 			   void *);
-
-	/*
-	 * Rebuild the unwinder internal cache.  Called when mmap cache
-	 * subsystem detects a change of tracee memory mapping.
-	 */
-	void   (*tcb_flush_cache)(struct tcb *);
 };
 
 extern const struct unwind_unwinder_t unwinder;

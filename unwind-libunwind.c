@@ -36,6 +36,8 @@ static unw_addr_space_t libunwind_as;
 static void
 init(void)
 {
+	mmap_cache_enable();
+
 	libunwind_as = unw_create_addr_space(&_UPT_accessors, 0);
 	if (!libunwind_as)
 		error_msg_and_die("failed to create address space"
@@ -125,10 +127,10 @@ print_stack_frame(struct tcb *tcp,
 }
 
 static void
-tcb_walk(struct tcb *tcp,
-	 unwind_call_action_fn call_action,
-	 unwind_error_action_fn error_action,
-	 void *data)
+walk(struct tcb *tcp,
+     unwind_call_action_fn call_action,
+     unwind_error_action_fn error_action,
+     void *data)
 {
 	char *symbol_name;
 	size_t symbol_name_size = 40;
@@ -159,9 +161,27 @@ tcb_walk(struct tcb *tcp,
 }
 
 static void
-tcb_flush_cache(struct tcb *tcp)
+tcb_walk(struct tcb *tcp,
+	 unwind_call_action_fn call_action,
+	 unwind_error_action_fn error_action,
+	 void *data)
 {
-	unw_flush_cache(libunwind_as, 0, 0);
+	switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
+		case MMAP_CACHE_REBUILD_RENEWED:
+			/*
+			 * Rebuild the unwinder internal cache.
+			 * Called when mmap cache subsystem detects a
+			 * change of tracee memory mapping.
+			 */
+			unw_flush_cache(libunwind_as, 0, 0);
+			ATTRIBUTE_FALLTHROUGH;
+		case MMAP_CACHE_REBUILD_READY:
+			walk(tcp, call_action, error_action, data);
+			break;
+		default:
+			/* Do nothing */
+			;
+	}
 }
 
 const struct unwind_unwinder_t unwinder = {
@@ -170,5 +190,4 @@ const struct unwind_unwinder_t unwinder = {
 	.tcb_init = tcb_init,
 	.tcb_fin = tcb_fin,
 	.tcb_walk = tcb_walk,
-	.tcb_flush_cache = tcb_flush_cache,
 };
