@@ -230,6 +230,17 @@ run_strace_match_diff()
 	match_diff "$LOG" "$EXP"
 }
 
+# Usage: run_strace_match_grep [args to run_strace]
+run_strace_match_grep()
+{
+	args="$*"
+	[ -n "$args" -a -z "${args##*-e trace=*}" ] ||
+		set -- -e trace="$NAME" "$@"
+	run_prog > /dev/null
+	run_strace "$@" $args > "$EXP"
+	match_grep "$LOG" "$EXP"
+}
+
 # Print kernel version code.
 # usage: kernel_version_code $(uname -r)
 kernel_version_code()
