@@ -99,4 +99,15 @@
 # define ATTRIBUTE_FALLTHROUGH	((void) 0)
 #endif
 
+#if GNUC_PREREQ(6, 0)
+# define DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE				\
+	_Pragma("GCC diagnostic push");					\
+	_Pragma("GCC diagnostic ignored \"-Wtautological-compare\"");
+# define DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE				\
+	_Pragma("GCC diagnostic pop");
+#else
+# define DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE	/* empty */
+# define DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE	/* empty */
+#endif
+
 #endif /* !STRACE_GCC_COMPAT_H */
