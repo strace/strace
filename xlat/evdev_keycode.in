@@ -254,6 +254,19 @@ KEY_BRIGHTNESS_AUTO	244
 KEY_DISPLAY_OFF		245
 
 KEY_WWAN		246
+
+#ifndef STRACE_WORKAROUND_FOR_KEY_RFKILL
+# define STRACE_WORKAROUND_FOR_KEY_RFKILL
+/*
+ * KEY_RFKILL and KEY_NUMERIC_A constants were introduced by Linux kernel
+ * commits v2.6.33~17^2~2 and v4.1-rc1~150^2~1^10~6, respectively.
+ * Apparently, RHEL6 introduced an alternative KEY_RFKILL constant
+ * with the same value as upstream KEY_NUMERIC_A.
+ * Downstream vendors are *not* allowed to do this.
+ * Ignore the system value of KEY_RFKILL.
+ */
+# undef KEY_RFKILL
+#endif
 KEY_RFKILL		247
 
 KEY_MICMUTE		248
@@ -518,7 +531,20 @@ KEY_SCREENSAVER		0x245
 KEY_VOICECOMMAND		0x246
 KEY_ASSISTANT		0x247
 
+#ifndef STRACE_WORKAROUND_FOR_KEY_BRIGHTNESS_MIN
+# define STRACE_WORKAROUND_FOR_KEY_BRIGHTNESS_MIN
+/*
+ * KEY_BRIGHTNESS_MIN and KEY_BRIGHTNESS_MAX constants were introduced
+ * by Linux kernel commit v3.16-rc1~30^2~6^2~1^2~7.
+ * Apparently, RHEL7 introduced an alternative KEY_BRIGHTNESS_MIN constant
+ * with the same value as upstream KEY_BRIGHTNESS_MAX.
+ * Downstream vendors are *not* allowed to do this.
+ * Ignore the system value of KEY_BRIGHTNESS_MIN.
+ */
+# undef KEY_BRIGHTNESS_MIN
+#endif
 KEY_BRIGHTNESS_MIN		0x250
+
 KEY_BRIGHTNESS_MAX		0x251
 
 KEY_KBDINPUTASSIST_PREV		0x260
