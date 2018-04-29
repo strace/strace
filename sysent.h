@@ -17,7 +17,7 @@ typedef struct sysent {
 #define TRACE_DESC			00000040	/* Trace file descriptor-related syscalls. */
 #define TRACE_MEMORY			00000100	/* Trace memory mapping-related syscalls. */
 #define SYSCALL_NEVER_FAILS		00000200	/* Syscall is always successful. */
-#define STACKTRACE_INVALIDATE_CACHE	00000400	/* Trigger proc/maps cache updating */
+#define MEMORY_MAPPING_CHANGE		00000400	/* Trigger proc/maps cache updating */
 #define STACKTRACE_CAPTURE_ON_ENTER	00001000	/* Capture stacktrace on "entering" stage */
 #define TRACE_INDIRECT_SUBCALL		00002000	/* Syscall is an indirect socket/ipc subcall. */
 #define COMPAT_SYSCALL_TYPES		00004000	/* A compat syscall that uses compat types. */

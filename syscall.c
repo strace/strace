@@ -744,7 +744,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
 		clock_gettime(CLOCK_MONOTONIC, pts);
 
-	if (tcp->s_ent->sys_flags & STACKTRACE_INVALIDATE_CACHE)
+	if (tcp->s_ent->sys_flags & MEMORY_MAPPING_CHANGE)
 		mmap_notify_report(tcp);
 
 	if (filtered(tcp) || hide_log(tcp))
