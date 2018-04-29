@@ -4,13 +4,48 @@ F_GETFD		1
 F_SETFD		2
 F_GETFL		3
 F_SETFL		4
+
+#if defined __alpha__ || defined __sparc__
+F_GETLK		7
+#elif defined __mips__
+F_GETLK		14
+#else
 F_GETLK		5
+#endif
+
+#if defined __alpha__ || defined __sparc__
+F_SETLK		8
+F_SETLKW	9
+#else
 F_SETLK		6
 F_SETLKW	7
+#endif
+
+#if defined __alpha__
+F_SETOWN	5
+F_GETOWN	6
+#elif defined __hppa__
+F_GETOWN	11
+F_SETOWN	12
+#elif defined __mips__
+F_GETOWN	23
+F_SETOWN	24
+#elif defined __sparc__
+F_GETOWN	5
+F_SETOWN	6
+#else
 F_SETOWN	8
 F_GETOWN	9
+#endif
+
+#ifdef __hppa__
+F_SETSIG	13
+F_GETSIG	14
+#else
 F_SETSIG	10
 F_GETSIG	11
+#endif
+
 F_SETOWN_EX	15
 F_GETOWN_EX	16
 F_GETOWNER_UIDS	17

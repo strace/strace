@@ -1,4 +1,14 @@
 /* asm-generic/fcntl.h */
+#if defined __hppa__
+F_GETLK64	8
+F_SETLK64	9
+F_SETLKW64	10
+#elif defined __mips__
+F_GETLK64	33
+F_SETLK64	34
+F_SETLKW64	35
+#else
 F_GETLK64	12
 F_SETLK64	13
 F_SETLKW64	14
+#endif
