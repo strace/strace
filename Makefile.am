@@ -192,6 +192,8 @@ strace_SOURCES =	\
 	mknod.c		\
 	mmap_cache.c	\
 	mmap_cache.h	\
+	mmap_notify.c	\
+	mmap_notify.h	\
 	mmsghdr.c	\
 	mount.c		\
 	mpers_type.h	\
