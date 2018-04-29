@@ -39,6 +39,10 @@
 #include "mmap_cache.h"
 #include <elfutils/libdwfl.h>
 
+struct ctx {
+	Dwfl *dwfl;
+};
+
 static void *
 tcb_init(struct tcb *tcp)
 {
@@ -68,14 +72,19 @@ tcb_init(struct tcb *tcp)
 		return NULL;
 	}
 
-	return dwfl;
+	struct ctx *ctx = xmalloc(sizeof(*ctx));
+	ctx->dwfl = dwfl;
+	return ctx;
 }
 
 static void
 tcb_fin(struct tcb *tcp)
 {
-	if (tcp->unwind_ctx)
-		dwfl_end(tcp->unwind_ctx);
+	struct ctx *ctx = tcp->unwind_ctx;
+	if (ctx) {
+		dwfl_end(ctx->dwfl);
+		free(ctx);
+	}
 }
 
 struct frame_user_data {
@@ -131,8 +140,8 @@ tcb_walk(struct tcb *tcp,
 	 unwind_error_action_fn error_action,
 	 void *data)
 {
-	Dwfl *dwfl = tcp->unwind_ctx;
-	if (!dwfl)
+	struct ctx *ctx = tcp->unwind_ctx;
+	if (!ctx)
 		return;
 
 	struct frame_user_data user_data = {
@@ -141,7 +150,7 @@ tcb_walk(struct tcb *tcp,
 		.data = data,
 		.stack_depth = 256,
 	};
-	int r = dwfl_getthread_frames(dwfl, tcp->pid, frame_callback,
+	int r = dwfl_getthread_frames(ctx->dwfl, tcp->pid, frame_callback,
 				      &user_data);
 	if (r)
 		error_action(data,
@@ -152,11 +161,11 @@ tcb_walk(struct tcb *tcp,
 static void
 tcb_flush_cache(struct tcb *tcp)
 {
-	Dwfl *dwfl = tcp->unwind_ctx;
-	if (!dwfl)
+	struct ctx *ctx = tcp->unwind_ctx;
+	if (!ctx)
 		return;
 
-	int r = dwfl_linux_proc_report(dwfl, tcp->pid);
+	int r = dwfl_linux_proc_report(ctx->dwfl, tcp->pid);
 
 	if (r < 0)
 		error_msg("dwfl_linux_proc_report returned an error"
@@ -164,7 +173,7 @@ tcb_flush_cache(struct tcb *tcp)
 	else if (r > 0)
 		error_msg("dwfl_linux_proc_report returned an error"
 			  " for pid %d", tcp->pid);
-	else if (dwfl_report_end(dwfl, NULL, NULL) != 0)
+	else if (dwfl_report_end(ctx->dwfl, NULL, NULL) != 0)
 		error_msg("dwfl_report_end returned an error"
 			  " for pid %d: %s", tcp->pid, dwfl_errmsg(-1));
 }
