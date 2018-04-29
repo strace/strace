@@ -46,8 +46,27 @@ F_SETSIG	10
 F_GETSIG	11
 #endif
 
+#ifndef STRACE_WORKAROUND_FOR_F_OWNER_EX
+# define STRACE_WORKAROUND_FOR_F_OWNER_EX
+/*
+ * Linux kernel commit v2.6.32-rc7~23 has changed values of F_SETOWN_EX
+ * and F_GETOWN_EX constants introduced by commit v2.6.32-rc1~96 to fix
+ * the conflict with F_GETLK64 and F_SETLK64 constants.
+ * Looks like the best way to handle this situation is to pretend that
+ * old values of F_SETOWN_EX and F_GETOWN_EX didn't exist.
+ */
+# if defined F_SETOWN_EX && F_SETOWN_EX != 15
+#  warning invalid value of F_SETOWN_EX ignored
+# endif
+# undef F_SETOWN_EX
+# if defined F_GETOWN_EX && F_GETOWN_EX != 16
+#  warning invalid value of F_GETOWN_EX ignored
+# endif
+# undef F_GETOWN_EX
+#endif
 F_SETOWN_EX	15
 F_GETOWN_EX	16
+
 F_GETOWNER_UIDS	17
 F_OFD_GETLK	36
 F_OFD_SETLK	37
