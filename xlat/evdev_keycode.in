@@ -547,7 +547,20 @@ KEY_VOD				0x273
 KEY_UNMUTE			0x274
 KEY_FASTREVERSE			0x275
 KEY_SLOWREVERSE			0x276
+
+#ifndef STRACE_WORKAROUND_FOR_KEY_DATA
+# define STRACE_WORKAROUND_FOR_KEY_DATA
+/*
+ * Linux kernel commit v4.9-rc8~12^2 has changed the value of KEY_DATA
+ * constant introduced by commit v4.7-rc6~32^2~6^2 because the old value
+ * was already used by KEY_FASTREVERSE.
+ * Looks like the best way to handle this situation is to pretend that
+ * the old value of KEY_DATA didn't exist.
+ */
+# undef KEY_DATA
+#endif
 KEY_DATA			0x277
+
 KEY_ONSCREEN_KEYBOARD		0x278
 
 BTN_TRIGGER_HAPPY		0x2c0
