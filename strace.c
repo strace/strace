@@ -421,7 +421,8 @@ set_cloexec_flag(int fd)
 	if (flags == newflags)
 		return;
 
-	fcntl(fd, F_SETFD, newflags); /* never fails */
+	if (fcntl(fd, F_SETFD, newflags)) /* never fails */
+		perror_msg_and_die("fcntl(%d, F_SETFD, %#x)", fd, newflags);
 }
 
 static void
