@@ -1124,9 +1124,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (tcp->u_error == EOVERFLOW) {
 				tprints(" => ");
 				if (!umove_or_printaddr_ignore_syserror(tcp,
-				    arg, &args))
+				    arg, &args)) {
 					PRINT_FIELD_U("{", args, buf_size);
 					tprints("}");
+				}
 			}
 			break;
 		} else
