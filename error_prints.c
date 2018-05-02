@@ -90,6 +90,7 @@ error_msg_and_die(const char *fmt, ...)
 	va_list p;
 	va_start(p, fmt);
 	verror_msg(0, fmt, p);
+	va_end(p);
 	die();
 }
 
@@ -100,6 +101,7 @@ error_msg_and_help(const char *fmt, ...)
 		va_list p;
 		va_start(p, fmt);
 		verror_msg(0, fmt, p);
+		va_end(p);
 	}
 	fprintf(stderr, "Try '%s -h' for more information.\n",
 		program_invocation_name);
@@ -121,5 +123,6 @@ perror_msg_and_die(const char *fmt, ...)
 	va_list p;
 	va_start(p, fmt);
 	verror_msg(errno, fmt, p);
+	va_end(p);
 	die();
 }
