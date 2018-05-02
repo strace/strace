@@ -928,6 +928,9 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 	const unsigned char *src;
 	int i;
 
+	if ((len < 0) || (len > INT_MAX - 16))
+		return;
+
 	memset(outbuf, ' ', sizeof(outbuf));
 
 	if (strsize < len + 16) {
