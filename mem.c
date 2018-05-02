@@ -40,8 +40,18 @@ get_pagesize(void)
 {
 	static unsigned long pagesize;
 
-	if (!pagesize)
-		pagesize = sysconf(_SC_PAGESIZE);
+	if (!pagesize) {
+		long ret = sysconf(_SC_PAGESIZE);
+
+		if (ret < 0)
+			perror_func_msg_and_die("sysconf(_SC_PAGESIZE)");
+		if (ret == 0)
+			error_func_msg_and_die("sysconf(_SC_PAGESIZE) "
+					       "returned 0");
+
+		pagesize = (unsigned long) ret;
+	}
+
 	return pagesize;
 }
 
