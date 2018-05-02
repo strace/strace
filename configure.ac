@@ -322,7 +322,9 @@ AC_CHECK_TYPES(m4_normalize([
 	struct flock,
 	struct flock64,
 	struct __kernel_flock,
-	struct __kernel_flock64
+	struct __kernel_flock64,
+	struct f_owner_ex,
+	struct __kernel_f_owner_ex
 ]),,,
 [#include <sys/types.h>
 #include <linux/fcntl.h>])

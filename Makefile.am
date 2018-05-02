@@ -128,6 +128,7 @@ strace_SOURCES =	\
 	evdev_mpers.c	\
 	eventfd.c	\
 	execve.c	\
+	f_owner_ex.h	\
 	fadvise.c	\
 	fallocate.c	\
 	fanotify.c	\
