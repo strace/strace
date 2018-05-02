@@ -35,7 +35,6 @@
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"
 #include "xlat/fcntlcmds.h"
-#include "xlat/fcntl64cmds.h"
 #include "xlat/fdflags.h"
 #include "xlat/lockfcmds.h"
 #include "xlat/notifyflags.h"
@@ -197,14 +196,7 @@ SYS_FUNC(fcntl)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		const unsigned int cmd = tcp->u_arg[1];
-
-		/*
-		 * fcntl syscall does not recognize fcntl64 command constants,
-		 * but we would like to show them for better debugging
-		 * experience.
-		 */
-		printxvals(cmd, "F_???", fcntlcmds, fcntl64cmds, NULL);
+		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
 	}
 	return print_fcntl(tcp);
 }
@@ -215,7 +207,7 @@ SYS_FUNC(fcntl64)
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
-		printxvals(cmd, "F_???", fcntl64cmds, fcntlcmds, NULL);
+		printxval(fcntlcmds, cmd, "F_???");
 	}
 	switch (cmd) {
 		case F_SETLK64:
