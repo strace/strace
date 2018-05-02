@@ -40,6 +40,7 @@
 # include <string.h>
 # include <sys/ioctl.h>
 # include <sys/mman.h>
+# include <unistd.h>
 # include <linux/kvm.h>
 
 static int
@@ -56,7 +57,7 @@ kvm_ioctl(int fd, unsigned long cmd, const char *cmd_str, void *arg)
 
 static const char dev[] = "/dev/kvm";
 static const char vm_dev[] = "anon_inode:kvm-vm";
-static const char vcpu_dev[] = "anon_inode:kvm-vcpu";
+static char vcpu_dev[] = "anon_inode:kvm-vcpu:0";
 static size_t page_size;
 
 extern const char code[];
@@ -165,6 +166,23 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 	}
 }
 
+static int
+vcpu_dev_should_have_cpuid(int fd)
+{
+	int r = 0;
+	char *filename = NULL;
+	char buf[sizeof(vcpu_dev)];
+
+	if (asprintf(&filename, "/proc/%d/fd/%d", getpid(), fd) < 0)
+		error_msg_and_fail("asprintf");
+
+	if (readlink(filename, buf, sizeof(buf)) == sizeof(buf) - 1
+	    && (memcmp(buf, vcpu_dev, sizeof(buf) - 1) == 0))
+		r = 1;
+	free(filename);
+	return r;
+}
+
 int
 main(void)
 {
@@ -208,6 +226,15 @@ main(void)
 	       (unsigned long) page_size, (unsigned long) page_size, mem);
 
 	int vcpu_fd = KVM_IOCTL(vm_fd, KVM_CREATE_VCPU, NULL);
+	if (!vcpu_dev_should_have_cpuid(vcpu_fd))
+		/*
+		 * This is an older kernel that doesn't place a cpuid
+		 * at the end of the dentry associated with vcpu_fd.
+		 * Trim the cpuid part of vcpu_dev like:
+		 * "anon_inode:kvm-vcpu:0" -> "anon_inode:kvm-vcpu"
+		 */
+		vcpu_dev[strlen (vcpu_dev) - 2] = '\0';
+
 	printf("ioctl(%d<%s>, KVM_CREATE_VCPU, 0) = %d<%s>\n",
 	       vm_fd, vm_dev, vcpu_fd, vcpu_dev);
 
