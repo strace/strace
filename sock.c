@@ -173,7 +173,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 		entering_ifc = get_tcb_priv_data(tcp);
 
 		if (!entering_ifc) {
-			error_msg("decode_ifconf: where is my ifconf?");
+			error_func_msg("where is my ifconf?");
 			return 0;
 		}
 	}
