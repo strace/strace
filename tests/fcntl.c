@@ -69,12 +69,83 @@ test_flock64(void)
 #endif
 }
 
+/*
+ * F_[GS]ETOWN_EX had conflicting values with F_[SG]ETLK64
+ * in kernel revisions v2.6.32-rc1~96..v2.6.32-rc7~23.
+ */
+#undef TEST_F_OWNER_EX
+#if defined F_GETOWN_EX && defined F_SETOWN_EX \
+ && (F_GETOWN_EX != F_SETLK64) && (F_SETOWN_EX != F_GETLK64)
+# define TEST_F_OWNER_EX
+#endif
+
+#ifdef TEST_F_OWNER_EX
+# include "f_owner_ex.h"
+
+static long
+test_f_owner_ex_type_pid(const int cmd, const char *const cmd_name,
+			 const int type, const char *const type_name,
+			 pid_t pid)
+{
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_kernel_f_owner_ex, fo);
+
+	fo->type = type;
+	fo->pid = pid;
+	long rc = invoke_test_syscall(cmd, fo);
+	printf("%s(0, %s, {type=%s, pid=%d}) = %s\n",
+	       TEST_SYSCALL_STR, cmd_name, type_name, fo->pid, sprintrc(rc));
+
+	void *bad_addr = (void *) fo + 1;
+	long rc_efault = invoke_test_syscall(cmd, bad_addr);
+	printf("%s(0, %s, %p) = %s\n",
+	       TEST_SYSCALL_STR, cmd_name, bad_addr, sprintrc(rc_efault));
+
+	return rc;
+}
+
+static void
+test_f_owner_ex_umove_or_printaddr(const int type, const char *const type_name,
+				   pid_t pid)
+{
+	long rc = test_f_owner_ex_type_pid(ARG_STR(F_SETOWN_EX),
+					   type, type_name, pid);
+	if (!rc)
+		test_f_owner_ex_type_pid(ARG_STR(F_GETOWN_EX),
+					 type, type_name, pid);
+}
+
+static void
+test_f_owner_ex(void)
+{
+	static const struct {
+		int type;
+		const char *type_name;
+		pid_t pid[2];
+	} a[] = {
+		{ ARG_STR(F_OWNER_TID), { 1234567890, 20 } },
+		{ ARG_STR(F_OWNER_PID), { 1298126790, 30 } },
+		{ ARG_STR(F_OWNER_PGRP), { 1294567890, 40 } }
+	};
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(a); i++) {
+		for (unsigned int j = 0; j < ARRAY_SIZE(a[0].pid); j++) {
+			test_f_owner_ex_umove_or_printaddr(a[i].type,
+							   a[i].type_name,
+							   a[i].pid[j]);
+		}
+	}
+}
+#endif /* TEST_F_OWNER_EX */
+
 int
 main(void)
 {
 	create_sample();
 	test_flock();
 	test_flock64();
+#ifdef TEST_F_OWNER_EX
+	test_f_owner_ex();
+#endif
 
 	puts("+++ exited with 0 +++");
 	return 0;
