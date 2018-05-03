@@ -66,6 +66,11 @@ enum trace_event {
 	 * Restart the tracee with signal 0.
 	 */
 	TE_STOP_BEFORE_EXIT,
+
+	/*
+	 * SECCOMP_RET_TRACE rule is triggered.
+	 */
+	TE_SECCOMP,
 };
 
 #endif /* !STRACE_TRACE_EVENT_H */

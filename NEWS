@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented usage of seccomp-bpf for stopping tracees only for filtered
+    syscalls.  Use --seccomp-bpf option to enable.
   * Implemented decoding of pidfd_open and clone3 syscalls.
   * Enhanced decoding of NETLINK_ROUTE protocol.
   * Implemented decoding of UNIX_DIAG_UID netlink attribute.

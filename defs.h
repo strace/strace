@@ -332,6 +332,9 @@ struct tcb {
 # define TCB_DELAYED	0x2000	/* Current syscall has been delayed */
 # define TCB_TAMPERED_NO_FAIL 0x4000	/* We tamper tcb with syscall
 					   that should not fail. */
+# define TCB_SECCOMP_FILTER	0x8000	/* This process has a seccomp filter
+					 * attached.
+					 */
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -358,6 +361,7 @@ struct tcb {
 # define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
 # define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
 # define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
+# define has_seccomp_filter(tcp)	((tcp)->flags & TCB_SECCOMP_FILTER)
 
 extern const struct_sysent stub_sysent;
 # define tcp_sysent(tcp) (tcp->s_ent ?: &stub_sysent)

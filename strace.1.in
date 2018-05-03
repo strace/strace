@@ -49,6 +49,7 @@ strace \- trace system calls and signals
 .OP \-X format
 .OM \-P path
 .OM \-p pid
+.OP \-\-seccomp\-bpf
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -68,6 +69,7 @@ strace \- trace system calls and signals
 .OP \-S sortby
 .OM \-P path
 .OM \-p pid
+.OP \-\-seccomp\-bpf
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -969,6 +971,23 @@ option set to
 Show some debugging output of
 .B strace
 itself on the standard error.
+.TP
+.B \-\-seccomp\-bpf
+Enable (experimental) usage of seccomp-bpf to have ptrace(2)-stops only when
+system calls that are being traced occur in the traced processes.  Implies the
+.B \-f
+option.
+An attempt to rely on seccomp-bpf to filter system calls may fail for various
+reasons, e.g. there are too many system calls to filter, the seccomp API is not
+available, or
+.B strace
+itself is being traced.
+.B \-\-seccomp\-bpf
+is also ineffective on processes attached using
+.BR \-p .
+In cases when seccomp-bpf filter setup failed,
+.B strace
+proceeds as usual and stops traced processes on every system call.
 .TP
 .B \-F
 This option is deprecated.  It is retained for backward compatibility only
