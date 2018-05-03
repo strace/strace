@@ -68,9 +68,6 @@ enum mmap_cache_rebuild_result {
 extern void
 mmap_cache_enable(void);
 
-extern bool
-mmap_cache_is_enabled(void);
-
 extern void
 mmap_cache_delete(struct tcb *, const char *caller);
 

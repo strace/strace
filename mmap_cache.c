@@ -34,7 +34,6 @@
 #include "xstring.h"
 
 static unsigned int mmap_cache_generation;
-static bool use_mmap_cache;
 
 static void
 mmap_cache_invalidate(struct tcb *tcp, void *unused)
@@ -55,15 +54,12 @@ mmap_cache_invalidate(struct tcb *tcp, void *unused)
 void
 mmap_cache_enable(void)
 {
+	static bool use_mmap_cache;
+
 	if (!use_mmap_cache) {
 		mmap_notify_register_client(mmap_cache_invalidate, NULL);
 		use_mmap_cache = true;
 	}
-}
-
-extern bool mmap_cache_is_enabled(void)
-{
-	return use_mmap_cache;
 }
 
 /*
