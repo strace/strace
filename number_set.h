@@ -62,5 +62,6 @@ free_number_set_array(struct number_set *, unsigned int nmemb);
 extern struct number_set *read_set;
 extern struct number_set *write_set;
 extern struct number_set *signal_set;
+extern struct number_set *trace_set;
 
 #endif /* !STRACE_NUMBER_SET_H */

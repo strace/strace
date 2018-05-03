@@ -36,11 +36,11 @@
 struct number_set *read_set;
 struct number_set *write_set;
 struct number_set *signal_set;
+struct number_set *trace_set;
 
 static struct number_set *abbrev_set;
 static struct number_set *inject_set;
 static struct number_set *raw_set;
-static struct number_set *trace_set;
 static struct number_set *verbose_set;
 
 /* Only syscall numbers are personality-specific so far.  */
