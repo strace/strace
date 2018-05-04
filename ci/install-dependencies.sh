@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
-common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libdw-dev make pkg-config xz-utils'
+common_packages='autoconf automake faketime file gawk gcc-multilib git gzip make pkg-config xz-utils'
 
 updated=
 apt_get_install()
@@ -87,6 +87,15 @@ case "$CC" in
 			$KHEADERS_INC/linux \
 			$KHEADERS_INC/mtd \
 			/opt/musl/include/
+		;;
+esac
+
+case "${STACKTRACE-}" in
+	libdw)
+		apt_get_install libdw-dev libz-dev liblzma-dev
+		;;
+	libunwind)
+		apt_get_install libunwind8-dev
 		;;
 esac
 

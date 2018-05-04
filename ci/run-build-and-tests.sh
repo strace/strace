@@ -24,6 +24,15 @@ case "${TARGET-}" in
 		;;
 esac
 
+case "${STACKTRACE-}" in
+	libdw|libunwind)
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --with-$STACKTRACE"
+		;;
+	no)
+		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --disable-stacktrace"
+		;;
+esac
+
 case "$KHEADERS" in
 	*/*)
 		CPPFLAGS='-isystem /opt/kernel/include'

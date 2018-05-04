@@ -21,35 +21,50 @@ matrix:
     - compiler: gcc
       env:
         - TARGET=x86_64
+        - STACKTRACE=libunwind
         - CHECK=coverage
         - KHEADERS=torvalds/linux
     - compiler: gcc
       env:
         - TARGET=x86_64
+        - STACKTRACE=libunwind
     - compiler: gcc
       env:
         - TARGET=x32
+        - STACKTRACE=no
     - compiler: gcc
       env:
         - TARGET=x86
+        - STACKTRACE=no
     - compiler: clang
       env:
         - TARGET=x86_64
+        - STACKTRACE=libunwind
     - compiler: musl-gcc
       env:
         - TARGET=x86_64
+        - STACKTRACE=no
     - compiler: clang
       env:
         - TARGET=x86
+        - STACKTRACE=no
     - compiler: musl-gcc
       env:
         - TARGET=x86
+        - STACKTRACE=no
     - compiler: gcc-7
       env:
         - TARGET=x86_64
+        - STACKTRACE=libunwind
     - compiler: gcc-7
       env:
         - TARGET=x32
+        - STACKTRACE=no
     - compiler: gcc-7
       env:
         - TARGET=x86
+        - STACKTRACE=no
+    - compiler: gcc
+      env:
+        - TARGET=x86_64
+        - STACKTRACE=no
