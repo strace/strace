@@ -75,6 +75,8 @@ libstrace_a_SOURCES =	\
 	fstatfs64.c \
 	getpagesize.c \
 	ipc.c \
+	mmap_cache.c	\
+	mmap_cache.h	\
 	sigreturn.c	\
 	socketcall.c \
 	statfs.c \
@@ -190,8 +192,6 @@ strace_SOURCES =	\
 	membarrier.c	\
 	memfd_create.c	\
 	mknod.c		\
-	mmap_cache.c	\
-	mmap_cache.h	\
 	mmap_notify.c	\
 	mmap_notify.h	\
 	mmsghdr.c	\

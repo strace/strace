@@ -89,26 +89,25 @@ print_stack_frame(struct tcb *tcp,
 		  size_t *symbol_name_size)
 {
 	unw_word_t ip;
-	struct mmap_cache_t *cur_mmap_cache;
 
 	if (unw_get_reg(cursor, UNW_REG_IP, &ip) < 0) {
 		perror_msg("cannot walk the stack of process %d", tcp->pid);
 		return -1;
 	}
 
-	cur_mmap_cache = mmap_cache_search(tcp, ip);
-	if (cur_mmap_cache
+	struct mmap_cache_entry_t *entry = mmap_cache_search(tcp, ip);
+
+	if (entry
 	    /* ignore mappings that have no PROT_EXEC bit set */
-	    && (cur_mmap_cache->protections & MMAP_CACHE_PROT_EXECUTABLE)) {
-		unsigned long true_offset;
+	    && (entry->protections & MMAP_CACHE_PROT_EXECUTABLE)) {
 		unw_word_t function_offset;
 
 		get_symbol_name(cursor, symbol_name, symbol_name_size,
 				&function_offset);
-		true_offset = ip - cur_mmap_cache->start_addr +
-			cur_mmap_cache->mmap_offset;
+		unsigned long true_offset =
+			ip - entry->start_addr + entry->mmap_offset;
 		call_action(data,
-			    cur_mmap_cache->binary_filename,
+			    entry->binary_filename,
 			    *symbol_name,
 			    function_offset,
 			    true_offset);
@@ -139,8 +138,6 @@ walk(struct tcb *tcp,
 
 	if (!tcp->mmap_cache)
 		error_func_msg_and_die("mmap_cache is NULL");
-	if (tcp->mmap_cache_size == 0)
-		error_func_msg_and_die("mmap_cache is empty");
 
 	symbol_name = xmalloc(symbol_name_size);
 

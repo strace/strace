@@ -819,7 +819,8 @@ droptcb(struct tcb *tcp)
 		unwind_tcb_fin(tcp);
 #endif
 
-	mmap_cache_delete(tcp, __func__);
+	if (tcp->mmap_cache)
+		tcp->mmap_cache->free_fn(tcp, __func__);
 
 	nprocs--;
 	debug_msg("dropped tcb for pid %d, %d remain", tcp->pid, nprocs);

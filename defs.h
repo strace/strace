@@ -219,8 +219,6 @@ struct tcb {
 	struct timespec delay_expiration_time; /* When does the delay end */
 
 	struct mmap_cache_t *mmap_cache;
-	unsigned int mmap_cache_size;
-	unsigned int mmap_cache_generation;
 
 #ifdef ENABLE_STACKTRACE
 	void *unwind_ctx;

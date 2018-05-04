@@ -31,7 +31,15 @@
  * Keep a sorted array of cache entries,
  * so that we can binary search through it.
  */
+
 struct mmap_cache_t {
+	struct mmap_cache_entry_t *entry;
+	void (*free_fn)(struct tcb *, const char *caller);
+	unsigned int size;
+	unsigned int generation;
+};
+
+struct mmap_cache_entry_t {
 	/**
 	 * example entry:
 	 * 7fabbb09b000-7fabbb09f000 r-xp 00179000 fc:00 1180246 /lib/libc-2.11.1.so
@@ -68,13 +76,10 @@ enum mmap_cache_rebuild_result {
 extern void
 mmap_cache_enable(void);
 
-extern void
-mmap_cache_delete(struct tcb *, const char *caller);
-
 extern enum mmap_cache_rebuild_result
 mmap_cache_rebuild_if_invalid(struct tcb *, const char *caller);
 
-extern struct mmap_cache_t *
+extern struct mmap_cache_entry_t *
 mmap_cache_search(struct tcb *, unsigned long ip);
 
 #endif /* !STRACE_MMAP_CACHE_H */
