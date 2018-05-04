@@ -149,6 +149,8 @@ strace_SOURCES =	\
 	file_ioctl.c	\
 	filter_qualify.c \
 	filter.h	\
+	filter_seccomp.c \
+	filter_seccomp.h \
 	flock.c		\
 	flock.h		\
 	fs_x_ioctl.c	\
