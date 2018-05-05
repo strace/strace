@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
-common_packages='autoconf automake faketime file gawk gcc-multilib git gzip make pkg-config xz-utils'
+common_packages='autoconf automake faketime file gawk gcc-multilib git gzip make xz-utils'
 
 updated=
 apt_get_install()
@@ -92,7 +92,7 @@ esac
 
 case "${STACKTRACE-}" in
 	libdw)
-		apt_get_install libdw-dev libz-dev liblzma-dev
+		apt_get_install libdw-dev
 		;;
 	libunwind)
 		apt_get_install libunwind8-dev

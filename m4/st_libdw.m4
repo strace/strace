@@ -27,6 +27,11 @@
 
 AC_DEFUN([st_ARG_LIBDW], [dnl
 
+: ${libdw_CPPFLAGS=}
+: ${libdw_CFLAGS=}
+: ${libdw_LDFLAGS=}
+: ${libdw_LIBS=}
+
 AC_ARG_WITH([libdw],
 	    [AS_HELP_STRING([--with-libdw],
 			    [use libdw to implement stack tracing support]
@@ -34,9 +39,9 @@ AC_ARG_WITH([libdw],
 	    ],
 	    [case "${withval}" in
 	     yes|no|check) ;;
-	     *)
-	     AC_MSG_ERROR([Use pkg-config variables instead of giving path to --with-libdw])
-	     ;;
+	     *) libdw_CPPFLAGS="-I${withval}/include"
+		libdw_LDFLAGS="-L${withval}/lib"
+		with_libdw=yes ;;
 	     esac
 	    ],
 	    [with_libdw=check]
@@ -46,60 +51,45 @@ AC_ARG_WITH([libdw],
 
 AC_DEFUN([st_LIBDW], [dnl
 
-: ${libdw_CPPFLAGS=}
-: ${libdw_CFLAGS=}
-: ${libdw_LDFLAGS=}
-: ${libdw_LIBS=}
 have_libdw=
 
-AS_IF([test "x$with_libdw" != xno],
-      [
-       dnl If libdw.pc is not available, then libdw is not new enough
-       dnl to be used for stack tracing.
-       AS_IF([test "x$with_libdw" = xyes],
-	     [PKG_CHECK_MODULES([libdw], [libdw], [have_libdw=yes])],
-	     [PKG_CHECK_MODULES([libdw], [libdw], [have_libdw=yes], [:])]
-	    )
-      ]
-     )
-
-AS_IF([test "x$have_libdw" = xyes],
-      [
-       dnl If libdw.pc is available, check whether libdw can be used
-       dnl for stack tracing.
-       saved_CPPFLAGS="$CPPFLAGS"
+AS_IF([test "x$with_libdw" != xno && test "x$use_unwinder" = x],
+      [saved_CPPFLAGS="$CPPFLAGS"
        saved_CFLAGS="$CFLAGS"
        CPPFLAGS="$CPPFLAGS $libdw_CPPFLAGS"
        CFLAGS="$CFLAGS $libdw_CFLAGS"
 
        AC_CHECK_HEADERS([elfutils/libdwfl.h],
-			[
-			 AC_MSG_CHECKING([for dwfl_linux_proc_attach in libdw])
-			 saved_LDFLAGS="$LDFLAGS"
-			 saved_LIBS="$LIBS"
-			 LDFLAGS="$LDFLAGS $libdw_LDFLAGS"
-			 LIBS="$LIBS $libdw_LIBS"
-
-			 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <elfutils/libdwfl.h>]],
-							 [[return dwfl_linux_proc_attach(0, 0, 0)]]
-							)
-					],
-					[AC_MSG_RESULT([yes])],
-					[AC_MSG_RESULT([no])
-					 AS_IF([test "x$with_libdw" = xyes],
-					       [AC_MSG_FAILURE([failed to find dwfl_linux_proc_attach in libdw])],
-					      )
-					 have_libdw=
-					]
-				       )
-
-			 LIBS="$saved_LIBS"
-			 LDFLAGS="$saved_LDFLAGS"
+			[AC_CHECK_LIB([dw], [dwfl_linux_proc_attach],
+				      [libdw_LIBS="-ldw $libdw_LIBS"
+				       AC_CACHE_CHECK([for elfutils version],
+						      [st_cv_ELFUTILS_VERSION],
+						      [[st_cv_ELFUTILS_VERSION="$(echo _ELFUTILS_VERSION |
+										  $CPP $CPPFLAGS -P -imacros elfutils/version.h - |
+										  grep '^[0-9]')"
+							test -n "$st_cv_ELFUTILS_VERSION" ||
+								st_cv_ELFUTILS_VERSION=0
+						      ]]
+						     )
+				       AS_IF([test "$st_cv_ELFUTILS_VERSION" -ge 164],
+					     [have_libdw=yes],
+					     [AS_IF([test "x$with_libdw" = xyes],
+						    [AC_MSG_ERROR([elfutils version >= 164 is required for stack tracing support])],
+						    [AC_MSG_WARN([elfutils version >= 164 is required for stack tracing support])]
+						   )
+					     ]
+					    )
+				      ],
+				      [AS_IF([test "x$with_libdw" = xyes],
+					     [AC_MSG_FAILURE([failed to find dwfl_linux_proc_attach in libdw])],
+					    )
+				      ],
+				      [$libdw_LDFLAGS $libdw_LIBS]
+				     )
 			],
 			[AS_IF([test "x$with_libdw" = xyes],
 			       [AC_MSG_FAILURE([failed to find elfutils/libdwfl.h])]
 			      )
-			 have_libdw=
 			]
 		       )
 
