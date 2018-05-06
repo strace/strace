@@ -54,15 +54,7 @@
 #include "xlat/ethernet_protocols.h"
 #include "xlat/af_packet_types.h"
 
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
-# include <bluetooth/bluetooth.h>
-# include <bluetooth/hci.h>
-# include <bluetooth/l2cap.h>
-# include <bluetooth/rfcomm.h>
-# include <bluetooth/sco.h>
-
-# include "xlat/hci_channels.h"
-#endif
+#include "xlat/hci_channels.h"
 
 #define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
 
@@ -262,10 +254,48 @@ print_sockaddr_data_raw(const void *const buf, const int addrlen)
 	print_quoted_string(data, datalen, 0);
 }
 
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
+static uint16_t
+btohs(uint16_t val)
+{
+#ifdef WORDS_BIGENDIAN
+	return (val << 8) | (val >> 8);
+#else
+	return val;
+#endif
+}
+
 static void
 print_sockaddr_data_bt(const void *const buf, const int addrlen)
 {
+	struct sockaddr_hci {
+		/* sa_family_t */ uint16_t	hci_family;
+		uint16_t			hci_dev;
+		uint16_t			hci_channel;
+	};
+
+	struct bdaddr {
+		uint8_t				b[6];
+	} ATTRIBUTE_PACKED;
+
+	struct sockaddr_sco {
+		/* sa_family_t */ uint16_t	sco_family;
+		struct bdaddr			sco_bdaddr;
+	};
+
+	struct sockaddr_rc {
+		/* sa_family_t */ uint16_t	rc_family;
+		struct bdaddr			rc_bdaddr;
+		uint8_t				rc_channel;
+	};
+
+	struct sockaddr_l2 {
+		/* sa_family_t */ uint16_t	l2_family;
+		/* little endiang */ uint16_t	l2_psm;
+		struct bdaddr			l2_bdaddr;
+		/* little endian */ uint16_t	l2_cid;
+		uint8_t				l2_bdaddr_type;
+	};
+
 	switch (addrlen) {
 		case sizeof(struct sockaddr_hci): {
 			const struct sockaddr_hci *const hci = buf;
@@ -310,7 +340,6 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 			break;
 	}
 }
-#endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
 
 typedef void (* const sockaddr_printer)(const void *const, const int);
 
@@ -324,9 +353,7 @@ static const struct {
 	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
-#endif
 };
 
 void
