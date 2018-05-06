@@ -1,7 +1,7 @@
 #!/bin/sh -ex
 
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
-common_packages='autoconf automake faketime file gawk gcc-multilib git gzip make xz-utils'
+common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libbluetooth-dev make xz-utils'
 
 updated=
 apt_get_install()
