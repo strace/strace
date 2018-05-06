@@ -384,29 +384,22 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 		}
 		case sizeof(struct sockaddr_sco): {
 			const struct sockaddr_sco *const sco = buf;
-			tprintf("sco_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x",
-				sco->sco_bdaddr.b[0], sco->sco_bdaddr.b[1],
-				sco->sco_bdaddr.b[2], sco->sco_bdaddr.b[3],
-				sco->sco_bdaddr.b[4], sco->sco_bdaddr.b[5]);
+			print_mac_addr("sco_bdaddr=", sco->sco_bdaddr.b,
+				       sizeof(sco->sco_bdaddr.b));
 			break;
 		}
 		case sizeof(struct sockaddr_rc): {
 			const struct sockaddr_rc *const rc = buf;
-			tprintf("rc_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-				", rc_channel=%u",
-				rc->rc_bdaddr.b[0], rc->rc_bdaddr.b[1],
-				rc->rc_bdaddr.b[2], rc->rc_bdaddr.b[3],
-				rc->rc_bdaddr.b[4], rc->rc_bdaddr.b[5],
-				rc->rc_channel);
+			print_mac_addr("rc_bdaddr=", rc->rc_bdaddr.b,
+				       sizeof(rc->rc_bdaddr.b));
+			tprintf(", rc_channel=%u", rc->rc_channel);
 			break;
 		}
 		case sizeof(struct sockaddr_l2): {
 			const struct sockaddr_l2 *const l2 = buf;
 			print_bluetooth_l2_psm("l2_psm=", l2->l2_psm);
-			tprintf(", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x",
-				l2->l2_bdaddr.b[0], l2->l2_bdaddr.b[1],
-				l2->l2_bdaddr.b[2], l2->l2_bdaddr.b[3],
-				l2->l2_bdaddr.b[4], l2->l2_bdaddr.b[5]);
+			print_mac_addr(", l2_bdaddr=", l2->l2_bdaddr.b,
+				       sizeof(l2->l2_bdaddr.b));
 			print_bluetooth_l2_cid(", l2_cid=", l2->l2_cid);
 			tprints(", l2_bdaddr_type=");
 			printxval_index(bdaddr_types, l2->l2_bdaddr_type,

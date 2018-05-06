@@ -78,11 +78,8 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	case SIOCGIFHWADDR: {
 		/* XXX Are there other hardware addresses
 		   than 6-byte MACs?  */
-		const unsigned char *bytes =
-			(unsigned char *) &ifr->ifr_hwaddr.sa_data;
-		tprintf("ifr_hwaddr=%02x:%02x:%02x:%02x:%02x:%02x",
-			bytes[0], bytes[1], bytes[2],
-			bytes[3], bytes[4], bytes[5]);
+		print_mac_addr("ifr_hwaddr=",
+			       (const uint8_t *) &ifr->ifr_hwaddr.sa_data, 6);
 		break;
 	}
 	case SIOCSIFFLAGS:

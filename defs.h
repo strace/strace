@@ -687,6 +687,9 @@ extern const char *sprintflags_ex(const char *prefix, const struct xlat *xlat,
 extern const char *sprinttime(long long sec);
 extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
 extern const char *sprinttime_usec(long long sec, unsigned long long usec);
+
+extern const char *sprint_mac_addr(const uint8_t addr[], size_t size);
+
 extern void print_symbolic_mode_t(unsigned int);
 extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
@@ -968,6 +971,13 @@ extern void tprintf(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints(const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints_comment(const char *str);
+
+static inline void
+print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
+{
+	tprints(prefix);
+	tprints(sprint_mac_addr(addr, size));
+}
 
 #if SUPPORTED_PERSONALITIES > 1
 extern void set_personality(unsigned int personality);

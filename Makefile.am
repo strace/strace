@@ -242,6 +242,7 @@ strace_SOURCES =	\
 	print_group_req.c \
 	print_fields.h	\
 	print_ifindex.c	\
+	print_mac.c	\
 	print_mq_attr.c	\
 	print_msgbuf.c	\
 	print_sg_req_info.c \
