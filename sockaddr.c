@@ -55,6 +55,7 @@
 #include "xlat/af_packet_types.h"
 
 #include "xlat/bdaddr_types.h"
+#include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
 
@@ -307,6 +308,40 @@ print_bluetooth_l2_psm_end:
 }
 
 static void
+print_bluetooth_l2_cid(const char *prefix, uint16_t cid)
+{
+	const uint16_t cid_he = btohs(cid);
+	const char *cid_name = xlookup(bluetooth_l2_cid, cid_he);
+	const bool cid_str = cid_name || (cid_he >= L2CAP_CID_DYN_START);
+
+	tprintf("%shtobs(", prefix);
+
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV || !cid_str)
+		tprintf("%#x", cid_he);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		goto print_bluetooth_l2_cid_end;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !cid_str)
+		tprints(" /* ");
+
+	if (cid_name) {
+		tprints(cid_name);
+	} else if (cid_he >= L2CAP_CID_DYN_START) {
+		print_xlat(L2CAP_CID_DYN_START);
+		tprintf(" + %u", cid_he - L2CAP_CID_DYN_START);
+	} else {
+		tprints("L2CAP_CID_???");
+	}
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !cid_str)
+		tprints(" */");
+
+print_bluetooth_l2_cid_end:
+	tprints(")");
+}
+
+static void
 print_sockaddr_data_bt(const void *const buf, const int addrlen)
 {
 	struct sockaddr_hci {
@@ -368,12 +403,12 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 		case sizeof(struct sockaddr_l2): {
 			const struct sockaddr_l2 *const l2 = buf;
 			print_bluetooth_l2_psm("l2_psm=", l2->l2_psm);
-			tprintf(", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-				", l2_cid=htobs(%hu), l2_bdaddr_type=",
+			tprintf(", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x",
 				l2->l2_bdaddr.b[0], l2->l2_bdaddr.b[1],
 				l2->l2_bdaddr.b[2], l2->l2_bdaddr.b[3],
-				l2->l2_bdaddr.b[4], l2->l2_bdaddr.b[5],
-				btohs(l2->l2_cid));
+				l2->l2_bdaddr.b[4], l2->l2_bdaddr.b[5]);
+			print_bluetooth_l2_cid(", l2_cid=", l2->l2_cid);
+			tprints(", l2_bdaddr_type=");
 			printxval_index(bdaddr_types, l2->l2_bdaddr_type,
 					"BDADDR_???");
 			break;

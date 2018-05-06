@@ -450,40 +450,44 @@ check_l2(void)
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
 	       ", l2_psm=htobs(L2CAP_PSM_DYN_START + %hu)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-	       ", l2_cid=htobs(%hu), l2_bdaddr_type=0xce /* BDADDR_??? */}"
+	       ", l2_cid=htobs(L2CAP_CID_DYN_START + %hu)"
+	       ", l2_bdaddr_type=0xce /* BDADDR_??? */}"
 	       ", %u) = %d EBADF (%m)\n", h_psm - 0x1001,
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
 	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
-	       h_cid, len, ret);
+	       h_cid - 0x40, len, ret);
 
 	c_l2.l2_psm = htobs(1);
+	c_l2.l2_cid = htobs(1);
 	c_l2.l2_bdaddr_type = BDADDR_LE_RANDOM;
 	memcpy(l2, &c_l2, sizeof(c_l2));
 	ret = connect(-1, l2, len);
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
 	       ", l2_psm=htobs(L2CAP_PSM_SDP)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-	       ", l2_cid=htobs(%hu), l2_bdaddr_type=BDADDR_LE_RANDOM}"
-	       ", %u) = %d EBADF (%m)\n",
+	       ", l2_cid=htobs(L2CAP_CID_SIGNALING)"
+	       ", l2_bdaddr_type=BDADDR_LE_RANDOM}, %u) = %d EBADF (%m)\n",
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
 	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
-	       h_cid, len, ret);
+	       len, ret);
 
 	c_l2.l2_psm = htobs(0xbad);
+	c_l2.l2_cid = htobs(8);
 	c_l2.l2_bdaddr_type = 3;
 	memcpy(l2, &c_l2, sizeof(c_l2));
 	ret = connect(-1, l2, len);
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
 	       ", l2_psm=htobs(0xbad /* L2CAP_PSM_??? */)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-	       ", l2_cid=htobs(%hu), l2_bdaddr_type=0x3 /* BDADDR_??? */}"
+	       ", l2_cid=htobs(0x8 /* L2CAP_CID_??? */)"
+	       ", l2_bdaddr_type=0x3 /* BDADDR_??? */}"
 	       ", %u) = %d EBADF (%m)\n",
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
 	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
-	       h_cid, len, ret);
+	       len, ret);
 }
 #endif
 
