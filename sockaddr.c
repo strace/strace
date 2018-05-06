@@ -55,6 +55,7 @@
 #include "xlat/af_packet_types.h"
 
 #include "xlat/bdaddr_types.h"
+#include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
 
 #define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
@@ -266,6 +267,46 @@ btohs(uint16_t val)
 }
 
 static void
+print_bluetooth_l2_psm(const char *prefix, uint16_t psm)
+{
+	const uint16_t psm_he = btohs(psm);
+	const char *psm_name = xlookup(bluetooth_l2_psm, psm_he);
+	const bool psm_str = psm_name || (psm_he >= L2CAP_PSM_LE_DYN_START
+					  && psm_he <= L2CAP_PSM_LE_DYN_END)
+				      || (psm_he >= L2CAP_PSM_DYN_START);
+
+	tprintf("%shtobs(", prefix);
+
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV || !psm_str)
+		tprintf("%#x", psm_he);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		goto print_bluetooth_l2_psm_end;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !psm_str)
+		tprints(" /* ");
+
+	if (psm_name) {
+		tprints(psm_name);
+	} else if (psm_he >= L2CAP_PSM_LE_DYN_START
+	    && psm_he <= L2CAP_PSM_LE_DYN_END) {
+		print_xlat(L2CAP_PSM_LE_DYN_START);
+		tprintf(" + %u", psm_he - L2CAP_PSM_LE_DYN_START);
+	} else if (psm_he >= L2CAP_PSM_DYN_START) {
+		print_xlat(L2CAP_PSM_DYN_START);
+		tprintf(" + %u", psm_he - L2CAP_PSM_DYN_START);
+	} else {
+		tprints("L2CAP_PSM_???");
+	}
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !psm_str)
+		tprints(" */");
+
+print_bluetooth_l2_psm_end:
+	tprints(")");
+}
+
+static void
 print_sockaddr_data_bt(const void *const buf, const int addrlen)
 {
 	struct sockaddr_hci {
@@ -326,10 +367,9 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 		}
 		case sizeof(struct sockaddr_l2): {
 			const struct sockaddr_l2 *const l2 = buf;
-			tprintf("l2_psm=htobs(%hu)"
-				", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
+			print_bluetooth_l2_psm("l2_psm=", l2->l2_psm);
+			tprintf(", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
 				", l2_cid=htobs(%hu), l2_bdaddr_type=",
-				btohs(l2->l2_psm),
 				l2->l2_bdaddr.b[0], l2->l2_bdaddr.b[1],
 				l2->l2_bdaddr.b[2], l2->l2_bdaddr.b[3],
 				l2->l2_bdaddr.b[4], l2->l2_bdaddr.b[5],
