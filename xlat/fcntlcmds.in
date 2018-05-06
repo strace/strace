@@ -50,7 +50,7 @@ F_GETSIG	11
 F_GETLK64	8
 F_SETLK64	9
 F_SETLKW64	10
-#elif defined __mips__
+#elif defined __mips__ && !defined __mips64
 F_GETLK64	33
 F_SETLK64	34
 F_SETLKW64	35
