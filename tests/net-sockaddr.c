@@ -436,25 +436,52 @@ check_l2(void)
 {
 	const unsigned short h_psm = 12345;
 	const unsigned short h_cid = 13579;
-	const struct sockaddr_l2 c_l2 = {
+	struct sockaddr_l2 c_l2 = {
 		.l2_family = AF_BLUETOOTH,
 		.l2_psm = htobs(h_psm),
 		.l2_bdaddr.b = "abcdef",
 		.l2_cid = htobs(h_cid),
-		.l2_bdaddr_type = 42
+		.l2_bdaddr_type = 0xce,
 	};
 	void *l2 = tail_memdup(&c_l2, sizeof(c_l2));
 	unsigned int len = sizeof(c_l2);
+
 	int ret = connect(-1, l2, len);
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
 	       ", l2_psm=htobs(%hu)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-	       ", l2_cid=htobs(%hu), l2_bdaddr_type=%u}"
+	       ", l2_cid=htobs(%hu), l2_bdaddr_type=0xce /* BDADDR_??? */}"
 	       ", %u) = %d EBADF (%m)\n", h_psm,
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
 	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
-	       h_cid, c_l2.l2_bdaddr_type, len, ret);
+	       h_cid, len, ret);
+
+	c_l2.l2_bdaddr_type = BDADDR_LE_RANDOM;
+	memcpy(l2, &c_l2, sizeof(c_l2));
+	ret = connect(-1, l2, len);
+	printf("connect(-1, {sa_family=AF_BLUETOOTH"
+	       ", l2_psm=htobs(%hu)"
+	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
+	       ", l2_cid=htobs(%hu), l2_bdaddr_type=BDADDR_LE_RANDOM}"
+	       ", %u) = %d EBADF (%m)\n", h_psm,
+	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
+	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
+	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
+	       h_cid, len, ret);
+
+	c_l2.l2_bdaddr_type = 3;
+	memcpy(l2, &c_l2, sizeof(c_l2));
+	ret = connect(-1, l2, len);
+	printf("connect(-1, {sa_family=AF_BLUETOOTH"
+	       ", l2_psm=htobs(%hu)"
+	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
+	       ", l2_cid=htobs(%hu), l2_bdaddr_type=0x3 /* BDADDR_??? */}"
+	       ", %u) = %d EBADF (%m)\n", h_psm,
+	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
+	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
+	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
+	       h_cid, len, ret);
 }
 #endif
 

@@ -54,6 +54,7 @@
 #include "xlat/ethernet_protocols.h"
 #include "xlat/af_packet_types.h"
 
+#include "xlat/bdaddr_types.h"
 #include "xlat/hci_channels.h"
 
 #define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
@@ -327,12 +328,14 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 			const struct sockaddr_l2 *const l2 = buf;
 			tprintf("l2_psm=htobs(%hu)"
 				", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-				", l2_cid=htobs(%hu), l2_bdaddr_type=%u",
+				", l2_cid=htobs(%hu), l2_bdaddr_type=",
 				btohs(l2->l2_psm),
 				l2->l2_bdaddr.b[0], l2->l2_bdaddr.b[1],
 				l2->l2_bdaddr.b[2], l2->l2_bdaddr.b[3],
 				l2->l2_bdaddr.b[4], l2->l2_bdaddr.b[5],
-				btohs(l2->l2_cid), l2->l2_bdaddr_type);
+				btohs(l2->l2_cid));
+			printxval_index(bdaddr_types, l2->l2_bdaddr_type,
+					"BDADDR_???");
 			break;
 		}
 		default:
