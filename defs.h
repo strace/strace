@@ -606,6 +606,12 @@ extern void printaddr(kernel_ulong_t addr);
 #define xlat_verbose(style_) ((style_) & XLAT_STYLE_VERBOSITY_MASK)
 #define xlat_format(style_)  ((style_) & XLAT_STYLE_FORMAT_MASK)
 
+enum xlat_type {
+	XT_NORMAL,
+	XT_SORTED,
+	XT_INDEXED,
+};
+
 enum xlat_style {
 	/**
 	 * Special value that is used for passing to *print{xval,flags}*_ex
@@ -669,6 +675,11 @@ extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
 #define sprintxval(buf_, size_, xlat_, val_, dflt_) \
 	sprintxval_ex((buf_), (size_), (xlat_), (val_), (dflt_), \
 		      XLAT_STYLE_DEFAULT)
+
+extern void printxval_dispatch(const struct xlat *, size_t xlat_size,
+			       uint64_t val, const char *dflt,
+			       enum xlat_type);
+
 /** Print a value in accordance with xlat formatting settings. */
 extern void print_xlat_ex(uint64_t val, const char *str, enum xlat_style style);
 #define print_xlat(val_) \

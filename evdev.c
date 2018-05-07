@@ -163,31 +163,6 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
-enum xlat_type {
-	XT_NORMAL,
-	XT_SORTED,
-	XT_INDEXED,
-};
-
-static void
-printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
-		   const char *dflt, enum xlat_type xt)
-{
-	switch (xt) {
-	case XT_NORMAL:
-		printxval64(xlat, val, dflt);
-		break;
-
-	case XT_SORTED:
-		printxval_searchn(xlat, xlat_size, val, dflt);
-		break;
-
-	case XT_INDEXED:
-		printxval_indexn(xlat, xlat_size, val, dflt);
-		break;
-	}
-}
-
 static int
 decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
 	       const struct xlat decode_nr[], const unsigned int max_nr,
