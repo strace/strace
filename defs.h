@@ -166,6 +166,12 @@ extern char *stpcpy(char *dst, const char *src);
 # define HAVE_PERSONALITY_2_MPERS 0
 #endif
 
+#ifdef WORDS_BIGENDIAN
+# define is_bigendian true
+#else
+# define is_bigendian false
+#endif
+
 typedef struct ioctlent {
 	const char *symbol;
 	unsigned int code;
