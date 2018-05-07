@@ -441,7 +441,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_IF_NETNSID]	= decode_nla_s32,
 	[IFLA_CARRIER_UP_COUNT]	= decode_nla_u32,
 	[IFLA_CARRIER_DOWN_COUNT]	= decode_nla_u32,
-	[IFLA_NEW_IFINDEX]	= decode_nla_s32,
+	[IFLA_NEW_IFINDEX]	= decode_nla_ifindex,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
