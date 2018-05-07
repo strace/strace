@@ -178,35 +178,41 @@ gen_header()
 		esac
 	done < "$input"
 
-	echo
+	cat <<-EOF
+
+		#ifndef XLAT_MACROS_ONLY
+
+	EOF
+
 	if [ -n "$in_defs" ]; then
 		cat <<-EOF
-			#ifndef IN_MPERS
+			# ifndef IN_MPERS
 
 		EOF
 	elif [ -n "$in_mpers" ]; then
 		cat <<-EOF
-			#ifdef IN_MPERS
+			# ifdef IN_MPERS
 
 			${decl}
 
-			#else
+			# else
 
-			# if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
+			#  if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
 			static
-			# endif
+			#  endif
 		EOF
 	else
 		cat <<-EOF
-			#ifdef IN_MPERS
+			# ifdef IN_MPERS
 
-			# error static const struct xlat ${name} in mpers mode
+			#  error static const struct xlat ${name} in mpers mode
 
-			#else
+			# else
 
 			static
 		EOF
 	fi
+
 	echo "const struct xlat ${name}[] = {"
 
 	unconditional= val_type=
@@ -255,7 +261,9 @@ gen_header()
 	cat <<-EOF
 		};
 
-		#endif /* !IN_MPERS */
+		# endif /* !IN_MPERS */
+
+		#endif /* !XLAT_MACROS_ONLY */
 	EOF
 	) >"${output}"
 }
