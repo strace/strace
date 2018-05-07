@@ -296,6 +296,32 @@ decode_nla_ip_proto(struct tcb *const tcp,
 }
 
 bool
+decode_nla_flags(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts * const opts = opaque_data;
+	union {
+		uint64_t flags;
+		uint8_t  bytes[sizeof(uint64_t)];
+	} data = { .flags = 0 };
+	const size_t bytes_offs = is_bigendian ? sizeof(data) - len : 0;
+
+	if (opts->xt == XT_INDEXED)
+		error_func_msg("indexed xlats are currently incompatible with "
+			       "printflags");
+
+	if (len > sizeof(data))
+		return false;
+	else if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs))
+		printflags_ex(data.flags, opts->dflt, opts->style, opts->xlat,
+			      NULL);
+
+	return true;
+}
+
+bool
 decode_nla_be16(struct tcb *const tcp,
 		const kernel_ulong_t addr,
 		const unsigned int len,
