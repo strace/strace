@@ -507,24 +507,6 @@ umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
 extern int upeek(struct tcb *tcp, unsigned long, kernel_ulong_t *);
 extern int upoke(struct tcb *tcp, unsigned long, kernel_ulong_t);
 
-extern bool print_uint64_array_member(struct tcb *tcp, void *elem_buf,
-				      size_t elem_size, void *data);
-extern bool
-print_array(struct tcb *,
-	    kernel_ulong_t start_addr,
-	    size_t nmemb,
-	    void *elem_buf,
-	    size_t elem_size,
-	    int (*umoven_func)(struct tcb *,
-				     kernel_ulong_t,
-				     unsigned int,
-				     void *),
-	    bool (*print_func)(struct tcb *,
-				     void *elem_buf,
-				     size_t elem_size,
-				     void *opaque_data),
-	    void *opaque_data);
-
 #if HAVE_ARCH_GETRVAL2
 extern long getrval2(struct tcb *);
 #endif
@@ -752,6 +734,25 @@ extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
 extern void print_dev_t(unsigned long long dev);
 extern void print_abnormal_hi(kernel_ulong_t);
+
+extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
+
+extern bool
+print_array(struct tcb *,
+	    kernel_ulong_t start_addr,
+	    size_t nmemb,
+	    void *elem_buf,
+	    size_t elem_size,
+	    int (*umoven_func)(struct tcb *,
+				     kernel_ulong_t,
+				     unsigned int,
+				     void *),
+	    bool (*print_func)(struct tcb *,
+				     void *elem_buf,
+				     size_t elem_size,
+				     void *opaque_data),
+	    void *opaque_data);
 
 extern kernel_ulong_t *
 fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_args);
