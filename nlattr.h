@@ -30,6 +30,16 @@
 #ifndef STRACE_NLATTR_H
 #define STRACE_NLATTR_H
 
+#include "xlat.h"
+
+struct decode_nla_xlat_opts {
+	const struct xlat *xlat;
+	size_t xlat_size; /* is not needed for XT_NORMAL */
+	const char *dflt;
+	enum xlat_type xt;
+	enum xlat_style style;
+};
+
 typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,
 			      unsigned int len, const void *opaque_data);
 extern void
@@ -58,6 +68,7 @@ DECL_NLA(s32);
 DECL_NLA(s64);
 DECL_NLA(be16);
 DECL_NLA(be64);
+DECL_NLA(xval);
 DECL_NLA(str);
 DECL_NLA(strn);
 DECL_NLA(fd);
