@@ -288,7 +288,7 @@ extern const struct xlat at_flags[];
 extern const struct xlat clocknames[];
 extern const struct xlat dirent_types[];
 
-/** Ethernet protocols list, sorted and unterminated, defined in sockaddr.c. */
+/** Ethernet protocols list, sorted, defined in sockaddr.c. */
 extern const struct xlat ethernet_protocols[];
 /** Ethernet protocols array size without terminating record. */
 extern const size_t ethernet_protocols_size;
