@@ -455,20 +455,21 @@ print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
 }
 
 void
-printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
-		   const char *dflt, enum xlat_type xt)
+printxval_dispatch_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		      const char *dflt, enum xlat_type xt,
+		      enum xlat_style style)
 {
 	switch (xt) {
 	case XT_NORMAL:
-		printxval64(xlat, val, dflt);
+		printxvals_ex(val, dflt, style, xlat, NULL);
 		break;
 
 	case XT_SORTED:
-		printxval_searchn(xlat, xlat_size, val, dflt);
+		printxval_searchn_ex(xlat, xlat_size, val, dflt, style);
 		break;
 
 	case XT_INDEXED:
-		printxval_indexn(xlat, xlat_size, val, dflt);
+		printxval_indexn_ex(xlat, xlat_size, val, dflt, style);
 		break;
 	}
 }

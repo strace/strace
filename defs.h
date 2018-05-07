@@ -676,9 +676,16 @@ extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
 	sprintxval_ex((buf_), (size_), (xlat_), (val_), (dflt_), \
 		      XLAT_STYLE_DEFAULT)
 
-extern void printxval_dispatch(const struct xlat *, size_t xlat_size,
-			       uint64_t val, const char *dflt,
-			       enum xlat_type);
+extern void printxval_dispatch_ex(const struct xlat *, size_t xlat_size,
+				  uint64_t val, const char *dflt,
+				  enum xlat_type, enum xlat_style);
+static inline void
+printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		   const char *dflt, enum xlat_type xt)
+{
+	return printxval_dispatch_ex(xlat, xlat_size, val, dflt, xt,
+				     XLAT_STYLE_DEFAULT);
+}
 
 /** Print a value in accordance with xlat formatting settings. */
 extern void print_xlat_ex(uint64_t val, const char *str, enum xlat_style style);
