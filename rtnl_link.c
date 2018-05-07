@@ -33,11 +33,20 @@
 #include "print_fields.h"
 
 #include "netlink.h"
+
+#include <netinet/in.h>
+
 #ifdef HAVE_LINUX_IF_LINK_H
 # include <linux/if_link.h>
 #endif
 #include <linux/rtnetlink.h>
 
+#include "xlat/in6_addr_gen_mode.h"
+#include "xlat/inet_devconf_indices.h"
+#include "xlat/inet6_devconf_indices.h"
+#include "xlat/inet6_if_flags.h"
+#include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
+#include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
 #include "xlat/rtnl_ifla_brport_attrs.h"
 #include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
@@ -45,6 +54,8 @@
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
 #include "xlat/rtnl_ifla_xdp_attrs.h"
 #include "xlat/rtnl_link_attrs.h"
+#include "xlat/snmp_icmp6_stats.h"
+#include "xlat/snmp_ip_stats.h"
 #include "xlat/xdp_flags.h"
 
 static bool
@@ -391,6 +402,227 @@ decode_ifla_event(struct tcb *const tcp,
 	return true;
 }
 
+
+static bool
+decode_ifla_inet_conf(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+	int elem;
+	size_t cnt = len / sizeof(elem);
+
+	if (!cnt)
+		return false;
+
+	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
+		       tfetch_mem, print_int32_array_member, NULL,
+		       PAF_PRINT_INDICES | PAF_INDEX_XLAT_VALUE_INDEXED
+			| XLAT_STYLE_FMT_D, ARRSZ_PAIR(inet_devconf_indices),
+		       "IPV4_DEVCONF_???");
+
+	return true;
+}
+
+static const nla_decoder_t ifla_inet_nla_decoders[] = {
+	[IFLA_INET_CONF] = decode_ifla_inet_conf,
+};
+
+static bool
+decode_ifla_inet6_flags(struct tcb *const tcp,
+		        const kernel_ulong_t addr,
+		        const unsigned int len,
+		        const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts opts = {
+		ARRSZ_PAIR(inet6_if_flags), "IF_???",
+		.size = 4,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static bool
+decode_ifla_inet6_conf(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	int elem;
+	size_t cnt = len / sizeof(elem);
+
+	if (!cnt)
+		return false;
+
+	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
+		       tfetch_mem, print_int32_array_member, NULL,
+		       PAF_PRINT_INDICES | PAF_INDEX_XLAT_VALUE_INDEXED
+			| XLAT_STYLE_FMT_D, ARRSZ_PAIR(inet6_devconf_indices),
+		       "DEVCONF_???");
+
+	return true;
+}
+
+static bool
+decode_ifla_inet6_stats(struct tcb *const tcp,
+		        const kernel_ulong_t addr,
+		        const unsigned int len,
+		        const void *const opaque_data)
+{
+	uint64_t elem;
+	size_t cnt = len / sizeof(elem);
+
+	if (!cnt)
+		return false;
+
+	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
+		       tfetch_mem, print_uint64_array_member, NULL,
+		       PAF_PRINT_INDICES | PAF_INDEX_XLAT_VALUE_INDEXED
+			| XLAT_STYLE_FMT_U, ARRSZ_PAIR(snmp_ip_stats),
+		       "IPSTATS_MIB_???");
+
+	return true;
+}
+
+static bool
+decode_ifla_inet6_cacheinfo(struct tcb *const tcp,
+			    const kernel_ulong_t addr,
+			    const unsigned int len,
+			    const void *const opaque_data)
+{
+	struct {
+		uint32_t max_reasm_len;
+		uint32_t tstamp;
+		uint32_t reachable_time;
+		uint32_t retrans_time;
+	} ci;
+
+	if (len < sizeof(ci))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &ci)) {
+		PRINT_FIELD_U("{", ci, max_reasm_len);
+		PRINT_FIELD_U(", ", ci, tstamp);
+		PRINT_FIELD_U(", ", ci, reachable_time);
+		PRINT_FIELD_U(", ", ci, retrans_time);
+		tprints("}");
+	}
+
+	return true;
+}
+
+static bool
+decode_ifla_inet6_icmp6_stats(struct tcb *const tcp,
+			      const kernel_ulong_t addr,
+			      const unsigned int len,
+			      const void *const opaque_data)
+{
+	uint64_t elem;
+	size_t cnt = len / sizeof(elem);
+
+	if (!cnt)
+		return false;
+
+	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
+		       tfetch_mem, print_uint64_array_member, NULL,
+		       PAF_PRINT_INDICES | PAF_INDEX_XLAT_VALUE_INDEXED
+			| XLAT_STYLE_FMT_U, ARRSZ_PAIR(snmp_icmp6_stats),
+		       "ICMP6_MIB_???");
+
+	return true;
+}
+
+static bool
+decode_ifla_inet6_token(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	struct in6_addr in6;
+
+	if (len < sizeof(in6))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &in6))
+		print_inet_addr(AF_INET6, &in6,	sizeof(in6), NULL);
+
+	return true;
+}
+
+static bool
+decode_ifla_inet6_agm(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts opts = {
+		ARRSZ_PAIR(in6_addr_gen_mode), "IN6_ADDR_GEN_MODE_???",
+		.xt = XT_INDEXED,
+		.size = 1,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t ifla_inet6_nla_decoders[] = {
+	[IFLA_INET6_FLAGS]		= decode_ifla_inet6_flags,
+	[IFLA_INET6_CONF]		= decode_ifla_inet6_conf,
+	[IFLA_INET6_STATS]		= decode_ifla_inet6_stats,
+	[IFLA_INET6_MCAST]		= NULL, /* unused */
+	[IFLA_INET6_CACHEINFO]		= decode_ifla_inet6_cacheinfo,
+	[IFLA_INET6_ICMP6STATS]		= decode_ifla_inet6_icmp6_stats,
+	[IFLA_INET6_TOKEN]		= decode_ifla_inet6_token,
+	[IFLA_INET6_ADDR_GEN_MODE]	= decode_ifla_inet6_agm,
+};
+
+static const struct nla_decoder_table_desc {
+	const struct xlat *xlat;
+	const char *dflt;
+	const nla_decoder_t *table;
+	size_t size;
+} ifla_af_spec_protos[] = {
+	[AF_INET]	= {
+		rtnl_ifla_af_spec_inet_attrs, "IFLA_INET_???",
+		ARRSZ_PAIR(ifla_inet_nla_decoders),
+	},
+	[AF_INET6]	= {
+		rtnl_ifla_af_spec_inet6_attrs, "IFLA_INET6_???",
+		ARRSZ_PAIR(ifla_inet6_nla_decoders),
+	},
+};
+
+static bool
+decode_ifla_af(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const unsigned int len,
+	       const void *const opaque_data)
+{
+	uintptr_t proto = (uintptr_t) opaque_data;
+	const struct nla_decoder_table_desc *desc
+		= proto < ARRAY_SIZE(ifla_af_spec_protos)
+			? ifla_af_spec_protos + proto : NULL;
+
+	if (!desc || !desc->table)
+		return false;
+
+	decode_nlattr(tcp, addr, len,
+		      desc->xlat, desc->dflt, desc->table, desc->size, NULL);
+
+	return true;
+}
+
+static bool
+decode_ifla_af_spec(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	nla_decoder_t af_spec_decoder = &decode_ifla_af;
+
+	decode_nlattr(tcp, addr, len, addrfams, "AF_???",
+		      &af_spec_decoder, 0, opaque_data);
+
+	return true;
+}
+
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_ADDRESS]		= NULL, /* unimplemented */
 	[IFLA_BROADCAST]	= NULL, /* unimplemented */
@@ -417,7 +649,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_STATS64]		= decode_rtnl_link_stats64,
 	[IFLA_VF_PORTS]		= decode_ifla_vf_ports,
 	[IFLA_PORT_SELF]	= decode_ifla_port,
-	[IFLA_AF_SPEC]		= NULL, /* unimplemented */
+	[IFLA_AF_SPEC]		= decode_ifla_af_spec,
 	[IFLA_GROUP]		= decode_nla_u32,
 	[IFLA_NET_NS_FD]	= decode_nla_fd,
 	[IFLA_EXT_MASK]		= decode_nla_u32,
