@@ -636,7 +636,7 @@ decode_netlink(struct tcb *const tcp,
 	}
 
 	struct nlmsghdr nlmsghdr;
-	bool print_array = false;
+	bool is_array = false;
 	unsigned int elt;
 
 	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len); elt++) {
@@ -656,9 +656,9 @@ decode_netlink(struct tcb *const tcp,
 				next_addr = addr + nlmsg_len;
 		}
 
-		if (!print_array && next_addr) {
+		if (!is_array && next_addr) {
 			tprints("[");
-			print_array = true;
+			is_array = true;
 		}
 
 		decode_nlmsghdr_with_payload(tcp, fd, family,
@@ -672,7 +672,7 @@ decode_netlink(struct tcb *const tcp,
 		len = next_len;
 	}
 
-	if (print_array) {
+	if (is_array) {
 		tprints("]");
 	}
 }

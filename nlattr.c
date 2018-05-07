@@ -115,7 +115,7 @@ decode_nlattr(struct tcb *const tcp,
 	      const void *const opaque_data)
 {
 	struct nlattr nla;
-	bool print_array = false;
+	bool is_array = false;
 	unsigned int elt;
 
 	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len); elt++) {
@@ -135,9 +135,9 @@ decode_nlattr(struct tcb *const tcp,
 				next_addr = addr + nla_len;
 		}
 
-		if (!print_array && next_addr) {
+		if (!is_array && next_addr) {
 			tprints("[");
-			print_array = true;
+			is_array = true;
 		}
 
 		decode_nlattr_with_data(tcp, &nla, addr, len, table, dflt,
@@ -151,7 +151,7 @@ decode_nlattr(struct tcb *const tcp,
 		len = next_len;
 	}
 
-	if (print_array) {
+	if (is_array) {
 		tprints("]");
 	}
 }
