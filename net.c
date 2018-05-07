@@ -87,7 +87,15 @@
 #define XLAT_MACROS_ONLY
 # include "xlat/addrfams.h"
 #undef XLAT_MACROS_ONLY
+#include "xlat/irda_protocols.h"
+#include "xlat/can_protocols.h"
 #include "xlat/bt_protocols.h"
+#include "xlat/isdn_protocols.h"
+#include "xlat/phonet_protocols.h"
+#include "xlat/caif_protocols.h"
+#include "xlat/nfc_protocols.h"
+#include "xlat/kcm_protocols.h"
+#include "xlat/smc_protocols.h"
 
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
@@ -138,8 +146,45 @@ SYS_FUNC(socket)
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
 
+	case AF_IRDA:
+		printxval_index(can_protocols, tcp->u_arg[2], "IRDAPROTO_???");
+		break;
+
+	case AF_CAN:
+		printxval_index(can_protocols, tcp->u_arg[2], "CAN_???");
+		break;
+
 	case AF_BLUETOOTH:
 		printxval_index(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
+		break;
+
+	case AF_RXRPC:
+		printxval(addrfams, tcp->u_arg[2], "AF_???");
+		break;
+
+	case AF_ISDN:
+		printxval(isdn_protocols, tcp->u_arg[2], "ISDN_P_???");
+		break;
+
+	case AF_PHONET:
+		printxval_index(phonet_protocols, tcp->u_arg[2], "PN_PROTO_???");
+		break;
+
+	case AF_CAIF:
+		printxval_index(caif_protocols, tcp->u_arg[2], "CAIFPROTO_???");
+		break;
+
+	case AF_NFC:
+		printxval_index(nfc_protocols, tcp->u_arg[2],
+				"NFC_SOCKPROTO_???");
+		break;
+
+	case AF_KCM:
+		printxval_index(kcm_protocols, tcp->u_arg[2], "KCMPROTO_???");
+		break;
+
+	case AF_SMC:
+		printxval_index(smc_protocols, tcp->u_arg[2], "SMCPROTO_???");
 		break;
 
 	default:
