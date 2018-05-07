@@ -73,9 +73,14 @@ print_xlat_val(uint64_t val, enum xlat_style style)
 const char *
 xlookup(const struct xlat *xlat, const uint64_t val)
 {
-	for (; xlat->str != NULL; xlat++)
-		if (xlat->val == val)
-			return xlat->str;
+	static const struct xlat *pos;
+
+	if (xlat)
+		pos = xlat;
+
+	for (; pos->str != NULL; pos++)
+		if (pos->val == val)
+			return pos->str;
 	return NULL;
 }
 
@@ -90,11 +95,24 @@ xlat_bsearch_compare(const void *a, const void *b)
 const char *
 xlat_search(const struct xlat *xlat, const size_t nmemb, const uint64_t val)
 {
+	static const struct xlat *pos;
+	static size_t memb_left;
+
+	if (xlat) {
+		pos = xlat;
+		memb_left = nmemb;
+	}
+
 	const struct xlat *e =
 		bsearch((const void *) &val,
-			xlat, nmemb, sizeof(*xlat), xlat_bsearch_compare);
+			pos, memb_left, sizeof(*pos), xlat_bsearch_compare);
 
-	return e ? e->str : NULL;
+	if (e) {
+		memb_left -= e - pos;
+		return e->str;
+	} else {
+		return NULL;
+	}
 }
 
 /**
@@ -112,6 +130,8 @@ int
 printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 	      const struct xlat *xlat, ...)
 {
+	static const struct xlat *last;
+
 	style = get_xlat_style(style);
 
 	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
@@ -123,7 +143,13 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 	va_list args;
 
 	va_start(args, xlat);
+
+	if (!xlat)
+		xlat = last;
+
 	for (; xlat; xlat = va_arg(args, const struct xlat *)) {
+		last = xlat;
+
 		str = xlookup(xlat, val);
 
 		if (str) {
@@ -231,17 +257,25 @@ printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 const char *
 xlat_idx(const struct xlat *xlat, size_t nmemb, uint64_t val)
 {
-	if (val >= nmemb)
+	static const struct xlat *pos;
+	static size_t memb_left;
+
+	if (xlat) {
+		pos = xlat;
+		memb_left = nmemb;
+	}
+
+	if (val >= memb_left)
 		return NULL;
 
-	if (val != xlat[val].val) {
+	if (val != pos[val].val) {
 		error_func_msg("Unexpected xlat value %" PRIu64
 			       " at index %" PRIu64,
-			       xlat[val].val, val);
+			       pos[val].val, val);
 		return NULL;
 	}
 
-	return xlat[val].str;
+	return pos[val].str;
 }
 
 int
