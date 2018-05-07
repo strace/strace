@@ -119,11 +119,12 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 		return 0;
 	}
 
+	const char *str = NULL;
 	va_list args;
 
 	va_start(args, xlat);
 	for (; xlat; xlat = va_arg(args, const struct xlat *)) {
-		const char *str = xlookup(xlat, val);
+		str = xlookup(xlat, val);
 
 		if (str) {
 			if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
@@ -133,17 +134,18 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 				tprints(str);
 			}
 
-			va_end(args);
-			return 1;
+			goto printxvals_ex_end;
 		}
 	}
+
 	/* No hits -- print raw # instead. */
 	print_xlat_val(val, style);
 	tprints_comment(dflt);
 
+printxvals_ex_end:
 	va_end(args);
 
-	return 0;
+	return !!str;
 }
 
 int
