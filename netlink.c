@@ -607,8 +607,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len)
 {
-	const unsigned int nlmsg_len =
-		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
+	const unsigned int nlmsg_len = MIN(nlmsghdr->nlmsg_len, len);
 
 	if (nlmsg_len > NLMSG_HDRLEN)
 		tprints("{");

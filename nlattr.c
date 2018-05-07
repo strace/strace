@@ -83,7 +83,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 			const unsigned int size,
 			const void *const opaque_data)
 {
-	const unsigned int nla_len = nla->nla_len > len ? len : nla->nla_len;
+	const unsigned int nla_len = MIN(nla->nla_len, len);
 
 	if (nla_len > NLA_HDRLEN)
 		tprints("{");

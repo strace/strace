@@ -255,8 +255,7 @@ decode_rta_multipath(struct tcb *const tcp,
 		PRINT_FIELD_IFINDEX(", ", nh, rtnh_ifindex);
 		tprints("}");
 
-		const unsigned short rtnh_len =
-			len < nh.rtnh_len ? len : nh.rtnh_len;
+		const unsigned short rtnh_len = MIN(len, nh.rtnh_len);
 		const size_t offset = RTNH_ALIGN(sizeof(nh));
 		if (rtnh_len > offset) {
 			tprints(", ");
