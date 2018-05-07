@@ -35,6 +35,8 @@
 
 #define ARRAY_SIZE(a_)	(sizeof(a_) / sizeof((a_)[0]) + MUST_BE_ARRAY(a_))
 
+#define ARRSZ_PAIR(a_) a_, ARRAY_SIZE(a_)
+
 #define STRINGIFY(...)		#__VA_ARGS__
 #define STRINGIFY_VAL(...)	STRINGIFY(__VA_ARGS__)
 
