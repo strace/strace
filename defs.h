@@ -289,7 +289,12 @@ struct tcb {
 #include "xlat.h"
 
 extern const struct xlat addrfams[];
+
+/** Protocol hardware identifiers array, sorted, defined in sockaddr.c. */
 extern const struct xlat arp_hardware_types[];
+/** Protocol hardware identifiers array size without terminating record. */
+extern const size_t arp_hardware_types_size;
+
 extern const struct xlat at_flags[];
 extern const struct xlat clocknames[];
 extern const struct xlat dirent_types[];

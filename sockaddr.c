@@ -61,6 +61,7 @@
 
 #define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
 
+const size_t arp_hardware_types_size = ARRAY_SIZE(arp_hardware_types) - 1;
 const size_t ethernet_protocols_size = ARRAY_SIZE(ethernet_protocols) - 1;
 
 static void
