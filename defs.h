@@ -640,6 +640,9 @@ printaddr(const kernel_ulong_t addr)
 #define XLAT_STYLE_FORMAT_SHIFT   2
 #define XLAT_STYLE_FORMAT_MASK    (3 << XLAT_STYLE_FORMAT_SHIFT)
 
+#define XLAT_STYLE_SPEC_BITS (XLAT_STYLE_FORMAT_SHIFT + 2)
+#define XLAT_STYLE_MASK ((1 << XLAT_STYLE_SPEC_BITS) - 1)
+
 #define xlat_verbose(style_) ((style_) & XLAT_STYLE_VERBOSITY_MASK)
 #define xlat_format(style_)  ((style_) & XLAT_STYLE_FORMAT_MASK)
 
@@ -788,21 +791,59 @@ extern bool print_uint32_array_member(struct tcb *, void *elem_buf,
 extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
 
+typedef bool (*tfetch_mem_fn)(struct tcb *, kernel_ulong_t addr,
+			      unsigned int size, void *dest);
+typedef bool (*print_fn)(struct tcb *, void *elem_buf,
+			 size_t elem_size, void *opaque_data);
+
+enum print_array_flag_bits {
+	PAF_PRINT_INDICES_BIT = XLAT_STYLE_SPEC_BITS + 1,
+	PAF_INDEX_XLAT_SORTED_BIT,
+	PAF_INDEX_XLAT_VALUE_INDEXED_BIT,
+};
+
+#define FLAG_(name_) name_ = 1 << name_##_BIT
+
+enum print_array_flags {
+	FLAG_(PAF_PRINT_INDICES),
+	FLAG_(PAF_INDEX_XLAT_SORTED),
+	FLAG_(PAF_INDEX_XLAT_VALUE_INDEXED),
+};
+
+#undef FLAG_
+
+/**
+ * @param flags Combination of xlat style settings and additional flags from
+ *              enum print_array_flags.
+ */
 extern bool
-print_array(struct tcb *,
-	    kernel_ulong_t start_addr,
-	    size_t nmemb,
-	    void *elem_buf,
-	    size_t elem_size,
-	    bool (*tfetch_mem_func)(struct tcb *,
-				    kernel_ulong_t addr,
-				    unsigned int len,
-				    void *laddr),
-	    bool (*print_func)(struct tcb *,
-			       void *elem_buf,
-			       size_t elem_size,
-			       void *opaque_data),
-	    void *opaque_data);
+print_array_ex(struct tcb *,
+	       kernel_ulong_t start_addr,
+	       size_t nmemb,
+	       void *elem_buf,
+	       size_t elem_size,
+	       tfetch_mem_fn tfetch_mem_func,
+	       print_fn print_func,
+	       void *opaque_data,
+	       unsigned int flags,
+	       const struct xlat *index_xlat,
+	       size_t index_xlat_size,
+	       const char *index_dflt);
+
+static inline bool
+print_array(struct tcb *const tcp,
+	    const kernel_ulong_t start_addr,
+	    const size_t nmemb,
+	    void *const elem_buf,
+	    const size_t elem_size,
+	    tfetch_mem_fn tfetch_mem_func,
+	    print_fn print_func,
+	    void *const opaque_data)
+{
+	return print_array_ex(tcp, start_addr, nmemb, elem_buf, elem_size,
+			      tfetch_mem_func, print_func, opaque_data,
+			      0, NULL, 0, NULL);
+}
 
 extern kernel_ulong_t *
 fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_args);

@@ -44,6 +44,7 @@
 #include <sys/uio.h>
 
 #include "largefile_wrappers.h"
+#include "xlat.h"
 #include "xstring.h"
 
 int
@@ -1086,20 +1087,18 @@ print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
  * at least once.
  */
 bool
-print_array(struct tcb *const tcp,
-	    const kernel_ulong_t start_addr,
-	    const size_t nmemb,
-	    void *const elem_buf,
-	    const size_t elem_size,
-	    bool (*const tfetch_mem_func)(struct tcb *,
-					  kernel_ulong_t addr,
-					  unsigned int len,
-					  void *laddr),
-	    bool (*const print_func)(struct tcb *,
-				     void *elem_buf,
-				     size_t elem_size,
-				     void *opaque_data),
-	    void *const opaque_data)
+print_array_ex(struct tcb *const tcp,
+	       const kernel_ulong_t start_addr,
+	       const size_t nmemb,
+	       void *const elem_buf,
+	       const size_t elem_size,
+	       tfetch_mem_fn tfetch_mem_func,
+	       print_fn print_func,
+	       void *const opaque_data,
+	       unsigned int flags,
+	       const struct xlat *index_xlat,
+	       size_t index_xlat_size,
+	       const char *index_dflt)
 {
 	if (!start_addr) {
 		tprints("NULL");
@@ -1123,8 +1122,10 @@ print_array(struct tcb *const tcp,
 		(abbrev(tcp) && max_strlen < nmemb) ?
 			start_addr + elem_size * max_strlen : end_addr;
 	kernel_ulong_t cur;
+	kernel_ulong_t idx = 0;
+	enum xlat_style xlat_style = flags & XLAT_STYLE_MASK;
 
-	for (cur = start_addr; cur < end_addr; cur += elem_size) {
+	for (cur = start_addr; cur < end_addr; cur += elem_size, idx++) {
 		if (cur != start_addr)
 			tprints(", ");
 
@@ -1145,6 +1146,25 @@ print_array(struct tcb *const tcp,
 			tprints("...");
 			cur = end_addr;
 			break;
+		}
+
+		if (flags & PAF_PRINT_INDICES) {
+			tprints("[");
+
+			if (!index_xlat) {
+				print_xlat_ex(idx, NULL, xlat_style);
+			} else if (flags & PAF_INDEX_XLAT_VALUE_INDEXED) {
+				printxval_indexn_ex(index_xlat,
+						    index_xlat_size, idx,
+						    index_dflt, xlat_style);
+			} else {
+				printxvals_ex(idx, index_dflt, xlat_style,
+					      (flags & PAF_INDEX_XLAT_SORTED)
+						&& idx ? NULL : index_xlat,
+					      NULL);
+			}
+
+			tprints("] = ");
 		}
 
 		if (!print_func(tcp, elem_buf, elem_size, opaque_data)) {
