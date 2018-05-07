@@ -224,7 +224,7 @@ print_sockaddr_data_ll(const void *const buf, const int addrlen)
 			 "ETH_P_???");
 	PRINT_FIELD_IFINDEX("), ", *sa_ll, sll_ifindex);
 	tprints(", sll_hatype=");
-	printxval(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");
+	printxval_search(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");
 	tprints(", sll_pkttype=");
 	printxval(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
 	tprintf(", sll_halen=%u", sa_ll->sll_halen);
