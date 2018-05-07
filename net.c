@@ -84,9 +84,9 @@
 
 #include "xlat/inet_protocols.h"
 
-#ifndef AF_BLUETOOTH
-# define AF_BLUETOOTH 31
-#endif
+#define XLAT_MACROS_ONLY
+# include "xlat/addrfams.h"
+#undef XLAT_MACROS_ONLY
 #include "xlat/bt_protocols.h"
 
 static void

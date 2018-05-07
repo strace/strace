@@ -57,10 +57,6 @@
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif
 
-#ifndef NT_PRSTATUS
-# define NT_PRSTATUS 1
-#endif
-
 #include "syscall.h"
 #include "xstring.h"
 
@@ -1000,6 +996,10 @@ restore_cleared_syserror(struct tcb *tcp)
 {
 	tcp->u_error = saved_u_error;
 }
+
+#define XLAT_MACROS_ONLY
+# include "xlat/nt_descriptor_types.h"
+#undef XLAT_MACROS_ONLY
 
 #include "arch_regs.c"
 

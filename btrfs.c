@@ -84,10 +84,6 @@ struct btrfs_ioctl_defrag_range_args {
 # define BTRFS_LABEL_SIZE 256
 #endif
 
-#ifndef BTRFS_FIRST_FREE_OBJECTID
-# define BTRFS_FIRST_FREE_OBJECTID 256ULL
-#endif
-
 #ifndef BTRFS_IOC_QUOTA_RESCAN
 struct btrfs_ioctl_quota_rescan_args {
 	uint64_t flags, progress, reserved[6];
