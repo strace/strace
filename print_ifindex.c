@@ -28,19 +28,41 @@
 #include "defs.h"
 #include <net/if.h>
 
+#ifdef HAVE_IF_INDEXTONAME
+# include "xstring.h"
+
+# define INI_PFX "if_nametoindex("
+# define INI_SFX ")"
+# define IFNAME_QUOTED_SZ (sizeof(IFNAMSIZ) * 4 + 3)
+
+static const char *
+get_ifname(const unsigned int ifindex)
+{
+	static char res[IFNAME_QUOTED_SZ + sizeof(INI_PFX INI_SFX)];
+
+	char name_buf[IFNAMSIZ];
+	char name_quoted_buf[IFNAME_QUOTED_SZ];
+
+	if (if_indextoname(ifindex, name_buf)) {
+		if (string_quote(name_buf, name_quoted_buf, sizeof(name_buf),
+				 QUOTE_0_TERMINATED, NULL))
+			return NULL;
+
+		xsprintf(res, INI_PFX "%s" INI_SFX, name_quoted_buf);
+
+		return res;
+	}
+
+	return NULL;
+}
+#endif /* HAVE_IF_INDEXTONAME */
+
 void
 print_ifindex(const unsigned int ifindex)
 {
 #ifdef HAVE_IF_INDEXTONAME
-	char buf[IFNAMSIZ + 1];
-
-	if (if_indextoname(ifindex, buf)) {
-		tprints("if_nametoindex(");
-		print_quoted_cstring(buf, sizeof(buf));
-		tprints(")");
-		return;
-	}
-#endif
-
+	print_xlat_ex(ifindex, get_ifname(ifindex), XLAT_STYLE_FMT_U);
+#else
 	tprintf("%u", ifindex);
+#endif
 }
