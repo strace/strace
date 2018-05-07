@@ -42,13 +42,19 @@ struct decode_nla_xlat_opts {
 
 typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,
 			      unsigned int len, const void *opaque_data);
+
+/**
+ * The case of non-NULL decoders and zero size is handled in a special way:
+ * the zeroth decoder is always called with nla_type being passed as opaque
+ * data.
+ */
 extern void
 decode_nlattr(struct tcb *,
 	      kernel_ulong_t addr,
 	      unsigned int len,
 	      const struct xlat *,
 	      const char *dflt,
-	      const nla_decoder_t *,
+	      const nla_decoder_t *decoders,
 	      unsigned int size,
 	      const void *opaque_data);
 

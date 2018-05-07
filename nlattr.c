@@ -101,13 +101,18 @@ decode_nlattr_with_data(struct tcb *const tcp,
 	print_nlattr(nla, table, dflt);
 
 	if (nla_len > NLA_HDRLEN) {
+		const unsigned int idx = size ? nla->nla_type : 0;
+
 		tprints(", ");
 		if (!decoders
-		    || nla->nla_type >= size
-		    || !decoders[nla->nla_type]
-		    || !decoders[nla->nla_type](tcp, addr + NLA_HDRLEN,
-						nla_len - NLA_HDRLEN,
-						opaque_data))
+		    || (size && idx >= size)
+		    || !decoders[idx]
+		    || !decoders[idx](
+				tcp, addr + NLA_HDRLEN,
+				nla_len - NLA_HDRLEN,
+				size ? opaque_data
+				     : (const void *) (uintptr_t) nla->nla_type)
+		    )
 			printstr_ex(tcp, addr + NLA_HDRLEN,
 				    nla_len - NLA_HDRLEN, QUOTE_FORCE_HEX);
 		tprints("}");
@@ -127,6 +132,13 @@ decode_nlattr(struct tcb *const tcp,
 	struct nlattr nla;
 	bool is_array = false;
 	unsigned int elt;
+
+	if (decoders && !size && opaque_data)
+		error_func_msg("[xlat %p, dflt \"%s\", decoders %p] "
+			       "size is zero (going to pass nla_type as "
+			       "decoder argument), but opaque data (%p) is not "
+			       "- will be ignored",
+			       table, dflt, decoders, opaque_data);
 
 	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len, is_array); elt++) {
 		if (abbrev(tcp) && elt == max_strlen) {
