@@ -438,6 +438,22 @@ SYS_FUNC(socketpair)
 #include "xlat/sockrawoptions.h"
 #include "xlat/socksctpoptions.h"
 #include "xlat/socktcpoptions.h"
+#include "xlat/sockudpoptions.h"
+#include "xlat/sockirdaoptions.h"
+#include "xlat/sockllcoptions.h"
+#include "xlat/sockdccpoptions.h"
+#include "xlat/socktipcoptions.h"
+#include "xlat/sockrxrpcoptions.h"
+#include "xlat/sockpppol2tpoptions.h"
+#include "xlat/sockbluetoothoptions.h"
+#include "xlat/sockpnpoptions.h"
+#include "xlat/sockrdsoptions.h"
+#include "xlat/sockiucvoptions.h"
+#include "xlat/sockcaifoptions.h"
+#include "xlat/sockalgoptions.h"
+#include "xlat/socknfcllcpoptions.h"
+#include "xlat/sockkcmoptions.h"
+#include "xlat/socktlsoptions.h"
 
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
@@ -477,6 +493,54 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_NETLINK:
 		printxval(socknetlinkoptions, name, "NETLINK_???");
+		break;
+	case SOL_UDP:
+		printxval(sockudpoptions, name, "UDP_???");
+		break;
+	case SOL_IRDA:
+		printxval_index(sockirdaoptions, name, "IRLMP_???");
+		break;
+	case SOL_LLC:
+		printxval_index(sockllcoptions, name, "LLC_OPT_???");
+		break;
+	case SOL_DCCP:
+		printxval_search(sockdccpoptions, name, "DCCP_SOCKOPT_???");
+		break;
+	case SOL_TIPC:
+		printxval_search(socktipcoptions, name, "TIPC_???");
+		break;
+	case SOL_RXRPC:
+		printxval_index(sockrxrpcoptions, name, "RXRPC_???");
+		break;
+	case SOL_PPPOL2TP:
+		printxval_index(sockpppol2tpoptions, name, "PPPOL2TP_SO_???");
+		break;
+	case SOL_BLUETOOTH:
+		printxval_search(sockbluetoothoptions, name, "BT_???");
+		break;
+	case SOL_PNPIPE:
+		printxval(sockpnpoptions, name, "PNPIPE_???");
+		break;
+	case SOL_RDS:
+		printxval(sockrdsoptions, name, "RDS_???");
+		break;
+	case SOL_IUCV:
+		printxval(sockiucvoptions, name, "SO_???");
+		break;
+	case SOL_CAIF:
+		printxval(sockcaifoptions, name, "CAIFSO_???");
+		break;
+	case SOL_ALG:
+		printxval_index(sockalgoptions, name, "ALG_???");
+		break;
+	case SOL_NFC:
+		printxval_index(socknfcllcpoptions, name, "NFC_LLCP_???");
+		break;
+	case SOL_KCM:
+		printxval(sockkcmoptions, name, "KCM_???");
+		break;
+	case SOL_TLS:
+		printxval(socktlsoptions, name, "TLS_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
