@@ -164,6 +164,7 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 enum xlat_type {
+	XT_NORMAL,
 	XT_SORTED,
 	XT_INDEXED,
 };
@@ -173,6 +174,10 @@ printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 		   const char *dflt, enum xlat_type xt)
 {
 	switch (xt) {
+	case XT_NORMAL:
+		printxval64(xlat, val, dflt);
+		break;
+
 	case XT_SORTED:
 		printxval_searchn(xlat, xlat_size, val, dflt);
 		break;
