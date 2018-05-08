@@ -1,7 +1,7 @@
 /*
  * Options specific to getsockopt(SOL_IP).
  * Common {g,s}etsockopt(SOL_IP) options
- * should be in sockipoptions.in instead.
+ * should be in sock_ip_options.in instead.
  */
 
 ARPT_SO_GET_INFO

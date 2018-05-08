@@ -425,35 +425,35 @@ SYS_FUNC(socketpair)
 	return 0;
 }
 
-#include "xlat/sockoptions.h"
-#include "xlat/sockipoptions.h"
-#include "xlat/getsockipoptions.h"
-#include "xlat/setsockipoptions.h"
-#include "xlat/sockipv6options.h"
-#include "xlat/getsockipv6options.h"
-#include "xlat/setsockipv6options.h"
-#include "xlat/sockipxoptions.h"
-#include "xlat/socknetlinkoptions.h"
-#include "xlat/sockpacketoptions.h"
-#include "xlat/sockrawoptions.h"
-#include "xlat/socksctpoptions.h"
-#include "xlat/socktcpoptions.h"
-#include "xlat/sockudpoptions.h"
-#include "xlat/sockirdaoptions.h"
-#include "xlat/sockllcoptions.h"
-#include "xlat/sockdccpoptions.h"
-#include "xlat/socktipcoptions.h"
-#include "xlat/sockrxrpcoptions.h"
-#include "xlat/sockpppol2tpoptions.h"
-#include "xlat/sockbluetoothoptions.h"
-#include "xlat/sockpnpoptions.h"
-#include "xlat/sockrdsoptions.h"
-#include "xlat/sockiucvoptions.h"
-#include "xlat/sockcaifoptions.h"
-#include "xlat/sockalgoptions.h"
-#include "xlat/socknfcllcpoptions.h"
-#include "xlat/sockkcmoptions.h"
-#include "xlat/socktlsoptions.h"
+#include "xlat/sock_options.h"
+#include "xlat/sock_ip_options.h"
+#include "xlat/getsock_ip_options.h"
+#include "xlat/setsock_ip_options.h"
+#include "xlat/sock_ipv6_options.h"
+#include "xlat/getsock_ipv6_options.h"
+#include "xlat/setsock_ipv6_options.h"
+#include "xlat/sock_ipx_options.h"
+#include "xlat/sock_netlink_options.h"
+#include "xlat/sock_packet_options.h"
+#include "xlat/sock_raw_options.h"
+#include "xlat/sock_sctp_options.h"
+#include "xlat/sock_tcp_options.h"
+#include "xlat/sock_udp_options.h"
+#include "xlat/sock_irda_options.h"
+#include "xlat/sock_llc_options.h"
+#include "xlat/sock_dccp_options.h"
+#include "xlat/sock_tipc_options.h"
+#include "xlat/sock_rxrpc_options.h"
+#include "xlat/sock_pppol2tp_options.h"
+#include "xlat/sock_bluetooth_options.h"
+#include "xlat/sock_pnp_options.h"
+#include "xlat/sock_rds_options.h"
+#include "xlat/sock_iucv_options.h"
+#include "xlat/sock_caif_options.h"
+#include "xlat/sock_alg_options.h"
+#include "xlat/sock_nfcllcp_options.h"
+#include "xlat/sock_kcm_options.h"
+#include "xlat/sock_tls_options.h"
 
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
@@ -466,81 +466,83 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 
 	switch (level) {
 	case SOL_SOCKET:
-		printxval(sockoptions, name, "SO_???");
+		printxval(sock_options, name, "SO_???");
 		break;
 	case SOL_IP:
-		printxvals(name, "IP_???", sockipoptions,
-			is_getsockopt ? getsockipoptions : setsockipoptions, NULL);
+		printxvals(name, "IP_???", sock_ip_options,
+			   is_getsockopt ? getsock_ip_options :
+					   setsock_ip_options, NULL);
 		break;
 	case SOL_IPV6:
-		printxvals(name, "IPV6_???", sockipv6options,
-			is_getsockopt ? getsockipv6options : setsockipv6options, NULL);
+		printxvals(name, "IPV6_???", sock_ipv6_options,
+			   is_getsockopt ? getsock_ipv6_options :
+					   setsock_ipv6_options, NULL);
 		break;
 	case SOL_IPX:
-		printxval(sockipxoptions, name, "IPX_???");
+		printxval(sock_ipx_options, name, "IPX_???");
 		break;
 	case SOL_PACKET:
-		printxval(sockpacketoptions, name, "PACKET_???");
+		printxval(sock_packet_options, name, "PACKET_???");
 		break;
 	case SOL_TCP:
-		printxval(socktcpoptions, name, "TCP_???");
+		printxval(sock_tcp_options, name, "TCP_???");
 		break;
 	case SOL_SCTP:
-		printxval(socksctpoptions, name, "SCTP_???");
+		printxval(sock_sctp_options, name, "SCTP_???");
 		break;
 	case SOL_RAW:
-		printxval(sockrawoptions, name, "RAW_???");
+		printxval(sock_raw_options, name, "RAW_???");
 		break;
 	case SOL_NETLINK:
-		printxval(socknetlinkoptions, name, "NETLINK_???");
+		printxval(sock_netlink_options, name, "NETLINK_???");
 		break;
 	case SOL_UDP:
-		printxval(sockudpoptions, name, "UDP_???");
+		printxval(sock_udp_options, name, "UDP_???");
 		break;
 	case SOL_IRDA:
-		printxval_index(sockirdaoptions, name, "IRLMP_???");
+		printxval_index(sock_irda_options, name, "IRLMP_???");
 		break;
 	case SOL_LLC:
-		printxval_index(sockllcoptions, name, "LLC_OPT_???");
+		printxval_index(sock_llc_options, name, "LLC_OPT_???");
 		break;
 	case SOL_DCCP:
-		printxval_search(sockdccpoptions, name, "DCCP_SOCKOPT_???");
+		printxval_search(sock_dccp_options, name, "DCCP_SOCKOPT_???");
 		break;
 	case SOL_TIPC:
-		printxval_search(socktipcoptions, name, "TIPC_???");
+		printxval_search(sock_tipc_options, name, "TIPC_???");
 		break;
 	case SOL_RXRPC:
-		printxval_index(sockrxrpcoptions, name, "RXRPC_???");
+		printxval_index(sock_rxrpc_options, name, "RXRPC_???");
 		break;
 	case SOL_PPPOL2TP:
-		printxval_index(sockpppol2tpoptions, name, "PPPOL2TP_SO_???");
+		printxval_index(sock_pppol2tp_options, name, "PPPOL2TP_SO_???");
 		break;
 	case SOL_BLUETOOTH:
-		printxval_search(sockbluetoothoptions, name, "BT_???");
+		printxval_search(sock_bluetooth_options, name, "BT_???");
 		break;
 	case SOL_PNPIPE:
-		printxval(sockpnpoptions, name, "PNPIPE_???");
+		printxval(sock_pnp_options, name, "PNPIPE_???");
 		break;
 	case SOL_RDS:
-		printxval(sockrdsoptions, name, "RDS_???");
+		printxval(sock_rds_options, name, "RDS_???");
 		break;
 	case SOL_IUCV:
-		printxval(sockiucvoptions, name, "SO_???");
+		printxval(sock_iucv_options, name, "SO_???");
 		break;
 	case SOL_CAIF:
-		printxval(sockcaifoptions, name, "CAIFSO_???");
+		printxval(sock_caif_options, name, "CAIFSO_???");
 		break;
 	case SOL_ALG:
-		printxval_index(sockalgoptions, name, "ALG_???");
+		printxval_index(sock_alg_options, name, "ALG_???");
 		break;
 	case SOL_NFC:
-		printxval_index(socknfcllcpoptions, name, "NFC_LLCP_???");
+		printxval_index(sock_nfcllcp_options, name, "NFC_LLCP_???");
 		break;
 	case SOL_KCM:
-		printxval(sockkcmoptions, name, "KCM_???");
+		printxval(sock_kcm_options, name, "KCM_???");
 		break;
 	case SOL_TLS:
-		printxval(socktlsoptions, name, "TLS_???");
+		printxval(sock_tls_options, name, "TLS_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
