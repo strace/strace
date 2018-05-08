@@ -395,15 +395,21 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 			tprintf(", rc_channel=%u", rc->rc_channel);
 			break;
 		}
+		case offsetof(struct sockaddr_l2, l2_bdaddr_type):
 		case sizeof(struct sockaddr_l2): {
 			const struct sockaddr_l2 *const l2 = buf;
 			print_bluetooth_l2_psm("l2_psm=", l2->l2_psm);
 			print_mac_addr(", l2_bdaddr=", l2->l2_bdaddr.b,
 				       sizeof(l2->l2_bdaddr.b));
 			print_bluetooth_l2_cid(", l2_cid=", l2->l2_cid);
-			tprints(", l2_bdaddr_type=");
-			printxval_index(bdaddr_types, l2->l2_bdaddr_type,
-					"BDADDR_???");
+
+			if (addrlen == sizeof(struct sockaddr_l2)) {
+				tprints(", l2_bdaddr_type=");
+				printxval_index(bdaddr_types,
+						l2->l2_bdaddr_type,
+						"BDADDR_???");
+			}
+
 			break;
 		}
 		default:

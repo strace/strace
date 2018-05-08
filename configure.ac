@@ -384,7 +384,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	asm/cachectl.h
 	asm/guarded_storage.h
 	asm/sysmips.h
-	bluetooth/bluetooth.h
 	elf.h
 	iconv.h
 	inttypes.h
@@ -469,6 +468,12 @@ AC_CHECK_HEADERS([linux/input.h], [
 AC_CHECK_HEADERS([linux/bpf.h], [
 	AC_CHECK_TYPES([struct bpf_insn],,, [#include <linux/bpf.h>])
 	st_BPF_ATTR
+])
+
+AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
+	AC_CHECK_MEMBERS([struct sockaddr_l2.l2_bdaddr_type],,,
+			 [#include <bluetooth/bluetooth.h>
+			 #include <bluetooth/l2cap.h>])
 ])
 
 AC_CHECK_TYPES(m4_normalize([
