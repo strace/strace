@@ -53,7 +53,7 @@ test_nlmsg_type(const int fd)
 static void
 test_selnl_msg_unspec(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, 4);
 
 	TEST_NETLINK_(fd, nlh0,
 		      0xffff, "0xffff /* SELNL_MSG_??? */",
@@ -65,11 +65,11 @@ test_selnl_msg_unspec(const int fd)
 static void
 test_selnl_msg_setenforce(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
-
 	static const struct selnl_msg_setenforce msg = {
 		.val = 0xfbdcdfab
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
+
 	TEST_NETLINK_OBJECT(fd, nlh0,
 			    SELNL_MSG_SETENFORCE, NLM_F_REQUEST, msg,
 			    PRINT_FIELD_D("{", msg, val);
@@ -79,11 +79,11 @@ test_selnl_msg_setenforce(const int fd)
 static void
 test_selnl_msg_policyload(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
-
 	static const struct selnl_msg_policyload msg = {
 		.seqno = 0xabdcfabc
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
+
 	TEST_NETLINK_OBJECT(fd, nlh0,
 			    SELNL_MSG_POLICYLOAD, NLM_F_REQUEST, msg,
 			    PRINT_FIELD_U("{", msg, seqno);

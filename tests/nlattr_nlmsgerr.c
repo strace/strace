@@ -69,11 +69,13 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+	static const uint8_t cookie[] = { 0xab, 0xfe };
+
 	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 	const unsigned int hdrlen = sizeof(struct nlmsgerr);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+			NLA_HDRLEN + sizeof(cookie));
 
-	static const uint8_t cookie[] = { 0xab, 0xfe };
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_nlmsgerr, print_nlmsgerr,
 		    NLMSGERR_ATTR_COOKIE,

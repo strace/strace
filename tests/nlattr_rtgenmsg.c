@@ -66,13 +66,14 @@ main(void)
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 	const unsigned int hdrlen = sizeof(struct rtgenmsg);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	const unsigned int nla_type = 0xffff & NLA_TYPE_MASK;
+	char nla_type_str[256];
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + sizeof(nla_type_str));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-	const unsigned int nla_type = 0xffff & NLA_TYPE_MASK;
-	char nla_type_str[256];
 	sprintf(nla_type_str, "%#x /* NETNSA_??? */", nla_type);
 	TEST_NLATTR_(fd, nlh0, hdrlen,
 		     init_rtgenmsg, print_rtgenmsg,

@@ -203,7 +203,7 @@ test_nlmsgerr(const int fd)
 {
 	struct nlmsgerr *err;
 	struct nlmsghdr *nlh;
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(*err) + 4);
 	long rc;
 
 	/* error message without enough room for the error code */
@@ -318,9 +318,9 @@ static void
 test_nlmsg_done(const int fd)
 {
 	struct nlmsghdr *nlh;
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
-	long rc;
 	const int num = 0xfacefeed;
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(num));
+	long rc;
 
 	/* NLMSG_DONE message without enough room for an integer payload */
 	nlh = nlh0;

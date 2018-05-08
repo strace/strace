@@ -77,7 +77,8 @@ main(void)
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 	const unsigned int hdrlen = sizeof(struct ndmsg);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + sizeof(struct nda_cacheinfo));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);

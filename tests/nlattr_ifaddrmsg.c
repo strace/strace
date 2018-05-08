@@ -83,9 +83,23 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+	static const char address4[] = "12.34.56.78";
+	static const char address6[] = "12:34:56:78:90:ab:cd:ef";
+	static const struct ifa_cacheinfo ci = {
+		.ifa_prefered = 0xabcdefac,
+		.ifa_valid = 0xbcdadbca,
+		.cstamp = 0xcdabedba,
+		.tstamp = 0xdebabdac
+	};
+
+	struct in_addr a4;
+	struct in6_addr a6;
+	const uint32_t ifa_flags = IFA_F_SECONDARY | IFA_F_PERMANENT;
+
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 	const unsigned int hdrlen = sizeof(struct ifaddrmsg);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + MAX(sizeof(ci), sizeof(a6)));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
@@ -106,8 +120,6 @@ main(void)
 		    print_quoted_hex(pattern, 4));
 
 	SET_IFA_FAMILY(AF_INET);
-	static const char address4[] = "12.34.56.78";
-	struct in_addr a4;
 
 	if (!inet_pton(AF_INET, address4, &a4))
 		perror_msg_and_skip("inet_pton");
@@ -118,8 +130,6 @@ main(void)
 			   printf("%s", address4));
 
 	SET_IFA_FAMILY(AF_INET6);
-	static const char address6[] = "12:34:56:78:90:ab:cd:ef";
-	struct in6_addr a6;
 
 	if (!inet_pton(AF_INET6, address6, &a6))
 		perror_msg_and_skip("inet_pton");
@@ -129,12 +139,6 @@ main(void)
 			   IFA_ADDRESS, pattern, a6,
 			   printf("%s", address6));
 
-	static const struct ifa_cacheinfo ci = {
-		.ifa_prefered = 0xabcdefac,
-		.ifa_valid = 0xbcdadbca,
-		.cstamp = 0xcdabedba,
-		.tstamp = 0xdebabdac
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_CACHEINFO, pattern, ci,
@@ -144,7 +148,6 @@ main(void)
 			   PRINT_FIELD_U(", ", ci, tstamp);
 			   printf("}"));
 
-	const uint32_t ifa_flags = IFA_F_SECONDARY | IFA_F_PERMANENT;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_FLAGS, pattern, ifa_flags,

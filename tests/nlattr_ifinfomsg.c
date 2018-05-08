@@ -89,28 +89,6 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	const int fd = create_nl_socket(NETLINK_ROUTE);
-	const unsigned int hdrlen = sizeof(struct ifinfomsg);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
-	const unsigned int nla_type = 0xffff & NLA_TYPE_MASK;
-	char nla_type_str[256];
-	sprintf(nla_type_str, "%#x /* IFLA_??? */", nla_type);
-	TEST_NLATTR_(fd, nlh0, hdrlen,
-		     init_ifinfomsg, print_ifinfomsg,
-		     nla_type, nla_type_str,
-		     4, pattern, 4,
-		     print_quoted_hex(pattern, 4));
-
-	const int32_t netnsid = 0xacbdabda;
-	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
-			   init_ifinfomsg, print_ifinfomsg,
-			   IFLA_LINK_NETNSID, pattern, netnsid,
-			   printf("%d", netnsid));
-
 	static const struct rtnl_link_stats st = {
 		.rx_packets = 0xabcdefac,
 		.tx_packets = 0xbcdacdab,
@@ -136,6 +114,29 @@ main(void)
 		.rx_compressed = 0xdeffadbd,
 		.tx_compressed = 0xefdadfab
 	};
+	const int fd = create_nl_socket(NETLINK_ROUTE);
+	const unsigned int hdrlen = sizeof(struct ifinfomsg);
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + sizeof(st));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
+	const unsigned int nla_type = 0xffff & NLA_TYPE_MASK;
+	char nla_type_str[256];
+	sprintf(nla_type_str, "%#x /* IFLA_??? */", nla_type);
+	TEST_NLATTR_(fd, nlh0, hdrlen,
+		     init_ifinfomsg, print_ifinfomsg,
+		     nla_type, nla_type_str,
+		     4, pattern, 4,
+		     print_quoted_hex(pattern, 4));
+
+	const int32_t netnsid = 0xacbdabda;
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_ifinfomsg, print_ifinfomsg,
+			   IFLA_LINK_NETNSID, pattern, netnsid,
+			   printf("%d", netnsid));
+
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifinfomsg, print_ifinfomsg,
 			   IFLA_STATS, pattern, st,

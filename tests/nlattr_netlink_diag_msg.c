@@ -76,27 +76,32 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	const unsigned int hdrlen = sizeof(struct netlink_diag_msg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
 	static const unsigned long groups[] = {
 		(unsigned long) 0xdeadbeefbadc0dedULL,
 		(unsigned long) 0xdeadbeefbadc0dedULL
 	};
-	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
-			  init_netlink_diag_msg, print_netlink_diag_msg,
-			  NETLINK_DIAG_GROUPS, pattern, groups, print_xlong);
-
 	static const struct netlink_diag_ring ndr = {
 		.ndr_block_size = 0xfabfabdc,
 		.ndr_block_nr = 0xabcdabda,
 		.ndr_frame_size = 0xcbadbafa,
 		.ndr_frame_nr = 0xdbcafadb
 	};
+	static const uint32_t flags =
+		NDIAG_FLAG_CB_RUNNING | NDIAG_FLAG_PKTINFO;
+
+	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
+	const unsigned int hdrlen = sizeof(struct netlink_diag_msg);
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN +
+					 MAX(sizeof(groups), sizeof(ndr)));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
+	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
+			  init_netlink_diag_msg, print_netlink_diag_msg,
+			  NETLINK_DIAG_GROUPS, pattern, groups, print_xlong);
+
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_netlink_diag_msg, print_netlink_diag_msg,
 			   NETLINK_DIAG_RX_RING, pattern, ndr,
@@ -106,8 +111,6 @@ main(void)
 			   PRINT_FIELD_U(", ", ndr, ndr_frame_nr);
 			   printf("}"));
 
-	static const uint32_t flags =
-		NDIAG_FLAG_CB_RUNNING | NDIAG_FLAG_PKTINFO;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_netlink_diag_msg, print_netlink_diag_msg,
 			   NETLINK_DIAG_FLAGS, pattern, flags,

@@ -117,6 +117,9 @@ void *tail_alloc(const size_t)
 void *tail_memdup(const void *, const size_t)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((2));
 
+#define midtail_alloc(after_, before_) \
+	((void *) ((char *) tail_alloc(((before_) + (after_))) + (before_)))
+
 /*
  * Allocate an object of the specified type at the end
  * of a mapped memory region.

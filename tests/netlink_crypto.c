@@ -98,8 +98,6 @@ test_nlmsg_flags(const int fd)
 static void
 test_crypto_msg_newalg(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
-
 	struct crypto_user_alg alg = {
 		.cru_name = "abcd",
 		.cru_driver_name = "efgh",
@@ -109,6 +107,8 @@ test_crypto_msg_newalg(const int fd)
 		.cru_refcnt = 0xbcacfacd,
 		.cru_flags = 0xefacdbad
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(alg));
+
 	TEST_NETLINK_OBJECT_EX(fd, nlh0,
 			       CRYPTO_MSG_NEWALG, NLM_F_REQUEST,
 			       alg, print_quoted_memory,
@@ -149,7 +149,7 @@ test_crypto_msg_newalg(const int fd)
 static void
 test_crypto_msg_unspec(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, 4);
 
 	TEST_NETLINK_(fd, nlh0,
 		      0xffff, "0xffff /* CRYPTO_MSG_??? */",

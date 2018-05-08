@@ -87,19 +87,46 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
 	static const struct inet_diag_meminfo minfo = {
 		.idiag_rmem = 0xfadcacdb,
 		.idiag_wmem = 0xbdabcada,
 		.idiag_fmem = 0xbadbfafb,
 		.idiag_tmem = 0xfdacdadf
 	};
+	static const struct tcpvegas_info vegas = {
+		.tcpv_enabled = 0xfadcacdb,
+		.tcpv_rttcnt = 0xbdabcada,
+		.tcpv_rtt = 0xbadbfafb,
+		.tcpv_minrtt = 0xfdacdadf
+	};
+	static const struct tcp_dctcp_info dctcp = {
+		.dctcp_enabled = 0xfdac,
+		.dctcp_ce_state = 0xfadc,
+		.dctcp_alpha = 0xbdabcada,
+		.dctcp_ab_ecn = 0xbadbfafb,
+		.dctcp_ab_tot = 0xfdacdadf
+	};
+	static const struct tcp_bbr_info bbr = {
+		.bbr_bw_lo = 0xfdacdadf,
+		.bbr_bw_hi = 0xfadcacdb,
+		.bbr_min_rtt = 0xbdabcada,
+		.bbr_pacing_gain = 0xbadbfafb,
+		.bbr_cwnd_gain = 0xfdacdadf
+	};
+	static const uint32_t mem[] = { 0xaffacbad, 0xffadbcab };
+	static uint32_t bigmem[SK_MEMINFO_VARS + 1];
+	static const uint32_t mark = 0xabdfadca;
+	static const uint8_t shutdown = 0xcd;
+
+	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
+	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN +
+					 MAX(sizeof(bigmem), DEFAULT_STRLEN));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_MEMINFO, pattern, minfo,
@@ -109,12 +136,6 @@ main(void)
 			   PRINT_FIELD_U(", ", minfo, idiag_tmem);
 			   printf("}"));
 
-	static const struct tcpvegas_info vegas = {
-		.tcpv_enabled = 0xfadcacdb,
-		.tcpv_rttcnt = 0xbdabcada,
-		.tcpv_rtt = 0xbadbfafb,
-		.tcpv_minrtt = 0xfdacdadf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_VEGASINFO, pattern, vegas,
@@ -125,13 +146,6 @@ main(void)
 			   printf("}"));
 
 
-	static const struct tcp_dctcp_info dctcp = {
-		.dctcp_enabled = 0xfdac,
-		.dctcp_ce_state = 0xfadc,
-		.dctcp_alpha = 0xbdabcada,
-		.dctcp_ab_ecn = 0xbadbfafb,
-		.dctcp_ab_tot = 0xfdacdadf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_DCTCPINFO, pattern, dctcp,
@@ -142,13 +156,6 @@ main(void)
 			   PRINT_FIELD_U(", ", dctcp, dctcp_ab_tot);
 			   printf("}"));
 
-	static const struct tcp_bbr_info bbr = {
-		.bbr_bw_lo = 0xfdacdadf,
-		.bbr_bw_hi = 0xfadcacdb,
-		.bbr_min_rtt = 0xbdabcada,
-		.bbr_pacing_gain = 0xbadbfafb,
-		.bbr_cwnd_gain = 0xfdacdadf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_BBRINFO, pattern, bbr,
@@ -159,12 +166,10 @@ main(void)
 			   PRINT_FIELD_U(", ", bbr, bbr_cwnd_gain);
 			   printf("}"));
 
-	static const uint32_t mem[] = { 0xaffacbad, 0xffadbcab };
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
 			  init_inet_diag_msg, print_inet_diag_msg,
 			  INET_DIAG_SKMEMINFO, pattern, mem, print_uint);
 
-	static uint32_t bigmem[SK_MEMINFO_VARS + 1];
 	memcpy(bigmem, pattern, sizeof(bigmem));
 
 	TEST_NLATTR(fd, nlh0, hdrlen, init_inet_diag_msg, print_inet_diag_msg,
@@ -176,7 +181,6 @@ main(void)
 		    }
 		    printf(", ...]"));
 
-	static const uint32_t mark = 0xabdfadca;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_MARK, pattern, mark,
@@ -187,7 +191,6 @@ main(void)
 			   INET_DIAG_CLASS_ID, pattern, mark,
 			   printf("%u", mark));
 
-	static const uint8_t shutdown = 0xcd;
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_SHUTDOWN,
 		    sizeof(shutdown), &shutdown, sizeof(shutdown),

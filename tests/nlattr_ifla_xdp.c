@@ -87,13 +87,14 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+	const int32_t num = 0xabacdbcd;
 	const int fd = create_nl_socket(NETLINK_ROUTE);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + sizeof(num));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-	const int32_t num = 0xabacdbcd;
 	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_XDP_FD, pattern, num,

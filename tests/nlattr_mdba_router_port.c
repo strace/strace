@@ -87,25 +87,27 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	const int fd = create_nl_socket(NETLINK_ROUTE);
-
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
 	const uint32_t ifindex = ifindex_lo();
-	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
-				  init_br_port_msg, print_br_port_msg,
-				  MDBA_ROUTER_PORT, pattern, ifindex,
-				  printf(IFINDEX_LO_STR));
-
 	const uint8_t type = MDB_RTR_TYPE_DISABLED;
 	static const struct nlattr nla = {
 		.nla_len = NLA_HDRLEN + sizeof(type),
 		.nla_type = MDBA_ROUTER_PATTR_TYPE
 	};
 	char buf[NLMSG_ALIGN(ifindex) + NLA_HDRLEN + sizeof(type)];
+
+	const int fd = create_nl_socket(NETLINK_ROUTE);
+
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + sizeof(buf));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
+	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				  init_br_port_msg, print_br_port_msg,
+				  MDBA_ROUTER_PORT, pattern, ifindex,
+				  printf(IFINDEX_LO_STR));
+
 	memcpy(buf, &ifindex, sizeof(ifindex));
 	memcpy(buf + NLMSG_ALIGN(ifindex), &nla, sizeof(nla));
 	memcpy(buf + NLMSG_ALIGN(ifindex) + NLA_HDRLEN, &type, sizeof(type));

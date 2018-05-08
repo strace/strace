@@ -72,7 +72,12 @@ main(void)
 
 	const int fd = create_nl_socket(NETLINK_CRYPTO);
 	const unsigned int hdrlen = sizeof(struct crypto_user_alg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	/*
+	 * There are also other structures, but they are not bigger than
+	 * DEFAULT_STRLEN so far.
+	 */
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN + DEFAULT_STRLEN);
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);

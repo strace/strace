@@ -86,7 +86,7 @@ main(void)
 
 	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 	const unsigned int hdrlen = sizeof(struct inet_diag_req);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), NLA_HDRLEN + 4);
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);

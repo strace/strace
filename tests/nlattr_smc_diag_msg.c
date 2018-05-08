@@ -97,13 +97,6 @@ int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	const unsigned int hdrlen = sizeof(struct smc_diag_msg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
 	static const struct smc_diag_conninfo cinfo = {
 		.token = 0xabcdefac,
 		.sndbuf_size = 0xbcdaefad,
@@ -149,6 +142,25 @@ int main(void)
 			.count = 0xcdedbad7
 		}
 	};
+	static const struct smc_diag_lgrinfo linfo = {
+		.lnk[0] = {
+			.link_id = 0xaf,
+			.ibport = 0xfa,
+			.ibname = "123",
+			.gid = "456",
+			.peer_gid = "789"
+		},
+		.role = SMC_CLNT
+	};
+
+	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
+	const unsigned int hdrlen = sizeof(struct smc_diag_msg);
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN +
+					 MAX(sizeof(cinfo), sizeof(linfo)));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_smc_diag_msg, print_smc_diag_msg,
@@ -170,16 +182,6 @@ int main(void)
 			   PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_fin);
 			   printf("}"));
 
-	static const struct smc_diag_lgrinfo linfo = {
-		.lnk[0] = {
-			.link_id = 0xaf,
-			.ibport = 0xfa,
-			.ibname = "123",
-			.gid = "456",
-			.peer_gid = "789"
-		},
-		.role = SMC_CLNT
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_smc_diag_msg, print_smc_diag_msg,
 			   SMC_DIAG_LGRINFO, pattern, linfo,

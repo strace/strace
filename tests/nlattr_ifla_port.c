@@ -88,7 +88,7 @@ main(void)
 	skip_if_unavailable("/proc/self/fd/");
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), 2 * NLA_HDRLEN + 8);
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);

@@ -84,19 +84,20 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+	const uint16_t u16 = 0xabcd;
+	const uint64_t u64 = 0xabcdedeeefeafeab;
 	const int fd = create_nl_socket(NETLINK_ROUTE);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN * 2 + sizeof(u64));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-	const uint16_t u16 = 0xabcd;
 	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_BRPORT_PRIORITY, pattern, u16,
 				  printf("%u", u16));
 
-	const uint64_t u64 = 0xabcdedeeefeafeab;
 	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_BRPORT_MESSAGE_AGE_TIMER, pattern, u64,

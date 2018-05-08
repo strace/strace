@@ -407,7 +407,10 @@ main(void)
 	skip_if_unavailable("/proc/self/fd/");
 
 	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), NLA_HDRLEN +
+			sizeof(struct inet_diag_bc_op) +
+				sizeof(struct inet_diag_hostcond) +
+				sizeof(struct in6_addr) + DEFAULT_STRLEN);
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
 	test_inet_diag_bc_op(fd);

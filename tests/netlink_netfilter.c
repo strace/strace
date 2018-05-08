@@ -88,8 +88,8 @@ test_nlmsg_type(const int fd)
 static void
 test_nlmsg_done(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	const int num = 0xabcdefad;
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(num));
 
 	TEST_NETLINK(fd, nlh0, NLMSG_DONE, NLM_F_REQUEST,
 		     sizeof(num), &num, sizeof(num),
@@ -99,13 +99,21 @@ test_nlmsg_done(const int fd)
 static void
 test_nfgenmsg(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	static const struct nlattr nla = {
+		.nla_len = sizeof(nla),
+		.nla_type = 0x0bcd
+	};
 
 	struct nfgenmsg msg = {
 		.nfgen_family = AF_UNIX,
 		.version = NFNETLINK_V0,
 		.res_id = NFNL_SUBSYS_NFTABLES
 	};
+	char str_buf[NLMSG_ALIGN(sizeof(msg)) + 4];
+	char nla_buf[NLMSG_ALIGN(sizeof(msg)) + sizeof(nla)];
+
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN,
+					 MAX(sizeof(str_buf), sizeof(nla_buf)));
 
 	TEST_NETLINK_OBJECT_EX_(fd, nlh0,
 				NFNL_SUBSYS_NFTABLES << 8 | NFT_MSG_NEWTABLE,
@@ -150,8 +158,6 @@ test_nfgenmsg(const int fd)
 		     printf(", version=NFNETLINK_V0");
 		     printf(", res_id=htons(%d)", NFNL_SUBSYS_NFTABLES));
 
-	char str_buf[NLMSG_ALIGN(sizeof(msg)) + 4];
-
 	msg.res_id = htons(0xabcd);
 	memcpy(str_buf, &msg, sizeof(msg));
 	memcpy(str_buf + NLMSG_ALIGN(sizeof(msg)), "1234", 4);
@@ -164,12 +170,6 @@ test_nfgenmsg(const int fd)
 		     printf(", res_id=htons(%d)"
 			    ", \"\\x31\\x32\\x33\\x34\"", 0xabcd));
 # endif /* NFNL_MSG_BATCH_BEGIN */
-
-	static const struct nlattr nla = {
-		.nla_len = sizeof(nla),
-		.nla_type = 0x0bcd
-	};
-	char nla_buf[NLMSG_ALIGN(sizeof(msg)) + sizeof(nla)];
 
 	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
 	memcpy(nla_buf, &msg, sizeof(msg));

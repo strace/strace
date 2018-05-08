@@ -75,17 +75,24 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	const unsigned int hdrlen = sizeof(struct unix_diag_msg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
 	static const struct unix_diag_vfs uv = {
 		.udiag_vfs_dev = 0xabcddafa,
 		.udiag_vfs_ino = 0xbafabcda
 	};
+	static const struct unix_diag_rqlen rql = {
+		.udiag_rqueue = 0xfabdcdad,
+		.udiag_wqueue = 0xbacdadcf
+	};
+	static const uint32_t inode[] = { 0xadbcadbc, 0xfabdcdac };
+
+	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
+	const unsigned int hdrlen = sizeof(struct unix_diag_msg);
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN + sizeof(inode));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_unix_diag_msg, print_unix_diag_msg,
 			   UNIX_DIAG_VFS, pattern, uv,
@@ -95,10 +102,6 @@ main(void)
 			   PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
 			   printf("}"));
 
-	static const struct unix_diag_rqlen rql = {
-		.udiag_rqueue = 0xfabdcdad,
-		.udiag_wqueue = 0xbacdadcf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_unix_diag_msg, print_unix_diag_msg,
 			   UNIX_DIAG_RQLEN, pattern, rql,
@@ -106,7 +109,6 @@ main(void)
 			   PRINT_FIELD_U(", ", rql, udiag_wqueue);
 			   printf("}"));
 
-	static const uint32_t inode[] = { 0xadbcadbc, 0xfabdcdac };
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
 			  init_unix_diag_msg, print_unix_diag_msg,
 			  UNIX_DIAG_ICONS, pattern, inode, print_uint);
