@@ -197,12 +197,6 @@ SO_BINDTODEVICE 25
 #endif
 
 #if defined __hppa__
-SO_ATTACH_FILTER 16410
-#else
-SO_ATTACH_FILTER 26
-#endif
-
-#if defined __hppa__
 SO_DETACH_FILTER 16411
 #else
 SO_DETACH_FILTER 27

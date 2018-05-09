@@ -1,0 +1,5 @@
+#if defined __hppa__
+SO_ATTACH_FILTER 16410
+#else
+SO_ATTACH_FILTER 26
+#endif

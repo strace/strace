@@ -35,6 +35,11 @@
 #include <sys/socket.h>
 #include <linux/filter.h>
 
+/* SO_GET_FILTER was introduced by Linux commit v3.8-rc1~139^2~518 */
+#ifndef SO_GET_FILTER
+# define SO_GET_FILTER SO_ATTACH_FILTER
+#endif
+
 #define HEX_FMT "%#x"
 
 #if XLAT_RAW
@@ -116,7 +121,7 @@ static const char *errstr;
 static int
 get_filter(int fd, void *val, socklen_t *len)
 {
-	int rc = getsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, val, len);
+	int rc = getsockopt(fd, SOL_SOCKET, SO_GET_FILTER, val, len);
 	errstr = sprintrc(rc);
 	return rc;
 }
@@ -150,17 +155,17 @@ main(void)
 	*len = BPF_MAXINSNS;
 	rc = get_filter(fd, NULL, len);
 	if (rc)
-		perror_msg_and_skip("getsockopt SOL_SOCKET SO_ATTACH_FILTER");
+		perror_msg_and_skip("getsockopt SOL_SOCKET SO_GET_FILTER");
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", NULL, [%u->0]) "
 	       "= 0\n",
-	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_ATTACH_FILTER),
+	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER),
 	       BPF_MAXINSNS);
 
 	/* getsockopt NULL optlen - EFAULT */
 	rc = get_filter(fd, NULL, NULL);
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", NULL, NULL) "
 	       "= %s\n",
-	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_ATTACH_FILTER), errstr);
+	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER), errstr);
 
 	/* attach a filter */
 	rc = set_filter(fd, prog, sizeof(*prog));
@@ -194,28 +199,28 @@ main(void)
 	rc = get_filter(fd, efault, len);
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", %p, [0->%u]) "
 	       "= %s\n",
-	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_ATTACH_FILTER), efault,
+	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER), efault,
 	       (unsigned int) ARRAY_SIZE(bpf_filter), errstr);
 
 	/* getsockopt optlen is too small - EINVAL */
 	*len = ARRAY_SIZE(bpf_filter) - 1;
 	rc = get_filter(fd, efault, len);
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", %p, [%u]) = %s\n",
-	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_ATTACH_FILTER), efault,
+	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER), efault,
 	       (unsigned int) ARRAY_SIZE(bpf_filter) - 1, errstr);
 
 	/* getsockopt optval EFAULT */
 	*len = ARRAY_SIZE(bpf_filter);
 	rc = get_filter(fd, filter + 1, len);
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", %p, [%u]) = %s\n",
-	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_ATTACH_FILTER),
+	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER),
 	       filter + 1, (unsigned int) ARRAY_SIZE(bpf_filter), errstr);
 
 	/* getsockopt optlen is too large - truncated */
 	*len = ARRAY_SIZE(bpf_filter) + 1;
 	rc = get_filter(fd, filter, len);
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", ",
-	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_ATTACH_FILTER));
+	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER));
 	print_filter();
 	printf(", [%u->%d]) = %s\n",
 	       (unsigned int) ARRAY_SIZE(bpf_filter) + 1, *len, errstr);

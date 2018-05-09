@@ -426,6 +426,8 @@ SYS_FUNC(socketpair)
 }
 
 #include "xlat/sock_options.h"
+#include "xlat/getsock_options.h"
+#include "xlat/setsock_options.h"
 #include "xlat/sock_ip_options.h"
 #include "xlat/getsock_ip_options.h"
 #include "xlat/setsock_ip_options.h"
@@ -466,7 +468,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 
 	switch (level) {
 	case SOL_SOCKET:
-		printxval(sock_options, name, "SO_???");
+		printxvals(name, "SO_???", sock_options,
+			   is_getsockopt ? getsock_options :
+					   setsock_options, NULL);
 		break;
 	case SOL_IP:
 		printxvals(name, "IP_???", sock_ip_options,
