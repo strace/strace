@@ -469,6 +469,9 @@ so_peercred-Xabbrev
 so_peercred-Xraw
 so_peercred-Xverbose
 sock_filter-v
+sock_filter-v-Xabbrev
+sock_filter-v-Xraw
+sock_filter-v-Xverbose
 socketcall
 sockopt-sol_netlink
 splice
