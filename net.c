@@ -528,7 +528,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_pnp_options, name, "PNPIPE_???");
 		break;
 	case SOL_RDS:
-		printxval(sock_rds_options, name, "RDS_???");
+		printxval_search(sock_rds_options, name, "RDS_???");
 		break;
 	case SOL_IUCV:
 		printxval(sock_iucv_options, name, "SO_???");
