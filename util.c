@@ -1029,6 +1029,15 @@ print_int32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 }
 
 bool
+print_uint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+bool
 print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {

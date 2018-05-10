@@ -737,6 +737,8 @@ extern void print_abnormal_hi(kernel_ulong_t);
 
 extern bool print_int32_array_member(struct tcb *, void *elem_buf,
 				     size_t elem_size, void *data);
+extern bool print_uint32_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
 extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
 
