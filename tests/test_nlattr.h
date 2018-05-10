@@ -310,7 +310,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			}						\
 			printf(", ... /* %p */]}",			\
 			       RTA_DATA(TEST_NLATTR_nla)		\
-			        + sizeof((obj_)[0])));			\
+			        + sizeof(obj_) - sizeof((obj_)[0])));	\
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN,		\
 			(hdrlen_) + NLA_HDRLEN,				\
