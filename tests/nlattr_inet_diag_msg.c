@@ -37,6 +37,18 @@
 #include <linux/inet_diag.h>
 #include <linux/sock_diag.h>
 
+static const char * const sk_meminfo_strs[] = {
+	"SK_MEMINFO_RMEM_ALLOC",
+	"SK_MEMINFO_RCVBUF",
+	"SK_MEMINFO_WMEM_ALLOC",
+	"SK_MEMINFO_SNDBUF",
+	"SK_MEMINFO_FWD_ALLOC",
+	"SK_MEMINFO_WMEM_QUEUED",
+	"SK_MEMINFO_OPTMEM",
+	"SK_MEMINFO_BACKLOG",
+	"SK_MEMINFO_DROPS",
+};
+
 static const char address[] = "10.11.12.13";
 
 static void
@@ -79,7 +91,12 @@ print_inet_diag_msg(const unsigned int msg_len)
 static void
 print_uint(const unsigned int *p, size_t i)
 {
-	printf("%u", *p);
+	if (i >= ARRAY_SIZE(sk_meminfo_strs))
+		printf("[%zu /* SK_MEMINFO_??? */", i);
+	else
+		printf("[%s", sk_meminfo_strs[i]);
+
+	printf("] = %u", *p);
 }
 
 int

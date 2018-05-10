@@ -36,6 +36,8 @@
 #include <linux/sock_diag.h>
 #include "static_assert.h"
 
+#include "xlat/netlink_sk_meminfo_indices.h"
+
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
 	     const kernel_ulong_t addr, const unsigned int len,
@@ -199,8 +201,12 @@ decode_nla_meminfo(struct tcb *const tcp,
 		return false;
 
 	unsigned int count = 0;
-	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
-		    tfetch_mem, print_uint32_array_member, &count);
+	print_array_ex(tcp, addr, nmemb, &mem, sizeof(mem),
+		       tfetch_mem, print_uint32_array_member, &count,
+		       PAF_PRINT_INDICES | PAF_INDEX_XLAT_VALUE_INDEXED
+			| XLAT_STYLE_FMT_U,
+		       ARRSZ_PAIR(netlink_sk_meminfo_indices),
+		       "SK_MEMINFO_???");
 
 	return true;
 }
