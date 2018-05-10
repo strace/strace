@@ -66,7 +66,7 @@ print_netlink_diag_msg(const unsigned int msg_len)
 }
 
 static void
-print_xlong(const unsigned long *p)
+print_xlong(const unsigned long *p, size_t i)
 {
 	printf("%#lx", *p);
 }

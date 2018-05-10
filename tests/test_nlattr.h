@@ -170,7 +170,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			size_t i;					\
 			for (i = 0; i < ARRAY_SIZE(obj_) - 1; ++i) {	\
 				if (i) printf(", ");			\
-				(print_elem_)(&(obj_)[i]);		\
+				(print_elem_)(&(obj_)[i], i);		\
 			}						\
 			printf("]"));					\
 		/* short read of sizeof(obj_) */			\
@@ -183,7 +183,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			size_t i;					\
 			for (i = 0; i < ARRAY_SIZE(obj_) - 1; ++i) {	\
 				if (i) printf(", ");			\
-				(print_elem_)(&(obj_)[i]);		\
+				(print_elem_)(&(obj_)[i], i);		\
 			}						\
 			printf(", %p]",					\
 			       RTA_DATA(NLMSG_ATTR(nlh, (hdrlen_)))	\
@@ -198,7 +198,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			size_t i;					\
 			for (i = 0; i < ARRAY_SIZE(obj_); ++i) {	\
 				if (i) printf(", ");			\
-				(print_elem_)(&(obj_)[i]);		\
+				(print_elem_)(&(obj_)[i], i);		\
 			}						\
 			printf("]"));					\
 	} while (0)

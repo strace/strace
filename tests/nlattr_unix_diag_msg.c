@@ -65,7 +65,7 @@ print_unix_diag_msg(const unsigned int msg_len)
 }
 
 static void
-print_uint(const unsigned int *p)
+print_uint(const unsigned int *p, size_t i)
 {
 	printf("%u", *p);
 }

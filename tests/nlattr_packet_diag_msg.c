@@ -67,7 +67,7 @@ print_packet_diag_msg(const unsigned int msg_len)
 }
 
 static void
-print_packet_diag_mclist(const struct packet_diag_mclist *const dml)
+print_packet_diag_mclist(const struct packet_diag_mclist *const dml, size_t i)
 {
 	printf("{pdmc_index=" IFINDEX_LO_STR);
 	PRINT_FIELD_U(", ", *dml, pdmc_count);
@@ -84,7 +84,7 @@ static const struct sock_filter filter[] = {
 };
 
 static void
-print_sock_filter(const struct sock_filter *const f)
+print_sock_filter(const struct sock_filter *const f, size_t i)
 {
 	if (f == filter)
 		printf("BPF_STMT(BPF_LD|BPF_B|BPF_ABS"
