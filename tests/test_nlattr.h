@@ -187,7 +187,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			}						\
 			printf(", %p]",					\
 			       RTA_DATA(NLMSG_ATTR(nlh, (hdrlen_)))	\
-			        + sizeof((obj_)[0])));			\
+			        + sizeof(obj_) - sizeof((obj_)[0])));	\
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
