@@ -178,24 +178,6 @@ decode_nla_strn(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-print_meminfo(struct tcb *const tcp,
-	      void *const elem_buf,
-	      const size_t elem_size,
-	      void *const opaque_data)
-{
-	unsigned int *const count = opaque_data;
-
-	if ((*count)++ >= SK_MEMINFO_VARS) {
-		tprints("...");
-		return false;
-	}
-
-	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
-
-	return true;
-}
-
 bool
 decode_nla_meminfo(struct tcb *const tcp,
 		   const kernel_ulong_t addr,
@@ -210,7 +192,7 @@ decode_nla_meminfo(struct tcb *const tcp,
 
 	unsigned int count = 0;
 	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
-		    umoven_or_printaddr, print_meminfo, &count);
+		    umoven_or_printaddr, print_uint32_array_member, &count);
 
 	return true;
 }

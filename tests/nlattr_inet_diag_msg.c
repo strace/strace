@@ -172,14 +172,9 @@ main(void)
 
 	memcpy(bigmem, pattern, sizeof(bigmem));
 
-	TEST_NLATTR(fd, nlh0, hdrlen, init_inet_diag_msg, print_inet_diag_msg,
-		    INET_DIAG_SKMEMINFO, sizeof(bigmem), bigmem, sizeof(bigmem),
-		    size_t i;
-		    for (i = 0; i < SK_MEMINFO_VARS; ++i) {
-			printf(i ? ", " : "[");
-			print_uint(&bigmem[i]);
-		    }
-		    printf(", ...]"));
+	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
+			  init_inet_diag_msg, print_inet_diag_msg,
+			  INET_DIAG_SKMEMINFO, pattern, bigmem, print_uint);
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
