@@ -363,8 +363,7 @@ netlink_send_query(struct tcb *tcp, const int fd, const unsigned long inode)
 		},
 		.ndr = {
 			.sdiag_family = AF_NETLINK,
-			.sdiag_protocol = NDIAG_PROTO_ALL,
-			.ndiag_show = NDIAG_SHOW_MEMINFO
+			.sdiag_protocol = NDIAG_PROTO_ALL
 		}
 	};
 	return send_query(tcp, fd, &req, sizeof(req));

@@ -55,8 +55,7 @@ send_query(const int fd)
 		},
 		.ndr = {
 			.sdiag_family = AF_NETLINK,
-			.sdiag_protocol = NDIAG_PROTO_ALL,
-			.ndiag_show = NDIAG_SHOW_MEMINFO
+			.sdiag_protocol = NDIAG_PROTO_ALL
 		}
 	};
 	struct iovec iov = {
