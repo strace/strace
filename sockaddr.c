@@ -226,7 +226,7 @@ print_sockaddr_data_ll(const void *const buf, const int addrlen)
 	tprints(", sll_hatype=");
 	printxval_search(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");
 	tprints(", sll_pkttype=");
-	printxval(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
+	printxval_index(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
 	tprintf(", sll_halen=%u", sa_ll->sll_halen);
 	if (sa_ll->sll_halen) {
 		const unsigned int oob_halen =
@@ -378,8 +378,8 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 			const struct sockaddr_hci *const hci = buf;
 			tprintf("hci_dev=htobs(%hu), hci_channel=",
 				btohs(hci->hci_dev));
-			printxval(hci_channels, hci->hci_channel,
-				  "HCI_CHANNEL_???");
+			printxval_index(hci_channels, hci->hci_channel,
+					"HCI_CHANNEL_???");
 			break;
 		}
 		case sizeof(struct sockaddr_sco): {
@@ -433,7 +433,7 @@ print_sockaddr(const void *const buf, const int addrlen)
 	const struct sockaddr *const sa = buf;
 
 	tprints("{sa_family=");
-	printxval(addrfams, sa->sa_family, "AF_???");
+	printxval_index(addrfams, sa->sa_family, "AF_???");
 
 	if (addrlen > (int) SIZEOF_SA_FAMILY) {
 		tprints(", ");
