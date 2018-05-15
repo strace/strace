@@ -226,7 +226,7 @@ printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 				  xlat_search);
 }
 
-static const char *
+const char *
 xlat_idx(const struct xlat *xlat, size_t nmemb, uint64_t val)
 {
 	if (val >= nmemb)

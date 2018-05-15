@@ -536,6 +536,7 @@ extern enum sock_proto getfdproto(struct tcb *, int);
 
 extern const char *xlookup(const struct xlat *, const uint64_t);
 extern const char *xlat_search(const struct xlat *, const size_t, const uint64_t);
+extern const char *xlat_idx(const struct xlat *xlat, size_t nmemb, uint64_t val);
 
 struct dyxlat;
 struct dyxlat *dyxlat_alloc(size_t nmemb);
