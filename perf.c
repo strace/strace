@@ -60,7 +60,7 @@ free_pea_desc(void *pea_desc_ptr)
 	free(desc);
 }
 
-static int
+int
 fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct pea_desc *desc;
@@ -117,7 +117,7 @@ fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		printxval_search(xlat, x, dflt); \
 	} while (0)
 
-static void
+void
 print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	static const char *precise_ip_desc[] = {

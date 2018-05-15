@@ -255,6 +255,8 @@ ioctl_decode(struct tcb *tcp)
 	const kernel_ulong_t arg = tcp->u_arg[2];
 
 	switch (_IOC_TYPE(code)) {
+	case '$':
+		return perf_ioctl(tcp, code, arg);
 #if defined(ALPHA) || defined(POWERPC)
 	case 'f': {
 		int ret = file_ioctl(tcp, code, arg);

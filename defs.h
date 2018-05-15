@@ -845,6 +845,11 @@ print_struct_statfs(struct tcb *, kernel_ulong_t addr);
 extern void
 print_struct_statfs64(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size);
 
+extern int
+fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr);
+extern void
+print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr);
+
 extern void print_ifindex(unsigned int);
 
 extern void print_bpf_filter_code(const uint16_t code, bool extended);

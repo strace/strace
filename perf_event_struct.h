@@ -71,4 +71,10 @@ struct perf_event_attr {
 	/* End of ver 5 - 112 bytes */
 };
 
+struct perf_event_query_bpf {
+        uint32_t ids_len;
+        uint32_t prog_cnt;
+        uint32_t ids[0];
+};
+
 #endif /* !STRACE_LINUX_PERF_EVENT_STRUCT_H */

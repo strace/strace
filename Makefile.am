@@ -235,6 +235,7 @@ strace_SOURCES =	\
 	pathtrace.c	\
 	perf.c		\
 	perf_event_struct.h \
+	perf_ioctl.c	\
 	personality.c	\
 	pkeys.c		\
 	poll.c		\
