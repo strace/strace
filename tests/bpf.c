@@ -523,7 +523,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 16,
+			.prog_type = 17,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -534,7 +534,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x10 /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x11 /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -542,7 +542,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 15,
+			.prog_type = 16,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
@@ -554,7 +554,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_CGROUP_DEVICE"
+		.str = "prog_type=BPF_PROG_TYPE_SK_MSG"
 		       ", insn_cnt=3134983661, insns=0xffffffff00000000"
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
 		       ", license=0xffffffff00000000"
