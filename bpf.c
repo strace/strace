@@ -448,7 +448,7 @@ SYS_FUNC(bpf)
 		buf = xmalloc(get_pagesize());
 
 	if (entering(tcp)) {
-		printxval(bpf_commands, cmd, "BPF_???");
+		printxval_index(bpf_commands, cmd, "BPF_???");
 		tprints(", ");
 	} else {
 		priv = get_tcb_priv_data(tcp);
