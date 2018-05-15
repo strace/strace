@@ -216,4 +216,13 @@ struct BPF_PROG_QUERY_struct /* query */ {
 	offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt)
 #define expected_BPF_PROG_QUERY_struct_size 28
 
+struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
+	uint64_t ATTRIBUTE_ALIGNED(8) name;
+	uint32_t prog_fd;
+};
+
+#define BPF_RAW_TRACEPOINT_OPEN_struct_size \
+	offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct, prog_fd)
+#define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 12
+
 #endif /* !STRACE_BPF_ATTR_H */

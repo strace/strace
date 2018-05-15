@@ -77,6 +77,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_MAP_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_OBJ_GET_INFO_BY_FD);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_QUERY);
+	BPF_ATTR_DATA_FIELD(BPF_RAW_TRACEPOINT_OPEN);
 	char char_data[256];
 };
 
@@ -524,7 +525,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 17,
+			.prog_type = 18,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -535,7 +536,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x11 /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x12 /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -543,7 +544,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 16,
+			.prog_type = 17,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
@@ -555,7 +556,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_SK_MSG"
+		.str = "prog_type=BPF_PROG_TYPE_RAW_TRACEPOINT"
 		       ", insn_cnt=3134983661, insns=0xffffffff00000000"
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
 		       ", license=0xffffffff00000000"
@@ -897,6 +898,58 @@ static const struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 };
 
 
+static void
+init_BPF_RAW_TRACEPOINT_attr2(struct bpf_attr_check *check)
+{
+	/* TODO: test the 128 byte limit */
+	static const char tp_name[] = "0123456789qwertyuiop0123456789qwe";
+
+	struct BPF_RAW_TRACEPOINT_OPEN_struct *attr =
+		&check->data.BPF_RAW_TRACEPOINT_OPEN_data;
+
+	attr->name = (uintptr_t) tp_name;
+}
+
+static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
+	{
+		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = { .name = 0 } },
+		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
+				    name),
+		.str = "raw_tracepoint={name=NULL, prog_fd=0}",
+	},
+	{ /* 1 */
+		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = {
+			.name = 0xffffffff00000000ULL,
+			.prog_fd = 0xdeadbeef,
+		} },
+		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
+				    prog_fd),
+		.str = "raw_tracepoint={name="
+#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+		       "0xffffffff00000000"
+#elif defined __arm__ || defined __i386__ || defined __mips__ || \
+      defined __powerpc__ || defined __riscv__ || defined __s390__ \
+      || defined __sparc__ || defined __tile__
+		       "0xffffffff00000000 or NULL"
+#else
+		       "NULL"
+#endif
+		       ", prog_fd=-559038737}",
+	},
+	{
+		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = {
+			.prog_fd = 0xdeadbeef,
+		} },
+		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
+				    prog_fd),
+		.init_fn = init_BPF_RAW_TRACEPOINT_attr2,
+		.str = "raw_tracepoint="
+		       "{name=\"0123456789qwertyuiop0123456789qw\"..."
+		       ", prog_fd=-559038737}",
+	}
+};
+
+
 #define CHK(cmd_) \
 	{ \
 		cmd_, #cmd_, \
@@ -925,6 +978,7 @@ main(void)
 		CHK(BPF_MAP_GET_FD_BY_ID),
 		CHK(BPF_OBJ_GET_INFO_BY_FD),
 		CHK(BPF_PROG_QUERY),
+		CHK(BPF_RAW_TRACEPOINT_OPEN),
 	};
 
 	page_size = get_page_size();

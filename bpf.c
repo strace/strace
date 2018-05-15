@@ -425,6 +425,20 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
+BEGIN_BPF_CMD_DECODER(BPF_RAW_TRACEPOINT_OPEN)
+{
+	enum { TP_NAME_SIZE = 128 };
+
+	tprintf("{raw_tracepoint={name=");
+	print_big_u64_addr(attr.name);
+	printstr_ex(tcp, attr.name, TP_NAME_SIZE, QUOTE_0_TERMINATED);
+
+	PRINT_FIELD_FD(", ", attr, prog_fd, tcp);
+
+	tprints("}");
+}
+END_BPF_CMD_DECODER(RVAL_DECODED)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -445,6 +459,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_MAP_GET_FD_BY_ID),
 		BPF_CMD_ENTRY(BPF_OBJ_GET_INFO_BY_FD),
 		BPF_CMD_ENTRY(BPF_PROG_QUERY),
+		BPF_CMD_ENTRY(BPF_RAW_TRACEPOINT_OPEN),
 	};
 
 	static char *buf;
