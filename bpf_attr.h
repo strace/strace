@@ -104,11 +104,12 @@ struct BPF_PROG_LOAD_struct {
 	uint32_t prog_flags;
 	char     prog_name[BPF_OBJ_NAME_LEN];
 	uint32_t prog_ifindex;
+	uint32_t expected_attach_type;
 };
 
 #define BPF_PROG_LOAD_struct_size \
-	offsetofend(struct BPF_PROG_LOAD_struct, prog_ifindex)
-#define expected_BPF_PROG_LOAD_struct_size 68
+	offsetofend(struct BPF_PROG_LOAD_struct, expected_attach_type)
+#define expected_BPF_PROG_LOAD_struct_size 72
 
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;

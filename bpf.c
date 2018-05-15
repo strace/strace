@@ -265,6 +265,15 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_ifindex))
 		break;
 	PRINT_FIELD_IFINDEX(", ", attr, prog_ifindex);
+
+	/*
+	 * expected_attach_type was added in Linux commit
+	 * v4.17-rc1~148^2~19^2^2~8.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, expected_attach_type))
+		break;
+	PRINT_FIELD_XVAL(", ", attr, expected_attach_type, bpf_attach_type,
+			 "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 

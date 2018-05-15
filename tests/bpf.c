@@ -509,7 +509,8 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr
 	       ", license=\"%s\", log_level=2718281828, log_size=4096"
 	       ", log_buf=%p, kern_version=KERNEL_VERSION(51966, 240, 13)"
 	       ", prog_flags=BPF_F_STRICT_ALIGNMENT|0x2"
-	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=%s",
+	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=%s"
+	       ", expected_attach_type=BPF_CGROUP_INET6_BIND",
 	       (unsigned int) ARRAY_SIZE(insns), insns,
 	       license, log_buf, IFINDEX_LO_STR);
 }
@@ -595,8 +596,10 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.kern_version = 0xcafef00d,
 			.prog_flags = 3,
 			.prog_name = "0123456789abcdef",
+			.expected_attach_type = 9,
 		} },
-		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_ifindex),
+		.size = offsetofend(struct BPF_PROG_LOAD_struct,
+				    expected_attach_type),
 		.init_fn = init_BPF_PROG_LOAD_attr4,
 		.print_fn = print_BPF_PROG_LOAD_attr4
 	},
