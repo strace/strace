@@ -1,0 +1,134 @@
+0. BUILD REQUIREMENTS
+
+ - Sane POSIX shell.
+ - gcc-like compiler that supports C99 and some GNU extensions (namely, empty
+   structures, empty definitions, zero length arrays, ranged designated
+   initialisers).
+ - libc. GNU libc and musl are supported.
+ - Linux UAPI headers.
+ - GNU Make.
+ - GNU coreutils.
+ - For running test suite: gawk, grep, sed, runtime environment for all
+   personalities.
+ - Requirements for optional features are documented in their description.
+
+1. CONFIGURATION AND OPTIONAL FEATURES
+
+Configuration is done using GNU Autoconf-generated configure script.
+Please refer to the README-configure file for generic information regarding
+configure usage.
+
+In addition to standard configure options, strace's configure file provides
+the following options:
+
+1.1. Additional build and testing hardening
+
+  --enable-gcc-Werror     turn on gcc's -Werror option
+  --enable-code-coverage  Whether to enable code coverage support
+  --with-gcov=GCOV        use given GCOV for coverage (GCOV=gcov).
+  --enable-valgrind       Whether to enable Valgrind on the unit tests
+  --disable-valgrind-memcheck
+                          Whether to skip memcheck during the Valgrind tests
+  --disable-valgrind-helgrind
+                          Whether to skip helgrind during the Valgrind tests
+  --disable-valgrind-drd  Whether to skip drd during the Valgrind tests
+  --enable-valgrind-sgcheck
+                          Whether to use sgcheck during the Valgrind tests
+
+1.2. Optional features
+
+1.2.1. Multiple personalities support
+
+  --enable-mpers=yes|no|check|m32|mx32
+                          whether to enable multiple personalities support
+                          required for proper decoding of structures used by
+                          tracees with personalities that differ from the
+                          personality of strace, default is yes.
+
+Personality is a way system call is performed (in terms of ABI). For example,
+Linux kernel on multiple 64-bit architectures that evolve from their 32-bit
+counterparts have support for running 32-bit binaries with 32-bit system call
+ABI, and that system call ABI constitutes a separate personality in strace's
+terms. Another example is 32-on-64 bit ABI; while exploiting the same way for
+performing system calls as native 64-bit system calls, this ABI has different
+type sizes and, as a result, also constitutes a separate personality; the only
+such ABI that is currently supported by strace is x32 on x86_64. This is
+important as different ABIs use different alignments and type sizes, as a
+result, fields in structures in unions have different offsets on different
+ABIs. In order to be able to correctly parse all the structures used in various
+system calls and ioctl commands, strace compiles these structure definitions
+for these different ABI and then parses DWARF of these compiled definitions in
+order to generate proper structure definitions that compiled with decoder code.
+Taking the aforementioned into account, there are the following requirements:
+
+ - gawk (at least version 3)
+ - Ability to compile for m32 personality (on architectures where it is supported)
+  - On x86_64, x32, powerpc64, sparc64, riscv64, tile64: gcc -m32
+  - s390x: gcc -m31
+  - AArch64: a separate compiler for armv7 EABI
+   - See information about configuration in "1.3.2. AArch64: AArch32 support"
+ - Ability to compile for mx32 personality (on architectures where it is supported)
+  - On x86_64: gcc -mx32
+ - For tests: runtime support (linker, libc, and loader)
+
+1.2.2. Stack unwinding (-k option)
+
+  --with-libunwind        use libunwind to implement stack tracing support
+  --with-libiberty        use libiberty to demangle symbols in stack trace
+
+1.3. Architecture-specific features
+
+1.3.1. ARMv7: OABI support
+
+  --enable-arm-oabi       enable OABI support on ARM EABI
+
+1.3.2. AArch64: AArch32 support
+
+  CC_FOR_M32
+  CPP_FOR_M32
+  CFLAGS_FOR_M32
+  CPPFLAGS_FOR_M32
+
+1.4. Miscellanea
+
+1.4.1. Static build configuration
+
+For static linking, provide LDFLAGS='-static -pthread'.
+
+1.4.2. Cross-compilation configuration
+
+2. BUILDING
+
+make
+make V=1
+
+3. TESTING
+
+make check
+
+TESTS='list of tests'
+VALGRIND_FLAGS
+TIMEOUT_DURATION
+
+BTRFS_MOUNTPOINT
+
+4. ADDITIONAL TARGETS
+
+  make code-coverage-capture
+  make code-coverage-capture CODE_COVERAGE_BRANCH_COVERAGE=
+
+5. INSTALLATION
+
+make install
+
+6. PACKAGING
+
+6.1. Distribution tarball
+
+./make-dist
+
+Requires git
+
+6.2. dpkg package
+
+6.3. RPM package

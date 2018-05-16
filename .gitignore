@@ -25,6 +25,7 @@
 /configure
 /depcomp
 /gnu
+/INSTALL
 /install-sh
 /ioctl_iocdef.[ih]
 /ioctl_redefs[12].h
