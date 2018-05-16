@@ -58,6 +58,7 @@
 { "linux/kvm.h", "KVM_GET_XCRS", _IOC_READ, 0xaea6, 0x188 },
 { "linux/kvm.h", "KVM_GET_XSAVE", _IOC_READ, 0xaea4, 0x1000 },
 { "linux/kvm.h", "KVM_HAS_DEVICE_ATTR", _IOC_WRITE, 0xaee3, 0x18 },
+{ "linux/kvm.h", "KVM_HYPERV_EVENTFD", _IOC_WRITE, 0xaebd, 0x18 },
 { "linux/kvm.h", "KVM_INTERRUPT", _IOC_WRITE, 0xae86, 0x04 },
 { "linux/kvm.h", "KVM_IOEVENTFD", _IOC_WRITE, 0xae79, 0x40 },
 { "linux/kvm.h", "KVM_IRQFD", _IOC_WRITE, 0xae76, 0x20 },
