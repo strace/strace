@@ -1030,6 +1030,14 @@ ARM syscall and
 Xtensa syscall are filtered and printed as
 .BR fadvise64_64 (2).
 .LP
+On x32, syscalls that are intended to be used by 64-bit processes and not x32
+ones (for example,
+.BR readv ,
+that has syscall number 19 on x86_64, with its x32 counterpart has syscall
+number 515), but called with
+.B __X32_SYSCALL_BIT
+flag being set, are designated with "#64" suffix.
+.LP
 On some platforms a process that is attached to with the
 .B \-p
 option may observe a spurious EINTR return from the current
