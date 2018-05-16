@@ -275,7 +275,8 @@ without affecting the redirections of executed programs.
 The latter is not compatible with
 .B \-ff
 option currently.
-.TP \-A
+.TP
+.B \-A
 Open the file provided in the
 .B \-o
 option in append mode.
