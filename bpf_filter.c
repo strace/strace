@@ -53,12 +53,13 @@
 void
 print_bpf_filter_code(const uint16_t code, bool extended)
 {
-	const struct xlat *class = extended ? ebpf_class : bpf_class;
 	const struct xlat *mode = extended ? ebpf_mode : bpf_mode;
-
 	uint16_t i = code & ~BPF_CLASS(code);
 
-	printxval(class, BPF_CLASS(code), "BPF_???");
+	if (extended)
+		printxval_index(ebpf_class, BPF_CLASS(code), "BPF_???");
+	else
+		printxval_index(bpf_class, BPF_CLASS(code), "BPF_???");
 	switch (BPF_CLASS(code)) {
 	case BPF_ST:
 	case BPF_STX:

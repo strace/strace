@@ -1,3 +1,4 @@
+#value_indexed
 BPF_ANY 0
 BPF_NOEXIST 1
 BPF_EXIST 2

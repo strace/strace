@@ -128,8 +128,8 @@ decode_attr_extra_data(struct tcb *const tcp,
 
 BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 {
-	PRINT_FIELD_XVAL("{", attr, map_type, bpf_map_types,
-			 "BPF_MAP_TYPE_???");
+	PRINT_FIELD_XVAL_INDEX("{", attr, map_type, bpf_map_types,
+			       "BPF_MAP_TYPE_???");
 	PRINT_FIELD_U(", ", attr, key_size);
 	PRINT_FIELD_U(", ", attr, value_size);
 	PRINT_FIELD_U(", ", attr, max_entries);
@@ -198,8 +198,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_ELEM)
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
 	PRINT_FIELD_ADDR64(", ", attr, key);
 	PRINT_FIELD_ADDR64(", ", attr, value);
-	PRINT_FIELD_XVAL(", ", attr, flags, bpf_map_update_elem_flags,
-			 "BPF_???");
+	PRINT_FIELD_XVAL_INDEX(", ", attr, flags, bpf_map_update_elem_flags,
+			       "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -220,8 +220,8 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 {
-	PRINT_FIELD_XVAL("{", attr, prog_type, bpf_prog_types,
-			 "BPF_PROG_TYPE_???");
+	PRINT_FIELD_XVAL_INDEX("{", attr, prog_type, bpf_prog_types,
+			       "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
 	PRINT_FIELD_ADDR64(", ", attr, insns);
 
@@ -290,7 +290,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 {
 	PRINT_FIELD_FD("{", attr, target_fd, tcp);
 	PRINT_FIELD_FD(", ", attr, attach_bpf_fd, tcp);
-	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	PRINT_FIELD_XVAL_INDEX(", ", attr, attach_type, bpf_attach_type,
+			       "BPF_???");
 	PRINT_FIELD_FLAGS(", ", attr, attach_flags, bpf_attach_flags,
 			  "BPF_F_???");
 }
@@ -299,7 +300,8 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 BEGIN_BPF_CMD_DECODER(BPF_PROG_DETACH)
 {
 	PRINT_FIELD_FD("{", attr, target_fd, tcp);
-	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	PRINT_FIELD_XVAL_INDEX(", ", attr, attach_type, bpf_attach_type,
+			       "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -373,8 +375,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 
 	if (entering(tcp)) {
 		PRINT_FIELD_FD("{query={", attr, target_fd, tcp);
-		PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type,
-				 "BPF_???");
+		PRINT_FIELD_XVAL_INDEX(", ", attr, attach_type, bpf_attach_type,
+				       "BPF_???");
 		PRINT_FIELD_FLAGS(", ", attr, query_flags, bpf_query_flags,
 				  "BPF_F_QUERY_???");
 		PRINT_FIELD_FLAGS(", ", attr, attach_flags, bpf_attach_flags,

@@ -1,3 +1,4 @@
+#value_indexed
 BPF_LD		0x0
 BPF_LDX		0x1
 BPF_ST		0x2
