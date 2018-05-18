@@ -51,12 +51,14 @@
 #include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
 #include "xlat/rtnl_ifla_info_data_bridge_attrs.h"
+#include "xlat/rtnl_ifla_info_data_tun_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
 #include "xlat/rtnl_ifla_xdp_attrs.h"
 #include "xlat/rtnl_link_attrs.h"
 #include "xlat/snmp_icmp6_stats.h"
 #include "xlat/snmp_ip_stats.h"
+#include "xlat/tun_device_types.h"
 #include "xlat/xdp_flags.h"
 
 static bool
@@ -344,6 +346,50 @@ decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_nla_tun_type(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts opts = {
+		.xlat = tun_device_types,
+		.xlat_size = ARRAY_SIZE(tun_device_types),
+		.xt = XT_INDEXED,
+		.dflt = "IFF_???",
+		.size = 1,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t ifla_info_data_tun_nla_decoders[] = {
+	[IFLA_TUN_UNSPEC]		= NULL,
+	[IFLA_TUN_OWNER]		= decode_nla_uid,
+	[IFLA_TUN_GROUP]		= decode_nla_gid,
+	[IFLA_TUN_TYPE]			= decode_nla_tun_type,
+	[IFLA_TUN_PI]			= decode_nla_u8,
+	[IFLA_TUN_VNET_HDR]		= decode_nla_u8,
+	[IFLA_TUN_PERSIST]		= decode_nla_u8,
+	[IFLA_TUN_MULTI_QUEUE]		= decode_nla_u8,
+	[IFLA_TUN_NUM_QUEUES]		= decode_nla_u32,
+	[IFLA_TUN_NUM_DISABLED_QUEUES]	= decode_nla_u32,
+};
+
+bool
+decode_nla_linkinfo_data_tun(struct tcb *const tcp,
+			     const kernel_ulong_t addr,
+			     const unsigned int len,
+			     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_tun_attrs,
+		      "IFLA_TUN_???", ifla_info_data_tun_nla_decoders,
+		      ARRAY_SIZE(rtnl_ifla_info_data_tun_attrs),
+		      opaque_data);
+
+	return true;
+}
+
 bool
 decode_nla_linkinfo_data(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
@@ -355,6 +401,8 @@ decode_nla_linkinfo_data(struct tcb *const tcp,
 
 	if (!strcmp(ctx->kind, "bridge"))
 		func = decode_nla_linkinfo_data_bridge;
+	else if (!strcmp(ctx->kind, "tun"))
+		func = decode_nla_linkinfo_data_tun;
 
 	if (func)
 		return func(tcp, addr, len, opaque_data);
