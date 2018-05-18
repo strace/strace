@@ -44,6 +44,16 @@ struct decode_nla_xlat_opts {
 	size_t size;
 };
 
+/*
+ * Used for IFLA_LINKINFO decoding.  Since there are no other indicators
+ * regarding the nature of data except for previously provided string
+ * in an IFLA_LINKINFO_KIND attribute, we have to store it in order to pass
+ * between calls as an opaque data.
+ */
+struct ifla_linkinfo_ctx {
+	char kind[16];
+};
+
 typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,
 			      unsigned int len, const void *opaque_data);
 

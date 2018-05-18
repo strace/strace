@@ -206,8 +206,31 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 	return true;
 }
 
+bool
+decode_nla_linkinfo_kind(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
+
+	memset(ctx->kind, '\0', sizeof(ctx->kind));
+
+	if (umovestr(tcp, addr, sizeof(ctx->kind), ctx->kind) <= 0) {
+		/*
+		 * If we haven't seen NUL or an error occurred, set kind to
+		 * an empty string.
+		 */
+		ctx->kind[0] = '\0';
+	}
+
+	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
+
+	return true;
+}
+
 static const nla_decoder_t ifla_linkinfo_nla_decoders[] = {
-	[IFLA_INFO_KIND]	= decode_nla_str,
+	[IFLA_INFO_KIND]	= decode_nla_linkinfo_kind,
 	[IFLA_INFO_DATA]	= NULL, /* unimplemented */
 	[IFLA_INFO_XSTATS]	= NULL, /* unimplemented */
 	[IFLA_INFO_SLAVE_KIND]	= decode_nla_str,
@@ -220,9 +243,11 @@ decode_ifla_linkinfo(struct tcb *const tcp,
 		     const unsigned int len,
 		     const void *const opaque_data)
 {
+	struct ifla_linkinfo_ctx ctx = { .kind = "", };
+
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_attrs,
 		      "IFLA_INFO_???", ifla_linkinfo_nla_decoders,
-		      ARRAY_SIZE(ifla_linkinfo_nla_decoders), opaque_data);
+		      ARRAY_SIZE(ifla_linkinfo_nla_decoders), &ctx);
 
 	return true;
 }
