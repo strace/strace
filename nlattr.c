@@ -240,6 +240,31 @@ decode_nla_fd(struct tcb *const tcp,
 }
 
 bool
+decode_nla_uid(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const unsigned int len,
+	       const void *const opaque_data)
+{
+	uint32_t uid;
+
+	if (len < sizeof(uid))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &uid))
+		printuid("", uid);
+
+	return true;
+}
+
+bool
+decode_nla_gid(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const unsigned int len,
+	       const void *const opaque_data)
+{
+	return decode_nla_uid(tcp, addr, len, opaque_data);
+}
+
+bool
 decode_nla_ifindex(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
 	       const unsigned int len,
