@@ -229,10 +229,62 @@ decode_nla_linkinfo_kind(struct tcb *const tcp,
 	return true;
 }
 
+bool
+decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
+			       const kernel_ulong_t addr,
+			       const unsigned int len,
+			       const void *const opaque_data)
+{
+	struct strace_can_device_stats {
+		uint32_t bus_error;
+		uint32_t error_warning;
+		uint32_t error_passive;
+		uint32_t bus_off;
+		uint32_t arbitration_lost;
+		uint32_t restarts;
+	} st;
+	const unsigned int def_size = sizeof(st);
+	const unsigned int size = (len >= def_size) ? def_size : 0;
+
+	if (!size)
+		return false;
+
+	if (umoven_or_printaddr(tcp, addr, size, &st))
+		return true;
+
+	PRINT_FIELD_U("{", st, bus_error);
+	PRINT_FIELD_U(", ", st, error_warning);
+	PRINT_FIELD_U(", ", st, error_passive);
+	PRINT_FIELD_U(", ", st, bus_off);
+	PRINT_FIELD_U(", ", st, arbitration_lost);
+	PRINT_FIELD_U(", ", st, restarts);
+	tprints("}");
+
+	return true;
+}
+
+bool
+decode_nla_linkinfo_xstats(struct tcb *const tcp,
+			   const kernel_ulong_t addr,
+			   const unsigned int len,
+			   const void *const opaque_data)
+{
+	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
+	nla_decoder_t func = NULL;
+
+	if (!strcmp(ctx->kind, "can"))
+		func = decode_nla_linkinfo_xstats_can;
+
+	if (func)
+		return func(tcp, addr, len, opaque_data);
+
+	return false;
+}
+
 static const nla_decoder_t ifla_linkinfo_nla_decoders[] = {
 	[IFLA_INFO_KIND]	= decode_nla_linkinfo_kind,
 	[IFLA_INFO_DATA]	= NULL, /* unimplemented */
-	[IFLA_INFO_XSTATS]	= NULL, /* unimplemented */
+	[IFLA_INFO_XSTATS]	= decode_nla_linkinfo_xstats,
 	[IFLA_INFO_SLAVE_KIND]	= decode_nla_str,
 	[IFLA_INFO_SLAVE_DATA]	= NULL, /* unimplemented */
 };
