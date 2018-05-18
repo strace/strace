@@ -67,6 +67,10 @@ decode_nla_ ## name(struct tcb *, kernel_ulong_t addr,	\
 		    unsigned int len, const void *)	\
 /* End of DECL_NLA definition. */
 
+DECL_NLA(x8);
+DECL_NLA(x16);
+DECL_NLA(x32);
+DECL_NLA(x64);
 DECL_NLA(u8);
 DECL_NLA(u16);
 DECL_NLA(u32);

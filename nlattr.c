@@ -414,6 +414,10 @@ decode_nla_ ## name(struct tcb *const tcp,		\
 	return true;					\
 }
 
+DECODE_NLA_INTEGER(x8, uint8_t, "%#" PRIx8)
+DECODE_NLA_INTEGER(x16, uint16_t, "%#" PRIx16)
+DECODE_NLA_INTEGER(x32, uint32_t, "%#" PRIx32)
+DECODE_NLA_INTEGER(x64, uint64_t, "%#" PRIx64)
 DECODE_NLA_INTEGER(u8, uint8_t, "%" PRIu8)
 DECODE_NLA_INTEGER(u16, uint16_t, "%" PRIu16)
 DECODE_NLA_INTEGER(u32, uint32_t, "%" PRIu32)
