@@ -136,6 +136,7 @@ ioctl_dm
 ioctl_dm-v
 ioctl_evdev
 ioctl_evdev-v
+ioctl_inotify
 ioctl_kvm_run
 ioctl_loop
 ioctl_loop-nv

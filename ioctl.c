@@ -322,6 +322,8 @@ ioctl_decode(struct tcb *tcp)
 	case 0xae:
 		return kvm_ioctl(tcp, code, arg);
 #endif
+	case 'I':
+		return inotify_ioctl(tcp, code, arg);
 	default:
 		break;
 	}

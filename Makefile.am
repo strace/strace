@@ -160,6 +160,7 @@ strace_SOURCES =	\
 	hdio.c		\
 	hostname.c	\
 	inotify.c	\
+	inotify_ioctl.c	\
 	io.c		\
 	ioctl.c		\
 	ioperm.c	\
