@@ -273,8 +273,16 @@ decode_nla_xval(struct tcb *const tcp,
 	if (len > sizeof(data))
 		return false;
 	else if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs))
+	{
+		if (opts->process_fn)
+			data.val = opts->process_fn(data.val);
+		if (opts->prefix)
+			tprints(opts->prefix);
 		printxval_dispatch_ex(opts->xlat, opts->xlat_size, data.val,
 				      opts->dflt, opts->xt, opts->style);
+		if (opts->suffix)
+			tprints(opts->suffix);
+	}
 
 	return true;
 }
@@ -315,8 +323,16 @@ decode_nla_flags(struct tcb *const tcp,
 	if (len > sizeof(data))
 		return false;
 	else if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs))
+	{
+		if (opts->process_fn)
+			data.flags = opts->process_fn(data.flags);
+		if (opts->prefix)
+			tprints(opts->prefix);
 		printflags_ex(data.flags, opts->dflt, opts->style, opts->xlat,
 			      NULL);
+		if (opts->suffix)
+			tprints(opts->suffix);
+	}
 
 	return true;
 }
