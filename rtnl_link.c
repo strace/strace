@@ -50,6 +50,7 @@
 #include "xlat/rtnl_ifla_brport_attrs.h"
 #include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
+#include "xlat/rtnl_ifla_info_data_bridge_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
 #include "xlat/rtnl_ifla_xdp_attrs.h"
@@ -281,9 +282,89 @@ decode_nla_linkinfo_xstats(struct tcb *const tcp,
 	return false;
 }
 
+static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
+	[IFLA_BR_UNSPEC]			= NULL,
+	[IFLA_BR_FORWARD_DELAY]			= decode_nla_u32,
+	[IFLA_BR_HELLO_TIME]			= decode_nla_u32,
+	[IFLA_BR_MAX_AGE]			= decode_nla_u32,
+	[IFLA_BR_AGEING_TIME]			= decode_nla_u32,
+	[IFLA_BR_STP_STATE]			= decode_nla_u32,
+	[IFLA_BR_PRIORITY]			= decode_nla_u16,
+	[IFLA_BR_VLAN_FILTERING]		= decode_nla_u8,
+	[IFLA_BR_VLAN_PROTOCOL]			= decode_nla_ether_proto,
+	[IFLA_BR_GROUP_FWD_MASK]		= decode_nla_x16,
+	[IFLA_BR_ROOT_ID]			= decode_ifla_bridge_id,
+	[IFLA_BR_BRIDGE_ID]			= decode_ifla_bridge_id,
+	[IFLA_BR_ROOT_PORT]			= decode_nla_u16,
+	[IFLA_BR_ROOT_PATH_COST]		= decode_nla_u32,
+	[IFLA_BR_TOPOLOGY_CHANGE]		= decode_nla_u8,
+	[IFLA_BR_TOPOLOGY_CHANGE_DETECTED]	= decode_nla_u8,
+	[IFLA_BR_HELLO_TIMER]			= decode_nla_u64,
+	[IFLA_BR_TCN_TIMER]			= decode_nla_u64,
+	[IFLA_BR_TOPOLOGY_CHANGE_TIMER]		= decode_nla_u64,
+	[IFLA_BR_GC_TIMER]			= decode_nla_u64,
+	[IFLA_BR_GROUP_ADDR]			= NULL, /* MAC address */
+	[IFLA_BR_FDB_FLUSH]			= NULL, /* unspecified */
+	[IFLA_BR_MCAST_ROUTER]			= decode_nla_u8,
+	[IFLA_BR_MCAST_SNOOPING]		= decode_nla_u8,
+	[IFLA_BR_MCAST_QUERY_USE_IFADDR]	= decode_nla_u8,
+	[IFLA_BR_MCAST_QUERIER]			= decode_nla_u8,
+	[IFLA_BR_MCAST_HASH_ELASTICITY]		= decode_nla_u32,
+	[IFLA_BR_MCAST_HASH_MAX]		= decode_nla_u32,
+	[IFLA_BR_MCAST_LAST_MEMBER_CNT]		= decode_nla_u32,
+	[IFLA_BR_MCAST_STARTUP_QUERY_CNT]	= decode_nla_u32,
+	[IFLA_BR_MCAST_LAST_MEMBER_INTVL]	= decode_nla_u64,
+	[IFLA_BR_MCAST_MEMBERSHIP_INTVL]	= decode_nla_u64,
+	[IFLA_BR_MCAST_QUERIER_INTVL]		= decode_nla_u64,
+	[IFLA_BR_MCAST_QUERY_INTVL]		= decode_nla_u64,
+	[IFLA_BR_MCAST_QUERY_RESPONSE_INTVL]	= decode_nla_u64,
+	[IFLA_BR_MCAST_STARTUP_QUERY_INTVL]	= decode_nla_u64,
+	[IFLA_BR_NF_CALL_IPTABLES]		= decode_nla_u8,
+	[IFLA_BR_NF_CALL_IP6TABLES]		= decode_nla_u8,
+	[IFLA_BR_NF_CALL_ARPTABLES]		= decode_nla_u8,
+	[IFLA_BR_VLAN_DEFAULT_PVID]		= decode_nla_u16,
+	[IFLA_BR_PAD]				= NULL,
+	[IFLA_BR_VLAN_STATS_ENABLED]		= decode_nla_u8,
+	[IFLA_BR_MCAST_STATS_ENABLED]		= decode_nla_u8,
+	[IFLA_BR_MCAST_IGMP_VERSION]		= decode_nla_u8,
+	[IFLA_BR_MCAST_MLD_VERSION]		= decode_nla_u8,
+};
+
+bool
+decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
+				const kernel_ulong_t addr,
+				const unsigned int len,
+				const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_bridge_attrs,
+		      "IFLA_BR_???", ifla_info_data_bridge_nla_decoders,
+		      ARRAY_SIZE(rtnl_ifla_info_data_bridge_attrs),
+		      opaque_data);
+
+	return true;
+}
+
+bool
+decode_nla_linkinfo_data(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
+	nla_decoder_t func = NULL;
+
+	if (!strcmp(ctx->kind, "bridge"))
+		func = decode_nla_linkinfo_data_bridge;
+
+	if (func)
+		return func(tcp, addr, len, opaque_data);
+
+	return false;
+}
+
 static const nla_decoder_t ifla_linkinfo_nla_decoders[] = {
 	[IFLA_INFO_KIND]	= decode_nla_linkinfo_kind,
-	[IFLA_INFO_DATA]	= NULL, /* unimplemented */
+	[IFLA_INFO_DATA]	= decode_nla_linkinfo_data,
 	[IFLA_INFO_XSTATS]	= decode_nla_linkinfo_xstats,
 	[IFLA_INFO_SLAVE_KIND]	= decode_nla_str,
 	[IFLA_INFO_SLAVE_DATA]	= NULL, /* unimplemented */
