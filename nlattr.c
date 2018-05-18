@@ -287,6 +287,31 @@ decode_nla_xval(struct tcb *const tcp,
 	return true;
 }
 
+static uint64_t
+process_host_order(uint64_t val)
+{
+	return ntohs(val);
+}
+
+bool
+decode_nla_ether_proto(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts opts = {
+		.xlat = ethernet_protocols,
+		.xlat_size = ethernet_protocols_size,
+		.dflt = "ETHER_P_???",
+		.xt = XT_SORTED,
+		.prefix = "htons(",
+		.suffix = ")",
+		.process_fn = process_host_order,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
 bool
 decode_nla_ip_proto(struct tcb *const tcp,
 		    const kernel_ulong_t addr,

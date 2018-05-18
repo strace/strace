@@ -83,6 +83,7 @@ DECL_NLA(str);
 DECL_NLA(strn);
 DECL_NLA(fd);
 DECL_NLA(ifindex);
+DECL_NLA(ether_proto);
 DECL_NLA(ip_proto);
 DECL_NLA(meminfo);
 DECL_NLA(rt_class);
