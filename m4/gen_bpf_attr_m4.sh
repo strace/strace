@@ -34,37 +34,36 @@ AC_DEFUN([st_BPF_ATTR], [dnl
 	AC_CHECK_MEMBERS(m4_normalize([
 EOF
 
-fetch_structs()
-{
-	local name="${1:-}"
-	local name_re=
-	[ -z "$name" ] ||
-		name_re='\/\* '"$name"' \*\/ '
+gawk -e '
+/^struct ([^[:space:]]+)_struct([[:space:]]+\/\* ([^[:space:]]+) \*\/)?[[:space:]]+{/ {
+	match($0, /^struct ([^[:space:]]+)_struct([[:space:]]+\/\* ([^[:space:]]+) \*\/)?[[:space:]]+{/, a)
 
-	sed -n '/^struct BPF_[^[:space:]]\+_struct '"$name_re"'{/,/^};/p' < "$input"
+	struct_name = a[1]
+	subtype_name = a[3]
+
+	if (struct_name ~ /^BPF_/)
+		prefix = "union bpf_attr"
+	else
+		prefix = "struct " struct_name
+
+	if (subtype_name != "")
+		prefix = prefix "." subtype_name
+
+	in_struct = 1
+	next
 }
 
-filter_entries()
-{
-	local name="${1:-}"
-	local subtype=
-	[ -z "$name" ] ||
-		subtype=".$name"
-	local search='^[[:space:]]\+[^][;]*[[:space:]]\([^][[:space:];]\+\)\(\[[^;]*\]\)\?;$'
-	local replacement='\t\tunion bpf_attr'"$subtype"'.\1,'
-	sed -n "s/$search/$replacement/p" |
-		sort -u
+/^}( ATTRIBUTE_ALIGNED\(.*\))?;/ {
+	in_struct = 0
+	next
 }
 
-# nameless structures in union bpf_attr
-fetch_structs |
-	filter_entries
-
-# named structures in union bpf_attr
-for name in $(sed -n 's/^struct BPF_[^[:space:]]\+_struct \/\* \([^[:space:]]\+\) \*\/ {.*/\1/p' < "$input"); do
-	fetch_structs "$name" |
-		filter_entries "$name"
-done
+(in_struct == 1) {
+	if (match($0, /^[[:space:]]+[^;\[\]]+[[:space:]]+([^[:space:]\[\];]+)(\[[^;]*\])?;$/, a)) {
+		print "\t\t" prefix "." a[1] ","
+	}
+}
+' < "$input" | sort -u
 
 cat <<'EOF'
 		union bpf_attr.dummy
