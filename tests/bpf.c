@@ -51,12 +51,15 @@
 
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
 # define BIG_ADDR(addr64_, addr32_) addr64_
+# define BIG_ADDR_MAYBE(addr_)
 #elif defined __arm__ || defined __i386__ || defined __mips__ \
    || defined __powerpc__ || defined __riscv__ || defined __s390__ \
    || defined __sparc__ || defined __tile__
 # define BIG_ADDR(addr64_, addr32_) addr64_ " or " addr32_
+# define BIG_ADDR_MAYBE(addr_) addr_ " or "
 #else
 # define BIG_ADDR(addr64_, addr32_) addr32_
+# define BIG_ADDR_MAYBE(addr_)
 #endif
 
 #ifndef HAVE_STRUCT_BPF_INSN
@@ -887,7 +890,9 @@ static const struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		       ", attach_type=0xe /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
 		       ", attach_flags=0xfffffffc /* BPF_F_??? */"
-		       ", prog_ids=0xffffffffffffffff, prog_cnt=2718281828}",
+		       ", prog_ids="
+		       BIG_ADDR("0xffffffffffffffff", "0xffffffff")
+		       ", prog_cnt=2718281828}",
 	},
 	{ /* 3 */
 		.data = { .BPF_PROG_QUERY_data = {
@@ -903,7 +908,8 @@ static const struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		       ", attach_type=0xfeedface /* BPF_??? */"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
 		       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
-		       ", prog_ids=0xffffffffffffffff, prog_cnt=0}",
+		       ", prog_ids=" BIG_ADDR_MAYBE("0xffffffffffffffff") "[]"
+		       ", prog_cnt=0}",
 	},
 };
 
