@@ -60,6 +60,37 @@ check_h "invalid -X argument: 'test'" -Xtest
 check_h "invalid -X argument: 'a'" -Xa
 check_h "invalid -X argument: 'abbreviated'" -X abbreviated
 
+check_h "incorrect personality designator '' in qualification 'getcwd@'" -e trace=getcwd@
+check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=getcwd@42
+check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=gettid,getcwd@42
+check_h "incorrect personality designator '42' in qualification '23@42'" -e trace=23@42,123
+
+check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
+
+case "$STRACE_NATIVE_ARCH" in
+x86_64)
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@x32
+	;;
+x32)
+	check_h "incorrect personality designator '64' in qualification 'getcwd@64'" -e trace=getcwd@64
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@x32
+	;;
+aarch64|powerpc64|riscv|s390x|sparc64|tile)
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
+	check_h "incorrect personality designator 'x32' in qualification 'getcwd@x32'" -e trace=getcwd@x32
+	;;
+*)
+	pers="$((SIZEOF_LONG * 8))"
+	inv_pers="$((96 - pers))"
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@"$pers"
+	check_h "incorrect personality designator '$inv_pers' in qualification 'getcwd@$inv_pers'" -e trace=getcwd@"$inv_pers"
+	check_h "incorrect personality designator 'x32' in qualification 'getcwd@x32'" -e trace=getcwd@x32
+esac
+
 ../zeroargc "$STRACE_EXE" /bin/true 2> "$LOG" &&
 	dump_log_and_fail_with \
 		'zeroargc strace failed to handle the error properly'
