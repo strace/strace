@@ -21,6 +21,8 @@ attach-p-cmd-p
 block_reset_raise_run
 bpf
 bpf-v
+bpf-success
+bpf-success-v
 brk
 btrfs
 caps

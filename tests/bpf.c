@@ -120,7 +120,20 @@ static long
 sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 {
 	long rc = syscall(__NR_bpf, cmd, attr, size);
+
 	errstr = sprintrc(rc);
+
+#ifdef INJECT_RETVAL
+	if (rc != INJECT_RETVAL)
+		error_msg_and_fail("Got a return value of %ld != %d",
+				   rc, INJECT_RETVAL);
+
+	static char inj_errstr[4096];
+
+	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
+	errstr = inj_errstr;
+#endif
+
 	return rc;
 }
 
@@ -853,8 +866,67 @@ static const struct bpf_attr_check BPF_OBJ_GET_INFO_BY_FD_checks[] = {
 };
 
 
-/* TODO: This is a read/write cmd and we do not check exiting path yet */
-static const struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
+static uint32_t prog_load_ids[] = { 0, 1, 0xffffffff, 2718281828, };
+uint32_t *prog_load_ids_ptr;
+
+static void
+init_BPF_PROG_QUERY_attr4(struct bpf_attr_check *check)
+{
+	struct BPF_PROG_QUERY_struct *attr = &check->data.BPF_PROG_QUERY_data;
+
+	if (!prog_load_ids_ptr)
+		prog_load_ids_ptr = tail_memdup(prog_load_ids,
+						sizeof(prog_load_ids));
+
+	attr->prog_ids = (uintptr_t) prog_load_ids_ptr;
+	attr->prog_cnt = ARRAY_SIZE(prog_load_ids);
+}
+
+static void
+print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check, unsigned long addr)
+{
+	printf("query={target_fd=-1153374643"
+	       ", attach_type=0xfeedface /* BPF_??? */"
+	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
+	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
+#if defined(INJECT_RETVAL) && INJECT_RETVAL > 0
+	       ", prog_ids=[0, 1, 4294967295, 2718281828], prog_cnt=4}"
+#else
+	       ", prog_ids=%p, prog_cnt=4}", prog_load_ids_ptr
+#endif
+	       );
+}
+
+static void
+init_BPF_PROG_QUERY_attr5(struct bpf_attr_check *check)
+{
+	struct BPF_PROG_QUERY_struct *attr = &check->data.BPF_PROG_QUERY_data;
+
+	if (!prog_load_ids_ptr)
+		prog_load_ids_ptr = tail_memdup(prog_load_ids,
+						sizeof(prog_load_ids));
+
+	attr->prog_ids = (uintptr_t) prog_load_ids_ptr;
+	attr->prog_cnt = ARRAY_SIZE(prog_load_ids) + 1;
+}
+
+static void
+print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check, unsigned long addr)
+{
+	printf("query={target_fd=-1153374643"
+	       ", attach_type=0xfeedface /* BPF_??? */"
+	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
+	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
+#if defined(INJECT_RETVAL) && INJECT_RETVAL > 0
+	       ", prog_ids=[0, 1, 4294967295, 2718281828, %p], prog_cnt=5}",
+	       prog_load_ids_ptr + ARRAY_SIZE(prog_load_ids)
+#else
+	       ", prog_ids=%p, prog_cnt=5}", prog_load_ids_ptr
+#endif
+	       );
+}
+
+static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{
 		.data = { .BPF_PROG_QUERY_data = { .target_fd = -1 } },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, target_fd),
@@ -910,6 +982,28 @@ static const struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
 		       ", prog_ids=" BIG_ADDR_MAYBE("0xffffffffffffffff") "[]"
 		       ", prog_cnt=0}",
+	},
+	{ /* 4 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_fd = 3141592653U,
+			.attach_type = 0xfeedface,
+			.query_flags = 0xdeadf00d,
+			.attach_flags = 0xbeefcafe,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
+		.init_fn = init_BPF_PROG_QUERY_attr4,
+		.print_fn = print_BPF_PROG_QUERY_attr4,
+	},
+	{ /* 5 */
+		.data = { .BPF_PROG_QUERY_data = {
+			.target_fd = 3141592653U,
+			.attach_type = 0xfeedface,
+			.query_flags = 0xdeadf00d,
+			.attach_flags = 0xbeefcafe,
+		} },
+		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
+		.init_fn = init_BPF_PROG_QUERY_attr5,
+		.print_fn = print_BPF_PROG_QUERY_attr5,
 	},
 };
 

@@ -1,0 +1,6 @@
+#!/bin/sh -efu
+
+. "${srcdir=.}/scno_tampering.sh"
+
+run_strace -a20 -e trace=bpf -e inject=bpf:retval=42 ../bpf-success > "$EXP"
+match_diff "$LOG" "$EXP"
