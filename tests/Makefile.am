@@ -399,6 +399,8 @@ EXTRA_DIST = \
 	qual_fault-exit_group.expected \
 	qual_inject-error-signal.expected \
 	qual_inject-signal.expected \
+	qualify_personality.sh \
+	qualify_personality_empty.in \
 	quotactl.h \
 	regex.in \
 	rt_sigaction.awk \
@@ -427,6 +429,12 @@ EXTRA_DIST = \
 	trace_fstat.in \
 	trace_fstatfs.in \
 	trace_lstat.in \
+	trace_personality_32.in \
+	trace_personality_64.in \
+	trace_personality_x32.in \
+	trace_personality_regex_32.in \
+	trace_personality_regex_64.in \
+	trace_personality_regex_x32.in \
 	trace_question.in \
 	trace_stat.in \
 	trace_stat_like.in \
