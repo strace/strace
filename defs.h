@@ -464,11 +464,17 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 	return set_tcb_priv_data(tcp, (void *) val, 0);
 }
 
+/**
+ * @return 0 on success, -1 on error.
+ */
 extern int
 umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 #define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
+/**
+ * @return 0 on success, -1 on error (and print addr).
+ */
 extern int
 umoven_or_printaddr64(struct tcb *, uint64_t addr,
 		      unsigned int len, void *laddr);
@@ -484,6 +490,9 @@ umoven_or_printaddr(struct tcb *tcp, const kernel_ulong_t addr,
 #define umove_or_printaddr(pid, addr, objp)	\
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
+/**
+ * @return 0 on success, -1 on error (and print addr).
+ */
 extern int
 umoven_or_printaddr64_ignore_syserror(struct tcb *, uint64_t addr,
 				      unsigned int len, void *laddr);
@@ -501,6 +510,9 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,
 	umoven_or_printaddr_ignore_syserror((pid), (addr), sizeof(*(objp)), \
 					    (void *) (objp))
 
+/**
+ * @return strlen + 1 on success, 0 on success and no NUL seen, -1 on error.
+ */
 extern int
 umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
 
