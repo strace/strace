@@ -58,7 +58,12 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .SY strace
+.if '@ENABLE_STACKTRACE_TRUE@'#' .ig end_unwind_opt
 .OP \-ACdffhikqrtttTvVxxy
+.end_unwind_opt
+.if '@ENABLE_STACKTRACE_FALSE@'#' .ig end_no_unwind_opt
+.OP \-ACdffhiqrtttTvVxxy
+.end_no_unwind_opt
 .OP \-I n
 .OP \-b execve
 .OM \-e expr
@@ -255,12 +260,11 @@ Align return values in a specific column (default column 40).
 .TP
 .B \-i
 Print the instruction pointer at the time of the system call.
+.if '@ENABLE_STACKTRACE_TRUE@'#' .ig end_unwind
 .TP
 .B \-k
 Print the execution stack trace of the traced processes after each system call.
-This option is available only if
-.B strace
-is built using \-\-enable\-stacktrace configure option.
+.end_unwind
 .TP
 .BI "\-o " filename
 Write the trace output to the file
