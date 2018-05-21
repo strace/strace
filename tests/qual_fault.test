@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -efu
 #
 # Check that fault injection works properly.
 #
