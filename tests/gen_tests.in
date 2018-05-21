@@ -175,6 +175,9 @@ kern_features -a16
 kexec_file_load	-s9
 kexec_load	-s9
 keyctl	-a31 -s10
+keyctl-Xabbrev	-a31 -s10 -e trace=keyctl -Xabbrev
+keyctl-Xraw	-a13 -s10 -e trace=keyctl -Xraw
+keyctl-Xverbose	-a41 -s10 -e trace=keyctl -Xverbose
 kill	-a12 -esignal=none
 lchown	-a30
 lchown32	-a32
