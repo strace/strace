@@ -532,10 +532,19 @@ extern long getrval2(struct tcb *);
 extern const char *signame(const int);
 extern void pathtrace_select_set(const char *, struct path_set *);
 extern bool pathtrace_match_set(struct tcb *, struct path_set *);
-#define pathtrace_select(tcp)	\
-	pathtrace_select_set(tcp, &global_path_set)
-#define pathtrace_match(tcp)	\
-	pathtrace_match_set(tcp, &global_path_set)
+
+static inline void
+pathtrace_select(const char *path)
+{
+	return pathtrace_select_set(path, &global_path_set);
+}
+
+static inline bool
+pathtrace_match(struct tcb *tcp)
+{
+	return pathtrace_match_set(tcp, &global_path_set);
+}
+
 extern int getfdpath(struct tcb *, int, char *, unsigned);
 extern unsigned long getfdinode(struct tcb *, int);
 extern enum sock_proto getfdproto(struct tcb *, int);
@@ -639,16 +648,23 @@ enum xlat_style {
 extern enum xlat_style xlat_verbosity;
 
 extern int printxvals_ex(uint64_t val, const char *dflt,
-			 enum xlat_style style, const struct xlat *, ...)
+			 enum xlat_style, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 #define printxvals(val_, dflt_, ...) \
 	printxvals_ex((val_), (dflt_), XLAT_STYLE_DEFAULT, __VA_ARGS__)
-extern int printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size,
+
+extern int printxval_searchn_ex(const struct xlat *, size_t xlat_size,
 				uint64_t val, const char *dflt,
-				enum xlat_style style);
-#define printxval_searchn(xlat_, xlat_size_, val_, dflt_) \
-	printxval_searchn_ex((xlat_), (xlat_size_), (val_), (dflt_), \
-			     XLAT_STYLE_DEFAULT)
+				enum xlat_style);
+
+static inline int
+printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		  const char *dflt)
+{
+	return printxval_searchn_ex(xlat, xlat_size, val, dflt,
+				    XLAT_STYLE_DEFAULT);
+}
+
 /**
  * Wrapper around printxval_searchn that passes ARRAY_SIZE - 1
  * as the array size, as all arrays are XLAT_END-terminated and
@@ -659,22 +675,33 @@ extern int printxval_searchn_ex(const struct xlat *xlat, size_t xlat_size,
 #define printxval_search_ex(xlat__, val__, dflt__) \
 	printxval_searchn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
 			     (dflt__), XLAT_STYLE_DEFAULT)
-extern int printxval_indexn_ex(const struct xlat *xlat, size_t xlat_size,
-	uint64_t val, const char *dflt, enum xlat_style style);
-#define printxval_indexn(xlat_, xlat_size_, val_, dflt_) \
-	printxval_indexn_ex((xlat_), (xlat_size_), (val_), (dflt_), \
-			    XLAT_STYLE_DEFAULT)
+
+extern int printxval_indexn_ex(const struct xlat *, size_t xlat_size,
+			       uint64_t val, const char *dflt, enum xlat_style);
+
+static inline int
+printxval_indexn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
+		 const char *dflt)
+{
+	return printxval_indexn_ex(xlat, xlat_size, val, dflt,
+				   XLAT_STYLE_DEFAULT);
+}
+
 #define printxval_index(xlat__, val__, dflt__) \
 	printxval_indexn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
 #define printxval_index_ex(xlat__, val__, dflt__) \
 	printxval_indexn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
 			    (dflt__), XLAT_STYLE_DEFAULT)
-extern int sprintxval_ex(char *buf, size_t size, const struct xlat *xlat,
-			 unsigned int val, const char *dflt,
-			 enum xlat_style style);
-#define sprintxval(buf_, size_, xlat_, val_, dflt_) \
-	sprintxval_ex((buf_), (size_), (xlat_), (val_), (dflt_), \
-		      XLAT_STYLE_DEFAULT)
+
+extern int sprintxval_ex(char *buf, size_t size, const struct xlat *,
+			 unsigned int val, const char *dflt, enum xlat_style);
+
+static inline int
+sprintxval(char *buf, size_t size, const struct xlat *xlat, unsigned int val,
+	   const char *dflt)
+{
+	return sprintxval_ex(buf, size, xlat, val, dflt, XLAT_STYLE_DEFAULT);
+}
 
 extern void printxval_dispatch_ex(const struct xlat *, size_t xlat_size,
 				  uint64_t val, const char *dflt,
@@ -703,12 +730,17 @@ extern int printargs_u(struct tcb *);
 extern int printargs_d(struct tcb *);
 
 extern int printflags_ex(uint64_t flags, const char *dflt,
-			 enum xlat_style style, const struct xlat *, ...)
+			 enum xlat_style, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
-extern const char *sprintflags_ex(const char *prefix, const struct xlat *xlat,
-				  uint64_t flags, enum xlat_style style);
-#define sprintflags(prefix_, xlat_, flags_) \
-	sprintflags_ex((prefix_), (xlat_), (flags_), XLAT_STYLE_DEFAULT)
+extern const char *sprintflags_ex(const char *prefix, const struct xlat *,
+				  uint64_t flags, enum xlat_style);
+
+static inline const char *
+sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
+{
+	return sprintflags_ex(prefix, xlat, flags, XLAT_STYLE_DEFAULT);
+}
+
 extern const char *sprinttime(long long sec);
 extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
 extern const char *sprinttime_usec(long long sec, unsigned long long usec);
@@ -1089,39 +1121,94 @@ printnum_long_int(struct tcb *, kernel_ulong_t addr,
 		  const char *fmt_long, const char *fmt_int)
 	ATTRIBUTE_FORMAT((printf, 3, 0))
 	ATTRIBUTE_FORMAT((printf, 4, 0));
+
 extern bool printnum_addr_long_int(struct tcb *, kernel_ulong_t addr);
-# define printnum_slong(tcp, addr) \
-	printnum_long_int((tcp), (addr), "%" PRId64, "%d")
-# define printnum_ulong(tcp, addr) \
-	printnum_long_int((tcp), (addr), "%" PRIu64, "%u")
-# define printnum_ptr(tcp, addr) \
-	printnum_addr_long_int((tcp), (addr))
+
+static inline bool
+printnum_slong(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_long_int(tcp, addr, "%" PRId64, "%d");
+}
+
+static inline bool
+printnum_ulong(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_long_int(tcp, addr, "%" PRIu64, "%u");
+}
+
+static inline bool
+printnum_ptr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_addr_long_int(tcp, addr);
+}
+
 #elif current_wordsize > 4
-# define printnum_slong(tcp, addr) \
-	printnum_int64((tcp), (addr), "%" PRId64)
-# define printnum_ulong(tcp, addr) \
-	printnum_int64((tcp), (addr), "%" PRIu64)
-# define printnum_ptr(tcp, addr) \
-	printnum_addr_int64((tcp), (addr))
+
+static inline bool
+printnum_slong(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_int64(tcp, addr, "%" PRId64);
+}
+
+static inline bool
+printnum_ulong(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_int64(tcp, addr, "%" PRIu64);
+}
+
+static inline bool
+printnum_ptr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_addr_int64(tcp, addr);
+}
+
 #else /* current_wordsize == 4 */
-# define printnum_slong(tcp, addr) \
-	printnum_int((tcp), (addr), "%d")
-# define printnum_ulong(tcp, addr) \
-	printnum_int((tcp), (addr), "%u")
-# define printnum_ptr(tcp, addr) \
-	printnum_addr_int((tcp), (addr))
+
+static inline bool
+printnum_slong(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_int(tcp, addr, "%d");
+}
+
+static inline bool
+printnum_ulong(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_int(tcp, addr, "%u");
+}
+
+static inline bool
+printnum_ptr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_addr_int(tcp, addr);
+}
+
 #endif
 
 #ifndef current_klongsize
 extern bool printnum_addr_klong_int(struct tcb *, kernel_ulong_t addr);
-# define printnum_kptr(tcp, addr) \
-	printnum_addr_klong_int((tcp), (addr))
+
+static inline bool
+printnum_kptr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_addr_klong_int(tcp, addr);
+}
+
 #elif current_klongsize > 4
-# define printnum_kptr(tcp, addr) \
-	printnum_addr_int64((tcp), (addr))
+
+static inline bool
+printnum_kptr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_addr_int64(tcp, addr);
+}
+
 #else /* current_klongsize == 4 */
-# define printnum_kptr(tcp, addr) \
-	printnum_addr_int((tcp), (addr))
+
+static inline bool
+printnum_kptr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printnum_addr_int(tcp, addr);
+}
+
 #endif
 
 #define DECL_PRINTPAIR(name)						\
