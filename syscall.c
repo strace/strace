@@ -450,6 +450,18 @@ err_name(unsigned long err)
 	return NULL;
 }
 
+static void
+print_err_ret(kernel_ulong_t ret, unsigned long u_error)
+{
+	const char *u_error_str = err_name(u_error);
+
+	if (u_error_str)
+		tprintf("= %" PRI_kld " %s (%s)",
+			ret, u_error_str, strerror(u_error));
+	else
+		tprintf("= %" PRI_kld " (errno %lu)", ret, u_error);
+}
+
 static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
@@ -770,20 +782,17 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 
 	tprints(") ");
 	tabto();
-	unsigned long u_error = tcp->u_error;
 
 	if (raw(tcp)) {
-		if (u_error) {
-			tprintf("= -1 (errno %lu)", u_error);
-		} else {
+		if (tcp->u_error)
+			print_err_ret(tcp->u_rval, tcp->u_error);
+		else
 			tprintf("= %#" PRI_klx, tcp->u_rval);
-		}
+
 		if (syscall_tampered(tcp))
 			tprints(" (INJECTED)");
-	} else if (!(sys_res & RVAL_NONE) && u_error) {
-		const char *u_error_str;
-
-		switch (u_error) {
+	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
+		switch (tcp->u_error) {
 		/* Blocked signals do not interrupt any syscalls.
 		 * In this case syscalls don't return ERESTARTfoo codes.
 		 *
@@ -838,13 +847,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
 			break;
 		default:
-			u_error_str = err_name(u_error);
-			if (u_error_str)
-				tprintf("= %" PRI_kld " %s (%s)", tcp->u_rval,
-					u_error_str, strerror(u_error));
-			else
-				tprintf("= %" PRI_kld " %lu (%s)", tcp->u_rval,
-					u_error, strerror(u_error));
+			print_err_ret(tcp->u_rval, tcp->u_error);
 			break;
 		}
 		if (syscall_tampered(tcp))

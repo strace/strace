@@ -213,8 +213,7 @@ Syscalls unknown to
 are printed raw, with the unknown system call number printed in hexadecimal form
 and prefixed with "syscall_":
 .CW
-syscall_0xbad(0xfedcba9876543210, 0xfedcba9876543211, 0xfedcba9876543212,
-0xfedcba9876543213, 0xfedcba9876543214, 0xfedcba9876543215) = -1 (errno 38)
+syscall_0xbad(0x1, 0x2, 0x3, 0x4, 0x5, 0x6) = -1 ENOSYS (Function not implemented)
 .CE
 .LP
 Character pointers are dereferenced and printed as C strings.

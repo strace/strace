@@ -77,8 +77,9 @@ invoke(int fail)
 					    err, rc, errno);
 
 		if (is_raw)
-			tprintf("writev(%#x, %p, 0x1) = -1 (errno %d)"
-				" (INJECTED)\n", got_fd, &io, err);
+			tprintf("writev(%#x, %p, 0x1)"
+				" = -1 %s (%m) (INJECTED)\n",
+				got_fd, &io, errstr);
 		else
 			tprintf("writev(%d, [{iov_base=\"%s\", iov_len=%d}], 1)"
 				" = -1 %s (%m) (INJECTED)\n",
