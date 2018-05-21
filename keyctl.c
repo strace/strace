@@ -387,7 +387,8 @@ SYS_FUNC(keyctl)
 		break;
 
 	case KEYCTL_SET_REQKEY_KEYRING:
-		printxval(key_reqkeys, arg2, "KEY_REQKEY_DEFL_???");
+		printxvals_ex((int) arg2, "KEY_REQKEY_DEFL_???",
+			      XLAT_STYLE_FMT_D, key_reqkeys, NULL);
 		break;
 
 	case KEYCTL_SET_TIMEOUT:

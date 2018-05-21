@@ -800,7 +800,7 @@ main(void)
 	do_keyctl(ARG_STR(KEYCTL_SET_REQKEY_KEYRING),
 		  sizeof(kernel_ulong_t),
 		  (kernel_ulong_t) 0xfeedf157badc0dedLLU,
-		  "0xbadc0ded /* KEY_REQKEY_DEFL_??? */", NULL, 0UL);
+		  "-1159983635 /* KEY_REQKEY_DEFL_??? */", NULL, 0UL);
 
 
 	/* KEYCTL_SET_TIMEOUT */
