@@ -87,8 +87,8 @@ check_fault_injection()
 	do
 		pid=$(cat "$outpid.$i")
 
-		match_diff "$outout.$i" "$LOG.$pid"
-		match_diff "$outexp.$i" "$outgot.$i"
+		match_diff "$LOG.$pid" "$outout.$i"
+		match_diff "$outgot.$i" "$outexp.$i"
 	done
 }
 
