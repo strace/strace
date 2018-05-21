@@ -584,6 +584,9 @@ This option has the effect of causing all arguments to be printed
 in hexadecimal.  This is mostly useful if you don't trust the
 decoding or you need to know the actual numeric value of an
 argument.
+See also
+.B \-X raw
+option.
 .TP
 \fB\-e\ signal\fR=\,\fIset\fR
 Trace only the specified subset of signals.  The default is
