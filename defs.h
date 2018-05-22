@@ -1272,28 +1272,25 @@ truncate_kulong_to_current_wordsize(const kernel_ulong_t v)
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
 	 (long long) (v))
 
+extern const char *const errnoent[];
+extern const char *const signalent[];
+extern const unsigned int nerrnos;
+extern const unsigned int nsignals;
+
 extern const struct_sysent sysent0[];
-extern const char *const errnoent0[];
-extern const char *const signalent0[];
 extern const struct_ioctlent ioctlent0[];
 
 extern const char *const personality_names[];
 
 #if SUPPORTED_PERSONALITIES > 1
 extern const struct_sysent *sysent;
-extern const char *const *errnoent;
-extern const char *const *signalent;
 extern const struct_ioctlent *ioctlent;
 #else
 # define sysent     sysent0
-# define errnoent   errnoent0
-# define signalent  signalent0
 # define ioctlent   ioctlent0
 #endif
 
 extern unsigned nsyscalls;
-extern unsigned nerrnos;
-extern unsigned nsignals;
 extern unsigned nioctlents;
 
 extern const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES];
