@@ -42,6 +42,9 @@
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
 #include "xlat/pr_set_mm.h"
+#include "xlat/pr_spec_cmds.h"
+#include "xlat/pr_spec_get_store_bypass_flags.h"
+#include "xlat/pr_spec_set_store_bypass_flags.h"
 #include "xlat/pr_sve_vl_flags.h"
 #include "xlat/pr_tsc.h"
 #include "xlat/pr_unalign_flags.h"
@@ -225,6 +228,27 @@ SYS_FUNC(prctl)
 
 		return RVAL_STR;
 
+	case PR_GET_SPECULATION_CTRL:
+		if (entering(tcp)) {
+			tprints(", ");
+			printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
+
+			break;
+		}
+
+		if (syserror(tcp))
+			return 0;
+
+		switch (arg2) {
+		case PR_SPEC_STORE_BYPASS:
+			tcp->auxstr = sprintflags("",
+						  pr_spec_get_store_bypass_flags,
+						  (kernel_ulong_t) tcp->u_rval);
+			break;
+		}
+
+		return RVAL_STR;
+
 	/* PR_TASK_PERF_EVENTS_* take no arguments. */
 	case PR_TASK_PERF_EVENTS_DISABLE:
 	case PR_TASK_PERF_EVENTS_ENABLE:
@@ -380,6 +404,23 @@ SYS_FUNC(prctl)
 	case PR_SET_FP_MODE:
 		tprints(", ");
 		printflags(pr_fp_mode, arg2, "PR_FP_MODE_???");
+		return RVAL_DECODED;
+
+	case PR_SET_SPECULATION_CTRL:
+		tprints(", ");
+		printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
+		tprints(", ");
+
+		switch (arg2) {
+		case PR_SPEC_STORE_BYPASS:
+			printxval64(pr_spec_set_store_bypass_flags, arg3,
+				    "PR_SPEC_???");
+			break;
+
+		default:
+			tprintf("%#" PRI_klx, arg3);
+		}
+
 		return RVAL_DECODED;
 
 	case PR_GET_NO_NEW_PRIVS:

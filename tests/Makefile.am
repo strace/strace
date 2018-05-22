@@ -137,6 +137,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ppoll-v \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
+	prctl-spec-inject \
 	print_maxfd \
 	qual_fault \
 	qual_inject-error-signal \
@@ -258,6 +259,7 @@ DECODER_TESTS = \
 	prctl-seccomp-filter-v.test \
 	prctl-seccomp-strict.test \
 	prctl-securebits.test \
+	prctl-spec-inject.test \
 	prctl-tid_address.test \
 	prctl-tsc.test \
 	qual_fault-exit_group.test \

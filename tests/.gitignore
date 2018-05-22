@@ -346,6 +346,7 @@ prctl-pdeathsig
 prctl-seccomp-filter-v
 prctl-seccomp-strict
 prctl-securebits
+prctl-spec-inject
 prctl-tid_address
 prctl-tsc
 pread64-pwrite64
