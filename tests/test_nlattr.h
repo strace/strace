@@ -106,11 +106,12 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			sizeof(obj_) - 1 > DEFAULT_STRLEN		\
 			? DEFAULT_STRLEN : (int) sizeof(obj_) - 1;	\
 		/* len < sizeof(obj_) */				\
-		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
-			(init_msg_), (print_msg_),			\
-			(nla_type_), (nla_type_str_),			\
-			plen, (pattern_), plen,				\
-			(fallback_func)((pattern_), plen));		\
+		if (plen > 0)						\
+			TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),		\
+				(init_msg_), (print_msg_),		\
+				(nla_type_), (nla_type_str_),		\
+				plen, (pattern_), plen,			\
+				(fallback_func)((pattern_), plen));	\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
@@ -212,15 +213,16 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 			sizeof(obj_) - 1 > DEFAULT_STRLEN		\
 			? DEFAULT_STRLEN : (int) sizeof(obj_) - 1;	\
 		/* len < sizeof(obj_) */				\
-		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
-			(hdrlen_) + NLA_HDRLEN * depth_,		\
-			(init_msg_), (print_msg_),			\
-			(nla_type_), (nla_type_str_),			\
-			plen, (pattern_), plen,				\
-			print_quoted_hex((pattern_), plen);		\
-			size_t i;					\
-			for (i = 0; i < depth_; ++i)			\
-				printf("}"));				\
+		if (plen > 0)						\
+			TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_, \
+				(hdrlen_) + NLA_HDRLEN * depth_,	\
+				(init_msg_), (print_msg_),		\
+				(nla_type_), (nla_type_str_),		\
+				plen, (pattern_), plen,			\
+				print_quoted_hex((pattern_), plen);	\
+				size_t i;				\
+				for (i = 0; i < depth_; ++i)		\
+					printf("}"));			\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
 			(hdrlen_) + NLA_HDRLEN * depth_,		\
