@@ -49,6 +49,19 @@
 #include "xlat.h"
 #include "xlat/bpf_commands.h"
 
+#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+# define BIG_ADDR_IS_64BIT 1
+# define BIG_ADDR_IS_32BIT 0
+#elif defined __arm__ || defined __i386__ || defined __mips__ \
+   || defined __powerpc__ || defined __riscv__ || defined __s390__ \
+   || defined __sparc__ || defined __tile__
+# define BIG_ADDR_IS_64BIT 0
+# define BIG_ADDR_IS_32BIT 0
+#else
+# define BIG_ADDR_IS_64BIT 0
+# define BIG_ADDR_IS_32BIT 1
+#endif
+
 #ifndef HAVE_STRUCT_BPF_INSN
 struct bpf_insn {
 	uint8_t	code;
@@ -558,14 +571,12 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
 		.str = "prog_type=BPF_PROG_TYPE_RAW_TRACEPOINT"
 		       ", insn_cnt=3134983661, insns=0xffffffff00000000"
-#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+#if BIG_ADDR_IS_64BIT
 		       ", license=0xffffffff00000000"
-#elif defined __arm__ || defined __i386__ || defined __mips__ || \
-      defined __powerpc__ || defined __riscv__ || defined __s390__ \
-      || defined __sparc__ || defined __tile__
-		       ", license=0xffffffff00000000 or NULL"
-#else
+#elif BIG_ADDR_IS_32BIT
 		       ", license=NULL"
+#else
+		       ", license=0xffffffff00000000 or NULL"
 #endif
 		       ", log_level=2718281828, log_size=4096"
 		       ", log_buf=0xffffffff00000000"
@@ -625,14 +636,12 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_OBJ_PIN_struct, pathname),
 		.str = "pathname="
-#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+#if BIG_ADDR_IS_64BIT
 		       "0xffffffffffffffff"
-#elif defined __arm__ || defined __i386__ || defined __mips__ || \
-      defined __powerpc__ || defined __riscv__ || defined __s390__ \
-      || defined __sparc__ || defined __tile__
-		       "0xffffffffffffffff or 0xffffffff"
-#else
+#elif BIG_ADDR_IS_32BIT
 		       "0xffffffff"
+#else
+		       "0xffffffffffffffff or 0xffffffff"
 #endif
 		       ", bpf_fd=0",
 	},
@@ -925,14 +934,12 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
 				    prog_fd),
 		.str = "raw_tracepoint={name="
-#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+#if BIG_ADDR_IS_64BIT
 		       "0xffffffff00000000"
-#elif defined __arm__ || defined __i386__ || defined __mips__ || \
-      defined __powerpc__ || defined __riscv__ || defined __s390__ \
-      || defined __sparc__ || defined __tile__
-		       "0xffffffff00000000 or NULL"
-#else
+#elif BIG_ADDR_IS_32BIT
 		       "NULL"
+#else
+		       "0xffffffff00000000 or NULL"
 #endif
 		       ", prog_fd=-559038737}",
 	},
