@@ -136,7 +136,8 @@ main(void)
 	prog->filter = big_filter;
 	prog->len = BPF_MAXINSNS + 1;
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, %s, {len=%u, filter=[",
-		"SECCOMP_FILTER_FLAG_TSYNC|SECCOMP_FILTER_FLAG_LOG|0xfffffffc",
+		"SECCOMP_FILTER_FLAG_TSYNC|SECCOMP_FILTER_FLAG_LOG|"
+		"SECCOMP_FILTER_FLAG_SPEC_ALLOW|0xfffffff8",
 		prog->len);
 	for (i = 0; i < BPF_MAXINSNS; ++i) {
 		if (i)
