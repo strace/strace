@@ -97,6 +97,8 @@
 #include "xlat/kcm_protocols.h"
 #include "xlat/smc_protocols.h"
 
+const size_t inet_protocols_size = ARRAY_SIZE(inet_protocols) - 1;
+
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
 	       const kernel_ulong_t addrlen)
@@ -139,7 +141,7 @@ SYS_FUNC(socket)
 	switch (tcp->u_arg[0]) {
 	case AF_INET:
 	case AF_INET6:
-		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
+		printxval_search(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
 
 	case AF_NETLINK:

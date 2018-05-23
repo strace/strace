@@ -273,8 +273,11 @@ decode_nla_ip_proto(struct tcb *const tcp,
 		    const unsigned int len,
 		    const void *const opaque_data)
 {
-	static const struct decode_nla_xlat_opts opts = {
-		.xlat = inet_protocols, .dflt = "IPPROTO_???",
+	const struct decode_nla_xlat_opts opts = {
+		.xlat = inet_protocols,
+		.xlat_size = inet_protocols_size,
+		.xt = XT_SORTED,
+		.dflt = "IPPROTO_???",
 	};
 
 	return decode_nla_xval(tcp, addr, len, &opts);

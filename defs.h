@@ -304,12 +304,16 @@ extern const struct xlat ethernet_protocols[];
 /** Ethernet protocols array size without terminating record. */
 extern const size_t ethernet_protocols_size;
 
+/** IP protocols list, sorted, defined in net.c. */
+extern const struct xlat inet_protocols[];
+/** IP protocols array size without terminating record. */
+extern const size_t inet_protocols_size;
+
 extern const struct xlat evdev_abs[];
 /** Number of elements in evdev_abs array without the terminating record. */
 extern const size_t evdev_abs_size;
 
 extern const struct xlat iffflags[];
-extern const struct xlat inet_protocols[];
 extern const struct xlat ip_type_of_services[];
 extern const struct xlat ipc_private[];
 extern const struct xlat msg_flags[];
