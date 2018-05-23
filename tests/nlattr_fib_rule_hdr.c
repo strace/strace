@@ -34,12 +34,24 @@
 # include <inttypes.h>
 # include "test_nlattr.h"
 # include <linux/fib_rules.h>
+# include <linux/in.h>
 # include <linux/ip.h>
 # include <linux/rtnetlink.h>
 
 #define FRA_TUN_ID 12
 #define FRA_TABLE 15
 #define FRA_UID_RANGE 20
+#define FRA_PROTOCOL 21
+#define FRA_IP_PROTO 22
+#define FRA_SPORT_RANGE 23
+#define FRA_DPORT_RANGE 24
+
+# ifndef HAVE_STRUCT_FIB_RULE_PORT_RANGE
+struct fib_rule_port_range {
+	uint16_t start;
+	uint16_t end;
+};
+# endif /* HAVE_STRUCT_FIB_RULE_PORT_RANGE */
 
 static void
 init_rtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -124,6 +136,62 @@ main(void)
 			   FRA_TUN_ID, pattern, tun_id,
 			   printf("htobe64(%" PRIu64 ")", be64toh(tun_id)));
 #endif
+
+	uint8_t proto;
+
+	static const struct {
+		uint8_t arg;
+		const char *str;
+	} proto_args[] = {
+		{ ARG_STR(RTPROT_UNSPEC) },
+		{ 5, "0x5 /* RTPROT_??? */" },
+		{ 17, "RTPROT_MROUTED" },
+		{ 42, "RTPROT_BABEL" },
+		{ 43, "0x2b /* RTPROT_??? */" },
+		{ ARG_STR(0xde) " /* RTPROT_??? */" },
+	};
+
+	for (unsigned i = 0; i < ARRAY_SIZE(proto_args); i++) {
+		proto = proto_args[i].arg;
+		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				   init_rtmsg, print_rtmsg,
+				   FRA_PROTOCOL, pattern, proto,
+				   printf("%s", proto_args[i].str));
+	}
+
+	static const struct {
+		uint8_t arg;
+		const char *str;
+	} ipproto_args[] = {
+		{ ARG_STR(IPPROTO_TCP) },
+		{ 254, "0xfe /* IPPROTO_??? */" },
+		{ ARG_STR(IPPROTO_RAW) },
+	};
+
+	for (unsigned i = 0; i < ARRAY_SIZE(ipproto_args); i++) {
+		proto = ipproto_args[i].arg;
+		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				   init_rtmsg, print_rtmsg,
+				   FRA_IP_PROTO, pattern, proto,
+				   printf("%s", ipproto_args[i].str));
+	}
+
+	static const struct fib_rule_port_range prange = {
+		.start = 0xabcd,
+		.end = 0xfeed,
+	};
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_SPORT_RANGE, pattern, prange,
+			   PRINT_FIELD_U("{", prange, start);
+			   PRINT_FIELD_U(", ", prange, end);
+			   printf("}"));
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_rtmsg, print_rtmsg,
+			   FRA_DPORT_RANGE, pattern, prange,
+			   PRINT_FIELD_U("{", prange, start);
+			   PRINT_FIELD_U(", ", prange, end);
+			   printf("}"));
 
 	puts("+++ exited with 0 +++");
 	return 0;
