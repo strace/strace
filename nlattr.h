@@ -41,6 +41,7 @@ struct decode_nla_xlat_opts {
 	const char *prefix;
 	const char *suffix;
 	uint64_t (*process_fn)(uint64_t val);
+	size_t size;
 };
 
 typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,
