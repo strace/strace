@@ -50,16 +50,13 @@
 #include "xlat/bpf_commands.h"
 
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
-# define BIG_ADDR_IS_64BIT 1
-# define BIG_ADDR_IS_32BIT 0
+# define BIG_ADDR(addr64_, addr32_) addr64_
 #elif defined __arm__ || defined __i386__ || defined __mips__ \
    || defined __powerpc__ || defined __riscv__ || defined __s390__ \
    || defined __sparc__ || defined __tile__
-# define BIG_ADDR_IS_64BIT 0
-# define BIG_ADDR_IS_32BIT 0
+# define BIG_ADDR(addr64_, addr32_) addr64_ " or " addr32_
 #else
-# define BIG_ADDR_IS_64BIT 0
-# define BIG_ADDR_IS_32BIT 1
+# define BIG_ADDR(addr64_, addr32_) addr32_
 #endif
 
 #ifndef HAVE_STRUCT_BPF_INSN
@@ -571,13 +568,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
 		.str = "prog_type=BPF_PROG_TYPE_RAW_TRACEPOINT"
 		       ", insn_cnt=3134983661, insns=0xffffffff00000000"
-#if BIG_ADDR_IS_64BIT
-		       ", license=0xffffffff00000000"
-#elif BIG_ADDR_IS_32BIT
-		       ", license=NULL"
-#else
-		       ", license=0xffffffff00000000 or NULL"
-#endif
+		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", log_level=2718281828, log_size=4096"
 		       ", log_buf=0xffffffff00000000"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -635,14 +626,7 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 			.pathname = 0xFFFFFFFFFFFFFFFFULL
 		} },
 		.size = offsetofend(struct BPF_OBJ_PIN_struct, pathname),
-		.str = "pathname="
-#if BIG_ADDR_IS_64BIT
-		       "0xffffffffffffffff"
-#elif BIG_ADDR_IS_32BIT
-		       "0xffffffff"
-#else
-		       "0xffffffffffffffff or 0xffffffff"
-#endif
+		.str = "pathname=" BIG_ADDR("0xffffffffffffffff", "0xffffffff")
 		       ", bpf_fd=0",
 	},
 	{
@@ -933,14 +917,8 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
 				    prog_fd),
-		.str = "raw_tracepoint={name="
-#if BIG_ADDR_IS_64BIT
-		       "0xffffffff00000000"
-#elif BIG_ADDR_IS_32BIT
-		       "NULL"
-#else
-		       "0xffffffff00000000 or NULL"
-#endif
+		.str = "raw_tracepoint="
+		       "{name=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", prog_fd=-559038737}",
 	},
 	{
