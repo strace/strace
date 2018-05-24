@@ -37,50 +37,15 @@
 #endif
 #include <linux/rtnetlink.h>
 
-#ifndef IFLA_XDP
-# define IFLA_XDP 43
+#if !HAVE_DECL_IFLA_XDP
+enum { IFLA_XDP = 43 };
 #endif
 #ifndef IFLA_XDP_FD
 # define IFLA_XDP_FD 1
 #endif
 
-const unsigned int hdrlen = sizeof(struct ifinfomsg);
-
-static void
-init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
-{
-	SET_STRUCT(struct nlmsghdr, nlh,
-		.nlmsg_len = msg_len,
-		.nlmsg_type = RTM_GETLINK,
-		.nlmsg_flags = NLM_F_DUMP
-	);
-
-	struct ifinfomsg *const msg = NLMSG_DATA(nlh);
-	SET_STRUCT(struct ifinfomsg, msg,
-		.ifi_family = AF_UNIX,
-		.ifi_type = ARPHRD_LOOPBACK,
-		.ifi_index = ifindex_lo(),
-		.ifi_flags = IFF_UP,
-	);
-
-	struct nlattr *const nla = NLMSG_ATTR(nlh, sizeof(*msg));
-	SET_STRUCT(struct nlattr, nla,
-		.nla_len = msg_len - NLMSG_SPACE(hdrlen),
-		.nla_type = IFLA_XDP
-	);
-}
-
-static void
-print_ifinfomsg(const unsigned int msg_len)
-{
-	printf("{len=%u, type=RTM_GETLINK, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {ifi_family=AF_UNIX"
-	       ", ifi_type=ARPHRD_LOOPBACK"
-	       ", ifi_index=" IFINDEX_LO_STR
-	       ", ifi_flags=IFF_UP, ifi_change=0}"
-	       ", {{nla_len=%u, nla_type=IFLA_XDP}",
-	       msg_len, msg_len - NLMSG_SPACE(hdrlen));
-}
+#define IFLA_ATTR IFLA_XDP
+#include "nlattr_ifla.h"
 
 int
 main(void)

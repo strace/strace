@@ -516,6 +516,12 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct rtnl_link_stats64.rx_nohandler
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
+AC_CHECK_DECLS(m4_normalize([
+	IFLA_PORT_SELF,
+	IFLA_PROTINFO,
+	IFLA_XDP
+]),,, [#include <sys/socket.h>
+#include <linux/rtnetlink.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct gnet_stats_basic,
