@@ -262,6 +262,7 @@ nlattr_fib_rule_hdr		+netlink_sock_diag.test
 nlattr_ifaddrlblmsg		+netlink_sock_diag.test
 nlattr_ifaddrmsg		+netlink_sock_diag.test
 nlattr_ifinfomsg		+netlink_sock_diag.test
+nlattr_ifla_af_spec		+netlink_sock_diag.test
 nlattr_ifla_brport		+netlink_sock_diag.test
 nlattr_ifla_port		+netlink_sock_diag.test
 nlattr_ifla_xdp			+netlink_sock_diag.test

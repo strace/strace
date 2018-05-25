@@ -238,6 +238,7 @@ nlattr_fib_rule_hdr
 nlattr_ifaddrlblmsg
 nlattr_ifaddrmsg
 nlattr_ifinfomsg
+nlattr_ifla_af_spec
 nlattr_ifla_brport
 nlattr_ifla_port
 nlattr_ifla_xdp

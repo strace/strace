@@ -507,6 +507,7 @@ AC_CHECK_TYPES(m4_normalize([
 
 AC_CHECK_TYPES(m4_normalize([
 	struct ifla_bridge_id,
+	struct ifla_cacheinfo,
 	struct ifla_port_vsi,
 	struct rtnl_link_stats64
 ]),,, [#include <sys/socket.h>
@@ -519,6 +520,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 AC_CHECK_DECLS(m4_normalize([
 	IFLA_PORT_SELF,
 	IFLA_PROTINFO,
+	IFLA_AF_SPEC,
 	IFLA_XDP
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
