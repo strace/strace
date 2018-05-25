@@ -76,7 +76,7 @@ print_tcmsg(const unsigned int msg_len)
 }
 
 static void
-print_uint16(const uint16_t *p)
+print_uint16(const uint16_t *p, size_t idx)
 {
 	printf("%u", *p);
 }
