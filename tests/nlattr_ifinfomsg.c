@@ -46,6 +46,7 @@
 # define IFLA_VF_PORTS 24
 #endif
 #define IFLA_LINK_NETNSID 37
+#define IFLA_EVENT 44
 
 #ifndef IFLA_INFO_KIND
 # define IFLA_INFO_KIND 1
@@ -343,6 +344,22 @@ main(void)
 		    IFLA_VF_PORTS, sizeof(nla), &nla, sizeof(nla),
 		    printf("{nla_len=%u, nla_type=IFLA_VF_PORT}",
 			   nla.nla_len));
+
+	static const struct {
+		uint32_t val;
+		const char *str;
+	} ifla_events[] = {
+		{ 0, "IFLA_EVENT_NONE" },
+		{ 6, "IFLA_EVENT_BONDING_OPTIONS" },
+		{ ARG_STR(0x7) " /* IFLA_EVENT_??? */" },
+		{ ARG_STR(0xdeadfeed) " /* IFLA_EVENT_??? */" },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(ifla_events); i++) {
+		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				   init_ifinfomsg, print_ifinfomsg,
+				   IFLA_EVENT, pattern, ifla_events[i].val,
+				   printf("%s", ifla_events[i].str));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
