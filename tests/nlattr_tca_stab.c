@@ -36,8 +36,8 @@
 #ifndef TCA_STAB
 # define TCA_STAB 8
 #endif
-#ifndef TCA_STAB_DATA
-# define TCA_STAB_DATA 2
+#if !HAVE_DECL_TCA_STAB_DATA
+enum { TCA_STAB_DATA = 2 };
 #endif
 
 const unsigned int hdrlen = sizeof(struct tcmsg);
