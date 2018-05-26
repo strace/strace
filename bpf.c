@@ -50,19 +50,12 @@
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
-/** Storage for all the data that is needed to be stored on entering. */
-struct bpf_priv_data {
-	bool     bpf_prog_query_stored;
-	uint32_t bpf_prog_query_prog_cnt;
-};
-
 #define DECL_BPF_CMD_DECODER(bpf_cmd_decoder)				\
 int									\
 bpf_cmd_decoder(struct tcb *const tcp,					\
 		const kernel_ulong_t addr,				\
 		const unsigned int size,				\
-		void *const data,					\
-		struct bpf_priv_data *priv)				\
+		void *const data)					\
 /* End of DECL_BPF_CMD_DECODER definition. */
 
 #define BEGIN_BPF_CMD_DECODER(bpf_cmd)					\
@@ -452,13 +445,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 
 		tprints(", prog_ids=");
 
-		if (!priv)
-			priv = xcalloc(1, sizeof(*priv));
-
-		priv->bpf_prog_query_stored = true;
-		priv->bpf_prog_query_prog_cnt = attr.prog_cnt;
-
-		set_tcb_priv_data(tcp, priv, free);
+		set_tcb_priv_ulong(tcp, attr.prog_cnt);
 
 		return 0;
 	}
@@ -469,9 +456,9 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 		    print_uint32_array_member, 0);
 
 	tprints(", prog_cnt=");
-	if (priv && priv->bpf_prog_query_stored
-	    && priv->bpf_prog_query_prog_cnt != attr.prog_cnt)
-		tprintf("%" PRIu32 " => ", priv->bpf_prog_query_prog_cnt);
+	const uint32_t prog_cnt_entering = get_tcb_priv_ulong(tcp);
+	if (prog_cnt_entering != attr.prog_cnt)
+		tprintf("%" PRIu32 " => ", prog_cnt_entering);
 	tprintf("%" PRIu32, attr.prog_cnt);
 	tprints("}");
 }
@@ -514,30 +501,27 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_RAW_TRACEPOINT_OPEN),
 	};
 
-	static char *buf;
-	struct bpf_priv_data *priv = NULL;
-
 	const unsigned int cmd = tcp->u_arg[0];
 	const kernel_ulong_t addr = tcp->u_arg[1];
 	const unsigned int size = tcp->u_arg[2];
 	int rc = RVAL_DECODED;
 
-	if (!buf)
-		buf = xmalloc(get_pagesize());
-
 	if (entering(tcp)) {
 		printxval_index(bpf_commands, cmd, "BPF_???");
 		tprints(", ");
-	} else {
-		priv = get_tcb_priv_data(tcp);
 	}
 
 	if (size > 0
 	    && size <= get_pagesize()
 	    && cmd < ARRAY_SIZE(bpf_cmd_decoders)
 	    && bpf_cmd_decoders[cmd]) {
+		static char *buf;
+
+		if (!buf)
+			buf = xmalloc(get_pagesize());
+
 		if (!umoven_or_printaddr_ignore_syserror(tcp, addr, size, buf))
-			rc = bpf_cmd_decoders[cmd](tcp, addr, size, buf, priv);
+			rc = bpf_cmd_decoders[cmd](tcp, addr, size, buf);
 	} else {
 		printaddr(addr);
 	}
