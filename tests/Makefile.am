@@ -115,6 +115,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_nsfs \
+	ioctl_perf-success \
 	ioctl_rtc-v \
 	is_linux_mips_n64 \
 	ksysent \
@@ -233,6 +234,7 @@ DECODER_TESTS = \
 	futex.test \
 	getuid.test \
 	ioctl.test \
+	ioctl_perf-success.test \
 	ipc_msgbuf.test \
 	kern_features-fault.test \
 	llseek.test \

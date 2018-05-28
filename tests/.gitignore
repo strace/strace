@@ -144,6 +144,7 @@ ioctl_loop-v
 ioctl_mtd
 ioctl_nsfs
 ioctl_perf
+ioctl_perf-success
 ioctl_ptp
 ioctl_rtc
 ioctl_rtc-v

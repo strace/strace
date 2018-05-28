@@ -166,7 +166,6 @@ main(void)
 	       str_ptr + 40);
 
 	/* PERF_EVENT_IOC_ID */
-	/* TODO: check return path */
 	ioctl(-1, PERF_EVENT_IOC_ID, NULL);
 	printf("ioctl(-1, PERF_EVENT_IOC_ID, NULL) = -1 EBADF (%m)\n");
 
@@ -189,7 +188,6 @@ main(void)
 	       (unsigned long) magic);
 
 	/* PERF_EVENT_IOC_QUERY_BPF */
-	/* TODO: check return path */
 	ioctl(-1, PERF_EVENT_IOC_QUERY_BPF, NULL);
 	printf("ioctl(-1, PERF_EVENT_IOC_QUERY_BPF, NULL) = -1 EBADF (%m)\n");
 
