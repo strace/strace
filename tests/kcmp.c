@@ -167,7 +167,7 @@ main(void)
 
 	int fd;
 	unsigned i;
-	struct kcmp_epoll_slot *slot = tail_alloc(sizeof(*slot));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct kcmp_epoll_slot, slot);
 
 	/* Open some files to test printpidfd */
 	fd = open(null_path, O_RDONLY);

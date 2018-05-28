@@ -175,8 +175,8 @@ main(void)
 	static const kernel_ulong_t bogus_addr =
 		(kernel_ulong_t) 0xfacefeedac0ffeedULL;
 
-	struct gs_cb *gscb = tail_alloc(sizeof(*gscb));
-	struct gs_epl *gsepl = tail_alloc(sizeof(*gsepl));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gs_cb, gscb);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gs_epl, gsepl);
 
 	long rc;
 

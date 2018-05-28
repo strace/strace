@@ -741,7 +741,7 @@ main(void)
 		(kernel_ulong_t) 0xfee1deadfa57beefULL;
 
 	unsigned char *buf = tail_alloc(PAGE_SIZE);
-	uint64_t *ret = tail_alloc(sizeof(*ret));
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, ret);
 
 	long rc;
 

@@ -152,9 +152,9 @@ get_thread_area(kernel_ulong_t ptr_val, const char *ptr_str, bool valid,
 
 int main(void)
 {
-	struct user_desc *ta1 = tail_alloc(sizeof(*ta1));
-	struct user_desc *ta2 = tail_alloc(sizeof(*ta2));
-	unsigned *bogus_entry_number = tail_alloc(sizeof(*bogus_entry_number));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct user_desc, ta1);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct user_desc, ta2);
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, bogus_entry_number);
 
 	long set_rc = -1;
 

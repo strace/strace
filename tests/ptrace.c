@@ -60,10 +60,11 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 	printf("ptrace(PTRACE_PEEKSIGINFO, %u, NULL, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, errstr);
 
-	struct {
+	struct psi {
 		unsigned long long off;
 		unsigned int flags, nr;
-	} *const psi = tail_alloc(sizeof(*psi));
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct psi, psi);
 
 	psi->off = 0xdeadbeeffacefeedULL;
 	psi->flags = 1;
@@ -179,7 +180,7 @@ main(void)
 	const unsigned long pid =
 		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
 
-	uint64_t *filter_off = tail_alloc(sizeof(*filter_off));
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, filter_off);
 
 	const unsigned int sigset_size = get_sigset_size();
 

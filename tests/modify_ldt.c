@@ -67,8 +67,8 @@ main(void)
 	static const kernel_ulong_t bogus_bytecount =
 		(kernel_ulong_t) 0xdeadfacefa57beefULL;
 
-	struct user_desc *us = tail_alloc(sizeof(*us));
-	unsigned int *bogus_int = tail_alloc(sizeof(*bogus_int));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct user_desc, us);
+	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, bogus_int);
 	long rc;
 
 	fill_memory(us, sizeof(*us));

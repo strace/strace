@@ -125,7 +125,8 @@ send_query(const int fd)
 		struct req req1;
 		char padding[NLMSG_ALIGN(sizeof(struct req)) - sizeof(struct req)];
 		struct req req2;
-	} *const reqs = tail_alloc(sizeof(*reqs));
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct reqs, reqs);
 	memcpy(&reqs->req1, &c_req, sizeof(c_req));
 	memcpy(&reqs->req2, &c_req, sizeof(c_req));
 
