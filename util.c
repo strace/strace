@@ -988,29 +988,43 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 	}
 }
 
+bool
+tfetch_mem64(struct tcb *const tcp, const uint64_t addr,
+	     const unsigned int len, void *const our_addr)
+{
+	return addr && verbose(tcp) &&
+	       (entering(tcp) || !syserror(tcp)) &&
+	       !umoven(tcp, addr, len, our_addr);
+}
+
+bool
+tfetch_mem64_ignore_syserror(struct tcb *const tcp, const uint64_t addr,
+			     const unsigned int len, void *const our_addr)
+{
+	return addr && verbose(tcp) &&
+	       !umoven(tcp, addr, len, our_addr);
+}
+
 int
 umoven_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
 		      const unsigned int len, void *const our_addr)
 {
-	if (!addr || !verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
-	    umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr64(addr);
-		return -1;
-	}
-	return 0;
+	if (tfetch_mem64(tcp, addr, len, our_addr))
+		return 0;
+	printaddr64(addr);
+	return -1;
 }
 
 int
 umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
-				    const uint64_t addr,
-				    const unsigned int len,
-				    void *const our_addr)
+				      const uint64_t addr,
+				      const unsigned int len,
+				      void *const our_addr)
 {
-	if (!addr || !verbose(tcp) || umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr64(addr);
-		return -1;
-	}
-	return 0;
+	if (tfetch_mem64_ignore_syserror(tcp, addr, len, our_addr))
+		return 0;
+	printaddr64(addr);
+	return -1;
 }
 
 bool

@@ -473,6 +473,35 @@ umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 /**
+ * @return true on success, false on error.
+ */
+extern bool
+tfetch_mem64(struct tcb *, uint64_t addr, unsigned int len, void *laddr);
+
+static inline bool
+tfetch_mem(struct tcb *tcp, const kernel_ulong_t addr,
+	   unsigned int len, void *laddr)
+{
+	return tfetch_mem64(tcp, addr, len, laddr);
+}
+#define tfetch_obj(pid, addr, objp)	\
+	tfetch_mem((pid), (addr), sizeof(*(objp)), (void *) (objp))
+
+/**
+ * @return true on success, false on error.
+ */
+extern bool
+tfetch_mem64_ignore_syserror(struct tcb *, uint64_t addr,
+			     unsigned int len, void *laddr);
+
+static inline bool
+tfetch_mem_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,
+			   unsigned int len, void *laddr)
+{
+	return tfetch_mem64_ignore_syserror(tcp, addr, len, laddr);
+}
+
+/**
  * @return 0 on success, -1 on error (and print addr).
  */
 extern int
