@@ -67,7 +67,7 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	print_array(tcp, arg + offsetof(struct perf_event_query_bpf, ids), info,
 		    &info, sizeof(info),
-		    umoven_or_printaddr, print_uint32_array_member, NULL);
+		    tfetch_mem, print_uint32_array_member, NULL);
 
 	tprints("}");
 

@@ -1060,8 +1060,8 @@ print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
  *
  * Array elements are being fetched to the address specified by elem_buf.
  *
- * The fetcher callback function specified by umoven_func should follow
- * the same semantics as umoven_or_printaddr function.
+ * The fetcher callback function specified by tfetch_mem_func should follow
+ * the same semantics as tfetch_mem function.
  *
  * The printer callback function specified by print_func is expected
  * to print something; if it returns false, no more iterations will be made.
@@ -1073,9 +1073,7 @@ print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
  * - "NULL", if start_addr is NULL;
  * - "[]", if nmemb is 0;
  * - start_addr, if nmemb * elem_size overflows or wraps around;
- * - nothing, if the first element cannot be fetched
- *   (if umoven_func returns non-zero), but it is assumed that
- *   umoven_func has printed the address it failed to fetch data from;
+ * - start_addr, if the first tfetch_mem_func invocation returned false;
  * - elements of the array, delimited by ", ", with the array itself
  *   enclosed with [] brackets.
  *
@@ -1084,9 +1082,8 @@ print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
  * - "..." is printed instead of max_strlen+1 element
  *   and no more iterations will be made.
  *
- * This function returns true only if
- * - umoven_func has been called at least once AND
- * - umoven_func has not returned false.
+ * This function returns true only if tfetch_mem_func has returned true
+ * at least once.
  */
 bool
 print_array(struct tcb *const tcp,
@@ -1094,10 +1091,10 @@ print_array(struct tcb *const tcp,
 	    const size_t nmemb,
 	    void *const elem_buf,
 	    const size_t elem_size,
-	    int (*const umoven_func)(struct tcb *,
-				     kernel_ulong_t,
-				     unsigned int,
-				     void *),
+	    bool (*const tfetch_mem_func)(struct tcb *,
+					  kernel_ulong_t addr,
+					  unsigned int len,
+					  void *laddr),
 	    bool (*const print_func)(struct tcb *,
 				     void *elem_buf,
 				     size_t elem_size,
@@ -1131,8 +1128,15 @@ print_array(struct tcb *const tcp,
 		if (cur != start_addr)
 			tprints(", ");
 
-		if (umoven_func(tcp, cur, elem_size, elem_buf))
+		if (!tfetch_mem_func(tcp, cur, elem_size, elem_buf)) {
+			if (cur == start_addr)
+				printaddr(cur);
+			else {
+				tprints("...");
+				printaddr_comment(cur);
+			}
 			break;
+		}
 
 		if (cur == start_addr)
 			tprints("[");

@@ -121,7 +121,7 @@ decode_packet_diag_mclist(struct tcb *const tcp,
 		return false;
 
 	print_array(tcp, addr, nmemb, &dml, sizeof(dml),
-		    umoven_or_printaddr, print_packet_diag_mclist, 0);
+		    tfetch_mem, print_packet_diag_mclist, 0);
 
 	return true;
 }

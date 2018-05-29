@@ -98,7 +98,7 @@ decode_netlink_diag_groups(struct tcb *const tcp,
 		return false;
 
 	print_array(tcp, addr, nmemb, &buf, current_wordsize,
-		    umoven_or_printaddr, print_group, 0);
+		    tfetch_mem, print_group, 0);
 
 	return true;
 }

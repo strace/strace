@@ -107,7 +107,7 @@ decode_unix_diag_inode(struct tcb *const tcp,
 		return false;
 
 	print_array(tcp, addr, nmemb, &inode, sizeof(inode),
-		    umoven_or_printaddr, print_inode, 0);
+		    tfetch_mem, print_inode, 0);
 
 	return true;
 }

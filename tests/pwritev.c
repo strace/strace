@@ -65,7 +65,7 @@ print_iovec(const struct iovec *iov, unsigned int cnt, unsigned int size)
 		if (i)
 			fputs(", ", stdout);
 		if (i == size) {
-			printf("%p", &iov[i]);
+			printf("... /* %p */", &iov[i]);
 			break;
 		}
 		if (i == LIM) {

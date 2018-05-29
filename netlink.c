@@ -473,7 +473,7 @@ decode_nlmsgerr_attr_cookie(struct tcb *const tcp,
 	const size_t nmemb = len / sizeof(cookie);
 
 	print_array(tcp, addr, nmemb, &cookie, sizeof(cookie),
-		    umoven_or_printaddr, print_cookie, 0);
+		    tfetch_mem, print_cookie, 0);
 
 	return true;
 }

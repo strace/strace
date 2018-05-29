@@ -123,7 +123,7 @@ tprint_iov_upto(struct tcb *const tcp, const kernel_ulong_t len,
 	};
 
 	print_array(tcp, addr, len, iov, current_wordsize * 2,
-		    umoven_or_printaddr_ignore_syserror, print_iovec, &config);
+		    tfetch_mem_ignore_syserror, print_iovec, &config);
 }
 
 SYS_FUNC(readv)

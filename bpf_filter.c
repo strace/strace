@@ -183,7 +183,7 @@ print_bpf_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
 		struct bpf_filter_block filter;
 
 		print_array(tcp, addr, len, &filter, sizeof(filter),
-			    umoven_or_printaddr, print_bpf_filter_block, &fbd);
+			    tfetch_mem, print_bpf_filter_block, &fbd);
 	}
 }
 

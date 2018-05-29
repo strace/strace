@@ -118,7 +118,7 @@ main(void)
 	prog->len = 3;
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, prog);
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=%u"
-		", filter=[%s, %p]}) = -1 EFAULT (%m)\n",
+		", filter=[%s, ... /* %p */]}) = -1 EFAULT (%m)\n",
 		prog->len, kill_stmt_txt, filter +  ARRAY_SIZE(filter_c));
 
 	prog->len = 0;

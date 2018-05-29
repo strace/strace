@@ -270,7 +270,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprintf(", chromakey=%#x, clips=", f->fmt.win.chromakey);
 		ret = print_array(tcp, ptr_to_kulong(f->fmt.win.clips),
 				  f->fmt.win.clipcount, &clip, sizeof(clip),
-				  umoven_or_printaddr, print_v4l2_clip, 0);
+				  tfetch_mem, print_v4l2_clip, 0);
 		tprintf(", clipcount=%u, bitmap=", f->fmt.win.clipcount);
 		printaddr(ptr_to_kulong(f->fmt.win.bitmap));
 #ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
@@ -853,7 +853,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct_v4l2_ext_control ctrl;
 	bool fail = !print_array(tcp, ptr_to_kulong(c.controls), c.count,
 				 &ctrl, sizeof(ctrl),
-				 umoven_or_printaddr_ignore_syserror,
+				 tfetch_mem_ignore_syserror,
 				 print_v4l2_ext_control, 0);
 
 	if (exiting(tcp) && syserror(tcp))

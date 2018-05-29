@@ -95,7 +95,7 @@ print_pollfd_array_entering(const struct pollfd *const pfd,
 		if (i)
 			tprintf(", ");
 		if (i >= valid) {
-			tprintf("%p", &pfd[i]);
+			tprintf("... /* %p */", &pfd[i]);
 			break;
 		}
 		if (i >= abbrev) {

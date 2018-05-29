@@ -63,7 +63,7 @@ print_page_array(const void **const pages,
 				break;
 			}
 		} else {
-			printf("%p", pages + i);
+			printf("... /* %p */", pages + i);
 			break;
 		}
 		const void *const addr = pages[i];
@@ -99,7 +99,7 @@ print_node_array(const int *const nodes,
 				break;
 			}
 		} else {
-			printf("%p", nodes + i);
+			printf("... /* %p */", nodes + i);
 			break;
 		}
 		printf("%d", nodes[i]);

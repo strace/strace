@@ -918,7 +918,8 @@ print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check, unsigned long add
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
 	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
 #if defined(INJECT_RETVAL) && INJECT_RETVAL > 0
-	       ", prog_ids=[0, 1, 4294967295, 2718281828, %p], prog_cnt=5}",
+	       ", prog_ids=[0, 1, 4294967295, 2718281828, ... /* %p */]"
+	       ", prog_cnt=5}",
 	       prog_load_ids_ptr + ARRAY_SIZE(prog_load_ids)
 #else
 	       ", prog_ids=%p, prog_cnt=5}", prog_load_ids_ptr

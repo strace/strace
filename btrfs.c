@@ -301,7 +301,7 @@ btrfs_print_logical_ino_container(struct tcb *tcp,
 		tprints(", val=");
 		print_array(tcp, val_addr, container.elem_cnt / 3,
 			    record, sizeof(record),
-			    umoven_or_printaddr,
+			    tfetch_mem,
 			    print_btrfs_data_container_logical_ino, 0);
 	}
 
@@ -340,7 +340,7 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 		tprints(", val=");
 		print_array(tcp, val_addr, container.elem_cnt,
 			    &offset, sizeof(offset),
-			    umoven_or_printaddr,
+			    tfetch_mem,
 			    print_btrfs_data_container_ino_path, &val_addr);
 	}
 
@@ -370,7 +370,7 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 		tprints(", qgroups=");
 		print_array(tcp, qgi_addr + offsetof(typeof(inherit), qgroups),
 			    inherit.num_qgroups, &record, sizeof(record),
-			    umoven_or_printaddr, print_uint64_array_member, 0);
+			    tfetch_mem, print_uint64_array_member, 0);
 	}
 	tprints("}");
 }
@@ -1158,7 +1158,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			print_array(tcp, ptr_to_kulong(args.clone_sources),
 				    args.clone_sources_count,
 				    &record, sizeof(record),
-				    umoven_or_printaddr,
+				    tfetch_mem,
 				    print_objectid_callback, 0);
 		}
 		btrfs_print_objectid(", ", args, parent_root);
@@ -1201,7 +1201,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints(", spaces=");
 			print_array(tcp, arg + offsetof(typeof(args), spaces),
 				    args.total_spaces,
-				    &info, sizeof(info), umoven_or_printaddr,
+				    &info, sizeof(info), tfetch_mem,
 				    print_btrfs_ioctl_space_info, 0);
 		}
 		tprints("}");

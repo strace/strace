@@ -89,7 +89,7 @@ main(void)
 		fds[1], (long) writev(fds[1], w_iov, 0));
 
 	rc = writev(fds[1], w_iov + ARRAY_SIZE(w_iov_) - 1, 2);
-	tprintf("writev(%d, [{iov_base=\"%s\", iov_len=%u}, %p], 2)"
+	tprintf("writev(%d, [{iov_base=\"%s\", iov_len=%u}, ... /* %p */], 2)"
 		" = %ld %s (%m)\n",
 		fds[1], w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
 		rc, errno2name());

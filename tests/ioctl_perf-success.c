@@ -143,7 +143,7 @@ main(int argc, char **argv)
 	u32_arr[1] = 5;
 	assert(ioctl(-1, PERF_EVENT_IOC_QUERY_BPF, u32_arr) == inject_retval);
 	printf("ioctl(-1, PERF_EVENT_IOC_QUERY_BPF, {ids_len=3134983661"
-	       ", prog_cnt=5, ids=[3737845741, 3735928559, %p]})"
+	       ", prog_cnt=5, ids=[3737845741, 3735928559, ... /* %p */]})"
 	       " = %ld (INJECTED)\n",
 	       u32_efault, inject_retval);
 

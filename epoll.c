@@ -94,7 +94,7 @@ epoll_wait_common(struct tcb *tcp)
 	} else {
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
-			    umoven_or_printaddr, print_epoll_event, 0);
+			    tfetch_mem, print_epoll_event, 0);
 		tprintf(", %d, %d", (int) tcp->u_arg[2], (int) tcp->u_arg[3]);
 	}
 }

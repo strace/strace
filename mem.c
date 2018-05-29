@@ -360,7 +360,7 @@ SYS_FUNC(subpage_prot)
 
 	unsigned int entry;
 	print_array(tcp, map, nmemb, &entry, sizeof(entry),
-		    umoven_or_printaddr, print_protmap_entry, 0);
+		    tfetch_mem, print_protmap_entry, 0);
 
 	return RVAL_DECODED;
 }

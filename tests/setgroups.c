@@ -115,7 +115,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("%s(2, [", SYSCALL_NAME);
 	printuid(*g1);
-	printf(", %p]) = %s\n", g1 + 1, errstr);
+	printf(", ... /* %p */]) = %s\n", g1 + 1, errstr);
 
 	g2[0] = -2;
 	g2[1] = -3;
@@ -133,7 +133,7 @@ main(void)
 	printuid(g2[0]);
 	printf(", ");
 	printuid(g2[1]);
-	printf(", %p]) = %s\n", g2 + 2, errstr);
+	printf(", ... /* %p */]) = %s\n", g2 + 2, errstr);
 
 	g3[0] = 0;
 	g3[1] = 1;

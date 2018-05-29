@@ -196,7 +196,7 @@ SYS_FUNC(io_submit)
 		printaddr(addr);
 	else
 		print_array(tcp, addr, nr, &iocbp, current_wordsize,
-			    umoven_or_printaddr, print_iocbp, 0);
+			    tfetch_mem, print_iocbp, 0);
 
 	return RVAL_DECODED;
 }
@@ -248,7 +248,7 @@ SYS_FUNC(io_getevents)
 	} else {
 		struct io_event buf;
 		print_array(tcp, tcp->u_arg[3], tcp->u_rval, &buf, sizeof(buf),
-			    umoven_or_printaddr, print_io_event, 0);
+			    tfetch_mem, print_io_event, 0);
 		tprints(", ");
 		/*
 		 * Since the timeout parameter is read by the kernel

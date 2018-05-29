@@ -185,7 +185,7 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 
 		rc = print_array(tcp, arg + offsetof(typeof(args), info),
 				 args.dest_count, &info, sizeof(info),
-				 umoven_or_printaddr,
+				 tfetch_mem,
 				 print_file_dedupe_range_info, limit);
 
 		tprints("}");
@@ -233,7 +233,7 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 			print_array(tcp,
 				    arg + offsetof(typeof(args), fm_extents),
 				    args.fm_mapped_extents, &fe, sizeof(fe),
-				    umoven_or_printaddr,
+				    tfetch_mem,
 				    print_fiemap_extent, 0);
 		}
 		tprints("}");

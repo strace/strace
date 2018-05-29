@@ -172,7 +172,7 @@ print_ebpf_prog(struct tcb *const tcp, const kernel_ulong_t addr,
 		struct ebpf_insn insn;
 
 		print_array(tcp, addr, len, &insn, sizeof(insn),
-			    umoven_or_printaddr, print_ebpf_insn, &eid);
+			    tfetch_mem, print_ebpf_insn, &eid);
 	}
 }
 
@@ -519,7 +519,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	print_big_u64_addr(info.map_ids);
 	print_array(tcp, info.map_ids, info.nr_map_ids,
 		    &map_id_buf, sizeof(map_id_buf),
-		    umoven_or_printaddr, print_uint64_array_member, 0);
+		    tfetch_mem, print_uint64_array_member, 0);
 
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
@@ -637,7 +637,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 
 	print_big_u64_addr(attr.prog_ids);
 	print_array(tcp, attr.prog_ids, attr.prog_cnt, &prog_id_buf,
-		    sizeof(prog_id_buf), umoven_or_printaddr,
+		    sizeof(prog_id_buf), tfetch_mem,
 		    print_uint32_array_member, 0);
 
 	tprints(", prog_cnt=");

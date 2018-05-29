@@ -135,7 +135,7 @@ print_iov(const struct iovec *iov, const void *arg_ptr, long rc)
 	}
 
 	if (arg->addr_term)
-		printf(", %p", iov + arg->count);
+		printf(", ... /* %p */", iov + arg->count);
 
 	printf("]");
 }

@@ -192,7 +192,7 @@ decode_nla_meminfo(struct tcb *const tcp,
 
 	unsigned int count = 0;
 	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
-		    umoven_or_printaddr, print_uint32_array_member, &count);
+		    tfetch_mem, print_uint32_array_member, &count);
 
 	return true;
 }

@@ -76,7 +76,7 @@ print_kexec_segments(struct tcb *const tcp, const kernel_ulong_t addr,
 	const size_t sizeof_seg = ARRAY_SIZE(seg) * current_wordsize;
 
 	print_array(tcp, addr, len, seg, sizeof_seg,
-		    umoven_or_printaddr, print_seg, 0);
+		    tfetch_mem, print_seg, 0);
 }
 
 SYS_FUNC(kexec_load)

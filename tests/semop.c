@@ -64,7 +64,7 @@ main(void)
 	sem_b2->sem_flg = 0xbeef;
 
 	rc = semop(bogus_semid, sem_b2, 2);
-	printf("semop(%d, [{%hu, %hd, %s%s%#hx}, %p], %u) = %s\n",
+	printf("semop(%d, [{%hu, %hd, %s%s%#hx}, ... /* %p */], %u) = %s\n",
 		bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 		sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
 		sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
@@ -91,7 +91,7 @@ main(void)
 	ts->tv_sec = 1;
 	ts->tv_nsec = 123456789;
 	rc = semtimedop(bogus_semid, sem_b2, 2, ts);
-	printf("semtimedop(%d, [{%hu, %hd, %s%s%#hx}, %p], %u"
+	printf("semtimedop(%d, [{%hu, %hd, %s%s%#hx}, ... /* %p */], %u"
 		", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
 		bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 		sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",

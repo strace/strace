@@ -99,7 +99,7 @@ main(void)
 	tprintf("pwritev(1, [], 0, 0) = 0\n");
 
 	rc = pwritev(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
-	tprintf("pwritev(1, [{iov_base=\"%s\", iov_len=%u}, %p], 2, 0)"
+	tprintf("pwritev(1, [{iov_base=\"%s\", iov_len=%u}, ... /* %p */], 2, 0)"
 		" = %ld %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
 		rc, errno2name());

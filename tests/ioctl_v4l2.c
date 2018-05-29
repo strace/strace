@@ -898,7 +898,7 @@ main(void)
 	       ", {ctrl_class=V4L2_CTRL_CLASS_MPEG, count=%u, controls="
 	       "[{id=V4L2_CID_BRIGHTNESS, size=0, value=%d, value64=%lld}"
 	       ", {id=V4L2_CID_CONTRAST, size=2, string=\"\\377\\377\"}"
-	       ", %p]}) = -1 EBADF (%m)\n",
+	       ", ... /* %p */]}) = -1 EBADF (%m)\n",
 	       p_ext_controls->count,
 	       p_ext_controls->controls[0].value,
 	       (long long) p_ext_controls->controls[0].value64,

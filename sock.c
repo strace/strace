@@ -310,7 +310,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 		print_array(tcp, ptr_to_kulong(ifc->ifc_buf),
 			    ifc->ifc_len / sizeof(struct_ifreq),
 			    &ifr, sizeof(ifr),
-			    umoven_or_printaddr, print_ifconf_ifreq, NULL);
+			    tfetch_mem, print_ifconf_ifreq, NULL);
 	}
 
 	tprints("}");

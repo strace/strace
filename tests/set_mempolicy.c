@@ -76,7 +76,7 @@ print_nodes(const unsigned long maxnode, unsigned int offset)
 				printf("%#0*lx", (int) sizeof(long) * 2 + 2,
 				       nodemask[i]);
 			} else {
-				printf("%p", nodemask + i);
+				printf("... /* %p */", nodemask + i);
 				break;
 			}
 		}

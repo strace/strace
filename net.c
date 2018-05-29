@@ -739,7 +739,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			uint32_t buf;
 			print_array(tcp, addr, MIN(ulen, rlen) / sizeof(buf),
 				    &buf, sizeof(buf),
-				    umoven_or_printaddr, print_uint32, 0);
+				    tfetch_mem, print_uint32, 0);
 			break;
 			}
 		default:

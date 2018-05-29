@@ -237,7 +237,7 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	tprints(", deps=");
 	print_array(tcp, addr + offset_end, s.count, &dev_buf, sizeof(dev_buf),
-		    umoven_or_printaddr, dm_print_dev, NULL);
+		    tfetch_mem, dm_print_dev, NULL);
 
 	tprints("}");
 

@@ -64,7 +64,7 @@ tprint_sembuf_array(struct tcb *const tcp, const kernel_ulong_t addr,
 #if defined HAVE_SYS_SEM_H || defined HAVE_LINUX_SEM_H
 	struct sembuf sb;
 	print_array(tcp, addr, count, &sb, sizeof(sb),
-		    umoven_or_printaddr, print_sembuf, 0);
+		    tfetch_mem, print_sembuf, 0);
 #else
 	printaddr(addr);
 #endif

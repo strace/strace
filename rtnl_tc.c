@@ -259,7 +259,7 @@ decode_tca_stab_data(struct tcb *const tcp,
 		return false;
 
 	print_array(tcp, addr, nmemb, &data, sizeof(data),
-		    umoven_or_printaddr, print_stab_data, NULL);
+		    tfetch_mem, print_stab_data, NULL);
 
 	return true;
 }
