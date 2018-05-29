@@ -236,12 +236,6 @@ printaddr64(const uint64_t addr)
 		tprintf("%#" PRIx64, addr);
 }
 
-void
-printaddr(const kernel_ulong_t addr)
-{
-	printaddr64(addr);
-}
-
 #define DEF_PRINTNUM(name, type) \
 bool									\
 printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\

@@ -600,7 +600,12 @@ extern int printllval(struct tcb *, const char *, int)
 	ATTRIBUTE_FORMAT((printf, 2, 0));
 
 extern void printaddr64(uint64_t addr);
-extern void printaddr(kernel_ulong_t addr);
+
+static inline void
+printaddr(const kernel_ulong_t addr)
+{
+	printaddr64(addr);
+}
 
 #define XLAT_STYLE_VERBOSITY_MASK (XLAT_STYLE_RAW | XLAT_STYLE_ABBREV)
 #define XLAT_STYLE_FORMAT_SHIFT   2
