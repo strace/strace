@@ -418,9 +418,13 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 				uint64_t addr = buf_addr + off;
 				if (i)
 					tprints(", ");
-				if (i > max_strlen ||
-				    umove(tcp, addr, &sh)) {
+				if (i > max_strlen) {
 					tprints("...");
+					break;
+				}
+				if (umove(tcp, addr, &sh)) {
+					tprints("...");
+					printaddr_comment(addr);
 					break;
 				}
 				PRINT_FIELD_U("{", sh, transid);

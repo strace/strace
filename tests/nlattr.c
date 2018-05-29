@@ -172,7 +172,7 @@ test_nlattr(const int fd)
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
 	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
 	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}, %p]}, %u"
+	       ", nla_type=UNIX_DIAG_NAME}, ... /* %p */]}, %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, NLA_HDRLEN, nla + 1, msg_len, sprintrc(rc));
 

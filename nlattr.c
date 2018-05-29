@@ -38,17 +38,25 @@
 
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
-	     const kernel_ulong_t addr, const unsigned int len)
+	     const kernel_ulong_t addr, const unsigned int len,
+	     const bool in_array)
 {
 	if (len < sizeof(struct nlattr)) {
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return false;
 	}
 
-	if (umove_or_printaddr(tcp, addr, nlattr))
-		return false;
+	if (tfetch_obj(tcp, addr, nlattr))
+		return true;
 
-	return true;
+	if (in_array) {
+		tprints("...");
+		printaddr_comment(addr);
+	} else {
+		printaddr(addr);
+	}
+
+	return false;
 }
 
 static void
@@ -118,7 +126,7 @@ decode_nlattr(struct tcb *const tcp,
 	bool is_array = false;
 	unsigned int elt;
 
-	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len); elt++) {
+	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len, is_array); elt++) {
 		if (abbrev(tcp) && elt == max_strlen) {
 			tprints("...");
 			break;

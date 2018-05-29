@@ -132,7 +132,7 @@ test_scm_rights1(struct msghdr *const mh,
 		print_fds(cmsg, src_len);
 		printf("}");
 		if (aligned_cms_len < msg_controllen)
-			printf(", %p", (void *) cmsg + aligned_cms_len);
+			printf(", ... /* %p */", (void *) cmsg + aligned_cms_len);
 		printf("]");
 	}
 
@@ -195,7 +195,7 @@ test_scm_rights2(struct msghdr *const mh,
 	print_fds(cmsg[1], src1_len);
 	printf("}");
 	if (aligned_cms_len[1] < msg_controllen1)
-		printf(", %p", (void *) cmsg[1] + aligned_cms_len[1]);
+		printf(", ... /* %p */", (void *) cmsg[1] + aligned_cms_len[1]);
 	printf("]");
 
 	errno = saved_errno;
@@ -425,7 +425,7 @@ test_scm_security(struct msghdr *const mh,
 	print_security(cmsg, src_len);
 	printf("}");
 	if (aligned_cms_len < msg_controllen)
-		printf(", %p", (void *) cmsg + aligned_cms_len);
+		printf(", ... /* %p */", (void *) cmsg + aligned_cms_len);
 	printf("]");
 
 	errno = saved_errno;

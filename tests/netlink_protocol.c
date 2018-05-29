@@ -145,7 +145,7 @@ send_query(const int fd)
 	rc = sendto(fd, efault2, sizeof(*reqs), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, [{{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
 	       ", seq=0, pid=0}, \"\\x61\\x62\\x63\\x64\"}"
-	       ", %p], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       ", ... /* %p */], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, reqs->req1.nlh.nlmsg_len, NLM_F_DUMP,
 	       &((struct reqs *) efault2)->req2, (unsigned) sizeof(*reqs),
 	       sprintrc(rc));

@@ -64,17 +64,25 @@
  */
 static bool
 fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
-	       const kernel_ulong_t addr, const kernel_ulong_t len)
+	       const kernel_ulong_t addr, const kernel_ulong_t len,
+	       const bool in_array)
 {
 	if (len < sizeof(struct nlmsghdr)) {
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return false;
 	}
 
-	if (umove_or_printaddr(tcp, addr, nlmsghdr))
-		return false;
+	if (tfetch_obj(tcp, addr, nlmsghdr))
+		return true;
 
-	return true;
+	if (in_array) {
+		tprints("...");
+		printaddr_comment(addr);
+	} else {
+		printaddr(addr);
+	}
+
+	return false;
 }
 
 static int
@@ -522,7 +530,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 
 	if (len) {
 		tprints(", msg=");
-		if (fetch_nlmsghdr(tcp, &err.msg, addr, len)) {
+		if (fetch_nlmsghdr(tcp, &err.msg, addr, len, false)) {
 			unsigned int payload =
 				capped ? sizeof(err.msg) : err.msg.nlmsg_len;
 			if (payload > len)
@@ -639,7 +647,8 @@ decode_netlink(struct tcb *const tcp,
 	bool is_array = false;
 	unsigned int elt;
 
-	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len); elt++) {
+	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
+	     elt++) {
 		if (abbrev(tcp) && elt == max_strlen) {
 			tprints("...");
 			break;

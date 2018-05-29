@@ -350,8 +350,8 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 		buf_len -= len;
 	}
 	if (buf_len) {
-		tprints(", ");
-		printaddr(addr + (control_len - buf_len));
+		tprints(", ...");
+		printaddr_comment(addr + (control_len - buf_len));
 	} else if (control_len < in_control_len) {
 		tprints(", ...");
 	}

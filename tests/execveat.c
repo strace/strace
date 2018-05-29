@@ -64,17 +64,18 @@ main(void)
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\""
-	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ???]"
+	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
 #if VERBOSE
-	       ", [\"%s\", \"%s\", %p, %p, %p, ???]"
+	       ", [\"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
 #else
 	       ", %p /* 5 vars, unterminated */"
 #endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
-	       argv[3], argv[4], argv[5],
+	       argv[3], argv[4], argv[5], (char *) tail_argv + sizeof(argv),
 #if VERBOSE
 	       q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
+	       (char *) tail_envp + sizeof(envp),
 #else
 	       tail_envp,
 #endif
