@@ -1058,6 +1058,12 @@ extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2
 extern void tprints_comment(const char *str);
 
 static inline void
+printaddr_comment(const kernel_ulong_t addr)
+{
+	tprintf_comment("%#llx", (unsigned long long) addr);
+}
+
+static inline void
 print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
 {
 	tprints(prefix);
