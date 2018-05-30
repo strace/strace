@@ -636,45 +636,8 @@ printaddr(const kernel_ulong_t addr)
 	printaddr64(addr);
 }
 
-#define XLAT_STYLE_VERBOSITY_MASK (XLAT_STYLE_RAW | XLAT_STYLE_ABBREV)
-#define XLAT_STYLE_FORMAT_SHIFT   2
-#define XLAT_STYLE_FORMAT_MASK    (3 << XLAT_STYLE_FORMAT_SHIFT)
-
-#define XLAT_STYLE_SPEC_BITS (XLAT_STYLE_FORMAT_SHIFT + 2)
-#define XLAT_STYLE_MASK ((1 << XLAT_STYLE_SPEC_BITS) - 1)
-
 #define xlat_verbose(style_) ((style_) & XLAT_STYLE_VERBOSITY_MASK)
 #define xlat_format(style_)  ((style_) & XLAT_STYLE_FORMAT_MASK)
-
-enum xlat_type {
-	XT_NORMAL,
-	XT_SORTED,
-	XT_INDEXED,
-};
-
-enum xlat_style {
-	/**
-	 * Special value that is used for passing to *print{xval,flags}*_ex
-	 * routines that indicates that no overriding of user-supplied xlat
-	 * verbosity/formatting configuration is intended.
-	 */
-	XLAT_STYLE_DEFAULT = 0,
-
-	/** Print xlat value as is without xlat processing */
-	XLAT_STYLE_RAW     = 1 << 0,
-	/**
-	 * Historic strace style, process xlat and print the result (xlat
-	 * constant name/combination of flags), raw number only if nothing is
-	 * found.
-	 */
-	XLAT_STYLE_ABBREV  = 1 << 1,
-	/** Always print both raw number and xlat processing result. */
-	XLAT_STYLE_VERBOSE = XLAT_STYLE_RAW | XLAT_STYLE_ABBREV,
-
-	XLAT_STYLE_FMT_X   = 0 << XLAT_STYLE_FORMAT_SHIFT,
-	XLAT_STYLE_FMT_U   = 1 << XLAT_STYLE_FORMAT_SHIFT,
-	XLAT_STYLE_FMT_D   = 2 << XLAT_STYLE_FORMAT_SHIFT,
-};
 
 extern enum xlat_style xlat_verbosity;
 
