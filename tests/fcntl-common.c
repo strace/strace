@@ -70,6 +70,11 @@ test_flock_einval(const int cmd, const char *name)
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
 	       (intmax_t) fl->l_start, (intmax_t) fl->l_len, errstr);
+
+	void *const bad_addr = (void *) fl + 1;
+	invoke_test_syscall(0, cmd, bad_addr);
+	printf("%s(0, %s, %p) = %s\n",
+	       TEST_SYSCALL_STR, name, bad_addr, errstr);
 }
 
 /*
@@ -89,6 +94,11 @@ test_flock64_einval(const int cmd, const char *name)
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
 	       (intmax_t) fl->l_start, (intmax_t) fl->l_len, errstr);
+
+	void *const bad_addr = (void *) fl + 1;
+	invoke_test_syscall(0, cmd, bad_addr);
+	printf("%s(0, %s, %p) = %s\n",
+	       TEST_SYSCALL_STR, name, bad_addr, errstr);
 }
 
 static void
