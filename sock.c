@@ -156,8 +156,10 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		uint8_t sz = (proto < ARRAY_SIZE(hwaddr_sizes))
 				? hwaddr_sizes[proto] : 255;
 
-		PRINT_FIELD_XVAL("ifr_hwaddr={", ifr->ifr_hwaddr, sa_family,
-				 arp_hardware_types, "ARPHRD_???");
+		PRINT_FIELD_XVAL_SORTED_SIZED("ifr_hwaddr={", ifr->ifr_hwaddr,
+					      sa_family, arp_hardware_types,
+					      arp_hardware_types_size,
+					      "ARPHRD_???");
 		PRINT_FIELD_MAC_SZ(", ", ifr->ifr_hwaddr, sa_data,
 				   MIN(sizeof(ifr->ifr_hwaddr.sa_data), sz));
 		tprints("}");
