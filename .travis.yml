@@ -52,15 +52,15 @@ matrix:
       env:
         - TARGET=x86
         - STACKTRACE=no
-    - compiler: gcc-7
+    - compiler: gcc-8
       env:
         - TARGET=x86_64
         - STACKTRACE=libunwind
-    - compiler: gcc-7
+    - compiler: gcc-8
       env:
         - TARGET=x32
         - STACKTRACE=no
-    - compiler: gcc-7
+    - compiler: gcc-8
       env:
         - TARGET=x86
         - STACKTRACE=no
