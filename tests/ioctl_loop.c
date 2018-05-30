@@ -34,8 +34,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/sysmacros.h>
+#include <asm/unistd.h>
 #include <linux/ioctl.h>
 #include <linux/loop.h>
 #include "print_fields.h"
@@ -44,6 +46,12 @@
 #ifndef ABBREV
 # define ABBREV 0
 #endif
+
+static long
+sys_ioctl(kernel_long_t fd, kernel_ulong_t cmd, kernel_ulong_t arg)
+{
+	return syscall(__NR_ioctl, fd, cmd, arg);
+}
 
 static void
 print_loop_info(struct loop_info * const info, bool print_encrypt,
@@ -178,7 +186,7 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info64, info64);
 
 	/* Unknown loop commands */
-	ioctl(-1, unknown_loop_cmd, magic);
+	sys_ioctl(-1, unknown_loop_cmd, magic);
 	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x4c, %#x, %#x), "
 	       "%#lx) = -1 EBADF (%m)\n",
 	       _IOC_DIR((unsigned int) unknown_loop_cmd) & _IOC_NONE ?
@@ -187,14 +195,14 @@ main(void)
 	       _IOC_SIZE((unsigned int) unknown_loop_cmd),
 	       (unsigned long) magic);
 
-	ioctl(-1, LOOP_SET_BLOCK_SIZE + 1, magic);
+	sys_ioctl(-1, LOOP_SET_BLOCK_SIZE + 1, magic);
 	printf("ioctl(-1, _IOC(0, 0x4c, %#x, %#x), %#lx) = "
 	       "-1 EBADF (%m)\n",
 	       _IOC_NR(LOOP_SET_BLOCK_SIZE + 1),
 	       _IOC_SIZE(LOOP_SET_BLOCK_SIZE + 1),
 	       (unsigned long) magic);
 
-	ioctl(-1, LOOP_CTL_GET_FREE + 1, magic);
+	sys_ioctl(-1, LOOP_CTL_GET_FREE + 1, magic);
 	printf("ioctl(-1, _IOC(0, 0x4c, %#x, %#x), %#lx) = "
 	       "-1 EBADF (%m)\n",
 	       _IOC_NR(LOOP_CTL_GET_FREE + 1),
@@ -202,7 +210,7 @@ main(void)
 	       (unsigned long) magic);
 
 	/* LOOP_SET_FD */
-	ioctl(-1, LOOP_SET_FD, magic);
+	sys_ioctl(-1, LOOP_SET_FD, magic);
 	printf("ioctl(-1, LOOP_SET_FD, %d) = -1 EBADF (%m)\n",
 	       (unsigned int) magic);
 
@@ -289,7 +297,7 @@ main(void)
 	printf("ioctl(-1, LOOP_GET_STATUS64, %p) = -1 EBADF (%m)\n", info64);
 
 	/* LOOP_CHANGE_FD */
-	ioctl(-1, LOOP_CHANGE_FD, magic);
+	sys_ioctl(-1, LOOP_CHANGE_FD, magic);
 	printf("ioctl(-1, LOOP_CHANGE_FD, %d) = -1 EBADF (%m)\n",
 	       (unsigned int) magic);
 
@@ -298,22 +306,22 @@ main(void)
 	printf("ioctl(-1, LOOP_SET_CAPACITY) = -1 EBADF (%m)\n");
 
 	/* LOOP_SET_DIRECT_IO */
-	ioctl(-1, LOOP_SET_DIRECT_IO, magic);
+	sys_ioctl(-1, LOOP_SET_DIRECT_IO, magic);
 	printf("ioctl(-1, LOOP_SET_DIRECT_IO, %lu) = -1 EBADF (%m)\n",
 	       (unsigned long) magic);
 
 	/* LOOP_SET_BLOCK_SIZE */
-	ioctl(-1, LOOP_SET_BLOCK_SIZE, magic);
+	sys_ioctl(-1, LOOP_SET_BLOCK_SIZE, magic);
 	printf("ioctl(-1, LOOP_SET_BLOCK_SIZE, %lu) = -1 EBADF (%m)\n",
 	       (unsigned long) magic);
 
 	/* LOOP_CTL_ADD */
-	ioctl(-1, LOOP_CTL_ADD, magic);
+	sys_ioctl(-1, LOOP_CTL_ADD, magic);
 	printf("ioctl(-1, LOOP_CTL_ADD, %d) = -1 EBADF (%m)\n",
 	       (unsigned int) magic);
 
 	/* LOOP_CTL_REMOVE */
-	ioctl(-1, LOOP_CTL_REMOVE, magic);
+	sys_ioctl(-1, LOOP_CTL_REMOVE, magic);
 	printf("ioctl(-1, LOOP_CTL_REMOVE, %d) = -1 EBADF (%m)\n",
 	       (unsigned int) magic);
 

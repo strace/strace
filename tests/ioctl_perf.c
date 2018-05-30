@@ -34,7 +34,9 @@
 # include <inttypes.h>
 # include <stdio.h>
 # include <string.h>
+# include <unistd.h>
 # include <sys/ioctl.h>
+# include <asm/unistd.h>
 # include <linux/perf_event.h>
 
 /*
@@ -50,6 +52,12 @@
 # undef XLAT_MACROS_ONLY
 
 # define STR16 "0123456789abcdef"
+
+static long
+sys_ioctl(kernel_long_t fd, kernel_ulong_t cmd, kernel_ulong_t arg)
+{
+	return syscall(__NR_ioctl, fd, cmd, arg);
+}
 
 int
 main(void)
@@ -82,7 +90,7 @@ main(void)
 	fill_memory_ex(pea_ptr, sizeof(*pea_ptr), 0xaa, 0x55);
 
 	/* Unknown perf commands */
-	ioctl(-1, unknown_perf_cmd, magic);
+	sys_ioctl(-1, unknown_perf_cmd, magic);
 	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x24, %#x, %#x), "
 	       "%#lx) = -1 EBADF (%m)\n",
 	       _IOC_DIR((unsigned int) unknown_perf_cmd) & _IOC_NONE ?
@@ -91,7 +99,7 @@ main(void)
 	       _IOC_SIZE((unsigned int) unknown_perf_cmd),
 	       (unsigned long) magic);
 
-	ioctl(-1, PERF_EVENT_IOC_MODIFY_ATTRIBUTES + 1, magic);
+	sys_ioctl(-1, PERF_EVENT_IOC_MODIFY_ATTRIBUTES + 1, magic);
 	printf("ioctl(-1, _IOC(_IOC_WRITE, 0x24, %#x, %#x), %#lx)"
 	       " = -1 EBADF (%m)\n",
 	       (unsigned int) _IOC_NR(PERF_EVENT_IOC_MODIFY_ATTRIBUTES + 1),
@@ -112,14 +120,14 @@ main(void)
 		       "= -1 EBADF (%m)\n",
 		       flag_iocs[i].str);
 
-		ioctl(-1, flag_iocs[i].cmd, magic);
+		sys_ioctl(-1, flag_iocs[i].cmd, magic);
 		printf("ioctl(-1, %s, PERF_IOC_FLAG_GROUP|%#x) "
 		       "= -1 EBADF (%m)\n",
 		       flag_iocs[i].str, (unsigned int) magic & ~1U);
 	}
 
 	/* PERF_EVENT_IOC_REFRESH */
-	ioctl(-1, PERF_EVENT_IOC_REFRESH, magic);
+	sys_ioctl(-1, PERF_EVENT_IOC_REFRESH, magic);
 	printf("ioctl(-1, PERF_EVENT_IOC_REFRESH, %d) = -1 EBADF (%m)\n",
 	       (int) magic);
 
@@ -137,7 +145,7 @@ main(void)
 	       magic64);
 
 	/* PERF_EVENT_IOC_SET_OUTPUT */
-	ioctl(-1, PERF_EVENT_IOC_SET_OUTPUT, magic);
+	sys_ioctl(-1, PERF_EVENT_IOC_SET_OUTPUT, magic);
 	printf("ioctl(-1, PERF_EVENT_IOC_SET_OUTPUT, %d) = -1 EBADF (%m)\n",
 	       (int) magic);
 
@@ -178,12 +186,12 @@ main(void)
 	       u64_ptr);
 
 	/* PERF_EVENT_IOC_SET_BPF */
-	ioctl(-1, PERF_EVENT_IOC_SET_BPF, magic);
+	sys_ioctl(-1, PERF_EVENT_IOC_SET_BPF, magic);
 	printf("ioctl(-1, PERF_EVENT_IOC_SET_BPF, %d) = -1 EBADF (%m)\n",
 	       (int) magic);
 
 	/* PERF_EVENT_IOC_PAUSE_OUTPUT */
-	ioctl(-1, PERF_EVENT_IOC_PAUSE_OUTPUT, magic);
+	sys_ioctl(-1, PERF_EVENT_IOC_PAUSE_OUTPUT, magic);
 	printf("ioctl(-1, PERF_EVENT_IOC_PAUSE_OUTPUT, %lu) = -1 EBADF (%m)\n",
 	       (unsigned long) magic);
 

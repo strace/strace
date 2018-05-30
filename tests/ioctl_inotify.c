@@ -32,15 +32,19 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <unistd.h>
+#include <asm/unistd.h>
 #include <linux/ioctl.h>
-
-#include <sys/ioctl.h>
-#include <sys/sysmacros.h>
 
 #ifndef INOTIFY_IOC_SETNEXTWD
 # define INOTIFY_IOC_SETNEXTWD  _IOW('I', 0, int32_t)
 #endif
+
+static long
+sys_ioctl(kernel_long_t fd, kernel_ulong_t cmd, kernel_ulong_t arg)
+{
+	return syscall(__NR_ioctl, fd, cmd, arg);
+}
 
 int
 main(void)
@@ -51,7 +55,7 @@ main(void)
 		(kernel_ulong_t) 0xdeadbeefbadc0dedULL;
 
 	/* Unknown inotify commands */
-	ioctl(-1, unknown_inotify_cmd, magic);
+	sys_ioctl(-1, unknown_inotify_cmd, magic);
 	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x49, %#x, %#x), "
 	       "%#lx) = -1 EBADF (%m)\n",
 	       _IOC_DIR((unsigned int) unknown_inotify_cmd) & _IOC_NONE ?
@@ -60,7 +64,7 @@ main(void)
 	       _IOC_SIZE((unsigned int) unknown_inotify_cmd),
 	       (unsigned long) magic);
 
-	ioctl(-1, INOTIFY_IOC_SETNEXTWD + 1, magic);
+	sys_ioctl(-1, INOTIFY_IOC_SETNEXTWD + 1, magic);
 	printf("ioctl(-1, _IOC(_IOC_WRITE, 0x49, %#x, %#x), %#lx)"
 	       " = -1 EBADF (%m)\n",
 	       (unsigned int) _IOC_NR(INOTIFY_IOC_SETNEXTWD + 1),
@@ -68,7 +72,7 @@ main(void)
 	       (unsigned long) magic);
 
 	/* INOTIFY_IOC_SETNEXTWD */
-	ioctl(-1, INOTIFY_IOC_SETNEXTWD, magic);
+	sys_ioctl(-1, INOTIFY_IOC_SETNEXTWD, magic);
 	printf("ioctl(-1, INOTIFY_IOC_SETNEXTWD, %d) = -1 EBADF (%m)\n",
 	       (int) magic);
 
