@@ -60,15 +60,16 @@ invoke_test_syscall(const unsigned int fd, const unsigned int cmd, void *const p
 static void
 test_flock_einval(const int cmd, const char *name)
 {
-	struct_kernel_flock fl = {
-		.l_type = F_RDLCK,
-		.l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeedULL,
-		.l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00dULL
-	};
-	invoke_test_syscall(0, cmd, &fl);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_kernel_flock, fl);
+	memset(fl, 0, sizeof(*fl));
+	fl->l_type = F_RDLCK;
+	fl->l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeedULL;
+	fl->l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00dULL;
+
+	invoke_test_syscall(0, cmd, fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
-	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, errstr);
+	       (intmax_t) fl->l_start, (intmax_t) fl->l_len, errstr);
 }
 
 /*
@@ -78,15 +79,16 @@ test_flock_einval(const int cmd, const char *name)
 void
 test_flock64_einval(const int cmd, const char *name)
 {
-	struct_kernel_flock64 fl = {
-		.l_type = F_RDLCK,
-		.l_start = 0xdefaced1facefeedULL,
-		.l_len = 0xdefaced2cafef00dULL
-	};
-	invoke_test_syscall(0, cmd, &fl);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_kernel_flock64, fl);
+	memset(fl, 0, sizeof(*fl));
+	fl->l_type = F_RDLCK;
+	fl->l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeedULL;
+	fl->l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00dULL;
+
+	invoke_test_syscall(0, cmd, fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
-	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, errstr);
+	       (intmax_t) fl->l_start, (intmax_t) fl->l_len, errstr);
 }
 
 static void
@@ -95,24 +97,25 @@ test_flock(void)
 	TEST_FLOCK_EINVAL(F_SETLK);
 	TEST_FLOCK_EINVAL(F_SETLKW);
 
-	struct_kernel_flock fl = {
-		.l_type = F_RDLCK,
-		.l_len = FILE_LEN
-	};
-	long rc = invoke_test_syscall(0, F_SETLK, &fl);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_kernel_flock, fl);
+	memset(fl, 0, sizeof(*fl));
+	fl->l_type = F_RDLCK;
+	fl->l_len = FILE_LEN;
+
+	long rc = invoke_test_syscall(0, F_SETLK, fl);
 	printf("%s(0, F_SETLK, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = %s\n",
 	       TEST_SYSCALL_STR, FILE_LEN, errstr);
 	if (rc)
 		return;
 
-	invoke_test_syscall(0, F_GETLK, &fl);
+	invoke_test_syscall(0, F_GETLK, fl);
 	printf("%s(0, F_GETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d, l_pid=0}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 
-	invoke_test_syscall(0, F_SETLK, &fl);
-	printf("%s(0, F_SETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
+	invoke_test_syscall(0, F_SETLKW, fl);
+	printf("%s(0, F_SETLKW, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 }
