@@ -286,7 +286,9 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		break;
 	PRINT_FIELD_U(", ", attr, log_level);
 	PRINT_FIELD_U(", ", attr, log_size);
-	PRINT_FIELD_ADDR64(", ", attr, log_buf);
+	tprintf(", log_buf=");
+	print_big_u64_addr(attr.log_buf);
+	printstr_ex(tcp, attr.log_buf, attr.log_size, QUOTE_0_TERMINATED);
 
 	/* kern_version field was added in Linux commit v4.1-rc1~84^2~50.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, kern_version))

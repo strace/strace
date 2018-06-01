@@ -501,8 +501,28 @@ static const struct bpf_insn insns[] = {
 	},
 };
 static const char license[] = "GPL";
-static char log_buf[4096];
 static const char pathname[] = "/sys/fs/bpf/foo/bar";
+
+static char *log_buf;
+/*
+ * This has to be a macro, otherwise the compiler complains that
+ * initializer element is not constant.
+ */
+#define log_buf_size 4096U
+
+static inline char *
+get_log_buf(void)
+{
+	if (!log_buf)
+		log_buf = tail_alloc(log_buf_size);
+	return log_buf;
+}
+
+static inline char *
+get_log_buf_tail(void)
+{
+	return get_log_buf() + log_buf_size;
+}
 
 #if VERBOSE
 # define INSNS_FMT \
@@ -518,9 +538,10 @@ static void
 init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check)
 {
 	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
+
 	attr->insns = (uintptr_t) insns;
 	attr->license = (uintptr_t) license;
-	attr->log_buf = (uintptr_t) log_buf;
+	attr->log_buf = (uintptr_t) get_log_buf_tail();
 }
 
 static void
@@ -528,34 +549,39 @@ print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check, unsigned long addr
 {
 	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u"
 	       ", insns=" INSNS_FMT ", license=\"%s\", log_level=2718281828"
-	       ", log_size=4096, log_buf=%p"
+	       ", log_size=%u, log_buf=%p"
 	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
 	       ", prog_flags=0x2 /* BPF_F_??? */"
 	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=3203399405",
-	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG, license, log_buf);
+	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG, license,
+	       log_buf_size, get_log_buf_tail());
 }
 
 static void
 init_BPF_PROG_LOAD_attr4(struct bpf_attr_check *check)
 {
 	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
+
 	attr->insns = (uintptr_t) insns;
 	attr->license = (uintptr_t) license;
-	attr->log_buf = (uintptr_t) log_buf;
+	attr->log_buf = (uintptr_t) get_log_buf();
 	attr->prog_ifindex = ifindex_lo();
+
+	strncpy(log_buf, "log test", 9);
 }
 
 static void
 print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr)
 {
 	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=%u, insns=" INSNS_FMT
-	       ", license=\"%s\", log_level=2718281828, log_size=4096"
-	       ", log_buf=%p, kern_version=KERNEL_VERSION(51966, 240, 13)"
+	       ", license=\"%s\", log_level=2718281828, log_size=4"
+	       ", log_buf=\"log \"..."
+	       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
 	       ", prog_flags=BPF_F_STRICT_ALIGNMENT|0x2"
 	       ", prog_name=\"0123456789abcde\"..., prog_ifindex=%s"
 	       ", expected_attach_type=BPF_CGROUP_INET6_BIND",
 	       (unsigned int) ARRAY_SIZE(insns), INSNS_ARG,
-	       license, log_buf, IFINDEX_LO_STR);
+	       license, IFINDEX_LO_STR);
 }
 
 static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
@@ -591,7 +617,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
 			.log_level = 2718281828U,
-			.log_size = sizeof(log_buf),
+			.log_size = log_buf_size,
 			.log_buf = 0xffffffff00000000,
 			.kern_version = 0xcafef00d,
 			.prog_flags = 1,
@@ -603,7 +629,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", log_level=2718281828, log_size=4096"
-		       ", log_buf=0xffffffff00000000"
+		       ", log_buf=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
 		       ", prog_flags=BPF_F_STRICT_ALIGNMENT"
 		       ", prog_name=\"fedcba987654321\"",
@@ -613,7 +639,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_type = 1,
 			.insn_cnt = ARRAY_SIZE(insns),
 			.log_level = 2718281828U,
-			.log_size = sizeof(log_buf),
+			.log_size = log_buf_size,
 			.kern_version = 0xcafef00d,
 			.prog_flags = 2,
 			.prog_name = "0123456789abcdef",
@@ -628,7 +654,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_type = 0,
 			.insn_cnt = ARRAY_SIZE(insns),
 			.log_level = 2718281828U,
-			.log_size = sizeof(log_buf),
+			.log_size = 4,
 			.kern_version = 0xcafef00d,
 			.prog_flags = 3,
 			.prog_name = "0123456789abcdef",
