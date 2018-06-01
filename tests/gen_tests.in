@@ -37,6 +37,10 @@ aio	-a14 -e trace=io_setup,io_submit,io_getevents,io_cancel,io_destroy
 alarm	-a10
 bpf	-a20
 bpf-v	-a20 -v -e trace=bpf
+bpf-obj_get_info_by_fd	-a20 -y -e trace=bpf
+bpf-obj_get_info_by_fd-v	-a20 -y -v -e trace=bpf
+bpf-obj_get_info_by_fd-prog	-a20 -y -e trace=bpf
+bpf-obj_get_info_by_fd-prog-v	-a20 -y -v -e trace=bpf
 btrfs	+ioctl.test
 chmod	-a28
 chown	-a28

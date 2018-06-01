@@ -466,7 +466,11 @@ AC_CHECK_HEADERS([linux/input.h], [
 ])
 
 AC_CHECK_HEADERS([linux/bpf.h], [
-	AC_CHECK_TYPES([struct bpf_insn],,, [#include <linux/bpf.h>])
+	AC_CHECK_TYPES(m4_normalize([
+		struct bpf_insn,
+		struct bpf_map_info,
+		struct bpf_prog_info
+	]),,, [#include <linux/bpf.h>])
 	st_BPF_ATTR
 ])
 
