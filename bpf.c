@@ -163,10 +163,10 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 
 static void
 print_ebpf_prog(struct tcb *const tcp, const uint64_t addr,
-		const uint32_t len)
+		const uint32_t len, bool decode)
 {
 	print_big_u64_addr(addr);
-	if (abbrev(tcp)) {
+	if (abbrev(tcp) || !decode) {
 		printaddr(addr);
 	} else {
 		struct ebpf_insns_data eid = {};
@@ -275,7 +275,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 			       "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
 	tprints(", insns=");
-	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt);
+	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt, true);
 
 	tprintf(", license=");
 	print_big_u64_addr(attr.license);
@@ -504,7 +504,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprintf("%" PRIu32, info.xlated_prog_len);
 
 	tprints(", xlated_prog_insns=");
-	print_ebpf_prog(tcp, info.xlated_prog_insns, info.xlated_prog_len / 8);
+	print_ebpf_prog(tcp, info.xlated_prog_insns, info.xlated_prog_len / 8,
+			!!saved->xlated_prog_len);
 
 	PRINT_FIELD_U(", ", info, load_time);
 	PRINT_FIELD_UID(", ", info, created_by_uid);
