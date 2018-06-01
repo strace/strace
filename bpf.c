@@ -459,12 +459,27 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	PRINT_FIELD_U(", ", info, value_size);
 	PRINT_FIELD_U(", ", info, max_entries);
 	PRINT_FIELD_FLAGS(", ", info, map_flags, bpf_map_flags, "BPF_F_???");
+
+	/*
+	 * "name" field was introduced by Linux commit v4.15-rc1~84^2~605^2~3.
+	 */
+	if (len <= offsetof(struct bpf_map_info_struct, name))
+		goto print_bpf_map_info_end;
 	PRINT_FIELD_CSTRING(", ", info, name);
+
+	/*
+	 * ifindex, netns_dev, and netns_ino fields were introduced
+	 * by Linux commit v4.16-rc1~123^2~109^2~5^2~4.
+	 */
+	if (len <= offsetof(struct bpf_map_info_struct, ifindex))
+		goto print_bpf_map_info_end;
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
 	decode_attr_extra_data(tcp, info_buf, size, bpf_map_info_struct_size);
+
+print_bpf_map_info_end:
 	tprints("}");
 }
 
@@ -510,6 +525,12 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	print_ebpf_prog(tcp, info.xlated_prog_insns, info.xlated_prog_len / 8,
 			!!saved->xlated_prog_len);
 
+	/*
+	 * load_time, created_by_uid, nr_map_ids, map_ids, and name fields
+	 * were introduced by Linux commit v4.15-rc1~84^2~605^2~4.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, load_time))
+		goto print_bpf_prog_info_end;
 	PRINT_FIELD_U(", ", info, load_time);
 	PRINT_FIELD_UID(", ", info, created_by_uid);
 
@@ -522,13 +543,23 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	print_big_u64_addr(info.map_ids);
 	print_array(tcp, info.map_ids, info.nr_map_ids,
 		    &map_id_buf, sizeof(map_id_buf),
-		    tfetch_mem, print_uint64_array_member, 0);
+		    tfetch_mem, print_uint32_array_member, 0);
 
+	PRINT_FIELD_CSTRING(", ", info, name);
+
+	/*
+	 * ifindex, netns_dev, and netns_ino fields were introduced
+	 * by Linux commit v4.16-rc1~123^2~227^2~5^2~2.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, ifindex))
+		goto print_bpf_prog_info_end;
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
+
+print_bpf_prog_info_end:
 	tprints("}");
 }
 
