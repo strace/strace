@@ -35,8 +35,6 @@
 # define TEST_SYSCALL_STR "fcntl64"
 # include "fcntl-common.c"
 
-# define TEST_FLOCK64_EINVAL(cmd) test_flock64_einval(cmd, #cmd)
-
 static void
 test_flock64_einval(const int cmd, const char *name)
 {
@@ -82,17 +80,6 @@ test_flock64(void)
 	printf("%s(0, F_SETLK64, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
-}
-
-int
-main(void)
-{
-	create_sample();
-	test_flock();
-	test_flock64();
-
-	puts("+++ exited with 0 +++");
-	return 0;
 }
 
 #else
