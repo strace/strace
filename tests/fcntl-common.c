@@ -44,12 +44,12 @@
 #endif
 
 static long
-invoke_test_syscall(const unsigned int cmd, void *const p)
+invoke_test_syscall(const unsigned int fd, const unsigned int cmd, void *const p)
 {
-	const kernel_ulong_t fd = F8ILL_KULONG_MASK;
+	const kernel_ulong_t kfd = F8ILL_KULONG_MASK | fd;
 	const kernel_ulong_t op = F8ILL_KULONG_MASK | cmd;
 
-	return syscall(TEST_SYSCALL_NR, fd, op, (unsigned long) p);
+	return syscall(TEST_SYSCALL_NR, kfd, op, (uintptr_t) p);
 }
 
 static void
@@ -60,7 +60,7 @@ test_flock_einval(const int cmd, const char *name)
 		.l_start = (TYPEOF_FLOCK_OFF_T) 0xdefaced1facefeedULL,
 		.l_len = (TYPEOF_FLOCK_OFF_T) 0xdefaced2cafef00dULL
 	};
-	long rc = invoke_test_syscall(cmd, &fl);
+	long rc = invoke_test_syscall(0, cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
 	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, sprintrc(rc));
@@ -78,7 +78,7 @@ test_flock64_einval(const int cmd, const char *name)
 		.l_start = 0xdefaced1facefeedULL,
 		.l_len = 0xdefaced2cafef00dULL
 	};
-	long rc = invoke_test_syscall(cmd, &fl);
+	long rc = invoke_test_syscall(0, cmd, &fl);
 	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
 	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, sprintrc(rc));
@@ -94,19 +94,19 @@ test_flock(void)
 		.l_type = F_RDLCK,
 		.l_len = FILE_LEN
 	};
-	long rc = invoke_test_syscall(F_SETLK, &fl);
+	long rc = invoke_test_syscall(0, F_SETLK, &fl);
 	printf("%s(0, F_SETLK, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = %s\n",
 	       TEST_SYSCALL_STR, FILE_LEN, sprintrc(rc));
 	if (rc)
 		return;
 
-	invoke_test_syscall(F_GETLK, &fl);
+	invoke_test_syscall(0, F_GETLK, &fl);
 	printf("%s(0, F_GETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d, l_pid=0}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 
-	invoke_test_syscall(F_SETLK, &fl);
+	invoke_test_syscall(0, F_SETLK, &fl);
 	printf("%s(0, F_SETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
@@ -147,12 +147,12 @@ test_f_owner_ex_type_pid(const int cmd, const char *const cmd_name,
 
 	fo->type = type;
 	fo->pid = pid;
-	long rc = invoke_test_syscall(cmd, fo);
+	long rc = invoke_test_syscall(0, cmd, fo);
 	printf("%s(0, %s, {type=%s, pid=%d}) = %s\n",
 	       TEST_SYSCALL_STR, cmd_name, type_name, fo->pid, sprintrc(rc));
 
 	void *bad_addr = (void *) fo + 1;
-	long rc_efault = invoke_test_syscall(cmd, bad_addr);
+	long rc_efault = invoke_test_syscall(0, cmd, bad_addr);
 	printf("%s(0, %s, %p) = %s\n",
 	       TEST_SYSCALL_STR, cmd_name, bad_addr, sprintrc(rc_efault));
 

@@ -45,7 +45,7 @@ test_flock64_lk64(void)
 		.l_type = F_RDLCK,
 		.l_len = FILE_LEN
 	};
-	long rc = invoke_test_syscall(F_SETLK64, &fl);
+	long rc = invoke_test_syscall(0, F_SETLK64, &fl);
 	printf("%s(0, F_SETLK64, {l_type=F_RDLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = %s\n",
 	       TEST_SYSCALL_STR, FILE_LEN, sprintrc(rc));
@@ -53,12 +53,12 @@ test_flock64_lk64(void)
 	if (rc)
 		return;
 
-	invoke_test_syscall(F_GETLK64, &fl);
+	invoke_test_syscall(0, F_GETLK64, &fl);
 	printf("%s(0, F_GETLK64, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d, l_pid=0}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
 
-	invoke_test_syscall(F_SETLK64, &fl);
+	invoke_test_syscall(0, F_SETLK64, &fl);
 	printf("%s(0, F_SETLK64, {l_type=F_UNLCK, l_whence=SEEK_SET"
 	       ", l_start=0, l_len=%d}) = 0\n",
 	       TEST_SYSCALL_STR, FILE_LEN);
