@@ -423,20 +423,33 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
-typedef bool (*print_bpf_obj_info_fn)(struct tcb *,
+struct obj_get_info_saved;
+typedef void (*print_bpf_obj_info_fn)(struct tcb *,
 				      uint32_t bpf_fd,
 				      const char *info_buf,
-				      uint32_t size);
+				      uint32_t size,
+				      struct obj_get_info_saved *saved);
 
-static bool
+struct obj_get_info_saved {
+	print_bpf_obj_info_fn print_fn;
+
+	uint32_t info_len;
+
+	uint32_t jited_prog_len;
+	uint32_t xlated_prog_len;
+	uint32_t nr_map_ids;
+};
+
+static void
 print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
-		   const char *info_buf, uint32_t size)
+		   const char *info_buf, uint32_t size,
+		   struct obj_get_info_saved *saved)
 {
+	if (entering(tcp))
+		return;
+
 	struct bpf_map_info_struct info = { 0 };
 	const unsigned int len = MIN(size, bpf_map_info_struct_size);
-
-	if (entering(tcp))
-		return false;
 
 	memcpy(&info, info_buf, len);
 
@@ -453,13 +466,12 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	decode_attr_extra_data(tcp, info_buf, size, bpf_map_info_struct_size);
 	tprints("}");
-
-	return true;
 }
 
-static bool
+static void
 print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
-		    const char *info_buf, uint32_t size)
+		    const char *info_buf, uint32_t size,
+		    struct obj_get_info_saved *saved)
 {
 	struct bpf_prog_info_struct info = { 0 };
 	const unsigned int len = MIN(size, bpf_prog_info_struct_size);
@@ -467,24 +479,13 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	memcpy(&info, info_buf, len);
 
-	struct {
-		print_bpf_obj_info_fn print_fn;
-		uint32_t jited_prog_len;
-		uint32_t xlated_prog_len;
-		uint32_t nr_map_ids;
-	} *saved;
-
 	if (entering(tcp)) {
-		saved = xcalloc(1, sizeof(*saved));
-		saved->print_fn = print_bpf_prog_info;
 		saved->jited_prog_len = info.jited_prog_len;
 		saved->xlated_prog_len = info.xlated_prog_len;
 		saved->nr_map_ids = info.nr_map_ids;
 
-		return false;
+		return;
 	}
-
-	saved = get_tcb_priv_data(tcp);
 
 	PRINT_FIELD_XVAL("{", info, type, bpf_prog_types, "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", info, id);
@@ -529,8 +530,6 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 	tprints("}");
-
-	return true;
 }
 
 static const char *
@@ -550,19 +549,21 @@ fetch_bpf_obj_info(struct tcb * const tcp, uint64_t info, uint32_t size)
 	return NULL;
 }
 
-static bool
-print_bpf_obj_info_addr(uint64_t addr)
+static void
+print_bpf_obj_info_addr(struct tcb * const tcp, uint64_t addr)
 {
-	printaddr64(addr);
-	return true;
+	if (exiting(tcp))
+		printaddr64(addr);
 }
 
-static bool
+static void
 print_bpf_obj_info(struct tcb * const tcp, uint32_t bpf_fd, uint64_t info,
-		   uint32_t size)
+		   uint32_t size, struct obj_get_info_saved *saved)
 {
-	if (abbrev(tcp))
-		return print_bpf_obj_info_addr(info);
+	if (abbrev(tcp)) {
+		print_bpf_obj_info_addr(tcp, info);
+		return;
+	}
 
 	static struct {
 		const char *id;
@@ -572,45 +573,56 @@ print_bpf_obj_info(struct tcb * const tcp, uint32_t bpf_fd, uint64_t info,
 		{ "anon_inode:bpf-prog", print_bpf_prog_info }
 	};
 
-	print_bpf_obj_info_fn print_fn = NULL;
-	unsigned long i;
-
-	if (exiting(tcp)) {
-		i = get_tcb_priv_ulong(tcp);
-		print_fn = i < ARRAY_SIZE(obj_printers)
-			   ? obj_printers[i].print_fn
-			   : * (print_bpf_obj_info_fn *) get_tcb_priv_data(tcp);
-	} else {
+	if (entering(tcp)) {
 		char path[PATH_MAX + 1];
 
 		if (getfdpath(tcp, bpf_fd, path, sizeof(path)) > 0) {
-			for (i = 0; i < ARRAY_SIZE(obj_printers); ++i) {
+			for (size_t i = 0; i < ARRAY_SIZE(obj_printers); ++i) {
 				if (!strcmp(path, obj_printers[i].id)) {
-					print_fn = obj_printers[i].print_fn;
+					saved->print_fn =
+						obj_printers[i].print_fn;
 					break;
 				}
 			}
 		}
 	}
 
-	if (!print_fn)
-		return print_bpf_obj_info_addr(info);
+	if (!saved || !saved->print_fn) {
+		print_bpf_obj_info_addr(tcp, info);
+		return;
+	}
 
 	const char *info_buf = fetch_bpf_obj_info(tcp, info, size);
 
-	return info_buf ? print_fn(tcp, bpf_fd, info_buf, size)
-			: print_bpf_obj_info_addr(info);
+	if (info_buf)
+		saved->print_fn(tcp, bpf_fd, info_buf, size, saved);
+	else
+		print_bpf_obj_info_addr(tcp, info);
 }
 
 BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 {
+	struct obj_get_info_saved *saved;
+
 	if (entering(tcp)) {
+		saved = xcalloc(1, sizeof(*saved));
+		saved->info_len = attr.info_len;
+		set_tcb_priv_data(tcp, saved, free);
+
 		PRINT_FIELD_FD("{info={", attr, bpf_fd, tcp);
 		PRINT_FIELD_U(", ", attr, info_len);
+	} else {
+		saved = get_tcb_priv_data(tcp);
+
+		if (saved && (saved->info_len != attr.info_len))
+			tprintf(" => %u", attr.info_len);
+
 		tprintf(", info=");
 	}
 
-	if (!print_bpf_obj_info(tcp, attr.bpf_fd, attr.info, attr.info_len))
+	print_bpf_obj_info(tcp, attr.bpf_fd, attr.info, attr.info_len, saved);
+
+	if (entering(tcp))
 		return 0;
 
 	tprints("}");
