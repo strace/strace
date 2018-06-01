@@ -492,7 +492,8 @@ AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 AC_CHECK_TYPES(m4_normalize([
 	struct rta_mfc_stats,
 	struct rtvia
-]),,, [#include <linux/rtnetlink.h>])
+]),,, [#include <sys/socket.h>
+#include <linux/rtnetlink.h>])
 
 AC_CHECK_MEMBERS([struct ndt_stats.ndts_table_fulls],,, [#include <linux/neighbour.h>])
 AC_CHECK_TYPES(m4_normalize([
@@ -504,11 +505,13 @@ AC_CHECK_TYPES(m4_normalize([
 	struct ifla_bridge_id,
 	struct ifla_port_vsi,
 	struct rtnl_link_stats64
-]),,, [#include <linux/rtnetlink.h>])
+]),,, [#include <sys/socket.h>
+#include <linux/rtnetlink.h>])
 AC_CHECK_MEMBERS(m4_normalize([
 	struct rtnl_link_stats.rx_nohandler,
 	struct rtnl_link_stats64.rx_nohandler
-]),,, [#include <linux/rtnetlink.h>])
+]),,, [#include <sys/socket.h>
+#include <linux/rtnetlink.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct gnet_stats_basic,
