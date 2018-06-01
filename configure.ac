@@ -504,11 +504,11 @@ AC_CHECK_TYPES(m4_normalize([
 	struct ifla_bridge_id,
 	struct ifla_port_vsi,
 	struct rtnl_link_stats64
-]),,, [#include <linux/if_link.h>])
+]),,, [#include <linux/rtnetlink.h>])
 AC_CHECK_MEMBERS(m4_normalize([
 	struct rtnl_link_stats.rx_nohandler,
 	struct rtnl_link_stats64.rx_nohandler
-]),,, [#include <linux/if_link.h>])
+]),,, [#include <linux/rtnetlink.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct gnet_stats_basic,
