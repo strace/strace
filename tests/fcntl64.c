@@ -36,28 +36,10 @@
 # include "fcntl-common.c"
 
 static void
-test_flock64_einval(const int cmd, const char *name)
-{
-	struct_kernel_flock64 fl = {
-		.l_type = F_RDLCK,
-		.l_start = 0xdefaced1facefeedULL,
-		.l_len = 0xdefaced2cafef00dULL
-	};
-	long rc = invoke_test_syscall(cmd, &fl);
-	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
-	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
-	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, sprintrc(rc));
-}
-
-static void
-test_flock64(void)
+test_flock64_lk64(void)
 {
 	TEST_FLOCK64_EINVAL(F_SETLK64);
 	TEST_FLOCK64_EINVAL(F_SETLKW64);
-# ifdef F_OFD_SETLK
-	TEST_FLOCK64_EINVAL(F_OFD_SETLK);
-	TEST_FLOCK64_EINVAL(F_OFD_SETLKW);
-# endif
 
 	struct_kernel_flock64 fl = {
 		.l_type = F_RDLCK,

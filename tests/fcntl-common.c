@@ -66,6 +66,24 @@ test_flock_einval(const int cmd, const char *name)
 	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, sprintrc(rc));
 }
 
+/*
+ * This function is not declared static to avoid potential
+ * "defined but not used" warning when included by fcntl.c
+ */
+void
+test_flock64_einval(const int cmd, const char *name)
+{
+	struct_kernel_flock64 fl = {
+		.l_type = F_RDLCK,
+		.l_start = 0xdefaced1facefeedULL,
+		.l_len = 0xdefaced2cafef00dULL
+	};
+	long rc = invoke_test_syscall(cmd, &fl);
+	printf("%s(0, %s, {l_type=F_RDLCK, l_whence=SEEK_SET"
+	       ", l_start=%jd, l_len=%jd}) = %s\n", TEST_SYSCALL_STR, name,
+	       (intmax_t) fl.l_start, (intmax_t) fl.l_len, sprintrc(rc));
+}
+
 static void
 test_flock(void)
 {
@@ -94,7 +112,18 @@ test_flock(void)
 	       TEST_SYSCALL_STR, FILE_LEN);
 }
 
-static void test_flock64(void);
+static void test_flock64_lk64(void);
+
+static void
+test_flock64(void)
+{
+# ifdef F_OFD_SETLK
+	TEST_FLOCK64_EINVAL(F_OFD_SETLK);
+	TEST_FLOCK64_EINVAL(F_OFD_SETLKW);
+# endif
+
+	test_flock64_lk64();
+}
 
 /*
  * F_[GS]ETOWN_EX had conflicting values with F_[SG]ETLK64
