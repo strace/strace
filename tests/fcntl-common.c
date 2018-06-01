@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "flock.h"
 
@@ -116,16 +117,43 @@ test_flock(void)
 	       TEST_SYSCALL_STR, FILE_LEN);
 }
 
+static void
+test_flock64_ofd(void)
+{
+#if defined F_OFD_GETLK && defined F_OFD_SETLK && defined F_OFD_SETLKW
+	TEST_FLOCK64_EINVAL(F_OFD_SETLK);
+	TEST_FLOCK64_EINVAL(F_OFD_SETLKW);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_kernel_flock64, fl);
+	memset(fl, 0, sizeof(*fl));
+	fl->l_type = F_RDLCK;
+	fl->l_len = FILE_LEN;
+
+	long rc = invoke_test_syscall(0, F_OFD_SETLK, fl);
+	printf("%s(0, F_OFD_SETLK, {l_type=F_RDLCK, l_whence=SEEK_SET"
+	       ", l_start=0, l_len=%d}) = %s\n",
+	       TEST_SYSCALL_STR, FILE_LEN, errstr);
+	if (rc)
+		return;
+
+	invoke_test_syscall(0, F_OFD_GETLK, fl);
+	printf("%s(0, F_OFD_GETLK, {l_type=F_UNLCK, l_whence=SEEK_SET"
+	       ", l_start=0, l_len=%d, l_pid=0}) = 0\n",
+	       TEST_SYSCALL_STR, FILE_LEN);
+
+	invoke_test_syscall(0, F_OFD_SETLKW, fl);
+	printf("%s(0, F_OFD_SETLKW, {l_type=F_UNLCK, l_whence=SEEK_SET"
+	       ", l_start=0, l_len=%d}) = 0\n",
+	       TEST_SYSCALL_STR, FILE_LEN);
+#endif /* F_OFD_GETLK && F_OFD_SETLK && F_OFD_SETLKW */
+}
+
 static void test_flock64_lk64(void);
 
 static void
 test_flock64(void)
 {
-# ifdef F_OFD_SETLK
-	TEST_FLOCK64_EINVAL(F_OFD_SETLK);
-	TEST_FLOCK64_EINVAL(F_OFD_SETLKW);
-# endif
-
+	test_flock64_ofd();
 	test_flock64_lk64();
 }
 
