@@ -28,6 +28,17 @@
 #ifndef STRACE_BPF_ATTR_H
 #define STRACE_BPF_ATTR_H
 
+/*
+ * The policy is that all fields of type uint64_t in this header file
+ * must have ATTRIBUTE_ALIGNED(8).
+ *
+ * This should not cause any contradictions with <linux/bpf.h>
+ * unless the latter is buggy.
+ *
+ * By word "buggy" I mean containing such changes as Linux kernel commit
+ * v4.16-rc1~123^2~109^2~5^2~4.
+ */
+
 #ifndef BPF_OBJ_NAME_LEN
 # define BPF_OBJ_NAME_LEN 16U
 #else
@@ -74,7 +85,7 @@ struct BPF_MAP_UPDATE_ELEM_struct {
 	uint32_t map_fd;
 	uint64_t ATTRIBUTE_ALIGNED(8) key;
 	uint64_t ATTRIBUTE_ALIGNED(8) value;
-	uint64_t flags;
+	uint64_t ATTRIBUTE_ALIGNED(8) flags;
 };
 
 #define BPF_MAP_UPDATE_ELEM_struct_size \
@@ -242,8 +253,12 @@ struct bpf_map_info_struct {
 	uint32_t map_flags;
 	char     name[BPF_OBJ_NAME_LEN];
 	uint32_t ifindex;
-	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* kernel UAPI is buggy, skip check */
-	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* kernel UAPI is buggy, skip check */
+	/*
+	 * The kernel UAPI is broken by Linux commit
+	 * v4.16-rc1~123^2~109^2~5^2~4 .
+	 */
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* skip check */
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* skip check */
 };
 
 #define bpf_map_info_struct_size \
@@ -258,14 +273,18 @@ struct bpf_prog_info_struct {
 	uint32_t xlated_prog_len;
 	uint64_t ATTRIBUTE_ALIGNED(8) jited_prog_insns;
 	uint64_t ATTRIBUTE_ALIGNED(8) xlated_prog_insns;
-	uint64_t load_time;
+	uint64_t ATTRIBUTE_ALIGNED(8) load_time;
 	uint32_t created_by_uid;
 	uint32_t nr_map_ids;
 	uint64_t ATTRIBUTE_ALIGNED(8) map_ids;
 	char     name[BPF_OBJ_NAME_LEN];
 	uint32_t ifindex;
-	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* kernel UAPI is buggy, skip check */
-	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* kernel UAPI is buggy, skip check */
+	/*
+	 * The kernel UAPI is broken by Linux commit
+	 * v4.16-rc1~123^2~227^2~5^2~2 .
+	 */
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* skip check */
+	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* skip check */
 };
 
 #define bpf_prog_info_struct_size \
