@@ -367,6 +367,7 @@ EXTRA_DIST = \
 	count-f.expected \
 	eventfd.expected \
 	fadvise.h \
+	fcntl-common.c \
 	filter-unavailable.expected \
 	fstatat.c \
 	fstatx.c \
@@ -412,7 +413,6 @@ EXTRA_DIST = \
 	strace-k.test \
 	strace-r.expected \
 	strace.supp \
-	struct_flock.c \
 	sun_path.expected \
 	syntax.sh \
 	trace_fstat.in \

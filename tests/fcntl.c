@@ -33,7 +33,7 @@
 
 # define TEST_SYSCALL_NR __NR_fcntl
 # define TEST_SYSCALL_STR "fcntl"
-# include "struct_flock.c"
+# include "fcntl-common.c"
 
 # define TEST_FLOCK64_EINVAL(cmd) test_flock64_einval(cmd, #cmd)
 
