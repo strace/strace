@@ -59,7 +59,7 @@ main(int ac, char **av)
 	rc = call_mknod(mode, dev);
 	printf("mknod(\"%s\", S_IFBLK|S_ISUID|S_ISGID|S_ISVTX|%#03ho"
 	       ", makedev(%u, %u)) = %ld %s (%m)\n",
-	       sample, mode & ~(S_IFMT|S_ISUID|S_ISGID|S_ISVTX),
+	       sample, (short) (mode & ~(S_IFMT|S_ISUID|S_ISGID|S_ISVTX)),
 	       major((unsigned) dev), minor((unsigned) dev),
 	       rc, errno2name());
 

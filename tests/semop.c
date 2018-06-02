@@ -68,7 +68,7 @@ main(void)
 		bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 		sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
 		sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
-		sem_b2->sem_flg & ~(SEM_UNDO | IPC_NOWAIT),
+		(short) (sem_b2->sem_flg & ~(SEM_UNDO | IPC_NOWAIT)),
 		sem_b2 + 1, 2, sprintrc(rc));
 
 	if (semop(id, sem_b, 1))
@@ -96,7 +96,7 @@ main(void)
 		bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 		sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
 		sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
-		sem_b2->sem_flg & ~(SEM_UNDO | IPC_NOWAIT),
+		(short) (sem_b2->sem_flg & ~(SEM_UNDO | IPC_NOWAIT)),
 		sem_b2 + 1, 2,
 		(long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec),
 		sprintrc(rc));

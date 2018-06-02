@@ -456,11 +456,12 @@ check_l2(void)
 #ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	       ", l2_bdaddr_type=0xce /* BDADDR_??? */"
 #endif
-	       "}, %u) = %d EBADF (%m)\n", h_psm - 0x1001,
+	       "}, %u) = %d EBADF (%m)\n",
+	       (short) (h_psm - 0x1001),
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
 	       c_l2.l2_bdaddr.b[4], c_l2.l2_bdaddr.b[5],
-	       h_cid - 0x40, len, ret);
+	       (short) (h_cid - 0x40), len, ret);
 
 	c_l2.l2_psm = htobs(1);
 	c_l2.l2_cid = htobs(1);
