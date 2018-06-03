@@ -50,23 +50,6 @@ dump_log_and_fail_with()
 	fail_ "$*"
 }
 
-run_prog()
-{
-	if [ $# -eq 0 ]; then
-		set -- "../$NAME"
-	fi
-	args="$*"
-	"$@" || {
-		rc=$?
-		if [ $rc -eq 77 ]; then
-			skip_ "$args exited with code 77"
-		else
-			fail_ "$args failed with code $rc"
-		fi
-	}
-}
-
-
 run_prog_skip_if_failed()
 {
 	args="$*"
@@ -85,6 +68,22 @@ try_run_prog()
 			fail_ "$* failed with code $rc"
 		fi
 	}
+}
+
+run_prog()
+{
+	if [ $# -eq 0 ]; then
+		set -- "../$NAME"
+	fi
+	args="$*"
+	# We try to run under strace since there could be some security policies
+	# or seccomp filters in place that change behaviour of various syscalls
+	# when a process is being traced
+
+	try_run_prog "$@" || skip_ "$args exited with code 77"
+	try_run_prog $STRACE -o /dev/null -qq -enone -esignal=none "$@" ||
+		skip_ "$STRACE -o /dev/null -qq -enone -esignal=none $args" \
+		      "exited with code 77"
 }
 
 run_strace()
