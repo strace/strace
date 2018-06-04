@@ -162,11 +162,10 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 }
 
 static void
-print_ebpf_prog(struct tcb *const tcp, const uint64_t addr,
-		const uint32_t len, bool decode)
+print_ebpf_prog(struct tcb *const tcp, const uint64_t addr, const uint32_t len)
 {
 	print_big_u64_addr(addr);
-	if (abbrev(tcp) || !decode) {
+	if (abbrev(tcp)) {
 		printaddr(addr);
 	} else {
 		struct ebpf_insns_data eid = {};
@@ -275,7 +274,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 			       "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
 	tprints(", insns=");
-	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt, true);
+	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt);
 
 	tprintf(", license=");
 	print_big_u64_addr(attr.license);
@@ -522,8 +521,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprintf("%" PRIu32, info.xlated_prog_len);
 
 	tprints(", xlated_prog_insns=");
-	print_ebpf_prog(tcp, info.xlated_prog_insns, info.xlated_prog_len / 8,
-			!!saved->xlated_prog_len);
+	print_ebpf_prog(tcp, info.xlated_prog_insns,
+			MIN(saved->xlated_prog_len, info.xlated_prog_len) / 8);
 
 	/*
 	 * load_time, created_by_uid, nr_map_ids, map_ids, and name fields
@@ -541,7 +540,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprints(", map_ids=");
 	print_big_u64_addr(info.map_ids);
-	print_array(tcp, info.map_ids, info.nr_map_ids,
+	print_array(tcp, info.map_ids, MIN(saved->nr_map_ids, info.nr_map_ids),
 		    &map_id_buf, sizeof(map_id_buf),
 		    tfetch_mem, print_uint32_array_member, 0);
 
