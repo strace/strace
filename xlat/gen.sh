@@ -45,7 +45,7 @@ cond_def()
 
 	local val
 	val="$(printf %s "$line" |
-		sed -r -n 's/^([^[:space:]]+).*$/\1/p')"
+		LC_ALL=C sed -r -n 's/^([[:alpha:]_][[:alnum:]_]*).*$/\1/p')"
 
 	local def
 	def="$(printf %s "${line}" |
