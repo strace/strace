@@ -102,7 +102,7 @@ main(void)
 		{ bogus_desc, NULL },
 		{ ARG_STR("\25\26\27\30\31") },
 		{ ARG_STR("desc") },
-		{ "overly long description", _STR("overly long ") "..." },
+		{ "overly long description", STRINGIFY("overly long ") "..." },
 	};
 
 	struct {
@@ -113,10 +113,10 @@ main(void)
 		{ ARG_STR(NULL), 0 },
 		{ bogus_payload + sizeof(unterminated3), NULL,
 			(size_t) 0xdeadbeefbadc0dedULL },
-		{ bogus_payload, _STR(""), 0 },
-		{ bogus_payload, _STR("\16\17\20\21\22"), 5 },
+		{ bogus_payload, STRINGIFY(""), 0 },
+		{ bogus_payload, STRINGIFY("\16\17\20\21\22"), 5 },
 		{ bogus_payload, NULL, 10 },
-		{ "overly long payload", _STR("overly long ") "...", 15 },
+		{ "overly long payload", STRINGIFY("overly long ") "...", 15 },
 	};
 
 	struct {

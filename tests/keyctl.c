@@ -90,9 +90,9 @@ bool buf_in_arg;
 # define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
 
 #if XLAT_RAW
-# define XARG_STR(v_) (v_), _STR(v_)
+# define XARG_STR(v_) (v_), STRINGIFY(v_)
 #elif XLAT_VERBOSE
-# define XARG_STR(v_) (v_), _STR(v_) " /* " #v_ " */"
+# define XARG_STR(v_) (v_), STRINGIFY(v_) " /* " #v_ " */"
 #else
 # define XARG_STR ARG_STR
 #endif

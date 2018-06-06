@@ -288,7 +288,6 @@ f8ill_ptr_to_kulong(const void *const ptr)
 #endif
 #define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
 
-#define _STR(_arg) #_arg
 #define ARG_STR(_arg) (_arg), #_arg
 #define ARG_ULL_STR(_arg) _arg##ULL, #_arg
 

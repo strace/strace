@@ -101,7 +101,7 @@ main(void)
 		{ bogus_desc, NULL },
 		{ ARG_STR("\25\26\27\30\31") },
 		{ ARG_STR("desc") },
-		{ "overly long description", _STR("overly long ") "..." },
+		{ "overly long description", STRINGIFY("overly long ") "..." },
 	};
 
 	struct {
@@ -113,7 +113,7 @@ main(void)
 		{ bogus_info, NULL },
 		{ ARG_STR("\32\33\34\35\36") },
 		{ ARG_STR("info") },
-		{ "overly long info", _STR("overly long ") "..." },
+		{ "overly long info", STRINGIFY("overly long ") "..." },
 	};
 
 	struct {
