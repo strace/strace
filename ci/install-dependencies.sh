@@ -17,9 +17,10 @@ apt_get_install()
 git_installed=
 clone_repo()
 {
-	local src dst
+	local src dst branch
 	src="$1"; shift
 	dst="$1"; shift
+	branch="${1-}"
 
 	[ -n "$git_installed" ] || {
 		apt_get_install git ca-certificates
@@ -35,12 +36,12 @@ clone_repo()
 			;;
 	esac
 
-	git clone --depth=1 "$src" "$dst"
+	git clone --depth=1 ${branch:+--branch $branch} "$src" "$dst"
 }
 
 case "$KHEADERS" in
 	*/*)
-		clone_repo https://github.com/"$KHEADERS" kernel
+		clone_repo https://github.com/"$KHEADERS" kernel ${KBRANCH-}
 		apt_get_install $common_packages
 		$sudo make -C kernel headers_install INSTALL_HDR_PATH=/opt/kernel
 		$sudo rm -rf kernel
