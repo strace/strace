@@ -1,4 +1,5 @@
 #value_indexed
+/* These fallback definitions are for constants, not for expressions.  */
 IPV4_DEVCONF_FORWARDING-1				1
 IPV4_DEVCONF_MC_FORWARDING-1				2
 IPV4_DEVCONF_PROXY_ARP-1				3
