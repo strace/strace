@@ -275,3 +275,4 @@
 [289] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [290] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [291] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[292] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},

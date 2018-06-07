@@ -241,6 +241,7 @@ strace_SOURCES =	\
 	pkeys.c		\
 	poll.c		\
 	prctl.c		\
+	print_aio_sigset.c \
 	print_dev_t.c	\
 	print_group_req.c \
 	print_fields.h	\

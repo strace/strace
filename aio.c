@@ -238,7 +238,8 @@ SYS_FUNC(io_cancel)
 	return 0;
 }
 
-SYS_FUNC(io_getevents)
+static int
+print_io_getevents(struct tcb *tcp, bool has_usig)
 {
 	if (entering(tcp)) {
 		printaddr(tcp->u_arg[0]);
@@ -251,13 +252,27 @@ SYS_FUNC(io_getevents)
 			    tfetch_mem, print_io_event, 0);
 		tprints(", ");
 		/*
-		 * Since the timeout parameter is read by the kernel
+		 * Since the timeout and usig parameters are read by the kernel
 		 * on entering syscall, it has to be decoded the same way
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
 		print_timespec(tcp, tcp->u_arg[4]);
+		if (has_usig) {
+			tprints(", ");
+			print_aio_sigset(tcp, tcp->u_arg[5]);
+		}
 		restore_cleared_syserror(tcp);
 	}
 	return 0;
+}
+
+SYS_FUNC(io_getevents)
+{
+	return print_io_getevents(tcp, false);
+}
+
+SYS_FUNC(io_pgetevents)
+{
+	return print_io_getevents(tcp, true);
 }

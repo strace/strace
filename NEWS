@@ -36,6 +36,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of BTRFS_*, FS_IOC_*, SIOCGIFHWADDR, and SIOCSIFHWADDR
     ioctl commands.
   * Enhanced decoding of AF_BLUETOOTH socket addresses.
+  * Implemented decoding of io_pgetevent syscall.
   * Updated lists of ADJ_*, BPF_*, BPF_F_*, BPF_PROG_TYPE_*, ETH_P_*, FPE_*,
     IFF_*, IPPROTO_*, MAP_*, MS_*, MSG_*, NETLINK_*, PACKET_*, PROT_*, SCTP_*,
     SECCOMP_FILTER_FLAG_*, SEGV_*, SEM_*, SHM_*, SW_*, V4L2_CID_*,

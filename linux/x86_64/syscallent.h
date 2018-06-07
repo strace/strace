@@ -331,3 +331,4 @@
 [330] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [331] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [332] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[333] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
