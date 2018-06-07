@@ -318,9 +318,13 @@ MISC_TESTS = \
 	printstrn-umoven-legacy.test \
 	qual_fault-syntax.test \
 	qual_fault.test \
+	qual_fault-syscall.test \
 	qual_inject-error-signal.test \
+	qual_inject-error-signal-syscall.test \
 	qual_inject-retval.test \
+	qual_inject-retval-syscall.test \
 	qual_inject-signal.test \
+	qual_inject-signal-syscall.test \
 	qual_inject-syntax.test \
 	qual_signal.test \
 	qual_syscall.test \

@@ -102,6 +102,12 @@ for arg in 42 chdir \
 	   chdir:delay_exit=3:delay_exit=4 \
 	   chdir:delay_enter=5:delay_exit=6:delay_enter=7 \
 	   chdir:delay_exit=8:delay_enter=9:delay_exit=10 \
+	   chdir:syscall=invalid \
+	   chdir:syscall=chdir \
+	   chdir:syscall=%file \
+	   chdir:syscall=-42 \
+	   chdir:syscall=42 \
+	   chdir:syscall=gettid:syscall=gettid \
 	   ; do
 	$STRACE -e inject="$arg" true 2> "$LOG" &&
 		fail_with "$arg"

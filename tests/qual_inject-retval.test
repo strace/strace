@@ -4,6 +4,9 @@
 
 . "${srcdir=.}/scno_tampering.sh"
 
+: ${suffix=}
+[ -z "${name_override-}" ] || NAME="$name_override"
+
 check_injection()
 {
 	local syscall rval
@@ -11,7 +14,7 @@ check_injection()
 	syscall=chdir
 	rval="$1"; shift
 
-	run_strace -a12 -e$syscall -einject="$syscall:retval=$rval" "$@" \
+	run_strace -a12 -e$syscall -einject="$syscall:retval=$rval$suffix" "$@" \
 		../qual_inject-retval "$rval" > "$EXP"
 	match_diff "$LOG" "$EXP"
 }

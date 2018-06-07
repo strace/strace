@@ -1,0 +1,3 @@
+suffix=:syscall=gettid
+name_override=qual_inject-error-signal
+. "${srcdir=.}/qual_inject-error-signal.test"

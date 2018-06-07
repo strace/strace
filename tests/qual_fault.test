@@ -37,6 +37,9 @@
 
 N=100
 
+: ${suffix=}
+[ -z "${name_override-}" ] || NAME="$name_override"
+
 check_fault_injection()
 {
 	local trace fault err first step procs extra
@@ -79,7 +82,7 @@ check_fault_injection()
 	outpid="$NAME.pid"
 
 	run_strace -a11 -ff -e trace=$trace \
-		"$@" -e fault=$fault$when$error $extra \
+		"$@" -e fault=$fault$when$error$suffix $extra \
 		../$NAME $raw "$err" "$first" "$step" $N \
 		"$procs" "$outexp" "$outgot" "$outout" "$outpid"
 

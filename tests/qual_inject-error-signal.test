@@ -3,6 +3,10 @@
 # Check fault injection along with signal injection.
 . "${srcdir=.}/scno_tampering.sh"
 
-run_strace -a12 -echdir,exit_group -einject=chdir:error=ENOENT:signal=USR1 \
+: ${suffix=}
+[ -z "${name_override-}" ] || NAME="$name_override"
+
+run_strace -a12 -echdir,exit_group \
+	-einject=chdir:error=ENOENT:signal=USR1"$suffix" \
 	"../$NAME"
 match_diff
