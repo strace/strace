@@ -51,15 +51,17 @@ init_nlattr(struct nlattr *const nla,
 }
 
 static void
-print_nlattr(const unsigned int nla_len, const char *const nla_type)
+print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_data)
 {
-	printf(", {{nla_len=%u, nla_type=%s}, ", nla_len, nla_type);
+	printf(", %s{{nla_len=%u, nla_type=%s}, ",
+	       add_data ? "[" : "", nla_len, nla_type);
 }
 
-#define TEST_NLATTR_(fd_, nlh0_, hdrlen_,				\
+#define TEST_NLATTR_EX_(fd_, nlh0_, hdrlen_,				\
 		     init_msg_, print_msg_,				\
 		     nla_type_, nla_type_str_,				\
-		     nla_data_len_, src_, slen_, ...)			\
+		     nla_data_len_, nla_total_len_,			\
+		     src_, slen_, ...)					\
 	do {								\
 		struct nlmsghdr *const nlh =				\
 			(nlh0_) - (NLA_HDRLEN + (slen_));		\
@@ -68,7 +70,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 		const unsigned int nla_len =				\
 			NLA_HDRLEN + (nla_data_len_);			\
 		const unsigned int msg_len =				\
-			NLMSG_SPACE(hdrlen_) + nla_len;			\
+			NLMSG_SPACE(hdrlen_) + NLA_HDRLEN + (nla_total_len_); \
 									\
 		(init_msg_)(nlh, msg_len);				\
 		init_nlattr(TEST_NLATTR_nla, nla_len, (nla_type_),	\
@@ -80,13 +82,27 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type)
 									\
 		printf("sendto(%d, {", (fd_));				\
 		(print_msg_)(msg_len);					\
-		print_nlattr(nla_len, (nla_type_str_));			\
+		print_nlattr(nla_len, (nla_type_str_),			\
+			     (nla_total_len_) > (nla_data_len_));	\
 									\
 		{ __VA_ARGS__; }					\
+									\
+		if ((nla_total_len_) > (nla_data_len_))			\
+			printf("]");					\
 									\
 		printf("}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
 		       msg_len, errstr);				\
 	} while (0)
+
+#define TEST_NLATTR_(fd_, nlh0_, hdrlen_,				\
+		     init_msg_, print_msg_,				\
+		     nla_type_, nla_type_str_,				\
+		     nla_data_len_, src_, slen_, ...)			\
+	TEST_NLATTR_EX_((fd_), (nlh0_), (hdrlen_),			\
+			(init_msg_), (print_msg_),			\
+			(nla_type_), (nla_type_str_),			\
+			(nla_data_len_), (nla_data_len_),		\
+			(src_), (slen_), __VA_ARGS__)
 
 #define TEST_NLATTR(fd_, nlh0_, hdrlen_,				\
 		    init_msg_, print_msg_,				\
