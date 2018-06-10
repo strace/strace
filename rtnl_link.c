@@ -178,8 +178,8 @@ decode_ifla_protinfo(struct tcb *const tcp,
 		     const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_brport_attrs,
-		      "IFLA_BRPORT_???", ifla_brport_nla_decoders,
-		      ARRAY_SIZE(ifla_brport_nla_decoders), opaque_data);
+		      "IFLA_BRPORT_???",
+		      ARRSZ_PAIR(ifla_brport_nla_decoders), opaque_data);
 
 	return true;
 }
@@ -339,8 +339,8 @@ decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
 				const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_bridge_attrs,
-		      "IFLA_BR_???", ifla_info_data_bridge_nla_decoders,
-		      ARRAY_SIZE(ifla_info_data_bridge_nla_decoders),
+		      "IFLA_BR_???",
+		      ARRSZ_PAIR(ifla_info_data_bridge_nla_decoders),
 		      opaque_data);
 
 	return true;
@@ -383,8 +383,8 @@ decode_nla_linkinfo_data_tun(struct tcb *const tcp,
 			     const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_tun_attrs,
-		      "IFLA_TUN_???", ifla_info_data_tun_nla_decoders,
-		      ARRAY_SIZE(ifla_info_data_tun_nla_decoders),
+		      "IFLA_TUN_???",
+		      ARRSZ_PAIR(ifla_info_data_tun_nla_decoders),
 		      opaque_data);
 
 	return true;
@@ -427,8 +427,8 @@ decode_ifla_linkinfo(struct tcb *const tcp,
 	struct ifla_linkinfo_ctx ctx = { .kind = "", };
 
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_attrs,
-		      "IFLA_INFO_???", ifla_linkinfo_nla_decoders,
-		      ARRAY_SIZE(ifla_linkinfo_nla_decoders), &ctx);
+		      "IFLA_INFO_???", ARRSZ_PAIR(ifla_linkinfo_nla_decoders),
+		      &ctx);
 
 	return true;
 }
@@ -533,8 +533,8 @@ decode_ifla_port(struct tcb *const tcp,
 		 const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_port_attrs,
-		      "IFLA_VF_PORT_???", ifla_port_nla_decoders,
-		      ARRAY_SIZE(ifla_port_nla_decoders), opaque_data);
+		      "IFLA_VF_PORT_???", ARRSZ_PAIR(ifla_port_nla_decoders),
+		      opaque_data);
 
 	return true;
 }
@@ -550,8 +550,8 @@ decode_ifla_vf_ports(struct tcb *const tcp,
 		     const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_vf_port_attrs,
-		      "IFLA_VF_PORT_???", ifla_vf_port_nla_decoders,
-		      ARRAY_SIZE(ifla_vf_port_nla_decoders), opaque_data);
+		      "IFLA_VF_PORT_???", ARRSZ_PAIR(ifla_vf_port_nla_decoders),
+		      opaque_data);
 
 	return true;
 }
@@ -586,8 +586,8 @@ decode_ifla_xdp(struct tcb *const tcp,
 		const void *const opaque_data)
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_xdp_attrs,
-		      "IFLA_XDP_???", ifla_xdp_nla_decoders,
-		      ARRAY_SIZE(ifla_xdp_nla_decoders), opaque_data);
+		      "IFLA_XDP_???", ARRSZ_PAIR(ifla_xdp_nla_decoders),
+		      opaque_data);
 
 	return true;
 }
@@ -913,7 +913,6 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_link_attrs, "IFLA_???",
-			      ifinfomsg_nla_decoders,
-			      ARRAY_SIZE(ifinfomsg_nla_decoders), NULL);
+			      ARRSZ_PAIR(ifinfomsg_nla_decoders), NULL);
 	}
 }
