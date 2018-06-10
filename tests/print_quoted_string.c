@@ -33,6 +33,18 @@ print_quoted_cstring(const char *instr, const size_t size)
 	}
 }
 
+void
+print_quoted_stringn(const char *instr, const size_t size)
+{
+	const size_t len = strnlen(instr, size);
+	if (len < size) {
+		print_quoted_memory(instr, len);
+	} else {
+		print_quoted_memory(instr, size);
+		printf("...");
+	}
+}
+
 static void
 print_octal(unsigned char c, char next)
 {
