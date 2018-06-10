@@ -340,7 +340,7 @@ decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_bridge_attrs,
 		      "IFLA_BR_???", ifla_info_data_bridge_nla_decoders,
-		      ARRAY_SIZE(rtnl_ifla_info_data_bridge_attrs),
+		      ARRAY_SIZE(ifla_info_data_bridge_nla_decoders),
 		      opaque_data);
 
 	return true;
@@ -384,7 +384,7 @@ decode_nla_linkinfo_data_tun(struct tcb *const tcp,
 {
 	decode_nlattr(tcp, addr, len, rtnl_ifla_info_data_tun_attrs,
 		      "IFLA_TUN_???", ifla_info_data_tun_nla_decoders,
-		      ARRAY_SIZE(rtnl_ifla_info_data_tun_attrs),
+		      ARRAY_SIZE(ifla_info_data_tun_nla_decoders),
 		      opaque_data);
 
 	return true;
