@@ -333,6 +333,7 @@ decode_nla_ether_proto(struct tcb *const tcp,
 		.xt = XT_SORTED,
 		.prefix = "htons(",
 		.suffix = ")",
+		.size = 2,
 		.process_fn = process_host_order,
 	};
 
