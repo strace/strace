@@ -121,8 +121,10 @@ decode_ifla_bridge_id(struct tcb *const tcp,
 		      const unsigned int len,
 		      const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_IFLA_BRIDGE_ID
-	struct ifla_bridge_id id;
+	struct {
+		uint8_t prio[2];
+		uint8_t addr[6];
+	} id;
 
 	if (len < sizeof(id))
 		return false;
@@ -133,9 +135,6 @@ decode_ifla_bridge_id(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static const nla_decoder_t ifla_brport_nla_decoders[] = {
