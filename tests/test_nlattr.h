@@ -223,7 +223,8 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 #define TEST_NESTED_NLATTR_OBJECT_EX_(fd_, nlh0_, hdrlen_,		\
 				      init_msg_, print_msg_,		\
 				      nla_type_, nla_type_str_,		\
-				      pattern_, obj_, depth_, ...)	\
+				      pattern_, obj_, fallback_func,	\
+				      depth_, ...)	\
 	do {								\
 		const unsigned int plen =				\
 			sizeof(obj_) - 1 > DEFAULT_STRLEN		\
@@ -235,7 +236,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 				(init_msg_), (print_msg_),		\
 				(nla_type_), (nla_type_str_),		\
 				plen, (pattern_), plen,			\
-				print_quoted_hex((pattern_), plen);	\
+				(fallback_func)((pattern_), plen);	\
 				size_t i;				\
 				for (i = 0; i < depth_; ++i)		\
 					printf("}"));			\
@@ -270,7 +271,8 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 	TEST_NESTED_NLATTR_OBJECT_EX_((fd_), (nlh0_), (hdrlen_),	\
 				      (init_msg_), (print_msg_),	\
 				      (nla_type_), #nla_type_,		\
-				      (pattern_), (obj_), (depth_),	\
+				      (pattern_), (obj_),		\
+				      print_quoted_hex, (depth_),	\
 				      __VA_ARGS__)
 
 #define TEST_NESTED_NLATTR_OBJECT(fd_, nlh0_, hdrlen_,			\
@@ -279,7 +281,8 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 	TEST_NESTED_NLATTR_OBJECT_EX_((fd_), (nlh0_), (hdrlen_),	\
 				      (init_msg_), (print_msg_),	\
 				      (nla_type_), #nla_type_,		\
-				      (pattern_), (obj_), 1,		\
+				      (pattern_), (obj_),		\
+				      print_quoted_hex, 1,		\
 				      __VA_ARGS__)
 
 #define TEST_NESTED_NLATTR_ARRAY_EX(fd_, nlh0_, hdrlen_,		\

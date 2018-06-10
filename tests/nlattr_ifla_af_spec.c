@@ -188,12 +188,12 @@ main(void)
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET_msg, print_AF_INET_msg,
 				      0, "IFLA_INET_UNSPEC", pattern,
-				      unknown_msg, 2,
+				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET_msg, print_AF_INET_msg,
 				      2, "0x2 /* IFLA_INET_??? */", pattern,
-				      unknown_msg, 2,
+				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 	/* AF_INET: IFLA_INET_CONF */
@@ -207,12 +207,12 @@ main(void)
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET6_msg, print_AF_INET6_msg,
 				      0, "IFLA_INET6_UNSPEC", pattern,
-				      unknown_msg, 2,
+				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET6_msg, print_AF_INET6_msg,
 				      9, "0x9 /* IFLA_INET6_??? */", pattern,
-				      unknown_msg, 2,
+				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 	/* AF_INET6: IFLA_INET6_FLAGS */
@@ -232,7 +232,8 @@ main(void)
 					      init_AF_INET6_msg,
 					      print_AF_INET6_msg,
 					      1, "IFLA_INET6_FLAGS", pattern,
-					      inet6_flags[i].flags, 2,
+					      inet6_flags[i].flags,
+					      print_quoted_hex, 2,
 					      printf("%s", inet6_flags[i].str));
 	}
 
@@ -254,7 +255,7 @@ main(void)
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET6_msg, print_AF_INET6_msg,
 				      4, "IFLA_INET6_MCAST", pattern,
-				      unknown_msg, 2,
+				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 	/* AF_INET6: IFLA_INET6_CACHEINFO */
@@ -264,7 +265,7 @@ main(void)
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET6_msg, print_AF_INET6_msg,
 				      5, "IFLA_INET6_CACHEINFO", pattern,
-				      ci, 2,
+				      ci, print_quoted_hex, 2,
 				      PRINT_FIELD_U("{", ci, max_reasm_len);
 				      PRINT_FIELD_U(", ", ci, tstamp);
 				      PRINT_FIELD_U(", ", ci, reachable_time);
@@ -290,7 +291,7 @@ main(void)
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET6_msg, print_AF_INET6_msg,
 				      7, "IFLA_INET6_TOKEN", pattern,
-				      inet6_addr, 2,
+				      inet6_addr, print_quoted_hex, 2,
 				      printf("badc:ded:face:beef:deca:feed"
 					     ":dead:feed"));
 
@@ -310,7 +311,8 @@ main(void)
 					      init_AF_INET6_msg,
 					      print_AF_INET6_msg,
 					      8, "IFLA_INET6_ADDR_GEN_MODE",
-					      pattern, agms[i].flags, 2,
+					      pattern, agms[i].flags,
+					      print_quoted_hex, 2,
 					      printf("%s", agms[i].str));
 	}
 
