@@ -1,8 +1,8 @@
 static int
 arch_set_error(struct tcb *tcp)
 {
-	alpha_r0 = tcp->u_error;
-	return upoke(tcp, REG_R0, alpha_r0);
+	return upoke(tcp, REG_A3, (alpha_a3 = 1))
+	       || upoke(tcp, REG_R0, (alpha_r0 = tcp->u_error));
 }
 
 static int
