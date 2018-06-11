@@ -66,7 +66,7 @@
 [4062] = { 2,	TSFA,		SEN(ustat),			"ustat"			},
 [4063] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [4064] = { 0,	NF,		SEN(getppid),			"getppid"		},
-[4065] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
+[4065] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
 [4066] = { 0,	0,		SEN(setsid),			"setsid"		},
 [4067] = { 3,	TS,		SEN(sigaction),			"sigaction"		},
 [4068] = { 0,	TS,		SEN(sgetmask),			"sgetmask"		},

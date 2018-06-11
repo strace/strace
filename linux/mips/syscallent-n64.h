@@ -109,7 +109,7 @@
 [5106] = { 0,	NF,		SEN(getegid),			"getegid"		},
 [5107] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [5108] = { 0,	NF,		SEN(getppid),			"getppid"		},
-[5109] = { 0,	0,		SEN(getpgrp),			"getpgrp"		},
+[5109] = { 0,	NF,		SEN(getpgrp),			"getpgrp"		},
 [5110] = { 0,	0,		SEN(setsid),			"setsid"		},
 [5111] = { 2,	0,		SEN(setreuid),			"setreuid"		},
 [5112] = { 2,	0,		SEN(setregid),			"setregid"		},
