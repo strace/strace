@@ -24,7 +24,6 @@ matrix:
         - STACKTRACE=libunwind
         - CHECK=coverage
         - KHEADERS=torvalds/linux
-        - KBRANCH=v4.17
     - compiler: gcc
       env:
         - TARGET=x86_64
