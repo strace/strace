@@ -182,6 +182,7 @@ strace_SOURCES =	\
 	ldt.c		\
 	link.c		\
 	linux/asm_stat.h \
+	linux/linux/signal.h \
 	linux/x32/asm_stat.h \
 	linux/x86_64/asm_stat.h \
 	listen.c	\
