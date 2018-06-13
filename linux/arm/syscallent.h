@@ -423,6 +423,7 @@
 [395] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [396] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [397] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[398] = { 4,	0,		SEN(rseq),			"rseq"			},
 
 #ifdef __ARM_EABI__
 # define ARM_FIRST_SHUFFLED_SYSCALL 400

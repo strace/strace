@@ -373,3 +373,4 @@
 [545] = { 5,	CST|TD|TF|TP|SE|SI,	SEN(execveat),		"execveat"		},
 [546] = { 5,	TD,		SEN(preadv2),			"preadv2"		},
 [547] = { 5,	TD,		SEN(pwritev2),			"pwritev2"		},
+[334] = { 4,	0,		SEN(rseq),			"rseq"			},

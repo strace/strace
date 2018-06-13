@@ -412,6 +412,7 @@
 [383] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [384] = { 2,	TP,		SEN(arch_prctl),		"arch_prctl"		},
 [385] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[386] = { 4,	0,		SEN(rseq),			"rseq"			},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
