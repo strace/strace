@@ -7,6 +7,7 @@ acct
 add_key
 adjtimex
 aio
+aio_pgetevents
 alarm
 bpf
 bpf-v

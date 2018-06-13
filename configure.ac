@@ -580,6 +580,11 @@ AC_CHECK_TYPES(m4_normalize([
 	struct kvm_userspace_memory_region
 ]),,, [#include <linux/kvm.h>])
 
+saved_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I$srcdir/linux"
+AC_CHECK_TYPES([struct __aio_sigset],,, [#include <linux/aio_abi.h>])
+CPPFLAGS="$saved_CPPFLAGS"
+
 AC_CHECK_HEADERS([linux/btrfs.h], [
 	AC_CHECK_MEMBERS(m4_normalize([
 		struct btrfs_ioctl_feature_flags.compat_flags,

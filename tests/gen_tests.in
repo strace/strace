@@ -34,6 +34,7 @@ acct	-a20
 add_key	-a30 -s12
 adjtimex	-a15
 aio	-a14 -e trace=io_setup,io_submit,io_getevents,io_cancel,io_destroy
+aio_pgetevents	-e trace=io_pgetevents
 alarm	-a10
 bpf	-a20
 bpf-v	-a20 -v -e trace=bpf

@@ -12,6 +12,7 @@ acct
 add_key
 adjtimex
 aio
+aio_pgetevents
 alarm
 answer
 attach-f-p
