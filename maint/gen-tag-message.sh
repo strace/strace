@@ -65,4 +65,5 @@ changes or bug reports.  These include:
 
 __EOF__
 
-"$(dirname "$0")"/gen-contributors-list.sh
+"$(dirname "$0")"/gen-contributors-list.sh |
+	sed 's/^./* &/'
