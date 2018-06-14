@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015 Andreas Schwab <schwab@suse.de>
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

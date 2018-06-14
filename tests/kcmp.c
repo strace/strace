@@ -2,6 +2,7 @@
  * Check decoding of kcmp syscall.
  *
  * Copyright (c) 2016-2017 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
