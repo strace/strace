@@ -11,6 +11,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     regardless of -e raw qualification settings.  One can specify
     -X raw for displaying raw error numbers unconditionally.
   * Unfetchable addresses inside arrays are now printed as comments.
+  * Obsolete IA-32 mode syscall names are no longer printed on ia64.
 
 * Improvements
   * Implemented libdw backend for -k option, configured at build time
@@ -37,6 +38,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     ioctl commands.
   * Enhanced decoding of AF_BLUETOOTH socket addresses.
   * Implemented decoding of io_pgetevent syscall.
+  * Wired up rseq syscall.
   * Updated lists of ADJ_*, BPF_*, BPF_F_*, BPF_PROG_TYPE_*, ETH_P_*, FPE_*,
     IFF_*, IPPROTO_*, MAP_*, MS_*, MSG_*, NETLINK_*, PACKET_*, PROT_*, SCTP_*,
     SECCOMP_FILTER_FLAG_*, SEGV_*, SEM_*, SHM_*, SW_*, V4L2_CID_*,
@@ -47,6 +49,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed decoding of msgtyp argument of msgrcv syscall.
   * Fixed fallback definitions for F_*, MCL_*, MSG_ZEROCOPY, SI_*,
     and SOL_SOCKET constants.
+  * Fixed -e trace=%pure expression on mips.
 
 Noteworthy changes in release 4.22 (2018-04-05)
 ===============================================
