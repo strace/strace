@@ -332,7 +332,8 @@
 [331] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [332] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [333] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
-[334 ... 511] = { },
+[334] = { 4,	0,		SEN(rseq),			"rseq"			},
+[335 ... 511] = { },
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.
@@ -373,4 +374,3 @@
 [545] = { 5,	CST|TD|TF|TP|SE|SI,	SEN(execveat),		"execveat"		},
 [546] = { 5,	TD,		SEN(preadv2),			"preadv2"		},
 [547] = { 5,	TD,		SEN(pwritev2),			"pwritev2"		},
-[334] = { 4,	0,		SEN(rseq),			"rseq"			},
