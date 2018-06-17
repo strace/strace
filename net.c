@@ -491,7 +491,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_packet_options, name, "PACKET_???");
 		break;
 	case SOL_TCP:
-		printxval(sock_tcp_options, name, "TCP_???");
+		printxval_index(sock_tcp_options, name, "TCP_???");
 		break;
 	case SOL_SCTP:
 		printxval(sock_sctp_options, name, "SCTP_???");
