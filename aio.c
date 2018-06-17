@@ -125,6 +125,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 static void
 print_iocb(struct tcb *tcp, const struct iocb *cb)
 {
+	tprints("{");
+
 	enum iocb_sub sub = print_iocb_header(tcp, cb);
 
 	switch (sub) {
@@ -156,6 +158,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 	case SUB_NONE:
 		break;
 	}
+
+	tprints("}");
 }
 
 static bool
@@ -170,10 +174,8 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		addr = *(kernel_ulong_t *) elem_buf;
 	}
 
-	tprints("{");
 	if (!umove_or_printaddr(tcp, addr, &cb))
 		print_iocb(tcp, &cb);
-	tprints("}");
 
 	return true;
 }

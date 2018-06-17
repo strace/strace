@@ -335,7 +335,7 @@ main(void)
 	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
 		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {NULL}, {%#lx}, ... /* %p */]) = %s\n",
+	       "}, NULL, %#lx, ... /* %p */]) = %s\n",
 	       *ctx, 1057L,
 	       cbv2[0].aio_data, cbv2[0].aio_key,
 	       cbv2[0].aio_lio_opcode, cbv2[0].aio_fildes,
