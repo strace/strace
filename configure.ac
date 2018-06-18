@@ -581,8 +581,22 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <linux/kvm.h>])
 
 saved_CPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS -I$srcdir/linux"
+
+AC_CACHE_CHECK([whether <linux/signal.h> can be used along with <signal.h>],
+	       [st_cv_linux_signal],
+	       [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include <signal.h>
+#include <linux/signal.h>]],[])],
+				  [st_cv_linux_signal=yes],
+				  [st_cv_linux_signal=no])])
+if test "x$st_cv_linux_signal" = xno; then
+	mkdir -p linux/linux
+	cp $srcdir/linux/signal.h.in linux/linux/signal.h
+	CPPFLAGS="$CPPFLAGS -Ilinux"
+fi
+
 AC_CHECK_TYPES([struct __aio_sigset],,, [#include <linux/aio_abi.h>])
+
 CPPFLAGS="$saved_CPPFLAGS"
 
 AC_CHECK_HEADERS([linux/btrfs.h], [

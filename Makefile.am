@@ -182,7 +182,6 @@ strace_SOURCES =	\
 	ldt.c		\
 	link.c		\
 	linux/asm_stat.h \
-	linux/linux/signal.h \
 	linux/x32/asm_stat.h \
 	linux/x86_64/asm_stat.h \
 	listen.c	\
@@ -804,6 +803,7 @@ EXTRA_DIST =				\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
 	linux/shuffle_scno.c		\
+	linux/signal.h.in 		\
 	linux/signalent.h		\
 	linux/smc_diag.h		\
 	linux/sock_diag.h		\
@@ -1042,7 +1042,7 @@ CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
 		ioctl_iocdef.h ioctl_iocdef.i \
 		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
 		printers.h sen.h sys_func.h
-DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h
+DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h linux/linux/signal.h
 
 include scno.am
 
