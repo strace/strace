@@ -49,7 +49,8 @@ git show "$id:NEWS" > "$tmpf"
 marker='^Noteworthy changes in release \([^ ]\+\) ([^)]\+)$'
 vers="$(sed -n "s/$marker/\\1/p;q" "$tmpf")"
 
-msg="NEWS for strace version $vers"
+msg_date=`LC_TIME=C date -u '+%Y-%m-%d'`
+msg="Noteworthy changes in strace $vers ($msg_date)"
 sep="$(echo "$msg" |sed s/./=/g)"
 echo "$msg"
 echo "$sep"
@@ -68,3 +69,8 @@ __EOF__
 
 "$(dirname "$0")"/gen-contributors-list.sh |
 	sed 's/^./* &/'
+
+cat <<'__EOF__'
+
+Please refer to the CREDITS file for the full list of strace contributors.
+__EOF__
