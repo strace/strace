@@ -353,3 +353,4 @@
 [347] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [348] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [349] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[350] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},

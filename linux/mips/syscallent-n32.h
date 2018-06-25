@@ -331,6 +331,8 @@
 [6328] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [6329] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [6330] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[6331] = { 4,	0,		SEN(rseq),			"rseq"			},
+[6332] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 
 # define SYS_socket_subcall      6400
 # include "subcall.h"

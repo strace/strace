@@ -411,6 +411,8 @@
 [379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [380] = { 4,	0,		SEN(s390_sthyi),		"s390_sthyi"		},
 [381] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
+[382] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[383] = { 4,	0,		SEN(rseq),			"rseq"			},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
