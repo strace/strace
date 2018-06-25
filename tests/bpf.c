@@ -276,7 +276,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 16,
+			.map_type = 18,
 			.key_size = 4,
 			.value_size = 8,
 			.max_entries = 256,
@@ -286,7 +286,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_name = "0123456789abcde",
 		} },
 		.size = offsetof(struct BPF_MAP_CREATE_struct, map_name) + 8,
-		.str = "map_type=BPF_MAP_TYPE_CPUMAP, key_size=4"
+		.str = "map_type=BPF_MAP_TYPE_SOCKHASH, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
 				   "|BPF_F_NUMA_NODE|BPF_F_RDONLY|BPF_F_WRONLY"
@@ -298,7 +298,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 17,
+			.map_type = 19,
 			.key_size = 0xface1e55,
 			.value_size = 0xbadc0ded,
 			.max_entries = 0xbeefcafe,
@@ -309,7 +309,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_ifindex = 3141592653,
 		} },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
-		.str = "map_type=0x11 /* BPF_MAP_TYPE_??? */"
+		.str = "map_type=0x13 /* BPF_MAP_TYPE_??? */"
 		       ", key_size=4207812181, value_size=3134983661"
 		       ", max_entries=3203386110"
 		       ", map_flags=0xffffffc0 /* BPF_F_??? */"
@@ -593,7 +593,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 18,
+			.prog_type = 20,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -604,7 +604,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x12 /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x14 /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -612,7 +612,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 17,
+			.prog_type = 19,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
@@ -624,7 +624,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_RAW_TRACEPOINT"
+		.str = "prog_type=BPF_PROG_TYPE_LIRC_MODE2"
 		       ", insn_cnt=3134983661"
 		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
@@ -964,13 +964,13 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 1 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 13,
+			.attach_type = 16,
 			.query_flags = 1,
 			.attach_flags = 3,
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, attach_flags),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=BPF_CGROUP_INET6_POST_BIND"
+		       ", attach_type=BPF_LIRC_MODE2"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE"
 		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
 		       ", prog_ids=NULL, prog_cnt=0}",
@@ -978,7 +978,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 2 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 14,
+			.attach_type = 17,
 			.query_flags = 0xfffffffe,
 			.attach_flags = 0xfffffffc,
 			.prog_ids = 0xffffffffffffffffULL,
@@ -986,7 +986,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=0xe /* BPF_??? */"
+		       ", attach_type=0x11 /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
 		       ", attach_flags=0xfffffffc /* BPF_F_??? */"
 		       ", prog_ids="
