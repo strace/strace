@@ -575,6 +575,7 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <linux/ptp_clock.h>])
 
 AC_CHECK_TYPES(m4_normalize([
+	struct kvm_cpuid2,
 	struct kvm_regs,
 	struct kvm_sregs,
 	struct kvm_userspace_memory_region

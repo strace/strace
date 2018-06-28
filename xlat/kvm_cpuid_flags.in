@@ -1,0 +1,10 @@
+#ifndef BIT
+/*
+ * Workaround a bug in kernel headers fixed by linux commit v4.7-rc1~32^2~42.
+ */
+# define BIT(nr_)	(1UL << (nr_))
+#endif
+
+KVM_CPUID_FLAG_SIGNIFCANT_INDEX	(1 << 0)
+KVM_CPUID_FLAG_STATEFUL_FUNC	(1 << 1)
+KVM_CPUID_FLAG_STATE_READ_NEXT	(1 << 2)

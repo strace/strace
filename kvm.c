@@ -85,6 +85,63 @@ kvm_ioctl_decode_regs(struct tcb *const tcp, const unsigned int code,
 }
 # endif /* HAVE_STRUCT_KVM_REGS */
 
+# ifdef HAVE_STRUCT_KVM_CPUID2
+#  include "xlat/kvm_cpuid_flags.h"
+static bool
+print_kvm_cpuid_entry(struct tcb *const tcp,
+		      void* elem_buf, size_t elem_size, void* data)
+{
+	const struct kvm_cpuid_entry2 *entry = elem_buf;
+	PRINT_FIELD_X("{", *entry, function);
+	PRINT_FIELD_X(", ", *entry, index);
+	PRINT_FIELD_FLAGS(", ", *entry, flags, kvm_cpuid_flags,
+			  "KVM_CPUID_FLAG_???");
+	PRINT_FIELD_X(", ", *entry, eax);
+	PRINT_FIELD_X(", ", *entry, ebx);
+	PRINT_FIELD_X(", ", *entry, ecx);
+	PRINT_FIELD_X(", ", *entry, edx);
+	tprints("}");
+
+	return true;
+}
+
+static int
+kvm_ioctl_decode_cpuid2(struct tcb *const tcp, const unsigned int code,
+			const kernel_ulong_t arg)
+{
+	struct kvm_cpuid2 cpuid;
+
+	if (entering(tcp) && (code == KVM_GET_SUPPORTED_CPUID
+#  ifdef KVM_GET_EMULATED_CPUID
+			      || code == KVM_GET_EMULATED_CPUID
+#  endif
+			     ))
+		return 0;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, arg, &cpuid)) {
+		PRINT_FIELD_U("{", cpuid, nent);
+
+		tprints(", entries=");
+		if (abbrev(tcp)) {
+			tprints("[");
+			if (cpuid.nent)
+				tprints("...");
+			tprints("]");
+
+		} else {
+			struct kvm_cpuid_entry2 entry;
+			print_array(tcp, arg + sizeof(cpuid), cpuid.nent,
+				    &entry, sizeof(entry), tfetch_mem,
+				    print_kvm_cpuid_entry, NULL);
+		}
+		tprints("}");
+	}
+
+	return RVAL_IOCTL_DECODED;
+}
+# endif /* HAVE_STRUCT_KVM_CPUID2 */
+
 # ifdef HAVE_STRUCT_KVM_SREGS
 static int
 kvm_ioctl_decode_sregs(struct tcb *const tcp, const unsigned int code,
@@ -125,6 +182,15 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 	case KVM_SET_SREGS:
 	case KVM_GET_SREGS:
 		return kvm_ioctl_decode_sregs(tcp, code, arg);
+# endif
+
+# ifdef HAVE_STRUCT_KVM_CPUID2
+       case KVM_SET_CPUID2:
+       case KVM_GET_SUPPORTED_CPUID:
+#  ifdef KVM_GET_EMULATED_CPUID
+       case KVM_GET_EMULATED_CPUID:
+#  endif
+               return kvm_ioctl_decode_cpuid2(tcp, code, arg);
 # endif
 
 	case KVM_CREATE_VM:

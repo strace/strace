@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Implemented decoding of KVM_SET_CPUID2 and KVM_GET_*_CPUID ioctl commands.
+
 Noteworthy changes in release 4.23 (2018-06-14)
 ===============================================
 
