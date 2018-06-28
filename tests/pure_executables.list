@@ -114,6 +114,7 @@ ioctl_dm
 ioctl_evdev
 ioctl_inotify
 ioctl_kvm_run
+ioctl_kvm_run-v
 ioctl_loop
 ioctl_mtd
 ioctl_rtc

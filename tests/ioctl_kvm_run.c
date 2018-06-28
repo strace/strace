@@ -48,6 +48,9 @@
 #  define KVM_MAX_CPUID_ENTRIES 80
 # endif
 
+#include "xlat.h"
+#include "xlat/kvm_cpuid_flags.h"
+
 static int
 kvm_ioctl(int fd, unsigned long cmd, const char *cmd_str, void *arg)
 {
@@ -82,6 +85,82 @@ __asm__(
 	".size code_size, . - code_size	\n"
 	);
 
+static void
+print_kvm_segment(const struct kvm_segment *seg)
+{
+	printf("{base=%#jx, limit=%u, selector=%u, type=%u, present=%u, "
+	       "dpl=%u, db=%u, s=%u, l=%u, g=%u, avl=%u}",
+	       (uintmax_t) seg->base, seg->limit, seg->selector, seg->type,
+	       seg->present, seg->dpl, seg->db, seg->s, seg->l, seg->g,
+	       seg->avl);
+}
+
+static void
+print_kvm_sregs(const struct kvm_sregs *sregs)
+{
+	printf("{cs=");
+	print_kvm_segment(&sregs->cs);
+#if VERBOSE
+	printf(", ds=");
+	print_kvm_segment(&sregs->ds);
+	printf(", es=");
+	print_kvm_segment(&sregs->es);
+	printf(", fs=");
+	print_kvm_segment(&sregs->fs);
+	printf(", gs=");
+	print_kvm_segment(&sregs->gs);
+	printf(", ss=");
+	print_kvm_segment(&sregs->ss);
+	printf(", tr=");
+	print_kvm_segment(&sregs->tr);
+	printf(", ldt=");
+	print_kvm_segment(&sregs->ldt);
+	printf(", gdt={base=%#jx, limit=%u}, idt={base=%#jx, limit=%u}, "
+	      "cr0=%llu, cr2=%llu, cr3=%llu, cr4=%llu, cr8=%llu, efer=%llu, "
+	      "apic_base=%#jx", (uintmax_t) sregs->gdt.base, sregs->gdt.limit,
+	      (uintmax_t) sregs->idt.base, sregs->idt.limit, sregs->cr0,
+	      sregs->cr2, sregs->cr3, sregs->cr4, sregs->cr8, sregs->efer,
+	      (uintmax_t)sregs->apic_base);
+	printf(", interrupt_bitmap=[");
+	for (size_t i = 0; i < ARRAY_SIZE(sregs->interrupt_bitmap); i++) {
+		if (i)
+			printf(", ");
+		printf("%#jx", (uintmax_t) sregs->interrupt_bitmap[i]);
+	}
+	printf("]");
+#else
+	printf(", ...");
+#endif
+	printf("}");
+}
+
+static void
+print_kvm_regs(const struct kvm_regs *regs)
+{
+	printf("{rax=%#jx", (uintmax_t) regs->rax);
+#if VERBOSE
+	printf(", rbx=%#jx, rcx=%#jx, rdx=%#jx, rsi=%#jx, rdi=%#jx",
+	       (uintmax_t) regs->rbx, (uintmax_t) regs->rcx,
+	       (uintmax_t) regs->rdx, (uintmax_t) regs->rsi,
+	       (uintmax_t) regs->rdi);
+#else
+	printf(", ...");
+#endif
+	printf(", rsp=%#jx, rbp=%#jx", (uintmax_t) regs->rsp,
+	       (uintmax_t) regs->rbp);
+#if VERBOSE
+	printf(", r8=%#jx, r9=%#jx, r10=%#jx, r11=%#jx, r12=%#jx, r13=%#jx"
+	       ", r14=%#jx, r15=%#jx",
+	       (uintmax_t) regs->r8, (uintmax_t) regs->r9,
+	       (uintmax_t) regs->r10, (uintmax_t) regs->r11,
+	       (uintmax_t) regs->r12, (uintmax_t) regs->r13,
+	       (uintmax_t) regs->r14, (uintmax_t) regs->r15);
+#else
+	printf(", ...");
+#endif
+	printf(", rip=%#jx, rflags=%#jx}", (uintmax_t) regs->rip,
+	       (uintmax_t) regs->rflags);
+}
 
 static void
 run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
@@ -90,23 +169,16 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 	/* Initialize CS to point at 0, via a read-modify-write of sregs. */
 	struct kvm_sregs sregs;
 	KVM_IOCTL(vcpu_fd, KVM_GET_SREGS, &sregs);
-	printf("ioctl(%d<%s>, KVM_GET_SREGS, {cs={base=%#jx, limit=%u, selector=%u"
-	       ", type=%u, present=%u, dpl=%u, db=%u, s=%u, l=%u, g=%u, avl=%u}"
-	       ", ...}) = 0\n", vcpu_fd, vcpu_dev, (uintmax_t) sregs.cs.base,
-	       sregs.cs.limit, sregs.cs.selector, sregs.cs.type,
-	       sregs.cs.present, sregs.cs.dpl, sregs.cs.db, sregs.cs.s,
-	       sregs.cs.l, sregs.cs.g, sregs.cs.avl);
+	printf("ioctl(%d<%s>, KVM_GET_SREGS, ", vcpu_fd, vcpu_dev);
+	print_kvm_sregs(&sregs);
+	printf(") = 0\n");
 
 	sregs.cs.base = 0;
 	sregs.cs.selector = 0;
 	KVM_IOCTL(vcpu_fd, KVM_SET_SREGS, &sregs);
-	printf("ioctl(%d<%s>, KVM_SET_SREGS, {cs={base=%#jx, limit=%u"
-	       ", selector=%u, type=%u, present=%u, dpl=%u, db=%u, s=%u"
-	       ", l=%u, g=%u, avl=%u}, ...}) = 0\n",
-	       vcpu_fd, vcpu_dev, (uintmax_t) sregs.cs.base,
-	       sregs.cs.limit, sregs.cs.selector, sregs.cs.type,
-	       sregs.cs.present, sregs.cs.dpl, sregs.cs.db, sregs.cs.s,
-	       sregs.cs.l, sregs.cs.g, sregs.cs.avl);
+	printf("ioctl(%d<%s>, KVM_SET_SREGS, ", vcpu_fd, vcpu_dev);
+	print_kvm_sregs(&sregs);
+	printf(") = 0\n");
 
 	/*
 	 * Initialize registers: instruction pointer for our code, addends,
@@ -119,11 +191,9 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 		.rflags = 0x2,
 	};
 	KVM_IOCTL(vcpu_fd, KVM_SET_REGS, &regs);
-	printf("ioctl(%d<%s>, KVM_SET_REGS, {rax=%#jx, ..."
-	       ", rsp=%#jx, rbp=%#jx, ..., rip=%#jx, rflags=%#jx}) = 0\n",
-	       vcpu_fd, vcpu_dev, (uintmax_t) regs.rax,
-	       (uintmax_t) regs.rsp, (uintmax_t) regs.rbp,
-	       (uintmax_t) regs.rip, (uintmax_t) regs.rflags);
+	printf("ioctl(%d<%s>, KVM_SET_REGS, ", vcpu_fd, vcpu_dev);
+	print_kvm_regs(&regs);
+	printf(") = 0\n");
 
 	/* Copy the code */
 	memcpy(mem, code, code_size);
@@ -194,8 +264,22 @@ print_cpuid_ioctl(int fd, const char *fd_dev,
 {
 	printf("ioctl(%d<%s>, %s, {nent=%u, entries=[",
 	       fd, fd_dev, ioctl_name, cpuid->nent);
+#if VERBOSE
+	for (size_t i = 0; i < cpuid->nent; i++) {
+		if (i)
+			printf(", ");
+		printf("{function=%#x, index=%#x, flags=",
+		       cpuid->entries[i].function, cpuid->entries[i].index);
+		printflags(kvm_cpuid_flags, cpuid->entries[i].flags,
+			   "KVM_CPUID_FLAG_???");
+		printf(", eax=%#x, ebx=%#x, ecx=%#x, edx=%#x}",
+		       cpuid->entries[i].eax, cpuid->entries[i].ebx,
+		       cpuid->entries[i].ecx, cpuid->entries[i].edx);
+	}
+#else
 	if (cpuid->nent)
 		printf("...");
+#endif
 	printf("]}) = 0\n");
 }
 

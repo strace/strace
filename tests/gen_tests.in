@@ -140,6 +140,7 @@ ioctl_evdev	+ioctl.test
 ioctl_evdev-v	+ioctl.test -v
 ioctl_inotify	+ioctl.test
 ioctl_kvm_run	+ioctl.test -a36 -y
+ioctl_kvm_run-v	+ioctl.test -v -a36 -y
 ioctl_loop	+ioctl.test
 ioctl_loop-nv	+ioctl.test -a22 -e verbose=none
 ioctl_loop-v	+ioctl.test -v
