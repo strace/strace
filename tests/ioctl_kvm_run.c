@@ -28,6 +28,7 @@
 #include "tests.h"
 
 #if defined HAVE_LINUX_KVM_H				\
+ && defined HAVE_STRUCT_KVM_CPUID2			\
  && defined HAVE_STRUCT_KVM_REGS			\
  && defined HAVE_STRUCT_KVM_SREGS			\
  && defined HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION	\
@@ -42,6 +43,10 @@
 # include <sys/mman.h>
 # include <unistd.h>
 # include <linux/kvm.h>
+
+# ifndef KVM_MAX_CPUID_ENTRIES
+#  define KVM_MAX_CPUID_ENTRIES 80
+# endif
 
 static int
 kvm_ioctl(int fd, unsigned long cmd, const char *cmd_str, void *arg)
@@ -183,6 +188,17 @@ vcpu_dev_should_have_cpuid(int fd)
 	return r;
 }
 
+static void
+print_cpuid_ioctl(int fd, const char *fd_dev,
+		  const char *ioctl_name, const struct kvm_cpuid2 *cpuid)
+{
+	printf("ioctl(%d<%s>, %s, {nent=%u, entries=[",
+	       fd, fd_dev, ioctl_name, cpuid->nent);
+	if (cpuid->nent)
+		printf("...");
+	printf("]}) = 0\n");
+}
+
 int
 main(void)
 {
@@ -253,6 +269,33 @@ main(void)
 	if (run == MAP_FAILED)
 		perror_msg_and_fail("mmap vcpu");
 
+	size_t cpuid_nent = KVM_MAX_CPUID_ENTRIES;
+	struct kvm_cpuid2 *cpuid = tail_alloc(sizeof(*cpuid) +
+					      cpuid_nent *
+					      sizeof(*cpuid->entries));
+
+	cpuid->nent = 0;
+	ioctl(kvm, KVM_GET_SUPPORTED_CPUID, cpuid);
+	printf("ioctl(%d<%s>, KVM_GET_SUPPORTED_CPUID, %p) = -1 E2BIG (%m)\n",
+	       kvm, dev, cpuid);
+
+	cpuid->nent = cpuid_nent;
+
+	KVM_IOCTL(kvm, KVM_GET_SUPPORTED_CPUID, cpuid);
+	print_cpuid_ioctl(kvm, dev, "KVM_GET_SUPPORTED_CPUID", cpuid);
+
+	struct kvm_cpuid2 cpuid_tmp = { .nent = 0 };
+	KVM_IOCTL(vcpu_fd, KVM_SET_CPUID2, &cpuid_tmp);
+	printf("ioctl(%d<%s>, KVM_SET_CPUID2, {nent=%u, entries=[]}) = 0\n",
+	       vcpu_fd, vcpu_dev, cpuid_tmp.nent);
+
+	KVM_IOCTL(vcpu_fd, KVM_SET_CPUID2, cpuid);
+	print_cpuid_ioctl(vcpu_fd, vcpu_dev, "KVM_SET_CPUID2", cpuid);
+
+	ioctl(vcpu_fd, KVM_SET_CPUID2, NULL);
+	printf("ioctl(%d<%s>, KVM_SET_CPUID2, NULL) = -1 EFAULT (%m)\n",
+	       vcpu_fd, vcpu_dev);
+
 	run_kvm(vcpu_fd, run, mmap_size, mem);
 
 	puts("+++ exited with 0 +++");
@@ -261,8 +304,8 @@ main(void)
 
 #else /* !HAVE_LINUX_KVM_H */
 
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_KVM_H && HAVE_STRUCT_KVM_REGS && "
-		    "HAVE_STRUCT_KVM_SREGS && "
+SKIP_MAIN_UNDEFINED("HAVE_LINUX_KVM_H && HAVE_STRUCT_KVM_CPUID2 && "
+		    "HAVE_STRUCT_KVM_REGS && HAVE_STRUCT_KVM_SREGS && "
 		    "HAVE_STRUCT_KVM_USERSPACE_MEMORY_REGION && "
 		    "(__x86_64__ || __i386__)")
 
