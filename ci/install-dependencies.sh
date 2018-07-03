@@ -3,14 +3,23 @@
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
 common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libbluetooth-dev make xz-utils'
 
+retry_if_failed()
+{
+	for i in `seq 0 99`; do
+		"$@" && i= && break || sleep 1
+	done
+	[ -z "$i" ]
+}
+
 updated=
 apt_get_install()
 {
 	[ -n "$updated" ] || {
-		$sudo apt-get -qq update
+		retry_if_failed $sudo apt-get -qq update
 		updated=1
 	}
-	$sudo apt-get -qq --no-install-suggests --no-install-recommends \
+	retry_if_failed $sudo \
+		apt-get -qq --no-install-suggests --no-install-recommends \
 		install -y "$@"
 }
 
@@ -36,7 +45,8 @@ clone_repo()
 			;;
 	esac
 
-	git clone --depth=1 ${branch:+--branch $branch} "$src" "$dst"
+	retry_if_failed \
+		git clone --depth=1 ${branch:+--branch $branch} "$src" "$dst"
 }
 
 case "$KHEADERS" in
@@ -57,7 +67,8 @@ case "$CC" in
 		apt_get_install $common_packages
 		;;
 	gcc-*)
-		$sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+		retry_if_failed \
+			$sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 		apt_get_install $common_packages "$CC"-multilib
 		;;
 	clang*)
@@ -103,7 +114,8 @@ esac
 case "${CHECK-}" in
 	coverage)
 		apt_get_install lcov
-		pip install --user codecov
+		retry_if_failed \
+			pip install --user codecov
 		;;
 	valgrind)
 		apt_get_install valgrind
