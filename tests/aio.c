@@ -315,7 +315,6 @@ main(void)
 	printf("io_submit(%#lx, %ld, %p) = %s\n",
 	       *ctx, -1L, cbvs + nr, sprintrc(rc));
 
-	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
 	printf("io_submit(%#lx, %ld, ["
 	       "{aio_data=%#" PRI__x64 ", aio_key=%u"
 		", aio_lio_opcode=%hu /* IOCB_CMD_??? */, aio_fildes=%d}"
@@ -335,7 +334,7 @@ main(void)
 	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
 		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, NULL, %#lx, ... /* %p */]) = %s\n",
+	       "}, NULL, %#lx, ... /* %p */]) = ",
 	       *ctx, 1057L,
 	       cbv2[0].aio_data, cbv2[0].aio_key,
 	       cbv2[0].aio_lio_opcode, cbv2[0].aio_fildes,
@@ -350,7 +349,9 @@ main(void)
 	       data2 + 4, cbv2[3].aio_nbytes, cbv2[3].aio_offset,
 	       cbv2[4].aio_key, cbv2[4].aio_reqprio, cbv2[4].aio_fildes,
 	       cbv2[4].aio_buf, cbv2[4].aio_nbytes, cbv2[4].aio_offset,
-	       cbvs2[6], cbvs2 + 7, sprintrc(rc));
+	       cbvs2[6], cbvs2 + 7);
+	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
+	puts(sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, nr, cbvs);
 	if (rc != (long) nr)
