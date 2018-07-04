@@ -129,6 +129,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ksysent \
 	list_sigaction_signum \
 	localtime \
+	looping_threads \
 	mmsg-silent \
 	mmsg_name-v \
 	msg_control-v \
@@ -192,6 +193,7 @@ fstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 fstatat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 ftruncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 localtime_LDADD = $(clock_LIBS) $(LDADD)
+looping_threads_LDADD = -lpthread $(LDADD)
 lstat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_Xabbrev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
@@ -325,6 +327,7 @@ MISC_TESTS = \
 	interactive_block.test \
 	ksysent.test \
 	localtime.test \
+	looping_threads.test \
 	opipe.test \
 	options-syntax.test \
 	pc.test \
@@ -368,7 +371,8 @@ XFAIL_TESTS_m32 = $(STACKTRACE_TESTS)
 XFAIL_TESTS_mx32 = $(STACKTRACE_TESTS)
 XFAIL_TESTS_x86_64 = int_0x80.gen.test
 XFAIL_TESTS_x32 = int_0x80.gen.test
-XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME)) $(XFAIL_TESTS_$(ARCH))
+XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME)) $(XFAIL_TESTS_$(ARCH)) \
+	      looping_threads.test
 
 TEST_LOG_COMPILER = env
 AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) STRACE_NATIVE_ARCH=$(NATIVE_ARCH) \

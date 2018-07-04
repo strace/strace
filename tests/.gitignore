@@ -208,6 +208,7 @@ list_sigaction_signum
 llseek
 localtime
 lookup_dcookie
+looping_threads
 lseek
 lstat
 lstat64
