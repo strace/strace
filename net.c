@@ -643,7 +643,7 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		printaddr(addr);
 	} else {
 		PRINT_FIELD_U("{", stats, tp_packets);
-		PRINT_FIELD_U("{", stats, tp_drops);
+		PRINT_FIELD_U(", ", stats, tp_drops);
 		tprints("}");
 	}
 }
