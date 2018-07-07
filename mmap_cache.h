@@ -73,6 +73,8 @@ enum mmap_cache_rebuild_result {
 	MMAP_CACHE_REBUILD_RENEWED,
 };
 
+typedef bool (*mmap_cache_search_fn)(struct mmap_cache_entry_t *, void *);
+
 extern void
 mmap_cache_enable(void);
 
@@ -81,5 +83,8 @@ mmap_cache_rebuild_if_invalid(struct tcb *, const char *caller);
 
 extern struct mmap_cache_entry_t *
 mmap_cache_search(struct tcb *, unsigned long ip);
+
+extern struct mmap_cache_entry_t *
+mmap_cache_search_custom(struct tcb *, mmap_cache_search_fn, void *);
 
 #endif /* !STRACE_MMAP_CACHE_H */

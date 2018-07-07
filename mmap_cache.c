@@ -235,3 +235,13 @@ mmap_cache_search(struct tcb *tcp, unsigned long ip)
 	}
 	return NULL;
 }
+
+struct mmap_cache_entry_t *
+mmap_cache_search_custom(struct tcb *tcp, mmap_cache_search_fn fn, void *data)
+{
+	for (unsigned int i = 0; i < tcp->mmap_cache->size; i++) {
+		if (fn(tcp->mmap_cache->entry + i, data))
+			return tcp->mmap_cache->entry + i;
+	}
+	return NULL;
+}
