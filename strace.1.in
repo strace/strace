@@ -427,8 +427,9 @@ is one of
 .BR read ,
 .BR write ,
 .BR fault ,
+.BR inject ,
 or
-.B inject
+.B kvm
 and
 .I value
 is a qualifier-dependent symbol or number.  The default
@@ -769,6 +770,11 @@ This is equivalent to more generic
 .I errno
 option set to
 .IR ENOSYS .
+
+.TP
+.BR "\-e\ kvm" = vcpu
+Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
+or higher.
 
 .TP
 .BI "\-P " path

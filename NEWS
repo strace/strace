@@ -2,6 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of kvm vcpu exit reason (-e kvm=vcpu option),
+    requires Linux kernel version 4.16.0 or higher.
   * Implemented decoding of KVM_SET_CPUID2 and KVM_GET_*_CPUID ioctl commands.
 
 Noteworthy changes in release 4.23 (2018-06-14)
