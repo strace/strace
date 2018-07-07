@@ -386,6 +386,7 @@ EXTRA_DIST = \
 	init.sh \
 	init_delete_module.h \
 	ipc.sh \
+	ioctl_kvm_run_common.c \
 	ksysent.sed \
 	lstatx.c \
 	match.awk \

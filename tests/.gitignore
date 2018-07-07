@@ -146,6 +146,7 @@ ioctl_evdev-v
 ioctl_inotify
 ioctl_kvm_run
 ioctl_kvm_run-v
+ioctl_kvm_run_auxstr_vcpu
 ioctl_loop
 ioctl_loop-nv
 ioctl_loop-v

@@ -141,6 +141,7 @@ ioctl_evdev-v	+ioctl.test -v
 ioctl_inotify	+ioctl.test
 ioctl_kvm_run	+ioctl.test -a36 -y
 ioctl_kvm_run-v	+ioctl.test -v -a36 -y
+ioctl_kvm_run_auxstr_vcpu	+ioctl.test -a36 -y -e kvm=vcpu
 ioctl_loop	+ioctl.test
 ioctl_loop-nv	+ioctl.test -a22 -e verbose=none
 ioctl_loop-v	+ioctl.test -v
