@@ -34,13 +34,175 @@
 # include <linux/kvm.h>
 # include "print_fields.h"
 # include "arch_kvm.c"
+# include "xmalloc.h"
+# include "mmap_cache.h"
+
+struct vcpu_info {
+	struct vcpu_info *next;
+	int fd;
+	int cpuid;
+	long mmap_addr;
+	unsigned long mmap_len;
+	bool resolved;
+};
+
+static bool dump_kvm_run_structure;
+
+static struct vcpu_info *
+vcpu_find(struct tcb *const tcp, int fd)
+{
+	for (struct vcpu_info *vcpu_info = tcp->vcpu_info_list;
+	     vcpu_info;
+	     vcpu_info = vcpu_info->next)
+		if (vcpu_info->fd == fd)
+			return vcpu_info;
+
+	return NULL;
+}
+
+static struct vcpu_info *
+vcpu_alloc(struct tcb *const tcp, int fd, int cpuid)
+{
+	struct vcpu_info *vcpu_info = xcalloc(1, sizeof(*vcpu_info));
+
+	vcpu_info->fd = fd;
+	vcpu_info->cpuid = cpuid;
+
+	vcpu_info->next = tcp->vcpu_info_list;
+	tcp->vcpu_info_list = vcpu_info;
+
+	return vcpu_info;
+}
+
+void
+kvm_vcpu_info_free(struct tcb *tcp)
+{
+	struct vcpu_info *head, *next;
+
+	for (head = tcp->vcpu_info_list; head; head = next) {
+		next = head->next;
+		free(head);
+	}
+
+	tcp->vcpu_info_list = NULL;
+}
+
+static void
+vcpu_register(struct tcb *const tcp, int fd, int cpuid)
+{
+	if (fd < 0)
+		return;
+
+	struct vcpu_info *vcpu_info = vcpu_find(tcp, fd);
+
+	if (!vcpu_info)
+		vcpu_info = vcpu_alloc(tcp, fd, cpuid);
+	else if (vcpu_info->cpuid != cpuid)
+	{
+		vcpu_info->cpuid = cpuid;
+		vcpu_info->resolved = false;
+	}
+}
+
+static bool
+is_map_for_file(struct mmap_cache_entry_t *map_info, void *data)
+{
+	/* major version for anon inode may be given in get_anon_bdev()
+	 * in linux kernel.
+	 *
+	 * 	*p = MKDEV(0, dev & MINORMASK);
+	 *-----------------^
+	 */
+	return map_info->binary_filename &&
+		map_info->major == 0 &&
+		strcmp(map_info->binary_filename, data) == 0;
+}
+
+static unsigned long
+map_len(struct mmap_cache_entry_t *map_info)
+{
+	return map_info->start_addr < map_info->end_addr
+		? map_info->end_addr - map_info->start_addr
+		: 0;
+}
+
+#define VCPU_DENTRY_PREFIX "anon_inode:kvm-vcpu:"
+
+static struct vcpu_info*
+vcpu_get_info(struct tcb *const tcp, int fd)
+{
+	struct vcpu_info *vcpu_info = vcpu_find(tcp, fd);
+	struct mmap_cache_entry_t *map_info;
+	const char *cpuid_str;
+
+	enum mmap_cache_rebuild_result mc_stat =
+		mmap_cache_rebuild_if_invalid(tcp, __func__);
+	if (mc_stat == MMAP_CACHE_REBUILD_NOCACHE)
+		return NULL;
+
+	if (vcpu_info && vcpu_info->resolved) {
+		if (mc_stat == MMAP_CACHE_REBUILD_READY)
+			return vcpu_info;
+		else {
+			map_info = mmap_cache_search(tcp, vcpu_info->mmap_addr);
+			if (map_info) {
+				cpuid_str =
+					STR_STRIP_PREFIX(map_info->binary_filename,
+							 VCPU_DENTRY_PREFIX);
+				if (cpuid_str != map_info->binary_filename) {
+					int cpuid = string_to_uint(cpuid_str);
+					if (cpuid < 0)
+						return NULL;
+					if (vcpu_info->cpuid == cpuid)
+						return vcpu_info;
+				}
+			}
+
+			/* The vcpu vma may be mremap'ed. */
+			vcpu_info->resolved = false;
+		}
+	}
+
+	/* Slow path: !vcpu_info || !vcpu_info->resolved */
+	char path[PATH_MAX + 1];
+	cpuid_str = path;
+	if (getfdpath(tcp, fd, path, sizeof(path)) >= 0)
+		cpuid_str = STR_STRIP_PREFIX(path, VCPU_DENTRY_PREFIX);
+	if (cpuid_str == path)
+		map_info = NULL;
+	else
+		map_info = mmap_cache_search_custom(tcp, is_map_for_file, path);
+
+	if (map_info) {
+		int cpuid = string_to_uint(cpuid_str);
+		if (cpuid < 0)
+			return NULL;
+		if (!vcpu_info)
+			vcpu_info = vcpu_alloc(tcp, fd, cpuid);
+		else if (vcpu_info->cpuid != cpuid)
+			vcpu_info->cpuid = cpuid;
+		vcpu_info->mmap_addr = map_info->start_addr;
+		vcpu_info->mmap_len  = map_len(map_info);
+		vcpu_info->resolved  = true;
+		return vcpu_info;
+	}
+
+	return NULL;
+}
 
 static int
 kvm_ioctl_create_vcpu(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	uint32_t cpuid = arg;
 
-	tprintf(", %u", cpuid);
+	if (entering(tcp)) {
+		tprintf(", %u", cpuid);
+		if (dump_kvm_run_structure)
+			return 0;
+	} else if (!syserror(tcp)) {
+		vcpu_register(tcp, tcp->u_rval, cpuid);
+	}
+
 	return RVAL_IOCTL_DECODED | RVAL_FD;
 }
 
@@ -160,6 +322,53 @@ kvm_ioctl_decode_sregs(struct tcb *const tcp, const unsigned int code,
 }
 # endif /* HAVE_STRUCT_KVM_SREGS */
 
+# include "xlat/kvm_exit_reason.h"
+static void
+kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
+			    struct vcpu_info *info)
+
+{
+	static struct kvm_run vcpu_run_struct;
+
+	if (info->mmap_len < sizeof(vcpu_run_struct))
+		return;
+
+	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0)
+		return;
+
+	tcp->auxstr = xlat_idx(kvm_exit_reason, ARRAY_SIZE(kvm_exit_reason) - 1,
+			       vcpu_run_struct.exit_reason);
+	if (!tcp->auxstr)
+		tcp->auxstr = "KVM_EXIT_???";
+}
+
+static int
+kvm_ioctl_decode_run(struct tcb *const tcp)
+{
+
+	if (entering(tcp))
+		return 0;
+
+	int r = RVAL_DECODED;
+
+	if (syserror(tcp))
+		return r;
+
+	if (dump_kvm_run_structure) {
+		tcp->auxstr = NULL;
+		int fd = tcp->u_arg[0];
+		struct vcpu_info *info = vcpu_get_info(tcp, fd);
+
+		if (info) {
+			kvm_ioctl_run_attach_auxstr(tcp, info);
+			if (tcp->auxstr)
+				r |= RVAL_STR;
+		}
+	}
+
+	return r;
+}
+
 int
 kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
 {
@@ -195,12 +404,22 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 
 	case KVM_CREATE_VM:
 		return RVAL_DECODED | RVAL_FD;
+
 	case KVM_RUN:
+		return kvm_ioctl_decode_run(tcp);
+
 	case KVM_GET_VCPU_MMAP_SIZE:
 	case KVM_GET_API_VERSION:
 	default:
 		return RVAL_DECODED;
 	}
+}
+
+void
+kvm_run_structure_decoder_init(void)
+{
+	dump_kvm_run_structure = true;
+	mmap_cache_enable();
 }
 
 #endif /* HAVE_LINUX_KVM_H */

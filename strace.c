@@ -278,7 +278,11 @@ Statistics:\n\
 \n\
 Filtering:\n\
   -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write, fault\n\
+     options:    trace, abbrev, verbose, raw, signal, read, write, fault"
+#ifdef HAVE_LINUX_KVM_H
+	       ", kvm"
+#endif
+"\n\
   -P path        trace accesses to path\n\
 \n\
 Tracing:\n\
@@ -817,6 +821,10 @@ droptcb(struct tcb *tcp)
 #ifdef ENABLE_STACKTRACE
 	if (stack_trace_enabled)
 		unwind_tcb_fin(tcp);
+#endif
+
+#ifdef HAVE_LINUX_KVM_H
+	kvm_vcpu_info_free(tcp);
 #endif
 
 	if (tcp->mmap_cache)

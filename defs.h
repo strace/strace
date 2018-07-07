@@ -236,6 +236,10 @@ struct tcb {
 
 	struct mmap_cache_t *mmap_cache;
 
+#ifdef HAVE_LINUX_KVM_H
+	struct vcpu_info *vcpu_info_list;
+#endif
+
 #ifdef ENABLE_STACKTRACE
 	void *unwind_ctx;
 	struct unwind_queue_t *unwind_queue;
@@ -986,6 +990,11 @@ extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
 extern void unwind_tcb_print(struct tcb *);
 extern void unwind_tcb_capture(struct tcb *);
+#endif
+
+#ifdef HAVE_LINUX_KVM_H
+extern void kvm_run_structure_decoder_init(void);
+extern void kvm_vcpu_info_free(struct tcb *);
 #endif
 
 static inline int
