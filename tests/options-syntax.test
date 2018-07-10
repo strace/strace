@@ -66,6 +66,7 @@ check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e 
 check_h "incorrect personality designator '42' in qualification '23@42'" -e trace=23@42,123
 
 check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
+check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
 
 case "$STRACE_NATIVE_ARCH" in
 x86_64)

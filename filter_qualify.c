@@ -415,7 +415,7 @@ qualify_kvm(const char *const str)
 		else
 			error_msg("-e kvm=vcpu option needs Linux 4.16.0 or higher");
 	} else {
-		error_msg("unknown value for -e kvm= option: %s", str);
+		error_msg_and_die("invalid -e kvm= argument: '%s'", str);
 	}
 }
 #endif
