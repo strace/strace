@@ -278,9 +278,9 @@ Statistics:\n\
 \n\
 Filtering:\n\
   -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write, fault"
+     options:    trace, abbrev, verbose, raw, signal, read, write, fault, inject"
 #ifdef HAVE_LINUX_KVM_H
-	       ", kvm"
+		", kvm"
 #endif
 "\n\
   -P path        trace accesses to path\n\
