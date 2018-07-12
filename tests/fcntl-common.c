@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 #include "flock.h"
 
 #define FILE_LEN 4096
@@ -238,6 +239,136 @@ test_f_owner_ex(void)
 }
 #endif /* TEST_F_OWNER_EX */
 
+struct fcntl_cmd_check {
+	int fd;
+	int cmd;
+	const char *cmd_str;
+	long arg;
+	const char *arg_str;
+	void (*print_flags)(long rc);
+};
+
+static void
+print_retval_flags(const struct fcntl_cmd_check *check, long rc)
+{
+	if (check->print_flags) {
+		check->print_flags(rc);
+	} else {
+		printf("%s", errstr);
+	}
+	printf("\n");
+}
+
+static void
+test_other_set_cmd(const struct fcntl_cmd_check *check)
+{
+	invoke_test_syscall(check->fd, check->cmd, (void *) check->arg);
+	printf("%s(%d, %s, %s) = %s\n",
+	       TEST_SYSCALL_STR, check->fd,
+	       check->cmd_str, check->arg_str, errstr);
+
+	/* bad file fd */
+	invoke_test_syscall(-1, check->cmd, (void *) check->arg);
+	printf("%s(-1, %s, %s) = %s\n",
+	       TEST_SYSCALL_STR, check->cmd_str,
+	       check->arg_str, errstr);
+}
+
+static void
+test_other_get_cmd(const struct fcntl_cmd_check *check)
+{
+	long rc = invoke_test_syscall(check->fd, check->cmd, NULL);
+	printf("%s(%d, %s) = ",
+	       TEST_SYSCALL_STR, check->fd, check->cmd_str);
+	print_retval_flags(check, rc);
+
+	/* bad file fd */
+	invoke_test_syscall(-1, check->cmd, NULL);
+	printf("%s(-1, %s) = %s\n",
+	       TEST_SYSCALL_STR, check->cmd_str, errstr);
+}
+
+static void
+print_flags_getfd(long rc)
+{
+	assert(rc >= 0);
+	printf("%#lx%s", rc, rc & 1 ? " (flags FD_CLOEXEC)" : "");
+}
+
+static void
+print_flags_getsig(long rc)
+{
+	assert(rc >= 0);
+
+	if (!rc) {
+		printf("%ld", rc);
+	} else {
+		printf("%ld (%s)", rc, signal2name((int) rc));
+	}
+}
+
+static void
+print_flags_getlease(long rc)
+{
+	assert(rc >= 0);
+	const char *text;
+
+	switch (rc) {
+	case F_RDLCK:
+		text = "F_RDLCK";
+		break;
+	case F_WRLCK:
+		text = "F_WRLCK";
+		break;
+	case F_UNLCK:
+		text = "F_UNLCK";
+		break;
+	default:
+		error_msg_and_fail("fcntl returned %#lx, does the"
+				   " test have to be updated?", rc);
+	}
+	printf("%#lx (%s)", rc, text);
+}
+
+static void
+test_fcntl_others(void)
+{
+	static const struct fcntl_cmd_check set_checks[] = {
+		{ 0, ARG_STR(F_SETFD), ARG_STR(FD_CLOEXEC) },
+		{ 0, ARG_STR(F_SETOWN), ARG_STR(20) },
+#ifdef F_SETPIPE_SZ
+		{ 0, ARG_STR(F_SETPIPE_SZ), ARG_STR(4097) },
+#endif
+		{ 0, ARG_STR(F_DUPFD), ARG_STR(0) },
+#ifdef F_DUPFD_CLOEXEC
+		{ 0, ARG_STR(F_DUPFD_CLOEXEC), ARG_STR(0) },
+#endif
+		{ 0, ARG_STR(F_SETFL), ARG_STR(O_RDWR|O_LARGEFILE) },
+		{ 0, ARG_STR(F_NOTIFY), ARG_STR(DN_ACCESS) },
+		{ 1, ARG_STR(F_SETLEASE), ARG_STR(F_RDLCK) },
+		{ 0, ARG_STR(F_SETSIG), 0, "SIG_0" },
+		{ 1, ARG_STR(F_SETSIG), 1, "SIGHUP" }
+	};
+	for (unsigned int i = 0; i < ARRAY_SIZE(set_checks); i++) {
+		test_other_set_cmd(set_checks + i);
+	}
+
+	static const struct fcntl_cmd_check get_checks[] = {
+		{ 0, ARG_STR(F_GETFD), .print_flags = print_flags_getfd },
+		{ 1, ARG_STR(F_GETFD), .print_flags = print_flags_getfd },
+		{ 0, ARG_STR(F_GETOWN) },
+#ifdef F_GETPIPE_SZ
+		{ 0, ARG_STR(F_GETPIPE_SZ) },
+#endif
+		{ 1, ARG_STR(F_GETLEASE), .print_flags = print_flags_getlease },
+		{ 0, ARG_STR(F_GETSIG), .print_flags = print_flags_getsig },
+		{ 1, ARG_STR(F_GETSIG), .print_flags = print_flags_getsig }
+	};
+	for (unsigned int j = 0; j < ARRAY_SIZE(get_checks); j++) {
+		test_other_get_cmd(get_checks + j);
+	}
+}
+
 static void
 create_sample(void)
 {
@@ -261,6 +392,7 @@ main(void)
 #ifdef TEST_F_OWNER_EX
 	test_f_owner_ex();
 #endif
+	test_fcntl_others();
 
 	puts("+++ exited with 0 +++");
 	return 0;
