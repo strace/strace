@@ -144,6 +144,7 @@ strace_SOURCES =	\
 	fetch_struct_stat.c \
 	fetch_struct_stat64.c \
 	fetch_struct_statfs.c \
+	fetch_struct_xfs_quotastat.c \
 	file_handle.c	\
 	file_ioctl.c	\
 	filter_qualify.c \
@@ -348,6 +349,7 @@ strace_SOURCES =	\
 	v4l2.c		\
 	wait.c		\
 	xattr.c		\
+	xfs_quota_stat.h \
 	xlat.c		\
 	xlat.h		\
 	xmalloc.c	\
