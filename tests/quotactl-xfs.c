@@ -213,7 +213,7 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_quota_statv, xqstatv);
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint32_t, flags);
 	char *unterminated = tail_memdup(unterminated_data,
-		sizeof(unterminated_data));
+					 sizeof(unterminated_data));
 
 	snprintf(bogus_special_str, sizeof(bogus_special_str), "%p",
 		 bogus_special);
