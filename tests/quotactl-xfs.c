@@ -298,20 +298,29 @@ main(void)
 		    ARG_STR("/dev/sda1"), xqstat, print_xquota_stat, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
+		    ARG_STR(QCMD(Q_XGETQSTAT, USRQUOTA)),
+		    ARG_STR("NULL"), xqstat, print_xquota_stat, (intptr_t) 2);
+
+	check_quota(CQF_ID_SKIP,
 		    ARG_STR(QCMD(Q_XGETQSTAT, PRJQUOTA)),
 		    unterminated, unterminated_str,
-		    xqstat + 1, print_xquota_stat, (intptr_t) 2);
+		    xqstat + 1);
 
 
 	/* Q_XGETQSTATV */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_XGETQSTATV, USRQUOTA)),
-		    ARG_STR("/dev/sda1"), xqstatv, print_xquota_statv, 1);
+		    ARG_STR("/dev/sda1"), xqstatv, print_xquota_statv, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_XGETQSTATV, GRPQUOTA)),
 		    ARG_STR(NULL), xqstatv, print_xquota_statv, (intptr_t) 2);
+
+	check_quota(CQF_ID_SKIP,
+		    ARG_STR(QCMD(Q_XGETQSTATV, PRJQUOTA)),
+		    unterminated, unterminated_str,
+		    xqstatv + 1);
 
 
 	/* Q_XQUOTARM */

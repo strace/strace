@@ -161,6 +161,37 @@ print_dqinfo(long rc, void *ptr, void *arg)
 	printf("}");
 }
 
+void
+print_dqfmt(long rc, void *ptr, void *arg)
+{
+	uint32_t *fmtval = ptr;
+	long out_arg = (long) arg;
+	const char *fmtstr;
+
+	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+		printf("%p", fmtval);
+		return;
+	}
+	printf("[");
+	switch (*fmtval) {
+	case 1:
+		fmtstr = "QFMT_VFS_OLD";
+		break;
+	case 2:
+		fmtstr = "QFMT_VFS_V0";
+		break;
+	case 3:
+		fmtstr = "QFMT_OCFS2";
+		break;
+	case 4:
+		fmtstr = "QFMT_VFS_V1";
+		break;
+	default:
+		printf("%#x /* QFMT_VFS_??? */]", *fmtval);
+		return;
+	}
+	printf("%s]", fmtstr);
+}
 
 int
 main(void)
@@ -294,9 +325,14 @@ main(void)
 	check_quota(CQF_ID_SKIP,
 		    ARG_STR(QCMD(Q_GETFMT, USRQUOTA)),
 		    unterminated, unterminated_str, fmt + 1);
-	check_quota(CQF_ID_SKIP,
+	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_GETFMT, GRPQUOTA)),
-		    ARG_STR("/dev/sda1"), fmt);
+		    ARG_STR("/dev/sda1"), fmt, print_dqfmt, (uintptr_t) 1);
+	/* Try to check valid quota format */
+	*fmt = QFMT_VFS_OLD;
+	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
+		    ARG_STR(QCMD(Q_GETFMT, GRPQUOTA)),
+		    ARG_STR("/dev/sda1"), fmt, print_dqfmt, (uintptr_t) 1);
 
 
 	/* Q_SYNC */
