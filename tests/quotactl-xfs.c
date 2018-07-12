@@ -264,11 +264,11 @@ main(void)
 	/* Q_XGETQUOTA */
 
 	/* Trying our best to get successful result */
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, USRQUOTA)),
+	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_XGETQUOTA, USRQUOTA)),
 		    ARG_STR("/dev/sda1"), getuid(), xdq, print_xdisk_quota,
 		    (intptr_t) 1);
 
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, GRPQUOTA)),
+	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_XGETQUOTA, GRPQUOTA)),
 		    ARG_STR(NULL), -1, xdq, print_xdisk_quota, (intptr_t) 2);
 
 
@@ -298,7 +298,7 @@ main(void)
 		    ARG_STR("/dev/sda1"), xqstat, print_xquota_stat, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_XGETQSTATV, PRJQUOTA)),
+		    ARG_STR(QCMD(Q_XGETQSTAT, PRJQUOTA)),
 		    unterminated, unterminated_str,
 		    xqstat + 1, print_xquota_stat, (intptr_t) 2);
 
@@ -306,7 +306,7 @@ main(void)
 	/* Q_XGETQSTATV */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_XGETQSTAT, USRQUOTA)),
+		    ARG_STR(QCMD(Q_XGETQSTATV, USRQUOTA)),
 		    ARG_STR("/dev/sda1"), xqstatv, print_xquota_statv, 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
