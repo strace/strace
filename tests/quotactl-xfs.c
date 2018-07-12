@@ -207,7 +207,7 @@ main(void)
 	char bogus_addr_str[sizeof(void *) * 2 + sizeof("0x")];
 	char unterminated_str[sizeof(void *) * 2 + sizeof("0x")];
 
-	long rc;
+	static char invalid_cmd_str[1024];
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_disk_quota, xdq);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_quota_stat, xqstat);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_quota_statv, xqstatv);
@@ -234,12 +234,12 @@ main(void)
 		    "|XFS_QUOTA_GDQ_ACCT|XFS_QUOTA_GDQ_ENFD"
 		    "|XFS_QUOTA_PDQ_ENFD|0xdeadbec0]");
 
-	rc = syscall(__NR_quotactl, QCMD(Q_XQUOTAON, 0xfacefeed), bogus_dev,
-		     bogus_id, bogus_addr);
-	printf("quotactl(QCMD(Q_XQUOTAON, %#x /* ???QUOTA */)"
-	       ", %s, %p) = %s\n",
-	       QCMD_TYPE(QCMD(Q_XQUOTAON, 0xfacefeed)),
-	       bogus_dev_str, bogus_addr, sprintrc(rc));
+	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
+		 "QCMD(Q_XQUOTAON, %#x /* ???QUOTA */)",
+		 QCMD_TYPE(QCMD(Q_XQUOTAON, 0xfacefeed)));
+	check_quota(CQF_ID_SKIP,
+		    QCMD(Q_XQUOTAON, 0xfacefeed), invalid_cmd_str,
+		    bogus_dev, bogus_dev_str, bogus_addr);
 
 
 	/* Q_XQUOTAOFF */

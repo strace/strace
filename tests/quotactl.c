@@ -193,6 +193,7 @@ print_dqfmt(long rc, void *ptr, void *arg)
 	printf("%s]", fmtstr);
 }
 
+
 int
 main(void)
 {
@@ -202,14 +203,14 @@ main(void)
 	char bogus_special_str[sizeof(void *) * 2 + sizeof("0x")];
 	char unterminated_str[sizeof(void *) * 2 + sizeof("0x")];
 
-	long rc;
+	static char invalid_cmd_str[1024];
+	static char invalid_id_str[1024];
 	char *unterminated = tail_memdup(unterminated_data,
 					 sizeof(unterminated_data));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct if_dqblk, dqblk);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct if_dqinfo, dqinfo);
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint32_t, fmt);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct if_nextdqblk, nextdqblk);
-
 
 	snprintf(bogus_special_str, sizeof(bogus_special_str), "%p",
 		bogus_special);
@@ -219,16 +220,16 @@ main(void)
 
 	/* Invalid commands */
 
-	rc = syscall(__NR_quotactl, bogus_cmd, bogus_special, bogus_id,
-		     bogus_addr);
-	printf("quotactl(QCMD(%#x /* Q_??? */, %#x /* ???QUOTA */)"
-	       ", %p, %u, %p) = %s\n",
-	       QCMD_CMD(bogus_cmd), QCMD_TYPE(bogus_cmd),
-	       bogus_special, bogus_id, bogus_addr, sprintrc(rc));
+	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
+		 "QCMD(%#x /* Q_??? */, %#x /* ???QUOTA */)",
+		 QCMD_CMD(bogus_cmd), QCMD_TYPE(bogus_cmd));
+	check_quota(CQF_NONE, bogus_cmd, invalid_cmd_str,
+		    bogus_special, bogus_special_str, bogus_id, bogus_addr);
 
-	rc = syscall(__NR_quotactl, 0, NULL, -1, NULL);
-	printf("quotactl(QCMD(0 /* Q_??? */, USRQUOTA), NULL, -1, NULL) = %s\n",
-	       sprintrc(rc));
+	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
+		 "QCMD(0 /* Q_??? */, USRQUOTA)");
+	check_quota(CQF_ADDR_STR, 0, invalid_cmd_str,
+		    ARG_STR(NULL), -1, ARG_STR(NULL));
 
 
 	/* Q_QUOTAON */
@@ -238,12 +239,14 @@ main(void)
 		    ARG_STR("/dev/bogus/"), ARG_STR(QFMT_VFS_OLD),
 		    ARG_STR("/tmp/bogus/"));
 
-	rc = syscall(__NR_quotactl, QCMD(Q_QUOTAON, 0xfacefeed), bogus_dev,
-		     bogus_id, bogus_addr);
-	printf("quotactl(QCMD(Q_QUOTAON, %#x /* ???QUOTA */)"
-	       ", %s, %#x /* QFMT_VFS_??? */, %p) = %s\n",
-	       QCMD_TYPE(QCMD(Q_QUOTAON, 0xfacefeed)),
-	       bogus_dev_str, bogus_id, bogus_addr, sprintrc(rc));
+	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
+		 "QCMD(Q_QUOTAON, %#x /* ???QUOTA */)",
+		 QCMD_TYPE(QCMD(Q_QUOTAON, 0xfacefeed)));
+	snprintf(invalid_id_str, sizeof(invalid_id_str),
+		 "%#x /* QFMT_VFS_??? */", bogus_id);
+	check_quota(CQF_ID_STR, QCMD(Q_QUOTAON, 0xfacefeed),
+		    invalid_cmd_str, bogus_dev, bogus_dev_str,
+		    bogus_id, invalid_id_str, bogus_addr);
 
 
 	/* Q_QUOTAOFF */
