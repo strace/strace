@@ -343,14 +343,14 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_FLAGS(", ", dq, qs_flags,
 					  xfs_quota_flags, "XFS_QUOTA_???");
-			PRINT_FIELD_U(", ", dq, qs_incoredqs);
 			PRINT_FIELD_U(", qs_uquota={", dq.qs_uquota, qfs_ino);
 			PRINT_FIELD_U(", ", dq.qs_uquota, qfs_nblks);
 			PRINT_FIELD_U(", ", dq.qs_uquota, qfs_nextents);
 			PRINT_FIELD_U("}, qs_gquota={", dq.qs_gquota, qfs_ino);
 			PRINT_FIELD_U(", ", dq.qs_gquota, qfs_nblks);
 			PRINT_FIELD_U(", ", dq.qs_gquota, qfs_nextents);
-			PRINT_FIELD_D("}, ", dq, qs_btimelimit);
+			PRINT_FIELD_U("}, ", dq, qs_incoredqs);
+			PRINT_FIELD_D(", ", dq, qs_btimelimit);
 			PRINT_FIELD_D(", ", dq, qs_itimelimit);
 			PRINT_FIELD_D(", ", dq, qs_rtbtimelimit);
 			PRINT_FIELD_U(", ", dq, qs_bwarnlimit);
