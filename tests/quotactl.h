@@ -79,6 +79,71 @@ enum check_quotactl_flags {
 };
 
 
+/**
+ * Generic quotactl syscall checker function.  Call convention:
+ *
+ *     check_quota(flags, cmd, cmd_str, special, special_str
+ *		   [, id [, id_str]]
+ *		   [, addr [, { addr_cb, addr_cb_arg | addr_str }]])
+ *
+ * check_quota performs a syscall invocation and prints the expected output
+ * for it.
+ *
+ * It might be useful to employ ARG_STR macro for passing cmd/cmd_str,
+ * special_special_str, id/id_str, and addr/addr_str argument pairs.
+ *
+ * @param flags Check flags:
+ *               - CQF_ID_SKIP: the "id" syscall argument is ignored
+ *                 in the syscall invocation.  No id and id_str arguments
+ *                 should be provided if this flag is set.
+ *                 This flag has priority over the CQF_ID_STR flag.
+ *               - CQF_ID_STR: the "id" syscall argument has a special string
+ *                 representation.  id_str argument should be provided if this
+ *                 flag is set; no id_str argument should be provided and id
+ *                 argument is printed as unsigned integer (with an exception
+ *                 for -1, which is printed as signed) if this flag is not set.
+ *               - CQF_ADDR_SKIP: the "addr" syscall argument is ignored
+ *                 in the syscall invocation.  None of the addr, addr_cb,
+ *                 addr_cb_arg, and/or addr_str arguments should be provided
+ *                 if this flag is set.  This flag has priority
+ *                 over the CQF_ADDR_STR and CQF_ADDR_CB flags.
+ *               - CQF_ADDR_CB: the "addr" syscall argument printing is handled
+ *                 via a callback function.  addr_cb (that points to a callback
+ *                 function of type print_cb) and addr_cb_arg (an opaque pointer
+ *                 that is passed to addr_cb in the third argument) should
+ *                 be provided if this flag is set.
+ *                 This flag has priority over the CQF_ADDR_STR flag.
+ *               - CQF_ADDR_STR: addr syscall argument has a special string
+ *                 representation.  addr_str argument should be provided if this
+ *                 flag is set.  If both CQF_ADDR_CB and CQF_ADDR_STR flags
+ *                 are not set, addr syscall argument is printed using "%p"
+ *                 printf format.
+ * @param cmd Value of the "cmd" syscall argument that should be passed
+ *            in the syscall invocation.
+ * @param cmd_str String representation of the "cmd" syscall argument.
+ * @param special Value of the "special" syscall argument that should be passed
+ *                in the syscall invocation.
+ * @param special_str String representation of the "special" syscall argument.
+ * @param ... Additional arguments depend on the flags being set:
+ *             - id: Value of the "id" syscall argument.  Provided
+ *               if CQF_ID_SKIP is not set, otherwise -1 is passed
+ *               in the syscall invocation and the argument is not printed
+ *               in the expected output.
+ *             - id_str: String representation of the "id" syscall argument.
+ *               Provided if CQF_ID_SKIP is not set and CQF_ID_STR is set.
+ *             - addr: Value of the "addr" syscall argument.  Provided
+ *               if CQF_ADDR_SKIP is not set, otherwise NULL is passed
+ *               in the syscall invocation and the argument is not printed
+ *               in the expected output.
+ *             - addr_cb: Callback function that is called for the "addr"
+ *               syscall argument printing. Should be of print_cb type.
+ *               Provided if CQF_ADDR_SKIP is not set and CQF_ADDR_CB is set.
+ *             - addr_cb_arg: Opaque pointer that is passed to addr_cb,
+ *               Provided if CQF_ADDR_SKIP is not set and CQF_ADDR_CB is set.
+ *             - addr_str: String representation of the "addr" syscall argument.
+ *               Provided if CQF_ADDR_SKIP is not set, CQF_ADDR_CB is not set,
+ *               and CQF_ADDR_STR is set.
+ */
 static inline void
 check_quota(uint32_t flags, int cmd, const char *cmd_str,
 	const char *special, const char *special_str, ...)
