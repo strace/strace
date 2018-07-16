@@ -29,7 +29,9 @@
 
 #include "tests.h"
 
+#include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -56,6 +58,19 @@ main(void)
 {
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct linger, linger);
 	TAIL_ALLOC_OBJECT_CONST_PTR(socklen_t, len);
+
+	const unsigned int sizeof_l_onoff = sizeof(linger->l_onoff);
+	struct linger *const l_onoff = tail_alloc(sizeof_l_onoff);
+
+	const unsigned int sizeof_l_onoff_truncated = sizeof_l_onoff - 1;
+	struct linger *const l_onoff_truncated =
+		tail_alloc(sizeof_l_onoff_truncated);
+
+	const unsigned int sizeof_l_linger_truncated =
+		offsetofend(struct linger, l_linger) - 1;
+	struct linger *const l_linger_truncated =
+		tail_alloc(sizeof_l_linger_truncated);
+
         int fd = socket(AF_UNIX, SOCK_STREAM, 0);
         if (fd < 0)
                 perror_msg_and_skip("socket AF_UNIX SOCK_STREAM");
@@ -98,6 +113,12 @@ main(void)
 	printf("setsockopt(%d, SOL_SOCKET, SO_LINGER, %p, %d) = %s\n",
 	       fd, &linger->l_linger, (unsigned int) sizeof(*linger), errstr);
 
+	/* getsockopt with zero optlen */
+	*len = 0;
+	get_linger(fd, linger, len);
+	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, %p, [0]) = %s\n",
+	       fd, linger, errstr);
+
 	/* getsockopt with optlen larger than necessary - shortened */
 	*len = sizeof(*linger) + 1;
 	get_linger(fd, linger, len);
@@ -106,19 +127,43 @@ main(void)
 	       fd, linger->l_onoff, linger->l_linger,
 	       (unsigned int) sizeof(*linger) + 1, *len, errstr);
 
-	/* getsockopt with optlen larger than usual - truncated to l_onoff */
-	*len = sizeof(linger->l_onoff);
-	get_linger(fd, linger, len);
+	/*
+	 * getsockopt with optlen less than sizeof(linger->l_onoff):
+	 * the part of struct linger.l_onoff is printed in hex.
+	 */
+	*len = sizeof_l_onoff_truncated;
+	get_linger(fd, l_onoff_truncated, len);
+	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=", fd);
+	print_quoted_hex(l_onoff_truncated, *len);
+	printf("}, [%d]) = %s\n", *len, errstr);
+
+	/*
+	 * getsockopt with optlen equals to sizeof(struct linger.l_onoff):
+	 * struct linger.l_linger is not printed.
+	 */
+	*len = sizeof_l_onoff;
+	get_linger(fd, l_onoff, len);
 	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=%d}"
 	       ", [%d]) = %s\n",
-	       fd, linger->l_onoff, *len, errstr);
+	       fd, l_onoff->l_onoff, *len, errstr);
 
-	/* getsockopt with optlen larger than usual - truncated to raw */
-	*len = sizeof(*linger) - 1;
-	get_linger(fd, linger, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, ", fd);
-	print_quoted_hex(linger, *len);
-	printf(", [%d]) = %s\n", *len, errstr);
+	/*
+	 * getsockopt with optlen greater than sizeof(struct linger.l_onoff)
+	 * but smaller than sizeof(struct linger):
+	 * the part of struct linger.l_linger is printed in hex.
+	 */
+	*len = sizeof_l_linger_truncated;
+	get_linger(fd, l_linger_truncated, len);
+	/*
+	 * Copy to a properly aligned structure to avoid unaligned access
+	 * to struct linger.l_onoff field.
+	 */
+	memcpy(linger, l_linger_truncated, sizeof_l_linger_truncated);
+	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=%d, l_linger=",
+	       fd, linger->l_onoff);
+	print_quoted_hex(&linger->l_linger, sizeof_l_linger_truncated -
+					    offsetof(struct linger, l_linger));
+	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/* getsockopt optval EFAULT */
 	*len = sizeof(*linger);

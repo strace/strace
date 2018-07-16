@@ -561,43 +561,38 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 }
 
 static void
-print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
-		 const int len)
-{
-	struct linger linger;
-
-	if (len < (int) sizeof(linger)) {
-		printaddr(addr);
-	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
-		PRINT_FIELD_D("{", linger, l_onoff);
-		PRINT_FIELD_D(", ", linger, l_linger);
-		tprints("}");
-	}
-}
-
-static void
 print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 		 unsigned int len)
 {
 	struct linger linger;
 
-	if (len < sizeof(linger)) {
-		if (len != sizeof(linger.l_onoff)) {
-			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
-			return;
-		}
-	} else {
+	/*
+	 * The kernel cannot return len > sizeof(linger) because struct linger
+	 * cannot change, but extra safety won't harm either.
+	 */
+	if (len > sizeof(linger))
 		len = sizeof(linger);
-	}
-
-	if (umoven(tcp, addr, len, &linger) < 0) {
-		printaddr(addr);
+	if (umoven_or_printaddr(tcp, addr, len, &linger))
 		return;
-	}
 
-	PRINT_FIELD_D("{", linger, l_onoff);
-	if (len == sizeof(linger))
-		PRINT_FIELD_D(", ", linger, l_linger);
+	if (len < sizeof(linger.l_onoff)) {
+		tprints("{l_onoff=");
+		print_quoted_string((void *) &linger.l_onoff,
+				    len, QUOTE_FORCE_HEX);
+	} else {
+		PRINT_FIELD_D("{", linger, l_onoff);
+
+		if (len > offsetof(struct linger, l_linger)) {
+			len -= offsetof(struct linger, l_linger);
+			if (len < sizeof(linger.l_linger)) {
+				tprints(", l_linger=");
+				print_quoted_string((void *) &linger.l_linger,
+						    len, QUOTE_FORCE_HEX);
+			} else {
+				PRINT_FIELD_D(", ", linger, l_linger);
+			}
+		}
+	}
 	tprints("}");
 }
 
@@ -805,6 +800,21 @@ SYS_FUNC(getsockopt)
 		}
 	}
 	return 0;
+}
+
+static void
+print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const int len)
+{
+	struct linger linger;
+
+	if (len < (int) sizeof(linger)) {
+		printaddr(addr);
+	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
+		PRINT_FIELD_D("{", linger, l_onoff);
+		PRINT_FIELD_D(", ", linger, l_linger);
+		tprints("}");
+	}
 }
 
 #ifdef IP_ADD_MEMBERSHIP
