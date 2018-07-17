@@ -598,30 +598,54 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 
 #ifdef SO_PEERCRED
 static void
-print_ucred(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
+print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
+		unsigned int len)
 {
 	struct ucred uc;
 
-	if (len < sizeof(uc)) {
-		if (len != sizeof(uc.pid)
-		    && len != offsetofend(struct ucred, uid)) {
-			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
-			return;
-		}
-	} else {
+	/*
+	 * The kernel is very unlikely to return len > sizeof(uc)
+	 * because struct ucred is very unlikely to change,
+	 * but extra safety won't harm either.
+	 */
+	if (len > sizeof(uc))
 		len = sizeof(uc);
-	}
 
-	if (umoven(tcp, addr, len, &uc) < 0) {
-		printaddr(addr);
+	if (umoven_or_printaddr(tcp, addr, len, &uc))
 		return;
-	}
 
-	PRINT_FIELD_D("{", uc, pid);
-	if (len > sizeof(uc.pid))
-		PRINT_FIELD_UID(", ", uc, uid);
-	if (len == sizeof(uc))
-		PRINT_FIELD_UID(", ", uc, gid);
+	if (len < sizeof(uc.pid)) {
+		tprints("{pid=");
+		print_quoted_string((void *) &uc.pid,
+				    len, QUOTE_FORCE_HEX);
+	} else {
+		PRINT_FIELD_D("{", uc, pid);
+
+		if (len > offsetof(struct ucred, uid)) {
+			len -= offsetof(struct ucred, uid);
+			if (len < sizeof(uc.uid)) {
+				tprints(", uid=");
+				print_quoted_string((void *) &uc.uid,
+						    len, QUOTE_FORCE_HEX);
+			} else {
+				PRINT_FIELD_UID(", ", uc, uid);
+
+				if (len > offsetof(struct ucred, gid) -
+					  offsetof(struct ucred, uid)) {
+					len -= offsetof(struct ucred, gid) -
+					       offsetof(struct ucred, uid);
+					if (len < sizeof(uc.gid)) {
+						tprints(", gid=");
+						print_quoted_string((void *) &uc.gid,
+								    len,
+								    QUOTE_FORCE_HEX);
+					} else {
+						PRINT_FIELD_UID(", ", uc, gid);
+					}
+				}
+			}
+		}
+	}
 	tprints("}");
 }
 #endif /* SO_PEERCRED */
@@ -699,7 +723,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 #ifdef SO_PEERCRED
 		case SO_PEERCRED:
-			print_ucred(tcp, addr, rlen);
+			print_get_ucred(tcp, addr, rlen);
 			return;
 #endif
 #ifdef SO_ATTACH_FILTER
