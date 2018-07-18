@@ -596,7 +596,6 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints("}");
 }
 
-#ifdef SO_PEERCRED
 static void
 print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 		unsigned int len)
@@ -648,7 +647,6 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 	tprints("}");
 }
-#endif /* SO_PEERCRED */
 
 #ifdef PACKET_STATISTICS
 static void
@@ -721,12 +719,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_LINGER:
 			print_get_linger(tcp, addr, rlen);
 			return;
-#ifdef SO_PEERCRED
 		case SO_PEERCRED:
 			print_get_ucred(tcp, addr, rlen);
 			return;
-#endif
-#ifdef SO_ATTACH_FILTER
 		case SO_ATTACH_FILTER:
 			/*
 			 * The length returned by the kernel in case of
@@ -739,7 +734,6 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			else
 				printaddr(addr);
 			return;
-#endif /* SO_ATTACH_FILTER */
 		}
 		break;
 
@@ -934,17 +928,13 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_LINGER:
 			print_set_linger(tcp, addr, len);
 			return;
-#ifdef SO_ATTACH_FILTER
 		case SO_ATTACH_FILTER:
-# ifdef SO_ATTACH_REUSEPORT_CBPF
 		case SO_ATTACH_REUSEPORT_CBPF:
-# endif
 			if ((unsigned int) len == get_sock_fprog_size())
 				decode_sock_fprog(tcp, addr);
 			else
 				printaddr(addr);
 			return;
-#endif /* SO_ATTACH_FILTER */
 		}
 		break;
 
