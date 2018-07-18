@@ -651,18 +651,55 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 #ifdef PACKET_STATISTICS
 static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
-		    const int len)
+		    unsigned int len)
 {
-	struct tpacket_stats stats;
+	struct tp_stats {
+		unsigned int tp_packets, tp_drops, tp_freeze_q_cnt;
+	} stats;
 
-	if (len != sizeof(stats) ||
-	    umove(tcp, addr, &stats) < 0) {
-		printaddr(addr);
+	/*
+	 * The kernel may return len > sizeof(stats) if the kernel structure
+	 * grew as it happened when tpacket_stats_v3 was introduced.
+	 */
+	if (len > sizeof(stats))
+		len = sizeof(stats);
+
+	if (umoven_or_printaddr(tcp, addr, len, &stats))
+		return;
+
+	if (len < sizeof(stats.tp_packets)) {
+		tprints("{tp_packets=");
+		print_quoted_string((void *) &stats.tp_packets,
+				    len, QUOTE_FORCE_HEX);
 	} else {
 		PRINT_FIELD_U("{", stats, tp_packets);
-		PRINT_FIELD_U(", ", stats, tp_drops);
-		tprints("}");
+
+		if (len > offsetof(struct tp_stats, tp_drops)) {
+			len -= offsetof(struct tp_stats, tp_drops);
+			if (len < sizeof(stats.tp_drops)) {
+				tprints(", tp_drops=");
+				print_quoted_string((void *) &stats.tp_drops,
+						    len, QUOTE_FORCE_HEX);
+			} else {
+				PRINT_FIELD_U(", ", stats, tp_drops);
+
+				if (len > offsetof(struct tp_stats, tp_freeze_q_cnt) -
+					  offsetof(struct tp_stats, tp_drops)) {
+					len -= offsetof(struct tp_stats, tp_freeze_q_cnt) -
+					       offsetof(struct tp_stats, tp_drops);
+					if (len < sizeof(stats.tp_freeze_q_cnt)) {
+						tprints(", tp_freeze_q_cnt=");
+						print_quoted_string((void *) &stats.tp_freeze_q_cnt,
+								    len,
+								    QUOTE_FORCE_HEX);
+					} else {
+						PRINT_FIELD_U(", ", stats, tp_freeze_q_cnt);
+					}
+				}
+			}
+		}
 	}
+	tprints("}");
 }
 #endif /* PACKET_STATISTICS */
 
