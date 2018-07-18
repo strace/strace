@@ -684,6 +684,17 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		 const unsigned int name, const kernel_ulong_t addr,
 		 const int ulen, const int rlen)
 {
+	if (ulen <= 0 || rlen <= 0) {
+		/*
+		 * As the kernel neither accepts nor returns a negative
+		 * length in case of successful getsockopt syscall
+		 * invocation, negative values must have been forged
+		 * by userspace.
+		 */
+		printaddr(addr);
+		return;
+	}
+
 	if (addr && verbose(tcp))
 	switch (level) {
 	case SOL_SOCKET:
@@ -698,7 +709,13 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 #endif
 #ifdef SO_ATTACH_FILTER
 		case SO_ATTACH_FILTER:
-			if (rlen && (unsigned short) rlen == (unsigned int) rlen)
+			/*
+			 * The length returned by the kernel in case of
+			 * successful getsockopt syscall invocation is struct
+			 * sock_fprog.len that has type unsigned short,
+			 * anything else must have been forged by userspace.
+			 */
+			if ((unsigned short) rlen == (unsigned int) rlen)
 				print_sock_fprog(tcp, addr, rlen);
 			else
 				printaddr(addr);
@@ -726,16 +743,6 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		break;
 
 	case SOL_NETLINK:
-		if (ulen < 0 || rlen < 0) {
-			/*
-			 * As the kernel neither accepts nor returns a negative
-			 * length, in case of successful getsockopt syscall
-			 * invocation these negative values must have come
-			 * from userspace.
-			 */
-			printaddr(addr);
-			return;
-		}
 		switch (name) {
 		case NETLINK_LIST_MEMBERSHIPS: {
 			uint32_t buf;
