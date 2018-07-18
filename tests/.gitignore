@@ -390,6 +390,10 @@ quotactl
 quotactl-v
 quotactl-xfs
 quotactl-xfs-v
+quotactl-success
+quotactl-success-v
+quotactl-xfs-success
+quotactl-xfs-success-v
 read-write
 readahead
 readdir

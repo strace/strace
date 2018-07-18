@@ -78,6 +78,7 @@ enum check_quotactl_flags {
 	CQF_ADDR_CB   = 1 << CQF_ADDR_CB_BIT,
 };
 
+static const char *errstr;
 
 /**
  * Generic quotactl syscall checker function.  Call convention:
@@ -181,6 +182,20 @@ check_quota(uint32_t flags, int cmd, const char *cmd_str,
 	va_end(ap);
 
 	rc = syscall(__NR_quotactl, cmd, special, id, addr);
+
+	errstr = sprintrc(rc);
+
+#ifdef INJECT_RETVAL
+	if (rc != INJECT_RETVAL)
+		error_msg_and_fail("Got a return value of %ld != %d",
+				   rc, INJECT_RETVAL);
+
+	static char inj_errstr[4096];
+
+	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
+	errstr = inj_errstr;
+#endif
+
 	printf("quotactl(%s, %s", cmd_str, special_str);
 
 	if (!(flags & CQF_ID_SKIP)) {
@@ -205,7 +220,7 @@ check_quota(uint32_t flags, int cmd, const char *cmd_str,
 		}
 	}
 
-	printf(") = %s\n", sprintrc(rc));
+	printf(") = %s\n", errstr);
 }
 
 

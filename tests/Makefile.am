@@ -153,6 +153,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	qual_signal \
 	quotactl-v \
 	quotactl-xfs-v \
+	quotactl-success \
+	quotactl-success-v \
+	quotactl-xfs-success \
+	quotactl-xfs-success-v \
 	redirect-fds \
 	restart_syscall \
 	run_expect_termsig \
@@ -273,6 +277,10 @@ DECODER_TESTS = \
 	prctl-tid_address.test \
 	prctl-tsc.test \
 	qual_fault-exit_group.test \
+	quotactl-success.test \
+	quotactl-success-v.test \
+	quotactl-xfs-success.test \
+	quotactl-xfs-success-v.test \
 	readv.test \
 	rt_sigaction.test \
 	scm_rights-fd.test \

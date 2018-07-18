@@ -83,7 +83,7 @@ print_dqblk(long rc, void *ptr, void *arg)
 	struct if_dqblk *db = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", db);
 		return;
 	}
@@ -113,7 +113,7 @@ print_nextdqblk(long rc, void *ptr, void *arg)
 	struct if_nextdqblk *db = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", db);
 		return;
 	}
@@ -146,7 +146,7 @@ print_dqinfo(long rc, void *ptr, void *arg)
 	struct if_dqinfo *di = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", di);
 		return;
 	}
@@ -168,7 +168,7 @@ print_dqfmt(long rc, void *ptr, void *arg)
 	long out_arg = (long) arg;
 	const char *fmtstr;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", fmtval);
 		return;
 	}
@@ -272,7 +272,7 @@ main(void)
 		    (intptr_t) 1);
 
 	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, GRPQUOTA)),
-		    ARG_STR(NULL), -1, dqblk, print_dqblk, (intptr_t) 2);
+		    ARG_STR(NULL), -1, dqblk, print_dqblk, (intptr_t) 1);
 
 
 	/* Q_GETNEXTQUOTA */
@@ -303,7 +303,7 @@ main(void)
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_GETINFO, GRPQUOTA)),
 		    bogus_special, bogus_special_str, dqinfo,
-		    print_dqinfo, (intptr_t) 2);
+		    print_dqinfo, (intptr_t) 1);
 
 	/* Q_SETINFO */
 

@@ -92,7 +92,7 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	struct fs_disk_quota *dq = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", dq);
 		return;
 	}
@@ -132,7 +132,7 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 	struct fs_quota_stat *qs = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", qs);
 		return;
 	}
@@ -166,7 +166,7 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 	struct fs_quota_statv *qs = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", qs);
 		return;
 	}
@@ -269,7 +269,7 @@ main(void)
 		    (intptr_t) 1);
 
 	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_XGETQUOTA, GRPQUOTA)),
-		    ARG_STR(NULL), -1, xdq, print_xdisk_quota, (intptr_t) 2);
+		    ARG_STR(NULL), -1, xdq, print_xdisk_quota, (intptr_t) 1);
 
 
 	/* Q_XGETNEXTQUOTA */
@@ -299,7 +299,7 @@ main(void)
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_XGETQSTAT, USRQUOTA)),
-		    ARG_STR("NULL"), xqstat, print_xquota_stat, (intptr_t) 2);
+		    ARG_STR("NULL"), xqstat, print_xquota_stat, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP,
 		    ARG_STR(QCMD(Q_XGETQSTAT, PRJQUOTA)),
@@ -315,7 +315,7 @@ main(void)
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_XGETQSTATV, GRPQUOTA)),
-		    ARG_STR(NULL), xqstatv, print_xquota_statv, (intptr_t) 2);
+		    ARG_STR(NULL), xqstatv, print_xquota_statv, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP,
 		    ARG_STR(QCMD(Q_XGETQSTATV, PRJQUOTA)),
