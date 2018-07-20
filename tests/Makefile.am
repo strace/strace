@@ -94,9 +94,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	attach-p-cmd-p \
 	block_reset_raise_run \
 	bpf-obj_get_info_by_fd \
-	bpf-obj_get_info_by_fd-v \
 	bpf-obj_get_info_by_fd-prog \
 	bpf-obj_get_info_by_fd-prog-v \
+	bpf-obj_get_info_by_fd-v \
 	bpf-success \
 	bpf-success-v \
 	caps-abbrev \
@@ -151,12 +151,12 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	qual_inject-retval \
 	qual_inject-signal \
 	qual_signal \
-	quotactl-v \
-	quotactl-xfs-v \
 	quotactl-success \
 	quotactl-success-v \
+	quotactl-v \
 	quotactl-xfs-success \
 	quotactl-xfs-success-v \
+	quotactl-xfs-v \
 	redirect-fds \
 	restart_syscall \
 	run_expect_termsig \
@@ -227,16 +227,16 @@ STACKTRACE_TESTS =
 endif
 
 DECODER_TESTS = \
-	bpf-success.test \
 	bpf-success-v.test \
+	bpf-success.test \
 	brk.test \
+	btrfs-X.test \
 	btrfs-v.test \
+	btrfs-vX.test \
 	btrfs-vw.test \
 	btrfs-vwX.test \
-	btrfs-vX.test \
 	btrfs-w.test \
 	btrfs-wX.test \
-	btrfs-X.test \
 	caps-abbrev.test \
 	caps.test \
 	eventfd.test \
@@ -258,9 +258,9 @@ DECODER_TESTS = \
 	net-yy-unix.test \
 	net.test \
 	netlink_sock_diag.test \
-	nsyscalls.test \
 	nsyscalls-d.test \
 	nsyscalls-nd.test \
+	nsyscalls.test \
 	personality.test \
 	pipe.test \
 	poll-P.test \
@@ -277,17 +277,16 @@ DECODER_TESTS = \
 	prctl-tid_address.test \
 	prctl-tsc.test \
 	qual_fault-exit_group.test \
-	quotactl-success.test \
 	quotactl-success-v.test \
-	quotactl-xfs-success.test \
+	quotactl-success.test \
 	quotactl-xfs-success-v.test \
+	quotactl-xfs-success.test \
 	readv.test \
 	rt_sigaction.test \
 	scm_rights-fd.test \
 	seccomp-strict.test \
 	sigaltstack.test \
 	sun_path.test \
-	xet_thread_area_x86.test \
 	uio.test \
 	umount.test \
 	umount2.test \
@@ -296,6 +295,7 @@ DECODER_TESTS = \
 	uname.test \
 	unix-pair-send-recv.test \
 	unix-pair-sendto-recvfrom.test \
+	xet_thread_area_x86.test \
 	# end of DECODER_TESTS
 
 MISC_TESTS = \
@@ -310,10 +310,10 @@ MISC_TESTS = \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
+	fflush.test \
 	filter-unavailable.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
-	fflush.test \
 	get_regs.test \
 	inject-nf.test \
 	interactive_block.test \
@@ -325,14 +325,14 @@ MISC_TESTS = \
 	printpath-umovestr-legacy.test \
 	printstrn-umoven-legacy.test \
 	qual_fault-syntax.test \
-	qual_fault.test \
 	qual_fault-syscall.test \
-	qual_inject-error-signal.test \
+	qual_fault.test \
 	qual_inject-error-signal-syscall.test \
-	qual_inject-retval.test \
+	qual_inject-error-signal.test \
 	qual_inject-retval-syscall.test \
-	qual_inject-signal.test \
+	qual_inject-retval.test \
 	qual_inject-signal-syscall.test \
+	qual_inject-signal.test \
 	qual_inject-syntax.test \
 	qual_signal.test \
 	qual_syscall.test \
