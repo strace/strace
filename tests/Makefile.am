@@ -131,6 +131,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	mmsg_name-v \
 	msg_control-v \
 	net-accept-connect \
+	net-tpacket_stats-success \
 	netlink_inet_diag \
 	netlink_netlink_diag \
 	netlink_unix_diag \
@@ -252,6 +253,7 @@ DECODER_TESTS = \
 	llseek.test \
 	lseek.test \
 	mmap.test \
+	net-tpacket_stats-success.test \
 	net-y-unix.test \
 	net-yy-inet.test \
 	net-yy-netlink.test \

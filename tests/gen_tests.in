@@ -237,6 +237,7 @@ net-icmp_filter	-e trace=getsockopt,setsockopt
 net-packet_mreq -e trace=setsockopt
 net-sockaddr	-a24 -e trace=connect
 net-tpacket_req -e trace=setsockopt
+net-tpacket_stats -e trace=getsockopt
 net-yy-inet6	+net-yy-inet.test
 netlink_audit	+netlink_sock_diag.test
 netlink_crypto	+netlink_sock_diag.test

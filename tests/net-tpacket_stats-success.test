@@ -1,0 +1,6 @@
+#!/bin/sh -efu
+
+ . "${srcdir=.}/scno_tampering.sh"
+
+run_strace -e trace=getsockopt -e inject=getsockopt:retval=42 ../net-tpacket_stats-success > "$EXP"
+match_diff "$LOG" "$EXP"
