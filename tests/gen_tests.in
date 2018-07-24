@@ -234,6 +234,7 @@ msg_name	-a20 -e trace=recvmsg
 munlockall	-a13
 nanosleep	-a20
 net-icmp_filter	-e trace=getsockopt,setsockopt
+net-packet_mreq -e trace=setsockopt
 net-sockaddr	-a24 -e trace=connect
 net-yy-inet6	+net-yy-inet.test
 netlink_audit	+netlink_sock_diag.test

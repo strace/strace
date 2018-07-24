@@ -205,6 +205,7 @@ msg_name
 munlockall
 nanosleep
 net-icmp_filter
+net-packet_mreq
 net-sockaddr
 net-y-unix
 net-yy-inet
