@@ -1,0 +1,13 @@
+#!/bin/sh -efu
+
+. "${srcdir=.}/scno_tampering.sh"
+
+: ${IOCTL_INJECT_START=256}
+: ${IOCTL_INJECT_RETVAL=8}
+
+run_prog
+run_strace -a16 -e trace=ioctl \
+	-e inject=ioctl:retval="${IOCTL_INJECT_RETVAL}":when="${IOCTL_INJECT_START}+" \
+	../ioctl_evdev-success "${IOCTL_INJECT_START}" "${IOCTL_INJECT_RETVAL}"> "$EXP"
+grep -v '^ioctl([012][,<]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"
