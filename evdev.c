@@ -171,10 +171,10 @@ decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
 	tprints(", ");
 
 	unsigned int size;
-	if ((kernel_ulong_t) tcp->u_rval > max_nr)
+	if ((kernel_ulong_t) tcp->u_rval > max_nr / 8)
 		size = max_nr;
 	else
-		size = tcp->u_rval;
+		size = tcp->u_rval * 8;
 	char decoded_arg[size];
 
 	if (umove_or_printaddr(tcp, arg, &decoded_arg))
