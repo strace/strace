@@ -330,6 +330,7 @@ extern const struct xlat evdev_abs[];
 /** Number of elements in evdev_abs array without the terminating record. */
 extern const size_t evdev_abs_size;
 
+extern const struct xlat evdev_ev[];
 extern const struct xlat iffflags[];
 extern const struct xlat ip_type_of_services[];
 extern const struct xlat ipc_private[];

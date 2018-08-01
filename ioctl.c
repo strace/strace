@@ -33,8 +33,6 @@
 #include <linux/ioctl.h>
 #include "xlat/ioctl_dirs.h"
 
-#include "xlat/evdev_ev.h"
-
 static int
 compare(const void *a, const void *b)
 {
@@ -99,7 +97,10 @@ evdev_decode_number(const unsigned int code)
 
 	if (nr >= 0x20 && nr <= 0x20 + 0x1f) {
 		tprints("EVIOCGBIT(");
-		printxval(evdev_ev, nr - 0x20, "EV_???");
+		if (nr == 0x20)
+			tprintf("0");
+		else
+			printxval(evdev_ev, nr - 0x20, "EV_???");
 		tprintf(", %u)", _IOC_SIZE(code));
 		return 1;
 	} else if (nr >= 0x40 && nr <= 0x40 + 0x3f) {
