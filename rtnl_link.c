@@ -167,7 +167,10 @@ static const nla_decoder_t ifla_brport_nla_decoders[] = {
 	[IFLA_BRPORT_MCAST_FLOOD]		= decode_nla_u8,
 	[IFLA_BRPORT_MCAST_TO_UCAST]		= decode_nla_u8,
 	[IFLA_BRPORT_VLAN_TUNNEL]		= decode_nla_u8,
-	[IFLA_BRPORT_BCAST_FLOOD]		= decode_nla_u8
+	[IFLA_BRPORT_BCAST_FLOOD]		= decode_nla_u8,
+	[IFLA_BRPORT_GROUP_FWD_MASK]		= decode_nla_u16,
+	[IFLA_BRPORT_NEIGH_SUPPRESS]		= decode_nla_u8,
+	[IFLA_BRPORT_ISOLATED]			= decode_nla_u8
 };
 
 static bool
