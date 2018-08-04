@@ -16,6 +16,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed decoding of Q_XGETQSTAT on non-native personalities.
   * Fixed race condition in aio test.
   * Fixed build with Bionic libc.
+  * Fixed build with glibc-2.28.
 
 Noteworthy changes in release 4.23 (2018-06-14)
 ===============================================
