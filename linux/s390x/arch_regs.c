@@ -1,3 +1,4 @@
+#ifndef HAVE_S390_COMPAT_REGS
 typedef struct {
 	uint32_t mask;
 	uint32_t addr;
@@ -9,6 +10,7 @@ typedef struct {
 	uint32_t acrs[NUM_ACRS];
 	uint32_t orig_gpr2;
 } s390_compat_regs;
+#endif
 
 static union {
 	s390_compat_regs s390_regs;

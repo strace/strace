@@ -17,6 +17,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed race condition in aio test.
   * Fixed build with Bionic libc.
   * Fixed build with glibc-2.28.
+  * Fixed build on s390 with kernel headers that do not contain Linux commit
+    v3.10-rc1~201^2~11.
 
 Noteworthy changes in release 4.23 (2018-06-14)
 ===============================================

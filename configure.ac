@@ -318,6 +318,9 @@ AC_CHECK_TYPES(m4_normalize([
 	struct ptrace_peeksiginfo_args
 ]),,, [#include <sys/ptrace.h>])
 
+# For kernels that do not have v3.10-rc1~201^2~11
+AC_CHECK_TYPES([s390_compat_regs],,, [#include <asm/ptrace.h>])
+
 AC_CHECK_TYPES(m4_normalize([
 	struct flock,
 	struct flock64,
