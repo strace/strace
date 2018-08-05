@@ -3,7 +3,7 @@ Name: strace
 Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
 License: BSD%{?suse_version:-3-Clause}
-Group: Development/Debuggers
+Group: Development%{?suse_version:/Tools}/Debuggers
 URL: https://strace.io
 Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
 BuildRequires: gcc
