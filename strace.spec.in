@@ -7,18 +7,25 @@ Group: Development/Debuggers
 URL: https://strace.io
 Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
 BuildRequires: gcc
+
+# Install Bluetooth headers for AF_BLUETOOTH sockets decoding.
 %if 0%{?fedora} >= 18 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
 BuildRequires: pkgconfig(bluez)
 %endif
+
+# Install elfutils-devel or libdw-devel to enable strace -k option.
+# Install binutils-devel to enable symbol demangling.
 %if 0%{?fedora} >= 20 || 0%{?centos} >= 6 || 0%{?rhel} >= 6
 %define buildrequires_stacktrace BuildRequires: elfutils-devel binutils-devel
 %endif
 %if 0%{?suse_version} >= 1100
 %define buildrequires_stacktrace BuildRequires: libdw-devel binutils-devel
 %endif
-# for -k option
 %{?buildrequires_stacktrace}
+
+# OBS compatibility
 %{?!buildroot:BuildRoot: %_tmppath/buildroot-%name-%version-%release}
+%define maybe_use_defattr %{?suse_version:%%defattr(-,root,root)}
 
 %description
 The strace program intercepts and records the system calls called and
@@ -43,7 +50,8 @@ libc="$(ldd /bin/sh |sed -n 's|^[^/]*\(/[^ ]*/libc\.so[^ ]*\).*|\1|p' |head -1)"
 $libc |head -1
 file -L /bin/sh
 gcc --version |head -1
-kver="$(echo -e '#include <linux/version.h>\nLINUX_VERSION_CODE' | gcc -E -P -)"
+ld --version |head -1
+kver="$(printf '%%s\n%%s\n' '#include <linux/version.h>' 'LINUX_VERSION_CODE' | gcc -E -P -)"
 printf 'kernel-headers %%s.%%s.%%s\n' $(($kver/65536)) $(($kver/256%%256)) $(($kver%%256))
 echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
@@ -66,7 +74,7 @@ find tests* -type f -name '*.log' -print0 |
 echo 'END OF TEST SUITE INFORMATION'
 
 %files
-%{?suse_version:%defattr(-,root,root)}
+%maybe_use_defattr
 %doc CREDITS ChangeLog ChangeLog-CVS COPYING NEWS README
 %{_bindir}/strace
 %{_bindir}/strace-log-merge
