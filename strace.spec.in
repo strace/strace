@@ -6,7 +6,7 @@ License: BSD%{?suse_version:-3-Clause}
 Group: Development%{?suse_version:/Tools}/Debuggers
 URL: https://strace.io
 Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
-BuildRequires: gcc
+BuildRequires: gcc gzip
 
 # Install Bluetooth headers for AF_BLUETOOTH sockets decoding.
 %if 0%{?fedora} >= 18 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
@@ -64,6 +64,12 @@ make DESTDIR=%{buildroot} install
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}%{_bindir}/strace-graph
 
+# some say uncompressed changelog files are too big
+for f in ChangeLog ChangeLog-CVS; do
+	gzip -9n < "$f" > "$f".gz &
+done
+wait
+
 %check
 %{buildroot}%{_bindir}/strace -V
 make %{?_smp_mflags} -k check VERBOSE=1
@@ -75,7 +81,7 @@ echo 'END OF TEST SUITE INFORMATION'
 
 %files
 %maybe_use_defattr
-%doc CREDITS ChangeLog ChangeLog-CVS COPYING NEWS README
+%doc CREDITS ChangeLog.gz ChangeLog-CVS.gz COPYING NEWS README
 %{_bindir}/strace
 %{_bindir}/strace-log-merge
 %{_mandir}/man1/*
