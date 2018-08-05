@@ -58,28 +58,28 @@ main(void)
 	tv->tv_usec = 1000000;
 	assert(syscall(__NR_settimeofday, tv, tz) == -1);
 	printf("settimeofday({tv_sec=%lld, tv_usec=%llu}"
-	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = -1 EINVAL (%m)\n",
+	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = %s\n",
 	       (long long) tv->tv_sec,
 	       zero_extend_signed_to_ull(tv->tv_usec),
-	       tz->tz_minuteswest, tz->tz_dsttime);
+	       tz->tz_minuteswest, tz->tz_dsttime, sprintrc(-1));
 
 	tv->tv_sec = 0xdeadbeefU;
 	tv->tv_usec = 0xfacefeedU;
 	assert(syscall(__NR_settimeofday, tv, tz) == -1);
 	printf("settimeofday({tv_sec=%lld, tv_usec=%llu}"
-	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = -1 EINVAL (%m)\n",
+	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = %s\n",
 	       (long long) tv->tv_sec,
 	       zero_extend_signed_to_ull(tv->tv_usec),
-	       tz->tz_minuteswest, tz->tz_dsttime);
+	       tz->tz_minuteswest, tz->tz_dsttime, sprintrc(-1));
 
 	tv->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
 	tv->tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 	assert(syscall(__NR_settimeofday, tv, tz) == -1);
 	printf("settimeofday({tv_sec=%lld, tv_usec=%llu}"
-	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = -1 EINVAL (%m)\n",
+	       ", {tz_minuteswest=%d, tz_dsttime=%d}) = %s\n",
 	       (long long) tv->tv_sec,
 	       zero_extend_signed_to_ull(tv->tv_usec),
-	       tz->tz_minuteswest, tz->tz_dsttime);
+	       tz->tz_minuteswest, tz->tz_dsttime, sprintrc(-1));
 
 	puts("+++ exited with 0 +++");
 	return 0;
