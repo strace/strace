@@ -1,0 +1,3 @@
+siginfo		-etrace=none
+socketcall	-esocketcall -a20
+wait4		-esignal=none -ewait4

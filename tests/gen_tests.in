@@ -85,6 +85,7 @@ fcntl64	-a8
 fdatasync	-a14
 file_handle	-e trace=name_to_handle_at,open_by_handle_at
 file_ioctl	+ioctl.test
+filter_seccomp test_prog_set -n
 finit_module	-a25
 flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir

@@ -386,6 +386,7 @@ EXTRA_DIST = \
 	eventfd.expected \
 	fadvise.h \
 	fcntl-common.c \
+	filter_seccomp.in \
 	filter-unavailable.expected \
 	fstatat.c \
 	fstatx.c \
