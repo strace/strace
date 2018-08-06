@@ -1,0 +1,4 @@
+fork-f	-a26 -qq -e signal=none -e trace=chdir
+vfork-f	-a26 -qq -e signal=none -e trace=chdir
+fork-f	-a26 -qq -e signal=none -e trace=chdir,%memory,%ipc,%pure,%signal,%network -e status=failed
+status-none-f	-e trace=!ptrace -e status=none

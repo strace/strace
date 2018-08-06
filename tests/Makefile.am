@@ -96,6 +96,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	delay \
 	execve-v \
 	execveat-v \
+	filter_seccomp-flag \
+	filter_seccomp-perf \
 	filter-unavailable \
 	fork-f \
 	fsync-y \
@@ -324,6 +326,7 @@ MISC_TESTS = \
 	detach-sleeping.test \
 	detach-stopped.test \
 	fflush.test \
+	filter_seccomp-perf.test \
 	filter-unavailable.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
@@ -406,6 +409,8 @@ EXTRA_DIST = \
 	eventfd.expected \
 	fadvise.h \
 	fcntl-common.c \
+	filter_seccomp.in \
+	filter_seccomp.sh \
 	filter-unavailable.expected \
 	fstatat.c \
 	fstatx.c \

@@ -324,6 +324,11 @@ test_trace_expr()
 		< negative.list
 }
 
+test_prog_set()
+{
+	test_pure_prog_set "$@" < "$srcdir/$NAME.in"
+}
+
 check_prog cat
 check_prog rm
 

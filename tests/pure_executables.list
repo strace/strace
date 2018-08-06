@@ -511,6 +511,7 @@ statfs64
 status-all
 status-failed
 status-none
+status-none-f
 status-successful
 status-unfinished
 statx
