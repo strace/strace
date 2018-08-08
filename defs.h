@@ -57,6 +57,7 @@
 #include "error_prints.h"
 #include "gcc_compat.h"
 #include "kernel_types.h"
+#include "list.h"
 #include "macros.h"
 #include "mpers_type.h"
 #include "string_to_uint.h"
@@ -235,6 +236,16 @@ struct tcb {
 	struct timespec delay_expiration_time; /* When does the delay end */
 
 	struct mmap_cache_t *mmap_cache;
+
+	/*
+	 * Data that is stored during process wait traversal.
+	 * We use indices as the actual data is stored in an array
+	 * that is realloc'ed in runtime.
+	 */
+	size_t wait_data_idx;
+	size_t wait_extra_data_idx;
+	struct list_item wait_list;
+
 
 #ifdef HAVE_LINUX_KVM_H
 	struct vcpu_info *vcpu_info_list;
