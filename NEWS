@@ -11,6 +11,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     and s390.
   * Updated lists of AUDIT_*, BPF_*, IFA_*, IFLA_*, RTA_*, RTPROT_*, TCP_*,
     TRAP_*, and UDP_* constants.
+  * Updated lists of ioctl commands from Linux 4.18.
 
 * Bug fixes
   * Fixed decoding of Q_XGETQSTAT on non-native personalities.
