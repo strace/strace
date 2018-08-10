@@ -260,6 +260,9 @@ __EOF__
 				*) return 0 ;; # not applicable
 			esac
 			;;
+		*linux/omap3isp.h)
+			echo 'struct omap3isp_stat_data_time32 {uint32_t dummy32[4]; uint16_t dummy16[3]; };'
+			;;
 		*linux/sonet.h)
 			echo '#include <linux/atmioc.h>'
 			;;
