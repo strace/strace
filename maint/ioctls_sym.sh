@@ -393,6 +393,10 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 
 	# Soft post-preprocess workarounds.  Fragile.
 	case "$f" in
+		*linux/btrfs.h)
+			sed -i '/[[:space:]]BTRFS_IOC_[GS]ET_FSLABEL[[:space:]]/d' \
+				"$tmpdir"/header.out
+			;;
 		*linux/kvm.h)
 			arm_list='KVM_ARM_[A-Z_]+'
 			ppc_list='KVM_ALLOCATE_RMA|KVM_CREATE_SPAPR_TCE|KVM_CREATE_SPAPR_TCE_64|KVM_PPC_[A-Z1-9_]+'

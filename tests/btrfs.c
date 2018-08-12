@@ -54,6 +54,14 @@
 # define BTRFS_NAME_LEN 255
 #endif
 
+#ifndef FS_IOC_GETFSLABEL
+# define FS_IOC_GETFSLABEL BTRFS_IOC_GET_FSLABEL
+#endif
+
+#ifndef FS_IOC_SETFSLABEL
+# define FS_IOC_SETFSLABEL BTRFS_IOC_SET_FSLABEL
+#endif
+
 /*
  * Prior to Linux 3.12, the BTRFS_IOC_DEFAULT_SUBVOL used u64 in
  * its definition, which isn't exported by the kernel.
@@ -1650,32 +1658,32 @@ btrfs_test_quota_rescan_ioctl(void)
 
 /*
  * Consumes argument, returns nothing:
- * - BTRFS_IOC_SET_FSLABEL
+ * - FS_IOC_SETFSLABEL
  *
  * Consumes no argument, returns argument:
- * - BTRFS_IOC_GET_FS_LABEL
+ * - FS_IOC_GETFSLABEL
  */
 static void
 btrfs_test_label_ioctls(void)
 {
 	char label[BTRFS_LABEL_SIZE] = "btrfs-label";
 
-	ioctl(-1, BTRFS_IOC_SET_FSLABEL, NULL);
+	ioctl(-1, FS_IOC_SETFSLABEL, NULL);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
-	       ioc(BTRFS_IOC_SET_FSLABEL));
+	       ioc(FS_IOC_SETFSLABEL));
 
-	ioctl(-1, BTRFS_IOC_SET_FSLABEL, label);
+	ioctl(-1, FS_IOC_SETFSLABEL, label);
 	printf("ioctl(-1, %s, \"%s\") = -1 EBADF (%m)\n",
-	       ioc(BTRFS_IOC_SET_FSLABEL), label);
+	       ioc(FS_IOC_SETFSLABEL), label);
 
 	if (write_ok) {
-		ioctl(btrfs_test_dir_fd, BTRFS_IOC_SET_FSLABEL, label);
+		ioctl(btrfs_test_dir_fd, FS_IOC_SETFSLABEL, label);
 		printf("ioctl(%d, %s, \"%s\") = 0\n",
-			btrfs_test_dir_fd, ioc(BTRFS_IOC_SET_FSLABEL), label);
+			btrfs_test_dir_fd, ioc(FS_IOC_SETFSLABEL), label);
 
-		ioctl(btrfs_test_dir_fd, BTRFS_IOC_GET_FSLABEL, label);
+		ioctl(btrfs_test_dir_fd, FS_IOC_GETFSLABEL, label);
 		printf("ioctl(%d, %s, \"%s\") = 0\n",
-			btrfs_test_dir_fd, ioc(BTRFS_IOC_GET_FSLABEL), label);
+			btrfs_test_dir_fd, ioc(FS_IOC_GETFSLABEL), label);
 	}
 }
 
@@ -2025,7 +2033,7 @@ btrfs_test_read_ioctls(void)
 		XLAT(BTRFS_IOC_BALANCE_PROGRESS),
 		XLAT(BTRFS_IOC_FS_INFO),
 		XLAT(BTRFS_IOC_GET_FEATURES),
-		XLAT(BTRFS_IOC_GET_FSLABEL),
+		XLAT(FS_IOC_GETFSLABEL),
 		XLAT(BTRFS_IOC_GET_SUPPORTED_FEATURES),
 		XLAT(BTRFS_IOC_QGROUP_LIMIT),
 		XLAT(BTRFS_IOC_QUOTA_RESCAN_STATUS),
