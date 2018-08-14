@@ -91,6 +91,9 @@ echo 'END OF TEST SUITE INFORMATION'
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Tue Aug 14 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.24-1
+- v4.23 -> v4.24.
+
 * Thu Jun 14 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.23-1
 - v4.22 -> v4.23.
 - Enabled libdw backend for -k option (#1568647).
