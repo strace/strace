@@ -158,6 +158,12 @@ static bool open_append;
 struct tcb *printing_tcp;
 static struct tcb *current_tcp;
 
+struct tcb_wait_data {
+	enum trace_event te; /**< Event passed to dispatch_event() */
+	int status;          /**< status, returned by wait4() */
+	siginfo_t si;        /**< siginfo, returned by PTRACE_GETSIGINFO */
+};
+
 static struct tcb **tcbtab;
 static unsigned int nprocs;
 static size_t tcbtabsize;
@@ -2226,16 +2232,19 @@ print_event_exit(struct tcb *tcp)
 	line_ended();
 }
 
-static enum trace_event
-next_event(int *pstatus, siginfo_t *si)
+static const struct tcb_wait_data *
+next_event(void)
 {
+	static struct tcb_wait_data wait_data;
+
 	int pid;
 	int status;
 	struct tcb *tcp;
+	struct tcb_wait_data *wd = &wait_data;
 	struct rusage ru;
 
 	if (interrupted)
-		return TE_BREAK;
+		return NULL;
 
 	/*
 	 * Used to exit simply when nprocs hits zero, but in this testcase:
@@ -2255,7 +2264,7 @@ next_event(int *pstatus, siginfo_t *si)
 		 * on exit. Oh well...
 		 */
 		if (nprocs == 0)
-			return TE_BREAK;
+			return NULL;
 	}
 
 	const bool unblock_delay_timer = is_delay_timer_armed();
@@ -2278,7 +2287,7 @@ next_event(int *pstatus, siginfo_t *si)
 	 * then the system call will be interrupted and
 	 * the expiration will be handled by the signal handler.
 	 */
-	pid = wait4(-1, pstatus, __WALL, (cflag ? &ru : NULL));
+	pid = wait4(-1, &status, __WALL, (cflag ? &ru : NULL));
 	const int wait_errno = errno;
 
 	/*
@@ -2292,14 +2301,16 @@ next_event(int *pstatus, siginfo_t *si)
 		sigprocmask(SIG_BLOCK, &timer_set, NULL);
 
 		if (restart_failed)
-			return TE_BREAK;
+			return NULL;
 	}
 
 	if (pid < 0) {
-		if (wait_errno == EINTR)
-			return TE_NEXT;
+		if (wait_errno == EINTR) {
+			wd->te = TE_NEXT;
+			return wd;
+		}
 		if (nprocs == 0 && wait_errno == ECHILD)
-			return TE_BREAK;
+			return NULL;
 		/*
 		 * If nprocs > 0, ECHILD is not expected,
 		 * treat it as any other error here:
@@ -2308,12 +2319,13 @@ next_event(int *pstatus, siginfo_t *si)
 		perror_msg_and_die("wait4(__WALL)");
 	}
 
-	status = *pstatus;
+	wd->status = status;
 
 	if (pid == popen_pid) {
 		if (!WIFSTOPPED(status))
 			popen_pid = 0;
-		return TE_NEXT;
+		wd->te = TE_NEXT;
+		return wd;
 	}
 
 	if (debug_flag)
@@ -2324,8 +2336,10 @@ next_event(int *pstatus, siginfo_t *si)
 
 	if (!tcp) {
 		tcp = maybe_allocate_tcb(pid, status);
-		if (!tcp)
-			return TE_NEXT;
+		if (!tcp) {
+			wd->te = TE_NEXT;
+			return wd;
+		}
 	}
 
 	clear_regs(tcp);
@@ -2342,11 +2356,15 @@ next_event(int *pstatus, siginfo_t *si)
 		tcp->stime = stime;
 	}
 
-	if (WIFSIGNALED(status))
-		return TE_SIGNALLED;
+	if (WIFSIGNALED(status)) {
+		wd->te = TE_SIGNALLED;
+		return wd;
+	}
 
-	if (WIFEXITED(status))
-		return TE_EXITED;
+	if (WIFEXITED(status)) {
+		wd->te = TE_EXITED;
+		return wd;
+	}
 
 	/*
 	 * As WCONTINUED flag has not been specified to wait4,
@@ -2373,19 +2391,19 @@ next_event(int *pstatus, siginfo_t *si)
 		if (sig == SIGSTOP && (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)) {
 			debug_func_msg("ignored SIGSTOP on pid %d", tcp->pid);
 			tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
-			return TE_RESTART;
+			wd->te = TE_RESTART;
 		} else if (sig == syscall_trap_sig) {
-			return TE_SYSCALL_STOP;
+			wd->te = TE_SYSCALL_STOP;
 		} else {
-			*si = (siginfo_t) {};
+			memset(&wd->si, 0, sizeof(wd->si));
 			/*
 			 * True if tracee is stopped by signal
 			 * (as opposed to "tracee received signal").
 			 * TODO: shouldn't we check for errno == EINVAL too?
 			 * We can get ESRCH instead, you know...
 			 */
-			bool stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, si) < 0;
-			return stopped ? TE_GROUP_STOP : TE_SIGNAL_DELIVERY_STOP;
+			bool stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, &wd->si) < 0;
+			wd->te = stopped ? TE_GROUP_STOP : TE_SIGNAL_DELIVERY_STOP;
 		}
 		break;
 	case PTRACE_EVENT_STOP:
@@ -2398,16 +2416,23 @@ next_event(int *pstatus, siginfo_t *si)
 		case SIGTSTP:
 		case SIGTTIN:
 		case SIGTTOU:
-			return TE_GROUP_STOP;
+			wd->te = TE_GROUP_STOP;
+			break;
+		default:
+			wd->te = TE_RESTART;
 		}
-		return TE_RESTART;
+		break;
 	case PTRACE_EVENT_EXEC:
-		return TE_STOP_BEFORE_EXECVE;
+		wd->te = TE_STOP_BEFORE_EXECVE;
+		break;
 	case PTRACE_EVENT_EXIT:
-		return TE_STOP_BEFORE_EXIT;
+		wd->te = TE_STOP_BEFORE_EXIT;
+		break;
 	default:
-		return TE_RESTART;
+		wd->te = TE_RESTART;
 	}
+
+	return wd;
 }
 
 static int
@@ -2436,12 +2461,18 @@ trace_syscall(struct tcb *tcp, unsigned int *sig)
 
 /* Returns true iff the main trace loop has to continue. */
 static bool
-dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
+dispatch_event(const struct tcb_wait_data *wd)
 {
 	unsigned int restart_op = PTRACE_SYSCALL;
 	unsigned int restart_sig = 0;
+	enum trace_event te = wd ? wd->te : TE_BREAK;
+	/*
+	 * Copy wd->status to a non-const variable to workaround glibc bugs
+	 * around union wait fixed by glibc commit glibc-2.24~391
+	 */
+	int status = wd ? wd->status : 0;
 
-	switch (ret) {
+	switch (te) {
 	case TE_BREAK:
 		return false;
 
@@ -2469,17 +2500,17 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 		break;
 
 	case TE_SIGNAL_DELIVERY_STOP:
-		restart_sig = WSTOPSIG(*pstatus);
-		print_stopped(current_tcp, si, restart_sig);
+		restart_sig = WSTOPSIG(status);
+		print_stopped(current_tcp, &wd->si, restart_sig);
 		break;
 
 	case TE_SIGNALLED:
-		print_signalled(current_tcp, current_tcp->pid, *pstatus);
+		print_signalled(current_tcp, current_tcp->pid, status);
 		droptcb(current_tcp);
 		return true;
 
 	case TE_GROUP_STOP:
-		restart_sig = WSTOPSIG(*pstatus);
+		restart_sig = WSTOPSIG(status);
 		print_stopped(current_tcp, NULL, restart_sig);
 		if (use_seize) {
 			/*
@@ -2494,7 +2525,7 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 		break;
 
 	case TE_EXITED:
-		print_exited(current_tcp, current_tcp->pid, *pstatus);
+		print_exited(current_tcp, current_tcp->pid, status);
 		droptcb(current_tcp);
 		return true;
 
@@ -2577,13 +2608,15 @@ dispatch_event(enum trace_event ret, int *pstatus, siginfo_t *si)
 static bool
 restart_delayed_tcb(struct tcb *const tcp)
 {
+	const struct tcb_wait_data wd = { .te = TE_RESTART };
+
 	debug_func_msg("pid %d", tcp->pid);
 
 	tcp->flags &= ~TCB_DELAYED;
 
 	struct tcb *const prev_tcp = current_tcp;
 	current_tcp = tcp;
-	bool ret = dispatch_event(TE_RESTART, NULL, NULL);
+	bool ret = dispatch_event(&wd);
 	current_tcp = prev_tcp;
 
 	return ret;
@@ -2694,9 +2727,7 @@ main(int argc, char *argv[])
 
 	exit_code = !nprocs;
 
-	int status;
-	siginfo_t si;
-	while (dispatch_event(next_event(&status, &si), &status, &si))
+	while (dispatch_event(next_event()))
 		;
 	terminate();
 }
