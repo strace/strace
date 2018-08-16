@@ -306,6 +306,11 @@ main(void)
 	printf("ioctl(%d<%s>, KVM_GET_API_VERSION, 0) = %d\n",
 	       kvm, dev, ret);
 
+	ret = KVM_IOCTL(kvm, KVM_CHECK_EXTENSION,
+			(void *) (uintptr_t) KVM_CAP_USER_MEMORY);
+	printf("ioctl(%d<%s>, KVM_CHECK_EXTENSION, KVM_CAP_USER_MEMORY) = %d\n",
+	       kvm, dev, ret);
+
 	int vm_fd = KVM_IOCTL(kvm, KVM_CREATE_VM, 0);
 	printf("ioctl(%d<%s>, KVM_CREATE_VM, 0) = %d<%s>\n",
 	       kvm, dev, vm_fd, vm_dev);

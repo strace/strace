@@ -323,6 +323,16 @@ kvm_ioctl_decode_sregs(struct tcb *const tcp, const unsigned int code,
 }
 # endif /* HAVE_STRUCT_KVM_SREGS */
 
+# include "xlat/kvm_cap.h"
+static int
+kvm_ioctl_decode_check_extension(struct tcb *const tcp, const unsigned int code,
+				 const kernel_ulong_t arg)
+{
+	tprints(", ");
+	printxval_index(kvm_cap, arg, "KVM_CAP_???");
+	return RVAL_IOCTL_DECODED;
+}
+
 # include "xlat/kvm_exit_reason.h"
 static void
 kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
@@ -402,6 +412,9 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 #  endif
                return kvm_ioctl_decode_cpuid2(tcp, code, arg);
 # endif
+
+	case KVM_CHECK_EXTENSION:
+		return kvm_ioctl_decode_check_extension(tcp, code, arg);
 
 	case KVM_CREATE_VM:
 		return RVAL_DECODED | RVAL_FD;
