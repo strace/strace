@@ -445,3 +445,11 @@ SO_ZEROCOPY	16437
 #else
 SO_ZEROCOPY	60
 #endif
+
+#if defined __sparc__
+SO_TXTIME	63
+#elif defined __hppa__
+SO_TXTIME	16438
+#else
+SO_TXTIME	61
+#endif
