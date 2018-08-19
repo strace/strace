@@ -194,6 +194,7 @@ gen_header()
 			# ifdef IN_MPERS
 
 			${decl}
+			extern const size_t ${name}_size;
 
 			# else
 
@@ -257,9 +258,19 @@ gen_header()
 		esac
 	done < "${input}"
 	echo ' XLAT_END'
+	echo '};'
+
+	if [ -n "$in_mpers" ]; then
+		cat <<-EOF
+
+			#  if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
+			static
+			#  endif
+			const size_t ${name}_size = ARRAY_SIZE(${name});
+		EOF
+	fi
 
 	cat <<-EOF
-		};
 
 		# endif /* !IN_MPERS */
 
