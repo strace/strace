@@ -1,0 +1,8 @@
+#value_indexed
+#enum
+#include <linux/if_bridge.h>
+BRIDGE_XSTATS_UNSPEC	0
+BRIDGE_XSTATS_VLAN	1
+BRIDGE_XSTATS_MCAST	2
+BRIDGE_XSTATS_PAD	3
+BRIDGE_XSTATS_STP	4

@@ -1,0 +1,5 @@
+#value_indexed
+#enum
+#include <linux/if_bonding.h>
+BOND_XSTATS_UNSPEC	0
+BOND_XSTATS_3AD		1

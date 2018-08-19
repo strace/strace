@@ -424,7 +424,10 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
+	linux/if_bonding.h
+	linux/if_bridge.h
 	linux/nexthop.h
+	linux/mpls.h
 	mqueue.h
 	netinet/sctp.h
 	netipx/ipx.h
@@ -504,6 +507,23 @@ AC_CHECK_TYPES(m4_normalize([
 	struct kvm_sregs,
 	struct kvm_userspace_memory_region
 ]),,, [#include <linux/kvm.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct if_stats_msg
+]),,, [#include <netinet/in.h>
+#include <linux/if_link.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct br_mcast_stats,
+	struct bridge_stp_xstats,
+	struct bridge_vlan_xstats
+]),,, [#include <netinet/in.h>
+#include <linux/if_bridge.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct mpls_link_stats
+]),,, [#include <netinet/in.h>
+#include <linux/mpls.h>])
 
 saved_CPPFLAGS="$CPPFLAGS"
 

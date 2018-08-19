@@ -547,6 +547,10 @@ nlattr_ifla_xdp-y
 nlattr_inet_diag_msg
 nlattr_inet_diag_req_compat
 nlattr_inet_diag_req_v2
+nlattr_ifstats
+nlattr_ifstats-Xabbrev
+nlattr_ifstats-Xraw
+nlattr_ifstats-Xverbose
 nlattr_mdba_mdb_entry
 nlattr_mdba_router_port
 nlattr_ndmsg

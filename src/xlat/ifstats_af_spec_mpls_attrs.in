@@ -1,0 +1,5 @@
+#value_indexed
+#enum
+#include <linux/mpls.h>
+MPLS_STATS_UNSPEC	0
+MPLS_STATS_LINK		1
