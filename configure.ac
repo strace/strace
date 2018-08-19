@@ -428,6 +428,8 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/if_bridge.h
 	linux/nexthop.h
 	linux/mpls.h
+	linux/mroute.h
+	linux/mroute6.h
 	mqueue.h
 	netinet/sctp.h
 	netipx/ipx.h

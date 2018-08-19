@@ -298,6 +298,7 @@ libstrace_a_SOURCES =	\
 	rtc.c		\
 	rtnl_addr.c	\
 	rtnl_addrlabel.c \
+	rtnl_cachereport.c \
 	rtnl_dcb.c	\
 	rtnl_link.c	\
 	rtnl_mdb.c	\
