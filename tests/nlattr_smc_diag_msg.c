@@ -77,7 +77,7 @@ print_smc_diag_msg(const unsigned int msg_len)
 	printf("{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
 	       ", {diag_family=AF_SMC, diag_state=SMC_ACTIVE"
-	       ", diag_fallback=0, diag_shutdown=0"
+	       ", diag_fallback=SMC_DIAG_MODE_SMCR, diag_shutdown=0"
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
 	       ", idiag_src=inet_addr(\"%s\")"
 	       ", idiag_dst=inet_addr(\"%s\")"

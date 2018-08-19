@@ -609,7 +609,7 @@ test_smc_diag_msg(const int fd)
 	struct smc_diag_msg msg = {
 		.diag_family = AF_SMC,
 		.diag_state = SMC_ACTIVE,
-		.diag_fallback = 0xde,
+		.diag_fallback = 0x1,
 		.diag_shutdown = 0xba,
 		.id = {
 			.idiag_sport = 0xdead,
@@ -630,7 +630,7 @@ test_smc_diag_msg(const int fd)
 		       SOCK_DIAG_BY_FAMILY, NLM_F_DUMP, msg,
 		       printf("{diag_family=AF_SMC"),
 		       printf(", diag_state=SMC_ACTIVE");
-		       PRINT_FIELD_U(", ", msg, diag_fallback);
+		       printf(", diag_fallback=SMC_DIAG_MODE_FALLBACK_TCP");
 		       PRINT_FIELD_U(", ", msg, diag_shutdown);
 		       printf(", id={idiag_sport=htons(%u)"
 			      ", idiag_dport=htons(%u)"

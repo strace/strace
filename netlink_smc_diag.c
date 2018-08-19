@@ -45,6 +45,7 @@
 
 #include "xlat/smc_diag_attrs.h"
 #include "xlat/smc_diag_extended_flags.h"
+#include "xlat/smc_diag_mode.h"
 #include "xlat/smc_link_group_roles.h"
 #include "xlat/smc_states.h"
 
@@ -190,7 +191,9 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 					 (void *) &msg + offset)) {
 			PRINT_FIELD_XVAL("", msg, diag_state,
 					 smc_states, "SMC_???");
-			PRINT_FIELD_U(", ", msg, diag_fallback);
+			PRINT_FIELD_XVAL_INDEX(", ", msg, diag_fallback,
+					       smc_diag_mode,
+					       "SMC_DIAG_MODE_???");
 			PRINT_FIELD_U(", ", msg, diag_shutdown);
 			/*
 			 * AF_SMC protocol family socket handler
