@@ -19,6 +19,7 @@
 #include <linux/if_addrlabel.h>
 #include <linux/if_arp.h>
 #include <linux/if_bridge.h>
+#include <linux/if_link.h>
 #include <linux/ip.h>
 #include <linux/neighbour.h>
 #include <linux/netconf.h>
@@ -640,6 +641,55 @@ test_rtnl_nexthop(const int fd)
 	test_rtnl_unknown_msg(fd, RTM_NEWNEXTHOP + 3);
 }
 
+static void
+test_rtnl_ifstats(const int fd)
+{
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWSTATS) },
+		{ ARG_STR(RTM_GETSTATS) },
+	};
+	const struct {
+		struct if_stats_msg msg;
+		const char *af_str;
+		const char *rest_str;
+	} msgs[] = {
+		{ { .family = AF_UNIX, .pad1 = 0, .pad2 = 0,
+		    .ifindex = ifindex_lo(), .filter_mask = 0, },
+		  "{family=AF_UNIX", ", ifindex=" IFINDEX_LO_STR
+		  ", filter_mask=0}" },
+		{ { .family = 44, .pad1 = 0, .pad2 = 0xdead,
+		    .ifindex = 0xdeadbeef, .filter_mask = 1, },
+		  "{family=AF_XDP", ", pad2=0xdead, ifindex=3735928559"
+		  ", filter_mask=1<<IFLA_STATS_UNSPEC}" },
+		{ { .family = 45, .pad1 = 0xca, .pad2 = 0,
+		    .ifindex = ifindex_lo(), .filter_mask = 0xff, },
+		  "{family=0x2d /* AF_??? */", ", pad1=0xca"
+		  ", ifindex=" IFINDEX_LO_STR
+		  ", filter_mask=1<<IFLA_STATS_UNSPEC|1<<IFLA_STATS_LINK_64"
+		  "|1<<IFLA_STATS_LINK_XSTATS|1<<IFLA_STATS_LINK_XSTATS_SLAVE"
+		  "|1<<IFLA_STATS_LINK_OFFLOAD_XSTATS|1<<IFLA_STATS_AF_SPEC"
+		  "|0xc0}" },
+		{ { .family = 255, .pad1 = 0xde, .pad2 = 0xbeef,
+		    .ifindex = ifindex_lo(), .filter_mask = 0xdec0dec0, },
+		  "{family=0xff /* AF_??? */", ", pad1=0xde"
+		  ", pad2=0xbeef, ifindex=" IFINDEX_LO_STR
+		  ", filter_mask=0xdec0dec0 /* 1<<IFLA_STATS_??? */}" },
+	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msgs[0].msg));
+
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		for (size_t j = 0; j < ARRAY_SIZE(msgs); j++) {
+			TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str,
+				       msgs[j].msg,
+				       printf("%s", msgs[j].af_str),
+				       printf("%s", msgs[j].rest_str));
+		}
+	}
+
+	test_rtnl_unknown_msg(fd, RTM_NEWSTATS + 1);
+	test_rtnl_unknown_msg(fd, RTM_NEWSTATS + 3);
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -678,12 +728,7 @@ int main(void)
 	test_rtnl_netconf(fd);		/* 80 */
 	test_rtnl_mdb(fd);		/* 84 */
 	test_rtnl_nsid(fd);		/* 88 */
-
-	/* stats */			/* 92 */
-	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWSTATS));
-	test_rtnl_unknown_msg(fd, RTM_NEWSTATS + 1);
-	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_GETSTATS));
-	test_rtnl_unknown_msg(fd, RTM_NEWSTATS + 3);
+	test_rtnl_ifstats(fd);		/* 92 */
 
 	/* cachereport */		/* 96 */
 	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWCACHEREPORT));

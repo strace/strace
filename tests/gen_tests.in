@@ -522,6 +522,10 @@ nlattr_ifla_xdp-y		+netlink_sock_diag.test -y; exec 9</dev/full
 nlattr_inet_diag_msg		+netlink_sock_diag.test
 nlattr_inet_diag_req_compat	+netlink_sock_diag.test
 nlattr_inet_diag_req_v2		+netlink_sock_diag.test
+nlattr_ifstats			+netlink_sock_diag.test
+nlattr_ifstats-Xabbrev		+netlink_sock_diag.test -Xabbrev
+nlattr_ifstats-Xraw		+netlink_sock_diag.test -Xraw
+nlattr_ifstats-Xverbose		+netlink_sock_diag.test -Xverbose
 nlattr_mdba_mdb_entry		+netlink_sock_diag.test
 nlattr_mdba_router_port		+netlink_sock_diag.test
 nlattr_ndmsg			+netlink_sock_diag.test

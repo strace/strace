@@ -523,6 +523,18 @@ tprints_arg_begin(const char *name)
 				  (print_func_));			\
 	} while (0)
 
+# define PRINT_FIELD_ARRAY_INDEXED(where_, field_, tcp_, print_func_,	\
+				   ind_xlat_, ind_dflt_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_local_array_ex((tcp_), (where_).field_,		\
+				  ARRAY_SIZE((where_).field_),		\
+				  sizeof(((where_).field_)[0]),		\
+				  (print_func_),			\
+				  NULL, PAF_PRINT_INDICES | XLAT_STYLE_FMT_U, \
+				  (ind_xlat_), (ind_dflt_));		\
+	} while (0)
+
 # define PRINT_FIELD_ARRAY_UPTO(where_, field_,				\
 				upto_, tcp_, print_func_)		\
 	do {								\

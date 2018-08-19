@@ -43,6 +43,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/hiddev.h \
 	linux/include/uapi/linux/if_addr.h \
 	linux/include/uapi/linux/if_addrlabel.h \
+	linux/include/uapi/linux/if_bonding.h \
 	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_link.h \
 	linux/include/uapi/linux/in6.h \
@@ -60,6 +61,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/memfd.h \
 	linux/include/uapi/linux/mmtimer.h \
 	linux/include/uapi/linux/mount.h \
+	linux/include/uapi/linux/mpls.h \
 	linux/include/uapi/linux/mqueue.h \
 	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netconf.h \

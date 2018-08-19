@@ -9,8 +9,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of SECCOMP_GET_NOTIF_SIZES operation of seccomp
     syscall.
   * Implemented decoding of SECCOMP_* ioctl commands.
-  * Implemented decoding of RTM_{NEW,DEL,GET}NEXTHOP NETLINK_ROUTE netlink
-    messages.
+  * Implemented decoding of RTM_{NEW,DEL,GET}NEXTHOP and RTM_{NEW,GET}STATS
+    NETLINK_ROUTE netlink messages.
   * Enhanced decoding of io_uring_register and times syscalls.
   * Enhanced AF_IPX socket address decoding.
   * Updated lists of BTRFS_*, DM_*, FAN_REPORT_*, IORING_*, MPOL_*, PACKET_*,

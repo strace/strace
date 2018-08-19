@@ -1,0 +1,4 @@
+#unconditional
+#value_indexed
+MPLS_STATS_UNSPEC	0
+MPLS_STATS_LINK		1

@@ -1,0 +1,4 @@
+#unconditional
+#value_indexed
+IFLA_OFFLOAD_XSTATS_UNSPEC	0
+IFLA_OFFLOAD_XSTATS_CPU_HIT	1
