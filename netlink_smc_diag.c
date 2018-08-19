@@ -146,10 +146,34 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_smc_diag_dmbinfo(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	struct smcd_diag_dmbinfo dinfo;
+
+	if (len < sizeof(dinfo))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &dinfo))
+		return true;
+
+	PRINT_FIELD_U("{", dinfo, linkid);
+	PRINT_FIELD_X(", ", dinfo, peer_gid);
+	PRINT_FIELD_X(", ", dinfo, my_gid);
+	PRINT_FIELD_X(", ", dinfo, token);
+	PRINT_FIELD_X(", ", dinfo, peer_token);
+	tprints("}");
+
+	return true;
+}
+
 static const nla_decoder_t smc_diag_msg_nla_decoders[] = {
 	[SMC_DIAG_CONNINFO]	= decode_smc_diag_conninfo,
 	[SMC_DIAG_LGRINFO]	= decode_smc_diag_lgrinfo,
-	[SMC_DIAG_SHUTDOWN]	= decode_nla_u8
+	[SMC_DIAG_SHUTDOWN]	= decode_nla_u8,
+	[SMC_DIAG_DMBINFO]      = decode_smc_diag_dmbinfo,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)

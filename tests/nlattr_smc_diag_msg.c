@@ -154,6 +154,13 @@ int main(void)
 		},
 		.role = SMC_CLNT
 	};
+	static const struct smcd_diag_dmbinfo dinfo = {
+		.linkid     = 0xdeadc0de,
+		.peer_gid   = 0xbefeededbadc0dedULL,
+		.my_gid     = 0xdeec0dedfacebeefULL,
+		.token      = 0xcafedecaffeedeedULL,
+		.peer_token = 0xfeedfacebeeff00dULL,
+	};
 
 	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 	const unsigned int hdrlen = sizeof(struct smc_diag_msg);
@@ -193,6 +200,16 @@ int main(void)
 			   printf(", gid=\"%s\"", linfo.lnk[0].gid);
 			   printf(", peer_gid=\"%s\"}", linfo.lnk[0].peer_gid);
 			   printf(", role=SMC_CLNT}"));
+
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_smc_diag_msg, print_smc_diag_msg,
+			   SMC_DIAG_DMBINFO, pattern, dinfo,
+			   PRINT_FIELD_U("{", dinfo, linkid);
+			   PRINT_FIELD_X(", ", dinfo, peer_gid);
+			   PRINT_FIELD_X(", ", dinfo, my_gid);
+			   PRINT_FIELD_X(", ", dinfo, token);
+			   PRINT_FIELD_X(", ", dinfo, peer_token);
+			   printf("}"));
 
 	printf("+++ exited with 0 +++\n");
 	return 0;
