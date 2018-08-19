@@ -29,20 +29,24 @@
 #include "defs.h"
 #include <sys/socket.h>
 
-#ifdef AF_SMC
+#ifndef AF_SMC
+# define XLAT_MACROS_ONLY
+# include "xlat/addrfams.h"
+# undef XLAT_MACROS_ONLY
+#endif
 
-# include "netlink.h"
-# include "netlink_sock_diag.h"
-# include "nlattr.h"
-# include "print_fields.h"
+#include "netlink.h"
+#include "netlink_sock_diag.h"
+#include "nlattr.h"
+#include "print_fields.h"
 
-# include <arpa/inet.h>
-# include <linux/smc_diag.h>
+#include <arpa/inet.h>
+#include <linux/smc_diag.h>
 
-# include "xlat/smc_diag_attrs.h"
-# include "xlat/smc_diag_extended_flags.h"
-# include "xlat/smc_link_group_roles.h"
-# include "xlat/smc_states.h"
+#include "xlat/smc_diag_attrs.h"
+#include "xlat/smc_diag_extended_flags.h"
+#include "xlat/smc_link_group_roles.h"
+#include "xlat/smc_states.h"
 
 DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 {
@@ -186,5 +190,3 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 			      ARRAY_SIZE(smc_diag_msg_nla_decoders), NULL);
 	}
 }
-
-#endif /* AF_SMC */

@@ -31,6 +31,10 @@
 #include "netlink.h"
 #include "netlink_sock_diag.h"
 
+#define XLAT_MACROS_ONLY
+#include "xlat/addrfams.h"
+#undef XLAT_MACROS_ONLY
+
 static void
 decode_family(struct tcb *const tcp, const uint8_t family,
 	      const kernel_ulong_t addr, const unsigned int len)
@@ -50,14 +54,12 @@ typedef DECL_NETLINK_DIAG_DECODER((*netlink_diag_decoder_t));
 static const struct {
 	const netlink_diag_decoder_t request, response;
 } diag_decoders[] = {
+	[AF_UNIX] = { decode_unix_diag_req, decode_unix_diag_msg },
 	[AF_INET] = { decode_inet_diag_req, decode_inet_diag_msg },
 	[AF_INET6] = { decode_inet_diag_req, decode_inet_diag_msg },
 	[AF_NETLINK] = { decode_netlink_diag_req, decode_netlink_diag_msg },
 	[AF_PACKET] = { decode_packet_diag_req, decode_packet_diag_msg },
-#ifdef AF_SMC
 	[AF_SMC] = { decode_smc_diag_req, decode_smc_diag_msg },
-#endif
-	[AF_UNIX] = { decode_unix_diag_req, decode_unix_diag_msg }
 };
 
 bool

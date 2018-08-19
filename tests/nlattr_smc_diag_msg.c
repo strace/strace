@@ -29,23 +29,25 @@
 #include "tests.h"
 #include <sys/socket.h>
 
-#ifdef AF_SMC
+#ifndef AF_SMC
+# define AF_SMC 43
+#endif
 
-# include <stdio.h>
-# include <string.h>
-# include <stdint.h>
-# include <arpa/inet.h>
-# include "test_nlattr.h"
-# include <linux/rtnetlink.h>
-# include <linux/smc_diag.h>
-# include <linux/sock_diag.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <arpa/inet.h>
+#include "test_nlattr.h"
+#include <linux/rtnetlink.h>
+#include <linux/smc_diag.h>
+#include <linux/sock_diag.h>
 
-# ifndef SMC_CLNT
-#  define SMC_CLNT 0
-# endif
-# ifndef SMC_ACTIVE
-#  define SMC_ACTIVE 1
-# endif
+#ifndef SMC_CLNT
+# define SMC_CLNT 0
+#endif
+#ifndef SMC_ACTIVE
+# define SMC_ACTIVE 1
+#endif
 
 static const char address[] = "12.34.56.78";
 
@@ -195,9 +197,3 @@ int main(void)
 	printf("+++ exited with 0 +++\n");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("AF_SMC")
-
-#endif
