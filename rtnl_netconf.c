@@ -47,7 +47,8 @@ static const nla_decoder_t netconfmsg_nla_decoders[] = {
 	[NETCONFA_MC_FORWARDING]		= decode_nla_s32,
 	[NETCONFA_PROXY_NEIGH]			= decode_nla_s32,
 	[NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN]	= decode_nla_s32,
-	[NETCONFA_INPUT]			= decode_nla_s32
+	[NETCONFA_INPUT]			= decode_nla_s32,
+	[NETCONFA_BC_FORWARDING]		= decode_nla_s32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
