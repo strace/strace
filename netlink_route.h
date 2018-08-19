@@ -25,6 +25,7 @@ extern DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg);
+extern DECL_NETLINK_ROUTE_DECODER(decode_ifstatsmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ndmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg);

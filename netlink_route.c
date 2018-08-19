@@ -100,6 +100,9 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_GETNSID - RTM_BASE] = decode_rtgenmsg,
 	[RTM_NEWNSID - RTM_BASE] = decode_rtgenmsg,
 
+	[RTM_NEWSTATS - RTM_BASE] = decode_ifstatsmsg,
+	[RTM_GETSTATS - RTM_BASE] = decode_ifstatsmsg,
+
 	[RTM_NEWCHAIN - RTM_BASE] = decode_tcmsg,
 	[RTM_DELCHAIN - RTM_BASE] = decode_tcmsg,
 	[RTM_GETCHAIN - RTM_BASE] = decode_tcmsg,

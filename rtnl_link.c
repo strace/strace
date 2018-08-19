@@ -416,11 +416,11 @@ decode_ifla_linkinfo(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_rtnl_link_stats64(struct tcb *const tcp,
-		         const kernel_ulong_t addr,
-			 const unsigned int len,
-			 const void *const opaque_data)
+bool
+decode_nla_rtnl_link_stats64(struct tcb *const tcp,
+			     const kernel_ulong_t addr,
+			     const unsigned int len,
+			     const void *const opaque_data)
 {
 #ifdef HAVE_STRUCT_RTNL_LINK_STATS64
 	struct rtnl_link_stats64 st;
@@ -795,11 +795,11 @@ decode_ifla_af(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_ifla_af_spec(struct tcb *const tcp,
-		    const kernel_ulong_t addr,
-		    const unsigned int len,
-		    const void *const opaque_data)
+bool
+decode_nla_ifla_af_spec(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
 {
 	nla_decoder_t af_spec_decoder = &decode_ifla_af;
 
@@ -849,10 +849,10 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_IFALIAS]		= decode_nla_str,
 	[IFLA_NUM_VF]		= decode_nla_u32,
 	[IFLA_VFINFO_LIST]	= NULL, /* unimplemented */
-	[IFLA_STATS64]		= decode_rtnl_link_stats64,
+	[IFLA_STATS64]		= decode_nla_rtnl_link_stats64,
 	[IFLA_VF_PORTS]		= decode_ifla_vf_ports,
 	[IFLA_PORT_SELF]	= decode_ifla_port,
-	[IFLA_AF_SPEC]		= decode_ifla_af_spec,
+	[IFLA_AF_SPEC]		= decode_nla_ifla_af_spec,
 	[IFLA_GROUP]		= decode_nla_u32,
 	[IFLA_NET_NS_FD]	= decode_nla_fd,
 	[IFLA_EXT_MASK]		= decode_nla_u32,
