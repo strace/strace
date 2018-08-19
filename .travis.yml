@@ -24,6 +24,11 @@ matrix:
         - STACKTRACE=libunwind
         - CHECK=coverage
         - KHEADERS=torvalds/linux
+    - compiler: gcc-8
+      env:
+        - TARGET=x86_64
+        - STACKTRACE=libunwind
+        - KHEADERS=torvalds/linux
     - compiler: gcc
       env:
         - TARGET=x86_64
