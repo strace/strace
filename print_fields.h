@@ -135,7 +135,7 @@
 	do {										\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);				\
 		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX)		\
-			print_xlat_ex(UINT64_MAX, "UINT64_MAX", XLAT_STYLE_FMT_U);	\
+			print_xlat_u(UINT64_MAX);					\
 		else									\
 			STRACE_PRINTF("%llu",						\
 				      zero_extend_signed_to_ull((where_).field_));	\
