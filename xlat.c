@@ -115,6 +115,35 @@ xlat_search(const struct xlat *xlat, const size_t nmemb, const uint64_t val)
 	}
 }
 
+const char *
+xlat_search_eq_or_less(const struct xlat *xlat, size_t nmemb, uint64_t *val)
+{
+	const struct xlat *base = xlat;
+	const struct xlat *cur = xlat;
+
+	for (; nmemb > 0; nmemb >>= 1) {
+		cur = base + (nmemb >> 1);
+
+		if (*val == cur->val)
+			return cur->str;
+
+		if (*val > cur->val) {
+			base = cur + 1;
+			nmemb--;
+		}
+	}
+
+	if (*val < cur->val) {
+		if (cur > xlat)
+			cur--;
+		else
+			return NULL;
+	}
+
+	*val = cur->val;
+	return cur->str;
+}
+
 /**
  * Print entry in struct xlat table, if there.
  *
