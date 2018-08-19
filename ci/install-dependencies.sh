@@ -49,10 +49,23 @@ clone_repo()
 		git clone --depth=1 ${branch:+--branch $branch} "$src" "$dst"
 }
 
+case "$CC" in
+	gcc-*)
+		retry_if_failed \
+			$sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+		apt_get_install $common_packages "$CC"-multilib
+		;;
+	clang*)
+		apt_get_install $common_packages "$CC"
+		;;
+	*)
+		apt_get_install $common_packages
+		;;
+esac
+
 case "$KHEADERS" in
 	*/*)
 		clone_repo https://github.com/"$KHEADERS" kernel ${KBRANCH-}
-		apt_get_install $common_packages
 		$sudo make -C kernel headers_install INSTALL_HDR_PATH=/opt/kernel
 		$sudo rm -rf kernel
 		KHEADERS_INC=/opt/kernel/include
@@ -63,20 +76,8 @@ case "$KHEADERS" in
 esac
 
 case "$CC" in
-	gcc)
-		apt_get_install $common_packages
-		;;
-	gcc-*)
-		retry_if_failed \
-			$sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-		apt_get_install $common_packages "$CC"-multilib
-		;;
-	clang*)
-		apt_get_install $common_packages "$CC"
-		;;
 	musl-gcc)
 		clone_repo strace/musl musl
-		apt_get_install $common_packages
 		cd musl
 			CC=gcc
 			build=
