@@ -379,6 +379,7 @@ main(void)
 {
 	const unsigned int size = get_page_size();
 	void *const page = tail_alloc(size);
+	void *const page_end = page + size;
 	fill_memory(page, size);
 
 	unsigned char cc[sizeof(int)] = { 'A', '\'', '\\', '\xfa' };
@@ -542,7 +543,7 @@ main(void)
 	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_SDR_OUTPUT);
 #endif
 	struct v4l2_format *const p_v4l2_format =
-		page + size - sizeof(*p_v4l2_format);
+		page_end - sizeof(*p_v4l2_format);
 	ioctl(-1, VIDIOC_TRY_FMT, p_v4l2_format);
 	printf("ioctl(-1, VIDIOC_TRY_FMT, {type=%#x /* V4L2_BUF_TYPE_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_format->type);
@@ -552,7 +553,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_REQBUFS, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_requestbuffers *const p_v4l2_requestbuffers =
-		page + size - sizeof(*p_v4l2_requestbuffers);
+		page_end - sizeof(*p_v4l2_requestbuffers);
 	ioctl(-1, VIDIOC_REQBUFS, p_v4l2_requestbuffers);
 	printf("ioctl(-1, VIDIOC_REQBUFS, {type=%#x /* V4L2_BUF_TYPE_??? */, "
 	       "memory=%#x /* V4L2_MEMORY_??? */, count=%u})"
@@ -566,7 +567,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_QUERYBUF, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_buffer *const p_v4l2_buffer =
-		page + size - sizeof(*p_v4l2_buffer);
+		page_end - sizeof(*p_v4l2_buffer);
 	ioctl(-1, VIDIOC_QUERYBUF, p_v4l2_buffer);
 	printf("ioctl(-1, VIDIOC_QUERYBUF, {type=%#x /* V4L2_BUF_TYPE_??? */"
 	       ", index=%u}) = -1 EBADF (%m)\n",
@@ -602,7 +603,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_S_FBUF, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_framebuffer *const p_v4l2_framebuffer =
-		page + size - sizeof(*p_v4l2_framebuffer);
+		page_end - sizeof(*p_v4l2_framebuffer);
 	ioctl(-1, VIDIOC_S_FBUF, p_v4l2_framebuffer);
 	printf("ioctl(-1, VIDIOC_S_FBUF, {capability=%#x"
 	       ", flags=%#x, base=%p}) = -1 EBADF (%m)\n",
@@ -614,7 +615,7 @@ main(void)
 	ioctl(-1, VIDIOC_STREAMON, 0);
 	printf("ioctl(-1, VIDIOC_STREAMON, NULL) = -1 EBADF (%m)\n");
 
-	int *const p_int = page + size - sizeof(int);
+	int *const p_int = page_end - sizeof(int);
 	ioctl(-1, VIDIOC_STREAMON, p_int);
 	printf("ioctl(-1, VIDIOC_STREAMON, [%#x /* V4L2_BUF_TYPE_??? */])"
 	       " = -1 EBADF (%m)\n", *p_int);
@@ -632,7 +633,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_G_PARM, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_streamparm *const p_v4l2_streamparm =
-		page + size - sizeof(*p_v4l2_streamparm);
+		page_end - sizeof(*p_v4l2_streamparm);
 	ioctl(-1, VIDIOC_G_PARM, p_v4l2_streamparm);
 	printf("ioctl(-1, VIDIOC_G_PARM, {type=%#x /* V4L2_BUF_TYPE_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_streamparm->type);
@@ -680,7 +681,7 @@ main(void)
 	ioctl(-1, VIDIOC_S_STD, 0);
 	printf("ioctl(-1, VIDIOC_S_STD, NULL) = -1 EBADF (%m)\n");
 
-	long long *const p_longlong = page + size - sizeof(*p_longlong);
+	long long *const p_longlong = page_end - sizeof(*p_longlong);
 	ioctl(-1, VIDIOC_S_STD, p_longlong);
 	printf("ioctl(-1, VIDIOC_S_STD, [%#llx]) = -1 EBADF (%m)\n",
 	       *p_longlong);
@@ -690,7 +691,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_ENUMSTD, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_standard *const p_v4l2_standard =
-		page + size - sizeof(*p_v4l2_standard);
+		page_end - sizeof(*p_v4l2_standard);
 	ioctl(-1, VIDIOC_ENUMSTD, p_v4l2_standard);
 	printf("ioctl(-1, VIDIOC_ENUMSTD, {index=%u}) = -1 EBADF (%m)\n",
 	       p_v4l2_standard->index);
@@ -700,7 +701,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_ENUMINPUT, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_input *const p_v4l2_input =
-		page + size - sizeof(*p_v4l2_input);
+		page_end - sizeof(*p_v4l2_input);
 	ioctl(-1, VIDIOC_ENUMINPUT, p_v4l2_input);
 	printf("ioctl(-1, VIDIOC_ENUMINPUT, {index=%u}) = -1 EBADF (%m)\n",
 	       p_v4l2_input->index);
@@ -710,7 +711,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_G_CTRL, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_control *const p_v4l2_control =
-		page + size - sizeof(*p_v4l2_control);
+		page_end - sizeof(*p_v4l2_control);
 	ioctl(-1, VIDIOC_G_CTRL, p_v4l2_control);
 	printf("ioctl(-1, VIDIOC_G_CTRL, {id=%#x /* V4L2_CID_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_control->id);
@@ -729,7 +730,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_G_TUNER, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_tuner *const p_v4l2_tuner =
-		page + size - sizeof(*p_v4l2_tuner);
+		page_end - sizeof(*p_v4l2_tuner);
 	ioctl(-1, VIDIOC_G_TUNER, p_v4l2_tuner);
 	printf("ioctl(-1, VIDIOC_G_TUNER, {index=%u})"
 	       " = -1 EBADF (%m)\n", p_v4l2_tuner->index);
@@ -765,7 +766,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_QUERYCTRL, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_queryctrl *const p_v4l2_queryctrl =
-		page + size - sizeof(*p_v4l2_queryctrl);
+		page_end - sizeof(*p_v4l2_queryctrl);
 	ioctl(-1, VIDIOC_QUERYCTRL, p_v4l2_queryctrl);
 # ifdef V4L2_CTRL_FLAG_NEXT_CTRL
 	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=V4L2_CTRL_FLAG_NEXT_CTRL"
@@ -801,7 +802,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_CROPCAP, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_cropcap *const p_v4l2_cropcap =
-		page + size - sizeof(*p_v4l2_cropcap);
+		page_end - sizeof(*p_v4l2_cropcap);
 	ioctl(-1, VIDIOC_CROPCAP, p_v4l2_cropcap);
 	printf("ioctl(-1, VIDIOC_CROPCAP, {type=%#x /* V4L2_BUF_TYPE_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_cropcap->type);
@@ -811,7 +812,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_G_CROP, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_crop *const p_v4l2_crop =
-		page + size - sizeof(*p_v4l2_crop);
+		page_end - sizeof(*p_v4l2_crop);
 	ioctl(-1, VIDIOC_G_CROP, p_v4l2_crop);
 	printf("ioctl(-1, VIDIOC_G_CROP, {type=%#x /* V4L2_BUF_TYPE_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_crop->type);
@@ -950,7 +951,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_frmivalenum *const p_v4l2_frmivalenum =
-		page + size - sizeof(*p_v4l2_frmivalenum);
+		page_end - sizeof(*p_v4l2_frmivalenum);
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, p_v4l2_frmivalenum);
 	printf("ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, {index=%u"
 	       ", pixel_format=v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
@@ -969,7 +970,7 @@ main(void)
 	printf("ioctl(-1, VIDIOC_CREATE_BUFS, NULL) = -1 EBADF (%m)\n");
 
 	struct v4l2_create_buffers *const p_v4l2_create_buffers =
-		page + size - sizeof(*p_v4l2_create_buffers);
+		page_end - sizeof(*p_v4l2_create_buffers);
 	ioctl(-1, VIDIOC_CREATE_BUFS, p_v4l2_create_buffers);
 	printf("ioctl(-1, VIDIOC_CREATE_BUFS, {count=%u, memory=%#x"
 	       " /* V4L2_MEMORY_??? */, format={type=%#x"
