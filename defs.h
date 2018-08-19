@@ -693,9 +693,9 @@ printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
  */
 #define printxval_search(xlat__, val__, dflt__) \
 	printxval_searchn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
-#define printxval_search_ex(xlat__, val__, dflt__) \
+#define printxval_search_ex(xlat__, val__, dflt__, style__) \
 	printxval_searchn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
-			     (dflt__), XLAT_STYLE_DEFAULT)
+			     (dflt__), (style__))
 
 extern int printxval_indexn_ex(const struct xlat *, size_t xlat_size,
 			       uint64_t val, const char *dflt, enum xlat_style);
