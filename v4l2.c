@@ -598,6 +598,34 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_control_id_bases.h"
 #include "xlat/v4l2_control_ids.h"
 
+static void
+print_v4l2_cid(const uint32_t cid)
+{
+	const char *id_name = xlookup(v4l2_control_ids, cid);
+
+	if (id_name) {
+		print_xlat_ex(cid, id_name, XLAT_STYLE_DEFAULT);
+		return;
+	}
+
+	uint64_t class_id = cid;
+	const char *class_str = xlookup_le(v4l2_control_classes, &class_id);
+
+	if (!class_str || (cid - class_id) >= 0x10000) {
+		print_xlat_ex(cid, "V4L2_CID_???", PXF_DEFAULT_STR);
+		return;
+	}
+
+	char *tmp_str;
+
+	if (asprintf(&tmp_str, "%s+%#" PRIx64,
+		     class_str, cid - class_id) < 0)
+		tmp_str = NULL;
+
+	print_xlat_ex(cid, tmp_str, XLAT_STYLE_DEFAULT);
+	free(tmp_str);
+}
+
 static int
 print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		   const bool is_get)
@@ -608,8 +636,9 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		tprints("{id=");
-		printxval(v4l2_control_ids, c.id, "V4L2_CID_???");
+		print_v4l2_cid(c.id);
 		if (!is_get)
 			tprintf(", value=%d", c.value);
 		return 0;

@@ -690,6 +690,23 @@ main(void)
 	ioctl(-1, VIDIOC_G_CTRL, 0);
 	printf("ioctl(-1, VIDIOC_G_CTRL, NULL) = -1 EBADF (%m)\n");
 
+	static const struct v4l2_control v4l2_control_vals[] = {
+		{ .id = 0,                    .value = 3141592653U },
+		{ .id = 0x97abcd,             .value = 1234567890U },
+		{ .id = V4L2_CTRL_CLASS_USER, .value = 0 },
+		{ .id = 0x990a64,             .value = 42 },
+		{ .id = 0xa31234,             .value = 1 },
+		{ .id = 0xa40000,             .value = -1 },
+	};
+	static const char *id_strs[] = {
+		"0 /* V4L2_CID_??? */",
+		"0x97abcd /* V4L2_CID_??? */",
+		"V4L2_CTRL_CLASS_USER+0",
+		"V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE",
+		"V4L2_CTRL_CLASS_DETECT+0x1234",
+		"0xa40000 /* V4L2_CID_??? */",
+	};
+
 	struct v4l2_control *const p_v4l2_control =
 		page_end - sizeof(*p_v4l2_control);
 	ioctl(-1, VIDIOC_G_CTRL, p_v4l2_control);
@@ -704,6 +721,19 @@ main(void)
 	printf("ioctl(-1, VIDIOC_S_CTRL, {id=%#x /* V4L2_CID_??? */"
 	       ", value=%d}) = -1 EBADF (%m)\n",
 	       p_v4l2_control->id, p_v4l2_control->value);
+
+	for (size_t i = 0; i < ARRAY_SIZE(id_strs); i++) {
+		struct v4l2_control v4l2_c = v4l2_control_vals[i];
+
+		ioctl(-1, VIDIOC_G_CTRL, &v4l2_c);
+		printf("ioctl(-1, VIDIOC_G_CTRL, {id=%s}) = -1 EBADF (%m)\n",
+		       id_strs[i]);
+
+		ioctl(-1, VIDIOC_S_CTRL, &v4l2_c);
+		printf("ioctl(-1, VIDIOC_S_CTRL, {id=%s, value=%d})"
+		       " = -1 EBADF (%m)\n",
+		       id_strs[i], v4l2_c.value);
+	}
 
 	/* VIDIOC_G_TUNER */
 	ioctl(-1, VIDIOC_G_TUNER, 0);
