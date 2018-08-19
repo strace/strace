@@ -102,6 +102,8 @@ DECL_NLA(gid);
 DECL_NLA(ifindex);
 DECL_NLA(ether_proto);
 DECL_NLA(ip_proto);
+DECL_NLA(in_addr);
+DECL_NLA(in6_addr);
 DECL_NLA(meminfo);
 DECL_NLA(rt_class);
 DECL_NLA(rt_proto);
