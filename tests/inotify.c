@@ -52,8 +52,8 @@ main(void)
 	static const char *bogus_mask_str = "IN_ACCESS|IN_ATTRIB|"
 		"IN_CLOSE_WRITE|IN_OPEN|IN_MOVED_TO|IN_DELETE|IN_DELETE_SELF|"
 		"IN_MOVE_SELF|IN_Q_OVERFLOW|IN_IGNORED|IN_ONLYDIR|"
-		"IN_DONT_FOLLOW|IN_EXCL_UNLINK|IN_MASK_ADD|IN_ISDIR|IN_ONESHOT|"
-		"0x18ff1000";
+		"IN_DONT_FOLLOW|IN_EXCL_UNLINK|IN_MASK_CREATE|IN_MASK_ADD|"
+		"IN_ISDIR|IN_ONESHOT|0x8ff1000";
 
 	long rc;
 	char *bogus_path = tail_memdup(bogus_path_str.path,
