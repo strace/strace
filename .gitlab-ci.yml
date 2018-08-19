@@ -1,4 +1,4 @@
-image: "ubuntu:17.10"
+image: "ubuntu:18.04"
 
 before_script:
   - ci/install-dependencies.sh
