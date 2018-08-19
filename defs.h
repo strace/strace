@@ -735,6 +735,30 @@ printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 				     XLAT_STYLE_DEFAULT);
 }
 
+enum xlat_style_private_flag_bits {
+	/* print_array */
+	PAF_PRINT_INDICES_BIT = XLAT_STYLE_SPEC_BITS + 1,
+	PAF_INDEX_XLAT_SORTED_BIT,
+	PAF_INDEX_XLAT_VALUE_INDEXED_BIT,
+
+	/* print_xlat */
+	PXF_DEFAULT_STR_BIT,
+};
+
+#define FLAG_(name_) name_ = 1 << name_##_BIT
+
+enum xlat_style_private_flags {
+	/* print_array */
+	FLAG_(PAF_PRINT_INDICES),
+	FLAG_(PAF_INDEX_XLAT_SORTED),
+	FLAG_(PAF_INDEX_XLAT_VALUE_INDEXED),
+
+	/* print_xlat */
+	FLAG_(PXF_DEFAULT_STR),
+};
+
+#undef FLAG_
+
 /** Print a value in accordance with xlat formatting settings. */
 extern void print_xlat_ex(uint64_t val, const char *str, enum xlat_style style);
 #define print_xlat(val_) \
@@ -786,21 +810,6 @@ typedef bool (*tfetch_mem_fn)(struct tcb *, kernel_ulong_t addr,
 typedef bool (*print_fn)(struct tcb *, void *elem_buf,
 			 size_t elem_size, void *opaque_data);
 
-enum print_array_flag_bits {
-	PAF_PRINT_INDICES_BIT = XLAT_STYLE_SPEC_BITS + 1,
-	PAF_INDEX_XLAT_SORTED_BIT,
-	PAF_INDEX_XLAT_VALUE_INDEXED_BIT,
-};
-
-#define FLAG_(name_) name_ = 1 << name_##_BIT
-
-enum print_array_flags {
-	FLAG_(PAF_PRINT_INDICES),
-	FLAG_(PAF_INDEX_XLAT_SORTED),
-	FLAG_(PAF_INDEX_XLAT_VALUE_INDEXED),
-};
-
-#undef FLAG_
 
 /**
  * @param flags Combination of xlat style settings and additional flags from
