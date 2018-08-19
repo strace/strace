@@ -458,6 +458,7 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_nfcllcp_options.h"
 #include "xlat/sock_kcm_options.h"
 #include "xlat/sock_tls_options.h"
+#include "xlat/sock_xdp_options.h"
 
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
@@ -549,6 +550,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_TLS:
 		printxval(sock_tls_options, name, "TLS_???");
+		break;
+	case SOL_XDP:
+		printxval_index(sock_xdp_options, name, "XDP_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
