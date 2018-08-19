@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Enhanced decoding of NETLINK_ROUTE protocol.
   * Updated lists of BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, TCP_*, V4L2_*,
     XDP_*, and *_MAGIC constants.
 
