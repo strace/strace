@@ -33,6 +33,7 @@ case "${STACKTRACE-}" in
 		;;
 esac
 
+CPPFLAGS=
 case "$KHEADERS" in
 	*/*)
 		CPPFLAGS='-isystem /opt/kernel/include'
@@ -62,7 +63,7 @@ $CC -print-multi-lib ||:
 make --version |head -1
 autoconf --version |head -1
 automake --version |head -1
-kver="$(printf '%s\n%s\n' '#include <linux/version.h>' 'LINUX_VERSION_CODE' | $CC -E -P -)"
+kver="$(printf '%s\n%s\n' '#include <linux/version.h>' 'LINUX_VERSION_CODE' | $CC $CPPFLAGS -E -P -)"
 printf 'kernel-headers %s.%s.%s\n' $(($kver/65536)) $(($kver/256%256)) $(($kver%256))
 echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
