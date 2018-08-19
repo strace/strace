@@ -289,6 +289,7 @@ strace_SOURCES =	\
 	rtnl_nsid.c	\
 	rtnl_route.c	\
 	rtnl_rule.c	\
+	rtnl_stats.c	\
 	rtnl_tc.c	\
 	rtnl_tc_action.c \
 	s390.c		\

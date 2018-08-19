@@ -100,11 +100,13 @@ DECL_NLA(fd);
 DECL_NLA(uid);
 DECL_NLA(gid);
 DECL_NLA(ifindex);
+DECL_NLA(ifla_af_spec);
 DECL_NLA(ether_proto);
 DECL_NLA(ip_proto);
 DECL_NLA(meminfo);
 DECL_NLA(rt_class);
 DECL_NLA(rt_proto);
+DECL_NLA(rtnl_link_stats64);
 DECL_NLA(tc_stats);
 
 #endif /* !STRACE_NLATTR_H */

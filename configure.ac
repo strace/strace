@@ -494,6 +494,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
+AC_CHECK_TYPES([struct if_stats_msg],,, [#include <linux/if_link.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 
 AC_CHECK_TYPES(m4_normalize([
