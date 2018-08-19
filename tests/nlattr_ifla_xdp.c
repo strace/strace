@@ -44,6 +44,22 @@ enum { IFLA_XDP = 43 };
 # define IFLA_XDP_FD 1
 #endif
 
+#ifndef IFLA_XDP_PROG_ID
+# define IFLA_XDP_PROG_ID 4
+#endif
+
+#ifndef IFLA_XDP_DRV_PROG_ID
+# define IFLA_XDP_DRV_PROG_ID 5
+#endif
+
+#ifndef IFLA_XDP_SKB_PROG_ID
+# define IFLA_XDP_SKB_PROG_ID 6
+#endif
+
+#ifndef IFLA_XDP_HW_PROG_ID
+# define IFLA_XDP_HW_PROG_ID 7
+#endif
+
 #define IFLA_ATTR IFLA_XDP
 #include "nlattr_ifla.h"
 
@@ -72,6 +88,25 @@ main(void)
 				  IFLA_XDP_FLAGS, pattern, flags,
 				  printf("XDP_FLAGS_UPDATE_IF_NOEXIST"));
 #endif
+
+	static const struct {
+		uint32_t val;
+		const char *str;
+	} attrs[] = {
+		{ ARG_STR(IFLA_XDP_PROG_ID) },
+		{ ARG_STR(IFLA_XDP_DRV_PROG_ID) },
+		{ ARG_STR(IFLA_XDP_SKB_PROG_ID) },
+		{ ARG_STR(IFLA_XDP_HW_PROG_ID) },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(attrs); i++) {
+		TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
+					      init_ifinfomsg, print_ifinfomsg,
+					      attrs[i].val, attrs[i].str,
+					      pattern, num,
+					      print_quoted_hex, 1,
+					      printf("%u", num));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

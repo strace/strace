@@ -578,7 +578,10 @@ static const nla_decoder_t ifla_xdp_nla_decoders[] = {
 	[IFLA_XDP_FD]		= decode_nla_fd,
 	[IFLA_XDP_ATTACHED]	= decode_nla_u8,
 	[IFLA_XDP_FLAGS]	= decode_ifla_xdp_flags,
-	[IFLA_XDP_PROG_ID]	= decode_nla_u32
+	[IFLA_XDP_PROG_ID]	= decode_nla_u32,
+	[IFLA_XDP_DRV_PROG_ID]  = decode_nla_u32,
+	[IFLA_XDP_SKB_PROG_ID]  = decode_nla_u32,
+	[IFLA_XDP_HW_PROG_ID]   = decode_nla_u32,
 };
 
 static bool
