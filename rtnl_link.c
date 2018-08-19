@@ -54,6 +54,7 @@
 #include "xlat/rtnl_ifla_info_data_tun_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
+#include "xlat/rtnl_ifla_xdp_attached_mode.h"
 #include "xlat/rtnl_ifla_xdp_attrs.h"
 #include "xlat/rtnl_link_attrs.h"
 #include "xlat/snmp_icmp6_stats.h"
@@ -574,9 +575,26 @@ decode_ifla_xdp_flags(struct tcb *const tcp,
 	return true;
 }
 
+bool
+decode_ifla_xdp_attached(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts opts = {
+		.xlat = rtnl_ifla_xdp_attached_mode,
+		.xlat_size = ARRAY_SIZE(rtnl_ifla_xdp_attached_mode),
+		.xt = XT_INDEXED,
+		.dflt = "XDP_ATTACHED_???",
+		.size = 1,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t ifla_xdp_nla_decoders[] = {
 	[IFLA_XDP_FD]		= decode_nla_fd,
-	[IFLA_XDP_ATTACHED]	= decode_nla_u8,
+	[IFLA_XDP_ATTACHED]	= decode_ifla_xdp_attached,
 	[IFLA_XDP_FLAGS]	= decode_ifla_xdp_flags,
 	[IFLA_XDP_PROG_ID]	= decode_nla_u32,
 	[IFLA_XDP_DRV_PROG_ID]  = decode_nla_u32,

@@ -44,6 +44,10 @@ enum { IFLA_XDP = 43 };
 # define IFLA_XDP_FD 1
 #endif
 
+#ifndef IFLA_XDP_ATTACHED
+# define IFLA_XDP_ATTACHED 2
+#endif
+
 #ifndef IFLA_XDP_PROG_ID
 # define IFLA_XDP_PROG_ID 4
 #endif
@@ -58,6 +62,14 @@ enum { IFLA_XDP = 43 };
 
 #ifndef IFLA_XDP_HW_PROG_ID
 # define IFLA_XDP_HW_PROG_ID 7
+#endif
+
+#ifndef XDP_ATTACHED_NONE
+# define XDP_ATTACHED_NONE 0
+#endif
+
+#ifndef XDP_ATTACHED_MULTI
+# define XDP_ATTACHED_MULTI 4
 #endif
 
 #define IFLA_ATTR IFLA_XDP
@@ -80,6 +92,24 @@ main(void)
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_XDP_FD, pattern, num,
 				  printf("%d", num));
+
+	static const struct {
+		uint8_t val;
+		const char *str;
+	} attach_types[] = {
+		{ ARG_STR(XDP_ATTACHED_NONE) },
+		{ ARG_STR(XDP_ATTACHED_MULTI) },
+		{ ARG_STR(0x5)  " /* XDP_ATTACHED_??? */" },
+		{ ARG_STR(0xfe) " /* XDP_ATTACHED_??? */" },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(attach_types); i++) {
+		TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
+					  init_ifinfomsg, print_ifinfomsg,
+					  IFLA_XDP_ATTACHED, pattern,
+					  attach_types[i].val,
+					  printf("%s", attach_types[i].str));
+	}
 
 #ifdef XDP_FLAGS_UPDATE_IF_NOEXIST
 	const uint32_t flags = XDP_FLAGS_UPDATE_IF_NOEXIST;
