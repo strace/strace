@@ -37,6 +37,7 @@ SOL_ALG		279
 SOL_NFC		280
 SOL_KCM		281
 SOL_TLS		282
+SOL_XDP		283
 #if defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__
 SOL_SOCKET	0xffff
 #endif
