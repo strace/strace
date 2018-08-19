@@ -31,6 +31,7 @@ enum {
 	SMC_DIAG_LGRINFO,
 	SMC_DIAG_SHUTDOWN,
 	SMC_DIAG_DMBINFO,
+	SMC_DIAG_FALLBACK,
 };
 
 /* SMC_DIAG_CONNINFO */
@@ -80,6 +81,12 @@ struct smcd_diag_dmbinfo {
 	uint64_t ATTRIBUTE_ALIGNED(8) my_gid;
 	uint64_t ATTRIBUTE_ALIGNED(8) token;
 	uint64_t ATTRIBUTE_ALIGNED(8) peer_token;
+};
+
+/* SMC_DIAG_FALLBACK */
+struct smc_diag_fallback {
+	uint32_t reason;
+	uint32_t peer_diagnosis;
 };
 
 #endif /* !STRACE_LINUX_SMC_DIAG_H */

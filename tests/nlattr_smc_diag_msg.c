@@ -161,6 +161,14 @@ int main(void)
 		.token      = 0xcafedecaffeedeedULL,
 		.peer_token = 0xfeedfacebeeff00dULL,
 	};
+	static const struct smc_diag_fallback fb1 = {
+		.reason         = 0,
+		.peer_diagnosis = 0x03020000,
+	};
+	static const struct smc_diag_fallback fb2 = {
+		.reason         = 0x03060000,
+		.peer_diagnosis = 0x99999999,
+	};
 
 	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 	const unsigned int hdrlen = sizeof(struct smc_diag_msg);
@@ -210,6 +218,21 @@ int main(void)
 			   PRINT_FIELD_X(", ", dinfo, token);
 			   PRINT_FIELD_X(", ", dinfo, peer_token);
 			   printf("}"));
+
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_smc_diag_msg, print_smc_diag_msg,
+			   SMC_DIAG_FALLBACK, pattern, fb1,
+			   printf("{reason=0 /* SMC_CLC_DECL_??? */");
+			   printf(", peer_diagnosis=0x3020000"
+			          " /* SMC_CLC_DECL_IPSEC */}"));
+
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_smc_diag_msg, print_smc_diag_msg,
+			   SMC_DIAG_FALLBACK, pattern, fb2,
+			   printf("{reason=0x3060000"
+			          " /* SMC_CLC_DECL_OPTUNSUPP */");
+			   printf(", peer_diagnosis=0x99999999"
+			          " /* SMC_CLC_DECL_??? */}"));
 
 	printf("+++ exited with 0 +++\n");
 	return 0;

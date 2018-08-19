@@ -43,6 +43,7 @@
 #include <arpa/inet.h>
 #include <linux/smc_diag.h>
 
+#include "xlat/smc_decl_codes.h"
 #include "xlat/smc_diag_attrs.h"
 #include "xlat/smc_diag_extended_flags.h"
 #include "xlat/smc_diag_mode.h"
@@ -169,12 +170,40 @@ decode_smc_diag_dmbinfo(struct tcb *const tcp,
 
 	return true;
 }
+static bool
+decode_smc_diag_fallback(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	struct smc_diag_fallback fb;
+
+	if (len < sizeof(fb))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &fb))
+		return true;
+
+	/*
+	 * We print them verbose since they are defined in a non-UAPI header,
+	 * net/smc/smc_clc.h
+	 */
+	tprints("{reason=");
+	printxval_search_ex(smc_decl_codes, fb.reason,
+			    "SMC_CLC_DECL_???", XLAT_STYLE_VERBOSE);
+	tprints(", peer_diagnosis=");
+	printxval_search_ex(smc_decl_codes, fb.peer_diagnosis,
+			    "SMC_CLC_DECL_???", XLAT_STYLE_VERBOSE);
+	tprints("}");
+
+	return true;
+}
 
 static const nla_decoder_t smc_diag_msg_nla_decoders[] = {
 	[SMC_DIAG_CONNINFO]	= decode_smc_diag_conninfo,
 	[SMC_DIAG_LGRINFO]	= decode_smc_diag_lgrinfo,
 	[SMC_DIAG_SHUTDOWN]	= decode_nla_u8,
 	[SMC_DIAG_DMBINFO]      = decode_smc_diag_dmbinfo,
+	[SMC_DIAG_FALLBACK]	= decode_smc_diag_fallback,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
