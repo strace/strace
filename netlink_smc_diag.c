@@ -49,6 +49,7 @@
 #include "xlat/smc_diag_mode.h"
 #include "xlat/smc_link_group_roles.h"
 #include "xlat/smc_states.h"
+#include "xlat/sock_shutdown_flags.h"
 
 DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 {
@@ -149,6 +150,20 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 }
 
 static bool
+decode_smc_diag_shutdown(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts opts = {
+		ARRSZ_PAIR(sock_shutdown_flags), "???_SHUTDOWN",
+		.size = 1,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static bool
 decode_smc_diag_dmbinfo(struct tcb *const tcp,
 			const kernel_ulong_t addr,
 			const unsigned int len,
@@ -201,7 +216,7 @@ decode_smc_diag_fallback(struct tcb *const tcp,
 static const nla_decoder_t smc_diag_msg_nla_decoders[] = {
 	[SMC_DIAG_CONNINFO]	= decode_smc_diag_conninfo,
 	[SMC_DIAG_LGRINFO]	= decode_smc_diag_lgrinfo,
-	[SMC_DIAG_SHUTDOWN]	= decode_nla_u8,
+	[SMC_DIAG_SHUTDOWN]	= decode_smc_diag_shutdown,
 	[SMC_DIAG_DMBINFO]      = decode_smc_diag_dmbinfo,
 	[SMC_DIAG_FALLBACK]	= decode_smc_diag_fallback,
 };

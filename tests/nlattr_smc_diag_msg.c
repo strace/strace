@@ -169,6 +169,8 @@ int main(void)
 		.reason         = 0x03060000,
 		.peer_diagnosis = 0x99999999,
 	};
+	static uint8_t sd1 = 0x23;
+	static uint8_t sd2 = 0x40;
 
 	int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 	const unsigned int hdrlen = sizeof(struct smc_diag_msg);
@@ -178,6 +180,16 @@ int main(void)
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_smc_diag_msg, print_smc_diag_msg,
+			   SMC_DIAG_SHUTDOWN, pattern, sd1,
+			   printf("RCV_SHUTDOWN|SEND_SHUTDOWN|0x20"));
+
+	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+			   init_smc_diag_msg, print_smc_diag_msg,
+			   SMC_DIAG_SHUTDOWN, pattern, sd2,
+			   printf("0x40 /* ???_SHUTDOWN */"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_smc_diag_msg, print_smc_diag_msg,
