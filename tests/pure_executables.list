@@ -383,6 +383,10 @@ nfnetlink_queue
 nfnetlink_ulog
 nlattr
 nlattr_br_port_msg
+nlattr_cachereport
+nlattr_cachereport-Xabbrev
+nlattr_cachereport-Xraw
+nlattr_cachereport-Xverbose
 nlattr_crypto_user_alg
 nlattr_dcbmsg
 nlattr_fib_rule_hdr

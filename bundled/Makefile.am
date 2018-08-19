@@ -64,6 +64,8 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/mount.h \
 	linux/include/uapi/linux/mpls.h \
 	linux/include/uapi/linux/mqueue.h \
+	linux/include/uapi/linux/mroute.h \
+	linux/include/uapi/linux/mroute6.h \
 	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netconf.h \
 	linux/include/uapi/linux/netfilter/ipset/ip_set.h \

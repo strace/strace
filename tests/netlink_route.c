@@ -582,6 +582,7 @@ test_rtnl_rtgen(const int fd)
 		{ ARG_STR(RTM_NEWNSID) },
 		{ ARG_STR(RTM_DELNSID) },
 		{ ARG_STR(RTM_GETNSID) },
+		{ ARG_STR(RTM_NEWCACHEREPORT) },
 	};
 	static const struct rtgenmsg msg = {
 		.rtgen_family = AF_UNIX
@@ -596,6 +597,9 @@ test_rtnl_rtgen(const int fd)
 	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWNSID + 3);
+	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 1);
+	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 2);
+	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 3);
 }
 
 static void
@@ -729,13 +733,6 @@ int main(void)
 	test_rtnl_mdb(fd);		/* 84 */
 	test_rtnl_rtgen(fd);		/* 88, 96 */
 	test_rtnl_ifstats(fd);		/* 92 */
-
-	/* cachereport */		/* 96 */
-	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWCACHEREPORT));
-	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 1);
-	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 2);
-	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 3);
-
 	test_rtnl_nexthop(fd);		/* 104 */
 
 	/* linkprop */			/* 108 */

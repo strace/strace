@@ -518,6 +518,10 @@ nfnetlink_queue			+netlink_sock_diag.test
 nfnetlink_ulog			+netlink_sock_diag.test
 nlattr		+netlink_sock_diag.test
 nlattr_br_port_msg		+netlink_sock_diag.test
+nlattr_cachereport		+netlink_sock_diag.test
+nlattr_cachereport-Xabbrev	+netlink_sock_diag.test -Xabbrev
+nlattr_cachereport-Xraw		+netlink_sock_diag.test -Xraw
+nlattr_cachereport-Xverbose	+netlink_sock_diag.test -Xverbose
 nlattr_crypto_user_alg		+netlink_sock_diag.test
 nlattr_dcbmsg			+netlink_sock_diag.test
 nlattr_fib_rule_hdr		+netlink_sock_diag.test
