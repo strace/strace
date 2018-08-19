@@ -466,12 +466,18 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 void
 print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
 {
+	bool default_str = style & PXF_DEFAULT_STR;
 	style = get_xlat_style(style);
 
 	switch (xlat_verbose(style)) {
 	case XLAT_STYLE_ABBREV:
 		if (str) {
-			tprints(str);
+			if (default_str) {
+				print_xlat_val(val, style);
+				tprints_comment(str);
+			} else {
+				tprints(str);
+			}
 			break;
 		}
 		ATTRIBUTE_FALLTHROUGH;
