@@ -112,6 +112,7 @@ gen_header()
 	local mpers="${0%/*}/../mpers_xlat.h"
 	local decl="extern const struct xlat ${name}[];"
 	local in_defs= in_mpers=
+	local xlat_type="XT_NORMAL"
 
 	value_indexed=0
 
@@ -152,8 +153,12 @@ gen_header()
 		'#val_type '*)
 			# to be processed during 2nd pass
 			;;
+		'#sorted'|'#sorted '*)
+			xlat_type="XT_SORTED"
+			;;
 		'#value_indexed')
 			value_indexed=1
+			xlat_type="XT_INDEXED"
 			;;
 		'#'*)
 			echo "${line}"
@@ -184,9 +189,6 @@ gen_header()
 
 			# else
 
-			#  if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
-			static
-			#  endif
 		EOF
 	else
 		cat <<-EOF
@@ -196,11 +198,10 @@ gen_header()
 
 			# else
 
-			static
 		EOF
 	fi
 
-	echo "const struct xlat ${name}[] = {"
+	echo "static const struct xlat_data ${name}_xdata[] = {"
 
 	unconditional= val_type=
 	# 2nd pass: output everything.
@@ -218,6 +219,8 @@ gen_header()
 			;;
 		'#unconditional')
 			unconditional=1
+			;;
+		'#sorted'|'#sorted '*)
 			;;
 		'#value_indexed')
 			;;
@@ -246,10 +249,28 @@ gen_header()
 			;;
 		esac
 	done < "${input}"
-	echo ' XLAT_END'
+	echo '};'
+
+	if [ -n "$in_defs" ]; then
+		:
+	elif [ -n "$in_mpers" ]; then
+		cat <<-EOF
+			#  if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
+			static
+			#  endif
+		EOF
+	else
+		cat <<-EOF
+			static
+		EOF
+	fi
 
 	cat <<-EOF
-		};
+		const struct xlat ${name}[1] = { {
+			 .data = ${name}_xdata,
+			 .size = ARRAY_SIZE(${name}_xdata),
+			 .type = ${xlat_type},
+		} };
 
 		# endif /* !IN_MPERS */
 

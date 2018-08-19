@@ -123,14 +123,13 @@ SYS_FUNC(socket)
 	switch (tcp->u_arg[0]) {
 	case AF_INET:
 	case AF_INET6:
-		printxval_search(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
+		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
 
 	case AF_AX25:
 		/* Those are not available in public headers.  */
-		printxval_searchn_ex(ARRSZ_PAIR(ax25_protocols) - 1,
-				     tcp->u_arg[2], "AX25_P_???",
-				     XLAT_STYLE_VERBOSE);
+		printxval_ex(ax25_protocols, tcp->u_arg[2], "AX25_P_???",
+			     XLAT_STYLE_VERBOSE);
 		break;
 
 	case AF_NETLINK:
@@ -139,21 +138,21 @@ SYS_FUNC(socket)
 
 	case AF_PACKET:
 		tprints("htons(");
-		printxval_searchn(ethernet_protocols, ethernet_protocols_size,
-				  ntohs(tcp->u_arg[2]), "ETH_P_???");
+		printxval(ethernet_protocols, ntohs(tcp->u_arg[2]),
+			  "ETH_P_???");
 		tprints(")");
 		break;
 
 	case AF_IRDA:
-		printxval_index(can_protocols, tcp->u_arg[2], "IRDAPROTO_???");
+		printxval(can_protocols, tcp->u_arg[2], "IRDAPROTO_???");
 		break;
 
 	case AF_CAN:
-		printxval_index(can_protocols, tcp->u_arg[2], "CAN_???");
+		printxval(can_protocols, tcp->u_arg[2], "CAN_???");
 		break;
 
 	case AF_BLUETOOTH:
-		printxval_index(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
+		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
 		break;
 
 	case AF_RXRPC:
@@ -165,24 +164,23 @@ SYS_FUNC(socket)
 		break;
 
 	case AF_PHONET:
-		printxval_index(phonet_protocols, tcp->u_arg[2], "PN_PROTO_???");
+		printxval(phonet_protocols, tcp->u_arg[2], "PN_PROTO_???");
 		break;
 
 	case AF_CAIF:
-		printxval_index(caif_protocols, tcp->u_arg[2], "CAIFPROTO_???");
+		printxval(caif_protocols, tcp->u_arg[2], "CAIFPROTO_???");
 		break;
 
 	case AF_NFC:
-		printxval_index(nfc_protocols, tcp->u_arg[2],
-				"NFC_SOCKPROTO_???");
+		printxval(nfc_protocols, tcp->u_arg[2], "NFC_SOCKPROTO_???");
 		break;
 
 	case AF_KCM:
-		printxval_index(kcm_protocols, tcp->u_arg[2], "KCMPROTO_???");
+		printxval(kcm_protocols, tcp->u_arg[2], "KCMPROTO_???");
 		break;
 
 	case AF_SMC:
-		printxval_index(smc_protocols, tcp->u_arg[2], "SMCPROTO_???");
+		printxval(smc_protocols, tcp->u_arg[2], "SMCPROTO_???");
 		break;
 
 	default:
@@ -463,7 +461,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 {
 	printfd(tcp, fd);
 	tprints(", ");
-	printxval_search(socketlayers, level, "SOL_??");
+	printxval(socketlayers, level, "SOL_??");
 	tprints(", ");
 
 	switch (level) {
@@ -486,13 +484,13 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_ipx_options, name, "IPX_???");
 		break;
 	case SOL_AX25:
-		printxval_search(sock_ax25_options, name, "AX25_???");
+		printxval(sock_ax25_options, name, "AX25_???");
 		break;
 	case SOL_PACKET:
 		printxval(sock_packet_options, name, "PACKET_???");
 		break;
 	case SOL_TCP:
-		printxval_index(sock_tcp_options, name, "TCP_???");
+		printxval(sock_tcp_options, name, "TCP_???");
 		break;
 	case SOL_SCTP:
 		printxval(sock_sctp_options, name, "SCTP_???");
@@ -507,31 +505,31 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_udp_options, name, "UDP_???");
 		break;
 	case SOL_IRDA:
-		printxval_index(sock_irda_options, name, "IRLMP_???");
+		printxval(sock_irda_options, name, "IRLMP_???");
 		break;
 	case SOL_LLC:
-		printxval_index(sock_llc_options, name, "LLC_OPT_???");
+		printxval(sock_llc_options, name, "LLC_OPT_???");
 		break;
 	case SOL_DCCP:
-		printxval_search(sock_dccp_options, name, "DCCP_SOCKOPT_???");
+		printxval(sock_dccp_options, name, "DCCP_SOCKOPT_???");
 		break;
 	case SOL_TIPC:
-		printxval_search(sock_tipc_options, name, "TIPC_???");
+		printxval(sock_tipc_options, name, "TIPC_???");
 		break;
 	case SOL_RXRPC:
-		printxval_index(sock_rxrpc_options, name, "RXRPC_???");
+		printxval(sock_rxrpc_options, name, "RXRPC_???");
 		break;
 	case SOL_PPPOL2TP:
-		printxval_index(sock_pppol2tp_options, name, "PPPOL2TP_SO_???");
+		printxval(sock_pppol2tp_options, name, "PPPOL2TP_SO_???");
 		break;
 	case SOL_BLUETOOTH:
-		printxval_search(sock_bluetooth_options, name, "BT_???");
+		printxval(sock_bluetooth_options, name, "BT_???");
 		break;
 	case SOL_PNPIPE:
 		printxval(sock_pnp_options, name, "PNPIPE_???");
 		break;
 	case SOL_RDS:
-		printxval_search(sock_rds_options, name, "RDS_???");
+		printxval(sock_rds_options, name, "RDS_???");
 		break;
 	case SOL_IUCV:
 		printxval(sock_iucv_options, name, "SO_???");
@@ -540,10 +538,10 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_caif_options, name, "CAIFSO_???");
 		break;
 	case SOL_ALG:
-		printxval_index(sock_alg_options, name, "ALG_???");
+		printxval(sock_alg_options, name, "ALG_???");
 		break;
 	case SOL_NFC:
-		printxval_index(sock_nfcllcp_options, name, "NFC_LLCP_???");
+		printxval(sock_nfcllcp_options, name, "NFC_LLCP_???");
 		break;
 	case SOL_KCM:
 		printxval(sock_kcm_options, name, "KCM_???");
@@ -552,7 +550,7 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxval(sock_tls_options, name, "TLS_???");
 		break;
 	case SOL_XDP:
-		printxval_index(sock_xdp_options, name, "XDP_???");
+		printxval(sock_xdp_options, name, "XDP_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */

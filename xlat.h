@@ -48,9 +48,15 @@ enum xlat_style {
 # define XLAT_STYLE_MASK ((1 << XLAT_STYLE_SPEC_BITS) - 1)
 };
 
-struct xlat {
+struct xlat_data {
 	uint64_t val;
 	const char *str;
+};
+
+struct xlat {
+	const struct xlat_data *data;
+	uint32_t size;
+	enum xlat_type type;
 };
 
 # define XLAT(val)			{ (unsigned)(val), #val }

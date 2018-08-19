@@ -1,4 +1,4 @@
-/* sort -k2,2n */
+#sorted sort -k2,2n
 IPPROTO_IP		0
 IPPROTO_ICMP		1
 IPPROTO_IGMP		2

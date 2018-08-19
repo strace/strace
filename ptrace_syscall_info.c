@@ -277,8 +277,8 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_XVAL_INDEX("{", info, op, ptrace_syscall_info_op,
-			       "PTRACE_SYSCALL_INFO_???");
+	PRINT_FIELD_XVAL("{", info, op, ptrace_syscall_info_op,
+			 "PTRACE_SYSCALL_INFO_???");
 	if (fetch_size < offsetofend(struct ptrace_syscall_info, arch))
 		goto printed;
 	PRINT_FIELD_XVAL(", ", info, arch, audit_arch, "AUDIT_ARCH_???");

@@ -1,4 +1,4 @@
-/* sort -k2,2n */
+#sorted sort -k2,2n
 BT_SECURITY		4
 BT_DEFER_SETUP		7
 BT_FLUSHABLE		8

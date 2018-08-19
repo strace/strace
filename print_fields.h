@@ -79,23 +79,6 @@
 			      (xlat_), NULL);				\
 	} while (0)
 
-# define PRINT_FIELD_XVAL_SORTED_SIZED(prefix_, where_, field_, xlat_,	\
-				      xlat_size_, dflt_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printxval_searchn((xlat_), (xlat_size_),		\
-				  zero_extend_signed_to_ull((where_).field_), \
-				  (dflt_));				\
-	} while (0)
-
-# define PRINT_FIELD_XVAL_INDEX(prefix_, where_, field_, xlat_, dflt_)	\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printxval_index((xlat_),				\
-				zero_extend_signed_to_ull((where_).field_), \
-				(dflt_));				\
-	} while (0)
-
 /*
  * Generic "ID" printing. ID is considered unsigned except for the special value
  * of -1.

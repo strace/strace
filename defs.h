@@ -310,30 +310,13 @@ extern const struct_sysent stub_sysent;
 # include "xlat.h"
 
 extern const struct xlat addrfams[];
-
-/** Protocol hardware identifiers array, sorted, defined in sockaddr.c. */
 extern const struct xlat arp_hardware_types[];
-/** Protocol hardware identifiers array size without terminating record. */
-extern const size_t arp_hardware_types_size;
-
 extern const struct xlat at_flags[];
 extern const struct xlat clocknames[];
 extern const struct xlat dirent_types[];
-
-/** Ethernet protocols list, sorted, defined in sockaddr.c. */
 extern const struct xlat ethernet_protocols[];
-/** Ethernet protocols array size without terminating record. */
-extern const size_t ethernet_protocols_size;
-
-/** IP protocols list, sorted, defined in net.c. */
 extern const struct xlat inet_protocols[];
-/** IP protocols array size without terminating record. */
-extern const size_t inet_protocols_size;
-
 extern const struct xlat evdev_abs[];
-/** Number of elements in evdev_abs array without the terminating record. */
-extern const size_t evdev_abs_size;
-
 extern const struct xlat audit_arch[];
 extern const struct xlat evdev_ev[];
 extern const struct xlat iffflags[];
@@ -628,8 +611,7 @@ extern unsigned long getfdinode(struct tcb *, int);
 extern enum sock_proto getfdproto(struct tcb *, int);
 
 extern const char *xlookup(const struct xlat *, const uint64_t);
-extern const char *xlat_search(const struct xlat *, const size_t, const uint64_t);
-extern const char *xlat_idx(const struct xlat *xlat, size_t nmemb, uint64_t val);
+extern const char *xlookup_le(const struct xlat *, uint64_t *);
 
 struct dyxlat;
 struct dyxlat *dyxlat_alloc(size_t nmemb);
@@ -701,46 +683,8 @@ extern int printxvals_ex(uint64_t val, const char *dflt,
 	ATTRIBUTE_SENTINEL;
 # define printxvals(val_, dflt_, ...) \
 	printxvals_ex((val_), (dflt_), XLAT_STYLE_DEFAULT, __VA_ARGS__)
-
-extern int printxval_searchn_ex(const struct xlat *, size_t xlat_size,
-				uint64_t val, const char *dflt,
-				enum xlat_style);
-
-static inline int
-printxval_searchn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
-		  const char *dflt)
-{
-	return printxval_searchn_ex(xlat, xlat_size, val, dflt,
-				    XLAT_STYLE_DEFAULT);
-}
-
-/**
- * Wrapper around printxval_searchn that passes ARRAY_SIZE - 1
- * as the array size, as all arrays are XLAT_END-terminated and
- * printxval_searchn expects a size without the terminating record.
- */
-# define printxval_search(xlat__, val__, dflt__) \
-	printxval_searchn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
-# define printxval_search_ex(xlat__, val__, dflt__, style__) \
-	printxval_searchn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
-			     (dflt__), (style__))
-
-extern int printxval_indexn_ex(const struct xlat *, size_t xlat_size,
-			       uint64_t val, const char *dflt, enum xlat_style);
-
-static inline int
-printxval_indexn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
-		 const char *dflt)
-{
-	return printxval_indexn_ex(xlat, xlat_size, val, dflt,
-				   XLAT_STYLE_DEFAULT);
-}
-
-# define printxval_index(xlat__, val__, dflt__) \
-	printxval_indexn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
-# define printxval_index_ex(xlat__, val__, dflt__, style__) \
-	printxval_indexn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
-			    (dflt__), (style__))
+# define printxval_ex(xlat_, val_, dflt_, style_) \
+	printxvals_ex((val_), (dflt_), (style_), (xlat_), NULL)
 
 extern int sprintxval_ex(char *buf, size_t size, const struct xlat *,
 			 unsigned int val, const char *dflt, enum xlat_style);
@@ -752,22 +696,9 @@ sprintxval(char *buf, size_t size, const struct xlat *xlat, unsigned int val,
 	return sprintxval_ex(buf, size, xlat, val, dflt, XLAT_STYLE_DEFAULT);
 }
 
-extern void printxval_dispatch_ex(const struct xlat *, size_t xlat_size,
-				  uint64_t val, const char *dflt,
-				  enum xlat_type, enum xlat_style);
-static inline void
-printxval_dispatch(const struct xlat *xlat, size_t xlat_size, uint64_t val,
-		   const char *dflt, enum xlat_type xt)
-{
-	return printxval_dispatch_ex(xlat, xlat_size, val, dflt, xt,
-				     XLAT_STYLE_DEFAULT);
-}
-
 enum xlat_style_private_flag_bits {
 	/* print_array */
 	PAF_PRINT_INDICES_BIT = XLAT_STYLE_SPEC_BITS + 1,
-	PAF_INDEX_XLAT_SORTED_BIT,
-	PAF_INDEX_XLAT_VALUE_INDEXED_BIT,
 
 	/* print_xlat */
 	PXF_DEFAULT_STR_BIT,
@@ -778,8 +709,6 @@ enum xlat_style_private_flag_bits {
 enum xlat_style_private_flags {
 	/* print_array */
 	FLAG_(PAF_PRINT_INDICES),
-	FLAG_(PAF_INDEX_XLAT_SORTED),
-	FLAG_(PAF_INDEX_XLAT_VALUE_INDEXED),
 
 	/* print_xlat */
 	FLAG_(PXF_DEFAULT_STR),
@@ -871,7 +800,6 @@ print_array_ex(struct tcb *,
 	       void *opaque_data,
 	       unsigned int flags,
 	       const struct xlat *index_xlat,
-	       size_t index_xlat_size,
 	       const char *index_dflt);
 
 static inline bool
@@ -886,7 +814,7 @@ print_array(struct tcb *const tcp,
 {
 	return print_array_ex(tcp, start_addr, nmemb, elem_buf, elem_size,
 			      tfetch_mem_func, print_func, opaque_data,
-			      0, NULL, 0, NULL);
+			      0, NULL, NULL);
 }
 
 extern kernel_ulong_t *

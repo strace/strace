@@ -17,9 +17,14 @@ int
 printxval(const struct xlat *xlat, unsigned long long val,
 	  const char *const dflt)
 {
-	for (; xlat->str; xlat++) {
-		if (xlat->val == val) {
-			fputs(xlat->str, stdout);
+	const struct xlat_data *xd = xlat->data;
+
+	for (size_t i = 0; i < xlat->size; i++, xd++) {
+		if (!xd->str)
+			continue;
+
+		if (xd->val == val) {
+			fputs(xd->str, stdout);
 			return 1;
 		}
 	}

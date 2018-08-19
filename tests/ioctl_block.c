@@ -24,7 +24,7 @@
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
-static struct xlat block_argless[] = {
+static struct xlat_data block_argless[] = {
 	XLAT(BLKRRPART),
 	XLAT(BLKFLSBUF),
 #ifdef BLKTRACESTART

@@ -22,7 +22,7 @@ SYS_FUNC(fsconfig)
 	printfd(tcp, fs_fd);
 	tprints(", ");
 
-	printxval_index(fsconfig_cmds, cmd, "FSCONFIG_???");
+	printxval(fsconfig_cmds, cmd, "FSCONFIG_???");
 	tprints(", ");
 
 	switch (cmd) {

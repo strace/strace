@@ -52,7 +52,7 @@ decode_nla_rt_proto(struct tcb *const tcp,
 	if (len < sizeof(num))
 		return false;
 	if (!umove_or_printaddr(tcp, addr, &num))
-		printxval_search(routing_protocols, num, "RTPROT_???");
+		printxval(routing_protocols, num, "RTPROT_???");
 	return true;
 }
 

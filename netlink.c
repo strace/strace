@@ -80,11 +80,14 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 	if (nl_details == details)
 		return -1;
 
-	const struct xlat *xlats = netlink_protocols;
-	for (; xlats->str; ++xlats) {
-		const char *name = STR_STRIP_PREFIX(xlats->str, "NETLINK_");
+	const struct xlat_data *xlats = netlink_protocols->data;
+	for (uint32_t idx = 0; idx < netlink_protocols->size; idx++) {
+		if (!netlink_protocols->data[idx].str)
+			continue;
+
+		const char *name = STR_STRIP_PREFIX(xlats[idx].str, "NETLINK_");
 		if (!strncmp(nl_details, name, strlen(name)))
-			return xlats->val;
+			return xlats[idx].val;
 	}
 
 	if (*nl_details >= '0' && *nl_details <= '9')

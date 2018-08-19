@@ -34,10 +34,9 @@ static void
 print_statfs_type(const char *const prefix, const unsigned int magic)
 {
 	fputs(prefix, stdout);
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(fsmagic); ++i)
-		if (magic == fsmagic[i].val) {
-			fputs(fsmagic[i].str, stdout);
+	for (unsigned int i = 0; i < fsmagic->size; ++i)
+		if (magic == fsmagic->data[i].val) {
+			fputs(fsmagic->data[i].str, stdout);
 			return;
 		}
 	printf("%#x", magic);

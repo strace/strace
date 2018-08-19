@@ -22,9 +22,9 @@
 static const char *
 xlookup_uint(const struct xlat *xlat, const unsigned int val)
 {
-	for (; xlat->str != NULL; xlat++)
-		if (xlat->val == val)
-			return xlat->str;
+	for (size_t i = 0; i < xlat->size; i++)
+		if (xlat->data[i].val == val)
+			return xlat->data[i].str;
 	return NULL;
 }
 
@@ -52,8 +52,8 @@ test_socketcall(const int i, const void *const addr)
 int
 main(void)
 {
-	assert((unsigned) sc_min == socketcalls[0].val);
-	assert((unsigned) sc_max == socketcalls[ARRAY_SIZE(socketcalls) - 2].val);
+	assert((unsigned) sc_min == socketcalls->data[0].val);
+	assert((unsigned) sc_max == socketcalls->data[socketcalls->size - 1].val);
 
 	const unsigned long *const args = tail_alloc(sizeof(*args) * 6);
 	efault = tail_alloc(1) + 1;

@@ -308,7 +308,7 @@ kvm_ioctl_decode_check_extension(struct tcb *const tcp, const unsigned int code,
 				 const kernel_ulong_t arg)
 {
 	tprints(", ");
-	printxval_index(kvm_cap, arg, "KVM_CAP_???");
+	printxval64(kvm_cap, arg, "KVM_CAP_???");
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -326,8 +326,7 @@ kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
 	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0)
 		return;
 
-	tcp->auxstr = xlat_idx(kvm_exit_reason, ARRAY_SIZE(kvm_exit_reason) - 1,
-			       vcpu_run_struct.exit_reason);
+	tcp->auxstr = xlookup(kvm_exit_reason, vcpu_run_struct.exit_reason);
 	if (!tcp->auxstr)
 		tcp->auxstr = "KVM_EXIT_???";
 }

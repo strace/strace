@@ -174,10 +174,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg)
 					 (char *) &msg + offset)) {
 			PRINT_FIELD_XVAL("", msg, pdiag_type,
 					 socktypes, "SOCK_???");
-			PRINT_FIELD_XVAL_SORTED_SIZED(", ", msg, pdiag_num,
-						      ethernet_protocols,
-						      ethernet_protocols_size,
-						      "ETH_P_???");
+			PRINT_FIELD_XVAL(", ", msg, pdiag_num,
+					 ethernet_protocols, "ETH_P_???");
 			PRINT_FIELD_U(", ", msg, pdiag_ino);
 			PRINT_FIELD_COOKIE(", ", msg, pdiag_cookie);
 			decode_nla = true;

@@ -136,7 +136,7 @@ decode_smc_diag_shutdown(struct tcb *const tcp,
 			 const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts opts = {
-		ARRSZ_PAIR(sock_shutdown_flags) - 1, "???_SHUTDOWN",
+		sock_shutdown_flags, "???_SHUTDOWN",
 		.size = 1,
 	};
 
@@ -183,11 +183,11 @@ decode_smc_diag_fallback(struct tcb *const tcp,
 	 * net/smc/smc_clc.h
 	 */
 	tprints("{reason=");
-	printxval_search_ex(smc_decl_codes, fb.reason,
-			    "SMC_CLC_DECL_???", XLAT_STYLE_VERBOSE);
+	printxval_ex(smc_decl_codes, fb.reason, "SMC_CLC_DECL_???",
+		     XLAT_STYLE_VERBOSE);
 	tprints(", peer_diagnosis=");
-	printxval_search_ex(smc_decl_codes, fb.peer_diagnosis,
-			    "SMC_CLC_DECL_???", XLAT_STYLE_VERBOSE);
+	printxval_ex(smc_decl_codes, fb.peer_diagnosis, "SMC_CLC_DECL_???",
+		     XLAT_STYLE_VERBOSE);
 	tprints("}");
 
 	return true;
@@ -215,9 +215,8 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 					 (void *) &msg + offset)) {
 			PRINT_FIELD_XVAL("", msg, diag_state,
 					 smc_states, "SMC_???");
-			PRINT_FIELD_XVAL_INDEX(", ", msg, diag_fallback,
-					       smc_diag_mode,
-					       "SMC_DIAG_MODE_???");
+			PRINT_FIELD_XVAL(", ", msg, diag_fallback,
+					 smc_diag_mode, "SMC_DIAG_MODE_???");
 			PRINT_FIELD_U(", ", msg, diag_shutdown);
 			/*
 			 * AF_SMC protocol family socket handler

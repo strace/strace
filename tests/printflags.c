@@ -17,21 +17,26 @@ int
 printflags(const struct xlat *xlat, unsigned long long flags,
 	   const char *const dflt)
 {
-	if (flags == 0 && xlat->val == 0 && xlat->str) {
-		fputs(xlat->str, stdout);
+	if (flags == 0 && xlat->data->val == 0 && xlat->data->str) {
+		fputs(xlat->data->str, stdout);
 		return 1;
 	}
 
 	int n;
+	size_t i = 0;
 	char sep = 0;
-	for (n = 0; xlat->str; xlat++) {
-		if (xlat->val && (flags & xlat->val) == xlat->val) {
+	const struct xlat_data *xd = xlat->data;
+	for (n = 0; i < xlat->size; xd++, i++) {
+		if (!xd->str)
+			continue;
+
+		if (xd->val && (flags & xd->val) == xd->val) {
 			if (sep)
 				putc(sep, stdout);
 			else
 				sep = '|';
-			fputs(xlat->str, stdout);
-			flags &= ~xlat->val;
+			fputs(xd->str, stdout);
+			flags &= ~xd->val;
 			n++;
 		}
 	}

@@ -886,9 +886,9 @@ btrfs_test_defrag_ioctls(void)
 static const char *
 xlookup(const struct xlat *xlat, const uint64_t val)
 {
-	for (; xlat->str != NULL; xlat++)
-		if (xlat->val == val)
-			return xlat->str;
+	for (size_t i = 0; i < xlat->size; i++)
+		if (xlat->data[i].val == val)
+			return xlat->data[i].str;
 	return NULL;
 }
 
@@ -2068,7 +2068,7 @@ btrfs_test_features_ioctls(void)
 static void
 btrfs_test_read_ioctls(void)
 {
-	static const struct xlat btrfs_read_cmd[] = {
+	static const struct xlat_data btrfs_read_cmd[] = {
 		XLAT(BTRFS_IOC_BALANCE_PROGRESS),
 		XLAT(BTRFS_IOC_FS_INFO),
 		XLAT(BTRFS_IOC_GET_FEATURES),

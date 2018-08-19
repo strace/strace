@@ -34,7 +34,7 @@ print_rtc_time(const struct rtc_time *rt)
 #endif
 }
 
-static struct xlat rtc_argless[] = {
+static struct xlat_data rtc_argless[] = {
 	XLAT(RTC_AIE_OFF),
 	XLAT(RTC_PIE_ON),
 	XLAT(RTC_PIE_OFF),

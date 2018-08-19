@@ -14,7 +14,7 @@ static void
 print_statfs_type(const char *const prefix, const unsigned long long magic)
 {
 	tprints(prefix);
-	printxval_search(fsmagic, magic, NULL);
+	printxval(fsmagic, magic, NULL);
 }
 
 #if defined HAVE_STRUCT_STATFS_F_FLAGS || defined HAVE_STRUCT_STATFS64_F_FLAGS
