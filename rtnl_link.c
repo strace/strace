@@ -762,22 +762,6 @@ decode_ifla_inet6_icmp6_stats(struct tcb *const tcp,
 }
 
 static bool
-decode_ifla_inet6_token(struct tcb *const tcp,
-			const kernel_ulong_t addr,
-			const unsigned int len,
-			const void *const opaque_data)
-{
-	struct in6_addr in6;
-
-	if (len < sizeof(in6))
-		return false;
-	else if (!umove_or_printaddr(tcp, addr, &in6))
-		print_inet_addr(AF_INET6, &in6,	sizeof(in6), NULL);
-
-	return true;
-}
-
-static bool
 decode_ifla_inet6_agm(struct tcb *const tcp,
 		      const kernel_ulong_t addr,
 		      const unsigned int len,
@@ -799,7 +783,7 @@ static const nla_decoder_t ifla_inet6_nla_decoders[] = {
 	[IFLA_INET6_MCAST]		= NULL, /* unused */
 	[IFLA_INET6_CACHEINFO]		= decode_ifla_inet6_cacheinfo,
 	[IFLA_INET6_ICMP6STATS]		= decode_ifla_inet6_icmp6_stats,
-	[IFLA_INET6_TOKEN]		= decode_ifla_inet6_token,
+	[IFLA_INET6_TOKEN]		= decode_nla_in6_addr,
 	[IFLA_INET6_ADDR_GEN_MODE]	= decode_ifla_inet6_agm,
 };
 

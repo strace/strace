@@ -358,6 +358,38 @@ decode_nla_ip_proto(struct tcb *const tcp,
 }
 
 bool
+decode_nla_in_addr(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	struct in_addr in;
+
+	if (len < sizeof(in))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &in))
+		print_inet_addr(AF_INET, &in,	sizeof(in), NULL);
+
+	return true;
+}
+
+bool
+decode_nla_in6_addr(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	struct in6_addr in6;
+
+	if (len < sizeof(in6))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &in6))
+		print_inet_addr(AF_INET6, &in6,	sizeof(in6), NULL);
+
+	return true;
+}
+
+bool
 decode_nla_flags(struct tcb *const tcp,
 		 const kernel_ulong_t addr,
 		 unsigned int len,
