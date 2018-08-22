@@ -6,7 +6,7 @@
 int
 main(void)
 {
-	printf("munlockall() = %d\n", munlockall());
+	printf("munlockall() = %s\n", sprintrc(munlockall()));
 
 	puts("+++ exited with 0 +++");
 	return 0;
