@@ -140,15 +140,15 @@ main(int ac, char **av)
 		perror_msg_and_fail("munmap");
 	printf("munmap(%p, %lu) = 0\n", p, length3);
 
-	if (mlockall(MCL_FUTURE))
-		perror_msg_and_fail("mlockall");
+	printf("mlockall(");
 #if XLAT_RAW
-	printf("mlockall(%#x) = 0\n", MCL_FUTURE);
+	printf("%#x", MCL_FUTURE);
 #elif XLAT_VERBOSE
-	printf("mlockall(%#x /* MCL_FUTURE */) = 0\n", MCL_FUTURE);
+	printf("%#x /* MCL_FUTURE */", MCL_FUTURE);
 #else
-	puts("mlockall(MCL_FUTURE) = 0");
+	printf("MCL_FUTURE");
 #endif
+	printf(") = %s\n", sprintrc(mlockall(MCL_FUTURE)));
 
 	puts("+++ exited with 0 +++");
 	return 0;
