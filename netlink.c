@@ -438,7 +438,7 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type,
 	} else if (family < ARRAY_SIZE(nlmsg_flags) && nlmsg_flags[family])
 		table = nlmsg_flags[family](type);
 
-	printflags_ex(flags, "NLM_F_???", XLAT_STYLE_ABBREV,
+	printflags_ex(flags, "NLM_F_???", XLAT_STYLE_DEFAULT,
 		      netlink_flags, table, NULL);
 }
 
