@@ -788,15 +788,6 @@ AC_CHECK_MEMBERS(m4_normalize([
 #include <linux/types.h>
 #include <linux/videodev2.h>])
 
-AC_CACHE_CHECK([for BLKGETSIZE64], [ac_cv_have_blkgetsize64],
-	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-#include <stdlib.h>
-#include <linux/fs.h>], [return !BLKGETSIZE64;])],
-			   [ac_cv_have_blkgetsize64=yes], [ac_cv_have_blkgetsize64=no])]
-	if test $ac_cv_have_blkgetsize64 = yes; then
-		AC_DEFINE([HAVE_BLKGETSIZE64], [1], [Define to 1 if you have BLKGETSIZE64.])
-	fi)
-
 AC_CHECK_SIZEOF([long])
 SIZEOF_LONG="$ac_cv_sizeof_long"
 AC_SUBST(SIZEOF_LONG)
