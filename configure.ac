@@ -572,7 +572,10 @@ AC_CHECK_TYPES([struct blk_user_trace_setup],,, [#include <linux/blktrace_api.h>
 
 AC_CHECK_TYPES([struct mtd_write_req],,, [#include <mtd/mtd-abi.h>])
 
-AC_CHECK_MEMBERS([struct ubi_attach_req.max_beb_per1024],,, [#include <mtd/ubi-user.h>])
+AC_CHECK_MEMBERS(m4_normalize([
+	struct ubi_attach_req.max_beb_per1024
+	struct ubi_mkvol_req.flags
+]),,, [#include <mtd/ubi-user.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct ptp_sys_offset
