@@ -57,10 +57,15 @@ print_timespec_t_utime(const timespec_t *t)
 {
 	switch (t->tv_nsec) {
 	case UTIME_NOW:
-		tprints("UTIME_NOW");
-		break;
 	case UTIME_OMIT:
-		tprints("UTIME_OMIT");
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+			print_timespec_t(t);
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+			break;
+
+		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+			? tprints_comment : tprints)(t->tv_nsec == UTIME_NOW
+				? "UTIME_NOW" : "UTIME_OMIT");
 		break;
 	default:
 		print_timespec_t(t);
