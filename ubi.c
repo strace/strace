@@ -12,8 +12,15 @@
 # include <linux/ioctl.h>
 # include <mtd/ubi-user.h>
 
+# include "xlat/ubi_mkvol_req_flags.h"
 # include "xlat/ubi_volume_types.h"
 # include "xlat/ubi_volume_props.h"
+
+# ifdef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
+#  define UBI_MKVOL_REQ_FLAGS_FIELD flags
+# else
+#  define UBI_MKVOL_REQ_FLAGS_FIELD padding1
+# endif
 
 int
 ubi_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -36,6 +43,9 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 				mkvol.alignment, (int64_t)mkvol.bytes);
 			printxval(ubi_volume_types,
 				    (uint8_t) mkvol.vol_type, "UBI_???_VOLUME");
+			printflags(ubi_mkvol_req_flags,
+				   (uint8_t) mkvol.UBI_MKVOL_REQ_FLAGS_FIELD,
+				   "UBI_VOL_???_FLG");
 			tprintf(", name_len=%" PRIi16 ", name=",
 				mkvol.name_len);
 			print_quoted_cstring(mkvol.name,
