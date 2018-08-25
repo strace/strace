@@ -204,7 +204,6 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		printnum_ulong(tcp, arg);
 		break;
 
-#ifdef HAVE_BLKGETSIZE64
 	/* returns an uint64_t */
 	case BLKGETSIZE64:
 		if (entering(tcp))
@@ -212,7 +211,6 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		tprints(", ");
 		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
-#endif
 
 	/* takes a pair of uint64_t */
 	case BLKDISCARD:
