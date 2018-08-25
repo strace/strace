@@ -163,7 +163,7 @@ test_nfgenmsg(const int fd)
 		      printf("{nfgen_family=AF_UNIX");
 		      printf(", version=NFNETLINK_V0");
 		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)"
-			     ", {nla_len=%d, nla_type=%#x}",
+			     ", {nla_len=%d, nla_type=%#x /* NFT_??? */}",
 			     nla.nla_len, nla.nla_type));
 }
 
