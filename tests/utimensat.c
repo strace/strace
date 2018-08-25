@@ -38,6 +38,46 @@
 
 #if defined __NR_utimensat && defined UTIME_NOW && defined UTIME_OMIT
 
+#if SIZEOF_KERNEL_LONG_T == 4
+#  define big_tv_sec "-559038737"
+#  define huge_tv_sec "-559038737"
+# else
+#  define big_tv_sec "3735928559"
+#  define huge_tv_sec "-3819351491602432273"
+# endif
+
+# if XLAT_RAW
+#  define str_at_fdcwd			"-100"
+#  define str_at_symlink_nofollow	"0x100"
+#  define str_at_removedir		"0x200"
+#  define str_flags1			"0x600"
+#  define str_flags2			"0xffffffff"
+#  define str_utime_now_omit \
+	"[{tv_sec=" big_tv_sec ", tv_nsec=1073741823}, " \
+	"{tv_sec=" huge_tv_sec ", tv_nsec=1073741822}]"
+# elif XLAT_VERBOSE
+#  define str_at_fdcwd			"-100 /* AT_FDCWD */"
+#  define str_at_symlink_nofollow	"0x100 /* AT_SYMLINK_NOFOLLOW */"
+#  define str_at_removedir		"0x200 /* AT_REMOVEDIR */"
+#  define str_flags1 \
+	"0x600 /* AT_REMOVEDIR|AT_SYMLINK_FOLLOW */"
+#  define str_flags2 \
+	"0xffffffff /* AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW" \
+	"|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff */"
+#  define str_utime_now_omit \
+	"[{tv_sec=" big_tv_sec ", tv_nsec=1073741823} /* UTIME_NOW */, " \
+	"{tv_sec=" huge_tv_sec ", tv_nsec=1073741822} /* UTIME_OMIT */]"
+# else
+#  define str_at_fdcwd			"AT_FDCWD"
+#  define str_at_symlink_nofollow	"AT_SYMLINK_NOFOLLOW"
+#  define str_at_removedir		"AT_REMOVEDIR"
+#  define str_flags1			"AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
+#  define str_flags2 \
+	"AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW" \
+	"|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff"
+#  define str_utime_now_omit		"[UTIME_NOW, UTIME_OMIT]"
+# endif
+
 static void
 print_ts(const struct timespec *ts)
 {
@@ -85,36 +125,36 @@ main(void)
 	       (int) bogus_fd, qname, errstr);
 
 	k_utimensat(-100U, kfname, 0, 0);
-	printf("utimensat(AT_FDCWD, %s, NULL, 0) = %s\n", qname, errstr);
+	printf("utimensat(" str_at_fdcwd ", %s, NULL, 0) = %s\n", qname, errstr);
 
 	k_utimensat(kfdcwd, kfname, 0, 0);
-	printf("utimensat(AT_FDCWD, %s, NULL, 0) = %s\n", qname, errstr);
+	printf("utimensat(" str_at_fdcwd ", %s, NULL, 0) = %s\n", qname, errstr);
 
 	/* pathname */
 	k_utimensat(kfdcwd, 0, 0, 0);
-	printf("utimensat(AT_FDCWD, NULL, NULL, 0) = %s\n", errstr);
+	printf("utimensat(" str_at_fdcwd ", NULL, NULL, 0) = %s\n", errstr);
 
 	k_utimensat(kfdcwd, kfname + sizeof(proto_fname) - 1, 0, 0);
-	printf("utimensat(AT_FDCWD, \"\", NULL, 0) = %s\n", errstr);
+	printf("utimensat(" str_at_fdcwd ", \"\", NULL, 0) = %s\n", errstr);
 
 	fname[sizeof(proto_fname) - 1] = '+';
 	k_utimensat(kfdcwd, kfname, 0, 0);
 	fname[sizeof(proto_fname) - 1] = '\0';
-	printf("utimensat(AT_FDCWD, %p, NULL, 0) = %s\n", fname, errstr);
+	printf("utimensat(" str_at_fdcwd ", %p, NULL, 0) = %s\n", fname, errstr);
 
 	if (F8ILL_KULONG_SUPPORTED) {
 		k_utimensat(kfdcwd, f8ill_ptr_to_kulong(fname), 0, 0);
-		printf("utimensat(AT_FDCWD, %#jx, NULL, 0) = %s\n",
+		printf("utimensat(" str_at_fdcwd ", %#jx, NULL, 0) = %s\n",
 		       (uintmax_t) f8ill_ptr_to_kulong(fname), errstr);
 	}
 
 	/* times */
 	k_utimensat(kfdcwd, kfname, (uintptr_t) (ts + 1), 0);
-	printf("utimensat(AT_FDCWD, %s, %p, 0) = %s\n",
+	printf("utimensat(" str_at_fdcwd ", %s, %p, 0) = %s\n",
 	       qname, ts + 1, errstr);
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) (ts + 2), 0);
-	printf("utimensat(AT_FDCWD, %s, %p, 0)"
+	printf("utimensat(" str_at_fdcwd ", %s, %p, 0)"
 	       " = %s\n", qname, ts + 2, errstr);
 
 	ts[0].tv_sec = 1492358706;
@@ -123,11 +163,11 @@ main(void)
 	ts[1].tv_nsec = 234567890;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
-	printf("utimensat(AT_FDCWD, %s, [", qname);
+	printf("utimensat(" str_at_fdcwd ", %s, [", qname);
 	print_ts(&ts[0]);
 	printf(", ");
 	print_ts(&ts[1]);
-	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+	printf("], " str_at_symlink_nofollow ") = %s\n", errstr);
 
 	ts[0].tv_sec = -1;
 	ts[0].tv_nsec = 2000000000;
@@ -135,11 +175,11 @@ main(void)
 	ts[1].tv_nsec = 2345678900U;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
-	printf("utimensat(AT_FDCWD, %s, [", qname);
+	printf("utimensat(" str_at_fdcwd ", %s, [", qname);
 	print_ts(&ts[0]);
 	printf(", ");
 	print_ts(&ts[1]);
-	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+	printf("], " str_at_symlink_nofollow ") = %s\n", errstr);
 
 	ts[0].tv_sec = 0;
 	ts[0].tv_nsec = 0;
@@ -147,11 +187,11 @@ main(void)
 	ts[1].tv_nsec = 0;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
-	printf("utimensat(AT_FDCWD, %s, [", qname);
+	printf("utimensat(" str_at_fdcwd ", %s, [", qname);
 	print_ts(&ts[0]);
 	printf(", ");
 	print_ts(&ts[1]);
-	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+	printf("], " str_at_symlink_nofollow ") = %s\n", errstr);
 
 	ts[0].tv_sec = 0xdeadbeefU;
 	ts[0].tv_nsec = 0xfacefeedU;
@@ -159,41 +199,40 @@ main(void)
 	ts[1].tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
-	printf("utimensat(AT_FDCWD, %s, [", qname);
+	printf("utimensat(" str_at_fdcwd ", %s, [", qname);
 	print_ts(&ts[0]);
 	printf(", ");
 	print_ts(&ts[1]);
-	printf("], AT_SYMLINK_NOFOLLOW) = %s\n", errstr);
+	printf("], " str_at_symlink_nofollow ") = %s\n", errstr);
 
 	ts[0].tv_nsec = UTIME_NOW;
 	ts[1].tv_nsec = UTIME_OMIT;
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
-	printf("utimensat(AT_FDCWD, %s, [UTIME_NOW, UTIME_OMIT]"
-	       ", AT_SYMLINK_NOFOLLOW) = %s\n", qname, errstr);
+	printf("utimensat(" str_at_fdcwd ", %s, " str_utime_now_omit
+	       ", " str_at_symlink_nofollow ") = %s\n", qname, errstr);
 
 	if (F8ILL_KULONG_SUPPORTED) {
 		k_utimensat(kfdcwd, kfname, f8ill_ptr_to_kulong(ts), 0);
-		printf("utimensat(AT_FDCWD, %s, %#jx, 0) = %s\n",
+		printf("utimensat(" str_at_fdcwd ", %s, %#jx, 0) = %s\n",
 		       qname, (uintmax_t) f8ill_ptr_to_kulong(ts), errstr);
 	}
 
 	/* flags */
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts,
 		    (kernel_ulong_t) 0xdefaced00000200);
-	printf("utimensat(AT_FDCWD, %s, [UTIME_NOW, UTIME_OMIT]"
-	       ", AT_REMOVEDIR) = %s\n",
+	printf("utimensat(" str_at_fdcwd ", %s, " str_utime_now_omit
+	       ", " str_at_removedir ") = %s\n",
 	       qname, errstr);
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts,
 		    (kernel_ulong_t) 0xdefaced00000600);
-	printf("utimensat(AT_FDCWD, %s, [UTIME_NOW, UTIME_OMIT]"
-	       ", AT_REMOVEDIR|AT_SYMLINK_FOLLOW) = %s\n",
+	printf("utimensat(" str_at_fdcwd ", %s, " str_utime_now_omit
+	       ", " str_flags1 ") = %s\n",
 	       qname, errstr);
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, (kernel_ulong_t) -1ULL);
-	printf("utimensat(AT_FDCWD, %s, [UTIME_NOW, UTIME_OMIT]"
-	       ", AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
-	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff) = %s\n",
+	printf("utimensat(" str_at_fdcwd ", %s, " str_utime_now_omit
+	       ", " str_flags2 ") = %s\n",
 	       qname, errstr);
 
 	puts("+++ exited with 0 +++");
