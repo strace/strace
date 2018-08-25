@@ -484,6 +484,9 @@ userfaultfd	-a38
 ustat	-a33
 utime	-a16
 utimensat	-a33
+utimensat-Xabbrev	-a33 -Xabbrev -e trace=utimensat
+utimensat-Xraw	-a29 -Xraw -e trace=utimensat
+utimensat-Xverbose	-a44 -Xverbose -e trace=utimensat
 utimes	-a17
 vfork-f	-a26 -qq -f -e signal=none -e trace=chdir
 vhangup	-a10

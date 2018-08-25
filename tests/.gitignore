@@ -551,6 +551,9 @@ userfaultfd
 ustat
 utime
 utimensat
+utimensat-Xabbrev
+utimensat-Xraw
+utimensat-Xverbose
 utimes
 vfork-f
 vhangup
