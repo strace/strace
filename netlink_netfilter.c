@@ -70,10 +70,13 @@ decode_netlink_netfilter(struct tcb *const tcp,
 		tprints(", res_id=");
 		if (subsys_id == NFNL_SUBSYS_NFTABLES
 		    && res_id == NFNL_SUBSYS_NFTABLES) {
-			tprints("htons(NFNL_SUBSYS_NFTABLES)");
+			print_xlat_ex(nfmsg.res_id,
+				      "htons(NFNL_SUBSYS_NFTABLES)",
+				      XLAT_STYLE_DEFAULT);
 		} else if (subsys_id == NFNL_SUBSYS_NFTABLES
 			   && nfmsg.res_id == NFNL_SUBSYS_NFTABLES) {
-			tprints("NFNL_SUBSYS_NFTABLES");
+			print_xlat_ex(nfmsg.res_id, "NFNL_SUBSYS_NFTABLES",
+				      XLAT_STYLE_DEFAULT);
 		} else {
 			tprintf("htons(%d)", res_id);
 		}
