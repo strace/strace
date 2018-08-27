@@ -183,6 +183,9 @@
 	STRACE_PRINTF("%s%s=inet_addr(\"%s\")", (prefix_), #field_,	\
 		      inet_ntoa((where_).field_))
 
+#define PRINT_FIELD_INET6_ADDR(prefix_, where_, field_)			\
+	PRINT_FIELD_INET_ADDR((prefix_), (where_), field_, AF_INET6)
+
 #define PRINT_FIELD_AX25_ADDR(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
