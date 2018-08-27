@@ -16,6 +16,7 @@
 #include <linux/inet_diag.h>
 #include <linux/unix_diag.h>
 #include <linux/netlink_diag.h>
+#include <linux/packet_diag.h>
 #include <linux/rtnetlink.h>
 #include <linux/genetlink.h>
 
@@ -27,7 +28,9 @@
 #include "xstring.h"
 
 #define XLAT_MACROS_ONLY
-#include "xlat/inet_protocols.h"
+# include "xlat/ethernet_protocols.h"
+# include "xlat/inet_protocols.h"
+# include "xlat/socktypes.h"
 #undef XLAT_MACROS_ONLY
 
 typedef struct {
@@ -359,6 +362,26 @@ netlink_send_query(struct tcb *tcp, const int fd, const unsigned long inode)
 	return send_query(tcp, fd, &req, sizeof(req));
 }
 
+static bool
+packet_send_query(struct tcb *tcp, const int fd, const unsigned long inode)
+{
+	struct {
+		const struct nlmsghdr nlh;
+		const struct packet_diag_req ndr;
+	} req = {
+		.nlh = {
+			.nlmsg_len = sizeof(req),
+			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
+			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
+		},
+		.ndr = {
+			.sdiag_family = AF_PACKET,
+			.pdiag_show = PACKET_SHOW_INFO,
+		}
+	};
+	return send_query(tcp, fd, &req, sizeof(req));
+}
+
 static int
 netlink_parse_response(const void *data, const int data_len,
 		       const unsigned long inode, void *opaque_data)
@@ -393,6 +416,122 @@ netlink_parse_response(const void *data, const int data_len,
 	return cache_inode_details(inode, details);
 }
 
+struct packet_cb_data {
+	const char *proto_name;
+	const char *ret;
+};
+
+static int
+packet_parse_response(const void *data, const int data_len,
+		       const unsigned long inode, void *opaque_data)
+{
+	struct packet_cb_data *cb_data = opaque_data;
+	const struct packet_diag_msg *const diag_msg = data;
+
+	uint32_t have_ifindex = false;
+	uint32_t ifindex = 0;
+	const char *ifname = NULL;
+
+	bool have_uid = false;
+	uint32_t uid = 0;
+
+	struct rtattr *attr;
+	int rta_len = data_len - NLMSG_LENGTH(sizeof(*diag_msg));
+
+	const char *packet_proto;
+	const char *packet_type;
+
+	char *details;
+
+	if (rta_len < 0)
+		return -1;
+	if (diag_msg->pdiag_ino != inode)
+		return 0;
+
+	if (diag_msg->pdiag_family != AF_PACKET)
+		return -1;
+
+	for (attr = (struct rtattr *) (diag_msg + 1);
+	     RTA_OK(attr, rta_len);
+	     attr = RTA_NEXT(attr, rta_len)) {
+		switch (attr->rta_type) {
+		case PACKET_DIAG_INFO: {
+			if (have_ifindex)
+				break;
+
+			struct packet_diag_info *pinfo;
+
+			if (RTA_PAYLOAD(attr) >= sizeof(pinfo)) {
+				pinfo = RTA_DATA(attr);
+
+				ifindex = pinfo->pdi_index;
+				ifname = get_ifname(ifindex);
+				have_ifindex = true;
+			}
+			break;
+		}
+		case PACKET_DIAG_UID: {
+			if (have_uid)
+				break;
+
+			if (RTA_PAYLOAD(attr) >= sizeof(uid)) {
+				uid = *(uint32_t *) RTA_DATA(attr);
+				have_ifindex = true;
+			}
+		}
+		}
+	}
+
+	packet_proto = xlookup(ethernet_protocols, diag_msg->pdiag_num);
+	packet_type = xlookup(socktypes, diag_msg->pdiag_type);
+
+	char ifindex_num[sizeof(ifindex) * 3 + sizeof("dev ")];
+	char proto_num[sizeof(diag_msg->pdiag_num) * 2 + sizeof("proto 0x")];
+	char type_num[sizeof(diag_msg->pdiag_type) * 2 + sizeof("type 0x")];
+
+	//if (have_ifindex && !ifindex)
+	//	return -1;
+
+	if (!have_ifindex) {
+		ifname = "???";
+	} else if (have_ifindex && !ifname) {
+		xsprintf(ifindex_num, "dev %u", ifindex);
+		ifname = ifindex_num;
+	}
+
+	if (!packet_proto) {
+		xsprintf(proto_num, "proto %#x", diag_msg->pdiag_num);
+		packet_proto = proto_num;
+	} else {
+		packet_proto = STR_STRIP_PREFIX(packet_proto, "ETH_P_");
+	}
+
+	if (!packet_type) {
+		xsprintf(type_num, "type %#x", diag_msg->pdiag_type);
+		packet_type = type_num;
+	} else {
+		packet_type = STR_STRIP_PREFIX(packet_type, "SOCK_");
+	}
+
+	if (have_uid) {
+		if (asprintf(&details, "%s:[%s:%s:%s:uid %u]",
+		    cb_data->proto_name, ifname, packet_type,
+		    packet_proto, uid) < 0)
+			return -1;
+	} else {
+		if (asprintf(&details, "%s:[%s:%s:%s]",
+		    cb_data->proto_name, ifname, packet_type, packet_proto) < 0)
+			return -1;
+	}
+
+	cb_data->ret = details;
+
+	if (have_ifindex && ifindex)
+		return cache_inode_details(inode, details);
+
+	return 1;
+}
+
 static const char *
 unix_get(struct tcb *tcp, const int fd, const int family, const int proto,
 	 const unsigned long inode, const char *name)
@@ -422,6 +561,19 @@ netlink_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 				     netlink_parse_response,
 				     (void *) proto_name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
+}
+
+static const char *
+packet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
+	   const unsigned long inode, const char *proto_name)
+{
+	struct packet_cb_data cb_data = { proto_name };
+
+	return packet_send_query(tcp, fd, inode)
+		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
+				     packet_parse_response,
+				     (void *) &cb_data)
+		? cb_data.ret : NULL;
 }
 
 static const struct {
@@ -474,7 +626,7 @@ static const struct {
 	[SOCK_PROTO_AX25]	= { "AX25",	NULL,		AF_AX25 },
 	[SOCK_PROTO_DDP]	= { "DDP",	NULL,		AF_APPLETALK },
 	[SOCK_PROTO_NETROM]	= { "NETROM",	NULL,		AF_NETROM },
-	[SOCK_PROTO_PACKET]	= { "PACKET",	NULL,		AF_PACKET },
+	[SOCK_PROTO_PACKET]	= { "PACKET",	packet_get,	AF_PACKET },
 	[SOCK_PROTO_ROSE]	= { "ROSE",	NULL,		AF_ROSE },
 	[SOCK_PROTO_X25]	= { "X25",	NULL,		AF_X25 },
 };
