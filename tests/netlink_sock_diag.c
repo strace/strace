@@ -338,7 +338,7 @@ test_packet_diag_req(const int fd)
 	TEST_SOCK_DIAG(fd, nlh0, AF_PACKET,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_REQUEST, req,
 		       printf("{sdiag_family=AF_PACKET"),
-		       printf(", sdiag_protocol=ETH_P_LOOP");
+		       printf(", sdiag_protocol=%#x", req.sdiag_protocol);
 		       PRINT_FIELD_U(", ", req, pdiag_ino);
 		       printf(", pdiag_show=PACKET_SHOW_INFO");
 		       PRINT_FIELD_COOKIE(", ", req, pdiag_cookie);
@@ -351,7 +351,7 @@ test_packet_diag_msg(const int fd)
 	static const struct packet_diag_msg msg = {
 		.pdiag_family = AF_PACKET,
 		.pdiag_type = SOCK_STREAM,
-		.pdiag_num = 0xbadc,
+		.pdiag_num = 0x9100,
 		.pdiag_ino = 0xfacefeed,
 		.pdiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
@@ -360,7 +360,7 @@ test_packet_diag_msg(const int fd)
 		       SOCK_DIAG_BY_FAMILY, NLM_F_DUMP, msg,
 		       printf("{pdiag_family=AF_PACKET"),
 		       printf(", pdiag_type=SOCK_STREAM");
-		       PRINT_FIELD_U(", ", msg, pdiag_num);
+		       printf(", pdiag_num=ETH_P_QINQ1");
 		       PRINT_FIELD_U(", ", msg, pdiag_ino);
 		       PRINT_FIELD_COOKIE(", ", msg, pdiag_cookie);
 		       printf("}"));
