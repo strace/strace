@@ -368,54 +368,53 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 
 	struct sockaddr_l2 {
 		/* sa_family_t */ uint16_t	l2_family;
-		/* little endiang */ uint16_t	l2_psm;
+		/* little endian */ uint16_t	l2_psm;
 		struct bdaddr			l2_bdaddr;
 		/* little endian */ uint16_t	l2_cid;
 		uint8_t				l2_bdaddr_type;
 	};
 
 	switch (addrlen) {
-		case sizeof(struct sockaddr_hci): {
-			const struct sockaddr_hci *const hci = buf;
-			tprintf("hci_dev=htobs(%hu), hci_channel=",
-				btohs(hci->hci_dev));
-			printxval_index(hci_channels, hci->hci_channel,
-					"HCI_CHANNEL_???");
-			break;
-		}
-		case sizeof(struct sockaddr_sco): {
-			const struct sockaddr_sco *const sco = buf;
-			print_mac_addr("sco_bdaddr=", sco->sco_bdaddr.b,
-				       sizeof(sco->sco_bdaddr.b));
-			break;
-		}
-		case sizeof(struct sockaddr_rc): {
-			const struct sockaddr_rc *const rc = buf;
-			print_mac_addr("rc_bdaddr=", rc->rc_bdaddr.b,
-				       sizeof(rc->rc_bdaddr.b));
-			tprintf(", rc_channel=%u", rc->rc_channel);
-			break;
-		}
-		case offsetof(struct sockaddr_l2, l2_bdaddr_type):
-		case sizeof(struct sockaddr_l2): {
-			const struct sockaddr_l2 *const l2 = buf;
-			print_bluetooth_l2_psm("l2_psm=", l2->l2_psm);
-			print_mac_addr(", l2_bdaddr=", l2->l2_bdaddr.b,
-				       sizeof(l2->l2_bdaddr.b));
-			print_bluetooth_l2_cid(", l2_cid=", l2->l2_cid);
+	case sizeof(struct sockaddr_hci): {
+		const struct sockaddr_hci *const hci = buf;
+		tprintf("hci_dev=htobs(%hu), hci_channel=",
+			btohs(hci->hci_dev));
+		printxval_index(hci_channels, hci->hci_channel,
+				"HCI_CHANNEL_???");
+		break;
+	}
+	case sizeof(struct sockaddr_sco): {
+		const struct sockaddr_sco *const sco = buf;
+		print_mac_addr("sco_bdaddr=", sco->sco_bdaddr.b,
+			       sizeof(sco->sco_bdaddr.b));
+		break;
+	}
+	case sizeof(struct sockaddr_rc): {
+		const struct sockaddr_rc *const rc = buf;
+		print_mac_addr("rc_bdaddr=", rc->rc_bdaddr.b,
+			       sizeof(rc->rc_bdaddr.b));
+		tprintf(", rc_channel=%u", rc->rc_channel);
+		break;
+	}
+	case offsetof(struct sockaddr_l2, l2_bdaddr_type):
+	case sizeof(struct sockaddr_l2): {
+		const struct sockaddr_l2 *const l2 = buf;
+		print_bluetooth_l2_psm("l2_psm=", l2->l2_psm);
+		print_mac_addr(", l2_bdaddr=", l2->l2_bdaddr.b,
+			       sizeof(l2->l2_bdaddr.b));
+		print_bluetooth_l2_cid(", l2_cid=", l2->l2_cid);
 
-			if (addrlen == sizeof(struct sockaddr_l2)) {
-				tprints(", l2_bdaddr_type=");
-				printxval_index(bdaddr_types,
-						l2->l2_bdaddr_type,
-						"BDADDR_???");
-			}
-
-			break;
+		if (addrlen == sizeof(struct sockaddr_l2)) {
+			tprints(", l2_bdaddr_type=");
+			printxval_index(bdaddr_types, l2->l2_bdaddr_type,
+					"BDADDR_???");
 		}
-		default:
-			print_sockaddr_data_raw(buf, addrlen);
-			break;
+
+		break;
+	}
+	default:
+		print_sockaddr_data_raw(buf, addrlen);
+		break;
 	}
 }
 
