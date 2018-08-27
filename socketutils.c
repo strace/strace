@@ -412,11 +412,12 @@ netlink_parse_response(const void *data, const int data_len,
 }
 
 static const char *
-unix_get(struct tcb *tcp, const int fd, const unsigned long inode)
+unix_get(struct tcb *tcp, const int fd, const int family, const int proto,
+	 const unsigned long inode, const char *name)
 {
 	return unix_send_query(tcp, fd, inode)
 		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
-				     unix_parse_response, (void *) "UNIX")
+				     unix_parse_response, (void *) name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
@@ -431,48 +432,34 @@ inet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 }
 
 static const char *
-tcp_v4_get(struct tcb *tcp, const int fd, const unsigned long inode)
-{
-	return inet_get(tcp, fd, AF_INET, IPPROTO_TCP, inode, "TCP");
-}
-
-static const char *
-udp_v4_get(struct tcb *tcp, const int fd, const unsigned long inode)
-{
-	return inet_get(tcp, fd, AF_INET, IPPROTO_UDP, inode, "UDP");
-}
-
-static const char *
-tcp_v6_get(struct tcb *tcp, const int fd, const unsigned long inode)
-{
-	return inet_get(tcp, fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
-}
-
-static const char *
-udp_v6_get(struct tcb *tcp, const int fd, const unsigned long inode)
-{
-	return inet_get(tcp, fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
-}
-
-static const char *
-netlink_get(struct tcb *tcp, const int fd, const unsigned long inode)
+netlink_get(struct tcb *tcp, const int fd, const int family, const int protocol,
+	    const unsigned long inode, const char *proto_name)
 {
 	return netlink_send_query(tcp, fd, inode)
 		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
-				     netlink_parse_response, (void *) "NETLINK")
+				     netlink_parse_response,
+				     (void *) proto_name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
 static const struct {
 	const char *const name;
-	const char * (*const get)(struct tcb *, int, unsigned long);
+	const char * (*const get)(struct tcb *, int fd, int family,
+				  int protocol, unsigned long inode,
+				  const char *proto_name);
+	int family;
+	int proto;
 } protocols[] = {
-	[SOCK_PROTO_UNIX] = { "UNIX", unix_get },
-	[SOCK_PROTO_TCP] = { "TCP", tcp_v4_get },
-	[SOCK_PROTO_UDP] = { "UDP", udp_v4_get },
-	[SOCK_PROTO_TCPv6] = { "TCPv6", tcp_v6_get },
-	[SOCK_PROTO_UDPv6] = { "UDPv6", udp_v6_get },
-	[SOCK_PROTO_NETLINK] = { "NETLINK", netlink_get }
+	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
+	[SOCK_PROTO_TCP]	=
+		{ "TCP",	inet_get, AF_INET,  IPPROTO_TCP },
+	[SOCK_PROTO_UDP]	=
+		{ "UDP",	inet_get, AF_INET,  IPPROTO_UDP },
+	[SOCK_PROTO_TCPv6]	=
+		{ "TCPv6",	inet_get, AF_INET6, IPPROTO_TCP },
+	[SOCK_PROTO_UDPv6]	=
+		{ "UDPv6",	inet_get, AF_INET6, IPPROTO_UDP },
+	[SOCK_PROTO_NETLINK]	= { "NETLINK",	netlink_get,	AF_NETLINK },
 };
 
 enum sock_proto
@@ -501,14 +488,20 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 	const char *details = NULL;
 
 	if (proto != SOCK_PROTO_UNKNOWN) {
-		details = protocols[proto].get(tcp, fd, inode);
+		details = protocols[proto].get(tcp, fd, protocols[proto].family,
+					       protocols[proto].proto, inode,
+					       protocols[proto].name);
 	} else {
 		unsigned int i;
 		for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
 		     i < ARRAY_SIZE(protocols); ++i) {
 			if (!protocols[i].get)
 				continue;
-			details = protocols[i].get(tcp, fd, inode);
+			details = protocols[i].get(tcp, fd,
+						   protocols[proto].family,
+						   protocols[proto].proto,
+						   inode,
+						   protocols[proto].name);
 			if (details)
 				break;
 		}
