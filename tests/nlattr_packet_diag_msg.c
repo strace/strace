@@ -51,7 +51,8 @@ init_packet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 	struct packet_diag_msg *const msg = NLMSG_DATA(nlh);
 	SET_STRUCT(struct packet_diag_msg, msg,
 		.pdiag_family = AF_PACKET,
-		.pdiag_type = SOCK_STREAM
+		.pdiag_type = SOCK_STREAM,
+		.pdiag_num = 3,
 	);
 }
 
@@ -61,7 +62,7 @@ print_packet_diag_msg(const unsigned int msg_len)
 	printf("{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
 	       ", {pdiag_family=AF_PACKET"
-	       ", pdiag_type=SOCK_STREAM, pdiag_num=0"
+	       ", pdiag_type=SOCK_STREAM, pdiag_num=ETH_P_ALL"
 	       ", pdiag_ino=0, pdiag_cookie=[0, 0]}",
 	       msg_len);
 }
@@ -98,9 +99,9 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	static const struct packet_diag_info pinfo = {
-		.pdi_index = 0xabcddafa,
-		.pdi_version = 0xbabcdafb,
+	struct packet_diag_info pinfo = {
+		.pdi_index = ifindex_lo(),
+		.pdi_version = 2,
 		.pdi_reserve = 0xcfaacdaf,
 		.pdi_copy_thresh = 0xdabacdaf,
 		.pdi_tstamp = 0xeafbaadf,
@@ -143,8 +144,8 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_packet_diag_msg, print_packet_diag_msg,
 			   PACKET_DIAG_INFO, pattern, pinfo,
-			   PRINT_FIELD_U("{", pinfo, pdi_index);
-			   PRINT_FIELD_U(", ", pinfo, pdi_version);
+			   printf("{pdi_index=%s", IFINDEX_LO_STR);
+			   printf(", pdi_version=TPACKET_V3");
 			   PRINT_FIELD_U(", ", pinfo, pdi_reserve);
 			   PRINT_FIELD_U(", ", pinfo, pdi_copy_thresh);
 			   PRINT_FIELD_U(", ", pinfo, pdi_tstamp);
