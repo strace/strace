@@ -87,6 +87,7 @@
 #define XLAT_MACROS_ONLY
 # include "xlat/addrfams.h"
 #undef XLAT_MACROS_ONLY
+#include "xlat/ax25_protocols.h"
 #include "xlat/irda_protocols.h"
 #include "xlat/can_protocols.h"
 #include "xlat/bt_protocols.h"
@@ -142,6 +143,12 @@ SYS_FUNC(socket)
 	case AF_INET:
 	case AF_INET6:
 		printxval_search(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
+		break;
+
+	case AF_AX25:
+		/* Those are not available in a public header */
+		printxval_searchn_ex(ARRSZ_PAIR(ax25_protocols), tcp->u_arg[2],
+				     "AX25_P_???", XLAT_STYLE_VERBOSE);
 		break;
 
 	case AF_NETLINK:
@@ -437,6 +444,7 @@ SYS_FUNC(socketpair)
 #include "xlat/getsock_ipv6_options.h"
 #include "xlat/setsock_ipv6_options.h"
 #include "xlat/sock_ipx_options.h"
+#include "xlat/sock_ax25_options.h"
 #include "xlat/sock_netlink_options.h"
 #include "xlat/sock_packet_options.h"
 #include "xlat/sock_raw_options.h"
@@ -487,6 +495,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_IPX:
 		printxval(sock_ipx_options, name, "IPX_???");
+		break;
+	case SOL_AX25:
+		printxval_search(sock_ax25_options, name, "AX25_???");
 		break;
 	case SOL_PACKET:
 		printxval(sock_packet_options, name, "PACKET_???");
