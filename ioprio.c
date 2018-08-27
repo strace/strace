@@ -34,6 +34,21 @@ sprint_ioprio(unsigned int ioprio)
 	return outstr;
 }
 
+void
+print_ioprio(unsigned int ioprio)
+{
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%#x", ioprio);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	const char *str = sprint_ioprio(ioprio);
+
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+		? tprints_comment : tprints)(str);
+}
+
 SYS_FUNC(ioprio_get)
 {
 	if (entering(tcp)) {
