@@ -819,6 +819,7 @@ extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
 extern void print_dev_t(unsigned long long dev);
 extern void print_abnormal_hi(kernel_ulong_t);
+extern void print_ioprio(unsigned int ioprio);
 
 extern bool print_int32_array_member(struct tcb *, void *elem_buf,
 				     size_t elem_size, void *data);
