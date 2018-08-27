@@ -507,6 +507,15 @@ get_proto_by_name(const char *const name)
 	return SOCK_PROTO_UNKNOWN;
 }
 
+int
+get_family_by_proto(enum sock_proto proto)
+{
+	if ((size_t) proto < ARRAY_SIZE(protocols))
+		return protocols[proto].family;
+
+	return AF_UNSPEC;
+}
+
 static const char *
 get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 			       const enum sock_proto proto)

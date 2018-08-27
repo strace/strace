@@ -396,6 +396,7 @@ enum sock_proto {
 	SOCK_PROTO_NETLINK,
 };
 extern enum sock_proto get_proto_by_name(const char *);
+extern int get_family_by_proto(enum sock_proto proto);
 
 enum iov_decode {
 	IOV_DECODE_ADDR,
