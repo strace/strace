@@ -39,6 +39,7 @@
 #include <arpa/inet.h>
 
 #include "netlink.h"
+#include <linux/ax25.h>
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
@@ -187,6 +188,164 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 	else
 #endif
 		PRINT_FIELD_U(", ", *sa_in6, sin6_scope_id);
+}
+
+/**
+ * Check that we can print an AX.25 address in its native form, otherwise it
+ * makes sense to print it in raw also (or in raw only).
+ */
+enum xlat_style
+check_ax25_address(const ax25_address *addr)
+{
+	enum xlat_style ret = XLAT_STYLE_DEFAULT;
+	bool space_seen = false;
+	bool char_seen = false;
+
+	for (size_t i = 0; i < ARRAY_SIZE(addr->ax25_call) - 1; i++) {
+		unsigned char c = addr->ax25_call[i];
+
+		/* The lowest bit should be zero */
+		if (c & 1)
+			ret = XLAT_STYLE_VERBOSE;
+
+		c >>= 1;
+
+		if (c == ' ')
+			space_seen = true;
+		else
+			char_seen = true;
+
+		/* Sane address contains only numbers and uppercase letters */
+		if ((c < '0' || c > '9') && (c < 'A' || c > 'Z') && c != ' ')
+			ret = XLAT_STYLE_VERBOSE;
+		if (c != ' ' && space_seen)
+			ret = XLAT_STYLE_VERBOSE;
+
+		/* non-printable chars */
+		if (c < ' ' || c > 0x7e
+		    /* characters used for printing comments */
+		    || c == '*' || c == '/')
+			return XLAT_STYLE_RAW;
+	}
+
+	if (addr->ax25_call[ARRAY_SIZE(addr->ax25_call) - 1] & ~0x1e)
+		ret = XLAT_STYLE_VERBOSE;
+
+	if (!char_seen && addr->ax25_call[ARRAY_SIZE(addr->ax25_call) - 1])
+		ret = XLAT_STYLE_VERBOSE;
+
+	return ret;
+}
+
+/** Convert a (presumably) valid AX.25 to a string */
+static const char *
+ax25_addr2str(const ax25_address *addr)
+{
+	static char buf[ARRAY_SIZE(addr->ax25_call) + sizeof("-15")];
+	char *p = buf;
+	size_t end;
+
+	for (end = ARRAY_SIZE(addr->ax25_call) - 1; end; end--)
+		if ((addr->ax25_call[end - 1] >> 1) != ' ')
+			break;
+
+	for (size_t i = 0; i < end; i++)
+		*p++ = ((unsigned char) addr->ax25_call[i]) >> 1;
+
+	*p++ = '-';
+
+	unsigned char ssid = (addr->ax25_call[ARRAY_SIZE(addr->ax25_call) - 1]
+			      >> 1) & 0xf;
+
+	if (ssid > 9) {
+		*p++ = '1';
+		ssid -= 10;
+	}
+
+	*p++ = ssid + '0';
+	*p = '\0';
+
+	if (buf[0] == '-' && buf[1] == '0')
+		return "*";
+
+	return buf;
+}
+
+static void
+print_ax25_addr_raw(const ax25_address *addr)
+{
+	PRINT_FIELD_HEX_ARRAY("{", *addr, ax25_call);
+	tprints("}");
+}
+
+void
+print_ax25_addr(const void /* ax25_address */ *addr_void)
+{
+	const ax25_address *addr = addr_void;
+	enum xlat_style xs = check_ax25_address(addr);
+
+	if (xs == XLAT_STYLE_DEFAULT)
+		xs = xlat_verbose(xlat_verbosity);
+
+	if (xs != XLAT_STYLE_ABBREV)
+		print_ax25_addr_raw(addr);
+
+	if (xs == XLAT_STYLE_RAW)
+		return;
+
+	const char *addr_str = ax25_addr2str(addr);
+
+	(xs == XLAT_STYLE_VERBOSE ? tprints_comment : tprints)(addr_str);
+}
+
+static void
+print_sockaddr_data_ax25(const void *const buf, const int addrlen)
+{
+	const struct full_sockaddr_ax25 *const sax25 = buf;
+	size_t addrlen_us = MAX(addrlen, 0);
+	bool full = sax25->fsa_ax25.sax25_ndigis ||
+	(addrlen_us > sizeof(struct sockaddr_ax25));
+
+	if (full)
+		tprints("fsa_ax25={");
+
+	tprints("sax25_call=");
+	print_ax25_addr(&sax25->fsa_ax25.sax25_call);
+	PRINT_FIELD_D(", ", sax25->fsa_ax25, sax25_ndigis);
+
+	if (!full)
+		return;
+
+	tprints("}");
+
+	size_t has_digis = MIN((addrlen_us - sizeof(sax25->fsa_ax25))
+			       / sizeof(sax25->fsa_digipeater[0]),
+			       ARRAY_SIZE(sax25->fsa_digipeater));
+	size_t want_digis = MIN(
+		(unsigned int) MAX(sax25->fsa_ax25.sax25_ndigis, 0),
+		ARRAY_SIZE(sax25->fsa_digipeater));
+	size_t digis = MIN(has_digis, want_digis);
+
+	if (want_digis == 0)
+		goto digis_end;
+
+	tprints(", fsa_digipeater=[");
+	for (size_t i = 0; i < digis; i++) {
+		if (i)
+			tprints(", ");
+
+		print_ax25_addr(sax25->fsa_digipeater + i);
+	}
+
+	if (want_digis > has_digis)
+		tprintf("%s/* ??? */", digis ? ", " : "");
+
+	tprints("]");
+
+digis_end:
+	if (addrlen_us > (has_digis * sizeof(sax25->fsa_digipeater[0])
+		       + sizeof(sax25->fsa_ax25)))
+		tprints(", ...");
 }
 
 static void
@@ -426,6 +585,7 @@ static const struct {
 } sa_printers[] = {
 	[AF_UNIX] = { print_sockaddr_data_un, SIZEOF_SA_FAMILY + 1 },
 	[AF_INET] = { print_sockaddr_data_in, sizeof(struct sockaddr_in) },
+	[AF_AX25] = { print_sockaddr_data_ax25, sizeof(struct sockaddr_ax25) },
 	[AF_IPX] = { print_sockaddr_data_ipx, sizeof(struct sockaddr_ipx) },
 	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
