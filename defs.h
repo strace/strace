@@ -391,6 +391,7 @@ extern const struct xlat open_mode_flags[];
 extern const struct xlat pollflags[];
 extern const struct xlat ptrace_cmds[];
 extern const struct xlat resource_flags[];
+extern const struct xlat route_nexthop_flags[];
 extern const struct xlat routing_scopes[];
 extern const struct xlat routing_table_ids[];
 extern const struct xlat routing_types[];
@@ -445,6 +446,12 @@ enum sock_proto {
 	SOCK_PROTO_PINGv6,
 	SOCK_PROTO_RAWv6,
 	SOCK_PROTO_NETLINK,
+	SOCK_PROTO_AX25,
+	SOCK_PROTO_DDP,
+	SOCK_PROTO_NETROM,
+	SOCK_PROTO_PACKET,
+	SOCK_PROTO_ROSE,
+	SOCK_PROTO_X25,
 };
 extern enum sock_proto get_proto_by_name(const char *);
 extern int get_family_by_proto(enum sock_proto proto);

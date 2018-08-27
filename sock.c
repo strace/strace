@@ -9,13 +9,20 @@
 #include "defs.h"
 #include "print_fields.h"
 
-#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#include <linux/socket.h>
+#include <linux/if.h>
 #if defined ALPHA || defined SH || defined SH64
 # include <linux/ioctl.h>
 #endif
+#include <linux/ax25.h>
+#include <linux/netrom.h>
+#include <linux/rose.h>
+#include <linux/route.h>
+#include <linux/ipv6_route.h>
 #include <linux/sockios.h>
-#include <arpa/inet.h>
-#include <net/if.h>
+#include <linux/x25.h>
 
 #include DEF_MPERS_TYPE(struct_ifconf)
 #include DEF_MPERS_TYPE(struct_ifreq)
@@ -27,8 +34,16 @@ typedef struct ifreq struct_ifreq;
 
 #include "xlat/iffflags.h"
 
+#include "xlat/inet6_route_metrics.h"
+#include "xlat/inet6_router_pref.h"
+#include "xlat/netrom_route_types.h"
+#include "xlat/route_flags.h"
+#include "xlat/route_flags_inet6.h"
+
 #define XLAT_MACROS_ONLY
-#include "xlat/arp_hardware_types.h"
+# include "xlat/arp_hardware_types.h"
+# include "xlat/route_nexthop_flags.h"
+# include "xlat/routing_types.h"
 #undef XLAT_MACROS_ONLY
 
 static void
@@ -223,6 +238,181 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	return RVAL_IOCTL_DECODED;
 }
 
+static void
+decode_rtentry(struct tcb *tcp, kernel_ulong_t arg)
+{
+	struct rtentry e;
+
+	if (umove_or_printaddr(tcp, arg, &e))
+		return;
+
+	tprints("{");
+	if (e.rt_pad1) {
+		PRINT_FIELD_X("", e, rt_pad1);
+		tprints(", ");
+	}
+	PRINT_FIELD_SOCKADDR("", e, rt_dst);
+	PRINT_FIELD_SOCKADDR(", ", e, rt_gateway);
+	PRINT_FIELD_SOCKADDR(", ", e, rt_genmask);
+
+	PRINT_FIELD_FLAGS(", ", e, rt_flags, route_flags, "RTF_???");
+
+	if (e.rt_pad2)
+		PRINT_FIELD_X(", ", e, rt_pad2);
+	if (e.rt_pad3)
+		PRINT_FIELD_X(", ", e, rt_pad3);
+	if (e.rt_pad4) {
+		tprintf(", rt_pad4=");
+		printaddr((uintptr_t) e.rt_pad4);
+	}
+
+	PRINT_FIELD_U(", ", e, rt_metric);
+	tprints(", rt_dev=");
+	printstr_ex(tcp, (uintptr_t) e.rt_dev, IFNAMSIZ, QUOTE_0_TERMINATED);
+	PRINT_FIELD_U(", ", e, rt_mtu);
+	PRINT_FIELD_U(", ", e, rt_window);
+	PRINT_FIELD_U(", ", e, rt_irtt);
+	tprints("}");
+}
+
+static void
+print_digipeaters(uint32_t val, const char *dps_name, ax25_address *dps,
+		  size_t dps_sz)
+{
+	if (!val)
+		return;
+
+	size_t cnt = MIN(val, dps_sz);
+
+	tprintf("%s=[", dps_name);
+	for (size_t i = 0; i < cnt; i++) {
+		if (i)
+			tprints(", ");
+
+		print_ax25_addr(dps + i);
+	}
+	tprints("]");
+}
+
+static void
+decode_ax25_routes_struct(struct tcb *tcp, kernel_ulong_t arg)
+{
+	struct ax25_routes_struct e;
+
+	if (umove_or_printaddr(tcp, arg, &e))
+		return;
+
+	PRINT_FIELD_AX25_ADDR("{", e, port_addr);
+	PRINT_FIELD_AX25_ADDR(", ", e, dest_addr);
+
+	PRINT_FIELD_U(", ", e, digi_count);
+	print_digipeaters(e.digi_count, "digi_addr", ARRSZ_PAIR(e.digi_addr));
+	tprints("}");
+}
+
+static void
+decode_nr_route_struct(struct tcb *tcp, kernel_ulong_t arg)
+{
+	struct nr_route_struct e;
+
+	if (umove_or_printaddr(tcp, arg, &e))
+		return;
+
+	PRINT_FIELD_XVAL("{", e, type, netrom_route_types, "NETROM_???");
+	PRINT_FIELD_AX25_ADDR(", ", e, callsign);
+	PRINT_FIELD_CSTRING(", ", e, device);
+	PRINT_FIELD_U(", ", e, quality);
+	PRINT_FIELD_CSTRING(", ", e, mnemonic);
+	PRINT_FIELD_AX25_ADDR(", ", e, neighbour);
+	PRINT_FIELD_U(", ", e, obs_count);
+	PRINT_FIELD_U(", ", e, ndigis);
+	print_digipeaters(e.ndigis, "digipeaters", ARRSZ_PAIR(e.digipeaters));
+	tprints("}");
+}
+
+static void
+decode_x25_route_struct(struct tcb *tcp, kernel_ulong_t arg)
+{
+	struct x25_route_struct e;
+
+	if (umove_or_printaddr(tcp, arg, &e))
+		return;
+
+	PRINT_FIELD_X25_ADDR("{", e, address);
+	PRINT_FIELD_U(", ", e, sigdigits);
+	PRINT_FIELD_CSTRING(", ", e, device);
+	tprints("}");
+}
+
+static void
+print_inet6_route_pref(uint8_t pref)
+{
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%#x", pref << 27);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	tprints("RTF_PREF(");
+	printxval(inet6_router_pref, pref, "ICMPV6_ROUTER_PREF_???");
+	tprints(")");
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" */");
+}
+
+static void
+decode_in6_rtmsg(struct tcb *tcp, kernel_ulong_t arg)
+{
+	struct in6_rtmsg e;
+
+	if (umove_or_printaddr(tcp, arg, &e))
+		return;
+
+	PRINT_FIELD_INET_ADDR("{", e, rtmsg_dst, AF_INET6);
+	PRINT_FIELD_INET_ADDR(", ", e, rtmsg_src, AF_INET6);
+	PRINT_FIELD_INET_ADDR(", ", e, rtmsg_gateway, AF_INET6);
+	PRINT_FIELD_XVAL(", ", e, rtmsg_type, routing_types, "RTN_???");
+	PRINT_FIELD_U(", ", e, rtmsg_dst_len);
+	PRINT_FIELD_U(", ", e, rtmsg_src_len);
+	PRINT_FIELD_XVAL(", ", e, rtmsg_metric, inet6_route_metrics,
+			 "IP6_RT_PRIO_???");
+	PRINT_FIELD_U(", ", e, rtmsg_info);
+
+	uint32_t pref = (e.rtmsg_flags >> 27) & 0x3;
+	uint32_t flags = e.rtmsg_flags & ~(0x3 << 27);
+
+	tprints(", rtmsg_flags=");
+	print_inet6_route_pref(pref);
+	if (flags) {
+		tprints("|");
+		printflags_ex(flags, "RTF_???", XLAT_STYLE_DEFAULT,
+			      route_nexthop_flags, route_flags_inet6, NULL);
+	}
+	PRINT_FIELD_IFINDEX(", ", e, rtmsg_ifindex);
+	tprints("}");
+}
+
+static void
+decode_rose_route_struct(struct tcb *tcp, kernel_ulong_t arg)
+{
+	struct rose_route_struct e;
+
+	if (umove_or_printaddr(tcp, arg, &e))
+		return;
+
+	PRINT_FIELD_ROSE_ADDR("{", e, address);
+	PRINT_FIELD_U(", ", e, mask);
+	PRINT_FIELD_AX25_ADDR("{", e, neighbour);
+	PRINT_FIELD_CSTRING(", ", e, device);
+	PRINT_FIELD_U(", ", e, ndigis);
+	print_digipeaters(e.ndigis, "digipeaters", ARRSZ_PAIR(e.digipeaters));
+	tprints("}");
+}
+
 MPERS_PRINTER_DECL(int, sock_ioctl,
 		   struct tcb *tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
@@ -349,6 +539,38 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 			tprints("}");
 			break;
 		}
+
+	/*
+	 * These two depend on the network protocol of the fd they're called.
+	 * Unfortunately, we can't get it right away, so we should derive from
+	 * the socket protocol.
+	 */
+	case SIOCADDRT:
+	case SIOCDELRT: {
+		typedef void (* handler)(struct tcb *tcp, kernel_ulong_t addr);
+
+		static const handler handlers[] = {
+			[AF_INET]	= decode_rtentry,
+			[AF_AX25]	= decode_ax25_routes_struct,
+			/* packet_ioctl explicitly calls inet_dgram_ops.ioctl */
+			[AF_APPLETALK]	= decode_rtentry,
+			[AF_NETROM]	= decode_nr_route_struct,
+			[AF_X25]	= decode_x25_route_struct,
+			[AF_INET6]	= decode_in6_rtmsg,
+			[AF_ROSE]	= decode_rose_route_struct,
+			[AF_PACKET]	= decode_rtentry,
+		};
+
+		enum sock_proto proto = getfdproto(tcp, tcp->u_arg[0]);
+		uint32_t family = MAX(get_family_by_proto(proto), 0);
+
+		if (family < ARRAY_SIZE(handlers) && handlers[family]) {
+			handlers[family](tcp, arg);
+			break;
+		}
+
+		return RVAL_DECODED;
+	}
 
 	default:
 		return RVAL_DECODED;

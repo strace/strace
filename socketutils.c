@@ -471,6 +471,12 @@ static const struct {
 	[SOCK_PROTO_RAWv6]	=
 		{ "RAWv6",	inet_get, AF_INET6, IPPROTO_RAW },
 	[SOCK_PROTO_NETLINK]	= { "NETLINK",	netlink_get,	AF_NETLINK },
+	[SOCK_PROTO_AX25]	= { "AX25",	NULL,		AF_AX25 },
+	[SOCK_PROTO_DDP]	= { "DDP",	NULL,		AF_APPLETALK },
+	[SOCK_PROTO_NETROM]	= { "NETROM",	NULL,		AF_NETROM },
+	[SOCK_PROTO_PACKET]	= { "PACKET",	NULL,		AF_PACKET },
+	[SOCK_PROTO_ROSE]	= { "ROSE",	NULL,		AF_ROSE },
+	[SOCK_PROTO_X25]	= { "X25",	NULL,		AF_X25 },
 };
 
 enum sock_proto
