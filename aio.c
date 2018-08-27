@@ -34,6 +34,13 @@
 #include <linux/aio_abi.h>
 
 #include "xlat/aio_cmds.h"
+#include "xlat/aio_iocb_flags.h"
+
+#ifdef HAVE_STRUCT_IOCB_AIO_RW_FLAGS
+# define AIO_RW_FLAGS_FIELD aio_rw_flags
+#else
+# define AIO_RW_FLAGS_FIELD aio_reserved1
+#endif
 
 SYS_FUNC(io_setup)
 {
@@ -52,7 +59,7 @@ SYS_FUNC(io_destroy)
 }
 
 enum iocb_sub {
-	SUB_NONE, SUB_COMMON, SUB_VECTOR
+	SUB_NONE, SUB_COMMON, SUB_VECTOR, SUB_POLL
 };
 
 static enum iocb_sub
@@ -64,7 +71,7 @@ tprint_lio_opcode(unsigned int cmd)
 		[IOCB_CMD_FSYNC]	= SUB_NONE,
 		[IOCB_CMD_FDSYNC]	= SUB_NONE,
 		[IOCB_CMD_PREADX]	= SUB_NONE,
-		[IOCB_CMD_POLL]		= SUB_NONE,
+		[IOCB_CMD_POLL]		= SUB_POLL,
 		[IOCB_CMD_NOOP]		= SUB_NONE,
 		[IOCB_CMD_PREADV]	= SUB_VECTOR,
 		[IOCB_CMD_PWRITEV]	= SUB_VECTOR,
@@ -79,14 +86,14 @@ tprint_lio_opcode(unsigned int cmd)
 static void
 print_common_flags(struct tcb *tcp, const struct iocb *cb)
 {
-/* IOCB_FLAG_RESFD is available since v2.6.22-rc1~47 */
-#ifdef IOCB_FLAG_RESFD
+	if (cb->aio_flags)
+		PRINT_FIELD_FLAGS(", ", *cb, aio_flags, aio_iocb_flags,
+				  "IOCB_FLAG_???");
+
 	if (cb->aio_flags & IOCB_FLAG_RESFD)
 		PRINT_FIELD_FD(", ", *cb, aio_resfd, tcp);
-
-	if (cb->aio_flags & ~IOCB_FLAG_RESFD)
-		PRINT_FIELD_X(", ", *cb, aio_flags);
-#endif
+	else if (cb->aio_resfd)
+		PRINT_FIELD_X(", ", *cb, aio_resfd);
 }
 
 static bool
@@ -102,20 +109,25 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 {
 	enum iocb_sub sub;
 
-	if (cb->aio_data){
-		PRINT_FIELD_X("", *cb, aio_data);
-		tprints(", ");
+	PRINT_FIELD_X("", *cb, aio_data);
+
+	if (cb->aio_key)
+		PRINT_FIELD_U(", ", *cb, aio_key);
+
+	if (cb->AIO_RW_FLAGS_FIELD) {
+		tprints(", aio_rw_flags=");
+		printflags(rwf_flags, cb->AIO_RW_FLAGS_FIELD, "RWF_???");
 	}
 
-	if (cb->aio_key) {
-		PRINT_FIELD_U("", *cb, aio_key);
-		tprints(", ");
-	}
-
-	tprints("aio_lio_opcode=");
+	tprints(", aio_lio_opcode=");
 	sub = tprint_lio_opcode(cb->aio_lio_opcode);
-	if (cb->aio_reqprio)
+
+	if (cb->aio_flags & IOCB_FLAG_IOPRIO) {
+		tprints(", aio_reqprio=");
+		print_ioprio(zero_extend_signed_to_ull(cb->aio_reqprio));
+	} else if (cb->aio_reqprio) {
 		PRINT_FIELD_D(", ", *cb, aio_reqprio);
+	}
 
 	PRINT_FIELD_FD(", ", *cb, aio_fildes, tcp);
 
@@ -153,6 +165,10 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 			PRINT_FIELD_U(", ", *cb, aio_nbytes);
 		}
 		PRINT_FIELD_D(", ", *cb, aio_offset);
+		print_common_flags(tcp, cb);
+		break;
+	case SUB_POLL:
+		PRINT_FIELD_FLAGS(", ", *cb, aio_buf, pollflags, "POLL???");
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_NONE:

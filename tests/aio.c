@@ -137,10 +137,8 @@ main(void)
 			/* In order to make record valid */
 			.aio_nbytes = (size_t) 0x1020304050607080ULL,
 			.aio_offset = 0xdeadda7abadc0dedULL,
-# ifdef IOCB_FLAG_RESFD
 			.aio_flags = 0xfacef157,
 			.aio_resfd = 0xded1ca7e,
-# endif
 		},
 		{
 			.aio_data = 0,
@@ -318,31 +316,28 @@ main(void)
 	printf("io_submit(%#lx, %ld, ["
 	       "{aio_data=%#" PRI__x64 ", aio_key=%u"
 		", aio_lio_opcode=%hu /* IOCB_CMD_??? */, aio_fildes=%d}"
-		", {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE, aio_reqprio=%hd"
-		", aio_fildes=%d, aio_buf=NULL"
+		", {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+		", aio_reqprio=IOPRIO_PRIO_VALUE(0x5 /* IOPRIO_CLASS_??? */"
+		", 7919), aio_fildes=%d, aio_buf=NULL"
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-# ifdef IOCB_FLAG_RESFD
-		", aio_resfd=%d, aio_flags=%#x"
-# endif
-	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+		", aio_flags=IOCB_FLAG_RESFD|IOCB_FLAG_IOPRIO|%#x, aio_resfd=%d"
+	       "}, {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
 		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+	       "}, {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
 		", aio_reqprio=%hd, aio_fildes=%d"
 		", aio_buf=\"\\0\\1\\2\\3%.28s\"..."
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
+	       "}, {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
 		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
 	       "}, NULL, %#lx, ... /* %p */]) = ",
 	       *ctx, 1057L,
 	       cbv2[0].aio_data, cbv2[0].aio_key,
 	       cbv2[0].aio_lio_opcode, cbv2[0].aio_fildes,
-	       cbv2[1].aio_key, cbv2[1].aio_reqprio, cbv2[1].aio_fildes,
+	       cbv2[1].aio_key, cbv2[1].aio_fildes,
 	       cbv2[1].aio_nbytes, cbv2[1].aio_offset,
-# ifdef IOCB_FLAG_RESFD
-	       cbv2[1].aio_resfd, cbv2[1].aio_flags,
-# endif
+	       cbv2[1].aio_flags & ~3, cbv2[1].aio_resfd,
 	       cbv2[2].aio_key, cbv2[2].aio_reqprio, cbv2[2].aio_fildes,
 	       cbv2[2].aio_buf, cbv2[2].aio_nbytes, cbv2[2].aio_offset,
 	       cbv2[3].aio_key, cbv2[3].aio_reqprio, cbv2[3].aio_fildes,

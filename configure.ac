@@ -605,6 +605,8 @@ fi
 
 AC_CHECK_TYPES([struct __aio_sigset],,, [#include <linux/aio_abi.h>])
 
+AC_CHECK_MEMBERS([struct iocb.aio_rw_flags],,, [#include <linux/aio_abi.h>])
+
 CPPFLAGS="$saved_CPPFLAGS"
 
 AC_CHECK_HEADERS([linux/btrfs.h], [
