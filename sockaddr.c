@@ -43,6 +43,7 @@
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
+#include <linux/x25.h>
 
 #ifdef HAVE_NETIPX_IPX_H
 # include <netipx/ipx.h>
@@ -365,6 +366,24 @@ print_sockaddr_data_ipx(const void *const buf, const int addrlen)
 	PRINT_FIELD_0X("], ", *sa_ipx, sipx_type);
 }
 
+void
+print_x25_addr(const void /* struct x25_address */ *addr_void)
+{
+	const struct x25_address *addr = addr_void;
+
+	tprints("{x25_addr=");
+	print_quoted_cstring(addr->x25_addr, sizeof(addr->x25_addr));
+	tprints("}");
+}
+
+static void
+print_sockaddr_data_x25(const void *const buf, const int addrlen)
+{
+	const struct sockaddr_x25 *const sa_x25 = buf;
+
+	PRINT_FIELD_X25_ADDR("", *sa_x25, sx25_addr);
+}
+
 static void
 print_sockaddr_data_nl(const void *const buf, const int addrlen)
 {
@@ -587,6 +606,7 @@ static const struct {
 	[AF_INET] = { print_sockaddr_data_in, sizeof(struct sockaddr_in) },
 	[AF_AX25] = { print_sockaddr_data_ax25, sizeof(struct sockaddr_ax25) },
 	[AF_IPX] = { print_sockaddr_data_ipx, sizeof(struct sockaddr_ipx) },
+	[AF_X25] = { print_sockaddr_data_x25, sizeof(struct sockaddr_x25) },
 	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },

@@ -42,6 +42,7 @@
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
+#include <linux/x25.h>
 #include <linux/ipx.h>
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
@@ -434,6 +435,38 @@ check_ax25(void)
 }
 
 static void
+check_x25(void)
+{
+	static const struct sockaddr_x25 c_x25 = {
+		.sx25_family = AF_X25,
+		.sx25_addr = { "0123456789abcdef" },
+	};
+	void *x25_void = tail_memdup(&c_x25, sizeof(c_x25) + 1);
+	struct sockaddr_x25 *x25 = x25_void;
+	long rc;
+
+	rc = connect(-1, x25, sizeof(c_x25) - 1);
+	printf("connect(-1, {sa_family=AF_X25"
+	       ", sa_data=\"0123456789abcde\"}, %zu) = %s\n",
+	       sizeof(c_x25) - 1, sprintrc(rc));
+
+	for (size_t i = 0; i < 2; i++) {
+		rc = connect(-1, x25, sizeof(c_x25) + i);
+		printf("connect(-1, {sa_family=AF_X25"
+		       ", sx25_addr={x25_addr=\"0123456789abcde\"...}"
+		       "}, %zu) = %s\n",
+		       sizeof(c_x25) + i, sprintrc(rc));
+	}
+
+	x25->sx25_addr.x25_addr[10] = '\0';
+	rc = connect(-1, x25, sizeof(c_x25));
+	printf("connect(-1, {sa_family=AF_X25"
+	       ", sx25_addr={x25_addr=\"0123456789\"}"
+	       "}, %zu) = %s\n",
+	       sizeof(c_x25), sprintrc(rc));
+}
+
+static void
 check_nl(void)
 {
 	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_nl, nl);
@@ -699,6 +732,7 @@ main(void)
 	check_in6();
 	check_ipx();
 	check_ax25();
+	check_x25();
 	check_nl();
 	check_ll();
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
