@@ -1,14 +1,42 @@
 POLLIN		0x0001
 POLLPRI		0x0002
 POLLOUT		0x0004
-POLLRDNORM	0x0040
-POLLWRNORM
-POLLRDBAND	0x0080
-POLLWRBAND
 POLLERR		0x0008
 POLLHUP		0x0010
 POLLNVAL	0x0020
-POLLMSG
-POLLREMOVE
-POLLRDHUP
+POLLRDNORM	0x0040
+POLLRDBAND	0x0080
+
+#if defined(__m68k__) || defined(__mips__) || defined(__sparc__) || defined(__xtensa__)
+/* POLLWRNORM	POLLOUT */
+#else
+POLLWRNORM	0x0100
+#endif
+
+#if defined(__m68k__) || defined(__mips__) || defined(__sparc__) || defined(__xtensa__)
+POLLWRBAND	0x0100
+#else
+POLLWRBAND	0x0200
+#endif
+
+#if defined(__sparc__)
+POLLMSG		0x0200
+#else
+POLLMSG		0x0400
+#endif
+
+#if defined(__sparc__)
+POLLREMOVE	0x0400
+#elif defined(__xtensa__)
+POLLREMOVE	0x0800
+#else
+POLLREMOVE	0x1000
+#endif
+
+#if defined(__sparc__)
+POLLRDHUP	0x0800
+#else
+POLLRDHUP	0x2000
+#endif
+
 POLL_BUSY_LOOP	0x8000
