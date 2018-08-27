@@ -949,6 +949,7 @@ fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr);
 extern void
 print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr);
 
+extern const char *get_ifname(const unsigned int ifindex);
 extern void print_ifindex(unsigned int);
 
 extern void print_bpf_filter_code(const uint16_t code, bool extended);
