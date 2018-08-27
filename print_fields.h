@@ -195,6 +195,12 @@
 		print_x25_addr(&(where_).field_);			\
 	} while (0)
 
+#define PRINT_FIELD_ROSE_ADDR(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_rose_addr(&(where_).field_);			\
+	} while (0)
+
 #define PRINT_FIELD_NET_PORT(prefix_, where_, field_)			\
 	STRACE_PRINTF("%s%s=htons(%u)", (prefix_), #field_,		\
 		      ntohs((where_).field_))

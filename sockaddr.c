@@ -43,6 +43,7 @@
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
+#include <linux/rose.h>
 #include <linux/x25.h>
 
 #ifdef HAVE_NETIPX_IPX_H
@@ -384,6 +385,61 @@ print_sockaddr_data_x25(const void *const buf, const int addrlen)
 	PRINT_FIELD_X25_ADDR("", *sa_x25, sx25_addr);
 }
 
+void
+print_rose_addr(const void /* rose_address */ *addr_void)
+{
+	const rose_address *addr = addr_void;
+
+	if (IS_ARRAY_ZERO(addr->rose_addr)) {
+		tprints("*");
+		return;
+	}
+
+	tprintf("%02x%02x%02x%02x%02x",
+		addr->rose_addr[0], addr->rose_addr[1], addr->rose_addr[2],
+		addr->rose_addr[3], addr->rose_addr[4]);
+}
+
+static void
+print_sockaddr_data_rose(const void *const buf, const int addrlen)
+{
+	const struct full_sockaddr_rose *const sa_rose = buf;
+	size_t addrlen_us = MAX(addrlen, 0);
+
+	PRINT_FIELD_ROSE_ADDR("", *sa_rose, srose_addr);
+	PRINT_FIELD_X25_ADDR(", ", *sa_rose, srose_call);
+	PRINT_FIELD_U(", ", *sa_rose, srose_ndigis);
+
+	size_t has_digis = MIN((addrlen_us - offsetof(struct full_sockaddr_rose,
+						      srose_digis))
+			       / sizeof(sa_rose->srose_digis[0]),
+			       ARRAY_SIZE(sa_rose->srose_digis));
+	size_t want_digis =
+		MIN(sa_rose->srose_ndigis, ARRAY_SIZE(sa_rose->srose_digis));
+	size_t digis = MIN(has_digis, want_digis);
+
+	if (want_digis == 0)
+		goto digis_end;
+
+	tprints(", srose_digis=[");
+	for (size_t i = 0; i < digis; i++) {
+		if (i)
+			tprints(", ");
+
+		print_ax25_addr(sa_rose->srose_digis + i);
+	}
+
+	if (want_digis > has_digis)
+		tprintf("%s/* ??? */", digis ? ", " : "");
+
+	tprints("]");
+
+digis_end:
+	if (addrlen_us > (has_digis * sizeof(sa_rose->srose_digis[0])
+		       + offsetof(struct full_sockaddr_rose, srose_digis)))
+		tprints(", ...");
+}
+
 static void
 print_sockaddr_data_nl(const void *const buf, const int addrlen)
 {
@@ -608,6 +664,7 @@ static const struct {
 	[AF_IPX] = { print_sockaddr_data_ipx, sizeof(struct sockaddr_ipx) },
 	[AF_X25] = { print_sockaddr_data_x25, sizeof(struct sockaddr_x25) },
 	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
+	[AF_ROSE] = { print_sockaddr_data_rose, sizeof(struct sockaddr_rose) },
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
