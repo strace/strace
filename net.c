@@ -86,6 +86,7 @@
 
 #define XLAT_MACROS_ONLY
 # include "xlat/addrfams.h"
+# include "xlat/ethernet_protocols.h"
 #undef XLAT_MACROS_ONLY
 #include "xlat/irda_protocols.h"
 #include "xlat/can_protocols.h"
@@ -146,6 +147,13 @@ SYS_FUNC(socket)
 
 	case AF_NETLINK:
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
+		break;
+
+	case AF_PACKET:
+		tprints("htons(");
+		printxval_searchn(ethernet_protocols, ethernet_protocols_size,
+				  ntohs(tcp->u_arg[2]), "ETH_P_???");
+		tprints(")");
 		break;
 
 	case AF_IRDA:
