@@ -29,21 +29,7 @@
 #include "defs.h"
 #include "xstring.h"
 
-enum {
-	IOPRIO_WHO_PROCESS = 1,
-	IOPRIO_WHO_PGRP,
-	IOPRIO_WHO_USER
-};
-
 #include "xlat/ioprio_who.h"
-
-enum {
-	IOPRIO_CLASS_NONE,
-	IOPRIO_CLASS_RT,
-	IOPRIO_CLASS_BE,
-	IOPRIO_CLASS_IDLE
-};
-
 #include "xlat/ioprio_class.h"
 
 #define IOPRIO_CLASS_SHIFT	(13)
