@@ -48,6 +48,10 @@
 
 #include "xstring.h"
 
+#define XLAT_MACROS_ONLY
+# include "xlat/inet_protocols.h"
+#undef XLAT_MACROS_ONLY
+
 typedef struct {
 	unsigned long inode;
 	char *details;
@@ -451,14 +455,43 @@ static const struct {
 	int proto;
 } protocols[] = {
 	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
+	/*
+	 * inet_diag handlers are currently implemented only for TCP,
+	 * UDP(lite), SCTP, RAW, and DCCP, but we try to resolve it for all
+	 * protocols anyway, just in case.
+	 */
 	[SOCK_PROTO_TCP]	=
 		{ "TCP",	inet_get, AF_INET,  IPPROTO_TCP },
 	[SOCK_PROTO_UDP]	=
 		{ "UDP",	inet_get, AF_INET,  IPPROTO_UDP },
+	[SOCK_PROTO_UDPLITE]	=
+		{ "UDPLITE",	inet_get, AF_INET,  IPPROTO_UDPLITE },
+	[SOCK_PROTO_DCCP]	=
+		{ "DCCP",	inet_get, AF_INET,  IPPROTO_DCCP },
+	[SOCK_PROTO_SCTP]	=
+		{ "SCTP",	inet_get, AF_INET,  IPPROTO_SCTP },
+	[SOCK_PROTO_L2TP_IP]	=
+		{ "L2TP/IP",	inet_get, AF_INET,  IPPROTO_L2TP },
+	[SOCK_PROTO_PING]	=
+		{ "PING",	inet_get, AF_INET,  IPPROTO_ICMP },
+	[SOCK_PROTO_RAW]	=
+		{ "RAW",	inet_get, AF_INET,  IPPROTO_RAW },
 	[SOCK_PROTO_TCPv6]	=
 		{ "TCPv6",	inet_get, AF_INET6, IPPROTO_TCP },
 	[SOCK_PROTO_UDPv6]	=
 		{ "UDPv6",	inet_get, AF_INET6, IPPROTO_UDP },
+	[SOCK_PROTO_UDPLITEv6]	=
+		{ "UDPLITEv6",	inet_get, AF_INET6, IPPROTO_UDPLITE },
+	[SOCK_PROTO_DCCPv6]	=
+		{ "DCCPv6",	inet_get, AF_INET6, IPPROTO_DCCP },
+	[SOCK_PROTO_SCTPv6]	=
+		{ "SCTPv6",	inet_get, AF_INET6, IPPROTO_SCTP },
+	[SOCK_PROTO_L2TP_IPv6]	=
+		{ "L2TP/IPv6",	inet_get, AF_INET6, IPPROTO_L2TP },
+	[SOCK_PROTO_PINGv6]	=
+		{ "PINGv6",	inet_get, AF_INET6, IPPROTO_ICMP },
+	[SOCK_PROTO_RAWv6]	=
+		{ "RAWv6",	inet_get, AF_INET6, IPPROTO_RAW },
 	[SOCK_PROTO_NETLINK]	= { "NETLINK",	netlink_get,	AF_NETLINK },
 };
 
