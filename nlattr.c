@@ -101,7 +101,8 @@ decode_nlattr_with_data(struct tcb *const tcp,
 	print_nlattr(nla, table, dflt);
 
 	if (nla_len > NLA_HDRLEN) {
-		const unsigned int idx = size ? nla->nla_type : 0;
+		const unsigned int idx =
+			size ? nla->nla_type & NLA_TYPE_MASK : 0;
 
 		tprints(", ");
 		if (!decoders
