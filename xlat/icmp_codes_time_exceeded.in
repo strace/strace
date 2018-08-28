@@ -1,0 +1,3 @@
+#value_indexed
+ICMP_EXC_TTL		0
+ICMP_EXC_FRAGTIME	1

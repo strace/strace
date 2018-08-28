@@ -38,6 +38,14 @@
 # include "netlink.h"
 # include <linux/netfilter/nfnetlink.h>
 
+# include "xlat/icmp_codes_redirect.h"
+# include "xlat/icmp_codes_time_exceeded.h"
+# include "xlat/icmp_codes_unreach.h"
+# include "xlat/icmp_types.h"
+# include "xlat/icmpv6_codes_parameter.h"
+# include "xlat/icmpv6_codes_time_exceeded.h"
+# include "xlat/icmpv6_codes_unreach.h"
+# include "xlat/icmpv6_types.h"
 # include "xlat/netfilter_versions.h"
 # include "xlat/nf_acct_attr_names.h"
 # include "xlat/nf_cthelper_attr_names.h"
@@ -49,6 +57,17 @@
 # include "xlat/nf_osf_attr_names.h"
 # include "xlat/nf_queue_attr_names.h"
 # include "xlat/nf_ulog_attr_names.h"
+# include "xlat/nfnl_ct_ip_attrs.h"
+# include "xlat/nfnl_ct_proto_attrs.h"
+# include "xlat/nfnl_ct_protoinfo_attrs.h"
+# include "xlat/nfnl_ct_protoinfo_dccp_attrs.h"
+# include "xlat/nfnl_ct_protoinfo_sctp_attrs.h"
+# include "xlat/nfnl_ct_protoinfo_tcp_attrs.h"
+# include "xlat/nfnl_ct_status.h"
+# include "xlat/nfnl_ct_tcp_flags.h"
+# include "xlat/nfnl_ct_tcp_states.h"
+# include "xlat/nfnl_ct_tuple_attrs.h"
+# include "xlat/nfnl_zones.h"
 # include "xlat/nft_chain_attr_names.h"
 # include "xlat/nft_flow_attr_names.h"
 # include "xlat/nft_gen_attr_names.h"
@@ -60,6 +79,7 @@
 # include "xlat/nft_trace_attr_names.h"
 # include "xlat/nl_netfilter_msg_types.h"
 # include "xlat/nl_netfilter_subsys_ids.h"
+
 
 # define XLAT_MACROS_ONLY
 #  include "xlat/nl_netfilter_subsys_ids.h"
@@ -130,9 +150,366 @@ static const struct nfnl_decoder nft_subsystem_decoders[] = {
 		{ nft_flow_attr_names,		"NFTA_FLOW_???", },
 };
 
+static const nla_decoder_t nfnl_ct_ip_decoders[] = {
+	[CTA_IP_V4_SRC]		= decode_nla_in_addr,
+	[CTA_IP_V4_DST]		= decode_nla_in_addr,
+	[CTA_IP_V6_SRC]		= decode_nla_in6_addr,
+	[CTA_IP_V6_DST]		= decode_nla_in6_addr,
+};
+
+static bool
+decode_cta_ip(struct tcb *const tcp,
+	      const kernel_ulong_t addr,
+	      const unsigned int len,
+	      const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, nfnl_ct_ip_attrs, "CTA_IP_???",
+		      ARRSZ_PAIR(nfnl_ct_ip_decoders), opaque_data);
+
+	return true;
+}
+
+struct cta_proto_ctx {
+	uint8_t icmp_type_seen   :1,
+		icmpv6_type_seen :1;
+
+	uint8_t icmp_type;
+	uint8_t icmpv6_type;
+};
+
+static bool
+decode_cta_icmp_type(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	struct cta_proto_ctx *ctx = (void *) opaque_data;
+	uint8_t type;
+
+	if (len < sizeof(type))
+		return false;
+	if (!umove_or_printaddr(tcp, addr, &type))
+		printxval(icmp_types, type, "ICMP_???");
+
+	if (ctx) {
+		ctx->icmp_type_seen = 1;
+		ctx->icmp_type = type;
+	}
+
+	return true;
+}
+
+static bool
+decode_cta_icmp_code(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	static const struct {
+		uint16_t type;
+		const struct xlat *xlat;
+		const char *dflt;
+	} codes[] = {
+		{ ICMP_DEST_UNREACH,	icmp_codes_unreach,
+			"ICMP_???" },
+		{ ICMP_REDIRECT,	icmp_codes_redirect,
+			"ICMP_REDIR_???" },
+		{ ICMP_TIME_EXCEEDED,	icmp_codes_time_exceeded,
+			"ICMP_EXC_???" },
+	};
+
+	struct cta_proto_ctx *ctx = (void *) opaque_data;
+	uint8_t code;
+
+	if (len < sizeof(code))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &code))
+		return true;
+
+	if (!ctx || !ctx->icmp_type_seen)
+		goto type_not_found;
+
+	for (size_t i = 0; i < ARRAY_SIZE(codes); i++) {
+		if (codes[i].type == ctx->icmp_type) {
+			printxval(codes[i].xlat, code, codes[i].dflt);
+			return true;
+		}
+	}
+
+type_not_found:
+	tprintf("%#hhx", code);
+
+	return true;
+}
+
+static bool
+decode_cta_icmpv6_type(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	struct cta_proto_ctx *ctx = (void *) opaque_data;
+	uint8_t type;
+
+	if (len < sizeof(type))
+		return false;
+	if (!umove_or_printaddr(tcp, addr, &type))
+		printxval(icmpv6_types, type, "ICMPV6_???");
+
+	if (ctx) {
+		ctx->icmpv6_type_seen = 1;
+		ctx->icmpv6_type = type;
+	}
+
+	return true;
+}
+
+static bool
+decode_cta_icmpv6_code(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	static const struct code_data {
+		const struct xlat *xlat;
+		const char *dflt;
+	} codes[] = {
+		[ICMPV6_DEST_UNREACH] =
+			{ icmpv6_codes_unreach,		"ICMPV6_???" },
+		[ICMPV6_TIME_EXCEED] =
+			{ icmpv6_codes_time_exceeded,	"ICMPV6_EXC_???" },
+		[ICMPV6_PARAMPROB] =
+			{ icmpv6_codes_parameter,	"ICMPV6_???" },
+	};
+
+	struct cta_proto_ctx *ctx = (void *) opaque_data;
+	uint8_t code;
+
+	if (len < sizeof(code))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &code))
+		return true;
+
+	if (!ctx || !ctx->icmpv6_type_seen
+	    || ctx->icmpv6_type >= ARRAY_SIZE(codes)
+	    || !codes[ctx->icmpv6_type].xlat) {
+		tprintf("%#hhx", code);
+		return true;
+	}
+
+	const struct code_data *c = codes + ctx->icmpv6_type;
+	printxval(c->xlat, code, c->dflt);
+
+	return true;
+}
+
+static const nla_decoder_t nfnl_ct_proto_decoders[] = {
+	[CTA_PROTO_NUM]		= decode_nla_ip_proto,
+	[CTA_PROTO_SRC_PORT]	= decode_nla_be16,
+	[CTA_PROTO_DST_PORT]	= decode_nla_be16,
+	[CTA_PROTO_ICMP_ID]	= decode_nla_be16,
+	[CTA_PROTO_ICMP_TYPE]	= decode_cta_icmp_type,
+	[CTA_PROTO_ICMP_CODE]	= decode_cta_icmp_code,
+	[CTA_PROTO_ICMPV6_ID]	= decode_nla_be16,
+	[CTA_PROTO_ICMPV6_TYPE]	= decode_cta_icmpv6_type,
+	[CTA_PROTO_ICMPV6_CODE]	= decode_cta_icmpv6_code,
+};
+
+static bool
+decode_cta_proto(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const void *const opaque_data)
+{
+	struct cta_proto_ctx ctx = { 0 };
+
+	decode_nlattr(tcp, addr, len, nfnl_ct_proto_attrs, "CTA_PROTO_???",
+		      ARRSZ_PAIR(nfnl_ct_proto_decoders), &ctx);
+
+	return true;
+}
+
+
+static const nla_decoder_t nfnl_ct_tuple_decoders[] = {
+	[CTA_TUPLE_IP]		= decode_cta_ip,
+	[CTA_TUPLE_PROTO]	= decode_cta_proto,
+	[CTA_TUPLE_ZONE]	= decode_nla_be16,
+};
+
+static bool
+decode_cta_tuple(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 const unsigned int len,
+		 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, nfnl_ct_tuple_attrs, "CTA_TUPLE_???",
+		      ARRSZ_PAIR(nfnl_ct_tuple_decoders), opaque_data);
+
+	return true;
+}
+
+static bool
+decode_cta_status(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	uint32_t status;
+
+	if (len < sizeof(status))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &status))
+		return true;
+
+	status = ntohs(status);
+	tprints("htons(");
+	printflags(nfnl_ct_status, status, "IPS_???");
+	tprints(")");
+
+	return true;
+}
+
+static bool
+decode_cta_tcp_state(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	uint32_t state;
+
+	if (len < sizeof(state))
+		return false;
+	if (!umove_or_printaddr(tcp, addr, &state))
+		printxval(nfnl_ct_tcp_states, state, "TCP_CONNTRACK_???");
+
+	return true;
+}
+
+static bool
+decode_cta_tcp_flags(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	uint8_t flags[2];
+
+	if (len < sizeof(flags))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &flags))
+		return true;
+
+	tprints("{flags=");
+	printflags(nfnl_ct_tcp_flags, flags[0], "IP_CT_???");
+	tprints(", mask=");
+	printflags(nfnl_ct_tcp_flags, flags[1], "IP_CT_???");
+	tprints("}");
+
+	return true;
+}
+
+static const nla_decoder_t nfnl_ct_protoinfo_tcp_decoders[] = {
+	[CTA_PROTOINFO_TCP_STATE]		= decode_cta_tcp_state,
+	[CTA_PROTOINFO_TCP_WSCALE_ORIGINAL]	= decode_nla_u8,
+	[CTA_PROTOINFO_TCP_WSCALE_REPLY]	= decode_nla_u8,
+	[CTA_PROTOINFO_TCP_FLAGS_ORIGINAL]	= decode_cta_tcp_flags,
+	[CTA_PROTOINFO_TCP_FLAGS_REPLY]		= decode_cta_tcp_flags,
+};
+
+static bool
+decode_cta_protoinfo_tcp(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, nfnl_ct_protoinfo_tcp_attrs,
+		      "CTA_PROTOINFO_TCP_???",
+		      ARRSZ_PAIR(nfnl_ct_protoinfo_tcp_decoders), opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t nfnl_ct_protoinfo_dccp_decoders[] = {
+};
+
+static bool
+decode_cta_protoinfo_dccp(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, nfnl_ct_protoinfo_dccp_attrs,
+		      "CTA_PROTOINFO_DCCP_???",
+		      ARRSZ_PAIR(nfnl_ct_protoinfo_dccp_decoders), opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t nfnl_ct_protoinfo_sctp_decoders[] = {
+};
+
+static bool
+decode_cta_protoinfo_sctp(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, nfnl_ct_protoinfo_sctp_attrs,
+		      "CTA_PROTOINFO_SCTP_???",
+		      ARRSZ_PAIR(nfnl_ct_protoinfo_sctp_decoders), opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t nfnl_ct_protoinfo_decoders[] = {
+	[CTA_PROTOINFO_TCP]	= decode_cta_protoinfo_tcp,
+	[CTA_PROTOINFO_DCCP]	= decode_cta_protoinfo_dccp,
+	[CTA_PROTOINFO_SCTP]	= decode_cta_protoinfo_sctp,
+};
+
+static bool
+decode_cta_protoinfo(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, nfnl_ct_protoinfo_attrs,
+		      "CTA_PROTOINFO_???",
+		      ARRSZ_PAIR(nfnl_ct_protoinfo_decoders), opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t nf_ctnetlink_decoders[] = {
+	[CTA_TUPLE_ORIG]	= decode_cta_tuple,
+	[CTA_TUPLE_REPLY]	= decode_cta_tuple,
+	[CTA_STATUS]		= decode_cta_status,
+	[CTA_PROTOINFO]		= decode_cta_protoinfo,
+	[CTA_HELP]		= decode_nla_u32,
+	[CTA_NAT_SRC]		= decode_nla_u32,
+	[CTA_TIMEOUT]		= decode_nla_u32,
+	[CTA_MARK]		= decode_nla_u32,
+	[CTA_COUNTERS_ORIG]	= decode_nla_u32,
+	[CTA_COUNTERS_REPLY]	= decode_nla_u32,
+	[CTA_USE]		= decode_nla_u32,
+	[CTA_ID]		= decode_nla_u32,
+	[CTA_NAT_DST]		= decode_nla_u32,
+	[CTA_TUPLE_MASTER]	= decode_nla_u32,
+	[CTA_SEQ_ADJ_ORIG]	= decode_nla_u32,
+	[CTA_SEQ_ADJ_REPLY]	= decode_nla_u32,
+	[CTA_SECMARK]		= decode_nla_u32,
+	[CTA_ZONE]		= decode_nla_u32,
+	[CTA_SECCTX]		= decode_nla_u32,
+	[CTA_TIMESTAMP]		= decode_nla_u32,
+	[CTA_MARK_MASK]		= decode_nla_u32,
+	[CTA_LABELS]		= decode_nla_u32,
+	[CTA_LABELS_MASK]	= decode_nla_u32,
+	[CTA_SYNPROXY]		= decode_nla_u32,
+};
+
 static const struct nfnl_decoder nfnl_subsystems[] = {
 	[NFNL_SUBSYS_CTNETLINK] =
-		{ nf_ctnetlink_attr_names,	"CTA_???", },
+		{ nf_ctnetlink_attr_names,	"CTA_???",
+		  ARRSZ_PAIR(nf_ctnetlink_decoders) },
 	[NFNL_SUBSYS_CTNETLINK_EXP] =
 		{ nf_ctnetlink_exp_attr_names,	"CTA_EXPECT_???", },
 	[NFNL_SUBSYS_QUEUE] =
