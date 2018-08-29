@@ -166,6 +166,9 @@ void invalid_op(int *val, int op, uint32_t argmask, ...)
 # define VAL3     ((unsigned long) 0xbadda7a09caffee1LLU)
 # define VAL3_PR  ((unsigned) VAL3)
 
+# define VAL3A    ((unsigned long) 0xbadda7a0ffffffffLLU)
+# define VAL3A_PR "FUTEX_BITSET_MATCH_ANY"
+
 int
 main(int argc, char *argv[])
 {
@@ -288,6 +291,14 @@ main(int argc, char *argv[])
 	       zero_extend_signed_to_ull(tmout->tv_nsec), VAL3_PR,
 	       sprintrc(rc));
 
+	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAIT_BITSET, VAL, tmout, uaddr2 + 1,
+		VAL3A, (rc == -1) && (errno == EAGAIN));
+	printf("futex(%p, FUTEX_WAIT_BITSET, %u, {tv_sec=%lld, tv_nsec=%llu}"
+	       ", %s) = %s\n",
+	       uaddr, VAL_PR, (long long) tmout->tv_sec,
+	       zero_extend_signed_to_ull(tmout->tv_nsec), VAL3A_PR,
+	       sprintrc(rc));
+
 	/* val3 of 0 is invalid  */
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAIT_BITSET, VAL, tmout, uaddr2 + 1, 0,
 		(rc == -1) && (errno == EINVAL));
@@ -374,6 +385,11 @@ main(int argc, char *argv[])
 		VAL3, (rc == 0));
 	printf("futex(%p, FUTEX_WAKE_BITSET, %u, %#x) = %s\n", uaddr, 10,
 		VAL3_PR, sprintrc(rc));
+
+	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAKE_BITSET, 10, NULL, NULL,
+		VAL3A, (rc == 0));
+	printf("futex(%p, FUTEX_WAKE_BITSET, %u, %s) = %s\n", uaddr, 10,
+		VAL3A_PR, sprintrc(rc));
 
 	/* bitset 0 is invalid */
 	CHECK_FUTEX_ENOSYS(uaddr, FUTEX_WAKE_BITSET, 10, NULL, NULL, 0,
