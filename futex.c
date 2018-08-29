@@ -41,6 +41,7 @@
 # define FUTEX_OP_OPARG_SHIFT 8
 #endif
 
+#include "xlat/futexbitset.h"
 #include "xlat/futexops.h"
 #include "xlat/futexwakeops.h"
 #include "xlat/futexwakecmps.h"
@@ -74,11 +75,13 @@ SYS_FUNC(futex)
 		tprintf(", %u", val);
 		tprints(", ");
 		print_timespec(tcp, timeout);
-		tprintf(", %#x", val3);
+		tprints(", ");
+		printxval(futexbitset, val3, NULL);
 		break;
 	case FUTEX_WAKE_BITSET:
 		tprintf(", %u", val);
-		tprintf(", %#x", val3);
+		tprints(", ");
+		printxval(futexbitset, val3, NULL);
 		break;
 	case FUTEX_REQUEUE:
 		tprintf(", %u", val);
