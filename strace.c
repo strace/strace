@@ -2168,6 +2168,11 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 		} else
 			tprintf("--- stopped by %s ---\n", signame(sig));
 		line_ended();
+
+#ifdef ENABLE_STACKTRACE
+		if (stack_trace_enabled)
+			unwind_tcb_print(tcp);
+#endif
 	}
 }
 
