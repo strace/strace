@@ -95,88 +95,13 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFHWADDR:
 	case SIOCGIFHWADDR: {
-		static uint8_t hwaddr_sizes[] = {
-			[0 ... ARPHRD_IEEE802_TR] = 255,
-
-			[ARPHRD_NETROM]     =  7 /* AX25_ADDR_LEN */,
-			[ARPHRD_ETHER]      =  6 /* ETH_ALEN */,
-			/* ARPHRD_EETHER - no actual devices in Linux */
-			[ARPHRD_AX25]       =  7 /* AX25_ADDR_LEN */,
-			/* ARPHRD_PRONET - no actual devices in Linux */
-			/* ARPHRD_CHAOS - no actual devices in Linux */
-			[ARPHRD_IEEE802]    =  6 /* FC_ALEN */,
-			[ARPHRD_ARCNET]     =  1 /* ARCNET_ALEN */,
-			/* ARPHRD_APPLETLK - no actual devices in Linux */
-			[ARPHRD_DLCI]       = sizeof(short),
-			/* ARPHRD_ATM - no explicit setting */
-			/* ARPHRD_METRICOM - no actual devices in Linux */
-			[ARPHRD_IEEE1394]   = 16 /* FWNET_ALEN */,
-			[ARPHRD_EUI64]      =  8 /* EUI64_ADDR_LEN */,
-			[ARPHRD_INFINIBAND] = 20 /* INFINIBAND_ALEN */,
-			[ARPHRD_SLIP]       =  0,
-			/* ARPHRD_CSLIP - no actual devices in Linux */
-			/* ARPHRD_SLIP6 - no actual devices in Linux */
-			/* ARPHRD_CSLIP6 - no actual devices in Linux */
-			/* ARPHRD_RSRVD - no actual devices in Linux */
-			/* ARPHRD_ADAPT - no actual devices in Linux */
-			[ARPHRD_ROSE]       =  5 /* ROSE_ADDR_LEN */,
-			[ARPHRD_X25]        =  0,
-			/* ARPHRD_HWX25 - no actual devices in Linux */
-			[ARPHRD_CAN]        =  0,
-			[ARPHRD_PPP]        =  0,
-			/* ARPHRD_CISCO - no actual devices in Linux */
-			/* ARPHRD_LAPB - no actual devices in Linux */
-			/* ARPHRD_DDCMP - no actual devices in Linux */
-			[ARPHRD_RAWHDLC]    =  0,
-			[ARPHRD_RAWIP]      =  0,
-			[ARPHRD_TUNNEL]     =  4 /* IPIP */,
-			[ARPHRD_TUNNEL6]    = 16 /* sizeof(struct in6_addr) */,
-			/* ARPHRD_FRAD - no actual devices in Linux */
-			/* ARPHRD_SKIP - no actual devices in Linux */
-			[ARPHRD_LOOPBACK]   =  6 /* ETH_ALEN */,
-			[ARPHRD_LOCALTLK]   =  1 /* LTALK_ALEN */,
-			[ARPHRD_FDDI]       =  6 /* FDDI_K_ALEN */,
-			/* ARPHRD_BIF - no actual devices in Linux */
-			[ARPHRD_SIT]        =  4,
-			[ARPHRD_IPDDP]      =  0,
-			[ARPHRD_IPGRE]      =  4,
-			[ARPHRD_PIMREG]     =  0,
-			[ARPHRD_HIPPI]      =  6 /* HIPPI_ALEN */,
-			/* ARPHRD_ASH - no actual devices in Linux */
-			/* ARPHRD_ECONET - no actual devices in Linux */
-			[ARPHRD_IRDA]       =  4 /* LAP_ALEN */,
-			/* ARPHRD_FCPP - no actual devices in Linux */
-			/* ARPHRD_FCAL - no actual devices in Linux */
-			/* ARPHRD_FCPL - no actual devices in Linux */
-			/* ARPHRD_FCFABRIC - no actual devices in Linux */
-			/* ARPHRD_IEEE802_TR - no actual devices in Linux */
-			[ARPHRD_IEEE80211]  =  6 /* ETH_ALEN */,
-			[ARPHRD_IEEE80211_PRISM] = 6 /* ETH_ALEN */,
-			[ARPHRD_IEEE80211_RADIOTAP] = 6 /* ETH_ALEN */,
-			[ARPHRD_IEEE802154]
-				= 8 /* IEEE802154_EXTENDED_ADDR_LEN */,
-			[ARPHRD_IEEE802154_MONITOR]
-				= 8 /* IEEE802154_EXTENDED_ADDR_LEN */,
-			[ARPHRD_PHONET]     =  1,
-			[ARPHRD_PHONET_PIPE] = 1,
-			[ARPHRD_CAIF]       =  0,
-			[ARPHRD_IP6GRE]     = 16 /* sizeof(struct in6_addr) */,
-			[ARPHRD_NETLINK]    =  0,
-			[ARPHRD_6LOWPAN]    =  8 /* EUI64_ADDR_LEN */
-				/* ^ or ETH_ALEN, depending on lltype */,
-			[ARPHRD_VSOCKMON]   =  0,
-		};
-
-		uint16_t proto = ifr->ifr_hwaddr.sa_family;
-		uint8_t sz = (proto < ARRAY_SIZE(hwaddr_sizes))
-				? hwaddr_sizes[proto] : 255;
-
 		PRINT_FIELD_XVAL_SORTED_SIZED("ifr_hwaddr={", ifr->ifr_hwaddr,
 					      sa_family, arp_hardware_types,
 					      arp_hardware_types_size,
 					      "ARPHRD_???");
-		PRINT_FIELD_MAC_SZ(", ", ifr->ifr_hwaddr, sa_data,
-				   MIN(sizeof(ifr->ifr_hwaddr.sa_data), sz));
+		PRINT_FIELD_HWADDR_SZ(", ", ifr->ifr_hwaddr, sa_data,
+				      sizeof(ifr->ifr_hwaddr.sa_data),
+				      ifr->ifr_hwaddr.sa_family);
 		tprints("}");
 		break;
 	}
