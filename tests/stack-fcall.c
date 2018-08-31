@@ -2,6 +2,7 @@
 
 int main(int argc, char **argv)
 {
-	f0(argc);
+	f0(0);
+	f0(1);
 	return 0;
 }

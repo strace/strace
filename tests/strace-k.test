@@ -43,13 +43,38 @@ run_prog "${test_prog=../stack-fcall}"
 run_strace -e getpid -k $args
 
 expected="$srcdir/$NAME.expected"
-sed -r -n '1,/\(main\+0x[a-f0-9]+\) .*/ s/^[^(]+\(([^+]+)\+0x[a-f0-9]+\) .*/\1/p' "$LOG" |
-	tr '\n' ' ' |sed 's/ $//' > "$OUT"
+awk '
+/^[^ ]/ {
+	if (out != "")
+		print out
+
+	syscall = gensub(/^([[:alnum:]_]+)\(.*/, "\\1", 1)
+	signal = gensub(/^--- ([A-Z]+) .*/, "\\1", 1)
+
+	if (syscall != $0) {
+		out = syscall
+		stop = 0
+	} else if (signal != $0) {
+		out = signal
+		stop = 0
+	} else {
+		out = ""
+	}
+}
+
+/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) / && !stop {
+	sym = gensub(/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) .*$/, "\\1", 1)
+	out = out " " sym
+	if (sym == "main")
+		stop = 1
+}' "$LOG" > "$OUT"
 
 LC_ALL=C grep -E -x -f "$expected" < "$OUT" > /dev/null || {
 	cat >&2 <<__EOF__
-Failed pattern of expected output: $(cat "$expected")
-Actual output: $(cat "$OUT")
+Failed pattern of expected output:
+$(cat "$expected")
+Actual output:
+$(cat "$OUT")
 __EOF__
 
 	pattern=
