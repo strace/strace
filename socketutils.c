@@ -36,6 +36,7 @@
 typedef struct {
 	unsigned long inode;
 	char *details;
+	bool has_data;
 } cache_entry;
 
 #define CACHE_SIZE 1024U
@@ -43,12 +44,13 @@ static cache_entry cache[CACHE_SIZE];
 #define CACHE_MASK (CACHE_SIZE - 1)
 
 static int
-cache_inode_details(const unsigned long inode, char *const details)
+cache_inode_details(const unsigned long inode, char *const details, bool data)
 {
 	cache_entry *e = &cache[inode & CACHE_MASK];
 	free(e->details);
 	e->inode = inode;
 	e->details = details;
+	e->has_data = data;
 
 	return 1;
 }
@@ -58,6 +60,14 @@ get_sockaddr_by_inode_cached(const unsigned long inode)
 {
 	const cache_entry *const e = &cache[inode & CACHE_MASK];
 	return (e && inode == e->inode) ? e->details : NULL;
+}
+
+static const char *
+get_sockdata_by_inode_cached(const unsigned long inode)
+{
+	const cache_entry *const e = &cache[inode & CACHE_MASK];
+	return (e && inode == e->inode && e->has_data)
+		? e->details + strlen(e->details) + 1 : NULL;
 }
 
 static bool
@@ -178,7 +188,7 @@ inet_parse_response(const void *const data, const int data_len,
 			return false;
 	}
 
-	return cache_inode_details(inode, details);
+	return cache_inode_details(inode, details, false);
 }
 
 static bool
@@ -339,7 +349,7 @@ unix_parse_response(const void *data, const int data_len,
 		     peer_str, path_str) < 0)
 		return -1;
 
-	return cache_inode_details(inode, details);
+	return cache_inode_details(inode, details, false);
 }
 
 static bool
@@ -404,16 +414,18 @@ netlink_parse_response(const void *data, const int data_len,
 
 	if (netlink_proto) {
 		netlink_proto = STR_STRIP_PREFIX(netlink_proto, "NETLINK_");
-		if (asprintf(&details, "%s:[%s:%u]", proto_name,
-			     netlink_proto, diag_msg->ndiag_portid) < 0)
+		if (asprintf(&details, "%s:[%s:%u]%c%c", proto_name,
+			     netlink_proto, diag_msg->ndiag_portid,
+			     '\0', diag_msg->ndiag_protocol) < 0)
 			return -1;
 	} else {
-		if (asprintf(&details, "%s:[%u]", proto_name,
-			     (unsigned) diag_msg->ndiag_protocol) < 0)
+		if (asprintf(&details, "%s:[%u]%c%c", proto_name,
+			     (unsigned) diag_msg->ndiag_protocol,
+			     '\0', diag_msg->ndiag_protocol) < 0)
 			return -1;
 	}
 
-	return cache_inode_details(inode, details);
+	return cache_inode_details(inode, details, true);
 }
 
 struct packet_cb_data {
@@ -527,15 +539,18 @@ packet_parse_response(const void *data, const int data_len,
 	cb_data->ret = details;
 
 	if (have_ifindex && ifindex)
-		return cache_inode_details(inode, details);
+		return cache_inode_details(inode, details, false);
 
 	return 1;
 }
 
 static const char *
 unix_get(struct tcb *tcp, const int fd, const int family, const int proto,
-	 const unsigned long inode, const char *name)
+	 const unsigned long inode, const char *name, bool data)
 {
+	if (data)
+		return NULL;
+
 	return unix_send_query(tcp, fd, inode)
 		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
 				     unix_parse_response, (void *) name)
@@ -544,8 +559,11 @@ unix_get(struct tcb *tcp, const int fd, const int family, const int proto,
 
 static const char *
 inet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
-	 const unsigned long inode, const char *proto_name)
+	 const unsigned long inode, const char *proto_name, bool data)
 {
+	if (data)
+		return NULL;
+
 	return inet_send_query(tcp, fd, family, protocol)
 		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
 				     inet_parse_response, (void *) proto_name)
@@ -554,20 +572,24 @@ inet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 
 static const char *
 netlink_get(struct tcb *tcp, const int fd, const int family, const int protocol,
-	    const unsigned long inode, const char *proto_name)
+	    const unsigned long inode, const char *proto_name, bool data)
 {
 	return netlink_send_query(tcp, fd, inode)
 		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
 				     netlink_parse_response,
 				     (void *) proto_name)
-		? get_sockaddr_by_inode_cached(inode) : NULL;
+		? (data ? get_sockdata_by_inode_cached
+			: get_sockaddr_by_inode_cached)(inode) : NULL;
 }
 
 static const char *
 packet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
-	   const unsigned long inode, const char *proto_name)
+	   const unsigned long inode, const char *proto_name, bool data)
 {
 	struct packet_cb_data cb_data = { proto_name };
+
+	if (data)
+		return NULL;
 
 	return packet_send_query(tcp, fd, inode)
 		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
@@ -580,9 +602,10 @@ static const struct {
 	const char *const name;
 	const char * (*const get)(struct tcb *, int fd, int family,
 				  int protocol, unsigned long inode,
-				  const char *proto_name);
+				  const char *proto_name, bool data);
 	int family;
 	int proto;
+	bool has_data;
 } protocols[] = {
 	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
 	/*
@@ -622,7 +645,8 @@ static const struct {
 		{ "PINGv6",	inet_get, AF_INET6, IPPROTO_ICMP },
 	[SOCK_PROTO_RAWv6]	=
 		{ "RAWv6",	inet_get, AF_INET6, IPPROTO_RAW },
-	[SOCK_PROTO_NETLINK]	= { "NETLINK",	netlink_get,	AF_NETLINK },
+	[SOCK_PROTO_NETLINK]	=
+		{ "NETLINK",	netlink_get, AF_NETLINK, 0, true },
 	[SOCK_PROTO_AX25]	= { "AX25",	NULL,		AF_AX25 },
 	[SOCK_PROTO_DDP]	= { "DDP",	NULL,		AF_APPLETALK },
 	[SOCK_PROTO_NETROM]	= { "NETROM",	NULL,		AF_NETROM },
@@ -654,7 +678,7 @@ get_family_by_proto(enum sock_proto proto)
 
 static const char *
 get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
-			       const enum sock_proto proto)
+			       const enum sock_proto proto, bool data)
 {
 	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
 	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].get))
@@ -668,7 +692,7 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 	if (proto != SOCK_PROTO_UNKNOWN) {
 		details = protocols[proto].get(tcp, fd, protocols[proto].family,
 					       protocols[proto].proto, inode,
-					       protocols[proto].name);
+					       protocols[proto].name, data);
 	} else {
 		unsigned int i;
 		for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
@@ -679,7 +703,7 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 						   protocols[proto].family,
 						   protocols[proto].proto,
 						   inode,
-						   protocols[proto].name);
+						   protocols[proto].name, data);
 			if (details)
 				break;
 		}
@@ -693,7 +717,8 @@ static bool
 print_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 				 const enum sock_proto proto)
 {
-	const char *details = get_sockaddr_by_inode_uncached(tcp, inode, proto);
+	const char *details = get_sockaddr_by_inode_uncached(tcp, inode, proto,
+							     false);
 
 	if (details) {
 		tprints(details);
@@ -716,7 +741,19 @@ get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 {
 	const char *details = get_sockaddr_by_inode_cached(inode);
 	return details ? details :
-		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd));
+		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd),
+					       false);
+}
+
+const char *
+get_sockdata_by_inode(struct tcb *const tcp, const int fd,
+		      const unsigned long inode)
+{
+	const char *data = get_sockdata_by_inode_cached(inode);
+
+	return data ? data :
+		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd),
+					       true);
 }
 
 /* Given an inode number of a socket, print out its protocol details.  */

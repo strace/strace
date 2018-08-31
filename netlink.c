@@ -73,28 +73,11 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 	if (!inode)
 		return -1;
 
-	const char *const details = get_sockaddr_by_inode(tcp, fd, inode);
-	if (!details)
+	const char *const data = get_sockdata_by_inode(tcp, fd, inode);
+	if (!data)
 		return -1;
 
-	const char *const nl_details = STR_STRIP_PREFIX(details, "NETLINK:[");
-	if (nl_details == details)
-		return -1;
-
-	const struct xlat_data *xlats = netlink_protocols->data;
-	for (uint32_t idx = 0; idx < netlink_protocols->size; idx++) {
-		if (!netlink_protocols->data[idx].str)
-			continue;
-
-		const char *name = STR_STRIP_PREFIX(xlats[idx].str, "NETLINK_");
-		if (!strncmp(nl_details, name, strlen(name)))
-			return xlats[idx].val;
-	}
-
-	if (*nl_details >= '0' && *nl_details <= '9')
-		return atoi(nl_details);
-
-	return -1;
+	return data[0];
 }
 
 static void
