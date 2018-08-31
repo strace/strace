@@ -1,4 +1,4 @@
-/* sorted */
+#sorted sorted
 /* Those are pulled from include/net/ax25.h, they should be part of UAPI */
 AX25_P_ROSE		0x01
 AX25_P_VJCOMP		0x06	/* Compressed TCP/IP packet   */

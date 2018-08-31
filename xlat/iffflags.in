@@ -1,4 +1,4 @@
-/* sort -k4,4g */
+#sorted sort -k4,4g
 IFF_UP		(1 << 0)
 IFF_BROADCAST	(1 << 1)
 IFF_DEBUG	(1 << 2)

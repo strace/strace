@@ -1,4 +1,4 @@
-/* sort -k2,2 */
+#sorted sort -k2,2
 FF_RUMBLE       0x50
 FF_PERIODIC     0x51
 FF_CONSTANT     0x52

@@ -624,8 +624,7 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 static void
 print_v4l2_cid(const uint32_t cid)
 {
-	const char *id_name = xlat_search(v4l2_control_ids,
-					 v4l2_control_ids_size - 1, cid);
+	const char *id_name = xlookup(v4l2_control_ids, cid);
 
 	if (id_name) {
 		print_xlat_ex(cid, id_name, XLAT_STYLE_DEFAULT);
@@ -633,10 +632,7 @@ print_v4l2_cid(const uint32_t cid)
 	}
 
 	uint64_t class_id = cid;
-	const char *class_str =
-		xlat_search_eq_or_less(v4l2_control_classes,
-				       v4l2_control_classes_size - 1,
-				       &class_id);
+	const char *class_str = xlookup_le(v4l2_control_classes, &class_id);
 
 	if (!class_str || (cid - class_id) >= 0x10000) {
 		print_xlat_ex(cid, "V4L2_CID_???", PXF_DEFAULT_STR);

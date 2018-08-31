@@ -1,4 +1,4 @@
-/* sort -k2,2n */
+#sorted sort -k2,2n
 SOL_IP		0
 #if !(defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__)
 SOL_SOCKET	1

@@ -48,8 +48,7 @@ decode_nla_ipmra_msg_type(struct tcb *const tcp,
 			  const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts opts = {
-		ARRSZ_PAIR(rtnl_ipmra_msg_types), "IGMPMSG_???",
-		.xt = XT_INDEXED,
+		rtnl_ipmra_msg_types, "IGMPMSG_???",
 		.size = 1,
 	};
 
@@ -72,8 +71,7 @@ decode_nla_ip6mra_msg_type(struct tcb *const tcp,
 			   const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts opts = {
-		ARRSZ_PAIR(rtnl_ip6mra_msg_types), "MRT6MSG_???",
-		.xt = XT_INDEXED,
+		rtnl_ip6mra_msg_types, "MRT6MSG_???",
 		.size = 1,
 	};
 

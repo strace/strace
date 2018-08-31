@@ -116,8 +116,8 @@ SYS_FUNC(nanosleep)
 SYS_FUNC(getitimer)
 {
 	if (entering(tcp)) {
-		printxval_index(itimer_which, (unsigned int) tcp->u_arg[0],
-				"ITIMER_???");
+		printxval(itimer_which, (unsigned int) tcp->u_arg[0],
+			  "ITIMER_???");
 		tprints(", ");
 	} else {
 		print_itimerval(tcp, tcp->u_arg[1]);
@@ -129,8 +129,8 @@ SYS_FUNC(getitimer)
 SYS_FUNC(osf_getitimer)
 {
 	if (entering(tcp)) {
-		printxval_index(itimer_which, (unsigned int) tcp->u_arg[0],
-				"ITIMER_???");
+		printxval(itimer_which, (unsigned int) tcp->u_arg[0],
+			  "ITIMER_???");
 		tprints(", ");
 	} else {
 		print_itimerval32(tcp, tcp->u_arg[1]);
@@ -142,8 +142,8 @@ SYS_FUNC(osf_getitimer)
 SYS_FUNC(setitimer)
 {
 	if (entering(tcp)) {
-		printxval_index(itimer_which, (unsigned int) tcp->u_arg[0],
-				"ITIMER_???");
+		printxval(itimer_which, (unsigned int) tcp->u_arg[0],
+			  "ITIMER_???");
 		tprints(", ");
 		print_itimerval(tcp, tcp->u_arg[1]);
 		tprints(", ");
@@ -176,8 +176,7 @@ do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	if (print_timex(tcp, addr))
 		return 0;
-	tcp->auxstr = xlat_idx(adjtimex_state, ARRAY_SIZE(adjtimex_state) - 1,
-			       (kernel_ulong_t) tcp->u_rval);
+	tcp->auxstr = xlookup(adjtimex_state, (kernel_ulong_t) tcp->u_rval);
 	return RVAL_STR;
 }
 
@@ -215,9 +214,9 @@ printclockname(int clockid)
 					"MAKE_THREAD_CPUCLOCK" :
 					"MAKE_PROCESS_CPUCLOCK",
 				CPUCLOCK_PID(clockid));
-			printxval_index(cpuclocknames,
-					(unsigned int) clockid & CLOCKFD_MASK,
-					"CPUCLOCK_???");
+			printxval(cpuclocknames,
+				  (unsigned int) clockid & CLOCKFD_MASK,
+				  "CPUCLOCK_???");
 			tprints(")");
 		}
 
@@ -225,7 +224,7 @@ printclockname(int clockid)
 			tprints(" */");
 	} else
 #endif
-		printxval_index(clocknames, clockid, "CLOCK_???");
+		printxval(clocknames, clockid, "CLOCK_???");
 }
 
 SYS_FUNC(clock_settime)

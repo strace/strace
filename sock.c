@@ -95,10 +95,8 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFHWADDR:
 	case SIOCGIFHWADDR: {
-		PRINT_FIELD_XVAL_SORTED_SIZED("ifr_hwaddr={", ifr->ifr_hwaddr,
-					      sa_family, arp_hardware_types,
-					      arp_hardware_types_size,
-					      "ARPHRD_???");
+		PRINT_FIELD_XVAL("ifr_hwaddr={", ifr->ifr_hwaddr, sa_family,
+				 arp_hardware_types, "ARPHRD_???");
 		PRINT_FIELD_HWADDR_SZ(", ", ifr->ifr_hwaddr, sa_data,
 				      sizeof(ifr->ifr_hwaddr.sa_data),
 				      ifr->ifr_hwaddr.sa_family);

@@ -1097,7 +1097,6 @@ print_array_ex(struct tcb *const tcp,
 	       void *const opaque_data,
 	       unsigned int flags,
 	       const struct xlat *index_xlat,
-	       size_t index_xlat_size,
 	       const char *index_dflt)
 {
 	if (!start_addr) {
@@ -1153,15 +1152,9 @@ print_array_ex(struct tcb *const tcp,
 
 			if (!index_xlat) {
 				print_xlat_ex(idx, NULL, xlat_style);
-			} else if (flags & PAF_INDEX_XLAT_VALUE_INDEXED) {
-				printxval_indexn_ex(index_xlat,
-						    index_xlat_size, idx,
-						    index_dflt, xlat_style);
 			} else {
-				printxvals_ex(idx, index_dflt, xlat_style,
-					      (flags & PAF_INDEX_XLAT_SORTED)
-						&& idx ? NULL : index_xlat,
-					      NULL);
+				printxval_ex(idx ? NULL : index_xlat, idx,
+					     index_dflt, xlat_style);
 			}
 
 			tprints("] = ");

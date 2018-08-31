@@ -1,4 +1,4 @@
-/* sort -k2,2n */
+#sorted sort -k2,2n
 PERF_COUNT_SW_CPU_CLOCK         0
 PERF_COUNT_SW_TASK_CLOCK        1
 PERF_COUNT_SW_PAGE_FAULTS       2

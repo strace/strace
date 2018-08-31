@@ -52,39 +52,39 @@
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }
 
-static const struct xlat struct_user_offsets[] = {
+static const struct xlat_data struct_user_offsets_data[] = {
 #include "userent.h"
-	XLAT_END
+};
+
+static const struct xlat struct_user_offsets = {
+	.type = XT_SORTED,
+	.size = ARRAY_SIZE(struct_user_offsets_data),
+	.data = struct_user_offsets_data,
 };
 
 static void
 print_user_offset_addr(const kernel_ulong_t addr)
 {
-	bool no_str = false;
-	const struct xlat *x;
+	uint64_t base_addr = addr;
+	const char *str = xlookup_le(&struct_user_offsets, &base_addr);
 
-	for (x = struct_user_offsets; x->str; ++x) {
-		if (x->val >= addr)
-			break;
-	}
+	/* We don't want to pretty print addresses beyond struct user */
+	if (addr > base_addr && base_addr == sizeof(struct user))
+		str = NULL;
 
-	if (!x->str || (x == struct_user_offsets && x->val > addr))
-		no_str = true;
-	if (no_str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		printaddr(addr);
-	if (no_str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprints(" /* ");
 
-	if (x->val > addr) {
-		--x;
+	if (base_addr == addr)
+		tprints(str);
+	else
 		tprintf("%s + %" PRI_klu,
-			x->str, addr - (kernel_ulong_t) x->val);
-	} else {
-		tprints(x->str);
-	}
+			str, addr - (kernel_ulong_t) base_addr);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprints(" */");

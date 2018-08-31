@@ -1,4 +1,4 @@
-/* sort -k2,2g */
+#sorted sort -k2,2g
 IF_RS_SENT	0x10
 IF_RA_RCVD	0x20
 IF_RA_MANAGED	0x40

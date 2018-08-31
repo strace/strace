@@ -1,4 +1,4 @@
-/* sed -rn 's/.*v4l2_fourcc(_be)?\('"'(.)', '(.)', '(.)', '(.)'"'\).*/\10\5\4\3\2\t\0/p' |LC_COLLATE=C sort -k1,1 -t' ' |cut -f2- */
+#sorted sed -rn 's/.*v4l2_fourcc(_be)?\('"'(.)', '(.)', '(.)', '(.)'"'\).*/\10\5\4\3\2\t\0/p' |LC_COLLATE=C sort -k1,1 -t' ' |cut -f2-
 V4L2_PIX_FMT_Y10     v4l2_fourcc('Y', '1', '0', ' ') /* 10  Greyscale     */
 V4L2_PIX_FMT_Y12     v4l2_fourcc('Y', '1', '2', ' ') /* 12  Greyscale     */
 V4L2_PIX_FMT_Y4      v4l2_fourcc('Y', '0', '4', ' ') /*  4  Greyscale     */

@@ -455,13 +455,12 @@ print_sockaddr_data_ll(const void *const buf, const int addrlen)
 	const struct sockaddr_ll *const sa_ll = buf;
 
 	tprints("sll_protocol=htons(");
-	printxval_search(ethernet_protocols, ntohs(sa_ll->sll_protocol),
-			 "ETH_P_???");
+	printxval(ethernet_protocols, ntohs(sa_ll->sll_protocol), "ETH_P_???");
 	PRINT_FIELD_IFINDEX("), ", *sa_ll, sll_ifindex);
 	tprints(", sll_hatype=");
-	printxval_search(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");
+	printxval(arp_hardware_types, sa_ll->sll_hatype, "ARPHRD_???");
 	tprints(", sll_pkttype=");
-	printxval_index(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
+	printxval(af_packet_types, sa_ll->sll_pkttype, "PACKET_???");
 	tprintf(", sll_halen=%u", sa_ll->sll_halen);
 	if (sa_ll->sll_halen) {
 		const unsigned int oob_halen =
@@ -613,8 +612,7 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 		const struct sockaddr_hci *const hci = buf;
 		tprintf("hci_dev=htobs(%hu), hci_channel=",
 			btohs(hci->hci_dev));
-		printxval_index(hci_channels, hci->hci_channel,
-				"HCI_CHANNEL_???");
+		printxval(hci_channels, hci->hci_channel, "HCI_CHANNEL_???");
 		break;
 	}
 	case sizeof(struct sockaddr_sco): {
@@ -640,8 +638,8 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 
 		if (addrlen == sizeof(struct sockaddr_l2)) {
 			tprints(", l2_bdaddr_type=");
-			printxval_index(bdaddr_types, l2->l2_bdaddr_type,
-					"BDADDR_???");
+			printxval(bdaddr_types, l2->l2_bdaddr_type,
+				  "BDADDR_???");
 		}
 
 		break;
@@ -676,7 +674,7 @@ print_sockaddr(const void *const buf, const int addrlen)
 	const struct sockaddr *const sa = buf;
 
 	tprints("{sa_family=");
-	printxval_index(addrfams, sa->sa_family, "AF_???");
+	printxval(addrfams, sa->sa_family, "AF_???");
 
 	if (addrlen > (int) SIZEOF_SA_FAMILY) {
 		tprints(", ");
