@@ -806,12 +806,12 @@ extern int printflags_ex(uint64_t flags, const char *dflt,
 			 enum xlat_style, const struct xlat *, ...)
 	ATTRIBUTE_SENTINEL;
 extern const char *sprintflags_ex(const char *prefix, const struct xlat *,
-				  uint64_t flags, enum xlat_style);
+				  uint64_t flags, char sep, enum xlat_style);
 
 static inline const char *
 sprintflags(const char *prefix, const struct xlat *xlat, uint64_t flags)
 {
-	return sprintflags_ex(prefix, xlat, flags, XLAT_STYLE_DEFAULT);
+	return sprintflags_ex(prefix, xlat, flags, '\0', XLAT_STYLE_DEFAULT);
 }
 
 extern const char *sprinttime(long long sec);

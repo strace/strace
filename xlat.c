@@ -292,7 +292,7 @@ printxval_indexn_ex(const struct xlat *xlat, size_t xlat_size, uint64_t val,
  */
 const char *
 sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
-	       enum xlat_style style)
+	       char sep, enum xlat_style style)
 {
 	static char outstr[1024];
 	char *outptr;
@@ -305,6 +305,8 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 		if (!flags)
 			return NULL;
 
+		if (sep)
+			*outptr++ = sep;
 		outptr = xappendstr(outstr, outptr, "%s",
 				    sprint_xlat_val(flags, style));
 
@@ -312,6 +314,8 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	}
 
 	if (flags == 0 && xlat->val == 0 && xlat->str) {
+		if (sep)
+			*outptr++ = sep;
 		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
 			outptr = xappendstr(outstr, outptr, "0 /* %s */",
 					    xlat->str);
@@ -322,26 +326,33 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 		return outstr;
 	}
 
-	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE && flags)
+	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE && flags) {
+		if (sep) {
+			*outptr++ = sep;
+			sep = '\0';
+		}
 		outptr = xappendstr(outstr, outptr, "%s",
 				    sprint_xlat_val(flags, style));
+	}
 
 	for (; flags && xlat->str; xlat++) {
 		if (xlat->val && (flags & xlat->val) == xlat->val) {
-			if (found)
-				*outptr++ = '|';
-			else if (xlat_verbose(style) == XLAT_STYLE_VERBOSE)
+			if (sep) {
+				*outptr++ = sep;
+			} else if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
 				outptr = stpcpy(outptr, " /* ");
+			}
 
 			outptr = stpcpy(outptr, xlat->str);
 			found = 1;
+			sep = '|';
 			flags &= ~xlat->val;
 		}
 	}
 
 	if (flags) {
-		if (found)
-			*outptr++ = '|';
+		if (sep)
+			*outptr++ = sep;
 		if (found || xlat_verbose(style) != XLAT_STYLE_VERBOSE)
 			outptr = xappendstr(outstr, outptr, "%s",
 					    sprint_xlat_val(flags, style));

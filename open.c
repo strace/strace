@@ -54,11 +54,10 @@ print_dirfd(struct tcb *tcp, int fd)
 const char *
 sprint_open_modes(unsigned int flags)
 {
-	static char outstr[(1 + ARRAY_SIZE(open_mode_flags)) * sizeof("O_LARGEFILE")];
+	static char outstr[sizeof("flags O_ACCMODE")];
 	char *p;
 	char sep;
 	const char *str;
-	const struct xlat *x;
 
 	sep = ' ';
 	p = stpcpy(outstr, "flags");
@@ -71,21 +70,10 @@ sprint_open_modes(unsigned int flags)
 			return outstr;
 		sep = '|';
 	}
+	*p = '\0';
 
-	for (x = open_mode_flags; x->str; x++) {
-		if ((flags & x->val) == x->val) {
-			*p++ = sep;
-			p = stpcpy(p, x->str);
-			flags &= ~x->val;
-			if (!flags)
-				return outstr;
-			sep = '|';
-		}
-	}
-	/* flags is still nonzero */
-	*p++ = sep;
-	p = xappendstr(outstr, p, "%#x", flags);
-	return outstr;
+	return sprintflags_ex(outstr, open_mode_flags, flags, sep,
+			      XLAT_STYLE_ABBREV) ?: outstr;
 }
 
 void
