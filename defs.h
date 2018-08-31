@@ -818,9 +818,18 @@ extern const char *sprinttime(long long sec);
 extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
 extern const char *sprinttime_usec(long long sec, unsigned long long usec);
 
+#ifndef MAX_ADDR_LEN
+# define MAX_ADDR_LEN 32
+#endif
+
 extern const char *sprint_mac_addr(const uint8_t addr[], size_t size);
 extern void print_mac_addr(const char *prefix,
 			   const uint8_t addr[], size_t size);
+
+extern const char *sprint_hwaddr(const uint8_t addr[], size_t size,
+				 uint32_t devtype);
+extern void print_hwaddr(const char *prefix,
+			 const uint8_t addr[], size_t size, uint32_t devtype);
 
 extern void print_uuid(const unsigned char *uuid);
 
