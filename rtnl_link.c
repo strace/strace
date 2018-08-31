@@ -804,14 +804,31 @@ decode_ifla_af_spec(struct tcb *const tcp,
 	nla_decoder_t af_spec_decoder = &decode_ifla_af;
 
 	decode_nlattr(tcp, addr, len, addrfams, "AF_???",
-		      &af_spec_decoder, 0, opaque_data);
+		      &af_spec_decoder, 0, NULL);
+
+	return true;
+}
+
+bool
+decode_nla_hwaddr(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	const struct ifinfomsg *ifinfo = opaque_data;
+	uint8_t hwa[MAX_ADDR_LEN];
+
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(hwa)), hwa))
+		return true;
+
+	print_hwaddr("", hwa, MIN(len, sizeof(hwa)), ifinfo->ifi_type);
 
 	return true;
 }
 
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
-	[IFLA_ADDRESS]		= NULL, /* unimplemented */
-	[IFLA_BROADCAST]	= NULL, /* unimplemented */
+	[IFLA_ADDRESS]		= decode_nla_hwaddr,
+	[IFLA_BROADCAST]	= decode_nla_hwaddr,
 	[IFLA_IFNAME]		= decode_nla_str,
 	[IFLA_MTU]		= decode_nla_u32,
 	[IFLA_LINK]		= decode_nla_u32,
@@ -893,6 +910,6 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_link_attrs, "IFLA_???",
-			      ARRSZ_PAIR(ifinfomsg_nla_decoders), NULL);
+			      ARRSZ_PAIR(ifinfomsg_nla_decoders), &ifinfo);
 	}
 }
