@@ -31,6 +31,7 @@
 #include "defs.h"
 
 #include "perf_event_struct.h"
+#include "print_fields.h"
 
 #include "xlat/hw_breakpoint_len.h"
 #include "xlat/hw_breakpoint_type.h"
@@ -111,12 +112,6 @@ fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	return 0;
 }
 
-#define PRINT_XLAT(prefix, xlat, x, dflt) \
-	do { \
-		tprints(prefix); \
-		printxval_search(xlat, x, dflt); \
-	} while (0)
-
 void
 print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -159,9 +154,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 			use_new_size = 1;
 	}
 
-	PRINT_XLAT("{type=", perf_type_id, attr->type, "PERF_TYPE_???");
-	tprints(", size=");
-	printxval(perf_attr_size, attr->size, "PERF_ATTR_SIZE_???");
+	PRINT_FIELD_XVAL("{", *attr, type, perf_type_id, "PERF_TYPE_???");
+	PRINT_FIELD_XVAL(", ", *attr, size, perf_attr_size,
+			 "PERF_ATTR_SIZE_???");
 
 	if (use_new_size) {
 		tprints(" => ");
@@ -175,12 +170,12 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	switch (attr->type) {
 	case PERF_TYPE_HARDWARE:
-		PRINT_XLAT(", config=", perf_hw_id, attr->config,
-			   "PERF_COUNT_HW_???");
+		PRINT_FIELD_XVAL(", ", *attr, config, perf_hw_id,
+				 "PERF_COUNT_HW_???");
 		break;
 	case PERF_TYPE_SOFTWARE:
-		PRINT_XLAT(", config=", perf_sw_ids, attr->config,
-			   "PERF_COUNT_SW_???");
+		PRINT_FIELD_XVAL(", ", *attr, config, perf_sw_ids,
+				 "PERF_COUNT_SW_???");
 		break;
 	case PERF_TYPE_TRACEPOINT:
 		/*
@@ -188,17 +183,20 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * debugfs tracing/events/../../id if ftrace is enabled
 		 * in the kernel."
 		 */
-		tprintf(", config=%" PRIu64, attr->config);
+		PRINT_FIELD_U(", ", *attr, config);
 		break;
 	case PERF_TYPE_HW_CACHE:
 		/*
 		 * (perf_hw_cache_id) | (perf_hw_cache_op_id << 8) |
 		 * (perf_hw_cache_op_result_id << 16)
 		 */
-		PRINT_XLAT(", config=", perf_hw_cache_id, attr->config & 0xFF,
-			   "PERF_COUNT_HW_CACHE_???");
-		PRINT_XLAT("|", perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
+		tprints(", config=");
+		printxval(perf_hw_cache_id, attr->config & 0xFF,
+			  "PERF_COUNT_HW_CACHE_???");
+		tprints("|");
+		printxval(perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
 			   "PERF_COUNT_HW_CACHE_OP_???");
+		tprints("<<8|");
 		/*
 		 * Current code (see set_ext_hw_attr in arch/x86/events/core.c,
 		 * tile_map_cache_event in arch/tile/kernel/perf_event.c,
@@ -214,9 +212,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * armpmu_map_cache_event in drivers/perf/arm_pmu.c) assumes
 		 * that cache result is 8 bits in size.
 		 */
-		PRINT_XLAT("<<8|", perf_hw_cache_op_result_id,
-			   (attr->config >> 16) & 0xFF,
-			   "PERF_COUNT_HW_CACHE_RESULT_???");
+		printxval(perf_hw_cache_op_result_id,
+			  (attr->config >> 16) & 0xFF,
+			  "PERF_COUNT_HW_CACHE_RESULT_???");
 		tprints("<<16");
 		if (attr->config >> 24) {
 			tprintf("|%#" PRIx64 "<<24", attr->config >> 24);
@@ -241,7 +239,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * to zero. Its parameters are set in other places."
 		 */
 	default:
-		tprintf(", config=%#" PRIx64, attr->config);
+		PRINT_FIELD_X(", ", *attr, config);
 		break;
 	}
 
@@ -249,17 +247,14 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		goto print_perf_event_attr_out;
 
 	if (attr->freq)
-		tprintf(", sample_freq=%" PRIu64, attr->sample_freq);
+		PRINT_FIELD_U(", ", *attr, sample_freq);
 	else
-		tprintf(", sample_period=%" PRIu64, attr->sample_period);
+		PRINT_FIELD_U(", ", *attr, sample_period);
 
-	tprints(", sample_type=");
-	printflags64(perf_event_sample_format, attr->sample_type,
-		"PERF_SAMPLE_???");
-
-	tprints(", read_format=");
-	printflags64(perf_event_read_format, attr->read_format,
-		"PERF_FORMAT_???");
+	PRINT_FIELD_FLAGS(", ", *attr, sample_type, perf_event_sample_format,
+			  "PERF_SAMPLE_???");
+	PRINT_FIELD_FLAGS(", ", *attr, read_format, perf_event_read_format,
+			  "PERF_FORMAT_???");
 
 	tprintf(", disabled=%u"
 		", inherit=%u"
@@ -330,22 +325,22 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (attr->watermark)
-		tprintf(", wakeup_watermark=%u", attr->wakeup_watermark);
+		PRINT_FIELD_U(", ", *attr, wakeup_watermark);
 	else
-		tprintf(", wakeup_events=%u", attr->wakeup_events);
+		PRINT_FIELD_U(", ", *attr, wakeup_events);
 
 	if (attr->type == PERF_TYPE_BREAKPOINT)
 		/* Any combination of R/W with X is deemed invalid */
-		PRINT_XLAT(", bp_type=", hw_breakpoint_type, attr->bp_type,
-			   (attr->bp_type <=
-				   (HW_BREAKPOINT_X | HW_BREAKPOINT_RW)) ?
-					   "HW_BREAKPOINT_INVALID" :
-					   "HW_BREAKPOINT_???");
+		PRINT_FIELD_XVAL(", ", *attr, bp_type, hw_breakpoint_type,
+				 (attr->bp_type <=
+					(HW_BREAKPOINT_X | HW_BREAKPOINT_RW))
+						? "HW_BREAKPOINT_INVALID"
+						: "HW_BREAKPOINT_???");
 
 	if (attr->type == PERF_TYPE_BREAKPOINT)
-		tprintf(", bp_addr=%#" PRIx64, attr->bp_addr);
+		PRINT_FIELD_X(", ", *attr, bp_addr);
 	else
-		tprintf(", config1=%#" PRIx64, attr->config1);
+		PRINT_FIELD_X(", ", *attr, config1);
 
 	/*
 	 * Fields after bp_addr/config1 are optional and may not present; check
@@ -354,15 +349,15 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	_PERF_CHECK_FIELD(bp_len);
 	if (attr->type == PERF_TYPE_BREAKPOINT)
-		tprintf(", bp_len=%" PRIu64, attr->bp_len);
+		PRINT_FIELD_U(", ", *attr, bp_len);
 	else
-		tprintf(", config2=%#" PRIx64, attr->config2);
+		PRINT_FIELD_X(", ", *attr, config2);
 
 	_PERF_CHECK_FIELD(branch_sample_type);
 	if (attr->sample_type & PERF_SAMPLE_BRANCH_STACK) {
-		tprints(", branch_sample_type=");
-		printflags64(perf_branch_sample_type, attr->branch_sample_type,
-			     "PERF_SAMPLE_BRANCH_???");
+		PRINT_FIELD_FLAGS(", ", *attr, branch_sample_type,
+				  perf_branch_sample_type,
+				  "PERF_SAMPLE_BRANCH_???");
 	}
 
 	_PERF_CHECK_FIELD(sample_regs_user);
@@ -372,7 +367,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * described in the kernel header
 	 * arch/ARCH/include/uapi/asm/perf_regs.h."
 	 */
-	tprintf(", sample_regs_user=%#" PRIx64, attr->sample_regs_user);
+	PRINT_FIELD_X(", ", *attr, sample_regs_user);
 
 	_PERF_CHECK_FIELD(sample_stack_user);
 	/*
@@ -380,26 +375,24 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * specified."
 	 */
 	if (attr->sample_type & PERF_SAMPLE_STACK_USER)
-		tprintf(", sample_stack_user=%#" PRIx32,
-			attr->sample_stack_user);
+		PRINT_FIELD_X(", ", *attr, sample_stack_user);
 
 	if (attr->use_clockid) {
 		_PERF_CHECK_FIELD(clockid);
-		tprints(", clockid=");
-		printxval(clocknames, attr->clockid, "CLOCK_???");
+		PRINT_FIELD_XVAL(", ", *attr, clockid, clocknames, "CLOCK_???");
 	}
 
 	_PERF_CHECK_FIELD(sample_regs_intr);
-	tprintf(", sample_regs_intr=%#" PRIx64, attr->sample_regs_intr);
+	PRINT_FIELD_X(", ", *attr, sample_regs_intr);
 
 	_PERF_CHECK_FIELD(aux_watermark);
-	tprintf(", aux_watermark=%" PRIu32, attr->aux_watermark);
+	PRINT_FIELD_U(", ", *attr, aux_watermark);
 
 	_PERF_CHECK_FIELD(sample_max_stack);
-	tprintf(", sample_max_stack=%" PRIu16, attr->sample_max_stack);
+	PRINT_FIELD_U(", ", *attr, sample_max_stack);
 
 	/* _PERF_CHECK_FIELD(__reserved_2);
-	tprintf(", __reserved2=%" PRIu16, attr->__reserved_2); */
+	PRINT_FIELD_U(", ", *attr, __reserved2); */
 
 print_perf_event_attr_out:
 	if ((attr->size && (attr->size > size)) ||
