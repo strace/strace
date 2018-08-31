@@ -1,7 +1,8 @@
 #include "stack-fcall.h"
 
-int main(int argc, char **argv)
+int main(void)
 {
-	f0(argc);
+	f0(0);
+	f0(1);
 	return 0;
 }
