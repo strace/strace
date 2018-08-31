@@ -198,6 +198,15 @@ printclockname(int clockid)
 # include "xlat/cpuclocknames.h"
 
 	if (clockid < 0) {
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+			tprintf("%d", clockid);
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+			return;
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprints(" /* ");
+
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
 			tprintf("FD_TO_CLOCKID(%d)", CLOCKID_TO_FD(clockid));
 		else {
@@ -211,6 +220,9 @@ printclockname(int clockid)
 					"CPUCLOCK_???");
 			tprints(")");
 		}
+
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprints(" */");
 	} else
 #endif
 		printxval_index(clocknames, clockid, "CLOCK_???");
