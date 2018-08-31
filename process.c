@@ -60,6 +60,7 @@ static const struct xlat struct_user_offsets[] = {
 static void
 print_user_offset_addr(const kernel_ulong_t addr)
 {
+	bool no_str = false;
 	const struct xlat *x;
 
 	for (x = struct_user_offsets; x->str; ++x) {
@@ -67,19 +68,26 @@ print_user_offset_addr(const kernel_ulong_t addr)
 			break;
 	}
 
-	if (!x->str) {
+	if (!x->str || (x == struct_user_offsets && x->val > addr))
+		no_str = true;
+	if (no_str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		printaddr(addr);
-	} else if (x->val > addr) {
-		if (x == struct_user_offsets) {
-			printaddr(addr);
-		} else {
-			--x;
-			tprintf("%s + %" PRI_klu,
-				x->str, addr - (kernel_ulong_t) x->val);
-		}
+	if (no_str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	if (x->val > addr) {
+		--x;
+		tprintf("%s + %" PRI_klu,
+			x->str, addr - (kernel_ulong_t) x->val);
 	} else {
 		tprints(x->str);
 	}
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" */");
 }
 
 SYS_FUNC(ptrace)
