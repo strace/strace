@@ -29,13 +29,21 @@ grep_log()
 	}
 }
 
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -O1
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -enanosleep
-grep_log ' *[^ ]+ +0\.0[^n]*nanosleep'		-c -O1 -enanosleep
-grep_log ' *[^ ]+ +(1\.[01]|0\.99)[^n]*nanosleep'	-cw
-grep_log ' *[^ ]+ +(1\.[01]|0\.99)[^n]*nanosleep'	-cw -O1
-grep_log '100\.00 +(1\.[01]|0\.99)[^n]*nanosleep'	-cw -enanosleep
-grep_log '100\.00 +(1\.[01]|0\.99)[^n]*nanosleep'	-cw -O1 -enanosleep
+GENERIC=' *[^ ]+ +0\.0[^n]*nanosleep *'
+WALLCLOCK=' *[^ ]+ +(1\.[01]|0\.99)[^n]*nanosleep *'
+WALLCLOCK1='100\.00 +(1\.[01]|0\.99)[^n]*nanosleep'
+HALFCLOCK=' *[^ ]+ +0\.[567][^n]*nanosleep *'
+
+grep_log "$GENERIC"	-c
+grep_log "$GENERIC"	-c -O1
+grep_log "$GENERIC"	-c -enanosleep
+grep_log "$GENERIC"	-c -O1 -enanosleep
+grep_log "$WALLCLOCK"	-cw
+grep_log "$WALLCLOCK"	-cw -O1
+grep_log "$WALLCLOCK1"	-cw -enanosleep
+grep_log "$WALLCLOCK1"	-cw -O1 -enanosleep
+grep_log "$HALFCLOCK"	-cw -O4.5e2ms -enanosleep
+grep_log "$HALFCLOCK"	-cw -O4.5e-1s -enanosleep
+grep_log "$HALFCLOCK"	-cw -O456789012ns -enanosleep
 
 exit 0

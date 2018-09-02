@@ -101,10 +101,10 @@ set_sortby(const char *sortby)
 	}
 }
 
-void set_overhead(int n)
+int
+set_overhead(const char *str)
 {
-	overhead.tv_sec = n / 1000000;
-	overhead.tv_nsec = n % 1000000 * 1000;
+	return parse_ts(str, &overhead);
 }
 
 static void
