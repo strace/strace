@@ -4,7 +4,7 @@
 . "${srcdir=.}/init.sh"
 
 while read -r denter dexit denter_us dexit_us; do
-	[ -n denter ] || continue
+	[ -n "$denter" ] || continue
 
 	run_strace -f -r -egettimeofday \
 		-einject=gettimeofday:delay_enter=$denter:delay_exit=$dexit \
