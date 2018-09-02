@@ -430,7 +430,7 @@ extern unsigned os_release;
 extern int read_int_from_file(struct tcb *, const char *, int *);
 
 extern void set_sortby(const char *);
-extern void set_overhead(int);
+extern void set_overhead(const char *);
 extern void print_pc(struct tcb *);
 
 extern int syscall_entering_decode(struct tcb *);

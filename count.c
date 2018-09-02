@@ -116,10 +116,11 @@ set_sortby(const char *sortby)
 	}
 }
 
-void set_overhead(int n)
+void
+set_overhead(const char *str)
 {
-	overhead.tv_sec = n / 1000000;
-	overhead.tv_nsec = n % 1000000 * 1000;
+	if (parse_ts(str, &overhead) < 0)
+		error_msg_and_help("invalid -O argument: '%s'", str);
 }
 
 static void

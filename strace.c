@@ -1675,10 +1675,7 @@ init(int argc, char *argv[])
 			outfname = optarg;
 			break;
 		case 'O':
-			i = string_to_uint(optarg);
-			if (i < 0)
-				error_opt_arg(c, optarg);
-			set_overhead(i);
+			set_overhead(optarg);
 			break;
 		case 'p':
 			process_opt_p_list(optarg);
