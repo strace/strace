@@ -324,8 +324,10 @@ check_ax25(void)
 		AX25_ADDR("smalls", 9),
 	};
 
-	size_t size = sizeof(ax25) + sizeof(ax25_address);;
-	void *sax_void = tail_alloc(size);
+	enum { AX25_ALIGN = ALIGNOF(struct full_sockaddr_ax25), };
+	size_t size = sizeof(ax25);
+	size_t surplus = ROUNDUP(sizeof(ax25_address), AX25_ALIGN);
+	void *sax_void = midtail_alloc(size, surplus);
 	struct full_sockaddr_ax25 *sax = sax_void;
 	long rc;
 
@@ -378,8 +380,8 @@ check_ax25(void)
 	memcpy(sax->fsa_digipeater, aux_addrs, sizeof(aux_addrs));
 	sax->fsa_digipeater[2].ax25_call[6] = 0xa5;
 	sax->fsa_digipeater[4].ax25_call[5] = 0x40;
-	for (size_t i = 0; i < 2; i++) {
-		size = sizeof(ax25) + sizeof(ax25_address) * i;
+	for (size_t i = 0; i < 3; i++) {
+		size = sizeof(ax25) + sizeof(ax25_address) * (i / 2);
 		rc = connect(-1, sax_void, size);
 		printf("connect(-1, {sa_family=AF_AX25"
 		       ", fsa_ax25={sax25_call=VALID-13, sax25_ndigis=%d}"
@@ -405,13 +407,19 @@ check_ax25(void)
 		       , i ? "" : " /* ,}]\"\\'-5 */"
 		       , i ? "fe" : "60"
 		       , i ? "" : " /* DASH-0-6 */"
-		       , i
+		       , i == 1
 		       ? ""
 		       : ", {ax25_call=\"\\x14\\x12\\x82\\x84\\x86\\x88\\x0e\"}"
-		       , i ? ", ..." : ""
+		       , i > 1 ? ", ..." : ""
 		       , size, sprintrc(rc));
 
-		sax->fsa_ax25.sax25_ndigis = 7;
+		if (i == 1) {
+			sax_void = (char *) sax_void - surplus;
+			memmove(sax_void, sax, sizeof(ax25));
+			sax = sax_void;
+		}
+
+		sax->fsa_ax25.sax25_ndigis = 7 + 2 * i;
 
 		sax->fsa_digipeater[2].ax25_call[5] = 0x41;
 		sax->fsa_digipeater[2].ax25_call[6] = 0x4;
