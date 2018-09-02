@@ -48,6 +48,10 @@
 #endif
 #define CLAMP(val, min, max)	MIN(MAX(min, val), max)
 
+#ifndef ROUNDUP
+# define ROUNDUP(val_, div_) ((((val_) + (div_) - 1) / (div_)) * (div_))
+#endif
+
 #ifndef offsetofend
 # define offsetofend(type_, member_)	\
 	(offsetof(type_, member_) + sizeof(((type_ *)0)->member_))
