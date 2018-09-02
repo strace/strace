@@ -9,7 +9,7 @@
 # define STRACE_DELAY_H
 
 uint16_t alloc_delay_data(void);
-void fill_delay_data(uint16_t delay_idx, int intval, bool isenter);
+void fill_delay_data(uint16_t delay_idx, struct timespec *val, bool isenter);
 bool is_delay_timer_armed(void);
 void delay_timer_expired(void);
 void arm_delay_timer(const struct tcb *);
