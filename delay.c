@@ -66,7 +66,7 @@ alloc_delay_data(void)
 }
 
 void
-fill_delay_data(uint16_t delay_idx, int intval, bool isenter)
+fill_delay_data(uint16_t delay_idx, struct timespec *val, bool isenter)
 {
 	if (delay_idx >= delay_data_vec_size)
 		error_func_msg_and_die("delay_idx >= delay_data_vec_size");
@@ -77,8 +77,7 @@ fill_delay_data(uint16_t delay_idx, int intval, bool isenter)
 	else
 		ts = &(delay_data_vec[delay_idx].ts_exit);
 
-	ts->tv_sec = intval / 1000000;
-	ts->tv_nsec = intval % 1000000 * 1000;
+	*ts = *val;
 }
 
 static bool

@@ -92,14 +92,15 @@ parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
 
        if (fopts->data.flags & flag) /* duplicate */
                return false;
-       long long intval = string_to_ulonglong(input);
-       if (intval < 0) /* couldn't parse */
+       struct timespec tsval;
+
+       if (parse_ts(input, &tsval) < 0) /* couldn't parse */
                return false;
 
        if (fopts->data.delay_idx == (uint16_t) -1)
                fopts->data.delay_idx = alloc_delay_data();
        /* populate .ts_enter or .ts_exit */
-       fill_delay_data(fopts->data.delay_idx, intval, isenter);
+       fill_delay_data(fopts->data.delay_idx, &tsval, isenter);
        fopts->data.flags |= flag;
 
        return true;
