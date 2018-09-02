@@ -44,6 +44,7 @@
 #include <sys/uio.h>
 
 #include "largefile_wrappers.h"
+#include "string_to_uint.h"
 #include "xlat.h"
 #include "xstring.h"
 
@@ -131,6 +132,71 @@ ts_max(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 		tv->tv_sec = b->tv_sec;
 		tv->tv_nsec = b->tv_nsec;
 	}
+}
+
+int
+parse_ts(const char *s, struct timespec *t)
+{
+	enum { NS_IN_S = 1000000000 };
+
+	static const struct time_unit {
+		const char *s;
+		unsigned int mul;
+	} units[] = {
+		{ "",   1000 }, /* default is microseconds */
+		{ "s",  1000000000 },
+		{ "ms", 1000000 },
+		{ "us", 1000 },
+		{ "ns", 1 },
+	};
+	static const char float_accept[] =  "eE.-+0123456789";
+	static const char int_accept[] = "+0123456789";
+
+	size_t float_len = strspn(s, float_accept);
+	size_t int_len = strspn(s, int_accept);
+	const struct time_unit *unit = NULL;
+	char *endptr = NULL;
+	double float_val;
+	long long int_val;
+
+	if (float_len > int_len) {
+		errno = 0;
+
+		float_val = strtod(s, &endptr);
+
+		if (endptr == s || errno)
+			return -1;
+		if (float_val < 0)
+			return -1;
+	} else {
+		int_val = string_to_uint_ex(s, &endptr, LLONG_MAX, "smun");
+
+		if (int_val < 0)
+			return -1;
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(units); i++) {
+		if (strcmp(endptr, units[i].s))
+			continue;
+
+		unit = units + i;
+		break;
+	}
+
+	if (!unit)
+		return -1;
+
+	if (float_len > int_len) {
+		t->tv_sec = float_val / (NS_IN_S / unit->mul);
+		t->tv_nsec = ((uint64_t) ((float_val -
+					   (t->tv_sec * (NS_IN_S / unit->mul)))
+					  * unit->mul)) % NS_IN_S;
+	} else {
+		t->tv_sec = int_val / (NS_IN_S / unit->mul);
+		t->tv_nsec = (int_val % (NS_IN_S / unit->mul)) * unit->mul;
+	}
+
+	return 0;
 }
 
 #if !defined HAVE_STPCPY

@@ -957,6 +957,7 @@ extern void ts_mul(struct timespec *, const struct timespec *, int);
 extern void ts_div(struct timespec *, const struct timespec *, int);
 extern void ts_min(struct timespec *, const struct timespec *, const struct timespec *);
 extern void ts_max(struct timespec *, const struct timespec *, const struct timespec *);
+extern int parse_ts(const char *s, struct timespec *t);
 
 #ifdef ENABLE_STACKTRACE
 extern void unwind_init(void);
