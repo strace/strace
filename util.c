@@ -156,8 +156,8 @@ parse_ts(const char *s, struct timespec *t)
 	size_t int_len = strspn(s, int_accept);
 	const struct time_unit *unit = NULL;
 	char *endptr = NULL;
-	double float_val;
-	long long int_val;
+	double float_val = -1;
+	long long int_val = -1;
 
 	if (float_len > int_len) {
 		errno = 0;
