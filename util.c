@@ -92,6 +92,18 @@ ts_mul(struct timespec *tv, const struct timespec *a, int n)
 	tv->tv_nsec = nsec % 1000000000;
 }
 
+const struct timespec *
+ts_min(const struct timespec *a, const struct timespec *b)
+{
+	return ts_cmp(a, b) < 0 ? a : b;
+}
+
+const struct timespec *
+ts_max(const struct timespec *a, const struct timespec *b)
+{
+	return ts_cmp(a, b) > 0 ? a : b;
+}
+
 int
 parse_ts(const char *s, struct timespec *t)
 {
