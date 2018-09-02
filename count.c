@@ -26,6 +26,8 @@ struct call_counts {
 static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 #define counts (countv[current_personality])
 
+static const struct timespec zero_ts;
+
 static struct timespec overhead;
 
 void
@@ -42,16 +44,17 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 	if (syserror(tcp))
 		cc->errors++;
 
+	struct timespec wts;
 	if (count_wallclock) {
 		/* wall clock time spent while in syscall */
-		struct timespec wts;
 		ts_sub(&wts, syscall_exiting_ts, &tcp->etime);
-
-		ts_add(&cc->time, &cc->time, &wts);
+		ts_sub(&wts, &wts, &overhead);
 	} else {
 		/* system CPU time spent while in syscall */
-		ts_add(&cc->time, &cc->time, &tcp->dtime);
+		ts_sub(&wts, &tcp->dtime, &overhead);
 	}
+
+	ts_add(&cc->time, &cc->time, ts_max(&wts, &zero_ts));
 }
 
 static int
@@ -133,10 +136,6 @@ call_summary_pers(FILE *outf)
 		sorted_count[i] = i;
 		if (counts == NULL || counts[i].calls == 0)
 			continue;
-		ts_mul(&dtv, &overhead, counts[i].calls);
-		ts_sub(&counts[i].time, &counts[i].time, &dtv);
-		if (counts[i].time.tv_sec < 0 || counts[i].time.tv_nsec < 0)
-			counts[i].time.tv_sec = counts[i].time.tv_nsec = 0;
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
 		ts_add(&tv_cum, &tv_cum, &counts[i].time);
