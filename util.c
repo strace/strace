@@ -109,6 +109,30 @@ ts_mul(struct timespec *tv, const struct timespec *a, int n)
 	tv->tv_nsec = nsec % 1000000000;
 }
 
+void
+ts_min(struct timespec *tv, const struct timespec *a, const struct timespec *b)
+{
+	if (ts_cmp(a, b) < 0) {
+		tv->tv_sec = a->tv_sec;
+		tv->tv_nsec = a->tv_nsec;
+	} else {
+		tv->tv_sec = b->tv_sec;
+		tv->tv_nsec = b->tv_nsec;
+	}
+}
+
+void
+ts_max(struct timespec *tv, const struct timespec *a, const struct timespec *b)
+{
+	if (ts_cmp(a, b) > 0) {
+		tv->tv_sec = a->tv_sec;
+		tv->tv_nsec = a->tv_nsec;
+	} else {
+		tv->tv_sec = b->tv_sec;
+		tv->tv_nsec = b->tv_nsec;
+	}
+}
+
 #if !defined HAVE_STPCPY
 char *
 stpcpy(char *dst, const char *src)
