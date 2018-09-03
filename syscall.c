@@ -709,9 +709,27 @@ syscall_entering_finish(struct tcb *tcp, int res)
 {
 	tcp->flags |= TCB_INSYSCALL;
 	tcp->sys_func_rval = res;
+
 	/* Measure the entrance time as late as possible to avoid errors. */
 	if ((Tflag || cflag) && !filtered(tcp))
 		clock_gettime(CLOCK_MONOTONIC, &tcp->etime);
+
+	/* Start tracking system time */
+	if (cflag) {
+		if (debug_flag) {
+			struct timespec dt;
+
+			ts_sub(&dt, &tcp->stime, &tcp->ltime);
+			if (ts_nz(&dt))
+				debug_func_msg("pid %d: %ld.%09ld seconds of "
+					       "system time spent since the "
+					       "last syscall exit", tcp->pid,
+					       dt.tv_sec, dt.tv_nsec);
+		}
+
+		tcp->ltime = tcp->stime;
+	}
+
 }
 
 /* Returns:
@@ -946,6 +964,9 @@ syscall_exiting_finish(struct tcb *tcp)
 	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
+
+	if (cflag)
+		tcp->ltime = tcp->stime;
 }
 
 bool

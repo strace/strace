@@ -815,6 +815,14 @@ droptcb(struct tcb *tcp)
 	if (tcp->pid == 0)
 		return;
 
+	if (cflag && debug_flag) {
+		struct timespec dt;
+
+		ts_sub(&dt, &tcp->stime, &tcp->atime);
+		debug_func_msg("pid %d: %ld.%09ld seconds of system time spent "
+			       "since attach", tcp->pid, dt.tv_sec, dt.tv_nsec);
+	}
+
 	int p;
 	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
 		free(tcp->inject_vec[p]);
@@ -2193,6 +2201,10 @@ startup_tcb(struct tcb *tcp)
 
 	if ((tcp->flags & TCB_GRABBED) && (get_scno(tcp) == 1))
 		tcp->s_prev_ent = tcp->s_ent;
+
+	if (cflag) {
+		tcp->atime = tcp->stime;
+	}
 }
 
 static void
@@ -2350,12 +2362,8 @@ next_event(void)
 	set_current_tcp(tcp);
 
 	if (cflag) {
-		struct timespec stime = {
-			.tv_sec = ru.ru_stime.tv_sec,
-			.tv_nsec = ru.ru_stime.tv_usec * 1000
-		};
-		ts_sub(&tcp->dtime, &stime, &tcp->stime);
-		tcp->stime = stime;
+		tcp->stime.tv_sec = ru.ru_stime.tv_sec;
+		tcp->stime.tv_nsec = ru.ru_stime.tv_usec * 1000;
 	}
 
 	if (WIFSIGNALED(status)) {
