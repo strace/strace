@@ -48,12 +48,12 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 	if (count_wallclock) {
 		/* wall clock time spent while in syscall */
 		ts_sub(&wts, syscall_exiting_ts, &tcp->etime);
-		ts_sub(&wts, &wts, &overhead);
 	} else {
 		/* system CPU time spent while in syscall */
-		ts_sub(&wts, &tcp->dtime, &overhead);
+		ts_sub(&wts, &tcp->stime, &tcp->ltime);
 	}
 
+	ts_sub(&wts, &wts, &overhead);
 	ts_add(&cc->time, &cc->time, ts_max(&wts, &zero_ts));
 }
 

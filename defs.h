@@ -215,8 +215,9 @@ struct tcb {
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
 	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 	struct timespec stime;	/* System time usage as of last process wait */
-	struct timespec dtime;	/* Delta for system time usage */
-	struct timespec etime;	/* Syscall entry time */
+	struct timespec ltime;	/* System time usage as of last syscall entry */
+	struct timespec atime;	/* System time right after attach */
+	struct timespec etime;	/* Syscall entry time (CLOCK_MONOTONIC) */
 	struct timespec delay_expiration_time; /* When does the delay end */
 
 	struct mmap_cache_t *mmap_cache;
