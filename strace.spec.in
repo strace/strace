@@ -7,11 +7,10 @@ Group: Development%{?suse_version:/Tools}/Debuggers
 URL: https://strace.io
 %if 0%{?fedora} >= 12 || 0%{?centos} >= 6 || 0%{?rhel} >= 6 || 0%{?suse_version} >= 1200
 Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
-BuildRequires: xz
 %else
 Source: strace-%{version}.tar.gz
 %endif
-BuildRequires: gcc gzip
+BuildRequires: gcc xz
 
 # Install Bluetooth headers for AF_BLUETOOTH sockets decoding.
 %if 0%{?fedora} >= 18 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
@@ -72,7 +71,7 @@ rm -f %{buildroot}%{_bindir}/strace-graph
 
 # some say uncompressed changelog files are too big
 for f in ChangeLog ChangeLog-CVS; do
-	gzip -9n < "$f" > "$f".gz &
+	xz < "$f" > "$f".xz &
 done
 wait
 
@@ -87,7 +86,7 @@ echo 'END OF TEST SUITE INFORMATION'
 
 %files
 %maybe_use_defattr
-%doc CREDITS ChangeLog.gz ChangeLog-CVS.gz COPYING NEWS README
+%doc CREDITS ChangeLog.xz ChangeLog-CVS.xz COPYING NEWS README
 %{_bindir}/strace
 %{_bindir}/strace-log-merge
 %{_mandir}/man1/*
