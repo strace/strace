@@ -177,7 +177,7 @@ This example shows the shell performing ">>xyzzy" output redirection:
 open("xyzzy", O_WRONLY|O_APPEND|O_CREAT, 0666) = 3
 .CE
 Here, the third argument of
-.B open
+.BR open (2)
 is decoded by breaking down the
 flag argument into its three bitwise-OR constituents and printing the
 mode value in octal by tradition.  Where the traditional or native
@@ -198,7 +198,7 @@ displayed symbolically.  In particular, observe how the
 .B st_mode
 member is carefully decoded into a bitwise-OR of symbolic and numeric values.
 Also notice in this example that the first argument to
-.B lstat
+.BR lstat (2)
 is an input to the system call and the second argument is an output.
 Since output arguments are not modified if the system call fails, arguments may
 not always be dereferenced.  For example, retrying the "ls \-l" example
@@ -224,15 +224,16 @@ Only the first
 (32 by default) bytes of strings are printed;
 longer strings have an ellipsis appended following the closing quote.
 Here is a line from "ls \-l" where the
-.B getpwuid
+.BR getpwuid (3)
 library routine is reading the password file:
 .CW
 read(3, "root::0:0:System Administrator:/"..., 1024) = 422
 .CE
 While structures are annotated using curly braces, simple pointers
 and arrays are printed using square brackets with commas separating
-elements.  Here is an example from the command "id" on a system with
-supplementary group ids:
+elements.  Here is an example from the command
+.BR id (1)
+on a system with supplementary group ids:
 .CW
 getgroups(32, [100, 0]) = 2
 .CE
@@ -835,7 +836,9 @@ One might want to consider using
 to obtain a combined strace log view.
 .TP
 .BI "\-I " interruptible
-When strace can be interrupted by signals (such as pressing ^C).
+When
+.B strace
+can be interrupted by signals (such as pressing ^C).
 1: no signals are blocked; 2: fatal signals are blocked while decoding syscall
 (default); 3: fatal signals are always blocked (default if '-o FILE PROG');
 4: fatal signals and SIGTSTP (^Z) are always blocked (useful to make
@@ -987,8 +990,11 @@ This support is optional and relies on ability to generate and parse structure
 definitions during the build time.
 Please refer to the output of the
 .B strace \-V
-command in order to figure out what support is available in your strace build
-("non-native" refers to an ABI that differs from the ABI strace has):
+command in order to figure out what support is available in your
+.B strace
+build ("non-native" refers to an ABI that differs from the ABI
+.B strace
+has):
 .TP 15
 .B m32-mpers
 .B strace
@@ -1035,7 +1041,7 @@ or have a different name.  For example, the
 system call does not have
 .I flags
 argument, and the
-.BR setrlimit (2)
+.BR setrlimit (3)
 library function uses
 .BR prlimit64 (2)
 system call on modern (2.6.38+) kernels.  These
