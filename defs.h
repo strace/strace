@@ -278,6 +278,8 @@ struct tcb {
 #define TCB_DELAYED	0x1000	/* Current syscall has been delayed */
 #define TCB_TAMPERED_NO_FAIL 0x2000	/* We tamper tcb with syscall
 					   that should not fail. */
+#define TCB_PTRACEOPTS_APPLIED	0x40000 /* Our PTRACE_SETOPTIONS have taken
+					   their effect. */
 
 /* qualifier flags */
 #define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -303,6 +305,7 @@ struct tcb {
 #define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
 #define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
 #define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
+#define ptraceopts_applied(tcp)	((tcp)->flags & TCB_PTRACEOPTS_APPLIED)
 
 #include "xlat.h"
 
@@ -448,6 +451,7 @@ extern void call_summary(FILE *);
 
 extern void clear_regs(struct tcb *tcp);
 extern int get_scno(struct tcb *);
+extern int get_syscall_result(struct tcb *, bool);
 extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
 
 /**

@@ -580,7 +580,6 @@ print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 
 static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
-static int get_syscall_result(struct tcb *);
 static int arch_get_scno(struct tcb *tcp);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
 static void get_error(struct tcb *, const bool);
@@ -852,7 +851,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 	update_personality(tcp, tcp->currpers);
 #endif
 
-	return get_syscall_result(tcp);
+	return get_syscall_result(tcp, false);
 }
 
 int
@@ -1312,13 +1311,13 @@ static int get_syscall_result_regs(struct tcb *);
  * -1: error, syscall_exiting_trace() should print error indicator
  *    ("????" etc) and bail out.
  */
-static int
-get_syscall_result(struct tcb *tcp)
+int
+get_syscall_result(struct tcb *tcp, bool ignore_tcp_state)
 {
 	if (get_syscall_result_regs(tcp) < 0)
 		return -1;
 	tcp->u_error = 0;
-	get_error(tcp,
+	get_error(tcp, !ignore_tcp_state &&
 		  (!(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS)
 			|| syscall_tampered(tcp))
                   && !syscall_tampered_nofail(tcp));

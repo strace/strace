@@ -340,6 +340,9 @@ error_opt_arg(int opt, const char *arg)
 	error_msg_and_help("invalid -%c argument: '%s'", opt, arg);
 }
 
+static const char ptrace_attach_attach[]    = "PTRACE_ATTACH";
+static const char ptrace_attach_seize[]     = "PTRACE_SEIZE";
+static const char ptrace_attach_interrupt[] = "PTRACE_INTERRUPT";
 static const char *ptrace_attach_cmd;
 
 static int
@@ -717,6 +720,8 @@ static void
 after_successful_attach(struct tcb *tcp, const unsigned int flags)
 {
 	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | flags;
+	if (ptrace_attach_cmd == ptrace_attach_interrupt)
+		tcp->flags |= TCB_PTRACEOPTS_APPLIED;
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
 		char name[PATH_MAX];
@@ -2391,6 +2396,9 @@ next_event(void)
 	const unsigned int sig = WSTOPSIG(status);
 	const unsigned int event = (unsigned int) status >> 16;
 
+	if (event != 0)
+		tcp->flags |= TCB_PTRACEOPTS_APPLIED;
+
 	switch (event) {
 	case 0:
 		/*
@@ -2405,6 +2413,7 @@ next_event(void)
 			tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
 			wd->te = TE_RESTART;
 		} else if (sig == syscall_trap_sig) {
+			tcp->flags |= TCB_PTRACEOPTS_APPLIED;
 			wd->te = TE_SYSCALL_STOP;
 		} else {
 			memset(&wd->si, 0, sizeof(wd->si));
@@ -2415,6 +2424,54 @@ next_event(void)
 			 * We can get ESRCH instead, you know...
 			 */
 			bool stopped = ptrace(PTRACE_GETSIGINFO, pid, 0, &wd->si) < 0;
+
+			/*
+			 * There is a race possibility if PTRACE_ATTACH is used:
+			 * when tracer attaches to tracee that undergoes exec
+			 * before kernel check whether it should notify tracer
+			 * about, it can  a post-execve SIGTRAP sent by kernel before it sets
+			 * ptrace options: kernel sends a naked SIGTRAP in that
+			 * case.
+			 *
+			 * However, if we use PTRACE_SEIZE (which provides
+			 * ability to set ptrace options during attach) or have
+			 * already seen something that indicates that our ptrace
+			 * options have been applied, we (seemingly) can't
+			 * receive it.
+			 */
+			if (!ptraceopts_applied(tcp) && (sig == SIGTRAP)) {
+				debug_func_msg("pid %d: got SIGTRAP, checking "
+					       "for possible post-execve "
+					       "notification", tcp->pid);
+
+				if (get_syscall_result(tcp, true) == 1
+				    && tcp->u_error == ENOSYS) {
+					debug_func_msg("We're inside a syscall,"
+						       " ignoring SIGTRAP");
+					wd->te = TE_RESTART;
+					break;
+				}
+
+				debug_func_msg("We're outside a syscall, can't "
+					       "assume that SIGTRAP is "
+					       "post-execve");
+
+				/* Try to check siginfo for garbage, old kernels
+				 * seemingly */
+				if (!stopped
+				    && (wd->si.si_signo != SIGTRAP
+				        || (wd->si.si_code != SI_KERNEL
+					    && wd->si.si_code != SI_USER))) {
+					debug_func_msg("Garbage in siginfo, "
+						       "ignoring SIGTRAP");
+					wd->te = TE_RESTART;
+					break;
+				}
+
+				debug_func_msg("siginfo is sane, looks like "
+					       "SIGTRAP is real");
+			}
+
 			wd->te = stopped ? TE_GROUP_STOP : TE_SIGNAL_DELIVERY_STOP;
 		}
 		break;
