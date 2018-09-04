@@ -42,6 +42,8 @@
 struct call_counts {
 	/* time may be total latency or system time */
 	struct timespec time;
+	struct timespec time_min;
+	struct timespec time_max;
 	double time_avg;
 	unsigned int calls, errors;
 };
@@ -50,6 +52,9 @@ static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 #define counts (countv[current_personality])
 
 static const struct timespec zero_ts;
+static const struct timespec max_ts = {
+	(time_t) (long long) (zero_extend_signed_to_ull(~(((time_t) 0))) >> 1),
+	LONG_MAX };
 
 static struct timespec overhead;
 
@@ -58,6 +63,8 @@ enum count_summary_columns {
 	CSC_NONE,
 	CSC_TIME_100S,
 	CSC_TIME_TOTAL,
+	CSC_TIME_MIN,
+	CSC_TIME_MAX,
 	CSC_TIME_AVG,
 	CSC_CALLS,
 	CSC_ERRORS,
@@ -88,8 +95,12 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 	if (!scno_in_range(tcp->scno))
 		return;
 
-	if (!counts)
+	if (!counts) {
 		counts = xcalloc(nsyscalls, sizeof(*counts));
+
+		for (size_t i = 0; i < nsyscalls; i++)
+			counts[i].time_min = max_ts;
+	}
 	struct call_counts *cc = &counts[tcp->scno];
 
 	cc->calls++;
@@ -107,6 +118,12 @@ count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 
 	ts_sub(&wts, &wts, &overhead);
 	ts_max(&wts, &wts, &zero_ts);
+
+	if (ts_cmp(&wts, &cc->time_min) < 0)
+		cc->time_min = wts;
+	if (ts_cmp(&wts, &cc->time_max) > 0)
+		cc->time_max = wts;
+
 	ts_add(&cc->time, &cc->time, &wts);
 }
 
@@ -115,6 +132,20 @@ time_cmp(const void *a, const void *b)
 {
 	return -ts_cmp(&counts[*((unsigned int *) a)].time,
 		       &counts[*((unsigned int *) b)].time);
+}
+
+static int
+min_time_cmp(const void *a, const void *b)
+{
+	return -ts_cmp(&counts[*((unsigned int *) a)].time_min,
+		       &counts[*((unsigned int *) b)].time_min);
+}
+
+static int
+max_time_cmp(const void *a, const void *b)
+{
+	return -ts_cmp(&counts[*((unsigned int *) a)].time_max,
+		       &counts[*((unsigned int *) b)].time_max);
 }
 
 static int
@@ -164,6 +195,10 @@ set_sortby(const char *sortby)
 		{ time_cmp,	"time" },
 		{ time_cmp,	"time_total" },
 		{ time_cmp,	"total_time" },
+		{ min_time_cmp,	"min_time" },
+		{ min_time_cmp,	"time_min" },
+		{ max_time_cmp,	"max_time" },
+		{ max_time_cmp,	"time_max" },
 		{ avg_time_cmp,	"avg_time" },
 		{ avg_time_cmp,	"time_avg" },
 		{ count_cmp,	"count" },
@@ -194,6 +229,8 @@ set_count_summary_columns(const char *s)
 	static const char *cnames[] = {
 		[CSC_TIME_100S]  = "time_percent",
 		[CSC_TIME_TOTAL] = "total_time",
+		[CSC_TIME_MIN]   = "min_time",
+		[CSC_TIME_MAX]   = "max_time",
 		[CSC_TIME_AVG]   = "avg_time",
 		[CSC_CALLS]      = "calls",
 		[CSC_ERRORS]     = "errors",
@@ -276,6 +313,8 @@ call_summary_pers(FILE *outf)
 	} cdesc[] = {
 		[CSC_TIME_100S]  = { ARRSZ_PAIR("% time"),     "%*.2f" },
 		[CSC_TIME_TOTAL] = { ARRSZ_PAIR("seconds"),    "%*.6f" },
+		[CSC_TIME_MIN]   = { ARRSZ_PAIR("shortest"),   "%*.6f" },
+		[CSC_TIME_MAX]   = { ARRSZ_PAIR("longest"),    "%*.6f" },
 		[CSC_TIME_AVG]   = { ARRSZ_PAIR("usecs/call"), "%*lu"  },
 		[CSC_CALLS]      = { ARRSZ_PAIR("calls"),      "%*" PRIu64 },
 		[CSC_ERRORS]     = { ARRSZ_PAIR("errors"),     "%*" PRIu64 },
@@ -285,6 +324,8 @@ call_summary_pers(FILE *outf)
 	unsigned int *indices;
 
 	struct timespec tv_cum = zero_ts;
+	struct timespec tv_min = max_ts;
+	struct timespec tv_max = zero_ts;
 	uint64_t call_cum = 0;
 	uint64_t error_cum = 0;
 
@@ -305,6 +346,8 @@ call_summary_pers(FILE *outf)
 			continue;
 
 		ts_add(&tv_cum, &tv_cum, &counts[i].time);
+		ts_min(&tv_min, &tv_min, &counts[i].time_min);
+		ts_max(&tv_max, &tv_max, &counts[i].time_max);
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
 
@@ -324,6 +367,8 @@ call_summary_pers(FILE *outf)
 	unsigned int cwidths[CSC_MAX] = {
 		W_(CSC_TIME_100S,  sizeof("100.00") - 1),
 		W_(CSC_TIME_TOTAL, num_chars("%.6f", float_tv_cum)),
+		W_(CSC_TIME_MIN,   num_chars("%ld.000000", tv_min.tv_sec)),
+		W_(CSC_TIME_MAX,   num_chars("%ld.000000", tv_max.tv_sec)),
 		W_(CSC_TIME_AVG,   num_chars("%lu", (unsigned long)
 						    (ts_avg_max * 1e6))),
 		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
@@ -376,6 +421,8 @@ call_summary_pers(FILE *outf)
 			switch (c) {
 			PC_(CSC_TIME_100S,  percent)
 			PC_(CSC_TIME_TOTAL, float_syscall_time)
+			PC_(CSC_TIME_MIN,   ts_float(&cc->time_min))
+			PC_(CSC_TIME_MAX,   ts_float(&cc->time_max))
 			PC_(CSC_TIME_AVG,   (long) (cc->time_avg * 1e6))
 			PC_(CSC_CALLS,      cc->calls)
 			case CSC_ERRORS:
@@ -412,6 +459,8 @@ call_summary_pers(FILE *outf)
 		switch (c) {
 		PC_(CSC_TIME_100S, 100.0)
 		PC_(CSC_TIME_TOTAL, float_tv_cum)
+		PC_(CSC_TIME_MIN, ts_float(&tv_min))
+		PC_(CSC_TIME_MAX, ts_float(&tv_max))
 		PC_(CSC_TIME_AVG,
 		    (unsigned long) (float_tv_cum / call_cum * 1e6))
 		PC_(CSC_CALLS, call_cum)

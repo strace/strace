@@ -417,6 +417,8 @@ Sort the output of the histogram printed by the
 .B \-c
 option by the specified criterion.  Legal values are
 .BR time " (or " total_time " or " time_total ),
+.BR min_time " (or " time_min ),
+.BR max_time " (or " time_max ),
 .BR avg_time " (or " time_avg ),
 .BR calls " (or " count ),
 .BR errors " (or " error ),
@@ -440,6 +442,12 @@ Percentage of cumulative time consumed by a specific system call.
 Total system (or wall clock, if
 .B \-w
 option is provided) time consumed by a specific process.
+.TQ
+.B min_time
+Minimum observed call duration.
+.TQ
+.B max_time
+Maximum observed call duration.
 .TQ
 .B avg_time
 Average call duration.
