@@ -406,8 +406,8 @@ Statistics:\n\
                  set overhead for tracing syscalls to OVERHEAD UNITs\n\
      units:      one of s, ms, us, ns; default is microseconds\n\
   -S SORTBY, --summary-sort-by=SORTBY\n\
-                 sort syscall counts by: time, calls, errors, name, nothing\n\
-                 (default %s)\n\
+                 sort syscall counts by: time, avg_time, calls, errors, name,\n\
+                 nothing (default %s)\n\
   -w, --summary-wall-clock\n\
                  summarise syscall latency (default is system time)\n\
 \n\

@@ -35,6 +35,10 @@ for s in '' '-S time' --summary-sort-by=time_total '-S total_time'; do
 	test_c "$s" '-n -r' \
 		's/^[[:space:]]+([0-9]+)[.,]([0-9]+)[[:space:]].*/\1\t\2/p'
 done
+for s in '-S avg_time' --summary-sort-by=time_avg; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\3/p'
+done
 for s in '-S calls' --summary-sort-by=count; do
 	test_c "$s" '-n -r' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'

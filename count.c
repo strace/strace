@@ -91,6 +91,15 @@ time_cmp(const void *a, const void *b)
 }
 
 static int
+avg_time_cmp(const void *a, const void *b)
+{
+	double m = counts[*((unsigned int *) a)].time_avg;
+	double n = counts[*((unsigned int *) b)].time_avg;
+
+	return (m < n) ? 1 : (m > n) ? -1 : 0;
+}
+
+static int
 syscall_cmp(const void *a, const void *b)
 {
 	const unsigned int *a_int = a;
@@ -134,6 +143,8 @@ set_sortby(const char *sortby)
 		{ time_cmp,	"time" },
 		{ time_cmp,	"time_total" },
 		{ time_cmp,	"total_time" },
+		{ avg_time_cmp,	"avg_time" },
+		{ avg_time_cmp,	"time_avg" },
 		{ count_cmp,	"calls" },
 		{ count_cmp,	"count" },
 		{ error_cmp,	"error" },
