@@ -145,7 +145,7 @@ check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
 
-for i in time time_percent time_total total_time avg_time time_avg calls count error errors name syscall syscall_name none nothing; do
+for i in time time_percent time_total total_time min_time time_min shortest max_time time_max longest avg_time time_avg calls count error errors name syscall syscall_name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
 	if [ "x$i" != xnone -a "x$i" != xnothing ]; then
@@ -157,7 +157,7 @@ for i in time,time_total,avg_time,calls,errors,name time_percent,total_time,time
 	check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
 done
-for i in min-time non time_max syscall-name syscall_names; do
+for i in min-time non syscall-name syscall_names; do
 	check_h "invalid sortby: '$i'" -S "$i"
 	check_h "invalid sortby: '$i'" --summary-sort-by="$i"
 	check_h "unknown column name: '$i'" -U "$i"
