@@ -36,10 +36,13 @@
 
 #include "defs.h"
 
+#include <stdarg.h>
+
 /* Per-syscall stats structure */
 struct call_counts {
 	/* time may be total latency or system time */
 	struct timespec time;
+	double time_avg;
 	unsigned int calls, errors;
 };
 
@@ -49,6 +52,35 @@ static struct call_counts *countv[SUPPORTED_PERSONALITIES];
 static const struct timespec zero_ts;
 
 static struct timespec overhead;
+
+
+enum count_summary_columns {
+	CSC_NONE,
+	CSC_TIME_100S,
+	CSC_TIME_TOTAL,
+	CSC_TIME_AVG,
+	CSC_CALLS,
+	CSC_ERRORS,
+	CSC_SC_NAME,
+
+	CSC_MAX,
+};
+
+#define DEF_COLUMNS		\
+	_(CSC_TIME_100S),	\
+	_(CSC_TIME_TOTAL),	\
+	_(CSC_TIME_AVG),	\
+	_(CSC_CALLS),		\
+	_(CSC_ERRORS),		\
+	_(CSC_SC_NAME),		\
+	/* End of DEF_COLUMNS definition */
+
+#define _(x) x
+static uint8_t columns[CSC_MAX] = { DEF_COLUMNS };
+#undef _
+#define _(x) [x] = 1
+static uint8_t visible[CSC_MAX] = { DEF_COLUMNS };
+#undef _
 
 void
 count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
@@ -141,65 +173,178 @@ set_overhead(const char *str)
 		error_msg_and_help("invalid -O argument: '%s'", str);
 }
 
+static size_t ATTRIBUTE_FORMAT((printf, 1, 2))
+num_chars(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	int ret = vsnprintf(NULL, 0, fmt, ap);
+	va_end(ap);
+
+	return (unsigned int) MAX(ret, 0);
+}
+
 static void
 call_summary_pers(FILE *outf)
 {
-	static const char dashes[]  = "----------------";
-	static const char header[]  = "%6.6s %11.11s %11.11s %9.9s %9.9s %s\n";
-	static const char data[]    = "%6.2f %11.6f %11lu %9u %9.u %s\n";
-	static const char summary[] = "%6.6s %11.6f %11.11s %9u %9.u %s\n";
+	enum column_flags {
+		CF_L = 1 << 0, /* Left-aligned column */
+	};
+	static const struct {
+		const char *s;
+		size_t sz;
+		const char *fmt;
+		uint32_t flags;
+	} cdesc[] = {
+		[CSC_TIME_100S]  = { ARRSZ_PAIR("% time"),     "%*.2f" },
+		[CSC_TIME_TOTAL] = { ARRSZ_PAIR("seconds"),    "%*.6f" },
+		[CSC_TIME_AVG]   = { ARRSZ_PAIR("usecs/call"), "%*lu"  },
+		[CSC_CALLS]      = { ARRSZ_PAIR("calls"),      "%*" PRIu64 },
+		[CSC_ERRORS]     = { ARRSZ_PAIR("errors"),     "%*" PRIu64 },
+		[CSC_SC_NAME]    = { ARRSZ_PAIR("syscall"),    "%-*s", CF_L },
+	};
 
-	unsigned int i;
-	unsigned int call_cum, error_cum;
-	struct timespec tv_cum, dtv;
-	double  float_tv_cum;
-	double  percent;
-	unsigned int *sorted_count;
+	unsigned int *indices;
 
-	fprintf(outf, header,
-		"% time", "seconds", "usecs/call",
-		"calls", "errors", "syscall");
-	fprintf(outf, header, dashes, dashes, dashes, dashes, dashes, dashes);
+	struct timespec tv_cum = zero_ts;
+	uint64_t call_cum = 0;
+	uint64_t error_cum = 0;
 
-	sorted_count = xcalloc(sizeof(sorted_count[0]), nsyscalls);
-	call_cum = error_cum = tv_cum.tv_sec = tv_cum.tv_nsec = 0;
-	for (i = 0; i < nsyscalls; i++) {
-		sorted_count[i] = i;
-		if (counts == NULL || counts[i].calls == 0)
+	double float_tv_cum;
+	double percent;
+
+	double ts_avg_max = 0;
+	size_t sc_name_max = 0;
+
+
+	/* sort, calculate statistics */
+	indices = xcalloc(sizeof(indices[0]), nsyscalls);
+	for (size_t i = 0; i < nsyscalls; i++) {
+		struct timespec dtv;
+
+		indices[i] = i;
+		if (counts[i].calls == 0)
 			continue;
+
+		ts_add(&tv_cum, &tv_cum, &counts[i].time);
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
-		ts_add(&tv_cum, &tv_cum, &counts[i].time);
+
+		ts_div(&dtv, &counts[i].time, counts[i].calls);
+		counts[i].time_avg = ts_float(&dtv);
+
+		ts_avg_max = MAX(ts_avg_max, counts[i].time_avg);
+		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
 	}
 	float_tv_cum = ts_float(&tv_cum);
-	if (counts) {
-		if (sortfun)
-			qsort((void *) sorted_count, nsyscalls,
-			      sizeof(sorted_count[0]), sortfun);
-		for (i = 0; i < nsyscalls; i++) {
-			double float_syscall_time;
-			unsigned int idx = sorted_count[i];
-			struct call_counts *cc = &counts[idx];
-			if (cc->calls == 0)
-				continue;
-			ts_div(&dtv, &cc->time, cc->calls);
-			float_syscall_time = ts_float(&cc->time);
-			percent = (100.0 * float_syscall_time);
-			if (percent != 0.0)
-				   percent /= float_tv_cum;
-			/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
-			fprintf(outf, data,
-				percent, float_syscall_time,
-				(long) (1000000 * dtv.tv_sec + dtv.tv_nsec / 1000),
-				cc->calls, cc->errors, sysent[idx].sys_name);
+
+	if (sortfun)
+		qsort((void *) indices, nsyscalls, sizeof(indices[0]), sortfun);
+
+	/* calculate column widths */
+#define W_(c_, v_) [c_] = MAX((cdesc[c_].sz - 1), (v_))
+	unsigned int cwidths[CSC_MAX] = {
+		W_(CSC_TIME_100S,  sizeof("100.00") - 1),
+		W_(CSC_TIME_TOTAL, num_chars("%.6f", float_tv_cum)),
+		W_(CSC_TIME_AVG,   num_chars("%lu", (unsigned long)
+						    (ts_avg_max * 1e6))),
+		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
+		W_(CSC_ERRORS,     num_chars("%" PRIu64, error_cum)),
+		W_(CSC_SC_NAME,    sc_name_max + 1),
+	};
+#undef W_
+
+	/* header */
+	for (size_t i = 0; columns[i] && i < ARRAY_SIZE(columns); i++) {
+		const char *fmt = cdesc[columns[i]].flags & CF_L
+				  ? "%s%-*s" : "%s%*s";
+		fprintf(outf, fmt, i ? " " : "", cwidths[columns[i]],
+			cdesc[columns[i]].s);
+	}
+	fputc('\n', outf);
+
+	for (size_t i = 0; columns[i] && i < ARRAY_SIZE(columns); i++) {
+		if (i)
+			fputc(' ', outf);
+
+		for (size_t j = 0; j < cwidths[columns[i]]; j++)
+			fputc('-', outf);
+	}
+	fputc('\n', outf);
+
+	/* data output */
+	for (size_t i = 0; i < nsyscalls; i++) {
+		unsigned int idx = indices[i];
+		struct call_counts *cc = &counts[idx];
+		double float_syscall_time;
+
+		if (cc->calls == 0)
+			continue;
+
+		float_syscall_time = ts_float(&cc->time);
+		percent = (100.0 * float_syscall_time);
+		/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
+		if (percent != 0.0)
+			   percent /= float_tv_cum;
+
+		for (size_t i = 0; columns[i] && i < ARRAY_SIZE(columns); i++) {
+			const size_t c = columns[i];
+			if (i)
+				fputc(' ', outf);
+
+#define PC_(c_, val_) \
+	case (c_): fprintf(outf, cdesc[c].fmt, cwidths[c], (val_)); break;
+
+			switch (c) {
+			PC_(CSC_TIME_100S,  percent)
+			PC_(CSC_TIME_TOTAL, float_syscall_time)
+			PC_(CSC_TIME_AVG,   (long) (cc->time_avg * 1e6))
+			PC_(CSC_CALLS,      cc->calls)
+			case CSC_ERRORS:
+				if (cc->errors)
+					fprintf(outf, cdesc[c].fmt,
+						cwidths[c], cc->errors);
+				else
+					fprintf(outf, "%*s", cwidths[c], "");
+				break;
+			PC_(CSC_SC_NAME,    sysent[idx].sys_name)
+			}
+		}
+		fputc('\n', outf);
+	}
+
+	free(indices);
+
+	/* footer */
+	for (size_t i = 0; columns[i] && i < ARRAY_SIZE(columns); i++) {
+		if (i)
+			fputc(' ', outf);
+
+		for (size_t j = 0; j < cwidths[columns[i]]; j++)
+			fputc('-', outf);
+	}
+	fputc('\n', outf);
+
+	/* totals */
+	for (size_t i = 0; columns[i] && i < ARRAY_SIZE(columns); i++) {
+		const size_t c = columns[i];
+		if (i)
+			fputc(' ', outf);
+
+		switch (c) {
+		PC_(CSC_TIME_100S, 100.0)
+		PC_(CSC_TIME_TOTAL, float_tv_cum)
+		PC_(CSC_TIME_AVG,
+		    (unsigned long) (float_tv_cum / call_cum * 1e6))
+		PC_(CSC_CALLS, call_cum)
+		PC_(CSC_ERRORS, error_cum)
+		PC_(CSC_SC_NAME, "total")
 		}
 	}
-	free(sorted_count);
+	fputc('\n', outf);
 
-	fprintf(outf, header, dashes, dashes, dashes, dashes, dashes, dashes);
-	fprintf(outf, summary,
-		"100.00", float_tv_cum, "",
-		call_cum, error_cum, "total");
+#undef PC_
 }
 
 void
