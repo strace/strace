@@ -624,30 +624,23 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	}
 
+# ifdef SYS_syscall_subcall
+	if (tcp->s_ent->sen == SEN_syscall)
+		decode_syscall_subcall(tcp);
+# endif
 #if defined SYS_ipc_subcall	\
- || defined SYS_socket_subcall	\
- || defined SYS_syscall_subcall
-	for (;;) {
-		switch (tcp->s_ent->sen) {
+ || defined SYS_socket_subcall
+	switch (tcp->s_ent->sen) {
 # ifdef SYS_ipc_subcall
-		case SEN_ipc:
-			decode_ipc_subcall(tcp);
-			break;
+	case SEN_ipc:
+		decode_ipc_subcall(tcp);
+		break;
 # endif
 # ifdef SYS_socket_subcall
-		case SEN_socketcall:
-			decode_socket_subcall(tcp);
-			break;
-# endif
-# ifdef SYS_syscall_subcall
-		case SEN_syscall:
-			decode_syscall_subcall(tcp);
-			if (tcp->s_ent->sen != SEN_syscall)
-				continue;
-			break;
-# endif
-		}
+	case SEN_socketcall:
+		decode_socket_subcall(tcp);
 		break;
+# endif
 	}
 #endif
 
