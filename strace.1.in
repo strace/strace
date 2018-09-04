@@ -413,7 +413,9 @@ Sort the output of the histogram printed by the
 .B \-c
 option by the specified criterion.  Legal values are
 .BR time " (or " total_time " or " time_total ),
+.BR avg_time " (or " time_avg ),
 .BR calls " (or " count ),
+.BR errors " (or " error ),
 .BR name " (or " syscall " or " syscall_name ),
 and
 .BR nothing " (or " none );

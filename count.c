@@ -118,6 +118,15 @@ time_cmp(const void *a, const void *b)
 }
 
 static int
+avg_time_cmp(const void *a, const void *b)
+{
+	double m = counts[*((unsigned int *) a)].time_avg;
+	double n = counts[*((unsigned int *) b)].time_avg;
+
+	return (m < n) ? 1 : (m > n) ? -1 : 0;
+}
+
+static int
 syscall_cmp(const void *a, const void *b)
 {
 	const char *a_name = sysent[*((unsigned int *) a)].sys_name;
@@ -127,6 +136,15 @@ syscall_cmp(const void *a, const void *b)
 
 static int
 count_cmp(const void *a, const void *b)
+{
+	unsigned int m = counts[*((unsigned int *) a)].calls;
+	unsigned int n = counts[*((unsigned int *) b)].calls;
+
+	return (m < n) ? 1 : (m > n) ? -1 : 0;
+}
+
+static int
+error_cmp(const void *a, const void *b)
 {
 	unsigned int m = counts[*((unsigned int *) a)].errors;
 	unsigned int n = counts[*((unsigned int *) b)].errors;
@@ -146,8 +164,12 @@ set_sortby(const char *sortby)
 		{ time_cmp,	"time" },
 		{ time_cmp,	"time_total" },
 		{ time_cmp,	"total_time" },
+		{ avg_time_cmp,	"avg_time" },
+		{ avg_time_cmp,	"time_avg" },
 		{ count_cmp,	"count" },
 		{ count_cmp,	"calls" },
+		{ error_cmp,	"errors" },
+		{ error_cmp,	"error" },
 		{ syscall_cmp,	"name" },
 		{ syscall_cmp,	"syscall_name" },
 		{ syscall_cmp,	"syscall" },
