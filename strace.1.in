@@ -131,8 +131,12 @@ interface, a close examination of this boundary is very
 useful for bug isolation, sanity checking and
 attempting to capture race conditions.
 .LP
-Each line in the trace contains the system call name, followed
-by its arguments in parentheses and its return value.
+Each line in the trace, except for those that are part of I/O dumps and stack
+traces (that start with a space character), signal delivery notifications
+(that start with a minus sign), process termination notifications (that start
+with a plus sign), and informational messages about process attach/detach,
+contains the system call name, followed by its arguments in parentheses and its
+return value.
 An example from stracing the command "cat /dev/null" is:
 .CW
 open("/dev/null", O_RDONLY) = 3
@@ -145,8 +149,8 @@ open("/foo/bar", O_RDONLY) = \-1 ENOENT (No such file or directory)
 Signals are printed as signal symbol and decoded siginfo structure.
 An excerpt from stracing and interrupting the command "sleep 666" is:
 .CW
-sigsuspend([] <unfinished ...>
---- SIGINT {si_signo=SIGINT, si_code=SI_USER, si_pid=...} ---
+nanosleep({tv_sec=666, tv_nsec=0}, NULL) = ? ERESTART_RESTARTBLOCK (Interrupted by signal)
+--- SIGINT {si_signo=SIGINT, si_code=SI_USER, si_pid=1728, si_uid=1000} ---
 +++ killed by SIGINT +++
 .CE
 If a system call is being executed and meanwhile another one is being called
@@ -166,10 +170,10 @@ Interruption of a (restartable) system call by a signal delivery is processed
 differently as kernel terminates the system call and also arranges its
 immediate reexecution after the signal handler completes.
 .CW
-read(0, 0x7ffff72cf5cf, 1)              = ? ERESTARTSYS (To be restarted)
---- SIGALRM ... ---
-rt_sigreturn(0xe)                       = 0
-read(0, "", 1)                          = 0
+recvfrom(3, 0x601590, 4, 0, NULL, NULL) = ? ERESTARTSYS (To be restarted if SA_RESTART is set)
+--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---
+rt_sigreturn({mask=[]})                 = 45
+recvfrom(3, "", 4, 0, NULL, NULL)       = 0
 .CE
 Arguments are printed in symbolic form with passion.
 This example shows the shell performing ">>xyzzy" output redirection:
@@ -222,13 +226,19 @@ ordinary C escape codes.
 Only the first
 .I strsize
 (32 by default) bytes of strings are printed;
-longer strings have an ellipsis appended following the closing quote.
+longer strings have an ellipsis appended after the closing quote.
 Here is a line from "ls \-l" where the
+.\" XXX This is not true with modern glibs, example probably should be updated
 .BR getpwuid (3)
 library routine is reading the password file:
 .CW
-read(3, "root::0:0:System Administrator:/"..., 1024) = 422
+read(3</etc/passwd>, "root::0:0:System Administrator:/"..., 1024) = 422
 .CE
+One may also notice here that a path associated the file  descriptor being read
+is provided in angle brackets, a feature that is enabled with the
+.B \-y
+option.
+.LP
 While structures are annotated using curly braces, simple pointers
 and arrays are printed using square brackets with commas separating
 elements.  Here is an example from the command
@@ -237,7 +247,7 @@ on a system with supplementary group ids:
 .CW
 getgroups(32, [100, 0]) = 2
 .CE
-On the other hand, bit-sets are also shown using square brackets
+On the other hand, bit sets are also shown using square brackets
 but set elements are separated only by a space.  Here is the shell,
 preparing to execute an external command:
 .CW
@@ -364,9 +374,14 @@ and block/character device number associated with device file descriptors.
 .TP 12
 .B \-c
 Count time, calls, and errors for each system call and report a summary on
-program exit, suppressing the regular output.
-This attempts to show system time (CPU time spent running
-in the kernel) independent of wall clock time.  If
+program exit, suppressing the regular output (but see
+.B \-C
+option).
+It shows system time (CPU time spent running in the kernel) independent
+of wall clock time (but see
+.B \w
+option).
+If
 .B \-c
 is used with
 .BR \-f ,
@@ -374,11 +389,12 @@ only aggregate totals for all traced processes are kept.
 .TP
 .B \-C
 Like
-.B \-c
+.BR \-c ,
 but also print regular output while processes are running.
 .TP
 .BI "\-O " overhead
-Set the overhead for tracing system calls to
+Set the overhead for tracing system calls.
+
 .I overhead
 microseconds.
 This is useful for overriding the default heuristic for guessing
@@ -405,7 +421,7 @@ default is
 .BR time .
 .TP
 .B \-w
-Summarise the time difference between the beginning and end of
+Summarise the wall clock time difference between the beginning and the end of
 each system call.  The default is to summarise the system time.
 .SS Filtering
 .TP 12
@@ -838,11 +854,28 @@ to obtain a combined strace log view.
 .BI "\-I " interruptible
 When
 .B strace
-can be interrupted by signals (such as pressing ^C).
-1: no signals are blocked; 2: fatal signals are blocked while decoding syscall
-(default); 3: fatal signals are always blocked (default if '-o FILE PROG');
-4: fatal signals and SIGTSTP (^Z) are always blocked (useful to make
-strace -o FILE PROG not stop on ^Z).
+can be interrupted by signals (such as pressing
+.BR ^C ).
+.RS
+.TP 4
+.B 1
+no signals are blocked;
+.TQ
+.B 2
+fatal signals are blocked while decoding syscall (default);
+.TQ
+.B 3
+fatal signals are always blocked (default if
+.BR -o " " \fIFILE\fR " " \fIPROG\fR );
+.TQ
+.B 4
+fatal signals and
+.BR SIGTSTP " (" ^Z )
+are always blocked (useful to make
+.BI "strace -o " FILE PROG
+not stop on
+.BR ^Z ).
+.RE
 .SS Startup
 .TP 12
 \fB\-E\ \fIvar\fR=\,\fIval\fR
