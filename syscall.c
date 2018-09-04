@@ -57,6 +57,7 @@
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif
 
+#include "static_assert.h"
 #include "syscall.h"
 #include "xstring.h"
 
@@ -462,16 +463,119 @@ err_name(unsigned long err)
 	return NULL;
 }
 
+/*
+ * Wrapper for strerror that provides error descriptions for ERESTART* errors,
+ * as libcs don't usually have them
+ */
+const char *
+err_desc(unsigned int err) {
+#define ERR_DESCS_BASE ERESTARTSYS
+#define _(err_, desc_) [(err_) - ERR_DESCS_BASE] = (desc_)
+	static const char *error_descs[] = {
+		_(ERESTARTSYS,    "To be restarted if SA_RESTART is set"),
+		_(ERESTARTNOINTR, "To be restarted"),
+		_(ERESTARTNOHAND, "To be restarted if no handler"),
+		_(ERESTART_RESTARTBLOCK, "Interrupted by signal"),
+
+		/* These are assorted Linux error codes that normally shouldn't
+		 * be exposed to userspace, except when they do.
+		 */
+		_(515 /* ENOIOCTLCMD */,  "Unknown ioctl command"),
+		_(517 /* EPROBE_DEFER */, "Driver requests probe retry"),
+		_(518 /* EOPENSTALE */,   "open found a stale dentry"),
+
+		_(521 /* EBADHANDLE */,   "Illegal NFS file handle"),
+		_(522 /* ENOTSYNC */,     "Update synchronization mismatch"),
+		_(523 /* EBADCOOKIE */,   "Cookie is stale"),
+		_(524 /* ENOTSUPP */,     "Operation is not supported"),
+		_(525 /* ETOOSMALL */,    "Buffer or request is too small"),
+		_(526 /* ESERVERFAULT */, "An untranslatable error occurred"),
+		_(527 /* EBADTYPE */,     "Type not supported by server"),
+		_(528 /* EJUKEBOX */,     "Request initiated, but will not "
+					   "complete before timeout"),
+		_(529 /* EIOCBQUEUED */,  "iocb queued, will get completion "
+					   "event"),
+		_(530 /* ERECALLCONFLICT */, "conflict with recalled state"),
+	};
+#undef _
+
+	/* Check that error_desc size is sane */
+	static_assert(ARRAY_SIZE(error_descs) < 20,
+		      "err_codes array is unexpectedly big");
+
+	if ((err - ERR_DESCS_BASE) < ARRAY_SIZE(error_descs)
+	    && error_descs[err - ERR_DESCS_BASE])
+		return error_descs[err - ERR_DESCS_BASE];
+
+	return strerror(err);
+}
+
 static void
 print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 {
 	const char *u_error_str = err_name(u_error);
+	bool print_ret = true;
 
-	if (u_error_str)
-		tprintf("= %" PRI_kld " %s (%s)",
-			ret, u_error_str, strerror(u_error));
-	else
+	/* Blocked signals do not interrupt any syscalls.
+	 * In this case syscalls don't return ERESTARTfoo codes.
+	 *
+	 * Deadly signals set to SIG_DFL interrupt syscalls
+	 * and kill the process regardless of which of the codes below
+	 * is returned by the interrupted syscall.
+	 * In some cases, kernel forces a kernel-generated deadly
+	 * signal to be unblocked and set to SIG_DFL (and thus cause
+	 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
+	 * or SIGILL. (The alternative is to leave process spinning
+	 * forever on the faulty instruction - not useful).
+	 *
+	 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
+	 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
+	 * but kernel will always restart them.
+	 */
+	switch (u_error) {
+	/* Most common type of signal-interrupted syscall exit code.
+	 * The system call will be restarted with the same arguments
+	 * if SA_RESTART is set; otherwise, it will fail with EINTR.
+	 */
+	case ERESTARTSYS:
+	/* Rare. For example, fork() returns this if interrupted.
+	 * SA_RESTART is ignored (assumed set): the restart is unconditional.
+	 */
+	case ERESTARTNOINTR:
+	/* pause(), rt_sigsuspend() etc use this code.
+	 * SA_RESTART is ignored (assumed not set):
+	 * syscall won't restart (will return EINTR instead)
+	 * even after signal with SA_RESTART set. However,
+	 * after SIG_IGN or SIG_DFL signal it will restart
+	 * (thus the name "restart only if has no handler").
+	 */
+	case ERESTARTNOHAND:
+	/* Syscalls like nanosleep(), poll() which can't be
+	 * restarted with their original arguments use this
+	 * code. Kernel will execute restart_syscall() instead,
+	 * which changes arguments before restarting syscall.
+	 * SA_RESTART is ignored (assumed not set) similarly
+	 * to ERESTARTNOHAND. (Kernel can't honor SA_RESTART
+	 * since restart data is saved in "restart block"
+	 * in task struct, and if signal handler uses a syscall
+	 * which in turn saves another such restart block,
+	 * old data is lost and restart becomes impossible)
+	 */
+	case ERESTART_RESTARTBLOCK:
+		print_ret = false;
+	}
+
+	if (u_error_str) {
+		const char *desc = err_desc(u_error);
+
+		if (print_ret)
+			tprintf("= %" PRI_kld " %s (%s)",
+				ret, u_error_str, desc);
+		else
+			tprintf("= ? %s (%s)", u_error_str, desc);
+	} else {
 		tprintf("= %" PRI_kld " (errno %lu)", ret, u_error);
+	}
 }
 
 static long get_regs(struct tcb *);
@@ -825,64 +929,8 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		if (syscall_tampered(tcp))
 			tprints(" (INJECTED)");
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
-		switch (tcp->u_error) {
-		/* Blocked signals do not interrupt any syscalls.
-		 * In this case syscalls don't return ERESTARTfoo codes.
-		 *
-		 * Deadly signals set to SIG_DFL interrupt syscalls
-		 * and kill the process regardless of which of the codes below
-		 * is returned by the interrupted syscall.
-		 * In some cases, kernel forces a kernel-generated deadly
-		 * signal to be unblocked and set to SIG_DFL (and thus cause
-		 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
-		 * or SIGILL. (The alternative is to leave process spinning
-		 * forever on the faulty instruction - not useful).
-		 *
-		 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
-		 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
-		 * but kernel will always restart them.
-		 */
-		case ERESTARTSYS:
-			/* Most common type of signal-interrupted syscall exit code.
-			 * The system call will be restarted with the same arguments
-			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
-			 */
-			tprints("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
-			break;
-		case ERESTARTNOINTR:
-			/* Rare. For example, fork() returns this if interrupted.
-			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
-			 */
-			tprints("= ? ERESTARTNOINTR (To be restarted)");
-			break;
-		case ERESTARTNOHAND:
-			/* pause(), rt_sigsuspend() etc use this code.
-			 * SA_RESTART is ignored (assumed not set):
-			 * syscall won't restart (will return EINTR instead)
-			 * even after signal with SA_RESTART set. However,
-			 * after SIG_IGN or SIG_DFL signal it will restart
-			 * (thus the name "restart only if has no handler").
-			 */
-			tprints("= ? ERESTARTNOHAND (To be restarted if no handler)");
-			break;
-		case ERESTART_RESTARTBLOCK:
-			/* Syscalls like nanosleep(), poll() which can't be
-			 * restarted with their original arguments use this
-			 * code. Kernel will execute restart_syscall() instead,
-			 * which changes arguments before restarting syscall.
-			 * SA_RESTART is ignored (assumed not set) similarly
-			 * to ERESTARTNOHAND. (Kernel can't honor SA_RESTART
-			 * since restart data is saved in "restart block"
-			 * in task struct, and if signal handler uses a syscall
-			 * which in turn saves another such restart block,
-			 * old data is lost and restart becomes impossible)
-			 */
-			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
-			break;
-		default:
-			print_err_ret(tcp->u_rval, tcp->u_error);
-			break;
-		}
+		print_err_ret(tcp->u_rval, tcp->u_error);
+
 		if (syscall_tampered(tcp))
 			tprints(" (INJECTED)");
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
