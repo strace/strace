@@ -791,9 +791,8 @@ option set to
 .BR ENOSYS .
 .TP
 .BR "\-e\ kvm" = vcpu
-Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
+Print the exit reason of a KVM vCPU.  Requires Linux kernel version 4.16.0
 or higher.
-
 .TP
 .BI "\-P " path
 Trace only system calls accessing
@@ -851,7 +850,7 @@ where
 is the numeric process id of each process.
 This is incompatible with
 .BR \-c ,
-since no per-process counts are kept.
+option, since no per-process counts are kept.
 
 One might want to consider using
 .BR strace-log-merge (1)
@@ -980,7 +979,7 @@ If
 .B strace
 is installed setuid to root then the invoking user will be able to
 attach to and trace processes owned by any user.
-In addition setuid and setgid programs will be executed and traced
+In addition, setuid and setgid programs will be executed and traced
 with the correct effective privileges.
 Since only users trusted with full root privileges should be allowed
 to do these things,
@@ -1127,7 +1126,7 @@ As
 executes the specified
 .I command
 directly and does not employ a shell for that, scripts without shebang
-that usually run just fine when invoked by shell fail to execute with
+that usually run just fine when invoked by a shell, fail to execute with
 .B ENOEXEC
 error.
 It is advisable to manually supply a shell as a
