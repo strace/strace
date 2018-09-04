@@ -819,8 +819,8 @@ droptcb(struct tcb *tcp)
 		struct timespec dt;
 
 		ts_sub(&dt, &tcp->stime, &tcp->atime);
-		debug_func_msg("pid %d: %ld.%09ld seconds of system time spent "
-			       "since attach", tcp->pid, dt.tv_sec, dt.tv_nsec);
+		debug_func_msg("pid %d: %.9f seconds of system time spent "
+			       "since attach", tcp->pid, ts_float(&dt));
 	}
 
 	int p;
