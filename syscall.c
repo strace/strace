@@ -579,11 +579,13 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	}
 
+# ifdef SYS_syscall_subcall
+	if (tcp_sysent(tcp)->sen == SEN_syscall)
+		decode_syscall_subcall(tcp);
+# endif
 #if defined SYS_ipc_subcall	\
- || defined SYS_socket_subcall	\
- || defined SYS_syscall_subcall
-	for (;;) {
-		switch (tcp_sysent(tcp)->sen) {
+ || defined SYS_socket_subcall
+	switch (tcp_sysent(tcp)->sen) {
 # ifdef SYS_ipc_subcall
 		case SEN_ipc:
 			decode_ipc_subcall(tcp);
@@ -594,15 +596,6 @@ syscall_entering_decode(struct tcb *tcp)
 			decode_socket_subcall(tcp);
 			break;
 # endif
-# ifdef SYS_syscall_subcall
-		case SEN_syscall:
-			decode_syscall_subcall(tcp);
-			if (tcp_sysent(tcp)->sen != SEN_syscall)
-				continue;
-			break;
-# endif
-		}
-		break;
 	}
 #endif
 
