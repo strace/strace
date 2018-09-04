@@ -157,7 +157,7 @@ This example shows the shell performing ">>xyzzy" output redirection:
 open("xyzzy", O_WRONLY|O_APPEND|O_CREAT, 0666) = 3
 .CE
 Here, the third argument of
-.B open
+.BR open (2)
 is decoded by breaking down the
 flag argument into its three bitwise-OR constituents and printing the
 mode value in octal by tradition.  Where the traditional or native
@@ -178,7 +178,7 @@ displayed symbolically.  In particular, observe how the
 .B st_mode
 member is carefully decoded into a bitwise-OR of symbolic and numeric values.
 Also notice in this example that the first argument to
-.B lstat
+.BR lstat (2)
 is an input to the system call and the second argument is an output.
 Since output arguments are not modified if the system call fails, arguments may
 not always be dereferenced.  For example, retrying the "ls \-l" example
@@ -204,15 +204,16 @@ Only the first
 (32 by default) bytes of strings are printed;
 longer strings have an ellipsis appended following the closing quote.
 Here is a line from "ls \-l" where the
-.B getpwuid
+.BR getpwuid (3)
 library routine is reading the password file:
 .CW
 read(3, "root::0:0:System Administrator:/"..., 1024) = 422
 .CE
 While structures are annotated using curly braces, simple pointers
 and arrays are printed using square brackets with commas separating
-elements.  Here is an example from the command "id" on a system with
-supplementary group ids:
+elements.  Here is an example from the command
+.BR id (1)
+on a system with supplementary group ids:
 .CW
 getgroups(32, [100, 0]) = 2
 .CE
@@ -469,7 +470,7 @@ can think of this as an abbreviation for
 which is useful to seeing what files the process is referencing.
 Furthermore, using the abbreviation will ensure that you don't
 accidentally forget to include a call like
-.B lstat
+.BR lstat (2)
 in the list.  Betchya woulda forgot that one.
 .TP
 .BR "\-e\ trace" = %process
@@ -751,8 +752,7 @@ This is equivalent to more generic
 \fB\-e\ inject\fR= expression with default value of
 .I errno
 option set to
-.IR ENOSYS .
-
+.BR ENOSYS .
 .TP
 .BR "\-e\ kvm" = vcpu
 Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
@@ -776,10 +776,11 @@ this option to get all of the gory details.
 .BI "\-b " syscall
 If specified syscall is reached, detach from traced process.
 Currently, only
-.I execve
+.BR execve (2)
 syscall is supported.  This option is useful if you want to trace
-multi-threaded process and therefore require -f, but don't want
-to trace its (potentially very complex) children.
+multi-threaded process and therefore require
+.BR \-f ,
+but don't want to trace its (potentially very complex) children.
 .TP
 .B \-D
 Run tracer process as a detached grandchild, not as parent of the
@@ -798,16 +799,20 @@ system calls.  Note that
 .B \-p
 .I PID
 .B \-f
-will attach all threads of process PID if it is multi-threaded,
-not only thread with thread_id = PID.
+will attach all threads of process
+.I PID
+if it is multi-threaded, not only thread with
+.IR thread_id " = " PID .
 .TP
 .B \-ff
 If the
 .B \-o
 .I filename
 option is in effect, each processes trace is written to
-.I filename.pid
-where pid is the numeric process id of each process.
+.IR filename . pid
+where
+.I pid
+is the numeric process id of each process.
 This is incompatible with
 .BR \-c ,
 since no per-process counts are kept.
@@ -817,11 +822,30 @@ One might want to consider using
 to obtain a combined strace log view.
 .TP
 .BI "\-I " interruptible
-When strace can be interrupted by signals (such as pressing ^C).
-1: no signals are blocked; 2: fatal signals are blocked while decoding syscall
-(default); 3: fatal signals are always blocked (default if '-o FILE PROG');
-4: fatal signals and SIGTSTP (^Z) are always blocked (useful to make
-strace -o FILE PROG not stop on ^Z).
+When
+.B strace
+can be interrupted by signals (such as pressing
+.BR ^C ).
+.RS
+.TP 4
+.B 1
+no signals are blocked;
+.TQ
+.B 2
+fatal signals are blocked while decoding syscall (default);
+.TQ
+.B 3
+fatal signals are always blocked (default if
+.BR -o " " \fIFILE\fR " " \fIPROG\fR );
+.TQ
+.B 4
+fatal signals and
+.BR SIGTSTP " (" ^Z )
+are always blocked (useful to make
+.BI "strace -o " "FILE PROG"
+not stop on
+.BR ^Z ).
+.RE
 .SS Startup
 .TP 12
 \fB\-E\ \fIvar\fR=\,\fIval\fR
@@ -902,7 +926,8 @@ terminates itself with the same signal, so that
 .B strace
 can be used as a wrapper process transparent to the invoking parent process.
 Note that parent-child relationship (signal stop notifications,
-getppid() value, etc) between traced process and its parent are not preserved
+.BR getppid (2)
+value, etc) between traced process and its parent are not preserved
 unless
 .B \-D
 is used.
@@ -969,8 +994,11 @@ This support is optional and relies on ability to generate and parse structure
 definitions during the build time.
 Please refer to the output of the
 .B strace \-V
-command in order to figure out what support is available in your strace build
-("non-native" refers to an ABI that differs from the ABI strace has):
+command in order to figure out what support is available in your
+.B strace
+build ("non-native" refers to an ABI that differs from the ABI
+.B strace
+has):
 .TP 15
 .B m32-mpers
 .B strace
@@ -1039,17 +1067,22 @@ Xtensa syscall are filtered and printed as
 .LP
 On x32, syscalls that are intended to be used by 64-bit processes and not x32
 ones (for example,
-.BR readv ,
+.BR readv (2),
 that has syscall number 19 on x86_64, with its x32 counterpart has syscall
 number 515), but called with
 .B __X32_SYSCALL_BIT
-flag being set, are designated with "#64" suffix.
+flag being set, are designated with
+.B "#64"
+suffix.
 .LP
 On some platforms a process that is attached to with the
 .B \-p
-option may observe a spurious EINTR return from the current
-system call that is not restartable.  (Ideally, all system calls
-should be restarted on strace attach, making the attach invisible
+option may observe a spurious
+.B EINTR
+return from the current system call that is not restartable.
+(Ideally, all system calls should be restarted on
+.B strace
+attach, making the attach invisible
 to the traced process, but a few system calls aren't.
 Arguably, every instance of such behavior is a kernel bug.)
 This may have an unpredictable effect on the process
