@@ -796,6 +796,7 @@ Sort the output of the histogram printed by the
 option by the specified criterion.  Legal values are
 .BR time " (or " time_total " or " total_time ),
 .BR calls " (or " count ),
+.BR errors " (or " error ),
 .BR name " (or " syscall " or " syscall_name ),
 and
 .BR nothing " (or " none );

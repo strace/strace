@@ -86,6 +86,17 @@ count_cmp(const void *a, const void *b)
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
 
+static int
+error_cmp(const void *a, const void *b)
+{
+	const unsigned int *a_int = a;
+	const unsigned int *b_int = b;
+	unsigned int m = counts[*a_int].errors;
+	unsigned int n = counts[*b_int].errors;
+
+	return (m < n) ? 1 : (m > n) ? -1 : 0;
+}
+
 static int (*sortfun)(const void *, const void *);
 
 void
@@ -100,6 +111,8 @@ set_sortby(const char *sortby)
 		{ time_cmp,	"total_time" },
 		{ count_cmp,	"calls" },
 		{ count_cmp,	"count" },
+		{ error_cmp,	"error" },
+		{ error_cmp,	"errors" },
 		{ syscall_cmp,	"name" },
 		{ syscall_cmp,	"syscall" },
 		{ syscall_cmp,	"syscall_name" },

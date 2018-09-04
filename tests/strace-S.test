@@ -43,3 +43,7 @@ for s in name syscall syscall_name; do
 	test_c "$s" '' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+[0-9]+)?'"$c"'$/\6/p'
 done
+for s in error errors; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+([0-9]+))?'"$c"'$/\6/p'
+done
