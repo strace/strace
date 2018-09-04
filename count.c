@@ -107,17 +107,31 @@ static int (*sortfun)(const void *a, const void *b);
 void
 set_sortby(const char *sortby)
 {
-	if (strcmp(sortby, "time") == 0)
-		sortfun = time_cmp;
-	else if (strcmp(sortby, "calls") == 0)
-		sortfun = count_cmp;
-	else if (strcmp(sortby, "name") == 0)
-		sortfun = syscall_cmp;
-	else if (strcmp(sortby, "nothing") == 0)
-		sortfun = NULL;
-	else {
-		error_msg_and_help("invalid sortby: '%s'", sortby);
+	static const struct {
+		int (*fn)(const void *a, const void *b);
+		const char *name;
+	} sort_fns[] = {
+		{ time_cmp,	"time" },
+		{ time_cmp,	"time_total" },
+		{ time_cmp,	"total_time" },
+		{ count_cmp,	"count" },
+		{ count_cmp,	"calls" },
+		{ syscall_cmp,	"name" },
+		{ syscall_cmp,	"syscall_name" },
+		{ syscall_cmp,	"syscall" },
+		{ NULL,		"nothing" },
+		{ NULL,		"none" },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(sort_fns); i++) {
+		if (strcmp(sort_fns[i].name, sortby))
+			continue;
+
+		sortfun = sort_fns[i].fn;
+		return;
 	}
+
+	error_msg_and_help("invalid sortby: '%s'", sortby);
 }
 
 void

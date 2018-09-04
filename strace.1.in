@@ -395,13 +395,13 @@ system call time to the total produced using
 Sort the output of the histogram printed by the
 .B \-c
 option by the specified criterion.  Legal values are
-.BR time ,
-.BR calls ,
-.BR name ,
+.BR time " (or " total_time " or " time_total ),
+.BR calls " (or " count ),
+.BR name " (or " syscall " or " syscall_name ),
 and
-.B nothing
-(default is
-.BR time ).
+.BR nothing " (or " none );
+default is
+.BR time .
 .TP
 .B \-w
 Summarise the time difference between the beginning and end of
