@@ -930,13 +930,15 @@ from the inherited list of environment variables before passing it on to
 the command.
 .TP
 .BI "\-p " pid
-Attach to the process with the process
-.SM ID
+Attach to the process with the process ID
 .I pid
 and begin tracing.
 The trace may be terminated
 at any time by a keyboard interrupt signal
-.RB ( CTRL\-C ).
+.RB ( CTRL\-C ,
+but see
+.BR \-I
+option).
 .B strace
 will respond by detaching itself from the traced process(es)
 leaving it (them) to continue running.
@@ -948,15 +950,15 @@ options can be used to attach to many processes in addition to
 .B \-p
 option is given).
 .B \-p
-"`pidof PROG`" syntax is supported.
+"`\fBpidof\fR \fIPROG\fR`" syntax is supported.
 .TP
 .BI "\-u " username
-Run command with the user \s-1ID\s0, group \s-2ID\s0, and
+Run command with the user ID, group ID, and
 supplementary groups of
 .IR username .
 This option is only useful when running as root and enables the
 correct execution of setuid and/or setgid binaries.
-Unless this option is used setuid and setgid programs are executed
+Unless this option is used, setuid and setgid programs are executed
 without effective privileges.
 .SS Miscellaneous
 .TP 12
@@ -1138,7 +1140,7 @@ Xtensa syscall are filtered and printed as
 On x32, syscalls that are intended to be used by 64-bit processes and not x32
 ones (for example,
 .BR readv (2),
-that has syscall number 19 on x86_64, with its x32 counterpart has syscall
+that has syscall number 19 on x86_64, with its x32 counterpart having syscall
 number 515), but called with
 .B __X32_SYSCALL_BIT
 flag being set, are designated with
@@ -1173,9 +1175,9 @@ with the script as its argument.
 Programs that use the
 .I setuid
 bit do not have
-effective user
-.SM ID
-privileges while being traced.
+effective user ID privileges while being traced (but see
+.I SETUID INSTALLATION
+section).
 .LP
 A traced process runs slowly.
 .LP
