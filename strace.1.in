@@ -825,7 +825,7 @@ to obtain a combined strace log view.
 When
 .B strace
 can be interrupted by signals (such as pressing
-.BR ^C ).
+.BR CTRL\-C ).
 .RS
 .TP 4
 .B 1
@@ -840,11 +840,11 @@ fatal signals are always blocked (default if
 .TQ
 .B 4
 fatal signals and
-.BR SIGTSTP " (" ^Z )
+.BR SIGTSTP " (" CTRL\-Z )
 are always blocked (useful to make
 .BI "strace -o " "FILE PROG"
 not stop on
-.BR ^Z ).
+.BR CTRL\-Z ).
 .RE
 .SS Startup
 .TP 12
@@ -865,8 +865,8 @@ Attach to the process with the process
 .I pid
 and begin tracing.
 The trace may be terminated
-at any time by a keyboard interrupt signal (\c
-.SM CTRL\s0-C).
+at any time by a keyboard interrupt signal
+.RB ( CTRL\-C ).
 .B strace
 will respond by detaching itself from the traced process(es)
 leaving it (them) to continue running.
@@ -1111,8 +1111,8 @@ A traced process runs slowly.
 .LP
 Traced processes which are descended from
 .I command
-may be left running after an interrupt signal (\c
-.SM CTRL\s0-C).
+may be left running after an interrupt signal
+.RB ( CTRL\-C ).
 .SH HISTORY
 The original
 .B strace
