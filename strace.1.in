@@ -543,7 +543,7 @@ can think of this as an abbreviation for
 which is useful to seeing what files the process is referencing.
 Furthermore, using the abbreviation will ensure that you don't
 accidentally forget to include a call like
-.B lstat
+.BR lstat (2)
 in the list.  Betchya woulda forgot that one.
 .TP
 .BR "\-e\ trace" = %process
@@ -996,7 +996,8 @@ terminates itself with the same signal, so that
 .B strace
 can be used as a wrapper process transparent to the invoking parent process.
 Note that parent-child relationship (signal stop notifications,
-getppid() value, etc) between traced process and its parent are not preserved
+.BR getppid (2)
+value, etc) between traced process and its parent are not preserved
 unless
 .B \-D
 is used.
@@ -1148,9 +1149,10 @@ On some platforms a process that is attached to with the
 .B \-p
 option may observe a spurious
 .B EINTR
-return from the current
-system call that is not restartable.  (Ideally, all system calls
-should be restarted on strace attach, making the attach invisible
+return from the current system call that is not restartable.
+(Ideally, all system calls should be restarted on
+.B strace
+attach, making the attach invisible
 to the traced process, but a few system calls aren't.
 Arguably, every instance of such behavior is a kernel bug.)
 This may have an unpredictable effect on the process
