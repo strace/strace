@@ -70,6 +70,8 @@ check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mut
 check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' --summary -ff true
 check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -w true
 check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --summary-wall-clock true
+check_h '-U/--summary-columns must be given with (-c/--summary-only or -C/--summary)' -U name,time,count,errors true
+check_h '-U/--summary-columns must be given with (-c/--summary-only or -C/--summary)' --summary-columns=name,time,count,errors true
 check_h 'piping the output and -ff/--output-separately are mutually exclusive' -o '|' -ff true
 check_h 'piping the output and -ff/--output-separately are mutually exclusive' --output='|' -ff true
 check_h 'piping the output and -ff/--output-separately are mutually exclusive' -o '!' -ff true
@@ -143,15 +145,26 @@ check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
 
-for i in time time_total total_time avg_time time_avg calls count error errors name syscall syscall_name none nothing; do
+for i in time time_percent time_total total_time avg_time time_avg calls count error errors name syscall syscall_name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
+	if [ "x$i" != xnone -a "x$i" != xnothing ]; then
+		check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
+		check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
+	fi
 done
-check_h "invalid sortby: 'min-time'" -S min-time
-check_h "invalid sortby: 'non'" -S non
-check_h "invalid sortby: 'time_max'" --summary-sort-by=time_max
-check_h "invalid sortby: 'syscall-name'" --summary-sort-by=syscall-name
-check_h "invalid sortby: 'syscall_names'" --summary-sort-by=syscall_names
+for i in time,time_total,avg_time,calls,errors,name time_percent,total_time,time_avg,count,error,syscall_name; do
+	check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
+	check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
+done
+for i in min-time non time_max syscall-name syscall_names; do
+	check_h "invalid sortby: '$i'" -S "$i"
+	check_h "invalid sortby: '$i'" --summary-sort-by="$i"
+	check_h "unknown column name: '$i'" -U "$i"
+	check_h "unknown column name: '$i'" --summary-columns="$i"
+done
+check_h "unknown column name: ''" -U time,,name
+check_h "call summary column has been provided more than once: 'time_percent' (-U option residual: 'time_percent,time_total')" -U time,time_percent,time_total
 
 check_e '-x and --strings-in-hex cannot be provided simultaneously' -x --strings-in-hex -p $$
 check_e '-x and --strings-in-hex cannot be provided simultaneously' --strings-in-hex -p $$ -xx

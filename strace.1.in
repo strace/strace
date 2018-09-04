@@ -43,6 +43,9 @@ strace \- trace system calls and signals
 .OP \-I n
 .OP \-b execve
 .OM \-e expr
+.OP \-O overhead
+.OP \-S sortby
+.OP \-U columns
 .OP \-a column
 .OP \-o file
 .OP \-s strsize
@@ -67,6 +70,7 @@ strace \- trace system calls and signals
 .OM \-e expr
 .OP \-O overhead
 .OP \-S sortby
+.OP \-U columns
 .OM \-P path
 .OM \-p pid
 .OP \-\-seccomp\-bpf
@@ -1120,6 +1124,42 @@ and
 .BR nothing " (or " none );
 default is
 .BR time .
+.TP
+.BI "\-U " columns
+.TQ
+.BR "\-\-summary\-columns" = \fIcolumns\fR
+Configure a set (and order) of columns being shown in the call summary.
+The
+.I columns
+argument is a comma-separated list with items being one of the following:
+.RS
+.TP 36
+.BR time_percent " (or " time )
+Percentage of cumulative time consumed by a specific system call.
+.TQ
+.BR total_time " (or " time_total )
+Total system (or wall clock, if
+.B \-w
+option is provided) time consumed by a specific system call.
+.TQ
+.BR avg_time " (or " time_avg )
+Average call duration.
+.TQ
+.BR calls " (or " count )
+Call count.
+.TQ
+.BR errors " (or " error )
+Error count.
+.TQ
+.BR name " (or " syscall " or " syscall_name )
+Syscall name.
+.RE
+.IP
+The default value is
+.BR time_percent , total_time , avg_time , calls , errors , name .
+If the
+.B name
+field is not supplied explicitly, it is added as the last column.
 .TP
 .B \-w
 .TQ
