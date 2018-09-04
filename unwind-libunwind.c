@@ -163,7 +163,7 @@ tcb_walk(struct tcb *tcp,
 	 unwind_error_action_fn error_action,
 	 void *data)
 {
-	switch (mmap_cache_rebuild_if_invalid(tcp, __func__)) {
+	switch (mmap_cache_rebuild_if_invalid(tcp)) {
 		case MMAP_CACHE_REBUILD_RENEWED:
 			/*
 			 * Rebuild the unwinder internal cache.

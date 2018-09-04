@@ -79,12 +79,18 @@ extern void
 mmap_cache_enable(void);
 
 extern enum mmap_cache_rebuild_result
-mmap_cache_rebuild_if_invalid(struct tcb *, const char *caller);
+mmap_cache_rebuild_if_invalid_(struct tcb *, const char *caller);
+#define mmap_cache_rebuild_if_invalid(tcp_) \
+	mmap_cache_rebuild_if_invalid_((tcp_), __func__)
 
 extern struct mmap_cache_entry_t *
 mmap_cache_search(struct tcb *, unsigned long ip);
 
 extern struct mmap_cache_entry_t *
 mmap_cache_search_custom(struct tcb *, mmap_cache_search_fn, void *);
+
+extern void
+mmap_cache_free_(struct tcb *tcp, const char *caller);
+#define mmap_cache_free(tcp_) mmap_cache_free_((tcp_), __func__)
 
 #endif /* !STRACE_MMAP_CACHE_H */

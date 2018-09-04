@@ -137,7 +137,7 @@ vcpu_get_info(struct tcb *const tcp, int fd)
 	const char *cpuid_str;
 
 	enum mmap_cache_rebuild_result mc_stat =
-		mmap_cache_rebuild_if_invalid(tcp, __func__);
+		mmap_cache_rebuild_if_invalid(tcp);
 	if (mc_stat == MMAP_CACHE_REBUILD_NOCACHE)
 		return NULL;
 

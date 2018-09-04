@@ -94,7 +94,7 @@ delete_mmap_cache(struct tcb *tcp, const char *caller)
  * e.g. mmap, mprotect, munmap, execve.
  */
 extern enum mmap_cache_rebuild_result
-mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
+mmap_cache_rebuild_if_invalid_(struct tcb *tcp, const char *caller)
 {
 	if (tcp->mmap_cache
 	    && tcp->mmap_cache->generation != mmap_cache_generation)
@@ -244,4 +244,19 @@ mmap_cache_search_custom(struct tcb *tcp, mmap_cache_search_fn fn, void *data)
 			return tcp->mmap_cache->entry + i;
 	}
 	return NULL;
+}
+
+void
+mmap_cache_free_(struct tcb *tcp, const char *caller)
+{
+	if (!tcp->mmap_cache)
+		return;
+
+	if (!tcp->mmap_cache->free_fn) {
+		error_func_msg("pid %d: mmap_cache has NULL free_fn "
+			       "(called from %s)", tcp->pid, caller);
+		return;
+	}
+
+	tcp->mmap_cache->free_fn(tcp, caller);
 }

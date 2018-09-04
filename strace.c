@@ -838,8 +838,7 @@ droptcb(struct tcb *tcp)
 	kvm_vcpu_info_free(tcp);
 #endif
 
-	if (tcp->mmap_cache)
-		tcp->mmap_cache->free_fn(tcp, __func__);
+	mmap_cache_free(tcp);
 
 	nprocs--;
 	debug_msg("dropped tcb for pid %d, %d remain", tcp->pid, nprocs);
