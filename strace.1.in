@@ -67,6 +67,9 @@ strace \- trace system calls and signals
 .OP \-I n
 .OP \-b execve
 .OM \-e expr
+.OP \-O overhead
+.OP \-S sortby
+.OP \-U columns
 .OP \-a column
 .OP \-o file
 .OP \-s strsize
@@ -90,6 +93,7 @@ strace \- trace system calls and signals
 .OM \-e expr
 .OP \-O overhead
 .OP \-S sortby
+.OP \-U columns
 .OM \-P path
 .OM \-p pid
 .BR "" {
@@ -421,6 +425,37 @@ and
 .BR nothing " (or " none );
 default is
 .BR time .
+.TP
+.BI "\-U " columns
+Configure a set (and order) of columns being shown in the call summary.
+The
+.I columns
+argument is a comma-separated list with items being one of the following:
+.RS
+.TP 14
+.B time_percent
+Percentage of cumulative time consumed by a specific system call.
+.TQ
+.B total_time
+Total system (or wall clock, if
+.B \-w
+option is provided) time consumed by a specific process.
+.TQ
+.B avg_time
+Average call duration.
+.TQ
+.B calls
+Call count.
+.TQ
+.B errors
+Error count.
+.TQ
+.B syscall
+Syscall name.
+.RE
+.IP
+The default value is
+.BR time_percent , total_time , avg_time , calls , errors , syscall .
 .TP
 .B \-w
 Summarise the wall clock time difference between the beginning and the end of

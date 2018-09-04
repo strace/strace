@@ -1615,7 +1615,7 @@ init(int argc, char *argv[])
 #ifdef ENABLE_STACKTRACE
 	    "k"
 #endif
-	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yz")) != EOF) {
+	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:U:vVwxX:yz")) != EOF) {
 		switch (c) {
 		case 'a':
 			acolumn = string_to_uint(optarg);
@@ -1713,6 +1713,9 @@ init(int argc, char *argv[])
 			break;
 		case 'u':
 			username = optarg;
+			break;
+		case 'U':
+			set_count_summary_columns(optarg);
 			break;
 		case 'v':
 			qualify("abbrev=none");

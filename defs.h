@@ -432,6 +432,7 @@ extern int read_int_from_file(struct tcb *, const char *, int *);
 
 extern void set_sortby(const char *);
 extern void set_overhead(const char *);
+extern void set_count_summary_columns(const char *columns);
 extern void print_pc(struct tcb *);
 
 extern int syscall_entering_decode(struct tcb *);

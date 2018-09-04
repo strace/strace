@@ -189,6 +189,61 @@ set_sortby(const char *sortby)
 }
 
 void
+set_count_summary_columns(const char *s)
+{
+	static const char *cnames[] = {
+		[CSC_TIME_100S]  = "time_percent",
+		[CSC_TIME_TOTAL] = "total_time",
+		[CSC_TIME_AVG]   = "avg_time",
+		[CSC_CALLS]      = "calls",
+		[CSC_ERRORS]     = "errors",
+		[CSC_SC_NAME]    = "syscall",
+	};
+
+	const char *pos = s;
+	const char *prev = s;
+	size_t cur = 0;
+
+	memset(columns, 0, sizeof(columns));
+	memset(visible, 0, sizeof(visible));
+
+	do {
+		bool found = false;
+
+		pos = strchr(prev, ',');
+
+		for (size_t i = 0; i < ARRAY_SIZE(cnames); i++) {
+			if (!cnames[i] || (pos
+			    ? ((size_t) (pos - prev) != strlen(cnames[i]))
+			      || strncmp(prev, cnames[i], pos - prev)
+			    : strcmp(prev, cnames[i]))) {
+				continue;
+			}
+
+			if (visible[i])
+				error_msg_and_help("call summary column "
+						   "has been provided more "
+						   "than once: '%s' (-U option "
+						   "residual: '%s')",
+						   cnames[i], prev);
+
+			columns[cur++] = i;
+			visible[i] = 1;
+			found = true;
+
+			break;
+		}
+
+		if (!found)
+			error_msg_and_help("unknown column name: '%.*s'",
+					   (int) (pos ? pos - prev : INT_MAX),
+					   prev);
+
+		prev = pos + 1;
+	} while (pos);
+}
+
+void
 set_overhead(const char *str)
 {
 	if (parse_ts(str, &overhead) < 0)
