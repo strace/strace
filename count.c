@@ -96,8 +96,14 @@ set_sortby(const char *sortby)
 		const char *name;
 	} sort_fns[] = {
 		{ time_cmp,	"time" },
+		{ time_cmp,	"time_total" },
+		{ time_cmp,	"total_time" },
 		{ count_cmp,	"calls" },
+		{ count_cmp,	"count" },
 		{ syscall_cmp,	"name" },
+		{ syscall_cmp,	"syscall" },
+		{ syscall_cmp,	"syscall_name" },
+		{ NULL,		"none" },
 		{ NULL,		"nothing" },
 	};
 
