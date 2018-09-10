@@ -628,6 +628,30 @@ set_current_tcp(const struct tcb *tcp)
 }
 
 void
+finish_line(void)
+{
+	/* There is no other output ont stderr */
+	if (followfork >= 2 || shared_log != stderr)
+		return;
+
+	if (printing_tcp && printing_tcp->curcol != 0) {
+		struct tcb *prev_tcp = current_tcp;
+		set_current_tcp(printing_tcp);
+
+		tprints(" <unfinished ...>\n");
+		printing_tcp->curcol = 0;
+
+		set_current_tcp(prev_tcp);
+		line_ended();
+	}
+
+	if (current_tcp && current_tcp->curcol != 0) {
+		tprints(" <unfinished ...>\n");
+		line_ended();
+	}
+}
+
+void
 printleader(struct tcb *tcp)
 {
 	/* If -ff, "previous tcb we printed" is always the same as current,

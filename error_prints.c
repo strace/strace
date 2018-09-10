@@ -25,7 +25,9 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
+#if defined(HAVE_DEFS_H)
+# include "defs.h"
+#elif defined(HAVE_CONFIG_H)
 # include "config.h"
 #endif
 
@@ -46,6 +48,7 @@ verror_msg(int err_no, const char *fmt, va_list p)
 {
 	char *msg;
 
+	finish_line();
 	fflush(NULL);
 
 	/* We want to print entire message with single fprintf to ensure

@@ -40,6 +40,11 @@
 extern bool debug_flag;
 
 void die(void) ATTRIBUTE_NORETURN;
+#ifdef HAVE_FINISH_LINE
+extern void finish_line(void);
+#else
+static inline void finish_line(void) {}
+#endif
 
 void error_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 void perror_msg(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
