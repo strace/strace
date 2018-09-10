@@ -53,6 +53,8 @@
 #include <time.h>
 #include <sys/time.h>
 
+#define HAVE_FINISH_LINE
+
 #include "arch_defs.h"
 #include "error_prints.h"
 #include "gcc_compat.h"
