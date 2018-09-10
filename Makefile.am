@@ -1075,7 +1075,7 @@ mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 		CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
 		CPP="$(CPP)" \
 		CPPFLAGS="$(mpers_sh_opts) -DIN_MPERS -DMPERS_IS_$(mpers_NAME)" \
-		$(srcdir)/mpers.sh $(mpers_NAME) $(mpers_CC_FLAGS) $$f || exit; \
+		$(srcdir)/mpers.sh "$(mpers_NAME)" "$(mpers_CC_FLAGS)" "$$f" || exit; \
 	done
 	> $@
 
