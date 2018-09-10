@@ -62,7 +62,8 @@ AM_CPPFLAGS_FOR_BUILD = $(AM_CPPFLAGS)
 include xlat/Makemodule.am
 
 strace_CPPFLAGS = $(AM_CPPFLAGS)
-strace_CFLAGS = $(AM_CFLAGS)
+strace_CFLAGS = $(AM_CFLAGS) -DMPERS_WORDSIZE=PERSONALITY0_WORDSIZE \
+			     -DMPERS_KLONGSIZE=PERSONALITY0_KLONGSIZE
 strace_LDFLAGS =
 strace_LDADD = libstrace.a $(clock_LIBS) $(timer_LIBS)
 noinst_LIBRARIES = libstrace.a
@@ -1146,7 +1147,9 @@ BUILT_SOURCES += $(mpers_m32_targets)
 CLEANFILES    += $(mpers_m32_targets)
 
 $(mpers_m32_targets): mpers_NAME = m32
-$(mpers_m32_targets): mpers_CC_FLAGS = @cc_flags_m32@
+$(mpers_m32_targets): mpers_CC_FLAGS = @cc_flags_m32@ \
+				       -DMPERS_WORDSIZE=PERSONALITY1_WORDSIZE \
+				       -DMPERS_KLONGSIZE=PERSONALITY1_KLONGSIZE
 
 endif # HAVE_M32_MPERS
 
@@ -1163,7 +1166,9 @@ BUILT_SOURCES += $(mpers_mx32_targets)
 CLEANFILES    += $(mpers_mx32_targets)
 
 $(mpers_mx32_targets): mpers_NAME = mx32
-$(mpers_mx32_targets): mpers_CC_FLAGS = @cc_flags_mx32@
+$(mpers_mx32_targets): mpers_CC_FLAGS = @cc_flags_mx32@ \
+					-DMPERS_WORDSIZE=PERSONALITY2_WORDSIZE \
+					-DMPERS_KLONGSIZE=PERSONALITY2_KLONGSIZE
 
 endif # HAVE_MX32_MPERS
 
