@@ -300,11 +300,15 @@ old_mmap-Xraw	-a11 -e trace=mmap -Xraw
 old_mmap-Xverbose	-a11 -e trace=mmap -Xverbose
 oldfstat	-a18 -v -P stat.sample
 oldlstat	-a32 -v -P stat.sample -P /dev/full
+oldolduname	-a50
+oldolduname-v	-a50 -v -e trace=oldolduname
 oldselect	-a13 -e trace=select
 oldselect-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
 oldselect-efault	-a13 -e trace=select
 oldselect-efault-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full
+olduname	-a50
+olduname-v	-a50 -v -e trace=olduname
 open	-a30 -P $NAME.sample
 openat	-a36 -P $NAME.sample
 osf_utimes	-a21

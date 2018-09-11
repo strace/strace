@@ -160,8 +160,6 @@
 
 /* deprecated */
 #define	sys_bdflush		printargs
-#define	sys_oldolduname		printargs
-#define	sys_olduname		printargs
 #define	sys_sysfs		printargs
 
 #endif /* !STRACE_LINUX_DUMMY_H */

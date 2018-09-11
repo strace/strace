@@ -276,9 +276,13 @@ old_mmap-Xverbose
 old_mmap-v-none
 oldfstat
 oldlstat
+oldolduname
+oldolduname-v
 oldselect
 oldselect-efault
 oldstat
+olduname
+olduname-v
 open
 openat
 osf_utimes

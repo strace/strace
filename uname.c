@@ -32,30 +32,54 @@
 
 #include "defs.h"
 #include "print_fields.h"
-#include <sys/utsname.h>
+#include <linux/utsname.h>
+
+#define DECODE_UTSNAME_COMMON(var_)					\
+	do {								\
+		if (entering(tcp))					\
+			return 0;					\
+									\
+		if (umove_or_printaddr(tcp, tcp->u_arg[0], &uname))	\
+			return 0;					\
+									\
+		PRINT_FIELD_CSTRING("{", var_, sysname);		\
+		PRINT_FIELD_CSTRING(", ", var_, nodename);		\
+		if (abbrev(tcp)) {					\
+			tprints(", ...}");				\
+			return 0;					\
+		}							\
+		PRINT_FIELD_CSTRING(", ", var_, release);		\
+		PRINT_FIELD_CSTRING(", ", var_, version);		\
+		PRINT_FIELD_CSTRING(", ", var_, machine);		\
+	} while (0)
+
+SYS_FUNC(oldolduname)
+{
+	struct oldold_utsname uname;
+
+	DECODE_UTSNAME_COMMON(uname);
+	tprints("}");
+
+	return 0;
+}
+
+SYS_FUNC(olduname)
+{
+	struct old_utsname uname;
+
+	DECODE_UTSNAME_COMMON(uname);
+	tprints("}");
+
+	return 0;
+}
 
 SYS_FUNC(uname)
 {
-	struct utsname uname;
+	struct new_utsname uname;
 
-	if (entering(tcp))
-		return 0;
-
-	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &uname)) {
-		PRINT_FIELD_CSTRING("{", uname, sysname);
-		PRINT_FIELD_CSTRING(", ", uname, nodename);
-		if (abbrev(tcp)) {
-			tprints(", ...}");
-			return 0;
-		}
-		PRINT_FIELD_CSTRING(", ", uname, release);
-		PRINT_FIELD_CSTRING(", ", uname, version);
-		PRINT_FIELD_CSTRING(", ", uname, machine);
-#ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
-		PRINT_FIELD_CSTRING(", ", uname, domainname);
-#endif
-		tprints("}");
-	}
+	DECODE_UTSNAME_COMMON(uname);
+	PRINT_FIELD_CSTRING(", ", uname, domainname);
+	tprints("}");
 
 	return 0;
 }
