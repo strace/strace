@@ -87,6 +87,14 @@
 # define ALIGNOF(t_)	(sizeof(struct { char x_; t_ y_; }) - sizeof(t_))
 #endif
 
+#if GNUC_PREREQ(4, 1)
+# define CMPXCHG(val_, old_, new_) \
+	__sync_bool_compare_and_swap((val_), (old_), (new_))
+#else
+# define CMPXCHG(val_, old_, new_) \
+	((val_) == (old_) ? (val_) = (new_), true : false)
+#endif
+
 #if GNUC_PREREQ(4, 3)
 # define ATTRIBUTE_ALLOC_SIZE(args)	__attribute__((__alloc_size__ args))
 #else

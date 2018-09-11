@@ -2020,7 +2020,8 @@ cleanup(void)
 static void
 interrupt(int sig)
 {
-	interrupted = sig;
+	/* Do not overwrite signal */
+	CMPXCHG(&interrupted, 0, sig);
 }
 
 static void
@@ -2154,21 +2155,30 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 static void
 print_signalled(struct tcb *tcp, const int pid, int status)
 {
+	const char *prefix = "+++ ";
+	const char *suffix = " +++\n";
+	void (*printer)(const char *fmt, ...) = tprintf;
+
 	if (pid == strace_child) {
 		exit_code = 0x100 | WTERMSIG(status);
 		strace_child = 0;
+	} else if (pid == strace_tracer_pid) {
+		prefix = "";
+		suffix = "";
+		printer = error_msg;
 	}
 
 	if (cflag != CFLAG_ONLY_STATS
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
-		printleader(tcp);
+		if (tcp)
+			printleader(tcp);
 #ifdef WCOREDUMP
-		tprintf("+++ killed by %s %s+++\n",
-			signame(WTERMSIG(status)),
-			WCOREDUMP(status) ? "(core dumped) " : "");
+		printer("%skilled by %s%s%s",
+			prefix, signame(WTERMSIG(status)),
+			WCOREDUMP(status) ? " (core dumped)" : "", suffix);
 #else
-		tprintf("+++ killed by %s +++\n",
-			signame(WTERMSIG(status)));
+		printer("%skilled by %s%s",
+			prefix, signame(WTERMSIG(status)), suffix);
 #endif
 		line_ended();
 	}
@@ -2809,6 +2819,10 @@ terminate(void)
 		   Exit with 128 + signo then.  */
 		exit_code += 128;
 	}
+
+	if (!qflag && interrupted)
+		print_signalled(NULL, strace_tracer_pid, interrupted);
+
 	exit(exit_code);
 }
 
