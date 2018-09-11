@@ -36,6 +36,9 @@ SYS_FUNC(close)
 {
 	printfd(tcp, tcp->u_arg[0]);
 
+	uint64_t inode = getfdinode(tcp, tcp->u_arg[0]);
+	invalidate_netlink_family_cache_entry(inode);
+
 	return RVAL_DECODED;
 }
 

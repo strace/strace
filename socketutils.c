@@ -592,16 +592,79 @@ inet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
+/* An additional fall-back cache for the cases sock_diag fails us, filled by
+ * socket() calls */
+enum {
+	NLF_CACHE_BITS = 8,
+	NLF_CACHE_SIZE = 1 << NLF_CACHE_BITS,
+	NLF_CACHE_MASK = NLF_CACHE_SIZE - 1,
+};
+static const uint64_t NLF_CACHE_KEY_MASK = ~((uint64_t) NLF_CACHE_MASK);
+static uint64_t netlink_cache[256];
+
+void
+set_netlink_family_cache_entry(uint64_t inode, uint8_t family)
+{
+	uint8_t idx = inode & NLF_CACHE_MASK;
+	uint64_t val = (inode & NLF_CACHE_KEY_MASK) | family;
+
+	netlink_cache[idx] = val;
+}
+
+int
+get_netlink_family_cache_entry(uint64_t inode)
+{
+	uint8_t idx = inode & NLF_CACHE_MASK;
+	uint64_t val = netlink_cache[idx];
+
+	if (!((inode ^ val) & NLF_CACHE_KEY_MASK))
+		return val & NLF_CACHE_MASK;
+
+	return -1;
+}
+
+void
+invalidate_netlink_family_cache_entry(uint64_t inode)
+{
+	uint8_t idx = inode & NLF_CACHE_MASK;
+	uint64_t val = netlink_cache[idx];
+
+	if ((inode ^ val) & NLF_CACHE_KEY_MASK)
+		return;
+
+	netlink_cache[idx] = ~0LLU;
+}
+
 static const char *
 netlink_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 	    const unsigned long inode, const char *proto_name, bool data)
 {
-	return netlink_send_query(tcp, fd, inode)
-		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
-				     netlink_parse_response,
-				     (void *) proto_name)
-		? (data ? get_sockdata_by_inode_cached
-			: get_sockaddr_by_inode_cached)(inode) : NULL;
+	const char *ret = NULL;
+
+	if (netlink_send_query(tcp, fd, inode)
+	    && receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
+				 netlink_parse_response, (void *) proto_name)) {
+		ret = (data ? get_sockdata_by_inode_cached
+			    : get_sockaddr_by_inode_cached)(inode);
+
+		if (ret)
+			return ret;
+	}
+
+	if (!ret && data) {
+		static char buf;
+
+		int ret = get_netlink_family_cache_entry(inode);
+
+		if (ret < 0)
+			return NULL;
+
+		buf = ret;
+
+		return &buf;
+	}
+
+	return NULL;
 }
 
 static const char *

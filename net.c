@@ -136,6 +136,15 @@ tprint_sock_type(unsigned int flags)
 
 SYS_FUNC(socket)
 {
+	if (exiting(tcp)) {
+		if (!syserror(tcp) && tcp->u_arg[0] == AF_NETLINK) {
+			uint64_t inode = getfdinode(tcp, tcp->u_rval);
+
+			set_netlink_family_cache_entry(inode, tcp->u_arg[2]);
+		}
+
+		return RVAL_DECODED | RVAL_FD;
+	}
 	printxval(addrfams, tcp->u_arg[0], "AF_???");
 	tprints(", ");
 	tprint_sock_type(tcp->u_arg[1]);
@@ -208,7 +217,10 @@ SYS_FUNC(socket)
 		break;
 	}
 
-	return RVAL_DECODED | RVAL_FD;
+	if (tcp->u_arg[0] != AF_NETLINK)
+		return RVAL_DECODED | RVAL_FD;
+
+	return 0;
 }
 
 static bool
