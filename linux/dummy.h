@@ -86,7 +86,6 @@
 #define	sys_rename		sys_link
 #define	sys_rmdir		sys_chdir
 #define	sys_sched_get_priority_max	sys_sched_get_priority_min
-#define	sys_set_robust_list	sys_munmap
 #define	sys_setdomainname	sys_sethostname
 #define	sys_setfsgid		sys_setfsuid
 #define	sys_setfsgid16		sys_setfsuid16

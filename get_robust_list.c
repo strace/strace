@@ -27,12 +27,63 @@
 
 #include "defs.h"
 
+#include DEF_MPERS_TYPE(struct_robust_list_head)
+
+#include <linux/futex.h>
+
+typedef struct robust_list_head struct_robust_list_head;
+
+#include MPERS_DEFS
+
+#include "print_fields.h"
+
+static void
+decode_robust_list(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
+{
+	struct_robust_list_head rl;
+
+	if (len < sizeof(rl)) {
+		printaddr(addr);
+		return;
+	}
+	if (umove_or_printaddr(tcp, addr, &rl))
+		return;
+
+	PRINT_FIELD_PTR("{list={", rl.list, next);
+	PRINT_FIELD_D("}, ", rl, futex_offset);
+	PRINT_FIELD_PTR(", ", rl, list_op_pending);
+
+	if (len > sizeof(rl))
+		tprints(", /* ??? */");
+
+	tprints("}");
+
+	printaddr_comment(addr);
+}
+
+SYS_FUNC(set_robust_list)
+{
+	decode_robust_list(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf(", %lu", (unsigned long) tcp->u_arg[1]);
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(get_robust_list)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 	} else {
-		printnum_ptr(tcp, tcp->u_arg[1]);
+		mpers_ptr_t rl_ptr;
+		mpers_ptr_t len = 0;
+		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &rl_ptr)) {
+			tprints("[");
+			if (!umove(tcp, tcp->u_arg[2], &len))
+				decode_robust_list(tcp, rl_ptr, len);
+			else
+				printaddr(tcp->u_arg[1]);
+			tprints("]");
+		}
 		tprints(", ");
 		printnum_ulong(tcp, tcp->u_arg[2]);
 	}
