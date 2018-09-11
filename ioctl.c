@@ -246,36 +246,24 @@ ioctl_decode(struct tcb *tcp)
 	const kernel_ulong_t arg = tcp->u_arg[2];
 
 	switch (_IOC_TYPE(code)) {
-	case '$':
-		return perf_ioctl(tcp, code, arg);
-#if defined(ALPHA) || defined(POWERPC)
-	case 'f': {
-		int ret = file_ioctl(tcp, code, arg);
-		if (ret != RVAL_DECODED)
-			return ret;
-		ATTRIBUTE_FALLTHROUGH;
-	}
-	case 't':
-	case 'T':
-		return term_ioctl(tcp, code, arg);
-#else /* !ALPHA */
-	case 'f':
-		return file_ioctl(tcp, code, arg);
-	case 0x54:
-#endif /* !ALPHA */
-		return term_ioctl(tcp, code, arg);
-	case 0x89:
-		return sock_ioctl(tcp, code, arg);
-	case 'p':
-		return rtc_ioctl(tcp, code, arg);
 	case 0x03:
 		return hdio_ioctl(tcp, code, arg);
 	case 0x12:
 		return block_ioctl(tcp, code, arg);
-	case 'X':
-		return fs_x_ioctl(tcp, code, arg);
-	case 0x22:
+	case '"': /* 0x22 */
 		return scsi_ioctl(tcp, code, arg);
+	case '$': /* 0x24 */
+		return perf_ioctl(tcp, code, arg);
+#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
+	case '=': /* 0x3d */
+		return ptp_ioctl(tcp, code, arg);
+#endif
+#ifdef HAVE_LINUX_INPUT_H
+	case 'E':
+		return evdev_ioctl(tcp, code, arg);
+#endif
+	case 'I':
+		return inotify_ioctl(tcp, code, arg);
 	case 'L':
 		return loop_ioctl(tcp, code, arg);
 #ifdef HAVE_STRUCT_MTD_WRITE_REQ
@@ -283,27 +271,54 @@ ioctl_decode(struct tcb *tcp)
 		return mtd_ioctl(tcp, code, arg);
 #endif
 #ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
-	case 'o':
 	case 'O':
 		return ubi_ioctl(tcp, code, arg);
 #endif
+	case 'R':
+		return random_ioctl(tcp, code, arg);
+	case 'T':
+		return term_ioctl(tcp, code, arg);
 	case 'V':
 		return v4l2_ioctl(tcp, code, arg);
-#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
-	case '=':
-		return ptp_ioctl(tcp, code, arg);
+	case 'W':
+		return watchdog_ioctl(tcp, code, arg);
+	case 'X':
+		return fs_x_ioctl(tcp, code, arg);
+	case 'f': {
+#if defined(ALPHA) || defined(POWERPC)
+		int ret = file_ioctl(tcp, code, arg);
+		if (ret != RVAL_DECODED)
+			return ret;
+		return term_ioctl(tcp, code, arg);
+#else /* !(ALPHA || POWERPC) */
+		return file_ioctl(tcp, code, arg);
+#endif /* (ALPHA || POWERPC) */
+	}
+#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
+	case 'o':
+		return ubi_ioctl(tcp, code, arg);
 #endif
-#ifdef HAVE_LINUX_INPUT_H
-	case 'E':
-		return evdev_ioctl(tcp, code, arg);
+	case 'p':
+		return rtc_ioctl(tcp, code, arg);
+#if defined(ALPHA) || defined(POWERPC)
+	case 't':
+		return term_ioctl(tcp, code, arg);
+#endif /* !ALPHA */
+	case 0x89:
+		return sock_ioctl(tcp, code, arg);
+#ifdef HAVE_LINUX_BTRFS_H
+	case 0x94:
+		return btrfs_ioctl(tcp, code, arg);
 #endif
 #ifdef HAVE_LINUX_USERFAULTFD_H
 	case 0xaa:
 		return uffdio_ioctl(tcp, code, arg);
 #endif
-#ifdef HAVE_LINUX_BTRFS_H
-	case 0x94:
-		return btrfs_ioctl(tcp, code, arg);
+	case 0xab:
+		return nbd_ioctl(tcp, code, arg);
+#ifdef HAVE_LINUX_KVM_H
+	case 0xae:
+		return kvm_ioctl(tcp, code, arg);
 #endif
 	case 0xb7:
 		return nsfs_ioctl(tcp, code, arg);
@@ -311,18 +326,6 @@ ioctl_decode(struct tcb *tcp)
 	case 0xfd:
 		return dm_ioctl(tcp, code, arg);
 #endif
-#ifdef HAVE_LINUX_KVM_H
-	case 0xae:
-		return kvm_ioctl(tcp, code, arg);
-#endif
-	case 'I':
-		return inotify_ioctl(tcp, code, arg);
-	case 0xab:
-		return nbd_ioctl(tcp, code, arg);
-	case 'R':
-		return random_ioctl(tcp, code, arg);
-	case 'W':
-		return watchdog_ioctl(tcp, code, arg);
 	default:
 		break;
 	}
