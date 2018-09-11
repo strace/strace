@@ -64,6 +64,14 @@ tprintf_uffdio_range(const struct uffdio_range *range)
 		tprintf_uffdio_range(&(where_).field_);			\
 	} while (0)
 
+void
+print_uffdio_api_start(struct uffdio_api *ua)
+{
+	PRINT_FIELD_X("{", *ua, api);
+	PRINT_FIELD_FLAGS(", ", *ua, features, uffd_api_features,
+			  "UFFD_FEATURE_???");
+}
+
 int
 uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 	     const kernel_ulong_t arg)
@@ -77,9 +85,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ua))
 				break;
-			PRINT_FIELD_X("{", ua, api);
-			PRINT_FIELD_FLAGS(", ", ua, features, uffd_api_features,
-					  "UFFD_FEATURE_???");
+			print_uffdio_api_start(&ua);
 			entering_features = malloc(sizeof(*entering_features));
 			if (entering_features) {
 				*entering_features = ua.features;
@@ -89,18 +95,28 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		}
 
-		if (!syserror(tcp) && !umove(tcp, arg, &ua)) {
-			entering_features = get_tcb_priv_data(tcp);
+		if (!umove(tcp, arg, &ua)) {
+			/* UFFDIO_API can return -EINVAL if api or features
+			 * do not match. */
+			if (syserror(tcp)) {
+				if (tcp->u_error == EINVAL) {
+					tprints("} => ");
+					print_uffdio_api_start(&ua);
+				}
+			} else {
+				entering_features = get_tcb_priv_data(tcp);
 
-			if (!entering_features
-			    || *entering_features != ua.features) {
-				PRINT_FIELD_FLAGS(" => ", ua, features,
-						  uffd_api_features,
-						  "UFFD_FEATURE_???");
+				if (!entering_features
+				    || *entering_features != ua.features) {
+					PRINT_FIELD_FLAGS(" => ", ua, features,
+							  uffd_api_features,
+							  "UFFD_FEATURE_???");
+				}
+
+				PRINT_FIELD_FLAGS(", ", ua, ioctls,
+						  uffd_api_flags,
+						  "_UFFDIO_???");
 			}
-
-			PRINT_FIELD_FLAGS(", ", ua, ioctls, uffd_api_flags,
-					  "_UFFDIO_???");
 		}
 
 		tprints("}");
