@@ -54,9 +54,6 @@ sprintrc_ex(long rc, enum sprintrc_fmt fmt)
 	};
 	static char buf[4096];
 
-	if (fmt >= ARRAY_SIZE(formats))
-		perror_msg_and_fail("sprintrc_ex: incorrect format provided");
-
 	if (rc == 0)
 		return "0";
 
