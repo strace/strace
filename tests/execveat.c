@@ -83,6 +83,7 @@ main(void)
 
 	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
 	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
+	(void) q_envp;	/* workaround for clang bug #33068 */
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
 	printf("execveat(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"

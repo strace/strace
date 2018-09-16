@@ -119,6 +119,7 @@ main(int argc, char *argv[])
 #endif
 
 	test_syscall(ARRAY_SIZE(syscallent));
+	(void) syscallent;	/* workaround for clang bug #33068 */
 
 #ifdef SYS_socket_subcall
 	test_syscall(SYS_socket_subcall + 1);

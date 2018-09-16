@@ -78,6 +78,7 @@ main(void)
 
 	tail_argv[ARRAY_SIZE(q_argv)] = NULL;
 	tail_envp[ARRAY_SIZE(q_envp)] = NULL;
+	(void) q_envp;	/* workaround for clang bug #33068 */
 
 	execve(FILENAME, tail_argv, tail_envp);
 	printf("execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
