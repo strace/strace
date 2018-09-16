@@ -33,8 +33,18 @@
 # define GNUC_PREREQ(maj, min)	\
 	((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
 #else
-# define __attribute__(x)	/* empty */
 # define GNUC_PREREQ(maj, min)	0
+#endif
+
+#if defined __clang__ && defined __clang_major__ && defined __clang_minor__
+# define CLANG_PREREQ(maj, min)	\
+	((__clang_major__ << 16) + __clang_minor__ >= ((maj) << 16) + (min))
+#else
+# define CLANG_PREREQ(maj, min)	0
+#endif
+
+#if !(GNUC_PREREQ(2, 0) || CLANG_PREREQ(1, 0))
+# define __attribute__(x)	/* empty */
 #endif
 
 #if GNUC_PREREQ(2, 5)
@@ -97,6 +107,23 @@
 # define ATTRIBUTE_FALLTHROUGH	__attribute__((__fallthrough__))
 #else
 # define ATTRIBUTE_FALLTHROUGH	((void) 0)
+#endif
+
+#if CLANG_PREREQ(2, 8)
+# define DIAG_PUSH_IGNORE_OVERRIDE_INIT					\
+	_Pragma("clang diagnostic push");				\
+	_Pragma("clang diagnostic ignored \"-Winitializer-overrides\"");
+# define DIAG_POP_IGNORE_OVERRIDE_INIT					\
+	_Pragma("clang diagnostic pop");
+#elif GNUC_PREREQ(4, 2)
+# define DIAG_PUSH_IGNORE_OVERRIDE_INIT					\
+	_Pragma("GCC diagnostic push");					\
+	_Pragma("GCC diagnostic ignored \"-Woverride-init\"");
+# define DIAG_POP_IGNORE_OVERRIDE_INIT					\
+	_Pragma("GCC diagnostic pop");
+#else
+# define DIAG_PUSH_IGNORE_OVERRIDE_INIT	/* empty */
+# define DIAG_POP_IGNORE_OVERRIDE_INIT	/* empty */
 #endif
 
 #if GNUC_PREREQ(6, 0)

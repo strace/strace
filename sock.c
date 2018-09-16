@@ -57,6 +57,8 @@ print_ifname(const char *ifname)
 	print_quoted_string(ifname, IFNAMSIZ + 1, QUOTE_0_TERMINATED);
 }
 
+DIAG_PUSH_IGNORE_OVERRIDE_INIT
+
 static void
 print_ifreq(struct tcb *const tcp, const unsigned int code,
 	    const kernel_ulong_t arg, const struct_ifreq *const ifr)
@@ -201,6 +203,8 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	}
 }
+
+DIAG_POP_IGNORE_OVERRIDE_INIT
 
 static unsigned int
 print_ifc_len(int len)
