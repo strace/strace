@@ -100,8 +100,8 @@ check_responses(const int fd)
 		perror_msg_and_skip("recvmsg");
 
 	struct nlmsghdr *h = &hdr_buf.hdr;
-	if (!NLMSG_OK(h, ret))
-		error_msg_and_skip("!NLMSG_OK");
+	if (!is_nlmsg_ok(h, ret))
+		error_msg_and_skip("!is_nlmsg_ok");
 	if (h->nlmsg_type == NLMSG_ERROR) {
 		const struct nlmsgerr *err = NLMSG_DATA(h);
 		if (h->nlmsg_len < NLMSG_LENGTH(sizeof(*err)))

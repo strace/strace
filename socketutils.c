@@ -237,9 +237,9 @@ receive_responses(struct tcb *tcp, const int fd, const unsigned long inode,
 		}
 
 		const struct nlmsghdr *h = &hdr_buf.hdr;
-		if (!NLMSG_OK(h, ret))
+		if (!is_nlmsg_ok(h, ret))
 			return false;
-		for (; NLMSG_OK(h, ret); h = NLMSG_NEXT(h, ret)) {
+		for (; is_nlmsg_ok(h, ret); h = NLMSG_NEXT(h, ret)) {
 			if (h->nlmsg_type != expected_msg_type)
 				return false;
 			const int rc = parser(NLMSG_DATA(h),

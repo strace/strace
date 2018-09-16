@@ -29,6 +29,7 @@
 #ifndef STRACE_NETLINK_H
 #define STRACE_NETLINK_H
 
+#include <stdbool.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
 
@@ -62,5 +63,13 @@
 # define NLA_F_NET_BYTEORDER	(1 << 14)
 # define NLA_TYPE_MASK		~(NLA_F_NESTED | NLA_F_NET_BYTEORDER)
 #endif
+
+static inline bool
+is_nlmsg_ok(const struct nlmsghdr *const nlh, const ssize_t len)
+{
+	return len >= (ssize_t) sizeof(*nlh)
+	       && nlh->nlmsg_len >= sizeof(*nlh)
+	       && (size_t) len >= nlh->nlmsg_len;
+}
 
 #endif /* !STRACE_NETLINK_H */
