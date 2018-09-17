@@ -55,8 +55,10 @@ struct xlat_data {
 
 struct xlat {
 	const struct xlat_data *data;
+	size_t flags_strsz;
 	uint32_t size;
 	enum xlat_type type;
+	uint64_t flags_mask;
 };
 
 # define XLAT(val)			{ (unsigned)(val), #val }

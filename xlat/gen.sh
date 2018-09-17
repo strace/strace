@@ -60,6 +60,10 @@ print_xlat()
 	else
 		echo " XLAT_TYPE(${val_type}, ${val}),"
 	fi
+
+	echo " #define XLAT_VAL_$xlat_flag_cnt ((${val_type:-unsigned}) (${val}))"
+	echo " #define XLAT_STR_$xlat_flag_cnt STRINGIFY(${val})"
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 print_xlat_pair()
@@ -74,6 +78,10 @@ print_xlat_pair()
 	else
 		echo " XLAT_TYPE_PAIR(${val_type}, ${val}, \"${str}\"),"
 	fi
+
+	echo " #define XLAT_VAL_$xlat_flag_cnt ((${val_type:-unsigned}) (${val}))"
+	echo " #define XLAT_STR_$xlat_flag_cnt \"${str}\""
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 cond_xlat()
@@ -101,6 +109,9 @@ cond_xlat()
 			echo "$xlat"
 		fi
 	}
+
+	# Since we're calling print_xlat/print_xlat_pair in subprocess
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 gen_header()
@@ -115,6 +126,7 @@ gen_header()
 	local xlat_type="XT_NORMAL"
 
 	value_indexed=0
+	xlat_flag_cnt=0
 
 	if grep -F -q -x "$decl" "$defs"; then
 		in_defs=1
@@ -267,8 +279,45 @@ gen_header()
 			 .data = ${name}_xdata,
 			 .size = ARRAY_SIZE(${name}_xdata),
 			 .type = ${xlat_type},
+	EOF
+
+	echo " .flags_mask = 0"
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  ifdef XLAT_VAL_${i}
+			  | XLAT_VAL_${i}
+			#  endif
+		EOF
+	done
+	echo "  ,"
+
+	echo " .flags_strsz = 0"
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  ifdef XLAT_STR_${i}
+			  + sizeof(XLAT_STR_${i})
+			#  endif
+		EOF
+	done
+	echo "  ,"
+
+	cat <<-EOF
 		} };
 
+	EOF
+
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  ifdef XLAT_STR_${i}
+			#   undef XLAT_STR_${i}
+			#  endif
+			#  ifdef XLAT_VAL_${i}
+			#   undef XLAT_VAL_${i}
+			#  endif
+		EOF
+	done
+
+	cat <<-EOF
 		# endif /* !IN_MPERS */
 
 		#endif /* !XLAT_MACROS_ONLY */
