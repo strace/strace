@@ -36,26 +36,15 @@
 #include "xlat.h"
 #include "xlat/resources.h"
 
-const char *
-sprint_rlim(kernel_ulong_t lim)
+void
+print_rlim(kernel_ulong_t lim)
 {
-	if (sizeof(lim) == sizeof(uint64_t)) {
-		if (lim == (kernel_ulong_t) -1ULL)
-			return "RLIM64_INFINITY";
-	} else {
-		if (lim == (kernel_ulong_t) -1U)
-			return "RLIM_INFINITY";
-	}
-
-	static char buf[2][sizeof(lim)*3 + sizeof("*1024")];
-	static int i;
-	i &= 1;
-	if (lim > 1024 && lim % 1024 == 0)
-		sprintf(buf[i], "%llu*1024", (unsigned long long) lim / 1024);
+	if (lim == INFINITY)
+		printf("%llu /* %s */", (unsigned long long) lim, INFINITY_STR);
+	else if (lim > 1024 && lim % 1024 == 0)
+		printf("%llu*1024", (unsigned long long) lim / 1024);
 	else
-		sprintf(buf[i], "%llu", (unsigned long long) lim);
-
-	return buf[i++];
+		printf("%llu", (unsigned long long) lim);
 }
 
 #ifdef NR_GETRLIMIT
@@ -79,13 +68,16 @@ main(void)
 		       STR_GETRLIMIT, xlat->str, rc, errno2name());
 
 		rc = syscall(NR_GETRLIMIT, res, rlimit);
-		if (rc)
-			printf("%s(%s, NULL) = %ld %s (%m)\n",
-			       STR_GETRLIMIT, xlat->str, rc, errno2name());
-		else
-			printf("%s(%s, {rlim_cur=%s, rlim_max=%s})"
-			       " = 0\n", STR_GETRLIMIT, xlat->str,
-			       sprint_rlim(rlimit[0]), sprint_rlim(rlimit[1]));
+		if (rc) {
+			printf("%s(%s, %p) = %s\n",
+			       STR_GETRLIMIT, xlat->str, rlimit, sprintrc(rc));
+		} else {
+			printf("%s(%s, {rlim_cur=", STR_GETRLIMIT, xlat->str);
+			print_rlim(rlimit[0]);
+			printf(", rlim_max=");
+			print_rlim(rlimit[1]);
+			printf("}) = 0\n");
+		}
 	}
 
 	puts("+++ exited with 0 +++");

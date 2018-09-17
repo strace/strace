@@ -32,6 +32,9 @@
 
 #ifdef __NR_setrlimit
 
+#define INFINITY RLIM_INFINITY
+#define INFINITY_STR "RLIM_INFINITY"
+
 # include "xgetrlimit.c"
 
 int
@@ -57,10 +60,12 @@ main(void)
 
 		rc = syscall(__NR_setrlimit, res, rlimit);
 		const char *errstr = sprintrc(rc);
-		printf("setrlimit(%s, {rlim_cur=%s, rlim_max=%s}) = %s\n",
-		       xlat->str,
-		       sprint_rlim(rlimit[0]), sprint_rlim(rlimit[1]),
-		       errstr);
+
+		printf("setrlimit(%s, {rlim_cur=", xlat->str);
+		print_rlim(rlimit[0]);
+		printf(", rlim_max=");
+		print_rlim(rlimit[1]);
+		printf("}) = %s\n", errstr);
 	}
 
 	puts("+++ exited with 0 +++");

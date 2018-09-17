@@ -5,6 +5,8 @@
 
 # define NR_GETRLIMIT	__NR_ugetrlimit
 # define STR_GETRLIMIT	"ugetrlimit"
+# define INFINITY	RLIM_INFINITY
+# define INFINITY_STR	"RLIM_INFINITY"
 # include "xgetrlimit.c"
 
 #else

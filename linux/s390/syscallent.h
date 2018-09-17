@@ -105,7 +105,7 @@
 [ 73] = { 1,	TS,		SEN(sigpending),		"sigpending"		},
 [ 74] = { 2,	0,		SEN(sethostname),		"sethostname"		},
 [ 75] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},
-[ 76] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
+[ 76] = { 2,	0,		SEN(old_getrlimit),		"getrlimit"		},
 [ 77] = { 2,	0,		SEN(getrusage),			"getrusage"		},
 [ 78] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [ 79] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
