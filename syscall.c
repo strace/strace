@@ -41,6 +41,7 @@
 
 #include "syscall.h"
 #include "xstring.h"
+#include "syscallent_base_nr.h"
 
 /* Define these shorthand notations to simplify the syscallent files. */
 #include "sysent_shorthand_defs.h"

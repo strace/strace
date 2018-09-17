@@ -7,7 +7,19 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#define BASE_NR 1024
+#ifdef SYSCALLENT_BASE_NR
+/*
+ * The syscallent table starts from 0 because
+ * it is optimized for use with shuffle_scno.
+ */
+# define BASE_NR 0
+#else
+/*
+ * __NR_* constants start from 1024 as usual.
+ * (1U << 10) cannot be used here because SCNO_SED is not smart enough.
+ */
+# define BASE_NR 1024
+#endif
 [BASE_NR +   0] = { 0,	0,		SEN(printargs),			"ni_syscall"		},
 [BASE_NR +   1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [BASE_NR +   2] = { 3,	TD,		SEN(read),			"read"			},

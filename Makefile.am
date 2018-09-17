@@ -588,7 +588,9 @@ EXTRA_DIST =				\
 	linux/ia64/rt_sigframe.h	\
 	linux/ia64/set_error.c		\
 	linux/ia64/set_scno.c		\
+	linux/ia64/shuffle_scno.c	\
 	linux/ia64/syscallent.h		\
+	linux/ia64/syscallent_base_nr.h	\
 	linux/ia64/userent.h		\
 	linux/inet_diag.h		\
 	linux/m68k/arch_defs_.h		\
@@ -849,6 +851,7 @@ EXTRA_DIST =				\
 	linux/syscall.h			\
 	linux/syscallent-common-32.h	\
 	linux/syscallent-common.h	\
+	linux/syscallent_base_nr.h	\
 	linux/tile/arch_defs_.h		\
 	linux/tile/arch_get_personality.c \
 	linux/tile/arch_regs.c		\
