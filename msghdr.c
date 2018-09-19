@@ -133,6 +133,15 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
+print_cmsg_int(struct tcb *tcp, const void *cmsg_data,
+	       const unsigned int data_len)
+{
+	const int *p = cmsg_data;
+
+	tprintf("[%d]", *p);
+}
+
+static void
 print_cmsg_uint(struct tcb *tcp, const void *cmsg_data,
 		const unsigned int data_len)
 {
@@ -229,6 +238,7 @@ static const struct {
 	[IP_RECVERR] = { print_cmsg_ip_recverr, sizeof(struct sock_ee) },
 	[IP_ORIGDSTADDR] = { print_cmsg_ip_origdstaddr, sizeof(struct sockaddr_in) },
 	[IP_CHECKSUM] = { print_cmsg_uint, sizeof(unsigned int) },
+	[IP_RECVFRAGSIZE] = { print_cmsg_int, sizeof(int) },
 	[SCM_SECURITY] = { print_scm_security, 1 }
 };
 
