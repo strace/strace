@@ -118,6 +118,7 @@ ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu
 ioctl_loop
 ioctl_mtd
+ioctl_nbd
 ioctl_perf
 ioctl_ptp
 ioctl_rtc

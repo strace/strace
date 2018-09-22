@@ -153,6 +153,7 @@ ioctl_loop
 ioctl_loop-nv
 ioctl_loop-v
 ioctl_mtd
+ioctl_nbd
 ioctl_nsfs
 ioctl_perf
 ioctl_perf-success

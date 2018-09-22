@@ -327,6 +327,8 @@ ioctl_decode(struct tcb *tcp)
 #endif
 	case 'I':
 		return inotify_ioctl(tcp, code, arg);
+	case 0xab:
+		return nbd_ioctl(tcp, code, arg);
 	default:
 		break;
 	}

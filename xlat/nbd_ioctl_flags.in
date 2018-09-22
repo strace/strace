@@ -1,0 +1,29 @@
+/*
+ * Some flags are not defined in <linux/nbd.h>, but are passed anyway.
+ * These flags are sent from nbd-server to the client, and the client
+ * passes them to the kernel unmodified after parsing. Both the client
+ * and the kernel ignore flags unknown to them.
+ */
+
+/* The server supports flags */
+NBD_FLAG_HAS_FLAGS	(1 << 0)
+/* The export is read-only */
+NBD_FLAG_READ_ONLY	(1 << 1)
+/* The server supports NBD_CMD_FLUSH */
+NBD_FLAG_SEND_FLUSH	(1 << 2)
+/* The server supports NBD_CMD_FLAG_FUA (Force Unit Access) */
+NBD_FLAG_SEND_FUA	(1 << 3)
+/* The export is a rotational medium */
+NBD_FLAG_ROTATIONAL	(1 << 4)
+/* The server supports NBD_CMD_TRIM */
+NBD_FLAG_SEND_TRIM	(1 << 5)
+/* The server supports NBD_CMD_WRITE_ZEROES and NBD_CMD_FLAG_NO_HOLE */
+NBD_FLAG_SEND_WRITE_ZEROES	(1 << 6)
+/* The server supports NBD_CMD_FLAG_DF (don't fragment replies) */
+NBD_FLAG_SEND_DF	(1 << 7)
+/* The server supports multiple connections */
+NBD_FLAG_CAN_MULTI_CONN	(1 << 8)
+/* The server supports NBD_CMD_RESIZE (resizing the device) */
+NBD_FLAG_SEND_RESIZE	(1 << 9)
+/* The server supports NBD_CMD_CACHE */
+NBD_FLAG_SEND_CACHE	(1 << 10)
