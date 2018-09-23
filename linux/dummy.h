@@ -160,6 +160,5 @@
 
 /* deprecated */
 #define	sys_bdflush		printargs
-#define	sys_sysfs		printargs
 
 #endif /* !STRACE_LINUX_DUMMY_H */
