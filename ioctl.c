@@ -31,6 +31,7 @@
 
 #include "defs.h"
 #include <linux/ioctl.h>
+#include "xlat/ioc_types.h"
 #include "xlat/ioctl_dirs.h"
 
 static int
@@ -68,6 +69,23 @@ ioctl_next_match(const struct_ioctlent *iop)
 	return NULL;
 }
 
+static const char *
+ioctl_type_str(uint8_t ioc_type)
+{
+	static char buf[] = { '\'', ' ', '\'', '\0' };
+
+	const char *ret = xlookup(ioc_types, ioc_type);
+	if (ret)
+		return ret;
+
+	if (ioc_type >= ' ' && ioc_type < 0x7F) {
+		buf[1] = ioc_type;
+		return buf;
+	}
+
+	return NULL;
+}
+
 static void
 ioctl_print_code(const unsigned int code)
 {
@@ -81,8 +99,10 @@ ioctl_print_code(const unsigned int code)
 
 	tprints("_IOC(");
 	printflags(ioctl_dirs, _IOC_DIR(code), "_IOC_???");
-	tprintf(", %#x, %#x, %#x)",
-		_IOC_TYPE(code), _IOC_NR(code), _IOC_SIZE(code));
+	tprints(", ");
+	print_xlat_ex(_IOC_TYPE(code), ioctl_type_str(_IOC_TYPE(code)),
+		      XLAT_STYLE_DEFAULT);
+	tprintf(", %#x, %#x)", _IOC_NR(code), _IOC_SIZE(code));
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprints(" */");

@@ -1,0 +1,75 @@
+#sorted
+/* Those constants that correspond ASCII alphanumeric characters are commented
+ * out, as there are too much conflicts and it makes more sense to just print
+ * a character */
+RDMA_IOCTL_MAGIC	0x1B
+SNAPSHOT_IOC_MAGIC	'3'
+VFIO_TYPE		';'
+PTP_CLK_MAGIC		'='
+/* APC_IOC		'A' */
+/* CCISS_IOC_MAGIC	'B' */
+/* CAP_IOCTL_BASE	'C' */
+/* CS_IO_MAGIC		'C' */
+/* DASD_IOCTL_LETTER	'D' */
+/* GIGASET_IOCTL	'G' */ /* 0x47 */
+/* AMDKFD_IOCTL_BASE	'K' */
+/* NVM_IOCTL		'L' */
+/* MB862XX_BASE		'M' */
+/* UBI_VOL_IOC_MAGIC	'O' */
+/* RFKILL_IOC_MAGIC	'R' */
+/* FW_MGMT_IOCTL_BASE	'S' */
+/* UINPUT_IOCTL_BASE	'U' */
+/* SW_SYNC_IOC_MAGIC	'W' */
+/* WATCHDOG_IOCTL_BASE	'W' */
+/* HP_IOC_MAGIC		'Z' */
+/* USBTMC_IOC_NR	'[' */ /* 91 */
+/* ADF_CTL_IOC_MAGIC	'a' */
+/* DMA_BUF_BASE		'b' */
+/* CHSC_IOCTL_MAGIC	'c' */
+/* RIO_CM_IOC_MAGIC	'c' */
+/* DRM_IOCTL_BASE	'd' */
+/* CIO			'd' */
+/* I2O_MAGIC_NUMBER	'i' */
+/* IPMI_IOC_MAGIC	'i' */
+/* GIODRV_IOC_MAGIC	'k' */
+/* ORANGEFS_DEV_MAGIC	'k' */
+/* HSI_CHAR_MAGIC	'k' */
+/* KYRO_IOC_MAGIC	'k' */
+/* SPI_IOC_MAGIC	'k' */
+/* MMTIMER_IOCTL_BASE	'm' */
+/* RIO_MPORT_DRV_MAGIC	'm' */
+/* MGSL_MAGIC_IOC	'm' */
+/* NILFS_IOCTL_IDENT	'n' */
+/* UBI_CTRL_IOC_MAGIC	'o' */
+/* UBI_IOC_MAGIC	'o' */
+/* PH_IOC_MAGIC		'p' */
+/* PP_IOCTL		'p' */
+/* D7S_IOC		'p' */
+/* PI433_IOC_MAGIC	'r' */
+/* ACPI_THERMAL_MAGIC	's' */
+/* ZCRYPT_IOCTL_MAGIC	'z' */
+APEX_IOCTL_BASE		0x7F
+DECNET_IOCTL_BASE	0x89
+MON_IOC_MAGIC		0x92
+AUTOFS_IOCTL		0x93
+BTRFS_IOCTL_MAGIC	0x94
+VDE_IOCTL_BASE		0x96 /* 'v' + 0x20 */
+CEPH_IOCTL_MAGIC	0x97
+TEE_IOC_MAGIC		0xA4
+GENWQE_IOC_CODE		0xA5
+UFFDIO			0xAA
+KVMIO			0xAE
+VHOST_VIRTIO		0xAF
+__BT_BMC_IOCTL_MAGIC	0xB1
+DFL_FPGA_MAGIC		0xB6
+NSIO			0xB7
+CODEMERCS_MAGIC_NUMBER	0xC0
+VCHIQ_IOC_MAGIC		0xC4
+CXL_MAGIC		0xCA
+OCXL_MAGIC		0xCA
+VMC_BASE		0xCC
+CIFS_IOCTL_MAGIC	0xCF
+MWAVE_MINOR		0xDB /* 219 */
+GASKET_IOCTL_BASE	0xDC
+OTG_IOCTL_MAGIC		0xF0 /* FSL_OTG_MAJOR - 240 */
+F2FS_IOCTL_MAGIC	0xF5
