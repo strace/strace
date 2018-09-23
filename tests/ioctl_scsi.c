@@ -137,13 +137,14 @@ main(void)
 	       "SG_SCSI_RESET");
 
 	ioctl(-1, 0x22ff, 0);
-	printf("ioctl(-1, _IOC(0, 0x22, 0xff, 0), 0) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, _IOC(%s, 0x22, 0xff, 0), 0) = -1 EBADF (%m)\n",
+	       _IOC_NONE ? "0" : "_IOC_NONE");
 
 	static const unsigned long magic =
 		(unsigned long) 0xdeadbeeffacefeedULL;
 	ioctl(-1, 0x22ff, magic);
-	printf("ioctl(-1, _IOC(0, 0x22, 0xff, 0), %#lx) = -1 EBADF (%m)\n",
-	       magic);
+	printf("ioctl(-1, _IOC(%s, 0x22, 0xff, 0), %#lx) = -1 EBADF (%m)\n",
+	       _IOC_NONE ? "0" : "_IOC_NONE", magic);
 
 	puts("+++ exited with 0 +++");
 	return 0;

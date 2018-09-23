@@ -91,10 +91,10 @@ main(void)
 
 	/* Unknown perf commands */
 	sys_ioctl(-1, unknown_perf_cmd, magic);
-	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x24, %#x, %#x), "
+	printf("ioctl(-1, _IOC(%s_IOC_READ|_IOC_WRITE, 0x24, %#x, %#x), "
 	       "%#lx) = -1 EBADF (%m)\n",
 	       _IOC_DIR((unsigned int) unknown_perf_cmd) & _IOC_NONE ?
-	       "|_IOC_NONE" : "",
+	       "_IOC_NONE|" : "",
 	       _IOC_NR((unsigned int) unknown_perf_cmd),
 	       _IOC_SIZE((unsigned int) unknown_perf_cmd),
 	       (unsigned long) magic);
