@@ -859,20 +859,29 @@ print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
  * codes are building xlat(dyxlat) at runtime.
  */
 static bool
-genl_send_dump_families(struct tcb *tcp, const int fd)
+genl_query_families(struct tcb *tcp, const int fd, int id)
 {
-	struct {
+	struct genl_req {
 		const struct nlmsghdr nlh;
 		struct genlmsghdr gnlh;
+		struct nlattr ATTRIBUTE_ALIGNED(NLA_ALIGNTO) nlah;
+		uint16_t id;
 	} req = {
 		.nlh = {
 			.nlmsg_len = sizeof(req),
 			.nlmsg_type = GENL_ID_CTRL,
-			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST,
+			.nlmsg_flags = NLM_F_REQUEST
+				       | (id < 0 ? NLM_F_DUMP : 0),
 		},
 		.gnlh = {
 			.cmd = CTRL_CMD_GETFAMILY,
-		}
+		},
+		.nlah = {
+			.nla_len = offsetofend(struct genl_req, id)
+				    - offsetof(struct genl_req, nlah),
+			.nla_type = CTRL_ATTR_FAMILY_ID,
+		},
+		.id = id,
 	};
 	return send_query(tcp, fd, &req, sizeof(req));
 }
@@ -924,24 +933,27 @@ genl_parse_families_response(const void *const data,
 	return 0;
 }
 
-const struct xlat *
-genl_families_xlat(struct tcb *tcp)
+const char *
+genl_get_family_name(struct tcb *tcp, uint16_t id)
 {
 	static struct dyxlat *dyxlat;
 
-	if (!dyxlat) {
+	const char *name = dyxlat ? xlookup(dyxlat_get(dyxlat), id) : NULL;
+	if (name)
+		return name;
+
+	bool init = !dyxlat;
+	if (init)
 		dyxlat = dyxlat_alloc(32);
 
-		int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-		if (fd < 0)
-			goto out;
+	int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+	if (fd < 0)
+		return NULL;
 
-		if (genl_send_dump_families(tcp, fd))
-			receive_responses(tcp, fd, 0, GENL_ID_CTRL,
-					  genl_parse_families_response, dyxlat);
-		close(fd);
-	}
+	if (genl_query_families(tcp, fd, init ? -1 : id))
+		receive_responses(tcp, fd, 0, GENL_ID_CTRL,
+				  genl_parse_families_response, dyxlat);
+	close(fd);
 
-out:
-	return dyxlat_get(dyxlat);
+	return xlookup(dyxlat_get(dyxlat), id);
 }

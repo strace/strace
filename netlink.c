@@ -113,7 +113,8 @@ decode_nlmsg_type_generic(struct tcb *tcp, const struct xlat *const xlat,
 			  const char *const dflt)
 {
 	/* As genl family numbers are allocated dynamically */
-	printxval_ex(genl_families_xlat(tcp), type, dflt, XLAT_STYLE_VERBOSE);
+	print_xlat_ex(type, genl_get_family_name(tcp, type),
+		      XLAT_STYLE_VERBOSE);
 }
 
 static const struct {
