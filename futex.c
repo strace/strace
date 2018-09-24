@@ -160,6 +160,8 @@ SYS_FUNC(futex)
 		printaddrpival(tcp, uaddr2);
 		break;
 	case FUTEX_FD:
+		tprintf(", %u", val);
+		return RVAL_DECODED | RVAL_FD;
 	case FUTEX_WAKE:
 		tprintf(", %u", val);
 		break;
