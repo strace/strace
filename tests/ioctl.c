@@ -102,6 +102,25 @@ main(void)
 	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x8), %p)"
 	       " = -1 EBADF (%m)\n", &data);
 
+	(void) ioctl(-1, _IO(0x7f, 0xad), &data);
+	printf("ioctl(-1, _IOC(_IOC_NONE, APEX_IOCTL_BASE, 0xad, 0), %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, _IOWR(0x7e, 0xad, char[0xf00d]), &data);
+	printf("ioctl(-1"
+	       ", _IOC(_IOC_READ|_IOC_WRITE, '~', 0xad, %#x), %p)"
+	       " = -1 EBADF (%m)\n", 0xf00d & _IOC_SIZEMASK, &data);
+
+	(void) ioctl(-1, _IOW('\'', 0xad, char[0xbad]), &data);
+	printf("ioctl(-1"
+	       ", _IOC(_IOC_WRITE, '\\'', 0xad, 0xbad), %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, _IOR('\\', 0xad, char), &data);
+	printf("ioctl(-1"
+	       ", _IOC(_IOC_READ, '\\\\', 0xad, 0x1), %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

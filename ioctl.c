@@ -72,15 +72,22 @@ ioctl_next_match(const struct_ioctlent *iop)
 static const char *
 ioctl_type_str(uint8_t ioc_type)
 {
-	static char buf[] = { '\'', ' ', '\'', '\0' };
+	static char buf[] = { '\'', '\\', '\'', '\'', '\0' };
 
 	const char *ret = xlookup(ioc_types, ioc_type);
 	if (ret)
 		return ret;
 
-	if (ioc_type >= ' ' && ioc_type < 0x7F) {
-		buf[1] = ioc_type;
+	if (ioc_type == '\\' || ioc_type == '\'') {
+		buf[1] = '\\';
+		buf[2] = ioc_type;
 		return buf;
+	}
+
+	if (ioc_type >= ' ' && ioc_type < 0x7F) {
+		buf[1] = '\'';
+		buf[2] = ioc_type;
+		return buf + 1;
 	}
 
 	return NULL;
