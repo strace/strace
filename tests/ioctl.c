@@ -85,6 +85,27 @@ main(void)
 	printf("ioctl(-1, EVIOCGBIT(EV_KEY, 8), %p)"
 	       " = -1 EBADF (%m)\n", &data);
 
+	(void) ioctl(-1, 0x89df, &data);
+	printf("ioctl(-1, _IOC(%s, SOCK_IOC_TYPE, 0xdf, 0), %p)"
+	       " = -1 EBADF (%m)\n",
+	       _IOC_NONE ? "0" : "_IOC_NONE", &data);
+
+	(void) ioctl(-1, 0x89ef, &data);
+	printf("ioctl(-1, SIOCPROTOPRIVATE+15, %p) = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, 0x89ff, &data);
+	printf("ioctl(-1, SIOCDEVPRIVATE+15, %p) = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, 0x8bdf, &data);
+	printf("ioctl(-1, _IOC(%s, 0x8b, 0xdf, 0), %p) = -1 EBADF (%m)\n",
+	       _IOC_NONE ? "0" : "_IOC_NONE", &data);
+
+	(void) ioctl(-1, 0x8bfe, &data);
+	printf("ioctl(-1, SIOCIWFIRSTPRIV+30, %p) = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, 0x8bff, &data);
+	printf("ioctl(-1, SIOCIWLASTPRIV, %p) = -1 EBADF (%m)\n", &data);
+
 	(void) ioctl(-1, _IOR('M', 13, int), &data);
 # ifdef HAVE_STRUCT_MTD_WRITE_REQ
 	printf("ioctl(-1, MIXER_READ(13) or OTPSELECT, [MTD_OTP_OFF])"

@@ -205,6 +205,19 @@ hiddev_decode_number(const unsigned int code)
 	return 0;
 }
 
+#ifndef SIOCPROTOPRIVATE
+# define SIOCPROTOPRIVATE 0x89E0
+#endif
+#ifndef SIOCDEVPRIVATE
+# define SIOCDEVPRIVATE 0x89F0
+#endif
+#ifndef SIOCIWFIRSTPRIV
+# define SIOCIWFIRSTPRIV 0x8BE0
+#endif
+#ifndef SIOCIWLASTPRIV
+# define SIOCIWLASTPRIV 0x8BFF
+#endif
+
 static int
 ioctl_decode_command_number(struct tcb *tcp)
 {
@@ -239,6 +252,22 @@ ioctl_decode_command_number(struct tcb *tcp)
 	case 'k':
 		if (_IOC_DIR(code) == _IOC_WRITE && _IOC_NR(code) == 0) {
 			tprintf("SPI_IOC_MESSAGE(%u)", _IOC_SIZE(code));
+			return 1;
+		}
+		return 0;
+	case SOCK_IOC_TYPE:
+		if (code > SIOCPROTOPRIVATE && code <= SIOCPROTOPRIVATE + 15) {
+			tprintf("SIOCPROTOPRIVATE+%u", code - SIOCPROTOPRIVATE);
+			return 1;
+		}
+		if (code > SIOCDEVPRIVATE && code <= SIOCDEVPRIVATE + 15) {
+			tprintf("SIOCDEVPRIVATE+%u", code - SIOCDEVPRIVATE);
+			return 1;
+		}
+		return 0;
+	case 0x8B: /* 802.11 */
+		if (code > SIOCIWFIRSTPRIV && code < SIOCIWLASTPRIV) {
+			tprintf("SIOCIWFIRSTPRIV+%u", code - SIOCIWFIRSTPRIV);
 			return 1;
 		}
 		return 0;
