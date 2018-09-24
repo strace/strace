@@ -30,8 +30,65 @@
  */
 
 #include "defs.h"
+
 #include <fcntl.h>
+#include <fnmatch.h>
 #include <sys/uio.h>
+
+struct filebuf_decoder_desc {
+	const char *fname;
+	filebuf_decoder_fn decoder;
+};
+
+static void
+decode_filebuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
+	       const kernel_ulong_t addrlen,
+	       const struct filebuf_decoder_desc *decoders, size_t decoders_cnt,
+	       enum fileops op)
+{
+	if (!verbose(tcp))
+		goto no_match;
+
+	char fdpath[PATH_MAX + 1];
+
+	if (getfdpath(tcp, fd, ARRSZ_PAIR(fdpath)) < 0)
+		goto no_match;
+
+	/* We don't support any "regular" files so far */
+	if (fdpath[0] == '/')
+		goto no_match;
+
+	for (size_t i = 0; i < decoders_cnt; i++) {
+		if (!fnmatch(decoders[i].fname, fdpath, 0) &&
+		    decoders[i].decoder(tcp, fd, fdpath, op, addr, addrlen))
+			return;
+	}
+
+no_match:
+	printstrn(tcp, addr, addrlen);
+}
+
+static void
+decode_readbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
+	       const kernel_ulong_t addrlen)
+{
+	static const struct filebuf_decoder_desc decoders[] = {
+	};
+
+	decode_filebuf(tcp, fd, addr, addrlen, ARRSZ_PAIR(decoders),
+		       FILEOP_READ);
+}
+
+static void
+decode_writebuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
+		const kernel_ulong_t addrlen)
+{
+	static const struct filebuf_decoder_desc decoders[] = {
+	};
+
+	decode_filebuf(tcp, fd, addr, addrlen, ARRSZ_PAIR(decoders),
+		       FILEOP_WRITE);
+}
 
 SYS_FUNC(read)
 {
@@ -42,7 +99,8 @@ SYS_FUNC(read)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
+			decode_readbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
+				       tcp->u_rval);
 		tprintf(", %" PRI_klu, tcp->u_arg[2]);
 	}
 	return 0;
@@ -52,7 +110,7 @@ SYS_FUNC(write)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	decode_writebuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu, tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -159,7 +217,8 @@ SYS_FUNC(pread)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
+			decode_readbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
+				       tcp->u_rval);
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		printllval(tcp, "%lld", 3);
 	}
@@ -170,7 +229,7 @@ SYS_FUNC(pwrite)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
-	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	decode_writebuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 	printllval(tcp, "%lld", 3);
 

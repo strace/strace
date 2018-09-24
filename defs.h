@@ -403,6 +403,15 @@ enum sock_proto {
 extern enum sock_proto get_proto_by_name(const char *);
 extern int get_family_by_proto(enum sock_proto proto);
 
+enum fileops {
+	FILEOP_READ,
+	FILEOP_WRITE,
+};
+
+typedef bool (*filebuf_decoder_fn)(struct tcb *tcp, int fd, const char *fdpath,
+				   enum fileops op, kernel_ulong_t addr,
+				   kernel_ulong_t addrlen);
+
 enum iov_decode {
 	IOV_DECODE_ADDR,
 	IOV_DECODE_STR,
