@@ -134,17 +134,20 @@ tprint_sock_type(unsigned int flags)
 	printflags(sock_type_flags, flags, "SOCK_???");
 }
 
+void
+socket_exiting_cb(struct tcb *tcp)
+{
+	if (syserror(tcp) || syscall_tampered_nofail(tcp)
+	    || tcp->u_arg[0] != AF_NETLINK)
+		return;
+
+	uint64_t inode = getfdinode(tcp, tcp->u_rval);
+
+	set_netlink_family_cache_entry(inode, tcp->u_arg[2]);
+}
+
 SYS_FUNC(socket)
 {
-	if (exiting(tcp)) {
-		if (!syserror(tcp) && tcp->u_arg[0] == AF_NETLINK) {
-			uint64_t inode = getfdinode(tcp, tcp->u_rval);
-
-			set_netlink_family_cache_entry(inode, tcp->u_arg[2]);
-		}
-
-		return RVAL_DECODED | RVAL_FD;
-	}
 	printxval(addrfams, tcp->u_arg[0], "AF_???");
 	tprints(", ");
 	tprint_sock_type(tcp->u_arg[1]);
@@ -217,10 +220,7 @@ SYS_FUNC(socket)
 		break;
 	}
 
-	if (tcp->u_arg[0] != AF_NETLINK)
-		return RVAL_DECODED | RVAL_FD;
-
-	return 0;
+	return RVAL_DECODED | RVAL_FD;
 }
 
 static bool

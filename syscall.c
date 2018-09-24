@@ -844,14 +844,25 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 	if (tcp->s_ent->sys_flags & MEMORY_MAPPING_CHANGE)
 		mmap_notify_report(tcp);
 
-	if (filtered(tcp) || hide_log(tcp))
-		return 0;
-
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);
 #endif
 
-	return get_syscall_result(tcp, false);
+	/* We rely on the fact that get_syscall_result returns only -1 and 1 */
+	int gsr = 0;
+	switch (tcp->s_ent->sen) {
+	/* Callback for storing information about newly created sockets */
+	case SEN_socket:
+		gsr = get_syscall_result(tcp, false);
+		if (gsr > 0)
+			socket_exiting_cb(tcp);
+		break;
+	}
+
+	if (filtered(tcp) || hide_log(tcp))
+		return 0;
+
+	return gsr ?: get_syscall_result(tcp, false);
 }
 
 int

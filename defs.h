@@ -366,6 +366,9 @@ extern const struct xlat whence_codes[];
 
 #define indirect_ipccall(tcp) (tcp->s_ent->sys_flags & TRACE_INDIRECT_SUBCALL)
 
+
+extern void socket_exiting_cb(struct tcb *tcp);
+
 extern void set_netlink_family_cache_entry(uint64_t inode, uint8_t family);
 extern int get_netlink_family_cache_entry(uint64_t inode);
 extern void invalidate_netlink_family_cache_entry(uint64_t inode);
