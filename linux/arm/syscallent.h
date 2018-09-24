@@ -440,6 +440,7 @@
  * __ARM_NR_cmpxchg (0x000ffff0).
  * Remapped by shuffle_scno() to be directly after ordinary syscalls
  * in this table.
+ * Removed in v4.4-rc1~163^2^3~13.
  */
 [ARM_FIRST_SHUFFLED_SYSCALL    ] = { 5,	0,	SEN(printargs),	"cmpxchg"		},
 
