@@ -28,14 +28,12 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_GENETLINK_H
-
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-# include <sys/socket.h>
-# include "netlink.h"
-# include <linux/genetlink.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include "netlink.h"
+#include <linux/genetlink.h>
 
 static void
 test_nlmsg_type(const int fd)
@@ -81,9 +79,3 @@ int main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_GENETLINK_H")
-
-#endif

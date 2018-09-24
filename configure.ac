@@ -397,7 +397,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/falloc.h
 	linux/fib_rules.h
 	linux/fiemap.h
-	linux/genetlink.h
 	linux/hiddev.h
 	linux/if_addr.h
 	linux/if_link.h
