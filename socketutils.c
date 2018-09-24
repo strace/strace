@@ -38,9 +38,7 @@
 #include <linux/netlink_diag.h>
 #include <linux/packet_diag.h>
 #include <linux/rtnetlink.h>
-#if HAVE_LINUX_GENETLINK_H
 #include <linux/genetlink.h>
-#endif
 
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
@@ -851,7 +849,6 @@ print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 						 getfdproto(tcp, fd));
 }
 
-#ifdef HAVE_LINUX_GENETLINK_H
 /*
  * Managing the cache for decoding communications of Netlink GENERIC protocol
  *
@@ -948,12 +945,3 @@ genl_families_xlat(struct tcb *tcp)
 out:
 	return dyxlat_get(dyxlat);
 }
-
-#else /* !HAVE_LINUX_GENETLINK_H */
-
-const struct xlat *
-genl_families_xlat(struct tcb *tcp)
-{
-	return NULL;
-}
-#endif
