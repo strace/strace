@@ -748,14 +748,6 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	tprints(")");
 }
 
-static bool
-print_uint32(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
-{
-	tprintf("%u", *(uint32_t *) elem_buf);
-
-	return true;
-}
-
 static void
 print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		 const unsigned int name, const kernel_ulong_t addr,
@@ -821,7 +813,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			uint32_t buf;
 			print_array(tcp, addr, MIN(ulen, rlen) / sizeof(buf),
 				    &buf, sizeof(buf),
-				    tfetch_mem, print_uint32, 0);
+				    tfetch_mem, print_uint32_array_member, 0);
 			break;
 			}
 		default:
