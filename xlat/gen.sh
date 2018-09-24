@@ -76,9 +76,9 @@ print_xlat()
 		echo " XLAT_TYPE(${val_type}, ${val}),"
 	fi
 
-	echo " #define XLAT_VAL_$xlat_flag_cnt ${val}"
+	echo " #define XLAT_VAL_$xlat_flag_cnt ((${val_type:-unsigned}) (${val}))"
 	echo " #define XLAT_STR_$xlat_flag_cnt STRINGIFY(${val})"
-	xlat_flags_cnt=$((xlat_flags_cnt + 1))
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 print_xlat_pair()
@@ -94,9 +94,9 @@ print_xlat_pair()
 		echo " XLAT_TYPE_PAIR(${val_type}, ${val}, \"${str}\"),"
 	fi
 
-	echo " #define XLAT_VAL_$xlat_flag_cnt ${val}"
+	echo " #define XLAT_VAL_$xlat_flag_cnt ((${val_type:-unsigned}) (${val}))"
 	echo " #define XLAT_STR_$xlat_flag_cnt \"${str}\""
-	xlat_flags_cnt=$((xlat_flags_cnt + 1))
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 cond_xlat()
@@ -115,6 +115,9 @@ cond_xlat()
 		xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}")"
 		m="${m#1<<}"
 	fi
+
+	# Since we're calling print_xlat/print_xlat_pair in subprocess
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 
 	if [ -z "${def}" ]; then
 		cat <<-EOF
@@ -292,31 +295,31 @@ gen_header()
 	EOF
 
 	echo " .flags_mask = 0"
-	for i in $(seq 0 "$((xlat_flag_cnt + 1))"); do
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
 		cat <<-EOF
 			#  ifdef XLAT_VAL_${i}
 			  | XLAT_VAL_${i}
 			#  endif
 		EOF
 	done
-	echo "  ;"
+	echo "  ,"
 
 	echo " .flags_strsz = 0"
-	for i in $(seq 0 "$((xlat_flag_cnt + 1))"); do
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
 		cat <<-EOF
 			#  ifdef XLAT_STR_${i}
 			  + sizeof(XLAT_STR_${i})
 			#  endif
 		EOF
 	done
-	echo "  ;"
+	echo "  ,"
 
 	cat <<-EOF
 		} };
 
 	EOF
 
-	for i in $(seq 0 "$((xlat_flag_cnt + 1))"); do
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
 		cat <<-EOF
 			#  ifdef XLAT_STR_${i}
 			#   undef XLAT_STR_${i}
