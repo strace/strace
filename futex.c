@@ -40,11 +40,38 @@
 #ifndef FUTEX_OP_OPARG_SHIFT
 # define FUTEX_OP_OPARG_SHIFT 8
 #endif
+#ifndef FUTEX_TID_MASK
+# define FUTEX_TID_MASK 0x3fffffffU
+#endif
 
 #include "xlat/futexbitset.h"
 #include "xlat/futexops.h"
+#include "xlat/futexpiflags.h"
 #include "xlat/futexwakeops.h"
 #include "xlat/futexwakecmps.h"
+
+static void
+printaddrnum(struct tcb *tcp, kernel_ulong_t addr)
+{
+	printnum_int_ex(tcp, addr, true, "%#x");
+}
+
+static void
+printaddrpival(struct tcb *tcp, kernel_ulong_t addr)
+{
+	uint32_t tid;
+
+	if (umove_or_printaddr(tcp, addr, &tid))
+		return;
+
+	tprints("[");
+	if (tid & ~FUTEX_TID_MASK) {
+	printflags(futexpiflags, tid & ~FUTEX_TID_MASK, NULL);
+		tprints("|");
+	}
+	tprintf("%u]", tid & FUTEX_TID_MASK);
+	printaddr_comment(addr);
+}
 
 SYS_FUNC(futex)
 {
@@ -58,7 +85,16 @@ SYS_FUNC(futex)
 	const unsigned int val3 = tcp->u_arg[5];
 	const char *comment;
 
-	printaddr(uaddr);
+	switch (cmd) {
+	case FUTEX_LOCK_PI:
+	case FUTEX_UNLOCK_PI:
+	case FUTEX_TRYLOCK_PI:
+		printaddrpival(tcp, uaddr);
+		break;
+	default:
+		printaddrnum(tcp, uaddr);
+	}
+
 	tprints(", ");
 	printxval(futexops, op, "FUTEX_???");
 	switch (cmd) {
@@ -86,19 +122,20 @@ SYS_FUNC(futex)
 	case FUTEX_REQUEUE:
 		tprintf(", %u", val);
 		tprintf(", %u, ", val2);
-		printaddr(uaddr2);
+		printaddrnum(tcp, uaddr2);
 		break;
 	case FUTEX_CMP_REQUEUE:
 	case FUTEX_CMP_REQUEUE_PI:
 		tprintf(", %u", val);
 		tprintf(", %u, ", val2);
-		printaddr(uaddr2);
+		(cmd == FUTEX_CMP_REQUEUE ? printaddrnum
+					  : printaddrpival)(tcp, uaddr2);
 		tprintf(", %u", val3);
 		break;
 	case FUTEX_WAKE_OP:
 		tprintf(", %u", val);
 		tprintf(", %u, ", val2);
-		printaddr(uaddr2);
+		printaddrnum(tcp, uaddr2);
 		tprints(", ");
 		if ((val3 >> 28) & FUTEX_OP_OPARG_SHIFT) {
 			print_xlat(FUTEX_OP_OPARG_SHIFT);
@@ -120,7 +157,7 @@ SYS_FUNC(futex)
 		tprints(", ");
 		print_timespec(tcp, timeout);
 		tprints(", ");
-		printaddr(uaddr2);
+		printaddrpival(tcp, uaddr2);
 		break;
 	case FUTEX_FD:
 	case FUTEX_WAKE:
