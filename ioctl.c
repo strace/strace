@@ -89,23 +89,12 @@ ioctl_type_str(uint8_t ioc_type)
 static void
 ioctl_print_code(const unsigned int code)
 {
-	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#x", code);
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
-		return;
-
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
-
 	tprints("_IOC(");
 	printflags(ioctl_dirs, _IOC_DIR(code), "_IOC_???");
 	tprints(", ");
 	print_xlat_ex(_IOC_TYPE(code), ioctl_type_str(_IOC_TYPE(code)),
 		      XLAT_STYLE_DEFAULT);
 	tprintf(", %#x, %#x)", _IOC_NR(code), _IOC_SIZE(code));
-
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
 }
 
 static int
