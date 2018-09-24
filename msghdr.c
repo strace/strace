@@ -228,7 +228,8 @@ static const struct {
 	[SCM_SECURITY] = { print_scm_security, 1 },
 	[SCM_TIMESTAMP] = { print_scm_timestamp, 1 },
 	[SCM_TIMESTAMPNS] = { print_scm_timestampns, 1 },
-	[SCM_TIMESTAMPING] = { print_scm_timestamping, 1 }
+	[SCM_TIMESTAMPING] = { print_scm_timestamping, 1 },
+	[SO_RXQ_OVFL] = { print_cmsg_uint, sizeof(unsigned int) },
 }, cmsg_ip_printers[] = {
 	[IP_PKTINFO] = { print_cmsg_ip_pktinfo, sizeof(struct in_pktinfo) },
 	[IP_TTL] = { print_cmsg_uint, sizeof(unsigned int) },

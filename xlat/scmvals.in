@@ -27,6 +27,14 @@ SCM_TIMESTAMPING 37
 #endif
 
 #if defined HPPA
+SO_RXQ_OVFL	0x4021
+#elif defined SPARC || defined SPARC64
+SO_RXQ_OVFL	0x0024
+#else
+SO_RXQ_OVFL	40
+#endif
+
+#if defined HPPA
 SCM_WIFI_STATUS 0x4022
 #elif defined SPARC || defined SPARC64
 SCM_WIFI_STATUS 0x0025
