@@ -208,18 +208,19 @@ main(void)
 
 	/* Incorrect operation */
 	ioctl(-1, _IOW(DM_IOCTL, 0xde, int), dm_arg);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, %#x, 0xde, %#zx), %p) = "
-	       "-1 EBADF (%m)\n",
-	       DM_IOCTL, sizeof(int), dm_arg);
+	printf("ioctl(-1, _IOC(_IOC_WRITE, DM_IOCTL, 0xde, %#zx), %p)"
+	       " = -1 EBADF (%m)\n",
+	       sizeof(int), dm_arg);
 
 	ioctl(-1, dummy_dm_ioctl1, 0);
-	printf("ioctl(-1, _IOC(_IOC_READ, %#x, 0, %#x), 0) = -1 EBADF (%m)\n",
-	       DM_IOCTL, (unsigned int) _IOC_SIZE(dummy_dm_ioctl1));
+	printf("ioctl(-1, _IOC(_IOC_READ, DM_IOCTL, 0, %#x), 0)"
+	       " = -1 EBADF (%m)\n",
+	       (unsigned int) _IOC_SIZE(dummy_dm_ioctl1));
 
 	ioctl(-1, dummy_dm_ioctl2, dummy_dm_arg);
-	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, %#x, %#x, 0), %#lx) = "
-	       "-1 EBADF (%m)\n",
-	       DM_IOCTL, (unsigned int) _IOC_NR(dummy_dm_ioctl2),
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, DM_IOCTL, %#x, 0), %#lx)"
+	       " = -1 EBADF (%m)\n",
+	       (unsigned int) _IOC_NR(dummy_dm_ioctl2),
 	       (unsigned long) dummy_dm_arg);
 
 

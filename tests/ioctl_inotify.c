@@ -56,7 +56,7 @@ main(void)
 
 	/* Unknown inotify commands */
 	sys_ioctl(-1, unknown_inotify_cmd, magic);
-	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x49, %#x, %#x), "
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 'I', %#x, %#x), "
 	       "%#lx) = -1 EBADF (%m)\n",
 	       _IOC_DIR((unsigned int) unknown_inotify_cmd) & _IOC_NONE ?
 	       "|_IOC_NONE" : "",
@@ -65,7 +65,7 @@ main(void)
 	       (unsigned long) magic);
 
 	sys_ioctl(-1, INOTIFY_IOC_SETNEXTWD + 1, magic);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, 0x49, %#x, %#x), %#lx)"
+	printf("ioctl(-1, _IOC(_IOC_WRITE, 'I', %#x, %#x), %#lx)"
 	       " = -1 EBADF (%m)\n",
 	       (unsigned int) _IOC_NR(INOTIFY_IOC_SETNEXTWD + 1),
 	       (unsigned int) _IOC_SIZE(INOTIFY_IOC_SETNEXTWD + 1),

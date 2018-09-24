@@ -91,7 +91,7 @@ main(void)
 
 	/* Unknown perf commands */
 	sys_ioctl(-1, unknown_perf_cmd, magic);
-	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, 0x24, %#x, %#x), "
+	printf("ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE%s, '$', %#x, %#x), "
 	       "%#lx) = -1 EBADF (%m)\n",
 	       _IOC_DIR((unsigned int) unknown_perf_cmd) & _IOC_NONE ?
 	       "|_IOC_NONE" : "",
@@ -100,7 +100,7 @@ main(void)
 	       (unsigned long) magic);
 
 	sys_ioctl(-1, PERF_EVENT_IOC_MODIFY_ATTRIBUTES + 1, magic);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, 0x24, %#x, %#x), %#lx)"
+	printf("ioctl(-1, _IOC(_IOC_WRITE, '$', %#x, %#x), %#lx)"
 	       " = -1 EBADF (%m)\n",
 	       (unsigned int) _IOC_NR(PERF_EVENT_IOC_MODIFY_ATTRIBUTES + 1),
 	       (unsigned int) _IOC_SIZE(PERF_EVENT_IOC_MODIFY_ATTRIBUTES + 1),

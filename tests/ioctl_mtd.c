@@ -189,9 +189,9 @@ main(void)
 	       (unsigned long long) wr->usr_data,
 	       (unsigned long long) wr->usr_oob);
 
-	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x4d, 0xfe, 0xff), lmagic);
+	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 'M', 0xfe, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_READ|_IOC_WRITE, 0x4d, 0xfe, 0xff)", lmagic);
+	       "_IOC(_IOC_READ|_IOC_WRITE, 'M', 0xfe, 0xff)", lmagic);
 
 	puts("+++ exited with 0 +++");
 	return 0;

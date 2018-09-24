@@ -106,13 +106,13 @@ test_no_device(void)
 
 	/* unrecognized */
 	ioctl(-1, _IOC(_IOC_READ, PTP_CLK_MAGIC, 0xff, 0xfe), 0);
-	printf("ioctl(-1, _IOC(_IOC_READ, %#x, 0xff, 0xfe), 0)"
-	       " = -1 EBADF (%m)\n", PTP_CLK_MAGIC);
+	printf("ioctl(-1, _IOC(_IOC_READ, PTP_CLK_MAGIC, 0xff, 0xfe), 0)"
+	       " = -1 EBADF (%m)\n");
 
 	const unsigned long arg = (unsigned long) 0xfacefeeddeadbeefULL;
 	ioctl(-1, _IOC(_IOC_WRITE, PTP_CLK_MAGIC, 0xfd, 0xfc), arg);
-	printf("ioctl(-1, _IOC(_IOC_WRITE, %#x, 0xfd, 0xfc), %#lx)"
-	       " = -1 EBADF (%m)\n", PTP_CLK_MAGIC, arg);
+	printf("ioctl(-1, _IOC(_IOC_WRITE, PTP_CLK_MAGIC, 0xfd, 0xfc), %#lx)"
+	       " = -1 EBADF (%m)\n", arg);
 }
 
 int
