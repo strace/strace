@@ -25,9 +25,19 @@
 # endif
 # define all_flags (O_NONBLOCK | cloexec_flag)
 
+#ifdef PRINT_PATHS
+# define RC_FMT "%ld<%s>"
+#else
+# define RC_FMT "%s"
+#endif
+
 int
 main(void)
 {
+#ifdef PRINT_PATHS
+	skip_if_unavailable("/proc/self/fd/");
+#endif
+
 	static const kernel_ulong_t bogus_flags1 =
 		(kernel_ulong_t) 0xfacefeeddeadbeefULL | O_NONBLOCK;
 	static const kernel_ulong_t bogus_flags2 =
@@ -46,8 +56,51 @@ main(void)
 	       (unsigned int) bogus_flags2, sprintrc(rc));
 
 	rc = syscall(__NR_inotify_init1, all_flags);
-	printf("inotify_init1(IN_NONBLOCK%s) = %s\n",
-	       all_flags & cloexec_flag ? "|IN_CLOEXEC" : "", sprintrc(rc));
+
+#ifdef PRINT_PATHS
+	if (rc < 0)
+		perror_msg_and_skip("inotify_init(%#x)", all_flags);
+
+	/*
+	 * Kernels that do not have v2.6.33-rc1~34^2~7 do not have
+	 * "anon_inode:" prefix.  Let's assume that it can be either "inotify"
+	 * or "anon_inode:inotify" for now, as any change there may be
+	 * of interest.
+	 */
+	char path[sizeof("/proc/self/fd/") + sizeof(rc) * 3];
+	char buf[2] = "";
+	const char *inotify_path;
+	ssize_t ret;
+
+	ret = snprintf(path, sizeof(path), "/proc/self/fd/%ld", rc);
+	if ((ret < 0) || ((size_t) ret >= sizeof(path)))
+		perror_msg_and_fail("snprintf(path)");
+
+	ret = readlink(path, buf, sizeof(buf));
+	if (ret < 0)
+		perror_msg_and_fail("readlink");
+
+	switch (buf[0]) {
+	case 'a':
+		inotify_path = "anon_inode:inotify";
+		break;
+	case 'i':
+		inotify_path = "inotify";
+		break;
+	default:
+		error_msg_and_fail("Unexpected first char '%c' of inotify fd "
+				   "link path", buf[0]);
+	}
+#endif
+
+	printf("inotify_init1(IN_NONBLOCK%s) = " RC_FMT "\n",
+	       all_flags & cloexec_flag ? "|IN_CLOEXEC" : "",
+#ifdef PRINT_PATHS
+	       rc, inotify_path
+#else
+	       sprintrc(rc)
+#endif
+	       );
 
 	puts("+++ exited with 0 +++");
 

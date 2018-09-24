@@ -126,7 +126,10 @@ group_req
 inet-cmsg
 init_module
 inotify
+inotify_init
+inotify_init-y
 inotify_init1
+inotify_init1-y
 io_uring_enter
 io_uring_register
 io_uring_setup

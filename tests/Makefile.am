@@ -234,6 +234,7 @@ DECODER_TESTS = \
 	futex.test \
 	getuid.test \
 	int_0x80.test \
+	inotify_init-y.test \
 	ioctl.test \
 	ioctl_evdev-success-v.test \
 	ioctl_evdev-success.test \

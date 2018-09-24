@@ -123,7 +123,9 @@ group_req	-e trace=setsockopt
 inet-cmsg	-e trace=recvmsg
 init_module	-a27
 inotify	-a23 -e trace=inotify_add_watch,inotify_rm_watch
+inotify_init	-a15
 inotify_init1	-a27
+inotify_init1-y	-a27 -y -e trace=inotify_init1
 io_uring_enter	-y
 io_uring_register	-y
 io_uring_setup	-a26 -y

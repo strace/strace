@@ -148,7 +148,10 @@ inet-cmsg
 init_module
 inject-nf
 inotify
+inotify_init
+inotify_init-y
 inotify_init1
+inotify_init1-y
 int_0x80
 io_uring_enter
 io_uring_register
