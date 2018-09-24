@@ -249,7 +249,8 @@
 [219] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [220] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [221] = { 3,	TD,		SEN(fcntl64),			"fcntl64"		},
-[222 ... 223] = { },
+/* [222] - tux */
+/* [223] - unused */
 [224] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [225] = { 5,	TD,		SEN(readahead),			"readahead"		},
 [226] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
@@ -280,7 +281,8 @@
 [251] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},
 [252] = { 4,	TD,		SEN(epoll_wait),		"epoll_wait"		},
 [253] = { 5,	TM|SI,		SEN(remap_file_pages),		"remap_file_pages"	},
-[254 ... 255] = { },
+/* [254] - set_thread_area */
+/* [255] - get_thread_area */
 [256] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [257] = { 3,	0,		SEN(timer_create),		"timer_create"		},
 [258] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},
