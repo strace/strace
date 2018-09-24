@@ -107,7 +107,10 @@ group_req
 inet-cmsg
 init_module
 inotify
+inotify_init
+inotify_init-y
 inotify_init1
+inotify_init1-y
 ioctl
 ioctl_block
 ioctl_dm
