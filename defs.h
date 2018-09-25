@@ -1212,6 +1212,10 @@ print_big_u64_addr(const uint64_t addr)
 
 #define DECL_PRINTNUM(name)						\
 extern bool								\
+printnum_ ## name ## _ex(struct tcb *, kernel_ulong_t addr,		\
+			 bool addr_cmnt, const char *fmt)		\
+	ATTRIBUTE_FORMAT((printf, 4, 0));				\
+extern bool								\
 printnum_ ## name(struct tcb *, kernel_ulong_t addr, const char *fmt)	\
 	ATTRIBUTE_FORMAT((printf, 3, 0))				\
 /* End of DECL_PRINTNUM definition. */
