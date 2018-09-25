@@ -418,6 +418,9 @@ extern bool decode_fanotify_read(struct tcb *tcp, int fd, const char *fdpath,
 extern bool decode_fanotify_write(struct tcb *tcp, int fd, const char *fdpath,
 				  enum fileops op, kernel_ulong_t addr,
 				  kernel_ulong_t addrlen);
+extern bool decode_inotify_read(struct tcb *tcp, int fd, const char *fdpath,
+				enum fileops op, kernel_ulong_t addr,
+				kernel_ulong_t addrlen);
 
 enum iov_decode {
 	IOV_DECODE_ADDR,

@@ -74,6 +74,7 @@ decode_readbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
 {
 	static const struct filebuf_decoder_desc decoders[] = {
 		{ "anon_inode:\\[fanotify\\]",	decode_fanotify_read },
+		{ "anon_inode:inotify",		decode_inotify_read },
 	};
 
 	decode_filebuf(tcp, fd, addr, addrlen, ARRSZ_PAIR(decoders),

@@ -29,8 +29,66 @@
 #include "defs.h"
 #include <fcntl.h>
 
+#include "print_fields.h"
+
 #include "xlat/inotify_flags.h"
 #include "xlat/inotify_init_flags.h"
+
+bool
+decode_inotify_read(struct tcb *tcp, int fd, const char *fdpath,
+		    enum fileops op, kernel_ulong_t addr,
+		    kernel_ulong_t addrlen)
+{
+	struct iev_hdr {
+		int32_t	 wd;
+		uint32_t mask;
+		uint32_t cookie;
+		uint32_t len;
+	} iev_hdr;
+	kernel_ulong_t pos = 0;
+
+	if (addrlen < sizeof(iev_hdr))
+		return false;
+
+	tprints("[");
+
+	do {
+		if (pos)
+			tprints(", ");
+
+		if (umove(tcp, addr + pos, &iev_hdr)) {
+			printaddr_comment(addr + pos);
+			break;
+		}
+
+		PRINT_FIELD_D("{", iev_hdr, wd);
+		PRINT_FIELD_FLAGS(", ", iev_hdr, mask, inotify_flags, "IN_???");
+		PRINT_FIELD_U(", ", iev_hdr, cookie);
+		PRINT_FIELD_U(", ", iev_hdr, len);
+
+		pos += sizeof(iev_hdr);
+
+		if (iev_hdr.len) {
+			tprints(", name=");
+			printstrn(tcp, addr + pos, iev_hdr.len);
+
+			pos += iev_hdr.len;
+		}
+
+		tprints("}");
+	} while (pos <= addrlen - sizeof(iev_hdr));
+
+	if (pos < addrlen) {
+		if (pos)
+			tprints(", ");
+
+		printstrn(tcp, addr + pos, addrlen - pos);
+	}
+
+	tprints("]");
+
+	return true;
+}
 
 SYS_FUNC(inotify_add_watch)
 {
