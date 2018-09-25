@@ -1,0 +1,3 @@
+#value_indexed
+FAN_ALLOW	0x1
+FAN_DENY	0x2

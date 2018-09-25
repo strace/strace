@@ -27,6 +27,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #include "xlat/fan_classes.h"
 #include "xlat/fan_init_flags.h"
@@ -37,6 +38,236 @@
 #ifndef FAN_NOFD
 # define FAN_NOFD -1
 #endif
+#ifndef FAN_AUDIT
+# define FAN_AUDIT 0x10
+#endif
+
+#include "xlat/fan_mark_flags.h"
+#include "xlat/fan_event_flags.h"
+#include "xlat/fan_responses.h"
+
+static void
+print_fanfd(struct tcb *tcp, int fd)
+{
+	if (fd == FAN_NOFD)
+		print_xlat_d(FAN_NOFD);
+	else
+		printfd(tcp, fd);
+}
+
+#define PRINT_FIELD_FANFD(prefix_, where_, field_, tcp_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_fanfd((tcp_), (where_).field_);			\
+	} while (0)
+
+bool
+decode_fanotify_read(struct tcb *tcp, int fd, const char *fdpath,
+		     enum fileops op, kernel_ulong_t addr,
+		     kernel_ulong_t addrlen)
+{
+	struct fev_hdr {
+		uint32_t event_len;
+		union {
+			struct {
+				uint8_t  vers;
+				uint8_t  reserved;
+				uint16_t metadata_len;
+			};
+			uint32_t vers_v2;
+		};
+	} fev_hdr;
+	uint32_t fev_ver = 0;
+
+	union fev_md {
+		struct fev_md_v2 {
+			uint64_t ATTRIBUTE_ALIGNED(8) mask;
+			int32_t  fd;
+			int32_t  pid;
+		} v2;
+		struct fev_md_v1 {
+			int32_t  fd;
+			uint64_t ATTRIBUTE_ALIGNED(8) mask;
+			int64_t  pid;
+		} ATTRIBUTE_PACKED v1;
+	} fev_md;
+
+	enum {
+		FEV_V1_SIZE = sizeof(struct fev_hdr) + sizeof(struct fev_md_v1),
+		FEV_V2_SIZE = sizeof(struct fev_hdr) + sizeof(struct fev_md_v2),
+		FEV_MIN_SIZE = MIN(FEV_V1_SIZE, FEV_V2_SIZE),
+	};
+
+	kernel_ulong_t pos = 0;
+
+	if (addrlen < sizeof(fev_hdr))
+		return false;
+
+	tprints("[");
+
+	do {
+		if (pos)
+			tprints(", ");
+
+		if (umove(tcp, addr + pos, &fev_hdr)) {
+			printaddr_comment(addr + pos);
+			break;
+		}
+
+		PRINT_FIELD_U("{", fev_hdr, event_len);
+
+		if (fev_hdr.event_len < FEV_MIN_SIZE) {
+			tprints(", ... /* invalid event_len */}");
+
+			if (!fev_hdr.event_len)
+				goto end_decoded;
+
+			goto end_fev_decoded;
+		}
+
+		switch (fev_hdr.vers) {
+		case 0: case 1: case 2:
+			switch (fev_hdr.vers_v2) {
+			case 1: case 2:
+				PRINT_FIELD_U(", ", fev_hdr, vers_v2);
+				fev_ver = fev_hdr.vers;
+				break;
+
+			default:
+				tprints("}");
+				pos += offsetof(struct fev_hdr, vers_v2);
+				goto end_decoded;
+			}
+			break;
+
+		case 3: default:
+			PRINT_FIELD_U(", ", fev_hdr, vers);
+			fev_ver = fev_hdr.vers;
+			if (fev_hdr.reserved)
+				PRINT_FIELD_U(", ", fev_hdr, reserved);
+			PRINT_FIELD_U(", ", fev_hdr, metadata_len);
+
+			if (fev_hdr.metadata_len < FEV_V2_SIZE) {
+				tprints(", ... /* invalid metadata_len */}");
+				goto end_fev_decoded;
+			}
+		}
+
+		if (fev_ver < 1 || fev_ver > 3) {
+			tprints(", ... /* invalid vers */}");
+			goto end_fev_decoded;
+		}
+
+		switch (fev_ver) {
+		case 1:
+			if (umove(tcp, addr + pos + sizeof(fev_hdr),
+				  &fev_md.v1)) {
+				printf(", ...}");
+				pos += sizeof(fev_hdr);
+				goto end_decoded;
+			}
+
+			PRINT_FIELD_FANFD(", ", fev_md.v1, fd, tcp);
+			PRINT_FIELD_FLAGS(", ", fev_md.v1, mask,
+					  fan_event_flags, "FAN_???");
+			PRINT_FIELD_D(", ", fev_md.v1, pid);
+
+			if (FEV_V1_SIZE < fev_hdr.event_len) {
+				tprints(", ");
+				printstrn(tcp, addr + pos,
+					  fev_hdr.event_len - FEV_V1_SIZE);
+			}
+
+			break;
+
+		case 2: case 3:
+			if (umove(tcp, addr + pos + sizeof(fev_hdr),
+				  &fev_md.v2)) {
+				printf(", ...}");
+				pos += sizeof(fev_hdr);
+				goto end_decoded;
+			}
+
+			PRINT_FIELD_FLAGS(", ", fev_md.v2, mask,
+					  fan_event_flags, "FAN_???");
+			PRINT_FIELD_FANFD(", ", fev_md.v2, fd, tcp);
+			PRINT_FIELD_D(", ", fev_md.v2, pid);
+
+			if (FEV_V2_SIZE < fev_hdr.event_len) {
+				tprints(", ");
+				printstrn(tcp, addr + pos,
+					  fev_hdr.event_len - FEV_V2_SIZE);
+			}
+		}
+
+		tprints("}");
+
+end_fev_decoded:
+		pos += fev_hdr.event_len;
+	} while (pos <= addrlen - sizeof(fev_hdr));
+
+end_decoded:
+	if (pos < addrlen) {
+		if (pos)
+			tprints(", ");
+
+		printstrn(tcp, addr + pos, addrlen - pos);
+	}
+
+	tprints("]");
+
+	return true;
+}
+
+bool
+decode_fanotify_write(struct tcb *tcp, int fd, const char *fdpath,
+		      enum fileops op, kernel_ulong_t addr,
+		      kernel_ulong_t addrlen)
+{
+	struct fresp {
+		int32_t fd;
+		uint32_t response;
+	} fresp;
+	kernel_ulong_t pos = 0;
+
+	if (addrlen < sizeof(fresp))
+		return false;
+
+	tprints("[");
+
+	do {
+		if (pos)
+			tprints(", ");
+
+		if (umove(tcp, addr + pos, &fresp)) {
+			printaddr_comment(addr + pos);
+			break;
+		}
+
+		PRINT_FIELD_FD("{", fresp, fd, tcp);
+
+		tprints(", response=");
+		if (fresp.response | FAN_AUDIT) {
+			print_xlat(FAN_AUDIT);
+			tprints("|");
+		}
+		printxval(fan_responses, fresp.response, "FAN_???");
+		tprints("}");
+
+		pos += sizeof(fresp);
+	} while (pos <= addrlen - sizeof(fresp));
+
+	if (pos < addrlen) {
+		if (pos)
+			tprints(", ");
+
+		printstrn(tcp, addr + pos, addrlen - pos);
+	}
+
+	tprints("]");
+
+	return true;
+}
 
 SYS_FUNC(fanotify_init)
 {
@@ -53,9 +284,6 @@ SYS_FUNC(fanotify_init)
 
 	return RVAL_DECODED | RVAL_FD;
 }
-
-#include "xlat/fan_mark_flags.h"
-#include "xlat/fan_event_flags.h"
 
 SYS_FUNC(fanotify_mark)
 {
