@@ -22,16 +22,16 @@ SYS_FUNC(syslog)
 	}
 
 	switch (type) {
-		case SYSLOG_ACTION_READ:
-		case SYSLOG_ACTION_READ_ALL:
-		case SYSLOG_ACTION_READ_CLEAR:
-			if (entering(tcp))
-				return 0;
-			break;
-		default:
-			printaddr(tcp->u_arg[1]);
-			tprintf(", %" PRI_klu, tcp->u_arg[2]);
-			return RVAL_DECODED;
+	case SYSLOG_ACTION_READ:
+	case SYSLOG_ACTION_READ_ALL:
+	case SYSLOG_ACTION_READ_CLEAR:
+		if (entering(tcp))
+			return 0;
+		break;
+	default:
+		printaddr(tcp->u_arg[1]);
+		tprintf(", %" PRI_klu, tcp->u_arg[2]);
+		return RVAL_DECODED;
 	}
 
 	/* bufp */
