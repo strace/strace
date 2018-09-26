@@ -22,11 +22,11 @@ main(void)
 	const long addr = (long) 0xfacefeeddeadbeefULL;
 
 	int rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, addr, -1);
-	printf("syslog(SYSLOG_ACTION_READ, %#lx, -1) = %s\n",
+	printf("syslog(2 /* SYSLOG_ACTION_READ */, %#lx, -1) = %s\n",
 	       addr, sprintrc(rc));
 
 	rc = syscall(__NR_syslog, SYSLOG_ACTION_SIZE_BUFFER, NULL, 10);
-	printf("syslog(SYSLOG_ACTION_SIZE_BUFFER, NULL, 10) = %s\n",
+	printf("syslog(10 /* SYSLOG_ACTION_SIZE_BUFFER */, NULL, 10) = %s\n",
 	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");

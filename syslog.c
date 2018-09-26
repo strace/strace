@@ -16,7 +16,8 @@ SYS_FUNC(syslog)
 
 	if (entering(tcp)) {
 		/* type */
-		printxval(syslog_action_type, type, "SYSLOG_ACTION_???");
+		printxval_ex(syslog_action_type, type, "SYSLOG_ACTION_???",
+			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
 		tprints(", ");
 	}
 
