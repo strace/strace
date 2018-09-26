@@ -13,7 +13,7 @@ main(void)
 {
 	const long addr = (long) 0xfacefeeddeadbeefULL;
 	int rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, addr, -1);
-	printf("syslog(SYSLOG_ACTION_READ, %#lx, -1) = %d %s (%m)\n",
+	printf("syslog(2 /* SYSLOG_ACTION_READ */, %#lx, -1) = %d %s (%m)\n",
 	       addr, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
