@@ -18,21 +18,35 @@ SYS_FUNC(syslog)
 		/* type */
 		printxval_ex(syslog_action_type, type, "SYSLOG_ACTION_???",
 			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
-		tprints(", ");
 	}
 
 	switch (type) {
+	/* Those commands have bufp and len ignored */
+	case SYSLOG_ACTION_CLOSE:
+	case SYSLOG_ACTION_OPEN:
+	case SYSLOG_ACTION_CLEAR:
+	case SYSLOG_ACTION_CONSOLE_OFF:
+	case SYSLOG_ACTION_CONSOLE_ON:
+	case SYSLOG_ACTION_SIZE_UNREAD:
+	case SYSLOG_ACTION_SIZE_BUFFER:
+		return RVAL_DECODED;
+
 	case SYSLOG_ACTION_READ:
 	case SYSLOG_ACTION_READ_ALL:
 	case SYSLOG_ACTION_READ_CLEAR:
-		if (entering(tcp))
+		if (entering(tcp)) {
+			tprints(", ");
 			return 0;
+		}
 		break;
 	default:
+		tprints(", ");
 		printaddr(tcp->u_arg[1]);
 		tprintf(", %" PRI_klu, tcp->u_arg[2]);
 		return RVAL_DECODED;
 	}
+
+	/* syscall exit handler for SYSLOG_ACTION_READ* */
 
 	/* bufp */
 	if (syserror(tcp))
