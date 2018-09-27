@@ -507,11 +507,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 		return;
 
 	tprints("{error=");
-	if (err.error < 0 && (unsigned) -err.error < nerrnos) {
-		tprintf("-%s", errnoent[-err.error]);
-	} else {
-		tprintf("%d", err.error);
-	}
+	print_err(err.error, true);
 
 	addr += offsetof(struct nlmsgerr, msg);
 	len -= offsetof(struct nlmsgerr, msg);
