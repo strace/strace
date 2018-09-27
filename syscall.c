@@ -825,14 +825,16 @@ syscall_entering_finish(struct tcb *tcp, int res)
 
 	/* Start tracking system time */
 	if (cflag) {
-		if (debug_flag && ts_nz(&dt)) {
+		if (debug_flag) {
 			struct timespec dt;
 
 			ts_sub(&dt, &tcp->stime, &tcp->ltime);
 
-			debug_func_msg("pid %d: %.9f seconds of system time "
-				       "spent since the last syscall exit",
-				       tcp->pid, ts_float(&dt));
+			if (ts_nz(&dt))
+				debug_func_msg("pid %d: %.9f seconds of system "
+					       "time spent since the last "
+					       "syscall exit",
+					       tcp->pid, ts_float(&dt));
 		}
 
 		tcp->ltime = tcp->stime;
