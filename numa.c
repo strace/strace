@@ -150,14 +150,6 @@ print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	return true;
 }
 
-static bool
-print_int(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
-{
-	tprintf("%d", *(int *) elem_buf);
-
-	return true;
-}
-
 SYS_FUNC(move_pages)
 {
 	const kernel_ulong_t npages = tcp->u_arg[1];
@@ -169,7 +161,7 @@ SYS_FUNC(move_pages)
 			    tfetch_mem, print_addr, 0);
 		tprints(", ");
 		print_array(tcp, tcp->u_arg[3], npages, &buf, sizeof(int),
-			    tfetch_mem, print_int, 0);
+			    tfetch_mem, print_int32_array_member, 0);
 		tprints(", ");
 	} else {
 		print_array(tcp, tcp->u_arg[4], npages, &buf, sizeof(int),
