@@ -1403,6 +1403,7 @@ extern const char *const errnoent[];
 extern const char *const signalent[];
 extern const unsigned int nerrnos;
 extern const unsigned int nsignals;
+extern const unsigned int nsig;
 
 extern const struct_sysent sysent0[];
 extern const struct_ioctlent ioctlent0[];
