@@ -52,12 +52,12 @@ static int
 sigstr_to_uint(const char *s)
 {
 	if (*s >= '0' && *s <= '9')
-		return string_to_uint_upto(s, 255);
+		return string_to_uint_upto(s, nsig);
 
 	if (strncasecmp(s, "SIG", 3) == 0)
 		s += 3;
 
-	for (int i = 0; i <= 255; ++i) {
+	for (size_t i = 0; i <= nsig; i++) {
 		const char *name = signame(i);
 
 		if (strncasecmp(name, "SIG", 3) != 0)

@@ -335,7 +335,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_PDEATHSIG:
 		tprints(", ");
-		if (arg2 > 128)
+		if (arg2 > nsig)
 			tprintf("%" PRI_klu, arg2);
 		else
 			tprints(signame(arg2));
