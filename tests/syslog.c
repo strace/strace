@@ -13,6 +13,12 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# ifdef RETVAL_INJECTED
+#  define RET_SFX " (INJECTED)"
+# else
+#  define RET_SFX ""
+# endif
+
 bool
 valid_cmd(int cmd)
 {
@@ -69,40 +75,63 @@ main(void)
 	};
 	static const kernel_ulong_t high =
 		(kernel_ulong_t) 0xbadc0ded00000000ULL;
+	static const size_t buf_size = 64;
+
 	const kernel_ulong_t addr = (kernel_ulong_t) 0xfacefeeddeadbeefULL;
 	int rc;
+	char *buf = tail_alloc(buf_size);
+
+	fill_memory(buf, buf_size);
 
 	for (size_t i = 0; i < ARRAY_SIZE(no_args); i++) {
 		rc = syscall(__NR_syslog, high | no_args[i].cmd, addr, -1);
-		printf("syslog(%s) = %s\n",
+		printf("syslog(%s) = %s" RET_SFX "\n",
 		no_args[i].str, sprintrc(rc));
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(two_args); i++) {
 		rc = syscall(__NR_syslog, high | two_args[i].cmd, NULL, -1);
-		printf("syslog(%s, NULL, -1) = %s\n",
+		printf("syslog(%s, NULL, -1) = %s" RET_SFX "\n",
 		       two_args[i].str, sprintrc(rc));
 
-		rc = syscall(__NR_syslog, high | two_args[i].cmd, addr, -1);
-		printf("syslog(%s, %#llx, -1) = %s\n",
-		       two_args[i].str, (unsigned long long) addr,
-		       sprintrc(rc));
+# ifdef RETVAL_INJECTED
+		/* Avoid valid commands with a bogus address */
+		if (!valid_cmd(two_args[i].cmd))
+# endif
+		{
+			rc = syscall(__NR_syslog, high | two_args[i].cmd, addr,
+				     -1);
+			printf("syslog(%s, %#llx, -1) = %s" RET_SFX "\n",
+			       two_args[i].str, (unsigned long long) addr,
+			       sprintrc(rc));
 
-		rc = syscall(__NR_syslog, two_args[i].cmd, addr, 0);
-		printf("syslog(%s, %s, 0) = %s\n",
-		       two_args[i].str,
-		       !rc && valid_cmd(two_args[i].cmd)
-			   && (sizeof(kernel_ulong_t) == sizeof(void *))
-				? "\"\""
-				: (sizeof(addr) == 8) ? "0xfacefeeddeadbeef"
-						      : "0xdeadbeef",
-		       sprintrc(rc));
+			rc = syscall(__NR_syslog, two_args[i].cmd, addr, 0);
+
+			printf("syslog(%s, %s, 0) = %s" RET_SFX "\n",
+			       two_args[i].str,
+			       !rc && valid_cmd(two_args[i].cmd)
+				   && (sizeof(kernel_ulong_t) == sizeof(void *))
+				      ? "\"\""
+				      : (sizeof(addr) == 8)
+					? "0xfacefeeddeadbeef" : "0xdeadbeef",
+			       sprintrc(rc));
+		}
+
+		rc = syscall(__NR_syslog, two_args[i].cmd, buf, buf_size);
+		const char *errstr = sprintrc(rc);
+
+		printf("syslog(%s, ", two_args[i].str);
+		if (rc >= 0 && valid_cmd(two_args[i].cmd))
+			printstr(buf, two_args[i].cmd, rc);
+		else
+			printf("%p", buf);
+		printf(", %zu) = %s" RET_SFX "\n", buf_size, errstr);
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(levels); i++) {
 		rc = syscall(__NR_syslog, high | 8, addr, levels[i].cmd);
 		printf("syslog(8 /* SYSLOG_ACTION_CONSOLE_LEVEL */, %#llx, %s)"
-		       " = %s\n",
+		       " = %s" RET_SFX "\n",
 		       (unsigned long long) addr, levels[i].str, sprintrc(rc));
 	}
 

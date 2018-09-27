@@ -161,6 +161,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	stack-fcall-mangled \
 	status-none-threads \
 	status-unfinished-threads \
+	syslog-success \
 	threads-execve \
 	unblock_reset_raise \
 	unix-pair-send-recv \
@@ -287,6 +288,7 @@ DECODER_TESTS = \
 	seccomp-strict.test \
 	sigaltstack.test \
 	sun_path.test \
+	syslog-success.test \
 	uio.test \
 	umount.test \
 	umount2.test \
