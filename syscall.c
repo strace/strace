@@ -786,6 +786,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 	tcp->flags &= ~TCB_FILTERED;
+	tcp->auxstr = NULL;
 
 	if (hide_log(tcp)) {
 		return 0;
