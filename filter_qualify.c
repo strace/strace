@@ -48,27 +48,30 @@ struct inject_personality_data {
 	uint16_t scno;
 };
 
+static bool
+signame_eq(const char *needle, const char *straw)
+{
+	if (strncasecmp(straw, "SIG", 3) != 0)
+		return false;
+
+	straw += 3;
+
+	if (strncasecmp(needle, "SIG", 3) == 0)
+		needle += 3;
+
+	return (strcasecmp(needle, straw) == 0);
+}
+
 static int
 sigstr_to_uint(const char *s)
 {
 	if (*s >= '0' && *s <= '9')
 		return string_to_uint_upto(s, nsig);
 
-	if (strncasecmp(s, "SIG", 3) == 0)
-		s += 3;
 
 	for (size_t i = 0; i <= nsig; i++) {
-		const char *name = signame(i);
-
-		if (strncasecmp(name, "SIG", 3) != 0)
-			continue;
-
-		name += 3;
-
-		if (strcasecmp(name, s) != 0)
-			continue;
-
-		return i;
+		if (signame_eq(s, signame(i)))
+			return i;
 	}
 
 	return -1;
