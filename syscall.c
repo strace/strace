@@ -399,8 +399,6 @@ static void
 dumpio(struct tcb *tcp)
 {
 	int fd = tcp->u_arg[0];
-	if (fd < 0)
-		return;
 
 	if (is_number_in_set(fd, write_set)) {
 		switch (tcp->s_ent->sen) {
@@ -426,7 +424,7 @@ dumpio(struct tcb *tcp)
 		}
 	}
 
-	if (syserror(tcp))
+	if (fd < 0 || syserror(tcp))
 		return;
 
 	if (is_number_in_set(fd, read_set)) {
