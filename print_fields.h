@@ -99,6 +99,12 @@
 			      (xlat_), NULL);				\
 	} while (0)
 
+#define PRINT_FIELD_ERR(prefix_, where_, field_, neg_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_err((where_).field_, (neg_));			\
+	} while (0)
+
 /*
  * Generic "ID" printing. ID is considered unsigned except for the special value
  * of -1.

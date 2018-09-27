@@ -463,6 +463,20 @@ err_name(unsigned long err)
 	return NULL;
 }
 
+void
+print_err(long err, bool negated)
+{
+	const char *str = err_name(negated ? -err : err);
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%ld", err);
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
+		? tprintf : tprintf_comment)("%s%s",
+					     negated ? "-" : "", str);
+}
+
 /*
  * Wrapper for strerror that provides error descriptions for ERESTART* errors,
  * as libcs don't usually have them

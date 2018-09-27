@@ -510,6 +510,14 @@ extern kernel_long_t scno_by_name(const char *s, unsigned p,
  */
 extern kernel_ulong_t shuffle_scno(kernel_ulong_t scno);
 extern const char *err_name(unsigned long err);
+/**
+ * Print error name in accordance with current xlat style setting.
+ *
+ * @param err     Error value.
+ * @param negated If set to true, negative values of the err parameter indicate
+ *                error condition, otherwise positive.
+ */
+extern void print_err(long err, bool negated);
 
 extern bool is_erestart(struct tcb *);
 extern void temporarily_clear_syserror(struct tcb *);
