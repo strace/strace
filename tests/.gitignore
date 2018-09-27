@@ -528,6 +528,7 @@ syscallent.i
 sysfs
 sysinfo
 syslog
+syslog-success
 tee
 threads-execve
 time
