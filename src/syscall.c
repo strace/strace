@@ -646,6 +646,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 	tcp->flags &= ~TCB_FILTERED;
+	tcp->auxstr = NULL;
 
 	if (inject(tcp))
 		tamper_with_syscall_entering(tcp, sig);
