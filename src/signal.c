@@ -63,6 +63,8 @@
 # endif
 #endif
 
+const unsigned int nsig = NSIG;
+
 /* Note on the size of sigset_t:
  *
  * In glibc, sigset_t is an array with space for 1024 bits (!),
