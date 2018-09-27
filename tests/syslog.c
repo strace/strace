@@ -13,8 +13,26 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# define SYSLOG_ACTION_READ 2
-# define SYSLOG_ACTION_SIZE_BUFFER 10
+bool
+valid_cmd(int cmd)
+{
+	return cmd >= 0 && cmd <= 10;
+}
+
+void
+printstr(const char *s, int cmd, long size)
+{
+	if (size < 0 || !valid_cmd(cmd))
+		printf("%p", s);
+	else if (size == 0)
+		printf("\"\"");
+	else if (size <= DEFAULT_STRLEN)
+		print_quoted_memory(s, size);
+	else {
+		print_quoted_memory(s, DEFAULT_STRLEN);
+		printf("...");
+	}
+}
 
 int
 main(void)
@@ -31,19 +49,46 @@ main(void)
 		{ 9,  "9 /* SYSLOG_ACTION_SIZE_UNREAD */" },
 		{ 10, "10 /* SYSLOG_ACTION_SIZE_BUFFER */" },
 	};
+	static const struct cmd_str two_args[] = {
+		{ 0xfeedbeef, "-17973521 /* SYSLOG_ACTION_??? */" },
+		{ -1U, "-1 /* SYSLOG_ACTION_??? */" },
+		{ 2,  "2 /* SYSLOG_ACTION_READ */" },
+		{ 3,  "3 /* SYSLOG_ACTION_READ_ALL */" },
+		{ 4,  "4 /* SYSLOG_ACTION_READ_CLEAR */" },
+		{ 11, "11 /* SYSLOG_ACTION_??? */" },
+		{ (1U << 31) - 1, "2147483647 /* SYSLOG_ACTION_??? */" },
+	};
 	static const kernel_ulong_t high =
 		(kernel_ulong_t) 0xbadc0ded00000000ULL;
-	const long addr = (long) 0xfacefeeddeadbeefULL;
+	const kernel_ulong_t addr = (kernel_ulong_t) 0xfacefeeddeadbeefULL;
 	int rc;
+
 	for (size_t i = 0; i < ARRAY_SIZE(no_args); i++) {
 		rc = syscall(__NR_syslog, high | no_args[i].cmd, addr, -1);
 		printf("syslog(%s) = %s\n",
 		no_args[i].str, sprintrc(rc));
 	}
 
-	rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, addr, -1);
-	printf("syslog(2 /* SYSLOG_ACTION_READ */, %#lx, -1) = %s\n",
-	       addr, sprintrc(rc));
+	for (size_t i = 0; i < ARRAY_SIZE(two_args); i++) {
+		rc = syscall(__NR_syslog, high | two_args[i].cmd, NULL, -1);
+		printf("syslog(%s, NULL, -1) = %s\n",
+		       two_args[i].str, sprintrc(rc));
+
+		rc = syscall(__NR_syslog, high | two_args[i].cmd, addr, -1);
+		printf("syslog(%s, %#llx, -1) = %s\n",
+		       two_args[i].str, (unsigned long long) addr,
+		       sprintrc(rc));
+
+		rc = syscall(__NR_syslog, two_args[i].cmd, addr, 0);
+		printf("syslog(%s, %s, 0) = %s\n",
+		       two_args[i].str,
+		       !rc && valid_cmd(two_args[i].cmd)
+			   && (sizeof(kernel_ulong_t) == sizeof(void *))
+				? "\"\""
+				: (sizeof(addr) == 8) ? "0xfacefeeddeadbeef"
+						      : "0xdeadbeef",
+		       sprintrc(rc));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

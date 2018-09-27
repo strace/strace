@@ -13,6 +13,7 @@
 SYS_FUNC(syslog)
 {
 	int type = tcp->u_arg[0];
+	int len = tcp->u_arg[2];
 
 	if (entering(tcp)) {
 		/* type */
@@ -41,8 +42,8 @@ SYS_FUNC(syslog)
 		break;
 	default:
 		tprints(", ");
-		printaddr(tcp->u_arg[1]);
-		tprintf(", %" PRI_klu, tcp->u_arg[2]);
+		printaddr64(tcp->u_arg[1]);
+		tprintf(", %d", len);
 		return RVAL_DECODED;
 	}
 
@@ -50,11 +51,11 @@ SYS_FUNC(syslog)
 
 	/* bufp */
 	if (syserror(tcp))
-		printaddr(tcp->u_arg[1]);
+		printaddr64(tcp->u_arg[1]);
 	else
 		printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
 	/* len */
-	tprintf(", %d", (int) tcp->u_arg[2]);
+	tprintf(", %d", len);
 
 	return 0;
 }
