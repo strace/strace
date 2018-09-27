@@ -448,7 +448,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_PDEATHSIG:
 		tprint_arg_next();
-		if (arg2 > 128)
+		if (arg2 > nsig)
 			PRINT_VAL_U(arg2);
 		else
 			printsignal(arg2);
