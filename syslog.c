@@ -9,6 +9,7 @@
 #include "defs.h"
 
 #include "xlat/syslog_action_type.h"
+#include "xlat/syslog_console_levels.h"
 
 SYS_FUNC(syslog)
 {
@@ -40,6 +41,15 @@ SYS_FUNC(syslog)
 			return 0;
 		}
 		break;
+
+	case SYSLOG_ACTION_CONSOLE_LEVEL: /* Uses len */
+		tprints(", ");
+		printaddr64(tcp->u_arg[1]);
+		tprints(", ");
+		printxval_ex(syslog_console_levels, len, "LOGLEVEL_???",
+			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
+		return RVAL_DECODED;
+
 	default:
 		tprints(", ");
 		printaddr64(tcp->u_arg[1]);

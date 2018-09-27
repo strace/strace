@@ -58,6 +58,15 @@ main(void)
 		{ 11, "11 /* SYSLOG_ACTION_??? */" },
 		{ (1U << 31) - 1, "2147483647 /* SYSLOG_ACTION_??? */" },
 	};
+	static const struct cmd_str levels[] = {
+		{ 0xfeedbeef, "-17973521 /* LOGLEVEL_??? */" },
+		{ -1U, "-1 /* LOGLEVEL_??? */" },
+		{ 0, "0 /* LOGLEVEL_EMERG */" },
+		{ 7, "7 /* LOGLEVEL_DEBUG */" },
+		{ 8, "8 /* LOGLEVEL_DEBUG+1 */" },
+		{ 9, "9 /* LOGLEVEL_??? */" },
+		{ (1U << 31) - 1, "2147483647 /* LOGLEVEL_??? */" },
+	};
 	static const kernel_ulong_t high =
 		(kernel_ulong_t) 0xbadc0ded00000000ULL;
 	const kernel_ulong_t addr = (kernel_ulong_t) 0xfacefeeddeadbeefULL;
@@ -88,6 +97,13 @@ main(void)
 				: (sizeof(addr) == 8) ? "0xfacefeeddeadbeef"
 						      : "0xdeadbeef",
 		       sprintrc(rc));
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(levels); i++) {
+		rc = syscall(__NR_syslog, high | 8, addr, levels[i].cmd);
+		printf("syslog(8 /* SYSLOG_ACTION_CONSOLE_LEVEL */, %#llx, %s)"
+		       " = %s\n",
+		       (unsigned long long) addr, levels[i].str, sprintrc(rc));
 	}
 
 	puts("+++ exited with 0 +++");
