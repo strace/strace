@@ -13,6 +13,7 @@
 #include <linux/audit.h>
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
+#include "print_fields.h"
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
@@ -501,12 +502,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &err.error))
 		return;
 
-	tprints("{error=");
-	if (err.error < 0 && (unsigned) -err.error < nerrnos) {
-		tprintf("-%s", errnoent[-err.error]);
-	} else {
-		tprintf("%d", err.error);
-	}
+	PRINT_FIELD_ERR_D("{", err, error);
 
 	addr += offsetof(struct nlmsgerr, msg);
 	len -= offsetof(struct nlmsgerr, msg);

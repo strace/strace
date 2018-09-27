@@ -417,13 +417,24 @@ dumpio(struct tcb *tcp)
 	}
 }
 
-const char *
-err_name(unsigned long err)
+static const char *
+err_name(uint64_t err)
 {
-	if ((err < nerrnos) && errnoent[err])
-		return errnoent[err];
+	return err < nerrnos ? errnoent[err] : NULL;
+}
 
-	return NULL;
+void
+print_err(int64_t err, bool negated)
+{
+	const char *str = err_name(negated ? -err : err);
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf(negated ? "%" PRId64 : "%" PRIu64, err);
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
+		? tprintf : tprintf_comment)("%s%s",
+					     negated ? "-" : "", str);
 }
 
 static void

@@ -158,21 +158,8 @@ static bool
 print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const int status = *(int *) elem_buf;
-	bool is_errno = (status < 0) && ((unsigned) -status < nerrnos);
 
-	if (!is_errno || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%d", status);
-
-	if (!is_errno || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
-		return true;
-
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
-
-	tprintf("-%s", errnoent[-status]);
-
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+	print_err(status, true);
 
 	return true;
 }

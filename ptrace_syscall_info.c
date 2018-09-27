@@ -326,11 +326,7 @@ entry_printed:
 			tprints(", exit={");
 			if (fetch_size >= expected_exit_size
 			    && info.exit.is_error) {
-				uint64_t err = -info.exit.rval;
-
-				tprints("rval=-");
-				print_xlat_ex(err, err_name(err),
-					      XLAT_STYLE_FMT_U);
+				PRINT_FIELD_ERR_D("", info.exit, rval);
 			} else {
 				PRINT_FIELD_D("", info.exit, rval);
 			}

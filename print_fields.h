@@ -79,6 +79,20 @@
 			      (xlat_), NULL);				\
 	} while (0)
 
+#define PRINT_FIELD_ERR_D(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_err(sign_extend_unsigned_to_ll((where_).field_),	\
+			  true);					\
+	} while (0)
+
+#define PRINT_FIELD_ERR_U(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_err(zero_extend_signed_to_ull((where_).field_),	\
+			  false);					\
+	} while (0)
+
 /*
  * Generic "ID" printing. ID is considered unsigned except for the special value
  * of -1.

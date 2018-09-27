@@ -166,11 +166,9 @@ static void
 keyctl_reject_key(struct tcb *tcp, key_serial_t id1, unsigned timeout,
 		  unsigned error, key_serial_t id2)
 {
-	const char *err_str = err_name(error);
-
 	print_keyring_serial_number(id1);
 	tprintf(", %u, ", timeout);
-	print_xlat_ex(error, err_str, XLAT_STYLE_FMT_U);
+	print_err(error, false);
 	tprints(", ");
 	print_keyring_serial_number(id2);
 }

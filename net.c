@@ -665,7 +665,7 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	tprints("[");
-	print_xlat_ex(err, err_name(err), XLAT_STYLE_FMT_U);
+	print_err(err, false);
 	tprints("]");
 }
 

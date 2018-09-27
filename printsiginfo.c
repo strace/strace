@@ -24,6 +24,8 @@
 
 #include "nr_prefix.c"
 
+#include "print_fields.h"
+
 #ifndef IN_MPERS
 # include "printsiginfo.h"
 #endif
@@ -117,14 +119,8 @@ print_si_code(int si_signo, unsigned int si_code)
 static void
 print_si_info(const siginfo_t *sip)
 {
-	if (sip->si_errno) {
-		tprints(", si_errno=");
-		if ((unsigned) sip->si_errno < nerrnos
-		    && errnoent[sip->si_errno])
-			tprints(errnoent[sip->si_errno]);
-		else
-			tprintf("%d", sip->si_errno);
-	}
+	if (sip->si_errno)
+		PRINT_FIELD_ERR_U(", ", *sip, si_errno);
 
 	if (SI_FROMUSER(sip)) {
 		switch (sip->si_code) {

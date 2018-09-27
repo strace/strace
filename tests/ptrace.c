@@ -307,7 +307,7 @@ main(void)
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGBUS"
-	       ", si_code=BUS_ADRALN, si_errno=%d, si_addr=%p}) = %s\n",
+	       ", si_code=BUS_ADRALN, si_errno=%u, si_addr=%p}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_errno, sip->si_addr,
 	       errstr);
 
@@ -321,7 +321,7 @@ main(void)
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGPROF"
-	       ", si_code=%#x, si_errno=%d, si_pid=0, si_uid=3}) = %s\n",
+	       ", si_code=%#x, si_errno=%u, si_pid=0, si_uid=3}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_code, sip->si_errno,
 	       errstr);
 
@@ -349,7 +349,7 @@ main(void)
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%d, si_call_addr=NULL"
+	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
 	       ", si_syscall=__NR_read, si_arch=%#x /* AUDIT_ARCH_??? */})"
 	       " = %s\n",
 	       (unsigned) pid, bad_request, sip->si_errno, sip->si_arch,
