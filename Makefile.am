@@ -337,6 +337,7 @@ strace_SOURCES =	\
 	utimes.c	\
 	v4l2.c		\
 	wait.c		\
+	wait.h		\
 	xattr.c		\
 	xfs_quota_stat.h \
 	xlat.c		\

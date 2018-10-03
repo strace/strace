@@ -16,7 +16,6 @@
 #include "ptrace.h"
 #include <signal.h>
 #include <sys/resource.h>
-#include <sys/wait.h>
 #include <sys/stat.h>
 #ifdef HAVE_PATHS_H
 # include <paths.h>
@@ -41,6 +40,7 @@
 #include "trace_event.h"
 #include "xstring.h"
 #include "delay.h"
+#include "wait.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -1977,14 +1977,9 @@ print_debug_info(const int pid, int status)
 
 	strcpy(buf, "???");
 	if (WIFSIGNALED(status))
-#ifdef WCOREDUMP
 		xsprintf(buf, "WIFSIGNALED,%ssig=%s",
 				WCOREDUMP(status) ? "core," : "",
 				signame(WTERMSIG(status)));
-#else
-		xsprintf(buf, "WIFSIGNALED,sig=%s",
-				signame(WTERMSIG(status)));
-#endif
 	if (WIFEXITED(status))
 		xsprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 	if (WIFSTOPPED(status))
@@ -2107,14 +2102,9 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
 		printleader(tcp);
-#ifdef WCOREDUMP
 		tprintf("+++ killed by %s %s+++\n",
 			signame(WTERMSIG(status)),
 			WCOREDUMP(status) ? "(core dumped) " : "");
-#else
-		tprintf("+++ killed by %s +++\n",
-			signame(WTERMSIG(status)));
-#endif
 		line_ended();
 	}
 }
