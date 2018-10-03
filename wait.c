@@ -36,29 +36,9 @@
 #include "defs.h"
 #include "ptrace.h"
 
-#include <sys/wait.h>
+#include "wait.h"
 
 #include "xlat/wait4_options.h"
-
-#if !defined WCOREFLAG && defined WCOREFLG
-# define WCOREFLAG WCOREFLG
-#endif
-#ifndef WCOREFLAG
-# define WCOREFLAG 0x80
-#endif
-#ifndef WCOREDUMP
-# define WCOREDUMP(status)  ((status) & 0200)
-#endif
-#ifndef W_STOPCODE
-# define W_STOPCODE(sig)  ((sig) << 8 | 0x7f)
-#endif
-#ifndef W_EXITCODE
-# define W_EXITCODE(ret, sig)  ((ret) << 8 | (sig))
-#endif
-#ifndef W_CONTINUED
-# define W_CONTINUED 0xffff
-#endif
-
 #include "xlat/ptrace_events.h"
 
 static int
