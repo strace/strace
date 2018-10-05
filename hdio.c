@@ -30,10 +30,12 @@
 #include "defs.h"
 
 #include DEF_MPERS_TYPE(struct_hd_geometry)
+#include DEF_MPERS_TYPE(struct_hd_drive_cmd_hdr)
 
 #include <linux/hdreg.h>
 
 typedef struct hd_geometry struct_hd_geometry;
+typedef struct hd_drive_cmd_hdr struct_hd_drive_cmd_hdr;
 
 #include MPERS_DEFS
 
@@ -55,6 +57,22 @@ MPERS_PRINTER_DECL(int, hdio_ioctl, struct tcb *const tcp,
 					(unsigned) geo.sectors,
 					geo.cylinders,
 					(unsigned long) geo.start);
+		}
+		break;
+	case HDIO_DRIVE_CMD:
+		if (entering(tcp))
+			return 0;
+		else {
+			struct_hd_drive_cmd_hdr cmd_head;
+
+			tprints(", ");
+			if (!umove_or_printaddr_ignore_syserror(tcp, arg, &cmd_head))
+				tprintf("{commamd=%u, sector-number=%u, "
+					"feature=%u, sector-count=%u}",
+					cmd_head.command,
+					cmd_head.sector_number,
+					cmd_head.feature,
+					cmd_head.sector_count);
 		}
 		break;
 	default:
