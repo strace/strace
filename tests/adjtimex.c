@@ -61,18 +61,19 @@ main(void)
 	else
 		putchar('0');
 	printf(", constant=%jd, precision=%jd"
-	       ", tolerance=%jd, time={tv_sec=%lld, tv_usec=%llu}, tick=%jd"
-	       ", ppsfreq=%jd, jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd"
-	       ", calcnt=%jd, errcnt=%jd, stbcnt=%jd"
-#ifdef HAVE_STRUCT_TIMEX_TAI
-	       ", tai=%d"
-#endif
-	       "}) = %d (",
+	       ", tolerance=%jd, time={tv_sec=%lld, tv_usec=%llu}",
 	       (intmax_t) tx->constant,
 	       (intmax_t) tx->precision,
 	       (intmax_t) tx->tolerance,
 	       (long long) tx->time.tv_sec,
-	       zero_extend_signed_to_ull(tx->time.tv_usec),
+	       zero_extend_signed_to_ull(tx->time.tv_usec));
+	print_time_t_usec(tx->time.tv_sec, tx->time.tv_usec, true);
+	printf(", tick=%jd, ppsfreq=%jd, jitter=%jd, shift=%d, stabil=%jd"
+	       ", jitcnt=%jd, calcnt=%jd, errcnt=%jd, stbcnt=%jd"
+#ifdef HAVE_STRUCT_TIMEX_TAI
+	       ", tai=%d"
+#endif
+	       "}) = %d (",
 	       (intmax_t) tx->tick,
 	       (intmax_t) tx->ppsfreq,
 	       (intmax_t) tx->jitter,

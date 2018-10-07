@@ -47,9 +47,9 @@ MPERS_PRINTER_DECL(void, printrusage,
 		return;
 
 	tprints("{ru_utime=");
-	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_utime);
+	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_utime, false);
 	tprints(", ru_stime=");
-	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_stime);
+	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_stime, false);
 	if (abbrev(tcp))
 		tprints(", ...");
 	else {

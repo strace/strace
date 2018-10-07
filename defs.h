@@ -1086,12 +1086,12 @@ typedef struct {
 	int tv_sec, tv_usec;
 } timeval32_t;
 
-extern void print_timeval32_t(const timeval32_t *);
+extern void print_timeval32_t(const timeval32_t *, bool rtc);
 extern void printrusage32(struct tcb *, kernel_ulong_t);
 extern const char *sprint_timeval32(struct tcb *, kernel_ulong_t addr);
-extern void print_timeval32(struct tcb *, kernel_ulong_t addr);
+extern void print_timeval32(struct tcb *, kernel_ulong_t addr, bool rtc);
 extern void print_timeval32_utimes(struct tcb *, kernel_ulong_t addr);
-extern void print_itimerval32(struct tcb *, kernel_ulong_t addr);
+extern void print_itimerval32(struct tcb *, kernel_ulong_t addr, bool rtc);
 #endif
 
 #ifdef HAVE_STRUCT_USER_DESC

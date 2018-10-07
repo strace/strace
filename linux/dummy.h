@@ -60,7 +60,6 @@
 /* like another call */
 #define	sys_acct		sys_chdir
 #define	sys_chroot		sys_chdir
-#define	sys_clock_getres	sys_clock_gettime
 #define	sys_connect		sys_bind
 #define	sys_fchdir		sys_close
 #define	sys_fdatasync		sys_close
@@ -95,7 +94,6 @@
 #define	sys_setregid16		sys_setreuid16
 #define	sys_setresgid		sys_setresuid
 #define	sys_setresgid16		sys_setresuid16
-#define	sys_stime		sys_time
 #define	sys_swapoff		sys_chdir
 #define	sys_symlink		sys_link
 #define	sys_syncfs		sys_close

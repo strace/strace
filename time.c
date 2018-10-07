@@ -33,6 +33,10 @@
 #include <signal.h>
 #include <sys/timex.h>
 
+#define XLAT_MACROS_ONLY
+# include "xlat/clocknames.h"
+#undef XLAT_MACROS_ONLY
+
 static void
 print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -48,7 +52,7 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
-		print_timeval(tcp, tcp->u_arg[0]);
+		print_timeval(tcp, tcp->u_arg[0], true);
 		tprints(", ");
 		print_timezone(tcp, tcp->u_arg[1]);
 	}
@@ -59,7 +63,7 @@ SYS_FUNC(gettimeofday)
 SYS_FUNC(osf_gettimeofday)
 {
 	if (exiting(tcp)) {
-		print_timeval32(tcp, tcp->u_arg[0]);
+		print_timeval32(tcp, tcp->u_arg[0], true);
 		tprints(", ");
 		print_timezone(tcp, tcp->u_arg[1]);
 	}
@@ -69,7 +73,7 @@ SYS_FUNC(osf_gettimeofday)
 
 SYS_FUNC(settimeofday)
 {
-	print_timeval(tcp, tcp->u_arg[0]);
+	print_timeval(tcp, tcp->u_arg[0], true);
 	tprints(", ");
 	print_timezone(tcp, tcp->u_arg[1]);
 
@@ -79,7 +83,7 @@ SYS_FUNC(settimeofday)
 #ifdef ALPHA
 SYS_FUNC(osf_settimeofday)
 {
-	print_timeval32(tcp, tcp->u_arg[0]);
+	print_timeval32(tcp, tcp->u_arg[0], true);
 	tprints(", ");
 	print_timezone(tcp, tcp->u_arg[1]);
 
@@ -90,7 +94,7 @@ SYS_FUNC(osf_settimeofday)
 SYS_FUNC(nanosleep)
 {
 	if (entering(tcp)) {
-		print_timespec(tcp, tcp->u_arg[0]);
+		print_timespec(tcp, tcp->u_arg[0], false);
 		tprints(", ");
 	} else {
 
@@ -102,7 +106,7 @@ SYS_FUNC(nanosleep)
 		 */
 		if (is_erestart(tcp)) {
 			temporarily_clear_syserror(tcp);
-			print_timespec(tcp, tcp->u_arg[1]);
+			print_timespec(tcp, tcp->u_arg[1], false);
 			restore_cleared_syserror(tcp);
 		} else {
 			printaddr(tcp->u_arg[1]);
@@ -115,12 +119,13 @@ SYS_FUNC(nanosleep)
 
 SYS_FUNC(getitimer)
 {
+	unsigned int tid = tcp->u_arg[0];
+
 	if (entering(tcp)) {
-		printxval(itimer_which, (unsigned int) tcp->u_arg[0],
-			  "ITIMER_???");
+		printxval(itimer_which, tid, "ITIMER_???");
 		tprints(", ");
 	} else {
-		print_itimerval(tcp, tcp->u_arg[1]);
+		print_itimerval(tcp, tcp->u_arg[1], false);
 	}
 	return 0;
 }
@@ -128,12 +133,13 @@ SYS_FUNC(getitimer)
 #ifdef ALPHA
 SYS_FUNC(osf_getitimer)
 {
+	unsigned int tid = tcp->u_arg[0];
+
 	if (entering(tcp)) {
-		printxval(itimer_which, (unsigned int) tcp->u_arg[0],
-			  "ITIMER_???");
+		printxval(itimer_which, tid, "ITIMER_???");
 		tprints(", ");
 	} else {
-		print_itimerval32(tcp, tcp->u_arg[1]);
+		print_itimerval32(tcp, tcp->u_arg[1], false);
 	}
 	return 0;
 }
@@ -141,14 +147,15 @@ SYS_FUNC(osf_getitimer)
 
 SYS_FUNC(setitimer)
 {
+	unsigned int tid = tcp->u_arg[0];
+
 	if (entering(tcp)) {
-		printxval(itimer_which, (unsigned int) tcp->u_arg[0],
-			  "ITIMER_???");
+		printxval(itimer_which, tid, "ITIMER_???");
 		tprints(", ");
-		print_itimerval(tcp, tcp->u_arg[1]);
+		print_itimerval(tcp, tcp->u_arg[1], false);
 		tprints(", ");
 	} else {
-		print_itimerval(tcp, tcp->u_arg[2]);
+		print_itimerval(tcp, tcp->u_arg[2], false);
 	}
 	return 0;
 }
@@ -156,14 +163,15 @@ SYS_FUNC(setitimer)
 #ifdef ALPHA
 SYS_FUNC(osf_setitimer)
 {
+	unsigned int tid = tcp->u_arg[0];
+
 	if (entering(tcp)) {
-		printxval_index(itimer_which, (unsigned int) tcp->u_arg[0],
-				"ITIMER_???");
+		printxval_index(itimer_which, tid, "ITIMER_???");
 		tprints(", ");
-		print_itimerval32(tcp, tcp->u_arg[1]);
+		print_itimerval32(tcp, tcp->u_arg[1], false);
 		tprints(", ");
 	} else {
-		print_itimerval32(tcp, tcp->u_arg[2]);
+		print_itimerval32(tcp, tcp->u_arg[2], false);
 	}
 	return 0;
 }
@@ -172,9 +180,9 @@ SYS_FUNC(osf_setitimer)
 #include "xlat/adjtimex_state.h"
 
 static int
-do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr)
+do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr, bool rtc)
 {
-	if (print_timex(tcp, addr))
+	if (print_timex(tcp, addr, rtc))
 		return 0;
 	tcp->auxstr = xlookup(adjtimex_state, (kernel_ulong_t) tcp->u_rval);
 	return RVAL_STR;
@@ -183,7 +191,7 @@ do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(adjtimex)
 {
 	if (exiting(tcp))
-		return do_adjtimex(tcp, tcp->u_arg[0]);
+		return do_adjtimex(tcp, tcp->u_arg[0], true);
 	return 0;
 }
 
@@ -227,11 +235,26 @@ printclockname(int clockid)
 		printxval(clocknames, clockid, "CLOCK_???");
 }
 
+
+static bool
+is_rtcid(int clk)
+{
+	switch (clk) {
+	case CLOCK_REALTIME:
+	case CLOCK_REALTIME_COARSE:
+	case CLOCK_REALTIME_ALARM:
+	case CLOCK_TAI:
+		return true;
+	}
+
+	return false;
+}
+
 SYS_FUNC(clock_settime)
 {
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
-	print_timespec(tcp, tcp->u_arg[1]);
+	print_timespec(tcp, tcp->u_arg[1], is_rtcid(tcp->u_arg[0]));
 
 	return RVAL_DECODED;
 }
@@ -242,7 +265,18 @@ SYS_FUNC(clock_gettime)
 		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		print_timespec(tcp, tcp->u_arg[1]);
+		print_timespec(tcp, tcp->u_arg[1], is_rtcid(tcp->u_arg[0]));
+	}
+	return 0;
+}
+
+SYS_FUNC(clock_getres)
+{
+	if (entering(tcp)) {
+		printclockname(tcp->u_arg[0]);
+		tprints(", ");
+	} else {
+		print_timespec(tcp, tcp->u_arg[1], false);
 	}
 	return 0;
 }
@@ -254,7 +288,8 @@ SYS_FUNC(clock_nanosleep)
 		tprints(", ");
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprints(", ");
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_timespec(tcp, tcp->u_arg[2], is_rtcid(tcp->u_arg[0])
+					     && (tcp->u_arg[1] & TIMER_ABSTIME));
 		tprints(", ");
 	} else {
 		/*
@@ -263,7 +298,7 @@ SYS_FUNC(clock_nanosleep)
 		 */
 		if (!tcp->u_arg[1] && is_erestart(tcp)) {
 			temporarily_clear_syserror(tcp);
-			print_timespec(tcp, tcp->u_arg[3]);
+			print_timespec(tcp, tcp->u_arg[3], false);
 			restore_cleared_syserror(tcp);
 		} else {
 			printaddr(tcp->u_arg[3]);
@@ -275,7 +310,7 @@ SYS_FUNC(clock_nanosleep)
 SYS_FUNC(clock_adjtime)
 {
 	if (exiting(tcp))
-		return do_adjtimex(tcp, tcp->u_arg[1]);
+		return do_adjtimex(tcp, tcp->u_arg[1], is_rtcid(tcp->u_arg[0]));
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
 	return 0;

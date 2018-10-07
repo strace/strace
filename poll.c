@@ -169,7 +169,7 @@ SYS_FUNC(ppoll)
 	if (entering(tcp)) {
 		decode_poll_entering(tcp);
 
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_timespec(tcp, tcp->u_arg[2], false);
 		tprints(", ");
 		/* NB: kernel requires arg[4] == NSIG_BYTES */
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);

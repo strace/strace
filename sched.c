@@ -89,7 +89,7 @@ SYS_FUNC(sched_rr_get_interval)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			print_timespec(tcp, tcp->u_arg[1]);
+			print_timespec(tcp, tcp->u_arg[1], false);
 	}
 	return 0;
 }

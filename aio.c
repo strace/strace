@@ -270,7 +270,7 @@ print_io_getevents(struct tcb *tcp, bool has_usig)
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_timespec(tcp, tcp->u_arg[4], false);
 		if (has_usig) {
 			tprints(", ");
 			print_aio_sigset(tcp, tcp->u_arg[5]);

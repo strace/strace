@@ -103,21 +103,21 @@ static void
 print_scm_timestamp(struct tcb *tcp, const void *cmsg_data,
 		    const unsigned int data_len)
 {
-	print_struct_timeval_data_size(cmsg_data, data_len);
+	print_struct_timeval_data_size(cmsg_data, data_len, true);
 }
 
 static void
 print_scm_timestampns(struct tcb *tcp, const void *cmsg_data,
 		      const unsigned int data_len)
 {
-	print_struct_timespec_data_size(cmsg_data, data_len);
+	print_struct_timespec_data_size(cmsg_data, data_len, true);
 }
 
 static void
 print_scm_timestamping(struct tcb *tcp, const void *cmsg_data,
 		       const unsigned int data_len)
 {
-	print_struct_timespec_array_data_size(cmsg_data, 3, data_len);
+	print_struct_timespec_array_data_size(cmsg_data, 3, data_len, true);
 }
 
 static void

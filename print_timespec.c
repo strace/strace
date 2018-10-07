@@ -46,10 +46,13 @@ typedef struct timespec timespec_t;
 static const char timespec_fmt[] = "{tv_sec=%lld, tv_nsec=%llu}";
 
 static void
-print_timespec_t(const timespec_t *t)
+print_timespec_t(const timespec_t *t, bool rtc)
 {
 	tprintf(timespec_fmt, (long long) t->tv_sec,
 		zero_extend_signed_to_ull(t->tv_nsec));
+	if (rtc)
+		tprints_comment(sprinttime_nsec(t->tv_sec,
+			zero_extend_signed_to_ull(t->tv_nsec)));
 }
 
 static void
@@ -59,7 +62,7 @@ print_timespec_t_utime(const timespec_t *t)
 	case UTIME_NOW:
 	case UTIME_OMIT:
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-			print_timespec_t(t);
+			print_timespec_t(t, false);
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 			break;
 
@@ -68,28 +71,26 @@ print_timespec_t_utime(const timespec_t *t)
 				? "UTIME_NOW" : "UTIME_OMIT");
 		break;
 	default:
-		print_timespec_t(t);
-		tprints_comment(sprinttime_nsec(t->tv_sec,
-			zero_extend_signed_to_ull(t->tv_nsec)));
+		print_timespec_t(t, true);
 		break;
 	}
 }
 
 MPERS_PRINTER_DECL(bool, print_struct_timespec_data_size,
-		   const void *arg, const size_t size)
+		   const void *arg, const size_t size, bool rtc)
 {
 	if (size < sizeof(timespec_t)) {
 		tprints("?");
 		return false;
 	}
 
-	print_timespec_t(arg);
+	print_timespec_t(arg, rtc);
 	return true;
 }
 
 MPERS_PRINTER_DECL(bool, print_struct_timespec_array_data_size,
 		   const void *arg, const unsigned int nmemb,
-		   const size_t size)
+		   const size_t size, bool rtc)
 {
 	const timespec_t *ts = arg;
 	unsigned int i;
@@ -104,7 +105,7 @@ MPERS_PRINTER_DECL(bool, print_struct_timespec_array_data_size,
 	for (i = 0; i < nmemb; i++) {
 		if (i)
 			tprints(", ");
-		print_timespec_t(&ts[i]);
+		print_timespec_t(&ts[i], rtc);
 	}
 
 	tprints("]");
@@ -112,14 +113,14 @@ MPERS_PRINTER_DECL(bool, print_struct_timespec_array_data_size,
 }
 
 MPERS_PRINTER_DECL(void, print_timespec,
-		   struct tcb *const tcp, const kernel_ulong_t addr)
+		   struct tcb *const tcp, const kernel_ulong_t addr, bool rtc)
 {
 	timespec_t t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
 		return;
 
-	print_timespec_t(&t);
+	print_timespec_t(&t, rtc);
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timespec,
@@ -166,8 +167,8 @@ MPERS_PRINTER_DECL(void, print_itimerspec,
 		return;
 
 	tprints("{it_interval=");
-	print_timespec_t(&t[0]);
+	print_timespec_t(&t[0], false);
 	tprints(", it_value=");
-	print_timespec_t(&t[1]);
+	print_timespec_t(&t[1], false);
 	tprints("}");
 }

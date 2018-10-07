@@ -128,9 +128,11 @@ main(void)
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 
 	assert(syscall(__NR_clock_gettime, CLOCK_REALTIME, &req.ts) == 0);
-	printf("clock_gettime(CLOCK_REALTIME, {tv_sec=%lld, tv_nsec=%llu}) = 0\n",
+	printf("clock_gettime(CLOCK_REALTIME, {tv_sec=%lld, tv_nsec=%llu}",
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec));
+	print_time_t_nsec(req.ts.tv_sec, req.ts.tv_nsec, true);
+	puts(") = 0");
 
 	++req.ts.tv_sec;
 	rem.ts.tv_sec = 0xc0de4;
@@ -138,10 +140,12 @@ main(void)
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, TIMER_ABSTIME,
 		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME"
-	       ", {tv_sec=%lld, tv_nsec=%llu}, %p)"
-	       " = ? ERESTARTNOHAND (To be restarted if no handler)\n",
+	       ", {tv_sec=%lld, tv_nsec=%llu}",
 	       (long long) req.ts.tv_sec,
-	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
+	       zero_extend_signed_to_ull(req.ts.tv_nsec));
+	print_time_t_nsec(req.ts.tv_sec, req.ts.tv_nsec, true);
+	printf(", %p) = ? ERESTARTNOHAND (To be restarted if no handler)\n",
+	       &rem.ts);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 
 	puts("+++ exited with 0 +++");

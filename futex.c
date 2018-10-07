@@ -78,6 +78,7 @@ SYS_FUNC(futex)
 	const kernel_ulong_t uaddr = tcp->u_arg[0];
 	const int op = tcp->u_arg[1];
 	const int cmd = op & 127;
+	const bool is_rt = op & FUTEX_CLOCK_REALTIME;
 	const kernel_ulong_t timeout = tcp->u_arg[3];
 	const kernel_ulong_t uaddr2 = tcp->u_arg[4];
 	const unsigned int val = tcp->u_arg[2];
@@ -101,16 +102,17 @@ SYS_FUNC(futex)
 	case FUTEX_WAIT:
 		tprintf(", %u", val);
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		/* timeout in FUTEX_WAIT is relative, contrary to other ops */
+		print_timespec(tcp, timeout, false);
 		break;
 	case FUTEX_LOCK_PI:
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_timespec(tcp, timeout, true);
 		break;
 	case FUTEX_WAIT_BITSET:
 		tprintf(", %u", val);
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_timespec(tcp, timeout, is_rt);
 		tprints(", ");
 		printxval(futexbitset, val3, NULL);
 		break;
@@ -155,7 +157,7 @@ SYS_FUNC(futex)
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprintf(", %u", val);
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_timespec(tcp, timeout, is_rt);
 		tprints(", ");
 		printaddrpival(tcp, uaddr2);
 		break;

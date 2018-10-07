@@ -89,14 +89,14 @@ SYS_FUNC(semtimedop)
 		tprint_sembuf_array(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 		tprints(", ");
 #if defined(S390) || defined(S390X)
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_timespec(tcp, tcp->u_arg[2], false);
 #else
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_timespec(tcp, tcp->u_arg[4], false);
 #endif
 	} else {
 		tprint_sembuf_array(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprints(", ");
-		print_timespec(tcp, tcp->u_arg[3]);
+		print_timespec(tcp, tcp->u_arg[3], false);
 	}
 	return RVAL_DECODED;
 }

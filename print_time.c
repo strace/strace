@@ -32,16 +32,22 @@
 
 #include MPERS_DEFS
 
+static void
+print_time_t(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	time_t t;
+
+	if (!umove_or_printaddr(tcp, addr, &t)) {
+		tprintf("[%lld", (long long) t);
+		tprints_comment(sprinttime(t));
+		tprints("]");
+	}
+}
+
 SYS_FUNC(time)
 {
 	if (exiting(tcp)) {
-		time_t t;
-
-		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t)) {
-			tprintf("[%lld", (long long) t);
-			tprints_comment(sprinttime(t));
-			tprints("]");
-		}
+		print_time_t(tcp, tcp->u_arg[0]);
 
 		if (!syserror(tcp)) {
 			tcp->auxstr = sprinttime((time_t) tcp->u_rval);
@@ -51,4 +57,11 @@ SYS_FUNC(time)
 	}
 
 	return 0;
+}
+
+SYS_FUNC(stime)
+{
+	print_time_t(tcp, tcp->u_arg[0]);
+
+	return RVAL_DECODED;
 }

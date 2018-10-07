@@ -669,7 +669,7 @@ SYS_FUNC(rt_sigtimedwait)
 			 */
 			printaddr(tcp->u_arg[1]);
 			tprints(", ");
-			print_timespec(tcp, tcp->u_arg[2]);
+			print_timespec(tcp, tcp->u_arg[2], false);
 			tprintf(", %" PRI_klu, tcp->u_arg[3]);
 		} else {
 			char *sts = xstrdup(sprint_timespec(tcp, tcp->u_arg[2]));

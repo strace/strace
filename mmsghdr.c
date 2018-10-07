@@ -211,7 +211,7 @@ SYS_FUNC(recvmmsg)
 			/* flags */
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprints(", ");
-			print_timespec(tcp, tcp->u_arg[4]);
+			print_timespec(tcp, tcp->u_arg[4], false);
 		}
 		return 0;
 	} else {

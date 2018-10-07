@@ -75,7 +75,7 @@ SYS_FUNC(dup3)
 
 static int
 decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
-	      void (*const print_tv_ts) (struct tcb *, kernel_ulong_t),
+	      void (*const print_tv_ts) (struct tcb *, kernel_ulong_t, bool),
 	      const char * (*const sprint_tv_ts) (struct tcb *, kernel_ulong_t))
 {
 	int i, j;
@@ -128,7 +128,7 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 		}
 		free(fds);
 		tprints(", ");
-		print_tv_ts(tcp, args[4]);
+		print_tv_ts(tcp, args[4], false);
 	} else {
 		static char outstr[1024];
 		char *outptr;
