@@ -2024,6 +2024,21 @@ interrupt(int sig)
 	CMPXCHG(&interrupted, 0, sig);
 }
 
+static const char *
+sprintsignal(int sig)
+{
+	const char *str = signame(sig);
+
+	if (str)
+		return str;
+
+	static char buf[sizeof(int) * 3 + 2];
+
+	xsprintf(buf, "%d", sig);
+
+	return buf;
+}
+
 static void
 print_debug_info(const int pid, int status)
 {
@@ -2035,11 +2050,12 @@ print_debug_info(const int pid, int status)
 	if (WIFSIGNALED(status))
 		xsprintf(buf, "WIFSIGNALED,%ssig=%s",
 				WCOREDUMP(status) ? "core," : "",
-				signame(WTERMSIG(status)));
+				sprintsignal(WTERMSIG(status)));
 	if (WIFEXITED(status))
 		xsprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 	if (WIFSTOPPED(status))
-		xsprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
+		xsprintf(buf, "WIFSTOPPED,sig=%s",
+			 sprintsignal(WSTOPSIG(status)));
 	evbuf[0] = '\0';
 	if (event != 0) {
 		static const char *const event_names[] = {
@@ -2168,7 +2184,7 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 		if (tcp)
 			printleader(tcp);
 		printer("%skilled by %s%s%s",
-			prefix, signame(WTERMSIG(status)),
+			prefix, sprintsignal(WTERMSIG(status)),
 			WCOREDUMP(status) ? " (core dumped)" : "", suffix);
 		line_ended();
 	}
@@ -2198,11 +2214,11 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 	    && is_number_in_set(sig, signal_set)) {
 		printleader(tcp);
 		if (si) {
-			tprintf("--- %s ", signame(sig));
-			printsiginfo(si);
+			tprintf("--- %s ", sprintsignal(sig));
+			printsiginfo(tcp, si);
 			tprints(" ---\n");
 		} else
-			tprintf("--- stopped by %s ---\n", signame(sig));
+			tprintf("--- stopped by %s ---\n", sprintsignal(sig));
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
