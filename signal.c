@@ -129,7 +129,7 @@ signame(const int sig)
 {
 	static char buf[sizeof("SIGRT_%u") + sizeof(int)*3];
 
-	if (sig >= 0) {
+	if (sig > 0) {
 		const unsigned int s = sig;
 
 		if (s < nsignals)

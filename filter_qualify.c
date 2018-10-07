@@ -69,7 +69,7 @@ sigstr_to_uint(const char *s)
 		return string_to_uint_upto(s, nsig);
 
 
-	for (size_t i = 0; i <= nsig; i++) {
+	for (size_t i = 1; i <= nsig; i++) {
 		if (signame_eq(s, signame(i)))
 			return i;
 	}
