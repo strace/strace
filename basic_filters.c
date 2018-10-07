@@ -174,6 +174,7 @@ lookup_class(const char *s)
 		{ "%process",	TRACE_PROCESS	},
 		{ "%signal",	TRACE_SIGNAL	},
 		{ "%ipc",	TRACE_IPC	},
+		{ "%net",	TRACE_NETWORK	},
 		{ "%network",	TRACE_NETWORK	},
 		{ "%stat",	TRACE_STAT	},
 		{ "%lstat",	TRACE_LSTAT	},
