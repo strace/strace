@@ -52,8 +52,10 @@ print_ioprio(unsigned int ioprio)
 static void
 ioprio_print_who(struct tcb *tcp, int which, int who)
 {
-	switch (which)
-	{
+	switch (which) {
+	case IOPRIO_WHO_USER:
+		printuid(who);
+		break;
 	case IOPRIO_WHO_PROCESS:
 		printpid(tcp, who, PT_TGID);
 		break;
