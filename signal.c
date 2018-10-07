@@ -105,22 +105,22 @@ print_sa_handler(kernel_ulong_t handler)
 const char *
 signame(const int sig)
 {
-	static char buf[sizeof("SIGRT_%u") + sizeof(int)*3];
-
-	if (sig >= 0) {
+	if (sig > 0) {
 		const unsigned int s = sig;
 
 		if (s < nsignals)
 			return signalent[s];
 #ifdef ASM_SIGRTMAX
 		if (s >= ASM_SIGRTMIN && s <= (unsigned int) ASM_SIGRTMAX) {
+			static char buf[sizeof("SIGRT_%u") + sizeof(s) * 3];
+
 			xsprintf(buf, "SIGRT_%u", s - ASM_SIGRTMIN);
 			return buf;
 		}
 #endif
 	}
-	xsprintf(buf, "%d", sig);
-	return buf;
+
+	return NULL;
 }
 
 const char *
