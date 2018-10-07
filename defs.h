@@ -579,6 +579,7 @@ extern long getrval2(struct tcb *);
 #endif
 
 extern const char *signame(const int);
+extern const char *sprintsigname(const int);
 extern void pathtrace_select_set(const char *, struct path_set *);
 extern bool pathtrace_match_set(struct tcb *, struct path_set *);
 

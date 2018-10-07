@@ -34,12 +34,12 @@ printstatus(int status)
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
 		tprintf("[{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
-			signame(sig & 0x7f),
+			sprintsigname(sig & 0x7f),
 			sig & 0x80 ? " | 0x80" : "");
 		status &= ~W_STOPCODE(sig);
 	} else if (WIFSIGNALED(status)) {
 		tprintf("[{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
-			signame(WTERMSIG(status)),
+			sprintsigname(WTERMSIG(status)),
 			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
 		status &= ~(W_EXITCODE(0, WTERMSIG(status)) | WCOREFLAG);
 	} else if (WIFEXITED(status)) {

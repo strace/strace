@@ -123,6 +123,21 @@ signame(const int sig)
 	return buf;
 }
 
+const char *
+sprintsigname(const int sig)
+{
+	const char *str = signame(sig);
+
+	if (str)
+		return str;
+
+	static char buf[sizeof(sig) * 3 + 2];
+
+	xsprintf(buf, "%d", sig);
+
+	return buf;
+}
+
 static unsigned int
 popcount32(const uint32_t *a, unsigned int size)
 {

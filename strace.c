@@ -1979,11 +1979,12 @@ print_debug_info(const int pid, int status)
 	if (WIFSIGNALED(status))
 		xsprintf(buf, "WIFSIGNALED,%ssig=%s",
 				WCOREDUMP(status) ? "core," : "",
-				signame(WTERMSIG(status)));
+				sprintsigname(WTERMSIG(status)));
 	if (WIFEXITED(status))
 		xsprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 	if (WIFSTOPPED(status))
-		xsprintf(buf, "WIFSTOPPED,sig=%s", signame(WSTOPSIG(status)));
+		xsprintf(buf, "WIFSTOPPED,sig=%s",
+			 sprintsigname(WSTOPSIG(status)));
 	evbuf[0] = '\0';
 	if (event != 0) {
 		static const char *const event_names[] = {
@@ -2103,7 +2104,7 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
 		printleader(tcp);
 		tprintf("+++ killed by %s %s+++\n",
-			signame(WTERMSIG(status)),
+			sprintsigname(WTERMSIG(status)),
 			WCOREDUMP(status) ? "(core dumped) " : "");
 		line_ended();
 	}
@@ -2133,11 +2134,11 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 	    && is_number_in_set(sig, signal_set)) {
 		printleader(tcp);
 		if (si) {
-			tprintf("--- %s ", signame(sig));
+			tprintf("--- %s ", sprintsigname(sig));
 			printsiginfo(si);
 			tprints(" ---\n");
 		} else
-			tprintf("--- stopped by %s ---\n", signame(sig));
+			tprintf("--- stopped by %s ---\n", sprintsigname(sig));
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
