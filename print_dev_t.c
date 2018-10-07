@@ -33,5 +33,12 @@
 void
 print_dev_t(const unsigned long long dev)
 {
-	tprintf("makedev(%u, %u)", major(dev), minor(dev));
+	if (xlat_verbosity(xlat_verbose) != XLAT_STYLE_ABBREV)
+		tprintf("%llu", dev);
+	if (xlat_verbosity(xlat_verbose) != XLAT_STYLE_RAW)
+		return;
+
+	(xlat_verbosity(xlat_verbose) == XLAT_STYLE_ABBREV
+		? tprintf : tprintf_comment)("makedev(%u, %u)",
+					     major(dev), minor(dev));
 }
