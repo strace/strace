@@ -54,6 +54,14 @@ main(int ac, char **av)
 	printf("mknod(\"%s\", S_IFIFO|0600) = %s\n",
 	       sample, sprintrc(rc));
 
+	rc = call_mknod(S_ISUID | 0600, 0);
+	printf("mknod(\"%s\", S_ISUID|0600) = %s\n",
+	       sample, sprintrc(rc));
+
+	rc = call_mknod(S_IFMT | 0600, 0);
+	printf("mknod(\"%s\", 0170600) = %s\n",
+	       sample, sprintrc(rc));
+
 	dev = (unsigned long) 0xdeadbeef00000000ULL | makedev(1, 7);
 
 	rc = call_mknod(S_IFCHR | 024, dev);
