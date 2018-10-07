@@ -69,13 +69,27 @@ print_ioprio(unsigned int ioprio)
 		? tprints_comment : tprints)(str);
 }
 
+static void
+print_ioprio_who(const char * prefix, int which, int who)
+{
+	switch (which) {
+	case IOPRIO_WHO_USER:
+		printuid(prefix, who);
+		break;
+	case IOPRIO_WHO_PROCESS:
+	case IOPRIO_WHO_PGRP:
+	default:
+		tprintf("%s%d", prefix, who);
+	}
+}
+
 SYS_FUNC(ioprio_get)
 {
 	if (entering(tcp)) {
 		/* int which */
 		printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
 		/* int who */
-		tprintf(", %d", (int) tcp->u_arg[1]);
+		print_ioprio_who(", ", tcp->u_arg[0], tcp->u_arg[1]);
 		return 0;
 	} else {
 		if (syserror(tcp))
@@ -91,8 +105,9 @@ SYS_FUNC(ioprio_set)
 	/* int which */
 	printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
 	/* int who */
-	tprintf(", %d, ", (int) tcp->u_arg[1]);
+	print_ioprio_who(", ", tcp->u_arg[0], tcp->u_arg[1]);
 	/* int ioprio */
+	tprints(", ");
 	tprints(sprint_ioprio(tcp->u_arg[2]));
 
 	return RVAL_DECODED;
