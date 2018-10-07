@@ -228,7 +228,14 @@ sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
 void
 printsignal(int nr)
 {
-	tprints(signame(nr));
+	const char *str = signame(nr);
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%d", nr);
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+		? tprints_comment : tprints)(str);
 }
 
 static void
