@@ -36,28 +36,35 @@
 #include <sys/stat.h>
 
 #include "xlat/modetypes.h"
+#include "xlat/modeflags.h"
 
 void
 print_symbolic_mode_t(const unsigned int mode)
 {
-	const char *ifmt = "";
+	const char *ifmt = xlookup(modetypes, mode & S_IFMT);
+	const unsigned int flags = mode & modeflags->flags_mask;
+	bool raw = (!ifmt && !flags)
+		   || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW;
 
-	if (mode & S_IFMT)
-		ifmt = xlookup(modetypes, mode & S_IFMT);
-
-	if (!ifmt || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+	if (raw || xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprintf("%#03o", mode);
-
-	if (!ifmt || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+	if (raw)
 		return;
 
-	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
-		? tprintf : tprintf_comment)("%s%s%s%s%s%#03o",
-			ifmt, ifmt[0] ? "|" : "",
-			(mode & S_ISUID) ? "S_ISUID|" : "",
-			(mode & S_ISGID) ? "S_ISGID|" : "",
-			(mode & S_ISVTX) ? "S_ISVTX|" : "",
-			mode & ~(S_IFMT|S_ISUID|S_ISGID|S_ISVTX));
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		printf(" /* ");
+	if (ifmt) {
+		printxlat_ex(ifmt, mode & S_IFMT, XLAT_STYLE_FMT_O);
+		tprints("|");
+	}
+	if (flags) {
+		printflags(modeflags, flags, NULL);
+		tprints("|");
+	}
+	tprintf("%#03o", mode - flags - ifmt ? mode & S_IFMT : 0);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		printf(" */")
 }
 
 void
