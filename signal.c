@@ -141,8 +141,8 @@ signame(const int sig)
 		}
 #endif
 	}
-	xsprintf(buf, "%d", sig);
-	return buf;
+
+	return NULL;
 }
 
 static unsigned int
