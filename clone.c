@@ -91,8 +91,10 @@ SYS_FUNC(clone)
 		tprints("flags=");
 		if (!printflags64(clone_flags, flags & ~CSIGNAL, NULL))
 			sep = "";
-		if ((flags & CSIGNAL) != 0)
-			tprintf("%s%s", sep, signame(flags & CSIGNAL));
+		if ((flags & CSIGNAL) != 0) {
+			tprints(sep);
+			printsignal(flags & CSIGNAL);
+		}
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
 			return 0;

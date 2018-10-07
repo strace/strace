@@ -141,7 +141,7 @@ SYS_FUNC(prctl)
 			tprints(", ");
 		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
 			tprints("[");
-			tprints(signame(i));
+			printsignal(i);
 			tprints("]");
 		}
 		break;
@@ -318,7 +318,7 @@ SYS_FUNC(prctl)
 		if (arg2 > 128)
 			tprintf("%" PRI_klu, arg2);
 		else
-			tprints(signame(arg2));
+			printsignal(arg2);
 		return RVAL_DECODED;
 
 	case PR_SET_PTRACER:

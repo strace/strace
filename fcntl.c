@@ -114,7 +114,7 @@ print_fcntl(struct tcb *tcp)
 		break;
 	case F_SETSIG:
 		tprints(", ");
-		tprints(signame(tcp->u_arg[2]));
+		printsignal(tcp->u_arg[2]);
 		break;
 	case F_GETOWN:
 	case F_GETPIPE_SZ:

@@ -442,19 +442,20 @@ SYS_FUNC(sigprocmask)
 
 SYS_FUNC(kill)
 {
-	tprintf("%d, %s",
-		(int) tcp->u_arg[0],
-		signame(tcp->u_arg[1]));
+	/* pid */
+	tprintf("%d, ", (int) tcp->u_arg[0]);
+	/* signal */
+	printsignal(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(tgkill)
 {
-	tprintf("%d, %d, %s",
-		(int) tcp->u_arg[0],
-		(int) tcp->u_arg[1],
-		signame(tcp->u_arg[2]));
+	/* tgid, tid */
+	tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
+	/* signal */
+	printsignal(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }

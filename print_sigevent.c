@@ -36,7 +36,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 	case SIGEV_SIGNAL:
 	case SIGEV_THREAD:
 	case SIGEV_THREAD_ID:
-		tprints(signame(sev.sigev_signo));
+		printsignal(sev.sigev_signo);
 		break;
 	default:
 		tprintf("%u", sev.sigev_signo);

@@ -1197,7 +1197,7 @@ SYS_FUNC(s390_runtime_instr)
 	switch (command) {
 	case S390_RUNTIME_INSTR_START:
 		tprints(", ");
-		tprints(signame(signum));
+		printsignal(signum);
 		break;
 
 	case S390_RUNTIME_INSTR_STOP:
