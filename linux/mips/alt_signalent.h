@@ -1,0 +1,4 @@
+_("SIGPOLL",	"SIGIO"),
+_("SIGUNUSED",	"31"),
+_("SIGINFO",	"SIGPWR"),
+_("SIGABRT,	""SIGIOT"),

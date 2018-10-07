@@ -1,0 +1,2 @@
+_("EWOULDBLOCK",	"EAGAIN"),
+_("EDEADLOCK",		"EDEADLK" ),
