@@ -24,15 +24,25 @@ test_one_sig()
 	match_diff "$LOG" "$EXP"
 }
 
-test_sigs()
+test_sigs_ex()
 {
 	local first second sigs
+	first_id="$1"; shift
 	first="$1"; shift
+	second_id="$1"; shift
 	second="$1"; shift
 
 	for sigs; do
-		test_one_sig "$sigs" 2 "$first" 15 "$second"
+		test_one_sig "$sigs" "$first_id" "$first" "$second_id" "$second"
 	done
+}
+
+test_sigs()
+{
+	local first
+	first="$1"; shift
+
+	test_sigs_ex 2 "$first" 15 "$@"
 }
 
 test_sigs '' '' \
@@ -77,6 +87,48 @@ test_sigs SIGINT SIGTERM \
 	'!CHLD' '!SIGCHLD' '!ALRM' '!SIGALRM' \
 	'!CHLD,SIGALRM' '!ALRM,SIGCHLD' \
 	'!9' '!9,4' '!9,4,11' '!4,CHLD,11,ALRM,9'
+
+case "$STRACE_ARCH" in
+alpha)
+	test_sigs '' '' \
+		none '!all' \
+		POLL UNUSED SIGPOLL SIGUNUSED \
+		poll unused sigpoll sigunused \
+		POLL,UNUSED SIGPOLL,UNUSED POLL,SIGUNUSED \
+		unused,poll unused,sigpoll sigunused,poll
+		PWR IOT SIGPWR SIGIOT \
+		pwr iot sigpwr sigiot \
+		PWR,IOT PWR,SIGIOT SIGPWR,IOT \
+		iot,pwr sigiot,pwr iot,siginfo
+	;;
+
+*)
+	test_sigs_ex 29 '' 31 SIGSYS \
+		UNUSED SIGUNUSED unused sigunused \
+		'!POLL' '!SIGPOLL' '!POLL,IO' \
+		'!poll' '!chld,sigpoll' '!sigalrm,poll'
+	test_sigs_ex 29 SIGIO 31 '' \
+		POLL SIGPOLL poll sigpoll \
+		'!UNUSED' '!SIGUNUSED' '!UNUSED,ALRM' \
+		'!unused' '!unused,sigchld' '!sigunused,term'
+	test_sigs_ex 29 SIGIO 31 SIGSYS \
+		POLL,UNUSED SIGPOLL,UNUSED POLL,SIGUNUSED \
+		unused,poll unused,sigpoll sigunused,poll
+
+	test_sigs_ex 30 '' 6 SIGABRT \
+		IOT SIGIOT iot sigiot \
+		'!INFO' '!SIGINFO' '!SIGINFO,POLL' \
+		'!info' '!sigstop,info' '!siginfo,pipe'
+	test_sigs_ex 30 SIGPWR 6 '' \
+		INFO SIGINFO info siginfo \
+		'!IOT' '!SIGIOT' '!SIGFPE,IOT' \
+		'!iot' '!sigiot,hup' '!iot,sigurg'
+	test_sigs_ex 30 SIGPWR 6 SIGABRT \
+		INFO,IOT SIGINFO,SIGIOT \
+		info,iot siginfo,sigiot
+	;;
+esac
+
 
 fail_with()
 {

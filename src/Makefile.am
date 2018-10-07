@@ -486,6 +486,8 @@ EXTRA_DIST =				\
 	linux/aarch64/shuffle_scno.c	\
 	linux/aarch64/syscallent.h	\
 	linux/aarch64/syscallent1.h	\
+	linux/alpha/alt_errnoent.h	\
+	linux/alpha/alt_signalent.h	\
 	linux/alpha/arch_defs_.h	\
 	linux/alpha/arch_getrval2.c	\
 	linux/alpha/arch_regs.c		\
@@ -568,6 +570,8 @@ EXTRA_DIST =				\
 	linux/csky/set_error.c		\
 	linux/csky/set_scno.c		\
 	linux/csky/syscallent.h		\
+	linux/generic/alt_errnoent.h		\
+	linux/generic/alt_signalent.h		\
 	linux/generic/arch_fpregset.c		\
 	linux/generic/arch_fpregset.h		\
 	linux/generic/arch_kvm.c		\
@@ -596,6 +600,7 @@ EXTRA_DIST =				\
 	linux/generic/syscallent_base_nr.h	\
 	linux/generic/userent.h			\
 	linux/generic/userent0.h		\
+	linux/hppa/alt_errnoent.h	\
 	linux/hppa/arch_defs_.h		\
 	linux/hppa/arch_regs.c		\
 	linux/hppa/arch_rt_sigframe.c	\
@@ -707,6 +712,8 @@ EXTRA_DIST =				\
 	linux/microblaze/set_scno.c	\
 	linux/microblaze/syscallent.h	\
 	linux/microblaze/userent.h	\
+	linux/mips/alt_errnoent.h	\
+	linux/mips/alt_signalent.h	\
 	linux/mips/arch_defs_.h		\
 	linux/mips/arch_getrval2.c	\
 	linux/mips/arch_prstatus_regset.c \
@@ -755,6 +762,7 @@ EXTRA_DIST =				\
 	linux/or1k/set_scno.c		\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
+	linux/powerpc/alt_errnoent.h	\
 	linux/powerpc/arch_defs_.h	\
 	linux/powerpc/arch_fpregset.c	\
 	linux/powerpc/arch_fpregset.h	\
@@ -776,6 +784,7 @@ EXTRA_DIST =				\
 	linux/powerpc/set_scno.c	\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/userent.h		\
+	linux/powerpc64/alt_errnoent.h	\
 	linux/powerpc64/arch_defs_.h	\
 	linux/powerpc64/arch_fpregset.c	\
 	linux/powerpc64/arch_fpregset.h	\
@@ -902,6 +911,8 @@ EXTRA_DIST =				\
 	linux/sh64/set_scno.c		\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
+	linux/sparc/alt_errnoent.h	\
+	linux/sparc/alt_signalent.h	\
 	linux/sparc/arch_defs_.h	\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_prstatus_regset.c \
@@ -922,6 +933,8 @@ EXTRA_DIST =				\
 	linux/sparc/signalent.h		\
 	linux/sparc/syscallent.h	\
 	linux/sparc/userent.h		\
+	linux/sparc64/alt_errnoent.h	\
+	linux/sparc64/alt_signalent.h	\
 	linux/sparc64/arch_defs_.h	\
 	linux/sparc64/arch_get_personality.c \
 	linux/sparc64/arch_getrval2.c	\

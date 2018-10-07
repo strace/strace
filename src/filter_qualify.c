@@ -38,6 +38,21 @@ struct inject_personality_data {
 	uint16_t scno;
 };
 
+struct alt_name {
+	const char *syn;
+	const char *orig;
+};
+
+#define _(a_, b_) { (a_), (b_) }
+static const struct alt_name alt_signames[] = {
+	#include "alt_signalent.h"
+};
+
+static const struct alt_name alt_errnames[] = {
+	#include "alt_signalent.h"
+};
+#undef _
+
 static bool
 signame_eq(const char *needle, const char *straw)
 {
@@ -58,6 +73,13 @@ signame_eq(const char *needle, const char *straw)
 static int
 sigstr_to_uint(const char *s)
 {
+	for (size_t i = 0; i < ARRAY_SIZE(alt_signames); i++) {
+		if (signame_eq(s, alt_signames[i].syn)) {
+			s = alt_signames[i].orig;
+			break;
+		}
+	}
+
 	if (*s >= '0' && *s <= '9')
 		return string_to_uint_upto(s, nsig);
 
@@ -127,6 +149,13 @@ decode_pid_str_to_uint(const char *str)
 static int
 find_errno_by_name(const char *name)
 {
+	for (unsigned int i = 0; i < ARRAY_SIZE(alt_errnames); ++i) {
+		if (!strcasecmp(name, alt_errnames[i].syn)) {
+			name = alt_errnames[i].orig;
+			break;
+		}
+	}
+
 	for (unsigned int i = 1; i < nerrnos; ++i) {
 		if (errnoent[i] && (strcasecmp(name, errnoent[i]) == 0))
 			return i;

@@ -1,0 +1,1 @@
+_("EWOULDBLOCK",	"EAGAIN"),
