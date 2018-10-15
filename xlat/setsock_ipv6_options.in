@@ -4,5 +4,5 @@
  * should be in sock_ipv6_options.in instead.
  */
 
-IP6T_SO_SET_REPLACE
-IP6T_SO_SET_ADD_COUNTERS
+IP6T_SO_SET_REPLACE		64
+IP6T_SO_SET_ADD_COUNTERS	65
