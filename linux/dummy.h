@@ -147,7 +147,6 @@
 #define	sys_lock		printargs
 #define	sys_mpx			printargs
 #define	sys_nfsservctl		printargs
-#define	sys_phys		printargs
 #define	sys_prof		printargs
 #define	sys_profil		printargs
 #define	sys_putpmsg		printargs
