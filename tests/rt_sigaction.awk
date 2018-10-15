@@ -17,7 +17,7 @@ BEGIN {
 
 	n1[2][1] = n2[2][1] = "0x[0-9a-f]+"
 	n1[2][2] = n2[2][2] = "\\[QUIT TERM\\]"
-	n1[2][3] = "SA_RESTORER\\|SA_SIGINFO"
+	n1[2][3] = "SA_SIGINFO\\|SA_RESTORER"
 	n2[2][3] = "SA_SIGINFO"
 	n1[2][4] = ", sa_restorer=0x[0-9a-f]+"
 	n2[2][4] = ""
