@@ -30,25 +30,23 @@
 #include <asm/unistd.h>
 
 #ifdef HAVE_READAHEAD
-/* Check for glibc readahead argument passing bugs. */
-# ifdef __GLIBC__
+# include "glibc_compat"
+
 /*
  * glibc < 2.8 had an incorrect order of higher and lower parts of offset,
  * see https://sourceware.org/bugzilla/show_bug.cgi?id=5208
  */
-#  if !(defined __GLIBC_MINOR__ && \
-	(__GLIBC__ << 16) + __GLIBC_MINOR__ >= (2 << 16) + 8)
-#   undef HAVE_READAHEAD
-#  endif /* glibc < 2.8 */
+# if GLIBC_OLDER(2, 8)
+#  undef HAVE_READAHEAD
+# endif /* glibc < 2.8 */
+
 /*
  * glibc < 2.25 had an incorrect implementation on mips n64,
  * see https://sourceware.org/bugzilla/show_bug.cgi?id=21026
  */
-#  if defined LINUX_MIPSN64 && !(defined __GLIBC_MINOR__ && \
-	(__GLIBC__ << 16) + __GLIBC_MINOR__ >= (2 << 16) + 25)
-#   undef HAVE_READAHEAD
-#  endif /* LINUX_MIPSN64 && glibc < 2.25 */
-# endif /* __GLIBC__ */
+# if defined LINUX_MIPSN64 && GLIBC_OLDER(2, 25)
+#  undef HAVE_READAHEAD
+# endif /* LINUX_MIPSN64 && glibc < 2.25 */
 #endif /* HAVE_READAHEAD */
 
 #ifdef HAVE_READAHEAD

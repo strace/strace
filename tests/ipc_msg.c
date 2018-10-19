@@ -33,6 +33,8 @@
 #include <stdlib.h>
 #include <sys/msg.h>
 
+#include "glibc_compat.h"
+
 #include "xlat.h"
 #include "xlat/resource_flags.h"
 
@@ -45,15 +47,9 @@
  * provided in third argument of msgctl call (in case of IPC_SET cmd)
  * which led to segmentation fault.
  */
-#undef TEST_MSGCTL_BOGUS_ADDR
-#if defined __GLIBC__ && defined POWERPC64
-# if !(defined __GLIBC_MINOR__) \
-   || ((__GLIBC__ << 16) + __GLIBC_MINOR__ < (2 << 16) + 23)
-#  define TEST_MSGCTL_BOGUS_ADDR 0
-# endif
-#endif /* __GLIBC__ && POWERPC64 */
-
-#ifndef TEST_MSGCTL_BOGUS_ADDR
+#if defined POWERPC64 && GLIBC_OLDER(2, 23)
+# define TEST_MSGCTL_BOGUS_ADDR 0
+#else
 # define TEST_MSGCTL_BOGUS_ADDR 1
 #endif
 
