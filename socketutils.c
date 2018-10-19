@@ -944,7 +944,7 @@ genl_get_family_name(struct tcb *tcp, uint16_t id)
 
 	bool init = !dyxlat;
 	if (init)
-		dyxlat = dyxlat_alloc(32);
+		dyxlat = dyxlat_alloc(0);
 
 	int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
 	if (fd < 0)
