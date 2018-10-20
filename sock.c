@@ -64,6 +64,7 @@ typedef struct ifreq struct_ifreq;
 # include "xlat/arp_hardware_types.h"
 # include "xlat/route_nexthop_flags.h"
 # include "xlat/routing_types.h"
+# include "xlat/sock_ioctls.h"
 #undef XLAT_MACROS_ONLY
 
 static void
@@ -547,45 +548,29 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCGIFCONF:
 		return decode_ifconf(tcp, fd, code, arg);
 
-#ifdef SIOCBRADDBR
 	case SIOCBRADDBR:
 	case SIOCBRDELBR:
 		tprints(", ");
 		printstr(tcp, arg);
 		break;
-#endif
 
-#ifdef FIOSETOWN
 	case FIOSETOWN:
-#endif
-#ifdef SIOCSPGRP
 	case SIOCSPGRP:
-#endif
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
 
-#ifdef FIOGETOWN
 	case FIOGETOWN:
-#endif
-#ifdef SIOCGPGRP
 	case SIOCGPGRP:
-#endif
-#ifdef SIOCATMARK
 	case SIOCATMARK:
-#endif
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
 
-#ifdef SIOCBRADDIF
 	case SIOCBRADDIF:
-#endif
-#ifdef SIOCBRDELIF
 	case SIOCBRDELIF:
-#endif
 		/* no arguments */
 		break;
 
