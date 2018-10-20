@@ -16,7 +16,7 @@ SIOCATMARK		0x8905
 
 #if defined __sh__ || defined __sh64__
 SIOCGSTAMP		_IOR('s', 100, struct timeval)
-SIOCGSTAMPNS		_IOR('s', 100, struct timeval)
+SIOCGSTAMPNS		_IOR('s', 101, struct timespec)
 #else
 SIOCGSTAMP		0x8906
 SIOCGSTAMPNS		0x8907
@@ -72,9 +72,9 @@ SIOCETHTOOL		0x8946
 SIOCGMIIPHY		0x8947
 SIOCGMIIREG		0x8948
 SIOCSMIIREG		0x8949
-SIOCWANDEV		0x894A
-SIOCOUTQNSD		0x894B
-SIOCGSKNS		0x894C
+SIOCWANDEV		0x894a
+SIOCOUTQNSD		0x894b
+SIOCGSKNS		0x894c
 
 /* ARP cache control calls. */
 /* OLD_SIOCDARP		0x8950 - removed in 2.1.68 */
@@ -117,5 +117,5 @@ SIOCBRDELIF		0x89a3
 SIOCSHWTSTAMP		0x89b0
 SIOCGHWTSTAMP		0x89b1
 
-/* SIOCPROTOPRIVATE == 0x89e0..0x89ef - protocol-private ioctls */
-/* SIOCDEVPRIVATE == 0x89f0..0x89ff - device-private ioctls */
+/* SIOCPROTOPRIVATE	0x89e0..0x89ef - protocol-private ioctls */
+/* SIOCDEVPRIVATE	0x89f0..0x89ff - device-private ioctls */
