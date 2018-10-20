@@ -1,5 +1,31 @@
-F_RDLCK
-F_WRLCK
-F_UNLCK
-F_EXLCK
-F_SHLCK
+#if defined __alpha__ || defined __sparc__ || defined __parisc__
+F_RDLCK	1
+#else
+F_RDLCK	0
+#endif
+
+#if defined __alpha__ || defined __sparc__ || defined __parisc__
+F_WRLCK	2
+#else
+F_WRLCK	1
+#endif
+
+#if defined __alpha__
+F_UNLCK	8
+#elif defined __sparc__ || defined __parisc__
+F_UNLCK	3
+#else
+F_UNLCK	2
+#endif
+
+#if defined __alpha__
+F_EXLCK	16
+#else
+F_EXLCK	4
+#endif
+
+#if defined __alpha__
+F_SHLCK	32
+#else
+F_SHLCK	8
+#endif
