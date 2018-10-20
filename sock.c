@@ -52,6 +52,8 @@ typedef struct ifreq struct_ifreq;
 
 #include MPERS_DEFS
 
+#include "static_assert.h"
+
 #include "xlat/iffflags.h"
 
 #include "xlat/inet6_route_metrics.h"
@@ -539,77 +541,210 @@ decode_route_ioc(struct tcb *tcp, const int fd, const unsigned int code,
 	return RVAL_DECODED;
 }
 
+enum sock_ioctl_type {
+	SIT_UNKNOWN,
+	SIT_NONE,
+	SIT_INT,
+	SIT_STR,
+	SIT_FUNC,
+};
+
+#define SIOC_DEC_BASE SIOCADDRT
+
+#define SIDEF_NONE(ioc_) \
+	[(ioc_) - SIOC_DEC_BASE] = { .type = SIT_NONE, }
+#define SIDEF_SET_INT(ioc_) \
+	[(ioc_) - SIOC_DEC_BASE] = { .type = SIT_INT, .setter = 1, }
+#define SIDEF_GET_INT(ioc_) \
+	[(ioc_) - SIOC_DEC_BASE] = { .type = SIT_INT, .setter = 0, }
+#define SIDEF_SET_STR(ioc_) \
+	[(ioc_) - SIOC_DEC_BASE] = { .type = SIT_STR, .setter = 1, }
+#define SIDEF_FUNC(ioc_, func_) \
+	[(ioc_) - SIOC_DEC_BASE] = { .type = SIT_FUNC, .func = (func_), }
+
+typedef int (*sock_ioctl_handler_fn)(struct tcb *tcp, int fd, unsigned int code,
+				     kernel_ulong_t arg);
+
+static const struct sock_decoder_desc {
+	enum sock_ioctl_type type;
+	union {
+		struct {
+			uint32_t setter :1;
+		};
+
+		sock_ioctl_handler_fn func;
+	};
+} sock_decoders[] = {
+	/* 0x0b */ SIDEF_FUNC(SIOCADDRT,	decode_route_ioc),
+	/* 0x0c */ SIDEF_FUNC(SIOCDELRT,	decode_route_ioc),
+	/* 0x0d SIOCRTMSG removed in 2.1.68 */
+	/* 0x0e, 0x0f are not defined */
+	/* 0x10 */ SIDEF_FUNC(SIOCGIFNAME,	decode_get_ifreq),
+	/* 0x11 SIOCSIFLINK has never been implemented */
+	/* 0x12 */ SIDEF_FUNC(SIOCGIFCONF,	decode_ifconf),
+	/* 0x13 */ SIDEF_FUNC(SIOCGIFFLAGS,	decode_get_ifreq),
+	/* 0x14 */ SIDEF_FUNC(SIOCSIFFLAGS,	decode_set_ifreq),
+	/* 0x15 */ SIDEF_FUNC(SIOCGIFADDR,	decode_get_ifreq),
+	/* 0x16 */ SIDEF_FUNC(SIOCSIFADDR,	decode_set_ifreq),
+	/* 0x17 */ SIDEF_FUNC(SIOCGIFDSTADDR,	decode_get_ifreq),
+	/* 0x18 */ SIDEF_FUNC(SIOCSIFDSTADDR,	decode_set_ifreq),
+	/* 0x19 */ SIDEF_FUNC(SIOCGIFBRDADDR,	decode_get_ifreq),
+	/* 0x1a */ SIDEF_FUNC(SIOCSIFBRDADDR,	decode_set_ifreq),
+	/* 0x1b */ SIDEF_FUNC(SIOCGIFNETMASK,	decode_get_ifreq),
+	/* 0x1c */ SIDEF_FUNC(SIOCSIFNETMASK,	decode_set_ifreq),
+	/* 0x1d */ SIDEF_FUNC(SIOCGIFMETRIC,	decode_get_ifreq),
+	/* 0x1e */ SIDEF_FUNC(SIOCSIFMETRIC,	decode_set_ifreq),
+	/* 0x1f SIOCGIFMEM has never been implemented */
+	/* 0x20 SIOCSIFMEM has never been implemented */
+	/* 0x21 */ SIDEF_FUNC(SIOCGIFMTU,	decode_get_ifreq),
+	/* 0x22 */ SIDEF_FUNC(SIOCSIFMTU,	decode_set_ifreq),
+	/* 0x23 */ SIDEF_FUNC(SIOCSIFNAME,	decode_set_ifreq),
+	/* 0x24 */ SIDEF_FUNC(SIOCSIFHWADDR,	decode_set_ifreq),
+	/* 0x25 SIOCGIFENCAP */
+	/* 0x26 SIOCSIFENCAP */
+	/* 0x27 */ SIDEF_FUNC(SIOCGIFHWADDR,	decode_get_ifreq),
+	/* 0x28 is not defined */
+	/* 0x29 */ SIDEF_FUNC(SIOCGIFSLAVE,	decode_get_ifreq),
+	/* 0x2a .. 0x2f are not defined */
+	/* 0x30 */ SIDEF_FUNC(SIOCSIFSLAVE,	decode_get_ifreq),
+	/* 0x31 SIOCADDMULTI */
+	/* 0x32 SIOCDELMULTI */
+	/* 0x33 */ SIDEF_FUNC(SIOCGIFINDEX,	decode_get_ifreq),
+	/* 0x34 SIOCSIFPFLAGS has never been implemented */
+	/* 0x35 SIOCGIFPFLAGS has never been implemented */
+	/* 0x36 SIOCDIFADDR */
+	/* 0x37 SIOCSIFHWBROADCAST */
+	/* 0x38 SIOCGIFCOUNT has never been implemented */
+	/* 0x39 .. 0x3f are not defined */
+	/* 0x40 SIOCGIFBR */
+	/* 0x41 SIOCSIFBR */
+	/* 0x42 */ SIDEF_FUNC(SIOCGIFTXQLEN,	decode_get_ifreq),
+	/* 0x43 */ SIDEF_FUNC(SIOCSIFTXQLEN,	decode_set_ifreq),
+	/* 0x44 SIOCGIFDIVERT */
+	/* 0x45 SIOCSIFDIVERT */
+	/* 0x46 SIOCETHTOOL */
+	/* 0x47 SIOCGMIIPHY */
+	/* 0x48 SIOCGMIIREG */
+	/* 0x49 SIOCSMIIREG */
+	/* 0x4a SIOCWANDEV */
+	/* 0x4b SIOCOUTQNSD */
+	/* 0x4c SIOCGSKNS */
+	/* 0x4e .. 0x52 are not defined */
+	/* 0x53 SIOCDARP */
+	/* 0x54 SIOCGARP */
+	/* 0x55 SIOCSARP */
+	/* 0x56 .. 0x5f are not defined */
+	/* 0x60 SIOCDRARP */
+	/* 0x61 SIOCGRARP */
+	/* 0x62 SIOCSRARP */
+	/* 0x63 .. 0x6f are not defined */
+	/* 0x70 */ SIDEF_FUNC(SIOCGIFMAP,	decode_get_ifreq),
+	/* 0x71 */ SIDEF_FUNC(SIOCSIFMAP,	decode_set_ifreq),
+	/* 0x72 .. 0x7f are not defined */
+	/* 0x80 SIOCADDDLCI */
+	/* 0x81 SIOCDELDLCI */
+	/* 0x82 SIOCGIFVLAN */
+	/* 0x83 SIOCSIFVLAN */
+	/* 0x84 .. 0x8f are not defined */
+	/* 0x90 SIOCBONDENSLAVE */
+	/* 0x91 SIOCBONDRELEASE */
+	/* 0x92 SIOCBONDSETHWADDR */
+	/* 0x93 SIOCBONDSLAVEINFOQUERY */
+	/* 0x94 SIOCBONDINFOQUERY */
+	/* 0x95 SIOCBONDCHANGEACTIVE */
+	/* 0x96 .. 0x9f are not defined */
+	/* 0xa0 */ SIDEF_SET_STR(SIOCBRADDBR),
+	/* 0xa1 */ SIDEF_SET_STR(SIOCBRDELBR),
+	/* 0xa2 */ SIDEF_NONE(SIOCBRADDIF),
+	/* 0xa3 */ SIDEF_NONE(SIOCBRDELIF),
+	/* 0xa4 .. 0xaf are not defined */
+	/* 0xb0 SIOCSHWTSTAMP */
+	/* 0xb1 SIOCGHWTSTAMP */
+};
+
+/* sanity check */
+static_assert(ARRAY_SIZE(sock_decoders) < 200,
+	      "sock_decoders is unexpectedly large");
+
+static int
+handle_sock_ioc_decoder(const struct sock_decoder_desc *d, struct tcb *tcp,
+			const int fd, const unsigned int code,
+			const kernel_ulong_t arg)
+{
+	switch (d->type) {
+	case SIT_NONE:
+		return RVAL_IOCTL_DECODED;
+
+	case SIT_INT:
+	case SIT_STR:
+		tprints(", ");
+		if (entering(tcp) && !d->setter)
+			return 0;
+
+		if (d->type == SIT_INT)
+			printnum_int(tcp, arg, "%d");
+		else if (d->type == SIT_STR)
+			printstr(tcp, arg);
+
+		return RVAL_IOCTL_DECODED;
+
+	case SIT_FUNC:
+		return d->func(tcp, fd, code, arg);
+	default:
+		return RVAL_DECODED;
+	}
+}
+
+static int
+decode_sock_ioc(struct tcb *tcp, const int fd, const unsigned int code,
+		const kernel_ulong_t arg)
+{
+	if (code < SIOC_DEC_BASE
+	    || code >= SIOC_DEC_BASE + ARRAY_SIZE(sock_decoders))
+		return RVAL_DECODED;
+
+	return handle_sock_ioc_decoder(sock_decoders + (code - SIOC_DEC_BASE),
+				       tcp, fd, code, arg);
+
+}
+
 MPERS_PRINTER_DECL(int, sock_ioctl,
 		   struct tcb *tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
 {
+	enum {
+		SET_PID,
+		GET_PID,
+		GET_ATMARK,
+	};
+
+	static const struct sock_decoder_desc descs[] = {
+		[SET_PID]	= { .type = SIT_INT, .setter = 1 },
+		[GET_PID]	= { .type = SIT_INT, .setter = 0 },
+		[GET_ATMARK]	= { .type = SIT_INT, .setter = 0 },
+	};
+
 	int fd = tcp->u_arg[0];
 
+	/* ioctls that have _IOC_TYPE other than 0x89 on some architectures */
 	switch (code) {
-	case SIOCGIFCONF:
-		return decode_ifconf(tcp, fd, code, arg);
-
-	case SIOCBRADDBR:
-	case SIOCBRDELBR:
-		tprints(", ");
-		printstr(tcp, arg);
-		break;
-
 	case FIOSETOWN:
 	case SIOCSPGRP:
-		tprints(", ");
-		printnum_int(tcp, arg, "%d");
-		break;
+		return handle_sock_ioc_decoder(descs + SET_PID,
+					       tcp, fd, code, arg);
 
 	case FIOGETOWN:
 	case SIOCGPGRP:
+		return handle_sock_ioc_decoder(descs + GET_PID,
+					       tcp, fd, code, arg);
 	case SIOCATMARK:
-		if (entering(tcp))
-			return 0;
-		tprints(", ");
-		printnum_int(tcp, arg, "%d");
-		break;
+		return handle_sock_ioc_decoder(descs + GET_ATMARK,
+					       tcp, fd, code, arg);
 
-	case SIOCBRADDIF:
-	case SIOCBRDELIF:
-		/* no arguments */
-		break;
-
-	case SIOCSIFNAME:
-	case SIOCSIFADDR:
-	case SIOCSIFDSTADDR:
-	case SIOCSIFBRDADDR:
-	case SIOCSIFNETMASK:
-	case SIOCSIFFLAGS:
-	case SIOCSIFMETRIC:
-	case SIOCSIFMTU:
-	case SIOCSIFSLAVE:
-	case SIOCSIFHWADDR:
-	case SIOCSIFTXQLEN:
-	case SIOCSIFMAP:
-		return decode_set_ifreq(tcp, fd, code, arg);
-
-	case SIOCGIFNAME:
-	case SIOCGIFINDEX:
-	case SIOCGIFADDR:
-	case SIOCGIFDSTADDR:
-	case SIOCGIFBRDADDR:
-	case SIOCGIFNETMASK:
-	case SIOCGIFFLAGS:
-	case SIOCGIFMETRIC:
-	case SIOCGIFMTU:
-	case SIOCGIFSLAVE:
-	case SIOCGIFHWADDR:
-	case SIOCGIFTXQLEN:
-	case SIOCGIFMAP:
-		return decode_get_ifreq(tcp, fd, code, arg);
-
-	case SIOCADDRT:
-	case SIOCDELRT:
-		return decode_route_ioc(tcp, fd, code, arg);
-
+	/* case SIOCGSTAMP: */
+	/* case SIOCGSTAMPNS: */
 	default:
-		return RVAL_DECODED;
+		return decode_sock_ioc(tcp, fd, code, arg);
 	}
 
 	return RVAL_IOCTL_DECODED;
