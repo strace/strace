@@ -329,8 +329,9 @@ printaddr64(const uint64_t addr)
 
 #define DEF_PRINTNUM(name, type) \
 bool									\
-printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
-		  const char *const fmt)				\
+printnum_ ## name ## _ex(struct tcb *const tcp,				\
+			 const kernel_ulong_t addr,			\
+			 bool addr_cmnt, const char *const fmt)		\
 {									\
 	type num;							\
 	if (umove_or_printaddr(tcp, addr, &num))			\
@@ -338,8 +339,17 @@ printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	tprints("[");							\
 	tprintf(fmt, num);						\
 	tprints("]");							\
+	if (addr_cmnt)							\
+		printaddr_comment(addr);				\
 	return true;							\
+}									\
+bool									\
+printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
+		  const char *const fmt)				\
+{									\
+	return(printnum_ ## name ## _ex(tcp, addr, false, fmt));	\
 }
+
 
 #define DEF_PRINTNUM_ADDR(name, type) \
 bool									\
