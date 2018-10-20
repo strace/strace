@@ -470,6 +470,7 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_sctp_options.h"
 #include "xlat/sock_tcp_options.h"
 #include "xlat/sock_udp_options.h"
+#include "xlat/sock_can_raw_options.h"
 #include "xlat/sock_irda_options.h"
 #include "xlat/sock_llc_options.h"
 #include "xlat/sock_dccp_options.h"
@@ -523,6 +524,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_TCP:
 		printxval(sock_tcp_options, name, "TCP_???");
+		break;
+	case SOL_CAN_RAW:
+		printxval(sock_can_raw_options, name, "CAN_RAW_???");
 		break;
 	case SOL_SCTP:
 		printxval(sock_sctp_options, name, "SCTP_???");
