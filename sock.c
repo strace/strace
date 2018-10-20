@@ -585,6 +585,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		uint32_t family = MAX(get_family_by_proto(proto), 0);
 
 		if (family < ARRAY_SIZE(handlers) && handlers[family]) {
+			tprints(", ");
 			handlers[family](tcp, arg);
 			break;
 		}
