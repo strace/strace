@@ -20,7 +20,7 @@ SYS_FUNC(sync_file_range2)
 	printflags(sync_file_range_flags, tcp->u_arg[1],
 		   "SYNC_FILE_RANGE_???");
 	argn = printllval(tcp, ", %lld, ", 2);
-	argn = printllval(tcp, "%lld", argn);
+	printllval(tcp, "%lld", argn);
 
 	return RVAL_DECODED;
 }
