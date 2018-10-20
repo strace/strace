@@ -176,7 +176,7 @@ decode_set_ifreq(struct tcb *tcp, const int fd, const unsigned int code,
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, arg, &ifr))
-		break;
+		return RVAL_IOCTL_DECODED;
 
 	tprints("{ifr_name=");
 	print_ifname(ifr.ifr_name);
@@ -201,7 +201,7 @@ decode_get_ifreq(struct tcb *tcp, const int fd, const unsigned int code,
 	if (entering(tcp)) {
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &ifr))
-			break;
+			return RVAL_IOCTL_DECODED;
 
 		if (SIOCGIFNAME == code) {
 			tprintf("{ifr_index=%d", ifr.ifr_ifindex);
@@ -221,7 +221,6 @@ decode_get_ifreq(struct tcb *tcp, const int fd, const unsigned int code,
 	if (umove(tcp, arg, &ifr) < 0) {
 		tprints("???}");
 		return RVAL_IOCTL_DECODED;
-	}
 	}
 
 	if (SIOCGIFNAME == code) {
@@ -251,7 +250,7 @@ decode_get_ifreq(struct tcb *tcp, const int fd, const unsigned int code,
  */
 static int
 decode_ifconf(struct tcb *const tcp, const int fd, const unsigned int code,
-	      uconst kernel_ulong_t addr)
+	      const kernel_ulong_t addr)
 {
 	struct_ifconf *entering_ifc = NULL;
 	struct_ifconf *ifc =
@@ -533,7 +532,8 @@ decode_route_ioc(struct tcb *tcp, const int fd, const unsigned int code,
 	if (family < ARRAY_SIZE(handlers) && handlers[family]) {
 		tprints(", ");
 		handlers[family](tcp, arg);
-		break;
+
+		return RVAL_IOCTL_DECODED;
 	}
 
 	return RVAL_DECODED;
@@ -543,6 +543,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		   struct tcb *tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
 {
+	int fd = tcp->u_arg[0];
 
 	switch (code) {
 	case SIOCGIFCONF:
