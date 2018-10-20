@@ -167,6 +167,74 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	return true;
 }
 
+static int
+decode_set_ifreq(struct tcb *tcp, const int fd, const unsigned int code,
+		 const kernel_ulong_t arg)
+{
+	struct_ifreq ifr;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, arg, &ifr))
+		break;
+
+	tprints("{ifr_name=");
+	print_ifname(ifr.ifr_name);
+	tprints(", ");
+	if (code == SIOCSIFNAME) {
+		tprints("ifr_newname=");
+		print_ifname(ifr.ifr_newname);
+	} else {
+		print_ifreq(tcp, code, arg, &ifr);
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
+decode_get_ifreq(struct tcb *tcp, const int fd, const unsigned int code,
+		 const kernel_ulong_t arg)
+{
+	struct_ifreq ifr;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &ifr))
+			break;
+
+		if (SIOCGIFNAME == code) {
+			tprintf("{ifr_index=%d", ifr.ifr_ifindex);
+		} else {
+			tprints("{ifr_name=");
+			print_ifname(ifr.ifr_name);
+		}
+		return 0;
+	}
+
+	if (syserror(tcp)) {
+		tprints("}");
+		return RVAL_IOCTL_DECODED;
+	}
+
+	tprints(", ");
+	if (umove(tcp, arg, &ifr) < 0) {
+		tprints("???}");
+		return RVAL_IOCTL_DECODED;
+	}
+	}
+
+	if (SIOCGIFNAME == code) {
+		tprints("ifr_name=");
+		print_ifname(ifr.ifr_name);
+	} else {
+		print_ifreq(tcp, code, arg, &ifr);
+	}
+
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
 /*
  * There are two different modes of operation:
  *
@@ -181,7 +249,8 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
  * implementation does not touch it.
  */
 static int
-decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
+decode_ifconf(struct tcb *const tcp, const int fd, const unsigned int code,
+	      uconst kernel_ulong_t addr)
 {
 	struct_ifconf *entering_ifc = NULL;
 	struct_ifconf *ifc =
@@ -433,15 +502,50 @@ decode_rose_route_struct(struct tcb *tcp, kernel_ulong_t arg)
 	tprints("}");
 }
 
+static int
+decode_route_ioc(struct tcb *tcp, const int fd, const unsigned int code,
+		 const kernel_ulong_t arg)
+{
+	typedef void (* handler)(struct tcb *tcp, kernel_ulong_t addr);
+
+	/*
+	 * Decoding of the argument depends on the network protocol
+	 * of the socket associated fd they're called on.
+	 * Unfortunately, we can't get it right away, so we should derive it
+	 * from the socket protocol.
+	 */
+	static const handler handlers[] = {
+		[AF_INET]	= decode_rtentry,
+		[AF_AX25]	= decode_ax25_routes_struct,
+		/* packet_ioctl explicitly calls inet_dgram_ops.ioctl */
+		[AF_APPLETALK]	= decode_rtentry,
+		[AF_NETROM]	= decode_nr_route_struct,
+		[AF_X25]	= decode_x25_route_struct,
+		[AF_INET6]	= decode_in6_rtmsg,
+		[AF_ROSE]	= decode_rose_route_struct,
+		[AF_PACKET]	= decode_rtentry,
+	};
+
+	enum sock_proto proto = getfdproto(tcp, fd);
+	uint32_t family = MAX(get_family_by_proto(proto), 0);
+
+	if (family < ARRAY_SIZE(handlers) && handlers[family]) {
+		tprints(", ");
+		handlers[family](tcp, arg);
+		break;
+	}
+
+	return RVAL_DECODED;
+}
+
 MPERS_PRINTER_DECL(int, sock_ioctl,
 		   struct tcb *tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
 {
-	struct_ifreq ifr;
 
 	switch (code) {
 	case SIOCGIFCONF:
-		return decode_ifconf(tcp, arg);
+		return decode_ifconf(tcp, fd, code, arg);
 
 #ifdef SIOCBRADDBR
 	case SIOCBRADDBR:
@@ -497,21 +601,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCSIFHWADDR:
 	case SIOCSIFTXQLEN:
 	case SIOCSIFMAP:
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &ifr))
-			break;
-
-		tprints("{ifr_name=");
-		print_ifname(ifr.ifr_name);
-		tprints(", ");
-		if (code == SIOCSIFNAME) {
-			tprints("ifr_newname=");
-			print_ifname(ifr.ifr_newname);
-		} else {
-			print_ifreq(tcp, code, arg, &ifr);
-		}
-		tprints("}");
-		break;
+		return decode_set_ifreq(tcp, fd, code, arg);
 
 	case SIOCGIFNAME:
 	case SIOCGIFINDEX:
@@ -526,72 +616,11 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCGIFHWADDR:
 	case SIOCGIFTXQLEN:
 	case SIOCGIFMAP:
-		if (entering(tcp)) {
-			tprints(", ");
-			if (umove_or_printaddr(tcp, arg, &ifr))
-				break;
+		return decode_get_ifreq(tcp, fd, code, arg);
 
-			if (SIOCGIFNAME == code) {
-				tprintf("{ifr_index=%d", ifr.ifr_ifindex);
-			} else {
-				tprints("{ifr_name=");
-				print_ifname(ifr.ifr_name);
-			}
-			return 0;
-		} else {
-			if (syserror(tcp)) {
-				tprints("}");
-				break;
-			}
-
-			tprints(", ");
-			if (umove(tcp, arg, &ifr) < 0) {
-				tprints("???}");
-				break;
-			}
-
-			if (SIOCGIFNAME == code) {
-				tprints("ifr_name=");
-				print_ifname(ifr.ifr_name);
-			} else {
-				print_ifreq(tcp, code, arg, &ifr);
-			}
-			tprints("}");
-			break;
-		}
-
-	/*
-	 * These two depend on the network protocol of the fd they're called.
-	 * Unfortunately, we can't get it right away, so we should derive from
-	 * the socket protocol.
-	 */
 	case SIOCADDRT:
-	case SIOCDELRT: {
-		typedef void (* handler)(struct tcb *tcp, kernel_ulong_t addr);
-
-		static const handler handlers[] = {
-			[AF_INET]	= decode_rtentry,
-			[AF_AX25]	= decode_ax25_routes_struct,
-			/* packet_ioctl explicitly calls inet_dgram_ops.ioctl */
-			[AF_APPLETALK]	= decode_rtentry,
-			[AF_NETROM]	= decode_nr_route_struct,
-			[AF_X25]	= decode_x25_route_struct,
-			[AF_INET6]	= decode_in6_rtmsg,
-			[AF_ROSE]	= decode_rose_route_struct,
-			[AF_PACKET]	= decode_rtentry,
-		};
-
-		enum sock_proto proto = getfdproto(tcp, tcp->u_arg[0]);
-		uint32_t family = MAX(get_family_by_proto(proto), 0);
-
-		if (family < ARRAY_SIZE(handlers) && handlers[family]) {
-			tprints(", ");
-			handlers[family](tcp, arg);
-			break;
-		}
-
-		return RVAL_DECODED;
-	}
+	case SIOCDELRT:
+		return decode_route_ioc(tcp, fd, code, arg);
 
 	default:
 		return RVAL_DECODED;
