@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Updated lists of ioctl commands from Linux 4.19.
+
 Noteworthy changes in release 4.24 (2018-08-14)
 ===============================================
 
