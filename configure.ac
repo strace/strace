@@ -934,8 +934,16 @@ AC_ARG_ENABLE([mpers],
 	 esac],
 	[enable_mpers=yes])
 
-st_MPERS([m32], [aarch64|powerpc64|riscv|s390x|sparc64|tile|x32|x86_64])
-st_MPERS([mx32], [x86_64])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(, [[#include "linux/]]$arch[[/arch_defs_.h"
+			     #include "linux/arch_defs_.h"
+			     int i[SUPPORTED_PERSONALITIES > 1 ? 1 : -1];]])],
+	[st_MPERS([m32], ["$arch"])])
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM(, [[#include "linux/]]$arch[[/arch_defs_.h"
+			     #include "linux/arch_defs_.h"
+			     int i[SUPPORTED_PERSONALITIES > 2 ? 1 : -1];]])],
+	[st_MPERS([mx32], ["$arch"])])
 
 AX_VALGRIND_DFLT([sgcheck], [off])
 AX_VALGRIND_CHECK
