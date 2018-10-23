@@ -265,6 +265,7 @@ strace_SOURCES =	\
 	process.c	\
 	process_vm.c	\
 	ptp.c		\
+	ptp_clock.h	\
 	ptrace.h	\
 	quota.c		\
 	readahead.c	\
@@ -363,7 +364,10 @@ strace_SOURCES =	\
 	$(strace_SOURCES_check) \
 	# end of strace_SOURCES
 
-strace_SOURCES_check = bpf_attr_check.c
+strace_SOURCES_check = \
+	bpf_attr_check.c	\
+	ptp_clock_check.c	\
+	# end of strace_SOURCES_check
 
 if ENABLE_STACKTRACE
 strace_SOURCES += unwind.c unwind.h
@@ -422,6 +426,7 @@ EXTRA_DIST =				\
 	debian/strace64.manpages	\
 	debian/watch			\
 	gen_bpf_attr_check.sh		\
+	gen_ptp_clock_check.sh		\
 	generate_sen.sh			\
 	ioctl_iocdef.c			\
 	ioctlsort.c			\
@@ -966,6 +971,9 @@ $(srcdir)/.version:
 bpf_attr_check.c: $(srcdir)/bpf_attr.h $(srcdir)/gen_bpf_attr_check.sh
 	$(srcdir)/gen_bpf_attr_check.sh $< > $@-t && mv $@-t $@
 
+ptp_clock_check.c: $(srcdir)/ptp_clock.h $(srcdir)/gen_ptp_clock_check.sh
+	$(srcdir)/gen_ptp_clock_check.sh $< > $@-t && mv $@-t $@
+
 strace_SOURCES_c = \
 	$(filter %.c,$(strace_SOURCES)) $(filter %.c,$(libstrace_a_SOURCES))
 
@@ -1045,11 +1053,11 @@ ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioc
 
 BUILT_SOURCES = $(ioctl_redefs_h) $(ioctlent_h) \
 		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
-		printers.h sen.h sys_func.h .version
+		printers.h ptp_clock_check.c sen.h sys_func.h .version
 CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
 		ioctl_iocdef.h ioctl_iocdef.i \
 		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
-		printers.h sen.h sys_func.h
+		printers.h ptp_clock_check.c sen.h sys_func.h
 DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h linux/linux/signal.h
 
 include scno.am
