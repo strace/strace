@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Enhanced decoding of PTP_* ioctl commands.
 
 * Bug fixes
 

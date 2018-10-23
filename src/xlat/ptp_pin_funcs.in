@@ -1,0 +1,6 @@
+#enum
+#value_indexed
+PTP_PF_NONE	0
+PTP_PF_EXTTS	1
+PTP_PF_PEROUT	2
+PTP_PF_PHYSYNC	3

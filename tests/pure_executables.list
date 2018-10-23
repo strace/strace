@@ -230,6 +230,9 @@ ioctl_mtd
 ioctl_nbd
 ioctl_perf
 ioctl_ptp
+ioctl_ptp-Xabbrev
+ioctl_ptp-Xraw
+ioctl_ptp-Xverbose
 ioctl_random
 ioctl_rtc
 ioctl_scsi

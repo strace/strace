@@ -349,6 +349,13 @@ ioctl_nsfs
 ioctl_perf
 ioctl_perf-success
 ioctl_ptp
+ioctl_ptp-Xabbrev
+ioctl_ptp-Xraw
+ioctl_ptp-Xverbose
+ioctl_ptp-success
+ioctl_ptp-success-Xabbrev
+ioctl_ptp-success-Xraw
+ioctl_ptp-success-Xverbose
 ioctl_random
 ioctl_rtc
 ioctl_rtc-success
