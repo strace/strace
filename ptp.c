@@ -29,13 +29,43 @@
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
+#include <linux/ioctl.h>
 
-# include <linux/ioctl.h>
-# include <linux/ptp_clock.h>
+#include "print_fields.h"
+#include "ptp_clock.h"
 
-# include "print_fields.h"
-# include "xlat/ptp_flags_options.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/ptp_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
+
+#include "xlat/ptp_flags_options.h"
+#include "xlat/ptp_pin_funcs.h"
+
+static void
+print_ptp_clock_time(const char *prefix, struct strace_ptp_clock_time *t,
+		     bool rtc)
+{
+	if (prefix && prefix[0])
+		tprints(prefix);
+
+	PRINT_FIELD_D("{", *t, sec);
+	PRINT_FIELD_U(", ", *t, nsec);
+	if (t->reserved)
+		PRINT_FIELD_X(", ", *t, reserved);
+	tprints("}");
+
+	if (rtc && xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW)
+		tprints_comment(sprinttime_nsec(t->sec, t->nsec));
+}
+
+#define PRINT_FIELD_PTP_CLOCK_TIME(prefix_, where_, field_, rtc_) \
+	print_ptp_clock_time(prefix_ #field_ "=", &((where_).field_), (rtc_))
+
+#define PRINT_FIELD_RSV(prefix_, where_, field_) \
+	do { \
+		if (!IS_ARRAY_ZERO(where_.field_)) \
+			PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_); \
+	} while (0)
 
 int
 ptp_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -46,41 +76,43 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	switch (code) {
 	case PTP_EXTTS_REQUEST: {
-		struct ptp_extts_request extts;
+		struct strace_ptp_extts_request extts;
 
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &extts))
 			break;
 
-		PRINT_FIELD_D("{", extts, index);
-		PRINT_FIELD_FLAGS(", ", extts, flags, ptp_flags_options, "PTP_???");
+		PRINT_FIELD_U("{", extts, index);
+		PRINT_FIELD_FLAGS(", ", extts, flags, ptp_flags_options,
+				  "PTP_???");
+		PRINT_FIELD_RSV(", ", extts, rsv);
 		tprints("}");
 		break;
 	}
 
 	case PTP_PEROUT_REQUEST: {
-		struct ptp_perout_request perout;
+		struct strace_ptp_perout_request perout;
 
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &perout))
 			break;
 
-		PRINT_FIELD_D("{start={", perout.start, sec);
-		PRINT_FIELD_U(", ", perout.start, nsec);
-		PRINT_FIELD_D("}, period={", perout.period, sec);
-		PRINT_FIELD_U(", ", perout.period, nsec);
-		PRINT_FIELD_D("}, ", perout, index);
-		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_flags_options, "PTP_???");
+		PRINT_FIELD_PTP_CLOCK_TIME("{", perout, start, true);
+		PRINT_FIELD_PTP_CLOCK_TIME(", ", perout, period, false);
+		PRINT_FIELD_D(", ", perout, index);
+		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_flags_options,
+				  "PTP_???");
+		PRINT_FIELD_RSV(", ", perout, rsv);
 		tprints("}");
 		break;
 	}
 
 	case PTP_ENABLE_PPS:
-		tprintf(", %" PRI_kld, arg);
+		tprintf(", %" PRI_klu, arg);
 		break;
 
 	case PTP_SYS_OFFSET: {
-		struct ptp_sys_offset sysoff;
+		struct strace_ptp_sys_offset sysoff;
 
 		if (entering(tcp)) {
 			tprints(", ");
@@ -89,43 +121,64 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 
 			PRINT_FIELD_U("{", sysoff, n_samples);
 			return 0;
-		} else {
-			unsigned int n_samples, i;
+		}
 
-			if (syserror(tcp)) {
-				tprints("}");
-				break;
-			}
-
-			tprints(", ");
-			if (umove(tcp, arg, &sysoff) < 0) {
-				tprints("???}");
-				break;
-			}
-
-			tprints("ts=[");
-			n_samples = sysoff.n_samples > PTP_MAX_SAMPLES ?
-				PTP_MAX_SAMPLES : sysoff.n_samples;
-			for (i = 0; i < 2 * n_samples + 1; ++i) {
-				if (i > 0)
-					tprints(", ");
-				PRINT_FIELD_D("{", sysoff.ts[i], sec);
-				PRINT_FIELD_U(", ", sysoff.ts[i], nsec);
-				tprints("}");
-			}
-			if (sysoff.n_samples > PTP_MAX_SAMPLES)
-				tprints(", ...");
-			tprints("]}");
+		if (syserror(tcp)) {
+			tprints("}");
 			break;
 		}
+
+		if (umove(tcp, arg, &sysoff) < 0) {
+			tprints(", ???}");
+			break;
+		}
+
+		PRINT_FIELD_RSV(", ", sysoff, rsv);
+
+		tprints(", ts=[");
+		unsigned int n_samples = sysoff.n_samples > PTP_MAX_SAMPLES ?
+			PTP_MAX_SAMPLES : sysoff.n_samples;
+		for (unsigned int i = 0; i < 2 * n_samples + 1; ++i) {
+			print_ptp_clock_time(i ? ", " : "",
+					     sysoff.ts + i, true);
+		}
+		if (sysoff.n_samples > PTP_MAX_SAMPLES)
+			tprints(", ...");
+		tprints("]}");
+		break;
+	}
+
+	case PTP_SYS_OFFSET_PRECISE: {
+		struct strace_ptp_sys_offset_precise sysoff;
+
+		if (entering(tcp)) {
+			tprints(", ");
+			return 0;
+		}
+
+		if (syserror(tcp)) {
+			tprints("}");
+			break;
+		}
+
+		if (umove_or_printaddr(tcp, arg, &sysoff))
+			break;
+
+		PRINT_FIELD_PTP_CLOCK_TIME("{", sysoff, device, true);
+		PRINT_FIELD_PTP_CLOCK_TIME(", ", sysoff, sys_realtime, true);
+		PRINT_FIELD_PTP_CLOCK_TIME(", ", sysoff, sys_monoraw, true);
+		PRINT_FIELD_RSV(", ", sysoff, rsv);
+		tprints("}");
+		break;
 	}
 	case PTP_CLOCK_GETCAPS: {
-		struct ptp_clock_caps caps;
+		struct strace_ptp_clock_caps caps;
 
-		if (entering(tcp))
+		if (entering(tcp)) {
+			tprints(", ");
 			return 0;
+		}
 
-		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &caps))
 			break;
 
@@ -134,6 +187,45 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_D(", ", caps, n_ext_ts);
 		PRINT_FIELD_D(", ", caps, n_per_out);
 		PRINT_FIELD_D(", ", caps, pps);
+		PRINT_FIELD_D(", ", caps, n_pins);
+		PRINT_FIELD_D(", ", caps, cross_timestamping);
+		PRINT_FIELD_RSV(", ", caps, rsv);
+		tprints("}");
+		break;
+	}
+
+	case PTP_PIN_GETFUNC:
+	case PTP_PIN_SETFUNC: {
+		struct strace_ptp_pin_desc pinfunc;
+
+		if (entering(tcp)) {
+			tprints(", ");
+
+			if (umove_or_printaddr(tcp, arg, &pinfunc))
+				break;
+
+			PRINT_FIELD_U("{", pinfunc, index);
+
+			if (code == PTP_PIN_GETFUNC)
+				return 0;
+		} else /* getter syscall exit */ {
+			if (syserror(tcp)) {
+				tprints("}");
+				break;
+			}
+
+			if (umove(tcp, arg, &pinfunc) < 0) {
+				tprints(", ???}");
+				break;
+			}
+		}
+
+		/* setter syscall enter or getter syscall exit */
+		PRINT_FIELD_CSTRING(", ", pinfunc, name);
+		PRINT_FIELD_XVAL(", ", pinfunc, func, ptp_pin_funcs,
+				 "PTP_PF_???");
+		PRINT_FIELD_U(", ", pinfunc, chan);
+		PRINT_FIELD_RSV(", ", pinfunc, rsv);
 		tprints("}");
 		break;
 	}
@@ -144,5 +236,3 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#endif /* HAVE_STRUCT_PTP_SYS_OFFSET */

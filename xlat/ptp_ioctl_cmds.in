@@ -1,0 +1,8 @@
+PTP_CLOCK_GETCAPS	_IOR (PTP_CLK_MAGIC, 1, struct strace_ptp_clock_caps)
+PTP_EXTTS_REQUEST	_IOW (PTP_CLK_MAGIC, 2, struct strace_ptp_extts_request)
+PTP_PEROUT_REQUEST	_IOW (PTP_CLK_MAGIC, 3, struct strace_ptp_perout_request)
+PTP_ENABLE_PPS		_IOW (PTP_CLK_MAGIC, 4, int)
+PTP_SYS_OFFSET		_IOW (PTP_CLK_MAGIC, 5, struct strace_ptp_sys_offset)
+PTP_PIN_GETFUNC		_IOWR(PTP_CLK_MAGIC, 6, struct strace_ptp_pin_desc)
+PTP_PIN_SETFUNC		_IOW (PTP_CLK_MAGIC, 7, struct strace_ptp_pin_desc)
+PTP_SYS_OFFSET_PRECISE	_IOWR(PTP_CLK_MAGIC, 8, struct strace_ptp_sys_offset_precise)
