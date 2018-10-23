@@ -366,7 +366,14 @@ ioctl_nbd	+ioctl.test -y
 ioctl_nsfs	+ioctl.test -esignal=none
 ioctl_perf	+ioctl.test
 ioctl_perf-success +ioctl-success.sh -a35
-ioctl_ptp	+ioctl.test
+ioctl_ptp			+ioctl.test -a29
+ioctl_ptp-Xabbrev		+ioctl.test -a29 -Xabbrev
+ioctl_ptp-Xraw			+ioctl.test -a20 -s51 -Xraw
+ioctl_ptp-Xverbose		+ioctl.test -a46 -s51 -Xverbose
+ioctl_ptp-success		+ioctl-success.sh -a29
+ioctl_ptp-success-Xabbrev	+ioctl-success.sh -a29 -Xabbrev
+ioctl_ptp-success-Xraw		+ioctl-success.sh -a20 -s51 -Xraw
+ioctl_ptp-success-Xverbose	+ioctl-success.sh -a46 -s51 -Xverbose
 ioctl_random	+ioctl.test
 ioctl_rtc	+ioctl.test
 ioctl_rtc-success	+ioctl-success.sh -a22
