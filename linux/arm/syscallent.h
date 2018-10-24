@@ -424,11 +424,12 @@
 [396] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [397] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [398] = { 4,	0,		SEN(rseq),			"rseq"			},
+[399] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 
 #ifdef __ARM_EABI__
-# define ARM_FIRST_SHUFFLED_SYSCALL 400
+# define ARM_FIRST_SHUFFLED_SYSCALL 500
 #else
-# define SYS_socket_subcall	400
+# define SYS_socket_subcall	500
 # include "subcall.h"
 # define ARM_FIRST_SHUFFLED_SYSCALL (SYS_ipc_subcall + SYS_ipc_nsubcalls)
 #endif /* !__ARM_EABI__ */

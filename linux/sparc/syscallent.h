@@ -359,6 +359,7 @@
 [358] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [359] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [360] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[361] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 
 #define SYS_socket_subcall	400
 #include "subcall.h"
