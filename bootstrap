@@ -1,6 +1,9 @@
 #!/bin/sh -eu
 
+export LANG=C
+
 ./m4/gen_bpf_attr_m4.sh
+./m4/gen_ptp_clock_m4.sh
 ./generate_mpers_am.sh
 ./xlat/gen.sh
 ./tests/gen_pure_executables.sh
