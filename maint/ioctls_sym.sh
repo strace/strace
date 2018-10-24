@@ -414,6 +414,10 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			esac
 			sed -r -i "/[[:space:]]($list)[[:space:]]/d" "$tmpdir"/header.out
 			;;
+		*linux/v4l2-subdev.h)
+			sed -r -i '/[[:space:]]VIDIOC_SUBDEV_(DV_TIMINGS_CAP|ENUM_DV_TIMINGS|ENUMSTD|G_DV_TIMINGS|G_EDID|G_STD|QUERY_DV_TIMINGS|QUERYSTD|S_DV_TIMINGS|S_EDID|S_STD)[[:space:]]/d' \
+				"$tmpdir"/header.out
+			;;
 	esac
 
 	# Need to exclude ioctl commands defined elsewhere.
