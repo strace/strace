@@ -34,6 +34,7 @@
 
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"
+#include "xlat/fcntl_rw_hints.h"
 #include "xlat/fcntlcmds.h"
 #include "xlat/fdflags.h"
 #include "xlat/lockfcmds.h"
@@ -82,6 +83,19 @@ print_f_owner_ex(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("{type=");
 	printxval(f_owner_types, owner.type, "F_OWNER_???");
 	tprintf(", pid=%d}", owner.pid);
+}
+
+static void
+print_rwhint(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	uint64_t hint;
+
+	if (umove_or_printaddr(tcp, addr, &hint))
+		return;
+
+	tprints("[");
+	printxval(fcntl_rw_hints, hint, "RWH_WRITE_LIFE_???");
+	tprints("]");
 }
 
 static int
@@ -136,6 +150,11 @@ print_fcntl(struct tcb *tcp)
 		tprints(", ");
 		printsignal(tcp->u_arg[2]);
 		break;
+	case F_SET_RW_HINT:
+	case F_SET_FILE_RW_HINT:
+		tprints(", ");
+		print_rwhint(tcp, tcp->u_arg[2]);
+		break;
 	case F_GETOWN:
 	case F_GETPIPE_SZ:
 		break;
@@ -179,6 +198,14 @@ print_fcntl(struct tcb *tcp)
 		tcp->auxstr = sprintflags("seals ", f_seals,
 					  (kernel_ulong_t) tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
+	case F_GET_RW_HINT:
+	case F_GET_FILE_RW_HINT:
+		if (entering(tcp)) {
+			tprints(", ");
+			return 0;
+		}
+		print_rwhint(tcp, tcp->u_arg[2]);
+		break;
 	case F_GETSIG:
 		if (entering(tcp) || syserror(tcp) || tcp->u_rval == 0)
 			return 0;
