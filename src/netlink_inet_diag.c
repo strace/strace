@@ -16,6 +16,7 @@
 
 #include <linux/sock_diag.h>
 #include <linux/inet_diag.h>
+#include <linux/tcp.h>
 
 #include "xlat/inet_diag_attrs.h"
 #include "xlat/inet_diag_bytecodes.h"
@@ -25,6 +26,7 @@
 
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
+
 
 void
 print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
@@ -433,6 +435,48 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+print_tcp_md5sig(struct tcb *const tcp, void *const elem_buf,
+		 const size_t elem_size, void *const data)
+{
+	const struct tcp_diag_md5sig *const sig =
+			(const struct tcp_diag_md5sig *) elem_buf;
+
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*sig, tcpm_family, addrfams, "AF_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(*sig, tcpm_prefixlen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sig, tcpm_keylen);
+	tprint_struct_next();
+	PRINT_FIELD_INET_ADDR(*sig, tcpm_addr, sig->tcpm_family);
+	tprint_struct_next();
+	PRINT_FIELD_HEX_ARRAY_UPTO(*sig, tcpm_key,
+				   MIN(sizeof(sig->tcpm_key),
+				       sig->tcpm_keylen));
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_tcp_md5sig(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	struct tcp_diag_md5sig sig;
+	const size_t nmemb = len / sizeof(sig);
+
+	if (!nmemb)
+		return false;
+
+	print_array(tcp, addr, nmemb, &sig, sizeof(sig),
+		    tfetch_mem, print_tcp_md5sig, 0);
+
+	return true;
+}
+
 static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_MEMINFO]	= decode_inet_diag_meminfo,
 	[INET_DIAG_INFO]	= NULL,			/* unimplemented */
@@ -450,7 +494,8 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_PAD]		= NULL,
 	[INET_DIAG_MARK]	= decode_nla_u32,
 	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info,
-	[INET_DIAG_CLASS_ID]	= decode_nla_u32
+	[INET_DIAG_CLASS_ID]	= decode_nla_u32,
+	[INET_DIAG_MD5SIG]	= decode_tcp_md5sig,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)

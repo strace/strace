@@ -17,6 +17,17 @@
 #include <linux/inet_diag.h>
 #include <linux/sock_diag.h>
 
+
+#ifndef HAVE_STRUCT_TCP_DIAG_MD5SIG
+struct tcp_diag_md5sig {
+	__u8	tcpm_family;
+	__u8	tcpm_prefixlen;
+	__u16	tcpm_keylen;
+	__be32	tcpm_addr[4];
+	__u8	tcpm_key[80 /* TCP_MD5SIG_MAXKEYLEN */];
+};
+#endif
+
 static const char * const sk_meminfo_strs[] = {
 	"SK_MEMINFO_RMEM_ALLOC",
 	"SK_MEMINFO_RCVBUF",
@@ -78,6 +89,51 @@ print_uint(const unsigned int *p, size_t i)
 		printf("[%s", sk_meminfo_strs[i]);
 
 	printf("] = %u", *p);
+}
+
+static const struct {
+	struct tcp_diag_md5sig val;
+	const char *str;
+} md5sig_vecs[] = {
+	{ { 0 },
+	  "{tcpm_family=AF_UNSPEC, tcpm_prefixlen=0, tcpm_keylen=0"
+	  ", tcpm_addr=\"\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
+	  "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\", tcpm_key=\"\"}" },
+	{ { AF_INET, 0x42, 1, { BE_LE(0xdeadface, 0xcefaedde) } },
+	  "{tcpm_family=AF_INET, tcpm_prefixlen=66, tcpm_keylen=1"
+	  ", tcpm_addr=inet_addr(\"222.237.250.206\")"
+	  ", tcpm_key=\"\\x00\"}" },
+	{ { AF_INET6, 0xbe, 42,
+	    { BE_LE(0xdeadface, 0xcefaadde), BE_LE(0xcafe0000, 0xfeca),
+	      BE_LE(0xface, 0xcefa0000), BE_LE(0xbadc0ded, 0xed0cdcba) },
+	    "OH HAI THAR\0\1\2\3\4\5\6\7\3779876543210abcdefghijklmnopqrstuv" },
+	  "{tcpm_family=AF_INET6, tcpm_prefixlen=190, tcpm_keylen=42"
+	  ", inet_pton(AF_INET6, \"dead:face:cafe::face:badc:ced\", &tcpm_addr)"
+	  ", tcpm_key=\"\\x4f\\x48\\x20\\x48\\x41\\x49\\x20\\x54\\x48\\x41"
+	  "\\x52\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\xff\\x39\\x38\\x37"
+	  "\\x36\\x35\\x34\\x33\\x32\\x31\\x30\\x61\\x62\\x63\\x64\\x65\\x66"
+	  "\\x67\\x68\\x69\\x6a\\x6b\\x6c\"}" },
+	{ { 46, 0, 45067,
+	    { BE_LE(0xdeadface, 0xcefaadde), BE_LE(0xcafe0000, 0xfeca),
+	      BE_LE(0xface, 0xcefa0000), BE_LE(0xbadc0ded, 0xed0cdcba) },
+	    "OH HAI THAR\0\1\2\3\4\5\6\7\3779876543210abcdefghijklmnopqrstuv"
+	    "xyz0123456789ABCDEFGHIJKLMNO" },
+	  "{tcpm_family=0x2e /* AF_??? */, tcpm_prefixlen=0, tcpm_keylen=45067"
+	  ", tcpm_addr=\"\\xde\\xad\\xfa\\xce\\xca\\xfe\\x00\\x00"
+	  "\\x00\\x00\\xfa\\xce\\xba\\xdc\\x0c\\xed\""
+	  ", tcpm_key=\"\\x4f\\x48\\x20\\x48\\x41\\x49\\x20\\x54\\x48\\x41"
+	  "\\x52\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\xff\\x39\\x38\\x37"
+	  "\\x36\\x35\\x34\\x33\\x32\\x31\\x30\\x61\\x62\\x63\\x64\\x65\\x66"
+	  "\\x67\\x68\\x69\\x6a\\x6b\\x6c\\x6d\\x6e\\x6f\\x70\\x71\\x72\\x73"
+	  "\\x74\\x75\\x76\\x78\\x79\\x7a\\x30\\x31\\x32\\x33\\x34\\x35\\x36"
+	  "\\x37\\x38\\x39\\x41\\x42\\x43\\x44\\x45\\x46\\x47\\x48\\x49\\x4a"
+	  "\\x4b\\x4c\\x4d\\x4e\\x4f\"}" },
+};
+
+static void
+print_md5sig(const struct tcp_diag_md5sig *p, size_t i)
+{
+	printf("%s", md5sig_vecs[i].str);
 }
 
 int
@@ -231,6 +287,23 @@ main(void)
 		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_CONG,
 		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
 		    printf("\"%s\"", str));
+
+	/* INET_DIAG_MD5SIG */
+	struct tcp_diag_md5sig md5s_arr[ARRAY_SIZE(md5sig_vecs)];
+
+	for (size_t i = 0; i < ARRAY_SIZE(md5sig_vecs); i++) {
+		memcpy(md5s_arr + i, &md5sig_vecs[i].val, sizeof(md5s_arr[0]));
+
+		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				   init_inet_diag_msg, print_inet_diag_msg,
+				   INET_DIAG_MD5SIG, pattern,
+				   md5sig_vecs[i].val,
+				   printf("[%s]", md5sig_vecs[i].str));
+	}
+
+	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
+			  init_inet_diag_msg, print_inet_diag_msg,
+			  INET_DIAG_MD5SIG, pattern, md5s_arr, print_md5sig);
 
 	puts("+++ exited with 0 +++");
 	return 0;

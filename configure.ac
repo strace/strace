@@ -541,6 +541,10 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <netinet/in.h>
 #include <linux/if_xdp.h>])
 
+AC_CHECK_TYPES(m4_normalize([
+	struct tcp_diag_md5sig
+]),,, [#include <netinet/tcp.h>])
+
 AC_CHECK_TYPES(m4_normalize([struct sockaddr_vm]),[
 	AC_CHECK_MEMBERS(m4_normalize([
 		struct sockaddr_vm.svm_flags
