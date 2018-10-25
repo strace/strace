@@ -98,6 +98,21 @@ print_f_owner_ex(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_end();
 }
 
+static void
+print_owner_uids(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	uint32_t uids[2];
+
+	if (umove_or_printaddr(tcp, addr, uids))
+		return;
+
+	tprint_array_begin();
+	printuid(uids[0]); /* Real */
+	tprint_array_next();
+	printuid(uids[1]); /* Effective */
+	tprint_array_end();
+}
+
 static int
 print_fcntl(struct tcb *tcp)
 {
@@ -205,6 +220,13 @@ print_fcntl(struct tcb *tcp)
 			return 0;
 		tcp->auxstr = signame(tcp->u_rval);
 		return RVAL_STR;
+	case F_GETOWNER_UIDS:
+		if (entering(tcp)) {
+			tprint_arg_next();
+			return 0;
+		}
+		print_owner_uids(tcp, tcp->u_arg[2]);
+		break;
 	default:
 		tprint_arg_next();
 		PRINT_VAL_X(tcp->u_arg[2]);
