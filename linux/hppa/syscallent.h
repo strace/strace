@@ -105,7 +105,7 @@
 [ 99] = { 2,	TF|TSF|TSFA,	SEN(statfs),			"statfs"		},
 [100] = { 2,	TD|TFSF|TSFA,	SEN(fstatfs),			"fstatfs"		},
 [101] = { 2,	TF|TST|TSTA,	SEN(stat64),			"stat64"		},
-[102] = { },
+/* [102] - was socketcall */
 [103] = { 3,	0,		SEN(syslog),			"syslog"		},
 [104] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [105] = { 2,	0,		SEN(getitimer),			"getitimer"		},
