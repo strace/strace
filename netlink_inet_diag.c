@@ -370,6 +370,51 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_tcp_md5sig(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	struct tcp_diag_md5sig sig;
+
+	if (len < sizeof(sig))
+		return false;
+
+	kernel_ulong_t l = len;
+	kernel_ulong_t a = addr;
+
+	for (; len >= sizeof(sig); l -= sizeof(sig), a += sizeof(sig)) {
+		if (a != addr)
+			tprints(", ");
+
+		if (umove(tcp, a, &sig)) {
+			tprints("/* ");
+			printaddr(a);
+			tprints(" */");
+
+			return true;
+		}
+
+		PRINT_FIELD_XVAL("{", sig, tcpm_family, addrfams, "AF_???");
+		PRINT_FIELD_U(", ", sig, tcpm_prefixlen);
+		PRINT_FIELD_U(", ", sig, tcpm_keylen);
+		PRINT_FIELD_INET_ADDR(", ", sig, tcpm_addr, sig.tcpm_family);
+		tprints(", ");
+		print_quoted_string((char *) sig.tcpm_key,
+				    MIN(sizeof(sig.tcpm_key), sig.tcpm_keylen),
+				    QUOTE_FORCE_HEX);
+		tprints("}");
+	}
+
+	if (l) {
+		tprints(",");
+		tprintf_comment("%" PRI_klu " bytes of unexpected data", l);
+	}
+
+	return true;
+}
+
 static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_MEMINFO]	= decode_inet_diag_meminfo,
 	[INET_DIAG_INFO]	= NULL,			/* unimplemented */
@@ -387,7 +432,8 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_PAD]		= NULL,
 	[INET_DIAG_MARK]	= decode_nla_u32,
 	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info,
-	[INET_DIAG_CLASS_ID]	= decode_nla_u32
+	[INET_DIAG_CLASS_ID]	= decode_nla_u32,
+	[INET_DIAG_MD5SIG]	= decode_tcp_md5sig,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)

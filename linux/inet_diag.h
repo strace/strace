@@ -109,6 +109,7 @@ enum {
 	INET_DIAG_MARK,
 	INET_DIAG_BBRINFO,
 	INET_DIAG_CLASS_ID,
+	INET_DIAG_MD5SIG,
 };
 
 /* INET_DIAG_MEM */
@@ -143,6 +144,17 @@ struct tcp_bbr_info {
 	uint32_t bbr_min_rtt;
 	uint32_t bbr_pacing_gain;
 	uint32_t bbr_cwnd_gain;
+};
+
+/* INET_DIAG_MD5SIG */
+#define TCP_MD5SIG_MAXKEYLEN   80
+
+struct tcp_diag_md5sig {
+	uint8_t  tcpm_family;
+	uint8_t  tcpm_prefixlen;
+	uint16_t tcpm_keylen;
+	uint32_t tcpm_addr[4]; /* big endian */
+	uint8_t  tcpm_key[TCP_MD5SIG_MAXKEYLEN];
 };
 
 #endif /* !STRACE_LINUX_INET_DIAG_H */
