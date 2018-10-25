@@ -2,7 +2,24 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of KVM_CHECK_EXTENSION and NBD_* ioctl commands.
+  * Implemented decoding of SOL_XDP socket option names.
+  * Implemented decoding of AF_PACKET protocols in socket syscall.
+  * Implemented decoding of AF_AX25 and AF_X25 addresses, protocols,
+    and options.
+  * Implemented stack trace printing on receiving signals.
+  * Enhanced xlat styles support configured by -X option.
+  * Enhanced decoding of IFLA_*, NETCONFA_*, and SMC_DIAG_* netlink attributes.
+  * Wired up io_pgetevents syscall on arm, sparc, and sparc64.
+  * Updated lists of AF_*, AUDIT_*, BPF_*, IFLA_*, IN_*, IPSTATS_*,
+    IPV4_DEVCONF_*, NT_*, SCTP_*, SO_*, SOCK_*, SOL_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 4.19.
+
+* Bug fixes
+  * Fixed decoding of bit sets in evdev ioctl commands.
+  * Fixed decoding of EVIOCGBIT(0, ...) ioctl commands.
+  * Fixed test suite for the case when mlockall and unimplemented syscalls
+    are explicitly disabled by a seccomp filter.
 
 Noteworthy changes in release 4.24 (2018-08-14)
 ===============================================
