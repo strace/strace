@@ -312,7 +312,10 @@ main(void)
 	static const char *bogus_key3_str = "-557785390";
 
 	static const struct keyctl_dh_params kcdhp_data = {
-		KEY_SPEC_GROUP_KEYRING, 1234567890, 3141592653U };
+		.private = KEY_SPEC_GROUP_KEYRING,
+		.prime = 1234567890,
+		.base = 3141592653U
+	};
 	static const char *kcdhp_str = "{private="
 #if XLAT_RAW || XLAT_VERBOSE
 		"-6"
