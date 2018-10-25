@@ -98,6 +98,19 @@ print_rwhint(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("]");
 }
 
+static void
+print_owner_uids(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	uint32_t uids[2];
+
+	if (umove_or_printaddr(tcp, addr, uids))
+		return;
+
+	printuid("[", uids[0]); /* Real */
+	printuid(", ", uids[1]); /* Effective */
+	tprints("]");
+}
+
 static int
 print_fcntl(struct tcb *tcp)
 {
@@ -211,6 +224,13 @@ print_fcntl(struct tcb *tcp)
 			return 0;
 		tcp->auxstr = signame(tcp->u_rval);
 		return RVAL_STR;
+	case F_GETOWNER_UIDS:
+		if (entering(tcp)) {
+			tprints(", ");
+			return 0;
+		}
+		print_owner_uids(tcp, tcp->u_arg[2]);
+		break;
 	default:
 		tprintf(", %#" PRI_klx, tcp->u_arg[2]);
 		break;
