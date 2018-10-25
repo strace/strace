@@ -25,6 +25,7 @@
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
 
+
 void
 print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 {
@@ -409,6 +410,61 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_tcp_md5sig(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	struct tcp_diag_md5sig {
+		uint8_t  tcpm_family;
+		uint8_t  tcpm_prefixlen;
+		uint16_t tcpm_keylen;
+		uint32_t tcpm_addr[4]; /* big endian */
+		uint8_t  tcpm_key[80 /* TCP_MD5SIG_MAXKEYLEN */];
+	} sig;
+
+	if (len < sizeof(sig))
+		return false;
+
+	kernel_ulong_t l = len;
+	kernel_ulong_t a = addr;
+
+	for (; len >= sizeof(sig); l -= sizeof(sig), a += sizeof(sig)) {
+		if (a != addr)
+			tprint_array_next();
+
+		if (umove(tcp, a, &sig)) {
+			tprint_comment_begin();
+			printaddr(a);
+			tprint_comment_end();
+
+			return true;
+		}
+
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(sig, tcpm_family, addrfams, "AF_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(sig, tcpm_prefixlen);
+		tprint_struct_next();
+		PRINT_FIELD_U(sig, tcpm_keylen);
+		tprint_struct_next();
+		PRINT_FIELD_INET_ADDR(sig, tcpm_addr, sig.tcpm_family);
+		tprint_struct_next();
+		PRINT_FIELD_HEX_ARRAY_UPTO(sig, tcpm_key,
+					   MIN(sizeof(sig.tcpm_key),
+					       sig.tcpm_keylen));
+		tprint_struct_end();
+	}
+
+	if (l) {
+		tprint_array_next();
+		printstr_ex(tcp, a, l, QUOTE_FORCE_HEX);
+	}
+
+	return true;
+}
+
 static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_MEMINFO]	= decode_inet_diag_meminfo,
 	[INET_DIAG_INFO]	= NULL,			/* unimplemented */
@@ -426,7 +482,8 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_PAD]		= NULL,
 	[INET_DIAG_MARK]	= decode_nla_u32,
 	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info,
-	[INET_DIAG_CLASS_ID]	= decode_nla_u32
+	[INET_DIAG_CLASS_ID]	= decode_nla_u32,
+	[INET_DIAG_MD5SIG]	= decode_tcp_md5sig,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
