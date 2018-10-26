@@ -25,6 +25,9 @@ arch_get_syscall_args(struct tcb *tcp)
 	    && umoven(tcp, mips_REG_SP + 4 * sizeof(tcp->u_arg[0]),
 		      (n_args(tcp) - 4) * sizeof(tcp->u_arg[0]),
 		      &tcp->u_arg[4]) < 0) {
+		error_msg("pid %d: cannot fetch 5th and 6th syscall arguments"
+			  " from tracee's memory", tcp->pid);
+
 		/*
 		 * Let's proceed with the first 4 arguments
 		 * instead of reporting the failure.
