@@ -41,7 +41,10 @@
 #include <linux/ioctl.h>
 #include <linux/loop.h>
 #include "print_fields.h"
-#include "xlat/loop_cmds.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/loop_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 #ifndef ABBREV
 # define ABBREV 0

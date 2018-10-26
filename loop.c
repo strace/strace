@@ -37,7 +37,11 @@ typedef struct loop_info struct_loop_info;
 #include MPERS_DEFS
 
 #include "print_fields.h"
-#include "xlat/loop_cmds.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/loop_cmds.h"
+#undef XLAT_MACROS_ONLY
+
 #include "xlat/loop_flags_options.h"
 #include "xlat/loop_crypt_type_options.h"
 
