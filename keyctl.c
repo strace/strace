@@ -147,7 +147,7 @@ keyctl_chown_key(struct tcb *tcp, key_serial_t id, unsigned user,
 {
 	print_keyring_serial_number(id);
 	printuid(", ", user);
-	printuid(", ", group);
+	printgid(", ", group);
 }
 
 static void

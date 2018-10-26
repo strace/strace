@@ -79,8 +79,8 @@ SYS_FUNC(statx)
 
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", stx, stx_nlink);
-			printuid(", stx_uid=", stx.stx_uid);
-			printuid(", stx_gid=", stx.stx_gid);
+			PRINT_FIELD_UID(", ", stx, stx_uid);
+			PRINT_FIELD_GID(", ", stx, stx_gid);
 		}
 
 		tprints(", stx_mode=");

@@ -33,7 +33,7 @@
 #include <unistd.h>
 
 void
-printuid(unsigned UGID_TYPE id)
+printugid(unsigned UGID_TYPE id)
 {
 	if (id == (unsigned UGID_TYPE) -1U)
 		printf("-1");
@@ -86,7 +86,7 @@ main(void)
 		}
 
 		printf("%s(", SYSCALL_NAME);
-		printuid(num);
+		printugid(num);
 		printf(") = %s\n", errstr);
 	}
 

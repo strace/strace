@@ -40,16 +40,23 @@
 # define SIZEIFY__(x, size)	x ## size
 
 # define printuid	SIZEIFY(printuid)
+# define printgid	SIZEIFY(printgid)
 # define sys_chown	SIZEIFY(sys_chown)
 # define sys_fchown	SIZEIFY(sys_fchown)
 # define sys_getgroups	SIZEIFY(sys_getgroups)
 # define sys_getresuid	SIZEIFY(sys_getresuid)
+# define sys_getresgid	SIZEIFY(sys_getresgid)
 # define sys_getuid	SIZEIFY(sys_getuid)
+# define sys_getgid	SIZEIFY(sys_getgid)
 # define sys_setfsuid	SIZEIFY(sys_setfsuid)
+# define sys_setfsgid	SIZEIFY(sys_setfsgid)
 # define sys_setgroups	SIZEIFY(sys_setgroups)
 # define sys_setresuid	SIZEIFY(sys_setresuid)
+# define sys_setresgid	SIZEIFY(sys_setresgid)
 # define sys_setreuid	SIZEIFY(sys_setreuid)
+# define sys_setregid	SIZEIFY(sys_setregid)
 # define sys_setuid	SIZEIFY(sys_setuid)
+# define sys_setgid	SIZEIFY(sys_setgid)
 #endif /* STRACE_UID_SIZE */
 
 #include "defs.h"
@@ -69,16 +76,44 @@
 # define uid_t_(size)	uid_t__(size)
 # define uid_t__(size)	uint ## size ## _t
 
+# undef gid_t
+# define gid_t		gid_t_(STRACE_UID_SIZE)
+# define gid_t_(size)	gid_t__(size)
+# define gid_t__(size)	uint ## size ## _t
+
+# include <grp.h>
+# include <pwd.h>
+# include <sys/types.h>
+
+enum id_type {
+	IDT_UID,
+	IDT_GID,
+
+	IDT_COUNT
+};
+
 SYS_FUNC(getuid)
 {
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_UID;
+}
+
+SYS_FUNC(getgid)
+{
+	return RVAL_DECODED | RVAL_GID;
 }
 
 SYS_FUNC(setfsuid)
 {
 	printuid("", tcp->u_arg[0]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_UID;
+}
+
+SYS_FUNC(setfsgid)
+{
+	printgid("", tcp->u_arg[0]);
+
+	return RVAL_DECODED | RVAL_GID;
 }
 
 SYS_FUNC(setuid)
@@ -88,15 +123,22 @@ SYS_FUNC(setuid)
 	return RVAL_DECODED;
 }
 
-static void
-get_print_uid(struct tcb *const tcp, const char *const prefix,
-	      const kernel_ulong_t addr)
+SYS_FUNC(setgid)
 {
-	uid_t uid;
+	printgid("", tcp->u_arg[0]);
+
+	return RVAL_DECODED;
+}
+
+static void
+get_print_id(struct tcb *const tcp, const char *const prefix,
+	      const kernel_ulong_t addr, enum id_type idt)
+{
+	uid_t id;
 
 	tprints(prefix);
-	if (!umove_or_printaddr(tcp, addr, &uid)) {
-		printuid("[", uid);
+	if (!umove_or_printaddr(tcp, addr, &id)) {
+		(idt == IDT_UID ? printuid : printgid)("[", id);
 		tprints("]");
 	}
 }
@@ -106,9 +148,21 @@ SYS_FUNC(getresuid)
 	if (entering(tcp))
 		return 0;
 
-	get_print_uid(tcp, "", tcp->u_arg[0]);
-	get_print_uid(tcp, ", ", tcp->u_arg[1]);
-	get_print_uid(tcp, ", ", tcp->u_arg[2]);
+	get_print_id(tcp, "", tcp->u_arg[0], IDT_UID);
+	get_print_id(tcp, ", ", tcp->u_arg[1], IDT_UID);
+	get_print_id(tcp, ", ", tcp->u_arg[2], IDT_UID);
+
+	return 0;
+}
+
+SYS_FUNC(getresgid)
+{
+	if (entering(tcp))
+		return 0;
+
+	get_print_id(tcp, "", tcp->u_arg[0], IDT_GID);
+	get_print_id(tcp, ", ", tcp->u_arg[1], IDT_GID);
+	get_print_id(tcp, ", ", tcp->u_arg[2], IDT_GID);
 
 	return 0;
 }
@@ -117,6 +171,14 @@ SYS_FUNC(setreuid)
 {
 	printuid("", tcp->u_arg[0]);
 	printuid(", ", tcp->u_arg[1]);
+
+	return RVAL_DECODED;
+}
+
+SYS_FUNC(setregid)
+{
+	printgid("", tcp->u_arg[0]);
+	printgid(", ", tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -130,11 +192,20 @@ SYS_FUNC(setresuid)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(setresgid)
+{
+	printgid("", tcp->u_arg[0]);
+	printgid(", ", tcp->u_arg[1]);
+	printgid(", ", tcp->u_arg[2]);
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(chown)
 {
 	printpath(tcp, tcp->u_arg[0]);
 	printuid(", ", tcp->u_arg[1]);
-	printuid(", ", tcp->u_arg[2]);
+	printgid(", ", tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
@@ -143,24 +214,97 @@ SYS_FUNC(fchown)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	printuid(", ", tcp->u_arg[1]);
-	printuid(", ", tcp->u_arg[2]);
+	printgid(", ", tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
 
-void
-printuid(const char *text, const unsigned int uid)
+#define ID_CACHE_SIZE 32
+
+static void
+print_id(const char *prefix, const uid_t id, enum id_type t)
 {
-	if ((uid_t) -1U == (uid_t) uid)
-		tprintf("%s-1", text);
-	else
-		tprintf("%s%u", text, (uid_t) uid);
+	static const uint32_t mask = 0x80000000;
+
+	if ((uid_t) -1U == (uid_t) id) {
+		tprintf("%s-1", prefix);
+		return;
+	}
+
+	tprintf("%s%u", prefix, (uid_t) id);
+
+	if (!show_fd_path)
+		return;
+
+	static struct cache_ent {
+		uint32_t  id;
+		uint32_t  str_len;
+		char     *str;
+	} id_cache[IDT_COUNT * ID_CACHE_SIZE] = { { 0 } };
+
+	struct cache_ent *cache = id_cache + t * ID_CACHE_SIZE;
+	const size_t idx = (id ^ mask) % ID_CACHE_SIZE;
+	const char *str = NULL;
+
+	if ((cache[idx].id ^ mask) == id) {
+		str = cache[idx].str;
+		goto print;
+	}
+
+	switch (t) {
+	case IDT_UID: {
+		/* NB: not thread-safe */
+		struct passwd *pwd = getpwuid((uid_t) id);
+		if (!pwd)
+			break;
+
+		str = pwd->pw_name;
+		break;
+	}
+	case IDT_GID: {
+		/* NB: not thread-safe */
+		struct group *gr = getgrgid((gid_t) id);
+		if (!gr)
+			break;
+
+		str = gr->gr_name;
+		break;
+	}
+	default:
+		break;
+	}
+
+	free(cache[idx].str);
+	cache[idx].id = id ^ mask;
+	cache[idx].str = str ? xstrdup(str) : NULL;
+	cache[idx].str_len = str ? strlen(str) : 0;
+
+print:
+	if (str) {
+		tprints("<");
+		print_quoted_string_ex(cache[idx].str, cache[idx].str_len,
+			       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+			       "<>");
+		tprints(">");
+	}
+}
+
+void
+printuid(const char *prefix, const unsigned int uid)
+{
+	print_id(prefix, uid, IDT_UID);
+}
+
+void
+printgid(const char *prefix, const unsigned int gid)
+{
+	print_id(prefix, gid, IDT_GID);
 }
 
 static bool
 print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	printuid("", (*(uid_t *) elem_buf));
+	printgid("", (*(uid_t *) elem_buf));
 
 	return true;
 }

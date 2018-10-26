@@ -66,7 +66,7 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		tprints("{msg_perm={");
 		printuid("uid=", msqid_ds.msg_perm.uid);
-		printuid(", gid=", msqid_ds.msg_perm.gid);
+		printgid(", gid=", msqid_ds.msg_perm.gid);
 		tprints(", mode=");
 		print_numeric_umode_t(msqid_ds.msg_perm.mode);
 
@@ -77,7 +77,7 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		tprintf(", key=%u", (unsigned) msqid_ds.msg_perm.__key);
 		printuid(", cuid=", msqid_ds.msg_perm.cuid);
-		printuid(", cgid=", msqid_ds.msg_perm.cgid);
+		printgid(", cgid=", msqid_ds.msg_perm.cgid);
 		tprints("}");
 		tprintf(", msg_stime=%u", (unsigned) msqid_ds.msg_stime);
 		tprintf(", msg_rtime=%u", (unsigned) msqid_ds.msg_rtime);

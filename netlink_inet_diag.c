@@ -457,7 +457,7 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 			PRINT_FIELD_U(", ", msg, idiag_expires);
 			PRINT_FIELD_U(", ", msg, idiag_rqueue);
 			PRINT_FIELD_U(", ", msg, idiag_wqueue);
-			PRINT_FIELD_U(", ", msg, idiag_uid);
+			PRINT_FIELD_UID(", ", msg, idiag_uid);
 			PRINT_FIELD_U(", ", msg, idiag_inode);
 			decode_nla = true;
 		}

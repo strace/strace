@@ -46,8 +46,9 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 		print_dev_t(st->dev);
 		tprintf(", st_ino=%llu, st_mode=", st->ino);
 		print_symbolic_mode_t(st->mode);
-		tprintf(", st_nlink=%llu, st_uid=%llu, st_gid=%llu",
-			st->nlink, st->uid, st->gid);
+		tprintf(", st_nlink=%llu", st->nlink);
+		printuid(", st_uid=", st->uid);
+		printgid(", st_gid=", st->gid);
 		tprintf(", st_blksize=%llu", st->blksize);
 		tprintf(", st_blocks=%llu", st->blocks);
 	} else {

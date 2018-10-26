@@ -38,12 +38,18 @@
 extern SYS_FUNC(chown16);
 extern SYS_FUNC(fchown16);
 extern SYS_FUNC(getgroups16);
+extern SYS_FUNC(getresgid16);
 extern SYS_FUNC(getresuid16);
+extern SYS_FUNC(getgid16);
 extern SYS_FUNC(getuid16);
+extern SYS_FUNC(setfsgid16);
 extern SYS_FUNC(setfsuid16);
 extern SYS_FUNC(setgroups16);
+extern SYS_FUNC(setresgid16);
 extern SYS_FUNC(setresuid16);
+extern SYS_FUNC(setregid16);
 extern SYS_FUNC(setreuid16);
+extern SYS_FUNC(setgid16);
 extern SYS_FUNC(setuid16);
 #endif /* HAVE_ARCH_UID16_SYSCALLS */
 

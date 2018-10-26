@@ -118,7 +118,10 @@
 				      zero_extend_signed_to_ull((where_).field_));	\
 	} while (0)
 
-#define PRINT_FIELD_UID PRINT_FIELD_ID
+#define PRINT_FIELD_UID(prefix_, where_, field_) \
+	printuid(prefix_ #field_ "=", (where_).field_)
+#define PRINT_FIELD_GID(prefix_, where_, field_) \
+	printgid(prefix_ #field_ "=", (where_).field_)
 
 #define PRINT_FIELD_U64(prefix_, where_, field_)					\
 	do {										\

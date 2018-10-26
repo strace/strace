@@ -71,9 +71,8 @@
 static void
 printsigsource(const siginfo_t *sip)
 {
-	tprintf(", si_pid=%u, si_uid=%u",
-		(unsigned int) sip->si_pid,
-		(unsigned int) sip->si_uid);
+	tprintf(", si_pid=%u", (unsigned int) sip->si_pid);
+	printuid(", si_uid=", (unsigned int) sip->si_uid);
 }
 
 static void

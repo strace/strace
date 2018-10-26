@@ -260,7 +260,14 @@ decode_nla_gid(struct tcb *const tcp,
 	       const unsigned int len,
 	       const void *const opaque_data)
 {
-	return decode_nla_uid(tcp, addr, len, opaque_data);
+	uint32_t gid;
+
+	if (len < sizeof(gid))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &gid))
+		printgid("", gid);
+
+	return true;
 }
 
 bool

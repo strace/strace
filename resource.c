@@ -249,10 +249,19 @@ SYS_FUNC(osf_getrusage)
 
 #include "xlat/priorities.h"
 
+static void
+print_priority_who(const char * prefix, int which, int who)
+{
+	if (which == PRIO_USER && who)
+		printuid(prefix, who);
+
+	tprintf("%s%d", prefix, who);
+}
+
 SYS_FUNC(getpriority)
 {
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprintf(", %d", (int) tcp->u_arg[1]);
+	print_priority_who(", ", tcp->u_arg[0], tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -260,7 +269,8 @@ SYS_FUNC(getpriority)
 SYS_FUNC(setpriority)
 {
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprintf(", %d, %d", (int) tcp->u_arg[1], (int) tcp->u_arg[2]);
+	print_priority_who(", ", tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf(", %d", (int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }

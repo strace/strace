@@ -351,6 +351,8 @@ extern const struct xlat whence_codes[];
 #define RVAL_HEX	001	/* hex format */
 #define RVAL_OCTAL	002	/* octal format */
 #define RVAL_FD		010	/* file descriptor */
+#define RVAL_UID	011	/* UID */
+#define RVAL_GID	012	/* GID */
 #define RVAL_MASK	013	/* mask for these values */
 
 #define RVAL_STR	020	/* Print `auxstr' field after return val */
@@ -889,6 +891,7 @@ extern int
 decode_sockaddr(struct tcb *, kernel_ulong_t addr, int addrlen);
 
 extern void printuid(const char *, const unsigned int);
+extern void printgid(const char *, const unsigned int);
 
 extern void
 print_sigset_addr_len(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);

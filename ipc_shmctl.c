@@ -66,7 +66,7 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		tprints("{shm_perm={");
 		printuid("uid=", shmid_ds.shm_perm.uid);
-		printuid(", gid=", shmid_ds.shm_perm.gid);
+		printgid(", gid=", shmid_ds.shm_perm.gid);
 		tprints(", mode=");
 		print_numeric_umode_t(shmid_ds.shm_perm.mode);
 
@@ -77,7 +77,7 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		tprintf(", key=%u", (unsigned) shmid_ds.shm_perm.__key);
 		printuid(", cuid=", shmid_ds.shm_perm.cuid);
-		printuid(", cgid=", shmid_ds.shm_perm.cgid);
+		printgid(", cgid=", shmid_ds.shm_perm.cgid);
 		tprints("}");
 		tprintf(", shm_segsz=%u", (unsigned) shmid_ds.shm_segsz);
 		tprintf(", shm_cpid=%u", (unsigned) shmid_ds.shm_cpid);

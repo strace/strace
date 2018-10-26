@@ -677,7 +677,7 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 								    len,
 								    QUOTE_FORCE_HEX);
 					} else {
-						PRINT_FIELD_UID(", ", uc, gid);
+						PRINT_FIELD_GID(", ", uc, gid);
 					}
 				}
 			}

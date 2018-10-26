@@ -59,7 +59,7 @@
 # include <unistd.h>
 
 void
-printuid(GID_TYPE id)
+printugid(GID_TYPE id)
 {
 	if (id == (GID_TYPE) -1U)
 		printf("-1");
@@ -102,7 +102,7 @@ main(void)
 	rc = syscall(SYSCALL_NR, 1, g1);
 	errstr = sprintrc(rc);
 	printf("%s(1, [", SYSCALL_NAME);
-	printuid(*g1);
+	printugid(*g1);
 	printf("]) = %s\n", errstr);
 
 	rc = syscall(SYSCALL_NR, 1, g1 + 1);
@@ -114,7 +114,7 @@ main(void)
 	rc = syscall(SYSCALL_NR, 2, g1);
 	errstr = sprintrc(rc);
 	printf("%s(2, [", SYSCALL_NAME);
-	printuid(*g1);
+	printugid(*g1);
 	printf(", ... /* %p */]) = %s\n", g1 + 1, errstr);
 
 	g2[0] = -2;
@@ -122,17 +122,17 @@ main(void)
 	rc = syscall(SYSCALL_NR, 2, g2);
 	errstr = sprintrc(rc);
 	printf("%s(2, [", SYSCALL_NAME);
-	printuid(g2[0]);
+	printugid(g2[0]);
 	printf(", ");
-	printuid(g2[1]);
+	printugid(g2[1]);
 	printf("]) = %s\n", errstr);
 
 	rc = syscall(SYSCALL_NR, 3, g2);
 	errstr = sprintrc(rc);
 	printf("%s(3, [", SYSCALL_NAME);
-	printuid(g2[0]);
+	printugid(g2[0]);
 	printf(", ");
-	printuid(g2[1]);
+	printugid(g2[1]);
 	printf(", ... /* %p */]) = %s\n", g2 + 2, errstr);
 
 	g3[0] = 0;
@@ -140,17 +140,17 @@ main(void)
 	rc = syscall(SYSCALL_NR, 3, g3);
 	errstr = sprintrc(rc);
 	printf("%s(3, [", SYSCALL_NAME);
-	printuid(g3[0]);
+	printugid(g3[0]);
 	printf(", ");
-	printuid(g3[1]);
+	printugid(g3[1]);
 	printf(", ...]) = %s\n", errstr);
 
 	rc = syscall(SYSCALL_NR, 4, g3);
 	errstr = sprintrc(rc);
 	printf("%s(4, [", SYSCALL_NAME);
-	printuid(g3[0]);
+	printugid(g3[0]);
 	printf(", ");
-	printuid(g3[1]);
+	printugid(g3[1]);
 	printf(", ...]) = %s\n", errstr);
 
 	rc = sysconf(_SC_NGROUPS_MAX);
@@ -160,17 +160,17 @@ main(void)
 		rc = syscall(SYSCALL_NR, ngroups_max, g3);
 		errstr = sprintrc(rc);
 		printf("%s(%d, [", SYSCALL_NAME, ngroups_max);
-		printuid(g3[0]);
+		printugid(g3[0]);
 		printf(", ");
-		printuid(g3[1]);
+		printugid(g3[1]);
 		printf(", ...]) = %s\n", errstr);
 
 		rc = syscall(SYSCALL_NR, F8ILL_KULONG_MASK | ngroups_max, g3);
 		errstr = sprintrc(rc);
 		printf("%s(%d, [", SYSCALL_NAME, ngroups_max);
-		printuid(g3[0]);
+		printugid(g3[0]);
 		printf(", ");
-		printuid(g3[1]);
+		printugid(g3[1]);
 		printf(", ...]) = %s\n", errstr);
 
 		rc = syscall(SYSCALL_NR, ngroups_max + 1, g3);

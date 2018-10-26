@@ -196,6 +196,8 @@ void print_time_t_nsec(time_t, unsigned long long, int);
 /* Print time_t and microseconds in symbolic format. */
 void print_time_t_usec(time_t, unsigned long long, int);
 
+void printuid(const char *prefix, unsigned int val);
+
 /* Read an int from the file. */
 int read_int_from_file(const char *, int *);
 

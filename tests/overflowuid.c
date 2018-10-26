@@ -28,6 +28,7 @@
 #include "tests.h"
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -92,4 +93,12 @@ void
 check_overflowgid(const int gid)
 {
 	check_overflow_id(gid, "/proc/sys/kernel/overflowgid");
+}
+
+void printuid(const char *prefix, unsigned int val)
+{
+	if (val == -1U)
+		printf("%s-1", prefix);
+	else
+		printf("%s%u", prefix, val);
 }

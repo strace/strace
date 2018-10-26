@@ -996,6 +996,14 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				} else
 					tprintf("= %" PRI_kld, tcp->u_rval);
 				break;
+			case RVAL_UID:
+			case RVAL_GID:
+				if (show_fd_path)
+					((sys_res & RVAL_MASK) == RVAL_UID
+					 ? printuid : printgid)("= ", tcp->u_rval);
+				else
+					tprintf("= %" PRI_kld, tcp->u_rval);
+				break;
 			default:
 				error_msg("invalid rval format");
 				break;
