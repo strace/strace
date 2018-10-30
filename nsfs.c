@@ -2,6 +2,7 @@
  * Support for decoding of NS_* ioctl commands.
  *
  * Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
+ * Copyright (c) 2017-2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
