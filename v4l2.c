@@ -809,7 +809,7 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 
 	tprints("{id=");
 	printxval(v4l2_control_ids, p->id, "V4L2_CID_???");
-# if HAVE_DECL_V4L2_CTRL_TYPE_STRING
+# if HAVE_STRUCT_V4L2_EXT_CONTROL_STRING
 	tprintf(", size=%u", p->size);
 	if (p->size > 0) {
 		tprints(", string=");
