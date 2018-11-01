@@ -23,7 +23,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of getsockopt SO_ERROR option.
   * Enhanced error diagnostics when the first exec fails.
   * Added %net as a short form of %network in syscall specifications.
-  * Updated lists of BPF_*, FAN_*, IFLA_*, NETLINK_*, SOL_*, and TCA_*
+  * Updated lists of BPF_*, FAN_*, IFLA_*, NETLINK_*, NTF_*, SOL_*, and TCA_*
     constants.
   * Enhanced manual page.
 
