@@ -24,7 +24,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced error diagnostics when the first exec fails.
   * Added %net as a short form of %network in syscall specifications.
   * Updated lists of BPF_*, FAN_*, IFA_*, IFLA_*, KVM_CAP_*, NETLINK_*, NTF_*,
-    SOL_*, and TCA_* constants.
+    REL_*, SOL_*, and TCA_* constants.
   * Enhanced manual page.
 
 * Bug fixes
