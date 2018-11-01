@@ -350,7 +350,7 @@ main(void)
 		{ 20, "IFLA_BR_GROUP_ADDR" },
 		{ 21, "IFLA_BR_FDB_FLUSH" },
 		{ 40, "IFLA_BR_PAD" },
-		{ 45, "0x2d /* IFLA_BR_??? */" },
+		{ 46, "0x2e /* IFLA_BR_??? */" },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(und_br_attrs); k++) {
@@ -479,6 +479,7 @@ main(void)
 		{ 42, "IFLA_BR_MCAST_STATS_ENABLED" },
 		{ 43, "IFLA_BR_MCAST_IGMP_VERSION" },
 		{ 44, "IFLA_BR_MCAST_MLD_VERSION" },
+		{ 45, "IFLA_BR_VLAN_STATS_PER_PORT" },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u8_br_attrs); k++) {
