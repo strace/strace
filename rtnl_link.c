@@ -334,6 +334,7 @@ static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_MCAST_STATS_ENABLED]		= decode_nla_u8,
 	[IFLA_BR_MCAST_IGMP_VERSION]		= decode_nla_u8,
 	[IFLA_BR_MCAST_MLD_VERSION]		= decode_nla_u8,
+	[IFLA_BR_VLAN_STATS_PER_PORT]		= decode_nla_u8,
 };
 
 bool
