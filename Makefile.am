@@ -267,6 +267,7 @@ strace_SOURCES =	\
 	ptp.c		\
 	ptrace.h	\
 	quota.c		\
+	random_ioctl.c	\
 	readahead.c	\
 	readlink.c	\
 	reboot.c	\

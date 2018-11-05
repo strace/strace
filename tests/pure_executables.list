@@ -121,6 +121,7 @@ ioctl_mtd
 ioctl_nbd
 ioctl_perf
 ioctl_ptp
+ioctl_random
 ioctl_rtc
 ioctl_scsi
 ioctl_sg_io_v3

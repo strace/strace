@@ -158,6 +158,7 @@ ioctl_nsfs
 ioctl_perf
 ioctl_perf-success
 ioctl_ptp
+ioctl_random
 ioctl_rtc
 ioctl_rtc-v
 ioctl_scsi
