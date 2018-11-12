@@ -292,8 +292,9 @@ main(void)
 				      init_AF_INET6_msg, print_AF_INET6_msg,
 				      7, "IFLA_INET6_TOKEN", pattern,
 				      inet6_addr, print_quoted_hex, 2,
-				      printf("badc:ded:face:beef:deca:feed"
-					     ":dead:feed"));
+				      printf("inet_pton(AF_INET6"
+					     ", \"badc:ded:face:beef"
+					     ":deca:feed:dead:feed\")"));
 
 	/* AF_INET6: IFLA_INET6_ */
 	static const struct {

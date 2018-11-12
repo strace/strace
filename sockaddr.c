@@ -98,7 +98,7 @@ print_inet_addr(const int af,
 			if (var_name)
 				tprintf("%s=inet_addr(\"%s\")", var_name, buf);
 			else
-				tprints(buf);
+				tprintf("inet_addr(\"%s\")", buf);
 			return true;
 		}
 		break;
@@ -108,7 +108,8 @@ print_inet_addr(const int af,
 				tprintf("inet_pton(%s, \"%s\", &%s)",
 					"AF_INET6", buf, var_name);
 			else
-				tprints(buf);
+				tprintf("inet_pton(%s, \"%s\")",
+					"AF_INET6", buf);
 			return true;
 		}
 		break;

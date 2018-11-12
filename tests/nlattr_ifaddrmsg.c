@@ -127,7 +127,7 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_ADDRESS, pattern, a4,
-			   printf("%s", address4));
+			   printf("inet_addr(\"%s\")", address4));
 
 	SET_IFA_FAMILY(AF_INET6);
 
@@ -137,7 +137,7 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_ADDRESS, pattern, a6,
-			   printf("%s", address6));
+			   printf("inet_pton(AF_INET6, \"%s\")", address6));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
