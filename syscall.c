@@ -657,19 +657,25 @@ syscall_entering_decode(struct tcb *tcp)
 int
 syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 {
-	/* Restrain from fault injection while the trace executes strace code. */
 	if (hide_log(tcp)) {
+		/*
+		 * Restrain from fault injection
+		 * while the trace executes strace code.
+		 */
 		tcp->qual_flg &= ~QUAL_INJECT;
-	}
 
-	switch (tcp->s_ent->sen) {
-		case SEN_execve:
-		case SEN_execveat:
+		switch (tcp->s_ent->sen) {
+			case SEN_execve:
+			case SEN_execveat:
 #if defined SPARC || defined SPARC64
-		case SEN_execv:
+			case SEN_execv:
 #endif
-			tcp->flags &= ~TCB_HIDE_LOG;
-			break;
+				/*
+				 * First exec* syscall makes the log visible.
+				 */
+				tcp->flags &= ~TCB_HIDE_LOG;
+				break;
+		}
 	}
 
 	if (!traced(tcp) || (tracing_paths && !pathtrace_match(tcp))) {
