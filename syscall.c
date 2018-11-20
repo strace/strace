@@ -675,6 +675,9 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 				 */
 				tcp->flags &= ~TCB_HIDE_LOG;
 				break;
+			default:
+				tcp->flags |= TCB_FILTERED;
+				return 0;
 		}
 	}
 
@@ -684,10 +687,6 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 	tcp->flags &= ~TCB_FILTERED;
-
-	if (hide_log(tcp)) {
-		return 0;
-	}
 
 	if (inject(tcp))
 		tamper_with_syscall_entering(tcp, sig);
@@ -732,13 +731,13 @@ int
 syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 {
 	/* Measure the exit time as early as possible to avoid errors. */
-	if ((Tflag || cflag) && !(filtered(tcp) || hide_log(tcp)))
+	if ((Tflag || cflag) && !filtered(tcp))
 		clock_gettime(CLOCK_MONOTONIC, pts);
 
 	if (tcp->s_ent->sys_flags & MEMORY_MAPPING_CHANGE)
 		mmap_notify_report(tcp);
 
-	if (filtered(tcp) || hide_log(tcp))
+	if (filtered(tcp))
 		return 0;
 
 #if SUPPORTED_PERSONALITIES > 1
