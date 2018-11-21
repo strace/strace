@@ -273,6 +273,7 @@ Output format:\n\
   -T             print time spent in each syscall\n\
   -x             print non-ascii strings in hex\n\
   -xx            print all strings in hex\n\
+  -X format      set the format for printing of named constants and flags\n\
   -y             print paths associated with file descriptor arguments\n\
   -yy            print protocol specific information associated with socket file descriptors\n\
 \n\
