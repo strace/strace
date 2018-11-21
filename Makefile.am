@@ -249,6 +249,8 @@ strace_SOURCES =	\
 	process_vm.c	\
 	ptp.c		\
 	ptrace.h	\
+	ptrace_syscall_info.c \
+	ptrace_syscall_info.h \
 	quota.c		\
 	random_ioctl.c	\
 	readahead.c	\
