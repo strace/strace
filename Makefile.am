@@ -178,6 +178,7 @@ strace_SOURCES =	\
 	kexec.c		\
 	keyctl.c	\
 	keyctl_kdf_params.h \
+	kill_save_errno.h \
 	kvm.c		\
 	largefile_wrappers.h \
 	ldt.c		\

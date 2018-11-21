@@ -51,6 +51,7 @@
 #endif
 #include <asm/unistd.h>
 
+#include "kill_save_errno.h"
 #include "largefile_wrappers.h"
 #include "mmap_cache.h"
 #include "number_set.h"
@@ -430,15 +431,6 @@ set_cloexec_flag(int fd)
 
 	if (fcntl(fd, F_SETFD, newflags)) /* never fails */
 		perror_msg_and_die("fcntl(%d, F_SETFD, %#x)", fd, newflags);
-}
-
-static void
-kill_save_errno(pid_t pid, int sig)
-{
-	int saved_errno = errno;
-
-	(void) kill(pid, sig);
-	errno = saved_errno;
 }
 
 /*
