@@ -118,7 +118,6 @@ inet-cmsg	-e trace=recvmsg
 init_module	-a27
 inotify	-a23 -e trace=inotify_add_watch,inotify_rm_watch
 inotify_init1	-a27
-int_0x80	-a11 -e trace=getgid32
 ioctl_block	+ioctl.test
 ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9

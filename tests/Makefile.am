@@ -228,6 +228,7 @@ DECODER_TESTS = \
 	fadvise64.test \
 	futex.test \
 	getuid.test \
+	int_0x80.test \
 	ioctl.test \
 	ioctl_evdev-success.test \
 	ioctl_evdev-success-v.test \
@@ -347,8 +348,6 @@ TESTS = $(GEN_TESTS) $(DECODER_TESTS) $(MISC_TESTS) $(STACKTRACE_TESTS)
 XFAIL_TESTS_ =
 XFAIL_TESTS_m32 = $(STACKTRACE_TESTS)
 XFAIL_TESTS_mx32 = $(STACKTRACE_TESTS)
-XFAIL_TESTS_x86_64 = int_0x80.gen.test
-XFAIL_TESTS_x32 = int_0x80.gen.test
 XFAIL_TESTS = $(XFAIL_TESTS_$(MPERS_NAME)) $(XFAIL_TESTS_$(ARCH))
 
 TEST_LOG_COMPILER = env

@@ -13,9 +13,11 @@
  */
 
 #include "defs.h"
+#include "get_personality.h"
 #include "mmap_notify.h"
 #include "native_defs.h"
 #include "ptrace.h"
+#include "ptrace_syscall_info.h"
 #include "nsig.h"
 #include "number_set.h"
 #include "delay.h"
@@ -461,6 +463,7 @@ static void get_error(struct tcb *, bool);
 static void set_error(struct tcb *, unsigned long);
 static void set_success(struct tcb *, kernel_long_t);
 static int arch_get_scno(struct tcb *);
+static int arch_check_scno(struct tcb *);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
 static int arch_get_syscall_args(struct tcb *);
 static void arch_get_error(struct tcb *, bool);
@@ -943,11 +946,21 @@ restore_cleared_syserror(struct tcb *tcp)
 	tcp->u_error = saved_u_error;
 }
 
+static struct ptrace_syscall_info ptrace_sci;
+
+static bool
+ptrace_syscall_info_is_valid(void)
+{
+	return ptrace_get_syscall_info_supported &&
+	       ptrace_sci.op <= PTRACE_SYSCALL_INFO_SECCOMP;
+}
+
 #define XLAT_MACROS_ONLY
 # include "xlat/nt_descriptor_types.h"
 #undef XLAT_MACROS_ONLY
 
 #define ARCH_MIGHT_USE_SET_REGS 1
+
 #include "arch_regs.c"
 
 #if HAVE_ARCH_GETRVAL2
@@ -1035,16 +1048,13 @@ ptrace_setregs(pid_t pid)
 
 #endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 
-#ifdef ptrace_getregset_or_getregs
-static long get_regs_error;
-#endif
+static long get_regs_error = -1;
 
 void
 clear_regs(struct tcb *tcp)
 {
-#ifdef ptrace_getregset_or_getregs
+	ptrace_sci.op = 0xff;
 	get_regs_error = -1;
-#endif
 }
 
 static long
@@ -1139,9 +1149,59 @@ free_sysent_buf(void *ptr)
 	free(ptr);
 }
 
+static bool
+ptrace_get_syscall_info(struct tcb *tcp)
+{
+	/*
+	 * ptrace_get_syscall_info_supported should have been checked
+	 * by the caller.
+	 */
+	if (ptrace_sci.op == 0xff) {
+		const size_t size = sizeof(ptrace_sci);
+		if (ptrace(PTRACE_GET_SYSCALL_INFO, tcp->pid,
+			   (void *) size, &ptrace_sci) < 0) {
+			get_regs_error = -2;
+			return false;
+		}
+#if SUPPORTED_PERSONALITIES > 1
+		int newpers = get_personality_from_syscall_info(&ptrace_sci);
+		if (newpers >= 0)
+			update_personality(tcp, newpers);
+#endif
+	}
+
+	if (entering(tcp)) {
+		if (ptrace_sci.op == PTRACE_SYSCALL_INFO_EXIT) {
+			error_msg("pid %d: entering"
+				  ", ptrace_syscall_info.op == %u",
+				  tcp->pid, ptrace_sci.op);
+			/* TODO: handle this.  */
+		}
+	} else {
+		if (ptrace_sci.op == PTRACE_SYSCALL_INFO_ENTRY) {
+			error_msg("pid %d: exiting"
+				  ", ptrace_syscall_info.op == %u",
+				  tcp->pid, ptrace_sci.op);
+			/* TODO: handle this.  */
+		}
+	}
+
+	return true;
+}
+
 bool
 get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 {
+	if (get_regs_error < -1)
+		return false;
+
+	if (ptrace_get_syscall_info_supported) {
+		if (!ptrace_get_syscall_info(tcp))
+			return false;
+		*ip = (kernel_ulong_t) ptrace_sci.instruction_pointer;
+		return true;
+	}
+
 #if defined ARCH_PC_REG
 	if (get_regs(tcp) < 0)
 		return false;
@@ -1159,6 +1219,16 @@ get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 bool
 get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 {
+	if (get_regs_error < -1)
+		return false;
+
+	if (ptrace_get_syscall_info_supported) {
+		if (!ptrace_get_syscall_info(tcp))
+			return false;
+		*sp = (kernel_ulong_t) ptrace_sci.stack_pointer;
+		return true;
+	}
+
 #if defined ARCH_SP_REG
 	if (get_regs(tcp) < 0)
 		return false;
@@ -1173,6 +1243,18 @@ get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 #endif
 }
 
+static int
+get_syscall_regs(struct tcb *tcp)
+{
+	if (get_regs_error != -1)
+		return get_regs_error;
+
+	if (ptrace_get_syscall_info_supported)
+		return ptrace_get_syscall_info(tcp) ? 0 : get_regs_error;
+
+	return get_regs(tcp);
+}
+
 /*
  * Returns:
  * 0: "ignore this ptrace stop", syscall_entering_decode() should return a "bail
@@ -1184,12 +1266,23 @@ get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 int
 get_scno(struct tcb *tcp)
 {
-	if (get_regs(tcp) < 0)
+	if (get_syscall_regs(tcp) < 0)
 		return -1;
 
-	int rc = arch_get_scno(tcp);
-	if (rc != 1)
-		return rc;
+	if (ptrace_syscall_info_is_valid()) {
+		/*
+		 * So far it's just a workaround for x32,
+		 * but let's pretend it could be used elsewhere.
+		 */
+		int rc = arch_check_scno(tcp);
+		if (rc != 1)
+			return rc;
+		tcp->scno = ptrace_sci.entry.nr;
+	} else {
+		int rc = arch_get_scno(tcp);
+		if (rc != 1)
+			return rc;
+	}
 
 	tcp->scno = shuffle_scno(tcp->scno);
 
@@ -1229,11 +1322,22 @@ get_scno(struct tcb *tcp)
 static int
 get_syscall_args(struct tcb *tcp)
 {
+	if (ptrace_syscall_info_is_valid()) {
+		for (unsigned int i = 0; i < ARRAY_SIZE(tcp->u_arg); ++i)
+			tcp->u_arg[i] = ptrace_sci.entry.args[i];
+#if SUPPORTED_PERSONALITIES > 1
+		if (tcp->s_ent->sys_flags & COMPAT_SYSCALL_TYPES) {
+			for (unsigned int i = 0; i < ARRAY_SIZE(tcp->u_arg); ++i)
+				tcp->u_arg[i] = (uint32_t) tcp->u_arg[i];
+		}
+#endif
+		return 1;
+	}
 	return arch_get_syscall_args(tcp);
 }
 
 #ifdef ptrace_getregset_or_getregs
-# define get_syscall_result_regs get_regs
+# define get_syscall_result_regs get_syscall_regs
 #else
 static int get_syscall_result_regs(struct tcb *);
 #endif
@@ -1259,8 +1363,18 @@ get_syscall_result(struct tcb *tcp)
 static void
 get_error(struct tcb *tcp, const bool check_errno)
 {
-	tcp->u_error = 0;
-	arch_get_error(tcp, check_errno);
+	if (ptrace_syscall_info_is_valid()) {
+		if (ptrace_sci.exit.is_error) {
+			tcp->u_rval = -1;
+			tcp->u_error = -ptrace_sci.exit.rval;
+		} else {
+			tcp->u_error = 0;
+			tcp->u_rval = ptrace_sci.exit.rval;
+		}
+	} else {
+		tcp->u_error = 0;
+		arch_get_error(tcp, check_errno);
+	}
 }
 
 static void
@@ -1271,12 +1385,22 @@ set_error(struct tcb *tcp, unsigned long new_error)
 	if (new_error == old_error || new_error > MAX_ERRNO_VALUE)
 		return;
 
+#ifdef ptrace_setregset_or_setregs
+	/* if we are going to invoke set_regs, call get_regs first */
+	if (get_regs(tcp) < 0)
+		return;
+#endif
+
 	tcp->u_error = new_error;
 	if (arch_set_error(tcp)) {
 		tcp->u_error = old_error;
 		/* arch_set_error does not update u_rval */
 	} else {
-		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+		if (ptrace_syscall_info_is_valid())
+			tcp->u_rval = -1;
+		else
+			get_error(tcp, !(tcp->s_ent->sys_flags &
+					 SYSCALL_NEVER_FAILS));
 	}
 }
 
@@ -1285,16 +1409,27 @@ set_success(struct tcb *tcp, kernel_long_t new_rval)
 {
 	const kernel_long_t old_rval = tcp->u_rval;
 
+#ifdef ptrace_setregset_or_setregs
+	/* if we are going to invoke set_regs, call get_regs first */
+	if (get_regs(tcp) < 0)
+		return;
+#endif
+
 	tcp->u_rval = new_rval;
 	if (arch_set_success(tcp)) {
 		tcp->u_rval = old_rval;
-		/* arch_set_error does not update u_error */
+		/* arch_set_success does not update u_error */
 	} else {
-		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+		if (ptrace_syscall_info_is_valid())
+			tcp->u_error = 0;
+		else
+			get_error(tcp, !(tcp->s_ent->sys_flags &
+					 SYSCALL_NEVER_FAILS));
 	}
 }
 
 #include "get_scno.c"
+#include "check_scno.c"
 #include "set_scno.c"
 #include "get_syscall_args.c"
 #ifndef ptrace_getregset_or_getregs
