@@ -111,6 +111,7 @@ SYS_FUNC(ptrace)
 		case PTRACE_SETSIGMASK:
 		case PTRACE_SECCOMP_GET_FILTER:
 		case PTRACE_SECCOMP_GET_METADATA:
+		case PTRACE_GET_SYSCALL_INFO:
 			tprintf(", %" PRI_klu, addr);
 			break;
 		case PTRACE_PEEKSIGINFO: {

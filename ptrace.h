@@ -17,6 +17,7 @@
 #ifndef STRACE_PTRACE_H
 #define STRACE_PTRACE_H
 
+#include <stdint.h>
 #include <sys/ptrace.h>
 
 #ifdef HAVE_STRUCT_IA64_FPREG
@@ -154,6 +155,35 @@
 #endif
 #ifndef PTRACE_SECCOMP_GET_METADATA
 # define PTRACE_SECCOMP_GET_METADATA	0x420d
+#endif
+#ifndef PTRACE_GET_SYSCALL_INFO
+# define PTRACE_GET_SYSCALL_INFO	0x420e
+# define PTRACE_SYSCALL_INFO_NONE	0
+# define PTRACE_SYSCALL_INFO_ENTRY	1
+# define PTRACE_SYSCALL_INFO_EXIT	2
+# define PTRACE_SYSCALL_INFO_SECCOMP	3
+struct ptrace_syscall_info {
+	uint8_t op;
+	uint8_t pad[3];
+	uint32_t arch;
+	uint64_t instruction_pointer;
+	uint64_t stack_pointer;
+	union {
+		struct {
+			uint64_t nr;
+			uint64_t args[6];
+		} entry;
+		struct {
+			int64_t rval;
+			uint8_t is_error;
+		} exit;
+		struct {
+			uint64_t nr;
+			uint64_t args[6];
+			uint32_t ret_data;
+		} seccomp;
+	};
+};
 #endif
 
 #if !HAVE_DECL_PTRACE_PEEKUSER
