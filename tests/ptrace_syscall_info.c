@@ -22,6 +22,10 @@
 #include <linux/audit.h>
 
 #include "xlat.h"
+#define XLAT_MACROS_ONLY
+/* For xlat/audit_arch.h */
+# include "xlat/elf_em.h"
+#undef XLAT_MACROS_ONLY
 #include "xlat/audit_arch.h"
 
 static const char *errstr;

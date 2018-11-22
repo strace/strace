@@ -28,6 +28,11 @@
 # include "printsiginfo.h"
 #endif
 
+#define XLAT_MACROS_ONLY
+/* For xlat/audit_arch.h */
+# include "xlat/elf_em.h"
+#undef XLAT_MACROS_ONLY
+
 #include "xlat/audit_arch.h"
 #include "xlat/sigbus_codes.h"
 #include "xlat/sigchld_codes.h"
