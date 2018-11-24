@@ -22,7 +22,7 @@ date=
 [ -f "${DATE_FILE}" ] && date="$(cat "${DATE_FILE}")"
 
 [ -n "${date}" ] ||
-	date="$(git log -n 1 --format=format:%cD --no-patch "${FILE}")"
+	date="$(git log -s -n 1 --format=format:%cD "${FILE}")"
 
 [ -n "${date}" ] ||
 	date="${DEFAULT_DATE}"

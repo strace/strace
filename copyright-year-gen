@@ -14,7 +14,7 @@ year=
 [ -f "${YEAR_FILE}" ] && year="$(cat "${YEAR_FILE}")"
 
 [ -n "${year}" ] ||
-	year="$(date -u +%Y -d "$(git show --format=format:%cD --no-patch)")"
+	year="$(date -u +%Y -d "$(git show -s --format=format:%cD)")"
 
 [ -n "${year}" ] ||
 	year="${DEFAULT_YEAR}"
