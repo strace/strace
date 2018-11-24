@@ -320,6 +320,7 @@ MISC_TESTS = \
 	filter-unavailable.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
+	first_exec_failure.test \
 	get_regs.test \
 	inject-nf.test \
 	interactive_block.test \

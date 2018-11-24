@@ -2528,6 +2528,8 @@ dispatch_event(const struct tcb_wait_data *wd)
 		return true;
 
 	case TE_STOP_BEFORE_EXECVE:
+		/* The syscall succeeded, clear the flag.  */
+		current_tcp->flags &= ~TCB_CHECK_EXEC_SYSCALL;
 		/*
 		 * Check that we are inside syscall now (next event after
 		 * PTRACE_EVENT_EXEC should be for syscall exiting).  If it is

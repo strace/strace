@@ -674,14 +674,15 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 				 * First exec* syscall makes the log visible.
 				 */
 				tcp->flags &= ~TCB_HIDE_LOG;
+				/*
+				 * Check whether this exec* syscall succeeds.
+				 */
+				tcp->flags |= TCB_CHECK_EXEC_SYSCALL;
 				break;
-			default:
-				tcp->flags |= TCB_FILTERED;
-				return 0;
 		}
 	}
 
-	if (!traced(tcp) || (tracing_paths && !pathtrace_match(tcp))) {
+	if (hide_log(tcp) || !traced(tcp) || (tracing_paths && !pathtrace_match(tcp))) {
 		tcp->flags |= TCB_FILTERED;
 		return 0;
 	}
@@ -739,6 +740,11 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 
 	if (filtered(tcp))
 		return 0;
+
+	if (check_exec_syscall(tcp)) {
+		/* The check failed, hide the log.  */
+		tcp->flags |= TCB_HIDE_LOG;
+	}
 
 #if SUPPORTED_PERSONALITIES > 1
 	update_personality(tcp, tcp->currpers);

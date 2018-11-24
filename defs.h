@@ -267,15 +267,16 @@ struct tcb {
 #define TCB_FILTERED	0x20	/* This system call has been filtered out */
 #define TCB_TAMPERED	0x40	/* A syscall has been tampered with */
 #define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
-#define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x100	/* -b execve should skip detach on first execve */
-#define TCB_GRABBED	0x200	/* We grab the process and can catch it
+#define TCB_CHECK_EXEC_SYSCALL	0x100	/* Check whether this execve syscall succeeded */
+#define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x200	/* -b execve should skip detach on first execve */
+#define TCB_GRABBED	0x400	/* We grab the process and can catch it
 				 * in the middle of a syscall */
-#define TCB_RECOVERING	0x400	/* We try to recover after detecting incorrect
+#define TCB_RECOVERING	0x800	/* We try to recover after detecting incorrect
 				 * syscall entering/exiting state */
-#define TCB_INJECT_DELAY_EXIT	0x800	/* Current syscall needs to be delayed
+#define TCB_INJECT_DELAY_EXIT	0x1000	/* Current syscall needs to be delayed
 					   on exit */
-#define TCB_DELAYED	0x1000	/* Current syscall has been delayed */
-#define TCB_TAMPERED_NO_FAIL 0x2000	/* We tamper tcb with syscall
+#define TCB_DELAYED	0x2000	/* Current syscall has been delayed */
+#define TCB_TAMPERED_NO_FAIL 0x4000	/* We tamper tcb with syscall
 					   that should not fail. */
 
 /* qualifier flags */
@@ -297,6 +298,7 @@ struct tcb {
 #define inject(tcp)	((tcp)->qual_flg & QUAL_INJECT)
 #define filtered(tcp)	((tcp)->flags & TCB_FILTERED)
 #define hide_log(tcp)	((tcp)->flags & TCB_HIDE_LOG)
+#define check_exec_syscall(tcp)	((tcp)->flags & TCB_CHECK_EXEC_SYSCALL)
 #define syscall_tampered(tcp)	((tcp)->flags & TCB_TAMPERED)
 #define recovering(tcp)	((tcp)->flags & TCB_RECOVERING)
 #define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
