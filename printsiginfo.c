@@ -164,11 +164,7 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 {
 	if (sip->si_errno) {
 		tprints(", si_errno=");
-		if ((unsigned) sip->si_errno < nerrnos
-		    && errnoent[sip->si_errno])
-			tprints(errnoent[sip->si_errno]);
-		else
-			tprintf("%d", sip->si_errno);
+		print_err(sip->si_errno, false);
 	}
 
 	if (SI_FROMUSER(sip)) {
