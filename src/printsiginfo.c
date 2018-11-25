@@ -80,44 +80,26 @@ printsigval(const siginfo_t *sip)
 static void
 print_si_code(const unsigned int si_code, const int si_signo)
 {
+	static const struct xlat * const si_codes[] = {
+		[SIGTRAP] = sigtrap_codes,
+		[SIGCHLD] = sigchld_codes,
+		[SIGIO]   = sigpoll_codes, /* SIGPOLL */
+		[SIGPROF] = sigprof_codes,
+		[SIGILL]  = sigill_codes,
+#ifdef SIGEMT
+		[SIGEMT]  = sigemt_codes,
+#endif
+		[SIGFPE]  = sigfpe_codes,
+		[SIGSEGV] = sigsegv_codes,
+		[SIGBUS]  = sigbus_codes,
+		[SIGSYS]  = sigsys_codes,
+	};
+
 	const char *code = xlookup(siginfo_codes, si_code);
 
-	if (!code) {
-		switch (si_signo) {
-		case SIGTRAP:
-			code = xlookup(sigtrap_codes, si_code);
-			break;
-		case SIGCHLD:
-			code = xlookup(sigchld_codes, si_code);
-			break;
-		case SIGIO: /* SIGPOLL */
-			code = xlookup(sigpoll_codes, si_code);
-			break;
-		case SIGPROF:
-			code = xlookup(sigprof_codes, si_code);
-			break;
-		case SIGILL:
-			code = xlookup(sigill_codes, si_code);
-			break;
-#ifdef SIGEMT
-		case SIGEMT:
-			code = xlookup(sigemt_codes, si_code);
-			break;
-#endif
-		case SIGFPE:
-			code = xlookup(sigfpe_codes, si_code);
-			break;
-		case SIGSEGV:
-			code = xlookup(sigsegv_codes, si_code);
-			break;
-		case SIGBUS:
-			code = xlookup(sigbus_codes, si_code);
-			break;
-		case SIGSYS:
-			code = xlookup(sigsys_codes, si_code);
-			break;
-		}
-	}
+	if (!code && (unsigned int) si_signo < ARRAY_SIZE(si_codes)
+	    && si_codes[si_signo])
+		code = xlookup(si_codes[si_signo], si_code);
 
 	print_xlat_ex(si_code, code, XLAT_STYLE_DEFAULT);
 }
