@@ -242,6 +242,12 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			}
 #endif /* ALPHA || HAVE_SIGINFO_T_SI_PERF_DATA */
 			break;
+#ifdef SIGEMT
+		case SIGEMT:
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_addr);
+			break;
+#endif
 		case SIGIO: /* SIGPOLL */
 			switch (sip->si_code) {
 			case POLL_IN: case POLL_OUT: case POLL_MSG:
