@@ -82,6 +82,9 @@ sigstr_to_uint(const char *s)
 {
 	for (size_t i = 0; i < ARRAY_SIZE(alt_signames); i++) {
 		if (!signame_eq(s, alt_signames[i].syn)) {
+			error_msg("Signal name \"%s\" is selected instead of "
+				  "synonymous \"%s\"",
+				  alt_signames[i].orig, s);
 			s = alt_signames[i].orig;
 			break;
 		}
@@ -104,6 +107,9 @@ find_errno_by_name(const char *name)
 {
 	for (unsigned int i = 0; i < ARRAY_SIZE(alt_errnames); ++i) {
 		if (!strcasecmp(name, alt_errnames[i].syn)) {
+			error_msg("Error name \"%s\" is selected instead of "
+				  "synonymous \"%s\"",
+				  alt_errnames[i].orig, name);
 			name = alt_errnames[i].orig;
 			break;
 		}
