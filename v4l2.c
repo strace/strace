@@ -449,7 +449,8 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
 		if (code == VIDIOC_DQBUF) {
 			tprints(", timestamp = ");
-			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
+			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp,
+							      true);
 		}
 		tprints(", ...");
 	}
