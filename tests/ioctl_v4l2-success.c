@@ -564,11 +564,16 @@ main(int argc, char **argv)
 		       ", index=3735929054, memory="
 		       XLAT_KNOWN(0x1, "V4L2_MEMORY_MMAP")
 		       ", m.offset=0xfacefeed, length=3405692629"
-		       ", bytesused=3737845742, flags="
+		       ", bytesused=3737845742, flags=" RAW("0x1ff")
+#if !XLAT_RAW
 		       XLAT_KNOWN(0x1ff, "V4L2_BUF_FLAG_MAPPED"
 		       "|V4L2_BUF_FLAG_QUEUED|V4L2_BUF_FLAG_DONE"
 		       "|V4L2_BUF_FLAG_KEYFRAME|V4L2_BUF_FLAG_PFRAME"
-		       "|V4L2_BUF_FLAG_BFRAME|V4L2_BUF_FLAG_TIMECODE|0xc0")
+		       "|V4L2_BUF_FLAG_BFRAME|V4L2_BUF_FLAG_ERROR"
+		       "|V4L2_BUF_FLAG_IN_REQUEST|V4L2_BUF_FLAG_TIMECODE") "|"
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN") "|"
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
+#endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       buf_cmds[i].val == VIDIOC_DQBUF
@@ -587,8 +592,12 @@ main(int argc, char **argv)
 		       ", index=3735929054, memory="
 		       XLAT_KNOWN(0x2, "V4L2_MEMORY_USERPTR")
 		       ", m.userptr=%p, length=3405692629"
-		       ", bytesused=3737845742, flags="
-		       XLAT_UNKNOWN(0x268040, "V4L2_BUF_FLAG_???")
+		       ", bytesused=3737845742, flags=" RAW("0x268040")
+#if !XLAT_RAW
+		       XLAT_KNOWN(0x200040, "V4L2_BUF_FLAG_ERROR|0x200000") "|"
+		       XLAT_UNKNOWN(0x8000, "V4L2_BUF_FLAG_TIMESTAMP_???") "|"
+		       XLAT_UNKNOWN(0x60000, "V4L2_BUF_FLAG_TSTAMP_SRC_???")
+#endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       (void *) (intptr_t) 0xdefaced0dec0ded1LL,
@@ -605,8 +614,12 @@ main(int argc, char **argv)
 		       ", index=3735929054, memory="
 		       XLAT_KNOWN(0x2, "V4L2_MEMORY_USERPTR")
 		       ", m.userptr=%p, length=3405692629"
-		       ", bytesused=3737845742, flags=0%s, ...})"
-		       " = %ld (INJECTED)\n",
+		       ", bytesused=3737845742, flags=" RAW("0")
+#if !XLAT_RAW
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN") "|"
+		       XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
+#endif
+		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),
 		       (void *) (intptr_t) 0xdefaced0dec0ded1LL,
 		       buf_cmds[i].val == VIDIOC_DQBUF
@@ -622,11 +635,11 @@ main(int argc, char **argv)
 		       XLAT_KNOWN(0xa, "V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE")
 		       ", index=3735929054, memory="
 		       XLAT_KNOWN(0x3, "V4L2_MEMORY_OVERLAY")
-		       ", length=3405692629, bytesused=3737845742, flags="
-#ifdef V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC
+		       ", length=3405692629, bytesused=3737845742"
+		       ", flags=" RAW("0x2000")
+#if !XLAT_RAW
 		       XLAT_KNOWN(0x2000, "V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC")
-#else
-		       XLAT_UNKNOWN(0x2000, "V4L2_BUF_FLAG_???")
+		       "|" XLAT_KNOWN(0, "V4L2_BUF_FLAG_TSTAMP_SRC_EOF")
 #endif
 		       "%s, ...}) = %ld (INJECTED)\n",
 		       sprintxlat(buf_cmds[i].str, buf_cmds[i].val, NULL),

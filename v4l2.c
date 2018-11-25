@@ -391,6 +391,35 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 #include "xlat/v4l2_buf_flags.h"
+#include "xlat/v4l2_buf_flags_ts_type.h"
+#include "xlat/v4l2_buf_flags_ts_src.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/v4l2_buf_flags_masks.h"
+#undef XLAT_MACROS_ONLY
+
+static void
+print_v4l2_buffer_flags(uint32_t val)
+{
+	const uint32_t ts_type = val & V4L2_BUF_FLAG_TIMESTAMP_MASK;
+	const uint32_t ts_src  = val & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
+	const uint32_t flags   = val & ~ts_type & ~ts_src;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#" PRIx32, val);
+		return;
+	}
+
+	if (flags) {
+		printflags(v4l2_buf_flags, flags, "V4L2_BUF_FLAG_???");
+		tprints("|");
+	}
+	printxval(v4l2_buf_flags_ts_type, ts_type,
+		  "V4L2_BUF_FLAG_TIMESTAMP_???");
+	tprints("|");
+	printxval(v4l2_buf_flags_ts_src, ts_src,
+		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
+}
 
 static int
 print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
@@ -425,7 +454,7 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 
 		tprintf(", length=%u, bytesused=%u, flags=",
 			b.length, b.bytesused);
-		printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
+		print_v4l2_buffer_flags(b.flags);
 		if (code == VIDIOC_DQBUF) {
 			tprints(", timestamp=");
 			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
