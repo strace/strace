@@ -206,6 +206,9 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
+#ifdef SIGEMT
+		case SIGEMT:
+#endif
 			tprints(", si_addr=");
 			printaddr(ptr_to_kulong(sip->si_addr));
 			break;
