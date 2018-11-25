@@ -355,7 +355,8 @@ AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 AC_CHECK_MEMBERS(m4_normalize([
 	siginfo_t.si_syscall,
 	siginfo_t.si_timerid,
-	siginfo_t.si_overrun
+	siginfo_t.si_overrun,
+	siginfo_t.si_trapno
 ]),,, [#include <signal.h>])
 
 AC_CHECK_MEMBERS(m4_normalize([

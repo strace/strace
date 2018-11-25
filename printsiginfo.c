@@ -66,6 +66,11 @@
 #include "xlat/sigsys_codes.h"
 #include "xlat/sigtrap_codes.h"
 
+#ifdef ALPHA
+# include <asm/gentrap.h>
+# include "xlat/alpha_gentrap.h"
+#endif /* ALPHA */
+
 #ifdef SIGEMT
 # include "xlat/sigemt_codes.h"
 #endif
@@ -206,11 +211,37 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
+		case SIGTRAP:
 #ifdef SIGEMT
 		case SIGEMT:
 #endif
 			tprints(", si_addr=");
 			printaddr(ptr_to_kulong(sip->si_addr));
+#ifdef HAVE_SIGINFO_T_SI_TRAPNO
+# if defined(SPARC)
+			if ((sip->si_signo == SIGILL && sip->si_code == ILLTRP)
+			    || sip->si_trapno)
+# elif defined(ALPHA)
+			/*
+			 * See arch/alpha/kernel/traps.c:do_entIF, gentrap
+			 * handling, and arch/alpha/include/uapi/asm/gentrap.h
+			 */
+			if (sip->si_trapno
+			    || sip->si_signo == SIGFPE
+			    || (sip->si_signo == SIGTRAP
+				&& sip->si_code == TRAP_UNK))
+# endif
+			{
+				tprints(", si_trapno=");
+# ifdef ALPHA
+				printxval_d(alpha_gentraps, sip->si_trapno,
+					    sip->si_trapno ? "GEN_???" : NULL);
+# else /* !ALPHA */
+				tprintf("%d")
+# endif ALPHA
+			}
+#endif /* HAVE_SIGINFO_T_SI_TRAPNO */
+
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
