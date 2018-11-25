@@ -117,6 +117,36 @@ print_si_code(int si_signo, unsigned int si_code)
 }
 
 static void
+print_scconst(unsigned scno)
+{
+	/*
+	 * Note that we can safely use the personality set in
+	 * current_personality  here (and don't have to guess it
+	 * based on X32_SYSCALL_BIT and si_arch, for example):
+	 *  - The signal is delivered as a result of seccomp
+	 *    filtering to the process executing forbidden
+	 *    syscall.
+	 *  - We have set the personality for the tracee during
+	 *    the syscall entering.
+	 *  - The current_personality is reliably switched in
+	 *    the next_event routine, it is set to the
+	 *    personality of the last call made (the one that
+	 *    triggered the signal delivery).
+	 *  - Looks like there are no other cases where SIGSYS
+	 *    is delivered from the kernel so far.
+	 */
+	const char *scname = syscall_name(shuffle_scno(scno));
+
+	if (!scname || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%u", scno);
+	if (!scname || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
+		? tprintf : tprintf_comment)("%s%s",
+					     nr_prefix(scno), scname);
+}
+
+static void
 print_si_info(const siginfo_t *sip)
 {
 	if (sip->si_errno) {
@@ -177,33 +207,10 @@ print_si_info(const siginfo_t *sip)
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS: {
-			/*
-			 * Note that we can safely use the personlity set in
-			 * current_personality  here (and don't have to guess it
-			 * based on X32_SYSCALL_BIT and si_arch, for example):
-			 *  - The signal is delivered as a result of seccomp
-			 *    filtering to the process executing forbidden
-			 *    syscall.
-			 *  - We have set the personality for the tracee during
-			 *    the syscall entering.
-			 *  - The current_personality is reliably switched in
-			 *    the next_event routine, it is set to the
-			 *    personality of the last call made (the one that
-			 *    triggered the signal delivery).
-			 *  - Looks like there are no other cases where SIGSYS
-			 *    is delivered from the kernel so far.
-			 */
-			const char *scname = syscall_name(shuffle_scno(
-				(unsigned) sip->si_syscall));
-
 			tprints(", si_call_addr=");
 			printaddr(ptr_to_kulong(sip->si_call_addr));
 			tprints(", si_syscall=");
-			if (scname)
-				tprintf("%s%s",
-					nr_prefix(sip->si_syscall), scname);
-			else
-				tprintf("%u", (unsigned) sip->si_syscall);
+			print_scconst(sip->si_syscall);
 			tprints(", si_arch=");
 			printxval(audit_arch, sip->si_arch, "AUDIT_ARCH_???");
 			break;
