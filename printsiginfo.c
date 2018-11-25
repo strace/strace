@@ -71,6 +71,10 @@
 # include "xlat/alpha_gentrap.h"
 #endif /* ALPHA */
 
+#ifdef IA64
+# include "xlat/ia64_siginfo_si_flags.h"
+#endif
+
 #ifdef SIGEMT
 # include "xlat/sigemt_codes.h"
 #endif
@@ -241,6 +245,16 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 # endif ALPHA
 			}
 #endif /* HAVE_SIGINFO_T_SI_TRAPNO */
+
+#ifdef IA64
+			tprintf(", si_imm=%d", sip->si_imm);
+			tprints(", si_flags=");
+			printflags(ia64_siginfo_si_flags, sip->si_flags, NULL);
+
+			if ((sip_si_flags & __ISR_VALID) || sip->si_isr)
+				/* See also arch/ia64/include/asm/kregs.h */
+				tprintf(", si_isr=%#lx", sip->si_isr);
+#endif
 
 			break;
 		case SIGPOLL:
