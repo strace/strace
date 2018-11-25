@@ -147,7 +147,20 @@ print_scconst(unsigned scno)
 }
 
 static void
-print_si_info(const siginfo_t *sip)
+print_fasync_info(struct tcb *tcp, const siginfo_t *sip)
+{
+	tprintf(", si_band=");
+	if ((long) sip->si_band != -1L)
+		printflags(pollflags, sip->si_band, "POLL???");
+	else
+		tprints("-1");
+
+	tprints(", si_fd=");
+	printfd(tcp, sip->si_fd);
+}
+
+static void
+print_si_info(struct tcb *tcp, const siginfo_t *sip)
 {
 	if (sip->si_errno) {
 		tprints(", si_errno=");
@@ -173,6 +186,9 @@ print_si_info(const siginfo_t *sip)
 			printsigval(sip);
 			break;
 #endif
+		case SI_SIGIO:
+			print_fasync_info(tcp, sip);
+			break;
 		default:
 			printsigsource(sip);
 			if (sip->si_ptr)
@@ -199,10 +215,9 @@ print_si_info(const siginfo_t *sip)
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
-			case POLL_IN: case POLL_OUT: case POLL_MSG:
-				tprintf(", si_band=%ld",
-					(long) sip->si_band);
-				break;
+			case POLL_IN:  case POLL_OUT: case POLL_MSG:
+			case POLL_ERR: case POLL_PRI: case POLL_HUP:
+				print_fasync_info(tcp, sip);
 			}
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
@@ -229,7 +244,7 @@ print_si_info(const siginfo_t *sip)
 static
 #endif
 void
-printsiginfo(const siginfo_t *sip)
+printsiginfo(struct tcb *tcp, const siginfo_t *sip)
 {
 	if (sip->si_signo == 0) {
 		tprints("{}");
@@ -244,7 +259,7 @@ printsiginfo(const siginfo_t *sip)
 #ifdef SI_NOINFO
 	if (sip->si_code != SI_NOINFO)
 #endif
-		print_si_info(sip);
+		print_si_info(tcp, sip);
 
 	tprints("}");
 }
@@ -255,13 +270,13 @@ MPERS_PRINTER_DECL(void, printsiginfo_at,
 	siginfo_t si;
 
 	if (!umove_or_printaddr(tcp, addr, &si))
-		printsiginfo(&si);
+		printsiginfo(tcp, &si);
 }
 
 static bool
 print_siginfo_t(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	printsiginfo((const siginfo_t *) elem_buf);
+	printsiginfo(tcp, (const siginfo_t *) elem_buf);
 	return true;
 }
 
