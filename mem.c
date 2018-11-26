@@ -77,7 +77,7 @@ static void
 print_mmap_flags(kernel_ulong_t flags)
 {
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#lx", flags);
+		tprintf("%#" PRI_klx, flags);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
