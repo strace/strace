@@ -80,14 +80,13 @@ main(void)
 
 	rc = syscall(__NR_mmap, args);
 # if XLAT_RAW
-	printf("mmap(%#lx, %lu, %#x, %#x|%#x, %d, %#lx) = %ld %s (%m)\n",
-	       args1_c[0], args1_c[1], PROT_READ|PROT_EXEC, MAP_FILE, MAP_FIXED,
+	printf("mmap(%#lx, %lu, %#x, %#x, %d, %#lx) = %ld %s (%m)\n",
+	       args1_c[0], args1_c[1], PROT_READ|PROT_EXEC, MAP_FILE | MAP_FIXED,
 	       (int) args1_c[4], args1_c[5], rc, errno2name());
 # elif XLAT_VERBOSE
 	printf("mmap(%#lx, %lu, %#x /* PROT_READ|PROT_EXEC */"
-	       ", %#x /* MAP_FILE */|%#x /* MAP_FIXED */"
-	       ", %d, %#lx) = %ld %s (%m)\n",
-	       args1_c[0], args1_c[1], PROT_READ|PROT_EXEC, MAP_FILE, MAP_FIXED,
+	       ", %#x /* MAP_FILE|MAP_FIXED */, %d, %#lx) = %ld %s (%m)\n",
+	       args1_c[0], args1_c[1], PROT_READ|PROT_EXEC, MAP_FILE | MAP_FIXED,
 	       (int) args1_c[4], args1_c[5], rc, errno2name());
 # else
 	printf("mmap(%#lx, %lu, PROT_READ|PROT_EXEC, MAP_FILE|MAP_FIXED"
@@ -100,14 +99,13 @@ main(void)
 	rc = syscall(__NR_mmap, args);
 # ifndef PATH_TRACING
 #  if XLAT_RAW
-	printf("mmap(NULL, %lu, %#x, %#x|%#x, %d, %#lx) = %#lx\n",
-	       args2_c[1], PROT_READ|PROT_WRITE, MAP_PRIVATE, MAP_ANONYMOUS,
+	printf("mmap(NULL, %lu, %#x, %#x, %d, %#lx) = %#lx\n",
+	       args2_c[1], PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 	       (int) args2_c[4], args2_c[5], rc);
 #  elif XLAT_VERBOSE
 	printf("mmap(NULL, %lu, %#x /* PROT_READ|PROT_WRITE */"
-	       ", %#x /* MAP_PRIVATE */|%#x /* MAP_ANONYMOUS */"
-	       ", %d, %#lx) = %#lx\n",
-	       args2_c[1], PROT_READ|PROT_WRITE, MAP_PRIVATE, MAP_ANONYMOUS,
+	       ", %#x /* MAP_PRIVATE|MAP_ANONYMOUS */, %d, %#lx) = %#lx\n",
+	       args2_c[1], PROT_READ|PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS,
 	       (int) args2_c[4], args2_c[5], rc);
 #  else
 	printf("mmap(NULL, %lu, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS"

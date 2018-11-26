@@ -76,7 +76,17 @@ SYS_FUNC(brk)
 static void
 print_mmap_flags(kernel_ulong_t flags)
 {
-	printxval64(mmap_flags, flags & MAP_TYPE, "MAP_???");
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%#lx", flags);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	printxvals_ex(flags & MAP_TYPE, "MAP_???", XLAT_STYLE_ABBREV,
+		      mmap_flags, NULL);
 	flags &= ~MAP_TYPE;
 
 	const unsigned int mask = MAP_HUGE_MASK << MAP_HUGE_SHIFT;
@@ -85,12 +95,16 @@ print_mmap_flags(kernel_ulong_t flags)
 	flags &= ~mask;
 	if (flags) {
 		tprints("|");
-		printflags64(mmap_flags, flags, NULL);
+		printflags_ex(flags, NULL, XLAT_STYLE_ABBREV,
+			      mmap_flags, NULL);
 	}
 
 	if (hugetlb_value)
 		tprintf("|%u<<MAP_HUGE_SHIFT",
 			hugetlb_value >> MAP_HUGE_SHIFT);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+                tprints(" */");
 }
 
 static void

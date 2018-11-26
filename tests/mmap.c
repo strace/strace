@@ -77,15 +77,14 @@ main(int ac, char **av)
 		perror_msg_and_fail("mmap");
 #if XLAT_RAW
 	printf("%s(%p, %lu, %#x, "
-	       "%#x|%#x, %d, %#jx) = %p\n",
-	       name, addr, length1, PROT_READ | PROT_WRITE, MAP_PRIVATE,
-	       MAP_ANONYMOUS, fd, uoffset, p);
+	       "%#x, %d, %#jx) = %p\n",
+	       name, addr, length1, PROT_READ | PROT_WRITE,
+	       MAP_PRIVATE | MAP_ANONYMOUS, fd, uoffset, p);
 #elif XLAT_VERBOSE
 	printf("%s(%p, %lu, %#x /* PROT_READ|PROT_WRITE */, "
-	       "%#x /* MAP_PRIVATE */|%#x /* MAP_ANONYMOUS */, %d, %#jx) "
-	       "= %p\n",
-	       name, addr, length1, PROT_READ | PROT_WRITE, MAP_PRIVATE,
-	       MAP_ANONYMOUS, fd, uoffset, p);
+	       "%#x /* MAP_PRIVATE|MAP_ANONYMOUS */, %d, %#jx) = %p\n",
+	       name, addr, length1, PROT_READ | PROT_WRITE,
+	       MAP_PRIVATE | MAP_ANONYMOUS, fd, uoffset, p);
 #else
 	printf("%s(%p, %lu, PROT_READ|PROT_WRITE, "
 	       "MAP_PRIVATE|MAP_ANONYMOUS, %d, %#jx) = %p\n",
