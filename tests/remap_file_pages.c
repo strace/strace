@@ -30,6 +30,7 @@
 
 #include "tests.h"
 #include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_remap_file_pages
 
@@ -61,12 +62,25 @@ main(void)
 	kernel_ulong_t prot = PROT_READ|PROT_WRITE|PROT_EXEC;
 	kernel_ulong_t pgoff = (kernel_ulong_t) 0xcaf3babebad4deedULL;
 	kernel_ulong_t flags = MAP_PRIVATE|MAP_ANONYMOUS;
+# define prot1_str "PROT_READ|PROT_WRITE|PROT_EXEC"
+# define flags1_str "MAP_PRIVATE|MAP_ANONYMOUS"
 
 	k_remap_file_pages(addr, size, prot, pgoff, flags);
+# if XLAT_RAW
+	printf("remap_file_pages(%#jx, %ju, %#jx, %ju, %#jx) = %s\n",
+	       (uintmax_t) addr, (uintmax_t) size, (uintmax_t) prot,
+	       (uintmax_t) pgoff, (uintmax_t) flags, errstr);
+# elif XLAT_VERBOSE
+	printf("remap_file_pages(%#jx, %ju, %#jx /* %s */, %ju, %#jx /* %s */)"
+	       " = %s\n",
+	       (uintmax_t) addr, (uintmax_t) size, (uintmax_t) prot, prot1_str,
+	       (uintmax_t) pgoff, (uintmax_t) flags,
+	       flags1_str, errstr);
+# else /* XLAT_ABBREV */
 	printf("remap_file_pages(%#jx, %ju, %s, %ju, %s) = %s\n",
-	       (uintmax_t) addr, (uintmax_t) size,
-	       "PROT_READ|PROT_WRITE|PROT_EXEC",
-	       (uintmax_t) pgoff, "MAP_PRIVATE|MAP_ANONYMOUS", errstr);
+	       (uintmax_t) addr, (uintmax_t) size, prot1_str,
+	       (uintmax_t) pgoff, flags1_str, errstr);
+# endif
 
 #ifdef MAP_HUGETLB
 # ifndef MAP_HUGE_2MB
@@ -81,22 +95,36 @@ main(void)
 	flags = MAP_TYPE | MAP_FIXED | MAP_NORESERVE | MAP_HUGETLB | MAP_HUGE_2MB;
 
 	k_remap_file_pages(addr, size, prot, pgoff, flags);
-	printf("remap_file_pages(%#jx, %ju, %s, %ju"
+
 /*
  * HP PA-RISC is the only architecture that has MAP_TYPE defined to 0x3, which
  * is also used for MAP_SHARED_VALIDATE since Linux commit v4.15-rc1~71^2^2~23.
  */
 # ifdef __hppa__
-	       ", MAP_SHARED_VALIDATE"
+#  define MAP_TYPE_str "MAP_SHARED_VALIDATE"
 # else
-	       ", 0xf /* MAP_??? */"
+#  define MAP_TYPE_str "0xf /* MAP_??? */"
 # endif
-	       "|MAP_FIXED|MAP_NORESERVE|MAP_HUGETLB|21<<MAP_HUGE_SHIFT)"
+# define flags2_str \
+	MAP_TYPE_str "|MAP_FIXED|MAP_NORESERVE|MAP_HUGETLB|21<<MAP_HUGE_SHIFT"
+
+# if XLAT_RAW
+	printf("remap_file_pages(%#jx, %ju, %#jx, %ju, %#jx) = %s\n",
+	       (uintmax_t) addr, (uintmax_t) size, (uintmax_t) prot,
+	       (uintmax_t) pgoff, (uintmax_t) flags, errstr);
+# elif XLAT_VERBOSE
+	printf("remap_file_pages(%#jx, %ju, %#jx /* %s */, %ju, %#jx /* %s */)"
 	       " = %s\n",
+	       (uintmax_t) addr, (uintmax_t) size, (uintmax_t) prot,
+	       prot == PROT_NONE ? "PROT_NONE" : "PROT_???",
+	       (uintmax_t) pgoff, (uintmax_t) flags, flags2_str, errstr);
+# else /* XLAT_ABBREV */
+	printf("remap_file_pages(%#jx, %ju, %s, %ju, %s) = %s\n",
 	       (uintmax_t) addr, (uintmax_t) size,
 	       prot == PROT_NONE ? "PROT_NONE" :
 				   "0xdefaced00000000 /* PROT_??? */",
-	       (uintmax_t) pgoff, errstr);
+	       (uintmax_t) pgoff, flags2_str, errstr);
+# endif
 #endif /* MAP_HUGETLB */
 
 	puts("+++ exited with 0 +++");

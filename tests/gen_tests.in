@@ -359,6 +359,9 @@ recvmmsg-timeout	-a25 -e trace=recvmmsg
 recvmsg	-eread=0 -ewrite=1 -e trace=recvmsg,sendmsg
 regex	test_trace_expr '' -etrace='/^(.*_)?statv?fs'
 remap_file_pages
+remap_file_pages-Xabbrev	-Xabbrev -e trace=remap_file_pages
+remap_file_pages-Xraw	-Xraw -e trace=remap_file_pages
+remap_file_pages-Xverbose	-Xverbose -e trace=remap_file_pages
 rename	-a35
 renameat
 renameat2

@@ -417,6 +417,9 @@ recvmmsg-timeout
 recvmsg
 redirect-fds
 remap_file_pages
+remap_file_pages-Xabbrev
+remap_file_pages-Xraw
+remap_file_pages-Xverbose
 rename
 renameat
 renameat2
