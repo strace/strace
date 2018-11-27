@@ -66,7 +66,7 @@ main(void)
 	       (int) big_pid, (int) big_sig, rc, errno2name());
 
 	rc = syscall(__NR_kill, (long) 0xdefaced00000000ULL | pid, 0);
-	printf("kill(%d, SIG_0) = %ld\n", pid, rc);
+	printf("kill(%d, 0) = %ld\n", pid, rc);
 
 	puts("+++ exited with 0 +++");
 	return 0;

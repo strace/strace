@@ -55,7 +55,7 @@ main(void)
 		kernel_ulong_t sig;
 		const char * sig_str;
 	} start_sig_args[] = {
-		{ 0, "SIG_0" },
+		{ 0, "0" },
 		{ (kernel_ulong_t) 0xfacefeedac0ffeedULL, NULL },
 		{ ARG_STR(SIGALRM) },
 		{ 33, "SIGRT_1" },

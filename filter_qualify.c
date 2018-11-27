@@ -57,7 +57,7 @@ sigstr_to_uint(const char *s)
 	if (strncasecmp(s, "SIG", 3) == 0)
 		s += 3;
 
-	for (int i = 0; i <= 255; ++i) {
+	for (int i = 1; i <= 255; ++i) {
 		const char *name = signame(i);
 
 		if (strncasecmp(name, "SIG", 3) != 0)

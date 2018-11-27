@@ -166,7 +166,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 			errno = saved;
 			perror_msg_and_fail("ptrace");
 		}
-		printf("ptrace(PTRACE_CONT, %ld, NULL, SIG_0) = 0\n", pid);
+		printf("ptrace(PTRACE_CONT, %ld, NULL, 0) = 0\n", pid);
 	}
 }
 
