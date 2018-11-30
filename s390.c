@@ -472,10 +472,12 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 	do { \
 		if ((size_) > sizeof(*(hdr_)) && \
 		    !is_filled((char *) ((hdr_) + 1), '\0', \
-		               (size_) - sizeof(*(hdr_)))) \
+		               (size_) - sizeof(*(hdr_)))) {	\
+			tprints(", ");				   \
 			print_quoted_string((char *) ((hdr_) + 1), \
 					    (size_) - sizeof(*(hdr_)), \
 					    QUOTE_FORCE_HEX); \
+		} \
 	} while (0)
 
 static void
