@@ -63,8 +63,8 @@ print_loop_info(struct loop_info * const info, bool print_encrypt,
 #else
 	printf("{lo_number=%d", info->lo_number);
 # if VERBOSE
-	printf(", lo_device=makedev(%u, %u), lo_inode=%lu, "
-	       "lo_rdevice=makedev(%u, %u)",
+	printf(", lo_device=makedev(%#x, %#x), lo_inode=%lu, "
+	       "lo_rdevice=makedev(%#x, %#x)",
 	       major(info->lo_device), minor(info->lo_device),
 	       info->lo_inode,
 	       major(info->lo_rdevice), minor(info->lo_rdevice));
@@ -119,8 +119,8 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 	printf("%p", info64);
 #else
 # if VERBOSE
-	printf("{lo_device=makedev(%u, %u), lo_inode=%" PRIu64
-	       ", lo_rdevice=makedev(%u, %u), lo_offset=%#" PRIx64
+	printf("{lo_device=makedev(%#x, %#x), lo_inode=%" PRIu64
+	       ", lo_rdevice=makedev(%#x, %#x), lo_offset=%#" PRIx64
 	       ", lo_sizelimit=%" PRIu64 ", lo_number=%" PRIu32,
 	       major(info64->lo_device), minor(info64->lo_device),
 	       (uint64_t) info64->lo_inode,

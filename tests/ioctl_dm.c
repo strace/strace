@@ -255,7 +255,7 @@ main(void)
 	memcpy(dm_arg->uuid, str129, sizeof(dm_arg->uuid));
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, {version=4.1.2, data_size=%zu, "
-	       "dev=makedev(18, 52), name=\"%.127s\"..., uuid=\"%.128s\"..., "
+	       "dev=makedev(0x12, 0x34), name=\"%.127s\"..., uuid=\"%.128s\"..., "
 	       "flags=0}) = -1 EBADF (%m)\n",
 	       min_sizeof_dm_ioctl, str129, str129);
 
@@ -264,7 +264,7 @@ main(void)
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, "
 	       "{version=4.1.2, data_size=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0}) = "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}) = "
 	       "-1 EBADF (%m)\n", min_sizeof_dm_ioctl);
 
 	/* Zero dev, name, uuid */
@@ -284,7 +284,7 @@ main(void)
 	ioctl(-1, DM_VERSION, dm_arg);
 	printf("ioctl(-1, DM_VERSION, "
 	       "{version=4.1.2, data_size=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags="
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags="
 	       "DM_READONLY_FLAG|DM_SUSPEND_FLAG|DM_EXISTS_FLAG|"
 	       "DM_PERSISTENT_DEV_FLAG|DM_STATUS_TABLE_FLAG|"
 	       "DM_ACTIVE_PRESENT_FLAG|DM_INACTIVE_PRESENT_FLAG|"
@@ -300,7 +300,7 @@ main(void)
 	ioctl(-1, DM_VERSION, &s);
 	printf("ioctl(-1, DM_VERSION, "
 	       "{version=4.1.2, data_size=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0}) = "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0}) = "
 	       "-1 EBADF (%m)\n", sizeof(s.ioc));
 
 
@@ -330,7 +330,7 @@ main(void)
 		init_s(dm_arg, min_sizeof_dm_ioctl, 0);
 		ioctl(-1, dummy_check_cmds[i].arg, dm_arg);
 		printf("ioctl(-1, %s, {version=4.1.2, data_size=%zu%s, "
-		       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\"%s, "
+		       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\"%s, "
 		       "flags=0}) = -1 EBADF (%m)\n",
 		       dummy_check_cmds[i].str, min_sizeof_dm_ioctl,
 		       dummy_check_cmds[i].has_params ? ", data_start=0" : "",
@@ -345,14 +345,14 @@ main(void)
 	ioctl(-1, DM_DEV_SUSPEND, &s);
 	printf("ioctl(-1, DM_DEV_SUSPEND, "
 	       "{version=4.1.2, data_size=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "flags=DM_SUSPEND_FLAG}) = -1 EBADF (%m)\n", sizeof(s.ioc));
 
 	init_s(&s.ioc, sizeof(s.ioc), 0);
 	s.ioc.event_nr = 0xbadc0ded;
 	ioctl(-1, DM_DEV_SUSPEND, &s);
 	printf("ioctl(-1, DM_DEV_SUSPEND, "
-	       "{version=4.1.2, data_size=%zu, dev=makedev(18, 52), "
+	       "{version=4.1.2, data_size=%zu, dev=makedev(0x12, 0x34), "
 	       "name=\"nnn\", uuid=\"uuu\", event_nr=3134983661, "
 	       "flags=0}) = -1 EBADF (%m)\n", sizeof(s.ioc));
 
@@ -369,7 +369,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, &s);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=1, flags=0, "
 # if VERBOSE
 	       "{sector_start=16, length=32, target_type=\"tgt\", "
@@ -386,7 +386,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, dm_arg);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=0, flags=0}) = -1 EBADF (%m)\n",
 	       sizeof(*dm_arg), min_sizeof_dm_ioctl);
 
@@ -397,7 +397,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, dm_arg);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%zu, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=1234, flags=0, "
 # if VERBOSE
 	       "??? /* misplaced struct dm_target_spec */"
@@ -414,7 +414,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, dm_arg_open1);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=3735936673, flags=0, "
 # if VERBOSE
 	       "%p"
@@ -442,7 +442,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=2, flags=0, ",
 	       sizeof(*dm_arg_open2),
 	       offsetof(struct dm_table_open_test, target1));
@@ -486,7 +486,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=4, flags=0, ",
 	       offsetof(struct dm_table_open_test, target5),
 	       offsetof(struct dm_table_open_test, target0));
@@ -537,7 +537,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=3134983661, flags=0, ",
 	       sizeof(*dm_arg_open3),
 	       offsetof(struct dm_table_open_test, target0));
@@ -563,7 +563,7 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, &s);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
 # if VERBOSE
 	       "{sector=4660, message=\"long targ\"...}"
 # else /* !VERBOSE */
@@ -578,7 +578,7 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, dm_arg);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
 # if VERBOSE
 	       "??? /* misplaced struct dm_target_msg */"
 # else /* !VERBOSE */
@@ -593,7 +593,7 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, dm_arg);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
 # if VERBOSE
 	       "??? /* misplaced struct dm_target_msg */"
 # else /* !VERBOSE */
@@ -609,7 +609,7 @@ main(void)
 	ioctl(-1, DM_TARGET_MSG, dm_arg);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
 # if VERBOSE
 	       "%p"
 # else /* !VERBOSE */
@@ -632,7 +632,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, ",
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, ",
 	       sizeof(*dm_arg_msg) + 1,
 	       offsetof(struct dm_target_msg_test, msg));
 # if VERBOSE
@@ -653,7 +653,7 @@ main(void)
 	errstr = sprintrc(rc);
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, ",
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, ",
 	       sizeof(*dm_arg_msg), offsetof(struct dm_target_msg_test, msg));
 # if VERBOSE
 	printf("{sector=%" PRI__u64 ", message=\"\"}",
@@ -670,7 +670,7 @@ main(void)
 	ioctl(-1, DM_DEV_SET_GEOMETRY, &s);
 	printf("ioctl(-1, DM_DEV_SET_GEOMETRY, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", flags=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
 # if VERBOSE
 	       "string=\"10 20 30 \"..."
 # else /* !VERBOSE */
@@ -688,7 +688,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, unaligned_dm_arg);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
 # if VERBOSE
 	       "string=%p"
@@ -708,7 +708,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, &s);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "{version=4.1.2, data_size=%u, data_start=3735928559, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
 # if VERBOSE
 	       "??? /* misplaced string */"
@@ -725,7 +725,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, &s);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "{version=4.1.2, data_size=%u, data_start=%zu, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
 # if VERBOSE
 	       "string=\"nn\""
@@ -742,7 +742,7 @@ main(void)
 	ioctl(-1, DM_DEV_RENAME, &s);
 	printf("ioctl(-1, DM_DEV_RENAME, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
 # if VERBOSE
 	       "string=\"new long \"..."
@@ -759,7 +759,7 @@ main(void)
 	ioctl(-1, DM_TABLE_LOAD, &s);
 	printf("ioctl(-1, DM_TABLE_LOAD, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
-	       "dev=makedev(18, 52), name=\"nnn\", uuid=\"uuu\", "
+	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=4294967295, flags=0, "
 # if VERBOSE
 	       "{sector_start=0, length=0, target_type=\"\", string=\"\"}"

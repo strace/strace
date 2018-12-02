@@ -50,7 +50,7 @@ main(void)
 	dev = (unsigned long) 0xdeadbeef00000000ULL | makedev(1, 7);
 
 	rc = call_mknodat(S_IFCHR | 024, dev);
-	printf("mknodat(-1, \"%s\", S_IFCHR|024, makedev(1, 7)) = %ld %s (%m)\n",
+	printf("mknodat(-1, \"%s\", S_IFCHR|024, makedev(0x1, 0x7)) = %ld %s (%m)\n",
 	       sample, rc, errno2name());
 
 	const unsigned short mode = (0xffff & ~S_IFMT) | S_IFBLK;
@@ -58,7 +58,7 @@ main(void)
 
 	rc = call_mknodat(mode, dev);
 	printf("mknodat(-1, \"%s\", S_IFBLK|S_ISUID|S_ISGID|S_ISVTX|%#03ho"
-	       ", makedev(%u, %u)) = %ld %s (%m)\n",
+	       ", makedev(%#x, %#x)) = %ld %s (%m)\n",
 	       sample, (short) (mode & ~(S_IFMT|S_ISUID|S_ISGID|S_ISVTX)),
 	       major((unsigned) dev), minor((unsigned) dev),
 	       rc, errno2name());

@@ -333,7 +333,7 @@ main(void)
 		printf(", ifindex=%u", map_info->ifindex);
 	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, netns_dev))
-		printf(", netns_dev=makedev(%u, %u)",
+		printf(", netns_dev=makedev(%#x, %#x)",
 		       major(map_info->netns_dev), minor(map_info->netns_dev));
 	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, netns_ino))
@@ -478,7 +478,7 @@ main(void)
 			printf(", ifindex=%u", prog_info->ifindex);
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, netns_dev))
-			printf(", netns_dev=makedev(%u, %u)",
+			printf(", netns_dev=makedev(%#x, %#x)",
 			       major(prog_info->netns_dev),
 			       minor(prog_info->netns_dev));
 		if (bpf_prog_get_info_attr.info_len >

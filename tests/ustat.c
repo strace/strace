@@ -55,10 +55,10 @@ main(void)
 	dev = (unsigned int) st.st_dev;
 	rc = syscall(__NR_ustat, dev, ust);
 	if (rc)
-		printf("ustat(makedev(%u, %u), %p) = %s\n",
+		printf("ustat(makedev(%#x, %#x), %p) = %s\n",
 		       major(dev), minor(dev), ust, sprintrc(rc));
 	else
-		printf("ustat(makedev(%u, %u)"
+		printf("ustat(makedev(%#x, %#x)"
 		       ", {f_tfree=%llu, f_tinode=%llu}) = 0\n",
 		       major(dev), minor(dev),
 		       zero_extend_signed_to_ull(ust->f_tfree),
@@ -67,11 +67,11 @@ main(void)
 
 	dev = (unsigned int) magic;
 	rc = syscall(__NR_ustat, magic, 0);
-	printf("ustat(makedev(%u, %u), NULL) = %s\n",
+	printf("ustat(makedev(%#x, %#x), NULL) = %s\n",
 	       major(dev), minor(dev), sprintrc(rc));
 
 	rc = syscall(__NR_ustat, magic, buf);
-	printf("ustat(makedev(%u, %u), %p) = %s\n",
+	printf("ustat(makedev(%#x, %#x), %p) = %s\n",
 	       major(dev), minor(dev), buf, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");

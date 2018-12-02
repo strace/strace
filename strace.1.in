@@ -191,7 +191,7 @@ as appropriate.  In most cases, arguments are formatted in the most C-like
 fashion possible.
 For example, the essence of the command "ls \-l /dev/null" is captured as:
 .CW
-lstat("/dev/null", {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 3), ...}) = 0
+lstat("/dev/null", {st_mode=S_IFCHR|0666, st_rdev=makedev(0x1, 0x3), ...}) = 0
 .CE
 Notice how the 'struct stat' argument is dereferenced and how each member is
 displayed symbolically.  In particular, observe how the

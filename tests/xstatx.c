@@ -147,7 +147,7 @@ print_perms(const unsigned int mode)
 static void
 print_stat(const STRUCT_STAT *st)
 {
-	printf("{st_dev=makedev(%u, %u)",
+	printf("{st_dev=makedev(%#x, %#x)",
 	       (unsigned int) major(zero_extend_signed_to_ull(st->st_dev)),
 	       (unsigned int) minor(zero_extend_signed_to_ull(st->st_dev)));
 	printf(", st_ino=%llu", zero_extend_signed_to_ull(st->st_ino));
@@ -167,7 +167,7 @@ print_stat(const STRUCT_STAT *st)
 
 	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-		printf(", st_rdev=makedev(%u, %u)",
+		printf(", st_rdev=makedev(%#x, %#x)",
 		       (unsigned int) major(zero_extend_signed_to_ull(st->st_rdev)),
 		       (unsigned int) minor(zero_extend_signed_to_ull(st->st_rdev)));
 		break;

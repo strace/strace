@@ -33,5 +33,5 @@
 void
 print_dev_t(const unsigned long long dev)
 {
-	tprintf("makedev(%u, %u)", major(dev), minor(dev));
+	tprintf("makedev(%#x, %#x)", major(dev), minor(dev));
 }

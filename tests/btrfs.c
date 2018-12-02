@@ -556,7 +556,7 @@ btrfs_print_balance_args(struct btrfs_balance_args *args)
 	prfl_btrfs(btrfs_space_info_flags, args->profiles,
 		   "BTRFS_BLOCK_GROUP_???");
 	print_uint64(", usage=", args->usage);
-	printf(", devid=makedev(%u, %u)",
+	printf(", devid=makedev(%#x, %#x)",
 	       major(args->devid), minor(args->devid));
 	print_uint64(", pstart=", args->pstart);
 	print_uint64(", pend=", args->pend);
@@ -1212,7 +1212,7 @@ btrfs_test_scrub_ioctls(void)
 	ioctl(-1, BTRFS_IOC_SCRUB_CANCEL, NULL);
 	printf("ioctl(-1, %s) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_SCRUB_CANCEL));
 
-	printf("ioctl(-1, %s, {devid=makedev(%u, %u)",
+	printf("ioctl(-1, %s, {devid=makedev(%#x, %#x)",
 	       ioc(BTRFS_IOC_SCRUB), major(args.devid), minor(args.devid));
 	print_uint64(", start=", args.start);
 	print_uint64(", end=", args.end);
@@ -1226,7 +1226,7 @@ btrfs_test_scrub_ioctls(void)
 	       ioc(BTRFS_IOC_SCRUB_PROGRESS));
 
 	ioctl(-1, BTRFS_IOC_SCRUB_PROGRESS, &args);
-	printf("ioctl(-1, %s, {devid=makedev(%u, %u)}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {devid=makedev(%#x, %#x)}) = -1 EBADF (%m)\n",
 	       ioc(BTRFS_IOC_SCRUB_PROGRESS),
 	       major(args.devid), minor(args.devid));
 }
@@ -1249,7 +1249,7 @@ btrfs_test_dev_info_ioctl(void)
 
 	ioctl(-1, BTRFS_IOC_DEV_INFO, &args);
 	printf("ioctl(-1, %s, "
-	       "{devid=makedev(%u, %u), uuid=%s}) = -1 EBADF (%m)\n",
+	       "{devid=makedev(%#x, %#x), uuid=%s}) = -1 EBADF (%m)\n",
 	       ioc(BTRFS_IOC_DEV_INFO), major(args.devid), minor(args.devid),
 	       uuid_reference_string);
 }
@@ -1703,7 +1703,7 @@ btrfs_test_get_dev_stats_ioctl(void)
 	ioctl(-1, BTRFS_IOC_GET_DEV_STATS, NULL);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_GET_DEV_STATS));
 
-	printf("ioctl(-1, %s, {devid=makedev(%u, %u)"
+	printf("ioctl(-1, %s, {devid=makedev(%#x, %#x)"
 	       ", nr_items=%" PRI__u64 ", flags=",
 	       ioc(BTRFS_IOC_GET_DEV_STATS),
 	       major(args.devid), minor(args.devid), args.nr_items);
@@ -1715,7 +1715,7 @@ btrfs_test_get_dev_stats_ioctl(void)
 	if (write_ok) {
 		unsigned int i;
 		args.flags = BTRFS_DEV_STATS_RESET;
-		printf("ioctl(%d, %s, {devid=makedev(%u, %u)"
+		printf("ioctl(%d, %s, {devid=makedev(%#x, %#x)"
 			", nr_items=%" PRI__u64 ", flags=",
 			btrfs_test_dir_fd, ioc(BTRFS_IOC_GET_DEV_STATS),
 			major(args.devid), minor(args.devid), args.nr_items);
@@ -1775,7 +1775,7 @@ btrfs_test_dev_replace_ioctl(void)
 		saved_errno = errno;
 		printf("ioctl(-1, %s, "
 		       "{cmd=%sBTRFS_IOCTL_DEV_REPLACE_CMD_START%s"
-		       ", start={srcdevid=makedev(%u, %u)"
+		       ", start={srcdevid=makedev(%#x, %#x)"
 		       ", cont_reading_from_srcdev_mode=",
 		       ioc(BTRFS_IOC_DEV_REPLACE),
 		       verbose_xlat ? "0 /* " : "", verbose_xlat ? " */" : "",

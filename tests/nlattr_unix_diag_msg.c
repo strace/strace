@@ -96,7 +96,7 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_unix_diag_msg, print_unix_diag_msg,
 			   UNIX_DIAG_VFS, pattern, uv,
-			   printf("{udiag_vfs_dev=makedev(%u, %u)",
+			   printf("{udiag_vfs_dev=makedev(%#x, %#x)",
 				  major(uv.udiag_vfs_dev),
 				  minor(uv.udiag_vfs_dev));
 			   PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
