@@ -441,7 +441,9 @@ extern int read_int_from_file(struct tcb *, const char *, int *);
 
 extern void set_sortby(const char *);
 extern void set_overhead(int);
-extern void print_pc(struct tcb *);
+
+extern bool get_instruction_pointer(struct tcb *, kernel_ulong_t *);
+extern void print_instruction_pointer(struct tcb *);
 
 extern int syscall_entering_decode(struct tcb *);
 extern int syscall_entering_trace(struct tcb *, unsigned int *);

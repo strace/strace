@@ -692,7 +692,7 @@ printleader(struct tcb *tcp)
 	}
 
 	if (iflag)
-		print_pc(tcp);
+		print_instruction_pointer(tcp);
 }
 
 void

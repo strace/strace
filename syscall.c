@@ -998,27 +998,6 @@ restore_cleared_syserror(struct tcb *tcp)
 # include "arch_getrval2.c"
 #endif
 
-void
-print_pc(struct tcb *tcp)
-{
-#if defined ARCH_PC_REG
-# define ARCH_GET_PC 0
-#elif defined ARCH_PC_PEEK_ADDR
-	kernel_ulong_t pc;
-# define ARCH_PC_REG pc
-# define ARCH_GET_PC upeek(tcp, ARCH_PC_PEEK_ADDR, &pc)
-#else
-# error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
-#endif
-	if (get_regs(tcp) < 0 || ARCH_GET_PC)
-		tprints(current_wordsize == 4 ? "[????????] "
-					      : "[????????????????] ");
-	else
-		tprintf(current_wordsize == 4
-			? "[%08" PRI_klx "] " : "[%016" PRI_klx "] ",
-			(kernel_ulong_t) ARCH_PC_REG);
-}
-
 #include "getregs_old.h"
 
 #undef ptrace_getregset_or_getregs
@@ -1197,6 +1176,23 @@ free_sysent_buf(void *ptr)
 	struct sysent_buf *s = ptr;
 	s->tcp->s_prev_ent = s->tcp->s_ent = NULL;
 	free(ptr);
+}
+
+bool
+get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
+{
+#if defined ARCH_PC_REG
+	if (get_regs(tcp) < 0)
+		return false;
+	*ip = (kernel_ulong_t) ARCH_PC_REG;
+	return true;
+#elif defined ARCH_PC_PEEK_ADDR
+	if (upeek(tcp, ARCH_PC_PEEK_ADDR, ip) < 0)
+		return false;
+	return true;
+#else
+# error Neither ARCH_PC_REG nor ARCH_PC_PEEK_ADDR is defined
+#endif
 }
 
 /*
