@@ -3,7 +3,7 @@ arch_sigreturn(struct tcb *tcp)
 {
 	unsigned long addr;
 
-	if (upeek(tcp, REG_FP, &addr) < 0)
+	if (!get_stack_pointer(tcp, &addr))
 		return;
 	addr += offsetof(struct sigcontext, sc_mask);
 

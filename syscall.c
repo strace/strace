@@ -1195,6 +1195,23 @@ get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 #endif
 }
 
+bool
+get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
+{
+#if defined ARCH_SP_REG
+	if (get_regs(tcp) < 0)
+		return false;
+	*sp = (kernel_ulong_t) ARCH_SP_REG;
+	return true;
+#elif defined ARCH_SP_PEEK_ADDR
+	if (upeek(tcp, ARCH_SP_PEEK_ADDR, sp) < 0)
+		return false;
+	return true;
+#else
+	return false;
+#endif
+}
+
 /*
  * Returns:
  * 0: "ignore this ptrace stop", syscall_entering_decode() should return a "bail

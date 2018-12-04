@@ -443,6 +443,7 @@ extern void set_sortby(const char *);
 extern void set_overhead(int);
 
 extern bool get_instruction_pointer(struct tcb *, kernel_ulong_t *);
+extern bool get_stack_pointer(struct tcb *, kernel_ulong_t *);
 extern void print_instruction_pointer(struct tcb *);
 
 extern int syscall_entering_decode(struct tcb *);

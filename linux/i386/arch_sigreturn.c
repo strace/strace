@@ -13,10 +13,10 @@ arch_sigreturn(struct tcb *tcp)
 		uint32_t struct_fpstate_padding[156];
 		uint32_t extramask;
 	} frame;
+	kernel_ulong_t sp;
 
-	if (umove(tcp, *i386_esp_ptr, &frame) < 0) {
-		tprintf("{mask=%#lx}", (unsigned long) *i386_esp_ptr);
-	} else {
+	if (get_stack_pointer(tcp, &sp) &&
+	    !umove_or_printaddr(tcp, sp, &frame)) {
 		uint32_t mask[2] = { frame.oldmask, frame.extramask };
 		tprintsigmask_addr("{mask=", mask);
 		tprints("}");

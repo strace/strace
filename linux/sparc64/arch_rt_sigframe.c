@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,9 @@
 
 FUNC_GET_RT_SIGFRAME_ADDR
 {
-	return tcp->currpers == 1 ? sparc_regs.u_regs[U_REG_FP] & 0xffffffffUL
-				  : sparc_regs.u_regs[U_REG_FP] + STACK_BIAS;
+	kernel_ulong_t sp;
+	if (!get_stack_pointer(tcp, &sp))
+		return 0;
+	return tcp->currpers == 1 ? sp & 0xffffffffUL
+				  : sp + STACK_BIAS;
 }

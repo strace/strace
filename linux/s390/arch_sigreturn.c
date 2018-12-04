@@ -1,6 +1,3 @@
-#ifndef S390_FRAME_PTR
-# define S390_FRAME_PTR s390_frame_ptr
-#endif
 #ifndef SIGNAL_FRAMESIZE
 # define SIGNAL_FRAMESIZE __SIGNAL_FRAMESIZE
 #endif
@@ -11,12 +8,14 @@
 static void
 arch_sigreturn(struct tcb *tcp)
 {
-	PTR_TYPE mask[NSIG_BYTES / sizeof(PTR_TYPE)];
-	const PTR_TYPE addr = *S390_FRAME_PTR + SIGNAL_FRAMESIZE;
+	kernel_ulong_t addr;
 
-	if (umove(tcp, addr, &mask) < 0) {
-		tprintf("{mask=%#llx}", zero_extend_signed_to_ull(addr));
-	} else {
+	if (!get_stack_pointer(tcp, &addr))
+		return;
+	addr += SIGNAL_FRAMESIZE;
+
+	PTR_TYPE mask[NSIG_BYTES / sizeof(PTR_TYPE)];
+	if (!umove_or_printaddr(tcp, addr, &mask)) {
 		tprintsigmask_addr("{mask=", mask);
 		tprints("}");
 	}

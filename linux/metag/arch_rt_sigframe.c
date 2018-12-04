@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,5 +29,7 @@
 
 FUNC_GET_RT_SIGFRAME_ADDR
 {
-	return *metag_sp_ptr - sizeof(struct_rt_sigframe);
+	kernel_ulong_t sp;
+	return get_stack_pointer(tcp, &sp)
+		? sp - sizeof(struct_rt_sigframe) : 0;
 }

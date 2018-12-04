@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,8 @@
 
 FUNC_GET_RT_SIGFRAME_ADDR
 {
-	return tcp->currpers == 1
-		? ppc_get_rt_sigframe_addr(tcp) : ppc_regs.gpr[1];
+	if (tcp->currpers == 1)
+		return ppc_get_rt_sigframe_addr(tcp);
+	kernel_ulong_t sp;
+	return get_stack_pointer(tcp, &sp) ? sp : 0;
 }
