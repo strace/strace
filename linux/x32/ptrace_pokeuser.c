@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2018 The strace developers.
+ * Copyright (c) 2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,18 +25,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
-#include "ptrace.h"
-#include "ptrace_pokeuser.c"
-
-int
-upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val)
+static long
+ptrace_pokeuser(int pid, unsigned long off, kernel_ulong_t val)
 {
-	if (ptrace_pokeuser(tcp->pid, off, val) < 0) {
-		if (errno != ESRCH)
-			perror_msg("upoke: PTRACE_POKEUSER pid:%d @%#lx)",
-				   tcp->pid, off);
-		return -1;
-	}
-	return 0;
+	/*
+	 * As PTRACE_POKEUSER is crippled on x32 by design from the very first
+	 * linux kernel commit v3.4-rc1~33^2~2 when it was introduced,
+	 * workaround this by using the raw x86_64 syscall instead.
+	 */
+	return syscall(101, PTRACE_POKEUSER, pid, off, val);
 }

@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2018 The strace developers.
+ * Copyright (c) 2018 The strace developers.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,18 +25,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "defs.h"
-#include "ptrace.h"
-#include "ptrace_pokeuser.c"
-
-int
-upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val)
+static long
+ptrace_pokeuser(int pid, unsigned long off, kernel_ulong_t val)
 {
-	if (ptrace_pokeuser(tcp->pid, off, val) < 0) {
-		if (errno != ESRCH)
-			perror_msg("upoke: PTRACE_POKEUSER pid:%d @%#lx)",
-				   tcp->pid, off);
-		return -1;
-	}
-	return 0;
+	return ptrace(PTRACE_POKEUSER, pid, off, val);
 }

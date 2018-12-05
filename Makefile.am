@@ -699,6 +699,7 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
+	linux/ptrace_pokeuser.c		\
 	linux/raw_syscall.h		\
 	linux/riscv/arch_defs_.h	\
 	linux/riscv/arch_regs.c		\
@@ -856,6 +857,7 @@ EXTRA_DIST =				\
 	linux/x32/ioctls_arch1.h	\
 	linux/x32/ioctls_inc0.h		\
 	linux/x32/ioctls_inc1.h		\
+	linux/x32/ptrace_pokeuser.c	\
 	linux/x32/raw_syscall.h		\
 	linux/x32/rt_sigframe.h		\
 	linux/x32/set_error.c		\
