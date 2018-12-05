@@ -967,6 +967,7 @@ restore_cleared_syserror(struct tcb *tcp)
 # include "xlat/nt_descriptor_types.h"
 #undef XLAT_MACROS_ONLY
 
+#define ARCH_MIGHT_USE_SET_REGS 1
 #include "arch_regs.c"
 
 #if HAVE_ARCH_GETRVAL2
@@ -974,6 +975,11 @@ restore_cleared_syserror(struct tcb *tcp)
 #endif
 
 #include "getregs_old.h"
+#ifdef HAVE_GETREGS_OLD
+/* Either getregs_old() or set_regs() */
+# undef ARCH_MIGHT_USE_SET_REGS
+# define ARCH_MIGHT_USE_SET_REGS 0
+#endif
 
 #undef ptrace_getregset_or_getregs
 #undef ptrace_setregset_or_setregs
@@ -999,7 +1005,7 @@ ptrace_getregset(pid_t pid)
 # endif
 }
 
-# ifndef HAVE_GETREGS_OLD
+# if ARCH_MIGHT_USE_SET_REGS
 #  define ptrace_setregset_or_setregs ptrace_setregset
 static int
 ptrace_setregset(pid_t pid)
@@ -1017,7 +1023,7 @@ ptrace_setregset(pid_t pid)
 	return ptrace(PTRACE_SETREGSET, pid, NT_PRSTATUS, &io);
 #  endif
 }
-# endif /* !HAVE_GETREGS_OLD */
+# endif /* ARCH_MIGHT_USE_SET_REGS */
 
 #elif defined ARCH_REGS_FOR_GETREGS
 
@@ -1033,7 +1039,7 @@ ptrace_getregs(pid_t pid)
 # endif
 }
 
-# ifndef HAVE_GETREGS_OLD
+# if ARCH_MIGHT_USE_SET_REGS
 #  define ptrace_setregset_or_setregs ptrace_setregs
 static int
 ptrace_setregs(pid_t pid)
@@ -1045,7 +1051,7 @@ ptrace_setregs(pid_t pid)
 	return ptrace(PTRACE_SETREGS, pid, NULL, &ARCH_REGS_FOR_GETREGS);
 #  endif
 }
-# endif /* !HAVE_GETREGS_OLD */
+# endif /* ARCH_MIGHT_USE_SET_REGS */
 
 #endif /* ARCH_REGS_FOR_GETREGSET || ARCH_REGS_FOR_GETREGS */
 

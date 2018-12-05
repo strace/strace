@@ -40,3 +40,6 @@ static struct iovec x86_io = {
 	(x86_io.iov_len == sizeof(i386_regs) ? i386_regs.eip : x86_64_regs.rip)
 #define ARCH_SP_REG \
 	(x86_io.iov_len == sizeof(i386_regs) ? i386_regs.esp : x86_64_regs.rsp)
+
+#undef ARCH_MIGHT_USE_SET_REGS
+#define ARCH_MIGHT_USE_SET_REGS 0
