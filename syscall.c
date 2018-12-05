@@ -478,7 +478,9 @@ static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
 static void get_error(struct tcb *, bool);
-static int arch_get_scno(struct tcb *tcp);
+static void set_error(struct tcb *, unsigned long);
+static void set_success(struct tcb *, kernel_long_t);
+static int arch_get_scno(struct tcb *);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
 static int arch_get_syscall_args(struct tcb *);
 static void arch_get_error(struct tcb *, bool);
@@ -564,37 +566,10 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 		return 1;
 	}
 
-	bool update_tcb = false;
-
-	if (opts->data.flags & INJECT_F_RETVAL) {
-		kernel_long_t inject_rval =
-			retval_get(opts->data.rval_idx);
-		kernel_long_t u_rval = tcp->u_rval;
-
-		tcp->u_rval = inject_rval;
-		if (arch_set_success(tcp)) {
-			tcp->u_rval = u_rval;
-		} else {
-			update_tcb = true;
-			tcp->u_error = 0;
-		}
-	} else {
-		unsigned long new_error = retval_get(opts->data.rval_idx);
-
-		if (new_error != tcp->u_error && new_error <= MAX_ERRNO_VALUE) {
-			unsigned long u_error = tcp->u_error;
-
-			tcp->u_error = new_error;
-			if (arch_set_error(tcp)) {
-				tcp->u_error = u_error;
-			} else {
-				update_tcb = true;
-			}
-		}
-	}
-
-	if (update_tcb)
-		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+	if (opts->data.flags & INJECT_F_RETVAL)
+		set_success(tcp, retval_get(opts->data.rval_idx));
+	else
+		set_error(tcp, retval_get(opts->data.rval_idx));
 
 	return 0;
 }
@@ -1300,6 +1275,37 @@ get_error(struct tcb *tcp, const bool check_errno)
 {
 	tcp->u_error = 0;
 	arch_get_error(tcp, check_errno);
+}
+
+static void
+set_error(struct tcb *tcp, unsigned long new_error)
+{
+	const unsigned long old_error = tcp->u_error;
+
+	if (new_error == old_error || new_error > MAX_ERRNO_VALUE)
+		return;
+
+	tcp->u_error = new_error;
+	if (arch_set_error(tcp)) {
+		tcp->u_error = old_error;
+		/* arch_set_error does not update u_rval */
+	} else {
+		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+	}
+}
+
+static void
+set_success(struct tcb *tcp, kernel_long_t new_rval)
+{
+	const kernel_long_t old_rval = tcp->u_rval;
+
+	tcp->u_rval = new_rval;
+	if (arch_set_success(tcp)) {
+		tcp->u_rval = old_rval;
+		/* arch_set_error does not update u_error */
+	} else {
+		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
+	}
 }
 
 #include "get_scno.c"
