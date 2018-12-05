@@ -31,12 +31,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef X86_64
-# define X32_PERSONALITY_NUMBER 2
-#else
-# define X32_PERSONALITY_NUMBER 0
-#endif
-
 /* Return codes: 1 - ok, 0 - ignore, other - error. */
 static int
 arch_get_scno(struct tcb *tcp)
@@ -48,7 +42,6 @@ arch_get_scno(struct tcb *tcp)
 # define __X32_SYSCALL_BIT	0x40000000
 #endif
 
-#if 1
 	/*
 	 * GETREGSET of NT_PRSTATUS tells us regset size,
 	 * which unambiguously detects i386.
@@ -83,61 +76,6 @@ arch_get_scno(struct tcb *tcp)
 			}
 		}
 	}
-
-#elif 0
-	/*
-	 * cs = 0x33 for long mode (native 64 bit and x32)
-	 * cs = 0x23 for compatibility mode (32 bit)
-	 * ds = 0x2b for x32 mode (x86-64 in 32 bit)
-	 */
-	scno = x86_64_regs.orig_rax;
-	switch (x86_64_regs.cs) {
-		case 0x23:
-			currpers = 1;
-			break;
-		case 0x33:
-			if (x86_64_regs.ds == 0x2b) {
-				currpers = 2;
-			} else
-				currpers = 0;
-			break;
-		default:
-			error_msg("Unknown value CS=0x%08X while "
-				  "detecting personality of process PID=%d",
-				  (int)x86_64_regs.cs, tcp->pid);
-			currpers = current_personality;
-			break;
-	}
-#elif 0
-	/*
-	 * This version analyzes the opcode of a syscall instruction.
-	 * (int 0x80 on i386 vs. syscall on x86-64)
-	 * It works, but is too complicated, and strictly speaking, unreliable.
-	 */
-	unsigned long call, rip = x86_64_regs.rip;
-	/* sizeof(syscall) == sizeof(int 0x80) == 2 */
-	rip -= 2;
-	errno = 0;
-	call = ptrace(PTRACE_PEEKTEXT, tcp->pid, (char *)rip, (char *)0);
-	if (errno)
-		perror_msg("ptrace_peektext failed");
-	switch (call & 0xffff) {
-		/* x86-64: syscall = 0x0f 0x05 */
-		case 0x050f:
-			currpers = 0;
-			break;
-		/* i386: int 0x80 = 0xcd 0x80 */
-		case 0x80cd:
-			currpers = 1;
-			break;
-		default:
-			currpers = current_personality;
-			error_msg("Unknown syscall opcode (0x%04X) while "
-				  "detecting personality of process PID=%d",
-				  (int)call, tcp->pid);
-			break;
-	}
-#endif
 
 #ifdef X32
 	/*
