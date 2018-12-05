@@ -1,7 +1,7 @@
 #include "negated_errno.h"
 
 static void
-get_error(struct tcb *tcp, const bool check_errno)
+arch_get_error(struct tcb *tcp, const bool check_errno)
 {
 	/* result pointer in D0Re0 (D0.0) */
 	if (check_errno && is_negated_errno(metag_regs.dx[0][0])) {

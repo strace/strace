@@ -1,6 +1,6 @@
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	tcp->u_arg[0] = m68k_regs.d1;
 	tcp->u_arg[1] = m68k_regs.d2;

@@ -1,5 +1,5 @@
 static void
-get_error(struct tcb *tcp, const bool check_errno)
+arch_get_error(struct tcb *tcp, const bool check_errno)
 {
 	/*
 	 * The system call convention specifies that r2 contains the return

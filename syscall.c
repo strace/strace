@@ -477,9 +477,11 @@ print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 static long get_regs(struct tcb *);
 static int get_syscall_args(struct tcb *);
 static int get_syscall_result(struct tcb *);
+static void get_error(struct tcb *, bool);
 static int arch_get_scno(struct tcb *tcp);
 static int arch_set_scno(struct tcb *, kernel_ulong_t);
-static void get_error(struct tcb *, const bool);
+static int arch_get_syscall_args(struct tcb *);
+static void arch_get_error(struct tcb *, bool);
 static int arch_set_error(struct tcb *);
 static int arch_set_success(struct tcb *);
 
@@ -591,10 +593,8 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 		}
 	}
 
-	if (update_tcb) {
-		tcp->u_error = 0;
+	if (update_tcb)
 		get_error(tcp, !(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS));
-	}
 
 	return 0;
 }
@@ -1265,6 +1265,12 @@ get_scno(struct tcb *tcp)
 	return 1;
 }
 
+static int
+get_syscall_args(struct tcb *tcp)
+{
+	return arch_get_syscall_args(tcp);
+}
+
 #ifdef ptrace_getregset_or_getregs
 # define get_syscall_result_regs get_regs
 #else
@@ -1281,13 +1287,19 @@ get_syscall_result(struct tcb *tcp)
 {
 	if (get_syscall_result_regs(tcp) < 0)
 		return -1;
-	tcp->u_error = 0;
 	get_error(tcp,
 		  (!(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS)
 			|| syscall_tampered(tcp))
                   && !syscall_tampered_nofail(tcp));
 
 	return 1;
+}
+
+static void
+get_error(struct tcb *tcp, const bool check_errno)
+{
+	tcp->u_error = 0;
+	arch_get_error(tcp, check_errno);
 }
 
 #include "get_scno.c"

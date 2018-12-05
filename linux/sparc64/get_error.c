@@ -1,5 +1,5 @@
 static void
-get_error(struct tcb *tcp, const bool check_errno)
+arch_get_error(struct tcb *tcp, const bool check_errno)
 {
 	if (sparc_regs.tstate & 0x1100000000UL) {
 		tcp->u_rval = -1;

@@ -1,6 +1,6 @@
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	if (tcp->currpers == 1) {
 		/*

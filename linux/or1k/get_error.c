@@ -1,7 +1,7 @@
 #include "negated_errno.h"
 
 static void
-get_error(struct tcb *tcp, const bool check_errno)
+arch_get_error(struct tcb *tcp, const bool check_errno)
 {
 	if (check_errno && is_negated_errno(or1k_regs.gpr[11])) {
 		tcp->u_rval = -1;

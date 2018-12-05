@@ -2,7 +2,7 @@
 
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	unsigned long *rbs_end =
 		(unsigned long *) ia64_regs.ar[PT_AUR_BSP];

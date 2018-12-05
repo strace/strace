@@ -1,7 +1,7 @@
 #include "negated_errno.h"
 
 static void
-get_error(struct tcb *tcp, const bool check_errno)
+arch_get_error(struct tcb *tcp, const bool check_errno)
 {
 	/*
 	 * The standard tile calling convention returns the value

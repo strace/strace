@@ -1,6 +1,6 @@
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	static const int syscall_regs[MAX_ARGS] = {
 		4 * (REG_REG0+4),

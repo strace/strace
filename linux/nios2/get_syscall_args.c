@@ -1,6 +1,6 @@
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	tcp->u_arg[0] = nios2_regs.regs[4];
 	tcp->u_arg[1] = nios2_regs.regs[5];
