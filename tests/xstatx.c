@@ -121,6 +121,7 @@ typedef off_t libc_off_t;
 #  define IS_STATX 0
 # endif
 
+#if !XLAT_RAW /* Fixes -Wunused warning */
 static void
 print_ftype(const unsigned int mode)
 {
@@ -141,20 +142,66 @@ print_perms(const unsigned int mode)
 {
 	printf("%#o", mode & ~S_IFMT);
 }
+#endif
+
+static void
+print_st_mode(const unsigned int mode)
+{
+#if XLAT_RAW
+	printf("%#o", mode);
+#elif XLAT_VERBOSE
+	printf("%#o /* ", mode);
+	print_ftype(mode);
+	printf("|");
+	print_perms(mode);
+	printf(" */");
+#else
+	print_ftype(mode);
+	printf("|");
+	print_perms(mode);
+#endif
+}
 
 # if !IS_STATX
+
+static const char *
+sprint_makedev(const unsigned long long val)
+{
+	static char devid[256];
+	int ret;
+
+#if XLAT_RAW
+	ret = snprintf(devid, sizeof(devid),
+			"%#llx", val);
+#elif XLAT_VERBOSE
+	ret = snprintf(devid, sizeof(devid),
+			"%#llx /* makedev(%#x, %#x) */",
+			val, major(val), minor(val));
+#else /* XLAT_ABBREV */
+	ret = snprintf(devid, sizeof(devid),
+			"makedev(%#x, %#x)",
+			major(val), minor(val));
+#endif
+	if (ret < 0)
+		perror_msg_and_fail("sprint_makedev(%llx)", val);
+	if ((unsigned) ret >= sizeof(devid))
+		error_msg_and_fail("sprint_makedev(%llx): buffer "
+					   "overflow", val);
+	return devid;
+}
+
 
 static void
 print_stat(const STRUCT_STAT *st)
 {
-	printf("{st_dev=makedev(%#x, %#x)",
-	       (unsigned int) major(zero_extend_signed_to_ull(st->st_dev)),
-	       (unsigned int) minor(zero_extend_signed_to_ull(st->st_dev)));
+	unsigned long long dev, rdev;
+
+	dev = zero_extend_signed_to_ull(st->st_dev);
+	rdev = zero_extend_signed_to_ull(st->st_rdev);
+	printf("{st_dev=%s", sprint_makedev(dev));
 	printf(", st_ino=%llu", zero_extend_signed_to_ull(st->st_ino));
 	printf(", st_mode=");
-	print_ftype(st->st_mode);
-	printf("|");
-	print_perms(st->st_mode);
+	print_st_mode(st->st_mode);
 	printf(", st_nlink=%llu", zero_extend_signed_to_ull(st->st_nlink));
 	printf(", st_uid=%llu", zero_extend_signed_to_ull(st->st_uid));
 	printf(", st_gid=%llu", zero_extend_signed_to_ull(st->st_gid));
@@ -167,9 +214,7 @@ print_stat(const STRUCT_STAT *st)
 
 	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-		printf(", st_rdev=makedev(%#x, %#x)",
-		       (unsigned int) major(zero_extend_signed_to_ull(st->st_rdev)),
-		       (unsigned int) minor(zero_extend_signed_to_ull(st->st_rdev)));
+		printf(", st_rdev=%s", sprint_makedev(rdev));
 		break;
 	default:
 		printf(", st_size=%llu", zero_extend_signed_to_ull(st->st_size));
@@ -237,9 +282,7 @@ print_stat(const STRUCT_STAT *st)
 	PRINT_FIELD_U32_UID(stx_gid);
 
 	printf(", stx_mode=");
-	print_ftype(st->stx_mode);
-	printf("|");
-	print_perms(st->stx_mode);
+	print_st_mode(st->stx_mode);
 
 	PRINT_FIELD_U(", ", *st, stx_ino);
 	PRINT_FIELD_U(", ", *st, stx_size);

@@ -89,7 +89,13 @@ finit_module	-a25
 flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
 fstat	-a15 -v -P stat.sample
+fstat-Xabbrev -a15 -v -Xabbrev -P stat.sample -e trace=fstat
+fstat-Xraw -a15 -v -Xraw -P stat.sample -e trace=fstat
+fstat-Xverbose -a15 -v -Xverbose -P stat.sample -e trace=fstat
 fstat64	-a17 -v -P stat.sample
+fstat64-Xabbrev -a17 -Xabbrev -v -P stat.sample -e trace=fstat64
+fstat64-Xraw -a17 -Xraw -v -P stat.sample -e trace=fstat64
+fstat64-Xverbose -a17 -Xverbose -v -P stat.sample -e trace=fstat64
 fstatat64	-a32 -v -P stat.sample -P /dev/full
 fstatfs	-a18
 fstatfs64	-a24

@@ -89,7 +89,13 @@ finit_module
 flock
 fork-f
 fstat
+fstat-Xabbrev
+fstat-Xraw
+fstat-Xverbose
 fstat64
+fstat64-Xabbrev
+fstat64-Xraw
+fstat64-Xverbose
 fstatat64
 fstatfs
 fstatfs64
