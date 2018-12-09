@@ -187,6 +187,10 @@ ipc_shm-Xraw	+ipc.sh -Xraw -a19
 ipc_shm-Xverbose	+ipc.sh -Xverbose -a36
 kcmp	-a22
 kcmp-y	-a22 -y -e trace=kcmp
+kernel_version	-a16 -v -e trace=bpf
+kernel_version-Xabbrev	-a16 -Xabbrev -v -e trace=bpf
+kernel_version-Xraw	-a16 -Xraw -v -e trace=bpf
+kernel_version-Xverbose	-a16 -Xverbose -v -e trace=bpf
 kern_features -a16
 kexec_file_load	-s9
 kexec_load	-s9

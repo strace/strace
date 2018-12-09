@@ -159,6 +159,10 @@ ipc_shm-Xverbose
 kcmp
 kcmp-y
 kern_features
+kernel_version
+kernel_version-Xabbrev
+kernel_version-Xraw
+kernel_version-Xverbose
 kexec_file_load
 kexec_load
 keyctl
