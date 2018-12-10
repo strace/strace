@@ -3,7 +3,8 @@ strace - the linux syscall tracer
 
 This is [strace](https://strace.io) -- a diagnostic, debugging and instructional userspace utility with a traditional command-line interface for Linux.  It is used to monitor and tamper with interactions between processes and the Linux kernel, which include system calls, signal deliveries, and changes of process state.  The operation of strace is made possible by the kernel feature known as [ptrace](http://man7.org/linux/man-pages/man2/ptrace.2.html).
 
-strace is released under a Berkeley-style license at the request of Paul Kranenburg; see the file [COPYING](COPYING) for details.
+strace is released under the terms of [the GNU Lesser General Public License version 2.1 or later](LGPL-2.1-or-later); see the file [COPYING](COPYING) for details.
+strace test suite is released under the terms of [the GNU General Public License version 2 or later](tests/GPL-2.0-or-later); see the file [tests/COPYING](tests/COPYING) for details.
 
 See the file [NEWS](NEWS) for information on what has changed in recent versions.
 

@@ -4,8 +4,10 @@ and tamper with interactions between processes and the Linux kernel, which
 include system calls, signal deliveries, and changes of process state.
 The operation of strace is made possible by the kernel feature known as ptrace.
 
-strace is released under a Berkeley-style license at the request
-of Paul Kranenburg; see the file COPYING for details.
+strace is released under the terms of the GNU Lesser General Public License
+version 2.1 or later; see the file COPYING for details.
+strace test suite is released under the terms of the GNU General Public License
+version 2 or later; see the file tests/COPYING for details.
 
 See the file CREDITS for a list of authors and other contributors.
 See the file INSTALL for compilation and installation instructions.
