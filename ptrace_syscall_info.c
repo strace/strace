@@ -7,12 +7,15 @@
 
 #include "defs.h"
 #include "kill_save_errno.h"
+#include "print_fields.h"
 #include "ptrace.h"
 #include "ptrace_syscall_info.h"
 #include "scno.h"
 
 #include <signal.h>
 #include <sys/wait.h>
+
+#include "xlat/ptrace_syscall_info_op.h"
 
 bool ptrace_get_syscall_info_supported;
 
@@ -30,6 +33,8 @@ static const unsigned int expected_entry_size =
 	offsetofend(struct ptrace_syscall_info, entry.args);
 static const unsigned int expected_exit_size =
 	offsetofend(struct ptrace_syscall_info, exit.is_error);
+static const unsigned int expected_seccomp_size =
+	offsetofend(struct ptrace_syscall_info, seccomp.ret_data);
 
 /*
  * Test that PTRACE_GET_SYSCALL_INFO API is supported by the kernel, and
@@ -249,4 +254,85 @@ done:
 		debug_msg("PTRACE_GET_SYSCALL_INFO does not work");
 
 	return ptrace_get_syscall_info_supported;
+}
+
+void
+print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
+			  kernel_ulong_t user_len)
+{
+	struct ptrace_syscall_info info;
+	kernel_ulong_t kernel_len = tcp->u_rval;
+	kernel_ulong_t ret_len = MIN(user_len, kernel_len);
+	kernel_ulong_t fetch_size = MIN(ret_len, expected_seccomp_size);
+
+	if (!fetch_size || !tfetch_mem(tcp, addr, fetch_size, &info)) {
+		printaddr(addr);
+		return;
+	}
+
+	PRINT_FIELD_XVAL_INDEX("{", info, op, ptrace_syscall_info_op,
+			       "PTRACE_SYSCALL_INFO_???");
+	if (fetch_size < offsetofend(struct ptrace_syscall_info, arch))
+		goto printed;
+	PRINT_FIELD_XVAL(", ", info, arch, audit_arch, "AUDIT_ARCH_???");
+
+	if (fetch_size < offsetofend(struct ptrace_syscall_info,
+				     instruction_pointer))
+		goto printed;
+	PRINT_FIELD_ADDR64(", ", info, instruction_pointer);
+
+	if (fetch_size < offsetofend(struct ptrace_syscall_info, stack_pointer))
+		goto printed;
+	PRINT_FIELD_ADDR64(", ", info, stack_pointer);
+
+	if (fetch_size < offsetofend(struct ptrace_syscall_info, entry.nr))
+		goto printed;
+
+	switch(info.op) {
+		case PTRACE_SYSCALL_INFO_ENTRY:
+		case PTRACE_SYSCALL_INFO_SECCOMP:
+			PRINT_FIELD_U((info.op == PTRACE_SYSCALL_INFO_ENTRY
+				       ? ", entry={" : ", seccomp={"),
+				      info.entry, nr);
+			for (unsigned int i = 0;
+			     i < ARRAY_SIZE(info.entry.args); ++i) {
+				const unsigned int i_size =
+					offsetofend(struct ptrace_syscall_info,
+						    entry.args[i]);
+				if (fetch_size < i_size) {
+					if (i)
+						break;
+					goto entry_printed;
+				}
+				tprintf(", %s%#" PRIx64,
+					(i ? "" : "arg=["),
+					(uint64_t) info.entry.args[i]);
+			}
+			tprints("]");
+			if (info.op == PTRACE_SYSCALL_INFO_SECCOMP
+			    && fetch_size >= expected_seccomp_size)
+				PRINT_FIELD_U(", ", info.seccomp, ret_data);
+entry_printed:
+			tprints("}");
+			break;
+		case PTRACE_SYSCALL_INFO_EXIT:
+			tprints(", exit={");
+			if (fetch_size >= expected_exit_size
+			    && info.exit.is_error) {
+				uint64_t err = -info.exit.rval;
+
+				tprints("rval=-");
+				print_xlat_ex(err, err_name(err),
+					      XLAT_STYLE_FMT_U);
+			} else {
+				PRINT_FIELD_D("", info.exit, rval);
+			}
+			if (fetch_size >= expected_exit_size)
+				PRINT_FIELD_U(", ", info.exit, is_error);
+			tprints("}");
+			break;
+	}
+
+printed:
+	tprints("}");
 }

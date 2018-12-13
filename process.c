@@ -22,6 +22,7 @@
 #endif
 
 #include "ptrace.h"
+#include "ptrace_syscall_info.h"
 #include "regs.h"
 
 #include "xlat/nt_descriptor_types.h"
@@ -220,6 +221,7 @@ SYS_FUNC(ptrace)
 		case PTRACE_GETSIGMASK:
 		case PTRACE_PEEKSIGINFO:
 		case PTRACE_SECCOMP_GET_FILTER:
+		case PTRACE_GET_SYSCALL_INFO:
 			if (verbose(tcp)) {
 				/* print data on exiting syscall */
 				return 0;
@@ -283,7 +285,11 @@ SYS_FUNC(ptrace)
 				tprints(", ...");
 
 			tprints("}");
+			break;
 		}
+		case PTRACE_GET_SYSCALL_INFO:
+			print_ptrace_syscall_info(tcp, data, addr);
+			break;
 		}
 	}
 	return 0;

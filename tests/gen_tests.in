@@ -332,6 +332,7 @@ process_vm_readv	-s5 -a37
 process_vm_writev	-s5 -a38
 pselect6
 ptrace	-a23 -e signal=none
+ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
 pwritev	-a22 -s7
 quotactl
 quotactl-v	-v -e trace=quotactl
