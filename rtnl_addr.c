@@ -73,14 +73,16 @@ decode_ifa_flags(struct tcb *const tcp,
 }
 
 static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
-	[IFA_ADDRESS]	= decode_ifa_address,
-	[IFA_LOCAL]	= decode_ifa_address,
-	[IFA_LABEL]	= decode_nla_str,
-	[IFA_BROADCAST]	= decode_ifa_address,
-	[IFA_ANYCAST]	= decode_ifa_address,
-	[IFA_CACHEINFO]	= decode_ifa_cacheinfo,
-	[IFA_MULTICAST]	= decode_ifa_address,
-	[IFA_FLAGS]	= decode_ifa_flags
+	[IFA_ADDRESS]		= decode_ifa_address,
+	[IFA_LOCAL]		= decode_ifa_address,
+	[IFA_LABEL]		= decode_nla_str,
+	[IFA_BROADCAST]		= decode_ifa_address,
+	[IFA_ANYCAST]		= decode_ifa_address,
+	[IFA_CACHEINFO]		= decode_ifa_cacheinfo,
+	[IFA_MULTICAST]		= decode_ifa_address,
+	[IFA_FLAGS]		= decode_ifa_flags,
+	[IFA_RT_PRIORITY]	= decode_nla_u32,
+	[IFA_TARGET_NETNSID]	= decode_nla_s32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
