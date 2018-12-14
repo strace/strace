@@ -101,6 +101,7 @@ static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
 	[IFA_CACHEINFO]		= decode_ifa_cacheinfo,
 	[IFA_MULTICAST]		= decode_ifa_address,
 	[IFA_FLAGS]		= decode_ifa_flags,
+	[IFA_RT_PRIORITY]	= decode_nla_u32,
 	[IFA_TARGET_NETNSID]	= decode_nla_s32,
 };
 
