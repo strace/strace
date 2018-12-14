@@ -40,6 +40,15 @@ main(int argc, char **argv)
 		(kernel_ulong_t) 0xdeadfacebadc0dedULL;
 	static const kernel_ulong_t bogus_arg3 =
 		(kernel_ulong_t) 0xdecafeedbeefda7eULL;
+
+	static const struct {
+		long arg;
+		const char *str;
+	} spec_strs[] = {
+		{ 0, "PR_SPEC_STORE_BYPASS" },
+		{ 1, "PR_SPEC_INDIRECT_BRANCH" },
+	};
+
 	static const struct {
 		long arg;
 		const char *str;
@@ -78,8 +87,8 @@ main(int argc, char **argv)
 	injected_val = strtol(argv[1], NULL, 0);
 
 	/* PR_GET_SPECULATION_CTRL */
-	rc = do_prctl(52, 1, bogus_arg3);
-	printf("prctl(PR_GET_SPECULATION_CTRL, 0x1 /* PR_SPEC_??? */) "
+	rc = do_prctl(52, 2, bogus_arg3);
+	printf("prctl(PR_GET_SPECULATION_CTRL, 0x2 /* PR_SPEC_??? */) "
 	       "= %s (INJECTED)\n", sprintrc(rc));
 
 	rc = do_prctl(52, bogus_arg2, bogus_arg3);
@@ -87,24 +96,26 @@ main(int argc, char **argv)
 	       "= %s (INJECTED)\n",
 	       (unsigned long long) bogus_arg2, sprintrc(rc));
 
-	rc = do_prctl(52, 0, bogus_arg3);
+	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
+		rc = do_prctl(52, spec_strs[c].arg, bogus_arg3);
 
-	for (unsigned i = 0; i < ARRAY_SIZE(get_strs); i++) {
-		if (get_strs[i].arg == rc) {
-			str = get_strs[i].str;
-			break;
+		for (unsigned i = 0; i < ARRAY_SIZE(get_strs); i++) {
+			if (get_strs[i].arg == rc) {
+				str = get_strs[i].str;
+				break;
+			}
 		}
-	}
-	if (!str)
-		error_msg_and_fail("Unknown return value: %ld", rc);
+		if (!str)
+			error_msg_and_fail("Unknown return value: %ld", rc);
 
-	printf("prctl(PR_GET_SPECULATION_CTRL, PR_SPEC_STORE_BYPASS) "
-	       "= %s%s (INJECTED)\n", sprintrc(rc), str);
+		printf("prctl(PR_GET_SPECULATION_CTRL, %s) = %s%s (INJECTED)\n",
+		       spec_strs[c].str, sprintrc(rc), str);
+	}
 
 
 	/* PR_SET_SPECULATION_CTRL*/
-	rc = do_prctl(53, 1, bogus_arg3);
-	printf("prctl(PR_SET_SPECULATION_CTRL, 0x1 /* PR_SPEC_??? */, %#llx) "
+	rc = do_prctl(53, 2, bogus_arg3);
+	printf("prctl(PR_SET_SPECULATION_CTRL, 0x2 /* PR_SPEC_??? */, %#llx) "
 	       "= %s (INJECTED)\n",
 	       (unsigned long long) bogus_arg3, sprintrc(rc));
 
@@ -115,11 +126,13 @@ main(int argc, char **argv)
 	       (unsigned long long) bogus_arg3,
 	       sprintrc(rc));
 
-	for (unsigned i = 0; i < ARRAY_SIZE(set_strs); i++) {
-		rc = do_prctl(53, 0, set_strs[i].arg);
-		printf("prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_STORE_BYPASS"
-		       ", %s) = %s (INJECTED)\n",
-		       set_strs[i].str, sprintrc(rc));
+	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
+		for (unsigned i = 0; i < ARRAY_SIZE(set_strs); i++) {
+			rc = do_prctl(53, spec_strs[c].arg, set_strs[i].arg);
+			printf("prctl(PR_SET_SPECULATION_CTRL, %s"
+			       ", %s) = %s (INJECTED)\n",
+			       spec_strs[c].str, set_strs[i].str, sprintrc(rc));
+		}
 	}
 
 	puts("+++ exited with 0 +++");
