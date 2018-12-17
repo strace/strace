@@ -33,3 +33,7 @@ BLKZEROOUT		_IO(0x12, 127)
 /* BLKDAXSET		_IO(0x12, 128) */
 /* BLKDAXGET was present between v4.5-rc1~112^2^2~16 and v4.7-rc1~78^2^2~4 */
 BLKDAXGET		_IO(0x12, 129)
+/* BLKREPORTZONE	_IOWR(0x12, 130, struct blk_zone_report) */
+/* BLKRESETZONE		_IOW(0x12, 131, struct blk_zone_range) */
+BLKGETZONESZ		_IOR(0x12, 132, uint32_t)
+BLKGETNRZONES		_IOR(0x12, 133, uint32_t)

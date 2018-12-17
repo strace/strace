@@ -116,6 +116,8 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKIOMIN:
 	case BLKIOOPT:
 	case BLKDISCARDZEROES:
+	case BLKGETZONESZ:
+	case BLKGETNRZONES:
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
