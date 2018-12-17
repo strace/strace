@@ -510,6 +510,7 @@ sigprocmask
 sigreturn
 sigsuspend
 sleep
+so_error
 so_linger
 so_peercred
 so_peercred-Xabbrev

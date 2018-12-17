@@ -421,6 +421,7 @@ sigpending	-a15
 sigprocmask	-a34
 sigreturn	-esignal='!USR1'
 sigsuspend	-a19 -esignal=none
+so_error	-e trace=getsockopt
 so_linger	-e trace=getsockopt,setsockopt
 so_peercred	-e trace=getsockopt
 so_peercred-Xabbrev	-e trace=getsockopt -Xabbrev

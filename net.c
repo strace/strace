@@ -651,6 +651,23 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints("}");
 }
 
+static void
+print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
+		unsigned int len)
+{
+	unsigned int err;
+
+	if (len > sizeof(err))
+		err = sizeof(err);
+
+	if (umoven_or_printaddr(tcp, addr, len, &err))
+		return;
+
+	tprints("[");
+	print_xlat_ex(err, err_name(err), XLAT_STYLE_FMT_U);
+	tprints("]");
+}
+
 #ifdef PACKET_STATISTICS
 static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
@@ -765,6 +782,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 				print_sock_fprog(tcp, addr, rlen);
 			else
 				printaddr(addr);
+			return;
+		case SO_ERROR:
+			print_get_error(tcp, addr, rlen);
 			return;
 		}
 		break;

@@ -421,6 +421,7 @@ sigpending
 sigprocmask
 sigreturn
 sigsuspend
+so_error
 so_linger
 so_peercred
 so_peercred-Xabbrev
