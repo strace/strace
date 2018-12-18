@@ -76,10 +76,9 @@ vcpu_register(struct tcb *const tcp, int fd, int cpuid)
 
 	struct vcpu_info *vcpu_info = vcpu_find(tcp, fd);
 
-	if (!vcpu_info)
-		vcpu_info = vcpu_alloc(tcp, fd, cpuid);
-	else if (vcpu_info->cpuid != cpuid)
-	{
+	if (!vcpu_info) {
+		vcpu_alloc(tcp, fd, cpuid);
+	} else if (vcpu_info->cpuid != cpuid) {
 		vcpu_info->cpuid = cpuid;
 		vcpu_info->resolved = false;
 	}
