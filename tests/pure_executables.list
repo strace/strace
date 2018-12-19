@@ -342,6 +342,9 @@ ptrace
 ptrace_syscall_info
 pwritev
 quotactl
+quotactl-Xabbrev
+quotactl-Xraw
+quotactl-Xverbose
 quotactl-xfs
 read-write
 readahead

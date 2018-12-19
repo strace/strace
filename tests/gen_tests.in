@@ -338,6 +338,9 @@ ptrace	-a23 -e signal=none
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
 pwritev	-a22 -s7
 quotactl
+quotactl-Xabbrev	-Xabbrev -e trace=quotactl
+quotactl-Xraw	-a27 -Xraw -e trace=quotactl
+quotactl-Xverbose	-Xverbose -e trace=quotactl
 quotactl-v	-v -e trace=quotactl
 quotactl-xfs	-e trace=quotactl
 quotactl-xfs-v	-v -e trace=quotactl

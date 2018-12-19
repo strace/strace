@@ -394,6 +394,31 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	return RVAL_DECODED;
 }
 
+static void
+print_qcmd(const uint32_t qcmd)
+{
+	const uint32_t cmd = QCMD_CMD(qcmd);
+	const uint32_t type = QCMD_TYPE(qcmd);
+
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%u", qcmd);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	tprints("QCMD(");
+	printxvals_ex(cmd, "Q_???", XLAT_STYLE_ABBREV, quotacmds, NULL);
+	tprints(", ");
+	printxvals_ex(type, "???QUOTA", XLAT_STYLE_ABBREV, quotatypes, NULL);
+	tprints(")");
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" */");
+}
+
 SYS_FUNC(quotactl)
 {
 	/*
@@ -404,15 +429,11 @@ SYS_FUNC(quotactl)
 	 */
 	uint32_t qcmd = tcp->u_arg[0];
 	uint32_t cmd = QCMD_CMD(qcmd);
-	uint32_t type = QCMD_TYPE(qcmd);
 	uint32_t id = tcp->u_arg[2];
 
 	if (entering(tcp)) {
-		tprints("QCMD(");
-		printxval(quotacmds, cmd, "Q_???");
+		print_qcmd(qcmd);
 		tprints(", ");
-		printxval(quotatypes, type, "???QUOTA");
-		tprints("), ");
 		printpath(tcp, tcp->u_arg[1]);
 	}
 	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);

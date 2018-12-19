@@ -57,6 +57,10 @@ struct if_nextdqblk {
 # include "xlat/if_dqinfo_flags.h"
 # include "xlat/if_dqinfo_valid.h"
 
+#define QUOTA_STR(_arg) (_arg), gen_quotacmd(#_arg, _arg)
+#define QUOTA_ID_STR(_arg) (_arg), gen_quotaid(#_arg, _arg)
+#define QUOTA_STR_INVALID(_arg, str) (_arg), gen_quotacmd(str, _arg)
+
 void
 print_dqblk(long rc, void *ptr, void *arg)
 {
@@ -135,9 +139,25 @@ print_dqinfo(long rc, void *ptr, void *arg)
 	PRINT_FIELD_U(", ", *di, dqi_igrace);
 
 	printf(", dqi_flags=");
+#if XLAT_RAW
+	printf("%#x", di->dqi_flags);
+#elif XLAT_VERBOSE
+	printf("%#x /* ", di->dqi_flags);
 	printflags(if_dqinfo_flags, di->dqi_flags, "DQF_???");
+	printf(" */");
+#else /* XLAT_ABBREV */
+	printflags(if_dqinfo_flags, di->dqi_flags, "DQF_???");
+#endif
 	printf(", dqi_valid=");
+#if XLAT_RAW
+	printf("%#x", di->dqi_valid);
+#elif XLAT_VERBOSE
+	printf("%#x /* ", di->dqi_valid);
 	printflags(if_dqinfo_valid, di->dqi_valid, "IIF_???");
+	printf(" */");
+#else /* XLAT_ABBREV */
+	printflags(if_dqinfo_valid, di->dqi_valid, "IIF_???");
+#endif
 	printf("}");
 }
 
@@ -153,6 +173,10 @@ print_dqfmt(long rc, void *ptr, void *arg)
 		return;
 	}
 	printf("[");
+#if XLAT_RAW
+	printf("%#x]", *fmtval);
+	return;
+#else
 	switch (*fmtval) {
 	case 1:
 		fmtstr = "QFMT_VFS_OLD";
@@ -170,9 +194,43 @@ print_dqfmt(long rc, void *ptr, void *arg)
 		printf("%#x /* QFMT_VFS_??? */]", *fmtval);
 		return;
 	}
+#endif
+#if XLAT_VERBOSE
+	printf("%#x /* %s */]", *fmtval, fmtstr);
+#else
 	printf("%s]", fmtstr);
+#endif
 }
 
+const char *
+gen_quotacmd(const char *abbrev_str, const uint32_t cmd)
+{
+	static char quotacmd_str[2048];
+
+#if XLAT_RAW
+	snprintf(quotacmd_str, sizeof(quotacmd_str), "%u", cmd);
+#elif XLAT_VERBOSE
+	snprintf(quotacmd_str, sizeof(quotacmd_str), "%u /* %s */", cmd, abbrev_str);
+#else
+	return abbrev_str;
+#endif
+	return quotacmd_str;
+}
+
+const char *
+gen_quotaid(const char *abbrev_str, const uint32_t id)
+{
+	static char quotaid_str[1024];
+
+#if XLAT_RAW
+	snprintf(quotaid_str, sizeof(quotaid_str), "%#x", id);
+#elif XLAT_VERBOSE
+	snprintf(quotaid_str, sizeof(quotaid_str), "%#x /* %s */", id, abbrev_str);
+#else
+	return abbrev_str;
+#endif
+	return quotaid_str;
+}
 
 int
 main(void)
@@ -199,65 +257,71 @@ main(void)
 
 
 	/* Invalid commands */
-
 	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
 		 "QCMD(%#x /* Q_??? */, %#x /* ???QUOTA */)",
 		 QCMD_CMD(bogus_cmd), QCMD_TYPE(bogus_cmd));
-	check_quota(CQF_NONE, bogus_cmd, invalid_cmd_str,
+	check_quota(CQF_NONE, bogus_cmd, gen_quotacmd(invalid_cmd_str, bogus_cmd),
 		    bogus_special, bogus_special_str, bogus_id, bogus_addr);
 
 	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
 		 "QCMD(0 /* Q_??? */, USRQUOTA)");
-	check_quota(CQF_ADDR_STR, 0, invalid_cmd_str,
+	check_quota(CQF_ADDR_STR, 0, gen_quotacmd(invalid_cmd_str, 0),
 		    ARG_STR(NULL), -1, ARG_STR(NULL));
 
 
 	/* Q_QUOTAON */
 
 	check_quota(CQF_ID_STR | CQF_ADDR_STR,
-		    ARG_STR(QCMD(Q_QUOTAON, USRQUOTA)),
-		    ARG_STR("/dev/bogus/"), ARG_STR(QFMT_VFS_OLD),
+		    QUOTA_STR(QCMD(Q_QUOTAON, USRQUOTA)),
+		    ARG_STR("/dev/bogus/"), QUOTA_ID_STR(QFMT_VFS_OLD),
 		    ARG_STR("/tmp/bogus/"));
 
 	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
 		 "QCMD(Q_QUOTAON, %#x /* ???QUOTA */)",
 		 QCMD_TYPE(QCMD(Q_QUOTAON, 0xfacefeed)));
+#if XLAT_RAW
+	snprintf(invalid_id_str, sizeof(invalid_id_str),
+		 "%#x", bogus_id);
+#else
 	snprintf(invalid_id_str, sizeof(invalid_id_str),
 		 "%#x /* QFMT_VFS_??? */", bogus_id);
+#endif
 	check_quota(CQF_ID_STR, QCMD(Q_QUOTAON, 0xfacefeed),
-		    invalid_cmd_str, bogus_dev, bogus_dev_str,
+		    gen_quotacmd(invalid_cmd_str, QCMD(Q_QUOTAON, 0xfacefeed)),
+		    bogus_dev, bogus_dev_str,
 		    bogus_id, invalid_id_str, bogus_addr);
 
 
 	/* Q_QUOTAOFF */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_SKIP,
-		    ARG_STR(QCMD(Q_QUOTAOFF, USRQUOTA)),
+		    QUOTA_STR(QCMD(Q_QUOTAOFF, USRQUOTA)),
 		    bogus_special, bogus_special_str);
 	check_quota(CQF_ID_SKIP | CQF_ADDR_SKIP,
-		    ARG_STR(QCMD(Q_QUOTAOFF, GRPQUOTA)),
+		    QUOTA_STR(QCMD(Q_QUOTAOFF, GRPQUOTA)),
 		    ARG_STR("/dev/bogus/"));
 	check_quota(CQF_ID_SKIP | CQF_ADDR_SKIP,
-		    ARG_STR(QCMD(Q_QUOTAOFF, PRJQUOTA)), ARG_STR(NULL));
+		    QUOTA_STR(QCMD(Q_QUOTAOFF, PRJQUOTA)), ARG_STR(NULL));
+	const char *cmd_str = "QCMD(Q_QUOTAOFF, 0x3 /* ???QUOTA */)";
 	check_quota(CQF_ID_SKIP | CQF_ADDR_SKIP,
-		    QCMD(Q_QUOTAOFF, 3), "QCMD(Q_QUOTAOFF, 0x3 /* ???QUOTA */)",
+		    QUOTA_STR_INVALID(QCMD(Q_QUOTAOFF, 3), cmd_str),
 		    ARG_STR(NULL));
 
 
 	/* Q_GETQUOTA */
 
 	/* Trying our best to get successful result */
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, USRQUOTA)),
+	check_quota(CQF_ADDR_CB, QUOTA_STR(QCMD(Q_GETQUOTA, USRQUOTA)),
 		    ARG_STR("/dev/sda1"), getuid(), dqblk, print_dqblk,
 		    (intptr_t) 1);
 
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, GRPQUOTA)),
+	check_quota(CQF_ADDR_CB, QUOTA_STR(QCMD(Q_GETQUOTA, GRPQUOTA)),
 		    ARG_STR(NULL), -1, dqblk, print_dqblk, (intptr_t) 1);
 
 
 	/* Q_GETNEXTQUOTA */
 
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETNEXTQUOTA, USRQUOTA)),
+	check_quota(CQF_ADDR_CB, QUOTA_STR(QCMD(Q_GETNEXTQUOTA, USRQUOTA)),
 		    ARG_STR("/dev/sda1"), 0, nextdqblk, print_nextdqblk,
 		    (intptr_t) 1);
 
@@ -266,10 +330,10 @@ main(void)
 
 	fill_memory(dqblk, sizeof(*dqblk));
 
-	check_quota(CQF_NONE, ARG_STR(QCMD(Q_SETQUOTA, PRJQUOTA)),
+	check_quota(CQF_NONE, QUOTA_STR(QCMD(Q_SETQUOTA, PRJQUOTA)),
 		    bogus_special, bogus_special_str, 0, bogus_addr);
 
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_SETQUOTA, PRJQUOTA)),
+	check_quota(CQF_ADDR_CB, QUOTA_STR(QCMD(Q_SETQUOTA, PRJQUOTA)),
 		    ARG_STR("/dev/bogus/"), 3141592653U, dqblk, print_dqblk,
 		    (intptr_t) 0);
 
@@ -277,11 +341,11 @@ main(void)
 	/* Q_GETINFO */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_GETINFO, GRPQUOTA)),
+		    QUOTA_STR(QCMD(Q_GETINFO, GRPQUOTA)),
 		    ARG_STR("/dev/sda1"), dqinfo, print_dqinfo, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_GETINFO, GRPQUOTA)),
+		    QUOTA_STR(QCMD(Q_GETINFO, GRPQUOTA)),
 		    bogus_special, bogus_special_str, dqinfo,
 		    print_dqinfo, (intptr_t) 1);
 
@@ -292,39 +356,40 @@ main(void)
 	dqinfo->dqi_flags = 0xdeadabcd;
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_STR,
-		    ARG_STR(QCMD(Q_SETINFO, PRJQUOTA)),
+		    QUOTA_STR(QCMD(Q_SETINFO, PRJQUOTA)),
 		    bogus_special, bogus_special_str, ARG_STR(NULL));
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_SETINFO, USRQUOTA)),
+		    QUOTA_STR(QCMD(Q_SETINFO, USRQUOTA)),
 		    ARG_STR("/dev/bogus/"), dqinfo, print_dqinfo, (intptr_t) 0);
 
 
 	/* Q_GETFMT */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_STR,
-		    ARG_STR(QCMD(Q_GETFMT, PRJQUOTA)),
+		    QUOTA_STR(QCMD(Q_GETFMT, PRJQUOTA)),
 		    bogus_special, bogus_special_str, ARG_STR(NULL));
 	check_quota(CQF_ID_SKIP,
-		    ARG_STR(QCMD(Q_GETFMT, USRQUOTA)),
+		    QUOTA_STR(QCMD(Q_GETFMT, USRQUOTA)),
 		    unterminated, unterminated_str, fmt + 1);
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_GETFMT, GRPQUOTA)),
+		    QUOTA_STR(QCMD(Q_GETFMT, GRPQUOTA)),
 		    ARG_STR("/dev/sda1"), fmt, print_dqfmt, (uintptr_t) 1);
 	/* Try to check valid quota format */
 	*fmt = QFMT_VFS_OLD;
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_GETFMT, GRPQUOTA)),
+		    QUOTA_STR(QCMD(Q_GETFMT, GRPQUOTA)),
 		    ARG_STR("/dev/sda1"), fmt, print_dqfmt, (uintptr_t) 1);
 
 
 	/* Q_SYNC */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_SKIP,
-		    ARG_STR(QCMD(Q_SYNC, USRQUOTA)),
+		    QUOTA_STR(QCMD(Q_SYNC, USRQUOTA)),
 		    bogus_special, bogus_special_str);
+	cmd_str = "QCMD(Q_SYNC, 0xff /* ???QUOTA */)";
 	check_quota(CQF_ID_SKIP | CQF_ADDR_SKIP,
-		    QCMD(Q_SYNC, 0xfff), "QCMD(Q_SYNC, 0xff /* ???QUOTA */)",
+		    QUOTA_STR_INVALID(QCMD(Q_SYNC, 0xfff), cmd_str),
 		    ARG_STR(NULL));
 
 	puts("+++ exited with 0 +++");
