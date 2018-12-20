@@ -324,6 +324,9 @@ printstr	-e trace=writev
 printpath-umovestr	-a11 -e signal=none -e trace=chdir
 printpath-umovestr-peekdata	-a11 -e signal=none -e trace=chdir
 printpath-umovestr-undumpable	-a11 -e signal=none -e trace=chdir
+printsignal-Xabbrev	-a11 -Xabbrev -e signal=none -e trace=kill
+printsignal-Xraw	-a11 -Xraw -e signal=none -e trace=kill
+printsignal-Xverbose 	-a11 -Xverbose -e signal=none -e trace=kill
 printstrn-umoven	-s4096 -e signal=none -e trace=add_key
 printstrn-umoven-peekdata	-e signal=none -e trace=add_key
 printstrn-umoven-undumpable	-e signal=none -e trace=add_key

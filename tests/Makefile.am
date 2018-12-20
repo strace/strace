@@ -391,6 +391,7 @@ EXTRA_DIST = \
 	nlattr_ifla.h \
 	pipe.expected \
 	print_user_desc.c \
+	printsignal.c \
 	process_vm_readv_writev.c \
 	pure_executables.list \
 	qual_fault-exit_group.expected \

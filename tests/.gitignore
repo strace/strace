@@ -391,6 +391,9 @@ print_maxfd
 printpath-umovestr
 printpath-umovestr-peekdata
 printpath-umovestr-undumpable
+printsignal-Xabbrev
+printsignal-Xraw
+printsignal-Xverbose
 printstr
 printstrn-umoven
 printstrn-umoven-peekdata
