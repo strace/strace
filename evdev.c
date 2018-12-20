@@ -188,7 +188,7 @@ decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
 
 #define decode_bitset(tcp_, arg_, decode_nr_, max_nr_, dflt_, xt_) \
 	decode_bitset_((tcp_), (arg_), (decode_nr_), (max_nr_), \
-		       (dflt_), ARRAY_SIZE(decode_nr_), (xt_))
+		       (dflt_), ARRAY_SIZE(decode_nr_) - 1, (xt_))
 
 # ifdef EVIOCGMTSLOTS
 static int
