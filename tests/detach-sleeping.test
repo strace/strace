@@ -15,6 +15,12 @@ run_prog_skip_if_failed \
 
 check_prog sleep
 
+trap - TERM
+sleep $TIMEOUT_DURATION &
+kill -TERM $!
+wait $!
+expected_rc=$?
+
 set -e
 
 ../set_ptracer_any sleep $((2*$TIMEOUT_DURATION)) > "$LOG" &
@@ -45,12 +51,17 @@ while ! grep -F "Process $tracee_pid attached" "$LOG" > /dev/null; do
 	$SLEEP_A_BIT
 done
 
-kill -INT $!
-wait $!
+kill -TERM $!
+wait $! && rc=0 || rc=$?
 
 grep -F "Process $tracee_pid detached" "$LOG" > /dev/null || {
 	cleanup
 	dump_log_and_fail_with "$STRACE -p failed to detach"
+}
+
+[ "$rc" = "$expected_rc" ] || {
+	cleanup
+	dump_log_and_fail_with "$STRACE -p failed to terminate itself"
 }
 
 if [ -f /proc/self/status ]; then

@@ -13,12 +13,18 @@
 run_prog_skip_if_failed \
 	kill -0 $$
 
-check_prog sleep
-
 $STRACE -d -enone / > /dev/null 2> "$LOG"
 if grep -x "[^:]*strace: PTRACE_SEIZE doesn't work" "$LOG" > /dev/null; then
 	skip_ "PTRACE_SEIZE doesn't work"
 fi
+
+check_prog sleep
+
+trap - TERM
+sleep $TIMEOUT_DURATION &
+kill -TERM $!
+wait $!
+expected_rc=$?
 
 set -e
 
@@ -62,12 +68,17 @@ while ! grep -F -e '--- stopped by ' "$LOG" > /dev/null; do
 	$SLEEP_A_BIT
 done
 
-kill -INT $!
-wait $!
+kill -TERM $!
+wait $! && rc=0 || rc=$?
 
 grep -F "Process $tracee_pid detached" "$LOG" > /dev/null || {
 	cleanup
 	dump_log_and_fail_with "$STRACE -p failed to detach"
+}
+
+[ "$rc" = "$expected_rc" ] || {
+	cleanup
+	dump_log_and_fail_with "$STRACE -p failed to terminate itself"
 }
 
 if [ -f /proc/self/status ]; then

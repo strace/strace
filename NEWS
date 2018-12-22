@@ -1,6 +1,11 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behavior
+  * If strace is interrupted by a signal it handles (currently
+    one of HUP, INT, QUIT, PIPE, or TERM), strace terminates
+    itself with this signal.
+
 Noteworthy changes in release 4.25 (2018-10-30)
 ===============================================
 

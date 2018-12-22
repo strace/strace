@@ -2669,6 +2669,9 @@ terminate(void)
 		while (waitpid(popen_pid, NULL, 0) < 0 && errno == EINTR)
 			;
 	}
+	if (interrupted) {
+		exit_code = 0x100 | interrupted;
+	}
 	if (exit_code > 0xff) {
 		/* Avoid potential core file clobbering.  */
 		struct_rlimit rlim = {0, 0};
