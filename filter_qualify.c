@@ -40,6 +40,9 @@ sigstr_to_uint(const char *s)
 	for (int i = 1; i <= 255; ++i) {
 		const char *name = signame(i);
 
+		if (!name)
+			continue;
+
 		if (strncasecmp(name, "SIG", 3) != 0)
 			continue;
 
