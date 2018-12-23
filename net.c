@@ -128,8 +128,9 @@ SYS_FUNC(socket)
 
 	case AF_AX25:
 		/* Those are not available in public headers.  */
-		printxval_searchn_ex(ARRSZ_PAIR(ax25_protocols), tcp->u_arg[2],
-				     "AX25_P_???", XLAT_STYLE_VERBOSE);
+		printxval_searchn_ex(ARRSZ_PAIR(ax25_protocols) - 1,
+				     tcp->u_arg[2], "AX25_P_???",
+				     XLAT_STYLE_VERBOSE);
 		break;
 
 	case AF_NETLINK:
