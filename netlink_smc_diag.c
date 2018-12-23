@@ -136,7 +136,7 @@ decode_smc_diag_shutdown(struct tcb *const tcp,
 			 const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts opts = {
-		ARRSZ_PAIR(sock_shutdown_flags), "???_SHUTDOWN",
+		ARRSZ_PAIR(sock_shutdown_flags) - 1, "???_SHUTDOWN",
 		.size = 1,
 	};
 
