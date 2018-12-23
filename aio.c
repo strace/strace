@@ -50,7 +50,7 @@ tprint_lio_opcode(unsigned int cmd)
 		[IOCB_CMD_PWRITEV]	= SUB_VECTOR,
 	};
 
-	printxval_indexn_ex(ARRSZ_PAIR(aio_cmds), cmd, "IOCB_CMD_???",
+	printxval_indexn_ex(ARRSZ_PAIR(aio_cmds) - 1, cmd, "IOCB_CMD_???",
 			    XLAT_STYLE_FMT_U);
 
 	return cmd < ARRAY_SIZE(subs) ? subs[cmd] : SUB_NONE;
