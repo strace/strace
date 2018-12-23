@@ -198,7 +198,7 @@ decode_nla_meminfo(struct tcb *const tcp,
 		       tfetch_mem, print_uint32_array_member, &count,
 		       PAF_PRINT_INDICES | PAF_INDEX_XLAT_VALUE_INDEXED
 			| XLAT_STYLE_FMT_U,
-		       ARRSZ_PAIR(netlink_sk_meminfo_indices),
+		       ARRSZ_PAIR(netlink_sk_meminfo_indices) - 1,
 		       "SK_MEMINFO_???");
 
 	return true;
