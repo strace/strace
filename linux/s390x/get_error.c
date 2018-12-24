@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "negated_errno.h"
 
 #define arch_get_error s390_get_error

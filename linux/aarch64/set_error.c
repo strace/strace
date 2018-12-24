@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2016-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #define arch_set_error arm_set_error
 #define arch_set_success arm_set_success
 #include "arm/set_error.c"

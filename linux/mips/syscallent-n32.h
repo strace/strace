@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2013-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #if defined LINUX_MIPSN32
 /* For an N32 strace decode the N32 64-bit syscalls. */
 [6000] = { 3,	TD,		SEN(read),			"read"			}, /* start of Linux N32 */

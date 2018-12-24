@@ -1,4 +1,9 @@
 #!/bin/sh -ex
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
 common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libbluetooth-dev make xz-utils'

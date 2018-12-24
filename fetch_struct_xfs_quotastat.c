@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "defs.h"
 
 #include DEF_MPERS_TYPE(struct_xfs_dqstats)

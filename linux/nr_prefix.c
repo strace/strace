@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 /**
  * Returns prefix for a syscall constant literal.  It is has to be that way
  * thanks to ARM that decided to prefix their special system calls like sys32

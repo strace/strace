@@ -1,6 +1,11 @@
 #!/bin/sh
-
-# check that <unavailable> syscalls are filtered properly
+#
+# Check that <unavailable> syscalls are filtered properly.
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

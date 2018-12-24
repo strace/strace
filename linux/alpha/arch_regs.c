@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static unsigned long alpha_r0;
 static unsigned long alpha_a3;
 

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 1999-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 [  0] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [  1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [  2] = { 0,	TP,		SEN(fork),			"fork"			},

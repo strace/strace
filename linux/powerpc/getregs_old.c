@@ -1,4 +1,11 @@
 /*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+/*
  * PTRACE_GETREGS was added to the PowerPC kernel in v2.6.23,
  * we provide a slow fallback for old kernels.
  */

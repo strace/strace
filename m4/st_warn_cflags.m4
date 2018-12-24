@@ -1,3 +1,10 @@
+#!/usr/bin/m4
+#
+# Copyright (c) 2016-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
 AC_DEFUN([st_WARN_CFLAGS], [dnl
 gl_WARN_ADD([-Wall])
 gl_WARN_ADD([-Wempty-body])

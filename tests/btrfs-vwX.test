@@ -1,6 +1,11 @@
 #!/bin/sh
-
+#
 # Check verbose, verbose xlat decoding of btrfs ioctl w/ live ioctls.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # WARNING: USE OF THIS TEST WILL MODIFY AN EXISTING BTRFS FILE SYSTEM
 

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2016-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #define arch_set_error s390_set_error
 #define arch_set_success s390_set_success
 #define ARCH_REGSET s390_regset

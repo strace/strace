@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2002-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 [  0] = { 3,	TD,		SEN(read),			"read"			},
 [  1] = { 3,	TD,		SEN(write),			"write"			},
 [  2] = { 3,	TD|TF,		SEN(open),			"open"			},

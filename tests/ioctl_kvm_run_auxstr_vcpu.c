@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #define KVM_NO_CPUID_CALLBACK	\
 	error_msg_and_skip("newer kernel (>= 4.16) is needed")
 

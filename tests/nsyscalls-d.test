@@ -1,6 +1,11 @@
 #!/bin/sh
-
+#
 # Check decoding of out-of-range syscalls along with debug ouput
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

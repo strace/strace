@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
 /* <asm/ptrace.h> does not provide these definitions.  */
 #define R15		0

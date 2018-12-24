@@ -1,4 +1,11 @@
 /*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+/*
  * On i386, pt_regs and user_regs_struct are the same,
  * but on 64 bit x86, user_regs_struct has six more fields:
  * fs_base, gs_base, ds, es, fs, gs.

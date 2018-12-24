@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #define arch_sigreturn	sparc64_arch_sigreturn
 #include "sparc/arch_sigreturn.c"
 #undef arch_sigreturn

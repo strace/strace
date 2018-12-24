@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 Dmitry V. Levin <ldv@altlinux.org>
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 /* retval to index and visa versa.  */
 #ifndef STRACE_RETVAL_H
 #define STRACE_RETVAL_H

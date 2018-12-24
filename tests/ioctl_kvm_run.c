@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #include "ioctl_kvm_run_common.c"
 
 #if need_print_KVM_RUN

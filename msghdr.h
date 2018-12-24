@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_MSGHDR_H
 #define STRACE_MSGHDR_H
 

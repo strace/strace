@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_XSTRING_H
 #define STRACE_XSTRING_H
 

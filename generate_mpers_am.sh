@@ -1,4 +1,9 @@
 #!/bin/sh -e
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 list="$(sed -r -n '/^strace_SOURCES[[:space:]]*=/,/^[[:space:]]*# end of strace_SOURCES/ s/^[[:space:]]*([[:alnum:]][^.]*\.c)[[:space:]]*\\$/\1/p' Makefile.am |
 	xargs -r grep -Elx '#[[:space:]]*include[[:space:]]+MPERS_DEFS' |

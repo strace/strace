@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2016-2018 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_LINUX_PERF_EVENT_STRUCT_H
 #define STRACE_LINUX_PERF_EVENT_STRUCT_H
 

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static unsigned long hppa_r28;
 
 #define PT_GR20 (20*4)

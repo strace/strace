@@ -1,3 +1,10 @@
 #!/bin/sh -efu
+#
 # Check handling of CLONE_PARENT'ed processes.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 . "${srcdir=.}/clone_ptrace.test"

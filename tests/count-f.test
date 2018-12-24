@@ -1,6 +1,11 @@
 #!/bin/sh
-
-# Check whether -c counts through forks and clones properly
+#
+# Check whether -c counts through forks and clones properly.
+#
+# Copyright (c) 2016-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

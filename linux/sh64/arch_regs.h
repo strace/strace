@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 /* SH64 Linux - this code assumes the following kernel API for system calls:
 	PC           Offset 0
 	System Call  Offset 16 (actually, (syscall no.) | (0x1n << 16),

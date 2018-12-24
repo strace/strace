@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2013-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 [   0] = { 0,	0,	SEN(printargs),		"svr4_syscall"	},
 [   1] = { 0,	0,	SEN(printargs),		"svr4_exit"	},
 [   2] = { 0,	0,	SEN(printargs),		"svr4_fork"	},

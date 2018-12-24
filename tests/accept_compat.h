@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #ifndef _STRACE_TESTS_ACCEPT_COMPAT_H_
 #define _STRACE_TESTS_ACCEPT_COMPAT_H_
 

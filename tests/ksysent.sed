@@ -1,4 +1,9 @@
 #!/bin/sed -rnf
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # should not have been exported at all
 /#define[[:space:]]+__NR_(sys_epoll_|arch_specific_syscall|arm_sync_file_range|syscalls|syscall_count|syscall_max|available|reserved|unused)/d

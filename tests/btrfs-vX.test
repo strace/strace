@@ -1,6 +1,11 @@
 #!/bin/sh
-
-# Check verbose, verbose xlat decoding of btrfs ioctl
+#
+# Check verbose, verbose xlat decoding of btrfs ioctl.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

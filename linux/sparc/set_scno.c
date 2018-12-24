@@ -1,4 +1,11 @@
 /*
+ * Copyright (c) 2016-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+/*
  * Reloading the syscall number from %g1 register is supported
  * by linux kernel starting with commit v4.5-rc7~35^2~3.
  */

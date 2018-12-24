@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static struct pt_regs sparc_regs;
 
 /* Indexes into the pt_regs.u_reg[] array -- UREG_XX from kernel are all off

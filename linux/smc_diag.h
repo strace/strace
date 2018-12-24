@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_LINUX_SMC_DIAG_H
 #define STRACE_LINUX_SMC_DIAG_H
 

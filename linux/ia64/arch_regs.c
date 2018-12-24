@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static struct pt_all_user_regs ia64_regs;
 
 #define ARCH_REGS_FOR_GETREGS ia64_regs

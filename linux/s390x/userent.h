@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "../s390/userent0.h"
 { PT_FPR0,		"fpr0" },
 { PT_FPR1,		"fpr1" },

@@ -1,4 +1,9 @@
 #!/bin/sh -ex
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 DISTCHECK_CONFIGURE_FLAGS='--disable-dependency-tracking'
 export DISTCHECK_CONFIGURE_FLAGS

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #define arch_get_syscall_args arm_get_syscall_args
 #include "arm/get_syscall_args.c"
 #undef arch_get_syscall_args

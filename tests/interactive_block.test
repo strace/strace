@@ -1,7 +1,12 @@
 #!/bin/sh
-
+#
 # Check that in interactive mode those signals that were blocked
 # at strace startup will remain blocked.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

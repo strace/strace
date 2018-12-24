@@ -2,6 +2,11 @@
 
 # Check how strace -e abbrev=set, -e raw=set, -e trace=set,
 # and -e verbose=set work.
+#
+# Copyright (c) 2014-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

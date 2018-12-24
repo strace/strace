@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 { PT_F32, "f32" }, { PT_F33, "f33" }, { PT_F34, "f34" },
 { PT_F35, "f35" }, { PT_F36, "f36" }, { PT_F37, "f37" },
 { PT_F38, "f38" }, { PT_F39, "f39" }, { PT_F40, "f40" },

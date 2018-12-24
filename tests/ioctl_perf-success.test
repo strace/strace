@@ -1,6 +1,11 @@
 #!/bin/sh -efu
-
+#
 # Check decoding of successful PERF_EVENT_IOC_{ID,QUERY_BPF} ioctls.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/scno_tampering.sh"
 

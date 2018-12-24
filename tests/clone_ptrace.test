@@ -1,5 +1,12 @@
 #!/bin/sh -efu
+#
 # Check handling of CLONE_PTRACE'ed processes.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null 3>&1

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2016-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef NT_ARM_SYSTEM_CALL
 # define NT_ARM_SYSTEM_CALL 0x404
 #endif

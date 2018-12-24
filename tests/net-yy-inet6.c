@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #define ADDR_FAMILY_FIELD sin6_family
 #define ADDR_FAMILY AF_INET6
 #define AF_STR "AF_INET6"

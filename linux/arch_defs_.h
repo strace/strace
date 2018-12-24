@@ -1,4 +1,11 @@
-/* Fallback file for arch-specific definitions.  */
+/*
+ * Fallback file for arch-specific definitions.
+ *
+ * Copyright (c) 2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
 #ifndef HAVE_ARCH_GETRVAL2
 # define HAVE_ARCH_GETRVAL2 0

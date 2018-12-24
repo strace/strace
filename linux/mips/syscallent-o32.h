@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2013-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #if defined LINUX_MIPSO32
 /* For an O32 strace, decode the o32 syscalls.  */
 # define SYS_syscall_subcall	4000

@@ -1,8 +1,13 @@
 #!/bin/sh
-
+#
 # Check signal disposition transparency.
 # Starting with commit v4.17-8-ge97a66f strace is expected
 # to forward the signal disposition to tracees unchanged.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
