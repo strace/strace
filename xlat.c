@@ -249,6 +249,9 @@ xlat_idx(const struct xlat *xlat, size_t nmemb, uint64_t val)
 		return NULL;
 
 	if (val != pos[val].val) {
+		if (pos[val].val == 0)
+			return NULL;	/* a hole in the index */
+
 		error_func_msg("Unexpected xlat value %" PRIu64
 			       " at index %" PRIu64,
 			       pos[val].val, val);
