@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2006 Bernhard Kaindl <bk@suse.de>
- * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006-2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

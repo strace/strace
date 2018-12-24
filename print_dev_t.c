@@ -1,7 +1,7 @@
 /*
  * Device number printing routine.
  *
- * Copyright (c) 2016 The strace developers.
+ * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

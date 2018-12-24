@@ -1,7 +1,7 @@
 /*
  * Check decoding of utimes/osf_utimes syscall.
  *
- * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

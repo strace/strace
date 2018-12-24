@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (c) 1993, 1994, 1995 Rick Sladkey <jrs@world.std.com>
-# Copyright (c) 1995-2017 The strace developers.
+# Copyright (c) 1995-2018 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

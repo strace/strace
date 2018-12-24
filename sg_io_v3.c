@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2007 Vladimir Nadvornik <nadvornik@suse.cz>
- * Copyright (c) 2007-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2007-2018 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2015 Bart Van Assche <bart.vanassche@sandisk.com>
  * All rights reserved.
  *
