@@ -478,6 +478,8 @@ in the list.  Betchya woulda forgot that one.
 Trace all system calls which involve process management.  This
 is useful for watching the fork, wait, and exec steps of a process.
 .TP
+.BR "\-e\ trace" = %net
+.TQ
 .BR "\-e\ trace" = %network
 .TQ
 .BR "\-e\ trace" = network " (deprecated)"
