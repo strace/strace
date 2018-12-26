@@ -104,6 +104,7 @@ process_file()
 
 	# Common code for every processed file.
 	cat > "$tmpdir"/printents.c <<__EOF__
+#include <linux/compiler_attributes.h>
 #include <asm/termbits.h>
 #include <asm/ioctl.h>
 #include <linux/types.h>
@@ -164,7 +165,7 @@ __EOF__
 		*asm/core_*.h)
 			return 0 # false positives
 			;;
-		*asm/ioctls.h)
+		*asm*/ioctls.h)
 			cat <<'__EOF__'
 #include <asm/termios.h>
 #include <linux/serial.h>
