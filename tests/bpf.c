@@ -278,7 +278,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 21,
+			.map_type = 24,
 			.key_size = 0xface1e55,
 			.value_size = 0xbadc0ded,
 			.max_entries = 0xbeefcafe,
@@ -289,7 +289,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_ifindex = 3141592653,
 		} },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
-		.str = "map_type=0x15 /* BPF_MAP_TYPE_??? */"
+		.str = "map_type=0x18 /* BPF_MAP_TYPE_??? */"
 		       ", key_size=4207812181, value_size=3134983661"
 		       ", max_entries=3203386110"
 		       ", map_flags=0xffffffc0 /* BPF_F_??? */"
