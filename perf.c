@@ -114,7 +114,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * offsetofend against size) in order to print fields as kernel sees
 	 * them. This also should work great on big endian architectures.
 	 */
-	#define _PERF_CHECK_FIELD(_field) \
+#define _PERF_CHECK_FIELD(_field) \
 		do { \
 			if (offsetof(struct perf_event_attr, _field) >= size) \
 				goto print_perf_event_attr_out; \

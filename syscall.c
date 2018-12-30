@@ -162,27 +162,27 @@ const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 };
 
 const char *const personality_names[] =
-# if defined X86_64
+#if defined X86_64
 	{"64 bit", "32 bit", "x32"}
-# elif defined X32
+#elif defined X32
 	{"x32", "32 bit"}
-# elif SUPPORTED_PERSONALITIES == 2
+#elif SUPPORTED_PERSONALITIES == 2
 	{"64 bit", "32 bit"}
-# else
+#else
 	{STRINGIFY_VAL(__WORDSIZE) " bit"}
-# endif
+#endif
 	;
 
 const char *const personality_designators[] =
-# if defined X86_64
+#if defined X86_64
 	{ "64", "32", "x32" }
-# elif defined X32
+#elif defined X32
 	{ "x32", "32" }
-# elif SUPPORTED_PERSONALITIES == 2
+#elif SUPPORTED_PERSONALITIES == 2
 	{ "64", "32" }
-# else
+#else
 	{ STRINGIFY_VAL(__WORDSIZE) }
-# endif
+#endif
 	;
 
 #if SUPPORTED_PERSONALITIES > 1
@@ -194,9 +194,9 @@ unsigned current_wordsize = PERSONALITY0_WORDSIZE;
 static const int personality_wordsize[SUPPORTED_PERSONALITIES] = {
 	PERSONALITY0_WORDSIZE,
 	PERSONALITY1_WORDSIZE,
-# if SUPPORTED_PERSONALITIES > 2
+#  if SUPPORTED_PERSONALITIES > 2
 	PERSONALITY2_WORDSIZE,
-# endif
+#  endif
 };
 # endif
 
@@ -956,7 +956,7 @@ ptrace_syscall_info_is_valid(void)
 }
 
 #define XLAT_MACROS_ONLY
-# include "xlat/nt_descriptor_types.h"
+#include "xlat/nt_descriptor_types.h"
 #undef XLAT_MACROS_ONLY
 
 #define ARCH_MIGHT_USE_SET_REGS 1

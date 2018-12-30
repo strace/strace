@@ -19,7 +19,7 @@ typedef struct loop_info struct_loop_info;
 #include "print_fields.h"
 
 #define XLAT_MACROS_ONLY
-# include "xlat/loop_cmds.h"
+#include "xlat/loop_cmds.h"
 #undef XLAT_MACROS_ONLY
 
 #include "xlat/loop_flags_options.h"

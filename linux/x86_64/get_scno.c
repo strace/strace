@@ -50,9 +50,9 @@ arch_get_scno(struct tcb *tcp)
 			if ((long long) x86_64_regs.orig_rax != -1) {
 				currpers = 2;
 			} else {
-# ifdef X32
+#ifdef X32
 				currpers = 2;
-# endif
+#endif
 			}
 		}
 	}

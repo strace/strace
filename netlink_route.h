@@ -8,9 +8,9 @@
  */
 
 #ifndef STRACE_NETLINK_ROUTE_H
-#define STRACE_NETLINK_ROUTE_H
+# define STRACE_NETLINK_ROUTE_H
 
-#define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
+# define DECL_NETLINK_ROUTE_DECODER(route_decode_name)	\
 void							\
 route_decode_name(struct tcb *tcp,			\
 		  const struct nlmsghdr *nlmsghdr,	\

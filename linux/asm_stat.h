@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_ASM_STAT_H
-#define STRACE_ASM_STAT_H
+# define STRACE_ASM_STAT_H
 
 # undef dev_t
 # undef gid_t

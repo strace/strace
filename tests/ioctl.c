@@ -38,12 +38,12 @@ main(void)
 {
 	uint64_t data = 0;
 
-#ifndef POWERPC
+# ifndef POWERPC
 	struct termios tty;
 	(void) ioctl(-1, TCGETS, &tty);
 	printf("ioctl(-1, TCGETS, %p)"
 	       " = -1 EBADF (%m)\n", &tty);
-#endif
+# endif
 
 	(void) ioctl(-1, MMTIMER_GETRES, &data);
 	printf("ioctl(-1, MMTIMER_GETRES, %p)"

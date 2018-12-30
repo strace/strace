@@ -94,11 +94,11 @@ main(void)
 	 * musl sets size to SIZE_MAX if size argument is greater than
 	 * PTRDIFF_MAX - musl/src/ipc/shmget.c
 	 */
-	#ifdef __GLIBC__
+#ifdef __GLIBC__
 		(size_t) 0xdec0ded1dec0ded2ULL;
-	#else
+#else
 		(size_t) 0x1e55c0de5dec0dedULL;
-	#endif
+#endif
 	static const unsigned int bogus_ipc_shm_flags =
 		IPC_CREAT | IPC_EXCL | SHM_HUGETLB | SHM_NORESERVE;
 	static const unsigned int huge_mask = SHM_HUGE_MASK << SHM_HUGE_SHIFT;

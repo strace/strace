@@ -273,7 +273,7 @@ main(void)
 	 * This has to be a macro, otherwise the compiler complains that
 	 * initializer element is not constant.
 	 */
-	#define  MAP_INFO_SZ (sizeof(*map_info) + 64)
+#define MAP_INFO_SZ (sizeof(*map_info) + 64)
 	struct bpf_map_info_struct *map_info = calloc(1, MAP_INFO_SZ);
 	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_map_get_info_attr = {
 		.bpf_fd   = map_fd,
@@ -329,7 +329,7 @@ main(void)
 	 * This has to be a macro, otherwise the compiler complains that
 	 * initializer element is not constant.
 	 */
-	#define  PROG_INFO_SZ (sizeof(*prog_info) + 64)
+# define PROG_INFO_SZ (sizeof(*prog_info) + 64)
 	struct bpf_prog_info_struct *prog_info = calloc(1, PROG_INFO_SZ);
 	struct bpf_insn *xlated_prog = tail_alloc(sizeof(*xlated_prog) * 42);
 	uint32_t *map_ids = tail_alloc(sizeof(*map_ids) * 2);

@@ -598,9 +598,9 @@ check_l2(void)
 		.l2_psm = htobs(h_psm),
 		.l2_bdaddr.b = "abcdef",
 		.l2_cid = htobs(h_cid),
-#ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
+# ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 		.l2_bdaddr_type = 0xce,
-#endif
+# endif
 	};
 	void *l2 = tail_memdup(&c_l2, sizeof(c_l2));
 	unsigned int len = sizeof(c_l2);
@@ -610,9 +610,9 @@ check_l2(void)
 	       ", l2_psm=htobs(L2CAP_PSM_DYN_START + %hu)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
 	       ", l2_cid=htobs(L2CAP_CID_DYN_START + %hu)"
-#ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
+# ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	       ", l2_bdaddr_type=0xce /* BDADDR_??? */"
-#endif
+# endif
 	       "}, %u) = %d EBADF (%m)\n",
 	       (short) (h_psm - 0x1001),
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
@@ -622,18 +622,18 @@ check_l2(void)
 
 	c_l2.l2_psm = htobs(1);
 	c_l2.l2_cid = htobs(1);
-#ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
+# ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	c_l2.l2_bdaddr_type = BDADDR_LE_RANDOM;
-#endif
+# endif
 	memcpy(l2, &c_l2, sizeof(c_l2));
 	ret = connect(-1, l2, len);
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
 	       ", l2_psm=htobs(L2CAP_PSM_SDP)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
 	       ", l2_cid=htobs(L2CAP_CID_SIGNALING)"
-#ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
+# ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	       ", l2_bdaddr_type=BDADDR_LE_RANDOM"
-#endif
+# endif
 	       "}, %u) = %d EBADF (%m)\n",
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],
@@ -642,18 +642,18 @@ check_l2(void)
 
 	c_l2.l2_psm = htobs(0xbad);
 	c_l2.l2_cid = htobs(8);
-#ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
+# ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	c_l2.l2_bdaddr_type = 3;
-#endif
+# endif
 	memcpy(l2, &c_l2, sizeof(c_l2));
 	ret = connect(-1, l2, len);
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
 	       ", l2_psm=htobs(0xbad /* L2CAP_PSM_??? */)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
 	       ", l2_cid=htobs(0x8 /* L2CAP_CID_??? */)"
-#ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
+# ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	       ", l2_bdaddr_type=0x3 /* BDADDR_??? */"
-#endif
+# endif
 	       "}, %u) = %d EBADF (%m)\n",
 	       c_l2.l2_bdaddr.b[0], c_l2.l2_bdaddr.b[1],
 	       c_l2.l2_bdaddr.b[2], c_l2.l2_bdaddr.b[3],

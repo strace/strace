@@ -137,8 +137,8 @@ struct strval {
 	const char *str;
 };
 
-#define STR16 "0123456789abcdef"
-#define STR64 STR16 STR16 STR16 STR16
+# define STR16 "0123456789abcdef"
+# define STR64 STR16 STR16 STR16 STR16
 
 int
 main(void)

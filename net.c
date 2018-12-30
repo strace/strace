@@ -65,8 +65,8 @@
 #include "xlat/inet_protocols.h"
 
 #define XLAT_MACROS_ONLY
-# include "xlat/addrfams.h"
-# include "xlat/ethernet_protocols.h"
+#include "xlat/addrfams.h"
+#include "xlat/ethernet_protocols.h"
 #undef XLAT_MACROS_ONLY
 #include "xlat/ax25_protocols.h"
 #include "xlat/irda_protocols.h"

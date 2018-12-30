@@ -27,7 +27,7 @@
 #include "xstring.h"
 
 #define XLAT_MACROS_ONLY
-# include "xlat/inet_protocols.h"
+#include "xlat/inet_protocols.h"
 #undef XLAT_MACROS_ONLY
 
 typedef struct {

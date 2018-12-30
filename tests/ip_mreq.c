@@ -19,9 +19,9 @@
 # include <arpa/inet.h>
 # include <net/if.h>
 
-#define	multi4addr	"224.0.0.3"
-#define	multi6addr	"ff01::c"
-#define	interface	"127.0.0.1"
+# define multi4addr	"224.0.0.3"
+# define multi6addr	"ff01::c"
+# define interface	"127.0.0.1"
 
 int
 main(void)

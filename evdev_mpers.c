@@ -11,7 +11,7 @@
 
 #ifdef HAVE_LINUX_INPUT_H
 
-#include DEF_MPERS_TYPE(struct_ff_effect)
+# include DEF_MPERS_TYPE(struct_ff_effect)
 
 # include <linux/ioctl.h>
 # include <linux/input.h>

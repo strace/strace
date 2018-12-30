@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_MSGHDR_H
-#define STRACE_MSGHDR_H
+# define STRACE_MSGHDR_H
 
 /* For definitions of struct msghdr and struct mmsghdr. */
 # include <sys/socket.h>

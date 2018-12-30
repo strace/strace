@@ -30,11 +30,11 @@ SYS_FUNC(lseek)
 
 	kernel_long_t offset;
 
-# ifndef current_klongsize
+#ifndef current_klongsize
 	if (current_klongsize < sizeof(kernel_long_t)) {
 		offset = (int) tcp->u_arg[1];
 	} else
-# endif /* !current_klongsize */
+#endif /* !current_klongsize */
 	{
 		offset = tcp->u_arg[1];
 	}

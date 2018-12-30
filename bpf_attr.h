@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_BPF_ATTR_H
-#define STRACE_BPF_ATTR_H
+# define STRACE_BPF_ATTR_H
 
 /*
  * The policy is that all fields of type uint64_t in this header file
@@ -19,21 +19,21 @@
  * v4.16-rc1~123^2~109^2~5^2~4.
  */
 
-#ifndef BPF_OBJ_NAME_LEN
-# define BPF_OBJ_NAME_LEN 16U
-#else
-# if BPF_OBJ_NAME_LEN != 16U
-#  error "Unexpected value of BPF_OBJ_NAME_LEN"
+# ifndef BPF_OBJ_NAME_LEN
+#  define BPF_OBJ_NAME_LEN 16U
+# else
+#  if BPF_OBJ_NAME_LEN != 16U
+#   error "Unexpected value of BPF_OBJ_NAME_LEN"
+#  endif
 # endif
-#endif
 
-#ifndef BPF_TAG_SIZE
-# define BPF_TAG_SIZE 8
-#else
-# if BPF_TAG_SIZE != 8
-#  error "Unexpected value of BPF_TAG_SIZE"
+# ifndef BPF_TAG_SIZE
+#  define BPF_TAG_SIZE 8
+# else
+#  if BPF_TAG_SIZE != 8
+#   error "Unexpected value of BPF_TAG_SIZE"
+#  endif
 # endif
-#endif
 
 struct BPF_MAP_CREATE_struct {
 	uint32_t map_type;
@@ -47,9 +47,9 @@ struct BPF_MAP_CREATE_struct {
 	uint32_t map_ifindex;
 };
 
-#define BPF_MAP_CREATE_struct_size \
+# define BPF_MAP_CREATE_struct_size \
 	sizeof(struct BPF_MAP_CREATE_struct)
-#define expected_BPF_MAP_CREATE_struct_size 48
+# define expected_BPF_MAP_CREATE_struct_size 48
 
 struct BPF_MAP_LOOKUP_ELEM_struct {
 	uint32_t map_fd;
@@ -57,9 +57,9 @@ struct BPF_MAP_LOOKUP_ELEM_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) value;
 };
 
-#define BPF_MAP_LOOKUP_ELEM_struct_size \
+# define BPF_MAP_LOOKUP_ELEM_struct_size \
 	sizeof(struct BPF_MAP_LOOKUP_ELEM_struct)
-#define expected_BPF_MAP_LOOKUP_ELEM_struct_size 24
+# define expected_BPF_MAP_LOOKUP_ELEM_struct_size 24
 
 struct BPF_MAP_UPDATE_ELEM_struct {
 	uint32_t map_fd;
@@ -68,18 +68,18 @@ struct BPF_MAP_UPDATE_ELEM_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) flags;
 };
 
-#define BPF_MAP_UPDATE_ELEM_struct_size \
+# define BPF_MAP_UPDATE_ELEM_struct_size \
 	sizeof(struct BPF_MAP_UPDATE_ELEM_struct)
-#define expected_BPF_MAP_UPDATE_ELEM_struct_size 32
+# define expected_BPF_MAP_UPDATE_ELEM_struct_size 32
 
 struct BPF_MAP_DELETE_ELEM_struct {
 	uint32_t map_fd;
 	uint64_t ATTRIBUTE_ALIGNED(8) key;
 };
 
-#define BPF_MAP_DELETE_ELEM_struct_size \
+# define BPF_MAP_DELETE_ELEM_struct_size \
 	sizeof(struct BPF_MAP_DELETE_ELEM_struct)
-#define expected_BPF_MAP_DELETE_ELEM_struct_size 16
+# define expected_BPF_MAP_DELETE_ELEM_struct_size 16
 
 struct BPF_MAP_GET_NEXT_KEY_struct {
 	uint32_t map_fd;
@@ -87,9 +87,9 @@ struct BPF_MAP_GET_NEXT_KEY_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) next_key;
 };
 
-#define BPF_MAP_GET_NEXT_KEY_struct_size \
+# define BPF_MAP_GET_NEXT_KEY_struct_size \
 	sizeof(struct BPF_MAP_GET_NEXT_KEY_struct)
-#define expected_BPF_MAP_GET_NEXT_KEY_struct_size 24
+# define expected_BPF_MAP_GET_NEXT_KEY_struct_size 24
 
 struct BPF_PROG_LOAD_struct {
 	uint32_t prog_type;
@@ -106,9 +106,9 @@ struct BPF_PROG_LOAD_struct {
 	uint32_t expected_attach_type;
 };
 
-#define BPF_PROG_LOAD_struct_size \
+# define BPF_PROG_LOAD_struct_size \
 	offsetofend(struct BPF_PROG_LOAD_struct, expected_attach_type)
-#define expected_BPF_PROG_LOAD_struct_size 72
+# define expected_BPF_PROG_LOAD_struct_size 72
 
 struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;
@@ -116,12 +116,12 @@ struct BPF_OBJ_PIN_struct {
 	uint32_t file_flags;
 };
 
-#define BPF_OBJ_PIN_struct_size \
+# define BPF_OBJ_PIN_struct_size \
 	sizeof(struct BPF_OBJ_PIN_struct)
-#define expected_BPF_OBJ_PIN_struct_size 16
+# define expected_BPF_OBJ_PIN_struct_size 16
 
-#define BPF_OBJ_GET_struct BPF_OBJ_PIN_struct
-#define BPF_OBJ_GET_struct_size BPF_OBJ_PIN_struct_size
+# define BPF_OBJ_GET_struct BPF_OBJ_PIN_struct
+# define BPF_OBJ_GET_struct_size BPF_OBJ_PIN_struct_size
 
 struct BPF_PROG_ATTACH_struct {
 	uint32_t target_fd;
@@ -130,9 +130,9 @@ struct BPF_PROG_ATTACH_struct {
 	uint32_t attach_flags;
 };
 
-#define BPF_PROG_ATTACH_struct_size \
+# define BPF_PROG_ATTACH_struct_size \
 	sizeof(struct BPF_PROG_ATTACH_struct)
-#define expected_BPF_PROG_ATTACH_struct_size 16
+# define expected_BPF_PROG_ATTACH_struct_size 16
 
 struct BPF_PROG_DETACH_struct {
 	uint32_t target_fd;
@@ -140,9 +140,9 @@ struct BPF_PROG_DETACH_struct {
 	uint32_t attach_type;
 };
 
-#define BPF_PROG_DETACH_struct_size \
+# define BPF_PROG_DETACH_struct_size \
 	sizeof(struct BPF_PROG_DETACH_struct)
-#define expected_BPF_PROG_DETACH_struct_size 12
+# define expected_BPF_PROG_DETACH_struct_size 12
 
 struct BPF_PROG_TEST_RUN_struct /* test */ {
 	uint32_t prog_fd;
@@ -155,9 +155,9 @@ struct BPF_PROG_TEST_RUN_struct /* test */ {
 	uint32_t duration;
 };
 
-#define BPF_PROG_TEST_RUN_struct_size \
+# define BPF_PROG_TEST_RUN_struct_size \
 	sizeof(struct BPF_PROG_TEST_RUN_struct)
-#define expected_BPF_PROG_TEST_RUN_struct_size 40
+# define expected_BPF_PROG_TEST_RUN_struct_size 40
 
 struct BPF_PROG_GET_NEXT_ID_struct {
 	uint32_t start_id;
@@ -165,12 +165,12 @@ struct BPF_PROG_GET_NEXT_ID_struct {
 	uint32_t open_flags;
 };
 
-#define BPF_PROG_GET_NEXT_ID_struct_size \
+# define BPF_PROG_GET_NEXT_ID_struct_size \
 	sizeof(struct BPF_PROG_GET_NEXT_ID_struct)
-#define expected_BPF_PROG_GET_NEXT_ID_struct_size 12
+# define expected_BPF_PROG_GET_NEXT_ID_struct_size 12
 
-#define BPF_MAP_GET_NEXT_ID_struct BPF_PROG_GET_NEXT_ID_struct
-#define BPF_MAP_GET_NEXT_ID_struct_size BPF_PROG_GET_NEXT_ID_struct_size
+# define BPF_MAP_GET_NEXT_ID_struct BPF_PROG_GET_NEXT_ID_struct
+# define BPF_MAP_GET_NEXT_ID_struct_size BPF_PROG_GET_NEXT_ID_struct_size
 
 struct BPF_PROG_GET_FD_BY_ID_struct {
 	uint32_t prog_id;
@@ -178,9 +178,9 @@ struct BPF_PROG_GET_FD_BY_ID_struct {
 	uint32_t open_flags;
 };
 
-#define BPF_PROG_GET_FD_BY_ID_struct_size \
+# define BPF_PROG_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_PROG_GET_FD_BY_ID_struct)
-#define expected_BPF_PROG_GET_FD_BY_ID_struct_size 12
+# define expected_BPF_PROG_GET_FD_BY_ID_struct_size 12
 
 struct BPF_MAP_GET_FD_BY_ID_struct {
 	uint32_t map_id;
@@ -188,9 +188,9 @@ struct BPF_MAP_GET_FD_BY_ID_struct {
 	uint32_t open_flags;
 };
 
-#define BPF_MAP_GET_FD_BY_ID_struct_size \
+# define BPF_MAP_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_MAP_GET_FD_BY_ID_struct)
-#define expected_BPF_MAP_GET_FD_BY_ID_struct_size 12
+# define expected_BPF_MAP_GET_FD_BY_ID_struct_size 12
 
 struct BPF_OBJ_GET_INFO_BY_FD_struct /* info */ {
 	uint32_t bpf_fd;
@@ -198,9 +198,9 @@ struct BPF_OBJ_GET_INFO_BY_FD_struct /* info */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) info;
 };
 
-#define BPF_OBJ_GET_INFO_BY_FD_struct_size \
+# define BPF_OBJ_GET_INFO_BY_FD_struct_size \
 	sizeof(struct BPF_OBJ_GET_INFO_BY_FD_struct)
-#define expected_BPF_OBJ_GET_INFO_BY_FD_struct_size 16
+# define expected_BPF_OBJ_GET_INFO_BY_FD_struct_size 16
 
 struct BPF_PROG_QUERY_struct /* query */ {
 	uint32_t target_fd;
@@ -211,18 +211,18 @@ struct BPF_PROG_QUERY_struct /* query */ {
 	uint32_t prog_cnt;
 };
 
-#define BPF_PROG_QUERY_struct_size \
+# define BPF_PROG_QUERY_struct_size \
 	offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt)
-#define expected_BPF_PROG_QUERY_struct_size 28
+# define expected_BPF_PROG_QUERY_struct_size 28
 
 struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) name;
 	uint32_t prog_fd;
 };
 
-#define BPF_RAW_TRACEPOINT_OPEN_struct_size \
+# define BPF_RAW_TRACEPOINT_OPEN_struct_size \
 	offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct, prog_fd)
-#define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 12
+# define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 12
 
 struct bpf_map_info_struct {
 	uint32_t type;
@@ -241,9 +241,9 @@ struct bpf_map_info_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* skip check */
 };
 
-#define bpf_map_info_struct_size \
+# define bpf_map_info_struct_size \
 	sizeof(struct bpf_map_info_struct)
-#define expected_bpf_map_info_struct_size 64
+# define expected_bpf_map_info_struct_size 64
 
 struct bpf_prog_info_struct {
 	uint32_t type;
@@ -267,8 +267,8 @@ struct bpf_prog_info_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* skip check */
 };
 
-#define bpf_prog_info_struct_size \
+# define bpf_prog_info_struct_size \
 	sizeof(struct bpf_prog_info_struct)
-#define expected_bpf_prog_info_struct_size 104
+# define expected_bpf_prog_info_struct_size 104
 
 #endif /* !STRACE_BPF_ATTR_H */

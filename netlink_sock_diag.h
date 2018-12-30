@@ -7,9 +7,9 @@
  */
 
 #ifndef STRACE_NETLINK_SOCK_DIAG_H
-#define STRACE_NETLINK_SOCK_DIAG_H
+# define STRACE_NETLINK_SOCK_DIAG_H
 
-#define DECL_NETLINK_DIAG_DECODER(diag_decode_name)	\
+# define DECL_NETLINK_DIAG_DECODER(diag_decode_name)	\
 void							\
 diag_decode_name(struct tcb *tcp,			\
 		 const struct nlmsghdr *nlmsghdr,	\
@@ -34,7 +34,7 @@ struct inet_diag_sockid;
 extern void
 print_inet_diag_sockid(const struct inet_diag_sockid *, const uint8_t family);
 
-#define PRINT_FIELD_INET_DIAG_SOCKID(prefix_, where_, field_, af_)	\
+# define PRINT_FIELD_INET_DIAG_SOCKID(prefix_, where_, field_, af_)	\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		print_inet_diag_sockid(&(where_).field_, (af_));	\

@@ -38,7 +38,7 @@
 # include <stdio.h>
 # include <unistd.h>
 
-#define MAX_STRLEN 32
+# define MAX_STRLEN 32
 static long ngroups;
 
 static void

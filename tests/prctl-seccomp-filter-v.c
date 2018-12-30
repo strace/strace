@@ -31,23 +31,23 @@
  && defined BPF_JUMP \
  && defined BPF_STMT
 
-#define SOCK_FILTER_ALLOW_SYSCALL(nr) \
+# define SOCK_FILTER_ALLOW_SYSCALL(nr) \
 		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW)
 
-#define SOCK_FILTER_DENY_SYSCALL(nr, err) \
+# define SOCK_FILTER_DENY_SYSCALL(nr, err) \
 		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|(SECCOMP_RET_DATA & (err)))
 
-#define SOCK_FILTER_KILL_PROCESS \
+# define SOCK_FILTER_KILL_PROCESS \
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)
 
-#define PRINT_ALLOW_SYSCALL(nr) \
+# define PRINT_ALLOW_SYSCALL(nr) \
 	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
 	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW), ", \
 	       __NR_ ## nr)
 
-#define PRINT_DENY_SYSCALL(nr, err) \
+# define PRINT_DENY_SYSCALL(nr, err) \
 	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
 	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|%#x), ", \
 	       __NR_ ## nr, err)

@@ -6,16 +6,16 @@
  */
 
 #ifndef STRACE_KEYCTL_KDF_PARAMS_H
-#define STRACE_KEYCTL_KDF_PARAMS_H
+# define STRACE_KEYCTL_KDF_PARAMS_H
 
-#include <stdint.h>
-#include "kernel_types.h"
+# include <stdint.h>
+# include "kernel_types.h"
 
 /* from include/linux/crypto.h */
-#define CRYPTO_MAX_ALG_NAME		128
+# define CRYPTO_MAX_ALG_NAME		128
 
 /* from security/keys/internal.h */
-#define KEYCTL_KDF_MAX_OI_LEN		64      /* max length of otherinfo */
+# define KEYCTL_KDF_MAX_OI_LEN		64      /* max length of otherinfo */
 
 struct keyctl_kdf_params {
 	char *hashname;

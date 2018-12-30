@@ -6,24 +6,24 @@
  */
 
 #ifndef STRACE_STATIC_ASSERT_H
-#define STRACE_STATIC_ASSERT_H
+# define STRACE_STATIC_ASSERT_H
 
-#include "assert.h"
+# include "assert.h"
 
-#if defined HAVE_STATIC_ASSERT
+# if defined HAVE_STATIC_ASSERT
 
 /* static_assert is already available */
 
-#elif defined HAVE__STATIC_ASSERT
+# elif defined HAVE__STATIC_ASSERT
 
-# undef static_assert
-# define static_assert _Static_assert
+#  undef static_assert
+#  define static_assert _Static_assert
 
-#else /* !HAVE_STATIC_ASSERT && !HAVE__STATIC_ASSERT */
+# else /* !HAVE_STATIC_ASSERT && !HAVE__STATIC_ASSERT */
 
-# define static_assert(expr, message) \
+#  define static_assert(expr, message) \
 	extern int (*strace_static_assert(int))[sizeof(int[2 * !!(expr) - 1])]
 
-#endif
+# endif
 
 #endif /* !STRACE_STATIC_ASSERT_H */

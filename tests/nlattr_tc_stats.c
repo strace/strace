@@ -75,7 +75,7 @@ main(void)
 				  PRINT_FIELD_U(", ", sb, packets);
 				  printf("}"));
 
-#ifdef HAVE_STRUCT_GNET_STATS_RATE_EST
+# ifdef HAVE_STRUCT_GNET_STATS_RATE_EST
 	static const struct gnet_stats_rate_est est = {
 		.bps = 0xebcdaebd,
 		.pps = 0xabdceade,
@@ -86,9 +86,9 @@ main(void)
 				  PRINT_FIELD_U("{", est, bps);
 				  PRINT_FIELD_U(", ", est, pps);
 				  printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_GNET_STATS_QUEUE
+# ifdef HAVE_STRUCT_GNET_STATS_QUEUE
 	static const struct gnet_stats_queue qstats = {
 		.qlen = 0xabcdeabd,
 		.backlog = 0xbcdaebad,
@@ -105,9 +105,9 @@ main(void)
 				  PRINT_FIELD_U(", ", qstats, requeues);
 				  PRINT_FIELD_U(", ", qstats, overlimits);
 				  printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_GNET_STATS_RATE_EST64
+# ifdef HAVE_STRUCT_GNET_STATS_RATE_EST64
 	static const struct gnet_stats_rate_est64 est64 = {
 		.bps = 0xacbdcdefafecaebf,
 		.pps = 0xcdabeabdfeabceaf
@@ -118,7 +118,7 @@ main(void)
 				  PRINT_FIELD_U("{", est64, bps);
 				  PRINT_FIELD_U(", ", est64, pps);
 				  printf("}"));
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

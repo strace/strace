@@ -28,7 +28,7 @@ typedef struct ifreq struct_ifreq;
 #include "xlat/iffflags.h"
 
 #define XLAT_MACROS_ONLY
-# include "xlat/arp_hardware_types.h"
+#include "xlat/arp_hardware_types.h"
 #undef XLAT_MACROS_ONLY
 
 static void

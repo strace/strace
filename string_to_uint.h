@@ -6,11 +6,11 @@
  */
 
 #ifndef STRACE_STRING_TO_UINT_H
-#define STRACE_STRING_TO_UINT_H
+# define STRACE_STRING_TO_UINT_H
 
-#include <limits.h>
+# include <limits.h>
 
-#include "kernel_types.h"
+# include "kernel_types.h"
 
 extern long long
 string_to_uint_ex(const char *str, char **endptr,

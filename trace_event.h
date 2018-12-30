@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_TRACE_EVENT_H
-#define STRACE_TRACE_EVENT_H
+# define STRACE_TRACE_EVENT_H
 
 /* Possible trace event loop states. Returned by next_event() and dispatched by
  * dispatch_event(). */

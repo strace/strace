@@ -6,9 +6,9 @@
  */
 
 #ifndef STRACE_NUMBER_SET_H
-#define STRACE_NUMBER_SET_H
+# define STRACE_NUMBER_SET_H
 
-#include "gcc_compat.h"
+# include "gcc_compat.h"
 
 struct number_set;
 

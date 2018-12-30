@@ -47,7 +47,7 @@ typedef struct blk_user_trace_setup {
 
 /* Provide fall-back definitions for BLK* ioctls */
 #define XLAT_MACROS_ONLY
-# include "xlat/block_ioctl_cmds.h"
+#include "xlat/block_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
 #include MPERS_DEFS

@@ -7,7 +7,7 @@
  */
 
 #ifndef STRACE_STAT_H
-#define STRACE_STAT_H
+# define STRACE_STAT_H
 
 struct strace_stat {
 	unsigned long long	dev;

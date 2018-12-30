@@ -11,7 +11,7 @@
 
 #ifdef HAVE_SCSI_SG_H
 
-#include DEF_MPERS_TYPE(struct_sg_req_info)
+# include DEF_MPERS_TYPE(struct_sg_req_info)
 
 # include <scsi/sg.h>
 

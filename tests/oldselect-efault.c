@@ -36,14 +36,14 @@ main(void)
 	memset(args, 0, sizeof(*args) * 4);
 
 	xselect(0);
-#ifndef PATH_TRACING_FD
+# ifndef PATH_TRACING_FD
 	printf("select(NULL) = %s\n", errstr);
-#endif
+# endif
 
 	xselect((uintptr_t) args);
-#ifndef PATH_TRACING_FD
+# ifndef PATH_TRACING_FD
 	printf("select(%p) = %s\n", args, errstr);
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

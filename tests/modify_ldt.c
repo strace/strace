@@ -22,7 +22,7 @@
 void
 printrc(long rc)
 {
-#ifdef __x86_64__
+# ifdef __x86_64__
 	int err = -rc;
 
 	/* Thanks, long return type of syscall(2) */
@@ -32,9 +32,9 @@ printrc(long rc)
 		errno = err;
 		printf(" %s (%m)", errno2name());
 	}
-#else
+# else
 	printf("%s", sprintrc(rc));
-#endif
+# endif
 
 	puts("");
 }

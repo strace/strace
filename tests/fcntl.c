@@ -28,7 +28,7 @@ test_flock64_undecoded(const int cmd, const char *name)
 	       TEST_SYSCALL_STR, name, &fl, errstr);
 }
 
-#define TEST_FLOCK64_UNDECODED(cmd) test_flock64_undecoded(cmd, #cmd)
+# define TEST_FLOCK64_UNDECODED(cmd) test_flock64_undecoded(cmd, #cmd)
 
 static void
 test_flock64_lk64(void)

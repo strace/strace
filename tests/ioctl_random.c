@@ -16,7 +16,7 @@
 #include <linux/random.h>
 
 #define XLAT_MACROS_ONLY
-# include "xlat/random_ioctl_cmds.h"
+#include "xlat/random_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
 #define RVAL_EBADF " = -1 EBADF (%m)\n"

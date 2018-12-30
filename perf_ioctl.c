@@ -12,7 +12,7 @@
 #include "perf_event_struct.h"
 
 #define XLAT_MACROS_ONLY
-# include "xlat/perf_ioctl_cmds.h"
+#include "xlat/perf_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
 #include "xlat/perf_ioctl_flags.h"

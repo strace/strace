@@ -9,65 +9,65 @@
 
 #ifdef HAVE_LINUX_BTRFS_H
 
-#include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
-#include <limits.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/sysmacros.h>
-#include <sys/vfs.h>
-#include <linux/fs.h>
-#include <linux/btrfs.h>
-#include <linux/magic.h>
-#include "xlat.h"
+# include <errno.h>
+# include <fcntl.h>
+# include <inttypes.h>
+# include <limits.h>
+# include <stdint.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/ioctl.h>
+# include <sys/stat.h>
+# include <sys/sysmacros.h>
+# include <sys/vfs.h>
+# include <linux/fs.h>
+# include <linux/btrfs.h>
+# include <linux/magic.h>
+# include "xlat.h"
 
-#include "xlat/btrfs_balance_args.h"
-#include "xlat/btrfs_balance_flags.h"
-#include "xlat/btrfs_balance_state.h"
-#include "xlat/btrfs_compress_types.h"
-#include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
-#include "xlat/btrfs_defrag_flags.h"
-#include "xlat/btrfs_dev_stats_values.h"
-#include "xlat/btrfs_dev_stats_flags.h"
-#include "xlat/btrfs_qgroup_inherit_flags.h"
-#include "xlat/btrfs_qgroup_limit_flags.h"
-#include "xlat/btrfs_scrub_flags.h"
-#include "xlat/btrfs_send_flags.h"
-#include "xlat/btrfs_space_info_flags.h"
-#include "xlat/btrfs_snap_flags_v2.h"
-#include "xlat/btrfs_tree_objectids.h"
-#include "xlat/btrfs_features_compat.h"
-#include "xlat/btrfs_features_compat_ro.h"
-#include "xlat/btrfs_features_incompat.h"
-#include "xlat/btrfs_key_types.h"
+# include "xlat/btrfs_balance_args.h"
+# include "xlat/btrfs_balance_flags.h"
+# include "xlat/btrfs_balance_state.h"
+# include "xlat/btrfs_compress_types.h"
+# include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
+# include "xlat/btrfs_defrag_flags.h"
+# include "xlat/btrfs_dev_stats_values.h"
+# include "xlat/btrfs_dev_stats_flags.h"
+# include "xlat/btrfs_qgroup_inherit_flags.h"
+# include "xlat/btrfs_qgroup_limit_flags.h"
+# include "xlat/btrfs_scrub_flags.h"
+# include "xlat/btrfs_send_flags.h"
+# include "xlat/btrfs_space_info_flags.h"
+# include "xlat/btrfs_snap_flags_v2.h"
+# include "xlat/btrfs_tree_objectids.h"
+# include "xlat/btrfs_features_compat.h"
+# include "xlat/btrfs_features_compat_ro.h"
+# include "xlat/btrfs_features_incompat.h"
+# include "xlat/btrfs_key_types.h"
 
-#ifdef HAVE_LINUX_FIEMAP_H
-# include <linux/fiemap.h>
-# include "xlat/fiemap_flags.h"
-# include "xlat/fiemap_extent_flags.h"
-#endif
+# ifdef HAVE_LINUX_FIEMAP_H
+#  include <linux/fiemap.h>
+#  include "xlat/fiemap_flags.h"
+#  include "xlat/fiemap_extent_flags.h"
+# endif
 
-#ifndef BTRFS_LABEL_SIZE
-# define BTRFS_LABEL_SIZE 256
-#endif
+# ifndef BTRFS_LABEL_SIZE
+#  define BTRFS_LABEL_SIZE 256
+# endif
 
-#ifndef BTRFS_NAME_LEN
-# define BTRFS_NAME_LEN 255
-#endif
+# ifndef BTRFS_NAME_LEN
+#  define BTRFS_NAME_LEN 255
+# endif
 
-#ifndef FS_IOC_GETFSLABEL
-# define FS_IOC_GETFSLABEL BTRFS_IOC_GET_FSLABEL
-#endif
+# ifndef FS_IOC_GETFSLABEL
+#  define FS_IOC_GETFSLABEL BTRFS_IOC_GET_FSLABEL
+# endif
 
-#ifndef FS_IOC_SETFSLABEL
-# define FS_IOC_SETFSLABEL BTRFS_IOC_SET_FSLABEL
-#endif
+# ifndef FS_IOC_SETFSLABEL
+#  define FS_IOC_SETFSLABEL BTRFS_IOC_SET_FSLABEL
+# endif
 
 /*
  * Prior to Linux 3.12, the BTRFS_IOC_DEFAULT_SUBVOL used u64 in
@@ -92,38 +92,38 @@ const unsigned char uuid_reference[BTRFS_UUID_SIZE] = {
 
 const char uuid_reference_string[] = "01234567-89ab-cdef-fedc-ba9876543210";
 
-#ifndef BTRFS_IOC_QUOTA_RESCAN
+# ifndef BTRFS_IOC_QUOTA_RESCAN
 struct btrfs_ioctl_quota_rescan_args {
 	uint64_t flags, progress, reserved[6];
 };
-# define BTRFS_IOC_QUOTA_RESCAN			\
+#  define BTRFS_IOC_QUOTA_RESCAN			\
 	_IOW(BTRFS_IOCTL_MAGIC, 44, struct btrfs_ioctl_quota_rescan_args)
-# define BTRFS_IOC_QUOTA_RESCAN_STATUS		\
+#  define BTRFS_IOC_QUOTA_RESCAN_STATUS		\
 	_IOR(BTRFS_IOCTL_MAGIC, 45, struct btrfs_ioctl_quota_rescan_args)
-#endif
+# endif
 
-#ifndef BTRFS_IOC_QUOTA_RESCAN_WAIT
-# define BTRFS_IOC_QUOTA_RESCAN_WAIT _IO(BTRFS_IOCTL_MAGIC, 46)
-#endif
+# ifndef BTRFS_IOC_QUOTA_RESCAN_WAIT
+#  define BTRFS_IOC_QUOTA_RESCAN_WAIT _IO(BTRFS_IOCTL_MAGIC, 46)
+# endif
 
-#ifndef BTRFS_IOC_GET_FEATURES
-# define BTRFS_IOC_GET_FEATURES			\
+# ifndef BTRFS_IOC_GET_FEATURES
+#  define BTRFS_IOC_GET_FEATURES			\
 	_IOR(BTRFS_IOCTL_MAGIC, 57, struct btrfs_ioctl_feature_flags)
-# define BTRFS_IOC_SET_FEATURES			\
+#  define BTRFS_IOC_SET_FEATURES			\
 	_IOW(BTRFS_IOCTL_MAGIC, 57, struct btrfs_ioctl_feature_flags[2])
-# define BTRFS_IOC_GET_SUPPORTED_FEATURES	\
+#  define BTRFS_IOC_GET_SUPPORTED_FEATURES	\
 	_IOR(BTRFS_IOCTL_MAGIC, 57, struct btrfs_ioctl_feature_flags[3])
-#endif
+# endif
 
-#ifndef HAVE_STRUCT_BTRFS_IOCTL_FEATURE_FLAGS_COMPAT_FLAGS
+# ifndef HAVE_STRUCT_BTRFS_IOCTL_FEATURE_FLAGS_COMPAT_FLAGS
 struct btrfs_ioctl_feature_flags {
 	uint64_t compat_flags;
 	uint64_t compat_ro_flags;
 	uint64_t incompat_flags;
 };
-#endif
+# endif
 
-#ifndef HAVE_STRUCT_BTRFS_IOCTL_DEFRAG_RANGE_ARGS_START
+# ifndef HAVE_STRUCT_BTRFS_IOCTL_DEFRAG_RANGE_ARGS_START
 struct btrfs_ioctl_defrag_range_args {
 	uint64_t start;
 	uint64_t len;
@@ -132,10 +132,10 @@ struct btrfs_ioctl_defrag_range_args {
 	uint32_t compress_type;
 	uint32_t unused[4];
 };
-#endif
+# endif
 
-#ifndef FIDEDUPERANGE
-# define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
+# ifndef FIDEDUPERANGE
+#  define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
 struct file_dedupe_range_info {
 	int64_t dest_fd;	/* in - destination file */
 	uint64_t dest_offset;	/* in - start of extent in destination */
@@ -158,10 +158,10 @@ struct file_dedupe_range {
 	uint32_t reserved2;	/* must be zero */
 	struct file_dedupe_range_info info[0];
 };
-#endif
+# endif
 
-#ifndef BTRFS_IOC_TREE_SEARCH_V2
-# define BTRFS_IOC_TREE_SEARCH_V2	\
+# ifndef BTRFS_IOC_TREE_SEARCH_V2
+#  define BTRFS_IOC_TREE_SEARCH_V2	\
 	_IOWR(BTRFS_IOCTL_MAGIC, 17, struct btrfs_ioctl_search_args_v2)
 struct btrfs_ioctl_search_args_v2 {
 	struct btrfs_ioctl_search_key key; /* in/out - search parameters */
@@ -170,7 +170,7 @@ struct btrfs_ioctl_search_args_v2 {
 					    *       to store item */
 	uint64_t buf[0];		   /* out - found items */
 };
-#endif
+# endif
 
 
 static const char *
@@ -216,7 +216,7 @@ sprint_makedev(unsigned long long val)
 	return devid;
 }
 
-#define ioc(x_) sprint_xlat_(x_, #x_)
+# define ioc(x_) sprint_xlat_(x_, #x_)
 
 void
 prfl_btrfs(const struct xlat *xlat, const unsigned long long val,
@@ -804,8 +804,8 @@ btrfs_test_clone_ioctls(void)
 		args.dest_offset);
 }
 
-#define BTRFS_COMPRESS_TYPES 2
-#define BTRFS_INVALID_COMPRESS (BTRFS_COMPRESS_TYPES + 1)
+# define BTRFS_COMPRESS_TYPES 2
+# define BTRFS_INVALID_COMPRESS (BTRFS_COMPRESS_TYPES + 1)
 
 static void
 btrfs_print_defrag_range_args(struct btrfs_ioctl_defrag_range_args *args,
@@ -1302,11 +1302,11 @@ btrfs_test_ino_path_ioctls(void)
 		.fspath = 0,
 	};
 
-#ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
+# ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
 	args.flags =
-#else
+# else
 	args.reserved[3] =
-#endif
+# endif
 			0xdeadc0defacefeeeULL;
 
 
@@ -1341,11 +1341,11 @@ btrfs_test_ino_path_ioctls(void)
 	args.fspath = (uintptr_t) buf;
 	args.reserved[0] = 0;
 	args.reserved[2] = 0;
-#ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
+# ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
 	args.flags =
-#else
+# else
 	args.reserved[3] =
-#endif
+# endif
 			1;
 
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
@@ -1358,11 +1358,11 @@ btrfs_test_ino_path_ioctls(void)
 	       args.fspath);
 
 	args.reserved[1] = 0;
-#ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
+# ifdef HAVE_BTRFS_IOCTL_LOGICAL_INO_ARGS
 	args.flags =
-#else
+# else
 	args.reserved[3] =
-#endif
+# endif
 			0;
 
 	ioctl(-1, BTRFS_IOC_LOGICAL_INO, &args);
@@ -1371,7 +1371,7 @@ btrfs_test_ino_path_ioctls(void)
 	       "}) = -1 EBADF (%m)\n",
 	       ioc(BTRFS_IOC_LOGICAL_INO), args.inum, args.size, args.fspath);
 
-#ifdef HAVE_LINUX_FIEMAP_H
+# ifdef HAVE_LINUX_FIEMAP_H
 	if (btrfs_test_root) {
 		int size;
 		struct stat si;
@@ -1480,7 +1480,7 @@ btrfs_test_ino_path_ioctls(void)
 		close(fd);
 		free(fiemap);
 	}
-#endif /* HAVE_LINUX_FIEMAP_H */
+# endif /* HAVE_LINUX_FIEMAP_H */
 }
 
 /*
@@ -1830,7 +1830,7 @@ btrfs_test_dev_replace_ioctl(void)
 static void
 btrfs_test_extent_same_ioctl(void)
 {
-#ifdef BTRFS_IOC_FILE_EXTENT_SAME
+# ifdef BTRFS_IOC_FILE_EXTENT_SAME
 	struct file_dedupe_range args = {
 		.src_offset = 1024,
 		.src_length = 10240,
@@ -1976,7 +1976,7 @@ btrfs_test_extent_same_ioctl(void)
 		close(fd2);
 	}
 	free(argsp);
-#endif /* BTRFS_IOC_FILE_EXTENT_SAME */
+# endif /* BTRFS_IOC_FILE_EXTENT_SAME */
 }
 
 static void

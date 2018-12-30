@@ -6,13 +6,13 @@
  */
 
 #ifndef _STRACE_TESTS_ACCEPT_COMPAT_H_
-#define _STRACE_TESTS_ACCEPT_COMPAT_H_
+# define _STRACE_TESTS_ACCEPT_COMPAT_H_
 
-#include <unistd.h>
-#include <sys/socket.h>
-#include <asm/unistd.h>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <asm/unistd.h>
 
-#if defined __NR_socketcall && defined __sparc__
+# if defined __NR_socketcall && defined __sparc__
 /*
  * Work around the fact that
  * - glibc >= 2.26 uses accept4 syscall to implement accept() call on sparc;
@@ -25,8 +25,8 @@ do_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 	return syscall(__NR_socketcall, 5, args);
 }
-#else
-# define do_accept accept
-#endif
+# else
+#  define do_accept accept
+# endif
 
 #endif /* !_STRACE_TESTS_ACCEPT_COMPAT_H_ */

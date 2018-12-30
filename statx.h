@@ -6,9 +6,9 @@
  */
 
 #ifndef STRACE_STATX_H
-#define STRACE_STATX_H
+# define STRACE_STATX_H
 
-#include <stdint.h>
+# include <stdint.h>
 
 typedef struct {
 	int64_t sec;

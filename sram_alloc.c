@@ -9,9 +9,9 @@
 
 #ifdef BFIN
 
-#include <bfin_sram.h>
+# include <bfin_sram.h>
 
-#include "xlat/sram_alloc_flags.h"
+# include "xlat/sram_alloc_flags.h"
 
 SYS_FUNC(sram_alloc)
 {

@@ -33,9 +33,9 @@
 # define ALIGNED_OFFSET(t_, m_) \
 	ALIGNED_SIZE(offsetof(t_, m_), t_)
 
-#  ifndef DM_DEV_ARM_POLL
-#   define DM_DEV_ARM_POLL     _IOWR(DM_IOCTL, 0x10, struct dm_ioctl)
-#  endif
+# ifndef DM_DEV_ARM_POLL
+#  define DM_DEV_ARM_POLL     _IOWR(DM_IOCTL, 0x10, struct dm_ioctl)
+# endif
 
 static const char str129[] = STR32 STR32 STR32 STR32 "6";
 
@@ -482,7 +482,7 @@ main(void)
 # endif /* VERBOSE */
 	printf("}) = %s\n", errstr);
 
-	#define FILL_DM_TARGET(id, id_next) \
+# define FILL_DM_TARGET(id, id_next) \
 		do { \
 			init_dm_target_spec(&dm_arg_open3->target##id, id); \
 			dm_arg_open3->target##id.next = \
@@ -493,7 +493,7 @@ main(void)
 			memcpy(dm_arg_open3->param##id, str129 + id * 2, id); \
 			dm_arg_open3->param##id[id] = '\0'; \
 		} while (0)
-	#define PRINT_DM_TARGET(id) \
+# define PRINT_DM_TARGET(id) \
 		do { \
 			print_dm_target_spec(&dm_arg_open3->target##id, id); \
 			printf("\"%.*s\"}, ", id, str129 + id * 2); \

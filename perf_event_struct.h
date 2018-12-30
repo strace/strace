@@ -6,9 +6,9 @@
  */
 
 #ifndef STRACE_LINUX_PERF_EVENT_STRUCT_H
-#define STRACE_LINUX_PERF_EVENT_STRUCT_H
+# define STRACE_LINUX_PERF_EVENT_STRUCT_H
 
-#include <stdint.h>
+# include <stdint.h>
 
 struct perf_event_attr {
 	uint32_t type;

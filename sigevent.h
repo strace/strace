@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_SIGEVENT_H
-#define STRACE_SIGEVENT_H
+# define STRACE_SIGEVENT_H
 
 typedef struct {
 	union {

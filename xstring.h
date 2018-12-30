@@ -6,13 +6,13 @@
  */
 
 #ifndef STRACE_XSTRING_H
-#define STRACE_XSTRING_H
+# define STRACE_XSTRING_H
 
-#include <stdarg.h>
-#include <stdio.h>
+# include <stdarg.h>
+# include <stdio.h>
 
-#include "error_prints.h"
-#include "gcc_compat.h"
+# include "error_prints.h"
+# include "gcc_compat.h"
 
 /**
  * Print to static buffer and die on (really unexpected) errors and overflows.
@@ -55,7 +55,7 @@ xsnprintf_(char *str, size_t size, const char *func, const char *argstr,
  * @param fmt_  Format string.
  * @param ...   Format arguments.
  */
-#define xsnprintf(str_, size_, fmt_, ...) \
+# define xsnprintf(str_, size_, fmt_, ...) \
 	xsnprintf_((str_), (size_), __func__, #fmt_ ", " #__VA_ARGS__, \
 		   (fmt_), __VA_ARGS__)
 
@@ -67,7 +67,7 @@ xsnprintf_(char *str, size_t size, const char *func, const char *argstr,
  * @param fmt_  Format string.
  * @param ...   Format arguments.
  */
-#define xsprintf(str_, fmt_, ...) \
+# define xsprintf(str_, fmt_, ...) \
 	xsnprintf((str_), sizeof(str_) + MUST_BE_ARRAY(str_), (fmt_), \
 		  __VA_ARGS__)
 
@@ -103,7 +103,7 @@ get_pos_diff_(char *str, size_t size, char *pos, const char *func,
  * @param ...   Format arguments.
  * @return      New position.
  */
-#define xappendstr(str_, pos_, fmt_, ...) \
+# define xappendstr(str_, pos_, fmt_, ...) \
 	(xsnprintf((pos_), sizeof(str_) + MUST_BE_ARRAY(str_) - \
 		   get_pos_diff_((str_), sizeof(str_), (pos_), __func__, \
 				 "xappendstr(" #str_ ", " #pos_ ", " #fmt_ ", " \

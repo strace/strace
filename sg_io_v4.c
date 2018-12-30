@@ -28,7 +28,7 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-#define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
+# define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
 	do {									\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
 		print_sg_io_buffer((tcp_), (where_).field_, (size_), (count_));	\

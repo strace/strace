@@ -42,12 +42,12 @@ main(void)
 	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
 	       (long long) rem.tv_sec, zero_extend_signed_to_ull(rem.tv_nsec));
 	puts("--- SIGALRM \\{si_signo=SIGALRM, si_code=SI_KERNEL\\} ---");
-#ifdef __arm__
+# ifdef __arm__
 /* old kernels used to overwrite ARM_r0 with -EINTR */
-# define ALTERNATIVE_NANOSLEEP_REQ "0xfffffffc|"
-#else
-# define ALTERNATIVE_NANOSLEEP_REQ ""
-#endif
+#  define ALTERNATIVE_NANOSLEEP_REQ "0xfffffffc|"
+# else
+#  define ALTERNATIVE_NANOSLEEP_REQ ""
+# endif
 	printf("(nanosleep\\((%s\\{tv_sec=%lld, tv_nsec=%llu\\})"
 	       ", %p|restart_syscall\\(<\\.\\.\\."
 	       " resuming interrupted nanosleep \\.\\.\\.>)\\) = 0\n",

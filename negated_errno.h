@@ -7,7 +7,7 @@
  */
 
 #ifndef STRACE_NEGATED_ERRNO_H
-#define STRACE_NEGATED_ERRNO_H
+# define STRACE_NEGATED_ERRNO_H
 
 /*
  * Check the syscall return value register value for whether it is
@@ -18,12 +18,12 @@ is_negated_errno(kernel_ulong_t val)
 {
 	kernel_ulong_t max = -(kernel_long_t) MAX_ERRNO_VALUE;
 
-#ifndef current_klongsize
+# ifndef current_klongsize
 	if (current_klongsize < sizeof(val)) {
 		val = (uint32_t) val;
 		max = (uint32_t) max;
 	}
-#endif /* !current_klongsize */
+# endif /* !current_klongsize */
 
 	return val >= max;
 }

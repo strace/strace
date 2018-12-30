@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_STATFS_H
-#define STRACE_STATFS_H
+# define STRACE_STATFS_H
 
 struct strace_statfs {
 	unsigned long long f_type;

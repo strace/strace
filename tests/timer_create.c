@@ -78,9 +78,9 @@ main(void)
 	       sev.sigev_un.sigev_thread.attribute,
 	       tid[2]);
 
-#ifndef SIGEV_THREAD_ID
-# define SIGEV_THREAD_ID 4
-#endif
+# ifndef SIGEV_THREAD_ID
+#  define SIGEV_THREAD_ID 4
+# endif
 	sev.sigev_notify = SIGEV_THREAD_ID;
 	sev.sigev_un.tid = getpid();
 	if (syscall(__NR_timer_create, CLOCK_MONOTONIC, &sev, &tid[3]))

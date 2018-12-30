@@ -845,19 +845,19 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 		struct { uint32_t base; uint32_t len; } *iov32;
 		struct { uint64_t base; uint64_t len; } *iov64;
 	} iovu;
-#define iov iovu.iov64
-#define sizeof_iov \
+# define iov iovu.iov64
+# define sizeof_iov \
 	(current_wordsize == 4 ? (unsigned int) sizeof(*iovu.iov32)	\
 			       : (unsigned int) sizeof(*iovu.iov64))
-#define iov_iov_base(i) \
+# define iov_iov_base(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].base : iovu.iov64[i].base)
-#define iov_iov_len(i) \
+# define iov_iov_len(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].len : iovu.iov64[i].len)
 #else
 	struct iovec *iov;
-#define sizeof_iov ((unsigned int) sizeof(*iov))
-#define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
-#define iov_iov_len(i) iov[i].iov_len
+# define sizeof_iov ((unsigned int) sizeof(*iov))
+# define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
+# define iov_iov_len(i) iov[i].iov_len
 #endif
 	int i;
 	unsigned int size = sizeof_iov * len;

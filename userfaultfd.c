@@ -38,7 +38,7 @@ tprintf_uffdio_range(const struct uffdio_range *range)
 	tprints("}");
 }
 
-#define PRINT_FIELD_UFFDIO_RANGE(prefix_, where_, field_)		\
+# define PRINT_FIELD_UFFDIO_RANGE(prefix_, where_, field_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		tprintf_uffdio_range(&(where_).field_);			\

@@ -75,11 +75,11 @@ main(void)
 	sigdelset(&u.libc_mask, SIGUSR2);
 	const unsigned long mask2 = u.old_mask;
 
-#if SIGNAL_MASK_BY_REF
+# if SIGNAL_MASK_BY_REF
 	k_sigsuspend((uintptr_t) &mask1, 0xdeadbeef, (uintptr_t) &mask2);
-#else
+# else
 	k_sigsuspend(mask1, 0xdeadbeef, mask2);
-#endif
+# endif
 	if (EINTR != errno)
 		perror_msg_and_skip("sigsuspend");
 

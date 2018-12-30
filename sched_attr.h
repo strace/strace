@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_SCHED_ATTR_H
-#define STRACE_SCHED_ATTR_H
+# define STRACE_SCHED_ATTR_H
 
 # include <stdint.h>
 

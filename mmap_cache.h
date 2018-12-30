@@ -5,7 +5,7 @@
  */
 
 #ifndef STRACE_MMAP_CACHE_H
-#define STRACE_MMAP_CACHE_H
+# define STRACE_MMAP_CACHE_H
 
 /*
  * Keep a sorted array of cache entries,

@@ -26,8 +26,8 @@ enum { IFLA_AF_SPEC = 26 };
 #endif
 
 #define XLAT_MACROS_ONLY
-# include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
-# include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
+#include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
+#include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
 #undef XLAT_MACROS_ONLY
 
 #ifndef HAVE_STRUCT_IFLA_CACHEINFO

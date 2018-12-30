@@ -107,7 +107,7 @@ map_len(struct mmap_cache_entry_t *map_info)
 		: 0;
 }
 
-#define VCPU_DENTRY_PREFIX "anon_inode:kvm-vcpu:"
+# define VCPU_DENTRY_PREFIX "anon_inode:kvm-vcpu:"
 
 static struct vcpu_info*
 vcpu_get_info(struct tcb *const tcp, int fd)

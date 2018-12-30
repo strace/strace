@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#define	SIGNAL_FRAMESIZE32	64
+#define SIGNAL_FRAMESIZE32	64
 
 FUNC_GET_RT_SIGFRAME_ADDR
 {

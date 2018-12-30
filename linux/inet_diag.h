@@ -6,10 +6,10 @@
  */
 
 #ifndef STRACE_LINUX_INET_DIAG_H
-#define STRACE_LINUX_INET_DIAG_H
+# define STRACE_LINUX_INET_DIAG_H
 
-#define TCPDIAG_GETSOCK 18
-#define DCCPDIAG_GETSOCK 19
+# define TCPDIAG_GETSOCK 18
+# define DCCPDIAG_GETSOCK 19
 
 /* Socket identity */
 struct inet_diag_sockid {

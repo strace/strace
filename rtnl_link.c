@@ -463,10 +463,10 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 
 		PRINT_FIELD_U(", ", st, rx_compressed);
 		PRINT_FIELD_U(", ", st, tx_compressed);
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
+# ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
 		if (len >= def_size)
 			PRINT_FIELD_U(", ", st, rx_nohandler);
-#endif
+# endif
 		tprints("}");
 	}
 

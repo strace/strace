@@ -15,12 +15,12 @@
 # include <stdio.h>
 # include <unistd.h>
 
-#ifdef O_TMPFILE
+# ifdef O_TMPFILE
 /* The kernel & C libraries often inline O_DIRECTORY. */
-# define STRACE_O_TMPFILE (O_TMPFILE & ~O_DIRECTORY)
-#else
-# define STRACE_O_TMPFILE 0
-#endif
+#  define STRACE_O_TMPFILE (O_TMPFILE & ~O_DIRECTORY)
+# else
+#  define STRACE_O_TMPFILE 0
+# endif
 
 static const char sample[] = "openat.sample";
 

@@ -8,9 +8,9 @@
  */
 
 #ifndef STRACE_UNWIND_H
-#define STRACE_UNWIND_H
+# define STRACE_UNWIND_H
 
-#include "defs.h"
+# include "defs.h"
 
 /*
  * Type used in stacktrace walker.

@@ -14,8 +14,8 @@
 #include <linux/nbd.h>
 
 #define XLAT_MACROS_ONLY
-# include "xlat/nbd_ioctl_cmds.h"
-# include "xlat/nbd_ioctl_flags.h"
+#include "xlat/nbd_ioctl_cmds.h"
+#include "xlat/nbd_ioctl_flags.h"
 #undef XLAT_MACROS_ONLY
 
 #define RVAL_EBADF " = -1 EBADF (%m)\n"

@@ -212,17 +212,17 @@ main(void)
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe, "FF_CONSTANT");
 
-#  if VERBOSE
+# if VERBOSE
 	printf(", constant={level=%hd", ffe->u.constant.level);
 	print_envelope(&ffe->u.constant.envelope);
 	printf("}");
-#  else
+# else
 	printf("...");
-#  endif
+# endif
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
 
-#  if VERBOSE
+# if VERBOSE
 	ffe->type = FF_RAMP;
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe, "FF_RAMP");
@@ -259,7 +259,7 @@ main(void)
 	print_ffe_common(ffe, "0xff /* FF_??? */");
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
-#  endif
+# endif
 
 	ioctl(-1, _IOC(_IOC_READ, 0x45, 0x1, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",

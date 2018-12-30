@@ -24,8 +24,8 @@
 #include <linux/rtnetlink.h>
 
 #define XLAT_MACROS_ONLY
-# include <xlat/rtnl_link_attrs.h>
-# include <xlat/rtnl_ifla_info_attrs.h>
+#include <xlat/rtnl_link_attrs.h>
+#include <xlat/rtnl_ifla_info_attrs.h>
 #undef XLAT_MACROS_ONLY
 
 #define IFLA_ATTR IFLA_LINKINFO

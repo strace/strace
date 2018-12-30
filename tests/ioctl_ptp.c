@@ -12,17 +12,17 @@
 
 #ifdef HAVE_STRUCT_PTP_SYS_OFFSET
 
-#include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <linux/ptp_clock.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <inttypes.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <sys/ioctl.h>
+# include <linux/ptp_clock.h>
 
-#include "xlat.h"
-#include "xlat/ptp_flags_options.h"
+# include "xlat.h"
+# include "xlat/ptp_flags_options.h"
 
 static void
 test_no_device(void)

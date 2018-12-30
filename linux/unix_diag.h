@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_LINUX_UNIX_DIAG_H
-#define STRACE_LINUX_UNIX_DIAG_H
+# define STRACE_LINUX_UNIX_DIAG_H
 
 struct unix_diag_req {
 	uint8_t	 sdiag_family;
@@ -18,12 +18,12 @@ struct unix_diag_req {
 	uint32_t udiag_cookie[2];
 };
 
-#define UDIAG_SHOW_NAME		0x01
-#define UDIAG_SHOW_VFS		0x02
-#define UDIAG_SHOW_PEER		0x04
-#define UDIAG_SHOW_ICONS	0x08
-#define UDIAG_SHOW_RQLEN	0x10
-#define UDIAG_SHOW_MEMINFO	0x20
+# define UDIAG_SHOW_NAME		0x01
+# define UDIAG_SHOW_VFS		0x02
+# define UDIAG_SHOW_PEER		0x04
+# define UDIAG_SHOW_ICONS	0x08
+# define UDIAG_SHOW_RQLEN	0x10
+# define UDIAG_SHOW_MEMINFO	0x20
 
 struct unix_diag_msg {
 	uint8_t	 udiag_family;

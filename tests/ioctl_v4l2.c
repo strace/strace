@@ -339,13 +339,13 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 
 		errno = saved_errno;
 		printf(
-#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		       ", buffersize=%u"
-#endif
+# endif
 		       "}}) = -1 EBADF (%m)\n"
-#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		       , f->fmt.sdr.buffersize
-#endif
+# endif
 		       );
 		break;
 #endif
@@ -748,14 +748,14 @@ main(void)
 	struct v4l2_queryctrl *const p_v4l2_queryctrl =
 		page_end - sizeof(*p_v4l2_queryctrl);
 	ioctl(-1, VIDIOC_QUERYCTRL, p_v4l2_queryctrl);
-# ifdef V4L2_CTRL_FLAG_NEXT_CTRL
+#ifdef V4L2_CTRL_FLAG_NEXT_CTRL
 	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=V4L2_CTRL_FLAG_NEXT_CTRL"
 	       "|%#x /* V4L2_CID_??? */}) = -1 EBADF (%m)\n",
 	       p_v4l2_queryctrl->id & ~V4L2_CTRL_FLAG_NEXT_CTRL);
-# else
+#else
 	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=%#x /* V4L2_CID_??? */})"
 	       " = -1 EBADF (%m)\n", p_v4l2_queryctrl->id);
-# endif
+#endif
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_queryctrl, p_queryctrl);
 	p_queryctrl->id = V4L2_CID_SATURATION;

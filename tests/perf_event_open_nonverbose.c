@@ -22,11 +22,11 @@
 # include "xlat.h"
 # include "xlat/perf_event_open_flags.h"
 
-#if ULONG_MAX > UINT_MAX
-#define LONG_STR_PREFIX "ffffffff"
-#else
-#define LONG_STR_PREFIX ""
-#endif
+# if ULONG_MAX > UINT_MAX
+#  define LONG_STR_PREFIX "ffffffff"
+# else
+#  define LONG_STR_PREFIX ""
+# endif
 
 static const char *printaddr(void *ptr)
 {

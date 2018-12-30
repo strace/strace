@@ -24,8 +24,8 @@
 # include <linux/ioctl.h>
 # include <linux/userfaultfd.h>
 
-#include "xlat.h"
-#include "xlat/uffd_api_features.h"
+# include "xlat.h"
+# include "xlat/uffd_api_features.h"
 
 int
 main(void)

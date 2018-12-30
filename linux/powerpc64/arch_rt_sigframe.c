@@ -6,13 +6,13 @@
  */
 
 #undef FUNC_GET_RT_SIGFRAME_ADDR
-#define	FUNC_GET_RT_SIGFRAME_ADDR	\
+#define FUNC_GET_RT_SIGFRAME_ADDR	\
 	static kernel_ulong_t ppc_get_rt_sigframe_addr(struct tcb *tcp)
 
 #include "powerpc/arch_rt_sigframe.c"
 
 #undef FUNC_GET_RT_SIGFRAME_ADDR
-#define	FUNC_GET_RT_SIGFRAME_ADDR	DEF_FUNC_GET_RT_SIGFRAME_ADDR
+#define FUNC_GET_RT_SIGFRAME_ADDR	DEF_FUNC_GET_RT_SIGFRAME_ADDR
 
 FUNC_GET_RT_SIGFRAME_ADDR
 {

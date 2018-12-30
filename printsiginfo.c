@@ -25,7 +25,7 @@
 #include "nr_prefix.c"
 
 #ifndef IN_MPERS
-#include "printsiginfo.h"
+# include "printsiginfo.h"
 #endif
 
 #include "xlat/audit_arch.h"

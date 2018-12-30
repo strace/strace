@@ -18,13 +18,13 @@
 # include <linux/ip.h>
 # include <linux/rtnetlink.h>
 
-#define FRA_TUN_ID 12
-#define FRA_TABLE 15
-#define FRA_UID_RANGE 20
-#define FRA_PROTOCOL 21
-#define FRA_IP_PROTO 22
-#define FRA_SPORT_RANGE 23
-#define FRA_DPORT_RANGE 24
+# define FRA_TUN_ID 12
+# define FRA_TABLE 15
+# define FRA_UID_RANGE 20
+# define FRA_PROTOCOL 21
+# define FRA_IP_PROTO 22
+# define FRA_SPORT_RANGE 23
+# define FRA_DPORT_RANGE 24
 
 # ifndef HAVE_STRUCT_FIB_RULE_PORT_RANGE
 struct fib_rule_port_range {
@@ -97,7 +97,7 @@ main(void)
 			   FRA_TABLE, pattern, table_id,
 			   printf("RT_TABLE_DEFAULT"));
 
-#ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
+# ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
 	static const struct fib_rule_uid_range range = {
 		.start = 0xabcdedad,
 		.end = 0xbcdeadba
@@ -108,14 +108,14 @@ main(void)
 			   PRINT_FIELD_U("{", range, start);
 			   PRINT_FIELD_U(", ", range, end);
 			   printf("}"));
-#endif
-#if defined HAVE_BE64TOH || defined be64toh
+# endif
+# if defined HAVE_BE64TOH || defined be64toh
 	const uint64_t tun_id = 0xabcdcdbeedabadef;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_rtmsg, print_rtmsg,
 			   FRA_TUN_ID, pattern, tun_id,
 			   printf("htobe64(%" PRIu64 ")", be64toh(tun_id)));
-#endif
+# endif
 
 	uint8_t proto;
 

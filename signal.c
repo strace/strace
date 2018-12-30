@@ -538,9 +538,9 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 		memset(&sa, 0, sizeof(sa));
 		sa.sa_handler__ = sa32.sa_handler__;
 		sa.sa_flags     = sa32.sa_flags;
-#if HAVE_SA_RESTORER && defined SA_RESTORER
+# if HAVE_SA_RESTORER && defined SA_RESTORER
 		sa.sa_restorer  = sa32.sa_restorer;
-#endif
+# endif
 		/* Kernel treats sa_mask as an array of longs.
 		 * For 32-bit process, "long" is uint32_t, thus, for example,
 		 * 32th bit in sa_mask will end up as bit 0 in sa_mask[1].

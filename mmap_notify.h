@@ -5,9 +5,9 @@
  */
 
 #ifndef STRACE_MMAP_NOTIFY_H
-#define STRACE_MMAP_NOTIFY_H
+# define STRACE_MMAP_NOTIFY_H
 
-#include "defs.h"
+# include "defs.h"
 
 typedef void (*mmap_notify_fn)(struct tcb *, void *);
 

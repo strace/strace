@@ -7,42 +7,42 @@
  */
 
 #ifndef STRACE_NETLINK_H
-#define STRACE_NETLINK_H
+# define STRACE_NETLINK_H
 
-#include <stdbool.h>
-#include <sys/socket.h>
-#include <linux/netlink.h>
+# include <stdbool.h>
+# include <sys/socket.h>
+# include <linux/netlink.h>
 
-#ifndef NETLINK_SOCK_DIAG
-# define NETLINK_SOCK_DIAG 4
-#endif
+# ifndef NETLINK_SOCK_DIAG
+#  define NETLINK_SOCK_DIAG 4
+# endif
 
-#ifndef NLM_F_NONREC
-# define NLM_F_NONREC	0x100
-#endif
-#ifndef NLM_F_CAPPED
-# define NLM_F_CAPPED	0x100
-#endif
+# ifndef NLM_F_NONREC
+#  define NLM_F_NONREC	0x100
+# endif
+# ifndef NLM_F_CAPPED
+#  define NLM_F_CAPPED	0x100
+# endif
 
-#undef NLMSG_HDRLEN
-#define NLMSG_HDRLEN ((unsigned int) NLMSG_ALIGN(sizeof(struct nlmsghdr)))
+# undef NLMSG_HDRLEN
+# define NLMSG_HDRLEN ((unsigned int) NLMSG_ALIGN(sizeof(struct nlmsghdr)))
 
-#ifndef NLMSG_MIN_TYPE
-# define NLMSG_MIN_TYPE		0x10
-#endif
+# ifndef NLMSG_MIN_TYPE
+#  define NLMSG_MIN_TYPE		0x10
+# endif
 
-#ifndef NLA_ALIGN
-# define NLA_ALIGN(len) (((len) + 3) & ~3)
-#endif
+# ifndef NLA_ALIGN
+#  define NLA_ALIGN(len) (((len) + 3) & ~3)
+# endif
 
-#undef NLA_HDRLEN
-#define NLA_HDRLEN ((unsigned int) NLA_ALIGN(sizeof(struct nlattr)))
+# undef NLA_HDRLEN
+# define NLA_HDRLEN ((unsigned int) NLA_ALIGN(sizeof(struct nlattr)))
 
-#ifndef NLA_TYPE_MASK
-# define NLA_F_NESTED		(1 << 15)
-# define NLA_F_NET_BYTEORDER	(1 << 14)
-# define NLA_TYPE_MASK		~(NLA_F_NESTED | NLA_F_NET_BYTEORDER)
-#endif
+# ifndef NLA_TYPE_MASK
+#  define NLA_F_NESTED		(1 << 15)
+#  define NLA_F_NET_BYTEORDER	(1 << 14)
+#  define NLA_TYPE_MASK		~(NLA_F_NESTED | NLA_F_NET_BYTEORDER)
+# endif
 
 static inline bool
 is_nlmsg_ok(const struct nlmsghdr *const nlh, const ssize_t len)

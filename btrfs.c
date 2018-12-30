@@ -10,10 +10,10 @@
 
 #ifdef HAVE_LINUX_BTRFS_H
 
-#include DEF_MPERS_TYPE(struct_btrfs_ioctl_dev_replace_args)
-#include DEF_MPERS_TYPE(struct_btrfs_ioctl_send_args)
-#include DEF_MPERS_TYPE(struct_btrfs_ioctl_received_subvol_args)
-#include DEF_MPERS_TYPE(struct_btrfs_ioctl_vol_args_v2)
+# include DEF_MPERS_TYPE(struct_btrfs_ioctl_dev_replace_args)
+# include DEF_MPERS_TYPE(struct_btrfs_ioctl_send_args)
+# include DEF_MPERS_TYPE(struct_btrfs_ioctl_received_subvol_args)
+# include DEF_MPERS_TYPE(struct_btrfs_ioctl_vol_args_v2)
 
 # include <linux/btrfs.h>
 
@@ -32,8 +32,8 @@ typedef struct btrfs_ioctl_vol_args_v2
 
 #ifdef HAVE_LINUX_BTRFS_H
 
-#include "print_fields.h"
-#include <linux/fs.h>
+# include "print_fields.h"
+# include <linux/fs.h>
 
 /*
  * Prior to Linux 3.12, the BTRFS_IOC_DEFAULT_SUBVOL used u64 in
@@ -41,15 +41,15 @@ typedef struct btrfs_ioctl_vol_args_v2
  */
 typedef __u64 u64;
 
-#ifndef HAVE_STRUCT_BTRFS_IOCTL_FEATURE_FLAGS_COMPAT_FLAGS
+# ifndef HAVE_STRUCT_BTRFS_IOCTL_FEATURE_FLAGS_COMPAT_FLAGS
 struct btrfs_ioctl_feature_flags {
 	uint64_t compat_flags;
 	uint64_t compat_ro_flags;
 	uint64_t incompat_flags;
 };
-#endif
+# endif
 
-#ifndef HAVE_STRUCT_BTRFS_IOCTL_DEFRAG_RANGE_ARGS_START
+# ifndef HAVE_STRUCT_BTRFS_IOCTL_DEFRAG_RANGE_ARGS_START
 struct btrfs_ioctl_defrag_range_args {
 	uint64_t start;
 	uint64_t len;
@@ -58,37 +58,37 @@ struct btrfs_ioctl_defrag_range_args {
 	uint32_t compress_type;
 	uint32_t unused[4];
 };
-#endif
+# endif
 
-#ifndef BTRFS_LABEL_SIZE
-# define BTRFS_LABEL_SIZE 256
-#endif
+# ifndef BTRFS_LABEL_SIZE
+#  define BTRFS_LABEL_SIZE 256
+# endif
 
-#ifndef BTRFS_IOC_QUOTA_RESCAN
+# ifndef BTRFS_IOC_QUOTA_RESCAN
 struct btrfs_ioctl_quota_rescan_args {
 	uint64_t flags, progress, reserved[6];
 };
-# define BTRFS_IOC_QUOTA_RESCAN _IOW(BTRFS_IOCTL_MAGIC, 44, \
+#  define BTRFS_IOC_QUOTA_RESCAN _IOW(BTRFS_IOCTL_MAGIC, 44, \
 					struct btrfs_ioctl_quota_rescan_args)
-# define BTRFS_IOC_QUOTA_RESCAN_STATUS _IOR(BTRFS_IOCTL_MAGIC, 45, \
+#  define BTRFS_IOC_QUOTA_RESCAN_STATUS _IOR(BTRFS_IOCTL_MAGIC, 45, \
 					struct btrfs_ioctl_quota_rescan_args)
-#endif
+# endif
 
-#ifndef BTRFS_IOC_QUOTA_RESCAN_WAIT
-# define BTRFS_IOC_QUOTA_RESCAN_WAIT _IO(BTRFS_IOCTL_MAGIC, 46)
-#endif
+# ifndef BTRFS_IOC_QUOTA_RESCAN_WAIT
+#  define BTRFS_IOC_QUOTA_RESCAN_WAIT _IO(BTRFS_IOCTL_MAGIC, 46)
+# endif
 
-#ifndef BTRFS_IOC_GET_FEATURES
-# define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
+# ifndef BTRFS_IOC_GET_FEATURES
+#  define BTRFS_IOC_GET_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
 					struct btrfs_ioctl_feature_flags)
-# define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
+#  define BTRFS_IOC_SET_FEATURES _IOW(BTRFS_IOCTL_MAGIC, 57, \
 					struct btrfs_ioctl_feature_flags[2])
-# define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
+#  define BTRFS_IOC_GET_SUPPORTED_FEATURES _IOR(BTRFS_IOCTL_MAGIC, 57, \
 					struct btrfs_ioctl_feature_flags[3])
-#endif
+# endif
 
-#ifndef BTRFS_IOC_TREE_SEARCH_V2
-# define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
+# ifndef BTRFS_IOC_TREE_SEARCH_V2
+#  define BTRFS_IOC_TREE_SEARCH_V2 _IOWR(BTRFS_IOCTL_MAGIC, 17, \
 					struct btrfs_ioctl_search_args_v2)
 struct btrfs_ioctl_search_args_v2 {
 	struct btrfs_ioctl_search_key key; /* in/out - search parameters */
@@ -97,34 +97,34 @@ struct btrfs_ioctl_search_args_v2 {
 					    *       to store item */
 	uint64_t buf[0];		   /* out - found items */
 };
-#endif
+# endif
 
-#include "xlat/btrfs_balance_args.h"
-#include "xlat/btrfs_balance_ctl_cmds.h"
-#include "xlat/btrfs_balance_flags.h"
-#include "xlat/btrfs_balance_state.h"
-#include "xlat/btrfs_compress_types.h"
-#include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
-#include "xlat/btrfs_defrag_flags.h"
-#include "xlat/btrfs_dev_replace_cmds.h"
-#include "xlat/btrfs_dev_replace_results.h"
-#include "xlat/btrfs_dev_replace_state.h"
-#include "xlat/btrfs_dev_stats_flags.h"
-#include "xlat/btrfs_dev_stats_values.h"
-#include "xlat/btrfs_features_compat.h"
-#include "xlat/btrfs_features_compat_ro.h"
-#include "xlat/btrfs_features_incompat.h"
-#include "xlat/btrfs_key_types.h"
-#include "xlat/btrfs_logical_ino_args_flags.h"
-#include "xlat/btrfs_qgroup_ctl_cmds.h"
-#include "xlat/btrfs_qgroup_inherit_flags.h"
-#include "xlat/btrfs_qgroup_limit_flags.h"
-#include "xlat/btrfs_qgroup_status_flags.h"
-#include "xlat/btrfs_scrub_flags.h"
-#include "xlat/btrfs_send_flags.h"
-#include "xlat/btrfs_snap_flags_v2.h"
-#include "xlat/btrfs_space_info_flags.h"
-#include "xlat/btrfs_tree_objectids.h"
+# include "xlat/btrfs_balance_args.h"
+# include "xlat/btrfs_balance_ctl_cmds.h"
+# include "xlat/btrfs_balance_flags.h"
+# include "xlat/btrfs_balance_state.h"
+# include "xlat/btrfs_compress_types.h"
+# include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
+# include "xlat/btrfs_defrag_flags.h"
+# include "xlat/btrfs_dev_replace_cmds.h"
+# include "xlat/btrfs_dev_replace_results.h"
+# include "xlat/btrfs_dev_replace_state.h"
+# include "xlat/btrfs_dev_stats_flags.h"
+# include "xlat/btrfs_dev_stats_values.h"
+# include "xlat/btrfs_features_compat.h"
+# include "xlat/btrfs_features_compat_ro.h"
+# include "xlat/btrfs_features_incompat.h"
+# include "xlat/btrfs_key_types.h"
+# include "xlat/btrfs_logical_ino_args_flags.h"
+# include "xlat/btrfs_qgroup_ctl_cmds.h"
+# include "xlat/btrfs_qgroup_inherit_flags.h"
+# include "xlat/btrfs_qgroup_limit_flags.h"
+# include "xlat/btrfs_qgroup_status_flags.h"
+# include "xlat/btrfs_scrub_flags.h"
+# include "xlat/btrfs_send_flags.h"
+# include "xlat/btrfs_snap_flags_v2.h"
+# include "xlat/btrfs_space_info_flags.h"
+# include "xlat/btrfs_tree_objectids.h"
 
 static inline char
 prnibble(char v)
@@ -135,7 +135,7 @@ prnibble(char v)
 }
 
 /* 8-4-4-4-12 = 36 characters */
-#define UUID_STRING_SIZE 36
+# define UUID_STRING_SIZE 36
 
 /* Formats uuid, returns 0 if it's all zeroes */
 static int
@@ -222,9 +222,9 @@ btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 	tprints("}");
 }
 
-#define btrfs_print_key_type(prefix_, where_, field_) \
+# define btrfs_print_key_type(prefix_, where_, field_) \
 	PRINT_FIELD_XVAL_U((prefix_), (where_), field_, btrfs_key_types, NULL)
-#define btrfs_print_objectid(prefix_, where_, field_) \
+# define btrfs_print_objectid(prefix_, where_, field_) \
 	PRINT_FIELD_XVAL_U((prefix_), (where_), field_, btrfs_tree_objectids, \
 			   NULL)
 
@@ -718,9 +718,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_fs_info_args args;
 		char uuid[UUID_STRING_SIZE+1];
 		uint32_t nodesize, sectorsize, clone_alignment;
-#ifndef HAVE_STRUCT_BTRFS_IOCTL_FS_INFO_ARGS_NODESIZE
+# ifndef HAVE_STRUCT_BTRFS_IOCTL_FS_INFO_ARGS_NODESIZE
 		uint32_t *reserved32;
-#endif
+# endif
 
 		if (entering(tcp))
 			return 0;
@@ -729,16 +729,16 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-#ifdef HAVE_STRUCT_BTRFS_IOCTL_FS_INFO_ARGS_NODESIZE
+# ifdef HAVE_STRUCT_BTRFS_IOCTL_FS_INFO_ARGS_NODESIZE
 		nodesize = args.nodesize,
 		sectorsize = args.sectorsize,
 		clone_alignment = args.clone_alignment;
-#else
+# else
 		reserved32 = (void *) args.reserved;
 		nodesize = reserved32[0];
 		sectorsize = reserved32[1];
 		clone_alignment = reserved32[2];
-#endif
+# endif
 		btrfs_unparse_uuid(args.fsid, uuid);
 
 		PRINT_FIELD_U("{", args, max_id);
@@ -892,11 +892,11 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 			tprintf(", flags=");
 			printflags64(btrfs_logical_ino_args_flags,
-#ifdef HAVE_STRUCT_BTRFS_IOCTL_LOGICAL_INO_ARGS_FLAGS
+# ifdef HAVE_STRUCT_BTRFS_IOCTL_LOGICAL_INO_ARGS_FLAGS
 				     args.flags
-#else
+# else
 				     args.reserved[3]
-#endif
+# endif
 				     , "BTRFS_LOGICAL_INO_ARGS_???");
 			PRINT_FIELD_ADDR64(", ", args, inodes);
 			tprints("}");
@@ -1262,9 +1262,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_CLONE:			/* FICLONE */
 	case BTRFS_IOC_CLONE_RANGE:		/* FICLONERANGE */
-#ifdef BTRFS_IOC_FILE_EXTENT_SAME
+# ifdef BTRFS_IOC_FILE_EXTENT_SAME
 	case BTRFS_IOC_FILE_EXTENT_SAME:	/* FIDEDUPERANGE */
-#endif
+# endif
 		/*
 		 * FICLONE, FICLONERANGE, and FIDEDUPERANGE started out as
 		 * btrfs ioctls and the code was kept for the generic

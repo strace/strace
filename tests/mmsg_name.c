@@ -100,9 +100,9 @@ test_mmsg_name(const int send_fd, const int recv_fd)
 		if (i)
 			printf(", ");
 		if (i >= IOV_MAX
-# if !VERBOSE
+#if !VERBOSE
 			|| i >= DEFAULT_STRLEN
-# endif
+#endif
 		   ) {
 			printf("...");
 			break;

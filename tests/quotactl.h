@@ -10,7 +10,7 @@
  */
 
 #ifndef STRACE_TESTS_QUOTACTL_H
-#define STRACE_TESTS_QUOTACTL_H
+# define STRACE_TESTS_QUOTACTL_H
 
 # include <inttypes.h>
 # include <stdarg.h>
@@ -165,7 +165,7 @@ check_quota(uint32_t flags, int cmd, const char *cmd_str,
 
 	errstr = sprintrc(rc);
 
-#ifdef INJECT_RETVAL
+# ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
 		error_msg_and_fail("Got a return value of %ld != %d",
 				   rc, INJECT_RETVAL);
@@ -174,7 +174,7 @@ check_quota(uint32_t flags, int cmd, const char *cmd_str,
 
 	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
 	errstr = inj_errstr;
-#endif
+# endif
 
 	printf("quotactl(%s, %s", cmd_str, special_str);
 

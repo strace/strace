@@ -10,7 +10,7 @@
  */
 
 #ifndef STRACE_TESTS_INIT_DELETE_MODULE_H
-#define STRACE_TESTS_INIT_DELETE_MODULE_H
+# define STRACE_TESTS_INIT_DELETE_MODULE_H
 
 # include <stdbool.h>
 # include <stdio.h>

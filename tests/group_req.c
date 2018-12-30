@@ -20,8 +20,8 @@
 # include <sys/socket.h>
 # include <arpa/inet.h>
 
-#define	multi4addr	"224.0.0.3"
-#define	multi6addr	"ff01::c"
+# define multi4addr	"224.0.0.3"
+# define multi6addr	"ff01::c"
 
 static const char *errstr;
 

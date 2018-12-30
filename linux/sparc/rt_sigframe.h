@@ -6,10 +6,10 @@
  */
 
 #ifndef STRACE_RT_SIGFRAME_H
-#define STRACE_RT_SIGFRAME_H
+# define STRACE_RT_SIGFRAME_H
 
-#include "ptrace.h"
-#include <signal.h>
+# include "ptrace.h"
+# include <signal.h>
 
 typedef struct {
 	struct sparc_stackf	ss;
@@ -19,7 +19,7 @@ typedef struct {
 	/* more data follows */
 } struct_rt_sigframe;
 
-#define OFFSETOF_SIGMASK_IN_RT_SIGFRAME	\
+# define OFFSETOF_SIGMASK_IN_RT_SIGFRAME	\
 		offsetof(struct_rt_sigframe, mask)
 
 #endif /* !STRACE_RT_SIGFRAME_H */

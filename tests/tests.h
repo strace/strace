@@ -7,53 +7,53 @@
  */
 
 #ifndef STRACE_TESTS_H
-#define STRACE_TESTS_H
+# define STRACE_TESTS_H
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+# ifdef HAVE_CONFIG_H
+#  include "config.h"
+# endif
 
-#ifdef TESTS_SIZEOF_KERNEL_LONG_T
-# undef SIZEOF_KERNEL_LONG_T
-# define SIZEOF_KERNEL_LONG_T TESTS_SIZEOF_KERNEL_LONG_T
-#endif
+# ifdef TESTS_SIZEOF_KERNEL_LONG_T
+#  undef SIZEOF_KERNEL_LONG_T
+#  define SIZEOF_KERNEL_LONG_T TESTS_SIZEOF_KERNEL_LONG_T
+# endif
 
-#ifdef TESTS_SIZEOF_LONG
-# undef SIZEOF_LONG
-# define SIZEOF_LONG TESTS_SIZEOF_LONG
-#endif
+# ifdef TESTS_SIZEOF_LONG
+#  undef SIZEOF_LONG
+#  define SIZEOF_LONG TESTS_SIZEOF_LONG
+# endif
 
-#include <stdbool.h>
-#include <sys/types.h>
-#include "kernel_types.h"
-#include "gcc_compat.h"
-#include "macros.h"
+# include <stdbool.h>
+# include <sys/types.h>
+# include "kernel_types.h"
+# include "gcc_compat.h"
+# include "macros.h"
 
 /*
  * The printf-like function to use in header files
  * shared between strace and its tests.
  */
-#ifndef STRACE_PRINTF
-# define STRACE_PRINTF printf
-#endif
+# ifndef STRACE_PRINTF
+#  define STRACE_PRINTF printf
+# endif
 
 /* Tests of "strace -v" are expected to define VERBOSE to 1. */
-#ifndef VERBOSE
-# define VERBOSE 0
-#endif
+# ifndef VERBOSE
+#  define VERBOSE 0
+# endif
 
 /* xlat verbosity defaults */
-#ifndef XLAT_RAW
-# define XLAT_RAW 0
-#endif
-#ifndef XLAT_VERBOSE
-# define XLAT_VERBOSE 0
-#endif
+# ifndef XLAT_RAW
+#  define XLAT_RAW 0
+# endif
+# ifndef XLAT_VERBOSE
+#  define XLAT_VERBOSE 0
+# endif
 
-#ifndef DEFAULT_STRLEN
+# ifndef DEFAULT_STRLEN
 /* Default maximum # of bytes printed in printstr et al. */
-# define DEFAULT_STRLEN 32
-#endif
+#  define DEFAULT_STRLEN 32
+# endif
 
 /* Cached sysconf(_SC_PAGESIZE). */
 size_t get_page_size(void);
@@ -74,14 +74,14 @@ void error_msg_and_skip(const char *, ...)
 void perror_msg_and_skip(const char *, ...)
 	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_NORETURN;
 
-#ifndef perror_msg_and_fail
-# define perror_msg_and_fail(fmt_, ...) \
+# ifndef perror_msg_and_fail
+#  define perror_msg_and_fail(fmt_, ...) \
 	perror_msg_and_fail("%s:%d: " fmt_, __FILE__, __LINE__, ##__VA_ARGS__)
-#endif
-#ifndef perror_msg_and_fail
-# define error_msg_and_fail(fmt_, ...) \
+# endif
+# ifndef perror_msg_and_fail
+#  define error_msg_and_fail(fmt_, ...) \
 	error_msg_and_fail("%s:%d: " fmt_, __FILE__, __LINE__, ##__VA_ARGS__)
-#endif
+# endif
 
 /* Stat the specified file and skip the test if the stat call failed. */
 void skip_if_unavailable(const char *);
@@ -97,7 +97,7 @@ void *tail_alloc(const size_t)
 void *tail_memdup(const void *, const size_t)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((2));
 
-#define midtail_alloc(after_, before_) \
+# define midtail_alloc(after_, before_) \
 	((void *) ((char *) tail_alloc(((before_) + (after_))) + (before_)))
 
 /*
@@ -105,7 +105,7 @@ void *tail_memdup(const void *, const size_t)
  * of a mapped memory region.
  * Assign its address to the specified constant pointer.
  */
-#define TAIL_ALLOC_OBJECT_CONST_PTR(type_name, type_ptr)	\
+# define TAIL_ALLOC_OBJECT_CONST_PTR(type_name, type_ptr)	\
 	type_name *const type_ptr = tail_alloc(sizeof(*type_ptr))
 
 /*
@@ -113,7 +113,7 @@ void *tail_memdup(const void *, const size_t)
  * of a mapped memory region.
  * Assign its address to the specified variable pointer.
  */
-#define TAIL_ALLOC_OBJECT_VAR_PTR(type_name, type_ptr)		\
+# define TAIL_ALLOC_OBJECT_VAR_PTR(type_name, type_ptr)		\
 	type_name *type_ptr = tail_alloc(sizeof(*type_ptr))
 
 /*
@@ -216,7 +216,7 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 
 /* Create a netlink socket. */
 int create_nl_socket_ext(int proto, const char *name);
-#define create_nl_socket(proto)	create_nl_socket_ext((proto), #proto)
+# define create_nl_socket(proto)	create_nl_socket_ext((proto), #proto)
 
 /* Create a pipe with maximized descriptor numbers. */
 void pipe_maxfd(int pipefd[2]);
@@ -224,14 +224,14 @@ void pipe_maxfd(int pipefd[2]);
 /* if_nametoindex("lo") */
 unsigned int ifindex_lo(void);
 
-#ifdef HAVE_IF_INDEXTONAME
-# define IFINDEX_LO_STR "if_nametoindex(\"lo\")"
-#else
-# define IFINDEX_LO_STR "1"
-#endif
+# ifdef HAVE_IF_INDEXTONAME
+#  define IFINDEX_LO_STR "if_nametoindex(\"lo\")"
+# else
+#  define IFINDEX_LO_STR "1"
+# endif
 
-#define F8ILL_KULONG_SUPPORTED	(sizeof(void *) < sizeof(kernel_ulong_t))
-#define F8ILL_KULONG_MASK	((kernel_ulong_t) 0xffffffff00000000ULL)
+# define F8ILL_KULONG_SUPPORTED	(sizeof(void *) < sizeof(kernel_ulong_t))
+# define F8ILL_KULONG_MASK	((kernel_ulong_t) 0xffffffff00000000ULL)
 
 /*
  * For 64-bit kernel_ulong_t and 32-bit pointer,
@@ -249,7 +249,7 @@ f8ill_ptr_to_kulong(const void *const ptr)
 # define LENGTH_OF(arg) ((unsigned int) sizeof(arg) - 1)
 
 /* Zero-extend a signed integer type to unsigned long long. */
-#define zero_extend_signed_to_ull(v) \
+# define zero_extend_signed_to_ull(v) \
 	(sizeof(v) == sizeof(char) ? (unsigned long long) (unsigned char) (v) : \
 	 sizeof(v) == sizeof(short) ? (unsigned long long) (unsigned short) (v) : \
 	 sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
@@ -257,36 +257,36 @@ f8ill_ptr_to_kulong(const void *const ptr)
 	 (unsigned long long) (v))
 
 /* Sign-extend an unsigned integer type to long long. */
-#define sign_extend_unsigned_to_ll(v) \
+# define sign_extend_unsigned_to_ll(v) \
 	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
 	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
 	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
 	 (long long) (v))
 
-#define SKIP_MAIN_UNDEFINED(arg) \
+# define SKIP_MAIN_UNDEFINED(arg) \
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
 
-#if WORDS_BIGENDIAN
-# define LL_PAIR(HI, LO) (HI), (LO)
-#else
-# define LL_PAIR(HI, LO) (LO), (HI)
-#endif
-#define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
+# if WORDS_BIGENDIAN
+#  define LL_PAIR(HI, LO) (HI), (LO)
+# else
+#  define LL_PAIR(HI, LO) (LO), (HI)
+# endif
+# define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))
 
-#define ARG_STR(_arg) (_arg), #_arg
-#define ARG_ULL_STR(_arg) _arg##ULL, #_arg
+# define ARG_STR(_arg) (_arg), #_arg
+# define ARG_ULL_STR(_arg) _arg##ULL, #_arg
 
 /*
  * Assign an object of type DEST_TYPE at address DEST_ADDR
  * using memcpy to avoid potential unaligned access.
  */
-#define SET_STRUCT(DEST_TYPE, DEST_ADDR, ...)						\
+# define SET_STRUCT(DEST_TYPE, DEST_ADDR, ...)						\
 	do {										\
 		DEST_TYPE dest_type_tmp_var = { __VA_ARGS__ };				\
 		memcpy(DEST_ADDR, &dest_type_tmp_var, sizeof(dest_type_tmp_var));	\
 	} while (0)
 
-#define NLMSG_ATTR(nlh, hdrlen) ((void *)(nlh) + NLMSG_SPACE(hdrlen))
+# define NLMSG_ATTR(nlh, hdrlen) ((void *)(nlh) + NLMSG_SPACE(hdrlen))
 
 #endif /* !STRACE_TESTS_H */

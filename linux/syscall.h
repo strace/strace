@@ -8,13 +8,13 @@
  */
 
 #ifndef STRACE_LINUX_SYSCALL_H
-#define STRACE_LINUX_SYSCALL_H
+# define STRACE_LINUX_SYSCALL_H
 
-#include "dummy.h"
-#include "sys_func.h"
-#include "sen.h"
+# include "dummy.h"
+# include "sys_func.h"
+# include "sen.h"
 
-#if HAVE_ARCH_UID16_SYSCALLS
+# if HAVE_ARCH_UID16_SYSCALLS
 extern SYS_FUNC(chown16);
 extern SYS_FUNC(fchown16);
 extern SYS_FUNC(getgroups16);
@@ -25,6 +25,6 @@ extern SYS_FUNC(setgroups16);
 extern SYS_FUNC(setresuid16);
 extern SYS_FUNC(setreuid16);
 extern SYS_FUNC(setuid16);
-#endif /* HAVE_ARCH_UID16_SYSCALLS */
+# endif /* HAVE_ARCH_UID16_SYSCALLS */
 
 #endif /* !STRACE_LINUX_SYSCALL_H */

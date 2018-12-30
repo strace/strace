@@ -57,9 +57,9 @@ struct if_nextdqblk {
 # include "xlat/if_dqinfo_flags.h"
 # include "xlat/if_dqinfo_valid.h"
 
-#define QUOTA_STR(_arg) (_arg), gen_quotacmd(#_arg, _arg)
-#define QUOTA_ID_STR(_arg) (_arg), gen_quotaid(#_arg, _arg)
-#define QUOTA_STR_INVALID(_arg, str) (_arg), gen_quotacmd(str, _arg)
+# define QUOTA_STR(_arg) (_arg), gen_quotacmd(#_arg, _arg)
+# define QUOTA_ID_STR(_arg) (_arg), gen_quotaid(#_arg, _arg)
+# define QUOTA_STR_INVALID(_arg, str) (_arg), gen_quotacmd(str, _arg)
 
 void
 print_dqblk(long rc, void *ptr, void *arg)
@@ -139,25 +139,25 @@ print_dqinfo(long rc, void *ptr, void *arg)
 	PRINT_FIELD_U(", ", *di, dqi_igrace);
 
 	printf(", dqi_flags=");
-#if XLAT_RAW
+# if XLAT_RAW
 	printf("%#x", di->dqi_flags);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	printf("%#x /* ", di->dqi_flags);
 	printflags(if_dqinfo_flags, di->dqi_flags, "DQF_???");
 	printf(" */");
-#else /* XLAT_ABBREV */
+# else /* XLAT_ABBREV */
 	printflags(if_dqinfo_flags, di->dqi_flags, "DQF_???");
-#endif
+# endif
 	printf(", dqi_valid=");
-#if XLAT_RAW
+# if XLAT_RAW
 	printf("%#x", di->dqi_valid);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	printf("%#x /* ", di->dqi_valid);
 	printflags(if_dqinfo_valid, di->dqi_valid, "IIF_???");
 	printf(" */");
-#else /* XLAT_ABBREV */
+# else /* XLAT_ABBREV */
 	printflags(if_dqinfo_valid, di->dqi_valid, "IIF_???");
-#endif
+# endif
 	printf("}");
 }
 
@@ -173,10 +173,10 @@ print_dqfmt(long rc, void *ptr, void *arg)
 		return;
 	}
 	printf("[");
-#if XLAT_RAW
+# if XLAT_RAW
 	printf("%#x]", *fmtval);
 	return;
-#else
+# else
 	switch (*fmtval) {
 	case 1:
 		fmtstr = "QFMT_VFS_OLD";
@@ -194,12 +194,12 @@ print_dqfmt(long rc, void *ptr, void *arg)
 		printf("%#x /* QFMT_VFS_??? */]", *fmtval);
 		return;
 	}
-#endif
-#if XLAT_VERBOSE
+# endif
+# if XLAT_VERBOSE
 	printf("%#x /* %s */]", *fmtval, fmtstr);
-#else
+# else
 	printf("%s]", fmtstr);
-#endif
+# endif
 }
 
 const char *
@@ -207,13 +207,13 @@ gen_quotacmd(const char *abbrev_str, const uint32_t cmd)
 {
 	static char quotacmd_str[2048];
 
-#if XLAT_RAW
+# if XLAT_RAW
 	snprintf(quotacmd_str, sizeof(quotacmd_str), "%u", cmd);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	snprintf(quotacmd_str, sizeof(quotacmd_str), "%u /* %s */", cmd, abbrev_str);
-#else
+# else
 	return abbrev_str;
-#endif
+# endif
 	return quotacmd_str;
 }
 
@@ -222,13 +222,13 @@ gen_quotaid(const char *abbrev_str, const uint32_t id)
 {
 	static char quotaid_str[1024];
 
-#if XLAT_RAW
+# if XLAT_RAW
 	snprintf(quotaid_str, sizeof(quotaid_str), "%#x", id);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	snprintf(quotaid_str, sizeof(quotaid_str), "%#x /* %s */", id, abbrev_str);
-#else
+# else
 	return abbrev_str;
-#endif
+# endif
 	return quotaid_str;
 }
 
@@ -279,13 +279,13 @@ main(void)
 	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
 		 "QCMD(Q_QUOTAON, %#x /* ???QUOTA */)",
 		 QCMD_TYPE(QCMD(Q_QUOTAON, 0xfacefeed)));
-#if XLAT_RAW
+# if XLAT_RAW
 	snprintf(invalid_id_str, sizeof(invalid_id_str),
 		 "%#x", bogus_id);
-#else
+# else
 	snprintf(invalid_id_str, sizeof(invalid_id_str),
 		 "%#x /* QFMT_VFS_??? */", bogus_id);
-#endif
+# endif
 	check_quota(CQF_ID_STR, QCMD(Q_QUOTAON, 0xfacefeed),
 		    gen_quotacmd(invalid_cmd_str, QCMD(Q_QUOTAON, 0xfacefeed)),
 		    bogus_dev, bogus_dev_str,

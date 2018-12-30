@@ -62,13 +62,13 @@ main(void)
 	       (uintmax_t) pgoff, flags1_str, errstr);
 # endif
 
-#ifdef MAP_HUGETLB
-# ifndef MAP_HUGE_2MB
-#  ifndef MAP_HUGE_SHIFT
-#   define MAP_HUGE_SHIFT 26
-#  endif
-#  define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
-# endif /* !MAP_HUGE_2MB */
+# ifdef MAP_HUGETLB
+#  ifndef MAP_HUGE_2MB
+#   ifndef MAP_HUGE_SHIFT
+#    define MAP_HUGE_SHIFT 26
+#   endif
+#   define MAP_HUGE_2MB (21 << MAP_HUGE_SHIFT)
+#  endif /* !MAP_HUGE_2MB */
 	addr = (kernel_ulong_t) 0xfacefeeddeadf00dULL;
 	size = (kernel_ulong_t) 0xdefaced1bad2beefULL;
 	prot = (kernel_ulong_t) 0xdefaced00000000ULL | PROT_NONE;
@@ -80,32 +80,32 @@ main(void)
  * HP PA-RISC is the only architecture that has MAP_TYPE defined to 0x3, which
  * is also used for MAP_SHARED_VALIDATE since Linux commit v4.15-rc1~71^2^2~23.
  */
-# ifdef __hppa__
-#  define MAP_TYPE_str "MAP_SHARED_VALIDATE"
-# else
-#  define MAP_TYPE_str "0xf /* MAP_??? */"
-# endif
-# define flags2_str \
+#  ifdef __hppa__
+#   define MAP_TYPE_str "MAP_SHARED_VALIDATE"
+#  else
+#   define MAP_TYPE_str "0xf /* MAP_??? */"
+#  endif
+#  define flags2_str \
 	MAP_TYPE_str "|MAP_FIXED|MAP_NORESERVE|MAP_HUGETLB|21<<MAP_HUGE_SHIFT"
 
-# if XLAT_RAW
+#  if XLAT_RAW
 	printf("remap_file_pages(%#jx, %ju, %#jx, %ju, %#jx) = %s\n",
 	       (uintmax_t) addr, (uintmax_t) size, (uintmax_t) prot,
 	       (uintmax_t) pgoff, (uintmax_t) flags, errstr);
-# elif XLAT_VERBOSE
+#  elif XLAT_VERBOSE
 	printf("remap_file_pages(%#jx, %ju, %#jx /* %s */, %ju, %#jx /* %s */)"
 	       " = %s\n",
 	       (uintmax_t) addr, (uintmax_t) size, (uintmax_t) prot,
 	       prot == PROT_NONE ? "PROT_NONE" : "PROT_???",
 	       (uintmax_t) pgoff, (uintmax_t) flags, flags2_str, errstr);
-# else /* XLAT_ABBREV */
+#  else /* XLAT_ABBREV */
 	printf("remap_file_pages(%#jx, %ju, %s, %ju, %s) = %s\n",
 	       (uintmax_t) addr, (uintmax_t) size,
 	       prot == PROT_NONE ? "PROT_NONE" :
 				   "0xdefaced00000000 /* PROT_??? */",
 	       (uintmax_t) pgoff, flags2_str, errstr);
-# endif
-#endif /* MAP_HUGETLB */
+#  endif
+# endif /* MAP_HUGETLB */
 
 	puts("+++ exited with 0 +++");
 	return 0;

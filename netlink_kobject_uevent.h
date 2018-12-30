@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_NETLINK_KOBJECT_UEVENT_H
-#define STRACE_NETLINK_KOBJECT_UEVENT_H
+# define STRACE_NETLINK_KOBJECT_UEVENT_H
 
 struct udev_monitor_netlink_header {
 	/* "libudev" prefix to distinguish libudev and kernel messages */

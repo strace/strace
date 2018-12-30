@@ -48,8 +48,8 @@
 #  define KVM_MAX_CPUID_ENTRIES 80
 # endif
 
-#include "xlat.h"
-#include "xlat/kvm_cpuid_flags.h"
+# include "xlat.h"
+# include "xlat/kvm_cpuid_flags.h"
 
 static int
 kvm_ioctl(int fd, unsigned long cmd, const char *cmd_str, void *arg)
@@ -60,7 +60,7 @@ kvm_ioctl(int fd, unsigned long cmd, const char *cmd_str, void *arg)
 	return rc;
 }
 
-#define KVM_IOCTL(fd_, cmd_, arg_)	\
+# define KVM_IOCTL(fd_, cmd_, arg_)	\
 	kvm_ioctl((fd_), (cmd_), #cmd_, (arg_))
 
 static const char dev[] = "/dev/kvm";
@@ -100,7 +100,7 @@ print_kvm_sregs(const struct kvm_sregs *sregs)
 {
 	printf("{cs=");
 	print_kvm_segment(&sregs->cs);
-#if VERBOSE
+# if VERBOSE
 	printf(", ds=");
 	print_kvm_segment(&sregs->ds);
 	printf(", es=");
@@ -128,9 +128,9 @@ print_kvm_sregs(const struct kvm_sregs *sregs)
 		printf("%#jx", (uintmax_t) sregs->interrupt_bitmap[i]);
 	}
 	printf("]");
-#else
+# else
 	printf(", ...");
-#endif
+# endif
 	printf("}");
 }
 
@@ -138,26 +138,26 @@ static void
 print_kvm_regs(const struct kvm_regs *regs)
 {
 	printf("{rax=%#jx", (uintmax_t) regs->rax);
-#if VERBOSE
+# if VERBOSE
 	printf(", rbx=%#jx, rcx=%#jx, rdx=%#jx, rsi=%#jx, rdi=%#jx",
 	       (uintmax_t) regs->rbx, (uintmax_t) regs->rcx,
 	       (uintmax_t) regs->rdx, (uintmax_t) regs->rsi,
 	       (uintmax_t) regs->rdi);
-#else
+# else
 	printf(", ...");
-#endif
+# endif
 	printf(", rsp=%#jx, rbp=%#jx", (uintmax_t) regs->rsp,
 	       (uintmax_t) regs->rbp);
-#if VERBOSE
+# if VERBOSE
 	printf(", r8=%#jx, r9=%#jx, r10=%#jx, r11=%#jx, r12=%#jx, r13=%#jx"
 	       ", r14=%#jx, r15=%#jx",
 	       (uintmax_t) regs->r8, (uintmax_t) regs->r9,
 	       (uintmax_t) regs->r10, (uintmax_t) regs->r11,
 	       (uintmax_t) regs->r12, (uintmax_t) regs->r13,
 	       (uintmax_t) regs->r14, (uintmax_t) regs->r15);
-#else
+# else
 	printf(", ...");
-#endif
+# endif
 	printf(", rip=%#jx, rflags=%#jx}", (uintmax_t) regs->rip,
 	       (uintmax_t) regs->rflags);
 }
@@ -269,7 +269,7 @@ print_cpuid_ioctl(int fd, const char *fd_dev,
 {
 	printf("ioctl(%d<%s>, %s, {nent=%u, entries=[",
 	       fd, fd_dev, ioctl_name, cpuid->nent);
-#if VERBOSE
+# if VERBOSE
 	for (size_t i = 0; i < cpuid->nent; i++) {
 		if (i)
 			printf(", ");
@@ -281,10 +281,10 @@ print_cpuid_ioctl(int fd, const char *fd_dev,
 		       cpuid->entries[i].eax, cpuid->entries[i].ebx,
 		       cpuid->entries[i].ecx, cpuid->entries[i].edx);
 	}
-#else
+# else
 	if (cpuid->nent)
 		printf("...");
-#endif
+# endif
 	printf("]}) = 0\n");
 }
 
@@ -344,9 +344,9 @@ main(void)
 		 * "anon_inode:kvm-vcpu:0" -> "anon_inode:kvm-vcpu"
 		 */
 		vcpu_dev[strlen (vcpu_dev) - 2] = '\0';
-#ifdef KVM_NO_CPUID_CALLBACK
+# ifdef KVM_NO_CPUID_CALLBACK
 		KVM_NO_CPUID_CALLBACK;
-#endif
+# endif
 	}
 
 	printf("ioctl(%d<%s>, KVM_CREATE_VCPU, 0) = %d<%s>\n",

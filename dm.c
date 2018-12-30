@@ -98,7 +98,7 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 	}
 }
 
-#include "xlat/dm_flags.h"
+#  include "xlat/dm_flags.h"
 
 static void
 dm_decode_flags(const struct dm_ioctl *ioc)

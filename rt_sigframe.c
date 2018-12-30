@@ -10,8 +10,8 @@
 #include "ptrace.h"
 #include "regs.h"
 
-#define	DEF_FUNC_GET_RT_SIGFRAME_ADDR	\
+#define DEF_FUNC_GET_RT_SIGFRAME_ADDR	\
 		kernel_ulong_t get_rt_sigframe_addr(struct tcb *tcp)
-#define	FUNC_GET_RT_SIGFRAME_ADDR	DEF_FUNC_GET_RT_SIGFRAME_ADDR
+#define FUNC_GET_RT_SIGFRAME_ADDR	DEF_FUNC_GET_RT_SIGFRAME_ADDR
 
 #include "arch_rt_sigframe.c"

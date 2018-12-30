@@ -6,9 +6,9 @@
  */
 
 #ifndef STRACE_RT_SIGFRAME_H
-#define STRACE_RT_SIGFRAME_H
+# define STRACE_RT_SIGFRAME_H
 
-#include <signal.h>
+# include <signal.h>
 
 typedef struct {
 	char		*pretcode;

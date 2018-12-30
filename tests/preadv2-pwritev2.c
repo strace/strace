@@ -170,34 +170,34 @@ main(void)
 
 	tprintf("%s", "");
 
-#if defined __x86_64__ && defined __ILP32__
+# if defined __x86_64__ && defined __ILP32__
 	/*
 	 * x32 is the only architecture where preadv2 takes 5 arguments,
 	 * see preadv64v2 in kernel sources.
 	 */
 	rc = syscall(__NR_preadv2, -1, NULL, vlen, pos_l, 1);
-#else
+# else
 	const kernel_ulong_t pos_h =
 		(sizeof(pos_l) == sizeof(pos)) ?
 		(kernel_ulong_t) 0xbadc0deddeadbeefULL :
 		(kernel_ulong_t) (pos >> 32);
 	rc = syscall(__NR_preadv2, -1, NULL, vlen, pos_l, pos_h, 1);
-#endif
+# endif
 	if (rc != -1 || (ENOSYS != errno && EBADF != errno))
 		perror_msg_and_fail("preadv2");
 	test_dumpio = EBADF == errno;
 	tprintf("preadv2(-1, NULL, %lu, %lld, RWF_HIPRI) = %s\n",
 		(unsigned long) vlen, pos, sprintrc(rc));
 
-#if defined __x86_64__ && defined __ILP32__
+# if defined __x86_64__ && defined __ILP32__
 	/*
 	 * x32 is the only architecture where pwritev2 takes 5 arguments,
 	 * see pwritev64v2 in kernel sources.
 	 */
 	rc = syscall(__NR_pwritev2, -1, NULL, vlen, pos_l, 1);
-#else
+# else
 	rc = syscall(__NR_pwritev2, -1, NULL, vlen, pos_l, pos_h, 1);
-#endif
+# endif
 	if (rc != -1 || (ENOSYS != errno && EBADF != errno))
 		perror_msg_and_fail("pwritev2");
 	tprintf("pwritev2(-1, NULL, %lu, %lld, RWF_HIPRI) = %s\n",

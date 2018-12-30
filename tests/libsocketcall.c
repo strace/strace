@@ -23,7 +23,7 @@ socketcall(const int nr, const int call,
 	int rc = -1;
 	errno = ENOSYS;
 
-# ifdef __NR_socketcall
+#ifdef __NR_socketcall
 	static int have_socketcall = -1;
 
 	if (have_socketcall < 0) {
@@ -39,7 +39,7 @@ socketcall(const int nr, const int call,
 		const long args[] = { a1, a2, a3, a4, a5 };
 		rc = syscall(__NR_socketcall, call, args);
 	} else
-# endif
+#endif
 	{
 		if (nr != -1)
 			rc = syscall(nr, a1, a2, a3, a4, a5);

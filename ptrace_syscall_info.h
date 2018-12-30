@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_PTRACE_SYSCALL_INFO_H
-#define STRACE_PTRACE_SYSCALL_INFO_H
+# define STRACE_PTRACE_SYSCALL_INFO_H
 
 extern bool ptrace_get_syscall_info_supported;
 extern bool test_ptrace_get_syscall_info(void);

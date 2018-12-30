@@ -19,7 +19,7 @@
 
 #if defined __NR_utimensat && defined UTIME_NOW && defined UTIME_OMIT
 
-#if SIZEOF_KERNEL_LONG_T == 4
+# if SIZEOF_KERNEL_LONG_T == 4
 #  define big_tv_sec "-559038737"
 #  define huge_tv_sec "-559038737"
 # else

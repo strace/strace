@@ -89,11 +89,11 @@ O_RSYNC
 
 #if defined O_NDELAY && O_NDELAY & O_NONBLOCK	/* O_NDELAY is unusual */
 # ifndef STRACE_WORKAROUND_FOR_O_NDELAY
-# define STRACE_WORKAROUND_FOR_O_NDELAY
+#  define STRACE_WORKAROUND_FOR_O_NDELAY
 /* On sparc32 O_NDELAY is erroneously defined to (0x0004 | O_NONBLOCK).  */
 /* On many architectures O_NDELAY is defined to O_NONBLOCK.  */
 /* Both cases are wrong and have to be fixed.  */
-# undef O_NDELAY
+#  undef O_NDELAY
 # endif
 #endif /* O_NDELAY & O_NONBLOCK */
 

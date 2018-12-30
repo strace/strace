@@ -10,7 +10,7 @@
  */
 
 #ifndef STRACE_TESTS_FADVISE_H
-#define STRACE_TESTS_FADVISE_H
+# define STRACE_TESTS_FADVISE_H
 
 # include <limits.h>
 # include <stdio.h>

@@ -114,10 +114,10 @@ decode_ndt_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", ndtst, ndts_rcv_probes_ucast);
 		PRINT_FIELD_U(", ", ndtst, ndts_periodic_gc_runs);
 		PRINT_FIELD_U(", ", ndtst, ndts_forced_gc_runs);
-#ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
+# ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 		if (len >= def_size)
 			PRINT_FIELD_U(", ", ndtst, ndts_table_fulls);
-#endif
+# endif
 		tprints("}");
 	}
 

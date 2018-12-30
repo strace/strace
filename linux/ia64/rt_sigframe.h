@@ -6,9 +6,9 @@
  */
 
 #ifndef STRACE_RT_SIGFRAME_H
-#define STRACE_RT_SIGFRAME_H
+# define STRACE_RT_SIGFRAME_H
 
-#include <signal.h>
+# include <signal.h>
 
 typedef struct {
 	unsigned long		arg0;
@@ -19,7 +19,7 @@ typedef struct {
 	struct sigcontext	sc;
 } struct_rt_sigframe;
 
-#define OFFSETOF_SIGMASK_IN_RT_SIGFRAME	\
+# define OFFSETOF_SIGMASK_IN_RT_SIGFRAME	\
 		offsetof(struct_rt_sigframe, sc.sc_mask)
 
 #endif /* !STRACE_RT_SIGFRAME_H */

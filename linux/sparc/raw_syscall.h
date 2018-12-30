@@ -8,7 +8,7 @@
  */
 
 #ifndef STRACE_RAW_SYSCALL_H
-#define STRACE_RAW_SYSCALL_H
+# define STRACE_RAW_SYSCALL_H
 
 # include "kernel_types.h"
 

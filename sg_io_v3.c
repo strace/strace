@@ -11,7 +11,7 @@
 
 #ifdef HAVE_SCSI_SG_H
 
-#include DEF_MPERS_TYPE(struct_sg_io_hdr)
+# include DEF_MPERS_TYPE(struct_sg_io_hdr)
 
 # include <scsi/sg.h>
 
@@ -40,7 +40,7 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-#define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
+# define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
 	do {									\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
 		print_sg_io_buffer((tcp_), (mpers_ptr_t)((where_).field_),	\

@@ -8,7 +8,7 @@
  */
 
 #ifndef STRACE_RAW_SYSCALL_H
-#define STRACE_RAW_SYSCALL_H
+# define STRACE_RAW_SYSCALL_H
 
 # include "kernel_types.h"
 
@@ -17,7 +17,7 @@ raw_syscall_0(const kernel_ulong_t nr, kernel_ulong_t *err)
 {
 	*err = 0;
 
-#ifdef __thumb__ /* && FRAME_POINTERS_ENABLED */
+# ifdef __thumb__ /* && FRAME_POINTERS_ENABLED */
 
 	register kernel_ulong_t rt;
 	register kernel_ulong_t r0 __asm__("r0");
@@ -26,7 +26,7 @@ raw_syscall_0(const kernel_ulong_t nr, kernel_ulong_t *err)
 			     : "r"(nr)
 			     : "memory");
 
-#else
+# else
 
 	register kernel_ulong_t r7 __asm__("r7") = nr;
 	register kernel_ulong_t r0 __asm__("r0");
@@ -35,7 +35,7 @@ raw_syscall_0(const kernel_ulong_t nr, kernel_ulong_t *err)
 			     : "r"(r7)
 			     : "memory");
 
-#endif
+# endif
 
 	return r0;
 }

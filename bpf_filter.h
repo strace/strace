@@ -8,7 +8,7 @@
  */
 
 #ifndef STRACE_BPF_FILTER_H
-#define STRACE_BPF_FILTER_H
+# define STRACE_BPF_FILTER_H
 
 struct bpf_filter_block {
 	uint16_t code;

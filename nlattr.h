@@ -8,9 +8,9 @@
  */
 
 #ifndef STRACE_NLATTR_H
-#define STRACE_NLATTR_H
+# define STRACE_NLATTR_H
 
-#include "xlat.h"
+# include "xlat.h"
 
 struct decode_nla_xlat_opts {
 	const struct xlat *xlat;
@@ -52,7 +52,7 @@ decode_nlattr(struct tcb *,
 	      unsigned int size,
 	      const void *opaque_data);
 
-#define DECL_NLA(name)					\
+# define DECL_NLA(name)					\
 extern bool						\
 decode_nla_ ## name(struct tcb *, kernel_ulong_t addr,	\
 		    unsigned int len, const void *)	\

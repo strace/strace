@@ -11,13 +11,13 @@
 
 #if defined S390 || defined S390X
 
-#include <sys/user.h>
+# include <sys/user.h>
 
-#include "print_fields.h"
+# include "print_fields.h"
 
-#include "xlat/s390_guarded_storage_commands.h"
-#include "xlat/s390_runtime_instr_commands.h"
-#include "xlat/s390_sthyi_function_codes.h"
+# include "xlat/s390_guarded_storage_commands.h"
+# include "xlat/s390_runtime_instr_commands.h"
+# include "xlat/s390_sthyi_function_codes.h"
 
 /*
  * Since, for some reason, kernel doesn't expose all these nice constants and
@@ -401,10 +401,10 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 		*ascii++ = conv_table[(unsigned char) *ebcdic++];
 }
 
-#define DECODE_EBCDIC(ebcdic_, ascii_) \
+# define DECODE_EBCDIC(ebcdic_, ascii_) \
 	decode_ebcdic((ebcdic_), (ascii_), \
 		      sizeof(ebcdic_) + MUST_BE_ARRAY(ebcdic_))
-#define PRINT_EBCDIC(ebcdic_) \
+# define PRINT_EBCDIC(ebcdic_) \
 	do { \
 		char ascii_str[sizeof(ebcdic_) + MUST_BE_ARRAY(ebcdic_)]; \
 		\
@@ -413,13 +413,13 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 				    QUOTE_EMIT_COMMENT); \
 	} while (0)
 
-#define PRINT_FIELD_EBCDIC(prefix_, where_, field_) \
+# define PRINT_FIELD_EBCDIC(prefix_, where_, field_) \
 	do { \
 		PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_); \
 		PRINT_EBCDIC((where_).field_); \
 	} while (0)
 
-#define PRINT_FIELD_WEIGHT(prefix_, where_, field_) \
+# define PRINT_FIELD_WEIGHT(prefix_, where_, field_) \
 	do { \
 		PRINT_FIELD_X(prefix_, where_, field_); \
 		if ((where_).field_) \
@@ -431,10 +431,10 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 	} while (0)
 
 
-#define IS_BLANK(arr_) /* 0x40 is space in EBCDIC */ \
+# define IS_BLANK(arr_) /* 0x40 is space in EBCDIC */ \
 	is_filled(arr_, '\x40', sizeof(arr_) + MUST_BE_ARRAY(arr_))
 
-#define CHECK_SIZE(hdr_, size_, name_, ...) \
+# define CHECK_SIZE(hdr_, size_, name_, ...) \
 	do { \
 		if ((size_) < sizeof(*(hdr_))) { \
 			tprintf_comment("Invalid " name_ " with size " \
@@ -448,7 +448,7 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 		} \
 	} while (0)
 
-#define PRINT_UNKNOWN_TAIL(hdr_, size_) \
+# define PRINT_UNKNOWN_TAIL(hdr_, size_) \
 	do { \
 		if ((size_) > sizeof(*(hdr_)) && \
 		    !is_filled((char *) ((hdr_) + 1), '\0', \
@@ -842,7 +842,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	tprints("}");
 }
 
-#define STHYI_PRINT_STRUCT(l_, name_) \
+# define STHYI_PRINT_STRUCT(l_, name_) \
 	do { \
 		if (hdr->inf ##l_## off && hdr->inf ##l_## off + \
 		    hdr->inf ##l_## len <= sizeof(data)) { \
@@ -853,7 +853,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 		} \
 	} while (0)
 
-#define STHYI_PRINT_HV_STRUCT(l_, n_, name_) \
+# define STHYI_PRINT_HV_STRUCT(l_, n_, name_) \
 	do { \
 		if (hdr->inf ##l_## off ##n_ && hdr->inf ##l_## off ##n_ + \
 		    hdr->inf ##l_## len ##n_ <= sizeof(data)) { \

@@ -65,7 +65,7 @@ print_smc_diag_cursor(const struct smc_diag_cursor *const cursor)
 	tprints("}");
 }
 
-# define PRINT_FIELD_SMC_DIAG_CURSOR(prefix_, where_, field_)		\
+#define PRINT_FIELD_SMC_DIAG_CURSOR(prefix_, where_, field_)		\
 	do {								\
 		tprintf("%s%s=", (prefix_), #field_);			\
 		print_smc_diag_cursor(&(where_).field_);		\

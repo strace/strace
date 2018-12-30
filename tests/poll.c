@@ -20,7 +20,7 @@
 # include <string.h>
 # include <unistd.h>
 
-#define PRINT_EVENT(flag, member)			\
+# define PRINT_EVENT(flag, member)			\
 	do {						\
 		if (member & flag) {			\
 			if (member != pfd->member)	\
@@ -42,18 +42,18 @@ print_pollfd_entering(const struct pollfd *const pfd)
 			PRINT_EVENT(POLLIN, events);
 			PRINT_EVENT(POLLPRI, events);
 			PRINT_EVENT(POLLOUT, events);
-#ifdef POLLRDNORM
+# ifdef POLLRDNORM
 			PRINT_EVENT(POLLRDNORM, events);
-#endif
-#ifdef POLLWRNORM
+# endif
+# ifdef POLLWRNORM
 			PRINT_EVENT(POLLWRNORM, events);
-#endif
-#ifdef POLLRDBAND
+# endif
+# ifdef POLLRDBAND
 			PRINT_EVENT(POLLRDBAND, events);
-#endif
-#ifdef POLLWRBAND
+# endif
+# ifdef POLLWRBAND
 			PRINT_EVENT(POLLWRBAND, events);
-#endif
+# endif
 			PRINT_EVENT(POLLERR, events);
 			PRINT_EVENT(POLLHUP, events);
 			PRINT_EVENT(POLLNVAL, events);
@@ -109,18 +109,18 @@ print_pollfd_exiting(const struct pollfd *const pfd,
 	PRINT_EVENT(POLLIN, revents);
 	PRINT_EVENT(POLLPRI, revents);
 	PRINT_EVENT(POLLOUT, revents);
-#ifdef POLLRDNORM
+# ifdef POLLRDNORM
 	PRINT_EVENT(POLLRDNORM, revents);
-#endif
-#ifdef POLLWRNORM
+# endif
+# ifdef POLLWRNORM
 	PRINT_EVENT(POLLWRNORM, revents);
-#endif
-#ifdef POLLRDBAND
+# endif
+# ifdef POLLRDBAND
 	PRINT_EVENT(POLLRDBAND, revents);
-#endif
-#ifdef POLLWRBAND
+# endif
+# ifdef POLLWRBAND
 	PRINT_EVENT(POLLWRBAND, revents);
-#endif
+# endif
 	PRINT_EVENT(POLLERR, revents);
 	PRINT_EVENT(POLLHUP, revents);
 	PRINT_EVENT(POLLNVAL, revents);

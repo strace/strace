@@ -30,10 +30,10 @@ MAP_32BIT
 
 #if defined MAP_RENAME && MAP_RENAME == MAP_ANONYMOUS  /* MAP_RENAME is unusual */
 # ifndef STRACE_WORKAROUND_FOR_MAP_RENAME
-# define STRACE_WORKAROUND_FOR_MAP_RENAME
+#  define STRACE_WORKAROUND_FOR_MAP_RENAME
 /* glibc erroneously defines MAP_RENAME to MAP_ANONYMOUS on some architectures.  */
 /* This is just wrong and has to be fixed.  */
-# undef MAP_RENAME
+#  undef MAP_RENAME
 # endif
 #endif /* MAP_RENAME */
 
@@ -151,9 +151,9 @@ MAP_HUGETLB	0x40000
 
 MAP_SYNC	0x80000
 
-# if defined MAP_UNINITIALIZED && MAP_UNINITIALIZED > 0
+#if defined MAP_UNINITIALIZED && MAP_UNINITIALIZED > 0
 MAP_UNINITIALIZED
-# endif
+#endif
 
 #if defined __alpha__
 MAP_FIXED_NOREPLACE	0x200000

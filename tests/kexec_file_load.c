@@ -25,7 +25,7 @@ struct strval {
 	const char *str;
 };
 
-#define CMDLINE_STR "deadcodebaddatadefaced"
+# define CMDLINE_STR "deadcodebaddatadefaced"
 
 int
 main(void)

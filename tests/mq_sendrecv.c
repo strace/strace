@@ -60,7 +60,7 @@ printstr(unsigned char start, unsigned int count)
 	printf("\"");
 }
 
-#if DUMPIO_READ || DUMPIO_WRITE
+# if DUMPIO_READ || DUMPIO_WRITE
 static void
 dumpstr(unsigned char start, unsigned int count)
 {
@@ -94,7 +94,7 @@ dumpstr(unsigned char start, unsigned int count)
 		}
 	}
 }
-#endif /* DUMPIO_READ || DUMPIO_WRITE */
+# endif /* DUMPIO_READ || DUMPIO_WRITE */
 
 static void
 cleanup(void)

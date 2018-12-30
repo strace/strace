@@ -9,13 +9,13 @@
  */
 
 #ifndef STRACE_TESTS_NLATTR_IFLA_H
-#define STRACE_TESTS_NLATTR_IFLA_H
+# define STRACE_TESTS_NLATTR_IFLA_H
 
-#include "tests.h"
+# include "tests.h"
 
-#ifndef IFLA_ATTR
-# error "Please define IFLA_ATTR before including this file"
-#endif
+# ifndef IFLA_ATTR
+#  error "Please define IFLA_ATTR before including this file"
+# endif
 
 static const unsigned int hdrlen = sizeof(struct ifinfomsg);
 

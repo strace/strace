@@ -11,13 +11,13 @@
  */
 
 #ifndef STRACE_XMALLOC_H
-#define STRACE_XMALLOC_H
+# define STRACE_XMALLOC_H
 
-#include <stddef.h>
-#include "gcc_compat.h"
+# include <stddef.h>
+# include "gcc_compat.h"
 
-#define xcalloc strace_calloc
-#define xmalloc strace_malloc
+# define xcalloc strace_calloc
+# define xmalloc strace_malloc
 
 void *xcalloc(size_t nmemb, size_t size)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));

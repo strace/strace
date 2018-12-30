@@ -76,7 +76,7 @@ main(void)
 		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
 		    printf("{type=\"%s\"}", str));
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
 	static const struct crypto_report_hash rhash = {
 		.type = "efgh",
 		.blocksize = 0xabcdefdc,
@@ -90,9 +90,9 @@ main(void)
 			      PRINT_FIELD_U(", ", rhash, blocksize);
 			      PRINT_FIELD_U(", ", rhash, digestsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
 	static const struct crypto_report_blkcipher rblkcipher = {
 		.type = "abcd",
 		.geniv = "efgh",
@@ -111,9 +111,9 @@ main(void)
 			      PRINT_FIELD_U(", ", rblkcipher, max_keysize);
 			      PRINT_FIELD_U(", ", rblkcipher, ivsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
 	static const struct crypto_report_aead raead = {
 		.type = "abcd",
 		.geniv = "efgh",
@@ -130,9 +130,9 @@ main(void)
 			      PRINT_FIELD_U(", ", raead, maxauthsize);
 			      PRINT_FIELD_U(", ", raead, ivsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
 	static const struct crypto_report_rng rrng = {
 		.type = "abcd",
 		.seedsize = 0xabcdefac
@@ -144,9 +144,9 @@ main(void)
 			      printf("{type=\"abcd\"");
 			      PRINT_FIELD_U(", ", rrng, seedsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
 	static const struct crypto_report_cipher rcipher = {
 		.type = "abcd",
 		.blocksize = 0xabcdefac,
@@ -162,7 +162,7 @@ main(void)
 			      PRINT_FIELD_U(", ", rcipher, min_keysize);
 			      PRINT_FIELD_U(", ", rcipher, max_keysize);
 			      printf("}"));
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

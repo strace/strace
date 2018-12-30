@@ -6,16 +6,16 @@
  */
 
 #ifndef STRACE_F_OWNER_EX_H
-#define STRACE_F_OWNER_EX_H
+# define STRACE_F_OWNER_EX_H
 
-#include <linux/fcntl.h>
+# include <linux/fcntl.h>
 
-#if defined HAVE_STRUCT_F_OWNER_EX
+# if defined HAVE_STRUCT_F_OWNER_EX
 typedef struct f_owner_ex struct_kernel_f_owner_ex;
-#elif defined HAVE_STRUCT___KERNEL_F_OWNER_EX
+# elif defined HAVE_STRUCT___KERNEL_F_OWNER_EX
 typedef struct __kernel_f_owner_ex struct_kernel_f_owner_ex;
-#else
-# error struct f_owner_ex definition not found in <linux/fcntl.h>
-#endif
+# else
+#  error struct f_owner_ex definition not found in <linux/fcntl.h>
+# endif
 
 #endif /* !STRACE_F_OWNER_EX_H */

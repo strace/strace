@@ -19,29 +19,29 @@
 # include <unistd.h>
 
 struct set_sa {
-#if defined MIPS
+# if defined MIPS
 	unsigned int flags;
 	unsigned long handler;
 	unsigned long mask[1];
-#elif defined ALPHA
+# elif defined ALPHA
 	unsigned long handler;
 	unsigned long mask[1];
 	unsigned int flags;
-#else
+# else
 	unsigned long handler;
 	unsigned long mask[1];
 	unsigned long flags;
 	unsigned long restorer;
-#endif
+# endif
 }
-#ifdef ALPHA
+# ifdef ALPHA
 	ATTRIBUTE_PACKED
-#endif
+# endif
 ;
 
 typedef struct set_sa struct_set_sa;
 
-#ifdef MIPS
+# ifdef MIPS
 
 struct get_sa {
 	unsigned int flags;
@@ -51,11 +51,11 @@ struct get_sa {
 
 typedef struct get_sa struct_get_sa;
 
-#else
+# else
 
 typedef struct set_sa struct_get_sa;
 
-#endif
+# endif
 
 static long
 k_sigaction(const kernel_ulong_t signum, const kernel_ulong_t new_act,
@@ -64,19 +64,19 @@ k_sigaction(const kernel_ulong_t signum, const kernel_ulong_t new_act,
 	return syscall(__NR_sigaction, signum, new_act, old_act);
 }
 
-#if defined SPARC || defined SPARC64
+# if defined SPARC || defined SPARC64
 /*
  * See arch/sparc/kernel/sys_sparc_32.c:sys_sparc_sigaction
  * and arch/sparc/kernel/sys_sparc32.c:compat_sys_sparc_sigaction
  */
-# define ADDR_INT ((unsigned int) -0xdefaced)
-# define SIGNO_INT ((unsigned int) -SIGUSR1)
-# define SIG_STR "-SIGUSR1"
-#else
-# define ADDR_INT ((unsigned int) 0xdefaced)
-# define SIGNO_INT ((unsigned int) SIGUSR1)
-# define SIG_STR "SIGUSR1"
-#endif
+#  define ADDR_INT ((unsigned int) -0xdefaced)
+#  define SIGNO_INT ((unsigned int) -SIGUSR1)
+#  define SIG_STR "-SIGUSR1"
+# else
+#  define ADDR_INT ((unsigned int) 0xdefaced)
+#  define SIGNO_INT ((unsigned int) SIGUSR1)
+#  define SIG_STR "SIGUSR1"
+# endif
 static const kernel_ulong_t signo =
 	(kernel_ulong_t) 0xbadc0ded00000000ULL | SIGNO_INT;
 static const kernel_ulong_t addr =
@@ -156,16 +156,16 @@ main(void)
 	sigdelset(mask.libc, SIGHUP);
 
 	memcpy(new_act->mask, mask.old, sizeof(mask.old));
-#ifdef SA_RESTORER
+# ifdef SA_RESTORER
 	new_act->flags = SA_RESTORER;
 	new_act->restorer = (unsigned long) 0xdeadfacecafef00dULL;
-# define SA_RESTORER_FMT ", sa_flags=SA_RESTORER, sa_restorer=%#lx"
-# define SA_RESTORER_ARGS , new_act->restorer
-#else
+#  define SA_RESTORER_FMT ", sa_flags=SA_RESTORER, sa_restorer=%#lx"
+#  define SA_RESTORER_ARGS , new_act->restorer
+# else
 	new_act->flags = SA_NODEFER;
-# define SA_RESTORER_FMT ", sa_flags=SA_NODEFER"
-# define SA_RESTORER_ARGS
-#endif
+#  define SA_RESTORER_FMT ", sa_flags=SA_NODEFER"
+#  define SA_RESTORER_ARGS
+# endif
 
 	k_sigaction(signo, (uintptr_t) new_act, (uintptr_t) old_act);
 	printf("sigaction(" SIG_STR ", {sa_handler=%#lx, sa_mask=~[HUP]"

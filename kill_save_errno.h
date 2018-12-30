@@ -6,11 +6,11 @@
  */
 
 #ifndef STRACE_KILL_SAVE_ERRNO_H
-#define STRACE_KILL_SAVE_ERRNO_H
+# define STRACE_KILL_SAVE_ERRNO_H
 
-#include <sys/types.h>
-#include <signal.h>
-#include <errno.h>
+# include <sys/types.h>
+# include <signal.h>
+# include <errno.h>
 
 static inline int
 kill_save_errno(pid_t pid, int sig)

@@ -6,11 +6,11 @@
  */
 
 #ifndef STRACE_LINUX_SMC_DIAG_H
-#define STRACE_LINUX_SMC_DIAG_H
+# define STRACE_LINUX_SMC_DIAG_H
 
-#include <linux/inet_diag.h>
+# include <linux/inet_diag.h>
 
-#include "gcc_compat.h"
+# include "gcc_compat.h"
 
 /* Request structure */
 struct smc_diag_req {

@@ -171,10 +171,10 @@ static void timer_sighandler(int);
 
 #ifndef HAVE_STRERROR
 
-#if !HAVE_DECL_SYS_ERRLIST
+# if !HAVE_DECL_SYS_ERRLIST
 extern int sys_nerr;
 extern char *sys_errlist[];
-#endif
+# endif
 
 const char *
 strerror(int err_no)

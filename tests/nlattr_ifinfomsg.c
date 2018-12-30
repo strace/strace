@@ -270,12 +270,12 @@ main(void)
 			   PRINT_FIELD_U(", ", st64, tx_window_errors);
 			   PRINT_FIELD_U(", ", st64, rx_compressed);
 			   PRINT_FIELD_U(", ", st64, tx_compressed);
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
+# ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
 			   PRINT_FIELD_U(", ", st64, rx_nohandler);
-#endif
+# endif
 			   printf("}"));
 
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
+# ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
 	const unsigned int sizeof_stats64 =
 		offsetofend(struct rtnl_link_stats64, tx_compressed);
 	TEST_NLATTR(fd, nlh0, hdrlen,
@@ -305,7 +305,7 @@ main(void)
 		    PRINT_FIELD_U(", ", st64, rx_compressed);
 		    PRINT_FIELD_U(", ", st64, tx_compressed);
 		    printf("}"));
-#endif /* HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER */
+# endif /* HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER */
 #endif /* HAVE_STRUCT_RTNL_LINK_STATS64 */
 
 	struct nlattr nla = {

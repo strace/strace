@@ -25,9 +25,9 @@ get_personality_from_syscall_info(const struct ptrace_syscall_info *sci)
 
 	kernel_ulong_t scno = sci->entry.nr;
 
-#ifndef __X32_SYSCALL_BIT
-# define __X32_SYSCALL_BIT	0x40000000
-#endif
+# ifndef __X32_SYSCALL_BIT
+#  define __X32_SYSCALL_BIT	0x40000000
+# endif
 
 	if (pers == 0 && (scno & __X32_SYSCALL_BIT)) {
 		/*

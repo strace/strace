@@ -6,7 +6,7 @@
  */
 
 #ifndef STRACE_DELAY_H
-#define STRACE_DELAY_H
+# define STRACE_DELAY_H
 
 uint16_t alloc_delay_data(void);
 void fill_delay_data(uint16_t delay_idx, int intval, bool isenter);

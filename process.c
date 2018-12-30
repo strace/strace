@@ -138,25 +138,25 @@ SYS_FUNC(ptrace)
 			printaddr(addr);
 		}
 
-# if defined IA64 || defined SPARC || defined SPARC64
+#if defined IA64 || defined SPARC || defined SPARC64
 		switch (request) {
-#  ifdef IA64
+# ifdef IA64
 		case PTRACE_PEEKDATA:
 		case PTRACE_PEEKTEXT:
 		case PTRACE_PEEKUSER:
 			/* data is ignored */
 			return RVAL_DECODED | RVAL_HEX;
-#  endif /* IA64 */
-#  if defined SPARC || defined SPARC64
+# endif /* IA64 */
+# if defined SPARC || defined SPARC64
 		case PTRACE_GETREGS:
 		case PTRACE_SETREGS:
 		case PTRACE_GETFPREGS:
 		case PTRACE_SETFPREGS:
 			/* data is ignored */
 			return RVAL_DECODED;
-#  endif /* SPARC || SPARC64 */
+# endif /* SPARC || SPARC64 */
 		}
-# endif /* IA64 || SPARC || SPARC64 */
+#endif /* IA64 || SPARC || SPARC64 */
 
 		tprints(", ");
 

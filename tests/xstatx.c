@@ -101,7 +101,7 @@ typedef off_t libc_off_t;
 #  define IS_STATX 0
 # endif
 
-#if !XLAT_RAW /* Fixes -Wunused warning */
+# if !XLAT_RAW /* Fixes -Wunused warning */
 static void
 print_ftype(const unsigned int mode)
 {
@@ -122,24 +122,24 @@ print_perms(const unsigned int mode)
 {
 	printf("%#o", mode & ~S_IFMT);
 }
-#endif
+# endif
 
 static void
 print_st_mode(const unsigned int mode)
 {
-#if XLAT_RAW
+# if XLAT_RAW
 	printf("%#o", mode);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	printf("%#o /* ", mode);
 	print_ftype(mode);
 	printf("|");
 	print_perms(mode);
 	printf(" */");
-#else
+# else
 	print_ftype(mode);
 	printf("|");
 	print_perms(mode);
-#endif
+# endif
 }
 
 # if !IS_STATX
@@ -150,18 +150,18 @@ sprint_makedev(const unsigned long long val)
 	static char devid[256];
 	int ret;
 
-#if XLAT_RAW
+#  if XLAT_RAW
 	ret = snprintf(devid, sizeof(devid),
 			"%#llx", val);
-#elif XLAT_VERBOSE
+#  elif XLAT_VERBOSE
 	ret = snprintf(devid, sizeof(devid),
 			"%#llx /* makedev(%#x, %#x) */",
 			val, major(val), minor(val));
-#else /* XLAT_ABBREV */
+#  else /* XLAT_ABBREV */
 	ret = snprintf(devid, sizeof(devid),
 			"makedev(%#x, %#x)",
 			major(val), minor(val));
-#endif
+#  endif
 	if (ret < 0)
 		perror_msg_and_fail("sprint_makedev(%llx)", val);
 	if ((unsigned) ret >= sizeof(devid))
@@ -208,7 +208,7 @@ print_stat(const STRUCT_STAT *st)
 #   define HAVE_NSEC		0
 #  endif
 
-#define PRINT_ST_TIME(field)							\
+#  define PRINT_ST_TIME(field)							\
 	do {									\
 		printf(", st_" #field "=%lld",					\
 		       sign_extend_unsigned_to_ll(st->st_ ## field));		\

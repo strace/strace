@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#define	STACK_BIAS	2047
+#define STACK_BIAS	2047
 
 FUNC_GET_RT_SIGFRAME_ADDR
 {

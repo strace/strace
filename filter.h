@@ -7,7 +7,7 @@
  */
 
 #ifndef STRACE_FILTER_H
-#define STRACE_FILTER_H
+# define STRACE_FILTER_H
 
 struct number_set;
 typedef int (*string_to_uint_func)(const char *);

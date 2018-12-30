@@ -111,9 +111,9 @@ main(void)
 		.ndts_rcv_probes_ucast	= 0xbcdefeacdadecdfe,
 		.ndts_periodic_gc_runs	= 0xedffeadedeffbecc,
 		.ndts_forced_gc_runs	= 0xfeefefeabedeedcd,
-#ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
+# ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 		.ndts_table_fulls	= 0xadebfefaecdfeade
-#endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
+# endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
 	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ndtmsg, print_ndtmsg,
@@ -128,9 +128,9 @@ main(void)
 			   PRINT_FIELD_U(", ", ndtst, ndts_rcv_probes_ucast);
 			   PRINT_FIELD_U(", ", ndtst, ndts_periodic_gc_runs);
 			   PRINT_FIELD_U(", ", ndtst, ndts_forced_gc_runs);
-#ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
+# ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 			   PRINT_FIELD_U(", ", ndtst, ndts_table_fulls);
-#endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
+# endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
 			   printf("}"));
 #endif /* HAVE_STRUCT_NDT_STATS */
 

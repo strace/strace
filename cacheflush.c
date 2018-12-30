@@ -20,15 +20,15 @@
 # include "xlat/cacheflush_scope.h"
 
 static const struct xlat cacheflush_flags[] = {
-#ifdef FLUSH_CACHE_BOTH
+# ifdef FLUSH_CACHE_BOTH
 	XLAT(FLUSH_CACHE_BOTH),
-#endif
-#ifdef FLUSH_CACHE_DATA
+# endif
+# ifdef FLUSH_CACHE_DATA
 	XLAT(FLUSH_CACHE_DATA),
-#endif
-#ifdef FLUSH_CACHE_INSN
+# endif
+# ifdef FLUSH_CACHE_INSN
 	XLAT(FLUSH_CACHE_INSN),
-#endif
+# endif
 	XLAT_END
 };
 
@@ -72,18 +72,18 @@ SYS_FUNC(cacheflush)
 
 #ifdef SH
 static const struct xlat cacheflush_flags[] = {
-#ifdef CACHEFLUSH_D_INVAL
+# ifdef CACHEFLUSH_D_INVAL
 	XLAT(CACHEFLUSH_D_INVAL),
-#endif
-#ifdef CACHEFLUSH_D_WB
+# endif
+# ifdef CACHEFLUSH_D_WB
 	XLAT(CACHEFLUSH_D_WB),
-#endif
-#ifdef CACHEFLUSH_D_PURGE
+# endif
+# ifdef CACHEFLUSH_D_PURGE
 	XLAT(CACHEFLUSH_D_PURGE),
-#endif
-#ifdef CACHEFLUSH_I
+# endif
+# ifdef CACHEFLUSH_I
 	XLAT(CACHEFLUSH_I),
-#endif
+# endif
 	XLAT_END
 };
 

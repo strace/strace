@@ -314,10 +314,10 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprints("fmt.sdr={pixelformat=");
 		print_pixelformat(f->fmt.sdr.pixelformat, v4l2_sdr_fmts);
-#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
+# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		tprintf(", buffersize=%u",
 			f->fmt.sdr.buffersize);
-#endif
+# endif
 		tprints("}");
 		break;
 #endif
