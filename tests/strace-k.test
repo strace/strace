@@ -20,7 +20,7 @@ check_prog sed
 check_prog tr
 
 run_prog "${test_prog=../stack-fcall}"
-run_strace -e getpid -k $args
+run_strace -e chdir -k $args
 
 expected="$srcdir/$NAME.expected"
 awk '

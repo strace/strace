@@ -12,14 +12,12 @@
 
 int f3(int i)
 {
-	static int pid;
-
 	switch (i) {
 	case 1:
-		return kill(pid, SIGURG);
+		return kill(getpid(), SIGURG);
 
 	default:
-		return (pid = getpid()) + i;
+		return chdir("") + i;
 	}
 
 }

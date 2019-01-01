@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Bug fixes
+  * Fixed strace-k test on alpha.
+
 Noteworthy changes in release 4.26 (2018-12-26)
 ===============================================
 
