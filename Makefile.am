@@ -127,8 +127,8 @@ strace_SOURCES =	\
 	fetch_struct_xfs_quotastat.c \
 	file_handle.c	\
 	file_ioctl.c	\
-	filter_qualify.c \
 	filter.h	\
+	filter_qualify.c \
 	flock.c		\
 	flock.h		\
 	fs_x_ioctl.c	\
@@ -193,10 +193,9 @@ strace_SOURCES =	\
 	netlink.c       \
 	netlink.h	\
 	netlink_crypto.c \
+	netlink_inet_diag.c \
 	netlink_kobject_uevent.c \
 	netlink_kobject_uevent.h \
-	netlink_sock_diag.h \
-	netlink_inet_diag.c \
 	netlink_netfilter.c \
 	netlink_netlink_diag.c \
 	netlink_packet_diag.c \
@@ -205,6 +204,7 @@ strace_SOURCES =	\
 	netlink_selinux.c \
 	netlink_smc_diag.c \
 	netlink_sock_diag.c \
+	netlink_sock_diag.h \
 	netlink_unix_diag.c \
 	nlattr.c	\
 	nlattr.h	\
@@ -227,8 +227,8 @@ strace_SOURCES =	\
 	prctl.c		\
 	print_aio_sigset.c \
 	print_dev_t.c	\
-	print_group_req.c \
 	print_fields.h	\
+	print_group_req.c \
 	print_ifindex.c	\
 	print_instruction_pointer.c \
 	print_kernel_version.c \
@@ -307,8 +307,8 @@ strace_SOURCES =	\
 	statx.c		\
 	statx.h		\
 	strace.c	\
-	string_to_uint.h \
 	string_to_uint.c \
+	string_to_uint.h \
 	swapon.c	\
 	syscall.c	\
 	sysctl.c	\

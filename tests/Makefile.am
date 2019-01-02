@@ -97,9 +97,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	inject-nf \
 	int_0x80 \
 	ioctl_dm-v \
-	ioctl_evdev-v \
 	ioctl_evdev-success \
 	ioctl_evdev-success-v \
+	ioctl_evdev-v \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_nsfs \
@@ -230,8 +230,8 @@ DECODER_TESTS = \
 	getuid.test \
 	int_0x80.test \
 	ioctl.test \
-	ioctl_evdev-success.test \
 	ioctl_evdev-success-v.test \
+	ioctl_evdev-success.test \
 	ioctl_perf-success.test \
 	ipc_msgbuf.test \
 	kern_features-fault.test \
@@ -381,8 +381,8 @@ EXTRA_DIST = \
 	getresugid.c \
 	init.sh \
 	init_delete_module.h \
-	ipc.sh \
 	ioctl_kvm_run_common.c \
+	ipc.sh \
 	ksysent.sed \
 	lstatx.c \
 	match.awk \
@@ -429,10 +429,10 @@ EXTRA_DIST = \
 	trace_lstat.in \
 	trace_personality_32.in \
 	trace_personality_64.in \
-	trace_personality_x32.in \
 	trace_personality_regex_32.in \
 	trace_personality_regex_64.in \
 	trace_personality_regex_x32.in \
+	trace_personality_x32.in \
 	trace_question.in \
 	trace_stat.in \
 	trace_stat_like.in \

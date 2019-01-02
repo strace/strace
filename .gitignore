@@ -12,6 +12,8 @@
 /.version
 /CREDITS
 /ChangeLog
+/INSTALL
+/README
 /aclocal.m4
 /autom4te.cache
 /bpf_attr_check.c
@@ -25,7 +27,6 @@
 /configure
 /depcomp
 /gnu
-/INSTALL
 /install-sh
 /ioctl_iocdef.[ih]
 /ioctl_redefs[12].h
@@ -54,15 +55,14 @@
 /native_printer_decls.h
 /native_printer_defs.h
 /printers.h
-/README
 /scno.h
 /sen.h
 /stamp-h1
 /strace
 /strace-*.tar.gz
 /strace-*.tar.xz
-/strace.1
 /strace-log-merge.1
+/strace.1
 /strace.dsc
 /strace.spec
 /sys_func.h
