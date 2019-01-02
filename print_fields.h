@@ -171,9 +171,29 @@
 		print_x25_addr(&(where_).field_);			\
 	} while (0)
 
-# define PRINT_FIELD_NET_PORT(prefix_, where_, field_)			\
-	STRACE_PRINTF("%s%s=htons(%u)", (prefix_), #field_,		\
-		      ntohs((where_).field_))
+#define PRINT_FIELD_NET_PORT(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+									\
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)	\
+			print_quoted_string((const char *)		\
+					&(where_).field_,		\
+					sizeof((where_).field_),	\
+					QUOTE_FORCE_HEX);		\
+									\
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)	\
+			break;						\
+									\
+		if (xlat_verbose(xlat_verbosity)			\
+				== XLAT_STYLE_VERBOSE)			\
+			STRACE_PRINTF(" /* ");				\
+									\
+		STRACE_PRINTF("htons(%u)", ntohs((where_).field_));	\
+									\
+		if (xlat_verbose(xlat_verbosity)			\
+				== XLAT_STYLE_VERBOSE)			\
+			STRACE_PRINTF(" */");				\
+	} while (0)
 
 # define PRINT_FIELD_IFINDEX(prefix_, where_, field_)			\
 	do {								\

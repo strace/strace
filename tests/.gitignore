@@ -526,6 +526,9 @@ sock_filter-v
 sock_filter-v-Xabbrev
 sock_filter-v-Xraw
 sock_filter-v-Xverbose
+sockaddr_xlat-Xabbrev
+sockaddr_xlat-Xraw
+sockaddr_xlat-Xverbose
 socketcall
 sockopt-sol_netlink
 splice
