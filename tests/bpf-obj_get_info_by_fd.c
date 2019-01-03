@@ -345,6 +345,7 @@ main(void)
 	memset(prog_info, 0, PROG_INFO_SZ);
 	for (unsigned int i = 0; i < 4; i++) {
 		prog_info->jited_prog_len = 0;
+		memset(prog_info + 1, 0, PROG_INFO_SZ - sizeof(*prog_info));
 		switch (i) {
 		case 1:
 			prog_info->xlated_prog_insns =
