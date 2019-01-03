@@ -41,6 +41,7 @@
 #include "xlat/pr_fp_mode.h"
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
+#include "xlat/pr_pac_reset_keys_flags.h"
 #include "xlat/pr_set_mm.h"
 #include "xlat/pr_spec_cmds.h"
 #include "xlat/pr_spec_get_store_bypass_flags.h"
@@ -426,6 +427,12 @@ SYS_FUNC(prctl)
 
 		print_prctl_args(tcp, 3);
 
+		return RVAL_DECODED;
+
+	case PR_PAC_RESET_KEYS:
+		tprints(", ");
+		printflags(pr_pac_reset_keys_flags, arg2, "PR_PAC_???");
+		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
 	case PR_GET_NO_NEW_PRIVS:
