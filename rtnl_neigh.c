@@ -88,6 +88,7 @@ static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_MASTER]		= decode_nla_ifindex,
 	[NDA_LINK_NETNSID]	= decode_nla_u32,
 	[NDA_SRC_VNI]		= decode_nla_u32,
+	[NDA_PROTOCOL]		= decode_nla_ip_proto,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
