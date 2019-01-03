@@ -19,10 +19,20 @@
 
 static long injected_val;
 
+#if SIZEOF_KERNEL_LONG_T > 4
+# define BOGUS_ARG4 ((kernel_ulong_t) 0xdeadfacebadbeefdULL)
+# define BOGUS_ARG5 ((kernel_ulong_t) 0xcafedeadfacefeedULL)
+# define BOGUS_ARGS_STR ", 0xdeadfacebadbeefd, 0xcafedeadfacefeed"
+#else
+# define BOGUS_ARG4 0xfacedbad
+# define BOGUS_ARG5 0xdeadcafe
+# define BOGUS_ARGS_STR ", 0xfacedbad, 0xdeadcafe"
+#endif
+
 static long
 do_prctl(kernel_ulong_t cmd, kernel_ulong_t arg2, kernel_ulong_t arg3)
 {
-	long rc = syscall(__NR_prctl, cmd, arg2, arg3);
+	long rc = syscall(__NR_prctl, cmd, arg2, arg3, BOGUS_ARG4, BOGUS_ARG5);
 
 	if (rc != injected_val)
 		error_msg_and_fail("Return value (%ld) differs from expected "
@@ -106,13 +116,15 @@ main(int argc, char **argv)
 
 	/* PR_GET_SPECULATION_CTRL */
 	rc = do_prctl(52, 3, bogus_arg3);
-	printf("prctl(PR_GET_SPECULATION_CTRL, 0x3 /* PR_SPEC_??? */) "
-	       "= %s (INJECTED)\n", sprintrc(rc));
+	printf("prctl(PR_GET_SPECULATION_CTRL, 0x3 /* PR_SPEC_??? */, %#llx"
+	       BOGUS_ARGS_STR ") = %s (INJECTED)\n",
+	       (unsigned long long) bogus_arg3, sprintrc(rc));
 
 	rc = do_prctl(52, bogus_arg2, bogus_arg3);
-	printf("prctl(PR_GET_SPECULATION_CTRL, %#llx /* PR_SPEC_??? */) "
-	       "= %s (INJECTED)\n",
-	       (unsigned long long) bogus_arg2, sprintrc(rc));
+	printf("prctl(PR_GET_SPECULATION_CTRL, %#llx /* PR_SPEC_??? */, %#llx"
+	       BOGUS_ARGS_STR ") = %s (INJECTED)\n",
+	       (unsigned long long) bogus_arg2, (unsigned long long) bogus_arg3,
+	       sprintrc(rc));
 
 	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
 		rc = do_prctl(52, spec_strs[c].arg, bogus_arg3);
@@ -127,26 +139,29 @@ main(int argc, char **argv)
 			error_msg_and_fail("Unknown return value: %ld", rc);
 
 		if (rc < 0) {
-			printf("prctl(PR_GET_SPECULATION_CTRL, %s) = %s%s"
-			       " (INJECTED)\n",
-			       spec_strs[c].str, sprintrc(rc), str);
+			printf("prctl(PR_GET_SPECULATION_CTRL, %s, %#llx"
+			       BOGUS_ARGS_STR ") = %s%s (INJECTED)\n",
+			       spec_strs[c].str,
+			       (unsigned long long) bogus_arg3,
+			       sprintrc(rc), str);
 		} else {
-			printf("prctl(PR_GET_SPECULATION_CTRL, %s) = %#lx%s"
-			       " (INJECTED)\n",
-			       spec_strs[c].str, rc, str);
+			printf("prctl(PR_GET_SPECULATION_CTRL, %s, %#llx"
+			       BOGUS_ARGS_STR ") = %#lx%s (INJECTED)\n",
+			       spec_strs[c].str,
+			       (unsigned long long) bogus_arg3, rc, str);
 		}
 	}
 
 
 	/* PR_SET_SPECULATION_CTRL*/
 	rc = do_prctl(53, 3, bogus_arg3);
-	printf("prctl(PR_SET_SPECULATION_CTRL, 0x3 /* PR_SPEC_??? */, %#llx) "
-	       "= %s (INJECTED)\n",
+	printf("prctl(PR_SET_SPECULATION_CTRL, 0x3 /* PR_SPEC_??? */, %#llx"
+	       BOGUS_ARGS_STR ") = %s (INJECTED)\n",
 	       (unsigned long long) bogus_arg3, sprintrc(rc));
 
 	rc = do_prctl(53, bogus_arg2, bogus_arg3);
-	printf("prctl(PR_SET_SPECULATION_CTRL, %#llx /* PR_SPEC_??? */, %#llx) "
-	       "= %s (INJECTED)\n",
+	printf("prctl(PR_SET_SPECULATION_CTRL, %#llx /* PR_SPEC_??? */, %#llx"
+	       BOGUS_ARGS_STR ") = %s (INJECTED)\n",
 	       (unsigned long long) bogus_arg2,
 	       (unsigned long long) bogus_arg3,
 	       sprintrc(rc));
@@ -154,8 +169,8 @@ main(int argc, char **argv)
 	for (unsigned c = 0; c < ARRAY_SIZE(spec_strs); c++) {
 		for (unsigned i = 0; i < ARRAY_SIZE(set_strs); i++) {
 			rc = do_prctl(53, spec_strs[c].arg, set_strs[i].arg);
-			printf("prctl(PR_SET_SPECULATION_CTRL, %s"
-			       ", %s) = %s (INJECTED)\n",
+			printf("prctl(PR_SET_SPECULATION_CTRL, %s, %s"
+			       BOGUS_ARGS_STR ") = %s (INJECTED)\n",
 			       spec_strs[c].str, set_strs[i].str, sprintrc(rc));
 		}
 	}

@@ -305,6 +305,7 @@ SYS_FUNC(prctl)
 		if (entering(tcp)) {
 			tprint_arg_next();
 			printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
+			print_prctl_args(tcp, 2);
 
 			break;
 		}
@@ -537,6 +538,8 @@ SYS_FUNC(prctl)
 		default:
 			PRINT_VAL_X(arg3);
 		}
+
+		print_prctl_args(tcp, 3);
 
 		return RVAL_DECODED;
 
