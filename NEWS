@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Improvements
+  * Updated the list of BPF_* constants.
+
 * Bug fixes
   * Fixed strace-k test on alpha.
 
