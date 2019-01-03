@@ -251,7 +251,7 @@
 [221] = { 6,	0,		SEN(futex),			"futex"			},
 [222] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [223] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
-[224] = { },
+/* 224 - was security */
 [225] = { 5,	0,		SEN(printargs),			"tuxcall"		},
 [226] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [227] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
