@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/sysmacros.h>
 #include <asm/unistd.h>
@@ -274,13 +275,14 @@ main(void)
 	 * initializer element is not constant.
 	 */
 #define MAP_INFO_SZ (sizeof(*map_info) + 64)
-	struct bpf_map_info_struct *map_info = calloc(1, MAP_INFO_SZ);
+	struct bpf_map_info_struct *map_info = tail_alloc(MAP_INFO_SZ);
 	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_map_get_info_attr = {
 		.bpf_fd   = map_fd,
 		.info_len = MAP_INFO_SZ,
 		.info     = (uintptr_t) map_info,
 	};
 
+	memset(map_info, 0, MAP_INFO_SZ);
 	int ret = sys_bpf(BPF_OBJ_GET_INFO_BY_FD, &bpf_map_get_info_attr,
 			  sizeof(bpf_map_get_info_attr));
 	if (ret < 0)
@@ -330,7 +332,7 @@ main(void)
 	 * initializer element is not constant.
 	 */
 # define PROG_INFO_SZ (sizeof(*prog_info) + 64)
-	struct bpf_prog_info_struct *prog_info = calloc(1, PROG_INFO_SZ);
+	struct bpf_prog_info_struct *prog_info = tail_alloc(PROG_INFO_SZ);
 	struct bpf_insn *xlated_prog = tail_alloc(sizeof(*xlated_prog) * 42);
 	uint32_t *map_ids = tail_alloc(sizeof(*map_ids) * 2);
 	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_prog_get_info_attr = {
@@ -340,6 +342,7 @@ main(void)
 	};
 	size_t old_prog_info_len = PROG_INFO_SZ;
 
+	memset(prog_info, 0, PROG_INFO_SZ);
 	for (unsigned int i = 0; i < 4; i++) {
 		prog_info->jited_prog_len = 0;
 		switch (i) {
