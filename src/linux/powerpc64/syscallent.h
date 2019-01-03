@@ -199,14 +199,19 @@
 [189] = { 0,	TP,		SEN(vfork),			"vfork"			},
 [190] = { 2,	0,		SEN(getrlimit),			"ugetrlimit"		},
 [191] = { 3,	TD,		SEN(readahead),			"readahead"		},
-[192 ... 197] = { },
+/* 192 - mmap2, powerpc32 only */
+/* 193 - truncate64, powerpc32 only */
+/* 194 - ftruncate64, powerpc32 only */
+/* 195 - stat64, powerpc32 only */
+/* 196 - lstat64, powerpc32 only */
+/* 197 - fstat64, powerpc32 only */
 [198] = { 5,	0,		SEN(printargs),			"pciconfig_read"	},
 [199] = { 5,	0,		SEN(printargs),			"pciconfig_write"	},
 [200] = { 3,	0,		SEN(printargs),			"pciconfig_iobase"	},
 [201] = { 6,	0,		SEN(printargs),			"multiplexer"		},
 [202] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
 [203] = { 2,	TF,		SEN(pivotroot),			"pivot_root"		},
-[204] = { },
+/* 204 - fcntl64, powerpc32 only */
 [205] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [206] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [207] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
@@ -226,9 +231,9 @@
 [221] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [222] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [223] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
-[224] = { },
+/* 224 - was security */
 [225] = { 5,	0,		SEN(printargs),			"tuxcall"		},
-[226] = { },
+/* 226 - sendfile64, powerpc32 only */
 [227] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [228] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [229] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
@@ -256,7 +261,7 @@
 [251] = { 2,	TF,		SEN(utimes),			"utimes"		},
 [252] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},
 [253] = { 3,	TD|TFSF|TSFA,	SEN(fstatfs64),			"fstatfs64"		},
-[254] = { },
+/* 254 - fadvise64_64, powerpc32 only */
 [255] = { 1,	0,		SEN(printargs),			"rtas"			},
 [256] = { 5,	0,		SEN(printargs),			"sys_debug_setcontext"	},
 [257] = { 5,	0,		SEN(vserver),			"vserver"		},
