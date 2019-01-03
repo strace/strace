@@ -133,7 +133,7 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 		caps.version & 0xFF);
 	printflags(v4l2_device_capabilities_flags, caps.capabilities,
 		   "V4L2_CAP_???");
-#ifdef V4L2_CAP_DEVICE_CAPS
+#ifdef HAVE_STRUCT_V4L2_CAPABILITY_DEVICE_CAPS
 	tprints(", device_caps=");
 	printflags(v4l2_device_capabilities_flags, caps.device_caps,
 		   "V4L2_CAP_???");
