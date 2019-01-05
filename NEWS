@@ -2,7 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of BPF_* and KERN_* constants.
+  * Updated lists of BPF_*, KERN_*, and *_MAGIC constants.
 
 * Bug fixes
   * Fixed strace-k test on alpha.
