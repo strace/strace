@@ -133,14 +133,14 @@ main(void)
 # endif
 # if !XLAT_RAW
 			"FAN_ACCESS|FAN_MODIFY|FAN_CLOSE_WRITE|FAN_OPEN|"
-			"FAN_ACCESS_PERM|FAN_ONDIR|FAN_EVENT_ON_CHILD|"
-			"0xdeadfeedb2ccbec4"
+			"FAN_OPEN_EXEC|FAN_ACCESS_PERM|FAN_OPEN_EXEC_PERM|"
+			"FAN_ONDIR|FAN_EVENT_ON_CHILD|0xdeadfeedb2c8aec4"
 # endif
 # if XLAT_VERBOSE
 			" */"
 # endif
 			},
-		{ ARG_ULL_STR(0xffffffffb7fcbfc4)
+		{ ARG_ULL_STR(0xffffffffb7f8afc4)
 # if !XLAT_RAW
 			" /* FAN_??? */"
 # endif
