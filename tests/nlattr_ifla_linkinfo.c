@@ -350,7 +350,7 @@ main(void)
 		{ 20, "IFLA_BR_GROUP_ADDR" },
 		{ 21, "IFLA_BR_FDB_FLUSH" },
 		{ 40, "IFLA_BR_PAD" },
-		{ 46, "0x2e /* IFLA_BR_??? */" },
+		{ 47, "0x2f /* IFLA_BR_??? */" },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(und_br_attrs); k++) {
