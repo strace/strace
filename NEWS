@@ -2,7 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Updated lists of BPF_*, BTRFS_*, KERN_*, KVM_CAP_*, NDA_*, V4L2_*,
+  * Updated lists of BPF_*, BTRFS_*, KERN_*, KVM_CAP_*, NDA_*, PR_*, V4L2_*,
     and *_MAGIC constants.
 
 * Bug fixes
