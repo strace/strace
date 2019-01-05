@@ -58,6 +58,9 @@ main(void)
 # ifdef SECCOMP_RET_ERRNO
 		{ ARG_STR(SECCOMP_RET_ERRNO) },
 # endif
+# ifdef SECCOMP_RET_USER_NOTIF
+		{ ARG_STR(SECCOMP_RET_USER_NOTIF) },
+# endif
 # ifdef SECCOMP_RET_TRACE
 		{ ARG_STR(SECCOMP_RET_TRACE) },
 # endif
