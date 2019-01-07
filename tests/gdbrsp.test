@@ -1,0 +1,109 @@
+#!/bin/sh
+#
+# Check -G option: gdb remote serial protocol
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote products
+#    derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+. "${srcdir=.}/init.sh"
+
+check_prog gdb
+check_prog gdbserver
+
+gdb -batch -iex 'target remote | gdbserver --remote-debug - /usr/bin/true' >| /tmp/,gdb 2>&1
+if grep QCatchSyscalls /tmp/,gdb > /dev/null
+then :
+else framework_skip_ "Correct version of gdbserver is not available"
+fi
+
+run_prog > /dev/null
+
+# all-stop
+gdbserver --once --multi :65432 &
+if [ $? -gt 0 ] ; then
+	framework_skip_ "Unable to start gdbserver"
+fi
+$STRACE -G localhost:65432 $(readlink -f ../gdbrsp) >& $LOG
+
+EXPECTED="$LOG.expected"
+cat > "$EXPECTED" << __EOF__
+close.-1..* = -1 EBADF .Bad file descriptor.
+chroot.* = -1 EPERM .Operation not permitted.*
+pipe..3, 4...* = 0
+write.4, "a.0", 2..* = 2
+read.3, "a.0", 2..* = 2
+vfork.*unfinished.*
+.pid.*exited with 0.*
+.*vfork resumed.* =.*
+syscall_0x75bcd15.*= -1.*
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+rm -f $EXPECTED
+
+# non-stop
+gdbserver --once --multi :65432 &
+if [ $? -gt 0 ] ; then
+	framework_skip_ "Unable to start gdbserver"
+fi
+$STRACE -G 'localhost:65432:non-stop' $(readlink -f ../gdbrsp) >& $LOG
+
+EXPECTED="$LOG.expected"
+cat > "$EXPECTED" << __EOF__
+close.-1..* = -1 EBADF .Bad file descriptor.
+chroot.* = -1 EPERM .Operation not permitted.*
+pipe..3, 4...* = 0
+write.4, "a.0", 2..* = 2
+read.3, "a.0", 2..* = 2
+vfork.*unfinished.*
+syscall_0x75bcd15.*= -1.*
+.pid.*exited with 0.*
+.*vfork resumed.* =.*
+__EOF__
+
+match_grep "$LOG" "$EXPECTED"
+rm -f $EXPECTED
+
+# -e write,read
+
+if [ ${STRACE_ARCH:-x86_64} = x86_64 ] ; then
+    gdbserver --once --multi :65432 &
+    if [ $? -gt 0 ] ; then
+	framework_skip_ "Unable to start gdbserver"
+    fi
+    $STRACE -G localhost:65432 -e write,read $(readlink -f ../gdbrsp) >& $LOG
+
+    EXPECTED="$LOG.expected"
+    cat > "$EXPECTED" << __EOF__
+write.4, "a.0", 2..* = 2
+read.3, "a.0", 2..* = 2
+__EOF__
+
+    match_grep "$LOG" "$EXPECTED"
+    rm -f $EXPECTED
+fi
+
+# TODO -pPID
+
+exit 0

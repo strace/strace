@@ -255,7 +255,7 @@ set_personality(unsigned int personality)
 # endif
 }
 
-static void
+void
 update_personality(struct tcb *tcp, unsigned int personality)
 {
 	static bool need_mpers_warning[] =
@@ -477,6 +477,10 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 
 	opts->first = opts->step;
 
+	if (opts->data.flags & INJECT_F_SIGNAL)
+		*signo = opts->data.signo;
+	if (opts->data.flags & INJECT_F_RETVAL && !set_scno(tcp, -1))
+		tcp->flags |= TCB_TAMPERED;
 	if (!recovering(tcp)) {
 		if (opts->data.flags & INJECT_F_SIGNAL)
 			*signo = opts->data.signo;
@@ -1048,6 +1052,17 @@ ptrace_clear_regs(struct tcb *tcp)
 	ptrace_sci.op = 0xff;
 	get_regs_error = -1;
 }
+
+struct iovec*
+arch_iovec_for_getregset(void)
+{
+#ifdef ARCH_IOVEC_FOR_GETREGSET
+	return (struct iovec *) &ARCH_IOVEC_FOR_GETREGSET;
+#else
+	return NULL;
+#endif
+}
+
 
 long
 ptrace_get_regs(struct tcb *const tcp)

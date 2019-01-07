@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
+ * Copyright (c) 1991, 1992, 2019 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
@@ -51,6 +51,10 @@
 extern char **environ;
 extern int optind;
 extern char *optarg;
+
+#ifdef ENABLE_GDBSERVER
+extern struct tracing_backend gdbserver_backend;
+#endif
 
 #ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
@@ -120,10 +124,10 @@ bool not_failing_only;
 /* Show path associated with fd arguments */
 unsigned int show_fd_path;
 
-static bool detach_on_execve;
+bool detach_on_execve;
 
 static int exit_code;
-static int strace_child;
+int strace_child;
 static int strace_tracer_pid;
 
 static const char *username;
@@ -760,7 +764,7 @@ tabto(void)
  * Otherwise, "strace -oFILE -ff -p<nonexistant_pid>"
  * may create bogus empty FILE.<nonexistant_pid>, and then die.
  */
-static void
+void
 after_successful_attach(struct tcb *tcp, const unsigned int flags)
 {
 	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | flags;
@@ -799,7 +803,7 @@ expand_tcbtab(void)
 		*tcb_ptr = newtcbs;
 }
 
-static struct tcb *
+struct tcb *
 alloctcb(int pid)
 {
 	unsigned int i;
@@ -857,7 +861,7 @@ free_tcb_priv_data(struct tcb *tcp)
 	}
 }
 
-static void
+void
 droptcb(struct tcb *tcp)
 {
 	if (tcp->pid == 0)
@@ -1616,7 +1620,7 @@ get_os_release(void)
 	return rel;
 }
 
-static void
+void
 set_sighandler(int signo, void (*sighandler)(int), struct sigaction *oldact)
 {
 	const struct sigaction sa = { .sa_handler = sighandler };
@@ -1807,6 +1811,9 @@ init(int argc, char *argv[])
 #endif
 	qualify("signal=all");
 	while ((c = getopt(argc, argv, "+"
+#ifdef ENABLE_GDBSERVER
+	    "G:"
+#endif
 #ifdef ENABLE_STACKTRACE
 	    "k"
 #endif
@@ -1861,6 +1868,15 @@ init(int argc, char *argv[])
 		case 'F':
 			optF = 1;
 			break;
+#ifdef ENABLE_GDBSERVER
+		case 'G':
+			set_tracing_backend(&gdbserver_backend);
+			tracing_backend_handle_arg(c, optarg);
+			/* gdbserver always follows the fork */
+			if (tracing_backend_handle_arg('f', optarg))
+				followfork = true;
+			break;
+#endif
 		case 'h':
 			usage();
 			break;
@@ -1951,7 +1967,8 @@ init(int argc, char *argv[])
 			not_failing_only = 1;
 			break;
 		default:
-			error_msg_and_help(NULL);
+			if (!tracing_backend_handle_arg(c, optarg))
+				error_msg_and_help(NULL);
 			break;
 		}
 	}
@@ -2148,7 +2165,7 @@ init(int argc, char *argv[])
 	tracing_backend_post_init();
 }
 
-static struct tcb *
+struct tcb *
 pid2tcb(const int pid, bool skip_preallocated)
 {
 	if (pid <= 0)
@@ -2377,7 +2394,7 @@ print_exited(struct tcb *tcp, const int pid, int exit)
 	}
 }
 
-static void
+void
 print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 {
 	if (cflag != CFLAG_ONLY_STATS
@@ -3017,6 +3034,7 @@ dispatch_event(struct tcb_wait_data *wd)
 		exit_code = 1;
 		return false;
 	}
+
 	return true;
 }
 

@@ -9,6 +9,10 @@ version 2.1 or later; see the file COPYING for details.
 strace test suite is released under the terms of the GNU General Public License
 version 2 or later; see the file tests/COPYING for details.
 
+The gdbserver feature of strace is released under the same license,
+except for a few sources copied from gdb which are required to use
+GPL version 3 or later.  See COPYING3 for details.
+
 See the file CREDITS for a list of authors and other contributors.
 See the file INSTALL for compilation and installation instructions.
 See the file NEWS for information on what has changed in recent versions.

@@ -105,6 +105,7 @@ ftruncate
 ftruncate64
 futex
 futimesat
+gdbrsp
 gen_tests.am
 get_mempolicy
 getcpu

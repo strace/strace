@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
+ * Copyright (c) 1991, 1992, 2018 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 2001-2018 The strace developers.
@@ -277,6 +277,7 @@ struct tcb {
 # define TCB_PREALLOCATED 0x8000	/* It's pre-allocated TCB,
 					 * in anticipation of an actual attach.
 					 */
+# define TCB_GDB_CONT_PID_TID 0x10000 /* Use vCont;c:pPID.TID for gdb backend */
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -454,6 +455,8 @@ extern bool generic_get_stack_pointer(struct tcb *, kernel_ulong_t *);
 extern void print_instruction_pointer(struct tcb *);
 
 extern void print_syscall_resume(struct tcb *tcp);
+/* XXX Does this really needed? */
+extern struct iovec* arch_iovec_for_getregset(void);
 
 extern int syscall_entering_decode(struct tcb *);
 extern int syscall_entering_trace(struct tcb *, unsigned int *);
@@ -462,6 +465,9 @@ extern void syscall_entering_finish(struct tcb *, int);
 extern int syscall_exiting_decode(struct tcb *, struct timespec *);
 extern int syscall_exiting_trace(struct tcb *, struct timespec *, int);
 extern void syscall_exiting_finish(struct tcb *);
+
+extern void update_personality(struct tcb *tcp, unsigned int personality);
+extern void call_summary(FILE *);
 
 extern void count_syscall(struct tcb *, const struct timespec *);
 extern void call_summary(FILE *);
@@ -505,6 +511,7 @@ extern void *get_tcb_priv_data(const struct tcb *);
 extern int set_tcb_priv_data(struct tcb *, void *priv_data,
 			     void (*free_priv_data)(void *));
 extern void free_tcb_priv_data(struct tcb *);
+extern struct tcb *pid2tcb(int pid, bool skip_preallocated);
 
 static inline unsigned long get_tcb_priv_ulong(const struct tcb *tcp)
 {
@@ -578,6 +585,24 @@ umoven_or_printaddr64_ignore_syserror(struct tcb *, uint64_t addr,
 # define umove_or_printaddr64_ignore_syserror(pid, addr, objp)	\
 	umoven_or_printaddr64_ignore_syserror((pid), (addr), sizeof(*(objp)), \
 					      (void *) (objp))
+
+#if 0
+extern bool
+print_array(struct tcb *,
+	    kernel_ulong_t start_addr,
+	    size_t nmemb,
+	    void *elem_buf,
+	    size_t elem_size,
+	    int (*umoven_func)(struct tcb *,
+				     kernel_ulong_t,
+				     unsigned int,
+				     void *),
+	    bool (*print_func)(struct tcb *,
+				     void *elem_buf,
+				     size_t elem_size,
+				     void *opaque_data),
+	    void *opaque_data);
+#endif
 
 static inline int
 umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,

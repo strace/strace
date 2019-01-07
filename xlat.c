@@ -180,6 +180,22 @@ sprintxval_ex(char *const buf, const size_t size, const struct xlat *const x,
 	return xsnprintf(buf, size, "%s", sprint_xlat_val(val, style));
 }
 
+#if 0
+int
+sprintxval(char *buf, size_t size, const struct xlat *x, const unsigned int val,
+	const char *dflt)
+{
+	const char *str = xlookup(x, val);
+
+	if (str)
+		return snprintf(buf, size, "%s", str);
+	if (dflt)
+		return snprintf(buf, size, "%#x /* %s */", val, dflt);
+
+	return snprintf(buf, size, "%#x", val);
+}
+#endif
+
 /**
  * Print entry in sorted struct xlat table, if it is there.
  *

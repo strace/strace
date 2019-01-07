@@ -22,7 +22,7 @@ AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests 1.13])
+AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests subdir-objects 1.13])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
@@ -888,6 +888,30 @@ AC_PATH_PROG([PERL], [perl])
 AC_CHECK_TOOL([READELF], [readelf])
 
 st_STACKTRACE
+
+dnl gdbserver
+AC_ARG_ENABLE([gdbserver],
+	      [AS_HELP_STRING([--enable-gdbserver],
+			      [enable gdbserver backend (includes GPLv3 code)])],
+	      [], [enable_gdbserver=check])
+
+use_gdbserver=no
+AS_IF([test "x$enable_gdbserver" != xno],
+	[AC_CHECK_FILE([$srcdir/gdbserver/$arch/gdb_arch_defs.h],
+		[use_gdbserver=yes],
+		[if test "x$enable_gdbserver" != xcheck; then
+                  AC_MSG_FAILURE([failed to find arch-specific gdbserver definitions $srcdir/gdbserver/$arch/gdb_arch_defs.h])
+                fi])]
+)
+
+AC_MSG_CHECKING([whether to enable gdbserver backend support])
+if test "x$use_gdbserver" = xyes; then
+	AC_DEFINE([ENABLE_GDBSERVER], 1, [Enable gdbserver backend support])
+	m4_define([additional_tracing_backends], [1])
+fi
+AM_CONDITIONAL([ENABLE_GDBSERVER], [test "x$use_gdbserver" = xyes])
+AC_MSG_RESULT([$use_gdbserver])
+
 
 if test "$arch" = mips && test "$no_create" != yes; then
 	mkdir -p linux/mips

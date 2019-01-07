@@ -90,6 +90,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	execveat-v \
 	filter-unavailable \
 	fork-f \
+	gdbrsp \
 	fsync-y \
 	getpid	\
 	getppid	\
@@ -230,6 +231,7 @@ DECODER_TESTS = \
 	execve.test \
 	fadvise64.test \
 	futex.test \
+	gdbrsp.test \
 	getuid.test \
 	int_0x80.test \
 	ioctl.test \
