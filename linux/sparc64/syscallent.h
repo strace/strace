@@ -29,10 +29,11 @@
 [ 28] = { 2,	TS,		SEN(sigaltstack),		"sigaltstack"		},
 [ 29] = { 0,	TS,		SEN(pause),			"pause"			},
 [ 30] = { 2,	TF,		SEN(utime),			"utime"			},
-[ 31 ... 32] = { },
+/* 31 - lchown32 on sparc32 */
+/* 32 - fchown32 on sparc32 */
 [ 33] = { 2,	TF,		SEN(access),			"access"		},
 [ 34] = { 1,	0,		SEN(nice),			"nice"			},
-[ 35] = { },
+/* 35 - chown32 on sparc32 */
 [ 36] = { 0,	0,		SEN(sync),			"sync"			},
 [ 37] = { 2,	TS,		SEN(kill),			"kill"			},
 [ 38] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
@@ -41,7 +42,7 @@
 [ 41] = { 1,	TD,		SEN(dup),			"dup"			},
 [ 42] = { 0,	TD,		SEN(pipe),			"pipe"			},
 [ 43] = { 1,	0,		SEN(times),			"times"			},
-[ 44] = { },
+/* 44 - getuid32 on sparc32 */
 [ 45] = { 2,	TF,		SEN(umount2),			"umount2"		},
 [ 46] = { 1,	0,		SEN(setgid),			"setgid"		},
 [ 47] = { 0,	PU|NF,		SEN(getgid),			"getgid"		},
@@ -50,10 +51,10 @@
 [ 50] = { 0,	PU|NF,		SEN(getegid),			"getegid"		},
 [ 51] = { 1,	TF,		SEN(acct),			"acct"			},
 [ 52] = { 2,	0,		SEN(printargs),			"memory_ordering"	},
-[ 53] = { },
+/* 53 - getgid32 on sparc32 */
 [ 54] = { 3,	TD,		SEN(ioctl),			"ioctl"			},
 [ 55] = { 4,	0,		SEN(reboot),			"reboot"		},
-[ 56] = { },
+/* 56 - mmap2 on sparc32 */
 [ 57] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 58] = { 3,	TF,		SEN(readlink),			"readlink"		},
 [ 59] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
@@ -66,31 +67,32 @@
 [ 66] = { 0,	TP,		SEN(vfork),			"vfork"			},
 [ 67] = { 4,	TD,		SEN(pread),			"pread64"		},
 [ 68] = { 4,	TD,		SEN(pwrite),			"pwrite64"		},
-[ 69 ... 70] = { },
+/* 69 - geteuid32 on sparc32 */
+/* 70 - getegid32 on sparc32 */
 [ 71] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},
-[ 72] = { },
+/* 72 - setreuid32 on sparc32 */
 [ 73] = { 2,	TM|SI,		SEN(munmap),			"munmap"		},
 [ 74] = { 3,	TM|SI,		SEN(mprotect),			"mprotect"		},
 [ 75] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [ 76] = { 0,	0,		SEN(vhangup),			"vhangup"		},
-[ 77] = { },
+/* 77 - truncate64 on sparc32 */
 [ 78] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [ 79] = { 2,	0,		SEN(getgroups),			"getgroups"		},
 [ 80] = { 2,	0,		SEN(setgroups),			"setgroups"		},
 [ 81] = { 0,	PU|NF,		SEN(getpgrp),			"getpgrp"		},
-[ 82] = { },
+/* 82 - setgroups32 on sparc32 */
 [ 83] = { 3,	0,		SEN(setitimer),			"setitimer"		},
-[ 84] = { },
+/* 84 - ftruncate64 on sparc32 */
 [ 85] = { 2,	TF,		SEN(swapon),			"swapon"		},
 [ 86] = { 2,	0,		SEN(getitimer),			"getitimer"		},
-[ 87] = { },
+/* 87 - setuid32 on sparc32 */
 [ 88] = { 2,	0,		SEN(sethostname),		"sethostname"		},
-[ 89] = { },
+/* 89 - setgid32 on sparc32 */
 [ 90] = { 2,	TD,		SEN(dup2),			"dup2"			},
-[ 91] = { },
+/* 91 - setfsuid32 on sparc32 */
 [ 92] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
 [ 93] = { 5,	TD,		SEN(select),			"select"		},
-[ 94] = { },
+/* 94 - setfsgid32 on sparc32 */
 [ 95] = { 1,	TD,		SEN(fsync),			"fsync"			},
 [ 96] = { 3,	0,		SEN(setpriority),		"setpriority"		},
 [ 97] = { 3,	TN,		SEN(socket),			"socket"		},
@@ -108,10 +110,10 @@
 [109] = { 3,	0,		SEN(getresuid),			"getresuid"		},
 [110] = { 3,	0,		SEN(setresgid),			"setresgid"		},
 [111] = { 3,	0,		SEN(getresgid),			"getresgid"		},
-[112] = { },
+/* 112 - setregid32 on sparc32 */
 [113] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [114] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
-[115] = { },
+/* 115 - getgroups32 on sparc32 */
 [116] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [117] = { 2,	0,		SEN(getrusage),			"getrusage"		},
 [118] = { 5,	TN,		SEN(getsockopt),		"getsockopt"		},
@@ -151,7 +153,7 @@
 [152] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
 [153] = { 3,	TD,		SEN(poll),			"poll"			},
 [154] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
-[155] = { },
+/* 155 - fcntl64 on sparc32 */
 [156] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [157] = { 2,	TF|TSF|TSFA,	SEN(statfs),			"statfs"		},
 [158] = { 2,	TD|TFSF|TSFA,	SEN(fstatfs),			"fstatfs"		},
@@ -227,7 +229,7 @@
 [228] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
 [229] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
 [230] = { 5,	TD,		SEN(select),			"_newselect"		},
-[231] = { },
+/* 231 - time on sparc32 */
 [232] = { 6,	TD,		SEN(splice),			"splice"		},
 [233] = { 1,	0,		SEN(stime),			"stime"			},
 [234] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},
@@ -263,7 +265,7 @@
 [264] = { 1,	0,		SEN(timer_getoverrun),		"timer_getoverrun"	},
 [265] = { 1,	0,		SEN(timer_delete),		"timer_delete"		},
 [266] = { 3,	0,		SEN(timer_create),		"timer_create"		},
-[267] = { },
+/* 267 - vserver */
 [268] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [269] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [270] = { 3,	0,		SEN(io_submit),			"io_submit"		},
