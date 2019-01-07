@@ -1,5 +1,7 @@
 language: c
 
+cache: ccache
+
 dist: trusty
 
 before_install: ci/install-dependencies.sh
