@@ -57,7 +57,7 @@
 [ 49] = { 0,	TC|PU|NF,	SEN(geteuid16),			"geteuid"		},
 [ 50] = { 0,	TC|PU|NF,	SEN(getegid16),			"getegid"		},
 [ 51] = { 1,	TF,		SEN(acct),			"acct"			},
-[ 52] = { },
+/* 52 - memory_ordering on sparc64 */
 [ 53] = { 0,	TC|PU|NF,	SEN(getgid),			"getgid32"		},
 [ 54] = { 3,	TD,		SEN(ioctl),			"ioctl"			},
 [ 55] = { 4,	0,		SEN(reboot),			"reboot"		},
@@ -169,7 +169,7 @@
 [161] = { 3,	0,		SEN(sched_getaffinity),		"sched_get_affinity"	},
 [162] = { 2,	0,		SEN(printargs),			"getdomainname"		},
 [163] = { 2,	0,		SEN(setdomainname),		"setdomainname"		},
-[164] = { },
+/* 164 - utrap_install on sparc64 */
 [165] = { 4,	TF,		SEN(quotactl),			"quotactl"		},
 [166] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [167] = { 5,	TF,		SEN(mount),			"mount"			},
