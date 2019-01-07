@@ -107,8 +107,8 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 	const struct in_pktinfo *info = cmsg_data;
 
 	PRINT_FIELD_IFINDEX("{", *info, ipi_ifindex);
-	PRINT_FIELD_INET4_ADDR(", ", *info, ipi_spec_dst);
-	PRINT_FIELD_INET4_ADDR(", ", *info, ipi_addr);
+	PRINT_FIELD_INET_ADDR(", ", *info, ipi_spec_dst, AF_INET);
+	PRINT_FIELD_INET_ADDR(", ", *info, ipi_addr, AF_INET);
 	tprints("}");
 }
 

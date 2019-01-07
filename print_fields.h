@@ -159,10 +159,6 @@
 				sizeof((where_).field_), #field_);	\
 	} while (0)
 
-# define PRINT_FIELD_INET4_ADDR(prefix_, where_, field_)			\
-	STRACE_PRINTF("%s%s=inet_addr(\"%s\")", (prefix_), #field_,	\
-		      inet_ntoa((where_).field_))
-
 # define PRINT_FIELD_AX25_ADDR(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\

@@ -146,7 +146,7 @@ print_sockaddr_data_in(const void *const buf, const int addrlen)
 	const struct sockaddr_in *const sa_in = buf;
 
 	PRINT_FIELD_NET_PORT("", *sa_in, sin_port);
-	PRINT_FIELD_INET4_ADDR(", ", *sa_in, sin_addr);
+	PRINT_FIELD_INET_ADDR(", ", *sa_in, sin_addr, AF_INET);
 }
 
 #define SIN6_MIN_LEN offsetof(struct sockaddr_in6, sin6_scope_id)

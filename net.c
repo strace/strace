@@ -898,8 +898,8 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (len < (int) sizeof(mreq)) {
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &mreq)) {
-		PRINT_FIELD_INET4_ADDR("{", mreq, imr_multiaddr);
-		PRINT_FIELD_INET4_ADDR(", ", mreq, imr_interface);
+		PRINT_FIELD_INET_ADDR("{", mreq, imr_multiaddr, AF_INET);
+		PRINT_FIELD_INET_ADDR(", ", mreq, imr_interface, AF_INET);
 		tprints("}");
 	}
 }
