@@ -349,31 +349,8 @@ decode_ipc_subcall(struct tcb *tcp)
 #endif /* SYS_ipc_subcall */
 
 #ifdef SYS_syscall_subcall
-static void
-decode_syscall_subcall(struct tcb *tcp)
-{
-	if (!scno_is_valid(tcp->u_arg[0]))
-		return;
-	tcp->scno = tcp->u_arg[0];
-	tcp->qual_flg = qual_flags(tcp->scno);
-	tcp->s_ent = &sysent[tcp->scno];
-	memmove(&tcp->u_arg[0], &tcp->u_arg[1],
-		sizeof(tcp->u_arg) - sizeof(tcp->u_arg[0]));
-# ifdef LINUX_MIPSO32
-	/*
-	 * Fetching the last arg of 7-arg syscalls (fadvise64_64
-	 * and sync_file_range) requires additional code,
-	 * see linux/mips/get_syscall_args.c
-	 */
-	if (tcp->s_ent->nargs == MAX_ARGS) {
-		if (umoven(tcp,
-			   mips_REG_SP + MAX_ARGS * sizeof(tcp->u_arg[0]),
-			   sizeof(tcp->u_arg[0]),
-			   &tcp->u_arg[MAX_ARGS - 1]) < 0)
-		tcp->u_arg[MAX_ARGS - 1] = 0;
-	}
-# endif /* LINUX_MIPSO32 */
-}
+/* The implementation is architecture specific.  */
+static void decode_syscall_subcall(struct tcb *);
 #endif /* SYS_syscall_subcall */
 
 static void
