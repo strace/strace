@@ -143,7 +143,7 @@ EM_RX			173 /* Renesas RX family */
 EM_METAG		174 /* Imagination Technologies META processor architecture, arch/metag/include/asm/elf.h; removed in v4.17-rc1~163^2~63^2~10 */
 EM_MCST_ELBRUS		175 /* MCST Elbrus general purpose hardware architecture */
 EM_ECOG16		176 /* Cyan Technology eCOG16 family */
-EM_CR16			177 /* National Semiconductor CompactRISC CR16 16-bit microprocessor 8/
+EM_CR16			177 /* National Semiconductor CompactRISC CR16 16-bit microprocessor */
 EM_ETPU			178 /* Freescale Extended Time Processing Unit */
 EM_SLE9X		179 /* Infineon Technologies SLE9X core */
 EM_L10M			180 /* Intel L10M/L1OM - Larrabee/Knights Ferry */
