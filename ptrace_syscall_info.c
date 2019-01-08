@@ -43,6 +43,11 @@ static const unsigned int expected_seccomp_size =
 bool
 test_ptrace_get_syscall_info(void)
 {
+	/*
+	 * NOMMU provides no forks necessary for PTRACE_GET_SYSCALL_INFO test,
+	 * leave the default unchanged.
+	 */
+#ifdef HAVE_FORK
 	static const unsigned long args[][7] = {
 		/* a sequence of architecture-agnostic syscalls */
 		{
@@ -252,6 +257,7 @@ done:
 		debug_msg("PTRACE_GET_SYSCALL_INFO works");
 	else
 		debug_msg("PTRACE_GET_SYSCALL_INFO does not work");
+#endif /* HAVE_FORK */
 
 	return ptrace_get_syscall_info_supported;
 }

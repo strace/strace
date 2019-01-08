@@ -1800,13 +1800,7 @@ init(int argc, char *argv[])
 				     PTRACE_O_TRACEVFORK;
 	debug_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
-
-	/*
-	 * NOMMU provides no forks necessary for PTRACE_GET_SYSCALL_INFO test,
-	 * leave the default unchanged.
-	 */
-	if (!NOMMU_SYSTEM)
-		test_ptrace_get_syscall_info();
+	test_ptrace_get_syscall_info();
 
 	/*
 	 * Is something weird with our stdin and/or stdout -
