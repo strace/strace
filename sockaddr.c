@@ -188,7 +188,6 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
 	PRINT_FIELD_NET_PORT("", *sa_in6, sin6_port);
-	PRINT_FIELD_INET_ADDR(", ", *sa_in6, sin6_addr, AF_INET6);
 	tprints(", sin6_flowinfo=");
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		print_quoted_string((const char*) &sa_in6->sin6_flowinfo,
@@ -201,6 +200,7 @@ print_sockaddr_data_in6(const void *const buf, const int addrlen)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV)
 		tprintf("htonl(%u)", ntohl(sa_in6->sin6_flowinfo));
 
+	PRINT_FIELD_INET_ADDR(", ", *sa_in6, sin6_addr, AF_INET6);
 	if (addrlen <= (int) SIN6_MIN_LEN)
 		return;
 

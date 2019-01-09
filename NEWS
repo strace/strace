@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     constants.
 
 * Bug fixes
+  * Fixed ordering of sockaddr_in6 fields.
   * Fixed strace-k test on alpha.
   * Fixed build on mips o32.
   * Fixed build on NOMMU architectures.

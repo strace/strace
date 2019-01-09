@@ -156,22 +156,22 @@ check_in6_linklocal(struct sockaddr_in6 *const in6, const char *const h_addr)
 	unsigned int len = sizeof(*in6);
 	int ret = connect(-1, (void *) in6, len);
 	printf("connect(-1, {sa_family=AF_INET6, sin6_port=htons(%hu)"
-	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
 	       ", sin6_flowinfo=htonl(%u)"
+	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
 	       ", sin6_scope_id=%u}, %u)"
 	       " = %d EBADF (%m)\n",
-	       ntohs(in6->sin6_port), h_addr,
-	       ntohl(in6->sin6_flowinfo), in6->sin6_scope_id, len, ret);
+	       ntohs(in6->sin6_port), ntohl(in6->sin6_flowinfo),
+	       h_addr, in6->sin6_scope_id, len, ret);
 
 	in6->sin6_scope_id = ifindex_lo();
 	if (in6->sin6_scope_id) {
 		ret = connect(-1, (void *) in6, len);
 		printf("connect(-1, {sa_family=AF_INET6, sin6_port=htons(%hu)"
-		       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
 		       ", sin6_flowinfo=htonl(%u)"
+		       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
 		       ", sin6_scope_id=%s}, %u)"
 		       " = %d EBADF (%m)\n",
-		       ntohs(in6->sin6_port), h_addr, ntohl(in6->sin6_flowinfo),
+		       ntohs(in6->sin6_port), ntohl(in6->sin6_flowinfo), h_addr,
 		       IFINDEX_LO_STR, len, ret);
 	}
 }
@@ -192,10 +192,11 @@ check_in6(void)
 	unsigned int len = sizeof(*in6);
 	int ret = connect(-1, (void *) in6, len);
 	printf("connect(-1, {sa_family=AF_INET6, sin6_port=htons(%hu)"
+	       ", sin6_flowinfo=htonl(%u)"
 	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
-	       ", sin6_flowinfo=htonl(%u), sin6_scope_id=%u}, %u)"
+	       ", sin6_scope_id=%u}, %u)"
 	       " = %d EBADF (%m)\n",
-	       h_port, h_addr, h_flowinfo, in6->sin6_scope_id, len, ret);
+	       h_port, h_flowinfo, h_addr, in6->sin6_scope_id, len, ret);
 
 	check_in6_linklocal(in6, "fe80::");
 	check_in6_linklocal(in6, "ff42::");
@@ -209,10 +210,11 @@ check_in6(void)
 	len = sizeof(*in6) + 4;
 	ret = connect(-1, (void *) in6, len);
 	printf("connect(-1, {sa_family=AF_INET6, sin6_port=htons(%hu)"
+	       ", sin6_flowinfo=htonl(%u)"
 	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
-	       ", sin6_flowinfo=htonl(%u), sin6_scope_id=%u}, %u)"
+	       ", sin6_scope_id=%u}, %u)"
 	       " = %d EBADF (%m)\n",
-	       h_port, h_addr, h_flowinfo, in6->sin6_scope_id, len, ret);
+	       h_port, h_flowinfo, h_addr, in6->sin6_scope_id, len, ret);
 
 	in6 = ((void *) in6) + 4 + sizeof(in6->sin6_scope_id);
 	in6->sin6_family = AF_INET6;
@@ -222,10 +224,10 @@ check_in6(void)
 	len = sizeof(*in6) - sizeof(in6->sin6_scope_id);
 	ret = connect(-1, (void *) in6, len);
 	printf("connect(-1, {sa_family=AF_INET6, sin6_port=htons(%hu)"
-	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
-	       ", sin6_flowinfo=htonl(%u)}, %u)"
+	       ", sin6_flowinfo=htonl(%u)"
+	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)}, %u)"
 	       " = %d EBADF (%m)\n",
-	       h_port, h_addr, h_flowinfo, len, ret);
+	       h_port, h_flowinfo, h_addr, len, ret);
 
 	in6 = ((void *) in6) + 4;
 	in6->sin6_family = AF_INET6;

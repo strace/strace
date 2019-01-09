@@ -125,36 +125,33 @@ validate_in6(struct sockaddr_in6 *const in6, const char *const h_addr)
 #if XLAT_RAW
 	printf("connect(-1, {sa_family=%#x, sin6_port=", AF_INET6);
 	print_quoted_hex(&in6->sin6_port, sizeof(in6->sin6_port));
-	printf(", sin6_addr=");
-	print_quoted_hex(&in6->sin6_addr, sizeof(struct in6_addr));
 	printf(", sin6_flowinfo=");
 	print_quoted_hex(&in6->sin6_flowinfo, sizeof(in6->sin6_flowinfo));
-	printf(", sin6_scope_id=%u}, %u)"
-	       " = %s\n", in6->sin6_scope_id, len, errstr);
+	printf(", sin6_addr=");
+	print_quoted_hex(&in6->sin6_addr, sizeof(struct in6_addr));
+	printf(", sin6_scope_id=%u}, %u) = %s\n",
+	       in6->sin6_scope_id, len, errstr);
 #elif XLAT_VERBOSE
 	printf("connect(-1, {sa_family=%#x /* AF_INET6 */", AF_INET6);
 	printf(", sin6_port=");
 	print_quoted_hex(&in6->sin6_port, sizeof(in6->sin6_port));
 	printf(" /* htons(%hu) */", ntohs(in6->sin6_port));
+	printf(", sin6_flowinfo=");
+	print_quoted_hex(&in6->sin6_flowinfo, sizeof(in6->sin6_flowinfo));
+	printf(" /* htonl(%u) */", ntohl(in6->sin6_flowinfo));
 	printf(", sin6_addr=");
 	print_quoted_hex(&in6->sin6_addr, sizeof(struct in6_addr));
 	printf(" /* inet_pton(AF_INET6, \"%s\") */", h_addr);
-	printf(", sin6_flowinfo=");
-	print_quoted_hex(&in6->sin6_flowinfo, sizeof(in6->sin6_flowinfo));
-	printf(" /* htonl(%u) */"
-	       ", sin6_scope_id=%u}, %u)"
-	       " = %s\n",
-	       ntohl(in6->sin6_flowinfo), in6->sin6_scope_id,
-		     len, errstr);
+	printf(", sin6_scope_id=%u}, %u) = %s\n",
+	       in6->sin6_scope_id, len, errstr);
 #else
 	printf("connect(-1, {sa_family=AF_INET6, sin6_port=htons(%hu)"
-	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
 	       ", sin6_flowinfo=htonl(%u)"
+	       ", inet_pton(AF_INET6, \"%s\", &sin6_addr)"
 	       ", sin6_scope_id=%u}, %u)"
 	       " = %s\n",
-	       ntohs(in6->sin6_port), h_addr,
-	       ntohl(in6->sin6_flowinfo), in6->sin6_scope_id,
-		     len, errstr);
+	       ntohs(in6->sin6_port), ntohl(in6->sin6_flowinfo),
+	       h_addr, in6->sin6_scope_id, len, errstr);
 #endif
 }
 

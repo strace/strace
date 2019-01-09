@@ -76,15 +76,15 @@ main(void)
 		{
 			ARG_STR(SOL_IPV6), ARG_STR(MCAST_JOIN_GROUP), greq6,
 			"gr_group={sa_family=AF_INET6, sin6_port=htons(65535)"
-			", inet_pton(AF_INET6, \"" multi6addr "\", &sin6_addr)"
 			", sin6_flowinfo=htonl(4294967295)"
+			", inet_pton(AF_INET6, \"" multi6addr "\", &sin6_addr)"
 			", sin6_scope_id=4294967295}"
 		},
 		{
 			ARG_STR(SOL_IPV6), ARG_STR(MCAST_LEAVE_GROUP), greq6,
 			"gr_group={sa_family=AF_INET6, sin6_port=htons(65535)"
-			", inet_pton(AF_INET6, \"" multi6addr "\", &sin6_addr)"
 			", sin6_flowinfo=htonl(4294967295)"
+			", inet_pton(AF_INET6, \"" multi6addr "\", &sin6_addr)"
 			", sin6_scope_id=4294967295}"
 		}
 	};
