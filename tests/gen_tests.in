@@ -147,6 +147,9 @@ ioctl_v4l2	+ioctl.test
 ioperm	-a27
 iopl	-a8
 ioprio	-a18 -e trace=ioprio_get,ioprio_set
+ioprio-Xabbrev	-a18 -e trace=ioprio_get,ioprio_set -Xabbrev
+ioprio-Xraw	-a18 -e trace=ioprio_get,ioprio_set -Xraw
+ioprio-Xverbose	-a18 -e trace=ioprio_get,ioprio_set -Xverbose
 ip_mreq	-e trace=setsockopt
 ipc	-a19
 ipc_msg	+ipc.sh -a26

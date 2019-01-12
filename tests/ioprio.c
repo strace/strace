@@ -27,14 +27,6 @@ enum {
 # include "xlat.h"
 # include "xlat/ioprio_class.h"
 
-void
-print_ioprio(unsigned long val)
-{
-	printf(" (IOPRIO_PRIO_VALUE(");
-	printxval(ioprio_class, val >> 13, "IOPRIO_CLASS_???");
-	printf(", %d))", (int) (val & 0x1fff));
-}
-
 int
 main(void)
 {
@@ -44,32 +36,78 @@ main(void)
 		(kernel_ulong_t) 0xbadc0dedda7a1057ULL;
 	static const kernel_ulong_t bogus_ioprio =
 		(kernel_ulong_t) 0xdec0ded1facefeedULL;
+# if !XLAT_RAW
 	static const char * const bogus_ioprio_str =
 		"IOPRIO_PRIO_VALUE(0x7d677 /* IOPRIO_CLASS_??? */, 7917)";
+# endif
 
 	long rc;
+	const char *errstr;
 
 	rc = syscall(__NR_ioprio_get, bogus_which, bogus_who);
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_get(%#x, %d) = %s\n",
+	       (int) bogus_which, (int) bogus_who, errstr);
+# else /* XLAT_ABBREV || XLAT_VERBOSE */
 	printf("ioprio_get(%#x /* IOPRIO_WHO_??? */, %d) = %s\n",
-	       (int) bogus_which, (int) bogus_who, sprintrc(rc));
+	       (int) bogus_which, (int) bogus_who, errstr);
+# endif
 
 	rc = syscall(__NR_ioprio_get, 1, 0);
-	printf("ioprio_get(IOPRIO_WHO_PROCESS, 0) = %s", sprintrc(rc));
-
-	if (rc >= -1)
-		print_ioprio(rc);
-
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_get(0x1, 0) = %s\n", errstr);
+# elif XLAT_VERBOSE
+	printf("ioprio_get(0x1 /* IOPRIO_WHO_PROCESS */, 0) = %s", errstr);
+	if (rc >= 0) {
+		printf(" (IOPRIO_PRIO_VALUE(%u /* ", (unsigned int) rc >> 13);
+		printxval(ioprio_class, (unsigned int) rc >> 13,
+			  "IOPRIO_CLASS_???");
+		printf(" */, %u))", (unsigned int) rc & 0x1fff);
+	}
 	puts("");
+# else /* XLAT_ABBREV */
+	printf("ioprio_get(IOPRIO_WHO_PROCESS, 0) = %s", errstr);
+	if (rc >= 0) {
+		printf(" (IOPRIO_PRIO_VALUE(");
+		printxval(ioprio_class, (unsigned int) rc >> 13,
+			  "IOPRIO_CLASS_???");
+		printf(", %u))", (unsigned int) rc & 0x1fff);
+	}
+	puts("");
+# endif
 
 	rc = syscall(__NR_ioprio_set, 2, 0, 8191);
-	printf("ioprio_set(IOPRIO_WHO_PGRP, 0, "
-	       "IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191)) = %s\n",
-	       sprintrc(rc));
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_set(%#x, 0, 8191) = %s\n", 2, errstr);
+# elif XLAT_VERBOSE
+	printf("ioprio_set(%#x /* IOPRIO_WHO_PGRP */, 0, 8191"
+	       " /* IOPRIO_PRIO_VALUE(0 /* IOPRIO_CLASS_NONE */, 8191) */)"
+	       " = %s\n",
+	       2, errstr);
+# else /* XLAT_ABBREV */
+	printf("ioprio_set(IOPRIO_WHO_PGRP, 0"
+	       ", IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191)) = %s\n",
+	       errstr);
+# endif
 
 	rc = syscall(__NR_ioprio_set, bogus_which, bogus_who, bogus_ioprio);
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_set(%#x, %d, %d) = %s\n",
+	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
+	       errstr);
+# elif XLAT_VERBOSE
+	printf("ioprio_set(%#x /* IOPRIO_WHO_??? */, %d, %d /* %s */) = %s\n",
+	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
+	       bogus_ioprio_str, errstr);
+# else /* XLAT_ABBREV */
 	printf("ioprio_set(%#x /* IOPRIO_WHO_??? */, %d, %s) = %s\n",
 	       (int) bogus_which, (int) bogus_who, bogus_ioprio_str,
-	       sprintrc(rc));
+	       errstr);
+# endif
 
 	puts("+++ exited with 0 +++");
 

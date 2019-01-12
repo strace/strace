@@ -45,8 +45,10 @@ SYS_FUNC(ioprio_get)
 	} else {
 		if (syserror(tcp))
 			return 0;
-
-		tcp->auxstr = sprint_ioprio(tcp->u_rval);
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+			tcp->auxstr = NULL;
+		else
+			tcp->auxstr = sprint_ioprio(tcp->u_rval);
 		return RVAL_STR;
 	}
 }
@@ -58,7 +60,14 @@ SYS_FUNC(ioprio_set)
 	/* int who */
 	tprintf(", %d, ", (int) tcp->u_arg[1]);
 	/* int ioprio */
-	tprints(sprint_ioprio(tcp->u_arg[2]));
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%d", (int) tcp->u_arg[2]);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return RVAL_DECODED;
+
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+		? tprints_comment : tprints)(sprint_ioprio(tcp->u_arg[2]));
 
 	return RVAL_DECODED;
 }

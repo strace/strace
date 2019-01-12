@@ -144,6 +144,9 @@ ioctl_v4l2
 ioperm
 iopl
 ioprio
+ioprio-Xabbrev
+ioprio-Xraw
+ioprio-Xverbose
 ip_mreq
 ipc
 ipc_msg
