@@ -414,6 +414,9 @@ setresuid32	-a21
 setreuid	-a15
 setreuid32	-a17
 setrlimit	-a27
+setrlimit-Xabbrev	-a27 -e trace=setrlimit -Xabbrev
+setrlimit-Xraw	-a19 -e trace=setrlimit -Xraw
+setrlimit-Xverbose	-a36 -e trace=setrlimit -Xverbose
 setuid	-a10
 setuid32	-a12
 shmxt	-a11 -e trace='/(osf_)?shmat,shmdt'

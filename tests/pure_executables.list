@@ -420,6 +420,9 @@ setresuid32
 setreuid
 setreuid32
 setrlimit
+setrlimit-Xabbrev
+setrlimit-Xraw
+setrlimit-Xverbose
 setuid
 setuid32
 shmxt

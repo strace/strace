@@ -19,23 +19,55 @@
 const char *
 sprint_rlim(kernel_ulong_t lim)
 {
+	static char buf[2][ /* space for 2 llu strings */
+				2*sizeof(lim)*3 +
+			    /* space for XLAT_STYLE_ABBREV decoding */
+				sizeof("*1024") + sizeof("RLIM64_INFINITY") +
+			    /* space for C style comments */
+				6];
+	static unsigned int i;
+
+	i &= 1;
+
+#if XLAT_RAW
+	sprintf(buf[i], "%llu", (unsigned long long) lim);
+	return buf[i++];
+#else
 	if (sizeof(lim) == sizeof(uint64_t)) {
-		if (lim == (kernel_ulong_t) -1ULL)
+		if (lim == (kernel_ulong_t) -1ULL) {
+# if XLAT_VERBOSE
+			sprintf(buf[i], "%llu /* RLIM64_INFINITY */",
+				(unsigned long long) lim);
+			return buf[i++];
+# else /* XLAT_ABBREV */
 			return "RLIM64_INFINITY";
+# endif
+		}
 	} else {
-		if (lim == (kernel_ulong_t) -1U)
+		if (lim == (kernel_ulong_t) -1U) {
+# if XLAT_VERBOSE
+			sprintf(buf[i], "%llu /* RLIM_INFINITY */",
+				(unsigned long long) lim);
+			return buf[i++];
+# else /* XLAT_ABBREV */
 			return "RLIM_INFINITY";
+# endif
+		}
 	}
 
-	static char buf[2][sizeof(lim)*3 + sizeof("*1024")];
-	static int i;
-	i &= 1;
 	if (lim > 1024 && lim % 1024 == 0)
+# if XLAT_VERBOSE
+		sprintf(buf[i], "%llu /* %llu*1024 */",
+			(unsigned long long) lim,
+			(unsigned long long) lim / 1024);
+# else /* XLAT_ABBREV */
 		sprintf(buf[i], "%llu*1024", (unsigned long long) lim / 1024);
+# endif
 	else
 		sprintf(buf[i], "%llu", (unsigned long long) lim);
 
 	return buf[i++];
+#endif /* !XLAT_RAW */
 }
 
 #ifdef NR_GETRLIMIT

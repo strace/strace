@@ -16,19 +16,27 @@
 
 #include "xlat/resources.h"
 
-static const char *
-sprint_rlim64(uint64_t lim)
-{
-	static char buf[sizeof(uint64_t)*3 + sizeof("*1024")];
+static void
+print_rlim64_t(uint64_t lim) {
+	const char *str = NULL;
 
 	if (lim == UINT64_MAX)
-		return "RLIM64_INFINITY";
+		str = "RLIM64_INFINITY";
+	else if (lim > 1024 && lim % 1024 == 0) {
+		static char buf[sizeof(lim) * 3 + sizeof("*1024")];
 
-	if (lim > 1024 && lim % 1024 == 0)
 		xsprintf(buf, "%" PRIu64 "*1024", lim / 1024);
-	else
-		xsprintf(buf, "%" PRIu64, lim);
-	return buf;
+		str = buf;
+	}
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%" PRIu64, lim);
+
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+                ? tprints_comment : tprints)(str);
 }
 
 static void
@@ -40,26 +48,37 @@ print_rlimit64(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		tprintf("{rlim_cur=%s,", sprint_rlim64(rlim.rlim_cur));
-		tprintf(" rlim_max=%s}", sprint_rlim64(rlim.rlim_max));
+		tprints("{rlim_cur=");
+		print_rlim64_t(rlim.rlim_cur);
+		tprints(", rlim_max=");
+		print_rlim64_t(rlim.rlim_max);
+		tprints("}");
 	}
 }
 
 #if !defined(current_wordsize) || current_wordsize == 4
 
-static const char *
-sprint_rlim32(uint32_t lim)
-{
-	static char buf[sizeof(uint32_t)*3 + sizeof("*1024")];
+static void
+print_rlim32_t(uint32_t lim) {
+	const char *str = NULL;
 
 	if (lim == UINT32_MAX)
-		return "RLIM_INFINITY";
+		str = "RLIM_INFINITY";
+	else if (lim > 1024 && lim % 1024 == 0) {
+		static char buf[sizeof(lim) * 3 + sizeof("*1024")];
 
-	if (lim > 1024 && lim % 1024 == 0)
 		xsprintf(buf, "%" PRIu32 "*1024", lim / 1024);
-	else
-		xsprintf(buf, "%" PRIu32, lim);
-	return buf;
+		str = buf;
+	}
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%" PRIu32, lim);
+
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+                ? tprints_comment : tprints)(str);
 }
 
 static void
@@ -71,8 +90,11 @@ print_rlimit32(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		tprintf("{rlim_cur=%s,", sprint_rlim32(rlim.rlim_cur));
-		tprintf(" rlim_max=%s}", sprint_rlim32(rlim.rlim_max));
+		tprints("{rlim_cur=");
+		print_rlim32_t(rlim.rlim_cur);
+		tprints(", rlim_max=");
+		print_rlim32_t(rlim.rlim_max);
+		tprints("}");
 	}
 }
 
