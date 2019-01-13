@@ -217,6 +217,9 @@ mount-Xabbrev
 mount-Xraw
 mount-Xverbose
 move_pages
+move_pages-Xabbrev
+move_pages-Xraw
+move_pages-Xverbose
 mq
 mq_sendrecv
 mq_sendrecv-read
