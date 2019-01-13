@@ -953,17 +953,13 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	    umove(tcp, addr, &mreq) < 0) {
 		printaddr(addr);
 	} else {
-		unsigned int i;
-
 		PRINT_FIELD_IFINDEX("{", mreq, mr_ifindex);
 		PRINT_FIELD_XVAL(", ", mreq, mr_type, packet_mreq_type,
 				 "PACKET_MR_???");
 		PRINT_FIELD_U(", ", mreq, mr_alen);
-		tprints(", mr_address=");
-		if (mreq.mr_alen > ARRAY_SIZE(mreq.mr_address))
-			mreq.mr_alen = ARRAY_SIZE(mreq.mr_address);
-		for (i = 0; i < mreq.mr_alen; ++i)
-			tprintf("%02x", mreq.mr_address[i]);
+		PRINT_FIELD_MAC_SZ(", ", mreq, mr_address,
+				   (mreq.mr_alen > sizeof(mreq.mr_address)
+				    ? sizeof(mreq.mr_address) : mreq.mr_alen));
 		tprints("}");
 	}
 }

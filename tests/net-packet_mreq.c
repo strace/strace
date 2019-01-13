@@ -38,9 +38,8 @@ test_packet_mreq(const int optname, const char *const optname_str)
 	printf("setsockopt(-1, SOL_PACKET, %s, {mr_ifindex=%d,"
 	       " mr_type=%#x /* PACKET_MR_??? */, mr_alen=%d, mr_address=",
 	       optname_str, pmreq->mr_ifindex, pmreq->mr_type, pmreq->mr_alen);
-	for (unsigned int i = 0; i < ARRAY_SIZE(pmreq->mr_address); i++) {
-		printf("%02x", pmreq->mr_address[i]);
-	}
+	for (unsigned int i = 0; i < ARRAY_SIZE(pmreq->mr_address); i++)
+		printf("%s%02x", i > 0 ? ":" : "", pmreq->mr_address[i]);
 	printf("}, %d) = %s\n", len, errstr);
 
 	/* setsockopt with mr_type unknown and mr_alen > sizeof(mr_address) */
@@ -49,9 +48,8 @@ test_packet_mreq(const int optname, const char *const optname_str)
 	printf("setsockopt(-1, SOL_PACKET, %s, {mr_ifindex=%d,"
 	       " mr_type=%#x /* PACKET_MR_??? */, mr_alen=%d, mr_address=",
 	       optname_str, pmreq->mr_ifindex, pmreq->mr_type, pmreq->mr_alen);
-	for (unsigned int i = 0; i < ARRAY_SIZE(pmreq->mr_address); i++) {
-		printf("%02x", pmreq->mr_address[i]);
-	}
+	for (unsigned int i = 0; i < ARRAY_SIZE(pmreq->mr_address); i++)
+		printf("%s%02x", i > 0 ? ":" : "", pmreq->mr_address[i]);
 	printf("}, %d) = %s\n", len, errstr);
 
 	/* setsockopt with mr_type unknown and mr_alen < sizeof(mr_address) */
@@ -60,9 +58,8 @@ test_packet_mreq(const int optname, const char *const optname_str)
 	printf("setsockopt(-1, SOL_PACKET, %s, {mr_ifindex=%d,"
 	       " mr_type=%#x /* PACKET_MR_??? */, mr_alen=%d, mr_address=",
 	       optname_str, pmreq->mr_ifindex, pmreq->mr_type, pmreq->mr_alen);
-	for (unsigned int i = 0; i < pmreq->mr_alen; i++) {
-		printf("%02x", pmreq->mr_address[i]);
-	}
+	for (unsigned int i = 0; i < pmreq->mr_alen; i++)
+		printf("%s%02x", i > 0 ? ":" : "", pmreq->mr_address[i]);
 	printf("}, %d) = %s\n", len, errstr);
 
 	/* setsockopt with valid mr_type */
@@ -85,9 +82,8 @@ test_packet_mreq(const int optname, const char *const optname_str)
 		printf("setsockopt(-1, SOL_PACKET, %s, {mr_ifindex=%d,"
 		       " mr_type=%s, mr_alen=%d, mr_address=",
 		       optname_str, pmreq->mr_ifindex, a[i].type_str, pmreq->mr_alen);
-		for (unsigned int i = 0; i < pmreq->mr_alen; i++) {
-			printf("%02x", pmreq->mr_address[i]);
-		}
+		for (unsigned int i = 0; i < pmreq->mr_alen; i++)
+			printf("%s%02x", i > 0 ? ":" : "", pmreq->mr_address[i]);
 		printf("}, %d) = %s\n", len, errstr);
 	}
 
