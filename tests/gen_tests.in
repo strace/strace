@@ -235,6 +235,9 @@ munlockall	-a13
 nanosleep	-a20
 net-icmp_filter	-e trace=getsockopt,setsockopt
 net-packet_mreq -e trace=setsockopt
+net-packet_mreq-Xabbrev	-e trace=setsockopt -Xabbrev
+net-packet_mreq-Xraw	-e trace=setsockopt -Xraw
+net-packet_mreq-Xverbose	-e trace=setsockopt -Xverbose
 net-sockaddr	-a24 -e trace=connect
 net-tpacket_req -e trace=setsockopt
 net-tpacket_stats -e trace=getsockopt

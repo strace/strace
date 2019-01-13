@@ -233,6 +233,9 @@ munlockall
 nanosleep
 net-icmp_filter
 net-packet_mreq
+net-packet_mreq-Xabbrev
+net-packet_mreq-Xraw
+net-packet_mreq-Xverbose
 net-sockaddr
 net-tpacket_req
 net-tpacket_stats

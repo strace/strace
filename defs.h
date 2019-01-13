@@ -814,6 +814,8 @@ extern const char *sprinttime_nsec(long long sec, unsigned long long nsec);
 extern const char *sprinttime_usec(long long sec, unsigned long long usec);
 
 extern const char *sprint_mac_addr(const uint8_t addr[], size_t size);
+extern void print_mac_addr(const char *prefix,
+			   const uint8_t addr[], size_t size);
 
 extern void print_uuid(const unsigned char *uuid);
 
@@ -1166,13 +1168,6 @@ static inline void
 printaddr_comment(const kernel_ulong_t addr)
 {
 	tprintf_comment("%#llx", (unsigned long long) addr);
-}
-
-static inline void
-print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
-{
-	tprints(prefix);
-	tprints(sprint_mac_addr(addr, size));
 }
 
 # if SUPPORTED_PERSONALITIES > 1

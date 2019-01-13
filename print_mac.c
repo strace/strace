@@ -33,3 +33,16 @@ sprint_mac_addr(const uint8_t addr[], size_t size)
 
 	return res;
 }
+
+void
+print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
+{
+	tprints(prefix);
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		print_quoted_string((const char *) addr, size,
+				    QUOTE_FORCE_HEX);
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+		? tprints_comment : tprints)(sprint_mac_addr(addr, size));
+}
