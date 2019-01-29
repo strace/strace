@@ -206,7 +206,9 @@ struct tcb {
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	void *_priv_data;	/* Private data for syscall decoding functions */
 	void (*_free_priv_data)(void *); /* Callback for freeing priv_data */
-	const struct_sysent *s_ent; /* sysent[scno] or dummy struct for bad scno */
+	const struct_sysent *s_ent; /* sysent[scno] or a stub struct for bad
+				     * scno.  Use tcp_sysent() macro for access.
+				     */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
 	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 	struct timespec stime;	/* System time usage as of last process wait */
@@ -285,6 +287,10 @@ struct tcb {
 # define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
 # define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
 
+extern const struct_sysent stub_sysent;
+# define tcp_sysent(tcp) (tcp->s_ent ?: &stub_sysent)
+# define n_args(tcp) (tcp_sysent(tcp)->nargs)
+
 # include "xlat.h"
 
 extern const struct xlat addrfams[];
@@ -355,7 +361,7 @@ extern const struct xlat whence_codes[];
 # define IOCTL_NUMBER_HANDLED 1
 # define IOCTL_NUMBER_STOP_LOOKUP 010
 
-# define indirect_ipccall(tcp) (tcp->s_ent->sys_flags & TRACE_INDIRECT_SUBCALL)
+# define indirect_ipccall(tcp) (tcp_sysent(tcp)->sys_flags & TRACE_INDIRECT_SUBCALL)
 
 enum sock_proto {
 	SOCK_PROTO_UNKNOWN,

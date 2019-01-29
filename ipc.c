@@ -21,7 +21,7 @@ SYS_FUNC(ipc)
 	printxval_u(ipccalls, call, NULL);
 
 	unsigned int i;
-	for (i = 1; i < tcp->s_ent->nargs; ++i)
+	for (i = 1; i < n_args(tcp); ++i)
 		tprintf(", %#" PRI_klx, tcp->u_arg[i]);
 
 	return RVAL_DECODED;

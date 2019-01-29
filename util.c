@@ -1161,7 +1161,7 @@ print_array_ex(struct tcb *const tcp,
 int
 printargs(struct tcb *tcp)
 {
-	const int n = tcp->s_ent->nargs;
+	const int n = n_args(tcp);
 	int i;
 	for (i = 0; i < n; ++i)
 		tprintf("%s%#" PRI_klx, i ? ", " : "", tcp->u_arg[i]);
@@ -1171,7 +1171,7 @@ printargs(struct tcb *tcp)
 int
 printargs_u(struct tcb *tcp)
 {
-	const int n = tcp->s_ent->nargs;
+	const int n = n_args(tcp);
 	int i;
 	for (i = 0; i < n; ++i)
 		tprintf("%s%u", i ? ", " : "",
@@ -1182,7 +1182,7 @@ printargs_u(struct tcb *tcp)
 int
 printargs_d(struct tcb *tcp)
 {
-	const int n = tcp->s_ent->nargs;
+	const int n = n_args(tcp);
 	int i;
 	for (i = 0; i < n; ++i)
 		tprintf("%s%d", i ? ", " : "",

@@ -167,7 +167,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 {
 	const struct_sysent *s;
 
-	s = tcp->s_ent;
+	s = tcp_sysent(tcp);
 
 	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC | TRACE_NETWORK)))
 		return false;

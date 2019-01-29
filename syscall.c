@@ -341,7 +341,7 @@ decode_ipc_subcall(struct tcb *tcp)
 	tcp->qual_flg = qual_flags(tcp->scno);
 	tcp->s_ent = &sysent[tcp->scno];
 
-	const unsigned int n = tcp->s_ent->nargs;
+	const unsigned int n = n_args(tcp);
 	unsigned int i;
 	for (i = 0; i < n; i++)
 		tcp->u_arg[i] = tcp->u_arg[i + 1];
@@ -361,7 +361,7 @@ dumpio(struct tcb *tcp)
 		return;
 
 	if (is_number_in_set(fd, write_set)) {
-		switch (tcp->s_ent->sen) {
+		switch (tcp_sysent(tcp)->sen) {
 		case SEN_write:
 		case SEN_pwrite:
 		case SEN_send:
@@ -388,7 +388,7 @@ dumpio(struct tcb *tcp)
 		return;
 
 	if (is_number_in_set(fd, read_set)) {
-		switch (tcp->s_ent->sen) {
+		switch (tcp_sysent(tcp)->sen) {
 		case SEN_read:
 		case SEN_pread:
 		case SEN_recv:
@@ -548,10 +548,9 @@ syscall_entering_decode(struct tcb *tcp)
 	int res = get_scno(tcp);
 	if (res == 0)
 		return res;
-	int scno_good = res;
 	if (res != 1 || (res = get_syscall_args(tcp)) != 1) {
 		printleader(tcp);
-		tprintf("%s(", scno_good == 1 ? tcp->s_ent->sys_name : "????");
+		tprintf("%s(", tcp_sysent(tcp)->sys_name);
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -563,7 +562,7 @@ syscall_entering_decode(struct tcb *tcp)
  || defined SYS_socket_subcall	\
  || defined SYS_syscall_subcall
 	for (;;) {
-		switch (tcp->s_ent->sen) {
+		switch (tcp_sysent(tcp)->sen) {
 # ifdef SYS_ipc_subcall
 		case SEN_ipc:
 			decode_ipc_subcall(tcp);
@@ -577,7 +576,7 @@ syscall_entering_decode(struct tcb *tcp)
 # ifdef SYS_syscall_subcall
 		case SEN_syscall:
 			decode_syscall_subcall(tcp);
-			if (tcp->s_ent->sen != SEN_syscall)
+			if (tcp_sysent(tcp)->sen != SEN_syscall)
 				continue;
 			break;
 # endif
@@ -599,7 +598,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		 */
 		tcp->qual_flg &= ~QUAL_INJECT;
 
-		switch (tcp->s_ent->sen) {
+		switch (tcp_sysent(tcp)->sen) {
 			case SEN_execve:
 			case SEN_execveat:
 			case SEN_execv:
@@ -631,14 +630,14 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 
 #ifdef ENABLE_STACKTRACE
 	if (stack_trace_enabled) {
-		if (tcp->s_ent->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
+		if (tcp_sysent(tcp)->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
 			unwind_tcb_capture(tcp);
 	}
 #endif
 
 	printleader(tcp);
-	tprintf("%s(", tcp->s_ent->sys_name);
-	int res = raw(tcp) ? printargs(tcp) : tcp->s_ent->sys_func(tcp);
+	tprintf("%s(", tcp_sysent(tcp)->sys_name);
+	int res = raw(tcp) ? printargs(tcp) : tcp_sysent(tcp)->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;
 }
@@ -668,7 +667,7 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 	if ((Tflag || cflag) && !filtered(tcp))
 		clock_gettime(CLOCK_MONOTONIC, pts);
 
-	if (tcp->s_ent->sys_flags & MEMORY_MAPPING_CHANGE)
+	if (tcp_sysent(tcp)->sys_flags & MEMORY_MAPPING_CHANGE)
 		mmap_notify_report(tcp);
 
 	if (filtered(tcp))
@@ -702,7 +701,7 @@ print_syscall_resume(struct tcb *tcp)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		tprintf("<... %s resumed>", tcp->s_ent->sys_name);
+		tprintf("<... %s resumed>", tcp_sysent(tcp)->sys_name);
 	}
 }
 
@@ -750,7 +749,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		if (tcp->sys_func_rval & RVAL_DECODED)
 			sys_res = tcp->sys_func_rval;
 		else
-			sys_res = tcp->s_ent->sys_func(tcp);
+			sys_res = tcp_sysent(tcp)->sys_func(tcp);
 	}
 
 	tprints(") ");
@@ -1237,6 +1236,13 @@ get_syscall_regs(struct tcb *tcp)
 	return get_regs(tcp);
 }
 
+const struct_sysent stub_sysent = {
+	.nargs = MAX_ARGS,
+	.sen = SEN_printargs,
+	.sys_func = printargs,
+	.sys_name = "????",
+};
+
 /*
  * Returns:
  * 0: "ignore this ptrace stop", syscall_entering_decode() should return a "bail
@@ -1248,6 +1254,10 @@ get_syscall_regs(struct tcb *tcp)
 int
 get_scno(struct tcb *tcp)
 {
+	tcp->scno = -1;
+	tcp->s_ent = NULL;
+	tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
+
 	if (get_syscall_regs(tcp) < 0)
 		return -1;
 
@@ -1275,14 +1285,11 @@ get_scno(struct tcb *tcp)
 		struct sysent_buf *s = xcalloc(1, sizeof(*s));
 
 		s->tcp = tcp;
-		s->ent.nargs = MAX_ARGS;
-		s->ent.sen = SEN_printargs;
-		s->ent.sys_func = printargs;
+		s->ent = stub_sysent;
 		s->ent.sys_name = s->buf;
 		xsprintf(s->buf, "syscall_%#" PRI_klx, shuffle_scno(tcp->scno));
 
 		tcp->s_ent = &s->ent;
-		tcp->qual_flg = QUAL_RAW | DEFAULT_QUAL_FLAGS;
 
 		set_tcb_priv_data(tcp, s, free_sysent_buf);
 
@@ -1308,7 +1315,7 @@ get_syscall_args(struct tcb *tcp)
 		for (unsigned int i = 0; i < ARRAY_SIZE(tcp->u_arg); ++i)
 			tcp->u_arg[i] = ptrace_sci.entry.args[i];
 #if SUPPORTED_PERSONALITIES > 1
-		if (tcp->s_ent->sys_flags & COMPAT_SYSCALL_TYPES) {
+		if (tcp_sysent(tcp)->sys_flags & COMPAT_SYSCALL_TYPES) {
 			for (unsigned int i = 0; i < ARRAY_SIZE(tcp->u_arg); ++i)
 				tcp->u_arg[i] = (uint32_t) tcp->u_arg[i];
 		}
@@ -1335,7 +1342,7 @@ get_syscall_result(struct tcb *tcp)
 	if (get_syscall_result_regs(tcp) < 0)
 		return -1;
 	get_error(tcp,
-		  (!(tcp->s_ent->sys_flags & SYSCALL_NEVER_FAILS)
+		  (!(tcp_sysent(tcp)->sys_flags & SYSCALL_NEVER_FAILS)
 			|| syscall_tampered(tcp))
                   && !syscall_tampered_nofail(tcp));
 
@@ -1381,7 +1388,7 @@ set_error(struct tcb *tcp, unsigned long new_error)
 		if (ptrace_syscall_info_is_valid())
 			tcp->u_rval = -1;
 		else
-			get_error(tcp, !(tcp->s_ent->sys_flags &
+			get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
 					 SYSCALL_NEVER_FAILS));
 	}
 }
@@ -1405,7 +1412,7 @@ set_success(struct tcb *tcp, kernel_long_t new_rval)
 		if (ptrace_syscall_info_is_valid())
 			tcp->u_error = 0;
 		else
-			get_error(tcp, !(tcp->s_ent->sys_flags &
+			get_error(tcp, !(tcp_sysent(tcp)->sys_flags &
 					 SYSCALL_NEVER_FAILS));
 	}
 }

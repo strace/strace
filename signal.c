@@ -405,10 +405,10 @@ SYS_FUNC(sgetmask)
 SYS_FUNC(sigsuspend)
 {
 #ifdef MIPS
-	print_sigset_addr_len(tcp, tcp->u_arg[tcp->s_ent->nargs - 1],
+	print_sigset_addr_len(tcp, tcp->u_arg[n_args(tcp) - 1],
 			      current_wordsize);
 #else
-	tprint_old_sigmask_val("", tcp->u_arg[tcp->s_ent->nargs - 1]);
+	tprint_old_sigmask_val("", tcp->u_arg[n_args(tcp) - 1]);
 #endif
 
 	return RVAL_DECODED;

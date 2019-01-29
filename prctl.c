@@ -61,7 +61,7 @@ print_prctl_args(struct tcb *tcp, const unsigned int first)
 {
 	unsigned int i;
 
-	for (i = first; i < tcp->s_ent->nargs; ++i)
+	for (i = first; i < n_args(tcp); ++i)
 		tprintf(", %#" PRI_klx, tcp->u_arg[i]);
 }
 

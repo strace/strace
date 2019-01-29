@@ -11,7 +11,7 @@ arch_get_syscall_args(struct tcb *tcp)
 {
 	if (x86_io.iov_len != sizeof(i386_regs)) {
 		/* x86-64 or x32 ABI */
-		if (tcp->s_ent->sys_flags & COMPAT_SYSCALL_TYPES) {
+		if (tcp_sysent(tcp)->sys_flags & COMPAT_SYSCALL_TYPES) {
 			/*
 			 * X32 compat syscall: zero-extend from 32 bits.
 			 * Use truncate_klong_to_current_wordsize(tcp->u_arg[N])

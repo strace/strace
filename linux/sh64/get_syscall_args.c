@@ -13,7 +13,7 @@ arch_get_syscall_args(struct tcb *tcp)
 	static const int syscall_regs[MAX_ARGS] = { 2, 3, 4, 5, 6, 7 };
 	unsigned int i;
 
-	for (i = 0; i < tcp->s_ent->nargs; ++i)
+	for (i = 0; i < n_args(tcp); ++i)
 		if (upeek(tcp, REG_GENERAL(syscall_regs[i]),
 			  &tcp->u_arg[i]) < 0)
 			return -1;

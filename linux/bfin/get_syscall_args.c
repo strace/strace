@@ -14,7 +14,7 @@ arch_get_syscall_args(struct tcb *tcp)
 	};
 	unsigned int i;
 
-	for (i = 0; i < tcp->s_ent->nargs; ++i)
+	for (i = 0; i < n_args(tcp); ++i)
 		if (upeek(tcp, argreg[i], &tcp->u_arg[i]) < 0)
 			return -1;
 	return 1;
