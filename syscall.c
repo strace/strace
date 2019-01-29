@@ -1238,6 +1238,7 @@ get_syscall_regs(struct tcb *tcp)
 
 const struct_sysent stub_sysent = {
 	.nargs = MAX_ARGS,
+	.sys_flags = MEMORY_MAPPING_CHANGE,
 	.sen = SEN_printargs,
 	.sys_func = printargs,
 	.sys_name = "????",
