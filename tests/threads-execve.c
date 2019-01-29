@@ -141,7 +141,7 @@ thread(void *arg)
 	}
 
 	printf("%-5d +++ superseded by execve in pid %u +++\n"
-	       "%-5d <... execve resumed> ) = 0\n",
+	       "%-5d <... execve resumed>) = 0\n",
 	       leader, tid,
 	       leader);
 

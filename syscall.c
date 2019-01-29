@@ -688,6 +688,26 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 	return get_syscall_result(tcp);
 }
 
+void
+print_syscall_resume(struct tcb *tcp)
+{
+	/* If not in -ff mode, and printing_tcp != tcp,
+	 * then the log currently does not end with output
+	 * of _our syscall entry_, but with something else.
+	 * We need to say which syscall's return is this.
+	 *
+	 * Forced reprinting via TCB_REPRINT is used only by
+	 * "strace -ff -oLOG test/threaded_execve" corner case.
+	 * It's the only case when -ff mode needs reprinting.
+	 */
+	if ((followfork < 2 && printing_tcp != tcp)
+	    || (tcp->flags & TCB_REPRINT)) {
+		tcp->flags &= ~TCB_REPRINT;
+		printleader(tcp);
+		tprintf("<... %s resumed>", tcp->s_ent->sys_name);
+	}
+}
+
 int
 syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 {
@@ -701,20 +721,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 	}
 
-	/* If not in -ff mode, and printing_tcp != tcp,
-	 * then the log currently does not end with output
-	 * of _our syscall entry_, but with something else.
-	 * We need to say which syscall's return is this.
-	 *
-	 * Forced reprinting via TCB_REPRINT is used only by
-	 * "strace -ff -oLOG test/threaded_execve" corner case.
-	 * It's the only case when -ff mode needs reprinting.
-	 */
-	if ((followfork < 2 && printing_tcp != tcp) || (tcp->flags & TCB_REPRINT)) {
-		tcp->flags &= ~TCB_REPRINT;
-		printleader(tcp);
-		tprintf("<... %s resumed> ", tcp->s_ent->sys_name);
-	}
+	print_syscall_resume(tcp);
 	printing_tcp = tcp;
 
 	tcp->s_prev_ent = NULL;
