@@ -602,9 +602,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		switch (tcp->s_ent->sen) {
 			case SEN_execve:
 			case SEN_execveat:
-#if defined SPARC || defined SPARC64
 			case SEN_execv:
-#endif
 				/*
 				 * First exec* syscall makes the log visible.
 				 */
