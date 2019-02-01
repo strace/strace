@@ -209,6 +209,7 @@ keyctl-Xabbrev
 keyctl-Xraw
 keyctl-Xverbose
 kill
+kill_child
 ksysent
 ksysent.h
 lchown

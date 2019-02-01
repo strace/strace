@@ -106,6 +106,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_perf-success \
 	ioctl_rtc-v \
 	is_linux_mips_n64 \
+	kill_child \
 	ksysent \
 	list_sigaction_signum \
 	localtime \
@@ -305,6 +306,7 @@ MISC_TESTS = \
 	get_regs.test \
 	inject-nf.test \
 	interactive_block.test \
+	kill_child.test \
 	ksysent.test \
 	localtime.test \
 	opipe.test \
