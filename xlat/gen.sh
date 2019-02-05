@@ -34,15 +34,14 @@ cond_def()
 		sed -r -n 's/^[^[:space:]]+[[:space:]]+([^[:space:]].*)$/\1/p')"
 
 	if [ -n "$def" ]; then
-		cat <<-EOF
-		#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)
-		DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE
-		static_assert(($val) == ($def), "$val != $def");
-		DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE
-		#else
-		# define $val $def
-		#endif
-		EOF
+		printf "%s\n" \
+			"#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)" \
+			"DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE" \
+			"static_assert(($val) == ($def), \"$val != $def\");" \
+			"DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE" \
+			"#else" \
+			"# define $val $def" \
+			"#endif"
 	fi
 }
 
@@ -91,11 +90,10 @@ cond_xlat()
 	fi
 
 	if [ -z "${def}" ]; then
-		cat <<-EOF
-		#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})
-		 ${xlat}
-		#endif
-		EOF
+		printf "%s\n" \
+			"#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})" \
+			" ${xlat}" \
+			"#endif"
 	else
 		echo "$xlat"
 	fi
