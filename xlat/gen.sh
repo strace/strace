@@ -7,6 +7,8 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+export LC_ALL=C
+
 usage()
 {
 	cat <<EOF
@@ -25,7 +27,7 @@ cond_def()
 
 	local val
 	val="$(printf %s "$line" |
-		LC_ALL=C sed -r -n 's/^([[:alpha:]_][[:alnum:]_]*).*$/\1/p')"
+		sed -r -n 's/^([[:alpha:]_][[:alnum:]_]*).*$/\1/p')"
 
 	local def
 	def="$(printf %s "${line}" |
@@ -128,7 +130,6 @@ gen_header()
 	local unconditional= line
 	# 1st pass: output directives.
 	while read line; do
-		LC_COLLATE=C
 		line=$(printf "%s" "$line" | \
 			sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
 
@@ -198,7 +199,6 @@ gen_header()
 	unconditional= val_type=
 	# 2nd pass: output everything.
 	while read line; do
-		LC_COLLATE=C
 		line=$(printf "%s" "$line" | \
 			sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
 
