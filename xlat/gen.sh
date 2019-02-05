@@ -132,8 +132,12 @@ gen_header()
 	local unconditional= line
 	# 1st pass: output directives.
 	while read line; do
-		line=$(printf "%s" "$line" | \
-			sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+		case "$line" in
+			*/\**)
+			line=$(printf "%s" "$line" |
+				sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+			;;
+		esac
 
 		case $line in
 		'#stop')
@@ -201,8 +205,12 @@ gen_header()
 	unconditional= val_type=
 	# 2nd pass: output everything.
 	while read line; do
-		line=$(printf "%s" "$line" | \
-			sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+		case "$line" in
+			*/\**)
+			line=$(printf "%s" "$line" |
+				sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+			;;
+		esac
 
 		case ${line} in
 		'#conditional')
