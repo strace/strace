@@ -111,9 +111,9 @@ gen_header()
 
 	value_indexed=0
 
-	if grep -F -x "$decl" "$defs" > /dev/null; then
+	if grep -F -q -x "$decl" "$defs"; then
 		in_defs=1
-	elif grep -F -x "$decl" "$mpers" > /dev/null; then
+	elif grep -F -q -x "$decl" "$mpers"; then
 		in_mpers=1
 	fi
 
