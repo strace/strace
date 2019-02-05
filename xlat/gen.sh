@@ -78,29 +78,29 @@ print_xlat_pair()
 
 cond_xlat()
 {
-	local line val m def xlat
-	line="$1"; shift
+	echo "$1" | {
+		local val def m xlat
 
-	val="$(printf %s "${line}" | sed -r -n 's/^([^[:space:]]+).*$/\1/p')"
-	m="${val%%|*}"
-	def="$(printf %s "${line}" |
-	       sed -r -n 's/^[^[:space:]]+[[:space:]]+([^[:space:]].*)$/\1/p')"
+		read val def
 
-	if [ "${m}" = "${m#1<<}" ]; then
-		xlat="$(print_xlat "${val}")"
-	else
-		xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}")"
-		m="${m#1<<}"
-	fi
+		m="${val%%|*}"
 
-	if [ -z "${def}" ]; then
-		printf "%s\n" \
-			"#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})" \
-			" ${xlat}" \
-			"#endif"
-	else
-		echo "$xlat"
-	fi
+		if [ "${m}" = "${m#1<<}" ]; then
+			xlat="$(print_xlat "${val}")"
+		else
+			xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}")"
+			m="${m#1<<}"
+		fi
+
+		if [ -z "${def}" ]; then
+			printf "%s\n" \
+				"#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})" \
+				" ${xlat}" \
+				"#endif"
+		else
+			echo "$xlat"
+		fi
+	}
 }
 
 gen_header()
