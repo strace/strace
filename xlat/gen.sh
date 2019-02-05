@@ -26,12 +26,16 @@ cond_def()
 	line="$1"; shift
 
 	local val
-	val="$(printf %s "$line" |
-		sed -r -n 's/^([[:alpha:]_][[:alnum:]_]*).*$/\1/p')"
+	val="${line%%[!A-Za-z0-9_]*}"
 
-	local def
-	def="$(printf %s "${line}" |
-		sed -r -n 's/^[^[:space:]]+[[:space:]]+([^[:space:]].*)$/\1/p')"
+	local t def=
+	t="${line#*[	 ]}"
+	if [ "$line" != "$t" ]; then
+		while [ "$def" != "$t" ]; do
+			def="$t"
+			t="${t##[	 ]}"
+		done
+	fi
 
 	if [ -n "$def" ]; then
 		printf "%s\n" \
