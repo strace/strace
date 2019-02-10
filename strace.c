@@ -382,7 +382,8 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	 * but before we tried to restart it. Log looks ugly.
 	 */
 	if (current_tcp && current_tcp->curcol != 0) {
-		tprintf(" <ptrace(%s):%s>\n", msg, strerror(err));
+		tprintf(" <Cannot restart pid %d with ptrace(%s): %s>\n",
+			tcp->pid, msg, strerror(err));
 		line_ended();
 	}
 	if (err == ESRCH)
