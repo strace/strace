@@ -142,10 +142,17 @@ static bool open_append;
 struct tcb *printing_tcp;
 static struct tcb *current_tcp;
 
+/**
+ * Tracing-backend-agnostic data. Embedded inside tracing-backend-specific
+ * structure.
+ */
 struct tcb_wait_data {
 	enum trace_event te; /**< Event passed to dispatch_event() */
-	int status;          /**< status, returned by wait4() */
-	unsigned long msg;   /**< Value returned by PTRACE_GETEVENTMSG */
+	union {
+		unsigned int sig;  /**< Signal tracee got. */
+		unsigned int exit; /**< Tracee's exit code. */
+	};
+	bool core_dumped;    /**< Wether core was dumped on termination. */
 	siginfo_t si;        /**< siginfo, returned by PTRACE_GETSIGINFO */
 };
 
@@ -153,7 +160,24 @@ static struct tcb **tcbtab;
 static unsigned int nprocs;
 static size_t tcbtabsize;
 
-static struct tcb_wait_data *tcb_wait_tab;
+
+/** ptrace-specific trace data */
+struct ptrace_wait_data {
+	struct tcb_wait_data wd; /**< Backend-agnostic data. */
+	unsigned int status;     /**< status, as returned by wait4(). */
+	unsigned int restart_op; /**< ptrace operation to restart tracee. */
+	unsigned long msg;       /**< Value returned by PTRACE_GETEVENTMSG. */
+};
+
+#define to_ptrace_wait_data(p_) containerof((p_), struct ptrace_wait_data, wd)
+
+/**
+ * (ptrace-specific) storage for queued wait4() responses.
+ * Since the queueing of tracees stops as soon as wait4() returns EAGAIN,
+ * or at least two events for a single tracee, tab_wait_tab size shouldn't
+ * exceed tcbtabsize + 1.
+ */
+static struct ptrace_wait_data *tcb_wait_tab;
 static size_t tcb_wait_tab_size;
 
 
@@ -336,7 +360,7 @@ ptrace_attach_or_seize(int pid)
 	int r;
 	if (!use_seize)
 		return ptrace_attach_cmd = "PTRACE_ATTACH",
-		       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
+	       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
 	r = ptrace(PTRACE_SEIZE, pid, 0L, (unsigned long) ptrace_setoptions);
 	if (r)
 		return ptrace_attach_cmd = "PTRACE_SEIZE", r;
@@ -2155,14 +2179,14 @@ out:
 }
 
 static struct tcb *
-maybe_switch_tcbs(struct tcb *tcp, const int pid)
+maybe_switch_tcbs(struct tcb *tcp, struct tcb_wait_data *wd)
 {
 	FILE *fp;
 	struct tcb *execve_thread;
-	long old_pid = tcb_wait_tab[tcp->wait_data_idx].msg;
+	long old_pid = to_ptrace_wait_data(wd)->msg;
 
 	/* Avoid truncation in pid2tcb() param passing */
-	if (old_pid <= 0 || old_pid == pid)
+	if (old_pid <= 0 || old_pid == tcp->pid)
 		return tcp;
 	if ((unsigned long) old_pid > UINT_MAX)
 		return tcp;
@@ -2176,7 +2200,8 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		 * One case we are here is -ff:
 		 * try "strace -oLOG -ff test/threaded_execve"
 		 */
-		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
+		fprintf(execve_thread->outf, " <pid changed to %d ...>\n",
+			tcp->pid);
 		/*execve_thread->curcol = 0; - no need, see code below */
 	}
 	/* Swap output FILEs (needed for -ff) */
@@ -2185,52 +2210,51 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	tcp->outf = fp;
 	/* And their column positions */
 	execve_thread->curcol = tcp->curcol;
+	execve_thread->pid = tcp->pid;
 	tcp->curcol = 0;
 	/* Drop leader, but close execve'd thread outfile (if -ff) */
 	droptcb(tcp);
-	/* Switch to the thread, reusing leader's outfile and pid */
-	tcp = execve_thread;
-	tcp->pid = pid;
+
 	if (cflag != CFLAG_ONLY_STATS) {
-		printleader(tcp);
+		printleader(execve_thread);
 		tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
 		line_ended();
-		tcp->flags |= TCB_REPRINT;
+		execve_thread->flags |= TCB_REPRINT;
 	}
 
-	return tcp;
+	return execve_thread;
 }
 
 static void
-print_signalled(struct tcb *tcp, const int pid, int status)
+print_signalled(struct tcb *tcp, const int pid, struct tcb_wait_data *wd)
 {
 	if (pid == strace_child) {
-		exit_code = 0x100 | WTERMSIG(status);
+		exit_code = 0x100 | wd->sig;
 		strace_child = 0;
 	}
 
 	if (cflag != CFLAG_ONLY_STATS
-	    && is_number_in_set(WTERMSIG(status), signal_set)) {
+	    && is_number_in_set(wd->sig, signal_set)) {
 		printleader(tcp);
 		tprintf("+++ killed by %s %s+++\n",
-			sprintsigname(WTERMSIG(status)),
-			WCOREDUMP(status) ? "(core dumped) " : "");
+			sprintsigname(wd->sig),
+			wd->core_dumped ? "(core dumped) " : "");
 		line_ended();
 	}
 }
 
 static void
-print_exited(struct tcb *tcp, const int pid, int status)
+print_exited(struct tcb *tcp, const int pid, int exit)
 {
 	if (pid == strace_child) {
-		exit_code = WEXITSTATUS(status);
+		exit_code = exit;
 		strace_child = 0;
 	}
 
 	if (cflag != CFLAG_ONLY_STATS &&
 	    qflag < 2) {
 		printleader(tcp);
-		tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
+		tprintf("+++ exited with %d +++\n", exit);
 		line_ended();
 	}
 }
@@ -2316,33 +2340,36 @@ print_event_exit(struct tcb *tcp)
 size_t
 trace_wait_data_size(struct tcb *tcp)
 {
-	return sizeof(struct tcb_wait_data);
+	return sizeof(struct ptrace_wait_data);
 }
 
 struct tcb_wait_data *
 init_trace_wait_data(void *p)
 {
-	struct tcb_wait_data *wd = p;
+	struct ptrace_wait_data *ptrace_wd = p;
 
-	memset(wd, 0, sizeof(*wd));
+	memset(ptrace_wd, 0, sizeof(*ptrace_wd));
+	ptrace_wd->restart_op = PTRACE_SYSCALL;
 
-	return wd;
+	return &ptrace_wd->wd;
 }
 
 struct tcb_wait_data *
 copy_trace_wait_data(const struct tcb_wait_data *wd)
 {
-	struct tcb_wait_data *new_wd = xmalloc(sizeof(*new_wd));
+	struct ptrace_wait_data *ptrace_wd = to_ptrace_wait_data(wd);
+	struct ptrace_wait_data *new_wd = xmalloc(sizeof(*new_wd));
 
-	memcpy(new_wd, wd, sizeof(*wd));
+	memcpy(new_wd, ptrace_wd, sizeof(*ptrace_wd));
 
-	return new_wd;
+	return &new_wd->wd;
 }
 
 void
 free_trace_wait_data(struct tcb_wait_data *wd)
 {
-	free(wd);
+	if (wd)
+		free(to_ptrace_wait_data(wd));
 }
 
 static void
@@ -2355,7 +2382,42 @@ tcb_wait_tab_check_size(size_t sz)
 				     sizeof(tcb_wait_tab[0]));
 }
 
-static const struct tcb_wait_data *
+static void
+classify_ptrace_stop(int pid, int status, struct ptrace_wait_data *wd)
+{
+	/*
+	 * PTRACE_GETSIGINFO succeeds if tracee has received a signal and fails
+	 * in other cases with EINVAL (when it has been stopped by signal).
+	 */
+	int ret = ptrace(PTRACE_GETSIGINFO, pid, 0, &wd->wd.si);
+
+	if (!ret) {
+		wd->wd.te = TE_SIGNAL_DELIVERY_STOP;
+		wd->wd.sig = WSTOPSIG(status);
+	} else if (errno == ESRCH) {
+		/* Process is gone */
+		wd->wd.te = TE_RESTART;
+	} else if (errno == EINVAL) {
+		wd->wd.te = TE_GROUP_STOP;
+
+		if (use_seize) {
+			/*
+			 * This ends ptrace-stop, but does *not* end group-stop.
+			 * This makes stopping signals work properly on straced
+			 * process (that is, process really stops. It used to
+			 * continue to run).
+			 */
+			wd->restart_op = PTRACE_LISTEN;
+			wd->wd.sig = 0;
+		} else {
+			wd->wd.sig = WSTOPSIG(status);
+		}
+	} else {
+		perror_msg("ptrace(PTRACE_GETSIGINFO, pid:%d)", pid);
+	}
+}
+
+struct tcb_wait_data *
 next_event(void)
 {
 	if (interrupted)
@@ -2454,7 +2516,7 @@ next_event(void)
 	 * appears (which may happen if a tracee SIGKILL'ed, for example).
 	 */
 	for (;;) {
-		struct tcb_wait_data *wd;
+		struct ptrace_wait_data *wd;
 
 		if (pid < 0) {
 			if (wait_errno == EINTR)
@@ -2517,9 +2579,12 @@ next_event(void)
 		wd->status = status;
 
 		if (WIFSIGNALED(status)) {
-			wd->te = TE_SIGNALLED;
+			wd->wd.te = TE_SIGNALLED;
+			wd->wd.sig = WTERMSIG(status);
+			wd->wd.core_dumped = WCOREDUMP(status);
 		} else if (WIFEXITED(status)) {
-			wd->te = TE_EXITED;
+			wd->wd.te = TE_EXITED;
+			wd->wd.exit = WEXITSTATUS(status);
 		} else {
 			/*
 			 * As WCONTINUED flag has not been specified to wait4,
@@ -2544,23 +2609,11 @@ next_event(void)
 					debug_func_msg("ignored SIGSTOP on "
 						       "pid %d", tcp->pid);
 					tcp->flags &= ~TCB_IGNORE_ONE_SIGSTOP;
-					wd->te = TE_RESTART;
+					wd->wd.te = TE_RESTART;
 				} else if (sig == syscall_trap_sig) {
-					wd->te = TE_SYSCALL_STOP;
+					wd->wd.te = TE_SYSCALL_STOP;
 				} else {
-					/*
-					 * True if tracee is stopped by signal
-					 * (as opposed to "tracee received
-					 * signal").
-					 * TODO: shouldn't we check for
-					 * errno == EINVAL too?
-					 * We can get ESRCH instead, you know...
-					 */
-					bool stopped = ptrace(PTRACE_GETSIGINFO,
-						pid, 0, &wd->si) < 0;
-
-					wd->te = stopped ? TE_GROUP_STOP
-							 : TE_SIGNAL_DELIVERY_STOP;
+					classify_ptrace_stop(pid, status, wd);
 				}
 				break;
 			case PTRACE_EVENT_STOP:
@@ -2573,10 +2626,11 @@ next_event(void)
 				case SIGTSTP:
 				case SIGTTIN:
 				case SIGTTOU:
-					wd->te = TE_GROUP_STOP;
+					wd->wd.te = TE_GROUP_STOP;
+					wd->wd.sig = WSTOPSIG(status);
 					break;
 				default:
-					wd->te = TE_RESTART;
+					wd->wd.te = TE_RESTART;
 				}
 				break;
 			case PTRACE_EVENT_EXEC:
@@ -2589,17 +2643,17 @@ next_event(void)
 				    &wd->msg) < 0)
 					wd->msg = 0;
 
-				wd->te = TE_STOP_BEFORE_EXECVE;
+				wd->wd.te = TE_STOP_BEFORE_EXECVE;
 				break;
 			case PTRACE_EVENT_EXIT:
-				wd->te = TE_STOP_BEFORE_EXIT;
+				wd->wd.te = TE_STOP_BEFORE_EXIT;
 				break;
 			case PTRACE_EVENT_FORK:
 			case PTRACE_EVENT_VFORK:
 			case PTRACE_EVENT_CLONE: {
 				unsigned long new_pid = 0;
 
-				wd->te = TE_RESTART;
+				wd->wd.te = TE_RESTART;
 
 				if (!followfork)
 					break;
@@ -2621,11 +2675,11 @@ next_event(void)
 				break;
 			}
 			default:
-				wd->te = TE_RESTART;
+				wd->wd.te = TE_RESTART;
 			}
 		}
 
-		if (!wd->te)
+		if (!wd->wd.te)
 			error_func_msg("Tracing event hasn't been determined "
 				       "for pid %d, status %0#x", pid, status);
 
@@ -2656,9 +2710,9 @@ next_event_get_tcp:
 	if (!elem) {
 		tcb_wait_tab_check_size(1);
 		memset(tcb_wait_tab, 0, sizeof(*tcb_wait_tab));
-		tcb_wait_tab->te = TE_NEXT;
+		tcb_wait_tab->wd.te = TE_NEXT;
 
-		return tcb_wait_tab;
+		return &(tcb_wait_tab->wd);
 	} else {
 		tcp = list_elem(elem, struct tcb, wait_list);
 		debug_func_msg("dequeued pid %d", tcp->pid);
@@ -2674,7 +2728,7 @@ next_event_exit:
 	/* Set current output file */
 	set_current_tcp(tcp);
 
-	return tcb_wait_tab + tcp->wait_data_idx;
+	return &(tcb_wait_tab[tcp->wait_data_idx].wd);
 }
 
 static int
@@ -2701,18 +2755,73 @@ trace_syscall(struct tcb *tcp, unsigned int *sig)
 	}
 }
 
+void
+handle_exec(struct tcb **current_tcp, struct tcb_wait_data *wd)
+{
+	/* The syscall succeeded, clear the flag.  */
+	(*current_tcp)->flags &= ~TCB_CHECK_EXEC_SYSCALL;
+	/*
+	 * Check that we are inside syscall now (next event after
+	 * PTRACE_EVENT_EXEC should be for syscall exiting).  If it is
+	 * not the case, we might have a situation when we attach to a
+	 * process and the first thing we see is a PTRACE_EVENT_EXEC
+	 * and all the following syscall state tracking is screwed up
+	 * otherwise.
+	 */
+	if (entering(*current_tcp)) {
+		int ret;
+
+		error_msg("Stray PTRACE_EVENT_EXEC from pid %d"
+			  ", trying to recover...",
+			  (*current_tcp)->pid);
+
+		(*current_tcp)->flags |= TCB_RECOVERING;
+		ret = trace_syscall(*current_tcp, &wd->sig);
+		(*current_tcp)->flags &= ~TCB_RECOVERING;
+
+		if (ret < 0) {
+			/* The reason is described in TE_SYSCALL_STOP */
+			return;
+		}
+	}
+
+	/*
+	 * Under Linux, execve changes pid to thread leader's pid,
+	 * and we see this changed pid on EVENT_EXEC and later,
+	 * execve sysexit. Leader "disappears" without exit
+	 * notification. Let user know that, drop leader's tcb,
+	 * and fix up pid in execve thread's tcb.
+	 * Effectively, execve thread's tcb replaces leader's tcb.
+	 *
+	 * BTW, leader is 'stuck undead' (doesn't report WIFEXITED
+	 * on exit syscall) in multithreaded programs exactly
+	 * in order to handle this case.
+	 *
+	 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
+	 * On 2.6 and earlier, it can return garbage.
+	 */
+	if (os_release >= KERNEL_VERSION(3, 0, 0))
+		set_current_tcp(maybe_switch_tcbs(*current_tcp, wd));
+}
+
+bool
+restart_process(struct tcb *current_tcp, struct tcb_wait_data *wd)
+{
+	struct ptrace_wait_data *ptrace_wd = to_ptrace_wait_data(wd);
+
+	if (ptrace_restart(ptrace_wd->restart_op, current_tcp, wd->sig) < 0) {
+		/* Note: ptrace_restart emitted error message */
+		return false;
+	}
+
+	return true;
+}
+
 /* Returns true iff the main trace loop has to continue. */
 static bool
-dispatch_event(const struct tcb_wait_data *wd)
+dispatch_event(struct tcb_wait_data *wd)
 {
-	unsigned int restart_op = PTRACE_SYSCALL;
-	unsigned int restart_sig = 0;
 	enum trace_event te = wd ? wd->te : TE_BREAK;
-	/*
-	 * Copy wd->status to a non-const variable to workaround glibc bugs
-	 * around union wait fixed by glibc commit glibc-2.24~391
-	 */
-	int status = wd ? wd->status : 0;
 
 	switch (te) {
 	case TE_BREAK:
@@ -2725,7 +2834,7 @@ dispatch_event(const struct tcb_wait_data *wd)
 		break;
 
 	case TE_SYSCALL_STOP:
-		if (trace_syscall(current_tcp, &restart_sig) < 0) {
+		if (trace_syscall(current_tcp, &wd->sig) < 0) {
 			/*
 			 * ptrace() failed in trace_syscall().
 			 * Likely a result of process disappearing mid-flight.
@@ -2742,81 +2851,25 @@ dispatch_event(const struct tcb_wait_data *wd)
 		break;
 
 	case TE_SIGNAL_DELIVERY_STOP:
-		restart_sig = WSTOPSIG(status);
-		print_stopped(current_tcp, &wd->si, restart_sig);
+		print_stopped(current_tcp, &wd->si, wd->sig);
 		break;
 
 	case TE_SIGNALLED:
-		print_signalled(current_tcp, current_tcp->pid, status);
+		print_signalled(current_tcp, current_tcp->pid, wd);
 		droptcb(current_tcp);
 		return true;
 
 	case TE_GROUP_STOP:
-		restart_sig = WSTOPSIG(status);
-		print_stopped(current_tcp, NULL, restart_sig);
-		if (use_seize) {
-			/*
-			 * This ends ptrace-stop, but does *not* end group-stop.
-			 * This makes stopping signals work properly on straced
-			 * process (that is, process really stops. It used to
-			 * continue to run).
-			 */
-			restart_op = PTRACE_LISTEN;
-			restart_sig = 0;
-		}
+		print_stopped(current_tcp, NULL, wd->sig);
 		break;
 
 	case TE_EXITED:
-		print_exited(current_tcp, current_tcp->pid, status);
+		print_exited(current_tcp, current_tcp->pid, wd->exit);
 		droptcb(current_tcp);
 		return true;
 
 	case TE_STOP_BEFORE_EXECVE:
-		/* The syscall succeeded, clear the flag.  */
-		current_tcp->flags &= ~TCB_CHECK_EXEC_SYSCALL;
-		/*
-		 * Check that we are inside syscall now (next event after
-		 * PTRACE_EVENT_EXEC should be for syscall exiting).  If it is
-		 * not the case, we might have a situation when we attach to a
-		 * process and the first thing we see is a PTRACE_EVENT_EXEC
-		 * and all the following syscall state tracking is screwed up
-		 * otherwise.
-		 */
-		if (entering(current_tcp)) {
-			int ret;
-
-			error_msg("Stray PTRACE_EVENT_EXEC from pid %d"
-				  ", trying to recover...",
-				  current_tcp->pid);
-
-			current_tcp->flags |= TCB_RECOVERING;
-			ret = trace_syscall(current_tcp, &restart_sig);
-			current_tcp->flags &= ~TCB_RECOVERING;
-
-			if (ret < 0) {
-				/* The reason is described in TE_SYSCALL_STOP */
-				return true;
-			}
-		}
-
-		/*
-		 * Under Linux, execve changes pid to thread leader's pid,
-		 * and we see this changed pid on EVENT_EXEC and later,
-		 * execve sysexit. Leader "disappears" without exit
-		 * notification. Let user know that, drop leader's tcb,
-		 * and fix up pid in execve thread's tcb.
-		 * Effectively, execve thread's tcb replaces leader's tcb.
-		 *
-		 * BTW, leader is 'stuck undead' (doesn't report WIFEXITED
-		 * on exit syscall) in multithreaded programs exactly
-		 * in order to handle this case.
-		 *
-		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
-		 * On 2.6 and earlier, it can return garbage.
-		 */
-		if (os_release >= KERNEL_VERSION(3, 0, 0))
-			set_current_tcp(maybe_switch_tcbs(current_tcp,
-							  current_tcp->pid));
+		handle_exec(&current_tcp, wd);
 
 		if (detach_on_execve) {
 			if (current_tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {
@@ -2848,8 +2901,7 @@ dispatch_event(const struct tcb_wait_data *wd)
 		return true;
 	}
 
-	if (ptrace_restart(restart_op, current_tcp, restart_sig) < 0) {
-		/* Note: ptrace_restart emitted error message */
+	if (!restart_process(current_tcp, wd)) {
 		exit_code = 1;
 		return false;
 	}
@@ -2919,7 +2971,8 @@ restart_delayed_tcbs(void)
 /*
  * As this signal handler does a lot of work that is not suitable
  * for signal handlers, extra care must be taken to ensure that
- * it is enabled only in those places where it's safe.
+ * it is enabled only in those places where it's safe (see the related
+ * comments in next_event).
  */
 static void
 timer_sighandler(int sig)
