@@ -339,6 +339,18 @@ ptrace_attach_or_seize(int pid)
 	return ptrace_attach_cmd = "PTRACE_INTERRUPT", r;
 }
 
+static const char *
+ptrace_op_str(unsigned int op)
+{
+	const char *str = xlookup(ptrace_cmds, op);
+	if (str)
+		return str;
+
+	static char buf[sizeof(op) * 3];
+	xsprintf(buf, "%u", op);
+	return buf;
+}
+
 /*
  * Used when we want to unblock stopped traced process.
  * Should be only used with PTRACE_CONT, PTRACE_DETACH and PTRACE_SYSCALL.
@@ -350,27 +362,12 @@ static int
 ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 {
 	int err;
-	const char *msg;
 
 	errno = 0;
 	ptrace(op, tcp->pid, 0L, (unsigned long) sig);
 	err = errno;
 	if (!err)
 		return 0;
-
-	switch (op) {
-		case PTRACE_CONT:
-			msg = "CONT";
-			break;
-		case PTRACE_DETACH:
-			msg = "DETACH";
-			break;
-		case PTRACE_LISTEN:
-			msg = "LISTEN";
-			break;
-		default:
-			msg = "SYSCALL";
-	}
 
 	/*
 	 * Why curcol != 0? Otherwise sometimes we get this:
@@ -383,13 +380,14 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	 */
 	if (current_tcp && current_tcp->curcol != 0) {
 		tprintf(" <Cannot restart pid %d with ptrace(%s): %s>\n",
-			tcp->pid, msg, strerror(err));
+			tcp->pid, ptrace_op_str(op), strerror(err));
 		line_ended();
 	}
 	if (err == ESRCH)
 		return 0;
 	errno = err;
-	perror_msg("ptrace(PTRACE_%s,pid:%d,sig:%u)", msg, tcp->pid, sig);
+	perror_msg("ptrace(%s,pid:%d,sig:%u)",
+		   ptrace_op_str(op), tcp->pid, sig);
 	return -1;
 }
 

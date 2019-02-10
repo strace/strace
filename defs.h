@@ -329,6 +329,7 @@ extern const struct xlat nl_netfilter_msg_types[];
 extern const struct xlat nl_route_types[];
 extern const struct xlat open_access_modes[];
 extern const struct xlat open_mode_flags[];
+extern const struct xlat ptrace_cmds[];
 extern const struct xlat resource_flags[];
 extern const struct xlat routing_scopes[];
 extern const struct xlat routing_table_ids[];
