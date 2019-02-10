@@ -81,7 +81,7 @@ strace_SOURCES =	\
 	bpf_attr.h	\
 	bpf_filter.c	\
 	bpf_filter.h	\
-	bpf_fprog.h 	\
+	bpf_fprog.h	\
 	bpf_seccomp_filter.c \
 	bpf_sock_filter.c \
 	btrfs.c		\
@@ -772,7 +772,7 @@ EXTRA_DIST =				\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
 	linux/shuffle_scno.c		\
-	linux/signal.h.in 		\
+	linux/signal.h.in		\
 	linux/signalent.h		\
 	linux/smc_diag.h		\
 	linux/sock_diag.h		\

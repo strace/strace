@@ -91,7 +91,7 @@ is_map_for_file(struct mmap_cache_entry_t *map_info, void *data)
 	/* major version for anon inode may be given in get_anon_bdev()
 	 * in linux kernel.
 	 *
-	 * 	*p = MKDEV(0, dev & MINORMASK);
+	 *	*p = MKDEV(0, dev & MINORMASK);
 	 *-----------------^
 	 */
 	return map_info->binary_filename &&

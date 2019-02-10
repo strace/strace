@@ -134,7 +134,7 @@ ioctl_mtd	+ioctl.test
 ioctl_nbd	+ioctl.test -y
 ioctl_nsfs	+ioctl.test -esignal=none
 ioctl_perf	+ioctl.test
-ioctl_ptp 	+ioctl.test
+ioctl_ptp	+ioctl.test
 ioctl_random	+ioctl.test
 ioctl_rtc	+ioctl.test
 ioctl_rtc-v	+ioctl.test -v
@@ -325,7 +325,7 @@ printpath-umovestr-peekdata	-a11 -e signal=none -e trace=chdir
 printpath-umovestr-undumpable	-a11 -e signal=none -e trace=chdir
 printsignal-Xabbrev	-a11 -Xabbrev -e signal=none -e trace=kill
 printsignal-Xraw	-a11 -Xraw -e signal=none -e trace=kill
-printsignal-Xverbose 	-a11 -Xverbose -e signal=none -e trace=kill
+printsignal-Xverbose	-a11 -Xverbose -e signal=none -e trace=kill
 printstr	-e trace=writev
 printstrn-umoven	-s4096 -e signal=none -e trace=add_key
 printstrn-umoven-peekdata	-e signal=none -e trace=add_key
