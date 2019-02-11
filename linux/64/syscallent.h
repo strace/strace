@@ -284,3 +284,4 @@
 [291] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [292] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 [293] = { 4,	0,		SEN(rseq),			"rseq"			},
+[294] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
