@@ -290,6 +290,7 @@
 [290] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [291] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [292] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[293] = { 4,	0,		SEN(rseq),			"rseq"			},
 
 #undef sys_ARCH_mmap
 #undef ARCH_WANT_SYNC_FILE_RANGE2

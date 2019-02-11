@@ -3,6 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Enhanced xlat styles support configured by -X option.
+  * Wired up rseq syscall on aarch64, arc, metag, nios2,
+    or1k, riscv, and tile architectures.
   * Updated lists of BPF_*, BTRFS_*, FAN_*, IFLA_*, KERN_*, KVM_CAP_*, NDA_*,
     NETNSA_*, NT_*, PR_*, REL_*, SECCOMP_*, SCTP_*, UDP_*, V4L2_*, and *_MAGIC
     constants.
