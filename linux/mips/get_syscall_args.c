@@ -52,7 +52,7 @@ decode_syscall_subcall(struct tcb *tcp)
 	/*
 	 * Fetching the last arg of 7-arg syscalls (fadvise64_64
 	 * and sync_file_range) requires additional code,
-	 * see linux/mips/get_syscall_args.c
+	 * see arch_get_syscall_args() above.
 	 */
 	if (n_args(tcp) == MAX_ARGS) {
 		if (umoven(tcp,
