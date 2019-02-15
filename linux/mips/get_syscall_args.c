@@ -38,6 +38,25 @@ arch_get_syscall_args(struct tcb *tcp)
 	return 1;
 }
 
+#ifdef LINUX_MIPSO32
+static void
+arch_get_syscall_args_extra(struct tcb *tcp, const unsigned int n)
+{
+	/* This assumes n >= 4. */
+	if (n_args(tcp) > n
+	    && umoven(tcp, mips_REG_SP + n * sizeof(tcp->u_arg[0]),
+		      (n_args(tcp) - n) * sizeof(tcp->u_arg[0]),
+		      &tcp->u_arg[n]) < 0) {
+		/*
+		 * Let's proceed with the first n arguments
+		 * instead of reporting the failure.
+		 */
+		memset(&tcp->u_arg[n], 0,
+		       (n_args(tcp) - n) * sizeof(tcp->u_arg[0]));
+	}
+}
+#endif
+
 #ifdef SYS_syscall_subcall
 static void
 decode_syscall_subcall(struct tcb *tcp)

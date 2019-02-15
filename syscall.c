@@ -446,6 +446,9 @@ static int arch_get_syscall_args(struct tcb *);
 static void arch_get_error(struct tcb *, bool);
 static int arch_set_error(struct tcb *);
 static int arch_set_success(struct tcb *);
+#if MAX_ARGS > 6
+static void arch_get_syscall_args_extra(struct tcb *, unsigned int);
+#endif
 
 struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
@@ -1313,13 +1316,23 @@ static int
 get_syscall_args(struct tcb *tcp)
 {
 	if (ptrace_syscall_info_is_valid()) {
-		for (unsigned int i = 0; i < ARRAY_SIZE(tcp->u_arg); ++i)
+		const unsigned int n =
+			MIN(ARRAY_SIZE(tcp->u_arg),
+			    ARRAY_SIZE(ptrace_sci.entry.args));
+		for (unsigned int i = 0; i < n; ++i)
 			tcp->u_arg[i] = ptrace_sci.entry.args[i];
 #if SUPPORTED_PERSONALITIES > 1
 		if (tcp_sysent(tcp)->sys_flags & COMPAT_SYSCALL_TYPES) {
-			for (unsigned int i = 0; i < ARRAY_SIZE(tcp->u_arg); ++i)
+			for (unsigned int i = 0; i < n; ++i)
 				tcp->u_arg[i] = (uint32_t) tcp->u_arg[i];
 		}
+#endif
+		/*
+		 * So far it's just a workaround for mips o32,
+		 * but let's pretend it could be used elsewhere.
+		 */
+#if MAX_ARGS > 6
+		arch_get_syscall_args_extra(tcp, n);
 #endif
 		return 1;
 	}
