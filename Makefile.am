@@ -529,6 +529,7 @@ EXTRA_DIST =				\
 	linux/hppa/set_scno.c		\
 	linux/hppa/signalent.h		\
 	linux/hppa/syscallent.h		\
+	linux/hppa/userent.h		\
 	linux/i386/arch_defs_.h		\
 	linux/i386/arch_kvm.c		\
 	linux/i386/arch_regs.c		\
