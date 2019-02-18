@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+[ "x${D:-0}" != x1 ] || set -x
+
 input="$1"
 shift
 

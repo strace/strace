@@ -927,6 +927,7 @@ $(srcdir)/.version:
 	$(AM_V_GEN)echo $(VERSION) > $@-t && mv $@-t $@
 
 bpf_attr_check.c: $(srcdir)/bpf_attr.h $(srcdir)/gen_bpf_attr_check.sh
+	D="$(D)" \
 	$(srcdir)/gen_bpf_attr_check.sh $< > $@-t && mv $@-t $@
 
 strace_SOURCES_c = \
@@ -946,6 +947,7 @@ syscallent_files = $(filter $(syscallent_patterns),$(EXTRA_DIST))
 
 sen.h: $(patsubst %,$(srcdir)/%,$(syscallent_files))
 	for f in $^; do cat -- $$f; done | \
+		D="$(D)" \
 		$(srcdir)/generate_sen.sh > $@
 
 dist-hook:
@@ -1037,6 +1039,7 @@ libmpers_CFLAGS = $(strace_CFLAGS)
 
 mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
 	for f in $^; do \
+		D="$(D)" \
 		READELF="$(READELF)" \
 		CC="$(CC)" \
 		CFLAGS="$(mpers_sh_opts) -DMPERS_IS_$(mpers_NAME)" \
@@ -1155,6 +1158,8 @@ $(srcdir)/CREDITS: $(srcdir)/CREDITS.in $(srcdir)/.mailmap \
 		   $(srcdir)/Makefile.in $(srcdir)/.version
 	$(AM_V_GEN)							\
 	(								\
+	  D="$(D)";							\
+	  export D;							\
 	  cd $(srcdir);							\
 	  sed '/^##/,$$d' CREDITS.in;					\
 	  sed -n '1,/^##>/d; s/   */\t/; s/^./&/p' CREDITS.in		\

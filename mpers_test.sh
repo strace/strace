@@ -7,6 +7,8 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+[ "x${D:-0}" != x1 ] || set -x
+
 mpers_name="$1"; shift
 mpers_cc_flags="$1"; shift
 size="$(printf %s "$mpers_name" |tr -cd '[0-9]')"

@@ -6,6 +6,8 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+[ "x${D:-0}" != x1 ] || set -x
+
 export LC_ALL=C
 
 MPERS_AWK="${0%/*}/mpers.awk"

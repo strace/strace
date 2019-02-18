@@ -5,6 +5,8 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
+[ "x${D:-0}" != x1 ] || set -x
+
 print_help()
 {
 	cat <<__EOF__
