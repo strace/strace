@@ -15,18 +15,20 @@
 require_min_kernel_version_or_skip 3.1
 
 check_prog diff
+run_prog_skip_if_failed date +%s > /dev/null
+s0="$(date +%s)"
+
 run_prog > /dev/null
 
 set -- -a21 -f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend $args
 
 # Due to probabilistic nature of the test, try it several times.
-i=0
-while [ $i -le 19 ]; do
-	i="$(($i+1))"
+while :; do
 	run_strace "$@" > "$EXP"
 	sed 1d < "$LOG" > "$OUT"
-	diff -- "$EXP" "$OUT" || continue
-	exit 0
+	diff -- "$EXP" "$OUT" && exit 0
+	s1="$(date +%s)"
+	if [ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ]; then
+		fail_ "$STRACE $* output mismatch"
+	fi
 done
-
-fail_ "$STRACE $* output mismatch"
