@@ -36,6 +36,27 @@
 
 struct gdb_conn;
 
+/**
+ * Structure containing response for vFile requests[1].
+ *
+ * [1] https://sourceware.org/gdb/onlinedocs/gdb/Host-I_002fO-Packets.html
+ */
+struct vfile_response {
+	/** The whole reply, callee-allocated. */
+	char *reply;
+	/** Result, returned from the target */
+	int64_t result;
+	/** Error number returned from the target */
+	int64_t errnum;
+	/** Size of attachment, in bytes */
+	uint64_t attachment_size;
+	/**
+	 * Pointer to the attachment inside reply. The attachment is hex-encoded
+	 * (should be subjected to gdb_decode_hex* before usage).
+	 */
+	const char *attachment;
+};
+
 void gdb_encode_hex(uint8_t byte, char *out);
 uint16_t gdb_decode_hex(char msb, char lsb);
 uint64_t gdb_decode_hex_n(const char *bytes, size_t n);

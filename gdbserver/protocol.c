@@ -695,14 +695,6 @@ gdb_xfer_read(struct gdb_conn *conn, const char *object, const char *annex,
 	return NULL;
 }
 
-struct vfile_response {
-	char *reply;
-	int64_t result;
-	int64_t errnum; /* avoid 'errno' macros */
-	size_t attachment_size;
-	const char *attachment;
-};
-
 static struct vfile_response
 gdb_vfile(struct gdb_conn *conn, const char *operation, const char *parameters)
 {
@@ -711,7 +703,6 @@ gdb_vfile(struct gdb_conn *conn, const char *operation, const char *parameters)
 	char *cmd;
 	int cmd_size = asprintf(&cmd, "vFile:%s:%s", operation, parameters);
 	if (cmd_size < 0)
-		/* XXX Returns automatic variable! */
 		return res;
 
 	gdb_send(conn, cmd, strlen(cmd));
@@ -730,39 +721,13 @@ gdb_vfile(struct gdb_conn *conn, const char *operation, const char *parameters)
 		}
 
 		const char *errnum = memchr(res.reply, ',', size - res.attachment_size);
+		/*
+		 * XXX convert errno value
+		 *     https://sourceware.org/gdb/onlinedocs/gdb/Errno-Values.html
+		 */
 		if (errnum)
 			res.errnum = gdb_decode_signed_hex_str(errnum + 1);
 	}
-	/* XXX Returns automatic variable! */
+
 	return res;
-}
-
-int
-gdb_readlink(struct gdb_conn *conn, const char *linkpath,
-	char *buf, unsigned bufsize)
-{
-	char *parameters = gdb_encode_hex_string(linkpath);
-	if (!parameters)
-		return -1;
-
-	struct vfile_response res = gdb_vfile(conn, "readlink", parameters);
-	free(parameters);
-
-	int ret = -1;
-
-	if (res.result >= 0 && res.attachment != NULL &&
-	    res.result == (int64_t) res.attachment_size) {
-		size_t data_len = res.attachment_size;
-
-		if (data_len >= bufsize)
-			data_len = bufsize - 1; /* XXX truncate -- ok? */
-
-		memcpy(buf, res.attachment, data_len);
-		buf[data_len] = 0;
-		ret = data_len;
-	}
-
-	free(res.reply);
-
-	return ret;
 }

@@ -1142,22 +1142,50 @@ gdb_upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t res)
 	return gdb_write_mem(tcp->pid, off, current_wordsize, (char*)&buffer);
 }
 
-
+/**
+ * readlink(2) implementation.
+ *  - Returns amount of bytes written to buf or -1 on error.
+ *  - Doesn't write terminating null byte.
+ *  - If result is more than bufsize, bufsize bytes is returned (result
+ *    is truncated)
+ */
 int
-gdb_getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
+gdb_readlink(struct tcb *tcp, const char *linkpath,
+	char *buf, size_t bufsize)
 {
-	if (!gdb || fd < 0)
+	char *parameters = gdb_encode_hex_string(linkpath);
+	if (!parameters) {
+		errno = ENAMETOOLONG;
 		return -1;
+	}
 
-	/*
-	 * As long as we assume a Linux target, we can peek at their procfs
-	 * just like normal getfdpath does.  Maybe that won't always be true.
-	 */
-	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
-	sprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
-	return gdb_readlink(gdb, linkpath, buf, bufsize);
+	struct vfile_response res = gdb_vfile(gdb, "readlink", parameters);
+	free(parameters);
+
+	int ret = -1;
+
+	if (res.result >= 0 && res.attachment != NULL &&
+	    res.result == (int64_t) res.attachment_size) {
+		uint64_t data_len = res.attachment_size;
+
+		if (data_len >= bufsize)
+			data_len = bufsize;
+		if (data_len > SSIZE_MAX)
+			data_len = SSIZE_MAX;
+
+		if (gdb_decode_hex_buf(res.attachment, data_len << 1, buf))
+			res.errnum = EIO;
+		else
+			ret = data_len;
+	}
+
+	free(res.reply);
+
+	if (ret == -1)
+		errno = res.errnum;
+
+	return ret;
 }
-
 
 bool
 gdb_verify_args(const char *username, bool daemon, unsigned int *follow_fork)
@@ -1274,17 +1302,20 @@ const struct tracing_backend gdbserver_backend = {
 
 	.next_event         = gdb_next_event,
 	.handle_exec        = (0),
-	.handle_group_stop  = gdb_handle_group_stop,
-	.get_siginfo        = (0),
 	.restart_process    = gdb_restart_process,
 
 	.clear_regs         = (0),
 	.get_regs           = gdb_get_registers,
 	.get_scno           = gdb_get_scno,
 	.set_scno           = gdb_set_scno,
-	.set_error          = ptrace_set_error,
-	.set_success        = ptrace_set_success,
-	.get_syscall_result = ptrace_get_syscall_result,
+
+	.set_error          = /* XXX */ ptrace_set_error,
+	.set_success        = /* XXX */ ptrace_set_success,
+
+	.get_instruction_pointer = generic_get_instruction_pointer,
+	.get_stack_pointer       = generic_get_stack_pointer,
+	.get_syscall_args        = /* XXX */ ptrace_get_syscall_args,
+	.get_syscall_result      = /* XXX */ ptrace_get_syscall_result,
 
 	.umoven             = gdb_umoven,
 	.umovestr           = gdb_umovestr,
@@ -1295,7 +1326,7 @@ const struct tracing_backend gdbserver_backend = {
 	.open               = (0),
 	.pread              = (0),
 	.close              = (0),
-	.readlink           = (0),
+	.readlink           = gdb_tracee_readlink,
 	.getxattr           = (0),
 	.socket             = (0),
 	.sendmsg            = (0),
