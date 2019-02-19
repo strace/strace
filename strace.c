@@ -309,7 +309,6 @@ void ATTRIBUTE_NORETURN
 die(void)
 {
 	if (strace_tracer_pid == getpid()) {
-		cflag = 0;
 		cleanup();
 		exit(1);
 	}
@@ -1947,8 +1946,6 @@ cleanup(void)
 		}
 		detach(tcp);
 	}
-	if (cflag)
-		call_summary(shared_log);
 }
 
 static void
@@ -2646,6 +2643,8 @@ static void ATTRIBUTE_NORETURN
 terminate(void)
 {
 	cleanup();
+	if (cflag)
+		call_summary(shared_log);
 	fflush(NULL);
 	if (shared_log != stderr)
 		fclose(shared_log);
