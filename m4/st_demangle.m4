@@ -27,26 +27,29 @@ use_libiberty=no
 AS_IF([test "x$with_libiberty" != xno],
       [saved_CPPFLAGS="$CPPFLAGS"
        CPPFLAGS="$CPPFLAGS $libiberty_CPPFLAGS"
+       found_demangle_h=no
        AC_CHECK_HEADERS([demangle.h libiberty/demangle.h],
-	 [saved_LDFLAGS="$LDFLAGS"
-	  LDFLAGS="$LDFLAGS $libiberty_LDFLAGS"
-	  AC_CHECK_LIB([iberty],[cplus_demangle],
-	    [libiberty_LIBS="-liberty"
-	     use_libiberty=yes
-	    ],
-	    [if test "x$with_libiberty" != xcheck; then
-	       AC_MSG_FAILURE([failed to find cplus_demangle in libiberty])
-	     fi
-	    ]
-	  )
-	  LDFLAGS="$saved_LDFLAGS"
-	 ],
-	 [if test "x$with_libiberty" != xcheck; then
-	      AC_MSG_FAILURE([failed to find demangle.h])
-	  fi
-	 ]
-       )
+			[found_demangle_h=yes])
        CPPFLAGS="$saved_CPPFLAGS"
+       AS_IF([test "x$found_demangle_h" = xyes],
+	     [saved_LDFLAGS="$LDFLAGS"
+	      LDFLAGS="$LDFLAGS $libiberty_LDFLAGS"
+	      AC_CHECK_LIB([iberty],[cplus_demangle],
+		[libiberty_LIBS="-liberty"
+		 use_libiberty=yes
+		],
+		[if test "x$with_libiberty" != xcheck; then
+		   AC_MSG_FAILURE([failed to find cplus_demangle in libiberty])
+		 fi
+		]
+	      )
+	      LDFLAGS="$saved_LDFLAGS"
+	     ],
+	     [if test "x$with_libiberty" != xcheck; then
+		AC_MSG_FAILURE([failed to find demangle.h])
+	      fi
+	     ]
+       )
       ]
 )
 
