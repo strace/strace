@@ -1748,10 +1748,8 @@ init(int argc, char *argv[])
 	if (cflag == CFLAG_ONLY_STATS) {
 		if (iflag)
 			error_msg("-%c has no effect with -c", 'i');
-#ifdef ENABLE_STACKTRACE
 		if (stack_trace_enabled)
 			error_msg("-%c has no effect with -c", 'k');
-#endif
 		if (rflag)
 			error_msg("-%c has no effect with -c", 'r');
 		if (tflag)

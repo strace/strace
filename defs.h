@@ -418,6 +418,8 @@ extern unsigned followfork;
 # ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
 extern bool stack_trace_enabled;
+# else
+#  define stack_trace_enabled 0
 # endif
 extern unsigned ptrace_setoptions;
 extern unsigned max_strlen;
