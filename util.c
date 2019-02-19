@@ -359,6 +359,36 @@ sprinttime_nsec(long long sec, unsigned long long nsec)
 	return sprinttime_ex(sec, nsec, 999999999, 9);
 }
 
+void
+print_uuid(const unsigned char *uuid)
+{
+	const char str[] = {
+		BYTE_HEX_CHARS(uuid[0]),
+		BYTE_HEX_CHARS(uuid[1]),
+		BYTE_HEX_CHARS(uuid[2]),
+		BYTE_HEX_CHARS(uuid[3]),
+		'-',
+		BYTE_HEX_CHARS(uuid[4]),
+		BYTE_HEX_CHARS(uuid[5]),
+		'-',
+		BYTE_HEX_CHARS(uuid[6]),
+		BYTE_HEX_CHARS(uuid[7]),
+		'-',
+		BYTE_HEX_CHARS(uuid[8]),
+		BYTE_HEX_CHARS(uuid[9]),
+		'-',
+		BYTE_HEX_CHARS(uuid[10]),
+		BYTE_HEX_CHARS(uuid[11]),
+		BYTE_HEX_CHARS(uuid[12]),
+		BYTE_HEX_CHARS(uuid[13]),
+		BYTE_HEX_CHARS(uuid[14]),
+		BYTE_HEX_CHARS(uuid[15]),
+		'\0'
+	};
+
+	tprints(str);
+}
+
 enum sock_proto
 getfdproto(struct tcb *tcp, int fd)
 {

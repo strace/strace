@@ -126,35 +126,6 @@ struct btrfs_ioctl_search_args_v2 {
 # include "xlat/btrfs_space_info_flags.h"
 # include "xlat/btrfs_tree_objectids.h"
 
-static inline char
-prnibble(char v)
-{
-	if (v >= 10)
-		return 'a' + (v - 10);
-	return '0' + v;
-}
-
-/* 8-4-4-4-12 = 36 characters */
-# define UUID_STRING_SIZE 36
-
-/* Formats uuid, returns 0 if it's all zeroes */
-static int
-btrfs_unparse_uuid(unsigned char *uuid, char *out)
-{
-	int i;
-	int ret = 0;
-	for (i = 0; i < BTRFS_UUID_SIZE; i++) {
-		if (i == 4 || i == 6 || i == 8 || i == 10)
-			*out++ = '-';
-		*out++ = prnibble(uuid[i] >> 4);
-		*out++ = prnibble(uuid[i] & 0xf);
-		if (uuid[i])
-			ret = 1;
-	}
-	*out = '\0';
-	return ret;
-}
-
 static void
 btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
 {
@@ -563,8 +534,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_DEV_INFO: { /* RW */
 		struct btrfs_ioctl_dev_info_args args;
-		char uuid[UUID_STRING_SIZE+1];
-		int valid;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -575,18 +544,20 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		valid = btrfs_unparse_uuid(args.uuid, uuid);
 		if (entering(tcp)) {
 			PRINT_FIELD_DEV("{", args, devid);
-			if (valid)
-				tprintf(", uuid=%s", uuid);
+			if (!IS_ARRAY_ZERO(args.uuid))
+				PRINT_FIELD_UUID(", ", args, uuid);
 			tprints("}");
 			return 0;
 		}
 
 		tprints("{");
-		if (valid)
-			tprintf("uuid=%s, ", uuid);
+
+		if (!IS_ARRAY_ZERO(args.uuid)) {
+			PRINT_FIELD_UUID("", args, uuid);
+			tprints(", ");
+		}
 
 		PRINT_FIELD_U("", args, bytes_used);
 		PRINT_FIELD_U(", ", args, total_bytes);
@@ -716,7 +687,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_FS_INFO: { /* R */
 		struct btrfs_ioctl_fs_info_args args;
-		char uuid[UUID_STRING_SIZE+1];
 		uint32_t nodesize, sectorsize, clone_alignment;
 # ifndef HAVE_STRUCT_BTRFS_IOCTL_FS_INFO_ARGS_NODESIZE
 		uint32_t *reserved32;
@@ -739,13 +709,11 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		sectorsize = reserved32[1];
 		clone_alignment = reserved32[2];
 # endif
-		btrfs_unparse_uuid(args.fsid, uuid);
-
 		PRINT_FIELD_U("{", args, max_id);
 		PRINT_FIELD_U(", ", args, num_devices);
-		tprintf(", fsid=%s, nodesize=%u, sectorsize=%u"
-			", clone_alignment=%u",
-			uuid, nodesize, sectorsize, clone_alignment);
+		PRINT_FIELD_UUID(", ", args, fsid);
+		tprintf(", nodesize=%u, sectorsize=%u, clone_alignment=%u",
+			nodesize, sectorsize, clone_alignment);
 		tprints("}");
 		break;
 	}
@@ -997,7 +965,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_SET_RECEIVED_SUBVOL: { /* RW */
 		struct_btrfs_ioctl_received_subvol_args args;
-		char uuid[UUID_STRING_SIZE+1];
 
 		if (entering(tcp))
 			tprints(", ");
@@ -1010,8 +977,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			btrfs_unparse_uuid((unsigned char *)args.uuid, uuid);
-			tprintf("{uuid=%s", uuid);
+			PRINT_FIELD_UUID("{", args, uuid);
 			PRINT_FIELD_U(", ", args, stransid);
 			print_btrfs_timespec(", stime=",
 					     args.stime.sec, args.stime.nsec);

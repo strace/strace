@@ -111,6 +111,12 @@
 
 # define PRINT_FIELD_UID PRINT_FIELD_ID
 
+# define PRINT_FIELD_UUID(prefix_, where_, field_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_uuid((const unsigned char *) ((where_).field_));	\
+	} while (0)
+
 # define PRINT_FIELD_U64(prefix_, where_, field_)					\
 	do {										\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);				\

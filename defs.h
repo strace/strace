@@ -803,6 +803,8 @@ extern const char *sprinttime_usec(long long sec, unsigned long long usec);
 
 extern const char *sprint_mac_addr(const uint8_t addr[], size_t size);
 
+extern void print_uuid(const unsigned char *uuid);
+
 extern void print_symbolic_mode_t(unsigned int);
 extern void print_numeric_umode_t(unsigned short);
 extern void print_numeric_long_umask(unsigned long);
