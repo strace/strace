@@ -243,6 +243,7 @@ strace_SOURCES =	\
 	print_timespec.c \
 	print_timeval.c	\
 	print_timex.c	\
+	print_utils.h	\
 	printmode.c	\
 	printrusage.c	\
 	printsiginfo.c	\

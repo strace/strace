@@ -24,6 +24,7 @@
 #include <sys/uio.h>
 
 #include "largefile_wrappers.h"
+#include "print_utils.h"
 #include "xlat.h"
 #include "xstring.h"
 
@@ -490,7 +491,7 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 	char *s = outstr;
 	unsigned int i;
 	int usehex, c, eol;
-	bool escape;
+	bool printable;
 
 	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
@@ -538,8 +539,7 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 				goto asciz_ended;
 			*s++ = '\\';
 			*s++ = 'x';
-			*s++ = "0123456789abcdef"[c >> 4];
-			*s++ = "0123456789abcdef"[c & 0xf];
+			s = sprint_byte_hex(s, c);
 		}
 
 		goto string_ended;
@@ -579,12 +579,12 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = 'v';
 			break;
 		default:
-			escape = (c < ' ') || (c > 0x7e);
+			printable = is_print(c);
 
-			if (!escape && escape_chars)
-				escape = !!strchr(escape_chars, c);
+			if (printable && escape_chars)
+				printable = !strchr(escape_chars, c);
 
-			if (!escape) {
+			if (printable) {
 				*s++ = c;
 			} else {
 				/* Print \octal */
@@ -942,8 +942,7 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		/* Hex dump */
 		do {
 			if (i < len) {
-				*dst++ = "0123456789abcdef"[*src >> 4];
-				*dst++ = "0123456789abcdef"[*src & 0xf];
+				dst = sprint_byte_hex(dst, *src);
 			} else {
 				*dst++ = ' ';
 				*dst++ = ' ';
@@ -958,7 +957,7 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		i -= 16;
 		src -= 16;
 		do {
-			if (*src >= ' ' && *src < 0x7f)
+			if (is_print(*src))
 				*dst++ = *src;
 			else
 				*dst++ = '.';

@@ -42,6 +42,7 @@ typedef struct v4l2_standard struct_v4l2_standard;
 #include MPERS_DEFS
 
 #include "print_fields.h"
+#include "print_utils.h"
 #include "xstring.h"
 
 /* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
@@ -70,6 +71,7 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 	unsigned int i;
 
 	tprints("v4l2_fourcc(");
+	/* Generic char array printing routine.  */
 	for (i = 0; i < ARRAY_SIZE(a); ++i) {
 		unsigned char c = a[i];
 
@@ -84,7 +86,7 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 				'\0'
 			};
 			tprints(sym);
-		} else if (c >= ' ' && c <= 0x7e) {
+		} else if (is_print(c)) {
 			char sym[] = {
 				'\'',
 				c,
@@ -94,12 +96,7 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 			tprints(sym);
 		} else {
 			char hex[] = {
-				'\'',
-				'\\',
-				'x',
-				"0123456789abcdef"[c >> 4],
-				"0123456789abcdef"[c & 0xf],
-				'\'',
+				BYTE_HEX_CHARS_PRINTF_QUOTED(c),
 				'\0'
 			};
 			tprints(hex);
