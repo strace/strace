@@ -25,6 +25,7 @@
 
 #include "largefile_wrappers.h"
 #include "print_utils.h"
+#include "static_assert.h"
 #include "xlat.h"
 #include "xstring.h"
 
@@ -924,52 +925,166 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 #undef iov
 }
 
-void
-dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+#define ILOG2_ITER_(val_, ret_, bit_)					\
+	do {								\
+		typeof(ret_) shift_ =					\
+			((val_) > ((((typeof(val_)) 1)			\
+				   << (1 << (bit_))) - 1)) << (bit_);	\
+		(val_) >>= shift_;					\
+		(ret_) |= shift_;					\
+	} while (0)
+
+/**
+ * Calculate floor(log2(val)), with the exception of val == 0, for which 0
+ * is returned as well.
+ *
+ * @param val 64-bit value to calculate integer base-2 logarithm for.
+ * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
+ */
+static inline unsigned int
+ilog2_64(uint64_t val)
 {
-	static int strsize = -1;
-	static unsigned char *str;
+	unsigned int ret = 0;
 
-	char outbuf[
-		(
-			(sizeof(
-			"xx xx xx xx xx xx xx xx  xx xx xx xx xx xx xx xx  "
-			"1234567890123456") + /*in case I'm off by few:*/ 4)
-		/*align to 8 to make memset easier:*/ + 7) & -8
-	];
-	const unsigned char *src;
-	int i;
+	ILOG2_ITER_(val, ret, 5);
+	ILOG2_ITER_(val, ret, 4);
+	ILOG2_ITER_(val, ret, 3);
+	ILOG2_ITER_(val, ret, 2);
+	ILOG2_ITER_(val, ret, 1);
+	ILOG2_ITER_(val, ret, 0);
 
-	if ((len < 0) || (len > INT_MAX - 16))
+	return ret;
+}
+
+/**
+ * Calculate floor(log2(val)), with the exception of val == 0, for which 0
+ * is returned as well.
+ *
+ * @param val 32-bit value to calculate integer base-2 logarithm for.
+ * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
+ */
+static inline unsigned int
+ilog2_32(uint32_t val)
+{
+	unsigned int ret = 0;
+
+	ILOG2_ITER_(val, ret, 4);
+	ILOG2_ITER_(val, ret, 3);
+	ILOG2_ITER_(val, ret, 2);
+	ILOG2_ITER_(val, ret, 1);
+	ILOG2_ITER_(val, ret, 0);
+
+	return ret;
+}
+
+#undef ILOG2_ITER_
+
+#if SIZEOF_KERNEL_LONG_T > 4
+# define ilog2_klong ilog2_64
+#else
+# define ilog2_klong ilog2_32
+#endif
+
+void
+dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
+	const kernel_ulong_t len)
+{
+	/* xx xx xx xx xx xx xx xx  xx xx xx xx xx xx xx xx  1234567890123456 */
+	enum {
+		HEX_BIT = 4,
+
+		DUMPSTR_GROUP_BYTES = 8,
+		DUMPSTR_GROUPS = 2,
+		DUMPSTR_WIDTH_BYTES = DUMPSTR_GROUP_BYTES * DUMPSTR_GROUPS,
+
+		/** Width of formatted dump in characters.  */
+		DUMPSTR_WIDTH_CHARS = DUMPSTR_WIDTH_BYTES +
+			sizeof("xx") * DUMPSTR_WIDTH_BYTES + DUMPSTR_GROUPS,
+
+		DUMPSTR_GROUP_MASK = DUMPSTR_GROUP_BYTES - 1,
+		DUMPSTR_BYTES_MASK = DUMPSTR_WIDTH_BYTES - 1,
+
+		/** Minimal width of the offset field in the output.  */
+		DUMPSTR_OFFS_MIN_CHARS = 5,
+
+		/** Arbitrarily chosen internal dumpstr buffer limit.  */
+		DUMPSTR_BUF_MAXSZ = 1 << 16,
+	};
+
+	static_assert(!(DUMPSTR_BUF_MAXSZ % DUMPSTR_WIDTH_BYTES),
+		      "Maximum internal buffer size should be divisible "
+		      "by amount of bytes dumped per line");
+	static_assert(!(DUMPSTR_GROUP_BYTES & DUMPSTR_GROUP_MASK),
+		      "DUMPSTR_GROUP_BYTES is not power of 2");
+	static_assert(!(DUMPSTR_WIDTH_BYTES & DUMPSTR_BYTES_MASK),
+		      "DUMPSTR_WIDTH_BYTES is not power of 2");
+
+	if (len > len + DUMPSTR_WIDTH_BYTES || addr + len < addr) {
+		debug_func_msg("len %" PRI_klu " at addr %#" PRI_klx
+			       " is too big, skipped", len, addr);
 		return;
-
-	memset(outbuf, ' ', sizeof(outbuf));
-
-	if (strsize < len + 16) {
-		free(str);
-		str = malloc(len + 16);
-		if (!str) {
-			strsize = -1;
-			error_func_msg("memory exhausted when tried to allocate"
-				       " %zu bytes", (size_t) (len + 16));
-			return;
-		}
-		strsize = len + 16;
 	}
 
-	if (umoven(tcp, addr, len, str) < 0)
-		return;
+	static kernel_ulong_t strsize;
+	static unsigned char *str;
 
-	/* Space-pad to 16 bytes */
-	i = len;
-	while (i & 0xf)
-		str[i++] = ' ';
+	const kernel_ulong_t alloc_size =
+		MIN(ROUNDUP(len, DUMPSTR_WIDTH_BYTES), DUMPSTR_BUF_MAXSZ);
 
-	i = 0;
-	src = str;
+	if (strsize < alloc_size) {
+		free(str);
+		str = malloc(alloc_size);
+		if (!str) {
+			strsize = 0;
+			error_func_msg("memory exhausted when tried to allocate"
+				       " %" PRI_klu " bytes", alloc_size);
+			return;
+		}
+		strsize = alloc_size;
+	}
+
+	/**
+	 * Characters needed in order to print the offset field. We calculate
+	 * it this way in order to avoid ilog2_64 call most of the time.
+	 */
+	const int offs_chars = len > (1 << (DUMPSTR_OFFS_MIN_CHARS * HEX_BIT))
+		? 1 + ilog2_klong(len - 1) / HEX_BIT : DUMPSTR_OFFS_MIN_CHARS;
+	kernel_ulong_t i = 0;
+	const unsigned char *src;
+
 	while (i < len) {
+		/*
+		 * It is important to overwrite all the byte values, as we
+		 * re-use the buffer in order to avoid its re-initialisation.
+		 */
+		static char outbuf[] = {
+			[0 ... DUMPSTR_WIDTH_CHARS - 1] = ' ',
+			'\0'
+		};
 		char *dst = outbuf;
-		/* Hex dump */
+
+		/* Fetching data from tracee.  */
+		if (!i || (i % DUMPSTR_BUF_MAXSZ) == 0) {
+			kernel_ulong_t fetch_size = MIN(len - i, alloc_size);
+
+			if (umoven(tcp, addr + i, fetch_size, str) < 0) {
+				/*
+				 * Don't silently abort if we have printed
+				 * something already.
+				 */
+				if (i)
+					tprintf(" | <Cannot fetch %" PRI_klu
+						" byte%s from pid %d"
+						" @%#" PRI_klx ">\n",
+						fetch_size,
+						fetch_size == 1 ? "" : "s",
+						tcp->pid, addr + i);
+				return;
+			}
+			src = str;
+		}
+
+		/* hex dump */
 		do {
 			if (i < len) {
 				dst = sprint_byte_hex(dst, *src);
@@ -977,24 +1092,30 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 				*dst++ = ' ';
 				*dst++ = ' ';
 			}
-			dst++; /* space is there by memset */
+			dst++; /* space is there */
 			i++;
-			if ((i & 7) == 0)
-				dst++; /* space is there by memset */
+			if ((i & DUMPSTR_GROUP_MASK) == 0)
+				dst++; /* space is there */
 			src++;
-		} while (i & 0xf);
+		} while (i & DUMPSTR_BYTES_MASK);
+
 		/* ASCII dump */
-		i -= 16;
-		src -= 16;
+		i -= DUMPSTR_WIDTH_BYTES;
+		src -= DUMPSTR_WIDTH_BYTES;
 		do {
-			if (is_print(*src))
-				*dst++ = *src;
-			else
-				*dst++ = '.';
+			if (i < len) {
+				if (is_print(*src))
+					*dst++ = *src;
+				else
+					*dst++ = '.';
+			} else {
+				*dst++ = ' ';
+			}
 			src++;
-		} while (++i & 0xf);
-		*dst = '\0';
-		tprintf(" | %05x  %s |\n", i - 16, outbuf);
+		} while (++i & DUMPSTR_BYTES_MASK);
+
+		tprintf(" | %0*" PRI_klx "  %s |\n",
+			offs_chars, i - DUMPSTR_WIDTH_BYTES, outbuf);
 	}
 }
 

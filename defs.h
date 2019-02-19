@@ -871,7 +871,7 @@ extern void
 dumpiov_upto(struct tcb *, int len, kernel_ulong_t addr, kernel_ulong_t data_size);
 
 extern void
-dumpstr(struct tcb *, kernel_ulong_t addr, int len);
+dumpstr(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);
 
 extern int
 printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
