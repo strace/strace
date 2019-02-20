@@ -9,7 +9,7 @@
 
 void
 fill_memory_ex(void *ptr, size_t size, unsigned char start,
-	       unsigned char period)
+	       unsigned int period)
 {
 	unsigned char *p = ptr;
 	size_t i;
