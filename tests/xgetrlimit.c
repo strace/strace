@@ -83,13 +83,13 @@ main(void)
 		long rc = syscall(NR_GETRLIMIT, res, 0);
 		if (rc && ENOSYS == errno)
 			perror_msg_and_skip(STR_GETRLIMIT);
-		printf("%s(%s, NULL) = %ld %s (%m)\n",
-		       STR_GETRLIMIT, xlat->str, rc, errno2name());
+		printf("%s(%s, NULL) = %s\n",
+		       STR_GETRLIMIT, xlat->str, sprintrc(rc));
 
 		rc = syscall(NR_GETRLIMIT, res, rlimit);
 		if (rc)
-			printf("%s(%s, NULL) = %ld %s (%m)\n",
-			       STR_GETRLIMIT, xlat->str, rc, errno2name());
+			printf("%s(%s, %p) = %s\n",
+			       STR_GETRLIMIT, xlat->str, rlimit, sprintrc(rc));
 		else
 			printf("%s(%s, {rlim_cur=%s, rlim_max=%s})"
 			       " = 0\n", STR_GETRLIMIT, xlat->str,
