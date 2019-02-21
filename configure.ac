@@ -48,7 +48,7 @@ AC_SUBST([COPYRIGHT_YEAR], [copyright_year])
 AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
 AC_SUBST([MANPAGE_DATE], [manpage_date])
 
-m4_define([additional_tracing_backends], [0])
+additional_tracing_backends=0
 
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
@@ -907,7 +907,7 @@ AS_IF([test "x$enable_gdbserver" != xno],
 AC_MSG_CHECKING([whether to enable gdbserver backend support])
 if test "x$use_gdbserver" = xyes; then
 	AC_DEFINE([ENABLE_GDBSERVER], 1, [Enable gdbserver backend support])
-	m4_define([additional_tracing_backends], [1])
+	additional_tracing_backends=1
 fi
 AM_CONDITIONAL([ENABLE_GDBSERVER], [test "x$use_gdbserver" = xyes])
 AC_MSG_RESULT([$use_gdbserver])
