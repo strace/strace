@@ -14,6 +14,11 @@
 # include "defs.h"
 
 # ifdef _LARGEFILE64_SOURCE
+#  ifdef HAVE_OPEN64
+#   define open_file open64
+#  else
+#   define open_file open
+#  endif
 #  ifdef HAVE_FOPEN64
 #   define fopen_stream fopen64
 #  else
@@ -26,6 +31,7 @@
 #  define struct_rlimit struct rlimit64
 #  define set_rlimit setrlimit64
 # else
+#  define open_file open
 #  define fopen_stream fopen
 #  define struct_stat struct stat
 #  define stat_file stat

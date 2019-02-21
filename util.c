@@ -1351,12 +1351,6 @@ print_abnormal_hi(const kernel_ulong_t val)
 	}
 }
 
-#if defined _LARGEFILE64_SOURCE && defined HAVE_OPEN64
-# define open_file open64
-#else
-# define open_file open
-#endif
-
 int
 read_int_from_file(struct tcb *tcp, const char *const fname, int *const pvalue)
 {
