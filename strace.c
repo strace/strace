@@ -1276,7 +1276,7 @@ redirect_standard_fds(void)
 static void
 startup_child(char **argv)
 {
-	struct_stat statbuf;
+	strace_stat_t statbuf;
 	const char *filename;
 	size_t filename_len;
 	char pathname[PATH_MAX];
