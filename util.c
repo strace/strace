@@ -455,7 +455,7 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 static bool
 printdev(struct tcb *tcp, int fd, const char *path)
 {
-	struct_stat st;
+	strace_stat_t st;
 
 	if (path[0] != '/')
 		return false;
