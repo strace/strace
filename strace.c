@@ -162,7 +162,7 @@ char *program_invocation_name;
 unsigned os_release; /* generated from uname()'s u.release */
 
 static void detach(struct tcb *tcp);
-static void cleanup(void);
+static void cleanup(int sig);
 static void interrupt(int sig);
 
 #ifdef HAVE_SIG_ATOMIC_T
@@ -314,7 +314,7 @@ void ATTRIBUTE_NORETURN
 die(void)
 {
 	if (strace_tracer_pid == getpid()) {
-		cleanup();
+		cleanup(0);
 		exit(1);
 	}
 
@@ -1932,14 +1932,11 @@ pid2tcb(const int pid)
 }
 
 static void
-cleanup(void)
+cleanup(int fatal_sig)
 {
 	unsigned int i;
 	struct tcb *tcp;
-	int fatal_sig;
 
-	/* 'interrupted' is a volatile object, fetch it only once */
-	fatal_sig = interrupted;
 	if (!fatal_sig)
 		fatal_sig = SIGTERM;
 
@@ -2789,7 +2786,9 @@ extern void __gcov_flush(void);
 static void ATTRIBUTE_NORETURN
 terminate(void)
 {
-	cleanup();
+	int sig = interrupted;
+
+	cleanup(sig);
 	if (cflag)
 		call_summary(shared_log);
 	fflush(NULL);
@@ -2799,8 +2798,8 @@ terminate(void)
 		while (waitpid(popen_pid, NULL, 0) < 0 && errno == EINTR)
 			;
 	}
-	if (interrupted) {
-		exit_code = 0x100 | interrupted;
+	if (sig) {
+		exit_code = 0x100 | sig;
 	}
 	if (exit_code > 0xff) {
 		/* Avoid potential core file clobbering.  */
