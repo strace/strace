@@ -1908,7 +1908,7 @@ init(int argc, char *argv[])
 }
 
 static struct tcb *
-pid2tcb(const int pid)
+pid2tcb(const int pid, bool skip_preallocated)
 {
 	if (pid <= 0)
 		return NULL;
@@ -1925,8 +1925,15 @@ pid2tcb(const int pid)
 
 	for (unsigned int i = 0; i < tcbtabsize; ++i) {
 		tcp = tcbtab[i];
-		if (tcp->pid == pid)
-			return *ptcp = tcp;
+		if (tcp->pid == pid) {
+			*ptcp = tcp;
+
+			if (skip_preallocated &&
+			    (tcp->flags & TCB_PREALLOCATED))
+				return NULL;
+
+			return tcp;
+		}
 	}
 
 	return NULL;
@@ -1999,24 +2006,25 @@ print_debug_info(const int pid, int status)
 }
 
 static struct tcb *
-maybe_allocate_tcb(const int pid, int status)
+maybe_allocate_tcb(struct tcb *tcp, const int pid, int status)
 {
 	if (!WIFSTOPPED(status)) {
 		if (detach_on_execve && pid == strace_child) {
 			/* example: strace -bexecve sh -c 'exec true' */
 			strace_child = 0;
-			return NULL;
+			goto out;
 		}
 		/*
 		 * This can happen if we inherited an unknown child.
 		 * Example: (sleep 1 & exec strace true)
 		 */
 		error_msg("Exit of unknown pid %u ignored", pid);
-		return NULL;
+		goto out;
 	}
 	if (followfork) {
 		/* We assume it's a fork/vfork/clone child */
-		struct tcb *tcp = alloctcb(pid);
+		tcp = tcp ?: alloctcb(pid);
+		tcp->flags &= ~TCB_PREALLOCATED;
 		after_successful_attach(tcp, post_attach_sigstop);
 		if (!qflag)
 			error_msg("Process %d attached", pid);
@@ -2031,8 +2039,14 @@ maybe_allocate_tcb(const int pid, int status)
 		 */
 		ptrace(PTRACE_DETACH, pid, NULL, 0L);
 		error_msg("Detached unknown pid %d", pid);
-		return NULL;
+		goto out;
 	}
+
+out:
+	if (tcp)
+		droptcb(tcp);
+
+	return NULL;
 }
 
 static struct tcb *
@@ -2047,7 +2061,7 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		return tcp;
 	if ((unsigned long) old_pid > UINT_MAX)
 		return tcp;
-	execve_thread = pid2tcb(old_pid);
+	execve_thread = pid2tcb(old_pid, true);
 	/* It should be !NULL, but I feel paranoid */
 	if (!execve_thread)
 		return tcp;
@@ -2278,6 +2292,10 @@ next_event(void)
 		 * Can work around that by double-forking the logger,
 		 * but that loses the ability to wait for its completion
 		 * on exit. Oh well...
+		 *
+		 * Let's hope that pre-allocating a tcp on
+		 * PTRACE_EVENT_{FORK,VFORK,CLONE} will handle this and won't
+		 * create more problems.
 		 */
 		if (nprocs == 0)
 			return NULL;
@@ -2361,10 +2379,10 @@ next_event(void)
 			print_debug_info(pid, status);
 
 		/* Look up 'pid' in our table. */
-		tcp = pid2tcb(pid);
+		tcp = pid2tcb(pid, false);
 
-		if (!tcp) {
-			tcp = maybe_allocate_tcb(pid, status);
+		if (!tcp || tcp->flags & TCB_PREALLOCATED) {
+			tcp = maybe_allocate_tcb(tcp, pid, status);
 			if (!tcp)
 				goto next_event_wait_next;
 		}
@@ -2463,6 +2481,32 @@ next_event(void)
 			case PTRACE_EVENT_EXIT:
 				wd->te = TE_STOP_BEFORE_EXIT;
 				break;
+			case PTRACE_EVENT_FORK:
+			case PTRACE_EVENT_VFORK:
+			case PTRACE_EVENT_CLONE: {
+				unsigned long new_pid = 0;
+
+				wd->te = TE_RESTART;
+
+				if (!followfork)
+					break;
+				if (ptrace(PTRACE_GETEVENTMSG, pid,
+					   NULL, &new_pid) < 0)
+					break;
+				if (!new_pid || pid2tcb(new_pid, false))
+					break;
+
+				struct tcb *prealloc_tcp = alloctcb(new_pid);
+
+				if (!prealloc_tcp)
+					break;
+
+				prealloc_tcp->flags = TCB_PREALLOCATED;
+				debug_msg("Pre-allocated a tcb for pid %lu",
+					  new_pid);
+
+				break;
+			}
 			default:
 				wd->te = TE_RESTART;
 			}
