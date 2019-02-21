@@ -272,6 +272,9 @@ struct tcb {
 # define TCB_DELAYED	0x2000	/* Current syscall has been delayed */
 # define TCB_TAMPERED_NO_FAIL 0x4000	/* We tamper tcb with syscall
 					   that should not fail. */
+# define TCB_PREALLOCATED 0x8000	/* It's pre-allocated TCB,
+					 * in anticipation of an actual attach.
+					 */
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */
