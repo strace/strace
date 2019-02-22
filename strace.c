@@ -1322,6 +1322,7 @@ struct exec_params {
 	uid_t run_euid;
 	gid_t run_egid;
 	char **argv;
+	char **env;
 	char *pathname;
 	struct sigaction child_sa;
 };
@@ -1384,7 +1385,7 @@ exec_or_die(void)
 		  seccomp_filtering ? "enabled" : "disabled");
 	if (seccomp_filtering)
 		init_seccomp_filter();
-	execv(params->pathname, params->argv);
+	execve(params->pathname, params->argv, params->env);
 	perror_msg_and_die("exec");
 }
 
@@ -1453,7 +1454,7 @@ redirect_standard_fds(void)
 }
 
 static void
-startup_child(char **argv)
+startup_child(char **argv, char **env)
 {
 	strace_stat_t statbuf;
 	const char *filename;
@@ -1526,6 +1527,7 @@ startup_child(char **argv)
 	params_for_tracee.run_euid = (statbuf.st_mode & S_ISUID) ? statbuf.st_uid : run_uid;
 	params_for_tracee.run_egid = (statbuf.st_mode & S_ISGID) ? statbuf.st_gid : run_gid;
 	params_for_tracee.argv = argv;
+	params_for_tracee.env = env;
 	/*
 	 * On NOMMU, can be safely freed only after execve in tracee.
 	 * It's hard to know when that happens, so we just leak it.
@@ -1826,6 +1828,109 @@ parse_ts_arg(const char *in_arg)
 	return 0;
 }
 
+static void
+remove_from_env(char **env, size_t *env_count, const char *var)
+{
+	const size_t len = strlen(var);
+	size_t w = 0;
+
+	debug_func_msg("Removing variable \"%s\" from the command environment",
+		       var);
+
+	for (size_t r = 0; r < *env_count; ++r) {
+		if (!strncmp(env[r], var, len) &&
+		    (env[r][len] == '=' || env[r][len] == '\0')) {
+			debug_func_msg("Skipping entry %zu (\"%s\")",
+				       r, env[r]);
+			continue;
+		}
+		if (w < r) {
+			debug_func_msg("Copying entry %zu to %zu", r, w);
+			env[w] = env[r];
+		}
+		++w;
+	}
+
+	if (w < *env_count) {
+		debug_func_msg("Decreasing env count from %zu to %zu",
+			       *env_count, w);
+		*env_count = w;
+	}
+}
+
+static void
+add_to_env(char **env, size_t *env_count, char *var, const size_t len)
+{
+	size_t r;
+
+	for (r = 0; r < *env_count; ++r) {
+		if (!strncmp(env[r], var, len) &&
+		    (env[r][len] == '=' || env[r][len] == '\0'))
+			break;
+	}
+
+	if (r < *env_count) {
+		debug_func_msg("Replacing entry %zu (\"%s\")"
+			       ", key=\"%.*s\", var=\"%s\"",
+			       r, env[r], (int) len, var, var);
+	} else {
+		debug_func_msg("Adding entry %zu"
+			       ", key=\"%.*s\", var=\"%s\"",
+			       r, (int) len, var, var);
+		*env_count += 1;
+	}
+
+	env[r] = var;
+}
+
+static void
+update_env(char **env, size_t *env_count, char *var)
+{
+	char *val = strchr(var, '=');
+
+	if (val)
+		add_to_env(env, env_count, var, val - var);
+	else
+		remove_from_env(env, env_count, var);
+}
+
+static char **
+make_env(char **orig_env, char *const *env_changes, size_t env_change_count)
+{
+	if (!env_change_count)
+		return orig_env;
+
+	char **new_env;
+	size_t new_env_count = 0;
+	size_t new_env_size;
+
+	/* Determining the environment variable count.  */
+	if (orig_env) {
+		for (; orig_env[new_env_count]; ++new_env_count)
+			;
+	}
+	new_env_size = new_env_count + env_change_count;
+
+	if (new_env_size < new_env_count || new_env_size < env_change_count ||
+	    new_env_size + 1 < new_env_size)
+		error_msg_and_die("Cannot construct new environment: the sum "
+				  "of old environment variable count (%zu) and "
+				  "environment changes count (%zu) is too big",
+				  new_env_count, env_change_count);
+
+	new_env_size++;
+	new_env = xallocarray(new_env_size, sizeof(*new_env));
+	if (new_env_count)
+		memcpy(new_env, orig_env, new_env_count * sizeof(*orig_env));
+
+	for (size_t i = 0; i < env_change_count; ++i)
+		update_env(new_env, &new_env_count, env_changes[i]);
+
+	new_env[new_env_count] = NULL;
+
+	return new_env;
+}
+
 /*
  * Initialization part of main() was eating much stack (~0.5k),
  * which was unused after init.
@@ -1869,6 +1974,19 @@ init(int argc, char *argv[])
 	const char **pathtrace_paths = NULL;
 	size_t pathtrace_size = 0;
 	size_t pathtrace_count = 0;
+
+	/**
+	 * Storage for environment changes requested for command.  They
+	 * are stored in a temporary array and not applied as is during
+	 * command line parsing for two reasons:
+	 *  - putenv() changes environment of the tracer as well,
+	 *    which is unacceptable.
+	 *  - Environment changes have to be applied
+	 *    in a tracing-backend-specific way.
+	 */
+	char **env_changes = NULL;
+	size_t env_change_size = 0;
+	size_t env_change_count = 0;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -2034,8 +2152,12 @@ init(int argc, char *argv[])
 			qualify(optarg);
 			break;
 		case 'E':
-			if (putenv(optarg) < 0)
-				perror_msg_and_die("putenv");
+			if (env_change_count >= env_change_size)
+				env_changes = xgrowarray(env_changes,
+							 &env_change_size,
+							 sizeof(*env_changes));
+
+			env_changes[env_change_count++] = optarg;
 			break;
 		case 'f':
 			followfork_short++;
@@ -2502,7 +2624,19 @@ init(int argc, char *argv[])
 	 * in the startup_child() mode we kill the spawned process anyway.
 	 */
 	if (argc) {
-		startup_child(argv);
+		char **new_environ = make_env(environ, env_changes,
+					      env_change_count);
+		free(env_changes);
+
+		startup_child(argv, new_environ);
+
+		/*
+		 * On a NOMMU system, new_environ can be freed only after exec
+		 * in child, so we leak it in that case, similar to pathname
+		 * in startup_child().
+		 */
+		if (new_environ != environ && !NOMMU_SYSTEM)
+			free(new_environ);
 	}
 
 	set_sighandler(SIGTTOU, SIG_IGN, NULL);

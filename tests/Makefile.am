@@ -410,6 +410,7 @@ MISC_TESTS = \
 	strace-DD.test \
 	strace-DDD.test \
 	strace-E.test \
+	strace-E-override.test \
 	strace-E-unset.test \
 	strace-S.test \
 	strace-T.test \

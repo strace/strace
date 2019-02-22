@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Check that --env option does not affect strace's own environment.
+#
+# Copyright (c) 2019-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog true
+run_prog true
+run_strace --quiet=all --trace=none --signal=none --env=PATH=/ $args
