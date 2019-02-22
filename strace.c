@@ -1435,7 +1435,8 @@ startup_child(char **argv)
 			pathname[0] = '\0';
 	}
 	if (stat_file(pathname, &statbuf) < 0) {
-		perror_msg_and_die("Can't stat '%s'", filename);
+		perror_msg_and_die("Can't stat '%s' (resolved as '%s')",
+				   filename, pathname);
 	}
 
 	params_for_tracee.fd_to_close = (shared_log != stderr) ? fileno(shared_log) : -1;
