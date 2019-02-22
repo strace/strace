@@ -69,6 +69,21 @@ struct notifications_s {
 } notifications;
 
 
+# define _(var_, str_, desc_) [var_##_BIT] = str_
+const char *gdb_conn_feature_str[] = {
+#  include "protocol_features.def"
+	NULL
+};
+# undef _
+
+# define _(var_, str_, desc_) [var_##_BIT] = desc_ ?: str_ " command support"
+const char *gdb_conn_feature_desc[] = {
+#  include "protocol_features.def"
+	NULL
+};
+# undef _
+
+
 void
 gdb_encode_hex(uint8_t byte, char* out) {
 	static const char value_hex[16] = {
@@ -80,7 +95,7 @@ gdb_encode_hex(uint8_t byte, char* out) {
 }
 
 char *
-gdb_encode_hex_string(const char *str)
+gdb_encode_hex_string(const char *buf, const char *str)
 {
 	char *out = malloc(2 * strlen(str) + 1);
 	if (out) {
@@ -127,6 +142,7 @@ uint64_t gdb_decode_hex_n(const char *bytes, size_t n)
 			break;
 		value = 16 * value + nibble;
 	}
+
 	return value;
 }
 
@@ -319,11 +335,13 @@ send_packet(FILE *out, const char *command, size_t size)
 	 * address.  So just write raw here, and maybe let higher levels
 	 * escape/RLE. */
 
-	debug_msg("\tSending packet: $%s", command);
+	debug_msg("\tSending packet: $%s#%02x", command, sum);
 
 	fputc('$', out); /* packet start */
-	/* XXX Check for partial writes. */
-	/* XXX Why not fputs? Is \0 allowed in the payload? */
+	/*
+	 * XXX Should we check that command doesn't have $%# characters?
+	 *     Should we escape them?
+	 */
 	fwrite(command, 1, size, out); /* payload */
 	fprintf(out, "#%02x", sum); /* packet end, checksum */
 	fflush(out);
@@ -354,7 +372,7 @@ gdb_send(struct gdb_conn *conn, const char *command, size_t size)
 		 * acknowledgment to a packet it has sent."
 		 */
 		/* look for '+' ACK or '-' NACK/resend */
-		acked = fgetc_unlocked(conn->in) == '+';
+		acked = fgetc(conn->in) == '+';
 	} while (!acked);
 }
 
@@ -620,7 +638,8 @@ gdb_start_noack(struct gdb_conn *conn)
 
 	if (ok)
 		conn->ack = false;
-	return ok ? "OK" : "";
+
+	return ok;
 }
 
 void

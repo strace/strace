@@ -30,11 +30,42 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "defs.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include "static_assert.h"
+
 struct gdb_conn;
+
+# define _(var_, str_, desc_) var_##_BIT
+enum gdb_conn_feature_bits {
+#  include "protocol_features.def"
+	GCF_TOTAL_FLAGS
+};
+#undef _
+
+# define _(var_, str_, desc_) var_ = 1 << var_##_BIT
+enum gdb_conn_feature_flags {
+#  include "protocol_features.def"
+	GCF_MASK = (1 << GCF_TOTAL_FLAGS) - 1
+};
+# undef _
+
+extern const char *gdb_conn_feature_str[];
+extern const char *gdb_conn_feature_desc[];
+
+struct gdb_conn_features {
+	uint64_t packet_size;
+	uint32_t flags;
+};
+
+static_assert((sizeof(((struct gdb_conn_features *) NULL)->flags) * CHAR_BIT) >=
+	      GCF_TOTAL_FLAGS,
+	      "struct gdb_conn_features.flags is not big enough in order "
+	      "to contain all flags from enum gdb_connfeature_flags");
 
 /**
  * Structure containing response for vFile requests[1].

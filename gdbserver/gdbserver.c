@@ -29,7 +29,8 @@
 
 #include "defs.h"
 
-#define _GNU_SOURCE 1
+/* XXX Why is that? */
+/* #define _GNU_SOURCE 1 */
 #include <stdlib.h>
 #include <sys/wait.h>
 
@@ -38,8 +39,8 @@
 #include "scno.h"
 #include "signals.h"
 #include "ptrace_backend.h"
+#include "tcb_wait_data.h"
 
-struct tcb *pid2tcb(int pid);
 struct tcb *alloctcb(int pid);
 void droptcb(struct tcb *tcp);
 void after_successful_attach(struct tcb *tcp, const unsigned int flags);
@@ -48,7 +49,7 @@ void print_exited(struct tcb *tcp, const int pid, int status);
 void print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig);
 void set_sighandler(int signo, void (*sighandler)(int), struct sigaction *oldact);
 void set_sigaction(int signo, void (*sighandler)(int), struct sigaction *oldact);
-bool gdb_restart_process(struct tcb *current_tcp, unsigned int restart_sig, void *data);
+bool gdb_restart_process(struct tcb *current_tcp, struct tcb_wait_data *wd);
 
 
 /* TODO Alternative to extern? */
@@ -107,12 +108,9 @@ struct gdb_stop_reply {
 	int tid; /* thread id, aka kernel tid */
 };
 
-/* TODO Same as strace.c */
-struct tcb_wait_data {
-	enum trace_event te; /**< Event passed to dispatch_event() */
-	int status;          /**< status, returned by wait4() */
-	siginfo_t si;        /**< siginfo, returned by PTRACE_GETSIGINFO */
-	unsigned int restart_op;
+struct gdb_wait_data {
+	struct tcb_wait_data wd;
+	struct gdb_stop_reply reply;
 };
 
 static int
@@ -371,7 +369,6 @@ gdb_ok(void)
 	return ok;
 }
 
-
 bool
 gdb_start_init(int argc, char *argv[])
 {
@@ -414,8 +411,6 @@ gdb_start_init(int argc, char *argv[])
 	bool gdb_fork;
 	char *reply = gdb_recv(gdb, &size, false);
 	gdb_multiprocess = strstr(reply, "multiprocess+") != NULL;
-	if (!gdb_multiprocess)
-		error_msg("couldn't enable GDB server multiprocess mode");
 	if (followfork) {
 		gdb_fork = strstr(reply, "vfork-events+") != NULL;
 		if (!gdb_fork)
@@ -507,7 +502,7 @@ gdb_find_thread(int tid, bool current)
 		return NULL;
 
 	/* Look up 'tid' in our table. */
-	struct tcb *tcp = pid2tcb(tid);
+	struct tcb *tcp = pid2tcb(tid, true);
 	if (!tcp) {
 		gdb_nprocs += 1;
 		tcp = alloctcb(tid);
@@ -565,22 +560,9 @@ gdb_enumerate_threads(void)
 	free(reply);
 }
 
-static void
-interrupt(int sig)
-{
-	interrupted = sig;
-}
-
 void
 gdb_end_init(void)
 {
-	/* TODO interface with -I? */
-	set_sighandler(SIGHUP, interrupt, NULL);
-	set_sighandler(SIGINT, interrupt, NULL);
-	set_sighandler(SIGQUIT, interrupt, NULL);
-	set_sighandler(SIGPIPE, interrupt, NULL);
-	set_sighandler(SIGTERM, interrupt, NULL);
-
 	/* We enumerate all attached threads to be sure, especially
 	 * since we get all threads on vAttach, not just the one
 	 * pid. */
@@ -596,7 +578,6 @@ gdb_end_init(void)
 void
 gdb_cleanup(void)
 {
-	ptrace_cleanup ();
 	if (gdb)
 		gdb_end(gdb);
 
@@ -607,7 +588,7 @@ void
 gdb_startup_child(char **argv)
 {
 	if (!gdb)
-		error_msg_and_die("GDB server not connected!");
+		error_msg_and_die("GDB server is not connected!");
 
 	if (!gdb_extended)
 		error_msg_and_die("GDB server doesn't support starting "
@@ -757,7 +738,7 @@ gdb_attach_tcb(struct tcb *tcp)
 		case GDB_STOP_SIGNAL:
 			if (stop.code == 0)
 				break;
-			__attribute__ ((fallthrough));
+			ATTRIBUTE_FALLTHROUGH;
 		default:
 			error_msg_and_die("Cannot connect to process %d: "
 					  "GDB server expected vAttach trap, "
@@ -842,7 +823,7 @@ gdb_next_event(void)
 	stop.reply = pop_notification(&stop.size);
 	if (stop.type == GDB_STOP_EXITED)
 		// If we previously exited then we need to continue before waiting for a stop
-		gdb_restart_process (current_tcp, 0, NULL);
+		return TE_RESTART;
 
 	if (stop.reply)	    /* cached out of order notification? */
 		stop = gdb_recv_stop(&stop);
@@ -1208,12 +1189,10 @@ gdb_verify_args(const char *username, bool daemon, unsigned int *follow_fork)
 		*follow_fork = 1;
 	}
 
-#ifdef USE_LIBUNWIND
 	if (stack_trace_enabled)
 		error_msg_and_die("Simultaneous usage of "
 				  "gdbserver backend (-G) and "
 				  "stack tracing (-k) is not supported");
-#endif
 
 	return true;
 }
@@ -1283,14 +1262,9 @@ gdb_restart_process(struct tcb *current_tcp, unsigned int restart_sig,
 }
 
 
-void
-gdb_handle_group_stop(unsigned int *restart_sig, void *data)
-{
-}
-
-
 const struct tracing_backend gdbserver_backend = {
 	.name               = "gdbserver",
+
 	.handle_arg         = gdb_handle_arg,
 	.init               = gdb_start_init,
 	.post_init          = gdb_end_init,
@@ -1309,26 +1283,21 @@ const struct tracing_backend gdbserver_backend = {
 	.get_scno           = gdb_get_scno,
 	.set_scno           = gdb_set_scno,
 
-	.set_error          = /* XXX */ ptrace_set_error,
-	.set_success        = /* XXX */ ptrace_set_success,
+	.set_error          = /* XXX */ gdb_set_error,
+	.set_success        = /* XXX */ gdb_set_success,
 
 	.get_instruction_pointer = generic_get_instruction_pointer,
 	.get_stack_pointer       = generic_get_stack_pointer,
-	.get_syscall_args        = /* XXX */ ptrace_get_syscall_args,
-	.get_syscall_result      = /* XXX */ ptrace_get_syscall_result,
+	.get_syscall_args        = /* XXX */ gdb_get_syscall_args,
+	.get_syscall_result      = /* XXX */ gdb_get_syscall_result,
 
 	.umoven             = gdb_umoven,
 	.umovestr           = gdb_umovestr,
 	.upeek              = gdb_upeek,
 	.upoke              = gdb_upoke,
 
-	.realpath           = (0),
 	.open               = (0),
 	.pread              = (0),
 	.close              = (0),
 	.readlink           = gdb_tracee_readlink,
-	.getxattr           = (0),
-	.socket             = (0),
-	.sendmsg            = (0),
-	.recvmsg            = (0),
 };

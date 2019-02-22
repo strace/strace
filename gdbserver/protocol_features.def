@@ -1,0 +1,46 @@
+/**
+ * GDB protocol feature definitions.
+ *
+ * Copyright (c) 2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+/* We include GCF_ prefixes here so flag variable names can be grepped */
+
+/**
+ * Extended mode is available (requires). Note that this one is not discovered
+ * via qSupported, but rather probed via "!" command.
+ */
+_(GCF_EXTENDED, "", "Extended mode"),
+/** QCatchSyscalls is supported (required) */
+_(GCF_Q_CATCH_SYSCALLS, "QCatchSyscalls", NULL),
+/** No-acknowledgement mode (QStartNoAckMode) is supported */
+_(GCF_NO_ACK, "QStartNoAckMode", NULL),
+/** Multi-process mode is supported */
+_(GCF_MULTIPROCESS, "multiprocess", "Multi-process support"),
+/** Non-stop mode (QNonStop) is supported */
+_(GCF_NON_STOP, "QNonStop", NULL),
+/** Can stop on fork */
+_(GCF_FORK_EVENTS, "fork-events", "Support for stopping on fork"),
+/** Can stop on fork */
+_(GCF_VFORK_EVENTS, "vfork-events", "Support for stopping on vfork"),
+/** Can stop on exec */
+_(GCF_EXEC_EVENTS, "exec-events", "Support for stopping on exec"),
+/** vCont is supported */
+_(GCF_VCONT_SUPPORTED, "vContSupported", "vConv command support"),
+/** QThreadEvents is supported */
+_(GCF_Q_THREAD_EVENTS, "QThreadEvents", NULL),
+/** QPassSignals is supported */
+_(GCF_Q_PASS_SIGNALS, "QPassSignals", NULL),
+/** QProgramSignals is supported */
+_(GCF_Q_PROGRAM_SIGNALS, "QProgramSignals", NULL),
+/** qXfer:features:read is supported */
+_(GCF_QXFER_FEATURES_READ, "qXfer:features:read", NULL),
+/** qXfer:siginfo:read is supported */
+_(GCF_QXFER_SIGINFO_READ, "qXfer:siginfo:read", NULL),
+/** qXfer:threads:read is supported */
+_(GCF_QXFER_THREADS_READ, "qXfer:threads:read", NULL),
+/** qXfer:osdata:read (process list) is supported */
+_(GCF_QXFER_OSDATA_READ, "qXfer:osdata:read", NULL),
