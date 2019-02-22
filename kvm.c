@@ -44,7 +44,7 @@ vcpu_find(struct tcb *const tcp, int fd)
 static struct vcpu_info *
 vcpu_alloc(struct tcb *const tcp, int fd, int cpuid)
 {
-	struct vcpu_info *vcpu_info = xcalloc(1, sizeof(*vcpu_info));
+	struct vcpu_info *vcpu_info = xzalloc(sizeof(*vcpu_info));
 
 	vcpu_info->fd = fd;
 	vcpu_info->cpuid = cpuid;
