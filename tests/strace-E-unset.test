@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Check modify/unset behaviour of -E/--env option.
+#
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+export option_E_var=OPTION_E_VAL
+export option_E_mod=OPTION_E_MOD
+export option_E_mods=OPTION_E_MODS
+export option_E_unset=OPTION_E_UNSET
+export option_E_unsets=OPTION_E_UNSETS
+
+run_prog ../sleep 0
+run_strace -qqq -e signal=none -e trace=execve -v \
+	-E option_E_mod=OPTION_E_NEW \
+	-E option_E_unset \
+	-E option_E_missing \
+	$args
+match_grep
+
+run_prog ../sleep 0
+run_strace --quiet=all --signal=none --trace=execve --no-abbrev \
+	--env=option_E_mod=OPTION_E_NEW \
+	--env=option_E_unset \
+	--env=option_E_missing \
+	$args
+match_grep

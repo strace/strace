@@ -410,6 +410,7 @@ MISC_TESTS = \
 	strace-DD.test \
 	strace-DDD.test \
 	strace-E.test \
+	strace-E-unset.test \
 	strace-S.test \
 	strace-T.test \
 	strace-V.test \
@@ -519,6 +520,7 @@ EXTRA_DIST = \
 	strace-D.expected \
 	strace-DDD.expected \
 	strace-E.expected \
+	strace-E-unset.expected \
 	strace-T.expected \
 	strace-ff.expected \
 	strace-k-demangle.expected \

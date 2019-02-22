@@ -1,0 +1,5 @@
+execve\("\.\./sleep", \["\.\./sleep", "0"\], \[.*"option_E_var=OPTION_E_VAL".*\]\) = 0
+execve\("\.\./sleep", \["\.\./sleep", "0"\], \[.*"option_E_unsets=OPTION_E_UNSETS".*\]\) = 0
+execve\("\.\./sleep", \["\.\./sleep", "0"\], \[.*"option_E_mod=OPTION_E_NEW".*\]\) = 0
+execve\("\.\./sleep", \["\.\./sleep", "0"\], \[.*"option_E_mods=OPTION_E_MODS".*\]\) = 0
+!execve\("\.\./sleep", \["\.\./sleep", "0"\], \[.*"option_E_unset=.*\]\) = 0
