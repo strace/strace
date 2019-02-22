@@ -780,7 +780,7 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 	struct obj_get_info_saved *saved;
 
 	if (entering(tcp)) {
-		saved = xcalloc(1, sizeof(*saved));
+		saved = xzalloc(sizeof(*saved));
 		saved->info_len = attr.info_len;
 		set_tcb_priv_data(tcp, saved, free);
 
