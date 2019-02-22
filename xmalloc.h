@@ -38,6 +38,13 @@ xzalloc(size_t size)
 }
 
 /**
+ * Allocate an array, but do not zero it out, die if the allocation
+ * has failed or if the product of nmemb and size is too big.
+ */
+void *xallocarray(size_t nmemb, size_t size)
+	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));
+
+/**
  * Reallocate memory for the array, die if the allocation has failed or
  * if the product of nmemb and size is too big.
  */

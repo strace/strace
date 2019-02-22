@@ -53,6 +53,23 @@ xcalloc(size_t nmemb, size_t size)
 #define HALF_SIZE_T	(((size_t) 1) << (sizeof(size_t) * 4))
 
 void *
+xallocarray(size_t nmemb, size_t size)
+{
+	size_t bytes = nmemb * size;
+
+	if ((nmemb | size) >= HALF_SIZE_T &&
+	    size && bytes / size != nmemb)
+		die_out_of_memory();
+
+	void *p = malloc(bytes);
+
+	if (!p)
+		die_out_of_memory();
+
+	return p;
+}
+
+void *
 xreallocarray(void *ptr, size_t nmemb, size_t size)
 {
 	size_t bytes = nmemb * size;
