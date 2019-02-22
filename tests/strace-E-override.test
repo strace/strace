@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Check that -E option doesn't override strace's own environment.
+#
+# Copyright (c) 2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog true
+
+run_prog true
+run_strace -E PATH=/ $args || fail_ "strace can't find true"

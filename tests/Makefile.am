@@ -337,6 +337,8 @@ MISC_TESTS = \
 	sigign.test \
 	strace-C.test \
 	strace-E.test \
+	strace-E-override.test \
+	strace-E-unset.test \
 	strace-S.test \
 	strace-T.test \
 	strace-V.test \
@@ -424,6 +426,7 @@ EXTRA_DIST = \
 	stack-fcall.h \
 	strace-C.expected \
 	strace-E.expected \
+	strace-E-unset.expected \
 	strace-T.expected \
 	strace-ff.expected \
 	strace-k-demangle.expected \
