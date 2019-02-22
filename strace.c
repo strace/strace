@@ -213,6 +213,9 @@ print_version(void)
 #ifdef USE_DEMANGLE
 		" stack-demangle"
 #endif
+#ifdef ENABLE_GDBSERVER
+		" tracing-backend:gdb"
+#endif
 #if SUPPORTED_PERSONALITIES > 1
 # if defined HAVE_M32_MPERS
 		" m32-mpers"
