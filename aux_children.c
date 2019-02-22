@@ -65,7 +65,7 @@ register_aux_child_ex(pid_t pid, const struct aux_child_handlers *h,
 			error_func_msg_and_die("Duplicate auxiliary child pid");
 	}
 
-	child = xcalloc(1, sizeof(*child));
+	child = xzalloc(sizeof(*child));
 
 	child->pid = pid;
 	child->handlers = h ?: &default_handlers;

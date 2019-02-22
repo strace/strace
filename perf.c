@@ -74,7 +74,7 @@ fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	/* Size should be multiple of 8, but kernel doesn't check for it */
 	/* size &= ~7; */
 
-	attr = xcalloc(1, sizeof(*attr));
+	attr = xzalloc(sizeof(*attr));
 
 	if (umoven_or_printaddr(tcp, addr, size, attr)) {
 		free(attr);

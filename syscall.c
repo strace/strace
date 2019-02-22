@@ -1301,7 +1301,7 @@ get_scno(struct tcb *tcp)
 		tcp->s_ent = &sysent[tcp->scno];
 		tcp->qual_flg = qual_flags(tcp->scno);
 	} else {
-		struct sysent_buf *s = xcalloc(1, sizeof(*s));
+		struct sysent_buf *s = xzalloc(sizeof(*s));
 
 		s->tcp = tcp;
 		s->ent = stub_sysent;
