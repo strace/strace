@@ -19,11 +19,29 @@
 # define xcalloc strace_calloc
 # define xmalloc strace_malloc
 
+/**
+ * Allocate an array and zero it out (similar to calloc), die if the allocation
+ * has failed or if the product of nmemb and size is too big.
+ */
 void *xcalloc(size_t nmemb, size_t size)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));
-void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
+/**
+ * Allocate an array, but don't zero it out, die if the allocation  has failed
+ * or if the product of nmemb and size is too big.
+ */
+void *xallocarray(size_t nmemb, size_t size)
+	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1, 2));
 void *xreallocarray(void *ptr, size_t nmemb, size_t size)
 	ATTRIBUTE_ALLOC_SIZE((2, 3));
+
+void *xmalloc(size_t size) ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((1));
+
+/** Wrapper for xcalloc(1, size) with xmalloc-like interface. */
+static inline void *
+xzalloc(size_t size)
+{
+	return xcalloc(1, size);
+}
 
 /**
  * Utility function for the simplification of managing various dynamic arrays.
