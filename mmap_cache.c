@@ -6,6 +6,7 @@
  */
 
 #include "defs.h"
+#include <fcntl.h>
 #include <limits.h>
 
 #include "largefile_wrappers.h"
@@ -82,13 +83,15 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 
 	if (tcp->mmap_cache)
 		return MMAP_CACHE_REBUILD_READY;
+	if (tcp->pid < 0)
+		return MMAP_CACHE_REBUILD_NOCACHE;
 
 	char filename[sizeof("/proc/4294967296/maps")];
-	xsprintf(filename, "/proc/%u/maps", tcp->pid);
+	xsprintf(filename, "/proc/%d/maps", tcp->pid);
 
-	FILE *fp = fopen_stream(filename, "r");
-	if (!fp) {
-		perror_msg("fopen: %s", filename);
+	int fd = tracee_open(tcp, filename, O_RDONLY, 0);
+	if (fd < 0) {
+		perror_msg("tracee_open(\"%s\", O_RDONLY)", filename);
 		return MMAP_CACHE_REBUILD_NOCACHE;
 	}
 
@@ -99,9 +102,15 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 
 	/* start with a small dynamically-allocated array and then expand it */
 	size_t allocated = 0;
-	char buffer[PATH_MAX + 80];
+	char buffer[PATH_MAX + 81];
+	size_t buf_pos = 0;
+	size_t fd_offset = 0;
+	ssize_t rret;
 
-	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+	while ((rret = tracee_pread(tcp, fd, buffer + buf_pos,
+				    sizeof(buffer) - buf_pos - 1, fd_offset))
+	       >= 0)
+	{
 		unsigned long start_addr, end_addr, mmap_offset;
 		char read_bit;
 		char write_bit;
@@ -109,24 +118,41 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 		char shared_bit;
 		unsigned long major, minor;
 		char binary_path[sizeof(buffer)];
+		char *newline;
+
+		if (rret < 0) {
+			debug_func_perror_msg("tracee_pread(fd: %d<\"%s\">, "
+					      "size: %zu, offs: %llu)",
+					      fd, filename,
+					      sizeof(buffer) - buf_pos,
+					      (unsigned long long) fd_offset);
+			break;
+		} else {
+			buffer[MIN((size_t) (rret + buf_pos),
+				   sizeof(buffer) - 1)] = '\0';
+		}
+		fd_offset += rret;
 
 		if (sscanf(buffer, "%lx-%lx %c%c%c%c %lx %lx:%lx %*d %[^\n]",
 			   &start_addr, &end_addr,
 			   &read_bit, &write_bit, &exec_bit, &shared_bit,
 			   &mmap_offset,
 			   &major, &minor,
-			   binary_path) != 10)
-			continue;
+			   binary_path) != 10) {
+			debug_func_msg("Can't parse line \"%.*s\"",
+				       (int) sizeof(buffer), buffer);
+			goto end_line;
+		}
 
 		/* skip mappings that have unknown protection */
 		if (!(read_bit == '-' || read_bit == 'r'))
-			continue;
+			goto end_line;
 		if (!(write_bit == '-' || write_bit == 'w'))
-			continue;
+			goto end_line;
 		if (!(exec_bit == '-' || exec_bit == 'x'))
-			continue;
+			goto end_line;
 		if (!(shared_bit == 'p' || shared_bit == 's'))
-			continue;
+			goto end_line;
 
 		if (end_addr < start_addr) {
 			error_msg("%s: unrecognized file format", filename);
@@ -143,7 +169,7 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 			if (entry->start_addr == start_addr &&
 			    entry->end_addr == end_addr) {
 				/* duplicate entry, e.g. [vsyscall] */
-				continue;
+				goto end_line;
 			}
 			if (start_addr <= entry->start_addr ||
 			    start_addr < entry->end_addr) {
@@ -153,7 +179,7 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 					  filename, binary_path, start_addr,
 					  end_addr, entry->binary_filename,
 					  entry->start_addr, entry->end_addr);
-				continue;
+				goto end_line;
 			}
 		}
 
@@ -176,8 +202,17 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 		entry->minor = minor;
 		entry->binary_filename = xstrdup(binary_path);
 		cache.size++;
+
+end_line:
+		newline = strchr(buffer, '\n');
+		if (newline) {
+			buf_pos = sizeof(buffer) - (newline - buffer) - 1;
+			memmove(buffer, newline + 1, buf_pos);
+		} else {
+			buf_pos = 0;
+		}
 	}
-	fclose(fp);
+	tracee_close(tcp, fd);
 
 	if (!cache.size)
 		return MMAP_CACHE_REBUILD_NOCACHE;
