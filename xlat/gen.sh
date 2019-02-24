@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh -efu
 #
 # Copyright (c) 2014-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
@@ -309,7 +309,10 @@ main()
 
 	if [ -d "${input}" ]; then
 		local f names=
-		for f in "${input}"/*.in; do
+		set +f
+		set -- "${input}"/*.in
+		set -f
+		for f; do
 			[ -f "${f}" ] || continue
 			name=${f##*/}
 			name=${name%.in}
