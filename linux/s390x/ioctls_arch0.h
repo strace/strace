@@ -78,6 +78,7 @@
 { "linux/kvm.h", "KVM_ASSIGN_SET_MSIX_ENTRY", _IOC_WRITE, 0xae74, 0x10 },
 { "linux/kvm.h", "KVM_ASSIGN_SET_MSIX_NR", _IOC_WRITE, 0xae73, 0x08 },
 { "linux/kvm.h", "KVM_CHECK_EXTENSION", _IOC_NONE, 0xae03, 0x00 },
+{ "linux/kvm.h", "KVM_CLEAR_DIRTY_LOG", _IOC_READ|_IOC_WRITE, 0xaec0, 0x18 },
 { "linux/kvm.h", "KVM_CREATE_DEVICE", _IOC_READ|_IOC_WRITE, 0xaee0, 0x0c },
 { "linux/kvm.h", "KVM_CREATE_IRQCHIP", _IOC_NONE, 0xae60, 0x00 },
 { "linux/kvm.h", "KVM_CREATE_PIT", _IOC_NONE, 0xae64, 0x00 },
