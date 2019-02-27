@@ -37,10 +37,17 @@ void *xreallocarray(void *ptr, size_t nmemb, size_t size)
  *                           number of members in the new array is decided by
  *                           the function. Member count is updated by the
  *                           function to the new value.
+ * @param[in]      min_memb  Minimum size required.
  * @param[in]      memb_size Size of array member in bytes.
  * @return                   Pointer to the (re)allocated array.
  */
-void *xgrowarray(void *ptr, size_t *nmemb, size_t memb_size);
+void *xgrowarray_ex(void *ptr, size_t *nmemb, size_t min_memb, size_t memb_size);
+
+static inline void *
+xgrowarray(void *ptr, size_t *nmemb, size_t memb_size)
+{
+	return xgrowarray_ex(ptr, nmemb, 0, memb_size);
+}
 
 /*
  * Note that the following two functions return NULL when NULL is specified
