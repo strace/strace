@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "error_prints.h"
+#include "macros.h"
 #include "xmalloc.h"
 
 static void
@@ -70,12 +71,14 @@ xreallocarray(void *ptr, size_t nmemb, size_t size)
 }
 
 void *
-xgrowarray(void *const ptr, size_t *const nmemb, const size_t memb_size)
+xgrowarray_ex(void *const ptr, size_t *const nmemb, const size_t min_size,
+	      const size_t memb_size)
 {
 	/* this is the same value as glibc DEFAULT_MXFAST */
 	enum { DEFAULT_ALLOC_SIZE = 64 * SIZEOF_LONG / 4 };
 
 	size_t grow_memb;
+	size_t new_size;
 
 	if (ptr == NULL)
 		grow_memb = *nmemb ? 0 :
@@ -83,12 +86,14 @@ xgrowarray(void *const ptr, size_t *const nmemb, const size_t memb_size)
 	else
 		grow_memb = (*nmemb >> 1) + 1;
 
-	if ((*nmemb + grow_memb) < *nmemb)
+	new_size = MAX(min_size, *nmemb + grow_memb);
+
+	if (new_size < *nmemb)
 		die_out_of_memory();
 
-	*nmemb += grow_memb;
+	*nmemb = new_size;
 
-	return xreallocarray(ptr, *nmemb, memb_size);
+	return xreallocarray(ptr, new_size, memb_size);
 }
 
 char *
