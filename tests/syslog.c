@@ -14,14 +14,20 @@
 # include <unistd.h>
 
 # define SYSLOG_ACTION_READ 2
+# define SYSLOG_ACTION_SIZE_BUFFER 10
 
 int
 main(void)
 {
 	const long addr = (long) 0xfacefeeddeadbeefULL;
+
 	int rc = syscall(__NR_syslog, SYSLOG_ACTION_READ, addr, -1);
-	printf("syslog(SYSLOG_ACTION_READ, %#lx, -1) = %d %s (%m)\n",
-	       addr, rc, errno2name());
+	printf("syslog(SYSLOG_ACTION_READ, %#lx, -1) = %s\n",
+	       addr, sprintrc(rc));
+
+	rc = syscall(__NR_syslog, SYSLOG_ACTION_SIZE_BUFFER, NULL, 10);
+	printf("syslog(SYSLOG_ACTION_SIZE_BUFFER, NULL, 10) = %s\n",
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;
