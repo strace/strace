@@ -738,9 +738,9 @@ printxval_indexn(const struct xlat *xlat, size_t xlat_size, uint64_t val,
 
 # define printxval_index(xlat__, val__, dflt__) \
 	printxval_indexn(xlat__, ARRAY_SIZE(xlat__) - 1, val__, dflt__)
-# define printxval_index_ex(xlat__, val__, dflt__) \
+# define printxval_index_ex(xlat__, val__, dflt__, style__) \
 	printxval_indexn_ex((xlat__), ARRAY_SIZE(xlat__) - 1, (val__), \
-			    (dflt__), XLAT_STYLE_DEFAULT)
+			    (dflt__), (style__))
 
 extern int sprintxval_ex(char *buf, size_t size, const struct xlat *,
 			 unsigned int val, const char *dflt, enum xlat_style);
