@@ -366,5 +366,5 @@
 [360] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [361] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 
-#define SYS_socket_subcall	400
+#define SYS_socket_subcall	500
 #include "subcall.h"

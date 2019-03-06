@@ -394,5 +394,5 @@
 [385] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 [386] = { 4,	0,		SEN(rseq),			"rseq"			},
 
-#define SYS_socket_subcall	400
+#define SYS_socket_subcall	500
 #include "subcall.h"

@@ -399,5 +399,5 @@
 [392] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [393] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 
-#define SYS_socket_subcall	400
+#define SYS_socket_subcall	500
 #include "subcall.h"

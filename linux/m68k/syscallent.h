@@ -387,5 +387,5 @@
 [378] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 
-#define SYS_socket_subcall	400
+#define SYS_socket_subcall	500
 #include "subcall.h"
