@@ -9,14 +9,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
+. "${srcdir=.}/PTRACE_SEIZE.sh"
 
 run_prog_skip_if_failed \
 	kill -0 $$
-
-$STRACE -d -enone / > /dev/null 2> "$LOG"
-if grep -x "[^:]*strace: PTRACE_SEIZE doesn't work" "$LOG" > /dev/null; then
-	skip_ "PTRACE_SEIZE doesn't work"
-fi
 
 check_prog sleep
 

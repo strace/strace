@@ -365,6 +365,7 @@ VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 EXTRA_DIST = \
 	COPYING \
 	GPL-2.0-or-later \
+	PTRACE_SEIZE.sh \
 	accept_compat.h \
 	attach-p-cmd.h \
 	caps-abbrev.awk \
