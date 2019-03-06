@@ -122,6 +122,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	nsyscalls-d \
 	oldselect-P \
 	oldselect-efault-P \
+	orphaned_process_group \
 	pc \
 	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \

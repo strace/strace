@@ -359,6 +359,7 @@ oldselect-efault-P
 oldstat
 open
 openat
+orphaned_process_group
 osf_utimes
 pause
 pc
