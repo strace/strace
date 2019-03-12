@@ -259,6 +259,7 @@ struct bpf_prog_info_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) map_ids;
 	char     name[BPF_OBJ_NAME_LEN];
 	uint32_t ifindex;
+	uint32_t gpl_compatible:1;
 	/*
 	 * The kernel UAPI is broken by Linux commit
 	 * v4.16-rc1~123^2~227^2~5^2~2 .

@@ -461,6 +461,9 @@ main(void)
 		    offsetof(struct bpf_prog_info_struct, ifindex))
 			printf(", ifindex=%u", prog_info->ifindex);
 		if (bpf_prog_get_info_attr.info_len >
+		    offsetofend(struct bpf_prog_info_struct, ifindex))
+			printf(", gpl_compatible=%u", prog_info->gpl_compatible);
+		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, netns_dev))
 			printf(", netns_dev=makedev(%#x, %#x)",
 			       major(prog_info->netns_dev),

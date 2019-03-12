@@ -525,11 +525,14 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	/*
 	 * ifindex, netns_dev, and netns_ino fields were introduced
-	 * by Linux commit v4.16-rc1~123^2~227^2~5^2~2.
+	 * by Linux commit v4.16-rc1~123^2~227^2~5^2~2, and
+	 * gpl_compatible was added later by Linux commit
+	 * v4.18-rc1~114^2~376^2~6.
 	 */
 	if (len <= offsetof(struct bpf_prog_info_struct, ifindex))
 		goto print_bpf_prog_info_end;
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
+	tprintf(", gpl_compatible=%u", info.gpl_compatible);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
