@@ -276,10 +276,22 @@ struct bpf_prog_info_struct {
 	uint32_t nr_jited_func_lens;
 	uint64_t ATTRIBUTE_ALIGNED(8) jited_ksyms;
 	uint64_t ATTRIBUTE_ALIGNED(8) jited_func_lens;
+	uint32_t btf_id;
+	uint32_t func_info_rec_size;
+	uint64_t ATTRIBUTE_ALIGNED(8) func_info;
+	uint32_t nr_func_info;
+	uint32_t nr_line_info;
+	uint64_t ATTRIBUTE_ALIGNED(8) line_info;
+	uint64_t ATTRIBUTE_ALIGNED(8) jited_line_info;
+	uint32_t nr_jited_line_info;
+	uint32_t line_info_rec_size;
+	uint32_t jited_line_info_rec_size;
+	uint32_t nr_prog_tags;
+	uint64_t ATTRIBUTE_ALIGNED(8) prog_tags;
 };
 
 # define bpf_prog_info_struct_size \
 	sizeof(struct bpf_prog_info_struct)
-# define expected_bpf_prog_info_struct_size 128
+# define expected_bpf_prog_info_struct_size 192
 
 #endif /* !STRACE_BPF_ATTR_H */

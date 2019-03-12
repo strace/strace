@@ -360,6 +360,14 @@ main(void)
 		prog_info->jited_prog_len = 0;
 		prog_info->nr_jited_ksyms = 0;
 		prog_info->nr_jited_func_lens = 0;
+		prog_info->func_info_rec_size = 0;
+		prog_info->nr_func_info = 0;
+		prog_info->nr_line_info = 0;
+		prog_info->nr_jited_line_info = 0;
+		prog_info->jited_line_info = 0;
+		prog_info->line_info_rec_size = 0;
+		prog_info->jited_line_info_rec_size = 0;
+		prog_info->nr_prog_tags = 0;
 		memset(prog_info + 1, 0, PROG_INFO_SZ - sizeof(*prog_info));
 		switch (i) {
 		case 1:
@@ -505,6 +513,64 @@ main(void)
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, jited_func_lens))
 			printf(", jited_func_lens=NULL");
+
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, btf_id))
+			PRINT_FIELD_U(", ", *prog_info, btf_id);
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, func_info_rec_size)) {
+			printf(", func_info_rec_size=0");
+			if (prog_info->func_info_rec_size)
+				printf(" => %u", prog_info->func_info_rec_size);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, func_info))
+			printf(", func_info=NULL");
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, nr_func_info)) {
+			printf(", nr_func_info=0");
+			if (prog_info->nr_func_info)
+				printf(" => %u", prog_info->nr_func_info);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, nr_line_info)) {
+			printf(", nr_line_info=0");
+			if (prog_info->nr_line_info)
+				printf(" => %u", prog_info->nr_line_info);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, line_info))
+			printf(", line_info=NULL");
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, jited_line_info))
+			printf(", jited_line_info=NULL");
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, nr_jited_line_info)) {
+			printf(", nr_jited_line_info=0");
+			if (prog_info->nr_jited_line_info)
+				printf(" => %u", prog_info->nr_jited_line_info);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, line_info_rec_size)) {
+			printf(", line_info_rec_size=0");
+			if (prog_info->line_info_rec_size)
+				printf(" => %u", prog_info->line_info_rec_size);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, jited_line_info_rec_size)) {
+			printf(", jited_line_info_rec_size=0");
+			if (prog_info->jited_line_info_rec_size)
+				printf(" => %u", prog_info->jited_line_info_rec_size);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, nr_prog_tags)) {
+			printf(", nr_prog_tags=0");
+			if (prog_info->nr_prog_tags)
+				printf(" => %u", prog_info->nr_prog_tags);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, prog_tags))
+			printf(", prog_tags=NULL");
 
 		printf("}");
 # else /* !VERBOSE */

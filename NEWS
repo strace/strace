@@ -3,6 +3,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Enhanced xlat styles support configured by -X option.
+  * Enhanced decoding of bpf syscall.
   * Enhanced decoding of PTRACE_PEEKUSER and PTRACE_POKEUSER on hppa.
   * Wired up kexec_file_load and rseq syscalls on aarch64, arc, metag, nios2,
     or1k, riscv, and tile architectures.

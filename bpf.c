@@ -429,6 +429,15 @@ struct obj_get_info_saved {
 	uint32_t nr_jited_func_lens;
 	uint64_t jited_ksyms;
 	uint64_t jited_func_lens;
+
+	uint32_t func_info_rec_size;
+	uint32_t nr_func_info;
+	uint32_t nr_line_info;
+	uint32_t nr_jited_line_info;
+	uint64_t jited_line_info;
+	uint32_t line_info_rec_size;
+	uint32_t jited_line_info_rec_size;
+	uint32_t nr_prog_tags;
 };
 
 static void
@@ -503,6 +512,15 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		saved->nr_jited_func_lens = info.nr_jited_func_lens;
 		saved->jited_ksyms = info.jited_ksyms;
 		saved->jited_func_lens = info.jited_func_lens;
+
+		saved->func_info_rec_size = info.func_info_rec_size;
+		saved->nr_func_info = info.nr_func_info;
+		saved->nr_line_info = info.nr_line_info;
+		saved->nr_jited_line_info = info.nr_jited_line_info;
+		saved->jited_line_info = info.jited_line_info;
+		saved->line_info_rec_size = info.line_info_rec_size;
+		saved->jited_line_info_rec_size = info.jited_line_info_rec_size;
+		saved->nr_prog_tags = info.nr_prog_tags;
 
 		return;
 	}
@@ -595,6 +613,66 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		tprints(" => ");
 	}
 	printaddr64(info.jited_func_lens);
+
+	/*
+	 * The next twelve fields were introduced by Linux commits
+	 * v5.0-rc1~129^2~209^2~16^2~8
+	 * v5.0-rc1~129^2~114^2~5^2~6
+	 * v5.0-rc1~129^2~114^2^2~2
+	 * v5.0-rc1~129^2~15^2~22
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, btf_id))
+		goto print_bpf_prog_info_end;
+
+	PRINT_FIELD_U(", ", info, btf_id);
+
+	tprints(", func_info_rec_size=");
+	if (saved->func_info_rec_size != info.func_info_rec_size)
+		tprintf("%" PRIu32 " => ", saved->func_info_rec_size);
+	tprintf("%" PRIu32, info.func_info_rec_size);
+
+	PRINT_FIELD_ADDR64(", ", info, func_info);
+
+	tprints(", nr_func_info=");
+	if (saved->nr_func_info != info.nr_func_info)
+		tprintf("%" PRIu32 " => ", saved->nr_func_info);
+	tprintf("%" PRIu32, info.nr_func_info);
+
+	tprints(", nr_line_info=");
+	if (saved->nr_line_info != info.nr_line_info)
+		tprintf("%" PRIu32 " => ", saved->nr_line_info);
+	tprintf("%" PRIu32, info.nr_line_info);
+
+	PRINT_FIELD_ADDR64(", ", info, line_info);
+
+	tprints(", jited_line_info=");
+	if (saved->jited_line_info != info.jited_line_info) {
+		printaddr64(saved->jited_line_info);
+		tprints(" => ");
+	}
+	printaddr64(info.jited_line_info);
+
+	tprints(", nr_jited_line_info=");
+	if (saved->nr_jited_line_info != info.nr_jited_line_info)
+		tprintf("%" PRIu32 " => ", saved->nr_jited_line_info);
+	tprintf("%" PRIu32, info.nr_jited_line_info);
+
+	tprints(", line_info_rec_size=");
+	if (saved->line_info_rec_size != info.line_info_rec_size)
+		tprintf("%" PRIu32 " => ", saved->line_info_rec_size);
+	tprintf("%" PRIu32, info.line_info_rec_size);
+
+	tprints(", jited_line_info_rec_size=");
+	if (saved->jited_line_info_rec_size != info.jited_line_info_rec_size)
+		tprintf("%" PRIu32 " => ", saved->jited_line_info_rec_size);
+	tprintf("%" PRIu32, info.jited_line_info_rec_size);
+
+	tprints(", nr_prog_tags=");
+	if (saved->nr_prog_tags != info.nr_prog_tags)
+		tprintf("%" PRIu32 " => ", saved->nr_prog_tags);
+	tprintf("%" PRIu32, info.nr_prog_tags);
+
+	PRINT_FIELD_ADDR64(", ", info, prog_tags);
 
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 
