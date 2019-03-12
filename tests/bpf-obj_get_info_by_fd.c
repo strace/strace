@@ -324,6 +324,15 @@ main(void)
 	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, netns_ino))
 		printf(", netns_ino=%" PRIu64, map_info->netns_ino);
+	if (bpf_map_get_info_attr.info_len >
+	    offsetof(struct bpf_map_info_struct, btf_id))
+		PRINT_FIELD_U(", ", *map_info, btf_id);
+	if (bpf_map_get_info_attr.info_len >
+	    offsetof(struct bpf_map_info_struct, btf_key_type_id))
+		PRINT_FIELD_U(", ", *map_info, btf_key_type_id);
+	if (bpf_map_get_info_attr.info_len >
+	    offsetof(struct bpf_map_info_struct, btf_value_type_id))
+		PRINT_FIELD_U(", ", *map_info, btf_value_type_id);
 	printf("}");
 #else /* !VERBOSE */
 	printf("%p", map_info);

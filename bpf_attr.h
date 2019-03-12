@@ -242,11 +242,14 @@ struct bpf_map_info_struct {
 	 */
 	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* skip check */
 	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* skip check */
+	uint32_t btf_id;
+	uint32_t btf_key_type_id;
+	uint32_t btf_value_type_id;
 };
 
 # define bpf_map_info_struct_size \
-	sizeof(struct bpf_map_info_struct)
-# define expected_bpf_map_info_struct_size 64
+	offsetofend(struct bpf_map_info_struct, btf_value_type_id)
+# define expected_bpf_map_info_struct_size 76
 
 struct bpf_prog_info_struct {
 	uint32_t type;

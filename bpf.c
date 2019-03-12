@@ -463,6 +463,16 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
+	/*
+	 * The next three fields were introduced by Linux commits
+	 * v4.18-rc1~114^2~223^2~21^2~4 and v4.18-rc1~114^2~148^2~7^2~2.
+	 */
+	if (len <= offsetof(struct bpf_map_info_struct, btf_id))
+		goto print_bpf_map_info_end;
+	PRINT_FIELD_U(", ", info, btf_id);
+	PRINT_FIELD_U(", ", info, btf_key_type_id);
+	PRINT_FIELD_U(", ", info, btf_value_type_id);
+
 	decode_attr_extra_data(tcp, info_buf, size, bpf_map_info_struct_size);
 
 print_bpf_map_info_end:
