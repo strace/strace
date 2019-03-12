@@ -358,6 +358,8 @@ main(void)
 	memset(prog_info, 0, PROG_INFO_SZ);
 	for (unsigned int i = 0; i < 4; i++) {
 		prog_info->jited_prog_len = 0;
+		prog_info->nr_jited_ksyms = 0;
+		prog_info->nr_jited_func_lens = 0;
 		memset(prog_info + 1, 0, PROG_INFO_SZ - sizeof(*prog_info));
 		switch (i) {
 		case 1:
@@ -484,6 +486,25 @@ main(void)
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, netns_ino))
 			printf(", netns_ino=%" PRIu64, prog_info->netns_ino);
+
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, nr_jited_ksyms)) {
+			printf(", nr_jited_ksyms=0");
+			if (prog_info->nr_jited_ksyms)
+				printf(" => %u", prog_info->nr_jited_ksyms);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, nr_jited_func_lens)) {
+			printf(", nr_jited_func_lens=0");
+			if (prog_info->nr_jited_func_lens)
+				printf(" => %u", prog_info->nr_jited_func_lens);
+		}
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, jited_ksyms))
+			printf(", jited_ksyms=NULL");
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, jited_func_lens))
+			printf(", jited_func_lens=NULL");
 
 		printf("}");
 # else /* !VERBOSE */

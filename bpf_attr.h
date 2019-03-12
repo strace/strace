@@ -272,10 +272,14 @@ struct bpf_prog_info_struct {
 	 */
 	uint64_t ATTRIBUTE_ALIGNED(8) netns_dev; /* skip check */
 	uint64_t ATTRIBUTE_ALIGNED(8) netns_ino; /* skip check */
+	uint32_t nr_jited_ksyms;
+	uint32_t nr_jited_func_lens;
+	uint64_t ATTRIBUTE_ALIGNED(8) jited_ksyms;
+	uint64_t ATTRIBUTE_ALIGNED(8) jited_func_lens;
 };
 
 # define bpf_prog_info_struct_size \
 	sizeof(struct bpf_prog_info_struct)
-# define expected_bpf_prog_info_struct_size 104
+# define expected_bpf_prog_info_struct_size 128
 
 #endif /* !STRACE_BPF_ATTR_H */

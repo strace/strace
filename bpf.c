@@ -424,6 +424,11 @@ struct obj_get_info_saved {
 	uint32_t jited_prog_len;
 	uint32_t xlated_prog_len;
 	uint32_t nr_map_ids;
+
+	uint32_t nr_jited_ksyms;
+	uint32_t nr_jited_func_lens;
+	uint64_t jited_ksyms;
+	uint64_t jited_func_lens;
 };
 
 static void
@@ -494,6 +499,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		saved->jited_prog_len = info.jited_prog_len;
 		saved->xlated_prog_len = info.xlated_prog_len;
 		saved->nr_map_ids = info.nr_map_ids;
+		saved->nr_jited_ksyms = info.nr_jited_ksyms;
+		saved->nr_jited_func_lens = info.nr_jited_func_lens;
+		saved->jited_ksyms = info.jited_ksyms;
+		saved->jited_func_lens = info.jited_func_lens;
 
 		return;
 	}
@@ -555,6 +564,37 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprintf(", gpl_compatible=%u", info.gpl_compatible);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
+
+	/*
+	 * The next four fields were introduced by Linux commits
+	 * v4.18-rc1~114^2~148^2~3^2~6 and v4.18-rc1~114^2~148^2~3^2~2.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, nr_jited_ksyms))
+		goto print_bpf_prog_info_end;
+
+	tprints(", nr_jited_ksyms=");
+	if (saved->nr_jited_ksyms != info.nr_jited_ksyms)
+		tprintf("%" PRIu32 " => ", saved->nr_jited_ksyms);
+	tprintf("%" PRIu32, info.nr_jited_ksyms);
+
+	tprints(", nr_jited_func_lens=");
+	if (saved->nr_jited_func_lens != info.nr_jited_func_lens)
+		tprintf("%" PRIu32 " => ", saved->nr_jited_func_lens);
+	tprintf("%" PRIu32, info.nr_jited_func_lens);
+
+	tprints(", jited_ksyms=");
+	if (saved->jited_ksyms != info.jited_ksyms) {
+		printaddr64(saved->jited_ksyms);
+		tprints(" => ");
+	}
+	printaddr64(info.jited_ksyms);
+
+	tprints(", jited_func_lens=");
+	if (saved->jited_func_lens != info.jited_func_lens) {
+		printaddr64(saved->jited_func_lens);
+		tprints(" => ");
+	}
+	printaddr64(info.jited_func_lens);
 
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 
