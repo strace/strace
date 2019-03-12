@@ -212,6 +212,16 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_ifindex))
 		break;
 	PRINT_FIELD_IFINDEX(", ", attr, map_ifindex);
+
+	/*
+	 * The following three fields were introduced by Linux commits
+	 * v4.18-rc1~114^2~417^2~1^2~3 and v4.18-rc1~114^2~148^2~7^2~2.
+	 */
+	if (len <= offsetof(struct BPF_MAP_CREATE_struct, btf_fd))
+		break;
+	PRINT_FIELD_FD(", ", attr, btf_fd, tcp);
+	PRINT_FIELD_U(", ", attr, btf_key_type_id);
+	PRINT_FIELD_U(", ", attr, btf_value_type_id);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
