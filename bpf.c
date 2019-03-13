@@ -825,6 +825,18 @@ BEGIN_BPF_CMD_DECODER(BPF_RAW_TRACEPOINT_OPEN)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
+BEGIN_BPF_CMD_DECODER(BPF_BTF_LOAD)
+{
+	tprints("{btf=");
+	print_big_u64_addr(attr.btf);
+	printstrn(tcp, attr.btf, attr.btf_size);
+	PRINT_FIELD_ADDR64(", ", attr, btf_log_buf);
+	PRINT_FIELD_U(", ", attr, btf_size);
+	PRINT_FIELD_U(", ", attr, btf_log_size);
+	PRINT_FIELD_U(", ", attr, btf_log_level);
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -846,6 +858,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_OBJ_GET_INFO_BY_FD),
 		BPF_CMD_ENTRY(BPF_PROG_QUERY),
 		BPF_CMD_ENTRY(BPF_RAW_TRACEPOINT_OPEN),
+		BPF_CMD_ENTRY(BPF_BTF_LOAD),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

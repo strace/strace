@@ -227,6 +227,18 @@ struct BPF_RAW_TRACEPOINT_OPEN_struct /* raw_tracepoint */ {
 	offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct, prog_fd)
 # define expected_BPF_RAW_TRACEPOINT_OPEN_struct_size 12
 
+struct BPF_BTF_LOAD_struct {
+	uint64_t ATTRIBUTE_ALIGNED(8) btf;
+	uint64_t ATTRIBUTE_ALIGNED(8) btf_log_buf;
+	uint32_t btf_size;
+	uint32_t btf_log_size;
+	uint32_t btf_log_level;
+};
+
+# define BPF_BTF_LOAD_struct_size \
+	offsetofend(struct BPF_BTF_LOAD_struct, btf_log_level)
+# define expected_BPF_BTF_LOAD_struct_size 28
+
 struct bpf_map_info_struct {
 	uint32_t type;
 	uint32_t id;

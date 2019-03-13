@@ -71,6 +71,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_OBJ_GET_INFO_BY_FD);
 	BPF_ATTR_DATA_FIELD(BPF_PROG_QUERY);
 	BPF_ATTR_DATA_FIELD(BPF_RAW_TRACEPOINT_OPEN);
+	BPF_ATTR_DATA_FIELD(BPF_BTF_LOAD);
 	char char_data[256];
 };
 
@@ -1078,6 +1079,44 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 	}
 };
 
+static void
+init_BPF_BTF_LOAD_attr(struct bpf_attr_check *check)
+{
+	static const char sample_btf_data[] = "bPf\0daTum";
+
+	static char *btf_data;
+	if (!btf_data)
+		btf_data = tail_memdup(sample_btf_data,
+				       sizeof(sample_btf_data) - 1);
+
+	struct BPF_BTF_LOAD_struct *attr = &check->data.BPF_BTF_LOAD_data;
+	attr->btf = (uintptr_t) btf_data;
+}
+
+static struct bpf_attr_check BPF_BTF_LOAD_checks[] = {
+	{
+		.data = { .BPF_BTF_LOAD_data = { .btf = 0 } },
+		.size = offsetofend(struct BPF_BTF_LOAD_struct, btf),
+		.str = "btf=NULL, btf_log_buf=NULL, btf_size=0"
+		       ", btf_log_size=0, btf_log_level=0"
+	},
+	{ /* 1 */
+		.data = { .BPF_BTF_LOAD_data = {
+			.btf_log_buf = 0xfacefeeddeadbeefULL,
+			.btf_size = 9,
+			.btf_log_size = -1U,
+			.btf_log_level = 42
+		} },
+		.size = offsetofend(struct BPF_BTF_LOAD_struct, btf_log_level),
+		.init_fn = init_BPF_BTF_LOAD_attr,
+		.str = "btf=\"bPf\\0daTum\""
+		       ", btf_log_buf=0xfacefeeddeadbeef"
+		       ", btf_size=9"
+		       ", btf_log_size=4294967295"
+		       ", btf_log_level=42"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1108,6 +1147,7 @@ main(void)
 		CHK(BPF_OBJ_GET_INFO_BY_FD),
 		CHK(BPF_PROG_QUERY),
 		CHK(BPF_RAW_TRACEPOINT_OPEN),
+		CHK(BPF_BTF_LOAD),
 	};
 
 	page_size = get_page_size();
