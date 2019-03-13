@@ -394,7 +394,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_FD_BY_ID)
 	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
 			  "BPF_F_???");
 }
-END_BPF_CMD_DECODER(RVAL_DECODED)
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 {
@@ -407,7 +407,7 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
 			  "BPF_F_???");
 }
-END_BPF_CMD_DECODER(RVAL_DECODED)
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 struct obj_get_info_saved;
 typedef void (*print_bpf_obj_info_fn)(struct tcb *,
