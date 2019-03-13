@@ -73,6 +73,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_RAW_TRACEPOINT_OPEN);
 	BPF_ATTR_DATA_FIELD(BPF_BTF_LOAD);
 	BPF_ATTR_DATA_FIELD(BPF_BTF_GET_FD_BY_ID);
+	BPF_ATTR_DATA_FIELD(BPF_TASK_FD_QUERY);
 	char char_data[256];
 };
 
@@ -1128,6 +1129,40 @@ static const struct bpf_attr_check BPF_BTF_GET_FD_BY_ID_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_TASK_FD_QUERY_checks[] = {
+	{
+		.data = { .BPF_TASK_FD_QUERY_data = { .pid = 0xdeadbeef } },
+		.size = offsetofend(struct BPF_TASK_FD_QUERY_struct, pid),
+		.str = "task_fd_query={pid=3735928559, fd=0, flags=0"
+		       ", buf_len=0, buf=NULL, prog_id=0"
+		       ", fd_type=BPF_FD_TYPE_RAW_TRACEPOINT"
+		       ", probe_offset=0, probe_addr=0}"
+	},
+	{ /* 1 */
+		.data = { .BPF_TASK_FD_QUERY_data = {
+			.pid = 0xcafef00d,
+			.fd = 0xdeadbeef,
+			.flags = 0xfacefeed,
+			.buf_len = 0xdefaced,
+			.buf = 0xfffffffffffffffe,
+			.prog_id = 0xbadc0ded,
+			.fd_type = 5,
+			.probe_offset = 0xfac1fed2fac3fed4,
+			.probe_addr = 0xfac5fed5fac7fed8
+		} },
+		.size = offsetofend(struct BPF_TASK_FD_QUERY_struct, probe_addr),
+		.str = "task_fd_query={pid=3405705229"
+		       ", fd=-559038737"
+		       ", flags=4207869677"
+		       ", buf_len=233811181"
+		       ", buf=" BIG_ADDR("0xfffffffffffffffe", "0xfffffffe")
+		       ", prog_id=3134983661"
+		       ", fd_type=BPF_FD_TYPE_URETPROBE"
+		       ", probe_offset=0xfac1fed2fac3fed4"
+		       ", probe_addr=0xfac5fed5fac7fed8}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1160,6 +1195,7 @@ main(void)
 		CHK(BPF_RAW_TRACEPOINT_OPEN),
 		CHK(BPF_BTF_LOAD),
 		CHK(BPF_BTF_GET_FD_BY_ID),
+		CHK(BPF_TASK_FD_QUERY),
 		CHK(BPF_MAP_LOOKUP_AND_DELETE_ELEM),
 	};
 

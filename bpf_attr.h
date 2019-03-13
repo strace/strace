@@ -247,6 +247,22 @@ struct BPF_BTF_GET_FD_BY_ID_struct {
 	sizeof(struct BPF_BTF_GET_FD_BY_ID_struct)
 # define expected_BPF_BTF_GET_FD_BY_ID_struct_size 4
 
+struct BPF_TASK_FD_QUERY_struct /* task_fd_query */ {
+	uint32_t pid;
+	uint32_t fd;
+	uint32_t flags;
+	uint32_t buf_len;
+	uint64_t ATTRIBUTE_ALIGNED(8) buf;
+	uint32_t prog_id;
+	uint32_t fd_type;
+	uint64_t ATTRIBUTE_ALIGNED(8) probe_offset;
+	uint64_t ATTRIBUTE_ALIGNED(8) probe_addr;
+};
+
+# define BPF_TASK_FD_QUERY_struct_size \
+	sizeof(struct BPF_TASK_FD_QUERY_struct)
+# define expected_BPF_TASK_FD_QUERY_struct_size 48
+
 struct bpf_map_info_struct {
 	uint32_t type;
 	uint32_t id;

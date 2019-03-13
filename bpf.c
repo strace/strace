@@ -27,6 +27,7 @@
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
 #include "xlat/bpf_query_flags.h"
+#include "xlat/bpf_task_fd_type.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -845,6 +846,38 @@ BEGIN_BPF_CMD_DECODER(BPF_BTF_GET_FD_BY_ID)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
+{
+	if (entering(tcp)) {
+		set_tcb_priv_ulong(tcp, attr.buf_len);
+
+		PRINT_FIELD_U("{task_fd_query={", attr, pid);
+		PRINT_FIELD_FD(", ", attr, fd, tcp);
+		PRINT_FIELD_U(", ", attr, flags);
+		PRINT_FIELD_U(", ", attr, buf_len);
+
+		return 0;
+	}
+
+	unsigned int saved_buf_len = get_tcb_priv_ulong(tcp);
+
+	if (saved_buf_len != attr.buf_len)
+		tprintf(" => %u", attr.buf_len);
+
+	const unsigned int buf_len = MIN(saved_buf_len, attr.buf_len);
+	tprintf(", buf=");
+	print_big_u64_addr(attr.buf);
+	printstr_ex(tcp, attr.buf, buf_len, QUOTE_0_TERMINATED);
+	PRINT_FIELD_U(", ", attr, prog_id);
+	PRINT_FIELD_XVAL_INDEX(", ", attr, fd_type, bpf_task_fd_type,
+			       "BPF_FD_TYPE_???");
+	PRINT_FIELD_X(", ", attr, probe_offset);
+	PRINT_FIELD_X(", ", attr, probe_addr);
+
+	tprints("}");
+}
+END_BPF_CMD_DECODER(RVAL_DECODED)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -868,6 +901,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_RAW_TRACEPOINT_OPEN),
 		BPF_CMD_ENTRY(BPF_BTF_LOAD),
 		BPF_CMD_ENTRY(BPF_BTF_GET_FD_BY_ID),
+		BPF_CMD_ENTRY(BPF_TASK_FD_QUERY),
 		BPF_CMD_ENTRY(BPF_MAP_LOOKUP_AND_DELETE_ELEM),
 	};
 
