@@ -239,6 +239,14 @@ struct BPF_BTF_LOAD_struct {
 	offsetofend(struct BPF_BTF_LOAD_struct, btf_log_level)
 # define expected_BPF_BTF_LOAD_struct_size 28
 
+struct BPF_BTF_GET_FD_BY_ID_struct {
+	uint32_t btf_id;
+};
+
+# define BPF_BTF_GET_FD_BY_ID_struct_size \
+	sizeof(struct BPF_BTF_GET_FD_BY_ID_struct)
+# define expected_BPF_BTF_GET_FD_BY_ID_struct_size 4
+
 struct bpf_map_info_struct {
 	uint32_t type;
 	uint32_t id;

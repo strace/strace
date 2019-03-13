@@ -837,6 +837,12 @@ BEGIN_BPF_CMD_DECODER(BPF_BTF_LOAD)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+BEGIN_BPF_CMD_DECODER(BPF_BTF_GET_FD_BY_ID)
+{
+	PRINT_FIELD_U("{", attr, btf_id);
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -859,6 +865,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_PROG_QUERY),
 		BPF_CMD_ENTRY(BPF_RAW_TRACEPOINT_OPEN),
 		BPF_CMD_ENTRY(BPF_BTF_LOAD),
+		BPF_CMD_ENTRY(BPF_BTF_GET_FD_BY_ID),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

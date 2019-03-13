@@ -72,6 +72,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_PROG_QUERY);
 	BPF_ATTR_DATA_FIELD(BPF_RAW_TRACEPOINT_OPEN);
 	BPF_ATTR_DATA_FIELD(BPF_BTF_LOAD);
+	BPF_ATTR_DATA_FIELD(BPF_BTF_GET_FD_BY_ID);
 	char char_data[256];
 };
 
@@ -1117,6 +1118,14 @@ static struct bpf_attr_check BPF_BTF_LOAD_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_BTF_GET_FD_BY_ID_checks[] = {
+	{
+		.data = { .BPF_BTF_GET_FD_BY_ID_data = { .btf_id = 0xdeadbeef } },
+		.size = offsetofend(struct BPF_BTF_GET_FD_BY_ID_struct, btf_id),
+		.str = "btf_id=3735928559"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1148,6 +1157,7 @@ main(void)
 		CHK(BPF_PROG_QUERY),
 		CHK(BPF_RAW_TRACEPOINT_OPEN),
 		CHK(BPF_BTF_LOAD),
+		CHK(BPF_BTF_GET_FD_BY_ID),
 	};
 
 	page_size = get_page_size();
