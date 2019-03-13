@@ -441,6 +441,8 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
 	}
 };
 
+#define BPF_MAP_LOOKUP_AND_DELETE_ELEM_checks BPF_MAP_LOOKUP_ELEM_checks
+
 static const struct bpf_attr_check BPF_MAP_UPDATE_ELEM_checks[] = {
 	{
 		.data = { .BPF_MAP_UPDATE_ELEM_data = { .map_fd = -1 } },
@@ -1158,6 +1160,7 @@ main(void)
 		CHK(BPF_RAW_TRACEPOINT_OPEN),
 		CHK(BPF_BTF_LOAD),
 		CHK(BPF_BTF_GET_FD_BY_ID),
+		CHK(BPF_MAP_LOOKUP_AND_DELETE_ELEM),
 	};
 
 	page_size = get_page_size();
