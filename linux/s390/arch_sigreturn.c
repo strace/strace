@@ -6,7 +6,7 @@
  */
 
 #ifndef SIGNAL_FRAMESIZE
-# define SIGNAL_FRAMESIZE __SIGNAL_FRAMESIZE
+# define SIGNAL_FRAMESIZE 96
 #endif
 #ifndef PTR_TYPE
 # define PTR_TYPE unsigned long
