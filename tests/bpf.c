@@ -670,6 +670,40 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		.init_fn = init_BPF_PROG_LOAD_attr4,
 		.print_fn = print_BPF_PROG_LOAD_attr4
 	},
+	{ /* 5 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.prog_flags = 2,
+			.expected_attach_type = 17,
+			.prog_btf_fd = 0xbadc0ded,
+			.func_info_rec_size = 0xdad1bef2,
+			.func_info = 0xfac1fed2fac3fed4,
+			.func_info_cnt = 0xdad3bef4,
+			.line_info_rec_size = 0xdad5bef6,
+			.line_info = 0xfac5fed5fac7fed8,
+			.line_info_cnt = 0xdad7bef8
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct,
+				    line_info_cnt),
+		.str = "prog_type=BPF_PROG_TYPE_UNSPEC"
+		       ", insn_cnt=0"
+		       ", insns=NULL"
+		       ", license=NULL"
+		       ", log_level=0"
+		       ", log_size=0"
+		       ", log_buf=NULL"
+		       ", kern_version=KERNEL_VERSION(0, 0, 0)"
+		       ", prog_flags=BPF_F_ANY_ALIGNMENT"
+		       ", prog_name=\"\""
+		       ", prog_ifindex=0"
+		       ", expected_attach_type=BPF_FLOW_DISSECTOR"
+		       ", prog_btf_fd=-1159983635"
+		       ", func_info_rec_size=3671178994"
+		       ", func_info=0xfac1fed2fac3fed4"
+		       ", func_info_cnt=3671310068"
+		       ", line_info_rec_size=3671441142"
+		       ", line_info=0xfac5fed5fac7fed8"
+		       ", line_info_cnt=3671572216"
+	},
 };
 
 static void

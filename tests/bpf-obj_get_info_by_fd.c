@@ -192,6 +192,20 @@ print_prog_load(void *attr_void, size_t size, long rc)
 		printf(", prog_ifindex=0");
 	if (size > offsetof(struct BPF_PROG_LOAD_struct, expected_attach_type))
 		printf(", expected_attach_type=BPF_CGROUP_INET_INGRESS");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, prog_btf_fd))
+		printf(", prog_btf_fd=0</dev/null>");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, func_info_rec_size))
+		printf(", func_info_rec_size=0");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, func_info))
+		printf(", func_info=NULL");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, func_info_cnt))
+		printf(", func_info_cnt=0");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, line_info_rec_size))
+		printf(", line_info_rec_size=0");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, line_info))
+		printf(", line_info=NULL");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, line_info_cnt))
+		printf(", line_info_cnt=0");
 	printf("}, %zu) = ", size);
 	if (rc >= 0)
 		printf("%ld<anon_inode:bpf-prog>\n", rc);

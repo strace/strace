@@ -58,13 +58,19 @@ print_bpf_attr(void)
 		", prog_ifindex=0"
 		", expected_attach_type="
 #if XLAT_RAW
-		"0}"
+		"0"
 #elif XLAT_VERBOSE
-		"0 /* BPF_CGROUP_INET_INGRESS */}"
+		"0 /* BPF_CGROUP_INET_INGRESS */"
 #else /* XLAT_ABBREV */
-		"BPF_CGROUP_INET_INGRESS}"
+		"BPF_CGROUP_INET_INGRESS"
 #endif
-		);
+		", prog_btf_fd=0"
+		", func_info_rec_size=0"
+		", func_info=NULL"
+		", func_info_cnt=0"
+		", line_info_rec_size=0"
+		", line_info=NULL"
+		", line_info_cnt=0}");
 }
 
 int

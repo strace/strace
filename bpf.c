@@ -317,6 +317,20 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		break;
 	PRINT_FIELD_XVAL(", ", attr, expected_attach_type, bpf_attach_type,
 			 "BPF_???");
+
+	/*
+	 * The following seven fields were introduced by Linux commits
+	 * v5.0-rc1~129^2~209^2~16^2~8 and v5.0-rc1~129^2~114^2~5^2~6.
+	 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_btf_fd))
+		break;
+	PRINT_FIELD_FD(", ", attr, prog_btf_fd, tcp);
+	PRINT_FIELD_U(", ", attr, func_info_rec_size);
+	PRINT_FIELD_ADDR64(", ", attr, func_info);
+	PRINT_FIELD_U(", ", attr, func_info_cnt);
+	PRINT_FIELD_U(", ", attr, line_info_rec_size);
+	PRINT_FIELD_ADDR64(", ", attr, line_info);
+	PRINT_FIELD_U(", ", attr, line_info_cnt);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
