@@ -1,6 +1,11 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behavior
+  * -D option now implies -I4: by default strace ignores SIGHUP, SIGINT,
+    SIGQUIT, SIGPIPE, SIGTERM, SIGTTIN, SIGTTOU, and SIGTSTP when -D option
+    is used.
+
 * Improvements
   * Enhanced xlat styles support configured by -X option.
   * Enhanced decoding of bpf syscall.

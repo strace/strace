@@ -85,7 +85,7 @@ enum {
 	INTR_ANYWHERE       = 1, /* don't block/ignore any signals */
 	INTR_WHILE_WAIT     = 2, /* block fatal signals while decoding syscall. default */
 	INTR_NEVER          = 3, /* block fatal signals. default if '-o FILE PROG' */
-	INTR_BLOCK_TSTP_TOO = 4, /* block fatal signals and SIGTSTP (^Z) */
+	INTR_BLOCK_TSTP_TOO = 4, /* block fatal signals and SIGTSTP (^Z); default if -D */
 	NUM_INTR_OPTS
 };
 static int opt_intr;
@@ -1852,6 +1852,8 @@ init(int argc, char *argv[])
 	 * no		1	1	INTR_WHILE_WAIT
 	 */
 
+	if (daemonized_tracer && !opt_intr)
+		opt_intr = INTR_BLOCK_TSTP_TOO;
 	if (outfname && argc) {
 		if (!opt_intr)
 			opt_intr = INTR_NEVER;

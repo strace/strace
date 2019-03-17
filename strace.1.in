@@ -844,7 +844,9 @@ fatal signals and
 are always blocked (useful to make
 .BI "strace -o " "FILE PROG"
 not stop on
-.BR CTRL\-Z ).
+.BR CTRL\-Z ,
+default if
+.BR \-D ).
 .RE
 .SS Startup
 .TP 12
