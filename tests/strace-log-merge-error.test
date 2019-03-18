@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# Check strace-log-merge error diagnostics.
+#
+# Copyright (c) 2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+rm -f -- "$LOG".[0-9]*
+echo "strace-log-merge: $LOG: strace output not found" > "$EXP"
+
+check_strace_log_merge()
+{
+	"$srcdir"/../strace-log-merge "$LOG" > "$OUT" 2> "$LOG"
+	rc=$?
+
+	[ $rc -gt 0 ] ||
+		dump_log_and_fail_with 'strace-log-merge unexpectedly succeeded'
+
+	[ ! -s "$OUT" ] ||
+		dump_log_and_fail_with 'strace-log-merge unexpectedly produced output'
+
+	match_diff "$LOG" "$EXP" 'strace-log-merge error diagnostics mismatch'
+}
+
+check_strace_log_merge
+
+echo '1234567890.123456 +++ exited with 0 +++' > "$LOG".0
+check_strace_log_merge
+
+echo > "$LOG".1
+check_strace_log_merge
+
+rm -f -- "$LOG".[0-9]*

@@ -341,6 +341,7 @@ MISC_TESTS = \
 	strace-T.test \
 	strace-V.test \
 	strace-ff.test \
+	strace-log-merge-error.test \
 	strace-r.test \
 	strace-t.test \
 	strace-tt.test \

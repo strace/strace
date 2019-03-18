@@ -35,6 +35,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed build in --with-libiberty=yes mode.
   * Fixed potential NULL dereference during printing of line continuation
     for syscalls that haven't been decoded.
+  * Fixed strace-log-merge error diagnostics.
 
 Noteworthy changes in release 4.26 (2018-12-26)
 ===============================================
