@@ -5,8 +5,18 @@ Noteworthy changes in release ?.?? (????-??-??)
   * -D option now implies -I4: by default strace ignores SIGHUP, SIGINT,
     SIGQUIT, SIGPIPE, SIGTERM, SIGTTIN, SIGTTOU, and SIGTSTP when -D option
     is used.
+  * Diagnostic message is no longer printed if an attempt to restart a process
+    has failed with ESRCH.  (Addresses RHBZ bug #1662936.)
+  * ASCII dump no longer tries to read the whole buffer at once.  As result,
+    it can fail with a diagnostic message after dumping only a part.
+    Amount of preceding zeroes printed for offset is now chosen in a way
+    to accommodate all the digits of all the offsets being printed.
 
 * Improvements
+  * Changed the way tracees are handled: all pending tracees are now waited for
+    before further processing, this improves fairness of tracee processing.
+    (Addresses RHBZ bugs #478419, #526740, #851457, #1609318, #1610774,
+    and maybe some others.)
   * Enhanced xlat styles support configured by -X option.
   * Enhanced decoding of bpf syscall.
   * Enhanced decoding of PTRACE_PEEKUSER and PTRACE_POKEUSER on hppa.
@@ -23,6 +33,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Fixed build on mips o32.
   * Fixed build on NOMMU architectures.
   * Fixed build in --with-libiberty=yes mode.
+  * Fixed potential NULL dereference during printing of line continuation
+    for syscalls that haven't been decoded.
 
 Noteworthy changes in release 4.26 (2018-12-26)
 ===============================================
