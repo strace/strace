@@ -106,16 +106,16 @@ print_status_array(const int *const status, const unsigned long count)
 		if (status[i] >= 0) {
 			printf("%d", status[i]);
 		} else {
-#if !XLAT_RAW
+# if !XLAT_RAW
 			errno = -status[i];
-#endif
-#if XLAT_RAW
+# endif
+# if XLAT_RAW
 			printf("%d", status[i]);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 			printf("%d /* -%s */", status[i], errno2name());
-#else
+# else
 			printf("-%s", errno2name());
-#endif
+# endif
 		}
 	}
 	printf("]");
@@ -141,13 +141,13 @@ print_stat_pages(const unsigned long pid, const unsigned long count,
 	} else {
 		print_status_array(status, count);
 	}
-#if XLAT_RAW
+# if XLAT_RAW
 	printf(", 0x2) = %s\n", errstr);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	printf(", 0x2 /* MPOL_MF_MOVE */) = %s\n", errstr);
-#else /* XLAT_ABBREV */
+# else /* XLAT_ABBREV */
 	printf(", MPOL_MF_MOVE) = %s\n", errstr);
-#endif
+# endif
 }
 
 static void
@@ -173,13 +173,13 @@ print_move_pages(const unsigned long pid,
 		printf("%p", status);
 	else
 		printf("[]");
-#if XLAT_RAW
+# if XLAT_RAW
 	printf(", 0x4) = %s\n", errstr);
-#elif XLAT_VERBOSE
+# elif XLAT_VERBOSE
 	printf(", 0x4 /* MPOL_MF_MOVE_ALL */) = %s\n", errstr);
-#else /* XLAT_ABBREV */
+# else /* XLAT_ABBREV */
 	printf(", MPOL_MF_MOVE_ALL) = %s\n", errstr);
-#endif
+# endif
 }
 
 int

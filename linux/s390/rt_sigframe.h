@@ -10,11 +10,11 @@
 
 # include <signal.h>
 
-#ifdef __s390x__
-# define SIGNAL_FRAMESIZE 160
-#else /* __s390__ */
-# define SIGNAL_FRAMESIZE 96
-#endif
+# ifdef __s390x__
+#  define SIGNAL_FRAMESIZE 160
+# else /* __s390__ */
+#  define SIGNAL_FRAMESIZE 96
+# endif
 
 typedef struct {
 	uint8_t		callee_used_stack[SIGNAL_FRAMESIZE];

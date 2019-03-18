@@ -8,7 +8,7 @@
  */
 
 #ifndef STRACE_LIST_H
-#define STRACE_LIST_H
+# define STRACE_LIST_H
 
 /*
  * struct list_item and related macros and functions provide an interface
@@ -87,7 +87,7 @@
  *     https://lwn.net/Articles/336255/
  */
 
-#include "macros.h"
+# include "macros.h"
 
 struct list_item {
 	struct list_item *prev;
@@ -99,7 +99,7 @@ struct list_item {
  *
  * @param l_ List head variable name.
  */
-#define EMPTY_LIST(l_) struct list_item l_ = { &l_, &l_ }
+# define EMPTY_LIST(l_) struct list_item l_ = { &l_, &l_ }
 
 /** Initialise an empty list. */
 static inline void
@@ -130,7 +130,7 @@ list_is_empty(const struct list_item *l)
  * @param type  Type of the list's item.
  * @param field Name of the field that holds the respective struct list_item.
  */
-#define list_elem(var, type, field) containerof((var), type, field)
+# define list_elem(var, type, field) containerof((var), type, field)
 
 /**
  * Get the first element in a list.
@@ -139,7 +139,7 @@ list_is_empty(const struct list_item *l)
  * @param type  Type of the list's item.
  * @param field Name of the field that holds the respective struct list_item.
  */
-#define list_head(head, type, field) \
+# define list_head(head, type, field) \
 	(list_is_empty(head) ? NULL : list_elem((head)->next, type, field))
 /**
  * Get the last element in a list.
@@ -148,7 +148,7 @@ list_is_empty(const struct list_item *l)
  * @param type  Type of the list's item.
  * @param field Name of the field that holds the respective struct list_item.
  */
-#define list_tail(head, type, field) \
+# define list_tail(head, type, field) \
 	(list_is_empty(head) ? NULL : list_elem((head)->prev, type, field))
 
 /**
@@ -157,7 +157,7 @@ list_is_empty(const struct list_item *l)
  * @param var   Pointer to a list item.
  * @param field Name of the field that holds the respective struct list_item.
  */
-#define list_next(var, field) \
+# define list_next(var, field) \
 	list_elem((var)->field.next, typeof(*(var)), field)
 /**
  * Get the previous element in a list.
@@ -165,7 +165,7 @@ list_is_empty(const struct list_item *l)
  * @param var   Pointer to a list item.
  * @param field Name of the field that holds the respective struct list_item.
  */
-#define list_prev(var, field) \
+# define list_prev(var, field) \
 	list_elem((var)->field.prev, typeof(*(var)), field)
 
 /**
@@ -279,7 +279,7 @@ list_replace(struct list_item *old, struct list_item *new)
  * @param field_ Name of the field containing the respective struct list_item
  *               inside list items.
  */
-#define list_foreach(var_, head_, field_) \
+# define list_foreach(var_, head_, field_) \
 	for (var_ = list_elem((head_)->next, typeof(*var_), field_); \
 	    &(var_->field_) != (head_); var_ = list_next(var_, field_))
 
@@ -292,7 +292,7 @@ list_replace(struct list_item *old, struct list_item *new)
  *               inside list items.
  * @param _tmp   Temporary variable for storing pointer to the next item.
  */
-#define list_foreach_safe(var_, head_, field_, _tmp) \
+# define list_foreach_safe(var_, head_, field_, _tmp) \
 	for (var_ = list_elem((head_)->next, typeof(*var_), field_), \
 	    _tmp = list_elem((var_)->field_.next, typeof(*var_), field_); \
 	    &var_->field_ != head_; var_ = _tmp, _tmp = list_next(_tmp, field_))
