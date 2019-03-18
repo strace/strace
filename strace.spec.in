@@ -4,7 +4,13 @@ Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
 # The test suite is GPLv2+, all the rest is LGPLv2.1+.
 License: LGPL-2.1-or-later and GPL-2.0-or-later
+# Some distros require Group tag to be present,
+# some require Group tag to be absent,
+# some do not care about Group tag at all,
+# and we have to cater for all of them.
+%if 0%{?fedora} < 28 && 0%{?centos} < 8 && 0%{?rhel} < 8 && 0%{?suse_version} < 1500
 Group: Development%{?suse_version:/Tools}/Debuggers
+%endif
 URL: https://strace.io
 Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
 BuildRequires: gcc gzip
