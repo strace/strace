@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Philippe De Muyter <phdm@macqel.be>
  * Copyright (c) 2014 William Manley <will@williammanley.net>
  * Copyright (c) 2011 Peter Zotov <whitequark@whitequark.org>
- * Copyright (c) 2014-2018 The strace developers.
+ * Copyright (c) 2014-2019 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
