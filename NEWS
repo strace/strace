@@ -1,5 +1,5 @@
-Noteworthy changes in release ?.?? (????-??-??)
-===============================================
+Noteworthy changes in release 5.0 (2019-03-19)
+==============================================
 
 * Changes in behavior
   * -D option now implies -I4: by default strace ignores SIGHUP, SIGINT,
