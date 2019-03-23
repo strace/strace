@@ -49,7 +49,7 @@ SYS_FUNC(cacheflush)
 }
 #endif /* M68K */
 
-#ifdef BFIN
+#if defined(BFIN) || defined(CSKY)
 static const struct xlat cacheflush_flags[] = {
 	XLAT(ICACHE),
 	XLAT(DCACHE),
@@ -68,7 +68,7 @@ SYS_FUNC(cacheflush)
 
 	return RVAL_DECODED;
 }
-#endif /* BFIN */
+#endif /* BFIN || CSKY */
 
 #ifdef SH
 static const struct xlat cacheflush_flags[] = {

@@ -4,6 +4,9 @@ Noteworthy changes in release ?.? (????-??-??)
 * Bug fixes
   * Fixed decoding of last two arguments of clone syscall on riscv.
 
+* Improvements
+  * Added C-SKY architecture support.
+
 Noteworthy changes in release 5.0 (2019-03-19)
 ==============================================
 

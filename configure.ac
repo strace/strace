@@ -79,6 +79,10 @@ bfin)
 	arch=bfin
 	AC_DEFINE([BFIN], 1, [Define for the Blackfin architecture.])
 	;;
+csky*)
+	arch=csky
+	AC_DEFINE([CSKY], 1, [Define for the C-SKY architecture])
+	;;
 hppa*|parisc*)
 	arch=hppa
 	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])

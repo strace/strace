@@ -510,6 +510,16 @@ EXTRA_DIST =				\
 	linux/bfin/set_error.c		\
 	linux/bfin/set_scno.c		\
 	linux/bfin/syscallent.h		\
+	linux/csky/arch_regs.c		\
+	linux/csky/get_error.c		\
+	linux/csky/get_scno.c		\
+	linux/csky/get_syscall_args.c	\
+	linux/csky/ioctls_arch0.h	\
+	linux/csky/ioctls_inc0.h	\
+	linux/csky/raw_syscall.h	\
+	linux/csky/set_error.c		\
+	linux/csky/set_scno.c		\
+	linux/csky/syscallent.h		\
 	linux/bfin/userent.h		\
 	linux/check_scno.c		\
 	linux/dummy.h			\
