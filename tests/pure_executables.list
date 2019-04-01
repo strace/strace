@@ -491,6 +491,11 @@ stat
 stat64
 statfs
 statfs64
+status-all
+status-failed
+status-none
+status-successful
+status-unfinished
 statx
 swap
 sxetmask

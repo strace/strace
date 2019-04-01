@@ -208,6 +208,9 @@ int printxval(const struct xlat *, const unsigned long long, const char *);
 int socketcall(const int nr, const int call,
 	       long a1, long a2, long a3, long a4, long a5);
 
+/* Call chdir and print strace output depending on flags. */
+void test_status_chdir(const char *dir, bool print_success, bool print_fail);
+
 /* Wrappers for recvmmsg and sendmmsg syscalls. */
 struct mmsghdr;
 struct timespec;
