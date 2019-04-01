@@ -417,6 +417,7 @@ extern bool iflag;
 extern bool count_wallclock;
 extern unsigned int qflag;
 extern bool not_failing_only;
+extern bool failing_only;
 extern unsigned int show_fd_path;
 /* are we filtering traces based on paths? */
 extern struct path_set {

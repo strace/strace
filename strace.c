@@ -109,8 +109,9 @@ static bool daemonized_tracer;
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
-/* Sometimes we want to print only succeeding syscalls. */
+/* Sometimes we want to print succeeding/failing syscalls only. */
 bool not_failing_only;
+bool failing_only;
 
 /* Show path associated with fd arguments */
 unsigned int show_fd_path;
@@ -304,6 +305,7 @@ Miscellaneous:\n\
  */
 /* this is broken, so don't document it
 -z -- print only succeeding syscalls\n\
+-Z -- print only failing syscalls\n\
  */
 , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(0);
@@ -1579,7 +1581,7 @@ init(int argc, char *argv[])
 #ifdef ENABLE_STACKTRACE
 	    "k"
 #endif
-	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yz")) != EOF) {
+	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ")) != EOF) {
 		switch (c) {
 		case 'a':
 			acolumn = string_to_uint(optarg);
@@ -1709,6 +1711,9 @@ init(int argc, char *argv[])
 			break;
 		case 'z':
 			not_failing_only = 1;
+			break;
+		case 'Z':
+			failing_only = 1;
 			break;
 		default:
 			error_msg_and_help(NULL);

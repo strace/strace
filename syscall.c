@@ -759,8 +759,10 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	 * whereas the intended result is that open(...) line
 	 * is not shown at all.
 	 */
-		if (not_failing_only && tcp->u_error)
-			return 0;	/* ignore failed syscalls */
+		if ((not_failing_only && syserror(tcp)) ||
+		    (failing_only && !syserror(tcp)))
+			return 0;	/* ignore failed/successful
+					 * syscalls */
 		if (tcp->sys_func_rval & RVAL_DECODED)
 			sys_res = tcp->sys_func_rval;
 		else
