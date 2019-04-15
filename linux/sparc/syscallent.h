@@ -367,6 +367,17 @@
 [359] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [360] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [361] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+/* room for arch specific calls */
+[393] = { 3,	TI,		SEN(semget),			"semget"		},
+[394] = { 4,	TI,		SEN(semctl),			"semctl"		},
+[395] = { 3,	TI,		SEN(shmget),			"shmget"		},
+[396] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
+[397] = { 3,	TI|TM|SI,	SEN(shmat),			"shmat"			},
+[398] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},
+[399] = { 2,	TI,		SEN(msgget),			"msgget"		},
+[400] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
+[401] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
+[402] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
 
 #define SYS_socket_subcall	500
 #include "subcall.h"
