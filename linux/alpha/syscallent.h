@@ -466,3 +466,4 @@
 [520] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [521] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [522] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[523] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
