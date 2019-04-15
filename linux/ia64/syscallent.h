@@ -337,3 +337,7 @@
 [1024 + 327] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
 [1024 + 328] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [1024 + 329] = { 3,	0,		SEN(seccomp),			"seccomp"		},
+[1024 + 330] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
+[1024 + 331] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
+[1024 + 332] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[1024 + 333] = { 4,	0,		SEN(rseq),			"rseq"			},

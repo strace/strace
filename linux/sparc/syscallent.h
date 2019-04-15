@@ -367,6 +367,10 @@
 [359] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [360] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [361] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[362] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
+[363] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
+[364] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[365] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* room for arch specific calls */
 [393] = { 3,	TI,		SEN(semget),			"semget"		},
 [394] = { 4,	TI,		SEN(semctl),			"semctl"		},

@@ -12,6 +12,10 @@ Noteworthy changes in release ?.? (????-??-??)
     on ia64.
   * Wired up seccomp syscall on m68k.
   * Wired up statx syscall on sh.
+  * Wired up pkey_mprotect, pkey_alloc, and pkey_free syscalls on alpha, hppa,
+    ia64, m68k, s390, s390x, sh, sparc, and sparc64.
+  * Wired up rseq syscall on alpha, hppa, ia64, m68k, sh, sparc, sparc64,
+    and xtensa.
   * Wired up direct ipc syscalls on m68k, mips o32, powerpc, powerpc64,
     s390, s390x, sh, sparc, sparc64, and x86.
 

@@ -467,3 +467,7 @@
 [521] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [522] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [523] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[524] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
+[525] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
+[526] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
+[527] = { 4,	0,		SEN(rseq),			"rseq"			},
