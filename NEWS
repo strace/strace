@@ -6,7 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Added C-SKY architecture support.
-  * Wired up io_pgetevents syscall on alpha.
+  * Wired up io_pgetevents, statfs64, and fstatfs64 syscalls on alpha.
   * Wired up kexec_file_load and migrate_pages syscalls on arm.
   * Wired up io_pgetevents, perf_event_open, seccomp, and statx syscalls
     on ia64.

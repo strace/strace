@@ -471,3 +471,5 @@
 [525] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [526] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [527] = { 4,	0,		SEN(rseq),			"rseq"			},
+[528] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},
+[529] = { 3,	TD|TFSF|TSFA,	SEN(fstatfs64),			"fstatfs64"		},
