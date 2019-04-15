@@ -6,7 +6,8 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Added C-SKY architecture support.
-  * Wired up statx and io_pgetevents syscalls on ia64.
+  * Wired up io_pgetevents, perf_event_open, seccomp, and statx syscalls
+    on ia64.
 
 Noteworthy changes in release 5.0 (2019-03-19)
 ==============================================

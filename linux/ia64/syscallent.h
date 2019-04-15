@@ -335,3 +335,5 @@
 [1024 + 325] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [1024 + 326] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [1024 + 327] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[1024 + 328] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
+[1024 + 329] = { 3,	0,		SEN(seccomp),			"seccomp"		},
