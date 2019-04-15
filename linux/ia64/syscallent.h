@@ -333,3 +333,5 @@
 [1024 + 323] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [1024 + 324] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [1024 + 325] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+[1024 + 326] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[1024 + 327] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
