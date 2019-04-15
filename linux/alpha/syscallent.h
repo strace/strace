@@ -473,3 +473,6 @@
 [527] = { 4,	0,		SEN(rseq),			"rseq"			},
 [528] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},
 [529] = { 3,	TD|TFSF|TSFA,	SEN(fstatfs64),			"fstatfs64"		},
+[530] = { 0,	PU|NF,		SEN(getegid),			"getegid"		},
+[531] = { 0,	PU|NF,		SEN(geteuid),			"geteuid"		},
+[532] = { 0,	PU|NF,		SEN(getppid),			"getppid"		},
