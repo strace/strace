@@ -389,6 +389,7 @@
 [380] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [381] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [382] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+[383] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 
 #define SYS_socket_subcall	500
 #include "subcall.h"
