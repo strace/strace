@@ -15,7 +15,7 @@
 #ifdef __NR_oldumount
 # define TEST_SYSCALL_STR "oldumount"
 #else
-# if defined __NR_umount && defined __NR_umount2
+# if defined __NR_umount && defined __NR_umount2 && __NR_umount != __NR_umount2
 #  define __NR_oldumount __NR_umount
 #  define TEST_SYSCALL_STR "umount"
 # endif

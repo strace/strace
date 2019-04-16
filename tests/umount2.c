@@ -12,7 +12,7 @@
 #include <sys/mount.h>
 #include <asm/unistd.h>
 
-#ifdef __NR_umount2
+#if defined __NR_umount2 && (!defined __NR_umount || __NR_umount2 != __NR_umount)
 # define TEST_SYSCALL_STR "umount2"
 #else
 # define __NR_umount2 __NR_umount
