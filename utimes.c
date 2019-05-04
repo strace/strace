@@ -33,16 +33,22 @@ SYS_FUNC(futimesat)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(utimensat)
+static int
+do_utimensat(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
-	print_timespec_utime_pair(tcp, tcp->u_arg[2]);
+	print_ts(tcp, tcp->u_arg[2]);
 	tprints(", ");
 	printflags(at_flags, tcp->u_arg[3], "AT_???");
 
 	return RVAL_DECODED;
+}
+
+SYS_FUNC(utimensat)
+{
+	return do_utimensat(tcp, print_timespec_utime_pair);
 }
 
 #ifdef ALPHA
