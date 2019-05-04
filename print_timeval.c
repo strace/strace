@@ -50,30 +50,32 @@ MPERS_PRINTER_DECL(bool, print_struct_timeval_data_size,
 	return true;
 }
 
-MPERS_PRINTER_DECL(void, print_timeval,
+MPERS_PRINTER_DECL(int, print_timeval,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval_t t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	print_timeval_t(&t);
+	return 0;
 }
 
-MPERS_PRINTER_DECL(void, print_timeval_utimes,
+MPERS_PRINTER_DECL(int, print_timeval_utimes,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval_t t[2];
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	tprints("[");
 	print_timeval_t_utime(&t[0]);
 	tprints(", ");
 	print_timeval_t_utime(&t[1]);
 	tprints("]");
+	return 0;
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timeval,
@@ -96,19 +98,20 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 	return buf;
 }
 
-MPERS_PRINTER_DECL(void, print_itimerval,
+MPERS_PRINTER_DECL(int, print_itimerval,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval_t t[2];
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	tprints("{it_interval=");
 	print_timeval_t(&t[0]);
 	tprints(", it_value=");
 	print_timeval_t(&t[1]);
 	tprints("}");
+	return 0;
 }
 
 #ifdef ALPHA
@@ -128,45 +131,48 @@ print_timeval32_t_utime(const timeval32_t *t)
 		zero_extend_signed_to_ull(t->tv_usec)));
 }
 
-void
+int
 print_timeval32(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval32_t t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	print_timeval32_t(&t);
+	return 0;
 }
 
-void
+int
 print_timeval32_utimes(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval32_t t[2];
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	tprints("[");
 	print_timeval32_t_utime(&t[0]);
 	tprints(", ");
 	print_timeval32_t_utime(&t[1]);
 	tprints("]");
+	return 0;
 }
 
-void
+int
 print_itimerval32(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timeval32_t t[2];
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	tprints("{it_interval=");
 	print_timeval32_t(&t[0]);
 	tprints(", it_value=");
 	print_timeval32_t(&t[1]);
 	tprints("}");
+	return 0;
 }
 
 const char *

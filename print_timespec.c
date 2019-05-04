@@ -91,15 +91,16 @@ MPERS_PRINTER_DECL(bool, print_struct_timespec_array_data_size,
 	return true;
 }
 
-MPERS_PRINTER_DECL(void, print_timespec,
+MPERS_PRINTER_DECL(int, print_timespec,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timespec_t t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	print_timespec_t(&t);
+	return 0;
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timespec,
@@ -122,32 +123,34 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec,
 	return buf;
 }
 
-MPERS_PRINTER_DECL(void, print_timespec_utime_pair,
+MPERS_PRINTER_DECL(int, print_timespec_utime_pair,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timespec_t t[2];
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	tprints("[");
 	print_timespec_t_utime(&t[0]);
 	tprints(", ");
 	print_timespec_t_utime(&t[1]);
 	tprints("]");
+	return 0;
 }
 
-MPERS_PRINTER_DECL(void, print_itimerspec,
+MPERS_PRINTER_DECL(int, print_itimerspec,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	timespec_t t[2];
 
 	if (umove_or_printaddr(tcp, addr, &t))
-		return;
+		return -1;
 
 	tprints("{it_interval=");
 	print_timespec_t(&t[0]);
 	tprints(", it_value=");
 	print_timespec_t(&t[1]);
 	tprints("}");
+	return 0;
 }

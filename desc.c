@@ -52,7 +52,7 @@ SYS_FUNC(dup3)
 
 static int
 decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
-	      void (*const print_tv_ts) (struct tcb *, kernel_ulong_t),
+	      int (*const print_tv_ts) (struct tcb *, kernel_ulong_t),
 	      const char * (*const sprint_tv_ts) (struct tcb *, kernel_ulong_t))
 {
 	int i, j;
