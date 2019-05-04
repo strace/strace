@@ -42,7 +42,8 @@ decode_poll_entering(struct tcb *tcp)
 }
 
 static int
-decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
+decode_poll_exiting(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts,
+		    const kernel_ulong_t pts)
 {
 	struct pollfd fds;
 	const unsigned int nfds = tcp->u_arg[1];
@@ -114,7 +115,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 
 	*outptr = '\0';
 	if (pts) {
-		const char *str = sprint_timespec(tcp, pts);
+		const char *str = sprint_ts(tcp, pts);
 
 		if (outptr + sizeof(", left ") + strlen(str) < end_outstr) {
 			outptr = stpcpy(outptr, outptr == outstr ? "left " : ", left ");
@@ -140,16 +141,18 @@ SYS_FUNC(poll)
 
 		return 0;
 	} else {
-		return decode_poll_exiting(tcp, 0);
+		return decode_poll_exiting(tcp, sprint_timespec, 0);
 	}
 }
 
-SYS_FUNC(ppoll)
+static int
+do_ppoll(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+	 const sprint_obj_by_addr_fn sprint_ts)
 {
 	if (entering(tcp)) {
 		decode_poll_entering(tcp);
 
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_ts(tcp, tcp->u_arg[2]);
 		tprints(", ");
 		/* NB: kernel requires arg[4] == NSIG_BYTES */
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
@@ -157,6 +160,11 @@ SYS_FUNC(ppoll)
 
 		return 0;
 	} else {
-		return decode_poll_exiting(tcp, tcp->u_arg[2]);
+		return decode_poll_exiting(tcp, sprint_ts, tcp->u_arg[2]);
 	}
+}
+
+SYS_FUNC(ppoll)
+{
+	return do_ppoll(tcp, print_timespec, sprint_timespec);
 }
