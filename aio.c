@@ -217,7 +217,8 @@ SYS_FUNC(io_cancel)
 }
 
 static int
-print_io_getevents(struct tcb *tcp, bool has_usig)
+print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+		   const bool has_usig)
 {
 	if (entering(tcp)) {
 		printaddr(tcp->u_arg[0]);
@@ -235,7 +236,7 @@ print_io_getevents(struct tcb *tcp, bool has_usig)
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_ts(tcp, tcp->u_arg[4]);
 		if (has_usig) {
 			tprints(", ");
 			print_aio_sigset(tcp, tcp->u_arg[5]);
@@ -247,10 +248,10 @@ print_io_getevents(struct tcb *tcp, bool has_usig)
 
 SYS_FUNC(io_getevents)
 {
-	return print_io_getevents(tcp, false);
+	return print_io_getevents(tcp, print_timespec, false);
 }
 
 SYS_FUNC(io_pgetevents)
 {
-	return print_io_getevents(tcp, true);
+	return print_io_getevents(tcp, print_timespec, true);
 }
