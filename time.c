@@ -209,34 +209,47 @@ printclockname(int clockid)
 		printxval_index(clocknames, clockid, "CLOCK_???");
 }
 
-SYS_FUNC(clock_settime)
+static int
+do_clock_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
-	print_timespec(tcp, tcp->u_arg[1]);
+	print_ts(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(clock_gettime)
+SYS_FUNC(clock_settime)
+{
+	return do_clock_settime(tcp, print_timespec);
+}
+
+static int
+do_clock_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
 		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 	} else {
-		print_timespec(tcp, tcp->u_arg[1]);
+		print_ts(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
 
-SYS_FUNC(clock_nanosleep)
+SYS_FUNC(clock_gettime)
+{
+	return do_clock_gettime(tcp, print_timespec);
+}
+
+static int
+do_clock_nanosleep(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
 		printclockname(tcp->u_arg[0]);
 		tprints(", ");
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprints(", ");
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_ts(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
 		/*
@@ -245,13 +258,18 @@ SYS_FUNC(clock_nanosleep)
 		 */
 		if (!tcp->u_arg[1] && is_erestart(tcp)) {
 			temporarily_clear_syserror(tcp);
-			print_timespec(tcp, tcp->u_arg[3]);
+			print_ts(tcp, tcp->u_arg[3]);
 			restore_cleared_syserror(tcp);
 		} else {
 			printaddr(tcp->u_arg[3]);
 		}
 	}
 	return 0;
+}
+
+SYS_FUNC(clock_nanosleep)
+{
+	return do_clock_nanosleep(tcp, print_timespec);
 }
 
 static int
