@@ -300,28 +300,40 @@ SYS_FUNC(timer_create)
 	return 0;
 }
 
-SYS_FUNC(timer_settime)
+static int
+do_timer_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
 		tprints(", ");
-		print_itimerspec(tcp, tcp->u_arg[2]);
+		print_its(tcp, tcp->u_arg[2]);
 		tprints(", ");
 	} else {
-		print_itimerspec(tcp, tcp->u_arg[3]);
+		print_its(tcp, tcp->u_arg[3]);
+	}
+	return 0;
+}
+
+SYS_FUNC(timer_settime)
+{
+	return do_timer_settime(tcp, print_itimerspec);
+}
+
+static int
+do_timer_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
+{
+	if (entering(tcp)) {
+		tprintf("%d, ", (int) tcp->u_arg[0]);
+	} else {
+		print_its(tcp, tcp->u_arg[1]);
 	}
 	return 0;
 }
 
 SYS_FUNC(timer_gettime)
 {
-	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
-	} else {
-		print_itimerspec(tcp, tcp->u_arg[1]);
-	}
-	return 0;
+	return do_timer_gettime(tcp, print_itimerspec);
 }
 
 #include "xlat/timerfdflags.h"
