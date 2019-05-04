@@ -26,18 +26,25 @@ SYS_FUNC(mq_open)
 	return RVAL_DECODED | RVAL_FD;
 }
 
-SYS_FUNC(mq_timedsend)
+static int
+do_mq_timedsend(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu ", %u, ", tcp->u_arg[2],
 		(unsigned int) tcp->u_arg[3]);
-	print_timespec(tcp, tcp->u_arg[4]);
+	print_ts(tcp, tcp->u_arg[4]);
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(mq_timedreceive)
+SYS_FUNC(mq_timedsend)
+{
+	return do_mq_timedsend(tcp, print_timespec);
+}
+
+static int
+do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -56,10 +63,15 @@ SYS_FUNC(mq_timedreceive)
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_ts(tcp, tcp->u_arg[4]);
 		restore_cleared_syserror(tcp);
 	}
 	return 0;
+}
+
+SYS_FUNC(mq_timedreceive)
+{
+	return do_mq_timedreceive(tcp, print_timespec);
 }
 
 SYS_FUNC(mq_notify)
