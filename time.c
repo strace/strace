@@ -254,13 +254,19 @@ SYS_FUNC(clock_nanosleep)
 	return 0;
 }
 
-SYS_FUNC(clock_adjtime)
+static int
+do_clock_adjtime(struct tcb *const tcp, const print_obj_by_addr_fn print_tx)
 {
 	if (exiting(tcp))
-		return do_adjtimex(tcp, print_timex, tcp->u_arg[1]);
+		return do_adjtimex(tcp, print_tx, tcp->u_arg[1]);
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
 	return 0;
+}
+
+SYS_FUNC(clock_adjtime)
+{
+	return do_clock_adjtime(tcp, print_timex);
 }
 
 SYS_FUNC(timer_create)
