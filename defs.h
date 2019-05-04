@@ -837,6 +837,8 @@ typedef bool (*tfetch_mem_fn)(struct tcb *, kernel_ulong_t addr,
 			      unsigned int size, void *dest);
 typedef bool (*print_fn)(struct tcb *, void *elem_buf,
 			 size_t elem_size, void *opaque_data);
+typedef int (*print_obj_by_addr_fn)(struct tcb *, kernel_ulong_t);
+typedef const char * (*sprint_obj_by_addr_fn)(struct tcb *, kernel_ulong_t);
 
 
 /**
