@@ -26,7 +26,8 @@
 #include "xlat/futexwakeops.h"
 #include "xlat/futexwakecmps.h"
 
-SYS_FUNC(futex)
+static int
+do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	const kernel_ulong_t uaddr = tcp->u_arg[0];
 	const int op = tcp->u_arg[1];
@@ -45,16 +46,16 @@ SYS_FUNC(futex)
 	case FUTEX_WAIT:
 		tprintf(", %u", val);
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_ts(tcp, timeout);
 		break;
 	case FUTEX_LOCK_PI:
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_ts(tcp, timeout);
 		break;
 	case FUTEX_WAIT_BITSET:
 		tprintf(", %u", val);
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_ts(tcp, timeout);
 		tprints(", ");
 		printxval(futexbitset, val3, NULL);
 		break;
@@ -98,7 +99,7 @@ SYS_FUNC(futex)
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprintf(", %u", val);
 		tprints(", ");
-		print_timespec(tcp, timeout);
+		print_ts(tcp, timeout);
 		tprints(", ");
 		printaddr(uaddr2);
 		break;
@@ -120,4 +121,9 @@ SYS_FUNC(futex)
 	}
 
 	return RVAL_DECODED;
+}
+
+SYS_FUNC(futex)
+{
+	return do_futex(tcp, print_timespec);
 }
