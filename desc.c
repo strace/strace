@@ -224,9 +224,11 @@ umove_kulong_array_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr
 	return umoven_or_printaddr(tcp, addr, n * sizeof(*ptr), ptr);
 }
 
-SYS_FUNC(pselect6)
+static int
+do_pselect6(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+	    const sprint_obj_by_addr_fn sprint_ts)
 {
-	int rc = decode_select(tcp, tcp->u_arg, print_timespec, sprint_timespec);
+	int rc = decode_select(tcp, tcp->u_arg, print_ts, sprint_ts);
 	if (entering(tcp)) {
 		kernel_ulong_t data[2];
 
@@ -241,4 +243,9 @@ SYS_FUNC(pselect6)
 	}
 
 	return rc;
+}
+
+SYS_FUNC(pselect6)
+{
+	return do_pselect6(tcp, print_timespec, sprint_timespec);
 }
