@@ -61,7 +61,9 @@ SYS_FUNC(sched_get_priority_min)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(sched_rr_get_interval)
+static int
+do_sched_rr_get_interval(struct tcb *const tcp,
+			 const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
@@ -69,9 +71,14 @@ SYS_FUNC(sched_rr_get_interval)
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
 		else
-			print_timespec(tcp, tcp->u_arg[1]);
+			print_ts(tcp, tcp->u_arg[1]);
 	}
 	return 0;
+}
+
+SYS_FUNC(sched_rr_get_interval)
+{
+	return do_sched_rr_get_interval(tcp, print_timespec);
 }
 
 static void
