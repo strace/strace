@@ -175,14 +175,16 @@ SYS_FUNC(sendmmsg)
 	return 0;
 }
 
-SYS_FUNC(recvmmsg)
+static int
+do_recvmmsg(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+	    const sprint_obj_by_addr_fn sprint_ts)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
 		tprints(", ");
 		if (verbose(tcp)) {
 			save_mmsgvec_namelen(tcp, tcp->u_arg[1], tcp->u_arg[2],
-					     sprint_timespec(tcp, tcp->u_arg[4]));
+					     sprint_ts(tcp, tcp->u_arg[4]));
 		} else {
 			/* msgvec */
 			printaddr(tcp->u_arg[1]);
@@ -191,7 +193,7 @@ SYS_FUNC(recvmmsg)
 			/* flags */
 			printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 			tprints(", ");
-			print_timespec(tcp, tcp->u_arg[4]);
+			print_ts(tcp, tcp->u_arg[4]);
 		}
 		return 0;
 	} else {
@@ -217,8 +219,13 @@ SYS_FUNC(recvmmsg)
 			return 0;
 		/* timeout on exit */
 		static char str[sizeof("left") + TIMESPEC_TEXT_BUFSIZE];
-		xsprintf(str, "left %s", sprint_timespec(tcp, tcp->u_arg[4]));
+		xsprintf(str, "left %s", sprint_ts(tcp, tcp->u_arg[4]));
 		tcp->auxstr = str;
 		return RVAL_STR;
 	}
+}
+
+SYS_FUNC(recvmmsg)
+{
+	return do_recvmmsg(tcp, print_timespec, sprint_timespec);
 }
