@@ -62,23 +62,29 @@ SYS_FUNC(semop)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(semtimedop)
+static int
+do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	tprintf("%d, ", (int) tcp->u_arg[0]);
 	if (indirect_ipccall(tcp)) {
 		tprint_sembuf_array(tcp, tcp->u_arg[3], tcp->u_arg[1]);
 		tprints(", ");
 #if defined(S390) || defined(S390X)
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_ts(tcp, tcp->u_arg[2]);
 #else
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_ts(tcp, tcp->u_arg[4]);
 #endif
 	} else {
 		tprint_sembuf_array(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 		tprints(", ");
-		print_timespec(tcp, tcp->u_arg[3]);
+		print_ts(tcp, tcp->u_arg[3]);
 	}
 	return RVAL_DECODED;
+}
+
+SYS_FUNC(semtimedop)
+{
+	return do_semtimedop(tcp, print_timespec);
 }
 
 SYS_FUNC(semget)
