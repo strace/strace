@@ -152,9 +152,10 @@ SYS_FUNC(osf_setitimer)
 #include "xlat/adjtimex_state.h"
 
 static int
-do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr)
+do_adjtimex(struct tcb *const tcp, const print_obj_by_addr_fn print_tx,
+	    const kernel_ulong_t addr)
 {
-	if (print_timex(tcp, addr))
+	if (print_tx(tcp, addr))
 		return 0;
 	tcp->auxstr = xlat_idx(adjtimex_state, ARRAY_SIZE(adjtimex_state) - 1,
 			       (kernel_ulong_t) tcp->u_rval);
@@ -164,7 +165,7 @@ do_adjtimex(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(adjtimex)
 {
 	if (exiting(tcp))
-		return do_adjtimex(tcp, tcp->u_arg[0]);
+		return do_adjtimex(tcp, print_timex, tcp->u_arg[0]);
 	return 0;
 }
 
@@ -256,7 +257,7 @@ SYS_FUNC(clock_nanosleep)
 SYS_FUNC(clock_adjtime)
 {
 	if (exiting(tcp))
-		return do_adjtimex(tcp, tcp->u_arg[1]);
+		return do_adjtimex(tcp, print_timex, tcp->u_arg[1]);
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
 	return 0;
