@@ -8,6 +8,11 @@
 #ifndef STRACE_KERNEL_TIMESPEC_H
 # define STRACE_KERNEL_TIMESPEC_H
 
+typedef struct {
+	long long tv_sec;
+	long long tv_nsec;
+} kernel_timespec64_t;
+
 # if HAVE_ARCH_TIME32_SYSCALLS
 
 typedef struct {
