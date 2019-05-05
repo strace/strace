@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#define ARCH_TIMESIZE 8
 #define HAVE_ARCH_OLD_MMAP 1
 #define HAVE_ARCH_OLD_SELECT 1
 #define HAVE_ARCH_UID16_SYSCALLS 1

@@ -7,6 +7,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#ifndef ARCH_TIMESIZE
+# define ARCH_TIMESIZE SIZEOF_LONG
+#endif
+
 #ifndef HAVE_ARCH_GETRVAL2
 # define HAVE_ARCH_GETRVAL2 0
 #endif
