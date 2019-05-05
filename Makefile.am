@@ -156,6 +156,7 @@ strace_SOURCES =	\
 	ipc_shm.c	\
 	ipc_shmctl.c	\
 	kcmp.c		\
+	kernel_timespec.h \
 	kernel_types.h	\
 	kexec.c		\
 	keyctl.c	\
