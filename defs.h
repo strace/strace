@@ -1120,6 +1120,15 @@ extern int print_timespec32_utime_pair(struct tcb *, kernel_ulong_t);
 extern int print_itimerspec32(struct tcb *, kernel_ulong_t);
 # endif /* HAVE_ARCH_TIME32_SYSCALLS */
 
+extern bool print_timespec64_data_size(const void *arg, size_t size);
+extern bool print_timespec64_array_data_size(const void *arg,
+					     unsigned int nmemb,
+					     size_t size);
+extern int print_timespec64(struct tcb *, kernel_ulong_t);
+extern const char *sprint_timespec64(struct tcb *, kernel_ulong_t);
+extern int print_timespec64_utime_pair(struct tcb *, kernel_ulong_t);
+extern int print_itimerspec64(struct tcb *, kernel_ulong_t);
+
 # ifdef ALPHA
 typedef struct {
 	int tv_sec, tv_usec;
