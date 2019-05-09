@@ -23,13 +23,21 @@ typedef struct timespec timespec_t;
 # define UTIME_OMIT ((1l << 30) - 2l)
 #endif
 
+#define TIMESPEC_TO_SEC_NSEC(t_)	\
+	((long long) (t_)->tv_sec), zero_extend_signed_to_ull((t_)->tv_nsec)
+
 static const char timespec_fmt[] = "{tv_sec=%lld, tv_nsec=%llu}";
+
+static void
+print_sec_nsec(long long sec, unsigned long long nsec)
+{
+	tprintf(timespec_fmt, sec, nsec);
+}
 
 static void
 print_timespec_t(const timespec_t *t)
 {
-	tprintf(timespec_fmt, (long long) t->tv_sec,
-		zero_extend_signed_to_ull(t->tv_nsec));
+	print_sec_nsec(TIMESPEC_TO_SEC_NSEC(t));
 }
 
 static void
@@ -49,8 +57,7 @@ print_timespec_t_utime(const timespec_t *t)
 		break;
 	default:
 		print_timespec_t(t);
-		tprints_comment(sprinttime_nsec(t->tv_sec,
-			zero_extend_signed_to_ull(t->tv_nsec)));
+		tprints_comment(sprinttime_nsec(TIMESPEC_TO_SEC_NSEC(t)));
 		break;
 	}
 }
@@ -115,9 +122,7 @@ MPERS_PRINTER_DECL(const char *, sprint_timespec,
 		   umove(tcp, addr, &t)) {
 		xsprintf(buf, "%#" PRI_klx, addr);
 	} else {
-		xsprintf(buf, timespec_fmt,
-			 (long long) t.tv_sec,
-			 zero_extend_signed_to_ull(t.tv_nsec));
+		xsprintf(buf, timespec_fmt, TIMESPEC_TO_SEC_NSEC(&t));
 	}
 
 	return buf;
