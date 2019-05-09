@@ -10,152 +10,71 @@
 
 #include DEF_MPERS_TYPE(timespec_t)
 
-typedef struct timespec timespec_t;
+#include "kernel_timespec.h"
+
+#if defined MPERS_IS_mx32
+# define TIMESPEC_IS_32BIT 0
+#elif defined MPERS_IS_m32
+# define TIMESPEC_IS_32BIT 1
+#elif ARCH_TIMESIZE == 4
+# define TIMESPEC_IS_32BIT 1
+#else
+# define TIMESPEC_IS_32BIT 0
+#endif
+
+#if TIMESPEC_IS_32BIT
+typedef kernel_timespec32_t timespec_t;
+# define PRINT_TIMESPEC_DATA_SIZE print_timespec32_data_size
+# define PRINT_TIMESPEC_ARRAY_DATA_SIZE print_timespec32_array_data_size
+# define PRINT_TIMESPEC print_timespec32
+# define SPRINT_TIMESPEC sprint_timespec32
+# define PRINT_TIMESPEC_UTIME_PAIR print_timespec32_utime_pair
+# define PRINT_ITIMERSPEC print_itimerspec32
+#else
+typedef kernel_timespec64_t timespec_t;
+# define PRINT_TIMESPEC_DATA_SIZE print_timespec64_data_size
+# define PRINT_TIMESPEC_ARRAY_DATA_SIZE print_timespec64_array_data_size
+# define PRINT_TIMESPEC print_timespec64
+# define SPRINT_TIMESPEC sprint_timespec64
+# define PRINT_TIMESPEC_UTIME_PAIR print_timespec64_utime_pair
+# define PRINT_ITIMERSPEC print_itimerspec64
+#endif
 
 #include MPERS_DEFS
-
-#include "xstring.h"
-
-#ifndef UTIME_NOW
-# define UTIME_NOW ((1l << 30) - 1l)
-#endif
-#ifndef UTIME_OMIT
-# define UTIME_OMIT ((1l << 30) - 2l)
-#endif
-
-#define TIMESPEC_TO_SEC_NSEC(t_)	\
-	((long long) (t_)->tv_sec), zero_extend_signed_to_ull((t_)->tv_nsec)
-
-static const char timespec_fmt[] = "{tv_sec=%lld, tv_nsec=%llu}";
-
-static void
-print_sec_nsec(long long sec, unsigned long long nsec)
-{
-	tprintf(timespec_fmt, sec, nsec);
-}
-
-static void
-print_timespec_t(const timespec_t *t)
-{
-	print_sec_nsec(TIMESPEC_TO_SEC_NSEC(t));
-}
-
-static void
-print_timespec_t_utime(const timespec_t *t)
-{
-	switch (t->tv_nsec) {
-	case UTIME_NOW:
-	case UTIME_OMIT:
-		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-			print_timespec_t(t);
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
-			break;
-
-		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprints_comment : tprints)(t->tv_nsec == UTIME_NOW
-				? "UTIME_NOW" : "UTIME_OMIT");
-		break;
-	default:
-		print_timespec_t(t);
-		tprints_comment(sprinttime_nsec(TIMESPEC_TO_SEC_NSEC(t)));
-		break;
-	}
-}
 
 MPERS_PRINTER_DECL(bool, print_struct_timespec_data_size,
 		   const void *arg, const size_t size)
 {
-	if (size < sizeof(timespec_t)) {
-		tprints("?");
-		return false;
-	}
-
-	print_timespec_t(arg);
-	return true;
+	return PRINT_TIMESPEC_DATA_SIZE(arg, size);
 }
 
 MPERS_PRINTER_DECL(bool, print_struct_timespec_array_data_size,
 		   const void *arg, const unsigned int nmemb,
 		   const size_t size)
 {
-	const timespec_t *ts = arg;
-	unsigned int i;
-
-	if (nmemb > size / sizeof(timespec_t)) {
-		tprints("?");
-		return false;
-	}
-
-	tprints("[");
-
-	for (i = 0; i < nmemb; i++) {
-		if (i)
-			tprints(", ");
-		print_timespec_t(&ts[i]);
-	}
-
-	tprints("]");
-	return true;
+	return PRINT_TIMESPEC_ARRAY_DATA_SIZE(arg, nmemb, size);
 }
 
 MPERS_PRINTER_DECL(int, print_timespec,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timespec_t t;
-
-	if (umove_or_printaddr(tcp, addr, &t))
-		return -1;
-
-	print_timespec_t(&t);
-	return 0;
+	return PRINT_TIMESPEC(tcp, addr);
 }
 
 MPERS_PRINTER_DECL(const char *, sprint_timespec,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timespec_t t;
-	static char buf[sizeof(timespec_fmt) + 3 * sizeof(t)];
-
-	if (!addr) {
-		strcpy(buf, "NULL");
-	} else if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
-		   umove(tcp, addr, &t)) {
-		xsprintf(buf, "%#" PRI_klx, addr);
-	} else {
-		xsprintf(buf, timespec_fmt, TIMESPEC_TO_SEC_NSEC(&t));
-	}
-
-	return buf;
+	return SPRINT_TIMESPEC(tcp, addr);
 }
 
 MPERS_PRINTER_DECL(int, print_timespec_utime_pair,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timespec_t t[2];
-
-	if (umove_or_printaddr(tcp, addr, &t))
-		return -1;
-
-	tprints("[");
-	print_timespec_t_utime(&t[0]);
-	tprints(", ");
-	print_timespec_t_utime(&t[1]);
-	tprints("]");
-	return 0;
+	return PRINT_TIMESPEC_UTIME_PAIR(tcp, addr);
 }
 
 MPERS_PRINTER_DECL(int, print_itimerspec,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timespec_t t[2];
-
-	if (umove_or_printaddr(tcp, addr, &t))
-		return -1;
-
-	tprints("{it_interval=");
-	print_timespec_t(&t[0]);
-	tprints(", it_value=");
-	print_timespec_t(&t[1]);
-	tprints("}");
-	return 0;
+	return PRINT_ITIMERSPEC(tcp, addr);
 }
