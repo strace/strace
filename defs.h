@@ -1129,6 +1129,7 @@ extern int print_timespec64(struct tcb *, kernel_ulong_t);
 extern const char *sprint_timespec64(struct tcb *, kernel_ulong_t);
 extern int print_timespec64_utime_pair(struct tcb *, kernel_ulong_t);
 extern int print_itimerspec64(struct tcb *, kernel_ulong_t);
+extern int print_timex64(struct tcb *, kernel_ulong_t);
 
 # ifdef ALPHA
 typedef struct {

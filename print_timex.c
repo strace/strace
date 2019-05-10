@@ -56,6 +56,12 @@ MPERS_PRINTER_DECL(int, print_timex,
 
 # include "kernel_timex.h"
 
+# define PRINT_TIMEX print_timex64
+# define TIMEX_T kernel_timex64_t
+# include "print_timex.h"
+# undef TIMEX_T
+# undef PRINT_TIMEX
+
 # if HAVE_ARCH_TIME32_SYSCALLS
 
 #  define PRINT_TIMEX print_timex32
