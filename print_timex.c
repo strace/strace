@@ -72,4 +72,14 @@ MPERS_PRINTER_DECL(int, print_timex,
 
 # endif /* HAVE_ARCH_TIME32_SYSCALLS */
 
+# ifdef SPARC64
+
+#  define PRINT_TIMEX print_sparc64_timex
+#  define TIMEX_T kernel_sparc64_timex_t
+#  include "print_timex.h"
+#  undef TIMEX_T
+#  undef PRINT_TIMEX
+
+# endif /* SPARC64 */
+
 #endif /* !IN_MPERS */

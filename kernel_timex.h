@@ -38,6 +38,40 @@ typedef struct {
 	int pad3[11];
 } kernel_timex64_t;
 
+#ifdef SPARC64
+
+typedef struct {
+	unsigned int modes;
+	int pad0;
+	long long offset;
+	long long freq;
+	long long maxerror;
+	long long esterror;
+	int status;
+	int pad1;
+	long long constant;
+	long long precision;
+	long long tolerance;
+	struct {
+		long long tv_sec;
+		int tv_usec;
+	} time;
+	long long tick;
+	long long ppsfreq;
+	long long jitter;
+	int shift;
+	int pad2;
+	long long stabil;
+	long long jitcnt;
+	long long calcnt;
+	long long errcnt;
+	long long stbcnt;
+	int tai;
+	int pad3[11];
+} kernel_sparc64_timex_t;
+
+#endif /* SPARC64 */
+
 # if HAVE_ARCH_TIME32_SYSCALLS
 
 typedef struct {

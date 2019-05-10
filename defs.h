@@ -1131,6 +1131,10 @@ extern int print_timespec64_utime_pair(struct tcb *, kernel_ulong_t);
 extern int print_itimerspec64(struct tcb *, kernel_ulong_t);
 extern int print_timex64(struct tcb *, kernel_ulong_t);
 
+# ifdef SPARC64
+extern int print_sparc64_timex(struct tcb *, kernel_ulong_t);
+# endif
+
 # ifdef ALPHA
 typedef struct {
 	int tv_sec, tv_usec;
