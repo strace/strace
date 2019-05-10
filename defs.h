@@ -1118,6 +1118,7 @@ extern int print_timespec32(struct tcb *, kernel_ulong_t);
 extern const char *sprint_timespec32(struct tcb *, kernel_ulong_t);
 extern int print_timespec32_utime_pair(struct tcb *, kernel_ulong_t);
 extern int print_itimerspec32(struct tcb *, kernel_ulong_t);
+extern int print_timex32(struct tcb *, kernel_ulong_t);
 # endif /* HAVE_ARCH_TIME32_SYSCALLS */
 
 extern bool print_timespec64_data_size(const void *arg, size_t size);

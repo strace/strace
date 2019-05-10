@@ -51,3 +51,19 @@ MPERS_PRINTER_DECL(int, print_timex,
 	tprints("}");
 	return 0;
 }
+
+#ifndef IN_MPERS
+
+# include "kernel_timex.h"
+
+# if HAVE_ARCH_TIME32_SYSCALLS
+
+#  define PRINT_TIMEX print_timex32
+#  define TIMEX_T kernel_timex32_t
+#  include "print_timex.h"
+#  undef TIMEX_T
+#  undef PRINT_TIMEX
+
+# endif /* HAVE_ARCH_TIME32_SYSCALLS */
+
+#endif /* !IN_MPERS */
