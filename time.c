@@ -169,6 +169,15 @@ SYS_FUNC(adjtimex)
 	return 0;
 }
 
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(adjtimex32)
+{
+	if (exiting(tcp))
+		return do_adjtimex(tcp, print_timex32, tcp->u_arg[0]);
+	return 0;
+}
+#endif
+
 #include "xlat/clockflags.h"
 #include "xlat/clocknames.h"
 
@@ -286,6 +295,13 @@ SYS_FUNC(clock_adjtime)
 {
 	return do_clock_adjtime(tcp, print_timex);
 }
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(clock_adjtime32)
+{
+	return do_clock_adjtime(tcp, print_timex32);
+}
+#endif
 
 SYS_FUNC(timer_create)
 {
