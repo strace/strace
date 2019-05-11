@@ -340,6 +340,27 @@
 [6330] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [6331] = { 4,	0,		SEN(rseq),			"rseq"			},
 [6332] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+/* [6333 ... 6402] - reserved to sync up with other architectures */
+[6403] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime64"	},
+[6404] = { 2,	0,		SEN(clock_settime64),		"clock_settime64"	},
+[6405] = { 2,	0,		SEN(clock_adjtime64),		"clock_adjtime64"	},
+[6406] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres_time64"	},
+[6407] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep_time64"},
+[6408] = { 2,	0,		SEN(timer_gettime64),		"timer_gettime64"	},
+[6409] = { 4,	0,		SEN(timer_settime64),		"timer_settime64"	},
+[6410] = { 2,	TD,		SEN(timerfd_gettime64),		"timerfd_gettime64"	},
+[6411] = { 4,	TD,		SEN(timerfd_settime64),		"timerfd_settime64"	},
+[6412] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat_time64"	},
+[6413] = { 6,	TD,		SEN(pselect6_time64),		"pselect6_time64"	},
+[6414] = { 5,	TD,		SEN(ppoll_time64),		"ppoll_time64"		},
+[6416] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents_time64"	},
+[6417] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg_time64"	},
+[6418] = { 5,	TD,		SEN(mq_timedsend_time64),	"mq_timedsend_time64"	},
+[6419] = { 5,	TD,		SEN(mq_timedreceive_time64),	"mq_timedreceive_time64"},
+[6420] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop_time64"	},
+[6421] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait_time64"},
+[6422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
+[6423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
 
 # define SYS_socket_subcall      6500
 # include "subcall.h"

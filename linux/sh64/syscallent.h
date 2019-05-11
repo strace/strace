@@ -398,6 +398,7 @@
 [391] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [392] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [393] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
+/* [403 ... 423] - reserved to sync up with other architectures */
 
 #define SYS_socket_subcall	500
 #include "subcall.h"

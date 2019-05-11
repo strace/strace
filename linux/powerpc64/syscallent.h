@@ -392,6 +392,7 @@
 [400] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
 [401] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
 [402] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
+/* [403 ... 423] - reserved to sync up with other architectures */
 
 #define SYS_socket_subcall	500
 #include "subcall.h"

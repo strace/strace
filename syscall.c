@@ -367,6 +367,7 @@ dumpio(struct tcb *tcp)
 		case SEN_send:
 		case SEN_sendto:
 		case SEN_mq_timedsend:
+		case SEN_mq_timedsend_time64:
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 			break;
 		case SEN_writev:
@@ -394,6 +395,7 @@ dumpio(struct tcb *tcp)
 		case SEN_recv:
 		case SEN_recvfrom:
 		case SEN_mq_timedreceive:
+		case SEN_mq_timedreceive_time64:
 			dumpstr(tcp, tcp->u_arg[1], tcp->u_rval);
 			return;
 		case SEN_readv:
@@ -406,6 +408,7 @@ dumpio(struct tcb *tcp)
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1], tcp->u_rval);
 			return;
 		case SEN_recvmmsg:
+		case SEN_recvmmsg_time64:
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 			return;
 		}
