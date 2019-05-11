@@ -43,6 +43,11 @@ SYS_FUNC(mq_timedsend)
 	return do_mq_timedsend(tcp, print_timespec);
 }
 
+SYS_FUNC(mq_timedsend_time64)
+{
+	return do_mq_timedsend(tcp, print_timespec64);
+}
+
 static int
 do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
@@ -72,6 +77,11 @@ do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 SYS_FUNC(mq_timedreceive)
 {
 	return do_mq_timedreceive(tcp, print_timespec);
+}
+
+SYS_FUNC(mq_timedreceive_time64)
+{
+	return do_mq_timedreceive(tcp, print_timespec64);
 }
 
 SYS_FUNC(mq_notify)

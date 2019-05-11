@@ -168,3 +168,8 @@ SYS_FUNC(ppoll)
 {
 	return do_ppoll(tcp, print_timespec, sprint_timespec);
 }
+
+SYS_FUNC(ppoll_time64)
+{
+	return do_ppoll(tcp, print_timespec64, sprint_timespec64);
+}

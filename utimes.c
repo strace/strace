@@ -51,6 +51,11 @@ SYS_FUNC(utimensat)
 	return do_utimensat(tcp, print_timespec_utime_pair);
 }
 
+SYS_FUNC(utimensat_time64)
+{
+	return do_utimensat(tcp, print_timespec64_utime_pair);
+}
+
 #ifdef ALPHA
 SYS_FUNC(osf_utimes)
 {

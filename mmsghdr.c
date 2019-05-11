@@ -229,3 +229,8 @@ SYS_FUNC(recvmmsg)
 {
 	return do_recvmmsg(tcp, print_timespec, sprint_timespec);
 }
+
+SYS_FUNC(recvmmsg_time64)
+{
+	return do_recvmmsg(tcp, print_timespec64, sprint_timespec64);
+}

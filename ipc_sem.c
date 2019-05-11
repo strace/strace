@@ -87,6 +87,11 @@ SYS_FUNC(semtimedop)
 	return do_semtimedop(tcp, print_timespec);
 }
 
+SYS_FUNC(semtimedop_time64)
+{
+	return do_semtimedop(tcp, print_timespec64);
+}
+
 SYS_FUNC(semget)
 {
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);

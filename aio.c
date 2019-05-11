@@ -255,3 +255,8 @@ SYS_FUNC(io_pgetevents)
 {
 	return print_io_getevents(tcp, print_timespec, true);
 }
+
+SYS_FUNC(io_pgetevents_time64)
+{
+	return print_io_getevents(tcp, print_timespec64, true);
+}

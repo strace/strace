@@ -249,3 +249,8 @@ SYS_FUNC(pselect6)
 {
 	return do_pselect6(tcp, print_timespec, sprint_timespec);
 }
+
+SYS_FUNC(pselect6_time64)
+{
+	return do_pselect6(tcp, print_timespec64, sprint_timespec64);
+}

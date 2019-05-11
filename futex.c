@@ -127,3 +127,8 @@ SYS_FUNC(futex)
 {
 	return do_futex(tcp, print_timespec);
 }
+
+SYS_FUNC(futex_time64)
+{
+	return do_futex(tcp, print_timespec64);
+}

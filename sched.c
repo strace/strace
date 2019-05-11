@@ -81,6 +81,11 @@ SYS_FUNC(sched_rr_get_interval)
 	return do_sched_rr_get_interval(tcp, print_timespec);
 }
 
+SYS_FUNC(sched_rr_get_interval_time64)
+{
+	return do_sched_rr_get_interval(tcp, print_timespec64);
+}
+
 static void
 print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		 unsigned int usize)

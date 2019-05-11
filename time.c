@@ -239,6 +239,11 @@ SYS_FUNC(clock_settime)
 	return do_clock_settime(tcp, print_timespec);
 }
 
+SYS_FUNC(clock_settime64)
+{
+	return do_clock_settime(tcp, print_timespec64);
+}
+
 static int
 do_clock_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
@@ -254,6 +259,11 @@ do_clock_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 SYS_FUNC(clock_gettime)
 {
 	return do_clock_gettime(tcp, print_timespec);
+}
+
+SYS_FUNC(clock_gettime64)
+{
+	return do_clock_gettime(tcp, print_timespec64);
 }
 
 static int
@@ -285,6 +295,11 @@ do_clock_nanosleep(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 SYS_FUNC(clock_nanosleep)
 {
 	return do_clock_nanosleep(tcp, print_timespec);
+}
+
+SYS_FUNC(clock_nanosleep_time64)
+{
+	return do_clock_nanosleep(tcp, print_timespec64);
 }
 
 static int
@@ -349,6 +364,11 @@ SYS_FUNC(timer_settime)
 	return do_timer_settime(tcp, print_itimerspec);
 }
 
+SYS_FUNC(timer_settime64)
+{
+	return do_timer_settime(tcp, print_itimerspec64);
+}
+
 static int
 do_timer_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
@@ -363,6 +383,11 @@ do_timer_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 SYS_FUNC(timer_gettime)
 {
 	return do_timer_gettime(tcp, print_itimerspec);
+}
+
+SYS_FUNC(timer_gettime64)
+{
+	return do_timer_gettime(tcp, print_itimerspec64);
 }
 
 #include "xlat/timerfdflags.h"
@@ -397,6 +422,11 @@ SYS_FUNC(timerfd_settime)
 	return do_timerfd_settime(tcp, print_itimerspec);
 }
 
+SYS_FUNC(timerfd_settime64)
+{
+	return do_timerfd_settime(tcp, print_itimerspec64);
+}
+
 static int
 do_timerfd_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
@@ -412,4 +442,9 @@ do_timerfd_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 SYS_FUNC(timerfd_gettime)
 {
 	return do_timerfd_gettime(tcp, print_itimerspec);
+}
+
+SYS_FUNC(timerfd_gettime64)
+{
+	return do_timerfd_gettime(tcp, print_itimerspec64);
 }

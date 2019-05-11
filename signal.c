@@ -691,6 +691,11 @@ SYS_FUNC(rt_sigtimedwait)
 	return do_rt_sigtimedwait(tcp, print_timespec, sprint_timespec);
 }
 
+SYS_FUNC(rt_sigtimedwait_time64)
+{
+	return do_rt_sigtimedwait(tcp, print_timespec64, sprint_timespec64);
+}
+
 SYS_FUNC(restart_syscall)
 {
 	tprintf("<... resuming interrupted %s ...>",
