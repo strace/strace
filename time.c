@@ -162,13 +162,6 @@ do_adjtimex(struct tcb *const tcp, const print_obj_by_addr_fn print_tx,
 	return RVAL_STR;
 }
 
-SYS_FUNC(adjtimex)
-{
-	if (exiting(tcp))
-		return do_adjtimex(tcp, print_timex, tcp->u_arg[0]);
-	return 0;
-}
-
 #if HAVE_ARCH_TIME32_SYSCALLS
 SYS_FUNC(adjtimex32)
 {
@@ -302,11 +295,6 @@ do_clock_adjtime(struct tcb *const tcp, const print_obj_by_addr_fn print_tx)
 	printclockname(tcp->u_arg[0]);
 	tprints(", ");
 	return 0;
-}
-
-SYS_FUNC(clock_adjtime)
-{
-	return do_clock_adjtime(tcp, print_timex);
 }
 
 #if HAVE_ARCH_TIME32_SYSCALLS

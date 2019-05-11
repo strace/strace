@@ -8,6 +8,7 @@
  */
 
 #include "tests.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -43,10 +44,7 @@ main(void)
 	printf(", constant=%jd, precision=%jd"
 	       ", tolerance=%jd, time={tv_sec=%lld, tv_usec=%llu}, tick=%jd"
 	       ", ppsfreq=%jd, jitter=%jd, shift=%d, stabil=%jd, jitcnt=%jd"
-	       ", calcnt=%jd, errcnt=%jd, stbcnt=%jd"
-#ifdef HAVE_STRUCT_TIMEX_TAI
-	       ", tai=%d"
-#endif
+	       ", calcnt=%jd, errcnt=%jd, stbcnt=%jd, tai=%d"
 	       "}) = %d (",
 	       (intmax_t) tx->constant,
 	       (intmax_t) tx->precision,
@@ -64,6 +62,8 @@ main(void)
 	       (intmax_t) tx->stbcnt,
 #ifdef HAVE_STRUCT_TIMEX_TAI
 	       tx->tai,
+#else
+	       *(const int *)((const void *) tx + offsetofend(struct timex, stbcnt)),
 #endif
 	       state);
 	printxval(adjtimex_state, (unsigned int) state, NULL);
