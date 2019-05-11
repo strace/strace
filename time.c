@@ -178,6 +178,19 @@ SYS_FUNC(adjtimex32)
 }
 #endif
 
+#if HAVE_ARCH_OLD_TIME64_SYSCALLS
+SYS_FUNC(adjtimex64)
+{
+	if (exiting(tcp))
+# ifndef SPARC64
+		return do_adjtimex(tcp, print_timex64, tcp->u_arg[0]);
+# else
+		return do_adjtimex(tcp, print_sparc64_timex, tcp->u_arg[0]);
+# endif
+	return 0;
+}
+#endif
+
 #include "xlat/clockflags.h"
 #include "xlat/clocknames.h"
 
@@ -300,6 +313,18 @@ SYS_FUNC(clock_adjtime)
 SYS_FUNC(clock_adjtime32)
 {
 	return do_clock_adjtime(tcp, print_timex32);
+}
+#endif
+
+SYS_FUNC(clock_adjtime64)
+{
+	return do_clock_adjtime(tcp, print_timex64);
+}
+
+#ifdef SPARC64
+SYS_FUNC(clock_sparc64_adjtime)
+{
+	return do_clock_adjtime(tcp, print_sparc64_timex);
 }
 #endif
 
