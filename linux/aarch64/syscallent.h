@@ -66,7 +66,7 @@
 [1065] = { 3,	TD,		SEN(getdents),		"getdents"	},
 [1066] = { 3,	TD|TF,		SEN(futimesat),		"futimesat"	},
 [1067] = { 5,	TD,		SEN(select),		"select"	},
-[1068] = { 3,	TD,		SEN(poll),		"poll"		},
+[1068] = { 3,	TD,		SEN(poll_time64),	"poll"		},
 [1069] = { 4,	TD,		SEN(epoll_wait),	"epoll_wait"	},
 [1070] = { 2,	TSFA,		SEN(ustat),		"ustat"		},
 [1071] = { 0,	TP,		SEN(vfork),		"vfork"		},

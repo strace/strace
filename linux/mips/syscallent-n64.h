@@ -14,7 +14,7 @@
 [5004] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
 [5005] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [5006] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
-[5007] = { 3,	TD,		SEN(poll),			"poll"			},
+[5007] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [5008] = { 3,	TD,		SEN(lseek),			"lseek"			},
 [5009] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},
 [5010] = { 3,	TM|SI,		SEN(mprotect),			"mprotect"		},

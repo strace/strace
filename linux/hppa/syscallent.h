@@ -171,7 +171,7 @@
 [165] = { 3,	0,		SEN(getresuid),			"getresuid"		},
 [166] = { 2,	TS,		SEN(sigaltstack),		"sigaltstack"		},
 [167] = { 5,	0,		SEN(query_module),		"query_module"		},
-[168] = { 3,	TD,		SEN(poll),			"poll"			},
+[168] = { 3,	TD,		SEN(poll_time32),		"poll"			},
 [169] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [170] = { 3,	0,		SEN(setresgid),			"setresgid"		},
 [171] = { 3,	0,		SEN(getresgid),			"getresgid"		},

@@ -16,7 +16,7 @@
 [ 13] = { 3,	TD,		SEN(write),			"write"			},
 [ 14] = { 5,	TD,		SEN(select),			"select"		},
 [ 15] = { 3,	TD,		SEN(lseek),			"lseek"			},
-[ 16] = { 3,	TD,		SEN(poll),			"poll"			},
+[ 16] = { 3,	TD,		SEN(poll_time32),		"poll"			},
 [ 17] = { 5,	TD,		SEN(llseek),			"_llseek"		},
 [ 18] = { 4,	TD,		SEN(epoll_wait),		"epoll_wait"		},
 [ 19] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},

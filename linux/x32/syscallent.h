@@ -12,7 +12,7 @@
 [  4] = { 2,	TF|TST|TSTA,	SEN(stat),			"stat"			},
 [  5] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [  6] = { 2,	TF|TLST|TSTA,	SEN(lstat),			"lstat"			},
-[  7] = { 3,	TD,		SEN(poll),			"poll"			},
+[  7] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [  8] = { 3,	TD,		SEN(lseek),			"lseek"			},
 [  9] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},
 [ 10] = { 3,	TM|SI,		SEN(mprotect),			"mprotect"		},

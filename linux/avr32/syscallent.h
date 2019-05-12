@@ -150,7 +150,7 @@
 [141] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
 [142] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
 [143] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
-[144] = { 3,	TD,		SEN(poll),			"poll"			},
+[144] = { 3,	TD,		SEN(poll_time32),		"poll"			},
 [145] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [146] = { 3,	0,		SEN(setresgid),			"setresgid"		},
 [147] = { 3,	0,		SEN(getresgid),			"getresgid"		},

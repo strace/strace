@@ -133,7 +133,9 @@ decode_poll_exiting(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts
 #undef end_outstr
 }
 
-SYS_FUNC(poll)
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
+static int
+do_poll(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts)
 {
 	if (entering(tcp)) {
 		decode_poll_entering(tcp);
@@ -141,9 +143,24 @@ SYS_FUNC(poll)
 
 		return 0;
 	} else {
-		return decode_poll_exiting(tcp, sprint_timespec, 0);
+		return decode_poll_exiting(tcp, sprint_ts, 0);
 	}
 }
+#endif /* HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS */
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(poll_time32)
+{
+	return do_poll(tcp, sprint_timespec32);
+}
+#endif
+
+#if HAVE_ARCH_OLD_TIME64_SYSCALLS
+SYS_FUNC(poll_time64)
+{
+	return do_poll(tcp, sprint_timespec64);
+}
+#endif
 
 static int
 do_ppoll(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,

@@ -73,7 +73,7 @@
 [1024 +  63] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [1024 +  64] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
 [1024 +  65] = { 5,	TD,		SEN(select),			"select"		},
-[1024 +  66] = { 3,	TD,		SEN(poll),			"poll"			},
+[1024 +  66] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [1024 +  67] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [1024 +  68] = { 3,	TF,		SEN(readlink),			"readlink"		},
 [1024 +  69] = { 1,	TF,		SEN(uselib),			"uselib"		},

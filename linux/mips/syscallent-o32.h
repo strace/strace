@@ -196,7 +196,7 @@
 [4185] = { 3,	0,		SEN(setresuid),			"setresuid"		},
 [4186] = { 3,	0,		SEN(getresuid),			"getresuid"		},
 [4187] = { 5,	0,		SEN(query_module),		"query_module"		},
-[4188] = { 3,	TD,		SEN(poll),			"poll"			},
+[4188] = { 3,	TD,		SEN(poll_time32),		"poll"			},
 [4189] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [4190] = { 3,	0,		SEN(setresgid),			"setresgid"		},
 [4191] = { 3,	0,		SEN(getresgid),			"getresgid"		},

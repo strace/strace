@@ -167,7 +167,7 @@
 [163] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [164 ... 166] = { },
 [167] = { 5,	0,		SEN(query_module),		"query_module"		},
-[168] = { 3,	TD,		SEN(poll),			"poll"			},
+[168] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [169] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [170 ... 171] = { },
 [172] = { 5,	0,		SEN(prctl),			"prctl"			},

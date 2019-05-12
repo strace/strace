@@ -156,7 +156,7 @@
 [150] = { 3,	TN,		SEN(getsockname),		"getsockname"		},
 [151] = { 0,	TD,		SEN(inotify_init),		"inotify_init"		},
 [152] = { 3,	TD|TF,		SEN(inotify_add_watch),		"inotify_add_watch"	},
-[153] = { 3,	TD,		SEN(poll),			"poll"			},
+[153] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [154] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
 [155] = { },
 [156] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},

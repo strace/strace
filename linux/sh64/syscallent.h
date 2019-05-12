@@ -175,7 +175,7 @@
 [165] = { 3,	0,		SEN(getresuid16),		"getresuid"		},
 [166] = { },
 [167] = { 5,	0,		SEN(query_module),		"query_module"		},
-[168] = { 3,	TD,		SEN(poll),			"poll"			},
+[168] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [169] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [170] = { 3,	0,		SEN(setresgid16),		"setresgid"		},
 [171] = { 3,	0,		SEN(getresgid16),		"getresgid"		},

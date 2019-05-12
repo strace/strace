@@ -101,7 +101,7 @@
 [ 91] = { 2,	TD|TFST|TSTA,	SEN(fstat),			"fstat"			},
 [ 92] = { 3,	TD,		SEN(fcntl),			"fcntl"			},
 [ 93] = { 5,	TD,		SEN(osf_select),		"osf_select"		},
-[ 94] = { 3,	TD,		SEN(poll),			"poll"			},
+[ 94] = { 3,	TD,		SEN(poll_time64),		"poll"			},
 [ 95] = { 1,	TD,		SEN(fsync),			"fsync"			},
 [ 96] = { 3,	0,		SEN(setpriority),		"setpriority"		},
 [ 97] = { 3,	TN,		SEN(socket),			"socket"		},
