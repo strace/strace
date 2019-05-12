@@ -835,6 +835,8 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
 	linux/subcall.h			\
+	linux/subcall32.h		\
+	linux/subcall64.h		\
 	linux/syscall.h			\
 	linux/tile/arch_defs_.h		\
 	linux/tile/arch_get_personality.c \

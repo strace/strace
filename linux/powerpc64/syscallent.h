@@ -395,4 +395,4 @@
 /* [403 ... 423] - reserved to sync up with other architectures */
 
 #define SYS_socket_subcall	500
-#include "subcall.h"
+#include "subcall64.h"

@@ -410,7 +410,7 @@
 [4423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
 
 # define SYS_socket_subcall      4500
-# include "subcall.h"
+# include "subcall32.h"
 
 #else
 

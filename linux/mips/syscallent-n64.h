@@ -339,7 +339,7 @@
 /* [5329 ... 5423] - reserved to sync up with other architectures */
 
 # define SYS_socket_subcall      5500
-# include "subcall.h"
+# include "subcall64.h"
 
 #else
 
