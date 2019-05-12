@@ -67,10 +67,12 @@ SYS_FUNC(osf_settimeofday)
 }
 #endif
 
-SYS_FUNC(nanosleep)
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
+static int
+do_nanosleep(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
-		print_timespec(tcp, tcp->u_arg[0]);
+		print_ts(tcp, tcp->u_arg[0]);
 		tprints(", ");
 	} else {
 
@@ -82,7 +84,7 @@ SYS_FUNC(nanosleep)
 		 */
 		if (is_erestart(tcp)) {
 			temporarily_clear_syserror(tcp);
-			print_timespec(tcp, tcp->u_arg[1]);
+			print_ts(tcp, tcp->u_arg[1]);
 			restore_cleared_syserror(tcp);
 		} else {
 			printaddr(tcp->u_arg[1]);
@@ -90,6 +92,21 @@ SYS_FUNC(nanosleep)
 	}
 	return 0;
 }
+#endif /* HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS */
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(nanosleep_time32)
+{
+	return do_nanosleep(tcp, print_timespec32);
+}
+#endif
+
+#if HAVE_ARCH_OLD_TIME64_SYSCALLS
+SYS_FUNC(nanosleep_time64)
+{
+	return do_nanosleep(tcp, print_timespec64);
+}
+#endif
 
 #include "xlat/itimer_which.h"
 

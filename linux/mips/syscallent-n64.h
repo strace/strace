@@ -41,7 +41,7 @@
 [5031] = { 1,	TD,		SEN(dup),			"dup"			},
 [5032] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [5033] = { 0,	TS,		SEN(pause),			"pause"			},
-[5034] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[5034] = { 2,	0,		SEN(nanosleep_time64),		"nanosleep"		},
 [5035] = { 2,	0,		SEN(getitimer),			"getitimer"		},
 [5036] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [5037] = { 1,	0,		SEN(alarm),			"alarm"			},

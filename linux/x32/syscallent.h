@@ -40,7 +40,7 @@
 [ 32] = { 1,	TD,		SEN(dup),			"dup"			},
 [ 33] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [ 34] = { 0,	TS,		SEN(pause),			"pause"			},
-[ 35] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[ 35] = { 2,	0,		SEN(nanosleep_time64),		"nanosleep"		},
 [ 36] = { 2,	0,		SEN(getitimer),			"getitimer"		},
 [ 37] = { 1,	0,		SEN(alarm),			"alarm"			},
 [ 38] = { 3,	0,		SEN(setitimer),			"setitimer"		},

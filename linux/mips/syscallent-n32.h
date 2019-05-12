@@ -41,7 +41,7 @@
 [6031] = { 1,	TD,		SEN(dup),			"dup"			},
 [6032] = { 2,	TD,		SEN(dup2),			"dup2"			},
 [6033] = { 0,	TS,		SEN(pause),			"pause"			},
-[6034] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[6034] = { 2,	0,		SEN(nanosleep_time32),		"nanosleep"		},
 [6035] = { 2,	0,		SEN(getitimer),			"getitimer"		},
 [6036] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [6037] = { 1,	0,		SEN(alarm),			"alarm"			},

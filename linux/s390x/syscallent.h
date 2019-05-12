@@ -163,7 +163,7 @@
 [159] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [160] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
 [161] = { 2,	0,		SEN(sched_rr_get_interval_time64),"sched_rr_get_interval"},
-[162] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[162] = { 2,	0,		SEN(nanosleep_time64),		"nanosleep"		},
 [163] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [164 ... 166] = { },
 [167] = { 5,	0,		SEN(query_module),		"query_module"		},

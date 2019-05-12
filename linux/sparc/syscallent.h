@@ -254,7 +254,7 @@
 [246] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [247] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
 [248] = { 2,	0,		SEN(sched_rr_get_interval_time32),"sched_rr_get_interval"},
-[249] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[249] = { 2,	0,		SEN(nanosleep_time32),		"nanosleep"		},
 [250] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [251] = { 1,	0,		SEN(sysctl),			"_sysctl"		},
 [252] = { 1,	0,		SEN(getsid),			"getsid"		},

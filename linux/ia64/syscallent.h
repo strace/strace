@@ -151,7 +151,7 @@
 [1024 + 141] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [1024 + 142] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
 [1024 + 143] = { 2,	0,		SEN(sched_rr_get_interval_time64),"sched_rr_get_interval"},
-[1024 + 144] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[1024 + 144] = { 2,	0,		SEN(nanosleep_time64),		"nanosleep"		},
 [1024 + 145] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [1024 + 146] = { 5,	0,		SEN(prctl),			"prctl"			},
 [1024 + 147] = { 0,	PU|NF,		SEN(getpagesize),		"getpagesize"		},

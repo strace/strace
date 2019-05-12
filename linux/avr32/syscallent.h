@@ -149,7 +149,7 @@
 [140] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [141] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
 [142] = { 2,	0,		SEN(sched_rr_get_interval_time32),"sched_rr_get_interval"},
-[143] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[143] = { 2,	0,		SEN(nanosleep_time32),		"nanosleep"		},
 [144] = { 3,	TD,		SEN(poll_time32),		"poll"			},
 [145] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [146] = { 3,	0,		SEN(setresgid),			"setresgid"		},

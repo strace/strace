@@ -194,7 +194,7 @@
 [192] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [193] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
 [194] = { 1,	0,		SEN(adjtimex32),		"adjtimex"		},
-[195] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[195] = { 2,	0,		SEN(nanosleep_time32),		"nanosleep"		},
 [196] = { 2,	0,		SEN(getgroups),			"getgroups"		},
 [197] = { 2,	0,		SEN(setgroups),			"setgroups"		},
 [198] = { 2,	0,		SEN(sethostname),		"sethostname"		},

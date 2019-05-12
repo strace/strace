@@ -169,7 +169,7 @@
 [159] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [160] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
 [161] = { 2,	0,		SEN(sched_rr_get_interval_time32),"sched_rr_get_interval"},
-[162] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[162] = { 2,	0,		SEN(nanosleep_time32),		"nanosleep"		},
 [163] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [164] = { 3,	0,		SEN(setresuid16),		"setresuid"		},
 [165] = { 3,	0,		SEN(getresuid16),		"getresuid"		},

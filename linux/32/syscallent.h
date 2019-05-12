@@ -113,7 +113,7 @@
 [ 98] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [ 99] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},
 [100] = { 3,	0,		SEN(get_robust_list),		"get_robust_list"	},
-[101] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[101] = { 2,	0,		SEN(nanosleep_time32),		"nanosleep"		},
 [102] = { 2,	0,		SEN(getitimer),			"getitimer"		},
 [103] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [104] = { 4,	0,		SEN(kexec_load),		"kexec_load"		},

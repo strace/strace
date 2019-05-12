@@ -284,7 +284,7 @@
 [337] = { 2,	0,		SEN(sched_rr_get_interval_time64),"sched_rr_get_interval"},
 [338] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		}, /* not implemented */
 [339] = { 1,	0,		SEN(uname),			"uname"			},
-[340] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+[340] = { 2,	0,		SEN(nanosleep_time64),		"nanosleep"		},
 [341] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [342] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		}, /* not implemented */
 [343] = { 3,	0,		SEN(setresuid),			"setresuid"		},
