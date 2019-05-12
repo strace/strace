@@ -38,10 +38,12 @@ do_mq_timedsend(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(mq_timedsend)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(mq_timedsend_time32)
 {
-	return do_mq_timedsend(tcp, print_timespec);
+	return do_mq_timedsend(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(mq_timedsend_time64)
 {
@@ -74,10 +76,12 @@ do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return 0;
 }
 
-SYS_FUNC(mq_timedreceive)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(mq_timedreceive_time32)
 {
-	return do_mq_timedreceive(tcp, print_timespec);
+	return do_mq_timedreceive(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(mq_timedreceive_time64)
 {
