@@ -343,7 +343,7 @@
 [333] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [334] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [335] = { 6,	TD,		SEN(pselect6_time32),		"pselect6"		},
-[336] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[336] = { 5,	TD,		SEN(ppoll_time32),		"ppoll"			},
 [337] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [338] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},
 [339] = { 3,	0,		SEN(get_robust_list),		"get_robust_list"	},

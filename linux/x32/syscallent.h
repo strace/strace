@@ -276,7 +276,7 @@
 [268] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [269] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [270] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
-[271] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[271] = { 5,	TD,		SEN(ppoll_time64),		"ppoll"			},
 [272] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [273] = { 2,	0,		SEN(printargs),			"set_robust_list#64"	},
 [274] = { 3,	0,		SEN(printargs),			"get_robust_list#64"	},

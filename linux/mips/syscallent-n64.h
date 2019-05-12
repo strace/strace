@@ -268,7 +268,7 @@
 [5258] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [5259] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [5260] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
-[5261] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[5261] = { 5,	TD,		SEN(ppoll_time64),		"ppoll"			},
 [5262] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [5263] = { 6,	TD,		SEN(splice),			"splice"		},
 [5264] = { 4,	TD,		SEN(sync_file_range),		"sync_file_range"	},

@@ -277,7 +277,7 @@
 [271] = { 2,	TD,		SEN(inotify_rm_watch),		"inotify_rm_watch"	},
 [272] = { 4,	TM,		SEN(migrate_pages),		"migrate_pages"		},
 [273] = { 6,	TD,		SEN(pselect6_time32),		"pselect6"		},
-[274] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[274] = { 5,	TD,		SEN(ppoll_time32),		"ppoll"			},
 [275] = { 4,	TD|TF,		SEN(openat),			"openat"		},
 [276] = { 3,	TD|TF,		SEN(mkdirat),			"mkdirat"		},
 [277] = { 4,	TD|TF,		SEN(mknodat),			"mknodat"		},

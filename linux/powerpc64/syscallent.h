@@ -283,7 +283,7 @@
 [278] = { 3,	0,		SEN(printargs),			"spu_run"		},
 [279] = { 4,	0,		SEN(printargs),			"spu_create"		},
 [280] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
-[281] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[281] = { 5,	TD,		SEN(ppoll_time64),		"ppoll"			},
 [282] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [283] = { 6,	TD,		SEN(splice),			"splice"		},
 [284] = { 4,	TD,		SEN(tee),			"tee"			},

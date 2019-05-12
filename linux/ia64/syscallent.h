@@ -278,7 +278,7 @@
 [1024 + 268] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [1024 + 269] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [1024 + 270] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
-[1024 + 271] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[1024 + 271] = { 5,	TD,		SEN(ppoll_time64),		"ppoll"			},
 [1024 + 272] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [1024 + 273] = { 6,	TD,		SEN(splice),			"splice"		},
 [1024 + 274] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},

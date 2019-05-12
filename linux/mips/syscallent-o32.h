@@ -310,7 +310,7 @@
 [4299] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [4300] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [4301] = { 6,	TD,		SEN(pselect6_time32),		"pselect6"		},
-[4302] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+[4302] = { 5,	TD,		SEN(ppoll_time32),		"ppoll"			},
 [4303] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [4304] = { 6,	TD,		SEN(splice),			"splice"		},
 [4305] = { 7,	TD,		SEN(sync_file_range),		"sync_file_range"	},
