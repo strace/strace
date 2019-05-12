@@ -343,9 +343,9 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_socket:
 	case SEN_socketpair:
 	case SEN_timerfd_create:
-	case SEN_timerfd_gettime:
+	case SEN_timerfd_gettime32:
 	case SEN_timerfd_gettime64:
-	case SEN_timerfd_settime:
+	case SEN_timerfd_settime32:
 	case SEN_timerfd_settime64:
 	case SEN_userfaultfd:
 		/*

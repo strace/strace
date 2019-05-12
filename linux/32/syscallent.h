@@ -98,8 +98,8 @@
 [ 84] = { 6,	TD,		SEN(sync_file_range),		"sync_file_range"	},
 #endif
 [ 85] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
-[ 86] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},
-[ 87] = { 2,	TD,		SEN(timerfd_gettime),		"timerfd_gettime"	},
+[ 86] = { 4,	TD,		SEN(timerfd_settime32),		"timerfd_settime"	},
+[ 87] = { 2,	TD,		SEN(timerfd_gettime32),		"timerfd_gettime"	},
 [ 88] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
 [ 89] = { 1,	TF,		SEN(acct),			"acct"			},
 [ 90] = { 2,	0,		SEN(capget),			"capget"		},
