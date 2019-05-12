@@ -406,7 +406,7 @@
 [396] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [397] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [398] = { 4,	0,		SEN(rseq),			"rseq"			},
-[399] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[399] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 [400] = { 4,	TM,		SEN(migrate_pages),		"migrate_pages"		},
 [401] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 /* [402] - unused */

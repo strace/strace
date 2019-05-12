@@ -260,10 +260,12 @@ SYS_FUNC(io_getevents_time64)
 }
 #endif
 
-SYS_FUNC(io_pgetevents)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(io_pgetevents_time32)
 {
-	return print_io_getevents(tcp, print_timespec, true);
+	return print_io_getevents(tcp, print_timespec32, true);
 }
+#endif
 
 SYS_FUNC(io_pgetevents_time64)
 {

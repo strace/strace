@@ -391,7 +391,7 @@
 [382] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [383] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [384] = { 2,	TP,		SEN(arch_prctl),		"arch_prctl"		},
-[385] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[385] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 [386] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* room for arch specific calls */
 [393] = { 3,	TI,		SEN(semget),			"semget"		},

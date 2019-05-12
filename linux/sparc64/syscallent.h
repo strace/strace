@@ -364,7 +364,7 @@
 [358] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [359] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [360] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
-[361] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[361] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 [362] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [363] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [364] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},

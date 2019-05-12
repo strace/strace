@@ -384,7 +384,7 @@
 [385] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [386] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [387] = { 4,	0,		SEN(rseq),			"rseq"			},
-[388] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[388] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 /* room for arch specific syscalls */
 [393] = { 3,	TI,		SEN(semget),			"semget"		},
 [394] = { 4,	TI,		SEN(semctl),			"semctl"		},

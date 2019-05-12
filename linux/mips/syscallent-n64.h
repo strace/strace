@@ -335,7 +335,7 @@
 [5325] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [5326] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [5327] = { 4,	0,		SEN(rseq),			"rseq"			},
-[5328] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[5328] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 /* [5329 ... 5423] - reserved to sync up with other architectures */
 
 # define SYS_socket_subcall      5500

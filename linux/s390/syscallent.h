@@ -391,7 +391,7 @@
 [379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [380] = { 4,	0,		SEN(s390_sthyi),		"s390_sthyi"		},
 [381] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
-[382] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[382] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 [383] = { 4,	0,		SEN(rseq),			"rseq"			},
 [384] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [385] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},

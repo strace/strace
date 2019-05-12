@@ -376,7 +376,7 @@
 [4365] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [4366] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [4367] = { 4,	0,		SEN(rseq),			"rseq"			},
-[4368] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[4368] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 /* room for arch specific calls */
 [4393] = { 3,	TI,		SEN(semget),			"semget"		},
 [4394] = { 4,	TI,		SEN(semctl),			"semctl"		},

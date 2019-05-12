@@ -339,7 +339,7 @@
 [6329] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [6330] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [6331] = { 4,	0,		SEN(rseq),			"rseq"			},
-[6332] = { 6,	0,		SEN(io_pgetevents),		"io_pgetevents"		},
+[6332] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 /* [6333 ... 6402] - reserved to sync up with other architectures */
 [6403] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime64"	},
 [6404] = { 2,	0,		SEN(clock_settime64),		"clock_settime64"	},
