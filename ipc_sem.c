@@ -82,10 +82,12 @@ do_semtimedop(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(semtimedop)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(semtimedop_time32)
 {
-	return do_semtimedop(tcp, print_timespec);
+	return do_semtimedop(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(semtimedop_time64)
 {

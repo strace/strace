@@ -319,7 +319,7 @@
 [309] = { 5,	0,		SEN(add_key),			"add_key"		},
 [310] = { 4,	0,		SEN(request_key),		"request_key"		},
 [311] = { 5,	0,		SEN(keyctl),			"keyctl"		},
-[312] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[312] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [313] = { 5,	0,		SEN(vserver),			"vserver"		},
 [314] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},
 [315] = { 2,	0,		SEN(ioprio_get),		"ioprio_get"		},

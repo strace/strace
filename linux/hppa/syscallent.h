@@ -231,7 +231,7 @@
 [225] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},
 [226] = { 4,	TD,		SEN(epoll_wait),		"epoll_wait"		},
 [227] = { 5,	TM|SI,		SEN(remap_file_pages),		"remap_file_pages"	},
-[228] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[228] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [229] = { 4,	TD,		SEN(mq_open),			"mq_open"		},
 [230] = { 1,	0,		SEN(mq_unlink),			"mq_unlink"		},
 [231] = { 5,	TD,		SEN(mq_timedsend),		"mq_timedsend"		},

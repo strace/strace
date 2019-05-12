@@ -279,7 +279,7 @@
 [270] = { 3,	TI,		SEN(semget),			"semget"		},
 [271] = { 3,	TI,		SEN(semop),			"semop"			},
 [272] = { 4,	TI,		SEN(semctl),			"semctl"		},
-[273] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[273] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [274] = { 3,	TI|TM|SI,	SEN(shmat),			"shmat"			},
 [275] = { 3,	TI,		SEN(shmget),			"shmget"		},
 [276] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},

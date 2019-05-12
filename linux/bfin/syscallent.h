@@ -363,7 +363,7 @@
 [354] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},
 [355] = { 3,	0,		SEN(get_robust_list),		"get_robust_list"	},
 [356] = { 6,	TD,		SEN(fallocate),			"fallocate"		},
-[357] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[357] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [358] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},
 [359] = { 2,	TD,		SEN(timerfd_gettime),		"timerfd_gettime"	},
 [360] = { 4,	TD|TS,		SEN(signalfd4),			"signalfd4"		},

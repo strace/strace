@@ -160,7 +160,7 @@
 [158] = { 2,	0,		SEN(capget),			"capget"		},
 [159] = { 2,	0,		SEN(capset),			"capset"		},
 [160] = { 4,	0,		SEN(ptrace),			"ptrace"		},
-[161] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[161] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [162] = { 3,	TI,		SEN(semget),			"semget"		},
 [163] = { 3,	TI,		SEN(semop),			"semop"			},
 [164] = { 4,	TI,		SEN(semctl),			"semctl"		},

@@ -370,7 +370,7 @@
 [364] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [365] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* room for arch specific calls */
-[392] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[392] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop"		},
 [393] = { 3,	TI,		SEN(semget),			"semget"		},
 [394] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [395] = { 3,	TI,		SEN(shmget),			"shmget"		},

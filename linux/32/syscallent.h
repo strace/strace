@@ -204,7 +204,7 @@
 [189] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
 [190] = { 3,	TI,		SEN(semget),			"semget"		},
 [191] = { 4,	TI,		SEN(semctl),			"semctl"		},
-[192] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[192] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [193] = { 3,	TI,		SEN(semop),			"semop"			},
 [194] = { 3,	TI,		SEN(shmget),			"shmget"		},
 [195] = { 3,	TI,		SEN(shmctl),			"shmctl"		},

@@ -331,7 +331,7 @@
 [322] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [323] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
 [324] = { 6,	TD,		SEN(fallocate),			"fallocate"		},
-[325] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[325] = { 4,	TI,		SEN(semtimedop_time32),		"semtimedop"		},
 [326] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},
 [327] = { 2,	TD,		SEN(timerfd_gettime),		"timerfd_gettime"	},
 [328] = { 4,	TI,		SEN(semctl),			"semctl"		},

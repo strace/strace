@@ -381,7 +381,7 @@
 [387] = { 4,	0,		SEN(rseq),			"rseq"			},
 [388] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 /* room for arch specific syscalls */
-[392] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[392] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop"		},
 [393] = { 3,	TI,		SEN(semget),			"semget"		},
 [394] = { 4,	TI,		SEN(semctl),			"semctl"		},
 [395] = { 3,	TI,		SEN(shmget),			"shmget"		},

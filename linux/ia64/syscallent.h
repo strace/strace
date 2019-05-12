@@ -230,7 +230,7 @@
 [1024 + 220] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},
 [1024 + 221] = { 4,	TD,		SEN(epoll_wait),		"epoll_wait"		},
 [1024 + 222] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
-[1024 + 223] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[1024 + 223] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop"		},
 [1024 + 224] = { 3,	0,		SEN(timer_create),		"timer_create"		},
 [1024 + 225] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},
 [1024 + 226] = { 2,	0,		SEN(timer_gettime),		"timer_gettime"		},

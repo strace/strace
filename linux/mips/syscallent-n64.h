@@ -221,7 +221,7 @@
 [5211] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [5212] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [5213] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
-[5214] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+[5214] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop"		},
 [5215] = { 4,	TD,		SEN(fadvise64),			"fadvise64"		},
 [5216] = { 3,	0,		SEN(timer_create),		"timer_create"		},
 [5217] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},
