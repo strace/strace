@@ -345,7 +345,7 @@
 [340] = { 5,	TN,		SEN(getsockopt),		"getsockopt"		},
 [341] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
 [342] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
-[343] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[343] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg"		},
 [344] = { 4,	TN,		SEN(accept4),			"accept4"		},
 [345] = { 5,	TD|TF,		SEN(name_to_handle_at),		"name_to_handle_at"	},
 [346] = { 3,	TD,		SEN(open_by_handle_at),		"open_by_handle_at"	},

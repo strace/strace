@@ -343,7 +343,7 @@
 [4332] = { 4,	TP|TS,		SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
 [4333] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [4334] = { 4,	TN,		SEN(accept4),			"accept4"		},
-[4335] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[4335] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [4336] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [4337] = { 6,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},
 [4338] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},

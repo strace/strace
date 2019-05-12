@@ -305,7 +305,7 @@
 [1024 + 295] = { 4,	TD,		SEN(preadv),			"preadv"		},
 [1024 + 296] = { 4,	TD,		SEN(pwritev),			"pwritev"		},
 [1024 + 297] = { 4,	TP|TS,		SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
-[1024 + 298] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[1024 + 298] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg"		},
 [1024 + 299] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [1024 + 300] = { 5,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},
 [1024 + 301] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},

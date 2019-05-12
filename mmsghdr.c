@@ -225,10 +225,12 @@ do_recvmmsg(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	}
 }
 
-SYS_FUNC(recvmmsg)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(recvmmsg_time32)
 {
-	return do_recvmmsg(tcp, print_timespec, sprint_timespec);
+	return do_recvmmsg(tcp, print_timespec32, sprint_timespec32);
 }
+#endif
 
 SYS_FUNC(recvmmsg_time64)
 {

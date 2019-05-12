@@ -255,7 +255,7 @@
 [240] = { 4,	TP|TS,		SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
 [241] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [242] = { 4,	TN,		SEN(accept4),			"accept4"		},
-[243] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[243] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 /* [244 ... 259] are arch specific */
 [260] = { 4,	TP,		SEN(wait4),			"wait4"			},
 [261] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},

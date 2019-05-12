@@ -350,7 +350,7 @@
 [354] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat"		},
 [355] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [356] = { 2,	0,		SEN(membarrier),		"membarrier"		},
-[357] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[357] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg"		},
 [358] = { 4,	TN,		SEN(sendmmsg),			"sendmmsg"		},
 [359] = { 3,	TN,		SEN(socket),			"socket"		},
 [360] = { 4,	TN,		SEN(socketpair),		"socketpair"		},

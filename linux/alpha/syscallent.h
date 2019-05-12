@@ -422,7 +422,7 @@
 [476] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [477] = { 4,	TD,		SEN(timerfd),			"timerfd"		}, /* not implemented */
 [478] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
-[479] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[479] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg"		},
 [480] = { 4,	TD,		SEN(fallocate),			"fallocate"		},
 [481] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [482] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},

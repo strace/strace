@@ -363,7 +363,7 @@
 [354] = { 5,	TN,		SEN(getsockopt),		"getsockopt"		},
 [355] = { 3,	TN,		SEN(sendmsg),			"sendmsg"		},
 [356] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
-[357] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[357] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [358] = { 4,	TN,		SEN(accept4),			"accept4"		},
 [359] = { 5,	TD|TF,		SEN(name_to_handle_at),		"name_to_handle_at"	},
 [360] = { 3,	TD,		SEN(open_by_handle_at),		"open_by_handle_at"	},

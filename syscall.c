@@ -408,6 +408,7 @@ dumpio(struct tcb *tcp)
 			dumpiov_in_msghdr(tcp, tcp->u_arg[1], tcp->u_rval);
 			return;
 		case SEN_recvmmsg:
+		case SEN_recvmmsg_time32:
 		case SEN_recvmmsg_time64:
 			dumpiov_in_mmsghdr(tcp, tcp->u_arg[1]);
 			return;

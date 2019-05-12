@@ -306,7 +306,7 @@
 [297] = { 5,	TD,		SEN(pwritev),			"pwritev"		},
 [298] = { 4,	TP|TS,		SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
 [299] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
-[300] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[300] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [301] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [302] = { 6,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},
 [303] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},

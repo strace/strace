@@ -377,7 +377,7 @@
 [368] = { 6,	TN,		SEN(recvfrom),			"recvfrom"		},
 [369] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [370] = { 2,	TN,		SEN(shutdown),			"shutdown"		},
-[371] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[371] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [372] = { 4,	TN,		SEN(sendmmsg),			"sendmmsg"		},
 [373] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [374] = { 2,	0,		SEN(membarrier),		"membarrier"		},

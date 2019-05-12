@@ -302,7 +302,7 @@
 [304] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [305] = { },
 [306] = { 1,	TD,		SEN(eventfd),			"eventfd"		},
-[307] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[307] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [308] = { 2,	TD,		SEN(setns),			"setns"			},
 [309] = { 4,	TD|TS,		SEN(signalfd4),			"signalfd4"		},
 [310] = { 3,	TD,		SEN(dup3),			"dup3"			},

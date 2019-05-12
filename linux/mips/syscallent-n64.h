@@ -301,7 +301,7 @@
 [5291] = { 4,	TP|TS,		SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
 [5292] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [5293] = { 4,	TN,		SEN(accept4),			"accept4"		},
-[5294] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+[5294] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg"		},
 [5295] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [5296] = { 5,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},
 [5297] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},

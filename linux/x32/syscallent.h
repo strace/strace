@@ -370,7 +370,7 @@
 [534] = { 4,	TD,		SEN(preadv),			"preadv"		},
 [535] = { 4,	TD,		SEN(pwritev),			"pwritev"		},
 [536] = { 4,	CST|TP|TS,	SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
-[537] = { 5,	CST|TN,		SEN(recvmmsg),			"recvmmsg"		},
+[537] = { 5,	CST|TN,		SEN(recvmmsg_time64),		"recvmmsg"		},
 [538] = { 4,	CST|TN,		SEN(sendmmsg),			"sendmmsg"		},
 [539] = { 6,	CST,		SEN(process_vm_readv),		"process_vm_readv"	},
 [540] = { 6,	CST,		SEN(process_vm_writev),		"process_vm_writev"	},
