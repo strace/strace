@@ -132,7 +132,7 @@
 [124] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [125] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [126] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
-[127] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
+[127] = { 2,	0,		SEN(sched_rr_get_interval_time64),"sched_rr_get_interval"},
 [128] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [129] = { 2,	TS,		SEN(kill),			"kill"			},
 [130] = { 2,	TS,		SEN(kill),			"tkill"			},

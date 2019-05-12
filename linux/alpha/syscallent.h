@@ -281,7 +281,7 @@
 [334] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [335] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [336] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
-[337] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
+[337] = { 2,	0,		SEN(sched_rr_get_interval_time64),"sched_rr_get_interval"},
 [338] = { 5,	0,		SEN(afs_syscall),		"afs_syscall"		}, /* not implemented */
 [339] = { 1,	0,		SEN(uname),			"uname"			},
 [340] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},

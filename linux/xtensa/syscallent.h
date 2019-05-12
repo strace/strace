@@ -217,7 +217,7 @@
 [215] = { 1,	0,		SEN(sched_getscheduler),	"sched_getscheduler"	},
 [216] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [217] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
-[218] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
+[218] = { 2,	0,		SEN(sched_rr_get_interval_time32),"sched_rr_get_interval"},
 [219] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [220 ... 222] = { },
 [223] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},

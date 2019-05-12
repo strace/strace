@@ -76,10 +76,12 @@ do_sched_rr_get_interval(struct tcb *const tcp,
 	return 0;
 }
 
-SYS_FUNC(sched_rr_get_interval)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(sched_rr_get_interval_time32)
 {
-	return do_sched_rr_get_interval(tcp, print_timespec);
+	return do_sched_rr_get_interval(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(sched_rr_get_interval_time64)
 {

@@ -173,7 +173,7 @@
 [4162] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [4163] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [4164] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
-[4165] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
+[4165] = { 2,	0,		SEN(sched_rr_get_interval_time32),"sched_rr_get_interval"},
 [4166] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
 [4167] = { 5,	TM|SI,		SEN(mremap),			"mremap"		},
 [4168] = { 3,	TN,		SEN(accept),			"accept"		},

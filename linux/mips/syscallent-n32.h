@@ -152,7 +152,7 @@
 [6142] = { 1,	0,		SEN(sched_getscheduler),	"sched_getscheduler"	},
 [6143] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [6144] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
-[6145] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
+[6145] = { 2,	0,		SEN(sched_rr_get_interval_time32),"sched_rr_get_interval"},
 [6146] = { 2,	TM,		SEN(mlock),			"mlock"			},
 [6147] = { 2,	TM,		SEN(munlock),			"munlock"		},
 [6148] = { 1,	TM,		SEN(mlockall),			"mlockall"		},
