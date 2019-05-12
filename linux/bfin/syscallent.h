@@ -314,7 +314,7 @@
 [305] = { 4,	TD|TF,		SEN(readlinkat),		"readlinkat"		},
 [306] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [307] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
-[308] = { 6,	TD,		SEN(pselect6),			"pselect6"		},
+[308] = { 6,	TD,		SEN(pselect6_time32),		"pselect6"		},
 [309] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
 [310] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [311] = { 2,	0,		SEN(sram_alloc),		"sram_alloc"		},

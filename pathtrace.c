@@ -283,7 +283,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return args && match_xselect_args(tcp, args, set);
 	}
 #endif
-	case SEN_pselect6:
+	case SEN_pselect6_time32:
 	case SEN_pselect6_time64:
 	case SEN_select:
 		return match_xselect_args(tcp, tcp->u_arg, set);

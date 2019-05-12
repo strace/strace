@@ -267,7 +267,7 @@
 [5257] = { 4,	TD|TF,		SEN(readlinkat),		"readlinkat"		},
 [5258] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [5259] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
-[5260] = { 6,	TD,		SEN(pselect6),			"pselect6"		},
+[5260] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
 [5261] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
 [5262] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [5263] = { 6,	TD,		SEN(splice),			"splice"		},

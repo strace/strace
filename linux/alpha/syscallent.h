@@ -406,7 +406,7 @@
 [460] = { 4,	TD|TF,		SEN(readlinkat),		"readlinkat"		},
 [461] = { 3,	TD|TF,		SEN(fchmodat),			"fchmodat"		},
 [462] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
-[463] = { 6,	TD,		SEN(pselect6),			"pselect6"		},
+[463] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
 [464] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
 [465] = { 1,	TP,		SEN(unshare),			"unshare"		},
 [466] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},

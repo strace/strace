@@ -77,7 +77,7 @@
 [ 69] = { 4,	TD,		SEN(preadv),			"preadv"		},
 [ 70] = { 4,	TD,		SEN(pwritev),			"pwritev"		},
 [ 71] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile"		},
-[ 72] = { 6,	TD,		SEN(pselect6),			"pselect6"		},
+[ 72] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
 [ 73] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
 [ 74] = { 4,	TD|TS,		SEN(signalfd4),			"signalfd4"		},
 [ 75] = { 4,	TD,		SEN(vmsplice),			"vmsplice"		},

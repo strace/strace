@@ -269,7 +269,7 @@
 [269] = { 4,	TD,		SEN(tee),			"tee"			},
 [270] = { 4,	TD,		SEN(vmsplice),			"vmsplice"		},
 [271] = { },
-[272] = { 6,	TD,		SEN(pselect6),			"pselect6"		},
+[272] = { 6,	TD,		SEN(pselect6_time32),		"pselect6"		},
 [273] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
 [274] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
 [275] = { 1,	TD,		SEN(epoll_create1),		"epoll_create1"		},
