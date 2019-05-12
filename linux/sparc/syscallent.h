@@ -110,7 +110,7 @@
 [102] = { 5,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [103] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [104] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[105] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[105] = { 4,	TS,		SEN(rt_sigtimedwait_time32),	"rt_sigtimedwait"	},
 [106] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [107] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [108] = { 3,	0,		SEN(setresuid),			"setresuid32"		},

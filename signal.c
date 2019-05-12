@@ -686,10 +686,12 @@ do_rt_sigtimedwait(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	return 0;
 }
 
-SYS_FUNC(rt_sigtimedwait)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(rt_sigtimedwait_time32)
 {
-	return do_rt_sigtimedwait(tcp, print_timespec, sprint_timespec);
+	return do_rt_sigtimedwait(tcp, print_timespec32, sprint_timespec32);
 }
+#endif
 
 SYS_FUNC(rt_sigtimedwait_time64)
 {

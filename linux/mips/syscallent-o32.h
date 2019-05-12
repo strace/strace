@@ -205,7 +205,7 @@
 [4194] = { 4,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [4195] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [4196] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[4197] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[4197] = { 4,	TS,		SEN(rt_sigtimedwait_time32),	"rt_sigtimedwait"	},
 [4198] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [4199] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [4200] = { 6,	TD,		SEN(pread),			"pread64"		},

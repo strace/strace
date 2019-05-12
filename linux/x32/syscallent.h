@@ -356,7 +356,7 @@
 [520] = { 3,	CST|TF|TP|SE|SI,SEN(execve),			"execve"		},
 [521] = { 4,	CST,		SEN(ptrace),			"ptrace"		},
 [522] = { 2,	CST|TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[523] = { 4,	CST|TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[523] = { 4,	CST|TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait"	},
 [524] = { 3,	CST|TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [525] = { 2,	CST|TS,		SEN(sigaltstack),		"sigaltstack"		},
 [526] = { 3,	CST,		SEN(timer_create),		"timer_create"		},

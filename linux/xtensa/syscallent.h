@@ -226,7 +226,7 @@
 [226] = { 4,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [227] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [228] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[229] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[229] = { 4,	TS,		SEN(rt_sigtimedwait_time32),	"rt_sigtimedwait"	},
 [230] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [231] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [232] = { 4,	TD,		SEN(mq_open),			"mq_open"		},

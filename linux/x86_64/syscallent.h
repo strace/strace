@@ -133,7 +133,7 @@
 [125] = { 2,	0,		SEN(capget),			"capget"		},
 [126] = { 2,	0,		SEN(capset),			"capset"		},
 [127] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[128] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[128] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait"	},
 [129] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [130] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [131] = { 2,	TS,		SEN(sigaltstack),		"sigaltstack"		},

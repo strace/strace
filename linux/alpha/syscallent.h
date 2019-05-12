@@ -299,7 +299,7 @@
 [352] = { 5,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [353] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [354] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[355] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[355] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait"	},
 [356] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [357] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [358] = { 5,	TD,		SEN(select),			"select"		},

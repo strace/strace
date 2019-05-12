@@ -166,7 +166,7 @@
 [1024 + 156] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [1024 + 157] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [1024 + 158] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
-[1024 + 159] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[1024 + 159] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait"	},
 [1024 + 160] = { 2,	TF,		SEN(getcwd),			"getcwd"		},
 [1024 + 161] = { 2,	0,		SEN(capget),			"capget"		},
 [1024 + 162] = { 2,	0,		SEN(capset),			"capset"		},

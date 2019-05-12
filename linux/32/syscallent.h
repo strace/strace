@@ -149,7 +149,7 @@
 [134] = { 4,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [135] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [136] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[137] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[137] = { 4,	TS,		SEN(rt_sigtimedwait_time32),	"rt_sigtimedwait"	},
 [138] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [139] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [140] = { 3,	0,		SEN(setpriority),		"setpriority"		},

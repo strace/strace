@@ -175,7 +175,7 @@
 [174] = { 4,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [175] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [176] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[177] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[177] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait"	},
 [178] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [179] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [180] = { 4,	TD,		SEN(pread),			"pread64"		},

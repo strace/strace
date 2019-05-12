@@ -77,7 +77,7 @@
 [ 68] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [ 69] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [ 70] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[ 71] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+[ 71] = { 4,	TS,		SEN(rt_sigtimedwait_time32),	"rt_sigtimedwait"	},
 [ 72] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [ 73] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [ 74] = { 2,	0,		SEN(sethostname),		"sethostname"		},
