@@ -241,7 +241,7 @@
 [232] = { 2,	TF,		SEN(removexattr),		"removexattr"		},
 [233] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [234] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[235] = { 6,	0,		SEN(futex),			"futex"			},
+[235] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [236] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [237] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [238] = { 3,	TM,		SEN(madvise),			"madvise"		},

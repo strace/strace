@@ -123,10 +123,12 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(futex)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(futex_time32)
 {
-	return do_futex(tcp, print_timespec);
+	return do_futex(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(futex_time64)
 {

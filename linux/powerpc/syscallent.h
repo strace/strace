@@ -228,7 +228,7 @@
 [218] = { 2,	TF,		SEN(removexattr),		"removexattr"		},
 [219] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [220] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[221] = { 6,	0,		SEN(futex),			"futex"			},
+[221] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [222] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [223] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [224] = { },

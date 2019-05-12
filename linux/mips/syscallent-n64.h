@@ -201,7 +201,7 @@
 [5191] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
 [5192] = { 2,	TS,		SEN(kill),			"tkill"			},
 [5193] = { 1,	0,		SEN(time),			"time"			},
-[5194] = { 6,	0,		SEN(futex),			"futex"			},
+[5194] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [5195] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [5196] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [5197] = { 3,	0,		SEN(printargs),			"cacheflush"		},

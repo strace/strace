@@ -207,7 +207,7 @@
 [199] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
 [200] = { 2,	TS,		SEN(kill),			"tkill"			},
 [201] = { 1,	0,		SEN(time),			"time"			},
-[202] = { 6,	0,		SEN(futex),			"futex"			},
+[202] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [203] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [204] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [205] = { 1,	0,		SEN(set_thread_area),		"set_thread_area"	},

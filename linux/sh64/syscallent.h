@@ -273,7 +273,7 @@
 [265] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
 [266] = { 2,	TS,		SEN(kill),			"tkill"			},
 [267] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
-[268] = { 6,	0,		SEN(futex),			"futex"			},
+[268] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [269] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [270] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [271 ... 272] = { },

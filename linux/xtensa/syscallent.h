@@ -190,7 +190,7 @@
 [188] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},
 [189] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
 [190] = { 2,	0,		SEN(getrusage),			"getrusage"		},
-[191] = { 6,	0,		SEN(futex),			"futex"			},
+[191] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [192] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
 [193] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
 [194] = { 1,	0,		SEN(adjtimex32),		"adjtimex"		},

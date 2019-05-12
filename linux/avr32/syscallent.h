@@ -198,7 +198,7 @@
 [189] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
 [190] = { 2,	TS,		SEN(kill),			"tkill"			},
 [191] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
-[192] = { 6,	0,		SEN(futex),			"futex"			},
+[192] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [193] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [194] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [195] = { 2,	0,		SEN(capget),			"capget"		},

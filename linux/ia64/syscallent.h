@@ -213,7 +213,7 @@
 [1024 + 203] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [1024 + 204] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
 [1024 + 205] = { 2,	TS,		SEN(kill),			"tkill"			},
-[1024 + 206] = { 6,	0,		SEN(futex),			"futex"			},
+[1024 + 206] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [1024 + 207] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [1024 + 208] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [1024 + 209] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},

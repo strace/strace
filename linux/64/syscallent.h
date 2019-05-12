@@ -103,7 +103,7 @@
 [ 95] = { 5,	TP,		SEN(waitid),			"waitid"		},
 [ 96] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [ 97] = { 1,	TP,		SEN(unshare),			"unshare"		},
-[ 98] = { 6,	0,		SEN(futex),			"futex"			},
+[ 98] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [ 99] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},
 [100] = { 3,	0,		SEN(get_robust_list),		"get_robust_list"	},
 [101] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},

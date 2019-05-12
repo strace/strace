@@ -147,7 +147,7 @@
 [139] = { 2,	TF|TST|TSTA,	SEN(stat64),			"stat64"		},
 [140] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [141] = { 3,	TN,		SEN(getpeername),		"getpeername"		},
-[142] = { 6,	0,		SEN(futex),			"futex"			},
+[142] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [143] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [144] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
 [145] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},

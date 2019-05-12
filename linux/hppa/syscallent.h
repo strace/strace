@@ -213,7 +213,7 @@
 [207] = { 4,	TD,		SEN(readahead),			"readahead"		},
 [208] = { 2,	TS,		SEN(kill),			"tkill"			},
 [209] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
-[210] = { 6,	0,		SEN(futex),			"futex"			},
+[210] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [211] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [212] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [213] = { 5,	0,		SEN(printargs),			"set_thread_area"	},
