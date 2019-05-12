@@ -265,8 +265,8 @@
 /* [255] - get_thread_area */
 [256] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [257] = { 3,	0,		SEN(timer_create),		"timer_create"		},
-[258] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},
-[259] = { 2,	0,		SEN(timer_gettime),		"timer_gettime"		},
+[258] = { 4,	0,		SEN(timer_settime32),		"timer_settime"		},
+[259] = { 2,	0,		SEN(timer_gettime32),		"timer_gettime"		},
 [260] = { 1,	0,		SEN(timer_getoverrun),		"timer_getoverrun"	},
 [261] = { 1,	0,		SEN(timer_delete),		"timer_delete"		},
 [262] = { 2,	0,		SEN(clock_settime32),		"clock_settime"		},

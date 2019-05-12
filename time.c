@@ -382,10 +382,12 @@ do_timer_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 	return 0;
 }
 
-SYS_FUNC(timer_settime)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(timer_settime32)
 {
-	return do_timer_settime(tcp, print_itimerspec);
+	return do_timer_settime(tcp, print_itimerspec32);
 }
+#endif
 
 SYS_FUNC(timer_settime64)
 {
@@ -403,10 +405,12 @@ do_timer_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 	return 0;
 }
 
-SYS_FUNC(timer_gettime)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(timer_gettime32)
 {
-	return do_timer_gettime(tcp, print_itimerspec);
+	return do_timer_gettime(tcp, print_itimerspec32);
 }
+#endif
 
 SYS_FUNC(timer_gettime64)
 {
