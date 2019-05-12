@@ -234,10 +234,12 @@ do_clock_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(clock_settime)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(clock_settime32)
 {
-	return do_clock_settime(tcp, print_timespec);
+	return do_clock_settime(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(clock_settime64)
 {
@@ -256,10 +258,12 @@ do_clock_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return 0;
 }
 
-SYS_FUNC(clock_gettime)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(clock_gettime32)
 {
-	return do_clock_gettime(tcp, print_timespec);
+	return do_clock_gettime(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(clock_gettime64)
 {
