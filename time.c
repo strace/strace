@@ -296,10 +296,12 @@ do_clock_nanosleep(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return 0;
 }
 
-SYS_FUNC(clock_nanosleep)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(clock_nanosleep_time32)
 {
-	return do_clock_nanosleep(tcp, print_timespec);
+	return do_clock_nanosleep(tcp, print_timespec32);
 }
+#endif
 
 SYS_FUNC(clock_nanosleep_time64)
 {

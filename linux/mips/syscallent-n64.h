@@ -231,7 +231,7 @@
 [5221] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [5222] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [5223] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[5224] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[5224] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [5225] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [5226] = { 2,	TF,		SEN(utimes),			"utimes"		},
 [5227] = { 6,	TM,		SEN(mbind),			"mbind"			},

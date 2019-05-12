@@ -261,7 +261,7 @@
 [255] = { 2,	0,		SEN(clock_settime32),		"clock_settime"		},
 [256] = { 2,	0,		SEN(clock_gettime32),		"clock_gettime"		},
 [257] = { 2,	0,		SEN(clock_getres_time32),	"clock_getres"		},
-[258] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[258] = { 4,	0,		SEN(clock_nanosleep_time32),	"clock_nanosleep"	},
 [259] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [260] = { 6,	TM,		SEN(mbind),			"mbind"			},
 [261] = { 5,	TM,		SEN(get_mempolicy),		"get_mempolicy"		},

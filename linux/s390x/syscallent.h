@@ -255,7 +255,7 @@
 [259] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [260] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [261] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[262] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[262] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [263] = { 5,	0,		SEN(vserver),			"vserver"		},
 [264] = { },
 [265] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},

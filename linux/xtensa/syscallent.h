@@ -244,7 +244,7 @@
 [244] = { 2,	0,		SEN(clock_settime32),		"clock_settime"		},
 [245] = { 2,	0,		SEN(clock_gettime32),		"clock_gettime"		},
 [246] = { 2,	0,		SEN(clock_getres_time32),	"clock_getres"		},
-[247] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[247] = { 4,	0,		SEN(clock_nanosleep_time32),	"clock_nanosleep"	},
 [248] = { 3,	0,		SEN(timer_create),		"timer_create"		},
 [249] = { 1,	0,		SEN(timer_delete),		"timer_delete"		},
 [250] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},

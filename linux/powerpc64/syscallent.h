@@ -250,7 +250,7 @@
 [245] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [246] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [247] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[248] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[248] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [249] = { 2,	0,		SEN(printargs),			"swapcontext"		},
 [250] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [251] = { 2,	TF,		SEN(utimes),			"utimes"		},

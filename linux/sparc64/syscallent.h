@@ -262,7 +262,7 @@
 [256] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [257] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [258] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[259] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[259] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [260] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [261] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [262] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},

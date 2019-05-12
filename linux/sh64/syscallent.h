@@ -299,7 +299,7 @@
 [292] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [293] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [294] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[295] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[295] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [296] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},
 [297] = { 3,	TD|TFSF|TSFA,	SEN(fstatfs64),			"fstatfs64"		},
 [298] = { 3,	TS,		SEN(tgkill),			"tgkill"		},

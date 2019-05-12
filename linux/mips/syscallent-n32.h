@@ -235,7 +235,7 @@
 [6225] = { 2,	0,		SEN(clock_settime32),		"clock_settime"		},
 [6226] = { 2,	0,		SEN(clock_gettime32),		"clock_gettime"		},
 [6227] = { 2,	0,		SEN(clock_getres_time32),	"clock_getres"		},
-[6228] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[6228] = { 4,	0,		SEN(clock_nanosleep_time32),	"clock_nanosleep"	},
 [6229] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [6230] = { 2,	TF,		SEN(utimes),			"utimes"		},
 [6231] = { 6,	TM,		SEN(mbind),			"mbind"			},

@@ -235,7 +235,7 @@
 [227] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [228] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [229] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[230] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[230] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [231] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
 [232] = { 4,	TD,		SEN(epoll_wait),		"epoll_wait"		},
 [233] = { 4,	TD,		SEN(epoll_ctl),			"epoll_ctl"		},

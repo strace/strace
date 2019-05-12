@@ -127,7 +127,7 @@
 [112] = { 2,	0,		SEN(clock_settime32),		"clock_settime"		},
 [113] = { 2,	0,		SEN(clock_gettime32),		"clock_gettime"		},
 [114] = { 2,	0,		SEN(clock_getres_time32),	"clock_getres"		},
-[115] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[115] = { 4,	0,		SEN(clock_nanosleep_time32),	"clock_nanosleep"	},
 [116] = { 3,	0,		SEN(syslog),			"syslog"		},
 [117] = { 4,	0,		SEN(ptrace),			"ptrace"		},
 [118] = { 2,	0,		SEN(sched_setparam),		"sched_setparam"	},

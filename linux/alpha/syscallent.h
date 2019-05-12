@@ -365,7 +365,7 @@
 [419] = { 2,	0,		SEN(clock_settime64),		"clock_settime"		},
 [420] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime"		},
 [421] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres"		},
-[422] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+[422] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [423] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop"		},
 [424] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
 [425] = { 2,	TF|TST|TSTA,	SEN(stat64),			"stat64"		},
