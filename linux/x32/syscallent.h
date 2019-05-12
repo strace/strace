@@ -213,7 +213,7 @@
 [205] = { 1,	0,		SEN(printargs),			"set_thread_area#64"	},
 [206] = { 2,	TM,		SEN(printargs),			"io_setup#64"		},
 [207] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[208] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[208] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [209] = { 3,	0,		SEN(printargs),			"io_submit#64"		},
 [210] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [211] = { 1,	0,		SEN(printargs),			"get_thread_area#64"	},

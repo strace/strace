@@ -223,7 +223,7 @@
 [1024 + 213] = { 3,	0,		SEN(lookup_dcookie),		"lookup_dcookie"	},
 [1024 + 214] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [1024 + 215] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[1024 + 216] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[1024 + 216] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [1024 + 217] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [1024 + 218] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [1024 + 219] = { 1,	TD,		SEN(epoll_create),		"epoll_create"		},

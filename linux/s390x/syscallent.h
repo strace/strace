@@ -238,7 +238,7 @@
 [242] = { },
 [243] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [244] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[245] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[245] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [246] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [247] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [248] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},

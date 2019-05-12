@@ -239,7 +239,7 @@
 [239] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [240] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [241] = { 3,	0,		SEN(io_submit),			"io_submit"		},
-[242] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[242] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [243] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [244] = { 2,	0,		SEN(clock_settime),		"clock_settime"		},
 [245] = { 2,	0,		SEN(clock_gettime),		"clock_gettime"		},

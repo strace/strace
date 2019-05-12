@@ -220,7 +220,7 @@
 [214] = { 5,	0,		SEN(printargs),			"get_thread_area"	},
 [215] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [216] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[217] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[217] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [218] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [219] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [220] = { 5,	0,		SEN(printargs),			"alloc_hugepages"	},

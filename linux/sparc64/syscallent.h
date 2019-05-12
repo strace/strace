@@ -275,7 +275,7 @@
 [269] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [270] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [271] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
-[272] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[272] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [273] = { 4,	TD,		SEN(mq_open),			"mq_open"		},
 [274] = { 1,	0,		SEN(mq_unlink),			"mq_unlink"		},
 [275] = { 5,	TD,		SEN(mq_timedsend),		"mq_timedsend"		},

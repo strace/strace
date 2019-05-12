@@ -344,7 +344,7 @@
 [397] = { 5,	0,		SEN(tuxcall),			"tuxcall"		}, /* not implemented */
 [398] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [399] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[400] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[400] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [401] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [402] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [403 ... 404] = { },

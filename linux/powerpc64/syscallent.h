@@ -231,7 +231,7 @@
 [226] = { },
 [227] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [228] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[229] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[229] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [230] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [231] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [232] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},

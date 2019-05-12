@@ -251,7 +251,7 @@
 [4240] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},
 [4241] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [4242] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[4243] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[4243] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [4244] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [4245] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [4246] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},

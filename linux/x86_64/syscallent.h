@@ -213,7 +213,7 @@
 [205] = { 1,	0,		SEN(set_thread_area),		"set_thread_area"	},
 [206] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [207] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[208] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[208] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [209] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [210] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [211] = { 1,	0,		SEN(get_thread_area),		"get_thread_area"	},

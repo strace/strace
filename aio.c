@@ -246,10 +246,19 @@ print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	return 0;
 }
 
-SYS_FUNC(io_getevents)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(io_getevents_time32)
 {
-	return print_io_getevents(tcp, print_timespec, false);
+	return print_io_getevents(tcp, print_timespec32, false);
 }
+#endif
+
+#if HAVE_ARCH_OLD_TIME64_SYSCALLS
+SYS_FUNC(io_getevents_time64)
+{
+	return print_io_getevents(tcp, print_timespec64, false);
+}
+#endif
 
 SYS_FUNC(io_pgetevents)
 {

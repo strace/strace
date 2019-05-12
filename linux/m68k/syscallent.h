@@ -249,7 +249,7 @@
 [240] = { 4,	TD,		SEN(readahead),			"readahead"		},
 [241] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [242] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[243] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[243] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [244] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [245] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [246] = { 5,	TD,		SEN(fadvise64),			"fadvise64"		},

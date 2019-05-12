@@ -12,7 +12,7 @@
 [  1] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [  2] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [  3] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
-[  4] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[  4] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [  5] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
 [  6] = { 5,	TF,		SEN(setxattr),			"lsetxattr"		},
 [  7] = { 5,	TD,		SEN(fsetxattr),			"fsetxattr"		},

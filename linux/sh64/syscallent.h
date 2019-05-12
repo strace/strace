@@ -279,7 +279,7 @@
 [271 ... 272] = { },
 [273] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [274] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[275] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[275] = { 5,	0,		SEN(io_getevents_time64),	"io_getevents"		},
 [276] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [277] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [278] = { 4,	TD,		SEN(fadvise64),			"fadvise64"		},

@@ -209,7 +209,7 @@
 [6199] = { 4,	0,		SEN(sysmips),			"sysmips"		},
 [6200] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [6201] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
-[6202] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+[6202] = { 5,	0,		SEN(io_getevents_time32),	"io_getevents"		},
 [6203] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [6204] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
 [6205] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
