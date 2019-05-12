@@ -292,7 +292,7 @@
 [293] = { 5,	TD|TF,		SEN(linkat),			"linkat"		},
 [294] = { 3,	TD|TF,		SEN(symlinkat),			"symlinkat"		},
 [295] = { 4,	TD|TF,		SEN(readlinkat),		"readlinkat"		},
-[296] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[296] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [297] = { 5,	TD|TF,		SEN(fchownat),			"fchownat"		},
 [298] = { 3,	TD|TF,		SEN(futimesat),			"futimesat"		},
 [299] = { 4,	TD|TF|TFST|TSTA,SEN(fstatat64),			"fstatat64"		},

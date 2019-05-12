@@ -289,7 +289,7 @@
 [1024 + 279] = { 4,	TD,		SEN(fallocate),			"fallocate"		},
 [1024 + 280] = { 3,	0,		SEN(getcpu),			"getcpu"		},
 [1024 + 281] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
-[1024 + 282] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[1024 + 282] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat"		},
 [1024 + 283] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [1024 + 284] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
 [1024 + 285] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

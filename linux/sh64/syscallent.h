@@ -352,7 +352,7 @@
 [345] = { 6,	TM,		SEN(move_pages),		"move_pages"		},
 [346] = { 3,	0,		SEN(getcpu),			"getcpu"		},
 [347] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
-[348] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[348] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat"		},
 [349] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [350] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [351] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

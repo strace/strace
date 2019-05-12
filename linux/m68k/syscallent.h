@@ -322,7 +322,7 @@
 [313] = { 4,	0,		SEN(kexec_load),		"kexec_load"		},
 [314] = { 3,	0,		SEN(getcpu),			"getcpu"		},
 [315] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
-[316] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[316] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [317] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [318] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [319] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

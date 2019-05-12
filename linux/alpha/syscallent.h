@@ -418,7 +418,7 @@
 [472] = { 6,	TM,		SEN(move_pages),		"move_pages"		},
 [473] = { 3,	0,		SEN(getcpu),			"getcpu"		},
 [474] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
-[475] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[475] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat"		},
 [476] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [477] = { 4,	TD,		SEN(timerfd),			"timerfd"		}, /* not implemented */
 [478] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

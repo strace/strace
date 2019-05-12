@@ -286,7 +286,7 @@
 [6276] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
 [6277] = { 3,	0,		SEN(ioprio_set),		"ioprio_set"		},
 [6278] = { 2,	0,		SEN(ioprio_get),		"ioprio_get"		},
-[6279] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[6279] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [6280] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [6281] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
 [6282] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

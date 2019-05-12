@@ -284,7 +284,7 @@
 [275] = { 3,	TI,		SEN(shmget),			"shmget"		},
 [276] = { 1,	TI|TM|SI,	SEN(shmdt),			"shmdt"			},
 [277] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
-[278] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[278] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [279] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [280] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
 [281] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

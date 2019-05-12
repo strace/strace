@@ -100,7 +100,7 @@
 [ 85] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [ 86] = { 4,	TD,		SEN(timerfd_settime32),		"timerfd_settime"	},
 [ 87] = { 2,	TD,		SEN(timerfd_gettime32),		"timerfd_gettime"	},
-[ 88] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[ 88] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [ 89] = { 1,	TF,		SEN(acct),			"acct"			},
 [ 90] = { 2,	0,		SEN(capget),			"capget"		},
 [ 91] = { 2,	0,		SEN(capset),			"capset"		},

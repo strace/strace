@@ -285,7 +285,7 @@
 [277] = { 4,	TD,		SEN(sync_file_range),		"sync_file_range"	},
 [278] = { 4,	TD,		SEN(vmsplice),			"vmsplice"		},
 [279] = { 6,	TM,		SEN(move_pages),		"move_pages"		},
-[280] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[280] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat"		},
 [281] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
 [282] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [283] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},

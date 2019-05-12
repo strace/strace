@@ -353,7 +353,7 @@
 [344] = { 4,	TD,		SEN(tee),			"tee"			},
 [345] = { 4,	TD,		SEN(vmsplice),			"vmsplice"		},
 [346] = { 6,	TD,		SEN(epoll_pwait),		"epoll_pwait"		},
-[347] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[347] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [348] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [349] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
 [350] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

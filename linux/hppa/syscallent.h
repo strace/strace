@@ -304,7 +304,7 @@
 [298] = { 3,	TF|TSF|TSFA,	SEN(statfs64),			"statfs64"		},
 [299] = { 3,	TD|TFSF|TSFA,	SEN(fstatfs64),			"fstatfs64"		},
 [300] = { 4,	0,		SEN(kexec_load),		"kexec_load"		},
-[301] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+[301] = { 4,	TD|TF,		SEN(utimensat_time32),		"utimensat"		},
 [302] = { 3,	TD|TS,		SEN(signalfd),			"signalfd"		},
 [303] = { 4,	TD,		SEN(timerfd),			"timerfd"		},
 [304] = { 1,	TD,		SEN(eventfd),			"eventfd"		},

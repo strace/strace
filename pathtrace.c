@@ -203,7 +203,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_readlinkat:
 	case SEN_statx:
 	case SEN_unlinkat:
-	case SEN_utimensat:
+	case SEN_utimensat_time32:
 	case SEN_utimensat_time64:
 		/* fd, path */
 		return fdmatch(tcp, tcp->u_arg[0], set) ||

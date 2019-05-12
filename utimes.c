@@ -46,10 +46,12 @@ do_utimensat(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(utimensat)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(utimensat_time32)
 {
-	return do_utimensat(tcp, print_timespec_utime_pair);
+	return do_utimensat(tcp, print_timespec32_utime_pair);
 }
+#endif
 
 SYS_FUNC(utimensat_time64)
 {
