@@ -211,9 +211,9 @@ SO_PEERNAME	28
 #endif
 
 #if defined __hppa__
-SO_TIMESTAMP	16402
+SO_TIMESTAMP_OLD	16402
 #else
-SO_TIMESTAMP	29
+SO_TIMESTAMP_OLD	29
 #endif
 
 #if defined __mips__
@@ -259,11 +259,11 @@ SO_PASSSEC	34
 #endif
 
 #if defined __sparc__
-SO_TIMESTAMPNS	33
+SO_TIMESTAMPNS_OLD	33
 #elif defined __hppa__
-SO_TIMESTAMPNS	16403
+SO_TIMESTAMPNS_OLD	16403
 #else
-SO_TIMESTAMPNS	35
+SO_TIMESTAMPNS_OLD	35
 #endif
 
 #if defined __sparc__
@@ -275,11 +275,11 @@ SO_MARK	36
 #endif
 
 #if defined __sparc__
-SO_TIMESTAMPING	35
+SO_TIMESTAMPING_OLD	35
 #elif defined __hppa__
-SO_TIMESTAMPING	16416
+SO_TIMESTAMPING_OLD	16416
 #else
-SO_TIMESTAMPING	37
+SO_TIMESTAMPING_OLD	37
 #endif
 
 #if defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__

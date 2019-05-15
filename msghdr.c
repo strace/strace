@@ -83,22 +83,22 @@ print_scm_security(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
-print_scm_timestamp(struct tcb *tcp, const void *cmsg_data,
-		    const unsigned int data_len)
+print_scm_timestamp_old(struct tcb *tcp, const void *cmsg_data,
+			const unsigned int data_len)
 {
 	print_struct_timeval_data_size(cmsg_data, data_len);
 }
 
 static void
-print_scm_timestampns(struct tcb *tcp, const void *cmsg_data,
-		      const unsigned int data_len)
+print_scm_timestampns_old(struct tcb *tcp, const void *cmsg_data,
+			  const unsigned int data_len)
 {
 	print_struct_timespec_data_size(cmsg_data, data_len);
 }
 
 static void
-print_scm_timestamping(struct tcb *tcp, const void *cmsg_data,
-		       const unsigned int data_len)
+print_scm_timestamping_old(struct tcb *tcp, const void *cmsg_data,
+			   const unsigned int data_len)
 {
 	print_struct_timespec_array_data_size(cmsg_data, 3, data_len);
 }
@@ -200,9 +200,9 @@ static const struct {
 	[SCM_RIGHTS] = { print_scm_rights, sizeof(int) },
 	[SCM_CREDENTIALS] = { print_scm_creds, sizeof(struct ucred) },
 	[SCM_SECURITY] = { print_scm_security, 1 },
-	[SO_TIMESTAMP] = { print_scm_timestamp, 1 },
-	[SO_TIMESTAMPNS] = { print_scm_timestampns, 1 },
-	[SO_TIMESTAMPING] = { print_scm_timestamping, 1 }
+	[SO_TIMESTAMP_OLD] = { print_scm_timestamp_old, 1 },
+	[SO_TIMESTAMPNS_OLD] = { print_scm_timestampns_old, 1 },
+	[SO_TIMESTAMPING_OLD] = { print_scm_timestamping_old, 1 }
 }, cmsg_ip_printers[] = {
 	[IP_PKTINFO] = { print_cmsg_ip_pktinfo, sizeof(struct in_pktinfo) },
 	[IP_TTL] = { print_cmsg_uint, sizeof(unsigned int) },

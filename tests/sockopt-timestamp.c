@@ -140,9 +140,9 @@ main(void)
 		const char *str;
 		void (*fun)(const struct cmsghdr *);
 	} tests[] = {
-		{ SO_TIMESTAMP_OLD, "SO_TIMESTAMP", print_timestamp_old },
+		{ SO_TIMESTAMP_OLD, "SO_TIMESTAMP_OLD", print_timestamp_old },
 #ifdef SO_TIMESTAMPNS_OLD
-		{ SO_TIMESTAMPNS_OLD, "SO_TIMESTAMPNS", print_timestampns_old },
+		{ SO_TIMESTAMPNS_OLD, "SO_TIMESTAMPNS_OLD", print_timestampns_old },
 #endif
 	};
 	unsigned int tested = 0;
