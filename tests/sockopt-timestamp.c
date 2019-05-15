@@ -116,7 +116,7 @@ test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
 			}
 			printf(", cmsg_type=");
 			if (c->cmsg_type == so_val) {
-				printf("SCM_%s, cmsg_data=", str);
+				printf("%s, cmsg_data=", str);
 				fun(c);
 				tested = 1;
 			} else {
@@ -140,9 +140,9 @@ main(void)
 		const char *str;
 		void (*fun)(const struct cmsghdr *);
 	} tests[] = {
-		{ SO_TIMESTAMP_OLD, "TIMESTAMP", print_timestamp_old },
+		{ SO_TIMESTAMP_OLD, "SO_TIMESTAMP", print_timestamp_old },
 #ifdef SO_TIMESTAMPNS_OLD
-		{ SO_TIMESTAMPNS_OLD, "TIMESTAMPNS", print_timestampns_old },
+		{ SO_TIMESTAMPNS_OLD, "SO_TIMESTAMPNS", print_timestampns_old },
 #endif
 	};
 	unsigned int tested = 0;
