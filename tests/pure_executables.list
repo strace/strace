@@ -460,6 +460,7 @@ sockaddr_xlat-Xraw
 sockaddr_xlat-Xverbose
 socketcall
 sockopt-sol_netlink
+sockopt-timestamp
 splice
 stat
 stat64

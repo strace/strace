@@ -546,6 +546,7 @@ sockaddr_xlat-Xraw
 sockaddr_xlat-Xverbose
 socketcall
 sockopt-sol_netlink
+sockopt-timestamp
 splice
 stack-fcall
 stack-fcall-mangled

@@ -455,6 +455,7 @@ sockaddr_xlat-Xraw	-Xraw -e trace=connect
 sockaddr_xlat-Xverbose	-Xverbose -e trace=connect
 socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
+sockopt-timestamp	-e trace=recvmsg
 splice
 stat	-a32 -v -P stat.sample -P /dev/full
 stat64	-a32 -v -P stat.sample -P /dev/full
