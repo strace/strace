@@ -8,6 +8,8 @@
 #ifndef STRACE_KERNEL_TIMEX_H
 # define STRACE_KERNEL_TIMEX_H
 
+# include "kernel_timeval.h"
+
 typedef struct {
 	unsigned int modes;
 	int pad0;
@@ -20,10 +22,7 @@ typedef struct {
 	long long constant;
 	long long precision;
 	long long tolerance;
-	struct {
-		long long tv_sec;
-		long long tv_usec;
-	} time;
+	kernel_timeval64_t time;
 	long long tick;
 	long long ppsfreq;
 	long long jitter;
