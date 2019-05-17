@@ -1129,6 +1129,9 @@ extern int print_timespec64(struct tcb *, kernel_ulong_t);
 extern const char *sprint_timespec64(struct tcb *, kernel_ulong_t);
 extern int print_timespec64_utime_pair(struct tcb *, kernel_ulong_t);
 extern int print_itimerspec64(struct tcb *, kernel_ulong_t);
+
+extern bool print_timeval64_data_size(const void *arg, size_t size);
+
 extern int print_timex64(struct tcb *, kernel_ulong_t);
 
 # ifdef SPARC64

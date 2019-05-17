@@ -6,6 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Added C-SKY architecture support.
+  * Implemented decoding of SO_TIMESTAMP*_NEW control messages.
   * Wired up clock_gettime64, clock_settime64, clock_adjtime64,
     clock_getres_time64, clock_nanosleep_time64, timer_gettime64,
     timer_settime64, timerfd_gettime64, timerfd_settime64, utimensat_time64,
