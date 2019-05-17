@@ -12,15 +12,14 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-#ifndef SO_TIMESTAMP_OLD
-# define SO_TIMESTAMP_OLD SO_TIMESTAMP
+#if defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL	\
+ || defined HAVE_STRUCT___KERNEL_TIMESPEC
+# include <linux/time_types.h>
 #endif
 
-#ifndef SO_TIMESTAMPNS_OLD
-# ifdef SO_TIMESTAMPNS
-#  define SO_TIMESTAMPNS_OLD SO_TIMESTAMPNS
-# endif
-#endif
+#define XLAT_MACROS_ONLY
+#include "xlat/sock_options.h"
+#undef XLAT_MACROS_ONLY
 
 static void
 print_timestamp_old(const struct cmsghdr *c)
@@ -39,7 +38,6 @@ print_timestamp_old(const struct cmsghdr *c)
 	       (long long) tv->tv_sec, (long long) tv->tv_usec);
 }
 
-#ifdef SO_TIMESTAMPNS_OLD
 static void
 print_timestampns_old(const struct cmsghdr *c)
 {
@@ -56,7 +54,44 @@ print_timestampns_old(const struct cmsghdr *c)
 	printf("{tv_sec=%lld, tv_nsec=%lld}",
 	       (long long) ts->tv_sec, (long long) ts->tv_nsec);
 }
-#endif /* SO_TIMESTAMPNS_OLD */
+
+#ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
+static void
+print_timestamp_new(const struct cmsghdr *c)
+{
+	const void *cmsg_header = c;
+	const void *cmsg_data = CMSG_DATA(c);
+	const struct __kernel_sock_timeval *tv = cmsg_data;
+	const unsigned int expected_len = sizeof(*tv);
+	const unsigned int data_len = c->cmsg_len - (cmsg_data - cmsg_header);
+
+	if (expected_len != data_len)
+		perror_msg_and_fail("sizeof(struct __kernel_sock_timeval) = %u"
+				    ", data_len = %u\n",
+				    expected_len, data_len);
+	printf("{tv_sec=%lld, tv_usec=%lld}",
+	       (long long) tv->tv_sec, (long long) tv->tv_usec);
+}
+#endif /* HAVE_STRUCT___KERNEL_SOCK_TIMEVAL */
+
+#ifdef HAVE_STRUCT___KERNEL_TIMESPEC
+static void
+print_timestampns_new(const struct cmsghdr *c)
+{
+	const void *cmsg_header = c;
+	const void *cmsg_data = CMSG_DATA(c);
+	const struct __kernel_timespec *ts = cmsg_data;
+	const unsigned int expected_len = sizeof(*ts);
+	const unsigned int data_len = c->cmsg_len - (cmsg_data - cmsg_header);
+
+	if (expected_len != data_len)
+		perror_msg_and_fail("sizeof(struct __kernel_timespec) = %u"
+				    ", data_len = %u\n",
+				    expected_len, data_len);
+	printf("{tv_sec=%lld, tv_nsec=%lld}",
+	       (long long) ts->tv_sec, (long long) ts->tv_nsec);
+}
+#endif /* HAVE_STRUCT___KERNEL_TIMESPEC */
 
 static unsigned int
 test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
@@ -141,8 +176,12 @@ main(void)
 		void (*fun)(const struct cmsghdr *);
 	} tests[] = {
 		{ SO_TIMESTAMP_OLD, "SO_TIMESTAMP_OLD", print_timestamp_old },
-#ifdef SO_TIMESTAMPNS_OLD
 		{ SO_TIMESTAMPNS_OLD, "SO_TIMESTAMPNS_OLD", print_timestampns_old },
+#ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
+		{ SO_TIMESTAMP_NEW, "SO_TIMESTAMP_NEW", print_timestamp_new },
+#endif
+#ifdef HAVE_STRUCT___KERNEL_TIMESPEC
+		{ SO_TIMESTAMPNS_NEW, "SO_TIMESTAMPNS_NEW", print_timestampns_new },
 #endif
 	};
 	unsigned int tested = 0;

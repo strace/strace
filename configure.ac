@@ -283,6 +283,9 @@ AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
 AC_CHECK_TYPES([__kernel_long_t, __kernel_ulong_t],,,
 [#include <asm/posix_types.h>])
 
+AC_CHECK_TYPES([struct __kernel_timespec, struct __kernel_sock_timeval],,,
+[#include <linux/time_types.h>])
+
 AC_CHECK_TYPES([struct stat64, struct __old_kernel_stat],,,
 [#include <sys/types.h>
 #include <asm/stat.h>])
