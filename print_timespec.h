@@ -8,6 +8,10 @@
 
 #include "xstring.h"
 
+#ifndef TIMESPEC_NSEC
+# define TIMESPEC_NSEC tv_nsec
+#endif
+
 #ifndef UTIME_NOW
 # define UTIME_NOW ((1l << 30) - 1l)
 #endif
@@ -16,9 +20,11 @@
 #endif
 
 #define TIMESPEC_TO_SEC_NSEC(t_)	\
-	((long long) (t_)->tv_sec), zero_extend_signed_to_ull((t_)->tv_nsec)
+	((long long) (t_)->tv_sec),	\
+	 zero_extend_signed_to_ull((t_)->TIMESPEC_NSEC)
 
-static const char timespec_fmt[] = "{tv_sec=%lld, tv_nsec=%llu}";
+static const char timespec_fmt[] =
+	"{tv_sec=%lld, " STRINGIFY_VAL(TIMESPEC_NSEC) "=%llu}";
 
 static void
 print_sec_nsec(long long sec, unsigned long long nsec)
@@ -110,7 +116,7 @@ SPRINT_TIMESPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 static void
 print_timespec_t_utime(const TIMESPEC_T *t)
 {
-	switch (t->tv_nsec) {
+	switch (t->TIMESPEC_NSEC) {
 	case UTIME_NOW:
 	case UTIME_OMIT:
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
@@ -119,7 +125,7 @@ print_timespec_t_utime(const TIMESPEC_T *t)
 			break;
 
 		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprints_comment : tprints)(t->tv_nsec == UTIME_NOW
+			? tprints_comment : tprints)(t->TIMESPEC_NSEC == UTIME_NOW
 				? "UTIME_NOW" : "UTIME_OMIT");
 		break;
 	default:
