@@ -453,3 +453,25 @@ SO_TXTIME	16438
 #else
 SO_TXTIME	61
 #endif
+
+#if defined __sparc__
+SO_TIMESTAMP_NEW	70
+#elif defined __hppa__
+SO_TIMESTAMP_NEW	16440
+#else
+SO_TIMESTAMP_NEW	63
+#endif
+#if defined __sparc__
+SO_TIMESTAMPNS_NEW	66
+#elif defined __hppa__
+SO_TIMESTAMPNS_NEW	16441
+#else
+SO_TIMESTAMPNS_NEW	64
+#endif
+#if defined __sparc__
+SO_TIMESTAMPING_NEW	67
+#elif defined __hppa__
+SO_TIMESTAMPING_NEW	16442
+#else
+SO_TIMESTAMPING_NEW	65
+#endif
