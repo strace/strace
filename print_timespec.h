@@ -32,28 +32,7 @@ print_timespec_t(const TIMESPEC_T *t)
 	print_sec_nsec(TIMESPEC_TO_SEC_NSEC(t));
 }
 
-static void
-print_timespec_t_utime(const TIMESPEC_T *t)
-{
-	switch (t->tv_nsec) {
-	case UTIME_NOW:
-	case UTIME_OMIT:
-		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-			print_timespec_t(t);
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
-			break;
-
-		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprints_comment : tprints)(t->tv_nsec == UTIME_NOW
-				? "UTIME_NOW" : "UTIME_OMIT");
-		break;
-	default:
-		print_timespec_t(t);
-		tprints_comment(sprinttime_nsec(TIMESPEC_TO_SEC_NSEC(t)));
-		break;
-	}
-}
-
+#ifdef PRINT_TIMESPEC_DATA_SIZE
 bool
 PRINT_TIMESPEC_DATA_SIZE(const void *arg, const size_t size)
 {
@@ -65,7 +44,9 @@ PRINT_TIMESPEC_DATA_SIZE(const void *arg, const size_t size)
 	print_timespec_t(arg);
 	return true;
 }
+#endif /* PRINT_TIMESPEC_DATA_SIZE */
 
+#ifdef PRINT_TIMESPEC_ARRAY_DATA_SIZE
 bool
 PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 			       const size_t size)
@@ -89,7 +70,9 @@ PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 	tprints("]");
 	return true;
 }
+#endif /* PRINT_TIMESPEC_ARRAY_DATA_SIZE */
 
+#ifdef PRINT_TIMESPEC
 int
 PRINT_TIMESPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -101,7 +84,9 @@ PRINT_TIMESPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 	print_timespec_t(&t);
 	return 0;
 }
+#endif /* PRINT_TIMESPEC */
 
+#ifdef SPRINT_TIMESPEC
 const char *
 SPRINT_TIMESPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -119,6 +104,30 @@ SPRINT_TIMESPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	return buf;
 }
+#endif /* SPRINT_TIMESPEC */
+
+#ifdef PRINT_TIMESPEC_UTIME_PAIR
+static void
+print_timespec_t_utime(const TIMESPEC_T *t)
+{
+	switch (t->tv_nsec) {
+	case UTIME_NOW:
+	case UTIME_OMIT:
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+			print_timespec_t(t);
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+			break;
+
+		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+			? tprints_comment : tprints)(t->tv_nsec == UTIME_NOW
+				? "UTIME_NOW" : "UTIME_OMIT");
+		break;
+	default:
+		print_timespec_t(t);
+		tprints_comment(sprinttime_nsec(TIMESPEC_TO_SEC_NSEC(t)));
+		break;
+	}
+}
 
 int
 PRINT_TIMESPEC_UTIME_PAIR(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -135,7 +144,9 @@ PRINT_TIMESPEC_UTIME_PAIR(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("]");
 	return 0;
 }
+#endif /* PRINT_TIMESPEC_UTIME_PAIR */
 
+#ifdef PRINT_ITIMERSPEC
 int
 PRINT_ITIMERSPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -151,3 +162,4 @@ PRINT_ITIMERSPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("}");
 	return 0;
 }
+#endif /* PRINT_ITIMERSPEC */
