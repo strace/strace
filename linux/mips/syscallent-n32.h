@@ -361,6 +361,7 @@
 [6421] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait_time64"},
 [6422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
 [6423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
+[6424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
 
 # define SYS_socket_subcall      6500
 # include "subcall32.h"

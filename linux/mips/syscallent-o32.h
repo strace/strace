@@ -408,6 +408,7 @@
 [4421] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait_time64"},
 [4422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
 [4423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
+[4424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
 
 # define SYS_socket_subcall      4500
 # include "subcall32.h"

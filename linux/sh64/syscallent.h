@@ -399,6 +399,7 @@
 [392] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [393] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 /* [403 ... 423] - reserved to sync up with other architectures */
+[424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
 
 #define SYS_socket_subcall	500
 #include "subcall64.h"

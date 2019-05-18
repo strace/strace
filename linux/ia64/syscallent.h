@@ -342,3 +342,4 @@
 [1024 + 332] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [1024 + 333] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [1024 + 334 ... 1024 + 423] - reserved to sync up with other architectures */
+[1024 + 424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},

@@ -382,6 +382,7 @@
 [401] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
 [402] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
 /* [403 ... 423] - reserved to sync up with other architectures */
+[424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
 
 #define SYS_socket_subcall	500
 #include "subcall64.h"

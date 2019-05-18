@@ -318,6 +318,7 @@ personality
 personality-Xabbrev
 personality-Xraw
 personality-Xverbose
+pidfd_send_signal
 pipe
 pipe2
 pkey_alloc

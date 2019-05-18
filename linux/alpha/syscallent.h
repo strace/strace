@@ -476,3 +476,5 @@
 [530] = { 0,	PU|NF,		SEN(getegid),			"getegid"		},
 [531] = { 0,	PU|NF,		SEN(geteuid),			"geteuid"		},
 [532] = { 0,	PU|NF,		SEN(getppid),			"getppid"		},
+/* all other architectures have common numbers for new syscalls, alpha is the exception */
+[534] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},

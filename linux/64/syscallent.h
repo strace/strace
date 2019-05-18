@@ -286,3 +286,4 @@
 [293] = { 4,	0,		SEN(rseq),			"rseq"			},
 [294] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 /* [295 ... 423] - reserved to sync up with other architectures */
+[424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},

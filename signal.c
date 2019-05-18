@@ -648,6 +648,19 @@ SYS_FUNC(rt_tgsigqueueinfo)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(pidfd_send_signal)
+{
+	/* int pidfd */
+	printfd(tcp, tcp->u_arg[0]);
+	/* int sig, siginfo_t *info */
+	tprints(", ");
+	print_sigqueueinfo(tcp, tcp->u_arg[1], tcp->u_arg[2]);
+	/* unsigned int flags */
+	tprintf(", %#x", (unsigned int) tcp->u_arg[3]);
+
+	return RVAL_DECODED;
+}
+
 static int
 do_rt_sigtimedwait(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 		   const sprint_obj_by_addr_fn sprint_ts)

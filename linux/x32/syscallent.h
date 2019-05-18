@@ -341,6 +341,7 @@
 [333] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 [334] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [335 ... 423] - reserved to sync up with other architectures */
+[424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.

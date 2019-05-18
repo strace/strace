@@ -337,6 +337,7 @@
 [5327] = { 4,	0,		SEN(rseq),			"rseq"			},
 [5328] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 /* [5329 ... 5423] - reserved to sync up with other architectures */
+[5424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
 
 # define SYS_socket_subcall      5500
 # include "subcall64.h"

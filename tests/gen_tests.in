@@ -319,6 +319,7 @@ perf_event_open_unabbrev	-a1 -v -e trace=perf_event_open
 personality-Xabbrev	+personality.test -Xabbrev
 personality-Xraw	+personality.test -a15 -Xraw
 personality-Xverbose	+personality.test -Xverbose
+pidfd_send_signal
 pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
