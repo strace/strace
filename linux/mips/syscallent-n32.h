@@ -362,6 +362,9 @@
 [6422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
 [6423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
 [6424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
+[6425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
+[6426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
+[6427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
 
 # define SYS_socket_subcall      6500
 # include "subcall32.h"

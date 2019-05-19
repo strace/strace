@@ -143,6 +143,9 @@ inject-nf
 inotify
 inotify_init1
 int_0x80
+io_uring_enter
+io_uring_register
+io_uring_setup
 ioctl
 ioctl_block
 ioctl_dm

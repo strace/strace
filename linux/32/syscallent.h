@@ -313,6 +313,9 @@
 [422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
 [423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
 [424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
+[425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
+[426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
+[427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
 
 #undef sys_ARCH_mmap
 #undef ARCH_WANT_SYNC_FILE_RANGE2

@@ -13,7 +13,8 @@ Noteworthy changes in release ?.? (????-??-??)
     pselect6_time64, ppoll_time64, io_pgetevents_time64, recvmmsg_time64,
     mq_timedsend_time64, mq_timedreceive_time64, semtimedop_time64,
     rt_sigtimedwait_time64, futex_time64, sched_rr_get_interval_time64,
-    and pidfd_send_signal syscalls.
+    pidfd_send_signal, io_uring_setup, io_uring_enter, and io_uring_register
+    syscalls.
   * Wired up getegid, geteuid, getppid, io_pgetevents, statfs64, and fstatfs64
     syscalls on alpha.
   * Wired up kexec_file_load and migrate_pages syscalls on arm.

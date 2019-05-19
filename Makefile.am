@@ -145,6 +145,7 @@ strace_SOURCES =	\
 	inotify.c	\
 	inotify_ioctl.c	\
 	io.c		\
+	io_uring.c	\
 	ioctl.c		\
 	ioperm.c	\
 	iopl.c		\

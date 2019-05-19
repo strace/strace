@@ -120,6 +120,9 @@ inet-cmsg
 init_module
 inotify
 inotify_init1
+io_uring_enter
+io_uring_register
+io_uring_setup
 ioctl
 ioctl_block
 ioctl_dm

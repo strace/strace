@@ -338,6 +338,9 @@
 [5328] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 /* [5329 ... 5423] - reserved to sync up with other architectures */
 [5424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
+[5425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
+[5426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
+[5427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
 
 # define SYS_socket_subcall      5500
 # include "subcall64.h"

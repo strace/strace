@@ -387,6 +387,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/hiddev.h
 	linux/if_addr.h
 	linux/if_link.h
+	linux/io_uring.h
 	linux/ip_vs.h
 	linux/ipc.h
 	linux/kcmp.h
