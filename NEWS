@@ -28,6 +28,7 @@ Noteworthy changes in release ?.? (????-??-??)
     and xtensa.
   * Wired up direct ipc syscalls on m68k, mips o32, powerpc, powerpc64,
     s390, s390x, sh, sparc, sparc64, and x86.
+  * Updated lists of NT_* and SO_* constants.
 
 Noteworthy changes in release 5.0 (2019-03-19)
 ==============================================
