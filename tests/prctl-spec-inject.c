@@ -58,7 +58,8 @@ main(int argc, char **argv)
 		{ 1, " (PR_SPEC_PRCTL)" },
 		{ 3, " (PR_SPEC_PRCTL|PR_SPEC_ENABLE)" },
 		{ 8, " (PR_SPEC_FORCE_DISABLE)" },
-		{ 16, " (0x10)" },
+		{ 16, " (PR_SPEC_DISABLE_NOEXEC)" },
+		{ 32, " (0x20)" },
 		{ 42, " (PR_SPEC_ENABLE|PR_SPEC_FORCE_DISABLE|0x20)" },
 	};
 	static const struct {
@@ -70,7 +71,8 @@ main(int argc, char **argv)
 		{ 2, "PR_SPEC_ENABLE" },
 		{ 3, "0x3 /* PR_SPEC_??? */" },
 		{ 8, "PR_SPEC_FORCE_DISABLE" },
-		{ 16, "0x10 /* PR_SPEC_??? */" },
+		{ 16, "PR_SPEC_DISABLE_NOEXEC" },
+		{ 32, "0x20 /* PR_SPEC_??? */" },
 		{ (kernel_ulong_t) 0xdecafeedbeefda7eULL, "0x"
 # if SIZEOF_KERNEL_LONG_T == 8
 			"decafeed"
