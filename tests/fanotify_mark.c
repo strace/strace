@@ -124,23 +124,40 @@ main(void)
 	};
 	static const struct strval64 masks[] = {
 		{ ARG_ULL_STR(0) },
-		{ 0xdeadfeedfacebeefULL,
+		{ 0xdeadfeedffffffffULL,
 # if XLAT_RAW || XLAT_VERBOSE
-			"0xdeadfeedfacebeef"
+			"0xdeadfeedffffffff"
 # endif
 # if XLAT_VERBOSE
 			" /* "
 # endif
 # if !XLAT_RAW
-			"FAN_ACCESS|FAN_MODIFY|FAN_CLOSE_WRITE|FAN_OPEN|"
-			"FAN_OPEN_EXEC|FAN_ACCESS_PERM|FAN_OPEN_EXEC_PERM|"
-			"FAN_ONDIR|FAN_EVENT_ON_CHILD|0xdeadfeedb2c8aec4"
+			"FAN_ACCESS|"
+			"FAN_MODIFY|"
+			"FAN_ATTRIB|"
+			"FAN_CLOSE_WRITE|"
+			"FAN_CLOSE_NOWRITE|"
+			"FAN_OPEN|"
+			"FAN_MOVED_FROM|"
+			"FAN_MOVED_TO|"
+			"FAN_CREATE|"
+			"FAN_DELETE|"
+			"FAN_DELETE_SELF|"
+			"FAN_MOVE_SELF|"
+			"FAN_OPEN_EXEC|"
+			"FAN_Q_OVERFLOW|"
+			"FAN_OPEN_PERM|"
+			"FAN_ACCESS_PERM|"
+			"FAN_OPEN_EXEC_PERM|"
+			"FAN_ONDIR|"
+			"FAN_EVENT_ON_CHILD|"
+			"0xdeadfeedb7f8a000"
 # endif
 # if XLAT_VERBOSE
 			" */"
 # endif
 			},
-		{ ARG_ULL_STR(0xffffffffb7f8afc4)
+		{ ARG_ULL_STR(0xffffffffb7f8a000)
 # if !XLAT_RAW
 			" /* FAN_??? */"
 # endif
