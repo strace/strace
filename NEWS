@@ -15,6 +15,7 @@ Noteworthy changes in release ?.? (????-??-??)
     rt_sigtimedwait_time64, futex_time64, sched_rr_get_interval_time64,
     pidfd_send_signal, io_uring_setup, io_uring_enter, and io_uring_register
     syscalls.
+  * Enhanced decoding of bpf syscall.
   * Wired up getegid, geteuid, getppid, io_pgetevents, statfs64, and fstatfs64
     syscalls on alpha.
   * Wired up kexec_file_load and migrate_pages syscalls on arm.

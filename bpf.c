@@ -691,6 +691,16 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	PRINT_FIELD_ADDR64(", ", info, prog_tags);
 
+	/*
+	 * run_time_ns and run_cnt fields were introduced
+	 * by Linux commit v5.1-rc1~178^2~17^2~15^2~2.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, run_time_ns))
+		goto print_bpf_prog_info_end;
+
+	PRINT_FIELD_U(", ", info, run_time_ns);
+	PRINT_FIELD_U(", ", info, run_cnt);
+
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 
 print_bpf_prog_info_end:

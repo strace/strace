@@ -332,10 +332,12 @@ struct bpf_prog_info_struct {
 	uint32_t jited_line_info_rec_size;
 	uint32_t nr_prog_tags;
 	uint64_t ATTRIBUTE_ALIGNED(8) prog_tags;
+	uint64_t ATTRIBUTE_ALIGNED(8) run_time_ns;
+	uint64_t ATTRIBUTE_ALIGNED(8) run_cnt;
 };
 
 # define bpf_prog_info_struct_size \
 	sizeof(struct bpf_prog_info_struct)
-# define expected_bpf_prog_info_struct_size 192
+# define expected_bpf_prog_info_struct_size 208
 
 #endif /* !STRACE_BPF_ATTR_H */

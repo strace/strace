@@ -585,6 +585,14 @@ main(void)
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, prog_tags))
 			printf(", prog_tags=NULL");
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, run_time_ns))
+			printf(", run_time_ns=%llu",
+			       (unsigned long long) prog_info->run_time_ns);
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, run_cnt))
+			printf(", run_cnt=%llu",
+			       (unsigned long long) prog_info->run_cnt);
 
 		printf("}");
 # else /* !VERBOSE */
