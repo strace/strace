@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2001 Hewlett-Packard, Matthew Wilcox
- * Copyright (c) 2001-2018 The strace developers.
+ * Copyright (c) 2001-2019 The strace developers.
  */
 
 [  0] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
