@@ -752,6 +752,17 @@ btrfs_test_device_ioctls(void)
 	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
 	       ioc(BTRFS_IOC_SCAN_DEV), (int) args.fd, args.name);
 
+# ifdef BTRFS_IOC_FORGET_DEV
+	ioctl(-1, BTRFS_IOC_FORGET_DEV, NULL);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       ioc(BTRFS_IOC_FORGET_DEV));
+
+	strcpy(args.name, devname);
+	ioctl(-1, BTRFS_IOC_FORGET_DEV, &args);
+	printf("ioctl(-1, %s, {fd=%d, name=\"%s\"}) = -1 EBADF (%m)\n",
+	       ioc(BTRFS_IOC_FORGET_DEV), (int) args.fd, args.name);
+# endif
+
 	ioctl(-1, BTRFS_IOC_ADD_DEV, NULL);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", ioc(BTRFS_IOC_ADD_DEV));
 
