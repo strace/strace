@@ -2,7 +2,7 @@
  * Wrappers for handling discrepancies in LF64-themed syscalls availability and
  * necessity between verious architectures and kernel veriosns.
  *
- * Copyright (c) 2012-2018 The strace developers.
+ * Copyright (c) 2012-2019 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
