@@ -26,7 +26,7 @@ struct vcpu_info {
 	bool resolved;
 };
 
-static bool decode_kvm_run_structure;
+enum decode_kvm_run_structure_modes decode_kvm_run_structure;
 
 static struct vcpu_info *
 vcpu_find(struct tcb *const tcp, int fd)
@@ -420,9 +420,9 @@ kvm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t a
 }
 
 void
-kvm_run_structure_decoder_init(void)
+kvm_run_structure_decoder_init(enum decode_kvm_run_structure_modes mode)
 {
-	decode_kvm_run_structure = true;
+	decode_kvm_run_structure = mode;
 	mmap_cache_enable();
 }
 

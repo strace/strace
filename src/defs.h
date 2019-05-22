@@ -562,6 +562,15 @@ extern enum stack_trace_modes stack_trace_mode;
 # else
 #  define stack_trace_mode STACK_TRACE_OFF
 # endif
+enum decode_kvm_run_structure_modes {
+	DECODE_KVM_RUN_STRUCTURE_OFF,
+	DECODE_KVM_RUN_STRUCTURE_EXIT_REASON,
+};
+# ifdef HAVE_LINUX_KVM_H
+extern enum decode_kvm_run_structure_modes decode_kvm_run_structure;
+# else
+#  define decode_kvm_run_structure DECODE_KVM_RUN_STRUCTURE_OFF
+# endif
 extern unsigned max_strlen;
 extern unsigned os_release;
 # undef KERNEL_VERSION
@@ -1592,7 +1601,7 @@ extern void unwind_tcb_capture(struct tcb *);
 # endif
 
 # ifdef HAVE_LINUX_KVM_H
-extern void kvm_run_structure_decoder_init(void);
+extern void kvm_run_structure_decoder_init(enum decode_kvm_run_structure_modes);
 extern void kvm_vcpu_info_free(struct tcb *);
 # endif
 
