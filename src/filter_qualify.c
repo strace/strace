@@ -623,8 +623,8 @@ qualify_kvm(const char *const str)
 			kvm_run_structure_decoder_init(DECODE_KVM_RUN_STRUCTURE_EXIT_REASON);
 
 		else
-			error_msg("-e kvm=vcpu option needs"
-				  " Linux 4.16.0 or higher");
+			error_msg("-e kvm=%s option needs"
+				  " Linux 4.16.0 or higher", str);
 #else
 		error_msg("-e kvm=vcpu option is not implemented"
 			  " for this architecture");
