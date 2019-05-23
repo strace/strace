@@ -238,6 +238,10 @@ run_kvm(const int vcpu_fd, struct kvm_run *const run, const size_t mmap_size,
 					   run->mmio.data[4], run->mmio.data[5],
 					   run->mmio.data[6], run->mmio.data[7],
 					   run->mmio.len, run->mmio.is_write);
+		case KVM_EXIT_FAIL_ENTRY:
+			error_msg_and_fail("Got an unexpected FAIL_ENTRY exit:"
+					   " hardware_entry_failure_reason %" PRI__x64,
+					   run->fail_entry.hardware_entry_failure_reason);
 
 		default:
 			error_msg_and_fail("exit_reason = %#x",
