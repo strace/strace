@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of AUDIT_* and V4L2_* constants.
+  * Updated lists of AUDIT_*, CLONE_*, and V4L2_* constants.
 
 Noteworthy changes in release 5.1 (2019-05-22)
 ==============================================
