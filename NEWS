@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of AUDIT_*, CLONE_*, KEY_*, KVM_*, TIPC_*,
+  * Updated lists of AUDIT_*, CLONE_*, ETH_*, KEY_*, KVM_*, TIPC_*,
     and V4L2_* constants.
 
 Noteworthy changes in release 5.1 (2019-05-22)
