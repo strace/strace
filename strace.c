@@ -280,6 +280,7 @@ Tracing:\n\
   -D             run tracer process as a detached grandchild, not as parent\n\
   -f             follow forks\n\
   -ff            follow forks with output into separate files\n\
+  -fff           follow forks with output into separate files with timestamp in filename\n\
   -I interruptible\n\
      1:          no signals are blocked\n\
      2:          fatal signals are blocked while decoding syscall (default)\n\
@@ -694,7 +695,15 @@ after_successful_attach(struct tcb *tcp, const unsigned int flags)
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
 	if (followfork >= 2) {
 		char name[PATH_MAX];
-		xsprintf(name, "%s.%u", outfname, tcp->pid);
+		if (followfork >= 3) {
+			struct timespec ts;
+			clock_gettime(CLOCK_REALTIME, &ts);
+
+			xsprintf(name, "%s.%u-%lld.%06ld", outfname, tcp->pid,
+				 (long long) ts.tv_sec, (long) ts.tv_nsec / 1000);
+		} else {
+			xsprintf(name, "%s.%u", outfname, tcp->pid);
+		}
 		tcp->outf = strace_fopen(name);
 	}
 
