@@ -13,9 +13,7 @@ arch_get_scno(struct tcb *tcp)
 
 	if (!scno_in_range(tcp->scno)) {
 		if (mips_REG_A3 == 0 || mips_REG_A3 == (uint64_t) -1) {
-			if (debug_flag)
-				error_msg("stray syscall exit: v0 = %ld",
-					  tcp->scno);
+			debug_msg("stray syscall exit: v0 = %ld", tcp->scno);
 			return 0;
 		}
 	}
