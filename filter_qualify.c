@@ -12,10 +12,12 @@
 #include "filter.h"
 #include "delay.h"
 #include "retval.h"
+#include "static_assert.h"
 
 struct number_set *read_set;
 struct number_set *write_set;
 struct number_set *signal_set;
+struct number_set *status_set;
 
 static struct number_set *abbrev_set;
 static struct number_set *inject_set;
@@ -53,6 +55,28 @@ sigstr_to_uint(const char *s)
 
 		return i;
 	}
+
+	return -1;
+}
+
+static const char *statuses[] = {
+	"successful",
+	"failed",
+	"unfinished",
+	"unavailable",
+	"detached",
+};
+static_assert(ARRAY_SIZE(statuses) == NUMBER_OF_STATUSES,
+	      "statuses array and status_t enum mismatch");
+
+static int
+statusstr_to_uint(const char *str)
+{
+	unsigned int i;
+
+	for (i = 0; i < NUMBER_OF_STATUSES; ++i)
+		if (strcasecmp(str, statuses[i]) == 0)
+			return i;
 
 	return -1;
 }
@@ -276,6 +300,14 @@ qualify_signals(const char *const str)
 }
 
 static void
+qualify_status(const char *const str)
+{
+	if (!status_set)
+		status_set = alloc_number_set_array(1);
+	qualify_tokens(str, status_set, statusstr_to_uint, "status");
+}
+
+static void
 qualify_trace(const char *const str)
 {
 	if (!trace_set)
@@ -421,6 +453,7 @@ static const struct qual_options {
 	{ "x",		qualify_raw	},
 	{ "signal",	qualify_signals	},
 	{ "signals",	qualify_signals	},
+	{ "status",	qualify_status	},
 	{ "s",		qualify_signals	},
 	{ "read",	qualify_read	},
 	{ "reads",	qualify_read	},

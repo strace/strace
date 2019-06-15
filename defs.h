@@ -420,8 +420,6 @@ extern bool Tflag;
 extern bool iflag;
 extern bool count_wallclock;
 extern unsigned int qflag;
-extern bool not_failing_only;
-extern bool failing_only;
 extern unsigned int show_fd_path;
 /* are we filtering traces based on paths? */
 extern struct path_set {
@@ -1450,6 +1448,28 @@ truncate_kulong_to_current_wordsize(const kernel_ulong_t v)
 	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
 	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
 	 (long long) (v))
+
+/*
+ * Computes the popcount of a vector of 32-bit values.
+ */
+static inline unsigned int
+popcount32(const uint32_t *a, unsigned int size)
+{
+	unsigned int count = 0;
+
+	for (; size; ++a, --size) {
+		uint32_t x = *a;
+
+#ifdef HAVE___BUILTIN_POPCOUNT
+		count += __builtin_popcount(x);
+#else
+		for (; x; ++count)
+			x &= x - 1;
+#endif
+	}
+
+	return count;
+}
 
 extern const char *const errnoent[];
 extern const char *const signalent[];

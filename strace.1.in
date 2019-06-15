@@ -409,6 +409,7 @@ is one of
 .BR write ,
 .BR fault ,
 .BR inject ,
+.BR status ,
 or
 .B kvm
 and
@@ -612,6 +613,53 @@ Note that this is independent from the normal tracing of the
 .BR write (2)
 system call which is controlled by the option
 .BR -e "\ " trace = write .
+.TP
+\fB\-e\ status\fR=\,\fIset\fR
+Print only system calls with the specified return status.  The default is
+.BR status = all .
+When using the
+.B status
+qualifier, because
+.B strace
+waits for system calls to return before deciding whether they should be printed
+or not, the traditional order of events may not be preserved anymore.  If two
+system calls are executed by concurrent threads,
+.B strace
+will first print both the entry and exit of the first system call to exit,
+regardless of their respective entry time.  The entry and exit of the second
+system call to exit will be printed afterwards.  Here is an example when
+.BR select (2)
+is called, but a different thread calls
+.BR clock_gettime (2)
+before
+.BR select (2)
+finishes:
+.CW
+[pid 28779] 1130322148.939977 clock_gettime(CLOCK_REALTIME, {1130322148, 939977000}) = 0
+[pid 28772] 1130322148.438139 select(4, [3], NULL, NULL, NULL) = 1 (in [3])
+.CE
+.TP
+.BR "\-e\ status" = successful
+Trace system calls that returned without an error code.  The
+.B -z
+option has the effect of
+.BR status=successful .
+.TP
+.BR "\-e\ status" = failed
+Trace system calls that returned with an error code.  The
+.B -Z
+option has the effect of
+.BR status=failed .
+.TP
+.BR "\-e\ status" = unfinished
+Trace system calls that did not return.  This might happen, for example, due to
+an execve call in a neighbour thread.
+.TP
+.BR "\-e\ status" = unavailable
+Trace system calls that returned but strace failed to fetch the error status.
+.TP
+.BR "\-e\ status" = detached
+Trace system calls for which strace detached before the return.
 .TP
 \fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIusecs\/\fR][:\fBdelay_exit\fR=\,\fIusecs\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.

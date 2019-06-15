@@ -12,7 +12,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "defs.h"
 #include "number_set.h"
+#include "static_assert.h"
 #include "xmalloc.h"
 
 typedef unsigned int number_slot_t;
@@ -47,6 +49,14 @@ reallocate_number_set(struct number_set *const set, const unsigned int new_nslot
 	set->nslots = new_nslots;
 }
 
+static unsigned int
+get_number_setbit(const struct number_set *const set)
+{
+	static_assert(sizeof(number_slot_t) == sizeof(uint32_t),
+		      "number_slot_t is not 32-bit long");
+	return popcount32(set->vec, set->nslots);
+}
+
 bool
 number_set_array_is_empty(const struct number_set *const set,
 			  const unsigned int idx)
@@ -67,6 +77,13 @@ is_number_in_set_array(const unsigned int number, const struct number_set *const
 {
 	return set && ((number / BITS_PER_SLOT < set[idx].nslots)
 		&& number_isset(number, set[idx].vec)) ^ set[idx].not;
+}
+
+bool
+is_complete_set(const struct number_set *const set, const unsigned int max_numbers)
+{
+	return set && ((set->not && !set->nslots) ||
+		       (get_number_setbit(set) == max_numbers));
 }
 
 void

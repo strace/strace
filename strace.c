@@ -109,10 +109,6 @@ static bool daemonized_tracer;
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
-/* Sometimes we want to print succeeding/failing syscalls only. */
-bool not_failing_only;
-bool failing_only;
-
 /* Show path associated with fd arguments */
 unsigned int show_fd_path;
 
@@ -273,7 +269,7 @@ Statistics:\n\
 \n\
 Filtering:\n\
   -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write, fault, inject, kvm\n\
+     options:    trace, abbrev, verbose, raw, signal, read, write, fault, inject, status, kvm\n\
   -P path        trace accesses to path\n\
   -z             print only syscalls that returned without an error code\n\
   -Z             print only syscalls that returned with an error code\n\
@@ -813,12 +809,18 @@ droptcb(struct tcb *tcp)
 	debug_msg("dropped tcb for pid %d, %d remain", tcp->pid, nprocs);
 
 	if (tcp->outf) {
+		bool publish = true;
+		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
+			publish = is_number_in_set(STATUS_DETACHED, status_set);
+			strace_close_memstream(tcp, publish);
+		}
+
 		if (followfork >= 2) {
-			if (tcp->curcol != 0)
+			if (tcp->curcol != 0 && publish)
 				fprintf(tcp->outf, " <detached ...>\n");
 			fclose(tcp->outf);
 		} else {
-			if (printing_tcp == tcp && tcp->curcol != 0)
+			if (printing_tcp == tcp && tcp->curcol != 0 && publish)
 				fprintf(tcp->outf, " <detached ...>\n");
 			flush_tcp_output(tcp);
 		}
@@ -1554,7 +1556,7 @@ static void ATTRIBUTE_NOINLINE
 init(int argc, char *argv[])
 {
 	int c, i;
-	int optF = 0;
+	int optF = 0, zflags = 0;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1572,6 +1574,7 @@ init(int argc, char *argv[])
 	qualify("trace=all");
 	qualify("abbrev=all");
 	qualify("verbose=all");
+	qualify("status=all");
 #if DEFAULT_QUAL_FLAGS != (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
@@ -1709,10 +1712,14 @@ init(int argc, char *argv[])
 			show_fd_path++;
 			break;
 		case 'z':
-			not_failing_only = 1;
+			clear_number_set_array(status_set, 1);
+			add_number_to_set(STATUS_SUCCESSFUL, status_set);
+			zflags++;
 			break;
 		case 'Z':
-			failing_only = 1;
+			clear_number_set_array(status_set, 1);
+			add_number_to_set(STATUS_FAILED, status_set);
+			zflags++;
 			break;
 		default:
 			error_msg_and_help(NULL);
@@ -1765,9 +1772,13 @@ init(int argc, char *argv[])
 	}
 
 #ifndef HAVE_OPEN_MEMSTREAM
-	if (not_failing_only || failing_only)
-		error_msg_and_help("open_memstream is required to use -z or -Z");
+	if (!is_complete_set(status_set, NUMBER_OF_STATUSES))
+		error_msg_and_help("open_memstream is required to use -z, -Z, or -e status");
 #endif
+
+	if (zflags > 1)
+		error_msg("Only the last of -z/-Z options will take effect. "
+			  "See status qualifier for more complex filters.");
 
 	acolumn_spaces = xmalloc(acolumn + 1);
 	memset(acolumn_spaces, ' ', acolumn);
@@ -2111,6 +2122,12 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		printleader(tcp);
 		tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
 		line_ended();
+		/*
+		 * Need to reopen memstream for thread
+		 * as we closed it in droptcb.
+		 */
+		if (!is_complete_set(status_set, NUMBER_OF_STATUSES))
+			strace_open_memstream(tcp);
 		tcp->flags |= TCB_REPRINT;
 	}
 
@@ -2237,6 +2254,10 @@ print_event_exit(struct tcb *tcp)
 	tprints(") ");
 	tabto();
 	tprints("= ?\n");
+	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
+		bool publish = is_number_in_set(STATUS_UNFINISHED, status_set);
+		strace_close_memstream(tcp, publish);
+	}
 	line_ended();
 }
 

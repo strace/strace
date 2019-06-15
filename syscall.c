@@ -650,7 +650,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 #endif
 
-	if (not_failing_only || failing_only)
+	if (!is_complete_set(status_set, NUMBER_OF_STATUSES))
 		strace_open_memstream(tcp);
 
 	printleader(tcp);
@@ -745,6 +745,11 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		tprints(") ");
 		tabto();
 		tprints("= ? <unavailable>\n");
+		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
+			bool publish = is_number_in_set(STATUS_UNAVAILABLE,
+							status_set);
+			strace_close_memstream(tcp, publish);
+		}
 		line_ended();
 		return res;
 	}
@@ -760,14 +765,16 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			sys_res = tcp_sysent(tcp)->sys_func(tcp);
 	}
 
-	if ((not_failing_only && syserror(tcp)) ||
-	    (failing_only && !syserror(tcp))) {
-		strace_close_memstream(tcp, false);
-		line_ended();
-		return 0;	/* ignore failed/successful
-				 * syscalls */
-	} else if (not_failing_only || failing_only) {
-		strace_close_memstream(tcp, true);
+	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
+		bool publish = syserror(tcp)
+			       && is_number_in_set(STATUS_FAILED, status_set);
+		publish |= !syserror(tcp)
+			   && is_number_in_set(STATUS_SUCCESSFUL, status_set);
+		strace_close_memstream(tcp, publish);
+		if (!publish) {
+			line_ended();
+			return 0;
+		}
 	}
 
 	tprints(") ");
