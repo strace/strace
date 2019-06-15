@@ -262,6 +262,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	iconv_open
 	if_indextoname
 	open64
+	open_memstream
 	prctl
 	preadv
 	process_vm_readv

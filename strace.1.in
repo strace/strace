@@ -771,6 +771,12 @@ Print unabbreviated versions of environment, stat, termios, etc.
 calls.  These structures are very common in calls and so the default
 behavior displays a reasonable subset of structure members.  Use
 this option to get all of the gory details.
+.TP
+.B \-z
+Print only syscalls that returned without an error code.
+.TP
+.B \-Z
+Print only syscalls that returned with an error code.
 .SS Tracing
 .TP 12
 .BI "\-b " syscall

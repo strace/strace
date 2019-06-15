@@ -650,6 +650,9 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 #endif
 
+	if (not_failing_only || failing_only)
+		strace_open_memstream(tcp);
+
 	printleader(tcp);
 	tprintf("%s(", tcp_sysent(tcp)->sys_name);
 	int res = raw(tcp) ? printargs(tcp) : tcp_sysent(tcp)->sys_func(tcp);
@@ -712,7 +715,7 @@ print_syscall_resume(struct tcb *tcp)
 	 * "strace -ff -oLOG test/threaded_execve" corner case.
 	 * It's the only case when -ff mode needs reprinting.
 	 */
-	if ((followfork < 2 && printing_tcp != tcp)
+	if ((followfork < 2 && printing_tcp != tcp && tcp->real_outf == NULL)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
@@ -751,22 +754,20 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	if (raw(tcp)) {
 		/* sys_res = printargs(tcp); - but it's nop on sysexit */
 	} else {
-	/* FIXME: not_failing_only (IOW, option -z) is broken:
-	 * failure of syscall is known only after syscall return.
-	 * Thus we end up with something like this on, say, ENOENT:
-	 *     open("does_not_exist", O_RDONLY <unfinished ...>
-	 *     {next syscall decode}
-	 * whereas the intended result is that open(...) line
-	 * is not shown at all.
-	 */
-		if ((not_failing_only && syserror(tcp)) ||
-		    (failing_only && !syserror(tcp)))
-			return 0;	/* ignore failed/successful
-					 * syscalls */
 		if (tcp->sys_func_rval & RVAL_DECODED)
 			sys_res = tcp->sys_func_rval;
 		else
 			sys_res = tcp_sysent(tcp)->sys_func(tcp);
+	}
+
+	if ((not_failing_only && syserror(tcp)) ||
+	    (failing_only && !syserror(tcp))) {
+		strace_close_memstream(tcp, false);
+		line_ended();
+		return 0;	/* ignore failed/successful
+				 * syscalls */
+	} else if (not_failing_only || failing_only) {
+		strace_close_memstream(tcp, true);
 	}
 
 	tprints(") ");

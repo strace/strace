@@ -6,6 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     PTRACE_GET_SYSCALL_INFO is in use.
 
 * Improvements
+  * Implemented syscall return status filtering options: -z, -Z.
   * Implemented decoding of open_tree, move_mount, fsopen, fsconfig, fsmount,
     and fspick syscalls.
   * Enhanced decoding of bpf, clone, mbind, and set_mempolicy syscalls.

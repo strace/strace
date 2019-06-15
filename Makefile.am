@@ -315,6 +315,7 @@ strace_SOURCES =	\
 	socketutils.c	\
 	sparc.c		\
 	sram_alloc.c	\
+	stage_output.c	\
 	stat.c		\
 	stat.h		\
 	stat64.c	\

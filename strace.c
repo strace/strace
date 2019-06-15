@@ -275,6 +275,8 @@ Filtering:\n\
   -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
      options:    trace, abbrev, verbose, raw, signal, read, write, fault, inject, kvm\n\
   -P path        trace accesses to path\n\
+  -z             print only syscalls that returned without an error code\n\
+  -Z             print only syscalls that returned with an error code\n\
 \n\
 Tracing:\n\
   -b execve      detach on execve syscall\n\
@@ -302,10 +304,6 @@ Miscellaneous:\n\
 "
 /* ancient, no one should use it
 -F -- attempt to follow vforks (deprecated, use -f)\n\
- */
-/* this is broken, so don't document it
--z -- print only succeeding syscalls\n\
--Z -- print only failing syscalls\n\
  */
 , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(0);
@@ -611,7 +609,8 @@ printleader(struct tcb *tcp)
 
 	if (printing_tcp) {
 		set_current_tcp(printing_tcp);
-		if (printing_tcp->curcol != 0 && (followfork < 2 || printing_tcp == tcp)) {
+		if (tcp->real_outf == NULL && printing_tcp->curcol != 0 &&
+		    (followfork < 2 || printing_tcp == tcp)) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
 			 * wasn't finished (same or different tcb, doesn't matter).
@@ -1765,6 +1764,11 @@ init(int argc, char *argv[])
 			error_msg("-%c has no effect with -c", 'y');
 	}
 
+#ifndef HAVE_OPEN_MEMSTREAM
+	if (not_failing_only || failing_only)
+		error_msg_and_help("open_memstream is required to use -z or -Z");
+#endif
+
 	acolumn_spaces = xmalloc(acolumn + 1);
 	memset(acolumn_spaces, ' ', acolumn);
 	acolumn_spaces[acolumn] = '\0';
@@ -2076,10 +2080,25 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
 		/*execve_thread->curcol = 0; - no need, see code below */
 	}
-	/* Swap output FILEs (needed for -ff) */
+	/* Swap output FILEs and memstream (needed for -ff) */
 	FILE *fp = execve_thread->outf;
 	execve_thread->outf = tcp->outf;
 	tcp->outf = fp;
+	if (execve_thread->real_outf || tcp->real_outf) {
+		char *memfptr;
+		size_t memfloc;
+
+		fp = execve_thread->real_outf;
+		execve_thread->real_outf = tcp->real_outf;
+		tcp->real_outf = fp;
+		memfptr = execve_thread->memfptr;
+		execve_thread->memfptr = tcp->memfptr;
+		tcp->memfptr = memfptr;
+		memfloc = execve_thread->memfloc;
+		execve_thread->memfloc = tcp->memfloc;
+		tcp->memfloc = memfloc;
+	}
+
 	/* And their column positions */
 	execve_thread->curcol = tcp->curcol;
 	tcp->curcol = 0;

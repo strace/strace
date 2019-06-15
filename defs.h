@@ -204,6 +204,10 @@ struct tcb {
 	int sys_func_rval;	/* Syscall entry parser's return value */
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
+	FILE *real_outf;	/* Backup for real outf while staging */
+	char *memfptr;
+	size_t memfloc;
+
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	void *_priv_data;	/* Private data for syscall decoding functions */
 	void (*_free_priv_data)(void *); /* Callback for freeing priv_data */
@@ -1195,6 +1199,12 @@ extern void tprintf(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints(const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints_comment(const char *str);
+
+/*
+ * Staging output for status qualifier.
+ */
+extern FILE *strace_open_memstream(struct tcb *tcp);
+extern void strace_close_memstream(struct tcb *tcp, bool publish);
 
 static inline void
 printaddr_comment(const kernel_ulong_t addr)
