@@ -77,9 +77,11 @@ print_tls_arg(struct tcb *const tcp, const kernel_ulong_t addr)
 
 SYS_FUNC(clone)
 {
-	if (exiting(tcp)) {
-		const char *sep = "|";
-		kernel_ulong_t flags = tcp->u_arg[ARG_FLAGS];
+	const kernel_ulong_t flags = tcp->u_arg[ARG_FLAGS] & ~CSIGNAL;
+
+	if (entering(tcp)) {
+		const unsigned int sig = tcp->u_arg[ARG_FLAGS] & CSIGNAL;
+
 		tprints("child_stack=");
 		printaddr(tcp->u_arg[ARG_STACK]);
 		tprints(", ");
@@ -89,15 +91,30 @@ SYS_FUNC(clone)
 				tcp->u_arg[ARG_STACKSIZE]);
 #endif
 		tprints("flags=");
-		if (!printflags64(clone_flags, flags & ~CSIGNAL, NULL))
+		const char *sep = "|";
+		if (!printflags64(clone_flags, flags, NULL))
 			sep = "";
-		if ((flags & CSIGNAL) != 0) {
+		if (sig != 0) {
 			tprints(sep);
-			printsignal(flags & CSIGNAL);
+			printsignal(sig);
 		}
+		/*
+		 * TODO on syscall entry:
+		 * We can clear CLONE_PTRACE here since it is an ancient hack
+		 * to allow us to catch children, and we use another hack for that.
+		 * But CLONE_PTRACE can conceivably be used by malicious programs
+		 * to subvert us. By clearing this bit, we can defend against it:
+		 * in untraced execution, CLONE_PTRACE should have no effect.
+		 *
+		 * We can also clear CLONE_UNTRACED, since it allows to start
+		 * children outside of our control. At the moment
+		 * I'm trying to figure out whether there is a *legitimate*
+		 * use of this flag which we should respect.
+		 */
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
-			return 0;
+			return RVAL_DECODED;
+	} else {
 		if (flags & CLONE_PARENT_SETTID) {
 			tprints(", parent_tidptr=");
 			printaddr(tcp->u_arg[ARG_PTID]);
@@ -111,18 +128,6 @@ SYS_FUNC(clone)
 			printaddr(tcp->u_arg[ARG_CTID]);
 		}
 	}
-	/* TODO on syscall entry:
-	 * We can clear CLONE_PTRACE here since it is an ancient hack
-	 * to allow us to catch children, and we use another hack for that.
-	 * But CLONE_PTRACE can conceivably be used by malicious programs
-	 * to subvert us. By clearing this bit, we can defend against it:
-	 * in untraced execution, CLONE_PTRACE should have no effect.
-	 *
-	 * We can also clear CLONE_UNTRACED, since it allows to start
-	 * children outside of our control. At the moment
-	 * I'm trying to figure out whether there is a *legitimate*
-	 * use of this flag which we should respect.
-	 */
 	return 0;
 }
 
