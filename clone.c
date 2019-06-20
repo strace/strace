@@ -91,12 +91,17 @@ SYS_FUNC(clone)
 				tcp->u_arg[ARG_STACKSIZE]);
 #endif
 		tprints("flags=");
-		const char *sep = "|";
-		if (!printflags64(clone_flags, flags, NULL))
-			sep = "";
-		if (sig != 0) {
-			tprints(sep);
-			printsignal(sig);
+		if (flags) {
+			printflags64(clone_flags, flags, "CLONE_???");
+			if (sig) {
+				tprints("|");
+				printsignal(sig);
+			}
+		} else {
+			if (sig)
+				printsignal(sig);
+			else
+				tprints("0");
 		}
 		/*
 		 * TODO on syscall entry:

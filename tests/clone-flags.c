@@ -95,6 +95,11 @@ main(void)
 		(unsigned long) child_stack +
 		(child_stack_reported - child_stack_expected);
 
+	pid = do_clone(child, child_stack, child_stack_size, 0, 0);
+	printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s) = %d\n",
+	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
+	       "0", pid);
+
 	pid = do_clone(child, child_stack, child_stack_size, CLONE_FS, 0);
 	printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s) = %d\n",
 	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
