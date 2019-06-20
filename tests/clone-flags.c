@@ -116,5 +116,13 @@ main(void)
 	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
 	       "CLONE_FS|SIGCHLD", pid);
 
+	TAIL_ALLOC_OBJECT_CONST_PTR(pid_t, ptid);
+	pid = do_clone(child, child_stack, child_stack_size,
+		       CLONE_PARENT_SETTID|SIGCHLD, 0, ptid);
+	printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s"
+	       ", parent_tid=[%u]) = %d\n",
+	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
+	       "CLONE_PARENT_SETTID|SIGCHLD", *ptid, pid);
+
 	return 0;
 }

@@ -121,8 +121,8 @@ SYS_FUNC(clone)
 			return RVAL_DECODED;
 	} else {
 		if (flags & CLONE_PARENT_SETTID) {
-			tprints(", parent_tidptr=");
-			printaddr(tcp->u_arg[ARG_PTID]);
+			tprints(", parent_tid=");
+			printnum_int(tcp, tcp->u_arg[ARG_PTID], "%u");
 		}
 		if (flags & CLONE_SETTLS) {
 			tprints(", tls=");
