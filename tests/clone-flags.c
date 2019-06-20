@@ -10,12 +10,17 @@
 #include "tests.h"
 
 #include <errno.h>
+#include <limits.h>
 #include <sched.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#define XLAT_MACROS_ONLY
+#include "xlat/clone_flags.h"
+#undef XLAT_MACROS_ONLY
 
 static const int child_exit_status = 42;
 static pid_t pid;
@@ -123,6 +128,24 @@ main(void)
 	       ", parent_tid=[%u]) = %d\n",
 	       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
 	       "CLONE_PARENT_SETTID|SIGCHLD", *ptid, pid);
+
+	char buf[PATH_MAX];
+	if (readlink("/proc/self/fd/0", buf, sizeof(buf) - 1) > 0) {
+		*ptid = 0;
+		pid = do_clone(child, child_stack, child_stack_size,
+			       CLONE_PIDFD|SIGCHLD, 0, ptid);
+		char *fname = 0;
+		if (asprintf(&fname, "/proc/self/fd/%d", *ptid) < 0)
+			perror_msg_and_fail("asprintf");
+		int rc = readlink(fname, buf, sizeof(buf) - 1);
+		if ((unsigned int) rc >= sizeof(buf))
+			perror_msg_and_fail("readlink");
+		buf[rc] = '\0';
+		printf("%s(child_stack=%#lx" STACK_SIZE_FMT ", flags=%s"
+		       ", parent_tid=[%u<%s>]) = %d\n",
+		       SYSCALL_NAME, child_stack_printed, STACK_SIZE_ARG
+		       "CLONE_PIDFD|SIGCHLD", *ptid, buf, pid);
+	}
 
 	return 0;
 }

@@ -116,13 +116,18 @@ SYS_FUNC(clone)
 		 * I'm trying to figure out whether there is a *legitimate*
 		 * use of this flag which we should respect.
 		 */
-		if ((flags & (CLONE_PARENT_SETTID|CLONE_CHILD_SETTID
+		if ((flags & (CLONE_PARENT_SETTID|CLONE_PIDFD|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
 			return RVAL_DECODED;
 	} else {
-		if (flags & CLONE_PARENT_SETTID) {
+		if (flags & (CLONE_PARENT_SETTID|CLONE_PIDFD)) {
+			kernel_ulong_t addr = tcp->u_arg[ARG_PTID];
+
 			tprints(", parent_tid=");
-			printnum_int(tcp, tcp->u_arg[ARG_PTID], "%u");
+			if (flags & CLONE_PARENT_SETTID)
+				printnum_int(tcp, addr, "%u");
+			else
+				printnum_fd(tcp, addr);
 		}
 		if (flags & CLONE_SETTLS) {
 			tprints(", tls=");
