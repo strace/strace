@@ -270,6 +270,18 @@ DEF_PRINTNUM(int64, uint64_t)
 DEF_PRINTNUM_ADDR(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
 
+bool
+printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	int fd;
+	if (umove_or_printaddr(tcp, addr, &fd))
+		return false;
+	tprints("[");
+	printfd(tcp, fd);
+	tprints("]");
+	return true;
+}
+
 #ifndef current_wordsize
 bool
 printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,

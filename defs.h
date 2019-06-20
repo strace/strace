@@ -1280,6 +1280,9 @@ DECL_PRINTNUM_ADDR(int);
 DECL_PRINTNUM_ADDR(int64);
 # undef DECL_PRINTNUM_ADDR
 
+extern bool
+printnum_fd(struct tcb *, kernel_ulong_t addr);
+
 # ifndef current_wordsize
 extern bool
 printnum_long_int(struct tcb *, kernel_ulong_t addr,
