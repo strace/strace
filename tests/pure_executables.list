@@ -31,6 +31,7 @@ chroot
 clock_adjtime
 clock_nanosleep
 clock_xettime
+clone-flags
 copy_file_range
 creat
 delete_module

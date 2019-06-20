@@ -226,6 +226,7 @@ DECODER_TESTS = \
 	btrfs-wX.test \
 	caps-abbrev.test \
 	caps.test \
+	clone-flags.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
