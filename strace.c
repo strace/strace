@@ -1507,35 +1507,29 @@ test_ptrace_seize(void)
 	}
 }
 
-static unsigned
+static unsigned int
 get_os_release(void)
 {
-	unsigned rel;
-	const char *p;
 	struct utsname u;
 	if (uname(&u) < 0)
 		perror_msg_and_die("uname");
-	/* u.release has this form: "3.2.9[-some-garbage]" */
-	rel = 0;
-	p = u.release;
-	for (;;) {
-		if (!(*p >= '0' && *p <= '9'))
-			error_msg_and_die("Bad OS release string: '%s'", u.release);
-		/* Note: this open-codes KERNEL_VERSION(): */
-		rel = (rel << 8) | atoi(p);
-		if (rel >= KERNEL_VERSION(1, 0, 0))
-			break;
-		while (*p >= '0' && *p <= '9')
-			p++;
-		if (*p != '.') {
-			if (rel >= KERNEL_VERSION(0, 1, 0)) {
-				/* "X.Y-something" means "X.Y.0" */
-				rel <<= 8;
-				break;
-			}
-			error_msg_and_die("Bad OS release string: '%s'", u.release);
+	/*
+	 * u.release string consists of at most three parts
+	 * and normally has this form: "3.2.9[-some-garbage]",
+	 * "X.Y-something" means "X.Y.0".
+	 */
+	const char *p = u.release;
+	unsigned int rel = 0;
+	for (unsigned int parts = 0; parts < 3; ++parts) {
+		unsigned int n = 0;
+		for (; (*p >= '0') && (*p <= '9'); ++p) {
+			n *= 10;
+			n += *p - '0';
 		}
-		p++;
+		rel <<= 8;
+		rel |= n;
+		if (*p == '.')
+			++p;
 	}
 	return rel;
 }
