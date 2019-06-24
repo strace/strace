@@ -314,6 +314,8 @@ oldselect
 oldselect-efault
 oldstat
 open
+open_tree
+open_tree-P
 openat
 osf_utimes
 pause

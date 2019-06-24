@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented decoding of open_tree syscall.
   * Enhanced decoding of clone syscall.
   * Updated lists of AT_*, AUDIT_*, CLONE_*, ETH_*, KEY_*, KVM_*, TIPC_*,
     and V4L2_* constants.

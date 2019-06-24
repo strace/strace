@@ -366,6 +366,8 @@ oldselect-efault
 oldselect-efault-P
 oldstat
 open
+open_tree
+open_tree-P
 openat
 orphaned_process_group
 osf_utimes

@@ -312,6 +312,8 @@ oldselect-efault	-a13 -e trace=select
 oldselect-efault-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full
 open	-a30 -P $NAME.sample
+open_tree -a30 -y
+open_tree-P -a30 -y -P /dev/full -e trace=open_tree
 openat	-a36 -P $NAME.sample
 orphaned_process_group	. "${srcdir=.}/PTRACE_SEIZE.sh"; run_strace_match_diff -f -e trace=none -e signal='!chld'
 osf_utimes	-a21
