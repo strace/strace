@@ -44,7 +44,7 @@
 	"0x600 /* AT_REMOVEDIR|AT_SYMLINK_FOLLOW */"
 #  define str_flags2 \
 	"0xffffffff /* AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW" \
-	"|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff */"
+	"|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE|0xffff60ff */"
 #  define str_utime_now_omit \
 	"[{tv_sec=" big_tv_sec ", tv_nsec=1073741823} /* UTIME_NOW */, " \
 	"{tv_sec=" huge_tv_sec ", tv_nsec=1073741822} /* UTIME_OMIT */]"
@@ -55,7 +55,7 @@
 #  define str_flags1			"AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
 #  define str_flags2 \
 	"AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW" \
-	"|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff"
+	"|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE|0xffff60ff"
 #  define str_utime_now_omit		"[UTIME_NOW, UTIME_OMIT]"
 # endif
 
