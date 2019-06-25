@@ -13,3 +13,4 @@
 [BASE_NR + 426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
 [BASE_NR + 427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
 [BASE_NR + 428] = { 3,	TD|TF,		SEN(open_tree),			"open_tree"		},
+[BASE_NR + 429] = { 5,	TD|TF,		SEN(move_mount),		"move_mount"		},

@@ -223,6 +223,8 @@ mount		-a33
 mount-Xabbrev	-a33 -e trace=mount -Xabbrev
 mount-Xraw	-a33 -e trace=mount -Xraw
 mount-Xverbose	-a33 -e trace=mount -Xverbose
+move_mount	-y
+move_mount-P	-y -P /dev/full -e trace=move_mount
 move_pages	-s3
 move_pages-Xabbrev	-s3 -e trace=move_pages -Xabbrev
 move_pages-Xraw	-s3 -a36 -e trace=move_pages -Xraw

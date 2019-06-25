@@ -186,6 +186,7 @@ strace_SOURCES =	\
 	mmap_notify.h	\
 	mmsghdr.c	\
 	mount.c		\
+	move_mount.c	\
 	mpers_type.h	\
 	mq.c		\
 	msghdr.c	\

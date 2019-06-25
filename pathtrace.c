@@ -223,6 +223,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return upathmatch(tcp, tcp->u_arg[1], set);
 
 	case SEN_linkat:
+	case SEN_move_mount:
 	case SEN_renameat2:
 	case SEN_renameat:
 		/* fd, path, fd, path */

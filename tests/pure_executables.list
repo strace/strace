@@ -223,6 +223,8 @@ mount
 mount-Xabbrev
 mount-Xraw
 mount-Xverbose
+move_mount
+move_mount-P
 move_pages
 move_pages-Xabbrev
 move_pages-Xraw
