@@ -68,6 +68,7 @@ file_ioctl	+ioctl.test
 finit_module	-a25
 flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
+fsopen	-a35
 fstat	-a15 -v -P stat.sample
 fstat-Xabbrev -a15 -v -Xabbrev -P stat.sample -e trace=fstat
 fstat-Xraw -a15 -v -Xraw -P stat.sample -e trace=fstat

@@ -132,6 +132,7 @@ strace_SOURCES =	\
 	flock.c		\
 	flock.h		\
 	fs_x_ioctl.c	\
+	fsopen.c	\
 	futex.c		\
 	gcc_compat.h	\
 	get_personality.c \

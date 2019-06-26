@@ -71,6 +71,7 @@ file_handle
 file_ioctl
 finit_module
 flock
+fsopen
 fstat
 fstat-Xabbrev
 fstat-Xraw

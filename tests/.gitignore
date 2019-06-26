@@ -89,6 +89,7 @@ filter-unavailable
 finit_module
 flock
 fork-f
+fsopen
 fstat
 fstat-Xabbrev
 fstat-Xraw
