@@ -5,11 +5,11 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-srcdir="${0%/*}"
+srcdir="$1"; shift
 dstdir="$1"; shift
 
-for n in n32 n64 o32; do
+for n; do
 	in="$srcdir/syscallent-$n.h"
 	out="$dstdir/syscallent-$n-stub.h"
-	sed -r -n '/^#if/,/^#else/ {s/^([^{]*\{[^,]*,[^,]*,[[:space:]]*)[^,[:space:]]+,[[:space:]]*"([^"]+".*)/\1SEN(printargs), "'$n':\2/; s/^\[.*/&/p}' < "$in" > "$out"
+	sed -r -n '/^#if/,/^#else/ {s/^([^{]*\{[^,]*,[^,]*,[[:space:]]*)[^,[:space:]]+,[[:space:]]*"([^"]+".*)/\1SEN(printargs), SYSCALL_NAME_PREFIX "\2/; s/^\[.*/&/p}' < "$in" > "$out"
 done

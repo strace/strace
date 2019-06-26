@@ -343,8 +343,5 @@
 [BASE_NR + 332] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [BASE_NR + 333] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [BASE_NR + 334 ... BASE_NR + 423] - reserved to sync up with other architectures */
-[BASE_NR + 424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
-[BASE_NR + 425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
-[BASE_NR + 426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
-[BASE_NR + 427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
+#include "syscallent-common.h"
 #undef BASE_NR

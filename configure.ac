@@ -897,7 +897,10 @@ st_STACKTRACE
 
 if test "$arch" = mips && test "$no_create" != yes; then
 	mkdir -p linux/mips
-	if $srcdir/linux/mips/genstub.sh linux/mips; then
+	if $srcdir/linux/mips/genstub.sh \
+	   $srcdir/linux/mips linux/mips n32 n64 o32 &&
+	   $srcdir/linux/mips/genstub.sh \
+	   $srcdir/linux linux/mips common common-32; then
 		AC_MSG_RESULT([Generated MIPS syscallent stubs])
 	else
 		AC_MSG_ERROR([Failed to generate syscallent stubs])

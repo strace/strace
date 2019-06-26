@@ -1,3 +1,5 @@
+syscallent-common-32-stub.h
+syscallent-common-stub.h
 syscallent-n32-stub.h
 syscallent-n64-stub.h
 syscallent-o32-stub.h

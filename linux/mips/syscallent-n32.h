@@ -341,38 +341,19 @@
 [BASE_NR + 330] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [BASE_NR + 331] = { 4,	0,		SEN(rseq),			"rseq"			},
 [BASE_NR + 332] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
-/* [6333 ... 6402] - reserved to sync up with other architectures */
-[BASE_NR + 403] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime64"	},
-[BASE_NR + 404] = { 2,	0,		SEN(clock_settime64),		"clock_settime64"	},
-[BASE_NR + 405] = { 2,	0,		SEN(clock_adjtime64),		"clock_adjtime64"	},
-[BASE_NR + 406] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres_time64"	},
-[BASE_NR + 407] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep_time64"},
-[BASE_NR + 408] = { 2,	0,		SEN(timer_gettime64),		"timer_gettime64"	},
-[BASE_NR + 409] = { 4,	0,		SEN(timer_settime64),		"timer_settime64"	},
-[BASE_NR + 410] = { 2,	TD,		SEN(timerfd_gettime64),		"timerfd_gettime64"	},
-[BASE_NR + 411] = { 4,	TD,		SEN(timerfd_settime64),		"timerfd_settime64"	},
-[BASE_NR + 412] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat_time64"	},
-[BASE_NR + 413] = { 6,	TD,		SEN(pselect6_time64),		"pselect6_time64"	},
-[BASE_NR + 414] = { 5,	TD,		SEN(ppoll_time64),		"ppoll_time64"		},
-[BASE_NR + 416] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents_time64"	},
-[BASE_NR + 417] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg_time64"	},
-[BASE_NR + 418] = { 5,	TD,		SEN(mq_timedsend_time64),	"mq_timedsend_time64"	},
-[BASE_NR + 419] = { 5,	TD,		SEN(mq_timedreceive_time64),	"mq_timedreceive_time64"},
-[BASE_NR + 420] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop_time64"	},
-[BASE_NR + 421] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait_time64"},
-[BASE_NR + 422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
-[BASE_NR + 423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
-[BASE_NR + 424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
-[BASE_NR + 425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
-[BASE_NR + 426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
-[BASE_NR + 427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
+# include "syscallent-common-32.h"
+# include "syscallent-common.h"
 
 # define SYS_socket_subcall      6500
 # include "subcall32.h"
 
 #else
 
+# define SYSCALL_NAME_PREFIX "n32:"
 # include "syscallent-n32-stub.h"
+# include "syscallent-common-32-stub.h"
+# include "syscallent-common-stub.h"
+# undef SYSCALL_NAME_PREFIX
 
 #endif
 #undef BASE_NR

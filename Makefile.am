@@ -841,6 +841,8 @@ EXTRA_DIST =				\
 	linux/subcall32.h		\
 	linux/subcall64.h		\
 	linux/syscall.h			\
+	linux/syscallent-common-32.h	\
+	linux/syscallent-common.h	\
 	linux/tile/arch_defs_.h		\
 	linux/tile/arch_get_personality.c \
 	linux/tile/arch_regs.c		\
@@ -963,6 +965,7 @@ sys_func.h: $(patsubst %,$(srcdir)/%,$(sys_func_h_sources))
 	done | sort -u > $@
 
 syscallent_names = subcall.h syscallent.h syscallent1.h \
+		   syscallent-common.h syscallent-common-32.h \
 		   syscallent-n32.h syscallent-n64.h syscallent-o32.h
 syscallent_patterns = $(patsubst %,\%/%,$(syscallent_names))
 syscallent_files = $(filter $(syscallent_patterns),$(EXTRA_DIST))

@@ -341,7 +341,7 @@
 [333] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 [334] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [335 ... 423] - reserved to sync up with other architectures */
-[424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
+#include "syscallent-common.h"
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.
@@ -382,6 +382,3 @@
 [545] = { 5,	CST|TD|TF|TP|SE|SI,	SEN(execveat),		"execveat"		},
 [546] = { 5,	TD,		SEN(preadv2),			"preadv2"		},
 [547] = { 5,	TD,		SEN(pwritev2),			"pwritev2"		},
-[425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
-[426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
-[427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},

@@ -337,18 +337,17 @@
 [BASE_NR + 326] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
 [BASE_NR + 327] = { 4,	0,		SEN(rseq),			"rseq"			},
 [BASE_NR + 328] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
-/* [5329 ... 5423] - reserved to sync up with other architectures */
-[BASE_NR + 424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
-[BASE_NR + 425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
-[BASE_NR + 426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
-[BASE_NR + 427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
+# include "syscallent-common.h"
 
 # define SYS_socket_subcall      5500
 # include "subcall64.h"
 
 #else
 
+# define SYSCALL_NAME_PREFIX "n64:"
 # include "syscallent-n64-stub.h"
+# include "syscallent-common-stub.h"
+# undef SYSCALL_NAME_PREFIX
 
 #endif
 #undef BASE_NR

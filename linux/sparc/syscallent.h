@@ -382,30 +382,8 @@
 [400] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
 [401] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
 [402] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
-[403] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime64"	},
-[404] = { 2,	0,		SEN(clock_settime64),		"clock_settime64"	},
-[405] = { 2,	0,		SEN(clock_adjtime64),		"clock_adjtime64"	},
-[406] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres_time64"	},
-[407] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep_time64"},
-[408] = { 2,	0,		SEN(timer_gettime64),		"timer_gettime64"	},
-[409] = { 4,	0,		SEN(timer_settime64),		"timer_settime64"	},
-[410] = { 2,	TD,		SEN(timerfd_gettime64),		"timerfd_gettime64"	},
-[411] = { 4,	TD,		SEN(timerfd_settime64),		"timerfd_settime64"	},
-[412] = { 4,	TD|TF,		SEN(utimensat_time64),		"utimensat_time64"	},
-[413] = { 6,	TD,		SEN(pselect6_time64),		"pselect6_time64"	},
-[414] = { 5,	TD,		SEN(ppoll_time64),		"ppoll_time64"		},
-[416] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents_time64"	},
-[417] = { 5,	TN,		SEN(recvmmsg_time64),		"recvmmsg_time64"	},
-[418] = { 5,	TD,		SEN(mq_timedsend_time64),	"mq_timedsend_time64"	},
-[419] = { 5,	TD,		SEN(mq_timedreceive_time64),	"mq_timedreceive_time64"},
-[420] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop_time64"	},
-[421] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait_time64"},
-[422] = { 6,	0,		SEN(futex_time64),		"futex_time64"		},
-[423] = { 2,	0,		SEN(sched_rr_get_interval_time64),	"sched_rr_get_interval_time64"	},
-[424] = { 4,	TD|TS,		SEN(pidfd_send_signal),		"pidfd_send_signal"	},
-[425] = { 2,	TD,		SEN(io_uring_setup),		"io_uring_setup"	},
-[426] = { 6,	TD|TS,		SEN(io_uring_enter),		"io_uring_enter"	},
-[427] = { 4,	TD|TM,		SEN(io_uring_register),		"io_uring_register"	},
+#include "syscallent-common-32.h"
+#include "syscallent-common.h"
 
 #define SYS_socket_subcall	500
 #include "subcall32.h"
