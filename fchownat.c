@@ -10,6 +10,7 @@
 SYS_FUNC(fchownat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	printuid(", ", tcp->u_arg[2]);
 	printuid(", ", tcp->u_arg[3]);

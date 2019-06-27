@@ -45,8 +45,6 @@ print_dirfd(struct tcb *tcp, int fd)
 		print_xlat_d(AT_FDCWD);
 	else
 		printfd(tcp, fd);
-
-	tprints(", ");
 }
 
 /*
@@ -121,6 +119,7 @@ SYS_FUNC(open)
 SYS_FUNC(openat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	return decode_open(tcp, 1);
 }
 

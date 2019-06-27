@@ -29,9 +29,11 @@ SYS_FUNC(link)
 SYS_FUNC(linkat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	print_dirfd(tcp, tcp->u_arg[2]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[3]);
 	tprints(", ");
 	printflags(at_flags, tcp->u_arg[4], "AT_???");
@@ -42,6 +44,7 @@ SYS_FUNC(linkat)
 SYS_FUNC(unlinkat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	printflags(at_flags, tcp->u_arg[2], "AT_???");
@@ -54,6 +57,7 @@ SYS_FUNC(symlinkat)
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	print_dirfd(tcp, tcp->u_arg[1]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[2]);
 
 	return RVAL_DECODED;

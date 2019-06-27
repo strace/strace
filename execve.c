@@ -109,6 +109,7 @@ SYS_FUNC(execve)
 SYS_FUNC(execveat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	decode_execve(tcp, 1);
 	tprints(", ");
 	printflags(at_flags, tcp->u_arg[4], "AT_???");

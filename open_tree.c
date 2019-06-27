@@ -15,6 +15,7 @@
 SYS_FUNC(open_tree)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	printflags(open_tree_flags, tcp->u_arg[2], "OPEN_TREE_???");

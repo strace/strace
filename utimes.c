@@ -26,6 +26,7 @@ SYS_FUNC(utimes)
 SYS_FUNC(futimesat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	print_timeval_utimes(tcp, tcp->u_arg[2]);
@@ -37,6 +38,7 @@ static int
 do_utimensat(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	print_ts(tcp, tcp->u_arg[2]);

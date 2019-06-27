@@ -19,6 +19,7 @@ SYS_FUNC(statx)
 {
 	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printpath(tcp, tcp->u_arg[1]);
 		tprints(", ");
 

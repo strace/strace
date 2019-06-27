@@ -46,6 +46,7 @@ SYS_FUNC(mknod)
 SYS_FUNC(mknodat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	decode_mknod(tcp, 1);
 
 	return RVAL_DECODED;

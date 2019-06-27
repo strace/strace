@@ -44,7 +44,9 @@ SYS_FUNC(readlink)
 
 SYS_FUNC(readlinkat)
 {
-	if (entering(tcp))
+	if (entering(tcp)) {
 		print_dirfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
+	}
 	return decode_readlink(tcp, 1);
 }

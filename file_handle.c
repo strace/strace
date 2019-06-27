@@ -27,6 +27,7 @@ SYS_FUNC(name_to_handle_at)
 	if (entering(tcp)) {
 		/* dirfd */
 		print_dirfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 
 		/* pathname */
 		printpath(tcp, tcp->u_arg[1]);

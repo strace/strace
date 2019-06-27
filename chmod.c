@@ -25,6 +25,7 @@ SYS_FUNC(chmod)
 SYS_FUNC(fchmodat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	decode_chmod(tcp, 1);
 
 	return RVAL_DECODED;

@@ -29,5 +29,6 @@ SYS_FUNC(access)
 SYS_FUNC(faccessat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	return decode_access(tcp, 1);
 }
