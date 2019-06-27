@@ -132,6 +132,7 @@ strace_SOURCES =	\
 	flock.c		\
 	flock.h		\
 	fs_x_ioctl.c	\
+	fsconfig.c	\
 	fsopen.c	\
 	futex.c		\
 	gcc_compat.h	\

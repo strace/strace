@@ -15,3 +15,4 @@
 [BASE_NR + 428] = { 3,	TD|TF,		SEN(open_tree),			"open_tree"		},
 [BASE_NR + 429] = { 5,	TD|TF,		SEN(move_mount),		"move_mount"		},
 [BASE_NR + 430] = { 2,	TD,		SEN(fsopen),			"fsopen"		},
+[BASE_NR + 431] = { 5,	TD|TF,		SEN(fsconfig),			"fsconfig"		},

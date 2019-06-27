@@ -71,6 +71,8 @@ file_handle
 file_ioctl
 finit_module
 flock
+fsconfig
+fsconfig-P
 fsopen
 fstat
 fstat-Xabbrev

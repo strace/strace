@@ -89,6 +89,8 @@ filter-unavailable
 finit_module
 flock
 fork-f
+fsconfig
+fsconfig-P
 fsopen
 fstat
 fstat-Xabbrev

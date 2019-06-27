@@ -318,6 +318,21 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return false;
 	}
 
+	case SEN_fsconfig: {
+		/* x, x, x, maybe path, maybe fd */
+		const unsigned int cmd = tcp->u_arg[1];
+		switch (cmd) {
+			case 3 /* FSCONFIG_SET_PATH */:
+			case 4 /* FSCONFIG_SET_PATH_EMPTY */:
+				return fdmatch(tcp, tcp->u_arg[4], set) ||
+					upathmatch(tcp, tcp->u_arg[3], set);
+			case 5 /* FSCONFIG_SET_FD */:
+				return fdmatch(tcp, tcp->u_arg[4], set);
+		}
+
+		return false;
+	}
+
 	case SEN_accept4:
 	case SEN_accept:
 	case SEN_bpf:
