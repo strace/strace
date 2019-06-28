@@ -20,6 +20,10 @@ matrix:
   include:
     - compiler: gcc
       env:
+        - TARGET=x86
+        - STACKTRACE=no
+    - compiler: gcc
+      env:
         - TARGET=x86_64
         - STACKTRACE=libunwind
         - CHECK=coverage
@@ -36,10 +40,6 @@ matrix:
     - compiler: gcc
       env:
         - TARGET=x32
-        - STACKTRACE=no
-    - compiler: gcc
-      env:
-        - TARGET=x86
         - STACKTRACE=no
     - compiler: clang
       env:
