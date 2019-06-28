@@ -16,3 +16,4 @@
 [BASE_NR + 429] = { 5,	TD|TF,		SEN(move_mount),		"move_mount"		},
 [BASE_NR + 430] = { 2,	TD,		SEN(fsopen),			"fsopen"		},
 [BASE_NR + 431] = { 5,	TD|TF,		SEN(fsconfig),			"fsconfig"		},
+[BASE_NR + 432] = { 3,	TD,		SEN(fsmount),			"fsmount"		},

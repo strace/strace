@@ -91,6 +91,7 @@ flock
 fork-f
 fsconfig
 fsconfig-P
+fsmount
 fsopen
 fstat
 fstat-Xabbrev

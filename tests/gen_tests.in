@@ -70,6 +70,7 @@ flock	-a19
 fork-f	-a26 -qq -f -e signal=none -e trace=chdir
 fsconfig	-s300 -y
 fsconfig-P	-s300 -y -P /dev/full -e trace=fsconfig
+fsmount	-a18 -y
 fsopen	-a35
 fstat	-a15 -v -P stat.sample
 fstat-Xabbrev -a15 -v -Xabbrev -P stat.sample -e trace=fstat

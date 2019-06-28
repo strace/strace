@@ -341,6 +341,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_eventfd2:
 	case SEN_eventfd:
 	case SEN_fanotify_init:
+	case SEN_fsmount:
 	case SEN_fsopen:
 	case SEN_inotify_init:
 	case SEN_inotify_init1:

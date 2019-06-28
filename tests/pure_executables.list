@@ -73,6 +73,7 @@ finit_module
 flock
 fsconfig
 fsconfig-P
+fsmount
 fsopen
 fstat
 fstat-Xabbrev
