@@ -72,6 +72,8 @@ fsconfig	-s300 -y
 fsconfig-P	-s300 -y -P /dev/full -e trace=fsconfig
 fsmount	-a18 -y
 fsopen	-a35
+fspick	-a27 -y
+fspick-P	-a27 -y -P /dev/full -e trace=fspick
 fstat	-a15 -v -P stat.sample
 fstat-Xabbrev -a15 -v -Xabbrev -P stat.sample -e trace=fstat
 fstat-Xraw -a15 -v -Xraw -P stat.sample -e trace=fstat

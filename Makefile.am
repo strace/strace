@@ -135,6 +135,7 @@ strace_SOURCES =	\
 	fsconfig.c	\
 	fsmount.c	\
 	fsopen.c	\
+	fspick.c	\
 	futex.c		\
 	gcc_compat.h	\
 	get_personality.c \

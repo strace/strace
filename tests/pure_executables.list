@@ -75,6 +75,8 @@ fsconfig
 fsconfig-P
 fsmount
 fsopen
+fspick
+fspick-P
 fstat
 fstat-Xabbrev
 fstat-Xraw
