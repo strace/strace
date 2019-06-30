@@ -91,7 +91,7 @@ evdev_decode_number(const unsigned int code)
 		return 1;
 	}
 
-	switch (_IOC_NR(nr)) {
+	switch (nr) {
 		case 0x06:
 			tprintf("EVIOCGNAME(%u)", _IOC_SIZE(code));
 			return 1;
