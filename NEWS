@@ -5,7 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of open_tree, move_mount, fsopen, fsconfig, fsmount,
     and fspick syscalls.
   * Enhanced decoding of clone syscall.
-  * Updated lists of AT_*, AUDIT_*, CLONE_*, ETH_*, KEY_*, KVM_*, TIPC_*,
+  * Updated lists of AT_*, AUDIT_*, BPF_*, CLONE_*, ETH_*, KEY_*, KVM_*, TIPC_*,
     and V4L2_* constants.
 
 Noteworthy changes in release 5.1 (2019-05-22)
