@@ -610,6 +610,16 @@ seccomp_filter_restart_operator(const struct tcb *tcp)
 void
 check_seccomp_filter(void)
 {
+	/* Let's avoid enabling seccomp if all syscalls are traced. */
+	seccomp_filtering = !is_complete_set_array(trace_set, nsyscall_vec,
+						   SUPPORTED_PERSONALITIES);
+	if (!seccomp_filtering) {
+		error_msg("Seccomp filter is requested "
+			  "but there are no syscalls to filter.  "
+			  "See -e trace to filter syscalls.");
+		return;
+	}
+
 	check_seccomp_filter_properties();
 
 	if (!seccomp_filtering)

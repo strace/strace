@@ -87,6 +87,18 @@ is_complete_set(const struct number_set *const set, const unsigned int max_numbe
 		       (get_number_setbit(set) == max_numbers));
 }
 
+bool
+is_complete_set_array(const struct number_set *const set,
+		      const unsigned int *const max_numbers,
+		      const unsigned int nmemb)
+{
+	for (unsigned int i = 0; i < nmemb; ++i) {
+		if (!is_complete_set(&set[i], max_numbers[i]))
+			return false;
+	}
+	return true;
+}
+
 void
 add_number_to_set(const unsigned int number, struct number_set *const set)
 {
