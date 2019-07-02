@@ -74,6 +74,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_BTF_LOAD);
 	BPF_ATTR_DATA_FIELD(BPF_BTF_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_TASK_FD_QUERY);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_FREEZE);
 	char char_data[256];
 };
 
@@ -493,6 +494,14 @@ static const struct bpf_attr_check BPF_MAP_GET_NEXT_KEY_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_MAP_GET_NEXT_KEY_struct, next_key),
 		.str = "map_fd=-1, key=0xdeadbeef, next_key=0xbadc0ded"
+	}
+};
+
+static const struct bpf_attr_check BPF_MAP_FREEZE_checks[] = {
+	{
+		.data = { .BPF_MAP_FREEZE_data = { .map_fd = -1 } },
+		.size = offsetofend(struct BPF_MAP_FREEZE_struct, map_fd),
+		.str = "map_fd=-1"
 	}
 };
 
@@ -1231,6 +1240,7 @@ main(void)
 		CHK(BPF_BTF_GET_FD_BY_ID),
 		CHK(BPF_TASK_FD_QUERY),
 		CHK(BPF_MAP_LOOKUP_AND_DELETE_ELEM),
+		CHK(BPF_MAP_FREEZE),
 	};
 
 	page_size = get_page_size();

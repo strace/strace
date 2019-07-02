@@ -95,6 +95,14 @@ struct BPF_MAP_GET_NEXT_KEY_struct {
 	sizeof(struct BPF_MAP_GET_NEXT_KEY_struct)
 # define expected_BPF_MAP_GET_NEXT_KEY_struct_size 24
 
+struct BPF_MAP_FREEZE_struct {
+	uint32_t map_fd;
+};
+
+# define BPF_MAP_FREEZE_struct_size \
+	sizeof(struct BPF_MAP_FREEZE_struct)
+# define expected_BPF_MAP_FREEZE_struct_size 4
+
 struct BPF_PROG_LOAD_struct {
 	uint32_t prog_type;
 	uint32_t insn_cnt;

@@ -4,7 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented decoding of open_tree, move_mount, fsopen, fsconfig, fsmount,
     and fspick syscalls.
-  * Enhanced decoding of clone syscall.
+  * Enhanced decoding of bpf and clone syscalls.
   * Updated lists of AT_*, AUDIT_*, BPF_*, CLONE_*, ETH_*, KEY_*, KVM_*, TIPC_*,
     and V4L2_* constants.
 
