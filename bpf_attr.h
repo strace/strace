@@ -172,11 +172,15 @@ struct BPF_PROG_TEST_RUN_struct /* test */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) data_out;
 	uint32_t repeat;
 	uint32_t duration;
+	uint32_t ctx_size_in;
+	uint32_t ctx_size_out;
+	uint64_t ATTRIBUTE_ALIGNED(8) ctx_in;
+	uint64_t ATTRIBUTE_ALIGNED(8) ctx_out;
 };
 
 # define BPF_PROG_TEST_RUN_struct_size \
 	sizeof(struct BPF_PROG_TEST_RUN_struct)
-# define expected_BPF_PROG_TEST_RUN_struct_size 40
+# define expected_BPF_PROG_TEST_RUN_struct_size 64
 
 struct BPF_PROG_GET_NEXT_ID_struct {
 	uint32_t start_id;

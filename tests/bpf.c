@@ -819,6 +819,33 @@ static const struct bpf_attr_check BPF_PROG_TEST_RUN_checks[] = {
 		       ", data_in=0xfacef11dbadc2ded"
 		       ", data_out=0xfacef33dbadc4ded"
 		       ", repeat=4207410904, duration=4207541978}"
+	},
+	{
+		.data = { .BPF_PROG_TEST_RUN_data = {
+			.prog_fd = -1,
+			.retval = 0xfac1fed2,
+			.data_size_in = 0xfac3fed4,
+			.data_size_out = 0xfac5fed6,
+			.data_in = (uint64_t) 0xfacef11dbadc2dedULL,
+			.data_out = (uint64_t) 0xfacef33dbadc4dedULL,
+			.repeat = 0xfac7fed8,
+			.duration = 0xfac9feda,
+			.ctx_size_in = 0xfacbfedc,
+			.ctx_size_out = 0xfacdfede,
+			.ctx_in = (uint64_t) 0xfacef55dbadc6dedULL,
+			.ctx_out = (uint64_t) 0xfacef77dbadc8dedULL
+		} },
+		.size = offsetofend(struct BPF_PROG_TEST_RUN_struct, ctx_out),
+		.str = "test={prog_fd=-1, retval=4207017682"
+		       ", data_size_in=4207148756, data_size_out=4207279830"
+		       ", data_in=0xfacef11dbadc2ded"
+		       ", data_out=0xfacef33dbadc4ded"
+		       ", repeat=4207410904"
+		       ", duration=4207541978"
+		       ", ctx_size_in=4207673052"
+		       ", ctx_size_out=4207804126"
+		       ", ctx_in=0xfacef55dbadc6ded"
+		       ", ctx_out=0xfacef77dbadc8ded}"
 	}
 };
 
