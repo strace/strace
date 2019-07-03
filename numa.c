@@ -53,7 +53,7 @@ SYS_FUNC(migrate_pages)
 }
 
 #include "xlat/mpol_modes.h"
-#include "xlat/mbindflags.h"
+#include "xlat/mbind_flags.h"
 
 SYS_FUNC(mbind)
 {
@@ -63,7 +63,7 @@ SYS_FUNC(mbind)
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[4]);
-	printflags(mbindflags, tcp->u_arg[5], "MPOL_???");
+	printflags(mbind_flags, tcp->u_arg[5], "MPOL_???");
 
 	return RVAL_DECODED;
 }
