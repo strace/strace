@@ -78,7 +78,7 @@ SYS_FUNC(set_mempolicy)
 	return RVAL_DECODED;
 }
 
-#include "xlat/mempolicyflags.h"
+#include "xlat/get_mempolicy_flags.h"
 
 SYS_FUNC(get_mempolicy)
 {
@@ -94,7 +94,7 @@ SYS_FUNC(get_mempolicy)
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		printaddr(tcp->u_arg[3]);
 		tprints(", ");
-		printflags64(mempolicyflags, tcp->u_arg[4], "MPOL_???");
+		printflags64(get_mempolicy_flags, tcp->u_arg[4], "MPOL_???");
 	}
 	return 0;
 }
