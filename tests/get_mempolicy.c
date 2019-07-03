@@ -68,8 +68,8 @@ main(void)
 	rc = syscall(__NR_get_mempolicy, mode, nodemask, maxnode, addr, flags);
 	printf("get_mempolicy(%p, %p, %lu, %#lx, %s|%#lx) = %ld %s (%m)\n",
 	       mode, nodemask, maxnode, addr,
-	       "MPOL_F_NODE|MPOL_F_ADDR",
-	       flags & ~3, rc, errno2name());
+	       "MPOL_F_NODE|MPOL_F_ADDR|MPOL_F_MEMS_ALLOWED",
+	       flags & ~7, rc, errno2name());
 
 	mode = tail_alloc(sizeof(*mode));
 
