@@ -19,7 +19,7 @@
 # include <unistd.h>
 
 # include "xlat.h"
-# include "xlat/policies.h"
+# include "xlat/mpol_modes.h"
 
 # define MAX_STRLEN 3
 # define NLONGS(n) ((n + 8 * sizeof(long) - 2) \

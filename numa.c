@@ -52,14 +52,14 @@ SYS_FUNC(migrate_pages)
 	return RVAL_DECODED;
 }
 
-#include "xlat/policies.h"
+#include "xlat/mpol_modes.h"
 #include "xlat/mbindflags.h"
 
 SYS_FUNC(mbind)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
-	printxval64(policies, tcp->u_arg[2], "MPOL_???");
+	printxval64(mpol_modes, tcp->u_arg[2], "MPOL_???");
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[4]);
@@ -70,7 +70,7 @@ SYS_FUNC(mbind)
 
 SYS_FUNC(set_mempolicy)
 {
-	printxval(policies, tcp->u_arg[0], "MPOL_???");
+	printxval(mpol_modes, tcp->u_arg[0], "MPOL_???");
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu, tcp->u_arg[2]);
@@ -86,7 +86,7 @@ SYS_FUNC(get_mempolicy)
 		int pol;
 		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &pol)) {
 			tprints("[");
-			printxval(policies, pol, "MPOL_???");
+			printxval(mpol_modes, pol, "MPOL_???");
 			tprints("]");
 		}
 		tprints(", ");

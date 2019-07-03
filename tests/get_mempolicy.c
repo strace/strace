@@ -16,7 +16,7 @@
 # include <unistd.h>
 
 # include "xlat.h"
-# include "xlat/policies.h"
+# include "xlat/mpol_modes.h"
 
 # define MAX_STRLEN 3
 # define NLONGS(n) ((n + 8 * sizeof(long) - 2) \
@@ -75,13 +75,13 @@ main(void)
 
 	rc = syscall(__NR_get_mempolicy, mode, 0, 0, 0, 0);
 	printf("get_mempolicy([");
-	printxval(policies, (unsigned) *mode, "MPOL_???");
+	printxval(mpol_modes, (unsigned) *mode, "MPOL_???");
 	printf("], NULL, 0, NULL, 0) = %ld\n", rc);
 
 	*mode = -1;
 	rc = syscall(__NR_get_mempolicy, mode, 0, 0, mode - 1, 2);
 	printf("get_mempolicy([");
-	printxval(policies, (unsigned) *mode, "MPOL_???");
+	printxval(mpol_modes, (unsigned) *mode, "MPOL_???");
 	printf("], NULL, 0, %p, MPOL_F_ADDR) = %ld\n", mode - 1, rc);
 
 	maxnode = get_page_size() * 8;
