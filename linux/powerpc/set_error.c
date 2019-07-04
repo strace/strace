@@ -8,6 +8,9 @@
 static int
 arch_set_error(struct tcb *tcp)
 {
+	if (ptrace_syscall_info_is_valid() &&
+	    upeek(tcp, sizeof(long) * PT_CCR, &ppc_regs.ccr))
+                return -1;
 	ppc_regs.gpr[3] = tcp->u_error;
 	ppc_regs.ccr |= 0x10000000;
 	return upoke(tcp, sizeof(long) * PT_CCR, ppc_regs.ccr) ||
@@ -17,6 +20,9 @@ arch_set_error(struct tcb *tcp)
 static int
 arch_set_success(struct tcb *tcp)
 {
+	if (ptrace_syscall_info_is_valid() &&
+	    upeek(tcp, sizeof(long) * PT_CCR, &ppc_regs.ccr))
+                return -1;
 	ppc_regs.gpr[3] = tcp->u_rval;
 	ppc_regs.ccr &= ~0x10000000;
 	return upoke(tcp, sizeof(long) * PT_CCR, ppc_regs.ccr) ||
