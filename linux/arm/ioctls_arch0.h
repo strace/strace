@@ -2,6 +2,7 @@
 { "asm/ioctls.h", "FIOQSIZE", 0, 0x545E, 0 },
 { "linux/kvm.h", "KVM_ARM_PREFERRED_TARGET", _IOC_READ, 0xaeaf, 0x20 },
 { "linux/kvm.h", "KVM_ARM_SET_DEVICE_ADDR", _IOC_WRITE, 0xaeab, 0x10 },
+{ "linux/kvm.h", "KVM_ARM_VCPU_FINALIZE", _IOC_WRITE, 0xaec2, 0x04 },
 { "linux/kvm.h", "KVM_ARM_VCPU_INIT", _IOC_WRITE, 0xaeae, 0x20 },
 { "linux/kvm.h", "KVM_ASSIGN_DEV_IRQ", _IOC_WRITE, 0xae70, 0x40 },
 { "linux/kvm.h", "KVM_ASSIGN_PCI_DEVICE", _IOC_READ, 0xae69, 0x40 },

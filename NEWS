@@ -11,6 +11,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Enhanced decoding of bpf and clone syscalls.
   * Updated lists of AT_*, AUDIT_*, BPF_*, CLONE_*, ETH_*, KEY_*, KVM_*, MPOL_*,
     TIPC_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 5.2.
 
 Noteworthy changes in release 5.1 (2019-05-22)
 ==============================================
