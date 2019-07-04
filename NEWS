@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Bug fixes
-  * Fixed syscall tampering on powerpc and powerpc64 when
+  * Fixed syscall tampering on powerpc, powerpc64, sparc, and sparc64 when
     PTRACE_GET_SYSCALL_INFO is in use.
 
 * Improvements
