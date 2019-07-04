@@ -6,21 +6,26 @@
  */
 
 static int
-arch_set_error(struct tcb *tcp)
+sparc64_set_o0_tstate(struct tcb *tcp, const unsigned long o0,
+		      const unsigned long tstate_set,
+		      const unsigned long tstate_clear)
 {
 	if (ptrace_syscall_info_is_valid() && get_regs(tcp) < 0)
 		return -1;
-	sparc_regs.tstate |= 0x1100000000UL;
-	sparc_regs.u_regs[U_REG_O0] = tcp->u_error;
+	sparc_regs.u_regs[U_REG_O0] = o0;
+	sparc_regs.tstate |= tstate_set;
+	sparc_regs.tstate &= ~tstate_clear;
 	return set_regs(tcp->pid);
+}
+
+static int
+arch_set_error(struct tcb *tcp)
+{
+	return sparc64_set_o0_tstate(tcp, tcp->u_error, 0x1100000000UL, 0);
 }
 
 static int
 arch_set_success(struct tcb *tcp)
 {
-	if (ptrace_syscall_info_is_valid() && get_regs(tcp) < 0)
-		return -1;
-	sparc_regs.tstate &= ~0x1100000000UL;
-	sparc_regs.u_regs[U_REG_O0] = tcp->u_rval;
-	return set_regs(tcp->pid);
+	return sparc64_set_o0_tstate(tcp, tcp->u_rval, 0, 0x1100000000UL);
 }
