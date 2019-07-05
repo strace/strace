@@ -199,6 +199,9 @@ lstat	-a32 -v -P stat.sample -P /dev/full
 lstat64	-a32 -v -P stat.sample -P /dev/full
 madvise	-a33
 mbind
+mbind-Xabbrev	-Xabbrev -e trace=mbind
+mbind-Xraw	-a33 -Xraw -e trace=mbind
+mbind-Xverbose	-Xverbose -e trace=mbind
 membarrier	-a36
 memfd_create
 memfd_create-Xabbrev	-Xabbrev -e trace=memfd_create
@@ -417,7 +420,10 @@ select-P	-a36 -e trace=select -P /dev/full 9>>/dev/full
 semop	-a32 -e trace=semop,semtimedop
 sendfile	-a27
 sendfile64	-a29
-set_mempolicy	-s3 -a35
+set_mempolicy	-a34 -s3
+set_mempolicy-Xabbrev	-a34 -s3 -Xabbrev -e trace=set_mempolicy
+set_mempolicy-Xraw	-a24 -s3 -Xraw -e trace=set_mempolicy
+set_mempolicy-Xverbose	-s3 -Xverbose -e trace=set_mempolicy
 setdomainname	-a24
 setfsgid	-a12
 setfsgid32	-a14

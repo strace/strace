@@ -240,6 +240,9 @@ lstat
 lstat64
 madvise
 mbind
+mbind-Xabbrev
+mbind-Xraw
+mbind-Xverbose
 membarrier
 memfd_create
 memfd_create-Xabbrev
@@ -505,6 +508,9 @@ semop
 sendfile
 sendfile64
 set_mempolicy
+set_mempolicy-Xabbrev
+set_mempolicy-Xraw
+set_mempolicy-Xverbose
 set_ptracer_any
 set_sigblock
 set_sigign
