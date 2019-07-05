@@ -8,7 +8,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented decoding of open_tree, move_mount, fsopen, fsconfig, fsmount,
     and fspick syscalls.
-  * Enhanced decoding of bpf and clone syscalls.
+  * Enhanced decoding of bpf, clone, mbind, and set_mempolicy syscalls.
   * Updated lists of AT_*, AUDIT_*, BPF_*, CLONE_*, ETH_*, KEY_*, KVM_*, MPOL_*,
     TIPC_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 5.2.

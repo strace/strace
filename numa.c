@@ -53,12 +53,43 @@ SYS_FUNC(migrate_pages)
 }
 
 #include "xlat/mpol_modes.h"
+#include "xlat/mpol_mode_flags.h"
 #include "xlat/mbind_flags.h"
 
 static void
 print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 {
-	printxval64(mpol_modes, mode_arg, "MPOL_???");
+	const kernel_ulong_t flags_mask =
+		MPOL_F_STATIC_NODES | MPOL_F_RELATIVE_NODES;
+	const kernel_ulong_t mode = mode_arg & ~flags_mask;
+	const unsigned int flags = mode_arg & flags_mask;
+
+	if (!flags) {
+		printxval64(mpol_modes, mode, "MPOL_???");
+		return;
+	}
+
+	const char *mode_str = xlookup(mpol_modes, mode);
+	if (!mode_str) {
+		printflags64(mpol_mode_flags, mode_arg, "MPOL_???");
+		return;
+	}
+
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%#" PRI_klx, mode_arg);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	tprints(mode_str);
+	tprints("|");
+	printflags_ex(flags, NULL, XLAT_STYLE_ABBREV, mpol_mode_flags, NULL);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" */");
 }
 
 SYS_FUNC(mbind)
