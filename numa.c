@@ -55,11 +55,17 @@ SYS_FUNC(migrate_pages)
 #include "xlat/mpol_modes.h"
 #include "xlat/mbind_flags.h"
 
+static void
+print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
+{
+	printxval64(mpol_modes, mode_arg, "MPOL_???");
+}
+
 SYS_FUNC(mbind)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
-	printxval64(mpol_modes, tcp->u_arg[2], "MPOL_???");
+	print_mode(tcp, tcp->u_arg[2]);
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[4]);
@@ -70,7 +76,7 @@ SYS_FUNC(mbind)
 
 SYS_FUNC(set_mempolicy)
 {
-	printxval(mpol_modes, tcp->u_arg[0], "MPOL_???");
+	print_mode(tcp, (unsigned int) tcp->u_arg[0]);
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu, tcp->u_arg[2]);
