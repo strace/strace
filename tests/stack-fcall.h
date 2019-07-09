@@ -14,7 +14,7 @@
 
 #endif
 
-int f0(int i);
-int f1(int i);
-int f2(int i);
-int f3(int i);
+int f0(int i, unsigned long);
+int f1(int i, unsigned long);
+int f2(int i, unsigned long);
+int f3(int i, unsigned long);

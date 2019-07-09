@@ -7,11 +7,13 @@
 
 #include <signal.h>
 #include <unistd.h>
+#include <asm/unistd.h>
 
 #include "stack-fcall.h"
 
-int f3(int i)
+int f3(int i, unsigned long f)
 {
+	syscall(__NR_gettid, f ^ (unsigned long) (void *) f3);
 	switch (i) {
 	case 1:
 		return kill(getpid(), SIGURG);

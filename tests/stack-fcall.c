@@ -9,7 +9,7 @@
 
 int main(void)
 {
-	f0(0);
-	f0(1);
+	f0(0, (unsigned long) (void *) main);
+	f0(1, (unsigned long) (void *) main);
 	return 0;
 }
