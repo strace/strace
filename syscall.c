@@ -1146,7 +1146,7 @@ free_sysent_buf(void *ptr)
 }
 
 static bool
-ptrace_get_syscall_info(struct tcb *tcp)
+strace_get_syscall_info(struct tcb *tcp)
 {
 	/*
 	 * ptrace_get_syscall_info_supported should have been checked
@@ -1192,7 +1192,7 @@ get_instruction_pointer(struct tcb *tcp, kernel_ulong_t *ip)
 		return false;
 
 	if (ptrace_get_syscall_info_supported) {
-		if (!ptrace_get_syscall_info(tcp))
+		if (!strace_get_syscall_info(tcp))
 			return false;
 		*ip = (kernel_ulong_t) ptrace_sci.instruction_pointer;
 		return true;
@@ -1219,7 +1219,7 @@ get_stack_pointer(struct tcb *tcp, kernel_ulong_t *sp)
 		return false;
 
 	if (ptrace_get_syscall_info_supported) {
-		if (!ptrace_get_syscall_info(tcp))
+		if (!strace_get_syscall_info(tcp))
 			return false;
 		*sp = (kernel_ulong_t) ptrace_sci.stack_pointer;
 		return true;
@@ -1246,7 +1246,7 @@ get_syscall_regs(struct tcb *tcp)
 		return get_regs_error;
 
 	if (ptrace_get_syscall_info_supported)
-		return ptrace_get_syscall_info(tcp) ? 0 : get_regs_error;
+		return strace_get_syscall_info(tcp) ? 0 : get_regs_error;
 
 	return get_regs(tcp);
 }
