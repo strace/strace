@@ -46,6 +46,7 @@ typedef off_t libc_off_t;
 # define stat64 libc_stat64
 # define statx libc_statx
 # define statx_timestamp libc_statx_timestamp
+struct statx;
 # include <fcntl.h>
 # include <sys/stat.h>
 # undef statx_timestamp
