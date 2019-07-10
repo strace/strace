@@ -2065,6 +2065,8 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		/*
 		 * One case we are here is -ff, try
 		 * "strace -oLOG -ff test/threaded_execve".
+		 * Another case is demonstrated by
+		 * tests/maybe_switch_current_tcp.c
 		 */
 		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
 		/*execve_thread->curcol = 0; - no need, see code below */
@@ -2645,7 +2647,7 @@ dispatch_event(const struct tcb_wait_data *wd)
 		 * and all the following syscall state tracking is screwed up
 		 * otherwise.
 		 */
-		if (entering(current_tcp)) {
+		if (!maybe_switch_current_tcp() && entering(current_tcp)) {
 			int ret;
 
 			error_msg("Stray PTRACE_EVENT_EXEC from pid %d"
@@ -2661,8 +2663,6 @@ dispatch_event(const struct tcb_wait_data *wd)
 				return true;
 			}
 		}
-
-		maybe_switch_current_tcp();
 
 		if (detach_on_execve) {
 			if (current_tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {

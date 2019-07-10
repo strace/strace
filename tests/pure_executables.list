@@ -202,6 +202,7 @@ lseek
 lstat
 lstat64
 madvise
+maybe_switch_current_tcp
 mbind
 mbind-Xabbrev
 mbind-Xraw
