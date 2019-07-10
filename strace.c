@@ -2029,33 +2029,48 @@ maybe_allocate_tcb(const int pid, int status)
 	}
 }
 
+/*
+ * Under Linux, execve changes pid to thread leader's pid, and we see this
+ * changed pid on EVENT_EXEC and later, execve sysexit.  Leader "disappears"
+ * without exit notification.  Let user know that, drop leader's tcb, and fix
+ * up pid in execve thread's tcb.  Effectively, execve thread's tcb replaces
+ * leader's tcb.
+ *
+ * BTW, leader is 'stuck undead' (doesn't report WIFEXITED on exit syscall)
+ * in multi-threaded programs exactly in order to handle this case.
+ */
 static struct tcb *
 maybe_switch_tcbs(struct tcb *tcp, const int pid)
 {
-	FILE *fp;
-	struct tcb *execve_thread;
-	long old_pid = tcb_wait_tab[tcp->wait_data_idx].msg;
+	/*
+	 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
+	 * On 2.6 and earlier it can return garbage.
+	 */
+	if (os_release < KERNEL_VERSION(3, 0, 0))
+		return NULL;
+
+	const long old_pid = tcb_wait_tab[tcp->wait_data_idx].msg;
 
 	/* Avoid truncation in pid2tcb() param passing */
 	if (old_pid <= 0 || old_pid == pid)
-		return tcp;
+		return NULL;
 	if ((unsigned long) old_pid > UINT_MAX)
-		return tcp;
-	execve_thread = pid2tcb(old_pid);
+		return NULL;
+	struct tcb *execve_thread = pid2tcb(old_pid);
 	/* It should be !NULL, but I feel paranoid */
 	if (!execve_thread)
-		return tcp;
+		return NULL;
 
 	if (execve_thread->curcol != 0) {
 		/*
-		 * One case we are here is -ff:
-		 * try "strace -oLOG -ff test/threaded_execve"
+		 * One case we are here is -ff, try
+		 * "strace -oLOG -ff test/threaded_execve".
 		 */
 		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
 		/*execve_thread->curcol = 0; - no need, see code below */
 	}
 	/* Swap output FILEs (needed for -ff) */
-	fp = execve_thread->outf;
+	FILE *fp = execve_thread->outf;
 	execve_thread->outf = tcp->outf;
 	tcp->outf = fp;
 	/* And their column positions */
@@ -2072,6 +2087,17 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		line_ended();
 		tcp->flags |= TCB_REPRINT;
 	}
+
+	return tcp;
+}
+
+static struct tcb *
+maybe_switch_current_tcp(void)
+{
+	struct tcb *tcp = maybe_switch_tcbs(current_tcp, current_tcp->pid);
+
+	if (tcp)
+		set_current_tcp(tcp);
 
 	return tcp;
 }
@@ -2636,24 +2662,7 @@ dispatch_event(const struct tcb_wait_data *wd)
 			}
 		}
 
-		/*
-		 * Under Linux, execve changes pid to thread leader's pid,
-		 * and we see this changed pid on EVENT_EXEC and later,
-		 * execve sysexit. Leader "disappears" without exit
-		 * notification. Let user know that, drop leader's tcb,
-		 * and fix up pid in execve thread's tcb.
-		 * Effectively, execve thread's tcb replaces leader's tcb.
-		 *
-		 * BTW, leader is 'stuck undead' (doesn't report WIFEXITED
-		 * on exit syscall) in multithreaded programs exactly
-		 * in order to handle this case.
-		 *
-		 * PTRACE_GETEVENTMSG returns old pid starting from Linux 3.0.
-		 * On 2.6 and earlier, it can return garbage.
-		 */
-		if (os_release >= KERNEL_VERSION(3, 0, 0))
-			set_current_tcp(maybe_switch_tcbs(current_tcp,
-							  current_tcp->pid));
+		maybe_switch_current_tcp();
 
 		if (detach_on_execve) {
 			if (current_tcp->flags & TCB_SKIP_DETACH_ON_FIRST_EXEC) {
