@@ -580,10 +580,10 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	}
 
-# ifdef SYS_syscall_subcall
+#ifdef SYS_syscall_subcall
 	if (tcp_sysent(tcp)->sen == SEN_syscall)
 		decode_syscall_subcall(tcp);
-# endif
+#endif
 #if defined SYS_ipc_subcall	\
  || defined SYS_socket_subcall
 	switch (tcp_sysent(tcp)->sen) {

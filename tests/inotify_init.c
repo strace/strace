@@ -19,23 +19,23 @@
 int
 main(void)
 {
-#ifdef PRINT_PATHS
+# ifdef PRINT_PATHS
 	skip_if_unavailable("/proc/self/fd/");
-#endif
+# endif
 
 	long rc = syscall(__NR_inotify_init, 42);
 
-#ifdef PRINT_PATHS
+# ifdef PRINT_PATHS
 	if (rc < 0)
 		perror_msg_and_skip("inotify_init");
-#endif
+# endif
 
 	printf("inotify_init() = "
-#ifdef PRINT_PATHS
+# ifdef PRINT_PATHS
 	       "%ld<anon_inode:inotify>\n", rc
-#else
+# else
 	       "%s\n", sprintrc(rc)
-#endif
+# endif
 	       );
 
 	puts("+++ exited with 0 +++");

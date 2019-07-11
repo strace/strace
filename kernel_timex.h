@@ -37,7 +37,7 @@ typedef struct {
 	int pad3[11];
 } kernel_timex64_t;
 
-#ifdef SPARC64
+# ifdef SPARC64
 
 typedef struct {
 	unsigned int modes;
@@ -69,7 +69,7 @@ typedef struct {
 	int pad3[11];
 } kernel_sparc64_timex_t;
 
-#endif /* SPARC64 */
+# endif /* SPARC64 */
 
 # if HAVE_ARCH_TIME32_SYSCALLS
 

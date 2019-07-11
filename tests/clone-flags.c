@@ -50,14 +50,14 @@ wait_cloned(pid_t pid, int sig, const char *text)
 
 #ifdef IA64
 extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
-#define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
+# define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(__clone2((fn_), (stack_), (size_), (flags_), (arg_), \
 			     ## __VA_ARGS__), (flags_) & 0xff, #flags_)
 # define SYSCALL_NAME "clone2"
 # define STACK_SIZE_FMT ", stack_size=%#lx"
 # define STACK_SIZE_ARG child_stack_size,
 #else
-#define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
+# define do_clone(fn_, stack_, size_, flags_, arg_, ...) \
 	wait_cloned(clone((fn_), (stack_), (flags_), (arg_),	\
 			  ## __VA_ARGS__), (flags_) & 0xff, #flags_)
 # define SYSCALL_NAME "clone"

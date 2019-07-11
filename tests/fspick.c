@@ -69,21 +69,21 @@ main(void)
 	       dfd, path, fname, "0xfffffff0 /* FSPICK_??? */", errstr);
 
 	k_fspick(-1, efault, 0xf);
-#  ifndef PATH_TRACING
+# ifndef PATH_TRACING
 	printf("fspick(-1, %p, %s) = %s\n",
 	       efault,
 	       "FSPICK_CLOEXEC|FSPICK_SYMLINK_NOFOLLOW"
 	       "|FSPICK_NO_AUTOMOUNT|FSPICK_EMPTY_PATH",
 	       errstr);
-#  endif
+# endif
 
 	k_fspick(-1, empty, -1);
-#  ifndef PATH_TRACING
+# ifndef PATH_TRACING
 	printf("fspick(-1, \"\", %s|0xfffffff0) = %s\n",
 	       "FSPICK_CLOEXEC|FSPICK_SYMLINK_NOFOLLOW"
 	       "|FSPICK_NO_AUTOMOUNT|FSPICK_EMPTY_PATH",
 	       errstr);
-#  endif
+# endif
 
 	if (k_fspick(-1, path, 0) < 0)
 		printf("fspick(-1, \"%s\", 0) = %s\n",

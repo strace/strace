@@ -1460,12 +1460,12 @@ popcount32(const uint32_t *a, unsigned int size)
 	for (; size; ++a, --size) {
 		uint32_t x = *a;
 
-#ifdef HAVE___BUILTIN_POPCOUNT
+# ifdef HAVE___BUILTIN_POPCOUNT
 		count += __builtin_popcount(x);
-#else
+# else
 		for (; x; ++count)
 			x &= x - 1;
-#endif
+# endif
 	}
 
 	return count;
