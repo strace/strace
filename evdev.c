@@ -155,6 +155,13 @@ decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
 		size = max_nr;
 	else
 		size = tcp->u_rval * 8;
+
+	if (syserror(tcp) || !size) {
+		printaddr(arg);
+
+		return RVAL_IOCTL_DECODED;
+	}
+
 	char decoded_arg[size];
 
 	if (umove_or_printaddr(tcp, arg, &decoded_arg))
