@@ -9,6 +9,7 @@
 
 #ifdef HAVE_LINUX_INPUT_H
 
+# include <assert.h>
 # include <inttypes.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -16,17 +17,19 @@
 # include <linux/input.h>
 # include "print_fields.h"
 
+# define NUM_WORDS 4
+
 static const char *errstr;
 
 struct evdev_check {
 	unsigned long cmd;
 	const char *cmd_str;
-	void *arg_ptr;
-	void (*print_arg)(long rc, void *ptr, void *arg);
+	const void *arg_ptr;
+	void (*print_arg)(long rc, const void *ptr, const void *arg);
 };
 
 static long
-invoke_test_syscall(unsigned long cmd, void *p)
+invoke_test_syscall(unsigned long cmd, const void *p)
 {
 	long rc = ioctl(-1, cmd, p);
 	errstr = sprintrc(rc);
@@ -38,7 +41,7 @@ invoke_test_syscall(unsigned long cmd, void *p)
 }
 
 static void
-test_evdev(struct evdev_check *check, void *arg)
+test_evdev(struct evdev_check *check, const void *arg)
 {
 	long rc = invoke_test_syscall(check->cmd, check->arg_ptr);
 	printf("ioctl(-1, %s, ", check->cmd_str);
@@ -50,9 +53,9 @@ test_evdev(struct evdev_check *check, void *arg)
 }
 
 static void
-print_input_absinfo(long rc, void *ptr, void *arg)
+print_input_absinfo(long rc, const void *ptr, const void *arg)
 {
-	struct input_absinfo *absinfo = ptr;
+	const struct input_absinfo *absinfo = ptr;
 
 	if (rc < 0) {
 		printf("%p", absinfo);
@@ -74,9 +77,9 @@ print_input_absinfo(long rc, void *ptr, void *arg)
 }
 
 static void
-print_input_id(long rc, void *ptr, void *arg)
+print_input_id(long rc, const void *ptr, const void *arg)
 {
-	struct input_id *id = ptr;
+	const struct input_id *id = ptr;
 
 	if (rc < 0) {
 		printf("%p", id);
@@ -91,10 +94,10 @@ print_input_id(long rc, void *ptr, void *arg)
 
 # ifdef EVIOCGMTSLOTS
 static void
-print_mtslots(long rc, void *ptr, void *arg)
+print_mtslots(long rc, const void *ptr, const void *arg)
 {
-	int *buffer = ptr;
-	const char **str = arg;
+	const int *buffer = ptr;
+	const char * const * str = arg;
 	int num = atoi(*(str + 1));
 
 	if (rc < 0) {
@@ -111,27 +114,26 @@ print_mtslots(long rc, void *ptr, void *arg)
 # endif
 
 static void
-print_getbit(long rc, void *ptr, void *arg)
+print_getbit(long rc, const void *ptr, const void *arg)
 {
-	const char **str = arg;
-	int num = atoi(*str);
+	const char * const *str = arg;
 
-	if (rc < 0) {
+	if (rc <= 0) {
 		printf("%p", ptr);
 		return;
 	}
 
 	printf("[");
-	printf("%s", *(str + 1));
-	for (unsigned int i = 2; i <= (unsigned) num; i++) {
+	for (unsigned long i = 0; str[i]; i++) {
 # if ! VERBOSE
-		if (i > 4) {
+		if (i >= 4) {
 			printf(", ...");
 			break;
 		}
 # endif
-		printf(", ");
-		printf("%s", *(str + i));
+		if (i)
+			printf(", ");
+		printf("%s", str[i]);
 	}
 	printf("]");
 }
@@ -177,6 +179,7 @@ main(int argc, char **argv)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_id, id);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_absinfo, absinfo);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, bad_addr_slot);
+
 # ifdef EVIOCGMTSLOTS
 	int mtslots[] = { ABS_MT_SLOT, 1, 3 };
 	/* we use the second element to indicate the number of values */
@@ -190,36 +193,65 @@ main(int argc, char **argv)
 	const char *invalid_mtslot_str[] = { invalid_str, "1", "1" };
 # endif
 
+	enum { ULONG_BIT = sizeof(unsigned long) * 8 };
+
 	/* set more than 4 bits */
-	unsigned long ev_more[] = { 1 << EV_ABS | 1 << EV_MSC | 1 << EV_LED | 1 << EV_SND | 1 << EV_PWR };
-	/* we use the first element to indicate the number of set bits */
-	/* ev_more_str[0] is "5" so the number of set bits is 5 */
-	const char *ev_more_str[] = { "5", "EV_ABS", "EV_MSC", "EV_LED", "EV_SND", "EV_PWR" };
+	static const unsigned long ev_more[NUM_WORDS] = {
+		1 << EV_ABS | 1 << EV_MSC | 1 << EV_LED | 1 << EV_SND
+		| 1 << EV_PWR };
+	static const char * const ev_more_str_2[] = {
+		"EV_ABS", "EV_MSC", NULL };
+	static const char * const ev_more_str_3[] = {
+		"EV_ABS", "EV_MSC", "EV_LED", "EV_SND", "EV_PWR", NULL };
 
 	/* set less than 4 bits */
-	unsigned long ev_less[] = { 1 << EV_ABS | 1 << EV_MSC | 1 << EV_LED };
-	const char *ev_less_str[] = { "3", "EV_ABS", "EV_MSC", "EV_LED" };
+	static const unsigned long ev_less[NUM_WORDS] = {
+		1 << EV_ABS | 1 << EV_MSC | 1 << EV_LED };
+	static const char * const ev_less_str_2[] = {
+		"EV_ABS", "EV_MSC", NULL };
+	static const char * const ev_less_str_3[] = {
+		"EV_ABS", "EV_MSC", "EV_LED", NULL };
 
 	/* set zero bit */
-	unsigned long ev_zero[] = { 0x0 };
-	const char *ev_zero_str[] = { "0", " 0 " };
+	static const unsigned long ev_zero[NUM_WORDS] = { 0x0 };
+	static const char * const ev_zero_str[] = { " 0 ", NULL };
 
 	/* KEY_MAX is 0x2ff which is greater than retval * 8 */
-	unsigned long key[] = { 1 << KEY_1 | 1 << KEY_2, 0 };
-	const char *key_str[] = { "2", "KEY_1", "KEY_2" };
+	static const unsigned long key[NUM_WORDS] = {
+		1 << KEY_1 | 1 << KEY_2,
+		[ KEY_F12 / ULONG_BIT ] = 1 << (KEY_F12 % ULONG_BIT) };
+
+	static const char * const key_str_8[] = {
+		"KEY_1", "KEY_2", NULL };
+	static const char * const key_str_16[] = {
+		"KEY_1", "KEY_2", "KEY_F12", NULL };
+
+	assert(sizeof(ev_more) >= (unsigned long) inject_retval);
+	assert(sizeof(ev_less) >= (unsigned long) inject_retval);
+	assert(sizeof(ev_zero) >= (unsigned long) inject_retval);
+	assert(sizeof(key) >= (unsigned long) inject_retval);
 
 	struct {
 		struct evdev_check check;
-		void *ptr;
+		const void *ptr;
 	} a[] = {
 		{ { ARG_STR(EVIOCGID), id, print_input_id }, NULL },
 		{ { ARG_STR(EVIOCGABS(ABS_X)), absinfo, print_input_absinfo }, NULL },
 		{ { ARG_STR(EVIOCGABS(ABS_Y)), absinfo, print_input_absinfo }, NULL },
 		{ { ARG_STR(EVIOCGABS(ABS_Y)), absinfo, print_input_absinfo }, NULL },
-		{ { ARG_STR(EVIOCGBIT(0, 0)), ev_more, print_getbit }, &ev_more_str },
-		{ { ARG_STR(EVIOCGBIT(0, 0)), ev_less, print_getbit }, &ev_less_str },
+		{ { ARG_STR(EVIOCGBIT(0, 0)), ev_more, print_getbit },
+			inject_retval * 8 <= EV_LED
+				? (const void *) &ev_more_str_2
+				: (const void *) &ev_more_str_3 },
+		{ { ARG_STR(EVIOCGBIT(0, 0)), ev_less, print_getbit },
+			inject_retval * 8 <= EV_LED
+				? (const void *) &ev_less_str_2
+				: (const void *) &ev_less_str_3 },
 		{ { ARG_STR(EVIOCGBIT(0, 0)), ev_zero, print_getbit }, &ev_zero_str },
-		{ { ARG_STR(EVIOCGBIT(EV_KEY, 0)), key, print_getbit }, &key_str},
+		{ { ARG_STR(EVIOCGBIT(EV_KEY, 0)), key, print_getbit },
+			inject_retval * 8 <= KEY_F12
+				? (const void *) &key_str_8
+				: (const void *) &key_str_16 },
 # ifdef EVIOCGMTSLOTS
 		{ { ARG_STR(EVIOCGMTSLOTS(12)), mtslots, print_mtslots }, &mtslots_str },
 		{ { ARG_STR(EVIOCGMTSLOTS(8)), invalid_mtslot, print_mtslots }, &invalid_mtslot_str }
