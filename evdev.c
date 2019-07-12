@@ -151,10 +151,14 @@ decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
 	tprints(", ");
 
 	unsigned int size;
+	unsigned int size_bits;
+
 	if ((kernel_ulong_t) tcp->u_rval > max_nr / 8)
-		size = max_nr;
+		size_bits = max_nr;
 	else
-		size = tcp->u_rval * 8;
+		size_bits = tcp->u_rval * 8;
+
+	size = ROUNDUP(ROUNDUP_DIV(size_bits, 8), current_wordsize);
 
 	if (syserror(tcp) || !size) {
 		printaddr(arg);
@@ -170,13 +174,13 @@ decode_bitset_(struct tcb *const tcp, const kernel_ulong_t arg,
 	tprints("[");
 
 	int bit_displayed = 0;
-	int i = next_set_bit(decoded_arg, 0, size);
+	int i = next_set_bit(decoded_arg, 0, size_bits);
 	if (i < 0) {
 		tprints(" 0 ");
 	} else {
 		printxval_dispatch(decode_nr, decode_nr_size, i, dflt, xt);
 
-		while ((i = next_set_bit(decoded_arg, i + 1, size)) > 0) {
+		while ((i = next_set_bit(decoded_arg, i + 1, size_bits)) > 0) {
 			if (abbrev(tcp) && bit_displayed >= 3) {
 				tprints(", ...");
 				break;
