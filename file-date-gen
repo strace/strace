@@ -40,8 +40,14 @@ date=
 	date="$(date -u)"
 
 [ -n "${date}" ] || {
-	echo >&2 'Undefined date.'
+	printf >&2 "%s: Undefined date.\n" "$0"
 	exit 1
 }
 
-exec printf "%s" $(date -u "+${DATE_FORMAT}" -d "${date}")
+datestr="$(date -u "+${DATE_FORMAT}" -d "${date}")" &&
+[ -n "${datestr}" ] || {
+	printf >&2 "%s: Invalid date: %s\n" "$0" "$date"
+	exit 1
+}
+
+exec printf '%s' "$datestr"

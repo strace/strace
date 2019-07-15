@@ -32,7 +32,7 @@ year=
 	year="$(date -u +%Y)"
 
 [ -n "${year}" ] || {
-	echo >&2 'Undefined year.'
+	printf >&2 "%s: Undefined year.\n" "$0"
 	exit 1
 }
 
