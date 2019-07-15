@@ -232,8 +232,10 @@ try_bpf(kernel_ulong_t cmd, void (*printer)(void *attr, size_t size, long rc),
 }
 
 int
-main(void)
+main(int ac, char **av)
 {
+	lock_file_by_dirname(av[0], "bpf-obj_get_info_by_fd");
+
 	struct BPF_MAP_CREATE_struct bpf_map_create_attr = {
 		.map_type    = BPF_MAP_TYPE_ARRAY,
 		.key_size    = 4,

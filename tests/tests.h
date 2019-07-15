@@ -87,6 +87,12 @@ void perror_msg_and_skip(const char *, ...)
 void skip_if_unavailable(const char *);
 
 /*
+ * Obtain an exclusive lock on dirname(path_name)/lock_name file
+ * using open and flock.
+ */
+int lock_file_by_dirname(const char *path_name, const char *lock_name);
+
+/*
  * Allocate memory that ends on the page boundary.
  * Pages allocated by this call are preceded by an unmapped page
  * and followed also by an unmapped page.
