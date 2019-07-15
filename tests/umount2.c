@@ -13,9 +13,10 @@
 #include <asm/unistd.h>
 
 #if defined __NR_umount2 && (!defined __NR_umount || __NR_umount2 != __NR_umount)
+# define TEST_SYSCALL_NR __NR_umount2
 # define TEST_SYSCALL_STR "umount2"
 #else
-# define __NR_umount2 __NR_umount
+# define TEST_SYSCALL_NR __NR_umount
 # define TEST_SYSCALL_STR "umount"
 #endif
 
@@ -25,7 +26,7 @@ main(void)
 	static const char sample[] = "umount2.sample";
 	if (mkdir(sample, 0700))
 		perror_msg_and_fail("mkdir: %s", sample);
-	(void) syscall(__NR_umount2, sample, 31);
+	(void) syscall(TEST_SYSCALL_NR, sample, 31);
 	printf("%s(\"%s\", MNT_FORCE|MNT_DETACH|MNT_EXPIRE|UMOUNT_NOFOLLOW|0x10)"
 	       " = -1 EINVAL (%m)\n", TEST_SYSCALL_STR, sample);
 	if (rmdir(sample))

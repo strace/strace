@@ -8,7 +8,7 @@
 #include "tests.h"
 #include <asm/unistd.h>
 
-#ifdef __NR_getpid
+#if defined __NR_getpid && (!defined __NR_getxpid || __NR_getxpid != __NR_getpid)
 
 # include <stdio.h>
 # include <unistd.h>

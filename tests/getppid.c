@@ -7,6 +7,7 @@
 
 #include "tests.h"
 #include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_getppid
 
@@ -16,7 +17,7 @@
 int
 main(void)
 {
-	printf("getppid() = %ld\n", syscall(__NR_getppid));
+	printf("getppid() = %s\n", sprintrc(syscall(__NR_getppid)));
 	puts("+++ exited with 0 +++");
 	return 0;
 }

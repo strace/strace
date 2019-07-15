@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Bug fixes
+  * Fixed tests on alpha with Linux kernel headers 5.1+.
+
 Noteworthy changes in release 5.2 (2019-07-12)
 ==============================================
 
