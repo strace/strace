@@ -153,6 +153,63 @@ extern char *stpcpy(char *dst, const char *src);
 #  define is_bigendian false
 # endif
 
+# if SUPPORTED_PERSONALITIES > 1
+extern void set_personality(unsigned int personality);
+extern unsigned current_personality;
+# else
+#  define set_personality(personality) ((void)0)
+#  define current_personality 0
+# endif
+
+# if SUPPORTED_PERSONALITIES == 1
+#  define current_wordsize PERSONALITY0_WORDSIZE
+#  define current_klongsize PERSONALITY0_KLONGSIZE
+# else
+#  if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_WORDSIZE == PERSONALITY1_WORDSIZE
+#   define current_wordsize PERSONALITY0_WORDSIZE
+#  else
+extern unsigned current_wordsize;
+#  endif
+#  if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_KLONGSIZE == PERSONALITY1_KLONGSIZE
+#   define current_klongsize PERSONALITY0_KLONGSIZE
+#  else
+extern unsigned current_klongsize;
+#  endif
+# endif
+
+# define max_addr() (~0ULL >> ((8 - current_wordsize) * 8))
+# define max_kaddr() (~0ULL >> ((8 - current_klongsize) * 8))
+
+/* Shorthands for defining word/klong-based dispatcher function bodies */
+# ifndef current_wordsize
+#  define opt_wordsize(opt_64_, opt_32_) \
+	((current_wordsize > sizeof(uint32_t)) ? (opt_64_) : (opt_32_))
+#  define dispatch_wordsize(call_64_, call_32_, ...) \
+	((current_wordsize > sizeof(uint32_t)) \
+		? (call_64_)(__VA_ARGS__) : (call_32_)(__VA_ARGS__))
+# elif current_wordsize > 4
+#  define opt_wordsize(opt_64_, opt_32_) (opt_64_)
+#  define dispatch_wordsize(call_64_, call_32_, ...) ((call_64_)(__VA_ARGS__))
+# else /* current_wordsize == 4 */
+#  define opt_wordsize(opt_64_, opt_32_) (opt_32_)
+#  define dispatch_wordsize(call_64_, call_32_, ...) ((call_32_)(__VA_ARGS__))
+# endif
+
+# ifndef current_klongsize
+#  define opt_klongsize(opt_64_, opt_32_) \
+	((current_klongsize > sizeof(uint32_t)) ? (opt_64_) : (opt_32_))
+#  define dispatch_klongsize(call_64_, call_32_, ...) \
+	((current_klongsize > sizeof(uint32_t)) \
+		? (call_64_)(__VA_ARGS__) : (call_32_)(__VA_ARGS__))
+# elif current_klongsize > 4
+#  define opt_klongsize(opt_64_, opt_32_) (opt_64_)
+#  define dispatch_klongsize(call_64_, call_32_, ...) ((call_64_)(__VA_ARGS__))
+# else /* current_klongsize == 4 */
+#  define opt_klongsize(opt_64_, opt_32_) (opt_32_)
+#  define dispatch_klongsize(call_64_, call_32_, ...) ((call_32_)(__VA_ARGS__))
+# endif
+
+
 typedef struct ioctlent {
 	const char *symbol;
 	unsigned int code;
@@ -1159,33 +1216,6 @@ printaddr_comment(const kernel_ulong_t addr)
 {
 	tprintf_comment("%#llx", (unsigned long long) addr);
 }
-
-# if SUPPORTED_PERSONALITIES > 1
-extern void set_personality(unsigned int personality);
-extern unsigned current_personality;
-# else
-#  define set_personality(personality) ((void)0)
-#  define current_personality 0
-# endif
-
-# if SUPPORTED_PERSONALITIES == 1
-#  define current_wordsize PERSONALITY0_WORDSIZE
-#  define current_klongsize PERSONALITY0_KLONGSIZE
-# else
-#  if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_WORDSIZE == PERSONALITY1_WORDSIZE
-#   define current_wordsize PERSONALITY0_WORDSIZE
-#  else
-extern unsigned current_wordsize;
-#  endif
-#  if SUPPORTED_PERSONALITIES == 2 && PERSONALITY0_KLONGSIZE == PERSONALITY1_KLONGSIZE
-#   define current_klongsize PERSONALITY0_KLONGSIZE
-#  else
-extern unsigned current_klongsize;
-#  endif
-# endif
-
-# define max_addr() (~0ULL >> ((8 - current_wordsize) * 8))
-# define max_kaddr() (~0ULL >> ((8 - current_klongsize) * 8))
 
 /*
  * When u64 is interpreted by the kernel as an address, there is a difference
