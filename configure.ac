@@ -12,12 +12,12 @@
 
 AC_PREREQ(2.57)
 AC_INIT([strace],
-	m4_esyscmd([./git-version-gen .tarball-version]),
+	st_esyscmd_s([./git-version-gen .tarball-version]),
 	[strace-devel@lists.strace.io],
 	[strace],
 	[https://strace.io])
-m4_define([copyright_year], m4_esyscmd([./copyright-year-gen .year]))
-m4_define([manpage_date], m4_esyscmd([./file-date-gen strace.1.in]))
+m4_define([copyright_year], st_esyscmd_s([./copyright-year-gen .year]))
+m4_define([manpage_date], st_esyscmd_s([./file-date-gen strace.1.in]))
 AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
