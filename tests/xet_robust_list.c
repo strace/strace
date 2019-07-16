@@ -7,7 +7,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_get_robust_list && defined __NR_set_robust_list
 

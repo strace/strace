@@ -10,7 +10,7 @@
 #include "tests.h"
 #include <signal.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 static void
 handler(int sig)

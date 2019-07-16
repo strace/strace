@@ -11,7 +11,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 static struct stat before, after;
 

@@ -10,7 +10,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined(__NR_fallocate) && defined(HAVE_FALLOCATE) && HAVE_FALLOCATE
 

@@ -10,7 +10,7 @@
 #include "tests.h"
 #include <signal.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 /*
  * If the sigset size specified to rt_sigprocmask is not equal to the size

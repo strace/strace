@@ -11,7 +11,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __arm__
 # ifdef __NR_arm_fadvise64_64

@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_s390_guarded_storage && defined HAVE_ASM_GUARDED_STORAGE_H
 

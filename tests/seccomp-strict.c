@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_seccomp && defined __NR_exit
 

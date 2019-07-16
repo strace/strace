@@ -11,7 +11,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined(__NR_quotactl) && \
 	(defined(HAVE_LINUX_QUOTA_H) || defined(HAVE_SYS_QUOTA_H))

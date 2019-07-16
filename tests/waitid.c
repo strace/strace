@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 static const char *
 sprint_rusage(const struct rusage *const ru)

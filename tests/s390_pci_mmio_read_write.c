@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_s390_pci_mmio_read && defined __NR_s390_pci_mmio_write
 

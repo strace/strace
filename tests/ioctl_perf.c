@@ -16,7 +16,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <sys/ioctl.h>
-# include <asm/unistd.h>
+#include "scno.h"
 # include <linux/perf_event.h>
 
 /*

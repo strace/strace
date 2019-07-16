@@ -9,7 +9,6 @@
 
 #include "tests.h"
 #include <unistd.h>
-#include <asm/unistd.h>
 #include "scno.h"
 
 #ifdef __NR_io_uring_register

@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_umount2 && (!defined __NR_umount || __NR_umount2 != __NR_umount)
 # define TEST_SYSCALL_NR __NR_umount2

@@ -6,7 +6,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __powerpc64__ \
  || (defined __sparc__ && defined __arch64__)

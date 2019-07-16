@@ -9,7 +9,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 /*
  * On s390x and m68k, this is the mmap syscall used by glibc, so,

@@ -16,7 +16,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/wait.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 static int64_t
 usecs_from_tv(const struct timeval *const tv)

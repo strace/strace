@@ -10,7 +10,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_oldlstat && HAVE_STRUCT___OLD_KERNEL_STAT
 

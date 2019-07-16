@@ -11,7 +11,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined HAVE_SYS_FANOTIFY_H && defined HAVE_FANOTIFY_MARK && \
 	defined __NR_fanotify_mark

@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 static const char *errstr;
 

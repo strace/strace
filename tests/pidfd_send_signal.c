@@ -9,7 +9,6 @@
 
 #include "tests.h"
 #include <unistd.h>
-#include <asm/unistd.h>
 #include "scno.h"
 
 #ifdef __NR_pidfd_send_signal

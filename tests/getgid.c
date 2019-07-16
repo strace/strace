@@ -6,7 +6,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_getgid && (!defined __NR_getxgid || __NR_getxgid != __NR_getgid)
 

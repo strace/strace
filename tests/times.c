@@ -19,7 +19,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <asm/unistd.h>
+#include "scno.h"
 #include <sys/times.h>
 #include <sys/wait.h>
 

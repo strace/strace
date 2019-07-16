@@ -9,7 +9,7 @@
 
 #include "tests.h"
 #include <errno.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifndef __NR_recvmmsg
 # define __NR_recvmmsg -1

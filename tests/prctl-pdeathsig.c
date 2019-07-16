@@ -10,7 +10,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 #include <linux/prctl.h>
 
 #if defined __NR_prctl && defined PR_GET_PDEATHSIG && defined PR_SET_PDEATHSIG

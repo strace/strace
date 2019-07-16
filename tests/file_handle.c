@@ -10,7 +10,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_name_to_handle_at && defined __NR_open_by_handle_at
 

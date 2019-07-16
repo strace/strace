@@ -9,7 +9,6 @@
 
 #include "tests.h"
 #include <unistd.h>
-#include <asm/unistd.h>
 #include "scno.h"
 
 #if defined HAVE_LINUX_IO_URING_H && defined __NR_io_uring_setup

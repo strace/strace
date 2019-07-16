@@ -10,7 +10,6 @@
 #include "tests.h"
 
 #include "ptrace.h"
-#include <asm/unistd.h>
 #include "scno.h"
 
 #include <errno.h>

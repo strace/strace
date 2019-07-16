@@ -10,7 +10,7 @@
 
 # include <unistd.h>
 # include <sys/socket.h>
-# include <asm/unistd.h>
+#include "scno.h"
 
 # if defined __NR_socketcall && defined __sparc__
 /*

@@ -9,7 +9,6 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
 
 #include "raw_syscall.h"
 #include "scno.h"

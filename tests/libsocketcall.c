@@ -10,7 +10,7 @@
 #include "tests.h"
 #include <errno.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 /*
  * Invoke a socket syscall, either directly or via __NR_socketcall.

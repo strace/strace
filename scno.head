@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#include <asm/unistd.h>
+
 #if defined __X32_SYSCALL_BIT && defined __NR_read \
  && (__X32_SYSCALL_BIT & __NR_read) == __X32_SYSCALL_BIT
 # define SYSCALL_BIT __X32_SYSCALL_BIT

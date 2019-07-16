@@ -10,7 +10,7 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined HAVE_SYS_SIGNALFD_H \
  && defined HAVE_SIGNALFD \

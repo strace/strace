@@ -8,7 +8,7 @@
 #include "tests.h"
 #include <fcntl.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_eventfd2 && defined O_CLOEXEC
 

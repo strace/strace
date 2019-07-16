@@ -10,7 +10,6 @@
 
 #include "tests.h"
 #include <unistd.h>
-#include <asm/unistd.h>
 #include "scno.h"
 
 #if defined __NR_io_setup && defined __NR_io_pgetevents

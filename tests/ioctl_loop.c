@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/sysmacros.h>
-#include <asm/unistd.h>
+#include "scno.h"
 #include <linux/ioctl.h>
 #include <linux/loop.h>
 #include "print_fields.h"

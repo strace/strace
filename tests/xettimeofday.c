@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 int
 main(void)

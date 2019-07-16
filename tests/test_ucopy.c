@@ -22,7 +22,6 @@
 
 #ifndef HAVE_PROCESS_VM_READV
 
-# include <asm/unistd.h>
 # include "scno.h"
 static ssize_t
 strace_process_vm_readv(pid_t pid,

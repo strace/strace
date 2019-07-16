@@ -14,7 +14,6 @@
 
 #include "defs.h"
 #include <sys/uio.h>
-#include <asm/unistd.h>
 
 #include "scno.h"
 #include "ptrace.h"

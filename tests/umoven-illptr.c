@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 int
 main(void)

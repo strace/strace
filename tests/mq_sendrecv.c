@@ -11,7 +11,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_mq_open && __NR_mq_timedsend && __NR_mq_timedreceive && \
 	__NR_mq_notify && __NR_mq_unlink

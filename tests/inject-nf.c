@@ -12,7 +12,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include "raw_syscall.h"
 

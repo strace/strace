@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef HAVE_PRCTL
 # include <sys/prctl.h>

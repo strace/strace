@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 #include <sched.h>
 
 #if defined __NR_sched_getaffinity && defined __NR_sched_setaffinity \

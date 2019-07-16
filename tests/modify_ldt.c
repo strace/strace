@@ -9,7 +9,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_modify_ldt && defined HAVE_STRUCT_USER_DESC
 

@@ -9,7 +9,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 #include <linux/prctl.h>
 
 #if defined __NR_prctl && defined __NR_set_tid_address && \

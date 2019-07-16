@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <asm/unistd.h>
+#include "scno.h"
 #include <unistd.h>
 
 #define N 3

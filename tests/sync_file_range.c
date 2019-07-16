@@ -9,7 +9,7 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined HAVE_SYNC_FILE_RANGE && defined __NR_sync_file_range
 

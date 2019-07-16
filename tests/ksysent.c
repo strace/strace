@@ -12,7 +12,7 @@
 #include "sysent.h"
 #include <stdio.h>
 #include <string.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include "sysent_shorthand_defs.h"
 

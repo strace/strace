@@ -7,7 +7,6 @@
 
 #include "tests.h"
 #include <fcntl.h>
-#include <asm/unistd.h>
 #include "scno.h"
 
 #if defined __NR_userfaultfd && defined O_CLOEXEC

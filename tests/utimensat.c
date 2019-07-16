@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_utimensat && defined UTIME_NOW && defined UTIME_OMIT
 

@@ -6,7 +6,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined(__NR_sched_get_priority_min) \
  && defined(__NR_sched_get_priority_max)

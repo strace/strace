@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/select.h>
-#include <asm/unistd.h>
+#include "scno.h"
 #include <sys/time.h>
 
 #ifdef __NR_pselect6

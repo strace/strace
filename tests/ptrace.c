@@ -9,7 +9,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include <errno.h>
 #include "ptrace.h"

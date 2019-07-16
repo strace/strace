@@ -6,7 +6,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_getuid && (!defined __NR_getxuid || __NR_getxuid != __NR_getuid)
 

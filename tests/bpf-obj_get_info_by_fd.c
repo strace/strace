@@ -21,7 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/sysmacros.h>
-#include <asm/unistd.h>
 
 #include "print_fields.h"
 #include "scno.h"

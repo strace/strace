@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 static void
 dump_str_ex(const char *str, const unsigned int len, const int idx_w)

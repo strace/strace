@@ -7,7 +7,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef HAVE_READAHEAD
 /* Check for glibc readahead argument passing bugs. */

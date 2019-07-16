@@ -15,7 +15,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <asm/unistd.h>
 #include "scno.h"
 
 #ifdef HAVE_LINUX_BPF_H

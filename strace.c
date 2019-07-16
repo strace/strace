@@ -28,7 +28,6 @@
 #ifdef HAVE_PRCTL
 # include <sys/prctl.h>
 #endif
-#include <asm/unistd.h>
 
 #include "kill_save_errno.h"
 #include "largefile_wrappers.h"

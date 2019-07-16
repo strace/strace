@@ -12,7 +12,7 @@
 
 #include "defs.h"
 #include <sched.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifndef CSIGNAL
 # define CSIGNAL 0x000000ff

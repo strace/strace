@@ -7,7 +7,7 @@
 
 #include <signal.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include "stack-fcall.h"
 

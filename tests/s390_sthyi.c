@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined HAVE_ICONV_H && defined HAVE_ICONV_OPEN && defined __NR_s390_sthyi
 

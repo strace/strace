@@ -12,7 +12,7 @@
 
 #include <unistd.h>
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_accept
 

@@ -10,7 +10,7 @@
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_get_thread_area && defined __NR_set_thread_area \
  && defined HAVE_STRUCT_USER_DESC

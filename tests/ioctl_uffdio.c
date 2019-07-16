@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_userfaultfd && defined HAVE_LINUX_USERFAULTFD_H
 

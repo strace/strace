@@ -9,7 +9,6 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
 #include "scno.h"
 
 #if defined __NR_preadv2 && defined __NR_pwritev2

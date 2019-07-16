@@ -28,7 +28,7 @@
 #include <sys/uio.h>
 
 /* for __X32_SYSCALL_BIT */
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include "regs.h"
 

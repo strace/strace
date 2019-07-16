@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include <linux/fcntl.h>
 

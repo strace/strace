@@ -8,7 +8,7 @@
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 #include <fcntl.h>
 
 #if defined __NR_fchownat && defined AT_FDCWD && defined AT_SYMLINK_NOFOLLOW
