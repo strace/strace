@@ -1272,101 +1272,34 @@ DECL_PRINTNUM_ADDR(int64);
 extern bool
 printnum_fd(struct tcb *, kernel_ulong_t addr);
 
-# ifndef current_wordsize
-extern bool
-printnum_long_int(struct tcb *, kernel_ulong_t addr,
-		  const char *fmt_long, const char *fmt_int)
-	ATTRIBUTE_FORMAT((printf, 3, 0))
-	ATTRIBUTE_FORMAT((printf, 4, 0));
-
-extern bool printnum_addr_long_int(struct tcb *, kernel_ulong_t addr);
-
 static inline bool
 printnum_slong(struct tcb *tcp, kernel_ulong_t addr)
 {
-	return printnum_long_int(tcp, addr, "%" PRId64, "%d");
+	return dispatch_wordsize(printnum_int64, printnum_int,
+				 tcp, addr, opt_wordsize("%" PRId64, "%d"));
 }
 
 static inline bool
 printnum_ulong(struct tcb *tcp, kernel_ulong_t addr)
 {
-	return printnum_long_int(tcp, addr, "%" PRIu64, "%u");
+	return dispatch_wordsize(printnum_int64, printnum_int,
+				 tcp, addr, opt_wordsize("%" PRIu64, "%u"));
 }
 
 static inline bool
 printnum_ptr(struct tcb *tcp, kernel_ulong_t addr)
 {
-	return printnum_addr_long_int(tcp, addr);
+	return dispatch_wordsize(printnum_addr_int64, printnum_addr_int,
+				 tcp, addr);
 }
-
-# elif current_wordsize > 4
-
-static inline bool
-printnum_slong(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_int64(tcp, addr, "%" PRId64);
-}
-
-static inline bool
-printnum_ulong(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_int64(tcp, addr, "%" PRIu64);
-}
-
-static inline bool
-printnum_ptr(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_addr_int64(tcp, addr);
-}
-
-# else /* current_wordsize == 4 */
-
-static inline bool
-printnum_slong(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_int(tcp, addr, "%d");
-}
-
-static inline bool
-printnum_ulong(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_int(tcp, addr, "%u");
-}
-
-static inline bool
-printnum_ptr(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_addr_int(tcp, addr);
-}
-
-# endif
-
-# ifndef current_klongsize
-extern bool printnum_addr_klong_int(struct tcb *, kernel_ulong_t addr);
 
 static inline bool
 printnum_kptr(struct tcb *tcp, kernel_ulong_t addr)
 {
-	return printnum_addr_klong_int(tcp, addr);
+	return dispatch_klongsize(printnum_addr_int64, printnum_addr_int,
+				  tcp, addr);
 }
 
-# elif current_klongsize > 4
-
-static inline bool
-printnum_kptr(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_addr_int64(tcp, addr);
-}
-
-# else /* current_klongsize == 4 */
-
-static inline bool
-printnum_kptr(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printnum_addr_int(tcp, addr);
-}
-
-# endif
 
 # define DECL_PRINTPAIR(name)						\
 extern bool								\

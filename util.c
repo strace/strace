@@ -360,41 +360,6 @@ printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 	return true;
 }
 
-#ifndef current_wordsize
-bool
-printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,
-		  const char *const fmt_long, const char *const fmt_int)
-{
-	if (current_wordsize > sizeof(int)) {
-		return printnum_int64(tcp, addr, fmt_long);
-	} else {
-		return printnum_int(tcp, addr, fmt_int);
-	}
-}
-
-bool
-printnum_addr_long_int(struct tcb *tcp, const kernel_ulong_t addr)
-{
-	if (current_wordsize > sizeof(int)) {
-		return printnum_addr_int64(tcp, addr);
-	} else {
-		return printnum_addr_int(tcp, addr);
-	}
-}
-#endif /* !current_wordsize */
-
-#ifndef current_klongsize
-bool
-printnum_addr_klong_int(struct tcb *tcp, const kernel_ulong_t addr)
-{
-	if (current_klongsize > sizeof(int)) {
-		return printnum_addr_int64(tcp, addr);
-	} else {
-		return printnum_addr_int(tcp, addr);
-	}
-}
-#endif /* !current_klongsize */
-
 /**
  * Prints time to a (static internal) buffer and returns pointer to it.
  * Returns NULL if the provided time specification is not correct.
