@@ -4,6 +4,11 @@ Noteworthy changes in release ?.? (????-??-??)
 * Bug fixes
   * Fixed tests on alpha with Linux kernel headers 5.1+.
 
+* Portability
+  * Removed support for decoding syscalls in range [1024...1079] on AArch64
+    architecture as this range has never been implemented in mainline kernel
+    releases.
+
 Noteworthy changes in release 5.2 (2019-07-12)
 ==============================================
 
