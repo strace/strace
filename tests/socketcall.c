@@ -10,7 +10,7 @@
 #include "tests.h"
 #include <asm/unistd.h>
 
-#ifdef __NR_socketcall
+#if defined __NR_socketcall && !defined __ARM_EABI__
 
 # include <assert.h>
 # include <stdio.h>
@@ -70,6 +70,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_socketcall")
+SKIP_MAIN_UNDEFINED("__NR_socketcall && !__ARM_EABI__")
 
 #endif
