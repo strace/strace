@@ -556,6 +556,9 @@ AC_CHECK_TYPES([struct statfs64], [
 ],, [#include <linux/types.h>
 #include <asm/statfs.h>])
 
+AC_CHECK_TYPES([struct statx],,, [#include <linux/types.h>
+#include <linux/stat.h>])
+
 AC_CHECK_TYPES([struct blk_user_trace_setup],,, [#include <linux/blktrace_api.h>])
 
 AC_CHECK_TYPES([struct mtd_write_req],,, [#include <mtd/mtd-abi.h>])
