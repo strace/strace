@@ -1275,7 +1275,7 @@ bool
 print_array_ex(struct tcb *const tcp,
 	       const kernel_ulong_t start_addr,
 	       const size_t nmemb,
-	       void *const elem_buf,
+	       void *elem_buf,
 	       const size_t elem_size,
 	       tfetch_mem_fn tfetch_mem_func,
 	       print_fn print_func,
@@ -1298,7 +1298,10 @@ print_array_ex(struct tcb *const tcp,
 	const kernel_ulong_t end_addr = start_addr + size;
 
 	if (end_addr <= start_addr || size / elem_size != nmemb) {
-		printaddr(start_addr);
+		if (tfetch_mem_func)
+			printaddr(start_addr);
+		else
+			tprints("???");
 		return false;
 	}
 
@@ -1313,14 +1316,18 @@ print_array_ex(struct tcb *const tcp,
 		if (cur != start_addr)
 			tprints(", ");
 
-		if (!tfetch_mem_func(tcp, cur, elem_size, elem_buf)) {
-			if (cur == start_addr)
-				printaddr(cur);
-			else {
-				tprints("...");
-				printaddr_comment(cur);
+		if (tfetch_mem_func) {
+			if (!tfetch_mem_func(tcp, cur, elem_size, elem_buf)) {
+				if (cur == start_addr)
+					printaddr(cur);
+				else {
+					tprints("...");
+					printaddr_comment(cur);
+				}
+				break;
 			}
-			break;
+		} else {
+			elem_buf = (void *) (uintptr_t) cur;
 		}
 
 		if (cur == start_addr)

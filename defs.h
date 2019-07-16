@@ -852,8 +852,29 @@ typedef const char * (*sprint_obj_by_addr_fn)(struct tcb *, kernel_ulong_t);
 
 
 /**
- * @param flags Combination of xlat style settings and additional flags from
- *              enum print_array_flags.
+ * Array printing function with over-engineered interface.
+ *
+ * @param start_addr       If tfetch_mem_fn is non-NULL: address in tracee's
+ *                         memory where the start of the array is located.
+ *                         If tfetch_mem_fn is NULL: ignored.
+ * @param nmemb            Number of elements in array.
+ * @param elem_buf         If tfetch_mem_fn is non-NULL: a buffer where each
+ *                         element fetched by tfetch_mem_fn is stored.
+ *                         If tfetch_mem_fn is NULL: address of the start of
+ *                         the array in local memory.
+ * @param elem_size        Size (in bytes) of each element in the array.
+ * @param tfetch_mem_fn    Fetching function. If NULL, then elem_buf is treated
+ *                         as local array of nmemb members elem_size each;
+ *                         start_addr is ignored.
+ * @param print_func       Element printing callback.
+ * @param opaque_data      A value that is unconditionally passed to print_func
+ *                         in opaque_data argument.
+ * @param flags            Combination of xlat style settings and additional
+ *                         flags from enum print_array_flags.
+ * @param index_xlat       Xlat array that is used for printing indices.
+ * @param index_xlat_size  The size of xlat array.
+ * @param index_dflt       Default string for the values not found
+ *                         in index_xlat.
  */
 extern bool
 print_array_ex(struct tcb *,
@@ -868,6 +889,7 @@ print_array_ex(struct tcb *,
 	       const struct xlat *index_xlat,
 	       const char *index_dflt);
 
+/** Print an array from tracee's memory without any index printing features. */
 static inline bool
 print_array(struct tcb *const tcp,
 	    const kernel_ulong_t start_addr,
@@ -881,6 +903,22 @@ print_array(struct tcb *const tcp,
 	return print_array_ex(tcp, start_addr, nmemb, elem_buf, elem_size,
 			      tfetch_mem_func, print_func, opaque_data,
 			      0, NULL, NULL);
+}
+
+/** Shorthand for printing local arrays. */
+static inline bool
+print_local_array(struct tcb *tcp,
+		  void *start_addr,
+		  const size_t nmemb,
+		  void *const elem_buf,
+		  const size_t elem_size,
+		  print_fn print_func,
+		  void *const opaque_data,
+		  unsigned int flags)
+{
+	return print_array_ex(tcp, (uintptr_t) start_addr , nmemb,
+			      elem_buf, elem_size, NULL, print_func,
+			      opaque_data, flags, NULL, NULL);
 }
 
 extern kernel_ulong_t *
