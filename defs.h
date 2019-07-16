@@ -765,6 +765,7 @@ sprintxval(char *buf, size_t size, const struct xlat *xlat, unsigned int val,
 enum xlat_style_private_flag_bits {
 	/* print_array */
 	PAF_PRINT_INDICES_BIT = XLAT_STYLE_SPEC_BITS + 1,
+	PAF_ARRAY_TRUNCATED_BIT,
 
 	/* print_xlat */
 	PXF_DEFAULT_STR_BIT,
@@ -775,6 +776,7 @@ enum xlat_style_private_flag_bits {
 enum xlat_style_private_flags {
 	/* print_array */
 	FLAG_(PAF_PRINT_INDICES),
+	FLAG_(PAF_ARRAY_TRUNCATED),
 
 	/* print_xlat */
 	FLAG_(PXF_DEFAULT_STR),
