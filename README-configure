@@ -57,7 +57,7 @@ you want to change it or regenerate 'configure' using a newer version of
 
   2. Type 'make' to compile the package.
 
-  3. Optionally, type 'make check' to run any self-tests that come with
+  3. Optionally, type 'make -k check' to run any self-tests that come with
      the package, generally using the just-built uninstalled binaries.
 
   4. Type 'make install' to install the programs and any data files and

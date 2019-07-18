@@ -73,7 +73,7 @@ messages telling which features it is checking for.
 Type @samp{make} to compile the package.
 
 @item
-Optionally, type @samp{make check} to run any self-tests that come with
+Optionally, type @samp{make -k check} to run any self-tests that come with
 the package, generally using the just-built uninstalled binaries.
 
 @item
