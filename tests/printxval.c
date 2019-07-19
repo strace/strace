@@ -13,9 +13,9 @@
 #include "xlat.h"
 #include <stdio.h>
 
-int
-printxval(const struct xlat *xlat, unsigned long long val,
-	  const char *const dflt)
+#if !XLAT_RAW
+static const char *
+lookup_xlat(const struct xlat *xlat, unsigned long long val)
 {
 	const struct xlat_data *xd = xlat->data;
 
@@ -24,13 +24,76 @@ printxval(const struct xlat *xlat, unsigned long long val,
 			continue;
 
 		if (xd->val == val) {
-			fputs(xd->str, stdout);
-			return 1;
+			return xd->str;
 		}
 	}
 
+	return NULL;
+}
+#endif
+
+int
+XLAT_NAME(printxval)(const struct xlat *xlat, unsigned long long val,
+		     const char *const dflt)
+{
+#if XLAT_RAW
 	printf("%#llx", val);
+
+	return 1;
+#else
+	const char *str = lookup_xlat(xlat, val);
+
+# if XLAT_VERBOSE
+	printf("%#llx", val);
+	if (str || dflt)
+		printf(" /* %s */", str ?: dflt);
+# else
+	if (str) {
+		fputs(str, stdout);
+	} else {
+		printf("%#llx", val);
+		if (dflt)
+			printf(" /* %s */", dflt);
+	}
+# endif /* XLAT_VERBOSE */
+
+	return !!str;
+#endif /* XLAT_RAW */
+}
+
+const char *
+XLAT_NAME(sprintxlat)(const char *str, unsigned long long val,
+		      const char *const dflt)
+{
+	static char buf[256];
+
+#if XLAT_RAW
+	snprintf(buf, sizeof(buf), "%#llx", val);
+#elif XLAT_VERBOSE
+	if (str || dflt)
+		snprintf(buf, sizeof(buf), "%#llx /* %s */", val, str ?: dflt);
+	else
+		snprintf(buf, sizeof(buf), "%#llx", val);
+#else
+	if (str)
+		return str;
+
 	if (dflt)
-		printf(" /* %s */", dflt);
-	return 0;
+		snprintf(buf, sizeof(buf), "%#llx /* %s */", val, dflt);
+	else
+		snprintf(buf, sizeof(buf), "%#llx", val);
+#endif
+
+	return buf;
+}
+
+const char *
+XLAT_NAME(sprintxval)(const struct xlat *xlat, unsigned long long val,
+		      const char *const dflt)
+{
+#if XLAT_RAW
+	return sprintxlat(NULL, val, dflt);
+#else
+	return sprintxlat(lookup_xlat(xlat, val), val, dflt);
+#endif
 }

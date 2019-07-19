@@ -223,7 +223,41 @@ struct xlat;
 int printflags(const struct xlat *, const unsigned long long, const char *);
 
 /* Print constant in symbolic form according to xlat table. */
-int printxval(const struct xlat *, const unsigned long long, const char *);
+int printxval_abbrev(const struct xlat *, const unsigned long long,
+		     const char *);
+int printxval_raw(const struct xlat *, const unsigned long long, const char *);
+int printxval_verbose(const struct xlat *, const unsigned long long,
+		      const char *);
+
+/* Print constant in symbolic form according to xlat table. */
+const char *sprintxlat_abbrev(const char *, const unsigned long long,
+			   const char *);
+const char *sprintxlat_raw(const char *, const unsigned long long,
+			   const char *);
+const char *sprintxlat_verbose(const char *, const unsigned long long,
+			       const char *);
+
+/* Print constant in symbolic form according to xlat table. */
+const char *sprintxval_abbrev(const struct xlat *, const unsigned long long,
+			      const char *);
+const char *sprintxval_raw(const struct xlat *, const unsigned long long,
+			   const char *);
+const char *sprintxval_verbose(const struct xlat *, const unsigned long long,
+			       const char *);
+
+# if XLAT_RAW
+#  define printxval  printxval_raw
+#  define sprintxlat sprintxlat_raw
+#  define sprintxval sprintxval_raw
+# elif XLAT_VERBOSE
+#  define printxval  printxval_verbose
+#  define sprintxlat sprintxlat_verbose
+#  define sprintxval sprintxval_verbose
+# else
+#  define printxval  printxval_abbrev
+#  define sprintxlat sprintxlat_abbrev
+#  define sprintxval sprintxval_abbrev
+# endif
 
 /* Invoke a socket syscall, either directly or via __NR_socketcall. */
 int socketcall(const int nr, const int call,

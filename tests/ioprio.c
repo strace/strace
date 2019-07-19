@@ -58,17 +58,12 @@ main(void)
 	errstr = sprintrc(rc);
 # if XLAT_RAW
 	printf("ioprio_get(0x1, 0) = %s\n", errstr);
-# elif XLAT_VERBOSE
-	printf("ioprio_get(0x1 /* IOPRIO_WHO_PROCESS */, 0) = %s", errstr);
-	if (rc >= 0) {
-		printf(" (IOPRIO_PRIO_VALUE(%u /* ", (unsigned int) rc >> 13);
-		printxval(ioprio_class, (unsigned int) rc >> 13,
-			  "IOPRIO_CLASS_???");
-		printf(" */, %u))", (unsigned int) rc & 0x1fff);
-	}
-	puts("");
 # else /* XLAT_ABBREV */
+#  if XLAT_VERBOSE
+	printf("ioprio_get(0x1 /* IOPRIO_WHO_PROCESS */, 0) = %s", errstr);
+#  else
 	printf("ioprio_get(IOPRIO_WHO_PROCESS, 0) = %s", errstr);
+#  endif
 	if (rc >= 0) {
 		printf(" (IOPRIO_PRIO_VALUE(");
 		printxval(ioprio_class, (unsigned int) rc >> 13,
