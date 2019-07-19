@@ -171,7 +171,13 @@ ioctl_dm-v
 ioctl_evdev
 ioctl_evdev-success
 ioctl_evdev-success-v
+ioctl_evdev-Xabbrev
+ioctl_evdev-Xraw
+ioctl_evdev-Xverbose
 ioctl_evdev-v
+ioctl_evdev-v-Xabbrev
+ioctl_evdev-v-Xraw
+ioctl_evdev-v-Xverbose
 ioctl_inotify
 ioctl_kvm_run
 ioctl_kvm_run-v

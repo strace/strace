@@ -844,6 +844,20 @@ extern bool print_uint32_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
 extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
+extern bool print_xint32_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
+extern bool print_xint64_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
+
+static inline bool
+print_xlong_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			 void *data)
+{
+	return dispatch_wordsize(print_xint64_array_member,
+				 print_xint32_array_member,
+				 tcp, elem_buf, elem_size, data);
+}
+
 
 typedef bool (*tfetch_mem_fn)(struct tcb *, kernel_ulong_t addr,
 			      unsigned int size, void *dest);

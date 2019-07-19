@@ -106,7 +106,13 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	int_0x80 \
 	ioctl_dm-v \
 	ioctl_evdev-success \
+	ioctl_evdev-success-Xabbrev \
+	ioctl_evdev-success-Xraw \
+	ioctl_evdev-success-Xverbose \
 	ioctl_evdev-success-v \
+	ioctl_evdev-success-v-Xabbrev \
+	ioctl_evdev-success-v-Xraw \
+	ioctl_evdev-success-v-Xverbose \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_nsfs \

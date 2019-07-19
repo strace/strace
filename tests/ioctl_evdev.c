@@ -26,6 +26,12 @@
 #  define ABS_MT_TOOL_Y 0x3d
 # endif
 
+# if XLAT_VERBOSE
+#  define UNK_CMD(val_, str_) val_
+# else
+#  define UNK_CMD(val_, str_) val_ " /* " str_ " */"
+# endif
+
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
@@ -43,9 +49,11 @@ print_envelope(const struct ff_envelope *const e)
 static void
 print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 {
-	printf("ioctl(-1, EVIOCSFF, {type=%s, id=%" PRIu16
+	printf("ioctl(-1, %s", XLAT_STR(EVIOCSFF));
+	printf(", {type=%s, id=%" PRIu16
 	       ", direction=%" PRIu16 ", ",
-	       type_str, ffe->id, ffe->direction);
+	       sprintxlat(type_str, ffe->type, NULL),
+	       ffe->id, ffe->direction);
 # if VERBOSE
 	printf("trigger={button=%hu, interval=%hu}"
 	       ", replay={length=%hu, delay=%hu}",
@@ -54,10 +62,11 @@ print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 # endif /* VERBOSE */
 }
 
-# define TEST_NULL_ARG_EX(cmd, str)						\
+# define TEST_NULL_ARG_EX(cmd, str)					\
 	do {								\
 		ioctl(-1, cmd, 0);					\
-		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", str);	\
+		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",		\
+		       sprintxlat(str, cmd, NULL));			\
 	} while (0)
 
 # define TEST_NULL_ARG(cmd) TEST_NULL_ARG_EX(cmd, #cmd)
@@ -107,17 +116,23 @@ main(void)
 	TEST_NULL_ARG(EVIOCGABS(ABS_X));
 	TEST_NULL_ARG(EVIOCSABS(ABS_X));
 
-	TEST_NULL_ARG_EX(EVIOCGABS(0xe), "EVIOCGABS(0xe /* ABS_??? */)");
-	TEST_NULL_ARG_EX(EVIOCSABS(0xe), "EVIOCSABS(0xe /* ABS_??? */)");
+	TEST_NULL_ARG_EX(EVIOCGABS(0xe),
+			 "EVIOCGABS(" UNK_CMD("0xe", "ABS_???") ")");
+	TEST_NULL_ARG_EX(EVIOCSABS(0xe),
+			 "EVIOCSABS(" UNK_CMD("0xe", "ABS_???") ")");
 
 	TEST_NULL_ARG(EVIOCGABS(ABS_MT_TOOL_Y));
 	TEST_NULL_ARG(EVIOCSABS(ABS_MT_TOOL_Y));
 
-	TEST_NULL_ARG_EX(EVIOCGABS(0x3e), "EVIOCGABS(0x3e /* ABS_??? */)");
-	TEST_NULL_ARG_EX(EVIOCSABS(0x3e), "EVIOCSABS(0x3e /* ABS_??? */)");
+	TEST_NULL_ARG_EX(EVIOCGABS(0x3e),
+			 "EVIOCGABS(" UNK_CMD("0x3e", "ABS_???") ")");
+	TEST_NULL_ARG_EX(EVIOCSABS(0x3e),
+			 "EVIOCSABS(" UNK_CMD("0x3e", "ABS_???") ")");
 
-	TEST_NULL_ARG_EX(EVIOCGABS(0x3f), "EVIOCGABS(0x3f /* ABS_??? */)");
-	TEST_NULL_ARG_EX(EVIOCSABS(0x3f), "EVIOCSABS(0x3f /* ABS_??? */)");
+	TEST_NULL_ARG_EX(EVIOCGABS(0x3f),
+			 "EVIOCGABS(" UNK_CMD("0x3f", "ABS_???") ")");
+	TEST_NULL_ARG_EX(EVIOCSABS(0x3f),
+			 "EVIOCSABS(" UNK_CMD("0x3f", "ABS_???") ")");
 
 	TEST_NULL_ARG(EVIOCGBIT(0, 0));
 	TEST_NULL_ARG(EVIOCGBIT(EV_KEY, 1));
@@ -132,25 +147,36 @@ main(void)
 	TEST_NULL_ARG(EVIOCGBIT(EV_PWR, 10));
 	TEST_NULL_ARG(EVIOCGBIT(EV_FF_STATUS, 11));
 
-	TEST_NULL_ARG_EX(EVIOCGBIT(0x6, 12), "EVIOCGBIT(0x6 /* EV_??? */, 12)");
+	TEST_NULL_ARG_EX(EVIOCGBIT(0x6, 12),
+			 "EVIOCGBIT(" UNK_CMD("0x6", "EV_???") ", 12)");
 	TEST_NULL_ARG_EX(EVIOCGBIT(0x18, 13),
-			 "EVIOCGBIT(0x18 /* EV_??? */, 13)");
+			 "EVIOCGBIT(" UNK_CMD("0x18", "EV_???") ", 13)");
 	TEST_NULL_ARG_EX(EVIOCGBIT(0x1f, 14),
-			 "EVIOCGBIT(0x1f /* EV_??? */, 14)");
+			 "EVIOCGBIT(" UNK_CMD("0x1f", "EV_???") ", 14)");
 
 	ioctl(-1, EVIOCGBIT(EV_MAX, 42), 0);
-	printf("ioctl(-1, EVIOCGBIT(%#x /* EV_??? */, 42), NULL)"
-	       " = -1 EBADF (%m)\n", EV_MAX);
+	printf("ioctl(-1, ");
+# if XLAT_RAW
+	printf("%#x", EVIOCGBIT(EV_MAX, 42));
+# elif XLAT_VERBOSE
+	printf("%#x /* EVIOCGBIT(%#x, 42) */", EVIOCGBIT(EV_MAX, 42), EV_MAX);
+# else
+	printf("EVIOCGBIT(%#x /* EV_??? */, 42)", EV_MAX);
+# endif
+	printf(", NULL) = -1 EBADF (%m)\n");
 
 	ioctl(-1, EVIOCRMFF, lmagic);
-	printf("ioctl(-1, EVIOCRMFF, %d) = -1 EBADF (%m)\n", (int) lmagic);
+	printf("ioctl(-1, %s, %d) = -1 EBADF (%m)\n",
+	       XLAT_STR(EVIOCRMFF), (int) lmagic);
 
 	ioctl(-1, EVIOCGRAB, lmagic);
-	printf("ioctl(-1, EVIOCGRAB, %lu) = -1 EBADF (%m)\n", lmagic);
+	printf("ioctl(-1, %s, %lu) = -1 EBADF (%m)\n",
+	       XLAT_STR(EVIOCGRAB), lmagic);
 
 # ifdef EVIOCREVOKE
 	ioctl(-1, EVIOCREVOKE, lmagic);
-	printf("ioctl(-1, EVIOCREVOKE, %lu) = -1 EBADF (%m)\n", lmagic);
+	printf("ioctl(-1, %s, %lu) = -1 EBADF (%m)\n",
+	       XLAT_STR(EVIOCREVOKE), lmagic);
 # endif
 
 	const unsigned int size = get_page_size();
@@ -162,7 +188,8 @@ main(void)
 
 # ifdef EVIOCSCLOCKID
 	ioctl(-1, EVIOCSCLOCKID, val_int);
-	printf("ioctl(-1, EVIOCSCLOCKID, [%u]) = -1 EBADF (%m)\n", *val_int);
+	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
+	       XLAT_STR(EVIOCSCLOCKID), *val_int);
 # endif
 
 	int *pair_int = tail_alloc(sizeof(*pair_int) * 2);
@@ -171,14 +198,15 @@ main(void)
 
 # ifdef EVIOSGREP
 	ioctl(-1, EVIOCSREP, pair_int);
-	printf("ioctl(-1, EVIOCSREP, [%u, %u]) = -1 EBADF (%m)\n",
-	       pair_int[0], pair_int[1]);
+	printf("ioctl(-1, %s, [%u, %u]) = -1 EBADF (%m)\n",
+	       XLAT_STR(EVIOCSREP), pair_int[0], pair_int[1]);
 # endif
 
 	pair_int[1] = 1;
 	ioctl(-1, EVIOCSKEYCODE, pair_int);
-	printf("ioctl(-1, EVIOCSKEYCODE, [%u, %s]) = -1 EBADF (%m)\n",
-	       pair_int[0], "KEY_ESC");
+	printf("ioctl(-1, %s, [%u, %s]) = -1 EBADF (%m)\n",
+	       XLAT_STR(EVIOCSKEYCODE), pair_int[0],
+	       XLAT_KNOWN(0x1, "KEY_ESC"));
 
 # ifdef EVIOCSKEYCODE_V2
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_keymap_entry, ike);
@@ -186,11 +214,11 @@ main(void)
 	ike->keycode = 2;
 
 	ioctl(-1, EVIOCSKEYCODE_V2, ike);
-	printf("ioctl(-1, EVIOCSKEYCODE_V2, {flags=%" PRIu8
-	       ", len=%" PRIu8 ", ", ike->flags, ike->len);
+	printf("ioctl(-1, %s, {flags=%" PRIu8 ", len=%" PRIu8 ", ",
+	       XLAT_STR(EVIOCSKEYCODE_V2), ike->flags, ike->len);
 #  if VERBOSE
 	printf("index=%" PRIu16 ", keycode=%s, scancode=[",
-	       ike->index, "KEY_1");
+	       ike->index, XLAT_STR(KEY_1));
 	unsigned int i;
 	for (i = 0; i < ARRAY_SIZE(ike->scancode); ++i) {
 		if (i > 0)
@@ -256,26 +284,37 @@ main(void)
 
 	ffe->type = 0xff;
 	ioctl(-1, EVIOCSFF, ffe);
-	print_ffe_common(ffe, "0xff /* FF_??? */");
+	print_ffe_common(ffe,
+#  if !XLAT_RAW && !XLAT_VERBOSE
+		"0xff"
+#  endif
+#  if !XLAT_VERBOSE
+		" /* "
+#  endif
+		"FF_???"
+#  if !XLAT_VERBOSE
+		" */"
+#  endif
+		);
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
 # endif
 
 	ioctl(-1, _IOC(_IOC_READ, 0x45, 0x1, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_READ, 0x45, 0x1, 0xff)", lmagic);
+	       XLAT_STR(_IOC(_IOC_READ, 0x45, 0x1, 0xff)), lmagic);
 
 	ioctl(-1, _IOC(_IOC_WRITE, 0x45, 0x1, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_WRITE, 0x45, 0x1, 0xff)", lmagic);
+	       XLAT_STR(_IOC(_IOC_WRITE, 0x45, 0x1, 0xff)), lmagic);
 
 	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff)", lmagic);
+	       XLAT_STR(_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0xfe, 0xff)), lmagic);
 
 	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0)", lmagic);
+	       XLAT_STR(_IOC(_IOC_READ|_IOC_WRITE, 0x45, 0, 0)), lmagic);
 
 	puts("+++ exited with 0 +++");
 	return 0;

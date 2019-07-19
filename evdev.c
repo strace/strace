@@ -169,27 +169,44 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (umove_or_printaddr(tcp, arg, &decoded_arg))
 		return RVAL_IOCTL_DECODED;
 
-	tprints("[");
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
+		tprints("[");
 
-	int bit_displayed = 0;
-	int i = next_set_bit(decoded_arg, 0, size_bits);
-	if (i < 0) {
-		tprints(" 0 ");
-	} else {
-		printxval(decode_nr, i, dflt);
-
-		while ((i = next_set_bit(decoded_arg, i + 1, size_bits)) > 0) {
-			if (abbrev(tcp) && bit_displayed >= 3) {
-				tprints(", ...");
-				break;
-			}
-			tprints(", ");
+		int bit_displayed = 0;
+		int i = next_set_bit(decoded_arg, 0, size_bits);
+		if (i < 0) {
+			tprints(" 0 ");
+		} else {
 			printxval(decode_nr, i, dflt);
-			bit_displayed++;
+
+			while ((i = next_set_bit(decoded_arg, i + 1,
+						 size_bits)) > 0) {
+				if (abbrev(tcp) && bit_displayed >= 3) {
+					tprints(", ...");
+					break;
+				}
+				tprints(", ");
+				printxval(decode_nr, i, dflt);
+				bit_displayed++;
+			}
 		}
+
+		tprints("]");
 	}
 
-	tprints("]");
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
+		uint64_t elem;
+
+		print_local_array(tcp, decoded_arg, size / current_wordsize,
+				  &elem, current_wordsize,
+				  print_xlong_array_member, NULL, 0);
+	}
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" */");
 
 	return RVAL_IOCTL_DECODED;
 }

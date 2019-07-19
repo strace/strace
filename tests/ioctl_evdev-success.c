@@ -44,7 +44,7 @@ static void
 test_evdev(struct evdev_check *check, const void *arg)
 {
 	long rc = invoke_test_syscall(check->cmd, check->arg_ptr);
-	printf("ioctl(-1, %s, ", check->cmd_str);
+	printf("ioctl(-1, %s, ", sprintxlat(check->cmd_str, check->cmd, NULL));
 	if (check->print_arg)
 		check->print_arg(rc, check->arg_ptr, arg);
 	else
@@ -115,26 +115,52 @@ print_mtslots(long rc, const void *ptr, const void *arg)
 static void
 print_getbit(long rc, const void *ptr, const void *arg)
 {
-	const char * const *str = arg;
+	const char * const *str = arg + sizeof(char *);
+# if XLAT_RAW || XLAT_VERBOSE
+	const unsigned long *buf = ptr;
+	const unsigned long buf_size = (uintptr_t) (str[-1]);
+# endif
+
+
 
 	if (rc <= 0) {
 		printf("%p", ptr);
 		return;
 	}
 
+# if !XLAT_RAW
 	printf("[");
 	for (unsigned long i = 0; str[i]; i++) {
-# if ! VERBOSE
+#  if ! VERBOSE
 		if (i >= 4) {
 			printf(", ...");
 			break;
 		}
-# endif
+#  endif
 		if (i)
 			printf(", ");
 		printf("%s", str[i]);
 	}
 	printf("]");
+# endif /* !XLAT_RAW */
+
+# if XLAT_VERBOSE
+	printf(" /* ");
+# endif
+
+# if XLAT_RAW || XLAT_VERBOSE
+	printf("[");
+	const unsigned long cnt =
+		(MIN((unsigned long) rc, buf_size) + sizeof(long) - 1)
+		/ sizeof(long);
+	for (unsigned long i = 0; i < cnt; i++)
+		printf("%s%#lx", i ? ", " : "", buf[i]);
+	printf("]");
+# endif
+
+# if XLAT_VERBOSE
+	printf(" */");
+# endif
 }
 
 int
@@ -159,8 +185,8 @@ main(int argc, char **argv)
 
 	for (unsigned int i = 0; i < num_skip; i++) {
 		long rc = ioctl(-1, EVIOCGID, NULL);
-		printf("ioctl(-1, EVIOCGID, NULL) = %s%s\n",
-		       sprintrc(rc),
+		printf("ioctl(-1, %s, NULL) = %s%s\n",
+		       XLAT_STR(EVIOCGID), sprintrc(rc),
 		       rc == inject_retval ? " (INJECTED)" : "");
 
 		if (rc != inject_retval)
@@ -187,7 +213,18 @@ main(int argc, char **argv)
 	/* invalid flag */
 	static const unsigned int invalid_mtslot[] = { -1, 1 };
 	static const char * const invalid_mtslot_str[] = {
-		"0xffffffff /* ABS_MT_??? */", "1", NULL };
+		""
+#  if !XLAT_RAW && !XLAT_VERBOSE
+		"0xffffffff"
+#  endif
+#  if !XLAT_VERBOSE
+		" /* "
+#  endif
+		"ABS_MT_???"
+#  if !XLAT_VERBOSE
+		" */"
+#  endif
+		, "1", NULL };
 # endif
 
 	enum { ULONG_BIT = sizeof(unsigned long) * 8 };
@@ -197,21 +234,30 @@ main(int argc, char **argv)
 		1 << EV_ABS | 1 << EV_MSC | 1 << EV_LED | 1 << EV_SND
 		| 1 << EV_PWR };
 	static const char * const ev_more_str_2[] = {
-		"EV_ABS", "EV_MSC", NULL };
+		(char *) (uintptr_t) 4,
+		XLAT_KNOWN(0x3, "EV_ABS"), XLAT_KNOWN(0x4, "EV_MSC"), NULL };
 	static const char * const ev_more_str_3[] = {
-		"EV_ABS", "EV_MSC", "EV_LED", "EV_SND", "EV_PWR", NULL };
+		(char *) (uintptr_t) 4,
+		XLAT_KNOWN(0x3, "EV_ABS"), XLAT_KNOWN(0x4, "EV_MSC"),
+		XLAT_KNOWN(0x11, "EV_LED"), XLAT_KNOWN(0x12, "EV_SND"),
+		XLAT_KNOWN(0x16, "EV_PWR"), NULL };
 
 	/* set less than 4 bits */
 	static const unsigned long ev_less[NUM_WORDS] = {
 		1 << EV_ABS | 1 << EV_MSC | 1 << EV_LED };
 	static const char * const ev_less_str_2[] = {
-		"EV_ABS", "EV_MSC", NULL };
+		(char *) (uintptr_t) 4,
+		XLAT_KNOWN(0x3, "EV_ABS"), XLAT_KNOWN(0x4, "EV_MSC"), NULL };
 	static const char * const ev_less_str_3[] = {
-		"EV_ABS", "EV_MSC", "EV_LED", NULL };
+		(char *) (uintptr_t) 4,
+		XLAT_KNOWN(0x3, "EV_ABS"), XLAT_KNOWN(0x4, "EV_MSC"),
+		XLAT_KNOWN(0x11, "EV_LED"), NULL };
 
 	/* set zero bit */
 	static const unsigned long ev_zero[NUM_WORDS] = { 0x0 };
-	static const char * const ev_zero_str[] = { " 0 ", NULL };
+	static const char * const ev_zero_str[] = {
+		(char *) (uintptr_t) 1,
+		" 0 ", NULL };
 
 	/* KEY_MAX is 0x2ff which is greater than retval * 8 */
 	static const unsigned long key[NUM_WORDS] = {
@@ -219,9 +265,12 @@ main(int argc, char **argv)
 		[ KEY_F12 / ULONG_BIT ] = 1 << (KEY_F12 % ULONG_BIT) };
 
 	static const char * const key_str_8[] = {
-		"KEY_1", "KEY_2", NULL };
+		(char *) (uintptr_t) (NUM_WORDS * sizeof(long)),
+		XLAT_KNOWN(0x2, "KEY_1"), XLAT_KNOWN(0x3, "KEY_2"), NULL };
 	static const char * const key_str_16[] = {
-		"KEY_1", "KEY_2", "KEY_F12", NULL };
+		(char *) (uintptr_t) (NUM_WORDS * sizeof(long)),
+		XLAT_KNOWN(0x2, "KEY_1"), XLAT_KNOWN(0x3, "KEY_2"),
+		XLAT_KNOWN(0x58, "KEY_F12"), NULL };
 
 	assert(sizeof(ev_more) >= (unsigned long) inject_retval);
 	assert(sizeof(ev_less) >= (unsigned long) inject_retval);

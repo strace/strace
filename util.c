@@ -1240,6 +1240,24 @@ print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	return true;
 }
 
+bool
+print_xint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%#" PRIx32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+bool
+print_xint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%#" PRIx64, *(uint64_t *) elem_buf);
+
+	return true;
+}
+
 /*
  * Iteratively fetch and print up to nmemb elements of elem_size size
  * from the array that starts at tracee's address start_addr.

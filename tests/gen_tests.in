@@ -139,9 +139,21 @@ io_uring_setup	-a26 -y
 ioctl_block	+ioctl.test
 ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9
-ioctl_evdev	+ioctl.test
-ioctl_evdev-v	+ioctl.test -v
+ioctl_evdev	+ioctl.test -a26
+ioctl_evdev-Xabbrev	+ioctl.test -a26 -Xabbrev
+ioctl_evdev-Xraw	+ioctl.test -a28 -Xraw
+ioctl_evdev-Xverbose	+ioctl.test -a41 -Xverbose
+ioctl_evdev-v	+ioctl.test -a26 -v
+ioctl_evdev-v-Xabbrev	+ioctl.test -a26 -v -Xabbrev
+ioctl_evdev-v-Xraw	+ioctl.test -a28 -v -Xraw
+ioctl_evdev-v-Xverbose	+ioctl.test -a41 -v -Xverbose
+ioctl_evdev-success-Xabbrev	+ioctl_evdev-success.test -Xabbrev
+ioctl_evdev-success-Xraw	+ioctl_evdev-success.test -a27 -Xraw
+ioctl_evdev-success-Xverbose	+ioctl_evdev-success.test -a43 -Xverbose
 ioctl_evdev-success-v	+ioctl_evdev-success.test -a26 -v
+ioctl_evdev-success-v-Xabbrev	+ioctl_evdev-success.test -v -Xabbrev
+ioctl_evdev-success-v-Xraw	+ioctl_evdev-success.test -a27 -v -Xraw
+ioctl_evdev-success-v-Xverbose	+ioctl_evdev-success.test -a43 -v -Xverbose
 ioctl_inotify	+ioctl.test
 ioctl_kvm_run	+ioctl.test -a36 -y
 ioctl_kvm_run-v	+ioctl.test -v -a36 -y
