@@ -249,7 +249,6 @@ DECODER_TESTS = \
 	int_0x80.test \
 	inotify_init-y.test \
 	ioctl.test \
-	ioctl_evdev-success-v.test \
 	ioctl_evdev-success.test \
 	ioctl_perf-success.test \
 	ipc_msgbuf.test \

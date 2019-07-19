@@ -141,6 +141,7 @@ ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9
 ioctl_evdev	+ioctl.test
 ioctl_evdev-v	+ioctl.test -v
+ioctl_evdev-success-v	+ioctl_evdev-success.test -a26 -v
 ioctl_inotify	+ioctl.test
 ioctl_kvm_run	+ioctl.test -a36 -y
 ioctl_kvm_run-v	+ioctl.test -v -a36 -y
