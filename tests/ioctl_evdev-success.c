@@ -96,19 +96,18 @@ print_input_id(long rc, const void *ptr, const void *arg)
 static void
 print_mtslots(long rc, const void *ptr, const void *arg)
 {
-	const int *buffer = ptr;
+	const unsigned int *buffer = ptr;
 	const char * const * str = arg;
-	int num = atoi(*(str + 1));
 
 	if (rc < 0) {
 		printf("%p", buffer);
 		return;
 	}
 
-	printf("{code=%s", *str);
+	printf("{code=%s", sprintxlat(*str, *buffer, NULL));
 	printf(", values=[");
-	for (unsigned int i = 1; i <= (unsigned) num; i++)
-		printf("%s%s", i > 1 ? ", " : "", *(str + i + 1));
+	for (unsigned int i = 1; str[i]; i++)
+		printf("%s%s", i > 1 ? ", " : "", str[i]);
 	printf("]}");
 }
 # endif
@@ -181,16 +180,14 @@ main(int argc, char **argv)
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, bad_addr_slot);
 
 # ifdef EVIOCGMTSLOTS
-	int mtslots[] = { ABS_MT_SLOT, 1, 3 };
-	/* we use the second element to indicate the number of values */
-	/* mtslots_str[1] is "2" so the number of values is 2 */
-	const char *mtslots_str[] = { "ABS_MT_SLOT", "2", "1", "3" };
+	static const unsigned int mtslots[] = { ABS_MT_SLOT, 1, 3 };
+	static const char * const mtslots_str[] = {
+		"ABS_MT_SLOT", "1", "3", NULL };
 
 	/* invalid flag */
-	int invalid_mtslot[] = { -1, 1 };
-	char invalid_str[4096];
-	snprintf(invalid_str, sizeof(invalid_str), "%#x /* ABS_MT_??? */", invalid_mtslot[0]);
-	const char *invalid_mtslot_str[] = { invalid_str, "1", "1" };
+	static const unsigned int invalid_mtslot[] = { -1, 1 };
+	static const char * const invalid_mtslot_str[] = {
+		"0xffffffff /* ABS_MT_??? */", "1", NULL };
 # endif
 
 	enum { ULONG_BIT = sizeof(unsigned long) * 8 };
