@@ -63,6 +63,8 @@
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
 # endif
 
+# define XLAT_STR(v_) sprintxlat(#v_, v_, NULL)
+
 # ifndef DEFAULT_STRLEN
 /* Default maximum # of bytes printed in printstr et al. */
 #  define DEFAULT_STRLEN 32
