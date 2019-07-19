@@ -105,7 +105,6 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_dm-v \
 	ioctl_evdev-success \
 	ioctl_evdev-success-v \
-	ioctl_evdev-v \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_nsfs \
