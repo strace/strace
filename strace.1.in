@@ -1028,14 +1028,29 @@ allbox;
 lb lb
 l l.
 Architecture	ABIs supported
-x86_64	i386, x32 (when built as an x86_64 application); i386 (when built as an x32 application)
+x86_64	i386, x32 [1]; i386 [2]
 AArch64	ARM 32-bit EABI
-PowerPC 64-bit BE	PowerPC 32-bit
+PowerPC 64-bit [3]	PowerPC 32-bit
 RISC-V 64-bit	RISC-V 32-bit
 s390x	s390
 SPARC 64-bit	SPARC 32-bit
 TILE 64-bit	TILE 32-bit
 .TE
+.RS 0
+.TP 5
+[1]
+When
+.B strace
+is built as an x86_64 application
+.TQ
+[2]
+When
+.B strace
+is built as an x32 application
+.TQ
+[3]
+Big endian only
+.RE
 .PP
 This support is optional and relies on ability to generate and parse structure
 definitions during the build time.
