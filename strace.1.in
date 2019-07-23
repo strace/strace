@@ -38,12 +38,8 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .SY strace
-.if '@ENABLE_STACKTRACE_TRUE@'#' .ig end_unwind_opt
-.OP \-ACdffhikqrtttTvVxxy
-.end_unwind_opt
-.if '@ENABLE_STACKTRACE_FALSE@'#' .ig end_no_unwind_opt
-.OP \-ACdffhiqrtttTvVxxy
-.end_no_unwind_opt
+.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqrtttTvVxxy
+.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqrtttTvVxxy
 .OP \-I n
 .OP \-b execve
 .OM \-e expr
@@ -651,11 +647,10 @@ or higher.
 .TP
 .B \-i
 Print the instruction pointer at the time of the system call.
-.if '@ENABLE_STACKTRACE_TRUE@'#' .ig end_unwind
-.TP
-.B \-k
-Print the execution stack trace of the traced processes after each system call.
-.end_unwind
+.if '@ENABLE_STACKTRACE_FALSE@'#' .TP
+.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
+.if '@ENABLE_STACKTRACE_FALSE@'#' Print the execution stack trace of the traced
+.if '@ENABLE_STACKTRACE_FALSE@'#' processes after each system call.
 .TP
 .BI "\-o " filename
 Write the trace output to the file
