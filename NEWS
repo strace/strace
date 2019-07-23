@@ -15,7 +15,8 @@ Noteworthy changes in release 5.2 (2019-07-12)
 * Improvements
   * Implemented syscall return status filtering with -e status=set option
     and its aliases: -z (limit syscall printing to successful syscalls only)
-    and -Z (limit syscall printing to failed syscalls only).
+    and -Z (limit syscall printing to failed syscalls only).  Addresses Debian
+    bug #176376.
   * Implemented decoding of open_tree, move_mount, fsopen, fsconfig, fsmount,
     and fspick syscalls.
   * Enhanced decoding of bpf, clone, inotify_init, mbind, and set_mempolicy
