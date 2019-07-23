@@ -734,14 +734,14 @@ values are:
 .TP 10
 .B raw
 Raw number output, without decoding.
-.TP
+.TQ
 .B abbrev
 Output a named constant or a set of flags instead of the raw number if they are
 found.
 This is the default
 .B strace
 behaviour.
-.TP
+.TQ
 .B verbose
 Output both the raw value and the decoded string (as a comment).
 .RE
@@ -873,27 +873,22 @@ an injection is being made into every invocation of each syscall from the
 
 The format of the subexpression is one of the following:
 .RS
-.IP "" 2
+.TP 12
 .I first
-.RS 4
 For every syscall from the
 .IR set ,
 perform an injection for the syscall invocation number
 .I first
 only.
-.RE
-.IP "" 2
+.TQ
 \fIfirst\/\fB+\fR
-.RS 4
 For every syscall from the
 .IR set ,
 perform injections for the syscall invocation number
 .I first
 and all subsequent invocations.
-.RE
-.IP "" 2
+.TQ
 \fIfirst\/\fB+\fIstep\fR
-.RS 4
 For every syscall from the
 .IR set ,
 perform injections for syscall invocations number
@@ -901,7 +896,6 @@ perform injections for syscall invocations number
 .IR first + step ,
 .IR first + step + step ,
 and so on.
-.RE
 .RE
 .IP
 For example, to fail each third and subsequent chdir syscalls with
@@ -1056,15 +1050,15 @@ has):
 .B m32-mpers
 .B strace
 can trace and properly decode non-native 32-bit binaries.
-.TP
+.TQ
 .B no-m32-mpers
 .B strace
 can trace, but cannot properly decode non-native 32-bit binaries.
-.TP
+.TQ
 .B mx32-mpers
 .B strace
 can trace and properly decode non-native 32-on-64-bit binaries.
-.TP
+.TQ
 .B no-mx32-mpers
 .B strace
 can trace, but cannot properly decode non-native 32-on-64-bit binaries.
