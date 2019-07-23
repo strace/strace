@@ -1261,3 +1261,9 @@ mailing list at <strace\-devel@lists.strace.io>.
 .B strace
 Home Page
 .UE
+.SH AUTHORS
+The complete list of
+.B strace
+contributors can be found in the
+.B CREDITS
+file.
