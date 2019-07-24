@@ -548,28 +548,34 @@ finishes:
 [pid 28779] 1130322148.939977 clock_gettime(CLOCK_REALTIME, {1130322148, 939977000}) = 0
 [pid 28772] 1130322148.438139 select(4, [3], NULL, NULL, NULL) = 1 (in [3])
 .CE
-.TP
-.BR "\-e\ status" = successful
-Trace system calls that returned without an error code.  The
+.I set
+can include the following elements:
+.RS
+.TP 13
+.B successful
+Trace system calls that returned without an error code.
+The
 .B -z
 option has the effect of
-.BR status=successful .
-.TP
-.BR "\-e\ status" = failed
-Trace system calls that returned with an error code.  The
+.BR status = successful .
+.TQ
+.B failed
+Trace system calls that returned with an error code.
+The
 .B -Z
 option has the effect of
-.BR status=failed .
-.TP
-.BR "\-e\ status" = unfinished
+.BR status = failed .
+.TQ
+.B unfinished
 Trace system calls that did not return.  This might happen, for example, due to
 an execve call in a neighbour thread.
-.TP
-.BR "\-e\ status" = unavailable
+.TQ
+.B unavailable
 Trace system calls that returned but strace failed to fetch the error status.
-.TP
-.BR "\-e\ status" = detached
+.TQ
+.B detached
 Trace system calls for which strace detached before the return.
+.RE
 .TP
 .BI "\-P " path
 Trace only system calls accessing
