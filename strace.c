@@ -259,6 +259,7 @@ Output format:\n\
   -t             print absolute timestamp\n\
   -tt            print absolute timestamp with usecs\n\
   -T             print time spent in each syscall\n\
+  -v             verbose mode: print entities unabbreviated\n\
   -x             print non-ascii strings in hex\n\
   -xx            print all strings in hex\n\
   -X format      set the format for printing of named constants and flags\n\
@@ -299,7 +300,6 @@ Startup:\n\
 \n\
 Miscellaneous:\n\
   -d             enable debug output to stderr\n\
-  -v             verbose mode: print unabbreviated argv, stat, termios, etc. args\n\
   -h             print help message\n\
   -V             print version\n\
 "
