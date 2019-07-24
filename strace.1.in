@@ -38,8 +38,8 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .SY strace
-.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqrtttTvVxxy
-.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqrtttTvVxxy
+.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyzZ
+.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyzZ
 .OP \-I n
 .OP \-b execve
 .OM \-e expr
@@ -60,7 +60,7 @@ strace \- trace system calls and signals
 .YS
 .SY strace
 .B \-c
-.OP \-df
+.OP \-dfwzZ
 .OP \-I n
 .OP \-b execve
 .OM \-e expr
