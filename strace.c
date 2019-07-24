@@ -264,10 +264,12 @@ Output format:\n\
   -xx            print all strings in hex\n\
   -X format      set the format for printing of named constants and flags\n\
   -y             print paths associated with file descriptor arguments\n\
-  -yy            print protocol specific information associated with socket file descriptors\n\
+  -yy            print protocol specific information associated with socket\n\
+                 file descriptors\n\
 \n\
 Statistics:\n\
-  -c             count time, calls, and errors for each syscall and report summary\n\
+  -c             count time, calls, and errors for each syscall and report\n\
+                 summary\n\
   -C             like -c but also print regular output\n\
   -O overhead    set overhead for tracing syscalls to OVERHEAD usecs\n\
   -S sortby      sort syscall counts by: time, calls, name, nothing (default %s)\n\
@@ -275,7 +277,8 @@ Statistics:\n\
 \n\
 Filtering:\n\
   -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write, fault, inject, status, kvm\n\
+     options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
+                 inject, status, kvm\n\
   -P path        trace accesses to path\n\
   -z             print only syscalls that returned without an error code\n\
   -Z             print only syscalls that returned with an error code\n\
