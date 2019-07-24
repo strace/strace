@@ -720,6 +720,21 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent.h	\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
+	linux/powerpc64le/arch_defs_.h	\
+	linux/powerpc64le/arch_regs.c	\
+	linux/powerpc64le/arch_rt_sigframe.c	\
+	linux/powerpc64le/errnoent.h	\
+	linux/powerpc64le/get_error.c	\
+	linux/powerpc64le/get_scno.c	\
+	linux/powerpc64le/get_syscall_args.c	\
+	linux/powerpc64le/ioctls_arch0.h	\
+	linux/powerpc64le/ioctls_inc0.h	\
+	linux/powerpc64le/raw_syscall.h	\
+	linux/powerpc64le/rt_sigframe.h	\
+	linux/powerpc64le/set_error.c	\
+	linux/powerpc64le/set_scno.c	\
+	linux/powerpc64le/syscallent.h	\
+	linux/powerpc64le/userent.h	\
 	linux/ptrace_pokeuser.c		\
 	linux/raw_syscall.h		\
 	linux/riscv/arch_defs_.h	\

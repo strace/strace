@@ -48,6 +48,8 @@ AC_SUBST([COPYRIGHT_YEAR], [copyright_year])
 AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
 AC_SUBST([MANPAGE_DATE], [manpage_date])
 
+AC_C_BIGENDIAN
+
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
 arch_mx32=
@@ -126,8 +128,19 @@ powerpc*)
 # error 32 bit
 #endif], [], arch=powerpc64, arch=powerpc)
 	if test "$arch" = "powerpc64"; then
-		arch_m32=powerpc
-		AC_DEFINE([POWERPC64], 1, [Define for the PowerPC64 architecture.])
+		# $ac_cv_c_bigendian is defined by AC_C_BIGENDIAN
+		case "$ac_cv_c_bigendian" in
+		no)
+			arch=powerpc64le
+			AC_DEFINE([POWERPC64LE], 1,
+				  [Define for the little endian PowerPC64 architecture.])
+			;;
+		*)
+			arch_m32=powerpc
+			AC_DEFINE([POWERPC64], 1,
+				  [Define for the big endian PowerPC64 architecture.])
+			;;
+		esac
 	fi
 	;;
 riscv*)
@@ -243,7 +256,6 @@ esac
 AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
 		   [Define to 1 if you want OABI support on ARM EABI.])
 
-AC_C_BIGENDIAN
 AC_C_TYPEOF
 
 AC_TYPE_UID_T

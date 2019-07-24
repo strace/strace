@@ -1039,7 +1039,7 @@ l l.
 Architecture	ABIs supported
 x86_64	i386, x32 (when built as an x86_64 application); i386 (when built as an x32 application)
 AArch64	ARM 32-bit EABI
-PowerPC 64-bit	PowerPC 32-bit
+PowerPC 64-bit BE	PowerPC 32-bit
 RISC-V 64-bit	RISC-V 32-bit
 s390x	s390
 SPARC 64-bit	SPARC 32-bit
