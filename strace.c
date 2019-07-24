@@ -229,8 +229,14 @@ print_version(void)
 static void
 usage(void)
 {
+#ifdef ENABLE_STACKTRACE
+# define K_OPT "k"
+#else
+# define K_OPT ""
+#endif
+
 	printf("\
-usage: strace [-CdffhiqrtttTvVwxxy] [-I n] [-e expr]...\n\
+usage: strace [-Cdffhi" K_OPT "qrtttTvVwxxy] [-I n] [-e expr]...\n\
               [-a column] [-o file] [-s strsize] [-P path]...\n\
               -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]\n\
    or: strace -c[dfw] [-I n] [-e expr]... [-O overhead] [-S sortby]\n\
@@ -302,6 +308,8 @@ Miscellaneous:\n\
  */
 , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(0);
+
+#undef K_OPT
 }
 
 void ATTRIBUTE_NORETURN
