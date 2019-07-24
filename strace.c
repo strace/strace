@@ -236,13 +236,16 @@ usage(void)
 #endif
 
 	printf("\
-usage: strace [-Cdffhi" K_OPT "qrtttTvVwxxy] [-I n] [-e expr]...\n\
-              [-a column] [-o file] [-s strsize] [-P path]...\n\
-              -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]\n\
-   or: strace -c[dfw] [-I n] [-e expr]... [-O overhead] [-S sortby]\n\
-              -p pid... / [-D] [-E var=val]... [-u username] PROG [ARGS]\n\
+usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I n] [-b execve] [-e expr]...\n\
+              [-a column] [-o file] [-s strsize] [-X format] [-P path]...\n\
+              [-p pid]...\n\
+	      { -p pid | [-D] [-E var=val]... [-u username] PROG [ARGS] }\n\
+   or: strace -c[dfwzZ] [-I n] [-b execve] [-e expr]... [-O overhead]\n\
+              [-S sortby] [-P path]... [-p pid]...\n\
+              { -p pid | [-D] [-E var=val]... [-u username] PROG [ARGS] }\n\
 \n\
 Output format:\n\
+  -A             open the file provided in the -o option in append mode\n\
   -a column      alignment COLUMN for printing syscall results (default %d)\n\
   -i             print instruction pointer at time of syscall\n\
 "
@@ -254,6 +257,7 @@ Output format:\n\
 "\
   -o file        send trace output to FILE instead of stderr\n\
   -q             suppress messages about attaching, detaching, etc.\n\
+  -qq            suppress messages about process exit status as well.\n\
   -r             print relative timestamp\n\
   -s strsize     limit length of print strings to STRSIZE chars (default %d)\n\
   -t             print absolute timestamp\n\
