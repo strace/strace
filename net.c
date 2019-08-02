@@ -291,7 +291,8 @@ SYS_FUNC(recv)
 			printaddr(tcp->u_arg[1]);
 		} else {
 			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
-				     tcp->u_rval);
+				       MIN((kernel_ulong_t) tcp->u_rval,
+					   tcp->u_arg[2]));
 		}
 
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
@@ -316,7 +317,8 @@ SYS_FUNC(recvfrom)
 			printaddr(tcp->u_arg[1]);
 		} else {
 			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
-				     tcp->u_rval);
+				       MIN((kernel_ulong_t) tcp->u_rval,
+					   tcp->u_arg[2]));
 		}
 		/* size */
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
