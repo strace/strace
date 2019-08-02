@@ -463,7 +463,9 @@ readlink
 readlinkat
 readv
 reboot
+recv-MSG_TRUNC
 recvfrom
+recvfrom-MSG_TRUNC
 recvmmsg-timeout
 recvmsg
 redirect-fds

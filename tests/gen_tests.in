@@ -380,7 +380,9 @@ readdir	-a16
 readlink	-xx
 readlinkat	-xx
 reboot		-s 256
+recv-MSG_TRUNC	-a26 -e trace=recv
 recvfrom	-a35
+recvfrom-MSG_TRUNC	-e trace=recvfrom
 recvmmsg-timeout	-a25 -e trace=recvmmsg
 recvmsg	-eread=0 -ewrite=1 -e trace=recvmsg,sendmsg
 regex	test_trace_expr '' -etrace='/^(.*_)?statv?fs'
