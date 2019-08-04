@@ -14,14 +14,21 @@
 
 #include "defs.h"
 
+struct staged_output_data {
+	char *memfptr;
+	size_t memfloc;
+	FILE *real_outf;	/* Backup for real outf while staging */
+};
+
 FILE *
 strace_open_memstream(struct tcb *tcp)
 {
 	FILE *fp = NULL;
 
 #if HAVE_OPEN_MEMSTREAM
-	tcp->memfptr = NULL;
-	fp = open_memstream(&tcp->memfptr, &tcp->memfloc);
+	tcp->staged_output_data = xmalloc(sizeof(*tcp->staged_output_data));
+	fp = open_memstream(&tcp->staged_output_data->memfptr,
+			    &tcp->staged_output_data->memfloc);
 	if (!fp)
 		perror_msg_and_die("open_memstream");
 	/*
@@ -31,7 +38,7 @@ strace_open_memstream(struct tcb *tcp)
 	fflush(fp);
 
 	/* Store the FILE pointer for later restauration. */
-	tcp->real_outf = tcp->outf;
+	tcp->staged_output_data->real_outf = tcp->outf;
 	tcp->outf = fp;
 #endif
 
@@ -42,7 +49,7 @@ void
 strace_close_memstream(struct tcb *tcp, bool publish)
 {
 #if HAVE_OPEN_MEMSTREAM
-	if (!tcp->real_outf) {
+	if (!tcp->staged_output_data) {
 		debug_msg("memstream already closed");
 		return;
 	}
@@ -50,15 +57,19 @@ strace_close_memstream(struct tcb *tcp, bool publish)
 	if (fclose(tcp->outf))
 		perror_msg("fclose(tcp->outf)");
 
-	tcp->outf = tcp->real_outf;
-	tcp->real_outf = NULL;
-	if (tcp->memfptr) {
+	tcp->outf = tcp->staged_output_data->real_outf;
+	if (tcp->staged_output_data->memfptr) {
 		if (publish)
-			fputs_unlocked(tcp->memfptr, tcp->outf);
+			fputs_unlocked(tcp->staged_output_data->memfptr,
+				       tcp->outf);
 		else
-			debug_msg("syscall output dropped: %s", tcp->memfptr);
-		free(tcp->memfptr);
-		tcp->memfptr = NULL;
+			debug_msg("syscall output dropped: %s",
+				  tcp->staged_output_data->memfptr);
+
+		free(tcp->staged_output_data->memfptr);
+		tcp->staged_output_data->memfptr = NULL;
 	}
+	free(tcp->staged_output_data);
+	tcp->staged_output_data = NULL;
 #endif
 }

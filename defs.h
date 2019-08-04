@@ -204,9 +204,7 @@ struct tcb {
 	int sys_func_rval;	/* Syscall entry parser's return value */
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
-	FILE *real_outf;	/* Backup for real outf while staging */
-	char *memfptr;
-	size_t memfloc;
+	struct staged_output_data *staged_output_data;
 
 	const char *auxstr;	/* Auxiliary info from syscall (see RVAL_STR) */
 	void *_priv_data;	/* Private data for syscall decoding functions */

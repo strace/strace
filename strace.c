@@ -604,7 +604,7 @@ printleader(struct tcb *tcp)
 
 	if (printing_tcp) {
 		set_current_tcp(printing_tcp);
-		if (tcp->real_outf == NULL && printing_tcp->curcol != 0 &&
+		if (!tcp->staged_output_data && printing_tcp->curcol != 0 &&
 		    (followfork < 2 || printing_tcp == tcp)) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
@@ -2094,19 +2094,12 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	FILE *fp = execve_thread->outf;
 	execve_thread->outf = tcp->outf;
 	tcp->outf = fp;
-	if (execve_thread->real_outf || tcp->real_outf) {
-		char *memfptr;
-		size_t memfloc;
+	if (execve_thread->staged_output_data || tcp->staged_output_data) {
+		struct staged_output_data *staged_output_data;
 
-		fp = execve_thread->real_outf;
-		execve_thread->real_outf = tcp->real_outf;
-		tcp->real_outf = fp;
-		memfptr = execve_thread->memfptr;
-		execve_thread->memfptr = tcp->memfptr;
-		tcp->memfptr = memfptr;
-		memfloc = execve_thread->memfloc;
-		execve_thread->memfloc = tcp->memfloc;
-		tcp->memfloc = memfloc;
+		staged_output_data = execve_thread->staged_output_data;
+		execve_thread->staged_output_data = tcp->staged_output_data;
+		tcp->staged_output_data = staged_output_data;
 	}
 
 	/* And their column positions */
