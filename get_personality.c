@@ -10,5 +10,9 @@
 #if SUPPORTED_PERSONALITIES > 1
 # include "get_personality.h"
 # include <linux/audit.h>
+# define XLAT_MACROS_ONLY
+#  include "xlat/elf_em.h"
+#  include "xlat/audit_arch.h"
+# undef XLAT_MACROS_ONLY
 # include "arch_get_personality.c"
 #endif
