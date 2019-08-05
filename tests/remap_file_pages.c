@@ -76,11 +76,17 @@ main(void)
 	k_remap_file_pages(addr, size, prot, pgoff, flags);
 
 /*
- * HP PA-RISC is the only architecture that has MAP_TYPE defined to 0x3, which
- * is also used for MAP_SHARED_VALIDATE since Linux commit v4.15-rc1~71^2^2~23.
+ * HP PA-RISC is the only architecture that has MAP_TYPE defined to something
+ * different.  For example, before commit v4.17-rc1~146^2~9 it was defined to
+ * 0x3 which is also used for MAP_SHARED_VALIDATE since Linux commit
+ * v4.15-rc1~71^2^2~23.
  */
 #  ifdef __hppa__
-#   define MAP_TYPE_str "MAP_SHARED_VALIDATE"
+#   if MAP_TYPE == 0x03
+#    define MAP_TYPE_str "MAP_SHARED_VALIDATE"
+#   else
+#    define MAP_TYPE_str "0x2b /* MAP_??? */"
+#   endif
 #  else
 #   define MAP_TYPE_str "0xf /* MAP_??? */"
 #  endif
