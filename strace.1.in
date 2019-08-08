@@ -1111,7 +1111,7 @@ specification is described in section
 Sort the output of the histogram printed by the
 .B \-c
 option by the specified criterion.  Legal values are
-.BR time " (or " time_total " or " total_time ),
+.BR time " (or " time_percent " or " time_total " or " total_time ),
 .BR avg_time " (or " time_avg ),
 .BR calls " (or " count ),
 .BR errors " (or " error ),

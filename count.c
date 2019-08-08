@@ -55,6 +55,27 @@ static uint8_t columns[CSC_MAX] = {
 	CSC_SC_NAME,
 };
 
+static const struct {
+	const char *name;
+	uint8_t     column;
+} column_aliases[] = {
+	{ "time",         CSC_TIME_100S  },
+	{ "time_percent", CSC_TIME_100S  },
+	{ "time_total",   CSC_TIME_TOTAL },
+	{ "total_time",   CSC_TIME_TOTAL },
+	{ "avg_time",     CSC_TIME_AVG   },
+	{ "time_avg",     CSC_TIME_AVG   },
+	{ "calls",        CSC_CALLS      },
+	{ "count",        CSC_CALLS      },
+	{ "error",        CSC_ERRORS     },
+	{ "errors",       CSC_ERRORS     },
+	{ "name",         CSC_SC_NAME    },
+	{ "syscall",      CSC_SC_NAME    },
+	{ "syscall_name", CSC_SC_NAME    },
+	{ "none",         CSC_NONE       },
+	{ "nothing",      CSC_NONE       },
+};
+
 void
 count_syscall(struct tcb *tcp, const struct timespec *syscall_exiting_ts)
 {
@@ -131,34 +152,24 @@ error_cmp(const void *a, const void *b)
 	return (m < n) ? 1 : (m > n) ? -1 : 0;
 }
 
-static int (*sortfun)(const void *, const void *);
+typedef int (*sort_func)(const void *, const void *);
+static sort_func sortfun;
 
 void
 set_sortby(const char *sortby)
 {
-	static const struct {
-		int (*fn)(const void *, const void *);
-		const char *name;
-	} sort_fns[] = {
-		{ time_cmp,	"time" },
-		{ time_cmp,	"time_total" },
-		{ time_cmp,	"total_time" },
-		{ avg_time_cmp,	"avg_time" },
-		{ avg_time_cmp,	"time_avg" },
-		{ count_cmp,	"calls" },
-		{ count_cmp,	"count" },
-		{ error_cmp,	"error" },
-		{ error_cmp,	"errors" },
-		{ syscall_cmp,	"name" },
-		{ syscall_cmp,	"syscall" },
-		{ syscall_cmp,	"syscall_name" },
-		{ NULL,		"none" },
-		{ NULL,		"nothing" },
+	static const sort_func sort_fns[CSC_MAX] = {
+		[CSC_TIME_100S]  = time_cmp,
+		[CSC_TIME_TOTAL] = time_cmp,
+		[CSC_TIME_AVG]   = avg_time_cmp,
+		[CSC_CALLS]      = count_cmp,
+		[CSC_ERRORS]     = error_cmp,
+		[CSC_SC_NAME]    = syscall_cmp,
 	};
 
-	for (size_t i = 0; i < ARRAY_SIZE(sort_fns); ++i) {
-		if (!strcmp(sort_fns[i].name, sortby)) {
-			sortfun = sort_fns[i].fn;
+	for (size_t i = 0; i < ARRAY_SIZE(column_aliases); ++i) {
+		if (!strcmp(column_aliases[i].name, sortby)) {
+			sortfun = sort_fns[column_aliases[i].column];
 			return;
 		}
 	}

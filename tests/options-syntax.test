@@ -142,6 +142,17 @@ check_e "invalid quiet 'detach'" --quiet=detach -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
+
+for i in time time_total total_time avg_time time_avg calls count error errors name syscall syscall_name none nothing; do
+	check_h "must have PROG [ARGS] or -p PID" -S "$i"
+	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
+done
+check_h "invalid sortby: 'min-time'" -S min-time
+check_h "invalid sortby: 'non'" -S non
+check_h "invalid sortby: 'time_max'" --summary-sort-by=time_max
+check_h "invalid sortby: 'syscall-name'" --summary-sort-by=syscall-name
+check_h "invalid sortby: 'syscall_names'" --summary-sort-by=syscall_names
+
 check_e '-x and --strings-in-hex cannot be provided simultaneously' -x --strings-in-hex -p $$
 check_e '-x and --strings-in-hex cannot be provided simultaneously' --strings-in-hex -p $$ -xx
 check_h "invalid -X argument: 'test'" -Xtest
