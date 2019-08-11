@@ -1249,6 +1249,15 @@ umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
 }
 
 bool
+print_uint16_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%" PRIu16, *(uint16_t*) elem_buf);
+
+	return true;
+}
+
+bool
 print_int32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			 void *data)
 {

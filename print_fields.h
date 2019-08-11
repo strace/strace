@@ -25,6 +25,9 @@
 	STRACE_PRINTF("%s%s=%llu", (prefix_), #field_,			\
 		      zero_extend_signed_to_ull((where_).field_))
 
+# define PRINT_FIELD_DRM_CRTC_ID(prefix_, where_, field_)		\
+	PRINT_FIELD_U(prefix_, where_, field_)
+
 # define PRINT_FIELD_U_CAST(prefix_, where_, field_, type_)		\
 	STRACE_PRINTF("%s%s=%llu", (prefix_), #field_,			\
 		      zero_extend_signed_to_ull((type_) (where_).field_))

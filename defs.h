@@ -313,6 +313,9 @@ extern const struct xlat arp_hardware_types[];
 extern const struct xlat at_flags[];
 extern const struct xlat clocknames[];
 extern const struct xlat dirent_types[];
+extern const struct xlat drm_ctx_flags[];
+extern const struct xlat drm_mode_flags[];
+extern const struct xlat drm_mode_type[];
 extern const struct xlat ethernet_protocols[];
 extern const struct xlat inet_protocols[];
 extern const struct xlat evdev_abs[];
@@ -514,6 +517,12 @@ extern int
 umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 # define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
+
+/**
+ * @return true on success, false on error.
+ */
+# define umove_nor_syserror(tcp, arg, objp) \
+	(!syserror(tcp) && !umove(tcp, arg, objp))
 
 /**
  * @return true on success, false on error.
@@ -776,6 +785,8 @@ extern void print_kernel_version(unsigned long version);
 extern void print_abnormal_hi(kernel_ulong_t);
 extern void print_ioprio(unsigned int ioprio);
 
+extern bool print_uint16_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
 extern bool print_int32_array_member(struct tcb *, void *elem_buf,
 				     size_t elem_size, void *data);
 extern bool print_uint32_array_member(struct tcb *, void *elem_buf,
@@ -931,6 +942,7 @@ name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)	\
 /* End of DECL_IOCTL definition. */
 
 DECL_IOCTL(dm);
+DECL_IOCTL(drm);
 DECL_IOCTL(evdev);
 DECL_IOCTL(file);
 DECL_IOCTL(fs_x);
@@ -948,6 +960,7 @@ DECL_IOCTL(uffdio);
 
 extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);
 extern void print_evdev_ff_type(const kernel_ulong_t val);
+extern int drm_decode_number(struct tcb *, const unsigned int code);
 
 struct nlmsghdr;
 

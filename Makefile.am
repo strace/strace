@@ -101,6 +101,8 @@ strace_SOURCES =	\
 	dirent.c	\
 	dirent64.c	\
 	dm.c		\
+	drm.c		\
+	drm_mpers.c	\
 	dyxlat.c	\
 	empty.h		\
 	epoll.c		\
@@ -539,6 +541,8 @@ EXTRA_DIST =				\
 	linux/csky/syscallent.h		\
 	linux/bfin/userent.h		\
 	linux/check_scno.c		\
+	linux/drm/drm.h			\
+	linux/drm/drm_mode.h		\
 	linux/dummy.h			\
 	linux/errnoent.h		\
 	linux/getregs_old.h		\

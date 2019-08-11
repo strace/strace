@@ -195,6 +195,8 @@ ioctl_decode_command_number(struct tcb *tcp)
 				return 1;
 			}
 			return 0;
+		case 'd':
+			return drm_decode_number(tcp, code);
 		default:
 			return 0;
 	}
@@ -264,6 +266,8 @@ ioctl_decode(struct tcb *tcp)
 		return fs_x_ioctl(tcp, code, arg);
 	case 0x22:
 		return scsi_ioctl(tcp, code, arg);
+	case 'd':
+		return drm_ioctl(tcp, code, arg);
 	case 'L':
 		return loop_ioctl(tcp, code, arg);
 #ifdef HAVE_STRUCT_MTD_WRITE_REQ
