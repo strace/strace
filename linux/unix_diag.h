@@ -24,6 +24,7 @@ struct unix_diag_req {
 # define UDIAG_SHOW_ICONS	0x08
 # define UDIAG_SHOW_RQLEN	0x10
 # define UDIAG_SHOW_MEMINFO	0x20
+# define UDIAG_SHOW_UID		0x40
 
 struct unix_diag_msg {
 	uint8_t	 udiag_family;
@@ -42,6 +43,8 @@ enum {
 	UNIX_DIAG_RQLEN,
 	UNIX_DIAG_MEMINFO,
 	UNIX_DIAG_SHUTDOWN,
+	UNIX_DIAG_UID,
+	UNIX_DIAG_FIRST_UNUSED
 };
 
 struct unix_diag_vfs {

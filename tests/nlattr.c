@@ -105,7 +105,7 @@ test_nlattr(const int fd)
 	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	*nla = (struct nlattr) {
 		.nla_len = NLA_HDRLEN + 4,
-		.nla_type = UNIX_DIAG_SHUTDOWN + 1
+		.nla_type = UNIX_DIAG_FIRST_UNUSED
 	};
 	memcpy(RTA_DATA(nla), "1234", 4);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
@@ -116,7 +116,7 @@ test_nlattr(const int fd)
 	       ", nla_type=%#x /* UNIX_DIAG_??? */}"
 	       ", \"\\x31\\x32\\x33\\x34\"}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, msg_len, nla->nla_len, UNIX_DIAG_SHUTDOWN + 1,
+	       fd, msg_len, nla->nla_len, UNIX_DIAG_FIRST_UNUSED,
 	       msg_len, sprintrc(rc));
 
 	/* print one struct nlattr and fetch fail second struct nlattr */
@@ -201,7 +201,7 @@ test_nlattr(const int fd)
 	for (i = 0; i < ABBREV_LEN; ++i) {
 		nla[i * 2] = (struct nlattr) {
 			.nla_len = NLA_HDRLEN * 2 - 1,
-			.nla_type = UNIX_DIAG_SHUTDOWN + 1 + i
+			.nla_type = UNIX_DIAG_FIRST_UNUSED + i
 		};
 		fill_memory_ex(&nla[i * 2 + 1], NLA_HDRLEN,
 			       '0' + i, '~' - '0' - i);
@@ -218,7 +218,7 @@ test_nlattr(const int fd)
 		if (i)
 			printf(", ");
 		printf("{{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}, ",
-		       nla->nla_len, UNIX_DIAG_SHUTDOWN + 1 + i);
+		       nla->nla_len, UNIX_DIAG_FIRST_UNUSED + i);
 		print_quoted_hex(&nla[i * 2 + 1], NLA_HDRLEN - 1);
 		printf("}");
 	}
@@ -286,7 +286,7 @@ test_nla_type(const int fd)
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
-	nla->nla_type = NLA_F_NESTED | (UNIX_DIAG_SHUTDOWN + 1);
+	nla->nla_type = NLA_F_NESTED | (UNIX_DIAG_FIRST_UNUSED);
 	rc = sendto(fd, msg, msg->nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
 	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
@@ -294,7 +294,7 @@ test_nla_type(const int fd)
 	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
 	       ", nla_type=NLA_F_NESTED|%#x /* UNIX_DIAG_??? */}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, msg->nlh.nlmsg_len, nla->nla_len, UNIX_DIAG_SHUTDOWN + 1,
+	       fd, msg->nlh.nlmsg_len, nla->nla_len, UNIX_DIAG_FIRST_UNUSED,
 	       msg->nlh.nlmsg_len, sprintrc(rc));
 }
 
