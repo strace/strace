@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of BPF_*, ETH_*, KEYCTL_*, MAP_*, SO_*, V4L2_*,
+  * Updated lists of BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, V4L2_*,
     and XDP_* constants.
 
 * Bug fixes
