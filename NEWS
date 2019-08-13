@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Improvements
+  * Updated lists of BPF_*, ETH_*, MAP_*, SO_*, V4L2_*, and XDP_* constants.
+
 * Bug fixes
   * Fixed tests on alpha with Linux kernel headers 5.1+.
 
