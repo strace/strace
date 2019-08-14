@@ -14,7 +14,9 @@
 
 #include <linux/filter.h>
 #include "xlat/skf_ad.h"
-#include "xlat/skf_off.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/skf_off.h"
+#undef XLAT_MACROS_ONLY
 
 static bool
 print_sock_filter_k(const struct bpf_filter_block *const fp)
