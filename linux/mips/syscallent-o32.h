@@ -9,7 +9,7 @@
 #if defined LINUX_MIPSO32
 /* For an O32 strace, decode the o32 syscalls.  */
 # define SYS_syscall_subcall	4000
-[BASE_NR +   0] = { MA,	0,		SEN(syscall),			"syscall"		}, /* start of Linux o32 */
+[BASE_NR +   0] = { MA,	TSD,		SEN(syscall),			"syscall"		}, /* start of Linux o32 */
 [BASE_NR +   1] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [BASE_NR +   2] = { 0,	TP,		SEN(fork),			"fork"			},
 [BASE_NR +   3] = { 3,	TD,		SEN(read),			"read"			},
@@ -20,7 +20,7 @@
 [BASE_NR +   8] = { 2,	TD|TF,		SEN(creat),			"creat"			},
 [BASE_NR +   9] = { 2,	TF,		SEN(link),			"link"			},
 [BASE_NR +  10] = { 1,	TF,		SEN(unlink),			"unlink"		},
-[BASE_NR +  11] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
+[BASE_NR +  11] = { 3,	TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
 [BASE_NR +  12] = { 1,	TF,		SEN(chdir),			"chdir"			},
 [BASE_NR +  13] = { 1,	0,		SEN(time),			"time"			},
 [BASE_NR +  14] = { 3,	TF,		SEN(mknod),			"mknod"			},
@@ -111,7 +111,7 @@
 [BASE_NR +  99] = { 2,	TF|TSF|TSFA,	SEN(statfs),			"statfs"		},
 [BASE_NR + 100] = { 2,	TD|TFSF|TSFA,	SEN(fstatfs),			"fstatfs"		},
 [BASE_NR + 101] = { 3,	0,		SEN(ioperm),			"ioperm"		},
-[BASE_NR + 102] = { 2,	TD,		SEN(socketcall),		"socketcall"		},
+[BASE_NR + 102] = { 2,	TD|TSD,		SEN(socketcall),		"socketcall"		},
 [BASE_NR + 103] = { 3,	0,		SEN(syslog),			"syslog"		},
 [BASE_NR + 104] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [BASE_NR + 105] = { 2,	0,		SEN(getitimer),			"getitimer"		},
@@ -126,7 +126,7 @@
 [BASE_NR + 114] = { 4,	TP,		SEN(wait4),			"wait4"			},
 [BASE_NR + 115] = { 1,	TF,		SEN(swapoff),			"swapoff"		},
 [BASE_NR + 116] = { 1,	0,		SEN(sysinfo),			"sysinfo"		},
-[BASE_NR + 117] = { 6,	TI,		SEN(ipc),			"ipc"			},
+[BASE_NR + 117] = { 6,	TI|TSD,		SEN(ipc),			"ipc"			},
 [BASE_NR + 118] = { 1,	TD,		SEN(fsync),			"fsync"			},
 [BASE_NR + 119] = { 0,	TS,		SEN(sigreturn),			"sigreturn"		},
 [BASE_NR + 120] = { 5,	TP,		SEN(clone),			"clone"			},
@@ -365,7 +365,7 @@
 [BASE_NR + 353] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [BASE_NR + 354] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
 [BASE_NR + 355] = { 3,	TD,		SEN(bpf),			"bpf"			},
-[BASE_NR + 356] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat"		},
+[BASE_NR + 356] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [BASE_NR + 357] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [BASE_NR + 358] = { 2,	0,		SEN(membarrier),		"membarrier"		},
 [BASE_NR + 359] = { 3,	TM,		SEN(mlock2),			"mlock2"		},

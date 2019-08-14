@@ -66,7 +66,7 @@
 [ 56] = { 5,	0,		SEN(printargs),			"osf_revoke"		}, /* not implemented */
 [ 57] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 58] = { 3,	TF,		SEN(readlink),			"readlink"		},
-[ 59] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
+[ 59] = { 3,	TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
 [ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
@@ -456,7 +456,7 @@
 [510] = { 5,	TD|TF,		SEN(renameat2),			"renameat2"		},
 [511] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [512] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
-[513] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat"		},
+[513] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [514] = { 3,	0,		SEN(seccomp),			"seccomp"		},
 [515] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [516] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
