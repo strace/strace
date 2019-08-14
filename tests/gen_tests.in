@@ -132,6 +132,7 @@ io_uring_setup	-a26 -y
 ioctl_block	+ioctl.test
 ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9
+ioctl_drm	+ioctl.test
 ioctl_evdev	+ioctl.test
 ioctl_evdev-v	+ioctl.test -v
 ioctl_inotify	+ioctl.test

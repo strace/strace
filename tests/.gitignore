@@ -160,6 +160,8 @@ ioctl
 ioctl_block
 ioctl_dm
 ioctl_dm-v
+ioctl_drm
+ioctl_drm-success
 ioctl_evdev
 ioctl_evdev-success
 ioctl_evdev-success-v

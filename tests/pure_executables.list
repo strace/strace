@@ -136,6 +136,7 @@ io_uring_setup
 ioctl
 ioctl_block
 ioctl_dm
+ioctl_drm
 ioctl_evdev
 ioctl_inotify
 ioctl_kvm_run
