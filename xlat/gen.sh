@@ -141,9 +141,6 @@ gen_header()
 		esac
 
 		case $line in
-		'#stop')
-			exit 0
-			;;
 		'#conditional')
 			unconditional=
 			;;
