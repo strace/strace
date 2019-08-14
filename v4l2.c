@@ -47,7 +47,7 @@ typedef struct v4l2_standard struct_v4l2_standard;
 
 /* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
 #ifndef v4l2_fourcc_be
-# define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1 << 31))
+# define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1U << 31))
 #endif
 
 #define FMT_FRACT "%u/%u"
