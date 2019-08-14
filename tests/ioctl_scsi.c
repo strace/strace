@@ -15,7 +15,9 @@
 # include <stdio.h>
 # include <sys/ioctl.h>
 # include <scsi/sg.h>
-# include "xlat/scsi_sg_commands.h"
+# define XLAT_MACROS_ONLY
+#  include "xlat/scsi_sg_commands.h"
+# undef XLAT_MACROS_ONLY
 
 # define TEST_NO_ARG(cmd)							\
 	do {									\

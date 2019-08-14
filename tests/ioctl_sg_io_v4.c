@@ -16,8 +16,9 @@
 # include <sys/ioctl.h>
 # include <sys/uio.h>
 # include <linux/bsg.h>
-
-# include "xlat/scsi_sg_commands.h"
+# define XLAT_MACROS_ONLY
+#  include "xlat/scsi_sg_commands.h"
+# undef XLAT_MACROS_ONLY
 
 int
 main(void)

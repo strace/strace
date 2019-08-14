@@ -12,7 +12,9 @@
 # include <scsi/sg.h>
 #endif
 
-#include "xlat/scsi_sg_commands.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/scsi_sg_commands.h"
+#undef XLAT_MACROS_ONLY
 #include "xlat/sg_scsi_reset.h"
 
 static int
