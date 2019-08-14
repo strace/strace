@@ -1,3 +1,4 @@
+#value_indexed
 NDA_UNSPEC		0
 NDA_DST			1
 NDA_LLADDR		2

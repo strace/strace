@@ -1,3 +1,4 @@
+#value_indexed
 RTAX_UNSPEC	0
 RTAX_LOCK	1
 RTAX_MTU	2

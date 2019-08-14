@@ -1,3 +1,4 @@
+#value_indexed
 IFLA_INFO_UNSPEC	0
 IFLA_INFO_KIND		1
 IFLA_INFO_DATA		2

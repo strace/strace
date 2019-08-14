@@ -52,7 +52,7 @@ test_socketcall(const int i, const void *const addr)
 int
 main(void)
 {
-	assert((unsigned) sc_min == socketcalls->data[0].val);
+	assert(0 == socketcalls->data[0].val);
 	assert((unsigned) sc_max == socketcalls->data[socketcalls->size - 1].val);
 
 	const unsigned long *const args = tail_alloc(sizeof(*args) * 6);

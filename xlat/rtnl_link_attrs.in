@@ -1,3 +1,4 @@
+#value_indexed
 IFLA_UNSPEC		0
 IFLA_ADDRESS		1
 IFLA_BROADCAST		2

@@ -1,3 +1,4 @@
+#value_indexed
 IFLA_XDP_UNSPEC		0
 IFLA_XDP_FD		1
 IFLA_XDP_ATTACHED	2

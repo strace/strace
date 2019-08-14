@@ -1,3 +1,4 @@
+#value_indexed
 IFA_UNSPEC		0
 IFA_ADDRESS		1
 IFA_LOCAL		2

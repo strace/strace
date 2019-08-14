@@ -1,3 +1,4 @@
+#value_indexed
 TCP_ESTABLISHED		1
 TCP_SYN_SENT		2
 TCP_SYN_RECV		3
