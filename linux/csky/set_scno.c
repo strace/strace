@@ -8,6 +8,8 @@
 static int
 arch_set_scno(struct tcb *tcp, kernel_ulong_t scno)
 {
+	if (ptrace_syscall_info_is_valid() && get_regs(tcp) < 0)
+		return -1;
 #if defined(__CSKYABIV2__)
 	csky_regs.regs[3] = scno;
 #else

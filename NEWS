@@ -9,6 +9,9 @@ Noteworthy changes in release ?.? (????-??-??)
     XDP_*, and *_MAGIC constants.
 
 * Bug fixes
+  * Fixed syscall tampering on arc, avr32, csky, ia64, m68k, metag, mips,
+    nios2, or1k, riscv, s390, s390x, sparc, sparc64, and tile architectures
+    when PTRACE_GET_SYSCALL_INFO is in use.
   * Fixed tests on alpha with Linux kernel headers 5.1+.
 
 * Portability
