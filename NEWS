@@ -33,7 +33,7 @@ Noteworthy changes in release 5.2 (2019-07-12)
   * Updated lists of ioctl commands from Linux 5.2.
 
 * Bug fixes
-  * Fixed syscall tampering on powerpc, powerpc64, sparc, and sparc64 when
+  * Fixed syscall tampering on powerpc and powerpc64 when
     PTRACE_GET_SYSCALL_INFO is in use.
   * Fixed build with cutting-edge toolchain.
 

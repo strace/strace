@@ -10,8 +10,6 @@ sparc64_set_o0_tstate(struct tcb *tcp, const unsigned long o0,
 		      const unsigned long tstate_set,
 		      const unsigned long tstate_clear)
 {
-	if (ptrace_syscall_info_is_valid() && get_regs(tcp) < 0)
-		return -1;
 	sparc_regs.u_regs[U_REG_O0] = o0;
 	sparc_regs.tstate |= tstate_set;
 	sparc_regs.tstate &= ~tstate_clear;
