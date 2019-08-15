@@ -106,14 +106,16 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umoven: short read (%u < %u) @0x%" PRI_klx,
-						   nread, nread + len, addr - nread);
+					perror_func_msg("short read (%u < %u)"
+							" @0x%" PRI_klx,
+							nread, nread + len,
+							addr - nread);
 				}
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%" PRI_klx,
-					    pid, addr);
+				perror_func_msg("pid:%d @0x%" PRI_klx,
+						pid, addr);
 				return -1;
 		}
 
@@ -166,8 +168,7 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 			return -1;
 		default:
 			/* all the rest is strange and should be reported */
-			perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
-				    pid, addr);
+			perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
 			return -1;
 	}
 }
@@ -202,14 +203,16 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
-						   nread, nread + len, addr - nread);
+					perror_func_msg("short read (%d < %d)"
+							" @0x%" PRI_klx,
+							nread, nread + len,
+							addr - nread);
 				}
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%" PRI_klx,
-					   pid, addr);
+				perror_func_msg("pid:%d @0x%" PRI_klx,
+						pid, addr);
 				return -1;
 		}
 
@@ -289,16 +292,17 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 			case EFAULT: case EIO:
 				/* address space is inaccessible */
 				if (nread)
-					perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
-						   nread, nread + len, addr - nread);
+					perror_func_msg("short read (%d < %d)"
+							" @0x%" PRI_klx,
+							nread, nread + len,
+							addr - nread);
 				return -1;
 			case ESRCH:
 				/* the process is gone */
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
-					    pid, addr);
+				perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
 				return -1;
 		}
 	}

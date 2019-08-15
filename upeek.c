@@ -23,10 +23,9 @@ upeek(struct tcb *tcp, unsigned long off, kernel_ulong_t *res)
 	errno = 0;
 	val = ptrace(PTRACE_PEEKUSER, (pid_t) tcp->pid, (void *) off, 0);
 	if (val == -1 && errno) {
-		if (errno != ESRCH) {
-			perror_msg("upeek: PTRACE_PEEKUSER pid:%d @0x%lx)",
-				   tcp->pid, off);
-		}
+		if (errno != ESRCH)
+			perror_func_msg("PTRACE_PEEKUSER pid:%d @0x%lx)",
+					tcp->pid, off);
 		return -1;
 	}
 	*res = (unsigned long) val;

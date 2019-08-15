@@ -23,7 +23,7 @@ arch_set_scno(struct tcb *tcp, kernel_ulong_t scno)
 	};
 	int rc = ptrace(PTRACE_SETREGSET, tcp->pid, NT_ARM_SYSTEM_CALL, &io);
 	if (rc && errno != ESRCH)
-		perror_msg("arch_set_scno: NT_ARM_SYSTEM_CALL pid:%d scno:%#x",
-			   tcp->pid, n);
+		perror_func_msg("NT_ARM_SYSTEM_CALL pid:%d scno:%#x",
+				tcp->pid, n);
 	return rc;
 }

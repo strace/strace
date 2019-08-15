@@ -15,8 +15,8 @@ upoke(struct tcb *tcp, unsigned long off, kernel_ulong_t val)
 {
 	if (ptrace_pokeuser(tcp->pid, off, val) < 0) {
 		if (errno != ESRCH)
-			perror_msg("upoke: PTRACE_POKEUSER pid:%d @%#lx)",
-				   tcp->pid, off);
+			perror_func_msg("PTRACE_POKEUSER pid:%d @%#lx)",
+					tcp->pid, off);
 		return -1;
 	}
 	return 0;
