@@ -395,6 +395,9 @@ personality
 personality-Xabbrev
 personality-Xraw
 personality-Xverbose
+pidfd_open
+pidfd_open-P
+pidfd_open-y
 pidfd_send_signal
 pipe
 pipe2

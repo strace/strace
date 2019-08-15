@@ -358,6 +358,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_mq_timedsend_time32:
 	case SEN_mq_timedsend_time64:
 	case SEN_perf_event_open:
+	case SEN_pidfd_open:
 	case SEN_pipe:
 	case SEN_pipe2:
 	case SEN_printargs:
