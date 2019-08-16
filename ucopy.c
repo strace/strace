@@ -151,8 +151,8 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 	if ((unsigned int) r == len)
 		return 0;
 	if (r >= 0) {
-		error_msg("umoven: short read (%u < %u) @0x%" PRI_klx,
-			  (unsigned int) r, len, addr);
+		error_func_msg("short read (%u < %u) @0x%" PRI_klx,
+			       (unsigned int) r, len, addr);
 		return -1;
 	}
 	switch (errno) {
