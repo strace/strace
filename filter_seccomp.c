@@ -73,6 +73,16 @@ static const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
 extern void __gcov_flush(void);
 #  endif
 
+/*
+ * Keep some margin in seccomp_filter as programs larger than allowed may
+ * be constructed before we discard them.
+ */
+static struct sock_filter seccomp_filter[2 * BPF_MAXINSNS];
+static struct sock_fprog bpf_prog = {
+	.len = 0,
+	.filter = seccomp_filter,
+};
+
 static void ATTRIBUTE_NORETURN
 check_seccomp_order_do_child(void)
 {
@@ -275,147 +285,6 @@ traced_by_seccomp(unsigned int scno, unsigned int p)
 }
 
 static void
-check_bpf_program_size(void)
-{
-	unsigned int nb_insns = SUPPORTED_PERSONALITIES > 1 ? 1 : 0;
-
-	/*
-	 * Implements a simplified form of init_sock_filter()'s bytecode
-	 * generation algorithm, to count the number of instructions that will
-	 * be generated.
-	 */
-	for (int p = SUPPORTED_PERSONALITIES - 1;
-	     p >= 0 && nb_insns < BPF_MAXINSNS; --p) {
-		unsigned int nb_insns_personality = 0;
-		unsigned int lower = UINT_MAX;
-
-		nb_insns_personality++;
-# if SUPPORTED_PERSONALITIES > 1
-		nb_insns_personality++;
-		if (audit_arch_vec[p].flag)
-			nb_insns_personality += 3;
-# endif
-
-		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
-			if (traced_by_seccomp(i, p)) {
-				if (lower == UINT_MAX)
-					lower = i;
-				continue;
-			}
-			if (lower == UINT_MAX)
-				continue;
-			if (lower + 1 == i)
-				nb_insns_personality++;
-			else
-				nb_insns_personality += 2;
-			lower = UINT_MAX;
-		}
-		if (lower != UINT_MAX) {
-			if (lower + 1 == nsyscall_vec[p])
-				nb_insns_personality++;
-			else
-				nb_insns_personality += 2;
-		}
-
-		nb_insns_personality += 3;
-
-		/*
-		 * Within generated BPF programs, the origin and destination of
-		 * jumps are always in the same personality section.  The
-		 * largest jump is therefore the jump from the first
-		 * instruction of the section to the last, to skip the
-		 * personality and try to compare .arch to the next
-		 * personality.
-		 * If we have a personality section with more than 255
-		 * instructions, the jump offset will overflow.  Such program
-		 * is unlikely to happen, so we simply disable seccomp filter
-		 * is such a case.
-		 */
-		if (nb_insns_personality > UCHAR_MAX) {
-			debug_msg("seccomp filter disabled due to "
-				  "possibility of overflow");
-			seccomp_filtering = false;
-			return;
-		}
-		nb_insns += nb_insns_personality;
-	}
-
-# if SUPPORTED_PERSONALITIES > 1
-	nb_insns++;
-# endif
-
-	if (nb_insns > BPF_MAXINSNS) {
-		debug_msg("seccomp filter disabled due to BPF program being "
-			  "oversized (%u > %d)", nb_insns, BPF_MAXINSNS);
-		seccomp_filtering = false;
-	}
-}
-
-static void
-check_seccomp_filter_properties(void)
-{
-	int rc = prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
-	seccomp_filtering = rc < 0 && errno != EINVAL;
-	if (!seccomp_filtering)
-		debug_func_perror_msg("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
-
-	if (seccomp_filtering)
-		check_bpf_program_size();
-	if (seccomp_filtering)
-		check_seccomp_order();
-}
-
-static void
-dump_seccomp_bpf(const struct sock_filter *filter, unsigned short len)
-{
-	for (unsigned int i = 0; i < len; ++i) {
-		switch (filter[i].code) {
-		case BPF_LD | BPF_W | BPF_ABS:
-			switch (filter[i].k) {
-			case offsetof(struct seccomp_data, arch):
-				error_msg("STMT(BPF_LDWABS, data->arch)");
-				break;
-			case offsetof(struct seccomp_data, nr):
-				error_msg("STMT(BPF_LDWABS, data->nr)");
-				break;
-			default:
-				error_msg("STMT(BPF_LDWABS, 0x%x)",
-					  filter[i].k);
-			}
-			break;
-		case BPF_RET | BPF_K:
-			switch (filter[i].k) {
-			case SECCOMP_RET_TRACE:
-				error_msg("STMT(BPF_RET, SECCOMP_RET_TRACE)");
-				break;
-			case SECCOMP_RET_ALLOW:
-				error_msg("STMT(BPF_RET, SECCOMP_RET_ALLOW)");
-				break;
-			default:
-				error_msg("STMT(BPF_RET, 0x%x)", filter[i].k);
-			}
-			break;
-		case BPF_JMP | BPF_JEQ | BPF_K:
-			error_msg("JUMP(BPF_JEQ, %u, %u, %u)",
-				  filter[i].jt, filter[i].jf,
-				  filter[i].k);
-			break;
-		case BPF_JMP | BPF_JGE | BPF_K:
-			error_msg("JUMP(BPF_JGE, %u, %u, %u)",
-				  filter[i].jt, filter[i].jf,
-				  filter[i].k);
-			break;
-		case BPF_JMP | BPF_JA:
-			error_msg("JUMP(BPF_JA, %u)", filter[i].k);
-			break;
-		default:
-			error_msg("STMT(0x%x, %u, %u, 0x%x)", filter[i].code,
-				  filter[i].jt, filter[i].jf, filter[i].k);
-		}
-	}
-}
-
-static void
 replace_jmp_placeholders(unsigned char *jmp_offset, unsigned char jmp_next,
 			 unsigned char jmp_trace)
 {
@@ -539,6 +408,25 @@ init_sock_filter(struct sock_filter *filter)
 		SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K,
 			     SECCOMP_RET_TRACE);
 
+		/*
+		 * Within generated BPF programs, the origin and destination of
+		 * jumps are always in the same personality section.  The
+		 * largest jump is therefore the jump from the first
+		 * instruction of the section to the last, to skip the
+		 * personality and try to compare .arch to the next
+		 * personality.
+		 * If we have a personality section with more than 255
+		 * instructions, the jump offset will overflow.  Such program
+		 * is unlikely to happen, so we simply disable seccomp-filter
+		 * in such a case.
+		 */
+		if (pos - start > UCHAR_MAX) {
+			debug_msg("seccomp-filter disabled due to jump offset "
+				  "overflow");
+			seccomp_filtering = false;
+			return pos;
+		}
+
 		for (unsigned int i = start; i < end; ++i) {
 			if (BPF_CLASS(filter[i].code) != BPF_JMP)
 				continue;
@@ -558,29 +446,91 @@ init_sock_filter(struct sock_filter *filter)
 	SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K, SECCOMP_RET_TRACE);
 # endif
 
-	if (debug_flag)
-		dump_seccomp_bpf(filter, pos);
-
 	return pos;
+}
+
+static void
+check_seccomp_filter_properties(void)
+{
+	int rc = prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
+	seccomp_filtering = rc < 0 && errno != EINVAL;
+	if (!seccomp_filtering)
+		debug_func_perror_msg("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
+
+	if (seccomp_filtering) {
+		bpf_prog.len = init_sock_filter(seccomp_filter);
+		if (bpf_prog.len > BPF_MAXINSNS) {
+			debug_msg("seccomp filter disabled due to BPF program "
+				  "being oversized (%u > %d)", bpf_prog.len,
+				  BPF_MAXINSNS);
+			seccomp_filtering = false;
+		}
+	}
+	if (seccomp_filtering)
+		check_seccomp_order();
+}
+
+static void
+dump_seccomp_bpf(void)
+{
+	const struct sock_filter *filter = bpf_prog.filter;
+	for (unsigned int i = 0; i < bpf_prog.len; ++i) {
+		switch (filter[i].code) {
+		case BPF_LD | BPF_W | BPF_ABS:
+			switch (filter[i].k) {
+			case offsetof(struct seccomp_data, arch):
+				error_msg("STMT(BPF_LDWABS, data->arch)");
+				break;
+			case offsetof(struct seccomp_data, nr):
+				error_msg("STMT(BPF_LDWABS, data->nr)");
+				break;
+			default:
+				error_msg("STMT(BPF_LDWABS, 0x%x)",
+					  filter[i].k);
+			}
+			break;
+		case BPF_RET | BPF_K:
+			switch (filter[i].k) {
+			case SECCOMP_RET_TRACE:
+				error_msg("STMT(BPF_RET, SECCOMP_RET_TRACE)");
+				break;
+			case SECCOMP_RET_ALLOW:
+				error_msg("STMT(BPF_RET, SECCOMP_RET_ALLOW)");
+				break;
+			default:
+				error_msg("STMT(BPF_RET, 0x%x)", filter[i].k);
+			}
+			break;
+		case BPF_JMP | BPF_JEQ | BPF_K:
+			error_msg("JUMP(BPF_JEQ, %u, %u, %u)",
+				  filter[i].jt, filter[i].jf,
+				  filter[i].k);
+			break;
+		case BPF_JMP | BPF_JGE | BPF_K:
+			error_msg("JUMP(BPF_JGE, %u, %u, %u)",
+				  filter[i].jt, filter[i].jf,
+				  filter[i].k);
+			break;
+		case BPF_JMP | BPF_JA:
+			error_msg("JUMP(BPF_JA, %u)", filter[i].k);
+			break;
+		default:
+			error_msg("STMT(0x%x, %u, %u, 0x%x)", filter[i].code,
+				  filter[i].jt, filter[i].jf, filter[i].k);
+		}
+	}
 }
 
 void
 init_seccomp_filter(void)
 {
-	struct sock_filter filter[BPF_MAXINSNS];
-	unsigned short len;
-
-	len = init_sock_filter(filter);
-
-	struct sock_fprog prog = {
-		.len = len,
-		.filter = filter
-	};
-
 	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0)
 		perror_func_msg_and_die("prctl(PR_SET_NO_NEW_PRIVS)");
 
-	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &prog) < 0)
+	if (debug_flag)
+		dump_seccomp_bpf();
+
+	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) < 0)
 		perror_func_msg_and_die("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
 }
 
