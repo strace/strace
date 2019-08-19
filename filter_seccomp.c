@@ -73,14 +73,23 @@ static const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
 extern void __gcov_flush(void);
 #  endif
 
+typedef unsigned short (*filter_generator_t)(struct sock_filter *,
+					     bool *overflow);
+static unsigned short linear_filter_generator(struct sock_filter *,
+					      bool *overflow);
+static filter_generator_t filter_generators[] = {
+	linear_filter_generator,
+};
+
 /*
  * Keep some margin in seccomp_filter as programs larger than allowed may
  * be constructed before we discard them.
  */
-static struct sock_filter seccomp_filter[2 * BPF_MAXINSNS];
+static struct sock_filter
+filters[ARRAY_SIZE(filter_generators)][2 * BPF_MAXINSNS];
 static struct sock_fprog bpf_prog = {
-	.len = 0,
-	.filter = seccomp_filter,
+	.len = USHRT_MAX,
+	.filter = NULL,
 };
 
 static void ATTRIBUTE_NORETURN
@@ -319,7 +328,7 @@ bpf_syscalls_cmp(struct sock_filter *filter,
 }
 
 static unsigned short
-init_sock_filter(struct sock_filter *filter)
+linear_filter_generator(struct sock_filter *filter, bool *overflow)
 {
 	/*
 	 * Generated program looks like:
@@ -421,9 +430,7 @@ init_sock_filter(struct sock_filter *filter)
 		 * in such a case.
 		 */
 		if (pos - start > UCHAR_MAX) {
-			debug_msg("seccomp-filter disabled due to jump offset "
-				  "overflow");
-			seccomp_filtering = false;
+			*overflow = true;
 			return pos;
 		}
 
@@ -458,8 +465,21 @@ check_seccomp_filter_properties(void)
 		debug_func_perror_msg("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
 
 	if (seccomp_filtering) {
-		bpf_prog.len = init_sock_filter(seccomp_filter);
-		if (bpf_prog.len > BPF_MAXINSNS) {
+		for (unsigned int i = 0; i < ARRAY_SIZE(filter_generators);
+		     ++i) {
+			bool overflow = false;
+			unsigned short len = filter_generators[i](filters[i],
+								  &overflow);
+			if (len < bpf_prog.len && !overflow) {
+				bpf_prog.len = len;
+				bpf_prog.filter = filters[i];
+			}
+		}
+		if (bpf_prog.len == USHRT_MAX) {
+			debug_msg("seccomp filter disabled due to jump offset "
+				  "overflow");
+			seccomp_filtering = false;
+		} else if (bpf_prog.len > BPF_MAXINSNS) {
 			debug_msg("seccomp filter disabled due to BPF program "
 				  "being oversized (%u > %d)", bpf_prog.len,
 				  BPF_MAXINSNS);
