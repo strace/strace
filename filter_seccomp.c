@@ -42,6 +42,7 @@ bool seccomp_before_sysentry;
 
 # define JMP_PLACEHOLDER_NEXT  ((unsigned char) -1)
 # define JMP_PLACEHOLDER_TRACE ((unsigned char) -2)
+# define JMP_PLACEHOLDER_ALLOW ((unsigned char) -3)
 
 # define SET_BPF(filter, code, jt, jf, k) \
 	(*(filter) = (struct sock_filter) { code, jt, jf, k })
@@ -77,8 +78,11 @@ typedef unsigned short (*filter_generator_t)(struct sock_filter *,
 					     bool *overflow);
 static unsigned short linear_filter_generator(struct sock_filter *,
 					      bool *overflow);
+static unsigned short binary_match_filter_generator(struct sock_filter *,
+						    bool *overflow);
 static filter_generator_t filter_generators[] = {
 	linear_filter_generator,
+	binary_match_filter_generator,
 };
 
 /*
@@ -295,7 +299,7 @@ traced_by_seccomp(unsigned int scno, unsigned int p)
 
 static void
 replace_jmp_placeholders(unsigned char *jmp_offset, unsigned char jmp_next,
-			 unsigned char jmp_trace)
+			 unsigned char jmp_trace, unsigned char jmp_allow)
 {
 	switch (*jmp_offset) {
 	case JMP_PLACEHOLDER_NEXT:
@@ -303,6 +307,9 @@ replace_jmp_placeholders(unsigned char *jmp_offset, unsigned char jmp_next,
 		break;
 	case JMP_PLACEHOLDER_TRACE:
 		*jmp_offset = jmp_trace;
+		break;
+	case JMP_PLACEHOLDER_ALLOW:
+		*jmp_offset = jmp_allow;
 		break;
 	default:
 		break;
@@ -439,10 +446,11 @@ linear_filter_generator(struct sock_filter *filter, bool *overflow)
 				continue;
 			unsigned char jmp_next = pos - i - 1;
 			unsigned char jmp_trace = pos - i - 2;
+			unsigned char jmp_allow = pos - i - 3;
 			replace_jmp_placeholders(&filter[i].jt, jmp_next,
-						 jmp_trace);
+						 jmp_trace, jmp_allow);
 			replace_jmp_placeholders(&filter[i].jf, jmp_next,
-						 jmp_trace);
+						 jmp_trace, jmp_allow);
 			if (BPF_OP(filter[i].code) == BPF_JA)
 				filter[i].k = (unsigned int) jmp_next;
 		}
@@ -452,6 +460,138 @@ linear_filter_generator(struct sock_filter *filter, bool *overflow)
 	/* Jumps conditioned on .arch default to this RET_TRACE. */
 	SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K, SECCOMP_RET_TRACE);
 # endif
+
+	return pos;
+}
+
+static unsigned short
+bpf_syscalls_match(struct sock_filter *filter, unsigned int bitarray,
+		   unsigned int bitarray_idx)
+{
+	if (!bitarray) {
+		/* return RET_ALLOW; */
+		SET_BPF_JUMP(filter, BPF_JMP | BPF_JEQ | BPF_K, bitarray_idx,
+			     JMP_PLACEHOLDER_ALLOW, 0);
+		return 1;
+	}
+	if (bitarray == UINT_MAX) {
+		/* return RET_TRACE; */
+		SET_BPF_JUMP(filter, BPF_JMP | BPF_JEQ | BPF_K, bitarray_idx,
+			     JMP_PLACEHOLDER_TRACE, 0);
+		return 1;
+	}
+	/*
+	 * if (A == nr / 32)
+	 *   return (X & bitarray) ? RET_TRACE : RET_ALLOW;
+	 */
+	SET_BPF_JUMP(filter, BPF_JMP | BPF_JEQ | BPF_K, bitarray_idx,
+		     0, 2);
+	SET_BPF_STMT(filter + 1, BPF_MISC | BPF_TXA, 0);
+	SET_BPF_JUMP(filter + 2, BPF_JMP | BPF_JSET | BPF_K, bitarray,
+		     JMP_PLACEHOLDER_TRACE, JMP_PLACEHOLDER_ALLOW);
+	return 3;
+}
+
+static unsigned short
+binary_match_filter_generator(struct sock_filter *filter, bool *overflow)
+{
+	unsigned short pos = 0;
+
+#if SUPPORTED_PERSONALITIES > 1
+	SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_W | BPF_ABS,
+		     offsetof(struct seccomp_data, arch));
+#endif
+
+	/* Personalities are iterated in reverse-order in the BPF program so that
+	 * the x86 case is naturally handled.  In x86, the first and third
+	 * personalities have the same arch identifier.  The third can be
+	 * distinguished based on its associated bit mask, so we check it first.
+	 * The only drawback here is that the first personality is more common,
+	 * which may make the BPF program slower to match syscalls on average. */
+	for (int p = SUPPORTED_PERSONALITIES - 1;
+		 p >= 0 && pos <= BPF_MAXINSNS;
+		 --p) {
+		unsigned short start = pos, end;
+		unsigned int bitarray = 0;
+		unsigned int i;
+
+#if SUPPORTED_PERSONALITIES > 1
+		SET_BPF_JUMP(&filter[pos++], BPF_JMP | BPF_JEQ | BPF_K,
+			     audit_arch_vec[p].arch, 0, JMP_PLACEHOLDER_NEXT);
+#endif
+		SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_W | BPF_ABS,
+			     offsetof(struct seccomp_data, nr));
+
+#if SUPPORTED_PERSONALITIES > 1
+		if (audit_arch_vec[p].flag) {
+			SET_BPF_JUMP(&filter[pos++], BPF_JMP | BPF_JGE | BPF_K,
+				     audit_arch_vec[p].flag, 2, 0);
+			SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_W | BPF_ABS,
+				     offsetof(struct seccomp_data, arch));
+			SET_BPF_JUMP(&filter[pos++], BPF_JMP | BPF_JA,
+				     JMP_PLACEHOLDER_NEXT, 0, 0);
+
+			/* nr = nr & ~mask */
+			SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_AND | BPF_K,
+				     ~audit_arch_vec[p].flag);
+		}
+#endif
+
+		/* X = 1 << nr % 32 = 1 << nr & 0x1F; */
+		SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_AND | BPF_K, 0x1F);
+		SET_BPF_STMT(&filter[pos++], BPF_MISC | BPF_TAX, 0);
+		SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_IMM, 1);
+		SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_LSH | BPF_X, 0);
+		SET_BPF_STMT(&filter[pos++], BPF_MISC | BPF_TAX, 0);
+
+		/* A = nr / 32 = n >> 5; */
+		SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_W | BPF_ABS,
+			     offsetof(struct seccomp_data, nr));
+		if (audit_arch_vec[p].flag) {
+			/* nr = nr & ~mask */
+			SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_AND | BPF_K,
+				     ~audit_arch_vec[p].flag);
+		}
+		SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_RSH | BPF_K, 5);
+
+		for (i = 0; i < nsyscall_vec[p] && pos <= BPF_MAXINSNS; ++i) {
+			if (traced_by_seccomp(i, p))
+				bitarray |= (1 << i % 32);
+			if (i % 32 == 31) {
+				pos += bpf_syscalls_match(filter + pos,
+							  bitarray, i / 32);
+				bitarray = 0;
+			}
+		}
+		if (i % 32 != 0)
+			pos += bpf_syscalls_match(filter + pos, bitarray,
+						  i / 32);
+
+		end = pos;
+
+		SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K,
+			     SECCOMP_RET_ALLOW);
+		SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K,
+			     SECCOMP_RET_TRACE);
+
+		for (unsigned int i = start; i < end; ++i) {
+			if (BPF_CLASS(filter[i].code) != BPF_JMP)
+				continue;
+			unsigned char jmp_next = pos - i - 1;
+			unsigned char jmp_trace = pos - i - 2;
+			unsigned char jmp_allow = pos - i - 3;
+			replace_jmp_placeholders(&filter[i].jt, jmp_next,
+						 jmp_trace, jmp_allow);
+			replace_jmp_placeholders(&filter[i].jf, jmp_next,
+						 jmp_trace, jmp_allow);
+			if (BPF_OP(filter[i].code) == BPF_JA)
+				filter[i].k = (unsigned int)jmp_next;
+		}
+	}
+
+#if SUPPORTED_PERSONALITIES > 1
+	SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K, SECCOMP_RET_TRACE);
+#endif
 
 	return pos;
 }
@@ -509,6 +649,9 @@ dump_seccomp_bpf(void)
 					  filter[i].k);
 			}
 			break;
+		case BPF_LD + BPF_W + BPF_IMM:
+			error_msg("STMT(BPF_LDWIMM, 0x%x)", filter[i].k);
+			break;
 		case BPF_RET | BPF_K:
 			switch (filter[i].k) {
 			case SECCOMP_RET_TRACE:
@@ -531,8 +674,28 @@ dump_seccomp_bpf(void)
 				  filter[i].jt, filter[i].jf,
 				  filter[i].k);
 			break;
+		case BPF_JMP + BPF_JSET + BPF_K:
+			error_msg("JUMP(BPF_JSET, %u, %u, 0x%x)",
+				  filter[i].jt, filter[i].jf,
+				  filter[i].k);
+			break;
 		case BPF_JMP | BPF_JA:
 			error_msg("JUMP(BPF_JA, %u)", filter[i].k);
+			break;
+		case BPF_ALU + BPF_RSH + BPF_K:
+			error_msg("STMT(BPF_RSH, %u)", filter[i].k);
+			break;
+		case BPF_ALU + BPF_LSH + BPF_X:
+			error_msg("STMT(BPF_LSH, X)");
+			break;
+		case BPF_ALU + BPF_AND + BPF_K:
+			error_msg("STMT(BPF_AND, 0x%x)", filter[i].k);
+			break;
+		case BPF_MISC + BPF_TAX:
+			error_msg("STMT(BPF_TAX)");
+			break;
+		case BPF_MISC + BPF_TXA:
+			error_msg("STMT(BPF_TXA)");
 			break;
 		default:
 			error_msg("STMT(0x%x, %u, %u, 0x%x)", filter[i].code,
