@@ -155,6 +155,7 @@ ioctl_sg_io_v4	+ioctl.test
 ioctl_sock_gifconf	+ioctl.test -a28 -s1
 ioctl_uffdio	+ioctl.test
 ioctl_v4l2	+ioctl.test
+ioctl_watchdog	+ioctl.test
 ioperm	-a27
 iopl	-a8
 ioprio	-a18 -e trace=ioprio_get,ioprio_set

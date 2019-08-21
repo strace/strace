@@ -309,6 +309,8 @@ ioctl_decode(struct tcb *tcp)
 		return nbd_ioctl(tcp, code, arg);
 	case 'R':
 		return random_ioctl(tcp, code, arg);
+	case 'W':
+		return watchdog_ioctl(tcp, code, arg);
 	default:
 		break;
 	}

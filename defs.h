@@ -944,6 +944,7 @@ DECL_IOCTL(scsi);
 DECL_IOCTL(term);
 DECL_IOCTL(ubi);
 DECL_IOCTL(uffdio);
+DECL_IOCTL(watchdog);
 # undef DECL_IOCTL
 
 extern int decode_sg_io_v4(struct tcb *, const kernel_ulong_t arg);

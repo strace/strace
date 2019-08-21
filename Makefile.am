@@ -357,6 +357,7 @@ strace_SOURCES =	\
 	v4l2.c		\
 	wait.c		\
 	wait.h		\
+	watchdog_ioctl.c \
 	xattr.c		\
 	xfs_quota_stat.h \
 	xlat.c		\
