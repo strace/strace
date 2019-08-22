@@ -1340,6 +1340,7 @@ DECL_IOCTL(fs_f);
 DECL_IOCTL(fs_x);
 DECL_IOCTL(gpio);
 DECL_IOCTL(inotify);
+DECL_IOCTL(kd);
 DECL_IOCTL(kvm);
 DECL_IOCTL(nbd);
 DECL_IOCTL(nsfs);

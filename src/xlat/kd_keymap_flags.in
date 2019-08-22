@@ -1,0 +1,8 @@
+1<<KG_SHIFT        1<<0
+1<<KG_ALTGR        1<<1
+1<<KG_CTRL         1<<2
+1<<KG_ALT          1<<3
+1<<KG_SHIFTL       1<<4
+1<<KG_SHIFTR       1<<5
+1<<KG_CTRLL        1<<6
+1<<KG_CTRLR        1<<7

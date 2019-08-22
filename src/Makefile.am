@@ -160,6 +160,8 @@ libstrace_a_SOURCES =	\
 	ipc_shm.c	\
 	ipc_shmctl.c	\
 	kcmp.c		\
+	kd_ioctl.c	\
+	kd_mpers_ioctl.c \
 	kernel_dirent.h	\
 	kernel_fcntl.h	\
 	kernel_rusage.h	\

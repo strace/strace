@@ -1,0 +1,12 @@
+#sorted
+K_BRL_BLANK     K(KT_BRL, 0)
+K_BRL_DOT1      K(KT_BRL, 1)
+K_BRL_DOT2      K(KT_BRL, 2)
+K_BRL_DOT3      K(KT_BRL, 3)
+K_BRL_DOT4      K(KT_BRL, 4)
+K_BRL_DOT5      K(KT_BRL, 5)
+K_BRL_DOT6      K(KT_BRL, 6)
+K_BRL_DOT7      K(KT_BRL, 7)
+K_BRL_DOT8      K(KT_BRL, 8)
+K_BRL_DOT9      K(KT_BRL, 9)
+K_BRL_DOT10     K(KT_BRL, 10)

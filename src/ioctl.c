@@ -366,6 +366,8 @@ ioctl_decode(struct tcb *tcp)
 		return evdev_ioctl(tcp, code, arg);
 	case 'I':
 		return inotify_ioctl(tcp, code, arg);
+	case 'K':
+		return kd_ioctl(tcp, code, arg);
 	case 'L':
 		return loop_ioctl(tcp, code, arg);
 	case 'M':

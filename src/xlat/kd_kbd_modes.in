@@ -1,0 +1,6 @@
+#value_indexed
+K_RAW		0
+K_XLATE		1
+K_MEDIUMRAW	2
+K_UNICODE	3
+K_OFF		4

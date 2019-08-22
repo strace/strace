@@ -1,0 +1,5 @@
+#sorted
+K_DOWN		K(KT_CUR,0)
+K_LEFT		K(KT_CUR,1)
+K_RIGHT		K(KT_CUR,2)
+K_UP		K(KT_CUR,3)

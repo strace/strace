@@ -1,0 +1,7 @@
+#unconditional
+LED_SCR
+LED_NUM
+LED_CAP
+LED_SCR<<4
+LED_NUM<<4
+LED_CAP<<4

@@ -192,6 +192,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_hdio-success-v-Xabbrev \
 	ioctl_hdio-success-v-Xraw \
 	ioctl_hdio-success-v-Xverbose \
+	ioctl_kd-success \
+	ioctl_kd-success-Xabbrev \
+	ioctl_kd-success-Xraw \
+	ioctl_kd-success-Xverbose \
+	ioctl_kd-success-s1024 \
+	ioctl_kd-success-s1024-Xabbrev \
+	ioctl_kd-success-s1024-Xraw \
+	ioctl_kd-success-s1024-Xverbose \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_mtd-success \
