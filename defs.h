@@ -775,18 +775,14 @@ enum xlat_style_private_flag_bits {
 	PXF_DEFAULT_STR_BIT,
 };
 
-# define FLAG_(name_) name_ = 1 << name_##_BIT
-
 enum xlat_style_private_flags {
 	/* print_array */
-	FLAG_(PAF_PRINT_INDICES),
-	FLAG_(PAF_ARRAY_TRUNCATED),
+	FLAG(PAF_PRINT_INDICES),
+	FLAG(PAF_ARRAY_TRUNCATED),
 
 	/* print_xlat */
-	FLAG_(PXF_DEFAULT_STR),
+	FLAG(PXF_DEFAULT_STR),
 };
-
-# undef FLAG_
 
 /** Print a value in accordance with xlat formatting settings. */
 extern void print_xlat_ex(uint64_t val, const char *str, enum xlat_style style);

@@ -73,4 +73,10 @@ is_filled(const char *ptr, char fill, size_t size)
 # define IS_ARRAY_ZERO(arr_)	\
 	is_filled((const char *) (arr_), 0, sizeof(arr_) + MUST_BE_ARRAY(arr_))
 
+# ifndef BIT
+#  define BIT(x_) (1U << (x_))
+# endif
+
+# define FLAG(name_) name_ = BIT(name_##_BIT)
+
 #endif /* !STRACE_MACROS_H */
