@@ -614,6 +614,12 @@ tprints_arg_begin(const char *name)
 		printfd((tcp_), (where_).field_);			\
 	} while (0)
 
+# define PRINT_FIELD_CHAR(where_, field_, flags_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_char((where_).field_, (flags_));			\
+	} while (0)
+
 # define PRINT_FIELD_TGID(where_, field_, tcp_)				\
 	do {								\
 		tprints_field_name(#field_);				\
