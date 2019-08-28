@@ -423,6 +423,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/nsfs.h
 	linux/perf_event.h
 	linux/quota.h
+	linux/sched.h
 	linux/seccomp.h
 	linux/securebits.h
 	linux/sem.h
@@ -612,6 +613,8 @@ AC_CHECK_MEMBERS(m4_normalize([
 		struct iocb.aio_flags,
 		struct iocb.aio_rw_flags
 		]),,, [#include <linux/aio_abi.h>])
+
+AC_CHECK_TYPES([struct clone_args],,, [#include <linux/sched.h>])
 
 CPPFLAGS="$saved_CPPFLAGS"
 

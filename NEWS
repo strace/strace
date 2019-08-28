@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Implemented decoding of pidfd_open syscall.
+  * Implemented decoding of pidfd_open and clone3 syscalls.
   * Enhanced decoding of NETLINK_ROUTE protocol.
   * Implemented decoding of UNIX_DIAG_UID netlink attribute.
   * Updated lists of BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, TCP_*, V4L2_*,

@@ -86,6 +86,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	check_sigign \
 	clone_parent \
 	clone_ptrace \
+	clone3-success \
+	clone3-success-Xabbrev \
+	clone3-success-Xraw \
+	clone3-success-Xverbose \
 	count-f \
 	delay \
 	execve-v \
@@ -235,6 +239,7 @@ DECODER_TESTS = \
 	caps-abbrev.test \
 	caps.test \
 	clone-flags.test \
+	clone3-success.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \

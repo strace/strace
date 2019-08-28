@@ -18,6 +18,8 @@
 # define CSIGNAL 0x000000ff
 #endif
 
+#include "print_fields.h"
+
 #include "xlat/clone_flags.h"
 #include "xlat/setns_types.h"
 #include "xlat/unshare_flags.h"
@@ -136,6 +138,193 @@ SYS_FUNC(clone)
 	}
 	return 0;
 }
+
+
+struct strace_clone_args {
+	uint64_t flags;
+	uint64_t /* int * */ pidfd;
+	uint64_t /* int * */ child_tid;
+	uint64_t /* int * */ parent_tid;
+	uint64_t /* int */   exit_signal;
+	uint64_t stack;
+	uint64_t stack_size;
+	uint64_t tls;
+};
+
+/**
+ * Print a region of tracee memory only in case non-zero bytes are present
+ * there.  It almost fits into printstr_ex, but it has some pretty specific
+ * behaviour peculiarities (like printing of ellipsis on error) to readily
+ * integrate it there.
+ *
+ * Since it is expected to be used for printing tail of a structure in tracee's
+ * memory, it accepts a combination of start_addr/start_offs/total_len and does
+ * the relevant calculations itself.
+ *
+ * @param prefix     A string printed in cases something is going to be printed.
+ * @param start_addr Address of the beginning of a structure (whose tail
+ *                   is supposedly to be printed) in tracee's memory.
+ * @param start_offs Offset from the beginning of the structure where the tail
+ *                   data starts.
+ * @param total_len  Total size of the tracee's memory region containing
+ *                   the structure and the tail data.
+ *                   Caller is responsible for imposing a sensible (usually
+ *                   mandated by the kernel interface, like get_pagesize())
+ *                   limit here.
+ * @param style      Passed to string_quote as "style" parameter.
+ * @return           Returns true is anything was printed, false otherwise.
+ */
+static bool
+print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+		    const kernel_ulong_t start_addr,
+		    const unsigned int start_offs,
+		    const unsigned int total_len,
+		    const unsigned int style)
+{
+	if (start_offs >= total_len)
+		return false;
+
+	const kernel_ulong_t addr = start_addr + start_offs;
+	const unsigned int len = total_len - start_offs;
+	const unsigned int size = MIN(len, max_strlen);
+
+	char *str = malloc(len);
+
+	if (!str) {
+		error_func_msg("memory exhausted when tried to allocate"
+                               " %u bytes", len);
+		tprintf("%s???", prefix);
+		return true;
+	}
+
+	bool ret = true;
+
+	if (umoven(tcp, addr, len, str)) {
+		tprintf("%s???", prefix);
+	} else if (is_filled(str, 0, len)) {
+		ret = false;
+	} else {
+		tprints(prefix);
+		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+
+		print_quoted_string(str, size, style);
+
+		if (size < len)
+			tprints("...");
+	}
+
+	free(str);
+	return ret;
+}
+
+SYS_FUNC(clone3)
+{
+	static const size_t minsz = offsetofend(struct strace_clone_args, tls);
+
+	const kernel_ulong_t addr = tcp->u_arg[0];
+	const kernel_ulong_t size = tcp->u_arg[1];
+
+	struct strace_clone_args arg = { 0 };
+	kernel_ulong_t fetch_size;
+
+	fetch_size = MIN(size, sizeof(arg));
+
+	if (entering(tcp)) {
+		if (fetch_size < minsz) {
+			printaddr(addr);
+			goto out;
+		} else if (umoven_or_printaddr(tcp, addr, fetch_size, &arg)) {
+			goto out;
+		}
+
+		PRINT_FIELD_FLAGS("{", arg, flags, clone_flags,
+				  "CLONE_???");
+
+		if (arg.flags & CLONE_PIDFD)
+			PRINT_FIELD_ADDR64(", ", arg, pidfd);
+
+		if (arg.flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID))
+			PRINT_FIELD_ADDR64(", ", arg, child_tid);
+
+		if (arg.flags & CLONE_PARENT_SETTID)
+			PRINT_FIELD_ADDR64(", ", arg, parent_tid);
+
+		tprints(", exit_signal=");
+		if (arg.exit_signal < INT_MAX)
+			printsignal(arg.exit_signal);
+		else
+			tprintf("%" PRIu64, arg.exit_signal);
+
+		PRINT_FIELD_ADDR64(", ", arg, stack);
+		PRINT_FIELD_X(", ", arg, stack_size);
+
+		if (arg.flags & CLONE_SETTLS) {
+			tprints(", tls=");
+			print_tls_arg(tcp, arg.tls);
+		}
+
+		if (size > fetch_size)
+			print_nonzero_bytes(tcp, ", ", addr, fetch_size,
+					    MIN(size, get_pagesize()),
+					    QUOTE_FORCE_HEX);
+
+		tprints("}");
+
+		if ((arg.flags & (CLONE_PIDFD | CLONE_PARENT_SETTID)) ||
+		    (size > fetch_size))
+			return 0;
+
+		goto out;
+	}
+
+	/* exiting */
+
+	if (syserror(tcp))
+		goto out;
+
+	if (umoven(tcp, addr, fetch_size, &arg)) {
+		tprints(" => ");
+		printaddr(addr);
+		goto out;
+	}
+
+	static const char initial_pfx[] = " => {";
+	const char *pfx = initial_pfx;
+
+	if (arg.flags & CLONE_PIDFD) {
+		tprintf("%spidfd=", pfx);
+		printnum_fd(tcp, arg.pidfd);
+		pfx = ", ";
+	}
+
+	if (arg.flags & CLONE_PARENT_SETTID) {
+		tprintf("%sparent_tid=", pfx);
+		printnum_int(tcp, arg.parent_tid, "%d"); /* TID */
+		pfx = ", ";
+	}
+
+	if (size > fetch_size) {
+		/*
+		 * TODO: it is possible to also store the tail on entering
+		 *       and then compare against it on exiting in order
+		 *       to avoid double-printing, but it would also require yet
+		 *       another complication of print_nonzero_bytes interface.
+		 */
+		if (print_nonzero_bytes(tcp, pfx, addr, fetch_size,
+					MIN(size, get_pagesize()),
+					QUOTE_FORCE_HEX))
+			pfx = ", ";
+	}
+
+	if (pfx != initial_pfx)
+		tprints("}");
+
+out:
+	tprintf(", %" PRI_klu, size);
+
+	return RVAL_DECODED;
+}
+
 
 SYS_FUNC(setns)
 {

@@ -31,6 +31,13 @@ clock	test_trace_expr 'times|fcntl.*' -e/clock
 clock_adjtime	-a37
 clock_nanosleep	-e trace=clock_nanosleep,clock_gettime
 clock_xettime	-a36 -e trace=clock_getres,clock_gettime,clock_settime
+clone3	-a16
+clone3-Xabbrev	-a16 -Xabbrev  -e trace=clone3
+clone3-Xraw	-a16 -Xraw     -e trace=clone3
+clone3-Xverbose	-a16 -Xverbose -e trace=clone3
+clone3-success-Xabbrev	+clone3-success.test -a16 -Xabbrev
+clone3-success-Xraw	+clone3-success.test -a16 -Xraw
+clone3-success-Xverbose	+clone3-success.test -a16 -Xverbose
 copy_file_range
 creat	-a20
 delete_module	-a23

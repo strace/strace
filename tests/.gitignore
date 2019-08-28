@@ -42,6 +42,14 @@ clock_adjtime
 clock_nanosleep
 clock_xettime
 clone-flags
+clone3
+clone3-Xabbrev
+clone3-Xraw
+clone3-Xverbose
+clone3-success
+clone3-success-Xabbrev
+clone3-success-Xraw
+clone3-success-Xverbose
 clone_parent
 clone_ptrace
 copy_file_range
