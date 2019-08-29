@@ -16,7 +16,7 @@ Source: https://strace.io/files/%{version}/strace-%{version}.tar.xz
 BuildRequires: gcc gzip
 
 # Install Bluetooth headers for AF_BLUETOOTH sockets decoding.
-%if 0%{?fedora} >= 18 || 0%{?centos} >= 8 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
+%if 0%{?fedora} >= 18 || 0%{?centos} >= 6 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
 BuildRequires: pkgconfig(bluez)
 %endif
 
