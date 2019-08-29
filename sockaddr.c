@@ -599,11 +599,21 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 	};
 
 	switch (addrlen) {
+	case offsetofend(struct sockaddr_hci, hci_dev):
 	case sizeof(struct sockaddr_hci): {
 		const struct sockaddr_hci *const hci = buf;
-		tprintf("hci_dev=htobs(%hu), hci_channel=",
-			btohs(hci->hci_dev));
-		printxval(hci_channels, hci->hci_channel, "HCI_CHANNEL_???");
+		tprintf("hci_dev=htobs(%hu)", btohs(hci->hci_dev));
+
+		/*
+		 * hci_channel field has been introduced
+		 * Linux commit in v2.6.38-rc1~476^2~14^2~3^2~43^2~9.
+		 */
+		if (addrlen == sizeof(struct sockaddr_hci)) {
+			tprints(", hci_channel=");
+			printxval(hci_channels, hci->hci_channel,
+				  "HCI_CHANNEL_???");
+		}
+
 		break;
 	}
 	case sizeof(struct sockaddr_sco): {

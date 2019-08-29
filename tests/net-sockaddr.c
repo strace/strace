@@ -543,11 +543,22 @@ check_hci(void)
 	TAIL_ALLOC_OBJECT_VAR_PTR(struct sockaddr_hci, hci);
 	hci->hci_family = AF_BLUETOOTH;
 	hci->hci_dev = htobs(h_port);
+# ifdef HAVE_STRUCT_SOCKADDR_HCI_HCI_CHANNEL
 	hci->hci_channel = HCI_CHANNEL_RAW;
+# endif
 	unsigned int len = sizeof(*hci);
-	int ret = connect(-1, (void *) hci, len);
+
+	int ret = connect(-1, (void *) hci, 4);
 	printf("connect(-1, {sa_family=AF_BLUETOOTH, hci_dev=htobs(%hu)"
-	       ", hci_channel=HCI_CHANNEL_RAW}, %u) = %d EBADF (%m)\n",
+	       "}, 4) = %d EBADF (%m)\n",
+	       h_port, ret);
+
+	ret = connect(-1, (void *) hci, len);
+	printf("connect(-1, {sa_family=AF_BLUETOOTH, hci_dev=htobs(%hu)"
+# ifdef HAVE_STRUCT_SOCKADDR_HCI_HCI_CHANNEL
+	       ", hci_channel=HCI_CHANNEL_RAW"
+# endif
+	       "}, %u) = %d EBADF (%m)\n",
 	       h_port, len, ret);
 }
 
@@ -700,9 +711,8 @@ check_raw(void)
 	       " = %d EBADF (%m)\n", len, ret);
 
 	u.sa->sa_family = AF_BLUETOOTH;
-	++len;
 	ret = connect(-1, (void *) u.st, len);
-	printf("connect(-1, {sa_family=AF_BLUETOOTH, sa_data=\"00\"}, %u)"
+	printf("connect(-1, {sa_family=AF_BLUETOOTH, sa_data=\"0\"}, %u)"
 	       " = %d EBADF (%m)\n", len, ret);
 }
 

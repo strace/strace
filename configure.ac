@@ -479,6 +479,9 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 ])
 
 AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
+	AC_CHECK_MEMBERS([struct sockaddr_hci.hci_channel],,,
+			 [#include <bluetooth/bluetooth.h>
+			 #include <bluetooth/hci.h>])
 	AC_CHECK_MEMBERS([struct sockaddr_l2.l2_bdaddr_type],,,
 			 [#include <bluetooth/bluetooth.h>
 			 #include <bluetooth/l2cap.h>])
