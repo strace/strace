@@ -321,7 +321,6 @@ MISC_TESTS = \
 	inject-nf.test \
 	interactive_block.test \
 	kill_child.test \
-	ksysent.test \
 	localtime.test \
 	looping_threads.test \
 	opipe.test \

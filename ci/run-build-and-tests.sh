@@ -94,7 +94,7 @@ case "${CHECK-}" in
 		make -k $j check VERBOSE=${VERBOSE-}
 		codecov --gcov-args=-abcp ||:
 		echo 'BEGIN OF TEST SUITE INFORMATION'
-		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
+		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 		echo 'END OF TEST SUITE INFORMATION'
 		;;
 	valgrind)
@@ -106,7 +106,7 @@ case "${CHECK-}" in
 					rc=$?
 		done
 		echo 'BEGIN OF TEST SUITE INFORMATION'
-		tail -n 99999 -- tests*/test-suite*.log tests*/ksysent.log ||
+		tail -n 99999 -- tests*/test-suite*.log tests*/ksysent.gen.log ||
 			rc=$?
 		echo 'END OF TEST SUITE INFORMATION'
 		[ "$rc" -eq 0 ]

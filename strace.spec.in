@@ -82,7 +82,7 @@ wait
 %{buildroot}%{_bindir}/strace -V
 make %{?_smp_mflags} -k check VERBOSE=1
 echo 'BEGIN OF TEST SUITE INFORMATION'
-tail -n 99999 -- tests*/test-suite.log tests*/ksysent.log
+tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 find tests* -type f -name '*.log' -print0 |
 	xargs -r0 grep -H '^KERNEL BUG:' -- ||:
 echo 'END OF TEST SUITE INFORMATION'

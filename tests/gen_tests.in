@@ -193,6 +193,7 @@ keyctl-Xabbrev	-a31 -s10 -e trace=keyctl -Xabbrev
 keyctl-Xraw	-a13 -s10 -e trace=keyctl -Xraw
 keyctl-Xverbose	-a41 -s10 -e trace=keyctl -Xverbose
 kill	-a12 -esignal=none
+ksysent	../$NAME
 lchown	-a30
 lchown32	-a32
 link
