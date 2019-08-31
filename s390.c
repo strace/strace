@@ -73,8 +73,9 @@ struct sthyi_hdr {
 	uint16_t infhlen3; /**< Length of Hypervisor Section3 */
 	uint16_t infgoff3; /**< Offset to Guest Section3 mapped by INF0GST */
 	uint16_t infglen3; /**< Length of Guest Section3 */
-	/* 44 bytes in total */
 } ATTRIBUTE_PACKED;
+static_assert(sizeof(struct sthyi_hdr) == 44,
+	      "Unexpected struct sthyi_hdr size");
 
 struct sthyi_machine {
 	uint8_t  infmflg1; /**< Machine Flag Byte 1 reserved for IBM use */
@@ -120,8 +121,9 @@ struct sthyi_machine {
 	char     infmmanu[16]; /**< EBCDIC Manufacturer */
 	char     infmseq[16];  /**< EBCDIC Sequence Code */
 	char     infmpman[4];  /**< EBCDIC Plant of Manufacture */
-	/* 60 bytes in total*/
 } ATTRIBUTE_PACKED;
+static_assert(sizeof(struct sthyi_machine) == 60,
+	      "Unexpected struct sthyi_machine size");
 
 struct sthyi_partition {
 	/**
@@ -217,8 +219,9 @@ struct sthyi_partition {
 	 * contains a scaled number where 0x00010000 represents one core.
 	 */
 	uint32_t infplgif;
-	/* 56 bytes */
 } ATTRIBUTE_PACKED;
+static_assert(sizeof(struct sthyi_partition) == 56,
+	      "Unexpected struct sthyi_partition size");
 
 struct sthyi_hypervisor {
 	/**
@@ -279,8 +282,9 @@ struct sthyi_hypervisor {
 	 * Number of cores when MT enabled.
 	 */
 	uint16_t infydifl;
-	/* 32 bytes */
 } ATTRIBUTE_PACKED;
+static_assert(sizeof(struct sthyi_hypervisor) == 32,
+	      "Unexpected struct sthyi_hypervisor size");
 
 struct sthyi_guest {
 	/**
@@ -366,8 +370,9 @@ struct sthyi_guest {
 	 * not capped.
 	 */
 	uint32_t infgpicc;
-	/* 56 bytes */
 } ATTRIBUTE_PACKED;
+static_assert(sizeof(struct sthyi_guest) == 56,
+	      "Unexpected struct sthyi_guest size");
 
 
 static void
