@@ -81,18 +81,21 @@ struct sthyi_machine {
 	uint8_t  infmflg1; /**< Machine Flag Byte 1 reserved for IBM use */
 	uint8_t  infmflg2; /**< Machine Flag Byte 2 reserved for IBM use */
 	/**
-	 * Machine Validity Byte 1
-	 *  - 0x80 - Processor Count Validity. When this bit is on, it indicates
-	 *           that INFMSCPS, INFMDCPS, INFMSIFL, and INFMDIFL contain
-	 *           valid counts. The validity bit may be off when:
-	 *   - STHYI support is not available on a lower level hypervisor, or
-	 *   - Global Performance Data is not enabled.
-	 *  - 0x40 - Machine ID Validity. This bit being on indicates that a
-	 *           SYSIB 1.1.1 was obtained from STSI and information reported
-	 *           in the following fields is valid: INFMTYPE, INFMMANU,
-	 *           INFMSEQ, and INFMPMAN.
-	 *  - 0x20 - Machine Name Validity. This bit being on indicates that the
-	 *           INFMNAME field is valid.
+	 * Machine Validity Byte 1.
+	 *  - 0x80 - INFMPROC, Processor Count Validity. When this bit is on,
+	 *           it indicates that INFMSCPS, INFMDCPS, INFMSIFL,
+	 *           and INFMDIFL contain valid counts. The validity bit
+	 *           may be off when:
+	 *            - STHYI support is not available on a lower level
+	 *              hypervisor, or
+	 *            - Global Performance Data is not enabled.
+	 *  - 0x40 - INFMMID, Machine ID Validity. This bit being on indicates
+	 *           that a SYSIB 1.1.1 was obtained from STSI and information
+	 *           reported in the following fields is valid: INFMTYPE,
+	 *           INFMMANU, INFMSEQ, and INFMPMAN.
+	 *  - 0x20 - INFMMNAM, Machine Name Validity. This bit being on
+	 *           indicates that the INFMNAME field is valid.
+	 *  - 0x10 - INFMPLNV, reserved for IBM use.
 	 */
 	uint8_t  infmval1;
 	uint8_t  infmval2; /**< Machine Validity Byte 2 reserved for IBM use */
@@ -121,33 +124,40 @@ struct sthyi_machine {
 	char     infmmanu[16]; /**< EBCDIC Manufacturer */
 	char     infmseq[16];  /**< EBCDIC Sequence Code */
 	char     infmpman[4];  /**< EBCDIC Plant of Manufacture */
+	char     reserved_1__[4]; /**< Reserved for future IBM use */
+	char     infmplnm[8];  /**< EBCDIC Reserved for IBM use */
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_machine) == 60,
+static_assert(sizeof(struct sthyi_machine) == 72,
 	      "Unexpected struct sthyi_machine size");
 
 struct sthyi_partition {
 	/**
-	 * Partition Flag Byte 1
-	 *  - 0x80 - Multithreading (MT) is enabled.
+	 * Partition Flag Byte 1.
+	 *  - 0x80 - INFPMTEN, multithreading (MT) is enabled.
+	 *  - 0x40 - INFPPOOL, reserved for IBM use.
 	 */
 	uint8_t  infpflg1;
 	/** Partition Flag Byte 2 reserved for IBM use */
 	uint8_t  infpflg2;
 	/**
-	 * Partition Validity Byte 1
-	 *  - 0x80 - Processor count validity. This bit being on indicates that
-	 *           INFPSCPS, INFPDCPS, INFPSIFL, and INFPDIFL contain valid
-	 *           counts.
-	 *  - 0x40 - Partition weight-based capped capacity validity. This bit
-	 *           being on indicates that INFPWBCP and INFPWBIF are valid
-	 *  - 0x20 - Partition absolute capped capacity validity. This bit being
-	 *           on indicates that INFPABCP and INFPABIF are valid.
-	 *  - 0x10 - Partition ID validity. This bit being on indicates that a
-	 *           SYSIB 2.2.2 was obtained from STSI and information reported
-	 *           in the following fields is valid: INFPPNUM and INFPPNAM.
-	 *  - 0x08 - LPAR group absolute capacity capping information validity.
-	 *           This bit being on indicates that INFPLGNM, INFPLGCP, and
-	 *           INFPLGIF are valid.
+	 * Partition Validity Byte 1.
+	 *  - 0x80 - INFPPROC, Processor Count Validity. This bit being on
+	 *           indicates that INFPSCPS, INFPDCPS, INFPSIFL, and INFPDIFL
+	 *           contain valid counts.
+	 *  - 0x40 - INFPWBCC, Partition Weight-Based Capped Capacity Validity.
+	 *           This bit being on indicates that INFPWBCP and INFPWBIF
+	 *           are valid.
+	 *  - 0x20 - INFPACC, Partition Absolute Capped Capacity Validity.
+	 *           This bit being on indicates that INFPABCP and INFPABIF
+	 *           are valid.
+	 *  - 0x10 - INFPPID, Partition ID Validity. This bit being on indicates
+	 *           that a SYSIB 2.2.2 was obtained from STSI and information
+	 *           reported in the following fields is valid: INFPPNUM
+	 *           and INFPPNAM.
+	 *  - 0x08 - INFPLGVL, LPAR Group Absolute Capacity Capping Information
+	 *           Validity. This bit being on indicates that INFPLGNM,
+	 *           INFPLGCP, and INFPLGIF are valid.
+	 *  - 0x04 - INFPPLNV, reserved for IBM use.
 	 */
 	uint8_t  infpval1;
 	/** Partition Validity Byte 2 reserved for IBM use */
@@ -219,17 +229,19 @@ struct sthyi_partition {
 	 * contains a scaled number where 0x00010000 represents one core.
 	 */
 	uint32_t infplgif;
+	char     infpplnm[8]; /**< Reserved for future IBM use. */
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_partition) == 56,
+static_assert(sizeof(struct sthyi_partition) == 64,
 	      "Unexpected struct sthyi_partition size");
 
 struct sthyi_hypervisor {
 	/**
 	 * Hypervisor Flag Byte 1
-	 *  - 0x80 - Guest CPU usage hard limiting is using the consumption
-	 *           method.
-	 *  - 0x40 - If on, LIMITHARD caps use prorated core time for capping.
-	 *           If off, raw CPU time is used.
+	 *  - 0x80 - INFYLMCN, guest CPU usage hard limiting is using
+	 *           the consumption method.
+	 *  - 0x40 - INFYLMPR, if on, LIMITHARD caps use prorated core time
+	 *           for capping. If off, raw CPU time is used.
+	 *  - 0x20 - INFYMTEN, hypervisor is MT-enabled.
 	 */
 	uint8_t infyflg1;
 	uint8_t infyflg2; /**< Hypervisor Flag Byte 2 reserved for IBM use */
@@ -282,8 +294,33 @@ struct sthyi_hypervisor {
 	 * Number of cores when MT enabled.
 	 */
 	uint16_t infydifl;
+	/**
+	 * Mask of installed function codes. Bit position corresponding
+	 * to the function code number is on if the function code is supported
+	 * by this hypervisor. Bits may be on even if the guest
+	 * is not authorized.
+	 *
+	 * Element 0 (INFYINS0) flags:
+	 *  - 0x80 - INFYFCCP, FC = 0, Obtain CPU Capacity Info.
+	 *  - 0x40 - INFYFHYP, FC = 1, Hypervisor Environment Info.
+	 *  - 0x20 - INFYFGLS, FC = 2, Guest List.
+	 *  - 0x10 - INFYFGST, FC = 3, Designated Guest Info.
+	 *  - 0x08 - INFYFPLS, FC = 4, Resource Pool List.
+	 *  - 0x04 - INFYFPDS, FC = 5, Designated Resource Pool Information.
+	 *  - 0x02 - INFYFPML, FC = 6, Resource Pool Member List.
+	 */
+	uint8_t  infyinsf[8];
+	/**
+	 * Mask of authorized functions codes. Bit position corresponding
+	 * to the function code number is on if the function code is supported
+	 * by this hypervisor and the guest has been authorized
+	 * in the directory.
+	 *
+	 * The flags are the same as in infyinsf.
+	 */
+	uint8_t  infyautf[8];
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_hypervisor) == 32,
+static_assert(sizeof(struct sthyi_hypervisor) == 48,
 	      "Unexpected struct sthyi_hypervisor size");
 
 struct sthyi_guest {
@@ -439,13 +476,13 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 # define IS_BLANK(arr_) /* 0x40 is space in EBCDIC */ \
 	is_filled(arr_, '\x40', sizeof(arr_) + MUST_BE_ARRAY(arr_))
 
-# define CHECK_SIZE(hdr_, size_, name_, ...) \
+# define CHECK_SIZE_EX(hdr_, min_size_, size_, name_, ...) \
 	do { \
-		if ((size_) < sizeof(*(hdr_))) { \
+		if ((size_) < (min_size_)) { \
 			tprintf_comment("Invalid " name_ " with size " \
 					"%hu < %zu expected", \
 					##__VA_ARGS__, \
-					(size_), sizeof(*(hdr_))); \
+					(size_), (min_size_)); \
 			print_quoted_string((char *) (hdr_), (size_), \
 					    QUOTE_FORCE_HEX); \
 			\
@@ -453,9 +490,12 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 		} \
 	} while (0)
 
-# define PRINT_UNKNOWN_TAIL(hdr_, size_) \
+# define CHECK_SIZE(hdr_, size_, name_, ...) \
+	CHECK_SIZE_EX((hdr_), sizeof(*(hdr_)), (size_), name_, ##__VA_ARGS__)
+
+# define PRINT_UNKNOWN_TAIL_EX(hdr_, hdr_size_, size_) \
 	do { \
-		if ((size_) > sizeof(*(hdr_)) && \
+		if ((size_) > (hdr_size_) && \
 		    !is_filled((char *) ((hdr_) + 1), '\0', \
 		               (size_) - sizeof(*(hdr_)))) {	\
 			tprints(", ");				   \
@@ -465,13 +505,17 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 		} \
 	} while (0)
 
+# define PRINT_UNKNOWN_TAIL(hdr_, size_) \
+	PRINT_UNKNOWN_TAIL_EX((hdr_), sizeof(*(hdr_)), (size_))
+
 static void
 print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 		    bool *dummy)
 {
+	size_t last_decoded = offsetofend(typeof(*hdr), infmpman);
 	int cnt_val, name_val, id_val;
 
-	CHECK_SIZE(hdr, size, "machine structure");
+	CHECK_SIZE_EX(hdr, last_decoded, size, "machine structure");
 
 	tprints("/* machine */ {");
 	if (!abbrev(tcp)) {
@@ -525,7 +569,18 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 		if (id_val || !IS_ARRAY_ZERO(hdr->infmpman))
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmpman);
 
-		PRINT_UNKNOWN_TAIL(hdr, size);
+		if (size >= offsetofend(struct sthyi_machine, infmplnm)) {
+			last_decoded = offsetofend(struct sthyi_machine,
+						   infmplnm);
+
+			if (!IS_ARRAY_ZERO(hdr->reserved_1__))
+				PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
+
+			if (!IS_ARRAY_ZERO(hdr->infmplnm))
+				PRINT_FIELD_EBCDIC(", ", *hdr, infmplnm);
+		}
+
+		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
 	} else {
 		tprints(", ...");
 	}
@@ -537,11 +592,12 @@ static void
 print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 		      uint16_t size, bool *mt)
 {
+	size_t last_decoded = offsetofend(typeof(*hdr), infplgif);
 	int cnt_val, wcap_val, acap_val, id_val, lpar_val;
 
 	*mt = false;
 
-	CHECK_SIZE(hdr, size, "partition structure");
+	CHECK_SIZE_EX(hdr, last_decoded, size, "partition structure");
 
 	*mt = !!(hdr->infpflg1 & 0x80);
 
@@ -620,7 +676,15 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 				PRINT_FIELD_X(", ", *hdr, infplgif);
 		}
 
-		PRINT_UNKNOWN_TAIL(hdr, size);
+		if (size >= offsetofend(struct sthyi_partition, infpplnm)) {
+			last_decoded = offsetofend(struct sthyi_partition,
+						   infpplnm);
+
+			if (!IS_ARRAY_ZERO(hdr->infpplnm))
+				PRINT_FIELD_EBCDIC(", ", *hdr, infpplnm);
+		}
+
+		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
 	} else {
 		tprints(", ...");
 	}
@@ -629,15 +693,56 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 }
 
 static void
+print_funcs(const uint8_t funcs[8])
+{
+	static const char *func_descs[] = {
+		[0] = "Obtain CPU Capacity Info",
+		[1] = "Hypervisor Environment Info",
+		[2] = "Guest List",
+		[3] = "Designated Guest Info",
+		[4] = "Resource Pool List",
+		[5] = "Designated Resource Pool Information",
+		[6] = "Resource Pool Member List",
+	};
+
+	static_assert(ARRAY_SIZE(func_descs) <= 64,
+		      "func_descs is too big");
+
+	if (is_filled((const char *) funcs, 0, 8))
+		return;
+
+	bool cont = false;
+
+	for (size_t i = 0; i < ARRAY_SIZE(func_descs); i++) {
+		if (!func_descs[i])
+			continue;
+
+		size_t b = i >> 3;
+		size_t f = 1 << (7 - (i & 7));
+
+		if (!(funcs[b] & f))
+			continue;
+
+		tprintf("%s%zu: %s", cont ? ", " : " /* ", i, func_descs[i]);
+		cont = true;
+	}
+
+	if (cont)
+		tprints(" */");
+}
+
+static void
 print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 		       uint16_t size, int num, bool mt)
 {
-	CHECK_SIZE(hdr, size, "hypervisor %d structure", num);
+	size_t last_decoded = offsetofend(typeof(*hdr), infydifl);
+
+	CHECK_SIZE_EX(hdr, last_decoded, size, "hypervisor %d structure", num);
 
 	tprintf("/* hypervisor %d */ ", num);
 	PRINT_FIELD_0X("{", *hdr, infyflg1);
 	if (!abbrev(tcp) && hdr->infyflg1)
-		tprintf_comment("%s%s%s%s%#.0x%s",
+		tprintf_comment("%s%s%s%s%s%s%#.0x%s",
 			hdr->infyflg1 & 0x80 ?
 				"0x80 - guest CPU usage had limiting is using "
 				"the consumption method" : "",
@@ -646,10 +751,14 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 			hdr->infyflg1 & 0x40 ?
 				"0x40 - LIMITHARD caps use prorated core time "
 				"for capping" : "",
-			(hdr->infyflg1 & 0xC0) && (hdr->infyflg1 & 0x3F) ?
+			(hdr->infyflg1 & 0xC0) && (hdr->infyflg1 & 0x20) ?
 				", " : "",
-			hdr->infyflg1 & 0x3F,
-			hdr->infyflg1 & 0x3F ? " - ???" : "");
+			hdr->infyflg1 & 0x20 ?
+				"0x20 - hypervisor is MT-enabled" :"",
+			(hdr->infyflg1 & 0xE0) && (hdr->infyflg1 & 0x1F) ?
+				", " : "",
+			hdr->infyflg1 & 0x1F,
+			hdr->infyflg1 & 0x1F ? " - ???" : "");
 
 	if (!abbrev(tcp)) {
 		if (hdr->infyflg2) /* Reserved */
@@ -692,7 +801,18 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 		PRINT_FIELD_U(", ", *hdr, infydifl);
 
 	if (!abbrev(tcp)) {
-		PRINT_UNKNOWN_TAIL(hdr, size);
+		if (size >= offsetofend(struct sthyi_hypervisor, infyautf)) {
+			last_decoded = offsetofend(struct sthyi_hypervisor,
+						   infyautf);
+
+			PRINT_FIELD_HEX_ARRAY(", ", *hdr, infyinsf);
+			print_funcs(hdr->infyinsf);
+
+			PRINT_FIELD_HEX_ARRAY(", ", *hdr, infyautf);
+			print_funcs(hdr->infyautf);
+		}
+
+		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
 	} else {
 		tprints(", ...");
 	}
@@ -967,7 +1087,9 @@ sthyi_sections:
 /**
  * Wrapper for the s390 STHYI instruction that provides hypervisor information.
  *
- * See https://www.ibm.com/support/knowledgecenter/SSB27U_6.3.0/com.ibm.zvm.v630.hcpb4/hcpb4sth.htm
+ * See
+ * https://www.ibm.com/support/knowledgecenter/SSB27U_6.4.0/com.ibm.zvm.v640.hcpb4/hcpb4sth.htm
+ * https://web.archive.org/web/20170306000915/https://www.ibm.com/support/knowledgecenter/SSB27U_6.3.0/com.ibm.zvm.v630.hcpb4/hcpb4sth.htm
  * for the instruction documentation.
  *
  * The difference in the kernel wrapper is that it doesn't require the 4K

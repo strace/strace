@@ -185,6 +185,44 @@ print_ebcdic(const char *prefix, unsigned char *addr, unsigned int offs,
 	return true;
 }
 
+static inline void
+print_funcs(unsigned char *addr, unsigned int offs)
+{
+	bool cont;
+	const uint8_t *funcs = addr + offs;
+
+	if (!funcs[0])
+		return;
+
+	printf(" /* ");
+
+	if (funcs[0] & 0x80) {
+		printf("0: Obtain CPU Capacity Info");
+		cont = true;
+	}
+
+	if (funcs[0] & 0x40)
+		printf("%s1: Hypervisor Environment Info",
+		       cont ? ", " : (cont = true, ""));
+	if (funcs[0] & 0x20)
+		printf("%s2: Guest List",
+		       cont ? ", " : (cont = true, ""));
+	if (funcs[0] & 0x10)
+		printf("%s3: Designated Guest Info",
+		       cont ? ", " : (cont = true, ""));
+	if (funcs[0] & 0x08)
+		printf("%s4: Resource Pool List",
+		       cont ? ", " : (cont = true, ""));
+	if (funcs[0] & 0x04)
+		printf("%s5: Designated Resource Pool Information",
+		       cont ? ", " : (cont = true, ""));
+	if (funcs[0] & 0x02)
+		printf("%s6: Resource Pool Member List",
+		       cont ? ", " : (cont = true, ""));
+
+	printf(" */");
+}
+
 static void
 print_hypervisor_header(unsigned char *buf, int level, unsigned int offs_pos,
 			unsigned int len_pos, bool mt)
@@ -220,10 +258,16 @@ print_hypervisor_header(unsigned char *buf, int level, unsigned int offs_pos,
 			       "for capping");
 			printed = true;
 		}
-		if (cur[0] & 0x3F) {
+		if (cur[0] & 0x20) {
 			if (printed)
 				printf(", ");
-			printf("%#hhx - ???", cur[0] & 0x3F);
+			printf("0x20 - hypervisor is MT-enabled");
+			printed = true;
+		}
+		if (cur[0] & 0x1F) {
+			if (printed)
+				printf(", ");
+			printf("%#hhx - ???", cur[0] & 0x1F);
 		}
 		printf(" */");
 	}
@@ -254,7 +298,20 @@ print_hypervisor_header(unsigned char *buf, int level, unsigned int offs_pos,
 	print_u16(", infydifl", cur, 30, VERBOSE);
 
 # if VERBOSE
-	if (hdr_size > 32 && !is_empty(cur + 32, hdr_size - 32)) {
+	if (hdr_size >= 48) {
+		printf(", infyinsf=");
+		print_quoted_hex((char *) (cur + 32), 8);
+		print_funcs(cur, 32);
+
+		printf(", infyautf=");
+		print_quoted_hex((char *) (cur + 40), 8);
+		print_funcs(cur, 40);
+
+		if (hdr_size > 48 && !is_empty(cur + 48, hdr_size - 48)) {
+			printf(", ");
+			print_quoted_hex((char *) (cur + 48), hdr_size - 48);
+		}
+	} else if (hdr_size > 32 && !is_empty(cur + 32, hdr_size - 32)) {
 		printf(", ");
 		print_quoted_hex((char *) (cur + 32), hdr_size - 32);
 	}
@@ -584,7 +641,19 @@ print_sthyi(unsigned char *buf)
 	print_ebcdic(", infmseq",  cur, 40, 16, id_valid, false);
 	print_ebcdic(", infmpman", cur, 56, 4,  id_valid, false);
 
-	if (hdr_size > 60 && !is_empty(cur + 60, hdr_size - 60)) {
+	if (hdr_size >= 72) {
+		if (cur[60] || cur[61] || cur[62] || cur[63])
+			printf(", reserved_1__="
+			       "\"\\x%#02hhx\\x%#02hhx\\x%#02hhx\\x%#02hhx\"",
+			       cur[60], cur[61], cur[62], cur[63]);
+
+		print_ebcdic(", infmplnm", cur, 64, 8, false, false);
+
+		if (hdr_size > 72 && !is_empty(cur + 72, hdr_size - 72)) {
+			printf(", ");
+			print_quoted_hex((char *) (cur + 72), hdr_size - 72);
+		}
+	} else if (hdr_size > 60 && !is_empty(cur + 60, hdr_size - 60)) {
 		printf(", ");
 		print_quoted_hex((char *) (cur + 60), hdr_size - 60);
 	}
@@ -686,7 +755,14 @@ partition_hdr:
 		print_x32(", infplgif", cur, 52, false);
 	}
 
-	if (hdr_size > 56 && !is_empty(cur + 56, hdr_size - 56)) {
+	if (hdr_size >= 64) {
+		print_ebcdic(", infpplnm", cur, 56, 8, false, false);
+
+		if (hdr_size > 64 && !is_empty(cur + 64, hdr_size - 64)) {
+			printf(", ");
+			print_quoted_hex((char *) (cur + 64), hdr_size - 64);
+		}
+	} else if (hdr_size > 56 && !is_empty(cur + 56, hdr_size - 56)) {
 		printf(", ");
 		print_quoted_hex((char *) (cur + 56), hdr_size - 56);
 	}
