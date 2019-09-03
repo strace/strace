@@ -60,15 +60,11 @@ static void
 print_tls_arg(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 #ifdef HAVE_STRUCT_USER_DESC
-# if SUPPORTED_PERSONALITIES > 1
-	if (current_personality == 1)
-# endif
+	if ((SUPPORTED_PERSONALITIES == 1) || (current_personality == 1))
 	{
 		print_user_desc(tcp, addr, USER_DESC_BOTH);
 	}
-# if SUPPORTED_PERSONALITIES > 1
 	else
-# endif
 #endif /* HAVE_STRUCT_USER_DESC */
 	{
 		printaddr(addr);
