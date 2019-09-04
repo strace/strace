@@ -496,11 +496,11 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 # define PRINT_UNKNOWN_TAIL_EX(hdr_, hdr_size_, size_) \
 	do { \
 		if ((size_) > (hdr_size_) && \
-		    !is_filled((char *) ((hdr_) + 1), '\0', \
-		               (size_) - sizeof(*(hdr_)))) {	\
-			tprints(", ");				   \
-			print_quoted_string((char *) ((hdr_) + 1), \
-					    (size_) - sizeof(*(hdr_)), \
+		    !is_filled(((char *) hdr_) + (hdr_size_), '\0', \
+		               (size_) - (hdr_size_))) { \
+			tprints(", "); \
+			print_quoted_string(((char *) hdr_) + (hdr_size_), \
+					    (size_) - (hdr_size_), \
 					    QUOTE_FORCE_HEX); \
 		} \
 	} while (0)
