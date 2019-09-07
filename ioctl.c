@@ -51,8 +51,12 @@ ioctl_next_match(const struct_ioctlent *iop)
 static void
 ioctl_print_code(const unsigned int code)
 {
+	const bool abbrev = xlat_verbose(xlat_verbosity) != XLAT_STYLE_VERBOSE;
+
 	tprints("_IOC(");
-	printflags(ioctl_dirs, _IOC_DIR(code), "_IOC_???");
+	printflags_ex(_IOC_DIR(code), abbrev ? "_IOC_???" : NULL,
+		      abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV,
+		      ioctl_dirs, NULL);
 	tprintf(", %#x, %#x, %#x)",
 		_IOC_TYPE(code), _IOC_NR(code), _IOC_SIZE(code));
 }
@@ -61,11 +65,15 @@ static int
 evdev_decode_number(const unsigned int code)
 {
 	const unsigned int nr = _IOC_NR(code);
+	const bool abbrev = xlat_verbose(xlat_verbosity) != XLAT_STYLE_VERBOSE;
 
 	if (_IOC_DIR(code) == _IOC_WRITE) {
 		if (nr >= 0xc0 && nr <= 0xc0 + 0x3f) {
 			tprints("EVIOCSABS(");
-			printxval(evdev_abs, nr - 0xc0, "ABS_???");
+			printxval_ex(evdev_abs, nr - 0xc0,
+				     abbrev ? "ABS_???" : NULL,
+				     abbrev ? XLAT_STYLE_DEFAULT
+					    : XLAT_STYLE_ABBREV);
 			tprints(")");
 			return 1;
 		}
@@ -79,12 +87,16 @@ evdev_decode_number(const unsigned int code)
 		if (nr == 0x20)
 			tprintf("0");
 		else
-			printxval(evdev_ev, nr - 0x20, "EV_???");
+			printxval_ex(evdev_ev, nr - 0x20,
+				     abbrev ? "EV_???" : NULL,
+				     abbrev ? XLAT_STYLE_DEFAULT
+					    : XLAT_STYLE_ABBREV);
 		tprintf(", %u)", _IOC_SIZE(code));
 		return 1;
 	} else if (nr >= 0x40 && nr <= 0x40 + 0x3f) {
 		tprints("EVIOCGABS(");
-		printxval(evdev_abs, nr - 0x40, "ABS_???");
+		printxval_ex(evdev_abs, nr - 0x40, abbrev ? "ABS_???" : NULL,
+			     abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV);
 		tprints(")");
 		return 1;
 	}
