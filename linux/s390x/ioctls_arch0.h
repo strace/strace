@@ -27,6 +27,7 @@
 { "asm/dasd.h", "BIODASDPRRST", _IOC_NONE, 0x4405, 0x00 },
 { "asm/dasd.h", "BIODASDPSRD", _IOC_READ, 0x4404, 0xc0 },
 { "asm/dasd.h", "BIODASDQUIESCE", _IOC_NONE, 0x4406, 0x00 },
+{ "asm/dasd.h", "BIODASDRAS", _IOC_WRITE, 0x4403, 0x10 },
 { "asm/dasd.h", "BIODASDRESUME", _IOC_NONE, 0x4407, 0x00 },
 { "asm/dasd.h", "BIODASDRLSE", _IOC_NONE, 0x4403, 0x00 },
 { "asm/dasd.h", "BIODASDRSRV", _IOC_NONE, 0x4402, 0x00 },

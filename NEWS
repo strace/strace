@@ -7,6 +7,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of UNIX_DIAG_UID netlink attribute.
   * Updated lists of BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, TCP_*, V4L2_*,
     XDP_*, and *_MAGIC constants.
+  * Updated lists of ioctl commands from Linux 5.3.
 
 * Bug fixes
   * Fixed syscall tampering on arc, avr32, csky, ia64, m68k, metag, mips,

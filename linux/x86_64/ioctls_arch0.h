@@ -96,6 +96,7 @@
 { "linux/kvm.h", "KVM_SET_ONE_REG", _IOC_WRITE, 0xaeac, 0x10 },
 { "linux/kvm.h", "KVM_SET_PIT", _IOC_READ, 0xae66, 0x48 },
 { "linux/kvm.h", "KVM_SET_PIT2", _IOC_WRITE, 0xaea0, 0x70 },
+{ "linux/kvm.h", "KVM_SET_PMU_EVENT_FILTER", _IOC_WRITE, 0xaeb2, 0x20 },
 { "linux/kvm.h", "KVM_SET_REGS", _IOC_WRITE, 0xae82, 0x90 },
 { "linux/kvm.h", "KVM_SET_SIGNAL_MASK", _IOC_WRITE, 0xae8b, 0x04 },
 { "linux/kvm.h", "KVM_SET_SREGS", _IOC_WRITE, 0xae84, 0x138 },
