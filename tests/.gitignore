@@ -624,6 +624,7 @@ umovestr
 umovestr-illptr
 umovestr2
 umovestr3
+umovestr_cached
 uname
 unblock_reset_raise
 unix-pair-send-recv

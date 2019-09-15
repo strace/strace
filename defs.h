@@ -645,6 +645,9 @@ umoven_or_printaddr_ignore_syserror(struct tcb *tcp, const kernel_ulong_t addr,
 extern int
 umovestr(struct tcb *, kernel_ulong_t addr, unsigned int len, char *laddr);
 
+/* Invalidate the cache used by umove* functions.  */
+extern void invalidate_umove_cache(void);
+
 extern int upeek(struct tcb *tcp, unsigned long, kernel_ulong_t *);
 extern int upoke(struct tcb *tcp, unsigned long, kernel_ulong_t);
 

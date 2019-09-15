@@ -2327,6 +2327,8 @@ next_event(void)
 	if (interrupted)
 		return NULL;
 
+	invalidate_umove_cache();
+
 	struct tcb *tcp = NULL;
 	struct list_item *elem;
 

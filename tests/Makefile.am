@@ -362,6 +362,7 @@ MISC_TESTS = \
 	strace-ttt.test \
 	termsig.test \
 	threads-execve.test \
+	umovestr_cached.test \
 	# end of MISC_TESTS
 
 TESTS = $(GEN_TESTS) $(DECODER_TESTS) $(MISC_TESTS) $(STACKTRACE_TESTS)

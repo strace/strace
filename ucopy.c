@@ -41,24 +41,15 @@ static ssize_t strace_process_vm_readv(pid_t pid,
 #endif /* !HAVE_PROCESS_VM_READV */
 
 static ssize_t
-vm_read_mem(const pid_t pid, void *const laddr,
-	    const kernel_ulong_t raddr, const size_t len)
+process_read_mem(const pid_t pid, void *const laddr,
+		 void *const raddr, const size_t len)
 {
-	const unsigned long truncated_raddr = raddr;
-
-#if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
-	if (raddr != (kernel_ulong_t) truncated_raddr) {
-		errno = EIO;
-		return -1;
-	}
-#endif
-
 	const struct iovec local = {
 		.iov_base = laddr,
 		.iov_len = len
 	};
 	const struct iovec remote = {
-		.iov_base = (void *) truncated_raddr,
+		.iov_base = raddr,
 		.iov_len = len
 	};
 
@@ -67,6 +58,75 @@ vm_read_mem(const pid_t pid, void *const laddr,
 		process_vm_readv_not_supported = true;
 
 	return rc;
+}
+
+static int cached_idx = -1;
+static unsigned long cached_raddr[2];
+
+void
+invalidate_umove_cache(void)
+{
+	cached_idx = -1;
+}
+
+static ssize_t
+vm_read_mem(const pid_t pid, void *const laddr,
+	    const kernel_ulong_t raddr, const size_t len)
+{
+	if (!len)
+		return len;
+
+	const unsigned long taddr = raddr;
+
+#if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
+	if (raddr != (kernel_ulong_t) taddr) {
+		errno = EIO;
+		return -1;
+	}
+#endif
+
+	const size_t page_size = get_pagesize();
+	const size_t page_mask = page_size - 1;
+	const unsigned long raddr_page_start =
+		taddr & ~page_mask;
+	const unsigned long raddr_page_next =
+		(taddr + len + page_mask) & ~page_mask;
+
+	if (!raddr_page_start ||
+	    raddr_page_next < raddr_page_start ||
+	    raddr_page_next - raddr_page_start != page_size)
+		return process_read_mem(pid, laddr, (void *) taddr, len);
+
+	int idx = -1;
+	if (cached_idx >= 0) {
+		if (raddr_page_start == cached_raddr[cached_idx])
+			idx = cached_idx;
+		else if (raddr_page_start == cached_raddr[!cached_idx])
+			idx = !cached_idx;
+	}
+
+	static char *buf[2];
+
+	if (idx == -1) {
+		idx = !cached_idx;
+
+		if (!buf[idx])
+			buf[idx] = xmalloc(page_size);
+
+		const ssize_t rc =
+			process_read_mem(pid, buf[idx],
+					 (void *) raddr_page_start, page_size);
+		if (rc < 0)
+			return rc;
+
+		cached_raddr[idx] = raddr_page_start;
+		if (cached_idx < 0)
+			cached_raddr[!idx] = 0;
+		cached_idx = idx;
+	}
+
+	memcpy(laddr, buf[idx] + (taddr - cached_raddr[idx]), len);
+	return len;
 }
 
 static bool
