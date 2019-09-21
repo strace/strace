@@ -43,14 +43,14 @@
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)
 
 # define PRINT_ALLOW_SYSCALL(nr) \
-	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
+	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#lx, 0, 0x1), " \
 	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW), ", \
-	       __NR_ ## nr)
+	       (long) __NR_ ## nr)
 
 # define PRINT_DENY_SYSCALL(nr, err) \
-	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
+	printf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#lx, 0, 0x1), " \
 	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|%#x), ", \
-	       __NR_ ## nr, err)
+	       (long) __NR_ ## nr, err)
 
 static const struct sock_filter filter[] = {
 	/* load syscall number */
