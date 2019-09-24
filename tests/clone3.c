@@ -142,7 +142,7 @@ print_addr64(const char *pfx, uint64_t addr)
 static void
 print_tls(const char *pfx, uint64_t arg_ptr, enum validity_flags vf)
 {
-# if defined HAVE_STRUCT_USER_DESC && defined __i386__
+#if defined HAVE_STRUCT_USER_DESC && defined __i386__
 	if (!(vf & TLS_VALID)) {
 		print_addr64(pfx, arg_ptr);
 		return;
@@ -169,9 +169,9 @@ print_tls(const char *pfx, uint64_t arg_ptr, enum validity_flags vf)
 	       arg->limit_in_pages,
 	       arg->seg_not_present,
 	       arg->useable);
-# else
+#else
 	print_addr64(pfx, arg_ptr);
-# endif
+#endif
 }
 
 static inline void
@@ -278,13 +278,13 @@ main(int argc, char *argv[])
 	int *parent_tid = tail_alloc(sizeof(*parent_tid));
 	long rc;
 
-# if defined HAVE_STRUCT_USER_DESC
+#if defined HAVE_STRUCT_USER_DESC
 	struct user_desc *tls = tail_alloc(sizeof(*tls));
 
 	fill_memory(tls, sizeof(*tls));
-# else
+#else
 	int *tls = tail_alloc(sizeof(*tls));
-# endif
+#endif
 
 	*pidfd = 0xbadc0ded;
 	*child_tid = 0xdeadface;

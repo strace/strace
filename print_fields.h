@@ -79,14 +79,14 @@
 			      (xlat_), NULL);				\
 	} while (0)
 
-#define PRINT_FIELD_ERR_D(prefix_, where_, field_)			\
+# define PRINT_FIELD_ERR_D(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		print_err(sign_extend_unsigned_to_ll((where_).field_),	\
 			  true);					\
 	} while (0)
 
-#define PRINT_FIELD_ERR_U(prefix_, where_, field_)			\
+# define PRINT_FIELD_ERR_U(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		print_err(zero_extend_signed_to_ull((where_).field_),	\
@@ -261,7 +261,7 @@
 			       (size_));				\
 	} while (0)
 
-#define PRINT_FIELD_HWADDR_SZ(prefix_, where_, field_, size_, hwtype_)	\
+# define PRINT_FIELD_HWADDR_SZ(prefix_, where_, field_, size_, hwtype_)	\
 	do {								\
 		static_assert(sizeof(((where_).field_)[0]) == 1,	\
 			      "hwaddress is not a byte array");	\
