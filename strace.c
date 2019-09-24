@@ -20,6 +20,7 @@
 #ifdef HAVE_PATHS_H
 # include <paths.h>
 #endif
+#include <getopt.h>
 #include <pwd.h>
 #include <grp.h>
 #include <dirent.h>
@@ -308,8 +309,8 @@ Startup:\n\
 \n\
 Miscellaneous:\n\
   -d             enable debug output to stderr\n\
-  -h             print help message\n\
-  -V             print version\n\
+  -h, --help     print help message\n\
+  -V, --version  print version\n\
 "
 /* ancient, no one should use it
 -F -- attempt to follow vforks (deprecated, use -f)\n\
@@ -1602,11 +1603,19 @@ init(int argc, char *argv[])
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
 	qualify("signal=all");
-	while ((c = getopt(argc, argv, "+"
+
+	static const char optstring[] = "+"
 #ifdef ENABLE_STACKTRACE
 	    "k"
 #endif
-	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ")) != EOF) {
+	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ";
+	static const struct option longopts[] = {
+		{ "help", no_argument, 0, 'h' },
+		{ "version", no_argument, 0, 'V' },
+		{ 0, 0, 0, 0 }
+	};
+
+	while ((c = getopt_long(argc, argv, optstring, longopts, NULL)) != EOF) {
 		switch (c) {
 		case 'a':
 			acolumn = string_to_uint(optarg);

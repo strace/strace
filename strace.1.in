@@ -981,10 +981,14 @@ and it is ignored at all if used along with one or more instances of
 .B \-f
 option.
 .TP
-.B \-h
+.BR \-h ,
+.TQ
+.B \-\-help
 Print the help summary.
 .TP
-.B \-V
+.BR \-V ,
+.TQ
+.B \-\-version
 Print the version number of
 .BR strace .
 .SH DIAGNOSTICS

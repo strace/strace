@@ -6,7 +6,9 @@
 run_prog_skip_if_failed date +%Y > /dev/null
 year="$(date +%Y)"
 
-run_strace -V > "$LOG"
+run_strace -V > "$OUT"
+run_strace --version > "$LOG"
+match_diff "$LOG" "$OUT" '-V and --version output mismatch'
 
 getstr()
 {
@@ -66,4 +68,4 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 Optional features enabled:${features}
 __EOF__
 
-match_diff "$LOG" "$EXP"
+match_diff "$OUT" "$EXP"
