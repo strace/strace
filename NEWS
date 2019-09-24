@@ -5,16 +5,26 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented usage of seccomp-bpf for stopping tracees only for filtered
     syscalls.  Use --seccomp-bpf option to enable.
   * Implemented decoding of pidfd_open and clone3 syscalls.
+  * Enhanced decoding of io_cancel, io_submit, s390_sthyi, and syslog syscalls.
   * Enhanced decoding of NETLINK_ROUTE protocol.
   * Implemented decoding of UNIX_DIAG_UID netlink attribute.
-  * Updated lists of BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, TCP_*, V4L2_*,
+  * Implemented decoding of WDIOC_* ioctl commands.
+  * Enchanced syscall count statistics: overhead is now applied per-call,
+    added ability for sorting on errors field.
+  * Syscall delay injection and overhead values can now be supplied with
+    time measure unit suffix and provided in IEEE 754 floating point format.
+  * Updated lists of AUDIT_*, BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, TCP_*, V4L2_*,
     XDP_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 5.3.
+  * Enhanced manual page.
 
 * Bug fixes
   * Fixed syscall tampering on arc, avr32, csky, ia64, m68k, metag, mips,
     nios2, or1k, riscv, s390, s390x, sparc, sparc64, and tile architectures
     when PTRACE_GET_SYSCALL_INFO is in use.
+  * Fixed decoding of sockaddr_hci (AF_BLUETOOTH) addresses that lack
+    hci_channel field.
+  * Fixed evdev ioctl bitset decoding.
   * Fixed tests on alpha with Linux kernel headers 5.1+.
 
 * Portability
