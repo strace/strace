@@ -978,8 +978,12 @@ Show some debugging output of
 itself on the standard error.
 .TP
 .B \-\-seccomp\-bpf
-Enable (experimental) usage of seccomp-bpf to have ptrace(2)-stops only when
-system calls that are being traced occur in the traced processes.  Implies the
+Enable (experimental) usage of seccomp-bpf (see
+.BR seccomp (2))
+to have
+.BR ptrace (2)-stops
+only when system calls that are being traced occur in the traced processes.
+Implies the
 .B \-f
 option.
 An attempt to rely on seccomp-bpf to filter system calls may fail for various
