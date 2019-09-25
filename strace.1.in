@@ -214,9 +214,9 @@ on a system with supplementary group ids:
 .CW
 getgroups(32, [100, 0]) = 2
 .CE
-On the other hand, bit-sets are also shown using square brackets
-but set elements are separated only by a space.  Here is the shell,
-preparing to execute an external command:
+On the other hand, bit-sets are also shown using square brackets,
+but set elements are separated only by a space.
+Here is the shell, preparing to execute an external command:
 .CW
 sigprocmask(SIG_BLOCK, [CHLD TTOU], []) = 0
 .CE
