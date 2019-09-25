@@ -109,13 +109,21 @@ do_clone3_(void *args, kernel_ulong_t size, bool should_fail, int line)
 				    "of a clone3() call (%ld instead of %ld)",
 				    line, rc, injected_retval);
 #else
-	if (should_fail && rc >= 0)
-		error_msg_and_fail("%d: Unexpected success of a clone3() call",
-				   line);
 
-	if (!should_fail && rc < 0 && errno != ENOSYS)
-		perror_msg_and_fail("%d: Unexpected failure of a clone3() call",
-				    line);
+	static int unimplemented_error = -1;
+
+	if (should_fail) {
+		if (rc >= 0)
+			error_msg_and_fail("%d: Unexpected success"
+					   " of a clone3() call", line);
+		if (unimplemented_error < 0)
+			unimplemented_error =
+				(errno == EINVAL) ? ENOSYS : errno;
+	} else {
+		if (rc < 0 && errno != unimplemented_error)
+			perror_msg_and_fail("%d: Unexpected failure"
+					    " of a clone3() call", line);
+	}
 
 	if (!rc)
 		_exit(child_exit_status);
