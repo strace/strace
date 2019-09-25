@@ -977,6 +977,22 @@ Show some debugging output of
 .B strace
 itself on the standard error.
 .TP
+.B \-F
+This option is deprecated.  It is retained for backward compatibility only
+and may be removed in future releases.
+Usage of multiple instances of
+.B \-F
+option is still equivalent to a single
+.BR \-f ,
+and it is ignored at all if used along with one or more instances of
+.B \-f
+option.
+.TP
+.BR \-h ,
+.TQ
+.B \-\-help
+Print the help summary.
+.TP
 .B \-\-seccomp\-bpf
 Enable (experimental) usage of seccomp-bpf (see
 .BR seccomp (2))
@@ -997,22 +1013,6 @@ is also ineffective on processes attached using
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
-.TP
-.B \-F
-This option is deprecated.  It is retained for backward compatibility only
-and may be removed in future releases.
-Usage of multiple instances of
-.B \-F
-option is still equivalent to a single
-.BR \-f ,
-and it is ignored at all if used along with one or more instances of
-.B \-f
-option.
-.TP
-.BR \-h ,
-.TQ
-.B \-\-help
-Print the help summary.
 .TP
 .BR \-V ,
 .TQ
