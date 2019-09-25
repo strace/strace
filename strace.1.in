@@ -79,7 +79,6 @@ strace \- trace system calls and signals
 .IR command " [" args ]
 .BR "" }
 .YS
-
 .SH DESCRIPTION
 .IX "strace command" "" "\fLstrace\fR command"
 .LP
@@ -372,7 +371,7 @@ is the numeric process id of each process.
 This is incompatible with
 .BR \-c ,
 since no per-process counts are kept.
-
+.IP
 One might want to consider using
 .BR strace-log-merge (1)
 to obtain a combined strace log view.
@@ -672,7 +671,6 @@ system call which is controlled by the option
 .BR "\-e\ kvm" = vcpu
 Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
 or higher.
-
 .TP
 .B \-i
 Print the instruction pointer at the time of the system call.
@@ -833,7 +831,7 @@ each system call.  The default is to summarise the system time.
 .TP 12
 \fB\-e\ inject\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIusecs\/\fR][:\fBdelay_exit\fR=\,\fIusecs\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.
-
+.IP
 At least one of
 .BR error ,
 .BR retval ,
@@ -846,7 +844,7 @@ options has to be specified.
 and
 .B retval
 are mutually exclusive.
-
+.IP
 If :\fBerror\fR=\,\fIerrno\/\fR option is specified,
 a fault is injected into a syscall invocation:
 the syscall number is replaced by -1 which corresponds to an invalid syscall
@@ -856,24 +854,24 @@ and the error code is specified using a symbolic
 value like
 .B ENOSYS
 or a numeric value within 1..4095 range.
-
+.IP
 If :\fBretval\fR=\,\fIvalue\/\fR option is specified,
 success injection is performed: the syscall number is replaced by -1,
 but a bogus success value is returned to the callee.
-
+.IP
 If :\fBsignal\fR=\,\fIsig\/\fR option is specified with either a symbolic value
 like
 .B SIGSEGV
 or a numeric value within 1..\fBSIGRTMAX\fR range,
 that signal is delivered on entering every syscall specified by the
 .IR set .
-
+.IP
 If :\fBdelay_enter\fR=\,\fIusecs\/\fR or :\fBdelay_exit\fR=\,\fIusecs\/\fR
 options are specified, delay injection is performed: the tracee is delayed
 by at least
 .IR usecs
 microseconds on entering or exiting the syscall.
-
+.IP
 If :\fBsignal\fR=\,\fIsig\/\fR option is specified without
 :\fBerror\fR=\,\fIerrno\/\fR, :\fBretval\fR=\,\fIvalue\/\fR or
 :\fBdelay_{enter,exit}\fR=\,\fIusecs\/\fR options,
@@ -886,21 +884,21 @@ Conversely, :\fBerror\fR=\,\fIerrno\/\fR or
 :\fBdelay_exit\fR=\,\fIusecs\/\fR or
 :\fBsignal\fR=\,\fIsig\/\fR options injects a fault without delivering a signal
 or injecting a delay, etc.
-
+.IP
 If both :\fBerror\fR=\,\fIerrno\/\fR or :\fBretval\fR=\,\fIvalue\/\fR
 and :\fBsignal\fR=\,\fIsig\/\fR options are specified, then both
 a fault or success is injected and a signal is delivered.
-
+.IP
 if :\fBsyscall\fR=\fIsyscall\fR option is specified, the corresponding syscall
 with no side effects is injected instead of -1.
 Currently, only "pure" (see
 .BR "-e trace" = "%pure"
 description) syscalls can be specified there.
-
+.IP
 Unless a :\fBwhen\fR=\,\fIexpr\fR subexpression is specified,
 an injection is being made into every invocation of each syscall from the
 .IR set .
-
+.IP
 The format of the subexpression is one of the following:
 .RS
 .TP 12
@@ -932,13 +930,13 @@ For example, to fail each third and subsequent chdir syscalls with
 .BR ENOENT ,
 use
 \fB\-e\ inject\fR=\,\fIchdir\/\fR:\fBerror\fR=\,\fIENOENT\/\fR:\fBwhen\fR=\,\fI3\/\fB+\fR.
-
+.IP
 The valid range for numbers
 .I first
 and
 .I step
 is 1..65535.
-
+.IP
 An injection expression can contain only one
 .BR error =
 or
@@ -948,18 +946,17 @@ specification, and only one
 specification.  If an injection expression contains multiple
 .BR when =
 specifications, the last one takes precedence.
-
+.IP
 Accounting of syscalls that are subject to injection
 is done per syscall and per tracee.
-
+.IP
 Specification of syscall injection can be combined
 with other syscall filtering options, for example,
 \fB\-P \fI/dev/urandom \fB\-e inject\fR=\,\fIfile\/\fR:\fBerror\fR=\,\fIENOENT\fR.
-
 .TP
 \fB\-e\ fault\fR=\,\fIset\/\fR[:\fBerror\fR=\,\fIerrno\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall fault injection for the specified set of syscalls.
-
+.IP
 This is equivalent to more generic
 \fB\-e\ inject\fR= expression with default value of
 .I errno
