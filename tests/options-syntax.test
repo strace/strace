@@ -59,7 +59,7 @@ x32)
 	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
 	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@x32
 	;;
-aarch64|powerpc64|riscv64|s390x|sparc64|tile)
+aarch64|powerpc64|s390x|sparc64|tile)
 	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
 	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
 	check_h "incorrect personality designator 'x32' in qualification 'getcwd@x32'" -e trace=getcwd@x32
