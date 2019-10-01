@@ -1,9 +1,8 @@
 #!/bin/sh
 # Print a version string.
-scriptversion=2014-12-02.19; # UTC
+scriptversion=2018-03-07.03; # UTC
 
-# Copyright (C) 2007-2014 Free Software Foundation, Inc.
-# Copyright (c) 2013-2017 The strace developers.
+# Copyright (C) 2007-2019 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +15,9 @@ scriptversion=2014-12-02.19; # UTC
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# This script is derived from GIT-VERSION-GEN from GIT: http://git.or.cz/.
+# This script is derived from GIT-VERSION-GEN from GIT: https://git-scm.com/.
 # It may be run two ways:
 # - from a git repository in which the "git describe" command below
 #   produces useful output (thus requiring at least one signed tag)
@@ -73,9 +72,10 @@ scriptversion=2014-12-02.19; # UTC
 
 me=$0
 
+year=`expr "$scriptversion" : '\([^-]*\)'`
 version="git-version-gen $scriptversion
 
-Copyright 2011 Free Software Foundation, Inc.
+Copyright $year Free Software Foundation, Inc.
 There is NO warranty.  You may redistribute this software
 under the terms of the GNU General Public License.
 For more information about these matters, see the files named COPYING."
@@ -102,8 +102,8 @@ while test $# -gt 0; do
   case $1 in
     --help) echo "$usage"; exit 0;;
     --version) echo "$version"; exit 0;;
-    --prefix) shift; prefix="$1";;
-    --fallback) shift; fallback="$1";;
+    --prefix) shift; prefix=${1?};;
+    --fallback) shift; fallback=${1?};;
     -*)
       echo "$0: Unknown option '$1'." >&2
       echo "$0: Try '--help' for more information." >&2
@@ -168,9 +168,10 @@ then
     # tag or the previous older version that did not?
     #   Newer: v6.10-77-g0f8faeb
     #   Older: v6.10-g0f8faeb
-    case $v in
-        *-*-*) : git describe is okay three part flavor ;;
-        *-*)
+    vprefix=`expr "X$v" : 'X\(.*\)-g[^-]*$'` || vprefix=$v
+    case $vprefix in
+        *-*) : git describe is probably okay three part flavor ;;
+        *)
             : git describe is older two part flavor
             # Recreate the number of commits and rewrite such that the
             # result is the same as if we were using the newer version
@@ -185,10 +186,11 @@ then
             ;;
     esac
 
-    # Change the first '-' to a '.', so version-comparing tools work properly.
-    # Remove the "g" in git describe's output string, to save a byte.
+    # Change the penultimate "-" to ".", for version-comparing tools.
+    # Remove the "g" to save a byte.
     # Change remaining '-' to '.', so version conforms to policies.
-    v=`echo "$v" | sed 's/-/.0./;s/\(.*\)-g/\1-/;s/-/./g'`;
+    v=`echo "$v" | sed 's/-\([^-]*\)-g\([^-]*\)$/.0.\1.\2/'`;
+
     v_from_git=1
 elif test "x$fallback" = x || git --version >/dev/null 2>&1; then
     v=UNKNOWN
@@ -202,7 +204,7 @@ v=`echo "$v" |sed "s/^$prefix//"`
 # string we're using came from git.  I.e., skip the test if it's "UNKNOWN"
 # or if it came from .tarball-version.
 if test "x$v_from_git" != x; then
-  # Don't declare a version "dirty" merely because a time stamp has changed.
+  # Don't declare a version "dirty" merely because a timestamp has changed.
   git update-index --refresh > /dev/null 2>&1
 
   dirty=`exec 2>/dev/null;git diff-index --name-only HEAD` || dirty=
@@ -220,9 +222,9 @@ fi
 printf %s "$v"
 
 # Local variables:
-# eval: (add-hook 'write-file-hooks 'time-stamp)
+# eval: (add-hook 'before-save-hook 'time-stamp)
 # time-stamp-start: "scriptversion="
 # time-stamp-format: "%:y-%02m-%02d.%02H"
-# time-stamp-time-zone: "UTC"
+# time-stamp-time-zone: "UTC0"
 # time-stamp-end: "; # UTC"
 # End:
