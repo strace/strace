@@ -221,7 +221,7 @@ lchown32	-a32
 link
 linkat
 lookup_dcookie	-a27
-lstat	-a32 -v -P stat.sample -P /dev/full
+lstat	-a31 -v -P stat.sample -P /dev/full
 lstat64	-a32 -v -P stat.sample -P /dev/full
 madvise	-a33
 maybe_switch_current_tcp	-a30 -f -e trace=execveat
@@ -509,7 +509,7 @@ socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
 sockopt-timestamp	-e trace=recvmsg
 splice
-stat	-a32 -v -P stat.sample -P /dev/full
+stat	-a30 -v -P stat.sample -P /dev/full
 stat64	-a32 -v -P stat.sample -P /dev/full
 statfs	-a17
 statfs64	-a23
