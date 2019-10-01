@@ -1,5 +1,5 @@
 # ===========================================================================
-#   http://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
+#   https://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -33,7 +33,7 @@
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 8
+#serial 9
 #modified for strace project
 
 AU_ALIAS([AC_PROG_CC_FOR_BUILD], [AX_PROG_CC_FOR_BUILD])
