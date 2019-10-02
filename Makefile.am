@@ -416,6 +416,7 @@ EXTRA_DIST =				\
 	LGPL-2.1-or-later		\
 	README-configure		\
 	README-linux-ptrace		\
+	copyright-year-gen		\
 	debian/changelog		\
 	debian/compat			\
 	debian/control			\
@@ -430,8 +431,10 @@ EXTRA_DIST =				\
 	debian/strace64.install		\
 	debian/strace64.manpages	\
 	debian/watch			\
+	file-date-gen			\
 	gen_bpf_attr_check.sh		\
 	generate_sen.sh			\
+	git-version-gen			\
 	ioctl_iocdef.c			\
 	ioctlsort.c			\
 	linux/32/ioctls_inc.h		\
