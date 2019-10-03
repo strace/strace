@@ -171,7 +171,13 @@ ioctl_dm
 ioctl_dm-v
 ioctl_evdev
 ioctl_evdev-success
+ioctl_evdev-success-Xabbrev
+ioctl_evdev-success-Xraw
+ioctl_evdev-success-Xverbose
 ioctl_evdev-success-v
+ioctl_evdev-success-v-Xabbrev
+ioctl_evdev-success-v-Xraw
+ioctl_evdev-success-v-Xverbose
 ioctl_evdev-Xabbrev
 ioctl_evdev-Xraw
 ioctl_evdev-Xverbose
