@@ -363,6 +363,7 @@ MISC_TESTS = \
 	status-none-threads.test \
 	status-unfinished-threads.test \
 	strace-C.test \
+	strace-D.test \
 	strace-E.test \
 	strace-S.test \
 	strace-T.test \
@@ -455,6 +456,7 @@ EXTRA_DIST = \
 	stack-fcall.h \
 	status-detached.expected \
 	strace-C.expected \
+	strace-D.expected \
 	strace-E.expected \
 	strace-T.expected \
 	strace-ff.expected \

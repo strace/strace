@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# Check -D option.
+#
+# Copyright (c) 2019 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog sed
+
+get_parent_pid()
+{
+	sed '/^PPid:[[:space:]]*/!d;s///'
+}
+
+get_tracer_pid()
+{
+	sed '/^TracerPid:[[:space:]]*/!d;s///'
+}
+
+status_file=/proc/self/status
+[ -f "$status_file" ] ||
+	framework_skip_ "$status_file is not available"
+
+set -- sed -n -E '/^(P|Tracer)Pid:/p' "$status_file"
+"$@" > "$LOG" ||
+	framework_skip_ "$* does not work"
+
+# not traced: PPid > 0, TracerPid == 0
+[ "$(get_parent_pid < "$LOG")" -gt 0 ] &&
+[ "$(get_tracer_pid < "$LOG")" -eq 0 ] ||
+	dump_log_and_fail_with "$*: unexpected output"
+
+# !-D: PPid > 0, TracerPid > 0, PPid == TracerPid
+run_strace -a14 -q -enone "$@" > "$OUT"
+[ "$(get_parent_pid < "$OUT")" -gt 0 ] &&
+[ "$(get_tracer_pid < "$OUT")" -gt 0 ] &&
+[ "$(get_parent_pid < "$OUT")" = "$(get_tracer_pid < "$OUT")" ] || {
+	cat < "$OUT" > "$LOG"
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+}
+match_diff
+
+# -D: PPid > 0, TracerPid > 0, PPid != TracerPid
+run_strace -a14 -D -q -enone "$@" > "$OUT"
+[ "$(get_parent_pid < "$OUT")" -gt 0 ] &&
+[ "$(get_tracer_pid < "$OUT")" -gt 0 ] &&
+[ "$(get_parent_pid < "$OUT")" != "$(get_tracer_pid < "$OUT")" ] || {
+	cat < "$OUT" > "$LOG"
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+}
+match_diff
+
+exit 0
