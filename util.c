@@ -1329,6 +1329,7 @@ print_array_ex(struct tcb *const tcp,
 	kernel_ulong_t cur;
 	kernel_ulong_t idx = 0;
 	enum xlat_style xlat_style = flags & XLAT_STYLE_MASK;
+	bool truncated = false;
 
 	for (cur = start_addr; cur < end_addr; cur += elem_size, idx++) {
 		if (cur != start_addr)
@@ -1341,6 +1342,7 @@ print_array_ex(struct tcb *const tcp,
 				else {
 					tprints("...");
 					printaddr_comment(cur);
+					truncated = true;
 				}
 				break;
 			}
@@ -1354,6 +1356,7 @@ print_array_ex(struct tcb *const tcp,
 		if (cur >= abbrev_end) {
 			tprints("...");
 			cur = end_addr;
+			truncated = true;
 			break;
 		}
 
@@ -1377,7 +1380,7 @@ print_array_ex(struct tcb *const tcp,
 	}
 
 	if ((cur != start_addr) || !tfetch_mem_func) {
-		if (flags & PAF_ARRAY_TRUNCATED) {
+		if ((flags & PAF_ARRAY_TRUNCATED) && !truncated) {
 			if (cur != start_addr)
 				tprints(", ");
 
