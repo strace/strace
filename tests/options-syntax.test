@@ -50,6 +50,13 @@ check_h '--seccomp-bpf implies -f
 check_h '--seccomp-bpf is not enabled for processes attached with -p
 -w must be given with (-c or -C)' --seccomp-bpf -f -p 1 -w
 
+check_h 'option -F is deprecated, please use -f instead
+-w must be given with (-c or -C)' -F -w /
+check_h 'option -F is deprecated, please use -f instead
+-w must be given with (-c or -C)' -FF -w /
+check_h 'deprecated option -F ignored
+-w must be given with (-c or -C)' -fF -w /
+
 check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
 check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
 
@@ -107,12 +114,14 @@ if [ "$uid" -ge 0 ]; then
 		check_e "-$c has no effect with -c
 $STRACE_EXE: $umsg" -u :nosuchuser: -c -$c true
 	done
-		check_e "-i has no effect with -c
+
+	check_e "-i has no effect with -c
 $STRACE_EXE: -r has no effect with -c
 $STRACE_EXE: -t has no effect with -c
 $STRACE_EXE: -T has no effect with -c
 $STRACE_EXE: -y has no effect with -c
-$STRACE_EXE: $umsg" -u :nosuchuser: -cirtTy true
+$STRACE_EXE: Only the last of -z/-Z options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
 fi
 
 args='-p 2147483647'
