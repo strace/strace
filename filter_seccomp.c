@@ -59,9 +59,11 @@ static const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
 # endif
 };
 
-# ifdef ENABLE_COVERAGE_GCOV
+# ifdef HAVE_FORK
+
+#  ifdef ENABLE_COVERAGE_GCOV
 extern void __gcov_flush(void);
-# endif
+#  endif
 
 static void ATTRIBUTE_NORETURN
 check_seccomp_order_do_child(void)
@@ -91,9 +93,9 @@ check_seccomp_order_do_child(void)
 		perror_func_msg_and_die("PTRACE_TRACEME");
 	}
 
-# ifdef ENABLE_COVERAGE_GCOV
+#  ifdef ENABLE_COVERAGE_GCOV
 	__gcov_flush();
-# endif
+#  endif
 
 	kill(pid, SIGSTOP);
 	syscall(__NR_gettid);
@@ -223,12 +225,15 @@ check_seccomp_order_tracer(int pid)
 
 	return pid;
 }
+# endif /* HAVE_FORK */
 
 static void
 check_seccomp_order(void)
 {
 	seccomp_filtering = false;
 
+	/* NOMMU provides no forks necessary for the test.  */
+# ifdef HAVE_FORK
 	int pid = fork();
 	if (pid < 0) {
 		perror_func_msg("fork");
@@ -248,6 +253,7 @@ check_seccomp_order(void)
 			break;
 		}
 	}
+# endif /* HAVE_FORK */
 }
 
 static bool
@@ -340,11 +346,6 @@ check_bpf_program_size(void)
 static void
 check_seccomp_filter_properties(void)
 {
-	if (NOMMU_SYSTEM) {
-		seccomp_filtering = false;
-		return;
-	}
-
 	int rc = prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
 	seccomp_filtering = rc < 0 && errno != EINVAL;
 	if (!seccomp_filtering)

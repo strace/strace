@@ -1,6 +1,9 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Bug fixes
+  * Fixed build on no-MMU architectures.
+
 Noteworthy changes in release 5.3 (2019-09-25)
 ==============================================
 
