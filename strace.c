@@ -1786,6 +1786,12 @@ init(int argc, char *argv[])
 		error_msg_and_help("PROG [ARGS] must be specified with -D");
 	}
 
+	if (seccomp_filtering && detach_on_execve) {
+		error_msg("--seccomp-bpf is not enabled because"
+			  " it is not compatible with -b");
+		seccomp_filtering = false;
+	}
+
 	if (seccomp_filtering) {
 		if (nprocs && (!argc || debug_flag))
 			error_msg("--seccomp-bpf is not enabled for processes"
