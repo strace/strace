@@ -1,6 +1,10 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Improvements
+  * Implemented -DD and -DDD options that move strace into a separate
+    process group and session, respectively.
+
 * Bug fixes
   * Fixed -b execve when --seccomp-bpf option is specified.
   * Fixed build on no-MMU architectures.

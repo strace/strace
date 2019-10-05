@@ -53,7 +53,7 @@ strace \- trace system calls and signals
 .BR "" {
 .OR \-p pid
 .BR "" |
-.OP \-D
+.OP \-DDD
 .OM \-E var\fR[=\fIval\fR]
 .OP \-u username
 .IR command " [" args ]
@@ -73,7 +73,7 @@ strace \- trace system calls and signals
 .BR "" {
 .OR \-p pid
 .BR "" |
-.OP \-D
+.OP \-DDD
 .OM \-E var\fR[=\fIval\fR]
 .OP -u username
 .IR command " [" args ]
@@ -338,10 +338,29 @@ multi-threaded process and therefore require
 but don't want to trace its (potentially very complex) children.
 .TP
 .B \-D
-Run tracer process as a detached grandchild, not as parent of the
+Run tracer process as a grandchild, not as the parent of the
 tracee.  This reduces the visible effect of
 .B strace
 by keeping the tracee a direct child of the calling process.
+.TP
+.B \-DD
+Run tracer process as tracee's grandchild in a separate process group.
+In addition to reduction of the visible effect of
+.BR strace ,
+it also avoids killing of
+.B strace
+with
+.BR kill (2)
+issued to the whole process group.
+.TP
+.B \-DDD
+Run tracer process as tracee's grandchild in a separate session
+("true daemonisation").
+In addition to reduction of the visible effect of
+.BR strace ,
+it also avoids killing of
+.B strace
+upon session termination.
 .TP
 .B \-f
 Trace child processes as they are created by currently traced

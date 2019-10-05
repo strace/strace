@@ -24,6 +24,10 @@ check_e_using_grep "$ff_name: File *name too long" -ff -o "$ff_name" true
 
 check_h 'must have PROG [ARGS] or -p PID'
 check_h 'PROG [ARGS] must be specified with -D' -D -p $$
+check_h 'PROG [ARGS] must be specified with -D' -DD -p $$
+check_h 'PROG [ARGS] must be specified with -D' -DDD -p $$
+check_h 'PROG [ARGS] must be specified with -D' -DDDD -p $$
+check_h 'Too many -D'\''s (4), maximum supported -D count is 3' -DDDD /bin/true
 check_h '-c and -C are mutually exclusive' -c -C true
 check_h '-c and -C are mutually exclusive' -C -c true
 check_h '(-c or -C) and -ff are mutually exclusive' -c -ff true
