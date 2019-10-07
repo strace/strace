@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -efu
 #
 # Check -D option.
 #
@@ -35,7 +35,7 @@ set -- sed -n -E '/^(P|Tracer)Pid:/p' "$status_file"
 	dump_log_and_fail_with "$*: unexpected output"
 
 # !-D: PPid > 0, TracerPid > 0, PPid == TracerPid
-run_strace -a14 -q -enone "$@" > "$OUT"
+run_strace -q -enone "$@" > "$OUT"
 [ "$(get_parent_pid < "$OUT")" -gt 0 ] &&
 [ "$(get_tracer_pid < "$OUT")" -gt 0 ] &&
 [ "$(get_parent_pid < "$OUT")" = "$(get_tracer_pid < "$OUT")" ] || {
@@ -44,14 +44,22 @@ run_strace -a14 -q -enone "$@" > "$OUT"
 }
 match_diff
 
-# -D: PPid > 0, TracerPid > 0, PPid != TracerPid
-run_strace -a14 -D -q -enone "$@" > "$OUT"
-[ "$(get_parent_pid < "$OUT")" -gt 0 ] &&
-[ "$(get_tracer_pid < "$OUT")" -gt 0 ] &&
-[ "$(get_parent_pid < "$OUT")" != "$(get_tracer_pid < "$OUT")" ] || {
-	cat < "$OUT" > "$LOG"
-	dump_log_and_fail_with "$STRACE $args: unexpected output"
-}
-match_diff
+test_parent_tracer_pid()
+{
+	local d
+	d="$1"; shift
 
-exit 0
+	# -D/-DD/-DDD: PPid > 0, TracerPid > 0, PPid != TracerPid
+	run_strace $d -q -enone "$@" > "$OUT"
+	[ "$(get_parent_pid < "$OUT")" -gt 0 ] &&
+	[ "$(get_tracer_pid < "$OUT")" -gt 0 ] &&
+	[ "$(get_parent_pid < "$OUT")" != "$(get_tracer_pid < "$OUT")" ] || {
+		cat < "$OUT" > "$LOG"
+		dump_log_and_fail_with "$STRACE $args: unexpected output"
+	}
+	match_diff
+}
+
+test_parent_tracer_pid -D "$@"
+test_parent_tracer_pid -DD "$@"
+test_parent_tracer_pid -DDD "$@"

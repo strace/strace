@@ -176,6 +176,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	status-unfinished-threads \
 	syslog-success \
 	threads-execve \
+	tracer_ppid_pgid_sid \
 	unblock_reset_raise \
 	unix-pair-send-recv \
 	unix-pair-sendto-recvfrom \
@@ -364,6 +365,8 @@ MISC_TESTS = \
 	status-unfinished-threads.test \
 	strace-C.test \
 	strace-D.test \
+	strace-DD.test \
+	strace-DDD.test \
 	strace-E.test \
 	strace-S.test \
 	strace-T.test \
@@ -457,6 +460,8 @@ EXTRA_DIST = \
 	status-detached.expected \
 	strace-C.expected \
 	strace-D.expected \
+	strace-DD.expected \
+	strace-DDD.expected \
 	strace-E.expected \
 	strace-T.expected \
 	strace-ff.expected \

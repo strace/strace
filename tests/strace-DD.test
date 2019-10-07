@@ -1,0 +1,37 @@
+#!/bin/sh -efu
+#
+# Check -DD option.
+#
+# Copyright (c) 2019 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+[ "$STRACE" = "$STRACE_EXE" ] ||
+	skip_ 'Not applicable: $STRACE != $STRACE_EXE'
+
+check_prog timeout
+
+test_D()
+{
+	local exp args
+	exp="$1"; shift
+
+	set -- -e signal=none -e trace=nanosleep "$@" ../sleep 2
+	args="$*"
+	set -- timeout -s XCPU 1 $STRACE -o "$LOG" "$@"
+	> "$LOG"
+	"$@" && rc=0 || rc=$?
+	[ "$rc" = 124 ] ||
+		dump_log_and_fail_with \
+			"$* failed with unexpected exit code $rc"
+	$SLEEP_A_BIT
+	match_diff "$LOG" "$exp"
+}
+
+printf %s 'nanosleep({tv_sec=2, tv_nsec=0}, ' > "$EXP"
+test_D "$EXP" -D
+test_D "$srcdir/$NAME.expected" -DD
+test_D "$srcdir/$NAME.expected" -DDD
