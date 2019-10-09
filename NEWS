@@ -8,6 +8,8 @@ Noteworthy changes in release ?.? (????-??-??)
 * Bug fixes
   * Fixed -b execve when --seccomp-bpf option is specified.
   * Fixed build on no-MMU architectures.
+  * Fixed build on antique systems that do not provide necessary definitions
+    of AUDIT_ARCH_* constants.
 
 Noteworthy changes in release 5.3 (2019-09-25)
 ==============================================
