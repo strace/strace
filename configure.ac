@@ -333,6 +333,7 @@ AC_CHECK_TYPES(m4_normalize([
 #include <linux/fcntl.h>])
 
 AC_CHECK_TYPES(m4_normalize([
+	struct crypto_user_alg,
 	struct crypto_report_aead,
 	struct crypto_report_blkcipher,
 	struct crypto_report_cipher,

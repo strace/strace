@@ -40,6 +40,10 @@
 #include "xlat/nl_xfrm_types.h"
 #include "xlat/nlmsgerr_attrs.h"
 
+# define XLAT_MACROS_ONLY
+#  include "xlat/crypto_msgs.h"
+# undef XLAT_MACROS_ONLY
+
 /*
  * Fetch a struct nlmsghdr from the given address.
  */
@@ -533,9 +537,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 }
 
 static const netlink_decoder_t netlink_decoders[] = {
-#ifdef HAVE_LINUX_CRYPTOUSER_H
 	[NETLINK_CRYPTO] = decode_netlink_crypto,
-#endif
 #ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
 	[NETLINK_NETFILTER] = decode_netlink_netfilter,
 #endif
