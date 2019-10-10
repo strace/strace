@@ -42,8 +42,10 @@ decode_fib_rule_uid_range(struct tcb *const tcp,
 			  const unsigned int len,
 			  const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
-	struct fib_rule_uid_range range;
+	struct /* fib_rule_uid_range */ {
+		uint32_t start;
+		uint32_t end;
+	} range;
 
 	if (len < sizeof(range))
 		return false;
@@ -54,9 +56,6 @@ decode_fib_rule_uid_range(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
