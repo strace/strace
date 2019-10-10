@@ -85,7 +85,8 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_HASH,
-			      pattern, rhash, print_quoted_memory,
+			      pattern, rhash, sizeof(rhash),
+			      print_quoted_memory,
 			      printf("{type=\"efgh\"");
 			      PRINT_FIELD_U(", ", rhash, blocksize);
 			      PRINT_FIELD_U(", ", rhash, digestsize);
@@ -104,7 +105,8 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_BLKCIPHER,
-			      pattern, rblkcipher, print_quoted_memory,
+			      pattern, rblkcipher, sizeof(rblkcipher),
+			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
 			      PRINT_FIELD_U(", ", rblkcipher, blocksize);
 			      PRINT_FIELD_U(", ", rblkcipher, min_keysize);
@@ -124,7 +126,8 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_AEAD,
-			      pattern, raead, print_quoted_memory,
+			      pattern, raead, sizeof(raead),
+			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
 			      PRINT_FIELD_U(", ", raead, blocksize);
 			      PRINT_FIELD_U(", ", raead, maxauthsize);
@@ -140,7 +143,7 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_RNG,
-			      pattern, rrng, print_quoted_memory,
+			      pattern, rrng, sizeof(rrng), print_quoted_memory,
 			      printf("{type=\"abcd\"");
 			      PRINT_FIELD_U(", ", rrng, seedsize);
 			      printf("}"));
@@ -156,7 +159,8 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_CIPHER,
-			      pattern, rcipher, print_quoted_memory,
+			      pattern, rcipher, sizeof(rcipher),
+			      print_quoted_memory,
 			      printf("{type=\"abcd\"");
 			      PRINT_FIELD_U(", ", rcipher, blocksize);
 			      PRINT_FIELD_U(", ", rcipher, min_keysize);

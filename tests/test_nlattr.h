@@ -96,11 +96,9 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 #define TEST_NLATTR_OBJECT_EX_(fd_, nlh0_, hdrlen_,			\
 			       init_msg_, print_msg_,			\
 			       nla_type_, nla_type_str_,		\
-			       pattern_, obj_, fallback_func, ...)	\
+			       pattern_, obj_, minsz_, fallback_func, ...) \
 	do {								\
-		const unsigned int plen =				\
-			sizeof(obj_) - 1 > DEFAULT_STRLEN		\
-			? DEFAULT_STRLEN : (int) sizeof(obj_) - 1;	\
+		const unsigned int plen = MIN((minsz_) - 1, DEFAULT_STRLEN); \
 		/* len < sizeof(obj_) */				\
 		if (plen > 0)						\
 			TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),		\
@@ -113,7 +111,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 			(init_msg_), (print_msg_),			\
 			(nla_type_), (nla_type_str_),			\
 			sizeof(obj_),					\
-			(pattern_), sizeof(obj_) - 1,			\
+			(pattern_), (minsz_) - 1,			\
 			printf("%p",					\
 			       RTA_DATA(NLMSG_ATTR(nlh, (hdrlen_)))));	\
 		/* sizeof(obj_) */					\
@@ -128,12 +126,12 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 #define TEST_NLATTR_OBJECT_EX(fd_, nlh0_, hdrlen_,			\
 			      init_msg_, print_msg_,			\
 			      nla_type_,				\
-			      pattern_, obj_, fallback_func, ...)	\
+			      pattern_, obj_, minsz_, fallback_func, ...) \
 	TEST_NLATTR_OBJECT_EX_((fd_), (nlh0_), (hdrlen_),		\
 			       (init_msg_), (print_msg_),		\
 			       (nla_type_), #nla_type_,			\
-			       (pattern_), (obj_), (fallback_func),	\
-			       __VA_ARGS__)
+			       (pattern_), (obj_), (minsz_),		\
+			       (fallback_func),	__VA_ARGS__)
 
 #define TEST_NLATTR_OBJECT(fd_, nlh0_, hdrlen_,				\
 			   init_msg_, print_msg_,			\
@@ -141,8 +139,17 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 	TEST_NLATTR_OBJECT_EX_((fd_), (nlh0_), (hdrlen_),		\
 			       (init_msg_), (print_msg_),		\
 			       (nla_type_), #nla_type_,			\
-			       (pattern_), (obj_), print_quoted_hex,	\
-			       __VA_ARGS__)
+			       (pattern_), (obj_), sizeof(obj_),	\
+			       print_quoted_hex, __VA_ARGS__)
+
+#define TEST_NLATTR_OBJECT_MINSZ(fd_, nlh0_, hdrlen_,			\
+			   init_msg_, print_msg_,			\
+			   nla_type_, pattern_, obj_, minsz_, ...)	\
+	TEST_NLATTR_OBJECT_EX_((fd_), (nlh0_), (hdrlen_),		\
+			       (init_msg_), (print_msg_),		\
+			       (nla_type_), #nla_type_,			\
+			       (pattern_), (obj_), (minsz_),		\
+			       print_quoted_hex, __VA_ARGS__)
 
 #define TEST_NLATTR_ARRAY(fd_, nlh0_, hdrlen_,				\
 			  init_msg_, print_msg_,			\
