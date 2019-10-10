@@ -122,9 +122,13 @@ main(void)
 				     printf(", state=MDB_TEMPORARY");
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 				     printf(", flags=MDB_FLAGS_OFFLOAD");
+#  else
+				     printf(", flags=0");
 #  endif
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 				     PRINT_FIELD_U(", ", entry, vid);
+#  else
+				     printf(", vid=0");
 #  endif
 				     printf(", addr={u=");
 				     print_quoted_hex(&entry.addr.u,
@@ -145,9 +149,13 @@ main(void)
 		    printf(", state=MDB_TEMPORARY");
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 		    printf(", flags=MDB_FLAGS_OFFLOAD");
+#  else
+		    printf(", flags=0");
 #  endif
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		    PRINT_FIELD_U(", ", entry, vid);
+#  else
+		    printf(", vid=0");
 #  endif
 		    printf(", addr={u=");
 		    print_quoted_hex(&entry.addr.u, sizeof(entry.addr.u));

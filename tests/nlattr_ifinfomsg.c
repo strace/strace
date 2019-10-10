@@ -118,40 +118,39 @@ main(void)
 			   IFLA_LINK_NETNSID, pattern, netnsid,
 			   printf("%d", netnsid));
 
-	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
-			   init_ifinfomsg, print_ifinfomsg,
-			   IFLA_STATS, pattern, st,
-			   PRINT_FIELD_U("{", st, rx_packets);
-			   PRINT_FIELD_U(", ", st, tx_packets);
-			   PRINT_FIELD_U(", ", st, rx_bytes);
-			   PRINT_FIELD_U(", ", st, tx_bytes);
-			   PRINT_FIELD_U(", ", st, rx_errors);
-			   PRINT_FIELD_U(", ", st, tx_errors);
-			   PRINT_FIELD_U(", ", st, rx_dropped);
-			   PRINT_FIELD_U(", ", st, tx_dropped);
-			   PRINT_FIELD_U(", ", st, multicast);
-			   PRINT_FIELD_U(", ", st, collisions);
-			   PRINT_FIELD_U(", ", st, rx_length_errors);
-			   PRINT_FIELD_U(", ", st, rx_over_errors);
-			   PRINT_FIELD_U(", ", st, rx_crc_errors);
-			   PRINT_FIELD_U(", ", st, rx_frame_errors);
-			   PRINT_FIELD_U(", ", st, rx_fifo_errors);
-			   PRINT_FIELD_U(", ", st, rx_missed_errors);
-			   PRINT_FIELD_U(", ", st, tx_aborted_errors);
-			   PRINT_FIELD_U(", ", st, tx_carrier_errors);
-			   PRINT_FIELD_U(", ", st, tx_fifo_errors);
-			   PRINT_FIELD_U(", ", st, tx_heartbeat_errors);
-			   PRINT_FIELD_U(", ", st, tx_window_errors);
-			   PRINT_FIELD_U(", ", st, rx_compressed);
-			   PRINT_FIELD_U(", ", st, tx_compressed);
+	const unsigned int sizeof_stats =
+		offsetofend(struct rtnl_link_stats, tx_compressed);
+	TEST_NLATTR_OBJECT_MINSZ(fd, nlh0, hdrlen,
+				 init_ifinfomsg, print_ifinfomsg,
+				 IFLA_STATS, pattern, st, sizeof_stats,
+				 PRINT_FIELD_U("{", st, rx_packets);
+				 PRINT_FIELD_U(", ", st, tx_packets);
+				 PRINT_FIELD_U(", ", st, rx_bytes);
+				 PRINT_FIELD_U(", ", st, tx_bytes);
+				 PRINT_FIELD_U(", ", st, rx_errors);
+				 PRINT_FIELD_U(", ", st, tx_errors);
+				 PRINT_FIELD_U(", ", st, rx_dropped);
+				 PRINT_FIELD_U(", ", st, tx_dropped);
+				 PRINT_FIELD_U(", ", st, multicast);
+				 PRINT_FIELD_U(", ", st, collisions);
+				 PRINT_FIELD_U(", ", st, rx_length_errors);
+				 PRINT_FIELD_U(", ", st, rx_over_errors);
+				 PRINT_FIELD_U(", ", st, rx_crc_errors);
+				 PRINT_FIELD_U(", ", st, rx_frame_errors);
+				 PRINT_FIELD_U(", ", st, rx_fifo_errors);
+				 PRINT_FIELD_U(", ", st, rx_missed_errors);
+				 PRINT_FIELD_U(", ", st, tx_aborted_errors);
+				 PRINT_FIELD_U(", ", st, tx_carrier_errors);
+				 PRINT_FIELD_U(", ", st, tx_fifo_errors);
+				 PRINT_FIELD_U(", ", st, tx_heartbeat_errors);
+				 PRINT_FIELD_U(", ", st, tx_window_errors);
+				 PRINT_FIELD_U(", ", st, rx_compressed);
+				 PRINT_FIELD_U(", ", st, tx_compressed);
 #ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
-			   PRINT_FIELD_U(", ", st, rx_nohandler);
+				 PRINT_FIELD_U(", ", st, rx_nohandler);
 #endif
 			   printf("}"));
 
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
-	const unsigned int sizeof_stats =
-		offsetofend(struct rtnl_link_stats, tx_compressed);
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_ifinfomsg, print_ifinfomsg,
 		    IFLA_STATS, sizeof_stats, &st, sizeof_stats,
@@ -179,7 +178,6 @@ main(void)
 		    PRINT_FIELD_U(", ", st, rx_compressed);
 		    PRINT_FIELD_U(", ", st, tx_compressed);
 		    printf("}"));
-#endif /* HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER */
 
 	static const struct rtnl_link_ifmap map = {
 		.mem_start = 0xadcbefedefbcdedb,

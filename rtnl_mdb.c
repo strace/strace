@@ -9,27 +9,52 @@
 
 #include "defs.h"
 
+#include "netlink_route.h"
+#include "nlattr.h"
+#include "print_fields.h"
+
+#include <netinet/in.h>
+#include <linux/if_bridge.h>
+#include "netlink.h"
+
+#include "xlat/mdb_flags.h"
+#include "xlat/mdb_states.h"
+#include "xlat/multicast_router_types.h"
+#include "xlat/rtnl_mdb_attrs.h"
+#include "xlat/rtnl_mdba_mdb_attrs.h"
+#include "xlat/rtnl_mdba_mdb_eattr_attrs.h"
+#include "xlat/rtnl_mdba_mdb_entry_attrs.h"
+#include "xlat/rtnl_mdba_router_attrs.h"
+#include "xlat/rtnl_mdba_router_pattr_attrs.h"
+
+typedef struct {
+	uint8_t  family;
+	uint32_t ifindex;
+} struct_br_port_msg;
+
+typedef struct {
+	uint32_t ifindex;
+	uint8_t  state;
+	uint8_t  flags;
+	uint16_t vid;
+	struct {
+		union {
+			uint32_t /* __be32 */ ip4;
+			struct in6_addr       ip6;
+		} u;
+		uint16_t /* __be16 */ proto;
+	} addr;
+} struct_br_mdb_entry;
+
 #ifdef HAVE_STRUCT_BR_PORT_MSG
+static_assert(sizeof(struct br_port_msg) <= sizeof(struct_br_port_msg),
+	      "Unexpected struct br_port_msg size, please update the decoder");
+#endif
 
-# include "netlink_route.h"
-# include "nlattr.h"
-# include "print_fields.h"
-
-# include <netinet/in.h>
-# include <linux/if_bridge.h>
-# include "netlink.h"
-
-# ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
-#  include "xlat/mdb_flags.h"
-# endif
-# include "xlat/mdb_states.h"
-# include "xlat/multicast_router_types.h"
-# include "xlat/rtnl_mdb_attrs.h"
-# include "xlat/rtnl_mdba_mdb_attrs.h"
-# include "xlat/rtnl_mdba_mdb_eattr_attrs.h"
-# include "xlat/rtnl_mdba_mdb_entry_attrs.h"
-# include "xlat/rtnl_mdba_router_attrs.h"
-# include "xlat/rtnl_mdba_router_pattr_attrs.h"
+#ifdef HAVE_STRUCT_BR_NDB_ENTRY
+static_assert(sizeof(struct br_mdb_entry) <= sizeof(struct_br_mdb_entry),
+	      "Unexpected struct br_mdb_entry size, please update the decoder");
+#endif
 
 static const nla_decoder_t mdba_mdb_eattr_nla_decoders[] = {
 	[MDBA_MDB_EATTR_TIMER]	= decode_nla_u32
@@ -41,21 +66,22 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 			   const unsigned int len,
 			   const void *const opaque_data)
 {
-# ifdef HAVE_STRUCT_BR_MDB_ENTRY
-	struct br_mdb_entry entry;
+	struct_br_mdb_entry entry;
 
 	if (len < sizeof(entry))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &entry)) {
 		PRINT_FIELD_IFINDEX("{", entry, ifindex);
 		PRINT_FIELD_XVAL(", ", entry, state, mdb_states, "MDB_???");
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
+
+		/*
+		 * Note that it's impossible to derive if flags/vid fields
+		 * are present on all architectures except m68k; as a side note,
+		 * v4.3-rc1~96^2~365 has introduced an ABI breakage on m68k.
+		 */
 		PRINT_FIELD_FLAGS(", ", entry, flags,
 				  mdb_flags, "MDB_FLAGS_???");
-#  endif
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		PRINT_FIELD_U(", ", entry, vid);
-#  endif
 
 		const int proto = ntohs(entry.addr.proto);
 
@@ -77,9 +103,6 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 	}
 
 	return true;
-# else
-	return false;
-# endif /* HAVE_STRUCT_BR_MDB_ENTRY */
 }
 
 static const nla_decoder_t mdba_mdb_entry_nla_decoders[] = {
@@ -185,7 +208,7 @@ static const nla_decoder_t br_port_msg_nla_decoders[] = {
 
 DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 {
-	struct br_port_msg bpm = { .family = family };
+	struct_br_port_msg bpm = { .family = family };
 	size_t offset = sizeof(bpm.family);
 	bool decode_nla = false;
 
@@ -212,5 +235,3 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 			      ARRAY_SIZE(br_port_msg_nla_decoders), NULL);
 	}
 }
-
-#endif

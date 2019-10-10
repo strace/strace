@@ -90,11 +90,9 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_NEWNETCONF - RTM_BASE] = decode_netconfmsg,
 #endif
 
-#ifdef HAVE_STRUCT_BR_PORT_MSG
 	[RTM_DELMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_GETMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_NEWMDB - RTM_BASE] = decode_br_port_msg,
-#endif
 
 	[RTM_DELNSID - RTM_BASE] = decode_rtgenmsg,
 	[RTM_GETNSID - RTM_BASE] = decode_rtgenmsg,
