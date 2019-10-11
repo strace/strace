@@ -24,7 +24,8 @@
 #include <sys/wait.h>
 
 enum {
-	NUM_USER_ITERS = 1000000,
+	NUM_USER_ITERS_SQRT = 1000,
+	NUM_USER_ITERS = NUM_USER_ITERS_SQRT * NUM_USER_ITERS_SQRT,
 	PARENT_CPUTIME_LIMIT_NSEC = 200000000,
 	CHILD_CPUTIME_LIMIT_NSEC = 300000000
 };
@@ -48,7 +49,7 @@ main(void)
 		if (ts.tv_sec || ts.tv_nsec >= cputime_limit)
 			break;
 
-		if (i && !(ts.tv_sec || ts.tv_nsec))
+		if ((i > NUM_USER_ITERS_SQRT) && !(ts.tv_sec || ts.tv_nsec))
 			error_msg_and_skip("clock_gettime(CLOCK_PROCESS_CPUTIME_ID, {0, 0})");
 
 		for (i = 0; i < NUM_USER_ITERS; ++i)
