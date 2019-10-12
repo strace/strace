@@ -744,7 +744,6 @@ EXTRA_DIST =				\
 	linux/powerpc64le/userent.h	\
 	linux/ptrace_pokeuser.c		\
 	linux/raw_syscall.h		\
-	linux/riscv64/arch_get_personality.c \
 	linux/riscv64/arch_regs.c		\
 	linux/riscv64/get_error.c		\
 	linux/riscv64/get_scno.c		\
