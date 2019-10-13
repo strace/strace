@@ -251,13 +251,13 @@ struct tcb {
 	int flags;		/* See below for TCB_ values */
 	int pid;		/* If 0, this tcb is free */
 	int qual_flg;		/* qual_flags[scno] or DEFAULT_QUAL_FLAGS + RAW */
+# if SUPPORTED_PERSONALITIES > 1
+	unsigned int currpers;	/* Personality at the time of scno update */
+# endif
 	unsigned long u_error;	/* Error code */
 	kernel_ulong_t scno;	/* System call number */
 	kernel_ulong_t u_arg[MAX_ARGS];	/* System call arguments */
 	kernel_long_t u_rval;	/* Return value */
-# if SUPPORTED_PERSONALITIES > 1
-	unsigned int currpers;	/* Personality at the time of scno update */
-# endif
 	int sys_func_rval;	/* Syscall entry parser's return value */
 	int curcol;		/* Output column for this process */
 	FILE *outf;		/* Output file for this process */
