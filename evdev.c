@@ -29,8 +29,57 @@
 # include "xlat/evdev_snd.h"
 # include "xlat/evdev_switch.h"
 
+/** Added by Linux commit v2.6.38-rc1~247^2~1^2~2^2~5 */
+# ifndef INPUT_PROP_MAX
+#  define INPUT_PROP_MAX 0x1f
+# endif
 # ifndef SYN_MAX
 #  define SYN_MAX 0xf
+# endif
+
+/** Added by Linux commit v2.6.37-rc1~5^2~3^2~47 */
+typedef struct {
+	uint8_t  flags;
+	uint8_t  len;
+	uint16_t index;
+	uint32_t keycode;
+	uint8_t  scancode[32];
+} struct_input_keymap_entry;
+
+/** Added by Linux commit v4.4-rc1~11^2~3^2~2 */
+typedef struct {
+	uint32_t type;
+	uint32_t codes_size;
+	uint64_t codes_ptr;
+} struct_input_mask;
+
+# ifdef HAVE_STRUCT_INPUT_KEYMAP_ENTRY
+static_assert(sizeof(struct input_keymap_entry)
+	      == sizeof(struct_input_keymap_entry),
+	      "Unexpected struct input_keymap_entry size, please update "
+	      "the decoder");
+# endif
+# ifdef HAVE_STRUCT_INPUT_MASK
+static_assert(sizeof(struct input_mask) == sizeof(struct_input_mask),
+	      "Unexpected struct input_mask size, please update the decoder");
+# endif
+
+/*
+ * Has to be included after struct_* type definitions, since _IO* macros
+ * used in fallback definitions require them for sizeof().
+ */
+# define XLAT_MACROS_ONLY
+#  include "xlat/evdev_ioctl_cmds.h"
+# undef XLAT_MACROS_ONLY
+
+# ifndef EVIOCGPROP
+#  define EVIOCGPROP(len)	_IOR('E', 0x09, len)
+# endif
+# ifndef EVIOCGMTSLOTS
+#  define EVIOCGMTSLOTS(len)	_IOR('E', 0x0a, len)
+# endif
+# ifndef EVIOCGSW
+#  define EVIOCGSW(len)		_IOR('E', 0x1b, len)
 # endif
 
 static int
@@ -83,13 +132,12 @@ keycode_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
-# ifdef EVIOCGKEYCODE_V2
 static int
 keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
-	struct input_keymap_entry ike;
+	struct_input_keymap_entry ike;
 
 	if (umove_or_printaddr(tcp, arg, &ike))
 		return RVAL_IOCTL_DECODED;
@@ -119,7 +167,6 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-# endif /* EVIOCGKEYCODE_V2 */
 
 static int
 getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -211,7 +258,6 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
-# ifdef EVIOCGMTSLOTS
 static int
 mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 	      const kernel_ulong_t arg)
@@ -242,9 +288,7 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	return RVAL_IOCTL_DECODED;
 }
-# endif /* EVIOCGMTSLOTS */
 
-# if defined EVIOCGREP || defined EVIOCSREP
 static int
 repeat_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -252,7 +296,6 @@ repeat_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	printpair_int(tcp, arg, "%u");
 	return RVAL_IOCTL_DECODED;
 }
-# endif /* EVIOCGREP || EVIOCSREP */
 
 static int
 bit_ioctl(struct tcb *const tcp, const unsigned int ev_nr,
@@ -319,24 +362,18 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 	case EVIOCGID:
 		return getid_ioctl(tcp, arg);
-# ifdef EVIOCGREP
 	case EVIOCGREP:
 		return repeat_ioctl(tcp, arg);
-# endif
 	case EVIOCGKEYCODE:
 		return keycode_ioctl(tcp, arg);
-# ifdef EVIOCGKEYCODE_V2
 	case EVIOCGKEYCODE_V2:
 		return keycode_V2_ioctl(tcp, arg);
-# endif
 	}
 
 	/* fixed-number variable-length commands */
 	switch (_IOC_NR(code)) {
-# ifdef EVIOCGMTSLOTS
 	case _IOC_NR(EVIOCGMTSLOTS(0)):
 		return mtslots_ioctl(tcp, code, arg);
-# endif
 	case _IOC_NR(EVIOCGNAME(0)):
 	case _IOC_NR(EVIOCGPHYS(0)):
 	case _IOC_NR(EVIOCGUNIQ(0)):
@@ -346,19 +383,15 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 		else
 			printstrn(tcp, arg, tcp->u_rval);
 		return RVAL_IOCTL_DECODED;
-# ifdef EVIOCGPROP
 	case _IOC_NR(EVIOCGPROP(0)):
 		return decode_bitset(tcp, arg, evdev_prop,
 				     INPUT_PROP_MAX, "PROP_???");
-# endif
 	case _IOC_NR(EVIOCGSND(0)):
 		return decode_bitset(tcp, arg, evdev_snd,
 				     SND_MAX, "SND_???");
-# ifdef EVIOCGSW
 	case _IOC_NR(EVIOCGSW(0)):
 		return decode_bitset(tcp, arg, evdev_switch,
 				     SW_MAX, "SW_???");
-# endif
 	case _IOC_NR(EVIOCGKEY(0)):
 		return decode_bitset(tcp, arg, evdev_keycode,
 				     KEY_MAX, "KEY_???");
@@ -384,31 +417,23 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	/* fixed-number fixed-length commands */
 	switch (code) {
-# ifdef EVIOCSREP
 	case EVIOCSREP:
 		return repeat_ioctl(tcp, arg);
-# endif
 	case EVIOCSKEYCODE:
 		return keycode_ioctl(tcp, arg);
-# ifdef EVIOCSKEYCODE_V2
 	case EVIOCSKEYCODE_V2:
 		return keycode_V2_ioctl(tcp, arg);
-# endif
 	case EVIOCRMFF:
 		tprintf(", %d", (int) arg);
 		return RVAL_IOCTL_DECODED;
 	case EVIOCGRAB:
-# ifdef EVIOCREVOKE
 	case EVIOCREVOKE:
-# endif
 		tprintf(", %" PRI_klu, arg);
 		return RVAL_IOCTL_DECODED;
-# ifdef EVIOCSCLOCKID
 	case EVIOCSCLOCKID:
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
 		return RVAL_IOCTL_DECODED;
-# endif
 	}
 
 	int rc = evdev_write_ioctl_mpers(tcp, code, arg);
