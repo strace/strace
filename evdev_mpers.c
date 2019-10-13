@@ -71,45 +71,45 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		ffe.replay.delay);
 
 	switch (ffe.type) {
-		case FF_CONSTANT:
-			tprintf(", constant={level=%" PRId16,
-				ffe.u.constant.level);
-			decode_envelope(&ffe.u.constant.envelope);
-			tprints("}");
-			break;
-		case FF_RAMP:
-			tprintf(", ramp={start_level=%" PRId16
-				", end_level=%" PRId16,
-				ffe.u.ramp.start_level,
-				ffe.u.ramp.end_level);
-			decode_envelope(&ffe.u.ramp.envelope);
-			tprints("}");
-			break;
-		case FF_PERIODIC:
-			tprintf(", periodic={waveform=%" PRIu16
-				", period=%" PRIu16
-				", magnitude=%" PRId16
-				", offset=%" PRId16
-				", phase=%" PRIu16,
-				ffe.u.periodic.waveform,
-				ffe.u.periodic.period,
-				ffe.u.periodic.magnitude,
-				ffe.u.periodic.offset,
-				ffe.u.periodic.phase);
-			decode_envelope(&ffe.u.periodic.envelope);
-			tprintf(", custom_len=%u, custom_data=",
-				ffe.u.periodic.custom_len);
-			printaddr(ptr_to_kulong(ffe.u.periodic.custom_data));
-			tprints("}");
-			break;
-		case FF_RUMBLE:
-			tprintf(", rumble={strong_magnitude=%" PRIu16
-				", weak_magnitude=%" PRIu16 "}",
-				ffe.u.rumble.strong_magnitude,
-				ffe.u.rumble.weak_magnitude);
-			break;
-		default:
-			break;
+	case FF_CONSTANT:
+		tprintf(", constant={level=%" PRId16,
+			ffe.u.constant.level);
+		decode_envelope(&ffe.u.constant.envelope);
+		tprints("}");
+		break;
+	case FF_RAMP:
+		tprintf(", ramp={start_level=%" PRId16
+			", end_level=%" PRId16,
+			ffe.u.ramp.start_level,
+			ffe.u.ramp.end_level);
+		decode_envelope(&ffe.u.ramp.envelope);
+		tprints("}");
+		break;
+	case FF_PERIODIC:
+		tprintf(", periodic={waveform=%" PRIu16
+			", period=%" PRIu16
+			", magnitude=%" PRId16
+			", offset=%" PRId16
+			", phase=%" PRIu16,
+			ffe.u.periodic.waveform,
+			ffe.u.periodic.period,
+			ffe.u.periodic.magnitude,
+			ffe.u.periodic.offset,
+			ffe.u.periodic.phase);
+		decode_envelope(&ffe.u.periodic.envelope);
+		tprintf(", custom_len=%u, custom_data=",
+			ffe.u.periodic.custom_len);
+		printaddr(ptr_to_kulong(ffe.u.periodic.custom_data));
+		tprints("}");
+		break;
+	case FF_RUMBLE:
+		tprintf(", rumble={strong_magnitude=%" PRIu16
+			", weak_magnitude=%" PRIu16 "}",
+			ffe.u.rumble.strong_magnitude,
+			ffe.u.rumble.weak_magnitude);
+		break;
+	default:
+		break;
 	}
 
 	tprints("}");
@@ -121,10 +121,10 @@ MPERS_PRINTER_DECL(int, evdev_write_ioctl_mpers, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
 {
 	switch (code) {
-		case EVIOCSFF:
-			return ff_effect_ioctl(tcp, arg);
-		default:
-			return RVAL_DECODED;
+	case EVIOCSFF:
+		return ff_effect_ioctl(tcp, arg);
+	default:
+		return RVAL_DECODED;
 	}
 }
 
