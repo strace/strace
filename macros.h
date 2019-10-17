@@ -9,6 +9,7 @@
 # define STRACE_MACROS_H
 
 # include <stdbool.h>
+# include <stddef.h>
 # include <sys/types.h>
 
 # include "gcc_compat.h"
