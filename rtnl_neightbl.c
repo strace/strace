@@ -21,14 +21,49 @@
 #include "xlat/rtnl_neightbl_attrs.h"
 #include "xlat/rtnl_neightbl_parms_attrs.h"
 
+typedef struct {
+	uint16_t ndtc_key_len;
+	uint16_t ndtc_entry_size;
+	uint32_t ndtc_entries;
+	uint32_t ndtc_last_flush;
+	uint32_t ndtc_last_rand;
+	uint32_t ndtc_hash_rnd;
+	uint32_t ndtc_hash_mask;
+	uint32_t ndtc_hash_chain_gc;
+	uint32_t ndtc_proxy_qlen;
+} struct_ndt_config;
+
+typedef struct {
+	uint64_t ndts_allocs;
+	uint64_t ndts_destroys;
+	uint64_t ndts_hash_grows;
+	uint64_t ndts_res_failed;
+	uint64_t ndts_lookups;
+	uint64_t ndts_hits;
+	uint64_t ndts_rcv_probes_mcast;
+	uint64_t ndts_rcv_probes_ucast;
+	uint64_t ndts_periodic_gc_runs;
+	uint64_t ndts_forced_gc_runs;
+	uint64_t ndts_table_fulls; /**< Added by v4.3-rc1~96^2~202 */
+} struct_ndt_stats;
+
+# ifdef HAVE_STRUCT_NDT_CONFIG
+static_assert(sizeof(struct ndt_config) == sizeof(struct_ndt_config),
+	      "Unexpected struct ndt_config size, please update the decoder");
+# endif
+# ifdef HAVE_STRUCT_NDT_STATS
+static_assert(sizeof(struct ndt_stats) <= sizeof(struct_ndt_stats),
+	      "Unexpected struct ndt_stats size, please update the decoder");
+# endif
+
+
 static bool
 decode_ndt_config(struct tcb *const tcp,
 		  const kernel_ulong_t addr,
 		  const unsigned int len,
 		  const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_NDT_CONFIG
-	struct ndt_config ndtc;
+	struct_ndt_config ndtc;
 
 	if (len < sizeof(ndtc))
 		return false;
@@ -46,9 +81,6 @@ decode_ndt_config(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static const nla_decoder_t ndt_parms_nla_decoders[] = {
@@ -91,8 +123,7 @@ decode_ndt_stats(struct tcb *const tcp,
 		 const unsigned int len,
 		 const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_NDT_STATS
-	struct ndt_stats ndtst;
+	struct_ndt_stats ndtst;
 	const unsigned int min_size =
 		offsetofend(struct ndt_stats, ndts_forced_gc_runs);
 	const unsigned int def_size = sizeof(ndtst);
@@ -114,17 +145,12 @@ decode_ndt_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", ndtst, ndts_rcv_probes_ucast);
 		PRINT_FIELD_U(", ", ndtst, ndts_periodic_gc_runs);
 		PRINT_FIELD_U(", ", ndtst, ndts_forced_gc_runs);
-# ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 		if (len >= def_size)
 			PRINT_FIELD_U(", ", ndtst, ndts_table_fulls);
-# endif
 		tprints("}");
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static const nla_decoder_t ndtmsg_nla_decoders[] = {
