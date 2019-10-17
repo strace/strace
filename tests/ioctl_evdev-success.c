@@ -56,6 +56,9 @@ static void
 print_input_absinfo(long rc, const void *ptr, const void *arg)
 {
 	const struct input_absinfo *absinfo = ptr;
+# if VERBOSE
+	const uintptr_t sz = (uintptr_t) arg;
+# endif
 
 	if (rc < 0) {
 		printf("%p", absinfo);
@@ -67,9 +70,20 @@ print_input_absinfo(long rc, const void *ptr, const void *arg)
 	PRINT_FIELD_U(", ", *absinfo, maximum);
 	PRINT_FIELD_U(", ", *absinfo, fuzz);
 	PRINT_FIELD_U(", ", *absinfo, flat);
+	if (sz > offsetofend(struct input_absinfo, flat)) {
+		if (sz >= 24) {
 #  ifdef HAVE_STRUCT_INPUT_ABSINFO_RESOLUTION
-	PRINT_FIELD_U(", ", *absinfo, resolution);
+			PRINT_FIELD_U(", ", *absinfo, resolution);
+#  else
+			printf(", resolution=%u", *((int *) ptr + 5));
 #  endif
+
+			if (sz > 24)
+				printf(", ...");
+		} else {
+			printf(", ...");
+		}
+	}
 # else
 	printf(", ...");
 # endif
@@ -201,9 +215,21 @@ main(int argc, char **argv)
 				   ", EVIOCGID, NULL) returning %lu",
 				   inject_retval);
 
+	static const void *absinfo_sz =
+		(const void *) (uintptr_t) sizeof(struct input_absinfo);
+
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_id, id);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_absinfo, absinfo);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, bad_addr_slot);
+
+	struct input_absinfo *absinfo_24 = tail_alloc(MAX(sizeof(*absinfo_24),
+							  24));
+	struct input_absinfo *absinfo_32 = tail_alloc(MAX(sizeof(*absinfo_32),
+							  32));
+
+	fill_memory(absinfo, sizeof(struct input_absinfo));
+	fill_memory(absinfo_24, 24);
+	fill_memory(absinfo_32, 32);
 
 # ifdef EVIOCGMTSLOTS
 	static const unsigned int mtslots[] = { ABS_MT_SLOT, 1, 3 };
@@ -282,9 +308,26 @@ main(int argc, char **argv)
 		const void *ptr;
 	} a[] = {
 		{ { ARG_STR(EVIOCGID), id, print_input_id }, NULL },
-		{ { ARG_STR(EVIOCGABS(ABS_X)), absinfo, print_input_absinfo }, NULL },
-		{ { ARG_STR(EVIOCGABS(ABS_Y)), absinfo, print_input_absinfo }, NULL },
-		{ { ARG_STR(EVIOCGABS(ABS_Y)), absinfo, print_input_absinfo }, NULL },
+		{ { _IOC(_IOC_READ, 'E', 0x40 + ABS_Y, 19), "EVIOCGABS(ABS_Y)",
+		    absinfo, NULL }, NULL },
+		{ { _IOC(_IOC_READ, 'E', 0x40 + ABS_Y, 20),
+		    "EVIOCGABS(ABS_Y)", absinfo, print_input_absinfo },
+		  (const void *) (uintptr_t) 20 },
+		{ { _IOC(_IOC_READ, 'E', 0x40 + ABS_Y, 21),
+		    "EVIOCGABS(ABS_Y)", absinfo_24, print_input_absinfo },
+		  (const void *) (uintptr_t) 21 },
+		{ { _IOC(_IOC_READ, 'E', 0x40 + ABS_Y, 24),
+		    "EVIOCGABS(ABS_Y)", absinfo_24, print_input_absinfo },
+		  (const void *) (uintptr_t) 24 },
+		{ { _IOC(_IOC_READ, 'E', 0x40 + ABS_Y, 32),
+		    "EVIOCGABS(ABS_Y)", absinfo_32, print_input_absinfo },
+		  (const void *) (uintptr_t) 32 },
+		{ { ARG_STR(EVIOCGABS(ABS_X)), absinfo, print_input_absinfo },
+		  absinfo_sz},
+		{ { ARG_STR(EVIOCGABS(ABS_Y)), absinfo, print_input_absinfo },
+		  absinfo_sz },
+		{ { ARG_STR(EVIOCGABS(ABS_Y)), absinfo, print_input_absinfo },
+		  absinfo_sz },
 		{ { ARG_STR(EVIOCGBIT(0, 0)), ev_more, print_getbit },
 			inject_retval * 8 <= EV_LED
 				? (const void *) &ev_more_str_2

@@ -37,6 +37,15 @@
 #  define SYN_MAX 0xf
 # endif
 
+typedef struct {
+	int32_t value;
+	int32_t minimum;
+	int32_t maximum;
+	int32_t fuzz;
+	int32_t flat;
+	int32_t resolution; /**< Added by Linux commit v2.6.31-rc1~100^2~1 */
+} struct_input_absinfo;
+
 /** Added by Linux commit v2.6.37-rc1~5^2~3^2~47 */
 typedef struct {
 	uint8_t  flags;
@@ -53,6 +62,9 @@ typedef struct {
 	uint64_t codes_ptr;
 } struct_input_mask;
 
+static_assert(sizeof(struct input_absinfo) <= sizeof(struct_input_absinfo),
+	      "Unexpected struct input_absinfo size, please update "
+	      "the decoder");
 # ifdef HAVE_STRUCT_INPUT_KEYMAP_ENTRY
 static_assert(sizeof(struct input_keymap_entry)
 	      == sizeof(struct_input_keymap_entry),
@@ -83,35 +95,49 @@ static_assert(sizeof(struct input_mask) == sizeof(struct_input_mask),
 # endif
 
 static int
-abs_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
+abs_ioctl(struct tcb *const tcp, const unsigned int code,
+	  const kernel_ulong_t arg)
 {
+	static const size_t orig_sz = offsetofend(struct_input_absinfo, flat);
+	static const size_t res_sz = offsetofend(struct_input_absinfo,
+						 resolution);
+
+	struct_input_absinfo absinfo;
+	size_t sz = _IOC_SIZE(code);
+	size_t read_sz = MIN(sz, sizeof(absinfo));
+
+	if (sz < orig_sz)
+		return RVAL_DECODED;
+
 	tprints(", ");
 
-	struct input_absinfo absinfo;
+	if (umoven_or_printaddr(tcp, arg, read_sz, &absinfo))
+		return RVAL_IOCTL_DECODED;
 
-	if (!umove_or_printaddr(tcp, arg, &absinfo)) {
-		tprintf("{value=%u"
-			", minimum=%u, ",
-			absinfo.value,
-			absinfo.minimum);
+	tprintf("{value=%u"
+		", minimum=%u, ",
+		absinfo.value,
+		absinfo.minimum);
 
-		if (!abbrev(tcp)) {
-			tprintf("maximum=%u"
-				", fuzz=%u"
-				", flat=%u",
-				absinfo.maximum,
-				absinfo.fuzz,
-				absinfo.flat);
-# ifdef HAVE_STRUCT_INPUT_ABSINFO_RESOLUTION
-			tprintf(", resolution=%u",
-				absinfo.resolution);
-# endif
-		} else {
-			tprints("...");
+	if (!abbrev(tcp)) {
+		tprintf("maximum=%u"
+			", fuzz=%u"
+			", flat=%u",
+			absinfo.maximum,
+			absinfo.fuzz,
+			absinfo.flat);
+		if (sz >= res_sz) {
+			tprintf(", resolution=%u%s",
+				absinfo.resolution,
+				sz > res_sz ? ", ..." : "");
+		} else if (sz > orig_sz) {
+			tprints(", ...");
 		}
-
-		tprints("}");
+	} else {
+		tprints("...");
 	}
+
+	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -402,7 +428,7 @@ evdev_read_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	/* multi-number fixed-length commands */
 	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCGABS(0)))
-		return abs_ioctl(tcp, arg);
+		return abs_ioctl(tcp, code, arg);
 
 	/* multi-number variable-length commands */
 	if ((_IOC_NR(code) & ~EV_MAX) == _IOC_NR(EVIOCGBIT(0, 0)))
@@ -443,7 +469,7 @@ evdev_write_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	/* multi-number fixed-length commands */
 	if ((_IOC_NR(code) & ~ABS_MAX) == _IOC_NR(EVIOCSABS(0)))
-		return abs_ioctl(tcp, arg);
+		return abs_ioctl(tcp, code, arg);
 
 	return 0;
 }
