@@ -57,6 +57,21 @@ main(void)
 				  printf(", vsi_type_id=\"\\x61\\x62\\x63\"");
 				  PRINT_FIELD_U(", ", vsi, vsi_type_version);
 				  printf("}"));
+
+	static const struct ifla_port_vsi vsi2 = {
+		.vsi_mgr_id = 0xab,
+		.vsi_type_id = { 10, 0, 255 },
+		.vsi_type_version = 0xef,
+		.pad = { 0, 1, 2 },
+	};
+	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				  init_ifinfomsg, print_ifinfomsg,
+				  IFLA_PORT_VSI_TYPE, pattern, vsi2,
+				  PRINT_FIELD_U("{", vsi2, vsi_mgr_id);
+				  printf(", vsi_type_id=\"\\x0a\\x00\\xff\"");
+				  PRINT_FIELD_U(", ", vsi2, vsi_type_version);
+				  printf(", pad=\"\\x00\\x01\\x02\"");
+				  printf("}"));
 #endif
 
 	puts("+++ exited with 0 +++");

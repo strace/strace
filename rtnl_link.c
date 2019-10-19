@@ -558,13 +558,18 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 
 	if (len < sizeof(vsi))
 		return false;
-	else if (!umove_or_printaddr(tcp, addr, &vsi)) {
-		PRINT_FIELD_U("{", vsi, vsi_mgr_id);
-		PRINT_FIELD_STRING(", ", vsi, vsi_type_id,
-				   sizeof(vsi.vsi_type_id), QUOTE_FORCE_HEX);
-		PRINT_FIELD_U(", ", vsi, vsi_type_version);
-		tprints("}");
-	}
+	if (umove_or_printaddr(tcp, addr, &vsi))
+		return true;
+
+	PRINT_FIELD_U("{", vsi, vsi_mgr_id);
+	PRINT_FIELD_STRING(", ", vsi, vsi_type_id,
+			   sizeof(vsi.vsi_type_id), QUOTE_FORCE_HEX);
+	PRINT_FIELD_U(", ", vsi, vsi_type_version);
+
+	if (!IS_ARRAY_ZERO(vsi.pad))
+		PRINT_FIELD_HEX_ARRAY(", ", vsi, pad);
+
+	tprints("}");
 
 	return true;
 }
