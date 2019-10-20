@@ -26,6 +26,27 @@
 #include "xlat/rtnl_route_attrs.h"
 #include "xlat/rtnl_rta_metrics_attrs.h"
 
+/** Added by Linux commit v3.8-rc1~139^2~90 */
+typedef struct {
+	uint64_t mfcs_packets;
+	uint64_t mfcs_bytes;
+	uint64_t mfcs_wrong_if;
+} struct_rta_mfc_stats;
+
+typedef struct {
+	uint16_t /* __kernel_sa_family_t */ rtvia_family;
+	uint8_t rtvia_addr[0];
+} struct_rtvia;
+
+#ifdef HAVE_STRUCT_RTA_MFC_STATS
+static_assert(sizeof(struct_rta_mfc_stats) == sizeof(struct rta_mfc_stats),
+	      "Unexpected struct rta_mfc_stats, please update the decoder");
+#endif
+#ifdef HAVE_STRUCT_RTVIA
+static_assert(sizeof(struct_rtvia) == sizeof(struct rtvia),
+	      "Unexpected struct rtvia, please update the decoder");
+#endif
+
 bool
 decode_nla_rt_class(struct tcb *const tcp,
 		    const kernel_ulong_t addr,
@@ -138,8 +159,7 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 		     const unsigned int len,
 		     const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_RTA_MFC_STATS
-	struct rta_mfc_stats mfcs;
+	struct_rta_mfc_stats mfcs;
 
 	if (len < sizeof(mfcs))
 		return false;
@@ -151,9 +171,6 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
@@ -162,15 +179,14 @@ decode_rtvia(struct tcb *const tcp,
 	     const unsigned int len,
 	     const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_RTVIA
-	struct rtvia via;
+	struct_rtvia via;
 
 	if (len < sizeof(via))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &via)) {
 		PRINT_FIELD_XVAL("{", via, rtvia_family, addrfams, "AF_???");
 
-		const unsigned int offset = offsetof(struct rtvia, rtvia_addr);
+		const unsigned int offset = offsetof(struct_rtvia, rtvia_addr);
 
 		if (len > offset) {
 			tprints(", ");
@@ -181,9 +197,6 @@ decode_rtvia(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
