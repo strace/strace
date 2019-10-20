@@ -1,9 +1,5 @@
-P_PID
-P_PPID
-P_PGID
-P_SID
-P_CID
-P_UID
-P_GID
-P_ALL
-P_LWPID
+#value_indexed
+P_ALL	0
+P_PID	1
+P_PGID	2
+P_PIDFD	3
