@@ -25,7 +25,7 @@ status_file=/proc/self/status
 [ -f "$status_file" ] ||
 	framework_skip_ "$status_file is not available"
 
-set -- sed -n -E '/^(P|Tracer)Pid:/p' "$status_file"
+set -- sed -r -n '/^(P|Tracer)Pid:/p' "$status_file"
 "$@" > "$LOG" ||
 	framework_skip_ "$* does not work"
 
