@@ -28,13 +28,6 @@ static const struct_sysent syscallent[] = {
 # define DEBUG_PRINT 0
 #endif
 
-#if defined __X32_SYSCALL_BIT && defined __NR_read \
- && (__X32_SYSCALL_BIT & __NR_read) != 0
-# define SYSCALL_BIT __X32_SYSCALL_BIT
-#else
-# define SYSCALL_BIT 0
-#endif
-
 #if DEBUG_PRINT
 static const char *strace_name;
 static FILE *debug_out;
