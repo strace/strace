@@ -18,19 +18,7 @@
 
 #ifdef M68K
 # include "xlat/cacheflush_scope.h"
-
-static const struct xlat cacheflush_flags[] = {
-# ifdef FLUSH_CACHE_BOTH
-	XLAT(FLUSH_CACHE_BOTH),
-# endif
-# ifdef FLUSH_CACHE_DATA
-	XLAT(FLUSH_CACHE_DATA),
-# endif
-# ifdef FLUSH_CACHE_INSN
-	XLAT(FLUSH_CACHE_INSN),
-# endif
-	XLAT_END
-};
+# include "xlat/cacheflush_flags.h"
 
 SYS_FUNC(cacheflush)
 {
@@ -50,12 +38,7 @@ SYS_FUNC(cacheflush)
 #endif /* M68K */
 
 #if defined(BFIN) || defined(CSKY)
-static const struct xlat cacheflush_flags[] = {
-	XLAT(ICACHE),
-	XLAT(DCACHE),
-	XLAT(BCACHE),
-	XLAT_END
-};
+# include "xlat/cacheflush_flags.h"
 
 SYS_FUNC(cacheflush)
 {
@@ -71,21 +54,7 @@ SYS_FUNC(cacheflush)
 #endif /* BFIN || CSKY */
 
 #ifdef SH
-static const struct xlat cacheflush_flags[] = {
-# ifdef CACHEFLUSH_D_INVAL
-	XLAT(CACHEFLUSH_D_INVAL),
-# endif
-# ifdef CACHEFLUSH_D_WB
-	XLAT(CACHEFLUSH_D_WB),
-# endif
-# ifdef CACHEFLUSH_D_PURGE
-	XLAT(CACHEFLUSH_D_PURGE),
-# endif
-# ifdef CACHEFLUSH_I
-	XLAT(CACHEFLUSH_I),
-# endif
-	XLAT_END
-};
+# include "xlat/cacheflush_flags.h"
 
 SYS_FUNC(cacheflush)
 {
