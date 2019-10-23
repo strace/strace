@@ -35,7 +35,7 @@
 
 static const struct xlat_data struct_user_offsets_data[] = {
 #include "userent.h"
-	XLAT_END
+	{ 0, 0 }
 };
 
 static const struct xlat struct_user_offsets = {
