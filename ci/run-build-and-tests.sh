@@ -86,7 +86,7 @@ export CC_FOR_BUILD="$CC"
 	exit $rc
 }
 
-j=-j`getconf _NPROCESSORS_ONLN 2> /dev/null` || j=
+j=-j`nproc` || j=
 
 case "${CHECK-}" in
 	coverage)

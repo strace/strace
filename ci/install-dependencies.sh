@@ -5,6 +5,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+j=-j`nproc` || j=
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
 common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libbluetooth-dev make xz-utils'
 
@@ -71,7 +72,7 @@ esac
 case "$KHEADERS" in
 	*/*)
 		clone_repo https://github.com/"$KHEADERS" kernel ${KBRANCH-}
-		$sudo make -C kernel headers_install INSTALL_HDR_PATH=/opt/kernel
+		$sudo make $j -C kernel headers_install INSTALL_HDR_PATH=/opt/kernel
 		$sudo rm -rf kernel
 		KHEADERS_INC=/opt/kernel/include
 		;;
@@ -96,8 +97,8 @@ case "$CC" in
 					;;
 			esac
 			./configure --prefix=/opt/musl --exec-prefix=/usr ${build}
-			make
-			$sudo make install
+			make $j
+			$sudo make $j install
 		cd -
 		rm -rf musl
 		$sudo ln -s \
