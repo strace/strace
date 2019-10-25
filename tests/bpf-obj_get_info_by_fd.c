@@ -261,7 +261,7 @@ main(int ac, char **av)
 		.prog_name    = "test_prog",
 	};
 	size_t bpf_prog_load_attr_sizes[] = {
-		sizeof(bpf_prog_load_attr),
+		BPF_PROG_LOAD_struct_size,
 		offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
 		offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
 		offsetofend(struct BPF_PROG_LOAD_struct, kern_version),
