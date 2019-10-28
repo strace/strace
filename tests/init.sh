@@ -247,6 +247,20 @@ require_min_kernel_version_or_skip()
 		skip_ "the kernel release $uname_r is not $1 or newer"
 }
 
+# Usage: require_min_nproc 2
+require_min_nproc()
+{
+	local min_nproc
+	min_nproc="$1"; shift
+
+	check_prog
+	local nproc
+	nproc="$(nproc)"
+
+	[ "$nproc" -ge "$min_nproc" ] ||
+		framework_skip_ "nproc = $nproc is less than $min_nproc"
+}
+
 # Usage: grep_pid_status $pid GREP-OPTIONS...
 grep_pid_status()
 {
