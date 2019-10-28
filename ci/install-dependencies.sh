@@ -72,6 +72,7 @@ esac
 case "$KHEADERS" in
 	*/*)
 		clone_repo https://github.com/"$KHEADERS" kernel ${KBRANCH-}
+		apt_get_install rsync
 		$sudo make $j -C kernel headers_install INSTALL_HDR_PATH=/opt/kernel
 		$sudo rm -rf kernel
 		KHEADERS_INC=/opt/kernel/include
