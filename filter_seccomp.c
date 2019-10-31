@@ -601,31 +601,31 @@ check_seccomp_filter_properties(void)
 {
 	int rc = prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, NULL, 0, 0);
 	seccomp_filtering = rc < 0 && errno != EINVAL;
-	if (!seccomp_filtering)
+	if (!seccomp_filtering) {
 		debug_func_perror_msg("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
+		return;
+	}
 
-	if (seccomp_filtering) {
-		for (unsigned int i = 0; i < ARRAY_SIZE(filter_generators);
-		     ++i) {
-			bool overflow = false;
-			unsigned short len = filter_generators[i](filters[i],
-								  &overflow);
-			if (len < bpf_prog.len && !overflow) {
-				bpf_prog.len = len;
-				bpf_prog.filter = filters[i];
-			}
-		}
-		if (bpf_prog.len == USHRT_MAX) {
-			debug_msg("seccomp filter disabled due to jump offset "
-				  "overflow");
-			seccomp_filtering = false;
-		} else if (bpf_prog.len > BPF_MAXINSNS) {
-			debug_msg("seccomp filter disabled due to BPF program "
-				  "being oversized (%u > %d)", bpf_prog.len,
-				  BPF_MAXINSNS);
-			seccomp_filtering = false;
+	for (unsigned int i = 0; i < ARRAY_SIZE(filter_generators); ++i) {
+		bool overflow = false;
+		unsigned short len = filter_generators[i](filters[i],
+							  &overflow);
+		if (len < bpf_prog.len && !overflow) {
+			bpf_prog.len = len;
+			bpf_prog.filter = filters[i];
 		}
 	}
+	if (bpf_prog.len == USHRT_MAX) {
+		debug_msg("seccomp filter disabled due to jump offset "
+			  "overflow");
+		seccomp_filtering = false;
+	} else if (bpf_prog.len > BPF_MAXINSNS) {
+		debug_msg("seccomp filter disabled due to BPF program "
+			  "being oversized (%u > %d)", bpf_prog.len,
+			  BPF_MAXINSNS);
+		seccomp_filtering = false;
+	}
+
 	if (seccomp_filtering)
 		check_seccomp_order();
 }
