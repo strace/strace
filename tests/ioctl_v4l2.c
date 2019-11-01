@@ -75,7 +75,18 @@ init_v4l2_format(struct v4l2_format *const f,
 		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
 		     i++) {
 			cur_pix[i].sizeimage = 0x1e3c531c | i;
-			cur_pix[i].bytesperline = 0xa983d721 | i;
+			if (sizeof(cur_pix[i].bytesperline) ==
+			    sizeof(uint32_t)) {
+				cur_pix[i].bytesperline = 0xa983d721 | i;
+			} else {
+#if WORDS_BIGENDIAN
+				cur_pix[i].bytesperline = 0xa983;
+				cur_pix[i].reserved[0] = 0xd721 | i;
+#else
+				cur_pix[i].bytesperline = 0xd721 | i;
+				cur_pix[i].reserved[0] = 0xa983;
+#endif
+			}
 		}
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
 			f->fmt.pix_mp.num_planes = 1;
@@ -108,6 +119,9 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.win.bitmap = (void *) -2UL;
 #ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		f->fmt.win.global_alpha = 0xce;
+#else
+		((uint8_t *) &f->fmt.win)[offsetofend(struct v4l2_window,
+						      bitmap)] = 0xce;
 #endif
 		break;
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
@@ -145,7 +159,12 @@ init_v4l2_format(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
 		f->fmt.sdr.pixelformat = sf_magic;
 # ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
-		f->fmt.sdr.buffersize = 0x25afabfb;
+		if (sizeof(f->fmt.sdr.buffersize == sizeof(uint32_t)))
+			f->fmt.sdr.buffersize = 0x25afabfb;
+		else
+			((uint32_t *) &f->fmt.sdr)[1] = 0x25afabfb;
+# else
+		((uint32_t *) &f->fmt.sdr)[1] = 0x25afabfb;
 # endif
 		break;
 #endif
@@ -238,7 +257,17 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 				printf(", ");
 			printf("{sizeimage=%u, bytesperline=%u}",
 			f->fmt.pix_mp.plane_fmt[i].sizeimage,
-			f->fmt.pix_mp.plane_fmt[i].bytesperline);
+			sizeof(f->fmt.pix_mp.plane_fmt[i].bytesperline) ==
+			sizeof(uint32_t)
+			? f->fmt.pix_mp.plane_fmt[i].bytesperline :
+#if WORDS_BIGENDIAN
+			(f->fmt.pix_mp.plane_fmt[i].bytesperline << 16) |
+			f->fmt.pix_mp.plane_fmt[i].reserved[0]
+#else
+			f->fmt.pix_mp.plane_fmt[i].bytesperline |
+			(f->fmt.pix_mp.plane_fmt[i].reserved[0] << 16)
+#endif
+			);
 		}
 		errno = saved_errno;
 		printf("], num_planes=%u}}) = -1 EBADF (%m)\n",
@@ -274,13 +303,14 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			printf(", ... /* %p */", f->fmt.win.clips + 2);
 		errno = saved_errno;
 		printf("], clipcount=%u, bitmap=%p"
-#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		       ", global_alpha=%#x"
-#endif
 		       "}}) = -1 EBADF (%m)\n",
-		       f->fmt.win.clipcount, f->fmt.win.bitmap
+		       f->fmt.win.clipcount, f->fmt.win.bitmap,
 #ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
-		       , f->fmt.win.global_alpha
+		       f->fmt.win.global_alpha
+#else
+		       ((uint8_t *) &f->fmt.win)[offsetofend(struct v4l2_window,
+							     bitmap)]
 #endif
 		       );
 		break;
@@ -381,13 +411,12 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 # endif /* XLAT_RAW */
 
 		errno = saved_errno;
-		printf(
+		printf(", buffersize=%u}}) = -1 EBADF (%m)\n"
 # ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
-		       ", buffersize=%u"
-# endif
-		       "}}) = -1 EBADF (%m)\n"
-# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
-		       , f->fmt.sdr.buffersize
+		       , sizeof(f->fmt.sdr.buffersize == sizeof(uint32_t))
+			? f->fmt.sdr.buffersize : ((uint32_t *) &f->fmt.sdr)[1]
+# else
+		       , ((uint32_t *) &f->fmt.sdr)[1]
 # endif
 		       );
 		break;

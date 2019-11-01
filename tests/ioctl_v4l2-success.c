@@ -101,8 +101,23 @@ fill_fmt(struct v4l2_format *f)
 
 		for (size_t i = 0; i < VIDEO_MAX_PLANES; i++) {
 			f->fmt.pix_mp.plane_fmt[i].sizeimage = 0xd0decad0 ^ i;
-			f->fmt.pix_mp.plane_fmt[i].bytesperline
-				= 0xd0decad1 ^ i;
+			if (sizeof(f->fmt.pix_mp.plane_fmt[i].bytesperline) ==
+			    sizeof(uint32_t)) {
+				f->fmt.pix_mp.plane_fmt[i].bytesperline
+					= 0xd0decad1 ^ i;
+			} else {
+#if WORDS_BIGENDIAN
+				f->fmt.pix_mp.plane_fmt[i].bytesperline
+					= 0xd0de;
+				f->fmt.pix_mp.plane_fmt[i].reserved[0]
+					= 0xcad1 ^ i;
+#else
+				f->fmt.pix_mp.plane_fmt[i].bytesperline
+					= 0xcad1 ^ i;
+				f->fmt.pix_mp.plane_fmt[i].reserved[0]
+					= 0xd0de;
+#endif
+			}
 		}
 
 		f->fmt.pix_mp.num_planes   = f->type ==
@@ -192,6 +207,18 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 
 #ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		printf(", global_alpha=%#hhx}", f->fmt.win.global_alpha);
+#else
+		struct win_ga {
+			struct v4l2_rect w;
+			uint32_t field;
+			uint32_t chromakey;
+			struct v4l2_clip *clips;
+			uint32_t clipcount;
+			void *bitmap;
+			uint8_t global_alpha;
+		};
+		printf(", global_alpha=%#hhx}",
+		       ((struct win_ga *) &f->fmt.win)->global_alpha);
 #endif
 		break;
 
@@ -503,7 +530,8 @@ main(int argc, char **argv)
 			fill_memory(fmt, sizeof(*fmt));
 
 			fmt->type = buf_types[j].val;
-			fill_fmt(fmt);
+			if (!fill_fmt(fmt))
+				continue;
 
 			ioctl(-1, fmt_cmds[i].val, fmt);
 			printf("ioctl(-1, %s, {type=%s",
@@ -1410,7 +1438,8 @@ main(int argc, char **argv)
 				   ARRAY_SIZE(reqb_mems)); i++) {
 		cbuf->memory = reqb_mems[i % ARRAY_SIZE(reqb_mems)].val;
 		cbuf->format.type = buf_types[i % ARRAY_SIZE(buf_types)].val;
-		fill_fmt(&cbuf->format);
+		if (!fill_fmt(&cbuf->format))
+			continue;
 
 		ioctl(-1, VIDIOC_CREATE_BUFS, cbuf);
 		printf("ioctl(-1, %s, {count=2158018785, memory=%s"
