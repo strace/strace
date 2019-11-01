@@ -41,6 +41,25 @@
 #include "types/v4l2.h"
 
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
+CHECK_V4L2_STRUCT_SIZE_LE(v4l2_pix_format);
+#ifdef HAVE_STRUCT_V4L2_PLANE_PIX_FORMAT
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_plane_pix_format);
+#endif
+#ifdef HAVE_STRUCT_V4L2_PIX_FORMAT_MPLANE
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_pix_format_mplane);
+#endif
+CHECK_V4L2_STRUCT_SIZE(v4l2_clip);
+CHECK_V4L2_STRUCT_SIZE_LE(v4l2_window);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_vbi_format);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sliced_vbi_format);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sliced_vbi_cap);
+#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
+#endif
+#ifdef HAVE_STRUCT_V4L2_META_FORMAT
+CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
+#endif
+CHECK_V4L2_STRUCT_SIZE(v4l2_format);
 #ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #endif
@@ -54,6 +73,10 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 /* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
 #ifndef v4l2_fourcc_be
 # define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1U << 31))
+#endif
+
+#ifndef VIDEO_MAX_PLANES
+# define VIDEO_MAX_PLANES 8
 #endif
 
 #define FMT_FRACT "%u/%u"
@@ -218,7 +241,6 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			  "V4L2_COLORSPACE_???");
 		tprints("}");
 		break;
-#if HAVE_STRUCT_V4L2_FORMAT_FMT_PIX_MP
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
 		unsigned int i, max;
@@ -247,7 +269,6 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			(unsigned) f->fmt.pix_mp.num_planes);
 		break;
 	}
-#endif
 	/* OUTPUT_OVERLAY since Linux v2.6.22-rc1~1118^2~179 */
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY: {
@@ -262,9 +283,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 				  tfetch_mem, print_v4l2_clip, 0);
 		tprintf(", clipcount=%u, bitmap=", f->fmt.win.clipcount);
 		printaddr(ptr_to_kulong(f->fmt.win.bitmap));
-#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
-		tprintf(", global_alpha=%#x", f->fmt.win.global_alpha);
-#endif
+		if (f->fmt.win.global_alpha)
+			tprintf(", global_alpha=%#x", f->fmt.win.global_alpha);
 		tprints("}");
 		break;
 	}
@@ -284,7 +304,6 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints("}");
 		break;
 	/* both since Linux v2.6.14-rc2~64 */
-#if HAVE_STRUCT_V4L2_FORMAT_FMT_SLICED
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
 		unsigned int i, j;
@@ -312,8 +331,6 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints("]}");
 		break;
 	}
-#endif
-#if HAVE_STRUCT_V4L2_FORMAT_FMT_SDR
 	/* since Linux v4.4-rc1~118^2~14 */
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
 	/* since Linux v3.15-rc1~85^2~213 */
@@ -321,13 +338,11 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprints("fmt.sdr={pixelformat=");
 		print_pixelformat(f->fmt.sdr.pixelformat, v4l2_sdr_fmts);
-# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
-		tprintf(", buffersize=%u",
-			f->fmt.sdr.buffersize);
-# endif
+		if (f->fmt.sdr.buffersize)
+			tprintf(", buffersize=%u",
+				f->fmt.sdr.buffersize);
 		tprints("}");
 		break;
-#endif
 	default:
 		return false;
 	}
