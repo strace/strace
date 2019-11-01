@@ -317,6 +317,8 @@ main(int argc, char **argv)
 	caps->capabilities = 0xdeadbeef;
 #ifdef HAVE_STRUCT_V4L2_CAPABILITY_DEVICE_CAPS
 	caps->device_caps = 0xfacefeed;
+#else
+	caps->reserved[0] = 0xfacefeed;
 #endif
 
 	ioctl(-1, VIDIOC_QUERYCAP, 0);
@@ -351,7 +353,6 @@ main(int argc, char **argv)
 	       "|V4L2_CAP_EXT_PIX_FORMAT|V4L2_CAP_META_CAPTURE|V4L2_CAP_ASYNCIO"
 	       "|V4L2_CAP_STREAMING|V4L2_CAP_META_OUTPUT|V4L2_CAP_TOUCH"
 	       "|V4L2_CAP_DEVICE_CAPS|0x40000008"));
-#ifdef HAVE_STRUCT_V4L2_CAPABILITY_DEVICE_CAPS
 	printf(", device_caps=" XLAT_KNOWN(0xfacefeed,
 	       "V4L2_CAP_VIDEO_CAPTURE|V4L2_CAP_VIDEO_OVERLAY"
 	       "|V4L2_CAP_VBI_OUTPUT|V4L2_CAP_SLICED_VBI_CAPTURE"
@@ -362,7 +363,6 @@ main(int argc, char **argv)
 	       "|V4L2_CAP_RADIO|V4L2_CAP_MODULATOR|V4L2_CAP_SDR_OUTPUT"
 	       "|V4L2_CAP_META_CAPTURE|V4L2_CAP_ASYNCIO|V4L2_CAP_META_OUTPUT"
 	       "|V4L2_CAP_TOUCH|V4L2_CAP_DEVICE_CAPS|0x60000008"));
-#endif
 	printf("}) = %ld (INJECTED)\n", inject_retval);
 
 

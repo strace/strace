@@ -40,6 +40,7 @@
 
 #include "types/v4l2.h"
 
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
 #ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #endif
@@ -131,7 +132,7 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 static int
 print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_capability caps;
+	struct_v4l2_capability caps;
 
 	if (entering(tcp))
 		return 0;
@@ -146,11 +147,11 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", capabilities=");
 	printflags(v4l2_device_capabilities_flags, caps.capabilities,
 		   "V4L2_CAP_???");
-#ifdef HAVE_STRUCT_V4L2_CAPABILITY_DEVICE_CAPS
-	tprints(", device_caps=");
-	printflags(v4l2_device_capabilities_flags, caps.device_caps,
-		   "V4L2_CAP_???");
-#endif
+	if (caps.device_caps) {
+		tprints(", device_caps=");
+		printflags(v4l2_device_capabilities_flags, caps.device_caps,
+			   "V4L2_CAP_???");
+	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
