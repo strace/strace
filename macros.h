@@ -37,9 +37,11 @@
 #  define ROUNDUP(val_, div_) (ROUNDUP_DIV((val_), (div_)) * (div_))
 # endif
 
+# define sizeof_field(type_, member_) (sizeof(((type_ *)0)->member_))
+
 # ifndef offsetofend
 #  define offsetofend(type_, member_)	\
-	(offsetof(type_, member_) + sizeof(((type_ *)0)->member_))
+	(offsetof(type_, member_) + sizeof_field(type_, member_))
 # endif
 
 # ifndef cast_ptr
