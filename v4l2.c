@@ -271,7 +271,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 			f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
 		tprints("flags=");
-		printxval(v4l2_vbi_flags, f->fmt.vbi.flags, "V4L2_VBI_???");
+		printflags(v4l2_vbi_flags, f->fmt.vbi.flags, "V4L2_VBI_???");
 		tprints("}");
 		break;
 	/* both since Linux v2.6.14-rc2~64 */
