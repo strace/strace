@@ -24,6 +24,18 @@ typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
 typedef struct v4l2_input struct_v4l2_input;
 typedef struct v4l2_standard struct_v4l2_standard;
 
+
+typedef struct {
+	uint8_t  driver[16];
+	uint8_t  card[32];
+	uint8_t  bus_info[32];
+	uint32_t version;
+	uint32_t capabilities;
+	uint32_t device_caps; /**< Added by v3.4-rc1~110^2^2~259 */
+	uint32_t reserved[3];
+} struct_v4l2_capability;
+
+
 typedef struct {
 	uint32_t index;
 	uint32_t count;

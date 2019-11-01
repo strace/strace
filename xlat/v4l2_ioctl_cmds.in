@@ -1,4 +1,4 @@
-VIDIOC_QUERYCAP			_IOR ('V',   0, struct v4l2_capability)
+VIDIOC_QUERYCAP			_IOR ('V',   0, struct_v4l2_capability)
 VIDIOC_ENUM_FMT			_IOWR('V',   2, struct v4l2_fmtdesc)
 VIDIOC_G_FMT			_IOWR('V',   4, struct_v4l2_format)
 VIDIOC_S_FMT			_IOWR('V',   5, struct_v4l2_format)
