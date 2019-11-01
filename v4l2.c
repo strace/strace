@@ -15,6 +15,24 @@
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
+#include "static_assert.h"
+
+#define CHECK_V4L2_STRUCT_SIZE(s_) \
+	static_assert(sizeof(struct s_) == sizeof(struct_##s_), \
+		      "Unexpected struct " #s_ " size")
+#define CHECK_V4L2_STRUCT_SIZE_LE(s_) \
+	static_assert(sizeof(struct s_) <= sizeof(struct_##s_), \
+		      "Unexpected struct " #s_ " size, " \
+		      "please update the decoder")
+#define CHECK_V4L2_RESERVED_SIZE(s_) \
+	static_assert(sizeof_field(struct s_, reserved) \
+		      >= sizeof_field(struct_##s_, reserved), \
+		      "Unexpected struct " #s_ ".reserved size, " \
+		      "please update the decoder")
+#define CHECK_V4L2_STRUCT_RESERVED_SIZE(s_) \
+	CHECK_V4L2_STRUCT_SIZE(s_); \
+	CHECK_V4L2_RESERVED_SIZE(s_)
+
 #include DEF_MPERS_TYPE(struct_v4l2_buffer)
 #include DEF_MPERS_TYPE(struct_v4l2_clip)
 #ifdef VIDIOC_CREATE_BUFS
