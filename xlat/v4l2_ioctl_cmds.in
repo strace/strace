@@ -76,7 +76,7 @@ VIDIOC_TRY_FMT			_IOWR('V',  64, struct_v4l2_format)
 /* VIDIOC_DQEVENT			_IOR ('V',  89, struct v4l2_event) - added in v2.6.35-rc1~480^2~121 */
 /* VIDIOC_SUBSCRIBE_EVENT		_IOW ('V',  90, struct v4l2_event_subscription) - added in v2.6.35-rc1~480^2~121 */
 /* VIDIOC_UNSUBSCRIBE_EVENT	_IOW ('V',  91, struct v4l2_event_subscription) - added in v2.6.35-rc1~480^2~121 */
-/* VIDIOC_CREATE_BUFS		_IOWR('V',  92, struct v4l2_create_buffers) - added in v3.2-rc1~63^2~55 */
+VIDIOC_CREATE_BUFS		_IOWR('V',  92, struct_v4l2_create_buffers) /* added in v3.2-rc1~63^2~55 */
 /* VIDIOC_PREPARE_BUF		_IOWR('V',  93, struct_v4l2_buffer) - added in v3.2-rc1~63^2~55 */
 /* VIDIOC_G_SELECTION		_IOWR('V',  94, struct v4l2_selection) - added in v3.3-rc1~48^2~18 */
 /* VIDIOC_S_SELECTION		_IOWR('V',  95, struct v4l2_selection) - added in v3.3-rc1~48^2~18 */

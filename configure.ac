@@ -814,6 +814,13 @@ AC_CHECK_DECLS(m4_normalize([
 #include <linux/types.h>
 #include <linux/videodev2.h>])
 
+AC_CHECK_TYPES(m4_normalize([
+	struct v4l2_create_buffers
+]),,, [#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>])
+
 AC_CHECK_MEMBERS(m4_normalize([
 	struct v4l2_capability.device_caps,
 	struct v4l2_ext_control.string,
