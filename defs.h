@@ -1469,7 +1469,11 @@ extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
 extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
 # ifdef ENABLE_COVERAGE_GCOV
+#  ifdef HAVE_GCOV_H
+#   include <gcov.h>
+#  else
 extern void __gcov_dump(void);
+#  endif
 #  define GCOV_DUMP __gcov_dump()
 # else
 #  define GCOV_DUMP

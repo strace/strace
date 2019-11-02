@@ -389,6 +389,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	asm/guarded_storage.h
 	asm/sysmips.h
 	elf.h
+	gcov.h
 	iconv.h
 	inttypes.h
 	linux/bsg.h
