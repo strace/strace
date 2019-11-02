@@ -1468,6 +1468,13 @@ extern const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES];
 extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
 extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
+# ifdef ENABLE_COVERAGE_GCOV
+extern void __gcov_flush(void);
+#  define GCOV_FLUSH __gcov_flush()
+# else
+#  define GCOV_FLUSH
+# endif
+
 # ifdef IN_MPERS_BOOTSTRAP
 /* Transform multi-line MPERS_PRINTER_DECL statements to one-liners.  */
 #  define MPERS_PRINTER_DECL(type, name, ...) MPERS_PRINTER_DECL(type, name, __VA_ARGS__)

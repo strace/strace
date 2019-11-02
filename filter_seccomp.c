@@ -70,10 +70,6 @@ static const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
 
 # ifdef HAVE_FORK
 
-#  ifdef ENABLE_COVERAGE_GCOV
-extern void __gcov_flush(void);
-#  endif
-
 typedef unsigned short (*filter_generator_t)(struct sock_filter *,
 					     bool *overflow);
 static unsigned short linear_filter_generator(struct sock_filter *,
@@ -124,9 +120,7 @@ check_seccomp_order_do_child(void)
 		perror_func_msg_and_die("PTRACE_TRACEME");
 	}
 
-#  ifdef ENABLE_COVERAGE_GCOV
-	__gcov_flush();
-#  endif
+	GCOV_FLUSH;
 
 	kill(pid, SIGSTOP);
 	syscall(__NR_gettid);

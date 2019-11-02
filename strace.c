@@ -2996,10 +2996,6 @@ timer_sighandler(int sig)
 	errno = saved_errno;
 }
 
-#ifdef ENABLE_COVERAGE_GCOV
-extern void __gcov_flush(void);
-#endif
-
 static void ATTRIBUTE_NORETURN
 terminate(void)
 {
@@ -3026,18 +3022,14 @@ terminate(void)
 		/* Child was killed by a signal, mimic that.  */
 		exit_code &= 0xff;
 		signal(exit_code, SIG_DFL);
-#ifdef ENABLE_COVERAGE_GCOV
-		__gcov_flush();
-#endif
+		GCOV_FLUSH;
 		raise(exit_code);
 
 		/* Unblock the signal.  */
 		sigset_t mask;
 		sigemptyset(&mask);
 		sigaddset(&mask, exit_code);
-#ifdef ENABLE_COVERAGE_GCOV
-		__gcov_flush();
-#endif
+		GCOV_FLUSH;
 		sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
 		/* Paranoia - what if this signal is not fatal?
