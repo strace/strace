@@ -120,7 +120,7 @@ check_seccomp_order_do_child(void)
 		perror_func_msg_and_die("PTRACE_TRACEME");
 	}
 
-	GCOV_FLUSH;
+	GCOV_DUMP;
 
 	kill(pid, SIGSTOP);
 	syscall(__NR_gettid);

@@ -1469,10 +1469,10 @@ extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
 extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
 # ifdef ENABLE_COVERAGE_GCOV
-extern void __gcov_flush(void);
-#  define GCOV_FLUSH __gcov_flush()
+extern void __gcov_dump(void);
+#  define GCOV_DUMP __gcov_dump()
 # else
-#  define GCOV_FLUSH
+#  define GCOV_DUMP
 # endif
 
 # ifdef IN_MPERS_BOOTSTRAP
