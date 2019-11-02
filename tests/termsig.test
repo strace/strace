@@ -11,10 +11,18 @@
 
 run_expect_termsig="../run_expect_termsig 15"
 unblock_reset_raise="../unblock_reset_raise 15"
+block_reset_run="../block_reset_run 15"
+orig_STRACE="$STRACE"
 
+run_prog $run_expect_termsig $block_reset_run $unblock_reset_raise
 run_prog $run_expect_termsig $unblock_reset_raise
-STRACE="$run_expect_termsig $STRACE"
 
+STRACE="$run_expect_termsig $orig_STRACE"
+for i in 1 2 3 4; do
+	run_strace -I$i -enone -esignal=none $unblock_reset_raise
+done
+
+STRACE="$run_expect_termsig $block_reset_run $orig_STRACE"
 for i in 1 2 3 4; do
 	run_strace -I$i -enone -esignal=none $unblock_reset_raise
 done
