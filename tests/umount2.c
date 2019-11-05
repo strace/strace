@@ -26,9 +26,9 @@ main(void)
 	static const char sample[] = "umount2.sample";
 	if (mkdir(sample, 0700))
 		perror_msg_and_fail("mkdir: %s", sample);
-	(void) syscall(TEST_SYSCALL_NR, sample, 31);
+	long ret = syscall(TEST_SYSCALL_NR, sample, 31);
 	printf("%s(\"%s\", MNT_FORCE|MNT_DETACH|MNT_EXPIRE|UMOUNT_NOFOLLOW|0x10)"
-	       " = -1 EINVAL (%m)\n", TEST_SYSCALL_STR, sample);
+	       " = %s\n", TEST_SYSCALL_STR, sample, sprintrc(ret));
 	if (rmdir(sample))
 		perror_msg_and_fail("rmdir: %s", sample);
 	puts("+++ exited with 0 +++");
