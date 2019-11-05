@@ -7,7 +7,7 @@
 
 j=-j`nproc` || j=
 type sudo >/dev/null 2>&1 && sudo=sudo || sudo=
-common_packages='autoconf automake faketime file gawk gcc-multilib git gzip libbluetooth-dev make xz-utils'
+common_packages='autoconf automake faketime file gawk git gzip libbluetooth-dev make xz-utils'
 
 retry_if_failed()
 {
@@ -55,17 +55,33 @@ clone_repo()
 		git clone --depth=1 ${branch:+--branch $branch} "$src" "$dst"
 }
 
+case "$TARGET" in
+	aarch64)
+		packages="$common_packages gcc-multilib-arm-linux-gnueabihf"
+		;;
+	*)
+		packages="$common_packages gcc-multilib"
+		;;
+esac
+
 case "$CC" in
 	gcc-*)
 		retry_if_failed \
 			$sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-		apt_get_install $common_packages "$CC"-multilib
+		case "$TARGET" in
+			aarch64)
+				apt_get_install $packages "$CC"-multilib-arm-linux-gnueabihf "$CC"
+				;;
+			*)
+				apt_get_install $packages "$CC"-multilib
+				;;
+		esac
 		;;
 	clang*)
-		apt_get_install $common_packages "$CC"
+		apt_get_install $packages "$CC"
 		;;
 	*)
-		apt_get_install $common_packages
+		apt_get_install $packages
 		;;
 esac
 
@@ -121,7 +137,7 @@ esac
 
 case "${CHECK-}" in
 	coverage)
-		apt_get_install lcov
+		apt_get_install lcov python-pip python-setuptools
 		retry_if_failed \
 			pip install --user codecov
 		;;
