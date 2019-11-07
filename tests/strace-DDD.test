@@ -23,8 +23,8 @@ set -- -enone -esignal=none ../tracer_ppid_pgid_sid
 run_strace "$@" > "$OUT"
 read -r ppid pgid sid < "$OUT" &&
 [ "$ppid" -gt 1 ] &&
-[ "$pgid" -gt 0 ] &&
-[ "$sid" -gt 0 ] || {
+[ "$pgid" -ge 0 ] &&
+[ "$sid" -ge 0 ] || {
 	cat < "$OUT" > "$LOG"
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 }
