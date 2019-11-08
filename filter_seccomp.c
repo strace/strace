@@ -568,6 +568,11 @@ binary_match_filter_generator(struct sock_filter *filter, bool *overflow)
 		SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K,
 			     SECCOMP_RET_TRACE);
 
+		if (pos - start > UCHAR_MAX) {
+			*overflow = true;
+			return pos;
+		}
+
 		for (unsigned int i = start; i < end; ++i) {
 			if (BPF_CLASS(filter[i].code) != BPF_JMP)
 				continue;
