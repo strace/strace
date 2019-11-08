@@ -25,6 +25,10 @@
 # define SHM_STAT_ANY 15
 #endif
 
+#ifndef SHM_NORESERVE
+# define SHM_NORESERVE 010000
+#endif
+
 #include "xlat.h"
 #include "xlat/shm_resource_flags.h"
 
