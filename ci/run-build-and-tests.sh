@@ -27,9 +27,6 @@ case "${TARGET-}" in
 		CC="$CC -m32"
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --build=i686-pc-linux-gnu --target=i686-pc-linux-gnu"
 		;;
-	aarch64)
-		DISTCHECK_CONFIGURE_FLAGS="--enable-mpers=check"
-		;;
 esac
 
 case "${STACKTRACE-}" in

@@ -57,7 +57,7 @@ clone_repo()
 
 case "$TARGET" in
 	aarch64)
-		packages="$common_packages gcc-multilib-arm-linux-gnueabihf"
+		packages="$common_packages gcc-multilib-arm-linux-gnueabihf libc6-dev-armhf-cross linux-libc-dev-armhf-cross"
 		;;
 	*)
 		packages="$common_packages gcc-multilib"
