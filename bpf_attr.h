@@ -195,6 +195,9 @@ struct BPF_PROG_GET_NEXT_ID_struct {
 # define BPF_MAP_GET_NEXT_ID_struct BPF_PROG_GET_NEXT_ID_struct
 # define BPF_MAP_GET_NEXT_ID_struct_size BPF_PROG_GET_NEXT_ID_struct_size
 
+# define BPF_BTF_GET_NEXT_ID_struct BPF_PROG_GET_NEXT_ID_struct
+# define BPF_BTF_GET_NEXT_ID_struct_size BPF_PROG_GET_NEXT_ID_struct_size
+
 struct BPF_PROG_GET_FD_BY_ID_struct {
 	uint32_t prog_id;
 	uint32_t next_id;

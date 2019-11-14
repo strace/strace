@@ -891,6 +891,7 @@ static const struct bpf_attr_check BPF_PROG_GET_NEXT_ID_checks[] = {
 };
 
 #define BPF_MAP_GET_NEXT_ID_checks BPF_PROG_GET_NEXT_ID_checks
+#define BPF_BTF_GET_NEXT_ID_checks BPF_PROG_GET_NEXT_ID_checks
 
 static const struct bpf_attr_check BPF_PROG_GET_FD_BY_ID_checks[] = {
 	{
@@ -1268,6 +1269,7 @@ main(void)
 		CHK(BPF_TASK_FD_QUERY),
 		CHK(BPF_MAP_LOOKUP_AND_DELETE_ELEM),
 		CHK(BPF_MAP_FREEZE),
+		CHK(BPF_BTF_GET_NEXT_ID),
 	};
 
 	page_size = get_page_size();

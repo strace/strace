@@ -4,6 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented -DD and -DDD options that move strace into a separate
     process group and session, respectively.
+  * Implemented decoding of BPF_BTF_GET_NEXT_ID bpf syscall command.
   * Updated lists of BPF_*, MADV_*, P_*, SCTP_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 5.4.
 
