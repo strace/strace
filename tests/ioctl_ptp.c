@@ -20,6 +20,22 @@
 # include <sys/ioctl.h>
 # include <linux/ptp_clock.h>
 
+# ifndef PTP_CLOCK_GETCAPS2
+#  define PTP_CLOCK_GETCAPS2 _IOR(PTP_CLK_MAGIC, 10, struct ptp_clock_caps)
+# endif
+# ifndef PTP_EXTTS_REQUEST2
+#  define PTP_EXTTS_REQUEST2 _IOW(PTP_CLK_MAGIC, 11, struct ptp_extts_request)
+# endif
+# ifndef PTP_PEROUT_REQUEST2
+#  define PTP_PEROUT_REQUEST2 _IOW(PTP_CLK_MAGIC, 12, struct ptp_perout_request)
+# endif
+# ifndef PTP_ENABLE_PPS2
+#  define PTP_ENABLE_PPS2 _IOW(PTP_CLK_MAGIC, 13, int)
+# endif
+# ifndef PTP_SYS_OFFSET2
+#  define PTP_SYS_OFFSET2 _IOW(PTP_CLK_MAGIC, 14, struct ptp_sys_offset)
+# endif
+
 # include "xlat.h"
 # include "xlat/ptp_extts_flags.h"
 # include "xlat/ptp_perout_flags.h"
@@ -73,6 +89,45 @@ test_no_device(void)
 	printf("ioctl(-1, PTP_PEROUT_REQUEST, NULL) = %s\n", errstr);
 	errstr = sprintrc(ioctl(-1, PTP_PEROUT_REQUEST, perout));
 	printf("ioctl(-1, PTP_PEROUT_REQUEST, {start={sec=%" PRId64
+	       ", nsec=%" PRIu32 "}, period={sec=%" PRId64 ", nsec=%" PRIu32 "}"
+	       ", index=%d, flags=",
+	       (int64_t) perout->start.sec, perout->start.nsec,
+	       (int64_t)perout->period.sec, perout->period.nsec, perout->index);
+	printflags(ptp_perout_flags, perout->flags, "PTP_???");
+	printf("}) = %s\n", errstr);
+
+	/* PTP_CLOCK_GETCAPS2 */
+	errstr = sprintrc(ioctl(-1, PTP_CLOCK_GETCAPS2, NULL));
+	printf("ioctl(-1, PTP_CLOCK_GETCAPS2, NULL) = %s\n", errstr);
+	errstr = sprintrc(ioctl(-1, PTP_CLOCK_GETCAPS2, caps));
+	printf("ioctl(-1, PTP_CLOCK_GETCAPS2, %p) = %s\n", caps, errstr);
+
+	/* PTP_SYS_OFFSET2 */
+	errstr = sprintrc(ioctl(-1, PTP_SYS_OFFSET2, NULL));
+	printf("ioctl(-1, PTP_SYS_OFFSET2, NULL) = %s\n", errstr);
+	errstr = sprintrc(ioctl(-1, PTP_SYS_OFFSET2, sysoff));
+	printf("ioctl(-1, PTP_SYS_OFFSET2, {n_samples=%u}) = %s\n",
+	       sysoff->n_samples, errstr);
+
+	/* PTP_ENABLE_PPS2 */
+	errstr = sprintrc(ioctl(-1, PTP_ENABLE_PPS2, 0));
+	printf("ioctl(-1, PTP_ENABLE_PPS2, 0) = %s\n", errstr);
+	errstr = sprintrc(ioctl(-1, PTP_ENABLE_PPS2, 1));
+	printf("ioctl(-1, PTP_ENABLE_PPS2, 1) = %s\n", errstr);
+
+	/* PTP_EXTTS_REQUEST2 */
+	errstr = sprintrc(ioctl(-1, PTP_EXTTS_REQUEST2, NULL));
+	printf("ioctl(-1, PTP_EXTTS_REQUEST2, NULL) = %s\n", errstr);
+	errstr = sprintrc(ioctl(-1, PTP_EXTTS_REQUEST2, extts));
+	printf("ioctl(-1, PTP_EXTTS_REQUEST2, {index=%d, flags=", extts->index);
+	printflags(ptp_extts_flags, extts->flags, "PTP_???");
+	printf("}) = %s\n", errstr);
+
+	/* PTP_PEROUT_REQUEST2 */
+	errstr = sprintrc(ioctl(-1, PTP_PEROUT_REQUEST2, NULL));
+	printf("ioctl(-1, PTP_PEROUT_REQUEST2, NULL) = %s\n", errstr);
+	errstr = sprintrc(ioctl(-1, PTP_PEROUT_REQUEST2, perout));
+	printf("ioctl(-1, PTP_PEROUT_REQUEST2, {start={sec=%" PRId64
 	       ", nsec=%" PRIu32 "}, period={sec=%" PRId64 ", nsec=%" PRIu32 "}"
 	       ", index=%d, flags=",
 	       (int64_t) perout->start.sec, perout->start.nsec,
