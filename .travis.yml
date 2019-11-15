@@ -1,6 +1,6 @@
 language: c
 
-dist: trusty
+dist: bionic
 
 before_install: ci/install-dependencies.sh
 
@@ -25,6 +25,7 @@ matrix:
         - STACKTRACE=no
     - compiler: gcc
       arch: amd64
+      dist: trusty
       env:
         - TARGET=x86_64
         - STACKTRACE=libunwind
@@ -63,6 +64,7 @@ matrix:
         - STACKTRACE=no
     - compiler: musl-gcc
       arch: amd64
+      dist: trusty
       env:
         - TARGET=x86
         - STACKTRACE=no
@@ -101,14 +103,6 @@ matrix:
         - STACKTRACE=no
         - KHEADERS=torvalds/linux
         - TIMEOUT_DURATION=1500
-    - compiler: gcc-8
-      arch: arm64
-      env:
-        - TARGET=aarch64
-        - SLEEP_A_BIT="sleep 0.5"
-        - STACKTRACE=no
-        - KHEADERS=torvalds/linux
-        - TIMEOUT_DURATION=1500
     - compiler: clang
       arch: arm64
       env:
@@ -118,6 +112,16 @@ matrix:
         - TIMEOUT_DURATION=1500
     - compiler: gcc-8
       arch: arm64
+      dist: trusty
+      env:
+        - TARGET=aarch64
+        - SLEEP_A_BIT="sleep 0.5"
+        - STACKTRACE=no
+        - KHEADERS=torvalds/linux
+        - TIMEOUT_DURATION=1500
+    - compiler: gcc-8
+      arch: arm64
+      dist: trusty
       env:
         - TARGET=aarch64
         - SLEEP_A_BIT="sleep 0.5"
