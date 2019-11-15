@@ -18,7 +18,7 @@ num_seccomp="$(run_strace --seccomp-bpf $args)"
 mv "$LOG" "$LOG.seccomp"
 match_diff "$LOG.regular" "$LOG.seccomp"
 
-min_ratio=8
+min_ratio=6
 # With seccomp filter enabled, we should be able to complete
 # at least $min_ratio times more chdir system calls.
 ratio="$((num_seccomp / num_regular))"
