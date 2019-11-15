@@ -31,7 +31,7 @@ matrix:
         - STACKTRACE=libunwind
         - CHECK=coverage
         - KHEADERS=torvalds/linux
-    - compiler: gcc-8
+    - compiler: gcc-9
       arch: amd64
       env:
         - TARGET=x86_64
@@ -68,17 +68,17 @@ matrix:
       env:
         - TARGET=x86
         - STACKTRACE=no
-    - compiler: gcc-8
+    - compiler: gcc-9
       arch: amd64
       env:
         - TARGET=x86_64
         - STACKTRACE=libunwind
-    - compiler: gcc-8
+    - compiler: gcc-9
       arch: amd64
       env:
         - TARGET=x32
         - STACKTRACE=no
-    - compiler: gcc-8
+    - compiler: gcc-9
       arch: amd64
       env:
         - TARGET=x86
