@@ -22,7 +22,8 @@
 # include <linux/ptp_clock.h>
 
 # include "xlat.h"
-# include "xlat/ptp_flags_options.h"
+# include "xlat/ptp_extts_flags.h"
+# include "xlat/ptp_perout_flags.h"
 
 static void
 test_no_device(void)
@@ -66,7 +67,7 @@ test_no_device(void)
 	ioctl(-1, PTP_EXTTS_REQUEST, extts);
 	saved_errno = errno;
 	printf("ioctl(-1, PTP_EXTTS_REQUEST, {index=%d, flags=", extts->index);
-	printflags(ptp_flags_options, extts->flags, "PTP_???");
+	printflags(ptp_extts_flags, extts->flags, "PTP_???");
 	errno = saved_errno;
 	printf("}) = -1 EBADF (%m)\n");
 
@@ -80,7 +81,7 @@ test_no_device(void)
 	       ", index=%d, flags=",
 	       (int64_t) perout->start.sec, perout->start.nsec,
 	       (int64_t)perout->period.sec, perout->period.nsec, perout->index);
-	printflags(ptp_flags_options, perout->flags, "PTP_???");
+	printflags(ptp_perout_flags, perout->flags, "PTP_???");
 	errno = saved_errno;
 	printf("}) = -1 EBADF (%m)\n");
 

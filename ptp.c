@@ -11,11 +11,13 @@
 
 #ifdef HAVE_STRUCT_PTP_SYS_OFFSET
 
+# include "print_fields.h"
+
 # include <linux/ioctl.h>
 # include <linux/ptp_clock.h>
 
-# include "print_fields.h"
-# include "xlat/ptp_flags_options.h"
+# include "xlat/ptp_extts_flags.h"
+# include "xlat/ptp_perout_flags.h"
 
 int
 ptp_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -33,7 +35,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 			break;
 
 		PRINT_FIELD_D("{", extts, index);
-		PRINT_FIELD_FLAGS(", ", extts, flags, ptp_flags_options, "PTP_???");
+		PRINT_FIELD_FLAGS(", ", extts, flags, ptp_extts_flags, "PTP_???");
 		tprints("}");
 		break;
 	}
@@ -50,7 +52,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_D("}, period={", perout.period, sec);
 		PRINT_FIELD_U(", ", perout.period, nsec);
 		PRINT_FIELD_D("}, ", perout, index);
-		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_flags_options, "PTP_???");
+		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_perout_flags, "PTP_???");
 		tprints("}");
 		break;
 	}
