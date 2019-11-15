@@ -104,6 +104,7 @@ SYS_FUNC(prctl)
 	case PR_GET_SECCOMP:
 	case PR_GET_TIMERSLACK:
 	case PR_GET_TIMING:
+	case PR_GET_TAGGED_ADDR_CTRL:
 		return RVAL_DECODED;
 
 	case PR_GET_CHILD_SUBREAPER:
@@ -241,6 +242,7 @@ SYS_FUNC(prctl)
 	case PR_SET_FPEXC:
 	case PR_SET_KEEPCAPS:
 	case PR_SET_TIMING:
+	case PR_SET_TAGGED_ADDR_CTRL:
 		tprintf(", %" PRI_klu, arg2);
 		return RVAL_DECODED;
 

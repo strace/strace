@@ -1,7 +1,8 @@
 /*
  * Check decoding of prctl operations without arguments and return code parsing:
  * PR_GET_KEEPCAPS, PR_GET_SECCOMP, PR_GET_TIMERSLACK, PR_GET_TIMING,
- * PR_TASK_PERF_EVENTS_DISABLE, and PR_TASK_PERF_EVENTS_ENABLE.
+ * PR_TASK_PERF_EVENTS_DISABLE, PR_TASK_PERF_EVENTS_ENABLE, and
+ * PR_GET_TAGGED_ADDR_CTRL.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2016-2019 The strace developers.
@@ -36,6 +37,7 @@ main(void)
 		{ 30, "PR_GET_TIMERSLACK" },
 		{ 31, "PR_TASK_PERF_EVENTS_DISABLE" },
 		{ 32, "PR_TASK_PERF_EVENTS_ENABLE" },
+		{ 56, "PR_GET_TAGGED_ADDR_CTRL" },
 	};
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
