@@ -35,13 +35,13 @@ matrix:
       arch: amd64
       env:
         - TARGET=x86_64
-        - STACKTRACE=libunwind
+        - STACKTRACE=libdw
         - KHEADERS=torvalds/linux
     - compiler: gcc
       arch: amd64
       env:
         - TARGET=x86_64
-        - STACKTRACE=libunwind
+        - STACKTRACE=libdw
     - compiler: gcc
       arch: amd64
       env:
@@ -51,7 +51,7 @@ matrix:
       arch: amd64
       env:
         - TARGET=x86_64
-        - STACKTRACE=libunwind
+        - STACKTRACE=libdw
     - compiler: musl-gcc
       arch: amd64
       env:
