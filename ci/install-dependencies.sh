@@ -112,10 +112,10 @@ esac
 
 case "${STACKTRACE-}" in
 	libdw)
-		apt_get_install libdw-dev
+		apt_get_install libdw-dev libiberty-dev
 		;;
 	libunwind)
-		apt_get_install libunwind8-dev
+		apt_get_install libunwind8-dev libiberty-dev
 		;;
 esac
 
