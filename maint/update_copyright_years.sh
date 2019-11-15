@@ -127,8 +127,10 @@ process_file()
 		first_commit_year="$copyright_year"
 	}
 
-	# if there is existing notice, its starting year takes precedence
-	if [ -n "$existing_notice_year" ]; then
+	# if there is existing notice and its starting year is earlier
+	# than the year of the first commit, the former takes precedence
+	if [ -n "$existing_notice_year" ] &&
+	   [ "$existing_notice_year" -le "$first_commit_year" ]; then
 		start_note='from existing copyright notice'
 		first_commit_year="$existing_notice_year"
 	fi
