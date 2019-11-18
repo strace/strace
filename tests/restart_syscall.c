@@ -14,6 +14,9 @@
 #include <time.h>
 #include <sys/time.h>
 
+#define NANOSLEEP_NAME_RE "(nanosleep|clock_nanosleep(_time64)?)"
+#define NANOSLEEP_CALL_RE "(nanosleep\\(|clock_nanosleep(_time64)?\\(CLOCK_REALTIME, 0, )"
+
 int
 main(void)
 {
@@ -36,9 +39,10 @@ main(void)
 	if (nanosleep(&req, &rem))
 		perror_msg_and_fail("nanosleep");
 
-	printf("nanosleep\\(\\{tv_sec=%lld, tv_nsec=%llu\\}"
+	printf("%s\\{tv_sec=%lld, tv_nsec=%llu\\}"
 	       ", \\{tv_sec=%lld, tv_nsec=%llu\\}\\)"
 	       " = \\? ERESTART_RESTARTBLOCK \\(Interrupted by signal\\)\n",
+	       NANOSLEEP_CALL_RE,
 	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
 	       (long long) rem.tv_sec, zero_extend_signed_to_ull(rem.tv_nsec));
 	puts("--- SIGALRM \\{si_signo=SIGALRM, si_code=SI_KERNEL\\} ---");
@@ -48,12 +52,14 @@ main(void)
 # else
 #  define ALTERNATIVE_NANOSLEEP_REQ ""
 # endif
-	printf("(nanosleep\\((%s\\{tv_sec=%lld, tv_nsec=%llu\\})"
+	printf("(%s(%s\\{tv_sec=%lld, tv_nsec=%llu\\})"
 	       ", %p|restart_syscall\\(<\\.\\.\\."
-	       " resuming interrupted nanosleep \\.\\.\\.>)\\) = 0\n",
+	       " resuming interrupted %s \\.\\.\\.>)\\) = 0\n",
+	       NANOSLEEP_CALL_RE,
 	       ALTERNATIVE_NANOSLEEP_REQ,
 	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
-	       &rem);
+	       &rem,
+	       NANOSLEEP_NAME_RE);
 
 	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
 	return 0;

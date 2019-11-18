@@ -10,6 +10,6 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-syscalls=nanosleep,restart_syscall
+syscalls=restart_syscall,/nanosleep
 run_strace -a20 -e trace=$syscalls $args > "$EXP"
 match_grep "$LOG" "$EXP"
