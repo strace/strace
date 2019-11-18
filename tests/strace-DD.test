@@ -13,6 +13,7 @@
 	skip_ 'Not applicable: $STRACE != $STRACE_EXE'
 
 check_prog timeout
+run_prog ../sleep 0
 
 test_D()
 {
