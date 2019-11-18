@@ -10,13 +10,18 @@
 
 #include "tests.h"
 #include "scno.h"
-#include <errno.h>
-#include <pthread.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
+
+#ifdef __NR_nanosleep
+
+# include <errno.h>
+# include <pthread.h>
+# include <signal.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <time.h>
+# include <unistd.h>
+
+# include "kernel_old_timespec.h"
 
 static pid_t leader;
 static pid_t tid;
@@ -110,9 +115,9 @@ thread(void *arg)
 	struct timespec ts = { .tv_nsec = 100000000 };
 	(void) clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL);
 
-	ts.tv_nsec = 12345;
+	kernel_old_timespec_t ots = { .tv_nsec = 12345 };
 	printf("%-5d nanosleep({tv_sec=0, tv_nsec=%u}, NULL) = 0\n",
-	       tid, (unsigned int) ts.tv_nsec);
+	       tid, (unsigned int) ots.tv_nsec);
 
 	switch (action % NUMBER_OF_ACTIONS) {
 		case ACTION_exit:
@@ -145,7 +150,7 @@ thread(void *arg)
 	       leader, tid,
 	       leader);
 
-	(void) nanosleep(&ts, NULL);
+	(void) syscall(__NR_nanosleep, (unsigned long) &ots, 0UL);
 	execve(argv[0], argv, environ);
 	perror_msg_and_fail("execve");
 }
@@ -190,7 +195,7 @@ main(int ac, char **av)
 	if (errno)
 		perror_msg_and_fail("pthread_create");
 
-	struct timespec ts = { .tv_sec = 123 };
+	kernel_old_timespec_t ots = { .tv_sec = 123 };
 	sigset_t mask;
 	sigemptyset(&mask);
 
@@ -214,11 +219,18 @@ main(int ac, char **av)
 		case ACTION_nanosleep:
 			printf("%s nanosleep({tv_sec=%u, tv_nsec=0}"
 			       ",  <unfinished ...>\n",
-			       leader_str, (unsigned int) ts.tv_sec);
+			       leader_str, (unsigned int) ots.tv_sec);
 			close(fds[1]);
-			(void) nanosleep(&ts, 0);
+			(void) syscall(__NR_nanosleep,
+				       (unsigned long) &ots, 0UL);
 			break;
 	}
 
 	return 1;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_nanosleep")
+
+#endif
