@@ -451,6 +451,7 @@ EXTRA_DIST = \
 	run.sh \
 	sched.in \
 	scno_tampering.sh \
+	semop-common.c \
 	setfsugid.c \
 	setresugid.c \
 	setreugid.c \

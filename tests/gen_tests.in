@@ -449,7 +449,8 @@ seccomp-filter-v	-v -e trace=seccomp
 seccomp_get_action_avail	-e trace=seccomp
 select	-a36
 select-P	-a36 -e trace=select -P /dev/full 9>>/dev/full
-semop	-a32 -e trace=semop,semtimedop
+semop	-a32
+semop-indirect	-a32 -e trace=semop
 semtimedop
 sendfile	-a27
 sendfile64	-a29

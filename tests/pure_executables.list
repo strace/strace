@@ -445,6 +445,7 @@ seccomp-filter
 seccomp_get_action_avail
 select
 semop
+semop-indirect
 semtimedop
 sendfile
 sendfile64
