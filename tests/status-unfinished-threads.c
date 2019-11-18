@@ -8,19 +8,24 @@
  */
 
 #include "tests.h"
-#include <errno.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <unistd.h>
 #include "scno.h"
+
+#ifdef __NR_nanosleep
+
+# include <errno.h>
+# include <pthread.h>
+# include <stdio.h>
+# include <unistd.h>
+
+# include "kernel_old_timespec.h"
 
 static pid_t leader;
 
 static void *
 thread(void *arg)
 {
-	struct timespec ts = { .tv_nsec = 100000000 };
-	(void) nanosleep(&ts, NULL);
+	kernel_old_timespec_t ts = { .tv_nsec = 100000000 };
+	(void) syscall(__NR_nanosleep, (unsigned long) &ts, 0UL);
 
 	printf("%-5d nanosleep({tv_sec=123, tv_nsec=0},  <unfinished ...>) = ?\n"
 	       "%-5d +++ superseded by execve in pid %u +++\n",
@@ -48,8 +53,14 @@ main(int ac, char **av)
 	if (errno)
 		perror_msg_and_fail("pthread_create");
 
-	struct timespec ts = { .tv_sec = 123 };
-	(void) nanosleep(&ts, 0);
+	kernel_old_timespec_t ts = { .tv_sec = 123 };
+	(void) syscall(__NR_nanosleep, (unsigned long) &ts, 0UL);
 
 	return 1;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_nanosleep")
+
+#endif
