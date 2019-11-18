@@ -350,8 +350,6 @@ AC_CHECK_TYPES(m4_normalize([
 	struct keyctl_kdf_params
 ]),,, [#include <linux/keyctl.h>])
 
-AC_CHECK_MEMBERS([struct timex.tai],,, [#include <sys/timex.h>])
-
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
 AC_CHECK_MEMBERS(m4_normalize([
