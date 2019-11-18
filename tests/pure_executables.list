@@ -445,6 +445,7 @@ seccomp-filter
 seccomp_get_action_avail
 select
 semop
+semtimedop
 sendfile
 sendfile64
 set_mempolicy
