@@ -23,6 +23,7 @@
 #include "xlat/bpf_map_flags.h"
 #include "xlat/bpf_prog_types.h"
 #include "xlat/bpf_prog_flags.h"
+#include "xlat/bpf_map_lookup_elem_flags.h"
 #include "xlat/bpf_map_update_elem_flags.h"
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
@@ -231,6 +232,11 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
 	PRINT_FIELD_FD("{", attr, map_fd, tcp);
 	PRINT_FIELD_ADDR64(", ", attr, key);
 	PRINT_FIELD_ADDR64(", ", attr, value);
+	/* flags field was added in Linux commit v5.1-rc1~178^2~375^2~4^2~3.  */
+	if (len <= offsetof(struct BPF_MAP_LOOKUP_ELEM_struct, flags))
+		break;
+	PRINT_FIELD_FLAGS(", ", attr, flags, bpf_map_lookup_elem_flags,
+			  "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 

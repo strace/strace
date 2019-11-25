@@ -435,10 +435,12 @@ static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
 		.data = { .BPF_MAP_LOOKUP_ELEM_data = {
 			.map_fd = -1,
 			.key = 0xdeadbeef,
-			.value = 0xbadc0ded
+			.value = 0xbadc0ded,
+			.flags = 4
 		} },
-		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, value),
+		.size = offsetofend(struct BPF_MAP_LOOKUP_ELEM_struct, flags),
 		.str = "map_fd=-1, key=0xdeadbeef, value=0xbadc0ded"
+		       ", flags=BPF_F_LOCK"
 	}
 };
 
