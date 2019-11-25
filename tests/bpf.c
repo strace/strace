@@ -27,6 +27,7 @@
 
 #include "xlat.h"
 #include "xlat/bpf_commands.h"
+#include "xlat/bpf_prog_types.h"
 
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
 # define BIG_ADDR(addr64_, addr32_) addr64_
@@ -600,6 +601,8 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr
 	       license, IFINDEX_LO_STR);
 }
 
+static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 26,
+	      "The prog_type for test 5 below needs to be updated");
 static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	{
 		.data = { .BPF_PROG_LOAD_data = { .prog_type = 1 } },
@@ -609,7 +612,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 25,
+			.prog_type = 26,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -620,7 +623,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x19 /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x1a /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -640,7 +643,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_SK_REUSEPORT"
+		.str = "prog_type=BPF_PROG_TYPE_LIRC_MODE2"
 		       ", insn_cnt=3134983661"
 		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
@@ -682,6 +685,30 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		.print_fn = print_BPF_PROG_LOAD_attr4
 	},
 	{ /* 5 */
+		.data = { .BPF_PROG_LOAD_data = {
+			.prog_type = 25,
+			.insn_cnt = 0xbadc0ded,
+			.insns = 0xffffffff00000000,
+			.license = 0xffffffff00000000,
+			.log_level = 2718281828U,
+			.log_size = log_buf_size,
+			.log_buf = 0xffffffff00000000,
+			.kern_version = 0xcafef00d,
+			.prog_flags = 1,
+			.prog_name = "fedcba987654321",
+		} },
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
+		.str = "prog_type=BPF_PROG_TYPE_CGROUP_SOCKOPT"
+		       ", insn_cnt=3134983661"
+		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
+		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
+		       ", log_level=2718281828, log_size=4096"
+		       ", log_buf=" BIG_ADDR("0xffffffff00000000", "NULL")
+		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
+		       ", prog_flags=BPF_F_STRICT_ALIGNMENT"
+		       ", prog_name=\"fedcba987654321\"",
+	},
+	{ /* 6 */
 		.data = { .BPF_PROG_LOAD_data = {
 			.prog_flags = 2,
 			.expected_attach_type = 17,
