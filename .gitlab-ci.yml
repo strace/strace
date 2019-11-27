@@ -7,6 +7,7 @@ variables:
   GIT_DEPTH: "2147483647"
   SLEEP_A_BIT: "sleep 0.2"
   VERBOSE: "1"
+  KBRANCH: "v5.4"
 
 gcc-x86_64-libdw-mainline:
   stage: test

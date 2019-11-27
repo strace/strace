@@ -15,6 +15,7 @@ env:
   global:
     - SLEEP_A_BIT="sleep 0.2"
     - VERBOSE="1"
+    - KBRANCH="v5.4"
 
 matrix:
   include:
