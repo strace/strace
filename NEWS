@@ -4,13 +4,23 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented -DD and -DDD options that move strace into a separate
     process group and session, respectively.
+  * Enhanced seccomp-bpf tracee syscall filtering support by implementing
+    new "binary match" BPF program generation strategy and automatically
+    choosing the strategy that generates the shortest BPF program.
   * Implemented decoding of BPF_BTF_GET_NEXT_ID bpf syscall command.
+  * Enhanced decoding of BPF_MAP_LOOKUP_ELEM bpf syscall command.
+  * Implemented PTP_CLOCK_GETCAPS2, PTP_EXTTS_REQUEST2, PTP_PEROUT_REQUEST2,
+    PTP_ENABLE_PPS2, and PTP_SYS_OFFSET2 ioctl decoding.
   * Updated lists of BPF_*, CAN_*, KEXEC_*, KVM_*, MADV_*, MSG_*, P_*, PR_*,
-    SCTP_*, and V4L2_* constants.
+    PTP_*, SCTP_*, and V4L2_* constants.
+  * Implemented ability to build ARM EABI mpers support using a separate
+    compiler on aarch64.
   * Updated lists of ioctl commands from Linux 5.4.
+  * Enhanced manual page.
 
 * Bug fixes
   * Fixed -b execve when --seccomp-bpf option is specified.
+  * Fixed decoding of BPF_PROG_LOAD bpf syscall command.
   * Fixed build on no-MMU architectures.
   * Fixed build on antique systems that do not provide necessary definitions
     of AUDIT_ARCH_* constants.
