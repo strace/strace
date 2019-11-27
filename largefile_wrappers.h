@@ -24,6 +24,11 @@
 #  else
 #   define fopen_stream fopen
 #  endif
+#  ifdef HAVE_FCNTL64
+#   define fcntl_fd fcntl64
+#  else
+#   define fcntl_fd fcntl
+#  endif
 #  define strace_stat_t struct stat64
 #  define stat_file stat64
 #  define struct_dirent struct dirent64
@@ -33,6 +38,7 @@
 # else
 #  define open_file open
 #  define fopen_stream fopen
+#  define fcntl_fd fcntl
 #  define strace_stat_t struct stat
 #  define stat_file stat
 #  define struct_dirent struct dirent

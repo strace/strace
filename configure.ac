@@ -266,6 +266,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	be64toh
 	fallocate
 	fanotify_mark
+	fcntl64
 	fopen64
 	fork
 	fputs_unlocked

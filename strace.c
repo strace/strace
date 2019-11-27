@@ -422,7 +422,7 @@ set_cloexec_flag(int fd)
 {
 	int flags, newflags;
 
-	flags = fcntl(fd, F_GETFD);
+	flags = fcntl_fd(fd, F_GETFD);
 	if (flags < 0) {
 		/* Can happen only if fd is bad.
 		 * Should never happen: if it does, we have a bug
@@ -436,7 +436,7 @@ set_cloexec_flag(int fd)
 	if (flags == newflags)
 		return;
 
-	if (fcntl(fd, F_SETFD, newflags)) /* never fails */
+	if (fcntl_fd(fd, F_SETFD, newflags)) /* never fails */
 		perror_msg_and_die("fcntl(%d, F_SETFD, %#x)", fd, newflags);
 }
 
