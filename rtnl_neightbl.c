@@ -47,14 +47,14 @@ typedef struct {
 	uint64_t ndts_table_fulls; /**< Added by v4.3-rc1~96^2~202 */
 } struct_ndt_stats;
 
-# ifdef HAVE_STRUCT_NDT_CONFIG
+#ifdef HAVE_STRUCT_NDT_CONFIG
 static_assert(sizeof(struct ndt_config) == sizeof(struct_ndt_config),
 	      "Unexpected struct ndt_config size, please update the decoder");
-# endif
-# ifdef HAVE_STRUCT_NDT_STATS
+#endif
+#ifdef HAVE_STRUCT_NDT_STATS
 static_assert(sizeof(struct ndt_stats) <= sizeof(struct_ndt_stats),
 	      "Unexpected struct ndt_stats size, please update the decoder");
-# endif
+#endif
 
 
 static bool

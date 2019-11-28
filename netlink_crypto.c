@@ -8,24 +8,24 @@
 
 #include "defs.h"
 
-# include "netlink.h"
-# include "nlattr.h"
-# include "print_fields.h"
+#include "netlink.h"
+#include "nlattr.h"
+#include "print_fields.h"
 
-# if HAVE_LINUX_CRYPTOUSER_H
-#  include <linux/cryptouser.h>
-# endif
+#if HAVE_LINUX_CRYPTOUSER_H
+# include <linux/cryptouser.h>
+#endif
 
-# include "xlat/crypto_nl_attrs.h"
+#include "xlat/crypto_nl_attrs.h"
 
-# define XLAT_MACROS_ONLY
-#  include "xlat/crypto_msgs.h"
-# undef XLAT_MACROS_ONLY
+#define XLAT_MACROS_ONLY
+# include "xlat/crypto_msgs.h"
+#undef XLAT_MACROS_ONLY
 
 
-# ifndef CRYPTO_MAX_NAME
-#  define CRYPTO_MAX_NAME 64
-# endif
+#ifndef CRYPTO_MAX_NAME
+# define CRYPTO_MAX_NAME 64
+#endif
 
 typedef struct {
 	char cru_name[CRYPTO_MAX_NAME];
@@ -72,35 +72,35 @@ typedef struct {
 	uint32_t seedsize;
 } struct_crypto_report_rng;
 
-# ifdef HAVE_STRUCT_CRYPTO_USER_ALG
+#ifdef HAVE_STRUCT_CRYPTO_USER_ALG
 static_assert(sizeof(struct_crypto_user_alg) == sizeof(struct crypto_user_alg),
 	      "struct crypto_user_alg mismatch, please update the decoder");
-# endif
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
+#endif
+#ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
 static_assert(sizeof(struct_crypto_report_hash)
 	      == sizeof(struct crypto_report_hash),
 	      "struct crypto_report_hash mismatch, please update the decoder");
-# endif
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
+#endif
+#ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
 static_assert(sizeof(struct_crypto_report_cipher)
 	      == sizeof(struct crypto_report_cipher),
 	      "struct crypto_report_cipher mismatch, please update the decoder");
-# endif
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
+#endif
+#ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
 static_assert(sizeof(struct_crypto_report_blkcipher)
 	      == sizeof(struct crypto_report_blkcipher),
 	      "struct crypto_report_blkcipher mismatch, please update the decoder");
-# endif
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
+#endif
+#ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
 static_assert(sizeof(struct_crypto_report_aead)
 	      == sizeof(struct crypto_report_aead),
 	      "struct crypto_report_aead mismatch, please update the decoder");
-# endif
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
+#endif
+#ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
 static_assert(sizeof(struct_crypto_report_rng)
 	      == sizeof(struct crypto_report_rng),
 	      "struct crypto_report_rng mismatch, please update the decoder");
-# endif
+#endif
 
 
 static bool

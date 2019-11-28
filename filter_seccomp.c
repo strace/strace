@@ -491,10 +491,10 @@ binary_match_filter_generator(struct sock_filter *filter, bool *overflow)
 {
 	unsigned short pos = 0;
 
-#if SUPPORTED_PERSONALITIES > 1
+# if SUPPORTED_PERSONALITIES > 1
 	SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_W | BPF_ABS,
 		     offsetof(struct seccomp_data, arch));
-#endif
+# endif
 
 	/* Personalities are iterated in reverse-order in the BPF program so that
 	 * the x86 case is naturally handled.  In x86, the first and third
@@ -509,14 +509,14 @@ binary_match_filter_generator(struct sock_filter *filter, bool *overflow)
 		unsigned int bitarray = 0;
 		unsigned int i;
 
-#if SUPPORTED_PERSONALITIES > 1
+# if SUPPORTED_PERSONALITIES > 1
 		SET_BPF_JUMP(&filter[pos++], BPF_JMP | BPF_JEQ | BPF_K,
 			     audit_arch_vec[p].arch, 0, JMP_PLACEHOLDER_NEXT);
-#endif
+# endif
 		SET_BPF_STMT(&filter[pos++], BPF_LD | BPF_W | BPF_ABS,
 			     offsetof(struct seccomp_data, nr));
 
-#if SUPPORTED_PERSONALITIES > 1
+# if SUPPORTED_PERSONALITIES > 1
 		if (audit_arch_vec[p].flag) {
 			SET_BPF_JUMP(&filter[pos++], BPF_JMP | BPF_JGE | BPF_K,
 				     audit_arch_vec[p].flag, 2, 0);
@@ -529,7 +529,7 @@ binary_match_filter_generator(struct sock_filter *filter, bool *overflow)
 			SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_AND | BPF_K,
 				     ~audit_arch_vec[p].flag);
 		}
-#endif
+# endif
 
 		/* X = 1 << nr % 32 = 1 << nr & 0x1F; */
 		SET_BPF_STMT(&filter[pos++], BPF_ALU | BPF_AND | BPF_K, 0x1F);
@@ -588,9 +588,9 @@ binary_match_filter_generator(struct sock_filter *filter, bool *overflow)
 		}
 	}
 
-#if SUPPORTED_PERSONALITIES > 1
+# if SUPPORTED_PERSONALITIES > 1
 	SET_BPF_STMT(&filter[pos++], BPF_RET | BPF_K, SECCOMP_RET_TRACE);
-#endif
+# endif
 
 	return pos;
 }
