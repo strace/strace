@@ -53,12 +53,11 @@ main(void)
 #  define ALTERNATIVE_NANOSLEEP_REQ ""
 # endif
 	printf("(%s(%s\\{tv_sec=%lld, tv_nsec=%llu\\})"
-	       ", %p|restart_syscall\\(<\\.\\.\\."
+	       ", 0x[[:xdigit:]]+|restart_syscall\\(<\\.\\.\\."
 	       " resuming interrupted %s \\.\\.\\.>)\\) = 0\n",
 	       NANOSLEEP_CALL_RE,
 	       ALTERNATIVE_NANOSLEEP_REQ,
 	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
-	       &rem,
 	       NANOSLEEP_NAME_RE);
 
 	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
