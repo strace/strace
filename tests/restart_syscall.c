@@ -30,7 +30,8 @@ main(void)
 	const sigset_t set = {};
 	const struct sigaction act = { .sa_handler = SIG_IGN };
 	const struct itimerval itv = { .it_value.tv_usec = 111111 };
-	struct timespec req = { .tv_nsec = 222222222 }, rem;
+	struct timespec req = { .tv_nsec = 222222222 };
+	struct timespec rem = { 0xbadc0ded, 0xbadc0ded };
 
 	assert(sigaction(SIGALRM, &act, NULL) == 0);
 	assert(sigprocmask(SIG_SETMASK, &set, NULL) == 0);
