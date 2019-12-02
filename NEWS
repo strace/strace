@@ -1,6 +1,11 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Improvements
+
+* Bug fixes
+  * Fixed tests for glibc-2.31.
+
 Noteworthy changes in release 5.4 (2019-11-28)
 ==============================================
 

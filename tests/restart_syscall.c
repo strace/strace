@@ -7,7 +7,6 @@
  */
 
 #include "tests.h"
-#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <signal.h>
@@ -30,22 +29,22 @@ main(void)
 	const sigset_t set = {};
 	const struct sigaction act = { .sa_handler = SIG_IGN };
 	const struct itimerval itv = { .it_value.tv_usec = 111111 };
-	struct timespec req = { .tv_nsec = 222222222 };
-	struct timespec rem = { 0xbadc0ded, 0xbadc0ded };
+	const struct timespec req = { .tv_nsec = 222222222 };
+	struct timespec rem = { 0xdefaced, 0xdefaced };
 
-	assert(sigaction(SIGALRM, &act, NULL) == 0);
-	assert(sigprocmask(SIG_SETMASK, &set, NULL) == 0);
+	if (sigaction(SIGALRM, &act, NULL))
+		perror_msg_and_fail("sigaction");
+	if (sigprocmask(SIG_SETMASK, &set, NULL))
+		perror_msg_and_fail("sigprocmask");
 	if (setitimer(ITIMER_REAL, &itv, NULL))
 		perror_msg_and_skip("setitimer");
 	if (nanosleep(&req, &rem))
 		perror_msg_and_fail("nanosleep");
 
-	printf("%s\\{tv_sec=%lld, tv_nsec=%llu\\}"
-	       ", \\{tv_sec=%lld, tv_nsec=%llu\\}\\)"
+	printf("%s\\{tv_sec=0, tv_nsec=[0-9]+\\}"
+	       ", \\{tv_sec=[0-9]+, tv_nsec=[0-9]+\\}\\)"
 	       " = \\? ERESTART_RESTARTBLOCK \\(Interrupted by signal\\)\n",
-	       NANOSLEEP_CALL_RE,
-	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
-	       (long long) rem.tv_sec, zero_extend_signed_to_ull(rem.tv_nsec));
+	       NANOSLEEP_CALL_RE);
 	puts("--- SIGALRM \\{si_signo=SIGALRM, si_code=SI_KERNEL\\} ---");
 # ifdef __arm__
 /* old kernels used to overwrite ARM_r0 with -EINTR */
@@ -53,12 +52,11 @@ main(void)
 # else
 #  define ALTERNATIVE_NANOSLEEP_REQ ""
 # endif
-	printf("(%s(%s\\{tv_sec=%lld, tv_nsec=%llu\\})"
+	printf("(%s(%s\\{tv_sec=0, tv_nsec=[0-9]+\\})"
 	       ", 0x[[:xdigit:]]+|restart_syscall\\(<\\.\\.\\."
 	       " resuming interrupted %s \\.\\.\\.>)\\) = 0\n",
 	       NANOSLEEP_CALL_RE,
 	       ALTERNATIVE_NANOSLEEP_REQ,
-	       (long long) req.tv_sec, zero_extend_signed_to_ull(req.tv_nsec),
 	       NANOSLEEP_NAME_RE);
 
 	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
