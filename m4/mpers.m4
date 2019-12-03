@@ -99,9 +99,12 @@ case "$arch" in
 			  AC_MSG_NOTICE([Created empty gnu_stubs])
 			  IFLAG=-I.])
 	popdef([gnu_stubs])
+	saved_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS${IFLAG:+ }$IFLAG"
 	saved_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS MPERS_CFLAGS${IFLAG:+ }$IFLAG"
-	AC_CACHE_CHECK([for mpers_name personality compile support (using $CC $CFLAGS)], [st_cv_cc],
+	CFLAGS="$CFLAGS MPERS_CFLAGS"
+	AC_CACHE_CHECK([for mpers_name personality compile support (using $CC $CPPFLAGS $CFLAGS)],
+		[st_cv_cc],
 		[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <stdint.h>
 						     int main(){return 0;}]])],
 				   [st_cv_cc=yes],
@@ -117,7 +120,7 @@ case "$arch" in
 		AC_CACHE_CHECK([whether mpers.sh mpers_name MPERS_CFLAGS works],
 			[st_cv_mpers],
 			[if READELF="$READELF" \
-			    CC="$CC" CPP="$CPP" [CPPFLAGS]="$CPPFLAGS $IFLAG" \
+			    CC="$CC" CPP="$CPP" CPPFLAGS="$CPPFLAGS" \
 			    $srcdir/mpers_test.sh [$1] "MPERS_CFLAGS"; then
 				st_cv_mpers=yes
 			 else
@@ -147,6 +150,7 @@ case "$arch" in
 			fi
 		fi
 	fi
+	CPPFLAGS="$saved_CPPFLAGS"
 	CFLAGS="$saved_CFLAGS"
 	;;
 
