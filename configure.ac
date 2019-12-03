@@ -984,11 +984,14 @@ AS_IF([test x$arch = xaarch64],
 	     ])
       ])
 
-# Setting default compiler variables for personalities
+# Set default compiler variables for personalities.
 m4_foreach([pers], [M32, MX32], dnl
-	[m4_foreach([var], [CC, CPP, CFLAGS, CPPFLAGS], dnl
-	[[: ${]var[_FOR_]pers[=$]var[}]
-	AC_SUBST(var[_FOR_]pers)])])
+	   [m4_foreach([var], [CC, CPP, CPPFLAGS], dnl
+		       [[: ${]var[_FOR_]pers[=$]var[}]
+		        AC_SUBST(var[_FOR_]pers)]) dnl
+	    m4_foreach([var], [CFLAGS], dnl
+		       [[: ${]var[_FOR_]pers[=][}]
+		        AC_SUBST(var[_FOR_]pers)])])
 
 st_MPERS([m32], [aarch64|powerpc64|s390x|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
