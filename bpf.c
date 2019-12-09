@@ -343,6 +343,16 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	PRINT_FIELD_U(", ", attr, line_info_rec_size);
 	PRINT_FIELD_ADDR64(", ", attr, line_info);
 	PRINT_FIELD_U(", ", attr, line_info_cnt);
+
+	/* attach_btf_id was added in Linux commit v5.5-rc1~174^2~310^2~19^2~7 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, attach_btf_id))
+		break;
+	PRINT_FIELD_U(", ", attr, attach_btf_id);
+
+	/* attach_prog_fd was added in Linux commit v5.5-rc1~174^2~49^2~12^2~3 */
+	if (len <= offsetof(struct BPF_PROG_LOAD_struct, attach_prog_fd))
+		break;
+	PRINT_FIELD_FD(", ", attr, attach_prog_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 

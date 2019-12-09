@@ -205,6 +205,10 @@ print_prog_load(void *attr_void, size_t size, long rc)
 		printf(", line_info=NULL");
 	if (size > offsetof(struct BPF_PROG_LOAD_struct, line_info_cnt))
 		printf(", line_info_cnt=0");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, attach_btf_id))
+		printf(", attach_btf_id=0");
+	if (size > offsetof(struct BPF_PROG_LOAD_struct, attach_prog_fd))
+		printf(", attach_prog_fd=0</dev/null>");
 	printf("}, %zu) = ", size);
 	if (rc >= 0)
 		printf("%ld<anon_inode:bpf-prog>\n", rc);

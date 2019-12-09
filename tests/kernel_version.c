@@ -69,7 +69,9 @@ print_bpf_attr(void)
 		", func_info_cnt=0"
 		", line_info_rec_size=0"
 		", line_info=NULL"
-		", line_info_cnt=0}");
+		", line_info_cnt=0"
+		", attach_btf_id=0"
+		", attach_prog_fd=0}");
 }
 
 int
