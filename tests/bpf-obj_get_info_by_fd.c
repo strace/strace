@@ -237,7 +237,23 @@ try_bpf(kernel_ulong_t cmd, void (*printer)(void *attr, size_t size, long rc),
 int
 main(int ac, char **av)
 {
+	/*
+	 * There is a delay when the locked memory is being reclaimed
+	 * after a BPF program or map is removed.
+	 *
+	 * Privileged tools like iproute2 and bpftool workaround this
+	 * by raising RLIMIT_MEMLOCK to infinity prior to creating
+	 * BPF objects.
+	 *
+	 * This test is expected to be invoked without extra privileges
+	 * and therefore does not have this option.
+	 *
+	 * The approach taken by this test is serialize all invocations
+	 * and insert a delay long enough to let the locked memory be
+	 * reclaimed.
+	 */
 	lock_file_by_dirname(av[0], "bpf-obj_get_info_by_fd");
+	sleep(1);
 
 	struct BPF_MAP_CREATE_struct bpf_map_create_attr = {
 		.map_type    = BPF_MAP_TYPE_ARRAY,
