@@ -38,7 +38,7 @@ main(void)
 		rc = 0;
 	} else {
 		/*
-		 * If kernel implementaton of SECCOMP_MODE_STRICT is buggy,
+		 * If kernel implementation of SECCOMP_MODE_STRICT is buggy,
 		 * the following syscall will result to SIGKILL.
 		 */
 		rc = write(1, text1, LENGTH_OF(text1)) != LENGTH_OF(text1);

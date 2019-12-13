@@ -294,7 +294,7 @@ unsigned int ifindex_lo(void);
 /*
  * For 64-bit kernel_ulong_t and 32-bit pointer,
  * return a kernel_ulong_t value by filling higher bits.
- * For other architertures, return the original pointer.
+ * For other architectures, return the original pointer.
  */
 static inline kernel_ulong_t
 f8ill_ptr_to_kulong(const void *const ptr)

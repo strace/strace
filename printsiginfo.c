@@ -172,7 +172,7 @@ print_si_info(const siginfo_t *sip)
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS: {
 			/*
-			 * Note that we can safely use the personlity set in
+			 * Note that we can safely use the personality set in
 			 * current_personality  here (and don't have to guess it
 			 * based on X32_SYSCALL_BIT and si_arch, for example):
 			 *  - The signal is delivered as a result of seccomp

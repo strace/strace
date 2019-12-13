@@ -1,6 +1,6 @@
 /*
  * Wrappers for handling discrepancies in LF64-themed syscalls availability and
- * necessity between verious architectures and kernel veriosns.
+ * necessity between various architectures and kernel versions.
  *
  * Copyright (c) 2012-2019 The strace developers.
  * All rights reserved.

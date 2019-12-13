@@ -37,7 +37,7 @@ strace_open_memstream(struct tcb *tcp)
 	 */
 	fflush(fp);
 
-	/* Store the FILE pointer for later restauration. */
+	/* Store the FILE pointer for later restoration. */
 	tcp->staged_output_data->real_outf = tcp->outf;
 	tcp->outf = fp;
 #endif

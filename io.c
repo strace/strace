@@ -90,7 +90,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 /*
  * data_size limits the cumulative size of printed data.
- * Example: recvmsg returing a short read.
+ * Example: recvmsg returning a short read.
  */
 void
 tprint_iov_upto(struct tcb *const tcp, const kernel_ulong_t len,
