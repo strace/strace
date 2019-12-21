@@ -510,6 +510,9 @@ The syntax without a preceding percent sign
 .RB (\[dq] "-e trace" = memory \[dq])
 is deprecated.
 .TP
+.BR "\-e\ trace" = %creds
+Trace system calls that read or modify user and group identifiers or capability sets.
+.TP
 .BR "\-e\ trace" = %stat
 Trace stat syscall variants.
 .TP

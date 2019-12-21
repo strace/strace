@@ -152,6 +152,7 @@ lookup_class(const char *s)
 		{ "%file",	TRACE_FILE	},
 		{ "%memory",	TRACE_MEMORY	},
 		{ "%process",	TRACE_PROCESS	},
+		{ "%creds",	TRACE_CREDS	},
 		{ "%signal",	TRACE_SIGNAL	},
 		{ "%ipc",	TRACE_IPC	},
 		{ "%net",	TRACE_NETWORK	},

@@ -28,6 +28,7 @@
 # define SE	0
 # define CST	0
 # define TSD	0
+# define TC	0
 # define SEN(a)	0, 0
 
 #else	/*	!STRACE_TESTS_H	*/
@@ -53,6 +54,7 @@
 # define SE	STACKTRACE_CAPTURE_ON_ENTER
 # define CST	COMPAT_SYSCALL_TYPES
 # define TSD	TRACE_SECCOMP_DEFAULT
+# define TC	TRACE_CREDS
 /* SEN(a) is defined elsewhere */
 
 #endif

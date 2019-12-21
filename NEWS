@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Added -e trace=%creds option for tracing syscalls related to process
+    credentials.
   * Enhanced decoding of BPF_PROG_LOAD bpf syscall command.
   * Updated lists of BPF_* constants.
 
