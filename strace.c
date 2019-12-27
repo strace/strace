@@ -1650,7 +1650,7 @@ init(int argc, char *argv[])
 #ifdef ENABLE_STACKTRACE
 	    "k"
 #endif
-	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ";
+	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwWxX:yzZ";
 
 	enum {
 		SECCOMP_OPTION = 0x100
@@ -1771,6 +1771,9 @@ init(int argc, char *argv[])
 			break;
 		case 'w':
 			count_wallclock = 1;
+			break;
+		case 'W':
+			enable_wildcard_path_matching = 1;
 			break;
 		case 'x':
 			xflag++;

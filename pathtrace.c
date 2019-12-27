@@ -10,17 +10,19 @@
 #include "defs.h"
 #include <limits.h>
 #include <poll.h>
+#include <fnmatch.h>
 
 #include "syscall.h"
 #include "xstring.h"
 
 struct path_set global_path_set;
+unsigned enable_wildcard_path_matching;
 
 /*
  * Return true if specified path matches one that we're tracing.
  */
 static bool
-pathmatch(const char *path, struct path_set *set)
+pathmatch_exact(const char *path, struct path_set *set)
 {
 	unsigned i;
 
@@ -29,6 +31,33 @@ pathmatch(const char *path, struct path_set *set)
 			return true;
 	}
 	return false;
+}
+
+/*
+ * Return true if specified path matches one that we're tracing.
+ */
+static bool
+pathmatch_wildcard(const char *path, struct path_set *set)
+{
+	unsigned i;
+
+	for (i = 0; i < set->num_selected; ++i) {
+		if (fnmatch(set->paths_selected[i], path, 0) == 0)
+			return true;
+	}
+	return false;
+}
+
+/*
+ * Return true if specified path matches one that we're tracing.
+ */
+static bool
+pathmatch(const char *path, struct path_set *set)
+{
+	if (enable_wildcard_path_matching)
+		return pathmatch_wildcard(path, set);
+	else
+		return pathmatch_exact(path, set);
 }
 
 /*
