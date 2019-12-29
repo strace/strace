@@ -86,22 +86,27 @@ child(void *arg)
 
 #ifdef IA64
 extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
-# define clone(fn, child_stack, flags, arg)	\
-		__clone2(fn, child_stack, get_page_size() / 2, flags, arg)
+# define do_clone(fn_, stack_, size_, flags_, arg_, ...)	\
+	__clone2((fn_), (stack_), (size_), (flags_), (arg_), ## __VA_ARGS__)
+#else
+# define do_clone(fn_, stack_, size_, flags_, arg_, ...)	\
+	clone((fn_), (stack_), (flags_), (arg_), ## __VA_ARGS__)
 #endif
 
 static void
 test_user_namespace(void)
 {
-	pid_t pid;
 	int pipefd[2];
-	int status;
-
 	if (pipe(pipefd))
 		perror_msg_and_fail("pipe");
 
-	pid = clone(child, tail_alloc(get_page_size() / 2),
-		    CLONE_NEWUSER | CLONE_UNTRACED | SIGCHLD, pipefd);
+	const unsigned long child_stack_size = get_page_size();
+	void *const child_stack =
+		tail_alloc(child_stack_size * 2) + child_stack_size;
+
+	const pid_t pid = do_clone(child, child_stack, child_stack_size,
+				   CLONE_NEWUSER | CLONE_UNTRACED | SIGCHLD,
+				   pipefd);
 	if (pid == -1) {
 		perror("clone");
 		return;
@@ -109,6 +114,8 @@ test_user_namespace(void)
 	close(pipefd[0]);
 	test_clone(pid);
 	close(pipefd[1]);
+
+	int status;
 	if (wait(&status) != pid) {
 		perror_msg_and_fail("wait");
 	} else if (status != 0) {

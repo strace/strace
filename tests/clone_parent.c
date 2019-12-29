@@ -23,19 +23,24 @@ child(void *const arg)
 	return 42;
 }
 
-#define child_stack_size	(get_page_size() / 2)
-
 #ifdef IA64
 extern int __clone2(int (*)(void *), void *, size_t, int, void *, ...);
-# define clone(fn, child_stack, flags, arg)	\
-		__clone2(fn, child_stack, child_stack_size, flags, arg)
+# define do_clone(fn_, stack_, size_, flags_, arg_, ...)	\
+	__clone2((fn_), (stack_), (size_), (flags_), (arg_), ## __VA_ARGS__)
+#else
+# define do_clone(fn_, stack_, size_, flags_, arg_, ...)	\
+	clone((fn_), (stack_), (flags_), (arg_), ## __VA_ARGS__)
 #endif
 
 int
 main(void)
 {
-	const pid_t pid = clone(child, tail_alloc(child_stack_size),
-				CLONE_PARENT | SIGCHLD, 0);
+	const unsigned long child_stack_size = get_page_size();
+	void *const child_stack =
+		tail_alloc(child_stack_size * 2) + child_stack_size;
+
+	const pid_t pid = do_clone(child, child_stack, child_stack_size,
+				   CLONE_PARENT | SIGCHLD, 0);
 	if (pid < 0)
 		perror_msg_and_fail("clone");
 
