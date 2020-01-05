@@ -21,6 +21,7 @@
 #include "print_fields.h"
 
 #include "xlat/clone_flags.h"
+#include "xlat/clone3_flags.h"
 #include "xlat/setns_types.h"
 #include "xlat/unshare_flags.h"
 
@@ -234,8 +235,9 @@ SYS_FUNC(clone3)
 			goto out;
 		}
 
-		PRINT_FIELD_FLAGS("{", arg, flags, clone_flags,
-				  "CLONE_???");
+		tprints("{flags=");
+		printflags_ex(arg.flags, "CLONE_???", XLAT_STYLE_DEFAULT,
+			      clone_flags, clone3_flags, NULL);
 
 		if (arg.flags & CLONE_PIDFD)
 			PRINT_FIELD_ADDR64(", ", arg, pidfd);

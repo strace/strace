@@ -27,6 +27,7 @@
 
 #define XLAT_MACROS_ONLY
 # include "xlat/clone_flags.h"
+# include "xlat/clone3_flags.h"
 #undef XLAT_MACROS_ONLY
 
 #include "scno.h"
@@ -85,6 +86,8 @@ static const long injected_retval = 42;
 # define INJ_STR "\n"
 #endif /* RETVAL_INJECTED */
 
+#define ERR(b_) ((1ULL << (b_)) + FAIL_BUILD_ON_ZERO((b_) < 64))
+
 
 #if !RETVAL_INJECTED
 static void
@@ -101,7 +104,7 @@ wait_cloned(int pid)
 #endif
 
 static long
-do_clone3_(void *args, kernel_ulong_t size, bool should_fail, int line)
+do_clone3_(void *args, kernel_ulong_t size, uint64_t possible_errors, int line)
 {
 	long rc = syscall(__NR_clone3, args, size);
 
@@ -114,17 +117,26 @@ do_clone3_(void *args, kernel_ulong_t size, bool should_fail, int line)
 
 	static int unimplemented_error = -1;
 
-	if (should_fail) {
+	if (!(possible_errors & ERR(0))) {
 		if (rc >= 0)
 			error_msg_and_fail("%d: Unexpected success"
 					   " of a clone3() call", line);
 		if (unimplemented_error < 0)
 			unimplemented_error =
 				(errno == EINVAL) ? ENOSYS : errno;
-	} else {
-		if (rc < 0 && errno != unimplemented_error)
-			perror_msg_and_fail("%d: Unexpected failure"
-					    " of a clone3() call", line);
+	}
+
+	/*
+	 * This code works as long as all the errors we care about (EFAULT
+	 * and EINVAL so far) fit inside 64 bits, otherwise it should
+	 * be rewritten.
+	 */
+	if (rc < 0 && errno != unimplemented_error
+	    && (errno >= 64 || errno < 0 || !(ERR(errno) & possible_errors))) {
+		perror_msg_and_fail("%d: Unexpected failure of a clone3() call"
+				    " (got errno %d, expected errno bitmask"
+				    " %#" PRIx64 ")",
+				    line, errno, possible_errors);
 	}
 
 	if (!rc)
@@ -137,8 +149,8 @@ do_clone3_(void *args, kernel_ulong_t size, bool should_fail, int line)
 	return rc;
 }
 
-#define do_clone3(args_, size_, should_fail_) \
-	do_clone3_((args_), (size_), (should_fail_), __LINE__)
+#define do_clone3(args_, size_, errors_) \
+	do_clone3_((args_), (size_), (errors_), __LINE__)
 
 static inline void
 print_addr64(const char *pfx, uint64_t addr)
@@ -271,15 +283,22 @@ main(int argc, char *argv[])
 {
 	static const struct {
 		struct_clone_args args;
-		bool should_fail;
+		uint64_t possible_errors;
 		enum validity_flags vf;
 		const char *flags_str;
 		const char *es_str;
 	} arg_vals[] = {
 		{ { .flags = 0 },
-			false, 0, "0", "0" },
+			ERR(0), 0, "0", "0" },
 		{ { .flags = CLONE_PARENT_SETTID },
-			false, 0, "CLONE_PARENT_SETTID", "0" },
+			ERR(0), 0, "CLONE_PARENT_SETTID", "0" },
+
+		/* check clone3_flags/clone_flags interoperation */
+		{ { .flags = CLONE_CLEAR_SIGHAND },
+			ERR(EINVAL) | ERR(0), 0, "CLONE_CLEAR_SIGHAND", "0" },
+		{ { .flags = CLONE_PARENT_SETTID | CLONE_CLEAR_SIGHAND },
+			ERR(EINVAL) | ERR(0), 0,
+			"CLONE_PARENT_SETTID|CLONE_CLEAR_SIGHAND", "0" },
 	};
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct_clone_args, arg);
@@ -301,15 +320,15 @@ main(int argc, char *argv[])
 	*child_tid = 0xdeadface;
 	*parent_tid = 0xfeedbeef;
 
-	rc = do_clone3(NULL, 0, true);
+	rc = do_clone3(NULL, 0, ERR(EINVAL));
 	printf("clone3(NULL, 0) = %s" INJ_STR, sprintrc(rc));
 
-	rc = do_clone3(arg + 1, sizeof(*arg), true);
+	rc = do_clone3(arg + 1, sizeof(*arg), ERR(EFAULT));
 	printf("clone3(%p, %zu) = %s" INJ_STR,
 	       arg + 1, sizeof(*arg), sprintrc(rc));
 
 	rc = do_clone3((char *) arg + sizeof(uint64_t),
-		       sizeof(*arg) - sizeof(uint64_t), true);
+		       sizeof(*arg) - sizeof(uint64_t), ERR(EINVAL));
 	printf("clone3(%p, %zu) = %s" INJ_STR,
 	       (char *) arg + sizeof(uint64_t), sizeof(*arg) - sizeof(uint64_t),
 	       sprintrc(rc));
@@ -318,12 +337,12 @@ main(int argc, char *argv[])
 	memset(arg, 0, sizeof(*arg));
 	memset(arg2, 0, sizeof(*arg2) + 8);
 
-	rc = do_clone3(arg, 64, false);
+	rc = do_clone3(arg, 64, ERR(0));
 	printf("clone3({flags=0, exit_signal=0, stack=NULL, stack_size=0}, 64)"
 	       " = %s" INJ_STR,
 	       sprintrc(rc));
 
-	rc = do_clone3(arg, sizeof(*arg) + 8, true);
+	rc = do_clone3(arg, sizeof(*arg) + 8, ERR(EFAULT));
 	printf("clone3({flags=0, exit_signal=0, stack=NULL, stack_size=0, ???}"
 #if RETVAL_INJECTED
 	       " => {???}"
@@ -331,7 +350,7 @@ main(int argc, char *argv[])
 	       ", %zu) = %s" INJ_STR,
 	       sizeof(*arg) + 8, sprintrc(rc));
 
-	rc = do_clone3(arg2, sizeof(*arg2) + 8, false);
+	rc = do_clone3(arg2, sizeof(*arg2) + 8, ERR(0));
 	printf("clone3({flags=0, exit_signal=0, stack=NULL, stack_size=0}"
 	       ", %zu) = %s" INJ_STR,
 	       sizeof(*arg2) + 8, sprintrc(rc));
@@ -343,7 +362,7 @@ main(int argc, char *argv[])
 	 */
 	arg2[1].flags = 0xfacefeeddeadc0de;
 	arg2->exit_signal = 0xdeadface00000000ULL | SIGCHLD;
-	rc = do_clone3(arg2, sizeof(*arg2) + 8, true);
+	rc = do_clone3(arg2, sizeof(*arg2) + 8, ERR(E2BIG));
 	printf("clone3({flags=0, exit_signal=%llu, stack=NULL, stack_size=0"
 	       ", /* bytes %zu..%zu */ "
 #if WORDS_BIGENDIAN
@@ -368,7 +387,7 @@ main(int argc, char *argv[])
 	       sizeof(*arg2) + 8, sprintrc(rc));
 
 	arg2->exit_signal = 0xdeadc0de;
-	rc = do_clone3(arg2, sizeof(*arg) + 16, true);
+	rc = do_clone3(arg2, sizeof(*arg) + 16, ERR(E2BIG));
 	printf("clone3({flags=0, exit_signal=3735929054, stack=NULL"
 	       ", stack_size=0, ???}"
 #if RETVAL_INJECTED
@@ -379,24 +398,24 @@ main(int argc, char *argv[])
 
 	arg->flags = 0xfacefeedbeefc0de;
 	arg->exit_signal = 0x1e55c0de;
-	rc = do_clone3(arg, 64, true);
+	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags=%s, child_tid=NULL, exit_signal=508936414"
 	       ", stack=NULL, stack_size=0, tls=NULL}, 64) = %s" INJ_STR,
 	       XLAT_KNOWN(0xfacefeedbeefc0de, "CLONE_VFORK|CLONE_PARENT"
 	       "|CLONE_THREAD|CLONE_NEWNS|CLONE_SYSVSEM|CLONE_SETTLS"
 	       "|CLONE_CHILD_CLEARTID|CLONE_UNTRACED|CLONE_NEWCGROUP"
 	       "|CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWUSER|CLONE_NEWPID|CLONE_IO"
-	       "|0xfacefeed004000de"), sprintrc(rc));
+	       "|CLONE_CLEAR_SIGHAND|0xfacefeec004000de"), sprintrc(rc));
 
-	arg->flags = 0xdec0dead004000ffULL;
+	arg->flags = 0xdec0deac004000ffULL;
 	arg->exit_signal = 250;
 	arg->stack = 0xface1e55beeff00dULL;
 	arg->stack_size = 0xcaffeedefacedca7ULL;
-	rc = do_clone3(arg, 64, true);
+	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags=%s, exit_signal=250"
 	       ", stack=0xface1e55beeff00d, stack_size=0xcaffeedefacedca7}, 64)"
 	       " = %s" INJ_STR,
-	       XLAT_UNKNOWN(0xdec0dead004000ff, "CLONE_???"),
+	       XLAT_UNKNOWN(0xdec0deac004000ff, "CLONE_???"),
 	       sprintrc(rc));
 
 	arg->exit_signal = SIGCHLD;
@@ -445,7 +464,7 @@ main(int argc, char *argv[])
 #endif
 
 		pid_fields[i].field[0] = 0;
-		rc = do_clone3(arg, 64, true);
+		rc = do_clone3(arg, 64, ERR(EINVAL));
 		rc_str = sprintrc(rc);
 		printf("clone3({flags=%s, %s=NULL"
 		       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
@@ -459,7 +478,7 @@ main(int argc, char *argv[])
 		printf(", 64) = %s" INJ_STR, rc_str);
 
 		pid_fields[i].field[0] = (uintptr_t) (pid_fields[i].ptr + 1);
-		rc = do_clone3(arg, 64, true);
+		rc = do_clone3(arg, 64, ERR(EINVAL));
 		rc_str = sprintrc(rc);
 		printf("clone3({flags=%s, %s=%p"
 		       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
@@ -475,7 +494,7 @@ main(int argc, char *argv[])
 		printf(", 64) = %s" INJ_STR, rc_str);
 
 		pid_fields[i].field[0] = (uintptr_t) pid_fields[i].ptr;
-		rc = do_clone3(arg, 64, true);
+		rc = do_clone3(arg, 64, ERR(EINVAL));
 		rc_str = sprintrc(rc);
 		printf("clone3({flags=%s, %s=%p"
 		       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
@@ -492,7 +511,7 @@ main(int argc, char *argv[])
 	}
 
 	arg->flags = 0xbad0000000000001ULL | CLONE_SETTLS;
-	rc = do_clone3(arg, 64, true);
+	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags="
 	       XLAT_KNOWN(0xbad0000000080001, "CLONE_SETTLS|0xbad0000000000001")
 	       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
@@ -501,7 +520,7 @@ main(int argc, char *argv[])
 	       sprintrc(rc));
 
 	arg->tls = (uintptr_t) (tls + 1);
-	rc = do_clone3(arg, 64, true);
+	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags="
 	       XLAT_KNOWN(0xbad0000000080001, "CLONE_SETTLS|0xbad0000000000001")
 	       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
@@ -510,7 +529,7 @@ main(int argc, char *argv[])
 	       tls + 1, sprintrc(rc));
 
 	arg->tls = (uintptr_t) tls;
-	rc = do_clone3(arg, 64, true);
+	rc = do_clone3(arg, 64, ERR(EINVAL));
 	printf("clone3({flags="
 	       XLAT_KNOWN(0xbad0000000080001, "CLONE_SETTLS|0xbad0000000000001")
 	       ", exit_signal=" XLAT_KNOWN(SIGCHLD, "SIGCHLD")
@@ -531,7 +550,7 @@ main(int argc, char *argv[])
 	for (size_t i = 0; i < ARRAY_SIZE(arg_vals); i++) {
 		memcpy(arg, &arg_vals[i].args, sizeof(*arg));
 
-		rc = do_clone3(arg, sizeof(*arg), arg_vals[i].should_fail);
+		rc = do_clone3(arg, sizeof(*arg), arg_vals[i].possible_errors);
 		print_clone3(arg, rc, sizeof(*arg),
 			     arg_vals[i].vf | STRUCT_VALID,
 			     arg_vals[i].flags_str, arg_vals[i].es_str);

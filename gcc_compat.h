@@ -50,6 +50,7 @@
 #  define MUST_BE_ARRAY(a) FAIL_BUILD_ON_ZERO(!SAME_TYPE((a), &(a)[0]))
 # else
 #  define SAME_TYPE(x, y)	0
+#  define FAIL_BUILD_ON_ZERO(e) 0
 #  define MUST_BE_ARRAY(a)	0
 # endif
 

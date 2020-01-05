@@ -1,0 +1,2 @@
+#val_type uint64_t
+CLONE_CLEAR_SIGHAND	0x100000000ULL
