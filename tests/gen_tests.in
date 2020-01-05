@@ -105,11 +105,17 @@ getcwd	-a18
 getdents	-a22 -v
 getdents64	-a24 -v
 getegid	+getuid.test
+getegid-creds	+getuid.test
 getegid32	+getuid.test
+getegid32-creds	+getuid.test
 geteuid	+getuid.test
+geteuid-creds	+getuid.test
 geteuid32	+getuid.test
+geteuid32-creds	+getuid.test
 getgid	+getuid.test
+getgid-creds	+getuid.test
 getgid32	+getuid.test
+getgid32-creds	+getuid.test
 getgroups	-a17
 getgroups32	-a19
 getpeername	-a27
@@ -126,7 +132,9 @@ getrusage	-v
 getsid	-a10
 getsockname	-a27
 gettid	-a9
+getuid-creds	+getuid.test
 getuid32	+getuid.test
+getuid32-creds	+getuid.test
 getxxid	-a10 -e trace=getxpid,getxuid,getxgid
 group_req	-e trace=setsockopt
 inet-cmsg	-e trace=recvmsg
@@ -537,6 +545,7 @@ timer_xettime	-e trace=timer_create,timer_settime,timer_gettime
 timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
 times	-esignal=none
 times-fail	-a12 -e trace=times
+trace_creds	test_trace_expr '([gs]et[^p]*([gu]id|groups)|caps|prctl|[fl]?chown|print(path-umovestr|strn-umoven)-undumpable|ptrace|quotactl|rt_sigtimedwait|rt_(tg)?sigqueueinfo).*' -e%creds
 trace_fstat	test_trace_expr '' -e%fstat -v -P stat.sample -P /dev/full
 trace_fstatfs	test_trace_expr '' -e%fstatfs
 trace_lstat	test_trace_expr '' -e%lstat -v -P stat.sample -P /dev/full

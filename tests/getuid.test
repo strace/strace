@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# Check getuid syscall decoding.
+# Check get(e)?[gu]id(32)? syscalls decoding.
 #
-# Copyright (c) 2016-2018 The strace developers.
+# Copyright (c) 2016-2020 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -10,7 +10,13 @@
 . "${srcdir=.}/init.sh"
 
 check_prog uniq
+if [ "${NAME%-creds}" = "$NAME" ]; then
+	syscall="$NAME"
+else
+	NAME="${NAME%-creds}"
+	syscall='%creds'
+fi
 run_prog > /dev/null
-run_strace -qq -a9 -e$NAME $args > "$EXP"
+run_strace -qq -a9 -e"$syscall" $args > "$EXP"
 uniq < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
