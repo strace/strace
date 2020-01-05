@@ -96,10 +96,7 @@ SYS_FUNC(clone)
 				printsignal(sig);
 			}
 		} else {
-			if (sig)
-				printsignal(sig);
-			else
-				tprints("0");
+			printsignal(sig);
 		}
 		/*
 		 * TODO on syscall entry:
