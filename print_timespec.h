@@ -67,9 +67,6 @@ bool
 PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 			       const size_t size)
 {
-	const TIMESPEC_T *ts = arg;
-	unsigned int i;
-
 	if (nmemb > size / sizeof(TIMESPEC_T)) {
 		tprints("?");
 		return false;
@@ -77,10 +74,10 @@ PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 
 	tprints("[");
 
-	for (i = 0; i < nmemb; i++) {
+	for (unsigned int i = 0; i < nmemb; i++, arg += sizeof(TIMESPEC_T)) {
 		if (i)
 			tprints(", ");
-		print_unaligned_timespec_t(&ts[i]);
+		print_unaligned_timespec_t(arg);
 	}
 
 	tprints("]");
