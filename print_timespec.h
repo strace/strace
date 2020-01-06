@@ -38,6 +38,16 @@ print_timespec_t(const TIMESPEC_T *t)
 	print_sec_nsec(TIMESPEC_TO_SEC_NSEC(t));
 }
 
+#if defined PRINT_TIMESPEC_DATA_SIZE || defined PRINT_TIMESPEC_ARRAY_DATA_SIZE
+static void
+print_unaligned_timespec_t(const void *arg)
+{
+	TIMESPEC_T t;
+	memcpy(&t, arg, sizeof(t));
+	print_timespec_t(&t);
+}
+#endif /* PRINT_TIMESPEC_DATA_SIZE || PRINT_TIMESPEC_ARRAY_DATA_SIZE */
+
 #ifdef PRINT_TIMESPEC_DATA_SIZE
 bool
 PRINT_TIMESPEC_DATA_SIZE(const void *arg, const size_t size)
@@ -47,7 +57,7 @@ PRINT_TIMESPEC_DATA_SIZE(const void *arg, const size_t size)
 		return false;
 	}
 
-	print_timespec_t(arg);
+	print_unaligned_timespec_t(arg);
 	return true;
 }
 #endif /* PRINT_TIMESPEC_DATA_SIZE */
@@ -70,7 +80,7 @@ PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 	for (i = 0; i < nmemb; i++) {
 		if (i)
 			tprints(", ");
-		print_timespec_t(&ts[i]);
+		print_unaligned_timespec_t(&ts[i]);
 	}
 
 	tprints("]");

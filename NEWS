@@ -8,6 +8,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_* constants.
 
 * Bug fixes
+  * Fixed potentially unaligned access in decoder of SO_TIMESTAMP*_NEW
+    control messages.
   * Fixed decoding of NDA_LLADDR netlink neighbor table attribute.
   * Fixed build of mpers support when CFLAGS contains -flto.
   * Fixed tests for glibc-2.31.

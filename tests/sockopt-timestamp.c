@@ -9,6 +9,7 @@
 
 #include "tests.h"
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 
@@ -61,16 +62,18 @@ print_timestamp_new(const struct cmsghdr *c)
 {
 	const void *cmsg_header = c;
 	const void *cmsg_data = CMSG_DATA(c);
-	const struct __kernel_sock_timeval *tv = cmsg_data;
-	const unsigned int expected_len = sizeof(*tv);
+	struct __kernel_sock_timeval tv;
+	const unsigned int expected_len = sizeof(tv);
 	const unsigned int data_len = c->cmsg_len - (cmsg_data - cmsg_header);
 
 	if (expected_len != data_len)
 		perror_msg_and_fail("sizeof(struct __kernel_sock_timeval) = %u"
 				    ", data_len = %u\n",
 				    expected_len, data_len);
+
+	memcpy(&tv, cmsg_data, sizeof(tv));
 	printf("{tv_sec=%lld, tv_usec=%lld}",
-	       (long long) tv->tv_sec, (long long) tv->tv_usec);
+	       (long long) tv.tv_sec, (long long) tv.tv_usec);
 }
 #endif /* HAVE_STRUCT___KERNEL_SOCK_TIMEVAL */
 
@@ -80,16 +83,18 @@ print_timestampns_new(const struct cmsghdr *c)
 {
 	const void *cmsg_header = c;
 	const void *cmsg_data = CMSG_DATA(c);
-	const struct __kernel_timespec *ts = cmsg_data;
-	const unsigned int expected_len = sizeof(*ts);
+	struct __kernel_timespec ts;
+	const unsigned int expected_len = sizeof(ts);
 	const unsigned int data_len = c->cmsg_len - (cmsg_data - cmsg_header);
 
 	if (expected_len != data_len)
 		perror_msg_and_fail("sizeof(struct __kernel_timespec) = %u"
 				    ", data_len = %u\n",
 				    expected_len, data_len);
+
+	memcpy(&ts, cmsg_data, sizeof(ts));
 	printf("{tv_sec=%lld, tv_nsec=%lld}",
-	       (long long) ts->tv_sec, (long long) ts->tv_nsec);
+	       (long long) ts.tv_sec, (long long) ts.tv_nsec);
 }
 #endif /* HAVE_STRUCT___KERNEL_TIMESPEC */
 
