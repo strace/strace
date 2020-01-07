@@ -9,7 +9,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Bug fixes
   * Fixed stack trace printing for early syscalls when strace is configured
-    to use libdw backend for stack tracing.
+    to use libdw backend for stack tracing (addresses Fedora bug #1788636).
   * Fixed potentially unaligned access in decoder of SO_TIMESTAMP*_NEW
     control messages.
   * Fixed decoding of NDA_LLADDR netlink neighbor table attribute.
