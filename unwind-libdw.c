@@ -69,7 +69,7 @@ tcb_init(struct tcb *tcp)
 
 	struct ctx *ctx = xmalloc(sizeof(*ctx));
 	ctx->dwfl = dwfl;
-	ctx->last_proc_updating = 0;
+	ctx->last_proc_updating = mapping_generation - 1;
 	return ctx;
 }
 

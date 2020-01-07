@@ -8,6 +8,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_* constants.
 
 * Bug fixes
+  * Fixed stack trace printing for early syscalls when strace is configured
+    to use libdw backend for stack tracing.
   * Fixed potentially unaligned access in decoder of SO_TIMESTAMP*_NEW
     control messages.
   * Fixed decoding of NDA_LLADDR netlink neighbor table attribute.
