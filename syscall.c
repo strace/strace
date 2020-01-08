@@ -620,7 +620,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	if (hide_log(tcp)) {
 		/*
 		 * Restrain from fault injection
-		 * while the trace executes strace code.
+		 * while the tracee executes strace code.
 		 */
 		tcp->qual_flg &= ~QUAL_INJECT;
 
@@ -655,9 +655,10 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled) {
-		if (tcp_sysent(tcp)->sys_flags & STACKTRACE_CAPTURE_ON_ENTER)
-			unwind_tcb_capture(tcp);
+	if (stack_trace_enabled &&
+	    !check_exec_syscall(tcp) &&
+	    tcp_sysent(tcp)->sys_flags & STACKTRACE_CAPTURE_ON_ENTER) {
+		unwind_tcb_capture(tcp);
 	}
 #endif
 
