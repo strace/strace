@@ -284,11 +284,11 @@ check_seccomp_order(void)
 static bool
 traced_by_seccomp(unsigned int scno, unsigned int p)
 {
-	if (is_number_in_set_array(scno, trace_set, p)
-	    || sysent_vec[p][scno].sys_flags
-	    & (TRACE_INDIRECT_SUBCALL | TRACE_SECCOMP_DEFAULT))
-		return true;
-	return false;
+	unsigned int always_trace_flags =
+		TRACE_INDIRECT_SUBCALL | TRACE_SECCOMP_DEFAULT |
+		(stack_trace_enabled ? MEMORY_MAPPING_CHANGE : 0);
+	return sysent_vec[p][scno].sys_flags & always_trace_flags ||
+		is_number_in_set_array(scno, trace_set, p);
 }
 
 static void
