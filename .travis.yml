@@ -133,9 +133,20 @@ matrix:
       env:
         - TARGET=ppc64le
         - STACKTRACE=libdw
+    - arch: s390x
+      compiler: gcc
+      env:
+        - TARGET=s390x
+        - STACKTRACE=libdw
     - arch: ppc64le
       compiler: gcc-9
       env:
         - TARGET=ppc64le
+        - STACKTRACE=no
+        - KHEADERS=torvalds/linux
+    - arch: s390x
+      compiler: gcc-9
+      env:
+        - TARGET=s390x
         - STACKTRACE=no
         - KHEADERS=torvalds/linux
