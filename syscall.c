@@ -1321,10 +1321,7 @@ get_scno(struct tcb *tcp)
 		return -1;
 
 	if (ptrace_syscall_info_is_valid()) {
-		/*
-		 * So far it's just a workaround for x32,
-		 * but let's pretend it could be used elsewhere.
-		 */
+		/* Apply arch-specific workarounds.  */
 		int rc = arch_check_scno(tcp);
 		if (rc != 1)
 			return rc;
