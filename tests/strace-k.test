@@ -16,8 +16,19 @@
 	framework_skip_ '/proc/self/maps is not available'
 
 check_prog grep
+check_prog readlink
 check_prog sed
 check_prog tr
+
+path_to_sed="$(command -v sed)"
+if [ -x "$path_to_sed" ] &&
+   path_to_sed="$(readlink -ev -- "$path_to_sed")"; then
+	"$path_to_sed" -n 's/^[^/]\+[[:space:]]\(\/.*\)$/\1/p' /proc/self/maps |
+	grep -F -x -e "$path_to_sed" > /dev/null || {
+		cat >&2 /proc/self/maps
+		framework_skip_ '/proc/self/maps is invalid'
+	}
+fi
 
 run_prog "${test_prog=../stack-fcall}"
 run_strace -e chdir -k $args
