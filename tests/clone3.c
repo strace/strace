@@ -48,9 +48,11 @@ struct test_clone_args {
 	uint64_t stack;
 	uint64_t stack_size;
 	uint64_t tls;
+	uint64_t set_tid;
+	uint64_t set_tid_size;
 };
 
-#ifdef HAVE_STRUCT_CLONE_ARGS
+#ifdef HAVE_STRUCT_CLONE_ARGS_SET_TID_SIZE
 typedef struct clone_args struct_clone_args;
 #else
 typedef struct test_clone_args struct_clone_args;
@@ -75,6 +77,8 @@ enum validity_flags {
 };
 
 #undef _
+
+#define MAX_SET_TID_SIZE 32
 
 static const int child_exit_status = 42;
 
@@ -196,6 +200,23 @@ print_tls(const char *pfx, uint64_t arg_ptr, enum validity_flags vf)
 #endif
 }
 
+static void
+print_set_tid(uint64_t set_tid, uint64_t set_tid_size)
+{
+	if (!set_tid || set_tid != (uintptr_t) set_tid ||
+	    !set_tid_size || set_tid_size > MAX_SET_TID_SIZE) {
+		print_addr64(", set_tid=", set_tid);
+	} else {
+		printf(", set_tid=");
+		int *tids = (int *) (uintptr_t) set_tid;
+		for (unsigned int i = 0; i < set_tid_size; ++i)
+			printf("%s%d", i ? ", " : "[", tids[i]);
+		printf("]");
+	}
+
+	printf(", set_tid_size=%" PRIu64, set_tid_size);
+}
+
 static inline void
 print_clone3(struct_clone_args *const arg, long rc, kernel_ulong_t sz,
 	     enum validity_flags valid,
@@ -241,6 +262,10 @@ print_clone3(struct_clone_args *const arg, long rc, kernel_ulong_t sz,
 
 	if (arg->flags & CLONE_SETTLS)
 		print_tls("tls=", arg->tls, valid);
+
+	if (sz >= offsetofend(struct_clone_args, set_tid_size) &&
+	    (arg->set_tid || arg->set_tid_size))
+		print_set_tid(arg->set_tid, arg->set_tid_size);
 
 	printf("}");
 
@@ -299,13 +324,24 @@ main(int argc, char *argv[])
 		{ { .flags = CLONE_PARENT_SETTID | CLONE_CLEAR_SIGHAND },
 			ERR(EINVAL) | ERR(0), 0,
 			"CLONE_PARENT_SETTID|CLONE_CLEAR_SIGHAND", "0" },
-	};
 
+		{ { .set_tid = 0xfacefeedcafebabe },
+			ERR(E2BIG) | ERR(EINVAL), 0, "0", "0" },
+		{ { .set_tid_size = 0xfacecafefeedbabe },
+			ERR(E2BIG) | ERR(EINVAL), 0, "0", "0" },
+		{ { .set_tid = 0xfacefeedcafebabe,
+		    .set_tid_size = MAX_SET_TID_SIZE + 1 },
+			ERR(E2BIG) | ERR(EINVAL), 0, "0", "0" },
+	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct_clone_args, arg);
-	struct_clone_args *arg2 = tail_alloc(sizeof(*arg2) + 8);
+	const size_t arg1_size = offsetofend(struct_clone_args, tls);
+	struct_clone_args *const arg1 = tail_alloc(arg1_size);
+	const size_t arg2_size = sizeof(*arg) + 8;
+	struct_clone_args *const arg2 = tail_alloc(arg2_size);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, pidfd);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, child_tid);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, parent_tid);
+	int *const tids = tail_alloc(sizeof(*tids) * MAX_SET_TID_SIZE);
 	long rc;
 
 #if defined HAVE_STRUCT_USER_DESC
@@ -319,6 +355,7 @@ main(int argc, char *argv[])
 	*pidfd = 0xbadc0ded;
 	*child_tid = 0xdeadface;
 	*parent_tid = 0xfeedbeef;
+	fill_memory(tids, sizeof(*tids) * MAX_SET_TID_SIZE);
 
 	rc = do_clone3(NULL, 0, ERR(EINVAL));
 	printf("clone3(NULL, 0) = %s" INJ_STR, sprintrc(rc));
@@ -327,15 +364,16 @@ main(int argc, char *argv[])
 	printf("clone3(%p, %zu) = %s" INJ_STR,
 	       arg + 1, sizeof(*arg), sprintrc(rc));
 
-	rc = do_clone3((char *) arg + sizeof(uint64_t),
-		       sizeof(*arg) - sizeof(uint64_t), ERR(EINVAL));
+	size_t short_size = arg1_size - sizeof(uint64_t);
+	char *short_start = (char *) arg1 + sizeof(uint64_t);
+	rc = do_clone3(short_start, short_size, ERR(EINVAL));
 	printf("clone3(%p, %zu) = %s" INJ_STR,
-	       (char *) arg + sizeof(uint64_t), sizeof(*arg) - sizeof(uint64_t),
-	       sprintrc(rc));
+	       short_start, short_size, sprintrc(rc));
 
 
 	memset(arg, 0, sizeof(*arg));
-	memset(arg2, 0, sizeof(*arg2) + 8);
+	memset(arg1, 0, arg1_size);
+	memset(arg2, 0, arg2_size);
 
 	rc = do_clone3(arg, 64, ERR(0));
 	printf("clone3({flags=0, exit_signal=0, stack=NULL, stack_size=0}, 64)"
@@ -350,10 +388,22 @@ main(int argc, char *argv[])
 	       ", %zu) = %s" INJ_STR,
 	       sizeof(*arg) + 8, sprintrc(rc));
 
-	rc = do_clone3(arg2, sizeof(*arg2) + 8, ERR(0));
+	rc = do_clone3(arg1, arg1_size, ERR(0));
 	printf("clone3({flags=0, exit_signal=0, stack=NULL, stack_size=0}"
 	       ", %zu) = %s" INJ_STR,
-	       sizeof(*arg2) + 8, sprintrc(rc));
+	       arg1_size, sprintrc(rc));
+
+	rc = do_clone3(arg2, arg2_size, ERR(0));
+	printf("clone3({flags=0, exit_signal=0, stack=NULL, stack_size=0}"
+	       ", %zu) = %s" INJ_STR,
+	       arg2_size, sprintrc(rc));
+
+	arg->set_tid = (uintptr_t) tids;
+	arg->set_tid_size = MAX_SET_TID_SIZE;
+	rc = do_clone3(arg, sizeof(*arg), ERR(E2BIG) | ERR(EINVAL));
+	print_clone3(arg, rc, sizeof(*arg), STRUCT_VALID, "0", "0");
+	printf(", %zu) = %s" INJ_STR, sizeof(*arg), sprintrc(rc));
+	memset(arg, 0, sizeof(*arg));
 
 	/*
 	 * NB: the following check is purposefully fragile (it will break

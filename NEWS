@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Added -e trace=%creds option for tracing syscalls related to process
     credentials.
   * Enhanced decoding of BPF_PROG_LOAD bpf syscall command.
+  * Updated decoding of clone3 syscall to match Linux 5.5.
   * Updated lists of BPF_* constants.
 
 * Bug fixes

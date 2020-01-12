@@ -147,6 +147,8 @@ struct strace_clone_args {
 	uint64_t stack;
 	uint64_t stack_size;
 	uint64_t tls;
+	uint64_t set_tid;
+	uint64_t set_tid_size;
 };
 
 /**
@@ -260,6 +262,23 @@ SYS_FUNC(clone3)
 		if (arg.flags & CLONE_SETTLS) {
 			tprints(", tls=");
 			print_tls_arg(tcp, arg.tls);
+		}
+
+		if (arg.set_tid || arg.set_tid_size) {
+			static const unsigned int max_set_tid_size = 32;
+
+			if (!arg.set_tid || !arg.set_tid_size ||
+			    arg.set_tid_size > max_set_tid_size) {
+				PRINT_FIELD_ADDR64(", ", arg, set_tid);
+			} else {
+				int buf;
+
+				tprints(", set_tid=");
+				print_array(tcp, arg.set_tid, arg.set_tid_size,
+					    &buf, sizeof(buf), tfetch_mem,
+					    print_int32_array_member, 0);
+			}
+			PRINT_FIELD_U(", ", arg, set_tid_size);
 		}
 
 		if (size > fetch_size)
