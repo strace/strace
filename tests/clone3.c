@@ -10,6 +10,7 @@
 #include "tests.h"
 
 #include <errno.h>
+#include <stdint.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -24,6 +25,10 @@
 # include <asm/ldt.h>
 #endif
 
+#define XLAT_MACROS_ONLY
+# include "xlat/clone_flags.h"
+#undef XLAT_MACROS_ONLY
+
 #include "scno.h"
 
 #ifndef VERBOSE
@@ -33,15 +38,7 @@
 # define RETVAL_INJECTED 0
 #endif
 
-#ifndef HAVE_STRUCT_CLONE_ARGS
-# include <stdint.h>
-# include <linux/types.h>
-
-# define XLAT_MACROS_ONLY
-#  include "xlat/clone_flags.h"
-# undef XLAT_MACROS_ONLY
-
-struct clone_args {
+struct test_clone_args {
 	uint64_t flags;
 	uint64_t pidfd;
 	uint64_t child_tid;
@@ -51,7 +48,12 @@ struct clone_args {
 	uint64_t stack_size;
 	uint64_t tls;
 };
-#endif /* !HAVE_STRUCT_CLONE_ARGS */
+
+#ifdef HAVE_STRUCT_CLONE_ARGS
+typedef struct clone_args struct_clone_args;
+#else
+typedef struct test_clone_args struct_clone_args;
+#endif
 
 enum validity_flag_bits {
 	STRUCT_VALID_BIT,
@@ -128,7 +130,7 @@ do_clone3_(void *args, kernel_ulong_t size, bool should_fail, int line)
 	if (!rc)
 		_exit(child_exit_status);
 
-	if (rc > 0 && ((struct clone_args *) args)->exit_signal)
+	if (rc > 0 && ((struct_clone_args *) args)->exit_signal)
 		wait_cloned(rc);
 #endif
 
@@ -183,12 +185,13 @@ print_tls(const char *pfx, uint64_t arg_ptr, enum validity_flags vf)
 }
 
 static inline void
-print_clone3(struct clone_args *const arg, long rc, kernel_ulong_t sz,
+print_clone3(struct_clone_args *const arg, long rc, kernel_ulong_t sz,
 	     enum validity_flags valid,
 	     const char *flags_str, const char *es_str)
 {
 	int saved_errno = errno;
 
+	printf("clone3(");
 	if (!(valid & STRUCT_VALID)) {
 		printf("%p", arg);
 		goto out;
@@ -267,7 +270,7 @@ int
 main(int argc, char *argv[])
 {
 	static const struct {
-		struct clone_args args;
+		struct_clone_args args;
 		bool should_fail;
 		enum validity_flags vf;
 		const char *flags_str;
@@ -279,19 +282,19 @@ main(int argc, char *argv[])
 			false, 0, "CLONE_PARENT_SETTID", "0" },
 	};
 
-	struct clone_args *arg = tail_alloc(sizeof(*arg));
-	struct clone_args *arg2 = tail_alloc(sizeof(*arg2) + 8);
-	int *pidfd = tail_alloc(sizeof(*pidfd));
-	int *child_tid = tail_alloc(sizeof(*child_tid));
-	int *parent_tid = tail_alloc(sizeof(*parent_tid));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_clone_args, arg);
+	struct_clone_args *arg2 = tail_alloc(sizeof(*arg2) + 8);
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, pidfd);
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, child_tid);
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, parent_tid);
 	long rc;
 
 #if defined HAVE_STRUCT_USER_DESC
-	struct user_desc *tls = tail_alloc(sizeof(*tls));
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct user_desc, tls);
 
 	fill_memory(tls, sizeof(*tls));
 #else
-	int *tls = tail_alloc(sizeof(*tls));
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, tls);
 #endif
 
 	*pidfd = 0xbadc0ded;
@@ -334,7 +337,7 @@ main(int argc, char *argv[])
 	       sizeof(*arg2) + 8, sprintrc(rc));
 
 	/*
-	 * NB: the following check is purposedly fragile (it will break
+	 * NB: the following check is purposefully fragile (it will break
 	 *     when system's struct clone_args has additional fields,
 	 *     so it signalises that the decoder needs to be updated.
 	 */
@@ -529,7 +532,6 @@ main(int argc, char *argv[])
 		memcpy(arg, &arg_vals[i].args, sizeof(*arg));
 
 		rc = do_clone3(arg, sizeof(*arg), arg_vals[i].should_fail);
-		printf("clone3(");
 		print_clone3(arg, rc, sizeof(*arg),
 			     arg_vals[i].vf | STRUCT_VALID,
 			     arg_vals[i].flags_str, arg_vals[i].es_str);
