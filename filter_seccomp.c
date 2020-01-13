@@ -68,8 +68,6 @@ static const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
 # endif
 };
 
-# ifdef HAVE_FORK
-
 typedef unsigned short (*filter_generator_t)(struct sock_filter *,
 					     bool *overflow);
 static unsigned short linear_filter_generator(struct sock_filter *,
@@ -91,6 +89,8 @@ static struct sock_fprog bpf_prog = {
 	.len = USHRT_MAX,
 	.filter = NULL,
 };
+
+# ifdef HAVE_FORK
 
 static void ATTRIBUTE_NORETURN
 check_seccomp_order_do_child(void)
