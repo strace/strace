@@ -6,7 +6,8 @@ Noteworthy changes in release ?.? (????-??-??)
     credentials.
   * Enhanced decoding of BPF_PROG_LOAD bpf syscall command.
   * Updated decoding of clone3 syscall to match Linux 5.5.
-  * Updated lists of BPF_* constants.
+  * Updated lists of AUDIT_*, BPF_*, CLONE_*, KEY_MACRO*, KVM_*, and V4l2_*
+    constants.
 
 * Bug fixes
   * Fixed stack trace printing for early syscalls when strace is configured
