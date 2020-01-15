@@ -13,6 +13,7 @@
 
 #include "print_fields.h"
 
+#include "xlat/uring_setup_features.h"
 #include "xlat/uring_setup_flags.h"
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_register_opcodes.h"
@@ -45,7 +46,8 @@ typedef struct {
 	uint32_t flags;
 	uint32_t sq_thread_cpu;
 	uint32_t sq_thread_idle;
-	uint32_t resv[5];
+	uint32_t features;
+	uint32_t resv[4];
 	struct_io_sqring_offsets sq_off;
 	struct_io_cqring_offsets cq_off;
 } struct_io_uring_params;
@@ -80,6 +82,19 @@ static_assert(sizeof(struct_io_cqring_offsets)
              == sizeof(struct io_cqring_offsets),
              "struct io_cqring_offsets size mismatch"
              ", please update the decoder");
+# ifdef HAVE_STRUCT_IO_URING_PARAMS_RESV
+static_assert(offsetof(struct_io_uring_params, resv)
+             >= offsetof(struct io_uring_params, resv),
+             "struct io_uring_params.resv offset mismatch"
+             ", please update the decoder");
+static_assert(sizeof_field(struct_io_uring_params, resv)
+             <= sizeof_field(struct io_uring_params, resv),
+             "struct io_uring_params.resv size mismatch"
+             ", please update the decoder");
+# else /* !HAVE_STRUCT_IO_URING_PARAMS_RESV */
+static_assert(0, "struct io_uring_params.resv is missing"
+		 ", please update the decoder");
+# endif
 #endif /* HAVE_STRUCT_IO_URING_PARAMS */
 
 
@@ -112,6 +127,9 @@ SYS_FUNC(io_uring_setup)
 		} else {
 			PRINT_FIELD_U(", ", params, sq_entries);
 			PRINT_FIELD_U(", ", params, cq_entries);
+			PRINT_FIELD_FLAGS(", ", params, features,
+					  uring_setup_features,
+					  "IORING_FEAT_???");
 			PRINT_FIELD_U(", sq_off={", params.sq_off, head);
 			PRINT_FIELD_U(", ", params.sq_off, tail);
 			PRINT_FIELD_U(", ", params.sq_off, ring_mask);

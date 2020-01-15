@@ -19,6 +19,15 @@
 # include <linux/io_uring.h>
 
 # include "print_fields.h"
+# include "xlat.h"
+
+# include "xlat/uring_setup_features.h"
+
+# ifdef HAVE_STRUCT_IO_URING_PARAMS_FEATURES
+#  define RESV_START 0
+# else
+#  define RESV_START 1
+# endif
 
 static const char *errstr;
 
@@ -57,12 +66,8 @@ main(void)
 	       "|IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF|%#x"
 	       ", sq_thread_cpu=%#x, sq_thread_idle=%u, resv=[",
 	       1, -1U - 7, params->sq_thread_cpu, params->sq_thread_idle);
-	/* XXX io_uring_setup doesn't support features field decoding just yet */
-# ifdef HAVE_STRUCT_IO_URING_PARAMS_FEATURES
-	printf("%#x, ", params->features);
-# endif
-	for (unsigned int i = 0; i < ARRAY_SIZE(params->resv); ++i)
-		printf("%s%#x", i ? ", " : "", params->resv[i]);
+	for (unsigned int i = RESV_START; i < ARRAY_SIZE(params->resv); ++i)
+		printf("%s%#x", i != RESV_START ? ", " : "", params->resv[i]);
 	printf("]}) = %s\n", errstr);
 
 	memset(params, 0, sizeof(*params));
@@ -72,11 +77,18 @@ main(void)
 	if (rc < 0) {
 		printf("}) = %s\n", errstr);
 	} else {
-		printf(", sq_entries=%u, cq_entries=%u"
-		       ", sq_off={head=%u, tail=%u, ring_mask=%u"
-		       ", ring_entries=%u, flags=%u, dropped=%u, array=%u",
+		printf(", sq_entries=%u, cq_entries=%u, features=",
 		       params->sq_entries,
-		       params->cq_entries,
+		       params->cq_entries);
+		printflags(uring_setup_features,
+# ifdef HAVE_STRUCT_IO_URING_PARAMS_FEATURES
+			   params->features,
+# else
+			   params->resv[0],
+# endif
+			   "IORING_FEAT_???");
+		printf(", sq_off={head=%u, tail=%u, ring_mask=%u"
+		       ", ring_entries=%u, flags=%u, dropped=%u, array=%u",
 		       params->sq_off.head,
 		       params->sq_off.tail,
 		       params->sq_off.ring_mask,
