@@ -99,15 +99,9 @@ SYS_FUNC(io_uring_setup)
 				  "IORING_SETUP_???");
 		PRINT_FIELD_X(", ", params, sq_thread_cpu);
 		PRINT_FIELD_U(", ", params, sq_thread_idle);
-		for (unsigned int i = 0; i < ARRAY_SIZE(params.resv); ++i) {
-			if (params.resv[i]) {
-				for (i = 0; i < ARRAY_SIZE(params.resv); ++i)
-					tprintf("%s%#x",
-						(i ? ", " : ", resv={"),
-						params.resv[i]);
-				tprints("}");
-				break;
-			}
+		if (!IS_ARRAY_ZERO(params.resv)) {
+			PRINT_FIELD_ARRAY(", ", params, resv, tcp,
+					  print_xint32_array_member);
 		}
 		return 0;
 	} else {
