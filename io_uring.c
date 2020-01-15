@@ -8,21 +8,86 @@
 #include "defs.h"
 
 #ifdef HAVE_LINUX_IO_URING_H
-# include "print_fields.h"
 # include <linux/io_uring.h>
 #endif
+
+#include "print_fields.h"
 
 #include "xlat/uring_setup_flags.h"
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_register_opcodes.h"
 
+typedef struct {
+	uint32_t head;
+	uint32_t tail;
+	uint32_t ring_mask;
+	uint32_t ring_entries;
+	uint32_t flags;
+	uint32_t dropped;
+	uint32_t array;
+	uint32_t resv1;
+	uint64_t resv2;
+} struct_io_sqring_offsets;
+
+typedef struct {
+	uint32_t head;
+	uint32_t tail;
+	uint32_t ring_mask;
+	uint32_t ring_entries;
+	uint32_t overflow;
+	uint32_t cqes;
+	uint64_t resv[2];
+} struct_io_cqring_offsets;
+
+typedef struct {
+	uint32_t sq_entries;
+	uint32_t cq_entries;
+	uint32_t flags;
+	uint32_t sq_thread_cpu;
+	uint32_t sq_thread_idle;
+	uint32_t resv[5];
+	struct_io_sqring_offsets sq_off;
+	struct_io_cqring_offsets cq_off;
+} struct_io_uring_params;
+
+#ifdef HAVE_STRUCT_IO_SQRING_OFFSETS
+static_assert(sizeof(struct_io_sqring_offsets)
+	      == sizeof(struct io_sqring_offsets),
+	      "struct io_sqring_offsets size mismatch"
+	      ", please update the decoder");
+#endif
+#ifdef HAVE_STRUCT_IO_CQRING_OFFSETS
+static_assert(sizeof(struct_io_cqring_offsets)
+             == sizeof(struct io_cqring_offsets),
+             "struct io_cqring_offsets size mismatch"
+             ", please update the decoder");
+# ifdef HAVE_STRUCT_IO_CQRING_OFFSETS_RESV
+static_assert(offsetof(struct_io_cqring_offsets, resv)
+             == offsetof(struct io_cqring_offsets, resv),
+             "struct io_cqring_offsets.resv offset mismatch"
+             ", please update the decoder");
+static_assert(sizeof_field(struct_io_cqring_offsets, resv)
+             <= sizeof_field(struct io_cqring_offsets, resv),
+             "struct io_cqring_offsets.resv size mismatch"
+             ", please update the decoder");
+# else /* !HAVE_STRUCT_IO_CQRING_OFFSETS_RESV */
+static_assert(0, "struct io_cqring_offsets.resv is missing"
+		 ", please update the decoder");
+# endif
+#endif /* HAVE_STRUCT_IO_CQRING_OFFSETS */
+#ifdef HAVE_STRUCT_IO_URING_PARAMS
+static_assert(sizeof(struct_io_cqring_offsets)
+             == sizeof(struct io_cqring_offsets),
+             "struct io_cqring_offsets size mismatch"
+             ", please update the decoder");
+#endif /* HAVE_STRUCT_IO_URING_PARAMS */
+
+
 SYS_FUNC(io_uring_setup)
 {
 	const uint32_t nentries = tcp->u_arg[0];
 	const kernel_ulong_t params_addr = tcp->u_arg[1];
-
-#ifdef HAVE_LINUX_IO_URING_H
-	struct io_uring_params params;
+	struct_io_uring_params params;
 
 	if (entering(tcp)) {
 		tprintf("%u, ", nentries);
@@ -70,10 +135,6 @@ SYS_FUNC(io_uring_setup)
 		}
 		tprints("}");
 	}
-#else /* !HAVE_LINUX_IO_URING_H */
-	tprintf("%u, ", nentries);
-	printaddr(params_addr);
-#endif
 
 	return RVAL_DECODED | RVAL_FD;
 }

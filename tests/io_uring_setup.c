@@ -57,6 +57,10 @@ main(void)
 	       "|IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF|%#x"
 	       ", sq_thread_cpu=%#x, sq_thread_idle=%u, resv={",
 	       1, -1U - 7, params->sq_thread_cpu, params->sq_thread_idle);
+	/* XXX io_uring_setup doesn't support features field decoding just yet */
+# ifdef HAVE_STRUCT_IO_URING_PARAMS_FEATURES
+	printf("%#x, ", params->features);
+# endif
 	for (unsigned int i = 0; i < ARRAY_SIZE(params->resv); ++i)
 		printf("%s%#x", i ? ", " : "", params->resv[i]);
 	printf("}}) = %s\n", errstr);
