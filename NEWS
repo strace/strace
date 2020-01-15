@@ -18,6 +18,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Fixed decoding of NDA_LLADDR netlink neighbor table attribute.
   * Fixed build of mpers support when CFLAGS contains -flto.
   * Fixed build on no-MMU architectures.
+  * Fixed build with glibc-2.31 and Linux kernel headers < 5.3.
   * Fixed tests for glibc-2.31.
 
 Noteworthy changes in release 5.4 (2019-11-28)

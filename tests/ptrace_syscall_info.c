@@ -98,11 +98,11 @@ static const unsigned long args[][7] = {
 };
 
 static const unsigned int expected_none_size =
-	offsetof(struct ptrace_syscall_info, entry);
+	offsetof(struct_ptrace_syscall_info, entry);
 static const unsigned int expected_entry_size =
-	offsetofend(struct ptrace_syscall_info, entry.args);
+	offsetofend(struct_ptrace_syscall_info, entry.args);
 static const unsigned int expected_exit_size =
-	offsetofend(struct ptrace_syscall_info, exit.is_error);
+	offsetofend(struct_ptrace_syscall_info, exit.is_error);
 
 static unsigned long end_of_page;
 static unsigned int ptrace_stop;
@@ -119,7 +119,7 @@ test_none(void)
 	       pid, end_of_page, errstr);
 
 	for (unsigned int size = 0;
-	     size <= sizeof(struct ptrace_syscall_info); ++size) {
+	     size <= sizeof(struct_ptrace_syscall_info); ++size) {
 		unsigned long buf = end_of_page - size;
 		memset((void *) buf, -1, size);
 
@@ -141,21 +141,21 @@ test_none(void)
 		}
 
 		/* copy to a local structure to avoid unaligned access */
-		struct ptrace_syscall_info info;
+		struct_ptrace_syscall_info info;
 		memcpy(&info, (void *) buf,  MIN(size, expected_none_size));
 
 		if (info.op != PTRACE_SYSCALL_INFO_NONE)
 			FAIL("signal stop mismatch");
 		printf("{op=PTRACE_SYSCALL_INFO_NONE");
 
-		if (size < offsetofend(struct ptrace_syscall_info, arch))
+		if (size < offsetofend(struct_ptrace_syscall_info, arch))
 			goto printed_none;
 		if (!info.arch)
 			FAIL("signal stop mismatch");
 		printf(", arch=");
 		printxval(audit_arch, info.arch, "AUDIT_ARCH_???");
 
-		if (size < offsetofend(struct ptrace_syscall_info,
+		if (size < offsetofend(struct_ptrace_syscall_info,
 				       instruction_pointer))
 			goto printed_none;
 		if (!info.instruction_pointer)
@@ -163,7 +163,7 @@ test_none(void)
 		printf(", instruction_pointer=%#llx",
 		       (unsigned long long) info.instruction_pointer);
 
-		if (size < offsetofend(struct ptrace_syscall_info,
+		if (size < offsetofend(struct_ptrace_syscall_info,
 				       stack_pointer))
 			goto printed_none;
 		if (!info.stack_pointer)
@@ -182,7 +182,7 @@ static void
 test_entry(void)
 {
 	for (unsigned int size = 0;
-	     size <= sizeof(struct ptrace_syscall_info); ++size) {
+	     size <= sizeof(struct_ptrace_syscall_info); ++size) {
 		unsigned long buf = end_of_page - size;
 		memset((void *) buf, -1, size);
 
@@ -201,21 +201,21 @@ test_entry(void)
 		}
 
 		/* copy to a local structure to avoid unaligned access */
-		struct ptrace_syscall_info info;
+		struct_ptrace_syscall_info info;
 		memcpy(&info, (void *) buf,  MIN(size, expected_entry_size));
 
 		if (info.op != PTRACE_SYSCALL_INFO_ENTRY)
 			FAIL("#%d: entry stop mismatch", ptrace_stop);
 		printf("{op=PTRACE_SYSCALL_INFO_ENTRY");
 
-		if (size < offsetofend(struct ptrace_syscall_info, arch))
+		if (size < offsetofend(struct_ptrace_syscall_info, arch))
 			goto printed_entry_common;
 		if (!info.arch)
 			FAIL("#%d: entry stop mismatch", ptrace_stop);
 		printf(", arch=");
 		printxval(audit_arch, info.arch, "AUDIT_ARCH_???");
 
-		if (size < offsetofend(struct ptrace_syscall_info,
+		if (size < offsetofend(struct_ptrace_syscall_info,
 				       instruction_pointer))
 			goto printed_entry_common;
 		if (!info.instruction_pointer)
@@ -223,7 +223,7 @@ test_entry(void)
 		printf(", instruction_pointer=%#llx",
 		       (unsigned long long) info.instruction_pointer);
 
-		if (size < offsetofend(struct ptrace_syscall_info,
+		if (size < offsetofend(struct_ptrace_syscall_info,
 				       stack_pointer))
 			goto printed_entry_common;
 		if (!info.stack_pointer)
@@ -231,7 +231,7 @@ test_entry(void)
 		printf(", stack_pointer=%#llx",
 		       (unsigned long long) info.stack_pointer);
 
-		if (size < offsetofend(struct ptrace_syscall_info, entry.nr))
+		if (size < offsetofend(struct_ptrace_syscall_info, entry.nr))
 			goto printed_entry_common;
 		const unsigned long *exp_args = args[ptrace_stop / 2];
 		if (info.entry.nr != exp_args[0])
@@ -240,7 +240,7 @@ test_entry(void)
 
 		for (unsigned int i = 0; i < ARRAY_SIZE(info.entry.args); ++i) {
 			const unsigned int i_size =
-				offsetofend(struct ptrace_syscall_info,
+				offsetofend(struct_ptrace_syscall_info,
 					    entry.args[i]);
 			if (size < i_size) {
 				if (i)
@@ -266,7 +266,7 @@ static void
 test_exit(void)
 {
 	for (unsigned int size = 0;
-	     size <= sizeof(struct ptrace_syscall_info); ++size) {
+	     size <= sizeof(struct_ptrace_syscall_info); ++size) {
 		unsigned long buf = end_of_page - size;
 		memset((void *) buf, -1, size);
 
@@ -285,21 +285,21 @@ test_exit(void)
 		}
 
 		/* copy to a local structure to avoid unaligned access */
-		struct ptrace_syscall_info info;
+		struct_ptrace_syscall_info info;
 		memcpy(&info, (void *) buf,  MIN(size, expected_exit_size));
 
 		if (info.op != PTRACE_SYSCALL_INFO_EXIT)
 			FAIL("#%d: exit stop mismatch", ptrace_stop);
 		printf("{op=PTRACE_SYSCALL_INFO_EXIT");
 
-		if (size < offsetofend(struct ptrace_syscall_info, arch))
+		if (size < offsetofend(struct_ptrace_syscall_info, arch))
 			goto printed_exit_common;
 		if (!info.arch)
 			FAIL("#%d: exit stop mismatch", ptrace_stop);
 		printf(", arch=");
 		printxval(audit_arch, info.arch, "AUDIT_ARCH_???");
 
-		if (size < offsetofend(struct ptrace_syscall_info,
+		if (size < offsetofend(struct_ptrace_syscall_info,
 				       instruction_pointer))
 			goto printed_exit_common;
 		if (!info.instruction_pointer)
@@ -307,7 +307,7 @@ test_exit(void)
 		printf(", instruction_pointer=%#llx",
 		       (unsigned long long) info.instruction_pointer);
 
-		if (size < offsetofend(struct ptrace_syscall_info,
+		if (size < offsetofend(struct_ptrace_syscall_info,
 				       stack_pointer))
 			goto printed_exit_common;
 		if (!info.stack_pointer)
@@ -324,7 +324,7 @@ test_exit(void)
 			{ 0, pid, NULL }		/* gettid */
 		}, *exp_param = &exit_param[ptrace_stop / 2 - 1];
 
-		if (size < offsetofend(struct ptrace_syscall_info, exit.rval))
+		if (size < offsetofend(struct_ptrace_syscall_info, exit.rval))
 			goto printed_exit_common;
 		if (info.exit.rval != exp_param->rval)
 			FAIL("#%d: exit stop mismatch", ptrace_stop);

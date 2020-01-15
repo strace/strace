@@ -317,8 +317,11 @@ AC_CHECK_MEMBERS([struct stat.st_mtime_nsec, struct stat64.st_mtime_nsec],,,
 AC_CHECK_TYPES(m4_normalize([
 	struct pt_all_user_regs,
 	struct ia64_fpreg,
-	struct ptrace_peeksiginfo_args
+	struct ptrace_peeksiginfo_args,
+	struct __ptrace_syscall_info
 ]),,, [#include <sys/ptrace.h>])
+
+AC_CHECK_TYPES([struct ptrace_syscall_info],,, [#include <linux/ptrace.h>])
 
 # For kernels that do not have v3.10-rc1~201^2~11
 AC_CHECK_TYPES([s390_compat_regs],,, [#include <asm/ptrace.h>])

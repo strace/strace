@@ -7,7 +7,7 @@
  */
 
 int
-get_personality_from_syscall_info(const struct ptrace_syscall_info *sci)
+get_personality_from_syscall_info(const struct_ptrace_syscall_info *sci)
 {
 	return sci->arch == AUDIT_ARCH_TILEGX32 ||
 	       sci->arch == AUDIT_ARCH_TILEPRO;

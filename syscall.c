@@ -985,7 +985,7 @@ restore_cleared_syserror(struct tcb *tcp)
 	tcp->u_error = saved_u_error;
 }
 
-static struct ptrace_syscall_info ptrace_sci;
+static struct_ptrace_syscall_info ptrace_sci;
 
 static bool
 ptrace_syscall_info_is_valid(void)

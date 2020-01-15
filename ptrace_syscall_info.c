@@ -29,13 +29,13 @@ kill_tracee(pid_t pid)
 #define FAIL	do { ptrace_stop = -1U; goto done; } while (0)
 
 static const unsigned int expected_none_size =
-	offsetof(struct ptrace_syscall_info, entry);
+	offsetof(struct_ptrace_syscall_info, entry);
 static const unsigned int expected_entry_size =
-	offsetofend(struct ptrace_syscall_info, entry.args);
+	offsetofend(struct_ptrace_syscall_info, entry.args);
 static const unsigned int expected_exit_size =
-	offsetofend(struct ptrace_syscall_info, exit.is_error);
+	offsetofend(struct_ptrace_syscall_info, exit.is_error);
 static const unsigned int expected_seccomp_size =
-	offsetofend(struct ptrace_syscall_info, seccomp.ret_data);
+	offsetofend(struct_ptrace_syscall_info, seccomp.ret_data);
 
 /*
  * Test that PTRACE_GET_SYSCALL_INFO API is supported by the kernel, and
@@ -113,7 +113,7 @@ test_ptrace_get_syscall_info(void)
 	unsigned int ptrace_stop;
 
 	for (ptrace_stop = 0; ; ++ptrace_stop) {
-		struct ptrace_syscall_info info = {
+		struct_ptrace_syscall_info info = {
 			.op = 0xff	/* invalid PTRACE_SYSCALL_INFO_* op */
 		};
 		const size_t size = sizeof(info);
@@ -267,7 +267,7 @@ void
 print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 			  kernel_ulong_t user_len)
 {
-	struct ptrace_syscall_info info;
+	struct_ptrace_syscall_info info;
 	kernel_ulong_t kernel_len = tcp->u_rval;
 	kernel_ulong_t ret_len = MIN(user_len, kernel_len);
 	kernel_ulong_t fetch_size = MIN(ret_len, expected_seccomp_size);
@@ -279,20 +279,20 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 
 	PRINT_FIELD_XVAL("{", info, op, ptrace_syscall_info_op,
 			 "PTRACE_SYSCALL_INFO_???");
-	if (fetch_size < offsetofend(struct ptrace_syscall_info, arch))
+	if (fetch_size < offsetofend(struct_ptrace_syscall_info, arch))
 		goto printed;
 	PRINT_FIELD_XVAL(", ", info, arch, audit_arch, "AUDIT_ARCH_???");
 
-	if (fetch_size < offsetofend(struct ptrace_syscall_info,
+	if (fetch_size < offsetofend(struct_ptrace_syscall_info,
 				     instruction_pointer))
 		goto printed;
 	PRINT_FIELD_ADDR64(", ", info, instruction_pointer);
 
-	if (fetch_size < offsetofend(struct ptrace_syscall_info, stack_pointer))
+	if (fetch_size < offsetofend(struct_ptrace_syscall_info, stack_pointer))
 		goto printed;
 	PRINT_FIELD_ADDR64(", ", info, stack_pointer);
 
-	if (fetch_size < offsetofend(struct ptrace_syscall_info, entry.nr))
+	if (fetch_size < offsetofend(struct_ptrace_syscall_info, entry.nr))
 		goto printed;
 
 	switch(info.op) {
@@ -304,7 +304,7 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 			for (unsigned int i = 0;
 			     i < ARRAY_SIZE(info.entry.args); ++i) {
 				const unsigned int i_size =
-					offsetofend(struct ptrace_syscall_info,
+					offsetofend(struct_ptrace_syscall_info,
 						    entry.args[i]);
 				if (fetch_size < i_size) {
 					if (i)

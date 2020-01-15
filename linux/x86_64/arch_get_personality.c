@@ -6,7 +6,7 @@
  */
 
 int
-get_personality_from_syscall_info(const struct ptrace_syscall_info *sci)
+get_personality_from_syscall_info(const struct_ptrace_syscall_info *sci)
 {
 	unsigned int pers = sci->arch == AUDIT_ARCH_I386;
 
