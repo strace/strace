@@ -271,11 +271,9 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(" /* ");
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
-		uint64_t elem;
-
-		print_local_array(tcp, decoded_arg, size / current_wordsize,
-				  &elem, current_wordsize,
-				  print_xlong_array_member, NULL, 0);
+		print_local_array_ex(tcp, decoded_arg, size / current_wordsize,
+				     current_wordsize, print_xlong_array_member,
+				     NULL, 0, NULL, NULL);
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)

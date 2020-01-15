@@ -923,19 +923,26 @@ print_array(struct tcb *const tcp,
 
 /** Shorthand for printing local arrays. */
 static inline bool
-print_local_array(struct tcb *tcp,
-		  void *start_addr,
-		  const size_t nmemb,
-		  void *const elem_buf,
-		  const size_t elem_size,
-		  print_fn print_func,
-		  void *const opaque_data,
-		  unsigned int flags)
+print_local_array_ex(struct tcb *tcp,
+		     void *start_addr,
+		     const size_t nmemb,
+		     const size_t elem_size,
+		     print_fn print_func,
+		     void *const opaque_data,
+		     unsigned int flags,
+		     const struct xlat *index_xlat,
+		     const char *index_dflt)
 {
-	return print_array_ex(tcp, (uintptr_t) start_addr , nmemb,
-			      elem_buf, elem_size, NULL, print_func,
-			      opaque_data, flags, NULL, NULL);
+	return print_array_ex(tcp, (uintptr_t) start_addr, nmemb,
+			      NULL, elem_size, NULL, print_func,
+			      opaque_data, flags, index_xlat, index_dflt);
 }
+
+/** Shorthand for a shorthand for printing local arrays. */
+#define print_local_array(tcp_, start_addr_, print_func_)      \
+	print_local_array_ex((tcp_), (start_addr_), ARRAY_SIZE(start_addr_), \
+			     sizeof((start_addr_)[0]), (print_func_),        \
+			     NULL, 0, NULL, NULL)
 
 extern kernel_ulong_t *
 fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_args);
