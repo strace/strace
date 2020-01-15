@@ -179,16 +179,16 @@ SYS_FUNC(io_uring_register)
 	printxval(uring_register_opcodes, opcode, "IORING_REGISTER_???");
 	tprints(", ");
 	switch (opcode) {
-		case IORING_REGISTER_BUFFERS:
-			tprint_iov(tcp, nargs, arg, IOV_DECODE_ADDR);
-			break;
-		case IORING_REGISTER_FILES:
-			print_array(tcp, arg, nargs, &buf, sizeof(buf),
-				    tfetch_mem, print_fd_array_member, NULL);
-			break;
-		default:
-			printaddr(arg);
-			break;
+	case IORING_REGISTER_BUFFERS:
+		tprint_iov(tcp, nargs, arg, IOV_DECODE_ADDR);
+		break;
+	case IORING_REGISTER_FILES:
+		print_array(tcp, arg, nargs, &buf, sizeof(buf),
+			    tfetch_mem, print_fd_array_member, NULL);
+		break;
+	default:
+		printaddr(arg);
+		break;
 	}
 	tprintf(", %u", nargs);
 
