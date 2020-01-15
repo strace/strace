@@ -69,15 +69,12 @@ main(void)
 	rc = sys_io_uring_setup(2, params);
 	printf("io_uring_setup(%u, {flags=0, sq_thread_cpu=0"
 	       ", sq_thread_idle=0", 2);
-	if (rc < 0)
+	if (rc < 0) {
 		printf("}) = %s\n", errstr);
-	else
+	} else {
 		printf(", sq_entries=%u, cq_entries=%u"
 		       ", sq_off={head=%u, tail=%u, ring_mask=%u"
-		       ", ring_entries=%u, flags=%u, dropped=%u, array=%u}"
-		       ", cq_off={head=%u, tail=%u, ring_mask=%u"
-		       ", ring_entries=%u, overflow=%u, cqes=%u}"
-		       "}) = %ld<anon_inode:[io_uring]>\n",
+		       ", ring_entries=%u, flags=%u, dropped=%u, array=%u",
 		       params->sq_entries,
 		       params->cq_entries,
 		       params->sq_off.head,
@@ -86,14 +83,29 @@ main(void)
 		       params->sq_off.ring_entries,
 		       params->sq_off.flags,
 		       params->sq_off.dropped,
-		       params->sq_off.array,
+		       params->sq_off.array);
+		if (params->sq_off.resv1)
+			printf(", resv1=%#x", params->sq_off.resv1);
+		if (params->sq_off.resv2)
+			printf(", resv1=%#llx",
+			       (unsigned long long) params->sq_off.resv2);
+
+		printf("}, cq_off={head=%u, tail=%u, ring_mask=%u"
+		       ", ring_entries=%u, overflow=%u, cqes=%u",
 		       params->cq_off.head,
 		       params->cq_off.tail,
 		       params->cq_off.ring_mask,
 		       params->cq_off.ring_entries,
 		       params->cq_off.overflow,
-		       params->cq_off.cqes,
-		       rc);
+		       params->cq_off.cqes);
+		if (params->cq_off.resv[0] || params->cq_off.resv[1]) {
+			printf(", resv=[%#llx, %#llx]",
+			       (unsigned long long) params->cq_off.resv[0],
+			       (unsigned long long) params->cq_off.resv[1]);
+		}
+
+		printf("}}) = %ld<anon_inode:[io_uring]>\n", rc);
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
