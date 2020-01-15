@@ -185,6 +185,7 @@ SYS_FUNC(io_uring_register)
 		tprint_iov(tcp, nargs, arg, IOV_DECODE_ADDR);
 		break;
 	case IORING_REGISTER_FILES:
+	case IORING_REGISTER_EVENTFD:
 		print_array(tcp, arg, nargs, &buf, sizeof(buf),
 			    tfetch_mem, print_fd_array_member, NULL);
 		break;
