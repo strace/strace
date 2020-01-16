@@ -28,7 +28,11 @@ printrc(long rc)
 	/* Thanks, long return type of syscall(2) */
 	printf("%lld", zero_extend_signed_to_ull(rc));
 
-	if (err > 0 && err < 0x1000) {
+	/*
+	 * Hopefully, we don't expect EPERM to be returned,
+	 * otherwise we can't distinguish it on x32.
+	 */
+	if (rc != -1 && err > 0 && err < 0x1000) {
 		errno = err;
 		printf(" %s (%m)", errno2name());
 	}
