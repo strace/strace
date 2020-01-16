@@ -38,9 +38,6 @@
 # define SOL_TCP 6
 #endif
 
-#define MIN_SIZE_OF(type, member) \
-	(offsetof(type, member) + sizeof(((type *) 0)->member))
-
 static struct cmsghdr *
 get_cmsghdr(void *const page, const size_t len)
 {
@@ -87,11 +84,11 @@ test_scm_rights1(struct msghdr *const mh,
 
 	struct cmsghdr *cmsg = get_cmsghdr(page, msg_controllen);
 
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_len))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_len))
 		cmsg->cmsg_len = cmsg_len;
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_level))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_level))
 		cmsg->cmsg_level = SOL_SOCKET;
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_type))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_type))
 		cmsg->cmsg_type = SCM_RIGHTS;
 
 	size_t src_len =
@@ -152,11 +149,11 @@ test_scm_rights2(struct msghdr *const mh,
 		memcpy(CMSG_DATA(cmsg[0]), src[0], cmsg_len[0] - CMSG_LEN(0));
 
 	const size_t msg_controllen1 = msg_controllen - aligned_cms_len[0];
-	if (msg_controllen1 >= MIN_SIZE_OF(struct cmsghdr, cmsg_len))
+	if (msg_controllen1 >= offsetofend(struct cmsghdr, cmsg_len))
 		cmsg[1]->cmsg_len = cmsg_len[1];
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_level))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_level))
 		cmsg[1]->cmsg_level = SOL_SOCKET;
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_type))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_type))
 		cmsg[1]->cmsg_type = SCM_RIGHTS;
 	size_t src1_len =
 		cmsg_len[1] < msg_controllen1 ? cmsg_len[1] : msg_controllen1;
