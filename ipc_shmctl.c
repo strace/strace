@@ -17,15 +17,8 @@
 
 #include "ipc_defs.h"
 
-#ifdef HAVE_SYS_SHM_H
-/* The C library generally exports the struct the current kernel expects. */
-# include <sys/shm.h>
-typedef struct shmid_ds shmid_ds_t;
-#elif defined HAVE_LINUX_SHM_H
-/* The linux header might provide the right struct. */
-# include <linux/shm.h>
-typedef struct shmid64_ds shmid_ds_t;
-#endif
+#include SHM_H_PROVIDER
+typedef struct NAME_OF_STRUCT_SHMID_DS shmid_ds_t;
 
 #include MPERS_DEFS
 
@@ -55,7 +48,8 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 			break;
 		}
 
-		tprintf(", key=%u", (unsigned) shmid_ds.shm_perm.__key);
+		tprintf(", key=%u",
+			(unsigned) shmid_ds.shm_perm.NAME_OF_STRUCT_IPC_PERM_KEY);
 		printuid(", cuid=", shmid_ds.shm_perm.cuid);
 		printuid(", cgid=", shmid_ds.shm_perm.cgid);
 		tprints("}");

@@ -14,11 +14,7 @@
 #include "defs.h"
 #include "ipc_defs.h"
 
-#ifdef HAVE_SYS_SHM_H
-# include <sys/shm.h>
-#elif defined HAVE_LINUX_SHM_H
-# include <linux/shm.h>
-#endif
+#include SHM_H_PROVIDER
 
 #ifndef SHM_HUGE_SHIFT
 # define SHM_HUGE_SHIFT 26

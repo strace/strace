@@ -17,15 +17,8 @@
 
 #include "ipc_defs.h"
 
-#ifdef HAVE_SYS_MSG_H
-/* The C library generally exports the struct the current kernel expects. */
-# include <sys/msg.h>
-typedef struct msqid_ds msqid_ds_t;
-#elif defined HAVE_LINUX_MSG_H
-/* The linux header might provide the right struct. */
-# include <linux/msg.h>
-typedef struct msqid64_ds msqid_ds_t;
-#endif
+#include MSG_H_PROVIDER
+typedef struct NAME_OF_STRUCT_MSQID_DS msqid_ds_t;
 
 #include MPERS_DEFS
 
@@ -55,7 +48,8 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 			break;
 		}
 
-		tprintf(", key=%u", (unsigned) msqid_ds.msg_perm.__key);
+		tprintf(", key=%u",
+			(unsigned) msqid_ds.msg_perm.NAME_OF_STRUCT_IPC_PERM_KEY);
 		printuid(", cuid=", msqid_ds.msg_perm.cuid);
 		printuid(", cgid=", msqid_ds.msg_perm.cgid);
 		tprints("}");

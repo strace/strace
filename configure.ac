@@ -413,7 +413,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/memfd.h
 	linux/mmtimer.h
 	linux/mount.h
-	linux/msg.h
 	linux/neighbour.h
 	linux/netfilter/ipset/ip_set.h
 	linux/netfilter/nf_tables.h
@@ -431,8 +430,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/sched.h
 	linux/seccomp.h
 	linux/securebits.h
-	linux/sem.h
-	linux/shm.h
 	linux/userfaultfd.h
 	linux/utsname.h
 	mqueue.h
@@ -445,10 +442,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	sys/eventfd.h
 	sys/fanotify.h
 	sys/ipc.h
-	sys/msg.h
 	sys/quota.h
-	sys/sem.h
-	sys/shm.h
 	sys/signalfd.h
 	sys/xattr.h
 	ustat.h

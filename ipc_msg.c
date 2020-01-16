@@ -14,11 +14,7 @@
 #include "defs.h"
 #include "ipc_defs.h"
 
-#ifdef HAVE_SYS_MSG_H
-# include <sys/msg.h>
-#elif defined HAVE_LINUX_MSG_H
-# include <linux/msg.h>
-#endif
+#include MSG_H_PROVIDER
 
 #include "xlat/ipc_msg_flags.h"
 #include "xlat/ipc_private.h"

@@ -14,7 +14,7 @@
 #include "defs.h"
 #include "ipc_defs.h"
 
-#include <sys/msg.h>
+#include MSG_H_PROVIDER
 
 #include DEF_MPERS_TYPE(msgbuf_t)
 typedef struct msgbuf msgbuf_t;
