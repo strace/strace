@@ -46,4 +46,10 @@ typedef struct {
 	struct_io_cqring_offsets cq_off;
 } struct_io_uring_params;
 
+typedef struct {
+	uint32_t offset;
+	uint32_t resv;
+	uint64_t /* int * */ fds;
+} struct_io_uring_files_update;
+
 #endif /* !STRACE_TYPES_IO_URING_H */

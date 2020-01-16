@@ -14,9 +14,26 @@
 #ifdef __NR_io_uring_register
 
 # include <fcntl.h>
+# include <inttypes.h>
 # include <stdio.h>
 # include <string.h>
 # include <sys/uio.h>
+
+# ifdef HAVE_LINUX_IO_URING_H
+#  include <linux/io_uring.h>
+# endif
+
+/* From tests/bpf.c */
+#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+# define BIG_ADDR_MAYBE(addr_)
+#elif defined __arm__ || defined __i386__ || defined __mips__ \
+   || defined __powerpc__ || defined __riscv__ || defined __s390__ \
+   || defined __sparc__ || defined __tile__
+# define BIG_ADDR_MAYBE(addr_) addr_ " or "
+#else
+# define BIG_ADDR_MAYBE(addr_)
+#endif
+
 
 static const char *errstr;
 
@@ -68,7 +85,7 @@ main(void)
 	int fds[] = { fd_full, fd_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 6 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 7 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -122,6 +139,34 @@ main(void)
 		       fd_full, path_full, fd_null, path_null,
 		       (unsigned int) ARRAY_SIZE(fds), errstr);
 	}
+
+#ifdef HAVE_STRUCT_IO_URING_FILES_UPDATE
+	struct io_uring_files_update bogus_iufu;
+	struct io_uring_files_update iufu;
+
+	sys_io_uring_register(fd_null, 6, NULL, 0xfacefeed);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_FILES_UPDATE"
+	       ", NULL, 4207869677) = %s\n",
+	       fd_null, path_null, errstr);
+
+	fill_memory(&bogus_iufu, sizeof(bogus_iufu));
+	sys_io_uring_register(fd_null, 6, &bogus_iufu, 0);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_FILES_UPDATE"
+	       ", {offset=%" PRIu32 ", resv=%#" PRIx32 ", fds="
+	       BIG_ADDR_MAYBE("0x8f8e8d8c8b8a8988") "[]}, 0) = %s\n",
+	       fd_null, path_null,
+	       ((uint32_t *) &bogus_iufu)[0], ((uint32_t *) &bogus_iufu)[1],
+	       errstr);
+
+	memset(&iufu, 0, sizeof(iufu));
+	iufu.offset = 0xdeadc0deU;
+	iufu.fds = (uintptr_t) fds;
+	sys_io_uring_register(fd_null, 6, &iufu, ARRAY_SIZE(fds));
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_FILES_UPDATE"
+	       ", {offset=3735929054, fds=[%u<%s>, %u<%s>]}, %u) = %s\n",
+	       fd_null, path_null, fd_full, path_full, fd_null, path_null,
+	       (unsigned int) ARRAY_SIZE(fds), errstr);
+#endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

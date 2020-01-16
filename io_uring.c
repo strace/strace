@@ -135,6 +135,26 @@ print_fd_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	return true;
 }
 
+static void
+print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
+			    const unsigned int nargs)
+{
+	struct_io_uring_files_update arg;
+	int buf;
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	PRINT_FIELD_U("{", arg, offset);
+	if (arg.resv)
+		PRINT_FIELD_X(", ", arg, resv);
+	tprints(", fds=");
+	print_big_u64_addr(arg.fds);
+	print_array(tcp, arg.fds, nargs, &buf, sizeof(buf),
+		    tfetch_mem, print_fd_array_member, NULL);
+	tprints("}");
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -155,6 +175,9 @@ SYS_FUNC(io_uring_register)
 	case IORING_REGISTER_EVENTFD:
 		print_array(tcp, arg, nargs, &buf, sizeof(buf),
 			    tfetch_mem, print_fd_array_member, NULL);
+		break;
+	case IORING_REGISTER_FILES_UPDATE:
+		print_io_uring_files_update(tcp, arg, nargs);
 		break;
 	default:
 		printaddr(arg);
