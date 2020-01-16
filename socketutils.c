@@ -21,7 +21,7 @@
 
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
-# define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
+# define UNIX_PATH_MAX sizeof_field(struct sockaddr_un, sun_path)
 #endif
 
 #include "xstring.h"

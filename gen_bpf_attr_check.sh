@@ -18,7 +18,6 @@ cat <<EOF
 # include "bpf_attr.h"
 # include "static_assert.h"
 
-# define SoM(type_, member_) (sizeof(((type_ *)0)->member_))
 EOF
 
 for struct in $(sed -n 's/^struct \([^[:space:]]\+_struct\) .*/\1/p' < "$input"); do
@@ -39,7 +38,7 @@ for struct in $(sed -n 's/^struct \([^[:space:]]\+_struct\) .*/\1/p' < "$input")
 		cat <<EOF
 
 # ifdef HAVE_${TYPE_NAME}_$ENUM$FIELD
-	static_assert(SoM(struct $struct, $field) == SoM($type_name, $enum$field),
+	static_assert(sizeof_field(struct $struct, $field) == sizeof_field($type_name, $enum$field),
 		      "$struct.$field size mismatch");
 	static_assert(offsetof(struct $struct, $field) == offsetof($type_name, $enum$field),
 		      "$struct.$field offset mismatch");

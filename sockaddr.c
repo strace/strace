@@ -41,7 +41,7 @@
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
 
-#define SIZEOF_SA_FAMILY sizeof(((struct sockaddr *) 0)->sa_family)
+#define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
 
 const size_t arp_hardware_types_size = ARRAY_SIZE(arp_hardware_types) - 1;
 const size_t ethernet_protocols_size = ARRAY_SIZE(ethernet_protocols) - 1;
