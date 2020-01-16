@@ -12,6 +12,7 @@
  */
 
 #include "defs.h"
+#include "ipc_defs.h"
 
 #ifdef HAVE_SYS_SHM_H
 # include <sys/shm.h>

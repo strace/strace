@@ -12,6 +12,7 @@
  */
 
 #include "defs.h"
+#include "ipc_defs.h"
 
 #include <sys/msg.h>
 
