@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#define ARCH_SIZEOF_STRUCT_MSQID64_DS 104
 #define HAVE_ARCH_GETRVAL2 1
 #define HAVE_ARCH_UID16_SYSCALLS 1
 #define HAVE_ARCH_SA_RESTORER 1

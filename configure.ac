@@ -826,6 +826,7 @@ AC_CHECK_SIZEOF([kernel_long_t],,[#include "$srcdir/kernel_types.h"])
 SIZEOF_KERNEL_LONG_T="$ac_cv_sizeof_kernel_long_t"
 AC_SUBST(SIZEOF_KERNEL_LONG_T)
 AC_CHECK_SIZEOF([struct i64_i32],,[struct i64_i32 {long long i64; int i32;};])
+AC_CHECK_SIZEOF([struct msqid64_ds],,[#include <linux/msg.h>])
 
 
 AC_CACHE_CHECK([for SIGRTMIN], [st_cv_SIGRTMIN],

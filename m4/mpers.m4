@@ -147,6 +147,14 @@ case "$arch" in
 						[#include "$srcdir/kernel_types.h"])
 				st_MPERS_SAVE_AC_CV([sizeof_kernel_long_t])
 				popdef([SIZEOF_KERNEL_LONG_T])
+
+				pushdef([SIZEOF_STRUCT_MSQID64_DS],
+					MPERS_NAME[_SIZEOF_STRUCT_MSQID64_DS])
+				st_MPERS_LOAD_AC_CV([sizeof_struct_msqid64_ds])
+				AC_CHECK_SIZEOF([struct msqid64_ds],,
+						[#include <linux/msg.h>])
+				st_MPERS_SAVE_AC_CV([sizeof_struct_msqid64_ds])
+				popdef([SIZEOF_STRUCT_MSQID64_DS])
 			fi
 		fi
 	fi
