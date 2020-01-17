@@ -23,22 +23,26 @@ void
 printrc(long rc)
 {
 # ifdef __x86_64__
-	int err = -rc;
-
-	/* Thanks, long return type of syscall(2) */
-	printf("%lld", zero_extend_signed_to_ull(rc));
-
 	/*
 	 * Hopefully, we don't expect EPERM to be returned,
 	 * otherwise we can't distinguish it on x32.
 	 */
-	if (rc != -1 && err > 0 && err < 0x1000) {
-		errno = err;
-		printf(" %s (%m)", errno2name());
+	if (rc != -1) {
+		int err = -rc;
+
+		/* Thanks, long return type of syscall(2) */
+		printf("%lld", zero_extend_signed_to_ull(rc));
+
+		if (err > 0 && err < 0x1000) {
+			errno = err;
+			printf(" %s (%m)", errno2name());
+		}
 	}
-# else
-	printf("%s", sprintrc(rc));
+	else
 # endif
+	{
+		printf("%s", sprintrc(rc));
+	}
 
 	puts("");
 }
