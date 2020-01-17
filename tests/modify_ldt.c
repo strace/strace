@@ -32,8 +32,10 @@ printrc(long rc)
 	 * Hopefully, we don't expect EPERM to be returned,
 	 * otherwise we can't distinguish it on x32.
 	 */
-	if (rc != -1 && err > 0 && err < 0x1000) {
-		errno = err;
+	if (err > 0 && err < 0x1000) {
+		if (rc != -1) {
+			errno = err;
+		}
 		printf(" %s (%m)", errno2name());
 	}
 # else
