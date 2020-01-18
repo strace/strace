@@ -10,7 +10,19 @@
 
 #include <stdio.h>
 #include "test_nlattr.h"
+#include <linux/pkt_cls.h>
 #include <linux/rtnetlink.h>
+
+#if !HAVE_DECL_TCA_ACT_PAD
+enum { TCA_ACT_PAD = 5 };
+#endif
+#if !HAVE_DECL_TCA_ACT_COOKIE
+enum { TCA_ACT_COOKIE = 6 };
+#endif
+#if !HAVE_DECL_TCA_ACT_FLAGS
+enum { TCA_ACT_FLAGS = 7 };
+#endif
+
 
 static void
 init_tcamsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -47,14 +59,57 @@ main(void)
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-	const unsigned int nla_type = 0xffff & NLA_TYPE_MASK;
-	char nla_type_str[256];
-	sprintf(nla_type_str, "%#x /* TCA_ACT_??? */", nla_type);
-	TEST_NLATTR_(fd, nlh0, hdrlen,
-		     init_tcamsg, print_tcamsg,
-		     nla_type, nla_type_str,
-		     4, pattern, 4,
-		     print_quoted_hex(pattern, 4));
+	/* Invalid */
+	static const unsigned int nla_invalid[] = { 8, 0xffff & NLA_TYPE_MASK };
+	for (size_t i = 0; i < ARRAY_SIZE(nla_invalid); i++) {
+		char nla_type_str[256];
+		sprintf(nla_type_str, "%#x /* TCA_ACT_??? */", nla_invalid[i]);
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_tcamsg, print_tcamsg,
+			     nla_invalid[i], nla_type_str,
+			     21, pattern, 21,
+			     print_quoted_hex(pattern, 21));
+	}
+
+	/* Default decoder */
+	static const struct {
+		unsigned int val;
+		const char *str;
+	} nla_default[] = {
+		{ ARG_STR(TCA_ACT_UNSPEC) },
+		{ ARG_STR(TCA_ACT_OPTIONS) },
+		{ ARG_STR(TCA_ACT_PAD) },
+		{ ARG_STR(TCA_ACT_COOKIE) },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(nla_default); i++) {
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_tcamsg, print_tcamsg,
+			     nla_default[i].val, nla_default[i].str,
+			     17, pattern, 17,
+			     print_quoted_hex(pattern, 17));
+	}
+
+	/* TCA_ACT_KIND */
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_KIND, 21, pattern, 21,
+		    print_quoted_cstring(pattern, 22));
+
+	static const char kind[] = "Hello\tthere";
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_KIND, sizeof(kind), kind, sizeof(kind),
+		    print_quoted_string(kind));
+
+	/* TCA_ACT_INDEX */
+	static uint32_t idx = 0xdeadc0de;
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_INDEX, sizeof(idx), &idx, sizeof(idx),
+		    printf("%u", idx));
+
+	/* TCA_ACT_FLAGS */
+	static uint32_t flags = 0xfacebeef;
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_FLAGS, sizeof(flags), &flags, sizeof(flags),
+		    printf("TCA_ACT_FLAGS_NO_PERCPU_STATS|0xfacebeee"));
 
 	puts("+++ exited with 0 +++");
 	return 0;

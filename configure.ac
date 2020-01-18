@@ -493,6 +493,13 @@ AC_CHECK_TYPES(m4_normalize([
 	struct ifla_cacheinfo
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
+
+AC_CHECK_DECLS(m4_normalize([
+	TCA_ACT_PAD,
+	TCA_ACT_COOKIE,
+	TCA_ACT_FLAGS
+]),,, [#include <sys/socket.h>
+#include <linux/pkt_cls.h>])
 AC_CHECK_DECLS(m4_normalize([
 	IFLA_PORT_SELF,
 	IFLA_PROTINFO,
