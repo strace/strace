@@ -514,6 +514,9 @@ AC_CHECK_TYPES(m4_normalize([
 	struct gnet_stats_rate_est,
 	struct gnet_stats_rate_est64
 ]),,, [#include <linux/gen_stats.h>])
+AC_CHECK_DECLS(m4_normalize([
+	TCA_STATS_PKT64
+]),,, [#include <linux/gen_stats.h>])
 
 AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/types.h>
 #include <linux/pkt_sched.h>])

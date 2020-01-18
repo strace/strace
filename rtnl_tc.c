@@ -174,6 +174,7 @@ static const nla_decoder_t tca_stats_nla_decoders[] = {
 	[TCA_STATS_RATE_EST64]	= decode_gnet_stats_rate_est64,
 	[TCA_STATS_PAD]		= NULL,
 	[TCA_STATS_BASIC_HW]	= decode_gnet_stats_basic,
+	[TCA_STATS_PKT64]	= decode_nla_u64,
 };
 
 bool
