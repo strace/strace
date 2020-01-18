@@ -384,7 +384,8 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct perf_event_attr.sample_stack_user,
 	struct perf_event_attr.sample_regs_intr,
 	struct perf_event_attr.aux_watermark,
-	struct perf_event_attr.sample_max_stack
+	struct perf_event_attr.sample_max_stack,
+	struct perf_event_attr.aux_sample_size
 ]),,, [#include <linux/perf_event.h>])
 
 AC_CHECK_HEADERS(m4_normalize([

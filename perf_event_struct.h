@@ -76,6 +76,9 @@ struct perf_event_attr {
 	uint16_t sample_max_stack;
 	uint16_t __reserved_2;
 	/* End of ver 5 - 112 bytes */
+	uint32_t aux_sample_size;
+	uint32_t __reserved_3;
+	/* End of ver 6 - 120 bytes */
 };
 
 struct perf_event_query_bpf {

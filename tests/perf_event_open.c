@@ -137,7 +137,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		STRACE_PEA_ABBREV_SIZE =
 			offsetof(struct perf_event_attr, config) +
 			sizeof(attr_ptr->config),
-		STRACE_PEA_SIZE = 112,
+		STRACE_PEA_SIZE = 120,
 	};
 
 	uint32_t read_size;
@@ -476,6 +476,28 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
+	val = ((uint16_t *) attr)[110 / sizeof(uint16_t)];
+	if (val)
+		printf(" /* bytes 110..111: %#" PRIx16 " */", (uint16_t) val);
+
+	if (size <= 112) {
+		cutoff = 112;
+		goto end;
+	}
+
+	val =
+#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_AUX_SAMPLE_SIZE
+		attr->aux_sample_size;
+#  else
+		((uint32_t *) attr)[112 / sizeof(uint32_t)];
+#  endif
+	printf(", aux_sample_size=%" PRIu32, (uint32_t) val);
+
+	if (size <= 116) {
+		cutoff = 116;
+		goto end;
+	}
+
 	cutoff = STRACE_PEA_SIZE;
 
 end:
@@ -529,7 +551,11 @@ main(void)
 	static const size_t attr_v4_625_size = PERF_ATTR_SIZE_VER4 + 5;
 	static const size_t attr_v4_875_size = PERF_ATTR_SIZE_VER4 + 7;
 	static const size_t attr_v5_size = PERF_ATTR_SIZE_VER5;
-	static const size_t attr_big_size = PERF_ATTR_SIZE_VER5 + 32;
+	static const size_t attr_v5_25_size = PERF_ATTR_SIZE_VER5 + 2;
+	static const size_t attr_v5_5_size = PERF_ATTR_SIZE_VER5 + 4;
+	static const size_t attr_v5_75_size = PERF_ATTR_SIZE_VER5 + 6;
+	static const size_t attr_v6_size = PERF_ATTR_SIZE_VER6;
+	static const size_t attr_big_size = PERF_ATTR_SIZE_VER6 + 32;
 
 	static const struct u64_val_str attr_types[] = {
 		{ ARG_STR(PERF_TYPE_HARDWARE) },
@@ -597,7 +623,7 @@ main(void)
 	static const struct u64_val_str sample_types[] = {
 		{ ARG_STR(0) },
 		{ 0x800, "PERF_SAMPLE_BRANCH_STACK" },
-		{ ARG_ULL_STR(0xdeadc0deda700000) " /* PERF_SAMPLE_??? */" },
+		{ ARG_ULL_STR(0xdeadc0deda600000) " /* PERF_SAMPLE_??? */" },
 		{ 0xffffffffffffffffULL,
 			"PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_TIME|"
 			"PERF_SAMPLE_ADDR|PERF_SAMPLE_READ|"
@@ -608,7 +634,8 @@ main(void)
 			"PERF_SAMPLE_WEIGHT|PERF_SAMPLE_DATA_SRC|"
 			"PERF_SAMPLE_IDENTIFIER|PERF_SAMPLE_TRANSACTION|"
 			"PERF_SAMPLE_REGS_INTR|PERF_SAMPLE_PHYS_ADDR|"
-			"0xfffffffffff00000" },
+			"PERF_SAMPLE_AUX|"
+			"0xffffffffffe00000" },
 	};
 	static const struct u64_val_str read_formats[] = {
 		{ ARG_STR(0) },
@@ -669,6 +696,10 @@ main(void)
 		ATTR_REC(attr_v4_625_size),
 		ATTR_REC(attr_v4_875_size),
 		ATTR_REC(attr_v5_size),
+		ATTR_REC(attr_v5_25_size),
+		ATTR_REC(attr_v5_5_size),
+		ATTR_REC(attr_v5_75_size),
+		ATTR_REC(attr_v6_size),
 		ATTR_REC(attr_big_size),
 	};
 
@@ -775,6 +806,10 @@ main(void)
 
 		ip_desc_str = precise_ip_descs[flags_data.flags.precise_ip];
 # endif
+
+		if (((i % 17) == 3) && (size >= 112))
+			((uint16_t *) attr)[110 / sizeof(uint16_t)] = 0;
+
 
 		if (i == 0)
 			attr->size = size + 8;
