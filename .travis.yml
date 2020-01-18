@@ -37,6 +37,18 @@ matrix:
         - TARGET=x86_64
         - STACKTRACE=libdw
         - KHEADERS=torvalds/linux
+    - compiler: gcc-9
+      arch: amd64
+      env:
+        - TARGET=x32
+        - STACKTRACE=no
+        - KHEADERS=torvalds/linux
+    - compiler: gcc-9
+      arch: amd64
+      env:
+        - TARGET=x86
+        - STACKTRACE=no
+        - KHEADERS=torvalds/linux
     - compiler: gcc
       arch: amd64
       env:
