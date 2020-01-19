@@ -27,7 +27,7 @@ ARCH		= @arch@
 
 READELF		= @READELF@
 
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 -I types
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 	      -I$(srcdir)/$(OS)/$(ARCH) \
@@ -39,6 +39,7 @@ AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 AM_CFLAGS_FOR_BUILD = $(WARN_CFLAGS_FOR_BUILD)
 AM_CPPFLAGS_FOR_BUILD = $(AM_CPPFLAGS)
 
+include types/Makemodule.am
 include xlat/Makemodule.am
 
 strace_CPPFLAGS = $(AM_CPPFLAGS)
@@ -367,10 +368,11 @@ strace_SOURCES =	\
 	xmalloc.c	\
 	xmalloc.h	\
 	xstring.h	\
+	$(TYPES_HEADER_FILES) \
 	$(strace_SOURCES_check) \
 	# end of strace_SOURCES
 
-strace_SOURCES_check = bpf_attr_check.c
+strace_SOURCES_check = bpf_attr_check.c $(TYPES_CHECK_FILES)
 
 if ENABLE_STACKTRACE
 strace_SOURCES += unwind.c unwind.h
@@ -964,6 +966,8 @@ EXTRA_DIST =				\
 	strace-graph			\
 	strace-log-merge		\
 	strace.spec			\
+	types/find_last_type_fields.awk	\
+	types/gen.sh			\
 	$(XLAT_INPUT_FILES)		\
 	$(XLAT_HEADER_FILES)		\
 	xlat/gen.sh			\

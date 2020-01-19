@@ -22,7 +22,7 @@ AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests 1.13])
+AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests subdir-objects 1.13])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 
@@ -646,6 +646,8 @@ AC_CHECK_HEADERS([linux/btrfs.h], [
 	AC_CHECK_DECLS(m4_normalize([BTRFS_COMPRESS_NONE, BTRFS_COMPRESS_ZLIB,
 				BTRFS_COMPRESS_LZO]),,,[ #include <stdio.h>
 #include <linux/btrfs.h>])])
+
+st_CHECK_TYPES
 
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([
