@@ -240,8 +240,6 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 		if (fetch_keyctl_kdf_params(tcp, kdf_addr, &kdf)) {
 			printaddr(kdf_addr);
 		} else {
-			size_t i;
-
 			PRINT_FIELD_STR("{", kdf, hashname, tcp);
 
 			/*
@@ -256,23 +254,9 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 
 			PRINT_FIELD_U(", ", kdf, otherinfolen);
 
-			/* Some future-proofing */
-			for (i = 0; i < ARRAY_SIZE(kdf.__spare); i++) {
-				if (kdf.__spare[i])
-					break;
-			}
-
-			if (i < ARRAY_SIZE(kdf.__spare)) {
-				tprints(", __spare=[");
-
-				for (i = 0; i < ARRAY_SIZE(kdf.__spare); i++) {
-					if (i)
-						tprints(", ");
-
-					tprintf("%#x", kdf.__spare[i]);
-				}
-
-				tprints("]");
+			if (!IS_ARRAY_ZERO(kdf.__spare)) {
+				PRINT_FIELD_ARRAY(", ", kdf, __spare, tcp,
+						  print_xint32_array_member);
 			}
 
 			tprints("}");
