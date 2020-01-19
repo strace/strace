@@ -95,10 +95,13 @@ bool buf_in_arg;
 
 # if XLAT_RAW
 #  define XARG_STR(v_) (v_), STRINGIFY(v_)
+#  define XSTR(v_, s_) STRINGIFY(v_)
 # elif XLAT_VERBOSE
 #  define XARG_STR(v_) (v_), STRINGIFY(v_) " /* " #v_ " */"
+#  define XSTR(v_, s_) STRINGIFY(v_) " /* " s_ " */"
 # else
 #  define XARG_STR ARG_STR
+#  define XSTR(v_, s_) s_
 # endif
 
 /*
@@ -1251,6 +1254,53 @@ main(void)
 							: pkey_vecs[j].str2,
 					ptr_fmt);
 		}
+	}
+
+	/* KEYCTL_MOVE */
+	static const struct {
+		kernel_ulong_t key;
+		const char *str;
+	} move_keys[] = {
+		  { 0xbadc0ded, "-1159983635" },
+		  { XARG_STR(KEY_SPEC_THREAD_KEYRING) },
+	};
+	static const struct {
+		kernel_ulong_t val;
+		const char *str;
+	} move_flags[] = {
+		{ (kernel_ulong_t) 0xbadc0ded00000000ULL, "0" },
+		{ 1, XSTR(0x1, "KEYCTL_MOVE_EXCL") },
+		{ (kernel_ulong_t) 0xbadc0ded00000001ULL,
+		  XSTR(0x1, "KEYCTL_MOVE_EXCL") },
+		{ (kernel_ulong_t) 0xfffffffffffffffeULL,
+# if !XLAT_RAW
+		  "0xfffffffe /* KEYCTL_MOVE_??? */"
+# else
+		  "0xfffffffe"
+# endif
+		 },
+		{ (kernel_ulong_t) 0xffffffffffffffffULL,
+		  XSTR(0xffffffff, "KEYCTL_MOVE_EXCL|0xfffffffe") },
+	};
+
+	for (i = 0; i < ARRAY_SIZE(move_keys) * ARRAY_SIZE(move_flags); i++) {
+		do_keyctl(ARG_STR(KEYCTL_MOVE),
+			  sizeof(kernel_ulong_t),
+				move_keys[i % ARRAY_SIZE(move_keys)].key,
+				move_keys[i % ARRAY_SIZE(move_keys)].str,
+				kulong_fmt,
+			  sizeof(kernel_ulong_t),
+				move_keys[(i + 1) % ARRAY_SIZE(move_keys)].key,
+				move_keys[(i + 1) % ARRAY_SIZE(move_keys)].str,
+				kulong_fmt,
+			  sizeof(kernel_ulong_t),
+				move_keys[(i + 2) % ARRAY_SIZE(move_keys)].key,
+				move_keys[(i + 2) % ARRAY_SIZE(move_keys)].str,
+				kulong_fmt,
+			  sizeof(kernel_ulong_t),
+				move_flags[i % ARRAY_SIZE(move_flags)].val,
+				move_flags[i % ARRAY_SIZE(move_flags)].str,
+				kulong_fmt);
 	}
 
 	puts("+++ exited with 0 +++");

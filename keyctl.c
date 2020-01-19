@@ -15,6 +15,7 @@
 #include "xlat/key_reqkeys.h"
 #include "xlat/key_spec.h"
 #include "xlat/keyctl_commands.h"
+#include "xlat/keyctl_move_flags.h"
 #include "xlat/keyctl_pkey_ops.h"
 
 
@@ -414,6 +415,22 @@ keyctl_restrict_keyring(struct tcb *const tcp,
 	printstr(tcp, addr2);
 }
 
+static void
+keyctl_move(struct tcb *const tcp,
+	    const key_serial_t id,
+	    const key_serial_t from,
+	    const key_serial_t to,
+	    const unsigned int flags)
+{
+	print_keyring_serial_number(id);
+	tprints(", ");
+	print_keyring_serial_number(from);
+	tprints(", ");
+	print_keyring_serial_number(to);
+	tprints(", ");
+	printflags(keyctl_move_flags, flags, "KEYCTL_MOVE_???");
+}
+
 SYS_FUNC(keyctl)
 {
 	int cmd = tcp->u_arg[0];
@@ -527,6 +544,10 @@ SYS_FUNC(keyctl)
 
 	case KEYCTL_RESTRICT_KEYRING:
 		keyctl_restrict_keyring(tcp, arg2, arg3, arg4);
+		break;
+
+	case KEYCTL_MOVE:
+		keyctl_move(tcp, arg2, arg3, arg4, arg5);
 		break;
 
 	default:
