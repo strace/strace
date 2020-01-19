@@ -338,15 +338,6 @@ AC_CHECK_TYPES(m4_normalize([
 #include <linux/fcntl.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct crypto_user_alg,
-	struct crypto_report_aead,
-	struct crypto_report_blkcipher,
-	struct crypto_report_cipher,
-	struct crypto_report_hash,
-	struct crypto_report_rng
-]),,, [#include <linux/cryptouser.h>])
-
-AC_CHECK_TYPES(m4_normalize([
 	struct kcmp_epoll_slot
 ]),,, [#include <linux/kcmp.h>])
 
@@ -397,7 +388,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	iconv.h
 	inttypes.h
 	linux/bsg.h
-	linux/cryptouser.h
 	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
 	linux/falloc.h
