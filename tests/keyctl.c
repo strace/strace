@@ -70,6 +70,8 @@ struct keyctl_pkey_params {
 # endif
 
 # include "xlat.h"
+# include "xlat/keyctl_caps0.h"
+# include "xlat/keyctl_caps1.h"
 # include "xlat/keyctl_commands.h"
 
 # ifndef KEY_SPEC_REQKEY_AUTH_KEY
@@ -150,6 +152,21 @@ print_arg(kernel_ulong_t arg, const char *str, const char *fmt, size_t size,
 			print_quoted_string_limit((void *) (uintptr_t) arg,
 						  size, rc);
 	}
+}
+
+void
+print_flags(const struct xlat *xlat, unsigned long long flags,
+	    const char *const dflt)
+{
+# if XLAT_RAW
+	printf("%#llx", flags);
+# elif XLAT_VERBOSE
+	printf("%#llx /* ", flags);
+	printflags(xlat, flags, dflt);
+	printf(" */");
+# else
+	printflags(xlat, flags, dflt);
+# endif
 }
 
 /*
@@ -430,8 +447,10 @@ main(void)
 	char *bogus_buf2 = tail_alloc(256);
 	char *key_iov_str1;
 	char *key_iov_str2 = tail_alloc(4096);
+	const char *errstr;
 	ssize_t ret;
 	ssize_t kis_size = 0;
+	long rc;
 	size_t i;
 
 	key_iov[0].iov_base = short_type;
@@ -1302,6 +1321,83 @@ main(void)
 				move_flags[i % ARRAY_SIZE(move_flags)].str,
 				kulong_fmt);
 	}
+
+	/* KEYCTL_CAPABILITIES */
+	unsigned char *caps1 = tail_alloc(1);
+	unsigned char *caps2 = tail_alloc(2);
+	unsigned char *caps4 = tail_alloc(4);
+
+	do_keyctl(ARG_STR(KEYCTL_CAPABILITIES),
+		  sizeof(unsigned char *), ARG_STR(NULL), ptr_fmt,
+		  sizeof(kernel_ulong_t),
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL,
+			ksize_fmt,
+		  0);
+
+	const kernel_ulong_t bad_len = (kernel_ulong_t) 0xbadc0ded00000001LLU;
+	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps1, bad_len);
+	errstr = sprintrc(rc);
+	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	if (rc >= 0) {
+		printf("[");
+		if (rc >= 1)
+			print_flags(keyctl_caps0, caps1[0], "KEYCTL_CAPS0_???");
+		printf("]");
+	} else {
+		printf("%p", caps1);
+	}
+	printf(", %llu) = %s\n", (unsigned long long) bad_len, errstr);
+
+	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps1, 2);
+	errstr = sprintrc(rc);
+	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	if (rc >= 0) {
+		printf("[");
+		if (rc == 1)
+			print_flags(keyctl_caps0, caps1[0], "KEYCTL_CAPS0_???");
+		printf("]");
+	} else {
+		printf("%p", caps1);
+	}
+	printf(", 2) = %s\n", errstr);
+
+	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps2, 2);
+	errstr = sprintrc(rc);
+	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	if (rc >= 0) {
+		printf("[");
+		if (rc >= 1)
+			print_flags(keyctl_caps0, caps2[0], "KEYCTL_CAPS0_???");
+		if (rc >= 2) {
+			printf(", ");
+			print_flags(keyctl_caps1, caps2[1], "KEYCTL_CAPS1_???");
+		}
+		printf("]");
+	} else {
+		printf("%p", caps2);
+	}
+	printf(", 2) = %s\n", errstr);
+
+	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps4, 4);
+	errstr = sprintrc(rc);
+	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	if (rc >= 0) {
+		printf("[");
+		if (rc >= 1)
+			print_flags(keyctl_caps0, caps4[0], "KEYCTL_CAPS0_???");
+		if (rc >= 2) {
+			printf(", ");
+			print_flags(keyctl_caps1, caps4[1], "KEYCTL_CAPS1_???");
+		}
+		if (rc >= 3)
+			printf(", %hhx", caps4[2]);
+		if (rc >= 4)
+			printf(", %hhx", caps4[3]);
+		printf("]");
+	} else {
+		printf("%p", caps4);
+	}
+	printf(", 4) = %s\n", errstr);
 
 	puts("+++ exited with 0 +++");
 

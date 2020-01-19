@@ -14,6 +14,8 @@
 #include "xlat/key_perms.h"
 #include "xlat/key_reqkeys.h"
 #include "xlat/key_spec.h"
+#include "xlat/keyctl_caps0.h"
+#include "xlat/keyctl_caps1.h"
 #include "xlat/keyctl_commands.h"
 #include "xlat/keyctl_move_flags.h"
 #include "xlat/keyctl_pkey_ops.h"
@@ -431,6 +433,52 @@ keyctl_move(struct tcb *const tcp,
 	printflags(keyctl_move_flags, flags, "KEYCTL_MOVE_???");
 }
 
+bool
+print_keyctl_caps(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	static const struct {
+		const struct xlat *xlat;
+		const char *dflt;
+	} caps[] = {
+		{ keyctl_caps0, "KEYCTL_CAPS0_???" },
+		{ keyctl_caps1, "KEYCTL_CAPS1_???" },
+	};
+
+	kernel_ulong_t *pos = data;
+	unsigned char *elem = elem_buf;
+
+	if (*pos < ARRAY_SIZE(caps))
+		printflags(caps[*pos].xlat, *elem, caps[*pos].dflt);
+	else
+		tprintf("%#hhx", *elem);
+
+	(*pos)++;
+
+	return true;
+}
+
+static void
+keyctl_capabilities(struct tcb *const tcp,
+		    const kernel_ulong_t /* char * */ buf,
+		    const kernel_ulong_t buflen)
+{
+	kernel_ulong_t pos = 0;
+	unsigned char elem;
+
+	if (entering(tcp))
+		return;
+
+	if (syserror(tcp)) {
+		printaddr(buf);
+	} else {
+		print_array(tcp, buf, MIN(buflen, (kernel_ulong_t) tcp->u_rval),
+			    &elem, sizeof(elem),
+			    tfetch_mem, print_keyctl_caps, &pos);
+	}
+
+	tprintf(", %" PRI_klu, buflen);
+}
+
 SYS_FUNC(keyctl)
 {
 	int cmd = tcp->u_arg[0];
@@ -549,6 +597,10 @@ SYS_FUNC(keyctl)
 	case KEYCTL_MOVE:
 		keyctl_move(tcp, arg2, arg3, arg4, arg5);
 		break;
+
+	case KEYCTL_CAPABILITIES:
+		keyctl_capabilities(tcp, arg2, arg3);
+		return 0;
 
 	default:
 		tprintf("%#" PRI_klx ", %#" PRI_klx
