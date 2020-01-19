@@ -11,9 +11,13 @@
 #include "keyctl_kdf_params.h"
 #include "print_fields.h"
 
-typedef int32_t key_serial_t;
-
+#include "xlat/key_perms.h"
+#include "xlat/key_reqkeys.h"
 #include "xlat/key_spec.h"
+#include "xlat/keyctl_commands.h"
+
+
+typedef int32_t key_serial_t;
 
 struct keyctl_dh_params {
 	int32_t private;
@@ -188,8 +192,6 @@ keyctl_get_persistent(struct tcb *tcp, unsigned uid, key_serial_t id)
 	print_keyring_serial_number(id);
 }
 
-#include "xlat/key_perms.h"
-
 static void
 keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
 {
@@ -290,9 +292,6 @@ keyctl_restrict_keyring(struct tcb *const tcp,
 	tprints(", ");
 	printstr(tcp, addr2);
 }
-
-#include "xlat/key_reqkeys.h"
-#include "xlat/keyctl_commands.h"
 
 SYS_FUNC(keyctl)
 {
