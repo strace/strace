@@ -504,12 +504,6 @@ AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct rta_mfc_stats,
-	struct rtvia
-]),,, [#include <sys/socket.h>
-#include <linux/rtnetlink.h>])
-
-AC_CHECK_TYPES(m4_normalize([
 	struct ifla_cacheinfo
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])

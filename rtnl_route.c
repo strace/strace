@@ -13,8 +13,7 @@
 #include "print_fields.h"
 
 #include <linux/ip.h>
-#include "netlink.h"
-#include <linux/rtnetlink.h>
+#include "types/rtnl_route.h"
 
 #include "xlat/ip_type_of_services.h"
 #include "xlat/lwtunnel_encap_types.h"
@@ -25,27 +24,6 @@
 #include "xlat/routing_types.h"
 #include "xlat/rtnl_route_attrs.h"
 #include "xlat/rtnl_rta_metrics_attrs.h"
-
-/** Added by Linux commit v3.8-rc1~139^2~90 */
-typedef struct {
-	uint64_t mfcs_packets;
-	uint64_t mfcs_bytes;
-	uint64_t mfcs_wrong_if;
-} struct_rta_mfc_stats;
-
-typedef struct {
-	uint16_t /* __kernel_sa_family_t */ rtvia_family;
-	uint8_t rtvia_addr[0];
-} struct_rtvia;
-
-#ifdef HAVE_STRUCT_RTA_MFC_STATS
-static_assert(sizeof(struct_rta_mfc_stats) == sizeof(struct rta_mfc_stats),
-	      "Unexpected struct rta_mfc_stats, please update the decoder");
-#endif
-#ifdef HAVE_STRUCT_RTVIA
-static_assert(sizeof(struct_rtvia) == sizeof(struct rtvia),
-	      "Unexpected struct rtvia, please update the decoder");
-#endif
 
 bool
 decode_nla_rt_class(struct tcb *const tcp,
