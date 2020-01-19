@@ -12,50 +12,10 @@
 #include "nlattr.h"
 #include "print_fields.h"
 
-#include "netlink.h"
-#include <linux/rtnetlink.h>
-#ifdef HAVE_LINUX_NEIGHBOUR_H
-# include <linux/neighbour.h>
-#endif
+#include "types/rtnl_neightbl.h"
 
 #include "xlat/rtnl_neightbl_attrs.h"
 #include "xlat/rtnl_neightbl_parms_attrs.h"
-
-typedef struct {
-	uint16_t ndtc_key_len;
-	uint16_t ndtc_entry_size;
-	uint32_t ndtc_entries;
-	uint32_t ndtc_last_flush;
-	uint32_t ndtc_last_rand;
-	uint32_t ndtc_hash_rnd;
-	uint32_t ndtc_hash_mask;
-	uint32_t ndtc_hash_chain_gc;
-	uint32_t ndtc_proxy_qlen;
-} struct_ndt_config;
-
-typedef struct {
-	uint64_t ndts_allocs;
-	uint64_t ndts_destroys;
-	uint64_t ndts_hash_grows;
-	uint64_t ndts_res_failed;
-	uint64_t ndts_lookups;
-	uint64_t ndts_hits;
-	uint64_t ndts_rcv_probes_mcast;
-	uint64_t ndts_rcv_probes_ucast;
-	uint64_t ndts_periodic_gc_runs;
-	uint64_t ndts_forced_gc_runs;
-	uint64_t ndts_table_fulls; /**< Added by v4.3-rc1~96^2~202 */
-} struct_ndt_stats;
-
-#ifdef HAVE_STRUCT_NDT_CONFIG
-static_assert(sizeof(struct ndt_config) == sizeof(struct_ndt_config),
-	      "Unexpected struct ndt_config size, please update the decoder");
-#endif
-#ifdef HAVE_STRUCT_NDT_STATS
-static_assert(sizeof(struct ndt_stats) <= sizeof(struct_ndt_stats),
-	      "Unexpected struct ndt_stats size, please update the decoder");
-#endif
-
 
 static bool
 decode_ndt_config(struct tcb *const tcp,

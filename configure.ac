@@ -513,12 +513,6 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
 
-AC_CHECK_MEMBERS([struct ndt_stats.ndts_table_fulls],,, [#include <linux/neighbour.h>])
-AC_CHECK_TYPES(m4_normalize([
-	struct ndt_config,
-	struct ndt_stats
-]),,, [#include <linux/neighbour.h>])
-
 AC_CHECK_TYPES(m4_normalize([
 	struct ifla_cacheinfo
 ]),,, [#include <sys/socket.h>
