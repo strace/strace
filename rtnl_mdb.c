@@ -13,8 +13,7 @@
 #include "nlattr.h"
 #include "print_fields.h"
 
-#include <netinet/in.h>
-#include <linux/if_bridge.h>
+#include "types/rtnl_mdb.h"
 #include "netlink.h"
 
 #include "xlat/mdb_flags.h"
@@ -26,35 +25,6 @@
 #include "xlat/rtnl_mdba_mdb_entry_attrs.h"
 #include "xlat/rtnl_mdba_router_attrs.h"
 #include "xlat/rtnl_mdba_router_pattr_attrs.h"
-
-typedef struct {
-	uint8_t  family;
-	uint32_t ifindex;
-} struct_br_port_msg;
-
-typedef struct {
-	uint32_t ifindex;
-	uint8_t  state;
-	uint8_t  flags;
-	uint16_t vid;
-	struct {
-		union {
-			uint32_t /* __be32 */ ip4;
-			struct in6_addr       ip6;
-		} u;
-		uint16_t /* __be16 */ proto;
-	} addr;
-} struct_br_mdb_entry;
-
-#ifdef HAVE_STRUCT_BR_PORT_MSG
-static_assert(sizeof(struct br_port_msg) <= sizeof(struct_br_port_msg),
-	      "Unexpected struct br_port_msg size, please update the decoder");
-#endif
-
-#ifdef HAVE_STRUCT_BR_NDB_ENTRY
-static_assert(sizeof(struct br_mdb_entry) <= sizeof(struct_br_mdb_entry),
-	      "Unexpected struct br_mdb_entry size, please update the decoder");
-#endif
 
 static const nla_decoder_t mdba_mdb_eattr_nla_decoders[] = {
 	[MDBA_MDB_EATTR_TIMER]	= decode_nla_u32

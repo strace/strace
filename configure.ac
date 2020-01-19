@@ -494,10 +494,6 @@ AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 			 #include <bluetooth/l2cap.h>])
 ])
 
-AC_CHECK_TYPES(m4_normalize([
-	struct br_mdb_entry,
-	struct br_port_msg
-]),,, [#include <linux/if_bridge.h>])
 AC_CHECK_MEMBERS(m4_normalize([
 	struct br_mdb_entry.flags,
 	struct br_mdb_entry.vid
