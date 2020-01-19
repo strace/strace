@@ -455,14 +455,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ]),,, [#include <netinet/in.h>
 #include <net/if.h>])
 
-AC_CHECK_HEADERS([linux/input.h], [
-	AC_CHECK_TYPES(m4_normalize([
-		struct input_keymap_entry,
-		struct input_mask
-	]),,, [#include <linux/input.h>])
-	AC_CHECK_MEMBERS([struct input_absinfo.resolution],,, [#include <linux/input.h>])
-])
-
 AC_CHECK_HEADERS([linux/bpf.h], [
 	AC_CHECK_TYPES(m4_normalize([
 		struct bpf_insn,

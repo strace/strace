@@ -15,7 +15,7 @@
 #ifdef HAVE_LINUX_INPUT_H
 
 # include <linux/ioctl.h>
-# include <linux/input.h>
+# include "types/evdev.h"
 
 # include "xlat/evdev_autorepeat.h"
 # include "xlat/evdev_ff_status.h"
@@ -35,45 +35,6 @@
 # endif
 # ifndef SYN_MAX
 #  define SYN_MAX 0xf
-# endif
-
-typedef struct {
-	int32_t value;
-	int32_t minimum;
-	int32_t maximum;
-	int32_t fuzz;
-	int32_t flat;
-	int32_t resolution; /**< Added by Linux commit v2.6.31-rc1~100^2~1 */
-} struct_input_absinfo;
-
-/** Added by Linux commit v2.6.37-rc1~5^2~3^2~47 */
-typedef struct {
-	uint8_t  flags;
-	uint8_t  len;
-	uint16_t index;
-	uint32_t keycode;
-	uint8_t  scancode[32];
-} struct_input_keymap_entry;
-
-/** Added by Linux commit v4.4-rc1~11^2~3^2~2 */
-typedef struct {
-	uint32_t type;
-	uint32_t codes_size;
-	uint64_t codes_ptr;
-} struct_input_mask;
-
-static_assert(sizeof(struct input_absinfo) <= sizeof(struct_input_absinfo),
-	      "Unexpected struct input_absinfo size, please update "
-	      "the decoder");
-# ifdef HAVE_STRUCT_INPUT_KEYMAP_ENTRY
-static_assert(sizeof(struct input_keymap_entry)
-	      == sizeof(struct_input_keymap_entry),
-	      "Unexpected struct input_keymap_entry size, please update "
-	      "the decoder");
-# endif
-# ifdef HAVE_STRUCT_INPUT_MASK
-static_assert(sizeof(struct input_mask) == sizeof(struct_input_mask),
-	      "Unexpected struct input_mask size, please update the decoder");
 # endif
 
 /*
