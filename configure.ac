@@ -342,7 +342,9 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <linux/kcmp.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct keyctl_kdf_params
+	struct keyctl_kdf_params,
+	struct keyctl_pkey_params,
+	struct keyctl_pkey_query
 ]),,, [#include <linux/keyctl.h>])
 
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])

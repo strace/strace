@@ -45,6 +45,30 @@ struct keyctl_kdf_params {
 };
 # endif
 
+# ifndef HAVE_STRUCT_KEYCTL_PKEY_QUERY
+struct keyctl_pkey_query {
+	uint32_t supported_ops;
+	uint32_t key_size;
+	uint16_t max_data_size;
+	uint16_t max_sig_size;
+	uint16_t max_enc_size;
+	uint16_t max_dec_size;
+	uint32_t __spare[10];
+};
+# endif
+
+# ifndef HAVE_STRUCT_KEYCTL_PKEY_PARAMS
+struct keyctl_pkey_params {
+	int32_t  key_id;
+	uint32_t in_len;
+	union {
+		uint32_t out_len;
+		uint32_t in2_len;
+	};
+	uint32_t __spare[7];
+};
+# endif
+
 # include "xlat.h"
 # include "xlat/keyctl_commands.h"
 
@@ -258,6 +282,51 @@ kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
 				append_str(&pos, &left, ", ");
 
 			append_str(&pos, &left, "%#x", kdf->__spare[i]);
+		}
+
+		append_str(&pos, &left, "]");
+	}
+
+	append_str(&pos, &left, "}");
+
+	return buf;
+}
+
+const char *
+kcpp_to_str(struct keyctl_pkey_params *params, bool out, const char *key_str,
+	    bool print_spare)
+{
+	static char buf[4096];
+
+	size_t left = sizeof(buf);
+	char *pos = buf;
+
+	append_str(&pos, &left, "{key_id=");
+
+# if XLAT_RAW
+	append_str(&pos, &left, "%d", params->key_id);
+# elif XLAT_VERBOSE
+	if (key_str)
+		append_str(&pos, &left, "%d /* %s */", params->key_id, key_str);
+	else
+		append_str(&pos, &left, "%d", params->key_id);
+# else
+	if (key_str)
+		append_str(&pos, &left, "%s", key_str);
+	else
+		append_str(&pos, &left, "%d", params->key_id);
+# endif
+
+	append_str(&pos, &left, ", in_len=%u, %s=%u",
+		   params->in_len,
+		   out ? "out_len" : "in2_len", params->out_len);
+
+	if (print_spare) {
+		append_str(&pos, &left, ", __spare=[");
+
+		for (size_t i = 0; i < ARRAY_SIZE(params->__spare); i++) {
+			append_str(&pos, &left, "%s%#x",
+				   i ? ", " : "", params->__spare[i]);
 		}
 
 		append_str(&pos, &left, "]");
@@ -1091,6 +1160,98 @@ main(void)
 	}
 
 	nul_terminated_buf = true;
+
+	/* KEYCTL_PKEY_QUERY */
+	do_keyctl(ARG_STR(KEYCTL_PKEY_QUERY),
+		  sizeof(int32_t), bogus_key2, NULL, "%d",
+		  sizeof(kernel_ulong_t),
+			(kernel_ulong_t) 0xfeedf157badc0dedLLU, NULL,
+			kulong_fmt,
+		  sizeof(char *), bogus_str, NULL, ptr_fmt,
+		  sizeof(char *), ARG_STR(NULL), ptr_fmt);
+
+	struct keyctl_pkey_query query;
+	do_keyctl(ARG_STR(KEYCTL_PKEY_QUERY),
+		  sizeof(int32_t), XARG_STR(KEY_SPEC_THREAD_KEYRING), "%d",
+		  sizeof(kernel_ulong_t), (kernel_ulong_t) 0, NULL, kulong_fmt,
+		  sizeof(char *), "x\377\0\1", "\"x\\377\"", NULL,
+		  sizeof(&query), &query, NULL, ptr_fmt);
+
+	/*
+	 * KEYCTL_PKEY_ENCRYPT, KEYCTL_PKEY_DECRYPT, KEYCTL_PKEY_SIGN,
+	 * KEYCTL_PKEY_VERIFY
+	 */
+	static const struct {
+		int op;
+		const char *str;
+		bool out;
+	} pkey_ops[] = {
+		{ ARG_STR(KEYCTL_PKEY_ENCRYPT),	true },
+		{ ARG_STR(KEYCTL_PKEY_DECRYPT),	true },
+		{ ARG_STR(KEYCTL_PKEY_SIGN),	true },
+		{ ARG_STR(KEYCTL_PKEY_VERIFY),	false },
+	};
+	static const char pkey_str1[] = STR32 "xxx";
+	static const char pkey_str2[] = "\1\2HAI\255\0\1";
+	static struct {
+		struct keyctl_pkey_params params;
+		const char * key_str;
+		bool print_spare;
+		const char *str1;
+		const char *str2;
+	} pkey_vecs[] = {
+		{ { KEY_SPEC_PROCESS_KEYRING, 0, { .out_len = 0 } },
+		  "KEY_SPEC_PROCESS_KEYRING", false, "\"\"", "\"\"" },
+		{ { 0, 0, { .out_len = 0 }, .__spare = { 1 } },
+		  NULL, true, "\"\"", "\"\"" },
+		{ { 0xdeadc0deU, 10, { .out_len = 10 },
+		    .__spare = { 0, 0xfacefeed } },
+		  NULL, true, "\"AbCdEfGhIj\"", NULL },
+		{ { 0xdeadc0deU, sizeof(pkey_str1),
+		    { .out_len = sizeof(pkey_str2) - 1 },
+		    .__spare = { [6] = 0xdec0ded } },
+		  NULL, true,
+		  "\"AbCdEfGhIj\"...", "\"\\1\\2HAI\\255\\0\\1\"" },
+	};
+
+	char *pkey1 = tail_memdup(pkey_str1, sizeof(pkey_str1) - 1);
+	char *pkey2 = tail_memdup(pkey_str2, sizeof(pkey_str2) - 1);
+	struct keyctl_pkey_params *pkey_params =
+		tail_alloc(sizeof(*pkey_params));
+
+	for (i = 0; i < ARRAY_SIZE(pkey_ops); i++) {
+		do_keyctl(pkey_ops[i].op, pkey_ops[i].str,
+			  sizeof(char *), ARG_STR(NULL), ptr_fmt,
+			  sizeof(char *), ARG_STR(NULL), ptr_fmt,
+			  sizeof(char *), ARG_STR(NULL), ptr_fmt,
+			  sizeof(char *), ARG_STR(NULL), ptr_fmt);
+
+		do_keyctl(pkey_ops[i].op, pkey_ops[i].str,
+			  sizeof(char *), (uint32_t *) pkey_params + 1, NULL,
+				ptr_fmt,
+			  sizeof(char *), "x\377\0\1", "\"x\\377\"", ptr_fmt,
+			  sizeof(char *), pkey1, NULL, ptr_fmt,
+			  sizeof(char *), pkey2, NULL, ptr_fmt);
+
+		for (size_t j = 0; j < ARRAY_SIZE(pkey_vecs); j++) {
+			memcpy(pkey_params, &pkey_vecs[j].params,
+			       sizeof(*pkey_params));
+			do_keyctl(pkey_ops[i].op, pkey_ops[i].str,
+				  sizeof(char *), pkey_params,
+					kcpp_to_str(pkey_params,
+						    pkey_ops[i].out,
+						    pkey_vecs[j].key_str,
+						    pkey_vecs[j].print_spare),
+					ptr_fmt,
+				  sizeof(char *), "", "\"\"", ptr_fmt,
+				  sizeof(char *), pkey1, pkey_vecs[j].str1,
+					ptr_fmt,
+				  sizeof(char *), pkey2,
+					pkey_ops[i].out ? NULL
+							: pkey_vecs[j].str2,
+					ptr_fmt);
+		}
+	}
 
 	puts("+++ exited with 0 +++");
 
