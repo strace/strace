@@ -16,10 +16,9 @@
 
 #include <netinet/in.h>
 
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
 #include <linux/rtnetlink.h>
+
+#include "types/rtnl_link.h"
 
 #include "xlat/in6_addr_gen_mode.h"
 #include "xlat/inet_devconf_indices.h"
@@ -41,86 +40,6 @@
 #include "xlat/snmp_ip_stats.h"
 #include "xlat/tun_device_types.h"
 #include "xlat/xdp_flags.h"
-
-typedef struct {
-	uint32_t rx_packets;
-	uint32_t tx_packets;
-	uint32_t rx_bytes;
-	uint32_t tx_bytes;
-	uint32_t rx_errors;
-	uint32_t tx_errors;
-	uint32_t rx_dropped;
-	uint32_t tx_dropped;
-	uint32_t multicast;
-	uint32_t collisions;
-	uint32_t rx_length_errors;
-	uint32_t rx_over_errors;
-	uint32_t rx_crc_errors;
-	uint32_t rx_frame_errors;
-	uint32_t rx_fifo_errors;
-	uint32_t rx_missed_errors;
-	uint32_t tx_aborted_errors;
-	uint32_t tx_carrier_errors;
-	uint32_t tx_fifo_errors;
-	uint32_t tx_heartbeat_errors;
-	uint32_t tx_window_errors;
-	uint32_t rx_compressed;
-	uint32_t tx_compressed;
-	uint32_t rx_nohandler; /**< Added by v4.6-rc1~91^2~329^2~2 */
-} struct_rtnl_link_stats;
-
-/** Added by Linux commit v2.6.35-rc1~473^2~759 */
-typedef struct {
-	uint64_t rx_packets;
-	uint64_t tx_packets;
-	uint64_t rx_bytes;
-	uint64_t tx_bytes;
-	uint64_t rx_errors;
-	uint64_t tx_errors;
-	uint64_t rx_dropped;
-	uint64_t tx_dropped;
-	uint64_t multicast;
-	uint64_t collisions;
-	uint64_t rx_length_errors;
-	uint64_t rx_over_errors;
-	uint64_t rx_crc_errors;
-	uint64_t rx_frame_errors;
-	uint64_t rx_fifo_errors;
-	uint64_t rx_missed_errors;
-	uint64_t tx_aborted_errors;
-	uint64_t tx_carrier_errors;
-	uint64_t tx_fifo_errors;
-	uint64_t tx_heartbeat_errors;
-	uint64_t tx_window_errors;
-	uint64_t rx_compressed;
-	uint64_t tx_compressed;
-	uint64_t rx_nohandler; /**< Added by v4.6-rc1~91^2~329^2~2 */
-} struct_rtnl_link_stats64;
-
-/** Added by Linux commit v2.6.35-rc1~473^2~33 */
-typedef struct {
-	uint8_t vsi_mgr_id;
-	uint8_t vsi_type_id[3];
-	uint8_t vsi_type_version;
-	uint8_t pad[3];
-} struct_ifla_port_vsi;
-
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
-static_assert(sizeof(struct_rtnl_link_stats)
-	      == sizeof(struct rtnl_link_stats),
-	      "struct rtnl_link_stats size mismatch"
-	      ", please update the decoder");
-#endif
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
-static_assert(sizeof(struct_rtnl_link_stats64)
-	      == sizeof(struct rtnl_link_stats64),
-	      "struct rtnl_link_stats64 size mismatch"
-	      ", please update the decoder");
-#endif
-#ifdef HAVE_STRUCT_IFLA_PORT_VSI
-static_assert(sizeof(struct_ifla_port_vsi) == sizeof(struct ifla_port_vsi),
-	      "struct ifla_port_vsi size mismatch, please update the decoder");
-#endif
 
 static bool
 decode_rtnl_link_stats(struct tcb *const tcp,

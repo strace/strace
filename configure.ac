@@ -520,15 +520,7 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <linux/neighbour.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct ifla_bridge_id,
-	struct ifla_cacheinfo,
-	struct ifla_port_vsi,
-	struct rtnl_link_stats64
-]),,, [#include <sys/socket.h>
-#include <linux/rtnetlink.h>])
-AC_CHECK_MEMBERS(m4_normalize([
-	struct rtnl_link_stats.rx_nohandler,
-	struct rtnl_link_stats64.rx_nohandler
+	struct ifla_cacheinfo
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
 AC_CHECK_DECLS(m4_normalize([
