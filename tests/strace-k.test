@@ -11,6 +11,8 @@
 
 . "${srcdir=.}/init.sh"
 
+: "${ATTACH_MODE=0}"
+
 # strace -k is implemented using /proc/$pid/maps
 [ -f /proc/self/maps ] ||
 	framework_skip_ '/proc/self/maps is not available'
@@ -31,7 +33,20 @@ if [ -x "$path_to_sed" ] &&
 fi
 
 run_prog "${test_prog=../stack-fcall}"
-run_strace -e chdir -k $args
+
+if [ "x${ATTACH_MODE}" = "x1" ]; then
+	../set_ptracer_any "${test_prog}" >> "$EXP" &
+	tracee_pid=$!
+
+	while ! [ -s "$EXP" ]; do
+		kill -0 "$tracee_pid" 2> /dev/null ||
+			fail_ 'set_ptracer_any failed'
+	done
+
+	run_strace -e chdir -k -p "$tracee_pid"
+else
+	run_strace -e chdir -k $args
+fi
 
 expected="$srcdir/$NAME.expected"
 awk '
