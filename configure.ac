@@ -465,13 +465,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 ])
 
 AC_CHECK_HEADERS([linux/io_uring.h], [
-	AC_CHECK_TYPES(m4_normalize([
-		struct io_sqring_offsets,
-		struct io_cqring_offsets,
-		struct io_uring_params
-	]),,, [#include <linux/io_uring.h>])
 	AC_CHECK_MEMBERS(m4_normalize([
-		struct io_cqring_offsets.resv,
 		struct io_uring_params.features,
 		struct io_uring_params.resv
 	]),,, [#include <linux/io_uring.h>])
