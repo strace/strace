@@ -144,6 +144,7 @@
 { "linux/kvm.h", "KVM_PPC_RESIZE_HPT_COMMIT", _IOC_READ, 0xaeae, 0x10 },
 { "linux/kvm.h", "KVM_PPC_RESIZE_HPT_PREPARE", _IOC_READ, 0xaead, 0x10 },
 { "linux/kvm.h", "KVM_PPC_RTAS_DEFINE_TOKEN", _IOC_WRITE, 0xaeac, 0x80 },
+{ "linux/kvm.h", "KVM_PPC_SVM_OFF", _IOC_NONE, 0xaeb3, 0x00 },
 { "linux/kvm.h", "KVM_REGISTER_COALESCED_MMIO", _IOC_WRITE, 0xae67, 0x10 },
 { "linux/kvm.h", "KVM_REINJECT_CONTROL", _IOC_NONE, 0xae71, 0x00 },
 { "linux/kvm.h", "KVM_RUN", _IOC_NONE, 0xae80, 0x00 },

@@ -8,6 +8,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of clone3 syscall to match Linux 5.5.
   * Updated lists of AUDIT_*, BPF_*, CLONE_*, KEY_MACRO*, KVM_*, and V4l2_*
     constants.
+  * Updated lists of ioctl commands from Linux 5.5.
 
 * Bug fixes
   * Fixed stack trace printing for early syscalls when strace is configured
