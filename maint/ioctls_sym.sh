@@ -143,6 +143,14 @@ typedef unsigned long long u64;
 
 #include "fixes.h"
 
+#ifndef UL
+# define UL(x) (_UL(x))
+#endif
+
+#ifndef ULL
+# define ULL(x) (_ULL(x))
+#endif
+
 #include <asm/bitsperlong.h>
 #ifndef BITS_PER_LONG
 # define BITS_PER_LONG __BITS_PER_LONG
@@ -243,6 +251,9 @@ __EOF__
 			;;
 		*linux/omap3isp.h)
 			echo 'struct omap3isp_stat_data_time32 {uint32_t dummy32[4]; uint16_t dummy16[3]; };'
+			;;
+		*linux/platform_data/cros_ec_chardev.h)
+			echo 'struct cros_ec_command {uint32_t dummy32[5]; uint8_t dummy8[0]; };'
 			;;
 		*linux/sonet.h)
 			echo '#include <linux/atmioc.h>'
