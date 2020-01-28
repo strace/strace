@@ -4,10 +4,14 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Added -e trace=%creds option for tracing syscalls related to process
     credentials.
+  * Enhanced decoding of arch_prctl, keyctl, io_uring_register, io_uring_setup,
+    and perf_event_open syscalls.
   * Enhanced decoding of BPF_PROG_LOAD bpf syscall command.
   * Updated decoding of clone3 syscall to match Linux 5.5.
-  * Updated lists of AUDIT_*, BPF_*, CLONE_*, KEY_MACRO*, KVM_*, and V4l2_*
-    constants.
+  * Implemented decoding of TCA_ACT_FLAGS and TCA_STATS_PKT64 netlink
+    attributes.
+  * Updated lists of AUDIT_*, BPF_*, CLONE_*, KEY_*, KVM_*, PPC_PTRACE_*,
+    SCTP_*, STATX_*, TIPC_*, V4L2_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 5.5.
 
 * Bug fixes
