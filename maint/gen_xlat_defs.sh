@@ -109,7 +109,7 @@ while read name_ rest; do
 			printf '%s\n' "$name_ $rest"
 			continue ;;
 	esac
-	sed -rn 's/#define[[:space:]]+('"$name_"')[[:space:]]+([x[:xdigit:]]+).*$/\2\t\1/p' \
+	sed -rn 's/#[[:space:]]*define[[:space:]]+('"$name_"')[[:space:]]+([x[:xdigit:]]+).*$/\2\t\1/p' \
 		$LINUX_SRC/include/uapi/$COMMON_DEFS_GLOB_PATTERN |
 	sort -n | {
 		def=
@@ -123,9 +123,9 @@ while read name_ rest; do
 			name="$name_"
 		fi
 
-		grep -oEH '#define[[:space:]]+'"$name"'[[:space:]]+(0x[[:xdigit:]]+|[[:digit:]]+)' \
+		grep -oEH '#[[:space:]]*define[[:space:]]+'"$name"'[[:space:]]+(0x[[:xdigit:]]+|[[:digit:]]+)' \
 		    $LINUX_SRC/arch/*/include/uapi/$ARCH_DEFS_FILE |
-		sed -rn 's|^[^#]*/arch/([^/]+)/include/uapi/'"$ARCH_DEFS_FILE"':#define[[:space:]]+'"$name"'[[:space:]]+([^[:space:]]+)([[:space:]].*)?$|\1\t\2|p' |
+		sed -rn 's|^[^#]*/arch/([^/]+)/include/uapi/[^:]*:#[[:space:]]*define[[:space:]]+'"$name"'[[:space:]]+([^[:space:]]+)([[:space:]].*)?$|\1\t\2|p' |
 		sed s/parisc/hppa/ |
 		sort |
 		awk -vname="$name" -vdef="$def" -vfmt="$VAL_PRINT_FMT" '
