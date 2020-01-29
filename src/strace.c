@@ -40,6 +40,7 @@
 #include "xstring.h"
 #include "delay.h"
 #include "wait.h"
+#include "selinux.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -240,6 +241,9 @@ print_version(void)
 		" no-mx32-mpers"
 # endif
 #endif /* SUPPORTED_PERSONALITIES > 2 */
+#ifdef USE_SELINUX
+		" secontext"
+#endif
 		"";
 
 	printf("%s -- version %s\n"
@@ -259,11 +263,17 @@ usage(void)
 #else
 # define K_OPT ""
 #endif
+#ifdef USE_SELINUX
+# define SELINUX_OPT "[--secontext[=full]]\n"
+#else
+# define SELINUX_OPT ""
+#endif
 
 	printf("\
 Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]...\n\
               [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-O OVERHEAD]\n\
-              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
+              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n"\
+              SELINUX_OPT "\
               { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
    or: strace -c[dfwzZ] [-I N] [-b execve] [-e EXPR]... [-O OVERHEAD]\n\
               [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
@@ -404,6 +414,14 @@ Output format:\n\
   -yy, --decode-fds=all\n\
                  print all available information associated with file\n\
                  descriptors in addition to paths\n\
+"
+#ifdef USE_SELINUX
+"\
+  --secontext[=full]\n\
+                 print SELinux contexts (type only unless 'full' is specified)\n\
+"
+#endif
+"\
 \n\
 Statistics:\n\
   -c, --summary-only\n\
@@ -783,6 +801,14 @@ printleader(struct tcb *tcp)
 	else if (nprocs > 1 && !outfname)
 		tprintf("[pid %5u] ", tcp->pid);
 
+#ifdef USE_SELINUX
+	char *context;
+	if (!selinux_getpidcon(tcp, &context)) {
+		tprintf("[%s] ", context);
+		free(context);
+	}
+#endif
+
 	if (tflag_format) {
 		struct timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts);
@@ -896,6 +922,9 @@ alloctcb(int pid)
 			tcp->pid = pid;
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
+#endif
+#ifdef USE_SELINUX
+			tcp->last_dirfd = AT_FDCWD;
 #endif
 			nprocs++;
 			debug_msg("new tcb for pid %d, active tcbs:%d",
@@ -2037,6 +2066,9 @@ init(int argc, char *argv[])
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_TS,
 		GETOPT_PIDNS_TRANSLATION,
+#ifdef USE_SELINUX
+		GETOPT_SELINUX_CONTEXT,
+#endif
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -2093,6 +2125,9 @@ init(int argc, char *argv[])
 		{ "failed-only",	no_argument,	   0, 'Z' },
 		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
+#ifdef USE_SELINUX
+		{ "secontext",		optional_argument, 0, GETOPT_SELINUX_CONTEXT },
+#endif
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2321,6 +2356,17 @@ init(int argc, char *argv[])
 		case GETOPT_SECCOMP:
 			seccomp_filtering = true;
 			break;
+#ifdef USE_SELINUX
+		case GETOPT_SELINUX_CONTEXT:
+			selinux_context = true;
+			if (optarg) {
+				if (!strcmp(optarg, "full"))
+					selinux_context_full = true;
+				else
+					error_opt_arg(c, lopt, optarg);
+			}
+			break;
+#endif
 		case GETOPT_QUAL_TRACE:
 			qualify_trace(optarg);
 			break;
@@ -2503,6 +2549,11 @@ init(int argc, char *argv[])
 		if (!number_set_array_is_empty(decode_fd_set, 0))
 			error_msg("-y/--decode-fds has no effect "
 				  "with -c/--summary-only");
+#ifdef USE_SELINUX
+		if (selinux_context)
+			error_msg("--secontext has no effect with "
+				  "-c/--summary-only");
+#endif
 	}
 
 	if (!outfname) {

@@ -406,6 +406,16 @@ strace_LDADD += $(libiberty_LIBS)
 endif
 endif
 
+if USE_SELINUX
+libstrace_a_SOURCES +=	\
+	mntns.c		\
+	selinux.c	\
+	selinux.h
+strace_CPPFLAGS += $(libselinux_CPPFLAGS)
+strace_LDFLAGS += $(libselinux_LDFLAGS)
+strace_LDADD += $(libselinux_LIBS)
+endif
+
 strace_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS)
 strace_CFLAGS += $(CODE_COVERAGE_CFLAGS)
 strace_LDADD += $(CODE_COVERAGE_LIBS)

@@ -26,6 +26,7 @@
 #include "largefile_wrappers.h"
 #include "number_set.h"
 #include "print_utils.h"
+#include "selinux.h"
 #include "static_assert.h"
 #include "string_to_uint.h"
 #include "xlat.h"
@@ -664,6 +665,13 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 
 printed:
 		tprints(">");
+#ifdef USE_SELINUX
+		char *context;
+		if (!selinux_getfilecon(tcp, path, &context)) {
+			tprintf(" [%s]", context);
+			free(context);
+		}
+#endif
 	} else {
 		tprintf("%d", fd);
 	}
@@ -959,6 +967,14 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 	else {
 		path[n++] = !nul_seen;
 		print_quoted_cstring(path, n);
+
+#ifdef USE_SELINUX
+		char *context;
+		if (nul_seen && !selinux_getfilecon(tcp, path, &context)) {
+			tprintf(" [%s]", context);
+			free(context);
+		}
+#endif
 	}
 
 	return nul_seen;

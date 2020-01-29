@@ -63,9 +63,11 @@ pushdef([mpers_name], [$1])
 pushdef([MPERS_NAME], translit([$1], [a-z], [A-Z]))
 pushdef([HAVE_MPERS], [HAVE_]MPERS_NAME[_MPERS])
 pushdef([HAVE_RUNTIME], [HAVE_]MPERS_NAME[_RUNTIME])
+pushdef([HAVE_SELINUX_RUNTIME], [HAVE_]MPERS_NAME[_SELINUX_RUNTIME])
 pushdef([MPERS_CFLAGS], [$cc_flags_$1])
 pushdef([st_cv_cc], [st_cv_$1_cc])
 pushdef([st_cv_runtime], [st_cv_$1_runtime])
+pushdef([st_cv_selinux_runtime], [st_cv_$1_selinux_runtime])
 pushdef([st_cv_mpers], [st_cv_$1_mpers])
 
 pushdef([EXEEXT], MPERS_NAME[_EXEEXT])dnl
@@ -126,6 +128,25 @@ case "$arch" in
 			 else
 				st_cv_mpers=no
 			 fi])
+		AS_IF([test "x$with_secontexts$st_cv_mpers$st_cv_runtime" = xyesyesyes],
+			AC_CACHE_CHECK([whether selinux runtime works with mpers_name personality],
+				[st_cv_selinux_runtime],
+				[saved_CPPFLAGS="$CPPFLAGS"
+				 saved_LDFLAGS="$LDFLAGS"
+				 saved_LIBS="$LIBS"
+				 CPPFLAGS="$CPPFLAGS $libselinux_CPPFLAGS"
+				 LDFLAGS="$LDFLAGS $libselinux_LDFLAGS"
+				 LIBS="$LIBS $libselinux_LIBS"
+				 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <selinux/selinux.h>]],
+								 [[return 0]])],
+						[st_cv_selinux_runtime=yes],
+						[st_cv_selinux_runtime=no],
+						[st_cv_selinux_runtime=no])
+				 LIBS="$saved_LIBS"
+				 LDFLAGS="$saved_LDFLAGS"
+				 CPPFLAGS="$saved_CPPFLAGS"
+				]),
+			[st_cv_selinux_runtime=no])
 		if test $st_cv_mpers = yes; then
 			AC_DEFINE(HAVE_MPERS, [1],
 				  [Define to 1 if you have mpers_name mpers support])
@@ -165,6 +186,7 @@ case "$arch" in
 	*) # case "$enable_mpers"
 	st_cv_runtime=no
 	st_cv_mpers=no
+	st_cv_selinux_runtime=no
 	;;
 	esac
 
@@ -187,6 +209,7 @@ case "$arch" in
 esac
 
 AM_CONDITIONAL(HAVE_RUNTIME, [test "$st_cv_mpers$st_cv_runtime" = yesyes])
+AM_CONDITIONAL(HAVE_SELINUX_RUNTIME, [test "$st_cv_mpers$st_cv_selinux_runtime" = yesyes])
 AM_CONDITIONAL(HAVE_MPERS, [test "$st_cv_mpers" = yes])
 
 st_RESTORE_VAR([CC])
@@ -201,9 +224,11 @@ popdef([EXEEXT])dnl
 
 popdef([st_cv_mpers])
 popdef([st_cv_runtime])
+popdef([st_cv_selinux_runtime])
 popdef([st_cv_cc])
 popdef([MPERS_CFLAGS])
 popdef([HAVE_RUNTIME])
+popdef([HAVE_SELINUX_RUNTIME])
 popdef([HAVE_MPERS])
 popdef([MPERS_NAME])
 popdef([mpers_name])

@@ -33,7 +33,9 @@ aarch64|powerpc64|s390x|sparc64|tile|x32)
 	;;
 esac
 
-features="${option_unwind}${option_demangle}${option_m32}${option_mx32}"
+option_secontext=$(get_config_option USE_SELINUX " secontext")
+
+features="${option_unwind}${option_demangle}${option_m32}${option_mx32}${option_secontext}"
 [ -n "$features" ] || features=" (none)"
 
 cat > "$EXP" << __EOF__

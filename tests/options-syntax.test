@@ -3,12 +3,14 @@
 # Check strace options syntax.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2016-2020 The strace developers.
+# Copyright (c) 2016-2021 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/syntax.sh"
+
+compiled_with_secontext=$(get_config_option USE_SELINUX "y")
 
 check_e "Invalid process id: '0'" -p 0
 check_e "Invalid process id: '0'" --attach=0
@@ -46,6 +48,8 @@ check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --ti
 check_e '-t and --absolute-timestamps cannot be provided simultaneously' --absolute-timestamps -ttt -p $$
 check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --timestamps=ns -t -p $$
 check_e '-t and --absolute-timestamps cannot be provided simultaneously' --timestamps=ns -t --absolute-timestamps=unix -p $$
+[ -z "$compiled_with_secontext" ] ||
+	check_h "invalid --secontext argument: 'ss'" --secontext=ss
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDD -p $$
@@ -281,6 +285,11 @@ $STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
 $STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
 $STRACE_EXE: $umsg" -u :nosuchuser: -cinrtTyzZ true
+
+	if [ -n "$compiled_with_secontext" ]; then
+		check_e "--secontext has no effect with -c/--summary-only
+$STRACE_EXE: $umsg" -u :nosuchuser: -c --secontext true
+	fi
 
 	for c in --output-separately -A/--output-append-mode; do
 		check_e "$c has no effect without -o/--output

@@ -24,6 +24,7 @@
 #include "poke.h"
 #include "retval.h"
 #include <limits.h>
+#include <fcntl.h>
 
 /* for struct iovec */
 #include <sys/uio.h>
@@ -1018,6 +1019,10 @@ syscall_exiting_finish(struct tcb *tcp)
 			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED | TCB_TAMPERED_POKED);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
+
+#ifdef USE_SELINUX
+	tcp->last_dirfd = AT_FDCWD;
+#endif
 
 	if (cflag)
 		tcp->ltime = tcp->stime;

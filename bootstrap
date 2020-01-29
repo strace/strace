@@ -24,11 +24,17 @@ for m in m32 mx32; do
 	     s/^MPERS_NAME$s=.*/& $m/;
 	     s/^\\(CC$s=\\).*/\\1 @CC_FOR_${m_upper}@/;
 	     s/^MPERS_CC_FLAGS$s=.*/& @CFLAGS_FOR_${m_upper}@ @cc_flags_$m@/;
-	     s/^ARCH_MFLAGS$s=.*/& -DMPERS_IS_\$(MPERS_NAME) \$(MPERS_CC_FLAGS)/" \
+	     s/^ARCH_MFLAGS$s=.*/& -DMPERS_IS_\$(MPERS_NAME) \$(MPERS_CC_FLAGS)/; \
+	     s/HAVE_SELINUX_RUNTIME/HAVE_${m_upper}_SELINUX_RUNTIME/" \
 		tests/Makefile.am > $tests/Makefile.am
 	for f in tests/*; do
-		case "${f##*/}" in
+		fname="${f##*/}"
+		case "$fname" in
 		Makefile*) continue;;
+		*--secontext.c)
+			sed "s/HAVE_SELINUX_RUNTIME/HAVE_${m_upper}_SELINUX_RUNTIME/" \
+			    "$f" > $tests/"$fname"
+			continue;;
 		esac
 		ln -s ../"$f" $tests/
 	done

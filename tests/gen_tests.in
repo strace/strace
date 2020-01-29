@@ -10,6 +10,8 @@ _newselect-P	 -e trace=_newselect -P /dev/full 9>>/dev/full
 accept	-a22
 accept4	-a37
 access	-a30 --trace-path=access_sample
+access--secontext	-a30 --secontext --trace-path=access_sample -e trace=access
+access--secontext_full	-a30 --secontext=full --trace-path=access_sample -e trace=access
 acct	-a20
 add_key	-a30 -s12
 adjtimex	-a15
@@ -25,6 +27,8 @@ bpf-v	-a20 -v -e trace=bpf
 btrfs	+ioctl.test
 chdir	-a10
 chmod	-a28
+chmod--secontext	-a28 --secontext -e trace=chmod
+chmod--secontext_full	-a28 --secontext=full -e trace=chmod
 chown	-a28
 chown32	-a31
 chroot	-a13
@@ -81,8 +85,14 @@ epoll_pwait2-P	--trace=epoll_pwait2 -P /dev/full
 epoll_pwait2-y	--trace=epoll_pwait2 -y
 epoll_wait	-a26
 erestartsys	-a34 -e signal=none -e trace=recvfrom
+execve--secontext	run_strace_match_grep --secontext --trace=execve
+execve--secontext_full	run_strace_match_grep --secontext=full --trace=execve
 execveat
+execveat--secontext	--secontext -y --trace=execveat
+execveat--secontext_full	--secontext=full -y --trace=execveat
 execveat-v	-v -e trace=execveat
+faccessat--secontext	--secontext -y --trace=faccessat
+faccessat--secontext_full	--secontext=full -y --trace=faccessat
 faccessat-P	-a23 --trace=faccessat -P /dev/full
 faccessat-y	+faccessat.test -a24 -y
 faccessat-yy	+faccessat.test -a24 -yy
@@ -93,21 +103,31 @@ fadvise64_64	+fadvise64.test
 fallocate	-a18
 fanotify_init
 fanotify_mark	-a32
+fanotify_mark--secontext	-a32 --secontext -y -e trace=fanotify_mark
+fanotify_mark--secontext_full	-a32 --secontext=full -y -e trace=fanotify_mark
 fanotify_mark-Xabbrev	-a32 -Xabbrev -e trace=fanotify_mark
 fanotify_mark-Xraw	-a32 -Xraw -e trace=fanotify_mark
 fanotify_mark-Xverbose	-a32 -Xverbose -e trace=fanotify_mark
 fchdir	-a11
 fchmod	-a15
+fchmod--secontext	-a15 --secontext -y -e trace=fchmod
+fchmod--secontext_full	-a15 --secontext=full -y -e trace=fchmod
 fchmodat
+fchmodat--secontext	--secontext -y -e trace=fchmodat
+fchmodat--secontext_full	--secontext=full -y -e trace=fchmodat
 fchown	-a16
 fchown32	-a18
 fchownat
+fchownat--secontext	--secontext -y -e trace=fchownat
+fchownat--secontext_full	--secontext=full -y -e trace=fchownat
 fcntl	-a8
 fcntl--pidns-translation	test_pidns -a8 -e trace=fcntl
 fcntl64	-a8
 fcntl64--pidns-translation	test_pidns -a8 -e trace=fcntl64
 fdatasync	-a14
 file_handle	-e trace=name_to_handle_at,open_by_handle_at
+file_handle--secontext	--secontext -y -e trace=name_to_handle_at,open_by_handle_at
+file_handle--secontext_full	--secontext=full -y -e trace=name_to_handle_at,open_by_handle_at
 filter_seccomp	. "${srcdir=.}/filter_seccomp.sh"; test_prog_set --seccomp-bpf -f
 filter_seccomp-flag	../$NAME
 finit_module	-a25
@@ -352,6 +372,8 @@ lchown	-a30
 lchown32	-a32
 link
 linkat
+linkat--secontext	--secontext -y -e trace=linkat
+linkat--secontext_full	--secontext=full -y -e trace=linkat
 lookup_dcookie	-a27
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
@@ -494,6 +516,8 @@ open	-a30 -P $NAME.sample
 open_tree -a30 -y
 open_tree-P -a30 --decode-fds -P /dev/full -e trace=open_tree
 openat	-a36 -P $NAME.sample
+openat--secontext	-a36 -P openat.sample -P $PWD/openat.sample --secontext -y -e trace=openat
+openat--secontext_full	-a36 -P openat.sample -P $PWD/openat.sample --secontext=full -y -e trace=openat
 openat2	-a35
 openat2-Xabbrev	--trace=openat2 -a35 -Xabbrev
 openat2-Xraw	--trace=openat2 -a32 -Xraw

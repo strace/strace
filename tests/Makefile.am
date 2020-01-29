@@ -77,7 +77,34 @@ LDADD = libtests.a
 
 include pure_executables.am
 
+secontext_EXECUTABLES = \
+	access--secontext \
+	access--secontext_full \
+	chmod--secontext \
+	chmod--secontext_full \
+	execve--secontext \
+	execve--secontext_full \
+	execveat--secontext \
+	execveat--secontext_full \
+	faccessat--secontext \
+	faccessat--secontext_full \
+	fanotify_mark--secontext \
+	fanotify_mark--secontext_full \
+	fchmod--secontext \
+	fchmod--secontext_full \
+	fchmodat--secontext \
+	fchmodat--secontext_full \
+	fchownat--secontext \
+	fchownat--secontext_full \
+	file_handle--secontext \
+	file_handle--secontext_full \
+	linkat--secontext \
+	linkat--secontext_full \
+	openat--secontext \
+	openat--secontext_full
+
 check_PROGRAMS = $(PURE_EXECUTABLES) \
+	$(secontext_EXECUTABLES) \
 	_newselect-P \
 	answer \
 	attach-f-p \
@@ -291,6 +318,37 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	xet_robust_list--pidns-translation \
 	zeroargc \
 	# end of check_PROGRAMS
+
+if HAVE_SELINUX_RUNTIME
+libselinux_LDADD = $(libselinux_LIBS)
+else
+libselinux_LDADD =
+endif
+
+access__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+access__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+chmod__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+chmod__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+execve__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+execve__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+execveat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+execveat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+faccessat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+faccessat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+fanotify_mark__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+fanotify_mark__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+fchmod__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+fchmod__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+fchmodat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+fchmodat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+fchownat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+fchownat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+file_handle__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+file_handle__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+linkat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+linkat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+openat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+openat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 
 attach_f_p_LDADD = -lpthread $(LDADD)
 count_f_LDADD = -lpthread $(LDADD)
@@ -596,6 +654,7 @@ EXTRA_DIST = \
 	run.sh \
 	sched.in \
 	scno_tampering.sh \
+	selinux.c \
 	semop-common.c \
 	semtimedop-common.c \
 	semtimedop-syscall.c \
