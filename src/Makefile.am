@@ -406,6 +406,15 @@ strace_LDADD += $(libiberty_LIBS)
 endif
 endif
 
+if ENABLE_SECONTEXT
+libstrace_a_SOURCES +=	\
+	secontext.c	\
+	secontext.h
+strace_CPPFLAGS += $(libselinux_CPPFLAGS)
+strace_LDFLAGS += $(libselinux_LDFLAGS)
+strace_LDADD += $(libselinux_LIBS)
+endif
+
 strace_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS)
 strace_CFLAGS += $(CODE_COVERAGE_CFLAGS)
 strace_LDADD += $(CODE_COVERAGE_LIBS)

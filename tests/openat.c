@@ -15,6 +15,8 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# include "secontext.h"
+
 # ifdef O_TMPFILE
 /* The kernel & C libraries often inline O_DIRECTORY. */
 #  define STRACE_O_TMPFILE (O_TMPFILE & ~O_DIRECTORY)
@@ -26,10 +28,12 @@ static const char sample[] = "openat.sample";
 
 static void
 test_mode_flag(unsigned int mode_val, const char *mode_str,
-	       unsigned int flag_val, const char *flag_str)
+	       unsigned int flag_val, const char *flag_str,
+	       const char *my_secontext)
 {
 	long rc = syscall(__NR_openat, -1, sample, mode_val | flag_val, 0);
-	printf("openat(-1, \"%s\", %s%s%s%s) = %s\n",
+	printf("%s%s(-1, \"%s\", %s%s%s%s) = %s\n",
+	       my_secontext, "openat",
 	       sample, mode_str,
 	       flag_val ? "|" : "", flag_str,
 	       flag_val & (O_CREAT | STRACE_O_TMPFILE) ? ", 000" : "",
@@ -45,20 +49,7 @@ main(void)
 	 */
 	create_and_enter_subdir("openat_subdir");
 
-	long fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
-	printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400) = %s\n",
-	       sample, sprintrc(fd));
-
-	if (fd != -1) {
-		close(fd);
-		if (unlink(sample) == -1)
-			perror_msg_and_fail("unlink");
-
-		fd = syscall(__NR_openat, -100, sample, O_RDONLY);
-		printf("openat(AT_FDCWD, \"%s\", O_RDONLY) = %s\n",
-		       sample, sprintrc(fd));
-	}
-
+	char *my_secontext = SECONTEXT_PID_MY();
 	struct {
 		unsigned int val;
 		const char *str;
@@ -105,7 +96,73 @@ main(void)
 	for (unsigned int m = 0; m < ARRAY_SIZE(modes); ++m)
 		for (unsigned int f = 0; f < ARRAY_SIZE(flags); ++f)
 			test_mode_flag(modes[m].val, modes[m].str,
-				       flags[f].val, flags[f].str);
+				       flags[f].val, flags[f].str,
+				       my_secontext);
+
+	/*
+	 * Tests with AT_FDCWD.
+	 */
+
+	(void) unlink(sample);
+	long fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
+
+	char *sample_secontext = SECONTEXT_FILE(sample);
+
+	/*
+	 * File context in openat() is not displayed because file doesn't exist
+	 * yet, but is displayed in return value since the file got created.
+	 */
+	printf("%s%s(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+	       my_secontext, "openat",
+	       sample,
+	       sprintrc(fd), sample_secontext);
+
+	close(fd);
+
+	fd = syscall(__NR_openat, -100, sample, O_RDONLY);
+	printf("%s%s(AT_FDCWD, \"%s\"%s, O_RDONLY) = %s%s\n",
+	       my_secontext, "openat",
+	       sample, sample_secontext,
+	       sprintrc(fd), sample_secontext);
+	if (fd != -1) {
+		close(fd);
+		if (unlink(sample))
+			perror_msg_and_fail("unlink");
+	}
+
+	/*
+	 * Tests with dirfd.
+	 */
+
+	int cwd_fd = get_dir_fd(".");
+	char *cwd_secontext = SECONTEXT_FILE(".");
+
+	fd = syscall(__NR_openat, cwd_fd, sample, O_RDONLY|O_CREAT, 0400);
+	if (fd == -1)
+		perror_msg_and_fail("openat");
+	close(fd);
+
+	/*
+	 * File context in openat() is not displayed because file doesn't exist
+	 * yet, but is displayed in return value since the file got created.
+	 */
+	printf("%s%s(%d%s, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       sample,
+	       sprintrc(fd), sample_secontext);
+
+	fd = syscall(__NR_openat, cwd_fd, sample, O_RDONLY);
+	printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+	       my_secontext, "openat",
+	       cwd_fd, cwd_secontext,
+	       sample, sample_secontext,
+	       sprintrc(fd), sample_secontext);
+	if (fd != -1) {
+		close(fd);
+		if (unlink(sample))
+			perror_msg_and_fail("unlink");
+	}
 
 	leave_and_remove_subdir();
 

@@ -11,7 +11,7 @@
 
 check_prog grep
 run_prog > /dev/null
-run_strace -eexecve $args > "$EXP"
+run_strace -eexecve "$@" $args > "$EXP"
 
 # Filter out execve() call made by strace.
 grep -F test.execve < "$LOG" > "$OUT"

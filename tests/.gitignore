@@ -1,3 +1,7 @@
+*--secontext
+*--secontext.c
+*--secontext_full
+*--secontext_full.c
 *.dir
 *.gen.test
 *.log
@@ -711,6 +715,7 @@ seccomp-filter
 seccomp-filter-v
 seccomp-strict
 seccomp_get_action_avail
+secontext.am
 select
 select-P
 semop

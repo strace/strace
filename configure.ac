@@ -619,6 +619,8 @@ AC_CHECK_TOOL([READELF], [readelf])
 
 st_STACKTRACE
 
+st_SELINUX
+
 if test "$arch" = mips && test "$no_create" != yes; then
 	mkdir -p src/linux/mips
 	if $srcdir/src/linux/mips/genstub.sh \

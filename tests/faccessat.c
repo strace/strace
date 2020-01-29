@@ -12,12 +12,16 @@
 
 #ifdef __NR_faccessat
 
-# include "xmalloc.h"
 # include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
 
-# ifndef FD_PATH
+# include "secontext.h"
+# include "xmalloc.h"
+
+# ifdef FD_PATH
+#  define YFLAG
+# else
 #  define FD_PATH ""
 # endif
 # ifndef SKIP_IF_PROC_IS_UNAVAILABLE
@@ -43,10 +47,129 @@ k_faccessat(const unsigned int dirfd,
 	return rc;
 }
 
+# ifndef PATH_TRACING
+static void
+tests_with_existing_file(void)
+{
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("faccessat_subdir");
+
+	char *my_secontext = SECONTEXT_PID_MY();
+
+	k_faccessat(-1, NULL, F_OK);
+	printf("%s%s(-1, NULL, F_OK) = %s\n",
+	       my_secontext, "faccessat", errstr);
+
+	static const char sample[] = "faccessat_sample";
+	(void) unlink(sample);
+	int fd = open(sample, O_CREAT|O_RDONLY, 0400);
+	if (fd == -1)
+		perror_msg_and_fail("open");
+	close(fd);
+	char *sample_secontext = SECONTEXT_FILE(sample);
+
+	/*
+	 * Tests with AT_FDCWD.
+	 */
+
+	k_faccessat(-100, sample, F_OK);
+	printf("%s%s(AT_FDCWD, \"%s\"%s, F_OK) = %s\n",
+	       my_secontext, "faccessat",
+	       sample, sample_secontext,
+	       errstr);
+
+	if (unlink(sample))
+		perror_msg_and_fail("unlink");
+
+	k_faccessat(-100, sample, F_OK);
+	printf("%s%s(AT_FDCWD, \"%s\", F_OK) = %s\n",
+	       my_secontext, "faccessat",
+	       sample,
+	       errstr);
+
+	/*
+	 * Tests with dirfd.
+	 */
+
+	int cwd_fd = get_dir_fd(".");
+	char *cwd = get_fd_path(cwd_fd);
+	char *cwd_secontext = SECONTEXT_FILE(".");
+	char *sample_realpath = xasprintf("%s/%s", cwd, sample);
+
+	/* no file */
+	k_faccessat(cwd_fd, sample, F_OK);
+#  ifdef YFLAG
+	printf("%s%s(%d<%s>%s, \"%s\", F_OK) = %s\n",
+#  else
+	printf("%s%s(%d%s, \"%s\", F_OK) = %s\n",
+#  endif
+	       my_secontext, "faccessat",
+	       cwd_fd,
+#  ifdef YFLAG
+	       cwd,
+#  endif
+	       cwd_secontext,
+	       sample,
+	       errstr);
+
+	fd = open(sample, O_CREAT|O_RDONLY, 0400);
+	if (fd == -1)
+		perror_msg_and_fail("open");
+	close(fd);
+
+	k_faccessat(cwd_fd, sample, F_OK);
+#  ifdef YFLAG
+	printf("%s%s(%d<%s>%s, \"%s\"%s, F_OK) = %s\n",
+#  else
+	printf("%s%s(%d%s, \"%s\"%s, F_OK) = %s\n",
+#  endif
+	       my_secontext, "faccessat",
+	       cwd_fd,
+#  ifdef YFLAG
+	       cwd,
+#  endif
+	       cwd_secontext,
+	       sample, sample_secontext,
+	       errstr);
+
+	/* cwd_fd ignored when path is absolute */
+	if (chdir("../.."))
+		perror_msg_and_fail("chdir");
+
+	k_faccessat(cwd_fd, sample_realpath, F_OK);
+#  ifdef YFLAG
+	printf("%s%s(%d<%s>%s, \"%s\"%s, F_OK) = %s\n",
+#  else
+	printf("%s%s(%d%s, \"%s\"%s, F_OK) = %s\n",
+#  endif
+	       my_secontext, "faccessat",
+	       cwd_fd,
+#  ifdef YFLAG
+	       cwd,
+#  endif
+	       cwd_secontext,
+	       sample_realpath, sample_secontext,
+	       errstr);
+
+	if (fchdir(cwd_fd))
+		perror_msg_and_fail("fchdir");
+
+	if (unlink(sample))
+		perror_msg_and_fail("unlink");
+
+	leave_and_remove_subdir();
+}
+# endif
+
 int
 main(void)
 {
 	SKIP_IF_PROC_IS_UNAVAILABLE;
+
+# ifndef TEST_SECONTEXT
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(const char, unterminated);
 	char *unterminated_str = xasprintf("%p", unterminated);
@@ -120,10 +243,10 @@ main(void)
 				k_faccessat(dirfds[dirfd_i].val,
 					    paths[path_i].val,
 					    modes[mode_i].val);
-# ifdef PATH_TRACING
+#  ifdef PATH_TRACING
 				if (dirfds[dirfd_i].val == fd ||
 				    paths[path_i].val == fd_path)
-# endif
+#  endif
 				printf("faccessat(%s, %s, %s) = %s\n",
 				       dirfds[dirfd_i].str,
 				       paths[path_i].str,
@@ -132,6 +255,12 @@ main(void)
 			}
 		}
 	}
+
+# endif /* !TEST_SECONTEXT */
+
+# ifndef PATH_TRACING
+	tests_with_existing_file();
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

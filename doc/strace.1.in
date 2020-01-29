@@ -53,6 +53,7 @@ strace \- trace system calls and signals
 .OM \-P path
 .OM \-p pid
 .OP \-\-seccomp\-bpf
+.if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=full]
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -1084,6 +1085,14 @@ and PIDs associated with pidfd file descriptors.
 .B \-\-pidns\-translation
 If strace and tracee are in different PID namespaces, print PIDs in
 strace's namespace, too.
+.if '@ENABLE_SECONTEXT_FALSE@'#' .TP
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext "[=full]"
+.if '@ENABLE_SECONTEXT_FALSE@'#' When SELinux is available and is not disabled,
+.if '@ENABLE_SECONTEXT_FALSE@'#' print in square brackets SELinux contexts of
+.if '@ENABLE_SECONTEXT_FALSE@'#' processes, files, and descriptors.  When
+.if '@ENABLE_SECONTEXT_FALSE@'#' .B full
+.if '@ENABLE_SECONTEXT_FALSE@'#' is specified, print the complete context (user,
+.if '@ENABLE_SECONTEXT_FALSE@'#' role, type and category) instead of just the type.
 .SS Statistics
 .TP 12
 .B \-c

@@ -31,6 +31,12 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -DTESTS_SIZEOF_LONG=$(SIZEOF_LONG)
 AM_LDFLAGS = $(ARCH_MFLAGS)
 
+if HAVE_SELINUX_RUNTIME
+libselinux_LDADD = $(libselinux_LIBS)
+else
+libselinux_LDADD =
+endif
+
 libtests_a_SOURCES = \
 	create_nl_socket.c \
 	create_tmpfile.c \
@@ -57,6 +63,8 @@ libtests_a_SOURCES = \
 	printxval-Xabbrev.c \
 	printxval-Xraw.c \
 	printxval-Xverbose.c \
+	secontext.c \
+	secontext.h \
 	signal2name.c \
 	skip_unavailable.c \
 	sprintrc.c \
@@ -79,7 +87,10 @@ LDADD = libtests.a
 
 include pure_executables.am
 
+include secontext.am
+
 check_PROGRAMS = $(PURE_EXECUTABLES) \
+	$(secontext_EXECUTABLES) \
 	_newselect-P \
 	answer \
 	attach-f-p \

@@ -18,6 +18,8 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# include "secontext.h"
+
 int
 main(void)
 {
@@ -26,6 +28,8 @@ main(void)
 	 * is different from the current workdir of the tracer.
 	 */
 	create_and_enter_subdir("fchmod_subdir");
+
+	char *my_secontext = SECONTEXT_PID_MY();
 
 	static const char sample[] = "fchmod_sample_file";
 	(void) unlink(sample);
@@ -37,16 +41,19 @@ main(void)
 	char *sample_realpath = get_fd_path(fd);
 # endif
 
+	const char *sample_secontext = SECONTEXT_FILE(sample);
 	long rc = syscall(__NR_fchmod, fd, 0600);
 # ifdef YFLAG
-	printf("fchmod(%d<%s>, 0600) = %s\n",
+	printf("%s%s(%d<%s>%s, 0600) = %s\n",
 # else
-	printf("fchmod(%d, 0600) = %s\n",
+	printf("%s%s(%d%s, 0600) = %s\n",
 # endif
+	       my_secontext, "fchmod",
 	       fd,
 # ifdef YFLAG
 	       sample_realpath,
 # endif
+	       sample_secontext,
 	       sprintrc(rc));
 
 	if (unlink(sample))
@@ -54,26 +61,30 @@ main(void)
 
 	rc = syscall(__NR_fchmod, fd, 051);
 # ifdef YFLAG
-	printf("fchmod(%d<%s (deleted)>, 051) = %s\n",
+	printf("%s%s(%d<%s (deleted)>%s, 051) = %s\n",
 # else
-	printf("fchmod(%d, 051) = %s\n",
+	printf("%s%s(%d%s, 051) = %s\n",
 # endif
+	       my_secontext, "fchmod",
 	       fd,
 # ifdef YFLAG
 	       sample_realpath,
 # endif
+	       sample_secontext,
 	       sprintrc(rc));
 
 	rc = syscall(__NR_fchmod, fd, 004);
 # ifdef YFLAG
-	printf("fchmod(%d<%s (deleted)>, 004) = %s\n",
+	printf("%s%s(%d<%s (deleted)>%s, 004) = %s\n",
 # else
-	printf("fchmod(%d, 004) = %s\n",
+	printf("%s%s(%d%s, 004) = %s\n",
 # endif
+	       my_secontext, "fchmod",
 	       fd,
 # ifdef YFLAG
 	       sample_realpath,
 # endif
+	       sample_secontext,
 	       sprintrc(rc));
 
 	leave_and_remove_subdir();

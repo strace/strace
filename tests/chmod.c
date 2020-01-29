@@ -16,6 +16,8 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# include "secontext.h"
+
 int
 main(void)
 {
@@ -25,22 +27,33 @@ main(void)
 	 */
 	create_and_enter_subdir("chmod_subdir");
 
-	static const char fname[] = "chmod_test_file";
+	char *my_secontext = SECONTEXT_PID_MY();
 
-	if (open(fname, O_CREAT|O_RDONLY, 0400) < 0)
-		perror_msg_and_fail("open");
+	static const char sample[] = "chmod_test_file";
+	(void) unlink(sample);
+	if (open(sample, O_CREAT|O_RDONLY, 0400) < 0)
+		perror_msg_and_fail("open: %s", sample);
 
-	long rc = syscall(__NR_chmod, fname, 0600);
-	printf("chmod(\"%s\", 0600) = %s\n", fname, sprintrc(rc));
+	long rc = syscall(__NR_chmod, sample, 0600);
+	printf("%s%s(\"%s\"%s, 0600) = %s\n",
+	       my_secontext, "chmod",
+	       sample, SECONTEXT_FILE(sample),
+	       sprintrc(rc));
 
-	if (unlink(fname))
-		perror_msg_and_fail("unlink");
+	if (unlink(sample))
+		perror_msg_and_fail("unlink: %s", sample);
 
-	rc = syscall(__NR_chmod, fname, 051);
-	printf("chmod(\"%s\", 051) = %s\n", fname, sprintrc(rc));
+	rc = syscall(__NR_chmod, sample, 051);
+	printf("%s%s(\"%s\", 051) = %s\n",
+	       my_secontext, "chmod",
+	       sample,
+	       sprintrc(rc));
 
-	rc = syscall(__NR_chmod, fname, 004);
-	printf("chmod(\"%s\", 004) = %s\n", fname, sprintrc(rc));
+	rc = syscall(__NR_chmod, sample, 004);
+	printf("%s%s(\"%s\", 004) = %s\n",
+	       my_secontext, "chmod",
+	       sample,
+	       sprintrc(rc));
 
 	leave_and_remove_subdir();
 

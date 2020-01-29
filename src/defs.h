@@ -293,6 +293,10 @@ struct tcb {
 	 */
 	unsigned int pid_ns;
 
+#ifdef ENABLE_SECONTEXT
+	int last_dirfd; /* Use AT_FDCWD for 'not set' */
+#endif
+
 	struct mmap_cache_t *mmap_cache;
 
 	/*
@@ -1164,6 +1168,11 @@ extern void print_ax25_addr(const void /* ax25_address */ *addr);
 extern void print_x25_addr(const void /* struct x25_address */ *addr);
 extern const char *get_sockaddr_by_inode(struct tcb *, int fd, unsigned long inode);
 extern bool print_sockaddr_by_inode(struct tcb *, int fd, unsigned long inode);
+
+/**
+ * Prints dirfd file descriptor and saves it in tcp->last_dirfd,
+ * the latter is used when printing SELinux contexts.
+ */
 extern void print_dirfd(struct tcb *, int);
 
 extern int

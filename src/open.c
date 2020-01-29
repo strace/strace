@@ -33,6 +33,9 @@ print_dirfd(struct tcb *tcp, int fd)
 		print_xlat_d(AT_FDCWD);
 	else
 		printfd(tcp, fd);
+#ifdef ENABLE_SECONTEXT
+	tcp->last_dirfd = fd;
+#endif
 }
 
 /*

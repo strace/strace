@@ -15,5 +15,5 @@ run_prog > /dev/null
 run_strace -a23 --trace=faccessat "$@" $args > "$EXP"
 
 # Filter out faccessat() calls made by ld.so and libc.
-sed -n '/^faccessat(-1, NULL,/,$p' < "$LOG" > "$OUT"
+sed -n '/faccessat(-1, NULL,/,$p' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

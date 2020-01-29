@@ -21,6 +21,8 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# include "secontext.h"
+
 enum assert_rc {
 	ASSERT_NONE,
 	ASSERT_SUCCESS,
@@ -48,6 +50,7 @@ print_handle_data(unsigned char *bytes, unsigned int size)
 		printf("...");
 }
 
+# ifndef TEST_SECONTEXT
 void
 do_name_to_handle_at(kernel_ulong_t dirfd, const char *dirfd_str,
 		     kernel_ulong_t pathname, const char *pathname_str,
@@ -129,6 +132,7 @@ do_open_by_handle_at(kernel_ulong_t mount_fd,
 
 	printf("%s\n", sprintrc(rc));
 }
+# endif /* !TEST_SECONTEXT */
 
 struct strval {
 	kernel_ulong_t val;
@@ -141,12 +145,86 @@ struct strval {
 int
 main(void)
 {
+	char *my_secontext = SECONTEXT_PID_MY();
 	enum {
 		PATH1_SIZE = 64,
 	};
 
 	static const kernel_ulong_t fdcwd =
 		(kernel_ulong_t) 0x87654321ffffff9cULL;
+
+	struct file_handle *handle =
+		tail_alloc(sizeof(struct file_handle) + MAX_HANDLE_SZ);
+	struct file_handle *handle_0 =
+		tail_alloc(sizeof(struct file_handle) + 0);
+	struct file_handle *handle_8 =
+		tail_alloc(sizeof(struct file_handle) + 8);
+	struct file_handle *handle_128 =
+		tail_alloc(sizeof(struct file_handle) + 128);
+	struct file_handle *handle_256 =
+		tail_alloc(sizeof(struct file_handle) + 256);
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, bogus_mount_id);
+
+	char handle_0_addr[sizeof("0x") + sizeof(void *) * 2];
+
+	const int flags = 0x400;
+	int mount_id;
+
+	handle_0->handle_bytes = 256;
+	handle_8->handle_bytes = 0;
+	handle_128->handle_bytes = 128;
+	handle_256->handle_bytes = 256;
+
+	fill_memory((char *) handle_128 + sizeof(struct file_handle), 128);
+	fill_memory((char *) handle_256 + sizeof(struct file_handle), 256);
+
+	snprintf(handle_0_addr, sizeof(handle_0_addr), "%p",
+		handle_0 + sizeof(struct file_handle));
+
+	handle->handle_bytes = 0;
+
+	char path[] = ".";
+	char *path_secontext = SECONTEXT_FILE(path);
+
+	assert(syscall(__NR_name_to_handle_at, fdcwd, path, handle, &mount_id,
+		flags | 1) == -1);
+	if (EINVAL != errno)
+		perror_msg_and_skip("name_to_handle_at");
+	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0}, %p"
+	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (%m)\n",
+	       my_secontext, "name_to_handle_at",
+	       path, path_secontext,
+	       &mount_id);
+
+	assert(syscall(__NR_name_to_handle_at, fdcwd, path, handle, &mount_id,
+		flags) == -1);
+	if (EOVERFLOW != errno)
+		perror_msg_and_skip("name_to_handle_at");
+	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0 => %u}"
+	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW (%m)\n",
+	       my_secontext, "name_to_handle_at",
+	       path, path_secontext,
+	       handle->handle_bytes, &mount_id);
+
+	assert(syscall(__NR_name_to_handle_at, fdcwd, path, handle, &mount_id,
+		flags) == 0);
+	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=%u"
+	       ", handle_type=%d, f_handle=",
+	       my_secontext, "name_to_handle_at",
+	       path, path_secontext,
+	       handle->handle_bytes, handle->handle_type);
+	print_handle_data(handle->f_handle, handle->handle_bytes);
+	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
+
+	printf("%s%s(-1, {handle_bytes=%u, handle_type=%d, f_handle=",
+	       my_secontext, "open_by_handle_at",
+	       handle->handle_bytes, handle->handle_type);
+	print_handle_data(handle->f_handle, handle->handle_bytes);
+	int rc = syscall(__NR_open_by_handle_at, -1, handle,
+		O_RDONLY | O_DIRECTORY);
+	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
+
+# ifndef TEST_SECONTEXT
 	static const struct strval dirfds[] = {
 		{ (kernel_ulong_t) 0xdeadca57badda7a1ULL, "-1159878751" },
 		{ (kernel_ulong_t) 0x12345678ffffff9cULL, "AT_FDCWD" },
@@ -171,28 +249,10 @@ main(void)
 	};
 
 	static const char str64[] = STR64;
-
-
 	char *bogus_path1 = tail_memdup(str64, PATH1_SIZE);
 	char *bogus_path2 = tail_memdup(str64, sizeof(str64));
-
-	struct file_handle *handle =
-		tail_alloc(sizeof(struct file_handle) + MAX_HANDLE_SZ);
-	struct file_handle *handle_0 =
-		tail_alloc(sizeof(struct file_handle) + 0);
-	struct file_handle *handle_8 =
-		tail_alloc(sizeof(struct file_handle) + 8);
-	struct file_handle *handle_128 =
-		tail_alloc(sizeof(struct file_handle) + 128);
-	struct file_handle *handle_256 =
-		tail_alloc(sizeof(struct file_handle) + 256);
-	TAIL_ALLOC_OBJECT_CONST_PTR(int, bogus_mount_id);
-
-	char handle_0_addr[sizeof("0x") + sizeof(void *) * 2];
-
 	char bogus_path1_addr[sizeof("0x") + sizeof(void *) * 2];
 	char bogus_path1_after_addr[sizeof("0x") + sizeof(void *) * 2];
-
 
 	struct strval paths[] = {
 		{ (kernel_ulong_t) 0, "NULL" },
@@ -229,61 +289,15 @@ main(void)
 		(kernel_ulong_t) (uintptr_t) bogus_mount_id,
 	};
 
-	const int flags = 0x400;
-	int mount_id;
 	unsigned int i;
 	unsigned int j;
 	unsigned int k;
 	unsigned int l;
 	unsigned int m;
 
-
 	snprintf(bogus_path1_addr, sizeof(bogus_path1_addr), "%p", bogus_path1);
 	snprintf(bogus_path1_after_addr, sizeof(bogus_path1_after_addr), "%p",
 		bogus_path1 + PATH1_SIZE);
-
-	handle_0->handle_bytes = 256;
-	handle_8->handle_bytes = 0;
-	handle_128->handle_bytes = 128;
-	handle_256->handle_bytes = 256;
-
-	fill_memory((char *) handle_128 + sizeof(struct file_handle), 128);
-	fill_memory((char *) handle_256 + sizeof(struct file_handle), 256);
-
-	snprintf(handle_0_addr, sizeof(handle_0_addr), "%p",
-		handle_0 + sizeof(struct file_handle));
-
-	handle->handle_bytes = 0;
-
-	assert(syscall(__NR_name_to_handle_at, fdcwd, ".", handle, &mount_id,
-		flags | 1) == -1);
-	if (EINVAL != errno)
-		perror_msg_and_skip("name_to_handle_at");
-	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=0}, %p"
-	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (%m)\n", &mount_id);
-
-	assert(syscall(__NR_name_to_handle_at, fdcwd, ".", handle, &mount_id,
-		flags) == -1);
-	if (EOVERFLOW != errno)
-		perror_msg_and_skip("name_to_handle_at");
-	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=0 => %u}"
-	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW (%m)\n",
-	       handle->handle_bytes, &mount_id);
-
-	assert(syscall(__NR_name_to_handle_at, fdcwd, ".", handle, &mount_id,
-		flags) == 0);
-	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=%u"
-	       ", handle_type=%d, f_handle=",
-	       handle->handle_bytes, handle->handle_type);
-	print_handle_data(handle->f_handle, handle->handle_bytes);
-	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
-
-	printf("open_by_handle_at(-1, {handle_bytes=%u, handle_type=%d"
-	       ", f_handle=", handle->handle_bytes, handle->handle_type);
-	print_handle_data(handle->f_handle, handle->handle_bytes);
-	int rc = syscall(__NR_open_by_handle_at, -1, handle,
-		O_RDONLY | O_DIRECTORY);
-	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
 
 	for (i = 0; i < ARRAY_SIZE(dirfds); i++) {
 		for (j = 0; j < ARRAY_SIZE(paths); j++) {
@@ -320,6 +334,68 @@ main(void)
 			}
 		}
 	}
+# endif
+
+	/*
+	 * Tests with dirfd.
+	 */
+
+	int cwd_fd = get_dir_fd(".");
+	char *cwd = get_fd_path(cwd_fd);
+	char *cwd_secontext = SECONTEXT_FILE(".");
+
+	assert(syscall(__NR_name_to_handle_at, cwd_fd, path, handle, &mount_id,
+		flags) == 0);
+	printf("%s%s(%d%s, \"%s\"%s, {handle_bytes=%u, handle_type=%d"
+	       ", f_handle=",
+	       my_secontext, "name_to_handle_at",
+	       cwd_fd, cwd_secontext,
+	       path, path_secontext,
+	       handle->handle_bytes, handle->handle_type);
+	print_handle_data((unsigned char *) handle +
+			  sizeof(struct file_handle),
+			  handle->handle_bytes);
+	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
+
+	printf("%s%s(-1, {handle_bytes=%u, handle_type=%d, f_handle=",
+	       my_secontext, "open_by_handle_at",
+	       handle->handle_bytes, handle->handle_type);
+	print_handle_data((unsigned char *) handle +
+			  sizeof(struct file_handle),
+			  handle->handle_bytes);
+	rc = syscall(__NR_open_by_handle_at, -1, handle,
+		O_RDONLY | O_DIRECTORY);
+	printf("}, O_RDONLY|O_DIRECTORY) = %s\n", sprintrc(rc));
+
+	/* cwd_fd ignored when path is absolute */
+	if (chdir(".."))
+		perror_msg_and_fail("chdir");
+
+	assert(syscall(__NR_name_to_handle_at, cwd_fd, cwd, handle, &mount_id,
+		flags) == 0);
+	printf("%s%s(%d%s, \"%s\"%s, {handle_bytes=%u"
+	       ", handle_type=%d, f_handle=",
+	       my_secontext, "name_to_handle_at",
+	       cwd_fd, cwd_secontext,
+	       cwd, cwd_secontext,
+	       handle->handle_bytes, handle->handle_type);
+	print_handle_data((unsigned char *) handle +
+			  sizeof(struct file_handle),
+			  handle->handle_bytes);
+	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
+
+	printf("%s%s(-1, {handle_bytes=%u, handle_type=%d, f_handle=",
+	       my_secontext, "open_by_handle_at",
+	       handle->handle_bytes, handle->handle_type);
+	print_handle_data((unsigned char *) handle +
+			  sizeof(struct file_handle),
+			  handle->handle_bytes);
+	rc = syscall(__NR_open_by_handle_at, -1, handle,
+		O_RDONLY | O_DIRECTORY);
+	printf("}, O_RDONLY|O_DIRECTORY) = %s\n", sprintrc(rc));
+
+	if (fchdir(cwd_fd))
+		perror_msg_and_fail("fchdir");
 
 	puts("+++ exited with 0 +++");
 	return 0;
