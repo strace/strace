@@ -768,6 +768,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 
 #include "xlat/v4l2_control_types.h"
 #include "xlat/v4l2_control_flags.h"
+#include "xlat/v4l2_control_query_flags.h"
 
 static int
 print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -789,7 +790,6 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (entering(tcp) || get_tcb_priv_ulong(tcp)) {
-#ifdef V4L2_CTRL_FLAG_NEXT_CTRL
 		const unsigned long next = c.id & V4L2_CTRL_FLAG_NEXT_CTRL;
 		set_tcb_priv_ulong(tcp, next);
 		if (next) {
@@ -797,7 +797,6 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 			tprints("|");
 			c.id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
 		}
-#endif
 		printxval(v4l2_control_ids, c.id, "V4L2_CID_???");
 	}
 
