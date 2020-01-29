@@ -862,7 +862,6 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
-#ifdef VIDIOC_S_EXT_CTRLS
 static bool
 print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
@@ -870,14 +869,13 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 
 	tprints("{id=");
 	printxval(v4l2_control_ids, p->id, "V4L2_CID_???");
-# if HAVE_STRUCT_V4L2_EXT_CONTROL_STRING
 	tprintf(", size=%u", p->size);
 	if (p->size > 0) {
 		tprints(", string=");
 		printstrn(tcp, ptr_to_kulong(p->string), p->size);
-	} else
-# endif
-	tprintf(", value=%d, value64=%" PRId64, p->value, (int64_t) p->value64);
+	} else {
+		tprintf(", value=%d, value64=%" PRId64, p->value, p->value64);
+	}
 	tprints("}");
 
 	return true;
@@ -930,7 +928,6 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	/* entering */
 	return 0;
 }
-#endif /* VIDIOC_S_EXT_CTRLS */
 
 #ifdef VIDIOC_ENUM_FRAMESIZES
 # include "xlat/v4l2_framesize_types.h"
@@ -1131,13 +1128,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_CROP: /* W */
 		return print_v4l2_crop(tcp, arg, code == VIDIOC_G_CROP);
 
-#ifdef VIDIOC_S_EXT_CTRLS
 	case VIDIOC_S_EXT_CTRLS: /* RW */
 	case VIDIOC_TRY_EXT_CTRLS: /* RW */
 	case VIDIOC_G_EXT_CTRLS: /* RW */
 		return print_v4l2_ext_controls(tcp, arg,
 					       code == VIDIOC_G_EXT_CTRLS);
-#endif /* VIDIOC_S_EXT_CTRLS */
 
 #ifdef VIDIOC_ENUM_FRAMESIZES
 	case VIDIOC_ENUM_FRAMESIZES: /* RW */

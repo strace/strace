@@ -16,8 +16,6 @@
 #include <linux/videodev2.h>
 
 typedef struct v4l2_buffer struct_v4l2_buffer;
-typedef struct v4l2_ext_control struct_v4l2_ext_control;
-typedef struct v4l2_ext_controls struct_v4l2_ext_controls;
 typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
 typedef struct v4l2_input struct_v4l2_input;
 typedef struct v4l2_standard struct_v4l2_standard;
@@ -160,6 +158,43 @@ typedef struct {
 		uint8_t raw_data[200];
 	} fmt;
 } struct_v4l2_format;
+
+
+/** Added by Linux v5.5-rc1~143^2^2~225 */
+typedef struct {
+	__u32   width;
+	__u32   height;
+} struct_v4l2_area;
+
+/** Added by Linux commit v2.6.18-rc1~862^2~18 */
+typedef struct {
+        uint32_t id;
+        uint32_t size; /* Added by v2.6.32-rc1~679^2~72 */
+        uint32_t reserved2[1];
+        union {
+                int32_t value;
+                int64_t value64;
+                char * string;             /**< Added by v2.6.32-rc1~679^2~72 */
+                uint8_t * p_u8;            /**< Added by v3.17-rc1~112^2~343 */
+                uint16_t * p_u16;          /**< Added by v3.17-rc1~112^2~343 */
+                uint32_t * p_u32;          /**< Added by v3.17-rc1~112^2~112 */
+                struct_v4l2_area * p_area; /**< Added by v5.5-rc1~143^2^2~51 */
+                void * ptr;                /**< Added by v3.17-rc1~112^2~363 */
+        };
+} ATTRIBUTE_PACKED struct_v4l2_ext_control;
+
+/** Added by Linux commit v2.6.18-rc1~862^2~18 */
+typedef struct {
+        union {
+		uint32_t ctrl_class;
+		uint32_t which;
+	};
+        uint32_t count;
+	uint32_t error_idx;
+	int32_t  request_fd; /**< Added by Linux commit v4.20-rc1~51^2~44 */
+	uint32_t reserved[1];
+	struct_v4l2_ext_control * controls;
+} struct_v4l2_ext_controls;
 
 
 typedef struct {
