@@ -198,6 +198,52 @@ typedef struct {
 
 
 typedef struct {
+	uint32_t width;
+	uint32_t height;
+} struct_v4l2_frmsize_discrete;
+
+typedef struct {
+	uint32_t min_width;
+	uint32_t max_width;
+	uint32_t step_width;
+	uint32_t min_height;
+	uint32_t max_height;
+	uint32_t step_height;
+} struct_v4l2_frmsize_stepwise;
+
+/** Added by Linux commit v2.6.19-rc1~183 */
+typedef struct {
+	uint32_t index;
+	uint32_t pixel_format;
+	uint32_t type; /**< enum v4l2_frmsizetypes */
+	union {
+		struct_v4l2_frmsize_discrete discrete;
+		struct_v4l2_frmsize_stepwise stepwise;
+	};
+	uint32_t reserved[2];
+} struct_v4l2_frmsizeenum;
+
+typedef struct {
+	struct v4l2_fract min;
+	struct v4l2_fract max;
+	struct v4l2_fract step;
+} struct_v4l2_frmival_stepwise;
+
+typedef struct {
+	uint32_t index;
+	uint32_t pixel_format;
+	uint32_t width;
+	uint32_t height;
+	uint32_t type; /**< enum v4l2_frmivaltypes */
+	union {
+		struct v4l2_fract		discrete;
+		struct_v4l2_frmival_stepwise	stepwise;
+	};
+	uint32_t reserved[2];
+} struct_v4l2_frmivalenum;
+
+
+typedef struct {
 	uint32_t index;
 	uint32_t count;
 	uint32_t memory;

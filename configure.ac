@@ -816,6 +816,8 @@ AC_CHECK_DECLS(m4_normalize([
 
 AC_CHECK_TYPES(m4_normalize([
 	struct v4l2_create_buffers,
+	struct v4l2_frmsizeenum,
+	struct v4l2_frmivalenum,
 	struct v4l2_meta_format,
 	struct v4l2_pix_format_mplane,
 	struct v4l2_plane_pix_format,

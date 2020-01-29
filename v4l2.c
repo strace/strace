@@ -60,6 +60,12 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 #endif
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
+#ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
+#endif
+#ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmivalenum);
+#endif
 #ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #endif
@@ -929,13 +935,12 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	return 0;
 }
 
-#ifdef VIDIOC_ENUM_FRAMESIZES
-# include "xlat/v4l2_framesize_types.h"
+#include "xlat/v4l2_framesize_types.h"
 
 static int
 print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_frmsizeenum s;
+	struct_v4l2_frmsizeenum s;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -967,15 +972,13 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
-#endif /* VIDIOC_ENUM_FRAMESIZES */
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
-# include "xlat/v4l2_frameinterval_types.h"
+#include "xlat/v4l2_frameinterval_types.h"
 
 static int
 print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_frmivalenum f;
+	struct_v4l2_frmivalenum f;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -1011,7 +1014,6 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
 
 static int
 print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -1134,15 +1136,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		return print_v4l2_ext_controls(tcp, arg,
 					       code == VIDIOC_G_EXT_CTRLS);
 
-#ifdef VIDIOC_ENUM_FRAMESIZES
 	case VIDIOC_ENUM_FRAMESIZES: /* RW */
 		return print_v4l2_frmsizeenum(tcp, arg);
-#endif /* VIDIOC_ENUM_FRAMESIZES */
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
 	case VIDIOC_ENUM_FRAMEINTERVALS: /* RW */
 		return print_v4l2_frmivalenum(tcp, arg);
-#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
 
 	case VIDIOC_CREATE_BUFS: /* RW */
 		return print_v4l2_create_buffers(tcp, arg);

@@ -57,8 +57,8 @@ VIDIOC_TRY_FMT			_IOWR('V',  64, struct_v4l2_format)
 VIDIOC_G_EXT_CTRLS		_IOWR('V',  71, struct_v4l2_ext_controls) /* added in v2.6.18-rc1~862^2~18 */
 VIDIOC_S_EXT_CTRLS		_IOWR('V',  72, struct_v4l2_ext_controls) /* added in v2.6.18-rc1~862^2~18 */
 VIDIOC_TRY_EXT_CTRLS		_IOWR('V',  73, struct_v4l2_ext_controls) /* added in v2.6.18-rc1~862^2~18 */
-/* VIDIOC_ENUM_FRAMESIZES		_IOWR('V',  74, struct v4l2_frmsizeenum) - added in v2.6.19-rc1~183 */
-/* VIDIOC_ENUM_FRAMEINTERVALS	_IOWR('V',  75, struct v4l2_frmivalenum) - added in v2.6.19-rc1~183 */
+VIDIOC_ENUM_FRAMESIZES		_IOWR('V',  74, struct_v4l2_frmsizeenum) /* added in v2.6.19-rc1~183 */
+VIDIOC_ENUM_FRAMEINTERVALS	_IOWR('V',  75, struct_v4l2_frmivalenum) /* added in v2.6.19-rc1~183 */
 /* VIDIOC_G_ENC_INDEX		_IOR ('V',  76, struct v4l2_enc_idx) - added in v2.6.21-rc3~150^2~2*/
 /* VIDIOC_ENCODER_CMD		_IOWR('V',  77, struct v4l2_encoder_cmd) - added in v2.6.21-rc3~150^2~1 */
 /* VIDIOC_TRY_ENCODER_CMD		_IOWR('V',  78, struct v4l2_encoder_cmd) - added in v2.6.21-rc3~150^2~1 */
