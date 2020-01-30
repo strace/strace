@@ -59,15 +59,13 @@ sigstr_to_uint(const char *s)
 	return -1;
 }
 
-static const char *statuses[] = {
-	"successful",
-	"failed",
-	"unfinished",
-	"unavailable",
-	"detached",
+static const char *statuses[NUMBER_OF_STATUSES] = {
+	[STATUS_SUCCESSFUL]  = "successful",
+	[STATUS_FAILED]      = "failed",
+	[STATUS_UNFINISHED]  = "unfinished",
+	[STATUS_UNAVAILABLE] = "unavailable",
+	[STATUS_DETACHED]    = "detached",
 };
-static_assert(ARRAY_SIZE(statuses) == NUMBER_OF_STATUSES,
-	      "statuses array and status_t enum mismatch");
 
 static int
 statusstr_to_uint(const char *str)
