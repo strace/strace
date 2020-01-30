@@ -128,6 +128,9 @@ $STRACE_EXE: Only the last of -z/-Z options will take effect. See status qualifi
 $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
 fi
 
+check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' -d /
+check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
+
 args='-p 2147483647'
 $STRACE $args 2> "$LOG" &&
 	dump_log_and_fail_with \

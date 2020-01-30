@@ -994,7 +994,9 @@ option set to
 .BR ENOSYS .
 .SS Miscellaneous
 .TP 12
-.B \-d
+.BR \-d ,
+.TQ
+.B \-\-debug
 Show some debugging output of
 .B strace
 itself on the standard error.

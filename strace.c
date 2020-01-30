@@ -321,7 +321,7 @@ Startup:\n\
 \n\
 Miscellaneous:\n\
   --seccomp-bpf  enable seccomp-bpf filtering\n\
-  -d             enable debug output to stderr\n\
+  -d, --debug    enable debug output to stderr\n\
   -h, --help     print help message\n\
   -V, --version  print version\n\
 "
@@ -1657,6 +1657,7 @@ init(int argc, char *argv[])
 	};
 	static const struct option longopts[] = {
 		{ "seccomp-bpf", no_argument, 0, SECCOMP_OPTION },
+		{ "debug", no_argument, 0, 'd' },
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
 		{ 0, 0, 0, 0 }
