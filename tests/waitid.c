@@ -18,6 +18,78 @@
 #include <sys/resource.h>
 #include "scno.h"
 
+/* Workaround for glibc/kernel interface discrepancy */
+#ifdef HAVE_STRUCT_RUSAGE___RU_MAXRSS_WORD
+# define RU_MAXRSS __ru_maxrss_word
+#else
+# define RU_MAXRSS ru_maxrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_IXRSS_WORD
+# define RU_IXRSS __ru_ixrss_word
+#else
+# define RU_IXRSS ru_ixrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_IDRSS_WORD
+# define RU_IDRSS __ru_idrss_word
+#else
+# define RU_IDRSS ru_idrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_ISRSS_WORD
+# define RU_ISRSS __ru_isrss_word
+#else
+# define RU_ISRSS ru_isrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MINFLT_WORD
+# define RU_MINFLT __ru_minflt_word
+#else
+# define RU_MINFLT ru_minflt
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MAJFLT_WORD
+# define RU_MAJFLT __ru_majflt_word
+#else
+# define RU_MAJFLT ru_majflt
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NSWAP_WORD
+# define RU_NSWAP __ru_nswap_word
+#else
+# define RU_NSWAP ru_nswap
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_INBLOCK_WORD
+# define RU_INBLOCK __ru_inblock_word
+#else
+# define RU_INBLOCK ru_inblock
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_OUBLOCK_WORD
+# define RU_OUBLOCK __ru_oublock_word
+#else
+# define RU_OUBLOCK ru_oublock
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MSGSND_WORD
+# define RU_MSGSND __ru_msgsnd_word
+#else
+# define RU_MSGSND ru_msgsnd
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MSGRCV_WORD
+# define RU_MSGRCV __ru_msgrcv_word
+#else
+# define RU_MSGRCV ru_msgrcv
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NSIGNALS_WORD
+# define RU_NSIGNALS __ru_nsignals_word
+#else
+# define RU_NSIGNALS ru_nsignals
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NVCSW_WORD
+# define RU_NVCSW __ru_nvcsw_word
+#else
+# define RU_NVCSW ru_nvcsw
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NIVCSW_WORD
+# define RU_NIVCSW __ru_nivcsw_word
+#else
+# define RU_NIVCSW ru_nivcsw
+#endif
+
 static const char *
 sprint_rusage(const struct rusage *const ru)
 {
@@ -48,20 +120,20 @@ sprint_rusage(const struct rusage *const ru)
 		 , (long long) ru->ru_stime.tv_sec
 		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
 #if VERBOSE
-		 , zero_extend_signed_to_ull(ru->ru_maxrss)
-		 , zero_extend_signed_to_ull(ru->ru_ixrss)
-		 , zero_extend_signed_to_ull(ru->ru_idrss)
-		 , zero_extend_signed_to_ull(ru->ru_isrss)
-		 , zero_extend_signed_to_ull(ru->ru_minflt)
-		 , zero_extend_signed_to_ull(ru->ru_majflt)
-		 , zero_extend_signed_to_ull(ru->ru_nswap)
-		 , zero_extend_signed_to_ull(ru->ru_inblock)
-		 , zero_extend_signed_to_ull(ru->ru_oublock)
-		 , zero_extend_signed_to_ull(ru->ru_msgsnd)
-		 , zero_extend_signed_to_ull(ru->ru_msgrcv)
-		 , zero_extend_signed_to_ull(ru->ru_nsignals)
-		 , zero_extend_signed_to_ull(ru->ru_nvcsw)
-		 , zero_extend_signed_to_ull(ru->ru_nivcsw)
+		 , zero_extend_signed_to_ull(ru->RU_MAXRSS)
+		 , zero_extend_signed_to_ull(ru->RU_IXRSS)
+		 , zero_extend_signed_to_ull(ru->RU_IDRSS)
+		 , zero_extend_signed_to_ull(ru->RU_ISRSS)
+		 , zero_extend_signed_to_ull(ru->RU_MINFLT)
+		 , zero_extend_signed_to_ull(ru->RU_MAJFLT)
+		 , zero_extend_signed_to_ull(ru->RU_NSWAP)
+		 , zero_extend_signed_to_ull(ru->RU_INBLOCK)
+		 , zero_extend_signed_to_ull(ru->RU_OUBLOCK)
+		 , zero_extend_signed_to_ull(ru->RU_MSGSND)
+		 , zero_extend_signed_to_ull(ru->RU_MSGRCV)
+		 , zero_extend_signed_to_ull(ru->RU_NSIGNALS)
+		 , zero_extend_signed_to_ull(ru->RU_NVCSW)
+		 , zero_extend_signed_to_ull(ru->RU_NIVCSW)
 #endif
 		 );
 	return buf;

@@ -16,7 +16,29 @@
 
 #include DEF_MPERS_TYPE(rusage_t)
 
-typedef struct rusage rusage_t;
+struct kernel_old_timeval {
+	kernel_long_t	tv_sec;
+	long		tv_nsec;
+};
+
+typedef struct {
+	struct kernel_old_timeval ru_utime;
+	struct kernel_old_timeval ru_stime;
+	kernel_long_t	ru_maxrss;
+	kernel_long_t	ru_ixrss;
+	kernel_long_t	ru_idrss;
+	kernel_long_t	ru_isrss;
+	kernel_long_t	ru_minflt;
+	kernel_long_t	ru_majflt;
+	kernel_long_t	ru_nswap;
+	kernel_long_t	ru_inblock;
+	kernel_long_t	ru_oublock;
+	kernel_long_t	ru_msgsnd;
+	kernel_long_t	ru_msgrcv;
+	kernel_long_t	ru_nsignals;
+	kernel_long_t	ru_nvcsw;
+	kernel_long_t	ru_nivcsw;
+} rusage_t;
 
 #include MPERS_DEFS
 

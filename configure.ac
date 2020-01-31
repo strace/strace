@@ -614,6 +614,23 @@ AC_CHECK_HEADERS([linux/btrfs.h], [
 
 st_CHECK_TYPES
 
+AC_CHECK_MEMBERS(m4_normalize([
+	struct rusage.__ru_maxrss_word,
+	struct rusage.__ru_ixrss_word,
+	struct rusage.__ru_idrss_word,
+	struct rusage.__ru_isrss_word,
+	struct rusage.__ru_minflt_word,
+	struct rusage.__ru_majflt_word,
+	struct rusage.__ru_nswap_word,
+	struct rusage.__ru_inblock_word,
+	struct rusage.__ru_oublock_word,
+	struct rusage.__ru_msgsnd_word,
+	struct rusage.__ru_msgrcv_word,
+	struct rusage.__ru_nsignals_word,
+	struct rusage.__ru_nvcsw_word,
+	struct rusage.__ru_nivcsw_word
+]),,, [#include <sys/resource.h>])
+
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([
 	PTRACE_PEEKUSER,
