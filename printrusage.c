@@ -12,6 +12,8 @@
 #include "defs.h"
 #include <sys/resource.h>
 
+#include "print_fields.h"
+
 #include DEF_MPERS_TYPE(rusage_t)
 
 typedef struct rusage rusage_t;
@@ -30,26 +32,23 @@ MPERS_PRINTER_DECL(void, printrusage,
 	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_utime);
 	tprints(", ru_stime=");
 	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_stime);
-	if (abbrev(tcp))
+	if (abbrev(tcp)) {
 		tprints(", ...");
-	else {
-#define PRINT_RUSAGE_MEMBER(member) \
-		tprintf(", " #member "=%llu", zero_extend_signed_to_ull(ru.member))
-		PRINT_RUSAGE_MEMBER(ru_maxrss);
-		PRINT_RUSAGE_MEMBER(ru_ixrss);
-		PRINT_RUSAGE_MEMBER(ru_idrss);
-		PRINT_RUSAGE_MEMBER(ru_isrss);
-		PRINT_RUSAGE_MEMBER(ru_minflt);
-		PRINT_RUSAGE_MEMBER(ru_majflt);
-		PRINT_RUSAGE_MEMBER(ru_nswap);
-		PRINT_RUSAGE_MEMBER(ru_inblock);
-		PRINT_RUSAGE_MEMBER(ru_oublock);
-		PRINT_RUSAGE_MEMBER(ru_msgsnd);
-		PRINT_RUSAGE_MEMBER(ru_msgrcv);
-		PRINT_RUSAGE_MEMBER(ru_nsignals);
-		PRINT_RUSAGE_MEMBER(ru_nvcsw);
-		PRINT_RUSAGE_MEMBER(ru_nivcsw);
-#undef PRINT_RUSAGE_MEMBER
+	} else {
+		PRINT_FIELD_U(", ", ru, ru_maxrss);
+		PRINT_FIELD_U(", ", ru, ru_ixrss);
+		PRINT_FIELD_U(", ", ru, ru_idrss);
+		PRINT_FIELD_U(", ", ru, ru_isrss);
+		PRINT_FIELD_U(", ", ru, ru_minflt);
+		PRINT_FIELD_U(", ", ru, ru_majflt);
+		PRINT_FIELD_U(", ", ru, ru_nswap);
+		PRINT_FIELD_U(", ", ru, ru_inblock);
+		PRINT_FIELD_U(", ", ru, ru_oublock);
+		PRINT_FIELD_U(", ", ru, ru_msgsnd);
+		PRINT_FIELD_U(", ", ru, ru_msgrcv);
+		PRINT_FIELD_U(", ", ru, ru_nsignals);
+		PRINT_FIELD_U(", ", ru, ru_nvcsw);
+		PRINT_FIELD_U(", ", ru, ru_nivcsw);
 	}
 	tprints("}");
 }
@@ -84,26 +83,23 @@ printrusage32(struct tcb *const tcp, const kernel_ulong_t addr)
 	print_timeval32_t(&ru.ru_utime);
 	tprints(", ru_stime=");
 	print_timeval32_t(&ru.ru_stime);
-	if (abbrev(tcp))
+	if (abbrev(tcp)) {
 		tprints(", ...");
-	else {
-# define PRINT_RUSAGE_MEMBER(member) \
-		tprintf(", " #member "=%lu", ru.member)
-		PRINT_RUSAGE_MEMBER(ru_maxrss);
-		PRINT_RUSAGE_MEMBER(ru_ixrss);
-		PRINT_RUSAGE_MEMBER(ru_idrss);
-		PRINT_RUSAGE_MEMBER(ru_isrss);
-		PRINT_RUSAGE_MEMBER(ru_minflt);
-		PRINT_RUSAGE_MEMBER(ru_majflt);
-		PRINT_RUSAGE_MEMBER(ru_nswap);
-		PRINT_RUSAGE_MEMBER(ru_inblock);
-		PRINT_RUSAGE_MEMBER(ru_oublock);
-		PRINT_RUSAGE_MEMBER(ru_msgsnd);
-		PRINT_RUSAGE_MEMBER(ru_msgrcv);
-		PRINT_RUSAGE_MEMBER(ru_nsignals);
-		PRINT_RUSAGE_MEMBER(ru_nvcsw);
-		PRINT_RUSAGE_MEMBER(ru_nivcsw);
-# undef PRINT_RUSAGE_MEMBER
+	} else {
+		PRINT_FIELD_U(", ", ru, ru_maxrss);
+		PRINT_FIELD_U(", ", ru, ru_ixrss);
+		PRINT_FIELD_U(", ", ru, ru_idrss);
+		PRINT_FIELD_U(", ", ru, ru_isrss);
+		PRINT_FIELD_U(", ", ru, ru_minflt);
+		PRINT_FIELD_U(", ", ru, ru_majflt);
+		PRINT_FIELD_U(", ", ru, ru_nswap);
+		PRINT_FIELD_U(", ", ru, ru_inblock);
+		PRINT_FIELD_U(", ", ru, ru_oublock);
+		PRINT_FIELD_U(", ", ru, ru_msgsnd);
+		PRINT_FIELD_U(", ", ru, ru_msgrcv);
+		PRINT_FIELD_U(", ", ru, ru_nsignals);
+		PRINT_FIELD_U(", ", ru, ru_nvcsw);
+		PRINT_FIELD_U(", ", ru, ru_nivcsw);
 	}
 	tprints("}");
 }
