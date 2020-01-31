@@ -13,6 +13,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of AUDIT_*, BPF_*, CLONE_*, KEY_*, KVM_*, PPC_PTRACE_*,
     SCTP_*, STATX_*, TIPC_*, V4L2_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 5.5.
+  * Enhanced manual page.
 
 * Bug fixes
   * Fixed stack trace printing for early syscalls when strace is configured
