@@ -473,6 +473,7 @@ extern struct path_set {
 	size_t size;
 } global_path_set;
 # define tracing_paths (global_path_set.num_selected != 0)
+extern unsigned enable_wildcard_path_matching;
 extern unsigned xflag;
 extern unsigned followfork;
 # ifdef ENABLE_STACKTRACE
