@@ -63,6 +63,8 @@ SYS_FUNC(io_uring_setup)
 				  "IORING_SETUP_???");
 		PRINT_FIELD_X(", ", params, sq_thread_cpu);
 		PRINT_FIELD_U(", ", params, sq_thread_idle);
+		if (params.flags & IORING_SETUP_ATTACH_WQ)
+			PRINT_FIELD_FD(", ", params, wq_fd, tcp);
 		if (!IS_ARRAY_ZERO(params.resv)) {
 			PRINT_FIELD_ARRAY(", ", params, resv, tcp,
 					  print_xint32_array_member);

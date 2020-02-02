@@ -41,7 +41,8 @@ typedef struct {
 	uint32_t sq_thread_cpu;
 	uint32_t sq_thread_idle;
 	uint32_t features;
-	uint32_t resv[4];
+	uint32_t wq_fd;
+	uint32_t resv[3];
 	struct_io_sqring_offsets sq_off;
 	struct_io_cqring_offsets cq_off;
 } struct_io_uring_params;
