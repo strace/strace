@@ -1044,6 +1044,17 @@ extern void print_ifindex(unsigned int);
 extern void print_bpf_filter_code(const uint16_t code, bool extended);
 
 extern void qualify(const char *);
+extern void qualify_trace(const char *);
+extern void qualify_abbrev(const char *);
+extern void qualify_verbose(const char *);
+extern void qualify_raw(const char *);
+extern void qualify_signals(const char *);
+extern void qualify_status(const char *);
+extern void qualify_read(const char *);
+extern void qualify_write(const char *);
+extern void qualify_fault(const char *);
+extern void qualify_inject(const char *);
+extern void qualify_kvm(const char *);
 extern unsigned int qual_flags(const unsigned int);
 
 # define DECL_IOCTL(name)						\

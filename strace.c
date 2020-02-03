@@ -281,13 +281,17 @@ Tracing:\n\
                  (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 \n\
 Filtering:\n\
-  -e trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none}\n\
+  -e trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none},\n\
+  --trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none}\n\
                  trace only specified syscalls.\n\
      groups:     %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
                  %%memory, %%net, %%process, %%pure, %%signal, %%stat, %%%%stat,\n\
                  %%statfs, %%%%statfs\n\
-  -e signal=SET  print only the signals from SET\n\
-  -e status=SET  print only system calls with the return statuses in SET\n\
+  -e signal=SET, --signal=SET\n\
+                 trace only the specified set of signals\n\
+                 print only the signals from SET\n\
+  -e status=SET, --status=SET\n\
+                 print only system calls with the return statuses in SET\n\
      statuses:   successful, failed, unfinished, unavailable, detached\n\
   -P PATH        trace accesses to PATH\n\
   -z             print only syscalls that returned without an error code\n\
@@ -295,12 +299,18 @@ Filtering:\n\
 \n\
 Output format:\n\
   -a COLUMN      alignment COLUMN for printing syscall results (default %d)\n\
-  -e abbrev=SET  abbreviate output for the syscalls in SET\n\
-  -e verbose=SET dereference structures for the syscall in SET\n\
-  -e raw=SET     print undecoded arguments for the syscalls in SET\n\
-  -e read=SET    dump the data read from the file descriptors in SET\n\
-  -e write=SET   dump the data written to the file descriptors in SET\n\
-  -e kvm=vcpu    print exit reason of kvm vcpu\n\
+  -e abbrev=SET, --abbrev=SET\n\
+                 abbreviate output for the syscalls in SET\n\
+  -e verbose=SET, --verbose=SET\n\
+                 dereference structures for the syscall in SET\n\
+  -e raw=SET, --raw=SET\n\
+                 print undecoded arguments for the syscalls in SET\n\
+  -e read=SET, --read=SET\n\
+                 dump the data read from the file descriptors in SET\n\
+  -e write=SET, --write=SET\n\
+                 dump the data written to the file descriptors in SET\n\
+  -e kvm=vcpu, --kvm=vcpu\n\
+                 print exit reason of kvm vcpu\n\
   -i             print instruction pointer at time of syscall\n\
 "
 #ifdef ENABLE_STACKTRACE
@@ -340,10 +350,12 @@ Statistics:\n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
             [:delay_enter=DELAY][:delay_exit=DELAY][:when=WHEN],\n\
+  --inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
+           [:delay_enter=DELAY][:delay_exit=DELAY][:when=WHEN]\n\
                  perform syscall tampering for the syscalls in SET\n\
      delay:      milliseconds or NUMBER{s|ms|us|ns}\n\
      when:       FIRST, FIRST+, or FIRST+STEP\n\
-  -e fault=SET[:error=ERRNO][:when=WHEN]\n\
+  -e fault=SET[:error=ERRNO][:when=WHEN], --fault=SET[:error=ERRNO][:when=WHEN]\n\
                  synonym for -e inject with default ERRNO set to ENOSYS.\n\
 Miscellaneous:\n\
   -d, --debug    enable debug output to stderr\n\
@@ -1679,13 +1691,38 @@ init(int argc, char *argv[])
 	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ";
 
 	enum {
-		SECCOMP_OPTION = 0x100
+		SECCOMP_OPTION = 0x100,
+
+		QUAL_TRACE_OPTION,
+		QUAL_ABBREV_OPTION,
+		QUAL_VERBOSE_OPTION,
+		QUAL_RAW_OPTION,
+		QUAL_SIGNAL_OPTION,
+		QUAL_STATUS_OPTION,
+		QUAL_READ_OPTION,
+		QUAL_WRITE_OPTION,
+		QUAL_FAULT_OPTION,
+		QUAL_INJECT_OPTION,
+		QUAL_KVM_OPTION,
 	};
 	static const struct option longopts[] = {
 		{ "seccomp-bpf", no_argument, 0, SECCOMP_OPTION },
 		{ "debug", no_argument, 0, 'd' },
 		{ "help", no_argument, 0, 'h' },
 		{ "version", no_argument, 0, 'V' },
+
+		{ "trace",	required_argument, 0, QUAL_TRACE_OPTION },
+		{ "abbrev",	required_argument, 0, QUAL_ABBREV_OPTION },
+		{ "verbose",	required_argument, 0, QUAL_VERBOSE_OPTION },
+		{ "raw",	required_argument, 0, QUAL_RAW_OPTION },
+		{ "signals",	required_argument, 0, QUAL_SIGNAL_OPTION },
+		{ "status",	required_argument, 0, QUAL_STATUS_OPTION },
+		{ "read",	required_argument, 0, QUAL_READ_OPTION },
+		{ "write",	required_argument, 0, QUAL_WRITE_OPTION },
+		{ "fault",	required_argument, 0, QUAL_FAULT_OPTION },
+		{ "inject",	required_argument, 0, QUAL_INJECT_OPTION },
+		{ "kvm",	required_argument, 0, QUAL_KVM_OPTION },
+
 		{ 0, 0, 0, 0 }
 	};
 
@@ -1827,6 +1864,39 @@ init(int argc, char *argv[])
 			break;
 		case SECCOMP_OPTION:
 			seccomp_filtering = true;
+			break;
+		case QUAL_TRACE_OPTION:
+			qualify_trace(optarg);
+			break;
+		case QUAL_ABBREV_OPTION:
+			qualify_abbrev(optarg);
+			break;
+		case QUAL_VERBOSE_OPTION:
+			qualify_verbose(optarg);
+			break;
+		case QUAL_RAW_OPTION:
+			qualify_raw(optarg);
+			break;
+		case QUAL_SIGNAL_OPTION:
+			qualify_signals(optarg);
+			break;
+		case QUAL_STATUS_OPTION:
+			qualify_status(optarg);
+			break;
+		case QUAL_READ_OPTION:
+			qualify_read(optarg);
+			break;
+		case QUAL_WRITE_OPTION:
+			qualify_write(optarg);
+			break;
+		case QUAL_FAULT_OPTION:
+			qualify_fault(optarg);
+			break;
+		case QUAL_INJECT_OPTION:
+			qualify_inject(optarg);
+			break;
+		case QUAL_KVM_OPTION:
+			qualify_kvm(optarg);
 			break;
 		default:
 			error_msg_and_help(NULL);

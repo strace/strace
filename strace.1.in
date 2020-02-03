@@ -420,6 +420,8 @@ default if
 .SS Filtering
 .TP 12
 \fB\-e\ trace\fR=\,\fIsyscall_set\fR
+.TQ
+\fB\-\-trace\fR=\,\fIsyscall_set\fR
 Trace only the specified set of system calls.
 .I syscall_set
 is defined as
@@ -586,6 +588,8 @@ are being monitored.  The default is
 .BR trace = all .
 .TP
 \fB\-e\ signal\fR=\,\fIset\fR
+.TQ
+\fB\-\-signal\fR=\,\fIset\fR
 Trace only the specified subset of signals.  The default is
 .BR signal = all .
 For example,
@@ -597,6 +601,8 @@ causes
 signals not to be traced.
 .TP
 \fB\-e\ status\fR=\,\fIset\fR
+.TQ
+\fB\-\-status\fR=\,\fIset\fR
 Print only system calls with the specified return status.  The default is
 .BR status = all .
 When using the
@@ -667,6 +673,8 @@ Print only syscalls that returned with an error code.
 Align return values in a specific column (default column 40).
 .TP
 \fB\-e\ abbrev\fR=\,\fIsyscall_set\fR
+.TQ
+\fB\-\-abbrev\fR=\,\fIsyscall_set\fR
 Abbreviate the output from printing each member of large structures.
 The syntax of the
 .I syscall_set
@@ -681,6 +689,8 @@ option has the effect of
 .BR abbrev = none .
 .TP
 \fB\-e\ verbose\fR=\,\fIsyscall_set\fR
+.TQ
+\fB\-\-verbose\fR=\,\fIsyscall_set\fR
 Dereference structures for the specified set of system calls.
 The syntax of the
 .I syscall_set
@@ -691,6 +701,8 @@ The default is
 .BR verbose = all .
 .TP
 \fB\-e\ raw\fR=\,\fIsyscall_set\fR
+.TQ
+\fB\-\-raw\fR=\,\fIsyscall_set\fR
 Print raw, undecoded arguments for the specified set of system calls.
 The syntax of the
 .I syscall_set
@@ -706,6 +718,8 @@ See also
 option.
 .TP
 \fB\-e\ read\fR=\,\fIset\fR
+.TQ
+\fB\-\-read\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data read from
 file descriptors listed in the specified set.  For example, to see
 all input activity on file descriptors
@@ -720,6 +734,8 @@ system call which is controlled by the option
 .BR -e "\ " trace = read .
 .TP
 \fB\-e\ write\fR=\,\fIset\fR
+.TQ
+\fB\-\-write\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data written to
 file descriptors listed in the specified set.  For example, to see
 all output activity on file descriptors
@@ -734,6 +750,8 @@ system call which is controlled by the option
 .BR -e "\ " trace = write .
 .TP
 .BR "\-e\ kvm" = vcpu
+.TQ
+.BR "\-\-kvm" = vcpu
 Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
 or higher.
 .TP
@@ -899,6 +917,8 @@ each system call.  The default is to summarise the system time.
 .SS Tampering
 .TP 12
 \fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+.TQ
+\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.
 The syntax of the
 .I syscall_set
@@ -1033,6 +1053,8 @@ with other syscall filtering options, for example,
 \fB\-P \fI/dev/urandom \fB\-e inject\fR=\,\fIfile\/\fR:\fBerror\fR=\,\fIENOENT\fR.
 .TP
 \fB\-e\ fault\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+.TQ
+\fB\-\-fault\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall fault injection for the specified set of syscalls.
 .IP
 This is equivalent to more generic
