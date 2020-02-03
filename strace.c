@@ -281,12 +281,26 @@ Tracing:\n\
                  (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 \n\
 Filtering:\n\
+  -e trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none}\n\
+                 trace only specified syscalls.\n\
+     groups:     %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
+                 %%memory, %%net, %%process, %%pure, %%signal, %%stat, %%%%stat,\n\
+                 %%statfs, %%%%statfs\n\
+  -e signal=SET  print only the signals from SET\n\
+  -e status=SET  print only system calls with the return statuses in SET\n\
+     statuses:   successful, failed, unfinished, unavailable, detached\n\
   -P PATH        trace accesses to PATH\n\
   -z             print only syscalls that returned without an error code\n\
   -Z             print only syscalls that returned with an error code\n\
 \n\
 Output format:\n\
   -a COLUMN      alignment COLUMN for printing syscall results (default %d)\n\
+  -e abbrev=SET  abbreviate output for the syscalls in SET\n\
+  -e verbose=SET dereference structures for the syscall in SET\n\
+  -e raw=SET     print undecoded arguments for the syscalls in SET\n\
+  -e read=SET    dump the data read from the file descriptors in SET\n\
+  -e write=SET   dump the data written to the file descriptors in SET\n\
+  -e kvm=vcpu    print exit reason of kvm vcpu\n\
   -i             print instruction pointer at time of syscall\n\
 "
 #ifdef ENABLE_STACKTRACE
@@ -323,6 +337,14 @@ Statistics:\n\
                  (default %s)\n\
   -w             summarise syscall latency (default is system time)\n\
 \n\
+Tampering:\n\
+  -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
+            [:delay_enter=DELAY][:delay_exit=DELAY][:when=WHEN],\n\
+                 perform syscall tampering for the syscalls in SET\n\
+     delay:      milliseconds or NUMBER{s|ms|us|ns}\n\
+     when:       FIRST, FIRST+, or FIRST+STEP\n\
+  -e fault=SET[:error=ERRNO][:when=WHEN]\n\
+                 synonym for -e inject with default ERRNO set to ENOSYS.\n\
 Miscellaneous:\n\
   -d, --debug    enable debug output to stderr\n\
   -h, --help     print help message\n\
