@@ -255,8 +255,37 @@ usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I n] [-b execve] [-e expr]..
               [-S sortby] [-P path]... [-p pid]... [--seccomp-bpf]\n\
               { -p pid | [-DDD] [-E var=val]... [-u username] PROG [ARGS] }\n\
 \n\
+General:\n\
+  -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
+     options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
+                 inject, status, kvm\n\
+\n\
+Startup:\n\
+  -E var=val     put var=val in the environment for command\n\
+  -E var         remove var from the environment for command\n\
+  -p pid         trace process with process id PID, may be repeated\n\
+  -u username    run command as username handling setuid and/or setgid\n\
+\n\
+Tracing:\n\
+  -b execve      detach on execve syscall\n\
+  -D             run tracer process as a grandchild, not as a parent\n\
+  -DD            run tracer process in a separate process group\n\
+  -DDD           run tracer process in a separate session\n\
+  -f             follow forks\n\
+  -ff            follow forks with output into separate files\n\
+  -I interruptible\n\
+     1:          no signals are blocked\n\
+     2:          fatal signals are blocked while decoding syscall (default)\n\
+     3:          fatal signals are always blocked (default if '-o FILE PROG')\n\
+     4:          fatal signals and SIGTSTP (^Z) are always blocked\n\
+                 (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
+\n\
+Filtering:\n\
+  -P path        trace accesses to path\n\
+  -z             print only syscalls that returned without an error code\n\
+  -Z             print only syscalls that returned with an error code\n\
+\n\
 Output format:\n\
-  -A             open the file provided in the -o option in append mode\n\
   -a column      alignment COLUMN for printing syscall results (default %d)\n\
   -i             print instruction pointer at time of syscall\n\
 "
@@ -267,12 +296,14 @@ Output format:\n\
 #endif
 "\
   -o file        send trace output to FILE instead of stderr\n\
+  -A             open the file provided in the -o option in append mode\n\
   -q             suppress messages about attaching, detaching, etc.\n\
   -qq            suppress messages about process exit status as well.\n\
   -r             print relative timestamp\n\
   -s strsize     limit length of print strings to STRSIZE chars (default %d)\n\
   -t             print absolute timestamp\n\
   -tt            print absolute timestamp with usecs\n\
+  -ttt           print absolute UNIX time with usecs\n\
   -T             print time spent in each syscall\n\
   -v             verbose mode: print entities unabbreviated\n\
   -x             print non-ascii strings in hex\n\
@@ -291,38 +322,10 @@ Statistics:\n\
                  (default %s)\n\
   -w             summarise syscall latency (default is system time)\n\
 \n\
-Filtering:\n\
-  -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
-                 inject, status, kvm\n\
-  -P path        trace accesses to path\n\
-  -z             print only syscalls that returned without an error code\n\
-  -Z             print only syscalls that returned with an error code\n\
-\n\
-Tracing:\n\
-  -b execve      detach on execve syscall\n\
-  -D             run tracer process as a grandchild, not as a parent\n\
-  -DD            run tracer process in a separate process group\n\
-  -DDD           run tracer process in a separate session\n\
-  -f             follow forks\n\
-  -ff            follow forks with output into separate files\n\
-  -I interruptible\n\
-     1:          no signals are blocked\n\
-     2:          fatal signals are blocked while decoding syscall (default)\n\
-     3:          fatal signals are always blocked (default if '-o FILE PROG')\n\
-     4:          fatal signals and SIGTSTP (^Z) are always blocked\n\
-                 (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
-\n\
-Startup:\n\
-  -E var         remove var from the environment for command\n\
-  -E var=val     put var=val in the environment for command\n\
-  -p pid         trace process with process id PID, may be repeated\n\
-  -u username    run command as username handling setuid and/or setgid\n\
-\n\
 Miscellaneous:\n\
-  --seccomp-bpf  enable seccomp-bpf filtering\n\
   -d, --debug    enable debug output to stderr\n\
   -h, --help     print help message\n\
+  --seccomp-bpf  enable seccomp-bpf filtering\n\
   -V, --version  print version\n\
 "
 /* ancient, no one should use it
