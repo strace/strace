@@ -1165,7 +1165,7 @@ If you do use this feature, please remember to install
 a regular non-setuid version of
 .B strace
 for ordinary users to use.
-.SH "MULTIPLE PERSONALITY SUPPORT"
+.SH "MULTIPLE PERSONALITIES SUPPORT"
 On some architectures,
 .B strace
 supports decoding of syscalls for processes that use different ABI rather than
