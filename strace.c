@@ -261,13 +261,18 @@ General:\n\
                  inject, status, kvm\n\
 \n\
 Startup:\n\
-  -E VAR=VAL     put VAR=VAL in the environment for command\n\
-  -E VAR         remove VAR from the environment for command\n\
-  -p PID         trace process with process id PID, may be repeated\n\
-  -u USERNAME    run command as USERNAME handling setuid and/or setgid\n\
+  -E VAR=VAL, --env=VAR=VAL\n\
+                 put VAR=VAL in the environment for command\n\
+  -E VAR, --env=VAR\n\
+                 remove VAR from the environment for command\n\
+  -p PID, --attach=PID\n\
+                 trace process with process id PID, may be repeated\n\
+  -u USERNAME, --user=USERNAME\n\
+                 run command as USERNAME handling setuid and/or setgid\n\
 \n\
 Tracing:\n\
-  -b execve      detach on execve syscall\n\
+  -b execve, --detach-on=execve\n\
+                 detach on execve syscall\n\
   -D             run tracer process as a grandchild, not as a parent\n\
   -DD            run tracer process in a separate process group\n\
   -DDD           run tracer process in a separate session\n\
@@ -293,12 +298,14 @@ Filtering:\n\
   -e status=SET, --status=SET\n\
                  print only system calls with the return statuses in SET\n\
      statuses:   successful, failed, unfinished, unavailable, detached\n\
-  -P PATH        trace accesses to PATH\n\
+  -P PATH, --trace-path=PATH\n\
+                 trace accesses to PATH\n\
   -z             print only syscalls that returned without an error code\n\
   -Z             print only syscalls that returned with an error code\n\
 \n\
 Output format:\n\
-  -a COLUMN      alignment COLUMN for printing syscall results (default %d)\n\
+  -a COLUMN, --columns=COLUMN\n\
+                 alignment COLUMN for printing syscall results (default %d)\n\
   -e abbrev=SET, --abbrev=SET\n\
                  abbreviate output for the syscalls in SET\n\
   -e verbose=SET, --verbose=SET\n\
@@ -311,25 +318,31 @@ Output format:\n\
                  dump the data written to the file descriptors in SET\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
-  -i             print instruction pointer at time of syscall\n\
+  -i, --instruction-pointer\n\
+                 print instruction pointer at time of syscall\n\
 "
 #ifdef ENABLE_STACKTRACE
 "\
-  -k             obtain stack trace between each syscall\n\
+  -k, --stack-traces\n\
+                 obtain stack trace between each syscall\n\
 "
 #endif
 "\
-  -o FILE        send trace output to FILE instead of stderr\n\
-  -A             open the file provided in the -o option in append mode\n\
+  -o FILE, --output=FILE\n\
+                 send trace output to FILE instead of stderr\n\
+  -A, --output-append-mode\n\
+                 open the file provided in the -o option in append mode\n\
   -q             suppress messages about attaching, detaching, etc.\n\
   -qq            suppress messages about process exit status as well.\n\
   -r             print relative timestamp\n\
-  -s STRSIZE     limit length of print strings to STRSIZE chars (default %d)\n\
+  -s STRSIZE, --string-limit=STRSIZE\n\
+                 limit length of print strings to STRSIZE chars (default %d)\n\
   -t             print absolute timestamp\n\
   -tt            print absolute timestamp with usecs\n\
   -ttt           print absolute UNIX time with usecs\n\
   -T             print time spent in each syscall\n\
-  -v             verbose mode: print entities unabbreviated\n\
+  -v, --no-abbrev\n\
+                 verbose mode: print entities unabbreviated\n\
   -x             print non-ascii strings in hex\n\
   -xx            print all strings in hex\n\
   -X FORMAT      set the FORMAT for printing of named constants and flags\n\
@@ -339,11 +352,13 @@ Output format:\n\
                  file descriptors\n\
 \n\
 Statistics:\n\
-  -c             count time, calls, and errors for each syscall and report\n\
+  -c, --summary-only\n\
+                 count time, calls, and errors for each syscall and report\n\
                  summary\n\
-  -C             like -c but also print regular output\n\
+  -C, --summary  like -c, but also print the regular output\n\
   -O OVERHEAD    set overhead for tracing syscalls to OVERHEAD usecs\n\
-  -S SORTBY      sort syscall counts by: time, calls, errors, name, nothing\n\
+  -S SORTBY, --summary-sort-by=SORTBY\n\
+                 sort syscall counts by: time, calls, errors, name, nothing\n\
                  (default %s)\n\
   -w             summarise syscall latency (default is system time)\n\
 \n\
@@ -1706,10 +1721,29 @@ init(int argc, char *argv[])
 		QUAL_KVM_OPTION,
 	};
 	static const struct option longopts[] = {
-		{ "seccomp-bpf", no_argument, 0, SECCOMP_OPTION },
-		{ "debug", no_argument, 0, 'd' },
-		{ "help", no_argument, 0, 'h' },
-		{ "version", no_argument, 0, 'V' },
+		{ "columns",		required_argument, 0, 'a' },
+		{ "output-append-mode",	no_argument,	   0, 'A' },
+		{ "detach-on",		required_argument, 0, 'b' },
+		{ "summary-only",	no_argument,	   0, 'c' },
+		{ "summary",		no_argument,	   0, 'C' },
+		{ "debug",		no_argument,	   0, 'd' },
+		{ "env",		required_argument, 0, 'E' },
+		{ "help",		no_argument,	   0, 'h' },
+		{ "instruction-pointer", no_argument,      0, 'i' },
+#ifdef ENABLE_STACKTRACE
+		{ "stack-traces",	no_argument,	   0, 'k' },
+#endif
+		{ "output",		required_argument, 0, 'o' },
+		{ "attach",		required_argument, 0, 'p' },
+		{ "trace-path",		required_argument, 0, 'P' },
+		{ "string-limit",	required_argument, 0, 's' },
+		{ "summary-sort-by",	required_argument, 0, 'S' },
+		{ "user",		required_argument, 0, 'u' },
+		{ "no-abbrev",		no_argument,	   0, 'v' },
+		{ "version",		no_argument,	   0, 'V' },
+		{ "summary-wall-clock", no_argument,	   0, 'w' },
+		{ "const-print-style",	required_argument, 0, 'X' },
+		{ "seccomp-bpf",	no_argument,	   0, SECCOMP_OPTION },
 
 		{ "trace",	required_argument, 0, QUAL_TRACE_OPTION },
 		{ "abbrev",	required_argument, 0, QUAL_ABBREV_OPTION },

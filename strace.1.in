@@ -282,17 +282,23 @@ the exclamation point with a backslash.
 .SS Startup
 .TP 12
 \fB\-E\ \fIvar\fR=\,\fIval\fR
+.TQ
+.BR "\-\-env" = \fIvar\fR = \fIval\fR
 Run command with
 .IR var = val
 in its list of environment variables.
 .TP
 .BI "\-E " var
+.TQ
+.BR "\-\-env" = \fIvar\fR
 Remove
 .IR var
 from the inherited list of environment variables before passing it on to
 the command.
 .TP
 .BI "\-p " pid
+.TQ
+.BR "\-\-attach" = \fIpid\fR
 Attach to the process with the process
 .SM ID
 .I pid
@@ -314,6 +320,8 @@ option is given).
 "`pidof PROG`" syntax is supported.
 .TP
 .BI "\-u " username
+.TQ
+.BR "\-\-user" = \fIusername\fR
 Run command with the user \s-1ID\s0, group \s-2ID\s0, and
 supplementary groups of
 .IR username .
@@ -324,6 +332,8 @@ without effective privileges.
 .SS Tracing
 .TP 12
 .BI "\-b " syscall
+.TQ
+.BR "\-\-detach\-on" = \fIsyscall\fR
 If specified syscall is reached, detach from traced process.
 Currently, only
 .BR execve (2)
@@ -656,6 +666,8 @@ Trace system calls for which strace detached before the return.
 .RE
 .TP
 .BI "\-P " path
+.TQ
+.BR "\-\-trace\-path" = \fIpath\fR
 Trace only system calls accessing
 .IR path .
 Multiple
@@ -670,6 +682,8 @@ Print only syscalls that returned with an error code.
 .SS Output format
 .TP 12
 .BI "\-a " column
+.TQ
+.BR "\-\-columns" = \fIcolumn\fR
 Align return values in a specific column (default column 40).
 .TP
 \fB\-e\ abbrev\fR=\,\fIsyscall_set\fR
@@ -756,13 +770,19 @@ Print the exit reason of kvm vcpu.  Requires Linux kernel version 4.16.0
 or higher.
 .TP
 .B \-i
+.TQ
+.B \-\-instruction\-pointer
 Print the instruction pointer at the time of the system call.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
+.if '@ENABLE_STACKTRACE_FALSE@'#' .TQ
+.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print the execution stack trace of the traced
 .if '@ENABLE_STACKTRACE_FALSE@'#' processes after each system call.
 .TP
 .BI "\-o " filename
+.TQ
+.BR "\-\-output" = \fIfilename\fR
 Write the trace output to the file
 .I filename
 rather than to stderr.
@@ -779,6 +799,8 @@ The latter is not compatible with
 option currently.
 .TP
 .B \-A
+.TQ
+.B \-\-output\-append\-mode
 Open the file provided in the
 .B \-o
 option in append mode.
@@ -804,6 +826,8 @@ reported by the
 option.
 .TP
 .BI "\-s " strsize
+.TQ
+.BR "\-\-string\-limit" = \fIstrsize\fR
 Specify the maximum string size to print (the default is 32).  Note
 that filenames are not considered strings and are always printed in
 full.
@@ -824,6 +848,8 @@ Show the time spent in system calls.  This records the time
 difference between the beginning and the end of each system call.
 .TP
 .B \-v
+.TQ
+.B \-\-no\-abbrev
 Print unabbreviated versions of environment, stat, termios, etc.
 calls.  These structures are very common in calls and so the default
 behavior displays a reasonable subset of structure members.  Use
@@ -836,6 +862,8 @@ Print all non-ASCII strings in hexadecimal string format.
 Print all strings in hexadecimal string format.
 .TP
 .BI "\-X " format
+.TQ
+.BR "\-\-const\-print\-style" = \fIformat\fR
 Set the format for printing of named constants and flags.
 Supported
 .I format
@@ -865,6 +893,8 @@ and block/character device number associated with device file descriptors.
 .SS Statistics
 .TP 12
 .B \-c
+.TQ
+.B \-\-summary\-only
 Count time, calls, and errors for each system call and report a summary on
 program exit, suppressing the regular output.
 This attempts to show system time (CPU time spent running
@@ -875,6 +905,8 @@ is used with
 only aggregate totals for all traced processes are kept.
 .TP
 .B \-C
+.TQ
+.B \-\-summary
 Like
 .B \-c
 but also print regular output while processes are running.
@@ -899,6 +931,8 @@ specification is described in section
 .IR "Time specification format description".
 .TP
 .BI "\-S " sortby
+.TQ
+.BR "\-\-summary\-sort\-by" = \fIsortby\fR
 Sort the output of the histogram printed by the
 .B \-c
 option by the specified criterion.  Legal values are
@@ -912,6 +946,8 @@ default is
 .BR time .
 .TP
 .B \-w
+.TQ
+.B \-\-summary\-wall\-clock
 Summarise the time difference between the beginning and end of
 each system call.  The default is to summarise the system time.
 .SS Tampering
