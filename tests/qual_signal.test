@@ -16,7 +16,11 @@ test_one_sig()
 	sigs="$1"; shift
 
 	run_prog "../$NAME" "$@" > /dev/null
+
 	run_strace -e trace=none -e signal="$sigs" "../$NAME" "$@" > "$EXP"
+	match_diff "$LOG" "$EXP"
+
+	run_strace --trace=none --signal="$sigs" "../$NAME" "$@" > "$EXP"
 	match_diff "$LOG" "$EXP"
 }
 
@@ -83,6 +87,11 @@ fail_with()
 for arg in ' ' invalid_signal_name SIG -1 256 1-1 \
 	   1,2,4,8,16,32,64,128,256,512,1024 9,chdir; do
 	$STRACE -e signal="$arg" true 2> "$LOG" &&
+		fail_with "$arg"
+	LC_ALL=C grep -F 'invalid signal' < "$LOG" > /dev/null ||
+		fail_with "$arg"
+
+	$STRACE --signal="$arg" true 2> "$LOG" &&
 		fail_with "$arg"
 	LC_ALL=C grep -F 'invalid signal' < "$LOG" > /dev/null ||
 		fail_with "$arg"

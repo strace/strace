@@ -14,8 +14,10 @@ check_fd_qualify()
 {
 	check_e "invalid descriptor '$1'" -e"read=$2"
 	check_e "invalid descriptor '$1'" -e "read=$2"
+	check_e "invalid descriptor '$1'" "--read=$2"
 	check_e "invalid descriptor '$1'" -e"write=$2"
 	check_e "invalid descriptor '$1'" -e "write=$2"
+	check_e "invalid descriptor '$1'" "--write=$2"
 }
 
 for arg in '' , ,, ,,, ; do

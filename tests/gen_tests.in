@@ -523,11 +523,11 @@ stat	-a30 -v -P stat.sample -P /dev/full
 stat64	-a32 -v -P stat.sample -P /dev/full
 statfs	-a17
 statfs64	-a23
-status-all	-a10 -e trace=chdir -e status=detached,failed,successful,unavailable,unfinished
+status-all	-a10 -e trace=chdir --status=detached,failed,successful,unavailable,unfinished
 status-failed	-a10 -e trace=chdir -Z
-status-none	-e trace=all -e status=none
+status-none	-e trace=all --status=none
 status-successful	-a10 -e trace=chdir -z
-status-unfinished	-a10 -e trace=all -e status=unfinished
+status-unfinished	-a10 -e trace=all --status=unfinished
 statx	-a32 -v -P stat.sample -P /dev/full
 swap	-a23 -e trace=swapon,swapoff
 sxetmask	-a11 -e trace=sgetmask,ssetmask
