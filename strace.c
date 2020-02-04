@@ -247,24 +247,24 @@ usage(void)
 #endif
 
 	printf("\
-usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I n] [-b execve] [-e expr]...\n\
-              [-a column] [-o file] [-s strsize] [-X format] [-P path]...\n\
-              [-p pid]... [--seccomp-bpf]\n\
-              { -p pid | [-DDD] [-E var=val]... [-u username] PROG [ARGS] }\n\
-   or: strace -c[dfwzZ] [-I n] [-b execve] [-e expr]... [-O overhead]\n\
-              [-S sortby] [-P path]... [-p pid]... [--seccomp-bpf]\n\
-              { -p pid | [-DDD] [-E var=val]... [-u username] PROG [ARGS] }\n\
+Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]...\n\
+              [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-P PATH]...\n\
+              [-p PID]... [--seccomp-bpf]\n\
+              { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
+   or: strace -c[dfwzZ] [-I N] [-b execve] [-e EXPR]... [-O OVERHEAD]\n\
+              [-S SORTBY] [-P PATH]... [-p PID]... [--seccomp-bpf]\n\
+              { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
 \n\
 General:\n\
-  -e expr        a qualifying expression: option=[!]all or option=[!]val1[,val2]...\n\
+  -e EXPR        a qualifying expression: OPTION=[!]all or OPTION=[!]VAL1[,VAL2]...\n\
      options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
                  inject, status, kvm\n\
 \n\
 Startup:\n\
-  -E var=val     put var=val in the environment for command\n\
-  -E var         remove var from the environment for command\n\
-  -p pid         trace process with process id PID, may be repeated\n\
-  -u username    run command as username handling setuid and/or setgid\n\
+  -E VAR=VAL     put VAR=VAL in the environment for command\n\
+  -E VAR         remove VAR from the environment for command\n\
+  -p PID         trace process with process id PID, may be repeated\n\
+  -u USERNAME    run command as USERNAME handling setuid and/or setgid\n\
 \n\
 Tracing:\n\
   -b execve      detach on execve syscall\n\
@@ -273,7 +273,7 @@ Tracing:\n\
   -DDD           run tracer process in a separate session\n\
   -f             follow forks\n\
   -ff            follow forks with output into separate files\n\
-  -I interruptible\n\
+  -I INTERRUPTIBLE\n\
      1:          no signals are blocked\n\
      2:          fatal signals are blocked while decoding syscall (default)\n\
      3:          fatal signals are always blocked (default if '-o FILE PROG')\n\
@@ -281,12 +281,12 @@ Tracing:\n\
                  (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 \n\
 Filtering:\n\
-  -P path        trace accesses to path\n\
+  -P PATH        trace accesses to PATH\n\
   -z             print only syscalls that returned without an error code\n\
   -Z             print only syscalls that returned with an error code\n\
 \n\
 Output format:\n\
-  -a column      alignment COLUMN for printing syscall results (default %d)\n\
+  -a COLUMN      alignment COLUMN for printing syscall results (default %d)\n\
   -i             print instruction pointer at time of syscall\n\
 "
 #ifdef ENABLE_STACKTRACE
@@ -295,12 +295,12 @@ Output format:\n\
 "
 #endif
 "\
-  -o file        send trace output to FILE instead of stderr\n\
+  -o FILE        send trace output to FILE instead of stderr\n\
   -A             open the file provided in the -o option in append mode\n\
   -q             suppress messages about attaching, detaching, etc.\n\
   -qq            suppress messages about process exit status as well.\n\
   -r             print relative timestamp\n\
-  -s strsize     limit length of print strings to STRSIZE chars (default %d)\n\
+  -s STRSIZE     limit length of print strings to STRSIZE chars (default %d)\n\
   -t             print absolute timestamp\n\
   -tt            print absolute timestamp with usecs\n\
   -ttt           print absolute UNIX time with usecs\n\
@@ -308,7 +308,7 @@ Output format:\n\
   -v             verbose mode: print entities unabbreviated\n\
   -x             print non-ascii strings in hex\n\
   -xx            print all strings in hex\n\
-  -X format      set the format for printing of named constants and flags\n\
+  -X FORMAT      set the FORMAT for printing of named constants and flags\n\
   -y             print paths associated with file descriptor arguments\n\
   -yy            print protocol specific information associated with socket\n\
                  file descriptors\n\
@@ -317,8 +317,8 @@ Statistics:\n\
   -c             count time, calls, and errors for each syscall and report\n\
                  summary\n\
   -C             like -c but also print regular output\n\
-  -O overhead    set overhead for tracing syscalls to OVERHEAD usecs\n\
-  -S sortby      sort syscall counts by: time, calls, errors, name, nothing\n\
+  -O OVERHEAD    set overhead for tracing syscalls to OVERHEAD usecs\n\
+  -S SORTBY      sort syscall counts by: time, calls, errors, name, nothing\n\
                  (default %s)\n\
   -w             summarise syscall latency (default is system time)\n\
 \n\
