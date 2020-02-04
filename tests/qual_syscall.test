@@ -66,7 +66,7 @@ for a in \!execve chdir 42 \!all none \
 	 \!file \!process desc ipc memory network signal; do
 	check_execve_output_mismatch abbrev "$a" "$pattern_nonabbrev_verbose"
 	check_execve_output_mismatch raw "$a" "$pattern_abbrev_verbose"
-	check_execve_output_mismatch verbose "$a" "$pattern_nonverbose" -a31
+	check_execve_output_mismatch verbose "$a" "$pattern_nonverbose" --columns=31
 done
 
 exit 0

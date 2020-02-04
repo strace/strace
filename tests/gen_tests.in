@@ -9,7 +9,7 @@ _newselect
 _newselect-P	 -e trace=_newselect -P /dev/full 9>>/dev/full
 accept	-a22
 accept4	-a37
-access	-a30 -P access_sample
+access	-a30 --trace-path=access_sample
 acct	-a20
 add_key	-a30 -s12
 adjtimex	-a15
@@ -91,7 +91,7 @@ fstat64	-a17 -v -P stat.sample
 fstat64-Xabbrev -a17 -Xabbrev -v -P stat.sample -e trace=fstat64
 fstat64-Xraw -a17 -Xraw -v -P stat.sample -e trace=fstat64
 fstat64-Xverbose -a17 -Xverbose -v -P stat.sample -e trace=fstat64
-fstatat64	-a32 -v -P stat.sample -P /dev/full
+fstatat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 fstatfs	-a18
 fstatfs64	-a24
 fsync	-a10
@@ -229,8 +229,8 @@ lchown32	-a32
 link
 linkat
 lookup_dcookie	-a27
-lstat	-a31 -v -P stat.sample -P /dev/full
-lstat64	-a32 -v -P stat.sample -P /dev/full
+lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
+lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 madvise	-a33
 maybe_switch_current_tcp	-a30 -f -e trace=execveat
 mbind
@@ -300,7 +300,7 @@ netlink_protocol	-e trace=sendto
 netlink_route	+netlink_sock_diag.test
 netlink_selinux	+netlink_sock_diag.test
 netlink_xfrm	+netlink_sock_diag.test
-newfstatat	-a32 -v -P stat.sample -P /dev/full
+newfstatat	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 nfnetlink_acct			+netlink_sock_diag.test
 nfnetlink_cthelper		+netlink_sock_diag.test
 nfnetlink_ctnetlink		+netlink_sock_diag.test
@@ -519,8 +519,8 @@ socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
 sockopt-timestamp	-e trace=recvmsg
 splice
-stat	-a30 -v -P stat.sample -P /dev/full
-stat64	-a32 -v -P stat.sample -P /dev/full
+stat	-a30 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
+stat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 statfs	-a17
 statfs64	-a23
 status-all	-a10 -e trace=chdir --status=detached,failed,successful,unavailable,unfinished
@@ -528,7 +528,7 @@ status-failed	-a10 -e trace=chdir -Z
 status-none	-e trace=all --status=none
 status-successful	-a10 -e trace=chdir -z
 status-unfinished	-a10 -e trace=all --status=unfinished
-statx	-a32 -v -P stat.sample -P /dev/full
+statx	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 swap	-a23 -e trace=swapon,swapoff
 sxetmask	-a11 -e trace=sgetmask,ssetmask
 symlink	-a34

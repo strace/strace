@@ -18,7 +18,7 @@ test_c()
 	sortopts="$1"; shift
 	sedexpr="$1"; shift
 
-	run_strace -c -w ${sortby:+-S} $sortby ../readv > /dev/null
+	run_strace -c -w $sortby ../readv > /dev/null
 	sed -r -n -e "$sedexpr" < "$LOG" > "$OUT"
 
 	[ -s "$OUT" ] ||
@@ -31,19 +31,19 @@ test_c()
 }
 
 c='[[:space:]]+([^[:space:]]+)'
-for s in '' time time_total total_time; do
+for s in '' '-S time' --summary-sort-by=time_total '-S total_time'; do
 	test_c "$s" '-n -r' \
 		's/^[[:space:]]+([0-9]+)[.,]([0-9]+)[[:space:]].*/\1\t\2/p'
 done
-for s in calls count; do
+for s in '-S calls' --summary-sort-by=count; do
 	test_c "$s" '-n -r' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
 done
-for s in name syscall syscall_name; do
+for s in '-S name' --summary-sort-by=syscall '-S syscall_name'; do
 	test_c "$s" '' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+[0-9]+)?'"$c"'$/\6/p'
 done
-for s in error errors; do
+for s in '-S error' --summary-sort-by=errors; do
 	test_c "$s" '-n -r' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+([0-9]+))?'"$c"'$/\6/p'
 done

@@ -43,7 +43,7 @@ if [ "x${ATTACH_MODE}" = "x1" ]; then
 			fail_ 'set_ptracer_any failed'
 	done
 
-	run_strace -e chdir -k -p "$tracee_pid"
+	run_strace --trace=chdir --stack-trace --attach="$tracee_pid"
 else
 	run_strace -e chdir -k $args
 fi
