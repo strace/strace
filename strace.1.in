@@ -1042,7 +1042,7 @@ option set to
 .BR ENOSYS .
 .SS Miscellaneous
 .TP 12
-.BR \-d ,
+.B \-d
 .TQ
 .B \-\-debug
 Show some debugging output of
@@ -1060,7 +1060,7 @@ and it is ignored at all if used along with one or more instances of
 .B \-f
 option.
 .TP
-.BR \-h ,
+.B \-h
 .TQ
 .B \-\-help
 Print the help summary.
@@ -1086,7 +1086,7 @@ In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
 .TP
-.BR \-V ,
+.B \-V
 .TQ
 .B \-\-version
 Print the version number of
