@@ -1401,8 +1401,10 @@ repository commit log.
 Problems with
 .B strace
 should be reported to the
+.UR mailto:strace\-devel@lists.strace.io
 .B strace
-mailing list at <strace\-devel@lists.strace.io>.
+mailing list
+.UE .
 .SH "SEE ALSO"
 .BR strace-log-merge (1),
 .BR ltrace (1),
