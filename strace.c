@@ -1699,11 +1699,8 @@ init(int argc, char *argv[])
 	qualify_status("all");
 	qualify_signals("all");
 
-	static const char optstring[] = "+"
-#ifdef ENABLE_STACKTRACE
-	    "k"
-#endif
-	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ";
+	static const char optstring[] =
+		"+a:Ab:cCdDe:E:fFhiI:ko:O:p:P:qrs:S:tTu:vVwxX:yzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -1730,9 +1727,7 @@ init(int argc, char *argv[])
 		{ "env",		required_argument, 0, 'E' },
 		{ "help",		no_argument,	   0, 'h' },
 		{ "instruction-pointer", no_argument,      0, 'i' },
-#ifdef ENABLE_STACKTRACE
 		{ "stack-traces",	no_argument,	   0, 'k' },
-#endif
 		{ "output",		required_argument, 0, 'o' },
 		{ "attach",		required_argument, 0, 'p' },
 		{ "trace-path",		required_argument, 0, 'P' },
@@ -1818,11 +1813,15 @@ init(int argc, char *argv[])
 			if (opt_intr <= 0)
 				error_opt_arg(c, optarg);
 			break;
-#ifdef ENABLE_STACKTRACE
 		case 'k':
+#ifdef ENABLE_STACKTRACE
 			stack_trace_enabled = true;
-			break;
+#else
+			error_msg_and_die("Stack traces (-k/--stack-traces "
+					  "option) are not supported by this "
+					  "build of strace");
 #endif
+			break;
 		case 'o':
 			outfname = optarg;
 			break;

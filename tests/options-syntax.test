@@ -154,6 +154,11 @@ fi
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' -d /
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
 
+if [ -z "$(get_config_option ENABLE_STACKTRACE 1)" ]; then
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" -k
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces
+fi
+
 args='-p 2147483647'
 $STRACE $args 2> "$LOG" &&
 	dump_log_and_fail_with \
