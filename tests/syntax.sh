@@ -10,45 +10,62 @@
 
 . "${srcdir=.}/init.sh"
 
+log_sfx()
+{
+	printf "%.128s" "$*" | tr -c '0-9A-Za-z-=,' '_'
+}
+
 check_exit_status_and_stderr()
 {
-	$STRACE "$@" 2> "$LOG" &&
-		dump_log_and_fail_with \
-			"strace $* failed to handle the error properly"
-	match_diff "$LOG" "$EXP" \
+	local sfx
+	sfx="$1"; shift
+	$STRACE "$@" 2> "$LOG.$sfx" && {
+		cat "$LOG.$sfx" >&2
+		fail_ "strace $* failed to handle the error properly"
+	}
+	match_diff "$LOG.$sfx" "$EXP.$sfx" \
 		"strace $* failed to print expected diagnostics"
 }
 
 check_exit_status_and_stderr_using_grep()
 {
-	$STRACE "$@" 2> "$LOG" &&
-		dump_log_and_fail_with \
-			"strace $* failed to handle the error properly"
-	match_grep "$LOG" "$EXP" \
+	local sfx
+	sfx="$1"; shift
+	$STRACE "$@" 2> "$LOG.$sfx" && {
+		cat "$LOG.$sfx" >&2
+		fail_ "strace $* failed to handle the error properly"
+	}
+	match_grep "$LOG.$sfx" "$EXP.$sfx" \
 		"strace $* failed to print expected diagnostics"
 }
 
 check_e()
 {
-	local pattern="$1"; shift
-	cat > "$EXP" << __EOF__
+	local pattern sfx
+	pattern="$1"; shift
+	sfx="$(log_sfx "$*")"
+	cat > "$EXP.$sfx" << __EOF__
 $STRACE_EXE: $pattern
 __EOF__
-	check_exit_status_and_stderr "$@"
+	check_exit_status_and_stderr "$sfx" "$@"
 }
 
 check_e_using_grep()
 {
-	local pattern="$1"; shift
-	cat > "$EXP" << __EOF__
+	local pattern sfx
+	pattern="$1"; shift
+	sfx="$(log_sfx "$*")"
+	cat > "$EXP.$sfx" << __EOF__
 $STRACE_EXE: $pattern
 __EOF__
-	check_exit_status_and_stderr_using_grep "$@"
+	check_exit_status_and_stderr_using_grep "$sfx" "$@"
 }
 
 check_h()
 {
-	local patterns="$1"; shift
+	local patterns sfx
+	patterns="$1"; shift
+	sfx="$(log_sfx "$*")"
 	{
 		local pattern
 		printf '%s\n' "$patterns" |
@@ -56,6 +73,6 @@ check_h()
 				printf '%s: %s\n' "$STRACE_EXE" "$pattern"
 			done
 		printf "Try '%s -h' for more information.\\n" "$STRACE_EXE"
-	} > "$EXP"
-	check_exit_status_and_stderr "$@"
+	} > "$EXP.$sfx"
+	check_exit_status_and_stderr "$sfx" "$@"
 }
