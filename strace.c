@@ -1690,14 +1690,14 @@ init(int argc, char *argv[])
 	shared_log = stderr;
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
-	qualify("trace=all");
-	qualify("abbrev=all");
-	qualify("verbose=all");
-	qualify("status=all");
+	qualify_trace("all");
+	qualify_abbrev("all");
+	qualify_verbose("all");
 #if DEFAULT_QUAL_FLAGS != (QUAL_TRACE | QUAL_ABBREV | QUAL_VERBOSE)
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
-	qualify("signal=all");
+	qualify_status("all");
+	qualify_signals("all");
 
 	static const char optstring[] = "+"
 #ifdef ENABLE_STACKTRACE
@@ -1861,7 +1861,7 @@ init(int argc, char *argv[])
 			username = optarg;
 			break;
 		case 'v':
-			qualify("abbrev=none");
+			qualify_abbrev("none");
 			break;
 		case 'V':
 			print_version();
