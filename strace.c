@@ -1706,19 +1706,19 @@ init(int argc, char *argv[])
 	    "a:Ab:cCdDe:E:fFhiI:o:O:p:P:qrs:S:tTu:vVwxX:yzZ";
 
 	enum {
-		SECCOMP_OPTION = 0x100,
+		GETOPT_SECCOMP = 0x100,
 
-		QUAL_TRACE_OPTION,
-		QUAL_ABBREV_OPTION,
-		QUAL_VERBOSE_OPTION,
-		QUAL_RAW_OPTION,
-		QUAL_SIGNAL_OPTION,
-		QUAL_STATUS_OPTION,
-		QUAL_READ_OPTION,
-		QUAL_WRITE_OPTION,
-		QUAL_FAULT_OPTION,
-		QUAL_INJECT_OPTION,
-		QUAL_KVM_OPTION,
+		GETOPT_QUAL_TRACE,
+		GETOPT_QUAL_ABBREV,
+		GETOPT_QUAL_VERBOSE,
+		GETOPT_QUAL_RAW,
+		GETOPT_QUAL_SIGNAL,
+		GETOPT_QUAL_STATUS,
+		GETOPT_QUAL_READ,
+		GETOPT_QUAL_WRITE,
+		GETOPT_QUAL_FAULT,
+		GETOPT_QUAL_INJECT,
+		GETOPT_QUAL_KVM,
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -1743,19 +1743,19 @@ init(int argc, char *argv[])
 		{ "version",		no_argument,	   0, 'V' },
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
 		{ "const-print-style",	required_argument, 0, 'X' },
-		{ "seccomp-bpf",	no_argument,	   0, SECCOMP_OPTION },
+		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
 
-		{ "trace",	required_argument, 0, QUAL_TRACE_OPTION },
-		{ "abbrev",	required_argument, 0, QUAL_ABBREV_OPTION },
-		{ "verbose",	required_argument, 0, QUAL_VERBOSE_OPTION },
-		{ "raw",	required_argument, 0, QUAL_RAW_OPTION },
-		{ "signals",	required_argument, 0, QUAL_SIGNAL_OPTION },
-		{ "status",	required_argument, 0, QUAL_STATUS_OPTION },
-		{ "read",	required_argument, 0, QUAL_READ_OPTION },
-		{ "write",	required_argument, 0, QUAL_WRITE_OPTION },
-		{ "fault",	required_argument, 0, QUAL_FAULT_OPTION },
-		{ "inject",	required_argument, 0, QUAL_INJECT_OPTION },
-		{ "kvm",	required_argument, 0, QUAL_KVM_OPTION },
+		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
+		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
+		{ "verbose",	required_argument, 0, GETOPT_QUAL_VERBOSE },
+		{ "raw",	required_argument, 0, GETOPT_QUAL_RAW },
+		{ "signals",	required_argument, 0, GETOPT_QUAL_SIGNAL },
+		{ "status",	required_argument, 0, GETOPT_QUAL_STATUS },
+		{ "read",	required_argument, 0, GETOPT_QUAL_READ },
+		{ "write",	required_argument, 0, GETOPT_QUAL_WRITE },
+		{ "fault",	required_argument, 0, GETOPT_QUAL_FAULT },
+		{ "inject",	required_argument, 0, GETOPT_QUAL_INJECT },
+		{ "kvm",	required_argument, 0, GETOPT_QUAL_KVM },
 
 		{ 0, 0, 0, 0 }
 	};
@@ -1896,40 +1896,40 @@ init(int argc, char *argv[])
 			add_number_to_set(STATUS_FAILED, status_set);
 			zflags++;
 			break;
-		case SECCOMP_OPTION:
+		case GETOPT_SECCOMP:
 			seccomp_filtering = true;
 			break;
-		case QUAL_TRACE_OPTION:
+		case GETOPT_QUAL_TRACE:
 			qualify_trace(optarg);
 			break;
-		case QUAL_ABBREV_OPTION:
+		case GETOPT_QUAL_ABBREV:
 			qualify_abbrev(optarg);
 			break;
-		case QUAL_VERBOSE_OPTION:
+		case GETOPT_QUAL_VERBOSE:
 			qualify_verbose(optarg);
 			break;
-		case QUAL_RAW_OPTION:
+		case GETOPT_QUAL_RAW:
 			qualify_raw(optarg);
 			break;
-		case QUAL_SIGNAL_OPTION:
+		case GETOPT_QUAL_SIGNAL:
 			qualify_signals(optarg);
 			break;
-		case QUAL_STATUS_OPTION:
+		case GETOPT_QUAL_STATUS:
 			qualify_status(optarg);
 			break;
-		case QUAL_READ_OPTION:
+		case GETOPT_QUAL_READ:
 			qualify_read(optarg);
 			break;
-		case QUAL_WRITE_OPTION:
+		case GETOPT_QUAL_WRITE:
 			qualify_write(optarg);
 			break;
-		case QUAL_FAULT_OPTION:
+		case GETOPT_QUAL_FAULT:
 			qualify_fault(optarg);
 			break;
-		case QUAL_INJECT_OPTION:
+		case GETOPT_QUAL_INJECT:
 			qualify_inject(optarg);
 			break;
-		case QUAL_KVM_OPTION:
+		case GETOPT_QUAL_KVM:
 			qualify_kvm(optarg);
 			break;
 		default:
