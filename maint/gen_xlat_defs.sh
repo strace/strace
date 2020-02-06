@@ -2,7 +2,7 @@
 
 # Generate xlat .in file based on the existing file and Linux UAPI headers.
 #
-# Copyright (c) 2018 The strace developers.
+# Copyright (c) 2018-2020 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

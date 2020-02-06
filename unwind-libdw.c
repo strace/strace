@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2014-2018 Mark Wielaard <mjw@redhat.com>
  * Copyright (c) 2018 Masatake YAMATO <yamato@redhat.com>
- * Copyright (c) 2018 The strace developers.
+ * Copyright (c) 2018-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

@@ -8,7 +8,7 @@
  * Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2013 Ali Polatel <alip@exherbo.org>
  * Copyright (c) 2015 Mike Frysinger <vapier@gentoo.org>
- * Copyright (c) 2015-2018 The strace developers.
+ * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

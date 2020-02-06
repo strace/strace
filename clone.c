@@ -4,7 +4,7 @@
  * Copyright (c) 2008 Jan Kratochvil <jan.kratochvil@redhat.com>
  * Copyright (c) 2009-2013 Denys Vlasenko <dvlasenk@redhat.com>
  * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2014-2019 The strace developers.
+ * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

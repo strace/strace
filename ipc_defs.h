@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003 Roland McGrath <roland@redhat.com>
- * Copyright (c) 2003-2018 The strace developers.
+ * Copyright (c) 2003-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

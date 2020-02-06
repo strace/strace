@@ -2,6 +2,7 @@
  * Check decoding of io_uring_setup syscall.
  *
  * Copyright (c) 2019 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2019-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
