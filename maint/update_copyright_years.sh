@@ -99,7 +99,7 @@ process_file()
 
 	if [ -z "$copyright_year_raw" ]; then
 		debug "Copyright notices haven't been found, skipping: $f"
-		continue
+		return
 	fi
 
 	last_commit_year=$(date -u +%Y -d "@$(git log --format=format:%at -- "$f" |
@@ -116,7 +116,7 @@ process_file()
 	# assume copyright notice is still relevant
 	if [ "$last_commit_year" = "$copyright_year" ]; then
 		debug "Does not need update, skipping: $f"
-		continue
+		return
 	else
 		debug "Needs update ('$copyright_year' != '$last_commit_year'): $f"
 	fi
