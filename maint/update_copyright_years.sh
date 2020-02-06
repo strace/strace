@@ -122,6 +122,7 @@ process_file()
 	fi
 
 	# avoid gaps not covered by copyright
+	[ -n "$copyright_year" ] &&
 	[ "$first_commit_year" -lt "$copyright_year" ] || {
 		start_note='from last copyright year'
 		first_commit_year="$copyright_year"
