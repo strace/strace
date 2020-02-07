@@ -687,9 +687,13 @@ Multiple
 options can be used to specify several paths.
 .TP
 .B \-z
+.TQ
+.B \-\-successful\-only
 Print only syscalls that returned without an error code.
 .TP
 .B \-Z
+.TQ
+.B \-\-failed\-only
 Print only syscalls that returned with an error code.
 .SS Output format
 .TP 12

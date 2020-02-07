@@ -309,8 +309,10 @@ Filtering:\n\
      statuses:   successful, failed, unfinished, unavailable, detached\n\
   -P PATH, --trace-path=PATH\n\
                  trace accesses to PATH\n\
-  -z             print only syscalls that returned without an error code\n\
-  -Z             print only syscalls that returned with an error code\n\
+  -z, --successful-only\n\
+                 print only syscalls that returned without an error code\n\
+  -Z, --failed-only\n\
+                 print only syscalls that returned with an error code\n\
 \n\
 Output format:\n\
   -a COLUMN, --columns=COLUMN\n\
@@ -1779,6 +1781,9 @@ init(int argc, char *argv[])
 		{ "version",		no_argument,	   0, 'V' },
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
 		{ "const-print-style",	required_argument, 0, 'X' },
+		{ "successful-only",	no_argument,	   0, 'z' },
+		{ "failed-only",	no_argument,	   0, 'Z' },
+		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
@@ -2081,7 +2086,9 @@ init(int argc, char *argv[])
 #endif
 
 	if (zflags > 1)
-		error_msg("Only the last of -z/-Z options will take effect. "
+		error_msg("Only the last of "
+			  "-z/--successful-only/-Z/--failed-only options will "
+			  "take effect. "
 			  "See status qualifier for more complex filters.");
 
 	acolumn_spaces = xmalloc(acolumn + 1);

@@ -178,8 +178,15 @@ $STRACE_EXE: -r has no effect with -c/--summary-only
 $STRACE_EXE: -t has no effect with -c/--summary-only
 $STRACE_EXE: -T has no effect with -c/--summary-only
 $STRACE_EXE: -y has no effect with -c/--summary-only
-$STRACE_EXE: Only the last of -z/-Z options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
 $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
+
+	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: -z --successful-only true
+	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: --successful-only -Z true
+	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: --successful-only --failed-only true
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" --user=:nosuchuser: --instruction-pointer --summary-only true

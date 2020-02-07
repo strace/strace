@@ -508,9 +508,13 @@ statfs
 statfs64
 status-all
 status-failed
+status-failed-long
+status-failed-status
 status-none
 status-none-f
 status-successful
+status-successful-long
+status-successful-status
 status-unfinished
 statx
 swap

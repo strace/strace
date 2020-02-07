@@ -526,8 +526,12 @@ statfs	-a17
 statfs64	-a23
 status-all	-a10 -e trace=chdir --status=detached,failed,successful,unavailable,unfinished
 status-failed	-a10 -e trace=chdir -Z
+status-failed-long	-a10 -e trace=chdir --failed-only
+status-failed-status	-a10 -e trace=chdir -e status=failed
 status-none	-e trace=all --status=none
 status-successful	-a10 -e trace=chdir -z
+status-successful-long	-a10 -e trace=chdir --successful-only
+status-successful-status	-a10 -e trace=chdir --status=successful
 status-unfinished	-a10 -e trace=all --status=unfinished
 statx	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 swap	-a23 -e trace=swapon,swapoff
