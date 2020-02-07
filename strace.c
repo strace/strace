@@ -102,6 +102,12 @@ enum {
 	DAEMONIZE_OPTS_GUARD__,
 	MAX_DAEMONIZE_OPTS    = DAEMONIZE_OPTS_GUARD__ - 1
 };
+static struct xlat_data daemonize_str[] = {
+	{ DAEMONIZE_GRANDCHILD,		"grandchild" },
+	{ DAEMONIZE_NEW_PGROUP,		"pgroup" },
+	{ DAEMONIZE_NEW_PGROUP,		"pgrp" },
+	{ DAEMONIZE_NEW_SESSION,	"session" },
+};
 /*
  * daemonized_tracer supports -D option.
  * With this option, strace forks twice.
@@ -273,9 +279,12 @@ Startup:\n\
 Tracing:\n\
   -b execve, --detach-on=execve\n\
                  detach on execve syscall\n\
-  -D             run tracer process as a grandchild, not as a parent\n\
-  -DD            run tracer process in a separate process group\n\
-  -DDD           run tracer process in a separate session\n\
+  -D, --daemonize[=grandchild]\n\
+                 run tracer process as a grandchild, not as a parent\n\
+  -DD, --daemonize=pgroup\n\
+                 run tracer process in a separate process group\n\
+  -DDD, --daemonize=session\n\
+                 run tracer process in a separate session\n\
   -f             follow forks\n\
   -ff            follow forks with output into separate files\n\
   -I INTERRUPTIBLE, --interruptible=INTERRUPTIBLE\n\
@@ -1702,6 +1711,7 @@ init(int argc, char *argv[])
 	int c, i;
 	int optF = 0, zflags = 0;
 	int lopt_idx;
+	int daemonized_tracer_long = DAEMONIZE_NONE;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1730,6 +1740,7 @@ init(int argc, char *argv[])
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
+		GETOPT_DAEMONIZE,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -1750,6 +1761,9 @@ init(int argc, char *argv[])
 		{ "summary-only",	no_argument,	   0, 'c' },
 		{ "summary",		no_argument,	   0, 'C' },
 		{ "debug",		no_argument,	   0, 'd' },
+		{ "daemonize",		optional_argument, 0, GETOPT_DAEMONIZE },
+		{ "daemonised",		optional_argument, 0, GETOPT_DAEMONIZE },
+		{ "daemonized",		optional_argument, 0, GETOPT_DAEMONIZE },
 		{ "env",		required_argument, 0, 'E' },
 		{ "help",		no_argument,	   0, 'h' },
 		{ "instruction-pointer", no_argument,      0, 'i' },
@@ -1825,6 +1839,14 @@ init(int argc, char *argv[])
 			break;
 		case 'D':
 			daemonized_tracer++;
+			break;
+		case GETOPT_DAEMONIZE:
+			daemonized_tracer_long =
+				find_arg_val(optarg, daemonize_str,
+					     DAEMONIZE_GRANDCHILD,
+					     DAEMONIZE_NONE);
+			if (daemonized_tracer_long <= DAEMONIZE_NONE)
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'e':
 			qualify(optarg);
@@ -1981,8 +2003,18 @@ init(int argc, char *argv[])
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
 
+	if (daemonized_tracer_long) {
+		if (daemonized_tracer) {
+			error_msg_and_die("-D and --daemonize cannot"
+					  " be provided simultaneously");
+		} else {
+			daemonized_tracer = daemonized_tracer_long;
+		}
+	}
+
 	if (!argc && daemonized_tracer) {
-		error_msg_and_help("PROG [ARGS] must be specified with -D");
+		error_msg_and_help("PROG [ARGS] must be specified with "
+				   "-D/--daemonize");
 	}
 
 	if (daemonized_tracer > (unsigned int) MAX_DAEMONIZE_OPTS)

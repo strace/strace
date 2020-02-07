@@ -343,12 +343,20 @@ multi-threaded process and therefore require
 but don't want to trace its (potentially very complex) children.
 .TP
 .B \-D
+.TQ
+.B \-\-daemonize
+.TQ
+.BR \-\-daemonize = grandchild
 Run tracer process as a grandchild, not as the parent of the
 tracee.  This reduces the visible effect of
 .B strace
 by keeping the tracee a direct child of the calling process.
 .TP
 .B \-DD
+.TQ
+.BR \-\-daemonize = pgroup
+.TQ
+.BR \-\-daemonize = pgrp
 Run tracer process as tracee's grandchild in a separate process group.
 In addition to reduction of the visible effect of
 .BR strace ,
@@ -359,6 +367,8 @@ with
 issued to the whole process group.
 .TP
 .B \-DDD
+.TQ
+.BR \-\-daemonize = session
 Run tracer process as tracee's grandchild in a separate session
 ("true daemonisation").
 In addition to reduction of the visible effect of
