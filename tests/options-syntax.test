@@ -35,16 +35,16 @@ check_h 'PROG [ARGS] must be specified with -D' -DD -p $$
 check_h 'PROG [ARGS] must be specified with -D' -DDD -p $$
 check_h 'PROG [ARGS] must be specified with -D' -DDDD -p $$
 check_h 'Too many -D'\''s (4), maximum supported -D count is 3' -DDDD /bin/true
-check_h '-c and -C are mutually exclusive' -c -C true
-check_h '-c and -C are mutually exclusive' --summary-only --summary true
-check_h '-c and -C are mutually exclusive' -C -c true
-check_h '-c and -C are mutually exclusive' --summary --summary-only true
-check_h '(-c or -C) and -ff are mutually exclusive' -c -ff true
-check_h '(-c or -C) and -ff are mutually exclusive' --summary-only -ff true
-check_h '(-c or -C) and -ff are mutually exclusive' -C -ff true
-check_h '(-c or -C) and -ff are mutually exclusive' --summary -ff true
-check_h '-w must be given with (-c or -C)' -w true
-check_h '-w must be given with (-c or -C)' --summary-wall-clock true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' -c -C true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' --summary-only --summary true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' -C -c true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' --summary --summary-only true
+check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' -c -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' --summary-only -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' -C -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' --summary -ff true
+check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -w true
+check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --summary-wall-clock true
 check_h 'piping the output and -ff are mutually exclusive' -o '|' -ff true
 check_h 'piping the output and -ff are mutually exclusive' --output='|' -ff true
 check_h 'piping the output and -ff are mutually exclusive' -o '!' -ff true
@@ -94,16 +94,16 @@ check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e 
 check_h "incorrect personality designator '42' in qualification '23@42'" -e trace=23@42,123
 
 check_h '--seccomp-bpf implies -f
--w must be given with (-c or -C)' --seccomp-bpf -w /
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -w /
 check_h '--seccomp-bpf is not enabled for processes attached with -p
--w must be given with (-c or -C)' --seccomp-bpf -f -p 1 -w
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -f -p 1 -w
 
 check_h 'option -F is deprecated, please use -f instead
--w must be given with (-c or -C)' -F -w /
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -F -w /
 check_h 'option -F is deprecated, please use -f instead
--w must be given with (-c or -C)' -FF -w /
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -FF -w /
 check_h 'deprecated option -F ignored
--w must be given with (-c or -C)' -fF -w /
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -fF -w /
 
 check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
 check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
@@ -154,25 +154,25 @@ if [ "$uid" -ge 0 ]; then
 	if [ "$uid" -eq 0 ]; then
 		umsg="Cannot find user ':nosuchuser:'"
 	else
-		umsg='You must be root to use the -u option'
+		umsg='You must be root to use the -u/--username option'
 	fi
 
 	check_e "$umsg" -u :nosuchuser: true
 
-	for c in i r t T y; do
-		check_e "-$c has no effect with -c
-$STRACE_EXE: $umsg" -u :nosuchuser: -c -$c true
+	for c in i/--instruction-pointer r t T y; do
+		check_e "-$c has no effect with -c/--summary-only
+$STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 	done
 
-	check_e "-i has no effect with -c
-$STRACE_EXE: -r has no effect with -c
-$STRACE_EXE: -t has no effect with -c
-$STRACE_EXE: -T has no effect with -c
-$STRACE_EXE: -y has no effect with -c
+	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
+$STRACE_EXE: -r has no effect with -c/--summary-only
+$STRACE_EXE: -t has no effect with -c/--summary-only
+$STRACE_EXE: -T has no effect with -c/--summary-only
+$STRACE_EXE: -y has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/-Z options will take effect. See status qualifier for more complex filters.
 $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
 
-	check_e "-i has no effect with -c
+	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" --user=:nosuchuser: --instruction-pointer --summary-only true
 fi
 

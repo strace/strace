@@ -1806,13 +1806,17 @@ init(int argc, char *argv[])
 			break;
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
-				error_msg_and_help("-c and -C are mutually exclusive");
+				error_msg_and_help("-c/--summary-only and "
+						   "-C/--summary are mutually "
+						   "exclusive");
 			}
 			cflag = CFLAG_ONLY_STATS;
 			break;
 		case 'C':
 			if (cflag == CFLAG_ONLY_STATS) {
-				error_msg_and_help("-c and -C are mutually exclusive");
+				error_msg_and_help("-c/--summary-only and "
+						   "-C/--summary are mutually "
+						   "exclusive");
 			}
 			cflag = CFLAG_BOTH;
 			break;
@@ -2013,26 +2017,30 @@ init(int argc, char *argv[])
 	}
 
 	if (followfork >= 2 && cflag) {
-		error_msg_and_help("(-c or -C) and -ff are mutually exclusive");
+		error_msg_and_help("(-c/--summary-only or -C/--summary) and -ff"
+				   " are mutually exclusive");
 	}
 
 	if (count_wallclock && !cflag) {
-		error_msg_and_help("-w must be given with (-c or -C)");
+		error_msg_and_help("-w/--summary-wall-clock must be given with"
+				   " (-c/--summary-only or -C/--summary)");
 	}
 
 	if (cflag == CFLAG_ONLY_STATS) {
 		if (iflag)
-			error_msg("-%c has no effect with -c", 'i');
+			error_msg("-i/--instruction-pointer has no effect "
+				  "with -c/--summary-only");
 		if (stack_trace_enabled)
-			error_msg("-%c has no effect with -c", 'k');
+			error_msg("-k/--stack-traces has no effect "
+				  "with -c/--summary-only");
 		if (rflag)
-			error_msg("-%c has no effect with -c", 'r');
+			error_msg("-%c has no effect with -c/--summary-only", 'r');
 		if (tflag)
-			error_msg("-%c has no effect with -c", 't');
+			error_msg("-%c has no effect with -c/--summary-only", 't');
 		if (Tflag)
-			error_msg("-%c has no effect with -c", 'T');
+			error_msg("-%c has no effect with -c/--summary-only", 'T');
 		if (show_fd_path)
-			error_msg("-%c has no effect with -c", 'y');
+			error_msg("-%c has no effect with -c/--summary-only", 'y');
 	}
 
 #ifndef HAVE_OPEN_MEMSTREAM
@@ -2060,7 +2068,8 @@ init(int argc, char *argv[])
 		struct passwd *pent;
 
 		if (getuid() != 0 || geteuid() != 0) {
-			error_msg_and_die("You must be root to use the -u option");
+			error_msg_and_die("You must be root to use "
+					  "the -u/--username option");
 		}
 		pent = getpwnam(username);
 		if (pent == NULL) {
