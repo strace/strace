@@ -134,22 +134,18 @@ parse_ts(const char *s, struct timespec *t)
 {
 	enum { NS_IN_S = 1000000000 };
 
-	static const struct time_unit {
-		const char *s;
-		unsigned int mul;
-	} units[] = {
-		{ "",   1000 }, /* default is microseconds */
-		{ "s",  1000000000 },
-		{ "ms", 1000000 },
-		{ "us", 1000 },
-		{ "ns", 1 },
+	static const struct xlat_data units[] = {
+		{ 1000,		"" }, /* default is microseconds */
+		{ 1000000000,	"s" },
+		{ 1000000,	"ms" },
+		{ 1000,		"us" },
+		{ 1,		"ns" },
 	};
 	static const char float_accept[] =  "eE.-+0123456789";
 	static const char int_accept[] = "+0123456789";
 
 	size_t float_len = strspn(s, float_accept);
 	size_t int_len = strspn(s, int_accept);
-	const struct time_unit *unit = NULL;
 	char *endptr = NULL;
 	double float_val = -1;
 	long long int_val = -1;
@@ -170,25 +166,18 @@ parse_ts(const char *s, struct timespec *t)
 			return -1;
 	}
 
-	for (size_t i = 0; i < ARRAY_SIZE(units); i++) {
-		if (strcmp(endptr, units[i].s))
-			continue;
-
-		unit = units + i;
-		break;
-	}
-
+	const struct xlat_data *unit = find_xlat_val(units, endptr);
 	if (!unit)
 		return -1;
 
 	if (float_len > int_len) {
-		t->tv_sec = float_val / (NS_IN_S / unit->mul);
+		t->tv_sec = float_val / (NS_IN_S / unit->val);
 		t->tv_nsec = ((uint64_t) ((float_val -
-					   (t->tv_sec * (NS_IN_S / unit->mul)))
-					  * unit->mul)) % NS_IN_S;
+					   (t->tv_sec * (NS_IN_S / unit->val)))
+					  * unit->val)) % NS_IN_S;
 	} else {
-		t->tv_sec = int_val / (NS_IN_S / unit->mul);
-		t->tv_nsec = (int_val % (NS_IN_S / unit->mul)) * unit->mul;
+		t->tv_sec = int_val / (NS_IN_S / unit->val);
+		t->tv_nsec = (int_val % (NS_IN_S / unit->val)) * unit->val;
 	}
 
 	return 0;
