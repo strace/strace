@@ -1103,6 +1103,57 @@ extern void
 decode_netlink_kobject_uevent(struct tcb *, kernel_ulong_t addr,
 			      kernel_ulong_t len);
 
+enum find_xlat_flag_bits {
+	FXL_CASE_SENSITIVE_BIT,
+};
+
+enum find_xlat_flags {
+	/** Whether to use strcmp instead of strcasecmp for comparison */
+	FLAG(FXL_CASE_SENSITIVE),
+};
+
+/**
+ * Searches for a string-value pair in the provided array of pairs.
+ *
+ * @param items     Array of string-value pairs to search in.
+ * @param s         String to search for.
+ * @param num_items Item count in items array.
+ * @param flags     Bitwise-or'ed flags from enum find_xlat_flags.
+ * @return          Pointer to the first matching string-value pair inside items
+ *                  or NULL if nothing has been found.
+ */
+extern const struct xlat_data *find_xlat_val_ex(const struct xlat_data *items,
+						const char *s, size_t num_items,
+						unsigned int flags);
+#define find_xlat_val(items_, s_) \
+	find_xlat_val_ex((items_), (s_), ARRAY_SIZE(items_), 0)
+#define find_xlat_val_case(items_, s_) \
+	find_xlat_val_ex((items_), (s_), ARRAY_SIZE(items_), FXL_CASE_SENSITIVE)
+
+/**
+ * A find_xlat_val_ex wrapper for option arguments parsing.  Provides a value
+ * from strs array that matched the supplied arg string.  If arg is NULL,
+ * default_val is returned.  If nothing has matched, not_found value
+ * is returned.
+ *
+ * find_arg_val provides a wrapper for the common case of statically-defined
+ * strs arrays.
+ *
+ * @param arg         Argument string to parse
+ * @param strs        Array of string-value pairs to match arg against.
+ * @param strs_size   Element count in the strs array.
+ * @param default_val Value to return if arg is NULL.
+ * @param not_found   Value to return if arg hasn't found among strs.
+ * @return            default_val is arg is NULL, value part of the matched
+ *                    string-value pair, or not_found if nothing has matched.
+ */
+extern uint64_t find_arg_val_(const char *arg, const struct xlat_data *strs,
+			      size_t strs_size, uint64_t default_val,
+			      uint64_t not_found);
+/** A find_arg_val_ wrapper that supplies strs_size to it using ARRAY_SIZE. */
+#define find_arg_val(arg_, strs_, dflt_, not_found_) \
+	find_arg_val_((arg_), (strs_), ARRAY_SIZE(strs_), (dflt_), (not_found_))
+
 extern int ts_nz(const struct timespec *);
 extern int ts_cmp(const struct timespec *, const struct timespec *);
 extern double ts_float(const struct timespec *);

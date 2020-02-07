@@ -30,6 +30,31 @@
 #include "xlat.h"
 #include "xstring.h"
 
+const struct xlat_data *
+find_xlat_val_ex(const struct xlat_data *items, const char *s, size_t num_items,
+		 unsigned int flags)
+{
+	for (size_t i = 0; i < num_items; i++) {
+		if (!(flags & FXL_CASE_SENSITIVE ? strcmp
+						 : strcasecmp)(items[i].str, s))
+			return items + i;
+	}
+
+	return NULL;
+}
+
+uint64_t
+find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
+	       uint64_t default_val, uint64_t not_found)
+{
+	if (!arg)
+		return default_val;
+
+	const struct xlat_data *res = find_xlat_val_ex(strs, arg, strs_size, 0);
+
+	return  res ? res->val : not_found;
+}
+
 int
 ts_nz(const struct timespec *a)
 {
