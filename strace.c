@@ -345,7 +345,8 @@ Output format:\n\
                  verbose mode: print entities unabbreviated\n\
   -x             print non-ascii strings in hex\n\
   -xx            print all strings in hex\n\
-  -X FORMAT      set the FORMAT for printing of named constants and flags\n\
+  -X FORMAT, --const-print-style=FORMAT\n\
+                 set the FORMAT for printing of named constants and flags\n\
      formats:    raw, abbrev, verbose\n\
   -y             print paths associated with file descriptor arguments\n\
   -yy            print protocol specific information associated with socket\n\
@@ -360,7 +361,8 @@ Statistics:\n\
   -S SORTBY, --summary-sort-by=SORTBY\n\
                  sort syscall counts by: time, calls, errors, name, nothing\n\
                  (default %s)\n\
-  -w             summarise syscall latency (default is system time)\n\
+  -w, --summary-wall-clock\n\
+                 summarise syscall latency (default is system time)\n\
 \n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
