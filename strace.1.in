@@ -401,23 +401,25 @@ One might want to consider using
 to obtain a combined strace log view.
 .TP
 .BI "\-I " interruptible
+.TQ
+.BR "\-\-interruptible" = \fIinterruptible\fR
 When
 .B strace
 can be interrupted by signals (such as pressing
 .BR CTRL\-C ).
 .RS
-.TP 4
-.B 1
+.TP 15
+.BR 1 ", " anywhere
 no signals are blocked;
 .TQ
-.B 2
+.BR 2 ", " waiting
 fatal signals are blocked while decoding syscall (default);
 .TQ
-.B 3
+.BR 3 ", " never
 fatal signals are always blocked (default if
 .BR -o " " \fIFILE\fR " " \fIPROG\fR );
 .TQ
-.B 4
+.BR 4 ", " never_tstp
 fatal signals and
 .BR SIGTSTP " (" CTRL\-Z )
 are always blocked (useful to make

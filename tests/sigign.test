@@ -20,7 +20,7 @@ for sig in $(../list_sigaction_signum); do
 		check_cmd="../check_sigign $ign $sig"
 		run_prog $set_cmd $check_cmd
 		STRACE="$set_cmd $saved_STRACE"
-		for i in '' -I1 -I2 -I3 -I4; do
+		for i in '' --interruptible=always --interruptible=2 -Inever -I4; do
 			run_strace $i -enone $check_cmd
 		done
 	done

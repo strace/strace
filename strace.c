@@ -278,12 +278,12 @@ Tracing:\n\
   -DDD           run tracer process in a separate session\n\
   -f             follow forks\n\
   -ff            follow forks with output into separate files\n\
-  -I INTERRUPTIBLE\n\
-     1:          no signals are blocked\n\
-     2:          fatal signals are blocked while decoding syscall (default)\n\
-     3:          fatal signals are always blocked (default if '-o FILE PROG')\n\
-     4:          fatal signals and SIGTSTP (^Z) are always blocked\n\
-                 (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
+  -I INTERRUPTIBLE, --interruptible=INTERRUPTIBLE\n\
+     1, anywhere:   no signals are blocked\n\
+     2, waiting:    fatal signals are blocked while decoding syscall (default)\n\
+     3, never:      fatal signals are always blocked (default if '-o FILE PROG')\n\
+     4, never_tstp: fatal signals and SIGTSTP (^Z) are always blocked\n\
+                    (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 \n\
 Filtering:\n\
   -e trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none},\n\
@@ -1666,6 +1666,23 @@ set_sighandler(int signo, void (*sighandler)(int), struct sigaction *oldact)
 	sigaction(signo, &sa, oldact);
 }
 
+static int
+parse_interruptible_arg(const char *arg)
+{
+	static const struct xlat_data intr_str[] = {
+		{ INTR_ANYWHERE,	"anywhere" },
+		{ INTR_ANYWHERE,	"always" },
+		{ INTR_WHILE_WAIT,	"waiting" },
+		{ INTR_NEVER,		"never" },
+		{ INTR_BLOCK_TSTP_TOO,	"never_tstp" },
+	};
+
+	const struct xlat_data *intr_arg = find_xlat_val(intr_str, arg);
+
+	return intr_arg ? (int) intr_arg->val
+			: (int) string_to_uint_upto(arg, NUM_INTR_OPTS - 1);
+}
+
 /*
  * Initialization part of main() was eating much stack (~0.5k),
  * which was unused after init.
@@ -1730,6 +1747,7 @@ init(int argc, char *argv[])
 		{ "env",		required_argument, 0, 'E' },
 		{ "help",		no_argument,	   0, 'h' },
 		{ "instruction-pointer", no_argument,      0, 'i' },
+		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
 		{ "output",		required_argument, 0, 'o' },
 		{ "attach",		required_argument, 0, 'p' },
@@ -1812,7 +1830,7 @@ init(int argc, char *argv[])
 			iflag = 1;
 			break;
 		case 'I':
-			opt_intr = string_to_uint_upto(optarg, NUM_INTR_OPTS - 1);
+			opt_intr = parse_interruptible_arg(optarg);
 			if (opt_intr <= 0)
 				error_opt_arg(c, optarg);
 			break;

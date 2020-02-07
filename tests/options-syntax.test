@@ -55,7 +55,32 @@ check_h "invalid -s argument: '-42'" -s -42
 check_h "invalid -s argument: '-42'" --string-limit=-42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
 check_h "invalid -s argument: '1073741824'" --string-limit=1073741824
+check_h "invalid -I argument: '0x1'" -I 0x1
+check_h "invalid -I argument: '0'" -I 0
+check_h "must have PROG [ARGS] or -p PID" -I1
+check_h "must have PROG [ARGS] or -p PID" -I 2
+check_h "must have PROG [ARGS] or -p PID" -I3
+check_h "must have PROG [ARGS] or -p PID" -I 4
 check_h "invalid -I argument: '5'" -I 5
+check_h "must have PROG [ARGS] or -p PID" -I always
+check_h "must have PROG [ARGS] or -p PID" -I anywhere
+check_h "must have PROG [ARGS] or -p PID" -Iwaiting
+check_h "must have PROG [ARGS] or -p PID" -I never
+check_h "must have PROG [ARGS] or -p PID" -Inever_tstp
+check_h "invalid -I argument: '=never'" -I=never
+check_h "invalid -I argument: 'nevertheless'" -Inevertheless
+check_h "invalid -I argument: 'nev'" -Inev
+check_h "invalid -I argument: '0x1'" --interruptible=0x1
+check_h "invalid -I argument: '0'" --interruptible=0
+check_h "must have PROG [ARGS] or -p PID" --interruptible 1
+check_h "must have PROG [ARGS] or -p PID" --interruptible=2
+check_h "invalid -I argument: '5'" --interruptible=5
+check_h "must have PROG [ARGS] or -p PID" --interruptible=anywhere
+check_h "must have PROG [ARGS] or -p PID" --interruptible=waiting
+check_h "must have PROG [ARGS] or -p PID" --interruptible=never
+check_h "must have PROG [ARGS] or -p PID" --interruptible=never_tstp
+check_h "invalid -I argument: 'nevertheless'" --interruptible=nevertheless
+check_h "invalid -I argument: 'nev'" --interruptible=nev
 check_h "invalid -X argument: 'test'" -Xtest
 check_h "invalid -X argument: 'test'" --const-print-style=test
 check_h "invalid -X argument: 'a'" -Xa
