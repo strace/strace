@@ -52,9 +52,9 @@ check_h 'piping the output and -ff are mutually exclusive' --output='!' -ff true
 check_h "invalid -a argument: '-42'" -a -42
 check_h "invalid -O argument: '-42'" -O -42
 check_h "invalid -s argument: '-42'" -s -42
-check_h "invalid -s argument: '-42'" --string-limit=-42
+check_h "invalid --string-limit argument: '-42'" --string-limit=-42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
-check_h "invalid -s argument: '1073741824'" --string-limit=1073741824
+check_h "invalid --string-limit argument: '1073741824'" --string-limit=1073741824
 check_h "invalid -I argument: '0x1'" -I 0x1
 check_h "invalid -I argument: '0'" -I 0
 check_h "must have PROG [ARGS] or -p PID" -I1
@@ -70,23 +70,23 @@ check_h "must have PROG [ARGS] or -p PID" -Inever_tstp
 check_h "invalid -I argument: '=never'" -I=never
 check_h "invalid -I argument: 'nevertheless'" -Inevertheless
 check_h "invalid -I argument: 'nev'" -Inev
-check_h "invalid -I argument: '0x1'" --interruptible=0x1
-check_h "invalid -I argument: '0'" --interruptible=0
+check_h "invalid --interruptible argument: '0x1'" --interruptible=0x1
+check_h "invalid --interruptible argument: '0'" --interruptible=0
 check_h "must have PROG [ARGS] or -p PID" --interruptible 1
 check_h "must have PROG [ARGS] or -p PID" --interruptible=2
-check_h "invalid -I argument: '5'" --interruptible=5
+check_h "invalid --interruptible argument: '5'" --interruptible=5
 check_h "must have PROG [ARGS] or -p PID" --interruptible=anywhere
 check_h "must have PROG [ARGS] or -p PID" --interruptible=waiting
 check_h "must have PROG [ARGS] or -p PID" --interruptible=never
 check_h "must have PROG [ARGS] or -p PID" --interruptible=never_tstp
-check_h "invalid -I argument: 'nevertheless'" --interruptible=nevertheless
-check_h "invalid -I argument: 'nev'" --interruptible=nev
+check_h "invalid --interruptible argument: 'nevertheless'" --interruptible=nevertheless
+check_h "invalid --interruptible argument: 'nev'" --interruptible=nev
 check_h "invalid -X argument: 'test'" -Xtest
-check_h "invalid -X argument: 'test'" --const-print-style=test
+check_h "invalid --const-print-style argument: 'test'" --const-print-style=test
 check_h "invalid -X argument: 'a'" -Xa
-check_h "invalid -X argument: 'a'" --const-print-style=a
+check_h "invalid --const-print-style argument: 'a'" --const-print-style=a
 check_h "invalid -X argument: 'abbreviated'" -X abbreviated
-check_h "invalid -X argument: 'abbreviated'" --const-print-style=abbreviated
+check_h "invalid --const-print-style argument: 'abbreviated'" --const-print-style=abbreviated
 
 check_h "incorrect personality designator '' in qualification 'getcwd@'" -e trace=getcwd@
 check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=getcwd@42

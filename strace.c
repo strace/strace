@@ -402,9 +402,14 @@ die(void)
 }
 
 static void
-error_opt_arg(int opt, const char *arg)
+error_opt_arg(int opt, const struct option *lopt, const char *arg)
 {
-	error_msg_and_help("invalid -%c argument: '%s'", opt, arg);
+	if (lopt && lopt->name) {
+		error_msg_and_help("invalid --%s argument: '%s'",
+				   lopt->name, arg);
+	} else {
+		error_msg_and_help("invalid -%c argument: '%s'", opt, arg);
+	}
 }
 
 static const char *ptrace_attach_cmd;
@@ -1696,6 +1701,7 @@ init(int argc, char *argv[])
 {
 	int c, i;
 	int optF = 0, zflags = 0;
+	int lopt_idx;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1776,12 +1782,18 @@ init(int argc, char *argv[])
 		{ 0, 0, 0, 0 }
 	};
 
-	while ((c = getopt_long(argc, argv, optstring, longopts, NULL)) != EOF) {
+	lopt_idx = -1;
+	while ((c = getopt_long(argc, argv, optstring, longopts, &lopt_idx)) != EOF) {
+		const struct option *lopt = lopt_idx >= 0
+			&& (unsigned) lopt_idx < ARRAY_SIZE(longopts)
+			? longopts + lopt_idx : NULL;
+		lopt_idx = -1;
+
 		switch (c) {
 		case 'a':
 			acolumn = string_to_uint(optarg);
 			if (acolumn < 0)
-				error_opt_arg(c, optarg);
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'A':
 			open_append = true;
@@ -1832,7 +1844,7 @@ init(int argc, char *argv[])
 		case 'I':
 			opt_intr = parse_interruptible_arg(optarg);
 			if (opt_intr <= 0)
-				error_opt_arg(c, optarg);
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'k':
 #ifdef ENABLE_STACKTRACE
@@ -1848,7 +1860,7 @@ init(int argc, char *argv[])
 			break;
 		case 'O':
 			if (set_overhead(optarg) < 0)
-				error_opt_arg(c, optarg);
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'p':
 			process_opt_p_list(optarg);
@@ -1865,7 +1877,7 @@ init(int argc, char *argv[])
 		case 's':
 			i = string_to_uint(optarg);
 			if (i < 0 || (unsigned int) i > -1U / 4)
-				error_opt_arg(c, optarg);
+				error_opt_arg(c, lopt, optarg);
 			max_strlen = i;
 			break;
 		case 'S':
@@ -1901,7 +1913,7 @@ init(int argc, char *argv[])
 			else if (!strcmp(optarg, "verbose"))
 				xlat_verbosity = XLAT_STYLE_VERBOSE;
 			else
-				error_opt_arg(c, optarg);
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'y':
 			show_fd_path++;
