@@ -865,6 +865,8 @@ Suppress messages attaching, detaching, personality changes,
 and about process exit status.
 .TP
 .B \-r
+.TQ
+.B \-\-relative\-timestamps
 Print a relative timestamp upon entry to each system call.  This
 records the time difference between the beginning of successive
 system calls.
@@ -895,6 +897,8 @@ and the leading portion will be printed as the number
 of seconds since the epoch.
 .TP
 .B \-T
+.TQ
+.B \-\-syscall\-times
 Show the time spent in system calls.  This records the time
 difference between the beginning and the end of each system call.
 .TP
@@ -969,6 +973,8 @@ Like
 but also print regular output while processes are running.
 .TP
 .BI "\-O " overhead
+.TQ
+.BR "\-\-summary\-syscall\-overhead " = \fIoverhead\fR
 Set the overhead for tracing system calls to
 .IR overhead .
 This is useful for overriding the default heuristic for guessing

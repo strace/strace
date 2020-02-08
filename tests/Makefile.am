@@ -468,6 +468,8 @@ EXTRA_DIST = \
 	sockname.c \
 	stack-fcall.h \
 	status-detached.expected \
+	strace--relative-timestamps.expected \
+	strace--syscall-times.expected \
 	strace-C.expected \
 	strace-D.expected \
 	strace-DD.expected \

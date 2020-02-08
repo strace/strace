@@ -36,6 +36,7 @@ HALFCLOCK=' *[^ ]+ +0\.[567][^n]*nanosleep *'
 
 grep_log "$GENERIC"	-c
 grep_log "$GENERIC"	-c -O1
+grep_log "$GENERIC"	-c --summary-syscall-overhead=1
 grep_log "$GENERIC"	-c -enanosleep
 grep_log "$GENERIC"	-c -O1 -enanosleep
 grep_log "$WALLCLOCK"	-cw
@@ -43,7 +44,10 @@ grep_log "$WALLCLOCK"	-cw -O1
 grep_log "$WALLCLOCK1"	-cw -enanosleep
 grep_log "$WALLCLOCK1"	-cw -O1 -enanosleep
 grep_log "$HALFCLOCK"	-cw -O4.5e2ms -enanosleep
+grep_log "$HALFCLOCK"	-cw --summary-syscall-overhead=4.5e2ms -enanosleep
 grep_log "$HALFCLOCK"	-cw -O4.5e-1s -enanosleep
+grep_log "$HALFCLOCK"	-cw --summary-syscall-overhead=4.5e-1s -enanosleep
 grep_log "$HALFCLOCK"	-cw -O456789012ns -enanosleep
+grep_log "$HALFCLOCK"	-cw --summary-syscall-overhead=456789012ns -enanosleep
 
 exit 0

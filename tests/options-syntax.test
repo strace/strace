@@ -186,15 +186,15 @@ if [ "$uid" -ge 0 ]; then
 
 	check_e "$umsg" -u :nosuchuser: true
 
-	for c in i/--instruction-pointer r t T y; do
+	for c in i/--instruction-pointer r/--relative-timestamps t T/--syscall-times y; do
 		check_e "-$c has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 	done
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
-$STRACE_EXE: -r has no effect with -c/--summary-only
+$STRACE_EXE: -r/--relative-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -t has no effect with -c/--summary-only
-$STRACE_EXE: -T has no effect with -c/--summary-only
+$STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
 $STRACE_EXE: -y has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
 $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true

@@ -9,6 +9,8 @@
 
 . "${srcdir=.}/init.sh"
 
+r_opt="${1:--r}"
+
 run_prog ../sleep 0
-run_strace -r -eexecve ../sleep 1
+run_strace "${r_opt}" -eexecve ../sleep 1
 match_grep

@@ -353,13 +353,15 @@ Output format:\n\
                  suppress messages about attaching, detaching, etc.\n\
   -qq, --quiet=attach,personality,exit\n\
                  suppress messages about process exit status as well.\n\
-  -r             print relative timestamp\n\
+  -r, --relative-timestamps\n\
+                 print relative timestamp\n\
   -s STRSIZE, --string-limit=STRSIZE\n\
                  limit length of print strings to STRSIZE chars (default %d)\n\
   -t             print absolute timestamp\n\
   -tt            print absolute timestamp with usecs\n\
   -ttt           print absolute UNIX time with usecs\n\
-  -T             print time spent in each syscall\n\
+  -T, --syscall-times\n\
+                 print time spent in each syscall\n\
   -v, --no-abbrev\n\
                  verbose mode: print entities unabbreviated\n\
   -x, --strings-in-hex=non-ascii\n\
@@ -378,7 +380,9 @@ Statistics:\n\
                  count time, calls, and errors for each syscall and report\n\
                  summary\n\
   -C, --summary  like -c, but also print the regular output\n\
-  -O OVERHEAD    set overhead for tracing syscalls to OVERHEAD usecs\n\
+  -O OVERHEAD[UNIT], --summary-syscall-overhead=OVERHEAD[UNIT]\n\
+                 set overhead for tracing syscalls to OVERHEAD UNITs\n\
+     units:      one of s, ms, us, ns; default is microseconds\n\
   -S SORTBY, --summary-sort-by=SORTBY\n\
                  sort syscall counts by: time, calls, errors, name, nothing\n\
                  (default %s)\n\
@@ -1791,10 +1795,13 @@ init(int argc, char *argv[])
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
 		{ "output",		required_argument, 0, 'o' },
+		{ "summary-syscall-overhead", required_argument, 0, 'O' },
 		{ "attach",		required_argument, 0, 'p' },
 		{ "trace-path",		required_argument, 0, 'P' },
+		{ "relative-timestamps", no_argument,	   0, 'r' },
 		{ "string-limit",	required_argument, 0, 's' },
 		{ "summary-sort-by",	required_argument, 0, 'S' },
+		{ "syscall-times",	no_argument,	   0, 'T' },
 		{ "user",		required_argument, 0, 'u' },
 		{ "no-abbrev",		no_argument,	   0, 'v' },
 		{ "version",		no_argument,	   0, 'V' },
@@ -2112,11 +2119,13 @@ init(int argc, char *argv[])
 			error_msg("-k/--stack-traces has no effect "
 				  "with -c/--summary-only");
 		if (rflag)
-			error_msg("-%c has no effect with -c/--summary-only", 'r');
+			error_msg("-r/--relative-timestamps has no effect "
+				  "with -c/--summary-only");
 		if (tflag)
 			error_msg("-%c has no effect with -c/--summary-only", 't');
 		if (Tflag)
-			error_msg("-%c has no effect with -c/--summary-only", 'T');
+			error_msg("-T/--syscall-times has no effect "
+				  "with -c/--summary-only");
 		if (show_fd_path)
 			error_msg("-%c has no effect with -c/--summary-only", 'y');
 	}
