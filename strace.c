@@ -372,6 +372,7 @@ Tampering:\n\
      when:       FIRST, FIRST+, or FIRST+STEP\n\
   -e fault=SET[:error=ERRNO][:when=WHEN], --fault=SET[:error=ERRNO][:when=WHEN]\n\
                  synonym for -e inject with default ERRNO set to ENOSYS.\n\
+\n\
 Miscellaneous:\n\
   -d, --debug    enable debug output to stderr\n\
   -h, --help     print help message\n\
