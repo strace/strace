@@ -324,7 +324,6 @@ MISC_TESTS = \
 	attach-f-p.test \
 	attach-p-cmd.test \
 	bexecve.test \
-	clone_parent.test \
 	clone_ptrace.test \
 	count-f.test \
 	count.test \

@@ -38,6 +38,7 @@ clone3-Xverbose	-a16 -Xverbose -e trace=clone3
 clone3-success-Xabbrev	+clone3-success.test -a16 -Xabbrev
 clone3-success-Xraw	+clone3-success.test -a16 -Xraw
 clone3-success-Xverbose	+clone3-success.test -a16 -Xverbose
+clone_parent +clone_ptrace.test
 copy_file_range
 creat	-a20
 delete_module	-a23
