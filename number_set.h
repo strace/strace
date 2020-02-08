@@ -56,10 +56,24 @@ enum status_t {
 	NUMBER_OF_STATUSES
 };
 
+enum quiet_bits {
+	/** Do not print messages on tracee attach/detach. */
+	QUIET_ATTACH,
+	/** Do not print messages on tracee exits. */
+	QUIET_EXIT,
+	/** Do not print messages on personality change. */
+	QUIET_PERSONALITY,
+
+	NUM_QUIET_BITS
+};
+
+extern bool quiet_set_updated;
+
 extern struct number_set *read_set;
 extern struct number_set *write_set;
 extern struct number_set *signal_set;
 extern struct number_set *status_set;
+extern struct number_set *quiet_set;
 extern struct number_set *trace_set;
 
 #endif /* !STRACE_NUMBER_SET_H */

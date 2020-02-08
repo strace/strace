@@ -79,7 +79,6 @@ bool debug_flag;
 bool Tflag;
 bool iflag;
 bool count_wallclock;
-unsigned int qflag;
 static unsigned int tflag;
 static bool rflag;
 static bool print_pid_pfx;
@@ -268,7 +267,7 @@ Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]..
 General:\n\
   -e EXPR        a qualifying expression: OPTION=[!]all or OPTION=[!]VAL1[,VAL2]...\n\
      options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
-                 inject, status, kvm\n\
+                 inject, status, quiet, kvm\n\
 \n\
 Startup:\n\
   -E VAR=VAL, --env=VAR=VAL\n\
@@ -331,6 +330,9 @@ Output format:\n\
                  dump the data read from the file descriptors in SET\n\
   -e write=SET, --write=SET\n\
                  dump the data written to the file descriptors in SET\n\
+  -e quiet=SET, --quiet=SET\n\
+                 suppress various informational messages\n\
+     messages:   attach, exit, personality\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
   -i, --instruction-pointer\n\
@@ -347,8 +349,10 @@ Output format:\n\
                  send trace output to FILE instead of stderr\n\
   -A, --output-append-mode\n\
                  open the file provided in the -o option in append mode\n\
-  -q             suppress messages about attaching, detaching, etc.\n\
-  -qq            suppress messages about process exit status as well.\n\
+  -q, --quiet=attach,personality\n\
+                 suppress messages about attaching, detaching, etc.\n\
+  -qq, --quiet=attach,personality,exit\n\
+                 suppress messages about process exit status as well.\n\
   -r             print relative timestamp\n\
   -s STRSIZE, --string-limit=STRSIZE\n\
                  limit length of print strings to STRSIZE chars (default %d)\n\
@@ -1105,7 +1109,8 @@ detach(struct tcb *tcp)
 	}
 
  drop:
-	if (!qflag && (tcp->flags & TCB_ATTACHED))
+	if (!is_number_in_set(QUIET_ATTACH, quiet_set)
+	    && (tcp->flags & TCB_ATTACHED))
 		error_msg("Process %u detached", tcp->pid);
 
 	droptcb(tcp);
@@ -1186,7 +1191,7 @@ attach_tcb(struct tcb *const tcp)
 		closedir(dir);
 	}
 
-	if (!qflag) {
+	if (!is_number_in_set(QUIET_ATTACH, quiet_set)) {
 		if (ntid > nerr)
 			error_msg("Process %u attached"
 				  " with %u threads",
@@ -1716,11 +1721,15 @@ parse_interruptible_arg(const char *arg)
 static void ATTRIBUTE_NOINLINE
 init(int argc, char *argv[])
 {
+	static const char qflag_qual[] = "attach,personality";
+	static const char qqflag_qual[] = "exit,attach,personality";
+
 	int c, i;
 	int optF = 0, zflags = 0;
 	int lopt_idx;
 	int daemonized_tracer_long = DAEMONIZE_NONE;
 	int xflag_long = HEXSTR_NONE;
+	int qflag_short = 0;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1742,6 +1751,7 @@ init(int argc, char *argv[])
 # error Bug in DEFAULT_QUAL_FLAGS
 #endif
 	qualify_status("all");
+	qualify_quiet("none");
 	qualify_signals("all");
 
 	static const char optstring[] =
@@ -1763,6 +1773,7 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_FAULT,
 		GETOPT_QUAL_INJECT,
 		GETOPT_QUAL_KVM,
+		GETOPT_QUAL_QUIET,
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -1806,6 +1817,9 @@ init(int argc, char *argv[])
 		{ "fault",	required_argument, 0, GETOPT_QUAL_FAULT },
 		{ "inject",	required_argument, 0, GETOPT_QUAL_INJECT },
 		{ "kvm",	required_argument, 0, GETOPT_QUAL_KVM },
+		{ "quiet",	optional_argument, 0, GETOPT_QUAL_QUIET },
+		{ "silent",	optional_argument, 0, GETOPT_QUAL_QUIET },
+		{ "silence",	optional_argument, 0, GETOPT_QUAL_QUIET },
 
 		{ 0, 0, 0, 0 }
 	};
@@ -1909,7 +1923,7 @@ init(int argc, char *argv[])
 			pathtrace_select(optarg);
 			break;
 		case 'q':
-			qflag++;
+			qflag_short++;
 			break;
 		case 'r':
 			rflag = 1;
@@ -2009,6 +2023,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_QUAL_KVM:
 			qualify_kvm(optarg);
+			break;
+		case GETOPT_QUAL_QUIET:
+			qualify_quiet(optarg ?: qflag_qual);
 			break;
 		default:
 			error_msg_and_help(NULL);
@@ -2213,11 +2230,20 @@ init(int argc, char *argv[])
 	if (outfname && argc) {
 		if (!opt_intr)
 			opt_intr = INTR_NEVER;
-		if (!qflag)
-			qflag = 1;
+		if (!qflag_short && !quiet_set_updated)
+			qflag_short = 1;
 	}
 	if (!opt_intr)
 		opt_intr = INTR_WHILE_WAIT;
+
+	if (qflag_short) {
+		if (quiet_set_updated) {
+			error_msg_and_die("-q and -e quiet/--quiet cannot"
+					  " be provided simultaneously");
+		}
+
+		qualify_quiet(qflag_short == 1 ? qflag_qual : qqflag_qual);
+	}
 
 	/*
 	 * startup_child() must be called before the signal handlers get
@@ -2375,7 +2401,7 @@ maybe_allocate_tcb(const int pid, int status)
 		/* We assume it's a fork/vfork/clone child */
 		struct tcb *tcp = alloctcb(pid);
 		after_successful_attach(tcp, post_attach_sigstop);
-		if (!qflag)
+		if (!is_number_in_set(QUIET_ATTACH, quiet_set))
 			error_msg("Process %d attached", pid);
 		return tcp;
 	} else {
@@ -2508,7 +2534,7 @@ print_exited(struct tcb *tcp, const int pid, int status)
 	}
 
 	if (cflag != CFLAG_ONLY_STATS &&
-	    qflag < 2) {
+	    !is_number_in_set(QUIET_EXIT, quiet_set)) {
 		printleader(tcp);
 		tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
 		line_ended();

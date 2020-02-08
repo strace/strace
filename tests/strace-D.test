@@ -35,7 +35,7 @@ set -- sed -r -n '/^(P|Tracer)Pid:/p' "$status_file"
 	dump_log_and_fail_with "$*: unexpected output"
 
 # !-D: PPid > 0, TracerPid > 0, PPid == TracerPid
-run_strace -q -enone "$@" > "$OUT"
+run_strace -e q=attach,personality -enone "$@" > "$OUT"
 [ "$(get_parent_pid < "$OUT")" -gt 0 ] &&
 [ "$(get_tracer_pid < "$OUT")" -gt 0 ] &&
 [ "$(get_parent_pid < "$OUT")" = "$(get_tracer_pid < "$OUT")" ] || {

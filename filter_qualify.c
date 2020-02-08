@@ -18,7 +18,10 @@ struct number_set *read_set;
 struct number_set *write_set;
 struct number_set *signal_set;
 struct number_set *status_set;
+struct number_set *quiet_set;
 struct number_set *trace_set;
+
+bool quiet_set_updated = false;
 
 static struct number_set *abbrev_set;
 static struct number_set *inject_set;
@@ -71,6 +74,19 @@ statusstr_to_uint(const char *str)
 	};
 
 	return (int) find_arg_val(str, statuses, -1ULL, -1ULL);
+}
+
+static int
+quietstr_to_uint(const char *str)
+{
+	static const struct xlat_data quiet_strs[] = {
+		{ QUIET_ATTACH,      "attach" },
+		{ QUIET_EXIT,        "exit" },
+		{ QUIET_EXIT,        "exits" },
+		{ QUIET_PERSONALITY, "personality" },
+	};
+
+	return (int) find_arg_val(str, quiet_strs, -1ULL, -1ULL);
 }
 
 static int
@@ -301,6 +317,16 @@ qualify_status(const char *const str)
 }
 
 void
+qualify_quiet(const char *const str)
+{
+	if (!quiet_set)
+		quiet_set = alloc_number_set_array(1);
+	else
+		quiet_set_updated = true;
+	qualify_tokens(str, quiet_set, quietstr_to_uint, "quiet");
+}
+
+void
 qualify_trace(const char *const str)
 {
 	if (!trace_set)
@@ -448,6 +474,10 @@ static const struct qual_options {
 	{ "signals",	qualify_signals	},
 	{ "status",	qualify_status	},
 	{ "s",		qualify_signals	},
+	{ "quiet",	qualify_quiet	},
+	{ "silent",	qualify_quiet	},
+	{ "silence",	qualify_quiet	},
+	{ "q",		qualify_quiet	},
 	{ "read",	qualify_read	},
 	{ "reads",	qualify_read	},
 	{ "r",		qualify_read	},

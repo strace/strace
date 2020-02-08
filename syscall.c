@@ -268,7 +268,7 @@ update_personality(struct tcb *tcp, unsigned int personality)
 		return;
 	tcp->currpers = personality;
 
-	if (!qflag) {
+	if (!is_number_in_set(QUIET_PERSONALITY, quiet_set)) {
 		error_msg("[ Process PID=%d runs in %s mode. ]",
 			  tcp->pid, personality_names[personality]);
 	}

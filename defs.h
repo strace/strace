@@ -464,7 +464,6 @@ extern cflag_t cflag;
 extern bool Tflag;
 extern bool iflag;
 extern bool count_wallclock;
-extern unsigned int qflag;
 extern unsigned int show_fd_path;
 /* are we filtering traces based on paths? */
 extern struct path_set {
@@ -1057,6 +1056,7 @@ extern void qualify_verbose(const char *);
 extern void qualify_raw(const char *);
 extern void qualify_signals(const char *);
 extern void qualify_status(const char *);
+extern void qualify_quiet(const char *);
 extern void qualify_read(const char *);
 extern void qualify_write(const char *);
 extern void qualify_fault(const char *);

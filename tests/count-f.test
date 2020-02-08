@@ -10,7 +10,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog
-run_strace -q -f -c $args
+run_strace -e silent=attach -f -c $args
 match_grep
 
 exit 0

@@ -96,6 +96,16 @@ check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=non-ascii
 check_h "invalid --strings-in-hex argument: 'al'" --strings-in-hex=al
 check_h "invalid --strings-in-hex argument: 'alll'" --strings-in-hex=alll
 check_h "invalid --strings-in-hex argument: 'ascii'" --strings-in-hex=ascii
+check_h "must have PROG [ARGS] or -p PID" --quiet=all
+check_h "must have PROG [ARGS] or -p PID" --quiet=none
+check_h "must have PROG [ARGS] or -p PID" --quiet=\!attach
+check_h "must have PROG [ARGS] or -p PID" --quiet=exit,exits,personality
+check_e "invalid quiet 'detach'" --quiet=detach -p $$
+check_e "invalid quiet 'fds'" -q --quiet=fds -p $$
+check_e "invalid quiet 'detach'" --quiet=detach -p $$
+check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -p $$
+check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
+check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
 check_e '-x and --strings-in-hex cannot be provided simultaneously' -x --strings-in-hex -p $$
 check_e '-x and --strings-in-hex cannot be provided simultaneously' --strings-in-hex -p $$ -xx
 check_h "invalid -X argument: 'test'" -Xtest
