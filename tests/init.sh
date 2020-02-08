@@ -231,7 +231,7 @@ match_grep()
 run_strace_match_diff()
 {
 	args="$*"
-	[ -n "$args" -a -z "${args##*-e trace=*}" ] ||
+	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o -z "${args##*--trace=*}" \) ] ||
 		set -- -e trace="$NAME" "$@"
 	run_prog > /dev/null
 	run_strace "$@" $args > "$EXP"
@@ -242,7 +242,7 @@ run_strace_match_diff()
 run_strace_match_grep()
 {
 	args="$*"
-	[ -n "$args" -a -z "${args##*-e trace=*}" ] ||
+	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o -z "${args##*--trace=*}" \) ] ||
 		set -- -e trace="$NAME" "$@"
 	run_prog > /dev/null
 	run_strace "$@" $args > "$EXP"
