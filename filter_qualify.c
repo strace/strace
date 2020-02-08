@@ -59,24 +59,18 @@ sigstr_to_uint(const char *s)
 	return -1;
 }
 
-static const char *statuses[NUMBER_OF_STATUSES] = {
-	[STATUS_SUCCESSFUL]  = "successful",
-	[STATUS_FAILED]      = "failed",
-	[STATUS_UNFINISHED]  = "unfinished",
-	[STATUS_UNAVAILABLE] = "unavailable",
-	[STATUS_DETACHED]    = "detached",
-};
-
 static int
 statusstr_to_uint(const char *str)
 {
-	unsigned int i;
+	static const struct xlat_data statuses[] = {
+		{ STATUS_SUCCESSFUL,  "successful" },
+		{ STATUS_FAILED,      "failed" },
+		{ STATUS_UNFINISHED,  "unfinished" },
+		{ STATUS_UNAVAILABLE, "unavailable" },
+		{ STATUS_DETACHED,    "detached" },
+	};
 
-	for (i = 0; i < NUMBER_OF_STATUSES; ++i)
-		if (strcasecmp(str, statuses[i]) == 0)
-			return i;
-
-	return -1;
+	return (int) find_arg_val(str, statuses, -1ULL, -1ULL);
 }
 
 static int
