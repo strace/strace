@@ -624,6 +624,11 @@ status-successful-status
 status-unfinished
 status-unfinished-threads
 statx
+strace--strings-in-hex
+strace--strings-in-hex-all
+strace--strings-in-hex-non-ascii
+strace-x
+strace-xx
 swap
 sxetmask
 symlink

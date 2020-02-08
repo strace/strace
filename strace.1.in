@@ -872,9 +872,15 @@ behavior displays a reasonable subset of structure members.  Use
 this option to get all of the gory details.
 .TP
 .B \-x
+.TQ
+.BR \-\-strings\-in\-hex = \fInon\-ascii\fR
 Print all non-ASCII strings in hexadecimal string format.
 .TP
 .B \-xx
+.TQ
+.B \-\-strings\-in\-hex
+.TQ
+.BR \-\-strings\-in\-hex = \fIall\fR
 Print all strings in hexadecimal string format.
 .TP
 .BI "\-X " format

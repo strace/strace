@@ -70,6 +70,10 @@ cflag_t cflag = CFLAG_NONE;
 unsigned int followfork;
 unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
 				 | PTRACE_O_TRACEEXIT;
+static struct xlat_data xflag_str[] = {
+	{ HEXSTR_NON_ASCII,	"non-ascii" },
+	{ HEXSTR_ALL,		"all" },
+};
 unsigned int xflag;
 bool debug_flag;
 bool Tflag;
@@ -354,8 +358,10 @@ Output format:\n\
   -T             print time spent in each syscall\n\
   -v, --no-abbrev\n\
                  verbose mode: print entities unabbreviated\n\
-  -x             print non-ascii strings in hex\n\
-  -xx            print all strings in hex\n\
+  -x, --strings-in-hex=non-ascii\n\
+                 print non-ascii strings in hex\n\
+  -xx, --strings-in-hex[=all]\n\
+                 print all strings in hex\n\
   -X FORMAT, --const-print-style=FORMAT\n\
                  set the FORMAT for printing of named constants and flags\n\
      formats:    raw, abbrev, verbose\n\
@@ -1714,6 +1720,7 @@ init(int argc, char *argv[])
 	int optF = 0, zflags = 0;
 	int lopt_idx;
 	int daemonized_tracer_long = DAEMONIZE_NONE;
+	int xflag_long = HEXSTR_NONE;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1743,6 +1750,7 @@ init(int argc, char *argv[])
 	enum {
 		GETOPT_SECCOMP = 0x100,
 		GETOPT_DAEMONIZE,
+		GETOPT_HEX_STR,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -1780,6 +1788,7 @@ init(int argc, char *argv[])
 		{ "no-abbrev",		no_argument,	   0, 'v' },
 		{ "version",		no_argument,	   0, 'V' },
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
+		{ "strings-in-hex",	optional_argument, 0, GETOPT_HEX_STR },
 		{ "const-print-style",	required_argument, 0, 'X' },
 		{ "successful-only",	no_argument,	   0, 'z' },
 		{ "failed-only",	no_argument,	   0, 'Z' },
@@ -1936,6 +1945,12 @@ init(int argc, char *argv[])
 		case 'x':
 			xflag++;
 			break;
+		case GETOPT_HEX_STR:
+			xflag_long = find_arg_val(optarg, xflag_str,
+						  HEXSTR_ALL, HEXSTR_NONE);
+			if (xflag_long <= HEXSTR_NONE)
+				error_opt_arg(c, lopt, optarg);
+			break;
 		case 'X':
 			if (!strcmp(optarg, "raw"))
 				xlat_verbosity = XLAT_STYLE_RAW;
@@ -2026,6 +2041,15 @@ init(int argc, char *argv[])
 		error_msg_and_help("Too many -D's (%u), maximum supported -D "
 				   "count is %d",
 				   daemonized_tracer, MAX_DAEMONIZE_OPTS);
+
+	if (xflag_long) {
+		if (xflag) {
+			error_msg_and_die("-x and --strings-in-hex cannot"
+					  " be provided simultaneously");
+		} else {
+			xflag = xflag_long;
+		}
+	}
 
 	if (seccomp_filtering && detach_on_execve) {
 		error_msg("--seccomp-bpf is not enabled because"

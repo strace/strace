@@ -473,6 +473,13 @@ extern struct path_set {
 	size_t size;
 } global_path_set;
 # define tracing_paths (global_path_set.num_selected != 0)
+enum xflag_opts {
+	HEXSTR_NONE,
+	HEXSTR_NON_ASCII,
+	HEXSTR_ALL,
+
+	NUM_HEXSTR_OPTS
+};
 extern unsigned xflag;
 extern unsigned followfork;
 # ifdef ENABLE_STACKTRACE

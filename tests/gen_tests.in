@@ -534,6 +534,11 @@ status-successful-long	-a10 -e trace=chdir --successful-only
 status-successful-status	-a10 -e trace=chdir --status=successful
 status-unfinished	-a10 -e trace=all --status=unfinished
 statx	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
+strace--strings-in-hex	--trace=chdir --strings-in-hex --columns=18
+strace--strings-in-hex-all	--trace=chdir --strings-in-hex=all --columns=18
+strace--strings-in-hex-non-ascii	--trace=chdir --strings-in-hex=non-ascii --columns=12
+strace-x	-e trace=chdir -x -a 12
+strace-xx	-e trace=chdir -xx -a 18
 swap	-a23 -e trace=swapon,swapoff
 sxetmask	-a11 -e trace=sgetmask,ssetmask
 symlink	-a34

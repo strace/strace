@@ -90,6 +90,14 @@ check_h "must have PROG [ARGS] or -p PID" --interruptible=never
 check_h "must have PROG [ARGS] or -p PID" --interruptible=never_tstp
 check_h "invalid --interruptible argument: 'nevertheless'" --interruptible=nevertheless
 check_h "invalid --interruptible argument: 'nev'" --interruptible=nev
+check_h "must have PROG [ARGS] or -p PID" --strings-in-hex
+check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=all
+check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=non-ascii
+check_h "invalid --strings-in-hex argument: 'al'" --strings-in-hex=al
+check_h "invalid --strings-in-hex argument: 'alll'" --strings-in-hex=alll
+check_h "invalid --strings-in-hex argument: 'ascii'" --strings-in-hex=ascii
+check_e '-x and --strings-in-hex cannot be provided simultaneously' -x --strings-in-hex -p $$
+check_e '-x and --strings-in-hex cannot be provided simultaneously' --strings-in-hex -p $$ -xx
 check_h "invalid -X argument: 'test'" -Xtest
 check_h "invalid --const-print-style argument: 'test'" --const-print-style=test
 check_h "invalid -X argument: 'a'" -Xa

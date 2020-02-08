@@ -517,6 +517,11 @@ status-successful-long
 status-successful-status
 status-unfinished
 statx
+strace--strings-in-hex
+strace--strings-in-hex-all
+strace--strings-in-hex-non-ascii
+strace-x
+strace-xx
 swap
 sxetmask
 symlink
