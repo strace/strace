@@ -243,17 +243,17 @@ or how to trace them.  The format of the expression is:
 where
 .I qualifier
 is one of
-.BR trace ,
-.BR abbrev ,
-.BR verbose ,
-.BR raw ,
-.BR signal ,
-.BR read ,
-.BR write ,
+.BR trace " (or " t ),
+.BR abbrev " (or " a ),
+.BR verbose " (or " v ),
+.BR raw " (or " x ),
+.BR signal " (or " signals " or " s ),
+.BR read " (or " reads " or " r ),
+.BR write " (or " writes " or " w ),
 .BR fault ,
 .BR inject ,
 .BR status ,
-.BR quiet ,
+.BR quiet " (or " silent " or " silence " or " q ),
 or
 .BR kvm ,
 and
