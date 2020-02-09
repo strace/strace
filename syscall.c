@@ -269,8 +269,10 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	tcp->currpers = personality;
 
 	if (!is_number_in_set(QUIET_PERSONALITY, quiet_set)) {
-		error_msg("[ Process PID=%d runs in %s mode. ]",
-			  tcp->pid, personality_names[personality]);
+		printleader(tcp);
+		tprintf("[ Process PID=%d runs in %s mode. ]\n",
+			tcp->pid, personality_names[personality]);
+		line_ended();
 	}
 
 	if (need_mpers_warning[personality]) {

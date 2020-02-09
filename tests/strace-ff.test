@@ -22,7 +22,7 @@ while ! [ -s "$OUT" ]; do
 		fail_ 'set_ptracer_any sleep failed'
 done
 
-run_strace -a14 -eexit_group -ff -p $tracee_pid
+run_strace --quiet=personality -a14 -eexit_group -ff -p $tracee_pid
 
 # check that output matches
 match_diff "$LOG.$tracee_pid"
