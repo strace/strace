@@ -61,6 +61,8 @@ enum quiet_bits {
 	QUIET_ATTACH,
 	/** Do not print messages on tracee exits. */
 	QUIET_EXIT,
+	/** Do not print messages about path tracing path resolution. */
+	QUIET_PATH_RESOLVE,
 	/** Do not print messages on personality change. */
 	QUIET_PERSONALITY,
 	/** Do not print messages on superseding execve. */

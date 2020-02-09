@@ -332,7 +332,7 @@ Output format:\n\
                  dump the data written to the file descriptors in SET\n\
   -e quiet=SET, --quiet=SET\n\
                  suppress various informational messages\n\
-     messages:   attach, exit, personality\n\
+     messages:   attach, exit, path-resolution, personality, thread-execve\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
   -i, --instruction-pointer\n\

@@ -792,7 +792,7 @@ Suppress various information messages.  The default is
 .I set
 can include the following elements:
 .RS
-.TP 15
+.TP 17
 .B attach
 Suppress messages about attaching and detaching
 .RB (\[dq] "[ Process NNNN attached ]" "\[dq],"
@@ -801,6 +801,12 @@ Suppress messages about attaching and detaching
 .B exit
 Suppress messages about process exits
 .RB (\[dq] "+++ exited with SSS +++" \[dq]).
+.TQ
+.B path-resolution
+Suppress messages about resolution of paths provided via the
+.B \-P
+option
+.RB (\[dq] "Requested path \[dq]...\[dq] resolved into \[dq]...\[dq]" \[dq]).
 .TQ
 .B personality
 Suppress messages about process personality changes

@@ -11,6 +11,7 @@
 #include <limits.h>
 #include <poll.h>
 
+#include "number_set.h"
 #include "syscall.h"
 #include "xstring.h"
 
@@ -119,7 +120,21 @@ pathtrace_select_set(const char *path, struct path_set *set)
 		return;
 	}
 
-	error_msg("Requested path '%s' resolved into '%s'", path, rpath);
+	if (!is_number_in_set(QUIET_PATH_RESOLVE, quiet_set)) {
+		char *path_quoted = xmalloc(strlen(path) * 4 + 4);
+		char *rpath_quoted = xmalloc(strlen(rpath) * 4 + 4);
+
+		string_quote(path, path_quoted, strlen(path) + 1,
+			     QUOTE_0_TERMINATED, NULL);
+		string_quote(rpath, rpath_quoted, strlen(rpath) + 1,
+			     QUOTE_0_TERMINATED, NULL);
+
+		error_msg("Requested path %s resolved into %s",
+			  path_quoted, rpath_quoted);
+
+		free(path_quoted);
+		free(rpath_quoted);
+	}
 	storepath(rpath, set);
 }
 

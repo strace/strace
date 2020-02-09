@@ -83,6 +83,7 @@ quietstr_to_uint(const char *str)
 		{ QUIET_ATTACH,        "attach" },
 		{ QUIET_EXIT,          "exit" },
 		{ QUIET_EXIT,          "exits" },
+		{ QUIET_PATH_RESOLVE,  "path-resolution" },
 		{ QUIET_PERSONALITY,   "personality" },
 		{ QUIET_THREAD_EXECVE, "superseded" },
 		{ QUIET_THREAD_EXECVE, "thread-execve" },
