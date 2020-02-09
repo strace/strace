@@ -14,6 +14,10 @@
 #include <unistd.h>
 #include "scno.h"
 
+#ifndef QUIET_MSG
+# define QUIET_MSG 0
+#endif
+
 static pid_t leader;
 static volatile unsigned int trigger;
 
@@ -25,9 +29,14 @@ thread(void *arg)
 
 	printf("%-5d execveat(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
 	       ", NULL, 0 <pid changed to %d ...>\n"
-	       "%-5d +++ superseded by execve in pid %d +++\n",
-	       tid, argv[0], argv[0], argv[1], argv[2], leader,
-	       leader, tid);
+#if !QUIET_MSG
+	       "%-5d +++ superseded by execve in pid %d +++\n"
+#endif
+	       , tid, argv[0], argv[0], argv[1], argv[2], leader
+#if !QUIET_MSG
+	       , leader, tid
+#endif
+	       );
 
 	while (!trigger) {
 		/* Wait for the parent to enter the busy loop.  */

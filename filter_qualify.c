@@ -80,10 +80,12 @@ static int
 quietstr_to_uint(const char *str)
 {
 	static const struct xlat_data quiet_strs[] = {
-		{ QUIET_ATTACH,      "attach" },
-		{ QUIET_EXIT,        "exit" },
-		{ QUIET_EXIT,        "exits" },
-		{ QUIET_PERSONALITY, "personality" },
+		{ QUIET_ATTACH,        "attach" },
+		{ QUIET_EXIT,          "exit" },
+		{ QUIET_EXIT,          "exits" },
+		{ QUIET_PERSONALITY,   "personality" },
+		{ QUIET_THREAD_EXECVE, "superseded" },
+		{ QUIET_THREAD_EXECVE, "thread-execve" },
 	};
 
 	return (int) find_arg_val(str, quiet_strs, -1ULL, -1ULL);

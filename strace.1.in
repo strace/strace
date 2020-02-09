@@ -792,7 +792,7 @@ Suppress various information messages.  The default is
 .I set
 can include the following elements:
 .RS
-.TP 13
+.TP 15
 .B attach
 Suppress messages about attaching and detaching
 .RB (\[dq] "[ Process NNNN attached ]" "\[dq],"
@@ -805,6 +805,14 @@ Suppress messages about process exits
 .B personality
 Suppress messages about process personality changes
 .RB (\[dq] "[ Process PID=NNNN runs in PPP mode. ]" \[dq]).
+.TQ
+.B thread-execve
+.TQ
+.B superseded
+Suppress messages about process being superseded by
+.BR execve (2)
+in another thread
+.RB (\[dq] "+++ superseded by execve in pid NNNN +++" \[dq]).
 .RE
 .TP
 .BR "\-e\ kvm" = vcpu

@@ -63,6 +63,8 @@ enum quiet_bits {
 	QUIET_EXIT,
 	/** Do not print messages on personality change. */
 	QUIET_PERSONALITY,
+	/** Do not print messages on superseding execve. */
+	QUIET_THREAD_EXECVE,
 
 	NUM_QUIET_BITS
 };

@@ -241,6 +241,7 @@ lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 madvise	-a33
 maybe_switch_current_tcp	-a30 -f -e trace=execveat
+maybe_switch_current_tcp--quiet-thread-execve	-a30 -s48 -f -e trace=execveat --quiet=personality,thread-execve
 mbind
 mbind-Xabbrev	-Xabbrev -e trace=mbind
 mbind-Xraw	-a33 -Xraw -e trace=mbind

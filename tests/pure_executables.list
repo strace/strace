@@ -211,6 +211,7 @@ lstat
 lstat64
 madvise
 maybe_switch_current_tcp
+maybe_switch_current_tcp--quiet-thread-execve
 mbind
 mbind-Xabbrev
 mbind-Xraw

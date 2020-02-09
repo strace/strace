@@ -2493,9 +2493,12 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	tcp = execve_thread;
 	tcp->pid = pid;
 	if (cflag != CFLAG_ONLY_STATS) {
-		printleader(tcp);
-		tprintf("+++ superseded by execve in pid %lu +++\n", old_pid);
-		line_ended();
+		if (!is_number_in_set(QUIET_THREAD_EXECVE, quiet_set)) {
+			printleader(tcp);
+			tprintf("+++ superseded by execve in pid %lu +++\n",
+				old_pid);
+			line_ended();
+		}
 		/*
 		 * Need to reopen memstream for thread
 		 * as we closed it in droptcb.
