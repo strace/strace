@@ -10,7 +10,7 @@
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null 3>&1
-args="-e trace=none $args"
+args="-e trace=none ${1:---quiet=personality} $args"
 > "$LOG" || fail_ "failed to write $LOG"
 
 $STRACE -o "$LOG" $args > "$EXP" 2> "$OUT"-err 3> "$EXP"-err || {

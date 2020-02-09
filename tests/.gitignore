@@ -53,7 +53,14 @@ clone3-success-Xabbrev
 clone3-success-Xraw
 clone3-success-Xverbose
 clone_parent
+clone_parent--quiet-exit
+clone_parent-q
+clone_parent-qq
 clone_ptrace
+clone_ptrace--quiet-attach
+clone_ptrace--quiet-exit
+clone_ptrace-q
+clone_ptrace-qq
 copy_file_range
 count-f
 creat

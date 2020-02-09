@@ -90,7 +90,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	check_sigblock \
 	check_sigign \
 	clone_parent \
+	clone_parent--quiet-exit \
+	clone_parent-q \
+	clone_parent-qq \
 	clone_ptrace \
+	clone_ptrace--quiet-attach \
+	clone_ptrace--quiet-exit \
+	clone_ptrace-q \
+	clone_ptrace-qq \
 	clone3-success \
 	clone3-success-Xabbrev \
 	clone3-success-Xraw \

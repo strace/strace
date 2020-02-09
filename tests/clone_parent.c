@@ -17,6 +17,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#ifndef QUIET_MSG
+# define QUIET_MSG 0
+#endif
+
 static int
 child(void *const arg)
 {
@@ -56,10 +60,14 @@ main(void)
 	FILE *const fp = fdopen(3, "a");
 	if (!fp)
 		perror_msg_and_fail("fdopen");
+#if !QUIET_MSG
 	if (fprintf(fp, "%s: Exit of unknown pid %d ignored\n",
 		    getenv("STRACE_EXE") ?: "strace", pid) < 0)
 		perror_msg_and_fail("fprintf");
+#endif
 
+#if !QUIET_MSG
 	puts("+++ exited with 0 +++");
+#endif
 	return 0;
 }

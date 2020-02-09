@@ -2399,11 +2399,13 @@ maybe_allocate_tcb(const int pid, int status)
 			strace_child = 0;
 			return NULL;
 		}
-		/*
-		 * This can happen if we inherited an unknown child.
-		 * Example: (sleep 1 & exec strace true)
-		 */
-		error_msg("Exit of unknown pid %u ignored", pid);
+		if (!is_number_in_set(QUIET_EXIT, quiet_set)) {
+			/*
+			 * This can happen if we inherited an unknown child.
+			 * Example: (sleep 1 & exec strace true)
+			 */
+			error_msg("Exit of unknown pid %u ignored", pid);
+		}
 		return NULL;
 	}
 	if (followfork) {
@@ -2422,7 +2424,8 @@ maybe_allocate_tcb(const int pid, int status)
 		 * observable stop here is the initial ptrace-stop.
 		 */
 		ptrace(PTRACE_DETACH, pid, NULL, 0L);
-		error_msg("Detached unknown pid %d", pid);
+		if (!is_number_in_set(QUIET_ATTACH, quiet_set))
+			error_msg("Detached unknown pid %d", pid);
 		return NULL;
 	}
 }
