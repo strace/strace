@@ -77,10 +77,14 @@ static struct xlat_data xflag_str[] = {
 unsigned int xflag;
 bool debug_flag;
 bool Tflag;
+int Tflag_scale = 1000;
+int Tflag_width = 6;
 bool iflag;
 bool count_wallclock;
 static unsigned int tflag;
 static bool rflag;
+static int rflag_scale = 1000;
+static int rflag_width = 6;
 static bool print_pid_pfx;
 
 /* -I n */
@@ -353,15 +357,17 @@ Output format:\n\
                  suppress messages about attaching, detaching, etc.\n\
   -qq, --quiet=attach,personality,exit\n\
                  suppress messages about process exit status as well.\n\
-  -r, --relative-timestamps\n\
+  -r, --relative-timestamps[=PRECISION]\n\
                  print relative timestamp\n\
+     precision:  one of s, ms, us, ns; default is microseconds\n\
   -s STRSIZE, --string-limit=STRSIZE\n\
                  limit length of print strings to STRSIZE chars (default %d)\n\
   -t             print absolute timestamp\n\
   -tt            print absolute timestamp with usecs\n\
   -ttt           print absolute UNIX time with usecs\n\
-  -T, --syscall-times\n\
+  -T, --syscall-times[=PRECISION]\n\
                  print time spent in each syscall\n\
+     precision:  one of s, ms, us, ns; default is microseconds\n\
   -v, --no-abbrev\n\
                  verbose mode: print entities unabbreviated\n\
   -x, --strings-in-hex=non-ascii\n\
@@ -778,10 +784,12 @@ printleader(struct tcb *tcp)
 		ts_sub(&dts, &ts, &ots);
 		ots = ts;
 
-		tprintf("%s%6ld.%06ld%s ",
-			tflag ? "(+" : "",
-			(long) dts.tv_sec, (long) dts.tv_nsec / 1000,
-			tflag ? ")" : "");
+		tprintf("%s%6ld", tflag ? "(+" : "", (long) dts.tv_sec);
+		if (rflag_width) {
+			tprintf(".%0*ld",
+				rflag_width, (long) dts.tv_nsec / rflag_scale);
+		}
+		tprints(tflag ? ") " : " ");
 	}
 
 	if (iflag)
@@ -1798,10 +1806,10 @@ init(int argc, char *argv[])
 		{ "summary-syscall-overhead", required_argument, 0, 'O' },
 		{ "attach",		required_argument, 0, 'p' },
 		{ "trace-path",		required_argument, 0, 'P' },
-		{ "relative-timestamps", no_argument,	   0, 'r' },
+		{ "relative-timestamps", optional_argument, 0, 'r' },
 		{ "string-limit",	required_argument, 0, 's' },
 		{ "summary-sort-by",	required_argument, 0, 'S' },
-		{ "syscall-times",	no_argument,	   0, 'T' },
+		{ "syscall-times",	optional_argument, 0, 'T' },
 		{ "user",		required_argument, 0, 'u' },
 		{ "no-abbrev",		no_argument,	   0, 'v' },
 		{ "version",		no_argument,	   0, 'V' },
@@ -1934,6 +1942,11 @@ init(int argc, char *argv[])
 			break;
 		case 'r':
 			rflag = 1;
+			rflag_width = 6;
+			rflag_scale = str2timescale_optarg(optarg,
+							   &rflag_width);
+			if (rflag_scale < 0)
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 's':
 			i = string_to_uint(optarg);
@@ -1949,6 +1962,11 @@ init(int argc, char *argv[])
 			break;
 		case 'T':
 			Tflag = 1;
+			Tflag_width = 6;
+			Tflag_scale = str2timescale_optarg(optarg,
+							   &Tflag_width);
+			if (Tflag_scale < 0)
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'u':
 			username = optarg;

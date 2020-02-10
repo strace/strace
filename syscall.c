@@ -939,8 +939,12 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	}
 	if (Tflag) {
 		ts_sub(ts, ts, &tcp->etime);
-		tprintf(" <%ld.%06ld>",
-			(long) ts->tv_sec, (long) ts->tv_nsec / 1000);
+		tprintf(" <%ld", (long) ts->tv_sec);
+		if (Tflag_width) {
+			tprintf(".%0*ld",
+				Tflag_width, (long) ts->tv_nsec / Tflag_scale);
+		}
+		tprints(">");
 	}
 	tprints("\n");
 	dumpio(tcp);

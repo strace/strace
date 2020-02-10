@@ -543,7 +543,15 @@ status-successful-status	-a10 -e trace=chdir --status=successful
 status-unfinished	-a10 -e trace=all --status=unfinished
 statx	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 strace--relative-timestamps +strace-r.test --relative-timestamps
+strace--relative-timestamps-s +strace-r.test --relative-timestamps=s
+strace--relative-timestamps-ms +strace-r.test --relative-timestamps=ms
+strace--relative-timestamps-us +strace-r.test --relative-timestamps=us
+strace--relative-timestamps-ns +strace-r.test --relative-timestamps=ns
 strace--syscall-times +strace-T.test --syscall-times
+strace--syscall-times-s +strace-T.test --syscall-times=s
+strace--syscall-times-ms +strace-T.test --syscall-times=ms
+strace--syscall-times-us +strace-T.test --syscall-times=us
+strace--syscall-times-ns +strace-T.test --syscall-times=ns
 strace--strings-in-hex	--trace=chdir --strings-in-hex --columns=18
 strace--strings-in-hex-all	--trace=chdir --strings-in-hex=all --columns=18
 strace--strings-in-hex-non-ascii	--trace=chdir --strings-in-hex=non-ascii --columns=12

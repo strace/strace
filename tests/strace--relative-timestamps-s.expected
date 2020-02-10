@@ -1,0 +1,2 @@
+[ ]{5}0 execve\("\.\./sleep", \["\.\./sleep", "1"\], 0x[[:xdigit:]]* /\* [[:digit:]]* vars \*/\) = 0
+[ ]{5}[01] \+\+\+ exited with 0 \+\+\+

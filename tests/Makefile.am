@@ -477,7 +477,15 @@ EXTRA_DIST = \
 	stack-fcall.h \
 	status-detached.expected \
 	strace--relative-timestamps.expected \
+	strace--relative-timestamps-s.expected \
+	strace--relative-timestamps-ms.expected \
+	strace--relative-timestamps-us.expected \
+	strace--relative-timestamps-ns.expected \
 	strace--syscall-times.expected \
+	strace--syscall-times-s.expected \
+	strace--syscall-times-ms.expected \
+	strace--syscall-times-us.expected \
+	strace--syscall-times-ns.expected \
 	strace-C.expected \
 	strace-D.expected \
 	strace-DD.expected \

@@ -880,10 +880,17 @@ and about process exit status.
 .TP
 .B \-r
 .TQ
-.B \-\-relative\-timestamps
+.BR \-\-relative\-timestamps [= \fIprecision\fR ]
 Print a relative timestamp upon entry to each system call.  This
 records the time difference between the beginning of successive
 system calls.
+.I precision
+can be one of
+.BR s " (for seconds), " ms " (milliseconds), " us " (microseconds), or " ns
+(nanoseconds), and allows setting the precision of time value being printed.
+Default is
+.B us
+(microseconds).
 Note that since
 .B \-r
 option uses the monotonic clock time for measuring time difference and not the
@@ -912,9 +919,16 @@ of seconds since the epoch.
 .TP
 .B \-T
 .TQ
-.B \-\-syscall\-times
+.BR \-\-syscall\-times [= \fIprecision\fR ]
 Show the time spent in system calls.  This records the time
 difference between the beginning and the end of each system call.
+.I precision
+can be one of
+.BR s " (for seconds), " ms " (milliseconds), " us " (microseconds), or " ns
+(nanoseconds), and allows setting the precision of time value being printed.
+Default is
+.B us
+(microseconds).
 .TP
 .B \-v
 .TQ

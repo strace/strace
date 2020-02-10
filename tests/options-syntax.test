@@ -90,6 +90,20 @@ check_h "must have PROG [ARGS] or -p PID" --interruptible=never
 check_h "must have PROG [ARGS] or -p PID" --interruptible=never_tstp
 check_h "invalid --interruptible argument: 'nevertheless'" --interruptible=nevertheless
 check_h "invalid --interruptible argument: 'nev'" --interruptible=nev
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=s
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=ms
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=us
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=ns
+check_h "invalid --relative-timestamps argument: 'n'" --relative-timestamps=n
+check_h "invalid --relative-timestamps argument: 'ss'" --relative-timestamps=ss
+check_h "must have PROG [ARGS] or -p PID" --syscall-times
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=s
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=ms
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=us
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=ns
+check_h "invalid --syscall-times argument: 'n'" --syscall-times=n
+check_h "invalid --syscall-times argument: 'ss'" --syscall-times=ss
 check_h "must have PROG [ARGS] or -p PID" --strings-in-hex
 check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=all
 check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=non-ascii

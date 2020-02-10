@@ -462,6 +462,8 @@ typedef enum {
 } cflag_t;
 extern cflag_t cflag;
 extern bool Tflag;
+extern int Tflag_scale;
+extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
 extern unsigned int show_fd_path;
