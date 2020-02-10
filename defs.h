@@ -1161,6 +1161,25 @@ extern uint64_t find_arg_val_(const char *arg, const struct xlat_data *strs,
 #define find_arg_val(arg_, strs_, dflt_, not_found_) \
 	find_arg_val_((arg_), (strs_), ARRAY_SIZE(strs_), (dflt_), (not_found_))
 
+/**
+ * A find_arg_val wrapper for parsing time scale names.
+ *
+ * @param arg        String to parse
+ * @param empty_dflt Default scale for the empty arg.
+ * @param null_dflt  Default scale for the NULL arg.
+ * @param width      Width of the field required to print the second part
+ *                   with the specified precision.
+ * @return           Time scale (amount of nanoseconds) if found,
+ *                   empty_dflt if arg is empty, null_dflt if arg is NULL,
+ *                   -1 if arg doesn't match any known time scale.
+ */
+extern int str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
+			    int *width);
+/** str2timescale_ex wrapper for handling a separate argument. */
+#define str2timescale_optarg(arg_, w_) str2timescale_ex((arg_), -1, 1000, (w_))
+/** str2timescale_ex wrapper for handling a suffix in existing argument. */
+#define str2timescale_sfx(arg_, w_) str2timescale_ex((arg_), 1000, -1, (w_))
+
 extern int ts_nz(const struct timespec *);
 extern int ts_cmp(const struct timespec *, const struct timespec *);
 extern double ts_float(const struct timespec *);

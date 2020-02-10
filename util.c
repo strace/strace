@@ -56,6 +56,30 @@ find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
 }
 
 int
+str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
+		 int *width)
+{
+	static const struct xlat_data units[] = {
+		{ 1000000000U | (0ULL << 32), "s" },
+		{ 1000000U    | (3ULL << 32), "ms" },
+		{ 1000U       | (6ULL << 32), "us" },
+		{ 1U          | (9ULL << 32), "ns" },
+	};
+
+	if (!arg)
+		return null_dflt;
+	if (!arg[0])
+		return empty_dflt;
+
+	uint64_t res = find_arg_val(arg, units, null_dflt, -1ULL);
+
+	if (width && res != -1ULL)
+		*width = res >> 32;
+
+	return res & 0xffffffff;
+}
+
+int
 ts_nz(const struct timespec *a)
 {
 	return a->tv_sec || a->tv_nsec;
@@ -134,13 +158,6 @@ parse_ts(const char *s, struct timespec *t)
 {
 	enum { NS_IN_S = 1000000000 };
 
-	static const struct xlat_data units[] = {
-		{ 1000,		"" }, /* default is microseconds */
-		{ 1000000000,	"s" },
-		{ 1000000,	"ms" },
-		{ 1000,		"us" },
-		{ 1,		"ns" },
-	};
 	static const char float_accept[] =  "eE.-+0123456789";
 	static const char int_accept[] = "+0123456789";
 
@@ -166,18 +183,18 @@ parse_ts(const char *s, struct timespec *t)
 			return -1;
 	}
 
-	const struct xlat_data *unit = find_xlat_val(units, endptr);
-	if (!unit)
+	int scale = str2timescale_sfx(endptr, NULL);
+	if (scale <= 0)
 		return -1;
 
 	if (float_len > int_len) {
-		t->tv_sec = float_val / (NS_IN_S / unit->val);
+		t->tv_sec = float_val / (NS_IN_S / scale);
 		t->tv_nsec = ((uint64_t) ((float_val -
-					   (t->tv_sec * (NS_IN_S / unit->val)))
-					  * unit->val)) % NS_IN_S;
+					   (t->tv_sec * (NS_IN_S / scale)))
+					  * scale)) % NS_IN_S;
 	} else {
-		t->tv_sec = int_val / (NS_IN_S / unit->val);
-		t->tv_nsec = (int_val % (NS_IN_S / unit->val)) * unit->val;
+		t->tv_sec = int_val / (NS_IN_S / scale);
+		t->tv_nsec = (int_val % (NS_IN_S / scale)) * scale;
 	}
 
 	return 0;
