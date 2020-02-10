@@ -103,6 +103,9 @@ echo 'END OF TEST SUITE INFORMATION'
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Thu Feb 06 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.5-1
+- v5.4 -> v5.5.
+
 * Thu Nov 28 2019 Dmitry V. Levin <ldv@altlinux.org> - 5.4-1
 - v5.3 -> v5.4.
 
