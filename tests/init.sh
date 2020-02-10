@@ -219,7 +219,8 @@ match_grep()
 			printf '#%d: %s\n' "$cnt" "$pattern"
 		}
 		cnt=$(($cnt + 1))
-	done < "$patterns"
+	done < "$patterns" ||
+		fail_ "Error reading patterns from \"$patterns\""
 	test -z "$failed" || {
 		echo 'Actual output:'
 		cat < "$output"
