@@ -12,7 +12,7 @@ arch_get_scno(struct tcb *tcp)
 #if defined(__CSKYABIV2__)
 	tcp->scno = csky_regs.regs[3];
 #else
-	tcp->scno = csky_regs.r1;
+	tcp->scno = csky_regs.a1;
 #endif
 	return 1;
 }

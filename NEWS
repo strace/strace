@@ -1,6 +1,11 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Improvements
+
+* Bug fixes
+  * Fixed build on csky abiv1 architecture.
+
 Noteworthy changes in release 5.5 (2020-02-06)
 ==============================================
 
