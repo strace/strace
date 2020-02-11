@@ -35,6 +35,9 @@ clone3-Xverbose
 copy_file_range
 creat
 delete_module
+dev--decode-fds-dev
+dev--decode-fds-path
+dev--decode-fds-socket
 dev-yy
 dup
 dup2
@@ -259,6 +262,10 @@ msg_control
 msg_name
 munlockall
 nanosleep
+net--decode-fds-dev-netlink
+net--decode-fds-none-netlink
+net--decode-fds-path-netlink
+net--decode-fds-socket-netlink
 net-icmp_filter
 net-packet_mreq
 net-packet_mreq-Xabbrev
@@ -349,6 +356,7 @@ personality-Xabbrev
 personality-Xraw
 personality-Xverbose
 pidfd_open
+pidfd_open--decode-fd-path
 pidfd_open-P
 pidfd_open-y
 pidfd_send_signal

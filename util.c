@@ -24,6 +24,7 @@
 #include <sys/uio.h>
 
 #include "largefile_wrappers.h"
+#include "number_set.h"
 #include "print_utils.h"
 #include "static_assert.h"
 #include "string_to_uint.h"
@@ -570,17 +571,23 @@ void
 printfd(struct tcb *tcp, int fd)
 {
 	char path[PATH_MAX + 1];
-	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
-		tprintf("%d<", fd);
-		if (show_fd_path <= 1
-		    || (!printsocket(tcp, fd, path)
-		         && !printdev(tcp, fd, path))) {
-			print_quoted_string_ex(path, strlen(path),
-				QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
-		}
+	if (!number_set_array_is_empty(decode_fd_set, 0)
+	    && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
+		tprintf("%d<", (int) fd);
+		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
+		    printsocket(tcp, fd, path))
+			goto printed;
+		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
+		    printdev(tcp, fd, path))
+			goto printed;
+		print_quoted_string_ex(path, strlen(path),
+			QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+
+printed:
 		tprints(">");
-	} else
+	} else {
 		tprintf("%d", fd);
+	}
 }
 
 /*

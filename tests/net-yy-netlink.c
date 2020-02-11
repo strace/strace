@@ -21,6 +21,27 @@
 #include <linux/sock_diag.h>
 #include <linux/netlink_diag.h>
 
+#ifndef PRINT_SOCK
+# define PRINT_SOCK 2
+#endif
+
+#if PRINT_SOCK == 2
+# define FMT_UNBOUND "<NETLINK:[%lu]>"
+# define FMT_BOUND   "<NETLINK:[SOCK_DIAG:%u]>"
+# define ARG_UNBOUND inode
+# define ARG_BOUND   addr.nl_pid
+#elif PRINT_SOCK == 1
+# define FMT_UNBOUND "<socket:[%lu]>"
+# define FMT_BOUND   "<socket:[%lu]>"
+# define ARG_UNBOUND inode
+# define ARG_BOUND   inode
+#else
+# define FMT_UNBOUND "%s"
+# define FMT_BOUND   "%s"
+# define ARG_UNBOUND ""
+# define ARG_BOUND   ""
+#endif
+
 int
 main(void)
 {
@@ -37,25 +58,27 @@ main(void)
 	const int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG);
 	if (fd < 0)
 		perror_msg_and_skip("socket");
+#if PRINT_SOCK
 	const unsigned long inode = inode_of_sockfd(fd);
+#endif
 	printf("socket(AF_NETLINK, SOCK_RAW, NETLINK_SOCK_DIAG) = "
-	       "%d<NETLINK:[%lu]>\n", fd, inode);
+	       "%d" FMT_UNBOUND "\n", fd, ARG_UNBOUND);
 
 	if (bind(fd, sa, *len))
 		perror_msg_and_skip("bind");
-	printf("bind(%d<NETLINK:[%lu]>, {sa_family=AF_NETLINK"
+	printf("bind(%d" FMT_UNBOUND ", {sa_family=AF_NETLINK"
 	       ", nl_pid=%u, nl_groups=00000000}, %u) = 0\n",
-	       fd, inode, addr.nl_pid, (unsigned) *len);
+	       fd, ARG_UNBOUND, addr.nl_pid, (unsigned) *len);
 
 	if (getsockname(fd, sa, len))
 		perror_msg_and_fail("getsockname");
-	printf("getsockname(%d<NETLINK:[SOCK_DIAG:%u]>, {sa_family=AF_NETLINK"
+	printf("getsockname(%d" FMT_BOUND ", {sa_family=AF_NETLINK"
 	       ", nl_pid=%u, nl_groups=00000000}, [%u]) = 0\n",
-	       fd, addr.nl_pid, addr.nl_pid, (unsigned) *len);
+	       fd, ARG_BOUND, addr.nl_pid, (unsigned) *len);
 
 	if (close(fd))
 		perror_msg_and_fail("close");
-	printf("close(%d<NETLINK:[SOCK_DIAG:%u]>) = 0\n", fd, addr.nl_pid);
+	printf("close(%d" FMT_BOUND ") = 0\n", fd, ARG_BOUND);
 
 	puts("+++ exited with 0 +++");
 	return 0;

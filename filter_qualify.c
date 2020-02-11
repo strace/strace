@@ -19,9 +19,11 @@ struct number_set *write_set;
 struct number_set *signal_set;
 struct number_set *status_set;
 struct number_set *quiet_set;
+struct number_set *decode_fd_set;
 struct number_set *trace_set;
 
 bool quiet_set_updated = false;
+bool decode_fd_set_updated = false;
 
 static struct number_set *abbrev_set;
 static struct number_set *inject_set;
@@ -90,6 +92,18 @@ quietstr_to_uint(const char *str)
 	};
 
 	return (int) find_arg_val(str, quiet_strs, -1ULL, -1ULL);
+}
+
+static int
+decode_fd_str_to_uint(const char *str)
+{
+	static const struct xlat_data decode_fd_strs[] = {
+		{ DECODE_FD_PATH,      "path" },
+		{ DECODE_FD_SOCKET,    "socket" },
+		{ DECODE_FD_DEV,       "dev" },
+	};
+
+	return (int) find_arg_val(str, decode_fd_strs, -1ULL, -1ULL);
 }
 
 static int
@@ -330,6 +344,17 @@ qualify_quiet(const char *const str)
 }
 
 void
+qualify_decode_fd(const char *const str)
+{
+	if (!decode_fd_set)
+		decode_fd_set = alloc_number_set_array(1);
+	else
+		decode_fd_set_updated = true;
+	qualify_tokens(str, decode_fd_set, decode_fd_str_to_uint,
+		       "decode-fds");
+}
+
+void
 qualify_trace(const char *const str)
 {
 	if (!trace_set)
@@ -490,6 +515,8 @@ static const struct qual_options {
 	{ "fault",	qualify_fault	},
 	{ "inject",	qualify_inject	},
 	{ "kvm",	qualify_kvm	},
+	{ "decode-fd",	qualify_decode_fd },
+	{ "decode-fds",	qualify_decode_fd },
 };
 
 void

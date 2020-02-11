@@ -49,6 +49,9 @@ clone_ptrace-qq +clone_ptrace.test -qq
 copy_file_range
 creat	-a20
 delete_module	-a23
+dev--decode-fds-dev	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=dev
+dev--decode-fds-path	-a19 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=path
+dev--decode-fds-socket	-a19 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" --decode-fds=socket
 dev-yy	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -yy
 dup	-a8
 dup2	-a13
@@ -291,6 +294,10 @@ msg_control-v	-v -a21 -e trace=sendmsg
 msg_name	-a20 -e trace=recvmsg
 munlockall	-a13
 nanosleep	-a20
+net--decode-fds-dev-netlink	+net-yy-netlink.test --decode-fds=dev
+net--decode-fds-none-netlink	+net-yy-netlink.test --decode-fds=none -a9
+net--decode-fds-path-netlink	+net-yy-netlink.test --decode-fds=path
+net--decode-fds-socket-netlink	+net-yy-netlink.test --decode-fds=socket
 net-icmp_filter	-e trace=getsockopt,setsockopt
 net-packet_mreq -e trace=setsockopt
 net-packet_mreq-Xabbrev	-e trace=setsockopt -Xabbrev
@@ -368,7 +375,7 @@ oldselect-efault-P	-a13 -e trace=select -P /dev/full 9>>/dev/full
 oldstat	-a32 -v -P stat.sample -P /dev/full
 open	-a30 -P $NAME.sample
 open_tree -a30 -y
-open_tree-P -a30 -y -P /dev/full -e trace=open_tree
+open_tree-P -a30 --decode-fds -P /dev/full -e trace=open_tree
 openat	-a36 -P $NAME.sample
 orphaned_process_group	. "${srcdir=.}/PTRACE_SEIZE.sh"; run_strace_match_diff -f -e trace=none -e signal='!chld'
 osf_utimes	-a21
@@ -380,6 +387,7 @@ personality-Xabbrev	+personality.test -Xabbrev
 personality-Xraw	+personality.test -a15 -Xraw
 personality-Xverbose	+personality.test -Xverbose
 pidfd_open	-a17
+pidfd_open--decode-fd-path	-a17 -e decode-fd=path -e trace=pidfd_open
 pidfd_open-P	-a17 -P /dev/full -e trace=pidfd_open
 pidfd_open-y	-a17 -y -e trace=pidfd_open
 pidfd_send_signal

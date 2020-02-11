@@ -254,6 +254,7 @@ is one of
 .BR inject ,
 .BR status ,
 .BR quiet " (or " silent " or " silence " or " q ),
+.BR decode\-fds " (or " decode\-fd ),
 or
 .BR kvm ,
 and
@@ -831,6 +832,25 @@ in another thread
 .RB (\[dq] "+++ superseded by execve in pid NNNN +++" \[dq]).
 .RE
 .TP
+\fB\-e\ decode\-fds\fR=\,\fIset\fR
+.TQ
+\fB\-\-decode\-fds\fR=\,\fIset\fR
+Decode various information associated with file descriptors.  The default is
+.BR decode\-fds = none .
+.I set
+can include the following elements:
+.RS
+.TP 8
+.B path
+Print file paths.
+.TQ
+.B socket
+Print socket protocol-specific information,
+.TQ
+.B dev
+Print character/block device numbers.
+.RE
+.TP
 .BR "\-e\ kvm" = vcpu
 .TQ
 .BR "\-\-kvm" = vcpu
@@ -984,9 +1004,15 @@ Output both the raw value and the decoded string (as a comment).
 .RE
 .TP
 .B \-y
+.TQ
+.B \-\-decode\-fds
+.TQ
+.BR \-\-decode\-fds = path
 Print paths associated with file descriptor arguments.
 .TP
 .B \-yy
+.TQ
+.BR \-\-decode\-fds = path , socket , dev
 Print protocol specific information associated with socket file descriptors,
 and block/character device number associated with device file descriptors.
 .SS Statistics

@@ -133,9 +133,6 @@ static unsigned int daemonized_tracer;
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
-/* Show path associated with fd arguments */
-unsigned int show_fd_path;
-
 static bool detach_on_execve;
 
 static int exit_code;
@@ -272,7 +269,7 @@ Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]..
 General:\n\
   -e EXPR        a qualifying expression: OPTION=[!]all or OPTION=[!]VAL1[,VAL2]...\n\
      options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
-                 inject, status, quiet, kvm\n\
+                 inject, status, quiet, kvm, decode-fds\n\
 \n\
 Startup:\n\
   -E VAR=VAL, --env=VAR=VAL\n\
@@ -342,6 +339,9 @@ Output format:\n\
      messages:   attach, exit, path-resolution, personality, thread-execve\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
+  -e decode-fds=SET, --decode-fds=SET\n\
+                 what kinds FD information details to decode\n\
+     details:    dev, path, socket\n\
   -i, --instruction-pointer\n\
                  print instruction pointer at time of syscall\n\
 "
@@ -382,9 +382,11 @@ Output format:\n\
   -X FORMAT, --const-print-style=FORMAT\n\
                  set the FORMAT for printing of named constants and flags\n\
      formats:    raw, abbrev, verbose\n\
-  -y             print paths associated with file descriptor arguments\n\
-  -yy            print protocol specific information associated with socket\n\
-                 file descriptors\n\
+  -y, --decode-fds[=path]\n\
+                 print paths associated with file descriptor arguments\n\
+  -yy, --decode-fds=path,socket,dev\n\
+                 print protocol specific information associated with socket\n\
+                 file descriptors and also device numbers in addition to paths\n\
 \n\
 Statistics:\n\
   -c, --summary-only\n\
@@ -1740,6 +1742,8 @@ init(int argc, char *argv[])
 {
 	static const char qflag_qual[] = "attach,personality";
 	static const char qqflag_qual[] = "exit,attach,personality";
+	static const char yflag_qual[] = "path";
+	static const char yyflag_qual[] = "socket,dev,path";
 
 	int c, i;
 	int optF = 0, zflags = 0;
@@ -1748,6 +1752,7 @@ init(int argc, char *argv[])
 	int xflag_long = HEXSTR_NONE;
 	int qflag_short = 0;
 	int followfork_short = 0;
+	int yflag_short = 0;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1770,6 +1775,7 @@ init(int argc, char *argv[])
 #endif
 	qualify_status("all");
 	qualify_quiet("none");
+	qualify_decode_fd("none");
 	qualify_signals("all");
 
 	static const char optstring[] =
@@ -1794,6 +1800,7 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_INJECT,
 		GETOPT_QUAL_KVM,
 		GETOPT_QUAL_QUIET,
+		GETOPT_QUAL_DECODE_FD,
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -1846,6 +1853,7 @@ init(int argc, char *argv[])
 		{ "quiet",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "silent",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "silence",	optional_argument, 0, GETOPT_QUAL_QUIET },
+		{ "decode-fds",	optional_argument, 0, GETOPT_QUAL_DECODE_FD },
 
 		{ 0, 0, 0, 0 }
 	};
@@ -2018,7 +2026,7 @@ init(int argc, char *argv[])
 				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'y':
-			show_fd_path++;
+			yflag_short++;
 			break;
 		case 'z':
 			clear_number_set_array(status_set, 1);
@@ -2069,6 +2077,9 @@ init(int argc, char *argv[])
 		case GETOPT_QUAL_QUIET:
 			qualify_quiet(optarg ?: qflag_qual);
 			break;
+		case GETOPT_QUAL_DECODE_FD:
+			qualify_decode_fd(optarg ?: yflag_qual);
+			break;
 		default:
 			error_msg_and_help(NULL);
 			break;
@@ -2108,6 +2119,15 @@ init(int argc, char *argv[])
 		} else {
 			xflag = xflag_long;
 		}
+	}
+
+	if (yflag_short) {
+		if (decode_fd_set_updated) {
+			error_msg_and_die("-y and --decode-fds cannot"
+					  " be provided simultaneously");
+		}
+
+		qualify_decode_fd(yflag_short == 1 ? yflag_qual : yyflag_qual);
 	}
 
 	if (seccomp_filtering && detach_on_execve) {
@@ -2175,8 +2195,9 @@ init(int argc, char *argv[])
 		if (Tflag)
 			error_msg("-T/--syscall-times has no effect "
 				  "with -c/--summary-only");
-		if (show_fd_path)
-			error_msg("-%c has no effect with -c/--summary-only", 'y');
+		if (!number_set_array_is_empty(decode_fd_set, 0))
+			error_msg("-y/--decode-fds has no effect "
+				  "with -c/--summary-only");
 	}
 
 #ifndef HAVE_OPEN_MEMSTREAM

@@ -134,6 +134,20 @@ check_h "invalid -X argument: 'a'" -Xa
 check_h "invalid --const-print-style argument: 'a'" --const-print-style=a
 check_h "invalid -X argument: 'abbreviated'" -X abbreviated
 check_h "invalid --const-print-style argument: 'abbreviated'" --const-print-style=abbreviated
+check_h "must have PROG [ARGS] or -p PID" --decode-fds
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=all
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=none
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=path
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=socket,dev
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=\!path
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=socket,path,dev
+check_e "invalid decode-fds 'p'" --decode-fds=p -p $$
+check_e "invalid decode-fds 'device'" -y --decode-fds=device -p $$
+check_e "invalid decode-fds 'name'" --decode-fds=path,name -p $$
+check_e "invalid decode-fds 'sock'" -e decode-fd=sock -y -p $$
+check_e '-y and --decode-fds cannot be provided simultaneously' -y --decode-fds -p $$
+check_e '-y and --decode-fds cannot be provided simultaneously' -e decode-fd=all -yy -p $$
+check_e '-y and --decode-fds cannot be provided simultaneously' --decode-fds=none -y -p $$
 
 check_h "incorrect personality designator '' in qualification 'getcwd@'" -e trace=getcwd@
 check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=getcwd@42
@@ -206,7 +220,7 @@ if [ "$uid" -ge 0 ]; then
 
 	check_e "$umsg" -u :nosuchuser: true
 
-	for c in i/--instruction-pointer r/--relative-timestamps t T/--syscall-times y; do
+	for c in i/--instruction-pointer r/--relative-timestamps t T/--syscall-times y/--decode-fds; do
 		check_e "-$c has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 	done
@@ -215,7 +229,7 @@ $STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 $STRACE_EXE: -r/--relative-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -t has no effect with -c/--summary-only
 $STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
-$STRACE_EXE: -y has no effect with -c/--summary-only
+$STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
 $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
 
