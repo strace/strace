@@ -370,7 +370,7 @@ Tampering:\n\
   --inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
            [:delay_enter=DELAY][:delay_exit=DELAY][:when=WHEN]\n\
                  perform syscall tampering for the syscalls in SET\n\
-     delay:      milliseconds or NUMBER{s|ms|us|ns}\n\
+     delay:      microseconds or NUMBER{s|ms|us|ns}\n\
      when:       FIRST, FIRST+, or FIRST+STEP\n\
   -e fault=SET[:error=ERRNO][:when=WHEN], --fault=SET[:error=ERRNO][:when=WHEN]\n\
                  synonym for -e inject with default ERRNO set to ENOSYS.\n\
