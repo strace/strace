@@ -837,6 +837,69 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+static void
+print_v4l2_query_ctrl_id(unsigned long id)
+{
+	if (id & V4L2_CTRL_FLAG_NEXT_CTRL) {
+		tprints("V4L2_CTRL_FLAG_NEXT_CTRL|");
+		id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
+	}
+	if (id & V4L2_CTRL_FLAG_NEXT_COMPOUND) {
+		tprints("V4L2_CTRL_FLAG_NEXT_COMPOUND|");
+		id &= ~V4L2_CTRL_FLAG_NEXT_COMPOUND;
+	}
+	printxval(v4l2_control_ids, id, NULL);
+}
+
+static int
+print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct v4l2_query_ext_ctrl c;
+
+#define NEXT_FLAGS (V4L2_CTRL_FLAG_NEXT_CTRL|V4L2_CTRL_FLAG_NEXT_COMPOUND)
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &c))
+			return RVAL_IOCTL_DECODED;
+		set_tcb_priv_ulong(tcp, c.id);
+		tprints("{id");
+		if (!(c.id & NEXT_FLAGS) || !abbrev(tcp)) {
+			tprints("=");
+			print_v4l2_query_ctrl_id(c.id);
+		}
+	} else {
+		unsigned long entry_id = get_tcb_priv_ulong(tcp);
+
+		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
+			if (abbrev(tcp) && (entry_id & NEXT_FLAGS)) {
+				tprints("=");
+				print_v4l2_query_ctrl_id(entry_id);
+			}
+			tprints("}");
+			return RVAL_IOCTL_DECODED;
+		}
+		if (entry_id & NEXT_FLAGS) {
+			tprints(" => ");
+			print_v4l2_query_ctrl_id(c.id);
+		}
+	}
+#undef NEXT_FLAGS
+
+	if (exiting(tcp)) {
+		tprints(", type=");
+		printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
+		PRINT_FIELD_CSTRING(", ", c, name);
+		if (!abbrev(tcp)) {
+			tprintf(", minimum=%lld, maximum=%lld, step=%lld"
+				", default_value=%lld, flags=",
+				c.minimum, c.maximum, c.step, c.default_value);
+			printflags(v4l2_control_flags, c.flags, "V4L2_CTRL_FLAG_???");
+		}
+		tprints("}");
+	}
+	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
+}
+
 static int
 print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -1136,6 +1199,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_QUERYCTRL: /* RW */
 		return print_v4l2_queryctrl(tcp, arg);
+
+	case VIDIOC_QUERY_EXT_CTRL: /* RW */
+		return print_v4l2_query_ext_ctrl(tcp, arg);
 
 	case VIDIOC_G_INPUT: /* R */
 		if (entering(tcp))
