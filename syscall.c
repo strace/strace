@@ -747,7 +747,7 @@ print_syscall_resume(struct tcb *tcp)
 	 * "strace -ff -oLOG test/threaded_execve" corner case.
 	 * It's the only case when -ff mode needs reprinting.
 	 */
-	if ((followfork < 2 && printing_tcp != tcp && !tcp->staged_output_data)
+	if ((!output_separately && printing_tcp != tcp && !tcp->staged_output_data)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);

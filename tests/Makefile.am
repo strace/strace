@@ -476,6 +476,7 @@ EXTRA_DIST = \
 	sockname.c \
 	stack-fcall.h \
 	status-detached.expected \
+	strace--follow-forks-output-separately.expected \
 	strace--relative-timestamps.expected \
 	strace--relative-timestamps-s.expected \
 	strace--relative-timestamps-ms.expected \

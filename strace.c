@@ -67,7 +67,8 @@ bool stack_trace_enabled;
 const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 
 cflag_t cflag = CFLAG_NONE;
-unsigned int followfork;
+bool followfork;
+bool output_separately;
 unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
 				 | PTRACE_O_TRACEEXIT;
 static struct xlat_data xflag_str[] = {
@@ -292,8 +293,10 @@ Tracing:\n\
                  run tracer process in a separate process group\n\
   -DDD, --daemonize=session\n\
                  run tracer process in a separate session\n\
-  -f             follow forks\n\
-  -ff            follow forks with output into separate files\n\
+  -f, --follow-forks\n\
+                 follow forks\n\
+  -ff, --follow-forks --output-separately\n\
+                 follow forks with output into separate files\n\
   -I INTERRUPTIBLE, --interruptible=INTERRUPTIBLE\n\
      1, anywhere:   no signals are blocked\n\
      2, waiting:    fatal signals are blocked while decoding syscall (default)\n\
@@ -353,6 +356,8 @@ Output format:\n\
                  send trace output to FILE instead of stderr\n\
   -A, --output-append-mode\n\
                  open the file provided in the -o option in append mode\n\
+  --output-separately\n\
+                 output into separate files (by appending pid to file names)\n\
   -q, --quiet=attach,personality\n\
                  suppress messages about attaching, detaching, etc.\n\
   -qq, --quiet=attach,personality,exit\n\
@@ -617,7 +622,7 @@ outf_perror(const struct tcb * const tcp)
 		return;
 
 	/* This is ugly, but we don't store separate file names */
-	if (followfork >= 2)
+	if (output_separately)
 		perror_msg("%s.%u", outfname, tcp->pid);
 	else
 		perror_msg("%s", outfname);
@@ -721,13 +726,13 @@ printleader(struct tcb *tcp)
 	/* If -ff, "previous tcb we printed" is always the same as current,
 	 * because we have per-tcb output files.
 	 */
-	if (followfork >= 2)
+	if (output_separately)
 		printing_tcp = tcp;
 
 	if (printing_tcp) {
 		set_current_tcp(printing_tcp);
 		if (!tcp->staged_output_data && printing_tcp->curcol != 0 &&
-		    (followfork < 2 || printing_tcp == tcp)) {
+		    (!output_separately || printing_tcp == tcp)) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
 			 * wasn't finished (same or different tcb, doesn't matter).
@@ -812,7 +817,7 @@ after_successful_attach(struct tcb *tcp, const unsigned int flags)
 {
 	tcp->flags |= TCB_ATTACHED | TCB_STARTUP | flags;
 	tcp->outf = shared_log; /* if not -ff mode, the same file is for all */
-	if (followfork >= 2) {
+	if (output_separately) {
 		char name[PATH_MAX];
 		xsprintf(name, "%s.%u", outfname, tcp->pid);
 		tcp->outf = strace_fopen(name);
@@ -946,7 +951,7 @@ droptcb(struct tcb *tcp)
 			strace_close_memstream(tcp, publish);
 		}
 
-		if (followfork >= 2) {
+		if (output_separately) {
 			if (tcp->curcol != 0 && publish)
 				fprintf(tcp->outf, " <detached ...>\n");
 			fclose(tcp->outf);
@@ -1742,6 +1747,7 @@ init(int argc, char *argv[])
 	int daemonized_tracer_long = DAEMONIZE_NONE;
 	int xflag_long = HEXSTR_NONE;
 	int qflag_short = 0;
+	int followfork_short = 0;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1773,6 +1779,8 @@ init(int argc, char *argv[])
 		GETOPT_SECCOMP = 0x100,
 		GETOPT_DAEMONIZE,
 		GETOPT_HEX_STR,
+		GETOPT_FOLLOWFORKS,
+		GETOPT_OUTPUT_SEPARATELY,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -1798,6 +1806,9 @@ init(int argc, char *argv[])
 		{ "daemonised",		optional_argument, 0, GETOPT_DAEMONIZE },
 		{ "daemonized",		optional_argument, 0, GETOPT_DAEMONIZE },
 		{ "env",		required_argument, 0, 'E' },
+		{ "follow-forks",	no_argument,	   0, GETOPT_FOLLOWFORKS },
+		{ "output-separately",	no_argument,	   0,
+			GETOPT_OUTPUT_SEPARATELY },
 		{ "help",		no_argument,	   0, 'h' },
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
@@ -1899,7 +1910,13 @@ init(int argc, char *argv[])
 				perror_msg_and_die("putenv");
 			break;
 		case 'f':
-			followfork++;
+			followfork_short++;
+			break;
+		case GETOPT_FOLLOWFORKS:
+			followfork = true;
+			break;
+		case GETOPT_OUTPUT_SEPARATELY:
+			output_separately = true;
 			break;
 		case 'F':
 			optF = 1;
@@ -2099,13 +2116,26 @@ init(int argc, char *argv[])
 		seccomp_filtering = false;
 	}
 
+	if (followfork_short) {
+		if (followfork) {
+			error_msg_and_die("-f and --follow-forks cannot"
+					  " be provided simultaneously");
+		} else if (followfork_short >= 2 && output_separately) {
+			error_msg_and_die("-ff and --output-separately cannot"
+					  " be provided simultaneously");
+		} else {
+			followfork = true;
+			output_separately = followfork_short >= 2;
+		}
+	}
+
 	if (seccomp_filtering) {
 		if (nprocs && (!argc || debug_flag))
 			error_msg("--seccomp-bpf is not enabled for processes"
 				  " attached with -p");
 		if (!followfork) {
 			error_msg("--seccomp-bpf implies -f");
-			followfork = 1;
+			followfork = true;
 		}
 	}
 
@@ -2114,13 +2144,14 @@ init(int argc, char *argv[])
 			error_msg("deprecated option -F ignored");
 		} else {
 			error_msg("option -F is deprecated, "
-				  "please use -f instead");
-			followfork = optF;
+				  "please use -f/--follow-forks instead");
+			followfork = true;
 		}
 	}
 
-	if (followfork >= 2 && cflag) {
-		error_msg_and_help("(-c/--summary-only or -C/--summary) and -ff"
+	if (output_separately && cflag) {
+		error_msg_and_help("(-c/--summary-only or -C/--summary) and"
+				   " -ff/--output-separately"
 				   " are mutually exclusive");
 	}
 
@@ -2224,11 +2255,12 @@ init(int argc, char *argv[])
 			 * We can't do the <outfname>.PID funny business
 			 * when using popen, so prohibit it.
 			 */
-			if (followfork >= 2)
-				error_msg_and_help("piping the output and -ff "
+			if (output_separately)
+				error_msg_and_help("piping the output and "
+						   "-ff/--output-separately "
 						   "are mutually exclusive");
 			shared_log = strace_popen(outfname + 1);
-		} else if (followfork < 2) {
+		} else if (!output_separately) {
 			shared_log = strace_fopen(outfname);
 		} else if (strlen(outfname) >= PATH_MAX - sizeof(int) * 3) {
 			errno = ENAMETOOLONG;
@@ -2236,8 +2268,7 @@ init(int argc, char *argv[])
 		}
 	} else {
 		/* -ff without -o FILE is the same as single -f */
-		if (followfork >= 2)
-			followfork = 1;
+		output_separately = false;
 	}
 
 	if (!outfname || outfname[0] == '|' || outfname[0] == '!') {
@@ -2313,7 +2344,8 @@ init(int argc, char *argv[])
 	 * -f: yes (there can be more pids in the future); or
 	 * -p PID1,PID2: yes (there are already more than one pid)
 	 */
-	print_pid_pfx = (outfname && followfork < 2 && (followfork == 1 || nprocs > 1));
+	print_pid_pfx = outfname && !output_separately &&
+		((followfork && !output_separately) || nprocs > 1);
 }
 
 static struct tcb *
@@ -2630,7 +2662,7 @@ print_event_exit(struct tcb *tcp)
 		return;
 	}
 
-	if (followfork < 2 && printing_tcp && printing_tcp != tcp
+	if (!output_separately && printing_tcp && printing_tcp != tcp
 	    && printing_tcp->curcol != 0) {
 		set_current_tcp(printing_tcp);
 		tprints(" <unfinished ...>\n");

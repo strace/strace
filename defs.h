@@ -482,7 +482,8 @@ enum xflag_opts {
 	NUM_HEXSTR_OPTS
 };
 extern unsigned xflag;
-extern unsigned followfork;
+extern bool followfork;
+extern bool output_separately;
 # ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
 extern bool stack_trace_enabled;

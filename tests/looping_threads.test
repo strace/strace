@@ -26,7 +26,7 @@ nproc=1
 run_prog "../$NAME" "$timeout_8" "$nproc"
 
 while :; do
-	run_strace -f -qq -enone -esignal=none "../$NAME" "$timeout_2" "$nproc"
+	run_strace --follow-forks -qq -enone -esignal=none "../$NAME" "$timeout_2" "$nproc"
 
 	s1="$(date +%s)"
 	[ "$(($s1-$s0))" -lt "$timeout_8" ] ||

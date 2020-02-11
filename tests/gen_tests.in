@@ -542,6 +542,7 @@ status-successful-long	-a10 -e trace=chdir --successful-only
 status-successful-status	-a10 -e trace=chdir --status=successful
 status-unfinished	-a10 -e trace=all --status=unfinished
 statx	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
+strace--follow-forks-output-separately +strace-ff.test --follow-forks --output-separately
 strace--relative-timestamps +strace-r.test --relative-timestamps
 strace--relative-timestamps-s +strace-r.test --relative-timestamps=s
 strace--relative-timestamps-ms +strace-r.test --relative-timestamps=ms

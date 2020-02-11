@@ -48,22 +48,28 @@ check_h '-c/--summary-only and -C/--summary are mutually exclusive' -c -C true
 check_h '-c/--summary-only and -C/--summary are mutually exclusive' --summary-only --summary true
 check_h '-c/--summary-only and -C/--summary are mutually exclusive' -C -c true
 check_h '-c/--summary-only and -C/--summary are mutually exclusive' --summary --summary-only true
-check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' -c -ff true
-check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' --summary-only -ff true
-check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' -C -ff true
-check_h '(-c/--summary-only or -C/--summary) and -ff are mutually exclusive' --summary -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' -c -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' --summary-only -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' -C -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' --summary -ff true
 check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -w true
 check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --summary-wall-clock true
-check_h 'piping the output and -ff are mutually exclusive' -o '|' -ff true
-check_h 'piping the output and -ff are mutually exclusive' --output='|' -ff true
-check_h 'piping the output and -ff are mutually exclusive' -o '!' -ff true
-check_h 'piping the output and -ff are mutually exclusive' --output='!' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' -o '|' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' --output='|' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' -o '!' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' --output='!' -ff true
 check_h "invalid -a argument: '-42'" -a -42
 check_h "invalid -O argument: '-42'" -O -42
 check_h "invalid -s argument: '-42'" -s -42
 check_h "invalid --string-limit argument: '-42'" --string-limit=-42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
 check_h "invalid --string-limit argument: '1073741824'" --string-limit=1073741824
+check_h "must have PROG [ARGS] or -p PID" --follow-forks
+check_h "must have PROG [ARGS] or -p PID" --follow-forks --output-separately
+check_h "must have PROG [ARGS] or -p PID" -f --output-separately
+check_h "must have PROG [ARGS] or -p PID" --output-separately
+check_e '-f and --follow-forks cannot be provided simultaneously' -f --follow-forks -p $$
+check_e '-ff and --output-separately cannot be provided simultaneously' --output-separately -ff -p $$
 check_h "invalid -I argument: '0x1'" -I 0x1
 check_h "invalid -I argument: '0'" -I 0
 check_h "must have PROG [ARGS] or -p PID" -I1
@@ -139,9 +145,9 @@ check_h '--seccomp-bpf implies -f
 check_h '--seccomp-bpf is not enabled for processes attached with -p
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -f -p 1 -w
 
-check_h 'option -F is deprecated, please use -f instead
+check_h 'option -F is deprecated, please use -f/--follow-forks instead
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -F -w /
-check_h 'option -F is deprecated, please use -f instead
+check_h 'option -F is deprecated, please use -f/--follow-forks instead
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -FF -w /
 check_h 'deprecated option -F ignored
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -fF -w /

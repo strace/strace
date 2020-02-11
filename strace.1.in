@@ -379,6 +379,8 @@ it also avoids killing of
 upon session termination.
 .TP
 .B \-f
+.TQ
+.BR \-\-follow\-forks
 Trace child processes as they are created by currently traced
 processes as a result of the
 .BR fork (2),
@@ -394,15 +396,23 @@ will attach all threads of process
 if it is multi-threaded, not only thread with
 .IR thread_id " = " PID .
 .TP
-.B \-ff
+.B \-\-output\-separately
 If the
-.B \-o
-.I filename
+.BR \-\-output = \fIfilename\fR
 option is in effect, each processes trace is written to
 .IR filename . pid
 where
 .I pid
 is the numeric process id of each process.
+.TP
+.B \-ff
+.TQ
+.B \-\-follow\-forks \-\-output\-separately
+Combine the effects of
+.B \-\-follow\-forks
+and
+.B \-\-output\-separately
+options.
 This is incompatible with
 .BR \-c ,
 since no per-process counts are kept.

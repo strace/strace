@@ -12,7 +12,7 @@
 while read -r denter dexit denter_us dexit_us; do
 	[ -n "$denter" ] || continue
 
-	run_strace -f -r -egettimeofday \
+	run_strace --follow-forks -r -egettimeofday \
 		-einject=gettimeofday:delay_enter=$denter:delay_exit=$dexit \
 		../delay 4 $denter_us $dexit_us
 done <<-EOF
