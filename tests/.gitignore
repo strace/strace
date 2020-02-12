@@ -27,6 +27,7 @@ bpf-obj_get_info_by_fd-prog
 bpf-obj_get_info_by_fd-prog-v
 bpf-obj_get_info_by_fd-v
 bpf-success
+bpf-success-long-y
 bpf-success-v
 bpf-v
 brk

@@ -913,11 +913,17 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				}
 				break;
 			case RVAL_FD:
-				if (show_fd_path) {
+				/*
+				 * printfd accepts int as fd and it makes
+				 * little sense to pass negative fds to it.
+				 */
+				if ((current_klongsize < sizeof(tcp->u_rval)) ||
+				    ((kernel_ulong_t) tcp->u_rval <= INT_MAX)) {
 					tprints("= ");
 					printfd(tcp, tcp->u_rval);
-				} else
+				} else {
 					tprintf("= %" PRI_kld, tcp->u_rval);
+				}
 				break;
 			default:
 				error_msg("invalid rval format");

@@ -84,6 +84,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	bpf-obj_get_info_by_fd-prog-v \
 	bpf-obj_get_info_by_fd-v \
 	bpf-success \
+	bpf-success-long-y \
 	bpf-success-v \
 	caps-abbrev \
 	check_sigblock \
@@ -242,6 +243,7 @@ STACKTRACE_TESTS =
 endif
 
 DECODER_TESTS = \
+	bpf-success-long-y.test \
 	bpf-success-v.test \
 	bpf-success.test \
 	brk.test \

@@ -42,6 +42,10 @@
 # define BIG_ADDR_MAYBE(addr_)
 #endif
 
+#ifndef FD0_PATH
+# define FD0_PATH ""
+#endif
+
 #ifndef HAVE_STRUCT_BPF_INSN
 struct bpf_insn {
 	uint8_t	code;
@@ -109,8 +113,8 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 
 #ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
-		error_msg_and_fail("Got a return value of %ld != %d",
-				   rc, INJECT_RETVAL);
+		error_msg_and_fail("Got a return value of %ld != %ld",
+				   rc, (long) INJECT_RETVAL);
 
 	static char inj_errstr[4096];
 
@@ -422,7 +426,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 		       ", value_size=0"
 		       ", max_entries=0"
 		       ", map_flags=0"
-		       ", inner_map_fd=0"
+		       ", inner_map_fd=0" FD0_PATH
 		       ", map_name=\"\""
 		       ", map_ifindex=0"
 		       ", btf_fd=-1159983635"
@@ -764,7 +768,7 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 	{
 		.data = { .BPF_OBJ_PIN_data = { .pathname = 0 } },
 		.size = offsetofend(struct BPF_OBJ_PIN_struct, pathname),
-		.str = "pathname=NULL, bpf_fd=0"
+		.str = "pathname=NULL, bpf_fd=0" FD0_PATH
 	},
 	{
 		.data = { .BPF_OBJ_PIN_data = {
@@ -772,7 +776,7 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_OBJ_PIN_struct, pathname),
 		.str = "pathname=" BIG_ADDR("0xffffffffffffffff", "0xffffffff")
-		       ", bpf_fd=0",
+		       ", bpf_fd=0" FD0_PATH,
 	},
 	{
 		.data = { .BPF_OBJ_PIN_data = { .bpf_fd = -1 } },
@@ -798,7 +802,7 @@ static const struct bpf_attr_check BPF_PROG_ATTACH_checks[] = {
 	{
 		.data = { .BPF_PROG_ATTACH_data = { .target_fd = -1 } },
 		.size = offsetofend(struct BPF_PROG_ATTACH_struct, target_fd),
-		.str = "target_fd=-1, attach_bpf_fd=0"
+		.str = "target_fd=-1, attach_bpf_fd=0" FD0_PATH
 		       ", attach_type=BPF_CGROUP_INET_INGRESS, attach_flags=0"
 	},
 	{
@@ -1029,7 +1033,7 @@ print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check, unsigned long add
 	       ", attach_type=0xfeedface /* BPF_??? */"
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
 	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
-#if defined(INJECT_RETVAL) && INJECT_RETVAL > 0
+#if defined(INJECT_RETVAL)
 	       ", prog_ids=[0, 1, 4294967295, 2718281828], prog_cnt=4}"
 #else
 	       ", prog_ids=%p, prog_cnt=4}", prog_load_ids_ptr
@@ -1057,7 +1061,7 @@ print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check, unsigned long add
 	       ", attach_type=0xfeedface /* BPF_??? */"
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
 	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
-#if defined(INJECT_RETVAL) && INJECT_RETVAL > 0
+#if defined(INJECT_RETVAL)
 	       ", prog_ids=[0, 1, 4294967295, 2718281828, ... /* %p */]"
 	       ", prog_cnt=5}",
 	       prog_load_ids_ptr + ARRAY_SIZE(prog_load_ids)
@@ -1166,7 +1170,7 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = { .name = 0 } },
 		.size = offsetofend(struct BPF_RAW_TRACEPOINT_OPEN_struct,
 				    name),
-		.str = "raw_tracepoint={name=NULL, prog_fd=0}",
+		.str = "raw_tracepoint={name=NULL, prog_fd=0" FD0_PATH "}",
 	},
 	{ /* 1 */
 		.data = { .BPF_RAW_TRACEPOINT_OPEN_data = {
@@ -1242,8 +1246,8 @@ static const struct bpf_attr_check BPF_TASK_FD_QUERY_checks[] = {
 	{
 		.data = { .BPF_TASK_FD_QUERY_data = { .pid = 0xdeadbeef } },
 		.size = offsetofend(struct BPF_TASK_FD_QUERY_struct, pid),
-		.str = "task_fd_query={pid=3735928559, fd=0, flags=0"
-		       ", buf_len=0, buf=NULL, prog_id=0"
+		.str = "task_fd_query={pid=3735928559, fd=0" FD0_PATH
+		       ", flags=0, buf_len=0, buf=NULL, prog_id=0"
 		       ", fd_type=BPF_FD_TYPE_RAW_TRACEPOINT"
 		       ", probe_offset=0, probe_addr=0}"
 	},
