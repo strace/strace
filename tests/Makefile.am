@@ -187,6 +187,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	status-unfinished-threads \
 	syslog-success \
 	threads-execve \
+	threads-execve--quiet-thread-execve \
+	threads-execve-q \
+	threads-execve-qq \
+	threads-execve-qqq \
 	tracer_ppid_pgid_sid \
 	unblock_reset_raise \
 	unix-pair-send-recv \
@@ -225,6 +229,10 @@ statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 status_none_threads_LDADD = -lpthread $(LDADD)
 status_unfinished_threads_LDADD = -lpthread $(LDADD)
 threads_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
+threads_execve__quiet_thread_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
+threads_execve_q_LDADD = -lpthread $(clock_LIBS) $(LDADD)
+threads_execve_qq_LDADD = -lpthread $(clock_LIBS) $(LDADD)
+threads_execve_qqq_LDADD = -lpthread $(clock_LIBS) $(LDADD)
 times_LDADD = $(clock_LIBS) $(LDADD)
 truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64

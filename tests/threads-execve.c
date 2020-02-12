@@ -23,6 +23,13 @@
 
 # include "kernel_old_timespec.h"
 
+#ifndef PRINT_EXITED
+# define PRINT_EXITED 1
+#endif
+#ifndef PRINT_SUPERSEDED
+# define PRINT_SUPERSEDED 1
+#endif
+
 static pid_t leader;
 static pid_t tid;
 
@@ -145,10 +152,10 @@ thread(void *arg)
 			break;
 	}
 
-	printf("%-5d +++ superseded by execve in pid %u +++\n"
-	       "%-5d <... execve resumed>) = 0\n",
-	       leader, tid,
-	       leader);
+#if PRINT_SUPERSEDED
+	printf("%-5d +++ superseded by execve in pid %u +++\n", leader, tid);
+#endif
+	printf("%-5d <... execve resumed>) = 0\n", leader);
 
 	(void) syscall(__NR_nanosleep, (unsigned long) &ots, 0UL);
 	execve(argv[0], argv, environ);
@@ -183,7 +190,9 @@ main(int ac, char **av)
 	action = atoi(av[2]);
 
 	if (action >= NUMBER_OF_ACTIONS * NUMBER_OF_ITERATIONS) {
+#if PRINT_EXITED
 		printf("%-5d +++ exited with 0 +++\n", leader);
+#endif
 		return 0;
 	}
 

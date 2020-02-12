@@ -908,6 +908,13 @@ and the command is run directly instead of attaching.
 Suppress messages attaching, detaching, personality changes,
 and about process exit status.
 .TP
+.B \-qqq
+.TQ
+.BR \-\-quiet = all
+Suppress all suppressible messages (please refer to the
+.B -e quiet
+option description for the full list of suppressible messages).
+.TP
 .B \-r
 .TQ
 .BR \-\-relative\-timestamps [= \fIprecision\fR ]

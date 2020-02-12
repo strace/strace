@@ -658,6 +658,10 @@ syslog
 syslog-success
 tee
 threads-execve
+threads-execve--quiet-thread-execve
+threads-execve-q
+threads-execve-qq
+threads-execve-qqq
 time
 timer_create
 timer_xettime

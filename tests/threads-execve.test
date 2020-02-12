@@ -17,13 +17,15 @@ require_min_kernel_version_or_skip 3.1
 # This test requires some concurrency between threads.
 require_min_nproc 2
 
+opts="${*:-}"
+
 check_prog diff
 run_prog_skip_if_failed date +%s > /dev/null
 s0="$(date +%s)"
 
 run_prog > /dev/null
 
-set -- -a21 -f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend $args
+set -- -a21 -f -esignal=none -e trace=execve,exit,nanosleep,rt_sigsuspend $opts $args
 
 # Due to probabilistic nature of the test, try it several times.
 while :; do
