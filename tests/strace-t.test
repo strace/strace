@@ -9,12 +9,14 @@
 
 . "${srcdir=.}/init.sh"
 
+opts="${*:--t}"
+
 run_prog_skip_if_failed date +%s > "$LOG"
 run_prog_skip_if_failed date +%T --date "@$(cat "$LOG")" > /dev/null
 run_prog ../sleep 0
 
 s0="$(date +%s)"
-run_strace -t -eexecve $args
+run_strace $opts -eexecve $args
 s1="$(date +%s)"
 
 s="$s0"

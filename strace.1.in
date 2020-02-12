@@ -943,13 +943,54 @@ Specify the maximum string size to print (the default is 32).  Note
 that filenames are not considered strings and are always printed in
 full.
 .TP
+.BR \-\-absolute\-timestamps [=[[ format: ] \fIformat\fR ],[[ precision: ] \fIprecision ]]
+.TQ
+.BR \-\-timestamps [=[[ format: ] \fIformat\fR ],[[ precision: ] \fIprecision ]]
+Prefix each line of the trace with the wall clock time in the specified
+.I format
+with the specified
+.IR precision .
+.I format
+can be one of the following:
+.RS
+.TP 14
+.B none
+No time stamp is printed.
+Can be used to override the previous setting.
+.TQ
+.B time
+Wall clock time
+.RB ( strftime (3)
+format string is
+.BR %T ).
+.TQ
+.B unix
+Number of seconds since the epoch
+.RB ( strftime (3)
+format string is
+.BR %s ).
+.RE
+.IP
+.I precision
+can be one of
+.BR s " (for seconds), " ms " (milliseconds), " us " (microseconds), or " ns
+(nanoseconds).
+Default arguments for the option are
+.BR format:time , precision:s .
+.TP
 .B \-t
+.TQ
+.B \-\-absolute\-timestamps
 Prefix each line of the trace with the wall clock time.
 .TP
 .B \-tt
+.TQ
+.BR \-\-absolute\-timestamps = precision:us
 If given twice, the time printed will include the microseconds.
 .TP
 .B \-ttt
+.TQ
+.BR \-\-absolute\-timestamps = format:unix , precision:us
 If given thrice, the time printed will include the microseconds
 and the leading portion will be printed as the number
 of seconds since the epoch.

@@ -82,7 +82,9 @@ int Tflag_scale = 1000;
 int Tflag_width = 6;
 bool iflag;
 bool count_wallclock;
-static unsigned int tflag;
+static int tflag_scale = 1000000000;
+static unsigned tflag_width = 0;
+static const char *tflag_format = NULL;
 static bool rflag;
 static int rflag_scale = 1000;
 static int rflag_width = 6;
@@ -369,9 +371,16 @@ Output format:\n\
      precision:  one of s, ms, us, ns; default is microseconds\n\
   -s STRSIZE, --string-limit=STRSIZE\n\
                  limit length of print strings to STRSIZE chars (default %d)\n\
-  -t             print absolute timestamp\n\
-  -tt            print absolute timestamp with usecs\n\
-  -ttt           print absolute UNIX time with usecs\n\
+  --absolute-timestamps=[[format:]FORMAT[,[precision:]PRECISION]]\n\
+                 set the format of absolute timestamps\n\
+     format:     none, time, or unix; default is time\n\
+     precision:  one of s, ms, us, ns; default is seconds\n\
+  -t, --absolute-timestamps[=time]\n\
+                 print absolute timestamp\n\
+  -tt, --absolute-timestamps=[time,]us\n\
+                 print absolute timestamp with usecs\n\
+  -ttt, --absolute-timestamps=unix,us\n\
+                 print absolute UNIX time with usecs\n\
   -T, --syscall-times[=PRECISION]\n\
                  print time spent in each syscall\n\
      precision:  one of s, ms, us, ns; default is microseconds\n\
@@ -757,28 +766,23 @@ printleader(struct tcb *tcp)
 	else if (nprocs > 1 && !outfname)
 		tprintf("[pid %5u] ", tcp->pid);
 
-	if (tflag) {
+	if (tflag_format) {
 		struct timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts);
 
-		if (tflag > 2) {
-			tprintf("%lld.%06ld ",
-				(long long) ts.tv_sec, (long) ts.tv_nsec / 1000);
-		} else {
-			time_t local = ts.tv_sec;
-			char str[MAX(sizeof("HH:MM:SS"), sizeof(ts.tv_sec) * 3)];
-			struct tm *tm = localtime(&local);
+		time_t local = ts.tv_sec;
+		char str[MAX(sizeof("HH:MM:SS"), sizeof(local) * 3)];
+		struct tm *tm = localtime(&local);
 
-			if (tm)
-				strftime(str, sizeof(str), "%T", tm);
-			else
-				xsprintf(str, "%lld", (long long) local);
-			if (tflag > 1)
-				tprintf("%s.%06ld ",
-					str, (long) ts.tv_nsec / 1000);
-			else
-				tprintf("%s ", str);
-		}
+		if (tm)
+			strftime(str, sizeof(str), tflag_format, tm);
+		else
+			xsprintf(str, "%lld", (long long) local);
+		if (tflag_width)
+			tprintf("%s.%0*ld ", str, tflag_width,
+				(long) ts.tv_nsec / tflag_scale);
+		else
+			tprintf("%s ", str);
 	}
 
 	if (rflag) {
@@ -793,12 +797,12 @@ printleader(struct tcb *tcp)
 		ts_sub(&dts, &ts, &ots);
 		ots = ts;
 
-		tprintf("%s%6ld", tflag ? "(+" : "", (long) dts.tv_sec);
+		tprintf("%s%6ld", tflag_format ? "(+" : "", (long) dts.tv_sec);
 		if (rflag_width) {
 			tprintf(".%0*ld",
 				rflag_width, (long) dts.tv_nsec / rflag_scale);
 		}
-		tprints(tflag ? ") " : " ");
+		tprints(tflag_format ? ") " : " ");
 	}
 
 	if (iflag)
@@ -1731,6 +1735,91 @@ parse_interruptible_arg(const char *arg)
 			: (int) string_to_uint_upto(arg, NUM_INTR_OPTS - 1);
 }
 
+static int
+parse_ts_arg(const char *in_arg)
+{
+	static const char format_pfx[] = "format:";
+	static const char scale_pfx[] = "precision:";
+
+	enum {
+		TOKEN_FORMAT = 1 << 0,
+		TOKEN_SCALE  = 1 << 1,
+	} token_type;
+	enum {
+		FK_UNSET,
+		FK_NONE,
+		FK_TIME,
+		FK_UNIX,
+	} format_kind = FK_UNSET;
+	int precision_width;
+	int precision_scale = 0;
+	char *arg = xstrdup(in_arg);
+	char *saveptr = NULL;
+
+	for (const char *token = strtok_r(arg, ",", &saveptr);
+	     token; token = strtok_r(NULL, ",", &saveptr)) {
+		token_type = TOKEN_FORMAT | TOKEN_SCALE;
+
+		if (!strncasecmp(token, format_pfx, sizeof(format_pfx) - 1)) {
+			token += sizeof(format_pfx) - 1;
+			token_type = TOKEN_FORMAT;
+		} else if (!strncasecmp(token, scale_pfx,
+					sizeof(scale_pfx) - 1)) {
+			token += sizeof(scale_pfx) - 1;
+			token_type = TOKEN_SCALE;
+
+		}
+
+		if (token_type & TOKEN_FORMAT) {
+			if (!strcasecmp(token, "none")) {
+				format_kind = FK_NONE;
+				continue;
+			} else if (!strcasecmp(token, "time")) {
+				format_kind = FK_TIME;
+				continue;
+			} else if (!strcasecmp(token, "unix")) {
+				format_kind = FK_UNIX;
+				continue;
+			}
+		}
+
+		if (token_type & TOKEN_SCALE) {
+			precision_scale =
+				str2timescale_optarg(token, &precision_width);
+
+			if (precision_scale > 0)
+				continue;
+		}
+
+		free(arg);
+		return -1;
+	}
+
+	switch (format_kind) {
+	case FK_UNSET:
+		if (!tflag_format)
+			tflag_format = "%T";
+		break;
+	case FK_NONE:
+		tflag_format = NULL;
+		break;
+	case FK_TIME:
+		tflag_format = "%T";
+		break;
+	case FK_UNIX:
+		tflag_format = "%s";
+		break;
+	}
+
+	if (precision_scale > 0) {
+		tflag_scale = precision_scale;
+		tflag_width = precision_width;
+	}
+
+	free(arg);
+	return 0;
+}
+
 /*
  * Initialization part of main() was eating much stack (~0.5k),
  * which was unused after init.
@@ -1747,6 +1836,9 @@ init(int argc, char *argv[])
 	static const char qqqflag_qual[] = "all";
 	static const char yflag_qual[] = "path";
 	static const char yyflag_qual[] = "socket,dev,path";
+	static const char tflag_str[] = "format:time";
+	static const char ttflag_str[] = "precision:us,format:time";
+	static const char tttflag_str[] = "format:unix,precision:us";
 
 	int c, i;
 	int optF = 0, zflags = 0;
@@ -1756,6 +1848,8 @@ init(int argc, char *argv[])
 	int qflag_short = 0;
 	int followfork_short = 0;
 	int yflag_short = 0;
+	bool tflag_long_set = false;
+	int tflag_short = 0;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1790,6 +1884,7 @@ init(int argc, char *argv[])
 		GETOPT_HEX_STR,
 		GETOPT_FOLLOWFORKS,
 		GETOPT_OUTPUT_SEPARATELY,
+		GETOPT_TS,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -1830,6 +1925,8 @@ init(int argc, char *argv[])
 		{ "relative-timestamps", optional_argument, 0, 'r' },
 		{ "string-limit",	required_argument, 0, 's' },
 		{ "summary-sort-by",	required_argument, 0, 'S' },
+		{ "absolute-timestamps", optional_argument, 0, GETOPT_TS },
+		{ "timestamps",		optional_argument, 0, GETOPT_TS },
 		{ "syscall-times",	optional_argument, 0, 'T' },
 		{ "user",		required_argument, 0, 'u' },
 		{ "no-abbrev",		no_argument,	   0, 'v' },
@@ -1986,7 +2083,12 @@ init(int argc, char *argv[])
 			set_sortby(optarg);
 			break;
 		case 't':
-			tflag++;
+			tflag_short++;
+			break;
+		case GETOPT_TS:
+			tflag_long_set = true;
+			if (parse_ts_arg(optarg ?: tflag_str))
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'T':
 			Tflag = 1;
@@ -2115,6 +2217,16 @@ init(int argc, char *argv[])
 				   "count is %d",
 				   daemonized_tracer, MAX_DAEMONIZE_OPTS);
 
+	if (tflag_short) {
+		if (tflag_long_set) {
+			error_msg_and_die("-t and --absolute-timestamps cannot"
+					  " be provided simultaneously");
+		}
+
+		parse_ts_arg(tflag_short == 1 ? tflag_str :
+			     tflag_short == 2 ? ttflag_str : tttflag_str);
+	}
+
 	if (xflag_long) {
 		if (xflag) {
 			error_msg_and_die("-x and --strings-in-hex cannot"
@@ -2193,8 +2305,9 @@ init(int argc, char *argv[])
 		if (rflag)
 			error_msg("-r/--relative-timestamps has no effect "
 				  "with -c/--summary-only");
-		if (tflag)
-			error_msg("-%c has no effect with -c/--summary-only", 't');
+		if (tflag_format)
+			error_msg("-t/--absolute-timestamps has no effect "
+				  "with -c/--summary-only");
 		if (Tflag)
 			error_msg("-T/--syscall-times has no effect "
 				  "with -c/--summary-only");

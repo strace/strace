@@ -30,6 +30,22 @@ check_e_using_grep "$ff_name: File *name too long" -ff -o "$ff_name" true
 check_e_using_grep "$ff_name: File *name too long" -ff --output="$ff_name" true
 
 check_h 'must have PROG [ARGS] or -p PID'
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,s
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=s,
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,,
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=s,,none
+check_h "must have PROG [ARGS] or -p PID" --timestamps --absolute-timestamps=ns --timestamps=none --absolute-timestamps=format:time,precision:s --timestamps=ns,format:unix --absolute-timestamps=us,precision:ms,unix,precision:ns --timestamps=format:none,time,precision:us
+check_h "invalid --absolute-timestamps argument: 'ss'" --absolute-timestamps=ss
+check_h "invalid --timestamps argument: 'format:s'" --timestamps=format:s
+check_h "invalid --timestamps argument: 's,non'" --timestamps=s,non
+check_h "invalid --timestamps argument: 'precision:none'" --timestamps=precision:none
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --timestamps -p $$
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' --absolute-timestamps -ttt -p $$
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --timestamps=ns -t -p $$
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' --timestamps=ns -t --absolute-timestamps=unix -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDD -p $$
@@ -220,14 +236,14 @@ if [ "$uid" -ge 0 ]; then
 
 	check_e "$umsg" -u :nosuchuser: true
 
-	for c in i/--instruction-pointer r/--relative-timestamps t T/--syscall-times y/--decode-fds; do
+	for c in i/--instruction-pointer r/--relative-timestamps t/--absolute-timestamps T/--syscall-times y/--decode-fds; do
 		check_e "-$c has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 	done
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
 $STRACE_EXE: -r/--relative-timestamps has no effect with -c/--summary-only
-$STRACE_EXE: -t has no effect with -c/--summary-only
+$STRACE_EXE: -t/--absolute-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
 $STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.

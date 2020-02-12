@@ -9,12 +9,16 @@
 
 . "${srcdir=.}/init.sh"
 
+precision="${1:-6}"
+[ x0 = "x$#" ] || shift
+opts="${*:--tt}"
+
 run_prog_skip_if_failed date +%s > "$LOG"
 run_prog_skip_if_failed date +%T --date "@$(cat "$LOG")" > /dev/null
 run_prog ../sleep 0
 
 s0="$(date +%s)"
-run_strace -tt -eexecve $args
+run_strace $opts -eexecve $args
 s1="$(date +%s)"
 
 s="$s0"
@@ -26,7 +30,7 @@ while [ "$s" -le "$s1" ]; do
 done
 
 cat > "$EXP" << __EOF__
-($t_reg)\\.[[:digit:]]{6} execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], 0x[[:xdigit:]]* /\\* [[:digit:]]* vars \\*/\\) = 0
+($t_reg)\\.[[:digit:]]{${precision}} execve\\("\\.\\./sleep", \\["\\.\\./sleep", "0"\\], 0x[[:xdigit:]]* /\\* [[:digit:]]* vars \\*/\\) = 0
 __EOF__
 
 match_grep "$LOG" "$EXP"
