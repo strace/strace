@@ -2,6 +2,17 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+ * Every short option now has a long option alias, which also has enabled
+   the following improvements:
+   * Ability to use human-readable settings for -I/--interruptible,
+     -D/--daemonize options.
+   * Ability to silence specific messages using -e quiet/--quiet qualifier
+     (an alias for the -q option).
+   * Ability to specify selected fd decoding features using
+     -e decode-fds/--decode-fds qualifier (an alias for the -y option).
+   * Ability to set precision for the absolute timestamp, relative timestamp,
+     and syscall time output (using --absolute-timestamps,
+     --relative-timestamps, and --syscall-times options, respectively).
 
 * Bug fixes
   * Fixed build on csky abiv1 architecture.
