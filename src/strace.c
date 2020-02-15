@@ -394,7 +394,7 @@ Output format:\n\
                  limit length of print strings to STRSIZE chars (default %d)\n\
   --absolute-timestamps=[[format:]FORMAT[,[precision:]PRECISION]]\n\
                  set the format of absolute timestamps\n\
-     format:     none, time, unix, or strftime=STRING; default is time\n\
+     format:     none, time, unix, iso, or strftime=STRING; default is time\n\
      precision:  one of s, ms, us, ns; default is seconds\n\
   -t, --absolute-timestamps[=time]\n\
                  print absolute timestamp\n\
@@ -1841,6 +1841,7 @@ parse_ts_arg(const char *in_arg)
 		FK_NONE,
 		FK_TIME,
 		FK_UNIX,
+		FK_ISO,
 		FK_STRFTIME,
 	} format_kind = FK_UNSET;
 	int precision_width;
@@ -1872,6 +1873,10 @@ parse_ts_arg(const char *in_arg)
 				continue;
 			} else if (!strcasecmp(token, "unix")) {
 				format_kind = FK_UNIX;
+				continue;
+			} else if (!strcasecmp(token, "iso8601") ||
+				   !strcasecmp(token, "iso")) {
+				format_kind = FK_ISO;
 				continue;
 			} else if (!strncasecmp(token, strftime_pfx,
 						sizeof(strftime_pfx) - 1)) {
@@ -1909,6 +1914,9 @@ parse_ts_arg(const char *in_arg)
 		break;
 	case FK_UNIX:
 		tflag_format = xstrdup("%s");
+		break;
+	case FK_ISO:
+		tflag_format = xstrdup("%FT%T%z");
 		break;
 	case FK_STRFTIME:
 		tflag_format = xstrdup(format_str);

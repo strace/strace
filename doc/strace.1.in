@@ -986,6 +986,12 @@ Number of seconds since the epoch
 format string is
 .BR %s ).
 .TQ
+.BR iso8601 ", " iso
+Time stamp in ISO 8601 format
+.RB ( strftime (3)
+format string is
+.BR %FT%T%z ).
+.TQ
 .BR strftime = \fIfmt\fR
 Arbitrary
 .BR strftime (3)

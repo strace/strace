@@ -28,7 +28,7 @@ s1="$(date +%s)"
 s="$s0"
 t_reg=
 while [ "$s" -le "$s1" ]; do
-	t="$(date "+${fmt_re}" --date "@$s")"
+	t="$(date "+${fmt_re}" --date "@$s" | sed 's/\(+\)/\\\1/')"
 	[ -z "$t_reg" ] && t_reg="$t" || t_reg="$t_reg|$t"
 	s=$(($s + 1))
 done
