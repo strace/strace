@@ -39,10 +39,13 @@ check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,s
 check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=s,
 check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,,
 check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=s,,none
-check_h "must have PROG [ARGS] or -p PID" --timestamps --absolute-timestamps=ns --timestamps=none --absolute-timestamps=format:time,precision:s --timestamps=ns,format:unix --absolute-timestamps=us,precision:ms,unix,precision:ns --timestamps=format:none,time,precision:us
+check_h "must have PROG [ARGS] or -p PID" --timestamps=strftime=
+check_h "must have PROG [ARGS] or -p PID" --timestamps --absolute-timestamps=ns --timestamps=none --absolute-timestamps=format:time,precision:s --timestamps=ns,format:unix --absolute-timestamps=us,precision:ms,unix,precision:ns --timestamps=format:none,time,precision:us --absolute-timestamps=format:strftime=%r
 check_h "invalid --absolute-timestamps argument: 'ss'" --absolute-timestamps=ss
+check_h "invalid --absolute-timestamps argument: 'strftime'" --absolute-timestamps=strftime
 check_h "invalid --timestamps argument: 'format:s'" --timestamps=format:s
 check_h "invalid --timestamps argument: 's,non'" --timestamps=s,non
+check_h "invalid --timestamps argument: 'precision:strftime='" --timestamps=precision:strftime=
 check_h "invalid --timestamps argument: 'precision:none'" --timestamps=precision:none
 check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --timestamps -p $$
 check_e '-t and --absolute-timestamps cannot be provided simultaneously' --absolute-timestamps -ttt -p $$

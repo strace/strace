@@ -985,6 +985,15 @@ Number of seconds since the epoch
 .RB ( strftime (3)
 format string is
 .BR %s ).
+.TQ
+.BR strftime = \fIfmt\fR
+Arbitrary
+.BR strftime (3)
+format string.
+.BR Note :
+conversion specification modifiers for
+.BR %c ", " %r ", and " %X
+conversion specifications are not supported if sub-second precision is set.
 .RE
 .IP
 .I precision

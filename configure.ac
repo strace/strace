@@ -353,6 +353,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	iconv_open
 	if_indextoname
 	mempcpy
+	nl_langinfo
 	open64
 	open_memstream
 	preadv
@@ -424,6 +425,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
+	langinfo.h
 	mqueue.h
 	netinet/sctp.h
 	netipx/ipx.h

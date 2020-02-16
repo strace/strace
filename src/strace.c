@@ -24,6 +24,9 @@
 #include <pwd.h>
 #include <grp.h>
 #include <dirent.h>
+#ifdef HAVE_LANGINFO_H /* For nl_langinfo in process_tflag_format */
+# include <langinfo.h>
+#endif
 #include <locale.h>
 #include <sys/utsname.h>
 #include <sys/prctl.h>
@@ -82,9 +85,11 @@ int Tflag_width = 6;
 bool iflag;
 bool nflag;
 bool count_wallclock;
+static size_t *tflag_pos = NULL;
+static size_t tflag_pos_size = 0;
 static int tflag_scale = 1000000000;
 static unsigned tflag_width = 0;
-static const char *tflag_format = NULL;
+static char *tflag_format = NULL;
 static bool rflag;
 static int rflag_scale = 1000;
 static int rflag_width = 6;
@@ -389,7 +394,7 @@ Output format:\n\
                  limit length of print strings to STRSIZE chars (default %d)\n\
   --absolute-timestamps=[[format:]FORMAT[,[precision:]PRECISION]]\n\
                  set the format of absolute timestamps\n\
-     format:     none, time, or unix; default is time\n\
+     format:     none, time, unix, or strftime=STRING; default is time\n\
      precision:  one of s, ms, us, ns; default is seconds\n\
   -t, --absolute-timestamps[=time]\n\
                  print absolute timestamp\n\
@@ -766,6 +771,56 @@ set_current_tcp(const struct tcb *tcp)
 		set_personality(current_tcp->currpers);
 }
 
+static void
+print_timestamp(void)
+{
+	static const unsigned TS_SZ = 1024;
+
+	if (!tflag_format)
+		return;
+
+	struct timespec ts;
+	clock_gettime(CLOCK_REALTIME, &ts);
+
+	time_t local = ts.tv_sec;
+	struct tm *tm = localtime(&local);
+	char str[TS_SZ + 1];
+	int res = 0;
+
+	if (tm) {
+		if (tflag_pos_size) {
+			char subsec[tflag_width + 1];
+			xsprintf(subsec, "%0*lld",
+				 tflag_width,
+				 (long long) ts.tv_nsec / tflag_scale);
+
+			for (size_t i = 0; i < tflag_pos_size; i++) {
+				debug_msg("copy to %zu", tflag_pos[i]);
+				memcpy(tflag_format + tflag_pos[i], subsec,
+				       tflag_width);
+			}
+		}
+
+		res = strftime(str, sizeof(str), tflag_format, tm);
+
+		if (!res) {
+		}
+	}
+
+	if (!res) {
+		if (tflag_width > 0) {
+			xsprintf(str, "%lld.%0*lld",
+				 (long long) local,
+				 tflag_width,
+				 (long long) ts.tv_nsec / tflag_scale);
+		} else {
+			xsprintf(str, "%lld", (long long) local);
+		}
+	}
+
+	tprintf("%s ", str);
+}
+
 void
 printleader(struct tcb *tcp)
 {
@@ -807,24 +862,7 @@ printleader(struct tcb *tcp)
 	}
 #endif
 
-	if (tflag_format) {
-		struct timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts);
-
-		time_t local = ts.tv_sec;
-		char str[MAX(sizeof("HH:MM:SS"), sizeof(local) * 3)];
-		struct tm *tm = localtime(&local);
-
-		if (tm)
-			strftime(str, sizeof(str), tflag_format, tm);
-		else
-			xsprintf(str, "%lld", (long long) local);
-		if (tflag_width)
-			tprintf("%s.%0*ld ", str, tflag_width,
-				(long) ts.tv_nsec / tflag_scale);
-		else
-			tprintf("%s ", str);
-	}
+	print_timestamp();
 
 	if (rflag) {
 		struct timespec ts;
@@ -1792,6 +1830,8 @@ parse_ts_arg(const char *in_arg)
 	static const char format_pfx[] = "format:";
 	static const char scale_pfx[] = "precision:";
 
+	static const char strftime_pfx[] = "strftime=";
+
 	enum {
 		TOKEN_FORMAT = 1 << 0,
 		TOKEN_SCALE  = 1 << 1,
@@ -1801,13 +1841,15 @@ parse_ts_arg(const char *in_arg)
 		FK_NONE,
 		FK_TIME,
 		FK_UNIX,
+		FK_STRFTIME,
 	} format_kind = FK_UNSET;
 	int precision_width;
 	int precision_scale = 0;
 	char *arg = xstrdup(in_arg);
+	char *format_str = NULL;
 	char *saveptr = NULL;
 
-	for (const char *token = strtok_r(arg, ",", &saveptr);
+	for (char *token = strtok_r(arg, ",", &saveptr);
 	     token; token = strtok_r(NULL, ",", &saveptr)) {
 		token_type = TOKEN_FORMAT | TOKEN_SCALE;
 
@@ -1831,6 +1873,11 @@ parse_ts_arg(const char *in_arg)
 			} else if (!strcasecmp(token, "unix")) {
 				format_kind = FK_UNIX;
 				continue;
+			} else if (!strncasecmp(token, strftime_pfx,
+						sizeof(strftime_pfx) - 1)) {
+				format_kind = FK_STRFTIME;
+				format_str = token + sizeof(strftime_pfx) - 1;
+				continue;
 			}
 		}
 
@@ -1846,19 +1893,25 @@ parse_ts_arg(const char *in_arg)
 		return -1;
 	}
 
+	if (format_kind != FK_UNSET)
+		free(tflag_format);
+
 	switch (format_kind) {
 	case FK_UNSET:
 		if (!tflag_format)
-			tflag_format = "%T";
+			tflag_format = xstrdup("%T");
 		break;
 	case FK_NONE:
 		tflag_format = NULL;
 		break;
 	case FK_TIME:
-		tflag_format = "%T";
+		tflag_format = xstrdup("%T");
 		break;
 	case FK_UNIX:
-		tflag_format = "%s";
+		tflag_format = xstrdup("%s");
+		break;
+	case FK_STRFTIME:
+		tflag_format = xstrdup(format_str);
 		break;
 	}
 
@@ -1869,6 +1922,215 @@ parse_ts_arg(const char *in_arg)
 
 	free(arg);
 	return 0;
+}
+
+#if defined(HAVE_LANGINFO_H) && defined(HAVE_NL_LANGINFO)
+# define nl_fallback(fmt_, dflt_) (nl_langinfo(fmt_) ?: (dflt_))
+#else
+# define nl_fallback(fmt_, dflt_) (dflt_)
+#endif
+
+static const char *
+get_local_fmt(const char fmt, bool era)
+{
+	switch (fmt) {
+	case 'c':
+		return era ? nl_fallback(ERA_D_T_FMT, "%a %b %e %H:%M:%S %Y")
+			   : nl_fallback(D_T_FMT, "%a %b %e %H:%M:%S %Y");
+	case 'r':
+		return nl_fallback(T_FMT_AMPM, "%I:%M:%S %p");
+	case 'X':
+		return era ? nl_fallback(ERA_T_FMT, "%H:%M:%S")
+			   : nl_fallback(T_FMT, "%H:%M:%S");
+	}
+
+	return NULL;
+}
+
+static void
+process_tflag_format(void)
+{
+	char *out = NULL;
+	size_t outsz = 0;
+	size_t outpos = 0;
+	size_t pos = 0;
+	size_t newpos;
+	size_t tflag_pos_pos = 0;
+	size_t saved_pos = 0;
+	const char *internal_str = NULL;
+	size_t percent_pos = 0;
+	enum {
+		ST_NORMAL,
+		ST_PERCENT,
+	} state = ST_NORMAL;
+	bool era = false;
+	char flag = 0;
+	char c;
+
+	if (!tflag_format || !tflag_width)
+		return;
+
+	/*
+	 * We need to expand some strftime conversion specifications in order
+	 * to inject sub-second parts.
+	 */
+	/* Inject:
+	 * %s
+	 * %S
+	 * %T - "%H:%M:%S"
+	 *
+	 * Expand:
+	 * %c - D_T_FMT "%a %b %e %H:%M:%S %Y"
+	 * %Ec - ERA_D_T_FMT
+	 * %r - T_FMT_AMPM "%I:%M:%S %p"
+	 * %X - T_FMT "%H:%M:%S"
+	 * %EX - ERA_T_FMT
+	 */
+
+	c = tflag_format[pos];
+	while (c) {
+		if (outpos >= outsz)
+			out = xgrowarray(out, &outsz, 1);
+
+		switch (state) {
+		case ST_NORMAL:
+			switch (c) {
+			case '%':
+				state = ST_PERCENT;
+				percent_pos = pos;
+				break;
+
+			default:
+				out[outpos++] = c;
+			}
+
+			break;
+
+		case ST_PERCENT:
+			switch (c) {
+			case '-': case '_': case '^': case '#':
+				if (!flag && !era)
+					flag = c;
+				else
+					goto dont_care;
+				break;
+
+			case '0': case '1': case '2': case '3': case '4':
+			case '5': case '6': case '7': case '8': case '9':
+				if (era)
+					goto dont_care;
+				break;
+
+			case 's':
+			case 'S':
+			case 'T':
+				newpos = outpos +
+					 (c != 'q' ? pos - percent_pos : 0) +
+					 tflag_width + 2;
+
+				if (newpos >= outsz) {
+					out = xreallocarray(out, newpos, 1);
+					outsz = newpos;
+				}
+				if (tflag_pos_pos >= tflag_pos_size) {
+					tflag_pos = xgrowarray(tflag_pos,
+						&tflag_pos_size,
+						sizeof(tflag_pos[0]));
+				}
+
+				strncpy(out + outpos,
+					(internal_str ?: tflag_format) +
+						percent_pos,
+					pos - percent_pos + 1);
+				outpos += pos - percent_pos + 1;
+				out[outpos++] = '.';
+				memset(out + outpos, ' ', newpos - outpos);
+
+				tflag_pos[tflag_pos_pos++] = outpos;
+				outpos = newpos;
+				flag = 0;
+				era = false;
+				state = ST_NORMAL;
+				break;
+
+			case 'E':
+				if (!era)
+					era = true;
+				else
+					goto dont_care;
+				break;
+
+			case 'c':
+			case 'r':
+			case 'X':
+				/*
+				 * We do not handle nested %[crx],
+				 * they should not exist anyway.
+				 */
+				if (!internal_str) {
+					internal_str = get_local_fmt(c, era);
+					saved_pos = pos;
+					pos = (size_t) -1;
+					state = ST_NORMAL;
+
+					break;
+				}
+
+				ATTRIBUTE_FALLTHROUGH;
+
+dont_care:
+			default:
+				newpos = outpos + pos - percent_pos + 1;
+				if (newpos >= outsz) {
+					out = xreallocarray(out, newpos, 1);
+					outsz = newpos;
+				}
+				strncpy(out + outpos,
+					(internal_str ?: tflag_format) +
+						percent_pos,
+					pos - percent_pos + 1);
+				outpos = newpos;
+				flag = 0;
+				era = false;
+				state = ST_NORMAL;
+			}
+		}
+
+		c = (internal_str ?: tflag_format)[++pos];
+		if (internal_str && !c) {
+			if (state == ST_PERCENT) {
+				newpos = outpos + pos - percent_pos + 1;
+				if (newpos >= outsz) {
+					out = xreallocarray(out, newpos, 1);
+					outsz = newpos;
+				}
+				strncpy(out + outpos,
+					(internal_str ?: tflag_format) +
+						percent_pos,
+					pos - percent_pos + 1);
+				outpos = newpos;
+				flag = 0;
+				era = false;
+			}
+			pos = saved_pos;
+			state = ST_NORMAL;
+			internal_str = NULL;
+			c = tflag_format[++pos];
+		}
+	}
+
+	if (out) {
+		if (outpos >= outsz)
+			out = xreallocarray(out, outsz + 1, 1);
+		out[outpos] = '\0';
+	}
+	if (tflag_pos_pos)
+		tflag_pos_size = tflag_pos_pos;
+
+	free(tflag_format);
+	tflag_format = out;
+
+	debug_msg("outpos = %zu, outsz = %zu, out = '%s'", outpos, outsz, out);
 }
 
 static void
@@ -2449,6 +2711,9 @@ init(int argc, char *argv[])
 		parse_ts_arg(tflag_short == 1 ? tflag_str :
 			     tflag_short == 2 ? ttflag_str : tttflag_str);
 	}
+
+	if (tflag_format)
+		process_tflag_format();
 
 	if (xflag_long) {
 		if (xflag) {
