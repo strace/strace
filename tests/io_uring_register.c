@@ -35,6 +35,11 @@
 # define BIG_ADDR_MAYBE(addr_)
 #endif
 
+#if WORDS_BIGENDIAN
+# define BE_LE(be_, le_) be_
+#else
+# define BE_LE(be_, le_) le_
+#endif
 
 static const char *errstr;
 
@@ -154,7 +159,8 @@ main(void)
 	sys_io_uring_register(fd_null, 6, &bogus_iufu, 0);
 	printf("io_uring_register(%u<%s>, IORING_REGISTER_FILES_UPDATE"
 	       ", {offset=%" PRIu32 ", resv=%#" PRIx32 ", fds="
-	       BIG_ADDR_MAYBE("0x8f8e8d8c8b8a8988") "[]}, 0) = %s\n",
+	       BIG_ADDR_MAYBE(BE_LE("0x88898a8b8c8d8e8f", "0x8f8e8d8c8b8a8988"))
+	       "[]}, 0) = %s\n",
 	       fd_null, path_null,
 	       ((uint32_t *) &bogus_iufu)[0], ((uint32_t *) &bogus_iufu)[1],
 	       errstr);
