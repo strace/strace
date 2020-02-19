@@ -151,11 +151,12 @@ struct BPF_PROG_ATTACH_struct {
 	uint32_t attach_bpf_fd;
 	uint32_t attach_type;
 	uint32_t attach_flags;
+	uint32_t replace_bpf_fd;
 };
 
 # define BPF_PROG_ATTACH_struct_size \
 	sizeof(struct BPF_PROG_ATTACH_struct)
-# define expected_BPF_PROG_ATTACH_struct_size 16
+# define expected_BPF_PROG_ATTACH_struct_size 20
 
 struct BPF_PROG_DETACH_struct {
 	uint32_t target_fd;

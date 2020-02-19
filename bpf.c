@@ -389,6 +389,14 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
 	PRINT_FIELD_FLAGS(", ", attr, attach_flags, bpf_attach_flags,
 			  "BPF_F_???");
+
+	/*
+	 * The following field was introduced by Linux commit
+	 * v5.6-rc1~151^2~199^2~7^2~3.
+	 */
+	if (len <= offsetof(struct BPF_PROG_ATTACH_struct, replace_bpf_fd))
+		break;
+	PRINT_FIELD_FD(", ", attr, replace_bpf_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 

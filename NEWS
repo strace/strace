@@ -13,7 +13,8 @@ Noteworthy changes in release ?.? (????-??-??)
    * Ability to set precision for the absolute timestamp, relative timestamp,
      and syscall time output (using --absolute-timestamps,
      --relative-timestamps, and --syscall-times options, respectively).
-  * Enhanced decoding of BPF_MAP_CREATE bpf syscall command.
+  * Enhanced decoding of BPF_MAP_CREATE and BPF_PROG_ATTACH bpf syscall
+    commands.
   * Updated lists of BPF_* constants.
 
 * Bug fixes

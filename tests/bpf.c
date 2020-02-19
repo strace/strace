@@ -835,13 +835,28 @@ static const struct bpf_attr_check BPF_PROG_ATTACH_checks[] = {
 			.target_fd = -1,
 			.attach_bpf_fd = -2,
 			.attach_type = 2,
-			.attach_flags = 1
+			.attach_flags = 7
 		} },
 		.size = offsetofend(struct BPF_PROG_ATTACH_struct, attach_flags),
 		.str = "target_fd=-1, attach_bpf_fd=-2"
 		       ", attach_type=BPF_CGROUP_INET_SOCK_CREATE"
-		       ", attach_flags=BPF_F_ALLOW_OVERRIDE"
-	}
+		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
+				       "|BPF_F_REPLACE"
+	},
+	{
+		.data = { .BPF_PROG_ATTACH_data = {
+			.target_fd = -1,
+			.attach_bpf_fd = -2,
+			.attach_type = 2,
+			.attach_flags = 0xf8,
+			.replace_bpf_fd = -3,
+		} },
+		.size = offsetofend(struct BPF_PROG_ATTACH_struct, replace_bpf_fd),
+		.str = "target_fd=-1, attach_bpf_fd=-2"
+		       ", attach_type=BPF_CGROUP_INET_SOCK_CREATE"
+		       ", attach_flags=0xf8 /* BPF_F_??? */"
+		       ", replace_bpf_fd=-3"
+	},
 };
 
 
