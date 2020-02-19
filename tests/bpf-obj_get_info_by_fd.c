@@ -87,6 +87,10 @@ print_map_create(void *attr_void, size_t size, long rc)
 		printf(", btf_fd=0</dev/null>"
 		       ", btf_key_type_id=0, btf_value_type_id=0");
 	}
+	if (size > offsetof(struct BPF_MAP_CREATE_struct,
+			    btf_vmlinux_value_type_id)) {
+		printf(", btf_vmlinux_value_type_id=0");
+	}
 	printf("}, %zu) = ", size);
 	if (rc >= 0)
 		printf("%ld<anon_inode:bpf-map>\n", rc);

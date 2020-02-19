@@ -433,6 +433,28 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 		       ", btf_key_type_id=4207869677"
 		       ", btf_value_type_id=3405705229"
 	},
+	{ /* 9 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.btf_fd = 0xbadc0ded,
+			.btf_key_type_id = 0xfacefeed,
+			.btf_value_type_id = 0xcafef00d,
+			.btf_vmlinux_value_type_id = 0xdeadc0de,
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct,
+				    btf_vmlinux_value_type_id),
+		.str = "map_type=BPF_MAP_TYPE_UNSPEC"
+		       ", key_size=0"
+		       ", value_size=0"
+		       ", max_entries=0"
+		       ", map_flags=0"
+		       ", inner_map_fd=0" FD0_PATH
+		       ", map_name=\"\""
+		       ", map_ifindex=0"
+		       ", btf_fd=-1159983635"
+		       ", btf_key_type_id=4207869677"
+		       ", btf_value_type_id=3405705229"
+		       ", btf_vmlinux_value_type_id=3735929054"
+	},
 };
 
 static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {

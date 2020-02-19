@@ -13,6 +13,7 @@ Noteworthy changes in release ?.? (????-??-??)
    * Ability to set precision for the absolute timestamp, relative timestamp,
      and syscall time output (using --absolute-timestamps,
      --relative-timestamps, and --syscall-times options, respectively).
+  * Enhanced decoding of BPF_MAP_CREATE bpf syscall command.
 
 * Bug fixes
   * Fixed build on csky abiv1 architecture.
