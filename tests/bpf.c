@@ -256,7 +256,7 @@ init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check)
 	attr->map_ifindex = ifindex_lo();
 }
 
-static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 26,
+static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 27,
 	      "The map_type for tests 1 and 2 below needs to be updated");
 static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	{
@@ -267,7 +267,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 25,
+			.map_type = 26,
 			.key_size = 4,
 			.value_size = 8,
 			.max_entries = 256,
@@ -277,7 +277,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_name = "0123456789abcde",
 		} },
 		.size = offsetof(struct BPF_MAP_CREATE_struct, map_name) + 8,
-		.str = "map_type=BPF_MAP_TYPE_DEVMAP_HASH, key_size=4"
+		.str = "map_type=BPF_MAP_TYPE_STRUCT_OPS, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
 				   "|BPF_F_NUMA_NODE|BPF_F_RDONLY|BPF_F_WRONLY"
@@ -289,7 +289,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 2 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 26,
+			.map_type = 27,
 			.key_size = 0xface1e55,
 			.value_size = 0xbadc0ded,
 			.max_entries = 0xbeefcafe,
@@ -300,7 +300,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_ifindex = 3141592653,
 		} },
 		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_ifindex),
-		.str = "map_type=0x1a /* BPF_MAP_TYPE_??? */"
+		.str = "map_type=0x1b /* BPF_MAP_TYPE_??? */"
 		       ", key_size=4207812181, value_size=3134983661"
 		       ", max_entries=3203386110"
 		       ", map_flags=0xfffff800 /* BPF_F_??? */"
@@ -635,7 +635,7 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr
 	       license, IFINDEX_LO_STR);
 }
 
-static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 27,
+static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 29,
 	      "The prog_type for test 5 below needs to be updated");
 static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	{
@@ -646,7 +646,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 27,
+			.prog_type = 29,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -657,7 +657,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x1b /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x1d /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -720,7 +720,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 5 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 26,
+			.prog_type = 28,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
@@ -732,7 +732,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_TRACING"
+		.str = "prog_type=BPF_PROG_TYPE_EXT"
 		       ", insn_cnt=3134983661"
 		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
@@ -1057,7 +1057,7 @@ print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check, unsigned long add
 	printf("query={target_fd=-1153374643"
 	       ", attach_type=0xfeedface /* BPF_??? */"
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
-	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
+	       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE|0xbeefcaf8"
 #if defined(INJECT_RETVAL)
 	       ", prog_ids=[0, 1, 4294967295, 2718281828], prog_cnt=4}"
 #else
@@ -1085,7 +1085,7 @@ print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check, unsigned long add
 	printf("query={target_fd=-1153374643"
 	       ", attach_type=0xfeedface /* BPF_??? */"
 	       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
-	       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
+	       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE|0xbeefcaf8"
 #if defined(INJECT_RETVAL)
 	       ", prog_ids=[0, 1, 4294967295, 2718281828, ... /* %p */]"
 	       ", prog_cnt=5}",
@@ -1123,7 +1123,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 			.target_fd = 3141592653U,
 			.attach_type = 26,
 			.query_flags = 0xfffffffe,
-			.attach_flags = 0xfffffffc,
+			.attach_flags = 0xfffffff8,
 			.prog_ids = 0xffffffffffffffffULL,
 			.prog_cnt = 2718281828,
 		} },
@@ -1131,7 +1131,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		.str = "query={target_fd=-1153374643"
 		       ", attach_type=0x1a /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
-		       ", attach_flags=0xfffffffc /* BPF_F_??? */"
+		       ", attach_flags=0xfffffff8 /* BPF_F_??? */"
 		       ", prog_ids="
 		       BIG_ADDR("0xffffffffffffffff", "0xffffffff")
 		       ", prog_cnt=2718281828}",
@@ -1149,7 +1149,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		.str = "query={target_fd=-1153374643"
 		       ", attach_type=0xfeedface /* BPF_??? */"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE|0xdeadf00c"
-		       ", attach_flags=BPF_F_ALLOW_MULTI|0xbeefcafc"
+		       ", attach_flags=BPF_F_ALLOW_MULTI|BPF_F_REPLACE|0xbeefcaf8"
 		       ", prog_ids=" BIG_ADDR_MAYBE("0xffffffffffffffff") "[]"
 		       ", prog_cnt=0}",
 	},

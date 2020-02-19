@@ -34,9 +34,9 @@ static void
 print_bpf_attr(void)
 {
 #if XLAT_RAW
-	printf("{prog_type=0x1b"
+	printf("{prog_type=0x1d"
 #else
-	printf("{prog_type=0x1b /* BPF_PROG_TYPE_??? */"
+	printf("{prog_type=0x1d /* BPF_PROG_TYPE_??? */"
 #endif
 		", insn_cnt=3134983661"
 		", insns=NULL"
@@ -79,7 +79,7 @@ main(void)
 {
 	long ret;
 	struct BPF_PROG_LOAD_struct prog = {
-		.prog_type = 27,
+		.prog_type = 29,
 		.insn_cnt = 0xbadc0ded,
 		.insns = 0,
 		.license = 0,
