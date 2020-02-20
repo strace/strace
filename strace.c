@@ -2316,6 +2316,15 @@ init(int argc, char *argv[])
 				  "with -c/--summary-only");
 	}
 
+	if (!outfname) {
+		if (output_separately && !followfork)
+			error_msg("--output-separately has no effect "
+				  "without -o/--output");
+		if (open_append)
+			error_msg("-A/--output-append-mode has no effect "
+				  "without -o/--output");
+	}
+
 #ifndef HAVE_OPEN_MEMSTREAM
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES))
 		error_msg_and_help("open_memstream is required to use -z, -Z, or -e status");
