@@ -455,9 +455,10 @@ main(int argc, char *argv[])
 	       "|CLONE_THREAD|CLONE_NEWNS|CLONE_SYSVSEM|CLONE_SETTLS"
 	       "|CLONE_CHILD_CLEARTID|CLONE_UNTRACED|CLONE_NEWCGROUP"
 	       "|CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWUSER|CLONE_NEWPID|CLONE_IO"
-	       "|CLONE_CLEAR_SIGHAND|0xfacefeec004000de"), sprintrc(rc));
+	       "|CLONE_NEWTIME|CLONE_CLEAR_SIGHAND|0xfacefeec0040005e"),
+	       sprintrc(rc));
 
-	arg->flags = 0xdec0deac004000ffULL;
+	arg->flags = 0xdec0deac0040007fULL;
 	arg->exit_signal = 250;
 	arg->stack = 0xface1e55beeff00dULL;
 	arg->stack_size = 0xcaffeedefacedca7ULL;
@@ -465,7 +466,7 @@ main(int argc, char *argv[])
 	printf("clone3({flags=%s, exit_signal=250"
 	       ", stack=0xface1e55beeff00d, stack_size=0xcaffeedefacedca7}, 64)"
 	       " = %s" INJ_STR,
-	       XLAT_UNKNOWN(0xdec0deac004000ff, "CLONE_???"),
+	       XLAT_UNKNOWN(0xdec0deac0040007f, "CLONE_???"),
 	       sprintrc(rc));
 
 	arg->exit_signal = SIGCHLD;
