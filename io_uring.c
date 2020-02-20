@@ -176,6 +176,7 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_FILES:
 	case IORING_REGISTER_EVENTFD:
+	case IORING_REGISTER_EVENTFD_ASYNC:
 		print_array(tcp, arg, nargs, &buf, sizeof(buf),
 			    tfetch_mem, print_fd_array_member, NULL);
 		break;

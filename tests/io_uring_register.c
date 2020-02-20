@@ -91,7 +91,7 @@ main(void)
 	int fds[] = { fd_full, fd_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 7 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 8 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -134,6 +134,7 @@ main(void)
 	} fd_arr_ops[] = {
 		{ 2, "IORING_REGISTER_FILES" },
 		{ 4, "IORING_REGISTER_EVENTFD" },
+		{ 7, "IORING_REGISTER_EVENTFD_ASYNC" },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(fd_arr_ops); i++) {
