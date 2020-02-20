@@ -299,6 +299,7 @@ struct bpf_map_info_struct {
 	uint32_t map_flags;
 	char     name[BPF_OBJ_NAME_LEN];
 	uint32_t ifindex;
+	uint32_t btf_vmlinux_value_type_id;
 	/*
 	 * The kernel UAPI is broken by Linux commit
 	 * v4.16-rc1~123^2~109^2~5^2~4 .

@@ -530,6 +530,11 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	if (len <= offsetof(struct bpf_map_info_struct, ifindex))
 		goto print_bpf_map_info_end;
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
+	/*
+	 * btf_vmlinux_value_type_id field was crammed in
+	 * by Linux commit v5.6-rc1~151^2~46^2~37^2~5.
+	 */
+	PRINT_FIELD_U(", ", info, btf_vmlinux_value_type_id);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 

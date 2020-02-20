@@ -357,6 +357,10 @@ main(int ac, char **av)
 	    offsetof(struct bpf_map_info_struct, ifindex))
 		printf(", ifindex=%u", map_info->ifindex);
 	if (bpf_map_get_info_attr.info_len >
+	    offsetof(struct bpf_map_info_struct, btf_vmlinux_value_type_id))
+		printf(", btf_vmlinux_value_type_id=%u",
+		       map_info->btf_vmlinux_value_type_id);
+	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, netns_dev))
 		printf(", netns_dev=makedev(%#x, %#x)",
 		       major(map_info->netns_dev), minor(map_info->netns_dev));
