@@ -148,6 +148,9 @@ hiddev_decode_number(const unsigned int code)
 		case 0x06:
 			tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(code));
 			return 1;
+		case 0x08:
+			tprintf("HIDIOCGRAWUNIQ(%u)", _IOC_SIZE(code));
+			return 1;
 		case 0x12:
 			tprintf("HIDIOCGPHYS(%u)", _IOC_SIZE(code));
 			return 1;
