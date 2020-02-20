@@ -170,7 +170,7 @@ check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e 
 check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=gettid,getcwd@42
 check_h "incorrect personality designator '42' in qualification '23@42'" -e trace=23@42,123
 
-check_h '--seccomp-bpf implies -f
+check_h '--seccomp-bpf cannot be used without -f/--follow-forks, disabling
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -w /
 check_h '--seccomp-bpf is not enabled for processes attached with -p
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -f -p 1 -w

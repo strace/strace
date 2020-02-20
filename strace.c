@@ -2269,8 +2269,9 @@ init(int argc, char *argv[])
 			error_msg("--seccomp-bpf is not enabled for processes"
 				  " attached with -p");
 		if (!followfork) {
-			error_msg("--seccomp-bpf implies -f");
-			followfork = true;
+			error_msg("--seccomp-bpf cannot be used without "
+				  "-f/--follow-forks, disabling");
+			seccomp_filtering = false;
 		}
 	}
 
