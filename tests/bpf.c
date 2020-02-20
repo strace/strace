@@ -27,6 +27,7 @@
 
 #include "xlat.h"
 #include "xlat/bpf_commands.h"
+#include "xlat/bpf_map_types.h"
 #include "xlat/bpf_prog_types.h"
 
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
@@ -255,6 +256,8 @@ init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check)
 	attr->map_ifindex = ifindex_lo();
 }
 
+static_assert(ARRAY_SIZE(bpf_map_types_xdata) == 26,
+	      "The map_type for tests 1 and 2 below needs to be updated");
 static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	{
 		.data = { .BPF_MAP_CREATE_data = { .map_type = 2 } },
@@ -264,7 +267,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_MAP_CREATE_data = {
-			.map_type = 20,
+			.map_type = 25,
 			.key_size = 4,
 			.value_size = 8,
 			.max_entries = 256,
@@ -274,7 +277,7 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 			.map_name = "0123456789abcde",
 		} },
 		.size = offsetof(struct BPF_MAP_CREATE_struct, map_name) + 8,
-		.str = "map_type=BPF_MAP_TYPE_REUSEPORT_SOCKARRAY, key_size=4"
+		.str = "map_type=BPF_MAP_TYPE_DEVMAP_HASH, key_size=4"
 		       ", value_size=8, max_entries=256"
 		       ", map_flags=BPF_F_NO_PREALLOC|BPF_F_NO_COMMON_LRU"
 				   "|BPF_F_NUMA_NODE|BPF_F_RDONLY|BPF_F_WRONLY"
