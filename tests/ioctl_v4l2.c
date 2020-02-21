@@ -14,6 +14,10 @@
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
+#ifndef V4L2_CTRL_CLASS_DETECT
+# define V4L2_CTRL_CLASS_DETECT 0x00a30000
+#endif
+
 #define cc0(arg) ((unsigned int) (unsigned char) (arg))
 #define cc1(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 8))
 #define cc2(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 16))
@@ -155,8 +159,8 @@ init_v4l2_format(struct v4l2_format *const f,
 
 static void
 dprint_ioctl_v4l2(struct v4l2_format *const f,
-		  const char *request, const unsigned int buf_type,
-		  const char *buf_type_string)
+		  XLAT_SEL(unsigned reqval, const char *reqstr),
+		  const unsigned int buf_type, const char *buf_type_string)
 {
 	int saved_errno;
 
@@ -164,10 +168,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
 		saved_errno = errno;
-		printf("ioctl(-1, %s, {type=%s"
+		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.pix={width=%u, height=%u, pixelformat=",
-		       request,
-		       buf_type_string,
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.pix.width, f->fmt.pix.height);
 
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
@@ -180,10 +184,12 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       cc3(pf_magic));
 
 		errno = saved_errno;
-		printf(", field=V4L2_FIELD_NONE, bytesperline=%u, sizeimage=%u"
-		       ", colorspace=V4L2_COLORSPACE_JPEG}}) = -1 EBADF (%m)\n",
+		printf(", field=" XLAT_FMT ", bytesperline=%u, sizeimage=%u"
+		       ", colorspace=" XLAT_FMT "}}) = -1 EBADF (%m)\n",
+		       XLAT_ARGS(V4L2_FIELD_NONE),
 		       f->fmt.pix.bytesperline,
-		       f->fmt.pix.sizeimage);
+		       f->fmt.pix.sizeimage,
+		       XLAT_ARGS(V4L2_COLORSPACE_JPEG));
 		break;
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
@@ -191,11 +197,11 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		unsigned int i;
 
 		saved_errno = errno;
-		printf("ioctl(-1, %s"
-		       ", {type=%s"
+		printf("ioctl(-1, " XLAT_FMT
+		       ", {type=" XLAT_FMT
 		       ", fmt.pix_mp={width=%u, height=%u, pixelformat=",
-		       request,
-		       buf_type_string,
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.pix_mp.width, f->fmt.pix_mp.height);
 
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
@@ -207,8 +213,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
 			       cc3(pf_magic));
 
-		printf(", field=V4L2_FIELD_NONE, colorspace="
-		       "V4L2_COLORSPACE_JPEG, plane_fmt=[");
+		printf(", field=" XLAT_FMT ", colorspace=" XLAT_FMT
+		       ", plane_fmt=[",
+		       XLAT_ARGS(V4L2_FIELD_NONE),
+		       XLAT_ARGS(V4L2_COLORSPACE_JPEG));
 		for (i = 0;
 		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
 		     ++i) {
@@ -228,9 +236,9 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 #endif
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
-		printf("ioctl(-1, %s, {type=%s"
+		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.win={left=%d, top=%d, width=%u, height=%u"
-		       ", field=V4L2_FIELD_ANY, chromakey=%#x, clips="
+		       ", field=" XLAT_FMT ", chromakey=%#x, clips="
 		       "[{left=%d, top=%d, width=%u, height=%u}, "
 		       "{left=%d, top=%d, width=%u, height=%u}]"
 		       ", clipcount=%u, bitmap=%p"
@@ -238,10 +246,11 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       ", global_alpha=%#x"
 #endif
 		       "}}) = -1 EBADF (%m)\n",
-		       request,
-		       buf_type_string,
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.win.w.left, f->fmt.win.w.top,
 		       f->fmt.win.w.width, f->fmt.win.w.height,
+		       XLAT_ARGS(V4L2_FIELD_ANY),
 		       f->fmt.win.chromakey,
 		       f->fmt.win.clips[0].c.left,
 		       f->fmt.win.clips[0].c.top,
@@ -260,11 +269,11 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
 		saved_errno = errno;
-		printf("ioctl(-1, %s, {type=%s"
+		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.vbi={sampling_rate=%u, offset=%u"
 		       ", samples_per_line=%u, sample_format=",
-		       request,
-		       buf_type_string,
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
 		       f->fmt.vbi.samples_per_line);
 
@@ -279,21 +288,23 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 
 		errno = saved_errno;
 		printf(", start=[%u, %u], count=[%u, %u]"
-		       ", flags=V4L2_VBI_INTERLACED}})"
+		       ", flags=" XLAT_FMT "}})"
 		       " = -1 EBADF (%m)\n",
 		       f->fmt.vbi.start[0], f->fmt.vbi.start[1],
-		       f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
+		       f->fmt.vbi.count[0], f->fmt.vbi.count[1],
+		       XLAT_ARGS(V4L2_VBI_INTERLACED));
 		break;
 #if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
 		unsigned int i, j;
 
-		printf("ioctl(-1, %s, {type=%s"
-		       ", fmt.sliced={service_set=V4L2_SLICED_VPS"
+		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
+		       ", fmt.sliced={service_set=" XLAT_FMT
 		       ", io_size=%u, service_lines=[",
-		       request,
-		       buf_type_string,
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string),
+		       XLAT_ARGS(V4L2_SLICED_VPS),
 		       f->fmt.sliced.io_size);
 		for (i = 0;
 		     i < ARRAY_SIZE(f->fmt.sliced.service_lines);
@@ -321,10 +332,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
 		saved_errno = errno;
-		printf("ioctl(-1, %s, {type=%s"
+		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.sdr={pixelformat=",
-		       request,
-		       buf_type_string);
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string));
 
 		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
 			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
@@ -352,7 +363,8 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	}
 }
 #define print_ioctl_v4l2(v4l2_format, request, buf_type)	\
-	dprint_ioctl_v4l2((v4l2_format), (request), (buf_type), #buf_type)
+	dprint_ioctl_v4l2((v4l2_format), XLAT_SEL(request, #request), \
+			  (buf_type), #buf_type)
 
 int
 main(void)
@@ -366,265 +378,299 @@ main(void)
 
 	/* VIDIOC_QUERYCAP */
 	ioctl(-1, VIDIOC_QUERYCAP, 0);
-	printf("ioctl(-1, VIDIOC_QUERYCAP, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYCAP));
 
 	ioctl(-1, VIDIOC_QUERYCAP, page);
-	printf("ioctl(-1, VIDIOC_QUERYCAP, %p) = -1 EBADF (%m)\n", page);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYCAP), page);
 
 	/* VIDIOC_ENUM_FMT */
 	ioctl(-1, VIDIOC_ENUM_FMT, 0);
-	printf("ioctl(-1, VIDIOC_ENUM_FMT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUM_FMT));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_fmtdesc, p_fmtdesc);
 	p_fmtdesc->index = magic;
 	p_fmtdesc->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	ioctl(-1, VIDIOC_ENUM_FMT, p_fmtdesc);
-	printf("ioctl(-1, VIDIOC_ENUM_FMT, {index=%u"
-	       ", type=V4L2_BUF_TYPE_VIDEO_CAPTURE}) = -1 EBADF (%m)\n",
-	       p_fmtdesc->index);
+	printf("ioctl(-1, %s, {index=%u, type=" XLAT_FMT
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUM_FMT), p_fmtdesc->index,
+	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE));
 
 	/* VIDIOC_G_FMT */
 	ioctl(-1, VIDIOC_G_FMT, 0);
-	printf("ioctl(-1, VIDIOC_G_FMT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_format, p_format);
 
 	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_VIDEO_CAPTURE}) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE));
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE}) ="
-	       " -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE));
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	p_format->type = V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY}) ="
-	       " -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY));
 #endif
 	p_format->type = V4L2_BUF_TYPE_VIDEO_OVERLAY;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_VIDEO_OVERLAY}) ="
-	       " -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OVERLAY));
 
 	p_format->type = V4L2_BUF_TYPE_VBI_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_VBI_CAPTURE}) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_VBI_CAPTURE));
 #if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	p_format->type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_SLICED_VBI_CAPTURE}) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_SLICED_VBI_CAPTURE));
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	p_format->type = V4L2_BUF_TYPE_SDR_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_SDR_CAPTURE}) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_SDR_CAPTURE));
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	p_format->type = V4L2_BUF_TYPE_SDR_OUTPUT;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, VIDIOC_G_FMT"
-	       ", {type=V4L2_BUF_TYPE_SDR_OUTPUT}) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_SDR_OUTPUT));
 #endif
 	/* VIDIOC_S_FMT */
 	ioctl(-1, VIDIOC_S_FMT, 0);
-	printf("ioctl(-1, VIDIOC_S_FMT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_FMT));
 
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_VIDEO_OUTPUT);
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT,
+			 V4L2_BUF_TYPE_VIDEO_OUTPUT);
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT,
 			 V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT,
 			 V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
 #endif
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OVERLAY);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT,
 			 V4L2_BUF_TYPE_VIDEO_OVERLAY);
 
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VBI_CAPTURE);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_VBI_CAPTURE);
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_VBI_CAPTURE);
 #if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT,
 			 V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_CAPTURE);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_SDR_CAPTURE);
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_SDR_CAPTURE);
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_OUTPUT);
 	ioctl(-1, VIDIOC_S_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_S_FMT", V4L2_BUF_TYPE_SDR_OUTPUT);
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_SDR_OUTPUT);
 #endif
 	/* VIDIOC_TRY_FMT */
 	ioctl(-1, VIDIOC_TRY_FMT, 0);
-	printf("ioctl(-1, VIDIOC_TRY_FMT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_TRY_FMT));
 
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT,
 			 V4L2_BUF_TYPE_VIDEO_OUTPUT);
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT,
 			 V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE);
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT,
 			 V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY);
 #endif
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OVERLAY);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT,
 			 V4L2_BUF_TYPE_VIDEO_OVERLAY);
 
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VBI_CAPTURE);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_VBI_CAPTURE);
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT, V4L2_BUF_TYPE_VBI_CAPTURE);
 #if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT",
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT,
 			 V4L2_BUF_TYPE_SLICED_VBI_CAPTURE);
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_CAPTURE);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_SDR_CAPTURE);
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT, V4L2_BUF_TYPE_SDR_CAPTURE);
 #endif
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_OUTPUT);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
-	print_ioctl_v4l2(p_format, "VIDIOC_TRY_FMT", V4L2_BUF_TYPE_SDR_OUTPUT);
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT, V4L2_BUF_TYPE_SDR_OUTPUT);
 #endif
 	struct v4l2_format *const p_v4l2_format =
 		page_end - sizeof(*p_v4l2_format);
 	ioctl(-1, VIDIOC_TRY_FMT, p_v4l2_format);
-	printf("ioctl(-1, VIDIOC_TRY_FMT, {type=%#x /* V4L2_BUF_TYPE_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_format->type);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_TRY_FMT), p_v4l2_format->type);
 
 	/* VIDIOC_REQBUFS */
 	ioctl(-1, VIDIOC_REQBUFS, 0);
-	printf("ioctl(-1, VIDIOC_REQBUFS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_REQBUFS));
 
 	struct v4l2_requestbuffers *const p_v4l2_requestbuffers =
 		page_end - sizeof(*p_v4l2_requestbuffers);
 	ioctl(-1, VIDIOC_REQBUFS, p_v4l2_requestbuffers);
-	printf("ioctl(-1, VIDIOC_REQBUFS, {type=%#x /* V4L2_BUF_TYPE_??? */, "
-	       "memory=%#x /* V4L2_MEMORY_??? */, count=%u})"
+	printf("ioctl(-1, %s, {type=%#x"
+	       NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       ", memory=%#x" NRAW(" /* V4L2_MEMORY_??? */") ", count=%u})"
 	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_REQBUFS),
 	       p_v4l2_requestbuffers->type,
 	       p_v4l2_requestbuffers->memory,
 	       p_v4l2_requestbuffers->count);
 
 	/* VIDIOC_QUERYBUF */
 	ioctl(-1, VIDIOC_QUERYBUF, 0);
-	printf("ioctl(-1, VIDIOC_QUERYBUF, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYBUF));
 
 	struct v4l2_buffer *const p_v4l2_buffer =
 		page_end - sizeof(*p_v4l2_buffer);
 	ioctl(-1, VIDIOC_QUERYBUF, p_v4l2_buffer);
-	printf("ioctl(-1, VIDIOC_QUERYBUF, {type=%#x /* V4L2_BUF_TYPE_??? */"
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
 	       ", index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYBUF),
 	       p_v4l2_buffer->type, p_v4l2_buffer->index);
 
 	/* VIDIOC_QBUF */
 	ioctl(-1, VIDIOC_QBUF, 0);
-	printf("ioctl(-1, VIDIOC_QBUF, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QBUF));
 
 	ioctl(-1, VIDIOC_QBUF, p_v4l2_buffer);
-	printf("ioctl(-1, VIDIOC_QBUF, {type=%#x /* V4L2_BUF_TYPE_??? */"
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
 	       ", index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QBUF),
 	       p_v4l2_buffer->type, p_v4l2_buffer->index);
 
 	/* VIDIOC_DQBUF */
 	ioctl(-1, VIDIOC_DQBUF, 0);
-	printf("ioctl(-1, VIDIOC_DQBUF, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_DQBUF));
 
 	ioctl(-1, VIDIOC_DQBUF, p_v4l2_buffer);
-	printf("ioctl(-1, VIDIOC_DQBUF, {type=%#x"
-	       " /* V4L2_BUF_TYPE_??? */}) = -1 EBADF (%m)\n",
-	       p_v4l2_buffer->type);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_DQBUF), p_v4l2_buffer->type);
 
 	/* VIDIOC_G_FBUF */
 	ioctl(-1, VIDIOC_G_FBUF, 0);
-	printf("ioctl(-1, VIDIOC_G_FBUF, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FBUF));
 
 	ioctl(-1, VIDIOC_G_FBUF, page);
-	printf("ioctl(-1, VIDIOC_G_FBUF, %p) = -1 EBADF (%m)\n", page);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FBUF), page);
 
 	/* VIDIOC_S_FBUF */
 	ioctl(-1, VIDIOC_S_FBUF, 0);
-	printf("ioctl(-1, VIDIOC_S_FBUF, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_FBUF));
 
 	struct v4l2_framebuffer *const p_v4l2_framebuffer =
 		page_end - sizeof(*p_v4l2_framebuffer);
 	ioctl(-1, VIDIOC_S_FBUF, p_v4l2_framebuffer);
-	printf("ioctl(-1, VIDIOC_S_FBUF, {capability=%#x"
+	printf("ioctl(-1, %s, {capability=%#x"
 	       ", flags=%#x, base=%p}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_FBUF),
 	       p_v4l2_framebuffer->capability,
 	       p_v4l2_framebuffer->flags,
 	       p_v4l2_framebuffer->base);
 
 	/* VIDIOC_STREAMON */
 	ioctl(-1, VIDIOC_STREAMON, 0);
-	printf("ioctl(-1, VIDIOC_STREAMON, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_STREAMON));
 
 	int *const p_int = page_end - sizeof(int);
 	ioctl(-1, VIDIOC_STREAMON, p_int);
-	printf("ioctl(-1, VIDIOC_STREAMON, [%#x /* V4L2_BUF_TYPE_??? */])"
-	       " = -1 EBADF (%m)\n", *p_int);
+	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "])"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_STREAMON), *p_int);
 
 	/* VIDIOC_STREAMOFF */
 	ioctl(-1, VIDIOC_STREAMOFF, 0);
-	printf("ioctl(-1, VIDIOC_STREAMOFF, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_STREAMOFF));
 
 	ioctl(-1, VIDIOC_STREAMOFF, p_int);
-	printf("ioctl(-1, VIDIOC_STREAMOFF, [%#x /* V4L2_BUF_TYPE_??? */])"
-	       " = -1 EBADF (%m)\n", *p_int);
+	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "])"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_STREAMOFF), *p_int);
 
 	/* VIDIOC_G_PARM */
 	ioctl(-1, VIDIOC_G_PARM, 0);
-	printf("ioctl(-1, VIDIOC_G_PARM, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_PARM));
 
 	struct v4l2_streamparm *const p_v4l2_streamparm =
 		page_end - sizeof(*p_v4l2_streamparm);
 	ioctl(-1, VIDIOC_G_PARM, p_v4l2_streamparm);
-	printf("ioctl(-1, VIDIOC_G_PARM, {type=%#x /* V4L2_BUF_TYPE_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_streamparm->type);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_PARM), p_v4l2_streamparm->type);
 
 	/* VIDIOC_S_PARM */
 	ioctl(-1, VIDIOC_S_PARM, 0);
-	printf("ioctl(-1, VIDIOC_S_PARM, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_PARM));
 
 	ioctl(-1, VIDIOC_S_PARM, p_v4l2_streamparm);
-	printf("ioctl(-1, VIDIOC_S_PARM, {type=%#x /* V4L2_BUF_TYPE_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_streamparm->type);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_PARM), p_v4l2_streamparm->type);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_streamparm, p_streamparm);
 	p_streamparm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -633,62 +679,72 @@ main(void)
 	p_streamparm->parm.capture.timeperframe.numerator = 0xdeadbeef;
 	p_streamparm->parm.capture.timeperframe.denominator = 0xbadc0ded;
 	ioctl(-1, VIDIOC_S_PARM, p_streamparm);
-	printf("ioctl(-1, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_CAPTURE"
-	       ", parm.capture={capability=V4L2_CAP_TIMEPERFRAME"
-	       ", capturemode=V4L2_MODE_HIGHQUALITY, timeperframe=%u/%u"
+	printf("ioctl(-1, %s, {type=" XLAT_FMT
+	       ", parm.capture={capability=" XLAT_FMT
+	       ", capturemode=" XLAT_FMT ", timeperframe=%u/%u"
 	       ", extendedmode=%u, readbuffers=%u}}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE),
+	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME), XLAT_ARGS(V4L2_MODE_HIGHQUALITY),
 	       p_streamparm->parm.capture.timeperframe.numerator,
 	       p_streamparm->parm.capture.timeperframe.denominator, -1U, -1U);
 
 	p_streamparm->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 	p_streamparm->parm.output.outputmode = 0;
 	ioctl(-1, VIDIOC_S_PARM, p_streamparm);
-	printf("ioctl(-1, VIDIOC_S_PARM, {type=V4L2_BUF_TYPE_VIDEO_OUTPUT"
-	       ", parm.output={capability=V4L2_CAP_TIMEPERFRAME"
+	printf("ioctl(-1, %s, {type=" XLAT_FMT
+	       ", parm.output={capability=" XLAT_FMT
 	       ", outputmode=0, timeperframe=%u/%u"
 	       ", extendedmode=%u, writebuffers=%u}}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT),
+	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME),
 	       p_streamparm->parm.output.timeperframe.numerator,
 	       p_streamparm->parm.output.timeperframe.denominator, -1U, -1U);
 
 	/* VIDIOC_G_STD */
 	ioctl(-1, VIDIOC_G_STD, 0);
-	printf("ioctl(-1, VIDIOC_G_STD, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_STD));
 
 	ioctl(-1, VIDIOC_G_STD, page);
-	printf("ioctl(-1, VIDIOC_G_STD, %p) = -1 EBADF (%m)\n", page);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_STD), page);
 
 	/* VIDIOC_S_STD */
 	ioctl(-1, VIDIOC_S_STD, 0);
-	printf("ioctl(-1, VIDIOC_S_STD, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_STD));
 
 	long long *const p_longlong = page_end - sizeof(*p_longlong);
 	ioctl(-1, VIDIOC_S_STD, p_longlong);
-	printf("ioctl(-1, VIDIOC_S_STD, [%#llx]) = -1 EBADF (%m)\n",
-	       *p_longlong);
+	printf("ioctl(-1, %s, [%#llx]) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_STD), *p_longlong);
 
 	/* VIDIOC_ENUMSTD */
 	ioctl(-1, VIDIOC_ENUMSTD, 0);
-	printf("ioctl(-1, VIDIOC_ENUMSTD, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUMSTD));
 
 	struct v4l2_standard *const p_v4l2_standard =
 		page_end - sizeof(*p_v4l2_standard);
 	ioctl(-1, VIDIOC_ENUMSTD, p_v4l2_standard);
-	printf("ioctl(-1, VIDIOC_ENUMSTD, {index=%u}) = -1 EBADF (%m)\n",
-	       p_v4l2_standard->index);
+	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUMSTD), p_v4l2_standard->index);
 
 	/* VIDIOC_ENUMINPUT */
 	ioctl(-1, VIDIOC_ENUMINPUT, 0);
-	printf("ioctl(-1, VIDIOC_ENUMINPUT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUMINPUT));
 
 	struct v4l2_input *const p_v4l2_input =
 		page_end - sizeof(*p_v4l2_input);
 	ioctl(-1, VIDIOC_ENUMINPUT, p_v4l2_input);
-	printf("ioctl(-1, VIDIOC_ENUMINPUT, {index=%u}) = -1 EBADF (%m)\n",
-	       p_v4l2_input->index);
+	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUMINPUT), p_v4l2_input->index);
 
 	/* VIDIOC_G_CTRL */
 	ioctl(-1, VIDIOC_G_CTRL, 0);
-	printf("ioctl(-1, VIDIOC_G_CTRL, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_CTRL));
 
 	static const struct v4l2_control v4l2_control_vals[] = {
 		{ .id = 0,                    .value = 3141592653U },
@@ -699,55 +755,59 @@ main(void)
 		{ .id = 0xa40000,             .value = -1 },
 	};
 	static const char *id_strs[] = {
-		"0 /* V4L2_CID_??? */",
-		"0x97abcd /* V4L2_CID_??? */",
-		"V4L2_CTRL_CLASS_USER+0",
-		"V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE",
-		"V4L2_CTRL_CLASS_DETECT+0x1234",
-		"0xa40000 /* V4L2_CID_??? */",
+		"0" NRAW(" /* V4L2_CID_??? */"),
+		"0x97abcd" NRAW(" /* V4L2_CID_??? */"),
+		XLAT_KNOWN(0x980000, "V4L2_CTRL_CLASS_USER+0"),
+		XLAT_KNOWN(0x990a64, "V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE"),
+		XLAT_KNOWN(0xa31234, "V4L2_CTRL_CLASS_DETECT+0x1234"),
+		"0xa40000" NRAW(" /* V4L2_CID_??? */"),
 	};
 
 	struct v4l2_control *const p_v4l2_control =
 		page_end - sizeof(*p_v4l2_control);
 	ioctl(-1, VIDIOC_G_CTRL, p_v4l2_control);
-	printf("ioctl(-1, VIDIOC_G_CTRL, {id=%#x /* V4L2_CID_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_control->id);
+	printf("ioctl(-1, %s, {id=%#x" NRAW(" /* V4L2_CID_??? */")
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_CTRL), p_v4l2_control->id);
 
 	/* VIDIOC_S_CTRL */
 	ioctl(-1, VIDIOC_S_CTRL, 0);
-	printf("ioctl(-1, VIDIOC_S_CTRL, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_CTRL));
 
 	ioctl(-1, VIDIOC_S_CTRL, p_v4l2_control);
-	printf("ioctl(-1, VIDIOC_S_CTRL, {id=%#x /* V4L2_CID_??? */"
+	printf("ioctl(-1, %s, {id=%#x" NRAW(" /* V4L2_CID_??? */")
 	       ", value=%d}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_CTRL),
 	       p_v4l2_control->id, p_v4l2_control->value);
 
 	for (size_t i = 0; i < ARRAY_SIZE(id_strs); i++) {
 		struct v4l2_control v4l2_c = v4l2_control_vals[i];
 
 		ioctl(-1, VIDIOC_G_CTRL, &v4l2_c);
-		printf("ioctl(-1, VIDIOC_G_CTRL, {id=%s}) = -1 EBADF (%m)\n",
-		       id_strs[i]);
+		printf("ioctl(-1, %s, {id=%s}) = -1 EBADF (%m)\n",
+		       XLAT_STR(VIDIOC_G_CTRL), id_strs[i]);
 
 		ioctl(-1, VIDIOC_S_CTRL, &v4l2_c);
-		printf("ioctl(-1, VIDIOC_S_CTRL, {id=%s, value=%d})"
-		       " = -1 EBADF (%m)\n",
-		       id_strs[i], v4l2_c.value);
+		printf("ioctl(-1, %s, {id=%s, value=%d}) = -1 EBADF (%m)\n",
+		       XLAT_STR(VIDIOC_S_CTRL), id_strs[i], v4l2_c.value);
 	}
 
 	/* VIDIOC_G_TUNER */
 	ioctl(-1, VIDIOC_G_TUNER, 0);
-	printf("ioctl(-1, VIDIOC_G_TUNER, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_TUNER));
 
 	struct v4l2_tuner *const p_v4l2_tuner =
 		page_end - sizeof(*p_v4l2_tuner);
 	ioctl(-1, VIDIOC_G_TUNER, p_v4l2_tuner);
-	printf("ioctl(-1, VIDIOC_G_TUNER, {index=%u})"
-	       " = -1 EBADF (%m)\n", p_v4l2_tuner->index);
+	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_TUNER), p_v4l2_tuner->index);
 
 	/* VIDIOC_S_TUNER */
 	ioctl(-1, VIDIOC_S_TUNER, 0);
-	printf("ioctl(-1, VIDIOC_S_TUNER, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_TUNER));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_tuner, p_tuner);
 	p_tuner->index = 0x4fb6df39;
@@ -761,79 +821,93 @@ main(void)
 	p_tuner->signal = 0x10bf92c8;
 	p_tuner->afc = 0x3bf7e18b;
 	ioctl(-1, VIDIOC_S_TUNER, p_tuner);
-	printf("ioctl(-1, VIDIOC_S_TUNER, {index=%u"
-	       ", name=\"cum tacent clamant\""
-	       ", type=V4L2_TUNER_RADIO, capability=V4L2_TUNER_CAP_LOW"
+	printf("ioctl(-1, %s, {index=%u, name=\"cum tacent clamant\""
+	       ", type=" XLAT_FMT ", capability=" XLAT_FMT
 	       ", rangelow=%u, rangehigh=%u"
-	       ", rxsubchans=V4L2_TUNER_SUB_MONO"
-	       ", audmode=V4L2_TUNER_MODE_MONO, signal=%d, afc=%d"
-	       "}) = -1 EBADF (%m)\n",
-	       p_tuner->index, p_tuner->rangelow,
-	       p_tuner->rangehigh, p_tuner->signal, p_tuner->afc);
+	       ", rxsubchans=" XLAT_FMT ", audmode=" XLAT_FMT
+	       ", signal=%d, afc=%d}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_TUNER), p_tuner->index,
+	       XLAT_ARGS(V4L2_TUNER_RADIO), XLAT_ARGS(V4L2_TUNER_CAP_LOW),
+	       p_tuner->rangelow, p_tuner->rangehigh,
+	       XLAT_ARGS(V4L2_TUNER_SUB_MONO), XLAT_ARGS(V4L2_TUNER_MODE_MONO),
+	       p_tuner->signal, p_tuner->afc);
 
 	/* VIDIOC_QUERYCTRL */
 	ioctl(-1, VIDIOC_QUERYCTRL, 0);
-	printf("ioctl(-1, VIDIOC_QUERYCTRL, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYCTRL));
 
 	struct v4l2_queryctrl *const p_v4l2_queryctrl =
 		page_end - sizeof(*p_v4l2_queryctrl);
 	ioctl(-1, VIDIOC_QUERYCTRL, p_v4l2_queryctrl);
 #ifdef V4L2_CTRL_FLAG_NEXT_CTRL
-	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=V4L2_CTRL_FLAG_NEXT_CTRL"
-	       "|%#x /* V4L2_CID_??? */}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {id=" XLAT_FMT "|%#x" NRAW(" /* V4L2_CID_??? */")
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYCTRL), XLAT_ARGS(V4L2_CTRL_FLAG_NEXT_CTRL),
 	       p_v4l2_queryctrl->id & ~V4L2_CTRL_FLAG_NEXT_CTRL);
 #else
-	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=%#x /* V4L2_CID_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_queryctrl->id);
+	printf("ioctl(-1, %s, {id=%#x" NRAW(" /* V4L2_CID_??? */})")
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYCTRL), p_v4l2_queryctrl->id);
 #endif
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_queryctrl, p_queryctrl);
 	p_queryctrl->id = V4L2_CID_SATURATION;
 	ioctl(-1, VIDIOC_QUERYCTRL, p_queryctrl);
-	printf("ioctl(-1, VIDIOC_QUERYCTRL, {id=V4L2_CID_SATURATION})"
-	       " = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, {id=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYCTRL), XLAT_ARGS(V4L2_CID_SATURATION));
 
 	/* VIDIOC_G_INPUT */
 	ioctl(-1, VIDIOC_G_INPUT, 0);
-	printf("ioctl(-1, VIDIOC_G_INPUT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_INPUT));
 
 	ioctl(-1, VIDIOC_G_INPUT, page);
-	printf("ioctl(-1, VIDIOC_G_INPUT, %p) = -1 EBADF (%m)\n", page);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_INPUT), page);
 
 	/* VIDIOC_S_INPUT */
 	ioctl(-1, VIDIOC_S_INPUT, 0);
-	printf("ioctl(-1, VIDIOC_S_INPUT, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_INPUT));
 
 	ioctl(-1, VIDIOC_S_INPUT, p_int);
-	printf("ioctl(-1, VIDIOC_S_INPUT, [%u]) = -1 EBADF (%m)\n", *p_int);
+	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_INPUT), *p_int);
 
 	/* VIDIOC_CROPCAP */
 	ioctl(-1, VIDIOC_CROPCAP, 0);
-	printf("ioctl(-1, VIDIOC_CROPCAP, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_CROPCAP));
 
 	struct v4l2_cropcap *const p_v4l2_cropcap =
 		page_end - sizeof(*p_v4l2_cropcap);
 	ioctl(-1, VIDIOC_CROPCAP, p_v4l2_cropcap);
-	printf("ioctl(-1, VIDIOC_CROPCAP, {type=%#x /* V4L2_BUF_TYPE_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_cropcap->type);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_CROPCAP), p_v4l2_cropcap->type);
 
 	/* VIDIOC_G_CROP */
 	ioctl(-1, VIDIOC_G_CROP, 0);
-	printf("ioctl(-1, VIDIOC_G_CROP, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_CROP));
 
 	struct v4l2_crop *const p_v4l2_crop =
 		page_end - sizeof(*p_v4l2_crop);
 	ioctl(-1, VIDIOC_G_CROP, p_v4l2_crop);
-	printf("ioctl(-1, VIDIOC_G_CROP, {type=%#x /* V4L2_BUF_TYPE_??? */})"
-	       " = -1 EBADF (%m)\n", p_v4l2_crop->type);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_CROP), p_v4l2_crop->type);
 
 	/* VIDIOC_S_CROP */
 	ioctl(-1, VIDIOC_S_CROP, 0);
-	printf("ioctl(-1, VIDIOC_S_CROP, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_CROP));
 
 	ioctl(-1, VIDIOC_S_CROP, p_v4l2_crop);
-	printf("ioctl(-1, VIDIOC_S_CROP, {type=%#x /* V4L2_BUF_TYPE_??? */"
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
 	       ", c={left=%d, top=%d, width=%u, height=%u}}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_CROP),
 	       p_v4l2_crop->type,
 	       p_v4l2_crop->c.left,
 	       p_v4l2_crop->c.top,
@@ -843,36 +917,42 @@ main(void)
 #ifdef VIDIOC_S_EXT_CTRLS
 	/* VIDIOC_S_EXT_CTRLS */
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, 0);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_ext_controls, p_ext_controls);
 	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_USER;
 	p_ext_controls->count = 0;
 	p_ext_controls->controls = (void *) -2UL;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_USER"
-	       ", count=%u}) = -1 EBADF (%m)\n", p_ext_controls->count);
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u})"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_USER),
+	       p_ext_controls->count);
 
 	p_ext_controls->ctrl_class = 0x00a30000;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_DETECT"
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT
 	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_DETECT),
 	       p_ext_controls->count, p_ext_controls->controls);
 
 	p_ext_controls->ctrl_class = 0x00a40000;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS"
-	       ", {ctrl_class=0xa40000 /* V4L2_CTRL_CLASS_??? */"
+	printf("ioctl(-1, %s"
+	       ", {ctrl_class=0xa40000" NRAW(" /* V4L2_CTRL_CLASS_??? */")
 	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS),
 	       p_ext_controls->count, p_ext_controls->controls);
 
 	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_MPEG;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS, {ctrl_class=V4L2_CTRL_CLASS_MPEG"
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT
 	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_MPEG),
 	       p_ext_controls->count, p_ext_controls->controls);
 
 # if HAVE_DECL_V4L2_CTRL_TYPE_STRING
@@ -888,85 +968,91 @@ main(void)
 		tail_alloc(p_ext_controls->controls[1].size);
 
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS"
-	       ", {ctrl_class=V4L2_CTRL_CLASS_MPEG, count=%u, controls="
-	       "[{id=V4L2_CID_BRIGHTNESS, size=0, value=%d, value64=%lld}"
-	       ", {id=V4L2_CID_CONTRAST, size=2, string=\"\\377\\377\"}"
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls="
+	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
+	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
 	       "] => controls="
-	       "[{id=V4L2_CID_BRIGHTNESS, size=0, value=%d, value64=%lld}"
-	       ", {id=V4L2_CID_CONTRAST, size=2, string=\"\\377\\377\"}"
+	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
+	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
 	       "], error_idx=%u}) = -1 EBADF (%m)\n",
-	       p_ext_controls->count,
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_MPEG),
+	       p_ext_controls->count, XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
 	       (long long) p_ext_controls->controls[0].value64,
+	       XLAT_ARGS(V4L2_CID_CONTRAST), XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
 	       (long long) p_ext_controls->controls[0].value64,
-	       p_ext_controls->error_idx);
+	       XLAT_ARGS(V4L2_CID_CONTRAST), p_ext_controls->error_idx);
 
 	++p_ext_controls->count;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_S_EXT_CTRLS"
-	       ", {ctrl_class=V4L2_CTRL_CLASS_MPEG, count=%u, controls="
-	       "[{id=V4L2_CID_BRIGHTNESS, size=0, value=%d, value64=%lld}"
-	       ", {id=V4L2_CID_CONTRAST, size=2, string=\"\\377\\377\"}"
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls="
+	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
+	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
 	       ", ... /* %p */]}) = -1 EBADF (%m)\n",
-	       p_ext_controls->count,
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_MPEG),
+	       p_ext_controls->count, XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
 	       (long long) p_ext_controls->controls[0].value64,
-	       p_ext_controls->controls + 2);
+	       XLAT_ARGS(V4L2_CID_CONTRAST), p_ext_controls->controls + 2);
 # endif /* HAVE_DECL_V4L2_CTRL_TYPE_STRING */
 
 	/* VIDIOC_TRY_EXT_CTRLS */
 	ioctl(-1, VIDIOC_TRY_EXT_CTRLS, 0);
-	printf("ioctl(-1, VIDIOC_TRY_EXT_CTRLS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_TRY_EXT_CTRLS));
 
 	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_USER;
 	p_ext_controls->count = magic;
 	p_ext_controls->controls = (void *) -2UL;
 	ioctl(-1, VIDIOC_TRY_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_TRY_EXT_CTRLS"
-	       ", {ctrl_class=V4L2_CTRL_CLASS_USER, count=%u, controls=%p})"
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls=%p})"
 	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_TRY_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_USER),
 	       p_ext_controls->count, p_ext_controls->controls);
 
 	/* VIDIOC_G_EXT_CTRLS */
 	ioctl(-1, VIDIOC_G_EXT_CTRLS, 0);
-	printf("ioctl(-1, VIDIOC_G_EXT_CTRLS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_EXT_CTRLS));
 
 	ioctl(-1, VIDIOC_G_EXT_CTRLS, p_ext_controls);
-	printf("ioctl(-1, VIDIOC_G_EXT_CTRLS"
-	       ", {ctrl_class=V4L2_CTRL_CLASS_USER, count=%u, controls=%p"
+	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls=%p"
 	       ", error_idx=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_USER),
 	       p_ext_controls->count, p_ext_controls->controls,
 	       p_ext_controls->error_idx);
 #endif /* VIDIOC_S_EXT_CTRLS */
 
 #ifdef VIDIOC_ENUM_FRAMESIZES
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, 0);
-	printf("ioctl(-1, VIDIOC_ENUM_FRAMESIZES, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_frmsizeenum, p_frmsizeenum);
 	p_frmsizeenum->index = magic;
 	p_frmsizeenum->pixel_format = fourcc(cc[0], cc[1], cc[2], cc[3]);
 
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, p_frmsizeenum);
-	printf("ioctl(-1, VIDIOC_ENUM_FRAMESIZES, {index=%u"
+	printf("ioctl(-1, %s, {index=%u"
 	       ", pixel_format=v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')})"
-	       " = -1 EBADF (%m)\n", p_frmsizeenum->index,
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), p_frmsizeenum->index,
 	       cc[0], cc[1], cc[2], cc[3]);
 #endif /* VIDIOC_ENUM_FRAMESIZES */
 
 #ifdef VIDIOC_ENUM_FRAMEINTERVALS
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, 0);
-	printf("ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS));
 
 	struct v4l2_frmivalenum *const p_v4l2_frmivalenum =
 		page_end - sizeof(*p_v4l2_frmivalenum);
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, p_v4l2_frmivalenum);
-	printf("ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, {index=%u"
+	printf("ioctl(-1, %s, {index=%u"
 	       ", pixel_format=v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
 	       ", width=%u, height=%u}) = -1 EBADF (%m)\n",
-	       p_v4l2_frmivalenum->index,
+	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS), p_v4l2_frmivalenum->index,
 	       cc0(p_v4l2_frmivalenum->pixel_format),
 	       cc1(p_v4l2_frmivalenum->pixel_format),
 	       cc2(p_v4l2_frmivalenum->pixel_format),
@@ -977,14 +1063,16 @@ main(void)
 
 #ifdef VIDIOC_CREATE_BUFS
 	ioctl(-1, VIDIOC_CREATE_BUFS, 0);
-	printf("ioctl(-1, VIDIOC_CREATE_BUFS, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_CREATE_BUFS));
 
 	struct v4l2_create_buffers *const p_v4l2_create_buffers =
 		page_end - sizeof(*p_v4l2_create_buffers);
 	ioctl(-1, VIDIOC_CREATE_BUFS, p_v4l2_create_buffers);
-	printf("ioctl(-1, VIDIOC_CREATE_BUFS, {count=%u, memory=%#x"
-	       " /* V4L2_MEMORY_??? */, format={type=%#x"
-	       " /* V4L2_BUF_TYPE_??? */}}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {count=%u, memory=%#x"
+	       NRAW(" /* V4L2_MEMORY_??? */") ", format={type=%#x"
+	       NRAW(" /* V4L2_BUF_TYPE_??? */") "}}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_CREATE_BUFS),
 	       p_v4l2_create_buffers->count,
 	       p_v4l2_create_buffers->memory,
 	       p_v4l2_create_buffers->format.type);

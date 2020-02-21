@@ -58,18 +58,42 @@
 
 #  define XLAT_FMT "%#x"
 #  define XLAT_ARGS(aa_) (aa_)
+#  define XLAT_SEL(v_, s_) v_
+
+#  define ABBR(s_) ""
+#  define RAW(s_) s_
+#  define VERB(s_) ""
+#  define NABBR(s_) s_
+#  define NRAW(s_) ""
+#  define NVERB(s_) s_
 # elif XLAT_VERBOSE
 #  define XLAT_KNOWN(val_, str_) STRINGIFY_VAL(val_) " /* " str_ " */"
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
 
 #  define XLAT_FMT "%#x /* %s */"
 #  define XLAT_ARGS(a_) a_, #a_
+#  define XLAT_SEL(v_, s_) v_, s_
+
+#  define ABBR(s_) ""
+#  define RAW(s_) ""
+#  define VERB(s_) s_
+#  define NABBR(s_) s_
+#  define NRAW(s_) s_
+#  define NVERB(s_) ""
 # else /* !XLAT_RAW && !XLAT_VERBOSE */
 #  define XLAT_KNOWN(val_, str_) str_
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
 
 #  define XLAT_FMT "%s"
 #  define XLAT_ARGS(a_) #a_
+#  define XLAT_SEL(v_, s_) s_
+
+#  define ABBR(s_) s_
+#  define RAW(s_) ""
+#  define VERB(s_) ""
+#  define NABBR(s_) ""
+#  define NRAW(s_) s_
+#  define NVERB(s_) s_
 # endif /* XLAT_RAW, XLAT_VERBOSE */
 
 # define XLAT_STR(v_) sprintxlat(#v_, v_, NULL)

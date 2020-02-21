@@ -196,6 +196,9 @@ ioctl_sg_io_v4	+ioctl.test
 ioctl_sock_gifconf	+ioctl.test -a28 -s1
 ioctl_uffdio	+ioctl.test
 ioctl_v4l2	+ioctl.test
+ioctl_v4l2-Xabbrev	+ioctl.test -Xabbrev
+ioctl_v4l2-Xraw	+ioctl.test -Xraw
+ioctl_v4l2-Xverbose	+ioctl.test -Xverbose
 ioctl_watchdog	+ioctl.test
 ioperm	-a27
 iopl	-a8
