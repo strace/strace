@@ -62,6 +62,11 @@ typedef struct v4l2_standard struct_v4l2_standard;
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 {
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#x", fourcc);
+		return;
+	}
+
 	unsigned char a[] = {
 		(unsigned char) fourcc,
 		(unsigned char) (fourcc >> 8),

@@ -174,6 +174,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.pix.width, f->fmt.pix.height);
 
+#if XLAT_RAW
+		printf("%#x", buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE
+			      ? magic : pf_magic);
+#else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
 			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
@@ -182,6 +186,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       "/* V4L2_PIX_FMT_SPCA508 */",
 			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
 			       cc3(pf_magic));
+#endif /* XLAT_RAW */
 
 		errno = saved_errno;
 		printf(", field=" XLAT_FMT ", bytesperline=%u, sizeimage=%u"
@@ -204,6 +209,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.pix_mp.width, f->fmt.pix_mp.height);
 
+#if XLAT_RAW
+		printf("%#x", buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+			      ? magic : pf_magic);
+#else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
 			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
@@ -212,6 +221,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       "/* V4L2_PIX_FMT_SPCA508 */",
 			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
 			       cc3(pf_magic));
+#endif /* XLAT_RAW */
 
 		printf(", field=" XLAT_FMT ", colorspace=" XLAT_FMT
 		       ", plane_fmt=[",
@@ -277,6 +287,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
 		       f->fmt.vbi.samples_per_line);
 
+#if XLAT_RAW
+		printf("%#x", buf_type == V4L2_BUF_TYPE_VBI_CAPTURE
+			      ? magic : pf_magic);
+#else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VBI_CAPTURE)
 			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
@@ -285,6 +299,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       "/* V4L2_PIX_FMT_SPCA508 */",
 			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
 			       cc3(pf_magic));
+#endif /* XLAT_RAW */
 
 		errno = saved_errno;
 		printf(", start=[%u, %u], count=[%u, %u]"
@@ -337,16 +352,25 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       XLAT_SEL(reqval, reqstr),
 		       XLAT_SEL(buf_type, buf_type_string));
 
+# if XLAT_RAW
+		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
+			printf("%#x", magic);
+#  if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+		else
+			printf("%#x", sf_magic);
+#  endif
+# else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
 			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
-# if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
+#  if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 		else
 			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
 			       "/* V4L2_SDR_FMT_RU12LE */",
 			       cc0(sf_magic), cc1(sf_magic), cc2(sf_magic),
 			       cc3(sf_magic));
-# endif
+#  endif
+# endif /* XLAT_RAW */
 
 		errno = saved_errno;
 		printf(
@@ -1034,11 +1058,20 @@ main(void)
 	p_frmsizeenum->pixel_format = fourcc(cc[0], cc[1], cc[2], cc[3]);
 
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, p_frmsizeenum);
-	printf("ioctl(-1, %s, {index=%u"
-	       ", pixel_format=v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')})"
-	       " = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {index=%u, pixel_format="
+#if XLAT_RAW
+	       "0x%hhx%hhx%hhx%hhx"
+#else /* !XLAT_RAW */
+	       "v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')"
+#endif /* XLAT_RAW */
+	       "}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), p_frmsizeenum->index,
-	       cc[0], cc[1], cc[2], cc[3]);
+#if XLAT_RAW
+	       cc[3], cc[2], cc[1], cc[0]
+#else /* !XLAT_RAW */
+	       cc[0], cc[1], cc[2], cc[3]
+#endif /* XLAT_RAW */
+	       );
 #endif /* VIDIOC_ENUM_FRAMESIZES */
 
 #ifdef VIDIOC_ENUM_FRAMEINTERVALS
@@ -1049,14 +1082,22 @@ main(void)
 	struct v4l2_frmivalenum *const p_v4l2_frmivalenum =
 		page_end - sizeof(*p_v4l2_frmivalenum);
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, p_v4l2_frmivalenum);
-	printf("ioctl(-1, %s, {index=%u"
-	       ", pixel_format=v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
+	printf("ioctl(-1, %s, {index=%u, pixel_format="
+#if XLAT_RAW
+	       "%#x"
+#else /* !XLAT_RAW */
+	       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
+#endif /* XLAT_RAW */
 	       ", width=%u, height=%u}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS), p_v4l2_frmivalenum->index,
+#if XLAT_RAW
+	       p_v4l2_frmivalenum->pixel_format,
+#else /* !XLAT_RAW */
 	       cc0(p_v4l2_frmivalenum->pixel_format),
 	       cc1(p_v4l2_frmivalenum->pixel_format),
 	       cc2(p_v4l2_frmivalenum->pixel_format),
 	       cc3(p_v4l2_frmivalenum->pixel_format),
+#endif /* XLAT_RAW */
 	       p_v4l2_frmivalenum->width,
 	       p_v4l2_frmivalenum->height);
 #endif /* VIDIOC_ENUM_FRAMEINTERVALS */
