@@ -282,7 +282,7 @@ require_min_nproc()
 	local min_nproc
 	min_nproc="$1"; shift
 
-	check_prog
+	check_prog nproc
 	local nproc
 	nproc="$(nproc)"
 
