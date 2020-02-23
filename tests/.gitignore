@@ -222,6 +222,10 @@ ioctl_v4l2
 ioctl_v4l2-Xabbrev
 ioctl_v4l2-Xraw
 ioctl_v4l2-Xverbose
+ioctl_v4l2-v
+ioctl_v4l2-v-Xabbrev
+ioctl_v4l2-v-Xraw
+ioctl_v4l2-v-Xverbose
 ioctl_watchdog
 ioperm
 iopl
