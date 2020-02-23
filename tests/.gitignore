@@ -227,6 +227,14 @@ ioctl_v4l2-v
 ioctl_v4l2-v-Xabbrev
 ioctl_v4l2-v-Xraw
 ioctl_v4l2-v-Xverbose
+ioctl_v4l2-success
+ioctl_v4l2-success-Xabbrev
+ioctl_v4l2-success-Xraw
+ioctl_v4l2-success-Xverbose
+ioctl_v4l2-success-v
+ioctl_v4l2-success-v-Xabbrev
+ioctl_v4l2-success-v-Xraw
+ioctl_v4l2-success-v-Xverbose
 ioctl_watchdog
 ioperm
 iopl

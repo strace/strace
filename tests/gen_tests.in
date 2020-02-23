@@ -204,6 +204,14 @@ ioctl_v4l2-v	+ioctl.test -v
 ioctl_v4l2-v-Xabbrev	+ioctl.test -v -Xabbrev
 ioctl_v4l2-v-Xraw	+ioctl.test -v -Xraw
 ioctl_v4l2-v-Xverbose	+ioctl.test -v -Xverbose
+ioctl_v4l2-success	+ioctl-success.sh -a29
+ioctl_v4l2-success-Xabbrev	+ioctl-success.sh -a29 -Xabbrev
+ioctl_v4l2-success-Xraw	+ioctl-success.sh -a27 -Xraw
+ioctl_v4l2-success-Xverbose	+ioctl-success.sh -a30 -Xverbose
+ioctl_v4l2-success-v	+ioctl-success.sh -a29 -v
+ioctl_v4l2-success-v-Xabbrev	+ioctl-success.sh -a29 -v -Xabbrev
+ioctl_v4l2-success-v-Xraw	+ioctl-success.sh -a27 -v -Xraw
+ioctl_v4l2-success-v-Xverbose	+ioctl-success.sh -a29 -v -Xverbose
 ioctl_watchdog	+ioctl.test
 ioperm	-a27
 iopl	-a8
