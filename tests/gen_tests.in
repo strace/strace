@@ -199,6 +199,10 @@ ioctl_v4l2	+ioctl.test
 ioctl_v4l2-Xabbrev	+ioctl.test -Xabbrev
 ioctl_v4l2-Xraw	+ioctl.test -Xraw
 ioctl_v4l2-Xverbose	+ioctl.test -Xverbose
+ioctl_v4l2-v	+ioctl.test -v
+ioctl_v4l2-v-Xabbrev	+ioctl.test -v -Xabbrev
+ioctl_v4l2-v-Xraw	+ioctl.test -v -Xraw
+ioctl_v4l2-v-Xverbose	+ioctl.test -v -Xverbose
 ioctl_watchdog	+ioctl.test
 ioperm	-a27
 iopl	-a8
