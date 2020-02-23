@@ -130,6 +130,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_nsfs \
 	ioctl_perf-success \
 	ioctl_rtc-v \
+	ioctl_v4l2-success \
+	ioctl_v4l2-success-Xabbrev \
+	ioctl_v4l2-success-Xraw \
+	ioctl_v4l2-success-Xverbose \
+	ioctl_v4l2-success-v \
+	ioctl_v4l2-success-v-Xabbrev \
+	ioctl_v4l2-success-v-Xraw \
+	ioctl_v4l2-success-v-Xverbose \
 	is_linux_mips_n64 \
 	kill_child \
 	ksysent \
@@ -285,6 +293,7 @@ DECODER_TESTS = \
 	ioctl.test \
 	ioctl_evdev-success.test \
 	ioctl_perf-success.test \
+	ioctl_v4l2-success.test \
 	ipc_msgbuf.test \
 	kern_features-fault.test \
 	llseek.test \
