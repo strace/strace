@@ -334,12 +334,13 @@ main(int argc, char **argv)
 	print_quoted_cstring((char *) caps->card, sizeof(caps->card));
 	printf(", bus_info=");
 	print_quoted_cstring((char *) caps->bus_info, sizeof(caps->bus_info));
+	printf(", version="
 #ifdef WORDS_BIGENDIAN
-	printf(", version=209.210.211");
+	       XLAT_KNOWN(0xd0d1d2d3, "KERNEL_VERSION(53457, 210, 211)")
 #else
-	printf(", version=210.209.208");
+	       XLAT_KNOWN(0xd3d2d1d0, "KERNEL_VERSION(54226, 209, 208)")
 #endif
-	printf(", capabilities=" XLAT_KNOWN(0xdeadbeef,
+	       ", capabilities=" XLAT_KNOWN(0xdeadbeef,
 	       "V4L2_CAP_VIDEO_CAPTURE|V4L2_CAP_VIDEO_OUTPUT"
 	       "|V4L2_CAP_VIDEO_OVERLAY|V4L2_CAP_VBI_OUTPUT"
 	       "|V4L2_CAP_SLICED_VBI_CAPTURE|V4L2_CAP_SLICED_VBI_OUTPUT"
