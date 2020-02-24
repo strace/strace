@@ -98,6 +98,9 @@
 
 # define XLAT_STR(v_) sprintxlat(#v_, v_, NULL)
 
+# define ARG_XLAT_KNOWN(val_, str_) val_, XLAT_KNOWN(val_, str_)
+# define ARG_XLAT_UNKNOWN(val_, str_) val_, XLAT_UNKNOWN(val_, str_)
+
 # ifndef DEFAULT_STRLEN
 /* Default maximum # of bytes printed in printstr et al. */
 #  define DEFAULT_STRLEN 32
