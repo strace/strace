@@ -91,6 +91,7 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 # define VIDEO_MAX_PLANES 8
 #endif
 
+#include "xlat/v4l2_meta_fmts.h"
 #include "xlat/v4l2_pix_fmts.h"
 #include "xlat/v4l2_sdr_fmts.h"
 
@@ -349,6 +350,16 @@ print_v4l2_format_fmt_sdr(struct tcb *const tcp, const void *const arg)
 	return true;
 }
 
+static bool
+print_v4l2_format_fmt_meta(struct tcb *const tcp, const void *const arg)
+{
+	const struct_v4l2_meta_format *const p = arg;
+	PRINT_FIELD_PIXFMT("{", *p, dataformat, v4l2_meta_fmts);
+	PRINT_FIELD_U(", ", *p, buffersize);
+	tprints("}");
+	return true;
+}
+
 #define PRINT_FIELD_V4L2_FORMAT_FMT(prefix_, where_, fmt_, field_, tcp_, ret_)	\
 	do {									\
 		STRACE_PRINTF("%s%s.%s=", (prefix_), #fmt_, #field_);		\
@@ -394,6 +405,12 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *const prefix,
 	/* since Linux v3.15-rc1~85^2~213 */
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
 		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, sdr, tcp, ret);
+		break;
+	/* since Linux v5.0-rc1~181^2~21 */
+	case V4L2_BUF_TYPE_META_OUTPUT:
+	/* since Linux v4.12-rc1~85^2~71 */
+	case V4L2_BUF_TYPE_META_CAPTURE:
+		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, meta, tcp, ret);
 		break;
 	default:
 		return false;

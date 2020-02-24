@@ -154,6 +154,22 @@ fill_fmt(struct v4l2_format *f)
 # endif
 		break;
 #endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+	case V4L2_BUF_TYPE_META_CAPTURE:
+# if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	case V4L2_BUF_TYPE_META_OUTPUT:
+# else
+	case 14:
+# endif
+		f->fmt.meta.dataformat = V4L2_META_FMT_VSP1_HGO;
+		f->fmt.meta.buffersize  = 0xbadc0ded;
+		break;
+#else
+	case 13: case 14:
+		((uint32_t *) &f->fmt)[0] = 0x48505356;
+		((uint32_t *) &f->fmt)[1] = 0xbadc0ded;
+		break;
+#endif
 	default:
 		return false;
 	}
@@ -297,6 +313,19 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 		       pfx);
 		break;
 #endif
+
+#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	case V4L2_BUF_TYPE_META_CAPTURE:
+	case V4L2_BUF_TYPE_META_OUTPUT:
+#else
+	case 13: case 14:
+#endif
+		printf("%sfmt.meta={dataformat=" RAW("0x48505356")
+		       NRAW("v4l2_fourcc('V', 'S', 'P', 'H')"
+			    " /* V4L2_META_FMT_VSP1_HGO */")
+		       ", buffersize=3134983661}",
+		       pfx);
+		break;
 	}
 }
 

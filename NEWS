@@ -7,7 +7,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of SIOCADDMULTI, SIOCDELMULTI, SIOCGIFENCAP,
     SIOCOUTQNSD, SIOCSIFENCAP, and SIOCSIFHWBROADCAST ioctl commands.
   * Implemented decoding of UBI_IOCRPEB and UBI_IOCSPEB ioctl commands.
-  * Implemented decoding of VIDIOC_QUERY_EXT_CTRL ioctl command.
+  * Implemented decoding of V4L2_BUF_TYPE_META_CAPTURE,
+    V4L2_BUF_TYPE_META_OUTPUT, and VIDIOC_QUERY_EXT_CTRL ioctl commands.
 
 * Bug fixes
   * Fixed decoding of SIOCGIFINDEX, SIOCBRADDIF, and SIOCBRDELIF ioctl commands.
