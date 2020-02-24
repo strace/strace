@@ -55,13 +55,22 @@
 # if XLAT_RAW
 #  define XLAT_KNOWN(val_, str_) STRINGIFY_VAL(val_)
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_)
+
+#  define XLAT_FMT "%#x"
+#  define XLAT_ARGS(aa_) (aa_)
 # elif XLAT_VERBOSE
 #  define XLAT_KNOWN(val_, str_) STRINGIFY_VAL(val_) " /* " str_ " */"
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
-# else
+
+#  define XLAT_FMT "%#x /* %s */"
+#  define XLAT_ARGS(a_) a_, #a_
+# else /* !XLAT_RAW && !XLAT_VERBOSE */
 #  define XLAT_KNOWN(val_, str_) str_
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
-# endif
+
+#  define XLAT_FMT "%s"
+#  define XLAT_ARGS(a_) #a_
+# endif /* XLAT_RAW, XLAT_VERBOSE */
 
 # define XLAT_STR(v_) sprintxlat(#v_, v_, NULL)
 
