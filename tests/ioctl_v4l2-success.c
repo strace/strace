@@ -240,7 +240,8 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
 		printf("%sfmt.pix_mp={width=3736074974, height=4208898469"
 		       ", pixelformat=" RAW("0x36314454")
-		       NRAW("v4l2_fourcc('T', 'D', '1', '6')")
+		       NRAW("v4l2_fourcc('T', 'D', '1', '6')"
+			    " /* V4L2_TCH_FMT_DELTA_TD16 */")
 		       ", field=%s, colorspace=0xd"
 		       NRAW(" /* V4L2_COLORSPACE_??? */") ", plane_fmt=[",
 		       pfx, XLAT_STR(V4L2_FIELD_NONE));
