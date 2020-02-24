@@ -94,6 +94,7 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #define FMT_RECT "{left=%d, top=%d, width=%u, height=%u}"
 #define ARGS_RECT(x) (x).left, (x).top, (x).width, (x).height
 
+#include "xlat/v4l2_meta_fmts.h"
 #include "xlat/v4l2_pix_fmts.h"
 #include "xlat/v4l2_sdr_fmts.h"
 
@@ -350,6 +351,16 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		if (f->fmt.sdr.buffersize)
 			tprintf(", buffersize=%u",
 				f->fmt.sdr.buffersize);
+		tprints("}");
+		break;
+	/* since Linux v5.0-rc1~181^2~21 */
+	case V4L2_BUF_TYPE_META_OUTPUT:
+	/* since Linux v4.12-rc1~85^2~71 */
+	case V4L2_BUF_TYPE_META_CAPTURE:
+		tprints(prefix);
+		tprints("fmt.meta={dataformat=");
+		print_pixelformat(f->fmt.meta.dataformat, v4l2_meta_fmts);
+		PRINT_FIELD_U(", ", f->fmt.meta, buffersize);
 		tprints("}");
 		break;
 	default:

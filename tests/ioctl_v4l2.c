@@ -34,6 +34,9 @@
 	 ((unsigned int)(a3) << 24))
 
 static const unsigned int magic = 0xdeadbeef;
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+static const unsigned int mf_magic = fourcc('V', 'I', 'V', 'D');
+#endif
 static const unsigned int pf_magic = fourcc('S', '5', '0', '8');
 #if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 static const unsigned int sf_magic = fourcc('R', 'U', '1', '2');
@@ -175,6 +178,18 @@ init_v4l2_format(struct v4l2_format *const f,
 # ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		f->fmt.sdr.buffersize = 0x25afabfb;
 # endif
+		break;
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	case V4L2_BUF_TYPE_META_OUTPUT:
+		f->fmt.meta.dataformat = magic;
+		f->fmt.meta.buffersize = 0xbadc0ded;
+		break;
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+	case V4L2_BUF_TYPE_META_CAPTURE:
+		f->fmt.meta.dataformat = mf_magic;
+		f->fmt.meta.buffersize = 0xbadc0ded;
 		break;
 #endif
 	}
@@ -419,6 +434,39 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       , ((uint32_t *) &f->fmt.sdr)[1]
 # endif
 		       );
+		break;
+#endif
+
+#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	case V4L2_BUF_TYPE_META_OUTPUT:
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+	case V4L2_BUF_TYPE_META_CAPTURE:
+		saved_errno = errno;
+		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
+		       ", fmt.meta={dataformat=",
+		       XLAT_SEL(reqval, reqstr),
+		       XLAT_SEL(buf_type, buf_type_string));
+
+# if XLAT_RAW
+		printf("%#x", buf_type == V4L2_BUF_TYPE_META_CAPTURE
+			      ? mf_magic : magic);
+# else /* !XLAT_RAW */
+		if (buf_type == V4L2_BUF_TYPE_META_CAPTURE)
+			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
+			       "/* V4L2_META_FMT_VIVID */",
+			       cc0(mf_magic), cc1(mf_magic), cc2(mf_magic),
+			       cc3(mf_magic));
+#  if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+		else
+			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
+#  endif
+# endif /* XLAT_RAW */
+
+		errno = saved_errno;
+		printf(", buffersize=%u}}) = -1 EBADF (%m)\n",
+		       f->fmt.meta.buffersize);
 		break;
 #endif
 	}
@@ -761,6 +809,20 @@ main(void)
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_SDR_OUTPUT));
 #endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+	p_format->type = V4L2_BUF_TYPE_META_CAPTURE;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_META_CAPTURE));
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	p_format->type = V4L2_BUF_TYPE_META_OUTPUT;
+	ioctl(-1, VIDIOC_G_FMT, p_format);
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FMT),
+	       XLAT_ARGS(V4L2_BUF_TYPE_META_OUTPUT));
+#endif
 	/* VIDIOC_S_FMT */
 	ioctl(-1, VIDIOC_S_FMT, 0);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
@@ -806,6 +868,16 @@ main(void)
 	ioctl(-1, VIDIOC_S_FMT, p_format);
 	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_SDR_OUTPUT);
 #endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_META_CAPTURE);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_META_CAPTURE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_META_OUTPUT);
+	ioctl(-1, VIDIOC_S_FMT, p_format);
+	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_META_OUTPUT);
+#endif
 	/* VIDIOC_TRY_FMT */
 	ioctl(-1, VIDIOC_TRY_FMT, 0);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
@@ -850,6 +922,16 @@ main(void)
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_SDR_OUTPUT);
 	ioctl(-1, VIDIOC_TRY_FMT, p_format);
 	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT, V4L2_BUF_TYPE_SDR_OUTPUT);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_META_CAPTURE);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT, V4L2_BUF_TYPE_META_CAPTURE);
+#endif
+#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
+	init_v4l2_format(p_format, V4L2_BUF_TYPE_META_OUTPUT);
+	ioctl(-1, VIDIOC_TRY_FMT, p_format);
+	print_ioctl_v4l2(p_format, VIDIOC_TRY_FMT, V4L2_BUF_TYPE_META_OUTPUT);
 #endif
 	struct v4l2_format *const p_v4l2_format =
 		page_end - sizeof(*p_v4l2_format);
