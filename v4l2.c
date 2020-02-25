@@ -319,6 +319,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints("}");
 		break;
 #endif
+	default:
+		return false;
 	}
 	return ret;
 }
