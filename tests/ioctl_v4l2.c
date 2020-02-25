@@ -8,6 +8,7 @@
 
 #include "tests.h"
 #include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -406,6 +407,252 @@ main(void)
 	fill_memory(page, size);
 
 	unsigned char cc[sizeof(int)] = { 'A', '\'', '\\', '\xfa' };
+
+	/* Unknown */
+	static const struct {
+		uint32_t flags;
+		const char *str;
+	} cmd_flags[] = {
+		{ ARG_STR(_IOC_NONE) },
+		{ ARG_STR(_IOC_READ) },
+		{ ARG_STR(_IOC_WRITE) },
+		{ ARG_STR(_IOC_READ|_IOC_WRITE) },
+	};
+	static const uint8_t unknown_cmds[] = {
+		1, 3, 6 /* VIDIOC_G_MPEGCOMP */, 7 /* VIDIOC_S_MPEGCOMP */,
+		12, 13, 20, 31, 32, 35, 42, 43, 44, 45, 51, 52, 53,
+		81 /* VIDIOC_G_CHIP_IDENT_OLD */,
+		83 /* VIDIOC_ENUM_DV_PRESETS */, 84 /* VIDIOC_S_DV_PRESET */,
+		85 /* VIDIOC_G_DV_PRESET */, 86 /* VIDIOC_QUERY_DV_PRESET */,
+		104 /* 103 is the last existing */, 255
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(unknown_cmds); i++) {
+		/* Trying to hit common argument sizes */
+		for (size_t j = 0; j < 256; j += 4) {
+			for (size_t k = 0; k < ARRAY_SIZE(cmd_flags); k++) {
+				uint32_t ioc = _IOC(cmd_flags[k].flags, 'V',
+						    unknown_cmds[i], j);
+				/*
+				 * Conflicts with VT* and VBG* ioctls
+				 * that happen to also use 'V' command type.
+				 */
+				switch (ioc) {
+				/* VT_GETMODE */
+				case _IOC(_IOC_NONE, 'V', 1, 0):
+				/* VT_GETSTATE */
+				case _IOC(_IOC_NONE, 'V', 3, 0):
+				/* VBG_IOCTL_VMMDEV_REQUEST_BIG */
+				case _IOC(_IOC_READ|_IOC_WRITE, 'V', 3, 0):
+				/* VT_ACTIVATE */
+				case _IOC(_IOC_NONE, 'V', 6, 0):
+				/* VT_WAITACTIVE */
+				case _IOC(_IOC_NONE, 'V', 7, 0):
+				/* VT_UNLOCKSWITCH */
+				case _IOC(_IOC_NONE, 'V', 12, 0):
+				/* VBG_IOCTL_CHANGE_FILTER_MASK */
+				case _IOC(_IOC_READ|_IOC_WRITE, 'V', 12, 32):
+				/* VT_GETHIFONTMASK */
+				case _IOC(_IOC_NONE, 'V', 13, 0):
+					continue;
+				}
+
+				ioctl(-1, ioc, 0);
+				printf("ioctl(-1, " NABBR("%#x") VERB(" /* ")
+				       NRAW("_IOC(%s, 0x56, %#x, %#zx)")
+				       VERB(" */") ", 0) = -1 EBADF (%m)\n"
+#if XLAT_RAW || XLAT_VERBOSE
+				       , ioc
+#endif
+#if !XLAT_RAW
+				       , cmd_flags[k].str, unknown_cmds[i], j
+#endif
+				       );
+
+				ioctl(-1, ioc,
+				      (unsigned long) 0xbadc0deddeadc0deULL);
+				printf("ioctl(-1, " NABBR("%#x") VERB(" /* ")
+				       NRAW("_IOC(%s, 0x56, %#x, %#zx)")
+				       VERB(" */") ", %#lx) = -1 EBADF (%m)\n",
+#if XLAT_RAW || XLAT_VERBOSE
+				       ioc,
+#endif
+#if !XLAT_RAW
+				       cmd_flags[k].str, unknown_cmds[i], j,
+#endif
+				       (unsigned long) 0xbadc0deddeadc0deULL);
+			}
+		}
+	}
+
+	/* Decoding is not supported */
+	static const struct {
+		uint32_t cmd;
+		const char *str;
+	} unsupp_cmds[] = {
+		{ ARG_STR(VIDIOC_OVERLAY) },
+#ifdef VIDIOC_EXPBUF
+		{ ARG_STR(VIDIOC_EXPBUF) },
+#endif
+		{ ARG_STR(VIDIOC_G_AUDIO) },
+		{ ARG_STR(VIDIOC_S_AUDIO) },
+		{ ARG_STR(VIDIOC_QUERYMENU) },
+#ifdef VIDIOC_G_EDID
+		{ ARG_STR(VIDIOC_G_EDID) },
+#endif
+#ifdef VIDIOC_S_EDID
+		{ ARG_STR(VIDIOC_S_EDID) },
+#endif
+		{ ARG_STR(VIDIOC_G_OUTPUT) },
+		{ ARG_STR(VIDIOC_S_OUTPUT) },
+		{ ARG_STR(VIDIOC_ENUMOUTPUT) },
+		{ ARG_STR(VIDIOC_G_AUDOUT) },
+		{ ARG_STR(VIDIOC_S_AUDOUT) },
+		{ ARG_STR(VIDIOC_G_MODULATOR) },
+		{ ARG_STR(VIDIOC_S_MODULATOR) },
+		{ ARG_STR(VIDIOC_G_FREQUENCY) },
+		{ ARG_STR(VIDIOC_S_FREQUENCY) },
+		{ ARG_STR(VIDIOC_G_JPEGCOMP) },
+		{ ARG_STR(VIDIOC_S_JPEGCOMP) },
+		{ ARG_STR(VIDIOC_QUERYSTD) },
+		{ ARG_STR(VIDIOC_ENUMAUDIO) },
+		{ ARG_STR(VIDIOC_ENUMAUDOUT) },
+		{ ARG_STR(VIDIOC_G_PRIORITY) },
+		{ ARG_STR(VIDIOC_S_PRIORITY) },
+		{ ARG_STR(VIDIOC_G_SLICED_VBI_CAP) },
+		{ ARG_STR(VIDIOC_LOG_STATUS) },
+#ifdef VIDIOC_G_ENC_INDEX
+		{ ARG_STR(VIDIOC_G_ENC_INDEX) },
+#endif
+#ifdef VIDIOC_ENCODER_CMD
+		{ ARG_STR(VIDIOC_ENCODER_CMD) },
+#endif
+#ifdef VIDIOC_TRY_ENCODER_CMD
+		{ ARG_STR(VIDIOC_TRY_ENCODER_CMD) },
+#endif
+#ifdef VIDIOC_DBG_S_REGISTER
+		{ ARG_STR(VIDIOC_DBG_S_REGISTER) },
+#endif
+#ifdef VIDIOC_DBG_G_REGISTER
+		{ ARG_STR(VIDIOC_DBG_G_REGISTER) },
+#endif
+#ifdef VIDIOC_G_CHIP_IDENT_OLD
+		{ ARG_STR(VIDIOC_G_CHIP_IDENT_OLD) },
+#endif
+#ifdef VIDIOC_DBG_G_CHIP_IDENT
+		/* Broken on RHEL 6/7 */
+		/* { ARG_STR(VIDIOC_DBG_G_CHIP_IDENT) }, */
+#endif
+#ifdef VIDIOC_S_HW_FREQ_SEEK
+		{ ARG_STR(VIDIOC_S_HW_FREQ_SEEK) },
+#endif
+#ifdef VIDIOC_ENUM_DV_PRESETS
+		/* Next 4 are broken on RHEL 6 */
+		/* { ARG_STR(VIDIOC_ENUM_DV_PRESETS) }, */
+#endif
+#ifdef VIDIOC_S_DV_PRESET
+		/* { ARG_STR(VIDIOC_S_DV_PRESET) }, */
+#endif
+#ifdef VIDIOC_G_DV_PRESET
+		/* { ARG_STR(VIDIOC_G_DV_PRESET) }, */
+#endif
+#ifdef VIDIOC_QUERY_DV_PRESET
+		/* { ARG_STR(VIDIOC_QUERY_DV_PRESET) }, */
+#endif
+#ifdef VIDIOC_S_DV_TIMINGS
+		{ ARG_STR(VIDIOC_S_DV_TIMINGS) },
+#endif
+#ifdef VIDIOC_G_DV_TIMINGS
+		{ ARG_STR(VIDIOC_G_DV_TIMINGS) },
+#endif
+#ifdef VIDIOC_DQEVENT
+		{ ARG_STR(VIDIOC_DQEVENT) },
+#endif
+#ifdef VIDIOC_SUBSCRIBE_EVENT
+		{ ARG_STR(VIDIOC_SUBSCRIBE_EVENT) },
+#endif
+#ifdef VIDIOC_UNSUBSCRIBE_EVENT
+		{ ARG_STR(VIDIOC_UNSUBSCRIBE_EVENT) },
+#endif
+#ifdef VIDIOC_PREPARE_BUF
+		{ ARG_STR(VIDIOC_PREPARE_BUF) },
+#endif
+#ifdef VIDIOC_G_SELECTION
+		{ ARG_STR(VIDIOC_G_SELECTION) },
+#endif
+#ifdef VIDIOC_S_SELECTION
+		{ ARG_STR(VIDIOC_S_SELECTION) },
+#endif
+#ifdef VIDIOC_DECODER_CMD
+		{ ARG_STR(VIDIOC_DECODER_CMD) },
+#endif
+#ifdef VIDIOC_TRY_DECODER_CMD
+		{ ARG_STR(VIDIOC_TRY_DECODER_CMD) },
+#endif
+#ifdef VIDIOC_ENUM_DV_TIMINGS
+		{ ARG_STR(VIDIOC_ENUM_DV_TIMINGS) },
+#endif
+#ifdef VIDIOC_QUERY_DV_TIMINGS
+		{ ARG_STR(VIDIOC_QUERY_DV_TIMINGS) },
+#endif
+#ifdef VIDIOC_DV_TIMINGS_CAP
+		{ ARG_STR(VIDIOC_DV_TIMINGS_CAP) },
+#endif
+#ifdef VIDIOC_ENUM_FREQ_BANDS
+		{ ARG_STR(VIDIOC_ENUM_FREQ_BANDS) },
+#endif
+#ifdef VIDIOC_DBG_G_CHIP_INFO
+		{ ARG_STR(VIDIOC_DBG_G_CHIP_INFO) },
+#endif
+#ifdef VIDIOC_QUERY_EXT_CTRL
+		{ ARG_STR(VIDIOC_QUERY_EXT_CTRL) },
+#endif
+#ifdef VIDIOC_SUBDEV_ENUM_MBUS_CODE
+		{ ARG_STR(VIDIOC_SUBDEV_ENUM_MBUS_CODE) },
+#endif
+#ifdef VIDIOC_SUBDEV_G_FMT
+		{ ARG_STR(VIDIOC_SUBDEV_G_FMT) },
+#endif
+#ifdef VIDIOC_SUBDEV_S_FMT
+		{ ARG_STR(VIDIOC_SUBDEV_S_FMT) },
+#endif
+#ifdef VIDIOC_SUBDEV_G_FRAME_INTERVAL
+		{ ARG_STR(VIDIOC_SUBDEV_G_FRAME_INTERVAL) },
+#endif
+#ifdef VIDIOC_SUBDEV_S_FRAME_INTERVAL
+		{ ARG_STR(VIDIOC_SUBDEV_S_FRAME_INTERVAL) },
+#endif
+#ifdef VIDIOC_SUBDEV_G_CROP
+		{ ARG_STR(VIDIOC_SUBDEV_G_CROP) },
+#endif
+#ifdef VIDIOC_SUBDEV_S_CROP
+		{ ARG_STR(VIDIOC_SUBDEV_S_CROP) },
+#endif
+#ifdef VIDIOC_SUBDEV_G_SELECTION
+		{ ARG_STR(VIDIOC_SUBDEV_G_SELECTION) },
+#endif
+#ifdef VIDIOC_SUBDEV_S_SELECTION
+		{ ARG_STR(VIDIOC_SUBDEV_S_SELECTION) },
+#endif
+#ifdef VIDIOC_SUBDEV_ENUM_FRAME_SIZE
+		{ ARG_STR(VIDIOC_SUBDEV_ENUM_FRAME_SIZE) },
+#endif
+#ifdef VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL
+		{ ARG_STR(VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL) },
+#endif
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(unsupp_cmds); i++) {
+		ioctl(-1, unsupp_cmds[i].cmd, 0);
+		printf("ioctl(-1, " XLAT_FMT ", 0) = -1 EBADF (%m)\n",
+		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str));
+
+		ioctl(-1, unsupp_cmds[i].cmd,
+		      (unsigned long) 0xbadc0deddeadc0deULL);
+		printf("ioctl(-1, " XLAT_FMT ", %#lx) = -1 EBADF (%m)\n",
+		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str),
+		       (unsigned long) 0xbadc0deddeadc0deULL);
+	}
 
 	/* VIDIOC_QUERYCAP */
 	ioctl(-1, VIDIOC_QUERYCAP, 0);
