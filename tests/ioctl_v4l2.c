@@ -76,6 +76,8 @@ init_v4l2_format(struct v4l2_format *const f,
 			cur_pix[i].sizeimage = 0x1e3c531c | i;
 			cur_pix[i].bytesperline = 0xa983d721 | i;
 		}
+		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
+			f->fmt.pix_mp.num_planes = 1;
 		break;
 	}
 #endif
@@ -89,10 +91,10 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.win.w.height = 0xbbd886c8;
 		f->fmt.win.field = V4L2_FIELD_ANY;
 		f->fmt.win.chromakey = 0xdb1f991f;
-		f->fmt.win.clipcount = 2;
+		f->fmt.win.clipcount =
+			buf_type == V4L2_BUF_TYPE_VIDEO_OVERLAY ? 3 : 2;
 		f->fmt.win.clips =
-			tail_alloc(sizeof(*f->fmt.win.clips) *
-			f->fmt.win.clipcount);
+			tail_alloc(sizeof(*f->fmt.win.clips) * 2);
 		f->fmt.win.clips[0].c.left = 0x3313d36e;
 		f->fmt.win.clips[0].c.top = 0xcdffe510;
 		f->fmt.win.clips[0].c.width = 0x2064f3a8;
@@ -228,7 +230,8 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       XLAT_ARGS(V4L2_FIELD_NONE),
 		       XLAT_ARGS(V4L2_COLORSPACE_JPEG));
 		for (i = 0;
-		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
+		     i < (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+		          ? 1 : ARRAY_SIZE(f->fmt.pix_mp.plane_fmt));
 		     ++i) {
 			if (i)
 				printf(", ");
@@ -246,16 +249,12 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 #endif
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
+		saved_errno = errno;
 		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.win={left=%d, top=%d, width=%u, height=%u"
 		       ", field=" XLAT_FMT ", chromakey=%#x, clips="
 		       "[{left=%d, top=%d, width=%u, height=%u}, "
-		       "{left=%d, top=%d, width=%u, height=%u}]"
-		       ", clipcount=%u, bitmap=%p"
-#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
-		       ", global_alpha=%#x"
-#endif
-		       "}}) = -1 EBADF (%m)\n",
+		       "{left=%d, top=%d, width=%u, height=%u}",
 		       XLAT_SEL(reqval, reqstr),
 		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.win.w.left, f->fmt.win.w.top,
@@ -269,7 +268,15 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       f->fmt.win.clips[1].c.left,
 		       f->fmt.win.clips[1].c.top,
 		       f->fmt.win.clips[1].c.width,
-		       f->fmt.win.clips[1].c.height,
+		       f->fmt.win.clips[1].c.height);
+		if (f->fmt.win.clipcount > 2)
+			printf(", ... /* %p */", f->fmt.win.clips + 2);
+		errno = saved_errno;
+		printf("], clipcount=%u, bitmap=%p"
+#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
+		       ", global_alpha=%#x"
+#endif
+		       "}}) = -1 EBADF (%m)\n",
 		       f->fmt.win.clipcount, f->fmt.win.bitmap
 #ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		       , f->fmt.win.global_alpha
