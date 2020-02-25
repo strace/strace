@@ -238,7 +238,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		}
 		errno = saved_errno;
 		printf("], num_planes=%u}}) = -1 EBADF (%m)\n",
-		f->fmt.pix_mp.num_planes);
+		       f->fmt.pix_mp.num_planes);
 		break;
 	}
 #endif
