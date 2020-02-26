@@ -90,15 +90,18 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #define FMT_FRACT "%u/%u"
 #define ARGS_FRACT(x) ((x).numerator), ((x).denominator)
 
-#define FMT_RECT "{left=%d, top=%d, width=%u, height=%u}"
-#define ARGS_RECT(x) (x).left, (x).top, (x).width, (x).height
-
 #include "xlat/v4l2_pix_fmts.h"
 #include "xlat/v4l2_sdr_fmts.h"
 
 #define XLAT_MACROS_ONLY
 # include "xlat/v4l2_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
+
+#define PRINT_FIELD_RECT(prefix_, where_, field_)			\
+	STRACE_PRINTF("%s%s={left=%d, top=%d, width=%u, height=%u}",	\
+		      (prefix_), #field_,				\
+		      (where_).field_.left, (where_).field_.top,	\
+		      (where_).field_.width, (where_).field_.height)
 
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
@@ -230,7 +233,8 @@ static bool
 print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct_v4l2_clip *p = elem_buf;
-	tprintf("{c=" FMT_RECT "}", ARGS_RECT(p->c));
+	PRINT_FIELD_RECT("{", *p, c);
+	tprints("}");
 	return true;
 }
 
@@ -287,7 +291,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY: {
 		struct_v4l2_clip clip;
 		tprints(prefix);
-		tprintf("fmt.win={w=" FMT_RECT, ARGS_RECT(f->fmt.win.w));
+		PRINT_FIELD_RECT("fmt.win={", f->fmt.win, w);
 		tprints(", field=");
 		printxval(v4l2_fields, f->fmt.win.field, "V4L2_FIELD_???");
 		tprintf(", chromakey=%#x, clips=", f->fmt.win.chromakey);
@@ -867,12 +871,9 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-		tprintf(", bounds=" FMT_RECT
-			", defrect=" FMT_RECT
-			", pixelaspect=" FMT_FRACT,
-			ARGS_RECT(c.bounds),
-			ARGS_RECT(c.defrect),
-			ARGS_FRACT(c.pixelaspect));
+		PRINT_FIELD_RECT(", ", c, bounds);
+		PRINT_FIELD_RECT(", ", c, defrect);
+		tprintf(", pixelaspect=" FMT_FRACT, ARGS_FRACT(c.pixelaspect));
 	}
 
 	tprints("}");
@@ -894,10 +895,10 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 		printxval(v4l2_buf_types, c.type, "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
-		tprintf(", c=" FMT_RECT, ARGS_RECT(c.c));
+		PRINT_FIELD_RECT(", " , c, c);
 	} else {
 		if (!syserror(tcp) && !umove(tcp, arg, &c))
-			tprintf(", c=" FMT_RECT, ARGS_RECT(c.c));
+			PRINT_FIELD_RECT(", " , c, c);
 	}
 
 	tprints("}");
