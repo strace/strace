@@ -297,10 +297,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
 		saved_errno = errno;
 		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
-		       ", fmt.win={left=%d, top=%d, width=%u, height=%u"
+		       ", fmt.win={w={left=%d, top=%d, width=%u, height=%u}"
 		       ", field=" XLAT_FMT ", chromakey=%#x, clips="
-		       "[{left=%d, top=%d, width=%u, height=%u}, "
-		       "{left=%d, top=%d, width=%u, height=%u}",
+		       "[{c={left=%d, top=%d, width=%u, height=%u}}, "
+		       "{c={left=%d, top=%d, width=%u, height=%u}}",
 		       XLAT_SEL(reqval, reqstr),
 		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.win.w.left, f->fmt.win.w.top,
