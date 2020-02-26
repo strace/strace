@@ -287,7 +287,8 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
 		printf("%sfmt.sliced={service_set="
-		       XLAT_UNKNOWN(0xfeed, "V4L2_SLICED_???")
+		       XLAT_KNOWN(0xfeed, "V4L2_SLICED_VBI_625"
+					  "|V4L2_SLICED_CAPTION_525|0xaaec")
 		       ", io_size=3740978925, service_lines=[[0xdead, 0xdeac"
 		       ", 0xdeaf, 0xdeae, 0xdea9, 0xdea8, 0xdeab, 0xdeaa"
 		       ", 0xdea5, 0xdea4, 0xdea7, 0xdea6, 0xdea1, 0xdea0"
