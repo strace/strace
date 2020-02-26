@@ -267,7 +267,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
 			f->fmt.vbi.samples_per_line);
 		print_pixelformat(f->fmt.vbi.sample_format, v4l2_pix_fmts);
-		tprintf(", start=[%u, %u], count=[%u, %u], ",
+		tprintf(", start=[%d, %d], count=[%u, %u], ",
 			f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 			f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
 		tprints("flags=");

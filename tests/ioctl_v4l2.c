@@ -310,7 +310,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #endif /* XLAT_RAW */
 
 		errno = saved_errno;
-		printf(", start=[%u, %u], count=[%u, %u]"
+		printf(", start=[%d, %d], count=[%u, %u]"
 		       ", flags=" XLAT_FMT "}})"
 		       " = -1 EBADF (%m)\n",
 		       f->fmt.vbi.start[0], f->fmt.vbi.start[1],
