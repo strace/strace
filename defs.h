@@ -951,7 +951,7 @@ print_array(struct tcb *const tcp,
 /** Shorthand for printing local arrays. */
 static inline bool
 print_local_array_ex(struct tcb *tcp,
-		     void *start_addr,
+		     const void *start_addr,
 		     const size_t nmemb,
 		     const size_t elem_size,
 		     print_fn print_func,
