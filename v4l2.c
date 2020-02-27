@@ -275,9 +275,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		printxval(v4l2_colorspaces, f->fmt.pix_mp.colorspace,
 			  "V4L2_COLORSPACE_???");
 		tprints(", plane_fmt=[");
-		max = f->fmt.pix_mp.num_planes;
-		if (max > VIDEO_MAX_PLANES)
-			max = VIDEO_MAX_PLANES;
+		max = MIN(f->fmt.pix_mp.num_planes, VIDEO_MAX_PLANES);
 		for (i = 0; i < max; i++) {
 			if (i > 0)
 				tprints(", ");
