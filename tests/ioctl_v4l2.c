@@ -370,11 +370,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		saved_errno = errno;
 		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.sliced={service_set=" XLAT_FMT
-		       ", io_size=%u, service_lines=[",
+		       ", service_lines=[",
 		       XLAT_SEL(reqval, reqstr),
 		       XLAT_SEL(buf_type, buf_type_string),
-		       XLAT_ARGS(V4L2_SLICED_VPS),
-		       f->fmt.sliced.io_size);
+		       XLAT_ARGS(V4L2_SLICED_VPS));
 		for (i = 0;
 		     i < ARRAY_SIZE(f->fmt.sliced.service_lines);
 		     i++) {
@@ -392,7 +391,8 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			printf("]");
 		}
 		errno = saved_errno;
-		printf("]}}) = -1 EBADF (%m)\n");
+		printf("], io_size=%u}}) = -1 EBADF (%m)\n",
+		       f->fmt.sliced.io_size);
 		break;
 	}
 #endif
