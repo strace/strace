@@ -367,6 +367,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
 		unsigned int i, j;
 
+		saved_errno = errno;
 		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.sliced={service_set=" XLAT_FMT
 		       ", io_size=%u, service_lines=[",
@@ -390,6 +391,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			}
 			printf("]");
 		}
+		errno = saved_errno;
 		printf("]}}) = -1 EBADF (%m)\n");
 		break;
 	}
