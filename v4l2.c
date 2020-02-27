@@ -326,7 +326,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	/* both since Linux v2.6.14-rc2~64 */
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
-		unsigned int i, j;
+		unsigned int i;
 
 		tprints(prefix);
 		tprints("fmt.sliced={service_set=");
@@ -335,18 +335,10 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprintf(", io_size=%u, service_lines=[",
 			f->fmt.sliced.io_size);
 		for (i = 0; i < ARRAY_SIZE(f->fmt.sliced.service_lines); i++) {
-			if (i > 0)
+			if (i)
 				tprints(", ");
-			tprints("[");
-			for (j = 0;
-			     j < ARRAY_SIZE(f->fmt.sliced.service_lines[0]);
-			     j++) {
-				if (j > 0)
-					tprints(", ");
-				tprintf("%#x",
-					f->fmt.sliced.service_lines[i][j]);
-			}
-			tprints("]");
+			print_local_array(tcp, f->fmt.sliced.service_lines[i],
+					  print_xint16_array_member);
 		}
 		tprints("]}");
 		break;
