@@ -250,15 +250,16 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
 		tprints(prefix);
-		tprintf("fmt.pix={width=%u, height=%u, pixelformat=",
-			f->fmt.pix.width, f->fmt.pix.height);
-		print_pixelformat(f->fmt.pix.pixelformat, v4l2_pix_fmts);
-		tprints(", field=");
-		printxval(v4l2_fields, f->fmt.pix.field, "V4L2_FIELD_???");
-		tprintf(", bytesperline=%u, sizeimage=%u, colorspace=",
-			f->fmt.pix.bytesperline, f->fmt.pix.sizeimage);
-		printxval(v4l2_colorspaces, f->fmt.pix.colorspace,
-			  "V4L2_COLORSPACE_???");
+		PRINT_FIELD_U("fmt.pix={", f->fmt.pix, width);
+		PRINT_FIELD_U(", ", f->fmt.pix, height);
+		PRINT_FIELD_PIXFMT(", ", f->fmt.pix, pixelformat,
+				   v4l2_pix_fmts);
+		PRINT_FIELD_XVAL(", ", f->fmt.pix, field, v4l2_fields,
+				 "V4L2_FIELD_???");
+		PRINT_FIELD_U(", ", f->fmt.pix, bytesperline);
+		PRINT_FIELD_U(", ", f->fmt.pix, sizeimage);
+		PRINT_FIELD_XVAL(", ", f->fmt.pix, colorspace, v4l2_colorspaces,
+				 "V4L2_COLORSPACE_???");
 		tprints("}");
 		break;
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
@@ -266,14 +267,14 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		unsigned int i, max;
 
 		tprints(prefix);
-		tprintf("fmt.pix_mp={width=%u, height=%u, pixelformat=",
-			f->fmt.pix_mp.width, f->fmt.pix_mp.height);
-		print_pixelformat(f->fmt.pix_mp.pixelformat, v4l2_pix_fmts);
-		tprints(", field=");
-		printxval(v4l2_fields, f->fmt.pix_mp.field, "V4L2_FIELD_???");
-		tprints(", colorspace=");
-		printxval(v4l2_colorspaces, f->fmt.pix_mp.colorspace,
-			  "V4L2_COLORSPACE_???");
+		PRINT_FIELD_U("fmt.pix_mp={", f->fmt.pix_mp, width);
+		PRINT_FIELD_U(", ", f->fmt.pix_mp, height);
+		PRINT_FIELD_PIXFMT(", ", f->fmt.pix_mp, pixelformat,
+				   v4l2_pix_fmts);
+		PRINT_FIELD_XVAL(", ", f->fmt.pix_mp, field, v4l2_fields,
+				 "V4L2_FIELD_???");
+		PRINT_FIELD_XVAL(", ", f->fmt.pix_mp, colorspace,
+				 v4l2_colorspaces, "V4L2_COLORSPACE_???");
 		tprints(", plane_fmt=[");
 		max = MIN(f->fmt.pix_mp.num_planes, VIDEO_MAX_PLANES);
 		for (i = 0; i < max; i++) {
@@ -283,42 +284,44 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 				f->fmt.pix_mp.plane_fmt[i].sizeimage,
 				f->fmt.pix_mp.plane_fmt[i].bytesperline);
 		}
-		tprintf("], num_planes=%u}",
-			(unsigned) f->fmt.pix_mp.num_planes);
+		PRINT_FIELD_U("], ", f->fmt.pix_mp, num_planes);
+		tprints("}");
 		break;
 	}
 	/* OUTPUT_OVERLAY since Linux v2.6.22-rc1~1118^2~179 */
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY: {
 		struct_v4l2_clip clip;
+
 		tprints(prefix);
 		PRINT_FIELD_RECT("fmt.win={", f->fmt.win, w);
-		tprints(", field=");
-		printxval(v4l2_fields, f->fmt.win.field, "V4L2_FIELD_???");
-		tprintf(", chromakey=%#x, clips=", f->fmt.win.chromakey);
+		PRINT_FIELD_XVAL(", ", f->fmt.win, field, v4l2_fields,
+				 "V4L2_FIELD_???");
+		PRINT_FIELD_X(", ", f->fmt.win, chromakey);
+		tprints(", clips=");
 		ret = print_array(tcp, ptr_to_kulong(f->fmt.win.clips),
 				  f->fmt.win.clipcount, &clip, sizeof(clip),
 				  tfetch_mem, print_v4l2_clip, 0);
-		tprintf(", clipcount=%u, bitmap=", f->fmt.win.clipcount);
-		printaddr(ptr_to_kulong(f->fmt.win.bitmap));
+		PRINT_FIELD_U(", ", f->fmt.win, clipcount);
+		PRINT_FIELD_PTR(", ", f->fmt.win, bitmap);
 		if (f->fmt.win.global_alpha)
-			tprintf(", global_alpha=%#x", f->fmt.win.global_alpha);
+			PRINT_FIELD_X(", ", f->fmt.win, global_alpha);
 		tprints("}");
 		break;
 	}
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
 		tprints(prefix);
-		tprintf("fmt.vbi={sampling_rate=%u, offset=%u, "
-			"samples_per_line=%u, sample_format=",
-			f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
-			f->fmt.vbi.samples_per_line);
-		print_pixelformat(f->fmt.vbi.sample_format, v4l2_pix_fmts);
+		PRINT_FIELD_U("fmt.vbi={", f->fmt.vbi, sampling_rate);
+		PRINT_FIELD_U(", ", f->fmt.vbi, offset);
+		PRINT_FIELD_U(", ", f->fmt.vbi, samples_per_line);
+		PRINT_FIELD_PIXFMT(", ", f->fmt.vbi, sample_format,
+				   v4l2_pix_fmts);
 		tprintf(", start=[%d, %d], count=[%u, %u], ",
 			f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 			f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
-		tprints("flags=");
-		printflags(v4l2_vbi_flags, f->fmt.vbi.flags, "V4L2_VBI_???");
+		PRINT_FIELD_FLAGS("", f->fmt.vbi, flags, v4l2_vbi_flags,
+				 "V4L2_VBI_???");
 		tprints("}");
 		break;
 	/* both since Linux v2.6.14-rc2~64 */
@@ -327,9 +330,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		unsigned int i;
 
 		tprints(prefix);
-		tprints("fmt.sliced={service_set=");
-		printflags(v4l2_sliced_flags, f->fmt.sliced.service_set,
-			   "V4L2_SLICED_???");
+		PRINT_FIELD_FLAGS("fmt.sliced={", f->fmt.sliced, service_set,
+				  v4l2_sliced_flags, "V4L2_SLICED_???");
 		tprints(", service_lines=[");
 		for (i = 0; i < ARRAY_SIZE(f->fmt.sliced.service_lines); i++) {
 			if (i)
@@ -346,11 +348,10 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	/* since Linux v3.15-rc1~85^2~213 */
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
 		tprints(prefix);
-		tprints("fmt.sdr={pixelformat=");
-		print_pixelformat(f->fmt.sdr.pixelformat, v4l2_sdr_fmts);
+		PRINT_FIELD_PIXFMT("fmt.sdr={", f->fmt.sdr, pixelformat,
+				   v4l2_sdr_fmts);
 		if (f->fmt.sdr.buffersize)
-			tprintf(", buffersize=%u",
-				f->fmt.sdr.buffersize);
+			PRINT_FIELD_U(", ", f->fmt.sdr, buffersize);
 		tprints("}");
 		break;
 	/* since Linux v5.0-rc1~181^2~21 */
@@ -358,8 +359,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	/* since Linux v4.12-rc1~85^2~71 */
 	case V4L2_BUF_TYPE_META_CAPTURE:
 		tprints(prefix);
-		tprints("fmt.meta={dataformat=");
-		print_pixelformat(f->fmt.meta.dataformat, v4l2_meta_fmts);
+		PRINT_FIELD_PIXFMT("fmt.meta={", f->fmt.meta, dataformat,
+				   v4l2_meta_fmts);
 		PRINT_FIELD_U(", ", f->fmt.meta, buffersize);
 		tprints("}");
 		break;
