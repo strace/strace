@@ -523,7 +523,9 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		printflags(v4l2_streaming_capabilities,
 			   s.parm.output.capability, "V4L2_CAP_???");
 
-		tprintf(", outputmode=%u", s.parm.output.outputmode);
+		tprintf(", outputmode=");
+		printflags(v4l2_capture_modes,
+			   s.parm.output.outputmode, "V4L2_MODE_???");
 
 		tprintf(", timeperframe=" FMT_FRACT,
 			ARGS_FRACT(s.parm.output.timeperframe));
