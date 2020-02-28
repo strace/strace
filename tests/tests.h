@@ -179,15 +179,26 @@ void *tail_memdup(const void *, const size_t)
 # define TAIL_ALLOC_OBJECT_VAR_PTR(type_name, type_ptr)		\
 	type_name *type_ptr = tail_alloc(sizeof(*type_ptr))
 
-/*
+/**
  * Fill memory (pointed by ptr, having size bytes) with different bytes (with
  * values starting with start and resetting every period) in order to catch
  * sign, byte order and/or alignment errors.
  */
 void fill_memory_ex(void *ptr, size_t size, unsigned char start,
 		    unsigned int period);
-/* Shortcut for fill_memory_ex(ptr, size, 0x80, 0x80) */
+/** Shortcut for fill_memory_ex(ptr, size, 0x80, 0x80) */
 void fill_memory(void *ptr, size_t size);
+/** Variant of fill_memory_ex for arrays of 16-bit (2-byte) values. */
+void fill_memory16_ex(void *ptr, size_t size, uint16_t start,
+		      unsigned int period);
+/** Shortcut for fill_memory16_ex(ptr, size, 0x80c0, 0x8000) */
+void fill_memory16(void *ptr, size_t size);
+/** Variant of fill_memory_ex for arrays of 32-bit (4-byte) values. */
+void fill_memory32_ex(void *ptr, size_t size, uint32_t start,
+		      unsigned int period);
+/** Shortcut for fill_memory32_ex(ptr, size, 0x80a0c0e0, 0x80000000) */
+void fill_memory32(void *ptr, size_t size);
+
 
 /* Close stdin, move stdout to a non-standard descriptor, and print. */
 void tprintf(const char *, ...)
