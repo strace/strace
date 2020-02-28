@@ -960,7 +960,7 @@ main(void)
 	printf("ioctl(-1, %s, {type=" XLAT_FMT
 	       ", parm.capture={capability=" XLAT_FMT
 	       ", capturemode=" XLAT_FMT ", timeperframe=%u/%u"
-	       ", extendedmode=%u, readbuffers=%u}}) = -1 EBADF (%m)\n",
+	       ", extendedmode=%#x, readbuffers=%u}}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE),
 	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME), XLAT_ARGS(V4L2_MODE_HIGHQUALITY),
 	       p_streamparm->parm.capture.timeperframe.numerator,
@@ -972,7 +972,7 @@ main(void)
 	printf("ioctl(-1, %s, {type=" XLAT_FMT
 	       ", parm.output={capability=" XLAT_FMT
 	       ", outputmode=0, timeperframe=%u/%u"
-	       ", extendedmode=%u, writebuffers=%u}}) = -1 EBADF (%m)\n",
+	       ", extendedmode=%#x, writebuffers=%u}}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT),
 	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME),
 	       p_streamparm->parm.output.timeperframe.numerator,
