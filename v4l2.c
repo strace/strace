@@ -515,7 +515,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprintf(", timeperframe=" FMT_FRACT,
 			ARGS_FRACT(s.parm.capture.timeperframe));
 
-		tprintf(", extendedmode=%u, readbuffers=%u}",
+		tprintf(", extendedmode=%#x, readbuffers=%u}",
 			s.parm.capture.extendedmode,
 			s.parm.capture.readbuffers);
 	} else {
@@ -528,7 +528,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprintf(", timeperframe=" FMT_FRACT,
 			ARGS_FRACT(s.parm.output.timeperframe));
 
-		tprintf(", extendedmode=%u, writebuffers=%u}",
+		tprintf(", extendedmode=%#x, writebuffers=%u}",
 			s.parm.output.extendedmode,
 			s.parm.output.writebuffers);
 	}
