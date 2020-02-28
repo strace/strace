@@ -650,8 +650,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-		tprints(is_get ? ", " : " => ");
-		tprintf("value=%d", c.value);
+		tprintf("%s%d", is_get ? ", value=" : " => ", c.value);
 	}
 
 	tprints("}");
