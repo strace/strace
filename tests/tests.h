@@ -24,6 +24,7 @@
 # endif
 
 # include <stdbool.h>
+# include <stdint.h>
 # include <sys/types.h>
 # include "kernel_types.h"
 # include "gcc_compat.h"
@@ -105,6 +106,11 @@
 /* Default maximum # of bytes printed in printstr et al. */
 #  define DEFAULT_STRLEN 32
 # endif
+
+struct strval64 {
+	uint64_t val;
+	const char *str;
+};
 
 /* Cached sysconf(_SC_PAGESIZE). */
 size_t get_page_size(void);
