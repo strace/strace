@@ -560,7 +560,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_CSTRING(", ", s, name);
 		tprintf(", frameperiod=" FMT_FRACT,
 			ARGS_FRACT(s.frameperiod));
-		tprintf(", framelines=%d", s.framelines);
+		tprintf(", framelines=%u", s.framelines);
 	}
 
 	tprints("}");
