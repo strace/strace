@@ -348,7 +348,7 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f))
-		print_v4l2_format_fmt(tcp, is_get ? ", " : " => ", &f);
+		print_v4l2_format_fmt(tcp, is_get ? ", " : "} => {", &f);
 
 	tprints("}");
 
@@ -500,7 +500,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : " => ");
+		tprints(is_get ? ", " : "} => {");
 	}
 
 	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
@@ -682,7 +682,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : " => ");
+		tprints(is_get ? ", " : "} => {");
 	}
 
 	PRINT_FIELD_CSTRING("", c, name);
@@ -857,7 +857,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : " => ");
+		tprints(is_get ? ", " : "} => {");
 	}
 
 	tprints("controls=");

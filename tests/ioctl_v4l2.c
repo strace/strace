@@ -1249,7 +1249,7 @@ main(void)
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls="
 	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
 	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
-	       "] => controls="
+	       "]} => {controls="
 	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
 	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
 	       "], error_idx=%u}) = -1 EBADF (%m)\n",
