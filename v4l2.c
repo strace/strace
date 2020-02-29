@@ -688,11 +688,11 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 	tprints(", type=");
 	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_???");
 	tprints(", capability=");
-	printxval(v4l2_tuner_capabilities, c.capability,
+	printflags(v4l2_tuner_capabilities, c.capability,
 		  "V4L2_TUNER_CAP_???");
 	tprintf(", rangelow=%u, rangehigh=%u, rxsubchans=",
 		c.rangelow, c.rangehigh);
-	printxval(v4l2_tuner_rxsubchanses, c.rxsubchans,
+	printflags(v4l2_tuner_rxsubchanses, c.rxsubchans,
 		  "V4L2_TUNER_SUB_???");
 	tprints(", audmode=");
 	printxval(v4l2_tuner_audmodes, c.audmode,
