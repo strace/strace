@@ -686,7 +686,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	PRINT_FIELD_CSTRING("", c, name);
 	tprints(", type=");
-	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_TYPE_???");
+	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_???");
 	tprints(", capability=");
 	printxval(v4l2_tuner_capabilities, c.capability,
 		  "V4L2_TUNER_CAP_???");
