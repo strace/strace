@@ -1,0 +1,103 @@
+VIDIOC_QUERYCAP			_IOR ('V',   0, struct v4l2_capability)
+VIDIOC_ENUM_FMT			_IOWR('V',   2, struct v4l2_fmtdesc)
+VIDIOC_G_FMT			_IOWR('V',   4, struct_v4l2_format)
+VIDIOC_S_FMT			_IOWR('V',   5, struct_v4l2_format)
+/* VIDIOC_G_MPEGCOMP		_IOR  ('V',  6, struct v4l2_mpeg_compression) - removed in v2.6.24-rc1~66^2~32 */
+/* VIDIOC_S_MPEGCOMP		_IOW  ('V',  7, struct v4l2_mpeg_compression) - removed in v2.6.24-rc1~66^2~32 */
+VIDIOC_REQBUFS			_IOWR('V',   8, struct v4l2_requestbuffers)
+VIDIOC_QUERYBUF			_IOWR('V',   9, struct_v4l2_buffer)
+VIDIOC_G_FBUF			_IOR ('V',  10, struct_v4l2_framebuffer)
+VIDIOC_S_FBUF			_IOW ('V',  11, struct_v4l2_framebuffer)
+/* VIDIOC_OVERLAY			_IOW ('V',  14, int) */
+VIDIOC_QBUF			_IOWR('V',  15, struct_v4l2_buffer)
+/* VIDIOC_EXPBUF			_IOWR('V',  16, struct v4l2_exportbuffer) - added in v3.8-rc1~115^2^2~34 */
+VIDIOC_DQBUF			_IOWR('V',  17, struct_v4l2_buffer)
+VIDIOC_STREAMON			_IOW ('V',  18, int)
+VIDIOC_STREAMOFF		_IOW ('V',  19, int)
+VIDIOC_G_PARM			_IOWR('V',  21, struct v4l2_streamparm)
+VIDIOC_S_PARM			_IOWR('V',  22, struct v4l2_streamparm)
+VIDIOC_G_STD			_IOR ('V',  23, uint64_t) /* v4l2_std_id */
+VIDIOC_S_STD			_IOW ('V',  24, uint64_t) /* v4l2_std_id */
+VIDIOC_ENUMSTD			_IOWR('V',  25, struct_v4l2_standard)
+VIDIOC_ENUMINPUT		_IOWR('V',  26, struct_v4l2_input)
+VIDIOC_G_CTRL			_IOWR('V',  27, struct v4l2_control)
+VIDIOC_S_CTRL			_IOWR('V',  28, struct v4l2_control)
+VIDIOC_G_TUNER			_IOWR('V',  29, struct v4l2_tuner)
+VIDIOC_S_TUNER			_IOW ('V',  30, struct v4l2_tuner)
+/* VIDIOC_G_AUDIO			_IOR ('V',  33, struct v4l2_audio) */
+/* VIDIOC_S_AUDIO			_IOW ('V',  34, struct v4l2_audio) */
+VIDIOC_QUERYCTRL		_IOWR('V',  36, struct v4l2_queryctrl)
+/* VIDIOC_QUERYMENU		_IOWR('V',  37, struct_v4l2_querymenu) */
+VIDIOC_G_INPUT			_IOR ('V',  38, int)
+VIDIOC_S_INPUT			_IOWR('V',  39, int)
+/* VIDIOC_G_EDID			_IOWR('V',  40, struct v4l2_edid) - renamed from VIDIOC_SUBDEV_G_EDID in v3.15-rc1~85^2~113 */
+/* VIDIOC_S_EDID			_IOWR('V',  41, struct v4l2_edid) - renamed from VIDIOC_SUBDEV_G_EDID in v3.15-rc1~85^2~113 */
+/* VIDIOC_G_OUTPUT			_IOR ('V',  46, int) */
+/* VIDIOC_S_OUTPUT			_IOWR('V',  47, int) */
+/* VIDIOC_ENUMOUTPUT		_IOWR('V',  48, struct_v4l2_output) */
+/* VIDIOC_G_AUDOUT			_IOR ('V',  49, struct v4l2_audioout) */
+/* VIDIOC_S_AUDOUT			_IOW ('V',  50, struct v4l2_audioout) */
+/* VIDIOC_G_MODULATOR		_IOWR('V',  54, struct_v4l2_modulator) */
+/* VIDIOC_S_MODULATOR		_IOW ('V',  55, struct_v4l2_modulator) */
+/* VIDIOC_G_FREQUENCY		_IOWR('V',  56, struct v4l2_frequency) */
+/* VIDIOC_S_FREQUENCY		_IOW ('V',  57, struct v4l2_frequency) */
+VIDIOC_CROPCAP			_IOWR('V',  58, struct v4l2_cropcap)
+VIDIOC_G_CROP			_IOWR('V',  59, struct v4l2_crop)
+VIDIOC_S_CROP			_IOW ('V',  60, struct v4l2_crop)
+/* VIDIOC_G_JPEGCOMP		_IOR ('V',  61, struct v4l2_jpegcompression) */
+/* VIDIOC_S_JPEGCOMP		_IOW ('V',  62, struct v4l2_jpegcompression) */
+/* VIDIOC_QUERYSTD			_IOR ('V',  63, uint64_t) */ /* v4l2_std_id */
+VIDIOC_TRY_FMT			_IOWR('V',  64, struct_v4l2_format)
+/* VIDIOC_ENUMAUDIO		_IOWR('V',  65, struct v4l2_audio) */
+/* VIDIOC_ENUMAUDOUT		_IOWR('V',  66, struct v4l2_audioout) */
+/* VIDIOC_G_PRIORITY		_IOR ('V',  67, uint32_t) */ /* enum v4l2_priority */
+/* VIDIOC_S_PRIORITY		_IOW ('V',  68, uint32_t) */ /* enum v4l2_priority */
+/* VIDIOC_G_SLICED_VBI_CAP		_IOWR('V',  69, struct_v4l2_sliced_vbi_cap) - added in v2.6.16.28-rc1~3732 */
+/* VIDIOC_LOG_STATUS		_IO  ('V',  70) - added in v2.6.16.28-rc1~2961 */
+/* VIDIOC_G_EXT_CTRLS		_IOWR('V',  71, struct_v4l2_ext_controls) - added in v2.6.18-rc1~862^2~18 */
+/* VIDIOC_S_EXT_CTRLS		_IOWR('V',  72, struct_v4l2_ext_controls) - added in v2.6.18-rc1~862^2~18 */
+/* VIDIOC_TRY_EXT_CTRLS		_IOWR('V',  73, struct_v4l2_ext_controls) - added in v2.6.18-rc1~862^2~18 */
+/* VIDIOC_ENUM_FRAMESIZES		_IOWR('V',  74, struct v4l2_frmsizeenum) - added in v2.6.19-rc1~183 */
+/* VIDIOC_ENUM_FRAMEINTERVALS	_IOWR('V',  75, struct v4l2_frmivalenum) - added in v2.6.19-rc1~183 */
+/* VIDIOC_G_ENC_INDEX		_IOR ('V',  76, struct v4l2_enc_idx) - added in v2.6.21-rc3~150^2~2*/
+/* VIDIOC_ENCODER_CMD		_IOWR('V',  77, struct v4l2_encoder_cmd) - added in v2.6.21-rc3~150^2~1 */
+/* VIDIOC_TRY_ENCODER_CMD		_IOWR('V',  78, struct v4l2_encoder_cmd) - added in v2.6.21-rc3~150^2~1 */
+/* VIDIOC_DBG_S_REGISTER		_IOW ('V',  79, struct v4l2_dbg_register) - added in v2.6.29-rc1~523^2~24 */
+/* VIDIOC_DBG_G_REGISTER		_IOWR('V',  80, struct v4l2_dbg_register) - added in v2.6.29-rc1~523^2~24 */
+/* VIDIOC_G_CHIP_IDENT_OLD	_IOWR('V', 81, struct v4l2_chip_ident_old) - added in v2.6.22-rc1~1118^2~172, renamed in v2.6.29-rc1~523^2~24, removed in v2.6.30-rc1~621^2~278 */
+/* VIDIOC_DBG_G_CHIP_IDENT	_IOWR('V', 81, struct v4l2_dbg_chip_ident) - added in v2.6.29-rc1~523^2~24, removed in v3.11-rc1~17^2~99 */
+/* VIDIOC_S_HW_FREQ_SEEK		_IOW ('V',  82, struct v4l2_hw_freq_seek) - added in v2.6.27-rc1~966^2~258 */
+/* VIDIOC_ENUM_DV_PRESETS	_IOWR('V', 83, struct v4l2_dv_enum_preset) - added in v2.6.33-rc1~70^2~91, removed in v3.10-rc1~136^2~239 */
+/* VIDIOC_S_DV_PRESET		_IOWR('V', 84, struct v4l2_dv_preset) - added in v2.6.33-rc1~70^2~91, removed in v3.10-rc1~136^2~239 */
+/* VIDIOC_G_DV_PRESET		_IOWR('V', 85, struct v4l2_dv_preset) - added in v2.6.33-rc1~70^2~91, removed in v3.10-rc1~136^2~239 */
+/* VIDIOC_QUERY_DV_PRESET	_IOR('V',  86, struct v4l2_dv_preset) - added in v2.6.33-rc1~70^2~91, removed in v3.10-rc1~136^2~239 */
+/* VIDIOC_S_DV_TIMINGS		_IOWR('V',  87, struct v4l2_dv_timings) - added in v2.6.33-rc1~70^2~91 */
+/* VIDIOC_G_DV_TIMINGS		_IOWR('V',  88, struct v4l2_dv_timings) - added in v2.6.33-rc1~70^2~91 */
+/* VIDIOC_DQEVENT			_IOR ('V',  89, struct v4l2_event) - added in v2.6.35-rc1~480^2~121 */
+/* VIDIOC_SUBSCRIBE_EVENT		_IOW ('V',  90, struct v4l2_event_subscription) - added in v2.6.35-rc1~480^2~121 */
+/* VIDIOC_UNSUBSCRIBE_EVENT	_IOW ('V',  91, struct v4l2_event_subscription) - added in v2.6.35-rc1~480^2~121 */
+/* VIDIOC_CREATE_BUFS		_IOWR('V',  92, struct v4l2_create_buffers) - added in v3.2-rc1~63^2~55 */
+/* VIDIOC_PREPARE_BUF		_IOWR('V',  93, struct_v4l2_buffer) - added in v3.2-rc1~63^2~55 */
+/* VIDIOC_G_SELECTION		_IOWR('V',  94, struct v4l2_selection) - added in v3.3-rc1~48^2~18 */
+/* VIDIOC_S_SELECTION		_IOWR('V',  95, struct v4l2_selection) - added in v3.3-rc1~48^2~18 */
+/* VIDIOC_DECODER_CMD		_IOWR('V',  96, struct v4l2_decoder_cmd) - added in v3.4-rc1~110^2^2~239 */
+/* VIDIOC_TRY_DECODER_CMD		_IOWR('V',  97, struct v4l2_decoder_cmd) - added in v3.4-rc1~110^2^2~239 */
+/* VIDIOC_ENUM_DV_TIMINGS		_IOWR('V',  98, struct v4l2_enum_dv_timings) - added in v3.5-rc1~104^2~100, changed in v3.5-rc5~26^2~41 */
+/* VIDIOC_QUERY_DV_TIMINGS		_IOR ('V',  99, struct v4l2_dv_timings) - added in v3.5-rc1~104^2~100, changed in v3.5-rc5~26^2~41 */
+/* VIDIOC_DV_TIMINGS_CAP		_IOWR('V', 100, struct v4l2_dv_timings_cap) - added in v3.5-rc1~104^2~100, changed in v3.5-rc5~26^2~41 */
+/* VIDIOC_ENUM_FREQ_BANDS		_IOWR('V', 101, struct v4l2_frequency_band) - added in v3.6-rc1~28^2~46 */
+/* VIDIOC_DBG_G_CHIP_INFO		_IOWR('V', 102, struct v4l2_dbg_chip_info) - added in v3.10-rc1~136^2~200 as VIDIOC_DBG_G_CHIP_NAME, renamed in v3.10-rc1~136^2~42 */
+/* VIDIOC_QUERY_EXT_CTRL		_IOWR('V', 103, struct v4l2_query_ext_ctrl) - added in v3.17-rc1~112^2~362 */
+
+/* subdev ioctls */
+/* VIDIOC_SUBDEV_ENUM_MBUS_CODE	_IOWR('V',  2, struct v4l2_subdev_mbus_code_enum) */
+/* VIDIOC_SUBDEV_G_FMT		_IOWR('V',  4, struct v4l2_subdev_format) */
+/* VIDIOC_SUBDEV_S_FMT		_IOWR('V',  5, struct v4l2_subdev_format) */
+/* VIDIOC_SUBDEV_G_FRAME_INTERVAL	_IOWR('V', 21, struct v4l2_subdev_frame_interval) - added in v2.6.39-rc1~86^2~163 */
+/* VIDIOC_SUBDEV_S_FRAME_INTERVAL	_IOWR('V', 22, struct v4l2_subdev_frame_interval) - added in v2.6.39-rc1~86^2~163 */
+/* VIDIOC_SUBDEV_G_CROP		_IOWR('V', 59, struct v4l2_subdev_crop) - added in v2.6.39-rc1~86^2~162 */
+/* VIDIOC_SUBDEV_S_CROP		_IOWR('V', 60, struct v4l2_subdev_crop) - added in v2.6.39-rc1~86^2~162 */
+/* VIDIOC_SUBDEV_G_SELECTION	_IOWR('V', 61, struct v4l2_subdev_selection) - added in v3.5-rc1~104^2~443  */
+/* VIDIOC_SUBDEV_S_SELECTION	_IOWR('V', 62, struct v4l2_subdev_selection) - added in v3.5-rc1~104^2~443 */
+/* VIDIOC_SUBDEV_ENUM_FRAME_SIZE	_IOWR('V', 74, struct v4l2_subdev_frame_size_enum) */
+/* VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL	_IOWR('V', 75, struct v4l2_subdev_frame_interval_enum) - added in v2.6.39-rc1~86^2~163 */
