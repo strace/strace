@@ -661,13 +661,26 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_control_classes.h"
 #include "xlat/v4l2_control_id_bases.h"
 #include "xlat/v4l2_control_ids.h"
+#include "xlat/v4l2_control_query_flags.h"
 
 static void
-print_v4l2_cid(const uint32_t cid)
+print_v4l2_cid(uint32_t cid, bool next_flags)
 {
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
 		tprintf("%#x", cid);
 		return;
+	}
+
+	if (next_flags) {
+		uint32_t flags = cid & v4l2_control_query_flags->flags_mask;
+
+		if (flags) {
+			printflags(v4l2_control_query_flags, flags,
+				   "V4L2_CTRL_FLAG_NEXT_???");
+			tprints("|");
+
+			cid &= ~flags;
+		}
 	}
 
 	const char *id_name = xlookup(v4l2_control_ids, cid);
@@ -707,7 +720,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 			return RVAL_IOCTL_DECODED;
 
 		tprints("{id=");
-		print_v4l2_cid(c.id);
+		print_v4l2_cid(c.id, false);
 		if (!is_get)
 			tprintf(", value=%d", c.value);
 		return 0;
@@ -773,7 +786,6 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 
 #include "xlat/v4l2_control_types.h"
 #include "xlat/v4l2_control_flags.h"
-#include "xlat/v4l2_control_query_flags.h"
 
 static int
 print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
