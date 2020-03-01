@@ -1005,6 +1005,13 @@ print_local_array_ex(struct tcb *tcp,
 			     sizeof((start_addr_)[0]), (print_func_),        \
 			     NULL, 0, NULL, NULL)
 
+#define print_local_array_upto(tcp_, start_addr_, upto_, print_func_)	     \
+	print_local_array_ex((tcp_), (start_addr_),			     \
+			     CLAMP((upto_), 0,				     \
+				   (typeof(upto_)) ARRAY_SIZE(start_addr_)), \
+			     sizeof((start_addr_)[0]), (print_func_),        \
+			     NULL, 0, NULL, NULL)
+
 extern kernel_ulong_t *
 fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_args);
 
