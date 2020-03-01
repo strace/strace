@@ -665,6 +665,11 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 static void
 print_v4l2_cid(const uint32_t cid)
 {
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#x", cid);
+		return;
+	}
+
 	const char *id_name = xlookup(v4l2_control_ids, cid);
 
 	if (id_name) {
