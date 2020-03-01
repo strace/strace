@@ -811,6 +811,7 @@ AC_CHECK_TYPES(m4_normalize([
 	struct v4l2_meta_format,
 	struct v4l2_pix_format_mplane,
 	struct v4l2_plane_pix_format,
+	struct v4l2_query_ext_ctrl,
 	struct v4l2_sdr_format
 ]),,, [#include <sys/time.h>
 #include <linux/ioctl.h>

@@ -633,9 +633,6 @@ main(void)
 #ifdef VIDIOC_DBG_G_CHIP_INFO
 		{ ARG_STR(VIDIOC_DBG_G_CHIP_INFO) },
 #endif
-#ifdef VIDIOC_QUERY_EXT_CTRL
-		{ ARG_STR(VIDIOC_QUERY_EXT_CTRL) },
-#endif
 #ifdef VIDIOC_SUBDEV_ENUM_MBUS_CODE
 		{ ARG_STR(VIDIOC_SUBDEV_ENUM_MBUS_CODE) },
 #endif
@@ -1406,6 +1403,28 @@ main(void)
 	       p_v4l2_create_buffers->memory,
 	       p_v4l2_create_buffers->format.type);
 #endif /* VIDIOC_CREATE_BUFS */
+
+#ifdef VIDIOC_QUERY_EXT_CTRL
+	ioctl(-1, VIDIOC_QUERY_EXT_CTRL, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL));
+
+	struct v4l2_query_ext_ctrl *const p_v4l2_query_ext_ctrl =
+		page_end - sizeof(*p_v4l2_query_ext_ctrl);
+	ioctl(-1, VIDIOC_QUERY_EXT_CTRL, p_v4l2_query_ext_ctrl);
+	printf("ioctl(-1, %s, {id="
+#if WORDS_BIGENDIAN
+	       RAW("0x98999a9b") VERB("0x80000000 /* ")
+	       NRAW("V4L2_CTRL_FLAG_NEXT_CTRL") VERB(" */")
+	       NRAW("|0x18999a9b /* V4L2_CID_??? */")
+#else
+	       RAW("0x9b9a9998") VERB("0x80000000 /* ")
+	       NRAW("V4L2_CTRL_FLAG_NEXT_CTRL") VERB(" */")
+	       NRAW("|0x1b9a9998 /* V4L2_CID_??? */")
+#endif
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL));
+#endif /* VIDIOC_QUERY_EXT_CTRL */
 
 	puts("+++ exited with 0 +++");
 	return 0;

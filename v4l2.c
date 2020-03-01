@@ -60,6 +60,9 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 #endif
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
+#ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
+#endif
 #ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
 #endif
@@ -837,67 +840,59 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
-static void
-print_v4l2_query_ctrl_id(unsigned long id)
-{
-	if (id & V4L2_CTRL_FLAG_NEXT_CTRL) {
-		tprints("V4L2_CTRL_FLAG_NEXT_CTRL|");
-		id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
-	}
-	if (id & V4L2_CTRL_FLAG_NEXT_COMPOUND) {
-		tprints("V4L2_CTRL_FLAG_NEXT_COMPOUND|");
-		id &= ~V4L2_CTRL_FLAG_NEXT_COMPOUND;
-	}
-	printxval(v4l2_control_ids, id, NULL);
-}
-
 static int
 print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_query_ext_ctrl c;
+	struct_v4l2_query_ext_ctrl c;
 
-#define NEXT_FLAGS (V4L2_CTRL_FLAG_NEXT_CTRL|V4L2_CTRL_FLAG_NEXT_COMPOUND)
 	if (entering(tcp)) {
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 		set_tcb_priv_ulong(tcp, c.id);
-		tprints("{id");
-		if (!(c.id & NEXT_FLAGS) || !abbrev(tcp)) {
-			tprints("=");
-			print_v4l2_query_ctrl_id(c.id);
-		}
-	} else {
-		unsigned long entry_id = get_tcb_priv_ulong(tcp);
+		tprints("{id=");
+		print_v4l2_cid(c.id, true);
 
-		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
-			if (abbrev(tcp) && (entry_id & NEXT_FLAGS)) {
-				tprints("=");
-				print_v4l2_query_ctrl_id(entry_id);
-			}
-			tprints("}");
-			return RVAL_IOCTL_DECODED;
-		}
-		if (entry_id & NEXT_FLAGS) {
-			tprints(" => ");
-			print_v4l2_query_ctrl_id(c.id);
-		}
+		return 0;
 	}
-#undef NEXT_FLAGS
 
-	if (exiting(tcp)) {
-		tprints(", type=");
-		printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
-		PRINT_FIELD_CSTRING(", ", c, name);
-		if (!abbrev(tcp)) {
-			tprintf(", minimum=%lld, maximum=%lld, step=%lld"
-				", default_value=%lld, flags=",
-				c.minimum, c.maximum, c.step, c.default_value);
-			printflags(v4l2_control_flags, c.flags, "V4L2_CTRL_FLAG_???");
-		}
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
 		tprints("}");
+		return RVAL_IOCTL_DECODED;
 	}
-	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
+
+	unsigned long entry_id = get_tcb_priv_ulong(tcp);
+
+	if (c.id != entry_id) {
+		tprints(" => ");
+		print_v4l2_cid(c.id, false);
+	}
+
+	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
+			 "V4L2_CTRL_TYPE_???");
+	PRINT_FIELD_CSTRING(", ", c, name);
+	if (!abbrev(tcp)) {
+		PRINT_FIELD_D(", ", c, minimum);
+		PRINT_FIELD_D(", ", c, maximum);
+		PRINT_FIELD_U(", ", c, step);
+		PRINT_FIELD_D(", ", c, default_value);
+		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
+				  "V4L2_CTRL_FLAG_???");
+		PRINT_FIELD_U(", ", c, elem_size);
+		PRINT_FIELD_U(", ", c, elems);
+		PRINT_FIELD_U(", ", c, nr_of_dims);
+		PRINT_FIELD_ARRAY_UPTO(", ", c, dims, tcp, c.nr_of_dims,
+				       print_uint32_array_member);
+		if (!IS_ARRAY_ZERO(c.reserved))
+			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,
+					  print_xint32_array_member);
+	} else {
+		tprints(", ...");
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
 }
 
 static int

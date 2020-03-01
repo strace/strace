@@ -87,7 +87,7 @@ VIDIOC_CREATE_BUFS		_IOWR('V',  92, struct_v4l2_create_buffers) /* added in v3.2
 /* VIDIOC_DV_TIMINGS_CAP		_IOWR('V', 100, struct v4l2_dv_timings_cap) - added in v3.5-rc1~104^2~100, changed in v3.5-rc5~26^2~41 */
 /* VIDIOC_ENUM_FREQ_BANDS		_IOWR('V', 101, struct v4l2_frequency_band) - added in v3.6-rc1~28^2~46 */
 /* VIDIOC_DBG_G_CHIP_INFO		_IOWR('V', 102, struct v4l2_dbg_chip_info) - added in v3.10-rc1~136^2~200 as VIDIOC_DBG_G_CHIP_NAME, renamed in v3.10-rc1~136^2~42 */
-/* VIDIOC_QUERY_EXT_CTRL		_IOWR('V', 103, struct v4l2_query_ext_ctrl) - added in v3.17-rc1~112^2~362 */
+VIDIOC_QUERY_EXT_CTRL		_IOWR('V', 103, struct_v4l2_query_ext_ctrl) /* added in v3.17-rc1~112^2~362 */
 
 /* subdev ioctls */
 /* VIDIOC_SUBDEV_ENUM_MBUS_CODE	_IOWR('V',  2, struct v4l2_subdev_mbus_code_enum) */
