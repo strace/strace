@@ -796,38 +796,36 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+		set_tcb_priv_ulong(tcp, c.id);
 		tprints("{id=");
-	} else {
-		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
-			tprints("}");
-			return RVAL_IOCTL_DECODED;
-		}
-		if (get_tcb_priv_ulong(tcp))
-			tprints(" => ");
+		print_v4l2_cid(c.id, true);
+
+		return 0;
 	}
 
-	if (entering(tcp) || get_tcb_priv_ulong(tcp)) {
-		const unsigned long next = c.id & V4L2_CTRL_FLAG_NEXT_CTRL;
-		set_tcb_priv_ulong(tcp, next);
-		if (next) {
-			print_xlat(V4L2_CTRL_FLAG_NEXT_CTRL);
-			tprints("|");
-			c.id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
-		}
-		printxval(v4l2_control_ids, c.id, "V4L2_CID_???");
-	}
-
-	if (exiting(tcp)) {
-		tprints(", type=");
-		printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
-		PRINT_FIELD_CSTRING(", ", c, name);
-		tprintf(", minimum=%d, maximum=%d, step=%d"
-			", default_value=%d, flags=",
-			c.minimum, c.maximum, c.step, c.default_value);
-		printflags(v4l2_control_flags, c.flags, "V4L2_CTRL_FLAG_???");
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
 		tprints("}");
+		return RVAL_IOCTL_DECODED;
 	}
-	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
+
+	unsigned long entry_id = get_tcb_priv_ulong(tcp);
+
+	if (c.id != entry_id) {
+		tprints(" => ");
+		print_v4l2_cid(c.id, false);
+	}
+
+	tprints(", type=");
+	printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
+	PRINT_FIELD_CSTRING(", ", c, name);
+	tprintf(", minimum=%d, maximum=%d, step=%d"
+		", default_value=%d, flags=",
+		c.minimum, c.maximum, c.step, c.default_value);
+	printflags(v4l2_control_flags, c.flags, "V4L2_CTRL_FLAG_???");
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
 }
 
 static int

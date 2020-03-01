@@ -1147,10 +1147,21 @@ main(void)
 	struct v4l2_queryctrl *const p_v4l2_queryctrl =
 		page_end - sizeof(*p_v4l2_queryctrl);
 	ioctl(-1, VIDIOC_QUERYCTRL, p_v4l2_queryctrl);
-	printf("ioctl(-1, %s, {id=" XLAT_FMT "|%#x" NRAW(" /* V4L2_CID_??? */")
+	printf("ioctl(-1, %s, {id="
+#if XLAT_RAW
+	      "%#x"
+#else
+	       XLAT_FMT "|%#x /* V4L2_CID_??? */"
+#endif
 	       "}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_QUERYCTRL), XLAT_ARGS(V4L2_CTRL_FLAG_NEXT_CTRL),
-	       p_v4l2_queryctrl->id & ~V4L2_CTRL_FLAG_NEXT_CTRL);
+	       XLAT_STR(VIDIOC_QUERYCTRL),
+#if XLAT_RAW
+	       p_v4l2_queryctrl->id
+#else
+	       XLAT_ARGS(V4L2_CTRL_FLAG_NEXT_CTRL),
+	       p_v4l2_queryctrl->id & ~V4L2_CTRL_FLAG_NEXT_CTRL
+#endif
+	       );
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_queryctrl, p_queryctrl);
 	p_queryctrl->id = V4L2_CID_SATURATION;
