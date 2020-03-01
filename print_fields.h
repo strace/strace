@@ -153,6 +153,14 @@
 				  (print_func_));			\
 	} while (0)
 
+# define PRINT_FIELD_ARRAY_UPTO(prefix_, where_, field_, tcp_, max_,	\
+				print_func_)				\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_local_array_upto((tcp_), (where_).field_, (max_),	\
+				  (print_func_));			\
+	} while (0)
+
 # define PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
