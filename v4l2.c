@@ -63,6 +63,9 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 #endif
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
+#ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
+#endif
 #ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
 #endif
@@ -910,6 +913,60 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 static int
+print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct_v4l2_query_ext_ctrl c;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &c))
+			return RVAL_IOCTL_DECODED;
+		set_tcb_priv_ulong(tcp, c.id);
+		PRINT_FIELD_V4L2_CID("{", c, id, true);
+
+		return 0;
+	}
+
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
+		tprints("}");
+		return RVAL_IOCTL_DECODED;
+	}
+
+	unsigned long entry_id = get_tcb_priv_ulong(tcp);
+
+	if (c.id != entry_id) {
+		tprints(" => ");
+		print_v4l2_cid(c.id, false);
+	}
+
+	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
+			 "V4L2_CTRL_TYPE_???");
+	PRINT_FIELD_CSTRING(", ", c, name);
+	if (!abbrev(tcp)) {
+		PRINT_FIELD_D(", ", c, minimum);
+		PRINT_FIELD_D(", ", c, maximum);
+		PRINT_FIELD_U(", ", c, step);
+		PRINT_FIELD_D(", ", c, default_value);
+		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
+				  "V4L2_CTRL_FLAG_???");
+		PRINT_FIELD_U(", ", c, elem_size);
+		PRINT_FIELD_U(", ", c, elems);
+		PRINT_FIELD_U(", ", c, nr_of_dims);
+		PRINT_FIELD_ARRAY_UPTO(", ", c, dims, c.nr_of_dims, tcp,
+				       print_uint32_array_member);
+		if (!IS_ARRAY_ZERO(c.reserved))
+			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,
+					  print_xint32_array_member);
+	} else {
+		tprints(", ...");
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
 print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct v4l2_cropcap c;
@@ -1237,6 +1294,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_QUERYCTRL: /* RW */
 		return print_v4l2_queryctrl(tcp, arg);
+
+	case VIDIOC_QUERY_EXT_CTRL: /* RW */
+		return print_v4l2_query_ext_ctrl(tcp, arg);
 
 	case VIDIOC_G_INPUT: /* R */
 		if (entering(tcp))

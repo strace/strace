@@ -196,6 +196,24 @@ typedef struct {
 } struct_v4l2_ext_controls;
 
 
+/** Added by Linux commit v3.17-rc1~112^2~362 */
+typedef struct {
+	uint32_t id;
+	uint32_t type;
+	char     name[32];
+	int64_t  minimum;
+	int64_t  maximum;
+	uint64_t step; /* Signedness differs from v4l2_queryctrl.step */
+	int64_t  default_value;
+	uint32_t flags; /* V4L2_CTRL_FLAG_* */
+	uint32_t elem_size;
+	uint32_t elems;
+	uint32_t nr_of_dims;
+	uint32_t dims[4 /* V4L2_CTRL_MAX_DIMS */];
+	uint32_t reserved[32];
+} struct_v4l2_query_ext_ctrl;
+
+
 typedef struct {
 	uint32_t width;
 	uint32_t height;

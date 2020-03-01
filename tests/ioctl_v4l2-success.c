@@ -1472,6 +1472,94 @@ main(int argc, char **argv)
 	}
 #endif /* HAVE_STRUCT_V4L2_CREATE_BUFFERS */
 
+#ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
+	/* VIDIOC_QUERY_EXT_CTRL */
+	static const struct strval32 qextc_nrdims[] = {
+		{ ARG_STR(0) },
+		{ ARG_STR(3) },
+		{ ARG_STR(4) },
+		{ ARG_STR(5) },
+		{ ARG_STR(3141592653) },
+	};
+
+	static const size_t qextc_iters = MAX(MAX(MAX(ARRAY_SIZE(cids),
+						      ARRAY_SIZE(ctrl_types)),
+						  ARRAY_SIZE(ctrl_flags)),
+					      ARRAY_SIZE(qextc_nrdims));
+
+	struct v4l2_query_ext_ctrl *qextc = tail_alloc(sizeof(*qextc));
+
+	fill_memory32(qextc, sizeof(*qextc));
+
+	ioctl(-1, VIDIOC_QUERY_EXT_CTRL, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL), inject_retval);
+
+	ioctl(-1, VIDIOC_QUERY_EXT_CTRL, (char *) qextc + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL),
+	       (char *) qextc + 1, inject_retval);
+
+	for (size_t i = 0; i < qextc_iters; i++) {
+		fill_memory32(qextc, sizeof(*qextc));
+		fill_memory_ex(qextc->name, sizeof(qextc->name),
+			       i * 49 + 23, 255);
+		qextc->id    = cids[i % ARRAY_SIZE(cids)].val;
+		qextc->type  = ctrl_types[i % ARRAY_SIZE(ctrl_types)].val;
+		qextc->flags = ctrl_flags[i % ARRAY_SIZE(ctrl_flags)].val;
+		qextc->nr_of_dims =
+			qextc_nrdims[ i % ARRAY_SIZE(qextc_nrdims)].val;
+
+		qextc->minimum       = 0xbadc0deddeadfaceULL;
+		qextc->maximum       = 0xdecaffedbeeff00dULL;
+		qextc->step          = 0xbeaded1dea5a51deULL;
+		qextc->default_value = 0xca5efade1cedbeefULL;
+
+		for (size_t j = 0; j < 2; j++) {
+			ioctl(-1, VIDIOC_QUERY_EXT_CTRL, qextc);
+			printf("ioctl(-1, %s, {id=%s, type=%s, name=",
+			       XLAT_STR(VIDIOC_QUERY_EXT_CTRL),
+			       cids[i % ARRAY_SIZE(cids)].str,
+			       ctrl_types[i % ARRAY_SIZE(ctrl_types)].str);
+			print_quoted_cstring((char *) qextc->name,
+					     sizeof(qextc->name));
+# if VERBOSE
+			printf(", minimum=-4982091772484257074"
+			       ", maximum=-2392818855418269683"
+			       ", step=13739898750918873566"
+			       ", default_value=-3864375598362280209, flags=%s"
+			       ", elem_size=2158018803, elems=2158018804"
+			       ", nr_of_dims=%s, dims=[%s%s]%s",
+			       ctrl_flags[i % ARRAY_SIZE(ctrl_flags)].str,
+			       qextc_nrdims[i % ARRAY_SIZE(qextc_nrdims)].str,
+			       qextc_nrdims[i % ARRAY_SIZE(qextc_nrdims)].val
+				? "2158018806, 2158018807, 2158018808" : "",
+			       qextc_nrdims[i % ARRAY_SIZE(qextc_nrdims)].val >
+				3 ? ", 2158018809" : "",
+			       j ? "" : ", reserved=[0x80a0c0fa"
+				", 0x80a0c0fb, 0x80a0c0fc, 0x80a0c0fd"
+				", 0x80a0c0fe, 0x80a0c0ff, 0x80a0c100"
+				", 0x80a0c101, 0x80a0c102, 0x80a0c103"
+				", 0x80a0c104, 0x80a0c105, 0x80a0c106"
+				", 0x80a0c107, 0x80a0c108, 0x80a0c109"
+				", 0x80a0c10a, 0x80a0c10b, 0x80a0c10c"
+				", 0x80a0c10d, 0x80a0c10e, 0x80a0c10f"
+				", 0x80a0c110, 0x80a0c111, 0x80a0c112"
+				", 0x80a0c113, 0x80a0c114, 0x80a0c115"
+				", 0x80a0c116, 0x80a0c117, 0x80a0c118"
+				", 0x80a0c119]"
+			);
+# else
+			printf(", ...");
+# endif
+			printf("}) = %ld (INJECTED)\n", inject_retval);
+
+			memset(qextc->reserved, 0, sizeof(qextc->reserved));
+		}
+	}
+
+#endif /* HAVE_STRUCT_V4L2_QUERY_EXT_CTRL */
+
 	puts("+++ exited with 0 +++");
 
 	return 0;
