@@ -77,6 +77,10 @@ typedef struct v4l2_standard struct_v4l2_standard;
 #include "xlat/v4l2_pix_fmts.h"
 #include "xlat/v4l2_sdr_fmts.h"
 
+#define XLAT_MACROS_ONLY
+# include "xlat/v4l2_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
+
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 {
