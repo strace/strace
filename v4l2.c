@@ -816,13 +816,22 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		print_v4l2_cid(c.id, false);
 	}
 
-	tprints(", type=");
-	printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
+	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
+			 "V4L2_CTRL_TYPE_???");
 	PRINT_FIELD_CSTRING(", ", c, name);
-	tprintf(", minimum=%d, maximum=%d, step=%d"
-		", default_value=%d, flags=",
-		c.minimum, c.maximum, c.step, c.default_value);
-	printflags(v4l2_control_flags, c.flags, "V4L2_CTRL_FLAG_???");
+	if (!abbrev(tcp)) {
+		PRINT_FIELD_D(", ", c, minimum);
+		PRINT_FIELD_D(", ", c, maximum);
+		PRINT_FIELD_D(", ", c, step);
+		PRINT_FIELD_D(", ", c, default_value);
+		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
+				  "V4L2_CTRL_FLAG_???");
+		if (!IS_ARRAY_ZERO(c.reserved))
+			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,
+					  print_xint32_array_member);
+	} else {
+		tprints(", ...");
+	}
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
