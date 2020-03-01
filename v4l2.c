@@ -680,14 +680,14 @@ print_v4l2_cid(const uint32_t cid)
 		return;
 	}
 
-	char *tmp_str;
+	/*
+	 * As of now, the longest control class name is V4L2_CTRL_CLASS_IMAGE_SOURCE,
+	 * of 28 characters long.
+	 */
+	char tmp_str[64 + sizeof("+%#") + sizeof(class_id) * 2];
 
-	if (asprintf(&tmp_str, "%s+%#" PRIx64,
-		     class_str, cid - class_id) < 0)
-		tmp_str = NULL;
-
+	xsprintf(tmp_str, "%s+%#" PRIx64, class_str, cid - class_id);
 	print_xlat_ex(cid, tmp_str, XLAT_STYLE_DEFAULT);
-	free(tmp_str);
 }
 
 static int
