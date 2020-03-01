@@ -1064,13 +1064,20 @@ main(int argc, char **argv)
 	static const struct strval32 cids[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_CID_???") },
 		{ ARG_XLAT_UNKNOWN(0x97abcd, "V4L2_CID_???") },
-		{ ARG_XLAT_UNKNOWN(0x980000, "V4L2_CID_???") },
+		{ ARG_XLAT_KNOWN(0x980000, "V4L2_CTRL_CLASS_USER+0") },
 		{ ARG_XLAT_KNOWN(0x990a64,
 				 "V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE") },
-		{ ARG_XLAT_UNKNOWN(0xa31234, "V4L2_CID_???") },
+		{ ARG_XLAT_KNOWN(0xa31234, "V4L2_CTRL_CLASS_DETECT+0x1234") },
 		{ ARG_XLAT_UNKNOWN(0xa40000, "V4L2_CID_???") },
-		{ 0xdeadc0de, XLAT_KNOWN(0x80000000, "V4L2_CTRL_FLAG_NEXT_CTRL")
-			      "|" XLAT_UNKNOWN(0x5eadc0de, "V4L2_CID_???") },
+		{ 0xdeadc0de,
+#if XLAT_RAW
+		  "0xdeadc0de"
+#else
+		  XLAT_KNOWN(0xc0000000, "V4L2_CTRL_FLAG_NEXT_CTRL"
+					 "|V4L2_CTRL_FLAG_NEXT_COMPOUND")
+		  "|0x1eadc0de /* V4L2_CID_??? */"
+#endif
+			      },
 	};
 	static const struct strval32 ctrl_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_CTRL_TYPE_???") },
@@ -1140,13 +1147,9 @@ main(int argc, char **argv)
 		qctrl->flags = ctrl_flags[i % ARRAY_SIZE(ctrl_flags)].val;
 
 		ioctl(-1, VIDIOC_QUERYCTRL, qctrl);
-		printf("ioctl(-1, %s, {id=%s%s%s, type=%s, name=",
+		printf("ioctl(-1, %s, {id=%s, type=%s, name=",
 		       XLAT_STR(VIDIOC_QUERYCTRL),
 		       cids[i % ARRAY_SIZE(cids)].str,
-		       cids[i % ARRAY_SIZE(cids)].val & 0x80000000
-			? " => " : "",
-		       cids[i % ARRAY_SIZE(cids)].val & 0x80000000
-			? cids[i % ARRAY_SIZE(cids)].str : "",
 		       ctrl_types[i % ARRAY_SIZE(ctrl_types)].str);
 		print_quoted_cstring((char *) qctrl->name, sizeof(qctrl->name));
 		printf(", minimum=-2136948502, maximum=-2136948501"
