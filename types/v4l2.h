@@ -16,7 +16,6 @@
 #include <linux/videodev2.h>
 
 typedef struct v4l2_buffer struct_v4l2_buffer;
-typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
 typedef struct v4l2_input struct_v4l2_input;
 typedef struct v4l2_standard struct_v4l2_standard;
 
@@ -213,6 +212,29 @@ typedef struct {
 	uint32_t dims[4 /* V4L2_CTRL_MAX_DIMS */];
 	uint32_t reserved[32];
 } struct_v4l2_query_ext_ctrl;
+
+
+typedef struct {
+        uint32_t capability;
+        uint32_t flags;
+        void *   base;
+	/*
+	 * struct v4l2_framebuffer embeds (a part of) struct v4l2_pix_format
+	 * in order to allow the latter to grow without breaking the API/ABI
+	 * (v4l2 developers don't allow the structures whose sizes are in ioctl
+	 * numbers to change their size).
+	 */
+        struct {
+                uint32_t width;
+                uint32_t height;
+                uint32_t pixelformat;
+                uint32_t field;          /** enum v4l2_field */
+                uint32_t bytesperline;
+                uint32_t sizeimage;
+                uint32_t colorspace;     /** enum v4l2_colorspace */
+                uint32_t priv;
+        } fmt;
+} struct_v4l2_framebuffer;
 
 
 typedef struct {

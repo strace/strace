@@ -60,6 +60,7 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 #endif
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
+CHECK_V4L2_STRUCT_SIZE(v4l2_framebuffer);
 #ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
 #endif
@@ -513,18 +514,42 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 	return RVAL_IOCTL_DECODED;
 }
 
+#include "xlat/v4l2_framebuffer_capabilities.h"
+#include "xlat/v4l2_framebuffer_flags.h"
+
 static int
 print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct_v4l2_framebuffer b;
 
 	tprints(", ");
-	if (!umove_or_printaddr(tcp, arg, &b)) {
-		tprintf("{capability=%#x, flags=%#x, base=",
-			b.capability, b.flags);
-		printaddr(ptr_to_kulong(b.base));
+	if (umove_or_printaddr(tcp, arg, &b))
+		return RVAL_IOCTL_DECODED;
+
+	PRINT_FIELD_FLAGS("{", b, capability,
+			  v4l2_framebuffer_capabilities,
+			  "V4L2_FBUF_CAP_???");
+	PRINT_FIELD_FLAGS(", ", b, flags, v4l2_framebuffer_flags,
+			  "V4L2_FBUF_FLAG_???");
+	PRINT_FIELD_PTR(", ", b, base);
+
+	if (!abbrev(tcp)) {
+		PRINT_FIELD_U(", fmt={", b.fmt, width);
+		PRINT_FIELD_U(", ", b.fmt, height);
+		PRINT_FIELD_PIXFMT(", ", b.fmt, pixelformat, v4l2_pix_fmts);
+		PRINT_FIELD_XVAL(", ", b.fmt, field, v4l2_fields,
+				 "V4L2_FIELD_???");
+		PRINT_FIELD_U(", ", b.fmt, bytesperline);
+		PRINT_FIELD_U(", ", b.fmt, sizeimage);
+		PRINT_FIELD_XVAL(", ", b.fmt, colorspace, v4l2_colorspaces,
+				 "V4L2_COLORSPACE_???");
+		PRINT_FIELD_X(", ", b.fmt, priv);
 		tprints("}");
+	} else {
+		tprints(", ...");
 	}
+
+	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
 }

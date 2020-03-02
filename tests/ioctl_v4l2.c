@@ -1009,13 +1009,74 @@ main(void)
 
 	struct v4l2_framebuffer *const p_v4l2_framebuffer =
 		page_end - sizeof(*p_v4l2_framebuffer);
+	fill_memory32_ex(&p_v4l2_framebuffer->fmt,
+			 sizeof(p_v4l2_framebuffer->fmt),
+			 0xdeadface, 0x80000000);
 	ioctl(-1, VIDIOC_S_FBUF, p_v4l2_framebuffer);
-	printf("ioctl(-1, %s, {capability=%#x"
-	       ", flags=%#x, base=%p}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_S_FBUF),
-	       p_v4l2_framebuffer->capability,
-	       p_v4l2_framebuffer->flags,
-	       p_v4l2_framebuffer->base);
+	printf("ioctl(-1, %s, {capability="
+#if SIZEOF_LONG > 4
+# if WORDS_BIGENDIAN
+	       XLAT_KNOWN(0xd0d1d2d3, "V4L2_FBUF_CAP_EXTERNOVERLAY"
+			  "|V4L2_FBUF_CAP_CHROMAKEY|V4L2_FBUF_CAP_LOCAL_ALPHA"
+			  "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+			  "|V4L2_FBUF_CAP_SRC_CHROMAKEY|0xd0d1d200")
+# else /* !WORDS_BIGENDIAN */
+	       XLAT_KNOWN(0xd3d2d1d0, "V4L2_FBUF_CAP_LOCAL_ALPHA"
+			  "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+			  "|V4L2_FBUF_CAP_SRC_CHROMAKEY|0xd3d2d100")
+# endif /* WORDS_BIGENDIAN */
+#else /* SIZEOF_LONG == 4 */
+# if WORDS_BIGENDIAN
+	       XLAT_KNOWN(0xd4d5d6d7, "V4L2_FBUF_CAP_EXTERNOVERLAY"
+			  "|V4L2_FBUF_CAP_CHROMAKEY"
+			  "|V4L2_FBUF_CAP_LIST_CLIPPING"
+			  "|V4L2_FBUF_CAP_LOCAL_ALPHA"
+			  "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+			  "|V4L2_FBUF_CAP_SRC_CHROMAKEY|0xd4d5d600")
+# else /* !WORDS_BIGENDIAN */
+	       XLAT_KNOWN(0xd7d6d5d4, "V4L2_FBUF_CAP_LIST_CLIPPING"
+			  "|V4L2_FBUF_CAP_LOCAL_ALPHA"
+			  "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+			  "|V4L2_FBUF_CAP_SRC_CHROMAKEY|0xd7d6d500")
+# endif /* WORDS_BIGENDIAN */
+#endif
+	       ", flags="
+#if SIZEOF_LONG > 4
+# if WORDS_BIGENDIAN
+	       XLAT_KNOWN(0xd4d5d6d7, "V4L2_FBUF_FLAG_PRIMARY"
+			  "|V4L2_FBUF_FLAG_OVERLAY|V4L2_FBUF_FLAG_CHROMAKEY"
+			  "|V4L2_FBUF_FLAG_GLOBAL_ALPHA"
+			  "|V4L2_FBUF_FLAG_SRC_CHROMAKEY|0xd4d5d680")
+# else /* !WORDS_BIGENDIAN */
+	       XLAT_KNOWN(0xd7d6d5d4, "V4L2_FBUF_FLAG_CHROMAKEY"
+			  "|V4L2_FBUF_FLAG_GLOBAL_ALPHA"
+			  "|V4L2_FBUF_FLAG_SRC_CHROMAKEY|0xd7d6d580")
+# endif /* WORDS_BIGENDIAN */
+#else /* SIZEOF_LONG == 4 */
+# if WORDS_BIGENDIAN
+	       XLAT_KNOWN(0xd8d9dadb, "V4L2_FBUF_FLAG_PRIMARY"
+			  "|V4L2_FBUF_FLAG_OVERLAY|V4L2_FBUF_FLAG_LOCAL_ALPHA"
+			  "|V4L2_FBUF_FLAG_LOCAL_INV_ALPHA||0xd8d9da80")
+# else /* !WORDS_BIGENDIAN */
+	       XLAT_KNOWN(0xdbdad9d8, "V4L2_FBUF_FLAG_LOCAL_ALPHA"
+			  "|V4L2_FBUF_FLAG_GLOBAL_ALPHA"
+			  "|V4L2_FBUF_FLAG_SRC_CHROMAKEY|0xdbdad980")
+# endif /* WORDS_BIGENDIAN */
+#endif
+	       ", base=%p, "
+#if VERBOSE
+	       "fmt={width=3735943886, height=3735943887"
+	       ", pixelformat=" RAW("0xdeadfad0")
+	       NRAW("v4l2_fourcc('\\xd0', '\\xfa', '\\xad', '\\xde')")
+	       ", field=0xdeadfad1" NRAW(" /* V4L2_FIELD_??? */")
+	       ", bytesperline=3735943890, sizeimage=3735943891"
+	       ", colorspace=0xdeadfad4" NRAW(" /* V4L2_COLORSPACE_??? */")
+	       ", priv=0xdeadfad5}"
+#else
+	       "..."
+#endif
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_FBUF), p_v4l2_framebuffer->base);
 
 	/* VIDIOC_STREAMON */
 	ioctl(-1, VIDIOC_STREAMON, 0);

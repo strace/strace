@@ -713,6 +713,75 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_G_FBUF) },
 		{ ARG_STR(VIDIOC_S_FBUF) },
 	};
+	static const struct strval32 fbuf_caps[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0xff, "V4L2_FBUF_CAP_EXTERNOVERLAY"
+				       "|V4L2_FBUF_CAP_CHROMAKEY"
+				       "|V4L2_FBUF_CAP_LIST_CLIPPING"
+				       "|V4L2_FBUF_CAP_BITMAP_CLIPPING"
+				       "|V4L2_FBUF_CAP_LOCAL_ALPHA"
+				       "|V4L2_FBUF_CAP_GLOBAL_ALPHA"
+				       "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+				       "|V4L2_FBUF_CAP_SRC_CHROMAKEY") },
+		{ ARG_XLAT_KNOWN(0xe5caffee, "V4L2_FBUF_CAP_CHROMAKEY"
+					     "|V4L2_FBUF_CAP_LIST_CLIPPING"
+					     "|V4L2_FBUF_CAP_BITMAP_CLIPPING"
+					     "|V4L2_FBUF_CAP_GLOBAL_ALPHA"
+					     "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+					     "|V4L2_FBUF_CAP_SRC_CHROMAKEY"
+					     "|0xe5caff00") },
+		{ ARG_XLAT_UNKNOWN(0xdecaf500, "V4L2_FBUF_CAP_???") },
+	};
+	static const struct strval32 fbuf_flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x7f, "V4L2_FBUF_FLAG_PRIMARY"
+				       "|V4L2_FBUF_FLAG_OVERLAY"
+				       "|V4L2_FBUF_FLAG_CHROMAKEY"
+				       "|V4L2_FBUF_FLAG_LOCAL_ALPHA"
+				       "|V4L2_FBUF_FLAG_GLOBAL_ALPHA"
+				       "|V4L2_FBUF_FLAG_LOCAL_INV_ALPHA"
+				       "|V4L2_FBUF_FLAG_SRC_CHROMAKEY") },
+		{ ARG_XLAT_KNOWN(0xdeadc0de, "V4L2_FBUF_FLAG_OVERLAY"
+					     "|V4L2_FBUF_FLAG_CHROMAKEY"
+					     "|V4L2_FBUF_FLAG_LOCAL_ALPHA"
+					     "|V4L2_FBUF_FLAG_GLOBAL_ALPHA"
+					     "|V4L2_FBUF_FLAG_SRC_CHROMAKEY"
+					     "|0xdeadc080") },
+		{ ARG_XLAT_UNKNOWN(0xb1a5ed80, "V4L2_FBUF_FLAG_???") },
+	};
+	static const struct strval32 fbuf_fmt_pfs[] = {
+		{ 0xdeadc0de,
+		  "v4l2_fourcc('\\xde', '\\xc0', '\\xad', '\\xde')" },
+		{ 0x38305554, "v4l2_fourcc('T', 'U', '0', '8')"
+			      " /* V4L2_TCH_FMT_TU08 */" },
+		{ 0xa0363159, "v4l2_fourcc('Y', '1', '6', '\\xa0')"
+			      " /* V4L2_PIX_FMT_Y16_BE */" },
+	};
+	static const struct strval32 fbuf_fmt_flds[] = {
+		{ ARG_XLAT_KNOWN(0, "V4L2_FIELD_ANY") },
+		{ ARG_XLAT_KNOWN(0x3, "V4L2_FIELD_BOTTOM") },
+		{ ARG_XLAT_KNOWN(0x9, "V4L2_FIELD_INTERLACED_BT") },
+		{ ARG_XLAT_UNKNOWN(0xa, "V4L2_FIELD_???") },
+		{ ARG_XLAT_UNKNOWN(0xb, "V4L2_FIELD_???") },
+		{ ARG_XLAT_UNKNOWN(0xbadc0ded, "V4L2_FIELD_???") },
+	};
+	static const struct strval32 fbuf_fmt_css[] = {
+		{ ARG_XLAT_KNOWN(0, "V4L2_COLORSPACE_DEFAULT") },
+		{ ARG_XLAT_KNOWN(0x4, "V4L2_COLORSPACE_BT878") },
+		{ ARG_XLAT_KNOWN(0x6, "V4L2_COLORSPACE_470_SYSTEM_BG") },
+		{ ARG_XLAT_KNOWN(0xa, "V4L2_COLORSPACE_BT2020") },
+		{ ARG_XLAT_KNOWN(0xc, "V4L2_COLORSPACE_DCI_P3") },
+		{ ARG_XLAT_UNKNOWN(0xd, "V4L2_COLORSPACE_???") },
+		{ ARG_XLAT_UNKNOWN(0xe, "V4L2_COLORSPACE_???") },
+		{ ARG_XLAT_UNKNOWN(0xf, "V4L2_COLORSPACE_???") },
+		{ ARG_XLAT_UNKNOWN(0x10, "V4L2_COLORSPACE_???") },
+		{ ARG_XLAT_UNKNOWN(0xdeadface, "V4L2_COLORSPACE_???") },
+	};
+	static const size_t fbuf_iters = MAX(MAX(MAX(MAX(ARRAY_SIZE(fbuf_caps),
+							ARRAY_SIZE(fbuf_flags)),
+						     ARRAY_SIZE(fbuf_fmt_pfs)),
+						 ARRAY_SIZE(fbuf_fmt_flds)),
+					     ARRAY_SIZE(fbuf_fmt_css));
 
 	struct v4l2_framebuffer *fbuf = tail_alloc(sizeof(*fbuf));
 
@@ -729,12 +798,79 @@ main(int argc, char **argv)
 
 		fill_memory32(fbuf, sizeof(*fbuf));
 		fbuf->base = NULL;
+		fill_memory32(&fbuf->fmt, sizeof(fbuf->fmt));
 
 		ioctl(-1, fbuf_cmds[i].val, fbuf);
-		printf("ioctl(-1, %s, {capability=0x80a0c0e0, flags=0x80a0c0e1"
-		       ", base=NULL}) = %ld (INJECTED)\n",
+		printf("ioctl(-1, %s, {capability="
+		       XLAT_KNOWN(0x80a0c0e0, "V4L2_FBUF_CAP_GLOBAL_ALPHA"
+				  "|V4L2_FBUF_CAP_LOCAL_INV_ALPHA"
+				  "|V4L2_FBUF_CAP_SRC_CHROMAKEY|0x80a0c000")
+		       ", flags="
+		       XLAT_KNOWN(0x80a0c0e1, "V4L2_FBUF_FLAG_PRIMARY"
+				  "|V4L2_FBUF_FLAG_LOCAL_INV_ALPHA"
+				  "|V4L2_FBUF_FLAG_SRC_CHROMAKEY|0x80a0c080")
+		       ", base=NULL, "
+#if VERBOSE
+		       "fmt={width=2158018784, height=2158018785"
+		       ", pixelformat=" RAW("0x80a0c0e2")
+		       NRAW("v4l2_fourcc('\\xe2', '\\xc0', '\\xa0', '\\x80')")
+		       ", field=0x80a0c0e3" NRAW(" /* V4L2_FIELD_??? */")
+		       ", bytesperline=2158018788, sizeimage=2158018789"
+		       ", colorspace=0x80a0c0e6"
+		       NRAW(" /* V4L2_COLORSPACE_??? */") ", priv=0x80a0c0e7}"
+#else
+		       "..."
+#endif
+		       "}) = %ld (INJECTED)\n",
 		       sprintxlat(fbuf_cmds[i].str, fbuf_cmds[i].val, NULL),
 		       inject_retval);
+
+		for (size_t j = 0; j < fbuf_iters; j++) {
+			fill_memory32(fbuf, sizeof(*fbuf));
+			fbuf->base = fbuf + j;
+			fill_memory32(&fbuf->fmt, sizeof(fbuf->fmt));
+
+			fbuf->capability =
+				fbuf_caps[j % ARRAY_SIZE(fbuf_caps)].val;
+			fbuf->flags =
+				fbuf_flags[j % ARRAY_SIZE(fbuf_flags)].val;
+			fbuf->fmt.pixelformat =
+				fbuf_fmt_pfs[j % ARRAY_SIZE(fbuf_fmt_pfs)].val;
+			fbuf->fmt.field =
+				fbuf_fmt_flds[j %
+					      ARRAY_SIZE(fbuf_fmt_flds)].val;
+			fbuf->fmt.colorspace =
+				fbuf_fmt_css[j % ARRAY_SIZE(fbuf_fmt_css)].val;
+
+			ioctl(-1, fbuf_cmds[i].val, fbuf);
+			printf("ioctl(-1, %s, {capability=%s, flags=%s"
+			       ", base=%p, "
+#if VERBOSE
+			       "fmt={width=2158018784, height=2158018785"
+			       ", pixelformat=" RAW("%#x") NRAW("%s")
+			       ", field=%s, bytesperline=2158018788"
+			       ", sizeimage=2158018789, colorspace=%s"
+			       ", priv=0x80a0c0e7}"
+#else
+			       "..."
+#endif
+			       "}) = %ld (INJECTED)\n",
+			       sprintxlat(fbuf_cmds[i].str, fbuf_cmds[i].val,
+					  NULL),
+			       fbuf_caps[j % ARRAY_SIZE(fbuf_caps)].str,
+			       fbuf_flags[j % ARRAY_SIZE(fbuf_flags)].str,
+			       fbuf + j,
+#if VERBOSE
+# if XLAT_RAW
+			       fbuf_fmt_pfs[j % ARRAY_SIZE(fbuf_fmt_pfs)].val,
+# else
+			       fbuf_fmt_pfs[j % ARRAY_SIZE(fbuf_fmt_pfs)].str,
+# endif
+			       fbuf_fmt_flds[j % ARRAY_SIZE(fbuf_fmt_flds)].str,
+			       fbuf_fmt_css[j % ARRAY_SIZE(fbuf_fmt_css)].str,
+#endif
+			       inject_retval);
+		}
 	}
 
 
