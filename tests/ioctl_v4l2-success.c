@@ -509,10 +509,26 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0x5, "V4L2_MEMORY_???") },
 		{ ARG_XLAT_UNKNOWN(0xbadc0ded, "V4L2_MEMORY_???") },
 	};
-	struct v4l2_requestbuffers *reqb = tail_alloc(sizeof(*reqb));
+	static const struct strval32 reqb_caps[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x3f, "V4L2_BUF_CAP_SUPPORTS_MMAP"
+				       "|V4L2_BUF_CAP_SUPPORTS_USERPTR"
+				       "|V4L2_BUF_CAP_SUPPORTS_DMABUF"
+				       "|V4L2_BUF_CAP_SUPPORTS_REQUESTS"
+				       "|V4L2_BUF_CAP_SUPPORTS_ORPHANED_BUFS"
+			       "|V4L2_BUF_CAP_SUPPORTS_M2M_HOLD_CAPTURE_BUF") },
+		{ ARG_XLAT_KNOWN(0xdeadc0de, "V4L2_BUF_CAP_SUPPORTS_USERPTR"
+					     "|V4L2_BUF_CAP_SUPPORTS_DMABUF"
+					     "|V4L2_BUF_CAP_SUPPORTS_REQUESTS"
+				      "|V4L2_BUF_CAP_SUPPORTS_ORPHANED_BUFS"
+				      "|0xdeadc0c0") },
+		{ ARG_XLAT_UNKNOWN(0xbeefdec0, "V4L2_BUF_CAP_???") },
+	};
+	static const size_t reqb_iters = MAX(MAX(ARRAY_SIZE(buf_types),
+						 ARRAY_SIZE(reqb_mems)),
+					     ARRAY_SIZE(reqb_caps));
 
-	fill_memory(reqb, sizeof(*reqb));
-	reqb->count = 0xfeedface;
+	struct v4l2_requestbuffers *reqb = tail_alloc(sizeof(*reqb));
 
 	ioctl(-1, VIDIOC_REQBUFS, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -522,17 +538,45 @@ main(int argc, char **argv)
 	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
 	       XLAT_STR(VIDIOC_REQBUFS), (char *) reqb + 1, inject_retval);
 
-	for (size_t i = 0; i < MAX(ARRAY_SIZE(buf_types),
-				   ARRAY_SIZE(reqb_mems)); i++) {
+	for (size_t i = 0; i < reqb_iters; i++) {
+		fill_memory32(reqb, sizeof(*reqb));
+		reqb->count = 0xfeedface;
+
 		reqb->type = buf_types[i % ARRAY_SIZE(buf_types)].val;
 		reqb->memory = reqb_mems[i % ARRAY_SIZE(reqb_mems)].val;
+#ifdef HAVE_STRUCT_V4L2_REQUESTBUFFERS_CAPABILITIES
+		reqb->capabilities =
+#else
+		reqb->reserved[0] =
+#endif
+			reqb_caps[i % ARRAY_SIZE(reqb_caps)].val;
 
 		ioctl(-1, VIDIOC_REQBUFS, reqb);
-		printf("ioctl(-1, %s, {type=%s, memory=%s"
-		       ", count=4277009102 => 4277009102}) = %ld (INJECTED)\n",
+		printf("ioctl(-1, %s, {count=4277009102, type=%s, memory=%s"
+		       ", reserved=[0x80a0c0e4]} => {count=4277009102"
+		       ", capabilities=%s, reserved=[0x80a0c0e4]}"
+		       ") = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_REQBUFS),
 		       buf_types[i % ARRAY_SIZE(buf_types)].str,
 		       reqb_mems[i % ARRAY_SIZE(reqb_mems)].str,
+		       reqb_caps[i % ARRAY_SIZE(reqb_caps)].str,
+		       inject_retval);
+
+#ifdef HAVE_STRUCT_V4L2_REQUESTBUFFERS_CAPABILITIES
+		memset(reqb->reserved, 0, sizeof(reqb->reserved));
+#else
+		memset(reqb->reserved + 1, 0,
+		       sizeof(reqb->reserved) - sizeof(reqb->reserved[0]));
+#endif
+
+		ioctl(-1, VIDIOC_REQBUFS, reqb);
+		printf("ioctl(-1, %s, {count=4277009102, type=%s, memory=%s}"
+		       " => {count=4277009102, capabilities=%s}"
+		       ") = %ld (INJECTED)\n",
+		       XLAT_STR(VIDIOC_REQBUFS),
+		       buf_types[i % ARRAY_SIZE(buf_types)].str,
+		       reqb_mems[i % ARRAY_SIZE(reqb_mems)].str,
+		       reqb_caps[i % ARRAY_SIZE(reqb_caps)].str,
 		       inject_retval);
 	}
 
@@ -1600,9 +1644,11 @@ main(int argc, char **argv)
 
 #ifdef VIDIOC_CREATE_BUFS
 	/* VIDIOC_CREATE_BUFS */
-	struct v4l2_create_buffers *cbuf = tail_alloc(sizeof(*cbuf));
+	static const size_t cbuf_iters = MAX(MAX(ARRAY_SIZE(reqb_mems),
+						 ARRAY_SIZE(buf_types)),
+					     ARRAY_SIZE(reqb_caps));
 
-	fill_memory32(cbuf, sizeof(*cbuf));
+	struct v4l2_create_buffers *cbuf = tail_alloc(sizeof(*cbuf));
 
 	ioctl(-1, VIDIOC_CREATE_BUFS, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1612,22 +1658,54 @@ main(int argc, char **argv)
 	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
 	       XLAT_STR(VIDIOC_CREATE_BUFS), (char *) cbuf + 1, inject_retval);
 
-	for (size_t i = 0; i < MAX(ARRAY_SIZE(buf_types),
-				   ARRAY_SIZE(reqb_mems)); i++) {
+	for (size_t i = 0; i < cbuf_iters; i++) {
+		fill_memory32(cbuf, sizeof(*cbuf));
+		fill_memory32(
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS_CAPABILITIES
+			&cbuf->capabilities
+#else
+			&cbuf->reserved
+#endif
+			, sizeof(uint32_t) * 8);
+
 		cbuf->memory = reqb_mems[i % ARRAY_SIZE(reqb_mems)].val;
 		cbuf->format.type = buf_types[i % ARRAY_SIZE(buf_types)].val;
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS_CAPABILITIES
+		cbuf->capabilities =
+#else
+		cbuf->reserved[0] =
+#endif
+			reqb_caps[i % ARRAY_SIZE(reqb_caps)].val;
+
 		if (!fill_fmt(&cbuf->format))
 			continue;
 
-		ioctl(-1, VIDIOC_CREATE_BUFS, cbuf);
-		printf("ioctl(-1, %s, {count=2158018785, memory=%s"
-		       ", format={type=%s",
-		       XLAT_STR(VIDIOC_CREATE_BUFS),
-		       reqb_mems[i % ARRAY_SIZE(reqb_mems)].str,
-		       buf_types[i % ARRAY_SIZE(buf_types)].str);
-		print_fmt(", ", &cbuf->format);
-		printf("}}) = %ld ({index=2158018784, count=2158018785})"
-		       " (INJECTED)\n", inject_retval);
+		for (size_t j = 0; j < 2; j++) {
+			static const char rsvd_str[] = ", reserved=[0x80a0c0e1"
+				", 0x80a0c0e2, 0x80a0c0e3, 0x80a0c0e4"
+				", 0x80a0c0e5, 0x80a0c0e6, 0x80a0c0e7]";
+
+			ioctl(-1, VIDIOC_CREATE_BUFS, cbuf);
+			printf("ioctl(-1, %s, {count=2158018785, memory=%s"
+			       ", format={type=%s",
+			       XLAT_STR(VIDIOC_CREATE_BUFS),
+			       reqb_mems[i % ARRAY_SIZE(reqb_mems)].str,
+			       buf_types[i % ARRAY_SIZE(buf_types)].str);
+			print_fmt(", ", &cbuf->format);
+			printf("}%s} => {index=2158018784, count=2158018785"
+			       ", capabilities=%s%s}) = %ld (INJECTED)\n",
+			       j ? "" : rsvd_str,
+			       reqb_caps[i % ARRAY_SIZE(reqb_caps)].str,
+			       j ? "" : rsvd_str, inject_retval);
+
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS_CAPABILITIES
+			memset(cbuf->reserved, 0, sizeof(cbuf->reserved));
+#else
+			memset(cbuf->reserved + 1, 0,
+			       sizeof(cbuf->reserved) -
+			       sizeof(reqb->reserved[0]));
+#endif
+		}
 	}
 #endif /* VIDIOC_CREATE_BUFS */
 

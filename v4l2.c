@@ -70,6 +70,7 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
 #ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmivalenum);
 #endif
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_requestbuffers);
 #ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #endif
@@ -402,11 +403,12 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 }
 
 #include "xlat/v4l2_memories.h"
+#include "xlat/v4l2_buf_capabilities.h"
 
 static int
 print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_requestbuffers reqbufs;
+	struct_v4l2_requestbuffers reqbufs;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -414,24 +416,29 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_IOCTL_DECODED;
 
-		tprintf("{type=");
-		printxval(v4l2_buf_types, reqbufs.type, "V4L2_BUF_TYPE_???");
-		tprints(", memory=");
-		printxval(v4l2_memories, reqbufs.memory, "V4L2_MEMORY_???");
-		tprintf(", count=%u", reqbufs.count);
+		PRINT_FIELD_U("{", reqbufs, count);
+		PRINT_FIELD_XVAL(", ", reqbufs, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_XVAL(", ", reqbufs, memory, v4l2_memories,
+				 "V4L2_MEMORY_???");
+		if (!IS_ARRAY_ZERO(reqbufs.reserved))
+			PRINT_FIELD_ARRAY(", ", reqbufs, reserved, tcp,
+					  print_xint32_array_member);
+		tprints("}");
 
 		return 0;
 	}
 
-	if (!syserror(tcp)) {
-		tprints(" => ");
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &reqbufs))
+		return RVAL_IOCTL_DECODED;
 
-		if (!umove(tcp, arg, &reqbufs))
-			tprintf("%u", reqbufs.count);
-		else
-			tprints("???");
-	}
-
+	PRINT_FIELD_U(" => {", reqbufs, count);
+	PRINT_FIELD_FLAGS(", ", reqbufs, capabilities, v4l2_buf_capabilities,
+			  "V4L2_BUF_CAP_???");
+	if (!IS_ARRAY_ZERO(reqbufs.reserved))
+		PRINT_FIELD_ARRAY(", ", reqbufs, reserved, tcp,
+				  print_xint32_array_member);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -1133,33 +1140,43 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	static const char fmt[] = "{index=%u, count=%u}";
-	static char outstr[sizeof(fmt) + sizeof(int) * 6];
-
 	struct_v4l2_create_buffers b;
 
 	if (entering(tcp)) {
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{count=%u, memory=", b.count);
-		printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
-		tprints(", format={type=");
-		printxval(v4l2_buf_types, b.format.type,
-			  "V4L2_BUF_TYPE_???");
+
+		PRINT_FIELD_U("{", b, count);
+		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+				 "V4L2_MEMORY_???");
+		PRINT_FIELD_XVAL(", format={", b.format, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		print_v4l2_format_fmt(tcp, ", ",
 				      (struct_v4l2_format *) &b.format);
-		tprints("}}");
+		tprints("}");
+		if (!IS_ARRAY_ZERO(b.reserved))
+			PRINT_FIELD_ARRAY(", ", b, reserved, tcp,
+					  print_xint32_array_member);
+		tprints("}");
+
 		return 0;
 	}
 
+	/* exiting */
 	if (syserror(tcp) || umove(tcp, arg, &b))
 		return RVAL_IOCTL_DECODED;
 
-	xsprintf(outstr, fmt, b.index, b.count);
-	tcp->auxstr = outstr;
+	PRINT_FIELD_U(" => {", b, index);
+	PRINT_FIELD_U(", ", b, count);
+	PRINT_FIELD_FLAGS(", ", b, capabilities, v4l2_buf_capabilities,
+			  "V4L2_BUF_CAP_???");
+	if (!IS_ARRAY_ZERO(b.reserved))
+		PRINT_FIELD_ARRAY(", ", b, reserved, tcp,
+				  print_xint32_array_member);
+	tprints("}");
 
-	return RVAL_IOCTL_DECODED | RVAL_STR;
+	return RVAL_IOCTL_DECODED;
 }
 
 MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,

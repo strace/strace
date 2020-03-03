@@ -950,14 +950,20 @@ main(void)
 	struct v4l2_requestbuffers *const p_v4l2_requestbuffers =
 		page_end - sizeof(*p_v4l2_requestbuffers);
 	ioctl(-1, VIDIOC_REQBUFS, p_v4l2_requestbuffers);
-	printf("ioctl(-1, %s, {type=%#x"
+	printf("ioctl(-1, %s, {count=%u, type=%#x"
 	       NRAW(" /* V4L2_BUF_TYPE_??? */")
-	       ", memory=%#x" NRAW(" /* V4L2_MEMORY_??? */") ", count=%u})"
-	       " = -1 EBADF (%m)\n",
+	       ", memory=%#x" NRAW(" /* V4L2_MEMORY_??? */")
+	       ", reserved=[%#x]}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_REQBUFS),
+	       p_v4l2_requestbuffers->count,
 	       p_v4l2_requestbuffers->type,
 	       p_v4l2_requestbuffers->memory,
-	       p_v4l2_requestbuffers->count);
+#ifdef HAVE_STRUCT_V4L2_REQUESTBUFFERS_CAPABILITIES
+	       p_v4l2_requestbuffers->reserved[0]
+#else
+	       p_v4l2_requestbuffers->reserved[1]
+#endif
+	       );
 
 	/* VIDIOC_QUERYBUF */
 	ioctl(-1, VIDIOC_QUERYBUF, 0);
@@ -1542,11 +1548,26 @@ main(void)
 	ioctl(-1, VIDIOC_CREATE_BUFS, p_v4l2_create_buffers);
 	printf("ioctl(-1, %s, {count=%u, memory=%#x"
 	       NRAW(" /* V4L2_MEMORY_??? */") ", format={type=%#x"
-	       NRAW(" /* V4L2_BUF_TYPE_??? */") "}}) = -1 EBADF (%m)\n",
+	       NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       "}, reserved=[%#x, %#x, %#x, %#x, %#x, %#x, %#x]}"
+	       ") = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_CREATE_BUFS),
 	       p_v4l2_create_buffers->count,
 	       p_v4l2_create_buffers->memory,
-	       p_v4l2_create_buffers->format.type);
+	       p_v4l2_create_buffers->format.type,
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS_CAPABILITIES
+	       p_v4l2_create_buffers->reserved[0],
+#endif
+	       p_v4l2_create_buffers->reserved[1],
+	       p_v4l2_create_buffers->reserved[2],
+	       p_v4l2_create_buffers->reserved[3],
+	       p_v4l2_create_buffers->reserved[4],
+	       p_v4l2_create_buffers->reserved[5],
+	       p_v4l2_create_buffers->reserved[6]
+#ifndef HAVE_STRUCT_V4L2_CREATE_BUFFERS_CAPABILITIES
+	       , p_v4l2_create_buffers->reserved[7]
+#endif
+	       );
 #endif /* VIDIOC_CREATE_BUFS */
 
 #ifdef VIDIOC_QUERY_EXT_CTRL

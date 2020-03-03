@@ -284,6 +284,16 @@ typedef struct {
 
 
 typedef struct {
+	uint32_t count;
+	uint32_t type;
+	uint32_t memory;
+	/** V4L2_BUF_CAP_*, added by Linux commit v4.20-rc1~51^2~14 */
+	uint32_t capabilities;
+	uint32_t reserved[1];
+} struct_v4l2_requestbuffers;
+
+
+typedef struct {
 	uint32_t index;
 	uint32_t count;
 	uint32_t memory;

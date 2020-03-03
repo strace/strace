@@ -4,7 +4,7 @@ VIDIOC_G_FMT			_IOWR('V',   4, struct_v4l2_format)
 VIDIOC_S_FMT			_IOWR('V',   5, struct_v4l2_format)
 /* VIDIOC_G_MPEGCOMP		_IOR  ('V',  6, struct v4l2_mpeg_compression) - removed in v2.6.24-rc1~66^2~32 */
 /* VIDIOC_S_MPEGCOMP		_IOW  ('V',  7, struct v4l2_mpeg_compression) - removed in v2.6.24-rc1~66^2~32 */
-VIDIOC_REQBUFS			_IOWR('V',   8, struct v4l2_requestbuffers)
+VIDIOC_REQBUFS			_IOWR('V',   8, struct_v4l2_requestbuffers)
 VIDIOC_QUERYBUF			_IOWR('V',   9, struct_v4l2_buffer)
 VIDIOC_G_FBUF			_IOR ('V',  10, struct_v4l2_framebuffer)
 VIDIOC_S_FBUF			_IOW ('V',  11, struct_v4l2_framebuffer)

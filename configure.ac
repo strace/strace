@@ -822,10 +822,12 @@ AC_CHECK_TYPES(m4_normalize([
 
 AC_CHECK_MEMBERS(m4_normalize([
 	struct v4l2_capability.device_caps,
+	struct v4l2_create_buffers.capabilities,
 	struct v4l2_ext_control.string,
 	struct v4l2_format.fmt.pix_mp,
 	struct v4l2_format.fmt.sdr,
 	struct v4l2_format.fmt.sliced,
+	struct v4l2_requestbuffers.capabilities,
 	struct v4l2_window.global_alpha,
 	struct v4l2_sdr_format.buffersize
 ]),,, [#include <sys/time.h>
