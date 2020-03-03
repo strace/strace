@@ -106,7 +106,7 @@ esac
 
 case "$CC" in
 	musl-gcc)
-		clone_repo strace/musl musl
+		clone_repo strace/musl musl esyr/mpers
 		cd musl
 			CC=gcc
 			build=
