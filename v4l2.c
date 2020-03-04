@@ -1288,10 +1288,12 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		return print_v4l2_query_ext_ctrl(tcp, arg);
 
 	case VIDIOC_G_INPUT: /* R */
+	case VIDIOC_G_OUTPUT: /* R */
 		if (entering(tcp))
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_INPUT: /* RW */
+	case VIDIOC_S_OUTPUT: /* RW */
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
 		break;

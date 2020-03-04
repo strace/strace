@@ -1411,10 +1411,12 @@ main(int argc, char **argv)
 	}
 
 
-	/* VIDIOC_G_INPUT, VIDIOC_S_INPUT */
-	static const struct strval32 input_cmds[] = {
+	/* VIDIOC_G_INPUT, VIDIOC_S_INPUT, VIDIOC_G_OUTPUT, VIDIOC_S_OUTPUT */
+	static const struct strval32 int_cmds[] = {
 		{ ARG_STR(VIDIOC_G_INPUT) },
 		{ ARG_STR(VIDIOC_S_INPUT) },
+		{ ARG_STR(VIDIOC_G_OUTPUT) },
+		{ ARG_STR(VIDIOC_S_OUTPUT) },
 	};
 	static const struct strval32 inputids[] = {
 		{ ARG_STR(0) },
@@ -1426,26 +1428,25 @@ main(int argc, char **argv)
 
 	int *inputid = tail_alloc(sizeof(*inputid));
 
-	for (size_t i = 0; i < ARRAY_SIZE(input_cmds); i++) {
-		ioctl(-1, input_cmds[i].val, 0);
+	for (size_t i = 0; i < ARRAY_SIZE(int_cmds); i++) {
+		ioctl(-1, int_cmds[i].val, 0);
 		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
-		       sprintxlat(input_cmds[i].str, input_cmds[i].val, NULL),
+		       sprintxlat(int_cmds[i].str, int_cmds[i].val, NULL),
 		       inject_retval);
 
-		ioctl(-1, input_cmds[i].val, (char *) inputid + 1);
+		ioctl(-1, int_cmds[i].val, (char *) inputid + 1);
 		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
-		       sprintxlat(input_cmds[i].str, input_cmds[i].val, NULL),
+		       sprintxlat(int_cmds[i].str, int_cmds[i].val, NULL),
 		       (char *) inputid + 1, inject_retval);
 
 		for (size_t j = 0; j < ARRAY_SIZE(inputids); j++) {
 			*inputid = inputids[j].val;
 
-			ioctl(-1, input_cmds[i].val, inputid);
+			ioctl(-1, int_cmds[i].val, inputid);
 			printf("ioctl(-1, %s, [%s]) = %ld (INJECTED)\n",
-			       sprintxlat(input_cmds[i].str, input_cmds[i].val,
+			       sprintxlat(int_cmds[i].str, int_cmds[i].val,
 					  NULL),
 			       inputids[j].str, inject_retval);
-
 		}
 	}
 

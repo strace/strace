@@ -582,8 +582,6 @@ main(void)
 #ifdef VIDIOC_S_EDID
 		{ ARG_STR(VIDIOC_S_EDID) },
 #endif
-		{ ARG_STR(VIDIOC_G_OUTPUT) },
-		{ ARG_STR(VIDIOC_S_OUTPUT) },
 		{ ARG_STR(VIDIOC_ENUMOUTPUT) },
 		{ ARG_STR(VIDIOC_G_AUDOUT) },
 		{ ARG_STR(VIDIOC_S_AUDOUT) },
@@ -1349,6 +1347,24 @@ main(void)
 	ioctl(-1, VIDIOC_S_INPUT, p_int);
 	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_INPUT), *p_int);
+
+	/* VIDIOC_G_OUTPUT */
+	ioctl(-1, VIDIOC_G_OUTPUT, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_OUTPUT));
+
+	ioctl(-1, VIDIOC_G_OUTPUT, page);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_OUTPUT), page);
+
+	/* VIDIOC_S_OUTPUT */
+	ioctl(-1, VIDIOC_S_OUTPUT, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_OUTPUT));
+
+	ioctl(-1, VIDIOC_S_OUTPUT, p_int);
+	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_OUTPUT), *p_int);
 
 	/* VIDIOC_CROPCAP */
 	ioctl(-1, VIDIOC_CROPCAP, 0);
