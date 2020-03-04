@@ -593,7 +593,6 @@ main(void)
 		{ ARG_STR(VIDIOC_S_FREQUENCY) },
 		{ ARG_STR(VIDIOC_G_JPEGCOMP) },
 		{ ARG_STR(VIDIOC_S_JPEGCOMP) },
-		{ ARG_STR(VIDIOC_QUERYSTD) },
 		{ ARG_STR(VIDIOC_ENUMAUDIO) },
 		{ ARG_STR(VIDIOC_ENUMAUDOUT) },
 		{ ARG_STR(VIDIOC_G_PRIORITY) },
@@ -1180,6 +1179,15 @@ main(void)
 	       "|V4L2_STD_ATSC_16_VSB|0xdeadfaceb8000000")
 	       "]) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_STD));
+
+	/* VIDIOC_QUERYSTD */
+	ioctl(-1, VIDIOC_QUERYSTD, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYSTD));
+
+	ioctl(-1, VIDIOC_QUERYSTD, page);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYSTD), page);
 
 	/* VIDIOC_ENUMSTD */
 	ioctl(-1, VIDIOC_ENUMSTD, 0);

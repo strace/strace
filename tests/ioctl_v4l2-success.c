@@ -1022,10 +1022,11 @@ main(int argc, char **argv)
 	}
 
 
-	/* VIDIOC_G_STD, VIDIOC_S_STD */
+	/* VIDIOC_G_STD, VIDIOC_S_STD, VIDIOC_QUERYSTD */
 	static const struct strval32 stdid_cmds[] = {
 		{ ARG_STR(VIDIOC_G_STD) },
 		{ ARG_STR(VIDIOC_S_STD) },
+		{ ARG_STR(VIDIOC_QUERYSTD) },
 	};
 	static const struct strval64 stdids[] = {
 		{ ARG_XLAT_KNOWN(0, "V4L2_STD_UNKNOWN") },

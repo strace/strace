@@ -1264,7 +1264,8 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_G_STD: /* R */
 	case VIDIOC_S_STD: /* W */
-		return printnum_v4l2_std_id(tcp, arg, code == VIDIOC_G_STD);
+	case VIDIOC_QUERYSTD: /* R */
+		return printnum_v4l2_std_id(tcp, arg, code != VIDIOC_S_STD);
 
 	case VIDIOC_ENUMSTD: /* RW */
 		return print_v4l2_standard(tcp, arg);
