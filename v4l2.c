@@ -107,6 +107,12 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 		print_pixelformat((where_).field_, (xlat_));	\
 	} while (0)
 
+# define PRINT_FIELD_STDID(prefix_, where_, field_)		\
+	do {							\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		print_v4l2_std_id((where_).field_);		\
+	} while (0)
+
 # define PRINT_FIELD_RECT(prefix_, where_, field_)			\
 	STRACE_PRINTF("%s%s={left=%d, top=%d, width=%u, height=%u}",	\
 		      (prefix_), #field_,				\
@@ -646,6 +652,37 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints("}");
 		return RVAL_IOCTL_DECODED;
 	}
+}
+
+#include "xlat/v4l2_std_ids.h"
+
+static void
+print_v4l2_std_id(const uint64_t std_id)
+{
+	printflags64(v4l2_std_ids, std_id, "V4L2_STD_???");
+}
+
+static int
+printnum_v4l2_std_id(struct tcb *const tcp, const kernel_ulong_t arg, bool get)
+{
+	uint64_t std;
+
+	if (entering(tcp)) {
+		tprints(", ");
+
+		if (get)
+			return 0;
+	}
+
+	/* (entering && !get) || exiting */
+	if (umove_or_printaddr(tcp, arg, &std))
+		return RVAL_IOCTL_DECODED;
+
+	tprints("[");
+	print_v4l2_std_id(std);
+	tprints("]");
+
+	return RVAL_IOCTL_DECODED;
 }
 
 static int
@@ -1221,13 +1258,8 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		return print_v4l2_streamparm(tcp, arg, code == VIDIOC_G_PARM);
 
 	case VIDIOC_G_STD: /* R */
-		if (entering(tcp))
-			return 0;
-		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_STD: /* W */
-		tprints(", ");
-		printnum_int64(tcp, arg, "%#" PRIx64);
-		break;
+		return printnum_v4l2_std_id(tcp, arg, code == VIDIOC_G_STD);
 
 	case VIDIOC_ENUMSTD: /* RW */
 		return print_v4l2_standard(tcp, arg);
