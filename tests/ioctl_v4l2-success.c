@@ -1131,6 +1131,36 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0x4, "V4L2_INPUT_TYPE_???") },
 		{ ARG_XLAT_UNKNOWN(0xdeadc0de, "V4L2_INPUT_TYPE_???") },
 	};
+	static const struct strval32 input_sts[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_IN_ST_NO_POWER") },
+		{ ARG_XLAT_KNOWN(0x7070f37, "V4L2_IN_ST_NO_POWER"
+				 "|V4L2_IN_ST_NO_SIGNAL|V4L2_IN_ST_NO_COLOR"
+				 "|V4L2_IN_ST_HFLIP|V4L2_IN_ST_VFLIP"
+				 "|V4L2_IN_ST_NO_H_LOCK|V4L2_IN_ST_COLOR_KILL"
+				 "|V4L2_IN_ST_NO_V_LOCK|V4L2_IN_ST_NO_STD_LOCK"
+				 "|V4L2_IN_ST_NO_SYNC|V4L2_IN_ST_NO_EQU"
+				 "|V4L2_IN_ST_NO_CARRIER|V4L2_IN_ST_MACROVISION"
+				 "|V4L2_IN_ST_NO_ACCESS|V4L2_IN_ST_VTR") },
+		{ ARG_XLAT_KNOWN(0xdeadbeef, "V4L2_IN_ST_NO_POWER"
+				 "|V4L2_IN_ST_NO_SIGNAL|V4L2_IN_ST_NO_COLOR"
+				 "|V4L2_IN_ST_VFLIP|V4L2_IN_ST_COLOR_KILL"
+				 "|V4L2_IN_ST_NO_V_LOCK|V4L2_IN_ST_NO_STD_LOCK"
+				 "|V4L2_IN_ST_NO_SYNC|V4L2_IN_ST_NO_CARRIER"
+				 "|V4L2_IN_ST_NO_ACCESS|V4L2_IN_ST_VTR"
+				 "|0xd8a8b0c8") },
+		{ ARG_XLAT_UNKNOWN(0x8, "V4L2_IN_ST_???") },
+		{ ARG_XLAT_UNKNOWN(0xf8f8f0c8, "V4L2_IN_ST_???") },
+	};
+	static const struct strval32 input_caps[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_IN_CAP_PRESETS") },
+		{ ARG_XLAT_KNOWN(0xe, "V4L2_IN_CAP_DV_TIMINGS|V4L2_IN_CAP_STD"
+				 "|V4L2_IN_CAP_NATIVE_SIZE") },
+		{ ARG_XLAT_KNOWN(0xdec0dedc, "V4L2_IN_CAP_STD"
+				 "|V4L2_IN_CAP_NATIVE_SIZE|0xdec0ded0") },
+		{ ARG_XLAT_UNKNOWN(0xdec0ded0, "V4L2_IN_CAP_???") },
+	};
 
 	struct v4l2_input *input = tail_alloc(sizeof(*input));
 
@@ -1142,21 +1172,49 @@ main(int argc, char **argv)
 	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
 	       XLAT_STR(VIDIOC_ENUMINPUT), (char *) input + 1, inject_retval);
 
-	for (size_t i = 0; i < ARRAY_SIZE(stdids); i++) {
-		for (size_t j = 0; j < ARRAY_SIZE(input_types); j++) {
+	for (size_t i = 0; i < MAX(ARRAY_SIZE(stdids), ARRAY_SIZE(input_sts));
+	     i++) {
+		for (size_t j = 0; j < MAX(ARRAY_SIZE(input_types),
+					   ARRAY_SIZE(input_caps)); j++) {
 			fill_memory32(input, sizeof(*input));
+			fill_memory32_ex(&input->status, sizeof(*input) -
+					 offsetof(struct v4l2_input, status),
+					 0xdecaffed, 0x80000000);
 			fill_memory_ex(input->name, sizeof(input->name),
 				       i * 47 + 13, 255);
-			input->type = input_types[j].val;
-			input->std = stdids[i].val;
+			input->std = stdids[i % ARRAY_SIZE(stdids)].val;
+			input->type =
+				input_types[j % ARRAY_SIZE(input_types)].val;
+			input->status =
+				input_sts[i % ARRAY_SIZE(input_sts)].val;
+
+			if ((i + j) % 2) {
+				memset(&input->reserved, 0,
+				       sizeof(input->reserved));
+			}
+
+#ifdef HAVE_STRUCT_V4L2_INPUT_CAPABILITIES
+			input->capabilities =
+#else
+			input->reserved[0]  =
+#endif
+				input_caps[j % ARRAY_SIZE(input_caps)].val;
 
 			ioctl(-1, VIDIOC_ENUMINPUT, input);
 			printf("ioctl(-1, %s, {index=2158018784, name=",
 			       XLAT_STR(VIDIOC_ENUMINPUT));
 			print_quoted_cstring((char *) input->name,
 					     sizeof(input->name));
-			printf(", type=%s}) = %ld (INJECTED)\n",
-			       input_types[j].str, inject_retval);
+			printf(", type=%s, audioset=0x80a0c0ea"
+			       ", tuner=2158018795, std=%s, status=%s"
+			       ", capabilities=%s%s}) = %ld (INJECTED)\n",
+			       input_types[j % ARRAY_SIZE(input_types)].str,
+			       stdids[i % ARRAY_SIZE(stdids)].str,
+			       input_sts[i % ARRAY_SIZE(input_sts)].str,
+			       input_caps[j % ARRAY_SIZE(input_caps)].str,
+			       (i + j) % 2 ? "" : ", reserved=[0xdecaffef"
+						  ", 0xdecafff0, 0xdecafff1]",
+			       inject_retval);
 		}
 	}
 

@@ -61,6 +61,7 @@ CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 #endif
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_framebuffer);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_input);
 #ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
 #endif
@@ -716,6 +717,8 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+#include "xlat/v4l2_input_capabilities.h"
+#include "xlat/v4l2_input_statuses.h"
 #include "xlat/v4l2_input_types.h"
 
 static int
@@ -727,15 +730,26 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &i))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u", i.index);
+
+		PRINT_FIELD_U("{", i, index);
 
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &i)) {
 		PRINT_FIELD_CSTRING(", ", i, name);
-		tprints(", type=");
-		printxval(v4l2_input_types, i.type, "V4L2_INPUT_TYPE_???");
+		PRINT_FIELD_XVAL(", ", i, type, v4l2_input_types,
+				 "V4L2_INPUT_TYPE_???");
+		PRINT_FIELD_X(", ", i, audioset);
+		PRINT_FIELD_U(", ", i, tuner);
+		PRINT_FIELD_STDID(", ", i, std);
+		PRINT_FIELD_FLAGS(", ", i, status, v4l2_input_statuses,
+				  "V4L2_IN_ST_???");
+		PRINT_FIELD_FLAGS(", ", i, capabilities,
+				  v4l2_input_capabilities, "V4L2_IN_CAP_???");
+		if (!IS_ARRAY_ZERO(i.reserved))
+			PRINT_FIELD_ARRAY(", ", i, reserved, tcp,
+					  print_xint32_array_member);
 	}
 
 	tprints("}");

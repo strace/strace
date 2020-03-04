@@ -16,7 +16,6 @@
 #include <linux/videodev2.h>
 
 typedef struct v4l2_buffer struct_v4l2_buffer;
-typedef struct v4l2_input struct_v4l2_input;
 typedef struct v4l2_standard struct_v4l2_standard;
 
 
@@ -157,6 +156,19 @@ typedef struct {
 		uint8_t raw_data[200];
 	} fmt;
 } struct_v4l2_format;
+
+
+typedef struct {
+	uint32_t index;
+	uint8_t  name[32];
+	uint32_t type; /* V4L2_INPUT_TYPE_* */
+	uint32_t audioset; /*  Associated audios (bitfield) */
+	uint32_t tuner;
+	uint64_t std; /* v4l2_std_id */
+	uint32_t status; /* V4L2_IN_ST_* */
+	uint32_t capabilities; /** V4L2_IN_CAP_*, Linux v2.6.33-rc1~70^2~91 */
+	uint32_t reserved[3];
+} struct_v4l2_input;
 
 
 /** Added by Linux v5.5-rc1~143^2^2~225 */
