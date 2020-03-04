@@ -18,30 +18,41 @@
 # include <unistd.h>
 # include <errno.h>
 
+# include "kernel_rusage.h"
 # include "xlat.h"
 # include "xlat/usagewho.h"
 
 int
-invoke_print(int who, const char *who_str, struct rusage *usage)
+invoke_print(int who, const char *who_str, kernel_rusage_t *usage)
 {
 	int rc = syscall(__NR_getrusage, who, usage);
 	int saved_errno = errno;
 	printf("getrusage(%s, {ru_utime={tv_sec=%lld, tv_usec=%llu}"
-	       ", ru_stime={tv_sec=%lld, tv_usec=%llu}, ru_maxrss=%lu"
-	       ", ru_ixrss=%lu, ru_idrss=%lu, ru_isrss=%lu, ru_minflt=%lu"
-	       ", ru_majflt=%lu, ru_nswap=%lu, ru_inblock=%lu"
-	       ", ru_oublock=%lu, ru_msgsnd=%lu, ru_msgrcv=%lu"
-	       ", ru_nsignals=%lu, ru_nvcsw=%lu, ru_nivcsw=%lu}) = %s\n",
+	       ", ru_stime={tv_sec=%lld, tv_usec=%llu}, ru_maxrss=%llu"
+	       ", ru_ixrss=%llu, ru_idrss=%llu, ru_isrss=%llu, ru_minflt=%llu"
+	       ", ru_majflt=%llu, ru_nswap=%llu, ru_inblock=%llu"
+	       ", ru_oublock=%llu, ru_msgsnd=%llu, ru_msgrcv=%llu"
+	       ", ru_nsignals=%llu, ru_nvcsw=%llu, ru_nivcsw=%llu}) = %s\n",
 	       who_str,
 	       (long long) usage->ru_utime.tv_sec,
 	       zero_extend_signed_to_ull(usage->ru_utime.tv_usec),
 	       (long long) usage->ru_stime.tv_sec,
 	       zero_extend_signed_to_ull(usage->ru_stime.tv_usec),
-	       usage->ru_maxrss, usage->ru_ixrss, usage->ru_idrss,
-	       usage->ru_isrss, usage->ru_minflt, usage->ru_majflt,
-	       usage->ru_nswap, usage->ru_inblock, usage->ru_oublock,
-	       usage->ru_msgsnd, usage->ru_msgrcv, usage->ru_nsignals,
-	       usage->ru_nvcsw, usage->ru_nivcsw, sprintrc(rc));
+	       zero_extend_signed_to_ull(usage->ru_maxrss),
+	       zero_extend_signed_to_ull(usage->ru_ixrss),
+	       zero_extend_signed_to_ull(usage->ru_idrss),
+	       zero_extend_signed_to_ull(usage->ru_isrss),
+	       zero_extend_signed_to_ull(usage->ru_minflt),
+	       zero_extend_signed_to_ull(usage->ru_majflt),
+	       zero_extend_signed_to_ull(usage->ru_nswap),
+	       zero_extend_signed_to_ull(usage->ru_inblock),
+	       zero_extend_signed_to_ull(usage->ru_oublock),
+	       zero_extend_signed_to_ull(usage->ru_msgsnd),
+	       zero_extend_signed_to_ull(usage->ru_msgrcv),
+	       zero_extend_signed_to_ull(usage->ru_nsignals),
+	       zero_extend_signed_to_ull(usage->ru_nvcsw),
+	       zero_extend_signed_to_ull(usage->ru_nivcsw),
+	       sprintrc(rc));
 	errno = saved_errno;
 	return rc;
 }
@@ -49,7 +60,7 @@ invoke_print(int who, const char *who_str, struct rusage *usage)
 int
 main(void)
 {
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct rusage, usage);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_rusage_t, usage);
 	if (invoke_print(ARG_STR(RUSAGE_SELF), usage)) {
 		perror_msg_and_fail("RUSAGE_SELF");
 	}
