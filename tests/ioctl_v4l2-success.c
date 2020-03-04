@@ -1105,12 +1105,17 @@ main(int argc, char **argv)
 		std->index = 0xdeadface;
 		std->id = stdids[i].val;
 
+		if (i % 2)
+			memset(std->reserved, 0, sizeof(std->reserved));
+
 		ioctl(-1, VIDIOC_ENUMSTD, std);
-		printf("ioctl(-1, %s, {index=3735943886, name=",
-		       XLAT_STR(VIDIOC_ENUMSTD));
+		printf("ioctl(-1, %s, {index=3735943886, id=%s, name=",
+		       XLAT_STR(VIDIOC_ENUMSTD), stdids[i].str);
 		print_quoted_cstring((char *) std->name, sizeof(std->name));
 		printf(", frameperiod=2158018784/2158018785"
-		       ", framelines=2158018786}) = %ld (INJECTED)\n",
+		       ", framelines=2158018786%s}) = %ld (INJECTED)\n",
+		       i % 2 ? "" : ", reserved=[0x80a0c0e3, 0x80a0c0e4"
+				    ", 0x80a0c0e5, 0x80a0c0e6]",
 		       inject_retval);
 	}
 

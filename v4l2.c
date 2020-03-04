@@ -700,10 +700,15 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
+		PRINT_FIELD_STDID(", ", s, id);
 		PRINT_FIELD_CSTRING(", ", s, name);
 		tprintf(", frameperiod=" FMT_FRACT,
 			ARGS_FRACT(s.frameperiod));
-		tprintf(", framelines=%u", s.framelines);
+		PRINT_FIELD_U(", ", s, framelines);
+
+		if (!IS_ARRAY_ZERO(s.reserved))
+			PRINT_FIELD_ARRAY(", ", s, reserved, tcp,
+					  print_xint32_array_member);
 	}
 
 	tprints("}");
