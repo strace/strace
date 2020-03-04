@@ -1411,8 +1411,12 @@ main(int argc, char **argv)
 	}
 
 
-	/* VIDIOC_G_INPUT, VIDIOC_S_INPUT, VIDIOC_G_OUTPUT, VIDIOC_S_OUTPUT */
+	/*
+	 * VIDIOC_OVERLAY,
+	 * VIDIOC_G_INPUT, VIDIOC_S_INPUT, VIDIOC_G_OUTPUT, VIDIOC_S_OUTPUT
+	 */
 	static const struct strval32 int_cmds[] = {
+		{ ARG_STR(VIDIOC_OVERLAY) },
 		{ ARG_STR(VIDIOC_G_INPUT) },
 		{ ARG_STR(VIDIOC_S_INPUT) },
 		{ ARG_STR(VIDIOC_G_OUTPUT) },

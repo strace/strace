@@ -569,7 +569,6 @@ main(void)
 		uint32_t cmd;
 		const char *str;
 	} unsupp_cmds[] = {
-		{ ARG_STR(VIDIOC_OVERLAY) },
 #ifdef VIDIOC_EXPBUF
 		{ ARG_STR(VIDIOC_EXPBUF) },
 #endif
@@ -1081,12 +1080,21 @@ main(void)
 	       "}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_FBUF), p_v4l2_framebuffer->base);
 
+	/* VIDIOC_OVERLAY */
+	ioctl(-1, VIDIOC_OVERLAY, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_OVERLAY));
+
+	int *const p_int = page_end - sizeof(int);
+	ioctl(-1, VIDIOC_OVERLAY, p_int);
+	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_OVERLAY), *p_int);
+
 	/* VIDIOC_STREAMON */
 	ioctl(-1, VIDIOC_STREAMON, 0);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_STREAMON));
 
-	int *const p_int = page_end - sizeof(int);
 	ioctl(-1, VIDIOC_STREAMON, p_int);
 	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "])"
 	       " = -1 EBADF (%m)\n",

@@ -1254,6 +1254,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_FBUF: /* W */
 		return print_v4l2_framebuffer(tcp, arg);
 
+	case VIDIOC_OVERLAY: /* W */
+		tprints(", ");
+		printnum_int(tcp, arg, "%u");
+		break;
+
 	case VIDIOC_STREAMON: /* W */
 	case VIDIOC_STREAMOFF: /* W */
 		return print_v4l2_buf_type(tcp, arg);

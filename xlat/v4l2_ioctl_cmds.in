@@ -8,7 +8,7 @@ VIDIOC_REQBUFS			_IOWR('V',   8, struct_v4l2_requestbuffers)
 VIDIOC_QUERYBUF			_IOWR('V',   9, struct_v4l2_buffer)
 VIDIOC_G_FBUF			_IOR ('V',  10, struct_v4l2_framebuffer)
 VIDIOC_S_FBUF			_IOW ('V',  11, struct_v4l2_framebuffer)
-/* VIDIOC_OVERLAY			_IOW ('V',  14, int) */
+VIDIOC_OVERLAY			_IOW ('V',  14, int)
 VIDIOC_QBUF			_IOWR('V',  15, struct_v4l2_buffer)
 /* VIDIOC_EXPBUF			_IOWR('V',  16, struct v4l2_exportbuffer) - added in v3.8-rc1~115^2^2~34 */
 VIDIOC_DQBUF			_IOWR('V',  17, struct_v4l2_buffer)
