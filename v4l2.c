@@ -1086,6 +1086,22 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
+#include "xlat/v4l2_priorities.h"
+
+static int
+print_v4l2_priority(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	int type;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, arg, &type)) {
+		tprints("[");
+		printxval(v4l2_priorities, type, "V4L2_PRIORITY_???");
+		tprints("]");
+	}
+	return RVAL_IOCTL_DECODED;
+}
+
 static bool
 print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
@@ -1366,6 +1382,13 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_CROP: /* RW */
 	case VIDIOC_S_CROP: /* W */
 		return print_v4l2_crop(tcp, arg, code == VIDIOC_G_CROP);
+
+	case VIDIOC_G_PRIORITY: /* R */
+		if (entering(tcp))
+			return 0;
+		ATTRIBUTE_FALLTHROUGH;
+	case VIDIOC_S_PRIORITY: /* W */
+		return print_v4l2_priority(tcp, arg);
 
 	case VIDIOC_S_EXT_CTRLS: /* RW */
 	case VIDIOC_TRY_EXT_CTRLS: /* RW */

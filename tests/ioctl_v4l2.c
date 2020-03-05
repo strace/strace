@@ -590,8 +590,6 @@ main(void)
 		{ ARG_STR(VIDIOC_S_JPEGCOMP) },
 		{ ARG_STR(VIDIOC_ENUMAUDIO) },
 		{ ARG_STR(VIDIOC_ENUMAUDOUT) },
-		{ ARG_STR(VIDIOC_G_PRIORITY) },
-		{ ARG_STR(VIDIOC_S_PRIORITY) },
 		{ ARG_STR(VIDIOC_G_SLICED_VBI_CAP) },
 		{ ARG_STR(VIDIOC_LOG_STATUS) },
 #ifdef VIDIOC_G_ENC_INDEX
@@ -1429,6 +1427,25 @@ main(void)
 	       p_v4l2_crop->c.top,
 	       p_v4l2_crop->c.width,
 	       p_v4l2_crop->c.height);
+
+	/* VIDIOC_G_PRIORITY */
+	ioctl(-1, VIDIOC_G_PRIORITY, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_PRIORITY));
+
+	ioctl(-1, VIDIOC_G_PRIORITY, p_int);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_PRIORITY), p_int);
+
+	/* VIDIOC_S_PRIORITY */
+	ioctl(-1, VIDIOC_S_PRIORITY, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_PRIORITY));
+
+	ioctl(-1, VIDIOC_S_PRIORITY, p_int);
+	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_PRIORITY_??? */") "])"
+	       " = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_PRIORITY), *p_int);
 
 #ifdef VIDIOC_S_EXT_CTRLS
 	/* VIDIOC_S_EXT_CTRLS */

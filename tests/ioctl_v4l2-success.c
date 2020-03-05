@@ -1634,6 +1634,45 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_G_PRIORITY, VIDIOC_S_PRIORITY */
+	static const struct strval32 prio_cmds[] = {
+		{ ARG_STR(VIDIOC_G_PRIORITY) },
+		{ ARG_STR(VIDIOC_S_PRIORITY) },
+	};
+	static const struct strval32 prios[] = {
+		{ ARG_XLAT_KNOWN(0, "V4L2_PRIORITY_UNSET") },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_PRIORITY_BACKGROUND") },
+		{ ARG_XLAT_KNOWN(0x2, "V4L2_PRIORITY_INTERACTIVE") },
+		{ ARG_XLAT_KNOWN(0x3, "V4L2_PRIORITY_RECORD") },
+		{ ARG_XLAT_UNKNOWN(0x4, "V4L2_PRIORITY_???") },
+		{ ARG_XLAT_UNKNOWN(0xdeadc0de, "V4L2_PRIORITY_???") },
+	};
+
+	int *prio = tail_alloc(sizeof(*prio));
+
+	for (size_t i = 0; i < ARRAY_SIZE(prio_cmds); i++) {
+		ioctl(-1, prio_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(prio_cmds[i].str, prio_cmds[i].val, NULL),
+		       inject_retval);
+
+		ioctl(-1, prio_cmds[i].val, (char *) prio + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(prio_cmds[i].str, prio_cmds[i].val, NULL),
+		       (char *) prio + 1, inject_retval);
+
+		for (size_t j = 0; j < ARRAY_SIZE(prios); j++) {
+			*prio = prios[j].val;
+
+			ioctl(-1, prio_cmds[i].val, prio);
+			printf("ioctl(-1, %s, [%s]) = %ld (INJECTED)\n",
+			       sprintxlat(prio_cmds[i].str, prio_cmds[i].val,
+					  NULL),
+			       prios[j].str, inject_retval);
+		}
+	}
+
+
 #ifdef VIDIOC_S_EXT_CTRLS
 	/* VIDIOC_S_EXT_CTRLS, VIDIOC_TRY_EXT_CTRLS, VIDIOC_G_EXT_CTRLS */
 	static const struct strval32 ectrl_cmds[] = {

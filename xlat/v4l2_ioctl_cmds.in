@@ -50,8 +50,8 @@ VIDIOC_QUERYSTD			_IOR ('V',  63, uint64_t) /* v4l2_std_id */
 VIDIOC_TRY_FMT			_IOWR('V',  64, struct_v4l2_format)
 /* VIDIOC_ENUMAUDIO		_IOWR('V',  65, struct v4l2_audio) */
 /* VIDIOC_ENUMAUDOUT		_IOWR('V',  66, struct v4l2_audioout) */
-/* VIDIOC_G_PRIORITY		_IOR ('V',  67, uint32_t) */ /* enum v4l2_priority */
-/* VIDIOC_S_PRIORITY		_IOW ('V',  68, uint32_t) */ /* enum v4l2_priority */
+VIDIOC_G_PRIORITY		_IOR ('V',  67, uint32_t) /* enum v4l2_priority */
+VIDIOC_S_PRIORITY		_IOW ('V',  68, uint32_t) /* enum v4l2_priority */
 /* VIDIOC_G_SLICED_VBI_CAP		_IOWR('V',  69, struct_v4l2_sliced_vbi_cap) - added in v2.6.16.28-rc1~3732 */
 /* VIDIOC_LOG_STATUS		_IO  ('V',  70) - added in v2.6.16.28-rc1~2961 */
 VIDIOC_G_EXT_CTRLS		_IOWR('V',  71, struct_v4l2_ext_controls) /* added in v2.6.18-rc1~862^2~18 */
