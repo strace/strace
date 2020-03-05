@@ -45,7 +45,7 @@
 		printaddr64((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_0X(prefix_, where_, field_)				\
+# define PRINT_FIELD_0X(prefix_, where_, field_)			\
 	STRACE_PRINTF("%s%s=%#0*llx", (prefix_), #field_,		\
 		      (int) sizeof((where_).field_) * 2,		\
 		      zero_extend_signed_to_ull((where_).field_))
@@ -63,7 +63,7 @@
 			     (dflt_));					\
 	} while (0)
 
-# define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)		\
+# define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)	\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		printxval64((xlat_),					\
@@ -257,7 +257,7 @@
 		printstr((tcp_), (where_).field_);			\
 	} while (0)
 
-# define PRINT_FIELD_PATH(prefix_, where_, field_, tcp_)			\
+# define PRINT_FIELD_PATH(prefix_, where_, field_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		printpath((tcp_), (where_).field_);			\
