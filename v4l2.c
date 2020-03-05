@@ -40,6 +40,9 @@
 
 #include "types/v4l2.h"
 
+#ifdef HAVE_STRUCT_V4L2_EXPORT_BUFFER
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_exportbuffer);
+#endif
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
 CHECK_V4L2_STRUCT_SIZE_LE(v4l2_pix_format);
 #ifdef HAVE_STRUCT_V4L2_PLANE_PIX_FORMAT
@@ -521,6 +524,40 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
 		}
 		tprints(", ...");
+	}
+
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
+print_v4l2_exportbuffer(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct_v4l2_exportbuffer eb;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &eb))
+			return RVAL_IOCTL_DECODED;
+
+		PRINT_FIELD_XVAL("{", eb, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_U(", ", eb, index);
+		PRINT_FIELD_U(", ", eb, plane);
+		tprints(", flags=");
+		tprint_open_modes(eb.flags);
+
+		return 0;
+	}
+
+	/* exiting */
+	if (!syserror(tcp) && !umove(tcp, arg, &eb)) {
+		PRINT_FIELD_FD(", ", eb, fd, tcp);
+
+		if (!IS_ARRAY_ZERO(eb.reserved))
+			PRINT_FIELD_ARRAY(", ", eb, reserved, tcp,
+					  print_xint32_array_member);
 	}
 
 	tprints("}");
@@ -1260,6 +1297,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_QBUF: /* RW */
 	case VIDIOC_DQBUF: /* RW */
 		return print_v4l2_buffer(tcp, code, arg);
+
+	case VIDIOC_EXPBUF: /* RW */
+		return print_v4l2_exportbuffer(tcp, arg);
 
 	case VIDIOC_G_FBUF: /* R */
 		if (entering(tcp))

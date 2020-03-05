@@ -7,6 +7,7 @@
 
 #include "tests.h"
 
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -757,6 +758,49 @@ main(int argc, char **argv)
 			? ", timestamp={tv_sec=508936414, tv_usec=999999}" : "",
 		       inject_retval);
 	}
+
+
+#ifdef VIDIOC_EXPBUF
+	/* VIDIOC_EXPBUF */
+	static const struct strval32 open_flags[] = {
+		{ ARG_STR(O_RDONLY) },
+		{ ARG_STR(O_WRONLY|0x80000000) },
+		{ ARG_STR(O_RDWR|O_EXCL) },
+	};
+	struct v4l2_exportbuffer *expb = tail_alloc(sizeof(*expb));
+
+	ioctl(-1, VIDIOC_EXPBUF, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_EXPBUF), inject_retval);
+
+	ioctl(-1, VIDIOC_EXPBUF, (char *) expb + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_EXPBUF), (char *) expb + 1, inject_retval);
+
+	for (size_t i = 0; i < MAX(ARRAY_SIZE(buf_types),
+				   ARRAY_SIZE(open_flags)); i++) {
+		fill_memory32(expb, sizeof(*expb));
+		expb->type  = buf_types[i % ARRAY_SIZE(buf_types)].val;
+		expb->flags = open_flags[i % ARRAY_SIZE(open_flags)].val;
+		expb->fd    = 0;
+
+		if (i % 2)
+			memset(expb->reserved, 0, sizeof(expb->reserved));
+
+		ioctl(-1, VIDIOC_EXPBUF, expb);
+		printf("ioctl(-1, %s, {type=%s, index=2158018785"
+		       ", plane=2158018786, flags=" XLAT_FMT ", fd=0" FD0_PATH
+		       "%s}) = %ld (INJECTED)\n",
+		       XLAT_STR(VIDIOC_EXPBUF), buf_types[i].str,
+		       XLAT_SEL(open_flags[i % ARRAY_SIZE(open_flags)].val,
+				open_flags[i % ARRAY_SIZE(open_flags)].str),
+		       i % 2 ? "" : ", reserved=[0x80a0c0e5, 0x80a0c0e6"
+				    ", 0x80a0c0e7, 0x80a0c0e8, 0x80a0c0e9"
+				    ", 0x80a0c0ea, 0x80a0c0eb, 0x80a0c0ec"
+				    ", 0x80a0c0ed, 0x80a0c0ee, 0x80a0c0ef]",
+		       inject_retval);
+	}
+#endif
 
 
 	/* VIDIOC_G_FBUF, VIDIOC_S_FBUF */

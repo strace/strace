@@ -8,6 +8,7 @@
 
 #include "tests.h"
 #include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -569,9 +570,6 @@ main(void)
 		uint32_t cmd;
 		const char *str;
 	} unsupp_cmds[] = {
-#ifdef VIDIOC_EXPBUF
-		{ ARG_STR(VIDIOC_EXPBUF) },
-#endif
 		{ ARG_STR(VIDIOC_G_AUDIO) },
 		{ ARG_STR(VIDIOC_S_AUDIO) },
 		{ ARG_STR(VIDIOC_QUERYMENU) },
@@ -994,6 +992,22 @@ main(void)
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
 	       "}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_DQBUF), p_v4l2_buffer->type);
+
+#ifdef VIDIOC_EXPBUF
+	ioctl(-1, VIDIOC_EXPBUF, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_EXPBUF));
+
+	struct v4l2_exportbuffer *const p_v4l2_exportbuffer =
+		page_end - sizeof(*p_v4l2_exportbuffer);
+	p_v4l2_exportbuffer->flags = O_RDWR | O_APPEND;
+	ioctl(-1, VIDIOC_EXPBUF, p_v4l2_exportbuffer);
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       ", index=%u, plane=%u, flags=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_EXPBUF), p_v4l2_exportbuffer->type,
+	       p_v4l2_exportbuffer->index, p_v4l2_exportbuffer->plane,
+	       XLAT_SEL(p_v4l2_exportbuffer->flags, "O_RDWR|O_APPEND"));
+#endif
 
 	/* VIDIOC_G_FBUF */
 	ioctl(-1, VIDIOC_G_FBUF, 0);

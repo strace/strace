@@ -20,6 +20,16 @@ typedef struct v4l2_standard struct_v4l2_standard;
 
 
 typedef struct {
+	uint32_t type; /* enum v4l2_buf_type */
+	uint32_t index;
+	uint32_t plane;
+	uint32_t flags;
+	int32_t  fd;
+	uint32_t reserved[11];
+} struct_v4l2_exportbuffer;
+
+
+typedef struct {
 	uint8_t  driver[16];
 	uint8_t  card[32];
 	uint8_t  bus_info[32];
