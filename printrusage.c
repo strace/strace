@@ -18,7 +18,7 @@
 
 struct kernel_old_timeval {
 	kernel_long_t	tv_sec;
-	long		tv_nsec;
+	long		tv_usec;
 };
 
 typedef struct {
