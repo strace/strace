@@ -19,6 +19,9 @@
 # include <linux/time_types.h>
 #endif
 
+# include "kernel_timeval.h"
+# include "kernel_old_timespec.h"
+
 #define XLAT_MACROS_ONLY
 #include "xlat/sock_options.h"
 #undef XLAT_MACROS_ONLY
@@ -28,7 +31,7 @@ print_timestamp_old(const struct cmsghdr *c)
 {
 	const void *cmsg_header = c;
 	const void *cmsg_data = CMSG_DATA(c);
-	struct timeval tv;
+	kernel_old_timeval_t tv;
 	const unsigned int expected_len = sizeof(tv);
 	const unsigned int data_len = c->cmsg_len - (cmsg_data - cmsg_header);
 
@@ -47,7 +50,7 @@ print_timestampns_old(const struct cmsghdr *c)
 {
 	const void *cmsg_header = c;
 	const void *cmsg_data = CMSG_DATA(c);
-	struct timespec ts;
+	kernel_old_timespec_t ts;
 	const unsigned int expected_len = sizeof(ts);
 	const unsigned int data_len = c->cmsg_len - (cmsg_data - cmsg_header);
 
