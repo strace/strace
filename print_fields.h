@@ -47,7 +47,7 @@
 		printaddr64((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_0X(prefix_, where_, field_)				\
+# define PRINT_FIELD_0X(prefix_, where_, field_)			\
 	STRACE_PRINTF("%s%s=%#0*llx", (prefix_), #field_,		\
 		      (int) sizeof((where_).field_) * 2,		\
 		      zero_extend_signed_to_ull((where_).field_))
@@ -83,7 +83,7 @@
 			     (dflt_));					\
 	} while (0)
 
-# define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)		\
+# define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)	\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		printxval64((xlat_),					\
@@ -241,7 +241,7 @@
 		print_ifindex((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_SOCKADDR(prefix_, where_, field_, tcp_)			\
+# define PRINT_FIELD_SOCKADDR(prefix_, where_, field_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		print_sockaddr(tcp_, &(where_).field_,			\
@@ -276,25 +276,25 @@
 # define PRINT_FIELD_TID(prefix_, where_, field_, tcp_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_TID);			\
+		printpid((tcp_), (where_).field_, PT_TID);		\
 	} while (0)
 
-# define PRINT_FIELD_TGID(prefix_, where_, field_, tcp_)			\
+# define PRINT_FIELD_TGID(prefix_, where_, field_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_TGID);			\
+		printpid((tcp_), (where_).field_, PT_TGID);		\
 	} while (0)
 
-# define PRINT_FIELD_PGID(prefix_, where_, field_, tcp_)			\
+# define PRINT_FIELD_PGID(prefix_, where_, field_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_PGID);			\
+		printpid((tcp_), (where_).field_, PT_PGID);		\
 	} while (0)
 
 # define PRINT_FIELD_SID(prefix_, where_, field_, tcp_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_SID);			\
+		printpid((tcp_), (where_).field_, PT_SID);		\
 	} while (0)
 
 # define PRINT_FIELD_STRN(prefix_, where_, field_, len_, tcp_)		\
@@ -310,7 +310,7 @@
 		printstr((tcp_), (where_).field_);			\
 	} while (0)
 
-# define PRINT_FIELD_PATH(prefix_, where_, field_, tcp_)			\
+# define PRINT_FIELD_PATH(prefix_, where_, field_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		printpath((tcp_), (where_).field_);			\
