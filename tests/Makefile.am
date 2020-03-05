@@ -138,6 +138,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_v4l2-success-v-Xabbrev \
 	ioctl_v4l2-success-v-Xraw \
 	ioctl_v4l2-success-v-Xverbose \
+	ioctl_v4l2-success-v-y \
+	ioctl_v4l2-success-v-y-Xabbrev \
+	ioctl_v4l2-success-v-y-Xraw \
+	ioctl_v4l2-success-v-y-Xverbose \
 	is_linux_mips_n64 \
 	kill_child \
 	ksysent \

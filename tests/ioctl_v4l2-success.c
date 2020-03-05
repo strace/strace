@@ -17,6 +17,13 @@
 
 #include <sys/ioctl.h>
 
+#ifndef PRINT_PATHS
+# define PRINT_PATHS 0
+#endif
+#ifndef FD0_PATH
+# define FD0_PATH ""
+#endif
+
 static bool
 fill_fmt(struct v4l2_format *f)
 {

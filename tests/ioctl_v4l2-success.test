@@ -18,7 +18,7 @@ for ret in 42; do
 	run_strace -a29 "$@" -e trace=ioctl \
 		-e inject=ioctl:retval="${ret}":when="${IOCTL_INJECT_START}+" \
 		"$prog" \
-		"${IOCTL_INJECT_START}" "${ret}"> "$EXP.${ret}"
+		"${IOCTL_INJECT_START}" "${ret}" < /dev/full > "$EXP.${ret}"
 	grep -v '^ioctl([012][,<]' < "$LOG" > "$OUT.$ret"
 	match_diff "$OUT.$ret" "$EXP.$ret"
 done
