@@ -1383,6 +1383,10 @@ main(int argc, char **argv)
 			tuner->audmode =
 				tuner_amodes[j % ARRAY_SIZE(tuner_amodes)].val;
 
+			if (!((i + j) % 2))
+				memset(tuner->reserved, 0,
+				       sizeof(tuner->reserved));
+
 			ioctl(-1, tuner_cmds[i].val, tuner);
 			printf("ioctl(-1, %s, {index=2158018784",
 			       sprintxlat(tuner_cmds[i].str,
@@ -1397,7 +1401,7 @@ main(int argc, char **argv)
 				       ", rangelow=2158018795"
 				       ", rangehigh=2158018796, rxsubchans=%s"
 				       ", audmode=%s, signal=-2136948497"
-				       ", afc=-2136948496",
+				       ", afc=-2136948496%s",
 				       tuner_types[j %
 						   ARRAY_SIZE(tuner_types)].str,
 				       tuner_caps[j %
@@ -1405,7 +1409,10 @@ main(int argc, char **argv)
 				       tuner_rxsc[j %
 						  ARRAY_SIZE(tuner_rxsc)].str,
 				       tuner_amodes[j %
-						 ARRAY_SIZE(tuner_amodes)].str);
+						 ARRAY_SIZE(tuner_amodes)].str,
+				       (i + j) % 2 ? ", reserved=[0x80a0c0f1"
+						     ", 0x80a0c0f2, 0x80a0c0f3"
+						     ", 0x80a0c0f4]" : "");
 			}
 			printf("}) = %ld (INJECTED)\n", inject_retval);
 		}

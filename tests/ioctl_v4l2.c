@@ -1315,12 +1315,15 @@ main(void)
 	       ", type=" XLAT_FMT ", capability=" XLAT_FMT
 	       ", rangelow=%u, rangehigh=%u"
 	       ", rxsubchans=" XLAT_FMT ", audmode=" XLAT_FMT
-	       ", signal=%d, afc=%d}) = -1 EBADF (%m)\n",
+	       ", signal=%d, afc=%d, reserved=[%#x, %#x, %#x, %#x]}"
+	       ") = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_TUNER), p_tuner->index,
 	       XLAT_ARGS(V4L2_TUNER_RADIO), XLAT_ARGS(V4L2_TUNER_CAP_LOW),
 	       p_tuner->rangelow, p_tuner->rangehigh,
 	       XLAT_ARGS(V4L2_TUNER_SUB_MONO), XLAT_ARGS(V4L2_TUNER_MODE_MONO),
-	       p_tuner->signal, p_tuner->afc);
+	       p_tuner->signal, p_tuner->afc,
+	       p_tuner->reserved[0], p_tuner->reserved[1],
+	       p_tuner->reserved[2], p_tuner->reserved[3]);
 
 	/* VIDIOC_QUERYCTRL */
 	ioctl(-1, VIDIOC_QUERYCTRL, 0);
