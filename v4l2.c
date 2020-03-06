@@ -198,13 +198,12 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING(", ", caps, bus_info);
 	tprintf(", version=");
 	print_kernel_version(caps.version);
-	tprints(", capabilities=");
-	printflags(v4l2_device_capabilities_flags, caps.capabilities,
-		   "V4L2_CAP_???");
+	PRINT_FIELD_FLAGS(", ", caps, capabilities,
+			  v4l2_device_capabilities_flags, "V4L2_CAP_???");
 	if (caps.device_caps) {
-		tprints(", device_caps=");
-		printflags(v4l2_device_capabilities_flags, caps.device_caps,
-			   "V4L2_CAP_???");
+		PRINT_FIELD_FLAGS(", ", caps, device_caps,
+				  v4l2_device_capabilities_flags,
+				  "V4L2_CAP_???");
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
@@ -222,18 +221,17 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u, type=", f.index);
-		printxval(v4l2_buf_types, f.type, "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_U("{", f, index);
+		PRINT_FIELD_XVAL(", ", f, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-		tprints(", flags=");
-		printflags(v4l2_format_description_flags, f.flags,
-			   "V4L2_FMT_FLAG_???");
+		PRINT_FIELD_FLAGS(", ", f, flags, v4l2_format_description_flags,
+				  "V4L2_FMT_FLAG_???");
 		PRINT_FIELD_CSTRING(", ", f, description);
-		tprints(", pixelformat=");
-		print_pixelformat(f.pixelformat, v4l2_pix_fmts);
+		PRINT_FIELD_PIXFMT(", ", f, pixelformat, v4l2_pix_fmts);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
