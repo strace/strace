@@ -205,6 +205,9 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 				  v4l2_device_capabilities_flags,
 				  "V4L2_CAP_???");
 	}
+	if (!IS_ARRAY_ZERO(caps.reserved))
+		PRINT_FIELD_ARRAY(", ", caps, reserved, tcp,
+				  print_xint32_array_member);
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
@@ -248,6 +251,10 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		}
 
 		PRINT_FIELD_PIXFMT(", ", f, pixelformat, fmt_xlat);
+
+		if (!IS_ARRAY_ZERO(f.reserved))
+			PRINT_FIELD_ARRAY(", ", f, reserved, tcp,
+					  print_xint32_array_member);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;

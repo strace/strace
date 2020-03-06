@@ -430,7 +430,13 @@ main(int argc, char **argv)
 	       "|V4L2_CAP_VIDEO_M2M_MPLANE|V4L2_CAP_VIDEO_M2M|V4L2_CAP_AUDIO"
 	       "|V4L2_CAP_RADIO|V4L2_CAP_MODULATOR|V4L2_CAP_SDR_OUTPUT"
 	       "|V4L2_CAP_META_CAPTURE|V4L2_CAP_ASYNCIO|V4L2_CAP_META_OUTPUT"
-	       "|V4L2_CAP_TOUCH|V4L2_CAP_DEVICE_CAPS|0x60000008"));
+	       "|V4L2_CAP_TOUCH|V4L2_CAP_DEVICE_CAPS|0x60000008")
+#if WORDS_BIGENDIAN
+	       ", reserved=[0xdcdddedf, 0xe0e1e2e3, 0xe4e5e6e7]"
+#else
+	       ", reserved=[0xdfdedddc, 0xe3e2e1e0, 0xe7e6e5e4]"
+#endif
+	       );
 	printf("}) = %ld (INJECTED)\n", inject_retval);
 
 
@@ -499,9 +505,6 @@ main(int argc, char **argv)
 
 	struct v4l2_fmtdesc *fmtdesc = tail_alloc(sizeof(*fmtdesc));
 
-	fill_memory(fmtdesc, sizeof(*fmtdesc));
-	fmtdesc->index = 0xdeac0de;
-
 	ioctl(-1, VIDIOC_ENUM_FMT, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
 	       XLAT_STR(VIDIOC_ENUM_FMT), inject_retval);
@@ -513,9 +516,15 @@ main(int argc, char **argv)
 	for (size_t i = 0; i < ARRAY_SIZE(buf_types); i++) {
 		for (size_t j = 0; j < ARRAY_SIZE(fmtdesc_flags); j++) {
 			for (size_t k = 0; k < ARRAY_SIZE(fmtdesc_fmts); k++) {
+				fill_memory(fmtdesc, sizeof(*fmtdesc));
+				fmtdesc->index = 0xdeac0de;
 				fmtdesc->type = buf_types[i].val;
 				fmtdesc->flags = fmtdesc_flags[j].val;
 				fmtdesc->pixelformat = fmtdesc_fmts[k].val;
+
+				if ((i + j + k) % 2)
+					memset(fmtdesc->reserved, 0,
+					       sizeof(fmtdesc->reserved));
 
 				ioctl(-1, VIDIOC_ENUM_FMT, fmtdesc);
 				printf("ioctl(-1, %s, {index=233488606, type=%s"
@@ -526,13 +535,22 @@ main(int argc, char **argv)
 				print_quoted_cstring((char *) fmtdesc->description,
 					sizeof(fmtdesc->description));
 				printf(", pixelformat=%s" NRAW("%s")
-				       "}) = %ld (INJECTED)\n",
+				       "%s}) = %ld (INJECTED)\n",
 				       fmtdesc_fmts[k].str,
 #if !XLAT_RAW
 				       fmtdesc_fmt_names[k].val &
 					(1 << MIN(buf_types[i].val, 31))
 						? fmtdesc_fmt_names[k].str : "",
 #endif
+				       (i + j + k) % 2 ? "" : ", reserved=["
+#if WORDS_BIGENDIAN
+					"0xb0b1b2b3, 0xb4b5b6b7"
+					", 0xb8b9babb, 0xbcbdbebf"
+#else
+					"0xb3b2b1b0, 0xb7b6b5b4"
+					", 0xbbbab9b8, 0xbfbebdbc"
+#endif
+					"]",
 				       inject_retval);
 
 				fill_memory_ex(fmtdesc->description,
