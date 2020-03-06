@@ -200,7 +200,7 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	print_kernel_version(caps.version);
 	PRINT_FIELD_FLAGS(", ", caps, capabilities,
 			  v4l2_device_capabilities_flags, "V4L2_CAP_???");
-	if (caps.device_caps) {
+	if (caps.capabilities & V4L2_CAP_DEVICE_CAPS || caps.device_caps) {
 		PRINT_FIELD_FLAGS(", ", caps, device_caps,
 				  v4l2_device_capabilities_flags,
 				  "V4L2_CAP_???");
