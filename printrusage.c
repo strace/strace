@@ -10,24 +10,14 @@
  */
 
 #include "defs.h"
-#include <sys/resource.h>
-
-#include "print_fields.h"
 
 #include DEF_MPERS_TYPE(rusage_t)
 
-struct kernel_old_timeval {
-	kernel_long_t	tv_sec;
-#if defined __sparc__ && defined __arch64__
-	int		tv_usec;
-#else
-	kernel_long_t	tv_usec;
-#endif
-};
+#include "kernel_timeval.h"
 
 typedef struct {
-	struct kernel_old_timeval ru_utime;
-	struct kernel_old_timeval ru_stime;
+	kernel_old_timeval_t ru_utime;
+	kernel_old_timeval_t ru_stime;
 	kernel_long_t	ru_maxrss;
 	kernel_long_t	ru_ixrss;
 	kernel_long_t	ru_idrss;
@@ -45,6 +35,9 @@ typedef struct {
 } rusage_t;
 
 #include MPERS_DEFS
+
+#include <sys/resource.h>
+#include "print_fields.h"
 
 MPERS_PRINTER_DECL(void, printrusage,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
