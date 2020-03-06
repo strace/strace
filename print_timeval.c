@@ -10,7 +10,9 @@
 
 #include DEF_MPERS_TYPE(timeval_t)
 
-typedef struct timeval timeval_t;
+#include "kernel_timeval.h"
+
+typedef kernel_old_timeval_t timeval_t;
 
 #include MPERS_DEFS
 
