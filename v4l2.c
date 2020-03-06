@@ -231,7 +231,23 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_FLAGS(", ", f, flags, v4l2_format_description_flags,
 				  "V4L2_FMT_FLAG_???");
 		PRINT_FIELD_CSTRING(", ", f, description);
-		PRINT_FIELD_PIXFMT(", ", f, pixelformat, v4l2_pix_fmts);
+
+		const struct xlat *fmt_xlat;
+
+		switch (f.type) {
+		case V4L2_BUF_TYPE_SDR_CAPTURE:
+		case V4L2_BUF_TYPE_SDR_OUTPUT:
+			fmt_xlat = v4l2_sdr_fmts;
+			break;
+		case V4L2_BUF_TYPE_META_CAPTURE:
+		case V4L2_BUF_TYPE_META_OUTPUT:
+			fmt_xlat = v4l2_meta_fmts;
+			break;
+		default:
+			fmt_xlat = v4l2_pix_fmts;
+		}
+
+		PRINT_FIELD_PIXFMT(", ", f, pixelformat, fmt_xlat);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;

@@ -18,6 +18,8 @@
 
 #include <sys/ioctl.h>
 
+#include "static_assert.h"
+
 #ifndef PRINT_PATHS
 # define PRINT_PATHS 0
 #endif
@@ -462,13 +464,39 @@ main(int argc, char **argv)
 		{ ARG_XLAT_UNKNOWN(0xdead0000, "V4L2_FMT_FLAG_???") },
 	};
 	static const struct strval32 fmtdesc_fmts[] = {
+		{ V4L2_PIX_FMT_JPEG, RAW("0x4745504a")
+				     NRAW("v4l2_fourcc('J', 'P', 'E', 'G')")},
 		{ 0x4c47504a, RAW("0x4c47504a")
-			      NRAW("v4l2_fourcc('J', 'P', 'G', 'L')"
-			           " /* V4L2_PIX_FMT_JPGL */") },
+			      NRAW("v4l2_fourcc('J', 'P', 'G', 'L')") },
+		{ 0xb5315241, RAW("0xb5315241")
+			      NRAW("v4l2_fourcc_be('A', 'R', '1', '5')") },
+		{ 0x38304454, RAW("0x38304454")
+			      NRAW("v4l2_fourcc('T', 'D', '0', '8')") },
+		{ 0x32315552, RAW("0x32315552")
+			      NRAW("v4l2_fourcc('R', 'U', '1', '2')") },
+		{ 0x58583444, RAW("0x58583444")
+			      NRAW("v4l2_fourcc('D', '4', 'X', 'X')") },
 		{ 0xbadc0ded, RAW("0xbadc0ded")
 			      NRAW("v4l2_fourcc_be('\\xed', '\\x0d', '\\xdc',"
 			           " ':')") },
 	};
+	/* val - bitmask of applicable buffer types */
+	static const struct strval32 fmtdesc_fmt_names[] = {
+		{ ~(1 << 0xb | 1 << 0xc | 1 << 0xd | 1<< 0xe),
+		  " /* V4L2_PIX_FMT_JPEG */" },
+		{ ~(1 << 0xb | 1 << 0xc | 1 << 0xd | 1<< 0xe),
+		  " /* V4L2_PIX_FMT_JPGL */" },
+		{ ~(1 << 0xb | 1 << 0xc | 1 << 0xd | 1<< 0xe),
+		  " /* V4L2_PIX_FMT_ARGB555X */" },
+		{ ~(1 << 0xb | 1 << 0xc | 1 << 0xd | 1<< 0xe),
+		  " /* V4L2_TCH_FMT_DELTA_TD08 */" },
+		{ 1 << 0xb | 1 << 0xc, " /* V4L2_SDR_FMT_RU12LE */" },
+		{ 1 << 0xd | 1 << 0xe, " /* V4L2_META_FMT_D4XX */" },
+		{ 0x0 },
+	};
+	static_assert(ARRAY_SIZE(fmtdesc_fmts) == ARRAY_SIZE(fmtdesc_fmt_names),
+		      "fmtdesc_fmts and fmtdesc_fmt_names have to be in sync");
+
 	struct v4l2_fmtdesc *fmtdesc = tail_alloc(sizeof(*fmtdesc));
 
 	fill_memory(fmtdesc, sizeof(*fmtdesc));
@@ -497,8 +525,15 @@ main(int argc, char **argv)
 				       fmtdesc_flags[j].str);
 				print_quoted_cstring((char *) fmtdesc->description,
 					sizeof(fmtdesc->description));
-				printf(", pixelformat=%s}) = %ld (INJECTED)\n",
-				       fmtdesc_fmts[k].str, inject_retval);
+				printf(", pixelformat=%s" NRAW("%s")
+				       "}) = %ld (INJECTED)\n",
+				       fmtdesc_fmts[k].str,
+#if !XLAT_RAW
+				       fmtdesc_fmt_names[k].val &
+					(1 << MIN(buf_types[i].val, 31))
+						? fmtdesc_fmt_names[k].str : "",
+#endif
+				       inject_retval);
 
 				fill_memory_ex(fmtdesc->description,
 					       sizeof(fmtdesc->description),
