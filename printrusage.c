@@ -18,7 +18,11 @@
 
 struct kernel_old_timeval {
 	kernel_long_t	tv_sec;
-	long		tv_usec;
+#if defined __sparc__ && defined __arch64__
+	int		tv_usec;
+#else
+	kernel_long_t	tv_usec;
+#endif
 };
 
 typedef struct {
