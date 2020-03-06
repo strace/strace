@@ -135,11 +135,11 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 		(unsigned char) fourcc,
 		(unsigned char) (fourcc >> 8),
 		(unsigned char) (fourcc >> 16),
-		(unsigned char) (fourcc >> 24),
+		(unsigned char) (fourcc >> 24) & 0x7f,
 	};
 	unsigned int i;
 
-	tprints("v4l2_fourcc(");
+	tprints(fourcc & 0x80000000 ? "v4l2_fourcc_be(" : "v4l2_fourcc(");
 	/* Generic char array printing routine.  */
 	for (i = 0; i < ARRAY_SIZE(a); ++i) {
 		unsigned char c = a[i];

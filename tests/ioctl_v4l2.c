@@ -27,7 +27,7 @@
 #define cc0(arg) ((unsigned int) (unsigned char) (arg))
 #define cc1(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 8))
 #define cc2(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 16))
-#define cc3(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 24))
+#define cc3(arg) ((unsigned int) (unsigned char) ((unsigned int) (arg) >> 24) & 0x7f)
 #define fourcc(a0, a1, a2, a3) \
 	((unsigned int)(a0) | \
 	 ((unsigned int)(a1) << 8) | \
@@ -218,7 +218,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			      ? magic : pf_magic);
 #else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
-			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			printf("v4l2_fourcc_be('\\x%x', '\\x%x', '\\x%x', '%c')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
 		else
 			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
@@ -253,7 +253,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			      ? magic : pf_magic);
 #else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
-			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			printf("v4l2_fourcc_be('\\x%x', '\\x%x', '\\x%x', '%c')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
 		else
 			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
@@ -346,7 +346,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			      ? magic : pf_magic);
 #else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VBI_CAPTURE)
-			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			printf("v4l2_fourcc_be('\\x%x', '\\x%x', '\\x%x', '%c')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
 		else
 			printf("v4l2_fourcc('%c', '%c', '%c', '%c') "
@@ -417,7 +417,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #  endif
 # else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_SDR_CAPTURE)
-			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			printf("v4l2_fourcc_be('\\x%x', '\\x%x', '\\x%x', '%c')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
 #  if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 		else
@@ -462,7 +462,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       cc3(mf_magic));
 #  if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
 		else
-			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
+			printf("v4l2_fourcc_be('\\x%x', '\\x%x', '\\x%x', '%c')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
 #  endif
 # endif /* XLAT_RAW */
@@ -1081,7 +1081,7 @@ main(void)
 #if VERBOSE
 	       "fmt={width=3735943886, height=3735943887"
 	       ", pixelformat=" RAW("0xdeadfad0")
-	       NRAW("v4l2_fourcc('\\xd0', '\\xfa', '\\xad', '\\xde')")
+	       NRAW("v4l2_fourcc_be('\\xd0', '\\xfa', '\\xad', '^')")
 	       ", field=0xdeadfad1" NRAW(" /* V4L2_FIELD_??? */")
 	       ", bytesperline=3735943890, sizeimage=3735943891"
 	       ", colorspace=0xdeadfad4" NRAW(" /* V4L2_COLORSPACE_??? */")
@@ -1571,14 +1571,14 @@ main(void)
 #if XLAT_RAW
 	       "0x%hhx%hhx%hhx%hhx"
 #else /* !XLAT_RAW */
-	       "v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')"
+	       "v4l2_fourcc_be('%c', '\\%c', '\\%c', '%c')"
 #endif /* XLAT_RAW */
 	       "}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), p_frmsizeenum->index,
 #if XLAT_RAW
 	       cc[3], cc[2], cc[1], cc[0]
 #else /* !XLAT_RAW */
-	       cc[0], cc[1], cc[2], cc[3]
+	       cc[0], cc[1], cc[2], cc[3] & 0x7f
 #endif /* XLAT_RAW */
 	       );
 #endif /* VIDIOC_ENUM_FRAMESIZES */
@@ -1595,7 +1595,7 @@ main(void)
 #if XLAT_RAW
 	       "%#x"
 #else /* !XLAT_RAW */
-	       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
+	       "v4l2_fourcc_be('\\x%x', '\\x%x', '\\x%x', '%c')"
 #endif /* XLAT_RAW */
 	       ", width=%u, height=%u}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS), p_v4l2_frmivalenum->index,

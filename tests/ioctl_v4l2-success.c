@@ -192,7 +192,7 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
 		printf("%sfmt.pix={width=3735929054, height=4276993775"
 		       ", pixelformat=" RAW("0xb5315258")
-		       NRAW("v4l2_fourcc('X', 'R', '1', '\\xb5')"
+		       NRAW("v4l2_fourcc_be('X', 'R', '1', '5')"
 		            " /* V4L2_PIX_FMT_XRGB555X */")
 		       ", field=%s, bytesperline=3134983661"
 		       ", sizeimage=4207812181, colorspace="
@@ -466,8 +466,8 @@ main(int argc, char **argv)
 			      NRAW("v4l2_fourcc('J', 'P', 'G', 'L')"
 			           " /* V4L2_PIX_FMT_JPGL */") },
 		{ 0xbadc0ded, RAW("0xbadc0ded")
-			      NRAW("v4l2_fourcc('\\xed', '\\x0d', '\\xdc',"
-			           " '\\xba')") },
+			      NRAW("v4l2_fourcc_be('\\xed', '\\x0d', '\\xdc',"
+			           " ':')") },
 	};
 	struct v4l2_fmtdesc *fmtdesc = tail_alloc(sizeof(*fmtdesc));
 
@@ -846,10 +846,10 @@ main(int argc, char **argv)
 	};
 	static const struct strval32 fbuf_fmt_pfs[] = {
 		{ 0xdeadc0de,
-		  "v4l2_fourcc('\\xde', '\\xc0', '\\xad', '\\xde')" },
+		  "v4l2_fourcc_be('\\xde', '\\xc0', '\\xad', '^')" },
 		{ 0x38305554, "v4l2_fourcc('T', 'U', '0', '8')"
 			      " /* V4L2_TCH_FMT_TU08 */" },
-		{ 0xa0363159, "v4l2_fourcc('Y', '1', '6', '\\xa0')"
+		{ 0xa0363159, "v4l2_fourcc_be('Y', '1', '6', ' ')"
 			      " /* V4L2_PIX_FMT_Y16_BE */" },
 	};
 	static const struct strval32 fbuf_fmt_flds[] = {
@@ -908,7 +908,7 @@ main(int argc, char **argv)
 #if VERBOSE
 		       "fmt={width=2158018784, height=2158018785"
 		       ", pixelformat=" RAW("0x80a0c0e2")
-		       NRAW("v4l2_fourcc('\\xe2', '\\xc0', '\\xa0', '\\x80')")
+		       NRAW("v4l2_fourcc_be('\\xe2', '\\xc0', '\\xa0', '\\x00')")
 		       ", field=0x80a0c0e3" NRAW(" /* V4L2_FIELD_??? */")
 		       ", bytesperline=2158018788, sizeimage=2158018789"
 		       ", colorspace=0x80a0c0e6"
@@ -1729,7 +1729,7 @@ main(int argc, char **argv)
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
 	printf("ioctl(-1, %s, {index=2158018784, pixel_format="
 	       RAW("0x80a0c0e1")
-	       NRAW("v4l2_fourcc('\\xe1', '\\xc0', '\\xa0', '\\x80')")
+	       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
 	       ", type=" XLAT_KNOWN(0x1, "V4L2_FRMSIZE_TYPE_DISCRETE")
 	       ", discrete={width=2158018787, height=2158018788}"
 	       "}) = %ld (INJECTED)\n",
@@ -1756,7 +1756,7 @@ main(int argc, char **argv)
 		ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
 		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
 		       RAW("0x80a0c0e1")
-		       NRAW("v4l2_fourcc('\\xe1', '\\xc0', '\\xa0', '\\x80')")
+		       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
 		       ", type=%s}) = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_ENUM_FRAMESIZES),
 		       frmsz_simple_types[i].str, inject_retval);
@@ -1794,7 +1794,7 @@ main(int argc, char **argv)
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, fie);
 	printf("ioctl(-1, %s, {index=2158018784, pixel_format="
 	       RAW("0x80a0c0e1")
-	       NRAW("v4l2_fourcc('\\xe1', '\\xc0', '\\xa0', '\\x80')")
+	       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
 	       ", width=2158018786, height=2158018787"
 	       ", type=" XLAT_KNOWN(0x1, "V4L2_FRMIVAL_TYPE_DISCRETE")
 	       ", discrete=2158018789/2158018790}) = %ld (INJECTED)\n",
@@ -1824,7 +1824,7 @@ main(int argc, char **argv)
 		ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, fie);
 		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
 		       RAW("0x80a0c0e1")
-		       NRAW("v4l2_fourcc('\\xe1', '\\xc0', '\\xa0', '\\x80')")
+		       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
 	               ", width=2158018786, height=2158018787, type=%s})"
 		       " = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS),
