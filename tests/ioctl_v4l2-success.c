@@ -1726,6 +1726,16 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_LOG_STATUS */
+	ioctl(-1, VIDIOC_LOG_STATUS, 0);
+	printf("ioctl(-1, %s) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_LOG_STATUS), inject_retval);
+
+	ioctl(-1, VIDIOC_LOG_STATUS, 0xdeadc0de);
+	printf("ioctl(-1, %s) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_LOG_STATUS), inject_retval);
+
+
 #ifdef VIDIOC_S_EXT_CTRLS
 	/* VIDIOC_S_EXT_CTRLS, VIDIOC_TRY_EXT_CTRLS, VIDIOC_G_EXT_CTRLS */
 	static const struct strval32 ectrl_cmds[] = {

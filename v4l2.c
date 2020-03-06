@@ -1411,6 +1411,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_PRIORITY: /* W */
 		return print_v4l2_priority(tcp, arg);
 
+	case VIDIOC_LOG_STATUS:
+		break;
+
 	case VIDIOC_S_EXT_CTRLS: /* RW */
 	case VIDIOC_TRY_EXT_CTRLS: /* RW */
 	case VIDIOC_G_EXT_CTRLS: /* RW */

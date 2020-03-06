@@ -591,7 +591,6 @@ main(void)
 		{ ARG_STR(VIDIOC_ENUMAUDIO) },
 		{ ARG_STR(VIDIOC_ENUMAUDOUT) },
 		{ ARG_STR(VIDIOC_G_SLICED_VBI_CAP) },
-		{ ARG_STR(VIDIOC_LOG_STATUS) },
 #ifdef VIDIOC_G_ENC_INDEX
 		{ ARG_STR(VIDIOC_G_ENC_INDEX) },
 #endif
@@ -1322,6 +1321,15 @@ main(void)
 	       p_tuner->signal, p_tuner->afc,
 	       p_tuner->reserved[0], p_tuner->reserved[1],
 	       p_tuner->reserved[2], p_tuner->reserved[3]);
+
+	/* VIDIOC_LOG_STATUS */
+	ioctl(-1, VIDIOC_LOG_STATUS, 0);
+	printf("ioctl(-1, %s) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_LOG_STATUS));
+
+	ioctl(-1, VIDIOC_LOG_STATUS, 0xdeadc0de);
+	printf("ioctl(-1, %s) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_LOG_STATUS));
 
 	/* VIDIOC_QUERYCTRL */
 	ioctl(-1, VIDIOC_QUERYCTRL, 0);

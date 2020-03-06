@@ -204,15 +204,15 @@ ioctl_v4l2-v-Xabbrev	+ioctl.test -v -Xabbrev
 ioctl_v4l2-v-Xraw	+ioctl.test -v -Xraw
 ioctl_v4l2-v-Xverbose	+ioctl.test -v -Xverbose
 ioctl_v4l2-success-Xabbrev	+ioctl_v4l2-success.test -Xabbrev
-ioctl_v4l2-success-Xraw	+ioctl_v4l2-success.test -a27 -Xraw
+ioctl_v4l2-success-Xraw	+ioctl_v4l2-success.test -a18 -Xraw
 ioctl_v4l2-success-Xverbose	+ioctl_v4l2-success.test -a30 -Xverbose
 ioctl_v4l2-success-v	+ioctl_v4l2-success.test -a29 -v
 ioctl_v4l2-success-v-Xabbrev	+ioctl_v4l2-success.test -a29 -v -Xabbrev
-ioctl_v4l2-success-v-Xraw	+ioctl_v4l2-success.test -a27 -v -Xraw
+ioctl_v4l2-success-v-Xraw	+ioctl_v4l2-success.test -a18 -v -Xraw
 ioctl_v4l2-success-v-Xverbose	+ioctl_v4l2-success.test -a29 -v -Xverbose
 ioctl_v4l2-success-v-y	+ioctl_v4l2-success.test -a29 -v -y
 ioctl_v4l2-success-v-y-Xabbrev	+ioctl_v4l2-success.test -a29 -v -y -Xabbrev
-ioctl_v4l2-success-v-y-Xraw	+ioctl_v4l2-success.test -a27 -v -y -Xraw
+ioctl_v4l2-success-v-y-Xraw	+ioctl_v4l2-success.test -a18 -v -y -Xraw
 ioctl_v4l2-success-v-y-Xverbose	+ioctl_v4l2-success.test -a29 -v -y -Xverbose
 ioctl_watchdog	+ioctl.test
 ioperm	-a27
