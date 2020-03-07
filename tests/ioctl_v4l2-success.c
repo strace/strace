@@ -1043,12 +1043,28 @@ main(int argc, char **argv)
 
 		fill_memory32(sparm, sizeof(*sparm));
 
-		ioctl(-1, sparm_cmds[i].val, sparm);
-		printf("ioctl(-1, %s, {type="
-		       XLAT_UNKNOWN(0x80a0c0e0, "V4L2_BUF_TYPE_???")
-		       "}) = %ld (INJECTED)\n",
-		       sprintxlat(sparm_cmds[i].str, sparm_cmds[i].val, NULL),
-		       inject_retval);
+		for (size_t j = 0; j < ARRAY_SIZE(buf_types); j++) {
+			sparm->type = buf_types[j].val;
+
+			if (sparm->type == 1 || sparm->type == 2 ||
+			    sparm->type == 9 || sparm->type == 10)
+				continue;
+
+			ioctl(-1, sparm_cmds[i].val, sparm);
+			printf("ioctl(-1, %s, {type=%s, parm.raw_data=",
+			       sprintxlat(sparm_cmds[i].str, sparm_cmds[i].val,
+					  NULL),
+			       buf_types[j].str);
+			static_assert(sizeof(sparm->parm.raw_data) == 200,
+				      "struct v4l2_streamparm.parm.raw_data has changed"
+				      " in size!");
+			print_quoted_hex(sparm->parm.raw_data, 200);
+			if (sparm_cmds[i].val == VIDIOC_S_PARM) {
+				printf("} => {parm.raw_data=");
+				print_quoted_hex(sparm->parm.raw_data, 200);
+			}
+			printf("}) = %ld (INJECTED)\n", inject_retval);
+		}
 
 		sparm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -1057,7 +1073,9 @@ main(int argc, char **argv)
 			", capturemode="
 			XLAT_UNKNOWN(0x80a0c0e2, "V4L2_MODE_???")
 			", timeperframe=2158018787/2158018788"
-			", extendedmode=0x80a0c0e5, readbuffers=2158018790}";
+			", extendedmode=0x80a0c0e5, readbuffers=2158018790"
+			", reserved=[0x80a0c0e7, 0x80a0c0e8, 0x80a0c0e9"
+			", 0x80a0c0ea]}";
 
 		ioctl(-1, sparm_cmds[i].val, sparm);
 		printf("ioctl(-1, %s, {type="
@@ -1072,6 +1090,8 @@ main(int argc, char **argv)
 
 		sparm->parm.capture.capability = 0x1000;
 		sparm->parm.capture.capturemode = 0x1;
+		memset(sparm->parm.capture.reserved, 0,
+		       sizeof(sparm->parm.capture.reserved));
 
 		static const char *parm_str2 = "parm.capture={capability="
 			XLAT_KNOWN(0x1000, "V4L2_CAP_TIMEPERFRAME")
@@ -1092,29 +1112,35 @@ main(int argc, char **argv)
 		       inject_retval);
 
 		sparm->type = 0x9;
-		sparm->parm.capture.capability = 0xdeadbeef;
-		sparm->parm.capture.capturemode = 0xadec0ded;
 
 		ioctl(-1, sparm_cmds[i].val, sparm);
 		printf("ioctl(-1, %s, {type="
 		       XLAT_KNOWN(0x9, "V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE")
-		       "}) = %ld (INJECTED)\n",
+		       ", %s}%s%s%s) = %ld (INJECTED)\n",
 		       sprintxlat(sparm_cmds[i].str, sparm_cmds[i].val, NULL),
+		       parm_str2,
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? " => {" : "",
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? parm_str2 : "",
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? "}" : "",
 		       inject_retval);
 
-		fill_memory32(sparm, sizeof(*sparm));
-		sparm->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
+		sparm->parm.capture.capability = 0xdeadbeef;
+		sparm->parm.capture.capturemode = 0xadec0ded;
+		sparm->parm.capture.reserved[2] = 0xf157face;
 
-		static const char *parm_str3 = "parm.output={capability="
-			XLAT_UNKNOWN(0x80a0c0e1, "V4L2_CAP_???")
-			", outputmode="
-			XLAT_UNKNOWN(0x80a0c0e2, "V4L2_MODE_???")
+		static const char *parm_str3 = "parm.capture={capability="
+			XLAT_KNOWN(0xdeadbeef,
+				   "V4L2_CAP_TIMEPERFRAME|0xdeadaeef")
+			", capturemode="
+			XLAT_KNOWN(0xadec0ded,
+				   "V4L2_MODE_HIGHQUALITY|0xadec0dec")
 			", timeperframe=2158018787/2158018788"
-			", extendedmode=0x80a0c0e5, writebuffers=2158018790}";
+			", extendedmode=0x80a0c0e5, readbuffers=2158018790"
+			", reserved=[0, 0, 0xf157face, 0]}";
 
 		ioctl(-1, sparm_cmds[i].val, sparm);
 		printf("ioctl(-1, %s, {type="
-		       XLAT_KNOWN(0x2, "V4L2_BUF_TYPE_VIDEO_OUTPUT")
+		       XLAT_KNOWN(0x9, "V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE")
 		       ", %s}%s%s%s) = %ld (INJECTED)\n",
 		       sprintxlat(sparm_cmds[i].str, sparm_cmds[i].val, NULL),
 		       parm_str3,
@@ -1123,6 +1149,52 @@ main(int argc, char **argv)
 		       sparm_cmds[i].val == VIDIOC_S_PARM ? "}" : "",
 		       inject_retval);
 
+		fill_memory32(sparm, sizeof(*sparm));
+		sparm->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
+
+		static const char *parm_str4 = "parm.output={capability="
+			XLAT_UNKNOWN(0x80a0c0e1, "V4L2_CAP_???")
+			", outputmode="
+			XLAT_UNKNOWN(0x80a0c0e2, "V4L2_MODE_???")
+			", timeperframe=2158018787/2158018788"
+			", extendedmode=0x80a0c0e5, writebuffers=2158018790"
+			", reserved=[0x80a0c0e7, 0x80a0c0e8, 0x80a0c0e9"
+			", 0x80a0c0ea]}";
+
+		ioctl(-1, sparm_cmds[i].val, sparm);
+		printf("ioctl(-1, %s, {type="
+		       XLAT_KNOWN(0x2, "V4L2_BUF_TYPE_VIDEO_OUTPUT")
+		       ", %s}%s%s%s) = %ld (INJECTED)\n",
+		       sprintxlat(sparm_cmds[i].str, sparm_cmds[i].val, NULL),
+		       parm_str4,
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? " => {" : "",
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? parm_str4 : "",
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? "}" : "",
+		       inject_retval);
+
+		sparm->type = 0xa;
+		sparm->parm.capture.capability = 0x1000;
+		sparm->parm.capture.capturemode = 0x1;
+		memset(sparm->parm.capture.reserved, 0,
+		       sizeof(sparm->parm.capture.reserved));
+
+		static const char *parm_str5 = "parm.output={capability="
+			XLAT_KNOWN(0x1000, "V4L2_CAP_TIMEPERFRAME")
+			", outputmode="
+			XLAT_KNOWN(0x1, "V4L2_MODE_HIGHQUALITY")
+			", timeperframe=2158018787/2158018788"
+			", extendedmode=0x80a0c0e5, writebuffers=2158018790}";
+
+		ioctl(-1, sparm_cmds[i].val, sparm);
+		printf("ioctl(-1, %s, {type="
+		       XLAT_KNOWN(0xa, "V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE")
+		       ", %s}%s%s%s) = %ld (INJECTED)\n",
+		       sprintxlat(sparm_cmds[i].str, sparm_cmds[i].val, NULL),
+		       parm_str5,
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? " => {" : "",
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? parm_str5 : "",
+		       sparm_cmds[i].val == VIDIOC_S_PARM ? "}" : "",
+		       inject_retval);
 	}
 
 

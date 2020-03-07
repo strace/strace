@@ -655,19 +655,11 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
-		tprints("{type=");
-		printxval(v4l2_buf_types, s.type, "V4L2_BUF_TYPE_???");
-		switch (s.type) {
-			case V4L2_BUF_TYPE_VIDEO_CAPTURE:
-			case V4L2_BUF_TYPE_VIDEO_OUTPUT:
-				if (is_get)
-					return 0;
-				tprints(", ");
-				break;
-			default:
-				tprints("}");
-				return RVAL_IOCTL_DECODED;
-		}
+		PRINT_FIELD_XVAL("{", s, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		if (is_get)
+			return 0;
+		tprints(", ");
 	} else {
 		if (syserror(tcp) || umove(tcp, arg, &s) < 0) {
 			tprints("}");
@@ -676,35 +668,42 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(is_get ? ", " : "} => {");
 	}
 
-	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
-		tprints("parm.capture={capability=");
-		printflags(v4l2_streaming_capabilities,
-			   s.parm.capture.capability, "V4L2_CAP_???");
-
-		tprints(", capturemode=");
-		printflags(v4l2_capture_modes,
-			   s.parm.capture.capturemode, "V4L2_MODE_???");
-
+	switch (s.type) {
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
+	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
+		PRINT_FIELD_FLAGS("parm.capture={", s.parm.capture, capability,
+				  v4l2_streaming_capabilities, "V4L2_CAP_???");
+		PRINT_FIELD_FLAGS(", ", s.parm.capture, capturemode,
+				  v4l2_capture_modes, "V4L2_MODE_???");
 		PRINT_FIELD_FRACT(", ", s.parm.capture, timeperframe);
+		PRINT_FIELD_X(", ", s.parm.capture, extendedmode);
+		PRINT_FIELD_U(", ", s.parm.capture, readbuffers);
+		if (!IS_ARRAY_ZERO(s.parm.capture.reserved))
+			PRINT_FIELD_ARRAY(", ", s.parm.capture, reserved, tcp,
+					  print_xint32_array_member);
+		tprints("}");
+		break;
 
-		tprintf(", extendedmode=%#x, readbuffers=%u}",
-			s.parm.capture.extendedmode,
-			s.parm.capture.readbuffers);
-	} else {
-		tprints("parm.output={capability=");
-		printflags(v4l2_streaming_capabilities,
-			   s.parm.output.capability, "V4L2_CAP_???");
-
-		tprintf(", outputmode=");
-		printflags(v4l2_capture_modes,
-			   s.parm.output.outputmode, "V4L2_MODE_???");
-
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
+	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
+		PRINT_FIELD_FLAGS("parm.output={", s.parm.output, capability,
+				  v4l2_streaming_capabilities, "V4L2_CAP_???");
+		PRINT_FIELD_FLAGS(", ", s.parm.output, outputmode,
+				  v4l2_capture_modes, "V4L2_MODE_???");
 		PRINT_FIELD_FRACT(", ", s.parm.output, timeperframe);
+		PRINT_FIELD_X(", ", s.parm.output, extendedmode);
+		PRINT_FIELD_U(", ", s.parm.output, writebuffers);
+		if (!IS_ARRAY_ZERO(s.parm.output.reserved))
+			PRINT_FIELD_ARRAY(", ", s.parm.output, reserved, tcp,
+					  print_xint32_array_member);
+		tprints("}");
+		break;
 
-		tprintf(", extendedmode=%#x, writebuffers=%u}",
-			s.parm.output.extendedmode,
-			s.parm.output.writebuffers);
+	default:
+		if (!IS_ARRAY_ZERO(s.parm.raw_data))
+			PRINT_FIELD_HEX_ARRAY("", s, parm.raw_data);
 	}
+
 	if (entering(tcp)) {
 		return 0;
 	} else {

@@ -16,6 +16,8 @@
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
+#include "static_assert.h"
+
 #ifndef V4L2_CTRL_FLAG_NEXT_CTRL
 # define V4L2_CTRL_FLAG_NEXT_CTRL 0x80000000
 #endif
@@ -487,6 +489,7 @@ main(void)
 	fill_memory(page, size);
 
 	unsigned char cc[sizeof(int)] = { 'A', '\'', '\\', '\xfa' };
+	int saved_errno;
 
 	/* Unknown */
 	static const struct {
@@ -1132,37 +1135,63 @@ main(void)
 	       XLAT_STR(VIDIOC_S_PARM));
 
 	ioctl(-1, VIDIOC_S_PARM, p_v4l2_streamparm);
-	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
-	       " = -1 EBADF (%m)\n",
+	saved_errno = errno;
+	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
+	       ", parm.raw_data=",
 	       XLAT_STR(VIDIOC_S_PARM), p_v4l2_streamparm->type);
+	print_quoted_hex((char *) p_v4l2_streamparm->parm.raw_data,
+			  sizeof(p_v4l2_streamparm->parm.raw_data));
+	errno = saved_errno;
+	printf("}) = -1 EBADF (%m)\n");
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_streamparm, p_streamparm);
-	p_streamparm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	p_streamparm->parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
-	p_streamparm->parm.capture.capturemode = V4L2_MODE_HIGHQUALITY;
-	p_streamparm->parm.capture.timeperframe.numerator = 0xdeadbeef;
-	p_streamparm->parm.capture.timeperframe.denominator = 0xbadc0ded;
-	ioctl(-1, VIDIOC_S_PARM, p_streamparm);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT
-	       ", parm.capture={capability=" XLAT_FMT
-	       ", capturemode=" XLAT_FMT ", timeperframe=%u/%u"
-	       ", extendedmode=%#x, readbuffers=%u}}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE),
-	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME), XLAT_ARGS(V4L2_MODE_HIGHQUALITY),
-	       p_streamparm->parm.capture.timeperframe.numerator,
-	       p_streamparm->parm.capture.timeperframe.denominator, -1U, -1U);
 
-	p_streamparm->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
-	p_streamparm->parm.output.outputmode = 0;
-	ioctl(-1, VIDIOC_S_PARM, p_streamparm);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT
-	       ", parm.output={capability=" XLAT_FMT
-	       ", outputmode=0, timeperframe=%u/%u"
-	       ", extendedmode=%#x, writebuffers=%u}}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT),
-	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME),
-	       p_streamparm->parm.output.timeperframe.numerator,
-	       p_streamparm->parm.output.timeperframe.denominator, -1U, -1U);
+	for (size_t i = 0; i < 2; i++) {
+		const char rsvd[] = ", reserved=[0xffffffff, 0xffffffff"
+				    ", 0xffffffff, 0xffffffff]";
+
+		p_streamparm->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		p_streamparm->parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
+		p_streamparm->parm.capture.capturemode = V4L2_MODE_HIGHQUALITY;
+		p_streamparm->parm.capture.timeperframe.numerator = 0xdeadbeef;
+		p_streamparm->parm.capture.timeperframe.denominator
+			= 0xbadc0ded;
+		ioctl(-1, VIDIOC_S_PARM, p_streamparm);
+		printf("ioctl(-1, %s, {type=" XLAT_FMT
+		       ", parm.capture={capability=" XLAT_FMT
+		       ", capturemode=" XLAT_FMT ", timeperframe=%u/%u"
+		       ", extendedmode=%#x, readbuffers=%u%s}}"
+		       ") = -1 EBADF (%m)\n",
+		       XLAT_STR(VIDIOC_S_PARM),
+		       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE),
+		       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME),
+		       XLAT_ARGS(V4L2_MODE_HIGHQUALITY),
+		       p_streamparm->parm.capture.timeperframe.numerator,
+		       p_streamparm->parm.capture.timeperframe.denominator,
+		       -1U, -1U, i ? "" : rsvd);
+
+		p_streamparm->type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
+		p_streamparm->parm.output.outputmode = 0;
+		ioctl(-1, VIDIOC_S_PARM, p_streamparm);
+		printf("ioctl(-1, %s, {type=" XLAT_FMT
+		       ", parm.output={capability=" XLAT_FMT
+		       ", outputmode=0, timeperframe=%u/%u"
+		       ", extendedmode=%#x, writebuffers=%u%s}}"
+		       ") = -1 EBADF (%m)\n",
+		       XLAT_STR(VIDIOC_S_PARM),
+		       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT),
+		       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME),
+		       p_streamparm->parm.output.timeperframe.numerator,
+		       p_streamparm->parm.output.timeperframe.denominator,
+		       -1U, -1U, i ? "" : rsvd);
+
+		static_assert(offsetof(struct v4l2_captureparm, reserved) ==
+			      offsetof(struct v4l2_outputparm, reserved),
+			      "reserved fields in struct v4l2_captureparm and "
+			      "struct v4l2_outputparm are misaligned");
+		memset(p_streamparm->parm.capture.reserved, 0,
+		       sizeof(p_streamparm->parm.capture.reserved));
+	}
 
 	/* VIDIOC_G_STD */
 	ioctl(-1, VIDIOC_G_STD, 0);
