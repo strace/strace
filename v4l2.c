@@ -1199,28 +1199,35 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u, pixel_format=", s.index);
-		print_pixelformat(s.pixel_format, v4l2_pix_fmts);
+		PRINT_FIELD_U("{", s, index);
+		PRINT_FIELD_PIXFMT(", ", s, pixel_format, v4l2_pix_fmts);
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
-		tprints(", type=");
-		printxval(v4l2_framesize_types, s.type, "V4L2_FRMSIZE_TYPE_???");
+		PRINT_FIELD_XVAL(", ", s, type, v4l2_framesize_types,
+				 "V4L2_FRMSIZE_TYPE_???");
 		switch (s.type) {
 		case V4L2_FRMSIZE_TYPE_DISCRETE:
-			tprintf(", discrete={width=%u, height=%u}",
-				s.discrete.width, s.discrete.height);
+			PRINT_FIELD_U(", discrete={", s.discrete, width);
+			PRINT_FIELD_U(", ", s.discrete, height);
+			tprints("}");
 			break;
 		case V4L2_FRMSIZE_TYPE_STEPWISE:
-			tprintf(", stepwise={min_width=%u, max_width=%u, "
-				"step_width=%u, min_height=%u, max_height=%u, "
-				"step_height=%u}",
-				s.stepwise.min_width, s.stepwise.max_width,
-				s.stepwise.step_width, s.stepwise.min_height,
-				s.stepwise.max_height, s.stepwise.step_height);
+		case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+			PRINT_FIELD_U(", stepwise={", s.stepwise, min_width);
+			PRINT_FIELD_U(", ", s.stepwise, max_width);
+			PRINT_FIELD_U(", ", s.stepwise, step_width);
+			PRINT_FIELD_U(", ", s.stepwise, min_height);
+			PRINT_FIELD_U(", ", s.stepwise, max_height);
+			PRINT_FIELD_U(", ", s.stepwise, step_height);
+			tprints("}");
 			break;
 		}
+
+		if (!IS_ARRAY_ZERO(s.reserved))
+			PRINT_FIELD_ARRAY(", ", s, reserved, tcp,
+					  print_xint32_array_member);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
@@ -1237,16 +1244,16 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u, pixel_format=", f.index);
-		print_pixelformat(f.pixel_format, v4l2_pix_fmts);
-		tprintf(", width=%u, height=%u", f.width, f.height);
+		PRINT_FIELD_U("{", f, index);
+		PRINT_FIELD_PIXFMT(", ", f, pixel_format, v4l2_pix_fmts);
+		PRINT_FIELD_U(", ", f, width);
+		PRINT_FIELD_U(", ", f, height);
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-		tprints(", type=");
-		printxval(v4l2_frameinterval_types, f.type,
-			  "V4L2_FRMIVAL_TYPE_???");
+		PRINT_FIELD_XVAL(", ", f, type, v4l2_frameinterval_types,
+				 "V4L2_FRMIVAL_TYPE_???");
 		switch (f.type) {
 		case V4L2_FRMIVAL_TYPE_DISCRETE:
 			PRINT_FIELD_FRACT(", ", f, discrete);
@@ -1259,6 +1266,10 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 			tprints("}");
 			break;
 		}
+
+		if (!IS_ARRAY_ZERO(f.reserved))
+			PRINT_FIELD_ARRAY(", ", f, reserved, tcp,
+					  print_xint32_array_member);
 	}
 
 	tprints("}");

@@ -1770,10 +1770,15 @@ main(int argc, char **argv)
 	/* VIDIOC_ENUM_FRAMESIZES */
 	static const struct strval32 frmsz_simple_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_FRMSIZE_TYPE_???") },
-		{ ARG_XLAT_KNOWN(0x2, "V4L2_FRMSIZE_TYPE_CONTINUOUS") },
 		{ ARG_XLAT_UNKNOWN(0x4, "V4L2_FRMSIZE_TYPE_???") },
 		{ ARG_XLAT_UNKNOWN(0xdeadf157, "V4L2_FRMSIZE_TYPE_???") },
 	};
+	static const struct strval32 frmsz_step_types[] = {
+		{ ARG_XLAT_KNOWN(0x2, "V4L2_FRMSIZE_TYPE_CONTINUOUS") },
+		{ ARG_XLAT_KNOWN(0x3, "V4L2_FRMSIZE_TYPE_STEPWISE") },
+	};
+	static const char fse_resv_str[] =
+		", reserved=[0x80a0c0e9, 0x80a0c0ea]";
 
 	struct v4l2_frmsizeenum *fse = tail_alloc(sizeof(*fse));
 
@@ -1789,40 +1794,59 @@ main(int argc, char **argv)
 	fill_memory32(fse, sizeof(*fse));
 	fse->type = V4L2_FRMSIZE_TYPE_DISCRETE;
 
-	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
-	printf("ioctl(-1, %s, {index=2158018784, pixel_format="
-	       RAW("0x80a0c0e1")
-	       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
-	       ", type=" XLAT_KNOWN(0x1, "V4L2_FRMSIZE_TYPE_DISCRETE")
-	       ", discrete={width=2158018787, height=2158018788}"
-	       "}) = %ld (INJECTED)\n",
-	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), inject_retval);
+	for (size_t i = 0; i < 2; i++) {
+		ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
+		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
+		       RAW("0x80a0c0e1")
+		       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
+		       ", type=" XLAT_KNOWN(0x1, "V4L2_FRMSIZE_TYPE_DISCRETE")
+		       ", discrete={width=2158018787, height=2158018788}"
+		       "%s}) = %ld (INJECTED)\n",
+		       XLAT_STR(VIDIOC_ENUM_FRAMESIZES),
+		       i ? "" : fse_resv_str, inject_retval);
 
-	fse->pixel_format = 0x5c22270d;
-	fse->type = V4L2_FRMSIZE_TYPE_STEPWISE;
+		memset(fse->reserved, 0, sizeof(fse->reserved));
+	}
 
-	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
-	printf("ioctl(-1, %s, {index=2158018784, pixel_format="
-	       RAW("0x5c22270d")
-	       NRAW("v4l2_fourcc('\\x0d', '\\\'', '\"', '\\\\')")
-	       ", type=" XLAT_KNOWN(0x3, "V4L2_FRMSIZE_TYPE_STEPWISE")
-	       ", stepwise={min_width=2158018787, max_width=2158018788"
-	       ", step_width=2158018789, min_height=2158018790"
-	       ", max_height=2158018791, step_height=2158018792}"
-	       "}) = %ld (INJECTED)\n",
-	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), inject_retval);
-
-	for (size_t i = 0; i < ARRAY_SIZE(frmsz_simple_types); i++) {
+	for (size_t i = 0; i < 2 * ARRAY_SIZE(frmsz_step_types); i++) {
 		fill_memory32(fse, sizeof(*fse));
-		fse->type = frmsz_simple_types[i].val;
+		fse->pixel_format = 0x5c22270d;
+		fse->type = frmsz_step_types[ i / 2].val;
+
+		if (i % 2)
+			memset(fse->reserved, 0, sizeof(fse->reserved));
+
+		ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
+		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
+		       RAW("0x5c22270d")
+		       NRAW("v4l2_fourcc('\\x0d', '\\\'', '\"', '\\\\')")
+		       ", type=%s"
+		       ", stepwise={min_width=2158018787, max_width=2158018788"
+		       ", step_width=2158018789, min_height=2158018790"
+		       ", max_height=2158018791, step_height=2158018792}"
+		       "%s}) = %ld (INJECTED)\n",
+		       XLAT_STR(VIDIOC_ENUM_FRAMESIZES),
+		       frmsz_step_types[i / 2].str,
+		       i % 2 ? "" : fse_resv_str,
+		       inject_retval);
+	}
+
+	for (size_t i = 0; i < 2 * ARRAY_SIZE(frmsz_simple_types); i++) {
+		fill_memory32(fse, sizeof(*fse));
+		fse->type = frmsz_simple_types[i / 2].val;
+
+		if (i % 2)
+			memset(fse->reserved, 0, sizeof(fse->reserved));
 
 		ioctl(-1, VIDIOC_ENUM_FRAMESIZES, fse);
 		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
 		       RAW("0x80a0c0e1")
 		       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
-		       ", type=%s}) = %ld (INJECTED)\n",
+		       ", type=%s%s}) = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_ENUM_FRAMESIZES),
-		       frmsz_simple_types[i].str, inject_retval);
+		       frmsz_simple_types[i / 2].str,
+		       i % 2 ? "" : fse_resv_str,
+		       inject_retval);
 
 	}
 #endif /* VIDIOC_ENUM_FRAMESIZES */
@@ -1839,6 +1863,8 @@ main(int argc, char **argv)
 		{ ARG_XLAT_KNOWN(0x2, "V4L2_FRMIVAL_TYPE_CONTINUOUS") },
 		{ ARG_XLAT_KNOWN(0x3, "V4L2_FRMIVAL_TYPE_STEPWISE") },
 	};
+	static const char fie_resv_str[] =
+		", reserved=[0x80a0c0eb, 0x80a0c0ec]";
 
 	struct v4l2_frmivalenum *fie = tail_alloc(sizeof(*fie));
 
@@ -1860,13 +1886,17 @@ main(int argc, char **argv)
 	       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
 	       ", width=2158018786, height=2158018787"
 	       ", type=" XLAT_KNOWN(0x1, "V4L2_FRMIVAL_TYPE_DISCRETE")
-	       ", discrete=2158018789/2158018790}) = %ld (INJECTED)\n",
-	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS), inject_retval);
+	       ", discrete=2158018789/2158018790%s}) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS),
+	       fie_resv_str, inject_retval);
 
-	fie->pixel_format = 0x5c22270d;
+	for (size_t i = 0; i < 2 * ARRAY_SIZE(frmival_step_types); i++) {
+		fill_memory32(fie, sizeof(*fie));
+		fie->pixel_format = 0x5c22270d;
+		fie->type = frmival_step_types[i / 2].val;
 
-	for (size_t i = 0; i < ARRAY_SIZE(frmival_step_types); i++) {
-		fie->type = frmival_step_types[i].val;
+		if (i % 2)
+			memset(fie->reserved, 0, sizeof(fie->reserved));
 
 		ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, fie);
 		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
@@ -1875,23 +1905,28 @@ main(int argc, char **argv)
 		       ", width=2158018786, height=2158018787, type=%s"
 		       ", stepwise={min=2158018789/2158018790"
 		       ", max=2158018791/2158018792"
-		       ", step=2158018793/2158018794}}) = %ld (INJECTED)\n",
+		       ", step=2158018793/2158018794}%s}) = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS),
-		       frmival_step_types[i].str, inject_retval);
+		       frmival_step_types[i / 2].str,
+		       i % 2 ? "" : fie_resv_str, inject_retval);
 	}
 
-	for (size_t i = 0; i < ARRAY_SIZE(frmival_simple_types); i++) {
+	for (size_t i = 0; i < 2 * ARRAY_SIZE(frmival_simple_types); i++) {
 		fill_memory32(fie, sizeof(*fie));
-		fie->type = frmival_simple_types[i].val;
+		fie->type = frmival_simple_types[i / 2].val;
+
+		if (i % 2)
+			memset(fie->reserved, 0, sizeof(fie->reserved));
 
 		ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, fie);
 		printf("ioctl(-1, %s, {index=2158018784, pixel_format="
 		       RAW("0x80a0c0e1")
 		       NRAW("v4l2_fourcc_be('\\xe1', '\\xc0', '\\xa0', '\\x00')")
-	               ", width=2158018786, height=2158018787, type=%s})"
+	               ", width=2158018786, height=2158018787, type=%s%s})"
 		       " = %ld (INJECTED)\n",
 		       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS),
-		       frmival_simple_types[i].str, inject_retval);
+		       frmival_simple_types[i / 2].str,
+		       i % 2 ? "" : fie_resv_str, inject_retval);
 
 	}
 #endif /* VIDIOC_ENUM_FRAMEINTERVALS */
