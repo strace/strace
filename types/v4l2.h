@@ -15,8 +15,50 @@
 #include <linux/types.h>
 #include <linux/videodev2.h>
 
-typedef struct v4l2_buffer struct_v4l2_buffer;
 typedef struct v4l2_standard struct_v4l2_standard;
+
+
+/** Added by Linux commit v2.6.39-rc1~86^2~437 */
+typedef struct {
+	uint32_t bytesused;
+	uint32_t length;
+	union {
+		uint32_t      mem_offset;
+		unsigned long userptr;
+		int32_t       fd; /**< Added by  v3.8-rc1~115^2^2~52 */
+	} m;
+	uint32_t data_offset;
+	uint32_t reserved[11];
+} struct_v4l2_plane;
+
+typedef struct {
+	uint32_t index;
+	uint32_t type;
+	uint32_t bytesused;
+	uint32_t flags;
+	uint32_t field;
+	struct timeval          timestamp;
+	struct v4l2_timecode    timecode;
+	uint32_t sequence;
+
+	uint32_t memory;
+	union {
+		uint32_t offset;
+		unsigned long   userptr;
+		/** Added by v2.6.39-rc1~86^2~437 */
+		struct_v4l2_plane * planes;
+		int32_t  fd; /**< Added by v3.8-rc1~115^2^2~52 */
+	} m;
+	uint32_t length;
+	union {
+		uint32_t input; /**< Removed by v3.6-rc1~28^2~240 */
+		uint32_t reserved2;
+	};
+	union {
+		int32_t  request_fd; /**< Added by v4.20-rc1~51^2~31 */
+		uint32_t reserved;
+	};
+} struct_v4l2_buffer;
 
 
 typedef struct {

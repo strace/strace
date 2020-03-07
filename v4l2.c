@@ -40,6 +40,7 @@
 
 #include "types/v4l2.h"
 
+CHECK_V4L2_STRUCT_SIZE(v4l2_buffer);
 #ifdef HAVE_STRUCT_V4L2_EXPORT_BUFFER
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_exportbuffer);
 #endif
@@ -133,6 +134,9 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #include "xlat/v4l2_sliced_flags.h"
 #include "xlat/v4l2_std_ids.h"
 #include "xlat/v4l2_streaming_capabilities.h"
+#include "xlat/v4l2_timecode_flags.h"
+#include "xlat/v4l2_timecode_types.h"
+#include "xlat/v4l2_timecode_userbits.h"
 #include "xlat/v4l2_tuner_types.h"
 #include "xlat/v4l2_tuner_capabilities.h"
 #include "xlat/v4l2_tuner_rxsubchannels.h"
@@ -528,6 +532,154 @@ print_v4l2_buffer_flags(uint32_t val)
 		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
 }
 
+static void
+print_v4l2_timecode_flags(uint32_t val)
+{
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#" PRIx32, val);
+		return;
+	}
+
+	const uint32_t userbits = val & V4L2_TC_USERBITS_field;
+	const uint32_t flags = val & ~userbits;
+
+	if (flags) {
+		printflags(v4l2_timecode_flags, flags, "V4L2_TC_FLAG_???");
+		tprints("|");
+	}
+	printxval(v4l2_timecode_userbits, userbits, "V4L2_TC_USERBITS_???");
+}
+
+static void
+print_v4l2_timecode(struct v4l2_timecode *tc)
+{
+	PRINT_FIELD_XVAL("{", *tc, type, v4l2_timecode_types,
+			 "V4L2_TC_TYPE_???");
+
+	tprints(", flags=");
+	print_v4l2_timecode_flags(tc->flags);
+
+	PRINT_FIELD_U(", ", *tc, frames);
+	PRINT_FIELD_U(", ", *tc, seconds);
+	PRINT_FIELD_U(", ", *tc, minutes);
+	PRINT_FIELD_U(", ", *tc, hours);
+
+	if (!IS_ARRAY_ZERO(tc->userbits))
+		PRINT_FIELD_HEX_ARRAY(", ", *tc, userbits);
+
+	tprints("}");
+}
+
+/** See also V4L2_TYPE_IS_OUTPUT */
+#define output_buftype(b_) \
+	((b_) == V4L2_BUF_TYPE_VIDEO_OUTPUT || \
+	 (b_) == V4L2_BUF_TYPE_VIDEO_OVERLAY || \
+	 (b_) == V4L2_BUF_TYPE_VBI_OUTPUT || \
+	 (b_) == V4L2_BUF_TYPE_SLICED_VBI_OUTPUT || \
+	 (b_) == V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY || \
+	 (b_) == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE || \
+	 (b_) == V4L2_BUF_TYPE_SDR_OUTPUT || \
+	 (b_) == V4L2_BUF_TYPE_META_OUTPUT || \
+	 (b_) < V4L2_BUF_TYPE_VIDEO_CAPTURE || \
+	 (b_) > V4L2_BUF_TYPE_META_OUTPUT)
+#define input_buftype(b_) \
+	((b_) == V4L2_BUF_TYPE_VIDEO_CAPTURE || \
+	 (b_) == V4L2_BUF_TYPE_VBI_CAPTURE || \
+	 (b_) == V4L2_BUF_TYPE_SLICED_VBI_CAPTURE || \
+	 (b_) == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE || \
+	 (b_) == V4L2_BUF_TYPE_SDR_CAPTURE || \
+	 (b_) == V4L2_BUF_TYPE_META_CAPTURE || \
+	 (b_) < V4L2_BUF_TYPE_VIDEO_CAPTURE || \
+	 (b_) > V4L2_BUF_TYPE_META_OUTPUT)
+/** See also V4L2_TYPE_IS_MULTIPLANAR */
+#define mplane_buftype(b_) \
+	((b_) == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE || \
+	 (b_) == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE)
+#define code_qbuf(c_) \
+	((c_) == VIDIOC_QBUF || (c_) == VIDIOC_PREPARE_BUF)
+
+static bool
+print_v4l2_plane_member(struct tcb *tcp, void *elem, size_t sz, void *code_ptr)
+{
+	struct_v4l2_plane *plane = (struct_v4l2_plane *) elem;
+	struct_v4l2_buffer *buf = containerof(plane, struct_v4l2_buffer,
+					      m.planes);
+	unsigned int code = (uintptr_t) code_ptr;
+
+	if (entering(tcp)) {
+		tprints("{");
+
+		if (code_qbuf(code) && output_buftype(buf->type)) {
+			PRINT_FIELD_U("", *plane, bytesused);
+			tprints(", ");
+		}
+		if (code != VIDIOC_QUERYBUF) {
+			PRINT_FIELD_U("", *plane, length);
+			tprints(", ");
+		}
+		if (code_qbuf(code) && output_buftype(buf->type)) {
+			switch (buf->memory) {
+			case V4L2_MEMORY_MMAP:
+				PRINT_FIELD_U("", *plane, m.mem_offset);
+				break;
+			case V4L2_MEMORY_USERPTR:
+				PRINT_FIELD_ADDR("", *plane, m.userptr);
+				break;
+			case V4L2_MEMORY_DMABUF:
+				PRINT_FIELD_FD("", *plane, m.fd, tcp);
+				break;
+			default: /* We just print the largest union item */
+				PRINT_FIELD_X("", *plane, m.userptr);
+			}
+			tprints(", ");
+		}
+		PRINT_FIELD_U("", *plane, data_offset);
+		if (!IS_ARRAY_ZERO(plane->reserved))
+			PRINT_FIELD_ARRAY(", ", *plane, reserved, tcp,
+					  print_xint32_array_member);
+
+		tprints("}");
+
+		return true;
+	}
+
+	/* exiting */
+	tprints("{");
+
+	if (code == VIDIOC_DQBUF && input_buftype(buf->type)) {
+		PRINT_FIELD_U("", *plane, bytesused);
+		tprints(", ");
+	}
+	if (code == VIDIOC_QUERYBUF) {
+		PRINT_FIELD_U("", *plane, length);
+		tprints(", ");
+	}
+	if (code == VIDIOC_DQBUF && input_buftype(buf->type)) {
+		switch (buf->memory) {
+		case V4L2_MEMORY_MMAP:
+			PRINT_FIELD_U("", *plane, m.mem_offset);
+			break;
+		case V4L2_MEMORY_USERPTR:
+			PRINT_FIELD_ADDR("", *plane, m.userptr);
+			break;
+		case V4L2_MEMORY_DMABUF:
+			PRINT_FIELD_FD("", *plane, m.fd, tcp);
+			break;
+		default: /* We just print the largest union item */
+			PRINT_FIELD_X("", *plane, m.userptr);
+		}
+		tprints(", ");
+	}
+	PRINT_FIELD_U("", *plane, data_offset);
+	if (!IS_ARRAY_ZERO(plane->reserved))
+		PRINT_FIELD_ARRAY(", ", *plane, reserved, tcp,
+				  print_xint32_array_member);
+
+	tprints("}");
+
+	return true;
+}
+
 static int
 print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		  const kernel_ulong_t arg)
@@ -538,37 +690,142 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
-		tprints("{type=");
-		printxval(v4l2_buf_types, b.type, "V4L2_BUF_TYPE_???");
-		if (code != VIDIOC_DQBUF)
-			tprintf(", index=%u", b.index);
+		tprints("{");
+		if (code != VIDIOC_DQBUF) {
+			PRINT_FIELD_U("", b, index);
+			tprints(", ");
+		}
+		PRINT_FIELD_XVAL("", b, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		if (code_qbuf(code) && output_buftype(b.type))
+			PRINT_FIELD_U(", ", b, bytesused);
+		if (code != VIDIOC_QUERYBUF) {
+			tprints(", flags=");
+			print_v4l2_buffer_flags(b.flags);
+		}
+		if (code_qbuf(code) && output_buftype(b.type)) {
+			PRINT_FIELD_XVAL(", ", b, field, v4l2_fields,
+					 "V4L2_FIELD_???");
+			tprints(", timestamp=");
+			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
+			if (b.flags & V4L2_BUF_FLAG_TIMECODE) {
+				tprints(", timecode=");
+				print_v4l2_timecode(
+					(struct v4l2_timecode *) &b.timecode);
+			}
+		}
+		if (code != VIDIOC_QUERYBUF) {
+			PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+					 "V4L2_MEMORY_???");
+		}
+		if (mplane_buftype(b.type)) {
+			struct_v4l2_plane buf;
+
+			tprints(", planes=");
+			print_array(tcp, (mpers_ptr_t) b.m.planes,
+				    MIN(b.length, VIDEO_MAX_PLANES),
+				    &buf, sizeof(buf), tfetch_mem,
+				    print_v4l2_plane_member,
+				    (void *) (uintptr_t) code);
+		}
+		if (code != VIDIOC_QUERYBUF)
+			PRINT_FIELD_U(", ", b, length);
+		if (code_qbuf(code) && output_buftype(b.type) &&
+		    !mplane_buftype(b.type)) {
+			switch (b.memory) {
+			case V4L2_MEMORY_MMAP:
+				PRINT_FIELD_U(", ", b, m.offset);
+				break;
+			case V4L2_MEMORY_USERPTR:
+				PRINT_FIELD_ADDR(", ", b, m.userptr);
+				break;
+			case V4L2_MEMORY_DMABUF:
+				PRINT_FIELD_FD(", ", b, m.fd, tcp);
+				break;
+			default: /* We just print the largest union item */
+				PRINT_FIELD_X("", b, m.userptr);
+			}
+		}
+		if (b.reserved2)
+			PRINT_FIELD_U(", ", b, reserved2);
+		if (code_qbuf(code) &&
+		    (b.flags & V4L2_BUF_FLAG_REQUEST_FD)) {
+			PRINT_FIELD_FD(", ", b, request_fd, tcp);
+		} else {
+			if (b.reserved)
+				PRINT_FIELD_X(", ", b, reserved);
+		}
+		tprints("}");
 
 		return 0;
 	}
 
-	if (!syserror(tcp) && !umove(tcp, arg, &b)) {
-		if (code == VIDIOC_DQBUF)
-			tprintf(", index=%u", b.index);
-		tprints(", memory=");
-		printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &b))
+		return RVAL_IOCTL_DECODED;
 
-		if (b.memory == V4L2_MEMORY_MMAP) {
-			tprintf(", m.offset=%#x", b.m.offset);
-		} else if (b.memory == V4L2_MEMORY_USERPTR) {
-			tprints(", m.userptr=");
-			printaddr(b.m.userptr);
-		}
-
-		tprintf(", length=%u, bytesused=%u, flags=",
-			b.length, b.bytesused);
-		print_v4l2_buffer_flags(b.flags);
-		if (code == VIDIOC_DQBUF) {
-			tprints(", timestamp=");
-			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
-		}
-		tprints(", ...");
+	tprints(" => {");
+	if (code == VIDIOC_DQBUF) {
+		PRINT_FIELD_U("", b, index);
+		tprints(", ");
 	}
+	if (code == VIDIOC_DQBUF && input_buftype(b.type)) {
+		PRINT_FIELD_U("", b, bytesused);
+		tprints(", ");
+	}
+	tprints("flags=");
+	print_v4l2_buffer_flags(b.flags);
+	if (code == VIDIOC_DQBUF && input_buftype(b.type)) {
+		PRINT_FIELD_XVAL(", ", b, field, v4l2_fields,
+				 "V4L2_FIELD_???");
+		tprints(", timestamp=");
+		MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
+		if (b.flags & V4L2_BUF_FLAG_TIMECODE) {
+			tprints(", timecode=");
+			print_v4l2_timecode(
+				(struct v4l2_timecode *)&b.timecode);
+		}
+	}
+	if (code != VIDIOC_QUERYBUF)
+		PRINT_FIELD_U(", ", b, sequence);
+	if (code == VIDIOC_QUERYBUF) {
+		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+				 "V4L2_MEMORY_???");
+	}
+	if (mplane_buftype(b.type)) {
+		struct_v4l2_plane buf;
 
+		tprints(", planes=");
+		print_array(tcp, (mpers_ptr_t) b.m.planes,
+			    MIN(b.length, VIDEO_MAX_PLANES),
+			    &buf, sizeof(buf), tfetch_mem,
+			    print_v4l2_plane_member, (void *) (uintptr_t) code);
+	}
+	PRINT_FIELD_U(", ", b, length);
+	if (code == VIDIOC_DQBUF && input_buftype(b.type) &&
+	    !mplane_buftype(b.type)) {
+		switch (b.memory) {
+		case V4L2_MEMORY_MMAP:
+			PRINT_FIELD_U(", ", b, m.offset);
+			break;
+		case V4L2_MEMORY_USERPTR:
+			PRINT_FIELD_ADDR(", ", b, m.userptr);
+			break;
+		case V4L2_MEMORY_DMABUF:
+			PRINT_FIELD_FD(", ", b, m.fd, tcp);
+			break;
+		default: /* We just print the largest union item */
+			PRINT_FIELD_X("", b, m.userptr);
+		}
+	}
+	if (b.reserved2)
+		PRINT_FIELD_U(", ", b, reserved2);
+	if (code == VIDIOC_DQBUF && (b.flags & V4L2_BUF_FLAG_REQUEST_FD)) {
+		PRINT_FIELD_FD(", ", b, request_fd, tcp);
+	} else {
+		if (b.reserved)
+			PRINT_FIELD_X(", ", b, reserved);
+	}
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -1628,6 +1885,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_QUERYBUF: /* RW */
 	case VIDIOC_QBUF: /* RW */
 	case VIDIOC_DQBUF: /* RW */
+	case VIDIOC_PREPARE_BUF: /* RW */
 		return print_v4l2_buffer(tcp, code, arg);
 
 	case VIDIOC_EXPBUF: /* RW */

@@ -689,6 +689,9 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_QUERYBUF) },
 		{ ARG_STR(VIDIOC_QBUF) },
 		{ ARG_STR(VIDIOC_DQBUF) },
+#ifdef VIDIOC_PREPARE_BUF
+		{ ARG_STR(VIDIOC_PREPARE_BUF) },
+#endif
 	};
 
 	struct v4l2_buffer *buf = tail_alloc(sizeof(*buf));
