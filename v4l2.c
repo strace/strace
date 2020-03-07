@@ -87,9 +87,6 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 # define VIDEO_MAX_PLANES 8
 #endif
 
-#define FMT_FRACT "%u/%u"
-#define ARGS_FRACT(x) ((x).numerator), ((x).denominator)
-
 #include "xlat/v4l2_pix_fmts.h"
 #include "xlat/v4l2_sdr_fmts.h"
 
@@ -102,6 +99,11 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 		      (prefix_), #field_,				\
 		      (where_).field_.left, (where_).field_.top,	\
 		      (where_).field_.width, (where_).field_.height)
+
+#define PRINT_FIELD_FRACT(prefix_, where_, field_)			\
+	STRACE_PRINTF("%s%s=%u/%u", (prefix_), #field_,			\
+		      (where_).field_.numerator,			\
+		      (where_).field_.denominator)
 
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
@@ -589,8 +591,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		printflags(v4l2_capture_modes,
 			   s.parm.capture.capturemode, "V4L2_MODE_???");
 
-		tprintf(", timeperframe=" FMT_FRACT,
-			ARGS_FRACT(s.parm.capture.timeperframe));
+		PRINT_FIELD_FRACT(", ", s.parm.capture, timeperframe);
 
 		tprintf(", extendedmode=%#x, readbuffers=%u}",
 			s.parm.capture.extendedmode,
@@ -604,8 +605,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		printflags(v4l2_capture_modes,
 			   s.parm.output.outputmode, "V4L2_MODE_???");
 
-		tprintf(", timeperframe=" FMT_FRACT,
-			ARGS_FRACT(s.parm.output.timeperframe));
+		PRINT_FIELD_FRACT(", ", s.parm.output, timeperframe);
 
 		tprintf(", extendedmode=%#x, writebuffers=%u}",
 			s.parm.output.extendedmode,
@@ -635,8 +635,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
 		PRINT_FIELD_CSTRING(", ", s, name);
-		tprintf(", frameperiod=" FMT_FRACT,
-			ARGS_FRACT(s.frameperiod));
+		PRINT_FIELD_FRACT(", ", s, frameperiod);
 		tprintf(", framelines=%u", s.framelines);
 	}
 
@@ -873,7 +872,7 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
 		PRINT_FIELD_RECT(", ", c, bounds);
 		PRINT_FIELD_RECT(", ", c, defrect);
-		tprintf(", pixelaspect=" FMT_FRACT, ARGS_FRACT(c.pixelaspect));
+		PRINT_FIELD_FRACT(", ", c, pixelaspect);
 	}
 
 	tprints("}");
@@ -1034,16 +1033,14 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 			  "V4L2_FRMIVAL_TYPE_???");
 		switch (f.type) {
 		case V4L2_FRMIVAL_TYPE_DISCRETE:
-			tprintf(", discrete=" FMT_FRACT,
-				ARGS_FRACT(f.discrete));
+			PRINT_FIELD_FRACT(", ", f, discrete);
 			break;
 		case V4L2_FRMIVAL_TYPE_STEPWISE:
 		case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-			tprintf(", stepwise={min=" FMT_FRACT ", max="
-				FMT_FRACT ", step=" FMT_FRACT "}",
-				ARGS_FRACT(f.stepwise.min),
-				ARGS_FRACT(f.stepwise.max),
-				ARGS_FRACT(f.stepwise.step));
+			PRINT_FIELD_FRACT(", stepwise={", f.stepwise, min);
+			PRINT_FIELD_FRACT(", ", f.stepwise, max);
+			PRINT_FIELD_FRACT(", ", f.stepwise, step);
+			tprints("}");
 			break;
 		}
 	}
