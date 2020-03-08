@@ -1472,6 +1472,83 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_G_AUDIO, VIDIOC_S_AUDIO, VIDIOC_ENUMAUDIO */
+	static const struct strval32 audio_cmds[] = {
+		{ ARG_STR(VIDIOC_G_AUDIO) },
+		{ ARG_STR(VIDIOC_S_AUDIO) },
+		{ ARG_STR(VIDIOC_ENUMAUDIO) },
+	};
+	static const struct strval32 audio_caps[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_AUDCAP_STEREO") },
+		{ ARG_XLAT_KNOWN(0x2, "V4L2_AUDCAP_AVL") },
+		{ ARG_XLAT_KNOWN(0xdeadbeef, "V4L2_AUDCAP_STEREO"
+					     "|V4L2_AUDCAP_AVL|0xdeadbeec") },
+		{ ARG_XLAT_UNKNOWN(0xdec0dedc, "V4L2_AUDCAP_???") },
+	};
+	static const struct strval32 audio_modes[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_AUDMODE_AVL") },
+		{ ARG_XLAT_KNOWN(0xfeedbeef, "V4L2_AUDMODE_AVL|0xfeedbeee") },
+		{ ARG_XLAT_UNKNOWN(0xdeadface, "V4L2_AUDMODE_???") },
+	};
+	static const size_t audio_iters = MAX(ARRAY_SIZE(audio_caps),
+					      ARRAY_SIZE(audio_modes));
+
+	struct v4l2_audio *audio = tail_alloc(sizeof(*audio));
+
+	for (size_t i = 0; i < ARRAY_SIZE(audio_cmds); i++) {
+		ioctl(-1, audio_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(audio_cmds[i].str, audio_cmds[i].val, NULL),
+		       inject_retval);
+
+		ioctl(-1, audio_cmds[i].val, (char *) audio + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(audio_cmds[i].str, audio_cmds[i].val, NULL),
+		       (char *) audio + 1, inject_retval);
+
+		for (size_t j = 0; j < audio_iters; j++) {
+			fill_memory32(audio, sizeof(*audio));
+			fill_memory_ex(audio->name, sizeof(audio->name),
+				       j * 39 + 5, 255);
+			audio->capability =
+				audio_caps[j % ARRAY_SIZE(audio_caps)].val;
+			audio->mode =
+				audio_modes[j % ARRAY_SIZE(audio_modes)].val;
+
+			if ((i + j) % 2)
+				memset(audio->reserved, 0,
+				       sizeof(audio->reserved));
+
+			ioctl(-1, audio_cmds[i].val, audio);
+			printf("ioctl(-1, %s, %s{index=2158018784",
+			       sprintxlat(audio_cmds[i].str,
+					  audio_cmds[i].val, NULL),
+			       (audio_cmds[i].val == VIDIOC_G_AUDIO) &&
+				!((i + j) % 2) ? "{reserved=[0x80a0c0eb"
+						 ", 0x80a0c0ec]} => " : "");
+			if (audio_cmds[i].val != VIDIOC_S_AUDIO) {
+				printf("%sname=",
+				       audio_cmds[i].val == VIDIOC_G_AUDIO
+					? ", " : (i + j) % 2 ? "} => {"
+						      : ", reserved=[0x80a0c0eb"
+						        ", 0x80a0c0ec]} => {");
+				print_quoted_cstring((char *) audio->name,
+						     sizeof(audio->name));
+				printf(", capability=%s",
+				       audio_caps[j %
+						  ARRAY_SIZE(audio_caps)].str);
+			}
+			printf(", mode=%s%s}) = %ld (INJECTED)\n",
+			       audio_modes[j % ARRAY_SIZE(audio_modes)].str,
+			       (i + j) % 2 ? "" : ", reserved=[0x80a0c0eb"
+						  ", 0x80a0c0ec]",
+			       inject_retval);
+		}
+	}
+
+
 	/* VIDIOC_QUERYCTRL */
 	static const struct strval32 cids[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_CID_???") },
@@ -1653,6 +1730,83 @@ main(int argc, char **argv)
 			       sprintxlat(int_cmds[i].str, int_cmds[i].val,
 					  NULL),
 			       inputids[j].str, inject_retval);
+		}
+	}
+
+
+	/* VIDIOC_G_AUDOUT, VIDIOC_S_AUDOUT, VIDIOC_ENUMAUDOUT */
+	static const struct strval32 audout_cmds[] = {
+		{ ARG_STR(VIDIOC_G_AUDOUT) },
+		{ ARG_STR(VIDIOC_S_AUDOUT) },
+		{ ARG_STR(VIDIOC_ENUMAUDOUT) },
+	};
+	static const struct strval32 audout_caps[] = {
+		{ ARG_STR(0) },
+		{ ARG_STR(0x1) },
+		{ ARG_STR(0x2) },
+		{ ARG_STR(0xdeadbeef) },
+		{ ARG_STR(0xdec0dedc) },
+	};
+	static const struct strval32 audout_modes[] = {
+		{ ARG_STR(0) },
+		{ ARG_STR(0x1) },
+		{ ARG_STR(0xfeadbeef) },
+		{ ARG_STR(0xdeadface) },
+	};
+	static const size_t audout_iters = MAX(ARRAY_SIZE(audout_caps),
+					      ARRAY_SIZE(audout_modes));
+
+	struct v4l2_audioout *audout = tail_alloc(sizeof(*audout));
+
+	for (size_t i = 0; i < ARRAY_SIZE(audout_cmds); i++) {
+		ioctl(-1, audout_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(audout_cmds[i].str, audout_cmds[i].val, NULL),
+		       inject_retval);
+
+		ioctl(-1, audout_cmds[i].val, (char *) audout + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(audout_cmds[i].str, audout_cmds[i].val, NULL),
+		       (char *) audout + 1, inject_retval);
+
+		for (size_t j = 0; j < audout_iters; j++) {
+			fill_memory32(audout, sizeof(*audout));
+			fill_memory_ex(audout->name, sizeof(audout->name),
+				       j * 39 + 5, 255);
+			audout->capability =
+				audout_caps[j % ARRAY_SIZE(audout_caps)].val;
+			audout->mode =
+				audout_modes[j % ARRAY_SIZE(audout_modes)].val;
+
+			if ((i + j) % 2)
+				memset(audout->reserved, 0,
+				       sizeof(audout->reserved));
+
+			ioctl(-1, audout_cmds[i].val, audout);
+			printf("ioctl(-1, %s, %s{index=2158018784",
+			       sprintxlat(audout_cmds[i].str,
+					  audout_cmds[i].val, NULL),
+			       (audout_cmds[i].val == VIDIOC_G_AUDOUT) &&
+				!((i + j) % 2) ? "{reserved=[0x80a0c0eb"
+						 ", 0x80a0c0ec]} => " : "");
+			if (audout_cmds[i].val != VIDIOC_S_AUDOUT) {
+				printf("%sname=",
+				       audout_cmds[i].val == VIDIOC_G_AUDOUT
+					? ", " : (i + j) % 2 ? "} => {"
+						      : ", reserved=[0x80a0c0eb"
+						        ", 0x80a0c0ec]} => {");
+				print_quoted_cstring((char *) audout->name,
+						     sizeof(audout->name));
+				printf(", capability=%s, mode=%s",
+				       audout_caps[j %
+						  ARRAY_SIZE(audout_caps)].str,
+			               audout_modes[j %
+						 ARRAY_SIZE(audout_modes)].str);
+			}
+			printf("%s}) = %ld (INJECTED)\n",
+			       (i + j) % 2 ? "" : ", reserved=[0x80a0c0eb"
+						  ", 0x80a0c0ec]",
+			       inject_retval);
 		}
 	}
 

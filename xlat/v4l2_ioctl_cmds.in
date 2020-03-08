@@ -24,8 +24,8 @@ VIDIOC_G_CTRL			_IOWR('V',  27, struct v4l2_control)
 VIDIOC_S_CTRL			_IOWR('V',  28, struct v4l2_control)
 VIDIOC_G_TUNER			_IOWR('V',  29, struct v4l2_tuner)
 VIDIOC_S_TUNER			_IOW ('V',  30, struct v4l2_tuner)
-/* VIDIOC_G_AUDIO			_IOR ('V',  33, struct v4l2_audio) */
-/* VIDIOC_S_AUDIO			_IOW ('V',  34, struct v4l2_audio) */
+VIDIOC_G_AUDIO			_IOR ('V',  33, struct v4l2_audio)
+VIDIOC_S_AUDIO			_IOW ('V',  34, struct v4l2_audio)
 VIDIOC_QUERYCTRL		_IOWR('V',  36, struct v4l2_queryctrl)
 VIDIOC_QUERYMENU		_IOWR('V',  37, struct_v4l2_querymenu)
 VIDIOC_G_INPUT			_IOR ('V',  38, int)
@@ -35,8 +35,8 @@ VIDIOC_S_INPUT			_IOWR('V',  39, int)
 VIDIOC_G_OUTPUT			_IOR ('V',  46, int)
 VIDIOC_S_OUTPUT			_IOWR('V',  47, int)
 /* VIDIOC_ENUMOUTPUT		_IOWR('V',  48, struct_v4l2_output) */
-/* VIDIOC_G_AUDOUT			_IOR ('V',  49, struct v4l2_audioout) */
-/* VIDIOC_S_AUDOUT			_IOW ('V',  50, struct v4l2_audioout) */
+VIDIOC_G_AUDOUT			_IOR ('V',  49, struct v4l2_audioout)
+VIDIOC_S_AUDOUT			_IOW ('V',  50, struct v4l2_audioout)
 /* VIDIOC_G_MODULATOR		_IOWR('V',  54, struct_v4l2_modulator) */
 /* VIDIOC_S_MODULATOR		_IOW ('V',  55, struct_v4l2_modulator) */
 /* VIDIOC_G_FREQUENCY		_IOWR('V',  56, struct v4l2_frequency) */
@@ -48,8 +48,8 @@ VIDIOC_S_CROP			_IOW ('V',  60, struct v4l2_crop)
 /* VIDIOC_S_JPEGCOMP		_IOW ('V',  62, struct v4l2_jpegcompression) */
 VIDIOC_QUERYSTD			_IOR ('V',  63, uint64_t) /* v4l2_std_id */
 VIDIOC_TRY_FMT			_IOWR('V',  64, struct_v4l2_format)
-/* VIDIOC_ENUMAUDIO		_IOWR('V',  65, struct v4l2_audio) */
-/* VIDIOC_ENUMAUDOUT		_IOWR('V',  66, struct v4l2_audioout) */
+VIDIOC_ENUMAUDIO		_IOWR('V',  65, struct v4l2_audio)
+VIDIOC_ENUMAUDOUT		_IOWR('V',  66, struct v4l2_audioout)
 VIDIOC_G_PRIORITY		_IOR ('V',  67, uint32_t) /* enum v4l2_priority */
 VIDIOC_S_PRIORITY		_IOW ('V',  68, uint32_t) /* enum v4l2_priority */
 /* VIDIOC_G_SLICED_VBI_CAP		_IOWR('V',  69, struct_v4l2_sliced_vbi_cap) - added in v2.6.16.28-rc1~3732 */

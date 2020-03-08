@@ -814,6 +814,136 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+#include "xlat/v4l2_audio_capabilities.h"
+#include "xlat/v4l2_audio_modes.h"
+
+static int
+print_v4l2_audio(struct tcb *const tcp, const unsigned int code,
+		 const kernel_ulong_t arg)
+{
+	struct v4l2_audio a;
+
+	if (entering(tcp))
+		tprints(", ");
+
+	if (entering(tcp) && code != VIDIOC_S_AUDIO) {
+		bool printed = false;
+
+		if (umove_or_printaddr(tcp, arg, &a))
+			return RVAL_IOCTL_DECODED;
+
+		if (code == VIDIOC_ENUMAUDIO) {
+			PRINT_FIELD_U("{", a, index);
+			printed = true;
+		}
+		if (!IS_ARRAY_ZERO(a.reserved)) {
+			PRINT_FIELD_ARRAY(printed ? ", " : "{", a, reserved,
+					  tcp, print_xint32_array_member);
+			printed = true;
+		}
+		if (printed)
+			tprints("}");
+
+		set_tcb_priv_ulong(tcp, printed);
+
+		return 0;
+	}
+
+	/* exiting || code == VIDIOC_S_AUDIO */
+	unsigned long printed = exiting(tcp) ? get_tcb_priv_ulong(tcp) : false;
+
+	if ((exiting(tcp) && syserror(tcp)) || umove(tcp, arg, &a)) {
+		if (!printed)
+			printaddr(arg);
+		return RVAL_IOCTL_DECODED;
+	}
+	if (printed)
+		tprints(" => ");
+
+	const char *pfx = "{";
+	if (code != VIDIOC_ENUMAUDIO) {
+		PRINT_FIELD_U(pfx, a, index);
+		pfx = ", ";
+	}
+	if (code != VIDIOC_S_AUDIO) {
+		PRINT_FIELD_CSTRING(pfx, a, name);
+		PRINT_FIELD_FLAGS(", ", a, capability, v4l2_audio_capabilities,
+				  "V4L2_AUDCAP_???");
+		pfx = ", ";
+	}
+	PRINT_FIELD_FLAGS(pfx, a, mode, v4l2_audio_modes, "V4L2_AUDMODE_???");
+	if (!IS_ARRAY_ZERO(a.reserved)) {
+		PRINT_FIELD_ARRAY(", ", a, reserved, tcp,
+				  print_xint32_array_member);
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
+print_v4l2_audioout(struct tcb *const tcp, const unsigned int code,
+		    const kernel_ulong_t arg)
+{
+	struct v4l2_audioout a;
+
+	if (entering(tcp))
+		tprints(", ");
+
+	if (entering(tcp) && code != VIDIOC_S_AUDOUT) {
+		bool printed = false;
+
+		if (umove_or_printaddr(tcp, arg, &a))
+			return RVAL_IOCTL_DECODED;
+
+		if (code == VIDIOC_ENUMAUDOUT) {
+			PRINT_FIELD_U("{", a, index);
+			printed = true;
+		}
+		if (!IS_ARRAY_ZERO(a.reserved)) {
+			PRINT_FIELD_ARRAY(printed ? ", " : "{", a, reserved,
+					  tcp, print_xint32_array_member);
+			printed = true;
+		}
+		if (printed)
+			tprints("}");
+
+		set_tcb_priv_ulong(tcp, printed);
+
+		return 0;
+	}
+
+	/* exiting || code == VIDIOC_S_AUDOUT */
+	unsigned long printed = exiting(tcp) ? get_tcb_priv_ulong(tcp) : false;
+
+	if ((exiting(tcp) && syserror(tcp)) || umove(tcp, arg, &a)) {
+		if (!printed)
+			printaddr(arg);
+		return RVAL_IOCTL_DECODED;
+	}
+	if (printed)
+		tprints(" => ");
+
+	const char *pfx = "{";
+	if (code != VIDIOC_ENUMAUDOUT) {
+		PRINT_FIELD_U(pfx, a, index);
+		pfx = ", ";
+	}
+	if (code != VIDIOC_S_AUDOUT) {
+		PRINT_FIELD_CSTRING(pfx, a, name);
+		PRINT_FIELD_X(", ", a, capability);
+		PRINT_FIELD_X(", ", a, mode);
+		pfx = ", ";
+	}
+	if (!IS_ARRAY_ZERO(a.reserved)) {
+		PRINT_FIELD_ARRAY(pfx, a, reserved, tcp,
+				  print_xint32_array_member);
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
 /*
  * We include it here and not before print_v4l2_ext_controls as we need
  * V4L2_CTRL_CLASS_* definitions for V4L2_CID_*_BASE ones.
@@ -1421,6 +1551,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_TUNER: /* RW */
 		return print_v4l2_tuner(tcp, arg, code == VIDIOC_G_TUNER);
 
+	case VIDIOC_G_AUDIO: /* R */
+	case VIDIOC_S_AUDIO: /* W */
+	case VIDIOC_ENUMAUDIO: /* RW */
+		return print_v4l2_audio(tcp, code, arg);
+
 	case VIDIOC_QUERYCTRL: /* RW */
 		return print_v4l2_queryctrl(tcp, arg);
 
@@ -1440,6 +1575,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
 		break;
+
+	case VIDIOC_G_AUDOUT: /* R */
+	case VIDIOC_S_AUDOUT: /* W */
+	case VIDIOC_ENUMAUDOUT: /* RW */
+		return print_v4l2_audioout(tcp, code, arg);
 
 	case VIDIOC_CROPCAP: /* RW */
 		return print_v4l2_cropcap(tcp, arg);
