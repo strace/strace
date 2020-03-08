@@ -499,6 +499,7 @@ extern int read_int_from_file(struct tcb *, const char *, int *);
 
 extern void set_sortby(const char *);
 extern int set_overhead(const char *);
+extern void set_default_count_summary_columns(void);
 extern void set_count_summary_columns(const char *columns);
 
 extern bool get_instruction_pointer(struct tcb *, kernel_ulong_t *);

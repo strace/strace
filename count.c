@@ -41,26 +41,105 @@ static struct timespec overhead;
 
 enum count_summary_columns {
 	CSC_NONE,
-	CSC_TIME_100S,
-	CSC_TIME_TOTAL,
-	CSC_TIME_MIN,
-	CSC_TIME_MAX,
-	CSC_TIME_AVG,
-	CSC_CALLS,
-	CSC_ERRORS,
-	CSC_SC_NAME,
+	CSC_TIME_100S, /* type: percent; format: percent, value; precision=2 */
+	CSC_TIME_TOTAL, /* type: time; format: s, ms, us, ns, s.ms, s.us, s.ns */
+	CSC_TIME_MIN, /* type: time */
+	CSC_TIME_MAX, /* tyoe: time */
+	CSC_TIME_AVG, /* type: time */
+	CSC_CALLS, /* type: number */
+	CSC_ERRORS, /* type: number, print-zeroes=yes|no */
+	CSC_SC_NAME, /* type scname, format: name, number, name (number) */
 
 	CSC_MAX,
 };
 
-static uint8_t columns[CSC_MAX] = {
-	CSC_TIME_100S,
-	CSC_TIME_TOTAL,
-	CSC_TIME_AVG,
-	CSC_CALLS,
-	CSC_ERRORS,
-	CSC_SC_NAME,
+enum count_summary_column_type {
+	CSCT_NONE,
+	CSCT_PERCENT,
+	CSCT_TIME,
+	CSCT_NUMBER,
+	CSCT_SC_NAME,
+
+	CSCT_COUNT
 };
+
+union count_summary_column_val {
+	double percent;
+	struct timespec t;
+	uint64_t num;
+	struct {
+		const char *sc_name;
+		size_t sc_num;
+	} se;
+};
+
+enum { CSCT_SHIFT = 3 };
+
+#define COLUMN_TYPE(c_) ((c_) >> CSCT_SHIFT)
+
+enum count_summary_column_formats {
+	CSCT_NONE_NONE       = CSCT_NONE << CSCT_SHIFT,
+
+	CSCT_PERCENT_PERCENT = CSCT_PERCENT << CSCT_SHIFT,
+	CSCT_PERCENT_PART,
+
+	CSCT_TIME_S          = CSCT_TIME << CSCT_SHIFT,
+	CSCT_TIME_MS,
+	CSCT_TIME_US,
+	CSCT_TIME_NS,
+	CSCT_TIME_S_MS,
+	CSCT_TIME_S_US,
+	CSCT_TIME_S_NS,
+
+	CSCT_NUMBER_NUMBER   = CSCT_NUMBER << CSCT_SHIFT,
+
+	CSCT_SC_NAME_NAME    = CSCT_SC_NAME << CSCT_SHIFT,
+	CSCT_SC_NAME_NUMBER,
+	CSCT_SC_NAME_NAME_NUMBER,
+};
+
+static const struct {
+	const char *name;
+	size_t name_len;
+	enum count_summary_column_formats format;
+} format_names[] = {
+	{ ARRSZ_PAIR("percent"), CSCT_PERCENT_PERCENT },
+	{ ARRSZ_PAIR("part"   ), CSCT_PERCENT_PART },
+	{ ARRSZ_PAIR("s"      ), CSCT_TIME_S },
+	{ ARRSZ_PAIR("ms"     ), CSCT_TIME_MS },
+	{ ARRSZ_PAIR("us"     ), CSCT_TIME_US },
+	{ ARRSZ_PAIR("ns"     ), CSCT_TIME_NS },
+	{ ARRSZ_PAIR("s.ms"   ), CSCT_TIME_S_MS },
+	{ ARRSZ_PAIR("s.us"   ), CSCT_TIME_S_US },
+	{ ARRSZ_PAIR("s.ns"   ), CSCT_TIME_S_NS },
+	{ ARRSZ_PAIR("name"   ), CSCT_SC_NAME_NAME },
+	{ ARRSZ_PAIR("number" ), CSCT_SC_NAME_NUMBER },
+	{ ARRSZ_PAIR("both"   ), CSCT_SC_NAME_NAME_NUMBER },
+};
+
+struct csct_config {
+	enum count_summary_columns column;
+	enum count_summary_column_formats format;
+	uint8_t precision;    /* 0..20, CSCT_PERCENT */
+	uint8_t print_zeroes; /* 0..1, CSCT_NUMBER */
+};
+
+static const struct csct_config column_types[CSC_MAX] = {
+	[CSC_NONE]       = { CSC_NONE,	     CSCT_NONE },
+	[CSC_TIME_100S]  = { CSC_TIME_100S,  CSCT_PERCENT_PERCENT,
+				.precision = 2 },
+	[CSC_TIME_TOTAL] = { CSC_TIME_TOTAL, CSCT_TIME_S_US },
+	[CSC_TIME_MIN]   = { CSC_TIME_MIN,   CSCT_TIME_S_US },
+	[CSC_TIME_MAX]   = { CSC_TIME_MAX,   CSCT_TIME_S_US },
+	[CSC_TIME_AVG]   = { CSC_TIME_AVG,   CSCT_TIME_US },
+	[CSC_CALLS]      = { CSC_CALLS,	     CSCT_NUMBER_NUMBER,
+				.print_zeroes = true },
+	[CSC_ERRORS]     = { CSC_ERRORS,     CSCT_NUMBER_NUMBER,
+				.print_zeroes = false, },
+	[CSC_SC_NAME]    = { CSC_SC_NAME,    CSCT_SC_NAME_NAME },
+};
+
+struct csct_config columns[CSC_MAX];
 
 static const struct {
 	const char *name;
@@ -69,6 +148,7 @@ static const struct {
 	{ "time",         CSC_TIME_100S  },
 	{ "time_percent", CSC_TIME_100S  },
 	{ "time-percent", CSC_TIME_100S  },
+	{ "seconds",      CSC_TIME_TOTAL },
 	{ "time_total",   CSC_TIME_TOTAL },
 	{ "time-total",   CSC_TIME_TOTAL },
 	{ "total_time",   CSC_TIME_TOTAL },
@@ -224,57 +304,192 @@ set_sortby(const char *sortby)
 }
 
 void
+set_default_count_summary_columns(void)
+{
+	columns[0] = column_types[CSC_TIME_100S];
+	columns[1] = column_types[CSC_TIME_TOTAL];
+	columns[2] = column_types[CSC_TIME_AVG];
+	columns[3] = column_types[CSC_CALLS];
+	columns[4] = column_types[CSC_ERRORS];
+	columns[5] = column_types[CSC_SC_NAME];
+}
+
+void
 set_count_summary_columns(const char *s)
 {
 	uint8_t visible[CSC_MAX] = { 0 };
+	const char *pos = s;
 	const char *prev = s;
 	size_t cur = 0;
+	size_t len;
+	const char *opt_pos;
+	size_t opt_len;
+	bool found;
+
+	enum {
+		TOKEN_FORMAT,
+		TOKEN_PRECISION,
+		TOKEN_ZEROES,
+	} token_type;
 
 	memset(columns, 0, sizeof(columns));
 
-	for (;;) {
-		bool found = false;
-		const char *pos = strchr(prev, ',');
-		size_t len = pos ? (size_t) (pos - prev) : strlen(prev);
+next_column:
+	found = false;
+	pos = strchr(prev, ',');
+	len = pos ? (size_t) (pos - prev) : strlen(prev);
 
-		for (size_t i = 0; i < ARRAY_SIZE(column_aliases); i++) {
-			if (strncmp(column_aliases[i].name, prev, len) ||
-			    column_aliases[i].name[len])
-				continue;
-			if (column_aliases[i].column == CSC_NONE ||
-			    column_aliases[i].column >= CSC_MAX)
-				continue;
+	opt_pos = strpbrk(prev, ",:");
+	opt_len = opt_pos ? (size_t) (opt_pos - prev) : len;
 
-			if (visible[column_aliases[i].column])
-				error_msg_and_help("call summary column "
-						   "has been provided more "
-						   "than once: '%s' (-U option "
-						   "residual: '%s')",
-						   column_aliases[i].name,
+	for (size_t i = 0; i < ARRAY_SIZE(column_aliases); i++) {
+		if (strncmp(column_aliases[i].name, prev, opt_len) ||
+		    column_aliases[i].name[opt_len])
+			continue;
+		if (column_aliases[i].column == CSC_NONE ||
+		    column_aliases[i].column >= CSC_MAX)
+			continue;
+
+		if (visible[column_aliases[i].column])
+			error_msg_and_help("call summary column has been "
+					   "provided more than once: '%s' (-U "
+					   "option residual: '%s')",
+					   column_aliases[i].name,
+					   prev);
+
+		columns[cur] = column_types[column_aliases[i].column];
+		visible[column_aliases[i].column] = 1;
+		found = true;
+		token_type = TOKEN_FORMAT;
+
+		break;
+	}
+
+	if (!found)
+		error_msg_and_help("unknown column name: '%.*s'",
+				   (int) MIN(len, INT_MAX), prev);
+
+	if (opt_pos == pos)
+		goto end_opt;
+
+	prev = opt_pos + 1;
+	len -= opt_len + 1;
+	opt_pos = strpbrk(prev, ",:");
+	if (opt_pos >= pos)
+		opt_pos = pos;
+	opt_len = opt_pos ? (size_t) (opt_pos - prev) : len;
+
+	while (true) {
+		static const char format_pfx[] = "format=";
+		static const char precision_pfx[]
+			= "precision=";
+		static const char zeroes_pfx[] = "show_zeroes=";
+
+		if (opt_len >= sizeof(format_pfx) &&
+		    !strncasecmp(prev, format_pfx, sizeof(format_pfx) - 1)) {
+			prev += sizeof(format_pfx) - 1;
+			opt_len -= sizeof(format_pfx) - 1;
+			token_type = TOKEN_FORMAT;
+		} else if (opt_len >= sizeof(precision_pfx) &&
+			   COLUMN_TYPE(columns[cur].format) == CSCT_PERCENT &&
+			   !strncasecmp(prev, precision_pfx,
+					sizeof(precision_pfx) - 1)) {
+			prev += sizeof(precision_pfx) - 1;
+			opt_len -= sizeof(precision_pfx) - 1;
+			token_type = TOKEN_PRECISION;
+		} else if (opt_len >= sizeof(zeroes_pfx) &&
+			   COLUMN_TYPE(columns[cur].format) == CSCT_NUMBER &&
+			   !strncasecmp(prev, zeroes_pfx,
+					sizeof(zeroes_pfx) - 1)) {
+			prev += sizeof(zeroes_pfx) - 1;
+			opt_len -= sizeof(zeroes_pfx) - 1;
+			token_type = TOKEN_ZEROES;
+		}
+
+		switch (token_type) {
+		case TOKEN_FORMAT: {
+			bool format_found = false;
+
+			for (size_t j = 0;
+			     j < ARRAY_SIZE(format_names); j++) {
+				if (!strncasecmp(prev, format_names[j].name,
+						 format_names[j].name_len - 1)
+				    && opt_len == format_names[j].name_len - 1
+				    && COLUMN_TYPE(format_names[j].format)
+				       == COLUMN_TYPE(columns[cur].format)) {
+					columns[cur].format =
+						format_names[j].format;
+					format_found = true;
+
+					break;
+				}
+			}
+
+			if (!format_found) {
+				error_msg_and_help("Unknown column format: "
+						   "'%.*s'",
+						   (int) MIN(opt_len, INT_MAX),
 						   prev);
-
-			columns[cur++] = column_aliases[i].column;
-			visible[column_aliases[i].column] = 1;
-			found = true;
+			}
 
 			break;
 		}
+		case TOKEN_PRECISION: {
+			long long val = string_to_uint_ex(prev, NULL, 20,
+							  ":,");
 
-		if (!found)
-			error_msg_and_help("unknown column name: '%.*s'",
-					   (int) MIN(len, INT_MAX), prev);
+			if (val < 0) {
+				error_msg_and_help("Invalid precision: '%.*s'",
+						   (int) MIN(opt_len, INT_MAX),
+						   prev);
+			}
 
-		if (!pos)
+			columns[cur].precision = val;
+
+			break;
+		}
+		case TOKEN_ZEROES: {
+			int val = string_to_bool(prev, ":,");
+
+			if (val < 0) {
+				error_msg_and_help("Invalid bool value: '%.*s'",
+						   (int) MIN(opt_len, INT_MAX),
+						   prev);
+			}
+
+			columns[cur].print_zeroes = val;
+
+			break;
+		}
+		}
+
+		if (!opt_pos || *opt_pos == ',')
 			break;
 
-		prev = pos + 1;
+		prev = opt_pos + 1;
+		len -= opt_len + 1;
+		opt_pos = strpbrk(prev, ",:");
+		if (opt_pos >= pos)
+			opt_pos = pos;
+		opt_len = opt_pos ? (size_t) (opt_pos - prev) : len;
 	}
 
+end_opt:
+	cur++;
+
+	if (!pos)
+		goto end;
+
+	prev = pos + 1;
+
+	goto next_column;
+
+end:
 	/*
 	 * Always enable syscall name column, as without it table is meaningless
 	 */
 	if (!visible[CSC_SC_NAME])
-		columns[cur++] = CSC_SC_NAME;
+		columns[cur++] = column_types[CSC_SC_NAME];
 }
 
 int
@@ -283,8 +498,8 @@ set_overhead(const char *str)
 	return parse_ts(str, &overhead);
 }
 
-static size_t ATTRIBUTE_FORMAT((printf, 1, 2))
-num_chars(const char *fmt, ...)
+static int ATTRIBUTE_FORMAT((printf, 2, 3))
+num_chars(FILE *dummy, const char *fmt, ...)
 {
 	va_list ap;
 
@@ -295,9 +510,167 @@ num_chars(const char *fmt, ...)
 	return (unsigned int) MAX(ret, 0);
 }
 
+static int
+print_percent_val(FILE *outf, const union count_summary_column_val *val,
+		  const int w, const struct csct_config *fmt, bool last)
+{
+	switch (fmt->format) {
+	case CSCT_PERCENT_PERCENT:
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$.*2$f" : "%1$*3$.*2$f",
+			 val->percent * 100, fmt->precision, w);
+	case CSCT_PERCENT_PART:
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$.*2$f" : "%1$*3$.*2$f",
+			 val->percent, fmt->precision, w);
+	default:
+		return 0;
+	}
+}
+
+static int
+print_time_val(FILE *outf, const union count_summary_column_val *val,
+	       const int w, const struct csct_config *fmt, bool last)
+{
+	switch (fmt->format) {
+	case CSCT_TIME_S:
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$" PRIu64 : "%1$*2$" PRId64,
+			 (int64_t) val->t.tv_sec, w);
+	case CSCT_TIME_MS:
+		if (val->t.tv_sec) {
+			return (!w ? num_chars : fprintf)
+				(outf, !w ? "%1$" PRIu64 "%2$03u"
+					  : "%1$*3$" PRId64 "%2$03u",
+				 (int64_t) val->t.tv_sec,
+				 (int32_t) val->t.tv_nsec / 1000000, w - 3);
+		} else {
+			return (!w ? num_chars : fprintf)
+				(outf, !w ? "%1$u" : "%1$*2$u",
+				 (int32_t) val->t.tv_nsec / 1000000, w);
+		}
+	case CSCT_TIME_US:
+		if (val->t.tv_sec) {
+			return (!w ? num_chars : fprintf)
+				(outf, !w ? "%1$" PRIu64 "%2$06u"
+					  : "%1$*3$" PRId64 "%2$06u",
+				 (int64_t) val->t.tv_sec,
+				 (int32_t) val->t.tv_nsec / 1000, w - 6);
+		} else {
+			return (!w ? num_chars : fprintf)
+				(outf, !w ? "%1$u" : "%1$*2$u",
+				 (int32_t) val->t.tv_nsec / 1000, w);
+		}
+	case CSCT_TIME_NS:
+		if (val->t.tv_sec) {
+			return (!w ? num_chars : fprintf)
+				(outf, !w ? "%1$" PRIu64 "%2$09u"
+					  : "%1$*3$" PRId64 "%2$09u",
+				 (int64_t) val->t.tv_sec,
+				 (int32_t) val->t.tv_nsec, w - 9);
+		} else {
+			return (!w ? num_chars : fprintf)
+				(outf, !w ? "%1$u" : "%1$*2$u",
+				 (int32_t) val->t.tv_nsec, w);
+		}
+	case CSCT_TIME_S_MS:
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$" PRIu64 ".%2$03u"
+				  : "%1$*3$" PRId64 ".%2$03u",
+			 (int64_t) val->t.tv_sec,
+			 (int32_t) val->t.tv_nsec / 1000000, w - 4);
+	case CSCT_TIME_S_US:
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$" PRIu64 ".%2$06u"
+				  : "%1$*3$" PRId64 ".%2$06u",
+			 (int64_t) val->t.tv_sec,
+			 (int32_t) val->t.tv_nsec / 1000, w - 7);
+	case CSCT_TIME_S_NS:
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$" PRIu64 ".%2$09u"
+				  : "%1$*3$" PRId64 ".%2$09u",
+			 (int64_t) val->t.tv_sec, (int32_t) val->t.tv_nsec,
+			 w - 10);
+	default:
+		return 0;
+	}
+}
+
+static int
+print_number_val(FILE *outf, const union count_summary_column_val *val,
+		 const int w, const struct csct_config *fmt, bool last)
+{
+	switch (fmt->format) {
+	case CSCT_NUMBER_NUMBER:
+		if (!val->num && !fmt->print_zeroes) {
+			if (!w)
+				return 0;
+			return fprintf(outf, "%*s", w, "");
+		}
+		return (!w ? num_chars : fprintf)
+			(outf, !w ? "%1$" PRIu64 : "%1$*2$" PRId64,
+			 val->num, w);
+	default:
+		return 0;
+	};
+}
+
+static int
+print_syscall_val(FILE *outf, const union count_summary_column_val *val,
+		  const int w, const struct csct_config *fmt, bool last)
+{
+	switch (fmt->format) {
+	case CSCT_SC_NAME_NAME:
+		return (!w ? num_chars : fprintf)
+			(outf, !w || last ? "%1$s" : "%1$-*2$s",
+			 val->se.sc_name, w);
+	case CSCT_SC_NAME_NUMBER:
+		return (!w ? num_chars : fprintf)
+			(outf, !w || last ? "%1$zu" : "%1$-*2$zu",
+			 val->se.sc_num, w);
+	case CSCT_SC_NAME_NAME_NUMBER: {
+		size_t sc_len = strlen(val->se.sc_name);
+		int num_len = num_chars(outf, "%zu", val->se.sc_num);
+
+		if (!w)
+			return sc_len + num_len + sizeof(" ()") - 1;
+
+		return fprintf(outf, "%s (%zu)%*s",
+			       val->se.sc_name, val->se.sc_num,
+			       last ? 0 : w, "");
+	}
+	default:
+		return 0;
+	}
+}
+
+typedef int (*val_printer_t)(FILE *, const union count_summary_column_val *,
+			     const int, const struct csct_config *, bool);
+
+static inline int
+print_val(FILE *outf, const union count_summary_column_val *val, const int w,
+	  const struct csct_config *fmt, bool last)
+{
+	static const val_printer_t printers[] = {
+		[CSCT_PERCENT] = print_percent_val,
+		[CSCT_TIME] = print_time_val,
+		[CSCT_NUMBER] = print_number_val,
+		[CSCT_SC_NAME] = print_syscall_val,
+	};
+
+	enum count_summary_column_type type = COLUMN_TYPE(fmt->format);
+
+	if (type > ARRAY_SIZE(printers) || !printers[type])
+		return 0;
+
+	return printers[type](outf, val, w, fmt, last);
+}
+
 static void
 call_summary_pers(FILE *outf)
 {
+	static const double one = 1.0;
+
 	unsigned int *indices;
 	size_t last_column = 0;
 
@@ -313,7 +686,7 @@ call_summary_pers(FILE *outf)
 	double percent;
 
 	size_t sc_name_max = 0;
-
+	union count_summary_column_val sc_max = { .se = { NULL, 0 } };
 
 	/* sort, calculate statistics */
 	indices = xcalloc(sizeof(indices[0]), nsyscalls);
@@ -332,7 +705,12 @@ call_summary_pers(FILE *outf)
 		ts_div(&counts[i].time_avg, &counts[i].time, counts[i].calls);
 		tv_avg_max = ts_max(tv_avg_max, &counts[i].time_avg);
 
-		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
+		size_t sys_name_len = strlen(sysent[i].sys_name);
+		if (sys_name_len > sc_name_max) {
+			sc_name_max = sys_name_len;
+			sc_max.se.sc_name = sysent[i].sys_name;
+		}
+		sc_max.se.sc_num = i;
 	}
 	float_tv_cum = ts_float(&tv_cum);
 
@@ -345,51 +723,56 @@ call_summary_pers(FILE *outf)
 	static const struct {
 		const char *s;
 		size_t sz;
-		const char *fmt;
-		const char *last_fmt;
 		uint32_t flags;
 	} cdesc[] = {
-		[CSC_TIME_100S]  = { ARRSZ_PAIR("% time") - 1,   "%1$*2$.2f" },
-		[CSC_TIME_MIN]   = { ARRSZ_PAIR("shortest") - 1, "%1$*2$.6f" },
-		[CSC_TIME_MAX]   = { ARRSZ_PAIR("longest") - 1,  "%1$*2$.6f" },
+		[CSC_TIME_100S]  = { ARRSZ_PAIR("% time") - 1 },
+		[CSC_TIME_MIN]   = { ARRSZ_PAIR("shortest") - 1 },
+		[CSC_TIME_MAX]   = { ARRSZ_PAIR("longest") - 1 },
 		/* Historical field sizes are preserved */
-		[CSC_TIME_TOTAL] = { "seconds",    11, "%1$*2$.6f" },
-		[CSC_TIME_AVG]   = { "usecs/call", 11, "%1$*2$" PRIu64 },
-		[CSC_CALLS]      = { "calls",       9, "%1$*2$" PRIu64 },
-		[CSC_ERRORS]     = { "errors",      9, "%1$*2$.0" PRIu64 },
-		[CSC_SC_NAME]    = { "syscall",    16, "%1$-*2$s", "%1$s", CF_L },
+		[CSC_TIME_TOTAL] = { "seconds",    11 },
+		[CSC_TIME_AVG]   = { "usecs/call", 11 },
+		[CSC_CALLS]      = { "calls",       9 },
+		[CSC_ERRORS]     = { "errors",      9 },
+		[CSC_SC_NAME]    = { "syscall",    16, CF_L },
 	};
+	unsigned int cwidths[CSC_MAX];
+
+	/* find the last column */
+	for (size_t i = 0; i < ARRAY_SIZE(columns) && columns[i].column; ++i)
+		last_column = i;
 
 	/* calculate column widths */
-#define W_(c_, v_) [c_] = MAX(cdesc[c_].sz, (v_))
-	unsigned int cwidths[CSC_MAX] = {
-		W_(CSC_TIME_100S,  sizeof("100.00") - 1),
-		W_(CSC_TIME_TOTAL, num_chars("%.6f", float_tv_cum)),
-		W_(CSC_TIME_MIN,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_min_max->tv_sec)),
-		W_(CSC_TIME_MAX,   num_chars("%" PRId64 ".000000",
-					     (int64_t) tv_max->tv_sec)),
-		W_(CSC_TIME_AVG,   num_chars("%" PRId64 ,
-					     (uint64_t) (ts_float(tv_avg_max)
-							 * 1e6))),
-		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
-		W_(CSC_ERRORS,     num_chars("%" PRIu64, error_cum)),
-		W_(CSC_SC_NAME,    sc_name_max + 1),
+#define W_(c_, v_) \
+	case (c_): \
+		cwidths[i] = MAX(cdesc[c_].sz, \
+			(size_t) print_val(outf, \
+				(const union count_summary_column_val *) &(v_),\
+				0, columns + i, i == last_column)); \
+		break
+	for (size_t i = 0; i <= last_column; i++) {
+		const size_t c = columns[i].column;
+
+		switch (c) {
+		W_(CSC_TIME_100S,  one);
+		W_(CSC_TIME_TOTAL, tv_cum);
+		W_(CSC_TIME_MIN,   *tv_min_max);
+		W_(CSC_TIME_MAX,   *tv_max);
+		W_(CSC_TIME_AVG,   *tv_avg_max);
+		W_(CSC_CALLS,      call_cum);
+		W_(CSC_ERRORS,     error_cum);
+		W_(CSC_SC_NAME,    sc_max);
+		}
 	};
 #undef W_
 
-	/* find the last column */
-	for (size_t i = 0; i < ARRAY_SIZE(columns) && columns[i]; ++i)
-		last_column = i;
-
 	/* header */
 	for (size_t i = 0; i <= last_column; ++i) {
-		const char *fmt = cdesc[columns[i]].flags & CF_L
+		const char *fmt = cdesc[columns[i].column].flags & CF_L
 				  ? (i == last_column ? "%1$s" : "%1$-*2$s")
 				  : "%1$*2$s";
 		if (i)
 			fputc(' ', outf);
-		fprintf(outf, fmt, cdesc[columns[i]].s, cwidths[columns[i]]);
+		fprintf(outf, fmt, cdesc[columns[i].column].s, cwidths[i]);
 	}
 	fputc('\n', outf);
 
@@ -398,68 +781,46 @@ call_summary_pers(FILE *outf)
 		if (i)
 			fputc(' ', outf);
 
-		for (size_t j = 0; j < cwidths[columns[i]]; ++j)
+		for (size_t j = 0; j < cwidths[i]; ++j)
 			fputc('-', outf);
 	}
 	fputc('\n', outf);
 
-	/* cache column formats */
-#define FC_(c_) \
-	case (c_): \
-		column_fmts[i] = (i == last_column) && cdesc[c].last_fmt \
-				 ? cdesc[c].last_fmt : cdesc[c].fmt; \
-		break
-#define PC_(c_, val_) \
-	case (c_): \
-		fprintf(outf, column_fmts[i], (val_), cwidths[c]); \
-		break
-
-	const char *column_fmts[last_column + 1];
-	for (size_t i = 0; i <= last_column; ++i) {
-		const size_t c = columns[i];
-
-		switch (c) {
-		FC_(CSC_TIME_100S);
-		FC_(CSC_TIME_TOTAL);
-		FC_(CSC_TIME_MIN);
-		FC_(CSC_TIME_MAX);
-		FC_(CSC_TIME_AVG);
-		FC_(CSC_CALLS);
-		FC_(CSC_ERRORS);
-		FC_(CSC_SC_NAME);
-		}
-	}
-
 	/* data output */
-	for (size_t j = 0; j < nsyscalls; ++j) {
+#define PC_(c_, v_) \
+	case (c_): \
+		print_val(outf, (union count_summary_column_val *) &(v_), \
+			  cwidths[i], columns + i, i == last_column); \
+		break
+	for (size_t j = 0; j < nsyscalls; j++) {
 		unsigned int idx = indices[j];
 		struct call_counts *cc = &counts[idx];
-		double float_syscall_time;
 
 		if (cc->calls == 0)
 			continue;
 
-		float_syscall_time = ts_float(&cc->time);
-		percent = (100.0 * float_syscall_time);
+		union count_summary_column_val sc = {
+			.se = { sysent[idx].sys_name, idx } };
+
+		percent = ts_float(&cc->time);
 		/* else: float_tv_cum can be 0.0 too and we get 0/0 = NAN */
 		if (percent != 0.0)
 			   percent /= float_tv_cum;
 
 		for (size_t i = 0; i <= last_column; ++i) {
-			const size_t c = columns[i];
+			const size_t c = columns[i].column;
 			if (i)
 				fputc(' ', outf);
 
 			switch (c) {
 			PC_(CSC_TIME_100S,  percent);
-			PC_(CSC_TIME_TOTAL, float_syscall_time);
-			PC_(CSC_TIME_MIN,   ts_float(&cc->time_min));
-			PC_(CSC_TIME_MAX,   ts_float(&cc->time_max));
-			PC_(CSC_TIME_AVG,
-			    (uint64_t) (ts_float(&cc->time_avg) * 1e6));
+			PC_(CSC_TIME_TOTAL, cc->time);
+			PC_(CSC_TIME_MIN,   cc->time_min);
+			PC_(CSC_TIME_MAX,   cc->time_max);
+			PC_(CSC_TIME_AVG,   cc->time_avg);
 			PC_(CSC_CALLS,      cc->calls);
 			PC_(CSC_ERRORS,     cc->errors);
-			PC_(CSC_SC_NAME,    sysent[idx].sys_name);
+			PC_(CSC_SC_NAME,    sc);
 			}
 		}
 
@@ -473,32 +834,36 @@ call_summary_pers(FILE *outf)
 		if (i)
 			fputc(' ', outf);
 
-		for (size_t j = 0; j < cwidths[columns[i]]; ++j)
+		for (size_t j = 0; j < cwidths[i]; ++j)
 			fputc('-', outf);
 	}
 	fputc('\n', outf);
 
+	struct timespec cum_tv_avg;
+	ts_div(&cum_tv_avg, &tv_cum, call_cum);
+
 	/* totals */
 	for (size_t i = 0; i <= last_column; ++i) {
-		const size_t c = columns[i];
+		const size_t c = columns[i].column;
 		if (i)
 			fputc(' ', outf);
 
 		switch (c) {
-		PC_(CSC_TIME_100S, 100.0);
-		PC_(CSC_TIME_TOTAL, float_tv_cum);
-		PC_(CSC_TIME_MIN, ts_float(tv_min));
-		PC_(CSC_TIME_MAX, ts_float(tv_max));
-		PC_(CSC_TIME_AVG, (uint64_t) (float_tv_cum / call_cum * 1e6));
-		PC_(CSC_CALLS, call_cum);
-		PC_(CSC_ERRORS, error_cum);
-		PC_(CSC_SC_NAME, "total");
+		PC_(CSC_TIME_100S,  one);
+		PC_(CSC_TIME_TOTAL, tv_cum);
+		PC_(CSC_TIME_MIN,   tv_min);
+		PC_(CSC_TIME_MAX,   tv_max);
+		PC_(CSC_TIME_AVG,   cum_tv_avg);
+		PC_(CSC_CALLS,      call_cum);
+		PC_(CSC_ERRORS,     error_cum);
+		case CSC_SC_NAME:
+			fprintf(outf, i == last_column ? "%1$s" : "%1$-*2$s",
+			       "total", cwidths[i]);
 		}
 	}
 	fputc('\n', outf);
 
 #undef PC_
-#undef FC_
 }
 
 void

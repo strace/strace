@@ -1879,6 +1879,8 @@ init(int argc, char *argv[])
 	qualify_decode_fd("none");
 	qualify_signals("all");
 
+	set_default_count_summary_columns();
+
 	static const char optstring[] =
 		"+a:Ab:cCdDe:E:fFhiI:ko:O:p:P:qrs:S:tTu:U:vVwxX:yzZ";
 
