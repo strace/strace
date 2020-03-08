@@ -1115,13 +1115,13 @@ specification is described in section
 Sort the output of the histogram printed by the
 .B \-c
 option by the specified criterion.  Legal values are
-.BR time " (or " time_percent " or " time_total " or " total_time ),
-.BR min_time " (or " shortest " or " time_min ),
-.BR max_time " (or " longest " or " time_max ),
-.BR avg_time " (or " time_avg ),
+.BR time " (or " time\-percent " or " time\-total " or " total\-time ),
+.BR min\-time " (or " shortest " or " time\-min ),
+.BR max\-time " (or " longest " or " time\-max ),
+.BR avg\-time " (or " time\-avg ),
 .BR calls " (or " count ),
 .BR errors " (or " error ),
-.BR name " (or " syscall " or " syscall_name ),
+.BR name " (or " syscall " or " syscall\-name ),
 and
 .BR nothing " (or " none );
 default is
@@ -1136,21 +1136,21 @@ The
 argument is a comma-separated list with items being one of the following:
 .RS
 .TP 36
-.BR time_percent " (or " time )
+.BR time\-percent " (or " time )
 Percentage of cumulative time consumed by a specific system call.
 .TQ
-.BR total_time " (or " time_total )
+.BR total\-time " (or " time\-total )
 Total system (or wall clock, if
 .B \-w
 option is provided) time consumed by a specific system call.
 .TQ
-.BR min_time " (or " shortest " or " time_min )
+.BR min\-time " (or " shortest " or " time\-min )
 Minimum observed call duration.
 .TQ
-.BR max_time " (or " longest " or " time_max )
+.BR max\-time " (or " longest " or " time\-max )
 Maximum observed call duration.
 .TQ
-.BR avg_time " (or " time_avg )
+.BR avg\-time " (or " time\-avg )
 Average call duration.
 .TQ
 .BR calls " (or " count )
@@ -1159,12 +1159,12 @@ Call count.
 .BR errors " (or " error )
 Error count.
 .TQ
-.BR name " (or " syscall " or " syscall_name )
+.BR name " (or " syscall " or " syscall\-name )
 Syscall name.
 .RE
 .IP
 The default value is
-.BR time_percent , total_time , avg_time , calls , errors , name .
+.BR time\-percent , total\-time , avg\-time , calls , errors , name .
 If the
 .B name
 field is not supplied explicitly, it is added as the last column.

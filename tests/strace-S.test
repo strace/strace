@@ -51,11 +51,11 @@ for s in '-S error' --summary-sort-by=errors; do
 	test_c "$s" '-n -r' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+([0-9]+))?'"$c"'$/\6/p'
 done
-for s in '--summary-columns=time,time_max,name -S max_time' '-U time_percent,max_time,syscall_name --summary-sort-by=longest'; do
+for s in '--summary-columns=time,time-max,name -S max_time' '-U time-percent,max_time,syscall_name --summary-sort-by=longest'; do
 	test_c "$s" '-n -r' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c"'[[:space:]].*/\2/p'
 done
-for s in '--summary-columns=time,time_min,name -S min_time' '-U time_percent,min_time,syscall_name --summary-sort-by=shortest'; do
+for s in '--summary-columns=time,time_min,name -S min-time' '-U time_percent,min_time,syscall-name --summary-sort-by=shortest'; do
 	test_c "$s" '-n -r' \
 		'/^[[:space:]]+[0-9]/ s/^'"$c$c"'[[:space:]].*/\2/p'
 done

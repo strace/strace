@@ -406,13 +406,13 @@ Statistics:\n\
                  set overhead for tracing syscalls to OVERHEAD UNITs\n\
      units:      one of s, ms, us, ns; default is microseconds\n\
   -S SORTBY, --summary-sort-by=SORTBY\n\
-                 sort syscall counts by: time, min_time, max_time, avg_time,\n\
+                 sort syscall counts by: time, min-time, max-time, avg-time,\n\
                  calls, errors, name, nothing (default %s)\n\
   -U COLUMNS, --summary-columns=COLUMNS\n\
                  show specific columns in the summary report: comma-separated\n\
-                 list of time_percent, total_time, min_time, max_time, \n\
-                 avg_time, calls, errors, name\n\
-                 (default time_percent,total_time,avg_time,calls,errors,name)\n\
+                 list of time-percent, total-time, min-time, max-time, \n\
+                 avg-time, calls, errors, name\n\
+                 (default time-percent,total-time,avg-time,calls,errors,name)\n\
   -w, --summary-wall-clock\n\
                  summarise syscall latency (default is system time)\n\
 \n\
