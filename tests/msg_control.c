@@ -25,6 +25,9 @@
 # include <linux/time_types.h>
 #endif
 
+#include "kernel_timeval.h"
+#include "kernel_old_timespec.h"
+
 #include "xlat.h"
 #define XLAT_MACROS_ONLY
 #include "xlat/sock_options.h"
@@ -214,7 +217,7 @@ test_scm_rights3(struct msghdr *const mh, void *const page, const size_t nfds)
 static void
 test_scm_timestamp_old(struct msghdr *const mh, void *const page)
 {
-	static const struct timeval tv = {
+	static const kernel_old_timeval_t tv = {
 		.tv_sec = 123456789,
 		.tv_usec = 987654
 	};
@@ -261,7 +264,7 @@ test_scm_timestamp_old(struct msghdr *const mh, void *const page)
 static void
 test_scm_timestampns_old(struct msghdr *const mh, void *const page)
 {
-	static const struct timespec ts = {
+	static const kernel_old_timespec_t ts = {
 		.tv_sec = 123456789,
 		.tv_nsec = 987654321
 	};
@@ -309,7 +312,7 @@ test_scm_timestampns_old(struct msghdr *const mh, void *const page)
 static void
 test_scm_timestamping_old(struct msghdr *const mh, void *const page)
 {
-	static const struct timespec ts[] = {
+	static const kernel_old_timespec_t ts[] = {
 		{ .tv_sec = 123456789, .tv_nsec = 987654321 },
 		{ .tv_sec = 123456790, .tv_nsec = 987654320 },
 		{ .tv_sec = 123456791, .tv_nsec = 987654319 }
