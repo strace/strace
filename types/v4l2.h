@@ -237,6 +237,17 @@ typedef struct {
 
 
 typedef struct {
+	uint32_t id;
+	uint32_t index;
+	union {
+		uint8_t name[32];
+		int64_t value;
+	};
+	uint32_t reserved;
+} ATTRIBUTE_PACKED struct_v4l2_querymenu;
+
+
+typedef struct {
         uint32_t capability;
         uint32_t flags;
         void *   base;

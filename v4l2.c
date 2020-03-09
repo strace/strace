@@ -68,6 +68,7 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_input);
 #ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
 #endif
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_querymenu);
 #ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
 #endif
@@ -1055,6 +1056,39 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 static int
+print_v4l2_querymenu(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct_v4l2_querymenu m;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &m))
+			return RVAL_IOCTL_DECODED;
+
+		tprints("{id=");
+		print_v4l2_cid(m.id, false);
+		PRINT_FIELD_U(", ", m, index);
+
+		return 0;
+	}
+
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &m) < 0) {
+		tprints("}");
+		return RVAL_IOCTL_DECODED;
+	}
+
+	/* TODO: update this when ctrl caching is implemented */
+	PRINT_FIELD_CSTRING(", ", m, name);
+	PRINT_FIELD_D(", ", m, value);
+	if (m.reserved)
+		PRINT_FIELD_X(", ", m, reserved);
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
 print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct v4l2_cropcap c;
@@ -1392,6 +1426,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 
 	case VIDIOC_QUERY_EXT_CTRL: /* RW */
 		return print_v4l2_query_ext_ctrl(tcp, arg);
+
+	case VIDIOC_QUERYMENU: /* RW */
+		return print_v4l2_querymenu(tcp, arg);
 
 	case VIDIOC_G_INPUT: /* R */
 	case VIDIOC_G_OUTPUT: /* R */

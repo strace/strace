@@ -1580,6 +1580,39 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_QUERYMENU */
+	struct v4l2_querymenu *qmenu = tail_alloc(sizeof(*qmenu));
+
+	ioctl(-1, VIDIOC_QUERYMENU, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU), inject_retval);
+
+	ioctl(-1, VIDIOC_QUERYMENU, (char *) qmenu + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU), (char *) qmenu + 1, inject_retval);
+
+	/* NB: cid printing is mostly tested in ioctl_v4l2.c */
+	fill_memory32(qmenu, sizeof(*qmenu));
+	fill_memory(qmenu->name, sizeof(qmenu->name));
+#ifdef HAVE_STRUCT_V4L2_QUERYMENU_VALUE
+	qmenu->value =
+#else
+	((int64_t *) qmenu->name)[0] =
+#endif
+		0xde61646330646564ULL;
+
+	for (size_t i = 0; i < 2; i++) {
+		ioctl(-1, VIDIOC_QUERYMENU, qmenu);
+		printf("ioctl(-1, %s, {id=0x80a0c0e0"
+		       NRAW(" /* V4L2_CID_??? */") ", index=2158018785, name=",
+		       XLAT_STR(VIDIOC_QUERYMENU));
+		print_quoted_cstring((char *) qmenu->name, sizeof(qmenu->name));
+		printf(", value=-2422544747372190364%s}) = %ld (INJECTED)\n",
+		       i ? "" : ", reserved=0x80a0c0ea", inject_retval);
+
+		qmenu->reserved = 0;
+	}
+
 	/*
 	 * VIDIOC_OVERLAY,
 	 * VIDIOC_G_INPUT, VIDIOC_S_INPUT, VIDIOC_G_OUTPUT, VIDIOC_S_OUTPUT

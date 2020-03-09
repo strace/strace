@@ -572,7 +572,6 @@ main(void)
 	} unsupp_cmds[] = {
 		{ ARG_STR(VIDIOC_G_AUDIO) },
 		{ ARG_STR(VIDIOC_S_AUDIO) },
-		{ ARG_STR(VIDIOC_QUERYMENU) },
 #ifdef VIDIOC_G_EDID
 		{ ARG_STR(VIDIOC_G_EDID) },
 #endif
@@ -1360,6 +1359,27 @@ main(void)
 	ioctl(-1, VIDIOC_QUERYCTRL, p_queryctrl);
 	printf("ioctl(-1, %s, {id=" XLAT_FMT "}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_QUERYCTRL), XLAT_ARGS(V4L2_CID_SATURATION));
+
+	/* VIDIOC_QUERYMENU */
+	ioctl(-1, VIDIOC_QUERYMENU, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_querymenu, p_v4l2_querymenu);
+	ioctl(-1, VIDIOC_QUERYMENU, p_v4l2_querymenu);
+	printf("ioctl(-1, %s, {id=%#x" NRAW(" /* V4L2_CID_??? */")
+	       ", index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_QUERYMENU), p_v4l2_querymenu->id,
+	       p_v4l2_querymenu->index);
+
+	for (size_t i = 0; i < ARRAY_SIZE(id_strs); i++) {
+		p_v4l2_querymenu->id = v4l2_control_vals[i].id;
+
+		ioctl(-1, VIDIOC_QUERYMENU, p_v4l2_querymenu);
+		printf("ioctl(-1, %s, {id=%s, index=%u}) = -1 EBADF (%m)\n",
+		       XLAT_STR(VIDIOC_QUERYMENU), id_strs[i],
+		       p_v4l2_querymenu->index);
+	}
 
 	/* VIDIOC_G_INPUT */
 	ioctl(-1, VIDIOC_G_INPUT, 0);
