@@ -10,12 +10,9 @@
  */
 
 #include "tests.h"
+#include <sys/prctl.h>
 
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
-
-#if defined HAVE_PRCTL && defined PR_GET_NAME && defined PR_SET_NAME
+#if defined PR_GET_NAME && defined PR_SET_NAME
 
 # include <stdio.h>
 # include <string.h>
@@ -79,6 +76,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PRCTL && PR_GET_NAME && PR_SET_NAME")
+SKIP_MAIN_UNDEFINED("PR_GET_NAME && PR_SET_NAME")
 
 #endif

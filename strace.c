@@ -26,9 +26,7 @@
 #include <dirent.h>
 #include <locale.h>
 #include <sys/utsname.h>
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
+#include <sys/prctl.h>
 
 #include "kill_save_errno.h"
 #include "filter_seccomp.h"
@@ -1526,7 +1524,7 @@ startup_child(char **argv)
 	 */
 	params_for_tracee.pathname = NOMMU_SYSTEM ? xstrdup(pathname) : pathname;
 
-#if defined HAVE_PRCTL && defined PR_SET_PTRACER && defined PR_SET_PTRACER_ANY
+#if defined PR_SET_PTRACER && defined PR_SET_PTRACER_ANY
 	if (daemonized_tracer)
 		prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY);
 #endif

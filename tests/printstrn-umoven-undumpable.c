@@ -8,12 +8,9 @@
  */
 
 #include "tests.h"
+#include <sys/prctl.h>
 
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
-
-#if defined HAVE_PRCTL && defined PR_SET_DUMPABLE
+#ifdef PR_SET_DUMPABLE
 
 # include <stdio.h>
 # include <unistd.h>
@@ -46,6 +43,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PRCTL && PR_SET_DUMPABLE")
+SKIP_MAIN_UNDEFINED("PR_SET_DUMPABLE")
 
 #endif

@@ -13,18 +13,14 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
-#include "scno.h"
-
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
+#include <sys/prctl.h>
 #ifdef HAVE_LINUX_SECCOMP_H
 # include <linux/seccomp.h>
 #endif
 #include <linux/filter.h>
+#include "scno.h"
 
-#if defined HAVE_PRCTL \
- && defined PR_SET_NO_NEW_PRIVS \
+#if defined PR_SET_NO_NEW_PRIVS \
  && defined PR_SET_SECCOMP \
  && defined SECCOMP_MODE_FILTER \
  && defined SECCOMP_RET_ERRNO \
@@ -117,7 +113,7 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PRCTL && PR_SET_NO_NEW_PRIVS && PR_SET_SECCOMP"
+SKIP_MAIN_UNDEFINED("PR_SET_NO_NEW_PRIVS && PR_SET_SECCOMP"
 		    " && SECCOMP_MODE_FILTER && SECCOMP_RET_ERRNO"
 		    " && BPF_JUMP && BPF_STMT")
 

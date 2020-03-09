@@ -13,16 +13,13 @@
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "scno.h"
 #include <unistd.h>
-
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
+#include <sys/prctl.h>
 #ifdef HAVE_LINUX_SECCOMP_H
 # include <linux/seccomp.h>
 #endif
 #include <linux/filter.h>
+#include "scno.h"
 
 #if defined __NR_seccomp \
  && defined PR_SET_NO_NEW_PRIVS \

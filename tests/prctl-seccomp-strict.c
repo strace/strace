@@ -7,12 +7,10 @@
  */
 
 #include "tests.h"
+#include <sys/prctl.h>
 #include "scno.h"
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
 
-#if defined HAVE_PRCTL && defined PR_SET_SECCOMP && defined __NR_exit
+#if defined PR_SET_SECCOMP && defined __NR_exit
 
 # include <stdio.h>
 # include <unistd.h>
@@ -49,6 +47,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_PRCTL && PR_SET_SECCOMP && __NR_exit")
+SKIP_MAIN_UNDEFINED("PR_SET_SECCOMP && __NR_exit")
 
 #endif
