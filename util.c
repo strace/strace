@@ -1027,6 +1027,9 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 		(ret_) |= shift_;					\
 	} while (0)
 
+#if SIZEOF_KERNEL_LONG_T > 4
+
+# define ilog2_klong ilog2_64
 /**
  * Calculate floor(log2(val)), with the exception of val == 0, for which 0
  * is returned as well.
@@ -1049,6 +1052,9 @@ ilog2_64(uint64_t val)
 	return ret;
 }
 
+#else /* SIZEOF_KERNEL_LONG_T == 4 */
+
+# define ilog2_klong ilog2_32
 /**
  * Calculate floor(log2(val)), with the exception of val == 0, for which 0
  * is returned as well.
@@ -1070,13 +1076,9 @@ ilog2_32(uint32_t val)
 	return ret;
 }
 
-#undef ILOG2_ITER_
+#endif /* SIZEOF_KERNEL_LONG_T */
 
-#if SIZEOF_KERNEL_LONG_T > 4
-# define ilog2_klong ilog2_64
-#else
-# define ilog2_klong ilog2_32
-#endif
+#undef ILOG2_ITER_
 
 void
 dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
