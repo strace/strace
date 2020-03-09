@@ -1615,7 +1615,7 @@ Since 2009,
 .B strace
 is actively maintained by Dmitry Levin.
 .B strace
-gained support for AArch64, ARC, AVR32, Blackfin, Meta, Nios II, OpenSISC 1000,
+gained support for AArch64, ARC, AVR32, Blackfin, Meta, Nios II, OpenRISC 1000,
 RISC-V, Tile/TileGx, Xtensa architectures since that time.
 In 2012, unmaintained and apparently broken support for non-Linux operating
 systems was removed.
