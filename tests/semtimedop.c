@@ -6,6 +6,10 @@
  */
 
 #include "tests.h"
+#include "scno.h"
+
+#if defined __NR_semtimedop || defined __NR_socketcall
+
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <stdint.h>
@@ -143,3 +147,9 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_semtimedop || __NR_socketcall")
+
+#endif
