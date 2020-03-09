@@ -9,12 +9,16 @@
  */
 
 #include "tests.h"
-#include <assert.h>
-#include <signal.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/resource.h>
+#include "scno.h"
+
+#ifdef __NR_wait4
+
+# include <assert.h>
+# include <signal.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <sys/wait.h>
+# include <sys/resource.h>
 
 static const char *
 sprint_rusage(const struct rusage *const ru)
@@ -23,7 +27,7 @@ sprint_rusage(const struct rusage *const ru)
 	snprintf(buf, sizeof(buf),
 		 "{ru_utime={tv_sec=%lld, tv_usec=%llu}"
 		 ", ru_stime={tv_sec=%lld, tv_usec=%llu}"
-#if VERBOSE
+# if VERBOSE
 		 ", ru_maxrss=%lu"
 		 ", ru_ixrss=%lu"
 		 ", ru_idrss=%lu"
@@ -38,14 +42,14 @@ sprint_rusage(const struct rusage *const ru)
 		 ", ru_nsignals=%lu"
 		 ", ru_nvcsw=%lu"
 		 ", ru_nivcsw=%lu}"
-#else
+# else
 		 ", ...}"
-#endif
+# endif
 		 , (long long) ru->ru_utime.tv_sec
 		 , zero_extend_signed_to_ull(ru->ru_utime.tv_usec)
 		 , (long long) ru->ru_stime.tv_sec
 		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
-#if VERBOSE
+# if VERBOSE
 		 , (long) ru->ru_maxrss
 		 , (long) ru->ru_ixrss
 		 , (long) ru->ru_idrss
@@ -60,7 +64,7 @@ sprint_rusage(const struct rusage *const ru)
 		 , (long) ru->ru_nsignals
 		 , (long) ru->ru_nvcsw
 		 , (long) ru->ru_nivcsw
-#endif
+# endif
 		 );
 	return buf;
 }
@@ -156,12 +160,12 @@ main(void)
 	if (kill(pid, SIGCONT))
 		perror_msg_and_fail("kill(SIGCONT)");
 
-#if defined WCONTINUED && defined WIFCONTINUED
+# if defined WCONTINUED && defined WIFCONTINUED
 	assert(do_wait4(pid, s, WCONTINUED, rusage) == pid);
 	assert(WIFCONTINUED(*s));
 	tprintf("wait4(%d, [{WIFCONTINUED(s)}], WCONTINUED"
 		", %s) = %d\n", pid, sprint_rusage(rusage), pid);
-#endif /* WCONTINUED && WIFCONTINUED */
+# endif /* WCONTINUED && WIFCONTINUED */
 
 	assert(write(1, "", 1) == 1);
 	(void) close(1);
@@ -178,3 +182,9 @@ main(void)
 	tprintf("%s\n", "+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_wait4")
+
+#endif /* __NR_wait4 */
