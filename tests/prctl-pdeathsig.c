@@ -17,7 +17,7 @@
 
 # include <stdio.h>
 # include <unistd.h>
-# include <sys/signal.h>
+# include <signal.h>
 
 int
 main(void)
