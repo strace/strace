@@ -1806,6 +1806,79 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_ENUMOUTPUT */
+	static const struct strval32 output_types[] = {
+		{ ARG_XLAT_UNKNOWN(0, "V4L2_OUTPUT_TYPE_???") },
+		{ V4L2_OUTPUT_TYPE_MODULATOR,
+		  XLAT_KNOWN(0x1, "V4L2_OUTPUT_TYPE_MODULATOR") },
+		{ V4L2_OUTPUT_TYPE_ANALOG,
+		  XLAT_KNOWN(0x2, "V4L2_OUTPUT_TYPE_ANALOG") },
+		{ V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY,
+		  XLAT_KNOWN(0x3, "V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY") },
+		{ ARG_XLAT_UNKNOWN(0x4, "V4L2_OUTPUT_TYPE_???") },
+		{ ARG_XLAT_UNKNOWN(0xdeadc0de, "V4L2_OUTPUT_TYPE_???") },
+	};
+	static const struct strval32 output_caps[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_OUT_CAP_PRESETS") },
+		{ ARG_XLAT_KNOWN(0xe, "V4L2_OUT_CAP_DV_TIMINGS|V4L2_OUT_CAP_STD"
+				 "|V4L2_OUT_CAP_NATIVE_SIZE") },
+		{ ARG_XLAT_KNOWN(0xdec0dedc, "V4L2_OUT_CAP_STD"
+				 "|V4L2_OUT_CAP_NATIVE_SIZE|0xdec0ded0") },
+		{ ARG_XLAT_UNKNOWN(0xdec0ded0, "V4L2_OUT_CAP_???") },
+	};
+
+	struct v4l2_output *output = tail_alloc(sizeof(*output));
+
+	ioctl(-1, VIDIOC_ENUMOUTPUT, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_ENUMOUTPUT), inject_retval);
+
+	ioctl(-1, VIDIOC_ENUMOUTPUT, (char *) output + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_ENUMOUTPUT), (char *) output + 1, inject_retval);
+
+	for (size_t i = 0; i < ARRAY_SIZE(stdids); i++) {
+		for (size_t j = 0; j < MAX(ARRAY_SIZE(output_types),
+					   ARRAY_SIZE(output_caps)); j++) {
+			fill_memory32_ex(output, sizeof(*output),
+					 0xdecaffed, 0x80000000);
+			fill_memory_ex(output->name, sizeof(output->name),
+				       i * 47 + 13, 255);
+			output->std = stdids[i].val;
+			output->type =
+				output_types[j % ARRAY_SIZE(output_types)].val;
+
+			if ((i + j) % 2) {
+				memset(&output->reserved, 0,
+				       sizeof(output->reserved));
+			}
+
+#ifdef HAVE_STRUCT_V4L2_OUTPUT_CAPABILITIES
+			output->capabilities =
+#else
+			output->reserved[0]  =
+#endif
+				output_caps[j % ARRAY_SIZE(output_caps)].val;
+
+			ioctl(-1, VIDIOC_ENUMOUTPUT, output);
+			printf("ioctl(-1, %s, {index=3737845741, name=",
+			       XLAT_STR(VIDIOC_ENUMOUTPUT));
+			print_quoted_cstring((char *) output->name,
+					     sizeof(output->name));
+			printf(", type=%s, audioset=0xdecafff7"
+			       ", modulator=3737845752, std=%s"
+			       ", capabilities=%s%s}) = %ld (INJECTED)\n",
+			       output_types[j % ARRAY_SIZE(output_types)].str,
+			       stdids[i % ARRAY_SIZE(stdids)].str,
+			       output_caps[j % ARRAY_SIZE(output_caps)].str,
+			       (i + j) % 2 ? "" : ", reserved=[0xdecafffc"
+						  ", 0xdecafffd, 0xdecafffe]",
+			       inject_retval);
+		}
+	}
+
+
 	/* VIDIOC_G_AUDOUT, VIDIOC_S_AUDOUT, VIDIOC_ENUMAUDOUT */
 	static const struct strval32 audout_cmds[] = {
 		{ ARG_STR(VIDIOC_G_AUDOUT) },

@@ -65,6 +65,7 @@ CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_framebuffer);
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_input);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_output);
 #ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
 #endif
@@ -808,6 +809,46 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 					  print_xint32_array_member);
 	}
 
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+#include "xlat/v4l2_output_capabilities.h"
+#include "xlat/v4l2_output_types.h"
+
+static int
+print_v4l2_output(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct_v4l2_output o;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &o))
+			return RVAL_IOCTL_DECODED;
+
+		PRINT_FIELD_U("{", o, index);
+
+		return 0;
+	}
+
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &o)) {
+		tprints("}");
+		return RVAL_IOCTL_DECODED;
+	}
+
+	PRINT_FIELD_CSTRING(", ", o, name);
+	PRINT_FIELD_XVAL(", ", o, type, v4l2_output_types,
+			 "V4L2_OUTPUT_TYPE_???");
+	PRINT_FIELD_X(", ", o, audioset);
+	PRINT_FIELD_U(", ", o, modulator);
+	PRINT_FIELD_STDID(", ", o, std);
+	PRINT_FIELD_FLAGS(", ", o, capabilities, v4l2_output_capabilities,
+			  "V4L2_OUT_CAP_???");
+	if (!IS_ARRAY_ZERO(o.reserved))
+		PRINT_FIELD_ARRAY(", ", o, reserved, tcp,
+				  print_xint32_array_member);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -1574,6 +1615,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
 		break;
+
+	case VIDIOC_ENUMOUTPUT: /* RW */
+		return print_v4l2_output(tcp, arg);
 
 	case VIDIOC_G_AUDOUT: /* R */
 	case VIDIOC_S_AUDOUT: /* W */

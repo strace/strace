@@ -181,6 +181,18 @@ typedef struct {
 } struct_v4l2_input;
 
 
+typedef struct {
+	uint32_t index;
+	uint8_t  name[32];
+	uint32_t type;
+	uint32_t audioset;
+	uint32_t modulator;
+	uint64_t std;
+	uint32_t capabilities;
+	uint32_t reserved[3];
+} struct_v4l2_output;
+
+
 /** Added by Linux v5.5-rc1~143^2^2~225 */
 typedef struct {
 	__u32   width;

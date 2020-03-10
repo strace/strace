@@ -579,7 +579,6 @@ main(void)
 #ifdef VIDIOC_S_EDID
 		{ ARG_STR(VIDIOC_S_EDID) },
 #endif
-		{ ARG_STR(VIDIOC_ENUMOUTPUT) },
 		{ ARG_STR(VIDIOC_G_MODULATOR) },
 		{ ARG_STR(VIDIOC_S_MODULATOR) },
 		{ ARG_STR(VIDIOC_G_FREQUENCY) },
@@ -1528,6 +1527,17 @@ main(void)
 	ioctl(-1, VIDIOC_S_OUTPUT, p_int);
 	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_OUTPUT), *p_int);
+
+	/* VIDIOC_ENUMOUTPUT */
+	ioctl(-1, VIDIOC_ENUMOUTPUT, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUMOUTPUT));
+
+	struct v4l2_output *const p_v4l2_output =
+		page_end - sizeof(*p_v4l2_output);
+	ioctl(-1, VIDIOC_ENUMOUTPUT, p_v4l2_output);
+	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_ENUMOUTPUT), p_v4l2_output->index);
 
 	/* VIDIOC_CROPCAP */
 	ioctl(-1, VIDIOC_CROPCAP, 0);
