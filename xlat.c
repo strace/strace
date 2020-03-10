@@ -483,7 +483,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 }
 
 void
-print_xlat_ex(const uint64_t val, const char *str, enum xlat_style style)
+print_xlat_ex(const uint64_t val, const char *str, uint32_t style)
 {
 	bool default_str = style & PXF_DEFAULT_STR;
 	style = get_xlat_style(style);

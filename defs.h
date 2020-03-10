@@ -792,8 +792,18 @@ enum xlat_style_private_flags {
 	FLAG(PXF_DEFAULT_STR),
 };
 
-/** Print a value in accordance with xlat formatting settings. */
-extern void print_xlat_ex(uint64_t val, const char *str, enum xlat_style style);
+/**
+ * Print a value in accordance with xlat formatting settings.
+ *
+ * @param val   Value itself.
+ * @param str   String representation of the value.  Semantics may be affected
+ *              by style argument;
+ * @param style Combination of flags from enum xlat_style and PXF_* flags
+ *              from enum xlat_style_private_flags:
+ *               - PXF_DEFAULT_STR - interpret str argument as default
+ *                 (fallback) string and not as string representation of val.
+ */
+extern void print_xlat_ex(uint64_t val, const char *str, uint32_t style);
 # define print_xlat(val_) \
 	print_xlat_ex((val_), #val_, XLAT_STYLE_DEFAULT)
 # define print_xlat32(val_) \
