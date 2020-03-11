@@ -193,6 +193,18 @@ typedef struct {
 } struct_v4l2_output;
 
 
+typedef struct {
+	uint32_t index;
+	uint8_t  name[32];
+	uint32_t capability;  /**< V4L2_TUNER_CAP_* */
+	uint32_t rangelow;
+	uint32_t rangehigh;
+	uint32_t txsubchans;
+	uint32_t type;        /**< V4L2_TUNER_*, added by v4.4-rc1~118^2~12 */
+	uint32_t reserved[3];
+} struct_v4l2_modulator;
+
+
 /** Added by Linux v5.5-rc1~143^2^2~225 */
 typedef struct {
 	__u32   width;

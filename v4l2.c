@@ -66,6 +66,7 @@ CHECK_V4L2_STRUCT_SIZE(v4l2_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_framebuffer);
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_input);
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_output);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_modulator);
 #ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
 #endif
@@ -983,6 +984,43 @@ print_v4l2_audioout(struct tcb *const tcp, const unsigned int code,
 	return RVAL_IOCTL_DECODED;
 }
 
+static int
+print_v4l2_modulator(struct tcb *const tcp, const kernel_ulong_t arg,
+		     const bool is_get)
+{
+	struct_v4l2_modulator m;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &m))
+			return RVAL_IOCTL_DECODED;
+		PRINT_FIELD_U("{", m, index);
+		if (is_get)
+			return 0;
+	} else {
+		if (syserror(tcp) || umove(tcp, arg, &m) < 0) {
+			tprints("}");
+			return RVAL_IOCTL_DECODED;
+		}
+	}
+
+	PRINT_FIELD_CSTRING(", ", m, name);
+	PRINT_FIELD_FLAGS(", ", m, capability, v4l2_tuner_capabilities,
+			  "V4L2_TUNER_CAP_???");
+	PRINT_FIELD_U(", ", m, rangelow);
+	PRINT_FIELD_U(", ", m, rangehigh);
+	PRINT_FIELD_FLAGS(", ", m, txsubchans, v4l2_tuner_rxsubchannels,
+		  "V4L2_TUNER_SUB_???");
+	PRINT_FIELD_XVAL(", ", m, type, v4l2_tuner_types, "V4L2_TUNER_???");
+
+	if (!IS_ARRAY_ZERO(m.reserved))
+		PRINT_FIELD_ARRAY(", ", m, reserved, tcp,
+				  print_xint32_array_member);
+
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
 
 static void
 print_v4l2_cid(uint32_t cid, bool next_flags)
@@ -1600,6 +1638,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_AUDOUT: /* W */
 	case VIDIOC_ENUMAUDOUT: /* RW */
 		return print_v4l2_audioout(tcp, code, arg);
+
+	case VIDIOC_G_MODULATOR: /* RW */
+	case VIDIOC_S_MODULATOR: /* W */
+		return print_v4l2_modulator(tcp, arg,
+					    code == VIDIOC_G_MODULATOR);
 
 	case VIDIOC_CROPCAP: /* RW */
 		return print_v4l2_cropcap(tcp, arg);

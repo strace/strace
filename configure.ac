@@ -829,6 +829,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct v4l2_format.fmt.sdr,
 	struct v4l2_format.fmt.sliced,
 	struct v4l2_input.capabilities,
+	struct v4l2_modulator.type,
 	struct v4l2_output.capabilities,
 	struct v4l2_querymenu.value,
 	struct v4l2_requestbuffers.capabilities,

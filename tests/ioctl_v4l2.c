@@ -579,8 +579,6 @@ main(void)
 #ifdef VIDIOC_S_EDID
 		{ ARG_STR(VIDIOC_S_EDID) },
 #endif
-		{ ARG_STR(VIDIOC_G_MODULATOR) },
-		{ ARG_STR(VIDIOC_S_MODULATOR) },
 		{ ARG_STR(VIDIOC_G_FREQUENCY) },
 		{ ARG_STR(VIDIOC_S_FREQUENCY) },
 		{ ARG_STR(VIDIOC_G_JPEGCOMP) },
@@ -1431,6 +1429,54 @@ main(void)
 	ioctl(-1, VIDIOC_S_AUDOUT, p_v4l2_audioout);
 	printf("ioctl(-1, %s, {index=0}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_AUDOUT));
+
+	/* VIDIOC_G_MODULATOR */
+	ioctl(-1, VIDIOC_G_MODULATOR, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_MODULATOR));
+
+	struct v4l2_modulator *const p_v4l2_modulator =
+		page_end - sizeof(*p_v4l2_modulator);
+	ioctl(-1, VIDIOC_G_MODULATOR, p_v4l2_modulator);
+	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_MODULATOR), p_v4l2_modulator->index);
+
+	/* VIDIOC_S_MODULATOR */
+	ioctl(-1, VIDIOC_S_MODULATOR, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_MODULATOR));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_modulator, p_modulator);
+	p_modulator->index = 0x4fb6df39;
+	strcpy((char *) p_modulator->name, "cum tacent clamant");
+	p_modulator->capability = V4L2_TUNER_CAP_LOW;
+	p_modulator->rangelow = 0xa673bc29;
+	p_modulator->rangehigh = 0xbaf16d12;
+	p_modulator->txsubchans = V4L2_TUNER_SUB_MONO;
+#ifdef HAVE_STRUCT_V4L2_MODULATOR_TYPE
+	p_modulator->type =
+#else
+	p_modulator->reserved[0] =
+#endif
+		V4L2_TUNER_RADIO;
+	ioctl(-1, VIDIOC_S_MODULATOR, p_modulator);
+	printf("ioctl(-1, %s, {index=%u, name=\"cum tacent clamant\""
+	       ", capability=" XLAT_FMT ", rangelow=%u, rangehigh=%u"
+	       ", txsubchans=" XLAT_FMT ", type=" XLAT_FMT
+	       ", reserved=[%#x, %#x, %#x]}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_MODULATOR), p_modulator->index,
+	       XLAT_ARGS(V4L2_TUNER_CAP_LOW),
+	       p_modulator->rangelow, p_modulator->rangehigh,
+	       XLAT_ARGS(V4L2_TUNER_SUB_MONO), XLAT_ARGS(V4L2_TUNER_RADIO)
+#if defined(HAVE_STRUCT_V4L2_MODULATOR_TYPE)
+	       , p_modulator->reserved[0]
+#endif
+	       , p_modulator->reserved[1]
+	       , p_modulator->reserved[2]
+#if !defined(HAVE_STRUCT_V4L2_MODULATOR_TYPE)
+	       , p_modulator->reserved[3]
+#endif
+	       );
 
 	/* VIDIOC_LOG_STATUS */
 	ioctl(-1, VIDIOC_LOG_STATUS, 0);

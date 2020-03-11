@@ -1956,6 +1956,72 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_G_MODULATOR, VIDIOC_S_MODULATOR */
+	static const struct strval32 modulator_cmds[] = {
+		{ ARG_STR(VIDIOC_G_MODULATOR) },
+		{ ARG_STR(VIDIOC_S_MODULATOR) },
+	};
+	static const size_t modulator_iters = MAX(MAX(ARRAY_SIZE(tuner_types),
+						      ARRAY_SIZE(tuner_caps)),
+						  ARRAY_SIZE(tuner_rxsc));
+
+	struct v4l2_modulator *modulator = tail_alloc(sizeof(*modulator));
+
+	for (size_t i = 0; i < ARRAY_SIZE(modulator_cmds); i++) {
+		ioctl(-1, modulator_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(modulator_cmds[i].str, modulator_cmds[i].val,
+				  NULL),
+		       inject_retval);
+
+		ioctl(-1, modulator_cmds[i].val, (char *) modulator + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(modulator_cmds[i].str, modulator_cmds[i].val,
+				  NULL),
+		       (char *) modulator + 1, inject_retval);
+
+		for (size_t j = 0; j < modulator_iters; j++) {
+			fill_memory32(modulator, sizeof(*modulator));
+			fill_memory_ex(modulator->name, sizeof(modulator->name),
+				       j * 47 + 17, 255);
+			modulator->capability =
+				tuner_caps[j % ARRAY_SIZE(tuner_caps)].val;
+			modulator->txsubchans =
+				tuner_rxsc[j % ARRAY_SIZE(tuner_rxsc)].val;
+
+			if (!((i + j) % 2))
+				memset(modulator->reserved, 0,
+				       sizeof(modulator->reserved));
+
+#ifdef HAVE_STRUCT_V4L2_MODULATOR_TYPE
+			modulator->type =
+#else
+			modulator->reserved[0] =
+#endif
+				tuner_types[j % ARRAY_SIZE(tuner_types)].val;
+
+			ioctl(-1, modulator_cmds[i].val, modulator);
+			printf("ioctl(-1, %s, {index=2158018784, name=",
+			       sprintxlat(modulator_cmds[i].str,
+					  modulator_cmds[i].val, NULL));
+			print_quoted_cstring((char *) modulator->name,
+					     sizeof(modulator->name));
+			printf(", capability=%s, rangelow=2158018794"
+			       ", rangehigh=2158018795, txsubchans=%s"
+			       ", type=%s%s}) = %ld (INJECTED)\n",
+			       tuner_caps[j %
+					  ARRAY_SIZE(tuner_caps)].str,
+			       tuner_rxsc[j %
+					  ARRAY_SIZE(tuner_rxsc)].str,
+			       tuner_types[j %
+					   ARRAY_SIZE(tuner_types)].str,
+			       (i + j) % 2 ? ", reserved=[0x80a0c0ee"
+					     ", 0x80a0c0ef, 0x80a0c0f0]" : "",
+			       inject_retval);
+		}
+	}
+
+
 	/* VIDIOC_CROPCAP */
 	struct v4l2_cropcap *ccap = tail_alloc(sizeof(*ccap));
 
