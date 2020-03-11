@@ -96,11 +96,49 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 # define VIDEO_MAX_PLANES 8
 #endif
 
+#include "xlat/v4l2_audio_capabilities.h"
+#include "xlat/v4l2_audio_modes.h"
+#include "xlat/v4l2_buf_capabilities.h"
+#include "xlat/v4l2_buf_flags.h"
+#include "xlat/v4l2_buf_flags_ts_type.h"
+#include "xlat/v4l2_buf_flags_ts_src.h"
+#include "xlat/v4l2_buf_types.h"
+#include "xlat/v4l2_capture_modes.h"
+#include "xlat/v4l2_colorspaces.h"
+#include "xlat/v4l2_control_classes.h"
+#include "xlat/v4l2_control_id_bases.h"
+#include "xlat/v4l2_control_ids.h"
+#include "xlat/v4l2_control_flags.h"
+#include "xlat/v4l2_control_query_flags.h"
+#include "xlat/v4l2_control_types.h"
+#include "xlat/v4l2_device_capabilities_flags.h"
+#include "xlat/v4l2_fields.h"
+#include "xlat/v4l2_format_description_flags.h"
+#include "xlat/v4l2_framebuffer_capabilities.h"
+#include "xlat/v4l2_framebuffer_flags.h"
+#include "xlat/v4l2_frameinterval_types.h"
+#include "xlat/v4l2_framesize_types.h"
+#include "xlat/v4l2_input_capabilities.h"
+#include "xlat/v4l2_input_statuses.h"
+#include "xlat/v4l2_input_types.h"
+#include "xlat/v4l2_memories.h"
 #include "xlat/v4l2_meta_fmts.h"
+#include "xlat/v4l2_output_capabilities.h"
+#include "xlat/v4l2_output_types.h"
 #include "xlat/v4l2_pix_fmts.h"
+#include "xlat/v4l2_priorities.h"
 #include "xlat/v4l2_sdr_fmts.h"
+#include "xlat/v4l2_sliced_flags.h"
+#include "xlat/v4l2_std_ids.h"
+#include "xlat/v4l2_streaming_capabilities.h"
+#include "xlat/v4l2_tuner_types.h"
+#include "xlat/v4l2_tuner_capabilities.h"
+#include "xlat/v4l2_tuner_rxsubchannels.h"
+#include "xlat/v4l2_tuner_audmodes.h"
+#include "xlat/v4l2_vbi_flags.h"
 
 #define XLAT_MACROS_ONLY
+# include "xlat/v4l2_buf_flags_masks.h"
 # include "xlat/v4l2_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
@@ -184,8 +222,6 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 	}
 }
 
-#include "xlat/v4l2_device_capabilities_flags.h"
-
 static int
 print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -214,9 +250,6 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_buf_types.h"
-#include "xlat/v4l2_format_description_flags.h"
 
 static int
 print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -262,11 +295,6 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_fields.h"
-#include "xlat/v4l2_colorspaces.h"
-#include "xlat/v4l2_vbi_flags.h"
-#include "xlat/v4l2_sliced_flags.h"
 
 static bool
 print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
@@ -436,9 +464,6 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
-#include "xlat/v4l2_memories.h"
-#include "xlat/v4l2_buf_capabilities.h"
-
 static int
 print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -477,14 +502,6 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_buf_flags.h"
-#include "xlat/v4l2_buf_flags_ts_type.h"
-#include "xlat/v4l2_buf_flags_ts_src.h"
-
-#define XLAT_MACROS_ONLY
-# include "xlat/v4l2_buf_flags_masks.h"
-#undef XLAT_MACROS_ONLY
 
 static void
 print_v4l2_buffer_flags(uint32_t val)
@@ -589,9 +606,6 @@ print_v4l2_exportbuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
-#include "xlat/v4l2_framebuffer_capabilities.h"
-#include "xlat/v4l2_framebuffer_flags.h"
-
 static int
 print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -642,9 +656,6 @@ print_v4l2_buf_type(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_streaming_capabilities.h"
-#include "xlat/v4l2_capture_modes.h"
 
 static int
 print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
@@ -713,8 +724,6 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 }
 
-#include "xlat/v4l2_std_ids.h"
-
 static void
 print_v4l2_std_id(const uint64_t std_id)
 {
@@ -774,10 +783,6 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
-#include "xlat/v4l2_input_capabilities.h"
-#include "xlat/v4l2_input_statuses.h"
-#include "xlat/v4l2_input_types.h"
-
 static int
 print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -813,9 +818,6 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_output_capabilities.h"
-#include "xlat/v4l2_output_types.h"
 
 static int
 print_v4l2_output(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -853,9 +855,6 @@ print_v4l2_output(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_audio_capabilities.h"
-#include "xlat/v4l2_audio_modes.h"
 
 static int
 print_v4l2_audio(struct tcb *const tcp, const unsigned int code,
@@ -984,14 +983,6 @@ print_v4l2_audioout(struct tcb *const tcp, const unsigned int code,
 	return RVAL_IOCTL_DECODED;
 }
 
-/*
- * We include it here and not before print_v4l2_ext_controls as we need
- * V4L2_CTRL_CLASS_* definitions for V4L2_CID_*_BASE ones.
- */
-#include "xlat/v4l2_control_classes.h"
-#include "xlat/v4l2_control_id_bases.h"
-#include "xlat/v4l2_control_ids.h"
-#include "xlat/v4l2_control_query_flags.h"
 
 static void
 print_v4l2_cid(uint32_t cid, bool next_flags)
@@ -1065,11 +1056,6 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
-#include "xlat/v4l2_tuner_types.h"
-#include "xlat/v4l2_tuner_capabilities.h"
-#include "xlat/v4l2_tuner_rxsubchannels.h"
-#include "xlat/v4l2_tuner_audmodes.h"
-
 static int
 print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 		 const bool is_get)
@@ -1116,9 +1102,6 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 		return RVAL_IOCTL_DECODED;
 	}
 }
-
-#include "xlat/v4l2_control_types.h"
-#include "xlat/v4l2_control_flags.h"
 
 static int
 print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -1309,8 +1292,6 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
-#include "xlat/v4l2_priorities.h"
-
 static int
 print_v4l2_priority(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -1392,8 +1373,6 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	return 0;
 }
 
-#include "xlat/v4l2_framesize_types.h"
-
 static int
 print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -1436,8 +1415,6 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
-
-#include "xlat/v4l2_frameinterval_types.h"
 
 static int
 print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
