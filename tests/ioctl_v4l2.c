@@ -579,8 +579,6 @@ main(void)
 #ifdef VIDIOC_S_EDID
 		{ ARG_STR(VIDIOC_S_EDID) },
 #endif
-		{ ARG_STR(VIDIOC_G_FREQUENCY) },
-		{ ARG_STR(VIDIOC_S_FREQUENCY) },
 		{ ARG_STR(VIDIOC_G_JPEGCOMP) },
 		{ ARG_STR(VIDIOC_S_JPEGCOMP) },
 		{ ARG_STR(VIDIOC_G_SLICED_VBI_CAP) },
@@ -1477,6 +1475,44 @@ main(void)
 	       , p_modulator->reserved[3]
 #endif
 	       );
+
+	/* VIDIOC_G_FREQUENCY */
+	ioctl(-1, VIDIOC_G_FREQUENCY, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FREQUENCY));
+
+	struct v4l2_frequency *const p_v4l2_frequency =
+		page_end - sizeof(*p_v4l2_frequency);
+	ioctl(-1, VIDIOC_G_FREQUENCY, p_v4l2_frequency);
+	printf("ioctl(-1, %s, {tuner=%u}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_FREQUENCY), p_v4l2_frequency->tuner);
+
+	/* VIDIOC_S_FREQUENCY */
+	ioctl(-1, VIDIOC_S_FREQUENCY, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_FREQUENCY));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_frequency, p_frequency);
+	p_frequency->tuner = 0x4fb6df39;
+	p_frequency->type = V4L2_TUNER_RADIO;
+	p_frequency->frequency = 0xa673bc29;
+	ioctl(-1, VIDIOC_S_FREQUENCY, p_frequency);
+	printf("ioctl(-1, %s, {tuner=%u, type=" XLAT_FMT ", frequency=%u"
+	       ", reserved=[%#x, %#x, %#x, %#x, %#x, %#x, %#x, %#x]}"
+	       ") = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_S_FREQUENCY),
+	       p_frequency->tuner, XLAT_ARGS(V4L2_TUNER_RADIO),
+	       p_frequency->frequency,
+	       p_frequency->reserved[0], p_frequency->reserved[1],
+	       p_frequency->reserved[2], p_frequency->reserved[3],
+	       p_frequency->reserved[4], p_frequency->reserved[5],
+	       p_frequency->reserved[6], p_frequency->reserved[7]);
+
+	memset(p_frequency->reserved, 0, sizeof(p_frequency->reserved));
+	ioctl(-1, VIDIOC_S_FREQUENCY, p_frequency);
+	printf("ioctl(-1, %s, {tuner=%u, type=" XLAT_FMT ", frequency=%u}"
+	       ") = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_S_FREQUENCY),
+	       p_frequency->tuner, XLAT_ARGS(V4L2_TUNER_RADIO),
+	       p_frequency->frequency);
 
 	/* VIDIOC_LOG_STATUS */
 	ioctl(-1, VIDIOC_LOG_STATUS, 0);

@@ -1022,6 +1022,38 @@ print_v4l2_modulator(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
+static int
+print_v4l2_frequency(struct tcb *const tcp, const kernel_ulong_t arg,
+		     const bool is_get)
+{
+	struct v4l2_frequency f;
+
+	if (entering(tcp)) {
+		tprints(", ");
+		if (umove_or_printaddr(tcp, arg, &f))
+			return RVAL_IOCTL_DECODED;
+		PRINT_FIELD_U("{", f, tuner);
+		if (is_get)
+			return 0;
+	} else {
+		if (syserror(tcp) || umove(tcp, arg, &f) < 0) {
+			tprints("}");
+			return RVAL_IOCTL_DECODED;
+		}
+	}
+
+	PRINT_FIELD_XVAL(", ", f, type, v4l2_tuner_types, "V4L2_TUNER_???");
+	PRINT_FIELD_U(", ", f, frequency);
+
+	if (!IS_ARRAY_ZERO(f.reserved))
+		PRINT_FIELD_ARRAY(", ", f, reserved, tcp,
+				  print_xint32_array_member);
+
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
 static void
 print_v4l2_cid(uint32_t cid, bool next_flags)
 {
@@ -1643,6 +1675,11 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_MODULATOR: /* W */
 		return print_v4l2_modulator(tcp, arg,
 					    code == VIDIOC_G_MODULATOR);
+
+	case VIDIOC_G_FREQUENCY: /* RW */
+	case VIDIOC_S_FREQUENCY: /* W */
+		return print_v4l2_frequency(tcp, arg,
+					    code == VIDIOC_G_FREQUENCY);
 
 	case VIDIOC_CROPCAP: /* RW */
 		return print_v4l2_cropcap(tcp, arg);

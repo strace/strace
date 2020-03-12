@@ -39,8 +39,8 @@ VIDIOC_G_AUDOUT			_IOR ('V',  49, struct v4l2_audioout)
 VIDIOC_S_AUDOUT			_IOW ('V',  50, struct v4l2_audioout)
 VIDIOC_G_MODULATOR		_IOWR('V',  54, struct_v4l2_modulator)
 VIDIOC_S_MODULATOR		_IOW ('V',  55, struct_v4l2_modulator)
-/* VIDIOC_G_FREQUENCY		_IOWR('V',  56, struct v4l2_frequency) */
-/* VIDIOC_S_FREQUENCY		_IOW ('V',  57, struct v4l2_frequency) */
+VIDIOC_G_FREQUENCY		_IOWR('V',  56, struct v4l2_frequency)
+VIDIOC_S_FREQUENCY		_IOW ('V',  57, struct v4l2_frequency)
 VIDIOC_CROPCAP			_IOWR('V',  58, struct v4l2_cropcap)
 VIDIOC_G_CROP			_IOWR('V',  59, struct v4l2_crop)
 VIDIOC_S_CROP			_IOW ('V',  60, struct v4l2_crop)

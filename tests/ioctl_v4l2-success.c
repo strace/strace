@@ -2022,6 +2022,49 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_G_FREQUENCY, VIDIOC_S_FREQUENCY */
+	static const struct strval32 frequency_cmds[] = {
+		{ ARG_STR(VIDIOC_G_FREQUENCY) },
+		{ ARG_STR(VIDIOC_S_FREQUENCY) },
+	};
+
+	struct v4l2_frequency *frequency = tail_alloc(sizeof(*frequency));
+
+	for (size_t i = 0; i < ARRAY_SIZE(frequency_cmds); i++) {
+		ioctl(-1, frequency_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(frequency_cmds[i].str, frequency_cmds[i].val,
+				  NULL),
+		       inject_retval);
+
+		ioctl(-1, frequency_cmds[i].val, (char *) frequency + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(frequency_cmds[i].str, frequency_cmds[i].val,
+				  NULL),
+		       (char *) frequency + 1, inject_retval);
+
+		for (size_t j = 0; j < ARRAY_SIZE(tuner_types); j++) {
+			fill_memory32(frequency, sizeof(*frequency));
+			frequency->type = tuner_types[j].val;
+
+			if ((i + j) % 2)
+				memset(frequency->reserved, 0,
+				       sizeof(frequency->reserved));
+
+			ioctl(-1, frequency_cmds[i].val, frequency);
+			printf("ioctl(-1, %s, {tuner=2158018784, type=%s"
+			       ", frequency=2158018786%s}) = %ld (INJECTED)\n",
+			       sprintxlat(frequency_cmds[i].str,
+					  frequency_cmds[i].val, NULL),
+			       tuner_types[j].str, (i + j) % 2 ? ""
+				: ", reserved=[0x80a0c0e3, 0x80a0c0e4"
+				  ", 0x80a0c0e5, 0x80a0c0e6, 0x80a0c0e7"
+				  ", 0x80a0c0e8, 0x80a0c0e9, 0x80a0c0ea]",
+			       inject_retval);
+		}
+	}
+
+
 	/* VIDIOC_CROPCAP */
 	struct v4l2_cropcap *ccap = tail_alloc(sizeof(*ccap));
 
