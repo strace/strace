@@ -579,8 +579,6 @@ main(void)
 #ifdef VIDIOC_S_EDID
 		{ ARG_STR(VIDIOC_S_EDID) },
 #endif
-		{ ARG_STR(VIDIOC_G_JPEGCOMP) },
-		{ ARG_STR(VIDIOC_S_JPEGCOMP) },
 		{ ARG_STR(VIDIOC_G_SLICED_VBI_CAP) },
 #ifdef VIDIOC_G_ENC_INDEX
 		{ ARG_STR(VIDIOC_G_ENC_INDEX) },
@@ -1659,6 +1657,63 @@ main(void)
 	       p_v4l2_crop->c.top,
 	       p_v4l2_crop->c.width,
 	       p_v4l2_crop->c.height);
+
+	/* VIDIOC_G_JPEGCOMP */
+	ioctl(-1, VIDIOC_G_JPEGCOMP, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_JPEGCOMP));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_jpegcompression, p_v4l2_jc);
+	fill_memory32(p_v4l2_jc, sizeof(*p_v4l2_jc));
+	fill_memory(p_v4l2_jc->APP_data, sizeof(p_v4l2_jc->APP_data));
+	fill_memory(p_v4l2_jc->COM_data, sizeof(p_v4l2_jc->COM_data));
+	ioctl(-1, VIDIOC_G_JPEGCOMP, p_v4l2_jc);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_JPEGCOMP), p_v4l2_jc);
+
+	/* VIDIOC_S_JPEGCOMP */
+	ioctl(-1, VIDIOC_S_JPEGCOMP, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_JPEGCOMP));
+
+	ioctl(-1, VIDIOC_S_JPEGCOMP, p_v4l2_jc);
+	printf("ioctl(-1, %s, {quality=%d, APPn=%d, APP_len=%d, APP_data=\"\""
+	       ", COM_len=%d, COM_data=\"\", jpeg_markers="
+	       XLAT_UNKNOWN(0x80a0c102, "V4L2_JPEG_MARKER_???")
+	       "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_JPEGCOMP),
+	       p_v4l2_jc->quality, p_v4l2_jc->APPn, p_v4l2_jc->APP_len,
+	       p_v4l2_jc->COM_len);
+
+	p_v4l2_jc->quality = 0;
+	p_v4l2_jc->APPn = 0;
+	p_v4l2_jc->APP_len = 42;
+	strcpy(p_v4l2_jc->APP_data, "Lorem ipsum dolor sit amet, consectetur "
+				    "adipiscing elit");
+	p_v4l2_jc->COM_len = 23;
+	strcpy(p_v4l2_jc->COM_data, "Latet enim veritas, sed nihil pretiosius "
+				    "veritate");
+	p_v4l2_jc->jpeg_markers = 0xdeadbeef;
+	ioctl(-1, VIDIOC_S_JPEGCOMP, p_v4l2_jc);
+	printf("ioctl(-1, %s, {quality=0, APPn=0, APP_len=42, APP_data=\"Lorem "
+	       "ipsum dolor sit amet, consectetur ad\""
+	       ", COM_len=23, COM_data=\"Latet enim veritas, sed\""
+	       ", jpeg_markers=" XLAT_KNOWN(0xdeadbeef, "V4L2_JPEG_MARKER_DHT"
+	       "|V4L2_JPEG_MARKER_DRI|V4L2_JPEG_MARKER_COM|V4L2_JPEG_MARKER_APP"
+	       "|0xdeadbe07") "}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_JPEGCOMP));
+
+	p_v4l2_jc->APP_len = 31415926;
+	p_v4l2_jc->COM_len = 27182818;
+	p_v4l2_jc->jpeg_markers = 0;
+	ioctl(-1, VIDIOC_S_JPEGCOMP, p_v4l2_jc);
+	printf("ioctl(-1, %s, {quality=0, APPn=0, APP_len=31415926"
+	       ", APP_data=\"Lorem ipsum dolor sit amet, consectetur adipiscing"
+	       " elit\\0\\270\\271\\272\\273\", COM_len=27182818"
+	       ", COM_data=\"Latet enim veritas, sed nihil pretiosius veritate"
+	       "\\0\\262\\263\\264\\265\\266\\267\\270\\271\\272\\273\""
+	       ", jpeg_markers=0}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_JPEGCOMP));
 
 	/* VIDIOC_ENUMAUDIO */
 	ioctl(-1, VIDIOC_ENUMAUDIO, 0);

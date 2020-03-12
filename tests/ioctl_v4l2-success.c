@@ -2128,6 +2128,87 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_G_JPEGCOMP, VIDIOC_S_JPEGCOMP */
+	static const struct strval32 jc_cmds[] = {
+		{ ARG_STR(VIDIOC_G_JPEGCOMP) },
+		{ ARG_STR(VIDIOC_S_JPEGCOMP) },
+	};
+	static const struct strval32 jpeg_markers[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0xf8, "V4L2_JPEG_MARKER_DHT"
+				"|V4L2_JPEG_MARKER_DQT|V4L2_JPEG_MARKER_DRI"
+				"|V4L2_JPEG_MARKER_COM|V4L2_JPEG_MARKER_APP") },
+		{ ARG_XLAT_KNOWN(0xbeeff157, "V4L2_JPEG_MARKER_DQT"
+				 "|V4L2_JPEG_MARKER_COM|0xbeeff107") },
+		{ ARG_XLAT_UNKNOWN(0xdeadff07, "V4L2_JPEG_MARKER_???") },
+	};
+	static const struct {
+		int val;
+		uint32_t len;
+	} comapp_lens[] = {
+		{ 0, 0 }, { -123, 0 }, { 27, 27 }, { 123, 60 }, { 59, 59 },
+	};
+	static const size_t jc_iters = MAX(ARRAY_SIZE(jpeg_markers),
+					   ARRAY_SIZE(comapp_lens));
+
+	struct v4l2_jpegcompression *jc = tail_alloc(sizeof(*jc));
+
+	for (size_t i = 0; i < ARRAY_SIZE(jc_cmds); i++) {
+		ioctl(-1, jc_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(jc_cmds[i].str, jc_cmds[i].val, NULL),
+		       inject_retval);
+
+		ioctl(-1, jc_cmds[i].val, (char *) jc + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(jc_cmds[i].str, jc_cmds[i].val, NULL),
+		       (char *) jc + 1, inject_retval);
+
+
+		for (size_t j = 0; j < jc_iters; j++) {
+			for (size_t k = 0; k < jc_iters; k++) {
+				fill_memory32(jc, sizeof(*jc));
+				fill_memory_ex(jc->APP_data,
+					       sizeof(jc->APP_data),
+					       53 * i + 13 * j + 5 * k + 1, 60);
+				fill_memory_ex(jc->COM_data,
+					       sizeof(jc->COM_data),
+					       3 * i + 37 * j + 13 * k + 2, 60);
+
+				jc->APPn = comapp_lens[(j + k) %
+					ARRAY_SIZE(comapp_lens)].val;
+				jc->APP_len = comapp_lens[j %
+					ARRAY_SIZE(comapp_lens)].val;
+				jc->COM_len = comapp_lens[k %
+					ARRAY_SIZE(comapp_lens)].val;
+				jc->jpeg_markers = jpeg_markers[(j + k) %
+					ARRAY_SIZE(jpeg_markers)].val;
+
+				ioctl(-1, jc_cmds[i].val, jc);
+				printf("ioctl(-1, %s, {quality=-2136948512"
+				       ", APPn=%d, APP_len=%d, APP_data=",
+				       sprintxlat(jc_cmds[i].str,
+						  jc_cmds[i].val, NULL),
+				       comapp_lens[(j + k) %
+						   ARRAY_SIZE(comapp_lens)].val,
+				       comapp_lens[j %
+						  ARRAY_SIZE(comapp_lens)].val);
+				print_quoted_memory(jc->APP_data, comapp_lens[j
+					% ARRAY_SIZE(comapp_lens)].len);
+				printf(", COM_len=%d, COM_data=",
+				       comapp_lens[k %
+						  ARRAY_SIZE(comapp_lens)].val);
+				print_quoted_memory(jc->COM_data, comapp_lens[k
+					% ARRAY_SIZE(comapp_lens)].len);
+				printf(", jpeg_markers=%s}) = %ld (INJECTED)\n",
+				       jpeg_markers[(j + k) %
+						  ARRAY_SIZE(jpeg_markers)].str,
+				       inject_retval);
+			}
+		}
+	}
+
+
 	/* VIDIOC_G_PRIORITY, VIDIOC_S_PRIORITY */
 	static const struct strval32 prio_cmds[] = {
 		{ ARG_STR(VIDIOC_G_PRIORITY) },

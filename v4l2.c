@@ -122,6 +122,7 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #include "xlat/v4l2_input_capabilities.h"
 #include "xlat/v4l2_input_statuses.h"
 #include "xlat/v4l2_input_types.h"
+#include "xlat/v4l2_jpeg_markers.h"
 #include "xlat/v4l2_memories.h"
 #include "xlat/v4l2_meta_fmts.h"
 #include "xlat/v4l2_output_capabilities.h"
@@ -1363,6 +1364,39 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 }
 
 static int
+print_v4l2_jpegcomp(struct tcb *const tcp, const kernel_ulong_t arg,
+		    const bool is_get)
+{
+	if (entering(tcp)) {
+		tprints(", ");
+		if (is_get)
+			return 0;
+	} else if (syserror(tcp)) {
+		printaddr(arg);
+		return RVAL_IOCTL_DECODED;
+	}
+
+	struct v4l2_jpegcompression c;
+
+	if (umove_or_printaddr(tcp, arg, &c))
+		return RVAL_IOCTL_DECODED;
+
+	PRINT_FIELD_D("{", c, quality);
+	PRINT_FIELD_D(", ", c, APPn);
+	PRINT_FIELD_D(", ", c, APP_len);
+	PRINT_FIELD_STRING(", ", c, APP_data, MIN((size_t) MAX(c.APP_len, 0),
+						  sizeof(c.APP_data)), 0);
+	PRINT_FIELD_D(", ", c, COM_len);
+	PRINT_FIELD_STRING(", ", c, COM_data, MIN((size_t) MAX(c.COM_len, 0),
+						  sizeof(c.COM_data)), 0);
+	PRINT_FIELD_FLAGS(", ", c, jpeg_markers, v4l2_jpeg_markers,
+			  "V4L2_JPEG_MARKER_???");
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static int
 print_v4l2_priority(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int type;
@@ -1687,6 +1721,10 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_CROP: /* RW */
 	case VIDIOC_S_CROP: /* W */
 		return print_v4l2_crop(tcp, arg, code == VIDIOC_G_CROP);
+
+	case VIDIOC_G_JPEGCOMP: /* R */
+	case VIDIOC_S_JPEGCOMP: /* W */
+		return print_v4l2_jpegcomp(tcp, arg, code == VIDIOC_G_JPEGCOMP);
 
 	case VIDIOC_G_PRIORITY: /* R */
 		if (entering(tcp))
