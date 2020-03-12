@@ -14,11 +14,17 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "scno.h"
+#include "kernel_timeval.h"
+
+typedef struct {
+	kernel_old_timeval_t it_interval;
+	kernel_old_timeval_t it_value;
+} kernel_old_itimerval_t;
 
 int
 main(void)
 {
-	static const struct itimerval new = {
+	static const kernel_old_itimerval_t new = {
 		.it_interval = { 0xc0de1, 0xc0de2 },
 		.it_value = { 0xc0de3, 0xc0de4 }
 	};
@@ -27,12 +33,12 @@ main(void)
 	static const kernel_ulong_t bogus_timer =
 		(kernel_ulong_t) 0xfacefeeddeadbeefULL;
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct itimerval, p_old);
-	struct itimerval *const p_new = tail_memdup(&new, sizeof(new));
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_itimerval_t, p_old);
+	kernel_old_itimerval_t *const p_new = tail_memdup(&new, sizeof(new));
 	void *const efault = tail_alloc(sizeof(new) - 8);
 	long rc;
 
-	if (setitimer(ITIMER_REAL, p_new, NULL))
+	if (syscall(__NR_setitimer, ITIMER_REAL, p_new, NULL))
 		perror_msg_and_skip("setitimer");
 	printf("setitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
@@ -44,7 +50,7 @@ main(void)
 	       zero_extend_signed_to_ull(new.it_value.tv_usec));
 
 	fill_memory(p_old, sizeof(*p_old));
-	if (getitimer(ITIMER_REAL, p_old))
+	if (syscall(__NR_getitimer, ITIMER_REAL, p_old))
 		perror_msg_and_skip("getitimer");
 	printf("getitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
@@ -55,7 +61,7 @@ main(void)
 	       zero_extend_signed_to_ull(p_old->it_value.tv_usec));
 
 	fill_memory(p_old, sizeof(*p_old));
-	setitimer(ITIMER_REAL, p_new, p_old);
+	syscall(__NR_setitimer, ITIMER_REAL, p_new, p_old);
 	printf("setitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
 	       ", it_value={tv_sec=%lld, tv_usec=%llu}}"
@@ -70,10 +76,10 @@ main(void)
 	       (long long) p_old->it_value.tv_sec,
 	       zero_extend_signed_to_ull(p_old->it_value.tv_usec));
 
-	rc = getitimer(ITIMER_REAL, efault);
+	rc = syscall(__NR_getitimer, ITIMER_REAL, efault);
 	printf("getitimer(ITIMER_REAL, %p) = %s\n", efault, sprintrc(rc));
 
-	rc = setitimer(ITIMER_REAL, p_new, efault);
+	rc = syscall(__NR_setitimer, ITIMER_REAL, p_new, efault);
 	printf("setitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
 	       ", it_value={tv_sec=%lld, tv_usec=%llu}}, %p) = %s\n",
@@ -83,7 +89,7 @@ main(void)
 	       zero_extend_signed_to_ull(new.it_value.tv_usec),
 	       efault, sprintrc(rc));
 
-	rc = setitimer(ITIMER_REAL, efault, p_old);
+	rc = syscall(__NR_setitimer, ITIMER_REAL, efault, p_old);
 	printf("setitimer(ITIMER_REAL, %p, %p) = %s\n",
 	       efault, p_old, sprintrc(rc));
 
@@ -147,10 +153,12 @@ main(void)
 
 	p_new->it_interval.tv_sec = 0xdeadbeefU;
 	p_new->it_interval.tv_usec = 0xfacefeedU;
-	p_new->it_value.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
-	p_new->it_value.tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
+	p_new->it_value.tv_sec =
+		(typeof(p_new->it_value.tv_sec)) 0xcafef00ddeadbeefLL;
+	p_new->it_value.tv_usec =
+		(typeof(p_new->it_value.tv_usec)) 0xbadc0dedfacefeedLL;
 
-	rc = setitimer(ITIMER_REAL, p_new, p_old);
+	rc = syscall(__NR_setitimer, ITIMER_REAL, p_new, p_old);
 	printf("setitimer(ITIMER_REAL"
 	       ", {it_interval={tv_sec=%lld, tv_usec=%llu}"
 	       ", it_value={tv_sec=%lld, tv_usec=%llu}}, %p) = %s\n",
