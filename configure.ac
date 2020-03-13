@@ -833,6 +833,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 	struct v4l2_output.capabilities,
 	struct v4l2_querymenu.value,
 	struct v4l2_requestbuffers.capabilities,
+	struct v4l2_sliced_vbi_cap.type,
 	struct v4l2_window.global_alpha,
 	struct v4l2_sdr_format.buffersize
 ]),,, [#include <sys/time.h>

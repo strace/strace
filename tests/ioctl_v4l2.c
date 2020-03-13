@@ -579,7 +579,6 @@ main(void)
 #ifdef VIDIOC_S_EDID
 		{ ARG_STR(VIDIOC_S_EDID) },
 #endif
-		{ ARG_STR(VIDIOC_G_SLICED_VBI_CAP) },
 #ifdef VIDIOC_G_ENC_INDEX
 		{ ARG_STR(VIDIOC_G_ENC_INDEX) },
 #endif
@@ -1769,6 +1768,17 @@ main(void)
 	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_PRIORITY_??? */") "])"
 	       " = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_PRIORITY), *p_int);
+
+	/* VIDIOC_G_SLICED_VBI_CAP */
+	ioctl(-1, VIDIOC_G_SLICED_VBI_CAP, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_SLICED_VBI_CAP));
+
+	struct v4l2_sliced_vbi_cap *const p_svc =
+		page_end - sizeof(*p_svc);
+	ioctl(-1, VIDIOC_G_SLICED_VBI_CAP, p_svc);
+	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+		       XLAT_STR(VIDIOC_G_SLICED_VBI_CAP), p_svc);
 
 #ifdef VIDIOC_S_EXT_CTRLS
 	/* VIDIOC_S_EXT_CTRLS */

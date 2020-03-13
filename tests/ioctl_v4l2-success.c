@@ -2251,6 +2251,85 @@ main(int argc, char **argv)
 	}
 
 
+	/* VIDIOC_G_SLICED_VBI_CAP */
+	static const struct strval32 vbi_services[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "V4L2_SLICED_TELETEXT_B") },
+		{ ARG_XLAT_KNOWN(0x1401, "V4L2_SLICED_TELETEXT_B"
+				 "|V4L2_SLICED_VPS|V4L2_SLICED_CAPTION_525") },
+		{ ARG_XLAT_KNOWN(0x4401, "V4L2_SLICED_VBI_625") },
+		{ ARG_XLAT_KNOWN(0xdead, "V4L2_SLICED_VBI_625"
+				 "|V4L2_SLICED_CAPTION_525|0x8aac") },
+		{ ARG_XLAT_UNKNOWN(0xabfe, "V4L2_SLICED_???") },
+	};
+	static const size_t svc_iters = MAX(ARRAY_SIZE(buf_types),
+					    ARRAY_SIZE(vbi_services));
+
+	struct v4l2_sliced_vbi_cap *svc = tail_alloc(sizeof(*svc));
+
+	ioctl(-1, VIDIOC_G_SLICED_VBI_CAP, 0);
+	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_G_SLICED_VBI_CAP), inject_retval);
+
+	ioctl(-1, VIDIOC_G_SLICED_VBI_CAP, (char *) svc + 1);
+	printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+	       XLAT_STR(VIDIOC_G_SLICED_VBI_CAP), (char *) svc + 1,
+	       inject_retval);
+
+	for (size_t i = 0; i < svc_iters; i++) {
+		svc->service_set =
+			vbi_services[i % ARRAY_SIZE(vbi_services)].val;
+		for (size_t j = 0; j < ARRAY_SIZE(svc->service_lines[0]); j++) {
+			svc->service_lines[0][j] = vbi_services[(i + j) %
+						ARRAY_SIZE(vbi_services)].val;
+			svc->service_lines[1][j] = vbi_services[(i + j + 17) %
+						ARRAY_SIZE(vbi_services)].val;
+		}
+#ifdef HAVE_STRUCT_V4L2_SLICED_VBI_CAP_TYPE
+		svc->type = buf_types[i % ARRAY_SIZE(buf_types)].val;
+		svc->reserved[0] = i % 2 ? 0xdec0ded0 : 0;
+		svc->reserved[1] = i % 2 ? 0xdec0ded1 : 0;
+		svc->reserved[2] = i % 4 ? 0xdec0ded2 : 0;
+#else
+		svc->reserved[0] = buf_types[i % ARRAY_SIZE(buf_types)].val;
+		svc->reserved[1] = i % 2 ? 0xdec0ded0 : 0;
+		svc->reserved[2] = i % 2 ? 0xdec0ded1 : 0;
+		svc->reserved[3] = i % 4 ? 0xdec0ded2 : 0;
+#endif
+
+		ioctl(-1, VIDIOC_G_SLICED_VBI_CAP, svc);
+		printf("ioctl(-1, %s, {service_set=%s, ",
+		       XLAT_STR(VIDIOC_G_SLICED_VBI_CAP),
+		       vbi_services[i % ARRAY_SIZE(vbi_services)].str);
+#if VERBOSE
+		printf("service_lines=[[");
+		for (size_t j = 0; j < ARRAY_SIZE(svc->service_lines[0]); j++) {
+			printf("%s%s", j ? ", " : "",
+			       vbi_services[(i + j) %
+					    ARRAY_SIZE(vbi_services)].str);
+		}
+		printf("], [");
+		for (size_t j = 0; j < ARRAY_SIZE(svc->service_lines[0]); j++) {
+			printf("%s%s", j ? ", " : "",
+			       vbi_services[(i + j + 17) %
+					    ARRAY_SIZE(vbi_services)].str);
+		}
+		printf("]], ");
+#endif
+		printf("type=%s%s}) = %ld (INJECTED)\n",
+		       buf_types[i % ARRAY_SIZE(buf_types)].str,
+#if VERBOSE
+		       i % 2 ? ", reserved=[0xdec0ded0, 0xdec0ded1"
+			       ", 0xdec0ded2]"
+			     : i % 4 == 2 ? ", reserved=[0, 0, 0xdec0ded2]"
+					  : "",
+#else
+		       ", ...",
+#endif
+		       inject_retval);
+	}
+
+
 	/* VIDIOC_LOG_STATUS */
 	ioctl(-1, VIDIOC_LOG_STATUS, 0);
 	printf("ioctl(-1, %s) = %ld (INJECTED)\n",

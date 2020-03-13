@@ -1668,6 +1668,58 @@ print_v4l2_priority(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 static bool
+print_sliced_vbi_service_item(struct tcb *tcp, void *elem_buf,
+			      size_t elem_size, void *data)
+{
+	uint16_t *s = (uint16_t *) elem_buf;
+
+	printflags(v4l2_sliced_flags, *s, "V4L2_SLICED_???");
+
+	return true;
+}
+
+static int
+print_v4l2_sliced_vbi_cap(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	if (entering(tcp)) {
+		tprints(", ");
+		return 0;
+	}
+
+	struct_v4l2_sliced_vbi_cap svc;
+
+	/* exiting */
+	if (umove_or_printaddr(tcp, arg, &svc))
+		return RVAL_IOCTL_DECODED;
+
+	PRINT_FIELD_FLAGS("{", svc, service_set, v4l2_sliced_flags,
+			  "V4L2_SLICED_???");
+	if (!abbrev(tcp)) {
+		tprints(", service_lines=[");
+		for (size_t i = 0; i < ARRAY_SIZE(svc.service_lines); i++) {
+			if (i)
+				tprints(", ");
+			print_local_array(tcp, svc.service_lines[i],
+					  print_sliced_vbi_service_item);
+		}
+		tprints("]");
+	}
+
+	PRINT_FIELD_XVAL(", ", svc, type, v4l2_buf_types, "V4L2_BUF_TYPE_???");
+
+	if (!abbrev(tcp)) {
+		if (!IS_ARRAY_ZERO(svc.reserved))
+			PRINT_FIELD_ARRAY(", ", svc, reserved, tcp,
+					  print_xint32_array_member);
+	} else {
+		tprints(", ...");
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
+}
+
+static bool
 print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct_v4l2_ext_control *p = elem_buf;
@@ -1990,6 +2042,9 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_PRIORITY: /* W */
 		return print_v4l2_priority(tcp, arg);
+
+	case VIDIOC_G_SLICED_VBI_CAP:
+		return print_v4l2_sliced_vbi_cap(tcp, arg);
 
 	case VIDIOC_LOG_STATUS:
 		break;
