@@ -29,11 +29,12 @@ decode_termios(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (abbrev(tcp)) {
 		tprints("{");
 		printxval(baud_options, tios.c_cflag & CBAUD, "B???");
-		tprintf(" %sopost %sisig %sicanon %secho ...}",
+		tprintf(" %sopost %sisig %sicanon %secho %scrtscts ...}",
 			(tios.c_oflag & OPOST) ? "" : "-",
 			(tios.c_lflag & ISIG) ? "" : "-",
 			(tios.c_lflag & ICANON) ? "" : "-",
-			(tios.c_lflag & ECHO) ? "" : "-");
+			(tios.c_lflag & ECHO) ? "" : "-",
+			(tios.c_cflag & CRTSCTS) ? "" : "-");
 		return;
 	}
 	tprintf("{c_iflags=%#lx, c_oflags=%#lx, ",
