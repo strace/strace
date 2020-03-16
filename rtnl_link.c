@@ -803,6 +803,45 @@ decode_ifla_af_spec(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_ifla_prop_list_attr(struct tcb *const tcp,
+			   const kernel_ulong_t addr,
+			   const unsigned int len,
+			   const void *const opaque_data)
+{
+	const uintptr_t type = (uintptr_t) opaque_data;
+
+	switch (type) {
+	case IFLA_ALT_IFNAME:
+		return decode_nla_str(tcp, addr, len, NULL);
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+static bool
+decode_ifla_prop_list(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+	nla_decoder_t ifla_prop_list_decoder = &decode_ifla_prop_list_attr;
+
+	/*
+	 * We're using the zero-size decoder list in order to avoid large table,
+	 * as IFLA_ALT_IFNAME is the only attribute type we need to decode
+	 * inside the IFLA_PROP_LIST attribute so far, and it has rather large
+	 * value of 53.
+	 */
+	decode_nlattr(tcp, addr, len, rtnl_link_attrs, "IFLA_???",
+		      &ifla_prop_list_decoder, 0, NULL);
+
+	return true;
+}
+
+
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_ADDRESS]		= NULL, /* unimplemented */
 	[IFLA_BROADCAST]	= NULL, /* unimplemented */
@@ -855,6 +894,8 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_NEW_IFINDEX]	= decode_nla_ifindex,
 	[IFLA_MIN_MTU]		= decode_nla_u32,
 	[IFLA_MAX_MTU]		= decode_nla_u32,
+	[IFLA_PROP_LIST]	= decode_ifla_prop_list,
+	[IFLA_ALT_IFNAME]	= decode_nla_str,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
