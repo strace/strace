@@ -333,6 +333,26 @@ decode_nla_ip_proto(struct tcb *const tcp,
 }
 
 bool
+decode_nla_hwaddr(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+	if (len > MAX_ADDR_LEN)
+		return false;
+
+	uint8_t buf[len];
+	const uintptr_t arphrd = (uintptr_t) opaque_data;
+
+	if (!umoven_or_printaddr(tcp, addr, len, buf)) {
+		print_hwaddr("", buf, len, arphrd & NLA_HWADDR_FAMILY_OFFSET
+				? arphrd & ~NLA_HWADDR_FAMILY_OFFSET : -1U);
+	}
+
+	return true;
+}
+
+bool
 decode_nla_in_addr(struct tcb *const tcp,
 		   const kernel_ulong_t addr,
 		   const unsigned int len,
