@@ -950,7 +950,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	 */
 	ellipsis = string_quote(str, outstr, size, style, NULL)
 		   && len
-		   && ((style & QUOTE_0_TERMINATED)
+		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 		       || len > max_strlen);
 
 	tprints(outstr);

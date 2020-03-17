@@ -716,11 +716,18 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 # define STR_STRIP_PREFIX(str, prefix)	\
 	str_strip_prefix_len((str), (prefix), sizeof(prefix) - 1)
 
+/** String is '\0'-terminated. */
 # define QUOTE_0_TERMINATED			0x01
+/** Do not emit leading and ending '"' characters. */
 # define QUOTE_OMIT_LEADING_TRAILING_QUOTES	0x02
+/** Do not print '\0' if it is the last character. */
 # define QUOTE_OMIT_TRAILING_0			0x08
-# define QUOTE_FORCE_HEX				0x10
-# define QUOTE_EMIT_COMMENT			0x20
+/** Print ellipsis if the last character is not '\0' */
+# define QUOTE_EXPECT_TRAILING_0		0x10
+/** Print string in hex (using '\xHH' notation). */
+# define QUOTE_FORCE_HEX			0x20
+/** Enclose the string in C comment syntax. */
+# define QUOTE_EMIT_COMMENT			0x40
 
 extern int string_quote(const char *, char *, unsigned int, unsigned int,
 			const char *escape_chars);
