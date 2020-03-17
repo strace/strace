@@ -509,7 +509,8 @@ AC_CHECK_DECLS(m4_normalize([
 	IFLA_AF_SPEC,
 	IFLA_XDP,
 	IFLA_PROP_LIST,
-	IFLA_ALT_IFNAME
+	IFLA_ALT_IFNAME,
+	IFLA_PERM_ADDRESS
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
 

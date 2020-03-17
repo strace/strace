@@ -907,6 +907,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_MAX_MTU]		= decode_nla_u32,
 	[IFLA_PROP_LIST]	= decode_ifla_prop_list,
 	[IFLA_ALT_IFNAME]	= decode_nla_str,
+	[IFLA_PERM_ADDRESS]	= decode_ifla_hwaddr,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
