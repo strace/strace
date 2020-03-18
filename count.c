@@ -24,7 +24,7 @@ struct call_counts {
 	struct timespec time;
 	struct timespec time_min;
 	struct timespec time_max;
-	double time_avg;
+	struct timespec time_avg;
 	uint64_t calls, errors;
 };
 
@@ -160,10 +160,8 @@ max_time_cmp(const void *a, const void *b)
 static int
 avg_time_cmp(const void *a, const void *b)
 {
-	double m = counts[*((unsigned int *) a)].time_avg;
-	double n = counts[*((unsigned int *) b)].time_avg;
-
-	return (m < n) ? 1 : (m > n) ? -1 : 0;
+	return -ts_cmp(&counts[*((unsigned int *) a)].time_avg,
+		       &counts[*((unsigned int *) b)].time_avg);
 }
 
 static int
@@ -307,21 +305,19 @@ call_summary_pers(FILE *outf)
 	const struct timespec *tv_min = &max_ts;
 	const struct timespec *tv_min_max = &zero_ts;
 	const struct timespec *tv_max = &zero_ts;
+	const struct timespec *tv_avg_max = &zero_ts;
 	uint64_t call_cum = 0;
 	uint64_t error_cum = 0;
 
 	double float_tv_cum;
 	double percent;
 
-	double ts_avg_max = 0;
 	size_t sc_name_max = 0;
 
 
 	/* sort, calculate statistics */
 	indices = xcalloc(sizeof(indices[0]), nsyscalls);
 	for (size_t i = 0; i < nsyscalls; ++i) {
-		struct timespec dtv;
-
 		indices[i] = i;
 		if (counts[i].calls == 0)
 			continue;
@@ -333,10 +329,9 @@ call_summary_pers(FILE *outf)
 		call_cum += counts[i].calls;
 		error_cum += counts[i].errors;
 
-		ts_div(&dtv, &counts[i].time, counts[i].calls);
-		counts[i].time_avg = ts_float(&dtv);
+		ts_div(&counts[i].time_avg, &counts[i].time, counts[i].calls);
+		tv_avg_max = ts_max(tv_avg_max, &counts[i].time_avg);
 
-		ts_avg_max = MAX(ts_avg_max, counts[i].time_avg);
 		sc_name_max = MAX(sc_name_max, strlen(sysent[i].sys_name));
 	}
 	float_tv_cum = ts_float(&tv_cum);
@@ -374,8 +369,9 @@ call_summary_pers(FILE *outf)
 					     (int64_t) tv_min_max->tv_sec)),
 		W_(CSC_TIME_MAX,   num_chars("%" PRId64 ".000000",
 					     (int64_t) tv_max->tv_sec)),
-		W_(CSC_TIME_AVG,   num_chars("%" PRIu64,
-					     (uint64_t) (ts_avg_max * 1e6))),
+		W_(CSC_TIME_AVG,   num_chars("%" PRId64 ,
+					     (uint64_t) (ts_float(tv_avg_max)
+							 * 1e6))),
 		W_(CSC_CALLS,      num_chars("%" PRIu64, call_cum)),
 		W_(CSC_ERRORS,     num_chars("%" PRIu64, error_cum)),
 		W_(CSC_SC_NAME,    sc_name_max + 1),
@@ -459,7 +455,8 @@ call_summary_pers(FILE *outf)
 			PC_(CSC_TIME_TOTAL, float_syscall_time);
 			PC_(CSC_TIME_MIN,   ts_float(&cc->time_min));
 			PC_(CSC_TIME_MAX,   ts_float(&cc->time_max));
-			PC_(CSC_TIME_AVG,   (uint64_t) (cc->time_avg * 1e6));
+			PC_(CSC_TIME_AVG,
+			    (uint64_t) (ts_float(&cc->time_avg) * 1e6));
 			PC_(CSC_CALLS,      cc->calls);
 			PC_(CSC_ERRORS,     cc->errors);
 			PC_(CSC_SC_NAME,    sysent[idx].sys_name);
