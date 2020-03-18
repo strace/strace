@@ -127,7 +127,7 @@ ts_sub(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 }
 
 void
-ts_div(struct timespec *tv, const struct timespec *a, int n)
+ts_div(struct timespec *tv, const struct timespec *a, uint64_t n)
 {
 	long long nsec = (a->tv_sec % n * 1000000000LL + a->tv_nsec + n / 2) / n;
 	tv->tv_sec = a->tv_sec / n + nsec / 1000000000;
@@ -135,7 +135,7 @@ ts_div(struct timespec *tv, const struct timespec *a, int n)
 }
 
 void
-ts_mul(struct timespec *tv, const struct timespec *a, int n)
+ts_mul(struct timespec *tv, const struct timespec *a, uint64_t n)
 {
 	long long nsec = a->tv_nsec * n;
 	tv->tv_sec = a->tv_sec * n + nsec / 1000000000;
