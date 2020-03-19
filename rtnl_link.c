@@ -42,6 +42,17 @@
 #include "xlat/xdp_flags.h"
 
 static bool
+decode_ifla_hwaddr(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	const struct ifinfomsg *ifinfo = (const struct ifinfomsg *) opaque_data;
+
+	return decode_nla_hwaddr_family(tcp, addr, len, ifinfo->ifi_family);
+}
+
+static bool
 decode_rtnl_link_stats(struct tcb *const tcp,
 		       const kernel_ulong_t addr,
 		       const unsigned int len,
@@ -843,8 +854,8 @@ decode_ifla_prop_list(struct tcb *const tcp,
 
 
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
-	[IFLA_ADDRESS]		= NULL, /* unimplemented */
-	[IFLA_BROADCAST]	= NULL, /* unimplemented */
+	[IFLA_ADDRESS]		= decode_ifla_hwaddr,
+	[IFLA_BROADCAST]	= decode_ifla_hwaddr,
 	[IFLA_IFNAME]		= decode_nla_str,
 	[IFLA_MTU]		= decode_nla_u32,
 	[IFLA_LINK]		= decode_nla_u32,
@@ -928,6 +939,6 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 		tprints(", ");
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_link_attrs, "IFLA_???",
-			      ARRSZ_PAIR(ifinfomsg_nla_decoders), NULL);
+			      ARRSZ_PAIR(ifinfomsg_nla_decoders), &ifinfo);
 	}
 }
