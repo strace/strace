@@ -17,7 +17,7 @@
 DIAG_PUSH_IGNORE_OVERRIDE_INIT
 
 static uint8_t hwaddr_sizes[] = {
-	[0 ... ARPHRD_IEEE802_TR] = 255,
+	[0 ... ARPHRD_VSOCKMON] = 255,
 
 	[ARPHRD_NETROM]     =  7 /* AX25_ADDR_LEN */,
 	[ARPHRD_ETHER]      =  6 /* ETH_ALEN */,
