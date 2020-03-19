@@ -114,10 +114,12 @@ void
 print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
 {
 	tprints(prefix);
-	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV
+	    || size > MAX_ADDR_LEN)
 		print_quoted_string((const char *) addr, size,
 				    QUOTE_FORCE_HEX);
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW
+	    || size > MAX_ADDR_LEN)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
 		? tprints_comment : tprints)(sprint_mac_addr(addr, size));
@@ -137,10 +139,12 @@ print_hwaddr(const char *prefix, const uint8_t addr[], size_t size,
 	     uint32_t devtype)
 {
 	tprints(prefix);
-	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV
+	    || size > MAX_ADDR_LEN)
 		print_quoted_string((const char *) addr, size,
 				    QUOTE_FORCE_HEX);
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW
+	    || size > MAX_ADDR_LEN)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
 		? tprints_comment : tprints)(sprint_hwaddr(addr, size,
