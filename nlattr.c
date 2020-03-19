@@ -165,7 +165,8 @@ decode_nla_str(struct tcb *const tcp,
 	       const unsigned int len,
 	       const void *const opaque_data)
 {
-	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
+	printstr_ex(tcp, addr, len,
+		    QUOTE_OMIT_TRAILING_0 | QUOTE_EXPECT_TRAILING_0);
 
 	return true;
 }
