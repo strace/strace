@@ -183,7 +183,7 @@ main(void)
 
 	attr->size = 0x90807060;
 	attr->sched_policy = 0xca7faced;
-	attr->sched_flags = 0xbadc0ded1057da78ULL;
+	attr->sched_flags = 0xbadc0ded1057da70ULL;
 	attr->sched_nice = 0xafbfcfdf;
 	attr->sched_priority = 0xb8c8d8e8;
 	attr->sched_runtime = 0xbadcaffedeadf157ULL;
@@ -223,7 +223,7 @@ main(void)
 
 	attr->size = 0x90807060;
 	attr->sched_policy = 0xca7faced;
-	attr->sched_flags = 0xfULL;
+	attr->sched_flags = 0x17ULL;
 	attr->sched_nice = 0xafbfcfdf;
 	attr->sched_priority = 0xb8c8d8e8;
 	attr->sched_runtime = 0xbadcaffedeadf157ULL;
@@ -233,13 +233,46 @@ main(void)
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
-	       "SCHED_FLAG_DL_OVERRUN|0x8, "
+	       "SCHED_FLAG_DL_OVERRUN|0x10, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
 	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", ...}, %u)"
 	       " = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
 	       attr->sched_policy,
+	       attr->sched_nice,
+	       attr->sched_priority,
+	       attr->sched_runtime,
+	       attr->sched_deadline,
+	       attr->sched_period,
+	       (unsigned) bogus_flags, errstr);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
+
+		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
+		       (unsigned long long) ill, (unsigned) sizeof(*attr),
+		       errstr);
+
+		sys_sched_setattr(0, ill, 0);
+		printf("sched_setattr(0, %#llx, 0) = %s\n",
+		       (unsigned long long) ill, errstr);
+	}
+
+	attr->size = SCHED_ATTR_MIN_SIZE;
+	attr->sched_policy = 0xdefaced;
+	attr->sched_flags = 0x1fULL;
+
+	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	printf("sched_setattr(%d, {size=%u, "
+	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
+	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_KEEP_POLICY|0x10, "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
+	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "}, %u)"
+	       " = %s\n",
+	       (int) bogus_pid,
+	       attr->size,
 	       attr->sched_nice,
 	       attr->sched_priority,
 	       attr->sched_runtime,

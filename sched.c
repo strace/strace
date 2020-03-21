@@ -96,6 +96,7 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct sched_attr attr = {};
 	unsigned int size;
+	bool is_set = false;
 
 	if (usize) {
 		/* called from sched_getattr */
@@ -106,6 +107,8 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		size = attr.size;
 	} else {
 		/* called from sched_setattr */
+		is_set = true;
+
 		if (umove_or_printaddr(tcp, addr, &attr.size))
 			return;
 		usize = attr.size;
@@ -123,7 +126,11 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (size < SCHED_ATTR_MIN_SIZE)
 		goto end;
 
-	PRINT_FIELD_XVAL(", ", attr, sched_policy, schedulers, "SCHED_???");
+	if (!is_set
+	    || (int) attr.sched_policy < 0
+	    || !(attr.sched_flags & SCHED_FLAG_KEEP_POLICY))
+		PRINT_FIELD_XVAL(", ", attr, sched_policy, schedulers,
+				 "SCHED_???");
 	PRINT_FIELD_FLAGS(", ", attr, sched_flags, sched_flags,
 			  "SCHED_FLAG_???");
 
