@@ -128,20 +128,30 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (!is_set
 	    || (int) attr.sched_policy < 0
-	    || !(attr.sched_flags & SCHED_FLAG_KEEP_POLICY))
+	    || !(attr.sched_flags & (SCHED_FLAG_KEEP_POLICY
+				     | SCHED_FLAG_KEEP_PARAMS)))
 		PRINT_FIELD_XVAL(", ", attr, sched_policy, schedulers,
 				 "SCHED_???");
 	PRINT_FIELD_FLAGS(", ", attr, sched_flags, sched_flags,
 			  "SCHED_FLAG_???");
 
-	PRINT_FIELD_D(", ", attr, sched_nice);
-	PRINT_FIELD_U(", ", attr, sched_priority);
-	PRINT_FIELD_U(", ", attr, sched_runtime);
-	PRINT_FIELD_U(", ", attr, sched_deadline);
-	PRINT_FIELD_U(", ", attr, sched_period);
+
+	if (!is_set || !(attr.sched_flags & SCHED_FLAG_KEEP_PARAMS)) {
+		PRINT_FIELD_D(", ", attr, sched_nice);
+		PRINT_FIELD_U(", ", attr, sched_priority);
+		PRINT_FIELD_U(", ", attr, sched_runtime);
+		PRINT_FIELD_U(", ", attr, sched_deadline);
+		PRINT_FIELD_U(", ", attr, sched_period);
+	}
+
+	if (size < SCHED_ATTR_SIZE_VER1)
+		goto end;
+
+	PRINT_FIELD_U(", ", attr, sched_util_min);
+	PRINT_FIELD_U(", ", attr, sched_util_max);
 
 end:
-	if (usize > size)
+	if ((is_set ? usize : attr.size) > size)
 		tprints(", ...");
 
 	tprints("}");
