@@ -573,12 +573,6 @@ main(void)
 		uint32_t cmd;
 		const char *str;
 	} unsupp_cmds[] = {
-#ifdef VIDIOC_G_EDID
-		{ ARG_STR(VIDIOC_G_EDID) },
-#endif
-#ifdef VIDIOC_S_EDID
-		{ ARG_STR(VIDIOC_S_EDID) },
-#endif
 #ifdef VIDIOC_G_ENC_INDEX
 		{ ARG_STR(VIDIOC_G_ENC_INDEX) },
 #endif
@@ -1588,6 +1582,61 @@ main(void)
 	ioctl(-1, VIDIOC_S_INPUT, p_int);
 	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_INPUT), *p_int);
+
+#ifdef VIDIOC_G_EDID
+	/* VIDIOC_G_EDID, VIDIOC_S_EDID */
+	ioctl(-1, VIDIOC_G_EDID, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_G_EDID));
+
+	ioctl(-1, VIDIOC_S_EDID, 0);
+	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EDID));
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_edid, p_v4l2_edid);
+	uint8_t *edid = tail_alloc(256);
+
+	fill_memory32(p_v4l2_edid, sizeof(*p_v4l2_edid));
+	p_v4l2_edid->edid = edid;
+	fill_memory(edid, 256);
+
+	ioctl(-1, VIDIOC_G_EDID, p_v4l2_edid);
+	printf("ioctl(-1, %s, {pad=2158018784, start_block=2158018785"
+	       ", blocks=2158018786, reserved=[0x80a0c0e3, 0x80a0c0e4"
+	       ", 0x80a0c0e5, 0x80a0c0e6, 0x80a0c0e7], edid=%p}"
+	       ") = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_G_EDID), edid);
+
+	ioctl(-1, VIDIOC_S_EDID, p_v4l2_edid);
+	printf("ioctl(-1, %s, {pad=2158018784, start_block=2158018785"
+	       ", blocks=2158018786, reserved=[0x80a0c0e3, 0x80a0c0e4"
+	       ", 0x80a0c0e5, 0x80a0c0e6, 0x80a0c0e7], edid=\"\\x80\\x81\\x82"
+	       "\\x83\\x84\\x85\\x86\\x87\\x88\\x89\\x8a\\x8b\\x8c\\x8d\\x8e"
+	       "\\x8f\\x90\\x91\\x92\\x93\\x94\\x95\\x96\\x97\\x98\\x99\\x9a"
+	       "\\x9b\\x9c\\x9d\\x9e\\x9f\"...}) = -1 EBADF (%m)\n",
+	       XLAT_STR(VIDIOC_S_EDID));
+
+	p_v4l2_edid->start_block = 0;
+	p_v4l2_edid->blocks = 0;
+	memset(p_v4l2_edid->reserved, 0, sizeof(p_v4l2_edid->reserved));
+
+	ioctl(-1, VIDIOC_G_EDID, p_v4l2_edid);
+	printf("ioctl(-1, %s, {pad=2158018784, start_block=0, blocks=0"
+	       ", edid=%p}) = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_G_EDID), edid);
+
+	ioctl(-1, VIDIOC_S_EDID, p_v4l2_edid);
+	printf("ioctl(-1, %s, {pad=2158018784, start_block=0, blocks=0"
+	       ", edid=\"\"}) = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_S_EDID));
+
+	p_v4l2_edid->edid = NULL;
+
+	ioctl(-1, VIDIOC_G_EDID, p_v4l2_edid);
+	printf("ioctl(-1, %s, {pad=2158018784, start_block=0, blocks=0"
+	       ", edid=NULL}) = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_G_EDID));
+
+	ioctl(-1, VIDIOC_S_EDID, p_v4l2_edid);
+	printf("ioctl(-1, %s, {pad=2158018784, start_block=0, blocks=0"
+	       ", edid=NULL}) = -1 EBADF (%m)\n", XLAT_STR(VIDIOC_S_EDID));
+#endif
 
 	/* VIDIOC_G_OUTPUT */
 	ioctl(-1, VIDIOC_G_OUTPUT, 0);

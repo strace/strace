@@ -808,6 +808,7 @@ AC_CHECK_DECLS(m4_normalize([
 
 AC_CHECK_TYPES(m4_normalize([
 	struct v4l2_create_buffers,
+	struct v4l2_edid,
 	struct v4l2_exportbuffer,
 	struct v4l2_frmsizeenum,
 	struct v4l2_frmivalenum,

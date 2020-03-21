@@ -1809,6 +1809,104 @@ main(int argc, char **argv)
 	}
 
 
+#ifdef VIDIOC_G_EDID
+	/* VIDIOC_G_EDID, VIDIOC_S_EDID */
+	static const struct strval32 edid_cmds[] = {
+		{ ARG_STR(VIDIOC_G_EDID) },
+		{ ARG_STR(VIDIOC_S_EDID) },
+	};
+
+	struct v4l2_edid *edid = tail_alloc(sizeof(*edid));
+	uint8_t *edid_data = tail_alloc(256);
+
+	for (size_t i = 0; i < ARRAY_SIZE(edid_cmds); i++) {
+		ioctl(-1, edid_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL),
+		       inject_retval);
+
+		ioctl(-1, edid_cmds[i].val, (char *) edid + 1);
+		printf("ioctl(-1, %s, %p) = %ld (INJECTED)\n",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL),
+		       (char *) edid + 1, inject_retval);
+
+		fill_memory32(edid, sizeof(*edid));
+		fill_memory_ex(edid_data, 256, 8, 128);
+		edid->edid = edid_data;
+
+		ioctl(-1, edid_cmds[i].val, edid);
+		printf("ioctl(-1, %s, {pad=2158018784, start_block=2158018785"
+		       ", blocks=2158018786, reserved=[0x80a0c0e3, 0x80a0c0e4"
+		       ", 0x80a0c0e5, 0x80a0c0e6, 0x80a0c0e7], edid=",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL));
+		if (edid_cmds[i].val == VIDIOC_G_EDID) {
+			printf("%p} => {pad=2158018784, start_block=2158018785"
+			       ", blocks=2158018786, reserved=[0x80a0c0e3"
+			       ", 0x80a0c0e4, 0x80a0c0e5, 0x80a0c0e6"
+			       ", 0x80a0c0e7], edid=", edid_data);
+		}
+		print_quoted_hex(edid_data, DEFAULT_STRLEN);
+		printf("...}) = %ld (INJECTED)\n", inject_retval);
+
+		edid->edid = edid_data + 250;
+		memset(edid->reserved, 0, sizeof(edid->reserved));
+
+		ioctl(-1, edid_cmds[i].val, edid);
+		printf("ioctl(-1, %s, {pad=2158018784, start_block=2158018785"
+		       ", blocks=2158018786, edid=%p",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL),
+		       edid_data + 250);
+		if (edid_cmds[i].val == VIDIOC_G_EDID) {
+			printf("} => {pad=2158018784, start_block=2158018785"
+			       ", blocks=2158018786, edid=%p", edid_data + 250);
+		}
+		printf("}) = %ld (INJECTED)\n", inject_retval);
+
+		edid->edid = NULL;
+		edid->start_block = 0;
+
+		ioctl(-1, edid_cmds[i].val, edid);
+		printf("ioctl(-1, %s, {pad=2158018784, start_block=0"
+		       ", blocks=2158018786, edid=NULL",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL));
+		if (edid_cmds[i].val == VIDIOC_G_EDID) {
+			printf("} => {pad=2158018784, start_block=0"
+			       ", blocks=2158018786, edid=NULL");
+		}
+		printf("}) = %ld (INJECTED)\n", inject_retval);
+
+		edid->start_block = 0xdecaffed;
+		edid->blocks = 0;
+		edid->reserved[4] = 0xfacebeef;
+		edid->edid = edid_data;
+
+		ioctl(-1, edid_cmds[i].val, edid);
+		printf("ioctl(-1, %s, {pad=2158018784, start_block=3737845741"
+		       ", blocks=0, reserved=[0, 0, 0, 0, 0xfacebeef], edid=",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL));
+		if (edid_cmds[i].val == VIDIOC_G_EDID) {
+			printf("%p} => {pad=2158018784, start_block=3737845741"
+			       ", blocks=0, reserved=[0, 0, 0, 0, 0xfacebeef]"
+			       ", edid=", edid_data);
+		}
+		printf("\"\"}) = %ld (INJECTED)\n", inject_retval);
+
+		edid->start_block = 0;
+		edid->edid = NULL;
+
+		ioctl(-1, edid_cmds[i].val, edid);
+		printf("ioctl(-1, %s, {pad=2158018784, start_block=0, blocks=0"
+		       ", reserved=[0, 0, 0, 0, 0xfacebeef], edid=NULL",
+		       sprintxlat(edid_cmds[i].str, edid_cmds[i].val, NULL));
+		if (edid_cmds[i].val == VIDIOC_G_EDID) {
+			printf("} => {blocks=0"
+			       ", reserved=[0, 0, 0, 0, 0xfacebeef]");
+		}
+		printf("}) = %ld (INJECTED)\n", inject_retval);
+	}
+#endif
+
+
 	/* VIDIOC_ENUMOUTPUT */
 	static const struct strval32 output_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_OUTPUT_TYPE_???") },

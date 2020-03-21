@@ -224,6 +224,15 @@ typedef struct {
 
 
 typedef struct {
+	uint32_t pad;
+	uint32_t start_block;
+	uint32_t blocks;
+	uint32_t reserved[5];
+	uint8_t * edid;
+} struct_v4l2_edid;
+
+
+typedef struct {
 	uint32_t index;
 	uint8_t  name[32];
 	uint32_t type;

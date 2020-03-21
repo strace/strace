@@ -36,6 +36,7 @@
 #include DEF_MPERS_TYPE(struct_v4l2_format)
 #include DEF_MPERS_TYPE(struct_v4l2_framebuffer)
 #include DEF_MPERS_TYPE(struct_v4l2_input)
+#include DEF_MPERS_TYPE(struct_v4l2_edid)
 #include DEF_MPERS_TYPE(struct_v4l2_standard)
 
 #include "types/v4l2.h"
@@ -66,6 +67,9 @@ CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_format);
 CHECK_V4L2_STRUCT_SIZE(v4l2_framebuffer);
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_input);
+#ifdef HAVE_STRUCT_V4L2_EDID
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_edid);
+#endif
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_output);
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_modulator);
 #ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
@@ -1079,6 +1083,55 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 static int
+print_v4l2_edid(struct tcb *const tcp, const kernel_ulong_t arg,
+		const bool is_get)
+{
+	struct_v4l2_edid e;
+
+	if (entering(tcp)) {
+		tprints(", ");
+
+		if (umove_or_printaddr(tcp, arg, &e))
+			return RVAL_IOCTL_DECODED;
+	} else {
+		if (syserror(tcp) || umove(tcp, arg, &e))
+			return RVAL_IOCTL_DECODED;
+
+		tprints(" => ");
+	}
+
+	unsigned long query = exiting(tcp) ? get_tcb_priv_ulong(tcp) : false;
+
+	tprints("{");
+	if (!query) {
+		PRINT_FIELD_U("", e, pad);
+		PRINT_FIELD_U(", ", e, start_block);
+		tprints(", ");
+	}
+	PRINT_FIELD_U("", e, blocks);
+
+	if (!IS_ARRAY_ZERO(e.reserved))
+		PRINT_FIELD_ARRAY(", ", e, reserved, tcp,
+				  print_xint32_array_member);
+
+	if (is_get && entering(tcp)) {
+		PRINT_FIELD_PTR(", ", e, edid);
+
+		/* start_block and blocks are 0 - query block count */
+		set_tcb_priv_ulong(tcp, !e.start_block && !e.blocks);
+	} else if (!query) {
+		/* Maximum number of blocks is 256, per EDID specification */
+		tprints(", edid=");
+		printstr_ex(tcp, (mpers_ptr_t) e.edid,
+			    MIN(e.blocks, 256) * 128, QUOTE_FORCE_HEX);
+	}
+
+	tprints("}");
+
+	return is_get && entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
+}
+
+static int
 print_v4l2_output(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct_v4l2_output o;
@@ -2006,6 +2059,10 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
 		break;
+
+	case VIDIOC_G_EDID: /* RW */
+	case VIDIOC_S_EDID: /* RW */
+		return print_v4l2_edid(tcp, arg, code == VIDIOC_G_EDID);
 
 	case VIDIOC_ENUMOUTPUT: /* RW */
 		return print_v4l2_output(tcp, arg);
