@@ -18,6 +18,8 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 
 #include MPERS_DEFS
 
+#include "xlat/rtc_vl_flags.h"
+
 #define XLAT_MACROS_ONLY
 # include "xlat/rtc_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
@@ -69,6 +71,19 @@ decode_rtc_pll_info(struct tcb *const tcp, const kernel_ulong_t addr)
 			pll.pll_posmult, pll.pll_negmult, (long) pll.pll_clock);
 }
 
+static void
+decode_rtc_vl(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	unsigned int val;
+
+	if (umove_or_printaddr(tcp, addr, &val))
+		return;
+
+	tprints("[");
+	printflags(rtc_vl_flags, val, "RTC_VL_???");
+	tprints("]");
+}
+
 MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
 {
@@ -114,7 +129,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
-		printnum_int(tcp, arg, "%d");
+		decode_rtc_vl(tcp, arg);
 		break;
 	case RTC_AIE_ON:
 	case RTC_AIE_OFF:
