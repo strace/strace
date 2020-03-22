@@ -18,6 +18,10 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 
 #include MPERS_DEFS
 
+#define XLAT_MACROS_ONLY
+# include "xlat/rtc_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
+
 static void
 print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 {
@@ -106,14 +110,12 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		tprints(", ");
 		decode_rtc_pll_info(tcp, arg);
 		break;
-#ifdef RTC_VL_READ
 	case RTC_VL_READ:
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
-#endif
 	case RTC_AIE_ON:
 	case RTC_AIE_OFF:
 	case RTC_UIE_ON:
@@ -122,9 +124,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_PIE_OFF:
 	case RTC_WIE_ON:
 	case RTC_WIE_OFF:
-#ifdef RTC_VL_CLR
 	case RTC_VL_CLR:
-#endif
 		/* no args */
 		break;
 	default:
