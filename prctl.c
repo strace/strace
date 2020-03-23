@@ -369,6 +369,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_NO_NEW_PRIVS:
 	case PR_SET_THP_DISABLE:
+	case PR_SET_IO_FLUSHER:
 		tprintf(", %" PRI_klu, arg2);
 		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
@@ -411,6 +412,7 @@ SYS_FUNC(prctl)
 	case PR_GET_THP_DISABLE:
 	case PR_MPX_DISABLE_MANAGEMENT:
 	case PR_MPX_ENABLE_MANAGEMENT:
+	case PR_GET_IO_FLUSHER:
 	default:
 		print_prctl_args(tcp, 1);
 		return RVAL_DECODED;
