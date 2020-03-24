@@ -1,0 +1,18 @@
+#!/bin/sh -efu
+#
+# Check decoding of RTC_* ioctls.
+#
+# Copyright (c) 2018-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+: ${IOCTL_INJECT_START=256}
+
+run_strace -a22 "$@" -e trace=ioctl \
+	-e inject=ioctl:retval=42:when="${IOCTL_INJECT_START}+" \
+	"../$NAME" "${IOCTL_INJECT_START}" > "$EXP"
+grep -v '^ioctl([012][,<]' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"

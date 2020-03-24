@@ -341,6 +341,14 @@ ioctl_random
 ioctl_rtc
 ioctl_rtc-success
 ioctl_rtc-v
+ioctl_rtc-success
+ioctl_rtc-success-Xabbrev
+ioctl_rtc-success-Xraw
+ioctl_rtc-success-Xverbose
+ioctl_rtc-success-v
+ioctl_rtc-success-v-Xabbrev
+ioctl_rtc-success-v-Xraw
+ioctl_rtc-success-v-Xverbose
 ioctl_scsi
 ioctl_seccomp
 ioctl_seccomp--pidns-translation

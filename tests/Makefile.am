@@ -220,6 +220,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_seccomp-y-success-Xabbrev \
 	ioctl_seccomp-y-success-Xraw \
 	ioctl_seccomp-y-success-Xverbose \
+	ioctl_rtc-success \
+	ioctl_rtc-success-Xabbrev \
+	ioctl_rtc-success-Xraw \
+	ioctl_rtc-success-Xverbose \
+	ioctl_rtc-success-v \
+	ioctl_rtc-success-v-Xabbrev \
+	ioctl_rtc-success-v-Xraw \
+	ioctl_rtc-success-v-Xverbose \
 	ioctl_ubi-success \
 	ioctl_v4l2-success \
 	ioctl_v4l2-success-Xabbrev \
