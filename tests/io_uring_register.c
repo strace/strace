@@ -91,7 +91,7 @@ main(void)
 	int fds[] = { fd_full, fd_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 8 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 9 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -174,6 +174,110 @@ main(void)
 	       ", {offset=3735929054, fds=[%u<%s>, %u<%s>]}, %u) = %s\n",
 	       fd_null, path_null, fd_full, path_full, fd_null, path_null,
 	       (unsigned int) ARRAY_SIZE(fds), errstr);
+#endif
+
+#ifdef HAVE_STRUCT_IO_URING_PROBE
+	struct io_uring_probe *probe = tail_alloc(sizeof(*probe) +
+		       (DEFAULT_STRLEN + 1) * sizeof(struct io_uring_probe_op));
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, NULL, 0xfacefeed);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", NULL, 4207869677) = %s\n",
+	       fd_null, path_null, errstr);
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe,
+			      0xfacefeed);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", %p, 4207869677) = %s\n",
+	       fd_null, path_null, probe, errstr);
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE,
+			      (char *) probe + 1, DEFAULT_STRLEN + 1);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", %p, %d) = %s\n",
+	       fd_null, path_null, (char *) probe + 1, DEFAULT_STRLEN + 1,
+	       errstr);
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 0);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", {last_op=%u /* IORING_OP_??? */, ops_len=%hhu, resv=%#hx"
+	       ", resv2=[%#x, %#x, %#x], ops=[]}, 0) = %s\n",
+	       fd_null, path_null, probe->last_op, probe->ops_len, probe->resv,
+	       probe->resv2[0], probe->resv2[1], probe->resv2[2], errstr);
+
+	probe->last_op = IORING_OP_READV;
+	probe->resv = 0;
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 0);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", {last_op=IORING_OP_READV, ops_len=%hhu"
+	       ", resv2=[%#x, %#x, %#x], ops=[]}, 0) = %s\n",
+	       fd_null, path_null, probe->ops_len,
+	       probe->resv2[0], probe->resv2[1], probe->resv2[2], errstr);
+
+	probe->last_op = IORING_OP_EPOLL_CTL;
+	probe->resv2[0] = 0;
+	probe->resv2[2] = 0;
+
+	probe->ops[0].op = IORING_OP_NOP;
+	probe->ops[0].resv = 0xde;
+	probe->ops[0].flags = 0;
+	probe->ops[0].resv2 = 0xbeefface;
+
+	probe->ops[1].op = 29;
+	probe->ops[1].resv = 0;
+	probe->ops[1].flags = IO_URING_OP_SUPPORTED;
+	probe->ops[1].resv2 = 0xdeadc0de;
+
+	probe->ops[2].op = 30;
+	probe->ops[2].resv = 0xaf;
+	probe->ops[2].flags = 0xbeef;
+	probe->ops[2].resv2 = 0;
+
+	probe->ops[3].op = 0xfe;
+	probe->ops[3].resv = 0;
+	probe->ops[3].flags = 0xc0de;
+	probe->ops[3].resv2 = 0;
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 4);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", {last_op=IORING_OP_EPOLL_CTL, ops_len=%hhu"
+	       ", resv2=[0, %#x, 0], ops=["
+	       "{op=IORING_OP_NOP, resv=0xde, flags=0, resv2=0xbeefface}, "
+	       "{op=IORING_OP_EPOLL_CTL, flags=IO_URING_OP_SUPPORTED"
+	       ", resv2=0xdeadc0de}, "
+	       "{op=30 /* IORING_OP_??? */, resv=0xaf"
+	       ", flags=IO_URING_OP_SUPPORTED|0xbeee}, "
+	       "{op=254 /* IORING_OP_??? */"
+	       ", flags=0xc0de /* IO_URING_OP_??? */}]}, 4) = %s\n",
+	       fd_null, path_null, probe->ops_len, probe->resv2[1], errstr);
+
+	probe->last_op = 30;
+	probe->resv2[1] = 0;
+	fill_memory_ex(probe->ops, sizeof(probe->ops[0]) * (DEFAULT_STRLEN + 1),
+		    0x40, 0x80);
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe,
+			      DEFAULT_STRLEN + 1);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
+	       ", {last_op=30 /* IORING_OP_??? */, ops_len=%hhu, ops=[",
+	       fd_null, path_null, probe->ops_len);
+	for (size_t i = 0; i < DEFAULT_STRLEN; i++) {
+		printf("%s{op=%u /* IORING_OP_??? */, resv=%#hhx"
+		       ", flags=%s%#hx%s, resv2=%#x}",
+		       i ? ", " : "",
+		       probe->ops[i].op, probe->ops[i].resv,
+		       probe->ops[i].flags & 1 ? "IO_URING_OP_SUPPORTED|" : "",
+		       probe->ops[i].flags & ~1,
+		       probe->ops[i].flags & 1 ? "" : " /* IO_URING_OP_??? */",
+		       probe->ops[i].resv2);
+	}
+	printf(", ...]}, %d) = %s\n", DEFAULT_STRLEN + 1, errstr);
+
+	probe->last_op = 0;
+	probe->ops_len = 0;
+	memset(probe->ops, 0, sizeof(probe->ops[0]) * (DEFAULT_STRLEN + 1));
+	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 8);
+	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE, %p, 8) = %s\n",
+	       fd_null, path_null, probe, errstr);
 #endif
 
 	puts("+++ exited with 0 +++");

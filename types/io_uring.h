@@ -53,4 +53,19 @@ typedef struct {
 	uint64_t /* int * */ fds;
 } struct_io_uring_files_update;
 
+typedef struct {
+	uint8_t  op;
+	uint8_t  resv;
+	uint16_t flags;    /* IO_URING_OP_* flags */
+	uint32_t resv2;
+} struct_io_uring_probe_op;
+
+typedef struct {
+	uint8_t  last_op;   /* last opcode supported */
+	uint8_t  ops_len;   /* length of ops[] array below */
+	uint16_t resv;
+	uint32_t resv2[3];
+	struct_io_uring_probe_op ops[0];
+} struct_io_uring_probe;
+
 #endif /* !STRACE_TYPES_IO_URING_H */
