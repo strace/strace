@@ -71,42 +71,43 @@ SYS_FUNC(io_uring_setup)
 					  print_xint32_array_member);
 		}
 		return 0;
+	}
+
+	/* exiting */
+	if (syserror(tcp)) {
+		/* The remaining part of params is irrelevant.  */
+	} else if (umove(tcp, params_addr, &params)) {
+		tprints(", ???");
 	} else {
-		if (syserror(tcp)) {
-			/* The remaining part of params is irrelevant.  */
-		} else if (umove(tcp, params_addr, &params)) {
-			tprints(", ???");
-		} else {
-			PRINT_FIELD_U(", ", params, sq_entries);
-			PRINT_FIELD_U(", ", params, cq_entries);
-			PRINT_FIELD_FLAGS(", ", params, features,
-					  uring_setup_features,
-					  "IORING_FEAT_???");
-			PRINT_FIELD_U(", sq_off={", params.sq_off, head);
-			PRINT_FIELD_U(", ", params.sq_off, tail);
-			PRINT_FIELD_U(", ", params.sq_off, ring_mask);
-			PRINT_FIELD_U(", ", params.sq_off, ring_entries);
-			PRINT_FIELD_U(", ", params.sq_off, flags);
-			PRINT_FIELD_U(", ", params.sq_off, dropped);
-			PRINT_FIELD_U(", ", params.sq_off, array);
-			if (params.sq_off.resv1)
-				PRINT_FIELD_X(", ", params.sq_off, resv1);
-			if (params.sq_off.resv2)
-				PRINT_FIELD_X(", ", params.sq_off, resv2);
-			PRINT_FIELD_U("}, cq_off={", params.cq_off, head);
-			PRINT_FIELD_U(", ", params.cq_off, tail);
-			PRINT_FIELD_U(", ", params.cq_off, ring_mask);
-			PRINT_FIELD_U(", ", params.cq_off, ring_entries);
-			PRINT_FIELD_U(", ", params.cq_off, overflow);
-			PRINT_FIELD_U(", ", params.cq_off, cqes);
-			if (!IS_ARRAY_ZERO(params.cq_off.resv)) {
-				PRINT_FIELD_ARRAY(", ", params.cq_off, resv, tcp,
-						  print_xint64_array_member);
-			}
-			tprints("}");
+		PRINT_FIELD_U(", ", params, sq_entries);
+		PRINT_FIELD_U(", ", params, cq_entries);
+		PRINT_FIELD_FLAGS(", ", params, features,
+				  uring_setup_features,
+				  "IORING_FEAT_???");
+		PRINT_FIELD_U(", sq_off={", params.sq_off, head);
+		PRINT_FIELD_U(", ", params.sq_off, tail);
+		PRINT_FIELD_U(", ", params.sq_off, ring_mask);
+		PRINT_FIELD_U(", ", params.sq_off, ring_entries);
+		PRINT_FIELD_U(", ", params.sq_off, flags);
+		PRINT_FIELD_U(", ", params.sq_off, dropped);
+		PRINT_FIELD_U(", ", params.sq_off, array);
+		if (params.sq_off.resv1)
+			PRINT_FIELD_X(", ", params.sq_off, resv1);
+		if (params.sq_off.resv2)
+			PRINT_FIELD_X(", ", params.sq_off, resv2);
+		PRINT_FIELD_U("}, cq_off={", params.cq_off, head);
+		PRINT_FIELD_U(", ", params.cq_off, tail);
+		PRINT_FIELD_U(", ", params.cq_off, ring_mask);
+		PRINT_FIELD_U(", ", params.cq_off, ring_entries);
+		PRINT_FIELD_U(", ", params.cq_off, overflow);
+		PRINT_FIELD_U(", ", params.cq_off, cqes);
+		if (!IS_ARRAY_ZERO(params.cq_off.resv)) {
+			PRINT_FIELD_ARRAY(", ", params.cq_off, resv, tcp,
+					  print_xint64_array_member);
 		}
 		tprints("}");
 	}
+	tprints("}");
 
 	return RVAL_DECODED | RVAL_FD;
 }
