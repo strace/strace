@@ -34,8 +34,6 @@ AC_SUBST(DEB_CHANGELOGTIME)
 AC_PROG_CC
 AC_PROG_CC_STDC
 AC_PROG_CPP
-st_WARN_CFLAGS
-AX_PROG_CC_FOR_BUILD
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 
@@ -49,6 +47,9 @@ AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
 AC_SUBST([MANPAGE_DATE], [manpage_date])
 
 AC_C_BIGENDIAN
+
+dnl arch-specific default for --enable-gcc-Werror
+arch_enable_Werror=yes
 
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
@@ -64,6 +65,7 @@ aarch64*)
 	;;
 alpha*)
 	arch=alpha
+	arch_enable_Werror=no
 	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
 	;;
 arc*)
@@ -80,6 +82,7 @@ avr32*)
 	;;
 bfin)
 	arch=bfin
+	arch_enable_Werror=no
 	AC_DEFINE([BFIN], 1, [Define for the Blackfin architecture.])
 	;;
 csky*)
@@ -88,6 +91,7 @@ csky*)
 	;;
 hppa*|parisc*)
 	arch=hppa
+	arch_enable_Werror=no
 	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
 	;;
 i[[3456]]86|pentium)
@@ -108,6 +112,7 @@ metag*)
 	;;
 microblaze*)
 	arch=microblaze
+	arch_enable_Werror=no
 	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
 	;;
 mips*)
@@ -160,10 +165,12 @@ s390x)
 	;;
 sh64*)
 	arch=sh64
+	arch_enable_Werror=no
 	AC_DEFINE([SH64], 1, [Define for the SH64 architecture.])
 	;;
 sh*)
 	arch=sh
+	arch_enable_Werror=no
 	AC_DEFINE([SH], 1, [Define for the SH architecture.])
 	;;
 sparc64*)
@@ -194,6 +201,7 @@ x86?64*)
 	;;
 xtensa*)
 	arch=xtensa
+	arch_enable_Werror=no
 	AC_DEFINE([XTENSA], 1, [Define for the Xtensa architecture])
 	;;
 *)
@@ -256,6 +264,9 @@ case "$enable_arm_oabi" in
 esac
 AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
 		   [Define to 1 if you want OABI support on ARM EABI.])
+
+st_WARN_CFLAGS
+AX_PROG_CC_FOR_BUILD
 
 AC_C_TYPEOF
 

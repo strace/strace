@@ -5,13 +5,10 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-DISTCHECK_CONFIGURE_FLAGS='--disable-dependency-tracking'
+DISTCHECK_CONFIGURE_FLAGS='--disable-dependency-tracking --enable-gcc-Werror'
 export DISTCHECK_CONFIGURE_FLAGS
 
 case "$CC" in
-	gcc*)
-		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-gcc-Werror"
-		;;
 	clang-*)
 		# clang -mx32 fails with the following error:
 		# clang: error: clang frontend command failed with exit code 70 (use -v to see invocation)
