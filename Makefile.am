@@ -558,7 +558,6 @@ EXTRA_DIST =				\
 	linux/hppa/get_error.c		\
 	linux/hppa/get_scno.c		\
 	linux/hppa/get_syscall_args.c	\
-	linux/hppa/get_syscall_result.c	\
 	linux/hppa/ioctls_arch0.h	\
 	linux/hppa/ioctls_inc0.h	\
 	linux/hppa/raw_syscall.h	\

@@ -91,7 +91,6 @@ csky*)
 	;;
 hppa*|parisc*)
 	arch=hppa
-	arch_enable_Werror=no
 	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
 	;;
 i[[3456]]86|pentium)

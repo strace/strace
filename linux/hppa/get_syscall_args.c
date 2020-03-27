@@ -9,11 +9,7 @@
 static int
 arch_get_syscall_args(struct tcb *tcp)
 {
-	for (unsigned int i = 0; i < n_args(tcp); ++i) {
-		unsigned int addr = offsetof(struct pt_regs, gr[26 - i]);
-
-		if (upeek(tcp, addr, &tcp->u_arg[i]) < 0)
-			return -1;
-	}
+	for (unsigned int i = 0; i < n_args(tcp); ++i)
+		tcp->u_arg[i] = hppa_regs.gr[26 - i];
 	return 1;
 }

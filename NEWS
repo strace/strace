@@ -13,12 +13,17 @@ Noteworthy changes in release ?.? (????-??-??)
    * Ability to set precision for the absolute timestamp, relative timestamp,
      and syscall time output (using --absolute-timestamps,
      --relative-timestamps, and --syscall-times options, respectively).
+  * Implemented PTRACE_GETREGS API support on hppa.
   * Enhanced decoding of BPF_MAP_CREATE and BPF_PROG_ATTACH bpf syscall
     commands.
   * Updated lists of BPF_* constants.
 
 * Bug fixes
   * Fixed build on csky abiv1 architecture.
+
+* Portability
+  * On hppa, linux kernel >= v4.7 is required.
+    Older versions without a decent PTRACE_GETREGS support will not work.
 
 Noteworthy changes in release 5.5 (2020-02-06)
 ==============================================

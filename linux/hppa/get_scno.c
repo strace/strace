@@ -9,5 +9,6 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	return upeek(tcp, PT_GR20, &tcp->scno) < 0 ? -1 : 1;
+	tcp->scno = hppa_regs.gr[20];
+	return 1;
 }
