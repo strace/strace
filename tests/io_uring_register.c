@@ -91,7 +91,7 @@ main(void)
 	int fds[] = { fd_full, fd_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 9 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 11 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -109,6 +109,8 @@ main(void)
 		{ 1, "IORING_UNREGISTER_BUFFERS" },
 		{ 3, "IORING_UNREGISTER_FILES" },
 		{ 5, "IORING_UNREGISTER_EVENTFD" },
+		{ 9, "IORING_REGISTER_PERSONALITY" },
+		{ 10, "IORING_UNREGISTER_PERSONALITY" },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(no_arg_ops); i++) {
