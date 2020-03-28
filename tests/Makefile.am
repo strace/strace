@@ -448,6 +448,7 @@ EXTRA_DIST = \
 	getresugid.c \
 	init.sh \
 	init_delete_module.h \
+	ioctl-success.sh \
 	ioctl_kvm_run_common.c \
 	ipc.sh \
 	kernel_old_timespec.h \
