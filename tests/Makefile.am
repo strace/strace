@@ -285,7 +285,6 @@ DECODER_TESTS = \
 	inotify_init-y.test \
 	ioctl.test \
 	ioctl_evdev-success.test \
-	ioctl_perf-success.test \
 	ipc_msgbuf.test \
 	kern_features-fault.test \
 	llseek.test \

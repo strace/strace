@@ -186,6 +186,7 @@ ioctl_mtd	+ioctl.test
 ioctl_nbd	+ioctl.test -y
 ioctl_nsfs	+ioctl.test -esignal=none
 ioctl_perf	+ioctl.test
+ioctl_perf-success +ioctl-success.sh -a35
 ioctl_ptp	+ioctl.test
 ioctl_random	+ioctl.test
 ioctl_rtc	+ioctl.test
