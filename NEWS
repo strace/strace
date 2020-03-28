@@ -92,7 +92,7 @@ Noteworthy changes in release 5.3 (2019-09-25)
   * Enhanced decoding of NETLINK_ROUTE protocol.
   * Implemented decoding of UNIX_DIAG_UID netlink attribute.
   * Implemented decoding of WDIOC_* ioctl commands.
-  * Enchanced syscall count statistics: overhead is now applied per-call,
+  * Enhanced syscall count statistics: overhead is now applied per-call,
     added ability for sorting on errors field.
   * Syscall delay injection and overhead values can now be supplied with
     time measure unit suffix and provided in IEEE 754 floating point format.
