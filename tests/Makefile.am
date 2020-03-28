@@ -111,6 +111,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	filter-unavailable \
 	fork-f \
 	fsync-y \
+	get_process_reaper \
 	getpid	\
 	getppid	\
 	gettid \

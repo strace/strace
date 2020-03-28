@@ -19,10 +19,14 @@ stat_file=/proc/self/stat
 [ -f "$stat_file" ] ||
 	framework_skip_ "$stat_file is not available"
 
+reapid="$(../get_process_reaper)" && [ "$reapid" -ge 1 ] ||
+	fail_ 'get_process_reaper failed'
+
 set -- -enone -esignal=none ../tracer_ppid_pgid_sid
 run_strace "$@" > "$OUT"
 read -r ppid pgid sid < "$OUT" &&
 [ "$ppid" -gt 1 ] &&
+[ "$ppid" -ne "$reapid" ] &&
 [ "$pgid" -ge 0 ] &&
 [ "$sid" -ge 0 ] || {
 	cat < "$OUT" > "$LOG"
@@ -35,7 +39,7 @@ sid0="$sid"
 
 run_strace -D "$@" > "$OUT"
 read -r ppid pgid sid < "$OUT" &&
-[ "$ppid" -eq 1 ] &&
+[ "$ppid" -eq "$reapid" ] &&
 [ "$pgid" = "$pgid0" ] &&
 [ "$sid" = "$sid0" ] || {
 	cat < "$OUT" > "$LOG"
@@ -45,8 +49,9 @@ match_diff
 
 run_strace -DD "$@" > "$OUT"
 read -r ppid pgid sid < "$OUT" &&
-[ "$ppid" -eq 1 ] &&
+[ "$ppid" -eq "$reapid" ] &&
 [ "$pgid" -gt 1 ] &&
+[ "$pgid" -ne "$reapid" ] &&
 [ "$pgid" != "$pgid0" ] &&
 [ "$pgid" != "$sid" ] &&
 [ "$sid" = "$sid0" ] || {
@@ -57,8 +62,9 @@ match_diff
 
 run_strace -DDD "$@" > "$OUT"
 read -r ppid pgid sid < "$OUT" &&
-[ "$ppid" -eq 1 ] &&
+[ "$ppid" -eq "$reapid" ] &&
 [ "$pgid" -gt 1 ] &&
+[ "$pgid" -ne "$reapid" ] &&
 [ "$pgid" != "$pgid0" ] &&
 [ "$sid" = "$pgid" ] &&
 [ "$sid" != "$sid0" ] || {

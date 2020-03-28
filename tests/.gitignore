@@ -134,6 +134,7 @@ ftruncate64
 futex
 futimesat
 gen_tests.am
+get_process_reaper
 get_mempolicy
 getcpu
 getcwd
