@@ -403,6 +403,12 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return false;
 	}
 
+	case SEN_spu_create:
+		/* path, x, x, maybe fd */
+		return upathmatch(tcp, tcp->u_arg[0], set) ||
+			((tcp->u_arg[1] & 0x10 /* SPU_CREATE_AFFINITY_SPU */)
+			 && fdmatch(tcp, tcp->u_arg[3], set));
+
 	case SEN_accept4:
 	case SEN_accept:
 	case SEN_bpf:

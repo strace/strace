@@ -959,6 +959,22 @@ sockopt-sol_socket-success-Xraw		-einject=getsockopt,setsockopt:retval=42 -etrac
 sockopt-sol_socket-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose
 sockopt-timestamp	-e trace=recvmsg
 splice
+spu_create-success		-einject=spu_create:retval=7 -etrace=spu_create -a23 </dev/null 7>/dev/full
+spu_create-success-Xabbrev	-einject=spu_create:retval=7 -etrace=spu_create -a23 -Xabbrev </dev/null 7>/dev/full
+spu_create-success-Xraw		-einject=spu_create:retval=7 -etrace=spu_create -a23 -Xraw </dev/null 7>/dev/full
+spu_create-success-Xverbose	-einject=spu_create:retval=7 -etrace=spu_create -a23 -Xverbose </dev/null 7>/dev/full
+spu_create-success-P		-einject=spu_create:retval=7 -etrace=spu_create -a23 -P/dev/full </dev/null 7>/dev/full
+spu_create-success-P-Xabbrev	-einject=spu_create:retval=7 -etrace=spu_create -a23 -P/dev/full -Xabbrev </dev/null 7>/dev/full
+spu_create-success-P-Xraw	-einject=spu_create:retval=7 -etrace=spu_create -a23 -P/dev/full -Xraw </dev/null 7>/dev/full
+spu_create-success-P-Xverbose	-einject=spu_create:retval=7 -etrace=spu_create -a23 -P/dev/full -Xverbose </dev/null 7>/dev/full
+spu_create-success-y		-einject=spu_create:retval=7 -etrace=spu_create -a23 -y </dev/null 7>/dev/full
+spu_create-success-y-Xabbrev	-einject=spu_create:retval=23 -etrace=spu_create -a23 -y -Xabbrev </dev/null 7>/dev/full
+spu_create-success-y-Xraw	-einject=spu_create:retval=7 -etrace=spu_create -a23 -y -Xraw </dev/null 7>/dev/full
+spu_create-success-y-Xverbose	-einject=spu_create:retval=7 -etrace=spu_create -a23 -y -Xverbose </dev/null 7>/dev/full
+spu_create-success-y-P		-einject=spu_create:retval=7 -etrace=spu_create -a23 -y -P/dev/full </dev/null 7>/dev/full
+spu_create-success-y-P-Xabbrev	-einject=spu_create:retval=23 -etrace=spu_create -a23 -y -P/dev/full -Xabbrev </dev/null 7>/dev/full
+spu_create-success-y-P-Xraw	-einject=spu_create:retval=7 -etrace=spu_create -a23 -y -P/dev/full -Xraw </dev/null 7>/dev/full
+spu_create-success-y-P-Xverbose	-einject=spu_create:retval=7 -etrace=spu_create -a23 -y -P/dev/full -Xverbose </dev/null 7>/dev/full
 stat	-a30 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 stat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 statfs	-a17

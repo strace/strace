@@ -339,6 +339,7 @@ libstrace_a_SOURCES =	\
 	socketcall.c \
 	socketutils.c	\
 	sparc.c		\
+	spu.c		\
 	sram_alloc.c	\
 	stage_output.c	\
 	stat.c		\
