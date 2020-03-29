@@ -312,6 +312,7 @@ strace_SOURCES =	\
 	sockaddr.c	\
 	socketutils.c	\
 	sparc.c		\
+	spu.c		\
 	sram_alloc.c	\
 	stat.c		\
 	stat.h		\
