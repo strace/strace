@@ -278,6 +278,9 @@ $STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
 $STRACE_EXE: $umsg" -u :nosuchuser: ${c%%/*} true
 	done
 
+	check_e "-S/--summary-sort-by has no effect without (-c/--summary-only or -C/--summary)
+$STRACE_EXE: $umsg" -u :nosuchuser: --summary-sort-by errors true
+
 	check_e "--output-separately has no effect without -o/--output
 $STRACE_EXE: -A/--output-append-mode has no effect without -o/--output
 $STRACE_EXE: $umsg" -u :nosuchuser: --output-separately --output-append-mode true

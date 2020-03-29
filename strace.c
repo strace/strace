@@ -1854,6 +1854,7 @@ init(int argc, char *argv[])
 	bool tflag_long_set = false;
 	int tflag_short = 0;
 	bool columns_set = false;
+	bool sortby_set = false;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -2088,6 +2089,7 @@ init(int argc, char *argv[])
 			break;
 		case 'S':
 			set_sortby(optarg);
+			sortby_set = true;
 			break;
 		case 't':
 			tflag_short++;
@@ -2310,6 +2312,11 @@ init(int argc, char *argv[])
 	if (columns_set && !cflag) {
 		error_msg_and_help("-U/--summary-columns must be given with"
 				   " (-c/--summary-only or -C/--summary)");
+	}
+
+	if (sortby_set && !cflag) {
+		error_msg("-S/--summary-sort-by has no effect without"
+			  " (-c/--summary-only or -C/--summary)");
 	}
 
 	if (cflag == CFLAG_ONLY_STATS) {
