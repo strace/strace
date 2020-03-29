@@ -9,29 +9,31 @@
 
 #include "tests.h"
 
+
+#include <assert.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+
 #ifdef HAVE_LINUX_PERF_EVENT_H
-
-# include <assert.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <sys/ioctl.h>
 # include <linux/perf_event.h>
+#endif
 
-# ifndef PERF_EVENT_IOC_ID
-#  define PERF_EVENT_IOC_ID			_IOR('$', 7, void *)
-# endif
+#ifndef PERF_EVENT_IOC_ID
+# define PERF_EVENT_IOC_ID			_IOR('$', 7, void *)
+#endif
 
-# ifndef PERF_EVENT_IOC_QUERY_BPF
-#  define PERF_EVENT_IOC_QUERY_BPF		_IOWR('$', 10, void *)
+#ifndef PERF_EVENT_IOC_QUERY_BPF
+# define PERF_EVENT_IOC_QUERY_BPF		_IOWR('$', 10, void *)
 
 struct perf_event_query_bpf {
         uint32_t ids_len;
         uint32_t prog_cnt;
         uint32_t ids[0];
 };
-# endif
+#endif
 
 int
 main(int argc, char **argv)
@@ -137,9 +139,3 @@ main(int argc, char **argv)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_PERF_EVENT_H");
-
-#endif
