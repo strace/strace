@@ -799,7 +799,6 @@ EXTRA_DIST =				\
 	linux/sh/get_error.c		\
 	linux/sh/get_scno.c		\
 	linux/sh/get_syscall_args.c	\
-	linux/sh/get_syscall_result.c	\
 	linux/sh/ioctls_arch0.h		\
 	linux/sh/ioctls_inc0.h		\
 	linux/sh/raw_syscall.h		\

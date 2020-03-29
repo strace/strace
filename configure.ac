@@ -169,7 +169,6 @@ sh64*)
 	;;
 sh*)
 	arch=sh
-	arch_enable_Werror=no
 	AC_DEFINE([SH], 1, [Define for the SH architecture.])
 	;;
 sparc64*)
