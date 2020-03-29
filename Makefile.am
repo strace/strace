@@ -947,7 +947,6 @@ EXTRA_DIST =				\
 	linux/xtensa/get_error.c	\
 	linux/xtensa/get_scno.c		\
 	linux/xtensa/get_syscall_args.c	\
-	linux/xtensa/get_syscall_result.c	\
 	linux/xtensa/ioctls_arch0.h	\
 	linux/xtensa/ioctls_inc0.h	\
 	linux/xtensa/raw_syscall.h	\

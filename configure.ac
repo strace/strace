@@ -198,7 +198,6 @@ x86?64*)
 	;;
 xtensa*)
 	arch=xtensa
-	arch_enable_Werror=no
 	AC_DEFINE([XTENSA], 1, [Define for the Xtensa architecture])
 	;;
 *)
