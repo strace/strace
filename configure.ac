@@ -164,7 +164,6 @@ s390x)
 	;;
 sh64*)
 	arch=sh64
-	arch_enable_Werror=no
 	AC_DEFINE([SH64], 1, [Define for the SH64 architecture.])
 	;;
 sh*)

@@ -809,11 +809,9 @@ EXTRA_DIST =				\
 	linux/sh/userent0.h		\
 	linux/sh64/arch_defs_.h		\
 	linux/sh64/arch_regs.c		\
-	linux/sh64/arch_regs.h		\
 	linux/sh64/get_error.c		\
 	linux/sh64/get_scno.c		\
 	linux/sh64/get_syscall_args.c	\
-	linux/sh64/get_syscall_result.c	\
 	linux/sh64/ioctls_arch0.h	\
 	linux/sh64/ioctls_inc0.h	\
 	linux/sh64/raw_syscall.h	\

@@ -9,8 +9,6 @@
 static int
 arch_get_scno(struct tcb *tcp)
 {
-	if (upeek(tcp, REG_SYSCALL, &tcp->scno) < 0)
-		return -1;
-	tcp->scno &= 0xffff;
+	tcp->scno = sh64_regs.regs[9];
 	return 1;
 }
