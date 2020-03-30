@@ -590,6 +590,17 @@ printed:
 	}
 }
 
+void
+print_pid_fd(struct tcb *tcp, pid_t pid, int fd)
+{
+	/*
+	 * TODO: We want to have the same formatting as printfd here,
+	 *       but we should figure out first which process in strace's
+	 *       PID NS is referred to by pid in tracee's PID NS.
+	 */
+	tprintf("%d", fd);
+}
+
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.

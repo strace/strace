@@ -16,20 +16,10 @@ struct strace_kcmp_epoll_slot {
 	uint32_t toff;
 };
 
-static void
-printpidfd(struct tcb *tcp, pid_t pid, int fd)
-{
-	/*
-	 * XXX We want to use printfd here, but we should figure out which
-	 *     process in strace's PID NS is referred to first.
-	 */
-	tprintf("%d", fd);
-}
-
 #define PRINT_FIELD_PIDFD(prefix_, where_, field_, tcp_, pid_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpidfd((tcp_), (pid_), (where_).field_);		\
+		print_pid_fd((tcp_), (pid_), (where_).field_);		\
 	} while (0)
 
 SYS_FUNC(kcmp)
@@ -46,9 +36,9 @@ SYS_FUNC(kcmp)
 	switch (type) {
 		case KCMP_FILE:
 			tprints(", ");
-			printpidfd(tcp, pid1, idx1);
+			print_pid_fd(tcp, pid1, idx1);
 			tprints(", ");
-			printpidfd(tcp, pid1, idx2);
+			print_pid_fd(tcp, pid1, idx2);
 
 			break;
 
@@ -56,7 +46,7 @@ SYS_FUNC(kcmp)
 			struct strace_kcmp_epoll_slot slot;
 
 			tprints(", ");
-			printpidfd(tcp, pid1, idx1);
+			print_pid_fd(tcp, pid1, idx1);
 			tprints(", ");
 
 			if (umove_or_printaddr(tcp, idx2, &slot))
