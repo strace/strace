@@ -439,6 +439,16 @@ open
 open_tree
 open_tree-P
 openat
+openat2
+openat2-Xabbrev
+openat2-Xraw
+openat2-Xverbose
+openat2-v
+openat2-v-y
+openat2-v-y-Xabbrev
+openat2-v-y-Xraw
+openat2-v-y-Xverbose
+openat2-y
 orphaned_process_group
 osf_utimes
 pause
