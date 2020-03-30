@@ -236,6 +236,7 @@ strace_SOURCES =	\
 	perf_event_struct.h \
 	perf_ioctl.c	\
 	personality.c	\
+	pidfd_getfd.c	\
 	pidfd_open.c	\
 	pkeys.c		\
 	poll.c		\

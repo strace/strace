@@ -412,6 +412,8 @@ perf_event_open_unabbrev	-a1 -v -e trace=perf_event_open
 personality-Xabbrev	+personality.test -Xabbrev
 personality-Xraw	+personality.test -a15 -Xraw
 personality-Xverbose	+personality.test -Xverbose
+pidfd_getfd	-a18 -Xverbose </dev/full
+pidfd_getfd-y	--trace=pidfd_getfd -a18 -y </dev/full
 pidfd_open	-a17
 pidfd_open--decode-fd-path	-a17 -e decode-fd=path -e trace=pidfd_open
 pidfd_open-P	-a17 -P /dev/full -e trace=pidfd_open

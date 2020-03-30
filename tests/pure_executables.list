@@ -372,6 +372,8 @@ personality
 personality-Xabbrev
 personality-Xraw
 personality-Xverbose
+pidfd_getfd
+pidfd_getfd-y
 pidfd_open
 pidfd_open--decode-fd-path
 pidfd_open-P
