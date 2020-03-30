@@ -960,6 +960,49 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	return rc;
 }
 
+bool
+print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+		    const kernel_ulong_t start_addr,
+		    const unsigned int start_offs,
+		    const unsigned int total_len,
+		    const unsigned int style)
+{
+	if (start_offs >= total_len)
+		return false;
+
+	const kernel_ulong_t addr = start_addr + start_offs;
+	const unsigned int len = total_len - start_offs;
+	const unsigned int size = MIN(len, max_strlen);
+
+	char *str = malloc(len);
+
+	if (!str) {
+		error_func_msg("memory exhausted when tried to allocate"
+                               " %u bytes", len);
+		tprintf("%s???", prefix);
+		return true;
+	}
+
+	bool ret = true;
+
+	if (umoven(tcp, addr, len, str)) {
+		tprintf("%s???", prefix);
+	} else if (is_filled(str, 0, len)) {
+		ret = false;
+	} else {
+		tprints(prefix);
+		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+
+		print_quoted_string(str, size, style);
+
+		if (size < len)
+			tprints("...");
+	}
+
+	free(str);
+	return ret;
+}
+
 void
 dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 	     kernel_ulong_t data_size)

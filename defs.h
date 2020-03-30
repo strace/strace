@@ -989,6 +989,35 @@ extern int
 printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
 	    unsigned int user_style);
 
+/**
+ * Print a region of tracee memory only in case non-zero bytes are present
+ * there.  It almost fits into printstr_ex, but it has some pretty specific
+ * behaviour peculiarities (like printing of ellipsis on error) to readily
+ * integrate it there.
+ *
+ * Since it is expected to be used for printing tail of a structure in tracee's
+ * memory, it accepts a combination of start_addr/start_offs/total_len and does
+ * the relevant calculations itself.
+ *
+ * @param prefix     A string printed in cases something is going to be printed.
+ * @param start_addr Address of the beginning of a structure (whose tail
+ *                   is supposedly to be printed) in tracee's memory.
+ * @param start_offs Offset from the beginning of the structure where the tail
+ *                   data starts.
+ * @param total_len  Total size of the tracee's memory region containing
+ *                   the structure and the tail data.
+ *                   Caller is responsible for imposing a sensible (usually
+ *                   mandated by the kernel interface, like get_pagesize())
+ *                   limit here.
+ * @param style      Passed to string_quote as "style" parameter.
+ * @return           Returns true is anything was printed, false otherwise.
+ */
+extern bool print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+				const kernel_ulong_t start_addr,
+				const unsigned int start_offs,
+				const unsigned int total_len,
+				const unsigned int style);
+
 extern int
 printpathn(struct tcb *, kernel_ulong_t addr, unsigned int n);
 
