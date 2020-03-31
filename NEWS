@@ -37,6 +37,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implement HIDIOCGRAWUNIQ() ioctl command number printing.
   * Updated lists of AUDIT_*, BPF_*, CLONE_*, GRND_*, IFLA_*, IORING_*,
     IPPROTO_*, KEY_*, KVM_*, RTM_F_*, SCHED_*, and *_MAGIC constants.
+  * Updated lists of ioctl commands from Linux 5.6.
 
 * Bug fixes
   * Fixed build on csky abiv1 architecture.
