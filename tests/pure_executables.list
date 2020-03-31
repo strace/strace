@@ -124,7 +124,9 @@ getsid
 getsockname
 getuid
 getuid32
-getxxid
+getxgid
+getxpid
+getxuid
 group_req
 inet-cmsg
 init_module

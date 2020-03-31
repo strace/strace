@@ -146,7 +146,9 @@ gettid	-a9
 getuid-creds	+getuid.test
 getuid32	+getuid.test
 getuid32-creds	+getuid.test
-getxxid	-a10 -e trace=getxpid,getxuid,getxgid
+getxgid	-a10
+getxpid	-a10
+getxuid	-a10
 group_req	-e trace=setsockopt
 inet-cmsg	-e trace=recvmsg
 init_module	-a27
