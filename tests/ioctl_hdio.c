@@ -102,7 +102,6 @@ main(int argc, char *argv[])
 		{ ARG_STR(HDIO_DRIVE_RESET) },
 		{ ARG_STR(HDIO_DRIVE_TASKFILE) },
 		{ ARG_STR(HDIO_DRIVE_TASK) },
-		{ ARG_STR(HDIO_DRIVE_CMD) },
 		{ ARG_STR(HDIO_SET_MULTCOUNT) },
 		{ ARG_STR(HDIO_SET_UNMASKINTR) },
 		{ ARG_STR(HDIO_SET_KEEPSETTINGS) },
@@ -159,6 +158,69 @@ main(int argc, char *argv[])
 		printf("%p", p_hd_geom);
 	}
 	printf(") = %s\n", errstr);
+
+	/* HDIO_DRIVE_CMD */
+	do_ioctl(HDIO_DRIVE_CMD, 0);
+	printf("ioctl(-1, %s, NULL) = %s\n",
+	       XLAT_STR(HDIO_DRIVE_CMD), errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct hd_drive_cmd_hdr, p_hd_drive_cmd);
+	struct hd_drive_cmd_hdr *p_hd_drive_cmd2 =
+		tail_alloc(sizeof(*p_hd_drive_cmd2) + 16);
+	struct hd_drive_cmd_hdr *p_hd_drive_cmd3 =
+		tail_alloc(sizeof(*p_hd_drive_cmd3) + DEFAULT_STRLEN + 1);
+
+	fill_memory(p_hd_drive_cmd2, sizeof(*p_hd_drive_cmd2) + 16);
+	fill_memory(p_hd_drive_cmd3,
+		    sizeof(*p_hd_drive_cmd3) + DEFAULT_STRLEN + 1);
+
+	p_hd_drive_cmd->command = 0xca;
+	p_hd_drive_cmd->sector_number = 0xff;
+	p_hd_drive_cmd->feature = 0xee;
+	p_hd_drive_cmd->sector_count = 0;
+
+	do_ioctl_ptr(HDIO_DRIVE_CMD, (char *) p_hd_drive_cmd + 1);
+	printf("ioctl(-1, %s, %p) = %s\n",
+	       XLAT_STR(HDIO_DRIVE_CMD), (char *) p_hd_drive_cmd + 1, errstr);
+
+	for (size_t i = 0; i < 2; i++) {
+		p_hd_drive_cmd->sector_count = i;
+
+		rc = do_ioctl_ptr(HDIO_DRIVE_CMD, p_hd_drive_cmd);
+		printf("ioctl(-1, %s, {command=" XLAT_FMT ", sector_number=255"
+		       ", feature=238, sector_count=%zu",
+		       XLAT_STR(HDIO_DRIVE_CMD),
+		       XLAT_SEL(0xca, "ATA_CMD_WRITE"), i);
+		if (rc >= 0) {
+			printf("} => {/* status */ 0xca, /* error */ 255"
+			       ", /* nsector */ 238");
+			if (i)
+				printf(", %p", p_hd_drive_cmd + 1);
+		}
+		printf("}) = %s\n", errstr);
+	}
+
+	rc = do_ioctl_ptr(HDIO_DRIVE_CMD, p_hd_drive_cmd2);
+	printf("ioctl(-1, %s, {command=0x80" NRAW(" /* ATA_CMD_??? */")
+	       ", sector_number=129, feature=130, sector_count=131",
+	       XLAT_STR(HDIO_DRIVE_CMD));
+	if (rc >= 0) {
+		printf("} => {/* status */ 0x80, /* error */ 129"
+		       ", /* nsector */ 130, %p", p_hd_drive_cmd2 + 1);
+	}
+	printf("}) = %s\n", errstr);
+
+	rc = do_ioctl_ptr(HDIO_DRIVE_CMD, p_hd_drive_cmd3);
+	printf("ioctl(-1, %s, {command=0x80" NRAW(" /* ATA_CMD_??? */")
+	       ", sector_number=129, feature=130, sector_count=131",
+	       XLAT_STR(HDIO_DRIVE_CMD));
+	if (rc >= 0) {
+		printf("} => {/* status */ 0x80, /* error */ 129"
+		       ", /* nsector */ 130, ");
+		print_quoted_hex(p_hd_drive_cmd3 + 1, DEFAULT_STRLEN);
+		printf("...");
+	}
+	printf("}) = %s\n", errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
