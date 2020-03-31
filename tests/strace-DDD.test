@@ -10,6 +10,8 @@
 . "${srcdir=.}/init.sh"
 
 check_prog sed
+run_prog_skip_if_failed \
+	kill -0 $$
 
 status_file=/proc/self/status
 [ -f "$status_file" ] ||
@@ -24,7 +26,9 @@ reapid="$(../get_process_reaper)" && [ "$reapid" -ge 1 ] ||
 
 set -- -enone -esignal=none ../tracer_ppid_pgid_sid
 run_strace "$@" > "$OUT"
-read -r ppid pgid sid < "$OUT" &&
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
 [ "$ppid" -gt 1 ] &&
 [ "$ppid" -ne "$reapid" ] &&
 [ "$pgid" -ge 0 ] &&
@@ -38,17 +42,24 @@ pgid0="$pgid"
 sid0="$sid"
 
 run_strace -D "$@" > "$OUT"
-read -r ppid pgid sid < "$OUT" &&
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
 [ "$ppid" -eq "$reapid" ] &&
 [ "$pgid" = "$pgid0" ] &&
 [ "$sid" = "$sid0" ] || {
 	cat < "$OUT" > "$LOG"
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 }
+while kill -0 "$tracer_pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+done
 match_diff
 
 run_strace -DD "$@" > "$OUT"
-read -r ppid pgid sid < "$OUT" &&
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
 [ "$ppid" -eq "$reapid" ] &&
 [ "$pgid" -gt 1 ] &&
 [ "$pgid" -ne "$reapid" ] &&
@@ -58,10 +69,15 @@ read -r ppid pgid sid < "$OUT" &&
 	cat < "$OUT" > "$LOG"
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 }
+while kill -0 "$tracer_pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+done
 match_diff
 
 run_strace -DDD "$@" > "$OUT"
-read -r ppid pgid sid < "$OUT" &&
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
 [ "$ppid" -eq "$reapid" ] &&
 [ "$pgid" -gt 1 ] &&
 [ "$pgid" -ne "$reapid" ] &&
@@ -71,4 +87,7 @@ read -r ppid pgid sid < "$OUT" &&
 	cat < "$OUT" > "$LOG"
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 }
+while kill -0 "$tracer_pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+done
 match_diff

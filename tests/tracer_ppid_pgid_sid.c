@@ -86,7 +86,7 @@ main(void)
 
 	int ppid = 0, pgid = 0, sid = 0;
 	get_ppid_pgid_sid(tracer_pid, &ppid, &pgid, &sid);
-	printf("%d %d %d\n", ppid, pgid, sid);
+	printf("%d %d %d %d\n", tracer_pid, ppid, pgid, sid);
 
 	return 0;
 }
