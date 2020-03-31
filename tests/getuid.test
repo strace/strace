@@ -9,14 +9,25 @@
 
 . "${srcdir=.}/init.sh"
 
+check_prog grep
 check_prog uniq
+
 if [ "${NAME%-creds}" = "$NAME" ]; then
 	syscall="$NAME"
 else
 	NAME="${NAME%-creds}"
 	syscall='%creds'
 fi
+
 run_prog > /dev/null
 run_strace -qq -a9 -e"$syscall" $args > "$EXP"
-uniq < "$LOG" > "$OUT"
+
+case "$STRACE_ARCH:$syscall" in
+	mips:%creds)
+		grep -Fxv 'prctl(PR_GET_FP_MODE) = 0' < "$LOG" | uniq > "$OUT"
+		;;
+	*)	uniq < "$LOG" > "$OUT"
+		;;
+esac
+
 match_diff "$OUT" "$EXP"
