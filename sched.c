@@ -13,6 +13,8 @@
 #include <sched.h>
 #include "sched_attr.h"
 
+#include "print_fields.h"
+
 #include "xlat/schedulers.h"
 #include "xlat/sched_flags.h"
 
@@ -94,6 +96,7 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct sched_attr attr = {};
 	unsigned int size;
+	bool is_set = false;
 
 	if (usize) {
 		/* called from sched_getattr */
@@ -104,6 +107,8 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		size = attr.size;
 	} else {
 		/* called from sched_setattr */
+		is_set = true;
+
 		if (umove_or_printaddr(tcp, addr, &attr.size))
 			return;
 		usize = attr.size;
@@ -116,26 +121,38 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		}
 	}
 
-	tprintf("{size=%u", attr.size);
+	PRINT_FIELD_U("{", attr, size);
 
-	if (size >= SCHED_ATTR_MIN_SIZE) {
-		tprints(", sched_policy=");
-		printxval(schedulers, attr.sched_policy, "SCHED_???");
-		tprints(", sched_flags=");
-		printflags64(sched_flags, attr.sched_flags, "SCHED_FLAG_???");
+	if (size < SCHED_ATTR_MIN_SIZE)
+		goto end;
 
-#define PRINT_SCHED_FIELD(field, fmt)			\
-		tprintf(", " #field "=%" fmt, attr.field)
+	if (!is_set
+	    || (int) attr.sched_policy < 0
+	    || !(attr.sched_flags & (SCHED_FLAG_KEEP_POLICY
+				     | SCHED_FLAG_KEEP_PARAMS)))
+		PRINT_FIELD_XVAL(", ", attr, sched_policy, schedulers,
+				 "SCHED_???");
+	PRINT_FIELD_FLAGS(", ", attr, sched_flags, sched_flags,
+			  "SCHED_FLAG_???");
 
-		PRINT_SCHED_FIELD(sched_nice, "d");
-		PRINT_SCHED_FIELD(sched_priority, "u");
-		PRINT_SCHED_FIELD(sched_runtime, PRIu64);
-		PRINT_SCHED_FIELD(sched_deadline, PRIu64);
-		PRINT_SCHED_FIELD(sched_period, PRIu64);
 
-		if (usize > size)
-			tprints(", ...");
+	if (!is_set || !(attr.sched_flags & SCHED_FLAG_KEEP_PARAMS)) {
+		PRINT_FIELD_D(", ", attr, sched_nice);
+		PRINT_FIELD_U(", ", attr, sched_priority);
+		PRINT_FIELD_U(", ", attr, sched_runtime);
+		PRINT_FIELD_U(", ", attr, sched_deadline);
+		PRINT_FIELD_U(", ", attr, sched_period);
 	}
+
+	if (size < SCHED_ATTR_SIZE_VER1)
+		goto end;
+
+	PRINT_FIELD_U(", ", attr, sched_util_min);
+	PRINT_FIELD_U(", ", attr, sched_util_max);
+
+end:
+	if ((is_set ? usize : attr.size) > size)
+		tprints(", ...");
 
 	tprints("}");
 }

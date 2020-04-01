@@ -127,7 +127,7 @@ ts_sub(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 }
 
 void
-ts_div(struct timespec *tv, const struct timespec *a, int n)
+ts_div(struct timespec *tv, const struct timespec *a, uint64_t n)
 {
 	long long nsec = (a->tv_sec % n * 1000000000LL + a->tv_nsec + n / 2) / n;
 	tv->tv_sec = a->tv_sec / n + nsec / 1000000000;
@@ -135,7 +135,7 @@ ts_div(struct timespec *tv, const struct timespec *a, int n)
 }
 
 void
-ts_mul(struct timespec *tv, const struct timespec *a, int n)
+ts_mul(struct timespec *tv, const struct timespec *a, uint64_t n)
 {
 	long long nsec = a->tv_nsec * n;
 	tv->tv_sec = a->tv_sec * n + nsec / 1000000000;
@@ -590,6 +590,17 @@ printed:
 	}
 }
 
+void
+print_pid_fd(struct tcb *tcp, pid_t pid, int fd)
+{
+	/*
+	 * TODO: We want to have the same formatting as printfd here,
+	 *       but we should figure out first which process in strace's
+	 *       PID NS is referred to by pid in tracee's PID NS.
+	 */
+	tprintf("%d", fd);
+}
+
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
@@ -950,7 +961,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	 */
 	ellipsis = string_quote(str, outstr, size, style, NULL)
 		   && len
-		   && ((style & QUOTE_0_TERMINATED)
+		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 		       || len > max_strlen);
 
 	tprints(outstr);
@@ -958,6 +969,49 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprints("...");
 
 	return rc;
+}
+
+bool
+print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+		    const kernel_ulong_t start_addr,
+		    const unsigned int start_offs,
+		    const unsigned int total_len,
+		    const unsigned int style)
+{
+	if (start_offs >= total_len)
+		return false;
+
+	const kernel_ulong_t addr = start_addr + start_offs;
+	const unsigned int len = total_len - start_offs;
+	const unsigned int size = MIN(len, max_strlen);
+
+	char *str = malloc(len);
+
+	if (!str) {
+		error_func_msg("memory exhausted when tried to allocate"
+                               " %u bytes", len);
+		tprintf("%s???", prefix);
+		return true;
+	}
+
+	bool ret = true;
+
+	if (umoven(tcp, addr, len, str)) {
+		tprintf("%s???", prefix);
+	} else if (is_filled(str, 0, len)) {
+		ret = false;
+	} else {
+		tprints(prefix);
+		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+
+		print_quoted_string(str, size, style);
+
+		if (size < len)
+			tprints("...");
+	}
+
+	free(str);
+	return ret;
 }
 
 void

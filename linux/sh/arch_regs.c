@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-static unsigned long sh_r0;
-#define ARCH_PC_PEEK_ADDR (4 * REG_PC)
-#define ARCH_SP_PEEK_ADDR (4 * 15)
+static struct pt_regs sh_regs;
+#define ARCH_REGS_FOR_GETREGS sh_regs
+#define ARCH_PC_REG sh_regs.pc
+#define ARCH_SP_REG sh_regs.regs[15]

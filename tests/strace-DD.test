@@ -12,23 +12,53 @@
 [ "$STRACE" = "$STRACE_EXE" ] ||
 	skip_ 'Not applicable: $STRACE != $STRACE_EXE'
 
+run_prog_skip_if_failed \
+        kill -0 $$
+
+status_file=/proc/self/status
+get_tracer_pid()
+{
+	sed '/^TracerPid:[[:space:]]*/!d;s///' "$@"
+}
+[ "$(get_tracer_pid "$status_file")" -ge 0 ] ||
+        framework_skip_ "$status_file is not available"
+
 check_prog timeout
 run_prog ../sleep 0
 
 test_D()
 {
-	local exp args
+	local exp args tracee_pid tracer_pid rc
 	exp="$1"; shift
 
-	set -- -e signal=none -e trace=nanosleep "$@" ../sleep 2
+	set -- -e signal=none -e trace=nanosleep "$@" -- \
+		sh -c 'echo $$ > tracee_pid && exec ../sleep 2'
 	args="$*"
 	set -- timeout -s XCPU 1 $STRACE -o "$LOG" "$@"
 	> "$LOG"
-	"$@" && rc=0 || rc=$?
+	> tracee_pid
+
+	"$@" &
+
+	while [ ! -s tracee_pid ]; do
+		kill -0 $! ||
+			break
+	done
+	tracee_pid="$(cat tracee_pid)"
+
+	while tracer_pid="$(get_tracer_pid "/proc/$tracee_pid/status")"; do
+		[ "$tracer_pid" = 0 ] ||
+			break
+	done
+
+	wait $! && rc=0 || rc=$?
 	[ "$rc" = 124 ] ||
 		dump_log_and_fail_with \
 			"$* failed with unexpected exit code $rc"
-	$SLEEP_A_BIT
+
+	while kill -0 "$tracer_pid" 2> /dev/null; do
+		$SLEEP_A_BIT
+	done
 	match_diff "$LOG" "$exp"
 }
 

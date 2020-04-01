@@ -347,7 +347,6 @@ main(void)
 	/* bridge attrs */
 	static const struct val_name und_br_attrs[] = {
 		{ 0, "IFLA_BR_UNSPEC" },
-		{ 20, "IFLA_BR_GROUP_ADDR" },
 		{ 21, "IFLA_BR_FDB_FLUSH" },
 		{ 40, "IFLA_BR_PAD" },
 		{ 47, "0x2f /* IFLA_BR_??? */" },
@@ -365,6 +364,21 @@ main(void)
 					"\\x63\\x64\"" },
 				     { 10, "\"\\xab\\xac\\xdb\\xcd\\x61\\x62"
 					"\\x63\\x64\\x65\\x66\"" });
+	}
+
+	static const struct val_name hwa_br_attrs[] = {
+		{ 20, "IFLA_BR_GROUP_ADDR" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(hwa_br_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+				     hwa_br_attrs[k].val, hwa_br_attrs[k].name,
+				     unknown_msg, pattern,
+				     { 2, "ab:ac" },
+				     { 4, "ab:ac:db:cd" },
+				     { 6, "ab:ac:db:cd:61:62" },
+				     { 8, "ab:ac:db:cd:61:62:63:64" },
+				     { 10, "ab:ac:db:cd:61:62:63:64:65:66" });
 	}
 
 	static const struct val_name u64_br_attrs[] = {

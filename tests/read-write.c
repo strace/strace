@@ -270,9 +270,11 @@ main(void)
 	if (open("/dev/null", O_WRONLY) != 1)
 		perror_msg_and_fail("open");
 
+	(void) close(4);
 	if (open("/dev/zero", O_RDONLY) != 4)
 		perror_msg_and_fail("open");
 
+	(void) close(5);
 	if (open("/dev/null", O_WRONLY) != 5)
 		perror_msg_and_fail("open");
 

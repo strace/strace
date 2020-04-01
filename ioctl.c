@@ -13,6 +13,29 @@
 #include <linux/ioctl.h>
 #include "xlat/ioctl_dirs.h"
 
+#if defined(SPARC) || defined(SPARC64)
+/*
+ * While Alpha, MIPS, PA-RISC, and POWER simply define _IOC_SIZEBITS to 13
+ * and utilise 3 bits for _IOC_DIRBITS, SPARC tries to provide 14 bits
+ * for the size field ("as on i386") by (ab)using the lowest direction bit.
+ * Unfortunately, while doing so, they decide to define _IOC_SIZE to 0
+ * when the direction doesn't have _IOC_READ/_IOC_WRITE bits set, which
+ * breaks the invariant
+ *
+ *     _IOC_SIZE(_IOC(dir, type, nr, size)) == size
+ *
+ * for _IOC_DIR(val) that doesn't include _IOC_READ or _IOC_WRITE, which
+ * is unacceptable for strace's use case.
+ * So, let's redefine _IOC_SIZE in a way that is more suitable for us.
+ */
+# undef _IOC_SIZE
+# define _IOC_SIZE(nr)						\
+	((_IOC_DIR(nr) & (_IOC_WRITE | _IOC_READ))		\
+		? (((nr) >> _IOC_SIZESHIFT) & _IOC_XSIZEMASK)	\
+		: (((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK))	\
+	/* end of _IOC_SIZE definition */
+#endif
+
 static int
 compare(const void *a, const void *b)
 {

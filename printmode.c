@@ -47,6 +47,12 @@ print_numeric_umode_t(const unsigned short mode)
 }
 
 void
+print_numeric_umode_t_64(const uint64_t mode)
+{
+	tprintf("%#03" PRIo64, mode);
+}
+
+void
 print_numeric_long_umask(const unsigned long mode)
 {
 	tprintf("%#03lo", mode);

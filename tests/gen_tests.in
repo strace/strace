@@ -146,7 +146,9 @@ gettid	-a9
 getuid-creds	+getuid.test
 getuid32	+getuid.test
 getuid32-creds	+getuid.test
-getxxid	-a10 -e trace=getxpid,getxuid,getxgid
+getxgid	-a10
+getxpid	-a10
+getxuid	-a10
 group_req	-e trace=setsockopt
 inet-cmsg	-e trace=recvmsg
 init_module	-a27
@@ -186,6 +188,7 @@ ioctl_mtd	+ioctl.test
 ioctl_nbd	+ioctl.test -y
 ioctl_nsfs	+ioctl.test -esignal=none
 ioctl_perf	+ioctl.test
+ioctl_perf-success +ioctl-success.sh -a35
 ioctl_ptp	+ioctl.test
 ioctl_random	+ioctl.test
 ioctl_rtc	+ioctl.test
@@ -196,6 +199,21 @@ ioctl_sg_io_v4	+ioctl.test
 ioctl_sock_gifconf	+ioctl.test -a28 -s1
 ioctl_uffdio	+ioctl.test
 ioctl_v4l2	+ioctl.test
+ioctl_v4l2-Xabbrev	+ioctl.test -Xabbrev
+ioctl_v4l2-Xraw	+ioctl.test -Xraw
+ioctl_v4l2-Xverbose	+ioctl.test -Xverbose
+ioctl_v4l2-v	+ioctl.test -v
+ioctl_v4l2-v-Xabbrev	+ioctl.test -v -Xabbrev
+ioctl_v4l2-v-Xraw	+ioctl.test -v -Xraw
+ioctl_v4l2-v-Xverbose	+ioctl.test -v -Xverbose
+ioctl_v4l2-success	+ioctl-success.sh -a29
+ioctl_v4l2-success-Xabbrev	+ioctl-success.sh -a29 -Xabbrev
+ioctl_v4l2-success-Xraw	+ioctl-success.sh -a27 -Xraw
+ioctl_v4l2-success-Xverbose	+ioctl-success.sh -a30 -Xverbose
+ioctl_v4l2-success-v	+ioctl-success.sh -a29 -v
+ioctl_v4l2-success-v-Xabbrev	+ioctl-success.sh -a29 -v -Xabbrev
+ioctl_v4l2-success-v-Xraw	+ioctl-success.sh -a27 -v -Xraw
+ioctl_v4l2-success-v-Xverbose	+ioctl-success.sh -a29 -v -Xverbose
 ioctl_watchdog	+ioctl.test
 ioperm	-a27
 iopl	-a8
@@ -377,6 +395,16 @@ open	-a30 -P $NAME.sample
 open_tree -a30 -y
 open_tree-P -a30 --decode-fds -P /dev/full -e trace=open_tree
 openat	-a36 -P $NAME.sample
+openat2	-a35
+openat2-Xabbrev	--trace=openat2 -a35 -Xabbrev
+openat2-Xraw	--trace=openat2 -a32 -Xraw
+openat2-Xverbose	--trace=openat2 -a35 -Xverbose
+openat2-v	--trace=openat2 -a35 -v
+openat2-v-y	--trace=openat2 -a36 -v -y </dev/full
+openat2-v-y-Xabbrev	--trace=openat2 -a35 -v -y -Xabbrev </dev/full
+openat2-v-y-Xraw	--trace=openat2 -a32 -v -y -Xraw </dev/full
+openat2-v-y-Xverbose	--trace=openat2 -a44 -v -y -Xverbose </dev/full
+openat2-y	--trace=openat2 -a36 -y </dev/full
 orphaned_process_group	. "${srcdir=.}/PTRACE_SEIZE.sh"; run_strace_match_diff -f -e trace=none -e signal='!chld'
 osf_utimes	-a21
 pause	-a8 -esignal=none
@@ -386,6 +414,8 @@ perf_event_open_unabbrev	-a1 -v -e trace=perf_event_open
 personality-Xabbrev	+personality.test -Xabbrev
 personality-Xraw	+personality.test -a15 -Xraw
 personality-Xverbose	+personality.test -Xverbose
+pidfd_getfd	-a18 -Xverbose </dev/full
+pidfd_getfd-y	--trace=pidfd_getfd -a18 -y </dev/full
 pidfd_open	-a17
 pidfd_open--decode-fd-path	-a17 -e decode-fd=path -e trace=pidfd_open
 pidfd_open-P	-a17 -P /dev/full -e trace=pidfd_open

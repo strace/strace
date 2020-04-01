@@ -9,7 +9,7 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_getxpid && defined __NR_getxuid && defined __NR_getxgid
+#ifdef __NR_getxpid
 
 # include <stdio.h>
 # include <unistd.h>
@@ -17,19 +17,11 @@
 int
 main(void)
 {
-	long id;
-	pid_t ppid;
+	long id = syscall(__NR_getxpid);
+	pid_t ppid = getppid();
 
-	id = syscall(__NR_getxpid);
-	ppid = getppid();
 	printf("getxpid() = %ld (ppid %ld)\n", id, (long) ppid);
 	printf("getxpid() = %ld (ppid %ld)\n", id, (long) ppid);
-
-	id = syscall(__NR_getxuid);
-	printf("getxuid() = %ld (euid %ld)\n", id, id);
-
-	id = syscall(__NR_getxgid);
-	printf("getxgid() = %ld (egid %ld)\n", id, id);
 
 	puts("+++ exited with 0 +++");
 	return 0;
@@ -37,6 +29,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_getxpid && __NR_getxuid && __NR_getxgid")
+SKIP_MAIN_UNDEFINED("__NR_getxpid")
 
 #endif

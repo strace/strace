@@ -36,13 +36,13 @@ const struct_sysent sysent0[] = {
 };
 
 #if SUPPORTED_PERSONALITIES > 1
-static const struct_sysent sysent1[] = {
+const struct_sysent sysent1[] = {
 # include "syscallent1.h"
 };
 #endif
 
 #if SUPPORTED_PERSONALITIES > 2
-static const struct_sysent sysent2[] = {
+const struct_sysent sysent2[] = {
 # include "syscallent2.h"
 };
 #endif

@@ -372,6 +372,17 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			# Fetch one piece of code containing ioctls definitions.
 			sed -n '/\* s_config \*/,/ ---/p' < "$s" >> "$tmpdir/$f"
 			;;
+		*media/v4l2-ioctl.h)
+			echo 'struct old_timespec32 {int32_t dummy[2];};' >> "$tmpdir/$f"
+			echo 'struct old_timeval32 {int32_t dummy[2];};' >> "$tmpdir/$f"
+			# Fetch one piece of code containing ioctls definitions.
+			awk '/^struct v4l2_event_time32/{p=1}/#endif/{p=0}p{print}' < "$s" >> "$tmpdir/$f"
+			;;
+		*sound/pcm.h)
+			echo '#include <uapi/sound/asound.h>' > "$tmpdir/$f"
+			# Fetch one piece of code containing ioctls definitions.
+			awk '/^struct snd_pcm_status64 {/{p=1}/#endif/{p=0}p{print}' < "$s" >> "$tmpdir/$f"
+			;;
 		openpromio.h|*/openpromio.h|fbio.h|*/fbio.h)
 			# Create the file it attempts to include.
 			mkdir -p "$tmpdir/linux"

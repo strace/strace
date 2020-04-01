@@ -167,7 +167,7 @@
 [BASE_NR + 144] = { 2,	0,		SEN(nanosleep_time64),		"nanosleep"		},
 [BASE_NR + 145] = { 3,	0,		SEN(nfsservctl),		"nfsservctl"		},
 [BASE_NR + 146] = { 5,	TC,		SEN(prctl),			"prctl"			},
-[BASE_NR + 147] = { 0,	PU|NF,		SEN(getpagesize),		"getpagesize"		},
+[BASE_NR + 147] = { 0,	PU|NF,		SEN(getpagesize),		"old_getpagesize"	},
 [BASE_NR + 148] = { 6,	TD|TM|SI,	SEN(mmap_pgoff),		"mmap2"			},
 [BASE_NR + 149] = { 5,	0,		SEN(printargs),			"pciconfig_read"	},
 [BASE_NR + 150] = { 5,	0,		SEN(printargs),			"pciconfig_write"	},

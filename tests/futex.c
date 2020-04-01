@@ -495,7 +495,7 @@ main(int argc, char *argv[])
 	 *                 wake val2 processes waiting for uaddr2 in case
 	 *                 operation encoded in val3 (change of value at uaddr2
 	 *                 and comparison of previous value against provided
-	 *                 constant) succeedes with value at uaddr2. Operation
+	 *                 constant) succeeds with value at uaddr2. Operation
 	 *                 result is written to value of uaddr2 (in any case).
 	 * 1. uaddr   - futex address
 	 * 2. op      - FUTEX_WAKE_OP

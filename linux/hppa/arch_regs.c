@@ -5,10 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-static unsigned long hppa_r28;
-
-#define PT_GR20 offsetof(struct pt_regs, gr[20])
-#define PT_GR28 offsetof(struct pt_regs, gr[28])
-
-#define ARCH_PC_PEEK_ADDR offsetof(struct pt_regs, iaoq[0])
-#define ARCH_SP_PEEK_ADDR offsetof(struct pt_regs, gr[30])
+static struct user_regs_struct hppa_regs;
+#define ARCH_REGS_FOR_GETREGS hppa_regs
+#define ARCH_PC_REG hppa_regs.iaoq[0]
+#define ARCH_SP_REG hppa_regs.gr[30]

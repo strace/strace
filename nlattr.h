@@ -87,4 +87,34 @@ DECL_NLA(rt_class);
 DECL_NLA(rt_proto);
 DECL_NLA(tc_stats);
 
+#define NLA_HWADDR_FAMILY_OFFSET 1024
+
+/**
+ * Print hardware (low-level, L2) address.
+ * @param opaque_data Interpreted as integer value, not pointer
+ */
+DECL_NLA(hwaddr);
+
+/** Non-standard decoder that accepts ARPHRD_* value as an argument */
+static inline bool
+decode_nla_hwaddr_family(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const unsigned int arphrd)
+{
+	return decode_nla_hwaddr(tcp, addr, len, (void *) (uintptr_t) (
+				 arphrd > NLA_HWADDR_FAMILY_OFFSET ? 0
+					: NLA_HWADDR_FAMILY_OFFSET | arphrd));
+}
+
+/** decode_nla_hwaddr wrapper that ignores opaque_data */
+static inline bool
+decode_nla_hwaddr_nofamily(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+	return decode_nla_hwaddr(tcp, addr, len, NULL);
+}
+
 #endif /* !STRACE_NLATTR_H */

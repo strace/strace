@@ -9,15 +9,23 @@
 
 . "${srcdir=.}/init.sh"
 
-run_strace_match_diff -e trace=writev
-
-if [ "$STRACE_ARCH" = ia64 ]; then
-	# ia64 invokes extra process_vm_readv syscalls to obtain syscall
-	# arguments, see linux/ia64/get_syscall_args.c for details.
-	skip_ "the test is not supported on $STRACE_ARCH yet"
-fi
-
 check_prog grep
+$STRACE -d -enone / > /dev/null 2> "$LOG"
+grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO works" "$LOG" > /dev/null || {
+	# PTRACE_GET_SYSCALL_INFO does not work
+	case "$STRACE_ARCH:$MIPS_ABI" in
+		ia64:|mips:o32)
+		# ia64 invokes extra process_vm_readv syscalls to obtain syscall
+		# arguments, see linux/ia64/get_syscall_args.c for details.
+		# mips o32 obtains the first four syscalls arguments from registers
+		# and invokes extra process_vm_readv syscalls to obtain remaining
+		# syscall arguments, see linux/mips/get_syscall_args.c for details.
+		skip_ "the test is not supported on $STRACE_ARCH yet"
+		;;
+	esac
+}
+
+run_strace_match_diff -e trace=writev
 
 run_strace -qq -esignal=none -eprocess_vm_readv -z \
 	-o '|grep -c ^process_vm_readv > count' \

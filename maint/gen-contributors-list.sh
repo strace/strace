@@ -17,7 +17,7 @@ Prints list of contributors for the specified range of commits.
 Options:
   -h, --help    Print this message and exit.
   -e, --include-email
-                Include e-mail address of each contributer in the output.
+                Include e-mail address of each contributor in the output.
   -, --stdin    Read the list of additional contributors from stdin.
   LAST_COMMIT   Last commit of the range. Default value is HEAD.
   FIRST_COMMIT  First commit in the range. Default is the last commit tagged

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Check decoding of out-of-range syscalls along with debug ouput
+# Check decoding of out-of-range syscalls along with debug output
 #
 # Copyright (c) 2017-2018 The strace developers.
 # All rights reserved.

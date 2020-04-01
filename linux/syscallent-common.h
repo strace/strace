@@ -20,3 +20,6 @@
 [BASE_NR + 433] = { 3,	TD|TF,		SEN(fspick),			"fspick"		},
 [BASE_NR + 434] = { 2,	TD,		SEN(pidfd_open),		"pidfd_open"		},
 [BASE_NR + 435] = { 2,	TP,		SEN(clone3),			"clone3"		},
+/* 436 is reserved for watch_devices */
+[BASE_NR + 437] = { 4,	TD|TF,		SEN(openat2),			"openat2"		},
+[BASE_NR + 438] = { 3,	TD,		SEN(pidfd_getfd),		"pidfd_getfd"		},

@@ -9,13 +9,7 @@
 static int
 arch_get_syscall_args(struct tcb *tcp)
 {
-	/* Registers used by SH5 Linux system calls for parameters */
-	static const int syscall_regs[MAX_ARGS] = { 2, 3, 4, 5, 6, 7 };
-	unsigned int i;
-
-	for (i = 0; i < n_args(tcp); ++i)
-		if (upeek(tcp, REG_GENERAL(syscall_regs[i]),
-			  &tcp->u_arg[i]) < 0)
-			return -1;
+	for (unsigned int i = 0; i < n_args(tcp); ++i)
+		tcp->u_arg[i] = sh64_regs.regs[i + 2];
 	return 1;
 }

@@ -499,6 +499,7 @@ extern int read_int_from_file(struct tcb *, const char *, int *);
 
 extern void set_sortby(const char *);
 extern int set_overhead(const char *);
+extern void set_count_summary_columns(const char *columns);
 
 extern bool get_instruction_pointer(struct tcb *, kernel_ulong_t *);
 extern bool get_stack_pointer(struct tcb *, kernel_ulong_t *);
@@ -716,11 +717,18 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 # define STR_STRIP_PREFIX(str, prefix)	\
 	str_strip_prefix_len((str), (prefix), sizeof(prefix) - 1)
 
+/** String is '\0'-terminated. */
 # define QUOTE_0_TERMINATED			0x01
+/** Do not emit leading and ending '"' characters. */
 # define QUOTE_OMIT_LEADING_TRAILING_QUOTES	0x02
+/** Do not print '\0' if it is the last character. */
 # define QUOTE_OMIT_TRAILING_0			0x08
-# define QUOTE_FORCE_HEX				0x10
-# define QUOTE_EMIT_COMMENT			0x20
+/** Print ellipsis if the last character is not '\0' */
+# define QUOTE_EXPECT_TRAILING_0		0x10
+/** Print string in hex (using '\xHH' notation). */
+# define QUOTE_FORCE_HEX			0x20
+/** Enclose the string in C comment syntax. */
+# define QUOTE_EMIT_COMMENT			0x40
 
 extern int string_quote(const char *, char *, unsigned int, unsigned int,
 			const char *escape_chars);
@@ -850,6 +858,7 @@ extern void print_uuid(const unsigned char *uuid);
 
 extern void print_symbolic_mode_t(unsigned int);
 extern void print_numeric_umode_t(unsigned short);
+extern void print_numeric_umode_t_64(uint64_t);
 extern void print_numeric_long_umask(unsigned long);
 extern void print_dev_t(unsigned long long dev);
 extern void print_kernel_version(unsigned long version);
@@ -981,6 +990,35 @@ extern int
 printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
 	    unsigned int user_style);
 
+/**
+ * Print a region of tracee memory only in case non-zero bytes are present
+ * there.  It almost fits into printstr_ex, but it has some pretty specific
+ * behaviour peculiarities (like printing of ellipsis on error) to readily
+ * integrate it there.
+ *
+ * Since it is expected to be used for printing tail of a structure in tracee's
+ * memory, it accepts a combination of start_addr/start_offs/total_len and does
+ * the relevant calculations itself.
+ *
+ * @param prefix     A string printed in cases something is going to be printed.
+ * @param start_addr Address of the beginning of a structure (whose tail
+ *                   is supposedly to be printed) in tracee's memory.
+ * @param start_offs Offset from the beginning of the structure where the tail
+ *                   data starts.
+ * @param total_len  Total size of the tracee's memory region containing
+ *                   the structure and the tail data.
+ *                   Caller is responsible for imposing a sensible (usually
+ *                   mandated by the kernel interface, like get_pagesize())
+ *                   limit here.
+ * @param style      Passed to string_quote as "style" parameter.
+ * @return           Returns true is anything was printed, false otherwise.
+ */
+extern bool print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+				const kernel_ulong_t start_addr,
+				const unsigned int start_offs,
+				const unsigned int total_len,
+				const unsigned int style);
+
 extern int
 printpathn(struct tcb *, kernel_ulong_t addr, unsigned int n);
 
@@ -990,6 +1028,11 @@ printpath(struct tcb *, kernel_ulong_t addr);
 # define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(long long) * 3 * 2 + sizeof("{tv_sec=-, tv_nsec=}"))
 extern void printfd(struct tcb *, int);
+/**
+ * Print file descriptor fd owned by process with ID pid (from the PID NS
+ * of the tracee the descriptor tcp).  This is a stub.
+ */
+extern void print_pid_fd(struct tcb *tcp, pid_t pid, int fd);
 extern void print_sockaddr(const void *sa, int len);
 extern bool
 print_inet_addr(int af, const void *addr, unsigned int len, const char *var_name);
@@ -1198,8 +1241,8 @@ extern int ts_cmp(const struct timespec *, const struct timespec *);
 extern double ts_float(const struct timespec *);
 extern void ts_add(struct timespec *, const struct timespec *, const struct timespec *);
 extern void ts_sub(struct timespec *, const struct timespec *, const struct timespec *);
-extern void ts_mul(struct timespec *, const struct timespec *, int);
-extern void ts_div(struct timespec *, const struct timespec *, int);
+extern void ts_mul(struct timespec *, const struct timespec *, uint64_t);
+extern void ts_div(struct timespec *, const struct timespec *, uint64_t);
 extern const struct timespec *ts_min(const struct timespec *, const struct timespec *);
 extern const struct timespec *ts_max(const struct timespec *, const struct timespec *);
 extern int parse_ts(const char *s, struct timespec *t);

@@ -259,11 +259,11 @@ usage(void)
 
 	printf("\
 Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]...\n\
-              [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-P PATH]...\n\
-              [-p PID]... [--seccomp-bpf]\n\
+              [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-O OVERHEAD]\n\
+              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
               { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
    or: strace -c[dfwzZ] [-I N] [-b execve] [-e EXPR]... [-O OVERHEAD]\n\
-              [-S SORTBY] [-P PATH]... [-p PID]... [--seccomp-bpf]\n\
+              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
               { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
 \n\
 General:\n\
@@ -406,8 +406,13 @@ Statistics:\n\
                  set overhead for tracing syscalls to OVERHEAD UNITs\n\
      units:      one of s, ms, us, ns; default is microseconds\n\
   -S SORTBY, --summary-sort-by=SORTBY\n\
-                 sort syscall counts by: time, calls, errors, name, nothing\n\
-                 (default %s)\n\
+                 sort syscall counts by: time, min-time, max-time, avg-time,\n\
+                 calls, errors, name, nothing (default %s)\n\
+  -U COLUMNS, --summary-columns=COLUMNS\n\
+                 show specific columns in the summary report: comma-separated\n\
+                 list of time-percent, total-time, min-time, max-time, \n\
+                 avg-time, calls, errors, name\n\
+                 (default time-percent,total-time,avg-time,calls,errors,name)\n\
   -w, --summary-wall-clock\n\
                  summarise syscall latency (default is system time)\n\
 \n\
@@ -1848,6 +1853,8 @@ init(int argc, char *argv[])
 	int yflag_short = 0;
 	bool tflag_long_set = false;
 	int tflag_short = 0;
+	bool columns_set = false;
+	bool sortby_set = false;
 
 	if (!program_invocation_name || !*program_invocation_name) {
 		static char name[] = "strace";
@@ -1874,7 +1881,7 @@ init(int argc, char *argv[])
 	qualify_signals("all");
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:ko:O:p:P:qrs:S:tTu:vVwxX:yzZ";
+		"+a:Ab:cCdDe:E:fFhiI:ko:O:p:P:qrs:S:tTu:U:vVwxX:yzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -1927,6 +1934,7 @@ init(int argc, char *argv[])
 		{ "timestamps",		optional_argument, 0, GETOPT_TS },
 		{ "syscall-times",	optional_argument, 0, 'T' },
 		{ "user",		required_argument, 0, 'u' },
+		{ "summary-columns",	required_argument, 0, 'U' },
 		{ "no-abbrev",		no_argument,	   0, 'v' },
 		{ "version",		no_argument,	   0, 'V' },
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
@@ -2079,6 +2087,7 @@ init(int argc, char *argv[])
 			break;
 		case 'S':
 			set_sortby(optarg);
+			sortby_set = true;
 			break;
 		case 't':
 			tflag_short++;
@@ -2098,6 +2107,10 @@ init(int argc, char *argv[])
 			break;
 		case 'u':
 			username = optarg;
+			break;
+		case 'U':
+			columns_set = true;
+			set_count_summary_columns(optarg);
 			break;
 		case 'v':
 			qualify_abbrev("none");
@@ -2292,6 +2305,16 @@ init(int argc, char *argv[])
 	if (count_wallclock && !cflag) {
 		error_msg_and_help("-w/--summary-wall-clock must be given with"
 				   " (-c/--summary-only or -C/--summary)");
+	}
+
+	if (columns_set && !cflag) {
+		error_msg_and_help("-U/--summary-columns must be given with"
+				   " (-c/--summary-only or -C/--summary)");
+	}
+
+	if (sortby_set && !cflag) {
+		error_msg("-S/--summary-sort-by has no effect without"
+			  " (-c/--summary-only or -C/--summary)");
 	}
 
 	if (cflag == CFLAG_ONLY_STATS) {

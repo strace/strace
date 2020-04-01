@@ -34,8 +34,6 @@ AC_SUBST(DEB_CHANGELOGTIME)
 AC_PROG_CC
 AC_PROG_CC_STDC
 AC_PROG_CPP
-st_WARN_CFLAGS
-AX_PROG_CC_FOR_BUILD
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 
@@ -49,6 +47,9 @@ AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
 AC_SUBST([MANPAGE_DATE], [manpage_date])
 
 AC_C_BIGENDIAN
+
+dnl arch-specific default for --enable-gcc-Werror
+arch_enable_Werror=yes
 
 AC_MSG_CHECKING([for supported architecture])
 arch_m32=
@@ -64,6 +65,7 @@ aarch64*)
 	;;
 alpha*)
 	arch=alpha
+	arch_enable_Werror=no
 	AC_DEFINE([ALPHA], 1, [Define for the Alpha architecture.])
 	;;
 arc*)
@@ -80,6 +82,7 @@ avr32*)
 	;;
 bfin)
 	arch=bfin
+	arch_enable_Werror=no
 	AC_DEFINE([BFIN], 1, [Define for the Blackfin architecture.])
 	;;
 csky*)
@@ -108,6 +111,7 @@ metag*)
 	;;
 microblaze*)
 	arch=microblaze
+	arch_enable_Werror=no
 	AC_DEFINE([MICROBLAZE], 1, [Define for the MicroBlaze architecture.])
 	;;
 mips*)
@@ -256,6 +260,9 @@ case "$enable_arm_oabi" in
 esac
 AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
 		   [Define to 1 if you want OABI support on ARM EABI.])
+
+st_WARN_CFLAGS
+AX_PROG_CC_FOR_BUILD
 
 AC_C_TYPEOF
 
@@ -416,6 +423,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter/nfnetlink_log.h
 	linux/netfilter/nfnetlink_queue.h
 	linux/nsfs.h
+	linux/openat2.h
 	linux/perf_event.h
 	linux/quota.h
 	linux/sched.h
@@ -485,7 +493,8 @@ AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 AC_CHECK_MEMBERS(m4_normalize([
 	struct br_mdb_entry.flags,
 	struct br_mdb_entry.vid
-]),,, [#include <linux/if_bridge.h>])
+]),,, [#include <netinet/in.h>
+#include <linux/if_bridge.h>])
 
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
@@ -506,7 +515,10 @@ AC_CHECK_DECLS(m4_normalize([
 	IFLA_PORT_SELF,
 	IFLA_PROTINFO,
 	IFLA_AF_SPEC,
-	IFLA_XDP
+	IFLA_XDP,
+	IFLA_PROP_LIST,
+	IFLA_ALT_IFNAME,
+	IFLA_PERM_ADDRESS
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
 
@@ -795,6 +807,19 @@ AC_CHECK_DECLS(m4_normalize([
 	V4L2_CTRL_TYPE_U16,
 	V4L2_CTRL_TYPE_U32,
 	V4L2_CTRL_TYPE_AREA
+]),,, [#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct v4l2_create_buffers,
+	struct v4l2_frmsizeenum,
+	struct v4l2_frmivalenum,
+	struct v4l2_meta_format,
+	struct v4l2_pix_format_mplane,
+	struct v4l2_plane_pix_format,
+	struct v4l2_sdr_format
 ]),,, [#include <sys/time.h>
 #include <linux/ioctl.h>
 #include <linux/types.h>

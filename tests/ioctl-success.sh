@@ -1,8 +1,10 @@
 #!/bin/sh -efu
 #
-# Check decoding of successful PERF_EVENT_IOC_{ID,QUERY_BPF} ioctls.
+# Check decoding of ioctls using syscall injection.
 #
-# Copyright (c) 2018 The strace developers.
+# Expects a binary that accepts IOCTL_INJECT_START as the first argument.
+#
+# Copyright (c) 2018-2020 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -12,9 +14,8 @@
 : ${IOCTL_INJECT_START=256}
 : ${IOCTL_INJECT_RETVAL=42}
 
-run_prog
-run_strace -a35 -e trace=ioctl \
+run_strace -a50 "$@" -e trace=ioctl \
 	-e inject=ioctl:retval="${IOCTL_INJECT_RETVAL}":when="${IOCTL_INJECT_START}+" \
-	../ioctl_perf-success "${IOCTL_INJECT_START}" "${IOCTL_INJECT_RETVAL}" > "$EXP"
+	"../$NAME" "${IOCTL_INJECT_START}" "${IOCTL_INJECT_RETVAL}" > "$EXP"
 grep -v '^ioctl([012][,<]' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

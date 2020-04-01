@@ -236,6 +236,7 @@ strace_SOURCES =	\
 	perf_event_struct.h \
 	perf_ioctl.c	\
 	personality.c	\
+	pidfd_getfd.c	\
 	pidfd_open.c	\
 	pkeys.c		\
 	poll.c		\
@@ -558,7 +559,6 @@ EXTRA_DIST =				\
 	linux/hppa/get_error.c		\
 	linux/hppa/get_scno.c		\
 	linux/hppa/get_syscall_args.c	\
-	linux/hppa/get_syscall_result.c	\
 	linux/hppa/ioctls_arch0.h	\
 	linux/hppa/ioctls_inc0.h	\
 	linux/hppa/raw_syscall.h	\
@@ -800,7 +800,6 @@ EXTRA_DIST =				\
 	linux/sh/get_error.c		\
 	linux/sh/get_scno.c		\
 	linux/sh/get_syscall_args.c	\
-	linux/sh/get_syscall_result.c	\
 	linux/sh/ioctls_arch0.h		\
 	linux/sh/ioctls_inc0.h		\
 	linux/sh/raw_syscall.h		\
@@ -811,11 +810,9 @@ EXTRA_DIST =				\
 	linux/sh/userent0.h		\
 	linux/sh64/arch_defs_.h		\
 	linux/sh64/arch_regs.c		\
-	linux/sh64/arch_regs.h		\
 	linux/sh64/get_error.c		\
 	linux/sh64/get_scno.c		\
 	linux/sh64/get_syscall_args.c	\
-	linux/sh64/get_syscall_result.c	\
 	linux/sh64/ioctls_arch0.h	\
 	linux/sh64/ioctls_inc0.h	\
 	linux/sh64/raw_syscall.h	\
@@ -951,7 +948,6 @@ EXTRA_DIST =				\
 	linux/xtensa/get_error.c	\
 	linux/xtensa/get_scno.c		\
 	linux/xtensa/get_syscall_args.c	\
-	linux/xtensa/get_syscall_result.c	\
 	linux/xtensa/ioctls_arch0.h	\
 	linux/xtensa/ioctls_inc0.h	\
 	linux/xtensa/raw_syscall.h	\

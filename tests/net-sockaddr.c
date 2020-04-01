@@ -423,25 +423,25 @@ check_x25(void)
 		.sx25_family = AF_X25,
 		.sx25_addr = { "0123456789abcdef" },
 	};
-	void *x25_void = tail_memdup(&c_x25, sizeof(c_x25) + 1);
-	struct sockaddr_x25 *x25 = x25_void;
+	void *const x25_void = tail_memdup(&c_x25, sizeof(c_x25) + 1);
 	long rc;
 
-	rc = connect(-1, x25, sizeof(c_x25) - 1);
+	rc = connect(-1, x25_void, sizeof(c_x25) - 1);
 	printf("connect(-1, {sa_family=AF_X25"
 	       ", sa_data=\"0123456789abcde\"}, %zu) = %s\n",
 	       sizeof(c_x25) - 1, sprintrc(rc));
 
 	for (size_t i = 0; i < 2; i++) {
-		rc = connect(-1, x25, sizeof(c_x25) + i);
+		rc = connect(-1, x25_void, sizeof(c_x25) + i);
 		printf("connect(-1, {sa_family=AF_X25"
 		       ", sx25_addr={x25_addr=\"0123456789abcde\"...}"
 		       "}, %zu) = %s\n",
 		       sizeof(c_x25) + i, sprintrc(rc));
 	}
 
+	struct sockaddr_x25 *const x25 = x25_void;
 	x25->sx25_addr.x25_addr[10] = '\0';
-	rc = connect(-1, x25, sizeof(c_x25));
+	rc = connect(-1, x25_void, sizeof(c_x25));
 	printf("connect(-1, {sa_family=AF_X25"
 	       ", sx25_addr={x25_addr=\"0123456789\"}"
 	       "}, %zu) = %s\n",

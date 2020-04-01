@@ -113,7 +113,7 @@ ebcdic2ascii(unsigned char *ebcdic, size_t size)
 				   size, sizeof(ascii_buf));
 	if (cd == (iconv_t) -1)
 		perror_msg_and_fail("ebcdic2ascii: unable to allocate a "
-				    "conversion descriptior for converting "
+				    "conversion descriptor for converting "
 				    "EBCDIC to ASCII");
 
 	while ((ret = iconv(cd, &ebcdic_pos, &ebcdic_left,

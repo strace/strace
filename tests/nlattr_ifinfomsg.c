@@ -27,6 +27,8 @@
 #endif
 #define IFLA_LINK_NETNSID 37
 #define IFLA_EVENT 44
+#define IFLA_PROP_LIST 52
+#define IFLA_ALT_IFNAME 53
 
 #ifndef IFLA_INFO_KIND
 # define IFLA_INFO_KIND 1
@@ -35,6 +37,8 @@
 #ifndef IFLA_VF_PORT
 # define IFLA_VF_PORT 1
 #endif
+
+static const unsigned int hdrlen = sizeof(struct ifinfomsg);
 
 static void
 init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -63,6 +67,27 @@ print_ifinfomsg(const unsigned int msg_len)
 	       ", ifi_index=" IFINDEX_LO_STR
 	       ", ifi_flags=IFF_UP, ifi_change=0}",
 	       msg_len);
+}
+
+static void
+init_prop_list_msg(struct nlmsghdr *const nlh,
+		     const unsigned int msg_len)
+{
+	init_ifinfomsg(nlh, msg_len);
+
+	struct nlattr *nla = NLMSG_ATTR(nlh, hdrlen);
+	SET_STRUCT(struct nlattr, nla,
+		.nla_len = msg_len - NLMSG_SPACE(hdrlen),
+		.nla_type = IFLA_PROP_LIST,
+	);
+}
+
+static void
+print_prop_list_msg(const unsigned int msg_len)
+{
+	print_ifinfomsg(msg_len);
+	printf(", {{nla_len=%u, nla_type=IFLA_PROP_LIST}",
+	       msg_len - NLMSG_SPACE(hdrlen));
 }
 
 int
@@ -96,9 +121,8 @@ main(void)
 		.tx_compressed = 0xefdadfab
 	};
 	const int fd = create_nl_socket(NETLINK_ROUTE);
-	const unsigned int hdrlen = sizeof(struct ifinfomsg);
 	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
-				   NLA_HDRLEN + sizeof(st));
+				   2 * NLA_HDRLEN + MAX(sizeof(st), 20));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
@@ -338,6 +362,33 @@ main(void)
 				   IFLA_EVENT, pattern, ifla_events[i].val,
 				   printf("%s", ifla_events[i].str));
 	}
+
+	/* IFLA_PROP_LIST */
+	struct {
+		char p1[20];
+	} buf;
+	fill_memory(&buf, sizeof(buf));
+	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
+				      init_prop_list_msg, print_prop_list_msg,
+				      IFLA_ALT_IFNAME, "IFLA_ALT_IFNAME",
+				      pattern, buf, print_quoted_stringn, 1,
+				      print_quoted_memory(&buf, sizeof(buf));
+				      printf("..."));
+
+	/* IFLA_ALT_IFNAME */
+	static const char alt_ifname[] = "OH HAI THAR\r\n\t\377\0\v\x7e";
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_ALT_IFNAME,
+		    sizeof(alt_ifname), alt_ifname, sizeof(alt_ifname),
+		    print_quoted_memory(alt_ifname, sizeof(alt_ifname) - 1));
+
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_ALT_IFNAME,
+		    sizeof(alt_ifname) - 1, alt_ifname, sizeof(alt_ifname) - 1,
+		    print_quoted_memory(alt_ifname, sizeof(alt_ifname) - 1);
+		    printf("..."));
 
 	puts("+++ exited with 0 +++");
 	return 0;

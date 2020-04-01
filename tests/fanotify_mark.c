@@ -68,11 +68,6 @@ struct strval {
 	const char *str;
 };
 
-struct strval64 {
-	uint64_t val;
-	const char *str;
-};
-
 # define STR16 "0123456789abcdef"
 # define STR64 STR16 STR16 STR16 STR16
 
