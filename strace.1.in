@@ -1348,7 +1348,7 @@ option.
 Print the help summary.
 .TP
 .B \-\-seccomp\-bpf
-Enable (experimental) usage of seccomp-bpf (see
+Try to enable use of seccomp-bpf (see
 .BR seccomp (2))
 to have
 .BR ptrace (2)-stops
