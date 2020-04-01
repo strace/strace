@@ -1356,14 +1356,14 @@ only when system calls that are being traced occur in the traced processes.
 This option has no effect unless
 .BR \-f / \-\-follow\-forks
 is also specified.
-An attempt to rely on seccomp-bpf to filter system calls may fail for various
-reasons, e.g. there are too many system calls to filter, the seccomp API is not
-available, or
+.B \-\-seccomp\-bpf
+is also not applicable to processes attached using
+.BR \-p / \-\-attach
+option.  An attempt to enable system calls filtering using seccomp-bpf may
+fail for various reasons, e.g. there are too many system calls to filter,
+the seccomp API is not available, or
 .B strace
 itself is being traced.
-.B \-\-seccomp\-bpf
-is also ineffective on processes attached using
-.BR \-p .
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
