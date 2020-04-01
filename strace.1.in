@@ -1353,9 +1353,9 @@ Enable (experimental) usage of seccomp-bpf (see
 to have
 .BR ptrace (2)-stops
 only when system calls that are being traced occur in the traced processes.
-Implies the
-.B \-f
-option.
+This option has no effect unless
+.BR \-f / \-\-follow\-forks
+is also specified.
 An attempt to rely on seccomp-bpf to filter system calls may fail for various
 reasons, e.g. there are too many system calls to filter, the seccomp API is not
 available, or
