@@ -34,7 +34,8 @@ Noteworthy changes in release ?.? (????-??-??)
     commands.
   * Enhanced decoding of RTC_VL_READ ioctl command.
   * Enhanced decoding of IFLA_* netlink attributes.
-  * Implement HIDIOCGRAWUNIQ() ioctl command number printing.
+  * Implemented HIDIOCGRAWUNIQ() ioctl command number printing.
+  * Wired up kexec_file_load syscall on hppa.
   * Updated lists of AUDIT_*, BPF_*, CLONE_*, GRND_*, IFLA_*, IORING_*,
     IPPROTO_*, KEY_*, KVM_*, RTM_F_*, SCHED_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 5.6.
