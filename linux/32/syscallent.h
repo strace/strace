@@ -181,8 +181,8 @@
 [166] = { 1,	NF,		SEN(umask),			"umask"			},
 [167] = { 5,	TC,		SEN(prctl),			"prctl"			},
 [168] = { 3,	0,		SEN(getcpu),			"getcpu"		},
-[169] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
-[170] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
+/* [169] gettimeofday */
+/* [170] settimeofday */
 /* [171] adjtimex */
 [172] = { 0,	PU|NF,		SEN(getpid),			"getpid"		},
 [173] = { 0,	PU|NF,		SEN(getppid),			"getppid"		},
@@ -257,7 +257,7 @@
 [242] = { 4,	TN,		SEN(accept4),			"accept4"		},
 /* [243] recvmmsg */
 /* [244 ... 259] are arch specific */
-[260] = { 4,	TP,		SEN(wait4),			"wait4"			},
+/* [260] wait4 */
 [261] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},
 [262] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [263] = { 6,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},

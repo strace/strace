@@ -116,10 +116,12 @@ SYS_FUNC(waitpid)
 	return printwaitn(tcp, NULL);
 }
 
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 SYS_FUNC(wait4)
 {
 	return printwaitn(tcp, printrusage);
 }
+#endif
 
 #ifdef ALPHA
 SYS_FUNC(osf_wait4)
