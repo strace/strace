@@ -187,6 +187,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	set_ptracer_any \
 	set_sigblock \
 	set_sigign \
+	setpgrp-exec \
 	signal_receive \
 	sleep \
 	stack-fcall \
@@ -506,7 +507,6 @@ EXTRA_DIST = \
 	strace--syscall-times-ns.expected \
 	strace-C.expected \
 	strace-D.expected \
-	strace-DD.expected \
 	strace-DDD.expected \
 	strace-E.expected \
 	strace-T.expected \

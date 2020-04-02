@@ -23,46 +23,51 @@ get_tracer_pid()
 [ "$(get_tracer_pid "$status_file")" -ge 0 ] ||
         framework_skip_ "$status_file is not available"
 
-check_prog timeout
 run_prog ../sleep 0
+
+sleep_duration="$(($TIMEOUT_DURATION/2))"
 
 test_D()
 {
-	local exp args tracee_pid tracer_pid rc
-	exp="$1"; shift
+	local tracee_pid tracer_pid rc sig=15
 
-	set -- -e signal=none -e trace=nanosleep "$@" -- \
-		sh -c 'echo $$ > tracee_pid && exec ../sleep 2'
-	args="$*"
-	set -- timeout -s XCPU 1 $STRACE -o "$LOG" "$@"
+	set -- $STRACE --output="$LOG" --columns=39 \
+		--interruptible=anywhere --trace=nanosleep "$@" -- \
+		../sleep "$sleep_duration"
 	> "$LOG"
-	> tracee_pid
 
-	"$@" &
-
-	while [ ! -s tracee_pid ]; do
-		kill -0 $! ||
-			break
-	done
-	tracee_pid="$(cat tracee_pid)"
+	../setpgrp-exec "$@" &
+	tracee_pid=$!
 
 	while tracer_pid="$(get_tracer_pid "/proc/$tracee_pid/status")"; do
 		[ "$tracer_pid" = 0 ] ||
 			break
+		$SLEEP_A_BIT
 	done
 
-	wait $! && rc=0 || rc=$?
-	[ "$rc" = 124 ] ||
+	$SLEEP_A_BIT
+	kill -$sig -$tracee_pid
+
+	wait $tracee_pid && rc=0 || rc=$?
+	[ "$rc" -eq $((128 + $sig)) ] ||
 		dump_log_and_fail_with \
-			"$* failed with unexpected exit code $rc"
+			"$* failed with unexpected exit status $rc"
 
 	while kill -0 "$tracer_pid" 2> /dev/null; do
 		$SLEEP_A_BIT
 	done
-	match_diff "$LOG" "$exp"
+	match_diff "$LOG" "$EXP"
 }
 
-printf %s 'nanosleep({tv_sec=2, tv_nsec=0}, ' > "$EXP"
-test_D "$EXP" -D
-test_D "$srcdir/$NAME.expected" -DD
-test_D "$srcdir/$NAME.expected" -DDD
+printf 'nanosleep({tv_sec=%s, tv_nsec=0}, ' "$sleep_duration" > "$EXP"
+test_D -D
+
+uid="${UID:-`id -u`}"
+cat > "$EXP" <<__EOF__
+nanosleep({tv_sec=$sleep_duration, tv_nsec=0}, NULL) = ? ERESTART_RESTARTBLOCK (Interrupted by signal)
+--- SIGTERM {si_signo=SIGTERM, si_code=SI_USER, si_pid=$$, si_uid=$uid} ---
++++ killed by SIGTERM +++
+__EOF__
+
+test_D -DD
+test_D -DDD
