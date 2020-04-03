@@ -966,7 +966,7 @@ print_local_array_ex(struct tcb *tcp,
 }
 
 /** Shorthand for a shorthand for printing local arrays. */
-#define print_local_array(tcp_, start_addr_, print_func_)      \
+# define print_local_array(tcp_, start_addr_, print_func_)      \
 	print_local_array_ex((tcp_), (start_addr_), ARRAY_SIZE(start_addr_), \
 			     sizeof((start_addr_)[0]), (print_func_),        \
 			     NULL, 0, NULL, NULL)
@@ -1188,9 +1188,9 @@ enum find_xlat_flags {
 extern const struct xlat_data *find_xlat_val_ex(const struct xlat_data *items,
 						const char *s, size_t num_items,
 						unsigned int flags);
-#define find_xlat_val(items_, s_) \
+# define find_xlat_val(items_, s_) \
 	find_xlat_val_ex((items_), (s_), ARRAY_SIZE(items_), 0)
-#define find_xlat_val_case(items_, s_) \
+# define find_xlat_val_case(items_, s_) \
 	find_xlat_val_ex((items_), (s_), ARRAY_SIZE(items_), FXL_CASE_SENSITIVE)
 
 /**
@@ -1214,7 +1214,7 @@ extern uint64_t find_arg_val_(const char *arg, const struct xlat_data *strs,
 			      size_t strs_size, uint64_t default_val,
 			      uint64_t not_found);
 /** A find_arg_val_ wrapper that supplies strs_size to it using ARRAY_SIZE. */
-#define find_arg_val(arg_, strs_, dflt_, not_found_) \
+# define find_arg_val(arg_, strs_, dflt_, not_found_) \
 	find_arg_val_((arg_), (strs_), ARRAY_SIZE(strs_), (dflt_), (not_found_))
 
 /**
@@ -1232,9 +1232,9 @@ extern uint64_t find_arg_val_(const char *arg, const struct xlat_data *strs,
 extern int str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
 			    int *width);
 /** str2timescale_ex wrapper for handling a separate argument. */
-#define str2timescale_optarg(arg_, w_) str2timescale_ex((arg_), -1, 1000, (w_))
+# define str2timescale_optarg(arg_, w_) str2timescale_ex((arg_), -1, 1000, (w_))
 /** str2timescale_ex wrapper for handling a suffix in existing argument. */
-#define str2timescale_sfx(arg_, w_) str2timescale_ex((arg_), 1000, -1, (w_))
+# define str2timescale_sfx(arg_, w_) str2timescale_ex((arg_), 1000, -1, (w_))
 
 extern int ts_nz(const struct timespec *);
 extern int ts_cmp(const struct timespec *, const struct timespec *);

@@ -9,17 +9,17 @@ AC_DEFUN([st_WARN_CFLAGS], [dnl
 AC_CACHE_CHECK([whether $[]_AC_CC[] is fresh enough for -Werror],
 	       [st_cv_cc_enable_Werror],
                [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-# if defined __GNUC__ && defined __GNUC_MINOR__
-#  define GNUC_PREREQ(maj, min) ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
-# else
-#  define GNUC_PREREQ(maj, min) 0
-# endif
+#if defined __GNUC__ && defined __GNUC_MINOR__
+# define GNUC_PREREQ(maj, min) ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+# define GNUC_PREREQ(maj, min) 0
+#endif
 
-# if defined __clang__ && defined __clang_major__ && defined __clang_minor__
-#  define CLANG_PREREQ(maj, min) ((__clang_major__ << 16) + __clang_minor__ >= ((maj) << 16) + (min))
-# else
-#  define CLANG_PREREQ(maj, min) 0
-# endif
+#if defined __clang__ && defined __clang_major__ && defined __clang_minor__
+# define CLANG_PREREQ(maj, min) ((__clang_major__ << 16) + __clang_minor__ >= ((maj) << 16) + (min))
+#else
+# define CLANG_PREREQ(maj, min) 0
+#endif
 ]],
 			       [[int i[GNUC_PREREQ(4, 8) + CLANG_PREREQ(6, 0) > 0 ? 1 : - 1];]])],
 			       [st_cv_cc_enable_Werror=yes],

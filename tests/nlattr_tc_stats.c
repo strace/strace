@@ -16,9 +16,9 @@
 # include <linux/gen_stats.h>
 # include <linux/rtnetlink.h>
 
-#if !HAVE_DECL_TCA_STATS_PKT64
+# if !HAVE_DECL_TCA_STATS_PKT64
 enum { TCA_STATS_PKT64 = 8 };
-#endif
+# endif
 
 const unsigned int hdrlen = sizeof(struct tcmsg);
 

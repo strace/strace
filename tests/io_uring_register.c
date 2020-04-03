@@ -25,21 +25,21 @@
 # endif
 
 /* From tests/bpf.c */
-#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
-# define BIG_ADDR_MAYBE(addr_)
-#elif defined __arm__ || defined __i386__ || defined __mips__ \
+# if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+#  define BIG_ADDR_MAYBE(addr_)
+# elif defined __arm__ || defined __i386__ || defined __mips__ \
    || defined __powerpc__ || defined __riscv__ || defined __s390__ \
    || defined __sparc__ || defined __tile__
-# define BIG_ADDR_MAYBE(addr_) addr_ " or "
-#else
-# define BIG_ADDR_MAYBE(addr_)
-#endif
+#  define BIG_ADDR_MAYBE(addr_) addr_ " or "
+# else
+#  define BIG_ADDR_MAYBE(addr_)
+# endif
 
-#if WORDS_BIGENDIAN
-# define BE_LE(be_, le_) be_
-#else
-# define BE_LE(be_, le_) le_
-#endif
+# if WORDS_BIGENDIAN
+#  define BE_LE(be_, le_) be_
+# else
+#  define BE_LE(be_, le_) le_
+# endif
 
 static const char *errstr;
 
@@ -149,7 +149,7 @@ main(void)
 		       (unsigned int) ARRAY_SIZE(fds), errstr);
 	}
 
-#ifdef HAVE_STRUCT_IO_URING_FILES_UPDATE
+# ifdef HAVE_STRUCT_IO_URING_FILES_UPDATE
 	struct io_uring_files_update bogus_iufu;
 	struct io_uring_files_update iufu;
 
@@ -176,9 +176,9 @@ main(void)
 	       ", {offset=3735929054, fds=[%u<%s>, %u<%s>]}, %u) = %s\n",
 	       fd_null, path_null, fd_full, path_full, fd_null, path_null,
 	       (unsigned int) ARRAY_SIZE(fds), errstr);
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_IO_URING_PROBE
+# ifdef HAVE_STRUCT_IO_URING_PROBE
 	struct io_uring_probe *probe = tail_alloc(sizeof(*probe) +
 		       (DEFAULT_STRLEN + 1) * sizeof(struct io_uring_probe_op));
 
@@ -280,7 +280,7 @@ main(void)
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 8);
 	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE, %p, 8) = %s\n",
 	       fd_null, path_null, probe, errstr);
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

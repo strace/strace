@@ -6,11 +6,11 @@
  */
 
 #ifndef STRACE_TYPES_OPENAT2_H
-#define STRACE_TYPES_OPENAT2_H
+# define STRACE_TYPES_OPENAT2_H
 
-#ifdef HAVE_LINUX_OPENAT2_H
-# include <linux/openat2.h>
-#endif
+# ifdef HAVE_LINUX_OPENAT2_H
+#  include <linux/openat2.h>
+# endif
 
 typedef struct {
 	uint64_t flags;

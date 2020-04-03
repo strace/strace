@@ -87,7 +87,7 @@ DECL_NLA(rt_class);
 DECL_NLA(rt_proto);
 DECL_NLA(tc_stats);
 
-#define NLA_HWADDR_FAMILY_OFFSET 1024
+# define NLA_HWADDR_FAMILY_OFFSET 1024
 
 /**
  * Print hardware (low-level, L2) address.

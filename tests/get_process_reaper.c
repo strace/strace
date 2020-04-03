@@ -73,8 +73,8 @@ main(void)
 #define grandchild_write_fd	parent_grandchild_fds[1]
 
 	int grandchild_parent_fds[2];
-#define	grandchild_read_fd	grandchild_parent_fds[0]
-#define	parent_write_fd		grandchild_parent_fds[1]
+#define grandchild_read_fd	grandchild_parent_fds[0]
+#define parent_write_fd		grandchild_parent_fds[1]
 
 	if (pipe(parent_grandchild_fds) ||
 	    pipe(grandchild_parent_fds))

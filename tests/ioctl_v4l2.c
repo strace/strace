@@ -83,13 +83,13 @@ init_v4l2_format(struct v4l2_format *const f,
 			    sizeof(uint32_t)) {
 				cur_pix[i].bytesperline = 0xa983d721 | i;
 			} else {
-#if WORDS_BIGENDIAN
+# if WORDS_BIGENDIAN
 				cur_pix[i].bytesperline = 0xa983;
 				cur_pix[i].reserved[0] = 0xd721 | i;
-#else
+# else
 				cur_pix[i].bytesperline = 0xd721 | i;
 				cur_pix[i].reserved[0] = 0xa983;
-#endif
+# endif
 			}
 		}
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
@@ -235,10 +235,10 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       XLAT_SEL(buf_type, buf_type_string),
 		       f->fmt.pix_mp.width, f->fmt.pix_mp.height);
 
-#if XLAT_RAW
+# if XLAT_RAW
 		printf("%#x", buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 			      ? magic : pf_magic);
-#else /* !XLAT_RAW */
+# else /* !XLAT_RAW */
 		if (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE)
 			printf("v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')",
 			       cc0(magic), cc1(magic), cc2(magic), cc3(magic));
@@ -247,7 +247,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			       "/* V4L2_PIX_FMT_SPCA508 */",
 			       cc0(pf_magic), cc1(pf_magic), cc2(pf_magic),
 			       cc3(pf_magic));
-#endif /* XLAT_RAW */
+# endif /* XLAT_RAW */
 
 		printf(", field=" XLAT_FMT ", colorspace=" XLAT_FMT
 		       ", plane_fmt=[",
@@ -264,13 +264,13 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			sizeof(f->fmt.pix_mp.plane_fmt[i].bytesperline) ==
 			sizeof(uint32_t)
 			? f->fmt.pix_mp.plane_fmt[i].bytesperline :
-#if WORDS_BIGENDIAN
+# if WORDS_BIGENDIAN
 			(f->fmt.pix_mp.plane_fmt[i].bytesperline << 16) |
 			f->fmt.pix_mp.plane_fmt[i].reserved[0]
-#else
+# else
 			f->fmt.pix_mp.plane_fmt[i].bytesperline |
 			(f->fmt.pix_mp.plane_fmt[i].reserved[0] << 16)
-#endif
+# endif
 			);
 		}
 		errno = saved_errno;
@@ -1360,18 +1360,18 @@ main(void)
 
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, p_frmsizeenum);
 	printf("ioctl(-1, %s, {index=%u, pixel_format="
-#if XLAT_RAW
+# if XLAT_RAW
 	       "0x%hhx%hhx%hhx%hhx"
-#else /* !XLAT_RAW */
+# else /* !XLAT_RAW */
 	       "v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')"
-#endif /* XLAT_RAW */
+# endif /* XLAT_RAW */
 	       "}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), p_frmsizeenum->index,
-#if XLAT_RAW
+# if XLAT_RAW
 	       cc[3], cc[2], cc[1], cc[0]
-#else /* !XLAT_RAW */
+# else /* !XLAT_RAW */
 	       cc[0], cc[1], cc[2], cc[3]
-#endif /* XLAT_RAW */
+# endif /* XLAT_RAW */
 	       );
 #endif /* VIDIOC_ENUM_FRAMESIZES */
 
@@ -1384,21 +1384,21 @@ main(void)
 		page_end - sizeof(*p_v4l2_frmivalenum);
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, p_v4l2_frmivalenum);
 	printf("ioctl(-1, %s, {index=%u, pixel_format="
-#if XLAT_RAW
+# if XLAT_RAW
 	       "%#x"
-#else /* !XLAT_RAW */
+# else /* !XLAT_RAW */
 	       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
-#endif /* XLAT_RAW */
+# endif /* XLAT_RAW */
 	       ", width=%u, height=%u}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS), p_v4l2_frmivalenum->index,
-#if XLAT_RAW
+# if XLAT_RAW
 	       p_v4l2_frmivalenum->pixel_format,
-#else /* !XLAT_RAW */
+# else /* !XLAT_RAW */
 	       cc0(p_v4l2_frmivalenum->pixel_format),
 	       cc1(p_v4l2_frmivalenum->pixel_format),
 	       cc2(p_v4l2_frmivalenum->pixel_format),
 	       cc3(p_v4l2_frmivalenum->pixel_format),
-#endif /* XLAT_RAW */
+# endif /* XLAT_RAW */
 	       p_v4l2_frmivalenum->width,
 	       p_v4l2_frmivalenum->height);
 #endif /* VIDIOC_ENUM_FRAMEINTERVALS */

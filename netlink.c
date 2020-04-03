@@ -40,9 +40,9 @@
 #include "xlat/nl_xfrm_types.h"
 #include "xlat/nlmsgerr_attrs.h"
 
-# define XLAT_MACROS_ONLY
-#  include "xlat/crypto_msgs.h"
-# undef XLAT_MACROS_ONLY
+#define XLAT_MACROS_ONLY
+# include "xlat/crypto_msgs.h"
+#undef XLAT_MACROS_ONLY
 
 /*
  * Fetch a struct nlmsghdr from the given address.
