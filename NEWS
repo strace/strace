@@ -31,6 +31,9 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of openat2 and pidfd_getfd syscalls.
   * Enhanced io_uring_register, prctl, sched_getattr, and sched_setattr syscall
     decoding.
+  * Implemented decoding of BPF_MAP_LOOKUP_BATCH,
+    BPF_MAP_LOOKUP_AND_DELETE_BATCH, BPF_MAP_UPDATE_BATCH, and
+    BPF_MAP_DELETE_BATCH bpf syscall commands.
   * Enhanced decoding of BPF_MAP_CREATE and BPF_PROG_ATTACH bpf syscall
     commands.
   * Enhanced decoding of RTC_VL_READ ioctl command.
