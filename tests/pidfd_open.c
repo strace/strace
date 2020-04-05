@@ -80,7 +80,9 @@ main(void)
 
 # ifndef PATH_TRACING
 	printf("pidfd_open(%d, 0) = "
-#  ifdef PRINT_PATHS
+#  if defined PRINT_PIDFD
+	       "%ld<pid:%d>\n", pid, rc, pid
+#  elif defined PRINT_PATHS
 	       "%ld<anon_inode:[pidfd]>\n", pid, rc
 #  else
 	       "%s\n", pid, errstr

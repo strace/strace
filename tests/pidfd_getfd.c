@@ -22,6 +22,9 @@
 # ifndef FD0_PATH
 #  define FD0_PATH ""
 # endif
+# ifndef PRINT_PIDFD
+#  define PRINT_PIDFD 0
+# endif
 
 static const char *errstr;
 
@@ -53,9 +56,15 @@ main(void)
 
 	int pid = getpid();
 	int pidfd = syscall(__NR_pidfd_open, pid, 0);
+#if PRINT_PIDFD
+	char pidfd_str[sizeof("<pid:>") + 3 * sizeof(int)];
+	snprintf(pidfd_str, sizeof(pidfd_str), "<pid:%d>", pid);
+#else
+	const char *pidfd_str = PIDFD_PATH;
+#endif
 	rc = k_pidfd_getfd(pidfd, 0, 0);
 	printf("pidfd_getfd(%d%s, 0, 0) = %s%s\n",
-	       pidfd, pidfd >= 0 ? PIDFD_PATH : "",
+	       pidfd, pidfd >= 0 ? pidfd_str : "",
 	       errstr, rc >= 0 ? FD0_PATH : "");
 
 	puts("+++ exited with 0 +++");

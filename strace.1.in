@@ -853,6 +853,9 @@ Print socket protocol-specific information,
 .TQ
 .B dev
 Print character/block device numbers.
+.TQ
+.B pidfd
+Print PIDs associated with pidfd file descriptors.
 .RE
 .TP
 .BR "\-e\ kvm" = vcpu
@@ -1064,9 +1067,10 @@ Print paths associated with file descriptor arguments.
 .TP
 .B \-yy
 .TQ
-.BR \-\-decode\-fds = path , socket , dev
+.BR \-\-decode\-fds = path , socket , dev , pidfd
 Print protocol specific information associated with socket file descriptors,
-and block/character device number associated with device file descriptors.
+block/character device number associated with device file descriptors,
+and PIDs asociated with pidfd file descriptors.
 .SS Statistics
 .TP 12
 .B \-c

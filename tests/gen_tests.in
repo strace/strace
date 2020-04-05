@@ -432,10 +432,14 @@ personality-Xraw	+personality.test -a15 -Xraw
 personality-Xverbose	+personality.test -Xverbose
 pidfd_getfd	-a18 -Xverbose </dev/full
 pidfd_getfd-y	--trace=pidfd_getfd -a18 -y </dev/full
+pidfd_getfd-yy	--trace=pidfd_getfd -a18 -yy </dev/full
 pidfd_open	-a17
 pidfd_open--decode-fd-path	-a17 -e decode-fd=path -e trace=pidfd_open
+pidfd_open--decode-fd-pidfd	-a17 -e decode-fd=pidfd -e trace=pidfd_open
+pidfd_open--decode-fd-socket	-a17 -e decode-fd=socket -e trace=pidfd_open
 pidfd_open-P	-a17 -P /dev/full -e trace=pidfd_open
 pidfd_open-y	-a17 -y -e trace=pidfd_open
+pidfd_open-yy	-a17 -yy -e trace=pidfd_open
 pidfd_send_signal
 pipe2	-a15
 pkey_alloc	-a17

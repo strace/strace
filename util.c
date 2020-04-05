@@ -567,6 +567,45 @@ printdev(struct tcb *tcp, int fd, const char *path)
 	return false;
 }
 
+static bool
+printpidfd(struct tcb *tcp, int fd, const char *path)
+{
+	static const char pidfd_path[] = "anon_inode:[pidfd]";
+
+	if (strcmp(path, pidfd_path))
+		return false;
+
+	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
+	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", tcp->pid, fd);
+
+	FILE *f = fopen_stream(fdi_path, "r");
+	if (!f)
+		return false;
+
+	static const char pid_pfx[] = "Pid:\t";
+	char *line = NULL;
+	size_t sz = 0;
+	bool ret = false;
+	while (getline(&line, &sz, f) > 0) {
+		const char *pos = STR_STRIP_PREFIX(line, pid_pfx);
+		if (pos == line)
+			continue;
+
+		int pid = string_to_uint_ex(pos, NULL, INT_MAX, "\n");
+		if (pid >= 0) {
+			tprintf("pid:%d", pid);
+			ret = true;
+		}
+
+		break;
+	}
+
+	free(line);
+	fclose(f);
+
+	return ret;
+}
+
 void
 printfd(struct tcb *tcp, int fd)
 {
@@ -579,6 +618,9 @@ printfd(struct tcb *tcp, int fd)
 			goto printed;
 		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
 		    printdev(tcp, fd, path))
+			goto printed;
+		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
+		    printpidfd(tcp, fd, path))
 			goto printed;
 		print_quoted_string_ex(path, strlen(path),
 			QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");

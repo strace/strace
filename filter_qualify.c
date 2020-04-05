@@ -101,6 +101,7 @@ decode_fd_str_to_uint(const char *str)
 		{ DECODE_FD_PATH,      "path" },
 		{ DECODE_FD_SOCKET,    "socket" },
 		{ DECODE_FD_DEV,       "dev" },
+		{ DECODE_FD_PIDFD,     "pidfd" },
 	};
 
 	return (int) find_arg_val(str, decode_fd_strs, -1ULL, -1ULL);

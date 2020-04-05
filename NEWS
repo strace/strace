@@ -26,6 +26,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented ability to sort on any summary column.
   * Implemented ability to show information about minimum and maximum call
     duration in the call summary output (addresses Debian bug #240945).
+  * Implemented printing of PIDs associated with pidfds in -yy mode.
   * Implemented PTRACE_GETREGS API support on hppa, sh, sh64, and xtensa.
   * Implemented decoding of openat2 and pidfd_getfd syscalls.
   * Enhanced io_uring_register, prctl, sched_getattr, and sched_setattr syscall
