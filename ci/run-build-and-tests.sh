@@ -80,12 +80,14 @@ export CC_FOR_BUILD="$CC"
 	exit $rc
 }
 
-j=-j`nproc` || j=
+nproc="$(nproc)" || nproc=1
+j="-j$nproc"
+j2="-j$((2*$nproc))"
 
 case "${CHECK-}" in
 	coverage)
 		make -k $j all VERBOSE=${VERBOSE-} CFLAGS='-g -Og'
-		make -k $j check VERBOSE=${VERBOSE-}
+		make -k $j2 check VERBOSE=${VERBOSE-}
 		codecov --gcov-args=-abcp ||:
 		echo 'BEGIN OF TEST SUITE INFORMATION'
 		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
@@ -95,7 +97,7 @@ case "${CHECK-}" in
 		make -k $j all VERBOSE=${VERBOSE-}
 		rc=$?
 		for n in ${VALGRIND_TOOLS:-memcheck helgrind drd}; do
-			make -k $j -C "${VALGRIND_TESTDIR:-.}" \
+			make -k $j2 -C "${VALGRIND_TESTDIR:-.}" \
 				check-valgrind-$n VERBOSE=${VERBOSE-} ||
 					rc=$?
 		done
@@ -106,6 +108,6 @@ case "${CHECK-}" in
 		[ "$rc" -eq 0 ]
 		;;
 	*)
-		make -k $j distcheck VERBOSE=${VERBOSE-}
+		make -k $j2 distcheck VERBOSE=${VERBOSE-}
 		;;
 esac
