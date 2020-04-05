@@ -94,7 +94,12 @@ case "${CHECK-}" in
 		echo 'BEGIN OF TEST SUITE INFORMATION'
 		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 		echo 'END OF TEST SUITE INFORMATION'
-		./codecov.bash -Z -a -abc
+		case "$CC" in
+			gcc*) GCOV="gcov${CC#gcc}" ;;
+			clang*) GCOV="llvm-cov${CC#clang} gcov" ;;
+			*) GCOV=gcov ;;
+		esac
+		./codecov.bash -Z -x "$GCOV" -a -abc
 		;;
 	valgrind)
 		make -k $j all VERBOSE=${VERBOSE-}

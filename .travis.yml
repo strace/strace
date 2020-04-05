@@ -24,13 +24,12 @@ matrix:
       env:
         - TARGET=x86
         - STACKTRACE=no
-    - compiler: gcc
+    - compiler: gcc-9
       arch: amd64
-      dist: trusty
       env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
         - CHECK=coverage
+        - TARGET=x86_64
+        - STACKTRACE=libdw
         - KHEADERS=torvalds/linux
     - compiler: gcc-9
       arch: amd64
