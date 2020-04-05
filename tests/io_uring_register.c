@@ -268,7 +268,7 @@ main(void)
 		       i ? ", " : "",
 		       probe->ops[i].op, probe->ops[i].resv,
 		       probe->ops[i].flags & 1 ? "IO_URING_OP_SUPPORTED|" : "",
-		       probe->ops[i].flags & ~1,
+		       probe->ops[i].flags & (typeof(probe->ops[i].flags)) ~1,
 		       probe->ops[i].flags & 1 ? "" : " /* IO_URING_OP_??? */",
 		       probe->ops[i].resv2);
 	}
