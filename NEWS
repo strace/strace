@@ -28,6 +28,8 @@ Noteworthy changes in release ?.? (????-??-??)
     duration in the call summary output (addresses Debian bug #240945).
   * Implemented printing of PIDs associated with pidfds in -yy mode.
   * Implemented PTRACE_GETREGS API support on hppa, sh, sh64, and xtensa.
+  * Improved performance of libdw-based stack traces printing by implementing
+    a symbol-to-address cache.
   * Implemented decoding of openat2 and pidfd_getfd syscalls.
   * Enhanced io_uring_register, prctl, sched_getattr, and sched_setattr syscall
     decoding.
