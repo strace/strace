@@ -143,9 +143,8 @@ esac
 
 case "${CHECK-}" in
 	coverage)
-		apt_get_install lcov python-pip python-setuptools
-		retry_if_failed \
-			pip install --user codecov
+		curl -s -S https://codecov.io/bash > codecov.bash
+		chmod u+x codecov.bash
 		;;
 	valgrind)
 		apt_get_install valgrind

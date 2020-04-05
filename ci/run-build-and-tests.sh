@@ -46,6 +46,9 @@ esac
 case "${CHECK-}" in
 	coverage)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-code-coverage"
+		ac_cv_prog_LCOV=lcov
+		ac_cv_prog_GENHTML=genhtml
+		export ac_cv_prog_LCOV ac_cv_prog_GENHTML
 		;;
 	valgrind)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-valgrind"
@@ -88,10 +91,10 @@ case "${CHECK-}" in
 	coverage)
 		make -k $j all VERBOSE=${VERBOSE-} CFLAGS='-g -Og'
 		make -k $j2 check VERBOSE=${VERBOSE-}
-		codecov --gcov-args=-abcp ||:
 		echo 'BEGIN OF TEST SUITE INFORMATION'
 		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 		echo 'END OF TEST SUITE INFORMATION'
+		./codecov.bash -Z -a -abc
 		;;
 	valgrind)
 		make -k $j all VERBOSE=${VERBOSE-}
