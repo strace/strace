@@ -46,9 +46,6 @@ esac
 case "${CHECK-}" in
 	coverage)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-code-coverage"
-		CFLAGS='-g -O0'
-		CFLAGS_FOR_BUILD="$CFLAGS"
-		export CFLAGS CFLAGS_FOR_BUILD
 		;;
 	valgrind)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-valgrind"
@@ -87,7 +84,7 @@ j=-j`nproc` || j=
 
 case "${CHECK-}" in
 	coverage)
-		make -k $j all VERBOSE=${VERBOSE-}
+		make -k $j all VERBOSE=${VERBOSE-} CFLAGS='-g -Og'
 		make -k $j check VERBOSE=${VERBOSE-}
 		codecov --gcov-args=-abcp ||:
 		echo 'BEGIN OF TEST SUITE INFORMATION'
