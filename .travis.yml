@@ -60,7 +60,7 @@ matrix:
       env:
         - TARGET=x32
         - STACKTRACE=no
-    - compiler: clang
+    - compiler: clang-9
       arch: amd64
       env:
         - TARGET=x86_64
@@ -70,7 +70,7 @@ matrix:
       env:
         - TARGET=x86_64
         - STACKTRACE=no
-    - compiler: clang
+    - compiler: clang-9
       arch: amd64
       env:
         - TARGET=x86
@@ -116,7 +116,7 @@ matrix:
         - STACKTRACE=no
         - KHEADERS=torvalds/linux
         - TIMEOUT_DURATION=1500
-    - compiler: clang
+    - compiler: clang-9
       arch: arm64
       env:
         - TARGET=aarch64
