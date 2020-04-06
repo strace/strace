@@ -340,8 +340,11 @@ Output format:\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
   -e decode-fds=SET, --decode-fds=SET\n\
-                 what kinds FD information details to decode\n\
-     details:    dev, path, pidfd, socket\n\
+                 what kinds of file descritor information details to decode\n\
+     details:    dev (device major/minor for block/char device files)\n\
+                 path (file path),\n\
+                 pidfd (associated PID for pidfds),\n\
+                 socket (protocol-specific information for socket descriptors)\n\
   -i, --instruction-pointer\n\
                  print instruction pointer at time of syscall\n\
 "
@@ -393,10 +396,9 @@ Output format:\n\
      formats:    raw, abbrev, verbose\n\
   -y, --decode-fds[=path]\n\
                  print paths associated with file descriptor arguments\n\
-  -yy, --decode-fds=path,socket,dev,pidfd\n\
-                 print protocol specific information associated with socket\n\
-                 file descriptors and also device numbers and pidfd PIDs\n\
-                 in addition to paths\n\
+  -yy, --decode-fds=all\n\
+                 print all available information associated with file\n\
+                 descriptors in addition to paths\n\
 \n\
 Statistics:\n\
   -c, --summary-only\n\
@@ -1839,7 +1841,7 @@ init(int argc, char *argv[])
 	static const char qqflag_qual[] = "exit,attach,personality";
 	static const char qqqflag_qual[] = "all";
 	static const char yflag_qual[] = "path";
-	static const char yyflag_qual[] = "socket,dev,path,pidfd";
+	static const char yyflag_qual[] = "all";
 	static const char tflag_str[] = "format:time";
 	static const char ttflag_str[] = "precision:us,format:time";
 	static const char tttflag_str[] = "format:unix,precision:us";

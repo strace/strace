@@ -1067,8 +1067,9 @@ Print paths associated with file descriptor arguments.
 .TP
 .B \-yy
 .TQ
-.BR \-\-decode\-fds = path , socket , dev , pidfd
-Print protocol specific information associated with socket file descriptors,
+.BR \-\-decode\-fds = all
+Print all available information associated with file descritors:
+protocol-specific information associated with socket file descriptors,
 block/character device number associated with device file descriptors,
 and PIDs asociated with pidfd file descriptors.
 .SS Statistics
