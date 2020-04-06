@@ -169,6 +169,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	pc \
 	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \
+	poll-P \
+	ppoll-P \
 	ppoll-v \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
