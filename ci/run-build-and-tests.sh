@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 #
-# Copyright (c) 2018-2019 The strace developers.
+# Copyright (c) 2018-2020 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -46,9 +46,9 @@ esac
 case "${CHECK-}" in
 	coverage)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-code-coverage"
-		CFLAGS='-g -O0'
-		CFLAGS_FOR_BUILD="$CFLAGS"
-		export CFLAGS CFLAGS_FOR_BUILD
+		ac_cv_prog_LCOV=lcov
+		ac_cv_prog_GENHTML=genhtml
+		export ac_cv_prog_LCOV ac_cv_prog_GENHTML
 		;;
 	valgrind)
 		DISTCHECK_CONFIGURE_FLAGS="$DISTCHECK_CONFIGURE_FLAGS --enable-valgrind"
@@ -83,22 +83,29 @@ export CC_FOR_BUILD="$CC"
 	exit $rc
 }
 
-j=-j`nproc` || j=
+nproc="$(nproc)" || nproc=1
+j="-j$nproc"
+j2="-j$((2*$nproc))"
 
 case "${CHECK-}" in
 	coverage)
-		make -k $j all VERBOSE=${VERBOSE-}
-		make -k $j check VERBOSE=${VERBOSE-}
-		codecov --gcov-args=-abcp ||:
+		make -k $j all VERBOSE=${VERBOSE-} CFLAGS='-g -Og'
+		make -k $j2 check VERBOSE=${VERBOSE-}
 		echo 'BEGIN OF TEST SUITE INFORMATION'
 		tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 		echo 'END OF TEST SUITE INFORMATION'
+		case "$CC" in
+			gcc*) GCOV="gcov${CC#gcc}" ;;
+			clang*) GCOV="llvm-cov${CC#clang} gcov" ;;
+			*) GCOV=gcov ;;
+		esac
+		./codecov.bash -Z -x "$GCOV" -a -abc
 		;;
 	valgrind)
 		make -k $j all VERBOSE=${VERBOSE-}
 		rc=$?
 		for n in ${VALGRIND_TOOLS:-memcheck helgrind drd}; do
-			make -k $j -C "${VALGRIND_TESTDIR:-.}" \
+			make -k $j2 -C "${VALGRIND_TESTDIR:-.}" \
 				check-valgrind-$n VERBOSE=${VERBOSE-} ||
 					rc=$?
 		done
@@ -109,6 +116,6 @@ case "${CHECK-}" in
 		[ "$rc" -eq 0 ]
 		;;
 	*)
-		make -k $j distcheck VERBOSE=${VERBOSE-}
+		make -k $j2 distcheck VERBOSE=${VERBOSE-}
 		;;
 esac

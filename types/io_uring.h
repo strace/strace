@@ -8,9 +8,9 @@
 #ifndef STRACE_TYPES_IO_URING_H
 # define STRACE_TYPES_IO_URING_H
 
-#ifdef HAVE_LINUX_IO_URING_H
-# include <linux/io_uring.h>
-#endif
+# ifdef HAVE_LINUX_IO_URING_H
+#  include <linux/io_uring.h>
+# endif
 
 typedef struct {
 	uint32_t head;

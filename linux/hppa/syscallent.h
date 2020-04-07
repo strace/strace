@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2001 Hewlett-Packard, Matthew Wilcox
- * Copyright (c) 2001-2019 The strace developers.
+ * Copyright (c) 2001-2020 The strace developers.
  */
 
 [  0] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
@@ -358,6 +358,7 @@
 [352] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [353] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [354] = { 4,	0,		SEN(rseq),			"rseq"			},
-/* [355 ... 402] - reserved to sync up with other architectures */
+[355] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
+/* [356 ... 402] - reserved to sync up with other architectures */
 #include "syscallent-common-32.h"
 #include "syscallent-common.h"

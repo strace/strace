@@ -1,6 +1,6 @@
 # Executables without side effects.
 #
-# Copyright (c) 2017-2019 The strace developers.
+# Copyright (c) 2017-2020 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -149,6 +149,14 @@ ioctl_evdev-v
 ioctl_evdev-v-Xabbrev
 ioctl_evdev-v-Xraw
 ioctl_evdev-v-Xverbose
+ioctl_hdio
+ioctl_hdio-Xabbrev
+ioctl_hdio-Xraw
+ioctl_hdio-Xverbose
+ioctl_hdio-v
+ioctl_hdio-v-Xabbrev
+ioctl_hdio-v-Xraw
+ioctl_hdio-v-Xverbose
 ioctl_inotify
 ioctl_kvm_run
 ioctl_kvm_run-v
@@ -376,10 +384,14 @@ personality-Xraw
 personality-Xverbose
 pidfd_getfd
 pidfd_getfd-y
+pidfd_getfd-yy
 pidfd_open
 pidfd_open--decode-fd-path
+pidfd_open--decode-fd-pidfd
+pidfd_open--decode-fd-socket
 pidfd_open-P
 pidfd_open-y
+pidfd_open-yy
 pidfd_send_signal
 pipe
 pipe2
@@ -387,9 +399,7 @@ pkey_alloc
 pkey_free
 pkey_mprotect
 poll
-poll-P
 ppoll
-ppoll-P
 prctl-arg2-intptr
 prctl-dumpable
 prctl-name

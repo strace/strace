@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2017-2019 The strace developers.
+ * Copyright (c) 2017-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -75,6 +75,7 @@ enum decode_fd_bits {
 	DECODE_FD_PATH,
 	DECODE_FD_SOCKET,
 	DECODE_FD_DEV,
+	DECODE_FD_PIDFD,
 
 	NUM_DECODE_FD_BITS
 };

@@ -340,6 +340,13 @@ test_pure_prog_set()
 
 		try_run_prog "../$t" || continue
 		run_strace $prog_args "$@" "../$t" > "$expfile"
+
+		case "$STRACE_ARCH:$MIPS_ABI:$NAME" in
+			mips:o32:*creds)
+				sed -i '/^prctl(PR_GET_FP_MODE)  *= 0$/d' "$LOG"
+				;;
+		esac
+
 		match_diff "$LOG" "$expfile"
 	} < /dev/null; done
 }

@@ -2,7 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 1996-2019 The strace developers.
+ * Copyright (c) 1996-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -25,6 +25,7 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 		tz.tz_minuteswest, tz.tz_dsttime);
 }
 
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
@@ -34,6 +35,16 @@ SYS_FUNC(gettimeofday)
 	}
 	return 0;
 }
+
+SYS_FUNC(settimeofday)
+{
+	print_timeval(tcp, tcp->u_arg[0]);
+	tprints(", ");
+	print_timezone(tcp, tcp->u_arg[1]);
+
+	return RVAL_DECODED;
+}
+#endif
 
 #ifdef ALPHA
 SYS_FUNC(osf_gettimeofday)
@@ -46,15 +57,6 @@ SYS_FUNC(osf_gettimeofday)
 	return 0;
 }
 #endif
-
-SYS_FUNC(settimeofday)
-{
-	print_timeval(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	print_timezone(tcp, tcp->u_arg[1]);
-
-	return RVAL_DECODED;
-}
 
 #ifdef ALPHA
 SYS_FUNC(osf_settimeofday)

@@ -177,6 +177,22 @@ ioctl_evdev-success-v	+ioctl_evdev-success.test -a26 -v
 ioctl_evdev-success-v-Xabbrev	+ioctl_evdev-success.test -v -Xabbrev
 ioctl_evdev-success-v-Xraw	+ioctl_evdev-success.test -a27 -v -Xraw
 ioctl_evdev-success-v-Xverbose	+ioctl_evdev-success.test -a43 -v -Xverbose
+ioctl_hdio	+ioctl.test -a27
+ioctl_hdio-Xabbrev	+ioctl.test -a27 -Xabbrev
+ioctl_hdio-Xraw	+ioctl.test -a20 -Xraw
+ioctl_hdio-Xverbose	+ioctl.test -a39 -Xverbose
+ioctl_hdio-v	+ioctl.test -a27 -v
+ioctl_hdio-v-Xabbrev	+ioctl.test -a27 -v -Xabbrev
+ioctl_hdio-v-Xraw	+ioctl.test -a20 -v -Xraw
+ioctl_hdio-v-Xverbose	+ioctl.test -a39 -v -Xverbose
+ioctl_hdio-success	+ioctl-success.sh -a27
+ioctl_hdio-success-Xabbrev	+ioctl-success.sh -a27 -Xabbrev
+ioctl_hdio-success-Xraw	+ioctl-success.sh -a20 -Xraw
+ioctl_hdio-success-Xverbose	+ioctl-success.sh -a39 -Xverbose
+ioctl_hdio-success-v	+ioctl-success.sh -a27 -v
+ioctl_hdio-success-v-Xabbrev	+ioctl-success.sh -a27 -v -Xabbrev
+ioctl_hdio-success-v-Xraw	+ioctl-success.sh -a20 -v -Xraw
+ioctl_hdio-success-v-Xverbose	+ioctl-success.sh -a39 -v -Xverbose
 ioctl_inotify	+ioctl.test
 ioctl_kvm_run	+ioctl.test -a36 -y
 ioctl_kvm_run-v	+ioctl.test -v -a36 -y
@@ -416,10 +432,14 @@ personality-Xraw	+personality.test -a15 -Xraw
 personality-Xverbose	+personality.test -Xverbose
 pidfd_getfd	-a18 -Xverbose </dev/full
 pidfd_getfd-y	--trace=pidfd_getfd -a18 -y </dev/full
+pidfd_getfd-yy	--trace=pidfd_getfd -a18 -yy </dev/full
 pidfd_open	-a17
 pidfd_open--decode-fd-path	-a17 -e decode-fd=path -e trace=pidfd_open
+pidfd_open--decode-fd-pidfd	-a17 -e decode-fd=pidfd -e trace=pidfd_open
+pidfd_open--decode-fd-socket	-a17 -e decode-fd=socket -e trace=pidfd_open
 pidfd_open-P	-a17 -P /dev/full -e trace=pidfd_open
 pidfd_open-y	-a17 -y -e trace=pidfd_open
+pidfd_open-yy	-a17 -yy -e trace=pidfd_open
 pidfd_send_signal
 pipe2	-a15
 pkey_alloc	-a17

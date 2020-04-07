@@ -126,6 +126,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_evdev-success-v-Xabbrev \
 	ioctl_evdev-success-v-Xraw \
 	ioctl_evdev-success-v-Xverbose \
+	ioctl_hdio-success \
+	ioctl_hdio-success-Xabbrev \
+	ioctl_hdio-success-Xraw \
+	ioctl_hdio-success-Xverbose \
+	ioctl_hdio-success-v \
+	ioctl_hdio-success-v-Xabbrev \
+	ioctl_hdio-success-v-Xraw \
+	ioctl_hdio-success-v-Xverbose \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_nsfs \
@@ -161,6 +169,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	pc \
 	perf_event_open_nonverbose \
 	perf_event_open_unabbrev \
+	poll-P \
+	ppoll-P \
 	ppoll-v \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
@@ -187,6 +197,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	set_ptracer_any \
 	set_sigblock \
 	set_sigign \
+	setpgrp-exec \
 	signal_receive \
 	sleep \
 	stack-fcall \
@@ -506,7 +517,6 @@ EXTRA_DIST = \
 	strace--syscall-times-ns.expected \
 	strace-C.expected \
 	strace-D.expected \
-	strace-DD.expected \
 	strace-DDD.expected \
 	strace-E.expected \
 	strace-T.expected \

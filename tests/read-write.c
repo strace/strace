@@ -2,7 +2,7 @@
  * Check decoding and dumping of read and write syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -153,9 +153,17 @@ main(void)
 	skip_if_unavailable("/proc/self/fd/");
 
 	static const char tmp[] = "read-write-tmpfile";
-	if (open(tmp, O_CREAT|O_RDONLY|O_TRUNC, 0600) != 0)
+	bool need_cleanup = true;
+	long rc;
+
+	rc = open(tmp, O_RDONLY, 0600);
+	if (rc < 0) {
+		rc = open(tmp, O_CREAT|O_EXCL|O_RDONLY, 0600);
+		need_cleanup = false;
+	}
+	if (rc != 0)
 		perror_msg_and_fail("creat: %s", tmp);
-	if (open(tmp, O_WRONLY) != 1)
+	if (open(tmp, O_TRUNC|O_WRONLY) != 1)
 		perror_msg_and_fail("open: %s", tmp);
 
 	static const char w_c[] = "0123456789abcde";
@@ -174,8 +182,6 @@ main(void)
 	void *r1 = tail_alloc(w_len);
 
 	void *efault = r1 - get_page_size();
-
-	long rc;
 
 	rc = k_write(1, w, 0);
 	if (rc)
@@ -283,6 +289,9 @@ main(void)
 		test_dump(i, false);
 
 	test_dump(256, true);
+
+	if (need_cleanup && unlink(tmp))
+		perror_msg_and_fail("unlink: %s", tmp);
 
 	tprintf("+++ exited with 0 +++\n");
 	return 0;

@@ -106,17 +106,17 @@ fill_fmt(struct v4l2_format *f)
 				f->fmt.pix_mp.plane_fmt[i].bytesperline
 					= 0xd0decad1 ^ i;
 			} else {
-#if WORDS_BIGENDIAN
+# if WORDS_BIGENDIAN
 				f->fmt.pix_mp.plane_fmt[i].bytesperline
 					= 0xd0de;
 				f->fmt.pix_mp.plane_fmt[i].reserved[0]
 					= 0xcad1 ^ i;
-#else
+# else
 				f->fmt.pix_mp.plane_fmt[i].bytesperline
 					= 0xcad1 ^ i;
 				f->fmt.pix_mp.plane_fmt[i].reserved[0]
 					= 0xd0de;
-#endif
+# endif
 			}
 		}
 

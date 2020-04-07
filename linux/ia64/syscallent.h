@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 1999, 2001 Hewlett-Packard Co
  *                          David Mosberger-Tang <davidm@hpl.hp.com>
- * Copyright (c) 2000-2019 The strace developers.
+ * Copyright (c) 2000-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

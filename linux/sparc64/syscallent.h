@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2019 The strace developers.
+ * Copyright (c) 2004-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -270,7 +270,7 @@
 [264] = { 1,	0,		SEN(timer_getoverrun),		"timer_getoverrun"	},
 [265] = { 1,	0,		SEN(timer_delete),		"timer_delete"		},
 [266] = { 3,	0,		SEN(timer_create),		"timer_create"		},
-[267] = { },
+[267] = { 5,	0,		SEN(vserver),			"vserver"		},
 [268] = { 2,	TM,		SEN(io_setup),			"io_setup"		},
 [269] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [270] = { 3,	0,		SEN(io_submit),			"io_submit"		},

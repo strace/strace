@@ -13,9 +13,13 @@ git:
 
 env:
   global:
-    - SLEEP_A_BIT="sleep 0.2"
-    - VERBOSE="1"
     - KBRANCH="v5.6"
+    - KHEADERS=""
+    - SLEEP_A_BIT="sleep 0.2"
+    - STACKTRACE=""
+    - TARGET=""
+    - TIMEOUT_DURATION=""
+    - VERBOSE="1"
 
 matrix:
   include:
@@ -24,83 +28,12 @@ matrix:
       env:
         - TARGET=x86
         - STACKTRACE=no
-    - compiler: gcc
-      arch: amd64
-      dist: trusty
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
-        - CHECK=coverage
-        - KHEADERS=torvalds/linux
-    - compiler: gcc-9
-      arch: amd64
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libdw
-        - KHEADERS=torvalds/linux
-    - compiler: gcc-9
-      arch: amd64
-      env:
-        - TARGET=x32
-        - STACKTRACE=no
-        - KHEADERS=torvalds/linux
-    - compiler: gcc-9
-      arch: amd64
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
-        - KHEADERS=torvalds/linux
-    - compiler: gcc
-      arch: amd64
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libdw
-    - compiler: gcc
-      arch: amd64
-      env:
-        - TARGET=x32
-        - STACKTRACE=no
-    - compiler: clang
-      arch: amd64
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libdw
-    - compiler: musl-gcc
-      arch: amd64
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=no
-    - compiler: clang
-      arch: amd64
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
     - compiler: musl-gcc
       arch: amd64
       dist: trusty
       env:
         - TARGET=x86
         - STACKTRACE=no
-    - compiler: gcc-9
-      arch: amd64
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=libunwind
-    - compiler: gcc-9
-      arch: amd64
-      env:
-        - TARGET=x32
-        - STACKTRACE=no
-    - compiler: gcc-9
-      arch: amd64
-      env:
-        - TARGET=x86
-        - STACKTRACE=no
-    - compiler: gcc
-      arch: amd64
-      env:
-        - TARGET=x86_64
-        - STACKTRACE=no
     - compiler: gcc
       arch: arm64
       env:
@@ -116,25 +49,8 @@ matrix:
         - STACKTRACE=no
         - KHEADERS=torvalds/linux
         - TIMEOUT_DURATION=1500
-    - compiler: clang
+    - compiler: clang-9
       arch: arm64
-      env:
-        - TARGET=aarch64
-        - SLEEP_A_BIT="sleep 0.5"
-        - STACKTRACE=no
-        - TIMEOUT_DURATION=1500
-    - compiler: gcc-8
-      arch: arm64
-      dist: trusty
-      env:
-        - TARGET=aarch64
-        - SLEEP_A_BIT="sleep 0.5"
-        - STACKTRACE=no
-        - KHEADERS=torvalds/linux
-        - TIMEOUT_DURATION=1500
-    - compiler: gcc-8
-      arch: arm64
-      dist: trusty
       env:
         - TARGET=aarch64
         - SLEEP_A_BIT="sleep 0.5"
@@ -145,9 +61,3 @@ matrix:
       env:
         - TARGET=s390x
         - STACKTRACE=libdw
-    - arch: s390x
-      compiler: gcc-9
-      env:
-        - TARGET=s390x
-        - STACKTRACE=no
-        - KHEADERS=torvalds/linux

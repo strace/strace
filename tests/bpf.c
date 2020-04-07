@@ -2,7 +2,7 @@
  * Check bpf syscall decoding.
  *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2019 The strace developers.
+ * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -80,6 +80,9 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_BTF_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_TASK_FD_QUERY);
 	BPF_ATTR_DATA_FIELD(BPF_MAP_FREEZE);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_LOOKUP_BATCH);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_UPDATE_BATCH);
+	BPF_ATTR_DATA_FIELD(BPF_MAP_DELETE_BATCH);
 	char char_data[256];
 };
 
@@ -1316,6 +1319,75 @@ static const struct bpf_attr_check BPF_TASK_FD_QUERY_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_MAP_LOOKUP_BATCH_checks[] = {
+	{
+		.data = { .BPF_MAP_LOOKUP_BATCH_data = { .map_fd = -1 } },
+		.size = offsetofend(struct BPF_MAP_LOOKUP_BATCH_struct, map_fd ),
+		.str = "batch={in_batch=NULL, out_batch=NULL, keys=NULL"
+		       ", values=NULL, count=0, map_fd=-1, elem_flags=BPF_ANY"
+		       ", flags=0}"
+	},
+	{
+		.data = { .BPF_MAP_LOOKUP_BATCH_data = {
+			.in_batch = 0xfacefeed,
+			.out_batch = 0xbadc0ded,
+			.keys = 0xdeadf00d,
+			.values = 0xfffffffe,
+			.count = 3,
+			.map_fd = -1,
+			.elem_flags = 4,
+			.flags = 4
+		} },
+		.size = offsetofend(struct BPF_MAP_LOOKUP_BATCH_struct, flags),
+		.str = "batch={in_batch=0xfacefeed, out_batch=0xbadc0ded"
+		       ", keys=0xdeadf00d, values=0xfffffffe, count=3"
+		       ", map_fd=-1, elem_flags=BPF_F_LOCK, flags=0x4}"
+	}
+};
+
+static const struct bpf_attr_check BPF_MAP_UPDATE_BATCH_checks[] = {
+	{
+		.data = { .BPF_MAP_UPDATE_BATCH_data = { .map_fd = -1 } },
+		.size = offsetofend(struct BPF_MAP_UPDATE_BATCH_struct, map_fd ),
+		.str = "batch={keys=NULL, values=NULL, count=0, map_fd=-1"
+		       ", elem_flags=BPF_ANY, flags=0}"
+	},
+	{
+		.data = { .BPF_MAP_UPDATE_BATCH_data = {
+			.keys = 0xdeadf00d,
+			.values = 0xfffffffe,
+			.count = 3,
+			.map_fd = -1,
+			.elem_flags = 4,
+			.flags = 4
+		} },
+		.size = offsetofend(struct BPF_MAP_UPDATE_BATCH_struct, flags),
+		.str = "batch={keys=0xdeadf00d, values=0xfffffffe, count=3"
+		       ", map_fd=-1, elem_flags=BPF_F_LOCK, flags=0x4}"
+	}
+};
+
+static const struct bpf_attr_check BPF_MAP_DELETE_BATCH_checks[] = {
+	{
+		.data = { .BPF_MAP_DELETE_BATCH_data = { .map_fd = -1 } },
+		.size = offsetofend(struct BPF_MAP_DELETE_BATCH_struct, map_fd ),
+		.str = "batch={keys=NULL, count=0, map_fd=-1"
+		       ", elem_flags=BPF_ANY, flags=0}"
+	},
+	{
+		.data = { .BPF_MAP_DELETE_BATCH_data = {
+			.keys = 0xdeadf00d,
+			.count = 3,
+			.map_fd = -1,
+			.elem_flags = 4,
+			.flags = 4
+		} },
+		.size = offsetofend(struct BPF_MAP_DELETE_BATCH_struct, flags),
+		.str = "batch={keys=0xdeadf00d, count=3, map_fd=-1"
+		       ", elem_flags=BPF_F_LOCK, flags=0x4}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1352,6 +1424,9 @@ main(void)
 		CHK(BPF_MAP_LOOKUP_AND_DELETE_ELEM),
 		CHK(BPF_MAP_FREEZE),
 		CHK(BPF_BTF_GET_NEXT_ID),
+		CHK(BPF_MAP_LOOKUP_BATCH),
+		CHK(BPF_MAP_UPDATE_BATCH),
+		CHK(BPF_MAP_DELETE_BATCH),
 	};
 
 	page_size = get_page_size();

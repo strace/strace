@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2018 Chen Jingpiao <chenjingpiao@gmail.com>
  * Copyright (c) 2019 Paul Chaignon <paul.chaignon@gmail.com>
+ * Copyright (c) 2018 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

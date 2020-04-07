@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2018-2019 The strace developers.
+ * Copyright (c) 2018-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -360,5 +360,29 @@ struct bpf_prog_info_struct {
 # define bpf_prog_info_struct_size \
 	sizeof(struct bpf_prog_info_struct)
 # define expected_bpf_prog_info_struct_size 208
+
+struct BPF_MAP_LOOKUP_BATCH_struct /* batch */ {
+	uint64_t ATTRIBUTE_ALIGNED(8) in_batch;
+	uint64_t ATTRIBUTE_ALIGNED(8) out_batch;
+	uint64_t ATTRIBUTE_ALIGNED(8) keys;
+	uint64_t ATTRIBUTE_ALIGNED(8) values;
+	uint32_t count;
+	uint32_t map_fd;
+	uint64_t ATTRIBUTE_ALIGNED(8) elem_flags;
+	uint64_t ATTRIBUTE_ALIGNED(8) flags;
+};
+
+# define BPF_MAP_LOOKUP_BATCH_struct_size \
+	sizeof(struct BPF_MAP_LOOKUP_BATCH_struct)
+# define expected_BPF_MAP_LOOKUP_BATCH_struct_size 56
+
+# define BPF_MAP_LOOKUP_AND_DELETE_BATCH_struct BPF_MAP_LOOKUP_BATCH_struct
+# define BPF_MAP_LOOKUP_AND_DELETE_BATCH_struct_size BPF_MAP_LOOKUP_BATCH_struct_size
+
+# define BPF_MAP_UPDATE_BATCH_struct BPF_MAP_LOOKUP_BATCH_struct
+# define BPF_MAP_UPDATE_BATCH_struct_size BPF_MAP_LOOKUP_BATCH_struct_size
+
+# define BPF_MAP_DELETE_BATCH_struct BPF_MAP_LOOKUP_BATCH_struct
+# define BPF_MAP_DELETE_BATCH_struct_size BPF_MAP_LOOKUP_BATCH_struct_size
 
 #endif /* !STRACE_BPF_ATTR_H */

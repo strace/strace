@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2018 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -87,7 +87,7 @@ DECL_NLA(rt_class);
 DECL_NLA(rt_proto);
 DECL_NLA(tc_stats);
 
-#define NLA_HWADDR_FAMILY_OFFSET 1024
+# define NLA_HWADDR_FAMILY_OFFSET 1024
 
 /**
  * Print hardware (low-level, L2) address.

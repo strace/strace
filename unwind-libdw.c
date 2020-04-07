@@ -17,14 +17,37 @@
 #include "defs.h"
 #include "unwind.h"
 #include "mmap_notify.h"
+#include "static_assert.h"
 #include <elfutils/libdwfl.h>
+
+#define STRACE_UW_CACHE_SIZE 2048
+#define STRACE_UW_CACHE_ASSOC 32
+static_assert(STRACE_UW_CACHE_SIZE % STRACE_UW_CACHE_ASSOC == 0,
+	     "STRACE_UW_CACHE_SIZE % STRACE_UW_CACHE_ASSOC != 0");
+
+struct cache_entry {
+	/* key */
+	Dwarf_Addr pc;
+	unsigned long long generation;
+
+	/* value */
+	const char *modname;
+	const char *symname;
+	GElf_Off off;
+	Dwarf_Addr true_offset;
+
+	/* replacement */
+	unsigned long long last_use;
+};
 
 struct ctx {
 	Dwfl *dwfl;
-	unsigned int last_proc_updating;
+	unsigned long long last_proc_updating;
+	struct cache_entry cache[STRACE_UW_CACHE_SIZE];
 };
 
-static unsigned int mapping_generation;
+static unsigned long long mapping_generation = 1;
+static unsigned long long uwcache_clock;
 
 static void
 update_mapping_generation(struct tcb *tcp, void *unused)
@@ -70,6 +93,7 @@ tcb_init(struct tcb *tcp)
 	struct ctx *ctx = xmalloc(sizeof(*ctx));
 	ctx->dwfl = dwfl;
 	ctx->last_proc_updating = mapping_generation - 1;
+	memset(ctx->cache, 0, sizeof(ctx->cache));
 	return ctx;
 }
 
@@ -113,7 +137,33 @@ struct frame_user_data {
 	unwind_error_action_fn error_action;
 	void *data;
 	int stack_depth;
+	struct ctx *ctx;
 };
+
+static bool
+find_bucket(struct ctx *ctx, Dwarf_Addr pc, struct cache_entry **res) {
+	unsigned int idx = pc & ((STRACE_UW_CACHE_SIZE-1) &
+				 ~(STRACE_UW_CACHE_ASSOC-1));
+	struct cache_entry *unused = NULL;
+	struct cache_entry *lru = ctx->cache + idx;
+	for (unsigned int i = 0; i < STRACE_UW_CACHE_ASSOC; ++i) {
+		struct cache_entry *ce = ctx->cache + (idx + i);
+		if (ce->generation == mapping_generation && ce->pc == pc) {
+			ce->last_use = uwcache_clock++;
+			*res = ce;
+			return true;
+		}
+		if (ce->generation != mapping_generation) {
+			unused = ce;
+			continue;
+		}
+		if (ce->last_use < lru->last_use)
+			lru = ce;
+	}
+	*res = unused ? unused : lru;
+
+	return false;
+}
 
 static int
 frame_callback(Dwfl_Frame *state, void *arg)
@@ -130,24 +180,40 @@ frame_callback(Dwfl_Frame *state, void *arg)
 	if (!isactivation)
 		pc--;
 
-	Dwfl *dwfl = dwfl_thread_dwfl(dwfl_frame_thread(state));
-	Dwfl_Module *mod = dwfl_addrmodule(dwfl, pc);
-	GElf_Off off = 0;
+	struct cache_entry *ce;
+	if (find_bucket(user_data->ctx, pc, &ce)) {
+		user_data->call_action(user_data->data,
+				       ce->modname, ce->symname,
+			               ce->off, ce->true_offset);
+	} else {
+		Dwfl *dwfl = dwfl_thread_dwfl(dwfl_frame_thread(state));
+		Dwfl_Module *mod = dwfl_addrmodule(dwfl, pc);
+		GElf_Off off = 0;
 
-	if (mod != NULL) {
-		const char *modname = NULL;
-		const char *symname = NULL;
-		GElf_Sym sym;
-		Dwarf_Addr true_offset = pc;
+		if (mod != NULL) {
+			const char *modname = NULL;
+			const char *symname = NULL;
+			GElf_Sym sym;
+			Dwarf_Addr true_offset = pc;
 
-		modname = dwfl_module_info(mod, NULL, NULL, NULL, NULL,
-					   NULL, NULL, NULL);
-		symname = dwfl_module_addrinfo(mod, pc, &off, &sym,
-					       NULL, NULL, NULL);
-		dwfl_module_relocate_address(mod, &true_offset);
-		user_data->call_action(user_data->data, modname, symname,
-				       off, true_offset);
+			modname = dwfl_module_info(mod, NULL, NULL, NULL, NULL,
+						   NULL, NULL, NULL);
+			symname = dwfl_module_addrinfo(mod, pc, &off, &sym,
+						       NULL, NULL, NULL);
+			dwfl_module_relocate_address(mod, &true_offset);
+			user_data->call_action(user_data->data, modname, symname,
+					       off, true_offset);
+
+			ce->generation = mapping_generation;
+			ce->pc = pc;
+			ce->modname = modname;
+			ce->symname = symname;
+			ce->off = off;
+			ce->true_offset = true_offset;
+			ce->last_use = uwcache_clock++;
+		}
 	}
+
 	/* Max number of frames to print reached? */
 	if (user_data->stack_depth-- == 0)
 		return DWARF_CB_ABORT;
@@ -170,6 +236,7 @@ tcb_walk(struct tcb *tcp,
 		.error_action = error_action,
 		.data = data,
 		.stack_depth = 256,
+		.ctx = ctx,
 	};
 
 	flush_cache_maybe(tcp);

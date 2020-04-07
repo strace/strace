@@ -8,9 +8,9 @@
 #ifndef STRACE_TYPES_EVDEV_H
 # define STRACE_TYPES_EVDEV_H
 
-#ifdef HAVE_LINUX_INPUT_H
-# include <linux/input.h>
-#endif
+# ifdef HAVE_LINUX_INPUT_H
+#  include <linux/input.h>
+# endif
 
 typedef struct {
 	int32_t value;

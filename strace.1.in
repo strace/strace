@@ -853,6 +853,9 @@ Print socket protocol-specific information,
 .TQ
 .B dev
 Print character/block device numbers.
+.TQ
+.B pidfd
+Print PIDs associated with pidfd file descriptors.
 .RE
 .TP
 .BR "\-e\ kvm" = vcpu
@@ -1064,9 +1067,11 @@ Print paths associated with file descriptor arguments.
 .TP
 .B \-yy
 .TQ
-.BR \-\-decode\-fds = path , socket , dev
-Print protocol specific information associated with socket file descriptors,
-and block/character device number associated with device file descriptors.
+.BR \-\-decode\-fds = all
+Print all available information associated with file descritors:
+protocol-specific information associated with socket file descriptors,
+block/character device number associated with device file descriptors,
+and PIDs asociated with pidfd file descriptors.
 .SS Statistics
 .TP 12
 .B \-c
@@ -1348,22 +1353,22 @@ option.
 Print the help summary.
 .TP
 .B \-\-seccomp\-bpf
-Enable (experimental) usage of seccomp-bpf (see
+Try to enable use of seccomp-bpf (see
 .BR seccomp (2))
 to have
 .BR ptrace (2)-stops
 only when system calls that are being traced occur in the traced processes.
-Implies the
-.B \-f
-option.
-An attempt to rely on seccomp-bpf to filter system calls may fail for various
-reasons, e.g. there are too many system calls to filter, the seccomp API is not
-available, or
+This option has no effect unless
+.BR \-f / \-\-follow\-forks
+is also specified.
+.B \-\-seccomp\-bpf
+is also not applicable to processes attached using
+.BR \-p / \-\-attach
+option.  An attempt to enable system calls filtering using seccomp-bpf may
+fail for various reasons, e.g. there are too many system calls to filter,
+the seccomp API is not available, or
 .B strace
 itself is being traced.
-.B \-\-seccomp\-bpf
-is also ineffective on processes attached using
-.BR \-p .
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.

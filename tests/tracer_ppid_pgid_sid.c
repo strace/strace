@@ -1,7 +1,7 @@
 /*
  * Helper program for strace-DDD.test
  *
- * Copyright (c) 2019 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2019-2020 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

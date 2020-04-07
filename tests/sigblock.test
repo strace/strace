@@ -4,7 +4,7 @@
 # Starting with commit v4.17-5-gf83b49b strace is expected
 # to forward the signal mask to tracees unchanged.
 #
-# Copyright (c) 2017-2018 The strace developers.
+# Copyright (c) 2017-2020 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
