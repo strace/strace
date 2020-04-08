@@ -1,2 +1,4 @@
 NETLINK_UNCONNECTED	0
 NETLINK_CONNECTED	1
+/* The initial socket state, as set by net/code/sock.c:sock_init_data */
+TCP_CLOSE		7

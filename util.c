@@ -6,101 +6,199 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
-#include <sys/param.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <sys/stat.h>
+#include <sys/sysmacros.h>
 #ifdef HAVE_SYS_XATTR_H
 # include <sys/xattr.h>
 #endif
 #include <sys/uio.h>
 
-int
-tv_nz(const struct timeval *a)
+#include "largefile_wrappers.h"
+#include "number_set.h"
+#include "print_utils.h"
+#include "static_assert.h"
+#include "string_to_uint.h"
+#include "xlat.h"
+#include "xstring.h"
+
+const struct xlat_data *
+find_xlat_val_ex(const struct xlat_data *items, const char *s, size_t num_items,
+		 unsigned int flags)
 {
-	return a->tv_sec || a->tv_usec;
+	for (size_t i = 0; i < num_items; i++) {
+		if (!(flags & FXL_CASE_SENSITIVE ? strcmp
+						 : strcasecmp)(items[i].str, s))
+			return items + i;
+	}
+
+	return NULL;
+}
+
+uint64_t
+find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
+	       uint64_t default_val, uint64_t not_found)
+{
+	if (!arg)
+		return default_val;
+
+	const struct xlat_data *res = find_xlat_val_ex(strs, arg, strs_size, 0);
+
+	return  res ? res->val : not_found;
 }
 
 int
-tv_cmp(const struct timeval *a, const struct timeval *b)
+str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
+		 int *width)
+{
+	static const struct xlat_data units[] = {
+		{ 1000000000U | (0ULL << 32), "s" },
+		{ 1000000U    | (3ULL << 32), "ms" },
+		{ 1000U       | (6ULL << 32), "us" },
+		{ 1U          | (9ULL << 32), "ns" },
+	};
+
+	if (!arg)
+		return null_dflt;
+	if (!arg[0])
+		return empty_dflt;
+
+	uint64_t res = find_arg_val(arg, units, null_dflt, -1ULL);
+
+	if (width && res != -1ULL)
+		*width = res >> 32;
+
+	return res & 0xffffffff;
+}
+
+int
+ts_nz(const struct timespec *a)
+{
+	return a->tv_sec || a->tv_nsec;
+}
+
+int
+ts_cmp(const struct timespec *a, const struct timespec *b)
 {
 	if (a->tv_sec < b->tv_sec
-	    || (a->tv_sec == b->tv_sec && a->tv_usec < b->tv_usec))
+	    || (a->tv_sec == b->tv_sec && a->tv_nsec < b->tv_nsec))
 		return -1;
 	if (a->tv_sec > b->tv_sec
-	    || (a->tv_sec == b->tv_sec && a->tv_usec > b->tv_usec))
+	    || (a->tv_sec == b->tv_sec && a->tv_nsec > b->tv_nsec))
 		return 1;
 	return 0;
 }
 
 double
-tv_float(const struct timeval *tv)
+ts_float(const struct timespec *tv)
 {
-	return tv->tv_sec + tv->tv_usec/1000000.0;
+	return tv->tv_sec + tv->tv_nsec/1000000000.0;
 }
 
 void
-tv_add(struct timeval *tv, const struct timeval *a, const struct timeval *b)
+ts_add(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 {
 	tv->tv_sec = a->tv_sec + b->tv_sec;
-	tv->tv_usec = a->tv_usec + b->tv_usec;
-	if (tv->tv_usec >= 1000000) {
+	tv->tv_nsec = a->tv_nsec + b->tv_nsec;
+	if (tv->tv_nsec >= 1000000000) {
 		tv->tv_sec++;
-		tv->tv_usec -= 1000000;
+		tv->tv_nsec -= 1000000000;
 	}
 }
 
 void
-tv_sub(struct timeval *tv, const struct timeval *a, const struct timeval *b)
+ts_sub(struct timespec *tv, const struct timespec *a, const struct timespec *b)
 {
 	tv->tv_sec = a->tv_sec - b->tv_sec;
-	tv->tv_usec = a->tv_usec - b->tv_usec;
-	if (((long) tv->tv_usec) < 0) {
+	tv->tv_nsec = a->tv_nsec - b->tv_nsec;
+	if (tv->tv_nsec < 0) {
 		tv->tv_sec--;
-		tv->tv_usec += 1000000;
+		tv->tv_nsec += 1000000000;
 	}
 }
 
 void
-tv_div(struct timeval *tv, const struct timeval *a, int n)
+ts_div(struct timespec *tv, const struct timespec *a, uint64_t n)
 {
-	tv->tv_usec = (a->tv_sec % n * 1000000 + a->tv_usec + n / 2) / n;
-	tv->tv_sec = a->tv_sec / n + tv->tv_usec / 1000000;
-	tv->tv_usec %= 1000000;
+	long long nsec = (a->tv_sec % n * 1000000000LL + a->tv_nsec + n / 2) / n;
+	tv->tv_sec = a->tv_sec / n + nsec / 1000000000;
+	tv->tv_nsec = nsec % 1000000000;
 }
 
 void
-tv_mul(struct timeval *tv, const struct timeval *a, int n)
+ts_mul(struct timespec *tv, const struct timespec *a, uint64_t n)
 {
-	tv->tv_usec = a->tv_usec * n;
-	tv->tv_sec = a->tv_sec * n + tv->tv_usec / 1000000;
-	tv->tv_usec %= 1000000;
+	long long nsec = a->tv_nsec * n;
+	tv->tv_sec = a->tv_sec * n + nsec / 1000000000;
+	tv->tv_nsec = nsec % 1000000000;
+}
+
+const struct timespec *
+ts_min(const struct timespec *a, const struct timespec *b)
+{
+	return ts_cmp(a, b) < 0 ? a : b;
+}
+
+const struct timespec *
+ts_max(const struct timespec *a, const struct timespec *b)
+{
+	return ts_cmp(a, b) > 0 ? a : b;
+}
+
+int
+parse_ts(const char *s, struct timespec *t)
+{
+	enum { NS_IN_S = 1000000000 };
+
+	static const char float_accept[] =  "eE.-+0123456789";
+	static const char int_accept[] = "+0123456789";
+
+	size_t float_len = strspn(s, float_accept);
+	size_t int_len = strspn(s, int_accept);
+	char *endptr = NULL;
+	double float_val = -1;
+	long long int_val = -1;
+
+	if (float_len > int_len) {
+		errno = 0;
+
+		float_val = strtod(s, &endptr);
+
+		if (endptr == s || errno)
+			return -1;
+		if (float_val < 0)
+			return -1;
+	} else {
+		int_val = string_to_uint_ex(s, &endptr, LLONG_MAX, "smun");
+
+		if (int_val < 0)
+			return -1;
+	}
+
+	int scale = str2timescale_sfx(endptr, NULL);
+	if (scale <= 0)
+		return -1;
+
+	if (float_len > int_len) {
+		t->tv_sec = float_val / (NS_IN_S / scale);
+		t->tv_nsec = ((uint64_t) ((float_val -
+					   (t->tv_sec * (NS_IN_S / scale)))
+					  * scale)) % NS_IN_S;
+	} else {
+		t->tv_sec = int_val / (NS_IN_S / scale);
+		t->tv_nsec = (int_val % (NS_IN_S / scale)) * scale;
+	}
+
+	return 0;
 }
 
 #if !defined HAVE_STPCPY
@@ -171,10 +269,10 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 #if SIZEOF_KERNEL_LONG_T > 4
 # ifndef current_klongsize
 	if (current_klongsize < SIZEOF_KERNEL_LONG_T) {
-#  if defined(AARCH64) || defined(POWERPC64)
+#  if defined(AARCH64) || defined(POWERPC64) || defined(POWERPC64LE)
 		/* Align arg_no to the next even number. */
 		arg_no = (arg_no + 1) & 0xe;
-#  endif /* AARCH64 || POWERPC64 */
+#  endif /* AARCH64 || POWERPC64 || POWERPC64LE */
 		*val = ULONG_LONG(tcp->u_arg[arg_no], tcp->u_arg[arg_no + 1]);
 		arg_no += 2;
 	} else
@@ -223,12 +321,12 @@ printllval(struct tcb *tcp, const char *format, int arg_no)
 }
 
 void
-printaddr(const kernel_ulong_t addr)
+printaddr64(const uint64_t addr)
 {
 	if (!addr)
 		tprints("NULL");
 	else
-		tprintf("%#" PRI_klx, addr);
+		tprintf("%#" PRIx64, addr);
 }
 
 #define DEF_PRINTNUM(name, type) \
@@ -253,7 +351,7 @@ printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr)	\
 	if (umove_or_printaddr(tcp, addr, &num))			\
 		return false;						\
 	tprints("[");							\
-	printaddr(num);							\
+	printaddr64(num);						\
 	tprints("]");							\
 	return true;							\
 }
@@ -282,48 +380,28 @@ DEF_PRINTNUM(int64, uint64_t)
 DEF_PRINTNUM_ADDR(int64, uint64_t)
 DEF_PRINTPAIR(int64, uint64_t)
 
-#ifndef current_wordsize
 bool
-printnum_long_int(struct tcb *const tcp, const kernel_ulong_t addr,
-		  const char *const fmt_long, const char *const fmt_int)
+printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	if (current_wordsize > sizeof(int)) {
-		return printnum_int64(tcp, addr, fmt_long);
-	} else {
-		return printnum_int(tcp, addr, fmt_int);
-	}
+	int fd;
+	if (umove_or_printaddr(tcp, addr, &fd))
+		return false;
+	tprints("[");
+	printfd(tcp, fd);
+	tprints("]");
+	return true;
 }
-
-bool
-printnum_addr_long_int(struct tcb *tcp, const kernel_ulong_t addr)
-{
-	if (current_wordsize > sizeof(int)) {
-		return printnum_addr_int64(tcp, addr);
-	} else {
-		return printnum_addr_int(tcp, addr);
-	}
-}
-#endif /* !current_wordsize */
-
-#ifndef current_klongsize
-bool
-printnum_addr_klong_int(struct tcb *tcp, const kernel_ulong_t addr)
-{
-	if (current_klongsize > sizeof(int)) {
-		return printnum_addr_int64(tcp, addr);
-	} else {
-		return printnum_addr_int(tcp, addr);
-	}
-}
-#endif /* !current_klongsize */
 
 /**
  * Prints time to a (static internal) buffer and returns pointer to it.
+ * Returns NULL if the provided time specification is not correct.
  *
  * @param sec		Seconds since epoch.
  * @param part_sec	Amount of second parts since the start of a second.
  * @param max_part_sec	Maximum value of a valid part_sec.
  * @param width		1 + floor(log10(max_part_sec)).
+ * @return		Pointer to a statically allocated string on success,
+ *			NULL on error.
  */
 static const char *
 sprinttime_ex(const long long sec, const unsigned long long part_sec,
@@ -344,15 +422,9 @@ sprinttime_ex(const long long sec, const unsigned long long part_sec,
 	if (!pos)
 		return NULL;
 
-	if (part_sec > 0) {
-		int ret = snprintf(buf + pos, sizeof(buf) - pos, ".%0*llu",
-				   width, part_sec);
-
-		if (ret < 0 || (size_t) ret >= sizeof(buf) - pos)
-			return NULL;
-
-		pos += ret;
-	}
+	if (part_sec > 0)
+		pos += xsnprintf(buf + pos, sizeof(buf) - pos, ".%0*llu",
+				 width, part_sec);
 
 	return strftime(buf + pos, sizeof(buf) - pos, "%z", tmp) ? buf : NULL;
 }
@@ -375,6 +447,36 @@ sprinttime_nsec(long long sec, unsigned long long nsec)
 	return sprinttime_ex(sec, nsec, 999999999, 9);
 }
 
+void
+print_uuid(const unsigned char *uuid)
+{
+	const char str[] = {
+		BYTE_HEX_CHARS(uuid[0]),
+		BYTE_HEX_CHARS(uuid[1]),
+		BYTE_HEX_CHARS(uuid[2]),
+		BYTE_HEX_CHARS(uuid[3]),
+		'-',
+		BYTE_HEX_CHARS(uuid[4]),
+		BYTE_HEX_CHARS(uuid[5]),
+		'-',
+		BYTE_HEX_CHARS(uuid[6]),
+		BYTE_HEX_CHARS(uuid[7]),
+		'-',
+		BYTE_HEX_CHARS(uuid[8]),
+		BYTE_HEX_CHARS(uuid[9]),
+		'-',
+		BYTE_HEX_CHARS(uuid[10]),
+		BYTE_HEX_CHARS(uuid[11]),
+		BYTE_HEX_CHARS(uuid[12]),
+		BYTE_HEX_CHARS(uuid[13]),
+		BYTE_HEX_CHARS(uuid[14]),
+		BYTE_HEX_CHARS(uuid[15]),
+		'\0'
+	};
+
+	tprints(str);
+}
+
 enum sock_proto
 getfdproto(struct tcb *tcp, int fd)
 {
@@ -387,7 +489,7 @@ getfdproto(struct tcb *tcp, int fd)
 	if (fd < 0)
 		return SOCK_PROTO_UNKNOWN;
 
-	sprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
+	xsprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
 	r = getxattr(path, "system.sockprotoname", buf, bufsize - 1);
 	if (r <= 0)
 		return SOCK_PROTO_UNKNOWN;
@@ -423,33 +525,130 @@ getfdinode(struct tcb *tcp, int fd)
 	return 0;
 }
 
+static bool
+printsocket(struct tcb *tcp, int fd, const char *path)
+{
+	const char *str = STR_STRIP_PREFIX(path, "socket:[");
+	size_t len;
+	unsigned long inode;
+
+	return (str != path)
+		&& (len = strlen(str))
+		&& (str[len - 1] == ']')
+		&& (inode = strtoul(str, NULL, 10))
+		&& print_sockaddr_by_inode(tcp, fd, inode);
+}
+
+static bool
+printdev(struct tcb *tcp, int fd, const char *path)
+{
+	strace_stat_t st;
+
+	if (path[0] != '/')
+		return false;
+
+	if (stat_file(path, &st)) {
+		debug_func_perror_msg("stat(\"%s\")", path);
+		return false;
+	}
+
+	switch (st.st_mode & S_IFMT) {
+	case S_IFBLK:
+	case S_IFCHR:
+		print_quoted_string_ex(path, strlen(path),
+				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+				       "<>");
+		tprintf("<%s %u:%u>",
+			S_ISBLK(st.st_mode)? "block" : "char",
+			major(st.st_rdev), minor(st.st_rdev));
+		return true;
+	}
+
+	return false;
+}
+
+static bool
+printpidfd(struct tcb *tcp, int fd, const char *path)
+{
+	static const char pidfd_path[] = "anon_inode:[pidfd]";
+
+	if (strcmp(path, pidfd_path))
+		return false;
+
+	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
+	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", tcp->pid, fd);
+
+	FILE *f = fopen_stream(fdi_path, "r");
+	if (!f)
+		return false;
+
+	static const char pid_pfx[] = "Pid:\t";
+	char *line = NULL;
+	size_t sz = 0;
+	bool ret = false;
+	while (getline(&line, &sz, f) > 0) {
+		const char *pos = STR_STRIP_PREFIX(line, pid_pfx);
+		if (pos == line)
+			continue;
+
+		int pid = string_to_uint_ex(pos, NULL, INT_MAX, "\n");
+		if (pid >= 0) {
+			tprintf("pid:%d", pid);
+			ret = true;
+		}
+
+		break;
+	}
+
+	free(line);
+	fclose(f);
+
+	return ret;
+}
+
 void
 printfd(struct tcb *tcp, int fd)
 {
 	char path[PATH_MAX + 1];
-	if (show_fd_path && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
-		const char *str;
-		size_t len;
-		unsigned long inode;
+	if (!number_set_array_is_empty(decode_fd_set, 0)
+	    && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
+		tprintf("%d<", (int) fd);
+		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
+		    printsocket(tcp, fd, path))
+			goto printed;
+		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
+		    printdev(tcp, fd, path))
+			goto printed;
+		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
+		    printpidfd(tcp, fd, path))
+			goto printed;
+		print_quoted_string_ex(path, strlen(path),
+			QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
 
-		tprintf("%d<", fd);
-		if (show_fd_path <= 1
-		    || (str = STR_STRIP_PREFIX(path, "socket:[")) == path
-		    || !(len = strlen(str))
-		    || str[len - 1] != ']'
-		    || !(inode = strtoul(str, NULL, 10))
-		    || !print_sockaddr_by_inode(tcp, fd, inode)) {
-			print_quoted_string(path, strlen(path),
-					    QUOTE_OMIT_LEADING_TRAILING_QUOTES);
-		}
+printed:
 		tprints(">");
-	} else
+	} else {
 		tprintf("%d", fd);
+	}
+}
+
+void
+print_pid_fd(struct tcb *tcp, pid_t pid, int fd)
+{
+	/*
+	 * TODO: We want to have the same formatting as printfd here,
+	 *       but we should figure out first which process in strace's
+	 *       PID NS is referred to by pid in tracee's PID NS.
+	 */
+	tprintf("%d", fd);
 }
 
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.
+ *
+ * `escape_chars' specifies characters (in addition to characters with
+ * codes 0..31, 127..255, single and double quotes) that should be escaped.
  *
  * If QUOTE_0_TERMINATED `style' flag is set,
  * treat `instr' as a NUL-terminated string,
@@ -463,12 +662,13 @@ printfd(struct tcb *tcp, int fd)
  */
 int
 string_quote(const char *instr, char *outstr, const unsigned int size,
-	     const unsigned int style)
+	     const unsigned int style, const char *escape_chars)
 {
 	const unsigned char *ustr = (const unsigned char *) instr;
 	char *s = outstr;
 	unsigned int i;
 	int usehex, c, eol;
+	bool printable;
 
 	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
@@ -502,6 +702,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 		}
 	}
 
+	if (style & QUOTE_EMIT_COMMENT)
+		s = stpcpy(s, " /* ");
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 
@@ -514,73 +716,81 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 				goto asciz_ended;
 			*s++ = '\\';
 			*s++ = 'x';
-			*s++ = "0123456789abcdef"[c >> 4];
-			*s++ = "0123456789abcdef"[c & 0xf];
+			s = sprint_byte_hex(s, c);
 		}
-	} else {
-		for (i = 0; i < size; ++i) {
-			c = ustr[i];
-			/* Check for NUL-terminated string. */
-			if (c == eol)
-				goto asciz_ended;
-			if ((i == (size - 1)) &&
-			    (style & QUOTE_OMIT_TRAILING_0) && (c == '\0'))
-				goto asciz_ended;
-			switch (c) {
-				case '\"': case '\\':
-					*s++ = '\\';
-					*s++ = c;
-					break;
-				case '\f':
-					*s++ = '\\';
-					*s++ = 'f';
-					break;
-				case '\n':
-					*s++ = '\\';
-					*s++ = 'n';
-					break;
-				case '\r':
-					*s++ = '\\';
-					*s++ = 'r';
-					break;
-				case '\t':
-					*s++ = '\\';
-					*s++ = 't';
-					break;
-				case '\v':
-					*s++ = '\\';
-					*s++ = 'v';
-					break;
-				default:
-					if (c >= ' ' && c <= 0x7e)
-						*s++ = c;
-					else {
-						/* Print \octal */
-						*s++ = '\\';
-						if (i + 1 < size
-						    && ustr[i + 1] >= '0'
-						    && ustr[i + 1] <= '9'
-						) {
-							/* Print \ooo */
+
+		goto string_ended;
+	}
+
+	for (i = 0; i < size; ++i) {
+		c = ustr[i];
+		/* Check for NUL-terminated string. */
+		if (c == eol)
+			goto asciz_ended;
+		if ((i == (size - 1)) &&
+		    (style & QUOTE_OMIT_TRAILING_0) && (c == '\0'))
+			goto asciz_ended;
+		switch (c) {
+		case '\"': case '\\':
+			*s++ = '\\';
+			*s++ = c;
+			break;
+		case '\f':
+			*s++ = '\\';
+			*s++ = 'f';
+			break;
+		case '\n':
+			*s++ = '\\';
+			*s++ = 'n';
+			break;
+		case '\r':
+			*s++ = '\\';
+			*s++ = 'r';
+			break;
+		case '\t':
+			*s++ = '\\';
+			*s++ = 't';
+			break;
+		case '\v':
+			*s++ = '\\';
+			*s++ = 'v';
+			break;
+		default:
+			printable = is_print(c);
+
+			if (printable && escape_chars)
+				printable = !strchr(escape_chars, c);
+
+			if (printable) {
+				*s++ = c;
+			} else {
+				/* Print \octal */
+				*s++ = '\\';
+				if (i + 1 < size
+				    && ustr[i + 1] >= '0'
+				    && ustr[i + 1] <= '7'
+				) {
+					/* Print \ooo */
+					*s++ = '0' + (c >> 6);
+					*s++ = '0' + ((c >> 3) & 0x7);
+				} else {
+					/* Print \[[o]o]o */
+					if ((c >> 3) != 0) {
+						if ((c >> 6) != 0)
 							*s++ = '0' + (c >> 6);
-							*s++ = '0' + ((c >> 3) & 0x7);
-						} else {
-							/* Print \[[o]o]o */
-							if ((c >> 3) != 0) {
-								if ((c >> 6) != 0)
-									*s++ = '0' + (c >> 6);
-								*s++ = '0' + ((c >> 3) & 0x7);
-							}
-						}
-						*s++ = '0' + (c & 0x7);
+						*s++ = '0' + ((c >> 3) & 0x7);
 					}
-					break;
+				}
+				*s++ = '0' + (c & 0x7);
 			}
 		}
 	}
 
+ string_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
+	if (style & QUOTE_EMIT_COMMENT)
+		s = stpcpy(s, " */");
 	*s = '\0';
 
 	/* Return zero if we printed entire ASCIZ string (didn't truncate it) */
@@ -596,6 +806,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
  asciz_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
+	if (style & QUOTE_EMIT_COMMENT)
+		s = stpcpy(s, " */");
 	*s = '\0';
 	/* Return zero: we printed entire ASCIZ string (didn't truncate it) */
 	return 0;
@@ -620,8 +832,8 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
  * Note that if QUOTE_0_TERMINATED is not set, always returns 1.
  */
 int
-print_quoted_string(const char *str, unsigned int size,
-		    const unsigned int style)
+print_quoted_string_ex(const char *str, unsigned int size,
+		       const unsigned int style, const char *escape_chars)
 {
 	char *buf;
 	char *outstr;
@@ -633,11 +845,13 @@ print_quoted_string(const char *str, unsigned int size,
 
 	alloc_size = 4 * size;
 	if (alloc_size / 4 != size) {
-		error_msg("Out of memory");
+		error_func_msg("requested %u bytes exceeds %u bytes limit",
+			       size, -1U / 4);
 		tprints("???");
 		return -1;
 	}
-	alloc_size += 1 + (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES ? 0 : 2);
+	alloc_size += 1 + (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES ? 0 : 2) +
+		(style & QUOTE_EMIT_COMMENT ? 7 : 0);
 
 	if (use_alloca(alloc_size)) {
 		outstr = alloca(alloc_size);
@@ -645,17 +859,25 @@ print_quoted_string(const char *str, unsigned int size,
 	} else {
 		outstr = buf = malloc(alloc_size);
 		if (!buf) {
-			error_msg("Out of memory");
+			error_func_msg("memory exhausted when tried to allocate"
+				       " %u bytes", alloc_size);
 			tprints("???");
 			return -1;
 		}
 	}
 
-	rc = string_quote(str, outstr, size, style);
+	rc = string_quote(str, outstr, size, style, escape_chars);
 	tprints(outstr);
 
 	free(buf);
 	return rc;
+}
+
+inline int
+print_quoted_string(const char *str, unsigned int size,
+		    const unsigned int style)
+{
+	return print_quoted_string_ex(str, size, style, NULL);
 }
 
 /*
@@ -679,8 +901,10 @@ print_quoted_cstring(const char *str, unsigned int size)
 /*
  * Print path string specified by address `addr' and length `n'.
  * If path length exceeds `n', append `...' to the output.
+ *
+ * Returns the result of umovenstr.
  */
-void
+int
 printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 {
 	char path[PATH_MAX];
@@ -688,7 +912,7 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 
 	if (!addr) {
 		tprints("NULL");
-		return;
+		return -1;
 	}
 
 	/* Cap path length to the path buffer size */
@@ -703,13 +927,15 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 		path[n++] = !nul_seen;
 		print_quoted_cstring(path, n);
 	}
+
+	return nul_seen;
 }
 
-void
+int
 printpath(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	/* Size must correspond to char path[] size in printpathn */
-	printpathn(tcp, addr, PATH_MAX - 1);
+	return printpathn(tcp, addr, PATH_MAX - 1);
 }
 
 /*
@@ -719,8 +945,11 @@ printpath(struct tcb *const tcp, const kernel_ulong_t addr)
  * Pass `user_style' on to `string_quote'.
  * Append `...' to the output if either the string length exceeds `max_strlen',
  * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
+ *
+ * Returns the result of umovenstr if style has QUOTE_0_TERMINATED,
+ * or the result of umoven otherwise.
  */
-void
+int
 printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	    const kernel_ulong_t len, const unsigned int user_style)
 {
@@ -734,7 +963,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (!addr) {
 		tprints("NULL");
-		return;
+		return -1;
 	}
 	/* Allocate static buffers if they are not allocated yet. */
 	if (!str) {
@@ -761,7 +990,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (rc < 0) {
 		printaddr(addr);
-		return;
+		return rc;
 	}
 
 	if (size > max_strlen)
@@ -772,14 +1001,59 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...
 	 */
-	ellipsis = string_quote(str, outstr, size, style)
+	ellipsis = string_quote(str, outstr, size, style, NULL)
 		   && len
-		   && ((style & QUOTE_0_TERMINATED)
+		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 		       || len > max_strlen);
 
 	tprints(outstr);
 	if (ellipsis)
 		tprints("...");
+
+	return rc;
+}
+
+bool
+print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+		    const kernel_ulong_t start_addr,
+		    const unsigned int start_offs,
+		    const unsigned int total_len,
+		    const unsigned int style)
+{
+	if (start_offs >= total_len)
+		return false;
+
+	const kernel_ulong_t addr = start_addr + start_offs;
+	const unsigned int len = total_len - start_offs;
+	const unsigned int size = MIN(len, max_strlen);
+
+	char *str = malloc(len);
+
+	if (!str) {
+		error_func_msg("memory exhausted when tried to allocate"
+                               " %u bytes", len);
+		tprintf("%s???", prefix);
+		return true;
+	}
+
+	bool ret = true;
+
+	if (umoven(tcp, addr, len, str)) {
+		tprintf("%s???", prefix);
+	} else if (is_filled(str, 0, len)) {
+		ret = false;
+	} else {
+		tprints(prefix);
+		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+
+		print_quoted_string(str, size, style);
+
+		if (size < len)
+			tprints("...");
+	}
+
+	free(str);
+	return ret;
 }
 
 void
@@ -791,27 +1065,32 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 		struct { uint32_t base; uint32_t len; } *iov32;
 		struct { uint64_t base; uint64_t len; } *iov64;
 	} iovu;
-#define iov iovu.iov64
-#define sizeof_iov \
-	(current_wordsize == 4 ? sizeof(*iovu.iov32) : sizeof(*iovu.iov64))
-#define iov_iov_base(i) \
+# define iov iovu.iov64
+# define sizeof_iov \
+	(current_wordsize == 4 ? (unsigned int) sizeof(*iovu.iov32)	\
+			       : (unsigned int) sizeof(*iovu.iov64))
+# define iov_iov_base(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].base : iovu.iov64[i].base)
-#define iov_iov_len(i) \
+# define iov_iov_len(i) \
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].len : iovu.iov64[i].len)
 #else
 	struct iovec *iov;
-#define sizeof_iov sizeof(*iov)
-#define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
-#define iov_iov_len(i) iov[i].iov_len
+# define sizeof_iov ((unsigned int) sizeof(*iov))
+# define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
+# define iov_iov_len(i) iov[i].iov_len
 #endif
 	int i;
-	unsigned size;
+	unsigned int size = sizeof_iov * len;
+	if (size / sizeof_iov != (unsigned int) len) {
+		error_func_msg("requested %u iovec elements exceeds"
+			       " %u iovec limit", len, -1U / sizeof_iov);
+		return;
+	}
 
-	size = sizeof_iov * len;
-	/* Assuming no sane program has millions of iovs */
-	if ((unsigned)len > 1024*1024 /* insane or negative size? */
-	    || (iov = malloc(size)) == NULL) {
-		error_msg("Out of memory");
+	iov = malloc(size);
+	if (!iov) {
+		error_func_msg("memory exhausted when tried to allocate"
+			       " %u bytes", size);
 		return;
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
@@ -835,100 +1114,284 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 #undef iov
 }
 
-void
-dumpstr(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+#define ILOG2_ITER_(val_, ret_, bit_)					\
+	do {								\
+		typeof(ret_) shift_ =					\
+			((val_) > ((((typeof(val_)) 1)			\
+				   << (1 << (bit_))) - 1)) << (bit_);	\
+		(val_) >>= shift_;					\
+		(ret_) |= shift_;					\
+	} while (0)
+
+#if SIZEOF_KERNEL_LONG_T > 4
+
+# define ilog2_klong ilog2_64
+/**
+ * Calculate floor(log2(val)), with the exception of val == 0, for which 0
+ * is returned as well.
+ *
+ * @param val 64-bit value to calculate integer base-2 logarithm for.
+ * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
+ */
+static inline unsigned int
+ilog2_64(uint64_t val)
 {
-	static int strsize = -1;
-	static unsigned char *str;
+	unsigned int ret = 0;
 
-	char outbuf[
-		(
-			(sizeof(
-			"xx xx xx xx xx xx xx xx  xx xx xx xx xx xx xx xx  "
-			"1234567890123456") + /*in case I'm off by few:*/ 4)
-		/*align to 8 to make memset easier:*/ + 7) & -8
-	];
-	const unsigned char *src;
-	int i;
+	ILOG2_ITER_(val, ret, 5);
+	ILOG2_ITER_(val, ret, 4);
+	ILOG2_ITER_(val, ret, 3);
+	ILOG2_ITER_(val, ret, 2);
+	ILOG2_ITER_(val, ret, 1);
+	ILOG2_ITER_(val, ret, 0);
 
-	memset(outbuf, ' ', sizeof(outbuf));
+	return ret;
+}
 
-	if (strsize < len + 16) {
-		free(str);
-		str = malloc(len + 16);
-		if (!str) {
-			strsize = -1;
-			error_msg("Out of memory");
-			return;
-		}
-		strsize = len + 16;
+#else /* SIZEOF_KERNEL_LONG_T == 4 */
+
+# define ilog2_klong ilog2_32
+/**
+ * Calculate floor(log2(val)), with the exception of val == 0, for which 0
+ * is returned as well.
+ *
+ * @param val 32-bit value to calculate integer base-2 logarithm for.
+ * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
+ */
+static inline unsigned int
+ilog2_32(uint32_t val)
+{
+	unsigned int ret = 0;
+
+	ILOG2_ITER_(val, ret, 4);
+	ILOG2_ITER_(val, ret, 3);
+	ILOG2_ITER_(val, ret, 2);
+	ILOG2_ITER_(val, ret, 1);
+	ILOG2_ITER_(val, ret, 0);
+
+	return ret;
+}
+
+#endif /* SIZEOF_KERNEL_LONG_T */
+
+#undef ILOG2_ITER_
+
+void
+dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
+	const kernel_ulong_t len)
+{
+	/* xx xx xx xx xx xx xx xx  xx xx xx xx xx xx xx xx  1234567890123456 */
+	enum {
+		HEX_BIT = 4,
+
+		DUMPSTR_GROUP_BYTES = 8,
+		DUMPSTR_GROUPS = 2,
+		DUMPSTR_WIDTH_BYTES = DUMPSTR_GROUP_BYTES * DUMPSTR_GROUPS,
+
+		/** Width of formatted dump in characters.  */
+		DUMPSTR_WIDTH_CHARS = DUMPSTR_WIDTH_BYTES +
+			sizeof("xx") * DUMPSTR_WIDTH_BYTES + DUMPSTR_GROUPS,
+
+		DUMPSTR_GROUP_MASK = DUMPSTR_GROUP_BYTES - 1,
+		DUMPSTR_BYTES_MASK = DUMPSTR_WIDTH_BYTES - 1,
+
+		/** Minimal width of the offset field in the output.  */
+		DUMPSTR_OFFS_MIN_CHARS = 5,
+
+		/** Arbitrarily chosen internal dumpstr buffer limit.  */
+		DUMPSTR_BUF_MAXSZ = 1 << 16,
+	};
+
+	static_assert(!(DUMPSTR_BUF_MAXSZ % DUMPSTR_WIDTH_BYTES),
+		      "Maximum internal buffer size should be divisible "
+		      "by amount of bytes dumped per line");
+	static_assert(!(DUMPSTR_GROUP_BYTES & DUMPSTR_GROUP_MASK),
+		      "DUMPSTR_GROUP_BYTES is not power of 2");
+	static_assert(!(DUMPSTR_WIDTH_BYTES & DUMPSTR_BYTES_MASK),
+		      "DUMPSTR_WIDTH_BYTES is not power of 2");
+
+	if (len > len + DUMPSTR_WIDTH_BYTES || addr + len < addr) {
+		debug_func_msg("len %" PRI_klu " at addr %#" PRI_klx
+			       " is too big, skipped", len, addr);
+		return;
 	}
 
-	if (umoven(tcp, addr, len, str) < 0)
-		return;
+	static kernel_ulong_t strsize;
+	static unsigned char *str;
 
-	/* Space-pad to 16 bytes */
-	i = len;
-	while (i & 0xf)
-		str[i++] = ' ';
+	const kernel_ulong_t alloc_size =
+		MIN(ROUNDUP(len, DUMPSTR_WIDTH_BYTES), DUMPSTR_BUF_MAXSZ);
 
-	i = 0;
-	src = str;
+	if (strsize < alloc_size) {
+		free(str);
+		str = malloc(alloc_size);
+		if (!str) {
+			strsize = 0;
+			error_func_msg("memory exhausted when tried to allocate"
+				       " %" PRI_klu " bytes", alloc_size);
+			return;
+		}
+		strsize = alloc_size;
+	}
+
+	/**
+	 * Characters needed in order to print the offset field. We calculate
+	 * it this way in order to avoid ilog2_64 call most of the time.
+	 */
+	const int offs_chars = len > (1 << (DUMPSTR_OFFS_MIN_CHARS * HEX_BIT))
+		? 1 + ilog2_klong(len - 1) / HEX_BIT : DUMPSTR_OFFS_MIN_CHARS;
+	kernel_ulong_t i = 0;
+	const unsigned char *src;
+
 	while (i < len) {
+		/*
+		 * It is important to overwrite all the byte values, as we
+		 * re-use the buffer in order to avoid its re-initialisation.
+		 */
+		static char outbuf[] = {
+			[0 ... DUMPSTR_WIDTH_CHARS - 1] = ' ',
+			'\0'
+		};
 		char *dst = outbuf;
-		/* Hex dump */
+
+		/* Fetching data from tracee.  */
+		if (!i || (i % DUMPSTR_BUF_MAXSZ) == 0) {
+			kernel_ulong_t fetch_size = MIN(len - i, alloc_size);
+
+			if (umoven(tcp, addr + i, fetch_size, str) < 0) {
+				/*
+				 * Don't silently abort if we have printed
+				 * something already.
+				 */
+				if (i)
+					tprintf(" | <Cannot fetch %" PRI_klu
+						" byte%s from pid %d"
+						" @%#" PRI_klx ">\n",
+						fetch_size,
+						fetch_size == 1 ? "" : "s",
+						tcp->pid, addr + i);
+				return;
+			}
+			src = str;
+		}
+
+		/* hex dump */
 		do {
 			if (i < len) {
-				*dst++ = "0123456789abcdef"[*src >> 4];
-				*dst++ = "0123456789abcdef"[*src & 0xf];
+				dst = sprint_byte_hex(dst, *src);
 			} else {
 				*dst++ = ' ';
 				*dst++ = ' ';
 			}
-			dst++; /* space is there by memset */
+			dst++; /* space is there */
 			i++;
-			if ((i & 7) == 0)
-				dst++; /* space is there by memset */
+			if ((i & DUMPSTR_GROUP_MASK) == 0)
+				dst++; /* space is there */
 			src++;
-		} while (i & 0xf);
+		} while (i & DUMPSTR_BYTES_MASK);
+
 		/* ASCII dump */
-		i -= 16;
-		src -= 16;
+		i -= DUMPSTR_WIDTH_BYTES;
+		src -= DUMPSTR_WIDTH_BYTES;
 		do {
-			if (*src >= ' ' && *src < 0x7f)
-				*dst++ = *src;
-			else
-				*dst++ = '.';
+			if (i < len) {
+				if (is_print(*src))
+					*dst++ = *src;
+				else
+					*dst++ = '.';
+			} else {
+				*dst++ = ' ';
+			}
 			src++;
-		} while (++i & 0xf);
-		*dst = '\0';
-		tprintf(" | %05x  %s |\n", i - 16, outbuf);
+		} while (++i & DUMPSTR_BYTES_MASK);
+
+		tprintf(" | %0*" PRI_klx "  %s |\n",
+			offs_chars, i - DUMPSTR_WIDTH_BYTES, outbuf);
 	}
 }
 
-int
-umoven_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr,
-		    const unsigned int len, void *const our_addr)
+bool
+tfetch_mem64(struct tcb *const tcp, const uint64_t addr,
+	     const unsigned int len, void *const our_addr)
 {
-	if (!addr || !verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
-	    umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr(addr);
-		return -1;
-	}
-	return 0;
+	return addr && verbose(tcp) &&
+	       (entering(tcp) || !syserror(tcp)) &&
+	       !umoven(tcp, addr, len, our_addr);
+}
+
+bool
+tfetch_mem64_ignore_syserror(struct tcb *const tcp, const uint64_t addr,
+			     const unsigned int len, void *const our_addr)
+{
+	return addr && verbose(tcp) &&
+	       !umoven(tcp, addr, len, our_addr);
 }
 
 int
-umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
-				    const kernel_ulong_t addr,
-				    const unsigned int len,
-				    void *const our_addr)
+umoven_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
+		      const unsigned int len, void *const our_addr)
 {
-	if (!addr || !verbose(tcp) || umoven(tcp, addr, len, our_addr) < 0) {
-		printaddr(addr);
-		return -1;
-	}
-	return 0;
+	if (tfetch_mem64(tcp, addr, len, our_addr))
+		return 0;
+	printaddr64(addr);
+	return -1;
+}
+
+int
+umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
+				      const uint64_t addr,
+				      const unsigned int len,
+				      void *const our_addr)
+{
+	if (tfetch_mem64_ignore_syserror(tcp, addr, len, our_addr))
+		return 0;
+	printaddr64(addr);
+	return -1;
+}
+
+bool
+print_int32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			 void *data)
+{
+	tprintf("%" PRId32, *(int32_t *) elem_buf);
+
+	return true;
+}
+
+bool
+print_uint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+bool
+print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
+
+	return true;
+}
+
+bool
+print_xint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%#" PRIx32, *(uint32_t *) elem_buf);
+
+	return true;
+}
+
+bool
+print_xint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%#" PRIx64, *(uint64_t *) elem_buf);
+
+	return true;
 }
 
 /*
@@ -937,8 +1400,8 @@ umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
  *
  * Array elements are being fetched to the address specified by elem_buf.
  *
- * The fetcher callback function specified by umoven_func should follow
- * the same semantics as umoven_or_printaddr function.
+ * The fetcher callback function specified by tfetch_mem_func should follow
+ * the same semantics as tfetch_mem function.
  *
  * The printer callback function specified by print_func is expected
  * to print something; if it returns false, no more iterations will be made.
@@ -950,9 +1413,7 @@ umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
  * - "NULL", if start_addr is NULL;
  * - "[]", if nmemb is 0;
  * - start_addr, if nmemb * elem_size overflows or wraps around;
- * - nothing, if the first element cannot be fetched
- *   (if umoven_func returns non-zero), but it is assumed that
- *   umoven_func has printed the address it failed to fetch data from;
+ * - start_addr, if the first tfetch_mem_func invocation returned false;
  * - elements of the array, delimited by ", ", with the array itself
  *   enclosed with [] brackets.
  *
@@ -961,25 +1422,21 @@ umoven_or_printaddr_ignore_syserror(struct tcb *const tcp,
  * - "..." is printed instead of max_strlen+1 element
  *   and no more iterations will be made.
  *
- * This function returns true only if
- * - umoven_func has been called at least once AND
- * - umoven_func has not returned false.
+ * This function returns true only if tfetch_mem_func has returned true
+ * at least once.
  */
 bool
-print_array(struct tcb *const tcp,
-	    const kernel_ulong_t start_addr,
-	    const size_t nmemb,
-	    void *const elem_buf,
-	    const size_t elem_size,
-	    int (*const umoven_func)(struct tcb *,
-				     kernel_ulong_t,
-				     unsigned int,
-				     void *),
-	    bool (*const print_func)(struct tcb *,
-				     void *elem_buf,
-				     size_t elem_size,
-				     void *opaque_data),
-	    void *const opaque_data)
+print_array_ex(struct tcb *const tcp,
+	       const kernel_ulong_t start_addr,
+	       const size_t nmemb,
+	       void *elem_buf,
+	       const size_t elem_size,
+	       tfetch_mem_fn tfetch_mem_func,
+	       print_fn print_func,
+	       void *const opaque_data,
+	       unsigned int flags,
+	       const struct xlat *index_xlat,
+	       const char *index_dflt)
 {
 	if (!start_addr) {
 		tprints("NULL");
@@ -995,7 +1452,10 @@ print_array(struct tcb *const tcp,
 	const kernel_ulong_t end_addr = start_addr + size;
 
 	if (end_addr <= start_addr || size / elem_size != nmemb) {
-		printaddr(start_addr);
+		if (tfetch_mem_func)
+			printaddr(start_addr);
+		else
+			tprints("???");
 		return false;
 	}
 
@@ -1003,13 +1463,28 @@ print_array(struct tcb *const tcp,
 		(abbrev(tcp) && max_strlen < nmemb) ?
 			start_addr + elem_size * max_strlen : end_addr;
 	kernel_ulong_t cur;
+	kernel_ulong_t idx = 0;
+	enum xlat_style xlat_style = flags & XLAT_STYLE_MASK;
+	bool truncated = false;
 
-	for (cur = start_addr; cur < end_addr; cur += elem_size) {
+	for (cur = start_addr; cur < end_addr; cur += elem_size, idx++) {
 		if (cur != start_addr)
 			tprints(", ");
 
-		if (umoven_func(tcp, cur, elem_size, elem_buf))
-			break;
+		if (tfetch_mem_func) {
+			if (!tfetch_mem_func(tcp, cur, elem_size, elem_buf)) {
+				if (cur == start_addr)
+					printaddr(cur);
+				else {
+					tprints("...");
+					printaddr_comment(cur);
+					truncated = true;
+				}
+				break;
+			}
+		} else {
+			elem_buf = (void *) (uintptr_t) cur;
+		}
 
 		if (cur == start_addr)
 			tprints("[");
@@ -1017,7 +1492,21 @@ print_array(struct tcb *const tcp,
 		if (cur >= abbrev_end) {
 			tprints("...");
 			cur = end_addr;
+			truncated = true;
 			break;
+		}
+
+		if (flags & PAF_PRINT_INDICES) {
+			tprints("[");
+
+			if (!index_xlat) {
+				print_xlat_ex(idx, NULL, xlat_style);
+			} else {
+				printxval_ex(idx ? NULL : index_xlat, idx,
+					     index_dflt, xlat_style);
+			}
+
+			tprints("] = ");
 		}
 
 		if (!print_func(tcp, elem_buf, elem_size, opaque_data)) {
@@ -1025,8 +1514,17 @@ print_array(struct tcb *const tcp,
 			break;
 		}
 	}
-	if (cur != start_addr)
+
+	if ((cur != start_addr) || !tfetch_mem_func) {
+		if ((flags & PAF_ARRAY_TRUNCATED) && !truncated) {
+			if (cur != start_addr)
+				tprints(", ");
+
+			tprints("...");
+		}
+
 		tprints("]");
+	}
 
 	return cur >= end_addr;
 }
@@ -1034,7 +1532,7 @@ print_array(struct tcb *const tcp,
 int
 printargs(struct tcb *tcp)
 {
-	const int n = tcp->s_ent->nargs;
+	const int n = n_args(tcp);
 	int i;
 	for (i = 0; i < n; ++i)
 		tprintf("%s%#" PRI_klx, i ? ", " : "", tcp->u_arg[i]);
@@ -1044,7 +1542,7 @@ printargs(struct tcb *tcp)
 int
 printargs_u(struct tcb *tcp)
 {
-	const int n = tcp->s_ent->nargs;
+	const int n = n_args(tcp);
 	int i;
 	for (i = 0; i < n; ++i)
 		tprintf("%s%u", i ? ", " : "",
@@ -1055,7 +1553,7 @@ printargs_u(struct tcb *tcp)
 int
 printargs_d(struct tcb *tcp)
 {
-	const int n = tcp->s_ent->nargs;
+	const int n = n_args(tcp);
 	int i;
 	for (i = 0; i < n; ++i)
 		tprintf("%s%d", i ? ", " : "",
@@ -1074,14 +1572,8 @@ print_abnormal_hi(const kernel_ulong_t val)
 	}
 }
 
-#if defined _LARGEFILE64_SOURCE && defined HAVE_OPEN64
-# define open_file open64
-#else
-# define open_file open
-#endif
-
 int
-read_int_from_file(const char *const fname, int *const pvalue)
+read_int_from_file(struct tcb *tcp, const char *const fname, int *const pvalue)
 {
 	const int fd = open_file(fname, O_RDONLY);
 	if (fd < 0)

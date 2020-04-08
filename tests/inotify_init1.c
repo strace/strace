@@ -2,34 +2,15 @@
  * Check decoding of inotify_init1 syscall.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined(__NR_inotify_init1)
 
@@ -44,9 +25,19 @@
 # endif
 # define all_flags (O_NONBLOCK | cloexec_flag)
 
+# ifdef PRINT_PATHS
+#  define RC_FMT "%ld<%s>"
+# else
+#  define RC_FMT "%s"
+# endif
+
 int
 main(void)
 {
+# ifdef PRINT_PATHS
+	skip_if_unavailable("/proc/self/fd/");
+# endif
+
 	static const kernel_ulong_t bogus_flags1 =
 		(kernel_ulong_t) 0xfacefeeddeadbeefULL | O_NONBLOCK;
 	static const kernel_ulong_t bogus_flags2 =
@@ -65,8 +56,51 @@ main(void)
 	       (unsigned int) bogus_flags2, sprintrc(rc));
 
 	rc = syscall(__NR_inotify_init1, all_flags);
-	printf("inotify_init1(IN_NONBLOCK%s) = %s\n",
-	       all_flags & cloexec_flag ? "|IN_CLOEXEC" : "", sprintrc(rc));
+
+# ifdef PRINT_PATHS
+	if (rc < 0)
+		perror_msg_and_skip("inotify_init(%#x)", all_flags);
+
+	/*
+	 * Kernels that do not have v2.6.33-rc1~34^2~7 do not have
+	 * "anon_inode:" prefix.  Let's assume that it can be either "inotify"
+	 * or "anon_inode:inotify" for now, as any change there may be
+	 * of interest.
+	 */
+	char path[sizeof("/proc/self/fd/") + sizeof(rc) * 3];
+	char buf[2] = "";
+	const char *inotify_path;
+	ssize_t ret;
+
+	ret = snprintf(path, sizeof(path), "/proc/self/fd/%ld", rc);
+	if ((ret < 0) || ((size_t) ret >= sizeof(path)))
+		perror_msg_and_fail("snprintf(path)");
+
+	ret = readlink(path, buf, sizeof(buf));
+	if (ret < 0)
+		perror_msg_and_fail("readlink");
+
+	switch (buf[0]) {
+	case 'a':
+		inotify_path = "anon_inode:inotify";
+		break;
+	case 'i':
+		inotify_path = "inotify";
+		break;
+	default:
+		error_msg_and_fail("Unexpected first char '%c' of inotify fd "
+				   "link path", buf[0]);
+	}
+# endif
+
+	printf("inotify_init1(IN_NONBLOCK%s) = " RC_FMT "\n",
+	       all_flags & cloexec_flag ? "|IN_CLOEXEC" : "",
+# ifdef PRINT_PATHS
+	       rc, inotify_path
+# else
+	       sprintrc(rc)
+# endif
+	       );
 
 	puts("+++ exited with 0 +++");
 

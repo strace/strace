@@ -1,28 +1,8 @@
 /*
- * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
+ * Copyright (c) 2017, 2018 Chen Jingpiao <chenjingpiao@gmail.com>
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -32,9 +12,24 @@
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
 # include <sys/socket.h>
-# include "netlink.h"
+# include "test_netlink.h"
 # include <linux/netfilter/nfnetlink.h>
+# ifdef HAVE_LINUX_NETFILTER_NF_TABLES_H
+#  include <linux/netfilter/nf_tables.h>
+# endif
+
+# ifndef NFNETLINK_V0
+#  define NFNETLINK_V0 0
+# endif
+# ifndef NFNL_SUBSYS_NFTABLES
+#  define NFNL_SUBSYS_NFTABLES 10
+# endif
+# ifndef NFT_MSG_NEWTABLE
+#  define NFT_MSG_NEWTABLE 0
+# endif
 
 static void
 test_nlmsg_type(const int fd)
@@ -70,6 +65,108 @@ test_nlmsg_type(const int fd)
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
 
+static void
+test_nlmsg_done(const int fd)
+{
+	const int num = 0xabcdefad;
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(num));
+
+	TEST_NETLINK(fd, nlh0, NLMSG_DONE, NLM_F_REQUEST,
+		     sizeof(num), &num, sizeof(num),
+		     printf("%d", num));
+}
+
+static void
+test_nfgenmsg(const int fd)
+{
+	static const struct nlattr nla = {
+		.nla_len = sizeof(nla),
+		.nla_type = 0x0bcd
+	};
+
+	struct nfgenmsg msg = {
+		.nfgen_family = AF_UNIX,
+		.version = NFNETLINK_V0,
+		.res_id = NFNL_SUBSYS_NFTABLES
+	};
+	char str_buf[NLMSG_ALIGN(sizeof(msg)) + 4];
+	char nla_buf[NLMSG_ALIGN(sizeof(msg)) + sizeof(nla)];
+
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN,
+					 MAX(sizeof(str_buf), sizeof(nla_buf)));
+
+	TEST_NETLINK_OBJECT_EX_(fd, nlh0,
+				NFNL_SUBSYS_NFTABLES << 8 | NFT_MSG_NEWTABLE,
+				"NFNL_SUBSYS_NFTABLES<<8|NFT_MSG_NEWTABLE",
+				NLM_F_REQUEST, "NLM_F_REQUEST",
+				msg, print_quoted_hex,
+				printf("{nfgen_family=AF_UNIX");
+				printf(", version=NFNETLINK_V0");
+				printf(", res_id=");
+				if (htons(NFNL_SUBSYS_NFTABLES) == NFNL_SUBSYS_NFTABLES)
+					printf("htons(NFNL_SUBSYS_NFTABLES)");
+				else
+					printf("NFNL_SUBSYS_NFTABLES");
+				);
+
+	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
+	TEST_NETLINK_(fd, nlh0,
+		      NFNL_SUBSYS_NFTABLES << 8 | NFT_MSG_NEWTABLE,
+		      "NFNL_SUBSYS_NFTABLES<<8|NFT_MSG_NEWTABLE",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(msg), &msg, sizeof(msg),
+		      printf("{nfgen_family=AF_UNIX");
+		      printf(", version=NFNETLINK_V0");
+		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)"));
+
+	msg.res_id = htons(0xabcd);
+	TEST_NETLINK_(fd, nlh0,
+		      NFNL_SUBSYS_NFTABLES << 8 | NFT_MSG_NEWTABLE,
+		      "NFNL_SUBSYS_NFTABLES<<8|NFT_MSG_NEWTABLE",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(msg), &msg, sizeof(msg),
+		      printf("{nfgen_family=AF_UNIX");
+		      printf(", version=NFNETLINK_V0");
+		      printf(", res_id=htons(%d)", 0xabcd));
+
+# ifdef NFNL_MSG_BATCH_BEGIN
+	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
+	TEST_NETLINK(fd, nlh0,
+		     NFNL_MSG_BATCH_BEGIN, NLM_F_REQUEST,
+		     sizeof(msg), &msg, sizeof(msg),
+		     printf("{nfgen_family=AF_UNIX");
+		     printf(", version=NFNETLINK_V0");
+		     printf(", res_id=htons(%d)", NFNL_SUBSYS_NFTABLES));
+
+	msg.res_id = htons(0xabcd);
+	memcpy(str_buf, &msg, sizeof(msg));
+	memcpy(str_buf + NLMSG_ALIGN(sizeof(msg)), "1234", 4);
+
+	TEST_NETLINK(fd, nlh0,
+		     NFNL_MSG_BATCH_BEGIN, NLM_F_REQUEST,
+		     sizeof(str_buf), str_buf, sizeof(str_buf),
+		     printf("{nfgen_family=AF_UNIX");
+		     printf(", version=NFNETLINK_V0");
+		     printf(", res_id=htons(%d)"
+			    ", \"\\x31\\x32\\x33\\x34\"", 0xabcd));
+# endif /* NFNL_MSG_BATCH_BEGIN */
+
+	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
+	memcpy(nla_buf, &msg, sizeof(msg));
+	memcpy(nla_buf + NLMSG_ALIGN(sizeof(msg)), &nla, sizeof(nla));
+
+	TEST_NETLINK_(fd, nlh0,
+		      NFNL_SUBSYS_NFTABLES << 8 | 0xff,
+		      "NFNL_SUBSYS_NFTABLES<<8|0xff /* NFT_MSG_??? */",
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(nla_buf), nla_buf, sizeof(nla_buf),
+		      printf("{nfgen_family=AF_UNIX");
+		      printf(", version=NFNETLINK_V0");
+		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)"
+			     ", {nla_len=%d, nla_type=%#x}",
+			     nla.nla_len, nla.nla_type));
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -77,6 +174,8 @@ int main(void)
 	int fd = create_nl_socket(NETLINK_NETFILTER);
 
 	test_nlmsg_type(fd);
+	test_nlmsg_done(fd);
+	test_nfgenmsg(fd);
 
 	printf("+++ exited with 0 +++\n");
 

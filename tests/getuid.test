@@ -1,11 +1,33 @@
 #!/bin/sh
-
-# Check getuid syscall decoding.
+#
+# Check get(e)?[gu]id(32)? syscalls decoding.
+#
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
+check_prog grep
 check_prog uniq
+
+if [ "${NAME%-creds}" = "$NAME" ]; then
+	syscall="$NAME"
+else
+	NAME="${NAME%-creds}"
+	syscall='%creds'
+fi
+
 run_prog > /dev/null
-run_strace -qq -a9 -e$NAME $args > "$EXP"
-uniq < "$LOG" > "$OUT"
+run_strace -qq -a9 -e"$syscall" $args > "$EXP"
+
+case "$STRACE_ARCH:$syscall" in
+	mips:%creds)
+		grep -Fxv 'prctl(PR_GET_FP_MODE) = 0' < "$LOG" | uniq > "$OUT"
+		;;
+	*)	uniq < "$LOG" > "$OUT"
+		;;
+esac
+
 match_diff "$OUT" "$EXP"

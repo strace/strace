@@ -1,0 +1,55 @@
+#!/bin/sh -efu
+#
+# Check decoding of return values injected into a syscall that "never fails".
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+case "$STRACE_ARCH" in
+alpha)
+	SYSCALL=getpgrp
+	;;
+*)
+	SYSCALL=getpid
+	;;
+esac
+
+run_prog
+prog="$args"
+fault_args="-a9 -e trace=${SYSCALL} -e inject=${SYSCALL}:retval="
+
+test_rval()
+{
+	local rval
+	rval="$1"; shift
+
+	run_strace $fault_args$rval $prog $rval > "$EXP"
+	match_diff "$LOG" "$EXP"
+}
+
+test_rval 0
+test_rval 1
+test_rval 0x7fffffff
+test_rval 0x80000000
+test_rval 0xfffff000
+test_rval 0xfffffffe
+test_rval 0xffffffff
+
+case "$SIZEOF_KERNEL_LONG_T" in
+8)
+	test_rval         0x80000000
+	test_rval         0xfffff000
+	test_rval         0xfffffffe
+	test_rval         0xffffffff
+	test_rval        0x100000000
+	test_rval 0x7fffffffffffffff
+	test_rval 0x8000000000000000
+	test_rval 0xfffffffffffff000
+	test_rval 0xfffffffffffffffe
+	test_rval 0xffffffffffffffff
+	;;
+esac

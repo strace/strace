@@ -1,0 +1,38 @@
+This is strace - a diagnostic, debugging and instructional userspace utility
+with a traditional command-line interface for Linux.  It is used to monitor
+and tamper with interactions between processes and the Linux kernel, which
+include system calls, signal deliveries, and changes of process state.
+The operation of strace is made possible by the kernel feature known as ptrace.
+
+strace is released under the terms of the GNU Lesser General Public License
+version 2.1 or later; see the file COPYING for details.
+strace test suite is released under the terms of the GNU General Public License
+version 2 or later; see the file tests/COPYING for details.
+
+See the file CREDITS for a list of authors and other contributors.
+See the file INSTALL for compilation and installation instructions.
+See the file NEWS for information on what has changed in recent versions.
+See the file README-hacking for information related to strace development.
+
+The project's homepage is at
+	https://strace.io
+
+The GIT repository of strace is available at
+	https://github.com/strace/strace/ and https://gitlab.com/strace/strace/
+
+strace has a mailing list:
+	strace-devel@lists.strace.io
+
+Everyone is welcome to post bug reports, feature requests, comments
+and patches to the list.  The mailing list archives are available at
+	https://lists.strace.io/pipermail/strace-devel/
+
+System requirements:
+	* Linux kernel >= 2.6.18 is recommended.  Older versions might still work
+	  but they haven't been thoroughly tested with this release.
+	* Linux kernel >= 2.5.46 is required.
+	  Older versions without a decent PTRACE_SETOPTIONS support will not work.
+	* On mips, Linux kernel >= 2.6.15 is required.
+	  Older versions without a decent PTRACE_GETREGS support will not work.
+	* On s390 and s390x, Linux kernel >= 2.6.27 is required.
+	  Older versions without a decent PTRACE_GETREGSET support will not work.

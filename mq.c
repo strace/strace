@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -43,23 +23,39 @@ SYS_FUNC(mq_open)
 		tprints(", ");
 		printmqattr(tcp, tcp->u_arg[3], false);
 	}
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
 
-SYS_FUNC(mq_timedsend)
+static int
+do_mq_timedsend(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printstrn(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu ", %u, ", tcp->u_arg[2],
 		(unsigned int) tcp->u_arg[3]);
-	print_timespec(tcp, tcp->u_arg[4]);
+	print_ts(tcp, tcp->u_arg[4]);
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(mq_timedreceive)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(mq_timedsend_time32)
+{
+	return do_mq_timedsend(tcp, print_timespec32);
+}
+#endif
+
+SYS_FUNC(mq_timedsend_time64)
+{
+	return do_mq_timedsend(tcp, print_timespec64);
+}
+
+static int
+do_mq_timedreceive(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 	} else {
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[1]);
@@ -74,15 +70,28 @@ SYS_FUNC(mq_timedreceive)
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_ts(tcp, tcp->u_arg[4]);
 		restore_cleared_syserror(tcp);
 	}
 	return 0;
 }
 
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(mq_timedreceive_time32)
+{
+	return do_mq_timedreceive(tcp, print_timespec32);
+}
+#endif
+
+SYS_FUNC(mq_timedreceive_time64)
+{
+	return do_mq_timedreceive(tcp, print_timespec64);
+}
+
 SYS_FUNC(mq_notify)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	print_sigevent(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
@@ -90,7 +99,8 @@ SYS_FUNC(mq_notify)
 SYS_FUNC(mq_getsetattr)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printfd(tcp, tcp->u_arg[0]);
+		tprints(", ");
 		printmqattr(tcp, tcp->u_arg[1], true);
 		tprints(", ");
 	} else {

@@ -1,8 +1,15 @@
-#ifndef STRACE_LINUX_INET_DIAG_H
-#define STRACE_LINUX_INET_DIAG_H
+/*
+ * Copyright (c) 2014-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-#define TCPDIAG_GETSOCK 18
-#define DCCPDIAG_GETSOCK 19
+#ifndef STRACE_LINUX_INET_DIAG_H
+# define STRACE_LINUX_INET_DIAG_H
+
+# define TCPDIAG_GETSOCK 18
+# define DCCPDIAG_GETSOCK 19
 
 /* Socket identity */
 struct inet_diag_sockid {
@@ -57,6 +64,8 @@ enum {
 	INET_DIAG_BC_D_COND,
 	INET_DIAG_BC_DEV_COND,   /* u32 ifindex */
 	INET_DIAG_BC_MARK_COND,
+	INET_DIAG_BC_S_EQ,
+	INET_DIAG_BC_D_EQ,
 };
 
 struct inet_diag_hostcond {

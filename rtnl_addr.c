@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -93,14 +73,16 @@ decode_ifa_flags(struct tcb *const tcp,
 }
 
 static const nla_decoder_t ifaddrmsg_nla_decoders[] = {
-	[IFA_ADDRESS]	= decode_ifa_address,
-	[IFA_LOCAL]	= decode_ifa_address,
-	[IFA_LABEL]	= decode_nla_str,
-	[IFA_BROADCAST]	= decode_ifa_address,
-	[IFA_ANYCAST]	= decode_ifa_address,
-	[IFA_CACHEINFO]	= decode_ifa_cacheinfo,
-	[IFA_MULTICAST]	= decode_ifa_address,
-	[IFA_FLAGS]	= decode_ifa_flags
+	[IFA_ADDRESS]		= decode_ifa_address,
+	[IFA_LOCAL]		= decode_ifa_address,
+	[IFA_LABEL]		= decode_nla_str,
+	[IFA_BROADCAST]		= decode_ifa_address,
+	[IFA_ANYCAST]		= decode_ifa_address,
+	[IFA_CACHEINFO]		= decode_ifa_cacheinfo,
+	[IFA_MULTICAST]		= decode_ifa_address,
+	[IFA_FLAGS]		= decode_ifa_flags,
+	[IFA_RT_PRIORITY]	= decode_nla_u32,
+	[IFA_TARGET_NETNSID]	= decode_nla_s32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
@@ -115,7 +97,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 	if (len >= sizeof(ifaddr)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifaddr) - offset,
-					 (void *) &ifaddr + offset)) {
+					 (char *) &ifaddr + offset)) {
 			PRINT_FIELD_U("", ifaddr, ifa_prefixlen);
 			PRINT_FIELD_FLAGS(", ", ifaddr, ifa_flags,
 					  ifaddrflags, "IFA_F_???");

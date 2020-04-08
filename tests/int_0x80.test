@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Check decoding of int 0x80 on x86_64, x32, and x86.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+$STRACE -d -enone / > /dev/null 2> "$LOG"
+grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO works" "$LOG" > /dev/null ||
+	skip_ 'PTRACE_GET_SYSCALL_INFO does not work'
+
+run_strace_match_diff -a11 -e trace=getgid32

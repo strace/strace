@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -33,6 +13,7 @@
 #include <linux/audit.h>
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
+#include "print_fields.h"
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
@@ -53,29 +34,40 @@
 #include "xlat/nf_ulog_msg_types.h"
 #include "xlat/nl_audit_types.h"
 #include "xlat/nl_crypto_types.h"
-#include "xlat/nl_netfilter_msg_types.h"
 #include "xlat/nl_netfilter_subsys_ids.h"
 #include "xlat/nl_selinux_types.h"
 #include "xlat/nl_sock_diag_types.h"
 #include "xlat/nl_xfrm_types.h"
 #include "xlat/nlmsgerr_attrs.h"
 
+#define XLAT_MACROS_ONLY
+# include "xlat/crypto_msgs.h"
+#undef XLAT_MACROS_ONLY
+
 /*
  * Fetch a struct nlmsghdr from the given address.
  */
 static bool
 fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
-	       const kernel_ulong_t addr, const kernel_ulong_t len)
+	       const kernel_ulong_t addr, const kernel_ulong_t len,
+	       const bool in_array)
 {
 	if (len < sizeof(struct nlmsghdr)) {
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return false;
 	}
 
-	if (umove_or_printaddr(tcp, addr, nlmsghdr))
-		return false;
+	if (tfetch_obj(tcp, addr, nlmsghdr))
+		return true;
 
-	return true;
+	if (in_array) {
+		tprints("...");
+		printaddr_comment(addr);
+	} else {
+		printaddr(addr);
+	}
+
+	return false;
 }
 
 static int
@@ -93,11 +85,14 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 	if (nl_details == details)
 		return -1;
 
-	const struct xlat *xlats = netlink_protocols;
-	for (; xlats->str; ++xlats) {
-		const char *name = STR_STRIP_PREFIX(xlats->str, "NETLINK_");
+	const struct xlat_data *xlats = netlink_protocols->data;
+	for (uint32_t idx = 0; idx < netlink_protocols->size; idx++) {
+		if (!netlink_protocols->data[idx].str)
+			continue;
+
+		const char *name = STR_STRIP_PREFIX(xlats[idx].str, "NETLINK_");
 		if (!strncmp(nl_details, name, strlen(name)))
-			return xlats->val;
+			return xlats[idx].val;
 	}
 
 	if (*nl_details >= '0' && *nl_details <= '9')
@@ -107,7 +102,7 @@ get_fd_nl_family(struct tcb *const tcp, const int fd)
 }
 
 static void
-decode_nlmsg_type_default(const struct xlat *const xlat,
+decode_nlmsg_type_default(struct tcb *tcp, const struct xlat *const xlat,
 			  const uint16_t type,
 			  const char *const dflt)
 {
@@ -115,11 +110,11 @@ decode_nlmsg_type_default(const struct xlat *const xlat,
 }
 
 static void
-decode_nlmsg_type_generic(const struct xlat *const xlat,
+decode_nlmsg_type_generic(struct tcb *tcp, const struct xlat *const xlat,
 			  const uint16_t type,
 			  const char *const dflt)
 {
-	printxval(genl_families_xlat(), type, dflt);
+	printxval(genl_families_xlat(tcp), type, dflt);
 }
 
 static const struct {
@@ -155,14 +150,14 @@ static const struct {
 };
 
 static void
-decode_nlmsg_type_netfilter(const struct xlat *const xlat,
+decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 			    const uint16_t type,
 			    const char *const dflt)
 {
 	/* Reserved control nfnetlink messages first. */
 	const char *const text = xlookup(nl_netfilter_msg_types, type);
 	if (text) {
-		tprints(text);
+		print_xlat_ex(type, text, XLAT_STYLE_DEFAULT);
 		return;
 	}
 
@@ -183,7 +178,7 @@ decode_nlmsg_type_netfilter(const struct xlat *const xlat,
 		tprintf("%#x", msg_type);
 }
 
-typedef void (*nlmsg_types_decoder_t)(const struct xlat *,
+typedef void (*nlmsg_types_decoder_t)(struct tcb *, const struct xlat *,
 				      uint16_t type,
 				      const char *dflt);
 
@@ -215,7 +210,8 @@ static const struct {
  * for family here to filter out -1.
  */
 static void
-decode_nlmsg_type(const uint16_t type, const unsigned int family)
+decode_nlmsg_type(struct tcb *tcp, const uint16_t type,
+		  const unsigned int family)
 {
 	nlmsg_types_decoder_t decoder = decode_nlmsg_type_default;
 	const struct xlat *xlat = netlink_types;
@@ -234,7 +230,7 @@ decode_nlmsg_type(const uint16_t type, const unsigned int family)
 			dflt = nlmsg_types[family].dflt;
 	}
 
-	decoder(xlat, type, dflt);
+	decoder(tcp, xlat, type, dflt);
 }
 
 static const struct xlat *
@@ -430,7 +426,8 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type,
 	} else if (family < ARRAY_SIZE(nlmsg_flags) && nlmsg_flags[family])
 		table = nlmsg_flags[family](type);
 
-	printflags_ex(flags, "NLM_F_???", netlink_flags, table, NULL);
+	printflags_ex(flags, "NLM_F_???", XLAT_STYLE_DEFAULT,
+		      netlink_flags, table, NULL);
 }
 
 static void
@@ -443,7 +440,7 @@ print_nlmsghdr(struct tcb *tcp,
 
 	tprintf("{len=%u, type=", nlmsghdr->nlmsg_len);
 
-	decode_nlmsg_type(nlmsghdr->nlmsg_type, family);
+	decode_nlmsg_type(tcp, nlmsghdr->nlmsg_type, family);
 
 	tprints(", flags=");
 	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,
@@ -472,7 +469,7 @@ decode_nlmsgerr_attr_cookie(struct tcb *const tcp,
 	const size_t nmemb = len / sizeof(cookie);
 
 	print_array(tcp, addr, nmemb, &cookie, sizeof(cookie),
-		    umoven_or_printaddr, print_cookie, 0);
+		    tfetch_mem, print_cookie, 0);
 
 	return true;
 }
@@ -509,19 +506,14 @@ decode_nlmsgerr(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &err.error))
 		return;
 
-	tprints("{error=");
-	if (err.error < 0 && (unsigned) -err.error < nerrnos) {
-		tprintf("-%s", errnoent[-err.error]);
-	} else {
-		tprintf("%d", err.error);
-	}
+	PRINT_FIELD_ERR_D("{", err, error);
 
 	addr += offsetof(struct nlmsgerr, msg);
 	len -= offsetof(struct nlmsgerr, msg);
 
 	if (len) {
 		tprints(", msg=");
-		if (fetch_nlmsghdr(tcp, &err.msg, addr, len)) {
+		if (fetch_nlmsghdr(tcp, &err.msg, addr, len, false)) {
 			unsigned int payload =
 				capped ? sizeof(err.msg) : err.msg.nlmsg_len;
 			if (payload > len)
@@ -545,8 +537,9 @@ decode_nlmsgerr(struct tcb *const tcp,
 }
 
 static const netlink_decoder_t netlink_decoders[] = {
-#ifdef HAVE_LINUX_CRYPTOUSER_H
 	[NETLINK_CRYPTO] = decode_netlink_crypto,
+#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
+	[NETLINK_NETFILTER] = decode_netlink_netfilter,
 #endif
 	[NETLINK_ROUTE] = decode_netlink_route,
 	[NETLINK_SELINUX] = decode_netlink_selinux,
@@ -603,8 +596,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 			     const kernel_ulong_t addr,
 			     const kernel_ulong_t len)
 {
-	const unsigned int nlmsg_len =
-		nlmsghdr->nlmsg_len > len ? len : nlmsghdr->nlmsg_len;
+	const unsigned int nlmsg_len = MIN(nlmsghdr->nlmsg_len, len);
 
 	if (nlmsg_len > NLMSG_HDRLEN)
 		tprints("{");
@@ -628,15 +620,16 @@ decode_netlink(struct tcb *const tcp,
 	const int family = get_fd_nl_family(tcp, fd);
 
 	if (family == NETLINK_KOBJECT_UEVENT) {
-		printstrn(tcp, addr, len);
+		decode_netlink_kobject_uevent(tcp, addr, len);
 		return;
 	}
 
 	struct nlmsghdr nlmsghdr;
-	bool print_array = false;
+	bool is_array = false;
 	unsigned int elt;
 
-	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len); elt++) {
+	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
+	     elt++) {
 		if (abbrev(tcp) && elt == max_strlen) {
 			tprints("...");
 			break;
@@ -653,9 +646,9 @@ decode_netlink(struct tcb *const tcp,
 				next_addr = addr + nlmsg_len;
 		}
 
-		if (!print_array && next_addr) {
+		if (!is_array && next_addr) {
 			tprints("[");
-			print_array = true;
+			is_array = true;
 		}
 
 		decode_nlmsghdr_with_payload(tcp, fd, family,
@@ -669,7 +662,7 @@ decode_netlink(struct tcb *const tcp,
 		len = next_len;
 	}
 
-	if (print_array) {
+	if (is_array) {
 		tprints("]");
 	}
 }

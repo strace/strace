@@ -6,35 +6,14 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
 #include <sys/uio.h>
-#include <asm/unistd.h>
 
 #include "scno.h"
 #include "ptrace.h"
@@ -62,24 +41,15 @@ static ssize_t strace_process_vm_readv(pid_t pid,
 #endif /* !HAVE_PROCESS_VM_READV */
 
 static ssize_t
-vm_read_mem(const pid_t pid, void *const laddr,
-	    const kernel_ulong_t raddr, const size_t len)
+process_read_mem(const pid_t pid, void *const laddr,
+		 void *const raddr, const size_t len)
 {
-	const unsigned long truncated_raddr = raddr;
-
-#if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
-	if (raddr != (kernel_ulong_t) truncated_raddr) {
-		errno = EIO;
-		return -1;
-	}
-#endif
-
 	const struct iovec local = {
 		.iov_base = laddr,
 		.iov_len = len
 	};
 	const struct iovec remote = {
-		.iov_base = (void *) truncated_raddr,
+		.iov_base = raddr,
 		.iov_len = len
 	};
 
@@ -88,6 +58,75 @@ vm_read_mem(const pid_t pid, void *const laddr,
 		process_vm_readv_not_supported = true;
 
 	return rc;
+}
+
+static int cached_idx = -1;
+static unsigned long cached_raddr[2];
+
+void
+invalidate_umove_cache(void)
+{
+	cached_idx = -1;
+}
+
+static ssize_t
+vm_read_mem(const pid_t pid, void *const laddr,
+	    const kernel_ulong_t raddr, const size_t len)
+{
+	if (!len)
+		return len;
+
+	const unsigned long taddr = raddr;
+
+#if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
+	if (raddr != (kernel_ulong_t) taddr) {
+		errno = EIO;
+		return -1;
+	}
+#endif
+
+	const size_t page_size = get_pagesize();
+	const size_t page_mask = page_size - 1;
+	const unsigned long raddr_page_start =
+		taddr & ~page_mask;
+	const unsigned long raddr_page_next =
+		(taddr + len + page_mask) & ~page_mask;
+
+	if (!raddr_page_start ||
+	    raddr_page_next < raddr_page_start ||
+	    raddr_page_next - raddr_page_start != page_size)
+		return process_read_mem(pid, laddr, (void *) taddr, len);
+
+	int idx = -1;
+	if (cached_idx >= 0) {
+		if (raddr_page_start == cached_raddr[cached_idx])
+			idx = cached_idx;
+		else if (raddr_page_start == cached_raddr[!cached_idx])
+			idx = !cached_idx;
+	}
+
+	static char *buf[2];
+
+	if (idx == -1) {
+		idx = !cached_idx;
+
+		if (!buf[idx])
+			buf[idx] = xmalloc(page_size);
+
+		const ssize_t rc =
+			process_read_mem(pid, buf[idx],
+					 (void *) raddr_page_start, page_size);
+		if (rc < 0)
+			return rc;
+
+		cached_raddr[idx] = raddr_page_start;
+		if (cached_idx < 0)
+			cached_raddr[!idx] = 0;
+		cached_idx = idx;
+	}
+
+	memcpy(laddr, buf[idx] + (taddr - cached_raddr[idx]), len);
+	return len;
 }
 
 static bool
@@ -127,14 +166,16 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umoven: short read (%u < %u) @0x%" PRI_klx,
-						   nread, nread + len, addr - nread);
+					perror_func_msg("short read (%u < %u)"
+							" @0x%" PRI_klx,
+							nread, nread + len,
+							addr - nread);
 				}
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umoven: PTRACE_PEEKDATA pid:%d @0x%" PRI_klx,
-					    pid, addr);
+				perror_func_msg("pid:%d @0x%" PRI_klx,
+						pid, addr);
 				return -1;
 		}
 
@@ -170,8 +211,8 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 	if ((unsigned int) r == len)
 		return 0;
 	if (r >= 0) {
-		error_msg("umoven: short read (%u < %u) @0x%" PRI_klx,
-			  (unsigned int) r, len, addr);
+		error_func_msg("short read (%u < %u) @0x%" PRI_klx,
+			       (unsigned int) r, len, addr);
 		return -1;
 	}
 	switch (errno) {
@@ -187,8 +228,7 @@ umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 			return -1;
 		default:
 			/* all the rest is strange and should be reported */
-			perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
-				    pid, addr);
+			perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
 			return -1;
 	}
 }
@@ -203,6 +243,7 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 {
 	unsigned int nread = 0;
 	unsigned int residue = addr & (sizeof(long) - 1);
+	void *const orig_addr = laddr;
 
 	while (len) {
 		addr &= -sizeof(long);		/* aligned address */
@@ -222,14 +263,16 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 			case EFAULT: case EIO: case EPERM:
 				/* address space is inaccessible */
 				if (nread) {
-					perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
-						   nread, nread + len, addr - nread);
+					perror_func_msg("short read (%d < %d)"
+							" @0x%" PRI_klx,
+							nread, nread + len,
+							addr - nread);
 				}
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("umovestr: PTRACE_PEEKDATA pid:%d @0x%" PRI_klx,
-					   pid, addr);
+				perror_func_msg("pid:%d @0x%" PRI_klx,
+						pid, addr);
 				return -1;
 		}
 
@@ -237,7 +280,7 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		memcpy(laddr, &u.x[residue], m);
 		while (residue < sizeof(long))
 			if (u.x[residue++] == '\0')
-				return 1;
+				return (laddr - orig_addr) + residue;
 		residue = 0;
 		addr += sizeof(long);
 		laddr += m;
@@ -252,8 +295,7 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
  * Like `umove' but make the additional effort of looking
  * for a terminating zero byte.
  *
- * Returns < 0 on error, > 0 if NUL was seen,
- * (TODO if useful: return count of bytes including NUL),
+ * Returns < 0 on error, strlen + 1  if NUL was seen,
  * else 0 if len bytes were read but no NUL byte seen.
  *
  * Note: there is no guarantee we won't overwrite some bytes
@@ -289,8 +331,10 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 
 		int r = vm_read_mem(pid, laddr, addr, chunk_len);
 		if (r > 0) {
-			if (memchr(laddr, '\0', r))
-				return 1;
+			char *nul_addr = memchr(laddr, '\0', r);
+
+			if (nul_addr)
+				return (nul_addr - laddr) + 1;
 			addr += r;
 			laddr += r;
 			nread += r;
@@ -304,20 +348,21 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 				if (!nread)
 					return umovestr_peekdata(pid, addr,
 								 len, laddr);
-				/* fall through */
+				ATTRIBUTE_FALLTHROUGH;
 			case EFAULT: case EIO:
 				/* address space is inaccessible */
 				if (nread)
-					perror_msg("umovestr: short read (%d < %d) @0x%" PRI_klx,
-						   nread, nread + len, addr - nread);
+					perror_func_msg("short read (%d < %d)"
+							" @0x%" PRI_klx,
+							nread, nread + len,
+							addr - nread);
 				return -1;
 			case ESRCH:
 				/* the process is gone */
 				return -1;
 			default:
 				/* all the rest is strange and should be reported */
-				perror_msg("process_vm_readv: pid:%d @0x%" PRI_klx,
-					    pid, addr);
+				perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
 				return -1;
 		}
 	}

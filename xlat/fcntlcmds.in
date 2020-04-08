@@ -4,15 +4,83 @@ F_GETFD		1
 F_SETFD		2
 F_GETFL		3
 F_SETFL		4
+
+#if defined __alpha__ || defined __sparc__
+F_GETLK		7
+#elif defined __mips__
+F_GETLK		14
+#else
 F_GETLK		5
+#endif
+
+#if defined __alpha__ || defined __sparc__
+F_SETLK		8
+F_SETLKW	9
+#else
 F_SETLK		6
 F_SETLKW	7
+#endif
+
+#if defined __alpha__
+F_SETOWN	5
+F_GETOWN	6
+#elif defined __hppa__
+F_GETOWN	11
+F_SETOWN	12
+#elif defined __mips__
+F_GETOWN	23
+F_SETOWN	24
+#elif defined __sparc__
+F_GETOWN	5
+F_SETOWN	6
+#else
 F_SETOWN	8
 F_GETOWN	9
+#endif
+
+#ifdef __hppa__
+F_SETSIG	13
+F_GETSIG	14
+#else
 F_SETSIG	10
 F_GETSIG	11
+#endif
+
+#if defined __hppa__
+F_GETLK64	8
+F_SETLK64	9
+F_SETLKW64	10
+#elif defined __mips__ && !defined __mips64
+F_GETLK64	33
+F_SETLK64	34
+F_SETLKW64	35
+#else
+F_GETLK64	12
+F_SETLK64	13
+F_SETLKW64	14
+#endif
+
+#ifndef STRACE_WORKAROUND_FOR_F_OWNER_EX
+# define STRACE_WORKAROUND_FOR_F_OWNER_EX
+/*
+ * Linux kernel commit v2.6.32-rc7~23 has changed values of F_SETOWN_EX
+ * and F_GETOWN_EX constants introduced by commit v2.6.32-rc1~96 to fix
+ * the conflict with F_GETLK64 and F_SETLK64 constants.
+ * Looks like the best way to handle this situation is to pretend that
+ * old values of F_SETOWN_EX and F_GETOWN_EX didn't exist.
+ */
+# if defined F_SETOWN_EX && F_SETOWN_EX != 15
+#  warning invalid value of F_SETOWN_EX ignored
+# endif
+# undef F_SETOWN_EX
+# if defined F_GETOWN_EX && F_GETOWN_EX != 16
+#  warning invalid value of F_GETOWN_EX ignored
+# endif
+# undef F_GETOWN_EX
+#endif
 F_SETOWN_EX	15
 F_GETOWN_EX	16
+
 F_GETOWNER_UIDS	17
 F_OFD_GETLK	36
 F_OFD_SETLK	37

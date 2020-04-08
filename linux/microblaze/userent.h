@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 { PT_GPR(0),		"r0" },
 { PT_GPR(1),		"r1" },
 { PT_GPR(2),		"r2" },

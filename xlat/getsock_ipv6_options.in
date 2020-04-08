@@ -1,0 +1,10 @@
+/*
+ * Options specific to getsockopt(SOL_IPV6).
+ * Common {g,s}etsockopt(SOL_IPV6) options
+ * should be in sock_ipv6_options.in instead.
+ */
+
+IP6T_SO_GET_INFO
+IP6T_SO_GET_ENTRIES
+IP6T_SO_GET_REVISION_MATCH
+IP6T_SO_GET_REVISION_TARGET

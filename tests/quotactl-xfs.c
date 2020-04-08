@@ -3,35 +3,15 @@
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined(__NR_quotactl) && \
 	(defined(HAVE_LINUX_QUOTA_H) || defined(HAVE_SYS_QUOTA_H)) && \
@@ -92,7 +72,7 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	struct fs_disk_quota *dq = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", dq);
 		return;
 	}
@@ -132,7 +112,7 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 	struct fs_quota_stat *qs = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", qs);
 		return;
 	}
@@ -166,7 +146,7 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 	struct fs_quota_statv *qs = ptr;
 	long out_arg = (long) arg;
 
-	if (((rc != 0) && out_arg) || (out_arg > 1)) {
+	if (((rc < 0) && out_arg) || (out_arg > 1)) {
 		printf("%p", qs);
 		return;
 	}
@@ -207,13 +187,13 @@ main(void)
 	char bogus_addr_str[sizeof(void *) * 2 + sizeof("0x")];
 	char unterminated_str[sizeof(void *) * 2 + sizeof("0x")];
 
-	long rc;
+	static char invalid_cmd_str[1024];
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_disk_quota, xdq);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_quota_stat, xqstat);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fs_quota_statv, xqstatv);
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint32_t, flags);
 	char *unterminated = tail_memdup(unterminated_data,
-		sizeof(unterminated_data));
+					 sizeof(unterminated_data));
 
 	snprintf(bogus_special_str, sizeof(bogus_special_str), "%p",
 		 bogus_special);
@@ -234,12 +214,12 @@ main(void)
 		    "|XFS_QUOTA_GDQ_ACCT|XFS_QUOTA_GDQ_ENFD"
 		    "|XFS_QUOTA_PDQ_ENFD|0xdeadbec0]");
 
-	rc = syscall(__NR_quotactl, QCMD(Q_XQUOTAON, 0xfacefeed), bogus_dev,
-		     bogus_id, bogus_addr);
-	printf("quotactl(QCMD(Q_XQUOTAON, %#x /* ???QUOTA */)"
-	       ", %s, %p) = %s\n",
-	       QCMD_TYPE(QCMD(Q_XQUOTAON, 0xfacefeed)),
-	       bogus_dev_str, bogus_addr, sprintrc(rc));
+	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
+		 "QCMD(Q_XQUOTAON, %#x /* ???QUOTA */)",
+		 QCMD_TYPE(QCMD(Q_XQUOTAON, 0xfacefeed)));
+	check_quota(CQF_ID_SKIP,
+		    QCMD(Q_XQUOTAON, 0xfacefeed), invalid_cmd_str,
+		    bogus_dev, bogus_dev_str, bogus_addr);
 
 
 	/* Q_XQUOTAOFF */
@@ -264,12 +244,12 @@ main(void)
 	/* Q_XGETQUOTA */
 
 	/* Trying our best to get successful result */
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, USRQUOTA)),
+	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_XGETQUOTA, USRQUOTA)),
 		    ARG_STR("/dev/sda1"), getuid(), xdq, print_xdisk_quota,
 		    (intptr_t) 1);
 
-	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_GETQUOTA, GRPQUOTA)),
-		    ARG_STR(NULL), -1, xdq, print_xdisk_quota, (intptr_t) 2);
+	check_quota(CQF_ADDR_CB, ARG_STR(QCMD(Q_XGETQUOTA, GRPQUOTA)),
+		    ARG_STR(NULL), -1, xdq, print_xdisk_quota, (intptr_t) 1);
 
 
 	/* Q_XGETNEXTQUOTA */
@@ -298,20 +278,29 @@ main(void)
 		    ARG_STR("/dev/sda1"), xqstat, print_xquota_stat, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_XGETQSTATV, PRJQUOTA)),
+		    ARG_STR(QCMD(Q_XGETQSTAT, USRQUOTA)),
+		    ARG_STR("NULL"), xqstat, print_xquota_stat, (intptr_t) 1);
+
+	check_quota(CQF_ID_SKIP,
+		    ARG_STR(QCMD(Q_XGETQSTAT, PRJQUOTA)),
 		    unterminated, unterminated_str,
-		    xqstat + 1, print_xquota_stat, (intptr_t) 2);
+		    xqstat + 1);
 
 
 	/* Q_XGETQSTATV */
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
-		    ARG_STR(QCMD(Q_XGETQSTAT, USRQUOTA)),
-		    ARG_STR("/dev/sda1"), xqstatv, print_xquota_statv, 1);
+		    ARG_STR(QCMD(Q_XGETQSTATV, USRQUOTA)),
+		    ARG_STR("/dev/sda1"), xqstatv, print_xquota_statv, (intptr_t) 1);
 
 	check_quota(CQF_ID_SKIP | CQF_ADDR_CB,
 		    ARG_STR(QCMD(Q_XGETQSTATV, GRPQUOTA)),
-		    ARG_STR(NULL), xqstatv, print_xquota_statv, (intptr_t) 2);
+		    ARG_STR(NULL), xqstatv, print_xquota_statv, (intptr_t) 1);
+
+	check_quota(CQF_ID_SKIP,
+		    ARG_STR(QCMD(Q_XGETQSTATV, PRJQUOTA)),
+		    unterminated, unterminated_str,
+		    xqstatv + 1);
 
 
 	/* Q_XQUOTARM */

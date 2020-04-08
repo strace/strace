@@ -1,55 +1,30 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_BR_PORT_MSG
+#include "netlink_route.h"
+#include "nlattr.h"
+#include "print_fields.h"
 
-# include "netlink_route.h"
-# include "nlattr.h"
-# include "print_fields.h"
+#include "types/rtnl_mdb.h"
+#include "netlink.h"
 
-# include <netinet/in.h>
-# include <linux/if_bridge.h>
-# include "netlink.h"
-
-# ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
-#  include "xlat/mdb_flags.h"
-# endif
-# include "xlat/mdb_states.h"
-# include "xlat/multicast_router_types.h"
-# include "xlat/rtnl_mdb_attrs.h"
-# include "xlat/rtnl_mdba_mdb_attrs.h"
-# include "xlat/rtnl_mdba_mdb_eattr_attrs.h"
-# include "xlat/rtnl_mdba_mdb_entry_attrs.h"
-# include "xlat/rtnl_mdba_router_attrs.h"
-# include "xlat/rtnl_mdba_router_pattr_attrs.h"
+#include "xlat/mdb_flags.h"
+#include "xlat/mdb_states.h"
+#include "xlat/multicast_router_types.h"
+#include "xlat/rtnl_mdb_attrs.h"
+#include "xlat/rtnl_mdba_mdb_attrs.h"
+#include "xlat/rtnl_mdba_mdb_eattr_attrs.h"
+#include "xlat/rtnl_mdba_mdb_entry_attrs.h"
+#include "xlat/rtnl_mdba_router_attrs.h"
+#include "xlat/rtnl_mdba_router_pattr_attrs.h"
 
 static const nla_decoder_t mdba_mdb_eattr_nla_decoders[] = {
 	[MDBA_MDB_EATTR_TIMER]	= decode_nla_u32
@@ -61,21 +36,22 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 			   const unsigned int len,
 			   const void *const opaque_data)
 {
-# ifdef HAVE_STRUCT_BR_MDB_ENTRY
-	struct br_mdb_entry entry;
+	struct_br_mdb_entry entry;
 
 	if (len < sizeof(entry))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &entry)) {
 		PRINT_FIELD_IFINDEX("{", entry, ifindex);
 		PRINT_FIELD_XVAL(", ", entry, state, mdb_states, "MDB_???");
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
+
+		/*
+		 * Note that it's impossible to derive if flags/vid fields
+		 * are present on all architectures except m68k; as a side note,
+		 * v4.3-rc1~96^2~365 has introduced an ABI breakage on m68k.
+		 */
 		PRINT_FIELD_FLAGS(", ", entry, flags,
 				  mdb_flags, "MDB_FLAGS_???");
-#  endif
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		PRINT_FIELD_U(", ", entry, vid);
-#  endif
 
 		const int proto = ntohs(entry.addr.proto);
 
@@ -97,9 +73,6 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 	}
 
 	return true;
-# else
-	return false;
-# endif /* HAVE_STRUCT_BR_MDB_ENTRY */
 }
 
 static const nla_decoder_t mdba_mdb_entry_nla_decoders[] = {
@@ -205,7 +178,7 @@ static const nla_decoder_t br_port_msg_nla_decoders[] = {
 
 DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 {
-	struct br_port_msg bpm = { .family = family };
+	struct_br_port_msg bpm = { .family = family };
 	size_t offset = sizeof(bpm.family);
 	bool decode_nla = false;
 
@@ -215,7 +188,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 	if (len >= sizeof(bpm)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(bpm) - offset,
-					 (void *) &bpm + offset)) {
+					 (char *) &bpm + offset)) {
 			PRINT_FIELD_IFINDEX("", bpm, ifindex);
 			decode_nla = true;
 		}
@@ -232,5 +205,3 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 			      ARRAY_SIZE(br_port_msg_nla_decoders), NULL);
 	}
 }
-
-#endif

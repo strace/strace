@@ -3,30 +3,10 @@
 # Check -bexecve behavior.
 #
 # Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2015-2017 The strace developers.
+# Copyright (c) 2015-2020 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
@@ -36,23 +16,36 @@ run_strace_redir()
 	$STRACE "$@" 2> "$LOG"
 }
 
-run_strace_redir -enone ../set_ptracer_any true ||
+run_strace_redir --quiet=personality -enone ../set_ptracer_any true ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
-run_strace_redir -enone ../set_ptracer_any false
+run_strace_redir --quiet=personality -enone ../set_ptracer_any false
 [ $? -eq 1 ] ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
-run_strace_redir -bexecve -enone ../set_ptracer_any false ||
+run_strace_redir --quiet=personality -bexecve -enone ../set_ptracer_any false ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
 pattern_detached='[^:]*strace: Process [1-9][0-9]* detached'
-pattern_personality='[^:]*strace: \[ Process PID=[1-9][0-9]* runs in .* mode. \]'
 
 LC_ALL=C grep -x "$pattern_detached" "$LOG" > /dev/null ||
 	dump_log_and_fail_with "$STRACE $args: output mismatch"
 
-if LC_ALL=C grep -E -v -x "($pattern_detached|$pattern_personality)" "$LOG" > /dev/null; then
+if LC_ALL=C grep -E -v -x "$pattern_detached" "$LOG" > /dev/null; then
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+fi
+
+run_strace_redir --quiet=personality --seccomp-bpf -bexecve -enone ../set_ptracer_any false ||
+	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
+
+pattern_seccomp='[^:]*strace: --seccomp-bpf is not enabled because it is not compatible with -b'
+
+LC_ALL=C grep -x "$pattern_detached" "$LOG" > /dev/null &&
+LC_ALL=C grep -x "$pattern_seccomp" "$LOG" > /dev/null ||
+	dump_log_and_fail_with "$STRACE $args: output mismatch"
+
+pattern_all="$pattern_detached|$pattern_seccomp"
+if LC_ALL=C grep -E -v -x "$pattern_all" "$LOG" > /dev/null; then
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 fi
 

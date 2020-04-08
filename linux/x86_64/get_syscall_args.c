@@ -1,10 +1,17 @@
+/*
+ * Copyright (c) 2015-2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	if (x86_io.iov_len != sizeof(i386_regs)) {
 		/* x86-64 or x32 ABI */
-		if (tcp->s_ent->sys_flags & COMPAT_SYSCALL_TYPES) {
+		if (tcp_sysent(tcp)->sys_flags & COMPAT_SYSCALL_TYPES) {
 			/*
 			 * X32 compat syscall: zero-extend from 32 bits.
 			 * Use truncate_klong_to_current_wordsize(tcp->u_arg[N])

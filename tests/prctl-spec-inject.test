@@ -1,0 +1,35 @@
+#!/bin/sh -efu
+#
+# Check decoding of PR_SET_SPECULATION_CTRL and PR_GET_SPECULATION_CTRL
+# prctl operations.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+fault_args='-a53 -e trace=prctl -e inject=prctl:'
+prog="../$NAME"
+
+test_run_rval()
+{
+	local run rval injexpr
+	run="$1"; shift
+	rval="$1"; shift
+	injexpr="$1"; shift
+
+	run_strace $fault_args$injexpr $prog $rval > "$EXP"
+	LC_ALL=C grep -Ev '^prctl\(PR_[GS]ET_([^S][^P][^E][^C]])' \
+		< "$LOG" > "$OUT"
+	match_diff "$OUT" "$EXP"
+}
+
+test_run_rval 0 -1 "error=ENOTTY"
+test_run_rval 1 0 "retval=0"
+test_run_rval 2 1 "retval=1"
+test_run_rval 3 3 "retval=3"
+test_run_rval 4 8 "retval=8"
+test_run_rval 5 16 "retval=16"
+test_run_rval 6 42 "retval=42"

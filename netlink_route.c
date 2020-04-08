@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -110,15 +90,17 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_NEWNETCONF - RTM_BASE] = decode_netconfmsg,
 #endif
 
-#ifdef HAVE_STRUCT_BR_PORT_MSG
 	[RTM_DELMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_GETMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_NEWMDB - RTM_BASE] = decode_br_port_msg,
-#endif
 
 	[RTM_DELNSID - RTM_BASE] = decode_rtgenmsg,
 	[RTM_GETNSID - RTM_BASE] = decode_rtgenmsg,
-	[RTM_NEWNSID - RTM_BASE] = decode_rtgenmsg
+	[RTM_NEWNSID - RTM_BASE] = decode_rtgenmsg,
+
+	[RTM_NEWCHAIN - RTM_BASE] = decode_tcmsg,
+	[RTM_DELCHAIN - RTM_BASE] = decode_tcmsg,
+	[RTM_GETCHAIN - RTM_BASE] = decode_tcmsg,
 };
 
 bool

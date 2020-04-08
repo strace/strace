@@ -1,11 +1,16 @@
 #!/bin/sh
-
+#
 # Check ioctl syscall decoding.
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
 check_prog grep
 run_prog > /dev/null
-run_strace -a16 -eioctl $args > "$EXP"
-grep -v '^ioctl([012],' < "$LOG" > "$OUT"
+run_strace -a16 -eioctl "$@" $args > "$EXP"
+grep -v '^ioctl([012][,<]' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

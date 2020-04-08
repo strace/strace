@@ -1,13 +1,20 @@
+/*
+ * Copyright (c) 2016-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static int
 arch_set_error(struct tcb *tcp)
 {
-	alpha_r0 = tcp->u_error;
-	return upoke(tcp->pid, REG_R0, alpha_r0);
+	return upoke(tcp, REG_A3, (alpha_a3 = 1))
+	       || upoke(tcp, REG_R0, (alpha_r0 = tcp->u_error));
 }
 
 static int
 arch_set_success(struct tcb *tcp)
 {
-	return upoke(tcp->pid, REG_A3, (alpha_a3 = 0))
-	       || upoke(tcp->pid, REG_R0, (alpha_r0 = tcp->u_rval));
+	return upoke(tcp, REG_A3, (alpha_a3 = 0))
+	       || upoke(tcp, REG_R0, (alpha_r0 = tcp->u_rval));
 }

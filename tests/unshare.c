@@ -2,34 +2,15 @@
  * Check decoding of unshare syscall.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_unshare
 
@@ -47,12 +28,12 @@ main(void)
 		const char *str;
 	} unshare_flags[] = {
 		{ ARG_STR(0) },
-		{ 0xdeadca75,
-			"CLONE_THREAD|CLONE_FS|CLONE_SIGHAND|CLONE_SYSVSEM|"
-			"CLONE_NEWUTS|CLONE_NEWIPC|CLONE_NEWNET|CLONE_NEWUSER|"
-			"CLONE_NEWCGROUP|0x80a8c075" },
+		{ 0xdeadcaf5,
+			"CLONE_NEWTIME|CLONE_FS|CLONE_SIGHAND|CLONE_THREAD"
+			"|CLONE_SYSVSEM|CLONE_NEWCGROUP|CLONE_NEWUTS"
+			"|CLONE_NEWIPC|CLONE_NEWUSER|CLONE_NEWNET|0x80a8c075" },
 		{ 0x2000000, "CLONE_NEWCGROUP" },
-		{ ARG_STR(0x81f8f0ff) " /* CLONE_??? */" },
+		{ ARG_STR(0x81f8f07f) " /* CLONE_??? */" },
 	};
 
 	long rc;

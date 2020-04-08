@@ -1,0 +1,418 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  KBRANCH: v5.6
+  SLEEP_A_BIT: sleep 0.2
+  VERBOSE: 1
+
+jobs:
+  whitespace-errors:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: check
+      run: git diff-index --check --cached 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+
+  coverage: # the longest of all build jobs
+    runs-on: ubuntu-latest
+    env:
+      CHECK: coverage
+      CC: gcc-9
+      TARGET: x86_64
+      KHEADERS: torvalds/linux
+      STACKTRACE: libdw
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x86-nostacktrace: # the fastest of all build jobs
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang9-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-9
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang9-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-9
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang9-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-9
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang6-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang6-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang6-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x32-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x32-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x32-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x32-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc9-x86-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-9
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc7-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang9-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-9
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang9-x86-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-9
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang6-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang6-x86-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  musl-x86_64-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: musl-gcc
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh

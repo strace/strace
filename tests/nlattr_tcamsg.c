@@ -1,36 +1,28 @@
 /*
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2017-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 
 #include <stdio.h>
 #include "test_nlattr.h"
+#include <linux/pkt_cls.h>
 #include <linux/rtnetlink.h>
+
+#if !HAVE_DECL_TCA_ACT_PAD
+enum { TCA_ACT_PAD = 5 };
+#endif
+#if !HAVE_DECL_TCA_ACT_COOKIE
+enum { TCA_ACT_COOKIE = 6 };
+#endif
+#if !HAVE_DECL_TCA_ACT_FLAGS
+enum { TCA_ACT_FLAGS = 7 };
+#endif
+
 
 static void
 init_tcamsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -62,19 +54,62 @@ main(void)
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 	const unsigned int hdrlen = sizeof(struct tcamsg);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), NLA_HDRLEN + 4);
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-	const unsigned int nla_type = 0xffff & NLA_TYPE_MASK;
-	char nla_type_str[256];
-	sprintf(nla_type_str, "%#x /* TCA_ACT_??? */", nla_type);
-	TEST_NLATTR_(fd, nlh0, hdrlen,
-		     init_tcamsg, print_tcamsg,
-		     nla_type, nla_type_str,
-		     4, pattern, 4,
-		     print_quoted_hex(pattern, 4));
+	/* Invalid */
+	static const unsigned int nla_invalid[] = { 8, 0xffff & NLA_TYPE_MASK };
+	for (size_t i = 0; i < ARRAY_SIZE(nla_invalid); i++) {
+		char nla_type_str[256];
+		sprintf(nla_type_str, "%#x /* TCA_ACT_??? */", nla_invalid[i]);
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_tcamsg, print_tcamsg,
+			     nla_invalid[i], nla_type_str,
+			     21, pattern, 21,
+			     print_quoted_hex(pattern, 21));
+	}
+
+	/* Default decoder */
+	static const struct {
+		unsigned int val;
+		const char *str;
+	} nla_default[] = {
+		{ ARG_STR(TCA_ACT_UNSPEC) },
+		{ ARG_STR(TCA_ACT_OPTIONS) },
+		{ ARG_STR(TCA_ACT_PAD) },
+		{ ARG_STR(TCA_ACT_COOKIE) },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(nla_default); i++) {
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_tcamsg, print_tcamsg,
+			     nla_default[i].val, nla_default[i].str,
+			     17, pattern, 17,
+			     print_quoted_hex(pattern, 17));
+	}
+
+	/* TCA_ACT_KIND */
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_KIND, 21, pattern, 21,
+		    print_quoted_cstring(pattern, 22));
+
+	static const char kind[] = "Hello\tthere";
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_KIND, sizeof(kind), kind, sizeof(kind),
+		    print_quoted_string(kind));
+
+	/* TCA_ACT_INDEX */
+	static uint32_t idx = 0xdeadc0de;
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_INDEX, sizeof(idx), &idx, sizeof(idx),
+		    printf("%u", idx));
+
+	/* TCA_ACT_FLAGS */
+	static uint32_t flags = 0xfacebeef;
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_FLAGS, sizeof(flags), &flags, sizeof(flags),
+		    printf("TCA_ACT_FLAGS_NO_PERCPU_STATS|0xfacebeee"));
 
 	puts("+++ exited with 0 +++");
 	return 0;

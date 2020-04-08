@@ -3,29 +3,9 @@
 # This script processes strace -ff -tt output.  It merges the contents of all
 # STRACE_LOG.PID files and sorts them, printing result on the standard output.
 #
-# Copyright (c) 2012 The strace developers.
+# Copyright (c) 2012-2019 The strace developers.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 show_usage()
 {
@@ -53,19 +33,56 @@ fi
 
 logfile=$1
 
-for file in "$logfile".*; do
-	[ -f "$file" ] || continue
-	suffix=${file#"$logfile".}
-	[ "$suffix" -gt 0 ] 2> /dev/null ||
-		continue
-	pid=$(printf "%-5s" $suffix)
+iterate_logfiles()
+{
+	local file suffix
+
+	for file in "$logfile".*; do
+		[ -f "$file" ] || continue
+		suffix=${file#"$logfile".}
+		[ "$suffix" -gt 0 ] 2> /dev/null ||
+			continue
+		"$@" "$suffix" "$file"
+	done
+}
+
+max_suffix_length=0
+process_suffix()
+{
+	local suffix len
+	suffix="$1"; shift
+
+	len=${#suffix}
+	if [ $len -gt $max_suffix_length ]; then
+		max_suffix_length=$len
+	fi
+}
+
+process_logfile()
+{
+	local suffix file pid
+	suffix="$1"; shift
+	file="$1"; shift
+
+	pid=$(printf "%-*s" $max_suffix_length $suffix)
 	# Some strace logs have last line which is not '\n' terminated,
 	# so add extra newline to every file.
-	# grep -v '^$' removes empty lines which may result.
+	# Empty lines are removed later.
 	sed -n "s/^\($dd:\)\?\($dd:\)\?\($ds\.\)\?$ds /\2\4\6\7 $pid \0/p" < "$file"
 	echo
-done \
-| sort -s -n -k1,1 | sed -n 's/^[0-9][0-9]* //p'
+}
+
+iterate_logfiles process_suffix
+
+[ $max_suffix_length -gt 0 ] || {
+	echo >&2 "${0##*/}: $logfile: strace output not found"
+	exit 1
+}
+
+iterate_logfiles process_logfile |
+	sort -s -n -k1,1 |
+	sed -n 's/^[0-9][0-9]* //p' |
+	grep -v '^$'
 
 rc=$?
 [ $rc -eq 1 ] &&

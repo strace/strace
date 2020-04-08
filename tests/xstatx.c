@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #if defined HAVE_FTRUNCATE && defined HAVE_FUTIMENS
@@ -64,10 +44,15 @@ typedef off_t libc_off_t;
 
 # define stat libc_stat
 # define stat64 libc_stat64
+# define statx libc_statx
+# define statx_timestamp libc_statx_timestamp
+struct statx;
 # include <fcntl.h>
 # include <sys/stat.h>
-# undef stat
+# undef statx_timestamp
+# undef statx
 # undef stat64
+# undef stat
 
 # undef st_atime
 # undef st_mtime
@@ -117,6 +102,7 @@ typedef off_t libc_off_t;
 #  define IS_STATX 0
 # endif
 
+# if !XLAT_RAW /* Fixes -Wunused warning */
 static void
 print_ftype(const unsigned int mode)
 {
@@ -137,20 +123,66 @@ print_perms(const unsigned int mode)
 {
 	printf("%#o", mode & ~S_IFMT);
 }
+# endif
+
+static void
+print_st_mode(const unsigned int mode)
+{
+# if XLAT_RAW
+	printf("%#o", mode);
+# elif XLAT_VERBOSE
+	printf("%#o /* ", mode);
+	print_ftype(mode);
+	printf("|");
+	print_perms(mode);
+	printf(" */");
+# else
+	print_ftype(mode);
+	printf("|");
+	print_perms(mode);
+# endif
+}
 
 # if !IS_STATX
+
+static const char *
+sprint_makedev(const unsigned long long val)
+{
+	static char devid[256];
+	int ret;
+
+#  if XLAT_RAW
+	ret = snprintf(devid, sizeof(devid),
+			"%#llx", val);
+#  elif XLAT_VERBOSE
+	ret = snprintf(devid, sizeof(devid),
+			"%#llx /* makedev(%#x, %#x) */",
+			val, major(val), minor(val));
+#  else /* XLAT_ABBREV */
+	ret = snprintf(devid, sizeof(devid),
+			"makedev(%#x, %#x)",
+			major(val), minor(val));
+#  endif
+	if (ret < 0)
+		perror_msg_and_fail("sprint_makedev(%llx)", val);
+	if ((unsigned) ret >= sizeof(devid))
+		error_msg_and_fail("sprint_makedev(%llx): buffer "
+					   "overflow", val);
+	return devid;
+}
+
 
 static void
 print_stat(const STRUCT_STAT *st)
 {
-	printf("{st_dev=makedev(%u, %u)",
-	       (unsigned int) major(zero_extend_signed_to_ull(st->st_dev)),
-	       (unsigned int) minor(zero_extend_signed_to_ull(st->st_dev)));
+	unsigned long long dev, rdev;
+
+	dev = zero_extend_signed_to_ull(st->st_dev);
+	rdev = zero_extend_signed_to_ull(st->st_rdev);
+	printf("{st_dev=%s", sprint_makedev(dev));
 	printf(", st_ino=%llu", zero_extend_signed_to_ull(st->st_ino));
 	printf(", st_mode=");
-	print_ftype(st->st_mode);
-	printf("|");
-	print_perms(st->st_mode);
+	print_st_mode(st->st_mode);
 	printf(", st_nlink=%llu", zero_extend_signed_to_ull(st->st_nlink));
 	printf(", st_uid=%llu", zero_extend_signed_to_ull(st->st_uid));
 	printf(", st_gid=%llu", zero_extend_signed_to_ull(st->st_gid));
@@ -163,9 +195,7 @@ print_stat(const STRUCT_STAT *st)
 
 	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-		printf(", st_rdev=makedev(%u, %u)",
-		       (unsigned int) major(zero_extend_signed_to_ull(st->st_rdev)),
-		       (unsigned int) minor(zero_extend_signed_to_ull(st->st_rdev)));
+		printf(", st_rdev=%s", sprint_makedev(rdev));
 		break;
 	default:
 		printf(", st_size=%llu", zero_extend_signed_to_ull(st->st_size));
@@ -179,7 +209,7 @@ print_stat(const STRUCT_STAT *st)
 #   define HAVE_NSEC		0
 #  endif
 
-#define PRINT_ST_TIME(field)							\
+#  define PRINT_ST_TIME(field)							\
 	do {									\
 		printf(", st_" #field "=%lld",					\
 		       sign_extend_unsigned_to_ll(st->st_ ## field));		\
@@ -233,9 +263,7 @@ print_stat(const STRUCT_STAT *st)
 	PRINT_FIELD_U32_UID(stx_gid);
 
 	printf(", stx_mode=");
-	print_ftype(st->stx_mode);
-	printf("|");
-	print_perms(st->stx_mode);
+	print_st_mode(st->stx_mode);
 
 	PRINT_FIELD_U(", ", *st, stx_ino);
 	PRINT_FIELD_U(", ", *st, stx_size);
@@ -433,7 +461,7 @@ main(void)
 	SET_FLAGS_INVOKE(0xffffff,
 		"AT_STATX_FORCE_SYNC|AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|"
 		"AT_REMOVEDIR|AT_SYMLINK_FOLLOW|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|"
-		"0xff80ff");
+		"AT_RECURSIVE|0xff00ff");
 
 	/* We're done playing with flags. */
 	TEST_SYSCALL_STATX_FLAGS = old_flags;

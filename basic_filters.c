@@ -1,53 +1,88 @@
 /*
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
-#include "number_set.h"
-#include "filter.h"
+
 #include <regex.h>
+
+#include "filter.h"
+#include "number_set.h"
+#include "xstring.h"
+
+
+/**
+ * Checks whether a @-separated personality specification suffix is present.
+ * Personality suffix is a one of strings stored in personality_designators
+ * array.
+ *
+ * @param[in]  s Specification string to check.
+ * @param[out] p Where to store personality number if it is found.
+ * @return       If personality is found, the provided string is copied without
+ *               suffix and returned as a result (callee should de-alllocate it
+ *               with free() after use), and personality number is written to p.
+ *               Otherwise, NULL is returned and p is untouched.
+ */
+static char *
+qualify_syscall_separate_personality(const char *s, unsigned int *p)
+{
+	char *pos = strchr(s, '@');
+
+	if (!pos)
+		return NULL;
+
+	for (unsigned int i = 0; i < SUPPORTED_PERSONALITIES; i++) {
+		if (!strcmp(pos + 1, personality_designators[i])) {
+			*p = i;
+			return xstrndup(s, pos - s);
+		}
+	}
+
+	error_msg_and_help("incorrect personality designator '%s'"
+			   " in qualification '%s'", pos + 1, s);
+}
+
+static bool
+qualify_syscall_number_personality(int n, unsigned int p,
+				   struct number_set *set)
+{
+	if ((unsigned int) n >= nsyscall_vec[p])
+		return false;
+
+	add_number_to_set_array(n, set, p);
+
+	return true;
+}
 
 static bool
 qualify_syscall_number(const char *s, struct number_set *set)
 {
-	int n = string_to_uint(s);
+	unsigned int p;
+	char *num_str = qualify_syscall_separate_personality(s, &p);
+	int n;
+
+	if (num_str) {
+		n = string_to_uint(num_str);
+		free(num_str);
+
+		if (n < 0)
+			return false;
+
+		return qualify_syscall_number_personality(n, p, set);
+	}
+
+	n = string_to_uint(s);
 	if (n < 0)
 		return false;
 
-	unsigned int p;
 	bool done = false;
 
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		if ((unsigned) n >= nsyscall_vec[p]) {
-			continue;
-		}
-		add_number_to_set_array(n, set, p);
-		done = true;
-	}
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+		done |= qualify_syscall_number_personality(n, p, set);
 
 	return done;
 }
@@ -71,20 +106,32 @@ qualify_syscall_regex(const char *s, struct number_set *set)
 	if ((rc = regcomp(&preg, s, REG_EXTENDED | REG_NOSUB)) != 0)
 		regerror_msg_and_die(rc, &preg, "regcomp", s);
 
-	unsigned int p;
 	bool found = false;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
 
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (!sysent_vec[p][i].sys_name)
 				continue;
+
 			rc = regexec(&preg, sysent_vec[p][i].sys_name,
 				     0, NULL, 0);
+
+			if (rc == REG_NOMATCH) {
+				char name_buf[128];
+				char *pos = stpcpy(name_buf,
+						   sysent_vec[p][i].sys_name);
+
+				(void) xappendstr(name_buf, pos, "@%s",
+						  personality_designators[p]);
+
+				rc = regexec(&preg, name_buf, 0, NULL, 0);
+			}
+
 			if (rc == REG_NOMATCH)
 				continue;
 			else if (rc)
 				regerror_msg_and_die(rc, &preg, "regexec", s);
+
 			add_number_to_set_array(i, set, p);
 			found = true;
 		}
@@ -101,19 +148,14 @@ lookup_class(const char *s)
 		const char *name;
 		unsigned int value;
 	} syscall_class[] = {
-		{ "desc",	TRACE_DESC	},
-		{ "file",	TRACE_FILE	},
-		{ "memory",	TRACE_MEMORY	},
-		{ "process",	TRACE_PROCESS	},
-		{ "signal",	TRACE_SIGNAL	},
-		{ "ipc",	TRACE_IPC	},
-		{ "network",	TRACE_NETWORK	},
 		{ "%desc",	TRACE_DESC	},
 		{ "%file",	TRACE_FILE	},
 		{ "%memory",	TRACE_MEMORY	},
 		{ "%process",	TRACE_PROCESS	},
+		{ "%creds",	TRACE_CREDS	},
 		{ "%signal",	TRACE_SIGNAL	},
 		{ "%ipc",	TRACE_IPC	},
+		{ "%net",	TRACE_NETWORK	},
 		{ "%network",	TRACE_NETWORK	},
 		{ "%stat",	TRACE_STAT	},
 		{ "%lstat",	TRACE_LSTAT	},
@@ -122,13 +164,20 @@ lookup_class(const char *s)
 		{ "%statfs",	TRACE_STATFS	},
 		{ "%fstatfs",	TRACE_FSTATFS	},
 		{ "%%statfs",	TRACE_STATFS_LIKE	},
+		{ "%pure",	TRACE_PURE	},
+		/* legacy class names */
+		{ "desc",	TRACE_DESC	},
+		{ "file",	TRACE_FILE	},
+		{ "memory",	TRACE_MEMORY	},
+		{ "process",	TRACE_PROCESS	},
+		{ "signal",	TRACE_SIGNAL	},
+		{ "ipc",	TRACE_IPC	},
+		{ "network",	TRACE_NETWORK	},
 	};
 
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
-		if (strcmp(s, syscall_class[i].name) == 0) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
+		if (strcmp(s, syscall_class[i].name) == 0)
 			return syscall_class[i].value;
-		}
 	}
 
 	return 0;
@@ -141,40 +190,63 @@ qualify_syscall_class(const char *s, struct number_set *set)
 	if (!n)
 		return false;
 
-	unsigned int p;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
-
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name
-			    || (sysent_vec[p][i].sys_flags & n) != n) {
-				continue;
-			}
-			add_number_to_set_array(i, set, p);
+	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
+			if (sysent_vec[p][i].sys_name &&
+			    (sysent_vec[p][i].sys_flags & n) == n)
+				add_number_to_set_array(i, set, p);
 		}
 	}
 
 	return true;
 }
 
+kernel_long_t
+scno_by_name(const char *s, unsigned int p, kernel_long_t start)
+{
+	if (p >= SUPPORTED_PERSONALITIES)
+		return -1;
+
+	for (kernel_ulong_t i = start; i < nsyscall_vec[p]; ++i) {
+		if (sysent_vec[p][i].sys_name &&
+		    strcmp(s, sysent_vec[p][i].sys_name) == 0)
+			return i;
+	}
+
+	return -1;
+}
+
+static bool
+qualify_syscall_name_personality(const char *s, unsigned int p,
+				 struct number_set *set)
+{
+	bool found = false;
+
+	for (kernel_long_t scno = 0; (scno = scno_by_name(s, p, scno)) >= 0;
+	     ++scno) {
+		add_number_to_set_array(scno, set, p);
+		found = true;
+	}
+
+	return found;
+}
+
 static bool
 qualify_syscall_name(const char *s, struct number_set *set)
 {
 	unsigned int p;
+	char *name_str = qualify_syscall_separate_personality(s, &p);
 	bool found = false;
 
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		unsigned int i;
+	if (name_str) {
+		found = qualify_syscall_name_personality(name_str, p, set);
+		free(name_str);
 
-		for (i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name
-			    || strcmp(s, sysent_vec[p][i].sys_name)) {
-				continue;
-			}
-			add_number_to_set_array(i, set, p);
-			found = true;
-		}
+		return found;
 	}
+
+	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+		found |= qualify_syscall_name_personality(s, p, set);
 
 	return found;
 }
@@ -202,8 +274,7 @@ qualify_syscall(const char *token, struct number_set *set)
  * according to STR specification.
  */
 void
-qualify_syscall_tokens(const char *const str, struct number_set *const set,
-		       const char *const name)
+qualify_syscall_tokens(const char *const str, struct number_set *const set)
 {
 	/* Clear all sets. */
 	clear_number_set_array(set, SUPPORTED_PERSONALITIES);
@@ -213,7 +284,6 @@ qualify_syscall_tokens(const char *const str, struct number_set *const set,
 	 * of the remaining specification.
 	 */
 	const char *s = str;
-handle_inversion:
 	while (*s == '!') {
 		invert_number_set_array(set, SUPPORTED_PERSONALITIES);
 		++s;
@@ -227,8 +297,9 @@ handle_inversion:
 		 */
 		return;
 	} else if (strcmp(s, "all") == 0) {
-		s = "!none";
-		goto handle_inversion;
+		/* "all" == "!none" */
+		invert_number_set_array(set, SUPPORTED_PERSONALITIES);
+		return;
 	}
 
 	/*
@@ -240,22 +311,19 @@ handle_inversion:
 	 */
 	char *copy = xstrdup(s);
 	char *saveptr = NULL;
-	const char *token;
 	bool done = false;
 
-	for (token = strtok_r(copy, ",", &saveptr); token;
-	     token = strtok_r(NULL, ",", &saveptr)) {
+	for (const char *token = strtok_r(copy, ",", &saveptr);
+	     token; token = strtok_r(NULL, ",", &saveptr)) {
 		done = qualify_syscall(token, set);
-		if (!done) {
-			error_msg_and_die("invalid %s '%s'", name, token);
-		}
+		if (!done)
+			error_msg_and_die("invalid system call '%s'", token);
 	}
 
 	free(copy);
 
-	if (!done) {
-		error_msg_and_die("invalid %s '%s'", name, str);
-	}
+	if (!done)
+		error_msg_and_die("invalid system call '%s'", str);
 }
 
 /*
@@ -273,7 +341,6 @@ qualify_tokens(const char *const str, struct number_set *const set,
 	 * of the remaining specification.
 	 */
 	const char *s = str;
-handle_inversion:
 	while (*s == '!') {
 		invert_number_set_array(set, 1);
 		++s;
@@ -287,8 +354,9 @@ handle_inversion:
 		 */
 		return;
 	} else if (strcmp(s, "all") == 0) {
-		s = "!none";
-		goto handle_inversion;
+		/* "all" == "!none" */
+		invert_number_set_array(set, 1);
+		return;
 	}
 
 	/*
@@ -300,22 +368,19 @@ handle_inversion:
 	 */
 	char *copy = xstrdup(s);
 	char *saveptr = NULL;
-	const char *token;
 	int number = -1;
 
-	for (token = strtok_r(copy, ",", &saveptr); token;
-	     token = strtok_r(NULL, ",", &saveptr)) {
+	for (const char *token = strtok_r(copy, ",", &saveptr);
+	     token; token = strtok_r(NULL, ",", &saveptr)) {
 		number = func(token);
-		if (number < 0) {
+		if (number < 0)
 			error_msg_and_die("invalid %s '%s'", name, token);
-		}
 
 		add_number_to_set(number, set);
 	}
 
 	free(copy);
 
-	if (number < 0) {
+	if (number < 0)
 		error_msg_and_die("invalid %s '%s'", name, str);
-	}
 }

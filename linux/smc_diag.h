@@ -1,7 +1,16 @@
-#ifndef STRACE_LINUX_SMC_DIAG_H
-#define STRACE_LINUX_SMC_DIAG_H
+/*
+ * Copyright (c) 2017-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-#include <linux/inet_diag.h>
+#ifndef STRACE_LINUX_SMC_DIAG_H
+# define STRACE_LINUX_SMC_DIAG_H
+
+# include <linux/inet_diag.h>
+
+# include "gcc_compat.h"
 
 /* Request structure */
 struct smc_diag_req {
@@ -14,7 +23,10 @@ struct smc_diag_req {
 struct smc_diag_msg {
 	uint8_t diag_family;
 	uint8_t diag_state;
-	uint8_t diag_fallback;
+	union {
+		uint8_t diag_fallback;
+		uint8_t diag_mode;
+	};
 	uint8_t diag_shutdown;
 	struct inet_diag_sockid id;
 
@@ -28,6 +40,8 @@ enum {
 	SMC_DIAG_CONNINFO,
 	SMC_DIAG_LGRINFO,
 	SMC_DIAG_SHUTDOWN,
+	SMC_DIAG_DMBINFO,
+	SMC_DIAG_FALLBACK,
 };
 
 /* SMC_DIAG_CONNINFO */
@@ -64,9 +78,25 @@ struct smc_diag_linkinfo {
 	uint8_t peer_gid[40];
 };
 
+/* SMC_DIAG_LGRINFO */
 struct smc_diag_lgrinfo {
 	struct smc_diag_linkinfo lnk[1];
 	uint8_t role;
+};
+
+/* SMC_DIAG_DMBINFO */
+struct smcd_diag_dmbinfo {
+	uint32_t linkid;
+	uint64_t ATTRIBUTE_ALIGNED(8) peer_gid;
+	uint64_t ATTRIBUTE_ALIGNED(8) my_gid;
+	uint64_t ATTRIBUTE_ALIGNED(8) token;
+	uint64_t ATTRIBUTE_ALIGNED(8) peer_token;
+};
+
+/* SMC_DIAG_FALLBACK */
+struct smc_diag_fallback {
+	uint32_t reason;
+	uint32_t peer_diagnosis;
 };
 
 #endif /* !STRACE_LINUX_SMC_DIAG_H */

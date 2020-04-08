@@ -1,19 +1,17 @@
+/*
+ * Copyright (c) 2015-2020 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
-	static const int syscall_regs[MAX_ARGS] = {
-		4 * (REG_REG0+4),
-		4 * (REG_REG0+5),
-		4 * (REG_REG0+6),
-		4 * (REG_REG0+7),
-		4 * (REG_REG0  ),
-		4 * (REG_REG0+1)
-	};
-	unsigned int i;
+	static const unsigned int syscall_regs[MAX_ARGS] = { 4, 5, 6, 7, 0, 1 };
 
-	for (i = 0; i < tcp->s_ent->nargs; ++i)
-		if (upeek(tcp->pid, syscall_regs[i], &tcp->u_arg[i]) < 0)
-			return -1;
+	for (unsigned int i = 0; i < n_args(tcp); ++i)
+		tcp->u_arg[i] = sh_regs.regs[syscall_regs[i]];
 	return 1;
 }

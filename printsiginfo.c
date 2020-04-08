@@ -7,30 +7,10 @@
  * Copyright (c) 2013 Denys Vlasenko <vda.linux@googlemail.com>
  * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -42,9 +22,18 @@
 
 #include MPERS_DEFS
 
+#include "nr_prefix.c"
+
+#include "print_fields.h"
+
 #ifndef IN_MPERS
-#include "printsiginfo.h"
+# include "printsiginfo.h"
 #endif
+
+#define XLAT_MACROS_ONLY
+/* For xlat/audit_arch.h */
+# include "xlat/elf_em.h"
+#undef XLAT_MACROS_ONLY
 
 #include "xlat/audit_arch.h"
 #include "xlat/sigbus_codes.h"
@@ -124,23 +113,14 @@ print_si_code(int si_signo, unsigned int si_code)
 		}
 	}
 
-	if (code)
-		tprints(code);
-	else
-		tprintf("%#x", si_code);
+	print_xlat_ex(si_code, code, XLAT_STYLE_DEFAULT);
 }
 
 static void
 print_si_info(const siginfo_t *sip)
 {
-	if (sip->si_errno) {
-		tprints(", si_errno=");
-		if ((unsigned) sip->si_errno < nerrnos
-		    && errnoent[sip->si_errno])
-			tprints(errnoent[sip->si_errno]);
-		else
-			tprintf("%d", sip->si_errno);
-	}
+	if (sip->si_errno)
+		PRINT_FIELD_ERR_U(", ", *sip, si_errno);
 
 	if (SI_FROMUSER(sip)) {
 		switch (sip->si_code) {
@@ -191,14 +171,31 @@ print_si_info(const siginfo_t *sip)
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS: {
-			const char *scname =
-				syscall_name((unsigned) sip->si_syscall);
+			/*
+			 * Note that we can safely use the personality set in
+			 * current_personality  here (and don't have to guess it
+			 * based on X32_SYSCALL_BIT and si_arch, for example):
+			 *  - The signal is delivered as a result of seccomp
+			 *    filtering to the process executing forbidden
+			 *    syscall.
+			 *  - We have set the personality for the tracee during
+			 *    the syscall entering.
+			 *  - The current_personality is reliably switched in
+			 *    the next_event routine, it is set to the
+			 *    personality of the last call made (the one that
+			 *    triggered the signal delivery).
+			 *  - Looks like there are no other cases where SIGSYS
+			 *    is delivered from the kernel so far.
+			 */
+			const char *scname = syscall_name(shuffle_scno(
+				(unsigned) sip->si_syscall));
 
 			tprints(", si_call_addr=");
 			printaddr(ptr_to_kulong(sip->si_call_addr));
 			tprints(", si_syscall=");
 			if (scname)
-				tprintf("__NR_%s", scname);
+				tprintf("%s%s",
+					nr_prefix(sip->si_syscall), scname);
 			else
 				tprintf("%u", (unsigned) sip->si_syscall);
 			tprints(", si_arch=");
@@ -261,5 +258,5 @@ MPERS_PRINTER_DECL(void, print_siginfo_array, struct tcb *const tcp,
 	siginfo_t si;
 
 	print_array(tcp, addr, len, &si, sizeof(si),
-		    umoven_or_printaddr, print_siginfo_t, 0);
+		    tfetch_mem, print_siginfo_t, 0);
 }

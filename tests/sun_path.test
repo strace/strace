@@ -1,6 +1,11 @@
 #!/bin/sh
-
+#
 # Check how long sun_path addresses are traced.
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

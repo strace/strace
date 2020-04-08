@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2016-2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_sched_getparam && defined __NR_sched_setparam
 

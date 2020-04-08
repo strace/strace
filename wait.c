@@ -7,58 +7,18 @@
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2009-2013 Denys Vlasenko <dvlasenk@redhat.com>
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2014-2017 The strace developers.
+ * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
+#include "ptrace.h"
 
-#include <sys/wait.h>
+#include "wait.h"
 
 #include "xlat/wait4_options.h"
-
-#if !defined WCOREFLAG && defined WCOREFLG
-# define WCOREFLAG WCOREFLG
-#endif
-#ifndef WCOREFLAG
-# define WCOREFLAG 0x80
-#endif
-#ifndef WCOREDUMP
-# define WCOREDUMP(status)  ((status) & 0200)
-#endif
-#ifndef W_STOPCODE
-# define W_STOPCODE(sig)  ((sig) << 8 | 0x7f)
-#endif
-#ifndef W_EXITCODE
-# define W_EXITCODE(ret, sig)  ((ret) << 8 | (sig))
-#endif
-#ifndef W_CONTINUED
-# define W_CONTINUED 0xffff
-#endif
-
-#include "ptrace.h"
 #include "xlat/ptrace_events.h"
 
 static int
@@ -74,12 +34,12 @@ printstatus(int status)
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
 		tprintf("[{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
-			signame(sig & 0x7f),
+			sprintsigname(sig & 0x7f),
 			sig & 0x80 ? " | 0x80" : "");
 		status &= ~W_STOPCODE(sig);
 	} else if (WIFSIGNALED(status)) {
 		tprintf("[{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
-			signame(WTERMSIG(status)),
+			sprintsigname(WTERMSIG(status)),
 			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
 		status &= ~(W_EXITCODE(0, WTERMSIG(status)) | WCOREFLAG);
 	} else if (WIFEXITED(status)) {
@@ -156,10 +116,12 @@ SYS_FUNC(waitpid)
 	return printwaitn(tcp, NULL);
 }
 
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 SYS_FUNC(wait4)
 {
 	return printwaitn(tcp, printrusage);
 }
+#endif
 
 #ifdef ALPHA
 SYS_FUNC(osf_wait4)

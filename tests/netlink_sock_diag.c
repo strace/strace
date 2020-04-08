@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2017-2018 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -127,10 +107,11 @@ test_nlmsg_flags(const int fd)
 static void
 test_odd_family_req(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	uint8_t family = 0;
+	char buf[sizeof(family) + 4];
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(buf));
 
 	/* unspecified family only */
-	uint8_t family = 0;
 	TEST_NETLINK(fd, nlh0,
 		     SOCK_DIAG_BY_FAMILY,
 		     NLM_F_REQUEST,
@@ -153,7 +134,6 @@ test_odd_family_req(const int fd)
 		     printf("%p", NLMSG_DATA(TEST_NETLINK_nlh)));
 
 	/* unspecified family and string */
-	char buf[sizeof(family) + 4];
 	family = 0;
 	memcpy(buf, &family, sizeof(family));
 	memcpy(buf + sizeof(family), "1234", 4);
@@ -177,10 +157,11 @@ test_odd_family_req(const int fd)
 static void
 test_odd_family_msg(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	uint8_t family = 0;
+	char buf[sizeof(family) + 4];
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(buf));
 
 	/* unspecified family only */
-	uint8_t family = 0;
 	TEST_NETLINK(fd, nlh0,
 		     SOCK_DIAG_BY_FAMILY, NLM_F_DUMP,
 		     sizeof(family), &family, sizeof(family),
@@ -200,7 +181,6 @@ test_odd_family_msg(const int fd)
 		     printf("%p", NLMSG_DATA(TEST_NETLINK_nlh)));
 
 	/* unspecified family and string */
-	char buf[sizeof(family) + 4];
 	family = 0;
 	memcpy(buf, &family, sizeof(family));
 	memcpy(buf + sizeof(family), "1234", 4);
@@ -222,7 +202,6 @@ test_odd_family_msg(const int fd)
 static void
 test_unix_diag_req(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	static const struct unix_diag_req req = {
 		.sdiag_family = AF_UNIX,
 		.sdiag_protocol = 253,
@@ -231,6 +210,7 @@ test_unix_diag_req(const int fd)
 		.udiag_show = UDIAG_SHOW_NAME,
 		.udiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 	TEST_SOCK_DIAG(fd, nlh0, AF_UNIX,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_REQUEST, req,
 		       printf("{sdiag_family=AF_UNIX"),
@@ -245,7 +225,6 @@ test_unix_diag_req(const int fd)
 static void
 test_unix_diag_msg(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	static const struct unix_diag_msg msg = {
 		.udiag_family = AF_UNIX,
 		.udiag_type = SOCK_STREAM,
@@ -253,6 +232,7 @@ test_unix_diag_msg(const int fd)
 		.udiag_ino = 0xfacefeed,
 		.udiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 	TEST_SOCK_DIAG(fd, nlh0, AF_UNIX,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_DUMP, msg,
 		       printf("{udiag_family=AF_UNIX"),
@@ -266,7 +246,6 @@ test_unix_diag_msg(const int fd)
 static void
 test_netlink_diag_req(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct netlink_diag_req req = {
 		.sdiag_family = AF_NETLINK,
 		.sdiag_protocol = NDIAG_PROTO_ALL,
@@ -274,6 +253,7 @@ test_netlink_diag_req(const int fd)
 		.ndiag_show = NDIAG_SHOW_MEMINFO,
 		.ndiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 	TEST_SOCK_DIAG(fd, nlh0, AF_NETLINK,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_REQUEST, req,
 		       printf("{sdiag_family=AF_NETLINK"),
@@ -298,7 +278,6 @@ test_netlink_diag_req(const int fd)
 static void
 test_netlink_diag_msg(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	static const struct netlink_diag_msg msg = {
 		.ndiag_family = AF_NETLINK,
 		.ndiag_type = SOCK_RAW,
@@ -310,6 +289,7 @@ test_netlink_diag_msg(const int fd)
 		.ndiag_ino = 0xdaeefacd,
 		.ndiag_cookie = { 0xbadc0ded, 0xdeadbeef }
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 	TEST_SOCK_DIAG(fd, nlh0, AF_NETLINK,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_DUMP, msg,
 		       printf("{ndiag_family=AF_NETLINK"),
@@ -327,7 +307,6 @@ test_netlink_diag_msg(const int fd)
 static void
 test_packet_diag_req(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	static const struct packet_diag_req req = {
 		.sdiag_family = AF_PACKET,
 		.sdiag_protocol = ETH_P_LOOP,
@@ -335,10 +314,11 @@ test_packet_diag_req(const int fd)
 		.pdiag_show = PACKET_SHOW_INFO,
 		.pdiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 	TEST_SOCK_DIAG(fd, nlh0, AF_PACKET,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_REQUEST, req,
 		       printf("{sdiag_family=AF_PACKET"),
-		       printf(", sdiag_protocol=ETH_P_LOOP");
+		       printf(", sdiag_protocol=%#x", req.sdiag_protocol);
 		       PRINT_FIELD_U(", ", req, pdiag_ino);
 		       printf(", pdiag_show=PACKET_SHOW_INFO");
 		       PRINT_FIELD_COOKIE(", ", req, pdiag_cookie);
@@ -348,19 +328,19 @@ test_packet_diag_req(const int fd)
 static void
 test_packet_diag_msg(const int fd)
 {
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	static const struct packet_diag_msg msg = {
 		.pdiag_family = AF_PACKET,
 		.pdiag_type = SOCK_STREAM,
-		.pdiag_num = 0xbadc,
+		.pdiag_num = 0x9100,
 		.pdiag_ino = 0xfacefeed,
 		.pdiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 	TEST_SOCK_DIAG(fd, nlh0, AF_PACKET,
 		       SOCK_DIAG_BY_FAMILY, NLM_F_DUMP, msg,
 		       printf("{pdiag_family=AF_PACKET"),
 		       printf(", pdiag_type=SOCK_STREAM");
-		       PRINT_FIELD_U(", ", msg, pdiag_num);
+		       printf(", pdiag_num=ETH_P_QINQ1");
 		       PRINT_FIELD_U(", ", msg, pdiag_ino);
 		       PRINT_FIELD_COOKIE(", ", msg, pdiag_cookie);
 		       printf("}"));
@@ -371,7 +351,6 @@ test_inet_diag_sockid(const int fd)
 {
 	const char address[] = "12.34.56.78";
 	const char address6[] = "12:34:56:78:90:ab:cd:ef";
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct inet_diag_req_v2 req = {
 		.sdiag_family = AF_INET,
 		.idiag_ext = 1 << (INET_DIAG_CONG - 1),
@@ -384,6 +363,7 @@ test_inet_diag_sockid(const int fd)
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 		},
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 
 	if (!inet_pton(AF_INET, address, &req.id.idiag_src) ||
 	    !inet_pton(AF_INET, address, &req.id.idiag_dst))
@@ -435,7 +415,6 @@ static void
 test_inet_diag_req(const int fd)
 {
 	const char address[] = "12.34.56.78";
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct inet_diag_req req = {
 		.idiag_family = AF_INET,
 		.idiag_src_len = 0xde,
@@ -450,6 +429,7 @@ test_inet_diag_req(const int fd)
 		.idiag_states = 1 << TCP_LAST_ACK,
 		.idiag_dbs = 0xfacefeed,
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 
 	if (!inet_pton(AF_INET, address, &req.id.idiag_src) ||
 	    !inet_pton(AF_INET, address, &req.id.idiag_dst))
@@ -479,7 +459,6 @@ static void
 test_inet_diag_req_v2(const int fd)
 {
 	const char address[] = "87.65.43.21";
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct inet_diag_req_v2 req = {
 		.sdiag_family = AF_INET,
 		.idiag_ext = 1 << (INET_DIAG_CONG - 1),
@@ -492,6 +471,7 @@ test_inet_diag_req_v2(const int fd)
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded }
 		},
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 
 	if (!inet_pton(AF_INET, address, &req.id.idiag_src) ||
 	    !inet_pton(AF_INET, address, &req.id.idiag_dst))
@@ -519,7 +499,6 @@ static void
 test_inet_diag_msg(const int fd)
 {
 	const char address[] = "11.22.33.44";
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct inet_diag_msg msg = {
 		.idiag_family = AF_INET,
 		.idiag_state = TCP_LISTEN,
@@ -537,6 +516,7 @@ test_inet_diag_msg(const int fd)
 		.idiag_uid = 0xdecefaeb,
 		.idiag_inode = 0xbadc0ded,
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
 	if (!inet_pton(AF_INET, address, &msg.id.idiag_src) ||
 	    !inet_pton(AF_INET, address, &msg.id.idiag_dst))
@@ -570,7 +550,6 @@ static void
 test_smc_diag_req(const int fd)
 {
 	const char address[] = "43.21.56.78";
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct smc_diag_req req = {
 		.diag_family = AF_SMC,
 		.diag_ext = 1 << (SMC_DIAG_CONNINFO - 1),
@@ -581,6 +560,7 @@ test_smc_diag_req(const int fd)
 			.idiag_cookie = { 0xdeadbeef, 0xbadc0ded },
 		},
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(req));
 
 	if (!inet_pton(AF_INET, address, &req.id.idiag_src) ||
 	    !inet_pton(AF_INET, address, &req.id.idiag_dst))
@@ -606,11 +586,10 @@ static void
 test_smc_diag_msg(const int fd)
 {
 	const char address[] = "34.87.12.90";
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
 	struct smc_diag_msg msg = {
 		.diag_family = AF_SMC,
 		.diag_state = SMC_ACTIVE,
-		.diag_fallback = 0xde,
+		.diag_fallback = 0x1,
 		.diag_shutdown = 0xba,
 		.id = {
 			.idiag_sport = 0xdead,
@@ -621,6 +600,7 @@ test_smc_diag_msg(const int fd)
 		.diag_uid = 0xadcdfafc,
 		.diag_inode = 0xbadc0ded,
 	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
 	if (!inet_pton(AF_INET, address, &msg.id.idiag_src) ||
 	    !inet_pton(AF_INET, address, &msg.id.idiag_dst))
@@ -630,7 +610,7 @@ test_smc_diag_msg(const int fd)
 		       SOCK_DIAG_BY_FAMILY, NLM_F_DUMP, msg,
 		       printf("{diag_family=AF_SMC"),
 		       printf(", diag_state=SMC_ACTIVE");
-		       PRINT_FIELD_U(", ", msg, diag_fallback);
+		       printf(", diag_fallback=SMC_DIAG_MODE_FALLBACK_TCP");
 		       PRINT_FIELD_U(", ", msg, diag_shutdown);
 		       printf(", id={idiag_sport=htons(%u)"
 			      ", idiag_dport=htons(%u)"

@@ -1,11 +1,20 @@
-#!/bin/sh
-
+#!/bin/sh -efu
+#
 # Check -ff option.
+#
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
+ff_opt="${*:--ff}"
+
 run_prog_skip_if_failed \
 	kill -0 $$
+
+run_prog ../sleep 0
 
 ../set_ptracer_any ../sleep 3 > "$OUT" &
 tracee_pid=$!
@@ -15,12 +24,13 @@ while ! [ -s "$OUT" ]; do
 		fail_ 'set_ptracer_any sleep failed'
 done
 
-run_strace -a14 -eexit_group -ff -p $tracee_pid
+run_strace --quiet=personality -a14 -eexit_group ${ff_opt} -p $tracee_pid
 
 # check that output matches
 match_diff "$LOG.$tracee_pid"
 
 # check that no other output files have been created
+set +f
 set -- "$LOG".*
 [ "$LOG.$tracee_pid" = "$*" ] ||
 	fail_ "too many output files: $*"

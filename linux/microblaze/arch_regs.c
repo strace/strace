@@ -1,2 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static unsigned long microblaze_r3;
 #define ARCH_PC_PEEK_ADDR PT_PC
+#define ARCH_SP_PEEK_ADDR PT_GPR(1)

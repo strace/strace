@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2017-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_LINUX_PACKET_DIAG_H
-#define STRACE_LINUX_PACKET_DIAG_H
+# define STRACE_LINUX_PACKET_DIAG_H
 
 struct packet_diag_req {
 	uint8_t sdiag_family;
@@ -10,12 +17,12 @@ struct packet_diag_req {
 	uint32_t pdiag_cookie[2];
 };
 
-#define PACKET_SHOW_INFO	0x00000001
-#define PACKET_SHOW_MCLIST	0x00000002
-#define PACKET_SHOW_RING_CFG	0x00000004
-#define PACKET_SHOW_FANOUT	0x00000008
-#define PACKET_SHOW_MEMINFO	0x00000010
-#define PACKET_SHOW_FILTER	0x00000020
+# define PACKET_SHOW_INFO	0x00000001
+# define PACKET_SHOW_MCLIST	0x00000002
+# define PACKET_SHOW_RING_CFG	0x00000004
+# define PACKET_SHOW_FANOUT	0x00000008
+# define PACKET_SHOW_MEMINFO	0x00000010
+# define PACKET_SHOW_FILTER	0x00000020
 
 struct packet_diag_msg {
 	uint8_t pdiag_family;
@@ -45,11 +52,11 @@ struct packet_diag_info {
 	uint32_t pdi_tstamp;
 	uint32_t pdi_flags;
 
-#define PDI_RUNNING	0x1
-#define PDI_AUXDATA	0x2
-#define PDI_ORIGDEV	0x4
-#define PDI_VNETHDR	0x8
-#define PDI_LOSS	0x10
+# define PDI_RUNNING	0x1
+# define PDI_AUXDATA	0x2
+# define PDI_ORIGDEV	0x4
+# define PDI_VNETHDR	0x8
+# define PDI_LOSS	0x10
 };
 
 struct packet_diag_mclist {

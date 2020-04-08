@@ -1,31 +1,13 @@
-#!/bin/sh
+#!/bin/sh -efu
 #
 # Copyright (c) 2014-2015 Mike Frysinger <vapier@gentoo.org>
 # Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2014-2017 The strace developers.
+# Copyright (c) 2014-2019 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+export LC_ALL=C
 
 usage()
 {
@@ -44,19 +26,26 @@ cond_def()
 	line="$1"; shift
 
 	local val
-	val="$(printf %s "$line" |
-		sed -r -n 's/^([^[:space:]]+).*$/\1/p')"
+	val="${line%%[!A-Za-z0-9_]*}"
 
-	local def
-	def="$(printf %s "${line}" |
-		sed -r -n 's/^[^[:space:]]+[[:space:]]+([^[:space:]].*)$/\1/p')"
+	local t def=
+	t="${line#*[	 ]}"
+	if [ "$line" != "$t" ]; then
+		while [ "$def" != "$t" ]; do
+			def="$t"
+			t="${t##[	 ]}"
+		done
+	fi
 
 	if [ -n "$def" ]; then
-		cat <<-EOF
-		#if !(defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val))
-		# define $val $def
-		#endif
-		EOF
+		printf "%s\n" \
+			"#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)" \
+			"DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE" \
+			"static_assert(($val) == ($def), \"$val != $def\");" \
+			"DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE" \
+			"#else" \
+			"# define $val $def" \
+			"#endif"
 	fi
 }
 
@@ -65,11 +54,16 @@ print_xlat()
 	local val
 	val="$1"; shift
 
+	[ 1 = "$value_indexed" ] && printf " [%s] =" "${val}"
 	if [ -z "${val_type-}" ]; then
 		echo " XLAT(${val}),"
 	else
 		echo " XLAT_TYPE(${val_type}, ${val}),"
 	fi
+
+	echo " #define XLAT_VAL_$xlat_flag_cnt ((${val_type:-unsigned}) (${val}))"
+	echo " #define XLAT_STR_$xlat_flag_cnt STRINGIFY(${val})"
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 print_xlat_pair()
@@ -78,39 +72,46 @@ print_xlat_pair()
 	val="$1"; shift
 	str="$1"; shift
 
+	[ 1 = "$value_indexed" ] && printf " [%s] =" "${val}"
 	if [ -z "${val_type-}" ]; then
 		echo " XLAT_PAIR(${val}, \"${str}\"),"
 	else
 		echo " XLAT_TYPE_PAIR(${val_type}, ${val}, \"${str}\"),"
 	fi
+
+	echo " #define XLAT_VAL_$xlat_flag_cnt ((${val_type:-unsigned}) (${val}))"
+	echo " #define XLAT_STR_$xlat_flag_cnt \"${str}\""
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 cond_xlat()
 {
-	local line val m def xlat
-	line="$1"; shift
+	echo "$1" | {
+		local val def m xlat
 
-	val="$(printf %s "${line}" | sed -r -n 's/^([^[:space:]]+).*$/\1/p')"
-	m="${val%%|*}"
-	def="$(printf %s "${line}" |
-	       sed -r -n 's/^[^[:space:]]+[[:space:]]+([^[:space:]].*)$/\1/p')"
+		read val def
 
-	if [ "${m}" = "${m#1<<}" ]; then
-		xlat="$(print_xlat "${val}")"
-	else
-		xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}")"
-		m="${m#1<<}"
-	fi
+		m="${val%%|*}"
 
-	if [ -z "${def}" ]; then
-		cat <<-EOF
-		#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})
-		 ${xlat}
-		#endif
-		EOF
-	else
-		echo "$xlat"
-	fi
+		if [ "${m}" = "${m#1<<}" ]; then
+			xlat="$(print_xlat "${val}")"
+		else
+			xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}")"
+			m="${m#1<<}"
+		fi
+
+		if [ -z "${def}" ]; then
+			printf "%s\n" \
+				"#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})" \
+				" ${xlat}" \
+				"#endif"
+		else
+			echo "$xlat"
+		fi
+	}
+
+	# Since we're calling print_xlat/print_xlat_pair in subprocess
+	xlat_flag_cnt=$((xlat_flag_cnt + 1))
 }
 
 gen_header()
@@ -122,34 +123,51 @@ gen_header()
 	local mpers="${0%/*}/../mpers_xlat.h"
 	local decl="extern const struct xlat ${name}[];"
 	local in_defs= in_mpers=
+	local xlat_type="XT_NORMAL"
 
-	if grep -F -x "$decl" "$defs" > /dev/null; then
+	value_indexed=0
+	xlat_flag_cnt=0
+
+	if grep -F -q -x "$decl" "$defs"; then
 		in_defs=1
-	elif grep -F -x "$decl" "$mpers" > /dev/null; then
+	elif grep -F -q -x "$decl" "$mpers"; then
 		in_mpers=1
 	fi
 
-	echo "/* Generated by $0 from $1; do not edit. */"
+	cat <<-EOF
+	/* Generated by $0 from $1; do not edit. */
 
-	local unconditional= unterminated= line
+	#include "gcc_compat.h"
+	#include "static_assert.h"
+
+	EOF
+
+	local unconditional= line
 	# 1st pass: output directives.
 	while read line; do
-		LC_COLLATE=C
-		case $line in
-		'#stop')
-			exit 0
+		case "$line" in
+			*/\**)
+			line=$(printf "%s" "$line" |
+				sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
 			;;
+		esac
+
+		case $line in
 		'#conditional')
 			unconditional=
 			;;
 		'#unconditional')
 			unconditional=1
 			;;
-		'#unterminated')
-			unterminated=1
-			;;
 		'#val_type '*)
 			# to be processed during 2nd pass
+			;;
+		'#sorted'|'#sorted '*)
+			xlat_type="XT_SORTED"
+			;;
+		'#value_indexed')
+			value_indexed=1
+			xlat_type="XT_INDEXED"
 			;;
 		'#'*)
 			echo "${line}"
@@ -161,41 +179,49 @@ gen_header()
 		esac
 	done < "$input"
 
-	echo
+	cat <<-EOF
+
+		#ifndef XLAT_MACROS_ONLY
+
+	EOF
+
 	if [ -n "$in_defs" ]; then
 		cat <<-EOF
-			#ifndef IN_MPERS
+			# ifndef IN_MPERS
 
 		EOF
 	elif [ -n "$in_mpers" ]; then
 		cat <<-EOF
-			#ifdef IN_MPERS
+			# ifdef IN_MPERS
 
 			${decl}
 
-			#else
+			# else
 
-			# if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
-			static
-			# endif
 		EOF
 	else
 		cat <<-EOF
-			#ifdef IN_MPERS
+			# ifdef IN_MPERS
 
-			# error static const struct xlat ${name} in mpers mode
+			#  error static const struct xlat ${name} in mpers mode
 
-			#else
+			# else
 
-			static
 		EOF
 	fi
-	echo "const struct xlat ${name}[] = {"
+
+	echo "static const struct xlat_data ${name}_xdata[] = {"
 
 	unconditional= val_type=
 	# 2nd pass: output everything.
 	while read line; do
-		LC_COLLATE=C
+		case "$line" in
+			*/\**)
+			line=$(printf "%s" "$line" |
+				sed "s|[[:space:]]*/\*.*\*/[[:space:]]*||")
+			;;
+		esac
+
 		case ${line} in
 		'#conditional')
 			unconditional=
@@ -203,8 +229,9 @@ gen_header()
 		'#unconditional')
 			unconditional=1
 			;;
-		'#unterminated')
-			# processed during 1st pass
+		'#sorted'|'#sorted '*)
+			;;
+		'#value_indexed')
 			;;
 		'#val_type '*)
 			val_type="${line#\#val_type }"
@@ -231,16 +258,65 @@ gen_header()
 			;;
 		esac
 	done < "${input}"
-	if [ -n "${unterminated}" ]; then
-		echo " /* this array should remain not NULL-terminated */"
+	echo '};'
+
+	if [ -n "$in_defs" ]; then
+		:
+	elif [ -n "$in_mpers" ]; then
+		cat <<-EOF
+			#  if !(defined HAVE_M32_MPERS || defined HAVE_MX32_MPERS)
+			static
+			#  endif
+		EOF
 	else
-		echo " XLAT_END"
+		cat <<-EOF
+			static
+		EOF
 	fi
 
 	cat <<-EOF
-		};
+		const struct xlat ${name}[1] = { {
+			 .data = ${name}_xdata,
+			 .size = ARRAY_SIZE(${name}_xdata),
+			 .type = ${xlat_type},
+	EOF
 
-		#endif /* !IN_MPERS */
+	echo " .flags_mask = 0"
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  ifdef XLAT_VAL_${i}
+			  | XLAT_VAL_${i}
+			#  endif
+		EOF
+	done
+	echo "  ,"
+
+	echo " .flags_strsz = 0"
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  ifdef XLAT_STR_${i}
+			  + sizeof(XLAT_STR_${i})
+			#  endif
+		EOF
+	done
+	echo "  ,"
+
+	cat <<-EOF
+		} };
+
+	EOF
+
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  undef XLAT_STR_${i}
+			#  undef XLAT_VAL_${i}
+		EOF
+	done
+
+	cat <<-EOF
+		# endif /* !IN_MPERS */
+
+		#endif /* !XLAT_MACROS_ONLY */
 	EOF
 	) >"${output}"
 }
@@ -296,7 +372,10 @@ main()
 
 	if [ -d "${input}" ]; then
 		local f names=
-		for f in "${input}"/*.in; do
+		set +f
+		set -- "${input}"/*.in
+		set -f
+		for f; do
 			[ -f "${f}" ] || continue
 			name=${f##*/}
 			name=${name%.in}

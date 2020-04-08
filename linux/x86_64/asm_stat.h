@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_X86_64_ASM_STAT_H
-#define STRACE_X86_64_ASM_STAT_H
+# define STRACE_X86_64_ASM_STAT_H
 
 # if defined __x86_64__ && defined __ILP32__
 #  define stat redirect_kernel_stat

@@ -1,3 +1,4 @@
+#value_indexed
 MDBA_UNSPEC		0
 MDBA_MDB		1
 MDBA_ROUTER		2

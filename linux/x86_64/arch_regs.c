@@ -1,4 +1,11 @@
 /*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+/*
  * On i386, pt_regs and user_regs_struct are the same,
  * but on 64 bit x86, user_regs_struct has six more fields:
  * fs_base, gs_base, ds, es, fs, gs.
@@ -30,12 +37,16 @@ static union {
 #define x86_64_regs x86_regs_union.x86_64_r
 #define i386_regs   x86_regs_union.i386_r
 
-uint32_t *const i386_esp_ptr = &i386_regs.esp;
-uint64_t *const x86_64_rsp_ptr = (uint64_t *) &x86_64_regs.rsp;
 static struct iovec x86_io = {
 	.iov_base = &x86_regs_union
 };
 
 #define ARCH_REGS_FOR_GETREGSET x86_regs_union
 #define ARCH_IOVEC_FOR_GETREGSET x86_io
-#define ARCH_PC_REG (x86_io.iov_len == sizeof(i386_regs) ? i386_regs.eip : x86_64_regs.rip)
+#define ARCH_PC_REG \
+	(x86_io.iov_len == sizeof(i386_regs) ? i386_regs.eip : x86_64_regs.rip)
+#define ARCH_SP_REG \
+	(x86_io.iov_len == sizeof(i386_regs) ? i386_regs.esp : x86_64_regs.rsp)
+
+#undef ARCH_MIGHT_USE_SET_REGS
+#define ARCH_MIGHT_USE_SET_REGS 0

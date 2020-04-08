@@ -1,35 +1,15 @@
 /*
- * This file is part of poll strace test.
+ * Check decoding of poll syscall.
  *
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_poll
 
@@ -38,9 +18,10 @@
 # include <poll.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <unistd.h>
 
-#define PRINT_EVENT(flag, member)			\
+# define PRINT_EVENT(flag, member)			\
 	do {						\
 		if (member & flag) {			\
 			if (member != pfd->member)	\
@@ -62,18 +43,18 @@ print_pollfd_entering(const struct pollfd *const pfd)
 			PRINT_EVENT(POLLIN, events);
 			PRINT_EVENT(POLLPRI, events);
 			PRINT_EVENT(POLLOUT, events);
-#ifdef POLLRDNORM
+# ifdef POLLRDNORM
 			PRINT_EVENT(POLLRDNORM, events);
-#endif
-#ifdef POLLWRNORM
+# endif
+# ifdef POLLWRNORM
 			PRINT_EVENT(POLLWRNORM, events);
-#endif
-#ifdef POLLRDBAND
+# endif
+# ifdef POLLRDBAND
 			PRINT_EVENT(POLLRDBAND, events);
-#endif
-#ifdef POLLWRBAND
+# endif
+# ifdef POLLWRBAND
 			PRINT_EVENT(POLLWRBAND, events);
-#endif
+# endif
 			PRINT_EVENT(POLLERR, events);
 			PRINT_EVENT(POLLHUP, events);
 			PRINT_EVENT(POLLNVAL, events);
@@ -95,7 +76,7 @@ print_pollfd_array_entering(const struct pollfd *const pfd,
 		if (i)
 			tprintf(", ");
 		if (i >= valid) {
-			tprintf("%p", &pfd[i]);
+			tprintf("... /* %p */", &pfd[i]);
 			break;
 		}
 		if (i >= abbrev) {
@@ -129,18 +110,18 @@ print_pollfd_exiting(const struct pollfd *const pfd,
 	PRINT_EVENT(POLLIN, revents);
 	PRINT_EVENT(POLLPRI, revents);
 	PRINT_EVENT(POLLOUT, revents);
-#ifdef POLLRDNORM
+# ifdef POLLRDNORM
 	PRINT_EVENT(POLLRDNORM, revents);
-#endif
-#ifdef POLLWRNORM
+# endif
+# ifdef POLLWRNORM
 	PRINT_EVENT(POLLWRNORM, revents);
-#endif
-#ifdef POLLRDBAND
+# endif
+# ifdef POLLRDBAND
 	PRINT_EVENT(POLLRDBAND, revents);
-#endif
-#ifdef POLLWRBAND
+# endif
+# ifdef POLLWRBAND
 	PRINT_EVENT(POLLWRBAND, revents);
-#endif
+# endif
 	PRINT_EVENT(POLLERR, revents);
 	PRINT_EVENT(POLLHUP, revents);
 	PRINT_EVENT(POLLNVAL, revents);
@@ -163,12 +144,19 @@ print_pollfd_array_exiting(const struct pollfd *const pfd,
 int
 main(int ac, char **av)
 {
+# ifdef PATH_TRACING_FD
+	skip_if_unavailable("/proc/self/fd/");
+# endif
+
 	tprintf("%s", "");
 
 	assert(syscall(__NR_poll, NULL, 42, 0) == -1);
 	if (ENOSYS == errno)
 		perror_msg_and_skip("poll");
+
+# ifndef PATH_TRACING_FD
 	tprintf("poll(NULL, 42, 0) = -1 EFAULT (%m)\n");
+# endif
 
 	int fds[2];
 	if (pipe(fds) || pipe(fds))
@@ -187,7 +175,93 @@ main(int ac, char **av)
 	int rc = syscall(__NR_poll, tail_fds0, 0, timeout);
 	assert(rc == 0);
 
+# ifndef PATH_TRACING_FD
 	tprintf("poll([], 0, %d) = %d (Timeout)\n", timeout, rc);
+# endif
+
+	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
+	assert(rc == 3);
+
+# ifndef PATH_TRACING_FD
+	tprintf("poll(");
+	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
+				    ARRAY_SIZE(pfds0), abbrev);
+	tprintf(", %u, %d) = %d (",
+		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
+	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
+	tprintf(")\n");
+# endif /* !PATH_TRACING_FD */
+
+	tail_fds0[0].fd = -1;
+	tail_fds0[2].fd = -3;
+	tail_fds0[4].events = 0;
+	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
+	assert(rc == 2);
+
+# ifndef PATH_TRACING_FD
+	tprintf("poll(");
+	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
+				    ARRAY_SIZE(pfds0), abbrev);
+	tprintf(", %u, %d) = %d (",
+		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
+	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
+	tprintf(")\n");
+# endif /* !PATH_TRACING_FD */
+
+	tail_fds0[1].fd = -2;
+	tail_fds0[4].fd = -5;
+	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
+	assert(rc == 1);
+
+# ifndef PATH_TRACING_FD
+	tprintf("poll(");
+	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
+				    ARRAY_SIZE(pfds0), abbrev);
+	tprintf(", %u, %d) = %d (",
+		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
+	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
+	tprintf(")\n");
+# endif /* !PATH_TRACING_FD */
+
+	struct pollfd pfds1[] = {
+		{ .fd = 1, .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
+		{ .fd = 0, .events = POLLOUT | POLLWRNORM | POLLWRBAND }
+	};
+	struct pollfd *const tail_fds1 = tail_memdup(pfds1, sizeof(pfds1));
+	rc = syscall(__NR_poll, tail_fds1, ARRAY_SIZE(pfds1), timeout);
+	assert(rc == 0);
+
+# ifndef PATH_TRACING_FD
+	tprintf("poll(");
+	print_pollfd_array_entering(tail_fds1, ARRAY_SIZE(pfds1),
+				    ARRAY_SIZE(pfds1), abbrev);
+	tprintf(", %u, %d) = %d (Timeout)\n",
+		(unsigned int) ARRAY_SIZE(pfds1), timeout, rc);
+# endif /* !PATH_TRACING_FD */
+
+	const void *const efault = tail_fds0 + ARRAY_SIZE(pfds0);
+	rc = syscall(__NR_poll, efault, 1, 0);
+	assert(rc == -1);
+
+# ifndef PATH_TRACING_FD
+	tprintf("poll(%p, 1, 0) = -1 EFAULT (%m)\n", efault);
+# endif
+
+	const unsigned int valid = 1;
+	const void *const epfds = tail_fds0 + ARRAY_SIZE(pfds0) - valid;
+	rc = syscall(__NR_poll, epfds, valid + 1, 0);
+	assert(rc == -1);
+
+# ifndef PATH_TRACING_FD
+	tprintf("poll(");
+	print_pollfd_array_entering(epfds, valid + 1, valid, abbrev);
+	errno = EFAULT;
+	tprintf(", %u, 0) = -1 EFAULT (%m)\n", valid + 1);
+# endif /* !PATH_TRACING_FD */
+
+# ifdef PATH_TRACING_FD
+	memcpy(tail_fds0, pfds0, sizeof(pfds0));
+	tail_fds0[4].fd = PATH_TRACING_FD;
 
 	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
 	assert(rc == 3);
@@ -200,60 +274,15 @@ main(int ac, char **av)
 	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
 	tprintf(")\n");
 
-	tail_fds0[0].fd = -1;
-	tail_fds0[2].fd = -3;
-	tail_fds0[4].events = 0;
-	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
-	assert(rc == 2);
-
-	tprintf("poll(");
-	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
-				    ARRAY_SIZE(pfds0), abbrev);
-	tprintf(", %u, %d) = %d (",
-		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
-	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
-	tprintf(")\n");
-
-	tail_fds0[1].fd = -2;
-	tail_fds0[4].fd = -5;
-	rc = syscall(__NR_poll, tail_fds0, ARRAY_SIZE(pfds0), timeout);
-	assert(rc == 1);
-
-	tprintf("poll(");
-	print_pollfd_array_entering(tail_fds0, ARRAY_SIZE(pfds0),
-				    ARRAY_SIZE(pfds0), abbrev);
-	tprintf(", %u, %d) = %d (",
-		(unsigned int) ARRAY_SIZE(pfds0), timeout, rc);
-	print_pollfd_array_exiting(tail_fds0, ARRAY_SIZE(pfds0), abbrev);
-	tprintf(")\n");
-
-	struct pollfd pfds1[] = {
-		{ .fd = 1, .events = POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND },
-		{ .fd = 0, .events = POLLOUT | POLLWRNORM | POLLWRBAND }
-	};
-	struct pollfd *const tail_fds1 = tail_memdup(pfds1, sizeof(pfds1));
-	rc = syscall(__NR_poll, tail_fds1, ARRAY_SIZE(pfds1), timeout);
-	assert(rc == 0);
-
-	tprintf("poll(");
-	print_pollfd_array_entering(tail_fds1, ARRAY_SIZE(pfds1),
-				    ARRAY_SIZE(pfds1), abbrev);
-	tprintf(", %u, %d) = %d (Timeout)\n",
-		(unsigned int) ARRAY_SIZE(pfds1), timeout, rc);
-
-	const void *const efault = tail_fds0 + ARRAY_SIZE(pfds0);
-	rc = syscall(__NR_poll, efault, 1, 0);
-	assert(rc == -1);
-	tprintf("poll(%p, 1, 0) = -1 EFAULT (%m)\n", efault);
-
-	const unsigned int valid = 1;
-	const void *const epfds = tail_fds0 + ARRAY_SIZE(pfds0) - valid;
 	rc = syscall(__NR_poll, epfds, valid + 1, 0);
 	assert(rc == -1);
+
+	/* the 1st pollfd element is readable and contains PATH_TRACING_FD */
 	tprintf("poll(");
 	print_pollfd_array_entering(epfds, valid + 1, valid, abbrev);
 	errno = EFAULT;
 	tprintf(", %u, 0) = -1 EFAULT (%m)\n", valid + 1);
+# endif /* PATH_TRACING_FD */
 
 	tprintf("+++ exited with 0 +++\n");
 	return 0;

@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2014 Zubin Mithra <zubin.mithra@gmail.com>
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2014-2017 The strace developers.
+ * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -37,14 +17,18 @@
 #include <linux/unix_diag.h>
 #include <linux/netlink_diag.h>
 #include <linux/rtnetlink.h>
-#if HAVE_LINUX_GENETLINK_H
 #include <linux/genetlink.h>
-#endif
 
 #include <sys/un.h>
 #ifndef UNIX_PATH_MAX
-# define UNIX_PATH_MAX sizeof(((struct sockaddr_un *) 0)->sun_path)
+# define UNIX_PATH_MAX sizeof_field(struct sockaddr_un, sun_path)
 #endif
+
+#include "xstring.h"
+
+#define XLAT_MACROS_ONLY
+#include "xlat/inet_protocols.h"
+#undef XLAT_MACROS_ONLY
 
 typedef struct {
 	unsigned long inode;
@@ -85,7 +69,7 @@ print_sockaddr_by_inode_cached(const unsigned long inode)
 }
 
 static bool
-send_query(const int fd, void *req, size_t req_size)
+send_query(struct tcb *tcp, const int fd, void *req, size_t req_size)
 {
 	struct sockaddr_nl nladdr = {
 		.nl_family = AF_NETLINK
@@ -112,7 +96,8 @@ send_query(const int fd, void *req, size_t req_size)
 }
 
 static bool
-inet_send_query(const int fd, const int family, const int proto)
+inet_send_query(struct tcb *tcp, const int fd, const int family,
+		const int proto)
 {
 	struct {
 		const struct nlmsghdr nlh;
@@ -129,7 +114,7 @@ inet_send_query(const int fd, const int family, const int proto)
 			.idiag_states = -1
 		}
 	};
-	return send_query(fd, &req, sizeof(req));
+	return send_query(tcp, fd, &req, sizeof(req));
 }
 
 static int
@@ -162,6 +147,10 @@ inet_parse_response(const void *const data, const int data_len,
 	char src_buf[text_size];
 	char *details;
 
+	/* open/closing brackets for IPv6 addresses */
+	const char *ob = diag_msg->idiag_family == AF_INET6 ? "[" : "";
+	const char *cb = diag_msg->idiag_family == AF_INET6 ? "]" : "";
+
 	if (!inet_ntop(diag_msg->idiag_family, diag_msg->id.idiag_src,
 		       src_buf, text_size))
 		return -1;
@@ -174,12 +163,14 @@ inet_parse_response(const void *const data, const int data_len,
 			       dst_buf, text_size))
 			return -1;
 
-		if (asprintf(&details, "%s:[%s:%u->%s:%u]", proto_name,
-			     src_buf, ntohs(diag_msg->id.idiag_sport),
-			     dst_buf, ntohs(diag_msg->id.idiag_dport)) < 0)
+		if (asprintf(&details, "%s:[%s%s%s:%u->%s%s%s:%u]", proto_name,
+			     ob, src_buf, cb, ntohs(diag_msg->id.idiag_sport),
+			     ob, dst_buf, cb, ntohs(diag_msg->id.idiag_dport))
+		    < 0)
 			return false;
 	} else {
-		if (asprintf(&details, "%s:[%s:%u]", proto_name, src_buf,
+		if (asprintf(&details, "%s:[%s%s%s:%u]",
+			     proto_name, ob, src_buf, cb,
 			     ntohs(diag_msg->id.idiag_sport)) < 0)
 			return false;
 	}
@@ -188,7 +179,7 @@ inet_parse_response(const void *const data, const int data_len,
 }
 
 static bool
-receive_responses(const int fd, const unsigned long inode,
+receive_responses(struct tcb *tcp, const int fd, const unsigned long inode,
 		  const unsigned long expected_msg_type,
 		  int (*parser)(const void *, int,
 				unsigned long, void *),
@@ -224,9 +215,9 @@ receive_responses(const int fd, const unsigned long inode,
 		}
 
 		const struct nlmsghdr *h = &hdr_buf.hdr;
-		if (!NLMSG_OK(h, ret))
+		if (!is_nlmsg_ok(h, ret))
 			return false;
-		for (; NLMSG_OK(h, ret); h = NLMSG_NEXT(h, ret)) {
+		for (; is_nlmsg_ok(h, ret); h = NLMSG_NEXT(h, ret)) {
 			if (h->nlmsg_type != expected_msg_type)
 				return false;
 			const int rc = parser(NLMSG_DATA(h),
@@ -241,8 +232,15 @@ receive_responses(const int fd, const unsigned long inode,
 }
 
 static bool
-unix_send_query(const int fd, const unsigned long inode)
+unix_send_query(struct tcb *tcp, const int fd, const unsigned long inode)
 {
+	/*
+	 * The kernel bug was fixed in mainline by commit v4.5-rc6~35^2~11
+	 * and backported to stable/linux-4.4.y by commit v4.4.4~297.
+	 */
+	const uint16_t dump_flag =
+		os_release < KERNEL_VERSION(4, 4, 4) ? NLM_F_DUMP : 0;
+
 	struct {
 		const struct nlmsghdr nlh;
 		const struct unix_diag_req udr;
@@ -250,16 +248,17 @@ unix_send_query(const int fd, const unsigned long inode)
 		.nlh = {
 			.nlmsg_len = sizeof(req),
 			.nlmsg_type = SOCK_DIAG_BY_FAMILY,
-			.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST
+			.nlmsg_flags = NLM_F_REQUEST | dump_flag
 		},
 		.udr = {
 			.sdiag_family = AF_UNIX,
 			.udiag_ino = inode,
 			.udiag_states = -1,
-			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER
+			.udiag_show = UDIAG_SHOW_NAME | UDIAG_SHOW_PEER,
+			.udiag_cookie = { ~0U, ~0U }
 		}
 	};
-	return send_query(fd, &req, sizeof(req));
+	return send_query(tcp, fd, &req, sizeof(req));
 }
 
 static int
@@ -310,7 +309,7 @@ unix_parse_response(const void *data, const int data_len,
 
 	char peer_str[3 + sizeof(peer) * 3];
 	if (peer)
-		snprintf(peer_str, sizeof(peer_str), "->%u", peer);
+		xsprintf(peer_str, "->%u", peer);
 	else
 		peer_str[0] = '\0';
 
@@ -322,10 +321,10 @@ unix_parse_response(const void *data, const int data_len,
 		if (path[0] == '\0') {
 			outstr[1] = '@';
 			string_quote(path + 1, outstr + 2,
-				     path_len - 1, QUOTE_0_TERMINATED);
+				     path_len - 1, QUOTE_0_TERMINATED, NULL);
 		} else {
 			string_quote(path, outstr + 1,
-				     path_len, QUOTE_0_TERMINATED);
+				     path_len, QUOTE_0_TERMINATED, NULL);
 		}
 		path_str = outstr;
 	} else {
@@ -341,7 +340,7 @@ unix_parse_response(const void *data, const int data_len,
 }
 
 static bool
-netlink_send_query(const int fd, const unsigned long inode)
+netlink_send_query(struct tcb *tcp, const int fd, const unsigned long inode)
 {
 	struct {
 		const struct nlmsghdr nlh;
@@ -354,11 +353,10 @@ netlink_send_query(const int fd, const unsigned long inode)
 		},
 		.ndr = {
 			.sdiag_family = AF_NETLINK,
-			.sdiag_protocol = NDIAG_PROTO_ALL,
-			.ndiag_show = NDIAG_SHOW_MEMINFO
+			.sdiag_protocol = NDIAG_PROTO_ALL
 		}
 	};
-	return send_query(fd, &req, sizeof(req));
+	return send_query(tcp, fd, &req, sizeof(req));
 }
 
 static int
@@ -396,67 +394,83 @@ netlink_parse_response(const void *data, const int data_len,
 }
 
 static const char *
-unix_get(const int fd, const unsigned long inode)
+unix_get(struct tcb *tcp, const int fd, const int family, const int proto,
+	 const unsigned long inode, const char *name)
 {
-	return unix_send_query(fd, inode)
-		&& receive_responses(fd, inode, SOCK_DIAG_BY_FAMILY,
-				     unix_parse_response, (void *) "UNIX")
+	return unix_send_query(tcp, fd, inode)
+		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
+				     unix_parse_response, (void *) name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
 static const char *
-inet_get(const int fd, const int family, const int protocol,
+inet_get(struct tcb *tcp, const int fd, const int family, const int protocol,
 	 const unsigned long inode, const char *proto_name)
 {
-	return inet_send_query(fd, family, protocol)
-		&& receive_responses(fd, inode, SOCK_DIAG_BY_FAMILY,
+	return inet_send_query(tcp, fd, family, protocol)
+		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
 				     inet_parse_response, (void *) proto_name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
 static const char *
-tcp_v4_get(const int fd, const unsigned long inode)
+netlink_get(struct tcb *tcp, const int fd, const int family, const int protocol,
+	    const unsigned long inode, const char *proto_name)
 {
-	return inet_get(fd, AF_INET, IPPROTO_TCP, inode, "TCP");
-}
-
-static const char *
-udp_v4_get(const int fd, const unsigned long inode)
-{
-	return inet_get(fd, AF_INET, IPPROTO_UDP, inode, "UDP");
-}
-
-static const char *
-tcp_v6_get(const int fd, const unsigned long inode)
-{
-	return inet_get(fd, AF_INET6, IPPROTO_TCP, inode, "TCPv6");
-}
-
-static const char *
-udp_v6_get(const int fd, const unsigned long inode)
-{
-	return inet_get(fd, AF_INET6, IPPROTO_UDP, inode, "UDPv6");
-}
-
-static const char *
-netlink_get(const int fd, const unsigned long inode)
-{
-	return netlink_send_query(fd, inode)
-		&& receive_responses(fd, inode, SOCK_DIAG_BY_FAMILY,
-				     netlink_parse_response, (void *) "NETLINK")
+	return netlink_send_query(tcp, fd, inode)
+		&& receive_responses(tcp, fd, inode, SOCK_DIAG_BY_FAMILY,
+				     netlink_parse_response,
+				     (void *) proto_name)
 		? get_sockaddr_by_inode_cached(inode) : NULL;
 }
 
 static const struct {
 	const char *const name;
-	const char * (*const get)(int, unsigned long);
+	const char * (*const get)(struct tcb *, int fd, int family,
+				  int protocol, unsigned long inode,
+				  const char *proto_name);
+	int family;
+	int proto;
 } protocols[] = {
-	[SOCK_PROTO_UNIX] = { "UNIX", unix_get },
-	[SOCK_PROTO_TCP] = { "TCP", tcp_v4_get },
-	[SOCK_PROTO_UDP] = { "UDP", udp_v4_get },
-	[SOCK_PROTO_TCPv6] = { "TCPv6", tcp_v6_get },
-	[SOCK_PROTO_UDPv6] = { "UDPv6", udp_v6_get },
-	[SOCK_PROTO_NETLINK] = { "NETLINK", netlink_get }
+	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
+	/*
+	 * inet_diag handlers are currently implemented only for TCP,
+	 * UDP(lite), SCTP, RAW, and DCCP, but we try to resolve it for all
+	 * protocols anyway, just in case.
+	 */
+	[SOCK_PROTO_TCP]	=
+		{ "TCP",	inet_get, AF_INET,  IPPROTO_TCP },
+	[SOCK_PROTO_UDP]	=
+		{ "UDP",	inet_get, AF_INET,  IPPROTO_UDP },
+	[SOCK_PROTO_UDPLITE]	=
+		{ "UDPLITE",	inet_get, AF_INET,  IPPROTO_UDPLITE },
+	[SOCK_PROTO_DCCP]	=
+		{ "DCCP",	inet_get, AF_INET,  IPPROTO_DCCP },
+	[SOCK_PROTO_SCTP]	=
+		{ "SCTP",	inet_get, AF_INET,  IPPROTO_SCTP },
+	[SOCK_PROTO_L2TP_IP]	=
+		{ "L2TP/IP",	inet_get, AF_INET,  IPPROTO_L2TP },
+	[SOCK_PROTO_PING]	=
+		{ "PING",	inet_get, AF_INET,  IPPROTO_ICMP },
+	[SOCK_PROTO_RAW]	=
+		{ "RAW",	inet_get, AF_INET,  IPPROTO_RAW },
+	[SOCK_PROTO_TCPv6]	=
+		{ "TCPv6",	inet_get, AF_INET6, IPPROTO_TCP },
+	[SOCK_PROTO_UDPv6]	=
+		{ "UDPv6",	inet_get, AF_INET6, IPPROTO_UDP },
+	[SOCK_PROTO_UDPLITEv6]	=
+		{ "UDPLITEv6",	inet_get, AF_INET6, IPPROTO_UDPLITE },
+	[SOCK_PROTO_DCCPv6]	=
+		{ "DCCPv6",	inet_get, AF_INET6, IPPROTO_DCCP },
+	[SOCK_PROTO_SCTPv6]	=
+		{ "SCTPv6",	inet_get, AF_INET6, IPPROTO_SCTP },
+	[SOCK_PROTO_L2TP_IPv6]	=
+		{ "L2TP/IPv6",	inet_get, AF_INET6, IPPROTO_L2TP },
+	[SOCK_PROTO_PINGv6]	=
+		{ "PINGv6",	inet_get, AF_INET6, IPPROTO_ICMP },
+	[SOCK_PROTO_RAWv6]	=
+		{ "RAWv6",	inet_get, AF_INET6, IPPROTO_RAW },
+	[SOCK_PROTO_NETLINK]	= { "NETLINK",	netlink_get,	AF_NETLINK },
 };
 
 enum sock_proto
@@ -471,8 +485,17 @@ get_proto_by_name(const char *const name)
 	return SOCK_PROTO_UNKNOWN;
 }
 
+int
+get_family_by_proto(enum sock_proto proto)
+{
+	if ((size_t) proto < ARRAY_SIZE(protocols))
+		return protocols[proto].family;
+
+	return AF_UNSPEC;
+}
+
 static const char *
-get_sockaddr_by_inode_uncached(const unsigned long inode,
+get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 			       const enum sock_proto proto)
 {
 	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
@@ -485,14 +508,20 @@ get_sockaddr_by_inode_uncached(const unsigned long inode,
 	const char *details = NULL;
 
 	if (proto != SOCK_PROTO_UNKNOWN) {
-		details = protocols[proto].get(fd, inode);
+		details = protocols[proto].get(tcp, fd, protocols[proto].family,
+					       protocols[proto].proto, inode,
+					       protocols[proto].name);
 	} else {
 		unsigned int i;
 		for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
 		     i < ARRAY_SIZE(protocols); ++i) {
 			if (!protocols[i].get)
 				continue;
-			details = protocols[i].get(fd, inode);
+			details = protocols[i].get(tcp, fd,
+						   protocols[proto].family,
+						   protocols[proto].proto,
+						   inode,
+						   protocols[proto].name);
 			if (details)
 				break;
 		}
@@ -503,10 +532,10 @@ get_sockaddr_by_inode_uncached(const unsigned long inode,
 }
 
 static bool
-print_sockaddr_by_inode_uncached(const unsigned long inode,
+print_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 				 const enum sock_proto proto)
 {
-	const char *details = get_sockaddr_by_inode_uncached(inode, proto);
+	const char *details = get_sockaddr_by_inode_uncached(tcp, inode, proto);
 
 	if (details) {
 		tprints(details);
@@ -529,7 +558,7 @@ get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 {
 	const char *details = get_sockaddr_by_inode_cached(inode);
 	return details ? details :
-		get_sockaddr_by_inode_uncached(inode, getfdproto(tcp, fd));
+		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd));
 }
 
 /* Given an inode number of a socket, print out its protocol details.  */
@@ -538,10 +567,10 @@ print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 			const unsigned long inode)
 {
 	return print_sockaddr_by_inode_cached(inode) ? true :
-		print_sockaddr_by_inode_uncached(inode, getfdproto(tcp, fd));
+		print_sockaddr_by_inode_uncached(tcp, inode,
+						 getfdproto(tcp, fd));
 }
 
-#ifdef HAVE_LINUX_GENETLINK_H
 /*
  * Managing the cache for decoding communications of Netlink GENERIC protocol
  *
@@ -552,7 +581,7 @@ print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
  * codes are building xlat(dyxlat) at runtime.
  */
 static bool
-genl_send_dump_families(const int fd)
+genl_send_dump_families(struct tcb *tcp, const int fd)
 {
 	struct {
 		const struct nlmsghdr nlh;
@@ -567,7 +596,7 @@ genl_send_dump_families(const int fd)
 			.cmd = CTRL_CMD_GETFAMILY,
 		}
 	};
-	return send_query(fd, &req, sizeof(req));
+	return send_query(tcp, fd, &req, sizeof(req));
 }
 
 static int
@@ -618,7 +647,7 @@ genl_parse_families_response(const void *const data,
 }
 
 const struct xlat *
-genl_families_xlat(void)
+genl_families_xlat(struct tcb *tcp)
 {
 	static struct dyxlat *dyxlat;
 
@@ -629,8 +658,8 @@ genl_families_xlat(void)
 		if (fd < 0)
 			goto out;
 
-		if (genl_send_dump_families(fd))
-			receive_responses(fd, 0, GENL_ID_CTRL,
+		if (genl_send_dump_families(tcp, fd))
+			receive_responses(tcp, fd, 0, GENL_ID_CTRL,
 					  genl_parse_families_response, dyxlat);
 		close(fd);
 	}
@@ -638,12 +667,3 @@ genl_families_xlat(void)
 out:
 	return dyxlat_get(dyxlat);
 }
-
-#else /* !HAVE_LINUX_GENETLINK_H */
-
-const struct xlat *
-genl_families_xlat(void)
-{
-	return NULL;
-}
-#endif

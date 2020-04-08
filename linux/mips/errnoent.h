@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 1999-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 [  1] = "EPERM",
 [  2] = "ENOENT",
 [  3] = "ESRCH",
@@ -147,4 +154,5 @@
 [527] = "EBADTYPE",
 [528] = "EJUKEBOX",
 [529] = "EIOCBQUEUED",
+[530] = "ERECALLCONFLICT",
 [1133] = "EDQUOT",

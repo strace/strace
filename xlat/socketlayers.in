@@ -1,9 +1,14 @@
+#sorted sort -k2,2n
 SOL_IP		0
+#if !(defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__)
 SOL_SOCKET	1
+#endif
 SOL_TCP		6
 SOL_UDP		17
 SOL_IPV6	41
 SOL_ICMPV6	58
+SOL_CAN_BASE	100
+SOL_CAN_RAW	101
 SOL_SCTP	132
 SOL_UDPLITE	136
 SOL_RAW		255
@@ -34,3 +39,7 @@ SOL_ALG		279
 SOL_NFC		280
 SOL_KCM		281
 SOL_TLS		282
+SOL_XDP		283
+#if defined __alpha__ || defined __hppa__ || defined __mips__ || defined __sparc__
+SOL_SOCKET	0xffff
+#endif

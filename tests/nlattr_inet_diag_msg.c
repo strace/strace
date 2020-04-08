@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2017-2018 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -36,6 +16,18 @@
 #include "test_nlattr.h"
 #include <linux/inet_diag.h>
 #include <linux/sock_diag.h>
+
+static const char * const sk_meminfo_strs[] = {
+	"SK_MEMINFO_RMEM_ALLOC",
+	"SK_MEMINFO_RCVBUF",
+	"SK_MEMINFO_WMEM_ALLOC",
+	"SK_MEMINFO_SNDBUF",
+	"SK_MEMINFO_FWD_ALLOC",
+	"SK_MEMINFO_WMEM_QUEUED",
+	"SK_MEMINFO_OPTMEM",
+	"SK_MEMINFO_BACKLOG",
+	"SK_MEMINFO_DROPS",
+};
 
 static const char address[] = "10.11.12.13";
 
@@ -77,9 +69,14 @@ print_inet_diag_msg(const unsigned int msg_len)
 }
 
 static void
-print_uint(const unsigned int *p)
+print_uint(const unsigned int *p, size_t i)
 {
-	printf("%u", *p);
+	if (i >= ARRAY_SIZE(sk_meminfo_strs))
+		printf("[%zu /* SK_MEMINFO_??? */", i);
+	else
+		printf("[%s", sk_meminfo_strs[i]);
+
+	printf("] = %u", *p);
 }
 
 int
@@ -87,19 +84,46 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
-	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
-
-	static char pattern[4096];
-	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
-
 	static const struct inet_diag_meminfo minfo = {
 		.idiag_rmem = 0xfadcacdb,
 		.idiag_wmem = 0xbdabcada,
 		.idiag_fmem = 0xbadbfafb,
 		.idiag_tmem = 0xfdacdadf
 	};
+	static const struct tcpvegas_info vegas = {
+		.tcpv_enabled = 0xfadcacdb,
+		.tcpv_rttcnt = 0xbdabcada,
+		.tcpv_rtt = 0xbadbfafb,
+		.tcpv_minrtt = 0xfdacdadf
+	};
+	static const struct tcp_dctcp_info dctcp = {
+		.dctcp_enabled = 0xfdac,
+		.dctcp_ce_state = 0xfadc,
+		.dctcp_alpha = 0xbdabcada,
+		.dctcp_ab_ecn = 0xbadbfafb,
+		.dctcp_ab_tot = 0xfdacdadf
+	};
+	static const struct tcp_bbr_info bbr = {
+		.bbr_bw_lo = 0xfdacdadf,
+		.bbr_bw_hi = 0xfadcacdb,
+		.bbr_min_rtt = 0xbdabcada,
+		.bbr_pacing_gain = 0xbadbfafb,
+		.bbr_cwnd_gain = 0xfdacdadf
+	};
+	static const uint32_t mem[] = { 0xaffacbad, 0xffadbcab };
+	static uint32_t bigmem[SK_MEMINFO_VARS + 1];
+	static const uint32_t mark = 0xabdfadca;
+	static const uint8_t shutdown = 0xcd;
+
+	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
+	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN +
+					 MAX(sizeof(bigmem), DEFAULT_STRLEN));
+
+	static char pattern[4096];
+	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
+
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_MEMINFO, pattern, minfo,
@@ -109,12 +133,6 @@ main(void)
 			   PRINT_FIELD_U(", ", minfo, idiag_tmem);
 			   printf("}"));
 
-	static const struct tcpvegas_info vegas = {
-		.tcpv_enabled = 0xfadcacdb,
-		.tcpv_rttcnt = 0xbdabcada,
-		.tcpv_rtt = 0xbadbfafb,
-		.tcpv_minrtt = 0xfdacdadf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_VEGASINFO, pattern, vegas,
@@ -125,13 +143,6 @@ main(void)
 			   printf("}"));
 
 
-	static const struct tcp_dctcp_info dctcp = {
-		.dctcp_enabled = 0xfdac,
-		.dctcp_ce_state = 0xfadc,
-		.dctcp_alpha = 0xbdabcada,
-		.dctcp_ab_ecn = 0xbadbfafb,
-		.dctcp_ab_tot = 0xfdacdadf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_DCTCPINFO, pattern, dctcp,
@@ -142,13 +153,6 @@ main(void)
 			   PRINT_FIELD_U(", ", dctcp, dctcp_ab_tot);
 			   printf("}"));
 
-	static const struct tcp_bbr_info bbr = {
-		.bbr_bw_lo = 0xfdacdadf,
-		.bbr_bw_hi = 0xfadcacdb,
-		.bbr_min_rtt = 0xbdabcada,
-		.bbr_pacing_gain = 0xbadbfafb,
-		.bbr_cwnd_gain = 0xfdacdadf
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_BBRINFO, pattern, bbr,
@@ -159,24 +163,16 @@ main(void)
 			   PRINT_FIELD_U(", ", bbr, bbr_cwnd_gain);
 			   printf("}"));
 
-	static const uint32_t mem[] = { 0xaffacbad, 0xffadbcab };
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
 			  init_inet_diag_msg, print_inet_diag_msg,
 			  INET_DIAG_SKMEMINFO, pattern, mem, print_uint);
 
-	static uint32_t bigmem[SK_MEMINFO_VARS + 1];
 	memcpy(bigmem, pattern, sizeof(bigmem));
 
-	TEST_NLATTR(fd, nlh0, hdrlen, init_inet_diag_msg, print_inet_diag_msg,
-		    INET_DIAG_SKMEMINFO, sizeof(bigmem), bigmem, sizeof(bigmem),
-		    size_t i;
-		    for (i = 0; i < SK_MEMINFO_VARS; ++i) {
-			printf(i ? ", " : "[");
-			print_uint(&bigmem[i]);
-		    }
-		    printf(", ...]"));
+	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
+			  init_inet_diag_msg, print_inet_diag_msg,
+			  INET_DIAG_SKMEMINFO, pattern, bigmem, print_uint);
 
-	static const uint32_t mark = 0xabdfadca;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_MARK, pattern, mark,
@@ -187,7 +183,6 @@ main(void)
 			   INET_DIAG_CLASS_ID, pattern, mark,
 			   printf("%u", mark));
 
-	static const uint8_t shutdown = 0xcd;
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_SHUTDOWN,
 		    sizeof(shutdown), &shutdown, sizeof(shutdown),

@@ -1,11 +1,16 @@
 #!/bin/sh
-
+#
 # Check msgget, msgsnd, msgrcv, msgctl syscalls decoding.
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
 run_prog
-run_strace -v -e msgget,msgsnd,msgrcv,msgctl $args
-match_grep
+run_strace -a26 -v -e msgget,msgsnd,msgrcv,msgctl "$@" $args > "$EXP"
+match_grep "$LOG" "$EXP"
 
 exit 0

@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2017-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -72,7 +52,12 @@ main(void)
 
 	const int fd = create_nl_socket(NETLINK_CRYPTO);
 	const unsigned int hdrlen = sizeof(struct crypto_user_alg);
-	void *const nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	/*
+	 * There are also other structures, but they are not bigger than
+	 * DEFAULT_STRLEN so far.
+	 */
+	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN + DEFAULT_STRLEN);
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
@@ -91,7 +76,7 @@ main(void)
 		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
 		    printf("{type=\"%s\"}", str));
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
 	static const struct crypto_report_hash rhash = {
 		.type = "efgh",
 		.blocksize = 0xabcdefdc,
@@ -100,14 +85,15 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_HASH,
-			      pattern, rhash, print_quoted_memory,
+			      pattern, rhash, sizeof(rhash),
+			      print_quoted_memory,
 			      printf("{type=\"efgh\"");
 			      PRINT_FIELD_U(", ", rhash, blocksize);
 			      PRINT_FIELD_U(", ", rhash, digestsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
 	static const struct crypto_report_blkcipher rblkcipher = {
 		.type = "abcd",
 		.geniv = "efgh",
@@ -119,16 +105,17 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_BLKCIPHER,
-			      pattern, rblkcipher, print_quoted_memory,
+			      pattern, rblkcipher, sizeof(rblkcipher),
+			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
 			      PRINT_FIELD_U(", ", rblkcipher, blocksize);
 			      PRINT_FIELD_U(", ", rblkcipher, min_keysize);
 			      PRINT_FIELD_U(", ", rblkcipher, max_keysize);
 			      PRINT_FIELD_U(", ", rblkcipher, ivsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
 	static const struct crypto_report_aead raead = {
 		.type = "abcd",
 		.geniv = "efgh",
@@ -139,15 +126,16 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_AEAD,
-			      pattern, raead, print_quoted_memory,
+			      pattern, raead, sizeof(raead),
+			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
 			      PRINT_FIELD_U(", ", raead, blocksize);
 			      PRINT_FIELD_U(", ", raead, maxauthsize);
 			      PRINT_FIELD_U(", ", raead, ivsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
 	static const struct crypto_report_rng rrng = {
 		.type = "abcd",
 		.seedsize = 0xabcdefac
@@ -155,13 +143,13 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_RNG,
-			      pattern, rrng, print_quoted_memory,
+			      pattern, rrng, sizeof(rrng), print_quoted_memory,
 			      printf("{type=\"abcd\"");
 			      PRINT_FIELD_U(", ", rrng, seedsize);
 			      printf("}"));
-#endif
+# endif
 
-#ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
+# ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
 	static const struct crypto_report_cipher rcipher = {
 		.type = "abcd",
 		.blocksize = 0xabcdefac,
@@ -171,13 +159,14 @@ main(void)
 	TEST_NLATTR_OBJECT_EX(fd, nlh0, hdrlen,
 			      init_crypto_user_alg, print_crypto_user_alg,
 			      CRYPTOCFGA_REPORT_CIPHER,
-			      pattern, rcipher, print_quoted_memory,
+			      pattern, rcipher, sizeof(rcipher),
+			      print_quoted_memory,
 			      printf("{type=\"abcd\"");
 			      PRINT_FIELD_U(", ", rcipher, blocksize);
 			      PRINT_FIELD_U(", ", rcipher, min_keysize);
 			      PRINT_FIELD_U(", ", rcipher, max_keysize);
 			      printf("}"));
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

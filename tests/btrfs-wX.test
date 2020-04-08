@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Check verbose xlat decoding of btrfs ioctl w/ live ioctls.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# WARNING: USE OF THIS TEST WILL MODIFY AN EXISTING BTRFS FILE SYSTEM
+
+# Typical usage:
+# mkfs.btrfs <dev>
+# mount <dev> /mnt
+# BTRFS_MOUNTPOINT=/mnt make check TESTS="btrfs-wX"
+# umount /mnt
+
+. "${srcdir=.}/init.sh"
+
+if [ -z "${BTRFS_MOUNTPOINT}" ]; then
+    skip_ "\$BTRFS_MOUNTPOINT not set"
+elif [ ! -d "${BTRFS_MOUNTPOINT}" ]; then
+    skip_ "\$BTRFS_MOUNTPOINT does not point to a directory"
+fi
+
+check_prog grep
+run_prog ../btrfs -w -X "${BTRFS_MOUNTPOINT}" > /dev/null
+run_strace -a16 -Xverbose -eioctl $args > "$EXP"
+grep -v '^ioctl([012],' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"

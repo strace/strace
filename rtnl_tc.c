@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -193,6 +173,8 @@ static const nla_decoder_t tca_stats_nla_decoders[] = {
 	[TCA_STATS_APP]		= NULL, /* unimplemented */
 	[TCA_STATS_RATE_EST64]	= decode_gnet_stats_rate_est64,
 	[TCA_STATS_PAD]		= NULL,
+	[TCA_STATS_BASIC_HW]	= decode_gnet_stats_basic,
+	[TCA_STATS_PKT64]	= decode_nla_u64,
 };
 
 bool
@@ -259,7 +241,7 @@ decode_tca_stab_data(struct tcb *const tcp,
 		return false;
 
 	print_array(tcp, addr, nmemb, &data, sizeof(data),
-		    umoven_or_printaddr, print_stab_data, NULL);
+		    tfetch_mem, print_stab_data, NULL);
 
 	return true;
 }
@@ -293,7 +275,10 @@ static const nla_decoder_t tcmsg_nla_decoders[] = {
 	[TCA_STAB]		= decode_tca_stab,
 	[TCA_PAD]		= NULL,
 	[TCA_DUMP_INVISIBLE]	= NULL,
-	[TCA_CHAIN]		= decode_nla_u32
+	[TCA_CHAIN]		= decode_nla_u32,
+	[TCA_HW_OFFLOAD]	= decode_nla_u8,
+	[TCA_INGRESS_BLOCK]	= decode_nla_u32,
+	[TCA_EGRESS_BLOCK]	= decode_nla_u32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
@@ -308,7 +293,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 	if (len >= sizeof(tcmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(tcmsg) - offset,
-					 (void *) &tcmsg + offset)) {
+					 (char *) &tcmsg + offset)) {
 			PRINT_FIELD_IFINDEX("", tcmsg, tcm_ifindex);
 			PRINT_FIELD_U(", ", tcmsg, tcm_handle);
 			PRINT_FIELD_U(", ", tcmsg, tcm_parent);

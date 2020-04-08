@@ -1,6 +1,11 @@
 #!/bin/sh
-
+#
 # Check capget/capset syscalls decoding.
+#
+# Copyright (c) 2016-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 

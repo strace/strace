@@ -1,5 +1,443 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 5.6 (2020-04-07)
+==============================================
+
+* Changes in behaviour
+  * Messages about unknown tracees are now subject to the strace's quietness
+    setting (-q/--quiet).
+  * If -A option is provided without -o, or -S option without -c/-C, a warning
+    about its uselessness is printed now.
+  * The usage of --seccomp-bpf without -f has no effect now.
+
+* Improvements
+  * Every short option now has a long option alias, which also has enabled
+    the following improvements:
+    * Ability to use human-readable settings for -I/--interruptible,
+      -D/--daemonize options.
+    * Ability to silence specific messages using -e quiet/--quiet qualifier
+      (an alias for the -q option), including those that couldn't be silenced
+      previously (path resolution messages and "superseded by execve").
+    * Ability to specify selected fd decoding features using
+      -e decode-fds/--decode-fds qualifier (an alias for the -y option).
+    * Ability to set precision for the absolute timestamp, relative timestamp,
+      and syscall time output (using --absolute-timestamps,
+      --relative-timestamps, and --syscall-times options, respectively).
+  * Implemented ability to select the set of displayed columns in the call
+    summary output (-U/--summary-columns option).
+  * Implemented ability to sort on any summary column.
+  * Implemented ability to show information about minimum and maximum call
+    duration in the call summary output (addresses Debian bug #240945).
+  * Implemented printing of PIDs associated with pidfds in -yy mode.
+  * Implemented PTRACE_GETREGS API support on hppa, sh, sh64, and xtensa.
+  * Improved performance of libdw-based stack traces printing by implementing
+    a symbol-to-address cache.
+  * Implemented decoding of openat2 and pidfd_getfd syscalls.
+  * Enhanced io_uring_register, prctl, sched_getattr, and sched_setattr syscall
+    decoding.
+  * Implemented decoding of BPF_MAP_LOOKUP_BATCH,
+    BPF_MAP_LOOKUP_AND_DELETE_BATCH, BPF_MAP_UPDATE_BATCH, and
+    BPF_MAP_DELETE_BATCH bpf syscall commands.
+  * Enhanced decoding of BPF_MAP_CREATE and BPF_PROG_ATTACH bpf syscall
+    commands.
+  * Enhanced decoding of RTC_VL_READ ioctl command.
+  * Enhanced decoding of IFLA_* netlink attributes.
+  * Implemented HIDIOCGRAWUNIQ() ioctl command number printing.
+  * Wired up kexec_file_load syscall on hppa.
+  * Updated lists of AUDIT_*, BPF_*, CLONE_*, GRND_*, IFLA_*, IORING_*,
+    IPPROTO_*, KEY_*, KVM_*, RTM_F_*, SCHED_*, and *_MAGIC constants.
+  * Updated lists of ioctl commands from Linux 5.6.
+
+* Bug fixes
+  * Fixed build on csky abiv1 architecture.
+  * Various minor fixes in VIDIOC_* ioctl output formatting.
+  * Fix printing of the size field for _IOC_NONE ioctl command numbers on sparc.
+
+* Portability
+  * On hppa, linux kernel >= 4.7 is required.
+    On sh and sh64, linux kernel >= 2.6.28 is required.
+    Older versions without a decent PTRACE_GETREGS support will not work.
+
+Noteworthy changes in release 5.5 (2020-02-06)
+==============================================
+
+* Improvements
+  * Added -e trace=%creds option for tracing syscalls related to process
+    credentials.
+  * Enhanced decoding of arch_prctl, keyctl, io_uring_register, io_uring_setup,
+    and perf_event_open syscalls.
+  * Enhanced decoding of BPF_PROG_LOAD bpf syscall command.
+  * Updated decoding of clone3 syscall to match Linux 5.5.
+  * Implemented decoding of TCA_ACT_FLAGS and TCA_STATS_PKT64 netlink
+    attributes.
+  * Updated lists of AUDIT_*, BPF_*, CLONE_*, KEY_*, KVM_*, PPC_PTRACE_*,
+    SCTP_*, STATX_*, TIPC_*, V4L2_*, and *_MAGIC constants.
+  * Updated lists of ioctl commands from Linux 5.5.
+  * Enhanced manual page and "strace --help" output.
+
+* Bug fixes
+  * Fixed stack trace printing for early syscalls when strace is configured
+    to use libdw backend for stack tracing (addresses Fedora bug #1788636).
+  * Fixed stack trace caching when --seccomp-bpf option is specified.
+  * Fixed potentially unaligned access in decoder of SO_TIMESTAMP*_NEW
+    control messages.
+  * Fixed decoding of NDA_LLADDR netlink neighbor table attribute.
+  * Fixed build of mpers support when CFLAGS contains -flto.
+  * Fixed build on no-MMU architectures.
+  * Fixed build with glibc-2.31 and Linux kernel headers < 5.3.
+  * Fixed tests for glibc-2.31.
+
+Noteworthy changes in release 5.4 (2019-11-28)
+==============================================
+
+* Improvements
+  * Implemented -DD and -DDD options that move strace into a separate
+    process group and session, respectively.
+  * Enhanced seccomp-bpf tracee syscall filtering support by implementing
+    new "binary match" BPF program generation strategy and automatically
+    choosing the strategy that generates the shortest BPF program.
+  * Implemented decoding of BPF_BTF_GET_NEXT_ID bpf syscall command.
+  * Enhanced decoding of BPF_MAP_LOOKUP_ELEM bpf syscall command.
+  * Implemented PTP_CLOCK_GETCAPS2, PTP_EXTTS_REQUEST2, PTP_PEROUT_REQUEST2,
+    PTP_ENABLE_PPS2, and PTP_SYS_OFFSET2 ioctl decoding.
+  * Updated lists of BPF_*, CAN_*, KEXEC_*, KVM_*, MADV_*, MSG_*, P_*, PR_*,
+    PTP_*, SCTP_*, and V4L2_* constants.
+  * Implemented ability to build ARM EABI mpers support using a separate
+    compiler on aarch64.
+  * Updated lists of ioctl commands from Linux 5.4.
+  * Enhanced manual page.
+
+* Bug fixes
+  * Fixed -b execve when --seccomp-bpf option is specified.
+  * Fixed decoding of BPF_PROG_LOAD bpf syscall command.
+  * Fixed build on no-MMU architectures.
+  * Fixed build on antique systems that do not provide necessary definitions
+    of AUDIT_ARCH_* constants.
+
+Noteworthy changes in release 5.3 (2019-09-25)
+==============================================
+
+* Improvements
+  * Implemented usage of seccomp-bpf for stopping tracees only for filtered
+    syscalls.  Use --seccomp-bpf option to enable.
+  * Implemented decoding of pidfd_open and clone3 syscalls.
+  * Enhanced decoding of io_cancel, io_submit, s390_sthyi, and syslog syscalls.
+  * Enhanced decoding of NETLINK_ROUTE protocol.
+  * Implemented decoding of UNIX_DIAG_UID netlink attribute.
+  * Implemented decoding of WDIOC_* ioctl commands.
+  * Enhanced syscall count statistics: overhead is now applied per-call,
+    added ability for sorting on errors field.
+  * Syscall delay injection and overhead values can now be supplied with
+    time measure unit suffix and provided in IEEE 754 floating point format.
+  * Updated lists of AUDIT_*, BPF_*, ETH_*, KEYCTL_*, KVM_*, MAP_*, SO_*, TCP_*, V4L2_*,
+    XDP_*, and *_MAGIC constants.
+  * Updated lists of ioctl commands from Linux 5.3.
+  * Enhanced manual page.
+
+* Bug fixes
+  * Fixed syscall tampering on arc, avr32, csky, ia64, m68k, metag, mips,
+    nios2, or1k, riscv, s390, s390x, sparc, sparc64, and tile architectures
+    when PTRACE_GET_SYSCALL_INFO is in use.
+  * Fixed decoding of sockaddr_hci (AF_BLUETOOTH) addresses that lack
+    hci_channel field.
+  * Fixed evdev ioctl bitset decoding.
+  * Fixed tests on alpha with Linux kernel headers 5.1+.
+
+* Portability
+  * Removed support for decoding syscalls in range [1024...1079] on AArch64
+    architecture as this range has never been implemented in mainline kernel
+    releases.
+
+Noteworthy changes in release 5.2 (2019-07-12)
+==============================================
+
+* Improvements
+  * Implemented syscall return status filtering with -e status=set option
+    and its aliases: -z (limit syscall printing to successful syscalls only)
+    and -Z (limit syscall printing to failed syscalls only).  Addresses Debian
+    bug #176376.
+  * Implemented decoding of open_tree, move_mount, fsopen, fsconfig, fsmount,
+    and fspick syscalls.
+  * Enhanced decoding of bpf, clone, inotify_init, mbind, and set_mempolicy
+    syscalls.
+  * Updated lists of AT_*, AUDIT_*, BPF_*, CLONE_*, ETH_*, KEY_*, KVM_*, MPOL_*,
+    TIPC_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 5.2.
+
+* Bug fixes
+  * Fixed syscall tampering on powerpc and powerpc64 when
+    PTRACE_GET_SYSCALL_INFO is in use.
+  * Fixed build with cutting-edge toolchain.
+
+Noteworthy changes in release 5.1 (2019-05-22)
+==============================================
+
+* Bug fixes
+  * Fixed decoding of last two arguments of clone syscall on riscv.
+
+* Improvements
+  * Added C-SKY architecture support.
+  * Implemented decoding of SO_TIMESTAMP*_NEW control messages.
+  * Implemented decoding of clock_gettime64, clock_settime64, clock_adjtime64,
+    clock_getres_time64, clock_nanosleep_time64, timer_gettime64,
+    timer_settime64, timerfd_gettime64, timerfd_settime64, utimensat_time64,
+    pselect6_time64, ppoll_time64, io_pgetevents_time64, recvmmsg_time64,
+    mq_timedsend_time64, mq_timedreceive_time64, semtimedop_time64,
+    rt_sigtimedwait_time64, futex_time64, sched_rr_get_interval_time64,
+    pidfd_send_signal, io_uring_setup, io_uring_enter, and io_uring_register
+    syscalls.
+  * Enhanced decoding of bpf syscall.
+  * Wired up getegid, geteuid, getppid, io_pgetevents, statfs64, and fstatfs64
+    syscalls on alpha.
+  * Wired up kexec_file_load and migrate_pages syscalls on arm.
+  * Wired up io_pgetevents, perf_event_open, seccomp, and statx syscalls
+    on ia64.
+  * Wired up seccomp syscall on m68k.
+  * Wired up statx syscall on sh.
+  * Wired up pkey_mprotect, pkey_alloc, and pkey_free syscalls on alpha, hppa,
+    ia64, m68k, s390, s390x, sh, sparc, and sparc64.
+  * Wired up rseq syscall on alpha, hppa, ia64, m68k, sh, sparc, sparc64,
+    and xtensa.
+  * Wired up direct ipc syscalls on m68k, mips o32, powerpc, powerpc64,
+    s390, s390x, sh, sparc, sparc64, and x86.
+  * Updated lists of BPF_*, FAN_*, F_SEAL_*, IPV6_*, NT_*, PR_SPEC_*, SO_*,
+    and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 5.1.
+
+Noteworthy changes in release 5.0 (2019-03-19)
+==============================================
+
+* Changes in behavior
+  * -D option now implies -I4: by default strace ignores SIGHUP, SIGINT,
+    SIGQUIT, SIGPIPE, SIGTERM, SIGTTIN, SIGTTOU, and SIGTSTP when -D option
+    is used.
+  * Diagnostic message is no longer printed if an attempt to restart a process
+    has failed with ESRCH.  (Addresses RHBZ bug #1662936.)
+  * ASCII dump no longer tries to read the whole buffer at once.  As result,
+    it can fail with a diagnostic message after dumping only a part.
+    Amount of preceding zeroes printed for offset is now chosen in a way
+    to accommodate all the digits of all the offsets being printed.
+
+* Improvements
+  * Changed the way tracees are handled: all pending tracees are now waited for
+    before further processing, this improves fairness of tracee processing.
+    (Addresses RHBZ bugs #478419, #526740, #851457, #1609318, #1610774,
+    and maybe some others.)
+  * Enhanced xlat styles support configured by -X option.
+  * Enhanced decoding of bpf syscall.
+  * Enhanced decoding of PTRACE_PEEKUSER and PTRACE_POKEUSER on hppa.
+  * Enhanced pid formatting in strace-log-merge output.
+  * Wired up kexec_file_load and rseq syscalls on aarch64, arc, metag, nios2,
+    or1k, riscv, and tile architectures.
+  * Updated lists of BPF_*, BTRFS_*, FAN_*, IFLA_*, KERN_*, KVM_CAP_*, NDA_*,
+    NETNSA_*, NT_*, PR_*, REL_*, SECCOMP_*, SCTP_*, UDP_*, V4L2_*, and *_MAGIC
+    constants.
+  * Updated lists of ioctl commands from Linux 5.0.
+
+* Bug fixes
+  * Fixed ordering of sockaddr_in6 fields.
+  * Fixed strace-k test on alpha.
+  * Fixed build on mips o32.
+  * Fixed build on NOMMU architectures.
+  * Fixed build in --with-libiberty=yes mode.
+  * Fixed potential NULL dereference during printing of line continuation
+    for syscalls that haven't been decoded.
+  * Fixed strace-log-merge error diagnostics.
+
+Noteworthy changes in release 4.26 (2018-12-26)
 ===============================================
+
+* License
+  * The test suite is now provided under the terms of
+    the GNU General Public License version 2 or later.
+  * All the rest of strace is now provided under the terms of
+    the GNU Lesser General Public License version 2.1 or later.
+
+* Changes in behavior
+  * If strace is interrupted by a signal it handles (currently
+    one of HUP, INT, QUIT, PIPE, or TERM), strace terminates
+    itself with this signal.
+
+* Improvements
+  * Implemented obtainment of system call information using
+    PTRACE_GET_SYSCALL_INFO ptrace API.
+  * Implemented decoding of PTRACE_GET_SYSCALL_INFO ptrace request.
+  * Implemented decoding of BLKGETZONESZ, BLKGETNRZONES, and RND* ioctl
+    commands.
+  * Enhanced xlat styles support configured by -X option.
+  * Enhanced internet address formatting in structureless contexts.
+  * Enhanced decoding of getsockopt SO_ERROR option.
+  * Enhanced error diagnostics when the first exec fails.
+  * Added %net as a short form of %network in syscall specifications.
+  * Updated lists of ABS_*, BPF_*, FAN_*, IFA_*, IFLA_*, KVM_CAP_*, NETLINK_*,
+    NTF_*, PR_SPEC_*, REL_*, SOL_*, TCA_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 4.20.
+  * Enhanced manual page.
+
+* Bug fixes
+  * Fixed "xlat_idx: Unexpected xlat value 0" warnings.
+  * Fixed sthyi output format on s390.
+  * Documented -X option in strace -h output.
+
+Noteworthy changes in release 4.25 (2018-10-30)
+===============================================
+
+* Improvements
+  * Implemented decoding of KVM_CHECK_EXTENSION and NBD_* ioctl commands.
+  * Implemented decoding of SOL_XDP socket option names.
+  * Implemented decoding of AF_PACKET protocols in socket syscall.
+  * Implemented decoding of AF_AX25 and AF_X25 addresses, protocols,
+    and options.
+  * Implemented stack trace printing on receiving signals.
+  * Enhanced xlat styles support configured by -X option.
+  * Enhanced decoding of IFLA_*, NETCONFA_*, and SMC_DIAG_* netlink attributes.
+  * Wired up io_pgetevents syscall on arm, sparc, and sparc64.
+  * Updated lists of AF_*, AUDIT_*, BPF_*, IFLA_*, IN_*, IPSTATS_*,
+    IPV4_DEVCONF_*, NT_*, SCTP_*, SO_*, SOCK_*, SOL_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 4.19.
+
+* Bug fixes
+  * Fixed decoding of bit sets in evdev ioctl commands.
+  * Fixed decoding of EVIOCGBIT(0, ...) ioctl commands.
+  * Fixed test suite for the case when mlockall and unimplemented syscalls
+    are explicitly disabled by a seccomp filter.
+
+Noteworthy changes in release 4.24 (2018-08-14)
+===============================================
+
+* Improvements
+  * Implemented decoding of kvm vcpu exit reason (-e kvm=vcpu option),
+    requires Linux kernel version 4.16.0 or higher.
+  * Implemented decoding of KVM_SET_CPUID2 and KVM_GET_*_CPUID ioctl commands.
+  * Enhanced decoding of corner cases of SO_LINGER, SO_PEERCRED,
+    and PACKET_STATISTICS getsockopt options.
+  * Wired up io_pgetevents and rseq syscalls on hppa, microblaze, mips, powerpc,
+    and s390.
+  * Updated lists of AUDIT_*, BPF_*, IFA_*, IFLA_*, RTA_*, RTPROT_*, TCP_*,
+    TRAP_*, and UDP_* constants.
+  * Updated lists of ioctl commands from Linux 4.18.
+
+* Bug fixes
+  * Fixed decoding of Q_XGETQSTAT on non-native personalities.
+  * Fixed race condition in aio test.
+  * Fixed build with Bionic libc.
+  * Fixed build with glibc-2.28.
+  * Fixed build in exotic systemd-nspawn based environments.
+  * Fixed build on s390 with kernel headers that do not contain Linux commit
+    v3.10-rc1~201^2~11.
+
+Noteworthy changes in release 4.23 (2018-06-14)
+===============================================
+
+* Changes in behaviour
+  * On x32 personality, 64-bit syscalls (such as readv) are now shown with "#64"
+    suffix instead of "64:" prefix.  Unlike the old names, these new names
+    can be used in syscall qualification expressions.
+  * Changed error number output format: error numbers are consistently
+    printed as "-1 ECONST (Error description)"
+    for known errors and as "-1 (errno 123)" for unknown errors,
+    regardless of -e raw qualification settings.  One can specify
+    -X raw for displaying raw error numbers unconditionally.
+  * Unfetchable addresses inside arrays are now printed as comments.
+  * Obsolete IA-32 mode syscall names are no longer printed on ia64.
+
+* Improvements
+  * Implemented libdw backend for -k option, configured at build time
+    using --with-libdw option.
+    Whether -k option is compiled is now configured at build time
+    using --enable-stacktrace option.
+  * Added -X option for configuring xlat output formatting (addresses
+    Debian bug #692915).
+  * Added support for personality designation ("64", "32", or "x32") to syscall
+    qualifications in -e trace expressions.
+  * Implemented injection of syscalls with no side effects as an alternative
+    to injection of an invalid syscall (-e inject=SET:syscall= expression).
+  * Improved support for reproducible builds (addresses Debian bug #896016).
+  * Implemented decoding of BPF_PROG_QUERY and BPF_RAW_TRACEPOINT_OPEN bpf
+    syscall commands.
+  * Implemented decoding of INOTIFY_IOC_SETNEXTWD and PERF_EVENT_IOC_* ioctl
+    commands.
+  * Implemented decoding of PR_GET_SPECULATION_CTRL and PR_SET_SPECULATION_CTRL
+    prctl syscall options.
+  * Enhanced decoding of bpf, getsockopt, setsockopt, and socket syscalls.
+  * Enhanced decoding of NETLINK_KOBJECT_UEVENT and NETLINK_ROUTE protocols.
+  * Enhanced decoding of *_DIAG_MEMINFO netlink attributes.
+  * Enhanced decoding of BTRFS_*, FS_IOC_*, SIOCGIFHWADDR, and SIOCSIFHWADDR
+    ioctl commands.
+  * Enhanced decoding of AF_BLUETOOTH socket addresses.
+  * Implemented decoding of io_pgetevent syscall.
+  * Wired up rseq syscall.
+  * Updated lists of ADJ_*, BPF_*, BPF_F_*, BPF_PROG_TYPE_*, ETH_P_*, FPE_*,
+    IFF_*, IPPROTO_*, MAP_*, MS_*, MSG_*, NETLINK_*, PACKET_*, PROT_*, SCTP_*,
+    SECCOMP_FILTER_FLAG_*, SEGV_*, SEM_*, SHM_*, SW_*, V4L2_CID_*,
+    V4L2_CTRL_CLASS_*, and V4L2_PIX_FMT_* constants.
+  * Updated lists of ioctl commands from Linux 4.17.
+
+* Bug fixes
+  * Fixed decoding of msgtyp argument of msgrcv syscall.
+  * Fixed fallback definitions for F_*, MCL_*, MSG_ZEROCOPY, SI_*,
+    and SOL_SOCKET constants.
+  * Fixed -e trace=%pure expression on mips.
+
+Noteworthy changes in release 4.22 (2018-04-05)
+===============================================
+
+* Changes in infrastructure
+  * The mailing list was moved to strace-devel@lists.strace.io.
+  * SourceForge git repository
+    (https://sourceforge.net/p/strace/code/ci/master/tree/) is no longer
+    maintained.  Please use GitLab (https://gitlab.com/strace/strace/)
+    or GitHub (https://github.com/strace/strace/) repository instead.
+
+* Changes in behaviour
+  * When printing string data, '8' and '9' following an octal escape sequence
+    no longer lead to unabbreviated octal escape sequence output, as they used
+    to do.
+  * Angle brackets are now printed as octal number escape sequences
+    in the output of paths associated with file descriptors.
+  * Data dump for write syscalls (-e write) is performed regardless
+    of successfulness of these syscall (addresses Debian bug #436284).
+  * -r and -t options are now affect output independently.  Previously,
+    -r option led to ignoring of the -t option (addresses Debian bug #466195).
+
+* Improvements
+  * Implemented delay injection (-e inject=SET:delay_enter= and
+    -e inject=SET:delay_exit= options).
+  * Added -A option for opening output files in append mode
+    (addresses Debian bug #528488).
+  * IPv6 addresses shown in socket information in -yy mode are now printed
+    in brackets.
+  * Enhanced decoding of bpf, prctl and ptrace syscalls.
+  * Enhanced decoding of BTRFS_IOC_INO_PATHS, BTRFS_IOC_LOGICAL_INO, and PTP_*
+    ioctl commands.
+  * Enhanced NETLINK_ROUTE protocol decoding.
+  * Updated lists of signal codes.
+  * Updated lists of BPF_*, BTN_*, ETH_P_*, INET_DIAG_BC_*, KEY_*, POLL*, RWF_*,
+    SCHED_FLAG_*, SCTP_* and error constants.
+  * Implemented block/character device number printing in -yy mode.
+  * Known pixel/SDR format names are printed as comments for pixelformat fields
+    in v4l2 structures.
+  * Enhanced decoding of kern_features syscall.
+  * Enhanced NETLINK_NETFILTER netlink protocol decoder.
+  * Optimized handling of large number of tracees.
+  * Improved wall clock time measurement in syscall count statistics
+    (-c -w option).
+  * Extended the range of allowed values in -e inject=...:retval= expression.
+  * Added i18n support.
+  * Updated lists of ioctl commands from Linux 4.16.
+  * Enhanced manual page.
+
+* Bug fixes
+  * Fixed build on m68k.
+  * Fixed v4l2 pixelformat decoding on big-endian architectures.
+  * Fixed -O option.
+
+Noteworthy changes in release 4.21 (2018-02-13)
+===============================================
+
+* Changes in behaviour
+  * Warning is now issued when -F option is used.
+  * Warning is now issued when a tracee with unsupported personality
+    is attached.
+  * Unknown syscall numbers are now printed in hexadecimal form.
 
 * Improvements
   * Implemented decoding of netlink descriptor attributes as file descriptors.
@@ -7,14 +445,63 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of BPF_PROG_TEST_RUN, BPF_PROG_GET_NEXT_ID,
     BPF_MAP_GET_NEXT_ID, BPF_PROG_GET_FD_BY_ID, BPF_MAP_GET_FD_BY_ID,
     and BPF_OBJ_GET_INFO_BY_FD commands of bpf syscall.
+  * Enhanced decoding of get_thread_area, memfd_create, modify_ldt,
+    perf_event_open, reboot, s390_guarded_storage, s390_pcio_mmio_read,
+    s390_pci_mmio_write, s390_runtime_instr, s390_sthyi, set_thread_area,
+    and shmget syscalls.
+  * Implemented decoding of KVM_* and DM_LIST_DEVICES ioctl commands.
+  * Implemented decoding of riscv_flush_icache syscall.
   * Enhanced decoding of getsockopt and setsockopt syscalls for SOL_NETLINK
     level.
   * Enhanced decoding of BPF_MAP_CREATE command of bpf syscall.
-  * Updated lists of MSG_* and SHM_* constants.
+  * Print values returned by mq_open syscall and first arguments
+    of mq_getsetattr, mq_notify, mq_timedreceive, and mq_timedsend syscalls
+    as file descriptors.
+  * Added decoding of get_tls syscall on arm.
+  * Added -e trace=%pure option for tracing system calls with no arguments that
+    never fail.
+  * Updated lists of IPV6_*, MAP_*, MEMBARRIER_CMD_*, MSG_*, NT_*, PKEY_*,
+    SHM_*, and TCP_* constants.
   * Added manual page for the strace-log-merge command.
+  * Updated lists of ioctl commands from Linux 4.15.
+  * Implemented biarch support for s390x.
+  * Implemented an optional support for symbol demangling in strace -k output
+    (activated by --with-libiberty configure option).
+  * Information about availability of demangling and reliable personality
+    decoding (on architectures with multiple personalities) is now available
+    in strace -V output.
+  * Added decoding of pkey_alloc, pkey_free, and pkey_mprotect syscalls on
+    powerpc and powerpc64.
+  * Enhanced manual page.
 
 * Bug fixes
   * Fixed multi-personality support in cross builds.
+  * Added mq_getsetattr, mq_notify, mq_open, mq_timedreceive, and mq_timedsend
+    syscalls to %desc tracing set.
+  * Fixed path tracing support for mmap syscalls with indirect arguments and
+    for old select syscall.
+  * Fixed decoding of arm-specific (__ARM_NR_*) syscalls.
+  * Fixed open mode flags decoding.
+  * Fixed corner cases in handling of strace -ff -ttt logs by strace-log-merge.
+  * Error counts that exceed one billion are now printed correctly in call
+    summary output.
+  * Fixed call summary header for x32 personality.
+  * Changes of tracee personalities are reported more reliably.
+  * Fixed the case when strace attaches to a tracee being inside exec and its
+    first syscall stop is syscall-exit-stop instead of syscall-enter-stop,
+    which messed up all the syscall state tracking.
+  * Fixed printing of higher 32 bits of the return value for x32 personality.
+
+* Portability
+  * A C compiler that supports "for" loop initial declarations is now required.
+  * Inability to configure multiple personality support on architectures where
+    multiple personalities are supported leads to configuration failure during
+    build now.  Use --enable-mpers=check to revert to the old behaviour.
+  * Build-time requirement for the mpers support has been lowered from gawk 4
+    to gawk 3.
+  * Removed incomplete and non-functional support for the CRIS architecture.
+  * Removed incomplete and unused support for IA-32 mode on the IA-64
+    architecture.
 
 Noteworthy changes in release 4.20 (2017-11-13)
 ===============================================

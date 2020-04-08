@@ -1,34 +1,15 @@
 /*
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
 #include <poll.h>
+#include "xstring.h"
 
 #include "xlat/pollflags.h"
 
@@ -56,12 +37,13 @@ decode_poll_entering(struct tcb *tcp)
 	struct pollfd fds;
 
 	print_array(tcp, addr, nfds, &fds, sizeof(fds),
-		    umoven_or_printaddr, print_pollfd, 0);
+		    tfetch_mem, print_pollfd, 0);
 	tprintf(", %u, ", nfds);
 }
 
 static int
-decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
+decode_poll_exiting(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts,
+		    const kernel_ulong_t pts)
 {
 	struct pollfd fds;
 	const unsigned int nfds = tcp->u_arg[1];
@@ -96,7 +78,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 				*outptr++ = '[';
 			else
 				outptr = stpcpy(outptr, ", ");
-			outptr += sprintf(outptr, "%#" PRI_klx, cur);
+			outptr = xappendstr(outstr, outptr, "%#" PRI_klx, cur);
 			break;
 		}
 		if (!fds.revents)
@@ -112,7 +94,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 
 		static const char fmt[] = "{fd=%d, revents=";
 		char fdstr[sizeof(fmt) + sizeof(int) * 3];
-		sprintf(fdstr, fmt, fds.fd);
+		xsprintf(fdstr, fmt, fds.fd);
 
 		const char *flagstr = sprintflags("", pollflags,
 						  (unsigned short) fds.revents);
@@ -133,7 +115,7 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 
 	*outptr = '\0';
 	if (pts) {
-		const char *str = sprint_timespec(tcp, pts);
+		const char *str = sprint_ts(tcp, pts);
 
 		if (outptr + sizeof(", left ") + strlen(str) < end_outstr) {
 			outptr = stpcpy(outptr, outptr == outstr ? "left " : ", left ");
@@ -151,31 +133,43 @@ decode_poll_exiting(struct tcb *const tcp, const kernel_ulong_t pts)
 #undef end_outstr
 }
 
-SYS_FUNC(poll)
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
+static int
+do_poll(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts)
 {
 	if (entering(tcp)) {
 		decode_poll_entering(tcp);
-		int timeout = tcp->u_arg[2];
-
-#ifdef INFTIM
-		if (INFTIM == timeout)
-			tprints("INFTIM");
-		else
-#endif
-			tprintf("%d", timeout);
+		tprintf("%d", (int) tcp->u_arg[2]);
 
 		return 0;
 	} else {
-		return decode_poll_exiting(tcp, 0);
+		return decode_poll_exiting(tcp, sprint_ts, 0);
 	}
 }
+#endif /* HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS */
 
-SYS_FUNC(ppoll)
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(poll_time32)
+{
+	return do_poll(tcp, sprint_timespec32);
+}
+#endif
+
+#if HAVE_ARCH_OLD_TIME64_SYSCALLS
+SYS_FUNC(poll_time64)
+{
+	return do_poll(tcp, sprint_timespec64);
+}
+#endif
+
+static int
+do_ppoll(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+	 const sprint_obj_by_addr_fn sprint_ts)
 {
 	if (entering(tcp)) {
 		decode_poll_entering(tcp);
 
-		print_timespec(tcp, tcp->u_arg[2]);
+		print_ts(tcp, tcp->u_arg[2]);
 		tprints(", ");
 		/* NB: kernel requires arg[4] == NSIG_BYTES */
 		print_sigset_addr_len(tcp, tcp->u_arg[3], tcp->u_arg[4]);
@@ -183,6 +177,18 @@ SYS_FUNC(ppoll)
 
 		return 0;
 	} else {
-		return decode_poll_exiting(tcp, tcp->u_arg[2]);
+		return decode_poll_exiting(tcp, sprint_ts, tcp->u_arg[2]);
 	}
+}
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(ppoll_time32)
+{
+	return do_ppoll(tcp, print_timespec32, sprint_timespec32);
+}
+#endif
+
+SYS_FUNC(ppoll_time64)
+{
+	return do_ppoll(tcp, print_timespec64, sprint_timespec64);
 }

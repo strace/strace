@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2014-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "userent0.h"
 { PT_FPR0_HI,		"fpr0.hi" },
 { PT_FPR0_LO,		"fpr0.lo" },

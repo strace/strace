@@ -1,3 +1,4 @@
+#value_indexed
 FR_ACT_UNSPEC		0
 FR_ACT_TO_TBL		1
 FR_ACT_GOTO		2

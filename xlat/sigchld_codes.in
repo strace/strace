@@ -1,3 +1,4 @@
+#value_indexed
 CLD_EXITED 1
 CLD_KILLED 2
 CLD_DUMPED 3

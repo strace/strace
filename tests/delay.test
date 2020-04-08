@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# Check delay injection.
+#
+# Copyright (c) 2018-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+while read -r denter dexit denter_us dexit_us; do
+	[ -n "$denter" ] || continue
+
+	run_strace --follow-forks -r -egettimeofday \
+		-einject=gettimeofday:delay_enter=$denter:delay_exit=$dexit \
+		../delay 4 $denter_us $dexit_us
+done <<-EOF
+	800000 1600000  800000 1600000
+	8e5    1.6s     800000 1600000
+	800ms  1.6e+6us 800000 1600000
+	+8e8ns .16E7    800000 1600000
+EOF

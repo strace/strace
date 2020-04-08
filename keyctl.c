@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2014-2017 The strace developers.
+ * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -31,9 +11,17 @@
 #include "keyctl_kdf_params.h"
 #include "print_fields.h"
 
-typedef int32_t key_serial_t;
-
+#include "xlat/key_perms.h"
+#include "xlat/key_reqkeys.h"
 #include "xlat/key_spec.h"
+#include "xlat/keyctl_caps0.h"
+#include "xlat/keyctl_caps1.h"
+#include "xlat/keyctl_commands.h"
+#include "xlat/keyctl_move_flags.h"
+#include "xlat/keyctl_pkey_ops.h"
+
+
+typedef int32_t key_serial_t;
 
 struct keyctl_dh_params {
 	int32_t private;
@@ -41,15 +29,31 @@ struct keyctl_dh_params {
 	int32_t base;
 };
 
+struct keyctl_pkey_query {
+	uint32_t supported_ops;
+	uint32_t key_size;
+	uint16_t max_data_size;
+	uint16_t max_sig_size;
+	uint16_t max_enc_size;
+	uint16_t max_dec_size;
+	uint32_t __spare[10];
+};
+
+struct keyctl_pkey_params {
+	int32_t  key_id;
+	uint32_t in_len;
+	union {
+		uint32_t out_len;
+		uint32_t in2_len;
+	};
+	uint32_t __spare[7];
+};
+
+
 static void
 print_keyring_serial_number(key_serial_t id)
 {
-	const char *str = xlookup(key_spec, (unsigned int) id);
-
-	if (str)
-		tprints(str);
-	else
-		tprintf("%d", id);
+	printxval_d(key_spec, id, NULL);
 }
 
 SYS_FUNC(add_key)
@@ -191,16 +195,10 @@ static void
 keyctl_reject_key(struct tcb *tcp, key_serial_t id1, unsigned timeout,
 		  unsigned error, key_serial_t id2)
 {
-	const char *err_str = err_name(error);
-
 	print_keyring_serial_number(id1);
 	tprintf(", %u, ", timeout);
-
-	if (err_str)
-		tprintf("%s, ", err_str);
-	else
-		tprintf("%u, ", error);
-
+	print_err(error, false);
+	tprints(", ");
 	print_keyring_serial_number(id2);
 }
 
@@ -218,8 +216,6 @@ keyctl_get_persistent(struct tcb *tcp, unsigned uid, key_serial_t id)
 	tprints(", ");
 	print_keyring_serial_number(id);
 }
-
-#include "xlat/key_perms.h"
 
 static void
 keyctl_setperm_key(struct tcb *tcp, key_serial_t id, uint32_t perm)
@@ -269,8 +265,6 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 		if (fetch_keyctl_kdf_params(tcp, kdf_addr, &kdf)) {
 			printaddr(kdf_addr);
 		} else {
-			size_t i;
-
 			PRINT_FIELD_STR("{", kdf, hashname, tcp);
 
 			/*
@@ -285,28 +279,129 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 
 			PRINT_FIELD_U(", ", kdf, otherinfolen);
 
-			/* Some future-proofing */
-			for (i = 0; i < ARRAY_SIZE(kdf.__spare); i++) {
-				if (kdf.__spare[i])
-					break;
-			}
-
-			if (i < ARRAY_SIZE(kdf.__spare)) {
-				tprints(", __spare=[");
-
-				for (i = 0; i < ARRAY_SIZE(kdf.__spare); i++) {
-					if (i)
-						tprints(", ");
-
-					tprintf("%#x", kdf.__spare[i]);
-				}
-
-				tprints("]");
+			if (!IS_ARRAY_ZERO(kdf.__spare)) {
+				PRINT_FIELD_ARRAY(", ", kdf, __spare, tcp,
+						  print_xint32_array_member);
 			}
 
 			tprints("}");
 		}
 	}
+}
+
+static void
+print_pkey_query(struct tcb *tcp, kernel_ulong_t addr)
+{
+	struct keyctl_pkey_query query;
+
+	if (umove_or_printaddr(tcp, addr, &query))
+		return;
+
+	PRINT_FIELD_FLAGS("{", query, supported_ops, keyctl_pkey_ops,
+			  "KEYCTL_SUPPORTS_???");
+	PRINT_FIELD_U(", ", query, key_size);
+	PRINT_FIELD_U(", ", query, max_data_size);
+	PRINT_FIELD_U(", ", query, max_sig_size);
+	PRINT_FIELD_U(", ", query, max_enc_size);
+	PRINT_FIELD_U(", ", query, max_dec_size);
+
+	if (!IS_ARRAY_ZERO(query.__spare)) {
+		PRINT_FIELD_ARRAY(", ", query, __spare, tcp,
+				  print_xint32_array_member);
+	}
+
+	tprints("}");
+}
+
+static void
+keyctl_pkey_query(struct tcb *const tcp,
+		  const key_serial_t id,
+		  const kernel_ulong_t reserved,
+		  const kernel_ulong_t /* char * */ info,
+		  const kernel_ulong_t /* keyctl_pkey_query * */ res)
+{
+	if (entering(tcp)) {
+		print_keyring_serial_number(id);
+		tprints(", ");
+		tprintf("%#" PRI_klx, reserved);
+		tprints(", ");
+		printstr(tcp, info);
+		tprints(", ");
+	} else {
+		print_pkey_query(tcp, res);
+	}
+}
+
+static bool
+fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
+			struct keyctl_pkey_params *params, bool out)
+{
+	if (umove_or_printaddr(tcp, addr, params))
+		return false;
+
+	tprints("{key_id=");
+	print_keyring_serial_number(params->key_id);
+
+	PRINT_FIELD_U(", ", *params, in_len);
+
+	if (out)
+		PRINT_FIELD_U(", ", *params, out_len);
+	else
+		PRINT_FIELD_U(", ", *params, in2_len);
+
+	if (!IS_ARRAY_ZERO(params->__spare)) {
+		PRINT_FIELD_ARRAY(", ", *params, __spare, tcp,
+				  print_xint32_array_member);
+	}
+
+	tprints("}");
+
+	return true;
+}
+
+static int
+keyctl_pkey_op(struct tcb *const tcp,
+	       const kernel_ulong_t /* keyctl_pkey_params * */ params_addr,
+	       const kernel_ulong_t /* char * */ info,
+	       const kernel_ulong_t /* void * */ op1,
+	       const kernel_ulong_t /* void * */ op2,
+	       bool out)
+{
+	if (entering(tcp)) {
+		struct keyctl_pkey_params params;
+		bool ret;
+
+		ret = fetch_print_pkey_params(tcp, params_addr, &params, out);
+		if (ret && out)
+			set_tcb_priv_ulong(tcp, params.out_len);
+
+		tprints(", ");
+		printstr(tcp, info);
+		tprints(", ");
+		if (ret)
+			printstrn(tcp, op1, params.in_len);
+		else
+			printaddr(op1);
+		tprints(", ");
+
+		if (!out || !ret) {
+			if (ret)
+				printstrn(tcp, op2, params.in2_len);
+			else
+				printaddr(op2);
+		}
+
+		return ret && out ? 0 : RVAL_DECODED;
+	} else {
+		unsigned long out_len = get_tcb_priv_ulong(tcp);
+
+		if (syserror(tcp))
+			printaddr(op2);
+		else
+			printstrn(tcp, op2, out_len);
+	}
+
+	return 0;
 }
 
 static void
@@ -322,8 +417,67 @@ keyctl_restrict_keyring(struct tcb *const tcp,
 	printstr(tcp, addr2);
 }
 
-#include "xlat/key_reqkeys.h"
-#include "xlat/keyctl_commands.h"
+static void
+keyctl_move(struct tcb *const tcp,
+	    const key_serial_t id,
+	    const key_serial_t from,
+	    const key_serial_t to,
+	    const unsigned int flags)
+{
+	print_keyring_serial_number(id);
+	tprints(", ");
+	print_keyring_serial_number(from);
+	tprints(", ");
+	print_keyring_serial_number(to);
+	tprints(", ");
+	printflags(keyctl_move_flags, flags, "KEYCTL_MOVE_???");
+}
+
+bool
+print_keyctl_caps(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	static const struct {
+		const struct xlat *xlat;
+		const char *dflt;
+	} caps[] = {
+		{ keyctl_caps0, "KEYCTL_CAPS0_???" },
+		{ keyctl_caps1, "KEYCTL_CAPS1_???" },
+	};
+
+	kernel_ulong_t *pos = data;
+	unsigned char *elem = elem_buf;
+
+	if (*pos < ARRAY_SIZE(caps))
+		printflags(caps[*pos].xlat, *elem, caps[*pos].dflt);
+	else
+		tprintf("%#hhx", *elem);
+
+	(*pos)++;
+
+	return true;
+}
+
+static void
+keyctl_capabilities(struct tcb *const tcp,
+		    const kernel_ulong_t /* char * */ buf,
+		    const kernel_ulong_t buflen)
+{
+	kernel_ulong_t pos = 0;
+	unsigned char elem;
+
+	if (entering(tcp))
+		return;
+
+	if (syserror(tcp)) {
+		printaddr(buf);
+	} else {
+		print_array(tcp, buf, MIN(buflen, (kernel_ulong_t) tcp->u_rval),
+			    &elem, sizeof(elem),
+			    tfetch_mem, print_keyctl_caps, &pos);
+	}
+
+	tprintf(", %" PRI_klu, buflen);
+}
 
 SYS_FUNC(keyctl)
 {
@@ -396,7 +550,8 @@ SYS_FUNC(keyctl)
 		break;
 
 	case KEYCTL_SET_REQKEY_KEYRING:
-		printxval(key_reqkeys, arg2, "KEY_REQKEY_DEFL_???");
+		printxvals_ex((int) arg2, "KEY_REQKEY_DEFL_???",
+			      XLAT_STYLE_FMT_D, key_reqkeys, NULL);
 		break;
 
 	case KEYCTL_SET_TIMEOUT:
@@ -422,9 +577,30 @@ SYS_FUNC(keyctl)
 		keyctl_dh_compute(tcp, arg2, arg3, arg4, arg5);
 		return 0;
 
+	case KEYCTL_PKEY_QUERY:
+		keyctl_pkey_query(tcp, arg2, arg3, arg4, arg5);
+		return 0;
+
+	case KEYCTL_PKEY_ENCRYPT:
+	case KEYCTL_PKEY_DECRYPT:
+	case KEYCTL_PKEY_SIGN:
+		return keyctl_pkey_op(tcp, arg2, arg3, arg4, arg5, true);
+
+	case KEYCTL_PKEY_VERIFY:
+		keyctl_pkey_op(tcp, arg2, arg3, arg4, arg5, false);
+		break;
+
 	case KEYCTL_RESTRICT_KEYRING:
 		keyctl_restrict_keyring(tcp, arg2, arg3, arg4);
 		break;
+
+	case KEYCTL_MOVE:
+		keyctl_move(tcp, arg2, arg3, arg4, arg5);
+		break;
+
+	case KEYCTL_CAPABILITIES:
+		keyctl_capabilities(tcp, arg2, arg3);
+		return 0;
 
 	default:
 		tprintf("%#" PRI_klx ", %#" PRI_klx

@@ -3,30 +3,10 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -84,10 +64,22 @@
 
 #include "xlat/inet_protocols.h"
 
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
-# include <bluetooth/bluetooth.h>
-# include "xlat/bt_protocols.h"
-#endif
+#define XLAT_MACROS_ONLY
+#include "xlat/addrfams.h"
+#include "xlat/ethernet_protocols.h"
+#undef XLAT_MACROS_ONLY
+#include "xlat/ax25_protocols.h"
+#include "xlat/irda_protocols.h"
+#include "xlat/can_protocols.h"
+#include "xlat/bt_protocols.h"
+#include "xlat/isdn_protocols.h"
+#include "xlat/phonet_protocols.h"
+#include "xlat/caif_protocols.h"
+#include "xlat/nfc_protocols.h"
+#include "xlat/kcm_protocols.h"
+#include "xlat/smc_protocols.h"
+
+const size_t inet_protocols_size = ARRAY_SIZE(inet_protocols) - 1;
 
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
@@ -113,7 +105,7 @@ tprint_sock_type(unsigned int flags)
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 
 	if (str) {
-		tprints(str);
+		print_xlat_ex(flags & SOCK_TYPE_MASK, str, XLAT_STYLE_DEFAULT);
 		flags &= ~SOCK_TYPE_MASK;
 		if (!flags)
 			return;
@@ -134,15 +126,62 @@ SYS_FUNC(socket)
 		printxval(inet_protocols, tcp->u_arg[2], "IPPROTO_???");
 		break;
 
+	case AF_AX25:
+		/* Those are not available in public headers.  */
+		printxval_ex(ax25_protocols, tcp->u_arg[2], "AX25_P_???",
+			     XLAT_STYLE_VERBOSE);
+		break;
+
 	case AF_NETLINK:
 		printxval(netlink_protocols, tcp->u_arg[2], "NETLINK_???");
 		break;
 
-#ifdef HAVE_BLUETOOTH_BLUETOOTH_H
+	case AF_PACKET:
+		tprints("htons(");
+		printxval(ethernet_protocols, ntohs(tcp->u_arg[2]),
+			  "ETH_P_???");
+		tprints(")");
+		break;
+
+	case AF_IRDA:
+		printxval(can_protocols, tcp->u_arg[2], "IRDAPROTO_???");
+		break;
+
+	case AF_CAN:
+		printxval(can_protocols, tcp->u_arg[2], "CAN_???");
+		break;
+
 	case AF_BLUETOOTH:
 		printxval(bt_protocols, tcp->u_arg[2], "BTPROTO_???");
 		break;
-#endif
+
+	case AF_RXRPC:
+		printxval(addrfams, tcp->u_arg[2], "AF_???");
+		break;
+
+	case AF_ISDN:
+		printxval(isdn_protocols, tcp->u_arg[2], "ISDN_P_???");
+		break;
+
+	case AF_PHONET:
+		printxval(phonet_protocols, tcp->u_arg[2], "PN_PROTO_???");
+		break;
+
+	case AF_CAIF:
+		printxval(caif_protocols, tcp->u_arg[2], "CAIFPROTO_???");
+		break;
+
+	case AF_NFC:
+		printxval(nfc_protocols, tcp->u_arg[2], "NFC_SOCKPROTO_???");
+		break;
+
+	case AF_KCM:
+		printxval(kcm_protocols, tcp->u_arg[2], "KCMPROTO_???");
+		break;
+
+	case AF_SMC:
+		printxval(smc_protocols, tcp->u_arg[2], "SMCPROTO_???");
+		break;
 
 	default:
 		tprintf("%" PRI_klu, tcp->u_arg[2]);
@@ -252,7 +291,8 @@ SYS_FUNC(recv)
 			printaddr(tcp->u_arg[1]);
 		} else {
 			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
-				     tcp->u_rval);
+				       MIN((kernel_ulong_t) tcp->u_rval,
+					   tcp->u_arg[2]));
 		}
 
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
@@ -277,7 +317,8 @@ SYS_FUNC(recvfrom)
 			printaddr(tcp->u_arg[1]);
 		} else {
 			decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1],
-				     tcp->u_rval);
+				       MIN((kernel_ulong_t) tcp->u_rval,
+					   tcp->u_arg[2]));
 		}
 		/* size */
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
@@ -354,7 +395,7 @@ do_pipe(struct tcb *tcp, int flags_arg)
 
 SYS_FUNC(pipe)
 {
-#ifdef HAVE_GETRVAL2
+#if HAVE_ARCH_GETRVAL2
 	if (exiting(tcp) && !syserror(tcp))
 		printpair_fd(tcp, tcp->u_rval, getrval2(tcp));
 	return 0;
@@ -382,19 +423,39 @@ SYS_FUNC(socketpair)
 	return 0;
 }
 
-#include "xlat/sockoptions.h"
-#include "xlat/sockipoptions.h"
-#include "xlat/getsockipoptions.h"
-#include "xlat/setsockipoptions.h"
-#include "xlat/sockipv6options.h"
-#include "xlat/getsockipv6options.h"
-#include "xlat/setsockipv6options.h"
-#include "xlat/sockipxoptions.h"
-#include "xlat/socknetlinkoptions.h"
-#include "xlat/sockpacketoptions.h"
-#include "xlat/sockrawoptions.h"
-#include "xlat/socksctpoptions.h"
-#include "xlat/socktcpoptions.h"
+#include "xlat/sock_options.h"
+#include "xlat/getsock_options.h"
+#include "xlat/setsock_options.h"
+#include "xlat/sock_ip_options.h"
+#include "xlat/getsock_ip_options.h"
+#include "xlat/setsock_ip_options.h"
+#include "xlat/sock_ipv6_options.h"
+#include "xlat/getsock_ipv6_options.h"
+#include "xlat/setsock_ipv6_options.h"
+#include "xlat/sock_ipx_options.h"
+#include "xlat/sock_ax25_options.h"
+#include "xlat/sock_netlink_options.h"
+#include "xlat/sock_packet_options.h"
+#include "xlat/sock_raw_options.h"
+#include "xlat/sock_sctp_options.h"
+#include "xlat/sock_tcp_options.h"
+#include "xlat/sock_udp_options.h"
+#include "xlat/sock_irda_options.h"
+#include "xlat/sock_llc_options.h"
+#include "xlat/sock_dccp_options.h"
+#include "xlat/sock_tipc_options.h"
+#include "xlat/sock_rxrpc_options.h"
+#include "xlat/sock_pppol2tp_options.h"
+#include "xlat/sock_bluetooth_options.h"
+#include "xlat/sock_pnp_options.h"
+#include "xlat/sock_rds_options.h"
+#include "xlat/sock_iucv_options.h"
+#include "xlat/sock_caif_options.h"
+#include "xlat/sock_alg_options.h"
+#include "xlat/sock_nfcllcp_options.h"
+#include "xlat/sock_kcm_options.h"
+#include "xlat/sock_tls_options.h"
+#include "xlat/sock_xdp_options.h"
 
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
@@ -407,33 +468,91 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 
 	switch (level) {
 	case SOL_SOCKET:
-		printxval(sockoptions, name, "SO_???");
+		printxvals(name, "SO_???", sock_options,
+			   is_getsockopt ? getsock_options :
+					   setsock_options, NULL);
 		break;
 	case SOL_IP:
-		printxvals(name, "IP_???", sockipoptions,
-			is_getsockopt ? getsockipoptions : setsockipoptions, NULL);
+		printxvals(name, "IP_???", sock_ip_options,
+			   is_getsockopt ? getsock_ip_options :
+					   setsock_ip_options, NULL);
 		break;
 	case SOL_IPV6:
-		printxvals(name, "IPV6_???", sockipv6options,
-			is_getsockopt ? getsockipv6options : setsockipv6options, NULL);
+		printxvals(name, "IPV6_???", sock_ipv6_options,
+			   is_getsockopt ? getsock_ipv6_options :
+					   setsock_ipv6_options, NULL);
 		break;
 	case SOL_IPX:
-		printxval(sockipxoptions, name, "IPX_???");
+		printxval(sock_ipx_options, name, "IPX_???");
+		break;
+	case SOL_AX25:
+		printxval(sock_ax25_options, name, "AX25_???");
 		break;
 	case SOL_PACKET:
-		printxval(sockpacketoptions, name, "PACKET_???");
+		printxval(sock_packet_options, name, "PACKET_???");
 		break;
 	case SOL_TCP:
-		printxval(socktcpoptions, name, "TCP_???");
+		printxval(sock_tcp_options, name, "TCP_???");
 		break;
 	case SOL_SCTP:
-		printxval(socksctpoptions, name, "SCTP_???");
+		printxval(sock_sctp_options, name, "SCTP_???");
 		break;
 	case SOL_RAW:
-		printxval(sockrawoptions, name, "RAW_???");
+		printxval(sock_raw_options, name, "RAW_???");
 		break;
 	case SOL_NETLINK:
-		printxval(socknetlinkoptions, name, "NETLINK_???");
+		printxval(sock_netlink_options, name, "NETLINK_???");
+		break;
+	case SOL_UDP:
+		printxval(sock_udp_options, name, "UDP_???");
+		break;
+	case SOL_IRDA:
+		printxval(sock_irda_options, name, "IRLMP_???");
+		break;
+	case SOL_LLC:
+		printxval(sock_llc_options, name, "LLC_OPT_???");
+		break;
+	case SOL_DCCP:
+		printxval(sock_dccp_options, name, "DCCP_SOCKOPT_???");
+		break;
+	case SOL_TIPC:
+		printxval(sock_tipc_options, name, "TIPC_???");
+		break;
+	case SOL_RXRPC:
+		printxval(sock_rxrpc_options, name, "RXRPC_???");
+		break;
+	case SOL_PPPOL2TP:
+		printxval(sock_pppol2tp_options, name, "PPPOL2TP_SO_???");
+		break;
+	case SOL_BLUETOOTH:
+		printxval(sock_bluetooth_options, name, "BT_???");
+		break;
+	case SOL_PNPIPE:
+		printxval(sock_pnp_options, name, "PNPIPE_???");
+		break;
+	case SOL_RDS:
+		printxval(sock_rds_options, name, "RDS_???");
+		break;
+	case SOL_IUCV:
+		printxval(sock_iucv_options, name, "SO_???");
+		break;
+	case SOL_CAIF:
+		printxval(sock_caif_options, name, "CAIFSO_???");
+		break;
+	case SOL_ALG:
+		printxval(sock_alg_options, name, "ALG_???");
+		break;
+	case SOL_NFC:
+		printxval(sock_nfcllcp_options, name, "NFC_LLCP_???");
+		break;
+	case SOL_KCM:
+		printxval(sock_kcm_options, name, "KCM_???");
+		break;
+	case SOL_TLS:
+		printxval(sock_tls_options, name, "TLS_???");
+		break;
+	case SOL_XDP:
+		printxval(sock_xdp_options, name, "XDP_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
@@ -446,91 +565,162 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 }
 
 static void
-print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
-		 const int len)
-{
-	struct linger linger;
-
-	if (len < (int) sizeof(linger)) {
-		printaddr(addr);
-	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
-		PRINT_FIELD_D("{", linger, l_onoff);
-		PRINT_FIELD_D(", ", linger, l_linger);
-		tprints("}");
-	}
-}
-
-static void
 print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 		 unsigned int len)
 {
 	struct linger linger;
 
-	if (len < sizeof(linger)) {
-		if (len != sizeof(linger.l_onoff)) {
-			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
-			return;
-		}
-	} else {
+	/*
+	 * The kernel cannot return len > sizeof(linger) because struct linger
+	 * cannot change, but extra safety won't harm either.
+	 */
+	if (len > sizeof(linger))
 		len = sizeof(linger);
-	}
-
-	if (umoven(tcp, addr, len, &linger) < 0) {
-		printaddr(addr);
+	if (umoven_or_printaddr(tcp, addr, len, &linger))
 		return;
-	}
 
-	PRINT_FIELD_D("{", linger, l_onoff);
-	if (len == sizeof(linger))
-		PRINT_FIELD_D(", ", linger, l_linger);
+	if (len < sizeof(linger.l_onoff)) {
+		tprints("{l_onoff=");
+		print_quoted_string((void *) &linger.l_onoff,
+				    len, QUOTE_FORCE_HEX);
+	} else {
+		PRINT_FIELD_D("{", linger, l_onoff);
+
+		if (len > offsetof(struct linger, l_linger)) {
+			len -= offsetof(struct linger, l_linger);
+			if (len < sizeof(linger.l_linger)) {
+				tprints(", l_linger=");
+				print_quoted_string((void *) &linger.l_linger,
+						    len, QUOTE_FORCE_HEX);
+			} else {
+				PRINT_FIELD_D(", ", linger, l_linger);
+			}
+		}
+	}
 	tprints("}");
 }
 
-#ifdef SO_PEERCRED
 static void
-print_ucred(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
+print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
+		unsigned int len)
 {
 	struct ucred uc;
 
-	if (len < sizeof(uc)) {
-		if (len != sizeof(uc.pid)
-		    && len != offsetofend(struct ucred, uid)) {
-			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
-			return;
-		}
-	} else {
+	/*
+	 * The kernel is very unlikely to return len > sizeof(uc)
+	 * because struct ucred is very unlikely to change,
+	 * but extra safety won't harm either.
+	 */
+	if (len > sizeof(uc))
 		len = sizeof(uc);
-	}
 
-	if (umoven(tcp, addr, len, &uc) < 0) {
-		printaddr(addr);
+	if (umoven_or_printaddr(tcp, addr, len, &uc))
 		return;
-	}
 
-	PRINT_FIELD_D("{", uc, pid);
-	if (len > sizeof(uc.pid))
-		PRINT_FIELD_UID(", ", uc, uid);
-	if (len == sizeof(uc))
-		PRINT_FIELD_UID(", ", uc, gid);
+	if (len < sizeof(uc.pid)) {
+		tprints("{pid=");
+		print_quoted_string((void *) &uc.pid,
+				    len, QUOTE_FORCE_HEX);
+	} else {
+		PRINT_FIELD_D("{", uc, pid);
+
+		if (len > offsetof(struct ucred, uid)) {
+			len -= offsetof(struct ucred, uid);
+			if (len < sizeof(uc.uid)) {
+				tprints(", uid=");
+				print_quoted_string((void *) &uc.uid,
+						    len, QUOTE_FORCE_HEX);
+			} else {
+				PRINT_FIELD_UID(", ", uc, uid);
+
+				if (len > offsetof(struct ucred, gid) -
+					  offsetof(struct ucred, uid)) {
+					len -= offsetof(struct ucred, gid) -
+					       offsetof(struct ucred, uid);
+					if (len < sizeof(uc.gid)) {
+						tprints(", gid=");
+						print_quoted_string((void *) &uc.gid,
+								    len,
+								    QUOTE_FORCE_HEX);
+					} else {
+						PRINT_FIELD_UID(", ", uc, gid);
+					}
+				}
+			}
+		}
+	}
 	tprints("}");
 }
-#endif /* SO_PEERCRED */
+
+static void
+print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
+		unsigned int len)
+{
+	unsigned int err;
+
+	if (len > sizeof(err))
+		err = sizeof(err);
+
+	if (umoven_or_printaddr(tcp, addr, len, &err))
+		return;
+
+	tprints("[");
+	print_err(err, false);
+	tprints("]");
+}
 
 #ifdef PACKET_STATISTICS
 static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
-		    const int len)
+		    unsigned int len)
 {
-	struct tpacket_stats stats;
+	struct tp_stats {
+		unsigned int tp_packets, tp_drops, tp_freeze_q_cnt;
+	} stats;
 
-	if (len != sizeof(stats) ||
-	    umove(tcp, addr, &stats) < 0) {
-		printaddr(addr);
+	/*
+	 * The kernel may return len > sizeof(stats) if the kernel structure
+	 * grew as it happened when tpacket_stats_v3 was introduced.
+	 */
+	if (len > sizeof(stats))
+		len = sizeof(stats);
+
+	if (umoven_or_printaddr(tcp, addr, len, &stats))
+		return;
+
+	if (len < sizeof(stats.tp_packets)) {
+		tprints("{tp_packets=");
+		print_quoted_string((void *) &stats.tp_packets,
+				    len, QUOTE_FORCE_HEX);
 	} else {
 		PRINT_FIELD_U("{", stats, tp_packets);
-		PRINT_FIELD_U("{", stats, tp_drops);
-		tprints("}");
+
+		if (len > offsetof(struct tp_stats, tp_drops)) {
+			len -= offsetof(struct tp_stats, tp_drops);
+			if (len < sizeof(stats.tp_drops)) {
+				tprints(", tp_drops=");
+				print_quoted_string((void *) &stats.tp_drops,
+						    len, QUOTE_FORCE_HEX);
+			} else {
+				PRINT_FIELD_U(", ", stats, tp_drops);
+
+				if (len > offsetof(struct tp_stats, tp_freeze_q_cnt) -
+					  offsetof(struct tp_stats, tp_drops)) {
+					len -= offsetof(struct tp_stats, tp_freeze_q_cnt) -
+					       offsetof(struct tp_stats, tp_drops);
+					if (len < sizeof(stats.tp_freeze_q_cnt)) {
+						tprints(", tp_freeze_q_cnt=");
+						print_quoted_string((void *) &stats.tp_freeze_q_cnt,
+								    len,
+								    QUOTE_FORCE_HEX);
+					} else {
+						PRINT_FIELD_U(", ", stats, tp_freeze_q_cnt);
+					}
+				}
+			}
+		}
 	}
+	tprints("}");
 }
 #endif /* PACKET_STATISTICS */
 
@@ -556,19 +746,22 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	tprints(")");
 }
 
-static bool
-print_uint32(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
-{
-	tprintf("%u", *(uint32_t *) elem_buf);
-
-	return true;
-}
-
 static void
 print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		 const unsigned int name, const kernel_ulong_t addr,
 		 const int ulen, const int rlen)
 {
+	if (ulen <= 0 || rlen <= 0) {
+		/*
+		 * As the kernel neither accepts nor returns a negative
+		 * length in case of successful getsockopt syscall
+		 * invocation, negative values must have been forged
+		 * by userspace.
+		 */
+		printaddr(addr);
+		return;
+	}
+
 	if (addr && verbose(tcp))
 	switch (level) {
 	case SOL_SOCKET:
@@ -576,19 +769,24 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_LINGER:
 			print_get_linger(tcp, addr, rlen);
 			return;
-#ifdef SO_PEERCRED
 		case SO_PEERCRED:
-			print_ucred(tcp, addr, rlen);
+			print_get_ucred(tcp, addr, rlen);
 			return;
-#endif
-#ifdef SO_ATTACH_FILTER
 		case SO_ATTACH_FILTER:
-			if (rlen && (unsigned short) rlen == (unsigned int) rlen)
+			/*
+			 * The length returned by the kernel in case of
+			 * successful getsockopt syscall invocation is struct
+			 * sock_fprog.len that has type unsigned short,
+			 * anything else must have been forged by userspace.
+			 */
+			if ((unsigned short) rlen == (unsigned int) rlen)
 				print_sock_fprog(tcp, addr, rlen);
 			else
 				printaddr(addr);
 			return;
-#endif /* SO_ATTACH_FILTER */
+		case SO_ERROR:
+			print_get_error(tcp, addr, rlen);
+			return;
 		}
 		break;
 
@@ -611,22 +809,12 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		break;
 
 	case SOL_NETLINK:
-		if (ulen < 0 || rlen < 0) {
-			/*
-			 * As the kernel neither accepts nor returns a negative
-			 * length, in case of successful getsockopt syscall
-			 * invocation these negative values must have come
-			 * from userspace.
-			 */
-			printaddr(addr);
-			return;
-		}
 		switch (name) {
 		case NETLINK_LIST_MEMBERSHIPS: {
 			uint32_t buf;
 			print_array(tcp, addr, MIN(ulen, rlen) / sizeof(buf),
 				    &buf, sizeof(buf),
-				    umoven_or_printaddr, print_uint32, 0);
+				    tfetch_mem, print_uint32_array_member, 0);
 			break;
 			}
 		default:
@@ -685,6 +873,21 @@ SYS_FUNC(getsockopt)
 	return 0;
 }
 
+static void
+print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const int len)
+{
+	struct linger linger;
+
+	if (len < (int) sizeof(linger)) {
+		printaddr(addr);
+	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
+		PRINT_FIELD_D("{", linger, l_onoff);
+		PRINT_FIELD_D(", ", linger, l_linger);
+		tprints("}");
+	}
+}
+
 #ifdef IP_ADD_MEMBERSHIP
 static void
 print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
@@ -695,8 +898,8 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (len < (int) sizeof(mreq)) {
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &mreq)) {
-		PRINT_FIELD_INET4_ADDR("{", mreq, imr_multiaddr);
-		PRINT_FIELD_INET4_ADDR(", ", mreq, imr_interface);
+		PRINT_FIELD_INET_ADDR("{", mreq, imr_multiaddr, AF_INET);
+		PRINT_FIELD_INET_ADDR(", ", mreq, imr_interface, AF_INET);
 		tprints("}");
 	}
 }
@@ -750,17 +953,13 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	    umove(tcp, addr, &mreq) < 0) {
 		printaddr(addr);
 	} else {
-		unsigned int i;
-
 		PRINT_FIELD_IFINDEX("{", mreq, mr_ifindex);
 		PRINT_FIELD_XVAL(", ", mreq, mr_type, packet_mreq_type,
 				 "PACKET_MR_???");
 		PRINT_FIELD_U(", ", mreq, mr_alen);
-		tprints(", mr_address=");
-		if (mreq.mr_alen > ARRAY_SIZE(mreq.mr_address))
-			mreq.mr_alen = ARRAY_SIZE(mreq.mr_address);
-		for (i = 0; i < mreq.mr_alen; ++i)
-			tprintf("%02x", mreq.mr_address[i]);
+		PRINT_FIELD_MAC_SZ(", ", mreq, mr_address,
+				   (mreq.mr_alen > sizeof(mreq.mr_address)
+				    ? sizeof(mreq.mr_address) : mreq.mr_alen));
 		tprints("}");
 	}
 }
@@ -778,17 +977,13 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_LINGER:
 			print_set_linger(tcp, addr, len);
 			return;
-#ifdef SO_ATTACH_FILTER
 		case SO_ATTACH_FILTER:
-# ifdef SO_ATTACH_REUSEPORT_CBPF
 		case SO_ATTACH_REUSEPORT_CBPF:
-# endif
 			if ((unsigned int) len == get_sock_fprog_size())
 				decode_sock_fprog(tcp, addr);
 			else
 				printaddr(addr);
 			return;
-#endif /* SO_ATTACH_FILTER */
 		}
 		break;
 

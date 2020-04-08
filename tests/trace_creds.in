@@ -1,0 +1,8 @@
+getgroups	-a17
+getgroups32	-a19
+getresgid	-a25
+getresgid32	-a27
+getresuid	-a25
+getresuid32	-a27
+setgroups	-s2 -a17
+setgroups32	-s2 -a19

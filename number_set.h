@@ -1,34 +1,15 @@
 /*
- * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #ifndef STRACE_NUMBER_SET_H
-#define STRACE_NUMBER_SET_H
+# define STRACE_NUMBER_SET_H
 
-#include "gcc_compat.h"
+# include "gcc_compat.h"
 
 struct number_set;
 
@@ -40,6 +21,13 @@ is_number_in_set(unsigned int number, const struct number_set *);
 
 extern bool
 is_number_in_set_array(unsigned int number, const struct number_set *, unsigned int idx);
+
+extern bool
+is_complete_set(const struct number_set *, unsigned int max_numbers);
+
+extern bool
+is_complete_set_array(const struct number_set *, const unsigned int *,
+		      const unsigned int nmemb);
 
 extern void
 add_number_to_set(unsigned int number, struct number_set *);
@@ -59,8 +47,48 @@ alloc_number_set_array(unsigned int nmemb) ATTRIBUTE_MALLOC;
 extern void
 free_number_set_array(struct number_set *, unsigned int nmemb);
 
+enum status_t {
+	STATUS_SUCCESSFUL,
+	STATUS_FAILED,
+	STATUS_UNFINISHED,
+	STATUS_UNAVAILABLE,
+	STATUS_DETACHED,
+	NUMBER_OF_STATUSES
+};
+
+enum quiet_bits {
+	/** Do not print messages on tracee attach/detach. */
+	QUIET_ATTACH,
+	/** Do not print messages on tracee exits. */
+	QUIET_EXIT,
+	/** Do not print messages about path tracing path resolution. */
+	QUIET_PATH_RESOLVE,
+	/** Do not print messages on personality change. */
+	QUIET_PERSONALITY,
+	/** Do not print messages on superseding execve. */
+	QUIET_THREAD_EXECVE,
+
+	NUM_QUIET_BITS
+};
+
+enum decode_fd_bits {
+	DECODE_FD_PATH,
+	DECODE_FD_SOCKET,
+	DECODE_FD_DEV,
+	DECODE_FD_PIDFD,
+
+	NUM_DECODE_FD_BITS
+};
+
+extern bool quiet_set_updated;
+extern bool decode_fd_set_updated;
+
 extern struct number_set *read_set;
 extern struct number_set *write_set;
 extern struct number_set *signal_set;
+extern struct number_set *status_set;
+extern struct number_set *quiet_set;
+extern struct number_set *decode_fd_set;
+extern struct number_set *trace_set;
 
 #endif /* !STRACE_NUMBER_SET_H */

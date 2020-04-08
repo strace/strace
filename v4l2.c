@@ -2,33 +2,31 @@
  * Copyright (c) 2014 Philippe De Muyter <phdm@macqel.be>
  * Copyright (c) 2014 William Manley <will@williammanley.net>
  * Copyright (c) 2011 Peter Zotov <whitequark@whitequark.org>
- * Copyright (c) 2014-2017 The strace developers.
+ * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
+
+#include "static_assert.h"
+
+#define CHECK_V4L2_STRUCT_SIZE(s_) \
+	static_assert(sizeof(struct s_) == sizeof(struct_##s_), \
+		      "Unexpected struct " #s_ " size")
+#define CHECK_V4L2_STRUCT_SIZE_LE(s_) \
+	static_assert(sizeof(struct s_) <= sizeof(struct_##s_), \
+		      "Unexpected struct " #s_ " size, " \
+		      "please update the decoder")
+#define CHECK_V4L2_RESERVED_SIZE(s_) \
+	static_assert(sizeof_field(struct s_, reserved) \
+		      >= sizeof_field(struct_##s_, reserved), \
+		      "Unexpected struct " #s_ ".reserved size, " \
+		      "please update the decoder")
+#define CHECK_V4L2_STRUCT_RESERVED_SIZE(s_) \
+	CHECK_V4L2_STRUCT_SIZE(s_); \
+	CHECK_V4L2_RESERVED_SIZE(s_)
 
 #include DEF_MPERS_TYPE(struct_v4l2_buffer)
 #include DEF_MPERS_TYPE(struct_v4l2_clip)
@@ -40,34 +38,51 @@
 #include DEF_MPERS_TYPE(struct_v4l2_input)
 #include DEF_MPERS_TYPE(struct_v4l2_standard)
 
-#include <stdint.h>
-#include <linux/ioctl.h>
-#include <linux/types.h>
-#include <linux/videodev2.h>
+#include "types/v4l2.h"
 
-typedef struct v4l2_buffer struct_v4l2_buffer;
-typedef struct v4l2_clip struct_v4l2_clip;
-typedef struct v4l2_create_buffers struct_v4l2_create_buffers;
-typedef struct v4l2_ext_control struct_v4l2_ext_control;
-typedef struct v4l2_ext_controls struct_v4l2_ext_controls;
-typedef struct v4l2_format struct_v4l2_format;
-typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
-typedef struct v4l2_input struct_v4l2_input;
-typedef struct v4l2_standard struct_v4l2_standard;
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
+CHECK_V4L2_STRUCT_SIZE_LE(v4l2_pix_format);
+#ifdef HAVE_STRUCT_V4L2_PLANE_PIX_FORMAT
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_plane_pix_format);
+#endif
+#ifdef HAVE_STRUCT_V4L2_PIX_FORMAT_MPLANE
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_pix_format_mplane);
+#endif
+CHECK_V4L2_STRUCT_SIZE(v4l2_clip);
+CHECK_V4L2_STRUCT_SIZE_LE(v4l2_window);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_vbi_format);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sliced_vbi_format);
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sliced_vbi_cap);
+#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
+#endif
+#ifdef HAVE_STRUCT_V4L2_META_FORMAT
+CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
+#endif
+CHECK_V4L2_STRUCT_SIZE(v4l2_format);
+#ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
+#endif
+#ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmivalenum);
+#endif
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
+CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
+#endif
 
 #include MPERS_DEFS
 
 #include "print_fields.h"
+#include "print_utils.h"
+#include "xstring.h"
 
-/* some historical constants */
-#ifndef V4L2_CID_HCENTER
-#define V4L2_CID_HCENTER (V4L2_CID_BASE+22)
+/* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
+#ifndef v4l2_fourcc_be
+# define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1U << 31))
 #endif
-#ifndef V4L2_CID_VCENTER
-#define V4L2_CID_VCENTER (V4L2_CID_BASE+23)
-#endif
-#ifndef V4L2_CID_BAND_STOP_FILTER
-#define V4L2_CID_BAND_STOP_FILTER (V4L2_CID_BASE+33)
+
+#ifndef VIDEO_MAX_PLANES
+# define VIDEO_MAX_PLANES 8
 #endif
 
 #define FMT_FRACT "%u/%u"
@@ -76,29 +91,33 @@ typedef struct v4l2_standard struct_v4l2_standard;
 #define FMT_RECT "{left=%d, top=%d, width=%u, height=%u}"
 #define ARGS_RECT(x) (x).left, (x).top, (x).width, (x).height
 
+#include "xlat/v4l2_pix_fmts.h"
+#include "xlat/v4l2_sdr_fmts.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/v4l2_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
+
 static void
-print_pixelformat(uint32_t fourcc)
+print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 {
-	const union {
-		uint32_t pixelformat;
-		unsigned char cc[sizeof(uint32_t)];
-	} u = {
-#if WORDS_BIGENDIAN
-		.cc = {
-			(unsigned char) (fourcc >> 24),
-			(unsigned char) (fourcc >> 16),
-			(unsigned char) (fourcc >> 8),
-			(unsigned char) fourcc
-		}
-#else
-		.pixelformat = fourcc
-#endif
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#x", fourcc);
+		return;
+	}
+
+	unsigned char a[] = {
+		(unsigned char) fourcc,
+		(unsigned char) (fourcc >> 8),
+		(unsigned char) (fourcc >> 16),
+		(unsigned char) (fourcc >> 24),
 	};
 	unsigned int i;
 
 	tprints("v4l2_fourcc(");
-	for (i = 0; i < sizeof(u.cc); ++i) {
-		unsigned char c = u.cc[i];
+	/* Generic char array printing routine.  */
+	for (i = 0; i < ARRAY_SIZE(a); ++i) {
+		unsigned char c = a[i];
 
 		if (i)
 			tprints(", ");
@@ -111,7 +130,7 @@ print_pixelformat(uint32_t fourcc)
 				'\0'
 			};
 			tprints(sym);
-		} else if (c >= ' ' && c <= 0x7e) {
+		} else if (is_print(c)) {
 			char sym[] = {
 				'\'',
 				c,
@@ -121,18 +140,20 @@ print_pixelformat(uint32_t fourcc)
 			tprints(sym);
 		} else {
 			char hex[] = {
-				'\'',
-				'\\',
-				'x',
-				"0123456789abcdef"[c >> 4],
-				"0123456789abcdef"[c & 0xf],
-				'\'',
+				BYTE_HEX_CHARS_PRINTF_QUOTED(c),
 				'\0'
 			};
 			tprints(hex);
 		}
 	}
 	tprints(")");
+
+	if (xlat) {
+		const char *pixfmt_name = xlookup(xlat, fourcc);
+
+		if (pixfmt_name)
+			tprints_comment(pixfmt_name);
+	}
 }
 
 #include "xlat/v4l2_device_capabilities_flags.h"
@@ -140,7 +161,7 @@ print_pixelformat(uint32_t fourcc)
 static int
 print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_capability caps;
+	struct_v4l2_capability caps;
 
 	if (entering(tcp))
 		return 0;
@@ -150,17 +171,16 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING("{", caps, driver);
 	PRINT_FIELD_CSTRING(", ", caps, card);
 	PRINT_FIELD_CSTRING(", ", caps, bus_info);
-	tprintf(", version=%u.%u.%u, capabilities=",
-		(caps.version >> 16) & 0xFF,
-		(caps.version >> 8) & 0xFF,
-		caps.version & 0xFF);
+	tprintf(", version=");
+	print_kernel_version(caps.version);
+	tprints(", capabilities=");
 	printflags(v4l2_device_capabilities_flags, caps.capabilities,
 		   "V4L2_CAP_???");
-#ifdef V4L2_CAP_DEVICE_CAPS
-	tprints(", device_caps=");
-	printflags(v4l2_device_capabilities_flags, caps.device_caps,
-		   "V4L2_CAP_???");
-#endif
+	if (caps.device_caps) {
+		tprints(", device_caps=");
+		printflags(v4l2_device_capabilities_flags, caps.device_caps,
+			   "V4L2_CAP_???");
+	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
@@ -188,7 +208,7 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 			   "V4L2_FMT_FLAG_???");
 		PRINT_FIELD_CSTRING(", ", f, description);
 		tprints(", pixelformat=");
-		print_pixelformat(f.pixelformat);
+		print_pixelformat(f.pixelformat, v4l2_pix_fmts);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
@@ -218,7 +238,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprintf("fmt.pix={width=%u, height=%u, pixelformat=",
 			f->fmt.pix.width, f->fmt.pix.height);
-		print_pixelformat(f->fmt.pix.pixelformat);
+		print_pixelformat(f->fmt.pix.pixelformat, v4l2_pix_fmts);
 		tprints(", field=");
 		printxval(v4l2_fields, f->fmt.pix.field, "V4L2_FIELD_???");
 		tprintf(", bytesperline=%u, sizeimage=%u, colorspace=",
@@ -227,7 +247,6 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			  "V4L2_COLORSPACE_???");
 		tprints("}");
 		break;
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
 		unsigned int i, max;
@@ -235,7 +254,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints(prefix);
 		tprintf("fmt.pix_mp={width=%u, height=%u, pixelformat=",
 			f->fmt.pix_mp.width, f->fmt.pix_mp.height);
-		print_pixelformat(f->fmt.pix_mp.pixelformat);
+		print_pixelformat(f->fmt.pix_mp.pixelformat, v4l2_pix_fmts);
 		tprints(", field=");
 		printxval(v4l2_fields, f->fmt.pix_mp.field, "V4L2_FIELD_???");
 		tprints(", colorspace=");
@@ -256,11 +275,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			(unsigned) f->fmt.pix_mp.num_planes);
 		break;
 	}
-#endif
 	/* OUTPUT_OVERLAY since Linux v2.6.22-rc1~1118^2~179 */
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
-#endif
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY: {
 		struct_v4l2_clip clip;
 		tprints(prefix);
@@ -270,12 +286,11 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprintf(", chromakey=%#x, clips=", f->fmt.win.chromakey);
 		ret = print_array(tcp, ptr_to_kulong(f->fmt.win.clips),
 				  f->fmt.win.clipcount, &clip, sizeof(clip),
-				  umoven_or_printaddr, print_v4l2_clip, 0);
+				  tfetch_mem, print_v4l2_clip, 0);
 		tprintf(", clipcount=%u, bitmap=", f->fmt.win.clipcount);
 		printaddr(ptr_to_kulong(f->fmt.win.bitmap));
-#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
-		tprintf(", global_alpha=%#x", f->fmt.win.global_alpha);
-#endif
+		if (f->fmt.win.global_alpha)
+			tprintf(", global_alpha=%#x", f->fmt.win.global_alpha);
 		tprints("}");
 		break;
 	}
@@ -286,16 +301,15 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			"samples_per_line=%u, sample_format=",
 			f->fmt.vbi.sampling_rate, f->fmt.vbi.offset,
 			f->fmt.vbi.samples_per_line);
-		print_pixelformat(f->fmt.vbi.sample_format);
-		tprintf(", start=[%u, %u], count=[%u, %u], ",
+		print_pixelformat(f->fmt.vbi.sample_format, v4l2_pix_fmts);
+		tprintf(", start=[%d, %d], count=[%u, %u], ",
 			f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 			f->fmt.vbi.count[0], f->fmt.vbi.count[1]);
 		tprints("flags=");
-		printxval(v4l2_vbi_flags, f->fmt.vbi.flags, "V4L2_VBI_???");
+		printflags(v4l2_vbi_flags, f->fmt.vbi.flags, "V4L2_VBI_???");
 		tprints("}");
 		break;
 	/* both since Linux v2.6.14-rc2~64 */
-#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
 		unsigned int i, j;
@@ -323,24 +337,20 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints("]}");
 		break;
 	}
-#endif
 	/* since Linux v4.4-rc1~118^2~14 */
-#if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
-#endif
 	/* since Linux v3.15-rc1~85^2~213 */
-#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
 		tprints(prefix);
 		tprints("fmt.sdr={pixelformat=");
-		print_pixelformat(f->fmt.sdr.pixelformat);
-#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
-		tprintf(", buffersize=%u",
-			f->fmt.sdr.buffersize);
-#endif
+		print_pixelformat(f->fmt.sdr.pixelformat, v4l2_sdr_fmts);
+		if (f->fmt.sdr.buffersize)
+			tprintf(", buffersize=%u",
+				f->fmt.sdr.buffersize);
 		tprints("}");
 		break;
-#endif
+	default:
+		return false;
 	}
 	return ret;
 }
@@ -368,7 +378,7 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f))
-		print_v4l2_format_fmt(tcp, is_get ? ", " : " => ", &f);
+		print_v4l2_format_fmt(tcp, is_get ? ", " : "} => {", &f);
 
 	tprints("}");
 
@@ -412,6 +422,35 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 #include "xlat/v4l2_buf_flags.h"
+#include "xlat/v4l2_buf_flags_ts_type.h"
+#include "xlat/v4l2_buf_flags_ts_src.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/v4l2_buf_flags_masks.h"
+#undef XLAT_MACROS_ONLY
+
+static void
+print_v4l2_buffer_flags(uint32_t val)
+{
+	const uint32_t ts_type = val & V4L2_BUF_FLAG_TIMESTAMP_MASK;
+	const uint32_t ts_src  = val & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
+	const uint32_t flags   = val & ~ts_type & ~ts_src;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#" PRIx32, val);
+		return;
+	}
+
+	if (flags) {
+		printflags(v4l2_buf_flags, flags, "V4L2_BUF_FLAG_???");
+		tprints("|");
+	}
+	printxval(v4l2_buf_flags_ts_type, ts_type,
+		  "V4L2_BUF_FLAG_TIMESTAMP_???");
+	tprints("|");
+	printxval(v4l2_buf_flags_ts_src, ts_src,
+		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
+}
 
 static int
 print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
@@ -446,9 +485,9 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 
 		tprintf(", length=%u, bytesused=%u, flags=",
 			b.length, b.bytesused);
-		printflags(v4l2_buf_flags, b.flags, "V4L2_BUF_FLAG_???");
+		print_v4l2_buffer_flags(b.flags);
 		if (code == VIDIOC_DQBUF) {
-			tprints(", timestamp = ");
+			tprints(", timestamp=");
 			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
 		}
 		tprints(", ...");
@@ -520,7 +559,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : " => ");
+		tprints(is_get ? ", " : "} => {");
 	}
 
 	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
@@ -535,7 +574,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprintf(", timeperframe=" FMT_FRACT,
 			ARGS_FRACT(s.parm.capture.timeperframe));
 
-		tprintf(", extendedmode=%u, readbuffers=%u}",
+		tprintf(", extendedmode=%#x, readbuffers=%u}",
 			s.parm.capture.extendedmode,
 			s.parm.capture.readbuffers);
 	} else {
@@ -543,12 +582,14 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		printflags(v4l2_streaming_capabilities,
 			   s.parm.output.capability, "V4L2_CAP_???");
 
-		tprintf(", outputmode=%u", s.parm.output.outputmode);
+		tprintf(", outputmode=");
+		printflags(v4l2_capture_modes,
+			   s.parm.output.outputmode, "V4L2_MODE_???");
 
 		tprintf(", timeperframe=" FMT_FRACT,
 			ARGS_FRACT(s.parm.output.timeperframe));
 
-		tprintf(", extendedmode=%u, writebuffers=%u}",
+		tprintf(", extendedmode=%#x, writebuffers=%u}",
 			s.parm.output.extendedmode,
 			s.parm.output.writebuffers);
 	}
@@ -578,7 +619,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_CSTRING(", ", s, name);
 		tprintf(", frameperiod=" FMT_FRACT,
 			ARGS_FRACT(s.frameperiod));
-		tprintf(", framelines=%d", s.framelines);
+		tprintf(", framelines=%u", s.framelines);
 	}
 
 	tprints("}");
@@ -613,7 +654,59 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+/*
+ * We include it here and not before print_v4l2_ext_controls as we need
+ * V4L2_CTRL_CLASS_* definitions for V4L2_CID_*_BASE ones.
+ */
+#include "xlat/v4l2_control_classes.h"
+#include "xlat/v4l2_control_id_bases.h"
 #include "xlat/v4l2_control_ids.h"
+#include "xlat/v4l2_control_query_flags.h"
+
+static void
+print_v4l2_cid(uint32_t cid, bool next_flags)
+{
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		tprintf("%#x", cid);
+		return;
+	}
+
+	if (next_flags) {
+		uint32_t flags = cid & v4l2_control_query_flags->flags_mask;
+
+		if (flags) {
+			printflags(v4l2_control_query_flags, flags,
+				   "V4L2_CTRL_FLAG_NEXT_???");
+			tprints("|");
+
+			cid &= ~flags;
+		}
+	}
+
+	const char *id_name = xlookup(v4l2_control_ids, cid);
+
+	if (id_name) {
+		print_xlat_ex(cid, id_name, XLAT_STYLE_DEFAULT);
+		return;
+	}
+
+	uint64_t class_id = cid;
+	const char *class_str = xlookup_le(v4l2_control_classes, &class_id);
+
+	if (!class_str || (cid - class_id) >= 0x10000) {
+		print_xlat_ex(cid, "V4L2_CID_???", PXF_DEFAULT_STR);
+		return;
+	}
+
+	/*
+	 * As of now, the longest control class name is V4L2_CTRL_CLASS_IMAGE_SOURCE,
+	 * of 28 characters long.
+	 */
+	char tmp_str[64 + sizeof("+%#") + sizeof(class_id) * 2];
+
+	xsprintf(tmp_str, "%s+%#" PRIx64, class_str, cid - class_id);
+	print_xlat_ex(cid, tmp_str, XLAT_STYLE_DEFAULT);
+}
 
 static int
 print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
@@ -625,16 +718,16 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		tprints("{id=");
-		printxval(v4l2_control_ids, c.id, "V4L2_CID_???");
+		print_v4l2_cid(c.id, false);
 		if (!is_get)
 			tprintf(", value=%d", c.value);
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-		tprints(is_get ? ", " : " => ");
-		tprintf("value=%d", c.value);
+		tprintf("%s%d", is_get ? ", value=" : " => ", c.value);
 	}
 
 	tprints("}");
@@ -665,18 +758,18 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : " => ");
+		tprints(is_get ? ", " : "} => {");
 	}
 
 	PRINT_FIELD_CSTRING("", c, name);
 	tprints(", type=");
-	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_TYPE_???");
+	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_???");
 	tprints(", capability=");
-	printxval(v4l2_tuner_capabilities, c.capability,
+	printflags(v4l2_tuner_capabilities, c.capability,
 		  "V4L2_TUNER_CAP_???");
 	tprintf(", rangelow=%u, rangehigh=%u, rxsubchans=",
 		c.rangelow, c.rangehigh);
-	printxval(v4l2_tuner_rxsubchanses, c.rxsubchans,
+	printflags(v4l2_tuner_rxsubchanses, c.rxsubchans,
 		  "V4L2_TUNER_SUB_???");
 	tprints(", audmode=");
 	printxval(v4l2_tuner_audmodes, c.audmode,
@@ -703,39 +796,45 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+		set_tcb_priv_ulong(tcp, c.id);
 		tprints("{id=");
-	} else {
-		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
-			tprints("}");
-			return RVAL_IOCTL_DECODED;
-		}
-		if (get_tcb_priv_ulong(tcp))
-			tprints(" => ");
+		print_v4l2_cid(c.id, true);
+
+		return 0;
 	}
 
-	if (entering(tcp) || get_tcb_priv_ulong(tcp)) {
-#ifdef V4L2_CTRL_FLAG_NEXT_CTRL
-		const unsigned long next = c.id & V4L2_CTRL_FLAG_NEXT_CTRL;
-		set_tcb_priv_ulong(tcp, next);
-		if (next) {
-			tprints("V4L2_CTRL_FLAG_NEXT_CTRL|");
-			c.id &= ~V4L2_CTRL_FLAG_NEXT_CTRL;
-		}
-#endif
-		printxval(v4l2_control_ids, c.id, "V4L2_CID_???");
-	}
-
-	if (exiting(tcp)) {
-		tprints(", type=");
-		printxval(v4l2_control_types, c.type, "V4L2_CTRL_TYPE_???");
-		PRINT_FIELD_CSTRING(", ", c, name);
-		tprintf(", minimum=%d, maximum=%d, step=%d"
-			", default_value=%d, flags=",
-			c.minimum, c.maximum, c.step, c.default_value);
-		printflags(v4l2_control_flags, c.flags, "V4L2_CTRL_FLAG_???");
+	/* exiting */
+	if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
 		tprints("}");
+		return RVAL_IOCTL_DECODED;
 	}
-	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
+
+	unsigned long entry_id = get_tcb_priv_ulong(tcp);
+
+	if (c.id != entry_id) {
+		tprints(" => ");
+		print_v4l2_cid(c.id, false);
+	}
+
+	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
+			 "V4L2_CTRL_TYPE_???");
+	PRINT_FIELD_CSTRING(", ", c, name);
+	if (!abbrev(tcp)) {
+		PRINT_FIELD_D(", ", c, minimum);
+		PRINT_FIELD_D(", ", c, maximum);
+		PRINT_FIELD_D(", ", c, step);
+		PRINT_FIELD_D(", ", c, default_value);
+		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
+				  "V4L2_CTRL_FLAG_???");
+		if (!IS_ARRAY_ZERO(c.reserved))
+			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,
+					  print_xint32_array_member);
+	} else {
+		tprints(", ...");
+	}
+	tprints("}");
+
+	return RVAL_IOCTL_DECODED;
 }
 
 static int
@@ -792,7 +891,6 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	return RVAL_IOCTL_DECODED;
 }
 
-#ifdef VIDIOC_S_EXT_CTRLS
 static bool
 print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
@@ -800,20 +898,17 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 
 	tprints("{id=");
 	printxval(v4l2_control_ids, p->id, "V4L2_CID_???");
-# if HAVE_DECL_V4L2_CTRL_TYPE_STRING
 	tprintf(", size=%u", p->size);
 	if (p->size > 0) {
 		tprints(", string=");
 		printstrn(tcp, ptr_to_kulong(p->string), p->size);
-	} else
-# endif
-	tprintf(", value=%d, value64=%" PRId64, p->value, (int64_t) p->value64);
+	} else {
+		tprintf(", value=%d, value64=%" PRId64, p->value, p->value64);
+	}
 	tprints("}");
 
 	return true;
 }
-
-#include "xlat/v4l2_control_classes.h"
 
 static int
 print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
@@ -841,14 +936,14 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : " => ");
+		tprints(is_get ? ", " : "} => {");
 	}
 
 	tprints("controls=");
 	struct_v4l2_ext_control ctrl;
 	bool fail = !print_array(tcp, ptr_to_kulong(c.controls), c.count,
 				 &ctrl, sizeof(ctrl),
-				 umoven_or_printaddr_ignore_syserror,
+				 tfetch_mem_ignore_syserror,
 				 print_v4l2_ext_control, 0);
 
 	if (exiting(tcp) && syserror(tcp))
@@ -862,22 +957,20 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	/* entering */
 	return 0;
 }
-#endif /* VIDIOC_S_EXT_CTRLS */
 
-#ifdef VIDIOC_ENUM_FRAMESIZES
-# include "xlat/v4l2_framesize_types.h"
+#include "xlat/v4l2_framesize_types.h"
 
 static int
 print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_frmsizeenum s;
+	struct_v4l2_frmsizeenum s;
 
 	if (entering(tcp)) {
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
 		tprintf("{index=%u, pixel_format=", s.index);
-		print_pixelformat(s.pixel_format);
+		print_pixelformat(s.pixel_format, v4l2_pix_fmts);
 		return 0;
 	}
 
@@ -902,22 +995,20 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
 }
-#endif /* VIDIOC_ENUM_FRAMESIZES */
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
-# include "xlat/v4l2_frameinterval_types.h"
+#include "xlat/v4l2_frameinterval_types.h"
 
 static int
 print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct v4l2_frmivalenum f;
+	struct_v4l2_frmivalenum f;
 
 	if (entering(tcp)) {
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 		tprintf("{index=%u, pixel_format=", f.index);
-		print_pixelformat(f.pixel_format);
+		print_pixelformat(f.pixel_format, v4l2_pix_fmts);
 		tprintf(", width=%u, height=%u", f.width, f.height);
 		return 0;
 	}
@@ -946,9 +1037,7 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
 
-#ifdef VIDIOC_CREATE_BUFS
 static int
 print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -975,12 +1064,11 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (syserror(tcp) || umove(tcp, arg, &b))
 		return RVAL_IOCTL_DECODED;
 
-	sprintf(outstr, fmt, b.index, b.count);
+	xsprintf(outstr, fmt, b.index, b.count);
 	tcp->auxstr = outstr;
 
 	return RVAL_IOCTL_DECODED | RVAL_STR;
 }
-#endif /* VIDIOC_CREATE_BUFS */
 
 MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
@@ -1011,7 +1099,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_FBUF: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_FBUF: /* W */
 		return print_v4l2_framebuffer(tcp, arg);
 
@@ -1026,7 +1114,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_STD: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_STD: /* W */
 		tprints(", ");
 		printnum_int64(tcp, arg, "%#" PRIx64);
@@ -1052,7 +1140,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_G_INPUT: /* R */
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_INPUT: /* RW */
 		tprints(", ");
 		printnum_int(tcp, arg, "%u");
@@ -1065,28 +1153,20 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 	case VIDIOC_S_CROP: /* W */
 		return print_v4l2_crop(tcp, arg, code == VIDIOC_G_CROP);
 
-#ifdef VIDIOC_S_EXT_CTRLS
 	case VIDIOC_S_EXT_CTRLS: /* RW */
 	case VIDIOC_TRY_EXT_CTRLS: /* RW */
 	case VIDIOC_G_EXT_CTRLS: /* RW */
 		return print_v4l2_ext_controls(tcp, arg,
 					       code == VIDIOC_G_EXT_CTRLS);
-#endif /* VIDIOC_S_EXT_CTRLS */
 
-#ifdef VIDIOC_ENUM_FRAMESIZES
 	case VIDIOC_ENUM_FRAMESIZES: /* RW */
 		return print_v4l2_frmsizeenum(tcp, arg);
-#endif /* VIDIOC_ENUM_FRAMESIZES */
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
 	case VIDIOC_ENUM_FRAMEINTERVALS: /* RW */
 		return print_v4l2_frmivalenum(tcp, arg);
-#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
 
-#ifdef VIDIOC_CREATE_BUFS
 	case VIDIOC_CREATE_BUFS: /* RW */
 		return print_v4l2_create_buffers(tcp, arg);
-#endif /* VIDIOC_CREATE_BUFS */
 
 	default:
 		return RVAL_DECODED;

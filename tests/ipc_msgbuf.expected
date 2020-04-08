@@ -1,4 +1,0 @@
-msgget\(IPC_PRIVATE, IPC_CREAT\|0700\) += [0-9]*
-msgsnd\([0-9]*, \{233811181, "STRACE_STRING\\0"\}, 14, 0\) += 0
-msgrcv\([0-9]*, \{233811181, "STRACE_STRING\\0"\}, 14, 233811181, 0\) += 14
-msgctl\([0-9]*, (IPC_64\|)?IPC_RMID, NULL\) += 0

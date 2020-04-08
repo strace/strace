@@ -53,12 +53,12 @@
 #ifdef __ia64__
 extern int __clone2(int (*fn) (void *), void *child_stack_base,
 		size_t stack_size, int flags, void *arg, ...);
-#define clone2 __clone2
+# define clone2 __clone2
 #elif defined(__metag__)
-#define clone2(func, stack_base, size, flags, arg...) \
+# define clone2(func, stack_base, size, flags, arg...) \
 	clone(func, stack_base, flags, arg)
 #else
-#define clone2(func, stack_base, size, flags, arg...) \
+# define clone2(func, stack_base, size, flags, arg...) \
 	clone(func, (stack_base) + (size), flags, arg)
 #endif
 /* Direct calls to syscalls, avoiding libc wrappers */

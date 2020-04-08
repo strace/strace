@@ -5,51 +5,24 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2003-2006 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
 #include "ipc_defs.h"
 
-#ifdef HAVE_SYS_MSG_H
-# include <sys/msg.h>
-#elif defined HAVE_LINUX_MSG_H
-# include <linux/msg.h>
-#endif
+#include MSG_H_PROVIDER
 
 #include "xlat/ipc_msg_flags.h"
+#include "xlat/ipc_private.h"
 #include "xlat/resource_flags.h"
 
 SYS_FUNC(msgget)
 {
-	const int key = (int) tcp->u_arg[0];
-	if (key)
-		tprintf("%#x", key);
-	else
-		tprints("IPC_PRIVATE");
+	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
 	tprints(", ");
 	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprints("|");
@@ -99,7 +72,7 @@ fetch_msgrcv_args(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr, &tmp))
 			return -1;
 		pair[0] = tmp[0];
-		pair[1] = tmp[1];
+		pair[1] = (int) tmp[1];
 	}
 	return 0;
 }

@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Check status=none filtering when a non-leader thread invokes execve.
+#
+# Copyright (c) 2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+# Check that PTRACE_EVENT_EXEC support in kernel is good enough.
+# The kernel before commit v3.1-rc1~308^2~7 reported 0 instead of old pid.
+require_min_kernel_version_or_skip 3.1
+
+# This test requires some concurrency between threads.
+require_min_nproc 2
+
+check_prog diff
+run_prog_skip_if_failed date +%s > /dev/null
+s0="$(date +%s)"
+
+run_prog > /dev/null
+
+set -- -a14 -f -e status=${status_filter:-none} $args
+
+# Due to probabilistic nature of the test, try it several times.
+while :; do
+	> "$LOG" || fail_ "failed to write $LOG"
+	rc=0
+	$STRACE -o "$LOG" "$@" > "$EXP" || {
+		rc=$?
+		cat < "$LOG" >&2
+	}
+
+	if [ "$rc" = 0 ] && diff -u -- "$EXP" "$LOG"; then
+		exit 0
+	fi
+
+	s1="$(date +%s)"
+	[ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ] ||
+		continue
+
+	[ "$rc" = 0 ] &&
+		fail_ "$STRACE $* output mismatch" ||
+		fail_ "$STRACE $* failed with code $rc"
+done

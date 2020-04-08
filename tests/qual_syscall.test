@@ -2,6 +2,11 @@
 
 # Check how strace -e abbrev=set, -e raw=set, -e trace=set,
 # and -e verbose=set work.
+#
+# Copyright (c) 2014-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
@@ -23,6 +28,16 @@ check_output_mismatch()
 	}
 }
 
+check_execve_output_mismatch()
+{
+	local what how
+	what="$1"; shift
+	how="$1"; shift
+
+	check_output_mismatch "$@" -e "$what=$how" -e execve
+	check_output_mismatch "$@" "--$what=$how" --trace=execve
+}
+
 check_output_mismatch "$pattern_abbrev_verbose" -e execve
 LC_ALL=C grep -v -x "$pattern_abbrev_verbose" "$LOG" |
 LC_ALL=C grep '^[[:alnum:]_]*(' > /dev/null &&
@@ -42,22 +57,16 @@ LC_ALL=C grep '^[[:alnum:]_]*(' "$LOG" > /dev/null &&
 
 for a in execve \!chdir /. all \!none \
 	 file process \!desc \!ipc \!memory \!network \!signal; do
-	check_output_mismatch \
-		"$pattern_abbrev_verbose" -e abbrev="$a" -e execve
-	check_output_mismatch \
-		"$pattern_raw" -a22 -e raw="$a" -e execve
-	check_output_mismatch \
-		"$pattern_abbrev_verbose" -e verbose="$a" -e execve
+	check_execve_output_mismatch abbrev "$a" "$pattern_abbrev_verbose"
+	check_execve_output_mismatch raw "$a" "$pattern_raw"
+	check_execve_output_mismatch verbose "$a" "$pattern_abbrev_verbose"
 done
 
 for a in \!execve chdir 42 \!all none \
 	 \!file \!process desc ipc memory network signal; do
-	check_output_mismatch \
-		"$pattern_nonabbrev_verbose" -e abbrev="$a" -e execve
-	check_output_mismatch \
-		"$pattern_abbrev_verbose" -e raw="$a" -e execve
-	check_output_mismatch \
-		"$pattern_nonverbose" -a31 -e verbose="$a" -e execve
+	check_execve_output_mismatch abbrev "$a" "$pattern_nonabbrev_verbose"
+	check_execve_output_mismatch raw "$a" "$pattern_abbrev_verbose"
+	check_execve_output_mismatch verbose "$a" "$pattern_nonverbose" --columns=31
 done
 
 exit 0

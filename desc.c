@@ -3,33 +3,14 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
+#include "xstring.h"
 
 SYS_FUNC(close)
 {
@@ -71,8 +52,8 @@ SYS_FUNC(dup3)
 
 static int
 decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
-	      void (*const print_tv_ts) (struct tcb *, kernel_ulong_t),
-	      const char * (*const sprint_tv_ts) (struct tcb *, kernel_ulong_t))
+	      const print_obj_by_addr_fn print_tv_ts,
+	      const sprint_obj_by_addr_fn sprint_tv_ts)
 {
 	int i, j;
 	int nfds, fdsize;
@@ -157,7 +138,9 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 				/* +2 chars needed at the end: ']',NUL */
 				if (outptr < end_outstr - (sizeof(", except [") + sizeof(int)*3 + 2)) {
 					if (first) {
-						outptr += sprintf(outptr, "%s%s [%u",
+						outptr = xappendstr(outstr,
+							outptr,
+							"%s%s [%u",
 							sep,
 							i == 0 ? "in" : i == 1 ? "out" : "except",
 							j
@@ -165,7 +148,9 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 						first = 0;
 						sep = ", ";
 					} else {
-						outptr += sprintf(outptr, " %u", j);
+						outptr = xappendstr(outstr,
+							outptr,
+							" %u", j);
 					}
 				}
 				if (--ready_fds == 0)
@@ -179,7 +164,8 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 		if (args[4]) {
 			const char *str = sprint_tv_ts(tcp, args[4]);
 			if (outptr + sizeof("left ") + strlen(sep) + strlen(str) < end_outstr) {
-				outptr += sprintf(outptr, "%sleft %s", sep, str);
+				outptr = xappendstr(outstr, outptr,
+						    "%sleft %s", sep, str);
 			}
 		}
 		*outptr = '\0';
@@ -190,29 +176,21 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	return 0;
 }
 
+#if HAVE_ARCH_OLD_SELECT
 SYS_FUNC(oldselect)
 {
-	kernel_ulong_t select_args[5];
-	unsigned int oldselect_args[5];
+	kernel_ulong_t *args =
+		fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 5);
 
-	if (sizeof(*select_args) == sizeof(*oldselect_args)) {
-		if (umove_or_printaddr(tcp, tcp->u_arg[0], &select_args)) {
-			return 0;
-		}
+	if (args) {
+		return decode_select(tcp, args, print_timeval, sprint_timeval);
 	} else {
-		unsigned int i;
-
-		if (umove_or_printaddr(tcp, tcp->u_arg[0], &oldselect_args)) {
-			return 0;
-		}
-
-		for (i = 0; i < 5; ++i) {
-			select_args[i] = oldselect_args[i];
-		}
+		if (entering(tcp))
+			printaddr(tcp->u_arg[0]);
+		return RVAL_DECODED;
 	}
-
-	return decode_select(tcp, select_args, print_timeval, sprint_timeval);
 }
+#endif /* HAVE_ARCH_OLD_SELECT */
 
 #ifdef ALPHA
 SYS_FUNC(osf_select)
@@ -246,9 +224,11 @@ umove_kulong_array_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr
 	return umoven_or_printaddr(tcp, addr, n * sizeof(*ptr), ptr);
 }
 
-SYS_FUNC(pselect6)
+static int
+do_pselect6(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+	    const sprint_obj_by_addr_fn sprint_ts)
 {
-	int rc = decode_select(tcp, tcp->u_arg, print_timespec, sprint_timespec);
+	int rc = decode_select(tcp, tcp->u_arg, print_ts, sprint_ts);
 	if (entering(tcp)) {
 		kernel_ulong_t data[2];
 
@@ -263,4 +243,16 @@ SYS_FUNC(pselect6)
 	}
 
 	return rc;
+}
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(pselect6_time32)
+{
+	return do_pselect6(tcp, print_timespec32, sprint_timespec32);
+}
+#endif
+
+SYS_FUNC(pselect6_time64)
+{
+	return do_pselect6(tcp, print_timespec64, sprint_timespec64);
 }

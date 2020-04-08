@@ -1,15 +1,22 @@
+/*
+ * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef STRACE_NSIG_H
-#define STRACE_NSIG_H
+# define STRACE_NSIG_H
 
-#include <signal.h>
+# include <signal.h>
 
-#ifndef NSIG
-# warning NSIG is not defined, using 32
-# define NSIG  32
-#elif NSIG < 32
-# error NSIG < 32
-#endif
+# ifndef NSIG
+#  warning NSIG is not defined, using 32
+#  define NSIG  32
+# elif NSIG < 32
+#  error NSIG < 32
+# endif
 
-#define NSIG_BYTES	(NSIG / 8)
+# define NSIG_BYTES	(NSIG / 8)
 
 #endif /* !STRACE_NSIG_H */

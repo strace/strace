@@ -2,47 +2,91 @@
  * Check decoding of set_mempolicy syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_set_mempolicy
 
-# include <errno.h>
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
 
-# include "xlat.h"
-# include "xlat/policies.h"
-
 # define MAX_STRLEN 3
 # define NLONGS(n) ((n + 8 * sizeof(long) - 2) \
 		      / (8 * sizeof(long)))
+
+static const char *errstr;
+
+static long
+k_set_mempolicy(const unsigned int mode,
+		const void *const nmask,
+		const unsigned long maxnode)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
+	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
+	const kernel_ulong_t arg1 = fill | mode;
+	const kernel_ulong_t arg2 = (unsigned long) nmask;
+	const kernel_ulong_t arg3 = maxnode;
+	const long rc = syscall(__NR_set_mempolicy,
+				arg1, arg2, arg3, bad, bad, bad);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
+# if XLAT_RAW
+#  define out_str	raw
+# elif XLAT_VERBOSE
+#  define out_str	verbose
+# else
+#  define out_str	abbrev
+# endif
+
+static struct {
+	unsigned int val;
+	const char *raw;
+	const char *verbose;
+	const char *abbrev;
+} mpol_modes[] = {
+	{ ARG_STR(0),
+	  "0 /* MPOL_DEFAULT */",
+	  "MPOL_DEFAULT" },
+	{ ARG_STR(0x1),
+	  "0x1 /* MPOL_PREFERRED */",
+	  "MPOL_PREFERRED" },
+	{ ARG_STR(0x2),
+	  "0x2 /* MPOL_BIND */",
+	  "MPOL_BIND" },
+	{ ARG_STR(0x3),
+	  "0x3 /* MPOL_INTERLEAVE */",
+	  "MPOL_INTERLEAVE" },
+	{ ARG_STR(0x4),
+	  "0x4 /* MPOL_LOCAL */",
+	  "MPOL_LOCAL" },
+	{ ARG_STR(0x8000),
+	  "0x8000 /* MPOL_DEFAULT|MPOL_F_STATIC_NODES */",
+	  "MPOL_DEFAULT|MPOL_F_STATIC_NODES" },
+	{ ARG_STR(0x4001),
+	  "0x4001 /* MPOL_PREFERRED|MPOL_F_RELATIVE_NODES */",
+	  "MPOL_PREFERRED|MPOL_F_RELATIVE_NODES" },
+	{ ARG_STR(0xc002),
+	  "0xc002 /* MPOL_BIND|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES */",
+	  "MPOL_BIND|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES" },
+	{ ARG_STR(0x5),
+	  "0x5 /* MPOL_??? */",
+	  "0x5 /* MPOL_??? */" },
+	{ ARG_STR(0xffff3fff),
+	  "0xffff3fff /* MPOL_??? */",
+	  "0xffff3fff /* MPOL_??? */" },
+	{ ARG_STR(0xffffffff),
+	  "0xffffffff /* MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffff3fff */",
+	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffff3fff" }
+};
 
 static void
 print_nodes(const unsigned long maxnode, unsigned int offset)
@@ -57,10 +101,9 @@ print_nodes(const unsigned long maxnode, unsigned int offset)
 		tail_alloc(size ? size : (offset ? 1 : 0));
 	memset(nodemask, 0, size);
 
-	long rc = syscall(__NR_set_mempolicy, 0, nodemask, maxnode);
-	const char *errstr = sprintrc(rc);
+	k_set_mempolicy(mpol_modes[0].val, nodemask, maxnode);
 
-	fputs("set_mempolicy(MPOL_DEFAULT, ", stdout);
+	printf("set_mempolicy(%s, ", mpol_modes[0].out_str);
 
 	if (nlongs) {
 		putc('[', stdout);
@@ -76,7 +119,7 @@ print_nodes(const unsigned long maxnode, unsigned int offset)
 				printf("%#0*lx", (int) sizeof(long) * 2 + 2,
 				       nodemask[i]);
 			} else {
-				printf("%p", nodemask + i);
+				printf("... /* %p */", nodemask + i);
 				break;
 			}
 		}
@@ -122,15 +165,24 @@ test_offset(const unsigned int offset)
 int
 main(void)
 {
-	if (syscall(__NR_set_mempolicy, 0, 0, 0))
+	if (k_set_mempolicy(mpol_modes[0].val, 0, 0))
 		perror_msg_and_skip("set_mempolicy");
-	puts("set_mempolicy(MPOL_DEFAULT, NULL, 0) = 0");
+	printf("set_mempolicy(%s, NULL, 0) = 0\n", mpol_modes[0].out_str);
 
 	const unsigned long *nodemask = (void *) 0xfacefeedfffffffeULL;
-	const unsigned long maxnode = (unsigned long) 0xcafef00dbadc0dedULL;
-	long rc = syscall(__NR_set_mempolicy, 1, nodemask, maxnode);
-	printf("set_mempolicy(MPOL_PREFERRED, %p, %lu) = %s\n",
-	       nodemask, maxnode, sprintrc(rc));
+	const unsigned long maxnode = (unsigned long) 0xcafef00ddeadbeefULL;
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(mpol_modes); ++i) {
+		if (i) {
+			k_set_mempolicy(mpol_modes[i].val, 0, 0);
+			printf("set_mempolicy(%s, NULL, 0) = %s\n",
+			       mpol_modes[i].out_str, errstr);
+		}
+
+		k_set_mempolicy(mpol_modes[i].val, nodemask, maxnode);
+		printf("set_mempolicy(%s, %p, %lu) = %s\n",
+		       mpol_modes[i].out_str, nodemask, maxnode, errstr);
+	}
 
 	test_offset(0);
 	test_offset(1);

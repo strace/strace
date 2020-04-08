@@ -3,84 +3,236 @@
 # Check strace options syntax.
 #
 # Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2016-2017 The strace developers.
+# Copyright (c) 2016-2020 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/syntax.sh"
 
 check_e "Invalid process id: '0'" -p 0
+check_e "Invalid process id: '0'" --attach=0
 check_e "Invalid process id: '-42'" -p -42
+check_e "Invalid process id: '-42'" --attach=-42
 check_e "Invalid process id: '$$.'" -p $$.
+check_e "Invalid process id: '$$.'" --attach=$$.
 check_e "Invalid process id: 'a'" -p 1,a
+check_e "Invalid process id: 'a'" --attach=1,a
 check_e "Syscall 'chdir' for -b isn't supported" -b chdir
+check_e "Syscall 'chdir' for -b isn't supported" --detach-on=chdir
 check_e "Syscall 'chdir' for -b isn't supported" -b execve -b chdir
-
-check_e "invalid system call '-1'" -e-1
-check_e "invalid system call '-2'" -e -2
-check_e "invalid system call '-3'" -etrace=-3
-check_e "invalid system call '-4'" -e trace=-4
-check_e "invalid system call '-5'" -e trace=1,-5
-check_e "invalid system call '/non_syscall'" -e trace=/non_syscall
-check_e "invalid system call '2147483647'" -e 2147483647
-check_e "invalid system call '2147483648'" -e 2147483648
-check_e "invalid system call '4294967295'" -e 4294967295
-check_e "invalid system call '4294967296'" -e 4294967296
-
-check_e "invalid descriptor '-1'" -eread=-1
-check_e "invalid descriptor '-42'" -ewrite=-42
-check_e "invalid descriptor '2147483648'" -eread=2147483648
-check_e "invalid descriptor '4294967296'" -ewrite=4294967296
-check_e "invalid descriptor 'foo'" -eread=foo
-check_e "invalid descriptor ''" -ewrite=
-check_e "invalid descriptor ','" -eread=,
-check_e "invalid descriptor '!'" -ewrite='!'
-check_e "invalid descriptor '!'" -eread='0,!'
-check_e "invalid descriptor '!,'" -ewrite='!,'
-
-check_e_using_grep 'regcomp: \+id: [[:alpha:]].+' -e trace='/+id'
-check_e_using_grep 'regcomp: \*id: [[:alpha:]].+' -e trace='/*id'
-check_e_using_grep 'regcomp: \{id: [[:alpha:]].+' -e trace='/{id'
-check_e_using_grep 'regcomp: \(id: [[:alpha:]].+' -e trace='/(id'
-check_e_using_grep 'regcomp: \[id: [[:alpha:]].+' -e trace='/[id'
+check_e "Syscall 'chdir' for -b isn't supported" --detach-on=execve --detach-on=chdir
 
 check_e_using_grep 'exec: File *name too long' "$(printf '%4096s' ' ')"
 
+ff_name="$(printf '%4084s' ' ')"
+check_e_using_grep "$ff_name: File *name too long" -ff -o "$ff_name" true
+check_e_using_grep "$ff_name: File *name too long" -ff --output="$ff_name" true
+
 check_h 'must have PROG [ARGS] or -p PID'
-check_h 'PROG [ARGS] must be specified with -D' -D -p $$
-check_h '-c and -C are mutually exclusive' -c -C true
-check_h '-c and -C are mutually exclusive' -C -c true
-check_h '(-c or -C) and -ff are mutually exclusive' -c -ff true
-check_h '(-c or -C) and -ff are mutually exclusive' -C -ff true
-check_h '-w must be given with (-c or -C)' -w true
-check_h 'piping the output and -ff are mutually exclusive' -o '|' -ff true
-check_h 'piping the output and -ff are mutually exclusive' -o '!' -ff true
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,s
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=s,
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=,,
+check_h "must have PROG [ARGS] or -p PID" --absolute-timestamps=s,,none
+check_h "must have PROG [ARGS] or -p PID" --timestamps --absolute-timestamps=ns --timestamps=none --absolute-timestamps=format:time,precision:s --timestamps=ns,format:unix --absolute-timestamps=us,precision:ms,unix,precision:ns --timestamps=format:none,time,precision:us
+check_h "invalid --absolute-timestamps argument: 'ss'" --absolute-timestamps=ss
+check_h "invalid --timestamps argument: 'format:s'" --timestamps=format:s
+check_h "invalid --timestamps argument: 's,non'" --timestamps=s,non
+check_h "invalid --timestamps argument: 'precision:none'" --timestamps=precision:none
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --timestamps -p $$
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' --absolute-timestamps -ttt -p $$
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' -t --timestamps=ns -t -p $$
+check_e '-t and --absolute-timestamps cannot be provided simultaneously' --timestamps=ns -t --absolute-timestamps=unix -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDD -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDDD -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' --daemonize -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' --daemonize=grandchild -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' --daemonize=pgroup -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' --daemonize=Pgrp -p $$
+check_h 'PROG [ARGS] must be specified with -D/--daemonize' --daemonize=SESSION -p $$
+check_h 'Too many -D'\''s (4), maximum supported -D count is 3' -DDDD /bin/true
+check_e '-D and --daemonize cannot be provided simultaneously' -D --daemonize -p $$
+check_e '-D and --daemonize cannot be provided simultaneously' --daemonize -D -p $$
+check_e '-D and --daemonize cannot be provided simultaneously' --daemonize -v -D /bit/true
+check_h "invalid --daemonize argument: 'pgr'" --daemonize=pgr
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' -c -C true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' --summary-only --summary true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' -C -c true
+check_h '-c/--summary-only and -C/--summary are mutually exclusive' --summary --summary-only true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' -c -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' --summary-only -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' -C -ff true
+check_h '(-c/--summary-only or -C/--summary) and -ff/--output-separately are mutually exclusive' --summary -ff true
+check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -w true
+check_h '-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --summary-wall-clock true
+check_h '-U/--summary-columns must be given with (-c/--summary-only or -C/--summary)' -U name,time,count,errors true
+check_h '-U/--summary-columns must be given with (-c/--summary-only or -C/--summary)' --summary-columns=name,time,count,errors true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' -o '|' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' --output='|' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' -o '!' -ff true
+check_h 'piping the output and -ff/--output-separately are mutually exclusive' --output='!' -ff true
 check_h "invalid -a argument: '-42'" -a -42
 check_h "invalid -O argument: '-42'" -O -42
 check_h "invalid -s argument: '-42'" -s -42
+check_h "invalid --string-limit argument: '-42'" --string-limit=-42
 check_h "invalid -s argument: '1073741824'" -s 1073741824
+check_h "invalid --string-limit argument: '1073741824'" --string-limit=1073741824
+check_h "must have PROG [ARGS] or -p PID" --follow-forks
+check_h "must have PROG [ARGS] or -p PID" --follow-forks --output-separately
+check_h "must have PROG [ARGS] or -p PID" -f --output-separately
+check_h "must have PROG [ARGS] or -p PID" --output-separately
+check_e '-f and --follow-forks cannot be provided simultaneously' -f --follow-forks -p $$
+check_e '-ff and --output-separately cannot be provided simultaneously' --output-separately -ff -p $$
+check_h "invalid -I argument: '0x1'" -I 0x1
+check_h "invalid -I argument: '0'" -I 0
+check_h "must have PROG [ARGS] or -p PID" -I1
+check_h "must have PROG [ARGS] or -p PID" -I 2
+check_h "must have PROG [ARGS] or -p PID" -I3
+check_h "must have PROG [ARGS] or -p PID" -I 4
 check_h "invalid -I argument: '5'" -I 5
+check_h "must have PROG [ARGS] or -p PID" -I always
+check_h "must have PROG [ARGS] or -p PID" -I anywhere
+check_h "must have PROG [ARGS] or -p PID" -Iwaiting
+check_h "must have PROG [ARGS] or -p PID" -I never
+check_h "must have PROG [ARGS] or -p PID" -Inever_tstp
+check_h "invalid -I argument: '=never'" -I=never
+check_h "invalid -I argument: 'nevertheless'" -Inevertheless
+check_h "invalid -I argument: 'nev'" -Inev
+check_h "invalid --interruptible argument: '0x1'" --interruptible=0x1
+check_h "invalid --interruptible argument: '0'" --interruptible=0
+check_h "must have PROG [ARGS] or -p PID" --interruptible 1
+check_h "must have PROG [ARGS] or -p PID" --interruptible=2
+check_h "invalid --interruptible argument: '5'" --interruptible=5
+check_h "must have PROG [ARGS] or -p PID" --interruptible=anywhere
+check_h "must have PROG [ARGS] or -p PID" --interruptible=waiting
+check_h "must have PROG [ARGS] or -p PID" --interruptible=never
+check_h "must have PROG [ARGS] or -p PID" --interruptible=never_tstp
+check_h "invalid --interruptible argument: 'nevertheless'" --interruptible=nevertheless
+check_h "invalid --interruptible argument: 'nev'" --interruptible=nev
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=s
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=ms
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=us
+check_h "must have PROG [ARGS] or -p PID" --relative-timestamps=ns
+check_h "invalid --relative-timestamps argument: 'n'" --relative-timestamps=n
+check_h "invalid --relative-timestamps argument: 'ss'" --relative-timestamps=ss
+check_h "must have PROG [ARGS] or -p PID" --syscall-times
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=s
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=ms
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=us
+check_h "must have PROG [ARGS] or -p PID" --syscall-times=ns
+check_h "invalid --syscall-times argument: 'n'" --syscall-times=n
+check_h "invalid --syscall-times argument: 'ss'" --syscall-times=ss
+check_h "must have PROG [ARGS] or -p PID" --strings-in-hex
+check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=all
+check_h "must have PROG [ARGS] or -p PID" --strings-in-hex=non-ascii
+check_h "invalid --strings-in-hex argument: 'al'" --strings-in-hex=al
+check_h "invalid --strings-in-hex argument: 'alll'" --strings-in-hex=alll
+check_h "invalid --strings-in-hex argument: 'ascii'" --strings-in-hex=ascii
+check_h "must have PROG [ARGS] or -p PID" --quiet=all
+check_h "must have PROG [ARGS] or -p PID" --quiet=none
+check_h "must have PROG [ARGS] or -p PID" --quiet=\!attach
+check_h "must have PROG [ARGS] or -p PID" --quiet=exit,exits,personality
+check_e "invalid quiet 'detach'" --quiet=detach -p $$
+check_e "invalid quiet 'fds'" -q --quiet=fds -p $$
+check_e "invalid quiet 'detach'" --quiet=detach -p $$
+check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -p $$
+check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
+check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
+
+for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg calls count error errors name syscall syscall_name syscall-name none nothing; do
+	check_h "must have PROG [ARGS] or -p PID" -S "$i"
+	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
+	if [ "x$i" != xnone -a "x$i" != xnothing ]; then
+		check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
+		check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
+	fi
+done
+for i in time,time_total,avg_time,calls,errors,name time_percent,total_time,time_avg,count,error,syscall_name; do
+	check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
+	check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
+done
+for i in non syscall_names; do
+	check_h "invalid sortby: '$i'" -S "$i"
+	check_h "invalid sortby: '$i'" --summary-sort-by="$i"
+	check_h "unknown column name: '$i'" -U "$i"
+	check_h "unknown column name: '$i'" --summary-columns="$i"
+done
+check_h "unknown column name: ''" -U time,,name
+check_h "call summary column has been provided more than once: 'time_percent' (-U option residual: 'time_percent,time_total')" -U time,time_percent,time_total
+
+check_e '-x and --strings-in-hex cannot be provided simultaneously' -x --strings-in-hex -p $$
+check_e '-x and --strings-in-hex cannot be provided simultaneously' --strings-in-hex -p $$ -xx
+check_h "invalid -X argument: 'test'" -Xtest
+check_h "invalid --const-print-style argument: 'test'" --const-print-style=test
+check_h "invalid -X argument: 'a'" -Xa
+check_h "invalid --const-print-style argument: 'a'" --const-print-style=a
+check_h "invalid -X argument: 'abbreviated'" -X abbreviated
+check_h "invalid --const-print-style argument: 'abbreviated'" --const-print-style=abbreviated
+check_h "must have PROG [ARGS] or -p PID" --decode-fds
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=all
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=none
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=path
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=socket,dev
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=\!path
+check_h "must have PROG [ARGS] or -p PID" --decode-fds=socket,path,dev
+check_e "invalid decode-fds 'p'" --decode-fds=p -p $$
+check_e "invalid decode-fds 'device'" -y --decode-fds=device -p $$
+check_e "invalid decode-fds 'name'" --decode-fds=path,name -p $$
+check_e "invalid decode-fds 'sock'" -e decode-fd=sock -y -p $$
+check_e '-y and --decode-fds cannot be provided simultaneously' -y --decode-fds -p $$
+check_e '-y and --decode-fds cannot be provided simultaneously' -e decode-fd=all -yy -p $$
+check_e '-y and --decode-fds cannot be provided simultaneously' --decode-fds=none -y -p $$
+
+check_h "incorrect personality designator '' in qualification 'getcwd@'" -e trace=getcwd@
+check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=getcwd@42
+check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=gettid,getcwd@42
+check_h "incorrect personality designator '42' in qualification '23@42'" -e trace=23@42,123
+
+check_h '--seccomp-bpf cannot be used without -f/--follow-forks, disabling
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -w /
+check_h '--seccomp-bpf is not enabled for processes attached with -p
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -f -p 1 -w
+
+check_h 'option -F is deprecated, please use -f/--follow-forks instead
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -F -w /
+check_h 'option -F is deprecated, please use -f/--follow-forks instead
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -FF -w /
+check_h 'deprecated option -F ignored
+-w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -fF -w /
+
+check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
+check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
+check_e "invalid -e kvm= argument: 'chdir'" --kvm=chdir
+
+case "$STRACE_NATIVE_ARCH" in
+x86_64)
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@x32
+	;;
+x32)
+	check_h "incorrect personality designator '64' in qualification 'getcwd@64'" -e trace=getcwd@64
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@x32
+	;;
+aarch64|powerpc64|s390x|sparc64|tile)
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@32
+	check_h "incorrect personality designator 'x32' in qualification 'getcwd@x32'" -e trace=getcwd@x32
+	;;
+*)
+	pers="$((SIZEOF_LONG * 8))"
+	inv_pers="$((96 - pers))"
+	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@"$pers"
+	check_h "incorrect personality designator '$inv_pers' in qualification 'getcwd@$inv_pers'" -e trace=getcwd@"$inv_pers"
+	check_h "incorrect personality designator 'x32' in qualification 'getcwd@x32'" -e trace=getcwd@x32
+esac
 
 ../zeroargc "$STRACE_EXE" /bin/true 2> "$LOG" &&
 	dump_log_and_fail_with \
@@ -98,28 +250,61 @@ diff -u -- "$EXP" "$LOG" > /dev/null || {
 		"zeroargc $STRACE $args output mismatch"
 }
 
-if [ -n "${UID-}" ]; then
-	if [ "${UID-}" = 0 ]; then
+uid="${UID:-`id -u`}"
+if [ "$uid" -ge 0 ]; then
+	if [ "$uid" -eq 0 ]; then
 		umsg="Cannot find user ':nosuchuser:'"
 	else
-		umsg='You must be root to use the -u option'
+		umsg='You must be root to use the -u/--username option'
 	fi
 
 	check_e "$umsg" -u :nosuchuser: true
 
-	for c in i r t T y; do
-		check_e "-$c has no effect with -c
-$STRACE_EXE: $umsg" -u :nosuchuser: -c -$c true
+	for c in i/--instruction-pointer r/--relative-timestamps t/--absolute-timestamps T/--syscall-times y/--decode-fds; do
+		check_e "-$c has no effect with -c/--summary-only
+$STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 	done
-		check_e "-i has no effect with -c
-$STRACE_EXE: -r has no effect with -c
-$STRACE_EXE: -t has no effect with -c
-$STRACE_EXE: -T has no effect with -c
-$STRACE_EXE: -y has no effect with -c
-$STRACE_EXE: $umsg" -u :nosuchuser: -cirtTy true
 
-	check_e "-tt has no effect with -r
-$STRACE_EXE: $umsg" -u :nosuchuser: -r -tt true
+	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
+$STRACE_EXE: -r/--relative-timestamps has no effect with -c/--summary-only
+$STRACE_EXE: -t/--absolute-timestamps has no effect with -c/--summary-only
+$STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
+$STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
+$STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
+
+	for c in --output-separately -A/--output-append-mode; do
+		check_e "$c has no effect without -o/--output
+$STRACE_EXE: $umsg" -u :nosuchuser: ${c%%/*} true
+	done
+
+	check_e "-S/--summary-sort-by has no effect without (-c/--summary-only or -C/--summary)
+$STRACE_EXE: $umsg" -u :nosuchuser: --summary-sort-by errors true
+
+	check_e "--output-separately has no effect without -o/--output
+$STRACE_EXE: -A/--output-append-mode has no effect without -o/--output
+$STRACE_EXE: $umsg" -u :nosuchuser: --output-separately --output-append-mode true
+
+	check_e "$umsg" -u :nosuchuser: -ff true
+	check_e "$umsg" -u :nosuchuser: --output-separately --follow-forks true
+
+	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: -z --successful-only true
+	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: --successful-only -Z true
+	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
+$STRACE_EXE: $umsg" -u :nosuchuser: --successful-only --failed-only true
+
+	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
+$STRACE_EXE: $umsg" --user=:nosuchuser: --instruction-pointer --summary-only true
+fi
+
+check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' -d /
+check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
+
+if [ -z "$(get_config_option ENABLE_STACKTRACE 1)" ]; then
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" -k
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces
 fi
 
 args='-p 2147483647'

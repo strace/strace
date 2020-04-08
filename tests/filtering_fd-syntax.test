@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Check descriptor set parsing syntax.
+#
+# Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/syntax.sh"
+
+check_fd_qualify()
+{
+	check_e "invalid descriptor '$1'" -e"read=$2"
+	check_e "invalid descriptor '$1'" -e "read=$2"
+	check_e "invalid descriptor '$1'" "--read=$2"
+	check_e "invalid descriptor '$1'" -e"write=$2"
+	check_e "invalid descriptor '$1'" -e "write=$2"
+	check_e "invalid descriptor '$1'" "--write=$2"
+}
+
+for arg in '' , ,, ,,, ; do
+	check_fd_qualify "$arg" "$arg"
+	check_fd_qualify "!$arg" "!$arg"
+done
+
+for arg in -1 -42 \
+	   not_fd \
+	   2147483648 \
+	   4294967296 \
+	   ; do
+	check_fd_qualify "$arg" "$arg"
+	check_fd_qualify "$arg" "1,$arg"
+	check_fd_qualify "$arg" "$arg,1"
+	check_fd_qualify "$arg" "!$arg"
+done
+
+for arg in ! all none; do
+	check_fd_qualify "$arg" "1,$arg"
+	check_fd_qualify "!$arg" "1,!$arg"
+done

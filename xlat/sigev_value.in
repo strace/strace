@@ -1,3 +1,4 @@
+#value_indexed
 SIGEV_SIGNAL 0
 SIGEV_NONE 1
 SIGEV_THREAD 2

@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2004-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -37,6 +17,12 @@
 typedef struct rtc_pll_info struct_rtc_pll_info;
 
 #include MPERS_DEFS
+
+#include "xlat/rtc_vl_flags.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/rtc_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 static void
 print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
@@ -85,6 +71,19 @@ decode_rtc_pll_info(struct tcb *const tcp, const kernel_ulong_t addr)
 			pll.pll_posmult, pll.pll_negmult, (long) pll.pll_clock);
 }
 
+static void
+decode_rtc_vl(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	unsigned int val;
+
+	if (umove_or_printaddr(tcp, addr, &val))
+		return;
+
+	tprints("[");
+	printflags(rtc_vl_flags, val, "RTC_VL_???");
+	tprints("]");
+}
+
 MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
 {
@@ -93,7 +92,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_RD_TIME:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case RTC_ALM_SET:
 	case RTC_SET_TIME:
 		tprints(", ");
@@ -113,7 +112,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_WKALM_RD:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case RTC_WKALM_SET:
 		tprints(", ");
 		decode_rtc_wkalrm(tcp, arg);
@@ -121,19 +120,17 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_PLL_GET:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	case RTC_PLL_SET:
 		tprints(", ");
 		decode_rtc_pll_info(tcp, arg);
 		break;
-#ifdef RTC_VL_READ
 	case RTC_VL_READ:
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
-		printnum_int(tcp, arg, "%d");
+		decode_rtc_vl(tcp, arg);
 		break;
-#endif
 	case RTC_AIE_ON:
 	case RTC_AIE_OFF:
 	case RTC_UIE_ON:
@@ -142,9 +139,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 	case RTC_PIE_OFF:
 	case RTC_WIE_ON:
 	case RTC_WIE_OFF:
-#ifdef RTC_VL_CLR
 	case RTC_VL_CLR:
-#endif
 		/* no args */
 		break;
 	default:

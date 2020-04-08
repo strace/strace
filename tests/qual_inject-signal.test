@@ -1,8 +1,17 @@
 #!/bin/sh
-
+#
 # Check signal injection.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 . "${srcdir=.}/init.sh"
 
-run_strace -a12 -echdir,exit_group -einject=chdir:signal=USR1 \
+: ${suffix=}
+[ -z "${name_override-}" ] || NAME="$name_override"
+
+run_strace -a12 -echdir,exit_group -einject=chdir:signal=USR1"$suffix" \
 	../$NAME
 match_diff

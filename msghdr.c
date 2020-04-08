@@ -4,30 +4,10 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -37,6 +17,9 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#define XLAT_MACROS_ONLY
+#include "xlat/sock_options.h"
+#undef XLAT_MACROS_ONLY
 #include "xlat/msg_flags.h"
 #include "xlat/scmvals.h"
 #include "xlat/ip_cmsg_types.h"
@@ -100,24 +83,45 @@ print_scm_security(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
-print_scm_timestamp(struct tcb *tcp, const void *cmsg_data,
-		    const unsigned int data_len)
+print_scm_timestamp_old(struct tcb *tcp, const void *cmsg_data,
+			const unsigned int data_len)
 {
 	print_struct_timeval_data_size(cmsg_data, data_len);
 }
 
 static void
-print_scm_timestampns(struct tcb *tcp, const void *cmsg_data,
-		      const unsigned int data_len)
+print_scm_timestampns_old(struct tcb *tcp, const void *cmsg_data,
+			  const unsigned int data_len)
 {
 	print_struct_timespec_data_size(cmsg_data, data_len);
 }
 
 static void
-print_scm_timestamping(struct tcb *tcp, const void *cmsg_data,
-		       const unsigned int data_len)
+print_scm_timestamping_old(struct tcb *tcp, const void *cmsg_data,
+			   const unsigned int data_len)
 {
 	print_struct_timespec_array_data_size(cmsg_data, 3, data_len);
+}
+
+static void
+print_scm_timestamp_new(struct tcb *tcp, const void *cmsg_data,
+			const unsigned int data_len)
+{
+	print_timeval64_data_size(cmsg_data, data_len);
+}
+
+static void
+print_scm_timestampns_new(struct tcb *tcp, const void *cmsg_data,
+			const unsigned int data_len)
+{
+	print_timespec64_data_size(cmsg_data, data_len);
+}
+
+static void
+print_scm_timestamping_new(struct tcb *tcp, const void *cmsg_data,
+			   const unsigned int data_len)
+{
+	print_timespec64_array_data_size(cmsg_data, 3, data_len);
 }
 
 static void
@@ -127,8 +131,8 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 	const struct in_pktinfo *info = cmsg_data;
 
 	PRINT_FIELD_IFINDEX("{", *info, ipi_ifindex);
-	PRINT_FIELD_INET4_ADDR(", ", *info, ipi_spec_dst);
-	PRINT_FIELD_INET4_ADDR(", ", *info, ipi_addr);
+	PRINT_FIELD_INET_ADDR(", ", *info, ipi_spec_dst, AF_INET);
+	PRINT_FIELD_INET_ADDR(", ", *info, ipi_addr, AF_INET);
 	tprints("}");
 }
 
@@ -217,9 +221,12 @@ static const struct {
 	[SCM_RIGHTS] = { print_scm_rights, sizeof(int) },
 	[SCM_CREDENTIALS] = { print_scm_creds, sizeof(struct ucred) },
 	[SCM_SECURITY] = { print_scm_security, 1 },
-	[SCM_TIMESTAMP] = { print_scm_timestamp, 1 },
-	[SCM_TIMESTAMPNS] = { print_scm_timestampns, 1 },
-	[SCM_TIMESTAMPING] = { print_scm_timestamping, 1 }
+	[SO_TIMESTAMP_OLD] = { print_scm_timestamp_old, 1 },
+	[SO_TIMESTAMPNS_OLD] = { print_scm_timestampns_old, 1 },
+	[SO_TIMESTAMPING_OLD] = { print_scm_timestamping_old, 1 },
+	[SO_TIMESTAMP_NEW] = { print_scm_timestamp_new, 1 },
+	[SO_TIMESTAMPNS_NEW] = { print_scm_timestampns_new, 1 },
+	[SO_TIMESTAMPING_NEW] = { print_scm_timestamping_new, 1 }
 }, cmsg_ip_printers[] = {
 	[IP_PKTINFO] = { print_cmsg_ip_pktinfo, sizeof(struct in_pktinfo) },
 	[IP_TTL] = { print_cmsg_uint, sizeof(unsigned int) },
@@ -262,12 +269,12 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 }
 
 static unsigned int
-get_optmem_max(void)
+get_optmem_max(struct tcb *tcp)
 {
 	static int optmem_max;
 
 	if (!optmem_max) {
-		if (read_int_from_file("/proc/sys/net/core/optmem_max",
+		if (read_int_from_file(tcp, "/proc/sys/net/core/optmem_max",
 				       &optmem_max) || optmem_max <= 0) {
 			optmem_max = sizeof(long long) * (2 * IOV_MAX + 512);
 		} else {
@@ -293,8 +300,8 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 #endif
 			sizeof(struct cmsghdr);
 
-	unsigned int control_len = in_control_len > get_optmem_max()
-				   ? get_optmem_max() : in_control_len;
+	unsigned int control_len = in_control_len > get_optmem_max(tcp)
+				   ? get_optmem_max(tcp) : in_control_len;
 	unsigned int buf_len = control_len;
 	char *buf = buf_len < cmsg_size ? NULL : malloc(buf_len);
 	if (!buf || umoven(tcp, addr, buf_len, buf) < 0) {
@@ -350,8 +357,8 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 		buf_len -= len;
 	}
 	if (buf_len) {
-		tprints(", ");
-		printaddr(addr + (control_len - buf_len));
+		tprints(", ...");
+		printaddr_comment(addr + (control_len - buf_len));
 	} else if (control_len < in_control_len) {
 		tprints(", ...");
 	}

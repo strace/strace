@@ -1,9 +1,18 @@
 #!/bin/sh
-
+#
 # Check -E option.
+#
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
 run_prog ../sleep 0 > /dev/null
 run_strace -E option_E_var=OPTION_E_VAL -v $args
+match_grep
+
+run_prog ../sleep 0 > /dev/null
+run_strace --env=option_E_var=OPTION_E_VAL --no-abbrev $args
 match_grep

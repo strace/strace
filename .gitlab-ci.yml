@@ -1,37 +1,83 @@
-image: "ubuntu:17.10"
+image: "ubuntu:18.04"
 
 before_script:
-  - ./travis-install.sh
+  - ci/install-dependencies.sh
 
 variables:
   GIT_DEPTH: "2147483647"
   SLEEP_A_BIT: "sleep 0.2"
   VERBOSE: "1"
+  KBRANCH: "v5.6"
 
-gcc-x86_64:
+gcc-x86_64-libdw-mainline:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "gcc"
     TARGET: "x86_64"
+    STACKTRACE: "libdw"
+    KHEADERS: "torvalds/linux"
 
-gcc-x86:
+gcc-x86_64-libdw:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
+  variables:
+    CC: "gcc"
+    TARGET: "x86_64"
+    STACKTRACE: "libdw"
+
+gcc-x86_64-libunwind:
+  stage: test
+  script: ci/run-build-and-tests.sh
+  variables:
+    CC: "gcc"
+    TARGET: "x86_64"
+    STACKTRACE: "libunwind"
+
+gcc-x86_64-nounwind:
+  stage: test
+  script: ci/run-build-and-tests.sh
+  variables:
+    CC: "gcc"
+    TARGET: "x86_64"
+    STACKTRACE: "no"
+
+gcc-x86-nounwind:
+  stage: test
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "gcc"
     TARGET: "x86"
+    STACKTRACE: "no"
 
-clang-x86_64:
+clang-x86_64-libdw:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "clang"
     TARGET: "x86_64"
+    STACKTRACE: "libdw"
 
-clang-x86:
+clang-x86_64-libunwind:
   stage: test
-  script: ./travis-build.sh
+  script: ci/run-build-and-tests.sh
+  variables:
+    CC: "clang"
+    TARGET: "x86_64"
+    STACKTRACE: "libunwind"
+
+clang-x86_64-nounwind:
+  stage: test
+  script: ci/run-build-and-tests.sh
+  variables:
+    CC: "clang"
+    TARGET: "x86_64"
+    STACKTRACE: "no"
+
+clang-x86-nounwind:
+  stage: test
+  script: ci/run-build-and-tests.sh
   variables:
     CC: "clang"
     TARGET: "x86"
+    STACKTRACE: "no"

@@ -1,0 +1,2 @@
+^chdir .*(__kernel_vsyscaln )?(__)?chdir f3 f2 f1 f0 main
+^SIGURG .*(__kernel_vsyscaln )?(__)?kill f3 f2 f1 f0 main

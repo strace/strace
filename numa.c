@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2003-2007 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -59,7 +39,7 @@ print_nodemask(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	kernel_ulong_t buf;
 	print_array(tcp, addr, nmemb, &buf, current_wordsize,
-		    umoven_or_printaddr, print_node, 0);
+		    tfetch_mem, print_node, 0);
 }
 
 SYS_FUNC(migrate_pages)
@@ -72,25 +52,62 @@ SYS_FUNC(migrate_pages)
 	return RVAL_DECODED;
 }
 
-#include "xlat/policies.h"
-#include "xlat/mbindflags.h"
+#include "xlat/mpol_modes.h"
+#include "xlat/mpol_mode_flags.h"
+#include "xlat/mbind_flags.h"
+
+static void
+print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
+{
+	const kernel_ulong_t flags_mask =
+		MPOL_F_STATIC_NODES | MPOL_F_RELATIVE_NODES;
+	const kernel_ulong_t mode = mode_arg & ~flags_mask;
+	const unsigned int flags = mode_arg & flags_mask;
+
+	if (!flags) {
+		printxval64(mpol_modes, mode, "MPOL_???");
+		return;
+	}
+
+	const char *mode_str = xlookup(mpol_modes, mode);
+	if (!mode_str) {
+		printflags64(mpol_mode_flags, mode_arg, "MPOL_???");
+		return;
+	}
+
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%#" PRI_klx, mode_arg);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" /* ");
+
+	tprints(mode_str);
+	tprints("|");
+	printflags_ex(flags, NULL, XLAT_STYLE_ABBREV, mpol_mode_flags, NULL);
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprints(" */");
+}
 
 SYS_FUNC(mbind)
 {
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
-	printxval64(policies, tcp->u_arg[2], "MPOL_???");
+	print_mode(tcp, tcp->u_arg[2]);
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[3], tcp->u_arg[4]);
 	tprintf(", %" PRI_klu ", ", tcp->u_arg[4]);
-	printflags(mbindflags, tcp->u_arg[5], "MPOL_???");
+	printflags(mbind_flags, tcp->u_arg[5], "MPOL_???");
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(set_mempolicy)
 {
-	printxval(policies, tcp->u_arg[0], "MPOL_???");
+	print_mode(tcp, (unsigned int) tcp->u_arg[0]);
 	tprints(", ");
 	print_nodemask(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	tprintf(", %" PRI_klu, tcp->u_arg[2]);
@@ -98,7 +115,7 @@ SYS_FUNC(set_mempolicy)
 	return RVAL_DECODED;
 }
 
-#include "xlat/mempolicyflags.h"
+#include "xlat/get_mempolicy_flags.h"
 
 SYS_FUNC(get_mempolicy)
 {
@@ -106,7 +123,7 @@ SYS_FUNC(get_mempolicy)
 		int pol;
 		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &pol)) {
 			tprints("[");
-			printxval(policies, pol, "MPOL_???");
+			printxval(mpol_modes, pol, "MPOL_???");
 			tprints("]");
 		}
 		tprints(", ");
@@ -114,7 +131,7 @@ SYS_FUNC(get_mempolicy)
 		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
 		printaddr(tcp->u_arg[3]);
 		tprints(", ");
-		printflags64(mempolicyflags, tcp->u_arg[4], "MPOL_???");
+		printflags64(get_mempolicy_flags, tcp->u_arg[4], "MPOL_???");
 	}
 	return 0;
 }
@@ -142,18 +159,7 @@ print_status(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const int status = *(int *) elem_buf;
 
-	if (status < 0 && (unsigned) -status < nerrnos)
-		tprintf("-%s", errnoent[-status]);
-	else
-		tprintf("%d", status);
-
-	return true;
-}
-
-static bool
-print_int(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
-{
-	tprintf("%d", *(int *) elem_buf);
+	print_err(status, true);
 
 	return true;
 }
@@ -166,14 +172,14 @@ SYS_FUNC(move_pages)
 	if (entering(tcp)) {
 		tprintf("%d, %" PRI_klu ", ", (int) tcp->u_arg[0], npages);
 		print_array(tcp, tcp->u_arg[2], npages, &buf, current_wordsize,
-			    umoven_or_printaddr, print_addr, 0);
+			    tfetch_mem, print_addr, 0);
 		tprints(", ");
 		print_array(tcp, tcp->u_arg[3], npages, &buf, sizeof(int),
-			    umoven_or_printaddr, print_int, 0);
+			    tfetch_mem, print_int32_array_member, 0);
 		tprints(", ");
 	} else {
 		print_array(tcp, tcp->u_arg[4], npages, &buf, sizeof(int),
-			    umoven_or_printaddr, print_status, 0);
+			    tfetch_mem, print_status, 0);
 		tprints(", ");
 		printflags(move_pages_flags, tcp->u_arg[5], "MPOL_???");
 	}

@@ -3,35 +3,27 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
 #include "print_fields.h"
 #include <linux/aio_abi.h>
+
+#include "xlat/aio_cmds.h"
+
+#ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
+# include "xlat/aio_iocb_flags.h"
+#endif
+
+#ifdef HAVE_STRUCT_IOCB_AIO_RW_FLAGS
+# define AIO_RW_FLAGS_FIELD aio_rw_flags
+#else
+# define AIO_RW_FLAGS_FIELD aio_reserved1
+#endif
 
 SYS_FUNC(io_setup)
 {
@@ -50,46 +42,42 @@ SYS_FUNC(io_destroy)
 }
 
 enum iocb_sub {
-	SUB_NONE, SUB_COMMON, SUB_VECTOR
+	SUB_NONE, SUB_COMMON, SUB_VECTOR, SUB_POLL
 };
 
 static enum iocb_sub
 tprint_lio_opcode(unsigned int cmd)
 {
-	static const struct {
-		const char *name;
-		enum iocb_sub sub;
-	} cmds[] = {
-		{ "IOCB_CMD_PREAD", SUB_COMMON },
-		{ "IOCB_CMD_PWRITE", SUB_COMMON },
-		{ "IOCB_CMD_FSYNC", SUB_NONE },
-		{ "IOCB_CMD_FDSYNC", SUB_NONE },
-		{ "IOCB_CMD_PREADX", SUB_NONE },
-		{ "IOCB_CMD_POLL", SUB_NONE },
-		{ "IOCB_CMD_NOOP", SUB_NONE },
-		{ "IOCB_CMD_PREADV", SUB_VECTOR },
-		{ "IOCB_CMD_PWRITEV", SUB_VECTOR },
+	static const enum iocb_sub subs[] = {
+		[IOCB_CMD_PREAD]	= SUB_COMMON,
+		[IOCB_CMD_PWRITE]	= SUB_COMMON,
+		[IOCB_CMD_FSYNC]	= SUB_NONE,
+		[IOCB_CMD_FDSYNC]	= SUB_NONE,
+		[IOCB_CMD_PREADX]	= SUB_NONE,
+		[IOCB_CMD_POLL]		= SUB_POLL,
+		[IOCB_CMD_NOOP]		= SUB_NONE,
+		[IOCB_CMD_PREADV]	= SUB_VECTOR,
+		[IOCB_CMD_PWRITEV]	= SUB_VECTOR,
 	};
 
-	if (cmd < ARRAY_SIZE(cmds)) {
-		tprints(cmds[cmd].name);
-		return cmds[cmd].sub;
-	}
-	tprintf("%u", cmd);
-	tprints_comment("IOCB_CMD_???");
-	return SUB_NONE;
+	printxval_ex(aio_cmds, cmd, "IOCB_CMD_???", XLAT_STYLE_FMT_U);
+
+	return cmd < ARRAY_SIZE(subs) ? subs[cmd] : SUB_NONE;
 }
 
 static void
 print_common_flags(struct tcb *tcp, const struct iocb *cb)
 {
-/* IOCB_FLAG_RESFD is available since v2.6.22-rc1~47 */
-#ifdef IOCB_FLAG_RESFD
+/* aio_flags and aio_resfd fields are available since v2.6.22-rc1~47 */
+#ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
+	if (cb->aio_flags)
+		PRINT_FIELD_FLAGS(", ", *cb, aio_flags, aio_iocb_flags,
+				  "IOCB_FLAG_???");
+
 	if (cb->aio_flags & IOCB_FLAG_RESFD)
 		PRINT_FIELD_FD(", ", *cb, aio_resfd, tcp);
-
-	if (cb->aio_flags & ~IOCB_FLAG_RESFD)
-		PRINT_FIELD_X(", ", *cb, aio_flags);
+	else if (cb->aio_resfd)
+		PRINT_FIELD_X(", ", *cb, aio_resfd);
 #endif
 }
 
@@ -106,20 +94,25 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 {
 	enum iocb_sub sub;
 
-	if (cb->aio_data){
-		PRINT_FIELD_X("", *cb, aio_data);
-		tprints(", ");
+	PRINT_FIELD_X("", *cb, aio_data);
+
+	if (cb->aio_key)
+		PRINT_FIELD_U(", ", *cb, aio_key);
+
+	if (cb->AIO_RW_FLAGS_FIELD) {
+		tprints(", aio_rw_flags=");
+		printflags(rwf_flags, cb->AIO_RW_FLAGS_FIELD, "RWF_???");
 	}
 
-	if (cb->aio_key) {
-		PRINT_FIELD_U("", *cb, aio_key);
-		tprints(", ");
-	}
-
-	tprints("aio_lio_opcode=");
+	tprints(", aio_lio_opcode=");
 	sub = tprint_lio_opcode(cb->aio_lio_opcode);
-	if (cb->aio_reqprio)
+
+	if (cb->aio_flags & IOCB_FLAG_IOPRIO) {
+		tprints(", aio_reqprio=");
+		print_ioprio(zero_extend_signed_to_ull(cb->aio_reqprio));
+	} else if (cb->aio_reqprio) {
 		PRINT_FIELD_D(", ", *cb, aio_reqprio);
+	}
 
 	PRINT_FIELD_FD(", ", *cb, aio_fildes, tcp);
 
@@ -129,6 +122,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 static void
 print_iocb(struct tcb *tcp, const struct iocb *cb)
 {
+	tprints("{");
+
 	enum iocb_sub sub = print_iocb_header(tcp, cb);
 
 	switch (sub) {
@@ -157,9 +152,15 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 		PRINT_FIELD_D(", ", *cb, aio_offset);
 		print_common_flags(tcp, cb);
 		break;
+	case SUB_POLL:
+		PRINT_FIELD_FLAGS(", ", *cb, aio_buf, pollflags, "POLL???");
+		print_common_flags(tcp, cb);
+		break;
 	case SUB_NONE:
 		break;
 	}
+
+	tprints("}");
 }
 
 static bool
@@ -174,10 +175,8 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		addr = *(kernel_ulong_t *) elem_buf;
 	}
 
-	tprints("{");
 	if (!umove_or_printaddr(tcp, addr, &cb))
 		print_iocb(tcp, &cb);
-	tprints("}");
 
 	return true;
 }
@@ -196,7 +195,7 @@ SYS_FUNC(io_submit)
 		printaddr(addr);
 	else
 		print_array(tcp, addr, nr, &iocbp, current_wordsize,
-			    umoven_or_printaddr, print_iocbp, 0);
+			    tfetch_mem, print_iocbp, 0);
 
 	return RVAL_DECODED;
 }
@@ -238,7 +237,9 @@ SYS_FUNC(io_cancel)
 	return 0;
 }
 
-SYS_FUNC(io_getevents)
+static int
+print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
+		   const bool has_usig)
 {
 	if (entering(tcp)) {
 		printaddr(tcp->u_arg[0]);
@@ -248,16 +249,46 @@ SYS_FUNC(io_getevents)
 	} else {
 		struct io_event buf;
 		print_array(tcp, tcp->u_arg[3], tcp->u_rval, &buf, sizeof(buf),
-			    umoven_or_printaddr, print_io_event, 0);
+			    tfetch_mem, print_io_event, 0);
 		tprints(", ");
 		/*
-		 * Since the timeout parameter is read by the kernel
+		 * Since the timeout and usig parameters are read by the kernel
 		 * on entering syscall, it has to be decoded the same way
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
-		print_timespec(tcp, tcp->u_arg[4]);
+		print_ts(tcp, tcp->u_arg[4]);
+		if (has_usig) {
+			tprints(", ");
+			print_aio_sigset(tcp, tcp->u_arg[5]);
+		}
 		restore_cleared_syserror(tcp);
 	}
 	return 0;
+}
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(io_getevents_time32)
+{
+	return print_io_getevents(tcp, print_timespec32, false);
+}
+#endif
+
+#if HAVE_ARCH_OLD_TIME64_SYSCALLS
+SYS_FUNC(io_getevents_time64)
+{
+	return print_io_getevents(tcp, print_timespec64, false);
+}
+#endif
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(io_pgetevents_time32)
+{
+	return print_io_getevents(tcp, print_timespec32, true);
+}
+#endif
+
+SYS_FUNC(io_pgetevents_time64)
+{
+	return print_io_getevents(tcp, print_timespec64, true);
 }

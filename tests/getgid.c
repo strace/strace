@@ -1,7 +1,14 @@
-#include "tests.h"
-#include <asm/unistd.h>
+/*
+ * Copyright (c) 2016-2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
 
-#ifdef __NR_getgid
+#include "tests.h"
+#include "scno.h"
+
+#if defined __NR_getgid && (!defined __NR_getxgid || __NR_getxgid != __NR_getgid)
 
 # include <stdio.h>
 # include <unistd.h>

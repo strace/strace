@@ -1,0 +1,93 @@
+#!/bin/sh -efu
+#
+# Check -DDD option.
+#
+# Copyright (c) 2019-2020 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog sed
+run_prog_skip_if_failed \
+	kill -0 $$
+
+status_file=/proc/self/status
+[ -f "$status_file" ] ||
+	framework_skip_ "$status_file is not available"
+
+stat_file=/proc/self/stat
+[ -f "$stat_file" ] ||
+	framework_skip_ "$stat_file is not available"
+
+reapid="$(../get_process_reaper)" && [ "$reapid" -ge 1 ] ||
+	fail_ 'get_process_reaper failed'
+
+set -- -enone -esignal=none ../tracer_ppid_pgid_sid
+run_strace "$@" > "$OUT"
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
+[ "$ppid" -gt 1 ] &&
+[ "$ppid" -ne "$reapid" ] &&
+[ "$pgid" -ge 0 ] &&
+[ "$sid" -ge 0 ] || {
+	cat < "$OUT" > "$LOG"
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+}
+match_diff
+
+pgid0="$pgid"
+sid0="$sid"
+
+run_strace -D "$@" > "$OUT"
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
+[ "$ppid" -eq "$reapid" ] &&
+[ "$pgid" = "$pgid0" ] &&
+[ "$sid" = "$sid0" ] || {
+	cat < "$OUT" > "$LOG"
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+}
+while kill -0 "$tracer_pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+done
+match_diff
+
+run_strace -DD "$@" > "$OUT"
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
+[ "$ppid" -eq "$reapid" ] &&
+[ "$pgid" -gt 1 ] &&
+[ "$pgid" -ne "$reapid" ] &&
+[ "$pgid" != "$pgid0" ] &&
+[ "$pgid" != "$sid" ] &&
+[ "$sid" = "$sid0" ] || {
+	cat < "$OUT" > "$LOG"
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+}
+while kill -0 "$tracer_pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+done
+match_diff
+
+run_strace -DDD "$@" > "$OUT"
+read -r tracer_pid ppid pgid sid < "$OUT" &&
+[ "$tracer_pid" -gt 1 ] &&
+[ "$tracer_pid" -ne "$reapid" ] &&
+[ "$ppid" -eq "$reapid" ] &&
+[ "$pgid" -gt 1 ] &&
+[ "$pgid" -ne "$reapid" ] &&
+[ "$pgid" != "$pgid0" ] &&
+[ "$sid" = "$pgid" ] &&
+[ "$sid" != "$sid0" ] || {
+	cat < "$OUT" > "$LOG"
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+}
+while kill -0 "$tracer_pid" 2> /dev/null; do
+	$SLEEP_A_BIT
+done
+match_diff

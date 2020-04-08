@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2009, 2010 Jeff Mahoney <jeffm@suse.com>
  * Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2011-2017 The strace developers.
+ * Copyright (c) 2011-2018 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -65,59 +45,14 @@ typedef struct blk_user_trace_setup {
 	uint32_t pid;
 } struct_blk_user_trace_setup;
 
+/* Provide fall-back definitions for BLK* ioctls */
+#define XLAT_MACROS_ONLY
+#include "xlat/block_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
+
 #include MPERS_DEFS
 
 #include "print_fields.h"
-
-#ifndef BLKPG
-# define BLKPG      _IO(0x12, 105)
-#endif
-
-/*
- * ioctl numbers <= 114 are present in Linux 2.4.  The following ones have been
- * added since then and headers containing them may not be available on every
- * system.
- */
-
-#ifndef BLKTRACESETUP
-# define BLKTRACESETUP _IOWR(0x12, 115, struct_blk_user_trace_setup)
-#endif
-#ifndef BLKTRACESTART
-# define BLKTRACESTART _IO(0x12, 116)
-#endif
-#ifndef BLKTRACESTOP
-# define BLKTRACESTOP _IO(0x12, 117)
-#endif
-#ifndef BLKTRACETEARDOWN
-# define BLKTRACETEARDOWN _IO(0x12, 118)
-#endif
-#ifndef BLKDISCARD
-# define BLKDISCARD _IO(0x12, 119)
-#endif
-#ifndef BLKIOMIN
-# define BLKIOMIN _IO(0x12, 120)
-#endif
-#ifndef BLKIOOPT
-# define BLKIOOPT _IO(0x12, 121)
-#endif
-#ifndef BLKALIGNOFF
-# define BLKALIGNOFF _IO(0x12, 122)
-#endif
-#ifndef BLKPBSZGET
-# define BLKPBSZGET _IO(0x12, 123)
-#endif
-#ifndef BLKDISCARDZEROES
-# define BLKDISCARDZEROES _IO(0x12, 124)
-#endif
-#ifndef BLKSECDISCARD
-# define BLKSECDISCARD _IO(0x12, 125)
-#endif
-#ifndef BLKROTATIONAL
-# define BLKROTATIONAL _IO(0x12, 126)
-#endif
-#ifndef BLKZEROOUT
-# define BLKZEROOUT _IO(0x12, 127)
-#endif
 
 #include "xlat/blkpg_ops.h"
 
@@ -168,7 +103,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKALIGNOFF:
 		if (entering(tcp))
 			return 0;
-		/* fall through */
+		ATTRIBUTE_FALLTHROUGH;
 	/* take a signed int */
 	case BLKROSET:
 	case BLKBSZSET:
@@ -181,6 +116,8 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 	case BLKIOMIN:
 	case BLKIOOPT:
 	case BLKDISCARDZEROES:
+	case BLKGETZONESZ:
+	case BLKGETNRZONES:
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
@@ -204,7 +141,6 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		printnum_ulong(tcp, arg);
 		break;
 
-#ifdef HAVE_BLKGETSIZE64
 	/* returns an uint64_t */
 	case BLKGETSIZE64:
 		if (entering(tcp))
@@ -212,7 +148,6 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		tprints(", ");
 		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
-#endif
 
 	/* takes a pair of uint64_t */
 	case BLKDISCARD:

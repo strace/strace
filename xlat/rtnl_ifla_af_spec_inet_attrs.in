@@ -1,0 +1,3 @@
+#value_indexed
+IFLA_INET_UNSPEC	0
+IFLA_INET_CONF		1

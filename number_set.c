@@ -1,28 +1,9 @@
 /*
- * Copyright (c) 2016-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #ifdef HAVE_CONFIG_H
@@ -32,7 +13,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include "defs.h"
 #include "number_set.h"
+#include "static_assert.h"
 #include "xmalloc.h"
 
 typedef unsigned int number_slot_t;
@@ -67,6 +50,14 @@ reallocate_number_set(struct number_set *const set, const unsigned int new_nslot
 	set->nslots = new_nslots;
 }
 
+static unsigned int
+get_number_setbit(const struct number_set *const set)
+{
+	static_assert(sizeof(number_slot_t) == sizeof(uint32_t),
+		      "number_slot_t is not 32-bit long");
+	return popcount32(set->vec, set->nslots);
+}
+
 bool
 number_set_array_is_empty(const struct number_set *const set,
 			  const unsigned int idx)
@@ -87,6 +78,25 @@ is_number_in_set_array(const unsigned int number, const struct number_set *const
 {
 	return set && ((number / BITS_PER_SLOT < set[idx].nslots)
 		&& number_isset(number, set[idx].vec)) ^ set[idx].not;
+}
+
+bool
+is_complete_set(const struct number_set *const set, const unsigned int max_numbers)
+{
+	return set && ((set->not && !set->nslots) ||
+		       (get_number_setbit(set) == max_numbers));
+}
+
+bool
+is_complete_set_array(const struct number_set *const set,
+		      const unsigned int *const max_numbers,
+		      const unsigned int nmemb)
+{
+	for (unsigned int i = 0; i < nmemb; ++i) {
+		if (!is_complete_set(&set[i], max_numbers[i]))
+			return false;
+	}
+	return true;
 }
 
 void

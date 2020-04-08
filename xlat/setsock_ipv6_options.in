@@ -1,0 +1,8 @@
+/*
+ * Options specific to setsockopt(SOL_IPV6).
+ * Common {g,s}etsockopt(SOL_IPV6) options
+ * should be in sock_ipv6_options.in instead.
+ */
+
+IP6T_SO_SET_REPLACE		64
+IP6T_SO_SET_ADD_COUNTERS	65

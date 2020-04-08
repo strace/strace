@@ -6,30 +6,10 @@
  * Copyright (c) 2006-2007 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2006 Bernhard Kaindl <bk@suse.de>
  * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2014-2017 The strace developers.
+ * Copyright (c) 2014-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -46,6 +26,7 @@ SYS_FUNC(utimes)
 SYS_FUNC(futimesat)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
 	print_timeval_utimes(tcp, tcp->u_arg[2]);
@@ -53,16 +34,30 @@ SYS_FUNC(futimesat)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(utimensat)
+static int
+do_utimensat(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	print_dirfd(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	printpath(tcp, tcp->u_arg[1]);
 	tprints(", ");
-	print_timespec_utime_pair(tcp, tcp->u_arg[2]);
+	print_ts(tcp, tcp->u_arg[2]);
 	tprints(", ");
 	printflags(at_flags, tcp->u_arg[3], "AT_???");
 
 	return RVAL_DECODED;
+}
+
+#if HAVE_ARCH_TIME32_SYSCALLS
+SYS_FUNC(utimensat_time32)
+{
+	return do_utimensat(tcp, print_timespec32_utime_pair);
+}
+#endif
+
+SYS_FUNC(utimensat_time64)
+{
+	return do_utimensat(tcp, print_timespec64_utime_pair);
 }
 
 #ifdef ALPHA

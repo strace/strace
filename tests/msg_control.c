@@ -2,30 +2,10 @@
  * Check decoding of struct msghdr ancillary data.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -40,8 +20,16 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#if defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL	\
+ || defined HAVE_STRUCT___KERNEL_TIMESPEC
+# include <linux/time_types.h>
+#endif
+
 #include "xlat.h"
+#define XLAT_MACROS_ONLY
+#include "xlat/sock_options.h"
 #include "xlat/scmvals.h"
+#undef XLAT_MACROS_ONLY
 
 #ifndef SOL_IP
 # define SOL_IP 0
@@ -49,13 +37,6 @@
 #ifndef SOL_TCP
 # define SOL_TCP 6
 #endif
-
-#ifndef SCM_SECURITY
-# define SCM_SECURITY 3
-#endif
-
-#define MIN_SIZE_OF(type, member) \
-	(offsetof(type, member) + sizeof(((type *) 0)->member))
 
 static struct cmsghdr *
 get_cmsghdr(void *const page, const size_t len)
@@ -103,11 +84,11 @@ test_scm_rights1(struct msghdr *const mh,
 
 	struct cmsghdr *cmsg = get_cmsghdr(page, msg_controllen);
 
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_len))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_len))
 		cmsg->cmsg_len = cmsg_len;
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_level))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_level))
 		cmsg->cmsg_level = SOL_SOCKET;
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_type))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_type))
 		cmsg->cmsg_type = SCM_RIGHTS;
 
 	size_t src_len =
@@ -132,7 +113,7 @@ test_scm_rights1(struct msghdr *const mh,
 		print_fds(cmsg, src_len);
 		printf("}");
 		if (aligned_cms_len < msg_controllen)
-			printf(", %p", (void *) cmsg + aligned_cms_len);
+			printf(", ... /* %p */", (void *) cmsg + aligned_cms_len);
 		printf("]");
 	}
 
@@ -168,11 +149,11 @@ test_scm_rights2(struct msghdr *const mh,
 		memcpy(CMSG_DATA(cmsg[0]), src[0], cmsg_len[0] - CMSG_LEN(0));
 
 	const size_t msg_controllen1 = msg_controllen - aligned_cms_len[0];
-	if (msg_controllen1 >= MIN_SIZE_OF(struct cmsghdr, cmsg_len))
+	if (msg_controllen1 >= offsetofend(struct cmsghdr, cmsg_len))
 		cmsg[1]->cmsg_len = cmsg_len[1];
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_level))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_level))
 		cmsg[1]->cmsg_level = SOL_SOCKET;
-	if (msg_controllen >= MIN_SIZE_OF(struct cmsghdr, cmsg_type))
+	if (msg_controllen >= offsetofend(struct cmsghdr, cmsg_type))
 		cmsg[1]->cmsg_type = SCM_RIGHTS;
 	size_t src1_len =
 		cmsg_len[1] < msg_controllen1 ? cmsg_len[1] : msg_controllen1;
@@ -195,7 +176,7 @@ test_scm_rights2(struct msghdr *const mh,
 	print_fds(cmsg[1], src1_len);
 	printf("}");
 	if (aligned_cms_len[1] < msg_controllen1)
-		printf(", %p", (void *) cmsg[1] + aligned_cms_len[1]);
+		printf(", ... /* %p */", (void *) cmsg[1] + aligned_cms_len[1]);
 	printf("]");
 
 	errno = saved_errno;
@@ -231,17 +212,19 @@ test_scm_rights3(struct msghdr *const mh, void *const page, const size_t nfds)
 }
 
 static void
-test_scm_timestamp(struct msghdr *const mh, void *const page)
+test_scm_timestamp_old(struct msghdr *const mh, void *const page)
 {
-	size_t len = CMSG_SPACE(sizeof(struct timeval));
+	static const struct timeval tv = {
+		.tv_sec = 123456789,
+		.tv_usec = 987654
+	};
+	size_t len = CMSG_SPACE(sizeof(tv));
 	struct cmsghdr *cmsg = get_cmsghdr(page, len);
 
-	cmsg->cmsg_len = CMSG_LEN(sizeof(struct timeval));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(tv));
 	cmsg->cmsg_level = SOL_SOCKET;
-	cmsg->cmsg_type = SCM_TIMESTAMP;
-	struct timeval *tv = (struct timeval *) CMSG_DATA(cmsg);
-	tv->tv_sec = 123456789;
-	tv->tv_usec = 987654;
+	cmsg->cmsg_type = SO_TIMESTAMP_OLD;
+	memcpy(CMSG_DATA(cmsg), &tv, sizeof(tv));
 
 	mh->msg_control = cmsg;
 	mh->msg_controllen = len;
@@ -249,19 +232,19 @@ test_scm_timestamp(struct msghdr *const mh, void *const page)
 	int rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
-	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMP"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMP_OLD"
 	       ", cmsg_data={tv_sec=%lld, tv_usec=%llu}}]"
 	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len,
-	       (long long) tv->tv_sec, zero_extend_signed_to_ull(tv->tv_usec),
+	       (long long) tv.tv_sec, zero_extend_signed_to_ull(tv.tv_usec),
 	       (unsigned long) len, rc, errno2name());
 
-	len = CMSG_SPACE(sizeof(struct timeval) - sizeof(long));
+	len = CMSG_SPACE(sizeof(tv) - sizeof(long));
 	cmsg = get_cmsghdr(page, len);
 
-	cmsg->cmsg_len = CMSG_LEN(sizeof(struct timeval) - sizeof(long));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(tv) - sizeof(long));
 	cmsg->cmsg_level = SOL_SOCKET;
-	cmsg->cmsg_type = SCM_TIMESTAMP;
+	cmsg->cmsg_type = SO_TIMESTAMP_OLD;
 
 	mh->msg_control = cmsg;
 	mh->msg_controllen = len;
@@ -269,24 +252,26 @@ test_scm_timestamp(struct msghdr *const mh, void *const page)
 	rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
-	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMP, cmsg_data=?}]"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMP_OLD, cmsg_data=?}]"
 	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len,
 	       (unsigned long) len, rc, errno2name());
 }
 
 static void
-test_scm_timestampns(struct msghdr *const mh, void *const page)
+test_scm_timestampns_old(struct msghdr *const mh, void *const page)
 {
-	size_t len = CMSG_SPACE(sizeof(struct timespec));
+	static const struct timespec ts = {
+		.tv_sec = 123456789,
+		.tv_nsec = 987654321
+	};
+	size_t len = CMSG_SPACE(sizeof(ts));
 	struct cmsghdr *cmsg = get_cmsghdr(page, len);
 
-	cmsg->cmsg_len = CMSG_LEN(sizeof(struct timespec));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts));
 	cmsg->cmsg_level = SOL_SOCKET;
-	cmsg->cmsg_type = SCM_TIMESTAMPNS;
-	struct timespec *ts = (struct timespec *) CMSG_DATA(cmsg);
-	ts->tv_sec = 123456789;
-	ts->tv_nsec = 987654321;
+	cmsg->cmsg_type = SO_TIMESTAMPNS_OLD;
+	memcpy(CMSG_DATA(cmsg), &ts, sizeof(ts));
 
 	mh->msg_control = cmsg;
 	mh->msg_controllen = len;
@@ -294,19 +279,19 @@ test_scm_timestampns(struct msghdr *const mh, void *const page)
 	int rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
-	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMPNS"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPNS_OLD"
 	       ", cmsg_data={tv_sec=%lld, tv_nsec=%llu}}]"
 	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len,
-	       (long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec),
+	       (long long) ts.tv_sec, zero_extend_signed_to_ull(ts.tv_nsec),
 	       (unsigned long) len, rc, errno2name());
 
-	len = CMSG_SPACE(sizeof(struct timespec) - sizeof(long));
+	len = CMSG_SPACE(sizeof(ts) - sizeof(long));
 	cmsg = get_cmsghdr(page, len);
 
-	cmsg->cmsg_len = CMSG_LEN(sizeof(struct timespec) - sizeof(long));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts) - sizeof(long));
 	cmsg->cmsg_level = SOL_SOCKET;
-	cmsg->cmsg_type = SCM_TIMESTAMPNS;
+	cmsg->cmsg_type = SO_TIMESTAMPNS_OLD;
 
 	mh->msg_control = cmsg;
 	mh->msg_controllen = len;
@@ -314,7 +299,7 @@ test_scm_timestampns(struct msghdr *const mh, void *const page)
 	rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
-	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMPNS"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPNS_OLD"
 	       ", cmsg_data=?}]"
 	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len,
@@ -322,21 +307,20 @@ test_scm_timestampns(struct msghdr *const mh, void *const page)
 }
 
 static void
-test_scm_timestamping(struct msghdr *const mh, void *const page)
+test_scm_timestamping_old(struct msghdr *const mh, void *const page)
 {
-	size_t len = CMSG_SPACE(3 * sizeof(struct timespec));
+	static const struct timespec ts[] = {
+		{ .tv_sec = 123456789, .tv_nsec = 987654321 },
+		{ .tv_sec = 123456790, .tv_nsec = 987654320 },
+		{ .tv_sec = 123456791, .tv_nsec = 987654319 }
+	};
+	size_t len = CMSG_SPACE(sizeof(ts));
 	struct cmsghdr *cmsg = get_cmsghdr(page, len);
 
-	cmsg->cmsg_len = CMSG_LEN(3 * sizeof(struct timespec));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts));
 	cmsg->cmsg_level = SOL_SOCKET;
-	cmsg->cmsg_type = SCM_TIMESTAMPING;
-	struct timespec *ts = (struct timespec *) CMSG_DATA(cmsg);
-	ts[0].tv_sec = 123456789;
-	ts[0].tv_nsec = 987654321;
-	ts[1].tv_sec = 123456790;
-	ts[1].tv_nsec = 987654320;
-	ts[2].tv_sec = 123456791;
-	ts[2].tv_nsec = 987654319;
+	cmsg->cmsg_type = SO_TIMESTAMPING_OLD;
+	memcpy(CMSG_DATA(cmsg), ts, sizeof(ts));
 
 	mh->msg_control = cmsg;
 	mh->msg_controllen = len;
@@ -344,7 +328,7 @@ test_scm_timestamping(struct msghdr *const mh, void *const page)
 	int rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
-	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMPING"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_OLD"
 	       ", cmsg_data=[{tv_sec=%lld, tv_nsec=%llu}"
 	       ", {tv_sec=%lld, tv_nsec=%llu}, {tv_sec=%lld, tv_nsec=%llu}]}]"
 	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
@@ -356,12 +340,12 @@ test_scm_timestamping(struct msghdr *const mh, void *const page)
 	       zero_extend_signed_to_ull(ts[2].tv_nsec),
 	       (unsigned long) len, rc, errno2name());
 
-	len = CMSG_SPACE(3 * sizeof(struct timespec) - sizeof(long));
+	len = CMSG_SPACE(sizeof(ts) - sizeof(long));
 	cmsg = get_cmsghdr(page, len);
 
-	cmsg->cmsg_len = CMSG_LEN(3 * sizeof(struct timespec) - sizeof(long));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts) - sizeof(long));
 	cmsg->cmsg_level = SOL_SOCKET;
-	cmsg->cmsg_type = SCM_TIMESTAMPING;
+	cmsg->cmsg_type = SO_TIMESTAMPING_OLD;
 
 	mh->msg_control = cmsg;
 	mh->msg_controllen = len;
@@ -369,12 +353,165 @@ test_scm_timestamping(struct msghdr *const mh, void *const page)
 	rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
-	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_TIMESTAMPING"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_OLD"
 	       ", cmsg_data=?}]"
 	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len,
 	       (unsigned long) len, rc, errno2name());
 }
+
+#ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
+static void
+test_scm_timestamp_new(struct msghdr *const mh, void *const page)
+{
+	static const struct __kernel_sock_timeval tv = {
+		.tv_sec = 0xdefaceddeadbeef,
+		.tv_usec = 0xdec0dedcafef00d
+	};
+	size_t len = CMSG_SPACE(sizeof(tv));
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(tv));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SO_TIMESTAMP_NEW;
+	memcpy(CMSG_DATA(cmsg), &tv, sizeof(tv));
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMP_NEW"
+	       ", cmsg_data={tv_sec=%lld, tv_usec=%llu}}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (long long) tv.tv_sec, zero_extend_signed_to_ull(tv.tv_usec),
+	       (unsigned long) len, sprintrc(rc));
+
+	len = CMSG_SPACE(sizeof(tv) - sizeof(long));
+	cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(tv) - sizeof(long));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SO_TIMESTAMP_NEW;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMP_NEW, cmsg_data=?}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (unsigned long) len, sprintrc(rc));
+}
+#endif /* HAVE_STRUCT___KERNEL_SOCK_TIMEVAL */
+
+#ifdef HAVE_STRUCT___KERNEL_TIMESPEC
+static void
+test_scm_timestampns_new(struct msghdr *const mh, void *const page)
+{
+	static const struct __kernel_timespec ts = {
+		.tv_sec = 0xdefaceddeadbeef,
+		.tv_nsec = 0xdec0dedcafef00d
+	};
+	size_t len = CMSG_SPACE(sizeof(ts));
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SO_TIMESTAMPNS_NEW;
+	memcpy(CMSG_DATA(cmsg), &ts, sizeof(ts));
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPNS_NEW"
+	       ", cmsg_data={tv_sec=%lld, tv_nsec=%llu}}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (long long) ts.tv_sec, zero_extend_signed_to_ull(ts.tv_nsec),
+	       (unsigned long) len, sprintrc(rc));
+
+	len = CMSG_SPACE(sizeof(ts) - sizeof(long));
+	cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts) - sizeof(long));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SO_TIMESTAMPNS_NEW;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPNS_NEW"
+	       ", cmsg_data=?}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (unsigned long) len, sprintrc(rc));
+}
+
+static void
+test_scm_timestamping_new(struct msghdr *const mh, void *const page)
+{
+	static const struct __kernel_timespec ts[] = {
+		{ .tv_sec = 0xdeface0deadbef1, .tv_nsec = 0xdec0de2cafef0d3 },
+		{ .tv_sec = 0xdeface4deadbef5, .tv_nsec = 0xdec0de6cafef0d7 },
+		{ .tv_sec = 0xdeface8deadbef9, .tv_nsec = 0xdec0dedcafef00d }
+	};
+	size_t len = CMSG_SPACE(sizeof(ts));
+	struct cmsghdr *cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SO_TIMESTAMPING_NEW;
+	memcpy(CMSG_DATA(cmsg), ts, sizeof(ts));
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_NEW"
+	       ", cmsg_data=[{tv_sec=%lld, tv_nsec=%llu}"
+	       ", {tv_sec=%lld, tv_nsec=%llu}, {tv_sec=%lld, tv_nsec=%llu}]}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len, (long long) ts[0].tv_sec,
+	       zero_extend_signed_to_ull(ts[0].tv_nsec),
+	       (long long) ts[1].tv_sec,
+	       zero_extend_signed_to_ull(ts[1].tv_nsec),
+	       (long long) ts[2].tv_sec,
+	       zero_extend_signed_to_ull(ts[2].tv_nsec),
+	       (unsigned long) len, sprintrc(rc));
+
+	len = CMSG_SPACE(sizeof(ts) - sizeof(long));
+	cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(ts) - sizeof(long));
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SO_TIMESTAMPING_NEW;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_NEW"
+	       ", cmsg_data=?}]"
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len,
+	       (unsigned long) len, sprintrc(rc));
+}
+#endif /* HAVE_STRUCT___KERNEL_TIMESPEC */
 
 static void
 print_security(const struct cmsghdr *const cmsg, const size_t cmsg_len)
@@ -425,7 +562,7 @@ test_scm_security(struct msghdr *const mh,
 	print_security(cmsg, src_len);
 	printf("}");
 	if (aligned_cms_len < msg_controllen)
-		printf(", %p", (void *) cmsg + aligned_cms_len);
+		printf(", ... /* %p */", (void *) cmsg + aligned_cms_len);
 	printf("]");
 
 	errno = saved_errno;
@@ -525,9 +662,16 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 	test_scm_rights3(mh, page, DEFAULT_STRLEN);
 	test_scm_rights3(mh, page, DEFAULT_STRLEN + 1);
 
-	test_scm_timestamp(mh, page);
-	test_scm_timestampns(mh, page);
-	test_scm_timestamping(mh, page);
+	test_scm_timestamp_old(mh, page);
+	test_scm_timestampns_old(mh, page);
+	test_scm_timestamping_old(mh, page);
+#ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
+	test_scm_timestamp_new(mh, page);
+#endif
+#ifdef HAVE_STRUCT___KERNEL_TIMESPEC
+	test_scm_timestampns_new(mh, page);
+	test_scm_timestamping_new(mh, page);
+#endif
 
 	test_unknown_type(mh, page, ARG_STR(SOL_SOCKET), "SCM_???");
 }
@@ -840,7 +984,7 @@ int main(int ac, const char **av)
 	printf("sendmsg(-1, %p, 0) = %d %s (%m)\n",
 	       mh + 1, rc, errno2name());
 
-	void *page = tail_alloc(1) + 1;
+	void *page = tail_alloc(1024) + 1024;
 	mh->msg_control = page;
 	mh->msg_controllen = CMSG_LEN(0);
 	rc = sendmsg(-1, mh, 0);

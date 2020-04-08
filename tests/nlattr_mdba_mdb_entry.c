@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2017-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -99,7 +79,12 @@ main(void)
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), NLA_HDRLEN + 4
+# ifdef HAVE_STRUCT_BR_MDB_ENTRY
+			- 4 + NLA_HDRLEN * 2 + sizeof(struct nlattr)
+			+ sizeof(struct br_mdb_entry)
+# endif
+			);
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
@@ -137,9 +122,13 @@ main(void)
 				     printf(", state=MDB_TEMPORARY");
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 				     printf(", flags=MDB_FLAGS_OFFLOAD");
+#  else
+				     printf(", flags=0");
 #  endif
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 				     PRINT_FIELD_U(", ", entry, vid);
+#  else
+				     printf(", vid=0");
 #  endif
 				     printf(", addr={u=");
 				     print_quoted_hex(&entry.addr.u,
@@ -160,9 +149,13 @@ main(void)
 		    printf(", state=MDB_TEMPORARY");
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 		    printf(", flags=MDB_FLAGS_OFFLOAD");
+#  else
+		    printf(", flags=0");
 #  endif
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		    PRINT_FIELD_U(", ", entry, vid);
+#  else
+		    printf(", vid=0");
 #  endif
 		    printf(", addr={u=");
 		    print_quoted_hex(&entry.addr.u, sizeof(entry.addr.u));

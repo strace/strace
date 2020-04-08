@@ -1,3 +1,4 @@
+#value_indexed
 SYS_SOCKET	1
 SYS_BIND	2
 SYS_CONNECT	3

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2020 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifndef sys_ARCH_mmap
 # define sys_ARCH_mmap sys_mmap
 #endif
@@ -5,7 +12,7 @@
 [  1] = { 1,	TM,		SEN(io_destroy),		"io_destroy"		},
 [  2] = { 3,	0,		SEN(io_submit),			"io_submit"		},
 [  3] = { 3,	0,		SEN(io_cancel),			"io_cancel"		},
-[  4] = { 5,	0,		SEN(io_getevents),		"io_getevents"		},
+/* [  4] io_getevents */
 [  5] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
 [  6] = { 5,	TF,		SEN(setxattr),			"lsetxattr"		},
 [  7] = { 5,	TD,		SEN(fsetxattr),			"fsetxattr"		},
@@ -73,8 +80,8 @@
 [ 69] = { 5,	TD,		SEN(preadv),			"preadv"		},
 [ 70] = { 5,	TD,		SEN(pwritev),			"pwritev"		},
 [ 71] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
-[ 72] = { 6,	TD,		SEN(pselect6),			"pselect6"		},
-[ 73] = { 5,	TD,		SEN(ppoll),			"ppoll"			},
+/* [ 72] pselect6 */
+/* [ 73] ppoll */
 [ 74] = { 4,	TD|TS,		SEN(signalfd4),			"signalfd4"		},
 [ 75] = { 4,	TD,		SEN(vmsplice),			"vmsplice"		},
 [ 76] = { 6,	TD,		SEN(splice),			"splice"		},
@@ -91,36 +98,36 @@
 [ 84] = { 6,	TD,		SEN(sync_file_range),		"sync_file_range"	},
 #endif
 [ 85] = { 2,	TD,		SEN(timerfd_create),		"timerfd_create"	},
-[ 86] = { 4,	TD,		SEN(timerfd_settime),		"timerfd_settime"	},
-[ 87] = { 2,	TD,		SEN(timerfd_gettime),		"timerfd_gettime"	},
-[ 88] = { 4,	TD|TF,		SEN(utimensat),			"utimensat"		},
+/* [ 86] timerfd_settime */
+/* [ 87] timerfd_gettime */
+/* [ 88] utimensat */
 [ 89] = { 1,	TF,		SEN(acct),			"acct"			},
-[ 90] = { 2,	0,		SEN(capget),			"capget"		},
-[ 91] = { 2,	0,		SEN(capset),			"capset"		},
+[ 90] = { 2,	TC,		SEN(capget),			"capget"		},
+[ 91] = { 2,	TC,		SEN(capset),			"capset"		},
 [ 92] = { 1,	NF,		SEN(personality),		"personality"		},
 [ 93] = { 1,	TP|SE,		SEN(exit),			"exit"			},
 [ 94] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
 [ 95] = { 5,	TP,		SEN(waitid),			"waitid"		},
 [ 96] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [ 97] = { 1,	TP,		SEN(unshare),			"unshare"		},
-[ 98] = { 6,	0,		SEN(futex),			"futex"			},
+/* [ 98] futex */
 [ 99] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},
 [100] = { 3,	0,		SEN(get_robust_list),		"get_robust_list"	},
-[101] = { 2,	0,		SEN(nanosleep),			"nanosleep"		},
+/* [101] nanosleep */
 [102] = { 2,	0,		SEN(getitimer),			"getitimer"		},
 [103] = { 3,	0,		SEN(setitimer),			"setitimer"		},
 [104] = { 4,	0,		SEN(kexec_load),		"kexec_load"		},
 [105] = { 3,	0,		SEN(init_module),		"init_module"		},
 [106] = { 2,	0,		SEN(delete_module),		"delete_module"		},
 [107] = { 3,	0,		SEN(timer_create),		"timer_create"		},
-[108] = { 2,	0,		SEN(timer_gettime),		"timer_gettime"		},
+/* [108] timer_gettime */
 [109] = { 1,	0,		SEN(timer_getoverrun),		"timer_getoverrun"	},
-[110] = { 4,	0,		SEN(timer_settime),		"timer_settime"		},
+/* [110] timer_settime */
 [111] = { 1,	0,		SEN(timer_delete),		"timer_delete"		},
-[112] = { 2,	0,		SEN(clock_settime),		"clock_settime"		},
-[113] = { 2,	0,		SEN(clock_gettime),		"clock_gettime"		},
-[114] = { 2,	0,		SEN(clock_getres),		"clock_getres"		},
-[115] = { 4,	0,		SEN(clock_nanosleep),		"clock_nanosleep"	},
+/* [112] clock_settime */
+/* [113] clock_gettime */
+/* [114] clock_getres */
+/* [115] clock_nanosleep */
 [116] = { 3,	0,		SEN(syslog),			"syslog"		},
 [117] = { 4,	0,		SEN(ptrace),			"ptrace"		},
 [118] = { 2,	0,		SEN(sched_setparam),		"sched_setparam"	},
@@ -132,7 +139,7 @@
 [124] = { 0,	0,		SEN(sched_yield),		"sched_yield"		},
 [125] = { 1,	0,		SEN(sched_get_priority_max),	"sched_get_priority_max"},
 [126] = { 1,	0,		SEN(sched_get_priority_min),	"sched_get_priority_min"},
-[127] = { 2,	0,		SEN(sched_rr_get_interval),	"sched_rr_get_interval"	},
+/* [127] sched_rr_get_interval */
 [128] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [129] = { 2,	TS,		SEN(kill),			"kill"			},
 [130] = { 2,	TS,		SEN(kill),			"tkill"			},
@@ -142,29 +149,29 @@
 [134] = { 4,	TS,		SEN(rt_sigaction),		"rt_sigaction"		},
 [135] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [136] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
-[137] = { 4,	TS,		SEN(rt_sigtimedwait),		"rt_sigtimedwait"	},
+/* [137] rt_sigtimedwait */
 [138] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [139] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
 [140] = { 3,	0,		SEN(setpriority),		"setpriority"		},
 [141] = { 2,	0,		SEN(getpriority),		"getpriority"		},
 [142] = { 4,	0,		SEN(reboot),			"reboot"		},
-[143] = { 2,	0,		SEN(setregid),			"setregid"		},
-[144] = { 1,	0,		SEN(setgid),			"setgid"		},
-[145] = { 2,	0,		SEN(setreuid),			"setreuid"		},
-[146] = { 1,	0,		SEN(setuid),			"setuid"		},
-[147] = { 3,	0,		SEN(setresuid),			"setresuid"		},
-[148] = { 3,	0,		SEN(getresuid),			"getresuid"		},
-[149] = { 3,	0,		SEN(setresgid),			"setresgid"		},
-[150] = { 3,	0,		SEN(getresgid),			"getresgid"		},
-[151] = { 1,	NF,		SEN(setfsuid),			"setfsuid"		},
-[152] = { 1,	NF,		SEN(setfsgid),			"setfsgid"		},
+[143] = { 2,	TC,		SEN(setregid),			"setregid"		},
+[144] = { 1,	TC,		SEN(setgid),			"setgid"		},
+[145] = { 2,	TC,		SEN(setreuid),			"setreuid"		},
+[146] = { 1,	TC,		SEN(setuid),			"setuid"		},
+[147] = { 3,	TC,		SEN(setresuid),			"setresuid"		},
+[148] = { 3,	TC,		SEN(getresuid),			"getresuid"		},
+[149] = { 3,	TC,		SEN(setresgid),			"setresgid"		},
+[150] = { 3,	TC,		SEN(getresgid),			"getresgid"		},
+[151] = { 1,	TC|NF,		SEN(setfsuid),			"setfsuid"		},
+[152] = { 1,	TC|NF,		SEN(setfsgid),			"setfsgid"		},
 [153] = { 1,	0,		SEN(times),			"times"			},
 [154] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [155] = { 1,	0,		SEN(getpgid),			"getpgid"		},
 [156] = { 1,	0,		SEN(getsid),			"getsid"		},
 [157] = { 0,	0,		SEN(setsid),			"setsid"		},
-[158] = { 2,	0,		SEN(getgroups),			"getgroups"		},
-[159] = { 2,	0,		SEN(setgroups),			"setgroups"		},
+[158] = { 2,	TC,		SEN(getgroups),			"getgroups"		},
+[159] = { 2,	TC,		SEN(setgroups),			"setgroups"		},
 [160] = { 1,	0,		SEN(uname),			"uname"			},
 [161] = { 2,	0,		SEN(sethostname),		"sethostname"		},
 [162] = { 2,	0,		SEN(setdomainname),		"setdomainname"		},
@@ -172,32 +179,32 @@
 [164] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},
 [165] = { 2,	0,		SEN(getrusage),			"getrusage"		},
 [166] = { 1,	NF,		SEN(umask),			"umask"			},
-[167] = { 5,	0,		SEN(prctl),			"prctl"			},
+[167] = { 5,	TC,		SEN(prctl),			"prctl"			},
 [168] = { 3,	0,		SEN(getcpu),			"getcpu"		},
-[169] = { 2,	0,		SEN(gettimeofday),		"gettimeofday"		},
-[170] = { 2,	0,		SEN(settimeofday),		"settimeofday"		},
-[171] = { 1,	0,		SEN(adjtimex),			"adjtimex"		},
-[172] = { 0,	NF,		SEN(getpid),			"getpid"		},
-[173] = { 0,	NF,		SEN(getppid),			"getppid"		},
-[174] = { 0,	NF,		SEN(getuid),			"getuid"		},
-[175] = { 0,	NF,		SEN(geteuid),			"geteuid"		},
-[176] = { 0,	NF,		SEN(getgid),			"getgid"		},
-[177] = { 0,	NF,		SEN(getegid),			"getegid"		},
-[178] = { 0,	NF,		SEN(gettid),			"gettid"		},
+/* [169] gettimeofday */
+/* [170] settimeofday */
+/* [171] adjtimex */
+[172] = { 0,	PU|NF,		SEN(getpid),			"getpid"		},
+[173] = { 0,	PU|NF,		SEN(getppid),			"getppid"		},
+[174] = { 0,	TC|PU|NF,	SEN(getuid),			"getuid"		},
+[175] = { 0,	TC|PU|NF,	SEN(geteuid),			"geteuid"		},
+[176] = { 0,	TC|PU|NF,	SEN(getgid),			"getgid"		},
+[177] = { 0,	TC|PU|NF,	SEN(getegid),			"getegid"		},
+[178] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [179] = { 1,	0,		SEN(sysinfo),			"sysinfo"		},
-[180] = { 4,	0,		SEN(mq_open),			"mq_open"		},
+[180] = { 4,	TD,		SEN(mq_open),			"mq_open"		},
 [181] = { 1,	0,		SEN(mq_unlink),			"mq_unlink"		},
-[182] = { 5,	0,		SEN(mq_timedsend),		"mq_timedsend"		},
-[183] = { 5,	0,		SEN(mq_timedreceive),		"mq_timedreceive"	},
-[184] = { 2,	0,		SEN(mq_notify),			"mq_notify"		},
-[185] = { 3,	0,		SEN(mq_getsetattr),		"mq_getsetattr"		},
+/* [182] mq_timedsend */
+/* [183] mq_timedreceive */
+[184] = { 2,	TD,		SEN(mq_notify),			"mq_notify"		},
+[185] = { 3,	TD,		SEN(mq_getsetattr),		"mq_getsetattr"		},
 [186] = { 2,	TI,		SEN(msgget),			"msgget"		},
 [187] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
 [188] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
 [189] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
 [190] = { 3,	TI,		SEN(semget),			"semget"		},
 [191] = { 4,	TI,		SEN(semctl),			"semctl"		},
-[192] = { 4,	TI,		SEN(semtimedop),		"semtimedop"		},
+/* [192] semtimedop */
 [193] = { 3,	TI,		SEN(semop),			"semop"			},
 [194] = { 3,	TI,		SEN(shmget),			"shmget"		},
 [195] = { 3,	TI,		SEN(shmctl),			"shmctl"		},
@@ -226,7 +233,7 @@
 [218] = { 4,	0,		SEN(request_key),		"request_key"		},
 [219] = { 5,	0,		SEN(keyctl),			"keyctl"		},
 [220] = { 5,	TP,		SEN(clone),			"clone"			},
-[221] = { 3,	TF|TP|SE|SI,	SEN(execve),			"execve"		},
+[221] = { 3,	TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
 [222] = { 6,	TD|TM|SI,	SEN(ARCH_mmap),			"mmap2"			},
 [223] = { 6,	TD,		SEN(fadvise64_64),		"fadvise64_64"		},
 [224] = { 2,	TF,		SEN(swapon),			"swapon"		},
@@ -248,15 +255,15 @@
 [240] = { 4,	TP|TS,		SEN(rt_tgsigqueueinfo),		"rt_tgsigqueueinfo"	},
 [241] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [242] = { 4,	TN,		SEN(accept4),			"accept4"		},
-[243] = { 5,	TN,		SEN(recvmmsg),			"recvmmsg"		},
+/* [243] recvmmsg */
 /* [244 ... 259] are arch specific */
-[260] = { 4,	TP,		SEN(wait4),			"wait4"			},
+/* [260] wait4 */
 [261] = { 4,	0,		SEN(prlimit64),			"prlimit64"		},
 [262] = { 2,	TD,		SEN(fanotify_init),		"fanotify_init"		},
 [263] = { 6,	TD|TF,		SEN(fanotify_mark),		"fanotify_mark"		},
 [264] = { 5,	TD|TF,		SEN(name_to_handle_at),		"name_to_handle_at"	},
 [265] = { 3,	TD,		SEN(open_by_handle_at),		"open_by_handle_at"	},
-[266] = { 2,	0,		SEN(clock_adjtime),		"clock_adjtime"		},
+/* [266] clock_adjtime */
 [267] = { 1,	TD,		SEN(syncfs),			"syncfs"		},
 [268] = { 2,	TD,		SEN(setns),			"setns"			},
 [269] = { 4,	TN,		SEN(sendmmsg),			"sendmmsg"		},
@@ -271,7 +278,7 @@
 [278] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [279] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
 [280] = { 3,	TD,		SEN(bpf),			"bpf"			},
-[281] = { 5,	TD|TF|TP|SE|SI,	SEN(execveat),			"execveat"		},
+[281] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [282] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [283] = { 2,	0,		SEN(membarrier),		"membarrier"		},
 [284] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
@@ -282,6 +289,15 @@
 [289] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [290] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [291] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+/* [292] io_pgetevents */
+[293] = { 4,	0,		SEN(rseq),			"rseq"			},
+[294] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
+#if HAVE_ARCH_TIME32_SYSCALLS
+# include "32/syscallent-time32.h"
+#endif
+/* [295 ... 402] - reserved to sync up with other architectures */
+#include "syscallent-common-32.h"
+#include "syscallent-common.h"
 
 #undef sys_ARCH_mmap
 #undef ARCH_WANT_SYNC_FILE_RANGE2

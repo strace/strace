@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Check decoding of SPARC-specific kern_features syscall.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+run_prog ../kern_features > /dev/null
+prog="$args"
+fault_args='-a16 -e trace=kern_features -e inject=kern_features:retval='
+
+test_run_rval()
+{
+	local run rval
+	run="$1"; shift
+	rval="$1"; shift
+
+	run_strace $fault_args$rval $prog $run > "$EXP"
+	match_diff "$LOG" "$EXP"
+}
+
+test_run_rval 0 0
+test_run_rval 1 1
+test_run_rval 2 2
+test_run_rval 3 2147483646 # 0x7ffffffe
+test_run_rval 4 2147483647 # 0x7fffffff
+
+exit 0 # injecting retval < 0 not supported yet
+
+case "$SIZEOF_KERNEL_LONG_T" in
+4)
+	test_run_rval 5 3735943886 # 0xdeadface
+	test_run_rval 6 4294967295 # 0xffffffff
+	;;
+8)
+	test_run_rval 5 13464652301225294542 # 0xbadc0deddeadface
+	test_run_rval 6 18446744073709551615 # 0xffffffffffffffff
+	;;
+esac

@@ -2,34 +2,13 @@
  * Check decoding of preadv2 and pwritev2 syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
 #include "scno.h"
 
 #if defined __NR_preadv2 && defined __NR_pwritev2
@@ -104,7 +83,7 @@ dumpio(void)
 	tprintf("pwritev2(1, [], 0, 0, 0) = 0\n");
 
 	rc = pw(1, w_iov + ARRAY_SIZE(w_iov_) - 1, 2, 0);
-	tprintf("pwritev2(1, [{iov_base=\"%s\", iov_len=%u}, %p], 2, 0, 0)"
+	tprintf("pwritev2(1, [{iov_base=\"%s\", iov_len=%u}, ... /* %p */], 2, 0, 0)"
 		" = %ld %s (%m)\n",
 		w2_c, LENGTH_OF(w2_c), w_iov + ARRAY_SIZE(w_iov_),
 		rc, errno2name());
@@ -186,44 +165,61 @@ main(void)
 	const unsigned long long pos = 0x7ac5fed6dad7bef8;
 	const kernel_ulong_t pos_l = (kernel_ulong_t) pos;
 	long rc;
-	int test_dumpio;
+	bool skip_dumpio_test = false;
 
 	tprintf("%s", "");
 
-#if defined __x86_64__ && defined __ILP32__
+# if defined __x86_64__ && defined __ILP32__
 	/*
 	 * x32 is the only architecture where preadv2 takes 5 arguments,
 	 * see preadv64v2 in kernel sources.
 	 */
 	rc = syscall(__NR_preadv2, -1, NULL, vlen, pos_l, 1);
-#else
+# else
 	const kernel_ulong_t pos_h =
 		(sizeof(pos_l) == sizeof(pos)) ?
 		(kernel_ulong_t) 0xbadc0deddeadbeefULL :
 		(kernel_ulong_t) (pos >> 32);
 	rc = syscall(__NR_preadv2, -1, NULL, vlen, pos_l, pos_h, 1);
-#endif
-	if (rc != -1 || (ENOSYS != errno && EBADF != errno))
-		perror_msg_and_fail("preadv2");
-	test_dumpio = EBADF == errno;
+# endif
+	if (rc != -1)
+		error_msg_and_fail("preadv2: expected -1, returned %ld", rc);
+	switch (errno) {
+		case ENOSYS:
+			skip_dumpio_test = true;
+			break;
+		case EBADF:
+			break;
+		default:
+			perror_msg_and_fail("preadv2");
+	}
 	tprintf("preadv2(-1, NULL, %lu, %lld, RWF_HIPRI) = %s\n",
 		(unsigned long) vlen, pos, sprintrc(rc));
 
-#if defined __x86_64__ && defined __ILP32__
+# if defined __x86_64__ && defined __ILP32__
 	/*
 	 * x32 is the only architecture where pwritev2 takes 5 arguments,
 	 * see pwritev64v2 in kernel sources.
 	 */
 	rc = syscall(__NR_pwritev2, -1, NULL, vlen, pos_l, 1);
-#else
+# else
 	rc = syscall(__NR_pwritev2, -1, NULL, vlen, pos_l, pos_h, 1);
-#endif
-	if (rc != -1 || (ENOSYS != errno && EBADF != errno))
-		perror_msg_and_fail("pwritev2");
+# endif
+	if (rc != -1)
+		error_msg_and_fail("pwritev2: expected -1, returned %ld", rc);
+	switch (errno) {
+		case ENOSYS:
+			skip_dumpio_test = true;
+			break;
+		case EBADF:
+			break;
+		default:
+			perror_msg_and_fail("pwritev2");
+	}
 	tprintf("pwritev2(-1, NULL, %lu, %lld, RWF_HIPRI) = %s\n",
 		(unsigned long) vlen, pos, sprintrc(rc));
 
-	if (test_dumpio)
+	if (!skip_dumpio_test)
 		dumpio();
 
 	tprintf("%s\n", "+++ exited with 0 +++");

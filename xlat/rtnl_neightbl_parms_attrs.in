@@ -1,3 +1,4 @@
+#value_indexed
 NDTPA_UNSPEC			0
 NDTPA_IFINDEX			1
 NDTPA_REFCNT			2

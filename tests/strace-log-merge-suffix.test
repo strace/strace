@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Check strace-log-merge pid formatting.
+#
+# Copyright (c) 2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+rm -f -- "$LOG".[0-9]*
+
+echo '3456789012.345678 +++ exited with 3 +++' > "$LOG".4294967295
+echo '1234567890.123456 +++ exited with 2 +++' > "$LOG".65535
+echo '2345678901.234567 +++ exited with 1 +++' > "$LOG".1
+
+cat > "$EXP" <<'EOF'
+65535      1234567890.123456 +++ exited with 2 +++
+1          2345678901.234567 +++ exited with 1 +++
+4294967295 3456789012.345678 +++ exited with 3 +++
+EOF
+
+"$srcdir"/../strace-log-merge "$LOG" > "$OUT" 2> "$LOG" ||
+	dump_log_and_fail_with 'strace-log-merge failed'
+
+match_diff "$OUT" "$EXP" 'strace-log-merge output mismatch'
+
+rm -f -- "$LOG".[0-9]*

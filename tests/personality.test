@@ -1,9 +1,14 @@
 #!/bin/sh
-
+#
 # Check personality syscall decoding.
+#
+# Copyright (c) 2015-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-run_strace -a20 -epersonality $args > "$EXP"
+run_strace -a20 -epersonality "$@" $args > "$EXP"
 match_grep "$LOG" "$EXP"

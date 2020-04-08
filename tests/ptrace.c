@@ -2,42 +2,24 @@
  * Check decoding of ptrace syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #include <errno.h>
+#include "ptrace.h"
+#include <inttypes.h>
 #include <signal.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "ptrace.h"
 #include <linux/audit.h>
 
 static const char *errstr;
@@ -58,10 +40,11 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 	printf("ptrace(PTRACE_PEEKSIGINFO, %u, NULL, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, errstr);
 
-	struct {
+	struct psi {
 		unsigned long long off;
 		unsigned int flags, nr;
-	} *const psi = tail_alloc(sizeof(*psi));
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct psi, psi);
 
 	psi->off = 0xdeadbeeffacefeedULL;
 	psi->flags = 1;
@@ -163,7 +146,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 			errno = saved;
 			perror_msg_and_fail("ptrace");
 		}
-		printf("ptrace(PTRACE_CONT, %ld, NULL, SIG_0) = 0\n", pid);
+		printf("ptrace(PTRACE_CONT, %ld, NULL, 0) = 0\n", pid);
 	}
 }
 
@@ -176,6 +159,8 @@ main(void)
 		(unsigned long) 0xdeadcafefffff00dULL;
 	const unsigned long pid =
 		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, filter_off);
 
 	const unsigned int sigset_size = get_sigset_size();
 
@@ -246,6 +231,22 @@ main(void)
 	printf("ptrace(PTRACE_SECCOMP_GET_FILTER, %u, 42, NULL) = %s\n",
 	       (unsigned) pid, errstr);
 
+	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data, 0);
+	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %u, %lu, NULL) = %s\n",
+	       (unsigned) pid, bad_data, errstr);
+
+	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, 7,
+		  (unsigned long) filter_off);
+	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %u, 7, %p) = %s\n",
+	       (unsigned) pid, filter_off, errstr);
+
+	*filter_off = 0xfacefeeddeadc0deULL;
+	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data,
+		  (unsigned long) filter_off);
+	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %u, %lu, "
+	       "{filter_off=%" PRIu64 "}) = %s\n",
+	       (unsigned) pid, bad_data, *filter_off, errstr);
+
 	do_ptrace(PTRACE_GETEVENTMSG, pid, bad_request, bad_data);
 	printf("ptrace(PTRACE_GETEVENTMSG, %u, %#lx, %#lx) = %s\n",
 	       (unsigned) pid, bad_request, bad_data, errstr);
@@ -306,7 +307,7 @@ main(void)
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGBUS"
-	       ", si_code=BUS_ADRALN, si_errno=%d, si_addr=%p}) = %s\n",
+	       ", si_code=BUS_ADRALN, si_errno=%u, si_addr=%p}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_errno, sip->si_addr,
 	       errstr);
 
@@ -320,7 +321,7 @@ main(void)
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGPROF"
-	       ", si_code=%#x, si_errno=%d, si_pid=0, si_uid=3}) = %s\n",
+	       ", si_code=%#x, si_errno=%u, si_pid=0, si_uid=3}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_code, sip->si_errno,
 	       errstr);
 
@@ -348,7 +349,7 @@ main(void)
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%d, si_call_addr=NULL"
+	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
 	       ", si_syscall=__NR_read, si_arch=%#x /* AUDIT_ARCH_??? */})"
 	       " = %s\n",
 	       (unsigned) pid, bad_request, sip->si_errno, sip->si_arch,

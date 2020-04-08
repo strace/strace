@@ -1,12 +1,22 @@
 SI_USER 0
 SI_KERNEL 0x80
 SI_QUEUE -1
+
+#ifdef __mips__
+SI_ASYNCIO -2
+SI_TIMER -3
+SI_MESGQ -4
+#else
 SI_TIMER -2
 SI_MESGQ -3
 SI_ASYNCIO -4
+#endif
+
 SI_SIGIO -5
 SI_TKILL -6
 SI_DETHREAD -7
 SI_ASYNCNL -60
-SI_NOINFO
-SI_LWP
+
+#ifdef __sparc__
+SI_NOINFO 32767
+#endif

@@ -3,49 +3,98 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2005-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 #include "xlat.h"
 #include <stdio.h>
 
-int
-printxval(const struct xlat *xlat, unsigned long long val,
-	  const char *const dflt)
+#if !XLAT_RAW
+static const char *
+lookup_xlat(const struct xlat *xlat, unsigned long long val)
 {
-	for (; xlat->str; xlat++) {
-		if (xlat->val == val) {
-			fputs(xlat->str, stdout);
-			return 1;
+	const struct xlat_data *xd = xlat->data;
+
+	for (size_t i = 0; i < xlat->size; i++, xd++) {
+		if (!xd->str)
+			continue;
+
+		if (xd->val == val) {
+			return xd->str;
 		}
 	}
 
+	return NULL;
+}
+#endif
+
+int
+XLAT_NAME(printxval)(const struct xlat *xlat, unsigned long long val,
+		     const char *const dflt)
+{
+#if XLAT_RAW
 	printf("%#llx", val);
+
+	return 1;
+#else
+	const char *str = lookup_xlat(xlat, val);
+
+# if XLAT_VERBOSE
+	printf("%#llx", val);
+	if (str || dflt)
+		printf(" /* %s */", str ?: dflt);
+# else
+	if (str) {
+		fputs(str, stdout);
+	} else {
+		printf("%#llx", val);
+		if (dflt)
+			printf(" /* %s */", dflt);
+	}
+# endif /* XLAT_VERBOSE */
+
+	return !!str;
+#endif /* XLAT_RAW */
+}
+
+const char *
+XLAT_NAME(sprintxlat)(const char *str, unsigned long long val,
+		      const char *const dflt)
+{
+	static char buf[256];
+
+#if XLAT_RAW
+	snprintf(buf, sizeof(buf), "%#llx", val);
+#elif XLAT_VERBOSE
+	if (str || dflt)
+		snprintf(buf, sizeof(buf), "%#llx /* %s */", val, str ?: dflt);
+	else
+		snprintf(buf, sizeof(buf), "%#llx", val);
+#else
+	if (str)
+		return str;
+
 	if (dflt)
-		printf(" /* %s */", dflt);
-	return 0;
+		snprintf(buf, sizeof(buf), "%#llx /* %s */", val, dflt);
+	else
+		snprintf(buf, sizeof(buf), "%#llx", val);
+#endif
+
+	return buf;
+}
+
+const char *
+XLAT_NAME(sprintxval)(const struct xlat *xlat, unsigned long long val,
+		      const char *const dflt)
+{
+#if XLAT_RAW
+	return sprintxlat(NULL, val, dflt);
+#else
+	return sprintxlat(lookup_xlat(xlat, val), val, dflt);
+#endif
 }

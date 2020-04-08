@@ -1,10 +1,15 @@
 #!/bin/sh
-
+#
 # Check how "resuming interrupted nanosleep" works.
+#
+# Copyright (c) 2015-2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
 run_prog > /dev/null
-syscalls=nanosleep,restart_syscall
+syscalls=restart_syscall,/nanosleep
 run_strace -a20 -e trace=$syscalls $args > "$EXP"
 match_grep "$LOG" "$EXP"

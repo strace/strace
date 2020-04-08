@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Check decoding of inotify_init with path decoding enabled.
+#
+# Copyright (c) 2018-2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+# Test expects "anon_inode:inotify" link path format for a inotify fd, which
+# is in place since v2.6.33-rc1~34^2~7. Check for older link path formats
+# is implemented in inotify_init1 test.
+require_min_kernel_version_or_skip 2.6.33
+
+run_strace_match_diff -a15 -y -e trace=inotify_init

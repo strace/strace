@@ -2,30 +2,10 @@
  * Check decoding of waitid syscall.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -36,7 +16,79 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
-#include <asm/unistd.h>
+#include "scno.h"
+
+/* Workaround for glibc/kernel interface discrepancy */
+#ifdef HAVE_STRUCT_RUSAGE___RU_MAXRSS_WORD
+# define RU_MAXRSS __ru_maxrss_word
+#else
+# define RU_MAXRSS ru_maxrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_IXRSS_WORD
+# define RU_IXRSS __ru_ixrss_word
+#else
+# define RU_IXRSS ru_ixrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_IDRSS_WORD
+# define RU_IDRSS __ru_idrss_word
+#else
+# define RU_IDRSS ru_idrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_ISRSS_WORD
+# define RU_ISRSS __ru_isrss_word
+#else
+# define RU_ISRSS ru_isrss
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MINFLT_WORD
+# define RU_MINFLT __ru_minflt_word
+#else
+# define RU_MINFLT ru_minflt
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MAJFLT_WORD
+# define RU_MAJFLT __ru_majflt_word
+#else
+# define RU_MAJFLT ru_majflt
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NSWAP_WORD
+# define RU_NSWAP __ru_nswap_word
+#else
+# define RU_NSWAP ru_nswap
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_INBLOCK_WORD
+# define RU_INBLOCK __ru_inblock_word
+#else
+# define RU_INBLOCK ru_inblock
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_OUBLOCK_WORD
+# define RU_OUBLOCK __ru_oublock_word
+#else
+# define RU_OUBLOCK ru_oublock
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MSGSND_WORD
+# define RU_MSGSND __ru_msgsnd_word
+#else
+# define RU_MSGSND ru_msgsnd
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_MSGRCV_WORD
+# define RU_MSGRCV __ru_msgrcv_word
+#else
+# define RU_MSGRCV ru_msgrcv
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NSIGNALS_WORD
+# define RU_NSIGNALS __ru_nsignals_word
+#else
+# define RU_NSIGNALS ru_nsignals
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NVCSW_WORD
+# define RU_NVCSW __ru_nvcsw_word
+#else
+# define RU_NVCSW ru_nvcsw
+#endif
+#ifdef HAVE_STRUCT_RUSAGE___RU_NIVCSW_WORD
+# define RU_NIVCSW __ru_nivcsw_word
+#else
+# define RU_NIVCSW ru_nivcsw
+#endif
 
 static const char *
 sprint_rusage(const struct rusage *const ru)
@@ -68,20 +120,20 @@ sprint_rusage(const struct rusage *const ru)
 		 , (long long) ru->ru_stime.tv_sec
 		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
 #if VERBOSE
-		 , zero_extend_signed_to_ull(ru->ru_maxrss)
-		 , zero_extend_signed_to_ull(ru->ru_ixrss)
-		 , zero_extend_signed_to_ull(ru->ru_idrss)
-		 , zero_extend_signed_to_ull(ru->ru_isrss)
-		 , zero_extend_signed_to_ull(ru->ru_minflt)
-		 , zero_extend_signed_to_ull(ru->ru_majflt)
-		 , zero_extend_signed_to_ull(ru->ru_nswap)
-		 , zero_extend_signed_to_ull(ru->ru_inblock)
-		 , zero_extend_signed_to_ull(ru->ru_oublock)
-		 , zero_extend_signed_to_ull(ru->ru_msgsnd)
-		 , zero_extend_signed_to_ull(ru->ru_msgrcv)
-		 , zero_extend_signed_to_ull(ru->ru_nsignals)
-		 , zero_extend_signed_to_ull(ru->ru_nvcsw)
-		 , zero_extend_signed_to_ull(ru->ru_nivcsw)
+		 , zero_extend_signed_to_ull(ru->RU_MAXRSS)
+		 , zero_extend_signed_to_ull(ru->RU_IXRSS)
+		 , zero_extend_signed_to_ull(ru->RU_IDRSS)
+		 , zero_extend_signed_to_ull(ru->RU_ISRSS)
+		 , zero_extend_signed_to_ull(ru->RU_MINFLT)
+		 , zero_extend_signed_to_ull(ru->RU_MAJFLT)
+		 , zero_extend_signed_to_ull(ru->RU_NSWAP)
+		 , zero_extend_signed_to_ull(ru->RU_INBLOCK)
+		 , zero_extend_signed_to_ull(ru->RU_OUBLOCK)
+		 , zero_extend_signed_to_ull(ru->RU_MSGSND)
+		 , zero_extend_signed_to_ull(ru->RU_MSGRCV)
+		 , zero_extend_signed_to_ull(ru->RU_NSIGNALS)
+		 , zero_extend_signed_to_ull(ru->RU_NVCSW)
+		 , zero_extend_signed_to_ull(ru->RU_NIVCSW)
 #endif
 		 );
 	return buf;

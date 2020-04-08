@@ -1,2 +1,2 @@
-version=3
-opts=pgpsigurlmangle=s/$/.asc/,uversionmangle=s/-/./g http://sf.net/strace/strace-([[:digit:].-]*)\.tar\.xz
+version=4
+opts=pgpsigurlmangle=s/$/.asc/,uversionmangle=s/-/./g https://strace.io/files/@ANY_VERSION@/@PACKAGE@-@ANY_VERSION@@ARCHIVE_EXT@

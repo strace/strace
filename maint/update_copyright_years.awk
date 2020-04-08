@@ -1,3 +1,10 @@
+#!/bin/gawk -f
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
 # External variables:
 #   COMMENT_MARKER    - marks beginning of the comment on the line
 #   COMMENT_MARKER_RE - the same as previous, but in form usable

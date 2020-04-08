@@ -3,50 +3,40 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
 #include <sys/resource.h>
 
+#include "xstring.h"
+
 #include "xlat/resources.h"
 
-static const char *
-sprint_rlim64(uint64_t lim)
-{
-	static char buf[sizeof(uint64_t)*3 + sizeof("*1024")];
+static void
+print_rlim64_t(uint64_t lim) {
+	const char *str = NULL;
 
 	if (lim == UINT64_MAX)
-		return "RLIM64_INFINITY";
+		str = "RLIM64_INFINITY";
+	else if (lim > 1024 && lim % 1024 == 0) {
+		static char buf[sizeof(lim) * 3 + sizeof("*1024")];
 
-	if (lim > 1024 && lim % 1024 == 0)
-		sprintf(buf, "%" PRIu64 "*1024", lim / 1024);
-	else
-		sprintf(buf, "%" PRIu64, lim);
-	return buf;
+		xsprintf(buf, "%" PRIu64 "*1024", lim / 1024);
+		str = buf;
+	}
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%" PRIu64, lim);
+
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+                ? tprints_comment : tprints)(str);
 }
 
 static void
@@ -58,26 +48,37 @@ print_rlimit64(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		tprintf("{rlim_cur=%s,", sprint_rlim64(rlim.rlim_cur));
-		tprintf(" rlim_max=%s}", sprint_rlim64(rlim.rlim_max));
+		tprints("{rlim_cur=");
+		print_rlim64_t(rlim.rlim_cur);
+		tprints(", rlim_max=");
+		print_rlim64_t(rlim.rlim_max);
+		tprints("}");
 	}
 }
 
 #if !defined(current_wordsize) || current_wordsize == 4
 
-static const char *
-sprint_rlim32(uint32_t lim)
-{
-	static char buf[sizeof(uint32_t)*3 + sizeof("*1024")];
+static void
+print_rlim32_t(uint32_t lim) {
+	const char *str = NULL;
 
 	if (lim == UINT32_MAX)
-		return "RLIM_INFINITY";
+		str = "RLIM_INFINITY";
+	else if (lim > 1024 && lim % 1024 == 0) {
+		static char buf[sizeof(lim) * 3 + sizeof("*1024")];
 
-	if (lim > 1024 && lim % 1024 == 0)
-		sprintf(buf, "%" PRIu32 "*1024", lim / 1024);
-	else
-		sprintf(buf, "%" PRIu32, lim);
-	return buf;
+		xsprintf(buf, "%" PRIu32 "*1024", lim / 1024);
+		str = buf;
+	}
+
+	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
+		tprintf("%" PRIu32, lim);
+
+	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+                ? tprints_comment : tprints)(str);
 }
 
 static void
@@ -89,8 +90,11 @@ print_rlimit32(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		tprintf("{rlim_cur=%s,", sprint_rlim32(rlim.rlim_cur));
-		tprintf(" rlim_max=%s}", sprint_rlim32(rlim.rlim_max));
+		tprints("{rlim_cur=");
+		print_rlim32_t(rlim.rlim_cur);
+		tprints(", rlim_max=");
+		print_rlim32_t(rlim.rlim_max);
+		tprints("}");
 	}
 }
 

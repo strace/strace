@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 struct arm_pt_regs {
 	uint32_t uregs[18];
 };
@@ -27,12 +34,16 @@ static union {
 #define aarch64_regs	arm_regs_union.aarch64_r
 #define arm_regs	arm_regs_union.arm_r
 
-uint64_t *const aarch64_sp_ptr = (uint64_t *) &aarch64_regs.sp;
-uint32_t *const arm_sp_ptr = &arm_regs.ARM_sp;
 static struct iovec aarch64_io = {
 	.iov_base = &arm_regs_union
 };
 
 #define ARCH_REGS_FOR_GETREGSET arm_regs_union
 #define ARCH_IOVEC_FOR_GETREGSET aarch64_io
-#define ARCH_PC_REG ((aarch64_io.iov_len == sizeof(arm_regs)) ? arm_regs.ARM_pc : aarch64_regs.pc)
+#define ARCH_PC_REG \
+	((aarch64_io.iov_len == sizeof(arm_regs)) ? arm_regs.ARM_pc : aarch64_regs.pc)
+#define ARCH_SP_REG \
+	((aarch64_io.iov_len == sizeof(arm_regs)) ? arm_regs.ARM_sp : aarch64_regs.sp)
+
+#define ARCH_PERSONALITY_0_IOV_SIZE sizeof(aarch64_regs)
+#define ARCH_PERSONALITY_1_IOV_SIZE sizeof(arm_regs)

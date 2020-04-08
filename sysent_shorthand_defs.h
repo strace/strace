@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2017-2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #ifdef	STRACE_TESTS_H
 
 # define TD	0
@@ -14,11 +21,14 @@
 # define TSF	0
 # define TFSF	0
 # define TSFA	0
+# define PU	0
 # define NF	0
 # define MA	0
 # define SI	0
 # define SE	0
 # define CST	0
+# define TSD	0
+# define TC	0
 # define SEN(a)	0, 0
 
 #else	/*	!STRACE_TESTS_H	*/
@@ -37,11 +47,14 @@
 # define TSF	TRACE_STATFS
 # define TFSF	TRACE_FSTATFS
 # define TSFA	TRACE_STATFS_LIKE
+# define PU	TRACE_PURE
 # define NF	SYSCALL_NEVER_FAILS
 # define MA	MAX_ARGS
-# define SI	STACKTRACE_INVALIDATE_CACHE
+# define SI	MEMORY_MAPPING_CHANGE
 # define SE	STACKTRACE_CAPTURE_ON_ENTER
 # define CST	COMPAT_SYSCALL_TYPES
+# define TSD	TRACE_SECCOMP_DEFAULT
+# define TC	TRACE_CREDS
 /* SEN(a) is defined elsewhere */
 
 #endif

@@ -1,29 +1,9 @@
 #!/bin/sh
 # Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
-# Copyright (c) 2015-2017 The strace developers.
+# Copyright (c) 2015-2020 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 set -efu
 
@@ -124,6 +104,7 @@ process_file()
 
 	# Common code for every processed file.
 	cat > "$tmpdir"/printents.c <<__EOF__
+#include <linux/compiler_attributes.h>
 #include <asm/termbits.h>
 #include <asm/ioctl.h>
 #include <linux/types.h>
@@ -162,6 +143,14 @@ typedef unsigned long long u64;
 
 #include "fixes.h"
 
+#ifndef UL
+# define UL(x) (_UL(x))
+#endif
+
+#ifndef ULL
+# define ULL(x) (_ULL(x))
+#endif
+
 #include <asm/bitsperlong.h>
 #ifndef BITS_PER_LONG
 # define BITS_PER_LONG __BITS_PER_LONG
@@ -184,7 +173,7 @@ __EOF__
 		*asm/core_*.h)
 			return 0 # false positives
 			;;
-		*asm/ioctls.h)
+		*asm*/ioctls.h)
 			cat <<'__EOF__'
 #include <asm/termios.h>
 #include <linux/serial.h>
@@ -236,6 +225,9 @@ __EOF__
 #include <linux/fiemap.h>
 __EOF__
 			;;
+		*linux/ndctl.h)
+			echo '#define PAGE_SIZE 0'
+			;;
 		*linux/if_pppox.h)
 			echo '#include <netinet/in.h>'
 			;;
@@ -253,9 +245,15 @@ __EOF__
 			;;
 		*linux/kvm.h)
 			case "$uname_m" in
-				i?86|x86_64|arm*|ppc*|s390*) ;;
+				i?86|x86_64|aarch64|arm*|mips*|ppc*|s390*) ;;
 				*) return 0 ;; # not applicable
 			esac
+			;;
+		*linux/omap3isp.h)
+			echo 'struct omap3isp_stat_data_time32 {uint32_t dummy32[4]; uint16_t dummy16[3]; };'
+			;;
+		*linux/platform_data/cros_ec_chardev.h)
+			echo 'struct cros_ec_command {uint32_t dummy32[5]; uint8_t dummy8[0]; };'
 			;;
 		*linux/sonet.h)
 			echo '#include <linux/atmioc.h>'
@@ -372,7 +370,18 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			;;
 		*media/v4l2-common.h)
 			# Fetch one piece of code containing ioctls definitions.
-			sed -n '/ remaining ioctls/,/ ---/p' < "$s" > "$tmpdir/$f"
+			sed -n '/\* s_config \*/,/ ---/p' < "$s" >> "$tmpdir/$f"
+			;;
+		*media/v4l2-ioctl.h)
+			echo 'struct old_timespec32 {int32_t dummy[2];};' >> "$tmpdir/$f"
+			echo 'struct old_timeval32 {int32_t dummy[2];};' >> "$tmpdir/$f"
+			# Fetch one piece of code containing ioctls definitions.
+			awk '/^struct v4l2_event_time32/{p=1}/#endif/{p=0}p{print}' < "$s" >> "$tmpdir/$f"
+			;;
+		*sound/pcm.h)
+			echo '#include <uapi/sound/asound.h>' > "$tmpdir/$f"
+			# Fetch one piece of code containing ioctls definitions.
+			awk '/^struct snd_pcm_status64 {/{p=1}/#endif/{p=0}p{print}' < "$s" >> "$tmpdir/$f"
 			;;
 		openpromio.h|*/openpromio.h|fbio.h|*/fbio.h)
 			# Create the file it attempts to include.
@@ -390,19 +399,27 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 
 	# Soft post-preprocess workarounds.  Fragile.
 	case "$f" in
+		*linux/btrfs.h)
+			sed -i '/[[:space:]]BTRFS_IOC_[GS]ET_FSLABEL[[:space:]]/d' \
+				"$tmpdir"/header.out
+			;;
 		*linux/kvm.h)
 			arm_list='KVM_ARM_[A-Z_]+'
 			ppc_list='KVM_ALLOCATE_RMA|KVM_CREATE_SPAPR_TCE|KVM_CREATE_SPAPR_TCE_64|KVM_PPC_[A-Z1-9_]+'
 			s390_list='KVM_S390_[A-Z_]+'
-			x86_list='KVM_GET_CPUID2|KVM_GET_DEBUGREGS|KVM_GET_EMULATED_CPUID|KVM_GET_LAPIC|KVM_GET_MSRS|KVM_GET_MSR_INDEX_LIST|KVM_GET_PIT|KVM_GET_PIT2|KVM_GET_SUPPORTED_CPUID|KVM_GET_VCPU_EVENTS|KVM_GET_XCRS|KVM_GET_XSAVE|KVM_SET_CPUID|KVM_SET_CPUID2|KVM_SET_DEBUGREGS|KVM_SET_LAPIC|KVM_SET_MEMORY_ALIAS|KVM_SET_MSRS|KVM_SET_PIT|KVM_SET_PIT2|KVM_SET_VCPU_EVENTS|KVM_SET_XCRS|KVM_SET_XSAVE|KVM_XEN_HVM_CONFIG|KVM_X86_[A-Z_]+'
+			x86_list='KVM_GET_CPUID2|KVM_GET_DEBUGREGS|KVM_GET_EMULATED_CPUID|KVM_GET_LAPIC|KVM_GET_MSRS|KVM_GET_MSR_FEATURE_INDEX_LIST|KVM_GET_MSR_INDEX_LIST|KVM_GET_NESTED_STATE|KVM_GET_PIT|KVM_GET_PIT2|KVM_GET_SUPPORTED_CPUID|KVM_GET_SUPPORTED_HV_CPUID|KVM_GET_VCPU_EVENTS|KVM_GET_XCRS|KVM_GET_XSAVE|KVM_HYPERV_EVENTFD|KVM_SET_CPUID|KVM_SET_CPUID2|KVM_SET_DEBUGREGS|KVM_SET_LAPIC|KVM_SET_MEMORY_ALIAS|KVM_SET_MSRS|KVM_SET_NESTED_STATE|KVM_SET_PIT|KVM_SET_PIT2|KVM_SET_PMU_EVENT_FILTER|KVM_SET_VCPU_EVENTS|KVM_SET_XCRS|KVM_SET_XSAVE|KVM_XEN_HVM_CONFIG|KVM_X86_[A-Z_]+'
 			case "$uname_m" in
-				arm*) list="$ppc_list|$s390_list|$x86_list" ;;
+				aarch64|arm*) list="$ppc_list|$s390_list|$x86_list" ;;
 				ppc*) list="$arm_list|$s390_list|$x86_list" ;;
 				s390*) list="$arm_list|$ppc_list|$x86_list" ;;
 				i?86|x86_64*) list="$arm_list|$ppc_list|$s390_list" ;;
 				*) list="$arm_list|$ppc_list|$s390_list|$x86_list" ;;
 			esac
 			sed -r -i "/[[:space:]]($list)[[:space:]]/d" "$tmpdir"/header.out
+			;;
+		*linux/v4l2-subdev.h)
+			sed -r -i '/[[:space:]]VIDIOC_SUBDEV_(DV_TIMINGS_CAP|ENUM_DV_TIMINGS|ENUMSTD|G_DV_TIMINGS|G_EDID|G_STD|QUERY_DV_TIMINGS|QUERYSTD|S_DV_TIMINGS|S_EDID|S_STD)[[:space:]]/d' \
+				"$tmpdir"/header.out
 			;;
 	esac
 

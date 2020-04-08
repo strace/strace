@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2016-2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_unlinkat
 
@@ -20,7 +27,7 @@ main(void)
 	printf("unlinkat(%s, \"%s\", %s) = %ld %s (%m)\n",
 	       "AT_FDCWD", sample,
 	       "AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
-	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|0xffffe0ff",
+	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE|0xffff60ff",
 	       rc, errno2name());
 
 	puts("+++ exited with 0 +++");

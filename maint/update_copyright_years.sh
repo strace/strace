@@ -2,30 +2,10 @@
 #
 # Update copyright notices for source files.
 #
-# Copyright (c) 2017 The strace developers.
+# Copyright (c) 2017-2020 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 DEFAULT_GIT_COMMIT_TEMPLATE="Update copyright headers
 
@@ -40,6 +20,7 @@ Headers updated automatically with
 : ${CALL_GIT_ADD=0}
 : ${CALL_GIT_COMMIT=0}
 : ${GIT_COMMIT_TEMPLATE=$DEFAULT_GIT_COMMIT_TEMPLATE}
+LC_TIME=C; export LC_TIME
 
 # These files are only imported into strace and not changed.
 # Remove them from the list once they have been changed.
@@ -118,13 +99,13 @@ process_file()
 
 	if [ -z "$copyright_year_raw" ]; then
 		debug "Copyright notices haven't been found, skipping: $f"
-		continue
+		return
 	fi
 
-	last_commit_year=$(date +%Y -d "$(git log -n1 --format=format:%aD \
-		-- "$f")")
-	first_commit_year=$(date +%Y -d "$(git log --reverse --format=format:%aD \
-		-- "$f" | head -n 1)")
+	last_commit_year=$(date -u +%Y -d "@$(git log --format=format:%at -- "$f" |
+						sort -rn |head -n1)")
+	first_commit_year=$(date -u +%Y -d "@$(git log --format=format:%at -- "$f" |
+						sort -n |head -n1)")
 	copyright_year=$(printf '%s' "$copyright_year_raw" |
 		sort -r -n | head -n 1)
 	start_note='from git log'
@@ -135,19 +116,22 @@ process_file()
 	# assume copyright notice is still relevant
 	if [ "$last_commit_year" = "$copyright_year" ]; then
 		debug "Does not need update, skipping: $f"
-		continue
+		return
 	else
 		debug "Needs update ('$copyright_year' != '$last_commit_year'): $f"
 	fi
 
 	# avoid gaps not covered by copyright
+	[ -n "$copyright_year" ] &&
 	[ "$first_commit_year" -lt "$copyright_year" ] || {
 		start_note='from last copyright year'
 		first_commit_year="$copyright_year"
 	}
 
-	# if there is existing notice, its starting year takes precedence
-	if [ -n "$existing_notice_year" ]; then
+	# if there is existing notice and its starting year is earlier
+	# than the year of the first commit, the former takes precedence
+	if [ -n "$existing_notice_year" ] &&
+	   [ "$existing_notice_year" -le "$first_commit_year" ]; then
 		start_note='from existing copyright notice'
 		first_commit_year="$existing_notice_year"
 	fi

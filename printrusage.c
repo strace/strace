@@ -3,40 +3,41 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2017 The strace developers.
+ * Copyright (c) 1999-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
-#include <sys/resource.h>
 
 #include DEF_MPERS_TYPE(rusage_t)
 
-typedef struct rusage rusage_t;
+#include "kernel_timeval.h"
+
+typedef struct {
+	kernel_old_timeval_t ru_utime;
+	kernel_old_timeval_t ru_stime;
+	kernel_long_t	ru_maxrss;
+	kernel_long_t	ru_ixrss;
+	kernel_long_t	ru_idrss;
+	kernel_long_t	ru_isrss;
+	kernel_long_t	ru_minflt;
+	kernel_long_t	ru_majflt;
+	kernel_long_t	ru_nswap;
+	kernel_long_t	ru_inblock;
+	kernel_long_t	ru_oublock;
+	kernel_long_t	ru_msgsnd;
+	kernel_long_t	ru_msgrcv;
+	kernel_long_t	ru_nsignals;
+	kernel_long_t	ru_nvcsw;
+	kernel_long_t	ru_nivcsw;
+} rusage_t;
 
 #include MPERS_DEFS
+
+#include <sys/resource.h>
+#include "print_fields.h"
 
 MPERS_PRINTER_DECL(void, printrusage,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
@@ -50,26 +51,23 @@ MPERS_PRINTER_DECL(void, printrusage,
 	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_utime);
 	tprints(", ru_stime=");
 	MPERS_FUNC_NAME(print_struct_timeval)(&ru.ru_stime);
-	if (abbrev(tcp))
+	if (abbrev(tcp)) {
 		tprints(", ...");
-	else {
-#define PRINT_RUSAGE_MEMBER(member) \
-		tprintf(", " #member "=%llu", zero_extend_signed_to_ull(ru.member))
-		PRINT_RUSAGE_MEMBER(ru_maxrss);
-		PRINT_RUSAGE_MEMBER(ru_ixrss);
-		PRINT_RUSAGE_MEMBER(ru_idrss);
-		PRINT_RUSAGE_MEMBER(ru_isrss);
-		PRINT_RUSAGE_MEMBER(ru_minflt);
-		PRINT_RUSAGE_MEMBER(ru_majflt);
-		PRINT_RUSAGE_MEMBER(ru_nswap);
-		PRINT_RUSAGE_MEMBER(ru_inblock);
-		PRINT_RUSAGE_MEMBER(ru_oublock);
-		PRINT_RUSAGE_MEMBER(ru_msgsnd);
-		PRINT_RUSAGE_MEMBER(ru_msgrcv);
-		PRINT_RUSAGE_MEMBER(ru_nsignals);
-		PRINT_RUSAGE_MEMBER(ru_nvcsw);
-		PRINT_RUSAGE_MEMBER(ru_nivcsw);
-#undef PRINT_RUSAGE_MEMBER
+	} else {
+		PRINT_FIELD_U(", ", ru, ru_maxrss);
+		PRINT_FIELD_U(", ", ru, ru_ixrss);
+		PRINT_FIELD_U(", ", ru, ru_idrss);
+		PRINT_FIELD_U(", ", ru, ru_isrss);
+		PRINT_FIELD_U(", ", ru, ru_minflt);
+		PRINT_FIELD_U(", ", ru, ru_majflt);
+		PRINT_FIELD_U(", ", ru, ru_nswap);
+		PRINT_FIELD_U(", ", ru, ru_inblock);
+		PRINT_FIELD_U(", ", ru, ru_oublock);
+		PRINT_FIELD_U(", ", ru, ru_msgsnd);
+		PRINT_FIELD_U(", ", ru, ru_msgrcv);
+		PRINT_FIELD_U(", ", ru, ru_nsignals);
+		PRINT_FIELD_U(", ", ru, ru_nvcsw);
+		PRINT_FIELD_U(", ", ru, ru_nivcsw);
 	}
 	tprints("}");
 }
@@ -104,26 +102,23 @@ printrusage32(struct tcb *const tcp, const kernel_ulong_t addr)
 	print_timeval32_t(&ru.ru_utime);
 	tprints(", ru_stime=");
 	print_timeval32_t(&ru.ru_stime);
-	if (abbrev(tcp))
+	if (abbrev(tcp)) {
 		tprints(", ...");
-	else {
-# define PRINT_RUSAGE_MEMBER(member) \
-		tprintf(", " #member "=%lu", ru.member)
-		PRINT_RUSAGE_MEMBER(ru_maxrss);
-		PRINT_RUSAGE_MEMBER(ru_ixrss);
-		PRINT_RUSAGE_MEMBER(ru_idrss);
-		PRINT_RUSAGE_MEMBER(ru_isrss);
-		PRINT_RUSAGE_MEMBER(ru_minflt);
-		PRINT_RUSAGE_MEMBER(ru_majflt);
-		PRINT_RUSAGE_MEMBER(ru_nswap);
-		PRINT_RUSAGE_MEMBER(ru_inblock);
-		PRINT_RUSAGE_MEMBER(ru_oublock);
-		PRINT_RUSAGE_MEMBER(ru_msgsnd);
-		PRINT_RUSAGE_MEMBER(ru_msgrcv);
-		PRINT_RUSAGE_MEMBER(ru_nsignals);
-		PRINT_RUSAGE_MEMBER(ru_nvcsw);
-		PRINT_RUSAGE_MEMBER(ru_nivcsw);
-# undef PRINT_RUSAGE_MEMBER
+	} else {
+		PRINT_FIELD_U(", ", ru, ru_maxrss);
+		PRINT_FIELD_U(", ", ru, ru_ixrss);
+		PRINT_FIELD_U(", ", ru, ru_idrss);
+		PRINT_FIELD_U(", ", ru, ru_isrss);
+		PRINT_FIELD_U(", ", ru, ru_minflt);
+		PRINT_FIELD_U(", ", ru, ru_majflt);
+		PRINT_FIELD_U(", ", ru, ru_nswap);
+		PRINT_FIELD_U(", ", ru, ru_inblock);
+		PRINT_FIELD_U(", ", ru, ru_oublock);
+		PRINT_FIELD_U(", ", ru, ru_msgsnd);
+		PRINT_FIELD_U(", ", ru, ru_msgrcv);
+		PRINT_FIELD_U(", ", ru, ru_nsignals);
+		PRINT_FIELD_U(", ", ru, ru_nvcsw);
+		PRINT_FIELD_U(", ", ru, ru_nivcsw);
 	}
 	tprints("}");
 }

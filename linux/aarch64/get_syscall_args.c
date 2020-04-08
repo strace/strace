@@ -1,10 +1,17 @@
-#define get_syscall_args arm_get_syscall_args
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+#define arch_get_syscall_args arm_get_syscall_args
 #include "arm/get_syscall_args.c"
-#undef get_syscall_args
+#undef arch_get_syscall_args
 
 /* Return -1 on error or 1 on success (never 0!). */
 static int
-get_syscall_args(struct tcb *tcp)
+arch_get_syscall_args(struct tcb *tcp)
 {
 	if (tcp->currpers == 1)
 		return arm_get_syscall_args(tcp);

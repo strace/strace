@@ -1,0 +1,21 @@
+* commit changes prepared by maint/update_copyright_years.sh
+* update copyright year number range in COPYING and debian/copyright
+* prepare NEWS for release
+* generate release notes for strace.io and git repository mirrors
+  using maint/gen-release-notes.sh, maint/gen-release-github.sh
+  and maint/gen-release-gitlab.sh
+* create a release tag using maint/gen-tag-message.sh
+* generate a release tarball using make-dist
+* send the tarball to release farms for the final testing
+* prepare and test package builds for ALT and Rawhide
+* generate a detached signature for the tarball using gpg -ab
+* push the release tag to all git repository mirrors
+* upload the tarball, it's signature and release notes to strace.io
+  and all git repository mirrors
+* adjust the link to the latest release at strace.io
+* submit a release announce to strace-devel
+* update irc #strace topic using /topic #strace
+* update https://en.wikipedia.org/wiki/Strace
+* tweet the news
+* announce the new release at https://freshcode.club/projects/strace
+* announce the new release at other news-related sites

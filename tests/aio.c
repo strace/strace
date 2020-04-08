@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2017 The strace developers.
+ * Copyright (c) 2015-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -32,7 +12,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_io_setup \
  && defined __NR_io_submit \
@@ -137,7 +117,7 @@ main(void)
 			/* In order to make record valid */
 			.aio_nbytes = (size_t) 0x1020304050607080ULL,
 			.aio_offset = 0xdeadda7abadc0dedULL,
-# ifdef IOCB_FLAG_RESFD
+# ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
 			.aio_flags = 0xfacef157,
 			.aio_resfd = 0xded1ca7e,
 # endif
@@ -315,34 +295,34 @@ main(void)
 	printf("io_submit(%#lx, %ld, %p) = %s\n",
 	       *ctx, -1L, cbvs + nr, sprintrc(rc));
 
-	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
 	printf("io_submit(%#lx, %ld, ["
 	       "{aio_data=%#" PRI__x64 ", aio_key=%u"
 		", aio_lio_opcode=%hu /* IOCB_CMD_??? */, aio_fildes=%d}"
-		", {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE, aio_reqprio=%hd"
-		", aio_fildes=%d, aio_buf=NULL"
+		", {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+		", aio_reqprio=IOPRIO_PRIO_VALUE(0x5 /* IOPRIO_CLASS_??? */"
+		", 7919), aio_fildes=%d, aio_buf=NULL"
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-# ifdef IOCB_FLAG_RESFD
-		", aio_resfd=%d, aio_flags=%#x"
+# ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
+		", aio_flags=IOCB_FLAG_RESFD|IOCB_FLAG_IOPRIO|%#x, aio_resfd=%d"
 # endif
-	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+	       "}, {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
 		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
+	       "}, {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITE"
 		", aio_reqprio=%hd, aio_fildes=%d"
 		", aio_buf=\"\\0\\1\\2\\3%.28s\"..."
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
+	       "}, {aio_data=0, aio_key=%u, aio_lio_opcode=IOCB_CMD_PWRITEV"
 		", aio_reqprio=%hd, aio_fildes=%d, aio_buf=%#" PRI__x64
 		", aio_nbytes=%" PRI__u64 ", aio_offset=%" PRI__d64
-	       "}, {NULL}, {%#lx}, %p]) = %s\n",
+	       "}, NULL, %#lx, ... /* %p */]) = ",
 	       *ctx, 1057L,
 	       cbv2[0].aio_data, cbv2[0].aio_key,
 	       cbv2[0].aio_lio_opcode, cbv2[0].aio_fildes,
-	       cbv2[1].aio_key, cbv2[1].aio_reqprio, cbv2[1].aio_fildes,
+	       cbv2[1].aio_key, cbv2[1].aio_fildes,
 	       cbv2[1].aio_nbytes, cbv2[1].aio_offset,
-# ifdef IOCB_FLAG_RESFD
-	       cbv2[1].aio_resfd, cbv2[1].aio_flags,
+# ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
+	       cbv2[1].aio_flags & ~3, cbv2[1].aio_resfd,
 # endif
 	       cbv2[2].aio_key, cbv2[2].aio_reqprio, cbv2[2].aio_fildes,
 	       cbv2[2].aio_buf, cbv2[2].aio_nbytes, cbv2[2].aio_offset,
@@ -350,7 +330,9 @@ main(void)
 	       data2 + 4, cbv2[3].aio_nbytes, cbv2[3].aio_offset,
 	       cbv2[4].aio_key, cbv2[4].aio_reqprio, cbv2[4].aio_fildes,
 	       cbv2[4].aio_buf, cbv2[4].aio_nbytes, cbv2[4].aio_offset,
-	       cbvs2[6], cbvs2 + 7, sprintrc(rc));
+	       cbvs2[6], cbvs2 + 7);
+	rc = syscall(__NR_io_submit, *ctx, 1057L, cbvs2);
+	puts(sprintrc(rc));
 
 	rc = syscall(__NR_io_submit, *ctx, nr, cbvs);
 	if (rc != (long) nr)

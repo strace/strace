@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Check -e status=detached option.
+#
+# Copyright (c) 2019 Paul Chaignon <paul.chaignon@gmail.com>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../sleep 0
+
+# -I2 avoids blocking all fatal signals, the default when using -o.
+$STRACE -o "$LOG" -I2 -e status=detached ../sleep 2 &
+pid=$!
+../sleep 1
+kill $pid
+wait
+match_grep

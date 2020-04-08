@@ -1,35 +1,17 @@
 /*
  * Check decoding of SO_LINGER socket option.
  *
- * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 
+#include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -56,6 +38,19 @@ main(void)
 {
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct linger, linger);
 	TAIL_ALLOC_OBJECT_CONST_PTR(socklen_t, len);
+
+	const unsigned int sizeof_l_onoff = sizeof(linger->l_onoff);
+	struct linger *const l_onoff = tail_alloc(sizeof_l_onoff);
+
+	const unsigned int sizeof_l_onoff_truncated = sizeof_l_onoff - 1;
+	struct linger *const l_onoff_truncated =
+		tail_alloc(sizeof_l_onoff_truncated);
+
+	const unsigned int sizeof_l_linger_truncated =
+		offsetofend(struct linger, l_linger) - 1;
+	struct linger *const l_linger_truncated =
+		tail_alloc(sizeof_l_linger_truncated);
+
         int fd = socket(AF_UNIX, SOCK_STREAM, 0);
         if (fd < 0)
                 perror_msg_and_skip("socket AF_UNIX SOCK_STREAM");
@@ -98,6 +93,12 @@ main(void)
 	printf("setsockopt(%d, SOL_SOCKET, SO_LINGER, %p, %d) = %s\n",
 	       fd, &linger->l_linger, (unsigned int) sizeof(*linger), errstr);
 
+	/* getsockopt with zero optlen */
+	*len = 0;
+	get_linger(fd, linger, len);
+	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, %p, [0]) = %s\n",
+	       fd, linger, errstr);
+
 	/* getsockopt with optlen larger than necessary - shortened */
 	*len = sizeof(*linger) + 1;
 	get_linger(fd, linger, len);
@@ -106,19 +107,43 @@ main(void)
 	       fd, linger->l_onoff, linger->l_linger,
 	       (unsigned int) sizeof(*linger) + 1, *len, errstr);
 
-	/* getsockopt with optlen larger than usual - truncated to l_onoff */
-	*len = sizeof(linger->l_onoff);
-	get_linger(fd, linger, len);
+	/*
+	 * getsockopt with optlen less than sizeof(linger->l_onoff):
+	 * the part of struct linger.l_onoff is printed in hex.
+	 */
+	*len = sizeof_l_onoff_truncated;
+	get_linger(fd, l_onoff_truncated, len);
+	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=", fd);
+	print_quoted_hex(l_onoff_truncated, *len);
+	printf("}, [%d]) = %s\n", *len, errstr);
+
+	/*
+	 * getsockopt with optlen equals to sizeof(struct linger.l_onoff):
+	 * struct linger.l_linger is not printed.
+	 */
+	*len = sizeof_l_onoff;
+	get_linger(fd, l_onoff, len);
 	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=%d}"
 	       ", [%d]) = %s\n",
-	       fd, linger->l_onoff, *len, errstr);
+	       fd, l_onoff->l_onoff, *len, errstr);
 
-	/* getsockopt with optlen larger than usual - truncated to raw */
-	*len = sizeof(*linger) - 1;
-	get_linger(fd, linger, len);
-	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, ", fd);
-	print_quoted_hex(linger, *len);
-	printf(", [%d]) = %s\n", *len, errstr);
+	/*
+	 * getsockopt with optlen greater than sizeof(struct linger.l_onoff)
+	 * but smaller than sizeof(struct linger):
+	 * the part of struct linger.l_linger is printed in hex.
+	 */
+	*len = sizeof_l_linger_truncated;
+	get_linger(fd, l_linger_truncated, len);
+	/*
+	 * Copy to a properly aligned structure to avoid unaligned access
+	 * to struct linger.l_onoff field.
+	 */
+	memcpy(linger, l_linger_truncated, sizeof_l_linger_truncated);
+	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=%d, l_linger=",
+	       fd, linger->l_onoff);
+	print_quoted_hex(&linger->l_linger, sizeof_l_linger_truncated -
+					    offsetof(struct linger, l_linger));
+	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/* getsockopt optval EFAULT */
 	*len = sizeof(*linger);

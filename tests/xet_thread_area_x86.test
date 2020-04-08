@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Check decoding of set_thread_area and get_thread_area syscalls on x86.
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog sed
+run_prog > /dev/null
+run_strace -a22 -e trace=reboot,/[gs]et_thread_area $args > "$EXP"
+sed '0,/^reboot/d' "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"

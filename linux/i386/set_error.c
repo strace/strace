@@ -1,21 +1,20 @@
+/*
+ * Copyright (c) 2016-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static int
 arch_set_error(struct tcb *tcp)
 {
 	i386_regs.eax = -tcp->u_error;
-#ifdef HAVE_GETREGS_OLD
-	return upoke(tcp->pid, 4 * EAX, i386_regs.eax);
-#else
-	return set_regs(tcp->pid);
-#endif
+	return upoke(tcp, 4 * EAX, i386_regs.eax);
 }
 
 static int
 arch_set_success(struct tcb *tcp)
 {
 	i386_regs.eax = tcp->u_rval;
-#ifdef HAVE_GETREGS_OLD
-	return upoke(tcp->pid, 4 * EAX, i386_regs.eax);
-#else
-	return set_regs(tcp->pid);
-#endif
+	return upoke(tcp, 4 * EAX, i386_regs.eax);
 }

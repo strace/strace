@@ -1,0 +1,116 @@
+#!/bin/sh
+#
+# Check syscall set parsing syntax.
+#
+# Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
+# Copyright (c) 2018-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/syntax.sh"
+
+check_syscall()
+{
+	[ -z "$2" ] || check_e "invalid system call '$1'" -e"$2"
+
+	check_e "invalid system call '$1'" -e "$2"
+	check_e "invalid system call '$1'" -etrace="$2"
+	check_e "invalid system call '$1'" --trace="$2"
+	check_e "invalid system call '$1'" -e trace="$2"
+
+	check_e "invalid system call '$1'" -eabbrev="$2"
+	check_e "invalid system call '$1'" --abbrev="$2"
+	check_e "invalid system call '$1'" -e abbrev="$2"
+
+	check_e "invalid system call '$1'" -everbose="$2"
+	check_e "invalid system call '$1'" --verbose="$2"
+	check_e "invalid system call '$1'" -e verbose="$2"
+
+	check_e "invalid system call '$1'" -eraw="$2"
+	check_e "invalid system call '$1'" --raw="$2"
+	check_e "invalid system call '$1'" -e raw="$2"
+
+	check_e "invalid system call '$1'" -einject="$2"
+	check_e "invalid system call '$1'" --inject="$2"
+	check_e "invalid system call '$1'" -e inject="$2"
+	check_e "invalid system call '$1'" -einject="$2:"
+	check_e "invalid system call '$1'" -einject="$2::"
+	check_e "invalid system call '$1'" -einject="$2:::"
+	check_e "invalid system call '$1'" --inject="$2:"
+	check_e "invalid system call '$1'" --inject="$2::"
+	check_e "invalid system call '$1'" --inject="$2:::"
+	check_e "invalid system call '$1'" -e inject="$2:"
+	check_e "invalid system call '$1'" -e inject="$2::"
+	check_e "invalid system call '$1'" -e inject="$2:::"
+	check_e "invalid system call '$1'" -einject="$2:when=3"
+	check_e "invalid system call '$1'" --inject="$2:when=3"
+	check_e "invalid system call '$1'" -e inject="$2:when=3"
+
+	check_e "invalid system call '$1'" -efault="$2"
+	check_e "invalid system call '$1'" --fault="$2"
+	check_e "invalid system call '$1'" -e fault="$2"
+	check_e "invalid system call '$1'" -efault="$2:"
+	check_e "invalid system call '$1'" -efault="$2::"
+	check_e "invalid system call '$1'" -efault="$2:::"
+	check_e "invalid system call '$1'" --fault="$2:"
+	check_e "invalid system call '$1'" --fault="$2::"
+	check_e "invalid system call '$1'" --fault="$2:::"
+	check_e "invalid system call '$1'" -e fault="$2:"
+	check_e "invalid system call '$1'" -e fault="$2::"
+	check_e "invalid system call '$1'" -e fault="$2:::"
+	check_e "invalid system call '$1'" -efault="$2:when=4"
+	check_e "invalid system call '$1'" --fault="$2:when=4"
+	check_e "invalid system call '$1'" -e fault="$2:when=4"
+}
+
+for arg in '' , ,, ,,, ; do
+	check_syscall "$arg" "$arg"
+	check_syscall "!$arg" "!$arg"
+done
+
+for arg in -1 -2 -3 -4 -5 \
+	   invalid_syscall_name \
+	   0x 0y \
+	   32767 \
+	   2147483647 \
+	   2147483648 \
+	   4294967295 \
+	   4294967296 \
+	   /non_syscall \
+	   % %not_a_class \
+	   ; do
+	check_syscall "$arg" "$arg"
+	check_syscall "$arg" "!$arg"
+	check_syscall "$arg" "1,$arg"
+done
+
+for arg in '!chdir' none all; do
+	check_syscall "$arg" "1,$arg"
+done
+
+# invalid syscall, multiple syscalls
+for arg in %desc \
+	   %file \
+	   %memory \
+	   %process \
+	   %network \
+	   chdir \
+	   1 \
+	   ?32767 \
+	   ?invalid \
+	   ?%not_a_class \
+	   ?/non_syscall \
+	   ; do
+	check_syscall nonsense "$arg,nonsense"
+	check_syscall nonsense "!$arg,nonsense"
+	check_syscall nonsense "nonsense,$arg"
+	check_syscall nonsense "!nonsense,$arg"
+done
+
+check_e_using_grep 'regcomp: \+id: [[:alpha:]].+' -e trace='/+id'
+check_e_using_grep 'regcomp: \*id: [[:alpha:]].+' -e trace='/*id'
+check_e_using_grep 'regcomp: \{id: [[:alpha:]].+' -e trace='/{id'
+check_e_using_grep 'regcomp: \(id: [[:alpha:]].+' -e trace='/(id'
+check_e_using_grep 'regcomp: \[id: [[:alpha:]].+' -e trace='/[id'

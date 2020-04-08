@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 CAP_CHOWN,
 CAP_DAC_OVERRIDE,
 CAP_DAC_READ_SEARCH,

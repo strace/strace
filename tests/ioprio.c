@@ -2,34 +2,15 @@
  * Check decoding of ioprio_get and ioprio_set syscalls.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
 
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined(__NR_ioprio_get) && defined(__NR_ioprio_set)
 
@@ -46,14 +27,6 @@ enum {
 # include "xlat.h"
 # include "xlat/ioprio_class.h"
 
-void
-print_ioprio(unsigned long val)
-{
-	printf(" (IOPRIO_PRIO_VALUE(");
-	printxval(ioprio_class, val >> 13, "IOPRIO_CLASS_???");
-	printf(", %d))", (int) (val & 0x1fff));
-}
-
 int
 main(void)
 {
@@ -63,32 +36,73 @@ main(void)
 		(kernel_ulong_t) 0xbadc0dedda7a1057ULL;
 	static const kernel_ulong_t bogus_ioprio =
 		(kernel_ulong_t) 0xdec0ded1facefeedULL;
+# if !XLAT_RAW
 	static const char * const bogus_ioprio_str =
 		"IOPRIO_PRIO_VALUE(0x7d677 /* IOPRIO_CLASS_??? */, 7917)";
+# endif
 
 	long rc;
+	const char *errstr;
 
 	rc = syscall(__NR_ioprio_get, bogus_which, bogus_who);
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_get(%#x, %d) = %s\n",
+	       (int) bogus_which, (int) bogus_who, errstr);
+# else /* XLAT_ABBREV || XLAT_VERBOSE */
 	printf("ioprio_get(%#x /* IOPRIO_WHO_??? */, %d) = %s\n",
-	       (int) bogus_which, (int) bogus_who, sprintrc(rc));
+	       (int) bogus_which, (int) bogus_who, errstr);
+# endif
 
 	rc = syscall(__NR_ioprio_get, 1, 0);
-	printf("ioprio_get(IOPRIO_WHO_PROCESS, 0) = %s", sprintrc(rc));
-
-	if (rc >= -1)
-		print_ioprio(rc);
-
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_get(0x1, 0) = %s\n", errstr);
+# else /* XLAT_ABBREV */
+#  if XLAT_VERBOSE
+	printf("ioprio_get(0x1 /* IOPRIO_WHO_PROCESS */, 0) = %s", errstr);
+#  else
+	printf("ioprio_get(IOPRIO_WHO_PROCESS, 0) = %s", errstr);
+#  endif
+	if (rc >= 0) {
+		printf(" (IOPRIO_PRIO_VALUE(");
+		printxval(ioprio_class, (unsigned int) rc >> 13,
+			  "IOPRIO_CLASS_???");
+		printf(", %u))", (unsigned int) rc & 0x1fff);
+	}
 	puts("");
+# endif
 
 	rc = syscall(__NR_ioprio_set, 2, 0, 8191);
-	printf("ioprio_set(IOPRIO_WHO_PGRP, 0, "
-	       "IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191)) = %s\n",
-	       sprintrc(rc));
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_set(%#x, 0, 8191) = %s\n", 2, errstr);
+# elif XLAT_VERBOSE
+	printf("ioprio_set(%#x /* IOPRIO_WHO_PGRP */, 0, 8191"
+	       " /* IOPRIO_PRIO_VALUE(0 /* IOPRIO_CLASS_NONE */, 8191) */)"
+	       " = %s\n",
+	       2, errstr);
+# else /* XLAT_ABBREV */
+	printf("ioprio_set(IOPRIO_WHO_PGRP, 0"
+	       ", IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191)) = %s\n",
+	       errstr);
+# endif
 
 	rc = syscall(__NR_ioprio_set, bogus_which, bogus_who, bogus_ioprio);
+	errstr = sprintrc(rc);
+# if XLAT_RAW
+	printf("ioprio_set(%#x, %d, %d) = %s\n",
+	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
+	       errstr);
+# elif XLAT_VERBOSE
+	printf("ioprio_set(%#x /* IOPRIO_WHO_??? */, %d, %d /* %s */) = %s\n",
+	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
+	       bogus_ioprio_str, errstr);
+# else /* XLAT_ABBREV */
 	printf("ioprio_set(%#x /* IOPRIO_WHO_??? */, %d, %s) = %s\n",
 	       (int) bogus_which, (int) bogus_who, bogus_ioprio_str,
-	       sprintrc(rc));
+	       errstr);
+# endif
 
 	puts("+++ exited with 0 +++");
 

@@ -1,0 +1,73 @@
+#!/bin/sh -efu
+#
+# Check -DD option.
+#
+# Copyright (c) 2019-2020 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+[ "$STRACE" = "$STRACE_EXE" ] ||
+	skip_ 'Not applicable: $STRACE != $STRACE_EXE'
+
+run_prog_skip_if_failed \
+        kill -0 $$
+
+status_file=/proc/self/status
+get_tracer_pid()
+{
+	sed '/^TracerPid:[[:space:]]*/!d;s///' "$@"
+}
+[ "$(get_tracer_pid "$status_file")" -ge 0 ] ||
+        framework_skip_ "$status_file is not available"
+
+run_prog ../sleep 0
+
+sleep_duration="$(($TIMEOUT_DURATION/2))"
+
+test_D()
+{
+	local tracee_pid tracer_pid rc sig=15
+
+	set -- $STRACE --output="$LOG" --columns=39 \
+		--interruptible=anywhere --trace=nanosleep "$@" -- \
+		../sleep "$sleep_duration"
+	> "$LOG"
+
+	../setpgrp-exec "$@" &
+	tracee_pid=$!
+
+	while tracer_pid="$(get_tracer_pid "/proc/$tracee_pid/status")"; do
+		[ "$tracer_pid" = 0 ] ||
+			break
+		$SLEEP_A_BIT
+	done
+
+	$SLEEP_A_BIT
+	kill -$sig -$tracee_pid
+
+	wait $tracee_pid && rc=0 || rc=$?
+	[ "$rc" -eq $((128 + $sig)) ] ||
+		dump_log_and_fail_with \
+			"$* failed with unexpected exit status $rc"
+
+	while kill -0 "$tracer_pid" 2> /dev/null; do
+		$SLEEP_A_BIT
+	done
+	match_diff "$LOG" "$EXP"
+}
+
+printf 'nanosleep({tv_sec=%s, tv_nsec=0}, ' "$sleep_duration" > "$EXP"
+test_D -D
+
+uid="${UID:-`id -u`}"
+cat > "$EXP" <<__EOF__
+nanosleep({tv_sec=$sleep_duration, tv_nsec=0}, NULL) = ? ERESTART_RESTARTBLOCK (Interrupted by signal)
+--- SIGTERM {si_signo=SIGTERM, si_code=SI_USER, si_pid=$$, si_uid=$uid} ---
++++ killed by SIGTERM +++
+__EOF__
+
+test_D -DD
+test_D -DDD

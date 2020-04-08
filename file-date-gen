@@ -1,4 +1,9 @@
-#! /bin/sh
+#!/bin/sh
+#
+# Copyright (c) 2017-2019 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 if [ "$1" = "-f" ]; then
 	shift
@@ -10,6 +15,7 @@ fi
 : ${DATE_FILE:=$(dirname "$FILE")/.$(basename "${FILE}").date}
 : ${DEFAULT_DATE:=$2}
 : ${DATE_FORMAT:=%Y-%m-%d}
+LC_TIME=C; export LC_TIME
 
 date=
 
@@ -21,15 +27,27 @@ date=
 [ -f "${DATE_FILE}" ] && date="$(cat "${DATE_FILE}")"
 
 [ -n "${date}" ] ||
-	date="$(git log -n 1 --format=format:%cD --no-patch "${FILE}")"
+	date="$(git log -s -n 1 --format=format:%cD "${FILE}")"
 
-[ -n "${date}" ] || year="${DEFAULT_DATE}"
+[ -n "${date}" ] ||
+	date="${DEFAULT_DATE}"
 
-[ -n "${date}" ] || date="$(date -u)"
+[ -n "${date}" ] ||
+	[ -z "${SOURCE_DATE_EPOCH-}" ] ||
+	date="$(date -u -d "@${SOURCE_DATE_EPOCH}")"
+
+[ -n "${date}" ] ||
+	date="$(date -u)"
 
 [ -n "${date}" ] || {
-	echo >&2 'Undefined date.'
+	printf >&2 "%s: Undefined date.\n" "$0"
 	exit 1
 }
 
-exec printf "%s" $(date "+${DATE_FORMAT}" -d "${date}")
+datestr="$(date -u "+${DATE_FORMAT}" -d "${date}")" &&
+[ -n "${datestr}" ] || {
+	printf >&2 "%s: Invalid date: %s\n" "$0" "$date"
+	exit 1
+}
+
+exec printf '%s' "$datestr"

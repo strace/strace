@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -33,8 +13,7 @@
 #include "print_fields.h"
 
 #include <linux/ip.h>
-#include "netlink.h"
-#include <linux/rtnetlink.h>
+#include "types/rtnl_route.h"
 
 #include "xlat/ip_type_of_services.h"
 #include "xlat/lwtunnel_encap_types.h"
@@ -58,6 +37,21 @@ decode_nla_rt_class(struct tcb *const tcp,
 		return false;
 	if (!umove_or_printaddr(tcp, addr, &num))
 		printxval(routing_table_ids, num, NULL);
+	return true;
+}
+
+bool
+decode_nla_rt_proto(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	uint8_t num;
+
+	if (len < sizeof(num))
+		return false;
+	if (!umove_or_printaddr(tcp, addr, &num))
+		printxval(routing_protocols, num, "RTPROT_???");
 	return true;
 }
 
@@ -143,8 +137,7 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 		     const unsigned int len,
 		     const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_RTA_MFC_STATS
-	struct rta_mfc_stats mfcs;
+	struct_rta_mfc_stats mfcs;
 
 	if (len < sizeof(mfcs))
 		return false;
@@ -156,9 +149,6 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
@@ -167,15 +157,14 @@ decode_rtvia(struct tcb *const tcp,
 	     const unsigned int len,
 	     const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_RTVIA
-	struct rtvia via;
+	struct_rtvia via;
 
 	if (len < sizeof(via))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &via)) {
 		PRINT_FIELD_XVAL("{", via, rtvia_family, addrfams, "AF_???");
 
-		const unsigned int offset = offsetof(struct rtvia, rtvia_addr);
+		const unsigned int offset = offsetof(struct_rtvia, rtvia_addr);
 
 		if (len > offset) {
 			tprints(", ");
@@ -186,9 +175,6 @@ decode_rtvia(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
@@ -233,7 +219,10 @@ static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_EXPIRES]		= decode_nla_u64,
 	[RTA_PAD]		= NULL,
 	[RTA_UID]		= decode_nla_u32,
-	[RTA_TTL_PROPAGATE]	= decode_nla_u8
+	[RTA_TTL_PROPAGATE]	= decode_nla_u8,
+	[RTA_IP_PROTO]		= decode_nla_u8,
+	[RTA_SPORT]		= decode_nla_u16,
+	[RTA_DPORT]		= decode_nla_u16
 };
 
 static bool
@@ -255,8 +244,7 @@ decode_rta_multipath(struct tcb *const tcp,
 		PRINT_FIELD_IFINDEX(", ", nh, rtnh_ifindex);
 		tprints("}");
 
-		const unsigned short rtnh_len =
-			len < nh.rtnh_len ? len : nh.rtnh_len;
+		const unsigned short rtnh_len = MIN(len, nh.rtnh_len);
 		const size_t offset = RTNH_ALIGN(sizeof(nh));
 		if (rtnh_len > offset) {
 			tprints(", ");
@@ -283,7 +271,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 	if (len >= sizeof(rtmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(rtmsg) - offset,
-					 (void *) &rtmsg + offset)) {
+					 (char *) &rtmsg + offset)) {
 			PRINT_FIELD_U("", rtmsg, rtm_dst_len);
 			PRINT_FIELD_U(", ", rtmsg, rtm_src_len);
 			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_tos,

@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -78,7 +58,7 @@ decode_nda_cacheinfo(struct tcb *const tcp,
 
 static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_DST]		= decode_neigh_addr,
-	[NDA_LLADDR]		= decode_neigh_addr,
+	[NDA_LLADDR]		= decode_nla_hwaddr_nofamily,
 	[NDA_CACHEINFO]		= decode_nda_cacheinfo,
 	[NDA_PROBES]		= decode_nla_u32,
 	[NDA_VLAN]		= decode_nla_u16,
@@ -88,6 +68,7 @@ static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_MASTER]		= decode_nla_ifindex,
 	[NDA_LINK_NETNSID]	= decode_nla_u32,
 	[NDA_SRC_VNI]		= NULL,
+	[NDA_PROTOCOL]		= decode_nla_u8,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
@@ -102,7 +83,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 	if (len >= sizeof(ndmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ndmsg) - offset,
-					 (void *) &ndmsg + offset)) {
+					 (char *) &ndmsg + offset)) {
 			PRINT_FIELD_IFINDEX("", ndmsg, ndm_ifindex);
 			PRINT_FIELD_FLAGS(", ", ndmsg, ndm_state,
 					  neighbor_cache_entry_states,

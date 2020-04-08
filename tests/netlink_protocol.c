@@ -3,29 +3,10 @@
  *
  * Copyright (c) 2014-2017 Dmitry V. Levin <ldv@altlinux.org>
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
+ * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -125,7 +106,8 @@ send_query(const int fd)
 		struct req req1;
 		char padding[NLMSG_ALIGN(sizeof(struct req)) - sizeof(struct req)];
 		struct req req2;
-	} *const reqs = tail_alloc(sizeof(*reqs));
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct reqs, reqs);
 	memcpy(&reqs->req1, &c_req, sizeof(c_req));
 	memcpy(&reqs->req2, &c_req, sizeof(c_req));
 
@@ -144,7 +126,7 @@ send_query(const int fd)
 	rc = sendto(fd, efault2, sizeof(*reqs), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, [{{len=%u, type=NLMSG_NOOP, flags=NLM_F_REQUEST|0x%x"
 	       ", seq=0, pid=0}, \"\\x61\\x62\\x63\\x64\"}"
-	       ", %p], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       ", ... /* %p */], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, reqs->req1.nlh.nlmsg_len, NLM_F_DUMP,
 	       &((struct reqs *) efault2)->req2, (unsigned) sizeof(*reqs),
 	       sprintrc(rc));
@@ -203,7 +185,7 @@ test_nlmsgerr(const int fd)
 {
 	struct nlmsgerr *err;
 	struct nlmsghdr *nlh;
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(*err) + 4);
 	long rc;
 
 	/* error message without enough room for the error code */
@@ -318,9 +300,9 @@ static void
 test_nlmsg_done(const int fd)
 {
 	struct nlmsghdr *nlh;
-	void *const nlh0 = tail_alloc(NLMSG_HDRLEN);
-	long rc;
 	const int num = 0xfacefeed;
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(num));
+	long rc;
 
 	/* NLMSG_DONE message without enough room for an integer payload */
 	nlh = nlh0;
@@ -363,7 +345,7 @@ test_nlmsg_done(const int fd)
 	       fd, nlh->nlmsg_len, num, nlh->nlmsg_len, sprintrc(rc));
 }
 
-#if defined NLM_F_CAPPED || defined NLM_F_ACK_TLVS
+# if defined NLM_F_CAPPED || defined NLM_F_ACK_TLVS
 static void
 test_ack_flags(const int fd)
 {
@@ -373,34 +355,34 @@ test_ack_flags(const int fd)
 		.nlmsg_type = NLMSG_ERROR,
 	};
 
-#ifdef NLM_F_CAPPED
+#  ifdef NLM_F_CAPPED
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_CAPPED,
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {len=%u, type=NLMSG_ERROR"
 	       ", flags=NLM_F_REQUEST|NLM_F_CAPPED, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-#endif
+#  endif
 
-#ifdef NLM_F_ACK_TLVS
+#  ifdef NLM_F_ACK_TLVS
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK_TLVS;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {len=%u, type=NLMSG_ERROR"
 	       ", flags=NLM_F_REQUEST|NLM_F_ACK_TLVS, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-#endif
+#  endif
 
-#if defined NLM_F_CAPPED && defined NLM_F_ACK_TLVS
+#  if defined NLM_F_CAPPED && defined NLM_F_ACK_TLVS
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_CAPPED | NLM_F_ACK_TLVS;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {len=%u, type=NLMSG_ERROR"
 	       ", flags=NLM_F_REQUEST|NLM_F_CAPPED|NLM_F_ACK_TLVS, seq=0, pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-#endif
+#  endif
 }
-#endif
+# endif
 
 int main(void)
 {
@@ -417,9 +399,9 @@ int main(void)
 	send_query(fd);
 	test_nlmsgerr(fd);
 	test_nlmsg_done(fd);
-#if defined NLM_F_CAPPED || defined NLM_F_ACK_TLVS
+# if defined NLM_F_CAPPED || defined NLM_F_ACK_TLVS
 	test_ack_flags(fd);
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -1,36 +1,19 @@
 #!/bin/sh -e
 #
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
-# Copyright (c) 2015-2017 The strace developers.
+# Copyright (c) 2015-2019 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+[ "x${D:-0}" != x1 ] || set -x
 
 export LC_ALL=C
 
 MPERS_AWK="${0%/*}/mpers.awk"
 ARCH_FLAG=$1
-PARSER_FILE=$2
+CC_ARCH_FLAG=$2
+PARSER_FILE=$3
 
 READELF="${READELF:-readelf}"
 CC="${CC-gcc}"
@@ -39,7 +22,7 @@ CPP="${CPP-$CC -E}"
 CPPFLAGS="$CPPFLAGS -MM -MG"
 
 VAR_NAME='mpers_target_var'
-BITS_DIR="mpers${ARCH_FLAG}"
+BITS_DIR="mpers-${ARCH_FLAG}"
 
 mkdir -p ${BITS_DIR}
 set -- $(sed -r -n \
@@ -62,7 +45,7 @@ for m_type; do
 	grep -F -q "${m_type}.h" "${f_i}" ||
 		continue
 	sed -i -e '/DEF_MPERS_TYPE/d' "${f_c}"
-	$CC $CFLAGS $ARCH_FLAG "${f_c}" -o "${f_o}"
+	$CC $CFLAGS $CC_ARCH_FLAG "${f_c}" -o "${f_o}"
 	$READELF --debug-dump=info "${f_o}" > "${f_d1}"
 	sed -r -n '
 		/^[[:space:]]*<1>/,/^[[:space:]]*<1><[^>]+>: Abbrev Number: 0/!d
@@ -71,6 +54,6 @@ for m_type; do
 		s/^[[:space:]]*((<[[:xdigit:]]+>){2}):[[:space:]]+/\1\n/
 		s/[[:space:]]+$//
 		p' "${f_d1}" > "${f_d2}"
-	gawk -v VAR_NAME="$VAR_NAME" -v ARCH_FLAG="${ARCH_FLAG#-}" \
+	gawk -v VAR_NAME="$VAR_NAME" -v ARCH_FLAG="${ARCH_FLAG}" \
 		-f "$MPERS_AWK" "${f_d2}" > "${f_h}"
 done

@@ -1,2 +1,2 @@
-BPF_K
-BPF_X
+BPF_K	0x00
+BPF_X	0x08

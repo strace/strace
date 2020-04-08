@@ -1,37 +1,19 @@
 /*
  * Copyright (c) 2011 Comtrol Corp.
- * Copyright (c) 2011-2017 The strace developers.
+ * Copyright (c) 2011-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  *
  */
 
 #include "defs.h"
-#include <sys/param.h>
+#include <limits.h>
 #include <poll.h>
 
+#include "number_set.h"
 #include "syscall.h"
+#include "xstring.h"
 
 struct path_set global_path_set;
 
@@ -105,7 +87,7 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 	if (fd < 0)
 		return -1;
 
-	sprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
+	xsprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
 	n = readlink(linkpath, buf, bufsize - 1);
 	/*
 	 * NB: if buf is too small, readlink doesn't fail,
@@ -138,8 +120,57 @@ pathtrace_select_set(const char *path, struct path_set *set)
 		return;
 	}
 
-	error_msg("Requested path '%s' resolved into '%s'", path, rpath);
+	if (!is_number_in_set(QUIET_PATH_RESOLVE, quiet_set)) {
+		char *path_quoted = xmalloc(strlen(path) * 4 + 4);
+		char *rpath_quoted = xmalloc(strlen(rpath) * 4 + 4);
+
+		string_quote(path, path_quoted, strlen(path) + 1,
+			     QUOTE_0_TERMINATED, NULL);
+		string_quote(rpath, rpath_quoted, strlen(rpath) + 1,
+			     QUOTE_0_TERMINATED, NULL);
+
+		error_msg("Requested path %s resolved into %s",
+			  path_quoted, rpath_quoted);
+
+		free(path_quoted);
+		free(rpath_quoted);
+	}
 	storepath(rpath, set);
+}
+
+static bool
+match_xselect_args(struct tcb *tcp, const kernel_ulong_t *args,
+		   struct path_set *set)
+{
+	/* Kernel truncates arg[0] to int, we do the same. */
+	int nfds = (int) args[0];
+	/* Kernel rejects negative nfds, so we don't parse it either. */
+	if (nfds <= 0)
+		return false;
+	/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
+	if (nfds > 1024*1024)
+		nfds = 1024*1024;
+	unsigned int fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
+	fd_set *fds = xmalloc(fdsize);
+
+	for (unsigned int i = 1; i <= 3; ++i) {
+		if (args[i] == 0)
+			continue;
+		if (umoven(tcp, args[i], fdsize, fds) < 0)
+			continue;
+		for (int j = 0;; ++j) {
+			j = next_set_bit(fds, j, nfds);
+			if (j < 0)
+				break;
+			if (fdmatch(tcp, j, set)) {
+				free(fds);
+				return true;
+			}
+		}
+	}
+
+	free(fds);
+	return false;
 }
 
 /*
@@ -151,7 +182,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 {
 	const struct_sysent *s;
 
-	s = tcp->s_ent;
+	s = tcp_sysent(tcp);
 
 	if (!(s->sys_flags & (TRACE_FILE | TRACE_DESC | TRACE_NETWORK)))
 		return false;
@@ -176,6 +207,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_faccessat:
 	case SEN_fchmodat:
 	case SEN_fchownat:
+	case SEN_fspick:
 	case SEN_fstatat64:
 	case SEN_futimesat:
 	case SEN_inotify_add_watch:
@@ -183,11 +215,13 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_mknodat:
 	case SEN_name_to_handle_at:
 	case SEN_newfstatat:
+	case SEN_open_tree:
 	case SEN_openat:
 	case SEN_readlinkat:
 	case SEN_statx:
 	case SEN_unlinkat:
-	case SEN_utimensat:
+	case SEN_utimensat_time32:
+	case SEN_utimensat_time64:
 		/* fd, path */
 		return fdmatch(tcp, tcp->u_arg[0], set) ||
 			upathmatch(tcp, tcp->u_arg[1], set);
@@ -205,6 +239,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return upathmatch(tcp, tcp->u_arg[1], set);
 
 	case SEN_linkat:
+	case SEN_move_mount:
 	case SEN_renameat2:
 	case SEN_renameat:
 		/* fd, path, fd, path */
@@ -213,10 +248,19 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 			upathmatch(tcp, tcp->u_arg[1], set) ||
 			upathmatch(tcp, tcp->u_arg[3], set);
 
+#if HAVE_ARCH_OLD_MMAP
 	case SEN_old_mmap:
-#if defined(S390)
+# if HAVE_ARCH_OLD_MMAP_PGOFF
 	case SEN_old_mmap_pgoff:
-#endif
+# endif
+	{
+		kernel_ulong_t *args =
+			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 6);
+
+		return args && fdmatch(tcp, args[4], set);
+	}
+#endif /* HAVE_ARCH_OLD_MMAP */
+
 	case SEN_mmap:
 	case SEN_mmap_4koff:
 	case SEN_mmap_pgoff:
@@ -248,72 +292,23 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return fdmatch(tcp, tcp->u_arg[argn], set) ||
 			upathmatch(tcp, tcp->u_arg[argn + 1], set);
 	}
+#if HAVE_ARCH_OLD_SELECT
 	case SEN_oldselect:
-	case SEN_pselect6:
-	case SEN_select:
 	{
-		int     i, j;
-		int     nfds;
-		kernel_ulong_t *args;
-		kernel_ulong_t select_args[5];
-		unsigned int oldselect_args[5];
-		unsigned int fdsize;
-		fd_set *fds;
+		kernel_ulong_t *args =
+			fetch_indirect_syscall_args(tcp, tcp->u_arg[0], 5);
 
-		if (SEN_oldselect == s->sen) {
-			if (sizeof(*select_args) == sizeof(*oldselect_args)) {
-				if (umove(tcp, tcp->u_arg[0], &select_args)) {
-					return false;
-				}
-			} else {
-				unsigned int n;
-
-				if (umove(tcp, tcp->u_arg[0], &oldselect_args)) {
-					return false;
-				}
-
-				for (n = 0; n < 5; ++n) {
-					select_args[n] = oldselect_args[n];
-				}
-			}
-			args = select_args;
-		} else {
-			args = tcp->u_arg;
-		}
-
-		/* Kernel truncates arg[0] to int, we do the same. */
-		nfds = (int) args[0];
-		/* Kernel rejects negative nfds, so we don't parse it either. */
-		if (nfds <= 0)
-			return false;
-		/* Beware of select(2^31-1, NULL, NULL, NULL) and similar... */
-		if (nfds > 1024*1024)
-			nfds = 1024*1024;
-		fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
-		fds = xmalloc(fdsize);
-
-		for (i = 1; i <= 3; ++i) {
-			if (args[i] == 0)
-				continue;
-			if (umoven(tcp, args[i], fdsize, fds) < 0) {
-				continue;
-			}
-			for (j = 0;; j++) {
-				j = next_set_bit(fds, j, nfds);
-				if (j < 0)
-					break;
-				if (fdmatch(tcp, j, set)) {
-					free(fds);
-					return true;
-				}
-			}
-		}
-		free(fds);
-		return false;
+		return args && match_xselect_args(tcp, args, set);
 	}
-
-	case SEN_poll:
-	case SEN_ppoll:
+#endif
+	case SEN_pselect6_time32:
+	case SEN_pselect6_time64:
+	case SEN_select:
+		return match_xselect_args(tcp, tcp->u_arg, set);
+	case SEN_poll_time32:
+	case SEN_poll_time64:
+	case SEN_ppoll_time32:
+	case SEN_ppoll_time64:
 	{
 		struct pollfd fds;
 		unsigned nfds;
@@ -339,24 +334,58 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 		return false;
 	}
 
+	case SEN_fsconfig: {
+		/* x, x, x, maybe path, maybe fd */
+		const unsigned int cmd = tcp->u_arg[1];
+		switch (cmd) {
+			case 3 /* FSCONFIG_SET_PATH */:
+			case 4 /* FSCONFIG_SET_PATH_EMPTY */:
+				return fdmatch(tcp, tcp->u_arg[4], set) ||
+					upathmatch(tcp, tcp->u_arg[3], set);
+			case 5 /* FSCONFIG_SET_FD */:
+				return fdmatch(tcp, tcp->u_arg[4], set);
+		}
+
+		return false;
+	}
+
+	case SEN_accept4:
+	case SEN_accept:
 	case SEN_bpf:
 	case SEN_epoll_create:
 	case SEN_epoll_create1:
 	case SEN_eventfd2:
 	case SEN_eventfd:
 	case SEN_fanotify_init:
+	case SEN_fsmount:
+	case SEN_fsopen:
 	case SEN_inotify_init:
 	case SEN_inotify_init1:
+	case SEN_io_uring_enter:
+	case SEN_io_uring_register:
+	case SEN_io_uring_setup:
 	case SEN_memfd_create:
+	case SEN_mq_getsetattr:
+	case SEN_mq_notify:
+	case SEN_mq_open:
+	case SEN_mq_timedreceive_time32:
+	case SEN_mq_timedreceive_time64:
+	case SEN_mq_timedsend_time32:
+	case SEN_mq_timedsend_time64:
 	case SEN_perf_event_open:
+	case SEN_pidfd_open:
 	case SEN_pipe:
 	case SEN_pipe2:
 	case SEN_printargs:
+	case SEN_signalfd4:
+	case SEN_signalfd:
 	case SEN_socket:
 	case SEN_socketpair:
 	case SEN_timerfd_create:
-	case SEN_timerfd_gettime:
-	case SEN_timerfd_settime:
+	case SEN_timerfd_gettime32:
+	case SEN_timerfd_gettime64:
+	case SEN_timerfd_settime32:
+	case SEN_timerfd_settime64:
 	case SEN_userfaultfd:
 		/*
 		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,

@@ -1,7 +1,12 @@
 #!/bin/sh
+#
 # Check strace -k symbol names demangling.
+#
+# Copyright (c) 2017-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 test_prog=../stack-fcall-mangled
-expected='getpid ns::f3(int) ns::f2(int) ns::f1(int) ns::f0(int) main '
 
 . "${srcdir=.}"/strace-k.test

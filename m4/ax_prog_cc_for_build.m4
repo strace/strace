@@ -1,5 +1,5 @@
 # ===========================================================================
-#   http://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
+#   https://www.gnu.org/software/autoconf-archive/ax_prog_cc_for_build.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -26,14 +26,14 @@
 # LICENSE
 #
 #   Copyright (c) 2008 Paolo Bonzini <bonzini@gnu.org>
-#   Copyright (c) 2008-2017 The strace developers.
+#   Copyright (c) 2008-2020 The strace developers.
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 8
+#serial 9
 #modified for strace project
 
 AU_ALIAS([AC_PROG_CC_FOR_BUILD], [AX_PROG_CC_FOR_BUILD])
@@ -77,6 +77,8 @@ pushdef([ac_cv_host_os], ac_cv_build_os)dnl
 pushdef([am_cv_prog_cc_c_o], am_cv_build_prog_cc_c_o)dnl
 pushdef([am_cv_CC_dependencies_compiler_type], am_cv_build_CC_dependencies_compiler_type)dnl
 pushdef([gl_unknown_warnings_are_errors], gl_build_unknown_warnings_are_errors)dnl
+pushdef([st_cv_enable_Werror], st_cv_build_enable_Werror)dnl
+pushdef([st_cv_cc_enable_Werror], st_cv_build_cc_enable_Werror)dnl
 
 st_SAVE_VAR([ac_c_decl_warn_flag])
 st_SAVE_VAR([ac_c_preproc_warn_flag])
@@ -112,6 +114,8 @@ st_RESTORE_VAR([ac_c_decl_warn_flag])
 
 dnl Restore the old definitions
 dnl
+popdef([st_cv_cc_enable_Werror])dnl
+popdef([st_cv_enable_Werror])dnl
 popdef([gl_unknown_warnings_are_errors])dnl
 popdef([am_cv_CC_dependencies_compiler_type])dnl
 popdef([am_cv_prog_cc_c_o])dnl

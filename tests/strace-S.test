@@ -1,6 +1,11 @@
 #!/bin/sh
-
+#
 # Check -S option.
+#
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
@@ -13,7 +18,7 @@ test_c()
 	sortopts="$1"; shift
 	sedexpr="$1"; shift
 
-	run_strace -c -w -S "$sortby" ../readv > /dev/null
+	run_strace -c -w $sortby ../readv > /dev/null
 	sed -r -n -e "$sedexpr" < "$LOG" > "$OUT"
 
 	[ -s "$OUT" ] ||
@@ -26,5 +31,31 @@ test_c()
 }
 
 c='[[:space:]]+([^[:space:]]+)'
-test_c calls '-n -r' '/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
-test_c name '' '/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+[0-9]+)?'"$c"'$/\6/p'
+for s in '' '-S time' --summary-sort-by=time_total '-S total_time'; do
+	test_c "$s" '-n -r' \
+		's/^[[:space:]]+([0-9]+)[.,]([0-9]+)[[:space:]].*/\1\t\2/p'
+done
+for s in '-S avg_time' --summary-sort-by=time_avg; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\3/p'
+done
+for s in '-S calls' --summary-sort-by=count; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'[[:space:]].*/\4/p'
+done
+for s in '-S name' --summary-sort-by=syscall '-S syscall_name'; do
+	test_c "$s" '' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+[0-9]+)?'"$c"'$/\6/p'
+done
+for s in '-S error' --summary-sort-by=errors; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c$c$c"'([[:space:]]+([0-9]+))?'"$c"'$/\6/p'
+done
+for s in '--summary-columns=time,time-max,name -S max_time' '-U time-percent,max_time,syscall_name --summary-sort-by=longest'; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c"'[[:space:]].*/\2/p'
+done
+for s in '--summary-columns=time,time_min,name -S min-time' '-U time_percent,min_time,syscall-name --summary-sort-by=shortest'; do
+	test_c "$s" '-n -r' \
+		'/^[[:space:]]+[0-9]/ s/^'"$c$c"'[[:space:]].*/\2/p'
+done

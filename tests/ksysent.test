@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Validate syscallent.h
-
-./ksysent

@@ -1,0 +1,19 @@
+ISDN_P_BASE		0
+ISDN_P_TE_S0		1
+ISDN_P_NT_S0		2
+ISDN_P_TE_E1		3
+ISDN_P_NT_E1		4
+ISDN_P_LAPD_TE		0x10
+ISDN_P_LAPD_NT		0x11
+ISDN_P_B_RAW		0x21
+ISDN_P_B_HDLC		0x22
+ISDN_P_B_X75SLP		0x23
+ISDN_P_B_L2DTMF		0x24
+ISDN_P_B_L2DSP		0x25
+ISDN_P_B_L2DSPHDLC	0x26
+/*
+ * those two are present in include/linux/mISDNif.h but are not handled during
+ * socket creation.
+ */
+/* ISDN_P_B_T30_FAX	0x27 */
+/* ISDN_P_B_MODEM_ASYNC	0x28 */

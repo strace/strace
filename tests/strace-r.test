@@ -1,9 +1,16 @@
 #!/bin/sh
-
+#
 # Check -r option.
+#
+# Copyright (c) 2016-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
+r_opt="${1:--r}"
+
 run_prog ../sleep 0
-run_strace -r -eexecve ../sleep 1
+run_strace "${r_opt}" -eexecve ../sleep 1
 match_grep

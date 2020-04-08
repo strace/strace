@@ -1,3 +1,4 @@
+#value_indexed
 RTN_UNSPEC	0
 RTN_UNICAST	1
 RTN_LOCAL	2

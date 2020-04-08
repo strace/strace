@@ -1,7 +1,14 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "negated_errno.h"
 
 static void
-get_error(struct tcb *tcp, const bool check_errno)
+arch_get_error(struct tcb *tcp, const bool check_errno)
 {
 	/*
 	 * In X32, return value is 64-bit (llseek uses one).
@@ -20,6 +27,9 @@ get_error(struct tcb *tcp, const bool check_errno)
 		tcp->u_rval = -1;
 		tcp->u_error = -rax;
 	} else {
-		tcp->u_rval = rax;
+		if (x86_io.iov_len == sizeof(i386_regs))
+			tcp->u_rval = (uint32_t) rax;
+		else
+			tcp->u_rval = rax;
 	}
 }

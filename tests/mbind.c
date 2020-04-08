@@ -1,54 +1,139 @@
 /*
  * Check decoding of mbind syscall.
  *
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2019 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #ifdef __NR_mbind
 
 # include <stdio.h>
 # include <unistd.h>
 
+static const char *errstr;
+
+static long
+k_mbind(const unsigned long start,
+	const unsigned long len,
+	const unsigned long mode,
+	const unsigned long nmask,
+	const unsigned long maxnode,
+	const unsigned int flags)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
+	const kernel_ulong_t arg1 = start;
+	const kernel_ulong_t arg2 = len;
+	const kernel_ulong_t arg3 = mode;
+	const kernel_ulong_t arg4 = nmask;
+	const kernel_ulong_t arg5 = maxnode;
+	const kernel_ulong_t arg6 = fill | flags;
+	const long rc = syscall(__NR_mbind, arg1, arg2, arg3, arg4, arg5, arg6);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
+# if XLAT_RAW
+#  define out_str	raw
+#  define flags_str	"0xffffffff"
+# elif XLAT_VERBOSE
+#  define out_str	verbose
+#  define flags_str	"0xffffffff /* MPOL_MF_STRICT|MPOL_MF_MOVE" \
+			"|MPOL_MF_MOVE_ALL|0xfffffff8 */"
+# else
+#  define out_str	abbrev
+#  define flags_str	"MPOL_MF_STRICT|MPOL_MF_MOVE|MPOL_MF_MOVE_ALL|0xfffffff8"
+# endif
+
+static struct {
+	unsigned long val;
+	const char *raw;
+	const char *verbose;
+	const char *abbrev;
+} mpol_modes[] = {
+	{ ARG_STR(0),
+	  "0 /* MPOL_DEFAULT */",
+	  "MPOL_DEFAULT" },
+	{ ARG_STR(0x1),
+	  "0x1 /* MPOL_PREFERRED */",
+	  "MPOL_PREFERRED" },
+	{ ARG_STR(0x2),
+	  "0x2 /* MPOL_BIND */",
+	  "MPOL_BIND" },
+	{ ARG_STR(0x3),
+	  "0x3 /* MPOL_INTERLEAVE */",
+	  "MPOL_INTERLEAVE" },
+	{ ARG_STR(0x4),
+	  "0x4 /* MPOL_LOCAL */",
+	  "MPOL_LOCAL" },
+	{ ARG_STR(0x8000),
+	  "0x8000 /* MPOL_DEFAULT|MPOL_F_STATIC_NODES */",
+	  "MPOL_DEFAULT|MPOL_F_STATIC_NODES" },
+	{ ARG_STR(0x4001),
+	  "0x4001 /* MPOL_PREFERRED|MPOL_F_RELATIVE_NODES */",
+	  "MPOL_PREFERRED|MPOL_F_RELATIVE_NODES" },
+	{ ARG_STR(0xc002),
+	  "0xc002 /* MPOL_BIND|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES */",
+	  "MPOL_BIND|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES" },
+	{ ARG_STR(0x5),
+	  "0x5 /* MPOL_??? */",
+	  "0x5 /* MPOL_??? */" },
+	{ ARG_STR(0xffff3fff),
+	  "0xffff3fff /* MPOL_??? */",
+	  "0xffff3fff /* MPOL_??? */" },
+	{ ARG_STR(0xffffffff),
+	  "0xffffffff /* MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffff3fff */",
+	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffff3fff" },
+# if SIZEOF_LONG > 4
+	{ 0xffffffff00000000UL,
+	  "0xffffffff00000000",
+	  "0xffffffff00000000 /* MPOL_??? */",
+	  "0xffffffff00000000 /* MPOL_??? */" },
+	{ 0xffffffffffff3fffUL,
+	  "0xffffffffffff3fff",
+	  "0xffffffffffff3fff /* MPOL_??? */",
+	  "0xffffffffffff3fff /* MPOL_??? */" },
+	{ -1UL,
+	  "0xffffffffffffffff",
+	  "0xffffffffffffffff /* MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES"
+	  "|0xffffffffffff3fff */",
+	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffffffffffff3fff" },
+# endif
+};
+
 int
 main(void)
 {
-	const unsigned long len = (unsigned long) 0xcafef00dbadc0dedULL;
-	const unsigned long mode = 3;
-	const unsigned long nodemask = (unsigned long) 0xfacefeedfffffff1ULL;
-	const unsigned long maxnode = (unsigned long) 0xdeadbeeffffffff2ULL;
-	const unsigned long flags = -1UL;
+	const unsigned long size = get_page_size();
+	unsigned long *const addr = tail_alloc(size);
+	const unsigned long start = (unsigned long) 0xfffffff1fffffff2ULL;
+	const unsigned long len = (unsigned long) 0xfffffff4fffffff4ULL;
+	const unsigned long nodemask = (unsigned long) 0xfffffff5fffffff6ULL;
+	const unsigned long maxnode = (unsigned long) 0xfffffff7fffffff8ULL;
 
-	long rc = syscall(__NR_mbind, 0, len, mode, nodemask, maxnode, flags);
-	printf("mbind(NULL, %lu, %s, %#lx, %lu, %s|%#x) = %ld %s (%m)\n",
-	       len, "MPOL_INTERLEAVE", nodemask, maxnode,
-	       "MPOL_MF_STRICT|MPOL_MF_MOVE|MPOL_MF_MOVE_ALL",
-	       (unsigned) flags & ~7, rc, errno2name());
+	if (k_mbind((unsigned long) addr, size, mpol_modes[0].val, 0, 0, 0))
+		perror_msg_and_skip("mbind");
+	printf("mbind(%p, %lu, %s, NULL, 0, 0) = 0\n",
+	       addr, size, mpol_modes[0].out_str);
+
+	for (unsigned int i = 0; i < ARRAY_SIZE(mpol_modes); ++i) {
+		if (i) {
+			k_mbind((unsigned long) addr, size, mpol_modes[i].val,
+				0, 0, 0);
+			printf("mbind(%p, %lu, %s, NULL, 0, 0) = %s\n",
+			       addr, size, mpol_modes[i].out_str, errstr);
+		}
+
+		k_mbind(start, len, mpol_modes[i].val,
+			nodemask, maxnode, -1U);
+		printf("mbind(%#lx, %lu, %s, %#lx, %lu, %s) = %s\n",
+		       start, len, mpol_modes[i].out_str,
+		       nodemask, maxnode, flags_str, errstr);
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

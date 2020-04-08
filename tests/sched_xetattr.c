@@ -1,32 +1,13 @@
 /*
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <asm/unistd.h>
+#include "scno.h"
 
 #if defined __NR_sched_getattr && defined __NR_sched_setattr
 
@@ -90,11 +71,11 @@ main(void)
 # endif
 	       (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
 
-	sys_sched_getattr(0, (unsigned long) efault, sizeof(*attr), 0);
+	sys_sched_getattr(0, (unsigned long) efault, SCHED_ATTR_MIN_SIZE, 0);
 	printf("sched_getattr(0, %p, %u, 0) = %s\n",
-	       efault, (unsigned) sizeof(*attr), errstr);
+	       efault, (unsigned) SCHED_ATTR_MIN_SIZE, errstr);
 
-	if (sys_sched_getattr(0, (unsigned long) attr, sizeof(*attr), 0))
+	if (sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_MIN_SIZE, 0))
 		perror_msg_and_skip("sched_getattr");
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
@@ -107,7 +88,31 @@ main(void)
 	       attr->sched_runtime,
 	       attr->sched_deadline,
 	       attr->sched_period,
-	       (unsigned) sizeof(*attr));
+	       (unsigned) SCHED_ATTR_MIN_SIZE);
+
+	sys_sched_getattr(0, (unsigned long) efault, sizeof(*attr), 0);
+	printf("sched_getattr(0, %p, %u, 0) = %s\n",
+	       efault, (unsigned) sizeof(*attr), errstr);
+
+	if (sys_sched_getattr(0, (unsigned long) attr, sizeof(*attr), 0))
+		perror_msg_and_skip("sched_getattr");
+	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
+	printxval(schedulers, attr->sched_policy, NULL);
+	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
+	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
+	       ", sched_period=%" PRIu64,
+	       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
+	       attr->sched_nice,
+	       attr->sched_priority,
+	       attr->sched_runtime,
+	       attr->sched_deadline,
+	       attr->sched_period);
+	if (attr->size >= SCHED_ATTR_SIZE_VER1) {
+		printf(", sched_util_min=%u, sched_util_max=%u",
+		       attr->sched_util_min,
+		       attr->sched_util_max);
+	}
+	printf("}, %u, 0) = 0\n", (unsigned) sizeof(*attr));
 
 # if defined __arm64__ || defined __aarch64__
 	long rc =
@@ -125,14 +130,19 @@ main(void)
 		printxval(schedulers, attr->sched_policy, NULL);
 		printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
 		       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-		       ", sched_period=%" PRIu64 "}, %u, 0) = 0\n",
+		       ", sched_period=%" PRIu64,
 		       attr->sched_flags ? "SCHED_FLAG_RESET_ON_FORK" : "0",
 		       attr->sched_nice,
 		       attr->sched_priority,
 		       attr->sched_runtime,
 		       attr->sched_deadline,
-		       attr->sched_period,
-		       (unsigned) sizeof(*attr));
+		       attr->sched_period);
+		if (attr->size >= SCHED_ATTR_SIZE_VER1) {
+			printf(", sched_util_min=%u, sched_util_max=%u",
+			       attr->sched_util_min,
+			       attr->sched_util_max);
+		}
+		printf("}, %u, 0) = 0\n", (unsigned) sizeof(*attr));
 	}
 
 	sys_sched_setattr(bogus_pid, 0, 0);
@@ -146,13 +156,19 @@ main(void)
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "}, 0) = 0\n",
+	       ", sched_period=%" PRIu64,
 	       "SCHED_FLAG_RESET_ON_FORK",
 	       attr->sched_nice,
 	       attr->sched_priority,
 	       attr->sched_runtime,
 	       attr->sched_deadline,
 	       attr->sched_period);
+	if (attr->size >= SCHED_ATTR_SIZE_VER1) {
+		printf(", sched_util_min=%u, sched_util_max=%u",
+		       attr->sched_util_min,
+		       attr->sched_util_max);
+	}
+	printf("}, 0) = 0\n");
 
 	sys_sched_setattr(F8ILL_KULONG_MASK, (unsigned long) attr,
 			  F8ILL_KULONG_MASK);
@@ -160,13 +176,19 @@ main(void)
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
-	       ", sched_period=%" PRIu64 "}, 0) = 0\n",
+	       ", sched_period=%" PRIu64,
 	       "SCHED_FLAG_RESET_ON_FORK",
 	       attr->sched_nice,
 	       attr->sched_priority,
 	       attr->sched_runtime,
 	       attr->sched_deadline,
 	       attr->sched_period);
+	if (attr->size >= SCHED_ATTR_SIZE_VER1) {
+		printf(", sched_util_min=%u, sched_util_max=%u",
+		       attr->sched_util_min,
+		       attr->sched_util_max);
+	}
+	printf("}, 0) = 0\n");
 
 	*psize = attr->size;
 
@@ -202,7 +224,7 @@ main(void)
 
 	attr->size = 0x90807060;
 	attr->sched_policy = 0xca7faced;
-	attr->sched_flags = 0xbadc0ded1057da7aULL;
+	attr->sched_flags = 0xbadc0ded1057da80ULL;
 	attr->sched_nice = 0xafbfcfdf;
 	attr->sched_priority = 0xb8c8d8e8;
 	attr->sched_runtime = 0xbadcaffedeadf157ULL;
@@ -213,8 +235,8 @@ main(void)
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
 	       "sched_flags=%#" PRIx64 " /* SCHED_FLAG_??? */, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
-	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", ...}, %u)"
-	       " = %s\n",
+	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", "
+	       "sched_util_min=%u, sched_util_max=%u, ...}, %u) = %s\n",
 	       (int) bogus_pid,
 	       attr->size,
 	       attr->sched_policy,
@@ -224,6 +246,143 @@ main(void)
 	       attr->sched_runtime,
 	       attr->sched_deadline,
 	       attr->sched_period,
+	       attr->sched_util_min,
+	       attr->sched_util_max,
+	       (unsigned) bogus_flags, errstr);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
+
+		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
+		       (unsigned long long) ill, (unsigned) sizeof(*attr),
+		       errstr);
+
+		sys_sched_setattr(0, ill, 0);
+		printf("sched_setattr(0, %#llx, 0) = %s\n",
+		       (unsigned long long) ill, errstr);
+	}
+
+
+	attr->size = 0x90807060;
+	attr->sched_policy = 0xca7faced;
+	attr->sched_flags = 0x87ULL;
+	attr->sched_nice = 0xafbfcfdf;
+	attr->sched_priority = 0xb8c8d8e8;
+	attr->sched_runtime = 0xbadcaffedeadf157ULL;
+	attr->sched_deadline = 0xc0de70a57badac75ULL;
+	attr->sched_period = 0xded1ca7edda7aca7ULL;
+
+	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
+	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
+	       "SCHED_FLAG_DL_OVERRUN|0x80, "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
+	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", "
+	       "sched_util_min=%u, sched_util_max=%u, ...}, %u) = %s\n",
+	       (int) bogus_pid,
+	       attr->size,
+	       attr->sched_policy,
+	       attr->sched_nice,
+	       attr->sched_priority,
+	       attr->sched_runtime,
+	       attr->sched_deadline,
+	       attr->sched_period,
+	       attr->sched_util_min,
+	       attr->sched_util_max,
+	       (unsigned) bogus_flags, errstr);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
+
+		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
+		       (unsigned long long) ill, (unsigned) sizeof(*attr),
+		       errstr);
+
+		sys_sched_setattr(0, ill, 0);
+		printf("sched_setattr(0, %#llx, 0) = %s\n",
+		       (unsigned long long) ill, errstr);
+	}
+
+	attr->size = SCHED_ATTR_MIN_SIZE;
+	attr->sched_policy = 0xdefaced;
+	attr->sched_flags = 0x8fULL;
+
+	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	printf("sched_setattr(%d, {size=%u, "
+	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
+	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_KEEP_POLICY|0x80, "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
+	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 "}, %u)"
+	       " = %s\n",
+	       (int) bogus_pid,
+	       attr->size,
+	       attr->sched_nice,
+	       attr->sched_priority,
+	       attr->sched_runtime,
+	       attr->sched_deadline,
+	       attr->sched_period,
+	       (unsigned) bogus_flags, errstr);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
+
+		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
+		       (unsigned long long) ill, (unsigned) sizeof(*attr),
+		       errstr);
+
+		sys_sched_setattr(0, ill, 0);
+		printf("sched_setattr(0, %#llx, 0) = %s\n",
+		       (unsigned long long) ill, errstr);
+	}
+
+	attr->size = SCHED_ATTR_SIZE_VER1;
+	attr->sched_flags = 0xe7ULL;
+
+	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
+	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
+	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_UTIL_CLAMP_MIN"
+	       "|SCHED_FLAG_UTIL_CLAMP_MAX|0x80, "
+	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
+	       "sched_deadline=%" PRIu64 ", sched_period=%" PRIu64 ", "
+	       "sched_util_min=%u, sched_util_max=%u}, %u) = %s\n",
+	       (int) bogus_pid,
+	       attr->size,
+	       attr->sched_policy,
+	       attr->sched_nice,
+	       attr->sched_priority,
+	       attr->sched_runtime,
+	       attr->sched_deadline,
+	       attr->sched_period,
+	       attr->sched_util_min,
+	       attr->sched_util_max,
+	       (unsigned) bogus_flags, errstr);
+
+	if (F8ILL_KULONG_SUPPORTED) {
+		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
+
+		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
+		       (unsigned long long) ill, (unsigned) sizeof(*attr),
+		       errstr);
+
+		sys_sched_setattr(0, ill, 0);
+		printf("sched_setattr(0, %#llx, 0) = %s\n",
+		       (unsigned long long) ill, errstr);
+	}
+
+	attr->sched_flags = 0xcaffee90LL;
+
+	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	printf("sched_setattr(%d, {size=%u, sched_flags=SCHED_FLAG_KEEP_PARAMS"
+	       "|0xcaffee80, sched_util_min=%u, sched_util_max=%u}, %u) = %s\n",
+	       (int) bogus_pid,
+	       attr->size,
+	       attr->sched_util_min,
+	       attr->sched_util_max,
 	       (unsigned) bogus_flags, errstr);
 
 	if (F8ILL_KULONG_SUPPORTED) {

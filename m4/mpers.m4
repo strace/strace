@@ -2,29 +2,10 @@
 #
 # Copyright (c) 2015-2017 Dmitry V. Levin <ldv@altlinux.org>
 # Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
+# Copyright (c) 2015-2020 The strace developers.
 # All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. The name of the author may not be used to endorse or promote products
-#    derived from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
 AC_DEFUN([st_MPERS_LOAD_AC_CV], [
 
@@ -61,7 +42,7 @@ AC_DEFUN([st_MPERS_STRUCT_STAT], [
 st_MPERS_LOAD_AC_CV([type_struct_stat$1])
 AC_CHECK_TYPE([struct stat$1],
 	      AC_DEFINE([HAVE_]MPERS_NAME[_STRUCT_STAT$1], [1],
-			[Define to 1 if MPERS_NAME has the type 'struct stat$1'.]),,
+			[Define to 1 if ]mpers_name[ has the type 'struct stat$1'.]),,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 st_MPERS_SAVE_AC_CV([type_struct_stat$1])
@@ -69,7 +50,7 @@ st_MPERS_SAVE_AC_CV([type_struct_stat$1])
 st_MPERS_LOAD_AC_CV([member_struct_stat$1_st_mtime_nsec])
 AC_CHECK_MEMBER([struct stat$1.st_mtime_nsec],
 		AC_DEFINE([HAVE_]MPERS_NAME[_STRUCT_STAT$1_ST_MTIME_NSEC], [1],
-			  [Define to 1 if 'st_mtime_nsec' is a member of MPERS_NAME 'struct stat$1'.]),,
+			  [Define to 1 if 'st_mtime_nsec' is a member of ]mpers_name[ 'struct stat$1'.]),,
 [#include <sys/types.h>
 #include <asm/stat.h>])
 st_MPERS_SAVE_AC_CV([member_struct_stat$1_st_mtime_nsec])
@@ -82,13 +63,31 @@ pushdef([mpers_name], [$1])
 pushdef([MPERS_NAME], translit([$1], [a-z], [A-Z]))
 pushdef([HAVE_MPERS], [HAVE_]MPERS_NAME[_MPERS])
 pushdef([HAVE_RUNTIME], [HAVE_]MPERS_NAME[_RUNTIME])
-pushdef([CFLAG], [-$1])
+pushdef([MPERS_CFLAGS], [$cc_flags_$1])
 pushdef([st_cv_cc], [st_cv_$1_cc])
 pushdef([st_cv_runtime], [st_cv_$1_runtime])
 pushdef([st_cv_mpers], [st_cv_$1_mpers])
 
+pushdef([EXEEXT], MPERS_NAME[_EXEEXT])dnl
+pushdef([OBJEXT], MPERS_NAME[_OBJEXT])dnl
+pushdef([LDFLAGS], [LDFLAGS_FOR_]MPERS_NAME)dnl
+pushdef([WARN_CFLAGS], [WARN_CFLAGS_FOR_]MPERS_NAME)dnl
+
+st_SAVE_VAR([CC])
+st_SAVE_VAR([CPP])
+st_SAVE_VAR([CFLAGS])
+st_SAVE_VAR([CPPFLAGS])
+
+CC=[$CC_FOR_]MPERS_NAME
+CPP=[$CPP_FOR_]MPERS_NAME
+CFLAGS=[$CFLAGS_FOR_]MPERS_NAME
+CPPFLAGS=[$CPPFLAGS_FOR_]MPERS_NAME
+
 case "$arch" in
 	[$2])
+	case "$enable_mpers" in
+	yes|check|[$1])
+
 	AH_TEMPLATE([HAVE_GNU_STUBS_32_H],
 		    [Define to 1 if you have the <gnu/stubs-32.h> header file.])
 	AH_TEMPLATE([HAVE_GNU_STUBS_X32_H],
@@ -100,31 +99,36 @@ case "$arch" in
 			  AC_MSG_NOTICE([Created empty gnu_stubs])
 			  IFLAG=-I.])
 	popdef([gnu_stubs])
+	saved_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS${IFLAG:+ }$IFLAG"
 	saved_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS CFLAG $IFLAG"
-	AC_CACHE_CHECK([for CFLAG compile support], [st_cv_cc],
-		[AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <stdint.h>
-						     int main(){return 0;}]])],
+	CFLAGS="$CFLAGS MPERS_CFLAGS"
+	AC_CACHE_CHECK([for mpers_name personality compile support (using $CC $CPPFLAGS $CFLAGS)],
+		[st_cv_cc],
+		[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdint.h>]],
+						    [[return 0]])],
 				   [st_cv_cc=yes],
 				   [st_cv_cc=no])])
 	if test $st_cv_cc = yes; then
-		AC_CACHE_CHECK([for CFLAG runtime support], [st_cv_runtime],
-			[AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <stdint.h>
-							 int main(){return 0;}]])],
+		AC_CACHE_CHECK([for mpers_name personality runtime support],
+			[st_cv_runtime],
+			[AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <stdint.h>]],
+							[[return 0]])],
 				       [st_cv_runtime=yes],
 				       [st_cv_runtime=no],
 				       [st_cv_runtime=no])])
-		AC_CACHE_CHECK([whether mpers.sh CFLAG works], [st_cv_mpers],
+		AC_CACHE_CHECK([whether mpers.sh mpers_name MPERS_CFLAGS works],
+			[st_cv_mpers],
 			[if READELF="$READELF" \
 			    CC="$CC" CPP="$CPP" CPPFLAGS="$CPPFLAGS" \
-			    $srcdir/mpers_test.sh [$1]; then
+			    $srcdir/mpers_test.sh [$1] "MPERS_CFLAGS"; then
 				st_cv_mpers=yes
 			 else
 				st_cv_mpers=no
 			 fi])
 		if test $st_cv_mpers = yes; then
 			AC_DEFINE(HAVE_MPERS, [1],
-				  [Define to 1 if you have CFLAG mpers support])
+				  [Define to 1 if you have mpers_name mpers support])
 			st_MPERS_STRUCT_STAT([])
 			st_MPERS_STRUCT_STAT([64])
 
@@ -143,13 +147,40 @@ case "$arch" in
 						[#include "$srcdir/kernel_types.h"])
 				st_MPERS_SAVE_AC_CV([sizeof_kernel_long_t])
 				popdef([SIZEOF_KERNEL_LONG_T])
+
+				pushdef([SIZEOF_STRUCT_MSQID64_DS],
+					MPERS_NAME[_SIZEOF_STRUCT_MSQID64_DS])
+				st_MPERS_LOAD_AC_CV([sizeof_struct_msqid64_ds])
+				AC_CHECK_SIZEOF([struct msqid64_ds],,
+						[#include <linux/msg.h>])
+				st_MPERS_SAVE_AC_CV([sizeof_struct_msqid64_ds])
+				popdef([SIZEOF_STRUCT_MSQID64_DS])
 			fi
 		fi
 	fi
+	CPPFLAGS="$saved_CPPFLAGS"
 	CFLAGS="$saved_CFLAGS"
 	;;
 
-	*)
+	*) # case "$enable_mpers"
+	st_cv_runtime=no
+	st_cv_mpers=no
+	;;
+	esac
+
+	test "$st_cv_mpers" = yes ||
+		st_cv_mpers=no
+	AC_MSG_CHECKING([whether to enable $1 personality support])
+	AC_MSG_RESULT([$st_cv_mpers])
+
+	case "$enable_mpers,$st_cv_mpers" in
+	yes,no|[$1],no)
+		AC_MSG_ERROR([Cannot enable $1 personality support])
+		;;
+	esac
+	;;
+
+	*) # case "$arch"
 	st_cv_runtime=no
 	st_cv_mpers=no
 	;;
@@ -158,10 +189,20 @@ esac
 AM_CONDITIONAL(HAVE_RUNTIME, [test "$st_cv_mpers$st_cv_runtime" = yesyes])
 AM_CONDITIONAL(HAVE_MPERS, [test "$st_cv_mpers" = yes])
 
+st_RESTORE_VAR([CC])
+st_RESTORE_VAR([CPP])
+st_RESTORE_VAR([CFLAGS])
+st_RESTORE_VAR([CPPFLAGS])
+
+popdef([WARN_CFLAGS])dnl
+popdef([LDFLAGS])dnl
+popdef([OBJEXT])dnl
+popdef([EXEEXT])dnl
+
 popdef([st_cv_mpers])
 popdef([st_cv_runtime])
 popdef([st_cv_cc])
-popdef([CFLAG])
+popdef([MPERS_CFLAGS])
 popdef([HAVE_RUNTIME])
 popdef([HAVE_MPERS])
 popdef([MPERS_NAME])

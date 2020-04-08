@@ -2,30 +2,10 @@
  * Check verbose decoding of seccomp SECCOMP_SET_MODE_FILTER.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -33,16 +13,13 @@
 #include <errno.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <asm/unistd.h>
 #include <unistd.h>
-
-#ifdef HAVE_PRCTL
-# include <sys/prctl.h>
-#endif
+#include <sys/prctl.h>
 #ifdef HAVE_LINUX_SECCOMP_H
 # include <linux/seccomp.h>
 #endif
 #include <linux/filter.h>
+#include "scno.h"
 
 #if defined __NR_seccomp \
  && defined PR_SET_NO_NEW_PRIVS \
@@ -51,26 +28,26 @@
  && defined BPF_JUMP \
  && defined BPF_STMT
 
-#define SOCK_FILTER_ALLOW_SYSCALL(nr) \
+# define SOCK_FILTER_ALLOW_SYSCALL(nr) \
 		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW)
 
-#define SOCK_FILTER_DENY_SYSCALL(nr, err) \
+# define SOCK_FILTER_DENY_SYSCALL(nr, err) \
 		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|(SECCOMP_RET_DATA & (err)))
 
-#define SOCK_FILTER_KILL_PROCESS \
+# define SOCK_FILTER_KILL_PROCESS \
 		BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_KILL)
 
-#define PRINT_ALLOW_SYSCALL(nr) \
-	tprintf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
-	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW), ", \
-	       __NR_ ## nr)
+# define PRINT_ALLOW_SYSCALL(nr) \
+	tprintf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#lx, 0, 0x1), " \
+	        "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ALLOW), ", \
+	        (long) __NR_ ## nr)
 
-#define PRINT_DENY_SYSCALL(nr, err) \
-	tprintf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#x, 0, 0x1), " \
-	       "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|%#x), ", \
-	       __NR_ ## nr, err)
+# define PRINT_DENY_SYSCALL(nr, err) \
+	tprintf("BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, %#lx, 0, 0x1), " \
+	        "BPF_STMT(BPF_RET|BPF_K, SECCOMP_RET_ERRNO|%#x), ", \
+	        (long) __NR_ ## nr, err)
 
 static const struct sock_filter filter_c[] = {
 	/* load syscall number */
@@ -118,7 +95,7 @@ main(void)
 	prog->len = 3;
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, prog);
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=%u"
-		", filter=[%s, %p]}) = -1 EFAULT (%m)\n",
+		", filter=[%s, ... /* %p */]}) = -1 EFAULT (%m)\n",
 		prog->len, kill_stmt_txt, filter +  ARRAY_SIZE(filter_c));
 
 	prog->len = 0;
@@ -136,7 +113,9 @@ main(void)
 	prog->filter = big_filter;
 	prog->len = BPF_MAXINSNS + 1;
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, %s, {len=%u, filter=[",
-		"SECCOMP_FILTER_FLAG_TSYNC|SECCOMP_FILTER_FLAG_LOG|0xfffffffc",
+		"SECCOMP_FILTER_FLAG_TSYNC|SECCOMP_FILTER_FLAG_LOG|"
+		"SECCOMP_FILTER_FLAG_SPEC_ALLOW|"
+		"SECCOMP_FILTER_FLAG_NEW_LISTENER|0xfffffff0",
 		prog->len);
 	for (i = 0; i < BPF_MAXINSNS; ++i) {
 		if (i)

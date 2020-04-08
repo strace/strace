@@ -1,8 +1,18 @@
 ILL_ILLOPC 1
+ILL_ILLPARAOP   /*  2 - bfin */
 ILL_ILLOPN 2
 ILL_ILLADR 3
+ILL_ILLEXCPT    /*  4 - bfin */
 ILL_ILLTRP 4
 ILL_PRVOPC 5
 ILL_PRVREG 6
 ILL_COPROC 7
 ILL_BADSTK 8
+ILL_CPLB_VI     /*  9 - bfin */
+ILL_CPLB_MISS   /* 10 - bfin */
+ILL_CPLB_MULHIT /* 11 - bfin */
+ILL_DBLFLT      /*  9 - tile */
+ILL_HARDWALL    /* 10 - tile */
+ILL_BADIADDR    /*  9 - ia64 */
+__ILL_BREAK     /* 10 - ia64 */
+__ILL_BNDMOD    /* 11 - ia64 */

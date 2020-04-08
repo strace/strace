@@ -1,0 +1,16 @@
+:#!/bin/sh -efu
+#
+# Copyright (c) 2018-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+case "$SIZEOF_LONG" in
+	4) rval=508935919;;
+	8) rval=841540765612359407;;
+esac
+
+run_strace -a20 -y -e trace=bpf -e inject=bpf:retval="${rval}" ../bpf-success-long-y < /dev/full > "$EXP"
+match_diff "$LOG" "$EXP"

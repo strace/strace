@@ -1,0 +1,24 @@
+#!/bin/sh -efu
+#
+# Check decoding of clone flags.
+#
+# Copyright (c) 2019-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+case "$STRACE_ARCH" in
+	ia64) syscall=clone2 ;;
+	*) syscall=clone ;;
+esac
+
+# Find out the expected and reported child stack addresses.
+run_strace_match_grep --silence=exits -e signal=none -e trace=$syscall
+CHILD_STACK_EXPECTED="$(sed -n 's/^clone[^(]*(child_stack=(\(0x[[:xdigit:]]\+\)|.*/\1/p' "$EXP")000"
+CHILD_STACK_REPORTED="$(sed -n 's/^clone[^(]*(child_stack=\(0x[[:xdigit:]]\+\),.*/\1/p' "$LOG")"
+export CHILD_STACK_EXPECTED CHILD_STACK_REPORTED
+
+# Use child stack addresses to check decoding.
+run_strace_match_diff -a35 --silence=exits,personality -y -e signal=none -e trace=$syscall

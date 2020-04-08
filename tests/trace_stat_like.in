@@ -1,5 +1,11 @@
 fstat	-a15
+fstat-Xabbrev	-a15 -Xabbrev
+fstat-Xraw	-a15 -Xraw
+fstat-Xverbose	-a15 -Xverbose
 fstat64	-a17
+fstat64-Xabbrev	-a17 -Xabbrev
+fstat64-Xraw	-a17 -Xraw
+fstat64-Xverbose	-a17 -Xverbose
 fstatat64	-a32
 lstat	-a32
 lstat64	-a32

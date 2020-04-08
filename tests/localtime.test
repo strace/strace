@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Check handling of localtime() failure in printleader().
+#
+# Copyright (c) 2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog faketime
+faketime -f +1000000000000000000x0 ../$NAME | grep -q '^100000000' \
+	|| framework_skip_ 'faketime failed to fake time'
+
+STRACE="faketime -f +1000000000000000000x0 $STRACE"
+
+run_strace_match_diff -tt -a10 -e trace=gettid

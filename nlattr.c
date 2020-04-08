@@ -1,30 +1,10 @@
 /*
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2016-2017 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "defs.h"
@@ -34,20 +14,31 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <linux/sock_diag.h>
+#include "static_assert.h"
+
+#include "xlat/netlink_sk_meminfo_indices.h"
 
 static bool
 fetch_nlattr(struct tcb *const tcp, struct nlattr *const nlattr,
-	     const kernel_ulong_t addr, const unsigned int len)
+	     const kernel_ulong_t addr, const unsigned int len,
+	     const bool in_array)
 {
 	if (len < sizeof(struct nlattr)) {
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return false;
 	}
 
-	if (umove_or_printaddr(tcp, addr, nlattr))
-		return false;
+	if (tfetch_obj(tcp, addr, nlattr))
+		return true;
 
-	return true;
+	if (in_array) {
+		tprints("...");
+		printaddr_comment(addr);
+	} else {
+		printaddr(addr);
+	}
+
+	return false;
 }
 
 static void
@@ -55,11 +46,18 @@ print_nlattr(const struct nlattr *const nla,
 	     const struct xlat *const table,
 	     const char *const dflt)
 {
+	static_assert(NLA_TYPE_MASK == ~(NLA_F_NESTED | NLA_F_NET_BYTEORDER),
+		      "wrong NLA_TYPE_MASK");
+
 	tprintf("{nla_len=%u, nla_type=", nla->nla_len);
-	if (nla->nla_type & NLA_F_NESTED)
-		tprints("NLA_F_NESTED|");
-	if (nla->nla_type & NLA_F_NET_BYTEORDER)
-		tprints("NLA_F_NET_BYTEORDER|");
+	if (nla->nla_type & NLA_F_NESTED) {
+		print_xlat(NLA_F_NESTED);
+		tprints("|");
+	}
+	if (nla->nla_type & NLA_F_NET_BYTEORDER) {
+		print_xlat(NLA_F_NET_BYTEORDER);
+		tprints("|");
+	}
 	printxval(table, nla->nla_type & NLA_TYPE_MASK, dflt);
 	tprints("}");
 }
@@ -75,7 +73,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 			const unsigned int size,
 			const void *const opaque_data)
 {
-	const unsigned int nla_len = nla->nla_len > len ? len : nla->nla_len;
+	const unsigned int nla_len = MIN(nla->nla_len, len);
 
 	if (nla_len > NLA_HDRLEN)
 		tprints("{");
@@ -83,13 +81,19 @@ decode_nlattr_with_data(struct tcb *const tcp,
 	print_nlattr(nla, table, dflt);
 
 	if (nla_len > NLA_HDRLEN) {
+		const unsigned int idx =
+			size ? nla->nla_type & NLA_TYPE_MASK : 0;
+
 		tprints(", ");
 		if (!decoders
-		    || nla->nla_type >= size
-		    || !decoders[nla->nla_type]
-		    || !decoders[nla->nla_type](tcp, addr + NLA_HDRLEN,
-						nla_len - NLA_HDRLEN,
-						opaque_data))
+		    || (size && idx >= size)
+		    || !decoders[idx]
+		    || !decoders[idx](
+				tcp, addr + NLA_HDRLEN,
+				nla_len - NLA_HDRLEN,
+				size ? opaque_data
+				     : (const void *) (uintptr_t) nla->nla_type)
+		    )
 			printstr_ex(tcp, addr + NLA_HDRLEN,
 				    nla_len - NLA_HDRLEN, QUOTE_FORCE_HEX);
 		tprints("}");
@@ -107,10 +111,17 @@ decode_nlattr(struct tcb *const tcp,
 	      const void *const opaque_data)
 {
 	struct nlattr nla;
-	bool print_array = false;
+	bool is_array = false;
 	unsigned int elt;
 
-	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len); elt++) {
+	if (decoders && !size && opaque_data)
+		error_func_msg("[xlat %p, dflt \"%s\", decoders %p] "
+			       "size is zero (going to pass nla_type as "
+			       "decoder argument), but opaque data (%p) is not "
+			       "- will be ignored",
+			       table, dflt, decoders, opaque_data);
+
+	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len, is_array); elt++) {
 		if (abbrev(tcp) && elt == max_strlen) {
 			tprints("...");
 			break;
@@ -127,9 +138,9 @@ decode_nlattr(struct tcb *const tcp,
 				next_addr = addr + nla_len;
 		}
 
-		if (!print_array && next_addr) {
+		if (!is_array && next_addr) {
 			tprints("[");
-			print_array = true;
+			is_array = true;
 		}
 
 		decode_nlattr_with_data(tcp, &nla, addr, len, table, dflt,
@@ -143,7 +154,7 @@ decode_nlattr(struct tcb *const tcp,
 		len = next_len;
 	}
 
-	if (print_array) {
+	if (is_array) {
 		tprints("]");
 	}
 }
@@ -154,7 +165,8 @@ decode_nla_str(struct tcb *const tcp,
 	       const unsigned int len,
 	       const void *const opaque_data)
 {
-	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
+	printstr_ex(tcp, addr, len,
+		    QUOTE_OMIT_TRAILING_0 | QUOTE_EXPECT_TRAILING_0);
 
 	return true;
 }
@@ -166,24 +178,6 @@ decode_nla_strn(struct tcb *const tcp,
 		const void *const opaque_data)
 {
 	printstrn(tcp, addr, len);
-
-	return true;
-}
-
-static bool
-print_meminfo(struct tcb *const tcp,
-	      void *const elem_buf,
-	      const size_t elem_size,
-	      void *const opaque_data)
-{
-	unsigned int *const count = opaque_data;
-
-	if ((*count)++ >= SK_MEMINFO_VARS) {
-		tprints("...");
-		return false;
-	}
-
-	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
 
 	return true;
 }
@@ -201,8 +195,10 @@ decode_nla_meminfo(struct tcb *const tcp,
 		return false;
 
 	unsigned int count = 0;
-	print_array(tcp, addr, nmemb, &mem, sizeof(mem),
-		    umoven_or_printaddr, print_meminfo, &count);
+	print_array_ex(tcp, addr, nmemb, &mem, sizeof(mem),
+		       tfetch_mem, print_uint32_array_member, &count,
+		       PAF_PRINT_INDICES | XLAT_STYLE_FMT_U,
+		       netlink_sk_meminfo_indices, "SK_MEMINFO_???");
 
 	return true;
 }
@@ -224,6 +220,31 @@ decode_nla_fd(struct tcb *const tcp,
 }
 
 bool
+decode_nla_uid(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const unsigned int len,
+	       const void *const opaque_data)
+{
+	uint32_t uid;
+
+	if (len < sizeof(uid))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &uid))
+		printuid("", uid);
+
+	return true;
+}
+
+bool
+decode_nla_gid(struct tcb *const tcp,
+	       const kernel_ulong_t addr,
+	       const unsigned int len,
+	       const void *const opaque_data)
+{
+	return decode_nla_uid(tcp, addr, len, opaque_data);
+}
+
+bool
 decode_nla_ifindex(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
 	       const unsigned int len,
@@ -235,6 +256,164 @@ decode_nla_ifindex(struct tcb *const tcp,
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ifindex))
 		print_ifindex(ifindex);
+
+	return true;
+}
+
+bool
+decode_nla_xval(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		unsigned int len,
+		const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts * const opts = opaque_data;
+	union {
+		uint64_t val;
+		uint8_t  bytes[sizeof(uint64_t)];
+	} data = { .val = 0 };
+
+	if (len > sizeof(data) || len < opts->size)
+		return false;
+
+	if (opts->size)
+		len = MIN(len, opts->size);
+
+	const size_t bytes_offs = is_bigendian ? sizeof(data) - len : 0;
+
+	if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs)) {
+		if (opts->process_fn)
+			data.val = opts->process_fn(data.val);
+		if (opts->prefix)
+			tprints(opts->prefix);
+		printxval_ex(opts->xlat, data.val, opts->dflt, opts->style);
+		if (opts->suffix)
+			tprints(opts->suffix);
+	}
+
+	return true;
+}
+
+static uint64_t
+process_host_order(uint64_t val)
+{
+	return ntohs(val);
+}
+
+bool
+decode_nla_ether_proto(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = ethernet_protocols,
+		.dflt = "ETHER_P_???",
+		.prefix = "htons(",
+		.suffix = ")",
+		.size = 2,
+		.process_fn = process_host_order,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+bool
+decode_nla_ip_proto(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat = inet_protocols,
+		.dflt = "IPPROTO_???",
+		.size = 1,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+bool
+decode_nla_hwaddr(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+	if (len > MAX_ADDR_LEN)
+		return false;
+
+	uint8_t buf[len];
+	const uintptr_t arphrd = (uintptr_t) opaque_data;
+
+	if (!umoven_or_printaddr(tcp, addr, len, buf)) {
+		print_hwaddr("", buf, len, arphrd & NLA_HWADDR_FAMILY_OFFSET
+				? arphrd & ~NLA_HWADDR_FAMILY_OFFSET : -1U);
+	}
+
+	return true;
+}
+
+bool
+decode_nla_in_addr(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	struct in_addr in;
+
+	if (len < sizeof(in))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &in))
+		print_inet_addr(AF_INET, &in, sizeof(in), NULL);
+
+	return true;
+}
+
+bool
+decode_nla_in6_addr(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	struct in6_addr in6;
+
+	if (len < sizeof(in6))
+		return false;
+	else if (!umove_or_printaddr(tcp, addr, &in6))
+		print_inet_addr(AF_INET6, &in6, sizeof(in6), NULL);
+
+	return true;
+}
+
+bool
+decode_nla_flags(struct tcb *const tcp,
+		 const kernel_ulong_t addr,
+		 unsigned int len,
+		 const void *const opaque_data)
+{
+	const struct decode_nla_xlat_opts * const opts = opaque_data;
+	union {
+		uint64_t flags;
+		uint8_t  bytes[sizeof(uint64_t)];
+	} data = { .flags = 0 };
+
+	if (len > sizeof(data) || len < opts->size)
+		return false;
+
+	if (opts->size)
+		len = MIN(len, opts->size);
+
+	const size_t bytes_offs = is_bigendian ? sizeof(data) - len : 0;
+
+	if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs)) {
+		if (opts->process_fn)
+			data.flags = opts->process_fn(data.flags);
+		if (opts->prefix)
+			tprints(opts->prefix);
+		printflags_ex(data.flags, opts->dflt, opts->style, opts->xlat,
+			      NULL);
+		if (opts->suffix)
+			tprints(opts->suffix);
+	}
 
 	return true;
 }
@@ -291,6 +470,10 @@ decode_nla_ ## name(struct tcb *const tcp,		\
 	return true;					\
 }
 
+DECODE_NLA_INTEGER(x8, uint8_t, "%#" PRIx8)
+DECODE_NLA_INTEGER(x16, uint16_t, "%#" PRIx16)
+DECODE_NLA_INTEGER(x32, uint32_t, "%#" PRIx32)
+DECODE_NLA_INTEGER(x64, uint64_t, "%#" PRIx64)
 DECODE_NLA_INTEGER(u8, uint8_t, "%" PRIu8)
 DECODE_NLA_INTEGER(u16, uint16_t, "%" PRIu16)
 DECODE_NLA_INTEGER(u32, uint32_t, "%" PRIu32)

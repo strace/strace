@@ -1,4 +1,9 @@
 #!/bin/sh
+#
+# Copyright (c) 2013-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
 
@@ -14,4 +19,4 @@ if [ $# -eq 0 ]; then
 	exit 1
 fi
 
-exec $TIMEOUT "$@"
+exec $TIMEOUT "$@" < /dev/null

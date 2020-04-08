@@ -1,6 +1,12 @@
 #!/bin/sh
-
+#
 # Check decoding of prctl PR_GET_SECUREBITS/PR_SET_SECUREBITS operations.
+#
+# Copyright (c) 2016-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 . "${srcdir=.}/init.sh"
 
 check_prog grep

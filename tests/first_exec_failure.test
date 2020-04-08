@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Check error diagnostics when the first exec fails.
+#
+# Copyright (c) 2016-2018 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+$STRACE / 2> "$LOG" &&
+	dump_log_and_fail_with \
+		"$STRACE / failed to handle the error properly"
+
+check_prog head
+check_prog tail
+
+head -n1 < "$LOG" > "$OUT"
+cat > "$EXP" <<__EOF__
+execve\("/", \["/"\], 0x[[:xdigit:]]+ /\* [[:digit:]]+ vars \*/\) += -1 EACCES \(Permission denied\)
+__EOF__
+match_grep "$OUT" "$EXP"
+
+tail -n +2 < "$LOG" > "$OUT"
+cat > "$EXP" <<__EOF__
+$STRACE_EXE: exec: Permission denied
++++ exited with 1 +++
+__EOF__
+match_diff "$OUT" "$EXP"

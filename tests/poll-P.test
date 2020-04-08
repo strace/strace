@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Check path tracing of poll syscall.
+#
+# Copyright (c) 2018-2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog > /dev/null 9>>/dev/full
+run_strace -a16 -vepoll -P /dev/full 9>>/dev/full \
+	$args > "$EXP"
+match_diff "$LOG" "$EXP"
+
+for abbrev in 0 1 2 3 4 5; do
+	run_prog "../$NAME" $abbrev > /dev/null 9>>/dev/full
+	run_strace -a16 -epoll -s$abbrev -P /dev/full 9>>/dev/full \
+		$args > "$EXP"
+	match_diff "$LOG" "$EXP"
+done

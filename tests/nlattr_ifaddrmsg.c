@@ -1,29 +1,9 @@
 /*
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017 The strace developers.
+ * Copyright (c) 2017-2018 The strace developers.
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
@@ -83,9 +63,23 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+	static const char address4[] = "12.34.56.78";
+	static const char address6[] = "12:34:56:78:90:ab:cd:ef";
+	static const struct ifa_cacheinfo ci = {
+		.ifa_prefered = 0xabcdefac,
+		.ifa_valid = 0xbcdadbca,
+		.cstamp = 0xcdabedba,
+		.tstamp = 0xdebabdac
+	};
+
+	struct in_addr a4;
+	struct in6_addr a6;
+	const uint32_t ifa_flags = IFA_F_SECONDARY | IFA_F_PERMANENT;
+
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 	const unsigned int hdrlen = sizeof(struct ifaddrmsg);
-	void *nlh0 = tail_alloc(NLMSG_SPACE(hdrlen));
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + MAX(sizeof(ci), sizeof(a6)));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
@@ -106,8 +100,6 @@ main(void)
 		    print_quoted_hex(pattern, 4));
 
 	SET_IFA_FAMILY(AF_INET);
-	static const char address4[] = "12.34.56.78";
-	struct in_addr a4;
 
 	if (!inet_pton(AF_INET, address4, &a4))
 		perror_msg_and_skip("inet_pton");
@@ -115,11 +107,9 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_ADDRESS, pattern, a4,
-			   printf("%s", address4));
+			   printf("inet_addr(\"%s\")", address4));
 
 	SET_IFA_FAMILY(AF_INET6);
-	static const char address6[] = "12:34:56:78:90:ab:cd:ef";
-	struct in6_addr a6;
 
 	if (!inet_pton(AF_INET6, address6, &a6))
 		perror_msg_and_skip("inet_pton");
@@ -127,14 +117,8 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_ADDRESS, pattern, a6,
-			   printf("%s", address6));
+			   printf("inet_pton(AF_INET6, \"%s\")", address6));
 
-	static const struct ifa_cacheinfo ci = {
-		.ifa_prefered = 0xabcdefac,
-		.ifa_valid = 0xbcdadbca,
-		.cstamp = 0xcdabedba,
-		.tstamp = 0xdebabdac
-	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_CACHEINFO, pattern, ci,
@@ -144,7 +128,6 @@ main(void)
 			   PRINT_FIELD_U(", ", ci, tstamp);
 			   printf("}"));
 
-	const uint32_t ifa_flags = IFA_F_SECONDARY | IFA_F_PERMANENT;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_FLAGS, pattern, ifa_flags,

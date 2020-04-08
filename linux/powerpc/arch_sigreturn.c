@@ -1,8 +1,19 @@
+/*
+ * Copyright (c) 2015-2018 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 static void
 arch_sigreturn(struct tcb *tcp)
 {
+	kernel_ulong_t addr;
+	if (!get_stack_pointer(tcp, &addr))
+		return;
+
 	/* Skip dummy stack frame. */
-	const unsigned long addr = ppc_regs.gpr[1] + 64;
+	addr += 64;
 
 #ifdef POWERPC64
 	/* The only sigreturn on ppc64 is compat_sys_sigreturn. */
@@ -19,9 +30,7 @@ arch_sigreturn(struct tcb *tcp)
 
 	sigreturn_context sc;
 
-	if (umove(tcp, addr, &sc) < 0) {
-		tprintf("{mask=%#lx}", addr);
-	} else {
+	if (!umove_or_printaddr(tcp, addr, &sc)) {
 		const unsigned int mask[NSIG_BYTES / sizeof(int)] = {
 			sc.oldmask,
 			sc._unused[3]

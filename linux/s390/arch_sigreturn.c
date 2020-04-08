@@ -1,12 +1,28 @@
+/*
+ * Copyright (c) 2015-2019 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+#ifndef SIGNAL_FRAMESIZE
+# define SIGNAL_FRAMESIZE 96
+#endif
+#ifndef PTR_TYPE
+# define PTR_TYPE unsigned long
+#endif
+
 static void
 arch_sigreturn(struct tcb *tcp)
 {
-	unsigned long mask[NSIG_BYTES / sizeof(long)];
-	const unsigned long addr = *s390_frame_ptr + __SIGNAL_FRAMESIZE;
+	kernel_ulong_t addr;
 
-	if (umove(tcp, addr, &mask) < 0) {
-		tprintf("{mask=%#lx}", addr);
-	} else {
+	if (!get_stack_pointer(tcp, &addr))
+		return;
+	addr += SIGNAL_FRAMESIZE;
+
+	PTR_TYPE mask[NSIG_BYTES / sizeof(PTR_TYPE)];
+	if (!umove_or_printaddr(tcp, addr, &mask)) {
 		tprintsigmask_addr("{mask=", mask);
 		tprints("}");
 	}
