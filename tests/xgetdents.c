@@ -15,6 +15,7 @@
 #include "kernel_dirent.h"
 #include "print_fields.h"
 
+#if VERBOSE
 static const char *
 str_d_type(const unsigned char d_type)
 {
@@ -30,6 +31,7 @@ str_d_type(const unsigned char d_type)
 
 static void
 print_dirent(const kernel_dirent_type *d);
+#endif
 
 static const char *errstr;
 
@@ -55,17 +57,37 @@ ls(int fd, char *buf, unsigned int size)
 	while ((rc = k_getdents(fd, buf, size))) {
 		if (rc < 0)
 			perror_msg_and_skip(STR_getdents);
-		printf("%s(%d, [", STR_getdents, fd);
+		printf("%s(%d, ", STR_getdents, fd);
+#if VERBOSE
+		printf("[");
+#else
+		unsigned long entries = 0;
+#endif
 		kernel_dirent_type *d;
 		for (long i = 0; i < rc; i += d->d_reclen) {
 			d = (kernel_dirent_type *) &buf[i];
+#if VERBOSE
 			if (i)
 				printf(", ");
 			print_dirent(d);
+#else
+			++entries;
+#endif
 		}
-		printf("], %u) = %ld\n", size, rc);
+#if VERBOSE
+		printf("]");
+#else
+		printf("/* %lu entries */", entries);
+#endif
+		printf(", %u) = %ld\n", size, rc);
 	}
-	printf("%s(%d, [], %u) = 0\n", STR_getdents, fd, size);
+	printf("%s(%d, %s, %u) = 0\n", STR_getdents, fd,
+#if VERBOSE
+	       "[]",
+#else
+	       "/* 0 entries */",
+#endif
+	       size);
 }
 
 int
@@ -73,7 +95,11 @@ main(void)
 {
 	static const char dot[] = ".";
 	static const char dot_dot[] = "..";
-	static const char dname[] = STR_getdents ".test.tmp.dir";
+	static const char dname[] = STR_getdents
+#if VERBOSE
+		"-v"
+#endif
+		".test.tmp.dir";
 	static const char fname[] =
 		"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
 		"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"

@@ -19,6 +19,7 @@
 
 # include "xgetdents.c"
 
+# if VERBOSE
 static void
 print_dirent(const kernel_dirent_type *d)
 {
@@ -34,6 +35,7 @@ print_dirent(const kernel_dirent_type *d)
 	print_quoted_cstring(d->d_name, d_name_len);
 	printf("}");
 }
+# endif
 
 #else
 

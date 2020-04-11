@@ -19,6 +19,7 @@
 
 # include "xgetdents.c"
 
+# if VERBOSE
 static void
 print_dirent(const kernel_dirent_type *d)
 {
@@ -35,6 +36,7 @@ print_dirent(const kernel_dirent_type *d)
 	printf(", d_type=%s}",
 	       str_d_type(*((const char *) d + d->d_reclen - 1)));
 }
+# endif
 
 #else
 

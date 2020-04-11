@@ -113,8 +113,10 @@ futimesat	-a28
 get_mempolicy	-s3 -a38
 getcpu	-a25
 getcwd	-a18
-getdents	-a22 -v
-getdents64	-a24 -v
+getdents	-a31
+getdents-v	-a22 -v --trace=getdents
+getdents64	-a33
+getdents64-v	-a24 -v --trace=getdents64
 getegid	+getuid.test
 getegid-creds	+getuid.test
 getegid32	+getuid.test

@@ -100,7 +100,9 @@ get_mempolicy
 getcpu
 getcwd
 getdents
+getdents-v
 getdents64
+getdents64-v
 getegid
 getegid32
 geteuid
