@@ -28,13 +28,6 @@ typedef unsigned long kernel_ulong_t;
 
 # endif
 
-typedef struct {
-	kernel_ulong_t	d_ino;
-	kernel_ulong_t	d_off;
-	unsigned short	d_reclen;
-	char		d_name[1];
-} kernel_dirent;
-
 # if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
 #  define PRI_kl "ll"
 # else

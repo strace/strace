@@ -18,6 +18,7 @@
 # include <stdio.h>
 # include <sys/stat.h>
 # include <unistd.h>
+# include "kernel_dirent.h"
 
 static const char fname[] =
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
@@ -53,9 +54,9 @@ str_d_type(const unsigned char d_type)
 	}
 }
 static void
-print_dirent(const kernel_dirent *d)
+print_dirent(const kernel_dirent_t *d)
 {
-	const unsigned int d_name_offset = offsetof(kernel_dirent, d_name);
+	const unsigned int d_name_offset = offsetof(kernel_dirent_t, d_name);
 	int d_name_len = d->d_reclen - d_name_offset - 1;
 	assert(d_name_len > 0);
 
@@ -92,14 +93,14 @@ main(void)
 
 	count = (unsigned long) 0xfacefeed00000000ULL | sizeof(buf);
 	while ((rc = syscall(__NR_getdents, 0, buf, count))) {
-		kernel_dirent *d;
+		kernel_dirent_t *d;
 		long i;
 
 		if (rc < 0)
 			perror_msg_and_skip("getdents");
 		printf("getdents(0, [");
 		for (i = 0; i < rc; i += d->d_reclen) {
-			d = (kernel_dirent *) &buf[i];
+			d = (kernel_dirent_t *) &buf[i];
 			if (i)
 				printf(", ");
 			print_dirent(d);

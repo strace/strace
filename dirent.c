@@ -11,8 +11,9 @@
  */
 
 #include "defs.h"
+#include "kernel_dirent.h"
 
-#include DEF_MPERS_TYPE(kernel_dirent)
+#include DEF_MPERS_TYPE(kernel_dirent_t)
 
 #include MPERS_DEFS
 
@@ -21,7 +22,7 @@
 static void
 print_old_dirent(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	kernel_dirent d;
+	kernel_dirent_t d;
 
 	if (umove_or_printaddr(tcp, addr, &d))
 		return;
@@ -31,7 +32,7 @@ print_old_dirent(struct tcb *const tcp, const kernel_ulong_t addr)
 		zero_extend_signed_to_ull(d.d_off), d.d_reclen);
 	if (d.d_reclen > D_NAME_LEN_MAX)
 		d.d_reclen = D_NAME_LEN_MAX;
-	printpathn(tcp, addr + offsetof(kernel_dirent, d_name), d.d_reclen);
+	printpathn(tcp, addr + offsetof(kernel_dirent_t, d_name), d.d_reclen);
 	tprints("}");
 }
 
@@ -74,7 +75,7 @@ SYS_FUNC(getdents)
 	/* Beware of insanely large or too small values in tcp->u_rval */
 	if (tcp->u_rval > 1024*1024)
 		len = 1024*1024;
-	else if (tcp->u_rval < (int) sizeof(kernel_dirent))
+	else if (tcp->u_rval < (int) sizeof(kernel_dirent_t))
 		len = 0;
 	else
 		len = tcp->u_rval;
@@ -95,14 +96,14 @@ SYS_FUNC(getdents)
 	tprints(",");
 	if (!abbrev(tcp))
 		tprints(" [");
-	for (i = 0; len && i <= len - sizeof(kernel_dirent); ) {
-		kernel_dirent *d = (kernel_dirent *) &buf[i];
+	for (i = 0; len && i <= len - sizeof(kernel_dirent_t); ) {
+		kernel_dirent_t *d = (kernel_dirent_t *) &buf[i];
 
 		if (!abbrev(tcp)) {
-			int oob = d->d_reclen < sizeof(kernel_dirent) ||
+			int oob = d->d_reclen < sizeof(kernel_dirent_t) ||
 				  i + d->d_reclen - 1 >= len;
 			int d_name_len = oob ? len - i : d->d_reclen;
-			d_name_len -= offsetof(kernel_dirent, d_name) + 1;
+			d_name_len -= offsetof(kernel_dirent_t, d_name) + 1;
 			if (d_name_len > D_NAME_LEN_MAX)
 				d_name_len = D_NAME_LEN_MAX;
 
@@ -122,7 +123,7 @@ SYS_FUNC(getdents)
 			tprints("}");
 		}
 		dents++;
-		if (d->d_reclen < sizeof(kernel_dirent)) {
+		if (d->d_reclen < sizeof(kernel_dirent_t)) {
 			tprints_comment("d_reclen < sizeof(struct dirent)");
 			break;
 		}
