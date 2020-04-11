@@ -18,4 +18,12 @@ typedef struct {
 	char		d_name[1];
 } kernel_dirent_t;
 
+typedef struct {
+	uint64_t	d_ino;
+	uint64_t	d_off;
+	unsigned short	d_reclen;
+	unsigned char	d_type;
+	char		d_name[1];
+} kernel_dirent64_t;
+
 #endif /* !STRACE_KERNEL_DIRENT_H */

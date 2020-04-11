@@ -19,6 +19,7 @@
 # include <stdio.h>
 # include <sys/stat.h>
 # include <unistd.h>
+# include "kernel_dirent.h"
 
 static const char fname[] =
 	"A\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\nA\n"
@@ -39,14 +40,6 @@ static const char qname[] =
 	"A\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\n"
 	"A\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nA\\nZ";
 
-typedef struct {
-		uint64_t d_ino;
-		uint64_t d_off;
-		unsigned short d_reclen;
-		unsigned char d_type;
-		char d_name[256];
-} kernel_dirent64;
-
 static char buf[8192];
 
 static const char *
@@ -62,9 +55,9 @@ str_d_type(const unsigned char d_type)
 	}
 }
 static void
-print_dirent(const kernel_dirent64 *d)
+print_dirent(const kernel_dirent64_t *d)
 {
-	const unsigned int d_name_offset = offsetof(kernel_dirent64, d_name);
+	const unsigned int d_name_offset = offsetof(kernel_dirent64_t, d_name);
 	int d_name_len = d->d_reclen - d_name_offset;
 	assert(d_name_len > 0);
 
@@ -98,14 +91,14 @@ main(void)
 
 	count = (unsigned long) 0xfacefeed00000000ULL | sizeof(buf);
 	while ((rc = syscall(__NR_getdents64, 0, buf, count))) {
-		kernel_dirent64 *d;
+		kernel_dirent64_t *d;
 		long i;
 
 		if (rc < 0)
 			perror_msg_and_skip("getdents64");
 		printf("getdents64(0, [");
 		for (i = 0; i < rc; i += d->d_reclen) {
-			d = (kernel_dirent64 *) &buf[i];
+			d = (kernel_dirent64_t *) &buf[i];
 			if (i)
 				printf(", ");
 			print_dirent(d);
