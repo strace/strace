@@ -34,7 +34,8 @@ SYS_FUNC(getdents64)
 
 	const unsigned int count = tcp->u_arg[2];
 
-	if (syserror(tcp) || !verbose(tcp)) {
+	if (syserror(tcp) || !verbose(tcp) ||
+	    (kernel_ulong_t) tcp->u_rval > count /* kernel gone bananas? */) {
 		printaddr(tcp->u_arg[1]);
 		tprintf(", %u", count);
 		return 0;
