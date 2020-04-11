@@ -77,17 +77,16 @@ ls(int fd, char *buf, unsigned int size)
 #if VERBOSE
 		printf("]");
 #else
-		printf("/* %lu entries */", entries);
+		printf("%p /* %lu entries */", buf, entries);
 #endif
 		printf(", %u) = %ld\n", size, rc);
 	}
-	printf("%s(%d, %s, %u) = 0\n", STR_getdents, fd,
 #if VERBOSE
-	       "[]",
+	printf("%s(%d, [], %u) = 0\n", STR_getdents, fd, size);
 #else
-	       "/* 0 entries */",
+	printf("%s(%d, %p /* 0 entries */, %u) = 0\n",
+	       STR_getdents, fd, buf, size);
 #endif
-	       size);
 }
 
 int
