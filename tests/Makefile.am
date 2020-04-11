@@ -555,6 +555,7 @@ EXTRA_DIST = \
 	unix-pair-send-recv.expected \
 	unix-pair-sendto-recvfrom.expected \
 	xchownx.c \
+	xgetdents.c \
 	xgetrlimit.c \
 	xselect.c \
 	xstatfs.c \
