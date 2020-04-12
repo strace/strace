@@ -46,29 +46,12 @@ strace_CPPFLAGS = $(AM_CPPFLAGS)
 strace_CFLAGS = $(AM_CFLAGS)
 strace_LDFLAGS =
 strace_LDADD = libstrace.a $(clock_LIBS) $(timer_LIBS)
-noinst_LIBRARIES = libstrace.a
+strace_SOURCES = strace.c
 
+noinst_LIBRARIES = libstrace.a
 libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
 libstrace_a_CFLAGS = $(strace_CFLAGS)
 libstrace_a_SOURCES =	\
-	fetch_indirect_syscall_args.c \
-	fstatfs.c \
-	fstatfs64.c \
-	getpagesize.c \
-	ipc.c \
-	mmap_cache.c	\
-	mmap_cache.h	\
-	sigreturn.c	\
-	socketcall.c \
-	statfs.c \
-	statfs64.c \
-	sync_file_range.c \
-	sync_file_range2.c \
-	upeek.c		\
-	upoke.c		\
-	# end of libstrace_a_SOURCES
-
-strace_SOURCES =	\
 	access.c	\
 	affinity.c	\
 	aio.c		\
@@ -119,6 +102,7 @@ strace_SOURCES =	\
 	fchownat.c	\
 	fcntl.c		\
 	fetch_bpf_fprog.c \
+	fetch_indirect_syscall_args.c \
 	fetch_struct_flock.c \
 	fetch_struct_keyctl_kdf_params.c \
 	fetch_struct_mmsghdr.c \
@@ -140,6 +124,8 @@ strace_SOURCES =	\
 	fsmount.c	\
 	fsopen.c	\
 	fspick.c	\
+	fstatfs.c \
+	fstatfs64.c \
 	futex.c		\
 	gcc_compat.h	\
 	get_personality.c \
@@ -147,6 +133,7 @@ strace_SOURCES =	\
 	get_robust_list.c \
 	getcpu.c	\
 	getcwd.c	\
+	getpagesize.c \
 	getrandom.c	\
 	hdio.c		\
 	hostname.c	\
@@ -158,6 +145,7 @@ strace_SOURCES =	\
 	ioperm.c	\
 	iopl.c		\
 	ioprio.c	\
+	ipc.c \
 	ipc_defs.h	\
 	ipc_msg.c	\
 	ipc_msgctl.c	\
@@ -191,6 +179,8 @@ strace_SOURCES =	\
 	membarrier.c	\
 	memfd_create.c	\
 	mknod.c		\
+	mmap_cache.c	\
+	mmap_cache.h	\
 	mmap_notify.c	\
 	mmap_notify.h	\
 	mmsghdr.c	\
@@ -317,8 +307,10 @@ strace_SOURCES =	\
 	sigevent.h	\
 	signal.c	\
 	signalfd.c	\
+	sigreturn.c	\
 	sock.c		\
 	sockaddr.c	\
+	socketcall.c \
 	socketutils.c	\
 	sparc.c		\
 	sram_alloc.c	\
@@ -327,14 +319,17 @@ strace_SOURCES =	\
 	stat.h		\
 	stat64.c	\
 	statfs.c	\
+	statfs.c \
 	statfs.h	\
+	statfs64.c \
 	static_assert.h	\
 	statx.c		\
 	statx.h		\
-	strace.c	\
 	string_to_uint.c \
 	string_to_uint.h \
 	swapon.c	\
+	sync_file_range.c \
+	sync_file_range2.c \
 	syscall.c	\
 	sysctl.c	\
 	sysent.h	\
@@ -355,6 +350,8 @@ strace_SOURCES =	\
 	umask.c		\
 	umount.c	\
 	uname.c		\
+	upeek.c		\
+	upoke.c		\
 	userfaultfd.c	\
 	ustat.c		\
 	util.c		\
@@ -375,21 +372,21 @@ strace_SOURCES =	\
 	xstring.h	\
 	$(TYPES_HEADER_FILES) \
 	$(strace_SOURCES_check) \
-	# end of strace_SOURCES
+	# end of libstrace_a_SOURCES
 
 strace_SOURCES_check = bpf_attr_check.c $(TYPES_CHECK_FILES)
 
 if ENABLE_STACKTRACE
-strace_SOURCES += unwind.c unwind.h
+libstrace_a_SOURCES += unwind.c unwind.h
 if USE_LIBDW
-strace_SOURCES += unwind-libdw.c
+libstrace_a_SOURCES += unwind-libdw.c
 strace_CPPFLAGS += $(libdw_CPPFLAGS)
 strace_CFLAGS += $(libdw_CFLAGS)
 strace_LDFLAGS += $(libdw_LDFLAGS)
 strace_LDADD += $(libdw_LIBS)
 endif
 if USE_LIBUNWIND
-strace_SOURCES += unwind-libunwind.c
+libstrace_a_SOURCES += unwind-libunwind.c
 strace_CPPFLAGS += $(libunwind_CPPFLAGS)
 strace_LDFLAGS += $(libunwind_LDFLAGS)
 strace_LDADD += $(libunwind_LIBS)
