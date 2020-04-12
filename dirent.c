@@ -17,22 +17,82 @@
 
 #include MPERS_DEFS
 
+#include "xgetdents.h"
+#include "print_fields.h"
+
 #define D_NAME_LEN_MAX 256
+
+/* The minimum size of a valid directory entry.  */
+static const unsigned int header_size =
+	offsetof(kernel_dirent_t, d_name);
+
+static void
+print_dentry_head(const kernel_dirent_t *const dent)
+{
+	PRINT_FIELD_U("{", *dent, d_ino);
+	PRINT_FIELD_U(", ", *dent, d_off);
+	PRINT_FIELD_U(", ", *dent, d_reclen);
+}
+
+static unsigned int
+decode_dentry_head(struct tcb *const tcp, const void *const arg)
+{
+	const kernel_dirent_t *const dent = arg;
+
+	if (!abbrev(tcp))
+		print_dentry_head(dent);
+
+	return dent->d_reclen;
+}
+
+static int
+decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
+		   const void *const arg, const unsigned int d_name_type_len)
+{
+	int rc = 0;
+
+	/* !abbrev(tcp) */
+
+	if (d_name_type_len) {
+		unsigned int d_name_len = d_name_type_len - 1;
+		if (d_name_len) {
+			if (d_name_len > D_NAME_LEN_MAX)
+				d_name_len = D_NAME_LEN_MAX;
+			tprints(", d_name=");
+			rc = printpathn(tcp, addr, d_name_len - 1);
+		}
+		tprints(", d_type=");
+		const kernel_ulong_t d_type_addr =
+			addr + (d_name_type_len - 1);
+		unsigned char d_type;
+		if (umove_or_printaddr(tcp, d_type_addr, &d_type))
+			rc = -1;
+		else
+			printxval(dirent_types, d_type, "DT_???");
+	}
+	tprints("}");
+
+	return rc;
+}
+
+SYS_FUNC(getdents)
+{
+	return xgetdents(tcp, header_size,
+			 decode_dentry_head, decode_dentry_tail);
+}
 
 static void
 print_old_dirent(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	kernel_dirent_t d;
+	kernel_dirent_t dent;
 
-	if (umove_or_printaddr(tcp, addr, &d))
+	if (umove_or_printaddr(tcp, addr, &dent))
 		return;
 
-	tprintf("{d_ino=%llu, d_off=%llu, d_reclen=%u, d_name=",
-		zero_extend_signed_to_ull(d.d_ino),
-		zero_extend_signed_to_ull(d.d_off), d.d_reclen);
-	if (d.d_reclen > D_NAME_LEN_MAX)
-		d.d_reclen = D_NAME_LEN_MAX;
-	printpathn(tcp, addr + offsetof(kernel_dirent_t, d_name), d.d_reclen);
+	print_dentry_head(&dent);
+	tprints(", d_name=");
+	printpathn(tcp, addr + header_size,
+		   MIN(dent.d_reclen, D_NAME_LEN_MAX));
 	tprints("}");
 }
 
@@ -46,99 +106,10 @@ SYS_FUNC(readdir)
 			printaddr(tcp->u_arg[1]);
 		else
 			print_old_dirent(tcp, tcp->u_arg[1]);
+		const unsigned int count = tcp->u_arg[2];
 		/* Not much point in printing this out, it is always 1. */
-		if (tcp->u_arg[2] != 1)
-			tprintf(", %" PRI_klu, tcp->u_arg[2]);
-	}
-	return 0;
-}
-
-SYS_FUNC(getdents)
-{
-	unsigned int i, len, dents = 0;
-	unsigned char *buf;
-
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		return 0;
-	}
-
-	tprints(", ");
-
-	const unsigned int count = tcp->u_arg[2];
-
-	if (syserror(tcp) || !verbose(tcp) ||
-	    (kernel_ulong_t) tcp->u_rval > count /* kernel gone bananas? */) {
-		printaddr(tcp->u_arg[1]);
-		tprintf(", %u", count);
-		return 0;
-	}
-
-	/* Beware of insanely large or too small values in tcp->u_rval */
-	if (tcp->u_rval > 1024*1024)
-		len = 1024*1024;
-	else if (tcp->u_rval < (int) sizeof(kernel_dirent_t))
-		len = 0;
-	else
-		len = tcp->u_rval;
-
-	if (len) {
-		buf = malloc(len);
-		if (!buf || umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-			printaddr(tcp->u_arg[1]);
+		if (count != 1)
 			tprintf(", %u", count);
-			free(buf);
-			return 0;
-		}
-	} else {
-		buf = NULL;
 	}
-
-	if (abbrev(tcp))
-		printaddr(tcp->u_arg[1]);
-	else
-		tprints("[");
-
-	for (i = 0; len && i <= len - sizeof(kernel_dirent_t); ) {
-		kernel_dirent_t *d = (kernel_dirent_t *) &buf[i];
-
-		if (!abbrev(tcp)) {
-			int oob = d->d_reclen < sizeof(kernel_dirent_t) ||
-				  i + d->d_reclen - 1 >= len;
-			int d_name_len = oob ? len - i : d->d_reclen;
-			d_name_len -= offsetof(kernel_dirent_t, d_name) + 1;
-			if (d_name_len > D_NAME_LEN_MAX)
-				d_name_len = D_NAME_LEN_MAX;
-
-			tprintf("%s{d_ino=%llu, d_off=%llu, d_reclen=%u"
-				", d_name=", i ? ", " : "",
-				zero_extend_signed_to_ull(d->d_ino),
-				zero_extend_signed_to_ull(d->d_off),
-				d->d_reclen);
-
-			print_quoted_cstring(d->d_name, d_name_len);
-
-			tprints(", d_type=");
-			if (oob)
-				tprints("?");
-			else
-				printxval(dirent_types, buf[i + d->d_reclen - 1], "DT_???");
-			tprints("}");
-		}
-		dents++;
-		if (d->d_reclen < sizeof(kernel_dirent_t)) {
-			tprints_comment("d_reclen < sizeof(struct dirent)");
-			break;
-		}
-		i += d->d_reclen;
-	}
-
-	if (abbrev(tcp))
-		tprintf_comment("%u entries", dents);
-	else
-		tprints("]");
-
-	tprintf(", %u", count);
-	free(buf);
 	return 0;
 }

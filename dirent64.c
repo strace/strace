@@ -1,111 +1,63 @@
 /*
- * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
- * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
- * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2018 The strace developers.
+ * Copyright (c) 2020 Dmitry V. Levin <ldv@altlinux.org>
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "defs.h"
-#include <dirent.h>
-
-#include "xlat/dirent_types.h"
+#include "xgetdents.h"
+#include "kernel_dirent.h"
+#include "print_fields.h"
 
 #define D_NAME_LEN_MAX 256
 
+static void
+print_dentry_head(const kernel_dirent64_t *const dent)
+{
+	PRINT_FIELD_U("{", *dent, d_ino);
+	PRINT_FIELD_U(", ", *dent, d_off);
+	PRINT_FIELD_U(", ", *dent, d_reclen);
+}
+
+static unsigned int
+decode_dentry_head(struct tcb *const tcp, const void *const arg)
+{
+	const kernel_dirent64_t *const dent = arg;
+
+	if (!abbrev(tcp))
+		print_dentry_head(dent);
+
+	return dent->d_reclen;
+}
+
+static int
+decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
+		   const void *const arg, unsigned int d_name_len)
+{
+	const kernel_dirent64_t *const dent = arg;
+	int rc = 0;
+
+	/* !abbrev(tcp) */
+
+	PRINT_FIELD_XVAL(", ", *dent, d_type, dirent_types, "DT_???");
+
+	if (d_name_len) {
+		if (d_name_len > D_NAME_LEN_MAX)
+			d_name_len = D_NAME_LEN_MAX;
+		tprints(", d_name=");
+		rc = printpathn(tcp, addr, d_name_len - 1);
+	}
+	tprints("}");
+
+	return rc;
+}
+
 SYS_FUNC(getdents64)
 {
-	/* the minimum size of a valid dirent64 structure */
-	const unsigned int d_name_offset = offsetof(struct dirent64, d_name);
+	/* The minimum size of a valid directory entry.  */
+	static const unsigned int header_size =
+		offsetof(kernel_dirent64_t, d_name);
 
-	unsigned int i, len, dents = 0;
-	char *buf;
-
-	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
-		return 0;
-	}
-
-	tprints(", ");
-
-	const unsigned int count = tcp->u_arg[2];
-
-	if (syserror(tcp) || !verbose(tcp) ||
-	    (kernel_ulong_t) tcp->u_rval > count /* kernel gone bananas? */) {
-		printaddr(tcp->u_arg[1]);
-		tprintf(", %u", count);
-		return 0;
-	}
-
-	/* Beware of insanely large or too small values in tcp->u_rval */
-	if (tcp->u_rval > 1024*1024)
-		len = 1024*1024;
-	else if (tcp->u_rval < (int) d_name_offset)
-		len = 0;
-	else
-		len = tcp->u_rval;
-
-	if (len) {
-		buf = malloc(len);
-		if (!buf || umoven(tcp, tcp->u_arg[1], len, buf) < 0) {
-			printaddr(tcp->u_arg[1]);
-			tprintf(", %u", count);
-			free(buf);
-			return 0;
-		}
-	} else {
-		buf = NULL;
-	}
-
-	if (abbrev(tcp))
-		printaddr(tcp->u_arg[1]);
-	else
-		tprints("[");
-
-	for (i = 0; len && i <= len - d_name_offset; ) {
-		struct dirent64 *d = (struct dirent64 *) &buf[i];
-		if (!abbrev(tcp)) {
-			int d_name_len;
-			if (d->d_reclen >= d_name_offset
-			    && i + d->d_reclen <= len) {
-				d_name_len = d->d_reclen - d_name_offset;
-			} else {
-				d_name_len = len - i - d_name_offset;
-			}
-			if (d_name_len > D_NAME_LEN_MAX)
-				d_name_len = D_NAME_LEN_MAX;
-
-			tprintf("%s{d_ino=%" PRIu64 ", d_off=%" PRId64
-				", d_reclen=%u, d_type=",
-				i ? ", " : "",
-				d->d_ino,
-				d->d_off,
-				d->d_reclen);
-			printxval(dirent_types, d->d_type, "DT_???");
-
-			tprints(", d_name=");
-			print_quoted_cstring(d->d_name, d_name_len);
-
-			tprints("}");
-		}
-		if (d->d_reclen < d_name_offset) {
-			tprints_comment("d_reclen < offsetof(struct dirent64, d_name)");
-			break;
-		}
-		i += d->d_reclen;
-		dents++;
-	}
-
-	if (abbrev(tcp))
-		tprintf_comment("%u entries", dents);
-	else
-		tprints("]");
-
-	tprintf(", %u", count);
-	free(buf);
-	return 0;
+	return xgetdents(tcp, header_size,
+			 decode_dentry_head, decode_dentry_tail);
 }

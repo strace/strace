@@ -101,6 +101,7 @@ strace_SOURCES =	\
 	desc.c		\
 	dirent.c	\
 	dirent64.c	\
+	dirent_types.c	\
 	dm.c		\
 	dyxlat.c	\
 	empty.h		\
@@ -365,6 +366,8 @@ strace_SOURCES =	\
 	watchdog_ioctl.c \
 	xattr.c		\
 	xfs_quota_stat.h \
+	xgetdents.c	\
+	xgetdents.h	\
 	xlat.c		\
 	xlat.h		\
 	xmalloc.c	\
