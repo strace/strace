@@ -225,12 +225,12 @@ main(void)
 	probe->ops[0].flags = 0;
 	probe->ops[0].resv2 = 0xbeefface;
 
-	probe->ops[1].op = 29;
+	probe->ops[1].op = 32;
 	probe->ops[1].resv = 0;
 	probe->ops[1].flags = IO_URING_OP_SUPPORTED;
 	probe->ops[1].resv2 = 0xdeadc0de;
 
-	probe->ops[2].op = 30;
+	probe->ops[2].op = 33;
 	probe->ops[2].resv = 0xaf;
 	probe->ops[2].flags = 0xbeef;
 	probe->ops[2].resv2 = 0;
@@ -245,22 +245,22 @@ main(void)
 	       ", {last_op=IORING_OP_EPOLL_CTL, ops_len=%hhu"
 	       ", resv2=[0, %#x, 0], ops=["
 	       "{op=IORING_OP_NOP, resv=0xde, flags=0, resv2=0xbeefface}, "
-	       "{op=IORING_OP_EPOLL_CTL, flags=IO_URING_OP_SUPPORTED"
+	       "{op=IORING_OP_REMOVE_BUFFERS, flags=IO_URING_OP_SUPPORTED"
 	       ", resv2=0xdeadc0de}, "
-	       "{op=30 /* IORING_OP_??? */, resv=0xaf"
+	       "{op=33 /* IORING_OP_??? */, resv=0xaf"
 	       ", flags=IO_URING_OP_SUPPORTED|0xbeee}, "
 	       "{op=254 /* IORING_OP_??? */"
 	       ", flags=0xc0de /* IO_URING_OP_??? */}]}, 4) = %s\n",
 	       fd_null, path_null, probe->ops_len, probe->resv2[1], errstr);
 
-	probe->last_op = 30;
+	probe->last_op = 33;
 	probe->resv2[1] = 0;
 	fill_memory_ex(probe->ops, sizeof(probe->ops[0]) * (DEFAULT_STRLEN + 1),
 		    0x40, 0x80);
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe,
 			      DEFAULT_STRLEN + 1);
 	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE"
-	       ", {last_op=30 /* IORING_OP_??? */, ops_len=%hhu, ops=[",
+	       ", {last_op=33 /* IORING_OP_??? */, ops_len=%hhu, ops=[",
 	       fd_null, path_null, probe->ops_len);
 	for (size_t i = 0; i < DEFAULT_STRLEN; i++) {
 		printf("%s{op=%u /* IORING_OP_??? */, resv=%#hhx"
