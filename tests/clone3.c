@@ -66,17 +66,13 @@ enum validity_flag_bits {
 	TLS_VALID_BIT,
 };
 
-#define _(x_) x_ = 1 << x_##_BIT
-
 enum validity_flags {
-	_(STRUCT_VALID),
-	_(PIDFD_VALID),
-	_(CHILD_TID_VALID),
-	_(PARENT_TID_VALID),
-	_(TLS_VALID),
+	FLAG(STRUCT_VALID),
+	FLAG(PIDFD_VALID),
+	FLAG(CHILD_TID_VALID),
+	FLAG(PARENT_TID_VALID),
+	FLAG(TLS_VALID),
 };
-
-#undef _
 
 #define MAX_SET_TID_SIZE 32
 
