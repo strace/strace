@@ -38,12 +38,13 @@ main(void)
 	       " = %ld %s (%m)\n",
 	       "SECCOMP_FILTER_FLAG_TSYNC|SECCOMP_FILTER_FLAG_LOG|"
 	       "SECCOMP_FILTER_FLAG_SPEC_ALLOW|"
-	       "SECCOMP_FILTER_FLAG_NEW_LISTENER|0xfffffff0",
+	       "SECCOMP_FILTER_FLAG_NEW_LISTENER|"
+	       "SECCOMP_FILTER_FLAG_TSYNC_ESRCH|0xffffffe0",
 	       prog->len, prog->filter, rc, errno2name());
 
-	rc = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -16L, efault);
+	rc = syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -32L, efault);
 	printf("seccomp(SECCOMP_SET_MODE_FILTER, %s, %p) = %ld %s (%m)\n",
-	       "0xfffffff0 /* SECCOMP_FILTER_FLAG_??? */",
+	       "0xffffffe0 /* SECCOMP_FILTER_FLAG_??? */",
 	       efault, rc, errno2name());
 
 	puts("+++ exited with 0 +++");
