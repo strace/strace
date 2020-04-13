@@ -140,14 +140,14 @@ SYS_FUNC(clone)
 
 struct strace_clone_args {
 	uint64_t flags;
-	uint64_t /* int * */ pidfd;
-	uint64_t /* int * */ child_tid;
-	uint64_t /* int * */ parent_tid;
-	uint64_t /* int */   exit_signal;
-	uint64_t stack;
+	uint64_t /* fd * */    pidfd;
+	uint64_t /* pid_t * */ child_tid;
+	uint64_t /* pid_t * */ parent_tid;
+	uint64_t /* int */     exit_signal;
+	uint64_t /* void * */  stack;
 	uint64_t stack_size;
-	uint64_t tls;
-	uint64_t set_tid;
+	uint64_t /* struct user_desc * / void * */ tls;
+	uint64_t /* pid_t * */ set_tid;
 	uint64_t set_tid_size;
 };
 
