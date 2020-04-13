@@ -638,7 +638,7 @@ print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr
 	       license, IFINDEX_LO_STR);
 }
 
-static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 29,
+static_assert(ARRAY_SIZE(bpf_prog_types_xdata) == 30,
 	      "The prog_type for test 5 below needs to be updated");
 static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	{
@@ -649,7 +649,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 1 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 29,
+			.prog_type = 30,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0,
 			.license = 0,
@@ -660,7 +660,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_flags = 0,
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_flags),
-		.str = "prog_type=0x1d /* BPF_PROG_TYPE_??? */"
+		.str = "prog_type=0x1e /* BPF_PROG_TYPE_??? */"
 		       ", insn_cnt=3134983661, insns=NULL, license=NULL"
 		       ", log_level=42, log_size=3141592653, log_buf=NULL"
 		       ", kern_version=KERNEL_VERSION(51966, 240, 13)"
@@ -723,7 +723,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 	},
 	{ /* 5 */
 		.data = { .BPF_PROG_LOAD_data = {
-			.prog_type = 28,
+			.prog_type = 29,
 			.insn_cnt = 0xbadc0ded,
 			.insns = 0xffffffff00000000,
 			.license = 0xffffffff00000000,
@@ -735,7 +735,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.prog_name = "fedcba987654321",
 		} },
 		.size = offsetofend(struct BPF_PROG_LOAD_struct, prog_name),
-		.str = "prog_type=BPF_PROG_TYPE_EXT"
+		.str = "prog_type=BPF_PROG_TYPE_LSM"
 		       ", insn_cnt=3134983661"
 		       ", insns=" BIG_ADDR("0xffffffff00000000", "NULL")
 		       ", license=" BIG_ADDR("0xffffffff00000000", "NULL")
@@ -1139,7 +1139,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 2 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 26,
+			.attach_type = 28,
 			.query_flags = 0xfffffffe,
 			.attach_flags = 0xfffffff8,
 			.prog_ids = 0xffffffffffffffffULL,
@@ -1147,7 +1147,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=0x1a /* BPF_??? */"
+		       ", attach_type=0x1c /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
 		       ", attach_flags=0xfffffff8 /* BPF_F_??? */"
 		       ", prog_ids="
