@@ -430,6 +430,7 @@ nlattr_ifla_brport
 nlattr_ifla_linkinfo
 nlattr_ifla_port
 nlattr_ifla_xdp
+nlattr_ifla_xdp-y
 nlattr_inet_diag_msg
 nlattr_inet_diag_req_compat
 nlattr_inet_diag_req_v2

@@ -1,4 +1,7 @@
 #value_indexed
+#enum
+#include <netinet/in.h>
+#include <linux/rtnetlink.h>
 IFLA_XDP_UNSPEC		0
 IFLA_XDP_FD		1
 IFLA_XDP_ATTACHED	2
@@ -7,3 +10,4 @@ IFLA_XDP_PROG_ID	4
 IFLA_XDP_DRV_PROG_ID	5
 IFLA_XDP_SKB_PROG_ID	6
 IFLA_XDP_HW_PROG_ID	7
+IFLA_XDP_EXPECTED_FD	8
