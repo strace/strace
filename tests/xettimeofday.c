@@ -7,6 +7,10 @@
  */
 
 #include "tests.h"
+#include "scno.h"
+
+#ifdef __NR_gettimeofday
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -64,3 +68,9 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+#else
+
+SKIP_MAIN_UNDEFINED("__NR_gettimeofday")
+
+#endif /* __NR_gettimeofday */
