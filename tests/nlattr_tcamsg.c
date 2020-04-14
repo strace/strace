@@ -22,6 +22,12 @@ enum { TCA_ACT_COOKIE = 6 };
 #if !HAVE_DECL_TCA_ACT_FLAGS
 enum { TCA_ACT_FLAGS = 7 };
 #endif
+#if !HAVE_DECL_TCA_ACT_HW_STATS
+enum { TCA_ACT_HW_STATS = 8 };
+#endif
+#if !HAVE_DECL_TCA_ACT_USED_HW_STATS
+enum { TCA_ACT_USED_HW_STATS = 9 };
+#endif
 
 
 static void
@@ -60,7 +66,7 @@ main(void)
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
 	/* Invalid */
-	static const unsigned int nla_invalid[] = { 8, 0xffff & NLA_TYPE_MASK };
+	static const unsigned int nla_invalid[] = { 10, 0xffff & NLA_TYPE_MASK };
 	for (size_t i = 0; i < ARRAY_SIZE(nla_invalid); i++) {
 		char nla_type_str[256];
 		sprintf(nla_type_str, "%#x /* TCA_ACT_??? */", nla_invalid[i]);
@@ -110,6 +116,21 @@ main(void)
 	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
 		    TCA_ACT_FLAGS, sizeof(flags), &flags, sizeof(flags),
 		    printf("TCA_ACT_FLAGS_NO_PERCPU_STATS|0xfacebeee"));
+
+	/* TCA_ACT_HW_STATS, TCA_ACT_USED_HW_STATS */
+	static const struct strval32 nla_hw_st[] = {
+		{ ARG_STR(TCA_ACT_HW_STATS) },
+		{ ARG_STR(TCA_ACT_USED_HW_STATS) },
+	};
+
+	static uint32_t hw_st = 0xfacebeef;
+	for (size_t i = 0; i < ARRAY_SIZE(nla_hw_st); i++) {
+		TEST_NLATTR_(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+			     nla_hw_st[i].val, nla_hw_st[i].str,
+			     sizeof(hw_st), &hw_st, sizeof(hw_st),
+			     printf("TCA_ACT_HW_STATS_IMMEDIATE|"
+				    "TCA_ACT_HW_STATS_DELAYED|0xfacebeec"));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

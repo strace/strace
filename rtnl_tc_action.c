@@ -18,6 +18,7 @@
 
 #include "xlat/rtnl_tc_action_attrs.h"
 #include "xlat/rtnl_tca_act_flags.h"
+#include "xlat/rtnl_tca_act_hw_stats.h"
 
 
 static bool
@@ -34,6 +35,20 @@ decode_tca_act_flags(struct tcb *const tcp,
 	return decode_nla_flags(tcp, addr, len, &opts);
 }
 
+static bool
+decode_tca_act_hw_stats(struct tcb *const tcp,
+		        const kernel_ulong_t addr,
+		        const unsigned int len,
+		        const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		rtnl_tca_act_hw_stats, "TCA_ACT_HW_STATS_???",
+		.size = 4,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t tcamsg_nla_decoders[] = {
 	[TCA_ACT_KIND]		= decode_nla_str,
 	[TCA_ACT_OPTIONS]	= NULL, /* unimplemented */
@@ -42,6 +57,8 @@ static const nla_decoder_t tcamsg_nla_decoders[] = {
 	[TCA_ACT_PAD]		= NULL,
 	[TCA_ACT_COOKIE]	= NULL, /* default parser */
 	[TCA_ACT_FLAGS]		= decode_tca_act_flags,
+	[TCA_ACT_HW_STATS]	= decode_tca_act_hw_stats,
+	[TCA_ACT_USED_HW_STATS]	= decode_tca_act_hw_stats,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_tcamsg)
