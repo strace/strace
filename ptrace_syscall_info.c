@@ -20,18 +20,20 @@
 
 bool ptrace_get_syscall_info_supported;
 
+#define FAIL	do { ptrace_stop = -1U; goto done; } while (0)
+
+#ifdef HAVE_FORK
 static int
 kill_tracee(pid_t pid)
 {
 	return kill_save_errno(pid, SIGKILL);
 }
 
-#define FAIL	do { ptrace_stop = -1U; goto done; } while (0)
-
 static const unsigned int expected_none_size =
 	offsetof(struct_ptrace_syscall_info, entry);
 static const unsigned int expected_entry_size =
 	offsetofend(struct_ptrace_syscall_info, entry.args);
+#endif /* HAVE_FORK */
 static const unsigned int expected_exit_size =
 	offsetofend(struct_ptrace_syscall_info, exit.is_error);
 static const unsigned int expected_seccomp_size =
