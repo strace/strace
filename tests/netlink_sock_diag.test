@@ -10,4 +10,4 @@
 . "${srcdir=.}/init.sh"
 
 run_prog ../netlink_netlink_diag
-run_strace_match_diff -e trace=sendto
+run_strace_match_diff -e trace=sendto "$@"

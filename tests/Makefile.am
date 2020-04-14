@@ -477,7 +477,6 @@ EXTRA_DIST = \
 	lstatx.c \
 	match.awk \
 	net.expected \
-	netlink_sock_diag-v.sh \
 	nlattr_ifla.h \
 	pipe.expected \
 	print_user_desc.c \

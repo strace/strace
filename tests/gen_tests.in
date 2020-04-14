@@ -387,7 +387,7 @@ nlattr_ndtmsg			+netlink_sock_diag.test
 nlattr_netconfmsg		+netlink_sock_diag.test
 nlattr_netlink_diag_msg		+netlink_sock_diag.test
 nlattr_nlmsgerr			+netlink_sock_diag.test
-nlattr_packet_diag_msg		+netlink_sock_diag-v.sh
+nlattr_packet_diag_msg		+netlink_sock_diag.test -v
 nlattr_rtgenmsg			+netlink_sock_diag.test
 nlattr_rtmsg			+netlink_sock_diag.test
 nlattr_smc_diag_msg		+netlink_sock_diag.test
