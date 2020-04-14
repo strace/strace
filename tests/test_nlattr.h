@@ -15,6 +15,10 @@
 #include "netlink.h"
 #include <linux/rtnetlink.h>
 
+#ifndef PRINT_SOCK
+# define PRINT_SOCK 0
+#endif
+
 static void
 init_nlattr(struct nlattr *const nla,
 	    const uint16_t nla_len,
@@ -35,6 +39,29 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 {
 	printf(", %s{{nla_len=%u, nla_type=%s}, ",
 	       add_data ? "[" : "", nla_len, nla_type);
+}
+
+static void
+print_sockfd(int sockfd, const char *pfx, const char *sfx)
+{
+#if PRINT_SOCK
+	static int fd = -1;
+	static unsigned long inode;
+
+	if (sockfd < 0) {
+		printf("%s%d%s", pfx, sockfd, sfx);
+		return;
+	}
+
+	if (sockfd != fd) {
+		fd = sockfd;
+		inode = inode_of_sockfd(fd);
+	}
+
+	printf("%s%d<socket:[%lu]>%s", pfx, sockfd, inode, sfx);
+#else
+	printf("%s%d%s", pfx, sockfd, sfx);
+#endif
 }
 
 #define TEST_NLATTR_EX_(fd_, nlh0_, hdrlen_,				\
@@ -60,7 +87,7 @@ print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_da
 			sprintrc(sendto((fd_), nlh, msg_len,		\
 					MSG_DONTWAIT, NULL, 0));	\
 									\
-		printf("sendto(%d, {", (fd_));				\
+		print_sockfd((fd_), "sendto(", ", {");			\
 		(print_msg_)(msg_len);					\
 		print_nlattr(nla_len, (nla_type_str_),			\
 			     (nla_total_len_) > (nla_data_len_));	\
