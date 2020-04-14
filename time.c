@@ -13,6 +13,7 @@
 #include <signal.h>
 #include <sys/timex.h>
 
+#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 static void
 print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -25,7 +26,6 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 		tz.tz_minuteswest, tz.tz_dsttime);
 }
 
-#if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
