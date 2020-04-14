@@ -135,6 +135,13 @@ main(void)
 	       " mode=UFFDIO_COPY_MODE_DONTWAKE, copy=%#zx}) = %d\n",
 	       fd, area2, area1, pagesize, pagesize, rc);
 
+	copy_struct->mode = 0xdeadbeef;;
+	rc = ioctl(fd, UFFDIO_COPY, copy_struct);
+	printf("ioctl(%d, UFFDIO_COPY, {dst=%p, src=%p, len=%#zx,"
+	       " mode=UFFDIO_COPY_MODE_DONTWAKE|UFFDIO_COPY_MODE_WP|0xdeadbeec"
+	       "}) = %s\n",
+	       fd, area2, area1, pagesize, sprintrc(rc));
+
 	/* ---- ZEROPAGE ---- */
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_zeropage, zero_struct);
 	madvise(area2, pagesize, MADV_DONTNEED);
