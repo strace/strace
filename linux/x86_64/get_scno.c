@@ -18,10 +18,6 @@ arch_get_scno(struct tcb *tcp)
 	kernel_ulong_t scno = 0;
 	unsigned int currpers;
 
-#ifndef __X32_SYSCALL_BIT
-# define __X32_SYSCALL_BIT	0x40000000
-#endif
-
 	/*
 	 * GETREGSET of NT_PRSTATUS tells us regset size,
 	 * which unambiguously detects i386.

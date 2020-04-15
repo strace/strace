@@ -22,12 +22,6 @@
 # undef XLAT_MACROS_ONLY
 #endif
 
-#ifdef __x86_64__
-# ifndef __X32_SYSCALL_BIT
-#  define __X32_SYSCALL_BIT     0x40000000
-# endif
-#endif
-
 /* Define these shorthand notations to simplify the syscallent files. */
 #include "sysent_shorthand_defs.h"
 
