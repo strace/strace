@@ -593,6 +593,7 @@ umovestr-illptr
 umovestr2
 umovestr3
 umovestr_cached
+umovestr_cached_adjacent
 uname
 unlink
 unlinkat

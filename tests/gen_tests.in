@@ -680,6 +680,7 @@ umask	-a11
 umoven-illptr	-a36 -e trace=nanosleep
 umovestr-illptr	-a11 -e trace=chdir
 umovestr3	-a14 -e trace=chdir
+umovestr_cached_adjacent	+umovestr_cached.test 3
 unlink	-a24
 unlinkat	-a35
 unshare	-a11

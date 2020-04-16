@@ -9,8 +9,10 @@
 
 . "${srcdir=.}/init.sh"
 
+expected_count="${1:-2}"
+
 check_prog grep
-$STRACE -d -enone / > /dev/null 2> "$LOG"
+$STRACE -d -enone / > /dev/null 2> "$LOG" ||:
 grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO works" "$LOG" > /dev/null || {
 	# PTRACE_GET_SYSCALL_INFO does not work
 	case "$STRACE_ARCH:$MIPS_ABI" in
@@ -34,6 +36,6 @@ run_strace -qq -esignal=none -eprocess_vm_readv -z \
 count="$(cat count)"
 case "$count" in
 	0) skip_ "$STRACE $args made no process_vm_readv syscall invocations" ;;
-	2) ;;
-	*) fail_ "$STRACE $args made $count != 2 process_vm_readv syscall invocations" ;;
+	$expected_count) ;;
+	*) fail_ "$STRACE $args made $count != $expected_count process_vm_readv syscall invocations" ;;
 esac

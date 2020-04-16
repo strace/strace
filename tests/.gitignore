@@ -734,6 +734,7 @@ umovestr-illptr
 umovestr2
 umovestr3
 umovestr_cached
+umovestr_cached_adjacent
 uname
 unblock_reset_raise
 unix-pair-send-recv

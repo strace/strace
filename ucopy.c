@@ -61,7 +61,7 @@ process_read_mem(const pid_t pid, void *const laddr,
 }
 
 static int cached_idx = -1;
-static unsigned long cached_raddr[2];
+static unsigned long cached_raddr[4];
 
 void
 invalidate_umove_cache(void)
@@ -69,17 +69,47 @@ invalidate_umove_cache(void)
 	cached_idx = -1;
 }
 
+static int
+get_next_unused_idx(void)
+{
+	return (cached_idx + 1) % ARRAY_SIZE(cached_raddr);
+}
+
+static int
+lookup_cached_raddr_idx(const unsigned long raddr)
+{
+	if (cached_idx >= 0) {
+		for (int i = cached_idx; i >= 0; --i)
+			if (raddr == cached_raddr[i])
+				return i;
+		for (int i = (int) ARRAY_SIZE(cached_raddr) - 1;
+		     i > cached_idx; --i)
+			if (raddr == cached_raddr[i])
+				return i;
+	}
+	return -1;
+}
+
+static void
+set_cached_raddr_idx(const unsigned long raddr, const int idx)
+{
+	if (cached_idx < 0)
+		memset(cached_raddr, 0, sizeof(cached_raddr));
+	cached_raddr[idx] = raddr;
+	cached_idx = idx;
+}
+
 static ssize_t
-vm_read_mem(const pid_t pid, void *const laddr,
-	    const kernel_ulong_t raddr, const size_t len)
+vm_read_mem(const pid_t pid, void *laddr,
+	    const kernel_ulong_t kraddr, size_t len)
 {
 	if (!len)
 		return len;
 
-	const unsigned long taddr = raddr;
+	unsigned long taddr = kraddr;
 
 #if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
-	if (raddr != (kernel_ulong_t) taddr) {
+	if (kraddr != (kernel_ulong_t) taddr) {
 		errno = EIO;
 		return -1;
 	}
@@ -87,46 +117,60 @@ vm_read_mem(const pid_t pid, void *const laddr,
 
 	const size_t page_size = get_pagesize();
 	const size_t page_mask = page_size - 1;
-	const unsigned long raddr_page_start =
-		taddr & ~page_mask;
-	const unsigned long raddr_page_next =
+	unsigned long page_start = taddr & ~page_mask;
+	const unsigned long page_after_last =
 		(taddr + len + page_mask) & ~page_mask;
 
-	if (!raddr_page_start ||
-	    raddr_page_next < raddr_page_start ||
-	    raddr_page_next - raddr_page_start != page_size)
+	if (!page_start ||
+	    page_after_last < page_start ||
+	    page_after_last - page_start > ARRAY_SIZE(cached_raddr) * page_size)
 		return process_read_mem(pid, laddr, (void *) taddr, len);
 
-	int idx = -1;
-	if (cached_idx >= 0) {
-		if (raddr_page_start == cached_raddr[cached_idx])
-			idx = cached_idx;
-		else if (raddr_page_start == cached_raddr[!cached_idx])
-			idx = !cached_idx;
+	size_t total_read = 0;
+
+	for (;;) {
+		static char *buf[ARRAY_SIZE(cached_raddr)];
+		int idx = lookup_cached_raddr_idx(page_start);
+
+		if (idx == -1) {
+			idx = get_next_unused_idx();
+
+			if (!buf[idx])
+				buf[idx] = xmalloc(page_size);
+
+			const ssize_t rc =
+				process_read_mem(pid, buf[idx],
+						 (void *) page_start, page_size);
+			if (rc < 0)
+				return total_read ? (ssize_t) total_read : rc;
+
+			set_cached_raddr_idx(page_start, idx);
+		}
+
+		const unsigned long offset = taddr - page_start;
+		size_t copy_len, next_len;
+
+		if (len <= page_size - offset) {
+			copy_len = len;
+			next_len = 0;
+		} else {
+			copy_len = page_size - offset;
+			next_len = len - copy_len;
+		}
+
+		memcpy(laddr, buf[idx] + offset, copy_len);
+		total_read += copy_len;
+
+		if (!next_len)
+			break;
+
+		len = next_len;
+		laddr += copy_len;
+		page_start += page_size;
+		taddr = page_start;
 	}
 
-	static char *buf[2];
-
-	if (idx == -1) {
-		idx = !cached_idx;
-
-		if (!buf[idx])
-			buf[idx] = xmalloc(page_size);
-
-		const ssize_t rc =
-			process_read_mem(pid, buf[idx],
-					 (void *) raddr_page_start, page_size);
-		if (rc < 0)
-			return rc;
-
-		cached_raddr[idx] = raddr_page_start;
-		if (cached_idx < 0)
-			cached_raddr[!idx] = 0;
-		cached_idx = idx;
-	}
-
-	memcpy(laddr, buf[idx] + (taddr - cached_raddr[idx]), len);
-	return len;
+	return total_read;
 }
 
 static bool
