@@ -1,4 +1,7 @@
 #value_indexed
+#enum
+#include <linux/types.h>
+#include <linux/pkt_sched.h>
 TCA_STAB_UNSPEC	0
 TCA_STAB_BASE	1
 TCA_STAB_DATA	2

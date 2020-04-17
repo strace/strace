@@ -510,8 +510,6 @@ AC_CHECK_TYPES(m4_normalize([
 
 AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/types.h>
 #include <linux/pkt_sched.h>])
-AC_CHECK_DECLS([TCA_STAB_DATA],,, [#include <linux/types.h>
-#include <linux/pkt_sched.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct fib_rule_uid_range,
