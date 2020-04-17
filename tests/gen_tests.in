@@ -658,6 +658,7 @@ timer_xettime	-e trace=timer_create,timer_settime,timer_gettime
 timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
 times	-esignal=none
 times-fail	-a12 -e trace=times
+trace_clock	test_trace_expr 'clock_nanosleep|times' -e%clock
 trace_creds	test_trace_expr '([gs]et[^p]*([gu]id|groups)|caps|prctl|[fl]?chown|print(path-umovestr|strn-umoven)-undumpable|ptrace|quotactl|rt_sigtimedwait|rt_(tg)?sigqueueinfo).*' -e%creds
 trace_fstat	test_trace_expr '' -e%fstat -v -P stat.sample -P /dev/full
 trace_fstatfs	test_trace_expr '' -e%fstatfs

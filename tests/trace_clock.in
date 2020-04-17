@@ -1,0 +1,5 @@
+adjtimex -a13
+clock_adjtime -a21
+clock_xettime -a21
+xettimeofday -a20
+time -a9

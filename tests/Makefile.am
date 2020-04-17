@@ -534,6 +534,7 @@ EXTRA_DIST = \
 	strace.supp \
 	sun_path.expected \
 	syntax.sh \
+	trace_clock.in \
 	trace_creds.in \
 	trace_fstat.in \
 	trace_fstatfs.in \
