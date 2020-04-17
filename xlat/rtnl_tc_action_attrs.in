@@ -1,4 +1,6 @@
 #value_indexed
+#enum
+#include <linux/pkt_cls.h>
 TCA_ACT_UNSPEC		0
 TCA_ACT_KIND		1
 TCA_ACT_OPTIONS		2
