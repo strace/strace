@@ -620,6 +620,7 @@ AC_CHECK_HEADERS([linux/btrfs.h], [
 #include <linux/btrfs.h>])])
 
 st_CHECK_TYPES
+st_CHECK_ENUMS
 
 AC_CHECK_DECLS([sys_errlist])
 AC_CHECK_DECLS(m4_normalize([

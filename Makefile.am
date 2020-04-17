@@ -27,7 +27,7 @@ ARCH		= @arch@
 
 READELF		= @READELF@
 
-ACLOCAL_AMFLAGS = -I m4 -I types
+ACLOCAL_AMFLAGS = -I m4 -I types -I xlat
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 	      -I$(srcdir)/$(OS)/$(ARCH) \
