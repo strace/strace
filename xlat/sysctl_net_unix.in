@@ -1,3 +1,6 @@
+#enum
+#include <sys/types.h>
+#include <linux/sysctl.h>
 #unconditional
 NET_UNIX_DESTROY_DELAY
 NET_UNIX_DELETE_DELAY

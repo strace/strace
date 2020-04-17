@@ -1,3 +1,6 @@
+#enum
+#include <sys/types.h>
+#include <linux/sysctl.h>
 #unconditional
 NET_IPV4_ROUTE_FLUSH
 NET_IPV4_ROUTE_MIN_DELAY

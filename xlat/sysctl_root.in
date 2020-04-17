@@ -1,3 +1,6 @@
+#enum
+#include <sys/types.h>
+#include <linux/sysctl.h>
 #unconditional
 CTL_KERN
 CTL_VM

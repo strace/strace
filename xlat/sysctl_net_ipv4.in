@@ -1,3 +1,6 @@
+#enum
+#include <sys/types.h>
+#include <linux/sysctl.h>
 #unconditional
 NET_IPV4_FORWARD
 NET_IPV4_DYNADDR

@@ -1,3 +1,6 @@
+#enum
+#include <sys/types.h>
+#include <linux/sysctl.h>
 #unconditional
 NET_CORE_WMEM_MAX
 NET_CORE_RMEM_MAX
