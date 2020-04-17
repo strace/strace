@@ -1,3 +1,5 @@
+#enum
+#include <linux/loop.h>
 LO_FLAGS_READ_ONLY	1
 /* Added in v2.6.11-732-gf3f28e4, Removed in v3.2-rc1~49^2~5^2~3 */
 LO_FLAGS_USE_AOPS	2
