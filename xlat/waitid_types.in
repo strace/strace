@@ -1,4 +1,7 @@
 #value_indexed
+#enum
+#include <sys/types.h>
+#include <sys/wait.h>
 P_ALL	0
 P_PID	1
 P_PGID	2

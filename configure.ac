@@ -629,12 +629,6 @@ AC_CHECK_DECLS(m4_normalize([
 ]),,, [#include <sys/ptrace.h>])
 
 AC_CHECK_DECLS(m4_normalize([
-	P_ALL,
-	P_PID,
-	P_PGID
-]),,, [#include <sys/wait.h>])
-
-AC_CHECK_DECLS(m4_normalize([
 	CTL_PROC,
 	CTL_ARLAN,
 	CTL_S390DBF,
