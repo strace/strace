@@ -50,14 +50,9 @@ main(void)
 	const unsigned int blen = file_size / 3;
 	const unsigned int alen = file_size - blen;
 
-	static const char fname[] = "sendfile64-tmpfile";
-	int reg_in = open(fname, O_RDWR | O_CREAT | O_TRUNC, 0600);
-	if (reg_in < 0)
-		perror_msg_and_fail("open: %s", fname);
-	if (unlink(fname))
-		perror_msg_and_fail("unlink: %s", fname);
+	int reg_in = create_tmpfile(O_RDWR);
 	if (ftruncate(reg_in, file_size))
-		perror_msg_and_fail("ftruncate: %s", fname);
+		perror_msg_and_fail("ftruncate(%d, %u)", reg_in, file_size);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, p_off);
 	void *p = p_off + 1;

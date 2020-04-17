@@ -74,12 +74,7 @@ main(void)
 		perror_msg_and_fail("preadv");
 	printf("preadv(0, [], 0, -3) = -1 EINVAL (%m)\n");
 
-	static const char tmp[] = "preadv-tmpfile";
-	int fd = open(tmp, O_RDWR | O_CREAT | O_TRUNC, 0600);
-	if (fd < 0)
-		perror_msg_and_fail("open");
-	if (unlink(tmp))
-		perror_msg_and_fail("unlink");
+	int fd = create_tmpfile(O_RDWR);
 
 	static const char w[] = "0123456789abcde";
 	if (write(fd, w, LENGTH_OF(w)) != LENGTH_OF(w))

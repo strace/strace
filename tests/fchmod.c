@@ -22,14 +22,7 @@
 int
 main(void)
 {
-	static const char fname[] = "fchmod_test_file";
-
-	int fd = open(fname, O_CREAT|O_RDONLY, 0400);
-	if (fd < 0)
-		perror_msg_and_fail("open");
-
-	if (unlink(fname))
-		perror_msg_and_fail("unlink");
+	int fd = create_tmpfile(O_RDWR);
 
 	long rc = syscall(__NR_fchmod, fd, 0600);
 	printf("fchmod(%d, 0600) = %s\n", fd, sprintrc(rc));

@@ -352,14 +352,8 @@ test_fcntl_others(void)
 static void
 create_sample(void)
 {
-	char fname[] = TEST_SYSCALL_STR "_XXXXXX";
-
 	(void) close(0);
-	if (mkstemp(fname))
-		perror_msg_and_fail("mkstemp: %s", fname);
-	if (unlink(fname))
-		perror_msg_and_fail("unlink: %s", fname);
-	if (ftruncate(0, FILE_LEN))
+	if (ftruncate(create_tmpfile(O_RDWR), FILE_LEN))
 		perror_msg_and_fail("ftruncate");
 }
 
