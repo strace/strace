@@ -501,17 +501,6 @@ AC_CHECK_TYPES(m4_normalize([
 ]),,, [#include <sys/socket.h>
 #include <linux/rtnetlink.h>])
 
-AC_CHECK_DECLS(m4_normalize([
-	IFLA_PORT_SELF,
-	IFLA_PROTINFO,
-	IFLA_AF_SPEC,
-	IFLA_XDP,
-	IFLA_PROP_LIST,
-	IFLA_ALT_IFNAME,
-	IFLA_PERM_ADDRESS
-]),,, [#include <sys/socket.h>
-#include <linux/rtnetlink.h>])
-
 AC_CHECK_TYPES(m4_normalize([
 	struct gnet_stats_basic,
 	struct gnet_stats_queue,

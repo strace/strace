@@ -1,4 +1,7 @@
 #value_indexed
+#enum
+#include <sys/socket.h>
+#include <linux/rtnetlink.h>
 IFLA_UNSPEC		0
 IFLA_ADDRESS		1
 IFLA_BROADCAST		2
