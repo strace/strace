@@ -334,6 +334,9 @@ int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 int create_nl_socket_ext(int proto, const char *name);
 # define create_nl_socket(proto)	create_nl_socket_ext((proto), #proto)
 
+/* Create a temporary file in the current directory. */
+int create_tmpfile(unsigned int flags);
+
 /* Create a pipe with maximized descriptor numbers. */
 void pipe_maxfd(int pipefd[2]);
 
