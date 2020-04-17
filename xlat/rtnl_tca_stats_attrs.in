@@ -1,4 +1,6 @@
 #value_indexed
+#enum
+#include <linux/gen_stats.h>
 TCA_STATS_UNSPEC	0
 TCA_STATS_BASIC		1
 TCA_STATS_RATE_EST	2
