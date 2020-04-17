@@ -29,6 +29,7 @@
 # define CST	0
 # define TSD	0
 # define TC	0
+# define TCL	0
 # define SEN(a)	0, 0
 
 #else	/*	!STRACE_TESTS_H	*/
@@ -55,6 +56,7 @@
 # define CST	COMPAT_SYSCALL_TYPES
 # define TSD	TRACE_SECCOMP_DEFAULT
 # define TC	TRACE_CREDS
+# define TCL	TRACE_CLOCK
 /* SEN(a) is defined elsewhere */
 
 #endif

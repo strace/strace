@@ -38,5 +38,6 @@ typedef struct sysent {
 # define TRACE_PURE			002000000	/* Trace getter syscalls with no arguments. */
 # define TRACE_SECCOMP_DEFAULT		004000000	/* Syscall is traced by seccomp filter by default. */
 # define TRACE_CREDS			010000000	/* Trace process credentials-related syscalls. */
+# define TRACE_CLOCK			020000000	/* Trace syscalls reading or modifying system clocks. */
 
 #endif /* !STRACE_SYSENT_H */

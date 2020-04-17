@@ -305,7 +305,7 @@ Filtering:\n\
   -e trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none},\n\
   --trace=[!]{[?]SYSCALL[@64|@32|@x32]|[?]/REGEX|GROUP|all|none}\n\
                  trace only specified syscalls.\n\
-     groups:     %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
+     groups:     %%clock, %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
                  %%memory, %%net, %%process, %%pure, %%signal, %%stat, %%%%stat,\n\
                  %%statfs, %%%%statfs\n\
   -e signal=SET, --signal=SET\n\

@@ -27,4 +27,5 @@
 #undef CST
 #undef TSD
 #undef TC
+#undef TCL
 #undef SEN

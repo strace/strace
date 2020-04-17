@@ -600,6 +600,9 @@ and ustat).  The same effect can be achieved with
 .BR "\-e\ trace" = /statv?fs|fsstat|ustat
 regular expression.
 .TP
+.BR %clock
+Trace system calls that read or modify system clocks.
+.TP
 .BR %pure
 Trace syscalls that always succeed and have no arguments.
 Currently, this list includes
