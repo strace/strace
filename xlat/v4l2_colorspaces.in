@@ -1,4 +1,9 @@
 #value_indexed
+#enum
+#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>
 V4L2_COLORSPACE_DEFAULT		0
 V4L2_COLORSPACE_SMPTE170M	1
 V4L2_COLORSPACE_SMPTE240M	2

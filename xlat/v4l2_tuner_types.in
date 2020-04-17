@@ -1,4 +1,9 @@
 #value_indexed
+#enum
+#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>
 V4L2_TUNER_RADIO	1
 V4L2_TUNER_ANALOG_TV	2
 V4L2_TUNER_DIGITAL_TV	3

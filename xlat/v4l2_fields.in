@@ -1,4 +1,9 @@
 #value_indexed
+#enum
+#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>
 V4L2_FIELD_ANY			0
 V4L2_FIELD_NONE			1
 V4L2_FIELD_TOP			2

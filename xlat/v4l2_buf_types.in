@@ -1,4 +1,9 @@
 #value_indexed
+#enum
+#include <sys/time.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/videodev2.h>
 V4L2_BUF_TYPE_VIDEO_CAPTURE		1
 V4L2_BUF_TYPE_VIDEO_OUTPUT		2
 V4L2_BUF_TYPE_VIDEO_OVERLAY		3
