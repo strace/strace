@@ -86,7 +86,7 @@ main(void)
 
 	int fd_full = open(path_full, O_RDONLY);
 	if (fd_full < 0)
-		perror_msg_and_fail("open: %s", path_null);
+		perror_msg_and_fail("open: %s", path_full);
 
 	int fds[] = { fd_full, fd_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
