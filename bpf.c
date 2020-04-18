@@ -1038,6 +1038,28 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 }
 END_BPF_CMD_DECODER(0)
 
+BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
+{
+	PRINT_FIELD_FD("{link_create={", attr, prog_fd, tcp);
+	PRINT_FIELD_FD(", ", attr, target_fd, tcp);
+	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	PRINT_FIELD_X(", ", attr, flags);
+	tprints("}");
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
+BEGIN_BPF_CMD_DECODER(BPF_LINK_UPDATE)
+{
+	PRINT_FIELD_FD("{link_update={", attr, link_fd, tcp);
+	PRINT_FIELD_FD(", ", attr, new_prog_fd, tcp);
+	PRINT_FIELD_FLAGS(", ", attr, flags, bpf_attach_flags,
+			  "BPF_F_???");
+	if (attr.flags & BPF_F_REPLACE)
+		PRINT_FIELD_FD(", ", attr, old_prog_fd, tcp);
+	tprints("}");
+}
+END_BPF_CMD_DECODER(RVAL_DECODED)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -1069,6 +1091,8 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_MAP_LOOKUP_AND_DELETE_BATCH),
 		BPF_CMD_ENTRY(BPF_MAP_UPDATE_BATCH),
 		BPF_CMD_ENTRY(BPF_MAP_DELETE_BATCH),
+		BPF_CMD_ENTRY(BPF_LINK_CREATE),
+		BPF_CMD_ENTRY(BPF_LINK_UPDATE),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

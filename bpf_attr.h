@@ -385,4 +385,26 @@ struct BPF_MAP_LOOKUP_BATCH_struct /* batch */ {
 # define BPF_MAP_DELETE_BATCH_struct BPF_MAP_LOOKUP_BATCH_struct
 # define BPF_MAP_DELETE_BATCH_struct_size BPF_MAP_LOOKUP_BATCH_struct_size
 
+struct BPF_LINK_CREATE_struct /* link_create */ {
+	uint32_t prog_fd;
+	uint32_t target_fd;
+	uint32_t attach_type;
+	uint32_t flags;
+};
+
+# define BPF_LINK_CREATE_struct_size \
+	sizeof(struct BPF_LINK_CREATE_struct)
+# define expected_BPF_LINK_CREATE_struct_size 16
+
+struct BPF_LINK_UPDATE_struct /* link_update */ {
+	uint32_t link_fd;
+	uint32_t new_prog_fd;
+	uint32_t flags;
+	uint32_t old_prog_fd;
+};
+
+# define BPF_LINK_UPDATE_struct_size \
+	sizeof(struct BPF_LINK_UPDATE_struct)
+# define expected_BPF_LINK_UPDATE_struct_size 16
+
 #endif /* !STRACE_BPF_ATTR_H */

@@ -83,6 +83,8 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_MAP_LOOKUP_BATCH);
 	BPF_ATTR_DATA_FIELD(BPF_MAP_UPDATE_BATCH);
 	BPF_ATTR_DATA_FIELD(BPF_MAP_DELETE_BATCH);
+	BPF_ATTR_DATA_FIELD(BPF_LINK_CREATE);
+	BPF_ATTR_DATA_FIELD(BPF_LINK_UPDATE);
 	char char_data[256];
 };
 
@@ -1388,6 +1390,48 @@ static const struct bpf_attr_check BPF_MAP_DELETE_BATCH_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_LINK_CREATE_checks[] = {
+	{
+		.data = { .BPF_LINK_CREATE_data = { .prog_fd = -1, .target_fd = -2 } },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct, flags),
+		.str = "link_create={prog_fd=-1, target_fd=-2"
+		       ", attach_type=BPF_CGROUP_INET_INGRESS, flags=0}"
+	},
+	{
+		.data = { .BPF_LINK_CREATE_data = {
+			.prog_fd = -1,
+			.target_fd = 0xdeadbeef,
+			.attach_type = 5,
+			.flags = 4
+		} },
+		.size = offsetofend(struct BPF_LINK_CREATE_struct, flags),
+		.str = "link_create={prog_fd=-1, target_fd=-559038737"
+		       ", attach_type=BPF_SK_SKB_STREAM_VERDICT, flags=0x4}"
+	}
+};
+
+static const struct bpf_attr_check BPF_LINK_UPDATE_checks[] = {
+	{
+		.data = { .BPF_LINK_UPDATE_data = {
+			.link_fd = -1,
+			.new_prog_fd = -2
+		} },
+		.size = offsetofend(struct BPF_LINK_UPDATE_struct, old_prog_fd),
+		.str = "link_update={link_fd=-1, new_prog_fd=-2, flags=0}"
+	},
+	{
+		.data = { .BPF_LINK_UPDATE_data = {
+			.link_fd = -1,
+			.new_prog_fd = 0xdeadbeef,
+			.flags = 4,
+			.old_prog_fd = 0xdeadf00d
+		} },
+		.size = offsetofend(struct BPF_LINK_UPDATE_struct, old_prog_fd),
+		.str = "link_update={link_fd=-1, new_prog_fd=-559038737"
+		       ", flags=BPF_F_REPLACE, old_prog_fd=-559026163}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1427,6 +1471,8 @@ main(void)
 		CHK(BPF_MAP_LOOKUP_BATCH),
 		CHK(BPF_MAP_UPDATE_BATCH),
 		CHK(BPF_MAP_DELETE_BATCH),
+		CHK(BPF_LINK_CREATE),
+		CHK(BPF_LINK_UPDATE),
 	};
 
 	page_size = get_page_size();
