@@ -158,10 +158,6 @@ gen_makefile()
 		[ $# -eq 0 ] ||
 			printf 'types/check-%s.c ' "$@"
 		echo
-		printf 'TYPES_M4_FILES = '
-		[ $# -eq 0 ] ||
-			printf 'types/check-%s.m4 ' "$@"
-		echo
 	} >"$output"
 }
 
