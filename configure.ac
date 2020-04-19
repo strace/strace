@@ -592,9 +592,6 @@ AC_CHECK_HEADERS([linux/btrfs.h], [
 		struct btrfs_ioctl_search_args_v2.buf_size,
 		struct btrfs_ioctl_logical_ino_args.flags
 		]),,, [ #include <stdio.h>
-#include <linux/btrfs.h>])
-	AC_CHECK_DECLS(m4_normalize([BTRFS_COMPRESS_NONE, BTRFS_COMPRESS_ZLIB,
-				BTRFS_COMPRESS_LZO]),,,[ #include <stdio.h>
 #include <linux/btrfs.h>])])
 
 st_CHECK_TYPES

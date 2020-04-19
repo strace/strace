@@ -1,4 +1,7 @@
 #value_indexed
+#enum
+#include <stdio.h>
+#include <linux/btrfs.h>
 BTRFS_COMPRESS_NONE 0
 BTRFS_COMPRESS_ZLIB 1
 BTRFS_COMPRESS_LZO 2
