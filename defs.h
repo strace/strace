@@ -1327,11 +1327,13 @@ tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
 	tprint_iov_upto(tcp, len, addr, decode_iov, -1);
 }
 
-# if HAVE_ARCH_TIME32_SYSCALLS
+# if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32
 extern bool print_timespec32_data_size(const void *arg, size_t size);
 extern bool print_timespec32_array_data_size(const void *arg,
 					     unsigned int nmemb,
 					     size_t size);
+# endif /* HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32 */
+# if HAVE_ARCH_TIME32_SYSCALLS
 extern int print_timespec32(struct tcb *, kernel_ulong_t);
 extern const char *sprint_timespec32(struct tcb *, kernel_ulong_t);
 extern int print_timespec32_utime_pair(struct tcb *, kernel_ulong_t);

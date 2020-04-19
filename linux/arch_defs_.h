@@ -7,10 +7,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef ARCH_TIMESIZE
-# define ARCH_TIMESIZE SIZEOF_LONG
-#endif
-
 #ifndef HAVE_ARCH_GETRVAL2
 # define HAVE_ARCH_GETRVAL2 0
 #endif
@@ -65,4 +61,16 @@
 
 #ifndef HAVE_ARCH_OLD_TIME64_SYSCALLS
 # define HAVE_ARCH_OLD_TIME64_SYSCALLS (SIZEOF_LONG == 8)
+#endif
+
+#ifndef MIN_KLONGSIZE
+# if SUPPORTED_PERSONALITIES > 1
+#  define MIN_KLONGSIZE 4
+# else
+#  define MIN_KLONGSIZE SIZEOF_KERNEL_LONG_T
+# endif
+#endif
+
+#ifndef HAVE_ARCH_TIMESPEC32
+# define HAVE_ARCH_TIMESPEC32 (MIN_KLONGSIZE == 4)
 #endif

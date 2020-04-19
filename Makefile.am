@@ -249,7 +249,6 @@ libstrace_a_SOURCES =	\
 	print_statfs.c	\
 	print_struct_stat.c \
 	print_time.c	\
-	print_timespec.c \
 	print_timespec.h \
 	print_timespec32.c \
 	print_timespec64.c \

@@ -89,18 +89,37 @@ print_scm_timestamp_old(struct tcb *tcp, const void *cmsg_data,
 	print_struct_timeval_data_size(cmsg_data, data_len);
 }
 
+#ifdef current_klongsize
+# if current_klongsize == 4
+#  define PRINT_TIMESPEC_DATA_SIZE print_timespec32_data_size
+#  define PRINT_TIMESPEC_ARRAY_DATA_SIZE print_timespec32_array_data_size
+# else
+#  define PRINT_TIMESPEC_DATA_SIZE print_timespec64_data_size
+#  define PRINT_TIMESPEC_ARRAY_DATA_SIZE print_timespec64_array_data_size
+# endif
+#else
+# define PRINT_TIMESPEC_DATA_SIZE			\
+	((current_klongsize == 4) ?			\
+		print_timespec32_data_size :		\
+		print_timespec64_data_size)
+# define PRINT_TIMESPEC_ARRAY_DATA_SIZE			\
+	((current_klongsize == 4) ?			\
+		print_timespec32_array_data_size :	\
+		print_timespec64_array_data_size)
+#endif
+
 static void
 print_scm_timestampns_old(struct tcb *tcp, const void *cmsg_data,
 			  const unsigned int data_len)
 {
-	print_struct_timespec_data_size(cmsg_data, data_len);
+	PRINT_TIMESPEC_DATA_SIZE(cmsg_data, data_len);
 }
 
 static void
 print_scm_timestamping_old(struct tcb *tcp, const void *cmsg_data,
 			   const unsigned int data_len)
 {
-	print_struct_timespec_array_data_size(cmsg_data, 3, data_len);
+	PRINT_TIMESPEC_ARRAY_DATA_SIZE(cmsg_data, 3, data_len);
 }
 
 static void
