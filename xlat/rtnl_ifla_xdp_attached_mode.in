@@ -1,4 +1,7 @@
 #value_indexed
+#enum
+#include <netinet/in.h>
+#include <linux/rtnetlink.h>
 XDP_ATTACHED_NONE	0
 XDP_ATTACHED_DRV	1
 XDP_ATTACHED_SKB	2

@@ -25,12 +25,11 @@
 enum { IFLA_XDP = 43 };
 #endif
 
-#ifndef XDP_ATTACHED_NONE
-# define XDP_ATTACHED_NONE 0
+#if !HAVE_DECL_XDP_ATTACHED_NONE
+enum { XDP_ATTACHED_NONE = 0 };
 #endif
-
-#ifndef XDP_ATTACHED_MULTI
-# define XDP_ATTACHED_MULTI 4
+#if !HAVE_DECL_XDP_ATTACHED_MULTI
+enum { XDP_ATTACHED_MULTI = 4 };
 #endif
 
 #define IFLA_ATTR IFLA_XDP
