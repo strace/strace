@@ -146,36 +146,59 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 {
 	const char *val;
 	int intval;
+	bool last_present;
 
 	if ((val = STR_STRIP_PREFIX(token, "when=")) != token) {
 		/*
-		 *	== 1+1
-		 * F	== F+0
-		 * F+	== F+1
-		 * F+S
+		 *		 == 1,INF+1
+		 * F	 == F,F+1
+		 * F+	== F,INF+1
+		 * F+S   == F,INF+S
+		 * F,L   == F,L+1
+		 * F,L+S
 		 */
 		char *end;
-		intval = string_to_uint_ex(val, &end, 0xffff, "+");
+		intval = string_to_uint_ex(val, &end, 0xffff, "+,");
 		if (intval < 1)
 			return false;
 
 		fopts->first = intval;
+		last_present = false;
+		fopts->last = intval;
+
+		if (*end == ',') {
+			/* F,L */
+			val = end + 1;
+			intval = string_to_uint_ex(val, &end, 0xffff, "+");
+			if (intval < fopts->first || intval == INJECT_LAST_INF)
+				return false;
+			fopts->last = intval;
+			last_present = true;
+		}
 
 		if (*end) {
 			val = end + 1;
 			if (*val) {
-				/* F+S */
+				/* F+S or F,L+S */
 				intval = string_to_uint_upto(val, 0xffff);
 				if (intval < 1)
 					return false;
 				fopts->step = intval;
+				if (!last_present) {
+					/* F+S == F,INF+S */
+					fopts->last = INJECT_LAST_INF;
+				}
 			} else {
-				/* F+ == F+1 */
+				/* F+ == F,INF+1 or F,L+ == F,L+1 */
 				fopts->step = 1;
+				if (!last_present) {
+					/* F+ == F,INF+1 */
+					fopts->last = INJECT_LAST_INF;
+				}
 			}
 		} else {
-			/* F == F+0 */
-			fopts->step = 0;
+			/* F == F,F+1 or F,L == F,L+1 */
+			fopts->step = 1;
 		}
 	} else if ((val = STR_STRIP_PREFIX(token, "syscall=")) != token) {
 		if (fopts->data.flags & INJECT_F_SYSCALL)

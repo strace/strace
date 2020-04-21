@@ -230,6 +230,8 @@ typedef struct ioctlent {
 	|INJECT_F_DELAY_EXIT	\
 	)
 
+# define INJECT_LAST_INF (uint16_t)-1
+
 struct inject_data {
 	uint8_t flags;		/* 6 of 8 flags are used so far */
 	uint8_t signo;		/* NSIG <= 128 */
@@ -240,6 +242,7 @@ struct inject_data {
 
 struct inject_opts {
 	uint16_t first;
+	uint16_t last;
 	uint16_t step;
 	struct inject_data data;
 };
