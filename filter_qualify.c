@@ -149,33 +149,67 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 
 	if ((val = STR_STRIP_PREFIX(token, "when=")) != token) {
 		/*
-		 *	== 1+1
-		 * F	== F+0
-		 * F+	== F+1
-		 * F+S
+		 *        == 1..INF+1
+		 * F      == F..INF+0
+		 * F+     == F..INF+1
+		 * F+S    == F..INF+S
+		 * F..L   == F..L+1
+		 * F..L+S
 		 */
 		char *end;
-		intval = string_to_uint_ex(val, &end, 0xffff, "+");
+		intval = string_to_uint_ex(val, &end, 0xffff, "+.");
 		if (intval < 1)
 			return false;
 
 		fopts->first = intval;
 
-		if (*end) {
+		if (end[0] == '.') {
+			if (end[1] != '.')
+				return false;
+			/*
+			 * F..L
+			 * F..L+S
+			 */
+			val = end + 2;
+			intval = string_to_uint_ex(val, &end, 0xffff, "+");
+			if (intval < fopts->first || intval == INJECT_LAST_INF)
+				return false;
+			fopts->last = intval;
+		} else {
+			/*
+			 * F   == F..INF+0
+			 * F+  == F..INF+1
+			 * F+S == F..INF+S
+			 */
+			fopts->last = INJECT_LAST_INF;
+		}
+
+		if (end[0] != '\0') {
 			val = end + 1;
-			if (*val) {
-				/* F+S */
+			if (val[0] != '\0') {
+				/*
+				 * F+S    == F..INF+S
+				 * F..L+S
+				 */
 				intval = string_to_uint_upto(val, 0xffff);
 				if (intval < 1)
 					return false;
 				fopts->step = intval;
 			} else {
-				/* F+ == F+1 */
+				/*
+				 * F+    == F..INF+1
+				 * F..L+ == F..L+1
+				 */
 				fopts->step = 1;
 			}
 		} else {
-			/* F == F+0 */
-			fopts->step = 0;
+			if (fopts->last == INJECT_LAST_INF) {
+				/* F == F..INF+0 */
+				fopts->step = 0;
+			} else {
+				/* F..L == F..L+1 */
+				fopts->step = 1;
+			}
 		}
 	} else if ((val = STR_STRIP_PREFIX(token, "syscall=")) != token) {
 		if (fopts->data.flags & INJECT_F_SYSCALL)
@@ -394,6 +428,7 @@ qualify_inject_common(const char *const str,
 {
 	struct inject_opts opts = {
 		.first = 1,
+		.last = INJECT_LAST_INF,
 		.step = 1,
 		.data = {
 			.delay_idx = -1

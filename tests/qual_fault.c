@@ -29,7 +29,7 @@ static int out_fd;
 #define DEFAULT_ERRNO ENOSYS
 
 static const char *errstr;
-static int is_raw, err, first, step, iter, try;
+static int is_raw, err, first, last, step, iter, try;
 
 static void
 invoke(int fail)
@@ -99,7 +99,7 @@ open_file(const char *prefix, int proc)
 int
 main(int argc, char *argv[])
 {
-	assert(argc == 11);
+	assert(argc == 12);
 
 	is_raw = !strcmp("raw", argv[1]);
 
@@ -120,13 +120,14 @@ main(int argc, char *argv[])
 	errstr = errno2name();
 
 	first = atoi(argv[3]);
-	step = atoi(argv[4]);
-	iter = atoi(argv[5]);
-	int num_procs = atoi(argv[6]);
-	char *exp_prefix = argv[7];
-	char *got_prefix = argv[8];
-	char *out_prefix = argv[9];
-	char *pid_prefix = argv[10];
+	last = atoi(argv[4]);
+	step = atoi(argv[5]);
+	iter = atoi(argv[6]);
+	int num_procs = atoi(argv[7]);
+	char *exp_prefix = argv[8];
+	char *got_prefix = argv[9];
+	char *out_prefix = argv[10];
+	char *pid_prefix = argv[11];
 
 	assert(first > 0);
 	assert(step >= 0);
@@ -164,8 +165,10 @@ main(int argc, char *argv[])
 		int i;
 		for (i = 1; i <= iter; ++i) {
 			int fail = 0;
-			if (first > 0) {
+			if (last != 0) {
 				--first;
+				if (last != -1)
+					--last;
 				if (first == 0) {
 					fail = 1;
 					first = step;

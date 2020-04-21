@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented interval specification in "when=" subexpression of syscall
+    tampering expressions.
   * Implemented decoding of BPF_LINK_CREATE and BPF_LINK_UPDATE bpf
     syscall commands.
   * Updated lists of BPF_* constants.

@@ -491,8 +491,11 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 
 	struct inject_opts *opts = tcb_inject_opts(tcp);
 
-	if (!opts || opts->first == 0)
+	if (!opts || opts->first == 0 || opts->last == 0)
 		return 0;
+
+	if (opts->last != INJECT_LAST_INF)
+		--opts->last;
 
 	--opts->first;
 

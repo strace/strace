@@ -240,9 +240,12 @@ struct inject_data {
 
 struct inject_opts {
 	uint16_t first;
+	uint16_t last;
 	uint16_t step;
 	struct inject_data data;
 };
+
+# define INJECT_LAST_INF	((uint16_t) -1)
 
 # define MAX_ERRNO_VALUE			4095
 
