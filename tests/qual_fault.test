@@ -32,8 +32,6 @@ check_fault_injection()
 	procs=$1; shift
 	extra="$*"
 
-	echo "RUNNING $first - $last - $step"
-
 	local when=
 	if [ -z "$first$last$step" ]; then
 		first=1
