@@ -417,6 +417,7 @@ qualify_inject_common(const char *const str,
 {
 	struct inject_opts opts = {
 		.first = 1,
+		.last = INJECT_LAST_INF,
 		.step = 1,
 		.data = {
 			.delay_idx = -1
