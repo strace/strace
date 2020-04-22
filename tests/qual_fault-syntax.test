@@ -72,6 +72,13 @@ for arg in chdir:42 \!chdir:42 \
 	   chdir:syscall=-42 \
 	   chdir:syscall=42 \
 	   chdir:syscall=gettid:syscall=gettid \
+	   chdir:when=3,2 \
+	   chdir:when=2,3+0 \
+	   chdir:when=,5+2 \
+	   chdir:when=,5+ \
+	   chdir:when=,+ \
+	   chdir:when=+ \
+	   chdir:when=2,65535 \
 	   ; do
 	$STRACE -e fault="$arg" true 2> "$LOG" &&
 		fail_with "$arg"
