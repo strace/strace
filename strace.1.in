@@ -1265,15 +1265,35 @@ Unless a :\fBwhen\fR=\,\fIexpr\fR subexpression is specified,
 an injection is being made into every invocation of each syscall from the
 .IR set .
 .IP
-The format of the subexpression is one of the following:
+The format of the subexpression is:
+.RS 15
+.IP
+\fIfirst\/\fR[\fB,\fR\,\fIlast\/\fR][\fB+\fR[\,\fIstep\/\fR]]
+.RE
+.IP
+Number
+.I first
+stands for the first invocation number in the range, number
+.I last
+stands for the last invocation number in the range and
+.I step
+stands for the step between two consecutive invocations.
+Following combinations are useful:
 .RS
-.TP 12
+.TP 17
 .I first
 For every syscall from the
 .IR set ,
 perform an injection for the syscall invocation number
 .I first
 only.
+.TQ
+\fIfirst\/\fB,\fIlast\fR
+For every syscall from the
+.IR set ,
+perform an injection for the syscall invocation number
+.I first
+and all subsequent invocations until the invocation number \fIlast\fR.
 .TQ
 \fIfirst\/\fB+\fR
 For every syscall from the
@@ -1290,6 +1310,11 @@ perform injections for syscall invocations number
 .IR first + step ,
 .IR first + step + step ,
 and so on.
+.TQ
+\fIfirst\/\fB,\fIlast\fB+\fIstep\fR
+Same as previous, but consider only syscall invocations with numbers up to
+.I last
+(inclusive).
 .RE
 .IP
 For example, to fail each third and subsequent chdir syscalls with
@@ -1301,7 +1326,9 @@ The valid range for numbers
 .I first
 and
 .I step
-is 1..65535.
+is 1..65535 and for number
+.I last
+is 1..65534.
 .IP
 An injection expression can contain only one
 .BR error =

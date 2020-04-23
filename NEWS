@@ -7,6 +7,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_* constants.
   * Added -e trace=%clock option for tracing syscalls reading of modifying
     system clocks.
+  * ":when=expr" subexpression now allows specifying last value of the
+    invocation range.
 
 Noteworthy changes in release 5.6 (2020-04-07)
 ==============================================
