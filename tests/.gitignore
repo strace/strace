@@ -71,6 +71,9 @@ dev--decode-fds-path
 dev--decode-fds-socket
 dev-yy
 dup
+dup-P
+dup-y
+dup-yy
 dup2
 dup3
 epoll_create
