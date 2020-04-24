@@ -61,7 +61,10 @@ dup2	-a11 9>>/dev/full
 dup2-P	-a11 --trace=dup2 -P /dev/full 9>>/dev/full
 dup2-y	-a13 --trace=dup2 -y 9>>/dev/full
 dup2-yy	-a13 --trace=dup2 -yy 9>>/dev/full
-dup3	-a24
+dup3	-a13 7>>/dev/full
+dup3-P	-a13 --trace=dup3 -P /dev/full 7>>/dev/full
+dup3-y	-a15 --trace=dup3 -y 7>>/dev/full
+dup3-yy	-a15 --trace=dup3 -yy 7>>/dev/full
 epoll_create	-a17
 epoll_create1	-a28
 epoll_ctl

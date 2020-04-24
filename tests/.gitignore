@@ -79,6 +79,9 @@ dup2-P
 dup2-y
 dup2-yy
 dup3
+dup3-P
+dup3-y
+dup3-yy
 epoll_create
 epoll_create1
 epoll_ctl
