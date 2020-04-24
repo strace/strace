@@ -47,6 +47,52 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc10-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc10-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc10-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc9-x86_64-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -231,6 +277,37 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc10-x32-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc10-x32-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc9-x32-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -284,6 +361,37 @@ jobs:
       CC: gcc
       STACKTRACE: no
       TARGET: x32
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc10-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc10-x86-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-10
+      STACKTRACE: no
+      TARGET: x86
     steps:
     - uses: actions/checkout@v2
       with:
