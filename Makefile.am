@@ -86,6 +86,7 @@ libstrace_a_SOURCES =	\
 	dirent64.c	\
 	dirent_types.c	\
 	dm.c		\
+	dup.c		\
 	dyxlat.c	\
 	empty.h		\
 	epoll.c		\

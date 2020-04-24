@@ -19,37 +19,6 @@ SYS_FUNC(close)
 	return RVAL_DECODED;
 }
 
-SYS_FUNC(dup)
-{
-	printfd(tcp, tcp->u_arg[0]);
-
-	return RVAL_DECODED | RVAL_FD;
-}
-
-static int
-do_dup2(struct tcb *tcp, int flags_arg)
-{
-	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	printfd(tcp, tcp->u_arg[1]);
-	if (flags_arg >= 0) {
-		tprints(", ");
-		printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
-	}
-
-	return RVAL_DECODED | RVAL_FD;
-}
-
-SYS_FUNC(dup2)
-{
-	return do_dup2(tcp, -1);
-}
-
-SYS_FUNC(dup3)
-{
-	return do_dup2(tcp, 2);
-}
-
 static int
 decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	      const print_obj_by_addr_fn print_tv_ts,
