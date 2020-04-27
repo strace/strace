@@ -899,9 +899,15 @@ case "x$st_cv_have_static_assert" in
 		;;
 esac
 
-AC_CHECK_LIB([dl], [dladdr], [dl_LIBS='-ldl'], [dl_LIBS=])
-if test "x$ac_cv_lib_dl_dladdr" = xyes; then
+saved_LIBS="$LIBS"
+AC_SEARCH_LIBS([dladdr], [dl])
+LIBS="$saved_LIBS"
+dl_LIBS=""
+if test "$ac_cv_search_dladdr" != no; then
 	AC_DEFINE([HAVE_DLADDR], [1], [Define to 1 if the system provides dladdr])
+	case "$ac_cv_search_dladdr" in
+		-l*) dl_LIBS="$ac_cv_search_dladdr" ;;
+	esac
 fi
 AC_SUBST(dl_LIBS)
 
