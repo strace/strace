@@ -293,9 +293,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	stpcpy
 	strerror
 	strndup
-	strsignal
 	sync_file_range
-	utimensat
 ]))
 
 AC_CHECK_TYPES([sig_atomic_t, struct sigcontext],,, [#include <signal.h>])
@@ -395,7 +393,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
-	inttypes.h
 	linux/bsg.h
 	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
@@ -437,8 +434,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	netipx/ipx.h
 	paths.h
 	scsi/sg.h
-	stropts.h
-	sys/conf.h
 	sys/eventfd.h
 	sys/fanotify.h
 	sys/ipc.h
@@ -633,15 +628,9 @@ AC_CHECK_DECLS(m4_normalize([
 ]),,, [#include <sys/ptrace.h>])
 
 AC_CHECK_DECLS(m4_normalize([
-	P_PID,
-	P_PPID,
-	P_PGID,
-	P_SID,
-	P_CID,
-	P_UID,
-	P_GID,
 	P_ALL,
-	P_LWPID
+	P_PID,
+	P_PGID
 ]),,, [#include <sys/wait.h>])
 
 AC_CHECK_DECLS(m4_normalize([
