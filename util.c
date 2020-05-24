@@ -607,11 +607,11 @@ printpidfd(struct tcb *tcp, int fd, const char *path)
 }
 
 void
-printfd(struct tcb *tcp, int fd)
+printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 {
 	char path[PATH_MAX + 1];
 	if (!number_set_array_is_empty(decode_fd_set, 0)
-	    && getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
+	    && getfdpath_pid(pid, fd, path, sizeof(path)) >= 0) {
 		tprintf("%d<", (int) fd);
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
@@ -630,6 +630,12 @@ printed:
 	} else {
 		tprintf("%d", fd);
 	}
+}
+
+void
+printfd(struct tcb *tcp, int fd)
+{
+	printfd_pid(tcp, tcp->pid, fd);
 }
 
 void

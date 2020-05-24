@@ -1031,6 +1031,12 @@ printpath(struct tcb *, kernel_ulong_t addr);
 
 # define TIMESPEC_TEXT_BUFSIZE \
 		(sizeof(long long) * 3 * 2 + sizeof("{tv_sec=-, tv_nsec=}"))
+
+/**
+ * Print file descriptor fd owned by process with ID pid (from the PID NS
+ * of the tracer).
+ */
+extern void printfd_pid(struct tcb *tcp, pid_t pid, int fd);
 extern void printfd(struct tcb *, int);
 /**
  * Print file descriptor fd owned by process with ID pid (from the PID NS
