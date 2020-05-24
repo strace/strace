@@ -1033,6 +1033,10 @@ printpath(struct tcb *, kernel_ulong_t addr);
 		(sizeof(long long) * 3 * 2 + sizeof("{tv_sec=-, tv_nsec=}"))
 
 /**
+ * Returns the pid associated with pidfd of the process with ID pid_of_fd
+ */
+extern pid_t pidfd_get_pid(pid_t pid_of_fd, int fd);
+/**
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracer).
  */
