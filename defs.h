@@ -688,6 +688,7 @@ pathtrace_match(struct tcb *tcp)
 	return pathtrace_match_set(tcp, &global_path_set);
 }
 
+extern int getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize);
 extern int getfdpath(struct tcb *, int, char *, unsigned);
 extern unsigned long getfdinode(struct tcb *, int);
 extern enum sock_proto getfdproto(struct tcb *, int);

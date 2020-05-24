@@ -76,10 +76,10 @@ storepath(const char *path, struct path_set *set)
 }
 
 /*
- * Get path associated with fd.
+ * Get path associated with fd of a process with pid.
  */
 int
-getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
+getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize)
 {
 	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 	ssize_t n;
@@ -87,7 +87,7 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 	if (fd < 0)
 		return -1;
 
-	xsprintf(linkpath, "/proc/%u/fd/%u", tcp->pid, fd);
+	xsprintf(linkpath, "/proc/%u/fd/%u", pid, fd);
 	n = readlink(linkpath, buf, bufsize - 1);
 	/*
 	 * NB: if buf is too small, readlink doesn't fail,
@@ -96,6 +96,15 @@ getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 	if (n >= 0)
 		buf[n] = '\0';
 	return n;
+}
+
+/*
+ * Get path associated with fd of tracee.
+ */
+int
+getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
+{
+	return getfdpath_pid(tcp->pid, fd, buf, bufsize);
 }
 
 /*
