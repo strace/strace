@@ -15,7 +15,7 @@ SYS_FUNC(pidfd_getfd)
 	printfd(tcp, (int) tcp->u_arg[0]);
 	/* int fd */
 	tprints(", ");
-	print_pid_fd(tcp, (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
+	printfd_pid_tracee_ns(tcp, (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
 	/* unsigned int flags */
 	tprintf(", %#x", (unsigned int) tcp->u_arg[2]);
 

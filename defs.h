@@ -1042,7 +1042,7 @@ extern void printfd(struct tcb *, int);
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracee the descriptor tcp).  This is a stub.
  */
-extern void print_pid_fd(struct tcb *tcp, pid_t pid, int fd);
+extern void printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd);
 extern void print_sockaddr(const void *sa, int len);
 extern bool
 print_inet_addr(int af, const void *addr, unsigned int len, const char *var_name);

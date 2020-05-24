@@ -639,7 +639,7 @@ printfd(struct tcb *tcp, int fd)
 }
 
 void
-print_pid_fd(struct tcb *tcp, pid_t pid, int fd)
+printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd)
 {
 	/*
 	 * TODO: We want to have the same formatting as printfd here,
