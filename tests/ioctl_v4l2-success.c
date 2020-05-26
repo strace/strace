@@ -11,11 +11,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <linux/types.h>
-#include <linux/videodev2.h>
-
 #include <sys/ioctl.h>
+#include "kernel_v4l2_types.h"
+
+#undef VIDIOC_QUERYBUF
+#define VIDIOC_QUERYBUF		_IOWR('V',   9, kernel_v4l2_buffer_t)
+#undef VIDIOC_QBUF
+#define VIDIOC_QBUF		_IOWR('V',  15, kernel_v4l2_buffer_t)
+#undef VIDIOC_DQBUF
+#define VIDIOC_DQBUF		_IOWR('V',  17, kernel_v4l2_buffer_t)
+#undef VIDIOC_PREPARE_BUF
+#define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
 
 static bool
 fill_fmt(struct v4l2_format *f)
@@ -555,7 +561,7 @@ main(int argc, char **argv)
 		{ ARG_STR(VIDIOC_DQBUF) },
 	};
 
-	struct v4l2_buffer *buf = tail_alloc(sizeof(*buf));
+	kernel_v4l2_buffer_t *buf = tail_alloc(sizeof(*buf));
 
 	for (size_t i = 0; i < ARRAY_SIZE(buf_cmds); i++) {
 		ioctl(-1, buf_cmds[i].val, 0);

@@ -160,6 +160,7 @@ libstrace_a_SOURCES =	\
 	kernel_timeval.h \
 	kernel_timex.h	\
 	kernel_types.h	\
+	kernel_v4l2_types.h \
 	kexec.c		\
 	keyctl.c	\
 	keyctl_kdf_params.h \

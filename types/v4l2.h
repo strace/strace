@@ -15,7 +15,6 @@
 # include <linux/types.h>
 # include <linux/videodev2.h>
 
-typedef struct v4l2_buffer struct_v4l2_buffer;
 typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
 typedef struct v4l2_input struct_v4l2_input;
 typedef struct v4l2_standard struct_v4l2_standard;

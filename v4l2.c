@@ -28,7 +28,7 @@
 	CHECK_V4L2_STRUCT_SIZE(s_); \
 	CHECK_V4L2_RESERVED_SIZE(s_)
 
-#include DEF_MPERS_TYPE(struct_v4l2_buffer)
+#include DEF_MPERS_TYPE(kernel_v4l2_buffer_t)
 #include DEF_MPERS_TYPE(struct_v4l2_clip)
 #include DEF_MPERS_TYPE(struct_v4l2_create_buffers)
 #include DEF_MPERS_TYPE(struct_v4l2_ext_control)
@@ -39,6 +39,7 @@
 #include DEF_MPERS_TYPE(struct_v4l2_standard)
 
 #include "types/v4l2.h"
+#include "kernel_v4l2_types.h"
 
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
 CHECK_V4L2_STRUCT_SIZE_LE(v4l2_pix_format);
@@ -97,6 +98,15 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #define XLAT_MACROS_ONLY
 # include "xlat/v4l2_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
+
+#undef VIDIOC_QUERYBUF
+#define VIDIOC_QUERYBUF		_IOWR('V',   9, kernel_v4l2_buffer_t)
+#undef VIDIOC_QBUF
+#define VIDIOC_QBUF		_IOWR('V',  15, kernel_v4l2_buffer_t)
+#undef VIDIOC_DQBUF
+#define VIDIOC_DQBUF		_IOWR('V',  17, kernel_v4l2_buffer_t)
+#undef VIDIOC_PREPARE_BUF
+#define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
 
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
@@ -456,7 +466,7 @@ static int
 print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		  const kernel_ulong_t arg)
 {
-	struct_v4l2_buffer b;
+	kernel_v4l2_buffer_t b;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -488,7 +498,15 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		print_v4l2_buffer_flags(b.flags);
 		if (code == VIDIOC_DQBUF) {
 			tprints(", timestamp=");
-			MPERS_FUNC_NAME(print_struct_timeval)(&b.timestamp);
+			kernel_timeval64_t t;
+			if (sizeof(t.tv_usec) == sizeof(b.timestamp.tv_usec)) {
+				print_timeval64_data_size(&b.timestamp,
+							  sizeof(b.timestamp));
+			} else {
+				t.tv_sec = b.timestamp.tv_sec;
+				t.tv_usec = zero_extend_signed_to_ull(b.timestamp.tv_usec);
+				print_timeval64_data_size(&t, sizeof(t));
+			}
 		}
 		tprints(", ...");
 	}

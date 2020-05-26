@@ -12,8 +12,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <linux/types.h>
-#include <linux/videodev2.h>
+#include "kernel_v4l2_types.h"
+
+#undef VIDIOC_QUERYBUF
+#define VIDIOC_QUERYBUF		_IOWR('V',   9, kernel_v4l2_buffer_t)
+#undef VIDIOC_QBUF
+#define VIDIOC_QBUF		_IOWR('V',  15, kernel_v4l2_buffer_t)
+#undef VIDIOC_DQBUF
+#define VIDIOC_DQBUF		_IOWR('V',  17, kernel_v4l2_buffer_t)
+#undef VIDIOC_PREPARE_BUF
+#define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
 
 #ifndef V4L2_CTRL_FLAG_NEXT_CTRL
 # define V4L2_CTRL_FLAG_NEXT_CTRL 0x80000000
@@ -896,7 +904,7 @@ main(void)
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_QUERYBUF));
 
-	struct v4l2_buffer *const p_v4l2_buffer =
+	kernel_v4l2_buffer_t *const p_v4l2_buffer =
 		page_end - sizeof(*p_v4l2_buffer);
 	ioctl(-1, VIDIOC_QUERYBUF, p_v4l2_buffer);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
