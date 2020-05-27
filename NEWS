@@ -6,7 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     tampering expressions.
   * Implemented decoding of BPF_LINK_CREATE and BPF_LINK_UPDATE bpf
     syscall commands.
-  * Updated lists of BPF_* constants.
+  * Updated lists of BPF_* and CLONE_* constants.
   * Added -e trace=%clock option for tracing syscalls reading of modifying
     system clocks.
 
