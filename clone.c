@@ -149,6 +149,7 @@ struct strace_clone_args {
 	uint64_t /* struct user_desc * / void * */ tls;
 	uint64_t /* pid_t * */ set_tid;
 	uint64_t set_tid_size;
+	uint64_t cgroup;
 };
 
 SYS_FUNC(clone3)
@@ -214,6 +215,10 @@ SYS_FUNC(clone3)
 			}
 			PRINT_FIELD_U(", ", arg, set_tid_size);
 		}
+
+		if (fetch_size > offsetof(struct strace_clone_args, cgroup)
+		    && (arg.cgroup || arg.flags & CLONE_INTO_CGROUP))
+			PRINT_FIELD_U(", ", arg, cgroup);
 
 		if (size > fetch_size)
 			print_nonzero_bytes(tcp, ", ", addr, fetch_size,

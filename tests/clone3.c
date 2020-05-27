@@ -50,9 +50,10 @@ struct test_clone_args {
 	uint64_t tls;
 	uint64_t set_tid;
 	uint64_t set_tid_size;
+	uint64_t cgroup;
 };
 
-#ifdef HAVE_STRUCT_CLONE_ARGS_SET_TID_SIZE
+#ifdef HAVE_STRUCT_CLONE_ARGS_CGROUP
 typedef struct clone_args struct_clone_args;
 #else
 typedef struct test_clone_args struct_clone_args;
@@ -263,6 +264,10 @@ print_clone3(struct_clone_args *const arg, long rc, kernel_ulong_t sz,
 	    (arg->set_tid || arg->set_tid_size))
 		print_set_tid(arg->set_tid, arg->set_tid_size);
 
+	if (sz > offsetof(struct_clone_args, cgroup) &&
+	    (arg->cgroup || arg->flags & CLONE_INTO_CGROUP))
+		printf(", cgroup=%" PRIu64, (uint64_t) arg->cgroup);
+
 	printf("}");
 
 	if (rc < 0)
@@ -398,6 +403,19 @@ main(int argc, char *argv[])
 	arg->set_tid_size = MAX_SET_TID_SIZE;
 	rc = do_clone3(arg, sizeof(*arg), ERR(E2BIG) | ERR(EINVAL));
 	print_clone3(arg, rc, sizeof(*arg), STRUCT_VALID, "0", "0");
+	printf(", %zu) = %s" INJ_STR, sizeof(*arg), sprintrc(rc));
+	memset(arg, 0, sizeof(*arg));
+
+	arg->cgroup = 0xfacefeedbadc0ded;
+	rc = do_clone3(arg, sizeof(*arg), ERR(0) | ERR(E2BIG));
+	print_clone3(arg, rc, sizeof(*arg), STRUCT_VALID, "0", "0");
+	printf(", %zu) = %s" INJ_STR, sizeof(*arg), sprintrc(rc));
+	memset(arg, 0, sizeof(*arg));
+
+	arg->flags = CLONE_INTO_CGROUP;
+	rc = do_clone3(arg, sizeof(*arg), ERR(0) | ERR(EINVAL));
+	print_clone3(arg, rc, sizeof(*arg), STRUCT_VALID,
+		     "CLONE_INTO_CGROUP", "0");
 	printf(", %zu) = %s" INJ_STR, sizeof(*arg), sprintrc(rc));
 	memset(arg, 0, sizeof(*arg));
 

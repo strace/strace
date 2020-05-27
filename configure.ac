@@ -607,7 +607,7 @@ AC_CHECK_MEMBERS(m4_normalize([
 		struct iocb.aio_rw_flags
 		]),,, [#include <linux/aio_abi.h>])
 
-AC_CHECK_MEMBERS([struct clone_args.set_tid_size],,, [#include <linux/sched.h>])
+AC_CHECK_MEMBERS([struct clone_args.cgroup],,, [#include <linux/sched.h>])
 
 CPPFLAGS="$saved_CPPFLAGS"
 
