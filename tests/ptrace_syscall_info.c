@@ -247,7 +247,12 @@ test_entry(void)
 					break;
 				goto printed_entry_nr;
 			}
-			if (info.entry.args[i] != exp_args[i + 1])
+#if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
+# define CAST (unsigned long)
+#else
+# define CAST
+#endif
+			if (CAST info.entry.args[i] != exp_args[i + 1])
 				FAIL("#%d: entry stop mismatch", ptrace_stop);
 			printf("%s%#llx", (i ? ", " : ", arg=["),
 			       (unsigned long long) info.entry.args[i]);

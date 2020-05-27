@@ -83,6 +83,12 @@ test_ptrace_get_syscall_info(void)
 	};
 	const unsigned long *exp_args;
 
+# if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
+#  define CAST (unsigned long)
+# else
+#  define CAST
+# endif
+
 	int pid = fork();
 	if (pid < 0)
 		perror_func_msg_and_die("fork");
@@ -198,12 +204,12 @@ test_ptrace_get_syscall_info(void)
 				    || !info.instruction_pointer
 				    || !info.stack_pointer
 				    || (info.entry.nr != exp_args[0])
-				    || (info.entry.args[0] != exp_args[1])
-				    || (info.entry.args[1] != exp_args[2])
-				    || (info.entry.args[2] != exp_args[3])
-				    || (info.entry.args[3] != exp_args[4])
-				    || (info.entry.args[4] != exp_args[5])
-				    || (info.entry.args[5] != exp_args[6])) {
+				    || (CAST info.entry.args[0] != exp_args[1])
+				    || (CAST info.entry.args[1] != exp_args[2])
+				    || (CAST info.entry.args[2] != exp_args[3])
+				    || (CAST info.entry.args[3] != exp_args[4])
+				    || (CAST info.entry.args[4] != exp_args[5])
+				    || (CAST info.entry.args[5] != exp_args[6])) {
 					debug_func_msg("#%d: entry stop"
 						       " mismatch",
 						       ptrace_stop);
