@@ -24,11 +24,7 @@ get_tracer_pid()
 	sed '/^TracerPid:[[:space:]]*/!d;s///'
 }
 
-status_file=/proc/self/status
-[ -f "$status_file" ] ||
-	framework_skip_ "$status_file is not available"
-
-set -- sed -r -n '/^(P|Tracer)Pid:/p' "$status_file"
+set -- ../print_ppid_tracerpid
 "$@" > "$LOG" ||
 	framework_skip_ "$* does not work"
 

@@ -177,6 +177,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-seccomp-strict \
 	prctl-spec-inject \
 	print_maxfd \
+	print_ppid_tracerpid \
 	qual_fault \
 	qual_inject-error-signal \
 	qual_inject-retval \

@@ -526,6 +526,7 @@ preadv
 preadv-pwritev
 preadv2-pwritev2
 print_maxfd
+print_ppid_tracerpid
 printpath-umovestr
 printpath-umovestr-peekdata
 printpath-umovestr-undumpable
