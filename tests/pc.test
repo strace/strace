@@ -14,7 +14,7 @@ check_prog sed
 
 run_prog > /dev/null
 
-args="-if $args"
+args="--quiet=attach,personality -if $args"
 $STRACE $args 2> "$LOG" ||
 	dump_log_and_fail_with "$STRACE $args failed"
 
