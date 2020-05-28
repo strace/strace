@@ -2254,7 +2254,7 @@
 { "linux/videodev2.h", "VIDIOC_DBG_S_REGISTER", _IOC_WRITE, 0x564f, 0x38 },
 { "linux/videodev2.h", "VIDIOC_DECODER_CMD", _IOC_READ|_IOC_WRITE, 0x5660, 0x48 },
 { "linux/videodev2.h", "VIDIOC_DQBUF", _IOC_READ|_IOC_WRITE, 0x5611, 0x4c },
-{ "linux/videodev2.h", "VIDIOC_DQEVENT", _IOC_READ, 0x5659, 0x78 },
+{ "linux/videodev2.h", "VIDIOC_DQEVENT", _IOC_READ, 0x5659, 0x80 },
 { "linux/videodev2.h", "VIDIOC_DV_TIMINGS_CAP", _IOC_READ|_IOC_WRITE, 0x5664, 0x90 },
 { "linux/videodev2.h", "VIDIOC_ENCODER_CMD", _IOC_READ|_IOC_WRITE, 0x564d, 0x28 },
 { "linux/videodev2.h", "VIDIOC_ENUMAUDIO", _IOC_READ|_IOC_WRITE, 0x5641, 0x34 },

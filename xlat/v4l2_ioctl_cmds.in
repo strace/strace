@@ -5,6 +5,8 @@
 # undef VIDIOC_QBUF
 # undef VIDIOC_DQBUF
 # undef VIDIOC_PREPARE_BUF
+/* Constants based on struct v4l2_event are unreliable as the latter uses struct timespec. */
+# undef VIDIOC_DQEVENT
 #endif
 
 VIDIOC_QUERYCAP			_IOR ('V',   0, struct_v4l2_capability)
@@ -82,7 +84,7 @@ VIDIOC_ENUM_FRAMEINTERVALS	_IOWR('V',  75, struct_v4l2_frmivalenum) /* added in 
 /* VIDIOC_QUERY_DV_PRESET	_IOR('V',  86, struct v4l2_dv_preset) - added in v2.6.33-rc1~70^2~91, removed in v3.10-rc1~136^2~239 */
 /* VIDIOC_S_DV_TIMINGS		_IOWR('V',  87, struct v4l2_dv_timings) - added in v2.6.33-rc1~70^2~91 */
 /* VIDIOC_G_DV_TIMINGS		_IOWR('V',  88, struct v4l2_dv_timings) - added in v2.6.33-rc1~70^2~91 */
-/* VIDIOC_DQEVENT			_IOR ('V',  89, struct v4l2_event) - added in v2.6.35-rc1~480^2~121 */
+VIDIOC_DQEVENT			_IOR ('V',  89, kernel_v4l2_event_t) /* added in v2.6.35-rc1~480^2~121 */
 /* VIDIOC_SUBSCRIBE_EVENT		_IOW ('V',  90, struct v4l2_event_subscription) - added in v2.6.35-rc1~480^2~121 */
 /* VIDIOC_UNSUBSCRIBE_EVENT	_IOW ('V',  91, struct v4l2_event_subscription) - added in v2.6.35-rc1~480^2~121 */
 VIDIOC_CREATE_BUFS		_IOWR('V',  92, struct_v4l2_create_buffers) /* added in v3.2-rc1~63^2~55 */

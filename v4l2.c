@@ -29,6 +29,7 @@
 	CHECK_V4L2_RESERVED_SIZE(s_)
 
 #include DEF_MPERS_TYPE(kernel_v4l2_buffer_t)
+#include DEF_MPERS_TYPE(kernel_v4l2_event_t)
 #include DEF_MPERS_TYPE(struct_v4l2_clip)
 #include DEF_MPERS_TYPE(struct_v4l2_create_buffers)
 #include DEF_MPERS_TYPE(struct_v4l2_ext_control)
