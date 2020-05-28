@@ -14,14 +14,9 @@
 #include <sys/ioctl.h>
 #include "kernel_v4l2_types.h"
 
-#undef VIDIOC_QUERYBUF
-#define VIDIOC_QUERYBUF		_IOWR('V',   9, kernel_v4l2_buffer_t)
-#undef VIDIOC_QBUF
-#define VIDIOC_QBUF		_IOWR('V',  15, kernel_v4l2_buffer_t)
-#undef VIDIOC_DQBUF
-#define VIDIOC_DQBUF		_IOWR('V',  17, kernel_v4l2_buffer_t)
-#undef VIDIOC_PREPARE_BUF
-#define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
+#define XLAT_MACROS_ONLY
+# include "xlat/v4l2_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 #ifndef V4L2_CTRL_FLAG_NEXT_CTRL
 # define V4L2_CTRL_FLAG_NEXT_CTRL 0x80000000
@@ -1357,7 +1352,7 @@ main(void)
 	       p_ext_controls->error_idx);
 #endif /* VIDIOC_S_EXT_CTRLS */
 
-#ifdef VIDIOC_ENUM_FRAMESIZES
+#ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, 0);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES));
@@ -1381,9 +1376,9 @@ main(void)
 	       cc[0], cc[1], cc[2], cc[3]
 # endif /* XLAT_RAW */
 	       );
-#endif /* VIDIOC_ENUM_FRAMESIZES */
+#endif /* HAVE_STRUCT_V4L2_FRMSIZEENUM */
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
+#ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, 0);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS));
@@ -1409,9 +1404,9 @@ main(void)
 # endif /* XLAT_RAW */
 	       p_v4l2_frmivalenum->width,
 	       p_v4l2_frmivalenum->height);
-#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
+#endif /* HAVE_STRUCT_V4L2_FRMIVALENUM */
 
-#ifdef VIDIOC_CREATE_BUFS
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 	ioctl(-1, VIDIOC_CREATE_BUFS, 0);
 	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_CREATE_BUFS));
@@ -1426,7 +1421,7 @@ main(void)
 	       p_v4l2_create_buffers->count,
 	       p_v4l2_create_buffers->memory,
 	       p_v4l2_create_buffers->format.type);
-#endif /* VIDIOC_CREATE_BUFS */
+#endif /* HAVE_STRUCT_V4L2_CREATE_BUFFERS */
 
 	puts("+++ exited with 0 +++");
 	return 0;

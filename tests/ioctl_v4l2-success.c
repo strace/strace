@@ -14,14 +14,9 @@
 #include <sys/ioctl.h>
 #include "kernel_v4l2_types.h"
 
-#undef VIDIOC_QUERYBUF
-#define VIDIOC_QUERYBUF		_IOWR('V',   9, kernel_v4l2_buffer_t)
-#undef VIDIOC_QBUF
-#define VIDIOC_QBUF		_IOWR('V',  15, kernel_v4l2_buffer_t)
-#undef VIDIOC_DQBUF
-#define VIDIOC_DQBUF		_IOWR('V',  17, kernel_v4l2_buffer_t)
-#undef VIDIOC_PREPARE_BUF
-#define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
+#define XLAT_MACROS_ONLY
+# include "xlat/v4l2_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 static bool
 fill_fmt(struct v4l2_format *f)
@@ -1306,7 +1301,7 @@ main(int argc, char **argv)
 #endif /* VIDIOC_S_EXT_CTRLS */
 
 
-#ifdef VIDIOC_ENUM_FRAMESIZES
+#ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
 	/* VIDIOC_ENUM_FRAMESIZES */
 	static const struct strval32 frmsz_simple_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_FRMSIZE_TYPE_???") },
@@ -1365,10 +1360,10 @@ main(int argc, char **argv)
 		       frmsz_simple_types[i].str, inject_retval);
 
 	}
-#endif /* VIDIOC_ENUM_FRAMESIZES */
+#endif /* HAVE_STRUCT_V4L2_FRMSIZEENUM */
 
 
-#ifdef VIDIOC_ENUM_FRAMEINTERVALS
+#ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
 	/* VIDIOC_ENUM_FRAMEINTERVALS */
 	static const struct strval32 frmival_simple_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_FRMIVAL_TYPE_???") },
@@ -1434,10 +1429,10 @@ main(int argc, char **argv)
 		       frmival_simple_types[i].str, inject_retval);
 
 	}
-#endif /* VIDIOC_ENUM_FRAMEINTERVALS */
+#endif /* HAVE_STRUCT_V4L2_FRMIVALENUM */
 
 
-#ifdef VIDIOC_CREATE_BUFS
+#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 	/* VIDIOC_CREATE_BUFS */
 	struct v4l2_create_buffers *cbuf = tail_alloc(sizeof(*cbuf));
 
@@ -1468,7 +1463,7 @@ main(int argc, char **argv)
 		printf("}}) = %ld ({index=2158018784, count=2158018785})"
 		       " (INJECTED)\n", inject_retval);
 	}
-#endif /* VIDIOC_CREATE_BUFS */
+#endif /* HAVE_STRUCT_V4L2_CREATE_BUFFERS */
 
 	puts("+++ exited with 0 +++");
 

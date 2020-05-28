@@ -38,7 +38,6 @@
 #include DEF_MPERS_TYPE(struct_v4l2_input)
 #include DEF_MPERS_TYPE(struct_v4l2_standard)
 
-#include "types/v4l2.h"
 #include "kernel_v4l2_types.h"
 
 CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
@@ -98,15 +97,6 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 #define XLAT_MACROS_ONLY
 # include "xlat/v4l2_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
-
-#undef VIDIOC_QUERYBUF
-#define VIDIOC_QUERYBUF		_IOWR('V',   9, kernel_v4l2_buffer_t)
-#undef VIDIOC_QBUF
-#define VIDIOC_QBUF		_IOWR('V',  15, kernel_v4l2_buffer_t)
-#undef VIDIOC_DQBUF
-#define VIDIOC_DQBUF		_IOWR('V',  17, kernel_v4l2_buffer_t)
-#undef VIDIOC_PREPARE_BUF
-#define VIDIOC_PREPARE_BUF	_IOWR('V',  93, kernel_v4l2_buffer_t)
 
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)

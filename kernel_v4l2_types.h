@@ -8,10 +8,7 @@
 #ifndef STRACE_KERNEL_V4L2_BUFFER_H
 # define STRACE_KERNEL_V4L2_BUFFER_H
 
-# include <stdint.h>
-# include <linux/ioctl.h>
-# include <linux/types.h>
-# include <linux/videodev2.h>
+# include "types/v4l2.h"
 # include "kernel_timeval.h"
 
 # if defined __sparc__ && defined __arch64__
