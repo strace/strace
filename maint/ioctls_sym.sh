@@ -360,6 +360,10 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			# Filter out the code that references unknown types.
 			sed '/^struct via_file_private/,/^}/d' < "$s" > "$tmpdir/$f"
 			;;
+		*linux/dma-buf.h)
+			# Filter out duplicates.
+			sed '/\<DMA_BUF_SET_NAME\>/d' < "$s" > "$tmpdir/$f"
+			;;
 		*linux/nilfs2_fs.h)
 			# Create the file it attempts to include.
 			touch "$tmpdir/asm/bug.h"
