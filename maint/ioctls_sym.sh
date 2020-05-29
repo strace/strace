@@ -364,6 +364,12 @@ s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			# Create the file it attempts to include.
 			touch "$tmpdir/asm/bug.h"
 			;;
+		*linux/videodev2.h)
+			# Force time64 based definitions.
+			sed -e 's/__KERNEL__/__linux__/' \
+			    -e 's/linux\/types\.h/linux\/time_types.h/' \
+			    < "$s" > "$tmpdir/$f"
+			;;
 		*linux/vmw_vmci_defs.h)
 			# Fetch ioctl macros only.
 			grep "${r_define}I" < "$s" > "$tmpdir/$f"
