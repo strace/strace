@@ -639,12 +639,6 @@ printed:
 }
 
 void
-printfd(struct tcb *tcp, int fd)
-{
-	printfd_pid(tcp, tcp->pid, fd);
-}
-
-void
 printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd)
 {
 	/*

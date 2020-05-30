@@ -689,7 +689,13 @@ pathtrace_match(struct tcb *tcp)
 }
 
 extern int getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize);
-extern int getfdpath(struct tcb *, int, char *, unsigned);
+
+static inline int
+getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
+{
+	return getfdpath_pid(tcp->pid, fd, buf, bufsize);
+}
+
 extern unsigned long getfdinode(struct tcb *, int);
 extern enum sock_proto getfdproto(struct tcb *, int);
 
@@ -1041,7 +1047,13 @@ extern pid_t pidfd_get_pid(pid_t pid_of_fd, int fd);
  * of the tracer).
  */
 extern void printfd_pid(struct tcb *tcp, pid_t pid, int fd);
-extern void printfd(struct tcb *, int);
+
+static inline void
+printfd(struct tcb *tcp, int fd)
+{
+	printfd_pid(tcp, tcp->pid, fd);
+}
+
 /**
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracee the descriptor tcp).  This is a stub.

@@ -99,15 +99,6 @@ getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize)
 }
 
 /*
- * Get path associated with fd of tracee.
- */
-int
-getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
-{
-	return getfdpath_pid(tcp->pid, fd, buf, bufsize);
-}
-
-/*
  * Add a path to the set we're tracing.  Also add the canonicalized
  * version of the path.  Specifying NULL will delete all paths.
  */
