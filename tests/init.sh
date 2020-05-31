@@ -428,7 +428,7 @@ fi
 : "${STRACE_EXE:=$STRACE}"
 export STRACE_EXE
 
-: "${TIMEOUT_DURATION:=600}"
+: "${TIMEOUT_DURATION:=1500}"
 : "${SLEEP_A_BIT:=sleep 1}"
 
 [ -z "${VERBOSE-}" ] ||

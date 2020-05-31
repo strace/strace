@@ -39,7 +39,6 @@ matrix:
         - TARGET=aarch64
         - SLEEP_A_BIT="sleep 0.5"
         - STACKTRACE=no
-        - TIMEOUT_DURATION=1500
     - compiler: gcc
       arch: arm64
       env:
@@ -47,14 +46,12 @@ matrix:
         - SLEEP_A_BIT="sleep 0.5"
         - STACKTRACE=no
         - KHEADERS=torvalds/linux
-        - TIMEOUT_DURATION=1500
     - compiler: clang-9
       arch: arm64
       env:
         - TARGET=aarch64
         - SLEEP_A_BIT="sleep 0.5"
         - STACKTRACE=no
-        - TIMEOUT_DURATION=1500
     - arch: s390x
       compiler: gcc
       env:
