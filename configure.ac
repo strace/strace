@@ -393,6 +393,21 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
+	mqueue.h
+	netinet/sctp.h
+	netipx/ipx.h
+	paths.h
+	scsi/sg.h
+	sys/eventfd.h
+	sys/fanotify.h
+	sys/ipc.h
+	sys/quota.h
+	sys/signalfd.h
+	sys/xattr.h
+	ustat.h
+]))
+
+AC_CHECK_HEADERS(m4_normalize([
 	linux/bsg.h
 	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
@@ -400,8 +415,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/fib_rules.h
 	linux/fiemap.h
 	linux/hiddev.h
-	linux/if_addr.h
-	linux/if_link.h
 	linux/ip_vs.h
 	linux/ipc.h
 	linux/kcmp.h
@@ -409,7 +422,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/memfd.h
 	linux/mmtimer.h
 	linux/mount.h
-	linux/neighbour.h
+	linux/mqueue.h
 	linux/netfilter/ipset/ip_set.h
 	linux/netfilter/nf_tables.h
 	linux/netfilter/nf_tables_compat.h
@@ -429,25 +442,22 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/securebits.h
 	linux/userfaultfd.h
 	linux/utsname.h
-	mqueue.h
-	netinet/sctp.h
-	netipx/ipx.h
-	paths.h
-	scsi/sg.h
-	sys/eventfd.h
-	sys/fanotify.h
-	sys/ipc.h
-	sys/quota.h
-	sys/signalfd.h
-	sys/xattr.h
-	ustat.h
-]))
+]),,, [AC_INCLUDES_DEFAULT
+#include <linux/types.h>
+])
+
+AC_CHECK_HEADERS(m4_normalize([
+	linux/if_addr.h
+	linux/if_link.h
+	linux/neighbour.h
+]),,, [AC_INCLUDES_DEFAULT
+#include <sys/socket.h>
+#include <linux/types.h>
+])
 
 AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])
 
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
-
-AC_CHECK_HEADERS([linux/mqueue.h],,, [#include <linux/types.h>])
 
 AC_CHECK_HEADERS([linux/netfilter/xt_osf.h],,, [#include <linux/ip.h>
 #include <linux/tcp.h>])
@@ -514,7 +524,8 @@ AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/types.h>
 AC_CHECK_TYPES(m4_normalize([
 	struct fib_rule_uid_range,
 	struct fib_rule_port_range
-]),,, [#include <linux/fib_rules.h>])
+]),,, [#include <sys/socket.h>
+#include <linux/fib_rules.h>])
 
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS(m4_normalize([
