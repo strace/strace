@@ -11,6 +11,7 @@
 
 # include <stdio.h>
 # include <sys/ioctl.h>
+# include <linux/types.h>
 # include <linux/fiemap.h>
 # include <linux/fs.h>
 # include "xlat.h"

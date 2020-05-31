@@ -11,6 +11,7 @@
 #include <linux/fs.h>
 
 #ifdef HAVE_LINUX_FIEMAP_H
+# include <linux/types.h>
 # include <linux/fiemap.h>
 # include "xlat/fiemap_flags.h"
 # include "xlat/fiemap_extent_flags.h"

@@ -14,6 +14,8 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 
+#include <linux/types.h>
+
 #ifdef HAVE_LINUX_MMTIMER_H
 # include <linux/mmtimer.h>
 #endif
