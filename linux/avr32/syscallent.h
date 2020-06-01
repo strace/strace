@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2004-2009 Atmel Corporation
- * Copyright (c) 2009-2019 The strace developers.
+ * Copyright (c) 2009-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
