@@ -12,6 +12,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_*, BTRFS_*, CLONE_*, FAN_*, IORING_*, KVM_*,
     LWTUNNEL_*, MREMAP_*, PERF_*, SECCOMP_*, UFFDIO_*, V4L2_*, and XDP_*
     constants.
+  * Updated lists of ioctl commands from Linux 5.7.
 
 * Bug fixes
   * Fixed decoding of getdents and getdents64 syscalls when they return

@@ -134,6 +134,7 @@
 { "linux/kvm.h", "KVM_S390_IRQ", _IOC_WRITE, 0xaeb4, 0x48 },
 { "linux/kvm.h", "KVM_S390_MEM_OP", _IOC_WRITE, 0xaeb1, 0x40 },
 { "linux/kvm.h", "KVM_S390_NORMAL_RESET", _IOC_NONE, 0xaec3, 0x00 },
+{ "linux/kvm.h", "KVM_S390_PV_COMMAND", _IOC_READ|_IOC_WRITE, 0xaec5, 0x20 },
 { "linux/kvm.h", "KVM_S390_SET_CMMA_BITS", _IOC_WRITE, 0xaeb9, 0x20 },
 { "linux/kvm.h", "KVM_S390_SET_INITIAL_PSW", _IOC_WRITE, 0xae96, 0x10 },
 { "linux/kvm.h", "KVM_S390_SET_IRQ_STATE", _IOC_WRITE, 0xaeb5, 0x20 },
