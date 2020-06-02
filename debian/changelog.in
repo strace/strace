@@ -4,6 +4,12 @@ strace (@PACKAGE_VERSION@-1) experimental; urgency=low
 
  -- Strace <@PACKAGE_BUGREPORT@>  @DEB_CHANGELOGTIME@
 
+strace (5.7-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Dmitry V. Levin <ldv@altlinux.org>  Mon, 01 Jun 2020 14:15:16 +0000
+
 strace (5.6-1) unstable; urgency=medium
 
   * New upstream version.
