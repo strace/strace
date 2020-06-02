@@ -18,65 +18,82 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/wait.h>
-# include <sys/resource.h>
+# include "kernel_rusage.h"
 
 static const char *
-sprint_rusage(const struct rusage *const ru)
+sprint_rusage(const kernel_rusage_t *const ru)
 {
 	static char buf[1024];
 	snprintf(buf, sizeof(buf),
-		 "{ru_utime={tv_sec=%lld, tv_usec=%llu}"
-		 ", ru_stime={tv_sec=%lld, tv_usec=%llu}"
+		 "{ru_utime={tv_sec=%llu, tv_usec=%llu}"
+		 ", ru_stime={tv_sec=%llu, tv_usec=%llu}"
 # if VERBOSE
-		 ", ru_maxrss=%lu"
-		 ", ru_ixrss=%lu"
-		 ", ru_idrss=%lu"
-		 ", ru_isrss=%lu"
-		 ", ru_minflt=%lu"
-		 ", ru_majflt=%lu"
-		 ", ru_nswap=%lu"
-		 ", ru_inblock=%lu"
-		 ", ru_oublock=%lu"
-		 ", ru_msgsnd=%lu"
-		 ", ru_msgrcv=%lu"
-		 ", ru_nsignals=%lu"
-		 ", ru_nvcsw=%lu"
-		 ", ru_nivcsw=%lu}"
+		 ", ru_maxrss=%llu"
+		 ", ru_ixrss=%llu"
+		 ", ru_idrss=%llu"
+		 ", ru_isrss=%llu"
+		 ", ru_minflt=%llu"
+		 ", ru_majflt=%llu"
+		 ", ru_nswap=%llu"
+		 ", ru_inblock=%llu"
+		 ", ru_oublock=%llu"
+		 ", ru_msgsnd=%llu"
+		 ", ru_msgrcv=%llu"
+		 ", ru_nsignals=%llu"
+		 ", ru_nvcsw=%llu"
+		 ", ru_nivcsw=%llu}"
 # else
 		 ", ...}"
 # endif
-		 , (long long) ru->ru_utime.tv_sec
+		 , zero_extend_signed_to_ull(ru->ru_utime.tv_sec)
 		 , zero_extend_signed_to_ull(ru->ru_utime.tv_usec)
-		 , (long long) ru->ru_stime.tv_sec
+		 , zero_extend_signed_to_ull(ru->ru_stime.tv_sec)
 		 , zero_extend_signed_to_ull(ru->ru_stime.tv_usec)
 # if VERBOSE
-		 , (long) ru->ru_maxrss
-		 , (long) ru->ru_ixrss
-		 , (long) ru->ru_idrss
-		 , (long) ru->ru_isrss
-		 , (long) ru->ru_minflt
-		 , (long) ru->ru_majflt
-		 , (long) ru->ru_nswap
-		 , (long) ru->ru_inblock
-		 , (long) ru->ru_oublock
-		 , (long) ru->ru_msgsnd
-		 , (long) ru->ru_msgrcv
-		 , (long) ru->ru_nsignals
-		 , (long) ru->ru_nvcsw
-		 , (long) ru->ru_nivcsw
+		 , zero_extend_signed_to_ull(ru->ru_maxrss)
+		 , zero_extend_signed_to_ull(ru->ru_ixrss)
+		 , zero_extend_signed_to_ull(ru->ru_idrss)
+		 , zero_extend_signed_to_ull(ru->ru_isrss)
+		 , zero_extend_signed_to_ull(ru->ru_minflt)
+		 , zero_extend_signed_to_ull(ru->ru_majflt)
+		 , zero_extend_signed_to_ull(ru->ru_nswap)
+		 , zero_extend_signed_to_ull(ru->ru_inblock)
+		 , zero_extend_signed_to_ull(ru->ru_oublock)
+		 , zero_extend_signed_to_ull(ru->ru_msgsnd)
+		 , zero_extend_signed_to_ull(ru->ru_msgrcv)
+		 , zero_extend_signed_to_ull(ru->ru_nsignals)
+		 , zero_extend_signed_to_ull(ru->ru_nvcsw)
+		 , zero_extend_signed_to_ull(ru->ru_nivcsw)
 # endif
 		 );
 	return buf;
 }
 
+static const char *errstr;
+
+static long
+k_wait4(const unsigned int pid, void const *wstatus,
+	const unsigned int options, void const *ru)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
+	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
+	const kernel_ulong_t arg1 = fill | pid;
+	const kernel_ulong_t arg2 = (uintptr_t) wstatus;
+	const kernel_ulong_t arg3 = fill | options;
+	const kernel_ulong_t arg4 = (uintptr_t) ru;
+	const long rc = syscall(__NR_wait4, arg1, arg2, arg3, arg4, bad, bad);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
 static pid_t
-do_wait4(pid_t pid, int *wstatus, int options, struct rusage *ru)
+do_wait4(pid_t pid, int *wstatus, int options, kernel_rusage_t *ru)
 {
 	sigset_t mask = {};
 	sigaddset(&mask, SIGCHLD);
 
 	assert(sigprocmask(SIG_BLOCK, &mask, NULL) == 0);
-	pid_t rc = wait4(pid, wstatus, options, ru);
+	pid_t rc = k_wait4(pid, wstatus, options, ru);
 	assert(sigprocmask(SIG_UNBLOCK, &mask, NULL) == 0);
 	return rc;
 }
@@ -105,12 +122,12 @@ main(void)
 	(void) close(0);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, s);
-	if (wait4(pid, s, WNOHANG|__WALL, NULL))
+	if (k_wait4(pid, s, WNOHANG|__WALL, NULL))
 		perror_msg_and_fail("wait4 #1");
 	tprintf("wait4(%d, %p, WNOHANG|__WALL, NULL) = 0\n", pid, s);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct rusage, rusage);
-	if (wait4(pid, s, WNOHANG|__WALL, rusage))
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_rusage_t, rusage);
+	if (k_wait4(pid, s, WNOHANG|__WALL, rusage))
 		perror_msg_and_fail("wait4 #2");
 	tprintf("wait4(%d, %p, WNOHANG|__WALL, %p) = 0\n", pid, s, rusage);
 
@@ -175,9 +192,9 @@ main(void)
 	tprintf("wait4(%d, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], 0"
 		", %s) = %d\n", pid, sprint_rusage(rusage), pid);
 
-	assert(wait4(-1, s, WNOHANG|WSTOPPED|__WALL, rusage) == -1);
-	tprintf("wait4(-1, %p, WNOHANG|WSTOPPED|__WALL, %p) = -1 %s (%m)\n",
-		s, rusage, errno2name());
+	assert(k_wait4(-1, s, WNOHANG|WSTOPPED|__WALL, rusage) == -1);
+	tprintf("wait4(-1, %p, WNOHANG|WSTOPPED|__WALL, %p) = %s\n",
+		s, rusage, errstr);
 
 	tprintf("%s\n", "+++ exited with 0 +++");
 	return 0;
