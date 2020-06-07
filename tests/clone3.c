@@ -413,7 +413,7 @@ main(int argc, char *argv[])
 	memset(arg, 0, sizeof(*arg));
 
 	arg->flags = CLONE_INTO_CGROUP;
-	rc = do_clone3(arg, sizeof(*arg), ERR(0) | ERR(EINVAL));
+	rc = do_clone3(arg, sizeof(*arg), ERR(0) | ERR(EINVAL) | ERR(EBADF));
 	print_clone3(arg, rc, sizeof(*arg), STRUCT_VALID,
 		     "CLONE_INTO_CGROUP", "0");
 	printf(", %zu) = %s" INJ_STR, sizeof(*arg), sprintrc(rc));
