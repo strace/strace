@@ -134,6 +134,8 @@ static unsigned int daemonized_tracer;
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
+unsigned int pidns_translation;
+
 static bool detach_on_execve;
 
 static int exit_code;
@@ -2004,6 +2006,8 @@ init(int argc, char *argv[])
 
 	os_release = get_os_release();
 
+	pidns_init();
+
 	shared_log = stderr;
 	set_sortby(DEFAULT_SORTBY);
 	set_personality(DEFAULT_PERSONALITY);
@@ -2028,6 +2032,7 @@ init(int argc, char *argv[])
 		GETOPT_FOLLOWFORKS,
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_TS,
+		GETOPT_PIDNS_TRANSLATION,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -2079,6 +2084,7 @@ init(int argc, char *argv[])
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
 		{ "strings-in-hex",	optional_argument, 0, GETOPT_HEX_STR },
 		{ "const-print-style",	required_argument, 0, 'X' },
+		{ "pidns-translation",	no_argument      , 0, GETOPT_PIDNS_TRANSLATION },
 		{ "successful-only",	no_argument,	   0, 'z' },
 		{ "failed-only",	no_argument,	   0, 'Z' },
 		{ "failing-only",	no_argument,	   0, 'Z' },
@@ -2294,6 +2300,9 @@ init(int argc, char *argv[])
 			break;
 		case 'y':
 			yflag_short++;
+			break;
+		case GETOPT_PIDNS_TRANSLATION:
+			pidns_translation++;
 			break;
 		case 'z':
 			clear_number_set_array(status_set, 1);

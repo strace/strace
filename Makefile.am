@@ -233,6 +233,7 @@ libstrace_a_SOURCES =	\
 	personality.c	\
 	pidfd_getfd.c	\
 	pidfd_open.c	\
+	pidns.c		\
 	pkeys.c		\
 	poll.c		\
 	prctl.c		\
@@ -345,6 +346,8 @@ libstrace_a_SOURCES =	\
 	time.c		\
 	times.c		\
 	trace_event.h	\
+	trie.c 		\
+	trie.h 		\
 	truncate.c	\
 	ubi.c		\
 	ucopy.c		\

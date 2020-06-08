@@ -937,6 +937,21 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 					tprintf("= %" PRI_kld, tcp->u_rval);
 				}
 				break;
+			case RVAL_TID:
+			case RVAL_SID:
+			case RVAL_TGID:
+			case RVAL_PGID: {
+				#define _(_t) [RVAL_##_t - RVAL_TID] = PT_##_t
+				static const enum pid_type types[] = {
+					_(TID), _(SID), _(TGID), _(PGID),
+				};
+				#undef _
+
+				tprints("= ");
+				printpid(tcp, tcp->u_rval,
+					 types[(sys_res & RVAL_MASK) - RVAL_TID]);
+				break;
+			}
 			default:
 				error_msg("invalid rval format");
 				break;
