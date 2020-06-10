@@ -1103,7 +1103,7 @@ printfd(struct tcb *tcp, int fd)
 
 /**
  * Print file descriptor fd owned by process with ID pid (from the PID NS
- * of the tracee the descriptor tcp).  This is a stub.
+ * of the tracee).
  */
 extern void printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd);
 
@@ -1563,6 +1563,9 @@ DECL_PRINTNUM_ADDR(int64);
 
 extern bool
 printnum_fd(struct tcb *, kernel_ulong_t addr);
+
+extern bool
+printnum_pid(struct tcb *const tcp, const kernel_ulong_t addr, enum pid_type type);
 
 static inline bool
 printnum_slong(struct tcb *tcp, kernel_ulong_t addr)

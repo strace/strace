@@ -392,6 +392,18 @@ printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 	return true;
 }
 
+bool
+printnum_pid(struct tcb *const tcp, const kernel_ulong_t addr, enum pid_type type)
+{
+	int pid;
+	if (umove_or_printaddr(tcp, addr, &pid))
+		return false;
+	tprints("[");
+	printpid(tcp, pid, type);
+	tprints("]");
+	return true;
+}
+
 /**
  * Prints time to a (static internal) buffer and returns pointer to it.
  * Returns NULL if the provided time specification is not correct.
@@ -616,7 +628,7 @@ void
 printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 {
 	char path[PATH_MAX + 1];
-	if (!number_set_array_is_empty(decode_fd_set, 0)
+	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
 	    && getfdpath_pid(pid, fd, path, sizeof(path)) >= 0) {
 		tprintf("%d<", (int) fd);
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
@@ -641,12 +653,8 @@ printed:
 void
 printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd)
 {
-	/*
-	 * TODO: We want to have the same formatting as printfd here,
-	 *       but we should figure out first which process in strace's
-	 *       PID NS is referred to by pid in tracee's PID NS.
-	 */
-	tprintf("%d", fd);
+	int strace_pid = translate_pid(tcp, pid, PT_TGID, NULL);
+	printfd_pid(tcp, strace_pid, fd);
 }
 
 /*

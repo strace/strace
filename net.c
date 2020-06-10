@@ -601,7 +601,7 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &uc))
 		return;
 
-	PRINT_FIELD_LEN("{", uc, pid, len, PRINT_FIELD_D);
+	PRINT_FIELD_LEN("{", uc, pid, len, PRINT_FIELD_TGID, tcp);
 	PRINT_FIELD_LEN(", ", uc, uid, len, PRINT_FIELD_UID);
 	PRINT_FIELD_LEN(", ", uc, gid, len, PRINT_FIELD_UID);
 	tprints("}");

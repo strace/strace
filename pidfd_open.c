@@ -10,7 +10,7 @@
 SYS_FUNC(pidfd_open)
 {
 	/* pid_t pid */
-	tprintf("%d", (int) tcp->u_arg[0]);
+	printpid(tcp, tcp->u_arg[0], PT_TGID);
 
 	/* unsigned int flags */
 	tprintf(", %#x", (unsigned int) tcp->u_arg[1]);

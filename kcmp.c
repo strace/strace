@@ -30,7 +30,10 @@ SYS_FUNC(kcmp)
 	kernel_ulong_t idx1 = tcp->u_arg[3];
 	kernel_ulong_t idx2 = tcp->u_arg[4];
 
-	tprintf("%d, %d, ", pid1, pid2);
+	printpid(tcp, pid1, PT_TGID);
+	tprints(", ");
+	printpid(tcp, pid2, PT_TGID);
+	tprints(", ");
 	printxval(kcmp_types, type, "KCMP_???");
 
 	switch (type) {

@@ -64,7 +64,26 @@ static const char zero_path[] = "/dev/zero";
 static void
 printpidfd(const char *prefix, pid_t pid, unsigned fd)
 {
-	printf("%s%d", prefix, fd);
+	const char *path = NULL;
+
+# if VERBOSE_FD
+	if (pid == getpid()) {
+		switch (fd)
+		{
+		case NULL_FD:
+			path = null_path;
+			break;
+		case ZERO_FD:
+			path = zero_path;
+			break;
+		}
+	}
+# endif
+
+	if (path)
+		printf("%s%d<%s>", prefix, fd, path);
+	else
+		printf("%s%d", prefix, fd);
 }
 
 /*
@@ -179,7 +198,7 @@ main(void)
 	/* KCMP_FILE is the only type which has additional args */
 	do_kcmp(3141592653U, 2718281828U, ARG_STR(KCMP_FILE), bogus_idx1,
 		bogus_idx2);
-	do_kcmp(-1, -1, ARG_STR(KCMP_FILE), NULL_FD, ZERO_FD);
+	do_kcmp(getpid(), getpid(), ARG_STR(KCMP_FILE), NULL_FD, ZERO_FD);
 
 	/* Types without additional args */
 	do_kcmp(-1, -1, ARG_STR(KCMP_VM), bogus_idx1, bogus_idx2);
@@ -198,7 +217,7 @@ main(void)
 	for (i = 0; i < ARRAY_SIZE(slot_data); i++) {
 		memcpy(slot, slot_data + i, sizeof(*slot));
 
-		do_kcmp(getpid(), getppid(), ARG_STR(KCMP_EPOLL_TFD), NULL_FD,
+		do_kcmp(getpid(), -1, ARG_STR(KCMP_EPOLL_TFD), NULL_FD,
 			(uintptr_t) slot, 1);
 	}
 

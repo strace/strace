@@ -142,7 +142,8 @@ SYS_FUNC(setrlimit)
 SYS_FUNC(prlimit64)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		printpid(tcp, tcp->u_arg[0], PT_TGID);
+		tprints(", ");
 		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
 		tprints(", ");
 		print_rlimit64(tcp, tcp->u_arg[2]);
@@ -179,10 +180,28 @@ SYS_FUNC(osf_getrusage)
 
 #include "xlat/priorities.h"
 
+static void
+priority_print_who(struct tcb *tcp, int which, int who)
+{
+	switch (which)
+	{
+	case PRIO_PROCESS:
+		printpid(tcp, who, PT_TGID);
+		break;
+	case PRIO_PGRP:
+		printpid(tcp, who, PT_PGID);
+		break;
+	default:
+		tprintf("%d", who);
+		break;
+	}
+}
+
 SYS_FUNC(getpriority)
 {
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprintf(", %d", (int) tcp->u_arg[1]);
+	tprints(", ");
+	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
@@ -190,7 +209,9 @@ SYS_FUNC(getpriority)
 SYS_FUNC(setpriority)
 {
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprintf(", %d, %d", (int) tcp->u_arg[1], (int) tcp->u_arg[2]);
+	tprints(", ");
+	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
+	tprintf(", %d", (int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }

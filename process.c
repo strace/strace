@@ -92,7 +92,8 @@ SYS_FUNC(ptrace)
 		}
 
 		/* pid */
-		tprintf(", %d", pid);
+		tprints(", ");
+		printpid(tcp, pid, PT_TGID);
 
 		/* addr */
 		switch (request) {

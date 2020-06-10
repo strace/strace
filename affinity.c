@@ -82,7 +82,8 @@ SYS_FUNC(sched_setaffinity)
 	const int pid = tcp->u_arg[0];
 	const unsigned int len = tcp->u_arg[1];
 
-	tprintf("%d, %u, ", pid, len);
+	printpid(tcp, pid, PT_TGID);
+	tprintf(", %u, ", len);
 	print_affinitylist(tcp, tcp->u_arg[2], len);
 
 	return RVAL_DECODED;
@@ -94,7 +95,8 @@ SYS_FUNC(sched_getaffinity)
 	const unsigned int len = tcp->u_arg[1];
 
 	if (entering(tcp)) {
-		tprintf("%d, %u, ", pid, len);
+		printpid(tcp, pid, PT_TGID);
+		tprintf(", %u, ", len);
 	} else {
 		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
 	}

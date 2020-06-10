@@ -263,6 +263,30 @@
 		printfd((tcp_), (where_).field_);			\
 	} while (0)
 
+# define PRINT_FIELD_TID(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printpid((tcp_), (where_).field_, PT_TID);			\
+	} while (0)
+
+# define PRINT_FIELD_TGID(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printpid((tcp_), (where_).field_, PT_TGID);			\
+	} while (0)
+
+# define PRINT_FIELD_PGID(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printpid((tcp_), (where_).field_, PT_PGID);			\
+	} while (0)
+
+# define PRINT_FIELD_SID(prefix_, where_, field_, tcp_)			\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		printpid((tcp_), (where_).field_, PT_SID);			\
+	} while (0)
+
 # define PRINT_FIELD_STRN(prefix_, where_, field_, len_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\

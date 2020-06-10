@@ -69,7 +69,7 @@ print_scm_creds(struct tcb *tcp, const void *cmsg_data,
 {
 	const struct ucred *uc = cmsg_data;
 
-	PRINT_FIELD_D("{", *uc, pid);
+	PRINT_FIELD_TGID("{", *uc, pid, tcp);
 	PRINT_FIELD_UID(", ", *uc, uid);
 	PRINT_FIELD_UID(", ", *uc, gid);
 	tprints("}");

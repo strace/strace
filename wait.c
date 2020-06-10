@@ -80,14 +80,8 @@ printwaitn(struct tcb *const tcp,
 	   void (*const print_rusage)(struct tcb *, kernel_ulong_t))
 {
 	if (entering(tcp)) {
-		/* On Linux, kernel-side pid_t is typedef'ed to int
-		 * on all arches. Also, glibc-2.8 truncates wait3 and wait4
-		 * pid argument to int on 64bit arches, producing,
-		 * for example, wait4(4294967295, ...) instead of -1
-		 * in strace. We have to use int here, not long.
-		 */
-		int pid = tcp->u_arg[0];
-		tprintf("%d, ", pid);
+		printpid_tgid_pgid(tcp, tcp->u_arg[0]);
+		tprintf(", ");
 	} else {
 		int status;
 
@@ -108,7 +102,7 @@ printwaitn(struct tcb *const tcp,
 				printaddr(tcp->u_arg[3]);
 		}
 	}
-	return 0;
+	return RVAL_TGID;
 }
 
 SYS_FUNC(waitpid)
@@ -134,10 +128,28 @@ SYS_FUNC(osf_wait4)
 
 SYS_FUNC(waitid)
 {
+	unsigned int idtype = (unsigned int) tcp->u_arg[0];
+	int id = tcp->u_arg[1];
+
 	if (entering(tcp)) {
-		printxval(waitid_types, tcp->u_arg[0], "P_???");
-		int pid = tcp->u_arg[1];
-		tprintf(", %d, ", pid);
+		printxval(waitid_types, idtype, "P_???");
+		tprints(", ");
+		switch (idtype)
+		{
+		case P_PID:
+			printpid(tcp, id, PT_TGID);
+			break;
+		case P_PIDFD:
+			printfd(tcp, id);
+			break;
+		case P_PGID:
+			printpid(tcp, id, PT_PGID);
+			break;
+		default:
+			tprintf("%d", id);
+			break;
+		}
+		tprints(", ");
 	} else {
 		/* siginfo */
 		printsiginfo_at(tcp, tcp->u_arg[2]);

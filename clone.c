@@ -114,14 +114,14 @@ SYS_FUNC(clone)
 		 */
 		if ((flags & (CLONE_PARENT_SETTID|CLONE_PIDFD|CLONE_CHILD_SETTID
 			      |CLONE_CHILD_CLEARTID|CLONE_SETTLS)) == 0)
-			return RVAL_DECODED;
+			return RVAL_DECODED | RVAL_TID;
 	} else {
 		if (flags & (CLONE_PARENT_SETTID|CLONE_PIDFD)) {
 			kernel_ulong_t addr = tcp->u_arg[ARG_PTID];
 
 			tprints(", parent_tid=");
 			if (flags & CLONE_PARENT_SETTID)
-				printnum_int(tcp, addr, "%u");
+				printnum_pid(tcp, addr, PT_TID);
 			else
 				printnum_fd(tcp, addr);
 		}
@@ -134,7 +134,7 @@ SYS_FUNC(clone)
 			printaddr(tcp->u_arg[ARG_CTID]);
 		}
 	}
-	return 0;
+	return RVAL_TID;
 }
 
 
@@ -229,7 +229,7 @@ SYS_FUNC(clone3)
 
 		if ((arg.flags & (CLONE_PIDFD | CLONE_PARENT_SETTID)) ||
 		    (size > fetch_size))
-			return 0;
+			return RVAL_TID;
 
 		goto out;
 	}
@@ -256,7 +256,7 @@ SYS_FUNC(clone3)
 
 	if (arg.flags & CLONE_PARENT_SETTID) {
 		tprintf("%sparent_tid=", pfx);
-		printnum_int(tcp, arg.parent_tid, "%d"); /* TID */
+		printnum_pid(tcp, arg.parent_tid, PT_TID);
 		pfx = ", ";
 	}
 
@@ -279,7 +279,7 @@ SYS_FUNC(clone3)
 out:
 	tprintf(", %" PRI_klu, size);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_TID;
 }
 
 
@@ -300,5 +300,5 @@ SYS_FUNC(unshare)
 
 SYS_FUNC(fork)
 {
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_TGID;
 }

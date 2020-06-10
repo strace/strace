@@ -927,7 +927,7 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 	if (entering(tcp)) {
 		set_tcb_priv_ulong(tcp, attr.buf_len);
 
-		PRINT_FIELD_D("{task_fd_query={", attr, pid);
+		PRINT_FIELD_TGID("{task_fd_query={", attr, pid, tcp);
 		PRINT_FIELD_FD(", ", attr, fd, tcp);
 		PRINT_FIELD_U(", ", attr, flags);
 		PRINT_FIELD_U(", ", attr, buf_len);

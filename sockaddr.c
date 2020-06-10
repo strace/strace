@@ -416,7 +416,7 @@ print_sockaddr_data_nl(struct tcb *tcp, const void *const buf, const int addrlen
 {
 	const struct sockaddr_nl *const sa_nl = buf;
 
-	PRINT_FIELD_D("", *sa_nl, nl_pid);
+	PRINT_FIELD_TGID("", *sa_nl, nl_pid, tcp);
 	PRINT_FIELD_0X(", ", *sa_nl, nl_groups);
 }
 

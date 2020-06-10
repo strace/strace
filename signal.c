@@ -439,7 +439,8 @@ SYS_FUNC(sigprocmask)
 SYS_FUNC(kill)
 {
 	/* pid */
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printpid_tgid_pgid(tcp, tcp->u_arg[0]);
+	tprints(", ");
 	/* signal */
 	printsignal(tcp->u_arg[1]);
 
@@ -448,7 +449,7 @@ SYS_FUNC(kill)
 
 SYS_FUNC(tkill)
 {
-	tprintf("%d", (int) tcp->u_arg[0]);
+	printpid(tcp, tcp->u_arg[0], PT_TID);
 	tprints(", ");
 	printsignal(tcp->u_arg[1]);
 
@@ -457,8 +458,12 @@ SYS_FUNC(tkill)
 
 SYS_FUNC(tgkill)
 {
-	/* tgid, tid */
-	tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
+	/* tgid */
+	printpid(tcp, tcp->u_arg[0], PT_TGID);
+	tprints(", ");
+	/* tid */
+	printpid(tcp, tcp->u_arg[1], PT_TID);
+	tprints(", ");
 	/* signal */
 	printsignal(tcp->u_arg[2]);
 
@@ -624,7 +629,8 @@ print_sigqueueinfo(struct tcb *const tcp, const int sig,
 
 SYS_FUNC(rt_sigqueueinfo)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	printpid(tcp, tcp->u_arg[0], PT_TGID);
+	tprints(", ");
 	print_sigqueueinfo(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 
 	return RVAL_DECODED;
@@ -632,7 +638,10 @@ SYS_FUNC(rt_sigqueueinfo)
 
 SYS_FUNC(rt_tgsigqueueinfo)
 {
-	tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
+	printpid(tcp, tcp->u_arg[0], PT_TGID);
+	tprints(", ");
+	printpid(tcp, tcp->u_arg[1], PT_TID);
+	tprints(", ");
 	print_sigqueueinfo(tcp, tcp->u_arg[2], tcp->u_arg[3]);
 
 	return RVAL_DECODED;
