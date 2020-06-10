@@ -125,7 +125,7 @@ make install
 
 6.1. Distribution tarball
 
-./make-dist
+maint/make-dist
 
 Requires git
 

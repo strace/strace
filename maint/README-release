@@ -5,7 +5,7 @@
   using maint/gen-release-notes.sh, maint/gen-release-github.sh
   and maint/gen-release-gitlab.sh
 * create a release tag using maint/gen-tag-message.sh
-* generate a release tarball using make-dist
+* generate a release tarball using maint/make-dist
 * send the tarball to release farms for the final testing
 * prepare and test package builds for ALT and Rawhide
 * generate a detached signature for the tarball using gpg -ab
