@@ -1698,4 +1698,64 @@ scno_is_valid(kernel_ulong_t scno)
 
 # define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(sys_ ## syscall_name)(struct tcb *tcp)
 
+#define ILOG2_ITER_(val_, ret_, bit_)					\
+	do {								\
+		typeof(ret_) shift_ =					\
+			((val_) > ((((typeof(val_)) 1)			\
+				   << (1 << (bit_))) - 1)) << (bit_);	\
+		(val_) >>= shift_;					\
+		(ret_) |= shift_;					\
+	} while (0)
+
+/**
+ * Calculate floor(log2(val)), with the exception of val == 0, for which 0
+ * is returned as well.
+ *
+ * @param val 64-bit value to calculate integer base-2 logarithm for.
+ * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
+ */
+static inline unsigned int
+ilog2_64(uint64_t val)
+{
+	unsigned int ret = 0;
+
+	ILOG2_ITER_(val, ret, 5);
+	ILOG2_ITER_(val, ret, 4);
+	ILOG2_ITER_(val, ret, 3);
+	ILOG2_ITER_(val, ret, 2);
+	ILOG2_ITER_(val, ret, 1);
+	ILOG2_ITER_(val, ret, 0);
+
+	return ret;
+}
+
+/**
+ * Calculate floor(log2(val)), with the exception of val == 0, for which 0
+ * is returned as well.
+ *
+ * @param val 32-bit value to calculate integer base-2 logarithm for.
+ * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
+ */
+static inline unsigned int
+ilog2_32(uint32_t val)
+{
+	unsigned int ret = 0;
+
+	ILOG2_ITER_(val, ret, 4);
+	ILOG2_ITER_(val, ret, 3);
+	ILOG2_ITER_(val, ret, 2);
+	ILOG2_ITER_(val, ret, 1);
+	ILOG2_ITER_(val, ret, 0);
+
+	return ret;
+}
+
+#if SIZEOF_KERNEL_LONG_T > 4
+# define ilog2_klong ilog2_64
+#else
+# define ilog2_klong ilog2_32
+#endif
+
+#undef ILOG2_ITER_
+
 #endif /* !STRACE_DEFS_H */

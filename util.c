@@ -1120,68 +1120,6 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 #undef iov
 }
 
-#define ILOG2_ITER_(val_, ret_, bit_)					\
-	do {								\
-		typeof(ret_) shift_ =					\
-			((val_) > ((((typeof(val_)) 1)			\
-				   << (1 << (bit_))) - 1)) << (bit_);	\
-		(val_) >>= shift_;					\
-		(ret_) |= shift_;					\
-	} while (0)
-
-#if SIZEOF_KERNEL_LONG_T > 4
-
-# define ilog2_klong ilog2_64
-/**
- * Calculate floor(log2(val)), with the exception of val == 0, for which 0
- * is returned as well.
- *
- * @param val 64-bit value to calculate integer base-2 logarithm for.
- * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
- */
-static inline unsigned int
-ilog2_64(uint64_t val)
-{
-	unsigned int ret = 0;
-
-	ILOG2_ITER_(val, ret, 5);
-	ILOG2_ITER_(val, ret, 4);
-	ILOG2_ITER_(val, ret, 3);
-	ILOG2_ITER_(val, ret, 2);
-	ILOG2_ITER_(val, ret, 1);
-	ILOG2_ITER_(val, ret, 0);
-
-	return ret;
-}
-
-#else /* SIZEOF_KERNEL_LONG_T == 4 */
-
-# define ilog2_klong ilog2_32
-/**
- * Calculate floor(log2(val)), with the exception of val == 0, for which 0
- * is returned as well.
- *
- * @param val 32-bit value to calculate integer base-2 logarithm for.
- * @return    (unsigned int) floor(log2(val)) if val > 0, 0 if val == 0.
- */
-static inline unsigned int
-ilog2_32(uint32_t val)
-{
-	unsigned int ret = 0;
-
-	ILOG2_ITER_(val, ret, 4);
-	ILOG2_ITER_(val, ret, 3);
-	ILOG2_ITER_(val, ret, 2);
-	ILOG2_ITER_(val, ret, 1);
-	ILOG2_ITER_(val, ret, 0);
-
-	return ret;
-}
-
-#endif /* SIZEOF_KERNEL_LONG_T */
-
-#undef ILOG2_ITER_
-
 void
 dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 	const kernel_ulong_t len)
