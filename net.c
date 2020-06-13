@@ -579,24 +579,8 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &linger))
 		return;
 
-	if (len < sizeof(linger.l_onoff)) {
-		tprints("{l_onoff=");
-		print_quoted_string((void *) &linger.l_onoff,
-				    len, QUOTE_FORCE_HEX);
-	} else {
-		PRINT_FIELD_D("{", linger, l_onoff);
-
-		if (len > offsetof(struct linger, l_linger)) {
-			len -= offsetof(struct linger, l_linger);
-			if (len < sizeof(linger.l_linger)) {
-				tprints(", l_linger=");
-				print_quoted_string((void *) &linger.l_linger,
-						    len, QUOTE_FORCE_HEX);
-			} else {
-				PRINT_FIELD_D(", ", linger, l_linger);
-			}
-		}
-	}
+	PRINT_FIELD_LEN("{", linger, l_onoff, len, PRINT_FIELD_D);
+	PRINT_FIELD_LEN(", ", linger, l_linger, len, PRINT_FIELD_D);
 	tprints("}");
 }
 
@@ -617,38 +601,9 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &uc))
 		return;
 
-	if (len < sizeof(uc.pid)) {
-		tprints("{pid=");
-		print_quoted_string((void *) &uc.pid,
-				    len, QUOTE_FORCE_HEX);
-	} else {
-		PRINT_FIELD_D("{", uc, pid);
-
-		if (len > offsetof(struct ucred, uid)) {
-			len -= offsetof(struct ucred, uid);
-			if (len < sizeof(uc.uid)) {
-				tprints(", uid=");
-				print_quoted_string((void *) &uc.uid,
-						    len, QUOTE_FORCE_HEX);
-			} else {
-				PRINT_FIELD_UID(", ", uc, uid);
-
-				if (len > offsetof(struct ucred, gid) -
-					  offsetof(struct ucred, uid)) {
-					len -= offsetof(struct ucred, gid) -
-					       offsetof(struct ucred, uid);
-					if (len < sizeof(uc.gid)) {
-						tprints(", gid=");
-						print_quoted_string((void *) &uc.gid,
-								    len,
-								    QUOTE_FORCE_HEX);
-					} else {
-						PRINT_FIELD_UID(", ", uc, gid);
-					}
-				}
-			}
-		}
-	}
+	PRINT_FIELD_LEN("{", uc, pid, len, PRINT_FIELD_D);
+	PRINT_FIELD_LEN(", ", uc, uid, len, PRINT_FIELD_UID);
+	PRINT_FIELD_LEN(", ", uc, gid, len, PRINT_FIELD_UID);
 	tprints("}");
 }
 
@@ -688,38 +643,9 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &stats))
 		return;
 
-	if (len < sizeof(stats.tp_packets)) {
-		tprints("{tp_packets=");
-		print_quoted_string((void *) &stats.tp_packets,
-				    len, QUOTE_FORCE_HEX);
-	} else {
-		PRINT_FIELD_U("{", stats, tp_packets);
-
-		if (len > offsetof(struct tp_stats, tp_drops)) {
-			len -= offsetof(struct tp_stats, tp_drops);
-			if (len < sizeof(stats.tp_drops)) {
-				tprints(", tp_drops=");
-				print_quoted_string((void *) &stats.tp_drops,
-						    len, QUOTE_FORCE_HEX);
-			} else {
-				PRINT_FIELD_U(", ", stats, tp_drops);
-
-				if (len > offsetof(struct tp_stats, tp_freeze_q_cnt) -
-					  offsetof(struct tp_stats, tp_drops)) {
-					len -= offsetof(struct tp_stats, tp_freeze_q_cnt) -
-					       offsetof(struct tp_stats, tp_drops);
-					if (len < sizeof(stats.tp_freeze_q_cnt)) {
-						tprints(", tp_freeze_q_cnt=");
-						print_quoted_string((void *) &stats.tp_freeze_q_cnt,
-								    len,
-								    QUOTE_FORCE_HEX);
-					} else {
-						PRINT_FIELD_U(", ", stats, tp_freeze_q_cnt);
-					}
-				}
-			}
-		}
-	}
+	PRINT_FIELD_LEN("{", stats, tp_packets, len, PRINT_FIELD_U);
+	PRINT_FIELD_LEN(", ", stats, tp_drops, len, PRINT_FIELD_U);
+	PRINT_FIELD_LEN(", ", stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
 	tprints("}");
 }
 #endif /* PACKET_STATISTICS */

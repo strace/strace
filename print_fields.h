@@ -277,4 +277,19 @@
 			       (size_), (hwtype_));			\
 	} while (0)
 
+# define PRINT_FIELD_LEN(prefix_, where_, field_, 			\
+			len_, print_func_, ...)				\
+	do {								\
+		unsigned int start = offsetof(typeof(where_), field_);	\
+		unsigned int end = start + sizeof(where_.field_);	\
+		if (len_ >= end) {					\
+			print_func_(prefix_, where_, field_,		\
+					##__VA_ARGS__);			\
+		} else if (len_ > start) {				\
+			tprintf("%s%s=", prefix_, #field_);		\
+			print_quoted_string((void *)&where_.field_,	\
+					len_ - start, QUOTE_FORCE_HEX);	\
+		}							\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */
