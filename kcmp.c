@@ -38,7 +38,7 @@ SYS_FUNC(kcmp)
 			tprints(", ");
 			printfd_pid_tracee_ns(tcp, pid1, idx1);
 			tprints(", ");
-			printfd_pid_tracee_ns(tcp, pid1, idx2);
+			printfd_pid_tracee_ns(tcp, pid2, idx2);
 
 			break;
 
