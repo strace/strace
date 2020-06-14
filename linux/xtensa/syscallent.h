@@ -346,7 +346,7 @@
 [348] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [349] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [350] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
-[351] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[351] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [352] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [353 ... 402] - reserved to sync up with other architectures */
 #include "syscallent-common-32.h"

@@ -385,7 +385,7 @@
 [376] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [377] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [378] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
-[379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[379] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [380] = { 3,	0,		SEN(seccomp),			"seccomp"		},
 [381] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [382] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},

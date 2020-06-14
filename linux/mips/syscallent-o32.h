@@ -375,7 +375,7 @@
 [BASE_NR + 363] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [BASE_NR + 364] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [BASE_NR + 365] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
-[BASE_NR + 366] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[BASE_NR + 366] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [BASE_NR + 367] = { 4,	0,		SEN(rseq),			"rseq"			},
 [BASE_NR + 368] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 /* room for arch specific calls */

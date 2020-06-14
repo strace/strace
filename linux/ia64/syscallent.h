@@ -346,7 +346,7 @@
 [BASE_NR + 323] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [BASE_NR + 324] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [BASE_NR + 325] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
-[BASE_NR + 326] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[BASE_NR + 326] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [BASE_NR + 327] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 [BASE_NR + 328] = { 5,	TD,		SEN(perf_event_open),		"perf_event_open"	},
 [BASE_NR + 329] = { 3,	0,		SEN(seccomp),			"seccomp"		},

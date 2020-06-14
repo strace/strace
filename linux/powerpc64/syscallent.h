@@ -374,7 +374,7 @@
 [380] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [381] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [382] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
-[383] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[383] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [384] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [385] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
 [386] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},

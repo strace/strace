@@ -404,7 +404,7 @@
 [395] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [396] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [397] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
-[398] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[398] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [399] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 [400] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [401 ... 402] - unused */

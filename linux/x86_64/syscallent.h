@@ -337,7 +337,7 @@
 [329] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [330] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},
 [331] = { 1,	0,		SEN(pkey_free),			"pkey_free"		},
-[332] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[332] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [333] = { 6,	0,		SEN(io_pgetevents_time64),	"io_pgetevents"		},
 [334] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [335 ... 423] - reserved to sync up with other architectures */

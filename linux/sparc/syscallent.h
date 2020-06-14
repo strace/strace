@@ -365,7 +365,7 @@
 [357] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [358] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [359] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
-[360] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[360] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [361] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 [362] = { 4,	TM|SI,		SEN(pkey_mprotect),		"pkey_mprotect"		},
 [363] = { 2,	0,		SEN(pkey_alloc),		"pkey_alloc"		},

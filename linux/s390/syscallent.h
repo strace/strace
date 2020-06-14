@@ -388,7 +388,7 @@
 [376] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
 [377] = { 6,	TD,		SEN(pwritev2),			"pwritev2"		},
 [378] = { 2,	0,		SEN(s390_guarded_storage),	"s390_guarded_storage"	},
-[379] = { 5,	TD|TF|TSTA,	SEN(statx),			"statx"			},
+[379] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [380] = { 4,	0,		SEN(s390_sthyi),		"s390_sthyi"		},
 [381] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 [382] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},

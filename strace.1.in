@@ -576,7 +576,7 @@ Trace stat syscall variants.
 Trace lstat syscall variants.
 .TP
 .BR %fstat
-Trace fstat and fstatat syscall variants.
+Trace fstat, fstatat, and statx syscall variants.
 .TP
 .BR %%stat
 Trace syscalls used for requesting file status (stat, lstat, fstat, fstatat,

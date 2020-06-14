@@ -9,3 +9,4 @@ fstat64-Xverbose	-a17 -Xverbose
 fstatat64	-a32
 newfstatat	-a32
 oldfstat	-a21
+statx	-a32
