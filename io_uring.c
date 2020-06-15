@@ -18,21 +18,6 @@
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_register_opcodes.h"
 
-#ifdef HAVE_STRUCT_IO_CQRING_OFFSETS
-# ifdef HAVE_STRUCT_IO_CQRING_OFFSETS_RESV
-static_assert(offsetof(struct_io_cqring_offsets, resv)
-             >= offsetof(struct io_cqring_offsets, resv),
-             "struct io_cqring_offsets.resv offset mismatch"
-             ", please update the decoder");
-static_assert(sizeof_field(struct_io_cqring_offsets, resv)
-             <= sizeof_field(struct io_cqring_offsets, resv),
-             "struct io_cqring_offsets.resv size mismatch"
-             ", please update the decoder");
-# else /* !HAVE_STRUCT_IO_CQRING_OFFSETS_RESV */
-static_assert(0, "struct io_cqring_offsets.resv is missing"
-		 ", please update the decoder");
-# endif
-#endif /* HAVE_STRUCT_IO_CQRING_OFFSETS */
 #ifdef HAVE_STRUCT_IO_URING_PARAMS
 # ifdef HAVE_STRUCT_IO_URING_PARAMS_RESV
 static_assert(offsetof(struct_io_uring_params, resv)
