@@ -27,6 +27,7 @@
 # include "xlat.h"
 
 # include "xlat/uring_setup_features.h"
+# include "xlat/uring_cqring_flags.h"
 
 # ifdef HAVE_STRUCT_IO_URING_PARAMS_FEATURES
 #  ifdef HAVE_STRUCT_IO_URING_PARAMS_WQ_FD
@@ -144,20 +145,40 @@ main(void)
 						params->sq_off.resv2);
 
 			printf("}, cq_off={head=%u, tail=%u, ring_mask=%u"
-			       ", ring_entries=%u, overflow=%u, cqes=%u",
+			       ", ring_entries=%u, overflow=%u, cqes=%u, flags=",
 			       params->cq_off.head,
 			       params->cq_off.tail,
 			       params->cq_off.ring_mask,
 			       params->cq_off.ring_entries,
 			       params->cq_off.overflow,
 			       params->cq_off.cqes);
-			if (params->cq_off.resv[0] || params->cq_off.resv[1]) {
-				printf(", resv=[%#llx, %#llx]",
+#ifdef HAVE_STRUCT_IO_CQRING_OFFSETS_FLAGS
+			printflags(uring_cqring_flags,
+			       params->cq_off.flags,
+			       "IORING_CQ_???");
+			if (params->cq_off.resv1)
+				printf(", resv1=%#x", params->cq_off.resv1);
+			if (params->cq_off.resv2)
+				printf(", resv2=%#llx",
 				       (unsigned long long)
-						params->cq_off.resv[0],
+						params->cq_off.resv2);
+#else
+			union {
+				struct {
+					uint32_t flags;
+					uint32_t resv1;
+				} s;
+				uint64_t v;
+			} u = { .v = params->cq_off.resv[0] };
+			printflags(uring_cqring_flags, u.s.flags,
+				   "IORING_CQ_???");
+			if (u.s.resv1)
+				printf(", resv1=%#x", u.s.resv1);
+			if (params->cq_off.resv[1])
+				printf(", resv2=%#llx",
 				       (unsigned long long)
 						params->cq_off.resv[1]);
-			}
+#endif
 
 			printf("}}) = %ld<anon_inode:[io_uring]>\n", rc);
 		}

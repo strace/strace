@@ -17,6 +17,7 @@
 #include "xlat/uring_setup_flags.h"
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_register_opcodes.h"
+#include "xlat/uring_cqring_flags.h"
 
 #ifdef HAVE_STRUCT_IO_URING_PARAMS
 # ifdef HAVE_STRUCT_IO_URING_PARAMS_RESV
@@ -88,10 +89,12 @@ SYS_FUNC(io_uring_setup)
 		PRINT_FIELD_U(", ", params.cq_off, ring_entries);
 		PRINT_FIELD_U(", ", params.cq_off, overflow);
 		PRINT_FIELD_U(", ", params.cq_off, cqes);
-		if (!IS_ARRAY_ZERO(params.cq_off.resv)) {
-			PRINT_FIELD_ARRAY(", ", params.cq_off, resv, tcp,
-					  print_xint64_array_member);
-		}
+		PRINT_FIELD_FLAGS(", ", params.cq_off, flags,
+				  uring_cqring_flags, "IORING_CQ_???");
+		if (params.cq_off.resv1)
+			PRINT_FIELD_X(", ", params.cq_off, resv1);
+		if (params.cq_off.resv2)
+			PRINT_FIELD_X(", ", params.cq_off, resv2);
 		tprints("}");
 	}
 	tprints("}");

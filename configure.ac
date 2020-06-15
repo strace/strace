@@ -481,6 +481,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 
 AC_CHECK_HEADERS([linux/io_uring.h], [
 	AC_CHECK_MEMBERS(m4_normalize([
+		struct io_cqring_offsets.flags,
 		struct io_uring_params.features,
 		struct io_uring_params.wq_fd,
 		struct io_uring_params.resv

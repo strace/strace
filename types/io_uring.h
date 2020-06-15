@@ -31,7 +31,9 @@ typedef struct {
 	uint32_t ring_entries;
 	uint32_t overflow;
 	uint32_t cqes;
-	uint64_t resv[2];
+	/** Added by v5.8-rc1~190^2~22 */	uint32_t flags;
+	/** Added by v5.8-rc1~190^2~22 */	uint32_t resv1;
+	/** Added by v5.8-rc1~190^2~22 */	uint64_t resv2;
 } struct_io_cqring_offsets;
 
 typedef struct {
