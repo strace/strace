@@ -52,8 +52,3 @@ matrix:
         - TARGET=aarch64
         - SLEEP_A_BIT="sleep 0.5"
         - STACKTRACE=no
-    - arch: s390x
-      compiler: gcc
-      env:
-        - TARGET=s390x
-        - STACKTRACE=libdw
