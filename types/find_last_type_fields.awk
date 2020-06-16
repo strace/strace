@@ -17,7 +17,7 @@
 		print a[1] "." last_field
 		next
 	}
-	if (match($0, /^[[:space:]]+[^];:[]+[[:space:]]+([^][:space:];:[]+)(\[[^];:[]*\])?;.*$/, a)) {
+	if (match($0, /^[[:space:]]+[^];[:space:]:\/[][^];:[]*[[:space:]]+([^][:space:];:[]+)(\[[^];:[]*\])?;.*$/, a)) {
 		last_field = a[1]
 		next
 	}
