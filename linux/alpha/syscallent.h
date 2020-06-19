@@ -44,7 +44,7 @@
 [ 34] = { 5,	0,		SEN(printargs),			"osf_chflags"		}, /* not implemented */
 [ 35] = { 5,	0,		SEN(printargs),			"osf_fchflags"		}, /* not implemented */
 [ 36] = { 0,	0,		SEN(sync),			"sync"			},
-[ 37] = { 2,	TS,		SEN(kill),			"kill"			},
+[ 37] = { 2,	TS|TP,		SEN(kill),			"kill"			},
 [ 38] = { 5,	TF|TST|TSTA,	SEN(printargs),			"osf_old_stat"		}, /* not implemented */
 [ 39] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [ 40] = { 5,	TF|TLST|TSTA,	SEN(printargs),			"osf_old_lstat"		}, /* not implemented */
@@ -153,7 +153,7 @@
 [143] = { 5,	0,		SEN(printargs),			"osf_sethostid"		}, /* not implemented */
 [144] = { 2,	0,		SEN(getrlimit),			"getrlimit"		},
 [145] = { 2,	0,		SEN(setrlimit),			"setrlimit"		},
-[146] = { 5,	0,		SEN(printargs),			"osf_old_killpg"	}, /* not implemented */
+[146] = { 5,	TP,		SEN(printargs),			"osf_old_killpg"	}, /* not implemented */
 [147] = { 0,	0,		SEN(setsid),			"setsid"		},
 [148] = { 4,	TF,		SEN(quotactl),			"quotactl"		},
 [149] = { 5,	0,		SEN(printargs),			"osf_oldquota"		}, /* not implemented */
@@ -300,7 +300,7 @@
 [353] = { 4,	TS,		SEN(rt_sigprocmask),		"rt_sigprocmask"	},
 [354] = { 2,	TS,		SEN(rt_sigpending),		"rt_sigpending"		},
 [355] = { 4,	TS,		SEN(rt_sigtimedwait_time64),	"rt_sigtimedwait"	},
-[356] = { 3,	TS,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
+[356] = { 3,	TS|TP,		SEN(rt_sigqueueinfo),		"rt_sigqueueinfo"	},
 [357] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},
 [358] = { 5,	TD,		SEN(select),			"select"		},
 [359] = { 2,	TCL,		SEN(gettimeofday),		"gettimeofday"		},
@@ -325,7 +325,7 @@
 [378] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [379] = { 3,	TD,		SEN(readahead),			"readahead"		},
 [380] = { },
-[381] = { 2,	TS,		SEN(kill),			"tkill"			},
+[381] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
 [382] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
 [383] = { 5,	TF,		SEN(setxattr),			"lsetxattr"		},
 [384] = { 5,	TD,		SEN(fsetxattr),			"fsetxattr"		},
@@ -367,7 +367,7 @@
 [421] = { 2,	TCL,		SEN(clock_getres_time64),	"clock_getres"		},
 [422] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep"	},
 [423] = { 4,	TI,		SEN(semtimedop_time64),		"semtimedop"		},
-[424] = { 3,	TS,		SEN(tgkill),			"tgkill"		},
+[424] = { 3,	TS|TP,		SEN(tgkill),			"tgkill"		},
 [425] = { 2,	TF|TST|TSTA,	SEN(stat64),			"stat64"		},
 [426] = { 2,	TF|TLST|TSTA,	SEN(lstat64),			"lstat64"		},
 [427] = { 2,	TD|TFST|TSTA,	SEN(fstat64),			"fstat64"		},
@@ -408,7 +408,7 @@
 [462] = { 3,	TD|TF,		SEN(faccessat),			"faccessat"		},
 [463] = { 6,	TD,		SEN(pselect6_time64),		"pselect6"		},
 [464] = { 5,	TD,		SEN(ppoll_time64),		"ppoll"			},
-[465] = { 1,	TP,		SEN(unshare),			"unshare"		},
+[465] = { 1,	0,		SEN(unshare),			"unshare"		},
 [466] = { 2,	0,		SEN(set_robust_list),		"set_robust_list"	},
 [467] = { 3,	0,		SEN(get_robust_list),		"get_robust_list"	},
 [468] = { 6,	TD,		SEN(splice),			"splice"		},

@@ -518,8 +518,8 @@ is deprecated.
 .B %process
 .TQ
 .B process
-Trace all system calls which involve process management.  This
-is useful for watching the fork, wait, and exec steps of a process.
+Trace system calls associated with process lifecycle
+(creation, exec, termination).
 The syntax without a preceding percent sign
 .RB (\[dq] "-e trace" = process \[dq])
 is deprecated.

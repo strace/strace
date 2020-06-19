@@ -1,6 +1,12 @@
 Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
+* Changes in behaviour
+  * Modified %process class to contain system calls associated with
+    process lifecycle (creation, exec, termination):
+    kill, tkill, tgkill, pidfd_send_signal and rt_sigqueueinfo are added,
+    arch_prctl and unshare are removed.
+
 * Improvements
 
 * Bug fixes
