@@ -9,14 +9,7 @@
 
 . "${srcdir=.}/scno_tampering.sh"
 
-case "$STRACE_ARCH" in
-alpha)
-	SYSCALL=getpgrp
-	;;
-*)
-	SYSCALL=getpid
-	;;
-esac
+SYSCALL='/^geteuid(32)?$'
 
 run_prog
 prog="$args"

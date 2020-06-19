@@ -16,28 +16,26 @@
 
 #include "raw_syscall.h"
 
-#ifdef __alpha__
-/* alpha has no getpid */
-# define SC_NR __NR_getpgrp
-# define SC_NAME "getpgrp"
-# define getpid getpgrp
+#ifdef __NR_geteuid32
+# define SC_NR __NR_geteuid32
+# define SC_NAME "geteuid32"
 #else
-# define SC_NR __NR_getpid
-# define SC_NAME "getpid"
+# define SC_NR __NR_geteuid
+# define SC_NAME "geteuid"
 #endif
 
 #ifdef raw_syscall_0
 # define INVOKE_SC(err) raw_syscall_0(SC_NR, &err)
 #else
-/* No raw_syscall_0, let's use getpid() and hope for the best.  */
-# define INVOKE_SC(err) getpid()
+/* No raw_syscall_0, let's use geteuid() and hope for the best. */
+# define INVOKE_SC(err) geteuid()
 #endif
 
 /*
  * This prototype is intentionally different
  * from the prototype provided by <unistd.h>.
  */
-extern kernel_ulong_t getpid(void);
+extern kernel_ulong_t geteuid(void);
 
 int
 main(int ac, char **av)
@@ -45,7 +43,7 @@ main(int ac, char **av)
 	assert(ac == 1 || ac == 2);
 
 	kernel_ulong_t expected =
-		(ac == 1) ? getpid() : strtoull(av[1], NULL, 0);
+		(ac == 1) ? geteuid() : strtoull(av[1], NULL, 0);
 	kernel_ulong_t err = 0;
 	kernel_ulong_t rc = INVOKE_SC(err);
 
