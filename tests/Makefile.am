@@ -44,6 +44,8 @@ libtests_a_SOURCES = \
 	libsocketcall.c \
 	lock_file.c \
 	overflowuid.c \
+	pidns.c \
+	pidns.h \
 	pipe_maxfd.c \
 	print_quoted_string.c \
 	print_time.c \
