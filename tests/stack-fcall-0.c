@@ -7,7 +7,10 @@
 
 #include "stack-fcall.h"
 
-int f0(int i, unsigned long f)
+int
+f0(int i, unsigned long f)
 {
-	return f1(i, f ^ (unsigned long) (void *) f0) - i;
+	f ^= (unsigned long) (void *) f0;
+	COMPLEX_BODY(i, f);
+	return f1(i, f) - i;
 }

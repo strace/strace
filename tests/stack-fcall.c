@@ -13,14 +13,14 @@
 # define ATTACH_MODE 0
 #endif
 
-int main(void)
+int
+main(int ac, char **av)
 {
 #if ATTACH_MODE
 	/* sleep a bit to let the tracer time to catch up */
 	sleep(1);
 #endif
 
-	f0(0, (unsigned long) (void *) main);
-	f0(1, (unsigned long) (void *) main);
-	return 0;
+	for (;;)
+		ac += f0(ac, (unsigned long) (void *) main);
 }

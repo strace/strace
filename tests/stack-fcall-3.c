@@ -6,20 +6,23 @@
  */
 
 #include <signal.h>
-#include <unistd.h>
-#include "scno.h"
-
 #include "stack-fcall.h"
 
-int f3(int i, unsigned long f)
+int
+f3(int i, unsigned long f)
 {
-	syscall(__NR_gettid, f ^ (unsigned long) (void *) f3);
+	f ^= (unsigned long) (void *) f3;
+	COMPLEX_BODY(i, f);
 	switch (i) {
 	case 1:
-		return kill(getpid(), SIGURG);
-
+		i -= chdir("");
+		break;
+	case 2:
+		i -= kill(getpid(), SIGURG) - 1;
+		break;
 	default:
-		return chdir("") + i;
+		i -= syscall(__NR_exit, i - 3);
+		break;
 	}
-
+	return i;
 }
