@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 BEGIN {
-	cap = "(0|1<<CAP_[A-Z_]+(\\|1<<CAP_[A-Z_]+)*|1<<CAP_[A-Z_]+(\\|1<<CAP_[A-Z_]+){37}\\|0xffffffc0)"
+	cap = "(0|1<<CAP_[A-Z_]+(\\|1<<CAP_[A-Z_]+)*|1<<CAP_[A-Z_]+(\\|1<<CAP_[A-Z_]+){39}\\|0xffffff00)"
 	s_efault = "-1 EFAULT (Bad address)"
 	r_efault = "-1 EFAULT \\(Bad address\\)"
 	r_einval = "-1 EINVAL \\(Invalid argument\\)"

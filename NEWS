@@ -8,7 +8,7 @@ Noteworthy changes in release ?.? (????-??-??)
     arch_prctl and unshare are removed.
 
 * Improvements
-  * Updated lists of AUDIT_* and IORING_* constants.
+  * Updated lists of AUDIT_*, CAP_*, and IORING_* constants.
 
 * Bug fixes
   * Added statx syscall to %fstat trace class.
