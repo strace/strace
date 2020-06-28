@@ -9,7 +9,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Updated lists of AUDIT_*, CAP_*, ETH_*, INET_DIAG_*, IORING_*,
-    and KEYCTL_* constants.
+    KEYCTL_*, and KVM_* constants.
 
 * Bug fixes
   * Added statx syscall to %fstat trace class.
