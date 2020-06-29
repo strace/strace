@@ -279,6 +279,7 @@ static const nla_decoder_t tcmsg_nla_decoders[] = {
 	[TCA_HW_OFFLOAD]	= decode_nla_u8,
 	[TCA_INGRESS_BLOCK]	= decode_nla_u32,
 	[TCA_EGRESS_BLOCK]	= decode_nla_u32,
+	[TCA_DUMP_FLAGS]	= decode_nla_u32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
