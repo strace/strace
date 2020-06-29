@@ -5,6 +5,7 @@
 *~
 .*.swp
 .deps
+.dirstamp
 .gdb_history
 .gdbinit
 .libs
