@@ -501,7 +501,7 @@ getfdproto(struct tcb *tcp, int fd)
 	if (fd < 0)
 		return SOCK_PROTO_UNKNOWN;
 
-	xsprintf(path, "/proc/%u/fd/%u", tcp->pid, fd);
+	xsprintf(path, "/proc/%u/fd/%u", get_proc_pid(tcp), fd);
 	r = getxattr(path, "system.sockprotoname", buf, bufsize - 1);
 	if (r <= 0)
 		return SOCK_PROTO_UNKNOWN;
@@ -582,8 +582,13 @@ printdev(struct tcb *tcp, int fd, const char *path)
 pid_t
 pidfd_get_pid(pid_t pid_of_fd, int fd)
 {
+	int proc_pid = 0;
+	translate_pid(NULL, pid_of_fd, PT_TID, &proc_pid);
+	if (!proc_pid)
+		return -1;
+
 	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
-	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", pid_of_fd, fd);
+	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", proc_pid, fd);
 
 	FILE *f = fopen_stream(fdi_path, "r");
 	if (!f)
