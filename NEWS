@@ -8,7 +8,7 @@ Noteworthy changes in release ?.? (????-??-??)
     arch_prctl and unshare are removed.
 
 * Improvements
-  * Updated lists of AUDIT_*, CAP_*, ETH_*, INET_DIAG_*, IORING_*,
+  * Updated lists of AUDIT_*, BPF_*, CAP_*, ETH_*, INET_DIAG_*, IORING_*,
     KEYCTL_*, KVM_*, LOOP_*, NDA_*, RTC_*, TCA_*, STATX_*, and *_MAGIC
     constants.
 
