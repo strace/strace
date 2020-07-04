@@ -76,6 +76,9 @@ execveat-v	-v -e trace=execveat
 faccessat-P	-a23 --trace=faccessat -P /dev/full
 faccessat-y	+faccessat.test -a24 -y
 faccessat-yy	+faccessat.test -a24 -yy
+faccessat2-P	-a27 --trace=faccessat2 -P /dev/full
+faccessat2-y	+faccessat2.test -a28 -y
+faccessat2-yy	+faccessat2.test -a28 -yy
 fadvise64_64	+fadvise64.test
 fallocate	-a18
 fanotify_init

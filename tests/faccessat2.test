@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Check decoding of faccessat2 syscall.
+#
+# Copyright (c) 2020 Dmitry V. Levin <ldv@altlinux.org>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog sed
+
+run_prog > /dev/null
+run_strace -a27 --trace=faccessat2 "$@" $args > "$EXP"
+
+# Filter out faccessat2() calls made by ld.so and libc.
+sed -n '/^faccessat2(-1, NULL,/,$p' < "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"

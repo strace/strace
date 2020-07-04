@@ -97,6 +97,10 @@ faccessat
 faccessat-P
 faccessat-y
 faccessat-yy
+faccessat2
+faccessat2-P
+faccessat2-y
+faccessat2-yy
 fadvise64
 fadvise64_64
 fallocate

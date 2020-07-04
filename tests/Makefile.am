@@ -302,6 +302,7 @@ DECODER_TESTS = \
 	execve.test \
 	fadvise64.test \
 	faccessat.test \
+	faccessat2.test \
 	futex.test \
 	getuid.test \
 	int_0x80.test \
