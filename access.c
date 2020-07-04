@@ -9,14 +9,14 @@
 
 #include <fcntl.h>
 
-#include "xlat/access_flags.h"
+#include "xlat/access_modes.h"
 
 static int
 decode_access(struct tcb *tcp, int offset)
 {
 	printpath(tcp, tcp->u_arg[offset]);
 	tprints(", ");
-	printflags(access_flags, tcp->u_arg[offset + 1], "?_OK");
+	printflags(access_modes, tcp->u_arg[offset + 1], "?_OK");
 
 	return RVAL_DECODED;
 }
