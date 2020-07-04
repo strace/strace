@@ -73,7 +73,9 @@ epoll_wait	-a26
 erestartsys	-a34 -e signal=none -e trace=recvfrom
 execveat
 execveat-v	-v -e trace=execveat
-faccessat	-P $NAME.sample
+faccessat-P	-a23 --trace=faccessat -P /dev/full
+faccessat-y	+faccessat.test -a24 -y
+faccessat-yy	+faccessat.test -a24 -yy
 fadvise64_64	+fadvise64.test
 fallocate	-a18
 fanotify_init

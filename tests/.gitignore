@@ -94,6 +94,9 @@ execve-v
 execveat
 execveat-v
 faccessat
+faccessat-P
+faccessat-y
+faccessat-yy
 fadvise64
 fadvise64_64
 fallocate

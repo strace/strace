@@ -61,6 +61,9 @@ eventfd
 execve
 execveat
 faccessat
+faccessat-P
+faccessat-y
+faccessat-yy
 fadvise64
 fadvise64_64
 fallocate
