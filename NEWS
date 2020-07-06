@@ -12,6 +12,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of AUDIT_*, BPF_*, CAP_*, ETH_*, INET_DIAG_*, IORING_*,
     KEYCTL_*, KVM_*, LOOP_*, NDA_*, RTC_*, TCA_*, STATX_*, and *_MAGIC
     constants.
+  * Updated lists of ioctl commands from Linux 5.8.
 
 * Bug fixes
   * Added statx syscall to %fstat trace class.

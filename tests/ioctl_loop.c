@@ -178,12 +178,12 @@ main(void)
 	       _IOC_SIZE((unsigned int) unknown_loop_cmd),
 	       (unsigned long) magic);
 
-	sys_ioctl(-1, LOOP_SET_BLOCK_SIZE + 1, magic);
+	sys_ioctl(-1, LOOP_CONFIGURE + 1, magic);
 	printf("ioctl(-1, _IOC(%s, 0x4c, %#x, %#x), %#lx) = "
 	       "-1 EBADF (%m)\n",
 	       _IOC_NONE ? "0" : "_IOC_NONE",
-	       _IOC_NR(LOOP_SET_BLOCK_SIZE + 1),
-	       _IOC_SIZE(LOOP_SET_BLOCK_SIZE + 1),
+	       _IOC_NR(LOOP_CONFIGURE + 1),
+	       _IOC_SIZE(LOOP_CONFIGURE + 1),
 	       (unsigned long) magic);
 
 	sys_ioctl(-1, LOOP_CTL_GET_FREE + 1, magic);

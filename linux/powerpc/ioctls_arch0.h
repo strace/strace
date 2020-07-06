@@ -89,6 +89,7 @@
 { "asm/ps3fb.h", "PS3FB_IOCTL_ON", _IOC_NONE, 0x7204, 0x00 },
 { "asm/ps3fb.h", "PS3FB_IOCTL_SCREENINFO", _IOC_READ, 0x7203, 0x04 },
 { "asm/ps3fb.h", "PS3FB_IOCTL_SETMODE", _IOC_WRITE, 0x7201, 0x04 },
+{ "asm/vas-api.h", "VAS_TX_WIN_OPEN", _IOC_WRITE, 0x7620, 0x40 },
 { "linux/kvm.h", "KVM_ALLOCATE_RMA", _IOC_READ, 0xaea9, 0x08 },
 { "linux/kvm.h", "KVM_ASSIGN_DEV_IRQ", _IOC_WRITE, 0xae70, 0x40 },
 { "linux/kvm.h", "KVM_ASSIGN_PCI_DEVICE", _IOC_READ, 0xae69, 0x40 },
