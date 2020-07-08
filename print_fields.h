@@ -9,6 +9,8 @@
 #ifndef STRACE_PRINT_FIELDS_H
 # define STRACE_PRINT_FIELDS_H
 
+# include "static_assert.h"
+
 /*
  * The printf-like function to use in header files
  * shared between strace and its tests.
@@ -50,10 +52,28 @@
 		      (int) sizeof((where_).field_) * 2,		\
 		      zero_extend_signed_to_ull((where_).field_))
 
+# define PRINT_FIELD_UINT_ARRAY(prefix_, where_, field_, fmt_)			\
+	do {									\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		for (size_t i_ = 0; i_ < ARRAY_SIZE((where_).field_); ++i_)	\
+			STRACE_PRINTF("%s" fmt_, (i_ ? ", " : "["),		\
+				zero_extend_signed_to_ull((where_).field_[i_]));\
+		STRACE_PRINTF("]");						\
+	} while (0)
+
+# define PRINT_FIELD_U_ARRAY(prefix_, where_, field_)			\
+	PRINT_FIELD_UINT_ARRAY((prefix_), (where_), field_, "%llu")
+
+# define PRINT_FIELD_X_ARRAY(prefix_, where_, field_)			\
+	PRINT_FIELD_UINT_ARRAY((prefix_), (where_), field_, "%#llx")
+
+
 # define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
-	STRACE_PRINTF("%s%s=[%llu, %llu]", (prefix_), #field_,		\
-		      zero_extend_signed_to_ull((where_).field_[0]),	\
-		      zero_extend_signed_to_ull((where_).field_[1]))
+	do {								\
+		static_assert(ARRAY_SIZE((where_).field_) == 2,		\
+			      "unexpected array size");			\
+		PRINT_FIELD_U_ARRAY((prefix_), (where_), field_);	\
+	} while (0)
 
 # define PRINT_FIELD_FLAGS(prefix_, where_, field_, xlat_, dflt_)	\
 	do {								\
