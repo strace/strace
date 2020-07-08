@@ -22,6 +22,12 @@
 #include <linux/loop.h>
 #include "print_fields.h"
 
+#ifdef HAVE_STRUCT_LOOP_CONFIG
+typedef struct loop_config struct_loop_config;
+#else
+# include "types/loop.h"
+#endif
+
 #define XLAT_MACROS_ONLY
 #include "xlat/loop_cmds.h"
 #undef XLAT_MACROS_ONLY
@@ -155,6 +161,27 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 #endif /* !ABBREV */
 }
 
+static void
+print_loop_config(struct_loop_config *config, bool print_reserved)
+{
+#if ABBREV
+	printf("%p", config);
+#else
+	printf("{fd=%d, block_size=%u, info=",
+	       (int) config->fd, config->block_size);
+	print_loop_info64(&config->info, false, "LO_CRYPT_NONE", NULL,
+			  "LO_FLAGS_READ_ONLY");
+	if (print_reserved) {
+		printf(", __reserved=");
+		for (size_t i = 0; i < ARRAY_SIZE(config->__reserved); ++i)
+			printf("%s%#llx", (i ? ", " : "["),
+			       (unsigned long long) config->__reserved[i]);
+		printf("]");
+	}
+	printf("}");
+#endif /* !ABBREV */
+}
+
 int
 main(void)
 {
@@ -167,6 +194,7 @@ main(void)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info, info);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info64, info64);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_loop_config, config);
 
 	/* Unknown loop commands */
 	sys_ioctl(-1, unknown_loop_cmd, magic);
@@ -280,6 +308,32 @@ main(void)
 
 	ioctl(-1, LOOP_GET_STATUS64, (unsigned long) info64 | kernel_mask);
 	printf("ioctl(-1, LOOP_GET_STATUS64, %p) = -1 EBADF (%m)\n", info64);
+
+	/* LOOP_CONFIGURE */
+	ioctl(-1, LOOP_CONFIGURE, NULL);
+	printf("ioctl(-1, LOOP_CONFIGURE, NULL) = -1 EBADF (%m)\n");
+
+	fill_memory(config, sizeof(*config));
+	config->info.lo_flags = LO_FLAGS_READ_ONLY;
+	config->info.lo_encrypt_type = LO_CRYPT_NONE;
+	memset(config->info.lo_file_name, 'C', sizeof(config->info.lo_file_name));
+	memset(config->info.lo_crypt_name, 'D', sizeof(config->info.lo_crypt_name));
+	memset(config->info.lo_encrypt_key, 'E', sizeof(config->info.lo_encrypt_key));
+
+	ioctl(-1, LOOP_CONFIGURE, (void *) config + ALIGNOF(config));
+	printf("ioctl(-1, LOOP_CONFIGURE, %p) = -1 EBADF (%m)\n",
+	       (void *) config + ALIGNOF(config));
+
+	printf("ioctl(-1, LOOP_CONFIGURE, ");
+	print_loop_config(config, true);
+	ioctl(-1, LOOP_CONFIGURE, config);
+	printf(") = -1 EBADF (%m)\n");
+
+	memset(config->__reserved, 0, sizeof(config->__reserved));
+	printf("ioctl(-1, LOOP_CONFIGURE, ");
+	print_loop_config(config, false);
+	ioctl(-1, LOOP_CONFIGURE, config);
+	printf(") = -1 EBADF (%m)\n");
 
 	/* LOOP_CHANGE_FD */
 	sys_ioctl(-1, LOOP_CHANGE_FD, magic);

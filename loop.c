@@ -7,8 +7,7 @@
  */
 
 #include "defs.h"
-#include <linux/ioctl.h>
-#include <linux/loop.h>
+#include "types/loop.h"
 
 typedef struct loop_info struct_loop_info;
 
@@ -128,6 +127,28 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 		print_loop_info64(tcp, &info64);
 }
 
+static void
+decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	struct_loop_config config;
+
+	tprints(", ");
+	if (umove_or_printaddr(tcp, addr, &config))
+		return;
+
+	PRINT_FIELD_FD("{", config, fd, tcp);
+
+	PRINT_FIELD_U(", ", config, block_size);
+
+	tprints(", info=");
+	print_loop_info64(tcp, &config.info);
+
+	if (!IS_ARRAY_ZERO(config.__reserved))
+		PRINT_FIELD_X_ARRAY(", ", config, __reserved);
+
+	tprints("}");
+}
+
 MPERS_PRINTER_DECL(int, loop_ioctl,
 		   struct tcb *tcp, const unsigned int code,
 		   const kernel_ulong_t arg)
@@ -147,6 +168,10 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS64:
 		decode_loop_info64(tcp, arg);
+		break;
+
+	case LOOP_CONFIGURE:
+		decode_loop_config(tcp, arg);
 		break;
 
 	case LOOP_CLR_FD:
