@@ -104,14 +104,7 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 	PRINT_FIELD_U(", ", *sregs, cr8);
 	PRINT_FIELD_U(", ", *sregs, efer);
 	PRINT_FIELD_X(", ", *sregs, apic_base);
-	tprints(", interrupt_bitmap=[");
-
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(sregs->interrupt_bitmap); i++) {
-		if (i != 0)
-			tprints(", ");
-		tprintf("%#" PRI__x64, sregs->interrupt_bitmap[i]);
-	}
-	tprints("]}");
+	PRINT_FIELD_X_ARRAY(", ", *sregs, interrupt_bitmap);
+	tprints("}");
 }
 #endif	/* HAVE_STRUCT_KVM_SREGS */
