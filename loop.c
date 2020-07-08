@@ -77,51 +77,55 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 }
 
 static void
+print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
+{
+	if (!abbrev(tcp)) {
+		PRINT_FIELD_DEV("{", *info64, lo_device);
+		PRINT_FIELD_U(", ", *info64, lo_inode);
+		PRINT_FIELD_DEV(", ", *info64, lo_rdevice);
+		PRINT_FIELD_X(", ", *info64, lo_offset);
+		PRINT_FIELD_U(", ", *info64, lo_sizelimit);
+		PRINT_FIELD_U(", ", *info64, lo_number);
+	} else {
+		PRINT_FIELD_X("{", *info64, lo_offset);
+		PRINT_FIELD_U(", ", *info64, lo_number);
+	}
+
+	if (!abbrev(tcp) || info64->lo_encrypt_type != LO_CRYPT_NONE) {
+		PRINT_FIELD_XVAL(", ", *info64, lo_encrypt_type,
+				 loop_crypt_type_options, "LO_CRYPT_???");
+		PRINT_FIELD_U(", ", *info64, lo_encrypt_key_size);
+	}
+
+	PRINT_FIELD_FLAGS(", ", *info64, lo_flags,
+			  loop_flags_options, "LO_FLAGS_???");
+
+	PRINT_FIELD_CSTRING(", ", *info64, lo_file_name);
+
+	if (!abbrev(tcp) || info64->lo_encrypt_type != LO_CRYPT_NONE) {
+		PRINT_FIELD_CSTRING(", ", *info64, lo_crypt_name);
+		const unsigned int lo_encrypt_key_size =
+			MIN((unsigned) info64->lo_encrypt_key_size, LO_KEY_SIZE);
+		PRINT_FIELD_STRING(", ", *info64, lo_encrypt_key,
+					  lo_encrypt_key_size, 0);
+	}
+
+	if (!abbrev(tcp))
+		PRINT_FIELD_X_ARRAY(", ", *info64, lo_init);
+	else
+		tprints(", ...");
+
+	tprints("}");
+}
+
+static void
 decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct loop_info64 info64;
 
 	tprints(", ");
-	if (umove_or_printaddr(tcp, addr, &info64))
-		return;
-
-	if (!abbrev(tcp)) {
-		PRINT_FIELD_DEV("{", info64, lo_device);
-		PRINT_FIELD_U(", ", info64, lo_inode);
-		PRINT_FIELD_DEV(", ", info64, lo_rdevice);
-		PRINT_FIELD_X(", ", info64, lo_offset);
-		PRINT_FIELD_U(", ", info64, lo_sizelimit);
-		PRINT_FIELD_U(", ", info64, lo_number);
-	} else {
-		PRINT_FIELD_X("{", info64, lo_offset);
-		PRINT_FIELD_U(", ", info64, lo_number);
-	}
-
-	if (!abbrev(tcp) || info64.lo_encrypt_type != LO_CRYPT_NONE) {
-		PRINT_FIELD_XVAL(", ", info64, lo_encrypt_type,
-				 loop_crypt_type_options, "LO_CRYPT_???");
-		PRINT_FIELD_U(", ", info64, lo_encrypt_key_size);
-	}
-
-	PRINT_FIELD_FLAGS(", ", info64, lo_flags,
-			  loop_flags_options, "LO_FLAGS_???");
-
-	PRINT_FIELD_CSTRING(", ", info64, lo_file_name);
-
-	if (!abbrev(tcp) || info64.lo_encrypt_type != LO_CRYPT_NONE) {
-		PRINT_FIELD_CSTRING(", ", info64, lo_crypt_name);
-		const unsigned int lo_encrypt_key_size =
-			MIN((unsigned) info64.lo_encrypt_key_size, LO_KEY_SIZE);
-		PRINT_FIELD_STRING(", ", info64, lo_encrypt_key,
-					  lo_encrypt_key_size, 0);
-	}
-
-	if (!abbrev(tcp))
-		PRINT_FIELD_X_ARRAY(", ", info64, lo_init);
-	else
-		tprints(", ...");
-
-	tprints("}");
+	if (!umove_or_printaddr(tcp, addr, &info64))
+		print_loop_info64(tcp, &info64);
 }
 
 MPERS_PRINTER_DECL(int, loop_ioctl,
