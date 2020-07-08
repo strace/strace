@@ -223,7 +223,7 @@ main(void)
 	for (i = 0; i < ARRAY_SIZE(ike->scancode); ++i) {
 		if (i > 0)
 			printf(", ");
-		printf("%" PRIx8, ike->scancode[i]);
+		printf("%#" PRIx8, ike->scancode[i]);
 	}
 	printf("]");
 #  else
