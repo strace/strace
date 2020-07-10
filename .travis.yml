@@ -52,3 +52,25 @@ matrix:
         - TARGET=aarch64
         - SLEEP_A_BIT="sleep 0.5"
         - STACKTRACE=no
+    - compiler: gcc
+      arch: ppc64le
+      env:
+        - TARGET=ppc64le
+        - STACKTRACE=libdw
+    - compiler: gcc
+      arch: s390x
+      env:
+        - TARGET=s390x
+        - STACKTRACE=libdw
+    - compiler: gcc-10
+      arch: ppc64le
+      env:
+        - TARGET=ppc64le
+        - STACKTRACE=no
+        - KHEADERS=torvalds/linux
+    - compiler: gcc-10
+      arch: s390x
+      env:
+        - TARGET=s390x
+        - STACKTRACE=no
+        - KHEADERS=torvalds/linux
