@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "pidns.h"
 
 #ifdef __NR_pidfd_open
 
@@ -37,6 +38,8 @@ k_pidfd_open(const unsigned int pid, const unsigned int flags)
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 # if defined PATH_TRACING || defined PRINT_PATHS
 	skip_if_unavailable("/proc/self/fd/");
 # endif
@@ -50,16 +53,19 @@ main(void)
 
 	k_pidfd_open(0, 0);
 # ifndef PATH_TRACING
+	pidns_print_leader();
 	printf("pidfd_open(0, 0) = %s\n", errstr);
 # endif
 
 	k_pidfd_open(-1U, 0);
 # ifndef PATH_TRACING
+	pidns_print_leader();
 	printf("pidfd_open(-1, 0) = %s\n", errstr);
 # endif
 
 	k_pidfd_open(0, -1U);
 # ifndef PATH_TRACING
+	pidns_print_leader();
 	printf("pidfd_open(0, %#x) = %s\n", -1U, errstr);
 # endif
 
@@ -68,7 +74,10 @@ main(void)
 
 	k_pidfd_open(pid, flags);
 # ifndef PATH_TRACING
-	printf("pidfd_open(%d, %#x) = %s\n", pid, flags, errstr);
+	const char *pid_str = pidns_pid2str(PT_TGID);
+	pidns_print_leader();
+	printf("pidfd_open(%d%s, %#x) = %s\n",
+		pid, pid_str, flags, errstr);
 # endif
 
 # ifdef PRINT_PATHS
@@ -80,17 +89,19 @@ main(void)
 # endif
 
 # ifndef PATH_TRACING
-	printf("pidfd_open(%d, 0) = "
+	pidns_print_leader();
+	printf("pidfd_open(%d%s, 0) = "
 #  if defined PRINT_PIDFD
-	       "%ld<pid:%d>\n", pid, rc, pid
+	       "%ld<pid:%d>\n", pid, pid_str, rc, pid
 #  elif defined PRINT_PATHS
-	       "%ld<anon_inode:[pidfd]>\n", pid, rc
+	       "%ld<anon_inode:[pidfd]>\n", pid, pid_str, rc
 #  else
-	       "%s\n", pid, errstr
+	       "%s\n", pid, pid_str, errstr
 #  endif
 	       );
 # endif
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 	return 0;
 }

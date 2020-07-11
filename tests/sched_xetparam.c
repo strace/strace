@@ -7,6 +7,7 @@
 
 #include "tests.h"
 #include "scno.h"
+# include "pidns.h"
 
 #if defined __NR_sched_getparam && defined __NR_sched_setparam
 
@@ -17,18 +18,27 @@
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	struct sched_param *const param =
 		tail_alloc(sizeof(struct sched_param));
 
-	long rc = syscall(__NR_sched_getparam, 0, param);
-	printf("sched_getparam(0, [%d]) = %ld\n",
-	       param->sched_priority, rc);
+	const int pid = getpid();
+	const char *pid_str = pidns_pid2str(PT_TGID);
+
+	long rc = syscall(__NR_sched_getparam, pid, param);
+	pidns_print_leader();
+	printf("sched_getparam(%d%s, [%d]) = %ld\n",
+	       pid, pid_str, param->sched_priority, rc);
 
 	param->sched_priority = -1;
-	rc = syscall(__NR_sched_setparam, 0, param);
-	printf("sched_setparam(0, [%d]) = %ld %s (%m)\n",
+	rc = syscall(__NR_sched_setparam, pid, param);
+	pidns_print_leader();
+	printf("sched_setparam(%d%s, [%d]) = %ld %s (%m)\n",
+	       pid, pid_str,
 	       param->sched_priority, rc, errno2name());
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 	return 0;
 }

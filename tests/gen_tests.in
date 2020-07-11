@@ -93,7 +93,9 @@ fchown	-a16
 fchown32	-a18
 fchownat
 fcntl	-a8
+fcntl--pidns-translation	test_pidns -a8 -e trace=fcntl
 fcntl64	-a8
+fcntl64--pidns-translation	test_pidns -a8 -e trace=fcntl64
 fdatasync	-a14
 file_handle	-e trace=name_to_handle_at,open_by_handle_at
 file_ioctl	+ioctl.test
@@ -147,7 +149,9 @@ getgroups	-a17
 getgroups32	-a19
 getpeername	-a27
 getpgrp	-a10
+getpgrp--pidns-translation	test_pidns -e trace=getpgrp -a10
 getpid	-a9
+getpid--pidns-translation	test_pidns -e trace=getpid -a9
 getppid	-a10
 getrandom	-a32 -s3
 getresgid	-a25
@@ -157,6 +161,7 @@ getresuid32	-a27
 getrlimit	-a27
 getrusage	-v
 getsid	-a10
+getsid--pidns-translation	test_pidns -e trace=getsid -a10
 getsockname	-a27
 gettid	-a9
 getuid-creds	+getuid.test
@@ -250,6 +255,7 @@ ioctl_watchdog	+ioctl.test
 ioperm	-a27
 iopl	-a8
 ioprio	-a18 -e trace=ioprio_get,ioprio_set
+ioprio--pidns-translation	test_pidns -a18 -e trace=ioprio_get,ioprio_set
 ioprio-Xabbrev	-a18 -e trace=ioprio_get,ioprio_set -Xabbrev
 ioprio-Xraw	-a18 -e trace=ioprio_get,ioprio_set -Xraw
 ioprio-Xverbose	-a18 -e trace=ioprio_get,ioprio_set -Xverbose
@@ -272,6 +278,7 @@ ipc_shm-Xraw	+ipc.sh -Xraw -a19
 ipc_shm-Xverbose	+ipc.sh -Xverbose -a34
 kcmp	-a22
 kcmp-y	-a22 -y -e trace=kcmp
+kcmp-y--pidns-translation	test_pidns -a22 -y -e trace=kcmp
 kern_features -a16
 kernel_version	-a16 -v -e trace=bpf
 kernel_version-Xabbrev	-a16 -Xabbrev -v -e trace=bpf
@@ -284,6 +291,7 @@ keyctl-Xabbrev	-a31 -s10 -e trace=keyctl -Xabbrev
 keyctl-Xraw	-a13 -s10 -e trace=keyctl -Xraw
 keyctl-Xverbose	-a41 -s10 -e trace=keyctl -Xverbose
 kill	-a12 -esignal=none
+kill--pidns-translation	test_pidns -a12 -e trace=kill -esignal=none
 ksysent	../$NAME
 lchown	-a30
 lchown32	-a32
@@ -305,6 +313,7 @@ memfd_create-Xabbrev	-Xabbrev -e trace=memfd_create
 memfd_create-Xraw	-a30 -Xraw -e trace=memfd_create
 memfd_create-Xverbose	-Xverbose -e trace=memfd_create
 migrate_pages	-a33
+migrate_pages--pidns-translation	test_pidns -a33 -e trace=migrate_pages
 mincore	-a22
 mkdir	-a20
 mkdirat	-a28
@@ -335,6 +344,7 @@ move_pages	-s3
 move_pages-Xabbrev	-s3 -e trace=move_pages -Xabbrev
 move_pages-Xraw	-s3 -a36 -e trace=move_pages -Xraw
 move_pages-Xverbose	-s3 -e trace=move_pages -Xverbose
+move_pages--pidns-translation	test_pidns -s3 -e trace=move_pages
 mq	-a32 -e trace=mq_getsetattr,mq_open,mq_unlink
 mq_sendrecv	-a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
 mq_sendrecv-read	-eread=0 -a14 -e trace=mq_open,mq_notify,mq_timedsend,mq_timedreceive,mq_unlink
@@ -354,6 +364,7 @@ net-packet_mreq-Xabbrev	-e trace=setsockopt -Xabbrev
 net-packet_mreq-Xraw	-e trace=setsockopt -Xraw
 net-packet_mreq-Xverbose	-e trace=setsockopt -Xverbose
 net-sockaddr	-a24 -e trace=connect
+net-sockaddr--pidns-translation	test_pidns -a24 -e trace=connect
 net-tpacket_req -e trace=setsockopt
 net-tpacket_stats -e trace=getsockopt
 net-yy-inet6	+net-yy-inet.test
@@ -457,7 +468,9 @@ pidfd_open--decode-fd-socket	-a17 -e decode-fd=socket -e trace=pidfd_open
 pidfd_open-P	-a17 -P /dev/full -e trace=pidfd_open
 pidfd_open-y	-a17 -y -e trace=pidfd_open
 pidfd_open-yy	-a17 -yy -e trace=pidfd_open
+pidfd_open--pidns-translation	test_pidns -a17 -e trace=pidfd_open
 pidfd_send_signal
+pidfd_send_signal--pidns-translation test_pidns -e trace=pidfd_send_signal
 pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
@@ -480,8 +493,11 @@ printstrn-umoven	-s4096 -e signal=none -e trace=add_key
 printstrn-umoven-peekdata	-e signal=none -e trace=add_key
 printstrn-umoven-undumpable	-e signal=none -e trace=add_key
 prlimit64
+prlimit64--pidns-translation     test_pidns -e trace=prlimit64
 process_vm_readv	-s5 -a37
+process_vm_readv--pidns-translation	test_pidns -s5 -a37 -e trace=process_vm_readv
 process_vm_writev	-s5 -a38
+process_vm_writev--pidns-translation	test_pidns -s5 -a38 -e trace=process_vm_writev
 pselect6
 ptrace	-a23 -e signal=none
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
@@ -518,10 +534,12 @@ rmdir	-a22
 rt_sigpending	-a20
 rt_sigprocmask
 rt_sigqueueinfo	-esignal=none
+rt_sigqueueinfo--pidns-translation	test_pidns -esignal=none -e trace=rt_sigqueueinfo
 rt_sigreturn	-esignal='!USR1'
 rt_sigsuspend	-a20 -esignal=none
 rt_sigtimedwait	-a38
 rt_tgsigqueueinfo	-esignal=none
+rt_tgsigqueueinfo--pidns-translation	test_pidns -esignal=none -e trace=rt_tgsigqueueinfo
 s390_guarded_storage	-a32
 s390_guarded_storage-v	-e trace=s390_guarded_storage -a32 -v
 s390_pci_mmio_read_write	-e trace=s390_pci_mmio_read,s390_pci_mmio_write -a30
@@ -532,9 +550,13 @@ sched	test_trace_expr times -e/sched
 sched_get_priority_mxx	-a33 -e trace=sched_get_priority_min,sched_get_priority_max
 sched_rr_get_interval	-a31
 sched_xetaffinity	-a28 -e trace=sched_getaffinity,sched_setaffinity
+sched_xetaffinity--pidns-translation	test_pidns -a28 -e trace=sched_getaffinity,sched_setaffinity
 sched_xetattr	-a29 -e trace=sched_getattr,sched_setattr
+sched_xetattr--pidns-translation	test_pidns -a29 -e trace=sched_getattr,sched_setattr
 sched_xetparam	-a23 -e trace=sched_getparam,sched_setparam
+sched_xetparam--pidns-translation	test_pidns -a23 -e trace=sched_getparam,sched_setparam
 sched_xetscheduler	-a22 -e trace=sched_getscheduler,sched_setscheduler
+sched_xetscheduler--pidns-translation	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler
 sched_yield	-a14
 seccomp-filter	-e trace=seccomp
 seccomp-filter-v	-v -e trace=seccomp
@@ -581,6 +603,7 @@ sigaction	-a31
 siginfo	-e trace=none
 signal	-a25 -e signal=none -e trace='/^signal$'
 signal_receive	-a16 -e trace=kill
+signal_receive--pidns-translation	test_pidns -a16 -e trace=kill
 signalfd4
 sigpending	-a15
 sigprocmask	-a34
@@ -592,6 +615,7 @@ so_peercred	-e trace=getsockopt
 so_peercred-Xabbrev	-e trace=getsockopt -Xabbrev
 so_peercred-Xraw	-e trace=getsockopt -Xraw -a39
 so_peercred-Xverbose	-e trace=getsockopt -Xverbose
+so_peercred--pidns-translation	test_pidns -e trace=getsockopt
 sock_filter-v	-v -e trace=getsockopt,setsockopt
 sock_filter-v-Xabbrev	-v -e trace=getsockopt,setsockopt -X abbrev
 sock_filter-v-Xraw	-a 37 -v -e trace=getsockopt,setsockopt -X raw
@@ -665,6 +689,7 @@ sysinfo	-a14
 syslog	-a35
 tee
 tgkill	-a15 --signal='!cont'
+tgkill--pidns-translation       test_pidns -a15 --signal='!cont' -e trace=tgkill
 threads-execve--quiet-thread-execve +threads-execve.test -s40 --quiet=personality,thread-execve
 threads-execve-q +threads-execve.test -q
 threads-execve-qq +threads-execve.test -qq
@@ -676,6 +701,7 @@ timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
 times	-esignal=none
 times-fail	-a12 -e trace=times
 tkill	-a12 --signal='!cont'
+tkill--pidns-translation       test_pidns --signal='!cont' -a12 -e trace=tkill
 trace_clock	test_trace_expr 'clock_nanosleep|times' -e%clock
 trace_creds	test_trace_expr '([gs]et[^p]*([gu]id|groups)|caps|prctl|[fl]?chown|print(path-umovestr|strn-umoven)-undumpable|ptrace|quotactl|rt_sigtimedwait|rt_(tg)?sigqueueinfo).*' -e%creds
 trace_fstat	test_trace_expr '' -e%fstat -v -P stat.sample -P /dev/full
@@ -692,6 +718,7 @@ trace_stat	test_trace_expr '' -e%stat -v -P stat.sample -P /dev/full
 trace_stat_like	test_trace_expr '' -e%%stat -v -P stat.sample -P /dev/full
 trace_statfs	test_trace_expr '' -e%statfs
 trace_statfs_like	test_trace_expr '' -e%%statfs
+trie_test    run_prog
 truncate
 truncate64
 ugetrlimit	-a28
@@ -722,7 +749,10 @@ waitpid	-a28
 xattr	-a22 -e trace=getxattr,fgetxattr,lgetxattr,setxattr,fsetxattr,lsetxattr,listxattr,flistxattr,llistxattr,removexattr,fremovexattr,lremovexattr
 xattr-strings	-a22 -s 4 -e trace=fsetxattr
 xet_robust_list	-a24 -e trace=get_robust_list,set_robust_list
+xet_robust_list--pidns-translation	test_pidns -a24 -e trace=get_robust_list,set_robust_list
 xetitimer	-a29 -e trace=setitimer,getitimer
 xetpgid	-a11 -e trace=getpgid,setpgid
-xetpriority	-a29 -e trace=getpriority,setpriority
+xetpgid--pidns-translation	test_pidns -a11 -e trace=getpgid,setpgid
+xetpriority	-a27 -e trace=getpriority,setpriority
+xetpriority--pidns-translation	test_pidns -a27 -e trace=getpriority,setpriority
 xettimeofday	-a20 -e trace=gettimeofday,settimeofday

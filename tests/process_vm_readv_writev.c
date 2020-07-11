@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/uio.h>
+#include "pidns.h"
 
 #if OP_WR
 # define in_iovec  rmt_iovec
@@ -121,7 +122,7 @@ print_iov(const struct iovec *iov, const void *arg_ptr, long rc)
 }
 
 static void
-do_call(kernel_ulong_t pid,
+do_call(kernel_ulong_t pid, enum pid_type pid_type,
 	kernel_ulong_t local_iov, const char *local_arg,
 	kernel_ulong_t liovcnt,
 	kernel_ulong_t remote_iov, const char *remote_arg,
@@ -135,7 +136,8 @@ do_call(kernel_ulong_t pid,
 		flags);
 	errstr = sprintrc(rc);
 
-	printf("%s(%d, ", OP_STR, (int) pid);
+	pidns_print_leader();
+	printf("%s(%d%s, ", OP_STR, (int) pid, pidns_pid2str(pid_type));
 
 	if (pr_iov)
 		pr_iov((const struct iovec *) (uintptr_t) local_iov, local_arg,
@@ -164,6 +166,8 @@ ptr_cast(void *ptr)
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	enum {
 		SIZE_11 = 2,
 		SIZE_12 = 3,
@@ -243,18 +247,18 @@ main(void)
 	fill_memory_ex(data2_out, SIZE_2, SEGM2_BASE, SIZE_2);
 
 
-	do_call(bogus_pid, (kernel_ulong_t) (uintptr_t) ARG_STR(NULL),
+	do_call(bogus_pid, PT_NONE, (kernel_ulong_t) (uintptr_t) ARG_STR(NULL),
 		bogus_iovcnt1, (kernel_ulong_t) (uintptr_t) ARG_STR(NULL),
 		bogus_iovcnt2, bogus_flags, NULL);
 
-	do_call(my_pid, ptr_cast(bogus_iov + ARRAY_SIZE(bogus_iovec)),
+	do_call(my_pid, PT_TGID, ptr_cast(bogus_iov + ARRAY_SIZE(bogus_iovec)),
 		"[]", 0, ptr_cast(in_iov + ARRAY_SIZE(in_iovec)), "[]",
 		0, 0, NULL);
-	do_call(my_pid, ptr_cast(bogus_iov + ARRAY_SIZE(bogus_iovec)), NULL,
-		bogus_iovcnt1, ptr_cast(in_iov + ARRAY_SIZE(in_iovec)), NULL,
-		bogus_iovcnt2, 0, print_iov);
+	do_call(my_pid, PT_TGID, ptr_cast(bogus_iov + ARRAY_SIZE(bogus_iovec)),
+		NULL, bogus_iovcnt1, ptr_cast(in_iov + ARRAY_SIZE(in_iovec)),
+		NULL, bogus_iovcnt2, 0, print_iov);
 
-	do_call(my_pid, ptr_cast(bogus_iov), (char *) &bogus_arg,
+	do_call(my_pid, PT_TGID, ptr_cast(bogus_iov), (char *) &bogus_arg,
 		ARRAY_SIZE(bogus_iovec), ptr_cast(rmt_iov + 2),
 		(char *) &rmt_arg_cut, ARRAY_SIZE(rmt_iovec) - 2, 0, print_iov);
 
@@ -263,7 +267,7 @@ main(void)
 	lcl_arg_cut.check_rc = 1;
 #endif
 
-	do_call(my_pid, ptr_cast(lcl_iov + 2), (char *) &lcl_arg_cut,
+	do_call(my_pid, PT_TGID, ptr_cast(lcl_iov + 2), (char *) &lcl_arg_cut,
 		ARRAY_SIZE(lcl_iovec) - 1, ptr_cast(bogus_iov + 2),
 		(char *) &bogus_arg_cut, ARRAY_SIZE(bogus_iovec) - 1, 0,
 		print_iov);
@@ -273,15 +277,16 @@ main(void)
 	rmt_arg_cut.addr_term = 1;
 	rmt_arg_cut.count = 5;
 
-	do_call(my_pid, ptr_cast(lcl_iov + 2), (char *) &lcl_arg_cut,
+	do_call(my_pid, PT_TGID, ptr_cast(lcl_iov + 2), (char *) &lcl_arg_cut,
 		ARRAY_SIZE(lcl_iovec) - 2, ptr_cast(rmt_iov + 1),
 		(char *) &rmt_arg_cut, ARRAY_SIZE(rmt_iovec), 0, print_iov);
 
 	/* Correct call */
-	do_call(my_pid, ptr_cast(lcl_iov), (char *) &lcl_arg,
+	do_call(my_pid, PT_TGID, ptr_cast(lcl_iov), (char *) &lcl_arg,
 		ARRAY_SIZE(lcl_iovec), ptr_cast(rmt_iov), (char *) &rmt_arg,
 		ARRAY_SIZE(rmt_iovec), 0, print_iov);
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 
 	return 0;

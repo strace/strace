@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Check pidns translation of ioctl(BLK*) syscall decoding.
+#
+# Copyright (c) 2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog head
+check_prog tail
+check_prog cut
+check_prog grep
+
+run_prog > /dev/null
+run_strace --pidns-translation -f -a16 -e trace=ioctl $@ $args > "$EXP"
+parent_pid="$(tail -n 2 $LOG | head -n 1 | cut -d' ' -f1)"
+init_pid="$(tail -n 1 $LOG | cut -d' ' -f1)"
+grep -E -v "^($parent_pid|$init_pid) |ioctl\([0123][,<]" "$LOG" > "$OUT"
+match_diff "$OUT" "$EXP"

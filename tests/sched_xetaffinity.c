@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "pidns.h"
 #include <sched.h>
 
 #if defined __NR_sched_getaffinity && defined __NR_sched_setaffinity \
@@ -41,8 +42,11 @@ setaffinity(unsigned long pid, unsigned long size, void *set)
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	unsigned int cpuset_size = 1;
 	const pid_t pid = getpid();
+	const char *pid_str = pidns_pid2str(PT_TGID);
 
 	while (cpuset_size) {
 		assert(getaffinity(pid, cpuset_size, NULL) == -1);
@@ -50,18 +54,21 @@ main(void)
 			break;
 		if (EINVAL != errno)
 			perror_msg_and_skip("sched_getaffinity");
-		printf("sched_getaffinity(%d, %u, NULL) = %s\n",
-		       pid, cpuset_size, errstr);
+		pidns_print_leader();
+		printf("sched_getaffinity(%d%s, %u, NULL) = %s\n",
+		       pid, pid_str, cpuset_size, errstr);
 		cpuset_size <<= 1;
 	}
 	assert(cpuset_size);
-	printf("sched_getaffinity(%d, %u, NULL) = %s\n",
-	       pid, cpuset_size, errstr);
+	pidns_print_leader();
+	printf("sched_getaffinity(%d%s, %u, NULL) = %s\n",
+	       pid, pid_str, cpuset_size, errstr);
 
 	cpu_set_t *cpuset = tail_alloc(cpuset_size);
 	getaffinity(pid, cpuset_size, cpuset + 1);
-	printf("sched_getaffinity(%d, %u, %p) = %s\n",
-	       pid, cpuset_size, cpuset + 1, errstr);
+	pidns_print_leader();
+	printf("sched_getaffinity(%d%s, %u, %p) = %s\n",
+	       pid, pid_str, cpuset_size, cpuset + 1, errstr);
 
 	int ret_size = getaffinity(pid, cpuset_size, cpuset);
 	if (ret_size < 0)
@@ -69,7 +76,8 @@ main(void)
 				    pid, (unsigned) cpuset_size, cpuset, errstr);
 	assert(ret_size <= (int) cpuset_size);
 
-	printf("sched_getaffinity(%d, %u, [", pid, cpuset_size);
+	pidns_print_leader();
+	printf("sched_getaffinity(%d%s, %u, [", pid, pid_str, cpuset_size);
 	const char *sep;
 	unsigned int i, cpu;
 	for (i = 0, cpu = 0, sep = ""; i < (unsigned) ret_size * 8; ++i) {
@@ -85,8 +93,9 @@ main(void)
 	CPU_SET_S(cpu, cpuset_size, cpuset);
 	if (setaffinity(pid, cpuset_size, cpuset))
 		perror_msg_and_skip("sched_setaffinity");
-	printf("sched_setaffinity(%d, %u, [%u]) = 0\n",
-	       pid, cpuset_size, cpu);
+	pidns_print_leader();
+	printf("sched_setaffinity(%d%s, %u, [%u]) = 0\n",
+	       pid, pid_str, cpuset_size, cpu);
 
 	const unsigned int big_size = cpuset_size < 128 ? 128 : cpuset_size * 2;
 	cpuset = tail_alloc(big_size);
@@ -95,7 +104,8 @@ main(void)
 		perror_msg_and_fail("sched_getaffinity(%d, %u, %p) = %s\n",
 				    pid, big_size, cpuset, errstr);
 	assert(ret_size <= (int) big_size);
-	printf("sched_getaffinity(%d, %u, [", pid, big_size);
+	pidns_print_leader();
+	printf("sched_getaffinity(%d%s, %u, [", pid, pid_str, big_size);
 	for (i = 0, sep = ""; i < (unsigned) ret_size * 8; ++i) {
 		if (CPU_ISSET_S(i, (unsigned) ret_size, cpuset)) {
 			printf("%s%u", sep, i);
@@ -104,6 +114,7 @@ main(void)
 	}
 	printf("]) = %s\n", errstr);
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 	return 0;
 }

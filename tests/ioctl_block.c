@@ -9,7 +9,9 @@
  */
 
 #include "tests.h"
+#include "pidns.h"
 #include <errno.h>
+#include <unistd.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,12 +43,15 @@ static struct xlat_data block_argless[] = {
 #define TEST_NULL_ARG(cmd)						\
 	do {								\
 		ioctl(-1, cmd, 0);					\
+		pidns_print_leader();					\
 		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd);	\
 	} while (0)
 
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	TEST_NULL_ARG(BLKBSZGET);
 	TEST_NULL_ARG(BLKBSZSET);
 	TEST_NULL_ARG(BLKFRAGET);
@@ -91,18 +96,22 @@ main(void)
 #endif
 
 	ioctl(-1, BLKRASET, lmagic);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKRASET, %lu) = -1 EBADF (%m)\n", lmagic);
 
 	ioctl(-1, BLKFRASET, lmagic);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKFRASET, %lu) = -1 EBADF (%m)\n", lmagic);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, val_int);
 	*val_int = magic;
 
 	ioctl(-1, BLKROSET, val_int);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKROSET, [%d]) = -1 EBADF (%m)\n", *val_int);
 
 	ioctl(-1, BLKBSZSET, val_int);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKBSZSET, [%d]) = -1 EBADF (%m)\n", *val_int);
 
 	uint64_t *pair_int64 = tail_alloc(sizeof(*pair_int64) * 2);
@@ -111,18 +120,21 @@ main(void)
 
 #ifdef BLKDISCARD
 	ioctl(-1, BLKDISCARD, pair_int64);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKDISCARD, [%" PRIu64 ", %" PRIu64 "])"
 	       " = -1 EBADF (%m)\n", pair_int64[0], pair_int64[1]);
 #endif
 
 #ifdef BLKSECDISCARD
 	ioctl(-1, BLKSECDISCARD, pair_int64);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKSECDISCARD, [%" PRIu64 ", %" PRIu64 "])"
 	       " = -1 EBADF (%m)\n", pair_int64[0], pair_int64[1]);
 #endif
 
 #ifdef BLKZEROOUT
 	ioctl(-1, BLKZEROOUT, pair_int64);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKZEROOUT, [%" PRIu64 ", %" PRIu64 "])"
 	       " = -1 EBADF (%m)\n", pair_int64[0], pair_int64[1]);
 #endif
@@ -134,6 +146,7 @@ main(void)
 	blkpg->data = (void *) (unsigned long) 0xcafef00dfffffeedULL;
 
 	ioctl(-1, BLKPG, blkpg);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKPG, {op=%s, flags=%d, datalen=%d"
 	       ", data=%#lx}) = -1 EBADF (%m)\n",
 	       "BLKPG_RESIZE_PARTITION", blkpg->flags, blkpg->datalen,
@@ -149,6 +162,7 @@ main(void)
 	blkpg->data = bp;
 
 	ioctl(-1, BLKPG, blkpg);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKPG, {op=%s, flags=%d, datalen=%d"
 	       ", data={start=%lld, length=%lld, pno=%d"
 	       ", devname=\"%.*s\"..., volname=\"%.*s\"...}})"
@@ -162,25 +176,31 @@ main(void)
 #if defined BLKTRACESETUP && defined HAVE_STRUCT_BLK_USER_TRACE_SETUP
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct blk_user_trace_setup, buts);
 	fill_memory(buts, sizeof(*buts));
+	buts->pid = getpid();
 
 	ioctl(-1, BLKTRACESETUP, buts);
+	pidns_print_leader();
 	printf("ioctl(-1, BLKTRACESETUP, {act_mask=%hu, buf_size=%u, buf_nr=%u"
-	       ", start_lba=%" PRI__u64 ", end_lba=%" PRI__u64 ", pid=%d})"
+	       ", start_lba=%" PRI__u64 ", end_lba=%" PRI__u64 ", pid=%d%s})"
 	       " = -1 EBADF (%m)\n",
 	       buts->act_mask, buts->buf_size, buts->buf_nr,
-	       buts->start_lba, buts->end_lba, buts->pid);
+	       buts->start_lba, buts->end_lba, buts->pid,
+	       pidns_pid2str(PT_TGID));
 #endif
 
 	unsigned int i;
 	for (i = 0; i < ARRAY_SIZE(block_argless); ++i) {
 		ioctl(-1, (unsigned long) block_argless[i].val, lmagic);
+		pidns_print_leader();
 		printf("ioctl(-1, %s) = -1 EBADF (%m)\n", block_argless[i].str);
 	}
 
 	ioctl(-1, _IOC(_IOC_READ, 0x12, 0xfe, 0xff), lmagic);
+	pidns_print_leader();
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
 	       "_IOC(_IOC_READ, 0x12, 0xfe, 0xff)", lmagic);
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 	return 0;
 }

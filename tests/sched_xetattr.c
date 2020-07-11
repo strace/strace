@@ -15,6 +15,7 @@
 # include <stdio.h>
 # include <sched.h>
 # include <unistd.h>
+# include "pidns.h"
 # include "sched_attr.h"
 # include "xlat.h"
 # include "xlat/schedulers.h"
@@ -41,6 +42,8 @@ sys_sched_setattr(kernel_ulong_t pid, kernel_ulong_t attr, kernel_ulong_t flags)
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	static const kernel_ulong_t bogus_pid =
 		(kernel_ulong_t) 0xdefacedfacefeedULL;
 	static const kernel_ulong_t bogus_size =
@@ -48,20 +51,28 @@ main(void)
 	static const kernel_ulong_t bogus_flags =
 		(kernel_ulong_t) 0xdefaceddeadc0deULL;
 
+	const int pid = getpid();
+	const char *pid_str = pidns_pid2str(PT_TGID);
+
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct sched_attr, attr);
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, psize);
 	void *const efault = attr + 1;
 
-	sys_sched_getattr(0, 0, 0, 0);
-	printf("sched_getattr(0, NULL, 0, 0) = %s\n", errstr);
+	sys_sched_getattr(pid, 0, 0, 0);
+	pidns_print_leader();
+	printf("sched_getattr(%d%s, NULL, 0, 0) = %s\n",
+		pid, pid_str, errstr);
 
 	sys_sched_getattr(0, (unsigned long) attr, 0, 0);
+	pidns_print_leader();
 	printf("sched_getattr(0, %p, 0, 0) = %s\n", attr, errstr);
 
 	sys_sched_getattr(bogus_pid, 0, 0, 0);
+	pidns_print_leader();
 	printf("sched_getattr(%d, NULL, 0, 0) = %s\n", (int) bogus_pid, errstr);
 
 	sys_sched_getattr(-1U, (unsigned long) attr, bogus_size, bogus_flags);
+	pidns_print_leader();
 	printf("sched_getattr(-1, %p, %s%u, %u) = %s\n",
 	       attr,
 # if defined __arm64__ || defined __aarch64__
@@ -72,11 +83,13 @@ main(void)
 	       (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
 
 	sys_sched_getattr(0, (unsigned long) efault, SCHED_ATTR_MIN_SIZE, 0);
+	pidns_print_leader();
 	printf("sched_getattr(0, %p, %u, 0) = %s\n",
 	       efault, (unsigned) SCHED_ATTR_MIN_SIZE, errstr);
 
 	if (sys_sched_getattr(0, (unsigned long) attr, SCHED_ATTR_MIN_SIZE, 0))
 		perror_msg_and_skip("sched_getattr");
+	pidns_print_leader();
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
@@ -91,11 +104,13 @@ main(void)
 	       (unsigned) SCHED_ATTR_MIN_SIZE);
 
 	sys_sched_getattr(0, (unsigned long) efault, sizeof(*attr), 0);
+	pidns_print_leader();
 	printf("sched_getattr(0, %p, %u, 0) = %s\n",
 	       efault, (unsigned) sizeof(*attr), errstr);
 
 	if (sys_sched_getattr(0, (unsigned long) attr, sizeof(*attr), 0))
 		perror_msg_and_skip("sched_getattr");
+	pidns_print_leader();
 	printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
@@ -121,11 +136,13 @@ main(void)
 			  F8ILL_KULONG_MASK | sizeof(*attr), F8ILL_KULONG_MASK);
 # if defined __arm64__ || defined __aarch64__
 	if (rc) {
+		pidns_print_leader();
 		printf("sched_getattr(0, %p, 0xffffffff<<32|%u, 0) = %s\n",
 		       attr, (unsigned) sizeof(*attr), errstr);
 	} else
 # endif
 	{
+		pidns_print_leader();
 		printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
 		printxval(schedulers, attr->sched_policy, NULL);
 		printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
@@ -146,13 +163,16 @@ main(void)
 	}
 
 	sys_sched_setattr(bogus_pid, 0, 0);
+	pidns_print_leader();
 	printf("sched_setattr(%d, NULL, 0) = %s\n", (int) bogus_pid, errstr);
 
 	attr->sched_flags |= 1;
 
-	if (sys_sched_setattr(0, (unsigned long) attr, 0))
+	if (sys_sched_setattr(pid, (unsigned long) attr, 0))
 		perror_msg_and_skip("sched_setattr");
-	printf("sched_setattr(0, {size=%u, sched_policy=", attr->size);
+	pidns_print_leader();
+	printf("sched_setattr(%d%s, {size=%u, sched_policy=",
+		pid, pid_str, attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
 	       ", sched_runtime=%" PRIu64 ", sched_deadline=%" PRIu64
@@ -172,6 +192,7 @@ main(void)
 
 	sys_sched_setattr(F8ILL_KULONG_MASK, (unsigned long) attr,
 			  F8ILL_KULONG_MASK);
+	pidns_print_leader();
 	printf("sched_setattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
@@ -193,11 +214,13 @@ main(void)
 	*psize = attr->size;
 
 	sys_sched_setattr(0, (unsigned long) psize, 0);
+	pidns_print_leader();
 	printf("sched_setattr(0, %p, 0) = %s\n", psize, errstr);
 
 	attr->size = 0;
 
 	sys_sched_setattr(0, (unsigned long) attr, 0);
+	pidns_print_leader();
 	printf("sched_setattr(0, {size=%u, sched_policy=", attr->size);
 	printxval(schedulers, attr->sched_policy, NULL);
 	printf(", sched_flags=%s, sched_nice=%d, sched_priority=%u"
@@ -213,12 +236,14 @@ main(void)
 	attr->size = 1;
 
 	sys_sched_setattr(0, (unsigned long) attr, 0);
+	pidns_print_leader();
 	printf("sched_setattr(0, {size=%u} => {size=%u}, 0) = %s\n",
 	       1, attr->size, errstr);
 
 	attr->size = SCHED_ATTR_MIN_SIZE - 1;
 
 	sys_sched_setattr(0, (unsigned long) attr, 0);
+	pidns_print_leader();
 	printf("sched_setattr(0, {size=%u} => {size=%u}, 0) = %s\n",
 	       SCHED_ATTR_MIN_SIZE - 1, attr->size, errstr);
 
@@ -232,6 +257,7 @@ main(void)
 	attr->sched_period = 0xded1ca7edda7aca7ULL;
 
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
 	       "sched_flags=%#" PRIx64 " /* SCHED_FLAG_??? */, "
 	       "sched_nice=%d, sched_priority=%u, sched_runtime=%" PRIu64 ", "
@@ -274,6 +300,7 @@ main(void)
 	attr->sched_period = 0xded1ca7edda7aca7ULL;
 
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|0x80, "
@@ -296,11 +323,13 @@ main(void)
 		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
 
 		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		pidns_print_leader();
 		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
 		       (unsigned long long) ill, (unsigned) sizeof(*attr),
 		       errstr);
 
 		sys_sched_setattr(0, ill, 0);
+		pidns_print_leader();
 		printf("sched_setattr(0, %#llx, 0) = %s\n",
 		       (unsigned long long) ill, errstr);
 	}
@@ -310,6 +339,7 @@ main(void)
 	attr->sched_flags = 0x8fULL;
 
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, "
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_KEEP_POLICY|0x80, "
@@ -329,11 +359,13 @@ main(void)
 		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
 
 		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		pidns_print_leader();
 		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
 		       (unsigned long long) ill, (unsigned) sizeof(*attr),
 		       errstr);
 
 		sys_sched_setattr(0, ill, 0);
+		pidns_print_leader();
 		printf("sched_setattr(0, %#llx, 0) = %s\n",
 		       (unsigned long long) ill, errstr);
 	}
@@ -342,6 +374,7 @@ main(void)
 	attr->sched_flags = 0xe7ULL;
 
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, sched_policy=%#x /* SCHED_??? */, "
 	       "sched_flags=SCHED_FLAG_RESET_ON_FORK|SCHED_FLAG_RECLAIM|"
 	       "SCHED_FLAG_DL_OVERRUN|SCHED_FLAG_UTIL_CLAMP_MIN"
@@ -365,11 +398,13 @@ main(void)
 		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
 
 		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		pidns_print_leader();
 		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
 		       (unsigned long long) ill, (unsigned) sizeof(*attr),
 		       errstr);
 
 		sys_sched_setattr(0, ill, 0);
+		pidns_print_leader();
 		printf("sched_setattr(0, %#llx, 0) = %s\n",
 		       (unsigned long long) ill, errstr);
 	}
@@ -377,6 +412,7 @@ main(void)
 	attr->sched_flags = 0xcaffee90LL;
 
 	sys_sched_setattr(bogus_pid, (unsigned long) attr, bogus_flags);
+	pidns_print_leader();
 	printf("sched_setattr(%d, {size=%u, sched_flags=SCHED_FLAG_KEEP_PARAMS"
 	       "|0xcaffee80, sched_util_min=%u, sched_util_max=%u}, %u) = %s\n",
 	       (int) bogus_pid,
@@ -389,15 +425,18 @@ main(void)
 		const kernel_ulong_t ill = f8ill_ptr_to_kulong(attr);
 
 		sys_sched_getattr(0, ill, sizeof(*attr), 0);
+		pidns_print_leader();
 		printf("sched_getattr(0, %#llx, %u, 0) = %s\n",
 		       (unsigned long long) ill, (unsigned) sizeof(*attr),
 		       errstr);
 
 		sys_sched_setattr(0, ill, 0);
+		pidns_print_leader();
 		printf("sched_setattr(0, %#llx, 0) = %s\n",
 		       (unsigned long long) ill, errstr);
 	}
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 	return 0;
 }

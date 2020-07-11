@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Test pidns translation cache.
+#
+# Copyright (c) 2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog timeout
+
+run_prog > /dev/null
+run_strace --pidns-translation -f -e trace=getpid $args

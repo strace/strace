@@ -9,8 +9,8 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
+#include "pidns.h"
 
 #ifdef __NR_kcmp
 
@@ -101,7 +101,11 @@ do_kcmp(kernel_ulong_t pid1, kernel_ulong_t pid2, kernel_ulong_t type,
 	rc = syscall(__NR_kcmp, pid1, pid2, type, idx1, idx2);
 	errstr = sprintrc(rc);
 
-	printf("kcmp(%d, %d, ", (int) pid1, (int) pid2);
+	const char *pid_str = pidns_pid2str(PT_TGID);
+	pidns_print_leader();
+	printf("kcmp(%d%s, %d%s, ",
+		(int) pid1, (int) pid1 == getpid() ? pid_str : "",
+		(int) pid2, (int) pid2 == getpid() ? pid_str : "");
 
 	if (type_str)
 		printf("%s", type_str);
@@ -146,6 +150,8 @@ do_kcmp(kernel_ulong_t pid1, kernel_ulong_t pid2, kernel_ulong_t type,
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	static const kernel_ulong_t bogus_pid1 =
 		(kernel_ulong_t) 0xdeadca75face1057ULL;
 	static const kernel_ulong_t bogus_pid2 =
@@ -221,6 +227,7 @@ main(void)
 			(uintptr_t) slot, 1);
 	}
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 
 	return 0;

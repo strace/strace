@@ -9,8 +9,8 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
+#include "pidns.h"
 
 #if defined(__NR_ioprio_get) && defined(__NR_ioprio_set)
 
@@ -30,12 +30,18 @@ enum {
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	static const kernel_ulong_t bogus_which =
 		(kernel_ulong_t) 0xdeadfacefa57beefULL;
 	static const kernel_ulong_t bogus_who =
 		(kernel_ulong_t) 0xbadc0dedda7a1057ULL;
 	static const kernel_ulong_t bogus_ioprio =
 		(kernel_ulong_t) 0xdec0ded1facefeedULL;
+
+	const int pid = getpid();
+	const int pgid = getpgid(0);
+
 # if !XLAT_RAW
 	static const char * const bogus_ioprio_str =
 		"IOPRIO_PRIO_VALUE(0x7d677 /* IOPRIO_CLASS_??? */, 7917)";
@@ -46,6 +52,7 @@ main(void)
 
 	rc = syscall(__NR_ioprio_get, bogus_which, bogus_who);
 	errstr = sprintrc(rc);
+	pidns_print_leader();
 # if XLAT_RAW
 	printf("ioprio_get(%#x, %d) = %s\n",
 	       (int) bogus_which, (int) bogus_who, errstr);
@@ -54,42 +61,52 @@ main(void)
 	       (int) bogus_which, (int) bogus_who, errstr);
 # endif
 
-	rc = syscall(__NR_ioprio_get, 1, 0);
+	rc = syscall(__NR_ioprio_get, 1, pid);
 	errstr = sprintrc(rc);
+	pidns_print_leader();
+	printf("ioprio_get(");
 # if XLAT_RAW
-	printf("ioprio_get(0x1, 0) = %s\n", errstr);
+	printf("0x1, ");
+# elif XLAT_VERBOSE
+	printf("0x1 /* IOPRIO_WHO_PROCESS */, ");
 # else /* XLAT_ABBREV */
-#  if XLAT_VERBOSE
-	printf("ioprio_get(0x1 /* IOPRIO_WHO_PROCESS */, 0) = %s", errstr);
-#  else
-	printf("ioprio_get(IOPRIO_WHO_PROCESS, 0) = %s", errstr);
-#  endif
+	printf("IOPRIO_WHO_PROCESS, ");
+# endif
+	printf("%d%s) = %s", pid, pidns_pid2str(PT_TGID), errstr);
+# if !XLAT_RAW
 	if (rc >= 0) {
 		printf(" (IOPRIO_PRIO_VALUE(");
 		printxval(ioprio_class, (unsigned int) rc >> 13,
 			  "IOPRIO_CLASS_???");
 		printf(", %u))", (unsigned int) rc & 0x1fff);
 	}
+# endif
 	puts("");
-# endif
 
-	rc = syscall(__NR_ioprio_set, 2, 0, 8191);
+	rc = syscall(__NR_ioprio_set, 2, pgid, 8191);
 	errstr = sprintrc(rc);
+	pidns_print_leader();
+	printf("ioprio_set(");
 # if XLAT_RAW
-	printf("ioprio_set(%#x, 0, 8191) = %s\n", 2, errstr);
+	printf("%#x", 2);
 # elif XLAT_VERBOSE
-	printf("ioprio_set(%#x /* IOPRIO_WHO_PGRP */, 0, 8191"
-	       " /* IOPRIO_PRIO_VALUE(0 /* IOPRIO_CLASS_NONE */, 8191) */)"
-	       " = %s\n",
-	       2, errstr);
+	printf("%#x /* IOPRIO_WHO_PGRP */", 2);
 # else /* XLAT_ABBREV */
-	printf("ioprio_set(IOPRIO_WHO_PGRP, 0"
-	       ", IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191)) = %s\n",
-	       errstr);
+	printf("IOPRIO_WHO_PGRP");
 # endif
+	printf(", %d%s", pgid, pidns_pid2str(PT_PGID));
+# if XLAT_RAW
+	printf(", 8191)");
+# elif XLAT_VERBOSE
+	printf(", 8191 /* IOPRIO_PRIO_VALUE(0 /* IOPRIO_CLASS_NONE */, 8191) */)");
+# else /* XLAT_ABBREV */
+	printf(", IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191))");
+# endif
+	printf(" = %s\n", errstr);
 
 	rc = syscall(__NR_ioprio_set, bogus_which, bogus_who, bogus_ioprio);
 	errstr = sprintrc(rc);
+	pidns_print_leader();
 # if XLAT_RAW
 	printf("ioprio_set(%#x, %d, %d) = %s\n",
 	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
@@ -104,6 +121,7 @@ main(void)
 	       errstr);
 # endif
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 
 	return 0;

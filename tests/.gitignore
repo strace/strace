@@ -116,7 +116,9 @@ fchown
 fchown32
 fchownat
 fcntl
+fcntl--pidns-translation
 fcntl64
+fcntl64--pidns-translation
 fdatasync
 fflush
 file_handle
@@ -126,6 +128,7 @@ filter-unavailable
 finit_module
 flock
 fork-f
+fork--pidns-translation
 fsconfig
 fsconfig-P
 fsmount
@@ -168,7 +171,9 @@ getgroups
 getgroups32
 getpeername
 getpgrp
+getpgrp--pidns-translation
 getpid
+getpid--pidns-translation
 getppid
 getrandom
 getresgid
@@ -178,8 +183,10 @@ getresuid32
 getrlimit
 getrusage
 getsid
+getsid--pidns-translation
 getsockname
 gettid
+gettid--pidns-translation
 getuid
 getuid32
 getxgid
@@ -200,6 +207,7 @@ io_uring_register
 io_uring_setup
 ioctl
 ioctl_block
+ioctl_block--pidns-translation
 ioctl_dm
 ioctl_dm-v
 ioctl_evdev
@@ -275,6 +283,7 @@ ioctl_watchdog
 ioperm
 iopl
 ioprio
+ioprio--pidns-translation
 ioprio-Xabbrev
 ioprio-Xraw
 ioprio-Xverbose
@@ -299,6 +308,7 @@ ipc_shm-Xverbose
 is_linux_mips_n64
 kcmp
 kcmp-y
+kcmp-y--pidns-translation
 kern_features
 kernel_version
 kernel_version-Xabbrev
@@ -311,6 +321,7 @@ keyctl-Xabbrev
 keyctl-Xraw
 keyctl-Xverbose
 kill
+kill--pidns-translation
 kill_child
 ksysent
 ksysent.h
@@ -340,6 +351,7 @@ memfd_create-Xabbrev
 memfd_create-Xraw
 memfd_create-Xverbose
 migrate_pages
+migrate_pages--pidns-translation
 mincore
 mkdir
 mkdirat
@@ -371,6 +383,7 @@ move_pages
 move_pages-Xabbrev
 move_pages-Xraw
 move_pages-Xverbose
+move_pages--pidns-translation
 mq
 mq_sendrecv
 mq_sendrecv-read
@@ -391,6 +404,7 @@ net-packet_mreq-Xabbrev
 net-packet_mreq-Xraw
 net-packet_mreq-Xverbose
 net-sockaddr
+net-sockaddr--pidns-translation
 net-tpacket_req
 net-tpacket_stats
 net-tpacket_stats-success
@@ -400,6 +414,7 @@ net-yy-inet6
 net-yy-netlink
 net-yy-unix
 netlink_audit
+netlink_audit--pidns-translation
 netlink_crypto
 netlink_generic
 netlink_inet_diag
@@ -507,7 +522,10 @@ pidfd_open--decode-fd-socket
 pidfd_open-P
 pidfd_open-y
 pidfd_open-yy
+pidfd_open--pidns-translation
 pidfd_send_signal
+pidfd_send_signal--pidns-translation
+pidns-cache
 pipe
 pipe2
 pkey_alloc
@@ -546,8 +564,11 @@ printstrn-umoven
 printstrn-umoven-peekdata
 printstrn-umoven-undumpable
 prlimit64
+prlimit64--pidns-translation
 process_vm_readv
+process_vm_readv--pidns-translation
 process_vm_writev
+process_vm_writev--pidns-translation
 pselect6
 ptrace
 ptrace_syscall_info
@@ -597,10 +618,12 @@ rt_sigaction
 rt_sigpending
 rt_sigprocmask
 rt_sigqueueinfo
+rt_sigqueueinfo--pidns-translation
 rt_sigreturn
 rt_sigsuspend
 rt_sigtimedwait
 rt_tgsigqueueinfo
+rt_tgsigqueueinfo--pidns-translation
 run_expect_termsig
 s390_guarded_storage
 s390_guarded_storage-v
@@ -611,9 +634,13 @@ s390_sthyi-v
 sched_get_priority_mxx
 sched_rr_get_interval
 sched_xetaffinity
+sched_xetaffinity--pidns-translation
 sched_xetattr
+sched_xetattr--pidns-translation
 sched_xetparam
+sched_xetparam--pidns-translation
 sched_xetscheduler
+sched_xetscheduler--pidns-translation
 sched_yield
 scm_rights
 scno.h
@@ -669,6 +696,7 @@ sigaltstack
 siginfo
 signal
 signal_receive
+signal_receive--pidns-translation
 signalfd4
 sigpending
 sigprocmask
@@ -681,6 +709,7 @@ so_peercred
 so_peercred-Xabbrev
 so_peercred-Xraw
 so_peercred-Xverbose
+so_peercred--pidns-translation
 sock_filter-v
 sock_filter-v-Xabbrev
 sock_filter-v-Xraw
@@ -731,6 +760,7 @@ syslog
 syslog-success
 tee
 tgkill
+tgkill--pidns-translation
 threads-execve
 threads-execve--quiet-thread-execve
 threads-execve-q
@@ -743,7 +773,9 @@ timerfd_xettime
 times
 times-fail
 tkill
+tkill--pidns-translation
 tracer_ppid_pgid_sid
+trie_test
 truncate
 truncate64
 ugetrlimit
@@ -784,9 +816,12 @@ waitpid
 xattr
 xattr-strings
 xet_robust_list
+xet_robust_list--pidns-translation
 xet_thread_area_x86
 xetitimer
 xetpgid
+xetpgid--pidns-translation
 xetpriority
+xetpriority--pidns-translation
 xettimeofday
 zeroargc

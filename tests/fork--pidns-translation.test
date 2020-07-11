@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# Check pidns translation of fork's return value.
+#
+# Copyright (c) 2020 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog
+run_strace -a6 --pidns-translation -f -e trace=fork $args
+match_awk

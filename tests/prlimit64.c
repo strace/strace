@@ -19,6 +19,7 @@
 # include <sys/resource.h>
 # include <unistd.h>
 
+# include "pidns.h"
 # include "xlat.h"
 # include "xlat/resources.h"
 
@@ -42,8 +43,11 @@ sprint_rlim(uint64_t lim)
 int
 main(void)
 {
+	PIDNS_TEST_INIT;
+
 	unsigned long pid =
 		(unsigned long) 0xdefaced00000000ULL | (unsigned) getpid();
+	const char *pid_str = pidns_pid2str(PT_TGID);
 	uint64_t *const rlimit = tail_alloc(sizeof(*rlimit) * 2);
 	const struct xlat_data *xlat;
 	size_t i = 0;
@@ -54,18 +58,23 @@ main(void)
 
 		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
 		long rc = syscall(__NR_prlimit64, pid, res, 0, rlimit);
+		pidns_print_leader();
 		if (rc)
-			printf("prlimit64(%d, %s, NULL, %p) = %ld %s (%m)\n",
-			       (unsigned) pid, xlat->str, rlimit,
+			printf("prlimit64(%d%s, %s, NULL, %p) ="
+				     " %ld %s (%m)\n",
+			       (unsigned) pid, pid_str,
+			       xlat->str, rlimit,
 			       rc, errno2name());
 		else
-			printf("prlimit64(%d, %s, NULL"
+			printf("prlimit64(%d%s, %s, NULL"
 			       ", {rlim_cur=%s, rlim_max=%s}) = 0\n",
-			       (unsigned) pid, xlat->str,
+			       (unsigned) pid, pid_str,
+			       xlat->str,
 			       sprint_rlim(rlimit[0]),
 			       sprint_rlim(rlimit[1]));
 	}
 
+	pidns_print_leader();
 	puts("+++ exited with 0 +++");
 	return 0;
 }

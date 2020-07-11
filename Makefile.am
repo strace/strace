@@ -409,7 +409,7 @@ endif
 CODE_COVERAGE_BRANCH_COVERAGE = 1
 CODE_COVERAGE_GENHTML_OPTIONS = $(CODE_COVERAGE_GENHTML_OPTIONS_DEFAULT) \
 	--prefix $(shell cd $(abs_top_srcdir)/.. && pwd || echo .)
-CODE_COVERAGE_IGNORE_PATTERN = '/usr/include/*'
+CODE_COVERAGE_IGNORE_PATTERN = '/usr/include/*' '*/tests/*' '*/tests-m32/*' '*/tests-mx32/*'
 strace_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS)
 strace_CFLAGS += $(CODE_COVERAGE_CFLAGS)
 strace_LDADD += $(CODE_COVERAGE_LIBS)
