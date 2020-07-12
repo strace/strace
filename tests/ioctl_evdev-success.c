@@ -99,10 +99,10 @@ print_input_id(long rc, const void *ptr, const void *arg)
 		printf("%p", id);
 		return;
 	}
-	printf("{ID_BUS=%" PRIu16
-	       ", ID_VENDOR=%" PRIu16
-	       ", ID_PRODUCT=%" PRIu16
-	       ", ID_VERSION=%" PRIu16 "}",
+	printf("{bustype=%" PRIu16
+	       ", vendor=%" PRIu16
+	       ", product=%" PRIu16
+	       ", version=%" PRIu16 "}",
 	       id->bustype, id->vendor, id->product, id->version);
 }
 

@@ -155,15 +155,13 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	struct input_id id;
 
-	if (!umove_or_printaddr(tcp, arg, &id))
-		tprintf("{ID_BUS=%" PRIu16
-			", ID_VENDOR=%" PRIu16
-			", ID_PRODUCT=%" PRIu16
-			", ID_VERSION=%" PRIu16 "}",
-			id.bustype,
-			id.vendor,
-			id.product,
-			id.version);
+	if (!umove_or_printaddr(tcp, arg, &id)) {
+		PRINT_FIELD_U("{", id, bustype);
+		PRINT_FIELD_U(", ", id, vendor);
+		PRINT_FIELD_U(", ", id, product);
+		PRINT_FIELD_U(", ", id, version);
+		tprints("}");
+	}
 
 	return RVAL_IOCTL_DECODED;
 }
