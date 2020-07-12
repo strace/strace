@@ -76,27 +76,21 @@ abs_ioctl(struct tcb *const tcp, const unsigned int code,
 	if (umoven_or_printaddr(tcp, arg, read_sz, &absinfo))
 		return RVAL_IOCTL_DECODED;
 
-	tprintf("{value=%u"
-		", minimum=%u, ",
-		absinfo.value,
-		absinfo.minimum);
+	PRINT_FIELD_U("{", absinfo, value);
+	PRINT_FIELD_U(", ", absinfo, minimum);
 
 	if (!abbrev(tcp)) {
-		tprintf("maximum=%u"
-			", fuzz=%u"
-			", flat=%u",
-			absinfo.maximum,
-			absinfo.fuzz,
-			absinfo.flat);
-		if (sz >= res_sz) {
-			tprintf(", resolution=%u%s",
-				absinfo.resolution,
-				sz > res_sz ? ", ..." : "");
-		} else if (sz > orig_sz) {
-			tprints(", ...");
+		PRINT_FIELD_U(", ", absinfo, maximum);
+		PRINT_FIELD_U(", ", absinfo, fuzz);
+		PRINT_FIELD_U(", ", absinfo, flat);
+		if (sz > orig_sz) {
+			if (sz >= res_sz)
+				PRINT_FIELD_U(", ", absinfo, resolution);
+			if (sz != res_sz)
+				tprints(", ...");
 		}
 	} else {
-		tprints("...");
+		tprints(", ...");
 	}
 
 	tprints("}");
@@ -130,17 +124,15 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &ike))
 		return RVAL_IOCTL_DECODED;
 
-	tprintf("{flags=%" PRIu8
-		", len=%" PRIu8 ", ",
-		ike.flags,
-		ike.len);
+	PRINT_FIELD_U("{", ike, flags);
+	PRINT_FIELD_U(", ", ike, len);
 
 	if (!abbrev(tcp)) {
-		tprintf("index=%" PRIu16 ", keycode=", ike.index);
-		printxval(evdev_keycode, ike.keycode, "KEY_???");
+		PRINT_FIELD_U(", ", ike, index);
+		PRINT_FIELD_XVAL(", ", ike, keycode, evdev_keycode, "KEY_???");
 		PRINT_FIELD_X_ARRAY(", ", ike, scancode);
 	} else {
-		tprints("...");
+		tprints(", ...");
 	}
 
 	tprints("}");
