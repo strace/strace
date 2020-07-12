@@ -7,6 +7,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include <linux/ioctl.h>
 #include <linux/fs.h>
 
@@ -73,14 +74,13 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 	}
 
 	if (entering(tcp)) {
-		tprints("{dest_fd=");
-		printfd(tcp, info->dest_fd);
-		tprintf(", dest_offset=%" PRIu64 "}",
-			(uint64_t) info->dest_offset);
+		PRINT_FIELD_FD("{", *info, dest_fd, tcp);
+		PRINT_FIELD_U(", ", *info, dest_offset);
 	} else {
-		tprintf("{bytes_deduped=%" PRIu64 ", status=%d}",
-			(uint64_t) info->bytes_deduped, info->status);
+		PRINT_FIELD_U("{", *info, bytes_deduped);
+		PRINT_FIELD_D(", ", *info, status);
 	}
+	tprints("}");
 
 	return true;
 }
@@ -91,13 +91,11 @@ print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 {
 	const struct fiemap_extent *fe = elem_buf;
 
-	tprintf("{fe_logical=%" PRI__u64
-		", fe_physical=%" PRI__u64
-		", fe_length=%" PRI__u64 ", ",
-		fe->fe_logical, fe->fe_physical, fe->fe_length);
-
-	printflags64(fiemap_extent_flags, fe->fe_flags,
-		     "FIEMAP_EXTENT_???");
+	PRINT_FIELD_U("{", *fe, fe_logical);
+	PRINT_FIELD_U(", ", *fe, fe_physical);
+	PRINT_FIELD_U(", ", *fe, fe_length);
+	PRINT_FIELD_FLAGS(", ", *fe, fe_flags, fiemap_extent_flags,
+			  "FIEMAP_EXTENT_???");
 	tprints("}");
 
 	return true;
@@ -120,14 +118,11 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{src_fd=");
-		printfd(tcp, args.src_fd);
-		tprintf(", src_offset=%" PRIu64
-			", src_length=%" PRIu64
-			", dest_offset=%" PRIu64 "}",
-			(uint64_t) args.src_offset,
-			(uint64_t) args.src_length,
-			(uint64_t) args.dest_offset);
+		PRINT_FIELD_FD("{", args, src_fd, tcp);
+		PRINT_FIELD_U(", ", args, src_offset);
+		PRINT_FIELD_U(", ", args, src_length);
+		PRINT_FIELD_U(", ", args, dest_offset);
+		tprints("}");
 		break;
 	}
 
@@ -150,12 +145,10 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 
 		tprints("{");
 		if (entering(tcp)) {
-			tprintf("src_offset=%" PRIu64
-				", src_length=%" PRIu64
-				", dest_count=%hu, ",
-				(uint64_t) args.src_offset,
-				(uint64_t) args.src_length,
-				(uint16_t) args.dest_count);
+			PRINT_FIELD_U("", args, src_offset);
+			PRINT_FIELD_U(", ", args, src_length);
+			PRINT_FIELD_U(", ", args, dest_count);
+			tprints(", ");
 		}
 
 		tprints("info=");
@@ -191,21 +184,18 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 			break;
 
 		if (entering(tcp)) {
-			tprintf("{fm_start=%" PRI__u64 ", "
-				"fm_length=%" PRI__u64 ", "
-				"fm_flags=",
-				args.fm_start, args.fm_length);
-			printflags64(fiemap_flags, args.fm_flags,
-				     "FIEMAP_FLAG_???");
-			tprintf(", fm_extent_count=%u}", args.fm_extent_count);
+			PRINT_FIELD_U("{", args, fm_start);
+			PRINT_FIELD_U(", ", args, fm_length);
+			PRINT_FIELD_FLAGS(", ", args, fm_flags, fiemap_flags,
+					  "FIEMAP_FLAG_???");
+			PRINT_FIELD_U(", ", args, fm_extent_count);
+			tprints("}");
 			return 0;
 		}
 
-		tprints("{fm_flags=");
-		printflags64(fiemap_flags, args.fm_flags,
-			     "FIEMAP_FLAG_???");
-		tprintf(", fm_mapped_extents=%u",
-			args.fm_mapped_extents);
+		PRINT_FIELD_FLAGS("{", args, fm_flags, fiemap_flags,
+				  "FIEMAP_FLAG_???");
+		PRINT_FIELD_U(", ", args, fm_mapped_extents);
 		if (abbrev(tcp)) {
 			tprints(", ...");
 		} else {
