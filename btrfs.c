@@ -33,6 +33,7 @@ typedef struct btrfs_ioctl_vol_args_v2
 #ifdef HAVE_LINUX_BTRFS_H
 
 # include "print_fields.h"
+# include "types/btrfs.h"
 # include <linux/fs.h>
 
 /*
@@ -833,7 +834,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	}
 
 	case BTRFS_IOC_LOGICAL_INO: { /* RW */
-		struct btrfs_ioctl_logical_ino_args args;
+		struct_btrfs_ioctl_logical_ino_args args;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -849,23 +850,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_U("{", args, logical);
 			PRINT_FIELD_U(", ", args, size);
 
-			if (!IS_ARRAY_ZERO(args.reserved)) {
-				tprints(", reserved=[");
-				for (size_t i = 0; i < 3; ++i)
-					tprintf("%s%#" PRI__x64,
-						i ? ", " : "",
-						args.reserved[i]);
-				tprints("]");
-			}
+			if (!IS_ARRAY_ZERO(args.reserved))
+				PRINT_FIELD_X_ARRAY(", ", args, reserved);
 
 			tprintf(", flags=");
-			printflags64(btrfs_logical_ino_args_flags,
-# ifdef HAVE_STRUCT_BTRFS_IOCTL_LOGICAL_INO_ARGS_FLAGS
-				     args.flags
-# else
-				     args.reserved[3]
-# endif
-				     , "BTRFS_LOGICAL_INO_ARGS_???");
+			printflags64(btrfs_logical_ino_args_flags, args.flags,
+				     "BTRFS_LOGICAL_INO_ARGS_???");
 			PRINT_FIELD_ADDR64(", ", args, inodes);
 			tprints("}");
 			return 0;
