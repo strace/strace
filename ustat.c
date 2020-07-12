@@ -15,6 +15,8 @@ typedef struct ustat struct_ustat;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
+
 SYS_FUNC(ustat)
 {
 	if (entering(tcp))
@@ -24,10 +26,11 @@ SYS_FUNC(ustat)
 #ifdef HAVE_USTAT_H
 		struct_ustat ust;
 
-		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &ust))
-			tprintf("{f_tfree=%llu, f_tinode=%llu}",
-				zero_extend_signed_to_ull(ust.f_tfree),
-				zero_extend_signed_to_ull(ust.f_tinode));
+		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &ust)) {
+			PRINT_FIELD_U("{", ust, f_tfree);
+			PRINT_FIELD_U(", ", ust, f_tinode);
+			tprints("}");
+		}
 #else /* !HAVE_USTAT_H */
 		printaddr(tcp->u_arg[1]);
 #endif /* HAVE_USTAT_H */
