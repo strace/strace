@@ -50,7 +50,7 @@ static void
 print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 {
 	printf("ioctl(-1, %s", XLAT_STR(EVIOCSFF));
-	printf(", {type=%s, id=%" PRIu16
+	printf(", {type=%s, id=%" PRId16
 	       ", direction=%" PRIu16 ", ",
 	       sprintxlat(type_str, ffe->type, NULL),
 	       ffe->id, ffe->direction);

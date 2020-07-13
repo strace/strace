@@ -24,19 +24,18 @@ typedef struct ff_effect struct_ff_effect;
 
 #ifdef HAVE_LINUX_INPUT_H
 
+# include "print_fields.h"
+
 static void
 decode_envelope(void *const data)
 {
 	const struct ff_envelope *const envelope = data;
 
-	tprintf(", envelope={attack_length=%" PRIu16
-		", attack_level=%" PRIu16
-		", fade_length=%" PRIu16
-		", fade_level=%#x}",
-		envelope->attack_length,
-		envelope->attack_level,
-		envelope->fade_length,
-		envelope->fade_level);
+	PRINT_FIELD_U(", envelope={", *envelope, attack_length);
+	PRINT_FIELD_U(", ", *envelope, attack_level);
+	PRINT_FIELD_U(", ", *envelope, fade_length);
+	PRINT_FIELD_X(", ", *envelope, fade_level);
+	tprints("}");
 }
 
 static int
@@ -51,62 +50,48 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints("{type=");
 	print_evdev_ff_type(ffe.type);
-	tprintf(", id=%" PRIu16
-		", direction=%" PRIu16 ", ",
-		ffe.id,
-		ffe.direction);
+	PRINT_FIELD_D(", ", ffe, id);
+	PRINT_FIELD_U(", ", ffe, direction);
 
 	if (abbrev(tcp)) {
-		tprints("...}");
+		tprints(", ...}");
 		return RVAL_IOCTL_DECODED;
 	}
 
-	tprintf("trigger={button=%" PRIu16
-		", interval=%" PRIu16 "}"
-		", replay={length=%" PRIu16
-		", delay=%" PRIu16 "}",
-		ffe.trigger.button,
-		ffe.trigger.interval,
-		ffe.replay.length,
-		ffe.replay.delay);
+	PRINT_FIELD_U(", trigger={", ffe.trigger, button);
+	PRINT_FIELD_U(", ", ffe.trigger, interval);
+	PRINT_FIELD_U("}, replay={", ffe.replay, length);
+	PRINT_FIELD_U(", ", ffe.replay, delay);
+	tprints("}");
 
 	switch (ffe.type) {
 	case FF_CONSTANT:
-		tprintf(", constant={level=%" PRId16,
-			ffe.u.constant.level);
+		PRINT_FIELD_D(", constant={", ffe.u.constant, level);
 		decode_envelope(&ffe.u.constant.envelope);
 		tprints("}");
 		break;
 	case FF_RAMP:
-		tprintf(", ramp={start_level=%" PRId16
-			", end_level=%" PRId16,
-			ffe.u.ramp.start_level,
-			ffe.u.ramp.end_level);
+		PRINT_FIELD_D(", ramp={", ffe.u.ramp, start_level);
+		PRINT_FIELD_D(", ", ffe.u.ramp, end_level);
 		decode_envelope(&ffe.u.ramp.envelope);
 		tprints("}");
 		break;
 	case FF_PERIODIC:
-		tprintf(", periodic={waveform=%" PRIu16
-			", period=%" PRIu16
-			", magnitude=%" PRId16
-			", offset=%" PRId16
-			", phase=%" PRIu16,
-			ffe.u.periodic.waveform,
-			ffe.u.periodic.period,
-			ffe.u.periodic.magnitude,
-			ffe.u.periodic.offset,
-			ffe.u.periodic.phase);
+		PRINT_FIELD_U(", periodic={", ffe.u.periodic, waveform);
+		PRINT_FIELD_U(", ", ffe.u.periodic, period);
+		PRINT_FIELD_D(", ", ffe.u.periodic, magnitude);
+		PRINT_FIELD_D(", ", ffe.u.periodic, offset);
+		PRINT_FIELD_U(", ", ffe.u.periodic, phase);
 		decode_envelope(&ffe.u.periodic.envelope);
-		tprintf(", custom_len=%u, custom_data=",
-			ffe.u.periodic.custom_len);
+		PRINT_FIELD_U(", ", ffe.u.periodic, custom_len);
+		tprints(", custom_data=");
 		printaddr(ptr_to_kulong(ffe.u.periodic.custom_data));
 		tprints("}");
 		break;
 	case FF_RUMBLE:
-		tprintf(", rumble={strong_magnitude=%" PRIu16
-			", weak_magnitude=%" PRIu16 "}",
-			ffe.u.rumble.strong_magnitude,
-			ffe.u.rumble.weak_magnitude);
+		PRINT_FIELD_U(", rumble={", ffe.u.rumble, strong_magnitude);
+		PRINT_FIELD_U(", ", ffe.u.rumble, weak_magnitude);
+		tprints("}");
 		break;
 	default:
 		break;
