@@ -11,6 +11,7 @@
 
 #include "defs.h"
 #include "flock.h"
+#include "print_fields.h"
 
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"
@@ -22,14 +23,12 @@
 static void
 print_struct_flock64(const struct_kernel_flock64 *fl, const int getlk)
 {
-	tprints("{l_type=");
-	printxval(lockfcmds, (unsigned short) fl->l_type, "F_???");
-	tprints(", l_whence=");
-	printxval(whence_codes, (unsigned short) fl->l_whence, "SEEK_???");
-	tprintf(", l_start=%" PRId64 ", l_len=%" PRId64,
-		(int64_t) fl->l_start, (int64_t) fl->l_len);
+	PRINT_FIELD_XVAL("{", *fl, l_type, lockfcmds, "F_???");
+	PRINT_FIELD_XVAL(", ", *fl, l_whence, whence_codes, "SEEK_???");
+	PRINT_FIELD_D(", ", *fl, l_start);
+	PRINT_FIELD_D(", ", *fl, l_len);
 	if (getlk)
-		tprintf(", l_pid=%lu", (unsigned long) fl->l_pid);
+		PRINT_FIELD_D(", ", *fl, l_pid);
 	tprints("}");
 }
 
@@ -59,9 +58,9 @@ print_f_owner_ex(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &owner))
 		return;
 
-	tprints("{type=");
-	printxval(f_owner_types, owner.type, "F_OWNER_???");
-	tprintf(", pid=%d}", owner.pid);
+	PRINT_FIELD_XVAL("{", owner, type, f_owner_types, "F_OWNER_???");
+	PRINT_FIELD_D(", ", owner, pid);
+	tprints("}");
 }
 
 static int
