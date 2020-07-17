@@ -96,7 +96,7 @@ main(void)
 		error_msg_and_fail("unexpected child exit status %d", status);
 
 	printf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_KILLED, si_pid=%d"
-	       ", si_uid=%u, si_status=%s, si_utime=%u, si_stime=%u} ---\n"
+	       ", si_uid=%d, si_status=%s, si_utime=%u, si_stime=%u} ---\n"
 #if !QUIET_EXIT
 	       "+++ exited with 0 +++\n"
 #endif

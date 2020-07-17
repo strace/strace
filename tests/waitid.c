@@ -103,8 +103,8 @@ sprint_siginfo(const siginfo_t *const si, const char *const status_text)
 	snprintf(buf, sizeof(buf),
 		 "{si_signo=SIGCHLD"
 		 ", si_code=%s"
-		 ", si_pid=%u"
-		 ", si_uid=%u"
+		 ", si_pid=%d"
+		 ", si_uid=%d"
 		 ", si_status=%s"
 		 ", si_utime=%llu"
 		 ", si_stime=%llu}",

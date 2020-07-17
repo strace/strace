@@ -139,7 +139,7 @@ main(void)
 	 */
 	leader = getpid();
 	printf("%-5d --- %s {si_signo=%s, si_code=SI_TKILL"
-	       ", si_pid=%d, si_uid=%u} ---\n",
+	       ", si_pid=%d, si_uid=%d} ---\n",
 	       stopped, "SIGSTOP", "SIGSTOP", stopped, geteuid());
 	printf("%-5d --- stopped by SIGSTOP ---\n", stopped);
 	printf("%-5d +++ exited with 0 +++\n", leader);

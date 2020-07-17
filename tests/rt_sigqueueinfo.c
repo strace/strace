@@ -27,7 +27,7 @@ main(void)
 	if (sigqueue(pid, SIGUSR1, value))
 		perror_msg_and_skip("sigqueue");
 	printf("rt_sigqueueinfo(%u, SIGUSR1, {si_signo=SIGUSR1, "
-		"si_code=SI_QUEUE, si_pid=%u, si_uid=%u, "
+		"si_code=SI_QUEUE, si_pid=%d, si_uid=%d, "
 		"si_value={int=%d, ptr=%p}}) = 0\n",
 		pid, pid, getuid(), value.sival_int, value.sival_ptr);
 	printf("+++ exited with 0 +++\n");

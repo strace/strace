@@ -53,8 +53,8 @@ main(void)
 			"rt_tgsigqueueinfo");
 
 	printf("rt_tgsigqueueinfo(%u, %u, %s, {si_signo=%s"
-		", si_code=SI_QUEUE, si_errno=ENOENT, si_pid=%u"
-		", si_uid=%u, si_value={int=%d, ptr=%p}}) = 0\n",
+		", si_code=SI_QUEUE, si_errno=ENOENT, si_pid=%d"
+		", si_uid=%d, si_value={int=%d, ptr=%p}}) = 0\n",
 		info->si_pid, info->si_pid, "SIGUSR1", "SIGUSR1",
 		info->si_pid, info->si_uid, info->si_value.sival_int,
 		info->si_value.sival_ptr);

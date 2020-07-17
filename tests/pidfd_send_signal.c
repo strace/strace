@@ -54,7 +54,7 @@ main(void)
 
 	sys_pidfd_send_signal(fd, SIGUSR2, si, -1);
 	printf("pidfd_send_signal(%d, SIGUSR2, {si_signo=SIGUSR1"
-	       ", si_code=SI_QUEUE, si_errno=%u, si_pid=%u, si_uid=%u"
+	       ", si_code=SI_QUEUE, si_errno=%u, si_pid=%d, si_uid=%d"
 	       ", si_value={int=%d, ptr=%p}}, %#x) = %s\n",
 	       fd, si->si_errno, si->si_pid, si->si_uid, si->si_int, si->si_ptr,
 	       -1U, errstr);

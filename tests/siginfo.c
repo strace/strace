@@ -63,7 +63,7 @@ main(void)
 
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED"
-		", si_pid=%d, si_uid=%u, si_status=%d"
+		", si_pid=%d, si_uid=%d, si_status=%d"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid, sinfo.si_status,
 		zero_extend_signed_to_ull(sinfo.si_utime),
@@ -94,7 +94,7 @@ main(void)
 
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_KILLED"
-		", si_pid=%d, si_uid=%u, si_status=SIGUSR1"
+		", si_pid=%d, si_uid=%d, si_status=SIGUSR1"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
 		zero_extend_signed_to_ull(sinfo.si_utime),
@@ -121,7 +121,7 @@ main(void)
 
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_STOPPED"
-		", si_pid=%d, si_uid=%u, si_status=SIGSTOP"
+		", si_pid=%d, si_uid=%d, si_status=SIGSTOP"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
 		zero_extend_signed_to_ull(sinfo.si_utime),
@@ -131,7 +131,7 @@ main(void)
 
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_CONTINUED"
-		", si_pid=%d, si_uid=%u, si_status=SIGCONT"
+		", si_pid=%d, si_uid=%d, si_status=SIGCONT"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
 		zero_extend_signed_to_ull(sinfo.si_utime),
@@ -142,7 +142,7 @@ main(void)
 
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED"
-		", si_pid=%d, si_uid=%u, si_status=0"
+		", si_pid=%d, si_uid=%d, si_status=0"
 		", si_utime=%llu, si_stime=%llu} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
 		zero_extend_signed_to_ull(sinfo.si_utime),
