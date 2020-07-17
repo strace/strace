@@ -22,6 +22,7 @@ typedef struct NAME_OF_STRUCT_SHMID_DS shmid_ds_t;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
 #include "xlat/shmctl_flags.h"
 
 static void
@@ -37,9 +38,8 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		if (umove_or_printaddr(tcp, addr, &shmid_ds))
 			return;
 
-		tprints("{shm_perm={");
-		printuid("uid=", shmid_ds.shm_perm.uid);
-		printuid(", gid=", shmid_ds.shm_perm.gid);
+		PRINT_FIELD_UID("{shm_perm={", shmid_ds.shm_perm, uid);
+		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, gid);
 		tprints(", mode=");
 		print_numeric_umode_t(shmid_ds.shm_perm.mode);
 
@@ -50,8 +50,8 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		tprintf(", key=%u",
 			(unsigned) shmid_ds.shm_perm.NAME_OF_STRUCT_IPC_PERM_KEY);
-		printuid(", cuid=", shmid_ds.shm_perm.cuid);
-		printuid(", cgid=", shmid_ds.shm_perm.cgid);
+		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cuid);
+		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cgid);
 		tprints("}");
 		tprintf(", shm_segsz=%u", (unsigned) shmid_ds.shm_segsz);
 		tprintf(", shm_cpid=%u", (unsigned) shmid_ds.shm_cpid);

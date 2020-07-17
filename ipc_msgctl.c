@@ -22,6 +22,7 @@ typedef struct NAME_OF_STRUCT_MSQID_DS msqid_ds_t;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
 #include "xlat/msgctl_flags.h"
 
 static void
@@ -37,9 +38,8 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		if (umove_or_printaddr(tcp, addr, &msqid_ds))
 			return;
 
-		tprints("{msg_perm={");
-		printuid("uid=", msqid_ds.msg_perm.uid);
-		printuid(", gid=", msqid_ds.msg_perm.gid);
+		PRINT_FIELD_UID("{msg_perm={", msqid_ds.msg_perm, uid);
+		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, gid);
 		tprints(", mode=");
 		print_numeric_umode_t(msqid_ds.msg_perm.mode);
 
@@ -50,8 +50,8 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		tprintf(", key=%u",
 			(unsigned) msqid_ds.msg_perm.NAME_OF_STRUCT_IPC_PERM_KEY);
-		printuid(", cuid=", msqid_ds.msg_perm.cuid);
-		printuid(", cgid=", msqid_ds.msg_perm.cgid);
+		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cuid);
+		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cgid);
 		tprints("}");
 		tprintf(", msg_stime=%u", (unsigned) msqid_ds.msg_stime);
 		tprintf(", msg_rtime=%u", (unsigned) msqid_ds.msg_rtime);
