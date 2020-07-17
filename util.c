@@ -1517,7 +1517,7 @@ print_abnormal_hi(const kernel_ulong_t val)
 }
 
 int
-read_int_from_file(struct tcb *tcp, const char *const fname, int *const pvalue)
+read_int_from_file(const char *const fname, int *const pvalue)
 {
 	const int fd = open_file(fname, O_RDONLY);
 	if (fd < 0)

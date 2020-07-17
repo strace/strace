@@ -498,7 +498,7 @@ extern unsigned os_release;
 # undef KERNEL_VERSION
 # define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 
-extern int read_int_from_file(struct tcb *, const char *, int *);
+extern int read_int_from_file(const char *, int *);
 
 extern void set_sortby(const char *);
 extern int set_overhead(const char *);

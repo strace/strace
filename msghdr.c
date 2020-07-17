@@ -293,7 +293,7 @@ get_optmem_max(struct tcb *tcp)
 	static int optmem_max;
 
 	if (!optmem_max) {
-		if (read_int_from_file(tcp, "/proc/sys/net/core/optmem_max",
+		if (read_int_from_file("/proc/sys/net/core/optmem_max",
 				       &optmem_max) || optmem_max <= 0) {
 			optmem_max = sizeof(long long) * (2 * IOV_MAX + 512);
 		} else {
