@@ -40,8 +40,7 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 
 		PRINT_FIELD_UID("{shm_perm={", shmid_ds.shm_perm, uid);
 		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, gid);
-		tprints(", mode=");
-		print_numeric_umode_t(shmid_ds.shm_perm.mode);
+		PRINT_FIELD_NUMERIC_UMODE_T(", ", shmid_ds.shm_perm, mode);
 
 		if (cmd != IPC_STAT) {
 			tprints("}, ...}");

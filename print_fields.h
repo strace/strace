@@ -244,6 +244,13 @@
 		print_dev_t((where_).field_);				\
 	} while (0)
 
+# define PRINT_FIELD_NUMERIC_UMODE_T(prefix_, where_, field_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_numeric_ll_umode_t(				\
+			zero_extend_signed_to_ull((where_).field_));	\
+	} while (0)
+
 # define PRINT_FIELD_PTR(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
