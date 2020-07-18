@@ -165,7 +165,7 @@ main(void)
 
 	ioctl(-1, BLKTRACESETUP, buts);
 	printf("ioctl(-1, BLKTRACESETUP, {act_mask=%hu, buf_size=%u, buf_nr=%u"
-	       ", start_lba=%" PRI__u64 ", end_lba=%" PRI__u64 ", pid=%u})"
+	       ", start_lba=%" PRI__u64 ", end_lba=%" PRI__u64 ", pid=%d})"
 	       " = -1 EBADF (%m)\n",
 	       buts->act_mask, buts->buf_size, buts->buf_nr,
 	       buts->start_lba, buts->end_lba, buts->pid);

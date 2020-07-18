@@ -67,13 +67,13 @@ main(void)
 	if (bind(fd, sa, *len))
 		perror_msg_and_skip("bind");
 	printf("bind(%d" FMT_UNBOUND ", {sa_family=AF_NETLINK"
-	       ", nl_pid=%u, nl_groups=00000000}, %u) = 0\n",
+	       ", nl_pid=%d, nl_groups=00000000}, %u) = 0\n",
 	       fd, ARG_UNBOUND, addr.nl_pid, (unsigned) *len);
 
 	if (getsockname(fd, sa, len))
 		perror_msg_and_fail("getsockname");
 	printf("getsockname(%d" FMT_BOUND ", {sa_family=AF_NETLINK"
-	       ", nl_pid=%u, nl_groups=00000000}, [%u]) = 0\n",
+	       ", nl_pid=%d, nl_groups=00000000}, [%u]) = 0\n",
 	       fd, ARG_BOUND, addr.nl_pid, (unsigned) *len);
 
 	if (close(fd))

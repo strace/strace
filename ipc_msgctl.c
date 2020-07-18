@@ -57,8 +57,8 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		tprintf(", msg_ctime=%u", (unsigned) msqid_ds.msg_ctime);
 		tprintf(", msg_qnum=%u", (unsigned) msqid_ds.msg_qnum);
 		tprintf(", msg_qbytes=%u", (unsigned) msqid_ds.msg_qbytes);
-		tprintf(", msg_lspid=%u", (unsigned) msqid_ds.msg_lspid);
-		tprintf(", msg_lrpid=%u", (unsigned) msqid_ds.msg_lrpid);
+		PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
+		PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
 		tprints("}");
 		break;
 

@@ -446,7 +446,7 @@ print_nlmsghdr(struct tcb *tcp,
 	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,
 			   nlmsghdr->nlmsg_type, family);
 
-	tprintf(", seq=%u, pid=%u}", nlmsghdr->nlmsg_seq,
+	tprintf(", seq=%u, pid=%d}", nlmsghdr->nlmsg_seq,
 		nlmsghdr->nlmsg_pid);
 }
 

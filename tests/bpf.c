@@ -1289,16 +1289,16 @@ static const struct bpf_attr_check BPF_BTF_GET_FD_BY_ID_checks[] = {
 
 static const struct bpf_attr_check BPF_TASK_FD_QUERY_checks[] = {
 	{
-		.data = { .BPF_TASK_FD_QUERY_data = { .pid = 0xdeadbeef } },
+		.data = { .BPF_TASK_FD_QUERY_data = { .pid = 1735928559 } },
 		.size = offsetofend(struct BPF_TASK_FD_QUERY_struct, pid),
-		.str = "task_fd_query={pid=3735928559, fd=0" FD0_PATH
+		.str = "task_fd_query={pid=1735928559, fd=0" FD0_PATH
 		       ", flags=0, buf_len=0, buf=NULL, prog_id=0"
 		       ", fd_type=BPF_FD_TYPE_RAW_TRACEPOINT"
 		       ", probe_offset=0, probe_addr=0}"
 	},
 	{ /* 1 */
 		.data = { .BPF_TASK_FD_QUERY_data = {
-			.pid = 0xcafef00d,
+			.pid = 1405705229,
 			.fd = 0xdeadbeef,
 			.flags = 0xfacefeed,
 			.buf_len = 0xdefaced,
@@ -1309,7 +1309,7 @@ static const struct bpf_attr_check BPF_TASK_FD_QUERY_checks[] = {
 			.probe_addr = 0xfac5fed5fac7fed8
 		} },
 		.size = offsetofend(struct BPF_TASK_FD_QUERY_struct, probe_addr),
-		.str = "task_fd_query={pid=3405705229"
+		.str = "task_fd_query={pid=1405705229"
 		       ", fd=-559038737"
 		       ", flags=4207869677"
 		       ", buf_len=233811181"

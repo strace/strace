@@ -168,15 +168,15 @@ main(void)
 	if (shmctl(id, IPC_STAT, &ds))
 		perror_msg_and_skip("shmctl IPC_STAT");
 	printf("shmctl\\(%d, (%s\\|)?%s, \\{shm_perm=\\{uid=%u, gid=%u, "
-		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u, shm_cpid=%u, "
-		"shm_lpid=%u, shm_nattch=%u, shm_atime=%u, shm_dtime=%u, "
+		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u, shm_cpid=%d, "
+		"shm_lpid=%d, shm_nattch=%u, shm_atime=%u, shm_dtime=%u, "
 		"shm_ctime=%u\\}\\) = 0\n",
 		id, str_ipc_64, str_ipc_stat,
 		(unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
 		(unsigned) ds.shm_perm.mode, (unsigned) ds.shm_perm.__key,
 		(unsigned) ds.shm_perm.cuid, (unsigned) ds.shm_perm.cgid,
-		(unsigned) ds.shm_segsz, (unsigned) ds.shm_cpid,
-		(unsigned) ds.shm_lpid, (unsigned) ds.shm_nattch,
+		(unsigned) ds.shm_segsz, (int) ds.shm_cpid,
+		(int) ds.shm_lpid, (unsigned) ds.shm_nattch,
 		(unsigned) ds.shm_atime, (unsigned) ds.shm_dtime,
 		(unsigned) ds. shm_ctime);
 

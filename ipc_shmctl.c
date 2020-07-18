@@ -53,8 +53,8 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cgid);
 		tprints("}");
 		tprintf(", shm_segsz=%u", (unsigned) shmid_ds.shm_segsz);
-		tprintf(", shm_cpid=%u", (unsigned) shmid_ds.shm_cpid);
-		tprintf(", shm_lpid=%u", (unsigned) shmid_ds.shm_lpid);
+		PRINT_FIELD_D(", ", shmid_ds, shm_cpid);
+		PRINT_FIELD_D(", ", shmid_ds, shm_lpid);
 		tprintf(", shm_nattch=%u", (unsigned) shmid_ds.shm_nattch);
 		tprintf(", shm_atime=%u", (unsigned) shmid_ds.shm_atime);
 		tprintf(", shm_dtime=%u", (unsigned) shmid_ds.shm_dtime);
