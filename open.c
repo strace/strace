@@ -138,7 +138,7 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 	tprint_open_modes64(how.flags);
 	if ((how.flags & (O_CREAT| __O_TMPFILE)) || how.mode) {
 		tprints(", mode=");
-		print_numeric_umode_t_64(how.mode);
+		print_numeric_ll_umode_t((unsigned long long) how.mode);
 	}
 	PRINT_FIELD_FLAGS(", ", how, resolve, open_resolve_flags,
 			  "RESOLVE_???");
