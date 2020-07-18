@@ -902,10 +902,17 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 					tprintf("= %#" PRI_klx, tcp->u_rval);
 				}
 				break;
-			case RVAL_OCTAL:
+			case RVAL_OCTAL: {
+				unsigned long long mode =
+					zero_extend_signed_to_ull(tcp->u_rval);
 				tprints("= ");
-				print_numeric_long_umask(tcp->u_rval);
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+				if (current_klongsize < sizeof(tcp->u_rval))
+					mode = (unsigned int) mode;
+#endif
+				print_numeric_ll_umode_t(mode);
 				break;
+			}
 			case RVAL_UDECIMAL:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
