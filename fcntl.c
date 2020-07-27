@@ -21,7 +21,7 @@
 #include "xlat/notifyflags.h"
 
 static void
-print_struct_flock64(const struct_kernel_flock64 *fl, const int getlk)
+print_struct_flock64(struct tcb *const tcp, const struct_kernel_flock64 *fl, const int getlk)
 {
 	PRINT_FIELD_XVAL("{", *fl, l_type, lockfcmds, "F_???");
 	PRINT_FIELD_XVAL(", ", *fl, l_whence, whence_codes, "SEEK_???");
@@ -38,7 +38,7 @@ printflock64(struct tcb *const tcp, const kernel_ulong_t addr, const int getlk)
 	struct_kernel_flock64 fl;
 
 	if (fetch_struct_flock64(tcp, addr, &fl))
-		print_struct_flock64(&fl, getlk);
+		print_struct_flock64(tcp, &fl, getlk);
 }
 
 static void
@@ -47,7 +47,7 @@ printflock(struct tcb *const tcp, const kernel_ulong_t addr, const int getlk)
 	struct_kernel_flock64 fl;
 
 	if (fetch_struct_flock(tcp, addr, &fl))
-		print_struct_flock64(&fl, getlk);
+		print_struct_flock64(tcp, &fl, getlk);
 }
 
 static void

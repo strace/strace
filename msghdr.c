@@ -216,7 +216,7 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 	PRINT_FIELD_U(", ", *err, ee_code);
 	PRINT_FIELD_U(", ", *err, ee_info);
 	PRINT_FIELD_U(", ", *err, ee_data);
-	PRINT_FIELD_SOCKADDR(", ", *err, offender);
+	PRINT_FIELD_SOCKADDR(", ", *err, offender, tcp);
 	tprints("}");
 }
 
@@ -228,7 +228,7 @@ print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 		data_len > sizeof(struct sockaddr_storage)
 		? sizeof(struct sockaddr_storage) : data_len;
 
-	print_sockaddr(cmsg_data, addr_len);
+	print_sockaddr(tcp, cmsg_data, addr_len);
 }
 
 typedef void (* const cmsg_printer)(struct tcb *, const void *, unsigned int);

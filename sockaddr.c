@@ -47,7 +47,7 @@ const size_t arp_hardware_types_size = ARRAY_SIZE(arp_hardware_types) - 1;
 const size_t ethernet_protocols_size = ARRAY_SIZE(ethernet_protocols) - 1;
 
 static void
-print_sockaddr_data_un(const void *const buf, const int addrlen)
+print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen)
 {
 	const struct sockaddr_un *const sa_un = buf;
 	const int un_len = addrlen > (int) sizeof(*sa_un)
@@ -172,7 +172,8 @@ decode_inet_addr(struct tcb *const tcp,
 }
 
 static void
-print_sockaddr_data_in(const void *const buf, const int addrlen)
+print_sockaddr_data_in(struct tcb *tcp, const void *const buf,
+		       const int addrlen)
 {
 	const struct sockaddr_in *const sa_in = buf;
 
@@ -183,7 +184,8 @@ print_sockaddr_data_in(const void *const buf, const int addrlen)
 #define SIN6_MIN_LEN offsetof(struct sockaddr_in6, sin6_scope_id)
 
 static void
-print_sockaddr_data_in6(const void *const buf, const int addrlen)
+print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
+			const int addrlen)
 {
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
@@ -322,7 +324,8 @@ print_ax25_addr(const void /* ax25_address */ *addr_void)
 }
 
 static void
-print_sockaddr_data_ax25(const void *const buf, const int addrlen)
+print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
+			 const int addrlen)
 {
 	const struct full_sockaddr_ax25 *const sax25 = buf;
 	size_t addrlen_us = MAX(addrlen, 0);
@@ -372,7 +375,8 @@ digis_end:
 }
 
 static void
-print_sockaddr_data_ipx(const void *const buf, const int addrlen)
+print_sockaddr_data_ipx(struct tcb *tcp, const void *const buf,
+			const int addrlen)
 {
 	const struct sockaddr_ipx *const sa_ipx = buf;
 	unsigned int i;
@@ -399,7 +403,8 @@ print_x25_addr(const void /* struct x25_address */ *addr_void)
 }
 
 static void
-print_sockaddr_data_x25(const void *const buf, const int addrlen)
+print_sockaddr_data_x25(struct tcb *tcp, const void *const buf,
+			const int addrlen)
 {
 	const struct sockaddr_x25 *const sa_x25 = buf;
 
@@ -407,7 +412,7 @@ print_sockaddr_data_x25(const void *const buf, const int addrlen)
 }
 
 static void
-print_sockaddr_data_nl(const void *const buf, const int addrlen)
+print_sockaddr_data_nl(struct tcb *tcp, const void *const buf, const int addrlen)
 {
 	const struct sockaddr_nl *const sa_nl = buf;
 
@@ -442,7 +447,8 @@ print_sll_protocol(const struct sockaddr_ll *const sa_ll)
 }
 
 static void
-print_sockaddr_data_ll(const void *const buf, const int addrlen)
+print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
+		       const int addrlen)
 {
 	const struct sockaddr_ll *const sa_ll = buf;
 
@@ -567,7 +573,8 @@ print_bluetooth_l2_cid_end:
 }
 
 static void
-print_sockaddr_data_bt(const void *const buf, const int addrlen)
+print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
+		       const int addrlen)
 {
 	struct sockaddr_hci {
 		/* sa_family_t */ uint16_t	hci_family;
@@ -651,7 +658,7 @@ print_sockaddr_data_bt(const void *const buf, const int addrlen)
 	}
 }
 
-typedef void (* const sockaddr_printer)(const void *const, const int);
+typedef void (* const sockaddr_printer)(struct tcb *tcp, const void *const, const int);
 
 static const struct {
 	const sockaddr_printer printer;
@@ -669,7 +676,7 @@ static const struct {
 };
 
 void
-print_sockaddr(const void *const buf, const int addrlen)
+print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 {
 	const struct sockaddr *const sa = buf;
 
@@ -682,7 +689,7 @@ print_sockaddr(const void *const buf, const int addrlen)
 		if (sa->sa_family < ARRAY_SIZE(sa_printers)
 		    && sa_printers[sa->sa_family].printer
 		    && addrlen >= sa_printers[sa->sa_family].min_len) {
-			sa_printers[sa->sa_family].printer(buf, addrlen);
+			sa_printers[sa->sa_family].printer(tcp, buf, addrlen);
 		} else {
 			print_sockaddr_data_raw(buf, addrlen);
 		}
@@ -713,7 +720,7 @@ decode_sockaddr(struct tcb *const tcp, const kernel_ulong_t addr, int addrlen)
 
 	memset(&addrbuf.pad[addrlen], 0, sizeof(addrbuf.pad) - addrlen);
 
-	print_sockaddr(&addrbuf, addrlen);
+	print_sockaddr(tcp, &addrbuf, addrlen);
 
 	return addrbuf.sa.sa_family;
 }

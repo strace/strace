@@ -2941,7 +2941,7 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 		printleader(tcp);
 		if (si) {
 			tprintf("--- %s ", sprintsigname(sig));
-			printsiginfo(si);
+			printsiginfo(tcp, si);
 			tprints(" ---\n");
 		} else
 			tprintf("--- stopped by %s ---\n", sprintsigname(sig));
