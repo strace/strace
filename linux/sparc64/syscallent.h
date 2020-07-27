@@ -190,7 +190,7 @@
 [184] = { 5,	0,		SEN(query_module),		"query_module"		},
 [185] = { 2,	0,		SEN(setpgid),			"setpgid"		},
 [186] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[187] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[187] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [188] = { 1,	TP|SE,		SEN(exit),			"exit_group"		},
 [189] = { 1,	0,		SEN(uname),			"uname"			},
 [190] = { 3,	0,		SEN(init_module),		"init_module"		},

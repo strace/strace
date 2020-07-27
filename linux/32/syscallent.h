@@ -142,7 +142,7 @@
 /* [127] sched_rr_get_interval */
 [128] = { 0,	0,		SEN(restart_syscall),		"restart_syscall"	},
 [129] = { 2,	TS|TP,		SEN(kill),			"kill"			},
-[130] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[130] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [131] = { 3,	TS|TP,		SEN(tgkill),			"tgkill"		},
 [132] = { 2,	TS,		SEN(sigaltstack),		"sigaltstack"		},
 [133] = { 2,	TS,		SEN(rt_sigsuspend),		"rt_sigsuspend"		},

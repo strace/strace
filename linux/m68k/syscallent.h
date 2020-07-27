@@ -228,7 +228,7 @@
 [218 ... 219] = { },
 [220] = { 3,	TD,		SEN(getdents64),		"getdents64"		},
 [221] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
-[222] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[222] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [223] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
 [224] = { 5,	TF,		SEN(setxattr),			"lsetxattr"		},
 [225] = { 5,	TD,		SEN(fsetxattr),			"fsetxattr"		},

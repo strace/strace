@@ -205,7 +205,7 @@
 [197] = { 2,	TF,		SEN(removexattr),		"removexattr"		},
 [198] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [199] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[200] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[200] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [201] = { 1,	TCL,		SEN(time),			"time"			},
 [202] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [203] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},

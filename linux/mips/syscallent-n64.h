@@ -200,7 +200,7 @@
 [BASE_NR + 189] = { 2,	TF,		SEN(removexattr),		"removexattr"		},
 [BASE_NR + 190] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [BASE_NR + 191] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[BASE_NR + 192] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[BASE_NR + 192] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [BASE_NR + 193] = { 1,	TCL,		SEN(time),			"time"			},
 [BASE_NR + 194] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [BASE_NR + 195] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},

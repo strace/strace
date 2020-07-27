@@ -446,6 +446,15 @@ SYS_FUNC(kill)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(tkill)
+{
+	tprintf("%d", (int) tcp->u_arg[0]);
+	tprints(", ");
+	printsignal(tcp->u_arg[1]);
+
+	return RVAL_DECODED;
+}
+
 SYS_FUNC(tgkill)
 {
 	/* tgid, tid */

@@ -325,7 +325,7 @@
 [378] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [379] = { 3,	TD,		SEN(readahead),			"readahead"		},
 [380] = { },
-[381] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[381] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [382] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
 [383] = { 5,	TF,		SEN(setxattr),			"lsetxattr"		},
 [384] = { 5,	TD,		SEN(fsetxattr),			"fsetxattr"		},

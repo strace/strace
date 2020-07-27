@@ -210,7 +210,7 @@
 [205] = { 3,	TM,		SEN(madvise),			"madvise"		},
 [206] = { 3,	TM,		SEN(mincore),			"mincore"		},
 [207] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
-[208] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[208] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [209] = { 5,	TF,		SEN(setxattr),			"setxattr"		},
 [210] = { 5,	TF,		SEN(setxattr),			"lsetxattr"		},
 [211] = { 5,	TD,		SEN(fsetxattr),			"fsetxattr"		},

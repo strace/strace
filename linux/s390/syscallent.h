@@ -246,7 +246,7 @@
 [234] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [235] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
 [236] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
-[237] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[237] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [238] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [239] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
 [240] = { 3,	0,		SEN(sched_getaffinity),		"sched_getaffinity"	},

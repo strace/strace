@@ -211,7 +211,7 @@
 [205] = { 5,	0,		SEN(printargs),			"acl_set"		},
 [206] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},
 [207] = { 4,	TD,		SEN(readahead),			"readahead"		},
-[208] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[208] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [209] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [210] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [211] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},

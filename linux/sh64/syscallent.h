@@ -271,7 +271,7 @@
 [263] = { 2,	TF,		SEN(removexattr),		"removexattr"		},
 [264] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [265] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[266] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[266] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [267] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [268] = { 6,	0,		SEN(futex_time64),		"futex"			},
 [269] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},

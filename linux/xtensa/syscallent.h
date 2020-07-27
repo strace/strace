@@ -124,7 +124,7 @@
 [121] = { 4,	TP,		SEN(wait4),			"wait4"			},
 [122] = { 5,	TP,		SEN(waitid),			"waitid"		},
 [123] = { 2,	TS|TP,		SEN(kill),			"kill"			},
-[124] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[124] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [125] = { 3,	TS|TP,		SEN(tgkill),			"tgkill"		},
 [126] = { 1,	0,		SEN(set_tid_address),		"set_tid_address"	},
 [127] = { 0,	PU|NF,		SEN(gettid),			"gettid"		},

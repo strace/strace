@@ -245,7 +245,7 @@
 [BASE_NR + 233] = { 2,	TF,		SEN(removexattr),		"removexattr"		},
 [BASE_NR + 234] = { 2,	TF,		SEN(removexattr),		"lremovexattr"		},
 [BASE_NR + 235] = { 2,	TD,		SEN(fremovexattr),		"fremovexattr"		},
-[BASE_NR + 236] = { 2,	TS|TP,		SEN(kill),			"tkill"			},
+[BASE_NR + 236] = { 2,	TS|TP,		SEN(tkill),			"tkill"			},
 [BASE_NR + 237] = { 4,	TD|TN,		SEN(sendfile64),		"sendfile64"		},
 [BASE_NR + 238] = { 6,	0,		SEN(futex_time32),		"futex"			},
 [BASE_NR + 239] = { 3,	0,		SEN(sched_setaffinity),		"sched_setaffinity"	},
