@@ -289,7 +289,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	tprints(", insns=");
 	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt);
 
-	tprintf(", license=");
+	tprints(", license=");
 	print_big_u64_addr(attr.license);
 	printstr(tcp, attr.license);
 
@@ -298,7 +298,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		break;
 	PRINT_FIELD_U(", ", attr, log_level);
 	PRINT_FIELD_U(", ", attr, log_size);
-	tprintf(", log_buf=");
+	tprints(", log_buf=");
 	print_big_u64_addr(attr.log_buf);
 	printstr_ex(tcp, attr.log_buf, attr.log_size, QUOTE_0_TERMINATED);
 
@@ -366,7 +366,7 @@ END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 {
-	tprintf("{pathname=");
+	tprints("{pathname=");
 	print_big_u64_addr(attr.pathname);
 	printpath(tcp, attr.pathname);
 
@@ -844,7 +844,7 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 		if (saved && (saved->info_len != attr.info_len))
 			tprintf(" => %u", attr.info_len);
 
-		tprintf(", info=");
+		tprints(", info=");
 	}
 
 	print_bpf_obj_info(tcp, attr.bpf_fd, attr.info, attr.info_len, saved);
@@ -894,7 +894,7 @@ BEGIN_BPF_CMD_DECODER(BPF_RAW_TRACEPOINT_OPEN)
 {
 	enum { TP_NAME_SIZE = 128 };
 
-	tprintf("{raw_tracepoint={name=");
+	tprints("{raw_tracepoint={name=");
 	print_big_u64_addr(attr.name);
 	printstr_ex(tcp, attr.name, TP_NAME_SIZE, QUOTE_0_TERMINATED);
 
@@ -941,7 +941,7 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 		tprintf(" => %u", attr.buf_len);
 
 	const unsigned int buf_len = MIN(saved_buf_len, attr.buf_len);
-	tprintf(", buf=");
+	tprints(", buf=");
 	print_big_u64_addr(attr.buf);
 	printstr_ex(tcp, attr.buf, buf_len, QUOTE_0_TERMINATED);
 	PRINT_FIELD_U(", ", attr, prog_id);
@@ -969,13 +969,13 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_BATCH)
 				  bpf_map_lookup_elem_flags, "BPF_???");
 		PRINT_FIELD_X(", ", attr, flags);
 
-		tprintf("}");
+		tprints("}");
 	} else {
 		unsigned long count = get_tcb_priv_ulong(tcp);
 
 		if (count != attr.count) {
 			PRINT_FIELD_U("=> {batch={", attr, count);
-			tprintf("}}");
+			tprints("}}");
 		}
 
 		return RVAL_DECODED;
@@ -998,13 +998,13 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_BATCH)
 				  bpf_map_lookup_elem_flags, "BPF_???");
 		PRINT_FIELD_X(", ", attr, flags);
 
-		tprintf("}");
+		tprints("}");
 	} else {
 		unsigned long count = get_tcb_priv_ulong(tcp);
 
 		if (count != attr.count) {
 			PRINT_FIELD_U("=> {batch={", attr, count);
-			tprintf("}}");
+			tprints("}}");
 		}
 
 		return RVAL_DECODED;
@@ -1024,13 +1024,13 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 				  bpf_map_lookup_elem_flags, "BPF_???");
 		PRINT_FIELD_X(", ", attr, flags);
 
-		tprintf("}");
+		tprints("}");
 	} else {
 		unsigned long count = get_tcb_priv_ulong(tcp);
 
 		if (count != attr.count) {
 			PRINT_FIELD_U("=> {batch={", attr, count);
-			tprintf("}}");
+			tprints("}}");
 		}
 
 		return RVAL_DECODED;

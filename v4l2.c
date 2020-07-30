@@ -172,7 +172,7 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING("{", caps, driver);
 	PRINT_FIELD_CSTRING(", ", caps, card);
 	PRINT_FIELD_CSTRING(", ", caps, bus_info);
-	tprintf(", version=");
+	tprints(", version=");
 	print_kernel_version(caps.version);
 	tprints(", capabilities=");
 	printflags(v4l2_device_capabilities_flags, caps.capabilities,
@@ -399,7 +399,7 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_IOCTL_DECODED;
 
-		tprintf("{type=");
+		tprints("{type=");
 		printxval(v4l2_buf_types, reqbufs.type, "V4L2_BUF_TYPE_???");
 		tprints(", memory=");
 		printxval(v4l2_memories, reqbufs.memory, "V4L2_MEMORY_???");
@@ -591,7 +591,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		printflags(v4l2_streaming_capabilities,
 			   s.parm.output.capability, "V4L2_CAP_???");
 
-		tprintf(", outputmode=");
+		tprints(", outputmode=");
 		printflags(v4l2_capture_modes,
 			   s.parm.output.outputmode, "V4L2_MODE_???");
 

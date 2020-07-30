@@ -108,7 +108,7 @@ evdev_decode_number(const unsigned int code)
 	if (nr >= 0x20 && nr <= 0x20 + 0x1f) {
 		tprints("EVIOCGBIT(");
 		if (nr == 0x20)
-			tprintf("0");
+			tprints("0");
 		else
 			printxval_ex(evdev_ev, nr - 0x20,
 				     abbrev ? "EV_???" : NULL,

@@ -50,7 +50,7 @@ decode_ifa_cacheinfo(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", ci, ifa_valid);
 		PRINT_FIELD_U(", ", ci, cstamp);
 		PRINT_FIELD_U(", ", ci, tstamp);
-		tprintf("}");
+		tprints("}");
 	}
 
 	return true;
