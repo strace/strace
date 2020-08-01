@@ -740,6 +740,7 @@ timer_xettime
 timerfd_xettime
 times
 times-fail
+tkill
 tracer_ppid_pgid_sid
 truncate
 truncate64

@@ -596,6 +596,7 @@ timer_xettime
 timerfd_xettime
 times
 times-fail
+tkill
 truncate
 truncate64
 ugetrlimit
