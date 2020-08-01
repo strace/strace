@@ -729,6 +729,7 @@ sysinfo
 syslog
 syslog-success
 tee
+tgkill
 threads-execve
 threads-execve--quiet-thread-execve
 threads-execve-q

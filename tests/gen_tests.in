@@ -663,6 +663,7 @@ sync_file_range2
 sysinfo	-a14
 syslog	-a35
 tee
+tgkill	-a15 --signal='!cont'
 threads-execve--quiet-thread-execve +threads-execve.test -s40 --quiet=personality,thread-execve
 threads-execve-q +threads-execve.test -q
 threads-execve-qq +threads-execve.test -qq
