@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009, 2010 Jeff Mahoney <jeffm@suse.com>
  * Copyright (c) 2011-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2011-2018 The strace developers.
+ * Copyright (c) 2011-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

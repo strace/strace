@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Jeff Mahoney <jeffm@suse.com>
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
