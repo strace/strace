@@ -32,6 +32,7 @@
 # include <errno.h>
 # include <time.h>
 # include <sys/time.h>
+# include <dirent.h>
 
 # include "arch_defs.h"
 # include "error_prints.h"
