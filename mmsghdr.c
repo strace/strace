@@ -14,6 +14,10 @@
 #include "xstring.h"
 #include <limits.h>
 
+#ifndef IOV_MAX
+#define IOV_MAX	1024
+#endif
+
 static bool
 fetch_struct_mmsghdr_for_print(struct tcb *const tcp,
 				  const kernel_ulong_t addr,

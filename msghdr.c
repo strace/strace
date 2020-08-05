@@ -17,6 +17,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#ifndef IOV_MAX
+#define IOV_MAX	1024
+#endif
+
 #define XLAT_MACROS_ONLY
 #include "xlat/sock_options.h"
 #undef XLAT_MACROS_ONLY
