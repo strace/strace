@@ -1,4 +1,4 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 5.8 (2020-08-06)
 ==============================================
 
 * Changes in behaviour
@@ -10,6 +10,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented decoding of faccessat2 syscall.
   * Implemented decoding of LOOP_CONFIGURE ioctl command.
+  * Updated decoding of io_uring_setup syscall to match Linux 5.8.
   * Updated lists of AUDIT_*, BPF_*, CAP_*, ETH_*, INET_DIAG_*, IORING_*,
     KEYCTL_*, KVM_*, LOOP_*, NDA_*, RTC_*, TCA_*, STATX_*, and *_MAGIC
     constants.
