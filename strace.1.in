@@ -871,6 +871,11 @@ or higher.
 .TQ
 .B \-\-instruction\-pointer
 Print the instruction pointer at the time of the system call.
+.TP
+.B \-n
+.TQ
+.B \-\-syscall\-number
+Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TQ

@@ -1354,6 +1354,7 @@ get_scno(struct tcb *tcp)
 			return rc;
 	}
 
+	tcp->true_scno = tcp->scno;
 	tcp->scno = shuffle_scno(tcp->scno);
 
 	if (scno_is_valid(tcp->scno)) {

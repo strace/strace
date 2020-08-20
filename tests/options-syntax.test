@@ -268,18 +268,19 @@ if [ "$uid" -ge 0 ]; then
 
 	check_e "$umsg" -u :nosuchuser: true
 
-	for c in i/--instruction-pointer r/--relative-timestamps t/--absolute-timestamps T/--syscall-times y/--decode-fds; do
+	for c in i/--instruction-pointer n/--syscall-number r/--relative-timestamps t/--absolute-timestamps T/--syscall-times y/--decode-fds; do
 		check_e "-$c has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" -u :nosuchuser: -c -${c%%/*} true
 	done
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
+$STRACE_EXE: -n/--syscall-number has no effect with -c/--summary-only
 $STRACE_EXE: -r/--relative-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -t/--absolute-timestamps has no effect with -c/--summary-only
 $STRACE_EXE: -T/--syscall-times has no effect with -c/--summary-only
 $STRACE_EXE: -y/--decode-fds has no effect with -c/--summary-only
 $STRACE_EXE: Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
-$STRACE_EXE: $umsg" -u :nosuchuser: -cirtTyzZ true
+$STRACE_EXE: $umsg" -u :nosuchuser: -cinrtTyzZ true
 
 	for c in --output-separately -A/--output-append-mode; do
 		check_e "$c has no effect without -o/--output
@@ -302,6 +303,9 @@ $STRACE_EXE: $umsg" -u :nosuchuser: -z --successful-only true
 $STRACE_EXE: $umsg" -u :nosuchuser: --successful-only -Z true
 	check_e "Only the last of -z/--successful-only/-Z/--failed-only options will take effect. See status qualifier for more complex filters.
 $STRACE_EXE: $umsg" -u :nosuchuser: --successful-only --failed-only true
+
+	check_e "-n/--syscall-number has no effect with -c/--summary-only
+$STRACE_EXE: $umsg" --user=:nosuchuser: --syscall-number --summary-only true
 
 	check_e "-i/--instruction-pointer has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" --user=:nosuchuser: --instruction-pointer --summary-only true

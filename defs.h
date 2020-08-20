@@ -259,6 +259,7 @@ struct tcb {
 # endif
 	unsigned long u_error;	/* Error code */
 	kernel_ulong_t scno;	/* System call number */
+	kernel_ulong_t true_scno;	/* Same, but without subcall decoding and shuffling */
 	kernel_ulong_t u_arg[MAX_ARGS];	/* System call arguments */
 	kernel_long_t u_rval;	/* Return value */
 	int sys_func_rval;	/* Syscall entry parser's return value */
@@ -507,6 +508,8 @@ extern void set_count_summary_columns(const char *columns);
 extern bool get_instruction_pointer(struct tcb *, kernel_ulong_t *);
 extern bool get_stack_pointer(struct tcb *, kernel_ulong_t *);
 extern void print_instruction_pointer(struct tcb *);
+
+extern void print_syscall_number(struct tcb *);
 
 extern void print_syscall_resume(struct tcb *tcp);
 

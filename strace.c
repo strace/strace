@@ -79,6 +79,7 @@ bool Tflag;
 int Tflag_scale = 1000;
 int Tflag_width = 6;
 bool iflag;
+bool nflag;
 bool count_wallclock;
 static int tflag_scale = 1000000000;
 static unsigned tflag_width = 0;
@@ -355,6 +356,8 @@ Output format:\n\
 "
 #endif
 "\
+  -n, --syscall-number\n\
+                 print syscall number\n\
   -o FILE, --output=FILE\n\
                  send trace output to FILE instead of stderr\n\
   -A, --output-append-mode\n\
@@ -810,6 +813,9 @@ printleader(struct tcb *tcp)
 		}
 		tprints(tflag_format ? ") " : " ");
 	}
+
+	if (nflag)
+		print_syscall_number(tcp);
 
 	if (iflag)
 		print_instruction_pointer(tcp);
@@ -2013,7 +2019,7 @@ init(int argc, char *argv[])
 	qualify_signals("all");
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:ko:O:p:P:qrs:S:tTu:U:vVwxX:yzZ";
+		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2055,6 +2061,7 @@ init(int argc, char *argv[])
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
+		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
 		{ "summary-syscall-overhead", required_argument, 0, 'O' },
 		{ "attach",		required_argument, 0, 'p' },
@@ -2190,6 +2197,9 @@ init(int argc, char *argv[])
 					  "option) are not supported by this "
 					  "build of strace");
 #endif
+			break;
+		case 'n':
+			nflag = 1;
 			break;
 		case 'o':
 			outfname = optarg;
@@ -2464,6 +2474,9 @@ init(int argc, char *argv[])
 				  "with -c/--summary-only");
 		if (stack_trace_enabled)
 			error_msg("-k/--stack-traces has no effect "
+				  "with -c/--summary-only");
+		if (nflag)
+			error_msg("-n/--syscall-number has no effect "
 				  "with -c/--summary-only");
 		if (rflag)
 			error_msg("-r/--relative-timestamps has no effect "

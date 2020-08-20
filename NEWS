@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Added -n/--syscall-number option for printing syscall numbers.
 
 * Bug fixes
 
