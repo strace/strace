@@ -651,6 +651,7 @@ strace--timestamps-unix-s +strace-ttt.test 0 --timestamps=unix,s
 strace--timestamps-unix-ms +strace-ttt.test 3 --timestamps=unix,ms
 strace--timestamps-unix-us +strace-ttt.test 6 --timestamps=unix,us
 strace--timestamps-unix-ns +strace-ttt.test 9 --timestamps=unix,ns
+strace-n	-e trace=listen -n -qq -a 12
 strace-x	-e trace=chdir -x -a 12
 strace-xx	-e trace=chdir -xx -a 18
 swap	-a23 -e trace=swapon,swapoff

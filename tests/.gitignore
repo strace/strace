@@ -715,6 +715,7 @@ statx
 strace--strings-in-hex
 strace--strings-in-hex-all
 strace--strings-in-hex-non-ascii
+strace-n
 strace-x
 strace-xx
 swap
