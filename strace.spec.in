@@ -39,6 +39,12 @@ BuildRequires: pkgconfig(bluez)
 %{?!buildroot:BuildRoot: %_tmppath/buildroot-%name-%version-%release}
 %define maybe_use_defattr %{?suse_version:%%defattr(-,root,root)}
 
+# Fallback definitions for make_build/make_install macros
+%{?!__make:       %global __make %_bindir/make}
+%{?!__install:    %global __install %_bindir/install}
+%{?!make_build:   %global make_build %__make %{?_smp_mflags}}
+%{?!make_install: %global make_install %__make install DESTDIR="%{?buildroot}" INSTALL="%__install -p"}
+
 %description
 The strace program intercepts and records the system calls called and
 received by a running process.  Strace can print a record of each
@@ -69,10 +75,10 @@ echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
 CFLAGS_FOR_BUILD="$RPM_OPT_FLAGS"; export CFLAGS_FOR_BUILD
 %configure --enable-mpers=check
-make %{?_smp_mflags}
+%make_build
 
 %install
-make DESTDIR=%{buildroot} install
+%make_install
 
 # remove unpackaged files from the buildroot
 rm -f %{buildroot}%{_bindir}/strace-graph
@@ -85,7 +91,7 @@ wait
 
 %check
 %{buildroot}%{_bindir}/strace -V
-make %{?_smp_mflags} -k check VERBOSE=1
+%make_build -k check VERBOSE=1
 echo 'BEGIN OF TEST SUITE INFORMATION'
 tail -n 99999 -- tests*/test-suite.log tests*/ksysent.gen.log
 find tests* -type f -name '*.log' -print0 |
