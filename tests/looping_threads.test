@@ -20,16 +20,16 @@ inc="$(nproc)"
 [ "$inc" -ge 1 ] || inc=1
 
 timeout_2="$(($TIMEOUT_DURATION/2))"
-timeout_8="$(($TIMEOUT_DURATION/8))"
+timeout_16="$(($TIMEOUT_DURATION/16))"
 nproc=1
 
-run_prog "../$NAME" "$timeout_8" "$nproc"
+run_prog "../$NAME" "$timeout_16" "$nproc"
 
 while :; do
 	run_strace --follow-forks -qq -enone -esignal=none "../$NAME" "$timeout_2" "$nproc"
 
 	s1="$(date +%s)"
-	[ "$(($s1-$s0))" -lt "$timeout_8" ] ||
+	[ "$(($s1-$s0))" -lt "$timeout_16" ] ||
 		break
 
 	nproc="$(($nproc+$inc))"
