@@ -22,6 +22,7 @@ mkdir -p "$mpers_dir"
 
 sample="$mpers_dir/sample.c"
 cat > "$sample" <<EOF
+#include <stdint.h>
 #include "mpers_type.h"
 #include DEF_MPERS_TYPE(sample_struct)
 typedef struct {
@@ -56,6 +57,14 @@ typedef struct {
 		unsigned short us[4];
 		char sc;
 		unsigned char uc;
+		int8_t i8;
+		int16_t i16;
+		int32_t i32;
+		int64_t i64;
+		uint8_t u8;
+		uint16_t u16;
+		uint32_t u32;
+		uint64_t u64;
 	} u[3][2];
 	short f[0];
 } sample_struct;
@@ -103,6 +112,14 @@ int16_t ss[7][9];
 uint16_t us[4];
 char sc;
 unsigned char uc;
+signed char i8;
+int16_t i16;
+int32_t i32;
+int64_t i64;
+unsigned char u8;
+uint16_t u16;
+uint32_t u32;
+uint64_t u64;
 } u[3][2];
 int16_t f[0];
 } ATTRIBUTE_PACKED ${mpers_name}_sample_struct;
