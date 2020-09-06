@@ -418,9 +418,11 @@ main(int argc, char **argv)
 	static const struct strval32 fmtdesc_flags[] = {
 		{ ARG_STR(0) },
 		{ ARG_XLAT_KNOWN(0x1, "V4L2_FMT_FLAG_COMPRESSED") },
-		{ ARG_XLAT_KNOWN(0x1e, "V4L2_FMT_FLAG_EMULATED"
+		{ ARG_XLAT_KNOWN(0x3e, "V4L2_FMT_FLAG_EMULATED"
 				       "|V4L2_FMT_FLAG_CONTINUOUS_BYTESTREAM"
-				       "|V4L2_FMT_FLAG_DYN_RESOLUTION|0x10") },
+				       "|V4L2_FMT_FLAG_DYN_RESOLUTION"
+				       "|V4L2_FMT_FLAG_ENC_CAP_FRAME_INTERVAL"
+				       "|0x20") },
 		{ ARG_XLAT_UNKNOWN(0xdead0000, "V4L2_FMT_FLAG_???") },
 	};
 	static const struct strval32 fmtdesc_fmts[] = {
