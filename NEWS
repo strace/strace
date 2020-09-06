@@ -6,7 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Added --pidns-translation option for PID namespace translation.
   * Implemented decoding of close_range syscall.
   * Updated lists of BPF_*, CAP_*, FAN_*, IFLA_*, INET_DIAG_REQ_*,
-    IORING_FEAT_*, IP_*, IPV6_*, and KVM_* constants.
+    IORING_FEAT_*, IP_*, IPV6_*, KVM_*, and NDA_* constants.
 
 * Bug fixes
 
