@@ -44,6 +44,8 @@ struct inet_diag_req_v2 {
 enum {
 	INET_DIAG_REQ_NONE,
 	INET_DIAG_REQ_BYTECODE,
+	INET_DIAG_REQ_SK_BPF_STORAGES,
+	INET_DIAG_REQ_PROTOCOL,
 };
 
 struct inet_diag_bc_op {

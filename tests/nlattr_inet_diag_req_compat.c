@@ -73,10 +73,10 @@ main(void)
 
 	char nla_type_str[256];
 	sprintf(nla_type_str, "%#x /* INET_DIAG_REQ_??? */",
-		INET_DIAG_REQ_BYTECODE + 1);
+		INET_DIAG_REQ_PROTOCOL + 1);
 	TEST_NLATTR_(fd, nlh0, hdrlen,
 		     init_inet_diag_req, print_inet_diag_req,
-		     INET_DIAG_REQ_BYTECODE + 1, nla_type_str,
+		     INET_DIAG_REQ_PROTOCOL + 1, nla_type_str,
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
 
