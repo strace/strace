@@ -5,7 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Added -n/--syscall-number option for printing syscall numbers.
   * Added --pidns-translation option for PID namespace translation.
   * Implemented decoding of close_range syscall.
-  * Updated lists of BPF_*, CAP_*, and FAN_* constants.
+  * Updated lists of BPF_*, CAP_*, FAN_*, and IP_* constants.
 
 * Bug fixes
 
