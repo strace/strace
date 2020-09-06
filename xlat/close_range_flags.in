@@ -1,0 +1,3 @@
+#enum
+#include <linux/close_range.h>
+CLOSE_RANGE_UNSHARE	(1U << 1)

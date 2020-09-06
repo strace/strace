@@ -76,6 +76,7 @@ libstrace_a_SOURCES =	\
 	chdir.c		\
 	chmod.c		\
 	clone.c		\
+	close_range.c	\
 	copy_file_range.c \
 	count.c		\
 	defs.h		\

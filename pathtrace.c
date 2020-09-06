@@ -198,6 +198,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	 */
 
 	switch (s->sen) {
+	case SEN_close_range:
 	case SEN_dup2:
 	case SEN_dup3:
 	case SEN_kexec_file_load:

@@ -4,6 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Added -n/--syscall-number option for printing syscall numbers.
   * Added --pidns-translation option for PID namespace translation.
+  * Implemented decoding of close_range syscall.
 
 * Bug fixes
 

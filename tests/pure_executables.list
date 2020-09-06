@@ -32,6 +32,10 @@ clone3
 clone3-Xabbrev
 clone3-Xraw
 clone3-Xverbose
+close_range
+close_range-P
+close_range-y
+close_range-yy
 copy_file_range
 creat
 delete_module
