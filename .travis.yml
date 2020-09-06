@@ -13,7 +13,6 @@ git:
 
 env:
   global:
-    - KBRANCH="v5.8"
     - KHEADERS=""
     - SLEEP_A_BIT="sleep 0.2"
     - STACKTRACE=""
