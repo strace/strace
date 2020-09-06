@@ -44,13 +44,14 @@ main(void)
 		{ F8ILL_KULONG_MASK, "FAN_CLASS_NOTIF" },
 		{ (kernel_ulong_t) 0xffffffff0000000cULL,
 			"0xc /* FAN_CLASS_??? */" },
-		{ (kernel_ulong_t) 0xdec0deddefacec04ULL,
-			"FAN_CLASS_CONTENT|0xefacec00 /* FAN_??? */" },
+		{ (kernel_ulong_t) 0xdec0deddeface004ULL,
+			"FAN_CLASS_CONTENT|0xeface000 /* FAN_??? */" },
 		{ (kernel_ulong_t) 0xffffffffffffffffULL,
 			"0xc /* FAN_CLASS_??? */|FAN_CLOEXEC|FAN_NONBLOCK|"
 			"FAN_UNLIMITED_QUEUE|FAN_UNLIMITED_MARKS|"
 			"FAN_ENABLE_AUDIT|FAN_REPORT_TID|FAN_REPORT_FID|"
-			"0xfffffc80" },
+			"FAN_REPORT_DIR_FID|FAN_REPORT_NAME|"
+			"0xfffff080" },
 	};
 	static const struct strval event_f_flags[] = {
 		{ F8ILL_KULONG_MASK, "O_RDONLY" },
