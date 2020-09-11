@@ -1657,7 +1657,9 @@ effective user
 .SM ID
 privileges while being traced.
 .LP
-A traced process runs slowly.
+A traced process runs slowly (but check out the
+.B \-\-seccomp\-bpf
+option).
 .LP
 Traced processes which are descended from
 .I command
