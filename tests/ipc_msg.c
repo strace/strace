@@ -26,12 +26,9 @@
  * which led to segmentation fault.
  */
 #undef TEST_MSGCTL_BOGUS_ADDR
-#if defined __GLIBC__ && (defined POWERPC64 || defined POWERPC64LE)
-# if !(defined __GLIBC_MINOR__) \
-   || ((__GLIBC__ << 16) + __GLIBC_MINOR__ < (2 << 16) + 23)
-#  define TEST_MSGCTL_BOGUS_ADDR 0
-# endif
-#endif /* __GLIBC__ && (POWERPC64 || POWERPC64LE) */
+#if GLIBC_PREREQ_LT(2, 23) && (defined POWERPC64 || defined POWERPC64LE)
+# define TEST_MSGCTL_BOGUS_ADDR 0
+#endif
 
 #ifndef TEST_MSGCTL_BOGUS_ADDR
 # define TEST_MSGCTL_BOGUS_ADDR 1

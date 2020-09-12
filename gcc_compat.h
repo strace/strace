@@ -23,6 +23,21 @@
 #  define CLANG_PREREQ(maj, min)	0
 # endif
 
+# ifdef __GLIBC__
+#  ifdef __GLIBC_MINOR__
+#   define GLIBC_PREREQ_GE(maj, min)	\
+	((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
+#   define GLIBC_PREREQ_LT(maj, min)	\
+	((__GLIBC__ << 16) + __GLIBC_MINOR__ < ((maj) << 16) + (min))
+#  else /* !__GLIBC_MINOR__ */
+#   define GLIBC_PREREQ_GE(maj, min)	0
+#   define GLIBC_PREREQ_LT(maj, min)	1
+#  endif
+# else /* !__GLIBC__ */
+#  define GLIBC_PREREQ_GE(maj, min)	0
+#  define GLIBC_PREREQ_LT(maj, min)	0
+# endif
+
 # if !(GNUC_PREREQ(2, 0) || CLANG_PREREQ(1, 0))
 #  define __attribute__(x)	/* empty */
 # endif
