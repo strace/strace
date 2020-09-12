@@ -20,12 +20,21 @@
 # define MSG_STAT_ANY 13
 #endif
 
+#undef TEST_MSGCTL_BOGUS_ADDR
+
+/*
+ * Starting with commit glibc-2.32~83, on every 32-bit architecture
+ * where 32-bit time_t support is enabled, glibc tries to retrieve
+ * the data provided in the third argument of msgctl call.
+ */
+#if GLIBC_PREREQ_GE(2, 32) && defined __TIMESIZE && __TIMESIZE != 64
+# define TEST_MSGCTL_BOGUS_ADDR 0
+#endif
 /*
  * Before glibc-2.22-122-gbe48165, ppc64 code tried to retrieve data
  * provided in third argument of msgctl call (in case of IPC_SET cmd)
  * which led to segmentation fault.
  */
-#undef TEST_MSGCTL_BOGUS_ADDR
 #if GLIBC_PREREQ_LT(2, 23) && (defined POWERPC64 || defined POWERPC64LE)
 # define TEST_MSGCTL_BOGUS_ADDR 0
 #endif
