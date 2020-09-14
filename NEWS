@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Added -n/--syscall-number option for printing syscall numbers.
   * Added --pidns-translation option for PID namespace translation.
   * Implemented decoding of close_range syscall.
+  * Implemented decoding of TEE_* ioctl commands.
   * Implemented decoding of struct msginfo argument of IPC_INFO
     and MSG_INFO msgctl syscall commands.
   * Implemented decoding of struct msqid_ds argument of MSG_STAT

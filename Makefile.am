@@ -345,6 +345,8 @@ libstrace_a_SOURCES =	\
 	sysinfo.c	\
 	syslog.c	\
 	sysmips.c	\
+	tee.c		\
+	tee.h		\
 	term.c		\
 	time.c		\
 	times.c		\

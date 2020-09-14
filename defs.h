@@ -1218,6 +1218,7 @@ DECL_IOCTL(nsfs);
 DECL_IOCTL(ptp);
 DECL_IOCTL(random);
 DECL_IOCTL(scsi);
+DECL_IOCTL(tee);
 DECL_IOCTL(term);
 DECL_IOCTL(ubi);
 DECL_IOCTL(uffdio);
