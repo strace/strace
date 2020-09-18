@@ -100,6 +100,7 @@ case "${CHECK-}" in
 			*) GCOV=gcov ;;
 		esac
 		./codecov.bash -Z -x "$GCOV" -a -abc
+		rm ./codecov.bash
 		;;
 	valgrind)
 		make -k $j all VERBOSE=${VERBOSE-}
@@ -119,3 +120,8 @@ case "${CHECK-}" in
 		make -k $j2 distcheck VERBOSE=${VERBOSE-}
 		;;
 esac
+
+if git status --porcelain |grep ^.; then
+	echo >&2 'git status reported uncleanness'
+	exit 1
+fi
