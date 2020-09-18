@@ -375,7 +375,7 @@ gen_header()
 	EOF
 	) >"${output}"
 
-	exec 3>-
+	exec 3>&-
 }
 
 gen_make()
