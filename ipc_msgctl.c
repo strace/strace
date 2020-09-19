@@ -81,20 +81,36 @@ print_msginfo(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(msgctl)
 {
+	const kernel_ulong_t addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
+	unsigned int cmd = tcp->u_arg[1];
+
+	/* TODO: We don't properly decode old compat ipc calls. */
+	if (cmd & IPC_64)
+		cmd &= ~IPC_64;
+
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 		PRINTCTL(msgctl_flags, tcp->u_arg[1], "MSG_???");
 		tprints(", ");
-	} else {
-		const kernel_ulong_t addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
-		unsigned int cmd = tcp->u_arg[1];
-
-		/* TODO: We don't properly decode old compat ipc calls. */
-		if (cmd & IPC_64)
-			cmd &= ~IPC_64;
-
 		switch (cmd) {
 		case IPC_SET:
+			print_msqid_ds(tcp, addr, cmd);
+			return RVAL_DECODED;
+
+		case IPC_STAT:
+		case MSG_STAT:
+		case MSG_STAT_ANY:
+		case IPC_INFO:
+		case MSG_INFO:
+			/* decode on exiting */
+			break;
+
+		default:
+			printaddr(addr);
+			return RVAL_DECODED;
+		}
+	} else {
+		switch (cmd) {
 		case IPC_STAT:
 		case MSG_STAT:
 		case MSG_STAT_ANY:
@@ -104,10 +120,6 @@ SYS_FUNC(msgctl)
 		case IPC_INFO:
 		case MSG_INFO:
 			print_msginfo(tcp, addr, cmd);
-			break;
-
-		default:
-			printaddr(addr);
 			break;
 		}
 	}
