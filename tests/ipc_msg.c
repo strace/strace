@@ -49,6 +49,7 @@
 # define str_ipc_rmid "0"
 # define str_ipc_set "0x1"
 # define str_ipc_stat "0x2"
+# define str_ipc_info "0x3"
 # define str_msg_stat "0xb"
 # define str_msg_info "0xc"
 # define str_msg_stat_any "0xd"
@@ -61,6 +62,7 @@
 # define str_ipc_rmid "0 /\\* IPC_RMID \\*/"
 # define str_ipc_set "0x1 /\\* IPC_SET \\*/"
 # define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
+# define str_ipc_info "0x3 /\\* IPC_INFO \\*/"
 # define str_msg_stat "0xb /\\* MSG_STAT \\*/"
 # define str_msg_info "0xc /\\* MSG_INFO \\*/"
 # define str_msg_stat_any "0xd /\\* MSG_STAT_ANY \\*/"
@@ -72,6 +74,7 @@
 # define str_ipc_rmid "IPC_RMID"
 # define str_ipc_set "IPC_SET"
 # define str_ipc_stat "IPC_STAT"
+# define str_ipc_info "IPC_INFO"
 # define str_msg_stat "MSG_STAT"
 # define str_msg_info "MSG_INFO"
 # define str_msg_stat_any "MSG_STAT_ANY"
@@ -88,6 +91,34 @@ cleanup(void)
 	printf("msgctl\\(%d, (%s\\|)?%s, NULL\\) += 0\n",
 	       id, str_ipc_64, str_ipc_rmid);
 	id = -1;
+}
+
+static void
+print_msginfo(const char *const str_ipc_cmd,
+	      const struct msginfo *const info,
+	      const int rc)
+{
+	if (rc < 0) {
+		printf("msgctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+		       id, str_ipc_64, str_ipc_cmd, info, sprintrc_grep(rc));
+		return;
+	}
+
+	printf("msgctl\\(%d, (%s\\|)?%s, \\{msgpool=%d, msgmap=%d, msgmax=%d"
+	       ", msgmnb=%d, msgmni=%d, msgssz=%d, msgtql=%d, msgseg=%u\\}\\)"
+	       " = %d\n",
+	       id,
+	       str_ipc_64,
+	       str_ipc_cmd,
+	       info->msgpool,
+	       info->msgmap,
+	       info->msgmax,
+	       info->msgmnb,
+	       info->msgmni,
+	       info->msgssz,
+	       info->msgtql,
+	       (unsigned) info->msgseg,
+	       rc);
 }
 
 static void
@@ -138,7 +169,10 @@ main(void)
 	static const int bogus_flags = 0xface1e55 & ~IPC_CREAT;
 
 	int rc;
-	struct msqid_ds ds;
+	union {
+		struct msqid_ds ds;
+		struct msginfo info;
+	} buf;
 
 	rc = msgget(bogus_key, bogus_flags);
 	printf("msgget\\(%#llx, %s\\|%#04o\\) = %s\n",
@@ -163,28 +197,32 @@ main(void)
 	       sprintrc_grep(rc));
 #endif
 
-	rc = msgctl(id, IPC_STAT, &ds);
+	rc = msgctl(id, IPC_STAT, &buf.ds);
 	if (rc < 0)
 		perror_msg_and_skip("msgctl IPC_STAT");
-	print_msqid_ds(str_ipc_stat, &ds, rc);
+	print_msqid_ds(str_ipc_stat, &buf.ds, rc);
 
-	if (msgctl(id, IPC_SET, &ds))
+	if (msgctl(id, IPC_SET, &buf.ds))
 		perror_msg_and_skip("msgctl IPC_SET");
 	printf("msgctl\\(%d, (%s\\|)?%s, \\{msg_perm=\\{uid=%u"
 	       ", gid=%u, mode=%#o\\}, msg_qbytes=%u\\}\\) = 0\n",
-	       id, str_ipc_64, str_ipc_set, (unsigned) ds.msg_perm.uid,
-	       (unsigned) ds.msg_perm.gid, (unsigned) ds.msg_perm.mode,
-	       (unsigned) ds.msg_qbytes);
+	       id, str_ipc_64, str_ipc_set,
+	       (unsigned) buf.ds.msg_perm.uid,
+	       (unsigned) buf.ds.msg_perm.gid,
+	       (unsigned) buf.ds.msg_perm.mode,
+	       (unsigned) buf.ds.msg_qbytes);
 
-	rc = msgctl(0, MSG_INFO, &ds);
-	printf("msgctl\\(0, (%s\\|)?%s, %p\\) = %s\n",
-	       str_ipc_64, str_msg_info, &ds, sprintrc_grep(rc));
+	rc = msgctl(id, IPC_INFO, &buf.ds);
+	print_msginfo(str_ipc_info, &buf.info, rc);
 
-	rc = msgctl(id, MSG_STAT, &ds);
-	print_msqid_ds(str_msg_stat, &ds, rc);
+	rc = msgctl(id, MSG_INFO, &buf.ds);
+	print_msginfo(str_msg_info, &buf.info, rc);
 
-	rc = msgctl(id, MSG_STAT_ANY, &ds);
-	print_msqid_ds(str_msg_stat_any, &ds, rc);
+	rc = msgctl(id, MSG_STAT, &buf.ds);
+	print_msqid_ds(str_msg_stat, &buf.ds, rc);
+
+	rc = msgctl(id, MSG_STAT_ANY, &buf.ds);
+	print_msqid_ds(str_msg_stat_any, &buf.ds, rc);
 
 	return 0;
 }

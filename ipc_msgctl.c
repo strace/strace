@@ -28,47 +28,55 @@ typedef struct NAME_OF_STRUCT_MSQID_DS msqid_ds_t;
 #define key NAME_OF_STRUCT_IPC_PERM_KEY
 
 static void
-print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
+print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
+	       const unsigned int cmd)
 {
-	/* TODO: We don't properly decode old compat ipc calls. */
-	if (cmd & IPC_64)
-		cmd &= ~IPC_64;
 	msqid_ds_t msqid_ds;
-	switch (cmd) {
-	case IPC_SET:
-	case IPC_STAT:
-	case MSG_STAT:
-	case MSG_STAT_ANY:
-		if (umove_or_printaddr(tcp, addr, &msqid_ds))
-			return;
 
-		PRINT_FIELD_UID("{msg_perm={", msqid_ds.msg_perm, uid);
-		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, gid);
-		PRINT_FIELD_NUMERIC_UMODE_T(", ", msqid_ds.msg_perm, mode);
-		if (cmd != IPC_SET) {
-			PRINT_FIELD_U(", ", msqid_ds.msg_perm, key);
-			PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cuid);
-			PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cgid);
-		}
-		tprints("}");
-		if (cmd != IPC_SET) {
-			PRINT_FIELD_U(", ", msqid_ds, msg_stime);
-			PRINT_FIELD_U(", ", msqid_ds, msg_rtime);
-			PRINT_FIELD_U(", ", msqid_ds, msg_ctime);
-			PRINT_FIELD_U(", ", msqid_ds, msg_qnum);
-		}
-		PRINT_FIELD_U(", ", msqid_ds, msg_qbytes);
-		if (cmd != IPC_SET) {
-			PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
-			PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
-		}
-		tprints("}");
-		break;
+	if (umove_or_printaddr(tcp, addr, &msqid_ds))
+		return;
 
-	default:
-		printaddr(addr);
-		break;
+	PRINT_FIELD_UID("{msg_perm={", msqid_ds.msg_perm, uid);
+	PRINT_FIELD_UID(", ", msqid_ds.msg_perm, gid);
+	PRINT_FIELD_NUMERIC_UMODE_T(", ", msqid_ds.msg_perm, mode);
+	if (cmd != IPC_SET) {
+		PRINT_FIELD_U(", ", msqid_ds.msg_perm, key);
+		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cuid);
+		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cgid);
 	}
+	tprints("}");
+	if (cmd != IPC_SET) {
+		PRINT_FIELD_U(", ", msqid_ds, msg_stime);
+		PRINT_FIELD_U(", ", msqid_ds, msg_rtime);
+		PRINT_FIELD_U(", ", msqid_ds, msg_ctime);
+		PRINT_FIELD_U(", ", msqid_ds, msg_qnum);
+	}
+	PRINT_FIELD_U(", ", msqid_ds, msg_qbytes);
+	if (cmd != IPC_SET) {
+		PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
+		PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
+	}
+	tprints("}");
+}
+
+static void
+print_msginfo(struct tcb *const tcp, const kernel_ulong_t addr,
+	      const unsigned int cmd)
+{
+	struct msginfo info;
+
+	if (umove_or_printaddr(tcp, addr, &info))
+		return;
+
+	PRINT_FIELD_D("{", info, msgpool);
+	PRINT_FIELD_D(", ", info, msgmap);
+	PRINT_FIELD_D(", ", info, msgmax);
+	PRINT_FIELD_D(", ", info, msgmnb);
+	PRINT_FIELD_D(", ", info, msgmni);
+	PRINT_FIELD_D(", ", info, msgssz);
+	PRINT_FIELD_D(", ", info, msgtql);
+	PRINT_FIELD_U(", ", info, msgseg);
+	tprints("}");
 }
 
 SYS_FUNC(msgctl)
@@ -79,7 +87,29 @@ SYS_FUNC(msgctl)
 		tprints(", ");
 	} else {
 		const kernel_ulong_t addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
-		print_msqid_ds(tcp, addr, tcp->u_arg[1]);
+		unsigned int cmd = tcp->u_arg[1];
+
+		/* TODO: We don't properly decode old compat ipc calls. */
+		if (cmd & IPC_64)
+			cmd &= ~IPC_64;
+
+		switch (cmd) {
+		case IPC_SET:
+		case IPC_STAT:
+		case MSG_STAT:
+		case MSG_STAT_ANY:
+			print_msqid_ds(tcp, addr, cmd);
+			break;
+
+		case IPC_INFO:
+		case MSG_INFO:
+			print_msginfo(tcp, addr, cmd);
+			break;
+
+		default:
+			printaddr(addr);
+			break;
+		}
 	}
 	return 0;
 }
