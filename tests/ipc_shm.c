@@ -84,6 +84,39 @@ cleanup(void)
 	id = -1;
 }
 
+static void
+print_shmid_ds(const char *const str_ipc_cmd,
+	       const struct shmid_ds *const ds,
+	       const int rc)
+{
+	if (rc < 0) {
+		printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+		       id, str_ipc_64, str_ipc_cmd, ds, sprintrc_grep(rc));
+		return;
+	}
+	printf("shmctl\\(%d, (%s\\|)?%s, \\{shm_perm=\\{uid=%u, gid=%u"
+		", mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u"
+		", shm_cpid=%d, shm_lpid=%d, shm_nattch=%u, shm_atime=%u"
+		", shm_dtime=%u, shm_ctime=%u\\}\\) = %d\n",
+		id,
+		str_ipc_64,
+		str_ipc_cmd,
+		(unsigned) ds->shm_perm.uid,
+		(unsigned) ds->shm_perm.gid,
+		(unsigned) ds->shm_perm.mode,
+		(unsigned) ds->shm_perm.__key,
+		(unsigned) ds->shm_perm.cuid,
+		(unsigned) ds->shm_perm.cgid,
+		(unsigned) ds->shm_segsz,
+		(int) ds->shm_cpid,
+		(int) ds->shm_lpid,
+		(unsigned) ds->shm_nattch,
+		(unsigned) ds->shm_atime,
+		(unsigned) ds->shm_dtime,
+		(unsigned) ds->shm_ctime,
+		rc);
+}
+
 int
 main(void)
 {
@@ -165,20 +198,10 @@ main(void)
 	       bogus_id, str_ipc_64, str_ipc_stat, bogus_addr,
 	       sprintrc_grep(rc));
 
-	if (shmctl(id, IPC_STAT, &ds))
+	rc = shmctl(id, IPC_STAT, &ds);
+	if (rc < 0)
 		perror_msg_and_skip("shmctl IPC_STAT");
-	printf("shmctl\\(%d, (%s\\|)?%s, \\{shm_perm=\\{uid=%u, gid=%u, "
-		"mode=%#o, key=%u, cuid=%u, cgid=%u\\}, shm_segsz=%u, shm_cpid=%d, "
-		"shm_lpid=%d, shm_nattch=%u, shm_atime=%u, shm_dtime=%u, "
-		"shm_ctime=%u\\}\\) = 0\n",
-		id, str_ipc_64, str_ipc_stat,
-		(unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
-		(unsigned) ds.shm_perm.mode, (unsigned) ds.shm_perm.__key,
-		(unsigned) ds.shm_perm.cuid, (unsigned) ds.shm_perm.cgid,
-		(unsigned) ds.shm_segsz, (int) ds.shm_cpid,
-		(int) ds.shm_lpid, (unsigned) ds.shm_nattch,
-		(unsigned) ds.shm_atime, (unsigned) ds.shm_dtime,
-		(unsigned) ds. shm_ctime);
+	print_shmid_ds(str_ipc_stat, &ds, rc);
 
 	if (shmctl(id, IPC_SET, &ds))
 		perror_msg_and_skip("shmctl IPC_SET");
@@ -193,12 +216,10 @@ main(void)
 	       str_ipc_64, str_shm_info, &ds, sprintrc_grep(rc));
 
 	rc = shmctl(id, SHM_STAT, &ds);
-	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
-	       id, str_ipc_64, str_shm_stat, &ds, sprintrc_grep(rc));
+	print_shmid_ds(str_shm_stat, &ds, rc);
 
 	rc = shmctl(id, SHM_STAT_ANY, &ds);
-	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
-	       id, str_ipc_64, str_shm_stat_any, &ds, sprintrc_grep(rc));
+	print_shmid_ds(str_shm_stat_any, &ds, rc);
 
 	return 0;
 }

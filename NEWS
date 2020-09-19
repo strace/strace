@@ -9,6 +9,8 @@ Noteworthy changes in release ?.? (????-??-??)
     and MSG_INFO msgctl syscall commands.
   * Implemented decoding of struct msqid_ds argument of MSG_STAT
     and MSG_STAT_ANY msgctl syscall commands.
+  * Implemented decoding of struct shmid_ds argument of SHM_STAT
+    and SHM_STAT_ANY shmctl syscall commands.
   * Updated lists of BPF_*, CAP_*, FAN_*, IFLA_*, INET_DIAG_REQ_*,
     IORING_FEAT_*, IP_*, IPV6_*, KVM_*, NDA_*, PTP_PEROUT_*, RTPROT_*,
     and V4L2_FMT_FLAG_* constants.
