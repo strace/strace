@@ -206,7 +206,7 @@ main(void)
 	if (shmctl(id, IPC_SET, &ds))
 		perror_msg_and_skip("shmctl IPC_SET");
 	printf("shmctl\\(%d, (%s\\|)?%s, \\{shm_perm=\\{uid=%u, gid=%u"
-	       ", mode=%#o\\}, ...\\}\\) = 0\n",
+	       ", mode=%#o\\}\\}\\) = 0\n",
 	       id, str_ipc_64, str_ipc_set,
 	       (unsigned) ds.shm_perm.uid, (unsigned) ds.shm_perm.gid,
 	       (unsigned) ds.shm_perm.mode);

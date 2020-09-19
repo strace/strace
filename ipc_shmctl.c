@@ -46,22 +46,21 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, gid);
 		PRINT_FIELD_NUMERIC_UMODE_T(", ", shmid_ds.shm_perm, mode);
 
-		if (cmd == IPC_SET) {
-			tprints("}, ...}");
-			break;
+		if (cmd != IPC_SET) {
+			PRINT_FIELD_U(", ", shmid_ds.shm_perm, key);
+			PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cuid);
+			PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cgid);
 		}
-
-		PRINT_FIELD_U(", ", shmid_ds.shm_perm, key);
-		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cuid);
-		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cgid);
 		tprints("}");
-		PRINT_FIELD_U(", ", shmid_ds, shm_segsz);
-		PRINT_FIELD_TGID(", ", shmid_ds, shm_cpid, tcp);
-		PRINT_FIELD_TGID(", ", shmid_ds, shm_lpid, tcp);
-		PRINT_FIELD_U(", ", shmid_ds, shm_nattch);
-		PRINT_FIELD_U(", ", shmid_ds, shm_atime);
-		PRINT_FIELD_U(", ", shmid_ds, shm_dtime);
-		PRINT_FIELD_U(", ", shmid_ds, shm_ctime);
+		if (cmd != IPC_SET) {
+			PRINT_FIELD_U(", ", shmid_ds, shm_segsz);
+			PRINT_FIELD_TGID(", ", shmid_ds, shm_cpid, tcp);
+			PRINT_FIELD_TGID(", ", shmid_ds, shm_lpid, tcp);
+			PRINT_FIELD_U(", ", shmid_ds, shm_nattch);
+			PRINT_FIELD_U(", ", shmid_ds, shm_atime);
+			PRINT_FIELD_U(", ", shmid_ds, shm_dtime);
+			PRINT_FIELD_U(", ", shmid_ds, shm_ctime);
+		}
 		tprints("}");
 		break;
 
