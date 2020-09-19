@@ -171,9 +171,10 @@ main(void)
 	if (msgctl(id, IPC_SET, &ds))
 		perror_msg_and_skip("msgctl IPC_SET");
 	printf("msgctl\\(%d, (%s\\|)?%s, \\{msg_perm=\\{uid=%u"
-	       ", gid=%u, mode=%#o\\}, ...\\}\\) = 0\n",
+	       ", gid=%u, mode=%#o\\}, msg_qbytes=%u\\}\\) = 0\n",
 	       id, str_ipc_64, str_ipc_set, (unsigned) ds.msg_perm.uid,
-	       (unsigned) ds.msg_perm.gid, (unsigned) ds.msg_perm.mode);
+	       (unsigned) ds.msg_perm.gid, (unsigned) ds.msg_perm.mode,
+	       (unsigned) ds.msg_qbytes);
 
 	rc = msgctl(0, MSG_INFO, &ds);
 	printf("msgctl\\(0, (%s\\|)?%s, %p\\) = %s\n",

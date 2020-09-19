@@ -45,23 +45,23 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		PRINT_FIELD_UID("{msg_perm={", msqid_ds.msg_perm, uid);
 		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, gid);
 		PRINT_FIELD_NUMERIC_UMODE_T(", ", msqid_ds.msg_perm, mode);
-
-		if (cmd == IPC_SET) {
-			tprints("}, ...}");
-			break;
+		if (cmd != IPC_SET) {
+			PRINT_FIELD_U(", ", msqid_ds.msg_perm, key);
+			PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cuid);
+			PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cgid);
 		}
-
-		PRINT_FIELD_U(", ", msqid_ds.msg_perm, key);
-		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cuid);
-		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cgid);
 		tprints("}");
-		PRINT_FIELD_U(", ", msqid_ds, msg_stime);
-		PRINT_FIELD_U(", ", msqid_ds, msg_rtime);
-		PRINT_FIELD_U(", ", msqid_ds, msg_ctime);
-		PRINT_FIELD_U(", ", msqid_ds, msg_qnum);
+		if (cmd != IPC_SET) {
+			PRINT_FIELD_U(", ", msqid_ds, msg_stime);
+			PRINT_FIELD_U(", ", msqid_ds, msg_rtime);
+			PRINT_FIELD_U(", ", msqid_ds, msg_ctime);
+			PRINT_FIELD_U(", ", msqid_ds, msg_qnum);
+		}
 		PRINT_FIELD_U(", ", msqid_ds, msg_qbytes);
-		PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
-		PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
+		if (cmd != IPC_SET) {
+			PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
+			PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
+		}
 		tprints("}");
 		break;
 
