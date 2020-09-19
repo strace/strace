@@ -15,12 +15,14 @@
 
 #include DEF_MPERS_TYPE(shmid_ds_t)
 #include DEF_MPERS_TYPE(struct_shm_info_t)
+#include DEF_MPERS_TYPE(struct_shm_ipc_info_t)
 
 #include "ipc_defs.h"
 
 #include SHM_H_PROVIDER
 typedef struct NAME_OF_STRUCT_SHMID_DS shmid_ds_t;
 typedef struct shm_info struct_shm_info_t;
+typedef struct NAME_OF_STRUCT_SHMINFO struct_shm_ipc_info_t;
 
 #include MPERS_DEFS
 
@@ -57,6 +59,23 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_U(", ", shmid_ds, shm_dtime);
 		PRINT_FIELD_U(", ", shmid_ds, shm_ctime);
 	}
+	tprints("}");
+}
+
+static void
+print_ipc_info(struct tcb *const tcp, const kernel_ulong_t addr,
+	       const unsigned int cmd)
+{
+	struct_shm_ipc_info_t info;
+
+	if (umove_or_printaddr(tcp, addr, &info))
+		return;
+
+	PRINT_FIELD_U("{", info, shmmax);
+	PRINT_FIELD_U(", ", info, shmmin);
+	PRINT_FIELD_U(", ", info, shmmni);
+	PRINT_FIELD_U(", ", info, shmseg);
+	PRINT_FIELD_U(", ", info, shmall);
 	tprints("}");
 }
 
@@ -98,6 +117,10 @@ SYS_FUNC(shmctl)
 		case SHM_STAT:
 		case SHM_STAT_ANY:
 			print_shmid_ds(tcp, addr, cmd);
+			break;
+
+		case IPC_INFO:
+			print_ipc_info(tcp, addr, cmd);
 			break;
 
 		case SHM_INFO:

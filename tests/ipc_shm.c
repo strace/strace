@@ -39,6 +39,7 @@
 # define str_ipc_rmid "0"
 # define str_ipc_set "0x1"
 # define str_ipc_stat "0x2"
+# define str_ipc_info "0x3"
 # define str_shm_stat "0xd"
 # define str_shm_info "0xe"
 # define str_shm_stat_any "0xf"
@@ -53,6 +54,7 @@
 # define str_ipc_rmid "0 /\\* IPC_RMID \\*/"
 # define str_ipc_set "0x1 /\\* IPC_SET \\*/"
 # define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
+# define str_ipc_info "0x3 /\\* IPC_INFO \\*/"
 # define str_shm_stat "0xd /\\* SHM_STAT \\*/"
 # define str_shm_info "0xe /\\* SHM_INFO \\*/"
 # define str_shm_stat_any "0xf /\\* SHM_STAT_ANY \\*/"
@@ -66,6 +68,7 @@
 # define str_ipc_rmid "IPC_RMID"
 # define str_ipc_set "IPC_SET"
 # define str_ipc_stat "IPC_STAT"
+# define str_ipc_info "IPC_INFO"
 # define str_shm_stat "SHM_STAT"
 # define str_shm_info "SHM_INFO"
 # define str_shm_stat_any "SHM_STAT_ANY"
@@ -115,6 +118,30 @@ print_shmid_ds(const char *const str_ipc_cmd,
 		(unsigned) ds->shm_dtime,
 		(unsigned) ds->shm_ctime,
 		rc);
+}
+
+static void
+print_ipc_info(const char *const str_ipc_cmd,
+               const struct shminfo *const info,
+               const int rc)
+{
+	if (rc < 0) {
+		printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
+		       id, str_ipc_64, str_ipc_cmd, info, sprintrc_grep(rc));
+		return;
+	}
+
+	printf("shmctl\\(%d, (%s\\|)?%s, \\{shmmax=%llu, shmmin=%llu"
+	       ", shmmni=%llu, shmseg=%llu, shmall=%llu\\}\\) = %d\n",
+	       id,
+	       str_ipc_64,
+	       str_ipc_cmd,
+	       (unsigned long long) info->shmmax,
+	       (unsigned long long) info->shmmin,
+	       (unsigned long long) info->shmmni,
+	       (unsigned long long) info->shmseg,
+	       (unsigned long long) info->shmall,
+	       rc);
 }
 
 static void
@@ -170,7 +197,8 @@ main(void)
 	int rc;
 	union {
 		struct shmid_ds ds;
-		struct shm_info info;
+		struct shminfo ipc_info;
+		struct shm_info shm_info;
 	} buf;
 
 	rc = shmget(bogus_key, bogus_size, 0);
@@ -241,8 +269,11 @@ main(void)
 	       (unsigned) buf.ds.shm_perm.gid,
 	       (unsigned) buf.ds.shm_perm.mode);
 
+	rc = shmctl(id, IPC_INFO, &buf.ds);
+	print_ipc_info(str_ipc_info, &buf.ipc_info, rc);
+
 	rc = shmctl(id, SHM_INFO, &buf.ds);
-	print_shm_info(str_shm_info, &buf.info, rc);
+	print_shm_info(str_shm_info, &buf.shm_info, rc);
 
 	rc = shmctl(id, SHM_STAT, &buf.ds);
 	print_shmid_ds(str_shm_stat, &buf.ds, rc);

@@ -38,6 +38,7 @@
 #  define SHM_H_PROVIDER "linux/shm.h"
 #  define NAME_OF_STRUCT_MSQID_DS msqid64_ds
 #  define NAME_OF_STRUCT_SHMID_DS shmid64_ds
+#  define NAME_OF_STRUCT_SHMINFO shminfo64
 #  define NAME_OF_STRUCT_IPC_PERM_KEY key
 # elif defined HAVE_SYS_IPC_H
 #  include <sys/ipc.h>
@@ -46,6 +47,7 @@
 #  define SHM_H_PROVIDER "sys/shm.h"
 #  define NAME_OF_STRUCT_MSQID_DS msqid_ds
 #  define NAME_OF_STRUCT_SHMID_DS shmid_ds
+#  define NAME_OF_STRUCT_SHMINFO shminfo
 #  define NAME_OF_STRUCT_IPC_PERM_KEY __key
 # else
 #  error Neither <sys/ipc.h> nor <linux/ipc.h> is available

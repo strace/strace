@@ -9,6 +9,8 @@ Noteworthy changes in release ?.? (????-??-??)
     and MSG_INFO msgctl syscall commands.
   * Implemented decoding of struct msqid_ds argument of MSG_STAT
     and MSG_STAT_ANY msgctl syscall commands.
+  * Implemented decoding of struct shminfo argument of IPC_INFO
+    shmctl syscall command.
   * Implemented decoding of struct shm_info argument of SHM_INFO
     shmctl syscall command.
   * Implemented decoding of struct shmid_ds argument of SHM_STAT
