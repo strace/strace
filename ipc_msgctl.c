@@ -25,6 +25,8 @@ typedef struct NAME_OF_STRUCT_MSQID_DS msqid_ds_t;
 #include "print_fields.h"
 #include "xlat/msgctl_flags.h"
 
+#define key NAME_OF_STRUCT_IPC_PERM_KEY
+
 static void
 print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 {
@@ -47,16 +49,15 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 			break;
 		}
 
-		tprintf(", key=%u",
-			(unsigned) msqid_ds.msg_perm.NAME_OF_STRUCT_IPC_PERM_KEY);
+		PRINT_FIELD_U(", ", msqid_ds.msg_perm, key);
 		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cuid);
 		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, cgid);
 		tprints("}");
-		tprintf(", msg_stime=%u", (unsigned) msqid_ds.msg_stime);
-		tprintf(", msg_rtime=%u", (unsigned) msqid_ds.msg_rtime);
-		tprintf(", msg_ctime=%u", (unsigned) msqid_ds.msg_ctime);
-		tprintf(", msg_qnum=%u", (unsigned) msqid_ds.msg_qnum);
-		tprintf(", msg_qbytes=%u", (unsigned) msqid_ds.msg_qbytes);
+		PRINT_FIELD_U(", ", msqid_ds, msg_stime);
+		PRINT_FIELD_U(", ", msqid_ds, msg_rtime);
+		PRINT_FIELD_U(", ", msqid_ds, msg_ctime);
+		PRINT_FIELD_U(", ", msqid_ds, msg_qnum);
+		PRINT_FIELD_U(", ", msqid_ds, msg_qbytes);
 		PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
 		PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
 		tprints("}");
