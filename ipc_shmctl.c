@@ -99,20 +99,36 @@ print_shm_info(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(shmctl)
 {
+	const kernel_ulong_t addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
+	unsigned int cmd = tcp->u_arg[1];
+
+	/* TODO: We don't properly decode old compat ipc calls. */
+	if (cmd & IPC_64)
+		cmd &= ~IPC_64;
+
 	if (entering(tcp)) {
 		tprintf("%d, ", (int) tcp->u_arg[0]);
 		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
 		tprints(", ");
-	} else {
-		const kernel_ulong_t addr = tcp->u_arg[indirect_ipccall(tcp) ? 3 : 2];
-		unsigned int cmd = tcp->u_arg[1];
-
-		/* TODO: We don't properly decode old compat ipc calls. */
-		if (cmd & IPC_64)
-			cmd &= ~IPC_64;
-
 		switch (cmd) {
 		case IPC_SET:
+			print_shmid_ds(tcp, addr, cmd);
+			return RVAL_DECODED;
+
+		case IPC_STAT:
+		case SHM_STAT:
+		case SHM_STAT_ANY:
+		case IPC_INFO:
+		case SHM_INFO:
+			/* decode on exiting */
+			break;
+
+		default:
+			printaddr(addr);
+			return RVAL_DECODED;
+		}
+	} else {
+		switch (cmd) {
 		case IPC_STAT:
 		case SHM_STAT:
 		case SHM_STAT_ANY:
@@ -125,10 +141,6 @@ SYS_FUNC(shmctl)
 
 		case SHM_INFO:
 			print_shm_info(tcp, addr, cmd);
-			break;
-
-		default:
-			printaddr(addr);
 			break;
 		}
 	}
