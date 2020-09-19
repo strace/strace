@@ -5,6 +5,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Added -n/--syscall-number option for printing syscall numbers.
   * Added --pidns-translation option for PID namespace translation.
   * Implemented decoding of close_range syscall.
+  * Implemented decoding of struct msqid_ds argument of MSG_STAT
+    and MSG_STAT_ANY msgctl syscall commands.
   * Updated lists of BPF_*, CAP_*, FAN_*, IFLA_*, INET_DIAG_REQ_*,
     IORING_FEAT_*, IP_*, IPV6_*, KVM_*, NDA_*, PTP_PEROUT_*, RTPROT_*,
     and V4L2_FMT_FLAG_* constants.

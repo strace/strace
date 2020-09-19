@@ -37,6 +37,8 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 	switch (cmd) {
 	case IPC_SET:
 	case IPC_STAT:
+	case MSG_STAT:
+	case MSG_STAT_ANY:
 		if (umove_or_printaddr(tcp, addr, &msqid_ds))
 			return;
 
@@ -44,7 +46,7 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr, int cmd)
 		PRINT_FIELD_UID(", ", msqid_ds.msg_perm, gid);
 		PRINT_FIELD_NUMERIC_UMODE_T(", ", msqid_ds.msg_perm, mode);
 
-		if (cmd != IPC_STAT) {
+		if (cmd == IPC_SET) {
 			tprints("}, ...}");
 			break;
 		}
