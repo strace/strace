@@ -153,6 +153,7 @@ libstrace_a_SOURCES =	\
 	ipc_msg.c	\
 	ipc_msgctl.c	\
 	ipc_sem.c	\
+	ipc_semctl.c	\
 	ipc_shm.c	\
 	ipc_shmctl.c	\
 	kcmp.c		\

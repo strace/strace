@@ -16,7 +16,6 @@
 
 #include SEM_H_PROVIDER
 
-#include "xlat/semctl_flags.h"
 #include "xlat/semop_flags.h"
 
 static bool
@@ -91,22 +90,5 @@ SYS_FUNC(semget)
 	if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
 		tprints("|");
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);
-	return RVAL_DECODED;
-}
-
-SYS_FUNC(semctl)
-{
-	tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
-	PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
-	tprints(", ");
-	if (indirect_ipccall(tcp)
-#ifdef SPARC64
-	    && current_personality != 0
-#endif
-	   ) {
-		printnum_ptr(tcp, tcp->u_arg[3]);
-	} else {
-		printaddr(tcp->u_arg[3]);
-	}
 	return RVAL_DECODED;
 }

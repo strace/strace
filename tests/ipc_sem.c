@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/sem.h>
 
 #include "xlat.h"
@@ -24,7 +25,9 @@
 # define str_ipc_flags "0xface1e00"
 # define str_ipc_private "0"
 # define str_ipc_rmid "0"
+# define str_ipc_set "0x1"
 # define str_ipc_stat "0x2"
+# define str_ipc_info "0x3"
 # define str_sem_stat "0x12"
 # define str_sem_info "0x13"
 # define str_sem_stat_any "0x14"
@@ -35,7 +38,9 @@
 	"0xface1e00 /\\* IPC_CREAT\\|IPC_EXCL\\|IPC_NOWAIT\\|0xface1000 \\*/"
 # define str_ipc_private "0 /\\* IPC_PRIVATE \\*/"
 # define str_ipc_rmid "0 /\\* IPC_RMID \\*/"
+# define str_ipc_set "0x1 /\\* IPC_SET \\*/"
 # define str_ipc_stat "0x2 /\\* IPC_STAT \\*/"
+# define str_ipc_info "0x3 /\\* IPC_INFO \\*/"
 # define str_sem_stat "0x12 /\\* SEM_STAT \\*/"
 # define str_sem_info "0x13 /\\* SEM_INFO \\*/"
 # define str_sem_stat_any "0x14 /\\* SEM_STAT_ANY \\*/"
@@ -45,7 +50,9 @@
 # define str_ipc_flags "IPC_CREAT\\|IPC_EXCL\\|IPC_NOWAIT\\|0xface1000"
 # define str_ipc_private "IPC_PRIVATE"
 # define str_ipc_rmid "IPC_RMID"
+# define str_ipc_set "IPC_SET"
 # define str_ipc_stat "IPC_STAT"
+# define str_ipc_info "IPC_INFO"
 # define str_sem_stat "SEM_STAT"
 # define str_sem_info "SEM_INFO"
 # define str_sem_stat_any "SEM_STAT_ANY"
@@ -72,6 +79,66 @@ cleanup(void)
 	id = -1;
 }
 
+static void
+print_semid_ds(const char *const str_ipc_cmd,
+              const struct semid_ds *const ds,
+              const int rc)
+{
+	if (rc < 0) {
+		printf("semctl\\(%d, 0, (%s\\|)?%s, (%p|\\[%p\\])\\) = %s\n",
+		       id, str_ipc_64, str_ipc_cmd, &ds, &ds,
+		       sprintrc_grep(rc));
+		return;
+	}
+	printf("semctl\\(%d, 0, (%s\\|)?%s, \\{sem_perm=\\{uid=%u, gid=%u"
+		", mode=%#o, key=%u, cuid=%u, cgid=%u\\}, sem_otime=%llu"
+		", sem_ctime=%llu, sem_nsems=%llu\\}\\) = %d\n",
+		id,
+		str_ipc_64,
+		str_ipc_cmd,
+		(unsigned) ds->sem_perm.uid,
+		(unsigned) ds->sem_perm.gid,
+		(unsigned) ds->sem_perm.mode,
+		(unsigned) ds->sem_perm.__key,
+		(unsigned) ds->sem_perm.cuid,
+		(unsigned) ds->sem_perm.cgid,
+		(unsigned long long) ds->sem_otime,
+		(unsigned long long) ds->sem_ctime,
+		(unsigned long long) ds->sem_nsems,
+		rc);
+}
+
+static void
+print_sem_info(const char *const str_ipc_cmd,
+               const struct seminfo *const info,
+               const int rc)
+{
+	if (rc < 0) {
+		printf("semctl\\(%d, 0, (%s\\|)?%s, (%p|\\[%p\\])\\) = %s\n",
+		       id, str_ipc_64, str_ipc_cmd, &info, &info,
+		       sprintrc_grep(rc));
+		return;
+	}
+
+	printf("semctl\\(%d, 0, (%s\\|)?%s, \\{semmap=%d, semmni=%d"
+	       ", semmns=%d, semmnu=%d, semmsl=%d, semopm=%d, semume=%d"
+	       ", semusz=%d, semvmx=%d, semaem=%d\\}\\) = %d\n",
+	       id,
+	       str_ipc_64,
+	       str_ipc_cmd,
+	       info->semmap,
+	       info->semmni,
+	       info->semmns,
+	       info->semmnu,
+	       info->semmsl,
+	       info->semopm,
+	       info->semume,
+	       info->semusz,
+	       info->semvmx,
+	       info->semaem,
+	       rc);
+}
+
 int
 main(void)
 {
@@ -91,6 +158,8 @@ main(void)
 	struct semid_ds ds;
 	struct seminfo info;
 
+	memset(&ds, 0, sizeof(ds));
+
 	rc = semget(bogus_key, bogus_size, bogus_flags);
 	printf("semget\\(%#llx, %d, %s\\|%#04o\\) = %s\n",
 	       zero_extend_signed_to_ull(bogus_key), bogus_size,
@@ -108,25 +177,41 @@ main(void)
 	       bogus_semid, bogus_semnum, str_ipc_64, str_bogus_cmd,
 	       bogus_arg, bogus_arg, sprintrc_grep(rc));
 
-	un.buf = &ds;
-	if (semctl(id, 0, IPC_STAT, un))
-		perror_msg_and_skip("semctl IPC_STAT");
-	printf("semctl\\(%d, 0, (%s\\|)?%s, \\[?%p\\]?\\) = 0\n",
-	       id, str_ipc_64, str_ipc_stat, &ds);
-
 	un.__buf = &info;
-	rc = semctl(0, 0, SEM_INFO, un);
-	printf("semctl\\(0, 0, (%s\\|)?%s, \\[?%p\\]?\\) = %s\n",
-	       str_ipc_64, str_sem_info, &info, sprintrc_grep(rc));
+	rc = semctl(id, 0, IPC_INFO, un);
+        print_sem_info(str_ipc_info, &info, rc);
+
+	rc = semctl(id, 0, SEM_INFO, un);
+        print_sem_info(str_sem_info, &info, rc);
 
 	un.buf = &ds;
-	rc = semctl(id, 0, SEM_STAT, un);
-	printf("semctl\\(%d, 0, (%s\\|)?%s, \\[?%p\\]?\\) = %s\n",
-	       id, str_ipc_64, str_sem_stat, &ds, sprintrc_grep(rc));
+	rc = semctl(id, 0, IPC_STAT, un);
+	if (rc < 0)
+		perror_msg_and_skip("semctl IPC_STAT");
+	print_semid_ds(str_ipc_stat, &ds, rc);
 
+	if (semctl(id, 0, IPC_SET, un))
+		perror_msg_and_skip("semctl IPC_SET");
+	printf("semctl\\(%d, 0, (%s\\|)?%s, \\{sem_perm=\\{uid=%u, gid=%u"
+	       ", mode=%#o\\}\\}\\) = 0\n",
+	       id, str_ipc_64, str_ipc_set,
+	       (unsigned) ds.sem_perm.uid,
+	       (unsigned) ds.sem_perm.gid,
+	       (unsigned) ds.sem_perm.mode);
+
+	rc = semctl(id, 0, SEM_STAT, un);
+	print_semid_ds(str_sem_stat, &ds, rc);
+
+/*
+ * glibc fails to pass the buffer for SEM_STAT_ANY command,
+ * so the kernel receives garbage instead of un.buf address:
+ * https://sourceware.org/bugzilla/show_bug.cgi?id=26637
+ * musl doesn't pass the buffer either.
+ */
+#if 0
 	rc = semctl(id, 0, SEM_STAT_ANY, un);
-	printf("semctl\\(%d, 0, (%s\\|)?%s, (%p|\\[(%p|NULL)\\]|NULL)\\) = %s\n",
-	       id, str_ipc_64, str_sem_stat_any, &ds, &ds, sprintrc_grep(rc));
+	print_semid_ds(str_sem_stat_any, &ds, rc);
+#endif
 
 	return 0;
 }
