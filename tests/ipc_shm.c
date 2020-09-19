@@ -76,6 +76,21 @@
 # define str_bogus_cmd "0xdefaced2 /\\* SHM_\\?\\?\\? \\*/"
 #endif
 
+#undef TEST_SHMCTL_BOGUS_ADDR
+
+/*
+ * Starting with commit glibc-2.32~80, on every 32-bit architecture
+ * where 32-bit time_t support is enabled, glibc tries to retrieve
+ * the data provided in the third argument of shmctl call.
+ */
+#if GLIBC_PREREQ_GE(2, 32) && defined __TIMESIZE && __TIMESIZE != 64
+# define TEST_SHMCTL_BOGUS_ADDR 0
+#endif
+
+#ifndef TEST_SHMCTL_BOGUS_ADDR
+# define TEST_SHMCTL_BOGUS_ADDR 1
+#endif
+
 static int id = -1;
 
 static void
@@ -178,7 +193,9 @@ main(void)
 	static const key_t bogus_key = (key_t) 0xeca86420fdb97531ULL;
 	static const int bogus_id = 0xdefaced1;
 	static const int bogus_cmd = 0xdefaced2;
+#if TEST_SHMCTL_BOGUS_ADDR
 	static void * const bogus_addr = (void *) -1L;
+#endif
 	static const size_t bogus_size =
 	/*
 	 * musl sets size to SIZE_MAX if size argument is greater than
@@ -250,10 +267,12 @@ main(void)
 	printf("shmctl\\(%d, (%s\\|)?%s, NULL\\) = %s\n",
 	       bogus_id, str_ipc_64, str_bogus_cmd, sprintrc_grep(rc));
 
+#if TEST_SHMCTL_BOGUS_ADDR
 	rc = shmctl(bogus_id, IPC_STAT, bogus_addr);
 	printf("shmctl\\(%d, (%s\\|)?%s, %p\\) = %s\n",
 	       bogus_id, str_ipc_64, str_ipc_stat, bogus_addr,
 	       sprintrc_grep(rc));
+#endif
 
 	rc = shmctl(id, IPC_STAT, &buf.ds);
 	if (rc < 0)
