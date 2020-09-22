@@ -490,23 +490,6 @@ AC_CHECK_HEADERS([linux/io_uring.h], [
 	]),,, [#include <linux/io_uring.h>])
 ])
 
-AC_CHECK_HEADERS([linux/tee.h], [
-	AC_CHECK_TYPES(m4_normalize([
-		struct tee_ioctl_version_data,
-		struct tee_ioctl_shm_alloc_data,
-		struct tee_ioctl_buf_data,
-		struct tee_ioctl_param,
-		struct tee_ioctl_open_session_arg,
-		struct tee_ioctl_invoke_arg,
-		struct tee_ioctl_cancel_arg,
-		struct tee_ioctl_close_session_arg,
-		struct tee_iocl_supp_recv_arg,
-		struct tee_iocl_supp_send_arg,
-		struct tee_ioctl_shm_register_fd_data,
-		struct tee_ioctl_shm_register_data
-	]),,, [#include <linux/tee.h>])
-])
-
 AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 	AC_CHECK_MEMBERS([struct sockaddr_hci.hci_channel],,,
 			 [#include <bluetooth/bluetooth.h>

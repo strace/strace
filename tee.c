@@ -6,8 +6,24 @@
  */
 
 #include "defs.h"
-#include "tee.h"
 #include "print_fields.h"
+
+#include "types/tee.h"
+
+#define XLAT_MACROS_ONLY
+#include "xlat/tee_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
+
+#include "xlat/tee_ioctl_gen_caps.h"
+#include "xlat/tee_ioctl_impl_ids.h"
+#include "xlat/tee_ioctl_login_types.h"
+#include "xlat/tee_ioctl_max_arg_size.h"
+#include "xlat/tee_ioctl_origins.h"
+#include "xlat/tee_ioctl_optee_caps.h"
+#include "xlat/tee_ioctl_param_attr_types.h"
+#include "xlat/tee_ioctl_shm_flags.h"
+
+#define TEE_IOCTL_PARAM_SIZE(x) (sizeof(struct_tee_ioctl_param) * (x))
 
 #define TEE_FETCH_BUF_DATA(buf_, arg_, params_) \
 	tee_fetch_buf_data(tcp, arg, &buf_, sizeof(arg_), \
@@ -19,7 +35,7 @@
 	PRINT_FIELD_X(prefix_, where_, field_)
 
 static void
-tee_print_buf(struct tee_ioctl_buf_data *buf)
+tee_print_buf(struct_tee_ioctl_buf_data *buf)
 {
 	PRINT_FIELD_U("{", *buf, buf_len);
 	PRINT_FIELD_ADDR64(", ", *buf, buf_ptr);
@@ -29,7 +45,7 @@ tee_print_buf(struct tee_ioctl_buf_data *buf)
 static int
 tee_fetch_buf_data(struct tcb *const tcp,
 		   const kernel_ulong_t arg,
-		   struct tee_ioctl_buf_data *buf,
+		   struct_tee_ioctl_buf_data *buf,
 		   size_t arg_size,
 		   void *arg_struct,
 		   unsigned *num_params,
@@ -72,7 +88,7 @@ tee_fetch_buf_data(struct tcb *const tcp,
 static bool
 tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	struct tee_ioctl_param *param = (struct tee_ioctl_param *) elem_buf;
+	struct_tee_ioctl_param *param = (struct_tee_ioctl_param *) elem_buf;
 
 	tprintf("{attr=");
 	printxval(tee_ioctl_param_attr_types,
@@ -109,7 +125,7 @@ tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data
 static void
 tee_print_params(struct tcb *const tcp, uint64_t params_start, unsigned num_params)
 {
-	struct tee_ioctl_param param_buffer;
+	struct_tee_ioctl_param param_buffer;
 
 	tprints(", params=");
 	print_array(tcp, params_start, num_params, &param_buffer, sizeof(param_buffer),
@@ -119,7 +135,7 @@ tee_print_params(struct tcb *const tcp, uint64_t params_start, unsigned num_para
 static int
 tee_version(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct tee_ioctl_version_data version;
+	struct_tee_ioctl_version_data version;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -148,8 +164,8 @@ static int
 tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int rval;
-	struct tee_ioctl_buf_data buf_data;
-	struct tee_ioctl_open_session_arg open_session;
+	struct_tee_ioctl_buf_data buf_data;
+	struct_tee_ioctl_open_session_arg open_session;
 	uint64_t params;
 	gid_t gid;
 
@@ -221,8 +237,8 @@ static int
 tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int rval;
-	struct tee_ioctl_buf_data buf_data;
-	struct tee_ioctl_invoke_arg invoke;
+	struct_tee_ioctl_buf_data buf_data;
+	struct_tee_ioctl_invoke_arg invoke;
 	uint64_t params;
 
 	if (entering(tcp)) {
@@ -262,7 +278,7 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 tee_cancel(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct tee_ioctl_cancel_arg cancel;
+	struct_tee_ioctl_cancel_arg cancel;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, arg, &cancel))
@@ -278,7 +294,7 @@ tee_cancel(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 tee_close_session(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct tee_ioctl_close_session_arg close_session;
+	struct_tee_ioctl_close_session_arg close_session;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, arg, &close_session))
@@ -294,8 +310,8 @@ static int
 tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int rval;
-	struct tee_ioctl_buf_data buf_data;
-	struct tee_iocl_supp_recv_arg supp_recv;
+	struct_tee_ioctl_buf_data buf_data;
+	struct_tee_iocl_supp_recv_arg supp_recv;
 	uint64_t params;
 
 	if (entering(tcp)) {
@@ -333,8 +349,8 @@ static int
 tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int rval;
-	struct tee_ioctl_buf_data buf_data;
-	struct tee_iocl_supp_send_arg supp_send;
+	struct_tee_ioctl_buf_data buf_data;
+	struct_tee_iocl_supp_send_arg supp_send;
 	uint64_t params;
 
 	if (entering(tcp)) {
@@ -369,7 +385,7 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct tee_ioctl_shm_alloc_data shm_alloc;
+	struct_tee_ioctl_shm_alloc_data shm_alloc;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -403,7 +419,7 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct tee_ioctl_shm_register_fd_data shm_register_fd;
+	struct_tee_ioctl_shm_register_fd_data shm_register_fd;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -435,7 +451,7 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct tee_ioctl_shm_register_data shm_register;
+	struct_tee_ioctl_shm_register_data shm_register;
 
 	if (entering(tcp)) {
 		tprints(", ");
