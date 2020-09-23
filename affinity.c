@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2002-2004 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2009-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
