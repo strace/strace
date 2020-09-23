@@ -131,6 +131,12 @@ process_file()
 #ifndef __packed
 # define __packed __attribute__((packed))
 #endif
+#ifndef __no_sanitize_or_inline
+# define __no_sanitize_or_inline
+#endif
+#ifndef __no_kasan_or_inline
+# define __no_kasan_or_inline
+#endif
 
 typedef signed char s8;
 typedef unsigned char u8;

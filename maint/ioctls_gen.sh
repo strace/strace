@@ -33,9 +33,11 @@ esac
 abs_inc_dir="$(cd "$inc_dir" && pwd -P)"
 INCLUDES_inc="-I$abs_inc_dir/uapi -I$abs_inc_dir"
 abs_arch_dir=
+INCLUDES_gen=
 INCLUDES_arch=
 [ -z "$arch_dir" ] || {
 	abs_arch_dir="$(cd "$arch_dir" && pwd -P)"
+	INCLUDES_gen="-I$abs_arch_dir/generated/uapi -I$abs_arch_dir/generated"
 	INCLUDES_arch="-I$abs_arch_dir/uapi -I$abs_arch_dir"
 }
 
@@ -65,7 +67,7 @@ trap 'cleanup 1' HUP PIPE INT QUIT TERM
 msg "generated $(grep -c '^{' ioctls_hex.h) hex ioctls from $inc_dir"
 
 # Fetch ioctl commands defined in symbolic form.
-INCLUDES="$INCLUDES_arch ${INCLUDES-}" \
+INCLUDES="$INCLUDES_arch $INCLUDES_gen ${INCLUDES-}" \
 	"$mydir"/ioctls_sym.sh "$inc_dir" > ioctls_sym.h
 
 # Move KVM_* constants from ioctls_inc.h to ioctls_arch.h.
@@ -76,7 +78,7 @@ mv ioctls_unkvm.h ioctls_sym.h
 # Part of android ioctl commands are defined elsewhere.
 android_dir="$inc_dir/../drivers/staging/android"
 if [ -d "$android_dir/uapi" ]; then
-	INCLUDES="$INCLUDES_inc $INCLUDES_arch ${INCLUDES-}" \
+	INCLUDES="$INCLUDES_inc $INCLUDES_arch $INCLUDES_gen ${INCLUDES-}" \
 	"$mydir"/ioctls_sym.sh "$android_dir" staging/android >> ioctls_sym.h
 fi
 msg "generated $(grep -c '^{' ioctls_sym.h) symbolic ioctls from $inc_dir"
@@ -97,7 +99,7 @@ msg "generated $(grep -c '^{' ioctls_inc.h) ioctls from $inc_dir"
 msg "generated $(grep -c '^{' ioctls_hex.h) hex ioctls from $arch_dir"
 
 # Fetch ioctl commands defined in symbolic form.
-INCLUDES="$INCLUDES_inc ${INCLUDES-}" \
+INCLUDES="$INCLUDES_inc $INCLUDES_gen ${INCLUDES-}" \
 	"$mydir"/ioctls_sym.sh "$arch_dir" > ioctls_sym.h
 msg "generated $(grep -c '^{' ioctls_sym.h) symbolic ioctls from $arch_dir"
 
