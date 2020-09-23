@@ -491,6 +491,9 @@ main(void)
 				/* VT_GETHIFONTMASK */
 				case _IOC(_IOC_NONE, 'V', 13, 0):
 					continue;
+				/* VBG_IOCTL_ACQUIRE_GUEST_CAPABILITIES */
+				case _IOC(_IOC_READ|_IOC_WRITE, 'V', 13, 36):
+					continue;
 				}
 
 				ioctl(-1, ioc, 0);

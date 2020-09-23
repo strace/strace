@@ -24,6 +24,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_*, CAP_*, FAN_*, IFLA_*, INET_DIAG_REQ_*,
     IORING_FEAT_*, IP_*, IPV6_*, KVM_*, NDA_*, PTP_PEROUT_*, RTPROT_*,
     and V4L2_FMT_FLAG_* constants.
+  * Updated lists of ioctl commands from Linux 5.9.
 
 * Bug fixes
 
