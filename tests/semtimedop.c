@@ -10,16 +10,16 @@
 
 #if defined __NR_semtimedop || defined __NR_socketcall
 
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+# include <sys/ipc.h>
+# include <sys/sem.h>
+# include <stdint.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-#define XLAT_MACROS_ONLY
-#include "xlat/semop_flags.h"
-#undef XLAT_MACROS_ONLY
+# define XLAT_MACROS_ONLY
+#  include "xlat/semop_flags.h"
+# undef XLAT_MACROS_ONLY
 
 union semun {
 	int val;

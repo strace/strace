@@ -13,24 +13,24 @@
 
 #ifdef __NR_fork
 
-#include <errno.h>
-#include <limits.h>
-#include <sched.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <linux/sched.h>
-#include "nsfs.h"
+# include <errno.h>
+# include <limits.h>
+# include <sched.h>
+# include <signal.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <sys/wait.h>
+# include <unistd.h>
+# include <linux/sched.h>
+# include "nsfs.h"
 
-#ifndef CLONE_NEWUSER
-# define CLONE_NEWUSER 0x10000000
-#endif
+# ifndef CLONE_NEWUSER
+#  define CLONE_NEWUSER 0x10000000
+# endif
 
-#ifndef CLONE_NEWPID
-# define CLONE_NEWPID 0x20000000
-#endif
+# ifndef CLONE_NEWPID
+#  define CLONE_NEWPID 0x20000000
+# endif
 
 static int
 fork_chain(int depth)

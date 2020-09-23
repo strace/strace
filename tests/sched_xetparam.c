@@ -7,7 +7,7 @@
 
 #include "tests.h"
 #include "scno.h"
-# include "pidns.h"
+#include "pidns.h"
 
 #if defined __NR_sched_getparam && defined __NR_sched_setparam
 

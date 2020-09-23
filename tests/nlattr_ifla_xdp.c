@@ -36,7 +36,7 @@ enum { XDP_ATTACHED_MULTI = 4 };
 #include "nlattr_ifla.h"
 
 #ifndef FD9_PATH
-#define FD9_PATH ""
+# define FD9_PATH ""
 #endif
 
 int

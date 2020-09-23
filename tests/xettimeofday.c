@@ -11,12 +11,12 @@
 
 #ifdef __NR_gettimeofday
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include "scno.h"
+# include <assert.h>
+# include <stdio.h>
+# include <stdint.h>
+# include <unistd.h>
+# include <sys/time.h>
+# include "scno.h"
 
 int
 main(void)

@@ -8,10 +8,10 @@
  */
 
 #ifndef STRACE_TRIE_H
-#define STRACE_TRIE_H
+# define STRACE_TRIE_H
 
-#include <stdbool.h>
-#include <stdint.h>
+# include <stdbool.h>
+# include <stdint.h>
 
 /**
  * Trie control structure.

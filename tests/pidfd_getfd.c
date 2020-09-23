@@ -74,12 +74,12 @@ main(void)
 	close(dupfd);
 
 	int pidfd = syscall(__NR_pidfd_open, pid, 0);
-#if PRINT_PIDFD
+# if PRINT_PIDFD
 	char pidfd_str[sizeof("<pid:>") + 3 * sizeof(int)];
 	snprintf(pidfd_str, sizeof(pidfd_str), "<pid:%d>", pid);
-#else
+# else
 	const char *pidfd_str = PIDFD_PATH;
-#endif
+# endif
 	rc = k_pidfd_getfd(pidfd, dupfd, 0);
 	printf("pidfd_getfd(%d%s, %d%s, 0) = %s%s\n",
 	       pidfd, pidfd >= 0 ? pidfd_str : "",

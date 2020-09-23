@@ -1758,7 +1758,7 @@ scno_is_valid(kernel_ulong_t scno)
 
 # define SYS_FUNC(syscall_name) int SYS_FUNC_NAME(sys_ ## syscall_name)(struct tcb *tcp)
 
-#define ILOG2_ITER_(val_, ret_, bit_)					\
+# define ILOG2_ITER_(val_, ret_, bit_)					\
 	do {								\
 		typeof(ret_) shift_ =					\
 			((val_) > ((((typeof(val_)) 1)			\
@@ -1810,12 +1810,12 @@ ilog2_32(uint32_t val)
 	return ret;
 }
 
-#if SIZEOF_KERNEL_LONG_T > 4
-# define ilog2_klong ilog2_64
-#else
-# define ilog2_klong ilog2_32
-#endif
+# if SIZEOF_KERNEL_LONG_T > 4
+#  define ilog2_klong ilog2_64
+# else
+#  define ilog2_klong ilog2_32
+# endif
 
-#undef ILOG2_ITER_
+# undef ILOG2_ITER_
 
 #endif /* !STRACE_DEFS_H */

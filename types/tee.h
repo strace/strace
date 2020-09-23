@@ -6,15 +6,15 @@
  */
 
 #ifndef STRACE_TYPES_TEE_H
-#define STRACE_TYPES_TEE_H
+# define STRACE_TYPES_TEE_H
 
-#include <linux/ioctl.h>
+# include <linux/ioctl.h>
 
-#ifdef HAVE_LINUX_TEE_H
-# include <linux/tee.h>
-#else
-# define TEE_IOCTL_UUID_LEN 16
-#endif
+# ifdef HAVE_LINUX_TEE_H
+#  include <linux/tee.h>
+# else
+#  define TEE_IOCTL_UUID_LEN 16
+# endif
 
 typedef struct {
 	uint64_t buf_ptr;

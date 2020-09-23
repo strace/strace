@@ -152,7 +152,7 @@ main(void)
 			       params->cq_off.ring_entries,
 			       params->cq_off.overflow,
 			       params->cq_off.cqes);
-#ifdef HAVE_STRUCT_IO_CQRING_OFFSETS_FLAGS
+# ifdef HAVE_STRUCT_IO_CQRING_OFFSETS_FLAGS
 			printflags(uring_cqring_flags,
 			       params->cq_off.flags,
 			       "IORING_CQ_???");
@@ -162,7 +162,7 @@ main(void)
 				printf(", resv2=%#llx",
 				       (unsigned long long)
 						params->cq_off.resv2);
-#else
+# else
 			union {
 				struct {
 					uint32_t flags;
@@ -178,7 +178,7 @@ main(void)
 				printf(", resv2=%#llx",
 				       (unsigned long long)
 						params->cq_off.resv[1]);
-#endif
+# endif
 
 			printf("}}) = %ld<anon_inode:[io_uring]>\n", rc);
 		}

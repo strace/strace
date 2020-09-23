@@ -19,8 +19,8 @@
 # include <linux/time_types.h>
 #endif
 
-# include "kernel_timeval.h"
-# include "kernel_old_timespec.h"
+#include "kernel_timeval.h"
+#include "kernel_old_timespec.h"
 
 #define XLAT_MACROS_ONLY
 #include "xlat/sock_options.h"

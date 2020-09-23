@@ -8,7 +8,7 @@
 #ifndef STRACE_XGETDENTS_H
 # define STRACE_XGETDENTS_H
 
-#include "defs.h"
+# include "defs.h"
 
 typedef unsigned int (*decode_dentry_head_fn)(struct tcb *, const void *);
 typedef int (*decode_dentry_tail_fn)(struct tcb *, kernel_ulong_t,

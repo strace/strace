@@ -148,10 +148,10 @@ main(void)
 						    paths[path_i].val,
 						    modes[mode_i].val,
 						    flags[flag_i].val);
-	# ifdef PATH_TRACING
+# ifdef PATH_TRACING
 					if (dirfds[dirfd_i].val == fd ||
 					    paths[path_i].val == fd_path)
-	# endif
+# endif
 					printf("faccessat2(%s, %s, %s, %s) = %s\n",
 					       dirfds[dirfd_i].str,
 					       paths[path_i].str,
