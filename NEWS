@@ -1,4 +1,4 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 5.9 (2020-09-24)
 ==============================================
 
 * Improvements
@@ -25,8 +25,6 @@ Noteworthy changes in release ?.? (????-??-??)
     IORING_FEAT_*, IP_*, IPV6_*, KVM_*, NDA_*, PTP_PEROUT_*, RTPROT_*,
     and V4L2_FMT_FLAG_* constants.
   * Updated lists of ioctl commands from Linux 5.9.
-
-* Bug fixes
 
 Noteworthy changes in release 5.8 (2020-08-06)
 ==============================================
