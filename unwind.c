@@ -264,7 +264,7 @@ queue_print(struct unwind_queue_t *queue)
 void
 unwind_tcb_print(struct tcb *tcp)
 {
-#if SUPPORTED_PERSONALITIES > 1
+#if defined(USE_LIBUNWIND) && (SUPPORTED_PERSONALITIES > 1)
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
 		/* disable stack trace */
 		return;
@@ -284,7 +284,7 @@ unwind_tcb_print(struct tcb *tcp)
 void
 unwind_tcb_capture(struct tcb *tcp)
 {
-#if SUPPORTED_PERSONALITIES > 1
+#if defined(USE_LIBUNWIND) && (SUPPORTED_PERSONALITIES > 1)
 	if (tcp->currpers != DEFAULT_PERSONALITY) {
 		/* disable stack trace */
 		return;

@@ -281,6 +281,13 @@ update_personality(struct tcb *tcp, unsigned int personality)
 			  "building strace with mpers support enabled.");
 		need_mpers_warning[personality] = false;
 	}
+
+#if defined(ENABLE_STACKTRACE) && !defined(USE_LIBUNWIND)
+	if (stack_trace_enabled) {
+		unwind_tcb_fin(tcp);
+		unwind_tcb_init(tcp);
+	}
+#endif
 }
 #endif
 
