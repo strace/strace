@@ -18,12 +18,6 @@ static unsigned int mmap_cache_generation;
 static void
 mmap_cache_invalidate(struct tcb *tcp, void *unused)
 {
-#if SUPPORTED_PERSONALITIES > 1
-	if (tcp->currpers != DEFAULT_PERSONALITY) {
-		/* disable stack trace */
-		return;
-	}
-#endif
 	mmap_cache_generation++;
 	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p",
 		       tcp->mmap_cache ? tcp->mmap_cache->generation : 0,
