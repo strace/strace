@@ -249,9 +249,7 @@ typedef struct {
 	struct_v4l2_format format;
 	/** V4L2_BUF_CAP_*, added by Linux commit v4.20-rc1~51^2~14 */
 	uint32_t capabilities;
-	/** V4L2_FLAG_MEMORY_NON_CONSISTENT, added by Linux commit v5.9-rc1~94^2~295 */
-	uint32_t flags;
-	uint32_t reserved[6];
+	uint32_t reserved[7];
 } struct_v4l2_create_buffers;
 
 #endif /* STRACE_TYPES_V4L2_H */
