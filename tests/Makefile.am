@@ -106,6 +106,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone3-success-Xabbrev \
 	clone3-success-Xraw \
 	clone3-success-Xverbose \
+	close_range \
+	close_range-P \
+	close_range-y \
+	close_range-yy \
 	count-f \
 	delay \
 	execve-v \
