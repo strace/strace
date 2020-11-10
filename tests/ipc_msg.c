@@ -31,6 +31,17 @@
 # define TEST_MSGCTL_BOGUS_ADDR 0
 #endif
 /*
+ * Starting with commit glibc-2.31~358, on every architecture where
+ * __ASSUME_SYSVIPC_BROKEN_MODE_T is defined, glibc tries to modify
+ * the data provided in the third argument of msgctl call.
+ */
+#if GLIBC_PREREQ_GE(2, 31) && \
+ (defined __m68k__ || defined __s390__ || \
+  (WORDS_BIGENDIAN && \
+   (defined __arm__ || defined __microblaze__ || defined __sh__)))
+# define TEST_MSGCTL_BOGUS_ADDR 0
+#endif
+/*
  * Before glibc-2.22-122-gbe48165, ppc64 code tried to retrieve data
  * provided in third argument of msgctl call (in case of IPC_SET cmd)
  * which led to segmentation fault.
