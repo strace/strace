@@ -8,17 +8,17 @@ env:
 
 jobs:
   whitespace-errors:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: check
       run: git diff-index --check --cached 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 
   coverage: # the longest of all build jobs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CHECK: coverage
-      CC: gcc-9
+      CC: gcc-10
       TARGET: x86_64
       KHEADERS: torvalds/linux
       STACKTRACE: libdw
@@ -31,8 +31,8 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
-  gcc7-x86-nostacktrace: # the fastest of all build jobs
-    runs-on: ubuntu-latest
+  gcc9-x86-nostacktrace: # the fastest of all build jobs
+    runs-on: ubuntu-20.04
     env:
       CC: gcc
       STACKTRACE: no
@@ -47,7 +47,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86_64-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       KHEADERS: torvalds/linux
@@ -63,7 +63,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86_64-dw:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       STACKTRACE: libdw
@@ -78,7 +78,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86_64-unwind:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       STACKTRACE: libunwind
@@ -93,9 +93,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86_64-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
-      CC: gcc-9
+      CC: gcc
       KHEADERS: torvalds/linux
       STACKTRACE: no
       TARGET: x86_64
@@ -109,9 +109,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86_64-dw:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
-      CC: gcc-9
+      CC: gcc
       STACKTRACE: libdw
       TARGET: x86_64
     steps:
@@ -124,9 +124,9 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86_64-unwind:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
-      CC: gcc-9
+      CC: gcc
       STACKTRACE: libunwind
       TARGET: x86_64
     steps:
@@ -139,7 +139,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc7-x86_64-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       CC: gcc
       KHEADERS: torvalds/linux
@@ -155,7 +155,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc7-x86_64-dw:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       CC: gcc
       STACKTRACE: libdw
@@ -170,7 +170,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc7-x86_64-unwind:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       CC: gcc
       STACKTRACE: libunwind
@@ -184,8 +184,54 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  clang10-x86_64-kheaders:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang10-x86_64-dw:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang10-x86_64-unwind:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   clang9-x86_64-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: clang-9
       KHEADERS: torvalds/linux
@@ -201,7 +247,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang9-x86_64-dw:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: clang-9
       STACKTRACE: libdw
@@ -216,7 +262,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang9-x86_64-unwind:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: clang-9
       STACKTRACE: libunwind
@@ -230,54 +276,8 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
-  clang6-x86_64-kheaders:
-    runs-on: ubuntu-latest
-    env:
-      CC: clang
-      KHEADERS: torvalds/linux
-      STACKTRACE: no
-      TARGET: x86_64
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  clang6-x86_64-dw:
-    runs-on: ubuntu-latest
-    env:
-      CC: clang
-      STACKTRACE: libdw
-      TARGET: x86_64
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  clang6-x86_64-unwind:
-    runs-on: ubuntu-latest
-    env:
-      CC: clang
-      STACKTRACE: libunwind
-      TARGET: x86_64
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
   gcc10-x32-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       KHEADERS: torvalds/linux
@@ -293,7 +293,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x32-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       STACKTRACE: no
@@ -308,38 +308,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x32-kheaders:
-    runs-on: ubuntu-latest
-    env:
-      CC: gcc-9
-      KHEADERS: torvalds/linux
-      STACKTRACE: no
-      TARGET: x32
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  gcc9-x32-nostacktrace:
-    runs-on: ubuntu-latest
-    env:
-      CC: gcc-9
-      STACKTRACE: no
-      TARGET: x32
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  gcc7-x32-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc
       KHEADERS: torvalds/linux
@@ -354,8 +323,8 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
-  gcc7-x32-nostacktrace:
-    runs-on: ubuntu-latest
+  gcc9-x32-nostacktrace:
+    runs-on: ubuntu-20.04
     env:
       CC: gcc
       STACKTRACE: no
@@ -370,7 +339,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       KHEADERS: torvalds/linux
@@ -386,7 +355,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc10-x86-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-10
       STACKTRACE: no
@@ -401,38 +370,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc9-x86-kheaders:
-    runs-on: ubuntu-latest
-    env:
-      CC: gcc-9
-      KHEADERS: torvalds/linux
-      STACKTRACE: no
-      TARGET: x86
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  gcc9-x86-nostacktrace:
-    runs-on: ubuntu-latest
-    env:
-      CC: gcc-9
-      STACKTRACE: no
-      TARGET: x86
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  gcc7-x86-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc
       KHEADERS: torvalds/linux
@@ -447,8 +385,39 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  clang10-x86-kheaders:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang10-x86-nostacktrace:
+    runs-on: ubuntu-20.04
+    env:
+      CC: clang
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   clang9-x86-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: clang-9
       KHEADERS: torvalds/linux
@@ -464,7 +433,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang9-x86-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: clang-9
       STACKTRACE: no
@@ -478,39 +447,8 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
-  clang6-x86-kheaders:
-    runs-on: ubuntu-latest
-    env:
-      CC: clang
-      KHEADERS: torvalds/linux
-      STACKTRACE: no
-      TARGET: x86
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  clang6-x86-nostacktrace:
-    runs-on: ubuntu-latest
-    env:
-      CC: clang
-      STACKTRACE: no
-      TARGET: x86
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
   musl-x86_64-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: musl-gcc
       STACKTRACE: no
