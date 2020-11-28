@@ -7,6 +7,10 @@
 
 AC_DEFUN([st_DEMANGLE], [dnl
 
+libiberty_CPPFLAGS=
+libiberty_LDFLAGS=
+libiberty_LIBS=
+
 AC_ARG_WITH([libiberty],
 	    [AS_HELP_STRING([--with-libiberty],
 			    [use libiberty to demangle symbols in stack trace])],
@@ -19,9 +23,6 @@ AC_ARG_WITH([libiberty],
 	    [with_libiberty=check]
 )
 
-libiberty_CPPFLAGS=
-libiberty_LDFLAGS=
-libiberty_LIBS=
 use_libiberty=no
 
 AS_IF([test "x$with_libiberty" != xno],
