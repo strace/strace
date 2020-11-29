@@ -1076,10 +1076,10 @@ Print paths associated with file descriptor arguments.
 .B \-yy
 .TQ
 .BR \-\-decode\-fds = all
-Print all available information associated with file descritors:
+Print all available information associated with file descriptors:
 protocol-specific information associated with socket file descriptors,
 block/character device number associated with device file descriptors,
-and PIDs asociated with pidfd file descriptors.
+and PIDs associated with pidfd file descriptors.
 .TP
 .B \-\-pidns\-translation
 If strace and tracee are in different PID namespaces, print PIDs in

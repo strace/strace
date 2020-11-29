@@ -343,7 +343,7 @@ Output format:\n\
   -e kvm=vcpu, --kvm=vcpu\n\
                  print exit reason of kvm vcpu\n\
   -e decode-fds=SET, --decode-fds=SET\n\
-                 what kinds of file descritor information details to decode\n\
+                 what kinds of file descriptor information details to decode\n\
      details:    dev (device major/minor for block/char device files)\n\
                  path (file path),\n\
                  pidfd (associated PID for pidfds),\n\

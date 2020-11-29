@@ -49,7 +49,7 @@ void check_ns_ioctl(void);
  * processes. These child processes are in a new PID namespace with different
  * PID configurations (group leader, session leader, ...). If any child
  * terminates with nonzero exit status the test is failed. Otherwise the test is
- * succesful, and the parent process exits with 0.
+ * successful, and the parent process exits with 0.
  */
 void pidns_test_init(void);
 

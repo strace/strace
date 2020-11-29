@@ -72,7 +72,7 @@ pidns_pid2str(enum pid_type type)
  *                 to be a PID of a zombie process (will be reaped). If
  *                 negative, leave the child in the process group of the parent.
  *                 If 0, move the process to its own process group.
- * @param new_sid  Wheather child should be moved to a new session.
+ * @param new_sid  Whether child should be moved to a new session.
  */
 static pid_t
 pidns_fork(pid_t pgid, bool new_sid)

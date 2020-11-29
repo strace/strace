@@ -1018,7 +1018,7 @@ extern void pidns_init(void);
 extern int get_proc_pid(struct tcb *);
 
 /**
- * Translates a pid from tracee's namespace to our namepace.
+ * Translates a pid from tracee's namespace to our namespace.
  *
  * @param tcp             The tcb of the tracee
  *                        (NULL: from_id is in strace's namespace. Useful for

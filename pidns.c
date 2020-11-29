@@ -366,7 +366,7 @@ fail:
 }
 
 /**
- * Paramters for id translation
+ * Parameters for id translation
  */
 struct translate_id_params {
 	/* The result (output) */

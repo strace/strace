@@ -1,3 +1,4 @@
+* check spelling using codespell tool
 * commit changes prepared by maint/update_copyright_years.sh
 * update copyright year number range in COPYING and debian/copyright
 * prepare NEWS for release
