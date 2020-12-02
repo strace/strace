@@ -170,7 +170,7 @@ BEGIN {
 	array[idx, "encoding"] = temparray[0]
 }
 /^DW_AT_type/ {
-	match($0, /:[[:space:]]+<0x([[:xdigit:]]*)>$/, temparray)
+	match($0, /:[[:space:]]+<0x([[:xdigit:]]*)>(, .*)?$/, temparray)
 	array[idx, "type"] = norm_idx(temparray[1])
 }
 /^DW_AT_upper_bound/ {
