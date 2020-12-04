@@ -21,4 +21,4 @@ The latest binary strace packages are available in many repositories, including
 [Fedora rawhide](https://apps.fedoraproject.org/packages/strace), and
 [Sisyphus](https://packages.altlinux.org/en/Sisyphus/srpms/strace).
 
-[![CI](https://github.com/strace/strace/workflows/CI/badge.svg?branch=master)](https://github.com/strace/strace/actions?query=workflow:CI+branch:master) [![Build Status](https://travis-ci.com/strace/strace.svg?branch=master)](https://travis-ci.com/strace/strace) [![Code Coverage](https://codecov.io/github/strace/strace/coverage.svg?branch=master)](https://codecov.io/github/strace/strace?branch=master)
+[![CI](https://github.com/strace/strace/workflows/CI/badge.svg?branch=master)](https://github.com/strace/strace/actions?query=workflow:CI+branch:master) [![Code Coverage](https://codecov.io/github/strace/strace/coverage.svg?branch=master)](https://codecov.io/github/strace/strace?branch=master)
