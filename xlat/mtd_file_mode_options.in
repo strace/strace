@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 MTD_FILE_MODE_NORMAL
 MTD_FILE_MODE_OTP_FACTORY
 MTD_FILE_MODE_OTP_USER

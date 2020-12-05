@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 INET_DIAG_BC_NOP
 INET_DIAG_BC_JMP
 INET_DIAG_BC_S_GE

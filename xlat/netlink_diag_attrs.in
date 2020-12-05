@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 NETLINK_DIAG_MEMINFO
 NETLINK_DIAG_GROUPS
 NETLINK_DIAG_RX_RING

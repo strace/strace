@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 INET_DIAG_NONE
 INET_DIAG_MEMINFO
 INET_DIAG_INFO

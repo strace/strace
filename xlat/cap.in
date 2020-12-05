@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 CAP_CHOWN
 CAP_DAC_OVERRIDE
 CAP_DAC_READ_SEARCH

@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 SMC_DIAG_NONE
 SMC_DIAG_CONNINFO
 SMC_DIAG_LGRINFO

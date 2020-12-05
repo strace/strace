@@ -1,4 +1,5 @@
 #unconditional
+#value_indexed
 UNIX_DIAG_NAME
 UNIX_DIAG_VFS
 UNIX_DIAG_PEER
