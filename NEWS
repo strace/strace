@@ -4,6 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * libdw-based stack tracing is now enabled for non-native
     personalities.
+  * Updated the list of SEGV_* constants.
 
 * Bug fixes
 
