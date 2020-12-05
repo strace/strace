@@ -6,3 +6,14 @@ STATX_ATTR_ENCRYPTED	0x00000800
 STATX_ATTR_AUTOMOUNT	0x00001000
 STATX_ATTR_MOUNT_ROOT	0x00002000
 STATX_ATTR_VERITY	0x00100000
+#ifndef STRACE_WORKAROUND_FOR_STATX_ATTR_DAX
+# define STRACE_WORKAROUND_FOR_STATX_ATTR_DAX
+/*
+ * Linux kernel commit v5.10-rc6-63-g72d1249e2ffdbc344e465031ec5335fa3489d62e
+ * has changed the value of STATX_ATTR_DAX constant introduced by commit
+ * v5.8-rc1~51^2~9 because the old value was already used by
+ * STATX_ATTR_MOUNT_ROOT.
+ */
+# undef STATX_ATTR_DAX
+#endif
+STATX_ATTR_DAX		0x00200000
