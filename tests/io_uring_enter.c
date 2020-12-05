@@ -66,9 +66,9 @@ main(void)
 
 	sys_io_uring_enter(fd, to_submit, min_complete, -1U, sigmask, size);
 	printf("io_uring_enter(%u<%s>, %u, %u"
-	       ", IORING_ENTER_GETEVENTS|IORING_ENTER_SQ_WAKEUP|%#x"
-	       ", %s, %u) = %s\n",
-	       fd, path, to_submit, min_complete, -1U - 3,
+	       ", IORING_ENTER_GETEVENTS|IORING_ENTER_SQ_WAKEUP"
+	       "|IORING_ENTER_SQ_WAIT|%#x, %s, %u) = %s\n",
+	       fd, path, to_submit, min_complete, -1U - 7U,
 	       "~[HUP KILL STOP]", size, errstr);
 
 	puts("+++ exited with 0 +++");

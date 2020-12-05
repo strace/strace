@@ -80,9 +80,10 @@ main(void)
 	sys_io_uring_setup(1, params);
 	printf("io_uring_setup(%u, {flags=IORING_SETUP_IOPOLL"
 	       "|IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF|IORING_SETUP_CQSIZE"
-	       "|IORING_SETUP_CLAMP|IORING_SETUP_ATTACH_WQ|%#x"
+	       "|IORING_SETUP_CLAMP|IORING_SETUP_ATTACH_WQ"
+	       "|IORING_SETUP_R_DISABLED|%#x"
 	       ", sq_thread_cpu=%#x, sq_thread_idle=%u, wq_fd=%d, resv=[",
-	       1, -1U - 63, params->sq_thread_cpu, params->sq_thread_idle,
+	       1, -1U - 127, params->sq_thread_cpu, params->sq_thread_idle,
 # if defined HAVE_STRUCT_IO_URING_PARAMS_WQ_FD
 	       params->wq_fd
 # elif defined HAVE_STRUCT_IO_URING_PARAMS_FEATURES
