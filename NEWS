@@ -5,7 +5,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * libdw-based stack tracing is now enabled for non-native
     personalities.
   * Updated lists of ALG_*, BPF_*, INET_DIAG_*, IORING_*, KEY_*, KVM_*, MDBA_*,
-    MEMBARRIER_CMD_*, MS_*, NLMSGERR_*, NT_*, STATX_*, and SEGV_* constants.
+    MEMBARRIER_CMD_*, MS_*, NLMSGERR_*, NT_*, STATX_*, SEGV_*, and V4L2_*
+    constants.
 
 * Bug fixes
 
