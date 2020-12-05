@@ -22,7 +22,7 @@
 #endif
 
 #if XLAT_RAW
-# define str_unknown "0x300"
+# define str_unknown "0x200"
 # define str_submount_200 "0x4000200"
 # define str_mgc_val "0xc0ed0000"
 # define str_remount "0x20"
@@ -30,7 +30,7 @@
 # define str_ro_nosuid_nodev_noexec "0xf"
 # define str_ro_nosuid_nodev_noexec_relatime "0x20000f"
 #elif XLAT_VERBOSE
-# define str_unknown "0x300 /* MS_??? */"
+# define str_unknown "0x200 /* MS_??? */"
 # define str_submount_200 "0x4000200 /* MS_SUBMOUNT|0x200 */"
 # define str_mgc_val "0xc0ed0000 /* MS_MGC_VAL */"
 # define str_remount "0x20 /* MS_REMOUNT */"
@@ -40,7 +40,7 @@
 # define str_ro_nosuid_nodev_noexec_relatime \
 	"0x20000f /* MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_RELATIME */"
 #else /* !XLAT_RAW && !XLAT_VERBOSE */
-# define str_unknown "0x300 /* MS_??? */"
+# define str_unknown "0x200 /* MS_??? */"
 # define str_submount_200 "MS_SUBMOUNT|0x200"
 # define str_mgc_val "MS_MGC_VAL"
 # define str_remount "MS_REMOUNT"
@@ -65,7 +65,7 @@ main(void)
 	printf("mount(NULL, NULL, NULL, 0, NULL) = %s\n",
 	       sprintrc(rc));
 
-	rc = mount(bogus, bogus, bogus, 768, bogus);
+	rc = mount(bogus, bogus, bogus, 0x200, bogus);
 	printf("mount(%p, %p, %p, %s, %p) = %s\n",
 	       bogus, bogus, bogus, str_unknown, bogus, sprintrc(rc));
 
