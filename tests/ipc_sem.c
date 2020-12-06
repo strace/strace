@@ -21,6 +21,21 @@
 # define SEM_STAT_ANY 20
 #endif
 
+#undef TEST_SEMCTL_BOGUS_CMD
+
+/*
+ * Starting with commit glibc-2.32.9000-147-ga16d2abd496bd974a882,
+ * glibc skips semctl syscall invocations and returns EINVAL
+ * for invalid semctl commands.
+ */
+#if GLIBC_PREREQ_GE(2, 32)
+# define TEST_SEMCTL_BOGUS_CMD 0
+#endif
+
+#ifndef TEST_SEMCTL_BOGUS_CMD
+# define TEST_SEMCTL_BOGUS_CMD 1
+#endif
+
 #if XLAT_RAW
 # define str_ipc_flags "0xface1e00"
 # define str_ipc_private "0"
@@ -145,13 +160,15 @@ main(void)
 	static const key_t private_key =
 		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
 	static const key_t bogus_key = (key_t) 0xeca86420fdb97531ULL;
-	static const int bogus_semid = 0xfdb97531;
-	static const int bogus_semnum = 0xeca86420;
 	static const int bogus_size = 0xdec0ded1;
 	static const int bogus_flags = 0xface1e55;
+#if TEST_SEMCTL_BOGUS_CMD
+	static const int bogus_semid = 0xfdb97531;
+	static const int bogus_semnum = 0xeca86420;
 	static const int bogus_cmd = 0xdeadbeef;
 	static const unsigned long bogus_arg =
 		(unsigned long) 0xbadc0dedfffffaceULL;
+#endif
 
 	int rc;
 	union semun un;
@@ -171,11 +188,13 @@ main(void)
 	printf("semget\\(%s, 1, 0600\\) = %d\n", str_ipc_private, id);
 	atexit(cleanup);
 
+#if TEST_SEMCTL_BOGUS_CMD
 	rc = semctl(bogus_semid, bogus_semnum, bogus_cmd, bogus_arg);
-#define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|NULL)\\]|NULL)"
+# define SEMCTL_BOGUS_ARG_FMT "(%#lx|\\[(%#lx|NULL)\\]|NULL)"
 	printf("semctl\\(%d, %d, (%s\\|)?%s, " SEMCTL_BOGUS_ARG_FMT "\\) = %s\n",
 	       bogus_semid, bogus_semnum, str_ipc_64, str_bogus_cmd,
 	       bogus_arg, bogus_arg, sprintrc_grep(rc));
+#endif
 
 	un.__buf = &info;
 	rc = semctl(id, 0, IPC_INFO, un);
