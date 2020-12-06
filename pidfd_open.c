@@ -7,6 +7,9 @@
  */
 
 #include "defs.h"
+#include <fcntl.h>
+
+#include "xlat/pidfd_open_flags.h"
 
 SYS_FUNC(pidfd_open)
 {
@@ -14,7 +17,8 @@ SYS_FUNC(pidfd_open)
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
 
 	/* unsigned int flags */
-	tprintf(", %#x", (unsigned int) tcp->u_arg[1]);
+	tprints(", ");
+	printflags(pidfd_open_flags, tcp->u_arg[1], "PIDFD_???");
 
 	return RVAL_DECODED | RVAL_FD;
 }

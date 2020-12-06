@@ -16,9 +16,7 @@
 
 # include <stdio.h>
 # include <unistd.h>
-# ifdef PATH_TRACING
-#  include <fcntl.h>
-# endif
+# include <fcntl.h>
 
 static const char *errstr;
 
@@ -63,20 +61,33 @@ main(void)
 	printf("pidfd_open(-1, 0) = %s\n", errstr);
 # endif
 
+	k_pidfd_open(0, O_NONBLOCK);
+# ifndef PATH_TRACING
+	pidns_print_leader();
+	printf("pidfd_open(0, PIDFD_NONBLOCK) = %s\n", errstr);
+# endif
+
+	k_pidfd_open(-1U, O_NONBLOCK);
+# ifndef PATH_TRACING
+	pidns_print_leader();
+	printf("pidfd_open(-1, PIDFD_NONBLOCK) = %s\n", errstr);
+# endif
+
 	k_pidfd_open(0, -1U);
 # ifndef PATH_TRACING
 	pidns_print_leader();
-	printf("pidfd_open(0, %#x) = %s\n", -1U, errstr);
+	printf("pidfd_open(0, PIDFD_NONBLOCK|%#x) = %s\n",
+	       -1U & (~O_NONBLOCK), errstr);
 # endif
 
-	const unsigned int flags = 0xfacefeed;
+	const unsigned int flags = 0xfacefeed & (~O_NONBLOCK);
 	const int pid = getpid();
 
 	k_pidfd_open(pid, flags);
 # ifndef PATH_TRACING
 	const char *pid_str = pidns_pid2str(PT_TGID);
 	pidns_print_leader();
-	printf("pidfd_open(%d%s, %#x) = %s\n",
+	printf("pidfd_open(%d%s, %#x /* PIDFD_??? */) = %s\n",
 		pid, pid_str, flags, errstr);
 # endif
 
