@@ -21,6 +21,7 @@
 #endif
 
 #undef TEST_MSGCTL_BOGUS_ADDR
+#undef TEST_MSGCTL_BOGUS_CMD
 
 /*
  * Starting with commit glibc-2.32~83, on every 32-bit architecture
@@ -50,8 +51,20 @@
 # define TEST_MSGCTL_BOGUS_ADDR 0
 #endif
 
+/*
+ * Starting with commit glibc-2.32.9000-149-gbe9b0b9a012780a403a2,
+ * glibc skips msgctl syscall invocations and returns EINVAL
+ * for invalid msgctl commands.
+ */
+#if GLIBC_PREREQ_GE(2, 32)
+# define TEST_MSGCTL_BOGUS_CMD 0
+#endif
+
 #ifndef TEST_MSGCTL_BOGUS_ADDR
 # define TEST_MSGCTL_BOGUS_ADDR 1
+#endif
+#ifndef TEST_MSGCTL_BOGUS_CMD
+# define TEST_MSGCTL_BOGUS_CMD 1
 #endif
 
 #if XLAT_RAW
@@ -172,12 +185,16 @@ main(void)
 	static const key_t private_key =
 		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
 	static const key_t bogus_key = (key_t) 0xeca86420fdb9f531ULL;
+	static const int bogus_flags = 0xface1e55 & ~IPC_CREAT;
+#if TEST_MSGCTL_BOGUS_CMD || TEST_MSGCTL_BOGUS_ADDR
 	static const int bogus_msgid = 0xfdb97531;
+#endif
+#if TEST_MSGCTL_BOGUS_CMD
 	static const int bogus_cmd = 0xdeadbeef;
+#endif
 #if TEST_MSGCTL_BOGUS_ADDR
 	static void * const bogus_addr = (void *) -1L;
 #endif
-	static const int bogus_flags = 0xface1e55 & ~IPC_CREAT;
 
 	int rc;
 	union {
@@ -197,9 +214,11 @@ main(void)
 	printf("msgget\\(%s, 0600\\) = %d\n", str_ipc_private, id);
 	atexit(cleanup);
 
+#if TEST_MSGCTL_BOGUS_CMD
 	rc = msgctl(bogus_msgid, bogus_cmd, NULL);
 	printf("msgctl\\(%d, (%s\\|)?%s, NULL\\) = %s\n",
 	       bogus_msgid, str_ipc_64, str_bogus_cmd, sprintrc_grep(rc));
+#endif
 
 #if TEST_MSGCTL_BOGUS_ADDR
 	rc = msgctl(bogus_msgid, IPC_SET, bogus_addr);
