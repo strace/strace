@@ -29,6 +29,34 @@
 # define SHM_NORESERVE 010000
 #endif
 
+#undef TEST_SHMCTL_BOGUS_ADDR
+#undef TEST_SHMCTL_BOGUS_CMD
+
+/*
+ * Starting with commit glibc-2.32~80, on every 32-bit architecture
+ * where 32-bit time_t support is enabled, glibc tries to retrieve
+ * the data provided in the third argument of shmctl call.
+ */
+#if GLIBC_PREREQ_GE(2, 32) && defined __TIMESIZE && __TIMESIZE != 64
+# define TEST_SHMCTL_BOGUS_ADDR 0
+#endif
+
+/*
+ * Starting with commit glibc-2.32.9000-207-g9ebaabeaac1a96b0d91f,
+ * glibc skips shmctl syscall invocations and returns EINVAL
+ * for invalid shmctl commands.
+ */
+#if GLIBC_PREREQ_GE(2, 32)
+# define TEST_SHMCTL_BOGUS_CMD 0
+#endif
+
+#ifndef TEST_SHMCTL_BOGUS_ADDR
+# define TEST_SHMCTL_BOGUS_ADDR 1
+#endif
+#ifndef TEST_SHMCTL_BOGUS_CMD
+# define TEST_SHMCTL_BOGUS_CMD 1
+#endif
+
 #include "xlat.h"
 #include "xlat/shm_resource_flags.h"
 
@@ -74,21 +102,6 @@
 # define str_shm_stat_any "SHM_STAT_ANY"
 # define str_ipc_64 "IPC_64"
 # define str_bogus_cmd "0xdefaced2 /\\* SHM_\\?\\?\\? \\*/"
-#endif
-
-#undef TEST_SHMCTL_BOGUS_ADDR
-
-/*
- * Starting with commit glibc-2.32~80, on every 32-bit architecture
- * where 32-bit time_t support is enabled, glibc tries to retrieve
- * the data provided in the third argument of shmctl call.
- */
-#if GLIBC_PREREQ_GE(2, 32) && defined __TIMESIZE && __TIMESIZE != 64
-# define TEST_SHMCTL_BOGUS_ADDR 0
-#endif
-
-#ifndef TEST_SHMCTL_BOGUS_ADDR
-# define TEST_SHMCTL_BOGUS_ADDR 1
 #endif
 
 static int id = -1;
@@ -191,8 +204,12 @@ main(void)
 	static const key_t private_key =
 		(key_t) (0xffffffff00000000ULL | IPC_PRIVATE);
 	static const key_t bogus_key = (key_t) 0xeca86420fdb97531ULL;
+#if TEST_SHMCTL_BOGUS_CMD || TEST_SHMCTL_BOGUS_ADDR
 	static const int bogus_id = 0xdefaced1;
+#endif
+#if TEST_SHMCTL_BOGUS_CMD
 	static const int bogus_cmd = 0xdefaced2;
+#endif
 #if TEST_SHMCTL_BOGUS_ADDR
 	static void * const bogus_addr = (void *) -1L;
 #endif
@@ -263,9 +280,11 @@ main(void)
 	printf("shmget\\(%s, 1, 0600\\) = %d\n", str_ipc_private, id);
 	atexit(cleanup);
 
+#if TEST_SHMCTL_BOGUS_CMD
 	rc = shmctl(bogus_id, bogus_cmd, NULL);
 	printf("shmctl\\(%d, (%s\\|)?%s, NULL\\) = %s\n",
 	       bogus_id, str_ipc_64, str_bogus_cmd, sprintrc_grep(rc));
+#endif
 
 #if TEST_SHMCTL_BOGUS_ADDR
 	rc = shmctl(bogus_id, IPC_STAT, bogus_addr);
