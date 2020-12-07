@@ -1,4 +1,6 @@
+#enum
 #value_indexed
+#include <linux/io_uring.h>
 IORING_OP_NOP			0
 IORING_OP_READV			1
 IORING_OP_WRITEV		2
