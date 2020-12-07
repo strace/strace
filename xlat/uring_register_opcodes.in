@@ -1,4 +1,6 @@
+#enum
 #value_indexed
+#include <linux/io_uring.h>
 IORING_REGISTER_BUFFERS		0U
 IORING_UNREGISTER_BUFFERS	1U
 IORING_REGISTER_FILES		2U
