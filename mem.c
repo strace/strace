@@ -247,6 +247,28 @@ SYS_FUNC(madvise)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(process_madvise)
+{
+	const int pidfd = tcp->u_arg[0];
+	const kernel_ulong_t addr = tcp->u_arg[1];
+	const kernel_ulong_t len = tcp->u_arg[2];
+	const unsigned int behavior = tcp->u_arg[3];
+	const unsigned int flags = tcp->u_arg[4];
+
+	printfd(tcp, pidfd);
+
+	tprints(", ");
+	tprint_iov(tcp, len, addr, IOV_DECODE_ADDR);
+
+	tprintf(", %" PRI_klu ", ", len);
+
+	printxval(madvise_cmds, behavior, "MADV_???");
+
+	tprintf(", %#x", flags);
+
+	return RVAL_DECODED;
+}
+
 #include "xlat/mlockall_flags.h"
 
 SYS_FUNC(mlockall)

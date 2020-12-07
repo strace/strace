@@ -24,3 +24,4 @@
 [BASE_NR + 437] = { 4,	TD|TF,		SEN(openat2),			"openat2"		},
 [BASE_NR + 438] = { 3,	TD,		SEN(pidfd_getfd),		"pidfd_getfd"		},
 [BASE_NR + 439] = { 4,	TD|TF,		SEN(faccessat2),		"faccessat2"		},
+[BASE_NR + 440] = { 5,	TD,		SEN(process_madvise),		"process_madvise"	},

@@ -499,6 +499,9 @@ printstrn-umoven-peekdata	-e signal=none -e trace=add_key
 printstrn-umoven-undumpable	-e signal=none -e trace=add_key
 prlimit64
 prlimit64--pidns-translation     test_pidns -e trace=prlimit64
+process_madvise
+process_madvise-y	--trace=process_madvise -y
+process_madvise-yy	--trace=process_madvise -yy
 process_vm_readv	-s5 -a37
 process_vm_readv--pidns-translation	test_pidns -s5 -a37 -e trace=process_vm_readv
 process_vm_writev	-s5 -a38

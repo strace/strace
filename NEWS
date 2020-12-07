@@ -3,6 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * libdw-based stack tracing is now enabled for non-native personalities.
+  * Implemented decoding of process_madvise syscall introduced in Linux 5.10.
   * Updated decoding of pidfd_open syscall to match Linux 5.10.
   * Updated lists of ALG_*, BPF_*, INET_DIAG_*, IORING_*, KEY_*, KVM_*, MDBA_*,
     MEMBARRIER_CMD_*, MS_*, NLMSGERR_*, NT_*, STATX_*, SEGV_*, and V4L2_*
