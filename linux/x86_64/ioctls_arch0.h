@@ -115,4 +115,5 @@
 { "linux/kvm.h", "KVM_X86_GET_MCE_CAP_SUPPORTED", _IOC_READ, 0xae9d, 0x08 },
 { "linux/kvm.h", "KVM_X86_SETUP_MCE", _IOC_WRITE, 0xae9c, 0x08 },
 { "linux/kvm.h", "KVM_X86_SET_MCE", _IOC_WRITE, 0xae9e, 0x40 },
+{ "linux/kvm.h", "KVM_X86_SET_MSR_FILTER", _IOC_WRITE, 0xaec6, 0x188 },
 { "linux/kvm.h", "KVM_XEN_HVM_CONFIG", _IOC_WRITE, 0xae7a, 0x38 },

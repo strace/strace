@@ -49,6 +49,7 @@
 { "asm/pkey.h", "PKEY_GENSECK2", _IOC_READ|_IOC_WRITE, 0x7011, 0x1c },
 { "asm/pkey.h", "PKEY_KBLOB2PROTK", _IOC_READ|_IOC_WRITE, 0x700a, 0x50 },
 { "asm/pkey.h", "PKEY_KBLOB2PROTK2", _IOC_READ|_IOC_WRITE, 0x701a, 0x58 },
+{ "asm/pkey.h", "PKEY_KBLOB2PROTK3", _IOC_READ|_IOC_WRITE, 0x701d, 0x1c },
 { "asm/pkey.h", "PKEY_SEC2PROTK", _IOC_READ|_IOC_WRITE, 0x7003, 0x8c },
 { "asm/pkey.h", "PKEY_SKEY2PKEY", _IOC_READ|_IOC_WRITE, 0x7006, 0x88 },
 { "asm/pkey.h", "PKEY_VERIFYKEY", _IOC_READ|_IOC_WRITE, 0x7007, 0x4c },
