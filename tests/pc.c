@@ -6,6 +6,7 @@
  */
 
 #include "tests.h"
+#include "scno.h"
 #include <assert.h>
 #include <dlfcn.h>
 #include <fcntl.h>
@@ -27,7 +28,7 @@ int main(void)
 #endif
 
 	/* write instruction pointer length to the log */
-	assert(write(-1, (void *) 8UL, 2 * sizeof(void *)) < 0);
+	assert(syscall(__NR_write, -1, (void *) 8UL, 2 * sizeof(void *)) < 0);
 
 	/* just a noticeable line in the log */
 	assert(munmap(&main, 0) < 0);
