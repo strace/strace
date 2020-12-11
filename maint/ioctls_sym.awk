@@ -47,7 +47,7 @@ function dir2str(dir, \
 	array[idx]["name"] = temparray[1]
 }
 /^DW_AT_type/ {
-	match($0, /:[[:space:]]+<(0x[[:xdigit:]]*)>$/, temparray)
+	match($0, /:[[:space:]]+<(0x[[:xdigit:]]*)>(, .*)?$/, temparray)
 	array[idx]["type"] = temparray[1]
 }
 /^DW_AT_upper_bound/ {
