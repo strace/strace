@@ -7,6 +7,7 @@
 
 #include <unistd.h>
 #include "scno.h"
+#include "gcc_compat.h"
 
 #ifdef MANGLE
 
@@ -17,10 +18,10 @@
 
 #endif
 
-int f0(int i, unsigned long);
-int f1(int i, unsigned long);
-int f2(int i, unsigned long);
-int f3(int i, unsigned long);
+int f0(int i, unsigned long) ATTRIBUTE_NOINLINE;
+int f1(int i, unsigned long) ATTRIBUTE_NOINLINE;
+int f2(int i, unsigned long) ATTRIBUTE_NOINLINE;
+int f3(int i, unsigned long) ATTRIBUTE_NOINLINE;
 
 #define COMPLEX_BODY(i, f)				\
 	do {						\
