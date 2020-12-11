@@ -19,9 +19,10 @@
 int
 main(void)
 {
-	assert(syscall(__NR_membarrier, 3, 255) == -1);
+	assert(syscall(__NR_membarrier, 3, 255, -1) == -1);
 	int saved_errno = errno;
-	printf("membarrier(0x3 /* MEMBARRIER_CMD_??? */, 255) = %s\n",
+	printf("membarrier(0x3 /* MEMBARRIER_CMD_??? */"
+	       ", MEMBARRIER_CMD_FLAG_CPU|0xfe, -1) = %s\n",
 	       sprintrc(-1));
 	if (saved_errno != ENOSYS) {
 		const char *text_global;
@@ -78,6 +79,12 @@ main(void)
 		printf("membarrier(MEMBARRIER_CMD_QUERY, 0) = %#x (%s%s%s)\n",
 		       rc, text_global, text[0] && text_global[0] ? "|" : "",
 		       text);
+
+		rc = syscall(__NR_membarrier, 128, 1, -1);
+		printf("membarrier(MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ"
+		       ", MEMBARRIER_CMD_FLAG_CPU, -1) = %s\n",
+		       sprintrc(rc));
+
 	}
 	puts("+++ exited with 0 +++");
 	return 0;
