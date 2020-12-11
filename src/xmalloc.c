@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include "error_prints.h"
+#include "macros.h"
 #include "xmalloc.h"
 
 static void
@@ -98,7 +99,7 @@ xgrowarray(void *const ptr, size_t *const nmemb, const size_t memb_size)
 
 	if (ptr == NULL)
 		grow_memb = *nmemb ? 0 :
-			(DEFAULT_ALLOC_SIZE + memb_size - 1) / memb_size;
+			ROUNDUP_DIV(DEFAULT_ALLOC_SIZE, memb_size);
 	else
 		grow_memb = (*nmemb >> 1) + 1;
 
