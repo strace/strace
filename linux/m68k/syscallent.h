@@ -380,7 +380,7 @@
 [371] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [372] = { 4,	TN,		SEN(sendmmsg),			"sendmmsg"		},
 [373] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[374] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[374] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [375] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [376] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [377] = { 6,	TD,		SEN(preadv2),			"preadv2"		},

@@ -367,7 +367,7 @@
 [BASE_NR + 355] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [BASE_NR + 356] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [BASE_NR + 357] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[BASE_NR + 358] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[BASE_NR + 358] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [BASE_NR + 359] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [BASE_NR + 360] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [BASE_NR + 361] = { 6,	TD,		SEN(preadv2),			"preadv2"		},

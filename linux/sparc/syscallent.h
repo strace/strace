@@ -356,7 +356,7 @@
 [348] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
 [349] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [350] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
-[351] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[351] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [352] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [353] = { 3,	TN,		SEN(bind),			"bind"			},
 [354] = { 2,	TN,		SEN(listen),			"listen"		},

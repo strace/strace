@@ -346,7 +346,7 @@
 [340] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
 [341] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [342] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
-[343] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[343] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [344] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
 [345] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [346] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},

@@ -372,7 +372,7 @@
 [362] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [363] = { 0,	0,		SEN(printargs),			"switch_endian"		},
 [364] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[365] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[365] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 /* originally left for IPC, now unused */
 [378] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [379] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},

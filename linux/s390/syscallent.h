@@ -365,7 +365,7 @@
 [353] = { 3,	0,		SEN(s390_pci_mmio_read),	"s390_pci_mmio_read"	},
 [354] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [355] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[356] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[356] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [357] = { 5,	TN,		SEN(recvmmsg_time32),		"recvmmsg"		},
 [358] = { 4,	TN,		SEN(sendmmsg),			"sendmmsg"		},
 [359] = { 3,	TN,		SEN(socket),			"socket"		},

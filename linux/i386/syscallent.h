@@ -381,7 +381,7 @@
 [372] = { 3,	TN,		SEN(recvmsg),			"recvmsg"		},
 [373] = { 2,	TN,		SEN(shutdown),			"shutdown"		},
 [374] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[375] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[375] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [376] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [377] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [378] = { 6,	TD,		SEN(preadv2),			"preadv2"		},

@@ -460,7 +460,7 @@
 [514] = { 3,	0,		SEN(seccomp),			"seccomp"		},
 [515] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [516] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[517] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[517] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [518] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [519] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [520] = { 6,	TD,		SEN(preadv2),			"preadv2"		},

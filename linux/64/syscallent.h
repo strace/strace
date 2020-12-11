@@ -273,7 +273,7 @@
 [280] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [281] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
 [282] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},
-[283] = { 2,	0,		SEN(membarrier),		"membarrier"		},
+[283] = { 3,	0,		SEN(membarrier),		"membarrier"		},
 [284] = { 3,	TM,		SEN(mlock2),			"mlock2"		},
 [285] = { 6,	TD,		SEN(copy_file_range),		"copy_file_range"	},
 [286] = { 6,	TD,		SEN(preadv2),			"preadv2"		},
