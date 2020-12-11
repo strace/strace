@@ -71,7 +71,7 @@ free_mmsgvec_data(void *ptr)
 struct mmsgvec_data {
 	char *timeout;
 	unsigned int count;
-	int namelen[IOV_MAX];
+	int namelen[0];
 };
 
 static void
