@@ -11,7 +11,8 @@ Noteworthy changes in release ?.? (????-??-??)
     constants.
   * Updated lists of ioctl commands from Linux 5.10.
 
-* Bug fixes
+* Portability
+  * Implemented workarounds for -Wall regressions in Red Hat gcc 11.0.0-0.
 
 Noteworthy changes in release 5.9 (2020-09-24)
 ==============================================

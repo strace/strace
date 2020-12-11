@@ -262,6 +262,7 @@ AC_DEFINE_UNQUOTED([ENABLE_ARM_OABI], [$enable_arm_oabi],
 		   [Define to 1 if you want OABI support on ARM EABI.])
 
 st_WARN_CFLAGS
+st_BROKEN_CC
 AX_PROG_CC_FOR_BUILD
 AM_PROG_AR
 
