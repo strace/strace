@@ -507,6 +507,7 @@ process_vm_readv--pidns-translation	test_pidns -s5 -a37 -e trace=process_vm_read
 process_vm_writev	-s5 -a38
 process_vm_writev--pidns-translation	test_pidns -s5 -a38 -e trace=process_vm_writev
 pselect6
+pselect6_time64
 ptrace	-a23 -e signal=none
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
 pwritev	-a22 -s7

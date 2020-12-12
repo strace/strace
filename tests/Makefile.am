@@ -547,6 +547,7 @@ EXTRA_DIST = \
 	printsignal.c \
 	printxval.c \
 	process_vm_readv_writev.c \
+	pselect6-common.c \
 	pure_executables.list \
 	qual_fault-exit_group.expected \
 	qual_inject-error-signal.expected \
