@@ -560,6 +560,8 @@ EXTRA_DIST = \
 	sched.in \
 	scno_tampering.sh \
 	semop-common.c \
+	semtimedop-common.c \
+	semtimedop-syscall.c \
 	setfsugid.c \
 	setresugid.c \
 	setreugid.c \

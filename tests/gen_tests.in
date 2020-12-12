@@ -574,6 +574,8 @@ select-P	-a36 -e trace=select -P /dev/full 9>>/dev/full
 semop	-a32
 semop-indirect	-a32 -e trace=semop
 semtimedop
+semtimedop-ipc	-e trace=semtimedop
+semtimedop_time64
 sendfile	-a27
 sendfile64	-a29
 set_mempolicy	-a34 -s3

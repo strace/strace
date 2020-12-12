@@ -662,6 +662,8 @@ select-P
 semop
 semop-indirect
 semtimedop
+semtimedop-ipc
+semtimedop_time64
 sendfile
 sendfile64
 set_mempolicy
