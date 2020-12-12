@@ -66,7 +66,7 @@ decode_syscall_subcall(struct tcb *tcp)
 {
 	if (!scno_is_valid(tcp->u_arg[0]))
 		return;
-	tcp->scno = tcp->u_arg[0];
+	tcp->true_scno = tcp->scno = tcp->u_arg[0];
 	tcp->qual_flg = qual_flags(tcp->scno);
 	tcp->s_ent = &sysent[tcp->scno];
 	memmove(&tcp->u_arg[0], &tcp->u_arg[1],
