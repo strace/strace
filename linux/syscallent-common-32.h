@@ -8,10 +8,10 @@
 #ifndef BASE_NR
 # define BASE_NR 0
 #endif
-[BASE_NR + 403] = { 2,	0,		SEN(clock_gettime64),		"clock_gettime64"	},
-[BASE_NR + 404] = { 2,	0,		SEN(clock_settime64),		"clock_settime64"	},
-[BASE_NR + 405] = { 2,	0,		SEN(clock_adjtime64),		"clock_adjtime64"	},
-[BASE_NR + 406] = { 2,	0,		SEN(clock_getres_time64),	"clock_getres_time64"	},
+[BASE_NR + 403] = { 2,	TCL,		SEN(clock_gettime64),		"clock_gettime64"	},
+[BASE_NR + 404] = { 2,	TCL,		SEN(clock_settime64),		"clock_settime64"	},
+[BASE_NR + 405] = { 2,	TCL,		SEN(clock_adjtime64),		"clock_adjtime64"	},
+[BASE_NR + 406] = { 2,	TCL,		SEN(clock_getres_time64),	"clock_getres_time64"	},
 [BASE_NR + 407] = { 4,	0,		SEN(clock_nanosleep_time64),	"clock_nanosleep_time64"},
 [BASE_NR + 408] = { 2,	0,		SEN(timer_gettime64),		"timer_gettime64"	},
 [BASE_NR + 409] = { 4,	0,		SEN(timer_settime64),		"timer_settime64"	},

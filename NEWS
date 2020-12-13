@@ -11,6 +11,10 @@ Noteworthy changes in release ?.? (????-??-??)
     constants.
   * Updated lists of ioctl commands from Linux 5.10.
 
+* Bug fixes
+  * Added clock_gettime64, clock_settime64, clock_adjtime64, and
+    lock_getres_time64 syscalls to %clock trace class.
+
 * Portability
   * Implemented workarounds for -Wall regressions in Red Hat gcc 11.0.0-0.
 
