@@ -44,6 +44,7 @@ clock_adjtime
 clock_adjtime64
 clock_nanosleep
 clock_xettime
+clock_xettime64
 clone-flags
 clone3
 clone3-Xabbrev

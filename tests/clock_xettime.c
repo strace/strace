@@ -1,77 +1,41 @@
 /*
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
- * Copyright (c) 2015-2019 The strace developers.
+ * Check decoding of clock_gettime, clock_settime, and
+ * clock_getres syscalls.
+ *
+ * Copyright (c) 2020 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <stdint.h>
-#include <time.h>
-#include <unistd.h>
 #include "scno.h"
 
-#if defined __NR_clock_getres \
- && defined __NR_clock_gettime \
- && defined __NR_clock_settime
+#if defined __NR_clock_gettime \
+ && defined __NR_clock_settime \
+ && defined __NR_clock_getres
 
-int
-main(void)
-{
-	struct {
-		struct timespec ts;
-		uint32_t pad[2];
-	} t = {
-		.pad = { 0xdeadbeef, 0xbadc0ded }
-	};
-	long rc;
+# define SYSCALL_NR_gettime	__NR_clock_gettime
+# define SYSCALL_NR_settime	__NR_clock_settime
+# define SYSCALL_NR_getres	__NR_clock_getres
 
-	if (syscall(__NR_clock_getres, CLOCK_REALTIME, &t.ts))
-		perror_msg_and_skip("clock_getres CLOCK_REALTIME");
-	printf("clock_getres(CLOCK_REALTIME, {tv_sec=%lld, tv_nsec=%llu})"
-	       " = 0\n",
-	       (long long) t.ts.tv_sec,
-	       zero_extend_signed_to_ull(t.ts.tv_nsec));
+# define SYSCALL_NAME_gettime	"clock_gettime"
+# define SYSCALL_NAME_settime	"clock_settime"
+# define SYSCALL_NAME_getres	"clock_getres"
 
-	if (syscall(__NR_clock_gettime, CLOCK_PROCESS_CPUTIME_ID, &t.ts))
-		perror_msg_and_skip("clock_gettime CLOCK_PROCESS_CPUTIME_ID");
-	printf("clock_gettime(CLOCK_PROCESS_CPUTIME_ID"
-	       ", {tv_sec=%lld, tv_nsec=%llu}) = 0\n",
-	       (long long) t.ts.tv_sec,
-	       zero_extend_signed_to_ull(t.ts.tv_nsec));
+# if defined __NR_clock_gettime64 \
+  || defined __NR_clock_settime64 \
+  || defined __NR_clock_getres_time64
+#  include "arch_defs.h"
+#  define clock_timespec_t kernel_timespec32_t
+# else
+#  define clock_timespec_t kernel_timespec64_t
+# endif
 
-	t.ts.tv_sec = 0xdeface1;
-	t.ts.tv_nsec = 0xdeface2;
-	rc = syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts);
-	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID"
-	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
-	       (long long) t.ts.tv_sec,
-	       zero_extend_signed_to_ull(t.ts.tv_nsec), sprintrc(rc));
-
-	t.ts.tv_sec = 0xdeadbeefU;
-	t.ts.tv_nsec = 0xfacefeedU;
-	rc = syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts);
-	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID"
-	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
-	       (long long) t.ts.tv_sec,
-	       zero_extend_signed_to_ull(t.ts.tv_nsec), sprintrc(rc));
-
-	t.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
-	t.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
-	rc = syscall(__NR_clock_settime, CLOCK_THREAD_CPUTIME_ID, &t.ts);
-	printf("clock_settime(CLOCK_THREAD_CPUTIME_ID"
-	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
-	       (long long) t.ts.tv_sec,
-	       zero_extend_signed_to_ull(t.ts.tv_nsec), sprintrc(rc));
-
-	puts("+++ exited with 0 +++");
-	return 0;
-}
+# include "clock_xettime-common.c"
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_clock_getres && __NR_clock_gettime && __NR_clock_settime")
+SKIP_MAIN_UNDEFINED("__NR_clock_gettime && __NR_clock_settime && __NR_clock_getres")
 
 #endif
