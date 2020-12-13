@@ -516,6 +516,7 @@ EXTRA_DIST = \
 	caps-abbrev.awk \
 	caps.awk \
 	clock.in \
+	clock_adjtime-common.c \
 	count-f.expected \
 	eventfd.expected \
 	fadvise.h \
