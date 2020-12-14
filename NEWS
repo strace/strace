@@ -1,5 +1,5 @@
-Noteworthy changes in release ?.? (????-??-??)
-==============================================
+Noteworthy changes in release 5.10 (2020-12-14)
+===============================================
 
 * Improvements
   * libdw-based stack tracing is now enabled for non-native personalities.
