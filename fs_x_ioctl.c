@@ -8,18 +8,19 @@
  */
 
 #include "defs.h"
-#include <linux/fs.h>
 #include "print_fields.h"
+#include "types/fs_x.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/fs_x_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 int
 fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
 {
 	switch (code) {
-#ifdef FITRIM
-	/* First seen in linux-2.6.37 */
 	case FITRIM: {
-		struct fstrim_range fstrim;
+		struct_fstrim_range fstrim;
 
 		tprints(", ");
 		if (!umove_or_printaddr(tcp, arg, &fstrim)) {
@@ -30,14 +31,11 @@ fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 		}
 		break;
 	}
-#endif
 
 	/* No arguments */
-#ifdef FIFREEZE
 	case FIFREEZE:
 	case FITHAW:
 		break;
-#endif
 
 	default:
 		return RVAL_DECODED;

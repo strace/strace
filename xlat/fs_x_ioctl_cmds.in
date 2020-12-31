@@ -1,0 +1,5 @@
+/* Introduced by Linux kernel commit v2.6.29-rc1~10. */
+FIFREEZE	_IOWR('X', 119, int)
+FITHAW		_IOWR('X', 120, int)
+/* Introduced by Linux kernel commit v2.6.37-rc1~76^2^2~16. */
+FITRIM		_IOWR('X', 121, struct_fstrim_range)
