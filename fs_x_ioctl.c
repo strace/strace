@@ -14,23 +14,28 @@
 # include "xlat/fs_x_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
+static void
+decode_fstrim_range(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	struct_fstrim_range range;
+
+	if (!umove_or_printaddr(tcp, arg, &range)) {
+		PRINT_FIELD_X("{", range, start);
+		PRINT_FIELD_U(", ", range, len);
+		PRINT_FIELD_U(", ", range, minlen);
+		tprints("}");
+	}
+}
+
 int
 fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
 {
 	switch (code) {
-	case FITRIM: {
-		struct_fstrim_range fstrim;
-
+	case FITRIM:
 		tprints(", ");
-		if (!umove_or_printaddr(tcp, arg, &fstrim)) {
-			PRINT_FIELD_X("{", fstrim, start);
-			PRINT_FIELD_U(", ", fstrim, len);
-			PRINT_FIELD_U(", ", fstrim, minlen);
-			tprints("}");
-		}
+		decode_fstrim_range(tcp, arg);
 		break;
-	}
 
 	/* No arguments */
 	case FIFREEZE:
