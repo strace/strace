@@ -9,6 +9,7 @@
 
 #include "defs.h"
 #include <linux/fs.h>
+#include "print_fields.h"
 
 int
 fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -21,13 +22,12 @@ fs_x_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct fstrim_range fstrim;
 
 		tprints(", ");
-		if (!umove_or_printaddr(tcp, arg, &fstrim))
-			tprintf("{start=%#" PRIx64
-				", len=%#" PRIx64
-				", minlen=%#" PRIx64 "}",
-				(uint64_t) fstrim.start,
-				(uint64_t) fstrim.len,
-				(uint64_t) fstrim.minlen);
+		if (!umove_or_printaddr(tcp, arg, &fstrim)) {
+			PRINT_FIELD_X("{", fstrim, start);
+			PRINT_FIELD_U(", ", fstrim, len);
+			PRINT_FIELD_U(", ", fstrim, minlen);
+			tprints("}");
+		}
 		break;
 	}
 #endif
