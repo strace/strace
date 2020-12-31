@@ -204,6 +204,10 @@ ioctl_evdev-success-v	+ioctl_evdev-success.test -a26 -v
 ioctl_evdev-success-v-Xabbrev	+ioctl_evdev-success.test -v -Xabbrev
 ioctl_evdev-success-v-Xraw	+ioctl_evdev-success.test -a27 -v -Xraw
 ioctl_evdev-success-v-Xverbose	+ioctl_evdev-success.test -a43 -v -Xverbose
+ioctl_fs_x	+ioctl.test -a18
+ioctl_fs_x-Xabbrev	+ioctl.test -a18 -Xabbrev
+ioctl_fs_x-Xraw	+ioctl.test -a21 -Xraw
+ioctl_fs_x-Xverbose	+ioctl.test -a35 -Xverbose
 ioctl_hdio	+ioctl.test -a27
 ioctl_hdio-Xabbrev	+ioctl.test -a27 -Xabbrev
 ioctl_hdio-Xraw	+ioctl.test -a20 -Xraw

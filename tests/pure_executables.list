@@ -169,6 +169,10 @@ ioctl_evdev-v
 ioctl_evdev-v-Xabbrev
 ioctl_evdev-v-Xraw
 ioctl_evdev-v-Xverbose
+ioctl_fs_x
+ioctl_fs_x-Xabbrev
+ioctl_fs_x-Xraw
+ioctl_fs_x-Xverbose
 ioctl_hdio
 ioctl_hdio-Xabbrev
 ioctl_hdio-Xraw
