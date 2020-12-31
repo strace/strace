@@ -2,7 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2019 The strace developers.
  * All rights reserved.
  *

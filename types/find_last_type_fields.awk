@@ -1,6 +1,6 @@
 #!/bin/gawk -f
 #
-# Copyright (c) 2018-2020 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2018-2020 Dmitry V. Levin <ldv@strace.io>
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

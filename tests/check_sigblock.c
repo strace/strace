@@ -1,7 +1,7 @@
 /*
  * Check that the specified signal number is blocked/unblocked.
  *
- * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

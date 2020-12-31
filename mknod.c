@@ -5,7 +5,7 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2006 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2006 Bernhard Kaindl <bk@suse.de>
- * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2014-2019 The strace developers.
  * All rights reserved.
  *

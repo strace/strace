@@ -109,103 +109,103 @@ echo 'END OF TEST SUITE INFORMATION'
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
-* Mon Dec 14 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.10-1
+* Mon Dec 14 2020 Dmitry V. Levin <ldv@strace.io> - 5.10-1
 - v5.9 -> v5.10.
 
-* Thu Sep 24 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.9-1
+* Thu Sep 24 2020 Dmitry V. Levin <ldv@strace.io> - 5.9-1
 - v5.8 -> v5.9.
 
-* Thu Aug 06 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.8-1
+* Thu Aug 06 2020 Dmitry V. Levin <ldv@strace.io> - 5.8-1
 - v5.7 -> v5.8.
 
-* Mon Jun 01 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.7-1
+* Mon Jun 01 2020 Dmitry V. Levin <ldv@strace.io> - 5.7-1
 - v5.6 -> v5.7.
 
-* Tue Apr 07 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.6-1
+* Tue Apr 07 2020 Dmitry V. Levin <ldv@strace.io> - 5.6-1
 - v5.5 -> v5.6.
 
-* Thu Feb 06 2020 Dmitry V. Levin <ldv@altlinux.org> - 5.5-1
+* Thu Feb 06 2020 Dmitry V. Levin <ldv@strace.io> - 5.5-1
 - v5.4 -> v5.5.
 
-* Thu Nov 28 2019 Dmitry V. Levin <ldv@altlinux.org> - 5.4-1
+* Thu Nov 28 2019 Dmitry V. Levin <ldv@strace.io> - 5.4-1
 - v5.3 -> v5.4.
 
-* Wed Sep 25 2019 Dmitry V. Levin <ldv@altlinux.org> - 5.3-1
+* Wed Sep 25 2019 Dmitry V. Levin <ldv@strace.io> - 5.3-1
 - v5.2 -> v5.3.
 
-* Fri Jul 12 2019 Dmitry V. Levin <ldv@altlinux.org> - 5.2-1
+* Fri Jul 12 2019 Dmitry V. Levin <ldv@strace.io> - 5.2-1
 - v5.1 -> v5.2.
 
-* Wed May 22 2019 Dmitry V. Levin <ldv@altlinux.org> - 5.1-1
+* Wed May 22 2019 Dmitry V. Levin <ldv@strace.io> - 5.1-1
 - v5.0 -> v5.1.
 
-* Tue Mar 19 2019 Dmitry V. Levin <ldv@altlinux.org> - 5.0-1
+* Tue Mar 19 2019 Dmitry V. Levin <ldv@strace.io> - 5.0-1
 - v4.26 -> v5.0 (resolves: #478419, #526740, #851457, #1609318,
   #1610774, #1662936, #1676045).
 
-* Wed Dec 26 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.26-1
+* Wed Dec 26 2018 Dmitry V. Levin <ldv@strace.io> - 4.26-1
 - v4.25 -> v4.26.
 
-* Tue Oct 30 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.25-1
+* Tue Oct 30 2018 Dmitry V. Levin <ldv@strace.io> - 4.25-1
 - v4.24 -> v4.25.
 
-* Tue Aug 14 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.24-1
+* Tue Aug 14 2018 Dmitry V. Levin <ldv@strace.io> - 4.24-1
 - v4.23 -> v4.24.
 
-* Thu Jun 14 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.23-1
+* Thu Jun 14 2018 Dmitry V. Levin <ldv@strace.io> - 4.23-1
 - v4.22 -> v4.23.
 - Enabled libdw backend for -k option (#1568647).
 
-* Thu Apr 05 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.22-1
+* Thu Apr 05 2018 Dmitry V. Levin <ldv@strace.io> - 4.22-1
 - v4.21 -> v4.22.
 
-* Tue Feb 13 2018 Dmitry V. Levin <ldv@altlinux.org> - 4.21-1
+* Tue Feb 13 2018 Dmitry V. Levin <ldv@strace.io> - 4.21-1
 - v4.20 -> v4.21.
 
-* Mon Nov 13 2017 Dmitry V. Levin <ldv@altlinux.org> - 4.20-1
+* Mon Nov 13 2017 Dmitry V. Levin <ldv@strace.io> - 4.20-1
 - v4.19 -> v4.20.
 
-* Tue Sep 05 2017 Dmitry V. Levin <ldv@altlinux.org> - 4.19-1
+* Tue Sep 05 2017 Dmitry V. Levin <ldv@strace.io> - 4.19-1
 - v4.18 -> v4.19.
 
-* Wed Jul 05 2017 Dmitry V. Levin <ldv@altlinux.org> - 4.18-1
+* Wed Jul 05 2017 Dmitry V. Levin <ldv@strace.io> - 4.18-1
 - v4.17 -> v4.18.
 
-* Wed May 24 2017 Dmitry V. Levin <ldv@altlinux.org> - 4.17-1
+* Wed May 24 2017 Dmitry V. Levin <ldv@strace.io> - 4.17-1
 - v4.16 -> v4.17.
 
-* Tue Feb 14 2017 Dmitry V. Levin <ldv@altlinux.org> - 4.16-1
+* Tue Feb 14 2017 Dmitry V. Levin <ldv@strace.io> - 4.16-1
 - v4.15 -> v4.16.
 
-* Wed Dec 14 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.15-1
+* Wed Dec 14 2016 Dmitry V. Levin <ldv@strace.io> - 4.15-1
 - v4.14-100-g622af42 -> v4.15.
 
-* Wed Nov 16 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.14.0.100.622a-1
+* Wed Nov 16 2016 Dmitry V. Levin <ldv@strace.io> - 4.14.0.100.622a-1
 - v4.14 -> v4.14-100-g622af42:
   + implemented syscall fault injection.
 
-* Tue Oct 04 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.14-1
+* Tue Oct 04 2016 Dmitry V. Levin <ldv@strace.io> - 4.14-1
 - v4.13 -> v4.14:
   + added printing of the mode argument of open and openat syscalls
     when O_TMPFILE flag is set (#1377846).
 
-* Tue Jul 26 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.13-1
+* Tue Jul 26 2016 Dmitry V. Levin <ldv@strace.io> - 4.13-1
 - v4.12 -> v4.13.
 
-* Tue May 31 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.12-1
+* Tue May 31 2016 Dmitry V. Levin <ldv@strace.io> - 4.12-1
 - v4.11-163-g972018f -> v4.12.
 
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.0.163.9720-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
-* Fri Jan 15 2016 Dmitry V. Levin <ldv@altlinux.org> - 4.11.0.163.9720-1
+* Fri Jan 15 2016 Dmitry V. Levin <ldv@strace.io> - 4.11.0.163.9720-1
 - New upstream snapshot v4.11-163-g972018f:
   + fixed decoding of syscalls unknown to the kernel on s390/s390x (#1298294).
 
-* Wed Dec 23 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.11-2
+* Wed Dec 23 2015 Dmitry V. Levin <ldv@strace.io> - 4.11-2
 - Enabled experimental -k option on x86_64 (#1170296).
 
-* Mon Dec 21 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.11-1
+* Mon Dec 21 2015 Dmitry V. Levin <ldv@strace.io> - 4.11-1
 - New upstream release:
   + print nanoseconds along with seconds in stat family syscalls (#1251176).
 
@@ -215,7 +215,7 @@ echo 'END OF TEST SUITE INFORMATION'
 * Mon May 11 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 4.10-2
 - Backport set of upstream patches to get it buildable on AArch64
 
-* Fri Mar 06 2015 Dmitry V. Levin <ldv@altlinux.org> - 4.10-1
+* Fri Mar 06 2015 Dmitry V. Levin <ldv@strace.io> - 4.10-1
 - New upstream release:
   + enhanced ioctl decoding (#902788).
 
@@ -225,7 +225,7 @@ echo 'END OF TEST SUITE INFORMATION'
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
-* Fri Aug 15 2014 Dmitry V. Levin <ldv@altlinux.org> - 4.9-1
+* Fri Aug 15 2014 Dmitry V. Levin <ldv@strace.io> - 4.9-1
 - New upstream release:
   + fixed build when <sys/ptrace.h> and <linux/ptrace.h> conflict (#993384);
   + updated CLOCK_* constants (#1088455);
@@ -244,7 +244,7 @@ echo 'END OF TEST SUITE INFORMATION'
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.8-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-* Mon Jun 03 2013 Dmitry V. Levin <ldv@altlinux.org> - 4.8-1
+* Mon Jun 03 2013 Dmitry V. Levin <ldv@strace.io> - 4.8-1
 - New upstream release:
   + fixed ERESTARTNOINTR leaking to userspace on ancient kernels (#659382);
   + fixed decoding of *xattr syscalls (#885233);
@@ -257,14 +257,14 @@ echo 'END OF TEST SUITE INFORMATION'
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
-* Wed May 02 2012 Dmitry V. Levin <ldv@altlinux.org> 4.7-1
+* Wed May 02 2012 Dmitry V. Levin <ldv@strace.io> 4.7-1
 - New upstream release.
   + implemented proper handling of real SIGTRAPs (#162774).
 
 * Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
-* Mon Mar 14 2011 Dmitry V. Levin <ldv@altlinux.org> - 4.6-1
+* Mon Mar 14 2011 Dmitry V. Levin <ldv@strace.io> - 4.6-1
 - New upstream release.
   + fixed a corner case in waitpid handling (#663547).
 
@@ -277,7 +277,7 @@ echo 'END OF TEST SUITE INFORMATION'
   + fixed FTBFS (#539044).
 
 * Wed Oct 21 2009 Roland McGrath <roland@redhat.com> - 4.5.19-1
-- New upstream release, work mostly by Dmitry V. Levin <ldv@altlinux.org>
+- New upstream release, work mostly by Dmitry V. Levin <ldv@strace.io>
   + exit/kill strace with traced process exitcode/signal (#105371);
   + fixed build on ARM EABI (#507576);
   + fixed display of 32-bit argv array on 64-bit architectures (#519480);

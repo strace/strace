@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2003 Russell King <rmk@arm.linux.org.uk>
  * Copyright (c) 2011-2013 Denys Vlasenko <vda.linux@googlemail.com>
- * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2018 The strace developers.
  * All rights reserved.
  *

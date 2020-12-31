@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2014 Mike Frysinger <vapier@gentoo.org>
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *

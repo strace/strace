@@ -1,7 +1,7 @@
 /*
  * This file is part of net-yy-netlink strace test.
  *
- * Copyright (c) 2013-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2013-2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2019 The strace developers.
  * All rights reserved.
  *

@@ -6,7 +6,7 @@
  * Copyright (c) 2009 Denys Vlasenko <dvlasenk@redhat.com>
  * Copyright (c) 2009-2010 Andreas Schwab <schwab@linux-m68k.org>
  * Copyright (c) 2012 H.J. Lu <hongjiu.lu@intel.com>
- * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *

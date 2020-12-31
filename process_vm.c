@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012 Denys Vlasenko <vda.linux@googlemail.com>
- * Copyright (c) 2012-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2012-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *

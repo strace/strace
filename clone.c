@@ -3,7 +3,7 @@
  * Copyright (c) 2002-2005 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2008 Jan Kratochvil <jan.kratochvil@redhat.com>
  * Copyright (c) 2009-2013 Denys Vlasenko <dvlasenk@redhat.com>
- * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2014-2020 The strace developers.
  * All rights reserved.
  *

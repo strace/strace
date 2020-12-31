@@ -4,7 +4,7 @@
  * Copyright (c) 2007 Daniel Jacobowitz  <dan@codesourcery.com>
  * Copyright (c) 2009 Andreas Schwab <schwab@redhat.com>
  * Copyright (c) 2009 Kirill A. Shutemov <kirill@shutemov.name>
- * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2014-2018 The strace developers.
  * All rights reserved.
  *

@@ -5,7 +5,7 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2012 H.J. Lu <hongjiu.lu@intel.com>
  * Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2018 The strace developers.
  * All rights reserved.
  *

@@ -1,7 +1,7 @@
 /*
  * Check that signal injection works properly.
  *
- * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2017-2019 The strace developers.
  * All rights reserved.
  *

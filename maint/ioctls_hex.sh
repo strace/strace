@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copyright (c) 2001 Wichert Akkerman <wichert@cistron.nl>
-# Copyright (c) 2004-2018 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2004-2018 Dmitry V. Levin <ldv@strace.io>
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

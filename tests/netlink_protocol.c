@@ -1,7 +1,7 @@
 /*
  * Check decoding of netlink protocol.
  *
- * Copyright (c) 2014-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Fabien Siron <fabien.siron@epita.fr>
  * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.

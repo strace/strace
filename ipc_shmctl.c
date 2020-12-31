@@ -4,7 +4,7 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2003-2006 Roland McGrath <roland@redhat.com>
- * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *

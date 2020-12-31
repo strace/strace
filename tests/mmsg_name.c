@@ -2,7 +2,7 @@
  * Check decoding of msg_name* fields of struct msghdr array argument
  * of sendmmsg and recvmmsg syscalls.
  *
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *

@@ -5,7 +5,7 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2001 John Hughes <john@Calva.COM>
  * Copyright (c) 2013 Denys Vlasenko <vda.linux@googlemail.com>
- * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2011-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015 Elvira Khabirova <lineprinter0@gmail.com>
  * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.

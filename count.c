@@ -7,7 +7,7 @@
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2004 Roland McGrath <roland@redhat.com>
- * Copyright (c) 2006 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2006 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2006-2020 The strace developers.
  * All rights reserved.
  *

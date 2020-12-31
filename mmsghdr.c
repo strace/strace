@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Andreas Schwab <schwab@linux-m68k.org>
  * Copyright (c) 2012-2013 Denys Vlasenko <vda.linux@googlemail.com>
  * Copyright (c) 2014 Masatake YAMATO <yamato@redhat.com>
- * Copyright (c) 2010-2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2010-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *

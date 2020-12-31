@@ -2,7 +2,7 @@
  * Check decoding of prctl PR_GET_SECUREBITS/PR_SET_SECUREBITS operations.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *

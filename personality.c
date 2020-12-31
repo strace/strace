@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2014-2018 The strace developers.
  * All rights reserved.
  *

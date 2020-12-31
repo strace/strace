@@ -1,7 +1,7 @@
 /*
  * Check decoding of ptrace PTRACE_GET_SYSCALL_INFO request.
  *
- * Copyright (c) 2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2018-2020 The strace developers.
  * All rights reserved.
  *

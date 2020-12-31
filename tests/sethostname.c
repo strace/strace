@@ -2,7 +2,7 @@
  * Check decoding of sethostname syscall.
  *
  * Copyright (c) 2016 Fei Jie <feij.fnst@cn.fujitsu.com>
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *

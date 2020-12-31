@@ -1,7 +1,7 @@
 /*
  * This file is part of net-y-unix strace test.
  *
- * Copyright (c) 2013-2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2013-2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.
  *

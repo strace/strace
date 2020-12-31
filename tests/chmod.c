@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Anchit Jain <anchitjain1234@gmail.com>
- * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *

@@ -1,7 +1,7 @@
 /*
  * Decoder of socket filter programs.
  *
- * Copyright (c) 2017 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2017-2019 The strace developers.
  * All rights reserved.
  *

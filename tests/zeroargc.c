@@ -1,7 +1,7 @@
 /*
  * Execute an executable with zero argc and specified environment.
  *
- * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2017-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2017-2020 The strace developers.
  * All rights reserved.
  *

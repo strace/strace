@@ -1,5 +1,5 @@
 #!/bin/sh -efu
-# Copyright (c) 2018 Dmitry V. Levin <ldv@altlinux.org>
+# Copyright (c) 2018 Dmitry V. Levin <ldv@strace.io>
 # All rights reserved.
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later

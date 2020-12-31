@@ -3,7 +3,7 @@
  * Copyright (c) 2010 Mike Frysinger <vapier@gentoo.org>
  * Copyright (c) 2010 Carmelo Amoroso <carmelo.amoroso@st.com>
  * Copyright (c) 2015 Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>
- * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2014-2019 The strace developers.
  * All rights reserved.
  *

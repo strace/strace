@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2004 Ulrich Drepper <drepper@redhat.com>
- * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2019 The strace developers.
  * All rights reserved.
  *

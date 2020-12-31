@@ -4,7 +4,7 @@
  * Copyright (c) 2002 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2008-2013 Denys Vlasenko <vda.linux@googlemail.com>
  * Copyright (c) 2012 H.J. Lu <hongjiu.lu@intel.com>
- * Copyright (c) 2010-2015 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2010-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
  *

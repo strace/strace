@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2016 Mikulas Patocka <mpatocka@redhat.com>
  * Copyright (c) 2016 Masatake Yamato <yamato@redhat.com>
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2016-2018 The strace developers.
  * All rights reserved.

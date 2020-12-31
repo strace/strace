@@ -3,7 +3,7 @@
  * value: PR_GET_CHILD_SUBREAPER, PR_GET_ENDIAN, PR_GET_FPEMU, and PR_GET_FPEXC.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2016 Dmitry V. Levin <ldv@altlinux.org>
+ * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
