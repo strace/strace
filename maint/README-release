@@ -1,6 +1,7 @@
 * check spelling using codespell tool
 * commit changes prepared by maint/update_copyright_years.sh
-* update copyright year number range in COPYING and debian/copyright
+* update copyright year number range in COPYING, tests/COPYING,
+  and debian/copyright files
 * prepare NEWS for release
 * generate release notes for strace.io and git repository mirrors
   using maint/gen-release-notes.sh, maint/gen-release-github.sh
