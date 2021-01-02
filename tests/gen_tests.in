@@ -208,6 +208,10 @@ ioctl_fs_x	+ioctl.test -a18
 ioctl_fs_x-Xabbrev	+ioctl.test -a18 -Xabbrev
 ioctl_fs_x-Xraw	+ioctl.test -a21 -Xraw
 ioctl_fs_x-Xverbose	+ioctl.test -a35 -Xverbose
+ioctl_fs_x-success	+ioctl-success.sh -a18
+ioctl_fs_x-success-Xabbrev	+ioctl-success.sh -a18 -Xabbrev
+ioctl_fs_x-success-Xraw	+ioctl-success.sh -a21 -Xraw
+ioctl_fs_x-success-Xverbose	+ioctl-success.sh -a35 -Xverbose
 ioctl_hdio	+ioctl.test -a27
 ioctl_hdio-Xabbrev	+ioctl.test -a27 -Xabbrev
 ioctl_hdio-Xraw	+ioctl.test -a20 -Xraw
