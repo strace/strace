@@ -128,7 +128,6 @@ fcntl64--pidns-translation
 fdatasync
 fflush
 file_handle
-file_ioctl
 filter_seccomp-perf
 filter-unavailable
 finit_module
@@ -232,6 +231,7 @@ ioctl_evdev-v
 ioctl_evdev-v-Xabbrev
 ioctl_evdev-v-Xraw
 ioctl_evdev-v-Xverbose
+ioctl_fiemap
 ioctl_fs_x
 ioctl_fs_x-Xabbrev
 ioctl_fs_x-Xraw

@@ -104,7 +104,6 @@ fcntl64	-a8
 fcntl64--pidns-translation	test_pidns -a8 -e trace=fcntl64
 fdatasync	-a14
 file_handle	-e trace=name_to_handle_at,open_by_handle_at
-file_ioctl	+ioctl.test
 filter_seccomp	. "${srcdir=.}/filter_seccomp.sh"; test_prog_set --seccomp-bpf -f
 filter_seccomp-flag	../$NAME
 finit_module	-a25
@@ -204,6 +203,7 @@ ioctl_evdev-success-v	+ioctl_evdev-success.test -a26 -v
 ioctl_evdev-success-v-Xabbrev	+ioctl_evdev-success.test -v -Xabbrev
 ioctl_evdev-success-v-Xraw	+ioctl_evdev-success.test -a27 -v -Xraw
 ioctl_evdev-success-v-Xverbose	+ioctl_evdev-success.test -a43 -v -Xverbose
+ioctl_fiemap	+ioctl.test
 ioctl_fs_x	+ioctl.test -a18
 ioctl_fs_x-Xabbrev	+ioctl.test -a18 -Xabbrev
 ioctl_fs_x-Xraw	+ioctl.test -a21 -Xraw

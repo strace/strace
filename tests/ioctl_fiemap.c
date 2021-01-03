@@ -1,4 +1,6 @@
 /*
+ * Check decoding of FS_IOC_FIEMAP ioctl command.
+ *
  * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
@@ -34,10 +36,8 @@ test_fiemap(void)
 	/* The live version of this test is in btrfs.c */
 }
 
-/* clone and dedupe ioctls are in btrfs.c since they originated there */
-
 int
-main(int argc, char *argv[])
+main(void)
 {
 	test_fiemap();
 
