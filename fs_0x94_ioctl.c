@@ -102,6 +102,16 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	return 0;
 }
 
+static void
+decode_fslabel(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	fs_0x94_label_t label;
+
+	tprints(", ");
+	if (!umove_or_printaddr(tcp, arg, &label))
+		print_quoted_cstring(label, sizeof(label));
+}
+
 int
 fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 	      const kernel_ulong_t arg)
@@ -117,6 +127,15 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	case FIDEDUPERANGE:	/* WR */
 		return decode_file_dedupe_range(tcp, arg);
+
+	case FS_IOC_GETFSLABEL:	/* R */
+		if (entering(tcp))
+			return 0;
+		ATTRIBUTE_FALLTHROUGH;
+
+	case FS_IOC_SETFSLABEL:	/* W */
+		decode_fslabel(tcp, arg);
+		break;
 
 	default:
 #ifdef HAVE_LINUX_BTRFS_H

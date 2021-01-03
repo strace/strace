@@ -3,3 +3,6 @@ FICLONE		_IOW(0x94, 9, int)
 FICLONERANGE	_IOW(0x94, 13, struct_file_clone_range)
 /* Introduced by Linux kernel commit v4.5-rc1~135^2~1. */
 FIDEDUPERANGE	_IOWR(0x94, 54, struct_file_dedupe_range)
+/* Introduced by Linux kernel commit v4.18-rc1~37^2~66. */
+FS_IOC_GETFSLABEL	_IOR(0x94, 49, fs_0x94_label_t)
+FS_IOC_SETFSLABEL	_IOW(0x94, 50, fs_0x94_label_t)

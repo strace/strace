@@ -36,4 +36,6 @@ typedef struct {
 	struct_file_dedupe_range_info info[0];
 } struct_file_dedupe_range;
 
+typedef char fs_0x94_label_t[256];
+
 #endif /* STRACE_TYPES_FS_0X94_H */

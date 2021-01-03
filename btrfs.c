@@ -1205,20 +1205,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		break;
 	}
 
-	case BTRFS_IOC_GET_FSLABEL: /* R */
-		if (entering(tcp))
-			return 0;
-		ATTRIBUTE_FALLTHROUGH;
-	case BTRFS_IOC_SET_FSLABEL: { /* W */
-		char label[BTRFS_LABEL_SIZE];
-
-		tprints(", ");
-		if (umove_or_printaddr(tcp, arg, &label))
-			break;
-		print_quoted_cstring(label, sizeof(label));
-		break;
-	}
-
 	default:
 		return RVAL_DECODED;
 	};
