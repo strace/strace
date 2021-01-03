@@ -121,6 +121,7 @@ libstrace_a_SOURCES =	\
 	filter_seccomp.h \
 	flock.c		\
 	flock.h		\
+	fs_0x94_ioctl.c	\
 	fs_x_ioctl.c	\
 	fsconfig.c	\
 	fsmount.c	\

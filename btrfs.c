@@ -1230,7 +1230,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		 * implementations.  We use the BTRFS_* names here because
 		 * they will be available on older systems.
 		 */
-		return file_ioctl(tcp, code, arg);
+		return fs_0x94_ioctl(tcp, code, arg);
 
 	default:
 		return RVAL_DECODED;
