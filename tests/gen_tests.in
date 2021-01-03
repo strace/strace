@@ -204,6 +204,17 @@ ioctl_evdev-success-v-Xabbrev	+ioctl_evdev-success.test -v -Xabbrev
 ioctl_evdev-success-v-Xraw	+ioctl_evdev-success.test -a27 -v -Xraw
 ioctl_evdev-success-v-Xverbose	+ioctl_evdev-success.test -a43 -v -Xverbose
 ioctl_fiemap	+ioctl.test
+ioctl_fiemap-Xabbrev	+ioctl.test -Xabbrev
+ioctl_fiemap-Xraw	+ioctl.test -Xraw
+ioctl_fiemap-Xverbose	+ioctl.test -Xverbose
+ioctl_fiemap-success	+ioctl-success.sh -a31
+ioctl_fiemap-success-Xabbrev	+ioctl-success.sh -a31 -Xabbrev
+ioctl_fiemap-success-Xraw	+ioctl-success.sh -a25 -Xraw
+ioctl_fiemap-success-Xverbose	+ioctl-success.sh -a48 -Xverbose
+ioctl_fiemap-success-v	+ioctl-success.sh -a31 -v
+ioctl_fiemap-success-v-Xabbrev	+ioctl-success.sh -a31 -v -Xabbrev
+ioctl_fiemap-success-v-Xraw	+ioctl-success.sh -a25 -v -Xraw
+ioctl_fiemap-success-v-Xverbose	+ioctl-success.sh -a48 -v -Xverbose
 ioctl_fs_x	+ioctl.test -a18
 ioctl_fs_x-Xabbrev	+ioctl.test -a18 -Xabbrev
 ioctl_fs_x-Xraw	+ioctl.test -a21 -Xraw

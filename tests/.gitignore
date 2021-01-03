@@ -232,6 +232,17 @@ ioctl_evdev-v-Xabbrev
 ioctl_evdev-v-Xraw
 ioctl_evdev-v-Xverbose
 ioctl_fiemap
+ioctl_fiemap-Xabbrev
+ioctl_fiemap-Xraw
+ioctl_fiemap-Xverbose
+ioctl_fiemap-success
+ioctl_fiemap-success-Xabbrev
+ioctl_fiemap-success-Xraw
+ioctl_fiemap-success-Xverbose
+ioctl_fiemap-success-v
+ioctl_fiemap-success-v-Xabbrev
+ioctl_fiemap-success-v-Xraw
+ioctl_fiemap-success-v-Xverbose
 ioctl_fs_x
 ioctl_fs_x-Xabbrev
 ioctl_fs_x-Xraw
