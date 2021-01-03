@@ -18,8 +18,8 @@
 int
 main(void)
 {
-	long rc = syscall(__NR_userfaultfd, 1 | O_NONBLOCK | O_CLOEXEC);
-	printf("userfaultfd(O_NONBLOCK|O_CLOEXEC|0x1) = %ld %s (%m)\n",
+	long rc = syscall(__NR_userfaultfd, 2 | O_NONBLOCK | O_CLOEXEC);
+	printf("userfaultfd(O_NONBLOCK|O_CLOEXEC|0x2) = %ld %s (%m)\n",
 	       rc, errno2name());
 	puts("+++ exited with 0 +++");
 	return 0;
