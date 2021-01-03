@@ -332,10 +332,8 @@ ioctl_decode(struct tcb *tcp)
 #endif /* !ALPHA */
 	case 0x89:
 		return sock_ioctl(tcp, code, arg);
-#ifdef HAVE_LINUX_BTRFS_H
 	case 0x94:
-		return btrfs_ioctl(tcp, code, arg);
-#endif
+		return fs_0x94_ioctl(tcp, code, arg);
 	case 0xa4:
 		return tee_ioctl(tcp, code, arg);
 #ifdef HAVE_LINUX_USERFAULTFD_H
