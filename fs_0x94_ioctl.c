@@ -8,53 +8,16 @@
 
 #include "defs.h"
 #include "print_fields.h"
-#include <linux/fs.h>
-
-#ifndef FICLONE
-# define FICLONE	_IOW(0x94, 9, int)
-#endif
-
-#ifndef FICLONERANGE
-# define FICLONERANGE	_IOW(0x94, 13, struct file_clone_range)
-struct file_clone_range {
-	int64_t src_fd;
-	uint64_t src_offset;
-	uint64_t src_length;
-	uint64_t dest_offset;
-};
-#endif
-
-#ifndef FIDEDUPERANGE
-# define FIDEDUPERANGE	_IOWR(0x94, 54, struct file_dedupe_range)
-struct file_dedupe_range_info {
-	int64_t dest_fd;	/* in - destination file */
-	uint64_t dest_offset;	/* in - start of extent in destination */
-	uint64_t bytes_deduped;	/* out - total # of bytes we were able
-				 * to dedupe from this file. */
-	/* status of this dedupe operation:
-	 * < 0 for error
-	 * == FILE_DEDUPE_RANGE_SAME if dedupe succeeds
-	 * == FILE_DEDUPE_RANGE_DIFFERS if data differs
-	 */
-	int32_t status;		/* out - see above description */
-	uint32_t reserved;	/* must be zero */
-};
-
-struct file_dedupe_range {
-	uint64_t src_offset;	/* in - start of extent in source */
-	uint64_t src_length;	/* in - length of extent */
-	uint16_t dest_count;	/* in - total elements in info array */
-	uint16_t reserved1;	/* must be zero */
-	uint32_t reserved2;	/* must be zero */
-	struct file_dedupe_range_info info[0];
-};
-#endif
+#include "types/fs_0x94.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/fs_0x94_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 static bool
 print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 			     size_t elem_size, void *data)
 {
-	const struct file_dedupe_range_info *info = elem_buf;
+	const struct_file_dedupe_range_info *info = elem_buf;
 	unsigned int *count = data;
 
 	if (count) {
@@ -87,7 +50,7 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 		break;
 
 	case FICLONERANGE: { /* W */
-		struct file_clone_range args;
+		struct_file_clone_range args;
 
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &args))
@@ -102,8 +65,8 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	case FIDEDUPERANGE: { /* RW */
-		struct file_dedupe_range args;
-		struct file_dedupe_range_info info;
+		struct_file_dedupe_range args;
+		struct_file_dedupe_range_info info;
 		unsigned int *limit = NULL;
 		unsigned int count = 2;
 		bool rc;
