@@ -9,17 +9,17 @@
 #include "defs.h"
 #include "print_fields.h"
 #include <linux/fs.h>
-
-#ifdef HAVE_LINUX_FIEMAP_H
-# include <linux/types.h>
-# include <linux/fiemap.h>
-# include "xlat/fiemap_flags.h"
-# include "xlat/fiemap_extent_flags.h"
+#include "types/fiemap.h"
+#include "xlat/fiemap_flags.h"
+#include "xlat/fiemap_extent_flags.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/fs_f_ioctl_cmds.h"
+#undef XLAT_MACROS_ONLY
 
 static bool
 print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const struct fiemap_extent *fe = elem_buf;
+	const struct_fiemap_extent *fe = elem_buf;
 
 	PRINT_FIELD_U("{", *fe, fe_logical);
 	PRINT_FIELD_U(", ", *fe, fe_physical);
@@ -30,16 +30,14 @@ print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 
 	return true;
 }
-#endif /* HAVE_LINUX_FIEMAP_H */
 
 int
 file_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
 {
 	switch (code) {
-#ifdef HAVE_LINUX_FIEMAP_H
 	case FS_IOC_FIEMAP: {
-		struct fiemap args;
+		struct_fiemap args;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -67,7 +65,7 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (abbrev(tcp)) {
 			tprints(", ...");
 		} else {
-			struct fiemap_extent fe;
+			struct_fiemap_extent fe;
 			tprints(", fm_extents=");
 			print_array(tcp,
 				    arg + offsetof(typeof(args), fm_extents),
@@ -79,7 +77,6 @@ file_ioctl(struct tcb *const tcp, const unsigned int code,
 
 		break;
 	}
-#endif /* HAVE_LINUX_FIEMAP_H */
 
 	default:
 		return RVAL_DECODED;

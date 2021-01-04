@@ -415,7 +415,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/dqblk_xfs.h
 	linux/falloc.h
 	linux/fib_rules.h
-	linux/fiemap.h
 	linux/hiddev.h
 	linux/ip_vs.h
 	linux/ipc.h
