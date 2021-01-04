@@ -1,1 +1,5 @@
+FS_IOC_GETFLAGS		_IOR('f', 1, long)
+FS_IOC32_GETFLAGS	_IOR('f', 1, int)
+FS_IOC_SETFLAGS		_IOW('f', 2, long)
+FS_IOC32_SETFLAGS	_IOW('f', 2, int)
 FS_IOC_FIEMAP		_IOWR('f', 11, struct_fiemap)

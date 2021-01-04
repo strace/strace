@@ -2,8 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Implemented decoding of FS_IOC_FSGETXATTR and FS_IOC_FSSETXATTR ioctl
-    commands.
+  * Implemented decoding of FS_IOC_FS[GS]ETXATTR, FS_IOC_[GS]ETFLAGS,
+    and FS_IOC32_[GS]ETFLAGS ioctl commands.
 
 * Bug fixes
 

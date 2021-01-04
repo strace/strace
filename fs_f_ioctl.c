@@ -12,6 +12,7 @@
 #include "types/fiemap.h"
 #include "xlat/fiemap_flags.h"
 #include "xlat/fiemap_extent_flags.h"
+#include "xlat/fs_ioc_flags.h"
 #define XLAT_MACROS_ONLY
 # include "xlat/fs_f_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
@@ -72,6 +73,18 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+static void
+decode_fs_ioc_flags(struct tcb *const tcp, const kernel_ulong_t arg)
+{
+	unsigned int flags;
+
+	if (!umove_or_printaddr(tcp, arg, &flags)) {
+		tprints("[");
+		printflags(fs_ioc_flags, flags, "FS_???_FL");
+		tprints("]");
+	}
+}
+
 int
 fs_f_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
@@ -79,6 +92,22 @@ fs_f_ioctl(struct tcb *const tcp, const unsigned int code,
 	switch (code) {
 	case FS_IOC_FIEMAP:
 		return decode_fiemap(tcp, arg);
+
+	case FS_IOC_GETFLAGS:
+#if SIZEOF_LONG > 4
+	case FS_IOC32_GETFLAGS:
+#endif
+		if (entering(tcp))
+			return 0;
+		ATTRIBUTE_FALLTHROUGH;
+
+	case FS_IOC_SETFLAGS:
+#if SIZEOF_LONG > 4
+	case FS_IOC32_SETFLAGS:
+#endif
+		tprints(", ");
+		decode_fs_ioc_flags(tcp, arg);
+		break;
 
 	default:
 		return RVAL_DECODED;
