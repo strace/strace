@@ -1209,8 +1209,8 @@ name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)	\
 
 DECL_IOCTL(dm);
 DECL_IOCTL(evdev);
-DECL_IOCTL(file);
 DECL_IOCTL(fs_0x94);
+DECL_IOCTL(fs_f);
 DECL_IOCTL(fs_x);
 DECL_IOCTL(inotify);
 DECL_IOCTL(kvm);

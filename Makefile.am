@@ -114,7 +114,6 @@ libstrace_a_SOURCES =	\
 	fetch_struct_statfs.c \
 	fetch_struct_xfs_quotastat.c \
 	file_handle.c	\
-	file_ioctl.c	\
 	filter.h	\
 	filter_qualify.c \
 	filter_seccomp.c \
@@ -122,6 +121,7 @@ libstrace_a_SOURCES =	\
 	flock.c		\
 	flock.h		\
 	fs_0x94_ioctl.c	\
+	fs_f_ioctl.c	\
 	fs_x_ioctl.c	\
 	fsconfig.c	\
 	fsmount.c	\

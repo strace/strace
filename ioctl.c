@@ -312,12 +312,12 @@ ioctl_decode(struct tcb *tcp)
 		return fs_x_ioctl(tcp, code, arg);
 	case 'f': {
 #if defined(ALPHA) || defined(POWERPC)
-		int ret = file_ioctl(tcp, code, arg);
+		int ret = fs_f_ioctl(tcp, code, arg);
 		if (ret != RVAL_DECODED)
 			return ret;
 		return term_ioctl(tcp, code, arg);
 #else /* !(ALPHA || POWERPC) */
-		return file_ioctl(tcp, code, arg);
+		return fs_f_ioctl(tcp, code, arg);
 #endif /* (ALPHA || POWERPC) */
 	}
 #ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024

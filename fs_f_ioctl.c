@@ -73,7 +73,7 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 int
-file_ioctl(struct tcb *const tcp, const unsigned int code,
+fs_f_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
 {
 	switch (code) {
