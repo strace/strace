@@ -91,9 +91,26 @@ END {
 				       FILENAME, ioc_name) > "/dev/stderr"
 				exit 1
 			}
-			printf("{ \"%s\", \"%s\", %s, 0x%04x, 0x%02x },\n",
-				  HEADER_NAME, ioc_name, dir2str(sizemap["d"]),
-				  sizemap["n"], sizemap["s"])
+			ioctls[sprintf("%s, 0x%04x, 0x%02x",
+				       dir2str(sizemap["d"]),
+				       sizemap["n"],
+				       sizemap["s"])][ioc_name]=""
+		}
+	}
+	for (val in ioctls) {
+		n = asorti(ioctls[val], d)
+		for (i = 1; i <= n; ++i) {
+			for (j = 1; j <= n; ++j) {
+				if (i == j)
+					continue
+				if (index(d[j], d[i]) ||
+				    gensub(/(_TIME)?(32|64)/, "", "g", d[j]) == d[i])
+					break
+			}
+			if (j > n) {
+				printf("{ \"%s\", \"%s\", %s },\n",
+				       HEADER_NAME, d[i], val)
+			}
 		}
 	}
 }
