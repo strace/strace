@@ -230,8 +230,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		break;
 
 	case FIOGETOWN:
-	case SIOCGPGRP:
 	case SIOCATMARK:
+	case SIOCGPGRP:
 		if (entering(tcp))
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
@@ -247,18 +247,18 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		/* no arguments */
 		break;
 
-	case SIOCSIFNAME:
 	case SIOCSIFADDR:
-	case SIOCSIFDSTADDR:
 	case SIOCSIFBRDADDR:
-	case SIOCSIFNETMASK:
+	case SIOCSIFDSTADDR:
 	case SIOCSIFFLAGS:
+	case SIOCSIFHWADDR:
+	case SIOCSIFMAP:
 	case SIOCSIFMETRIC:
 	case SIOCSIFMTU:
+	case SIOCSIFNAME:
+	case SIOCSIFNETMASK:
 	case SIOCSIFSLAVE:
-	case SIOCSIFHWADDR:
 	case SIOCSIFTXQLEN:
-	case SIOCSIFMAP:
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &ifr))
 			break;
@@ -269,19 +269,19 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		tprints("}");
 		break;
 
-	case SIOCGIFNAME:
-	case SIOCGIFINDEX:
 	case SIOCGIFADDR:
-	case SIOCGIFDSTADDR:
 	case SIOCGIFBRDADDR:
-	case SIOCGIFNETMASK:
+	case SIOCGIFDSTADDR:
 	case SIOCGIFFLAGS:
+	case SIOCGIFHWADDR:
+	case SIOCGIFINDEX:
+	case SIOCGIFMAP:
 	case SIOCGIFMETRIC:
 	case SIOCGIFMTU:
+	case SIOCGIFNAME:
+	case SIOCGIFNETMASK:
 	case SIOCGIFSLAVE:
-	case SIOCGIFHWADDR:
 	case SIOCGIFTXQLEN:
-	case SIOCGIFMAP:
 		if (entering(tcp)) {
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ifr))
