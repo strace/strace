@@ -32,12 +32,6 @@ typedef struct ifreq struct_ifreq;
 #undef XLAT_MACROS_ONLY
 
 static void
-print_ifname(const char *ifname)
-{
-	print_quoted_string(ifname, IFNAMSIZ + 1, QUOTE_0_TERMINATED);
-}
-
-static void
 print_ifreq(struct tcb *const tcp, const unsigned int code,
 	    const kernel_ulong_t arg, const struct_ifreq *const ifr)
 {
@@ -59,7 +53,7 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_SOCKADDR("", *ifr, ifr_netmask, tcp);
 		break;
 	case SIOCSIFHWADDR:
-	case SIOCGIFHWADDR: {
+	case SIOCGIFHWADDR:
 		PRINT_FIELD_XVAL("ifr_hwaddr={", ifr->ifr_hwaddr, sa_family,
 				 arp_hardware_types, "ARPHRD_???");
 		PRINT_FIELD_HWADDR_SZ(", ", ifr->ifr_hwaddr, sa_data,
@@ -67,40 +61,35 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 				      ifr->ifr_hwaddr.sa_family);
 		tprints("}");
 		break;
-	}
 	case SIOCSIFFLAGS:
 	case SIOCGIFFLAGS:
-		tprints("ifr_flags=");
-		printflags(iffflags, (unsigned short) ifr->ifr_flags, "IFF_???");
+		PRINT_FIELD_FLAGS("", *ifr, ifr_flags, iffflags, "IFF_???");
 		break;
 	case SIOCSIFMETRIC:
 	case SIOCGIFMETRIC:
-		tprintf("ifr_metric=%d", ifr->ifr_metric);
+		PRINT_FIELD_D("", *ifr, ifr_metric);
 		break;
 	case SIOCSIFMTU:
 	case SIOCGIFMTU:
-		tprintf("ifr_mtu=%d", ifr->ifr_mtu);
+		PRINT_FIELD_D("", *ifr, ifr_mtu);
 		break;
 	case SIOCSIFSLAVE:
 	case SIOCGIFSLAVE:
-		tprints("ifr_slave=");
-		print_ifname(ifr->ifr_slave);
+		PRINT_FIELD_CSTRING("", *ifr, ifr_slave);
 		break;
 	case SIOCSIFTXQLEN:
 	case SIOCGIFTXQLEN:
-		tprintf("ifr_qlen=%d", ifr->ifr_qlen);
+		PRINT_FIELD_D("", *ifr, ifr_qlen);
 		break;
 	case SIOCSIFMAP:
 	case SIOCGIFMAP:
-		tprintf("ifr_map={mem_start=%#" PRI_klx ", "
-			"mem_end=%#" PRI_klx ", base_addr=%#x, "
-			"irq=%u, dma=%u, port=%u}",
-			(kernel_ulong_t) ifr->ifr_map.mem_start,
-			(kernel_ulong_t) ifr->ifr_map.mem_end,
-			(unsigned) ifr->ifr_map.base_addr,
-			(unsigned) ifr->ifr_map.irq,
-			(unsigned) ifr->ifr_map.dma,
-			(unsigned) ifr->ifr_map.port);
+		PRINT_FIELD_X("ifr_map={", ifr->ifr_map, mem_start);
+		PRINT_FIELD_X(", ", ifr->ifr_map, mem_end);
+		PRINT_FIELD_X(", ", ifr->ifr_map, base_addr);
+		PRINT_FIELD_X(", ", ifr->ifr_map, irq);
+		PRINT_FIELD_X(", ", ifr->ifr_map, dma);
+		PRINT_FIELD_X(", ", ifr->ifr_map, port);
+		tprints("}");
 		break;
 	}
 }
@@ -124,8 +113,7 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 {
 	struct_ifreq *ifr = elem_buf;
 
-	tprints("{ifr_name=");
-	print_ifname(ifr->ifr_name);
+	PRINT_FIELD_CSTRING("{", *ifr, ifr_name);
 	PRINT_FIELD_SOCKADDR(", ", *ifr, ifr_addr, tcp);
 	tprints("}");
 
@@ -175,8 +163,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 			if (!entering_ifc->ifc_buf)
 				print_ifc_len(entering_ifc->ifc_len);
 
-			tprints(", ifc_buf=");
-			printaddr(ptr_to_kulong(entering_ifc->ifc_buf));
+			PRINT_FIELD_PTR(", ", *entering_ifc, ifc_buf);
 
 			tprints("}");
 		}
@@ -201,10 +188,8 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!entering_ifc->ifc_buf || (entering_ifc->ifc_len != ifc->ifc_len))
 		print_ifc_len(ifc->ifc_len);
 
-	tprints(", ifc_buf=");
-
 	if (!entering_ifc->ifc_buf || syserror(tcp)) {
-		printaddr(ptr_to_kulong(entering_ifc->ifc_buf));
+		PRINT_FIELD_PTR(", ", *entering_ifc, ifc_buf);
 		if (entering_ifc->ifc_buf != ifc->ifc_buf) {
 			tprints(" => ");
 			printaddr(ptr_to_kulong(ifc->ifc_buf));
@@ -212,6 +197,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	} else {
 		struct_ifreq ifr;
 
+		tprints(", ifc_buf=");
 		print_array(tcp, ptr_to_kulong(ifc->ifc_buf),
 			    ifc->ifc_len / sizeof(struct_ifreq),
 			    &ifr, sizeof(ifr),
@@ -291,13 +277,11 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		if (umove_or_printaddr(tcp, arg, &ifr))
 			break;
 
-		tprints("{ifr_name=");
-		print_ifname(ifr.ifr_name);
-		tprints(", ");
+		PRINT_FIELD_CSTRING("{", ifr, ifr_name);
 		if (code == SIOCSIFNAME) {
-			tprints("ifr_newname=");
-			print_ifname(ifr.ifr_newname);
+			PRINT_FIELD_CSTRING(", ", ifr, ifr_newname);
 		} else {
+			tprints(", ");
 			print_ifreq(tcp, code, arg, &ifr);
 		}
 		tprints("}");
@@ -322,10 +306,9 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 				break;
 
 			if (SIOCGIFNAME == code) {
-				tprintf("{ifr_index=%d", ifr.ifr_ifindex);
+				PRINT_FIELD_D("{", ifr, ifr_ifindex);
 			} else {
-				tprints("{ifr_name=");
-				print_ifname(ifr.ifr_name);
+				PRINT_FIELD_CSTRING("{", ifr, ifr_name);
 			}
 			return 0;
 		} else {
@@ -341,8 +324,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 			}
 
 			if (SIOCGIFNAME == code) {
-				tprints("ifr_name=");
-				print_ifname(ifr.ifr_name);
+				PRINT_FIELD_CSTRING("", ifr, ifr_name);
 			} else {
 				print_ifreq(tcp, code, arg, &ifr);
 			}
