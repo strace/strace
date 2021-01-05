@@ -99,7 +99,7 @@ print_ifc_len(int len)
 {
 	const unsigned int n = (unsigned int) len / sizeof(struct_ifreq);
 
-	if (len < 0 || n * sizeof(struct_ifreq) != (unsigned int) len)
+	if (len <= 0 || n * sizeof(struct_ifreq) != (unsigned int) len)
 		tprintf("%d", len);
 	else
 		tprintf("%u * sizeof(struct ifreq)", n);
