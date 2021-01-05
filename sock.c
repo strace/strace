@@ -7,21 +7,23 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
-
-#include <sys/socket.h>
-#include <linux/ioctl.h>
-#include <linux/sockios.h>
-#include <arpa/inet.h>
-#include <net/if.h>
 
 #include DEF_MPERS_TYPE(struct_ifconf)
 #include DEF_MPERS_TYPE(struct_ifreq)
+
+#include <sys/socket.h>
+#include <net/if.h>
 
 typedef struct ifconf struct_ifconf;
 typedef struct ifreq struct_ifreq;
 
 #include MPERS_DEFS
+
+#include <linux/ioctl.h>
+#include <linux/sockios.h>
+#include <arpa/inet.h>
+
+#include "print_fields.h"
 
 #include "xlat/iffflags.h"
 
