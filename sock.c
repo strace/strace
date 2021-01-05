@@ -223,17 +223,15 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		printstr(tcp, arg);
 		break;
 
-	case FIOSETOWN:
-	case SIOCSPGRP:
-		tprints(", ");
-		printnum_int(tcp, arg, "%d");
-		break;
-
 	case FIOGETOWN:
 	case SIOCGPGRP:
 	case SIOCATMARK:
 		if (entering(tcp))
 			return 0;
+		ATTRIBUTE_FALLTHROUGH;
+
+	case FIOSETOWN:
+	case SIOCSPGRP:
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
