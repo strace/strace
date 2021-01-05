@@ -10,9 +10,7 @@
 #include "print_fields.h"
 
 #include <sys/socket.h>
-#if defined ALPHA || defined SH || defined SH64
-# include <linux/ioctl.h>
-#endif
+#include <linux/ioctl.h>
 #include <linux/sockios.h>
 #include <arpa/inet.h>
 #include <net/if.h>
@@ -219,45 +217,29 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCGIFCONF:
 		return decode_ifconf(tcp, arg);
 
-#ifdef SIOCBRADDBR
 	case SIOCBRADDBR:
 	case SIOCBRDELBR:
 		tprints(", ");
 		printstr(tcp, arg);
 		break;
-#endif
 
-#ifdef FIOSETOWN
 	case FIOSETOWN:
-#endif
-#ifdef SIOCSPGRP
 	case SIOCSPGRP:
-#endif
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
 
-#ifdef FIOGETOWN
 	case FIOGETOWN:
-#endif
-#ifdef SIOCGPGRP
 	case SIOCGPGRP:
-#endif
-#ifdef SIOCATMARK
 	case SIOCATMARK:
-#endif
 		if (entering(tcp))
 			return 0;
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
 
-#ifdef SIOCBRADDIF
 	case SIOCBRADDIF:
-#endif
-#ifdef SIOCBRDELIF
 	case SIOCBRDELIF:
-#endif
 		/* no arguments */
 		break;
 
