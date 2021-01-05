@@ -292,21 +292,13 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 			}
 			return 0;
 		} else {
-			if (syserror(tcp)) {
-				tprints("}");
-				break;
-			}
-
-			tprints(", ");
-			if (umove(tcp, arg, &ifr) < 0) {
-				tprints("???}");
-				break;
-			}
-
-			if (SIOCGIFNAME == code) {
-				PRINT_FIELD_CSTRING("", ifr, ifr_name);
-			} else {
-				print_ifreq(tcp, code, arg, &ifr);
+			if (!syserror(tcp) && !umove(tcp, arg, &ifr)) {
+				if (SIOCGIFNAME == code) {
+					PRINT_FIELD_CSTRING(", ", ifr, ifr_name);
+				} else {
+					tprints(", ");
+					print_ifreq(tcp, code, arg, &ifr);
+				}
 			}
 			tprints("}");
 			break;
