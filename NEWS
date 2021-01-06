@@ -6,6 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     and FS_IOC32_[GS]ETFLAGS ioctl commands.
 
 * Bug fixes
+  * Fixed decoding of SIOCGIFINDEX ioctl command.
 
 Noteworthy changes in release 5.10 (2020-12-14)
 ===============================================

@@ -65,6 +65,9 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	case SIOCGIFFLAGS:
 		PRINT_FIELD_FLAGS("", *ifr, ifr_flags, iffflags, "IFF_???");
 		break;
+	case SIOCGIFINDEX:
+		PRINT_FIELD_D("", *ifr, ifr_ifindex);
+		break;
 	case SIOCSIFMETRIC:
 	case SIOCGIFMETRIC:
 		PRINT_FIELD_D("", *ifr, ifr_metric);
