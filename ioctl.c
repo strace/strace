@@ -238,6 +238,25 @@ ioctl_decode_command_number(struct tcb *tcp)
 	}
 }
 
+static int
+f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
+{
+	int rc = fs_f_ioctl(tcp, code, arg);
+#if defined ALPHA
+	if (rc == RVAL_DECODED)
+		rc = sock_ioctl(tcp, code, arg);
+	if (rc == RVAL_DECODED)
+		rc = term_ioctl(tcp, code, arg);
+#elif defined MIPS || defined SH || defined XTENSA
+	if (rc == RVAL_DECODED)
+		rc = sock_ioctl(tcp, code, arg);
+#elif defined POWERPC
+	if (rc == RVAL_DECODED)
+		rc = term_ioctl(tcp, code, arg);
+#endif
+	return rc;
+}
+
 /**
  * Decode arg parameter of the ioctl call.
  *
@@ -310,22 +329,18 @@ ioctl_decode(struct tcb *tcp)
 		return watchdog_ioctl(tcp, code, arg);
 	case 'X':
 		return fs_x_ioctl(tcp, code, arg);
-	case 'f': {
-#if defined(ALPHA) || defined(POWERPC)
-		int ret = fs_f_ioctl(tcp, code, arg);
-		if (ret != RVAL_DECODED)
-			return ret;
-		return term_ioctl(tcp, code, arg);
-#else /* !(ALPHA || POWERPC) */
-		return fs_f_ioctl(tcp, code, arg);
-#endif /* (ALPHA || POWERPC) */
-	}
+	case 'f':
+		return f_ioctl(tcp, code, arg);
 #ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 	case 'o':
 		return ubi_ioctl(tcp, code, arg);
 #endif
 	case 'p':
 		return rtc_ioctl(tcp, code, arg);
+#if defined ALPHA || defined MIPS || defined SH || defined XTENSA
+	case 's':
+		return sock_ioctl(tcp, code, arg);
+#endif
 #if defined(ALPHA) || defined(POWERPC)
 	case 't':
 		return term_ioctl(tcp, code, arg);
