@@ -249,7 +249,11 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 
 	case SIOCBRADDIF:
 	case SIOCBRDELIF:
-		/* no arguments */
+		tprints(", ");
+		if (!umove_or_printaddr(tcp, arg, &ifr)) {
+			PRINT_FIELD_IFINDEX("{", ifr, ifr_ifindex);
+			tprints("}");
+		}
 		break;
 
 	case SIOCSIFADDR:
