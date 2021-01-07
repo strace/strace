@@ -77,6 +77,4 @@
 { "asm/sockios.h", "FIOSETOWN", _IOC_WRITE, 0x667c, 0x04 },
 { "asm/sockios.h", "SIOCATMARK", _IOC_READ, 0x7307, 0x04 },
 { "asm/sockios.h", "SIOCGPGRP", _IOC_READ, 0x7309, 0x04 },
-{ "asm/sockios.h", "SIOCGSTAMP", 0, 0x8906, 0 },
-{ "asm/sockios.h", "SIOCGSTAMPNS", 0, 0x8907, 0 },
 { "asm/sockios.h", "SIOCSPGRP", _IOC_WRITE, 0x7308, 0x04 },
