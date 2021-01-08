@@ -167,10 +167,46 @@ test_ptr(void)
 	}
 }
 
+static void
+test_int(const int fd)
+{
+	TAIL_ALLOC_OBJECT_CONST_PTR(int, p_int);
+	pid_t pid = getpid();
+
+	const struct {
+		uint32_t cmd;
+		const char *str;
+		int val;
+	} cmd[] = {
+		{ ARG_STR(FIOGETOWN), -1 },
+		{ ARG_STR(FIOSETOWN), pid },
+		{ ARG_STR(SIOCATMARK), -1 },
+		{ ARG_STR(SIOCGPGRP), -1 },
+		{ ARG_STR(SIOCSPGRP), pid },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(cmd); ++i) {
+		*p_int = cmd[i].val;
+
+		do_ioctl_ptr(fd, cmd[i].cmd, p_int + 1);
+		printf("ioctl(%d, %s, %p) = %s\n",
+		       fd, cmd[i].str, p_int + 1, errstr);
+
+		do_ioctl_ptr(fd, cmd[i].cmd, p_int);
+		printf("ioctl(%d, %s, [%d]) = %s\n",
+		       fd, cmd[i].str, *p_int, errstr);
+	}
+}
+
 int
 main(void)
 {
+	const int fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (fd < 0)
+		perror_msg_and_skip("socket AF_INET");
+
 	test_ptr();
+	test_int(fd);
 
 	puts("+++ exited with 0 +++");
 	return 0;
