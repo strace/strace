@@ -198,6 +198,36 @@ test_int(const int fd)
 	}
 }
 
+static void
+test_str(void)
+{
+	char *const buf = tail_alloc(IFNAMSIZ);
+
+	static const struct {
+		uint32_t cmd;
+		const char *str;
+	} cmd[] = {
+		{ ARG_STR(SIOCBRADDBR) },
+		{ ARG_STR(SIOCBRDELBR) },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(cmd); ++i) {
+		fill_memory_ex(buf, IFNAMSIZ, '0', 10);
+		do_ioctl_ptr(-1, cmd[i].cmd, buf + 1);
+		printf("ioctl(%d, %s, %p) = %s\n",
+		       -1, cmd[i].str, buf + 1, errstr);
+
+		do_ioctl_ptr(-1, cmd[i].cmd, buf);
+		printf("ioctl(%d, %s, \"%.*s\"...) = %s\n",
+		       -1, cmd[i].str, IFNAMSIZ - 1, buf, errstr);
+
+		buf[IFNAMSIZ - 1] = '\0';
+		do_ioctl_ptr(-1, cmd[i].cmd, buf);
+		printf("ioctl(%d, %s, \"%s\") = %s\n",
+		       -1, cmd[i].str, buf, errstr);
+	}
+}
+
 int
 main(void)
 {
@@ -207,6 +237,7 @@ main(void)
 
 	test_ptr();
 	test_int(fd);
+	test_str();
 
 	puts("+++ exited with 0 +++");
 	return 0;
