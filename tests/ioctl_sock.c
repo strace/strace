@@ -183,6 +183,7 @@ test_int(const int fd)
 		{ ARG_STR(SIOCATMARK), -1 },
 		{ ARG_STR(SIOCGPGRP), -1 },
 		{ ARG_STR(SIOCSPGRP), pid },
+		{ ARG_STR(SIOCSIFENCAP), -1 },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(cmd); ++i) {
@@ -394,6 +395,9 @@ test_ifreq(const int fd)
 		{ ARG_STR(SIOCSIFDSTADDR),	ARG_IFREQ(ifr_dstaddr) },
 		{ ARG_STR(SIOCSIFFLAGS),	ARG_IFREQ(ifr_flags) },
 		{ ARG_STR(SIOCSIFHWADDR),	ARG_IFREQ(ifr_hwaddr) },
+		{ ARG_STR(SIOCSIFHWBROADCAST),	ARG_IFREQ(ifr_hwaddr) },
+		{ ARG_STR(SIOCADDMULTI),	ARG_IFREQ(ifr_hwaddr) },
+		{ ARG_STR(SIOCDELMULTI),	ARG_IFREQ(ifr_hwaddr) },
 		{ ARG_STR(SIOCSIFMAP),		ARG_IFREQ(ifr_map) },
 		{ ARG_STR(SIOCSIFMETRIC),	ARG_IFREQ(ifr_metric) },
 		{ ARG_STR(SIOCSIFMTU),		ARG_IFREQ(ifr_mtu) },

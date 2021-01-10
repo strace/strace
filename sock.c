@@ -52,8 +52,11 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	case SIOCGIFNETMASK:
 		PRINT_FIELD_SOCKADDR("", *ifr, ifr_netmask, tcp);
 		break;
-	case SIOCSIFHWADDR:
+	case SIOCADDMULTI:
+	case SIOCDELMULTI:
 	case SIOCGIFHWADDR:
+	case SIOCSIFHWADDR:
+	case SIOCSIFHWBROADCAST:
 		PRINT_FIELD_XVAL("ifr_hwaddr={", ifr->ifr_hwaddr, sa_family,
 				 arp_hardware_types, "ARPHRD_???");
 		PRINT_FIELD_HWADDR_SZ(", ", ifr->ifr_hwaddr, sa_data,
@@ -236,12 +239,17 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 
 	case FIOGETOWN:
 	case SIOCATMARK:
+	case SIOCGIFENCAP:
 	case SIOCGPGRP:
+#ifdef SIOCOUTQNSD
+	case SIOCOUTQNSD:
+#endif
 		if (entering(tcp))
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 
 	case FIOSETOWN:
+	case SIOCSIFENCAP:
 	case SIOCSPGRP:
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
@@ -256,11 +264,14 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		}
 		break;
 
+	case SIOCADDMULTI:
+	case SIOCDELMULTI:
 	case SIOCSIFADDR:
 	case SIOCSIFBRDADDR:
 	case SIOCSIFDSTADDR:
 	case SIOCSIFFLAGS:
 	case SIOCSIFHWADDR:
+	case SIOCSIFHWBROADCAST:
 	case SIOCSIFMAP:
 	case SIOCSIFMETRIC:
 	case SIOCSIFMTU:
@@ -312,7 +323,6 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		}
 
 	case SIOCADDDLCI:
-	case SIOCADDMULTI:
 	case SIOCADDRT:
 	case SIOCBONDCHANGEACTIVE:
 	case SIOCBONDENSLAVE:
@@ -322,7 +332,6 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCBONDSLAVEINFOQUERY:
 	case SIOCDARP:
 	case SIOCDELDLCI:
-	case SIOCDELMULTI:
 	case SIOCDELRT:
 	case SIOCDIFADDR:
 	case SIOCDRARP:
@@ -333,7 +342,6 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 #endif
 	case SIOCGIFBR:
 	case SIOCGIFCOUNT:
-	case SIOCGIFENCAP:
 	case SIOCGIFMEM:
 	case SIOCGIFPFLAGS:
 	case SIOCGIFVLAN:
@@ -355,17 +363,12 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 #ifdef SIOCGSTAMPNS_NEW
 	case SIOCGSTAMPNS_NEW:
 #endif
-#ifdef SIOCOUTQNSD
-	case SIOCOUTQNSD:
-#endif
 	case SIOCRTMSG:
 	case SIOCSARP:
 #ifdef SIOCSHWTSTAMP
 	case SIOCSHWTSTAMP:
 #endif
 	case SIOCSIFBR:
-	case SIOCSIFENCAP:
-	case SIOCSIFHWBROADCAST:
 	case SIOCSIFLINK:
 	case SIOCSIFMEM:
 	case SIOCSIFPFLAGS:
