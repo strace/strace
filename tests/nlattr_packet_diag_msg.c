@@ -39,8 +39,8 @@ init_packet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_packet_diag_msg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	printf("{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", {pdiag_family=AF_PACKET"
 	       ", pdiag_type=SOCK_STREAM, pdiag_num=ETH_P_ALL"
 	       ", pdiag_ino=0, pdiag_cookie=[0, 0]}",

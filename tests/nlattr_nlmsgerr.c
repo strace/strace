@@ -36,11 +36,11 @@ init_nlmsgerr(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_nlmsgerr(const unsigned int msg_len)
 {
-	printf("{len=%u, type=NLMSG_ERROR"
-	       ", flags=NLM_F_REQUEST|NLM_F_CAPPED"
-	       ", seq=0, pid=0}, {error=-EACCES"
-	       ", msg={len=%u, type=NLMSG_NOOP"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}",
+	printf("{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
+	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_CAPPED"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {error=-EACCES"
+	       ", msg={nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}",
 	       msg_len, NLMSG_HDRLEN + 4);
 }
 

@@ -74,8 +74,8 @@ test_nlmsg_type(const int fd)
 	};
 
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=RTM_GETLINK"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=RTM_GETLINK"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
@@ -91,32 +91,32 @@ test_nlmsg_flags(const int fd)
 	nlh.nlmsg_type = RTM_GETLINK;
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=RTM_GETLINK"
-	       ", flags=NLM_F_REQUEST|NLM_F_DUMP, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=RTM_GETLINK"
+	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = RTM_DELACTION;
 	nlh.nlmsg_flags = NLM_F_ROOT;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=RTM_DELACTION"
-	       ", flags=NLM_F_ROOT, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=RTM_DELACTION"
+	       ", nlmsg_flags=NLM_F_ROOT, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = RTM_NEWLINK;
 	nlh.nlmsg_flags = NLM_F_ECHO | NLM_F_REPLACE;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=RTM_NEWLINK"
-	       ", flags=NLM_F_ECHO|NLM_F_REPLACE, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=RTM_NEWLINK"
+	       ", nlmsg_flags=NLM_F_ECHO|NLM_F_REPLACE, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = RTM_DELLINK;
 	nlh.nlmsg_flags = NLM_F_NONREC;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=RTM_DELLINK"
-	       ", flags=NLM_F_NONREC, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=RTM_DELLINK"
+	       ", nlmsg_flags=NLM_F_NONREC, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }

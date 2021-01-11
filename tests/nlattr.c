@@ -51,11 +51,11 @@ test_nlattr(const int fd)
 	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
 	memcpy(nla, "12", 2);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, \"\\x31\\x32\"}, %u"
-	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", \"\\x31\\x32\"}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, msg_len, sprintrc(rc));
 
 	/* fetch fail: short read */
@@ -63,11 +63,11 @@ test_nlattr(const int fd)
 	msg = tail_memdup(&c_msg, msg_len - 1);
 	memcpy(&msg->nlh.nlmsg_len, &msg_len, sizeof(msg_len));
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, %p}, %u"
-	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0"
+	       ", udiag_cookie=[0, 0]}, %p}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, (void *) msg + NLMSG_SPACE(sizeof(msg->udm)),
 	       msg_len, sprintrc(rc));
 
@@ -81,21 +81,23 @@ test_nlattr(const int fd)
 		.nla_type = UNIX_DIAG_NAME
 	};
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=UNIX_DIAG_NAME}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	/* print one struct nlattr with nla_len out of msg_len bounds */
 	nla->nla_len += 8;
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=UNIX_DIAG_NAME}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	/* print one struct nlattr and some data */
@@ -109,11 +111,11 @@ test_nlattr(const int fd)
 	};
 	memcpy(RTA_DATA(nla), "1234", 4);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {{nla_len=%u"
-	       ", nla_type=%#x /* UNIX_DIAG_??? */}"
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}"
 	       ", \"\\x31\\x32\\x33\\x34\"}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, UNIX_DIAG_FIRST_UNUSED,
@@ -130,12 +132,12 @@ test_nlattr(const int fd)
 	);
 	memcpy(nla + 1, "12", 2);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}, \"\\x31\\x32\"]}, %u"
-	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", [{nla_len=%u, nla_type=UNIX_DIAG_NAME}, \"\\x31\\x32\"]}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, NLA_HDRLEN, msg_len, sprintrc(rc));
 
 	/* print one struct nlattr and short read of second struct nlattr */
@@ -148,12 +150,12 @@ test_nlattr(const int fd)
 		.nla_type = UNIX_DIAG_NAME
 	);
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}, ... /* %p */]}, %u"
-	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", [{nla_len=%u, nla_type=UNIX_DIAG_NAME}, ... /* %p */]}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, NLA_HDRLEN, nla + 1, msg_len, sprintrc(rc));
 
 	/* print two struct nlattr */
@@ -170,24 +172,25 @@ test_nlattr(const int fd)
 		.nla_type = UNIX_DIAG_PEER
 	};
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, [{nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}, {nla_len=%u"
-	       ", nla_type=UNIX_DIAG_PEER}]}, %u"
-	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", [{nla_len=%u, nla_type=UNIX_DIAG_NAME}"
+	       ", {nla_len=%u, nla_type=UNIX_DIAG_PEER}]}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, nla->nla_len,
 	       msg_len, sprintrc(rc));
 
 	/* print first nlattr only when its nla_len is less than NLA_HDRLEN */
 	nla->nla_len = NLA_HDRLEN - 1;
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=UNIX_DIAG_NAME}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=UNIX_DIAG_NAME}}"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	/* unrecognized attribute data, abbreviated output */
@@ -208,8 +211,8 @@ test_nlattr(const int fd)
 	}
 
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
 	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0"
 	       ", udiag_cookie=[0, 0]}, [",
@@ -258,41 +261,42 @@ test_nla_type(const int fd)
 		.nla_type = NLA_F_NESTED | UNIX_DIAG_NAME
 	};
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=NLA_F_NESTED|UNIX_DIAG_NAME}}"
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=NLA_F_NESTED|UNIX_DIAG_NAME}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	nla->nla_type = NLA_F_NET_BYTEORDER | UNIX_DIAG_NAME;
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=NLA_F_NET_BYTEORDER|UNIX_DIAG_NAME}}"
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=NLA_F_NET_BYTEORDER|UNIX_DIAG_NAME}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	nla->nla_type = NLA_F_NESTED | NLA_F_NET_BYTEORDER | UNIX_DIAG_NAME;
 	rc = sendto(fd, msg, msg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=NLA_F_NESTED|NLA_F_NET_BYTEORDER|UNIX_DIAG_NAME}}"
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=NLA_F_NESTED|NLA_F_NET_BYTEORDER"
+	       "|UNIX_DIAG_NAME}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, msg_len, sprintrc(rc));
 
 	nla->nla_type = NLA_F_NESTED | (UNIX_DIAG_FIRST_UNUSED);
 	rc = sendto(fd, msg, msg->nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {udiag_family=AF_UNIX"
-	       ", udiag_type=SOCK_STREAM, udiag_state=TCP_FIN_WAIT1"
-	       ", udiag_ino=0, udiag_cookie=[0, 0]}, {nla_len=%u"
-	       ", nla_type=NLA_F_NESTED|%#x /* UNIX_DIAG_??? */}}"
+	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
+	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
+	       ", {nla_len=%u, nla_type=NLA_F_NESTED|%#x /* UNIX_DIAG_??? */}}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg->nlh.nlmsg_len, nla->nla_len, UNIX_DIAG_FIRST_UNUSED,
 	       msg->nlh.nlmsg_len, sprintrc(rc));

@@ -41,8 +41,8 @@ init_ndmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_ndmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETNEIGH, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {ndm_family=AF_UNIX"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETNEIGH, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {ndm_family=AF_UNIX"
 	       ", ndm_ifindex=" IFINDEX_LO_STR
 	       ", ndm_state=NUD_PERMANENT"
 	       ", ndm_flags=NTF_PROXY"

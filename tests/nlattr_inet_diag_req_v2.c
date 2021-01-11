@@ -50,8 +50,8 @@ init_inet_diag_req_v2(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_inet_diag_req_v2(const unsigned int msg_len)
 {
-	printf("{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", {sdiag_family=AF_INET, sdiag_protocol=IPPROTO_TCP"
 	       ", idiag_ext=1<<(INET_DIAG_CONG-1)"
 	       ", idiag_states=1<<TCP_CLOSE"

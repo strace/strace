@@ -37,8 +37,8 @@ init_crypto_user_alg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_crypto_user_alg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=CRYPTO_MSG_GETALG"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}"
+	printf("{nlmsg_len=%u, nlmsg_type=CRYPTO_MSG_GETALG"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", {cru_name=\"abcd\", cru_driver_name=\"efgh\""
 	       ", cru_module_name=\"ijkl\", cru_type=0"
 	       ", cru_mask=0, cru_refcnt=0, cru_flags=0}",

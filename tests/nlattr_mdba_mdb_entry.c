@@ -63,8 +63,8 @@ init_br_port_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_br_port_msg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETMDB, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {family=AF_UNIX"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETMDB, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {family=AF_UNIX"
 	       ", ifindex=" IFINDEX_LO_STR "}"
 	       ", {{nla_len=%u, nla_type=MDBA_MDB}"
 	       ", {{nla_len=%u, nla_type=MDBA_MDB_ENTRY}",

@@ -55,9 +55,10 @@ init_inet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_inet_diag_msg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=SOCK_DIAG_BY_FAMILY"
-	       ", flags=NLM_F_DUMP, seq=0, pid=0}, {idiag_family=AF_INET"
-	       ", idiag_state=TCP_LISTEN, idiag_timer=0, idiag_retrans=0"
+	printf("{nlmsg_len=%u, nlmsg_type=SOCK_DIAG_BY_FAMILY"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {idiag_family=AF_INET, idiag_state=TCP_LISTEN"
+	       ", idiag_timer=0, idiag_retrans=0"
 	       ", id={idiag_sport=htons(0), idiag_dport=htons(0)"
 	       ", idiag_src=inet_addr(\"%s\")"
 	       ", idiag_dst=inet_addr(\"%s\")"

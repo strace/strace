@@ -27,17 +27,17 @@ test_nlmsg_type(const int fd)
 
 	nlh.nlmsg_type = NFNL_SUBSYS_IPSET << 8 | IPSET_CMD_NONE;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_IPSET<<8|IPSET_CMD_NONE"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_IPSET<<8|IPSET_CMD_NONE"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 
 	nlh.nlmsg_type = NFNL_SUBSYS_IPSET << 8 | 0xff;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_IPSET<<8|0xff /* IPSET_CMD_??? */"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_IPSET<<8|0xff /* IPSET_CMD_??? */"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 }

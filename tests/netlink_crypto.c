@@ -27,8 +27,8 @@ test_nlmsg_type(const int fd)
 	};
 
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_NEWALG"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=CRYPTO_MSG_NEWALG"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
@@ -44,32 +44,32 @@ test_nlmsg_flags(const int fd)
 	nlh.nlmsg_type = CRYPTO_MSG_GETALG;
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_DUMP;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_GETALG"
-	       ", flags=NLM_F_REQUEST|NLM_F_DUMP, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=CRYPTO_MSG_GETALG"
+	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_DUMP, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = CRYPTO_MSG_NEWALG;
 	nlh.nlmsg_flags = NLM_F_ECHO | NLM_F_REPLACE;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_NEWALG"
-	       ", flags=NLM_F_ECHO|NLM_F_REPLACE, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=CRYPTO_MSG_NEWALG"
+	       ", nlmsg_flags=NLM_F_ECHO|NLM_F_REPLACE, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = CRYPTO_MSG_DELALG;
 	nlh.nlmsg_flags = NLM_F_ECHO | NLM_F_NONREC;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_DELALG"
-	       ", flags=NLM_F_ECHO|NLM_F_NONREC, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=CRYPTO_MSG_DELALG"
+	       ", nlmsg_flags=NLM_F_ECHO|NLM_F_NONREC, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = CRYPTO_MSG_UPDATEALG;
 	nlh.nlmsg_flags = NLM_F_REPLACE;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u, type=CRYPTO_MSG_UPDATEALG"
-	       ", flags=%#x /* NLM_F_??? */, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=CRYPTO_MSG_UPDATEALG"
+	       ", nlmsg_flags=%#x /* NLM_F_??? */, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, NLM_F_REPLACE,
 	       (unsigned) sizeof(nlh), sprintrc(rc));

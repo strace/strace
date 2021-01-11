@@ -36,8 +36,9 @@ init_ndtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_ndtmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETNEIGHTBL, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {ndtm_family=AF_NETLINK}",
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETNEIGHTBL"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {ndtm_family=AF_NETLINK}",
 	       msg_len);
 }
 

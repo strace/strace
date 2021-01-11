@@ -34,8 +34,8 @@ init_rtgenmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_rtgenmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETNSID, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {rtgen_family=AF_UNIX}",
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETNSID, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {rtgen_family=AF_UNIX}",
 	       msg_len);
 }
 

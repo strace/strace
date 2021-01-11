@@ -438,16 +438,18 @@ print_nlmsghdr(struct tcb *tcp,
 {
 	/* print the whole structure regardless of its nlmsg_len */
 
-	tprintf("{len=%u, type=", nlmsghdr->nlmsg_len);
+	PRINT_FIELD_U("{", *nlmsghdr, nlmsg_len);
 
+	tprints(", nlmsg_type=");
 	decode_nlmsg_type(tcp, nlmsghdr->nlmsg_type, family);
 
-	tprints(", flags=");
+	tprints(", nlmsg_flags=");
 	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,
 			   nlmsghdr->nlmsg_type, family);
 
-	tprintf(", seq=%u, pid=", nlmsghdr->nlmsg_seq);
-	printpid(tcp, nlmsghdr->nlmsg_pid, PT_TGID);
+	PRINT_FIELD_U(", ", *nlmsghdr, nlmsg_seq);
+
+	PRINT_FIELD_TGID(", ", *nlmsghdr, nlmsg_pid, tcp);
 	tprints("}");
 }
 

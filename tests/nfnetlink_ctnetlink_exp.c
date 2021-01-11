@@ -27,17 +27,18 @@ test_nlmsg_type(const int fd)
 
 	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK_EXP << 8 | IPCTNL_MSG_EXP_NEW;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_NEW"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_NEW"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 
 	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK_EXP << 8 | 0xff;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_CTNETLINK_EXP<<8|0xff /* IPCTNL_MSG_EXP_??? */"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=0}"
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_CTNETLINK_EXP<<8|0xff"
+	       " /* IPCTNL_MSG_EXP_??? */"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 }
@@ -53,28 +54,28 @@ test_nlmsg_flags(const int fd)
 	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK_EXP << 8 | IPCTNL_MSG_EXP_NEW;
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_EXCL;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_NEW"
-	       ", flags=NLM_F_REQUEST|NLM_F_EXCL, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_NEW"
+	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_EXCL, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 
 	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK_EXP << 8 | IPCTNL_MSG_EXP_GET;
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_ROOT;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_GET"
-	       ", flags=NLM_F_REQUEST|NLM_F_ROOT, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_GET"
+	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_ROOT, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 
 	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK_EXP << 8 | IPCTNL_MSG_EXP_DELETE;
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_NONREC;
 	rc = sendto(fd, &nlh, nlh.nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {len=%u"
-	       ", type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_DELETE"
-	       ", flags=NLM_F_REQUEST|NLM_F_NONREC, seq=0, pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("sendto(%d, {nlmsg_len=%u"
+	       ", nlmsg_type=NFNL_SUBSYS_CTNETLINK_EXP<<8|IPCTNL_MSG_EXP_DELETE"
+	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_NONREC, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_len, sprintrc(rc));
 }
 

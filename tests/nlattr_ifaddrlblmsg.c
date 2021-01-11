@@ -34,9 +34,9 @@ init_ifaddrlblmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_ifaddrlblmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETADDRLABEL, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {ifal_family=AF_UNIX"
-	       ", ifal_prefixlen=0, ifal_flags=0"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETADDRLABEL"
+	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {ifal_family=AF_UNIX, ifal_prefixlen=0, ifal_flags=0"
 	       ", ifal_index=" IFINDEX_LO_STR
 	       ", ifal_seq=0}",
 	       msg_len);

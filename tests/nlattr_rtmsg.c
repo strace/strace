@@ -42,8 +42,8 @@ init_rtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_rtmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETROUTE, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {rtm_family=AF_UNIX"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETROUTE, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {rtm_family=AF_UNIX"
 	       ", rtm_dst_len=0, rtm_src_len=0"
 	       ", rtm_tos=IPTOS_LOWDELAY"
 	       ", rtm_table=RT_TABLE_DEFAULT"

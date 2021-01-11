@@ -49,8 +49,8 @@ init_ifaddrmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_ifaddrmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETADDR, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {ifa_family=%s"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETADDR, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {ifa_family=%s"
 	       ", ifa_prefixlen=0"
 	       ", ifa_flags=IFA_F_SECONDARY"
 	       ", ifa_scope=RT_SCOPE_UNIVERSE"

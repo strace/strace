@@ -30,8 +30,8 @@ test_nlmsg_type(const int fd)
 
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	pidns_print_leader();
-	printf("sendto(%d, {len=%u, type=AUDIT_GET"
-	       ", flags=NLM_F_REQUEST, seq=0, pid=%d%s}"
+	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=AUDIT_GET"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=%d%s}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, nlh.nlmsg_pid, pidns_pid2str(PT_TGID),
 	       (unsigned) sizeof(nlh), sprintrc(rc));

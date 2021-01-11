@@ -46,8 +46,8 @@ init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_ifinfomsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETLINK, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {ifi_family=AF_UNIX"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETLINK, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {ifi_family=AF_UNIX"
 	       ", ifi_type=ARPHRD_LOOPBACK"
 	       ", ifi_index=" IFINDEX_LO_STR
 	       ", ifi_flags=IFF_UP, ifi_change=0}"

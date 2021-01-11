@@ -47,8 +47,8 @@ init_tcmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_tcmsg(const unsigned int msg_len)
 {
-	printf("{len=%u, type=RTM_GETQDISC, flags=NLM_F_DUMP"
-	       ", seq=0, pid=0}, {tcm_family=AF_UNIX"
+	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETQDISC, nlmsg_flags=NLM_F_DUMP"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {tcm_family=AF_UNIX"
 	       ", tcm_ifindex=" IFINDEX_LO_STR
 	       ", tcm_handle=0, tcm_parent=0, tcm_info=0}"
 	       ", {{nla_len=%u, nla_type=TCA_STATS2}",
