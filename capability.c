@@ -9,6 +9,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 /* these constants are the same as in <linux/capability.h> */
 enum {
@@ -67,11 +68,9 @@ print_cap_header(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	tprints("{version=");
-	printxval(cap_version, h->version,
-		  "_LINUX_CAPABILITY_VERSION_???");
-	tprints(", pid=");
-	printpid(tcp, h->pid, PT_TGID);
+	PRINT_FIELD_XVAL("{", *h, version, cap_version,
+			 "_LINUX_CAPABILITY_VERSION_???");
+	PRINT_FIELD_TGID(", ", *h, pid, tcp);
 	tprints("}");
 }
 
