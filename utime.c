@@ -15,6 +15,8 @@ typedef struct utimbuf utimbuf_t;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
+
 SYS_FUNC(utime)
 {
 	utimbuf_t u;
@@ -22,9 +24,9 @@ SYS_FUNC(utime)
 	printpath(tcp, tcp->u_arg[0]);
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, tcp->u_arg[1], &u)) {
-		tprintf("{actime=%lld", (long long) u.actime);
+		PRINT_FIELD_D("{", u, actime);
 		tprints_comment(sprinttime(u.actime));
-		tprintf(", modtime=%lld", (long long) u.modtime);
+		PRINT_FIELD_D(", ", u, modtime);
 		tprints_comment(sprinttime(u.modtime));
 		tprints("}");
 	}
