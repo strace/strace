@@ -598,7 +598,7 @@ AC_CHECK_MEMBERS([struct clone_args.cgroup],,, [#include <linux/sched.h>])
 
 CPPFLAGS="$saved_CPPFLAGS"
 
-AC_CHECK_MEMBERS([struct fsxattr.fsx_cowextsize]),,, [#include <linux/fs.h>])
+AC_CHECK_MEMBERS([struct fsxattr.fsx_cowextsize],,, [#include <linux/fs.h>])
 
 AC_CHECK_HEADERS([linux/btrfs.h], [
 	AC_CHECK_MEMBERS(m4_normalize([
