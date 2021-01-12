@@ -24,6 +24,7 @@
 #include "ptrace.h"
 #include "ptrace_syscall_info.h"
 #include "regs.h"
+#include "print_fields.h"
 
 #include "xlat/nt_descriptor_types.h"
 #include "xlat/ptrace_cmds.h"
@@ -132,10 +133,12 @@ SYS_FUNC(ptrace)
 				printaddr(data);
 				return RVAL_DECODED;
 			}
-			tprintf("{off=%" PRIu64 ", flags=", psi.off);
-			printflags(ptrace_peeksiginfo_flags, psi.flags,
-				   "PTRACE_PEEKSIGINFO_???");
-			tprintf(", nr=%u}", psi.nr);
+			PRINT_FIELD_U("{", psi, off);
+			PRINT_FIELD_FLAGS(", ", psi, flags,
+					  ptrace_peeksiginfo_flags,
+					  "PTRACE_PEEKSIGINFO_???");
+			PRINT_FIELD_U(", ", psi, nr);
+			tprints("}");
 			break;
 		}
 		default:
