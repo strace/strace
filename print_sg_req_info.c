@@ -21,6 +21,8 @@ typedef struct sg_req_info struct_sg_req_info;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
+
 #ifdef HAVE_SCSI_SG_H
 
 MPERS_PRINTER_DECL(int, decode_sg_req_info,
@@ -33,19 +35,14 @@ MPERS_PRINTER_DECL(int, decode_sg_req_info,
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &info)) {
-		tprintf("{req_state=%hhd"
-			", orphan=%hhd"
-			", sg_io_owned=%hhd"
-			", problem=%hhd"
-			", pack_id=%d"
-			", usr_ptr=",
-			info.req_state,
-			info.orphan,
-			info.sg_io_owned,
-			info.problem,
-			info.pack_id);
-		printaddr(ptr_to_kulong(info.usr_ptr));
-		tprintf(", duration=%u}", info.duration);
+		PRINT_FIELD_D("{", info, req_state);
+		PRINT_FIELD_D(", ", info, orphan);
+		PRINT_FIELD_D(", ", info, sg_io_owned);
+		PRINT_FIELD_D(", ", info, problem);
+		PRINT_FIELD_D(", ", info, pack_id);
+		PRINT_FIELD_PTR(", ", info, usr_ptr);
+		PRINT_FIELD_U(", ", info, duration);
+		tprints("}");
 	}
 
 	return RVAL_IOCTL_DECODED;
