@@ -17,18 +17,18 @@
 #include <sys/times.h>
 typedef struct tms tms_t;
 #include MPERS_DEFS
+#include "print_fields.h"
 
 SYS_FUNC(times)
 {
 	tms_t tbuf;
 
 	if (exiting(tcp) && !umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
-		tprintf("{tms_utime=%llu, tms_stime=%llu, ",
-			zero_extend_signed_to_ull(tbuf.tms_utime),
-			zero_extend_signed_to_ull(tbuf.tms_stime));
-		tprintf("tms_cutime=%llu, tms_cstime=%llu}",
-			zero_extend_signed_to_ull(tbuf.tms_cutime),
-			zero_extend_signed_to_ull(tbuf.tms_cstime));
+		PRINT_FIELD_U("{", tbuf, tms_utime);
+		PRINT_FIELD_U(", ", tbuf, tms_stime);
+		PRINT_FIELD_U(", ", tbuf, tms_cutime);
+		PRINT_FIELD_U(", ", tbuf, tms_cstime);
+		tprints("}");
 	}
 
 	return 0;
