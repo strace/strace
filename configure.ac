@@ -414,7 +414,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
 	linux/falloc.h
-	linux/fib_rules.h
 	linux/hiddev.h
 	linux/ip_vs.h
 	linux/ipc.h
@@ -523,12 +522,6 @@ AC_CHECK_TYPES(m4_normalize([
 
 AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/types.h>
 #include <linux/pkt_sched.h>])
-
-AC_CHECK_TYPES(m4_normalize([
-	struct fib_rule_uid_range,
-	struct fib_rule_port_range
-]),,, [#include <sys/socket.h>
-#include <linux/fib_rules.h>])
 
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS(m4_normalize([

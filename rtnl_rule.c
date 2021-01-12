@@ -14,10 +14,7 @@
 #include "print_fields.h"
 
 #include "netlink.h"
-#include <linux/rtnetlink.h>
-#ifdef HAVE_LINUX_FIB_RULES_H
-# include <linux/fib_rules.h>
-#endif
+#include "types/fib_rules.h"
 
 #include "xlat/fib_rule_actions.h"
 #include "xlat/fib_rule_flags.h"
@@ -29,9 +26,9 @@ decode_rule_addr(struct tcb *const tcp,
 		 const unsigned int len,
 		 const void *const opaque_data)
 {
-	const struct rtmsg *const rtmsg = opaque_data;
+	const struct_fib_rule_hdr *const msg = opaque_data;
 
-	decode_inet_addr(tcp, addr, len, rtmsg->rtm_family, NULL);
+	decode_inet_addr(tcp, addr, len, msg->family, NULL);
 
 	return true;
 }
@@ -42,10 +39,7 @@ decode_fib_rule_uid_range(struct tcb *const tcp,
 			  const unsigned int len,
 			  const void *const opaque_data)
 {
-	struct /* fib_rule_uid_range */ {
-		uint32_t start;
-		uint32_t end;
-	} range;
+	struct_fib_rule_uid_range range;
 
 	if (len < sizeof(range))
 		return false;
@@ -64,10 +58,7 @@ decode_rule_port_range(struct tcb *const tcp,
 		       const unsigned int len,
 		       const void *const opaque_data)
 {
-	struct /* fib_rule_port_range */ {
-		uint16_t start;
-		uint16_t end;
-	} range;
+	struct_fib_rule_port_range range;
 
 	if (len < sizeof(range))
 		return false;
@@ -105,35 +96,27 @@ static const nla_decoder_t fib_rule_hdr_nla_decoders[] = {
 
 DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 {
-	/*
-	 * struct rtmsg and struct fib_rule_hdr are essentially
-	 * the same structure, use struct rtmsg but treat it as
-	 * struct fib_rule_hdr.
-	 */
-	struct rtmsg msg = { .rtm_family = family };
-	size_t offset = sizeof(msg.rtm_family);
+	struct_fib_rule_hdr msg = { .family = family };
+	size_t offset = sizeof(msg.family);
 	bool decode_nla = false;
 
-	tprints("{family=");
-	printxval(addrfams, msg.rtm_family, "AF_???");
+	PRINT_FIELD_XVAL("{", msg, family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (char *) &msg + offset)) {
-			tprintf("dst_len=%u, src_len=%u",
-				msg.rtm_dst_len, msg.rtm_src_len);
-			tprints(", tos=");
-			printflags(ip_type_of_services, msg.rtm_tos,
-				   "IPTOS_TOS_???");
-			tprints(", table=");
-			printxval(routing_table_ids, msg.rtm_table, NULL);
-			tprints(", action=");
-			printxval(fib_rule_actions, msg.rtm_type, "FR_ACT_???");
-			tprints(", flags=");
-			printflags(fib_rule_flags, msg.rtm_flags,
-				   "FIB_RULE_???");
+			PRINT_FIELD_U("", msg, dst_len);
+			PRINT_FIELD_U(", ", msg, src_len);
+			PRINT_FIELD_FLAGS(", ", msg, tos,
+					  ip_type_of_services, "IPTOS_TOS_???");
+			PRINT_FIELD_XVAL(", ", msg, table,
+					 routing_table_ids, "RT_TABLE_???");
+			PRINT_FIELD_XVAL(", ", msg, action,
+					 fib_rule_actions, "FR_ACT_???");
+			PRINT_FIELD_FLAGS(", ", msg, flags,
+					  fib_rule_flags, "FIB_RULE_???");
 			decode_nla = true;
 		}
 	} else
