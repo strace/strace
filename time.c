@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/timex.h>
+#include "print_fields.h"
 
 #if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 static void
@@ -22,8 +23,9 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &tz))
 		return;
 
-	tprintf("{tz_minuteswest=%d, tz_dsttime=%d}",
-		tz.tz_minuteswest, tz.tz_dsttime);
+	PRINT_FIELD_D("{", tz, tz_minuteswest);
+	PRINT_FIELD_D(", ", tz, tz_dsttime);
+	tprints("}");
 }
 
 SYS_FUNC(gettimeofday)
