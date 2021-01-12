@@ -19,6 +19,7 @@
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
 #include "xlat/sigaltstack_flags.h"
 
 static void
@@ -29,11 +30,10 @@ print_stack_t(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &ss))
 		return;
 
-	tprints("{ss_sp=");
-	printaddr(ptr_to_kulong(ss.ss_sp));
-	tprints(", ss_flags=");
-	printflags(sigaltstack_flags, ss.ss_flags, "SS_???");
-	tprintf(", ss_size=%" PRI_klu "}", (kernel_ulong_t) ss.ss_size);
+	PRINT_FIELD_PTR("{", ss, ss_sp);
+	PRINT_FIELD_FLAGS(", ", ss, ss_flags, sigaltstack_flags, "SS_???");
+	PRINT_FIELD_U(", ", ss, ss_size);
+	tprints("}");
 }
 
 SYS_FUNC(sigaltstack)
