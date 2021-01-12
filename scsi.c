@@ -8,6 +8,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #ifdef HAVE_SCSI_SG_H
 # include <scsi/sg.h>
@@ -46,20 +47,14 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &id)) {
-		tprintf("{host_no=%d"
-			", channel=%d"
-			", scsi_id=%#x"
-			", lun=%d"
-			", scsi_type=%#x"
-			", h_cmd_per_lun=%hd"
-			", d_queue_depth=%hd}",
-			id.host_no,
-			id.channel,
-			id.scsi_id,
-			id.lun,
-			id.scsi_type,
-			id.h_cmd_per_lun,
-			id.d_queue_depth);
+		PRINT_FIELD_D("{", id, host_no);
+		PRINT_FIELD_D(", ", id, channel);
+		PRINT_FIELD_X(", ", id, scsi_id);
+		PRINT_FIELD_D(", ", id, lun);
+		PRINT_FIELD_X(", ", id, scsi_type);
+		PRINT_FIELD_D(", ", id, h_cmd_per_lun);
+		PRINT_FIELD_D(", ", id, d_queue_depth);
+		tprints("}");
 	}
 	return RVAL_IOCTL_DECODED;
 }
