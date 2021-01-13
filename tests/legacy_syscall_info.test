@@ -1,0 +1,47 @@
+#!/bin/sh -efu
+#
+# Check legacy code used for obtaining syscall number, arguments,
+# and return value when modern ptrace API was not available yet.
+#
+# Copyright (c) 2017-2021 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog grep
+$STRACE -d -enone / > /dev/null 2> "$LOG" ||:
+grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO works" "$LOG" > /dev/null ||
+        skip_ 'PTRACE_GET_SYSCALL_INFO does not work'
+
+run_prog ../chdir > /dev/null
+
+helper='../../disable_ptrace_get_syscall_info'
+$helper $args > /dev/null ||
+	skip_ "$helper does not work"
+
+$helper $STRACE -d -enone / > /dev/null 2> "$LOG" ||:
+grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO does not work" "$LOG" > /dev/null ||
+	fail_ "$helper does not work properly"
+
+> "$LOG" || fail_ "failed to write $LOG"
+set -- --trace=chdir -a10 $args
+$helper $STRACE -o "$LOG" "$@" > "$EXP" ||
+	dump_log_and_fail_with "$helper $STRACE $* failed with code $?"
+
+match_diff "$LOG" "$EXP"
+
+helper2='../../disable_ptrace_getregset'
+$helper2 $helper $args > /dev/null ||
+	exit 0 # the second part of the test is not applicable
+
+$helper2 $helper $STRACE -d -enone / > /dev/null 2> "$LOG" ||:
+grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO does not work" "$LOG" > /dev/null ||
+	fail_ "$helper2 $helper does not work properly"
+
+> "$LOG" || fail_ "failed to write $LOG"
+$helper2 $helper $STRACE -o "$LOG" "$@" > "$EXP" ||
+	dump_log_and_fail_with "$helper2 $helper $STRACE $* failed with code $?"
+
+match_diff "$LOG" "$EXP"

@@ -451,6 +451,7 @@ MISC_TESTS = \
 	inject-nf.test \
 	interactive_block.test \
 	kill_child.test \
+	legacy_syscall_info.test \
 	localtime.test \
 	looping_threads.test \
 	netlink_audit--pidns-translation.test \
