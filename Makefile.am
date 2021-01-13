@@ -48,6 +48,10 @@ strace_LDFLAGS =
 strace_LDADD = libstrace.a $(clock_LIBS) $(timer_LIBS)
 strace_SOURCES = strace.c
 
+noinst_PROGRAMS = disable_ptrace_get_syscall_info disable_ptrace_getregset
+disable_ptrace_get_syscall_info_LDADD = $(strace_LDADD)
+disable_ptrace_getregset_LDADD = $(strace_LDADD)
+
 noinst_LIBRARIES = libstrace.a
 libstrace_a_CPPFLAGS = $(strace_CPPFLAGS)
 libstrace_a_CFLAGS = $(strace_CFLAGS)
@@ -446,6 +450,7 @@ EXTRA_DIST =				\
 	debian/strace64.install		\
 	debian/strace64.manpages	\
 	debian/watch			\
+	disable_ptrace_request.c	\
 	file-date-gen			\
 	gen_bpf_attr_check.sh		\
 	generate_sen.sh			\

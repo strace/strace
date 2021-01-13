@@ -31,6 +31,8 @@
 /configure
 /cscope.*
 /depcomp
+/disable_ptrace_get_syscall_info
+/disable_ptrace_getregset
 /gnu
 /install-sh
 /ioctl_iocdef.[ih]
