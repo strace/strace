@@ -23,6 +23,7 @@ bpf-obj_get_info_by_fd-prog-v	-a20 -y -v -e trace=bpf
 bpf-obj_get_info_by_fd-v	-a20 -y -v -e trace=bpf
 bpf-v	-a20 -v -e trace=bpf
 btrfs	+ioctl.test
+chdir	-a10
 chmod	-a28
 chown	-a28
 chown32	-a31

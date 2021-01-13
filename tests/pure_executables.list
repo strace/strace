@@ -20,6 +20,7 @@ bpf-v
 brk
 btrfs
 caps
+chdir
 chmod
 chown
 chown32
