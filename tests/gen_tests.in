@@ -26,7 +26,7 @@ btrfs	+ioctl.test
 chmod	-a28
 chown	-a28
 chown32	-a31
-chroot	-a24
+chroot	-a13
 clock	test_trace_expr 'times|fcntl.*' -e/clock
 clock_adjtime	-a37
 clock_adjtime64	-a39
