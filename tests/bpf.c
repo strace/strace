@@ -955,7 +955,7 @@ static const struct bpf_attr_check BPF_PROG_GET_NEXT_ID_checks[] = {
 		} },
 		.size = 1,
 		.str = "start_id="
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 		       "3724541952"	/* 0xde000000 */
 #else
 		       "239"		/* 0x000000ef */

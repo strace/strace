@@ -399,7 +399,7 @@ main(void)
 				     u64_br_attrs[k].val, u64_br_attrs[k].name,
 				     u64_val, pattern,
 				     { 7, "\""
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 					"\\xde\\xad\\xc0\\xde\\xfa\\xce\\xfe"
 #else
 					"\\xed\\xfe\\xce\\xfa\\xde\\xc0\\xad"
@@ -427,7 +427,7 @@ main(void)
 				     u32_br_attrs[k].val, u32_br_attrs[k].name,
 				     u32_val, pattern,
 				     { 3, "\""
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 					"\\xba\\xdc\\x0d"
 #else
 					"\\xed\\x0d\\xdc"
@@ -448,7 +448,7 @@ main(void)
 				     u16_br_attrs[k].val, u16_br_attrs[k].name,
 				     u16_val, pattern,
 				     { 1, "\""
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 					"\\xde"
 #else
 					"\\xed"
@@ -468,7 +468,7 @@ main(void)
 				     x16_br_attrs[k].val, x16_br_attrs[k].name,
 				     u16_val, pattern,
 				     { 1, "\""
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 					"\\xde"
 #else
 					"\\xed"
@@ -560,7 +560,7 @@ main(void)
 				     u32_tun_attrs[k].name,
 				     u32_val, pattern,
 				     { 3, "\""
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 					"\\xba\\xdc\\x0d"
 #else
 					"\\xed\\x0d\\xdc"
@@ -602,7 +602,7 @@ main(void)
 				     uid_tun_attrs[k].name,
 				     u32_val, pattern,
 				     { 3, "\""
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 					"\\xba\\xdc\\x0d"
 #else
 					"\\xed\\x0d\\xdc"

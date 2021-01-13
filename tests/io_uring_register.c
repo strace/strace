@@ -35,7 +35,7 @@
 #  define BIG_ADDR_MAYBE(addr_)
 # endif
 
-# if WORDS_BIGENDIAN
+# ifdef WORDS_BIGENDIAN
 #  define BE_LE(be_, le_) be_
 # else
 #  define BE_LE(be_, le_) le_

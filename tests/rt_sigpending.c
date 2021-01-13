@@ -35,7 +35,7 @@ iterate(const char *const text, unsigned int size, void *set)
 			break;
 		}
 		if (size) {
-# if WORDS_BIGENDIAN
+# ifdef WORDS_BIGENDIAN
 			if (size < sizeof(long))
 				tprintf("rt_sigpending(%s, %u) = 0\n",
 					"[]", size);

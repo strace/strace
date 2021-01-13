@@ -429,14 +429,14 @@ main(int argc, char *argv[])
 	rc = do_clone3(arg2, sizeof(*arg2) + 8, ERR(E2BIG));
 	printf("clone3({flags=0, exit_signal=%llu, stack=NULL, stack_size=0"
 	       ", /* bytes %zu..%zu */ "
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 	       "\"\\xfa\\xce\\xfe\\xed\\xde\\xad\\xc0\\xde\""
 #else
 	       "\"\\xde\\xc0\\xad\\xde\\xed\\xfe\\xce\\xfa\""
 #endif
 #if RETVAL_INJECTED
 	       "} => {/* bytes %zu..%zu */ "
-# if WORDS_BIGENDIAN
+# ifdef WORDS_BIGENDIAN
 	       "\"\\xfa\\xce\\xfe\\xed\\xde\\xad\\xc0\\xde\""
 # else
 	       "\"\\xde\\xc0\\xad\\xde\\xed\\xfe\\xce\\xfa\""

@@ -394,7 +394,7 @@ f8ill_ptr_to_kulong(const void *const ptr)
 # define SKIP_MAIN_UNDEFINED(arg) \
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
 
-# if WORDS_BIGENDIAN
+# ifdef WORDS_BIGENDIAN
 #  define LL_PAIR(HI, LO) (HI), (LO)
 # else
 #  define LL_PAIR(HI, LO) (LO), (HI)

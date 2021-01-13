@@ -86,7 +86,7 @@ init_v4l2_format(struct v4l2_format *const f,
 			    sizeof(uint32_t)) {
 				cur_pix[i].bytesperline = 0xa983d721 | i;
 			} else {
-# if WORDS_BIGENDIAN
+# ifdef WORDS_BIGENDIAN
 				cur_pix[i].bytesperline = 0xa983;
 				cur_pix[i].reserved[0] = 0xd721 | i;
 # else
@@ -267,7 +267,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			sizeof(f->fmt.pix_mp.plane_fmt[i].bytesperline) ==
 			sizeof(uint32_t)
 			? f->fmt.pix_mp.plane_fmt[i].bytesperline :
-# if WORDS_BIGENDIAN
+# ifdef WORDS_BIGENDIAN
 			(f->fmt.pix_mp.plane_fmt[i].bytesperline << 16) |
 			f->fmt.pix_mp.plane_fmt[i].reserved[0]
 # else
