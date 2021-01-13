@@ -12,6 +12,7 @@
 
 #include "bpf_filter.h"
 #include "bpf_fprog.h"
+#include "print_fields.h"
 
 #include <linux/filter.h>
 
@@ -172,7 +173,8 @@ decode_bpf_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
 	struct bpf_fprog fprog;
 
 	if (fetch_bpf_fprog(tcp, addr, &fprog)) {
-		tprintf("{len=%hu, filter=", fprog.len);
+		PRINT_FIELD_U("{", fprog, len);
+		tprints(", filter=");
 		print_bpf_fprog(tcp, fprog.filter, fprog.len, print_k);
 		tprints("}");
 	}
