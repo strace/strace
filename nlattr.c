@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <linux/sock_diag.h>
+#include "print_fields.h"
 #include "static_assert.h"
 
 #include "xlat/netlink_sk_meminfo_indices.h"
@@ -49,7 +50,8 @@ print_nlattr(const struct nlattr *const nla,
 	static_assert(NLA_TYPE_MASK == ~(NLA_F_NESTED | NLA_F_NET_BYTEORDER),
 		      "wrong NLA_TYPE_MASK");
 
-	tprintf("{nla_len=%u, nla_type=", nla->nla_len);
+	PRINT_FIELD_U("{", *nla, nla_len);
+	tprints(", nla_type=");
 	if (nla->nla_type & NLA_F_NESTED) {
 		print_xlat(NLA_F_NESTED);
 		tprints("|");
