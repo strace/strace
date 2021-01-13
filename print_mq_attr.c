@@ -20,9 +20,10 @@ typedef struct mq_attr mq_attr_t;
 typedef struct mq_attr mq_attr_t;
 #endif
 
-#include "xlat/mq_attr_flags.h"
-
 #include MPERS_DEFS
+
+#include "print_fields.h"
+#include "xlat/mq_attr_flags.h"
 
 MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 		   const kernel_ulong_t addr, const bool decode_flags)
@@ -31,17 +32,14 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 	mq_attr_t attr;
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
-	tprints("{mq_flags=");
 	if (decode_flags)
-		printflags64(mq_attr_flags,
-			     zero_extend_signed_to_ull(attr.mq_flags),
-			     "O_???");
+		PRINT_FIELD_FLAGS("{", attr, mq_flags, mq_attr_flags, "O_???");
 	else
-		tprintf("%#llx", zero_extend_signed_to_ull(attr.mq_flags));
-	tprintf(", mq_maxmsg=%lld, mq_msgsize=%lld, mq_curmsgs=%lld}",
-		sign_extend_unsigned_to_ll(attr.mq_maxmsg),
-		sign_extend_unsigned_to_ll(attr.mq_msgsize),
-		sign_extend_unsigned_to_ll(attr.mq_curmsgs));
+		PRINT_FIELD_X("{", attr, mq_flags);
+	PRINT_FIELD_D(", ", attr, mq_maxmsg);
+	PRINT_FIELD_D(", ", attr, mq_msgsize);
+	PRINT_FIELD_D(", ", attr, mq_curmsgs);
+	tprints("}");
 #else
 	printaddr(addr);
 #endif
