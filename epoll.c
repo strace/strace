@@ -11,6 +11,7 @@
 #include "defs.h"
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include "print_fields.h"
 
 SYS_FUNC(epoll_create)
 {
@@ -35,12 +36,12 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct epoll_event *ev = elem_buf;
 
-	tprints("{");
-	printflags(epollevents, ev->events, "EPOLL???");
+	PRINT_FIELD_FLAGS("{", *ev, events, epollevents, "EPOLL???");
 	/* We cannot know what format the program uses, so print u32 and u64
 	   which will cover every value.  */
-	tprintf(", {u32=%" PRIu32 ", u64=%" PRIu64 "}}",
-		ev->data.u32, ev->data.u64);
+	PRINT_FIELD_U(", data={", ev->data, u32);
+	PRINT_FIELD_U(", ", ev->data, u64);
+	tprints("}}");
 
 	return true;
 }
