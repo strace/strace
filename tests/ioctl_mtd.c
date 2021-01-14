@@ -1,8 +1,8 @@
 /*
- * This file is part of ioctl_mtd strace test.
+ * Check decoding of MTD ioctl commands.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2018 The strace developers.
+ * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -15,163 +15,327 @@
 # include <errno.h>
 # include <inttypes.h>
 # include <stdio.h>
+# include <stdlib.h>
 # include <string.h>
 # include <sys/ioctl.h>
 # include <linux/ioctl.h>
 # include <linux/version.h>
 # include <mtd/mtd-abi.h>
 
-static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
+static const char *errstr;
 
-# define TEST_NULL_ARG(cmd) \
-	do { \
-		ioctl(-1, cmd, 0); \
-		if (_IOC_DIR(cmd) == _IOC_WRITE) \
-			printf("ioctl(-1, MIXER_WRITE(%u) or %s, NULL)" \
-			       " = -1 EBADF (%m)\n", \
-			       (unsigned int) _IOC_NR(cmd), #cmd); \
-		else if (_IOC_DIR(cmd) == _IOC_READ) \
-			printf("ioctl(-1, MIXER_READ(%u) or %s, NULL)" \
-			       " = -1 EBADF (%m)\n", \
-			       (unsigned int) _IOC_NR(cmd), #cmd); \
-		else \
-			printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n", #cmd); \
-	} while (0)
+static int
+do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
+{
+	int rc = ioctl(-1, cmd, arg);
+	errstr = sprintrc(rc);
 
-# define TEST_erase_info_user(cmd, eiu)						\
-	do {									\
-		ioctl(-1, cmd, eiu);						\
-		printf("ioctl(-1, MIXER_%s(%u) or %s, {start=%#x, length=%#x})"	\
-		       " = -1 EBADF (%m)\n",					\
-		       (_IOC_DIR(cmd) == _IOC_READ) ? "READ" : "WRITE",		\
-		       (unsigned int) _IOC_NR(cmd), #cmd,			\
-		       eiu->start, eiu->length);				\
-	} while (0)
+# ifdef INJECT_RETVAL
+	if (rc != INJECT_RETVAL)
+		error_msg_and_fail("Return value [%d] does not match"
+				   " expectations [%d]", rc, INJECT_RETVAL);
+
+	static char inj_errstr[4096];
+
+	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
+	errstr = inj_errstr;
+# endif
+
+	return rc;
+}
+
+static int
+do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
+{
+	return do_ioctl(cmd, (uintptr_t) arg);
+}
+
+# ifdef INJECT_RETVAL
+static void
+skip_ioctls(int argc, const char *argv[])
+{
+	if (argc < 2)
+		error_msg_and_fail("Usage: %s NUM_SKIP", argv[0]);
+
+	unsigned long num_skip = strtoul(argv[1], NULL, 0);
+
+	for (size_t i = 0; i < num_skip; ++i) {
+		int rc = ioctl(-1, MEMWRITE, 0);
+
+		printf("ioctl(-1, MEMWRITE, NULL) = %s%s\n", sprintrc(rc),
+		       rc == INJECT_RETVAL ? " (INJECTED)" : "");
+
+		if (rc == INJECT_RETVAL)
+			return;
+	}
+
+	error_msg_and_fail("Issued %lu ioctl syscalls but failed"
+			   " to detect an injected return code %d",
+			   num_skip, INJECT_RETVAL);
+}
+# endif /* INJECT_RETVAL */
 
 int
-main(void)
+main(int argc, const char *argv[])
 {
-	TEST_NULL_ARG(ECCGETLAYOUT);
-	TEST_NULL_ARG(ECCGETSTATS);
-	TEST_NULL_ARG(MEMERASE);
-	TEST_NULL_ARG(MEMERASE64);
-	TEST_NULL_ARG(MEMGETBADBLOCK);
-	TEST_NULL_ARG(MEMGETINFO);
-	TEST_NULL_ARG(MEMGETOOBSEL);
-	TEST_NULL_ARG(MEMGETREGIONCOUNT);
-	TEST_NULL_ARG(MEMISLOCKED);
-	TEST_NULL_ARG(MEMLOCK);
-	TEST_NULL_ARG(MEMREADOOB);
-	TEST_NULL_ARG(MEMREADOOB64);
-	TEST_NULL_ARG(MEMSETBADBLOCK);
-	TEST_NULL_ARG(MEMUNLOCK);
-	TEST_NULL_ARG(MEMWRITE);
-	TEST_NULL_ARG(MEMWRITEOOB);
-	TEST_NULL_ARG(MEMWRITEOOB64);
-	TEST_NULL_ARG(OTPGETREGIONCOUNT);
-	TEST_NULL_ARG(OTPGETREGIONINFO);
-	TEST_NULL_ARG(OTPLOCK);
-	TEST_NULL_ARG(OTPSELECT);
+# ifdef INJECT_RETVAL
+	skip_ioctls(argc, argv);
+# endif
 
-	ioctl(-1, MTDFILEMODE, MTD_FILE_MODE_NORMAL);
-	printf("ioctl(-1, MTDFILEMODE, MTD_FILE_MODE_NORMAL) = -1 EBADF (%m)\n");
+	static const struct {
+		uint32_t cmd;
+		const char *str;
+	} ptr_cmds[] = {
+		{ ARG_STR(ECCGETLAYOUT) },
+		{ ARG_STR(ECCGETSTATS) },
+		{ ARG_STR(MEMERASE) },
+		{ ARG_STR(MEMERASE64) },
+		{ ARG_STR(MEMGETBADBLOCK) },
+		{ ARG_STR(MEMGETINFO) },
+		{ ARG_STR(MEMGETOOBSEL) },
+		{ ARG_STR(MEMGETREGIONCOUNT) },
+		{ ARG_STR(MEMISLOCKED) },
+		{ ARG_STR(MEMLOCK) },
+		{ ARG_STR(MEMREADOOB) },
+		{ ARG_STR(MEMREADOOB64) },
+		{ ARG_STR(MEMSETBADBLOCK) },
+		{ ARG_STR(MEMUNLOCK) },
+		{ ARG_STR(MEMWRITE) },
+		{ ARG_STR(MEMWRITEOOB) },
+		{ ARG_STR(MEMWRITEOOB64) },
+		{ ARG_STR(OTPGETREGIONCOUNT) },
+		{ ARG_STR(OTPGETREGIONINFO) },
+		{ ARG_STR(OTPLOCK) },
+		{ ARG_STR(OTPSELECT) },
+	},
+	eiu_cmds[] = {
+		{ ARG_STR(MEMERASE) },
+		{ ARG_STR(MEMLOCK) },
+		{ ARG_STR(MEMUNLOCK) },
+		{ ARG_STR(MEMISLOCKED) },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(ptr_cmds); ++i) {
+		do_ioctl(ptr_cmds[i].cmd, 0);
+		if (_IOC_DIR(ptr_cmds[i].cmd) == _IOC_WRITE)
+			printf("ioctl(-1, MIXER_WRITE(%u) or %s, NULL) = %s\n",
+			       (unsigned int) _IOC_NR(ptr_cmds[i].cmd),
+			       ptr_cmds[i].str, errstr);
+		else if (_IOC_DIR(ptr_cmds[i].cmd) == _IOC_READ)
+			printf("ioctl(-1, MIXER_READ(%u) or %s, NULL) = %s\n",
+			       (unsigned int) _IOC_NR(ptr_cmds[i].cmd),
+			       ptr_cmds[i].str, errstr);
+		else
+			printf("ioctl(-1, %s, NULL) = %s\n",
+			       ptr_cmds[i].str, errstr);
+	}
+
+	do_ioctl(MTDFILEMODE, MTD_FILE_MODE_NORMAL);
+	printf("ioctl(-1, MTDFILEMODE, MTD_FILE_MODE_NORMAL) = %s\n", errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, opt);
 	*opt = MTD_OTP_OFF;
-	ioctl(-1, OTPSELECT, opt);
-	printf("ioctl(-1, MIXER_READ(%u) or OTPSELECT, [MTD_OTP_OFF])"
-	       " = -1 EBADF (%m)\n", (unsigned int) _IOC_NR(OTPSELECT));
+	do_ioctl_ptr(OTPSELECT, opt);
+	printf("ioctl(-1, MIXER_READ(%u) or OTPSELECT, [MTD_OTP_OFF]) = %s\n",
+	       (unsigned int) _IOC_NR(OTPSELECT), errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, v64);
 	fill_memory(v64, sizeof(*v64));
 
-	ioctl(-1, MEMGETBADBLOCK, v64);
+	do_ioctl_ptr(MEMGETBADBLOCK, v64);
 	printf("ioctl(-1, MIXER_WRITE(%u) or MEMGETBADBLOCK, [%" PRIu64 "])"
-	       " = -1 EBADF (%m)\n",
-	       (unsigned int) _IOC_NR(MEMGETBADBLOCK), *v64);
+	       " = %s\n",
+	       (unsigned int) _IOC_NR(MEMGETBADBLOCK), *v64, errstr);
 
-	ioctl(-1, MEMSETBADBLOCK, v64);
+	do_ioctl_ptr(MEMSETBADBLOCK, v64);
 	printf("ioctl(-1, MIXER_WRITE(%u) or MEMSETBADBLOCK, [%" PRIu64 "])"
-	       " = -1 EBADF (%m)\n",
-	       (unsigned int) _IOC_NR(MEMSETBADBLOCK), *v64);
+	       " = %s\n",
+	       (unsigned int) _IOC_NR(MEMSETBADBLOCK), *v64, errstr);
+
+	if (do_ioctl(MEMGETREGIONINFO, 0) < 0) {
+		printf("ioctl(-1, %s, NULL) = %s\n",
+		       "MEMGETREGIONINFO"
+# ifdef __i386__
+		       " or MTRRIOC_GET_PAGE_ENTRY"
+# endif
+		       , errstr);
+	} else {
+		printf("ioctl(-1, %s, NULL) = %s\n",
+		       "MEMGETREGIONINFO"
+# ifdef __i386__
+		       " or MTRRIOC_GET_PAGE_ENTRY"
+# endif
+		       , errstr);
+	}
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct region_info_user, riu);
 	fill_memory(riu, sizeof(*riu));
-	ioctl(-1, MEMGETREGIONINFO, riu);
-	printf("ioctl(-1, %s, {regionindex=%#x}) = -1 EBADF (%m)\n",
-	       "MEMGETREGIONINFO"
+	if (do_ioctl_ptr(MEMGETREGIONINFO, riu) < 0) {
+		printf("ioctl(-1, %s, {regionindex=%#x}) = %s\n",
+		       "MEMGETREGIONINFO"
 # ifdef __i386__
-	       " or MTRRIOC_GET_PAGE_ENTRY"
+		       " or MTRRIOC_GET_PAGE_ENTRY"
 # endif
-	       , riu->regionindex);
+		       , riu->regionindex, errstr);
+	} else {
+		printf("ioctl(-1, %s, {regionindex=%#x, offset=%#x"
+		       ", erasesize=%#x, numblocks=%#x}) = %s\n",
+		       "MEMGETREGIONINFO"
+# ifdef __i386__
+		       " or MTRRIOC_GET_PAGE_ENTRY"
+# endif
+		       , riu->regionindex, riu->offset,
+		       riu->erasesize, riu->numblocks, errstr);
+	}
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct erase_info_user, eiu);
 	fill_memory(eiu, sizeof(*eiu));
 
-	TEST_erase_info_user(MEMERASE, eiu);
-	TEST_erase_info_user(MEMLOCK, eiu);
-	TEST_erase_info_user(MEMUNLOCK, eiu);
-	TEST_erase_info_user(MEMISLOCKED, eiu);
+	for (size_t i = 0; i < ARRAY_SIZE(eiu_cmds); ++i) {
+		do_ioctl_ptr(eiu_cmds[i].cmd, eiu);
+		printf("ioctl(-1, MIXER_%s(%u) or %s"
+		       ", {start=%#x, length=%#x}) = %s\n",
+		       (_IOC_DIR(eiu_cmds[i].cmd) == _IOC_READ)
+		        ? "READ" : "WRITE",
+		       (unsigned int) _IOC_NR(eiu_cmds[i].cmd),
+		       eiu_cmds[i].str, eiu->start, eiu->length, errstr);
+	}
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct erase_info_user64, eiu64);
 	fill_memory(eiu64, sizeof(*eiu64));
-	ioctl(-1, MEMERASE64, eiu64);
+	do_ioctl_ptr(MEMERASE64, eiu64);
 	printf("ioctl(-1, MIXER_WRITE(%u) or %s, {start=%#llx, length=%#llx})"
-	       " = -1 EBADF (%m)\n",
+	       " = %s\n",
 	       (unsigned int) _IOC_NR(MEMERASE64), "MEMERASE64",
 	       (unsigned long long) eiu64->start,
-	       (unsigned long long) eiu64->length);
+	       (unsigned long long) eiu64->length, errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_oob_buf, oob);
 	fill_memory(oob, sizeof(*oob));
 
-	ioctl(-1, MEMWRITEOOB, oob);
+	do_ioctl_ptr(MEMWRITEOOB, oob);
 	printf("ioctl(-1, MEMWRITEOOB, {start=%#x, length=%#x, ptr=%p})"
-	       " = -1 EBADF (%m)\n", oob->start, oob->length, oob->ptr);
+	       " = %s\n", oob->start, oob->length, oob->ptr, errstr);
 
-	ioctl(-1, MEMREADOOB, oob);
+	do_ioctl_ptr(MEMREADOOB, oob);
 	printf("ioctl(-1, MEMREADOOB, {start=%#x, length=%#x, ptr=%p})"
-	       " = -1 EBADF (%m)\n", oob->start, oob->length, oob->ptr);
+	       " = %s\n", oob->start, oob->length, oob->ptr, errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_oob_buf64, oob64);
 	fill_memory(oob64, sizeof(*oob64));
 
-	ioctl(-1, MEMWRITEOOB64, oob64);
+	do_ioctl_ptr(MEMWRITEOOB64, oob64);
 	printf("ioctl(-1, MEMWRITEOOB64"
-	       ", {start=%#llx, length=%#x, usr_ptr=%#llx}) = -1 EBADF (%m)\n",
+	       ", {start=%#llx, length=%#x, usr_ptr=%#llx}) = %s\n",
 	       (unsigned long long) oob64->start, oob64->length,
-	       (unsigned long long) oob64->usr_ptr);
+	       (unsigned long long) oob64->usr_ptr, errstr);
 
-	ioctl(-1, MEMREADOOB64, oob64);
+	do_ioctl_ptr(MEMREADOOB64, oob64);
 	printf("ioctl(-1, MEMREADOOB64"
-	       ", {start=%#llx, length=%#x, usr_ptr=%#llx}) = -1 EBADF (%m)\n",
+	       ", {start=%#llx, length=%#x, usr_ptr=%#llx}) = %s\n",
 	       (unsigned long long) oob64->start, oob64->length,
-	       (unsigned long long) oob64->usr_ptr);
+	       (unsigned long long) oob64->usr_ptr, errstr);
 
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct otp_info, oi);
 	fill_memory(oi, sizeof(*oi));
-	ioctl(-1, OTPLOCK, oi);
+	do_ioctl_ptr(OTPLOCK, oi);
 	printf("ioctl(-1, MIXER_READ(%u) or OTPLOCK"
-	       ", {start=%#x, length=%#x, locked=%u}) = -1 EBADF (%m)\n",
-	       (unsigned int) _IOC_NR(OTPLOCK),  oi->start, oi->length, oi->locked);
+	       ", {start=%#x, length=%#x, locked=%u}) = %s\n",
+	       (unsigned int) _IOC_NR(OTPLOCK),
+	       oi->start, oi->length, oi->locked, errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_write_req, wr);
 	fill_memory(wr, sizeof(*wr));
 	wr->mode = MTD_OPS_PLACE_OOB;
-	ioctl(-1, MEMWRITE, wr);
+	do_ioctl_ptr(MEMWRITE, wr);
 	printf("ioctl(-1, MEMWRITE, {start=%#llx, len=%#llx, ooblen=%#llx"
 	       ", usr_data=%#llx, usr_oob=%#llx, mode=MTD_OPS_PLACE_OOB})"
-	       " = -1 EBADF (%m)\n",
+	       " = %s\n",
 	       (unsigned long long) wr->start,
 	       (unsigned long long) wr->len,
 	       (unsigned long long) wr->ooblen,
 	       (unsigned long long) wr->usr_data,
-	       (unsigned long long) wr->usr_oob);
+	       (unsigned long long) wr->usr_oob,
+	       errstr);
 
-	ioctl(-1, _IOC(_IOC_READ|_IOC_WRITE, 0x4d, 0xfe, 0xff), lmagic);
-	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
-	       "_IOC(_IOC_READ|_IOC_WRITE, 0x4d, 0xfe, 0xff)", lmagic);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_info_user, minfo);
+	fill_memory(minfo, sizeof(*minfo));
+	minfo->type = MTD_ABSENT;
+	minfo->flags = MTD_WRITEABLE;
+	if (do_ioctl_ptr(MEMGETINFO, minfo) <0 ) {
+		printf("ioctl(-1, MIXER_READ(%u) or MEMGETINFO, %p) = %s\n",
+		       (unsigned int) _IOC_NR(MEMGETINFO), minfo, errstr);
+	} else {
+		printf("ioctl(-1, MIXER_READ(%u) or MEMGETINFO"
+		       ", {type=MTD_ABSENT, flags=MTD_WRITEABLE, size=%#x"
+		       ", erasesize=%#x, writesize=%#x, oobsize=%#x"
+		       ", padding=%#jx}) = %s\n",
+		       (unsigned int) _IOC_NR(MEMGETINFO),
+		       minfo->size, minfo->erasesize,
+		       minfo->writesize, minfo->oobsize,
+		       (uintmax_t) minfo->padding, errstr);
+	}
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct nand_oobinfo, ninfo);
+	fill_memory(ninfo, sizeof(*ninfo));
+	ninfo->useecc = MTD_NANDECC_OFF;
+	if (do_ioctl_ptr(MEMGETOOBSEL, ninfo) < 0) {
+		printf("ioctl(-1, MIXER_READ(%u) or MEMGETOOBSEL, %p) = %s\n",
+		       (unsigned int) _IOC_NR(MEMGETOOBSEL), ninfo, errstr);
+	} else {
+		printf("ioctl(-1, MIXER_READ(%u) or MEMGETOOBSEL"
+		       ", {useecc=MTD_NANDECC_OFF, eccbytes=%#x, oobfree=[",
+		       (unsigned int) _IOC_NR(MEMGETOOBSEL), ninfo->eccbytes);
+		for (unsigned int i = 0; i < ARRAY_SIZE(ninfo->oobfree); ++i)
+			printf("%s[%#x, %#x]", i ? ", " : "",
+			       ninfo->oobfree[i][0], ninfo->oobfree[i][1]);
+		printf("], eccpos=[");
+		for (unsigned int i = 0; i < ARRAY_SIZE(ninfo->eccpos); ++i)
+			printf("%s%#x", i ? ", " : "", ninfo->eccpos[i]);
+		printf("]}) = %s\n", errstr);
+	}
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct nand_ecclayout_user, nlay);
+	fill_memory(nlay, sizeof(*nlay));
+	if (do_ioctl_ptr(ECCGETLAYOUT, nlay) < 0) {
+		printf("ioctl(-1, MIXER_READ(%u) or ECCGETLAYOUT, %p) = %s\n",
+		       (unsigned int) _IOC_NR(ECCGETLAYOUT), nlay, errstr);
+	} else {
+		printf("ioctl(-1, MIXER_READ(%u) or ECCGETLAYOUT"
+		       ", {eccbytes=%#x, eccpos=[",
+		       (unsigned int) _IOC_NR(ECCGETLAYOUT), nlay->eccbytes);
+		for (unsigned int i = 0; i < DEFAULT_STRLEN; ++i)
+			printf("%s%#x", i ? ", " : "", nlay->eccpos[i]);
+		printf(", ...], oobavail=%#x, oobfree=[", nlay->oobavail);
+		for (unsigned int i = 0; i < ARRAY_SIZE(nlay->oobfree); ++i)
+			printf("%s{offset=%#x, length=%#x}", i ? ", " : "",
+			       nlay->oobfree[i].offset,
+			       nlay->oobfree[i].length);
+		printf("]}) = %s\n", errstr);
+	}
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct mtd_ecc_stats, es);
+	fill_memory(es, sizeof(*es));
+	if (do_ioctl_ptr(ECCGETSTATS, es) <0 ) {
+		printf("ioctl(-1, MIXER_READ(%u) or ECCGETSTATS, %p) = %s\n",
+		       (unsigned int) _IOC_NR(ECCGETSTATS), es, errstr);
+	} else {
+		printf("ioctl(-1, MIXER_READ(%u) or ECCGETSTATS"
+		       ", {corrected=%#x, failed=%#x, badblocks=%#x"
+		       ", bbtblocks=%#x}) = %s\n",
+		       (unsigned int) _IOC_NR(ECCGETSTATS),
+		       es->corrected, es->failed,
+		       es->badblocks, es->bbtblocks, errstr);
+	}
+
+	static const unsigned long lmagic =
+		(unsigned long) 0xdeadbeefbadc0dedULL;
+
+	do_ioctl(_IOC(_IOC_READ|_IOC_WRITE, 0x4d, 0xfe, 0xff), lmagic);
+	printf("ioctl(-1, %s, %#lx) = %s\n",
+	       "_IOC(_IOC_READ|_IOC_WRITE, 0x4d, 0xfe, 0xff)",
+	       lmagic, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

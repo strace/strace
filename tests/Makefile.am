@@ -164,6 +164,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_hdio-success-v-Xverbose \
 	ioctl_loop-nv \
 	ioctl_loop-v \
+	ioctl_mtd-success \
 	ioctl_nsfs \
 	ioctl_perf-success \
 	ioctl_rtc-v \

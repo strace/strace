@@ -252,6 +252,7 @@ ioctl_loop	+ioctl.test
 ioctl_loop-nv	+ioctl.test -a22 -e verbose=none
 ioctl_loop-v	+ioctl.test -v
 ioctl_mtd	+ioctl.test
+ioctl_mtd-success	+ioctl-success.sh -a26
 ioctl_nbd	+ioctl.test -y
 ioctl_nsfs	+ioctl.test -esignal=none
 ioctl_perf	+ioctl.test
