@@ -167,6 +167,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_mtd-success \
 	ioctl_nsfs \
 	ioctl_perf-success \
+	ioctl_rtc-success \
 	ioctl_rtc-v \
 	ioctl_v4l2-success \
 	ioctl_v4l2-success-Xabbrev \

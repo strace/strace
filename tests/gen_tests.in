@@ -260,6 +260,7 @@ ioctl_perf-success +ioctl-success.sh -a35
 ioctl_ptp	+ioctl.test
 ioctl_random	+ioctl.test
 ioctl_rtc	+ioctl.test
+ioctl_rtc-success	+ioctl-success.sh -a22
 ioctl_rtc-v	+ioctl.test -v
 ioctl_scsi	+ioctl.test
 ioctl_sg_io_v3	+ioctl.test
