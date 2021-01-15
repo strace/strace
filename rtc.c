@@ -18,6 +18,8 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 
 #include MPERS_DEFS
 
+#include "print_fields.h"
+
 #include "xlat/rtc_vl_flags.h"
 
 #define XLAT_MACROS_ONLY
@@ -27,16 +29,27 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 static void
 print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 {
-	tprintf("{tm_sec=%d, tm_min=%d, tm_hour=%d, "
-		"tm_mday=%d, tm_mon=%d, tm_year=%d, ",
-		rt->tm_sec, rt->tm_min, rt->tm_hour,
-		rt->tm_mday, rt->tm_mon, rt->tm_year);
-	if (!abbrev(tcp))
-		tprintf("tm_wday=%d, tm_yday=%d, tm_isdst=%d}",
-			rt->tm_wday, rt->tm_yday, rt->tm_isdst);
-	else
-		tprints("...}");
+	PRINT_FIELD_D("{", *rt, tm_sec);
+	PRINT_FIELD_D(", ", *rt, tm_min);
+	PRINT_FIELD_D(", ", *rt, tm_hour);
+	PRINT_FIELD_D(", ", *rt, tm_mday);
+	PRINT_FIELD_D(", ", *rt, tm_mon);
+	PRINT_FIELD_D(", ", *rt, tm_year);
+	if (abbrev(tcp)) {
+		tprints(", ...");
+	} else {
+		PRINT_FIELD_D(", ", *rt, tm_wday);
+		PRINT_FIELD_D(", ", *rt, tm_yday);
+		PRINT_FIELD_D(", ", *rt, tm_isdst);
+	}
+	tprints("}");
 }
+
+#define PRINT_FIELD_RTC_TIME(prefix_, where_, field_, tcp_)	\
+	do {							\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		print_rtc_time((tcp_), &(where_).field_);	\
+	} while (0)
 
 static void
 decode_rtc_time(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -52,11 +65,13 @@ decode_rtc_wkalrm(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct rtc_wkalrm wk;
 
-	if (!umove_or_printaddr(tcp, addr, &wk)) {
-		tprintf("{enabled=%d, pending=%d, time=", wk.enabled, wk.pending);
-		print_rtc_time(tcp, &wk.time);
-		tprints("}");
-	}
+	if (umove_or_printaddr(tcp, addr, &wk))
+		return;
+
+	PRINT_FIELD_U("{", wk, enabled);
+	PRINT_FIELD_U(", ", wk, pending);
+	PRINT_FIELD_RTC_TIME(", ", wk, time, tcp);
+	tprints("}");
 }
 
 static void
@@ -64,11 +79,17 @@ decode_rtc_pll_info(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct_rtc_pll_info pll;
 
-	if (!umove_or_printaddr(tcp, addr, &pll))
-		tprintf("{pll_ctrl=%d, pll_value=%d, pll_max=%d, pll_min=%d"
-			", pll_posmult=%d, pll_negmult=%d, pll_clock=%ld}",
-			pll.pll_ctrl, pll.pll_value, pll.pll_max, pll.pll_min,
-			pll.pll_posmult, pll.pll_negmult, (long) pll.pll_clock);
+	if (umove_or_printaddr(tcp, addr, &pll))
+		return;
+
+	PRINT_FIELD_D("{", pll, pll_ctrl);
+	PRINT_FIELD_D(", ", pll, pll_value);
+	PRINT_FIELD_D(", ", pll, pll_max);
+	PRINT_FIELD_D(", ", pll, pll_min);
+	PRINT_FIELD_D(", ", pll, pll_posmult);
+	PRINT_FIELD_D(", ", pll, pll_negmult);
+	PRINT_FIELD_D(", ", pll, pll_clock);
+	tprints("}");
 }
 
 static void
