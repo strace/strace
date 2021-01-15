@@ -14,6 +14,15 @@
 : ${IOCTL_INJECT_START=256}
 : ${IOCTL_INJECT_RETVAL=42}
 
+"../$NAME" > /dev/null || {
+	rc=$?
+	case "$rc" in
+		1) ;; # expected
+		77) skip_ "../$NAME exited with code $rc" ;;
+		*) fail_ "../$NAME failed with code $rc" ;;
+	esac
+}
+
 run_strace -a50 "$@" -e trace=ioctl \
 	-e inject=ioctl:retval="${IOCTL_INJECT_RETVAL}":when="${IOCTL_INJECT_START}+" \
 	"../$NAME" "${IOCTL_INJECT_START}" "${IOCTL_INJECT_RETVAL}" > "$EXP"
