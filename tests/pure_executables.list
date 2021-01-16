@@ -206,6 +206,7 @@ ioctl_sg_io_v4
 ioctl_sock
 ioctl_sock_gifconf
 ioctl_tee
+ioctl_ubi
 ioctl_uffdio
 ioctl_v4l2
 ioctl_v4l2-Xabbrev

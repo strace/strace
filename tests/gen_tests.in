@@ -268,6 +268,8 @@ ioctl_sg_io_v4	+ioctl.test
 ioctl_sock	+ioctl.test -a23
 ioctl_sock_gifconf	+ioctl.test -a28 -s1
 ioctl_tee	+ioctl.test
+ioctl_ubi	+ioctl.test
+ioctl_ubi-success	+ioctl-success.sh -a24
 ioctl_uffdio	+ioctl.test
 ioctl_v4l2	+ioctl.test
 ioctl_v4l2-Xabbrev	+ioctl.test -Xabbrev
