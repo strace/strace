@@ -6,6 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     and FS_IOC32_[GS]ETFLAGS ioctl commands.
   * Implemented decoding of SIOCADDMULTI, SIOCDELMULTI, SIOCGIFENCAP,
     SIOCOUTQNSD, SIOCSIFENCAP, and SIOCSIFHWBROADCAST ioctl commands.
+  * Implemented decoding of UBI_IOCRPEB and UBI_IOCSPEB ioctl commands.
 
 * Bug fixes
   * Fixed decoding of SIOCGIFINDEX, SIOCBRADDIF, and SIOCBRDELIF ioctl commands.

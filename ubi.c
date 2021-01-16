@@ -206,6 +206,12 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case UBI_IOCEBISMAP:
 	case UBI_IOCEBUNMAP:
 	case UBI_IOCRMVOL:
+# ifdef UBI_IOCRPEB
+	case UBI_IOCRPEB:
+# endif
+# ifdef UBI_IOCSPEB
+	case UBI_IOCSPEB:
+# endif
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
