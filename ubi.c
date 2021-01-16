@@ -15,6 +15,7 @@
 # include <mtd/ubi-user.h>
 
 # include "xlat/ubi_volume_types.h"
+# include "xlat/ubi_volume_flags.h"
 # include "xlat/ubi_volume_props.h"
 # include "xlat/ubi_data_types.h"
 
@@ -33,6 +34,14 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(", ", mkvol, bytes);
 		PRINT_FIELD_XVAL(", ", mkvol, vol_type,
 				 ubi_volume_types, "UBI_???_VOLUME");
+# ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
+#  define flags padding1
+# endif
+		PRINT_FIELD_FLAGS(", ", mkvol, flags,
+				  ubi_volume_flags, "UBI_VOL_???");
+# ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
+#  undef flags
+# endif
 		PRINT_FIELD_D(", ", mkvol, name_len);
 		PRINT_FIELD_CSTRING_SZ(", ", mkvol, name,
 				       1 + CLAMP(mkvol.name_len, 0,
