@@ -353,4 +353,10 @@
 		}							\
 	} while (0)
 
+# define PRINT_FIELD_KERNEL_VERSION(prefix_, where_, field_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_kernel_version((where_).field_);			\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */

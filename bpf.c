@@ -305,8 +305,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	/* kern_version field was added in Linux commit v4.1-rc1~84^2~50.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, kern_version))
 		break;
-	tprints(", kern_version=");
-	print_kernel_version(attr.kern_version);
+	PRINT_FIELD_KERNEL_VERSION(", ", attr, kern_version);
+
 	/* prog_flags field was added in Linux commit v4.12-rc2~34^2~29^2~2.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_flags))
 		break;
