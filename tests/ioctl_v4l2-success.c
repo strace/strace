@@ -190,12 +190,12 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 			? XLAT_STR(V4L2_FIELD_ANY)
 			: XLAT_UNKNOWN(0xa, "V4L2_FIELD_???"));
 		if (f->type == V4L2_BUF_TYPE_VIDEO_OVERLAY) {
-			printf("{left=-1532647769, top=-1263159625"
-			       ", width=3301295815, height=3570783959}, "
-			       "{left=-1465275733, top=-1195787589"
-			       ", width=3368667851, height=3638155995}, "
-			       "{left=-1397903697, top=-1128415553"
-			       ", width=3436039887, height=3705528031}, "
+			printf("{c={left=-1532647769, top=-1263159625"
+			       ", width=3301295815, height=3570783959}}, "
+			       "{c={left=-1465275733, top=-1195787589"
+			       ", width=3368667851, height=3638155995}}, "
+			       "{c={left=-1397903697, top=-1128415553"
+			       ", width=3436039887, height=3705528031}}, "
 			       "... /* %p */", f->fmt.win.clips + 3);
 		}
 		printf("], clipcount=%d, bitmap=",

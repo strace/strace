@@ -223,7 +223,7 @@ static bool
 print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct_v4l2_clip *p = elem_buf;
-	tprintf(FMT_RECT, ARGS_RECT(p->c));
+	tprintf("{c=" FMT_RECT "}", ARGS_RECT(p->c));
 	return true;
 }
 
