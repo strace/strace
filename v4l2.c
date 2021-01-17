@@ -38,6 +38,7 @@
 #include DEF_MPERS_TYPE(struct_v4l2_framebuffer)
 #include DEF_MPERS_TYPE(struct_v4l2_input)
 #include DEF_MPERS_TYPE(struct_v4l2_standard)
+#include DEF_MPERS_TYPE(struct_v4l2_window)
 
 #include "kernel_v4l2_types.h"
 
