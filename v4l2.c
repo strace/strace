@@ -316,8 +316,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 
 		tprints(prefix);
 		tprints("fmt.sliced={service_set=");
-		printxval(v4l2_sliced_flags, f->fmt.sliced.service_set,
-			"V4L2_SLICED_???");
+		printflags(v4l2_sliced_flags, f->fmt.sliced.service_set,
+			   "V4L2_SLICED_???");
 		tprintf(", io_size=%u, service_lines=[",
 			f->fmt.sliced.io_size);
 		for (i = 0; i < ARRAY_SIZE(f->fmt.sliced.service_lines); i++) {
