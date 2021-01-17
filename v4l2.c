@@ -280,8 +280,8 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY: {
 		struct_v4l2_clip clip;
 		tprints(prefix);
-		tprintf("fmt.win={left=%d, top=%d, width=%u, height=%u, field=",
-			ARGS_RECT(f->fmt.win.w));
+		tprintf("fmt.win={w=" FMT_RECT, ARGS_RECT(f->fmt.win.w));
+		tprints(", field=");
 		printxval(v4l2_fields, f->fmt.win.field, "V4L2_FIELD_???");
 		tprintf(", chromakey=%#x, clips=", f->fmt.win.chromakey);
 		ret = print_array(tcp, ptr_to_kulong(f->fmt.win.clips),

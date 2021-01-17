@@ -183,8 +183,8 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 #if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 #endif
-		printf("%sfmt.win={left=-1600019805, top=-1330531661"
-		       ", width=3233923779, height=3503411923, field=%s"
+		printf("%sfmt.win={w={left=-1600019805, top=-1330531661"
+		       ", width=3233923779, height=3503411923}, field=%s"
 		       ", chromakey=0xbeefface, clips=[",
 		       pfx, f->type == V4L2_BUF_TYPE_VIDEO_OVERLAY
 			? XLAT_STR(V4L2_FIELD_ANY)
