@@ -318,8 +318,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 		tprints("fmt.sliced={service_set=");
 		printflags(v4l2_sliced_flags, f->fmt.sliced.service_set,
 			   "V4L2_SLICED_???");
-		tprintf(", io_size=%u, service_lines=[",
-			f->fmt.sliced.io_size);
+		tprints(", service_lines=[");
 		for (i = 0; i < ARRAY_SIZE(f->fmt.sliced.service_lines); i++) {
 			if (i > 0)
 				tprints(", ");
@@ -334,7 +333,7 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *prefix,
 			}
 			tprints("]");
 		}
-		tprints("]}");
+		tprintf("], io_size=%u}", f->fmt.sliced.io_size);
 		break;
 	}
 	/* since Linux v4.4-rc1~118^2~14 */
