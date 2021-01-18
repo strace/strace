@@ -173,16 +173,6 @@
 				  (print_func_));			\
 	} while (0)
 
-# define PRINT_FIELD_ARRAY_SZ(prefix_, where_, field_,			\
-			      size_, tcp_, print_func_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_local_array_ex((tcp_), (where_).field_, (size_),	\
-				     sizeof(((where_).field_)[0]),	\
-				     (print_func_),			\
-				     NULL, 0, NULL, NULL);		\
-	} while (0)
-
 # define PRINT_FIELD_ARRAY_UPTO(prefix_, where_, field_,		\
 				upto_, tcp_, print_func_)		\
 	do {								\

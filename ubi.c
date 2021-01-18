@@ -99,10 +99,8 @@ decode_UBI_IOCRNVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	PRINT_FIELD_D("{", rnvol, count);
-	PRINT_FIELD_ARRAY_SZ(", ", rnvol, ents,
-			     CLAMP(rnvol.count, 0,
-				   (int) ARRAY_SIZE(rnvol.ents)),
-			     tcp, print_ubi_rnvol_req_ent_array_member);
+	PRINT_FIELD_ARRAY_UPTO(", ", rnvol, ents, rnvol.count, tcp,
+			       print_ubi_rnvol_req_ent_array_member);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
