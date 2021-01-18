@@ -1028,6 +1028,34 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 
 #include "xlat/v4l2_framesize_types.h"
 
+static void
+print_v4l2_frmsize_discrete(const void *const arg)
+{
+	const struct_v4l2_frmsize_discrete *const p = arg;
+	PRINT_FIELD_U("{", *p, width);
+	PRINT_FIELD_U(", ", *p, height);
+	tprints("}");
+}
+
+static void
+print_v4l2_frmsize_stepwise(const void *const arg)
+{
+	const struct_v4l2_frmsize_stepwise *const p = arg;
+	PRINT_FIELD_U("{", *p, min_width);
+	PRINT_FIELD_U(", ", *p, max_width);
+	PRINT_FIELD_U(", ", *p, step_width);
+	PRINT_FIELD_U(", ", *p, min_height);
+	PRINT_FIELD_U(", ", *p, max_height);
+	PRINT_FIELD_U(", ", *p, step_height);
+	tprints("}");
+}
+
+#define PRINT_FIELD_V4L2_FRMSIZE_TYPE(prefix_, where_, field_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_v4l2_frmsize_ ## field_(&((where_).field_));	\
+	} while (0)
+
 static int
 print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -1037,26 +1065,20 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u, pixel_format=", s.index);
-		print_pixelformat(s.pixel_format, v4l2_pix_fmts);
+		PRINT_FIELD_U("{", s, index);
+		PRINT_FIELD_PIXFMT(", ", s, pixel_format, v4l2_pix_fmts);
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
-		tprints(", type=");
-		printxval(v4l2_framesize_types, s.type, "V4L2_FRMSIZE_TYPE_???");
+		PRINT_FIELD_XVAL(", ", s, type, v4l2_framesize_types,
+				 "V4L2_FRMSIZE_TYPE_???");
 		switch (s.type) {
 		case V4L2_FRMSIZE_TYPE_DISCRETE:
-			tprintf(", discrete={width=%u, height=%u}",
-				s.discrete.width, s.discrete.height);
+			PRINT_FIELD_V4L2_FRMSIZE_TYPE(", ", s, discrete);
 			break;
 		case V4L2_FRMSIZE_TYPE_STEPWISE:
-			tprintf(", stepwise={min_width=%u, max_width=%u, "
-				"step_width=%u, min_height=%u, max_height=%u, "
-				"step_height=%u}",
-				s.stepwise.min_width, s.stepwise.max_width,
-				s.stepwise.step_width, s.stepwise.min_height,
-				s.stepwise.max_height, s.stepwise.step_height);
+			PRINT_FIELD_V4L2_FRMSIZE_TYPE(", ", s, stepwise);
 			break;
 		}
 	}
