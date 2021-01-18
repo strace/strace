@@ -27,7 +27,7 @@
 # ifndef MIN
 #  define MIN(a, b)		(((a) < (b)) ? (a) : (b))
 # endif
-# define CLAMP(val, min, max)	MIN(MAX(min, val), max)
+# define CLAMP(val, min, max)	MIN(MAX(val, min), max)
 
 # ifndef ROUNDUP_DIV
 #  define ROUNDUP_DIV(val_, div_) (((val_) + (div_) - 1) / (div_))
