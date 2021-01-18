@@ -208,18 +208,18 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u, type=", f.index);
-		printxval(v4l2_buf_types, f.type, "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_U("{", f, index);
+		PRINT_FIELD_XVAL(", ", f, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-		tprints(", flags=");
-		printflags(v4l2_format_description_flags, f.flags,
-			   "V4L2_FMT_FLAG_???");
+		PRINT_FIELD_FLAGS(", ", f, flags,
+				  v4l2_format_description_flags,
+				  "V4L2_FMT_FLAG_???");
 		PRINT_FIELD_CSTRING(", ", f, description);
-		tprints(", pixelformat=");
-		print_pixelformat(f.pixelformat, v4l2_pix_fmts);
+		PRINT_FIELD_PIXFMT(", ", f, pixelformat, v4l2_pix_fmts);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
