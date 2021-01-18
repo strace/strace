@@ -61,6 +61,18 @@
 		STRACE_PRINTF("]");						\
 	} while (0)
 
+# define PRINT_FIELD_SINT_ARRAY(prefix_, where_, field_, fmt_)			\
+	do {									\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		for (size_t i_ = 0; i_ < ARRAY_SIZE((where_).field_); ++i_)	\
+			STRACE_PRINTF("%s" fmt_, (i_ ? ", " : "["),		\
+				sign_extend_unsigned_to_ll((where_).field_[i_]));\
+		STRACE_PRINTF("]");						\
+	} while (0)
+
+# define PRINT_FIELD_D_ARRAY(prefix_, where_, field_)			\
+	PRINT_FIELD_SINT_ARRAY((prefix_), (where_), field_, "%lld")
+
 # define PRINT_FIELD_U_ARRAY(prefix_, where_, field_)			\
 	PRINT_FIELD_UINT_ARRAY((prefix_), (where_), field_, "%llu")
 
