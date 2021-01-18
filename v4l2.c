@@ -901,14 +901,14 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 {
 	const struct_v4l2_ext_control *p = elem_buf;
 
-	tprints("{id=");
-	printxval(v4l2_control_ids, p->id, "V4L2_CID_???");
-	tprintf(", size=%u", p->size);
+	PRINT_FIELD_XVAL("{", *p, id, v4l2_control_ids, "V4L2_CID_???");
+	PRINT_FIELD_U(", ", *p, size);
 	if (p->size > 0) {
 		tprints(", string=");
 		printstrn(tcp, ptr_to_kulong(p->string), p->size);
 	} else {
-		tprintf(", value=%d, value64=%" PRId64, p->value, p->value64);
+		PRINT_FIELD_D(", ", *p, value);
+		PRINT_FIELD_D(", ", *p, value64);
 	}
 	tprints("}");
 
@@ -925,10 +925,9 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
-		tprints("{ctrl_class=");
-		printxval(v4l2_control_classes, c.ctrl_class,
-			  "V4L2_CTRL_CLASS_???");
-		tprintf(", count=%u", c.count);
+		PRINT_FIELD_XVAL("{", c, ctrl_class, v4l2_control_classes,
+				 "V4L2_CTRL_CLASS_???");
+		PRINT_FIELD_U(", ", c, count);
 		if (!c.count) {
 			tprints("}");
 			return RVAL_IOCTL_DECODED;
@@ -952,7 +951,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 				 print_v4l2_ext_control, 0);
 
 	if (exiting(tcp) && syserror(tcp))
-		tprintf(", error_idx=%u", c.error_idx);
+		PRINT_FIELD_U(", ", c, error_idx);
 
 	if (exiting(tcp) || fail) {
 		tprints("}");
