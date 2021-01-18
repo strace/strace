@@ -376,8 +376,8 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
-		tprints("{type=");
-		printxval(v4l2_buf_types, f.type, "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_XVAL("{", f, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
 		if (!print_v4l2_format_fmt(tcp, ", ", &f)) {
