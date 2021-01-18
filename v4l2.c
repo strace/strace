@@ -1088,6 +1088,22 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 
 #include "xlat/v4l2_frameinterval_types.h"
 
+static void
+print_v4l2_frmival_stepwise(const void *const arg)
+{
+	const struct_v4l2_frmival_stepwise *const p = arg;
+	PRINT_FIELD_FRACT("{", *p, min);
+	PRINT_FIELD_FRACT(", ", *p, max);
+	PRINT_FIELD_FRACT(", ", *p, step);
+	tprints("}");
+}
+
+#define PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(prefix_, where_, field_)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_v4l2_frmival_stepwise(&((where_).field_));	\
+	} while (0)
+
 static int
 print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -1097,26 +1113,23 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u, pixel_format=", f.index);
-		print_pixelformat(f.pixel_format, v4l2_pix_fmts);
-		tprintf(", width=%u, height=%u", f.width, f.height);
+		PRINT_FIELD_U("{", f, index);
+		PRINT_FIELD_PIXFMT(", ", f, pixel_format, v4l2_pix_fmts);
+		PRINT_FIELD_U(", ", f, width);
+		PRINT_FIELD_U(", ", f, height);
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-		tprints(", type=");
-		printxval(v4l2_frameinterval_types, f.type,
-			  "V4L2_FRMIVAL_TYPE_???");
+		PRINT_FIELD_XVAL(", ", f, type, v4l2_frameinterval_types,
+				 "V4L2_FRMIVAL_TYPE_???");
 		switch (f.type) {
 		case V4L2_FRMIVAL_TYPE_DISCRETE:
 			PRINT_FIELD_FRACT(", ", f, discrete);
 			break;
 		case V4L2_FRMIVAL_TYPE_STEPWISE:
 		case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-			PRINT_FIELD_FRACT(", stepwise={", f.stepwise, min);
-			PRINT_FIELD_FRACT(", ", f.stepwise, max);
-			PRINT_FIELD_FRACT(", ", f.stepwise, step);
-			tprints("}");
+			PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(", ", f, stepwise);
 			break;
 		}
 	}
