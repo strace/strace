@@ -775,6 +775,12 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 	print_xlat_ex(cid, tmp_str, XLAT_STYLE_DEFAULT);
 }
 
+#define PRINT_FIELD_V4L2_CID(prefix_, where_, field_, next_)	\
+	do {							\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		print_v4l2_cid((where_).field_, (next_));	\
+	} while (0)
+
 static int
 print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		   const bool is_get)
@@ -786,15 +792,17 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
-		tprints("{id=");
-		print_v4l2_cid(c.id, false);
+		PRINT_FIELD_V4L2_CID("{", c, id, false);
 		if (!is_get)
-			tprintf(", value=%d", c.value);
+			PRINT_FIELD_D(", ", c, value);
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-		tprintf("%s%d", is_get ? ", value=" : " => ", c.value);
+		if (is_get)
+			PRINT_FIELD_D(", ", c, value);
+		else
+			tprintf(" => %d", c.value);
 	}
 
 	tprints("}");
@@ -862,8 +870,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 		set_tcb_priv_ulong(tcp, c.id);
-		tprints("{id=");
-		print_v4l2_cid(c.id, true);
+		PRINT_FIELD_V4L2_CID("{", c, id, true);
 
 		return 0;
 	}
