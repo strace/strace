@@ -759,7 +759,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u", c.index);
+		PRINT_FIELD_U("{", c, index);
 		if (is_get)
 			return 0;
 		tprints(", ");
@@ -772,19 +772,17 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	PRINT_FIELD_CSTRING("", c, name);
-	tprints(", type=");
-	printxval(v4l2_tuner_types, c.type, "V4L2_TUNER_???");
-	tprints(", capability=");
-	printflags(v4l2_tuner_capabilities, c.capability,
-		  "V4L2_TUNER_CAP_???");
-	tprintf(", rangelow=%u, rangehigh=%u, rxsubchans=",
-		c.rangelow, c.rangehigh);
-	printflags(v4l2_tuner_rxsubchanses, c.rxsubchans,
-		  "V4L2_TUNER_SUB_???");
-	tprints(", audmode=");
-	printxval(v4l2_tuner_audmodes, c.audmode,
-		  "V4L2_TUNER_MODE_???");
-	tprintf(", signal=%d, afc=%d", c.signal, c.afc);
+	PRINT_FIELD_XVAL(", ", c, type, v4l2_tuner_types, "V4L2_TUNER_???");
+	PRINT_FIELD_FLAGS(", ", c, capability, v4l2_tuner_capabilities,
+			  "V4L2_TUNER_CAP_???");
+	PRINT_FIELD_U(", ", c, rangelow);
+	PRINT_FIELD_U(", ", c, rangehigh);
+	PRINT_FIELD_FLAGS(", ", c, rxsubchans, v4l2_tuner_rxsubchanses,
+			  "V4L2_TUNER_SUB_???");
+	PRINT_FIELD_XVAL(", ", c, audmode, v4l2_tuner_audmodes,
+			 "V4L2_TUNER_MODE_???");
+	PRINT_FIELD_D(", ", c, signal);
+	PRINT_FIELD_D(", ", c, afc);
 
 	if (entering(tcp)) {
 		return 0;
