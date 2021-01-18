@@ -621,7 +621,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u", s.index);
+		PRINT_FIELD_U("{", s, index);
 
 		return 0;
 	}
@@ -629,7 +629,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
 		PRINT_FIELD_CSTRING(", ", s, name);
 		PRINT_FIELD_FRACT(", ", s, frameperiod);
-		tprintf(", framelines=%u", s.framelines);
+		PRINT_FIELD_U(", ", s, framelines);
 	}
 
 	tprints("}");
