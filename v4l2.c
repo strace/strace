@@ -648,15 +648,15 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &i))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{index=%u", i.index);
+		PRINT_FIELD_U("{", i, index);
 
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &i)) {
 		PRINT_FIELD_CSTRING(", ", i, name);
-		tprints(", type=");
-		printxval(v4l2_input_types, i.type, "V4L2_INPUT_TYPE_???");
+		PRINT_FIELD_XVAL(", ", i, type, v4l2_input_types,
+				 "V4L2_INPUT_TYPE_???");
 	}
 
 	tprints("}");
