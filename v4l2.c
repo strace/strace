@@ -518,9 +518,9 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &b)) {
-		tprintf("{capability=%#x, flags=%#x, base=",
-			b.capability, b.flags);
-		printaddr(ptr_to_kulong(b.base));
+		PRINT_FIELD_X("{", b, capability);
+		PRINT_FIELD_X(", ", b, flags);
+		PRINT_FIELD_PTR(", ", b, base);
 		tprints("}");
 	}
 
