@@ -409,23 +409,17 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_IOCTL_DECODED;
 
-		tprints("{type=");
-		printxval(v4l2_buf_types, reqbufs.type, "V4L2_BUF_TYPE_???");
-		tprints(", memory=");
-		printxval(v4l2_memories, reqbufs.memory, "V4L2_MEMORY_???");
-		tprintf(", count=%u", reqbufs.count);
+		PRINT_FIELD_XVAL("{", reqbufs, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_XVAL(", ", reqbufs, memory, v4l2_memories,
+				 "V4L2_MEMORY_???");
+		PRINT_FIELD_U(", ", reqbufs, count);
 
 		return 0;
 	}
 
-	if (!syserror(tcp)) {
-		tprints(" => ");
-
-		if (!umove(tcp, arg, &reqbufs))
-			tprintf("%u", reqbufs.count);
-		else
-			tprints("???");
-	}
+	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs))
+		tprintf(" => %u", reqbufs.count);
 
 	tprints("}");
 
