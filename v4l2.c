@@ -30,6 +30,7 @@
 
 #include DEF_MPERS_TYPE(kernel_v4l2_buffer_t)
 #include DEF_MPERS_TYPE(kernel_v4l2_event_t)
+#include DEF_MPERS_TYPE(kernel_v4l2_timeval_t)
 #include DEF_MPERS_TYPE(struct_v4l2_clip)
 #include DEF_MPERS_TYPE(struct_v4l2_create_buffers)
 #include DEF_MPERS_TYPE(struct_v4l2_ext_control)
@@ -488,6 +489,34 @@ print_v4l2_buffer_flags(uint32_t val)
 		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
 }
 
+#define PRINT_FIELD_V4L2_BUFFER_FLAGS(prefix_, where_, field_)	\
+	do {							\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		print_v4l2_buffer_flags((where_).field_);	\
+	} while (0)
+
+static void
+print_v4l2_timeval(const void *const arg)
+{
+	const kernel_v4l2_timeval_t *const t = arg;
+	kernel_timeval64_t tv;
+
+	if (sizeof(tv.tv_sec) == sizeof(t->tv_sec) &&
+	    sizeof(tv.tv_usec) == sizeof(t->tv_usec)) {
+		print_timeval64_data_size(t, sizeof(*t));
+	} else {
+		tv.tv_sec = sign_extend_unsigned_to_ll(t->tv_sec);
+		tv.tv_usec = zero_extend_signed_to_ull(t->tv_usec);
+		print_timeval64_data_size(&tv, sizeof(tv));
+	}
+}
+
+#define PRINT_FIELD_V4L2_TIMEVAL(prefix_, where_, field_)	\
+	do {							\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		print_v4l2_timeval(&((where_).field_));		\
+	} while (0)
+
 static int
 print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		  const kernel_ulong_t arg)
@@ -498,42 +527,31 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
-		tprints("{type=");
-		printxval(v4l2_buf_types, b.type, "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_XVAL("{", b, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		if (code != VIDIOC_DQBUF)
-			tprintf(", index=%u", b.index);
+			PRINT_FIELD_U(", ", b, index);
 
 		return 0;
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &b)) {
 		if (code == VIDIOC_DQBUF)
-			tprintf(", index=%u", b.index);
-		tprints(", memory=");
-		printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
+			PRINT_FIELD_U(", ", b, index);
+		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+				 "V4L2_MEMORY_???");
 
 		if (b.memory == V4L2_MEMORY_MMAP) {
-			tprintf(", m.offset=%#x", b.m.offset);
+			PRINT_FIELD_X(", ", b, m.offset);
 		} else if (b.memory == V4L2_MEMORY_USERPTR) {
-			tprints(", m.userptr=");
-			printaddr(b.m.userptr);
+			PRINT_FIELD_PTR(", ", b, m.userptr);
 		}
 
-		tprintf(", length=%u, bytesused=%u, flags=",
-			b.length, b.bytesused);
-		print_v4l2_buffer_flags(b.flags);
-		if (code == VIDIOC_DQBUF) {
-			tprints(", timestamp=");
-			kernel_timeval64_t t;
-			if (sizeof(t.tv_usec) == sizeof(b.timestamp.tv_usec)) {
-				print_timeval64_data_size(&b.timestamp,
-							  sizeof(b.timestamp));
-			} else {
-				t.tv_sec = b.timestamp.tv_sec;
-				t.tv_usec = zero_extend_signed_to_ull(b.timestamp.tv_usec);
-				print_timeval64_data_size(&t, sizeof(t));
-			}
-		}
+		PRINT_FIELD_U(", ", b, length);
+		PRINT_FIELD_U(", ", b, bytesused);
+		PRINT_FIELD_V4L2_BUFFER_FLAGS(", ", b, flags);
+		if (code == VIDIOC_DQBUF)
+			PRINT_FIELD_V4L2_TIMEVAL(", ", b, timestamp);
 		tprints(", ...");
 	}
 
