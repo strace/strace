@@ -593,6 +593,38 @@ print_v4l2_buf_type(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_streaming_capabilities.h"
 #include "xlat/v4l2_capture_modes.h"
 
+static void
+print_v4l2_streamparm_capture(const struct v4l2_captureparm *const p)
+{
+	PRINT_FIELD_FLAGS("{", *p, capability, v4l2_streaming_capabilities,
+			  "V4L2_CAP_???");
+	PRINT_FIELD_FLAGS(", ", *p, capturemode, v4l2_capture_modes,
+			  "V4L2_MODE_???");
+	PRINT_FIELD_FRACT(", ", *p, timeperframe);
+	PRINT_FIELD_X(", ", *p, extendedmode);
+	PRINT_FIELD_U(", ", *p, readbuffers);
+	tprints("}");
+}
+
+static void
+print_v4l2_streamparm_output(const struct v4l2_outputparm *const p)
+{
+	PRINT_FIELD_FLAGS("{", *p, capability, v4l2_streaming_capabilities,
+			  "V4L2_CAP_???");
+	PRINT_FIELD_FLAGS(", ", *p, outputmode, v4l2_capture_modes,
+			  "V4L2_MODE_???");
+	PRINT_FIELD_FRACT(", ", *p, timeperframe);
+	PRINT_FIELD_X(", ", *p, extendedmode);
+	PRINT_FIELD_U(", ", *p, writebuffers);
+	tprints("}");
+}
+
+#define PRINT_FIELD_V4L2_STREAMPARM_PARM(prefix_, where_, parm_, field_)	\
+	do {									\
+		STRACE_PRINTF("%s%s.%s=", (prefix_), #parm_, #field_);		\
+		print_v4l2_streamparm_ ## field_(&((where_).parm_.field_));	\
+	} while (0)
+
 static int
 print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		      const bool is_get)
@@ -603,8 +635,8 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
-		tprints("{type=");
-		printxval(v4l2_buf_types, s.type, "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_XVAL("{", s, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		switch (s.type) {
 			case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 			case V4L2_BUF_TYPE_VIDEO_OUTPUT:
@@ -624,35 +656,11 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(is_get ? ", " : "} => {");
 	}
 
-	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
-		tprints("parm.capture={capability=");
-		printflags(v4l2_streaming_capabilities,
-			   s.parm.capture.capability, "V4L2_CAP_???");
+	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE)
+		PRINT_FIELD_V4L2_STREAMPARM_PARM("", s, parm, capture);
+	else
+		PRINT_FIELD_V4L2_STREAMPARM_PARM("", s, parm, output);
 
-		tprints(", capturemode=");
-		printflags(v4l2_capture_modes,
-			   s.parm.capture.capturemode, "V4L2_MODE_???");
-
-		PRINT_FIELD_FRACT(", ", s.parm.capture, timeperframe);
-
-		tprintf(", extendedmode=%#x, readbuffers=%u}",
-			s.parm.capture.extendedmode,
-			s.parm.capture.readbuffers);
-	} else {
-		tprints("parm.output={capability=");
-		printflags(v4l2_streaming_capabilities,
-			   s.parm.output.capability, "V4L2_CAP_???");
-
-		tprints(", outputmode=");
-		printflags(v4l2_capture_modes,
-			   s.parm.output.outputmode, "V4L2_MODE_???");
-
-		PRINT_FIELD_FRACT(", ", s.parm.output, timeperframe);
-
-		tprintf(", extendedmode=%#x, writebuffers=%u}",
-			s.parm.output.extendedmode,
-			s.parm.output.writebuffers);
-	}
 	if (entering(tcp)) {
 		return 0;
 	} else {
