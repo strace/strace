@@ -1052,13 +1052,13 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
-		tprintf("{count=%u, memory=", b.count);
-		printxval(v4l2_memories, b.memory, "V4L2_MEMORY_???");
-		tprints(", format={type=");
-		printxval(v4l2_buf_types, b.format.type,
-			  "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_U("{", b, count);
+		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+				 "V4L2_MEMORY_???");
+		PRINT_FIELD_XVAL(", format={", b.format, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		print_v4l2_format_fmt(tcp, ", ",
-				      (struct_v4l2_format *) &b.format);
+				      (const struct_v4l2_format *) &b.format);
 		tprints("}}");
 		return 0;
 	}
