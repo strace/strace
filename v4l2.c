@@ -881,8 +881,8 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
-		tprints("{type=");
-		printxval(v4l2_buf_types, c.type, "V4L2_BUF_TYPE_???");
+		PRINT_FIELD_XVAL("{", c, type, v4l2_buf_types,
+				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
 		PRINT_FIELD_RECT(", " , c, c);
