@@ -171,14 +171,14 @@ typedef struct {
         uint32_t size; /* Added by v2.6.32-rc1~679^2~72 */
         uint32_t reserved2[1];
         union {
-                int32_t value;
-                int64_t value64;
                 char * string;             /**< Added by v2.6.32-rc1~679^2~72 */
                 uint8_t * p_u8;            /**< Added by v3.17-rc1~112^2~343 */
                 uint16_t * p_u16;          /**< Added by v3.17-rc1~112^2~343 */
                 uint32_t * p_u32;          /**< Added by v3.17-rc1~112^2~112 */
                 struct_v4l2_area * p_area; /**< Added by v5.5-rc1~143^2^2~51 */
                 void * ptr;                /**< Added by v3.17-rc1~112^2~363 */
+                int32_t value;
+                int64_t value64;
         };
 } ATTRIBUTE_PACKED struct_v4l2_ext_control;
 
