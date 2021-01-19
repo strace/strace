@@ -12,9 +12,9 @@
 }
 
 (in_struct == 1) {
-	if (match($0, /^} struct_([a-z][a-z_0-9]*);$/, a)) {
+	if (match($0, /^}( ATTRIBUTE_[^ ]*)* struct_([a-z][a-z_0-9]*);$/, a)) {
 		in_struct = 0
-		print a[1] "." last_field
+		print a[2] "." last_field
 		next
 	}
 	if (match($0, /^[[:space:]]+[^];[:space:]:\/[][^];:[]*[[:space:]]+([^][:space:];:[]+)(\[[^];:[]*\])?;.*$/, a)) {
