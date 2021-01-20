@@ -185,7 +185,7 @@ btrfs_print_features(const struct btrfs_ioctl_feature_flags *flags)
 static void
 btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 {
-	PRINT_FIELD_FLAGS(", lim={", *lim, flags, btrfs_qgroup_limit_flags,
+	PRINT_FIELD_FLAGS("{", *lim, flags, btrfs_qgroup_limit_flags,
 			  "BTRFS_QGROUP_LIMIT_???");
 	PRINT_FIELD_U(", ", *lim, max_rfer);
 	PRINT_FIELD_U(", ", *lim, max_excl);
@@ -313,7 +313,7 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 	PRINT_FIELD_U(", ", inherit, num_ref_copies);
 	PRINT_FIELD_U(", ", inherit, num_excl_copies);
 
-	btrfs_print_qgroup_limit(&inherit.lim);
+	PRINT_FIELD_OBJ_PTR(", ", inherit, lim, btrfs_print_qgroup_limit);
 
 	if (abbrev(tcp)) {
 		tprints(", ...");
@@ -424,6 +424,65 @@ print_btrfs_timespec(const char *prefix, uint64_t sec, uint32_t nsec)
 {
 	tprintf("%s{sec=%" PRIu64 ", nsec=%u}", prefix, sec, nsec);
 	tprints_comment(sprinttime_nsec(sec, nsec));
+}
+
+static void
+print_btrfs_scrub_progress(const struct btrfs_scrub_progress *const p)
+{
+	PRINT_FIELD_U("{", *p, data_extents_scrubbed);
+	PRINT_FIELD_U(", ", *p, tree_extents_scrubbed);
+	PRINT_FIELD_U(", ", *p, data_bytes_scrubbed);
+	PRINT_FIELD_U(", ", *p, tree_bytes_scrubbed);
+	PRINT_FIELD_U(", ", *p, read_errors);
+	PRINT_FIELD_U(", ", *p, csum_errors);
+	PRINT_FIELD_U(", ", *p, verify_errors);
+	PRINT_FIELD_U(", ", *p, no_csum);
+	PRINT_FIELD_U(", ", *p, csum_discards);
+	PRINT_FIELD_U(", ", *p, super_errors);
+	PRINT_FIELD_U(", ", *p, malloc_errors);
+	PRINT_FIELD_U(", ", *p, uncorrectable_errors);
+	PRINT_FIELD_U(", ", *p, corrected_errors);
+	PRINT_FIELD_U(", ", *p, last_physical);
+	PRINT_FIELD_U(", ", *p, unverified_errors);
+	tprints("}");
+}
+
+static void
+print_btrfs_replace_start_params(const void *const arg)
+{
+	const struct btrfs_ioctl_dev_replace_start_params *const p = arg;
+	PRINT_FIELD_DEV("{", *p, srcdevid);
+	PRINT_FIELD_XVAL(", ", *p, cont_reading_from_srcdev_mode,
+			 btrfs_cont_reading_from_srcdev_mode,
+			 "BTRFS_IOCTL_DEV_REPLACE_CONT_READING"
+			 "_FROM_SRCDEV_MODE_???");
+	PRINT_FIELD_CSTRING(", ", *p, srcdev_name);
+	PRINT_FIELD_CSTRING(", ", *p, tgtdev_name);
+	tprints("}");
+}
+
+static void
+print_btrfs_replace_status_params(const void *const arg)
+{
+	const struct btrfs_ioctl_dev_replace_status_params *const p = arg;
+	PRINT_FIELD_XVAL("{", *p, replace_state, btrfs_dev_replace_state,
+			 "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
+
+	PRINT_FIELD_U(", ", *p, progress_1000);
+	if (p->progress_1000 <= 1000)
+		tprintf_comment("%u.%u%%",
+			(unsigned) p->progress_1000 / 10,
+			(unsigned) p->progress_1000 % 10);
+
+	PRINT_FIELD_U(", ", *p, time_started);
+	tprints_comment(sprinttime(p->time_started));
+
+	PRINT_FIELD_U(", ", *p, time_stopped);
+	tprints_comment(sprinttime(p->time_stopped));
+
+	PRINT_FIELD_U(", ", *p, num_write_errors);
+	PRINT_FIELD_U(", ", *p, num_uncorrectable_read_errors);
+	tprints("}");
 }
 
 MPERS_PRINTER_DECL(int, btrfs_ioctl,
@@ -585,19 +644,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_XVAL("{", args, cmd, btrfs_dev_replace_cmds,
 					 "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
-				PRINT_FIELD_DEV(", start={", args.start,
-					      srcdevid);
-				PRINT_FIELD_XVAL(", ", args.start,
-					cont_reading_from_srcdev_mode,
-					btrfs_cont_reading_from_srcdev_mode,
-					"BTRFS_IOCTL_DEV_REPLACE_CONT_READING"
-					"_FROM_SRCDEV_MODE_???");
-				PRINT_FIELD_CSTRING(", ", args.start,
-						    srcdev_name);
-				PRINT_FIELD_CSTRING(", ", args.start,
-						    tgtdev_name);
-				tprints("}");
-
+				PRINT_FIELD_OBJ_PTR(", ", args, start,
+						    print_btrfs_replace_start_params);
 			}
 			tprints("}");
 			return 0;
@@ -606,25 +654,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_XVAL("{", args, result, btrfs_dev_replace_results,
 				 "BTRFS_IOCTL_DEV_REPLACE_RESULT_???");
 		if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_STATUS) {
-			PRINT_FIELD_XVAL(", status={", args.status,
-					 replace_state, btrfs_dev_replace_state,
-					 "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
-
-			PRINT_FIELD_U(", ", args.status, progress_1000);
-			if (args.status.progress_1000 <= 1000)
-				tprintf_comment("%u.%u%%",
-					(unsigned) args.status.progress_1000 / 10,
-					(unsigned) args.status.progress_1000 % 10);
-
-			PRINT_FIELD_U(", ", args.status, time_started);
-			tprints_comment(sprinttime(args.status.time_started));
-
-			PRINT_FIELD_U(", ", args.status, time_stopped);
-			tprints_comment(sprinttime(args.status.time_stopped));
-
-			PRINT_FIELD_U(", ", args.status, num_write_errors);
-			PRINT_FIELD_U(", ", args.status,
-				      num_uncorrectable_read_errors);
+			PRINT_FIELD_OBJ_PTR(", ", args, status,
+					    print_btrfs_replace_status_params);
 		}
 		tprints("}");
 		break;
@@ -906,7 +937,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		PRINT_FIELD_U("{", args, qgroupid);
-		btrfs_print_qgroup_limit(&args.lim);
+		PRINT_FIELD_OBJ_PTR(", ", args, lim, btrfs_print_qgroup_limit);
 		tprints("}");
 		break;
 	}
@@ -1008,23 +1039,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints("}");
 			return 0;
 		}
-		PRINT_FIELD_U("{progress={", args.progress,
-			      data_extents_scrubbed);
-		PRINT_FIELD_U(", ", args.progress, tree_extents_scrubbed);
-		PRINT_FIELD_U(", ", args.progress, data_bytes_scrubbed);
-		PRINT_FIELD_U(", ", args.progress, tree_bytes_scrubbed);
-		PRINT_FIELD_U(", ", args.progress, read_errors);
-		PRINT_FIELD_U(", ", args.progress, csum_errors);
-		PRINT_FIELD_U(", ", args.progress, verify_errors);
-		PRINT_FIELD_U(", ", args.progress, no_csum);
-		PRINT_FIELD_U(", ", args.progress, csum_discards);
-		PRINT_FIELD_U(", ", args.progress, super_errors);
-		PRINT_FIELD_U(", ", args.progress, malloc_errors);
-		PRINT_FIELD_U(", ", args.progress, uncorrectable_errors);
-		PRINT_FIELD_U(", ", args.progress, corrected_errors);
-		PRINT_FIELD_U(", ", args.progress, last_physical);
-		PRINT_FIELD_U(", ", args.progress, unverified_errors);
-		tprints("}}");
+		PRINT_FIELD_OBJ_PTR("{", args, progress,
+				    print_btrfs_scrub_progress);
+		tprints("}");
 		break;
 	}
 
