@@ -388,4 +388,16 @@
 		print_kernel_version((where_).field_);			\
 	} while (0)
 
+# define PRINT_FIELD_OBJ_PTR(prefix_, where_, field_, print_func_, ...)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		(print_func_)(&((where_).field_), ##__VA_ARGS__);	\
+	} while (0)
+
+# define PRINT_FIELD_OBJ_VAL(prefix_, where_, field_, print_func_, ...)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		(print_func_)((where_).field_, ##__VA_ARGS__);		\
+	} while (0)
+
 #endif /* !STRACE_PRINT_FIELDS_H */
