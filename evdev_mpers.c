@@ -27,16 +27,88 @@ typedef struct ff_effect struct_ff_effect;
 # include "print_fields.h"
 
 static void
-decode_envelope(void *const data)
+print_ff_envelope(const void *const arg)
 {
-	const struct ff_envelope *const envelope = data;
-
-	PRINT_FIELD_U(", envelope={", *envelope, attack_length);
-	PRINT_FIELD_U(", ", *envelope, attack_level);
-	PRINT_FIELD_U(", ", *envelope, fade_length);
-	PRINT_FIELD_X(", ", *envelope, fade_level);
+	const struct ff_envelope *const p = arg;
+	PRINT_FIELD_U("{", *p, attack_length);
+	PRINT_FIELD_U(", ", *p, attack_level);
+	PRINT_FIELD_U(", ", *p, fade_length);
+	PRINT_FIELD_X(", ", *p, fade_level);
 	tprints("}");
 }
+
+#define DECL_print_ff(name_)	\
+	print_ff_ ## name_(const typeof_field(struct_ff_effect, name_) *const p)
+
+static void
+DECL_print_ff(trigger)
+{
+	PRINT_FIELD_U("{", *p, button);
+	PRINT_FIELD_U(", ", *p, interval);
+	tprints("}");
+}
+
+static void
+DECL_print_ff(replay)
+{
+	PRINT_FIELD_U("{", *p, length);
+	PRINT_FIELD_U(", ", *p, delay);
+	tprints("}");
+}
+
+# define PRINT_FIELD_FF_EFFECT(prefix_, where_, field_)		\
+	do {							\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		print_ff_ ## field_(&((where_).field_));	\
+	} while (0)
+
+#define DECL_print_ff_effect(name_)	\
+	print_ff_ ## name_ ## _effect(const typeof_field(struct_ff_effect, u.name_) *const p)
+
+static void
+DECL_print_ff_effect(constant)
+{
+	PRINT_FIELD_D("{", *p, level);
+	PRINT_FIELD_OBJ_PTR(", ", *p, envelope, print_ff_envelope);
+	tprints("}");
+}
+
+static void
+DECL_print_ff_effect(ramp)
+{
+	PRINT_FIELD_D("{", *p, start_level);
+	PRINT_FIELD_D(", ", *p, end_level);
+	PRINT_FIELD_OBJ_PTR(", ", *p, envelope, print_ff_envelope);
+	tprints("}");
+}
+
+static void
+DECL_print_ff_effect(periodic)
+{
+	PRINT_FIELD_U("{", *p, waveform);
+	PRINT_FIELD_U(", ", *p, period);
+	PRINT_FIELD_D(", ", *p, magnitude);
+	PRINT_FIELD_D(", ", *p, offset);
+	PRINT_FIELD_U(", ", *p, phase);
+	PRINT_FIELD_OBJ_PTR(", ", *p, envelope, print_ff_envelope);
+	PRINT_FIELD_U(", ", *p, custom_len);
+	PRINT_FIELD_PTR(", ", *p, custom_data);
+	tprints("}");
+}
+
+static void
+DECL_print_ff_effect(rumble)
+{
+	PRINT_FIELD_U("{", *p, strong_magnitude);
+	PRINT_FIELD_U(", ", *p, weak_magnitude);
+	tprints("}");
+}
+
+# define PRINT_FIELD_FF_TYPE_EFFECT(prefix_, where_, field_)		\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		print_ff_ ## field_ ## _effect(&((where_).field_));	\
+	} while (0)
 
 static int
 ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -48,8 +120,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &ffe))
 		return RVAL_IOCTL_DECODED;
 
-	tprints("{type=");
-	print_evdev_ff_type(ffe.type);
+	PRINT_FIELD_OBJ_VAL("{", ffe, type, print_evdev_ff_type);
 	PRINT_FIELD_D(", ", ffe, id);
 	PRINT_FIELD_U(", ", ffe, direction);
 
@@ -58,40 +129,21 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 	}
 
-	PRINT_FIELD_U(", trigger={", ffe.trigger, button);
-	PRINT_FIELD_U(", ", ffe.trigger, interval);
-	PRINT_FIELD_U("}, replay={", ffe.replay, length);
-	PRINT_FIELD_U(", ", ffe.replay, delay);
-	tprints("}");
+	PRINT_FIELD_FF_EFFECT(", ", ffe, trigger);
+	PRINT_FIELD_FF_EFFECT(", ", ffe, replay);
 
 	switch (ffe.type) {
 	case FF_CONSTANT:
-		PRINT_FIELD_D(", constant={", ffe.u.constant, level);
-		decode_envelope(&ffe.u.constant.envelope);
-		tprints("}");
+		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, constant);
 		break;
 	case FF_RAMP:
-		PRINT_FIELD_D(", ramp={", ffe.u.ramp, start_level);
-		PRINT_FIELD_D(", ", ffe.u.ramp, end_level);
-		decode_envelope(&ffe.u.ramp.envelope);
-		tprints("}");
+		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, ramp);
 		break;
 	case FF_PERIODIC:
-		PRINT_FIELD_U(", periodic={", ffe.u.periodic, waveform);
-		PRINT_FIELD_U(", ", ffe.u.periodic, period);
-		PRINT_FIELD_D(", ", ffe.u.periodic, magnitude);
-		PRINT_FIELD_D(", ", ffe.u.periodic, offset);
-		PRINT_FIELD_U(", ", ffe.u.periodic, phase);
-		decode_envelope(&ffe.u.periodic.envelope);
-		PRINT_FIELD_U(", ", ffe.u.periodic, custom_len);
-		tprints(", custom_data=");
-		printaddr(ptr_to_kulong(ffe.u.periodic.custom_data));
-		tprints("}");
+		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, periodic);
 		break;
 	case FF_RUMBLE:
-		PRINT_FIELD_U(", rumble={", ffe.u.rumble, strong_magnitude);
-		PRINT_FIELD_U(", ", ffe.u.rumble, weak_magnitude);
-		tprints("}");
+		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, rumble);
 		break;
 	default:
 		break;
