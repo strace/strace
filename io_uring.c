@@ -35,6 +35,39 @@ static_assert(0, "struct io_uring_params.resv is missing"
 # endif
 #endif /* HAVE_STRUCT_IO_URING_PARAMS */
 
+static void
+print_io_sqring_offsets(const struct_io_sqring_offsets *const p)
+{
+	PRINT_FIELD_U("{", *p, head);
+	PRINT_FIELD_U(", ", *p, tail);
+	PRINT_FIELD_U(", ", *p, ring_mask);
+	PRINT_FIELD_U(", ", *p, ring_entries);
+	PRINT_FIELD_U(", ", *p, flags);
+	PRINT_FIELD_U(", ", *p, dropped);
+	PRINT_FIELD_U(", ", *p, array);
+	if (p->resv1)
+		PRINT_FIELD_X(", ", *p, resv1);
+	if (p->resv2)
+		PRINT_FIELD_X(", ", *p, resv2);
+	tprints("}");
+}
+
+static void
+print_io_cqring_offsets(const struct_io_cqring_offsets *const p)
+{
+	PRINT_FIELD_U("{", *p, head);
+	PRINT_FIELD_U(", ", *p, tail);
+	PRINT_FIELD_U(", ", *p, ring_mask);
+	PRINT_FIELD_U(", ", *p, ring_entries);
+	PRINT_FIELD_U(", ", *p, overflow);
+	PRINT_FIELD_U(", ", *p, cqes);
+	PRINT_FIELD_FLAGS(", ", *p, flags, uring_cqring_flags, "IORING_CQ_???");
+	if (p->resv1)
+		PRINT_FIELD_X(", ", *p, resv1);
+	if (p->resv2)
+		PRINT_FIELD_X(", ", *p, resv2);
+	tprints("}");
+}
 
 SYS_FUNC(io_uring_setup)
 {
@@ -72,30 +105,10 @@ SYS_FUNC(io_uring_setup)
 		PRINT_FIELD_FLAGS(", ", params, features,
 				  uring_setup_features,
 				  "IORING_FEAT_???");
-		PRINT_FIELD_U(", sq_off={", params.sq_off, head);
-		PRINT_FIELD_U(", ", params.sq_off, tail);
-		PRINT_FIELD_U(", ", params.sq_off, ring_mask);
-		PRINT_FIELD_U(", ", params.sq_off, ring_entries);
-		PRINT_FIELD_U(", ", params.sq_off, flags);
-		PRINT_FIELD_U(", ", params.sq_off, dropped);
-		PRINT_FIELD_U(", ", params.sq_off, array);
-		if (params.sq_off.resv1)
-			PRINT_FIELD_X(", ", params.sq_off, resv1);
-		if (params.sq_off.resv2)
-			PRINT_FIELD_X(", ", params.sq_off, resv2);
-		PRINT_FIELD_U("}, cq_off={", params.cq_off, head);
-		PRINT_FIELD_U(", ", params.cq_off, tail);
-		PRINT_FIELD_U(", ", params.cq_off, ring_mask);
-		PRINT_FIELD_U(", ", params.cq_off, ring_entries);
-		PRINT_FIELD_U(", ", params.cq_off, overflow);
-		PRINT_FIELD_U(", ", params.cq_off, cqes);
-		PRINT_FIELD_FLAGS(", ", params.cq_off, flags,
-				  uring_cqring_flags, "IORING_CQ_???");
-		if (params.cq_off.resv1)
-			PRINT_FIELD_X(", ", params.cq_off, resv1);
-		if (params.cq_off.resv2)
-			PRINT_FIELD_X(", ", params.cq_off, resv2);
-		tprints("}");
+		PRINT_FIELD_OBJ_PTR(", ", params, sq_off,
+				    print_io_sqring_offsets);
+		PRINT_FIELD_OBJ_PTR(", ", params, cq_off,
+				    print_io_cqring_offsets);
 	}
 	tprints("}");
 
