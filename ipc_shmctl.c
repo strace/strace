@@ -32,6 +32,21 @@ typedef struct NAME_OF_STRUCT_SHMINFO struct_shm_ipc_info_t;
 #define key NAME_OF_STRUCT_IPC_PERM_KEY
 
 static void
+print_ipc_perm(const typeof_field(shmid_ds_t, shm_perm) *const p,
+	       const unsigned int cmd)
+{
+	PRINT_FIELD_UID("{", *p, uid);
+	PRINT_FIELD_UID(", ", *p, gid);
+	PRINT_FIELD_NUMERIC_UMODE_T(", ", *p, mode);
+	if (cmd != IPC_SET) {
+		PRINT_FIELD_U(", ", *p, key);
+		PRINT_FIELD_UID(", ", *p, cuid);
+		PRINT_FIELD_UID(", ", *p, cgid);
+	}
+	tprints("}");
+}
+
+static void
 print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	       const unsigned int cmd)
 {
@@ -40,16 +55,7 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &shmid_ds))
 		return;
 
-	PRINT_FIELD_UID("{shm_perm={", shmid_ds.shm_perm, uid);
-	PRINT_FIELD_UID(", ", shmid_ds.shm_perm, gid);
-	PRINT_FIELD_NUMERIC_UMODE_T(", ", shmid_ds.shm_perm, mode);
-
-	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", shmid_ds.shm_perm, key);
-		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cuid);
-		PRINT_FIELD_UID(", ", shmid_ds.shm_perm, cgid);
-	}
-	tprints("}");
+	PRINT_FIELD_OBJ_PTR("{", shmid_ds, shm_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
 		PRINT_FIELD_U(", ", shmid_ds, shm_segsz);
 		PRINT_FIELD_TGID(", ", shmid_ds, shm_cpid, tcp);
