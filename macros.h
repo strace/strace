@@ -39,6 +39,8 @@
 
 # define sizeof_field(type_, member_) (sizeof(((type_ *)0)->member_))
 
+# define typeof_field(type_, member_) typeof(((type_ *)0)->member_)
+
 # ifndef offsetofend
 #  define offsetofend(type_, member_)	\
 	(offsetof(type_, member_) + sizeof_field(type_, member_))
