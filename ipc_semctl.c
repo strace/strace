@@ -31,6 +31,21 @@ typedef kernel_ulong_t semun_ptr_t;
 #define key NAME_OF_STRUCT_IPC_PERM_KEY
 
 static void
+print_ipc_perm(const typeof_field(semid_ds_t, sem_perm) *const p,
+	       const unsigned int cmd)
+{
+	PRINT_FIELD_UID("{", *p, uid);
+	PRINT_FIELD_UID(", ", *p, gid);
+	PRINT_FIELD_NUMERIC_UMODE_T(", ", *p, mode);
+	if (cmd != IPC_SET) {
+		PRINT_FIELD_U(", ", *p, key);
+		PRINT_FIELD_UID(", ", *p, cuid);
+		PRINT_FIELD_UID(", ", *p, cgid);
+	}
+	tprints("}");
+}
+
+static void
 print_semid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	       const unsigned int cmd, const bool indirect_addr)
 {
@@ -45,15 +60,7 @@ print_semid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_UID("{sem_perm={", ds.sem_perm, uid);
-	PRINT_FIELD_UID(", ", ds.sem_perm, gid);
-	PRINT_FIELD_NUMERIC_UMODE_T(", ", ds.sem_perm, mode);
-	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", ds.sem_perm, key);
-		PRINT_FIELD_UID(", ", ds.sem_perm, cuid);
-		PRINT_FIELD_UID(", ", ds.sem_perm, cgid);
-	}
-	tprints("}");
+	PRINT_FIELD_OBJ_PTR("{", ds, sem_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
 		PRINT_FIELD_U(", ", ds, sem_otime);
 		PRINT_FIELD_U(", ", ds, sem_ctime);
