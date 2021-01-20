@@ -31,17 +31,26 @@ SYS_FUNC(epoll_create1)
 
 #include "xlat/epollevents.h"
 
+static void
+print_epoll_data(const epoll_data_t data)
+{
+	/*
+	 * We cannot know what format the tracee uses, so
+	 * print both u32 and u66 which will cover every value.
+	 */
+	PRINT_FIELD_U("{", data, u32);
+	PRINT_FIELD_U(", ", data, u64);
+	tprints("}");
+}
+
 static bool
 print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct epoll_event *ev = elem_buf;
 
 	PRINT_FIELD_FLAGS("{", *ev, events, epollevents, "EPOLL???");
-	/* We cannot know what format the program uses, so print u32 and u64
-	   which will cover every value.  */
-	PRINT_FIELD_U(", data={", ev->data, u32);
-	PRINT_FIELD_U(", ", ev->data, u64);
-	tprints("}}");
+	PRINT_FIELD_OBJ_VAL(", ", *ev, data, print_epoll_data);
+	tprints("}");
 
 	return true;
 }
