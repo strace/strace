@@ -105,6 +105,20 @@ decode_smc_diag_conninfo(struct tcb *const tcp,
 }
 
 static bool
+print_smc_diag_linkinfo_array_member(struct tcb *tcp, void *elem_buf,
+				     size_t elem_size, void *data)
+{
+	const struct smc_diag_linkinfo *const p = elem_buf;
+	PRINT_FIELD_U("{", *p, link_id);
+	PRINT_FIELD_CSTRING(", ", *p, ibname);
+	PRINT_FIELD_U(", ", *p, ibport);
+	PRINT_FIELD_CSTRING(", ", *p, gid);
+	PRINT_FIELD_CSTRING(", ", *p, peer_gid);
+	tprints("}");
+	return true;
+}
+
+static bool
 decode_smc_diag_lgrinfo(struct tcb *const tcp,
 			const kernel_ulong_t addr,
 			const unsigned int len,
@@ -117,13 +131,9 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &linfo))
 		return true;
 
-	tprints("{lnk[0]={");
-	PRINT_FIELD_U("", linfo.lnk[0], link_id);
-	PRINT_FIELD_CSTRING(", ", linfo.lnk[0], ibname);
-	PRINT_FIELD_U(", ", linfo.lnk[0], ibport);
-	PRINT_FIELD_CSTRING(", ", linfo.lnk[0], gid);
-	PRINT_FIELD_CSTRING(", ", linfo.lnk[0], peer_gid);
-	PRINT_FIELD_XVAL("}, ", linfo, role, smc_link_group_roles, "SMC_???");
+	PRINT_FIELD_ARRAY("{", linfo, lnk, tcp,
+			  print_smc_diag_linkinfo_array_member);
+	PRINT_FIELD_XVAL(", ", linfo, role, smc_link_group_roles, "SMC_???");
 	tprints("}");
 
 	return true;

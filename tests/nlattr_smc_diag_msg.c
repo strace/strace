@@ -194,11 +194,11 @@ int main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_smc_diag_msg, print_smc_diag_msg,
 			   SMC_DIAG_LGRINFO, pattern, linfo,
-			   PRINT_FIELD_U("{lnk[0]={", linfo.lnk[0], link_id);
+			   PRINT_FIELD_U("{lnk=[{", linfo.lnk[0], link_id);
 			   printf(", ibname=\"%s\"", linfo.lnk[0].ibname);
 			   PRINT_FIELD_U(", ", linfo.lnk[0], ibport);
 			   printf(", gid=\"%s\"", linfo.lnk[0].gid);
-			   printf(", peer_gid=\"%s\"}", linfo.lnk[0].peer_gid);
+			   printf(", peer_gid=\"%s\"}]", linfo.lnk[0].peer_gid);
 			   printf(", role=SMC_CLNT}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
