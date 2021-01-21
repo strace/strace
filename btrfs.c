@@ -328,18 +328,19 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 }
 
 static void
-btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
-			uint64_t buf_addr, uint64_t buf_size, bool print_size)
+print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
+			     const bool is_entering, const bool is_not_abbrev)
 {
-	if (entering(tcp)) {
-		btrfs_print_objectid("{key={", *key, tree_id);
+	tprints("{");
+	if (is_entering) {
+		btrfs_print_objectid("", *key, tree_id);
 
 		if (key->min_objectid != BTRFS_FIRST_FREE_OBJECTID ||
-		    !abbrev(tcp))
+		    is_not_abbrev)
 			btrfs_print_objectid(", ", *key, min_objectid);
 
 		if (key->max_objectid != BTRFS_LAST_FREE_OBJECTID ||
-		    !abbrev(tcp))
+		    is_not_abbrev)
 			btrfs_print_objectid(", ", *key, max_objectid);
 
 		PRINT_FIELD_U64(", ", *key, min_offset);
@@ -350,47 +351,55 @@ btrfs_print_tree_search(struct tcb *tcp, struct btrfs_ioctl_search_key *key,
 		btrfs_print_key_type(", ", *key, min_type);
 		btrfs_print_key_type(", ", *key, max_type);
 		PRINT_FIELD_U(", ", *key, nr_items);
-		tprints("}");
-		if (print_size)
-			tprintf(", buf_size=%" PRIu64, buf_size);
-		tprints("}");
 	} else {
-		PRINT_FIELD_U("{key={", *key, nr_items);
-		tprints("}");
-		if (print_size)
-			tprintf(", buf_size=%" PRIu64, buf_size);
-		if (abbrev(tcp)) {
-			tprints(", ...");
-		} else {
-			uint64_t i;
-			uint64_t off = 0;
-			tprints(", buf=[");
-			for (i = 0; i < key->nr_items; i++) {
-				struct btrfs_ioctl_search_header sh;
-				uint64_t addr = buf_addr + off;
-				if (i)
-					tprints(", ");
-				if (i > max_strlen) {
-					tprints("...");
-					break;
-				}
-				if (umove(tcp, addr, &sh)) {
-					tprints("...");
-					printaddr_comment(addr);
-					break;
-				}
-				PRINT_FIELD_U("{", sh, transid);
-				btrfs_print_objectid(", ", sh, objectid);
-				PRINT_FIELD_U(", ", sh, offset);
-				btrfs_print_key_type(", ", sh, type);
-				PRINT_FIELD_U(", ", sh, len);
-				tprints("}");
-				off += sizeof(sh) + sh.len;
+		PRINT_FIELD_U("", *key, nr_items);
+	}
+	tprints("}");
+}
 
+static void
+print_btrfs_ioctl_search_header(const struct btrfs_ioctl_search_header *p)
+{
+	PRINT_FIELD_U("{", *p, transid);
+	btrfs_print_objectid(", ", *p, objectid);
+	PRINT_FIELD_U(", ", *p, offset);
+	btrfs_print_key_type(", ", *p, type);
+	PRINT_FIELD_U(", ", *p, len);
+	tprints("}");
+}
+
+static void
+decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_size,
+		      unsigned int nr_items)
+{
+	if (entering(tcp))
+		return;
+	tprints(", ");
+	if (abbrev(tcp)) {
+		tprints("...");
+	} else {
+		tprints("buf=[");
+		uint64_t off = 0;
+		for (unsigned int i = 0; i < nr_items; ++i) {
+			if (i)
+				tprints(", ");
+			struct btrfs_ioctl_search_header sh;
+			uint64_t addr = buf_addr + off;
+			if (addr < buf_addr || off + sizeof(sh) > buf_size ||
+			    i > max_strlen) {
+				tprints("...");
+				break;
 			}
-			tprints("]");
+			if (!tfetch_mem(tcp, addr, sizeof(sh), &sh)) {
+				tprints("...");
+				printaddr_comment(addr);
+				break;
+			}
+			print_btrfs_ioctl_search_header(&sh);
+			off += sizeof(sh) + sh.len;
+
 		}
-		tprints("}");
+		tprints("]");
 	}
 }
 
@@ -1047,7 +1056,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_TREE_SEARCH: { /* RW */
 		struct btrfs_ioctl_search_args args;
-		uint64_t buf_offset;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -1056,12 +1064,15 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		else
 			tprints(" => ");
 
-		if (umove_or_printaddr(tcp, arg, &args))
+		if (umove_or_printaddr(tcp, arg, &args.key))
 			break;
 
-		buf_offset = offsetof(struct btrfs_ioctl_search_args, buf);
-		btrfs_print_tree_search(tcp, &args.key, arg + buf_offset,
-					sizeof(args.buf), false);
+		PRINT_FIELD_OBJ_PTR("{", args, key,
+				    print_btrfs_ioctl_search_key,
+				    entering(tcp), !abbrev(tcp));
+		decode_search_arg_buf(tcp, arg + offsetof(typeof(args), buf),
+				      sizeof(args.buf), args.key.nr_items);
+		tprints("}");
 		if (entering(tcp))
 			return 0;
 		break;
@@ -1069,7 +1080,6 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_TREE_SEARCH_V2: { /* RW */
 		struct btrfs_ioctl_search_args_v2 args;
-		uint64_t buf_offset;
 
 		if (entering(tcp))
 			tprints(", ");
@@ -1089,9 +1099,13 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		buf_offset = offsetof(struct btrfs_ioctl_search_args_v2, buf);
-		btrfs_print_tree_search(tcp, &args.key, arg + buf_offset,
-					args.buf_size, true);
+		PRINT_FIELD_OBJ_PTR("{", args, key,
+				    print_btrfs_ioctl_search_key,
+				    entering(tcp), !abbrev(tcp));
+		PRINT_FIELD_U(", ", args, buf_size);
+		decode_search_arg_buf(tcp, arg + offsetof(typeof(args), buf),
+				      args.buf_size, args.key.nr_items);
+		tprints("}");
 		if (entering(tcp))
 			return 0;
 		break;
