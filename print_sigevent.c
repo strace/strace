@@ -13,7 +13,16 @@
 #include MPERS_DEFS
 
 #include <signal.h>
+#include "print_fields.h"
 #include "xlat/sigev_value.h"
+
+static void
+print_sigev_value(const typeof_field(struct_sigevent, sigev_value) v)
+{
+	PRINT_FIELD_D("{", v, sival_int);
+	PRINT_FIELD_PTR(", ", v, sival_ptr);
+	tprints("}");
+}
 
 MPERS_PRINTER_DECL(void, print_sigevent,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
@@ -25,35 +34,35 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 
 	tprints("{");
 	if (sev.sigev_value.sival_ptr) {
-		tprintf("sigev_value={sival_int=%d, sival_ptr=",
-			sev.sigev_value.sival_int);
-		printaddr(ptr_to_kulong(sev.sigev_value.sival_ptr));
-		tprints("}, ");
+		PRINT_FIELD_OBJ_VAL("", sev, sigev_value, print_sigev_value);
+		tprints(", ");
 	}
 
-	tprints("sigev_signo=");
 	switch (sev.sigev_notify) {
 	case SIGEV_SIGNAL:
 	case SIGEV_THREAD:
 	case SIGEV_THREAD_ID:
-		printsignal(sev.sigev_signo);
+		PRINT_FIELD_OBJ_VAL("", sev, sigev_signo, printsignal);
 		break;
 	default:
-		tprintf("%u", sev.sigev_signo);
+		PRINT_FIELD_U("", sev, sigev_signo);
 	}
 
-	tprints(", sigev_notify=");
-	printxval(sigev_value, sev.sigev_notify, "SIGEV_???");
+	PRINT_FIELD_XVAL(", ", sev, sigev_notify, sigev_value, "SIGEV_???");
 
 	switch (sev.sigev_notify) {
 	case SIGEV_THREAD_ID:
-		tprintf(", sigev_notify_thread_id=%d", sev.sigev_un.tid);
+#undef sigev_notify_thread_id
+#define sigev_notify_thread_id sigev_un.tid
+		PRINT_FIELD_D(", ", sev, sigev_notify_thread_id);
 		break;
 	case SIGEV_THREAD:
-		tprints(", sigev_notify_function=");
-		printaddr(ptr_to_kulong(sev.sigev_un.sigev_thread.function));
-		tprints(", sigev_notify_attributes=");
-		printaddr(ptr_to_kulong(sev.sigev_un.sigev_thread.attribute));
+#undef sigev_notify_function
+#define sigev_notify_function sigev_un.sigev_thread.function
+		PRINT_FIELD_PTR(", ", sev, sigev_notify_function);
+#undef sigev_notify_attributes
+#define sigev_notify_attributes sigev_un.sigev_thread.attribute
+		PRINT_FIELD_PTR(", ", sev, sigev_notify_attributes);
 		break;
 	}
 	tprints("}");
