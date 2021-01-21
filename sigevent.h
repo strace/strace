@@ -11,15 +11,15 @@
 typedef struct {
 	union {
 		int sival_int;
-		unsigned long sival_ptr;
+		void *sival_ptr;
 	} sigev_value;
 	int sigev_signo;
 	int sigev_notify;
 	union {
 		int tid;
 		struct {
-			unsigned long function;
-			unsigned long attribute;
+			void *function;
+			void *attribute;
 		} sigev_thread;
 	} sigev_un;
 } struct_sigevent;

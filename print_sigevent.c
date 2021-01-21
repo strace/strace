@@ -27,7 +27,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 	if (sev.sigev_value.sival_ptr) {
 		tprintf("sigev_value={sival_int=%d, sival_ptr=",
 			sev.sigev_value.sival_int);
-		printaddr(sev.sigev_value.sival_ptr);
+		printaddr(ptr_to_kulong(sev.sigev_value.sival_ptr));
 		tprints("}, ");
 	}
 
@@ -51,9 +51,9 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 		break;
 	case SIGEV_THREAD:
 		tprints(", sigev_notify_function=");
-		printaddr(sev.sigev_un.sigev_thread.function);
+		printaddr(ptr_to_kulong(sev.sigev_un.sigev_thread.function));
 		tprints(", sigev_notify_attributes=");
-		printaddr(sev.sigev_un.sigev_thread.attribute);
+		printaddr(ptr_to_kulong(sev.sigev_un.sigev_thread.attribute));
 		break;
 	}
 	tprints("}");

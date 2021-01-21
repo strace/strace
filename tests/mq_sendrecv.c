@@ -211,7 +211,8 @@ main(void)
 	struct_sigevent bogus_sev_data = {
 		.sigev_notify = 0xdefaced,
 		.sigev_signo = 0xfacefeed,
-		.sigev_value.sival_ptr = (unsigned long) 0xdeadbeefbadc0dedULL
+		.sigev_value.sival_ptr =
+			(void *) (unsigned long) 0xdeadbeefbadc0dedULL
 	};
 
 	const char *errstr;
@@ -348,7 +349,7 @@ main(void)
 
 	/* Invalid SIGEV_* */
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%p}"
 	       ", sigev_signo=%u, sigev_notify=%#x /* SIGEV_??? */}) = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr,
@@ -358,7 +359,7 @@ main(void)
 	/* SIGEV_NONE */
 	bogus_sev->sigev_notify = SIGEV_NONE;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%p}"
 	       ", sigev_signo=%u, sigev_notify=SIGEV_NONE}) = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr,
@@ -368,7 +369,7 @@ main(void)
 	bogus_sev->sigev_notify = SIGEV_SIGNAL;
 	bogus_sev->sigev_signo = SIGALRM;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%p}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_SIGNAL}) = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr, sprintrc(rc));
@@ -376,13 +377,13 @@ main(void)
 	/* SIGEV_THREAD */
 	bogus_sev->sigev_notify = SIGEV_THREAD;
 	bogus_sev->sigev_un.sigev_thread.function =
-		(unsigned long) 0xdeadbeefbadc0dedULL;
+		(void *) (unsigned long) 0xdeadbeefbadc0dedULL;
 	bogus_sev->sigev_un.sigev_thread.attribute =
-		(unsigned long) 0xcafef00dfacefeedULL;
+		(void *) (unsigned long) 0xcafef00dfacefeedULL;
 	rc = syscall(__NR_mq_notify, bogus_fd, bogus_sev);
-	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%#lx}"
+	printf("mq_notify(%d, {sigev_value={sival_int=%d, sival_ptr=%p}"
 	       ", sigev_signo=SIGALRM, sigev_notify=SIGEV_THREAD"
-	       ", sigev_notify_function=%#lx, sigev_notify_attributes=%#lx})"
+	       ", sigev_notify_function=%p, sigev_notify_attributes=%p})"
 	       " = %s\n",
 	       (int) bogus_fd, bogus_sev->sigev_value.sival_int,
 	       bogus_sev->sigev_value.sival_ptr,
