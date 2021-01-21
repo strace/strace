@@ -65,13 +65,12 @@ printsigsource(struct tcb *tcp, const siginfo_t *sip)
 static void
 printsigval(const siginfo_t *sip)
 {
-	tprintf(", si_value={int=%d, ptr=", sip->si_int);
-	printaddr(ptr_to_kulong(sip->si_ptr));
-	tprints("}");
+	PRINT_FIELD_D(", ", *sip, si_int);
+	PRINT_FIELD_PTR(", ", *sip, si_ptr);
 }
 
 static void
-print_si_code(int si_signo, unsigned int si_code)
+print_si_code(const unsigned int si_code, const int si_signo)
 {
 	const char *code = xlookup(siginfo_codes, si_code);
 
@@ -116,6 +115,32 @@ print_si_code(int si_signo, unsigned int si_code)
 }
 
 static void
+print_si_syscall(const unsigned int scno)
+{
+	/*
+	 * Note that we can safely use the personality set in
+	 * current_personality  here (and don't have to guess it
+	 * based on X32_SYSCALL_BIT and si_arch, for example):
+	 *  - The signal is delivered as a result of seccomp
+	 *    filtering to the process executing forbidden
+	 *    syscall.
+	 *  - We have set the personality for the tracee during
+	 *    the syscall entering.
+	 *  - The current_personality is reliably switched in
+	 *    the next_event routine, it is set to the
+	 *    personality of the last call made (the one that
+	 *    triggered the signal delivery).
+	 *  - Looks like there are no other cases where SIGSYS
+	 *    is delivered from the kernel so far.
+	 */
+	const char *scname = syscall_name(shuffle_scno(scno));
+	if (scname)
+		tprintf("%s%s", nr_prefix(scno), scname);
+	else
+		tprintf("%u", scno);
+}
+
+static void
 print_si_info(struct tcb *tcp, const siginfo_t *sip)
 {
 	if (sip->si_errno)
@@ -131,8 +156,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			break;
 #if defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
 		case SI_TIMER:
-			tprintf(", si_timerid=%#x, si_overrun=%d",
-				sip->si_timerid, sip->si_overrun);
+			PRINT_FIELD_X(", ", *sip, si_timerid);
+			PRINT_FIELD_D(", ", *sip, si_overrun);
 			printsigval(sip);
 			break;
 #endif
@@ -146,61 +171,32 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		switch (sip->si_signo) {
 		case SIGCHLD:
 			printsigsource(tcp, sip);
-			tprints(", si_status=");
 			if (sip->si_code == CLD_EXITED)
-				tprintf("%d", sip->si_status);
+				PRINT_FIELD_D(", ", *sip, si_status);
 			else
-				printsignal(sip->si_status);
-			tprintf(", si_utime=%llu, si_stime=%llu",
-				zero_extend_signed_to_ull(sip->si_utime),
-				zero_extend_signed_to_ull(sip->si_stime));
+				PRINT_FIELD_OBJ_VAL(", ", *sip, si_status, printsignal);
+			PRINT_FIELD_U(", ", *sip, si_utime);
+			PRINT_FIELD_U(", ", *sip, si_stime);
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
-			tprints(", si_addr=");
-			printaddr(ptr_to_kulong(sip->si_addr));
+			PRINT_FIELD_PTR(", ", *sip, si_addr);
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
 			case POLL_IN: case POLL_OUT: case POLL_MSG:
-				tprintf(", si_band=%ld",
-					(long) sip->si_band);
+				PRINT_FIELD_D(", ", *sip, si_band);
 				break;
 			}
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
-		case SIGSYS: {
-			/*
-			 * Note that we can safely use the personality set in
-			 * current_personality  here (and don't have to guess it
-			 * based on X32_SYSCALL_BIT and si_arch, for example):
-			 *  - The signal is delivered as a result of seccomp
-			 *    filtering to the process executing forbidden
-			 *    syscall.
-			 *  - We have set the personality for the tracee during
-			 *    the syscall entering.
-			 *  - The current_personality is reliably switched in
-			 *    the next_event routine, it is set to the
-			 *    personality of the last call made (the one that
-			 *    triggered the signal delivery).
-			 *  - Looks like there are no other cases where SIGSYS
-			 *    is delivered from the kernel so far.
-			 */
-			const char *scname = syscall_name(shuffle_scno(
-				(unsigned) sip->si_syscall));
-
-			tprints(", si_call_addr=");
-			printaddr(ptr_to_kulong(sip->si_call_addr));
-			tprints(", si_syscall=");
-			if (scname)
-				tprintf("%s%s",
-					nr_prefix(sip->si_syscall), scname);
-			else
-				tprintf("%u", (unsigned) sip->si_syscall);
-			tprints(", si_arch=");
-			printxval(audit_arch, sip->si_arch, "AUDIT_ARCH_???");
+		case SIGSYS:
+			PRINT_FIELD_PTR(", ", *sip, si_call_addr);
+			PRINT_FIELD_OBJ_VAL(", ", *sip, si_syscall,
+					    print_si_syscall);
+			PRINT_FIELD_XVAL(", ", *sip, si_arch, audit_arch,
+					 "AUDIT_ARCH_???");
 			break;
-		}
 #endif
 		default:
 			if (sip->si_pid || sip->si_uid)
@@ -217,20 +213,18 @@ static
 void
 printsiginfo(struct tcb *tcp, const siginfo_t *sip)
 {
-	if (sip->si_signo == 0) {
-		tprints("{}");
-		return;
-	}
-	tprints("{si_signo=");
-	printsignal(sip->si_signo);
+	tprints("{");
 
-	tprints(", si_code=");
-	print_si_code(sip->si_signo, sip->si_code);
+	if (sip->si_signo) {
+		PRINT_FIELD_OBJ_VAL("", *sip, si_signo, printsignal);
+		PRINT_FIELD_OBJ_VAL(", ", *sip, si_code, print_si_code,
+				    sip->si_signo);
 
 #ifdef SI_NOINFO
-	if (sip->si_code != SI_NOINFO)
+		if (sip->si_code != SI_NOINFO)
 #endif
-		print_si_info(tcp, sip);
+			print_si_info(tcp, sip);
+	}
 
 	tprints("}");
 }

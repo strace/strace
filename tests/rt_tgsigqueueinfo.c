@@ -58,7 +58,7 @@ main(void)
 	pidns_print_leader();
 	printf("rt_tgsigqueueinfo(%d%s, %d%s, %s, {si_signo=%s"
 		", si_code=SI_QUEUE, si_errno=ENOENT, si_pid=%d%s"
-		", si_uid=%d, si_value={int=%d, ptr=%p}}) = 0\n",
+		", si_uid=%d, si_int=%d, si_ptr=%p}) = 0\n",
 		info->si_pid, pidns_pid2str(PT_TGID),
 		info->si_pid, pidns_pid2str(PT_TID),
 		"SIGUSR1", "SIGUSR1",

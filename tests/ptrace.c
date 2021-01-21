@@ -273,7 +273,7 @@ main(void)
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGTRAP"
 	       ", si_code=TRAP_BRKPT, si_errno=ENOENT, si_pid=2, si_uid=3"
-	       ", si_value={int=%d, ptr=%p}}) = %s\n",
+	       ", si_int=%d, si_ptr=%p}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_int, sip->si_ptr,
 	       errstr);
 
@@ -368,7 +368,7 @@ main(void)
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %u, %#lx, {si_signo=SIGHUP"
 	       ", si_code=SI_TIMER, si_errno=ENOENT, si_timerid=%#x"
-	       ", si_overrun=%d, si_value={int=%d, ptr=%p}}) = %s\n",
+	       ", si_overrun=%d, si_int=%d, si_ptr=%p}) = %s\n",
 	       (unsigned) pid, bad_request, sip->si_timerid, sip->si_overrun,
 	       sip->si_int, sip->si_ptr, errstr);
 #endif

@@ -33,7 +33,7 @@ main(void)
 	pidns_print_leader();
 	printf("rt_sigqueueinfo(%d%s, SIGUSR1, {si_signo=SIGUSR1, "
 		"si_code=SI_QUEUE, si_pid=%d%s, si_uid=%u, "
-		"si_value={int=%d, ptr=%p}}) = 0\n",
+		"si_int=%d, si_ptr=%p}) = 0\n",
 		pid, pid_str, pid, pid_str,
 		getuid(), value.sival_int, value.sival_ptr);
 	pidns_print_leader();
