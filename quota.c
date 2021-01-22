@@ -116,6 +116,24 @@ struct fs_quota_statv {
 	uint64_t qs_pad2[8];
 };
 
+static void
+print_fs_qfilestat(const struct fs_qfilestat *const p)
+{
+	PRINT_FIELD_U("{", *p, qfs_ino);
+	PRINT_FIELD_U(", ", *p, qfs_nblks);
+	PRINT_FIELD_U(", ", *p, qfs_nextents);
+	tprints("}");
+}
+
+static void
+print_fs_qfilestatv(const struct fs_qfilestatv *const p)
+{
+	PRINT_FIELD_U("{", *p, qfs_ino);
+	PRINT_FIELD_U(", ", *p, qfs_nblks);
+	PRINT_FIELD_U(", ", *p, qfs_nextents);
+	tprints("}");
+}
+
 static int
 decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 {
@@ -302,13 +320,11 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			if (!abbrev(tcp)) {
 				PRINT_FIELD_FLAGS(", ", dq, qs_flags,
 						  xfs_quota_flags, "XFS_QUOTA_???");
-				PRINT_FIELD_U(", qs_uquota={", dq.qs_uquota, qfs_ino);
-				PRINT_FIELD_U(", ", dq.qs_uquota, qfs_nblks);
-				PRINT_FIELD_U(", ", dq.qs_uquota, qfs_nextents);
-				PRINT_FIELD_U("}, qs_gquota={", dq.qs_gquota, qfs_ino);
-				PRINT_FIELD_U(", ", dq.qs_gquota, qfs_nblks);
-				PRINT_FIELD_U(", ", dq.qs_gquota, qfs_nextents);
-				PRINT_FIELD_U("}, ", dq, qs_incoredqs);
+				PRINT_FIELD_OBJ_PTR(", ", dq, qs_uquota,
+						    print_fs_qfilestat);
+				PRINT_FIELD_OBJ_PTR(", ", dq, qs_gquota,
+						    print_fs_qfilestat);
+				PRINT_FIELD_U(", ", dq, qs_incoredqs);
 				PRINT_FIELD_D(", ", dq, qs_btimelimit);
 				PRINT_FIELD_D(", ", dq, qs_itimelimit);
 				PRINT_FIELD_D(", ", dq, qs_rtbtimelimit);
@@ -338,16 +354,13 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			PRINT_FIELD_FLAGS(", ", dq, qs_flags,
 					  xfs_quota_flags, "XFS_QUOTA_???");
 			PRINT_FIELD_U(", ", dq, qs_incoredqs);
-			PRINT_FIELD_U(", qs_uquota={", dq.qs_uquota, qfs_ino);
-			PRINT_FIELD_U(", ", dq.qs_uquota, qfs_nblks);
-			PRINT_FIELD_U(", ", dq.qs_uquota, qfs_nextents);
-			PRINT_FIELD_U("}, qs_gquota={", dq.qs_gquota, qfs_ino);
-			PRINT_FIELD_U(", ", dq.qs_gquota, qfs_nblks);
-			PRINT_FIELD_U(", ", dq.qs_gquota, qfs_nextents);
-			PRINT_FIELD_U("}, qs_pquota={", dq.qs_pquota, qfs_ino);
-			PRINT_FIELD_U(", ", dq.qs_pquota, qfs_nblks);
-			PRINT_FIELD_U(", ", dq.qs_pquota, qfs_nextents);
-			PRINT_FIELD_D("}, ", dq, qs_btimelimit);
+			PRINT_FIELD_OBJ_PTR(", ", dq, qs_uquota,
+					    print_fs_qfilestatv);
+			PRINT_FIELD_OBJ_PTR(", ", dq, qs_gquota,
+					    print_fs_qfilestatv);
+			PRINT_FIELD_OBJ_PTR(", ", dq, qs_pquota,
+					    print_fs_qfilestatv);
+			PRINT_FIELD_D(", ", dq, qs_btimelimit);
 			PRINT_FIELD_D(", ", dq, qs_itimelimit);
 			PRINT_FIELD_D(", ", dq, qs_rtbtimelimit);
 			PRINT_FIELD_U(", ", dq, qs_bwarnlimit);
