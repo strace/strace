@@ -15,6 +15,16 @@
 #include "xlat/statx_attrs.h"
 #include "xlat/at_statx_sync_types.h"
 
+static void
+print_statx_timestamp(const struct_statx_timestamp *const p)
+{
+	PRINT_FIELD_D("{", *p, tv_sec);
+	PRINT_FIELD_U(", ", *p, tv_nsec);
+	tprints("}");
+	tprints_comment(sprinttime_nsec(p->tv_sec,
+		zero_extend_signed_to_ull(p->tv_nsec)));
+}
+
 SYS_FUNC(statx)
 {
 	if (entering(tcp)) {
@@ -36,15 +46,6 @@ SYS_FUNC(statx)
 		printflags(statx_masks, tcp->u_arg[3], "STATX_???");
 		tprints(", ");
 	} else {
-#define PRINT_FIELD_TIME(field)						\
-	do {								\
-		tprintf(", " #field "={tv_sec=%" PRId64			\
-			", tv_nsec=%" PRIu32 "}",			\
-			stx.field.sec, stx.field.nsec);			\
-		tprints_comment(sprinttime_nsec(stx.field.sec,		\
-			zero_extend_signed_to_ull(stx.field.nsec)));	\
-	} while (0)
-
 		struct_statx stx;
 		if (umove_or_printaddr(tcp, tcp->u_arg[4], &stx))
 			return 0;
@@ -76,10 +77,14 @@ SYS_FUNC(statx)
 			PRINT_FIELD_U(", ", stx, stx_blocks);
 			PRINT_FIELD_FLAGS(", ", stx, stx_attributes_mask,
 					  statx_attrs, "STATX_ATTR_???");
-			PRINT_FIELD_TIME(stx_atime);
-			PRINT_FIELD_TIME(stx_btime);
-			PRINT_FIELD_TIME(stx_ctime);
-			PRINT_FIELD_TIME(stx_mtime);
+			PRINT_FIELD_OBJ_PTR(", ", stx, stx_atime,
+					    print_statx_timestamp);
+			PRINT_FIELD_OBJ_PTR(", ", stx, stx_btime,
+					    print_statx_timestamp);
+			PRINT_FIELD_OBJ_PTR(", ", stx, stx_ctime,
+					    print_statx_timestamp);
+			PRINT_FIELD_OBJ_PTR(", ", stx, stx_mtime,
+					    print_statx_timestamp);
 			PRINT_FIELD_U(", ", stx, stx_rdev_major);
 			PRINT_FIELD_U(", ", stx, stx_rdev_minor);
 			PRINT_FIELD_U(", ", stx, stx_dev_major);

@@ -11,8 +11,8 @@
 # include <stdint.h>
 
 typedef struct {
-	int64_t sec;
-	int32_t nsec;
+	int64_t tv_sec;
+	int32_t tv_nsec;
 	int32_t reserved;
 } struct_statx_timestamp;
 
