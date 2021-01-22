@@ -271,6 +271,50 @@ done:
 	return ptrace_get_syscall_info_supported;
 }
 
+static void
+print_psi_entry(const typeof_field(struct_ptrace_syscall_info, entry) *const p,
+		const kernel_ulong_t fetch_size, struct tcb *const tcp)
+{
+	PRINT_FIELD_U("{", *p, nr);
+	const kernel_ulong_t nargs =
+		(fetch_size - offsetof(struct_ptrace_syscall_info, entry.args))
+		/ sizeof(p->args[0]);
+	if (nargs)
+		PRINT_FIELD_ARRAY_UPTO(", ", *p, args, nargs, tcp,
+				       print_xint64_array_member);
+	tprints("}");
+}
+
+static void
+print_psi_seccomp(const typeof_field(struct_ptrace_syscall_info, seccomp) *const p,
+		const kernel_ulong_t fetch_size, struct tcb *const tcp)
+{
+	PRINT_FIELD_U("{", *p, nr);
+	const kernel_ulong_t nargs =
+		(fetch_size - offsetof(struct_ptrace_syscall_info, seccomp.args))
+		/ sizeof(p->args[0]);
+	if (nargs)
+		PRINT_FIELD_ARRAY_UPTO(", ", *p, args, nargs, tcp,
+				       print_xint64_array_member);
+	if (fetch_size >= expected_seccomp_size)
+		PRINT_FIELD_U(", ", *p, ret_data);
+	tprints("}");
+}
+
+static void
+print_psi_exit(const typeof_field(struct_ptrace_syscall_info, exit) *const p,
+	       const kernel_ulong_t fetch_size, struct tcb *const tcp)
+{
+	if (fetch_size >= expected_exit_size && p->is_error) {
+		PRINT_FIELD_ERR_D("{", *p, rval);
+	} else {
+		PRINT_FIELD_D("{", *p, rval);
+	}
+	if (fetch_size >= expected_exit_size)
+		PRINT_FIELD_U(", ", *p, is_error);
+	tprints("}");
+}
+
 void
 print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 			  kernel_ulong_t user_len)
@@ -305,42 +349,16 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 
 	switch(info.op) {
 		case PTRACE_SYSCALL_INFO_ENTRY:
+			PRINT_FIELD_OBJ_PTR(", ", info, entry,
+					    print_psi_entry, fetch_size, tcp);
+			break;
 		case PTRACE_SYSCALL_INFO_SECCOMP:
-			PRINT_FIELD_U((info.op == PTRACE_SYSCALL_INFO_ENTRY
-				       ? ", entry={" : ", seccomp={"),
-				      info.entry, nr);
-			for (unsigned int i = 0;
-			     i < ARRAY_SIZE(info.entry.args); ++i) {
-				const unsigned int i_size =
-					offsetofend(struct_ptrace_syscall_info,
-						    entry.args[i]);
-				if (fetch_size < i_size) {
-					if (i)
-						break;
-					goto entry_printed;
-				}
-				tprintf(", %s%#" PRIx64,
-					(i ? "" : "args=["),
-					(uint64_t) info.entry.args[i]);
-			}
-			tprints("]");
-			if (info.op == PTRACE_SYSCALL_INFO_SECCOMP
-			    && fetch_size >= expected_seccomp_size)
-				PRINT_FIELD_U(", ", info.seccomp, ret_data);
-entry_printed:
-			tprints("}");
+			PRINT_FIELD_OBJ_PTR(", ", info, seccomp,
+					    print_psi_seccomp, fetch_size, tcp);
 			break;
 		case PTRACE_SYSCALL_INFO_EXIT:
-			tprints(", exit={");
-			if (fetch_size >= expected_exit_size
-			    && info.exit.is_error) {
-				PRINT_FIELD_ERR_D("", info.exit, rval);
-			} else {
-				PRINT_FIELD_D("", info.exit, rval);
-			}
-			if (fetch_size >= expected_exit_size)
-				PRINT_FIELD_U(", ", info.exit, is_error);
-			tprints("}");
+			PRINT_FIELD_OBJ_PTR(", ", info, exit,
+					    print_psi_exit, fetch_size, tcp);
 			break;
 	}
 
