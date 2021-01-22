@@ -244,10 +244,13 @@ print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	return true;
 }
 
+#define DECL_print_v4l2_format_fmt(name_)				\
+	print_v4l2_format_fmt_ ## name_(struct tcb *const tcp,		\
+		const typeof_field(struct_v4l2_format, fmt.name_) *const p)
+
 static bool
-print_v4l2_format_fmt_pix(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(pix)
 {
-	const struct_v4l2_pix_format *const p = arg;
 	PRINT_FIELD_U("{", *p, width);
 	PRINT_FIELD_U(", ", *p, height);
 	PRINT_FIELD_PIXFMT(", ", *p, pixelformat, v4l2_pix_fmts);
@@ -274,9 +277,8 @@ print_v4l2_plane_pix_format_array_member(struct tcb *tcp, void *elem_buf,
 }
 
 static bool
-print_v4l2_format_fmt_pix_mp(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(pix_mp)
 {
-	const struct_v4l2_pix_format_mplane *const p = arg;
 	PRINT_FIELD_U("{", *p, width);
 	PRINT_FIELD_U(", ", *p, height);
 	PRINT_FIELD_PIXFMT(", ", *p, pixelformat, v4l2_pix_fmts);
@@ -291,9 +293,8 @@ print_v4l2_format_fmt_pix_mp(struct tcb *const tcp, const void *const arg)
 }
 
 static bool
-print_v4l2_format_fmt_win(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(win)
 {
-	const struct_v4l2_window *const p = arg;
 	PRINT_FIELD_RECT("{", *p, w);
 	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_X(", ", *p, chromakey);
@@ -313,9 +314,8 @@ print_v4l2_format_fmt_win(struct tcb *const tcp, const void *const arg)
 }
 
 static bool
-print_v4l2_format_fmt_vbi(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(vbi)
 {
-	const struct_v4l2_vbi_format *const p = arg;
 	PRINT_FIELD_U("{", *p, sampling_rate);
 	PRINT_FIELD_U(", ", *p, offset);
 	PRINT_FIELD_U(", ", *p, samples_per_line);
@@ -328,9 +328,8 @@ print_v4l2_format_fmt_vbi(struct tcb *const tcp, const void *const arg)
 }
 
 static bool
-print_v4l2_format_fmt_sliced(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(sliced)
 {
-	const struct_v4l2_sliced_vbi_format *const p = arg;
 	PRINT_FIELD_FLAGS("{", *p, service_set, v4l2_sliced_flags,
 			  "V4L2_SLICED_???");
 	PRINT_FIELD_X_ARRAY2D(", ", *p, service_lines);
@@ -340,9 +339,8 @@ print_v4l2_format_fmt_sliced(struct tcb *const tcp, const void *const arg)
 }
 
 static bool
-print_v4l2_format_fmt_sdr(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(sdr)
 {
-	const struct_v4l2_sdr_format *const p = arg;
 	PRINT_FIELD_PIXFMT("{", *p, pixelformat, v4l2_sdr_fmts);
 	if (p->buffersize)
 		PRINT_FIELD_U(", ", *p, buffersize);
@@ -351,9 +349,8 @@ print_v4l2_format_fmt_sdr(struct tcb *const tcp, const void *const arg)
 }
 
 static bool
-print_v4l2_format_fmt_meta(struct tcb *const tcp, const void *const arg)
+DECL_print_v4l2_format_fmt(meta)
 {
-	const struct_v4l2_meta_format *const p = arg;
 	PRINT_FIELD_PIXFMT("{", *p, dataformat, v4l2_meta_fmts);
 	PRINT_FIELD_U(", ", *p, buffersize);
 	tprints("}");
