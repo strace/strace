@@ -88,11 +88,14 @@ test_no_device(void)
 	errstr = sprintrc(ioctl(-1, PTP_PEROUT_REQUEST, NULL));
 	printf("ioctl(-1, PTP_PEROUT_REQUEST, NULL) = %s\n", errstr);
 	errstr = sprintrc(ioctl(-1, PTP_PEROUT_REQUEST, perout));
-	printf("ioctl(-1, PTP_PEROUT_REQUEST, {start={sec=%" PRId64
-	       ", nsec=%" PRIu32 "}, period={sec=%" PRId64 ", nsec=%" PRIu32 "}"
-	       ", index=%d, flags=",
-	       (int64_t) perout->start.sec, perout->start.nsec,
-	       (int64_t)perout->period.sec, perout->period.nsec, perout->index);
+	printf("ioctl(-1, PTP_PEROUT_REQUEST"
+	       ", {start={sec=%" PRId64 ", nsec=%" PRIu32 "}",
+	       (int64_t) perout->start.sec, perout->start.nsec);
+	print_time_t_nsec(perout->start.sec, perout->start.nsec, 1);
+	printf(", period={sec=%" PRId64 ", nsec=%" PRIu32 "}",
+	       (int64_t)perout->period.sec, perout->period.nsec);
+	print_time_t_nsec(perout->period.sec, perout->period.nsec, 1);
+	printf(", index=%d, flags=", perout->index);
 	printflags(ptp_perout_flags, perout->flags, "PTP_???");
 	printf("}) = %s\n", errstr);
 
