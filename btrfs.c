@@ -457,9 +457,8 @@ print_btrfs_scrub_progress(const struct btrfs_scrub_progress *const p)
 }
 
 static void
-print_btrfs_replace_start_params(const void *const arg)
+print_btrfs_replace_start_params(const typeof_field(struct_btrfs_ioctl_dev_replace_args, start) *const p)
 {
-	const struct btrfs_ioctl_dev_replace_start_params *const p = arg;
 	PRINT_FIELD_DEV("{", *p, srcdevid);
 	PRINT_FIELD_XVAL(", ", *p, cont_reading_from_srcdev_mode,
 			 btrfs_cont_reading_from_srcdev_mode,
@@ -471,9 +470,8 @@ print_btrfs_replace_start_params(const void *const arg)
 }
 
 static void
-print_btrfs_replace_status_params(const void *const arg)
+print_btrfs_replace_status_params(const typeof_field(struct_btrfs_ioctl_dev_replace_args, status) *const p)
 {
-	const struct btrfs_ioctl_dev_replace_status_params *const p = arg;
 	PRINT_FIELD_XVAL("{", *p, replace_state, btrfs_dev_replace_state,
 			 "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
 
