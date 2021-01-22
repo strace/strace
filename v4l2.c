@@ -99,11 +99,16 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 # include "xlat/v4l2_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
-#define PRINT_FIELD_RECT(prefix_, where_, field_)			\
-	STRACE_PRINTF("%s%s={left=%d, top=%d, width=%u, height=%u}",	\
-		      (prefix_), #field_,				\
-		      (where_).field_.left, (where_).field_.top,	\
-		      (where_).field_.width, (where_).field_.height)
+static void
+print_v4l2_rect(const MPERS_PTR_ARG(struct v4l2_rect *) const arg)
+{
+	const struct v4l2_rect *const p = arg;
+	PRINT_FIELD_D("{", *p, left);
+	PRINT_FIELD_D(", ", *p, top);
+	PRINT_FIELD_U(", ", *p, width);
+	PRINT_FIELD_U(", ", *p, height);
+	tprints("}");
+}
 
 #define PRINT_FIELD_FRACT(prefix_, where_, field_)			\
 	STRACE_PRINTF("%s%s=%u/%u", (prefix_), #field_,			\
@@ -239,7 +244,7 @@ static bool
 print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct_v4l2_clip *p = elem_buf;
-	PRINT_FIELD_RECT("{", *p, c);
+	PRINT_FIELD_OBJ_PTR("{", *p, c, print_v4l2_rect);
 	tprints("}");
 	return true;
 }
@@ -295,7 +300,7 @@ DECL_print_v4l2_format_fmt(pix_mp)
 static bool
 DECL_print_v4l2_format_fmt(win)
 {
-	PRINT_FIELD_RECT("{", *p, w);
+	PRINT_FIELD_OBJ_PTR("{", *p, w, print_v4l2_rect);
 	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_X(", ", *p, chromakey);
 
@@ -996,8 +1001,8 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-		PRINT_FIELD_RECT(", ", c, bounds);
-		PRINT_FIELD_RECT(", ", c, defrect);
+		PRINT_FIELD_OBJ_PTR(", ", c, bounds, print_v4l2_rect);
+		PRINT_FIELD_OBJ_PTR(", ", c, defrect, print_v4l2_rect);
 		PRINT_FIELD_FRACT(", ", c, pixelaspect);
 	}
 
@@ -1020,10 +1025,10 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
-		PRINT_FIELD_RECT(", " , c, c);
+		PRINT_FIELD_OBJ_PTR(", " , c, c, print_v4l2_rect);
 	} else {
 		if (!syserror(tcp) && !umove(tcp, arg, &c))
-			PRINT_FIELD_RECT(", " , c, c);
+			PRINT_FIELD_OBJ_PTR(", " , c, c, print_v4l2_rect);
 	}
 
 	tprints("}");
@@ -1210,6 +1215,16 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	return RVAL_IOCTL_DECODED;
 }
 
+static void
+print_v4l2_create_buffers_format(const typeof_field(struct_v4l2_create_buffers, format) *const p,
+				 struct tcb *const tcp)
+{
+	PRINT_FIELD_XVAL("{", *p, type, v4l2_buf_types,
+			 "V4L2_BUF_TYPE_???");
+	print_v4l2_format_fmt(tcp, ", ", (const struct_v4l2_format *) p);
+	tprints("}");
+}
+
 static int
 print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 {
@@ -1225,11 +1240,9 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U("{", b, count);
 		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
 				 "V4L2_MEMORY_???");
-		PRINT_FIELD_XVAL(", format={", b.format, type, v4l2_buf_types,
-				 "V4L2_BUF_TYPE_???");
-		print_v4l2_format_fmt(tcp, ", ",
-				      (const struct_v4l2_format *) &b.format);
-		tprints("}}");
+		PRINT_FIELD_OBJ_PTR(", ", b, format,
+				    print_v4l2_create_buffers_format, tcp);
+		tprints("}");
 		return 0;
 	}
 
