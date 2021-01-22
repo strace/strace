@@ -32,6 +32,28 @@ typedef struct ifreq struct_ifreq;
 #undef XLAT_MACROS_ONLY
 
 static void
+print_ifr_hwaddr(const typeof_field(struct_ifreq, ifr_hwaddr) *const p)
+{
+	PRINT_FIELD_XVAL("{", *p, sa_family,
+			 arp_hardware_types, "ARPHRD_???");
+	PRINT_FIELD_HWADDR_SZ(", ", *p, sa_data, sizeof(p->sa_data),
+			      p->sa_family);
+	tprints("}");
+}
+
+static void
+print_ifr_map(const typeof_field(struct_ifreq, ifr_map) *const p)
+{
+	PRINT_FIELD_X("{", *p, mem_start);
+	PRINT_FIELD_X(", ", *p, mem_end);
+	PRINT_FIELD_X(", ", *p, base_addr);
+	PRINT_FIELD_X(", ", *p, irq);
+	PRINT_FIELD_X(", ", *p, dma);
+	PRINT_FIELD_X(", ", *p, port);
+	tprints("}");
+}
+
+static void
 print_ifreq(struct tcb *const tcp, const unsigned int code,
 	    const kernel_ulong_t arg, const struct_ifreq *const ifr)
 {
@@ -57,12 +79,7 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	case SIOCGIFHWADDR:
 	case SIOCSIFHWADDR:
 	case SIOCSIFHWBROADCAST:
-		PRINT_FIELD_XVAL("ifr_hwaddr={", ifr->ifr_hwaddr, sa_family,
-				 arp_hardware_types, "ARPHRD_???");
-		PRINT_FIELD_HWADDR_SZ(", ", ifr->ifr_hwaddr, sa_data,
-				      sizeof(ifr->ifr_hwaddr.sa_data),
-				      ifr->ifr_hwaddr.sa_family);
-		tprints("}");
+		PRINT_FIELD_OBJ_PTR("", *ifr, ifr_hwaddr, print_ifr_hwaddr);
 		break;
 	case SIOCSIFFLAGS:
 	case SIOCGIFFLAGS:
@@ -95,13 +112,7 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFMAP:
 	case SIOCGIFMAP:
-		PRINT_FIELD_X("ifr_map={", ifr->ifr_map, mem_start);
-		PRINT_FIELD_X(", ", ifr->ifr_map, mem_end);
-		PRINT_FIELD_X(", ", ifr->ifr_map, base_addr);
-		PRINT_FIELD_X(", ", ifr->ifr_map, irq);
-		PRINT_FIELD_X(", ", ifr->ifr_map, dma);
-		PRINT_FIELD_X(", ", ifr->ifr_map, port);
-		tprints("}");
+		PRINT_FIELD_OBJ_PTR("", *ifr, ifr_map, print_ifr_map);
 		break;
 	}
 }
