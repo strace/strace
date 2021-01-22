@@ -320,7 +320,7 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 					goto entry_printed;
 				}
 				tprintf(", %s%#" PRIx64,
-					(i ? "" : "arg=["),
+					(i ? "" : "args=["),
 					(uint64_t) info.entry.args[i]);
 			}
 			tprints("]");

@@ -254,7 +254,7 @@ test_entry(void)
 #endif
 			if (CAST info.entry.args[i] != exp_args[i + 1])
 				FAIL("#%d: entry stop mismatch", ptrace_stop);
-			printf("%s%#llx", (i ? ", " : ", arg=["),
+			printf("%s%#llx", (i ? ", " : ", args=["),
 			       (unsigned long long) info.entry.args[i]);
 		}
 		printf("]");
