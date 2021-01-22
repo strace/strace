@@ -6,34 +6,23 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include "statfs.h"
 #include "xlat/fsmagic.h"
 #include "xlat/statfs_flags.h"
 
+#if defined HAVE_STRUCT_STATFS_F_FSID_VAL \
+ || defined HAVE_STRUCT_STATFS_F_FSID___VAL \
+ || defined HAVE_STRUCT_STATFS64_F_FSID_VAL \
+ || defined HAVE_STRUCT_STATFS64_F_FSID___VAL
 static void
-print_statfs_type(const char *const prefix, const unsigned long long magic)
+print_f_fsid(const typeof_field(struct strace_statfs, f_fsid) *const p,
+	     struct tcb *const tcp)
 {
-	tprints(prefix);
-	printxval(fsmagic, magic, NULL);
+	PRINT_FIELD_ARRAY("{", *p, val, tcp, print_xint64_array_member);
+	tprints("}");
 }
-
-#if defined HAVE_STRUCT_STATFS_F_FLAGS || defined HAVE_STRUCT_STATFS64_F_FLAGS
-static void
-print_statfs_flags(const char *const prefix, const unsigned long long flags)
-{
-	if (flags & ST_VALID) {
-		tprints(prefix);
-		printflags64(statfs_flags, flags, "ST_???");
-	}
-}
-#endif /* HAVE_STRUCT_STATFS_F_FLAGS || HAVE_STRUCT_STATFS64_F_FLAGS */
-
-static void
-print_statfs_number(const char *const prefix, const unsigned long long number)
-{
-	tprints(prefix);
-	tprintf("%llu",  number);
-}
+#endif
 
 void
 print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -44,25 +33,24 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!fetch_struct_statfs(tcp, addr, &b))
 		return;
 
-	print_statfs_type("{f_type=", b.f_type);
-	print_statfs_number(", f_bsize=", b.f_bsize);
-	print_statfs_number(", f_blocks=", b.f_blocks);
-	print_statfs_number(", f_bfree=", b.f_bfree);
-	print_statfs_number(", f_bavail=", b.f_bavail);
-	print_statfs_number(", f_files=", b.f_files);
-	print_statfs_number(", f_ffree=", b.f_ffree);
+	PRINT_FIELD_XVAL("{", b, f_type, fsmagic, NULL);
+	PRINT_FIELD_U(", ", b, f_bsize);
+	PRINT_FIELD_U(", ", b, f_blocks);
+	PRINT_FIELD_U(", ", b, f_bfree);
+	PRINT_FIELD_U(", ", b, f_bavail);
+	PRINT_FIELD_U(", ", b, f_files);
+	PRINT_FIELD_U(", ", b, f_ffree);
 # if defined HAVE_STRUCT_STATFS_F_FSID_VAL \
   || defined HAVE_STRUCT_STATFS_F_FSID___VAL
-	print_statfs_number(", f_fsid={val=[", b.f_fsid[0]);
-	print_statfs_number(", ", b.f_fsid[1]);
-	tprints("]}");
+	PRINT_FIELD_OBJ_PTR(", ", b, f_fsid, print_f_fsid, tcp);
 # endif
-	print_statfs_number(", f_namelen=", b.f_namelen);
+	PRINT_FIELD_U(", ", b, f_namelen);
 # ifdef HAVE_STRUCT_STATFS_F_FRSIZE
-	print_statfs_number(", f_frsize=", b.f_frsize);
+	PRINT_FIELD_U(", ", b, f_frsize);
 # endif
 # ifdef HAVE_STRUCT_STATFS_F_FLAGS
-	print_statfs_flags(", f_flags=", b.f_flags);
+	if (b.f_flags & ST_VALID)
+		PRINT_FIELD_FLAGS(", ", b, f_flags, statfs_flags, "ST_???");
 # endif
 	tprints("}");
 #else
@@ -80,25 +68,24 @@ print_struct_statfs64(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (!fetch_struct_statfs64(tcp, addr, size, &b))
 		return;
 
-	print_statfs_type("{f_type=", b.f_type);
-	print_statfs_number(", f_bsize=", b.f_bsize);
-	print_statfs_number(", f_blocks=", b.f_blocks);
-	print_statfs_number(", f_bfree=", b.f_bfree);
-	print_statfs_number(", f_bavail=", b.f_bavail);
-	print_statfs_number(", f_files=", b.f_files);
-	print_statfs_number(", f_ffree=", b.f_ffree);
+	PRINT_FIELD_XVAL("{", b, f_type, fsmagic, NULL);
+	PRINT_FIELD_U(", ", b, f_bsize);
+	PRINT_FIELD_U(", ", b, f_blocks);
+	PRINT_FIELD_U(", ", b, f_bfree);
+	PRINT_FIELD_U(", ", b, f_bavail);
+	PRINT_FIELD_U(", ", b, f_files);
+	PRINT_FIELD_U(", ", b, f_ffree);
 # if defined HAVE_STRUCT_STATFS64_F_FSID_VAL \
   || defined HAVE_STRUCT_STATFS64_F_FSID___VAL
-	print_statfs_number(", f_fsid={val=[", b.f_fsid[0]);
-	print_statfs_number(", ", b.f_fsid[1]);
-	tprints("]}");
+	PRINT_FIELD_OBJ_PTR(", ", b, f_fsid, print_f_fsid, tcp);
 # endif
-	print_statfs_number(", f_namelen=", b.f_namelen);
+	PRINT_FIELD_U(", ", b, f_namelen);
 # ifdef HAVE_STRUCT_STATFS64_F_FRSIZE
-	print_statfs_number(", f_frsize=", b.f_frsize);
+	PRINT_FIELD_U(", ", b, f_frsize);
 # endif
 # ifdef HAVE_STRUCT_STATFS64_F_FLAGS
-	print_statfs_flags(", f_flags=", b.f_flags);
+	if (b.f_flags & ST_VALID)
+		PRINT_FIELD_FLAGS(", ", b, f_flags, statfs_flags, "ST_???");
 # endif
 	tprints("}");
 #else

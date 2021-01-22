@@ -16,7 +16,9 @@ struct strace_statfs {
 	unsigned long long f_bavail;
 	unsigned long long f_files;
 	unsigned long long f_ffree;
-	unsigned long f_fsid[2];
+	struct {
+		unsigned long long val[2];
+	} f_fsid;
 	unsigned long long f_namelen;
 	unsigned long long f_frsize;
 	unsigned long long f_flags;

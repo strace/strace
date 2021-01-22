@@ -37,11 +37,11 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs,
 	p->f_files = zero_extend_signed_to_ull(b.f_files);
 	p->f_ffree = zero_extend_signed_to_ull(b.f_ffree);
 #if defined HAVE_STRUCT_STATFS_F_FSID_VAL
-	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.val[0]);
-	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.val[1]);
+	p->f_fsid.val[0] = zero_extend_signed_to_ull(b.f_fsid.val[0]);
+	p->f_fsid.val[1] = zero_extend_signed_to_ull(b.f_fsid.val[1]);
 #elif defined HAVE_STRUCT_STATFS_F_FSID___VAL
-	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.__val[0]);
-	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.__val[1]);
+	p->f_fsid.val[0] = zero_extend_signed_to_ull(b.f_fsid.__val[0]);
+	p->f_fsid.val[1] = zero_extend_signed_to_ull(b.f_fsid.__val[1]);
 #endif
 	p->f_namelen = zero_extend_signed_to_ull(b.f_namelen);
 #ifdef HAVE_STRUCT_STATFS_F_FRSIZE
@@ -85,11 +85,11 @@ MPERS_PRINTER_DECL(bool, fetch_struct_statfs64,
 	p->f_files = zero_extend_signed_to_ull(b.f_files);
 	p->f_ffree = zero_extend_signed_to_ull(b.f_ffree);
 #if defined HAVE_STRUCT_STATFS64_F_FSID_VAL
-	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.val[0]);
-	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.val[1]);
+	p->f_fsid.val[0] = zero_extend_signed_to_ull(b.f_fsid.val[0]);
+	p->f_fsid.val[1] = zero_extend_signed_to_ull(b.f_fsid.val[1]);
 #elif defined HAVE_STRUCT_STATFS64_F_FSID___VAL
-	p->f_fsid[0] = zero_extend_signed_to_ull(b.f_fsid.__val[0]);
-	p->f_fsid[1] = zero_extend_signed_to_ull(b.f_fsid.__val[1]);
+	p->f_fsid.val[0] = zero_extend_signed_to_ull(b.f_fsid.__val[0]);
+	p->f_fsid.val[1] = zero_extend_signed_to_ull(b.f_fsid.__val[1]);
 #endif
 	p->f_namelen = zero_extend_signed_to_ull(b.f_namelen);
 #ifdef HAVE_STRUCT_STATFS64_F_FRSIZE
