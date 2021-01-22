@@ -13,6 +13,7 @@
 # include DEF_MPERS_TYPE(struct_btrfs_ioctl_dev_replace_args)
 # include DEF_MPERS_TYPE(struct_btrfs_ioctl_send_args)
 # include DEF_MPERS_TYPE(struct_btrfs_ioctl_received_subvol_args)
+# include DEF_MPERS_TYPE(struct_btrfs_ioctl_timespec)
 # include DEF_MPERS_TYPE(struct_btrfs_ioctl_vol_args_v2)
 
 # include <linux/btrfs.h>
@@ -23,6 +24,8 @@ typedef struct btrfs_ioctl_send_args
 	struct_btrfs_ioctl_send_args;
 typedef struct btrfs_ioctl_received_subvol_args
 	struct_btrfs_ioctl_received_subvol_args;
+typedef struct btrfs_ioctl_timespec
+	struct_btrfs_ioctl_timespec;
 typedef struct btrfs_ioctl_vol_args_v2
 	struct_btrfs_ioctl_vol_args_v2;
 
@@ -128,9 +131,8 @@ struct btrfs_ioctl_search_args_v2 {
 # include "xlat/btrfs_tree_objectids.h"
 
 static void
-btrfs_print_balance_args(const char *name, const struct btrfs_balance_args *bba)
+btrfs_print_balance_args(const struct btrfs_balance_args *const bba)
 {
-	tprintf(", %s=", name);
 	PRINT_FIELD_FLAGS("{", *bba, profiles, btrfs_space_info_flags,
 			  "BTRFS_BLOCK_GROUP_???");
 	PRINT_FIELD_U64(", ", *bba, usage);
@@ -161,11 +163,14 @@ btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 				  "BTRFS_BALANCE_STATE_???");
 
 	if (balance_args.flags & BTRFS_BALANCE_DATA)
-		btrfs_print_balance_args("data", &balance_args.data);
+		PRINT_FIELD_OBJ_PTR(", ", balance_args, data,
+				    btrfs_print_balance_args);
 	if (balance_args.flags & BTRFS_BALANCE_METADATA)
-		btrfs_print_balance_args("meta", &balance_args.meta);
+		PRINT_FIELD_OBJ_PTR(", ", balance_args, meta,
+				    btrfs_print_balance_args);
 	if (balance_args.flags & BTRFS_BALANCE_SYSTEM)
-		btrfs_print_balance_args("sys", &balance_args.sys);
+		PRINT_FIELD_OBJ_PTR(", ", balance_args, sys,
+				    btrfs_print_balance_args);
 	tprints("}");
 }
 
@@ -429,10 +434,13 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 }
 
 static void
-print_btrfs_timespec(const char *prefix, uint64_t sec, uint32_t nsec)
+print_btrfs_timespec(const MPERS_PTR_ARG(struct_btrfs_ioctl_timespec *) const arg)
 {
-	tprintf("%s{sec=%" PRIu64 ", nsec=%u}", prefix, sec, nsec);
-	tprints_comment(sprinttime_nsec(sec, nsec));
+	const struct_btrfs_ioctl_timespec *const p = arg;
+	PRINT_FIELD_U("{", *p, sec);
+	PRINT_FIELD_U(", ", *p, nsec);
+	tprints("}");
+	tprints_comment(sprinttime_nsec(p->sec, p->nsec));
 }
 
 static void
@@ -1007,15 +1015,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			PRINT_FIELD_UUID("{", args, uuid);
 			PRINT_FIELD_U(", ", args, stransid);
-			print_btrfs_timespec(", stime=",
-					     args.stime.sec, args.stime.nsec);
+			PRINT_FIELD_OBJ_PTR(", ", args, stime,
+					    print_btrfs_timespec);
 			PRINT_FIELD_U(", ", args, flags);
 			tprints("}");
 			return 0;
 		}
 		PRINT_FIELD_U("{", args, rtransid);
-		print_btrfs_timespec(", rtime=",
-				     args.rtime.sec, args.rtime.nsec);
+		PRINT_FIELD_OBJ_PTR(", ", args, rtime, print_btrfs_timespec);
 		tprints("}");
 		break;
 	}
