@@ -1738,6 +1738,12 @@ extern void __gcov_dump(void);
 #  define MPERS_PRINTER_DECL(type, name, ...) type MPERS_FUNC_NAME(name)(__VA_ARGS__)
 # endif /* !IN_MPERS_BOOTSTRAP */
 
+#ifdef IN_MPERS
+# define MPERS_PTR_ARG(arg_) void *
+#else
+# define MPERS_PTR_ARG(arg_) arg_
+#endif
+
 /* Checks that sysent[scno] is not out of range. */
 static inline bool
 scno_in_range(kernel_ulong_t scno)

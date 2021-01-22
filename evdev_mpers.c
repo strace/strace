@@ -27,7 +27,7 @@ typedef struct ff_effect struct_ff_effect;
 # include "print_fields.h"
 
 static void
-print_ff_envelope(const void *const arg)
+print_ff_envelope(const MPERS_PTR_ARG(struct ff_envelope *) const arg)
 {
 	const struct ff_envelope *const p = arg;
 	PRINT_FIELD_U("{", *p, attack_length);

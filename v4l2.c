@@ -516,7 +516,7 @@ print_v4l2_buffer_flags(uint32_t val)
 	} while (0)
 
 static void
-print_v4l2_timeval(const void *const arg)
+print_v4l2_timeval(const MPERS_PTR_ARG(kernel_v4l2_timeval_t *) const arg)
 {
 	const kernel_v4l2_timeval_t *const t = arg;
 	kernel_timeval64_t tv;
@@ -1103,7 +1103,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 #include "xlat/v4l2_framesize_types.h"
 
 static void
-print_v4l2_frmsize_discrete(const void *const arg)
+print_v4l2_frmsize_discrete(const MPERS_PTR_ARG(struct_v4l2_frmsize_discrete *) const arg)
 {
 	const struct_v4l2_frmsize_discrete *const p = arg;
 	PRINT_FIELD_U("{", *p, width);
@@ -1112,7 +1112,7 @@ print_v4l2_frmsize_discrete(const void *const arg)
 }
 
 static void
-print_v4l2_frmsize_stepwise(const void *const arg)
+print_v4l2_frmsize_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmsize_stepwise *) const arg)
 {
 	const struct_v4l2_frmsize_stepwise *const p = arg;
 	PRINT_FIELD_U("{", *p, min_width);
@@ -1163,7 +1163,7 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_frameinterval_types.h"
 
 static void
-print_v4l2_frmival_stepwise(const void *const arg)
+print_v4l2_frmival_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmival_stepwise *) const arg)
 {
 	const struct_v4l2_frmival_stepwise *const p = arg;
 	PRINT_FIELD_FRACT("{", *p, min);
