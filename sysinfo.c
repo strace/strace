@@ -18,6 +18,7 @@
 #include <sys/sysinfo.h>
 typedef struct sysinfo sysinfo_t;
 #include MPERS_DEFS
+#include "print_fields.h"
 
 SYS_FUNC(sysinfo)
 {
@@ -27,34 +28,20 @@ SYS_FUNC(sysinfo)
 		return 0;
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &si)) {
-		tprintf("{uptime=%llu"
-			", loads=[%llu, %llu, %llu]"
-			", totalram=%llu"
-			", freeram=%llu"
-			", sharedram=%llu"
-			", bufferram=%llu"
-			", totalswap=%llu"
-			", freeswap=%llu"
-			", procs=%u"
-			", totalhigh=%llu"
-			", freehigh=%llu"
-			", mem_unit=%u"
-			"}",
-			zero_extend_signed_to_ull(si.uptime)
-			, zero_extend_signed_to_ull(si.loads[0])
-			, zero_extend_signed_to_ull(si.loads[1])
-			, zero_extend_signed_to_ull(si.loads[2])
-			, zero_extend_signed_to_ull(si.totalram)
-			, zero_extend_signed_to_ull(si.freeram)
-			, zero_extend_signed_to_ull(si.sharedram)
-			, zero_extend_signed_to_ull(si.bufferram)
-			, zero_extend_signed_to_ull(si.totalswap)
-			, zero_extend_signed_to_ull(si.freeswap)
-			, (unsigned) si.procs
-			, zero_extend_signed_to_ull(si.totalhigh)
-			, zero_extend_signed_to_ull(si.freehigh)
-			, si.mem_unit
-			);
+		PRINT_FIELD_U("{", si, uptime);
+		PRINT_FIELD_ARRAY(", ", si, loads, tcp,
+				  print_kulong_array_member);
+		PRINT_FIELD_U(", ", si, totalram);
+		PRINT_FIELD_U(", ", si, freeram);
+		PRINT_FIELD_U(", ", si, sharedram);
+		PRINT_FIELD_U(", ", si, bufferram);
+		PRINT_FIELD_U(", ", si, totalswap);
+		PRINT_FIELD_U(", ", si, freeswap);
+		PRINT_FIELD_U(", ", si, procs);
+		PRINT_FIELD_U(", ", si, totalhigh);
+		PRINT_FIELD_U(", ", si, freehigh);
+		PRINT_FIELD_U(", ", si, mem_unit);
+		tprints("}");
 	}
 
 	return 0;
