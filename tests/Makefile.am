@@ -154,6 +154,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_fs_x-success-Xabbrev \
 	ioctl_fs_x-success-Xraw \
 	ioctl_fs_x-success-Xverbose \
+	ioctl_gpio-success \
+	ioctl_gpio-success-Xabbrev \
+	ioctl_gpio-success-Xraw \
+	ioctl_gpio-success-Xverbose \
+	ioctl_gpio-success-v \
+	ioctl_gpio-success-v-Xabbrev \
+	ioctl_gpio-success-v-Xraw \
+	ioctl_gpio-success-v-Xverbose \
 	ioctl_hdio-success \
 	ioctl_hdio-success-Xabbrev \
 	ioctl_hdio-success-Xraw \

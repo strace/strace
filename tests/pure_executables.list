@@ -181,6 +181,14 @@ ioctl_fs_x
 ioctl_fs_x-Xabbrev
 ioctl_fs_x-Xraw
 ioctl_fs_x-Xverbose
+ioctl_gpio
+ioctl_gpio-Xabbrev
+ioctl_gpio-Xraw
+ioctl_gpio-Xverbose
+ioctl_gpio-v
+ioctl_gpio-v-Xabbrev
+ioctl_gpio-v-Xraw
+ioctl_gpio-v-Xverbose
 ioctl_hdio
 ioctl_hdio-Xabbrev
 ioctl_hdio-Xraw

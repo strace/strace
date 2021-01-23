@@ -228,6 +228,22 @@ ioctl_fs_x-success	+ioctl-success.sh -a18
 ioctl_fs_x-success-Xabbrev	+ioctl-success.sh -a18 -Xabbrev
 ioctl_fs_x-success-Xraw	+ioctl-success.sh -a21 -Xraw
 ioctl_fs_x-success-Xverbose	+ioctl-success.sh -a35 -Xverbose
+ioctl_gpio	+ioctl.test
+ioctl_gpio-Xabbrev	+ioctl.test -Xabbrev
+ioctl_gpio-Xraw	+ioctl.test -Xraw
+ioctl_gpio-Xverbose	+ioctl.test -Xverbose
+ioctl_gpio-v	+ioctl.test -v
+ioctl_gpio-v-Xabbrev	+ioctl.test -v -Xabbrev
+ioctl_gpio-v-Xraw	+ioctl.test -v -Xraw
+ioctl_gpio-v-Xverbose	+ioctl.test -v -Xverbose
+ioctl_gpio-success	+ioctl-success.sh -a30
+ioctl_gpio-success-Xabbrev	+ioctl-success.sh -a30 -Xabbrev
+ioctl_gpio-success-Xraw	+ioctl-success.sh -a20 -Xraw
+ioctl_gpio-success-Xverbose	+ioctl-success.sh -a30 -Xverbose
+ioctl_gpio-success-v	+ioctl-success.sh -a30 -v
+ioctl_gpio-success-v-Xabbrev	+ioctl-success.sh -a30 -v -Xabbrev
+ioctl_gpio-success-v-Xraw	+ioctl-success.sh -a20 -v -Xraw
+ioctl_gpio-success-v-Xverbose	+ioctl-success.sh -a30 -v -Xverbose
 ioctl_hdio	+ioctl.test -a27
 ioctl_hdio-Xabbrev	+ioctl.test -a27 -Xabbrev
 ioctl_hdio-Xraw	+ioctl.test -a20 -Xraw
