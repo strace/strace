@@ -9,6 +9,7 @@
 
 #include "tests.h"
 #include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,8 @@
 # include "xlat/gpio_handle_flags.h"
 # include "xlat/gpio_ioctl_cmds.h"
 # include "xlat/gpio_line_flags.h"
+# include "xlat/gpio_v2_line_attr_ids.h"
+# include "xlat/gpio_v2_line_flags.h"
 #undef XLAT_MACROS_ONLY
 
 #ifdef HAVE_STRUCT_GPIOCHIP_INFO
@@ -45,16 +48,43 @@
 # define struct_gpiohandle_config struct gpiohandle_config
 #endif
 
+#ifdef HAVE_STRUCT_GPIO_V2_LINE_VALUES
+# define struct_gpio_v2_line_values struct gpio_v2_line_values
+#endif
+
+#ifdef HAVE_STRUCT_GPIO_V2_LINE_ATTRIBUTE
+# define struct_gpio_v2_line_attribute struct gpio_v2_line_attribute
+#endif
+
+#ifdef HAVE_STRUCT_GPIO_V2_LINE_CONFIG_ATTRIBUTE
+# define struct_gpio_v2_line_config_attribute struct gpio_v2_line_config_attribute
+#endif
+
+#ifdef HAVE_STRUCT_GPIO_V2_LINE_CONFIG
+# define struct_gpio_v2_line_config struct gpio_v2_line_config
+#endif
+
+#ifdef HAVE_STRUCT_GPIO_V2_LINE_REQUEST
+# define struct_gpio_v2_line_request struct gpio_v2_line_request
+#endif
+
+#ifdef HAVE_STRUCT_GPIO_V2_LINE_INFO
+# define struct_gpio_v2_line_info struct gpio_v2_line_info
+#endif
+
 # define str_event_flags	XLAT_KNOWN(0x3, "GPIOEVENT_REQUEST_BOTH_EDGES")
 # define str_handle_flags	XLAT_KNOWN(0x14, \
 	"GPIOHANDLE_REQUEST_ACTIVE_LOW|GPIOHANDLE_REQUEST_OPEN_SOURCE")
 # define str_info_flags		XLAT_KNOWN(0xc, \
 	"GPIOLINE_FLAG_ACTIVE_LOW|GPIOLINE_FLAG_OPEN_DRAIN")
+# define str_line_flags		XLAT_KNOWN(0x102, \
+	"GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP")
 
 #define UNK_GPIO_FLAG 0x8000
 
 # define str_handle_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIOHANDLE_REQUEST_???")
 # define str_info_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIOLINE_FLAG_???")
+# define str_line_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIO_V2_LINE_FLAG_???")
 
 #if VERBOSE
 # define str_line_seq		"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, " \
@@ -361,6 +391,339 @@ test_print_gpiohandle_set_config(void)
 	       XLAT_STR(GPIOHANDLE_SET_CONFIG_IOCTL), errstr);
 }
 
+static void
+print_gpio_v2_line_attr(struct_gpio_v2_line_attribute *attr)
+{
+	printf("{");
+	switch (attr->id) {
+	case GPIO_V2_LINE_ATTR_ID_FLAGS:
+		printf("flags=%#" PRIx64 NRAW(" /* GPIO_V2_LINE_FLAG_??? */"),
+		       (uint64_t) attr->flags);
+		break;
+	case GPIO_V2_LINE_ATTR_ID_OUTPUT_VALUES:
+		printf("values=%#" PRIx64, (uint64_t) attr->values);
+		break;
+	case GPIO_V2_LINE_ATTR_ID_DEBOUNCE:
+		printf("debounce_period_us=%u", attr->debounce_period_us);
+		break;
+	default:
+		printf("id=%u, data=%#" PRIx64, attr->id, (uint64_t) attr->values);
+		break;
+	}
+	printf("}");
+}
+
+static void
+test_print_gpio_v2_line_info(void)
+{
+	long rc;
+
+	do_ioctl(GPIO_V2_GET_LINEINFO_IOCTL, 0);
+	printf("ioctl(-1, %s, NULL) = %s\n",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL), errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_info, p_lineinfo);
+
+	strcpy(p_lineinfo->name, "line name");
+	strcpy(p_lineinfo->consumer, "line consumer");
+	p_lineinfo->offset = 0x32;
+	p_lineinfo->num_attrs = 0;
+	p_lineinfo->flags = GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP;
+	memset(p_lineinfo->padding, 0, sizeof(p_lineinfo->padding));
+
+	do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, (char *) p_lineinfo + 1);
+	printf("ioctl(-1, %s, %p) = %s\n",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL), (char *) p_lineinfo + 1, errstr);
+
+	/* GPIO_V2_GET_LINEINFO_IOCTL */
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=50}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL));
+	if (rc >= 0)
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		       str_line_flags ", num_attrs=0}");
+	printf(") = %s\n", errstr);
+
+	/* GPIO_V2_GET_LINEINFO_WATCH_IOCTL */
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_WATCH_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=50}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_WATCH_IOCTL));
+	if (rc >= 0)
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		       str_line_flags ", num_attrs=0}");
+	printf(") = %s\n", errstr);
+
+	/* unknown flag */
+	p_lineinfo->offset = 0x35;
+	p_lineinfo->flags = UNK_GPIO_FLAG;
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=53}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL));
+	if (rc >= 0)
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		       str_line_unk_flag ", num_attrs=0}");
+	printf(") = %s\n", errstr);
+	p_lineinfo->flags = GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP;
+
+	/* with non-zero padding */
+	p_lineinfo->offset = 0x36;
+	p_lineinfo->padding[2] = 0xdeadd0d0;
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=54}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL));
+	if (rc >= 0)
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		       str_line_flags ", num_attrs=0, padding=[0, 0, 0xdeadd0d0, 0]}");
+	printf(") = %s\n", errstr);
+	memset(p_lineinfo->padding, 0, sizeof(p_lineinfo->padding));
+
+	/* num_attrs = 1 */
+	p_lineinfo->offset = 0x37;
+	memset(p_lineinfo->attrs, 0, sizeof(p_lineinfo->attrs));
+	p_lineinfo->num_attrs = 1;
+	p_lineinfo->attrs[0].id = GPIO_V2_LINE_ATTR_ID_DEBOUNCE;
+	p_lineinfo->attrs[0].debounce_period_us = 0xdeadbeef;
+
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=55}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL));
+	if (rc >= 0)
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		       str_line_flags ", num_attrs=1, attrs=[{debounce_period_us=3735928559}]}");
+	printf(") = %s\n", errstr);
+
+	/* num_attrs = 1 with non-zero padding */
+	p_lineinfo->offset = 0x38;
+	memset(p_lineinfo->attrs, 0, sizeof(p_lineinfo->attrs));
+	p_lineinfo->num_attrs = 1;
+	p_lineinfo->attrs[0].id = GPIO_V2_LINE_ATTR_ID_OUTPUT_VALUES;
+	p_lineinfo->attrs[0].values = 0xdeadbeefba11c0da;
+	p_lineinfo->attrs[0].padding = 0xfeedface;
+
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=56}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL));
+	if (rc >= 0)
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		       str_line_flags ", num_attrs=1, "
+		       "attrs=[{id=2, padding=0xfeedface, data=0xdeadbeefba11c0da}]}");
+	printf(") = %s\n", errstr);
+
+	/* num_attrs > GPIO_V2_LINE_NUM_ATTRS_MAX */
+	memset(p_lineinfo->attrs, 0, sizeof(p_lineinfo->attrs));
+	p_lineinfo->num_attrs = GPIO_V2_LINE_NUM_ATTRS_MAX;
+	for (int i = 0; i < GPIO_V2_LINE_NUM_ATTRS_MAX; i++) {
+		p_lineinfo->attrs[i].id = i + 1;
+		p_lineinfo->attrs[i].flags = 0xafeddeadd0d00000 + i;
+	}
+	p_lineinfo->offset = 0x39;
+	p_lineinfo->num_attrs = GPIO_V2_LINE_NUM_ATTRS_MAX + 1;
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINEINFO_IOCTL, p_lineinfo);
+	printf("ioctl(-1, %s, {offset=57}",
+	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL));
+	if (rc >= 0) {
+		printf(" => {name=\"line name\", consumer=\"line consumer\", flags="
+		      str_line_flags ", num_attrs=11, attrs=[");
+		for (int i = 0; i < GPIO_V2_LINE_NUM_ATTRS_MAX; i++) {
+			print_gpio_v2_line_attr(&p_lineinfo->attrs[i]);
+			if (i != GPIO_V2_LINE_NUM_ATTRS_MAX-1)
+				printf(", ");
+		}
+		printf("]}");
+	}
+	printf(") = %s\n", errstr);
+}
+
+static void
+test_print_gpio_v2_line_request(void)
+{
+	long rc;
+
+	do_ioctl(GPIO_V2_GET_LINE_IOCTL, 0);
+	printf("ioctl(-1, %s, NULL) = %s\n",
+	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL), errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_request, p_line_request);
+
+	p_line_request->offsets[0] = 0x12;
+	p_line_request->offsets[1] = 0x23;
+	p_line_request->offsets[2] = 0x34;
+	p_line_request->offsets[3] = 0x45;
+	strcpy(p_line_request->consumer, "line consumer");
+	memset(&p_line_request->config, 0, sizeof(p_line_request->config));
+	p_line_request->num_lines = 4;
+	p_line_request->event_buffer_size = 0;
+	memset(p_line_request->padding, 0, sizeof(p_line_request->padding));
+	p_line_request->fd = 0x64;
+
+	do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, (char *) p_line_request + 1);
+	printf("ioctl(-1, %s, %p) = %s\n",
+	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL), (char *) p_line_request + 1, errstr);
+
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
+	printf("ioctl(-1, %s, {num_lines=4, offsets=[18, 35, 52, 69], "
+	       "config={flags=0, num_attrs=0}, consumer=\"line consumer\"}",
+	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
+	if (rc >= 0)
+		printf(" => {fd=100}");
+	printf(") = %s\n", errstr);
+
+	/* with event_buffer_size */
+	p_line_request->event_buffer_size = 0xdeafdace;
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
+	printf("ioctl(-1, %s, {num_lines=4, offsets=[18, 35, 52, 69], "
+	       "config={flags=0, num_attrs=0}, consumer=\"line consumer\", "
+	       "event_buffer_size=3736066766}",
+	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
+	if (rc >= 0)
+		printf(" => {fd=100}");
+	printf(") = %s\n", errstr);
+	p_line_request->event_buffer_size = 0;
+
+	/* with non-zero-padding */
+	p_line_request->padding[1] = 0xfeedface;
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
+	printf("ioctl(-1, %s, {num_lines=4, offsets=[18, 35, 52, 69], "
+	       "config={flags=0, num_attrs=0}, consumer=\"line consumer\", "
+	       "padding=[0, 0xfeedface, 0, 0, 0]}",
+	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
+	if (rc >= 0)
+		printf(" => {fd=100}");
+	printf(") = %s\n", errstr);
+	p_line_request->padding[1] = 0;
+
+	/* num_lines > GPIO_V2_LINES_MAX */
+	p_line_request->num_lines = GPIO_V2_LINES_MAX + 1;
+	for (int i = 0; i < GPIO_V2_LINES_MAX; i++)
+		p_line_request->offsets[i] = i + 1;
+	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
+	printf("ioctl(-1, %s, {num_lines=65, offsets=" str_line_seq
+	       ", config={flags=0, num_attrs=0}, consumer=\"line consumer\"}",
+	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
+	if (rc >= 0)
+		printf(" => {fd=100}");
+	printf(") = %s\n", errstr);
+}
+
+static void
+test_print_gpio_v2_line_get_values(void)
+{
+	long rc;
+
+	do_ioctl(GPIO_V2_LINE_GET_VALUES_IOCTL, 0);
+	printf("ioctl(-1, %s, NULL) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_GET_VALUES_IOCTL), errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_values, p_line_values);
+
+	p_line_values->bits = 0xcacafeedfacecafe;
+	p_line_values->mask = 0xfadebeaddeedbabe;
+
+	do_ioctl_ptr(GPIO_V2_LINE_GET_VALUES_IOCTL, (char *) p_line_values + 1);
+	printf("ioctl(-1, %s, %p) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_GET_VALUES_IOCTL), (char *) p_line_values + 1, errstr);
+
+	rc = do_ioctl_ptr(GPIO_V2_LINE_GET_VALUES_IOCTL, p_line_values);
+	printf("ioctl(-1, %s, {mask=0xfadebeaddeedbabe}",
+	       XLAT_STR(GPIO_V2_LINE_GET_VALUES_IOCTL));
+	if (rc >= 0)
+		printf(" => {bits=0xcacafeedfacecafe}");
+	printf(") = %s\n", errstr);
+}
+
+static void
+test_print_gpio_v2_line_set_values(void)
+{
+	do_ioctl(GPIO_V2_LINE_SET_VALUES_IOCTL, 0);
+	printf("ioctl(-1, %s, NULL) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_VALUES_IOCTL), errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_values, p_line_values);
+
+	p_line_values->bits = 0xcacafeedfacecafe;
+	p_line_values->mask = 0xfadebeaddeedbabe;
+
+	do_ioctl_ptr(GPIO_V2_LINE_SET_VALUES_IOCTL, (char *) p_line_values + 1);
+	printf("ioctl(-1, %s, %p) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_VALUES_IOCTL), (char *) p_line_values + 1, errstr);
+
+	do_ioctl_ptr(GPIO_V2_LINE_SET_VALUES_IOCTL, p_line_values);
+	printf("ioctl(-1, %s, {bits=0xcacafeedfacecafe, mask=0xfadebeaddeedbabe}) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_VALUES_IOCTL),
+	       errstr);
+}
+
+static void
+test_print_gpio_v2_line_set_config(void)
+{
+	do_ioctl(GPIO_V2_LINE_SET_CONFIG_IOCTL, 0);
+	printf("ioctl(-1, %s, NULL) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), errstr);
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_config, p_line_config);
+
+	p_line_config->flags = GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP;
+	p_line_config->num_attrs = 0;
+	memset(p_line_config->attrs, 0, sizeof(p_line_config->attrs));
+	memset(p_line_config->padding, 0, sizeof(p_line_config->padding));
+
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, (char *) p_line_config + 1);
+	printf("ioctl(-1, %s, %p) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), (char *) p_line_config + 1, errstr);
+
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, p_line_config);
+	printf("ioctl(-1, %s, {flags=" str_line_flags ", num_attrs=0}) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), errstr);
+
+	/* unknown flag */
+	p_line_config->flags = UNK_GPIO_FLAG;
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, p_line_config);
+	printf("ioctl(-1, %s, {flags=" str_line_unk_flag
+	       ", num_attrs=0}) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), errstr);
+	p_line_config->flags = GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP;
+
+	/* with non-zero-padding */
+	p_line_config->padding[1] = 0xfeedface;
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, p_line_config);
+	printf("ioctl(-1, %s, {flags=" str_line_flags
+	       ", num_attrs=0, padding=[0, 0xfeedface, 0, 0, 0]}) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), errstr);
+	p_line_config->padding[1] = 0;
+
+	/* num_attrs > GPIO_V2_LINE_NUM_ATTRS_MAX */
+	for (int i = 0; i < GPIO_V2_LINE_NUM_ATTRS_MAX; i++) {
+		p_line_config->attrs[i].mask = 2 * i + 1;
+		p_line_config->attrs[i].attr.id = GPIO_V2_LINE_ATTR_ID_FLAGS;
+		p_line_config->attrs[i].attr.flags =
+			GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP;
+	}
+	p_line_config->num_attrs = GPIO_V2_LINE_NUM_ATTRS_MAX + 1;
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, p_line_config);
+	printf("ioctl(-1, %s, {flags=" str_line_flags ", num_attrs=11, attrs=[",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL));
+	for (int i = 0; i < GPIO_V2_LINE_NUM_ATTRS_MAX - 1; i++)
+		printf("{flags=" str_line_flags ", mask=0x%x}, ", 2 * i + 1);
+	printf("{flags=" str_line_flags ", mask=0x13}]}) = %s\n", errstr);
+
+	/* num_attrs = 1 */
+	p_line_config->num_attrs = 1;
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, p_line_config);
+	printf("ioctl(-1, %s, {flags=" str_line_flags ", num_attrs=1, attrs=[{flags="
+	       str_line_flags ", mask=0x1}]}) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), errstr);
+
+	/* num_attrs = 1 with non-zero padding*/
+	p_line_config->attrs[0].attr.padding = 0xfeedface;
+	p_line_config->attrs[0].attr.values = 0xdeadbeefba11c0da;
+	do_ioctl_ptr(GPIO_V2_LINE_SET_CONFIG_IOCTL, p_line_config);
+	printf("ioctl(-1, %s, {flags=" str_line_flags ", num_attrs=1, attrs=["
+		"{attr={id=%u, padding=0xfeedface, data=0xdeadbeefba11c0da}, "
+	       "mask=0x1}]}) = %s\n",
+	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL),
+	       GPIO_V2_LINE_ATTR_ID_FLAGS, errstr);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -412,6 +775,13 @@ main(int argc, char *argv[])
 	test_print_gpiohandle_get_values();
 	test_print_gpiohandle_set_values();
 	test_print_gpiohandle_set_config();
+
+	/* GPIO v2 ioctls */
+	test_print_gpio_v2_line_info();
+	test_print_gpio_v2_line_request();
+	test_print_gpio_v2_line_get_values();
+	test_print_gpio_v2_line_set_values();
+	test_print_gpio_v2_line_set_config();
 
 	puts("+++ exited with 0 +++");
 	return 0;
