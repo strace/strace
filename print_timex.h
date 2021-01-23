@@ -11,6 +11,14 @@
 
 #include "print_fields.h"
 
+static void
+PRINT_TIMEX_TIME(const typeof_field(TIMEX_T, time) *const p)
+{
+	PRINT_FIELD_D("{", *p, tv_sec);
+	PRINT_FIELD_U(", ", *p, tv_usec);
+	tprints("}");
+}
+
 int
 PRINT_TIMEX(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -28,9 +36,8 @@ PRINT_TIMEX(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_D(", ", tx, constant);
 	PRINT_FIELD_D(", ", tx, precision);
 	PRINT_FIELD_D(", ", tx, tolerance);
-	PRINT_FIELD_D(", time={", tx.time, tv_sec);
-	PRINT_FIELD_U(", ", tx.time, tv_usec);
-	PRINT_FIELD_D("}, ", tx, tick);
+	PRINT_FIELD_OBJ_PTR(", ", tx, time, PRINT_TIMEX_TIME);
+	PRINT_FIELD_D(", ", tx, tick);
 	PRINT_FIELD_D(", ", tx, ppsfreq);
 	PRINT_FIELD_D(", ", tx, jitter);
 	PRINT_FIELD_D(", ", tx, shift);
