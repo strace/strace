@@ -1232,6 +1232,7 @@ DECL_IOCTL(evdev);
 DECL_IOCTL(fs_0x94);
 DECL_IOCTL(fs_f);
 DECL_IOCTL(fs_x);
+DECL_IOCTL(gpio);
 DECL_IOCTL(inotify);
 DECL_IOCTL(kvm);
 DECL_IOCTL(nbd);

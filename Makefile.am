@@ -143,6 +143,7 @@ libstrace_a_SOURCES =	\
 	getpagesize.c \
 	getpid.c	\
 	getrandom.c	\
+	gpio_ioctl.c	\
 	hdio.c		\
 	hostname.c	\
 	inotify.c	\

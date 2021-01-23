@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented decoding of GPIO_* ioctl commands.
   * Implemented decoding of FS_IOC_FS[GS]ETXATTR, FS_IOC_[GS]ETFLAGS,
     and FS_IOC32_[GS]ETFLAGS ioctl commands.
   * Implemented decoding of SIOCADDMULTI, SIOCDELMULTI, SIOCGIFENCAP,
