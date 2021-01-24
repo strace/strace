@@ -236,71 +236,42 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_FLAGS(", ", *attr, read_format, perf_event_read_format,
 			  "PERF_FORMAT_???");
 
-	tprintf(", disabled=%u"
-		", inherit=%u"
-		", pinned=%u"
-		", exclusive=%u"
-		", exclude_user=%u"
-		", exclude_kernel=%u"
-		", exclude_hv=%u"
-		", exclude_idle=%u"
-		", mmap=%u"
-		", comm=%u"
-		", freq=%u"
-		", inherit_stat=%u"
-		", enable_on_exec=%u"
-		", task=%u"
-		", watermark=%u"
-		", precise_ip=%u",
-		attr->disabled,
-		attr->inherit,
-		attr->pinned,
-		attr->exclusive,
-		attr->exclude_user,
-		attr->exclude_kernel,
-		attr->exclude_hv,
-		attr->exclude_idle,
-		attr->mmap,
-		attr->comm,
-		attr->freq,
-		attr->inherit_stat,
-		attr->enable_on_exec,
-		attr->task,
-		attr->watermark,
-		attr->precise_ip);
+	PRINT_FIELD_U_CAST(", ", *attr, disabled, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, inherit, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, pinned, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclusive, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_user, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_kernel, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_hv, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_idle, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, mmap, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, comm, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, freq, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, inherit_stat, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, enable_on_exec, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, task, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, watermark, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, precise_ip, unsigned int);
 	tprints_comment(precise_ip_desc[attr->precise_ip]);
-	tprintf(", mmap_data=%u"
-		", sample_id_all=%u"
-		", exclude_host=%u"
-		", exclude_guest=%u"
-		", exclude_callchain_kernel=%u"
-		", exclude_callchain_user=%u"
-		", mmap2=%u"
-		", comm_exec=%u"
-		", use_clockid=%u"
-		", context_switch=%u"
-		", write_backward=%u"
-		", namespaces=%u",
-		attr->mmap_data,
-		attr->sample_id_all,
-		attr->exclude_host,
-		attr->exclude_guest,
-		attr->exclude_callchain_kernel,
-		attr->exclude_callchain_user,
-		attr->mmap2,
-		attr->comm_exec,
-		attr->use_clockid,
-		attr->context_switch,
-		attr->write_backward,
-		attr->namespaces);
+	PRINT_FIELD_U_CAST(", ", *attr, mmap_data, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, sample_id_all, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_host, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_guest, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_callchain_kernel, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, exclude_callchain_user, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, mmap2, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, comm_exec, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, use_clockid, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, context_switch, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, write_backward, unsigned int);
+	PRINT_FIELD_U_CAST(", ", *attr, namespaces, unsigned int);
 
 	/*
 	 * Print it only in case it is non-zero, since it may contain flags we
 	 * are not aware about.
 	 */
 	if (attr->__reserved_1) {
-		tprintf(", __reserved_1=%#" PRIx64,
-			(uint64_t) attr->__reserved_1);
+		PRINT_FIELD_X_CAST(", ", *attr, __reserved_1, uint64_t);
 		tprints_comment("Bits 63..29");
 	}
 
