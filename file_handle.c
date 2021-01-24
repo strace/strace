@@ -7,6 +7,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #include "xlat/name_to_handle_at_flags.h"
 
@@ -47,7 +48,7 @@ SYS_FUNC(name_to_handle_at)
 
 			return RVAL_DECODED;
 		}
-		tprintf("{handle_bytes=%u", h.handle_bytes);
+		PRINT_FIELD_U("{", h, handle_bytes);
 
 		set_tcb_priv_ulong(tcp, h.handle_bytes);
 
@@ -62,7 +63,7 @@ SYS_FUNC(name_to_handle_at)
 			if (i != h.handle_bytes)
 				tprintf(" => %u", h.handle_bytes);
 			if (!syserror(tcp)) {
-				tprintf(", handle_type=%d", h.handle_type);
+				PRINT_FIELD_D(", ", h, handle_type);
 				if (h.handle_bytes > MAX_HANDLE_SZ)
 					h.handle_bytes = MAX_HANDLE_SZ;
 				if (!umoven(tcp, addr + sizeof(h), h.handle_bytes,
@@ -98,8 +99,8 @@ SYS_FUNC(open_by_handle_at)
 	if (!umove_or_printaddr(tcp, addr, &h)) {
 		unsigned char f_handle[MAX_HANDLE_SZ];
 
-		tprintf("{handle_bytes=%u, handle_type=%d",
-			h.handle_bytes, h.handle_type);
+		PRINT_FIELD_U("{", h, handle_bytes);
+		PRINT_FIELD_D(", ", h, handle_type);
 		if (h.handle_bytes > MAX_HANDLE_SZ)
 			h.handle_bytes = MAX_HANDLE_SZ;
 		if (!umoven(tcp, addr + sizeof(h), h.handle_bytes, &f_handle)) {
