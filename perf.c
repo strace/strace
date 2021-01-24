@@ -240,7 +240,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		", inherit=%u"
 		", pinned=%u"
 		", exclusive=%u"
-		", exclusive_user=%u"
+		", exclude_user=%u"
 		", exclude_kernel=%u"
 		", exclude_hv=%u"
 		", exclude_idle=%u"

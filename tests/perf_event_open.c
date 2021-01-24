@@ -206,7 +206,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	       ", inherit=%u"
 	       ", pinned=%u"
 	       ", exclusive=%u"
-	       ", exclusive_user=%u"
+	       ", exclude_user=%u"
 	       ", exclude_kernel=%u"
 	       ", exclude_hv=%u"
 	       ", exclude_idle=%u"
