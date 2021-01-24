@@ -35,6 +35,10 @@
 	STRACE_PRINTF("%s%s=%#llx", (prefix_), #field_,			\
 		      zero_extend_signed_to_ull((where_).field_))
 
+# define PRINT_FIELD_X_CAST(prefix_, where_, field_, type_)		\
+	STRACE_PRINTF("%s%s=%#llx", (prefix_), #field_,			\
+		      zero_extend_signed_to_ull((type_) (where_).field_))
+
 # define PRINT_FIELD_ADDR(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
@@ -398,6 +402,13 @@
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		(print_func_)((where_).field_, ##__VA_ARGS__);		\
+	} while (0)
+
+# define PRINT_FIELD_OBJ_U(prefix_, where_, field_, print_func_, ...)	\
+	do {								\
+		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		(print_func_)(zero_extend_signed_to_ull((where_).field_),\
+			      ##__VA_ARGS__);				\
 	} while (0)
 
 #endif /* !STRACE_PRINT_FIELDS_H */
