@@ -127,8 +127,7 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 		return false;
 	}
 
-	tprints("{code=");
-	print_bpf_filter_code(insn->code, true);
+	PRINT_FIELD_OBJ_VAL("{", *insn, code, print_bpf_filter_code, true);
 
 	/* We can't use PRINT_FIELD_XVAL on bit fields */
 	tprints(", dst_reg=");
@@ -648,7 +647,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	if (len <= offsetof(struct bpf_prog_info_struct, ifindex))
 		goto print_bpf_prog_info_end;
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
-	tprintf(", gpl_compatible=%u", info.gpl_compatible);
+	PRINT_FIELD_U_CAST(", ", info, gpl_compatible, unsigned int);
 	PRINT_FIELD_DEV(", ", info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
