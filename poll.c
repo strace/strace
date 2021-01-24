@@ -10,6 +10,7 @@
 #include "defs.h"
 #include <poll.h>
 #include "xstring.h"
+#include "print_fields.h"
 
 #include "xlat/pollflags.h"
 
@@ -18,11 +19,9 @@ print_pollfd(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct pollfd *fds = elem_buf;
 
-	tprints("{fd=");
-	printfd(tcp, fds->fd);
+	PRINT_FIELD_FD("{", *fds, fd, tcp);
 	if (fds->fd >= 0) {
-		tprints(", events=");
-		printflags(pollflags, (unsigned short) fds->events, "POLL???");
+		PRINT_FIELD_FLAGS(", ", *fds, events, pollflags, "POLL???");
 	}
 	tprints("}");
 
