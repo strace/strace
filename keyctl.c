@@ -233,12 +233,9 @@ print_dh_params(struct tcb *tcp, kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &params))
 		return;
 
-	tprints("{private=");
-	print_keyring_serial_number(params.private);
-	tprints(", prime=");
-	print_keyring_serial_number(params.prime);
-	tprints(", base=");
-	print_keyring_serial_number(params.base);
+	PRINT_FIELD_OBJ_VAL("{", params, private, print_keyring_serial_number);
+	PRINT_FIELD_OBJ_VAL(", ", params, prime, print_keyring_serial_number);
+	PRINT_FIELD_OBJ_VAL(", ", params, base, print_keyring_serial_number);
 	tprints("}");
 }
 
@@ -339,9 +336,7 @@ fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, params))
 		return false;
 
-	tprints("{key_id=");
-	print_keyring_serial_number(params->key_id);
-
+	PRINT_FIELD_OBJ_VAL("{", *params, key_id, print_keyring_serial_number);
 	PRINT_FIELD_U(", ", *params, in_len);
 
 	if (out)
