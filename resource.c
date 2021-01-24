@@ -13,6 +13,7 @@
 #include <sys/resource.h>
 
 #include "xstring.h"
+#include "print_fields.h"
 
 #include "xlat/resources.h"
 
@@ -48,10 +49,8 @@ print_rlimit64(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		tprints("{rlim_cur=");
-		print_rlim64_t(rlim.rlim_cur);
-		tprints(", rlim_max=");
-		print_rlim64_t(rlim.rlim_max);
+		PRINT_FIELD_OBJ_VAL("{", rlim, rlim_cur, print_rlim64_t);
+		PRINT_FIELD_OBJ_VAL(", ", rlim, rlim_max, print_rlim64_t);
 		tprints("}");
 	}
 }
@@ -90,10 +89,8 @@ print_rlimit32(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		tprints("{rlim_cur=");
-		print_rlim32_t(rlim.rlim_cur);
-		tprints(", rlim_max=");
-		print_rlim32_t(rlim.rlim_max);
+		PRINT_FIELD_OBJ_VAL("{", rlim, rlim_cur, print_rlim32_t);
+		PRINT_FIELD_OBJ_VAL(", ", rlim, rlim_max, print_rlim32_t);
 		tprints("}");
 	}
 }
