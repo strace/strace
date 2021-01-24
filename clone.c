@@ -185,11 +185,10 @@ SYS_FUNC(clone3)
 		if (arg.flags & CLONE_PARENT_SETTID)
 			PRINT_FIELD_ADDR64(", ", arg, parent_tid);
 
-		tprints(", exit_signal=");
 		if (arg.exit_signal < INT_MAX)
-			printsignal(arg.exit_signal);
+			PRINT_FIELD_OBJ_VAL(", ", arg, exit_signal, printsignal);
 		else
-			tprintf("%" PRIu64, arg.exit_signal);
+			PRINT_FIELD_U(", ", arg, exit_signal);
 
 		PRINT_FIELD_ADDR64(", ", arg, stack);
 		PRINT_FIELD_X(", ", arg, stack_size);
