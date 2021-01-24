@@ -443,9 +443,8 @@ print_nlmsghdr(struct tcb *tcp,
 	tprints(", nlmsg_type=");
 	decode_nlmsg_type(tcp, nlmsghdr->nlmsg_type, family);
 
-	tprints(", nlmsg_flags=");
-	decode_nlmsg_flags(nlmsghdr->nlmsg_flags,
-			   nlmsghdr->nlmsg_type, family);
+	PRINT_FIELD_OBJ_VAL(", ", *nlmsghdr, nlmsg_flags, decode_nlmsg_flags,
+			    nlmsghdr->nlmsg_type, family);
 
 	PRINT_FIELD_U(", ", *nlmsghdr, nlmsg_seq);
 
