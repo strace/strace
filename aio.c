@@ -19,12 +19,6 @@
 # include "xlat/aio_iocb_flags.h"
 #endif
 
-#ifdef HAVE_STRUCT_IOCB_AIO_RW_FLAGS
-# define AIO_RW_FLAGS_FIELD aio_rw_flags
-#else
-# define AIO_RW_FLAGS_FIELD aio_reserved1
-#endif
-
 SYS_FUNC(io_setup)
 {
 	if (entering(tcp))
@@ -99,17 +93,18 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 	if (cb->aio_key)
 		PRINT_FIELD_U(", ", *cb, aio_key);
 
-	if (cb->AIO_RW_FLAGS_FIELD) {
-		tprints(", aio_rw_flags=");
-		printflags(rwf_flags, cb->AIO_RW_FLAGS_FIELD, "RWF_???");
+#ifndef HAVE_STRUCT_IOCB_AIO_RW_FLAGS
+# define aio_rw_flags aio_reserved1
+#endif
+	if (cb->aio_rw_flags) {
+		PRINT_FIELD_FLAGS(", ", *cb, aio_rw_flags, rwf_flags, "RWF_???");
 	}
 
 	tprints(", aio_lio_opcode=");
 	sub = tprint_lio_opcode(cb->aio_lio_opcode);
 
 	if (cb->aio_flags & IOCB_FLAG_IOPRIO) {
-		tprints(", aio_reqprio=");
-		print_ioprio(zero_extend_signed_to_ull(cb->aio_reqprio));
+		PRINT_FIELD_OBJ_U(", ", *cb, aio_reqprio, print_ioprio);
 	} else if (cb->aio_reqprio) {
 		PRINT_FIELD_D(", ", *cb, aio_reqprio);
 	}
