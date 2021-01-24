@@ -899,9 +899,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (!IS_ARRAY_ZERO(args.reserved))
 				PRINT_FIELD_X_ARRAY(", ", args, reserved);
 
-			tprints(", flags=");
-			printflags64(btrfs_logical_ino_args_flags, args.flags,
-				     "BTRFS_LOGICAL_INO_ARGS_???");
+			PRINT_FIELD_FLAGS(", ", args, flags,
+					  btrfs_logical_ino_args_flags,
+					  "BTRFS_LOGICAL_INO_ARGS_???");
 			PRINT_FIELD_ADDR64(", ", args, inodes);
 			tprints("}");
 			return 0;
