@@ -218,8 +218,8 @@ sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
 #endif
 }
 
-#define tprint_old_sigmask_val(prefix, mask) \
-	tprints(sprint_old_sigmask_val((prefix), (mask)))
+#define tprint_old_sigmask_val(mask) \
+	tprints(sprint_old_sigmask_val("", (mask)))
 
 void
 printsignal(int nr)
@@ -268,7 +268,7 @@ print_sigset_addr(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(ssetmask)
 {
 	if (entering(tcp)) {
-		tprint_old_sigmask_val("", (unsigned) tcp->u_arg[0]);
+		tprint_old_sigmask_val((unsigned) tcp->u_arg[0]);
 	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprint_old_sigmask_val("old mask ",
 						     (unsigned) tcp->u_rval);
@@ -329,7 +329,7 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints("{sa_handler=");
 	print_sa_handler(sa.sa_handler__);
 	tprints(", sa_mask=");
-	tprint_old_sigmask_val("", sa.sa_mask);
+	tprint_old_sigmask_val(sa.sa_mask);
 	tprints(", sa_flags=");
 	printflags(sigact_flags, sa.sa_flags, "SA_???");
 #if !(defined ALPHA || defined MIPS)
@@ -389,7 +389,7 @@ SYS_FUNC(sigsuspend)
 	print_sigset_addr_len(tcp, tcp->u_arg[n_args(tcp) - 1],
 			      current_wordsize);
 #else
-	tprint_old_sigmask_val("", tcp->u_arg[n_args(tcp) - 1]);
+	tprint_old_sigmask_val(tcp->u_arg[n_args(tcp) - 1]);
 #endif
 
 	return RVAL_DECODED;
