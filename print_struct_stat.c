@@ -14,52 +14,110 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include <sys/stat.h>
 #include "stat.h"
+
+/*
+ * This series of #undef/#define was produced by the following script:
+ * sed -n 's/.*[[:space:]]\([[:alpha:]_]\+\);$/\1/p' stat.h |
+ * while read n; do
+ * 	printf '#undef st_%s\n#define st_%s %s\n\n' "$n" "$n" "$n"
+ * done
+ */
+
+#undef st_dev
+#define st_dev dev
+
+#undef st_ino
+#define st_ino ino
+
+#undef st_rdev
+#define st_rdev rdev
+
+#undef st_size
+#define st_size size
+
+#undef st_blocks
+#define st_blocks blocks
+
+#undef st_blksize
+#define st_blksize blksize
+
+#undef st_mode
+#define st_mode mode
+
+#undef st_nlink
+#define st_nlink nlink
+
+#undef st_uid
+#define st_uid uid
+
+#undef st_gid
+#define st_gid gid
+
+#undef st_atime
+#define st_atime atime
+
+#undef st_ctime
+#define st_ctime ctime
+
+#undef st_mtime
+#define st_mtime mtime
+
+#undef st_atime_nsec
+#define st_atime_nsec atime_nsec
+
+#undef st_ctime_nsec
+#define st_ctime_nsec ctime_nsec
+
+#undef st_mtime_nsec
+#define st_mtime_nsec mtime_nsec
 
 void
 print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 {
 	tprints("{");
 	if (!abbrev(tcp)) {
-		tprints("st_dev=");
-		print_dev_t(st->dev);
-		tprintf(", st_ino=%llu, st_mode=", st->ino);
-		print_symbolic_mode_t(st->mode);
-		tprintf(", st_nlink=%llu, st_uid=%llu, st_gid=%llu",
-			st->nlink, st->uid, st->gid);
-		tprintf(", st_blksize=%llu", st->blksize);
-		tprintf(", st_blocks=%llu", st->blocks);
+		PRINT_FIELD_DEV("", *st, st_dev);
+		PRINT_FIELD_U(", ", *st, st_ino);
+		PRINT_FIELD_OBJ_VAL(", ", *st, st_mode, print_symbolic_mode_t);
+		PRINT_FIELD_U(", ", *st, st_nlink);
+		PRINT_FIELD_U(", ", *st, st_uid);
+		PRINT_FIELD_U(", ", *st, st_gid);
+		PRINT_FIELD_U(", ", *st, st_blksize);
+		PRINT_FIELD_U(", ", *st, st_blocks);
 	} else {
-		tprints("st_mode=");
-		print_symbolic_mode_t(st->mode);
+		PRINT_FIELD_OBJ_VAL("", *st, st_mode, print_symbolic_mode_t);
 	}
 
-	switch (st->mode & S_IFMT) {
+	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-		tprints(", st_rdev=");
-		print_dev_t(st->rdev);
+		PRINT_FIELD_DEV(", ", *st, st_rdev);
 		break;
 	default:
-		tprintf(", st_size=%llu", st->size);
+		PRINT_FIELD_U(", ", *st, st_size);
 		break;
 	}
 
 	if (!abbrev(tcp)) {
-#define PRINT_ST_TIME(field)						\
-	do {								\
-		tprintf(", st_" #field "=%lld", (long long) st->field);	\
-		tprints_comment(sprinttime_nsec(st->field,		\
-			zero_extend_signed_to_ull(st->field ## _nsec)));\
-		if (st->has_nsec)					\
-			tprintf(", st_" #field "_nsec=%llu",		\
-				zero_extend_signed_to_ull(		\
-					st->field ## _nsec));		\
-	} while (0)
+		PRINT_FIELD_D(", ", *st, st_atime);
+		tprints_comment(sprinttime_nsec(st->st_atime,
+						st->st_atime_nsec));
+		if (st->has_nsec)
+			PRINT_FIELD_U(", ", *st, st_atime_nsec);
 
-		PRINT_ST_TIME(atime);
-		PRINT_ST_TIME(mtime);
-		PRINT_ST_TIME(ctime);
+		PRINT_FIELD_D(", ", *st, st_mtime);
+		tprints_comment(sprinttime_nsec(st->st_mtime,
+						st->st_mtime_nsec));
+		if (st->has_nsec)
+			PRINT_FIELD_U(", ", *st, st_mtime_nsec);
+
+		PRINT_FIELD_D(", ", *st, st_ctime);
+		tprints_comment(sprinttime_nsec(st->st_ctime,
+						st->st_ctime_nsec));
+		if (st->has_nsec)
+			PRINT_FIELD_U(", ", *st, st_ctime_nsec);
 	} else {
 		tprints(", ...");
 	}
