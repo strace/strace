@@ -44,9 +44,9 @@ print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
 	}
 	--c->count;
 
-	tprints("{msg_hdr=");
-	print_struct_msghdr(tcp, &mmsg->msg_hdr, c->p_user_msg_namelen,
-			    c->use_msg_len ? mmsg->msg_len : (kernel_ulong_t) -1);
+	PRINT_FIELD_OBJ_TCB_PTR("{", *mmsg, msg_hdr, tcp, print_struct_msghdr,
+			c->p_user_msg_namelen,
+			c->use_msg_len ? mmsg->msg_len : (kernel_ulong_t) -1);
 	if (c->msg_len_vlen) {
 		PRINT_FIELD_U(", ", *mmsg, msg_len);
 		--c->msg_len_vlen;
