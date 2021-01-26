@@ -38,12 +38,6 @@ tprintf_uffdio_range(const struct uffdio_range *range)
 	tprints("}");
 }
 
-# define PRINT_FIELD_UFFDIO_RANGE(prefix_, where_, field_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		tprintf_uffdio_range(&(where_).field_);			\
-	} while (0)
-
 int
 uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 	     const kernel_ulong_t arg)
@@ -119,7 +113,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ur))
 				return RVAL_IOCTL_DECODED;
-			PRINT_FIELD_UFFDIO_RANGE("{", ur, range);
+			PRINT_FIELD_OBJ_PTR("{", ur, range,
+					    tprintf_uffdio_range);
 			PRINT_FIELD_FLAGS(", ", ur, mode,
 					  uffd_register_mode_flags,
 					  "UFFDIO_REGISTER_MODE_???");
@@ -157,7 +152,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uz))
 				return RVAL_IOCTL_DECODED;
-			PRINT_FIELD_UFFDIO_RANGE("{", uz, range);
+			PRINT_FIELD_OBJ_PTR("{", uz, range,
+					    tprintf_uffdio_range);
 			PRINT_FIELD_FLAGS(", ", uz, mode, uffd_zeropage_flags,
 					  "UFFDIO_ZEROPAGE_???");
 
