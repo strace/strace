@@ -285,8 +285,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	PRINT_FIELD_XVAL("{", attr, prog_type, bpf_prog_types,
 			 "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
-	tprints(", insns=");
-	print_ebpf_prog(tcp, attr.insns, attr.insn_cnt);
+	PRINT_FIELD_OBJ_TCB_VAL(", ", attr, insns, tcp,
+				print_ebpf_prog, attr.insn_cnt);
 
 	tprints(", license=");
 	print_big_u64_addr(attr.license);
@@ -612,9 +612,9 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		tprintf("%" PRIu32 " => ", saved->xlated_prog_len);
 	tprintf("%" PRIu32, info.xlated_prog_len);
 
-	tprints(", xlated_prog_insns=");
-	print_ebpf_prog(tcp, info.xlated_prog_insns,
-			MIN(saved->xlated_prog_len, info.xlated_prog_len) / 8);
+	PRINT_FIELD_OBJ_TCB_VAL(", ", info, xlated_prog_insns,
+				tcp, print_ebpf_prog,
+				MIN(saved->xlated_prog_len, info.xlated_prog_len) / 8);
 
 	/*
 	 * load_time, created_by_uid, nr_map_ids, map_ids, and name fields
