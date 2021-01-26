@@ -380,7 +380,7 @@
 			print_func_(prefix_, where_, field_,		\
 					##__VA_ARGS__);			\
 		} else if (len_ > start) {				\
-			tprintf("%s%s=", prefix_, #field_);		\
+			STRACE_PRINTF("%s%s=", prefix_, #field_);	\
 			print_quoted_string((void *)&where_.field_,	\
 					len_ - start, QUOTE_FORCE_HEX);	\
 		}							\
