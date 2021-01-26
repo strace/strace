@@ -17,6 +17,7 @@ typedef kernel_old_timeval_t timeval_t;
 #include MPERS_DEFS
 
 #include "xstring.h"
+#include "print_fields.h"
 
 static const char timeval_fmt[]  = "{tv_sec=%lld, tv_usec=%llu}";
 
@@ -27,12 +28,15 @@ print_timeval_t(const timeval_t *t)
 		zero_extend_signed_to_ull(t->tv_usec));
 }
 
-static void
-print_timeval_t_utime(const timeval_t *t)
+static bool
+print_timeval_t_utime(struct tcb *tcp, void *elem_buf, size_t elem_size,
+		      void *data)
 {
+	const timeval_t *const t = elem_buf;
 	print_timeval_t(t);
 	tprints_comment(sprinttime_usec(t->tv_sec,
 		zero_extend_signed_to_ull(t->tv_usec)));
+	return true;
 }
 
 MPERS_PRINTER_DECL(void, print_struct_timeval, const void *arg)
@@ -72,11 +76,7 @@ MPERS_PRINTER_DECL(int, print_timeval_utimes,
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	tprints("[");
-	print_timeval_t_utime(&t[0]);
-	tprints(", ");
-	print_timeval_t_utime(&t[1]);
-	tprints("]");
+	print_local_array(tcp, t, print_timeval_t_utime);
 	return 0;
 }
 
@@ -103,15 +103,13 @@ MPERS_PRINTER_DECL(const char *, sprint_timeval,
 MPERS_PRINTER_DECL(int, print_itimerval,
 		   struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timeval_t t[2];
+	struct { timeval_t it_interval, it_value; } t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	tprints("{it_interval=");
-	print_timeval_t(&t[0]);
-	tprints(", it_value=");
-	print_timeval_t(&t[1]);
+	PRINT_FIELD_OBJ_PTR("{", t, it_interval, print_timeval_t);
+	PRINT_FIELD_OBJ_PTR(", ", t, it_value, print_timeval_t);
 	tprints("}");
 	return 0;
 }
@@ -125,12 +123,15 @@ print_timeval32_t(const timeval32_t *t)
 		zero_extend_signed_to_ull(t->tv_usec));
 }
 
-static void
-print_timeval32_t_utime(const timeval32_t *t)
+static bool
+print_timeval32_t_utime(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			void *data)
 {
+	const timeval32_t *const t = elem_buf;
 	print_timeval32_t(t);
 	tprints_comment(sprinttime_usec(t->tv_sec,
 		zero_extend_signed_to_ull(t->tv_usec)));
+	return true;
 }
 
 int
@@ -153,26 +154,20 @@ print_timeval32_utimes(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	tprints("[");
-	print_timeval32_t_utime(&t[0]);
-	tprints(", ");
-	print_timeval32_t_utime(&t[1]);
-	tprints("]");
+	print_local_array(tcp, t, print_timeval32_t_utime);
 	return 0;
 }
 
 int
 print_itimerval32(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	timeval32_t t[2];
+	struct { timeval32_t it_interval, it_value; } t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	tprints("{it_interval=");
-	print_timeval32_t(&t[0]);
-	tprints(", it_value=");
-	print_timeval32_t(&t[1]);
+	PRINT_FIELD_OBJ_PTR("{", t, it_interval, print_timeval32_t);
+	PRINT_FIELD_OBJ_PTR(", ", t, it_value, print_timeval32_t);
 	tprints("}");
 	return 0;
 }
