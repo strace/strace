@@ -15,6 +15,7 @@
 #include "defs.h"
 #include "nsig.h"
 #include "xstring.h"
+#include "print_fields.h"
 
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */
@@ -218,8 +219,11 @@ sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
 #endif
 }
 
-#define tprint_old_sigmask_val(mask) \
-	tprints(sprint_old_sigmask_val("", (mask)))
+static void
+tprint_old_sigmask_val(const unsigned long mask)
+{
+	tprints(sprint_old_sigmask_val("", mask));
+}
 
 void
 printsignal(int nr)
@@ -328,14 +332,11 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprints("{sa_handler=");
 	print_sa_handler(sa.sa_handler__);
-	tprints(", sa_mask=");
-	tprint_old_sigmask_val(sa.sa_mask);
-	tprints(", sa_flags=");
-	printflags(sigact_flags, sa.sa_flags, "SA_???");
+	PRINT_FIELD_OBJ_VAL(", ", sa, sa_mask, tprint_old_sigmask_val);
+	PRINT_FIELD_FLAGS(", ", sa, sa_flags, sigact_flags, "SA_???");
 #if !(defined ALPHA || defined MIPS)
 	if (sa.sa_flags & 0x04000000U) {
-		tprints(", sa_restorer=");
-		printaddr(sa.sa_restorer);
+		PRINT_FIELD_ADDR(", ", sa, sa_restorer);
 	}
 #endif
 	tprints("}");
@@ -552,7 +553,6 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprints("{sa_handler=");
 	print_sa_handler(sa.sa_handler__);
-	tprints(", sa_mask=");
 	/*
 	 * Sigset size is in tcp->u_arg[4] (SPARC)
 	 * or in tcp->u_arg[3] (all other),
@@ -560,14 +560,12 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * with wrong sigset size (just returns EINVAL instead).
 	 * We just fetch the right size, which is NSIG_BYTES.
 	 */
+	tprints(", sa_mask=");
 	tprintsigmask_val("", sa.sa_mask);
-	tprints(", sa_flags=");
-
-	printflags(sigact_flags, sa.sa_flags, "SA_???");
+	PRINT_FIELD_FLAGS(", ", sa, sa_flags, sigact_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER) {
-		tprints(", sa_restorer=");
-		printaddr(sa.sa_restorer);
+		PRINT_FIELD_ADDR(", ", sa, sa_restorer);
 	}
 #endif
 	tprints("}");
