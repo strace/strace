@@ -45,12 +45,6 @@ print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 	tprints("}");
 }
 
-#define PRINT_FIELD_RTC_TIME(prefix_, where_, field_, tcp_)	\
-	do {							\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
-		print_rtc_time((tcp_), &(where_).field_);	\
-	} while (0)
-
 static void
 decode_rtc_time(struct tcb *const tcp, const kernel_ulong_t addr)
 {
@@ -70,7 +64,7 @@ decode_rtc_wkalrm(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	PRINT_FIELD_U("{", wk, enabled);
 	PRINT_FIELD_U(", ", wk, pending);
-	PRINT_FIELD_RTC_TIME(", ", wk, time, tcp);
+	PRINT_FIELD_OBJ_TCB_PTR(", ", wk, time, tcp, print_rtc_time);
 	tprints("}");
 }
 
