@@ -7,6 +7,7 @@
  */
 
 #include "xstring.h"
+#include "print_fields.h"
 
 #ifndef TIMESPEC_NSEC
 # define TIMESPEC_NSEC tv_nsec
@@ -120,9 +121,11 @@ SPRINT_TIMESPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 #endif /* SPRINT_TIMESPEC */
 
 #ifdef PRINT_TIMESPEC_UTIME_PAIR
-static void
-print_timespec_t_utime(const TIMESPEC_T *t)
+static bool
+print_timespec_t_utime(struct tcb *tcp, void *elem_buf, size_t elem_size,
+		       void *data)
 {
+	const TIMESPEC_T *const t = elem_buf;
 	switch (t->TIMESPEC_NSEC) {
 	case UTIME_NOW:
 	case UTIME_OMIT:
@@ -140,6 +143,7 @@ print_timespec_t_utime(const TIMESPEC_T *t)
 		tprints_comment(sprinttime_nsec(TIMESPEC_TO_SEC_NSEC(t)));
 		break;
 	}
+	return true;
 }
 
 int
@@ -150,11 +154,7 @@ PRINT_TIMESPEC_UTIME_PAIR(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	tprints("[");
-	print_timespec_t_utime(&t[0]);
-	tprints(", ");
-	print_timespec_t_utime(&t[1]);
-	tprints("]");
+	print_local_array(tcp, t, print_timespec_t_utime);
 	return 0;
 }
 #endif /* PRINT_TIMESPEC_UTIME_PAIR */
@@ -163,15 +163,13 @@ PRINT_TIMESPEC_UTIME_PAIR(struct tcb *const tcp, const kernel_ulong_t addr)
 int
 PRINT_ITIMERSPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	TIMESPEC_T t[2];
+	struct { TIMESPEC_T it_interval, it_value; } t;
 
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	tprints("{it_interval=");
-	print_timespec_t(&t[0]);
-	tprints(", it_value=");
-	print_timespec_t(&t[1]);
+	PRINT_FIELD_OBJ_PTR("{", t, it_interval, print_timespec_t);
+	PRINT_FIELD_OBJ_PTR(", ", t, it_value, print_timespec_t);
 	tprints("}");
 	return 0;
 }
