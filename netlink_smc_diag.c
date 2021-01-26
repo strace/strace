@@ -65,12 +65,6 @@ print_smc_diag_cursor(const struct smc_diag_cursor *const cursor)
 	tprints("}");
 }
 
-#define PRINT_FIELD_SMC_DIAG_CURSOR(prefix_, where_, field_)		\
-	do {								\
-		tprintf("%s%s=", (prefix_), #field_);			\
-		print_smc_diag_cursor(&(where_).field_);		\
-	} while (0)
-
 static bool
 decode_smc_diag_conninfo(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
@@ -88,17 +82,17 @@ decode_smc_diag_conninfo(struct tcb *const tcp,
 	PRINT_FIELD_U(", ", cinfo, sndbuf_size);
 	PRINT_FIELD_U(", ", cinfo, rmbe_size);
 	PRINT_FIELD_U(", ", cinfo, peer_rmbe_size);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, rx_prod);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, rx_cons);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_prod);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_cons);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, rx_prod, print_smc_diag_cursor);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, rx_cons, print_smc_diag_cursor);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, tx_prod, print_smc_diag_cursor);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, tx_cons, print_smc_diag_cursor);
 	PRINT_FIELD_0X(", ", cinfo, rx_prod_flags);
 	PRINT_FIELD_0X(", ", cinfo, rx_conn_state_flags);
 	PRINT_FIELD_0X(", ", cinfo, tx_prod_flags);
 	PRINT_FIELD_0X(", ", cinfo, tx_conn_state_flags);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_prep);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_sent);
-	PRINT_FIELD_SMC_DIAG_CURSOR(", ", cinfo, tx_fin);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, tx_prep, print_smc_diag_cursor);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, tx_sent, print_smc_diag_cursor);
+	PRINT_FIELD_OBJ_PTR(", ", cinfo, tx_fin, print_smc_diag_cursor);
 	tprints("}");
 
 	return true;
