@@ -140,8 +140,7 @@ decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	PRINT_FIELD_U(", ", config, block_size);
 
-	tprints(", info=");
-	print_loop_info64(tcp, &config.info);
+	PRINT_FIELD_OBJ_TCB_PTR(", ", config, info, tcp, print_loop_info64);
 
 	if (!IS_ARRAY_ZERO(config.__reserved))
 		PRINT_FIELD_X_ARRAY(", ", config, __reserved);
