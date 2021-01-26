@@ -335,8 +335,7 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 	if (full)
 		tprints("fsa_ax25={");
 
-	tprints("sax25_call=");
-	print_ax25_addr(&sax25->fsa_ax25.sax25_call);
+	PRINT_FIELD_OBJ_PTR("", sax25->fsa_ax25, sax25_call, print_ax25_addr);
 	PRINT_FIELD_D(", ", sax25->fsa_ax25, sax25_ndigis);
 
 	if (!full)
