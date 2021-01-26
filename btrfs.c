@@ -872,9 +872,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("{fspath=");
-		btrfs_print_ino_path_container(tcp, args.fspath);
-
+		PRINT_FIELD_OBJ_TCB_VAL("{", args, fspath, tcp,
+					btrfs_print_ino_path_container);
 		tprints("}");
 		break;
 	}
@@ -907,8 +906,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("{inodes=");
-		btrfs_print_logical_ino_container(tcp, args.inodes);
+		PRINT_FIELD_OBJ_TCB_VAL("{", args, inodes, tcp,
+					btrfs_print_logical_ino_container);
 
 		tprints("}");
 		break;
@@ -1126,10 +1125,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_FD("{", args, send_fd, tcp);
 		PRINT_FIELD_U(", ", args, clone_sources_count);
 
-		tprints(", clone_sources=");
-		if (abbrev(tcp))
-			printaddr((uintptr_t) args.clone_sources);
-		else {
+		if (abbrev(tcp)) {
+			PRINT_FIELD_PTR(", ", args, clone_sources);
+		} else {
+			tprints(", clone_sources=");
 			uint64_t record;
 			print_array(tcp, ptr_to_kulong(args.clone_sources),
 				    args.clone_sources_count,
