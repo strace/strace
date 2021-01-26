@@ -194,8 +194,8 @@ SYS_FUNC(clone3)
 		PRINT_FIELD_X(", ", arg, stack_size);
 
 		if (arg.flags & CLONE_SETTLS) {
-			tprints(", tls=");
-			print_tls_arg(tcp, arg.tls);
+			PRINT_FIELD_OBJ_TCB_VAL(", ", arg, tls, tcp,
+						print_tls_arg);
 		}
 
 		if (arg.set_tid || arg.set_tid_size) {
@@ -207,10 +207,10 @@ SYS_FUNC(clone3)
 			} else {
 				int buf;
 
-				tprints(", set_tid=");
-				print_array(tcp, arg.set_tid, arg.set_tid_size,
-					    &buf, sizeof(buf), tfetch_mem,
-					    print_int32_array_member, 0);
+				PRINT_FIELD_OBJ_TCB_VAL(", ", arg, set_tid, tcp,
+					print_array, arg.set_tid_size,
+					&buf, sizeof(buf), tfetch_mem,
+					print_int32_array_member, 0);
 			}
 			PRINT_FIELD_U(", ", arg, set_tid_size);
 		}
