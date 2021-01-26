@@ -1277,8 +1277,8 @@ guard_storage_print_gscb(struct tcb *tcp, kernel_ulong_t addr)
 
 	PRINT_FIELD_0X(", ", gscb, gssm);
 
-	tprints(", gs_epl_a=");
-	guard_storage_print_gsepl(tcp, gscb.gs_epl_a);
+	PRINT_FIELD_OBJ_TCB_VAL(", ", gscb, gs_epl_a, tcp,
+				guard_storage_print_gsepl);
 
 	tprints("}");
 }
