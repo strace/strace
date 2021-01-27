@@ -30,14 +30,6 @@
 # include "gcc_compat.h"
 # include "macros.h"
 
-/*
- * The printf-like function to use in header files
- * shared between strace and its tests.
- */
-# ifndef STRACE_PRINTF
-#  define STRACE_PRINTF printf
-# endif
-
 /* Tests of "strace -v" are expected to define VERBOSE to 1. */
 # ifndef VERBOSE
 #  define VERBOSE 0

@@ -11,13 +11,127 @@
 
 # include "static_assert.h"
 
+# ifdef IN_STRACE
+
+static inline void
+tprint_struct_begin(void)
+{
+	tprints("{");
+}
+
+static inline void
+tprint_struct_next(void)
+{
+	tprints(", ");
+}
+
+static inline void
+tprint_struct_end(void)
+{
+	tprints("}");
+}
+
+static inline void
+tprint_array_begin(void)
+{
+	tprints("[");
+}
+
+static inline void
+tprint_array_next(void)
+{
+	tprints(", ");
+}
+
+static inline void
+tprint_array_end(void)
+{
+	tprints("]");
+}
+
+static inline void
+tprint_more_data_follows(void)
+{
+	tprints("...");
+}
+
+static inline void
+tprint_value_changed(void)
+{
+	tprints(" => ");
+}
+
 /*
  * The printf-like function to use in header files
  * shared between strace and its tests.
  */
-# ifndef STRACE_PRINTF
 #  define STRACE_PRINTF tprintf
-# endif
+
+# else /* !IN_STRACE */
+
+#  include <stdio.h>
+
+static inline void
+tprint_struct_begin(void)
+{
+	fputs("{", stdout);
+}
+
+static inline void
+tprint_struct_next(void)
+{
+	fputs(", ", stdout);
+}
+
+static inline void
+tprint_struct_end(void)
+{
+	fputs("}", stdout);
+}
+
+static inline void
+tprint_array_begin(void)
+{
+	fputs("[", stdout);
+}
+
+static inline void
+tprint_array_next(void)
+{
+	fputs(", ", stdout);
+}
+
+static inline void
+tprint_array_end(void)
+{
+	fputs("]", stdout);
+}
+
+static inline void
+tprint_more_data_follows(void)
+{
+	fputs("...", stdout);
+}
+
+static inline void
+tprint_value_changed(void)
+{
+	fputs(" => ", stdout);
+}
+
+/*
+ * The printf-like function to use in header files
+ * shared between strace and its tests.
+ */
+#  define STRACE_PRINTF printf
+
+# endif /* !IN_STRACE */
+
+static inline void
+tprints_field_name(const char *name)
+{
+	STRACE_PRINTF("%s=", name);
+}
 
 # define PRINT_FIELD_D(prefix_, where_, field_)				\
 	STRACE_PRINTF("%s%s=%lld", (prefix_), #field_,			\

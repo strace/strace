@@ -42,7 +42,7 @@ AM_CPPFLAGS_FOR_BUILD = $(AM_CPPFLAGS)
 include types/Makemodule.am
 include xlat/Makemodule.am
 
-strace_CPPFLAGS = $(AM_CPPFLAGS)
+strace_CPPFLAGS = $(AM_CPPFLAGS) -DIN_STRACE=1
 strace_CFLAGS = $(AM_CFLAGS)
 strace_LDFLAGS =
 strace_LDADD = libstrace.a $(clock_LIBS) $(timer_LIBS)
