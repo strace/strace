@@ -64,14 +64,16 @@ print_common_flags(struct tcb *tcp, const struct iocb *cb)
 {
 /* aio_flags and aio_resfd fields are available since v2.6.22-rc1~47 */
 #ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
-	if (cb->aio_flags)
+	if (cb->aio_flags) {
 		PRINT_FIELD_FLAGS(", ", *cb, aio_flags, aio_iocb_flags,
 				  "IOCB_FLAG_???");
+	}
 
-	if (cb->aio_flags & IOCB_FLAG_RESFD)
+	if (cb->aio_flags & IOCB_FLAG_RESFD) {
 		PRINT_FIELD_FD(", ", *cb, aio_resfd, tcp);
-	else if (cb->aio_resfd)
+	} else if (cb->aio_resfd) {
 		PRINT_FIELD_X(", ", *cb, aio_resfd);
+	}
 #endif
 }
 
@@ -90,8 +92,9 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 
 	PRINT_FIELD_X("", *cb, aio_data);
 
-	if (cb->aio_key)
+	if (cb->aio_key) {
 		PRINT_FIELD_U(", ", *cb, aio_key);
+	}
 
 #ifndef HAVE_STRUCT_IOCB_AIO_RW_FLAGS
 # define aio_rw_flags aio_reserved1

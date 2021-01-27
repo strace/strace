@@ -176,19 +176,23 @@ SYS_FUNC(clone3)
 		printflags_ex(arg.flags, "CLONE_???", XLAT_STYLE_DEFAULT,
 			      clone_flags, clone3_flags, NULL);
 
-		if (arg.flags & CLONE_PIDFD)
+		if (arg.flags & CLONE_PIDFD) {
 			PRINT_FIELD_ADDR64(", ", arg, pidfd);
+		}
 
-		if (arg.flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID))
+		if (arg.flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)) {
 			PRINT_FIELD_ADDR64(", ", arg, child_tid);
+		}
 
-		if (arg.flags & CLONE_PARENT_SETTID)
+		if (arg.flags & CLONE_PARENT_SETTID) {
 			PRINT_FIELD_ADDR64(", ", arg, parent_tid);
+		}
 
-		if (arg.exit_signal < INT_MAX)
+		if (arg.exit_signal < INT_MAX) {
 			PRINT_FIELD_OBJ_VAL(", ", arg, exit_signal, printsignal);
-		else
+		} else {
 			PRINT_FIELD_U(", ", arg, exit_signal);
+		}
 
 		PRINT_FIELD_ADDR64(", ", arg, stack);
 		PRINT_FIELD_X(", ", arg, stack_size);
@@ -216,8 +220,9 @@ SYS_FUNC(clone3)
 		}
 
 		if (fetch_size > offsetof(struct strace_clone_args, cgroup)
-		    && (arg.cgroup || arg.flags & CLONE_INTO_CGROUP))
+		    && (arg.cgroup || arg.flags & CLONE_INTO_CGROUP)) {
 			PRINT_FIELD_U(", ", arg, cgroup);
+		}
 
 		if (size > fetch_size)
 			print_nonzero_bytes(tcp, ", ", addr, fetch_size,

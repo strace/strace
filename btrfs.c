@@ -157,20 +157,24 @@ btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 
 	PRINT_FIELD_FLAGS("{", balance_args, flags, btrfs_balance_flags,
 			  "BTRFS_BALANCE_???");
-	if (out)
+	if (out) {
 		PRINT_FIELD_FLAGS(", ", balance_args, state,
 				  btrfs_balance_state,
 				  "BTRFS_BALANCE_STATE_???");
+	}
 
-	if (balance_args.flags & BTRFS_BALANCE_DATA)
+	if (balance_args.flags & BTRFS_BALANCE_DATA) {
 		PRINT_FIELD_OBJ_PTR(", ", balance_args, data,
 				    btrfs_print_balance_args);
-	if (balance_args.flags & BTRFS_BALANCE_METADATA)
+	}
+	if (balance_args.flags & BTRFS_BALANCE_METADATA) {
 		PRINT_FIELD_OBJ_PTR(", ", balance_args, meta,
 				    btrfs_print_balance_args);
-	if (balance_args.flags & BTRFS_BALANCE_SYSTEM)
+	}
+	if (balance_args.flags & BTRFS_BALANCE_SYSTEM) {
 		PRINT_FIELD_OBJ_PTR(", ", balance_args, sys,
 				    btrfs_print_balance_args);
+	}
 	tprints("}");
 }
 
@@ -341,12 +345,14 @@ print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
 		btrfs_print_objectid("", *key, tree_id);
 
 		if (key->min_objectid != BTRFS_FIRST_FREE_OBJECTID ||
-		    is_not_abbrev)
+		    is_not_abbrev) {
 			btrfs_print_objectid(", ", *key, min_objectid);
+		}
 
 		if (key->max_objectid != BTRFS_LAST_FREE_OBJECTID ||
-		    is_not_abbrev)
+		    is_not_abbrev) {
 			btrfs_print_objectid(", ", *key, max_objectid);
+		}
 
 		PRINT_FIELD_U64(", ", *key, min_offset);
 		PRINT_FIELD_U64(", ", *key, max_offset);
@@ -621,8 +627,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		if (entering(tcp)) {
 			PRINT_FIELD_DEV("{", args, devid);
-			if (!IS_ARRAY_ZERO(args.uuid))
+			if (!IS_ARRAY_ZERO(args.uuid)) {
 				PRINT_FIELD_UUID(", ", args, uuid);
+			}
 			tprints("}");
 			return 0;
 		}
@@ -895,8 +902,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_U("{", args, logical);
 			PRINT_FIELD_U(", ", args, size);
 
-			if (!IS_ARRAY_ZERO(args.reserved))
+			if (!IS_ARRAY_ZERO(args.reserved)) {
 				PRINT_FIELD_X_ARRAY(", ", args, reserved);
+			}
 
 			PRINT_FIELD_FLAGS(", ", args, flags,
 					  btrfs_logical_ino_args_flags,

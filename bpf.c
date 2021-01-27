@@ -1053,8 +1053,9 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_UPDATE)
 	PRINT_FIELD_FD(", ", attr, new_prog_fd, tcp);
 	PRINT_FIELD_FLAGS(", ", attr, flags, bpf_attach_flags,
 			  "BPF_F_???");
-	if (attr.flags & BPF_F_REPLACE)
+	if (attr.flags & BPF_F_REPLACE) {
 		PRINT_FIELD_FD(", ", attr, old_prog_fd, tcp);
+	}
 	tprints("}");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)

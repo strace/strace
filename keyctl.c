@@ -268,11 +268,12 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 			 * Kernel doesn't touch otherinfo
 			 * if otherinfolen is zero.
 			 */
-			if (kdf.otherinfolen)
+			if (kdf.otherinfolen) {
 				PRINT_FIELD_STRN(", ", kdf, otherinfo,
 						 kdf.otherinfolen, tcp);
-			else
+			} else {
 				PRINT_FIELD_PTR(", ", kdf, otherinfo);
+			}
 
 			PRINT_FIELD_U(", ", kdf, otherinfolen);
 
@@ -339,10 +340,11 @@ fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
 	PRINT_FIELD_OBJ_VAL("{", *params, key_id, print_keyring_serial_number);
 	PRINT_FIELD_U(", ", *params, in_len);
 
-	if (out)
+	if (out) {
 		PRINT_FIELD_U(", ", *params, out_len);
-	else
+	} else {
 		PRINT_FIELD_U(", ", *params, in2_len);
+	}
 
 	if (!IS_ARRAY_ZERO(params->__spare)) {
 		PRINT_FIELD_ARRAY(", ", *params, __spare, tcp,

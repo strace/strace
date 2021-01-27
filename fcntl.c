@@ -27,8 +27,9 @@ print_struct_flock64(struct tcb *const tcp, const struct_kernel_flock64 *fl, con
 	PRINT_FIELD_XVAL(", ", *fl, l_whence, whence_codes, "SEEK_???");
 	PRINT_FIELD_D(", ", *fl, l_start);
 	PRINT_FIELD_D(", ", *fl, l_len);
-	if (getlk)
+	if (getlk) {
 		PRINT_FIELD_TGID(", ", *fl, l_pid, tcp);
+	}
 	tprints("}");
 }
 

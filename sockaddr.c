@@ -208,11 +208,13 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 
 #if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
 	if (IN6_IS_ADDR_LINKLOCAL(&sa_in6->sin6_addr)
-	    || IN6_IS_ADDR_MC_LINKLOCAL(&sa_in6->sin6_addr))
+	    || IN6_IS_ADDR_MC_LINKLOCAL(&sa_in6->sin6_addr)) {
 		PRINT_FIELD_IFINDEX(", ", *sa_in6, sin6_scope_id);
-	else
+	} else
 #endif
+	{
 		PRINT_FIELD_U(", ", *sa_in6, sin6_scope_id);
+	}
 }
 
 /**

@@ -226,10 +226,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (abbrev(tcp))
 		goto print_perf_event_attr_out;
 
-	if (attr->freq)
+	if (attr->freq) {
 		PRINT_FIELD_U(", ", *attr, sample_freq);
-	else
+	} else {
 		PRINT_FIELD_U(", ", *attr, sample_period);
+	}
 
 	PRINT_FIELD_FLAGS(", ", *attr, sample_type, perf_event_sample_format,
 			  "PERF_SAMPLE_???");
@@ -275,23 +276,26 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprints_comment("Bits 63..29");
 	}
 
-	if (attr->watermark)
+	if (attr->watermark) {
 		PRINT_FIELD_U(", ", *attr, wakeup_watermark);
-	else
+	} else {
 		PRINT_FIELD_U(", ", *attr, wakeup_events);
+	}
 
-	if (attr->type == PERF_TYPE_BREAKPOINT)
+	if (attr->type == PERF_TYPE_BREAKPOINT) {
 		/* Any combination of R/W with X is deemed invalid */
 		PRINT_FIELD_XVAL(", ", *attr, bp_type, hw_breakpoint_type,
 				 (attr->bp_type <=
 					(HW_BREAKPOINT_X | HW_BREAKPOINT_RW))
 						? "HW_BREAKPOINT_INVALID"
 						: "HW_BREAKPOINT_???");
+	}
 
-	if (attr->type == PERF_TYPE_BREAKPOINT)
+	if (attr->type == PERF_TYPE_BREAKPOINT) {
 		PRINT_FIELD_X(", ", *attr, bp_addr);
-	else
+	} else {
 		PRINT_FIELD_X(", ", *attr, config1);
+	}
 
 	/*
 	 * Fields after bp_addr/config1 are optional and may not present; check
@@ -299,10 +303,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 */
 
 	_PERF_CHECK_FIELD(bp_len);
-	if (attr->type == PERF_TYPE_BREAKPOINT)
+	if (attr->type == PERF_TYPE_BREAKPOINT) {
 		PRINT_FIELD_U(", ", *attr, bp_len);
-	else
+	} else {
 		PRINT_FIELD_X(", ", *attr, config2);
+	}
 
 	_PERF_CHECK_FIELD(branch_sample_type);
 	if (attr->sample_type & PERF_SAMPLE_BRANCH_STACK) {
@@ -325,8 +330,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * "size of the user stack to dump if PERF_SAMPLE_STACK_USER is
 	 * specified."
 	 */
-	if (attr->sample_type & PERF_SAMPLE_STACK_USER)
+	if (attr->sample_type & PERF_SAMPLE_STACK_USER) {
 		PRINT_FIELD_X(", ", *attr, sample_stack_user);
+	}
 
 	if (attr->use_clockid) {
 		_PERF_CHECK_FIELD(clockid);
@@ -349,9 +355,12 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	_PERF_CHECK_FIELD(aux_sample_size);
 	PRINT_FIELD_U(", ", *attr, aux_sample_size);
 
-	/* _PERF_CHECK_FIELD(__reserved_3);
-	if (attr->__reserved_3)
-		PRINT_FIELD_X(", ", *attr, __reserved_3); */
+#if 0
+	_PERF_CHECK_FIELD(__reserved_3);
+	if (attr->__reserved_3) {
+		PRINT_FIELD_X(", ", *attr, __reserved_3);
+	}
+#endif
 
 print_perf_event_attr_out:
 	if ((attr->size && (attr->size > size)) ||

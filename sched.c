@@ -131,12 +131,10 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (size < SCHED_ATTR_MIN_SIZE)
 		goto end;
 
-	if (!is_set
-	    || (int) attr.sched_policy < 0
-	    || !(attr.sched_flags & (SCHED_FLAG_KEEP_POLICY
-				     | SCHED_FLAG_KEEP_PARAMS)))
+	if (!is_set || (int)attr.sched_policy < 0 || !(attr.sched_flags & (SCHED_FLAG_KEEP_POLICY | SCHED_FLAG_KEEP_PARAMS))) {
 		PRINT_FIELD_XVAL(", ", attr, sched_policy, schedulers,
 				 "SCHED_???");
+	}
 	PRINT_FIELD_FLAGS(", ", attr, sched_flags, sched_flags,
 			  "SCHED_FLAG_???");
 

@@ -32,13 +32,14 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
-			if (NDIAG_PROTO_ALL == req.sdiag_protocol)
+			if (NDIAG_PROTO_ALL == req.sdiag_protocol) {
 				tprintf("%s=%s",
 					"sdiag_protocol", "NDIAG_PROTO_ALL");
-			else
+			} else {
 				PRINT_FIELD_XVAL("", req, sdiag_protocol,
 						 netlink_protocols,
 						 "NETLINK_???");
+			}
 			PRINT_FIELD_U(", ", req, ndiag_ino);
 			PRINT_FIELD_FLAGS(", ", req, ndiag_show,
 					  netlink_diag_show, "NDIAG_SHOW_???");

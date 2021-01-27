@@ -97,8 +97,9 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", st, rx_compressed);
 		PRINT_FIELD_U(", ", st, tx_compressed);
 
-		if (len >= def_size)
+		if (len >= def_size) {
 			PRINT_FIELD_U(", ", st, rx_nohandler);
+		}
 		tprints("}");
 	}
 
@@ -471,8 +472,9 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", st, rx_compressed);
 		PRINT_FIELD_U(", ", st, tx_compressed);
 
-		if (len >= def_size)
+		if (len >= def_size) {
 			PRINT_FIELD_U(", ", st, rx_nohandler);
+		}
 		tprints("}");
 	}
 
@@ -497,8 +499,9 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 			   sizeof(vsi.vsi_type_id), QUOTE_FORCE_HEX);
 	PRINT_FIELD_U(", ", vsi, vsi_type_version);
 
-	if (!IS_ARRAY_ZERO(vsi.pad))
+	if (!IS_ARRAY_ZERO(vsi.pad)) {
 		PRINT_FIELD_HEX_ARRAY(", ", vsi, pad);
+	}
 
 	tprints("}");
 

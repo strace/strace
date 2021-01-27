@@ -184,8 +184,9 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 		} else {
 			struct_blk_user_trace_setup buts;
 
-			if (!syserror(tcp) && !umove(tcp, arg, &buts))
+			if (!syserror(tcp) && !umove(tcp, arg, &buts)) {
 				PRINT_FIELD_CSTRING(", ", buts, name);
+			}
 			tprints("}");
 			break;
 		}

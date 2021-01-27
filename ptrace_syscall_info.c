@@ -279,9 +279,10 @@ print_psi_entry(const typeof_field(struct_ptrace_syscall_info, entry) *const p,
 	const kernel_ulong_t nargs =
 		(fetch_size - offsetof(struct_ptrace_syscall_info, entry.args))
 		/ sizeof(p->args[0]);
-	if (nargs)
+	if (nargs) {
 		PRINT_FIELD_ARRAY_UPTO(", ", *p, args, nargs, tcp,
 				       print_xint64_array_member);
+	}
 	tprints("}");
 }
 
@@ -293,11 +294,13 @@ print_psi_seccomp(const typeof_field(struct_ptrace_syscall_info, seccomp) *const
 	const kernel_ulong_t nargs =
 		(fetch_size - offsetof(struct_ptrace_syscall_info, seccomp.args))
 		/ sizeof(p->args[0]);
-	if (nargs)
+	if (nargs) {
 		PRINT_FIELD_ARRAY_UPTO(", ", *p, args, nargs, tcp,
 				       print_xint64_array_member);
-	if (fetch_size >= expected_seccomp_size)
+	}
+	if (fetch_size >= expected_seccomp_size) {
 		PRINT_FIELD_U(", ", *p, ret_data);
+	}
 	tprints("}");
 }
 
@@ -310,8 +313,9 @@ print_psi_exit(const typeof_field(struct_ptrace_syscall_info, exit) *const p,
 	} else {
 		PRINT_FIELD_D("{", *p, rval);
 	}
-	if (fetch_size >= expected_exit_size)
+	if (fetch_size >= expected_exit_size) {
 		PRINT_FIELD_U(", ", *p, is_error);
+	}
 	tprints("}");
 }
 

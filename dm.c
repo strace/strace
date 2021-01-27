@@ -46,14 +46,17 @@ dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
 	case DM_LIST_VERSIONS:
 		break;
 	default:
-		if (ioc->dev)
+		if (ioc->dev) {
 			PRINT_FIELD_DEV(", ", *ioc, dev);
+		}
 
-		if (ioc->name[0])
+		if (ioc->name[0]) {
 			PRINT_FIELD_CSTRING(", ", *ioc, name);
+		}
 
-		if (ioc->uuid[0])
+		if (ioc->uuid[0]) {
 			PRINT_FIELD_CSTRING(", ", *ioc, uuid);
+		}
 
 		break;
 	}
@@ -147,8 +150,9 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_U("{", s, sector_start);
 		PRINT_FIELD_U(", ", s, length);
 
-		if (exiting(tcp))
+		if (exiting(tcp)) {
 			PRINT_FIELD_D(", ", s, status);
+		}
 
 		PRINT_FIELD_CSTRING(", ", s, target_type);
 
@@ -516,8 +520,9 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 		goto skip;
 	}
 
-	if (dm_ioctl_has_params(code))
+	if (dm_ioctl_has_params(code)) {
 		PRINT_FIELD_U(", ", *ioc, data_start);
+	}
 
 	dm_decode_device(code, ioc);
 	dm_decode_values(tcp, code, ioc);

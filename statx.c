@@ -53,8 +53,9 @@ SYS_FUNC(statx)
 		PRINT_FIELD_FLAGS("{", stx, stx_mask, statx_masks,
 				  "STATX_???");
 
-		if (!abbrev(tcp))
+		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", stx, stx_blksize);
+		}
 
 		PRINT_FIELD_FLAGS(", ", stx, stx_attributes, statx_attrs,
 				  "STATX_ATTR_???");
@@ -67,8 +68,9 @@ SYS_FUNC(statx)
 
 		PRINT_FIELD_OBJ_VAL(", ", stx, stx_mode, print_symbolic_mode_t);
 
-		if (!abbrev(tcp))
+		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", stx, stx_ino);
+		}
 
 		PRINT_FIELD_U(", ", stx, stx_size);
 

@@ -38,8 +38,9 @@ decode_fsxattr(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (!umove_or_printaddr(tcp, arg, &fsxattr)) {
 		PRINT_FIELD_FLAGS("{", fsxattr, fsx_xflags, fs_xflags, "FS_XFLAG_???");
 		PRINT_FIELD_U(", ", fsxattr, fsx_extsize);
-		if (is_get)
+		if (is_get) {
 			PRINT_FIELD_U(", ", fsxattr, fsx_nextents);
+		}
 		PRINT_FIELD_X(", ", fsxattr, fsx_projid);
 		PRINT_FIELD_U(", ", fsxattr, fsx_cowextsize);
 		tprints("}");

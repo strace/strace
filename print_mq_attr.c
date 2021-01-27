@@ -32,10 +32,11 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 	mq_attr_t attr;
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
-	if (decode_flags)
+	if (decode_flags) {
 		PRINT_FIELD_FLAGS("{", attr, mq_flags, mq_attr_flags, "O_???");
-	else
+	} else {
 		PRINT_FIELD_X("{", attr, mq_flags);
+	}
 	PRINT_FIELD_D(", ", attr, mq_maxmsg);
 	PRINT_FIELD_D(", ", attr, mq_msgsize);
 	PRINT_FIELD_D(", ", attr, mq_curmsgs);

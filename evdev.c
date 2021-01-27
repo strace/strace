@@ -84,8 +84,9 @@ abs_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_U(", ", absinfo, fuzz);
 		PRINT_FIELD_U(", ", absinfo, flat);
 		if (sz > orig_sz) {
-			if (sz >= res_sz)
+			if (sz >= res_sz) {
 				PRINT_FIELD_U(", ", absinfo, resolution);
+			}
 			if (sz != res_sz)
 				tprints(", ...");
 		}

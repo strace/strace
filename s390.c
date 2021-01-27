@@ -543,41 +543,53 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 					hdr->infmval1 & 0x1F ? ", " : "",
 					hdr->infmval1 & 0x1F,
 					hdr->infmval1 & 0x1F ? " - ???" : "");
-		if (hdr->infmval2)
+		if (hdr->infmval2) {
 			PRINT_FIELD_0X(", ", *hdr, infmval2);
+		}
 	}
 
-	if (cnt_val || hdr->infmscps)
+	if (cnt_val || hdr->infmscps) {
 		PRINT_FIELD_U(", ", *hdr, infmscps);
-	if (cnt_val || hdr->infmdcps)
+	}
+	if (cnt_val || hdr->infmdcps) {
 		PRINT_FIELD_U(", ", *hdr, infmdcps);
-	if (cnt_val || hdr->infmsifl)
+	}
+	if (cnt_val || hdr->infmsifl) {
 		PRINT_FIELD_U(", ", *hdr, infmsifl);
-	if (cnt_val || hdr->infmdifl)
+	}
+	if (cnt_val || hdr->infmdifl) {
 		PRINT_FIELD_U(", ", *hdr, infmdifl);
+	}
 
 	if (!abbrev(tcp)) {
-		if (name_val || hdr->infmname)
+		if (name_val || hdr->infmname) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmname);
+		}
 
-		if (id_val || !IS_ARRAY_ZERO(hdr->infmtype))
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmtype)) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmtype);
-		if (id_val || !IS_ARRAY_ZERO(hdr->infmmanu))
+		}
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmmanu)) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmmanu);
-		if (id_val || !IS_ARRAY_ZERO(hdr->infmseq))
+		}
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmseq)) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmseq);
-		if (id_val || !IS_ARRAY_ZERO(hdr->infmpman))
+		}
+		if (id_val || !IS_ARRAY_ZERO(hdr->infmpman)) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infmpman);
+		}
 
 		if (size >= offsetofend(struct sthyi_machine, infmplnm)) {
 			last_decoded = offsetofend(struct sthyi_machine,
 						   infmplnm);
 
-			if (!IS_ARRAY_ZERO(hdr->reserved_1__))
+			if (!IS_ARRAY_ZERO(hdr->reserved_1__)) {
 				PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
+			}
 
-			if (!IS_ARRAY_ZERO(hdr->infmplnm))
+			if (!IS_ARRAY_ZERO(hdr->infmplnm)) {
 				PRINT_FIELD_EBCDIC(", ", *hdr, infmplnm);
+			}
 		}
 
 		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
@@ -610,8 +622,9 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 				", " : "",
 			hdr->infpflg1 & 0x7F,
 			hdr->infpflg1 & 0x7F ? " - ???" : "");
-	if (!abbrev(tcp) && hdr->infpflg2) /* Reserved */
+	if (!abbrev(tcp) && hdr->infpflg2) { /* Reserved */
 		PRINT_FIELD_0X(", ", *hdr, infpflg2);
+	}
 
 	PRINT_FIELD_0X(", ", *hdr, infpval1);
 	cnt_val  = !!(hdr->infpval1 & 0x80);
@@ -631,36 +644,48 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 				hdr->infpval1 & 0x07 ? ", " : "",
 				hdr->infpval1 & 0x07,
 				hdr->infpval1 & 0x07 ? " - ???" : "");
-	if (!abbrev(tcp) && hdr->infpval2) /* Reserved */
+	if (!abbrev(tcp) && hdr->infpval2) { /* Reserved */
 		PRINT_FIELD_0X(", ", *hdr, infpval2);
+	}
 
-	if (id_val || hdr->infppnum)
+	if (id_val || hdr->infppnum) {
 		PRINT_FIELD_U(", ", *hdr, infppnum);
+	}
 
-	if (cnt_val || hdr->infpscps)
+	if (cnt_val || hdr->infpscps) {
 		PRINT_FIELD_U(", ", *hdr, infpscps);
-	if (cnt_val || hdr->infpdcps)
+	}
+	if (cnt_val || hdr->infpdcps) {
 		PRINT_FIELD_U(", ", *hdr, infpdcps);
-	if (cnt_val || hdr->infpsifl)
+	}
+	if (cnt_val || hdr->infpsifl) {
 		PRINT_FIELD_U(", ", *hdr, infpsifl);
-	if (cnt_val || hdr->infpdifl)
+	}
+	if (cnt_val || hdr->infpdifl) {
 		PRINT_FIELD_U(", ", *hdr, infpdifl);
+	}
 
-	if (!abbrev(tcp) && !IS_ARRAY_ZERO(hdr->reserved_1__))
+	if (!abbrev(tcp) && !IS_ARRAY_ZERO(hdr->reserved_1__)) {
 		PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
+	}
 
-	if (id_val || !IS_ARRAY_ZERO(hdr->infppnam))
+	if (id_val || !IS_ARRAY_ZERO(hdr->infppnam)) {
 		PRINT_FIELD_EBCDIC(", ", *hdr, infppnam);
+	}
 
 	if (!abbrev(tcp)) {
-		if (wcap_val || hdr->infpwbcp)
+		if (wcap_val || hdr->infpwbcp) {
 			PRINT_FIELD_WEIGHT(", ", *hdr, infpwbcp);
-		if (acap_val || hdr->infpabcp)
+		}
+		if (acap_val || hdr->infpabcp) {
 			PRINT_FIELD_WEIGHT(", ", *hdr, infpabcp);
-		if (wcap_val || hdr->infpwbif)
+		}
+		if (wcap_val || hdr->infpwbif) {
 			PRINT_FIELD_WEIGHT(", ", *hdr, infpwbif);
-		if (acap_val || hdr->infpabif)
+		}
+		if (acap_val || hdr->infpabif) {
 			PRINT_FIELD_WEIGHT(", ", *hdr, infpabif);
+		}
 
 		if (size >= offsetofend(struct sthyi_partition, infplgif)) {
 			if (!IS_ARRAY_ZERO(hdr->infplgnm)) {
@@ -669,12 +694,15 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 				PRINT_FIELD_WEIGHT(", ", *hdr, infplgcp);
 				PRINT_FIELD_WEIGHT(", ", *hdr, infplgif);
 			} else {
-				if (lpar_val)
+				if (lpar_val) {
 					PRINT_FIELD_HEX_ARRAY(", ", *hdr, infplgnm);
-				if (hdr->infplgcp)
+				}
+				if (hdr->infplgcp) {
 					PRINT_FIELD_X(", ", *hdr, infplgcp);
-				if (hdr->infplgif)
+				}
+				if (hdr->infplgif) {
 					PRINT_FIELD_X(", ", *hdr, infplgif);
+				}
 			}
 		}
 
@@ -682,8 +710,9 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 			last_decoded = offsetofend(struct sthyi_partition,
 						   infpplnm);
 
-			if (!IS_ARRAY_ZERO(hdr->infpplnm))
+			if (!IS_ARRAY_ZERO(hdr->infpplnm)) {
 				PRINT_FIELD_EBCDIC(", ", *hdr, infpplnm);
+			}
 		}
 
 		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
@@ -763,12 +792,15 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 			hdr->infyflg1 & 0x1F ? " - ???" : "");
 
 	if (!abbrev(tcp)) {
-		if (hdr->infyflg2) /* Reserved */
+		if (hdr->infyflg2) { /* Reserved */
 			PRINT_FIELD_0X(", ", *hdr, infyflg2);
-		if (hdr->infyval1) /* Reserved */
+		}
+		if (hdr->infyval1) { /* Reserved */
 			PRINT_FIELD_0X(", ", *hdr, infyval1);
-		if (hdr->infyval2) /* Reserved */
+		}
+		if (hdr->infyval2) { /* Reserved */
 			PRINT_FIELD_0X(", ", *hdr, infyval2);
+		}
 
 		PRINT_FIELD_U(", ", *hdr, infytype);
 		switch (hdr->infytype) {
@@ -779,28 +811,37 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 			tprints_comment("unknown hypervisor type");
 		}
 
-		if (!IS_ARRAY_ZERO(hdr->reserved_1__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_1__)) {
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
+		}
 
-		if (mt || hdr->infycpt)
+		if (mt || hdr->infycpt) {
 			PRINT_FIELD_U(", ", *hdr, infycpt);
-		if (mt || hdr->infyiflt)
+		}
+		if (mt || hdr->infyiflt) {
 			PRINT_FIELD_U(", ", *hdr, infyiflt);
+		}
 	}
 
-	if (!abbrev(tcp) || !IS_BLANK(hdr->infysyid))
+	if (!abbrev(tcp) || !IS_BLANK(hdr->infysyid)) {
 		PRINT_FIELD_EBCDIC(", ", *hdr, infysyid);
-	if (!abbrev(tcp) || !IS_BLANK(hdr->infyclnm))
+	}
+	if (!abbrev(tcp) || !IS_BLANK(hdr->infyclnm)) {
 		PRINT_FIELD_EBCDIC(", ", *hdr, infyclnm);
+	}
 
-	if (!abbrev(tcp) || hdr->infyscps)
+	if (!abbrev(tcp) || hdr->infyscps) {
 		PRINT_FIELD_U(", ", *hdr, infyscps);
-	if (!abbrev(tcp) || hdr->infydcps)
+	}
+	if (!abbrev(tcp) || hdr->infydcps) {
 		PRINT_FIELD_U(", ", *hdr, infydcps);
-	if (!abbrev(tcp) || hdr->infysifl)
+	}
+	if (!abbrev(tcp) || hdr->infysifl) {
 		PRINT_FIELD_U(", ", *hdr, infysifl);
-	if (!abbrev(tcp) || hdr->infydifl)
+	}
+	if (!abbrev(tcp) || hdr->infydifl) {
 		PRINT_FIELD_U(", ", *hdr, infydifl);
+	}
 
 	if (!abbrev(tcp)) {
 		if (size >= offsetofend(struct sthyi_hypervisor, infyautf)) {
@@ -864,20 +905,25 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			hdr->infgflg1 & 0x03,
 			hdr->infgflg1 & 0x03 ? " - ???" : "");
 	if (!abbrev(tcp)) {
-		if (hdr->infgflg2) /* Reserved */
+		if (hdr->infgflg2) { /* Reserved */
 			PRINT_FIELD_0X(", ", *hdr, infgflg2);
-		if (hdr->infgval1) /* Reserved */
+		}
+		if (hdr->infgval1) { /* Reserved */
 			PRINT_FIELD_0X(", ", *hdr, infgval1);
-		if (hdr->infgval2) /* Reserved */
+		}
+		if (hdr->infgval2) { /* Reserved */
 			PRINT_FIELD_0X(", ", *hdr, infgval2);
+		}
 	}
 
 	PRINT_FIELD_EBCDIC(", ", *hdr, infgusid);
 
-	if (!abbrev(tcp) || hdr->infgscps)
+	if (!abbrev(tcp) || hdr->infgscps) {
 		PRINT_FIELD_U(", ", *hdr, infgscps);
-	if (!abbrev(tcp) || hdr->infgdcps)
+	}
+	if (!abbrev(tcp) || hdr->infgdcps) {
 		PRINT_FIELD_U(", ", *hdr, infgdcps);
+	}
 
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_U(", ", *hdr, infgcpdt);
@@ -889,17 +935,21 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			tprints_comment("unknown");
 		}
 
-		if (!IS_ARRAY_ZERO(hdr->reserved_1__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_1__)) {
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
+		}
 	}
 
-	if (!abbrev(tcp) || hdr->infgcpcc)
+	if (!abbrev(tcp) || hdr->infgcpcc) {
 		PRINT_FIELD_WEIGHT(", ", *hdr, infgcpcc);
+	}
 
-	if (!abbrev(tcp) || hdr->infgsifl)
+	if (!abbrev(tcp) || hdr->infgsifl) {
 		PRINT_FIELD_U(", ", *hdr, infgsifl);
-	if (!abbrev(tcp) || hdr->infgdifl)
+	}
+	if (!abbrev(tcp) || hdr->infgdifl) {
 		PRINT_FIELD_U(", ", *hdr, infgdifl);
+	}
 
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_U(", ", *hdr, infgifdt);
@@ -914,12 +964,14 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			tprints_comment("unknown");
 		}
 
-		if (!IS_ARRAY_ZERO(hdr->reserved_2__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_2__)) {
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_2__);
+		}
 	}
 
-	if (!abbrev(tcp) || hdr->infgifcc)
+	if (!abbrev(tcp) || hdr->infgifcc) {
 		PRINT_FIELD_WEIGHT(", ", *hdr, infgifcc);
+	}
 
 	PRINT_FIELD_0X(", ", *hdr, infgpflg);
 	if (!abbrev(tcp) && hdr->infgpflg)
@@ -952,11 +1004,13 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			hdr->infgpflg & 0x07 ? " - ???" : "");
 
 	if (!abbrev(tcp)) {
-		if (!IS_ARRAY_ZERO(hdr->reserved_3__))
+		if (!IS_ARRAY_ZERO(hdr->reserved_3__)) {
 			PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_3__);
+		}
 
-		if (!IS_BLANK(hdr->infgpnam))
+		if (!IS_BLANK(hdr->infgpnam)) {
 			PRINT_FIELD_EBCDIC(", ", *hdr, infgpnam);
+		}
 
 		PRINT_FIELD_WEIGHT(", ", *hdr, infgpccc);
 		PRINT_FIELD_WEIGHT(", ", *hdr, infgpicc);
@@ -1036,15 +1090,19 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 				", " : "",
 			hdr->infhflg1 & 0x0F,
 			hdr->infhflg1 & 0x0F ? " - ???" : "");
-	if (hdr->infhflg2) /* Reserved */
+	if (hdr->infhflg2) { /* Reserved */
 		PRINT_FIELD_0X(", ", *hdr, infhflg2);
-	if (hdr->infhval1) /* Reserved */
+	}
+	if (hdr->infhval1) { /* Reserved */
 		PRINT_FIELD_0X(", ", *hdr, infhval1);
-	if (hdr->infhval2) /* Reserved */
+	}
+	if (hdr->infhval2) { /* Reserved */
 		PRINT_FIELD_0X(", ", *hdr, infhval2);
+	}
 
-	if (!IS_ARRAY_ZERO(hdr->reserved_1__))
+	if (!IS_ARRAY_ZERO(hdr->reserved_1__)) {
 		PRINT_FIELD_HEX_ARRAY(", ", *hdr, reserved_1__);
+	}
 
 	PRINT_FIELD_U(", ", *hdr, infhygct);
 	PRINT_FIELD_U(", ", *hdr, infhtotl);
@@ -1223,8 +1281,9 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 				(gsepl.gs_eai >> 4) & 0x3,
 				gsepl.gs_eai & 0xF);
 
-		if (gsepl.pad2)
+		if (gsepl.pad2) {
 			PRINT_FIELD_0X(", ", gsepl, pad2);
+		}
 
 		tprints(", ");
 	}

@@ -143,8 +143,9 @@ print_si_syscall(const unsigned int scno)
 static void
 print_si_info(struct tcb *tcp, const siginfo_t *sip)
 {
-	if (sip->si_errno)
+	if (sip->si_errno) {
 		PRINT_FIELD_ERR_U(", ", *sip, si_errno);
+	}
 
 	if (SI_FROMUSER(sip)) {
 		switch (sip->si_code) {
@@ -171,10 +172,11 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		switch (sip->si_signo) {
 		case SIGCHLD:
 			printsigsource(tcp, sip);
-			if (sip->si_code == CLD_EXITED)
+			if (sip->si_code == CLD_EXITED) {
 				PRINT_FIELD_D(", ", *sip, si_status);
-			else
+			} else {
 				PRINT_FIELD_OBJ_VAL(", ", *sip, si_status, printsignal);
+			}
 			PRINT_FIELD_U(", ", *sip, si_utime);
 			PRINT_FIELD_U(", ", *sip, si_stime);
 			break;

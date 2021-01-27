@@ -135,8 +135,9 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 		return;
 
 	PRINT_FIELD_OBJ_VAL("{", how, flags, tprint_open_modes64);
-	if ((how.flags & (O_CREAT| __O_TMPFILE)) || how.mode)
+	if ((how.flags & (O_CREAT | __O_TMPFILE)) || how.mode) {
 		PRINT_FIELD_NUMERIC_UMODE_T(", ", how, mode);
+	}
 	PRINT_FIELD_FLAGS(", ", how, resolve, open_resolve_flags,
 			  "RESOLVE_???");
 

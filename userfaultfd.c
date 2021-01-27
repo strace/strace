@@ -98,8 +98,9 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		}
 
-		if (!syserror(tcp) && !umove(tcp, arg, &uc))
+		if (!syserror(tcp) && !umove(tcp, arg, &uc)) {
 			PRINT_FIELD_X(", ", uc, copy);
+		}
 
 		tprints("}");
 
@@ -160,8 +161,9 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		}
 
-		if (!syserror(tcp) && !umove(tcp, arg, &uz))
+		if (!syserror(tcp) && !umove(tcp, arg, &uz)) {
 			PRINT_FIELD_X(", ", uz, zeropage);
+		}
 
 		tprints("}");
 

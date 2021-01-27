@@ -104,8 +104,9 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 
 # ifdef HAVE_STRUCT_USER_DESC_LM
 		/* lm is totally ignored for 32-bit processes */
-		if (current_klongsize == 8)
+		if (current_klongsize == 8) {
 			PRINT_FIELD_U_CAST(", ", desc, lm, unsigned int);
+		}
 # endif /* HAVE_STRUCT_USER_DESC_LM */
 
 		tprints("}");
