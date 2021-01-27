@@ -70,8 +70,8 @@ kvm_ioctl_decode_regs_dtable(const struct kvm_dtable *const dtable)
 	tprints("}");
 }
 
-# define PRINT_FIELD_KVM_SREGS_STRUCT(prefix_, where_, field_, type_)	\
-	PRINT_FIELD_OBJ_PTR(prefix_, where_, field_,			\
+# define PRINT_FIELD_KVM_SREGS_STRUCT(where_, field_, type_)	\
+	PRINT_FIELD_OBJ_PTR("", where_, field_,			\
 			    kvm_ioctl_decode_regs_ ## type_)
 
 static void
@@ -79,21 +79,31 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 		     const kernel_ulong_t addr,
 		     const struct kvm_sregs *const sregs)
 {
-	PRINT_FIELD_KVM_SREGS_STRUCT("{", *sregs, cs, segment);
+	tprint_struct_begin();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, cs, segment);
 	if (abbrev(tcp)) {
 		tprints(", ...}");
 		return;
 	}
 
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, ds, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, es, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, fs, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, gs, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, ss, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, tr, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, ldt, segment);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, gdt, dtable);
-	PRINT_FIELD_KVM_SREGS_STRUCT(", ", *sregs, idt, dtable);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, ds, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, es, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, fs, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, gs, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, ss, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, tr, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, ldt, segment);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, gdt, dtable);
+	tprint_struct_next();
+	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, idt, dtable);
 	PRINT_FIELD_U(", ", *sregs, cr0);
 	PRINT_FIELD_U(", ", *sregs, cr2);
 	PRINT_FIELD_U(", ", *sregs, cr3);
