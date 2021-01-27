@@ -85,10 +85,14 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_netlink_diag_msg, print_netlink_diag_msg,
 			   NETLINK_DIAG_RX_RING, pattern, ndr,
-			   PRINT_FIELD_U("{", ndr, ndr_block_size);
-			   PRINT_FIELD_U(", ", ndr, ndr_block_nr);
-			   PRINT_FIELD_U(", ", ndr, ndr_frame_size);
-			   PRINT_FIELD_U(", ", ndr, ndr_frame_nr);
+			   printf("{");
+			   PRINT_FIELD_U("", ndr, ndr_block_size);
+			   printf(", ");
+			   PRINT_FIELD_U("", ndr, ndr_block_nr);
+			   printf(", ");
+			   PRINT_FIELD_U("", ndr, ndr_frame_size);
+			   printf(", ");
+			   PRINT_FIELD_U("", ndr, ndr_frame_nr);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,

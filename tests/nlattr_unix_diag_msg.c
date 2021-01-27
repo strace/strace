@@ -80,14 +80,17 @@ main(void)
 			   printf("{udiag_vfs_dev=makedev(%#x, %#x)",
 				  major(uv.udiag_vfs_dev),
 				  minor(uv.udiag_vfs_dev));
-			   PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
+			   printf(", ");
+			   PRINT_FIELD_U("", uv, udiag_vfs_ino);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_unix_diag_msg, print_unix_diag_msg,
 			   UNIX_DIAG_RQLEN, pattern, rql,
-			   PRINT_FIELD_U("{", rql, udiag_rqueue);
-			   PRINT_FIELD_U(", ", rql, udiag_wqueue);
+			   printf("{");
+			   PRINT_FIELD_U("", rql, udiag_rqueue);
+			   printf(", ");
+			   PRINT_FIELD_U("", rql, udiag_wqueue);
 			   printf("}"));
 
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,

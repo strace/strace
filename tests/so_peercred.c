@@ -89,10 +89,13 @@ main(void)
 	get_peercred(sv[0], peercred, len);
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
-	PRINT_FIELD_D(", {", *peercred, pid);
+	printf(", {");
+	PRINT_FIELD_D("", *peercred, pid);
 	printf("%s", pid_str);
-	PRINT_FIELD_UID(", ", *peercred, uid);
-	PRINT_FIELD_UID(", ", *peercred, gid);
+	printf(", ");
+	PRINT_FIELD_UID("", *peercred, uid);
+	printf(", ");
+	PRINT_FIELD_UID("", *peercred, gid);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/* getsockopt with zero optlen */
@@ -107,10 +110,13 @@ main(void)
 	get_peercred(sv[0], peercred, len);
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
-	PRINT_FIELD_D(", {", *peercred, pid);
+	printf(", {");
+	PRINT_FIELD_D("", *peercred, pid);
 	printf("%s", pid_str);
-	PRINT_FIELD_UID(", ", *peercred, uid);
-	PRINT_FIELD_UID(", ", *peercred, gid);
+	printf(", ");
+	PRINT_FIELD_UID("", *peercred, uid);
+	printf(", ");
+	PRINT_FIELD_UID("", *peercred, gid);
 	printf("}, [%u->%d]) = %s\n",
 	       (unsigned int) sizeof(*peercred) + 1, *len, errstr);
 
@@ -133,7 +139,8 @@ main(void)
 	get_peercred(sv[0], pid, len);
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
-	PRINT_FIELD_D(", {", *pid, pid);
+	printf(", {");
+	PRINT_FIELD_D("", *pid, pid);
 	printf("%s", pid_str);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
@@ -151,7 +158,8 @@ main(void)
 	memcpy(uid, uid_truncated, sizeof_uid_truncated);
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
-	PRINT_FIELD_D(", {", *uid, pid);
+	printf(", {");
+	PRINT_FIELD_D("", *uid, pid);
 	printf("%s", pid_str);
 	printf(", uid=");
 	print_quoted_hex(&uid->uid, sizeof_uid_truncated -
@@ -166,9 +174,11 @@ main(void)
 	get_peercred(sv[0], uid, len);
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
-	PRINT_FIELD_D(", {", *uid, pid);
+	printf(", {");
+	PRINT_FIELD_D("", *uid, pid);
 	printf("%s", pid_str);
-	PRINT_FIELD_UID(", ", *uid, uid);
+	printf(", ");
+	PRINT_FIELD_UID("", *uid, uid);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/*
@@ -185,9 +195,11 @@ main(void)
 	memcpy(peercred, gid_truncated, sizeof_gid_truncated);
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
-	PRINT_FIELD_D(", {", *peercred, pid);
+	printf(", {");
+	PRINT_FIELD_D("", *peercred, pid);
 	printf("%s", pid_str);
-	PRINT_FIELD_UID(", ", *peercred, uid);
+	printf(", ");
+	PRINT_FIELD_UID("", *peercred, uid);
 	printf(", gid=");
 	print_quoted_hex(&peercred->gid, sizeof_gid_truncated -
 				    offsetof(struct ucred, gid));

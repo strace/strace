@@ -199,7 +199,8 @@ test_rtnl_link(const int fd)
 		      printf(", ifi_type=ARPHRD_LOOPBACK"
 			     ", ifi_index=" IFINDEX_LO_STR
 			     ", ifi_flags=IFF_UP");
-		      PRINT_FIELD_X(", ", ifinfo, ifi_change);
+		      printf(", ");
+		      PRINT_FIELD_X("", ifinfo, ifi_change);
 		      printf("}"));
 }
 
@@ -217,7 +218,8 @@ test_rtnl_addr(const int fd)
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDR, msg,
 		      printf("{ifa_family=AF_UNIX"),
-		      PRINT_FIELD_U(", ", msg, ifa_prefixlen);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, ifa_prefixlen);
 		      printf(", ifa_flags=IFA_F_SECONDARY"
 			     ", ifa_scope=RT_SCOPE_UNIVERSE"
 			     ", ifa_index=" IFINDEX_LO_STR);
@@ -242,8 +244,10 @@ test_rtnl_route(const int fd)
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETROUTE, msg,
 		      printf("{rtm_family=AF_UNIX"),
-		      PRINT_FIELD_U(", ", msg, rtm_dst_len);
-		      PRINT_FIELD_U(", ", msg, rtm_src_len);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, rtm_dst_len);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, rtm_src_len);
 		      printf(", rtm_tos=IPTOS_LOWDELAY"
 			     ", rtm_table=RT_TABLE_DEFAULT"
 			     ", rtm_protocol=RTPROT_KERNEL"
@@ -328,9 +332,12 @@ test_rtnl_tc(const int fd)
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETQDISC, msg,
 		      printf("{tcm_family=AF_UNIX"),
 		      printf(", tcm_ifindex=" IFINDEX_LO_STR);
-		      PRINT_FIELD_U(", ", msg, tcm_handle);
-		      PRINT_FIELD_U(", ", msg, tcm_parent);
-		      PRINT_FIELD_U(", ", msg, tcm_info);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, tcm_handle);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, tcm_parent);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, tcm_info);
 		      printf("}"));
 }
 
@@ -363,10 +370,13 @@ test_rtnl_addrlabel(const int fd)
 
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDRLABEL, msg,
 		      printf("{ifal_family=AF_UNIX"),
-		      PRINT_FIELD_U(", ", msg, ifal_prefixlen);
-		      PRINT_FIELD_U(", ", msg, ifal_flags);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, ifal_prefixlen);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, ifal_flags);
 		      printf(", ifal_index=" IFINDEX_LO_STR);
-		      PRINT_FIELD_U(", ", msg, ifal_seq);
+		      printf(", ");
+		      PRINT_FIELD_U("", msg, ifal_seq);
 		      printf("}"));
 }
 #endif

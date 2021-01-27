@@ -78,14 +78,22 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_tcmsg, print_tcmsg,
 			   TCA_STATS, pattern, buf,
-			   PRINT_FIELD_U("{", st, bytes);
-			   PRINT_FIELD_U(", ", st, packets);
-			   PRINT_FIELD_U(", ", st, drops);
-			   PRINT_FIELD_U(", ", st, overlimits);
-			   PRINT_FIELD_U(", ", st, bps);
-			   PRINT_FIELD_U(", ", st, pps);
-			   PRINT_FIELD_U(", ", st, qlen);
-			   PRINT_FIELD_U(", ", st, backlog);
+			   printf("{");
+			   PRINT_FIELD_U("", st, bytes);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, packets);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, drops);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, overlimits);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, bps);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, pps);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, qlen);
+			   printf(", ");
+			   PRINT_FIELD_U("", st, backlog);
 			   printf("}"));
 
 	static const struct tc_estimator est = {
@@ -95,8 +103,10 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_tcmsg, print_tcmsg,
 			   TCA_RATE, pattern, est,
-			   PRINT_FIELD_D("{", est, interval);
-			   PRINT_FIELD_U(", ", est, ewma_log);
+			   printf("{");
+			   PRINT_FIELD_D("", est, interval);
+			   printf(", ");
+			   PRINT_FIELD_U("", est, ewma_log);
 			   printf("}"));
 
 	puts("+++ exited with 0 +++");

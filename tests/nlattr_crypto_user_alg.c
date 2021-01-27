@@ -88,8 +88,10 @@ main(void)
 			      pattern, rhash, sizeof(rhash),
 			      print_quoted_memory,
 			      printf("{type=\"efgh\"");
-			      PRINT_FIELD_U(", ", rhash, blocksize);
-			      PRINT_FIELD_U(", ", rhash, digestsize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rhash, blocksize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rhash, digestsize);
 			      printf("}"));
 # endif
 
@@ -108,10 +110,14 @@ main(void)
 			      pattern, rblkcipher, sizeof(rblkcipher),
 			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
-			      PRINT_FIELD_U(", ", rblkcipher, blocksize);
-			      PRINT_FIELD_U(", ", rblkcipher, min_keysize);
-			      PRINT_FIELD_U(", ", rblkcipher, max_keysize);
-			      PRINT_FIELD_U(", ", rblkcipher, ivsize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rblkcipher, blocksize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rblkcipher, min_keysize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rblkcipher, max_keysize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rblkcipher, ivsize);
 			      printf("}"));
 # endif
 
@@ -129,9 +135,12 @@ main(void)
 			      pattern, raead, sizeof(raead),
 			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
-			      PRINT_FIELD_U(", ", raead, blocksize);
-			      PRINT_FIELD_U(", ", raead, maxauthsize);
-			      PRINT_FIELD_U(", ", raead, ivsize);
+			      printf(", ");
+			      PRINT_FIELD_U("", raead, blocksize);
+			      printf(", ");
+			      PRINT_FIELD_U("", raead, maxauthsize);
+			      printf(", ");
+			      PRINT_FIELD_U("", raead, ivsize);
 			      printf("}"));
 # endif
 
@@ -145,7 +154,8 @@ main(void)
 			      CRYPTOCFGA_REPORT_RNG,
 			      pattern, rrng, sizeof(rrng), print_quoted_memory,
 			      printf("{type=\"abcd\"");
-			      PRINT_FIELD_U(", ", rrng, seedsize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rrng, seedsize);
 			      printf("}"));
 # endif
 
@@ -162,9 +172,12 @@ main(void)
 			      pattern, rcipher, sizeof(rcipher),
 			      print_quoted_memory,
 			      printf("{type=\"abcd\"");
-			      PRINT_FIELD_U(", ", rcipher, blocksize);
-			      PRINT_FIELD_U(", ", rcipher, min_keysize);
-			      PRINT_FIELD_U(", ", rcipher, max_keysize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rcipher, blocksize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rcipher, min_keysize);
+			      printf(", ");
+			      PRINT_FIELD_U("", rcipher, max_keysize);
 			      printf("}"));
 # endif
 

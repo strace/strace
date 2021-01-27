@@ -87,10 +87,14 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ndmsg, print_ndmsg,
 			   NDA_CACHEINFO, pattern, ci,
-			   PRINT_FIELD_U("{", ci, ndm_confirmed);
-			   PRINT_FIELD_U(", ", ci, ndm_used);
-			   PRINT_FIELD_U(", ", ci, ndm_updated);
-			   PRINT_FIELD_U(", ", ci, ndm_refcnt);
+			   printf("{");
+			   PRINT_FIELD_U("", ci, ndm_confirmed);
+			   printf(", ");
+			   PRINT_FIELD_U("", ci, ndm_used);
+			   printf(", ");
+			   PRINT_FIELD_U("", ci, ndm_updated);
+			   printf(", ");
+			   PRINT_FIELD_U("", ci, ndm_refcnt);
 			   printf("}"));
 
 	const uint16_t port = 0xabcd;

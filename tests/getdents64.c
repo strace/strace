@@ -28,9 +28,12 @@ print_dirent(const kernel_dirent_type *d)
 	if (d_name_len <= 0)
 		error_msg_and_fail("d_name_len = %d", d_name_len);
 
-	PRINT_FIELD_U("{", *d, d_ino);
-	PRINT_FIELD_U(", ", *d, d_off);
-	PRINT_FIELD_U(", ", *d, d_reclen);
+	printf("{");
+	PRINT_FIELD_U("", *d, d_ino);
+	printf(", ");
+	PRINT_FIELD_U("", *d, d_off);
+	printf(", ");
+	PRINT_FIELD_U("", *d, d_reclen);
 	printf(", d_type=%s, d_name=", str_d_type(d->d_type));
 	print_quoted_cstring(d->d_name, d_name_len);
 	printf("}");

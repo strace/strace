@@ -122,10 +122,14 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifaddrmsg, print_ifaddrmsg,
 			   IFA_CACHEINFO, pattern, ci,
-			   PRINT_FIELD_U("{", ci, ifa_prefered);
-			   PRINT_FIELD_U(", ", ci, ifa_valid);
-			   PRINT_FIELD_U(", ", ci, cstamp);
-			   PRINT_FIELD_U(", ", ci, tstamp);
+			   printf("{");
+			   PRINT_FIELD_U("", ci, ifa_prefered);
+			   printf(", ");
+			   PRINT_FIELD_U("", ci, ifa_valid);
+			   printf(", ");
+			   PRINT_FIELD_U("", ci, cstamp);
+			   printf(", ");
+			   PRINT_FIELD_U("", ci, tstamp);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,

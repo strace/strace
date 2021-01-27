@@ -53,7 +53,8 @@ test_selnl_msg_setenforce(const int fd)
 
 	TEST_NETLINK_OBJECT(fd, nlh0,
 			    SELNL_MSG_SETENFORCE, NLM_F_REQUEST, msg,
-			    PRINT_FIELD_D("{", msg, val);
+			    printf("{");
+			    PRINT_FIELD_D("", msg, val);
 			    printf("}"));
 }
 
@@ -67,7 +68,8 @@ test_selnl_msg_policyload(const int fd)
 
 	TEST_NETLINK_OBJECT(fd, nlh0,
 			    SELNL_MSG_POLICYLOAD, NLM_F_REQUEST, msg,
-			    PRINT_FIELD_U("{", msg, seqno);
+			    printf("{");
+			    PRINT_FIELD_U("", msg, seqno);
 			    printf("}"));
 }
 

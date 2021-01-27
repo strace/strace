@@ -77,29 +77,47 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 		return;
 	}
 
-	PRINT_FIELD_D("{", *dq, d_version);
+	printf("{");
+	PRINT_FIELD_D("", *dq, d_version);
 	printf(", d_flags=");
 	printflags(xfs_dqblk_flags, (uint8_t) dq->d_flags, "XFS_???_QUOTA");
 
-	PRINT_FIELD_X(", ", *dq, d_fieldmask);
-	PRINT_FIELD_U(", ", *dq, d_id);
-	PRINT_FIELD_U(", ", *dq, d_blk_hardlimit);
-	PRINT_FIELD_U(", ", *dq, d_blk_softlimit);
-	PRINT_FIELD_U(", ", *dq, d_ino_hardlimit);
-	PRINT_FIELD_U(", ", *dq, d_ino_softlimit);
-	PRINT_FIELD_U(", ", *dq, d_bcount);
-	PRINT_FIELD_U(", ", *dq, d_icount);
+	printf(", ");
+	PRINT_FIELD_X("", *dq, d_fieldmask);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_id);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_blk_hardlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_blk_softlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_ino_hardlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_ino_softlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_bcount);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_icount);
 
 # if VERBOSE
-	PRINT_FIELD_D(", ", *dq, d_itimer);
-	PRINT_FIELD_D(", ", *dq, d_btimer);
-	PRINT_FIELD_U(", ", *dq, d_iwarns);
-	PRINT_FIELD_U(", ", *dq, d_bwarns);
-	PRINT_FIELD_U(", ", *dq, d_rtb_hardlimit);
-	PRINT_FIELD_U(", ", *dq, d_rtb_softlimit);
-	PRINT_FIELD_U(", ", *dq, d_rtbcount);
-	PRINT_FIELD_D(", ", *dq, d_rtbtimer);
-	PRINT_FIELD_U(", ", *dq, d_rtbwarns);
+	printf(", ");
+	PRINT_FIELD_D("", *dq, d_itimer);
+	printf(", ");
+	PRINT_FIELD_D("", *dq, d_btimer);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_iwarns);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_bwarns);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_rtb_hardlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_rtb_softlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_rtbcount);
+	printf(", ");
+	PRINT_FIELD_D("", *dq, d_rtbtimer);
+	printf(", ");
+	PRINT_FIELD_U("", *dq, d_rtbwarns);
 # else
 	printf(", ...");
 # endif /* !VERBOSE */
@@ -117,23 +135,36 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 		return;
 	}
 
-	PRINT_FIELD_D("{", *qs, qs_version);
+	printf("{");
+	PRINT_FIELD_D("", *qs, qs_version);
 
 # if VERBOSE
 	printf(", qs_flags=");
 	printflags(xfs_quota_flags, qs->qs_flags, "XFS_QUOTA_???");
-	PRINT_FIELD_U(", qs_uquota={", qs->qs_uquota, qfs_ino);
-	PRINT_FIELD_U(", ", qs->qs_uquota, qfs_nblks);
-	PRINT_FIELD_U(", ", qs->qs_uquota, qfs_nextents);
-	PRINT_FIELD_U("}, qs_gquota={", qs->qs_gquota, qfs_ino);
-	PRINT_FIELD_U(", ", qs->qs_gquota, qfs_nblks);
-	PRINT_FIELD_U(", ", qs->qs_gquota, qfs_nextents);
-	PRINT_FIELD_U("}, ", *qs, qs_incoredqs);
-	PRINT_FIELD_D(", ", *qs, qs_btimelimit);
-	PRINT_FIELD_D(", ", *qs, qs_itimelimit);
-	PRINT_FIELD_D(", ", *qs, qs_rtbtimelimit);
-	PRINT_FIELD_U(", ", *qs, qs_bwarnlimit);
-	PRINT_FIELD_U(", ", *qs, qs_iwarnlimit);
+	printf(", qs_uquota={");
+	PRINT_FIELD_U("", qs->qs_uquota, qfs_ino);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_uquota, qfs_nblks);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_uquota, qfs_nextents);
+	printf("}, qs_gquota={");
+	PRINT_FIELD_U("", qs->qs_gquota, qfs_ino);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_gquota, qfs_nblks);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_gquota, qfs_nextents);
+	printf("}, ");
+	PRINT_FIELD_U("", *qs, qs_incoredqs);
+	printf(", ");
+	PRINT_FIELD_D("", *qs, qs_btimelimit);
+	printf(", ");
+	PRINT_FIELD_D("", *qs, qs_itimelimit);
+	printf(", ");
+	PRINT_FIELD_D("", *qs, qs_rtbtimelimit);
+	printf(", ");
+	PRINT_FIELD_U("", *qs, qs_bwarnlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *qs, qs_iwarnlimit);
 # else
 	printf(", ...");
 # endif /* !VERBOSE */
@@ -151,26 +182,42 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 		return;
 	}
 
-	PRINT_FIELD_D("{", *qs, qs_version);
+	printf("{");
+	PRINT_FIELD_D("", *qs, qs_version);
 
 # if VERBOSE
 	printf(", qs_flags=");
 	printflags(xfs_quota_flags, qs->qs_flags, "XFS_QUOTA_???");
-	PRINT_FIELD_U(", ", *qs, qs_incoredqs);
-	PRINT_FIELD_U(", qs_uquota={", qs->qs_uquota, qfs_ino);
-	PRINT_FIELD_U(", ", qs->qs_uquota, qfs_nblks);
-	PRINT_FIELD_U(", ", qs->qs_uquota, qfs_nextents);
-	PRINT_FIELD_U("}, qs_gquota={", qs->qs_gquota, qfs_ino);
-	PRINT_FIELD_U(", ", qs->qs_gquota, qfs_nblks);
-	PRINT_FIELD_U(", ", qs->qs_gquota, qfs_nextents);
-	PRINT_FIELD_U("}, qs_pquota={", qs->qs_pquota, qfs_ino);
-	PRINT_FIELD_U(", ", qs->qs_pquota, qfs_nblks);
-	PRINT_FIELD_U(", ", qs->qs_pquota, qfs_nextents);
-	PRINT_FIELD_D("}, ", *qs, qs_btimelimit);
-	PRINT_FIELD_D(", ", *qs, qs_itimelimit);
-	PRINT_FIELD_D(", ", *qs, qs_rtbtimelimit);
-	PRINT_FIELD_U(", ", *qs, qs_bwarnlimit);
-	PRINT_FIELD_U(", ", *qs, qs_iwarnlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *qs, qs_incoredqs);
+	printf(", qs_uquota={");
+	PRINT_FIELD_U("", qs->qs_uquota, qfs_ino);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_uquota, qfs_nblks);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_uquota, qfs_nextents);
+	printf("}, qs_gquota={");
+	PRINT_FIELD_U("", qs->qs_gquota, qfs_ino);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_gquota, qfs_nblks);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_gquota, qfs_nextents);
+	printf("}, qs_pquota={");
+	PRINT_FIELD_U("", qs->qs_pquota, qfs_ino);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_pquota, qfs_nblks);
+	printf(", ");
+	PRINT_FIELD_U("", qs->qs_pquota, qfs_nextents);
+	printf("}, ");
+	PRINT_FIELD_D("", *qs, qs_btimelimit);
+	printf(", ");
+	PRINT_FIELD_D("", *qs, qs_itimelimit);
+	printf(", ");
+	PRINT_FIELD_D("", *qs, qs_rtbtimelimit);
+	printf(", ");
+	PRINT_FIELD_U("", *qs, qs_bwarnlimit);
+	printf(", ");
+	PRINT_FIELD_U("", *qs, qs_iwarnlimit);
 # else
 	printf(", ...");
 # endif /* !VERBOSE */
