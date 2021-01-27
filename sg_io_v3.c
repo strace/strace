@@ -40,9 +40,9 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-# define PRINT_FIELD_SG_IO_BUFFER(prefix_, where_, field_, size_, count_, tcp_)	\
+# define PRINT_FIELD_SG_IO_BUFFER(where_, field_, size_, count_, tcp_)		\
 	do {									\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		tprints_field_name(#field_);					\
 		print_sg_io_buffer((tcp_), (mpers_ptr_t)((where_).field_),	\
 				   (size_), (count_));				\
 	} while (0)
@@ -64,7 +64,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_XVAL("", sg_io, dxfer_direction, sg_io_dxfer_direction,
 			 "SG_DXFER_???");
 	PRINT_FIELD_U(", ", sg_io, cmd_len);
-	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, cmdp, sg_io.cmd_len, 0, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_SG_IO_BUFFER(sg_io, cmdp, sg_io.cmd_len, 0, tcp);
 	PRINT_FIELD_U(", ", sg_io, mx_sb_len);
 	PRINT_FIELD_U(", ", sg_io, iovec_count);
 	PRINT_FIELD_U(", ", sg_io, dxfer_len);
@@ -73,7 +74,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
-		PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, dxferp, sg_io.dxfer_len, sg_io.iovec_count, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_SG_IO_BUFFER(sg_io, dxferp, sg_io.dxfer_len, sg_io.iovec_count, tcp);
 	}
 
 	struct_sg_io_hdr *entering_sg_io = malloc(sizeof(*entering_sg_io));
@@ -121,7 +123,7 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		if (prefix) {
 			tprints(prefix);
-			PRINT_FIELD_SG_IO_BUFFER("", sg_io, dxferp, din_len,
+			PRINT_FIELD_SG_IO_BUFFER(sg_io, dxferp, din_len,
 						 sg_io.iovec_count, tcp);
 		}
 	}
@@ -129,7 +131,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_X(", ", sg_io, masked_status);
 	PRINT_FIELD_X(", ", sg_io, msg_status);
 	PRINT_FIELD_U(", ", sg_io, sb_len_wr);
-	PRINT_FIELD_SG_IO_BUFFER(", ", sg_io, sbp, sg_io.sb_len_wr, 0, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_SG_IO_BUFFER(sg_io, sbp, sg_io.sb_len_wr, 0, tcp);
 	PRINT_FIELD_X(", ", sg_io, host_status);
 	PRINT_FIELD_X(", ", sg_io, driver_status);
 	PRINT_FIELD_D(", ", sg_io, resid);
