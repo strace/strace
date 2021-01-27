@@ -197,7 +197,7 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING("{", caps, driver);
 	PRINT_FIELD_CSTRING(", ", caps, card);
 	PRINT_FIELD_CSTRING(", ", caps, bus_info);
-	PRINT_FIELD_KERNEL_VERSION(", ", caps, version);
+	PRINT_FIELD_OBJ_VAL(", ", caps, version, print_kernel_version);
 	PRINT_FIELD_FLAGS(", ", caps, capabilities,
 			  v4l2_device_capabilities_flags, "V4L2_CAP_???");
 	if (caps.device_caps) {
