@@ -31,8 +31,8 @@
 			   params_)
 
 /* session id is printed as 0x%x in libteec */
-#define PRINT_FIELD_SESSION(prefix_, where_, field_) \
-	PRINT_FIELD_X(prefix_, where_, field_)
+#define PRINT_FIELD_SESSION(where_, field_) \
+	PRINT_FIELD_X("", where_, field_)
 
 static void
 tee_print_buf(struct_tee_ioctl_buf_data *buf)
@@ -222,7 +222,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, open_session, &params)))
 			return rval;
 
-		PRINT_FIELD_SESSION("{", open_session, session);
+		tprint_struct_begin();
+		PRINT_FIELD_SESSION(open_session, session);
 		PRINT_FIELD_U(", ", open_session, ret);
 		PRINT_FIELD_XVAL(", ", open_session, ret_origin, tee_ioctl_origins,
 				 "TEEC_ORIGIN_???");
@@ -248,7 +249,8 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		PRINT_FIELD_U("{", buf_data, buf_len);
 		PRINT_FIELD_U(", buf_ptr={", invoke, func);
-		PRINT_FIELD_SESSION(", ", invoke, session);
+		tprint_struct_next();
+		PRINT_FIELD_SESSION(invoke, session);
 		PRINT_FIELD_U(", ", invoke, cancel_id);
 		PRINT_FIELD_U(", ", invoke, num_params);
 		tee_print_params(tcp, params, invoke.num_params);
@@ -285,7 +287,8 @@ tee_cancel(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	PRINT_FIELD_U("{", cancel, cancel_id);
-	PRINT_FIELD_SESSION(", ", cancel, session);
+	tprint_struct_next();
+	PRINT_FIELD_SESSION(cancel, session);
 
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
@@ -300,7 +303,8 @@ tee_close_session(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &close_session))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_SESSION("{", close_session, session);
+	tprint_struct_begin();
+	PRINT_FIELD_SESSION(close_session, session);
 
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
