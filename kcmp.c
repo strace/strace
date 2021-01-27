@@ -16,10 +16,10 @@ struct strace_kcmp_epoll_slot {
 	uint32_t toff;
 };
 
-#define PRINT_FIELD_PIDFD(prefix_, where_, field_, tcp_, pid_)		\
+#define PRINT_FIELD_PIDFD(where_, field_, tcp_, pid_)			\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printfd_pid_tracee_ns((tcp_), (pid_), (where_).field_);		\
+		tprints_field_name(#field_);				\
+		printfd_pid_tracee_ns((tcp_), (pid_), (where_).field_);	\
 	} while (0)
 
 SYS_FUNC(kcmp)
@@ -55,8 +55,10 @@ SYS_FUNC(kcmp)
 			if (umove_or_printaddr(tcp, idx2, &slot))
 				break;
 
-			PRINT_FIELD_PIDFD("{",  slot, efd, tcp, pid2);
-			PRINT_FIELD_PIDFD(", ", slot, tfd, tcp, pid2);
+			tprint_struct_begin();
+			PRINT_FIELD_PIDFD(slot, efd, tcp, pid2);
+			tprint_struct_next();
+			PRINT_FIELD_PIDFD(slot, tfd, tcp, pid2);
 			PRINT_FIELD_U(", ", slot, toff);
 			tprints("}");
 
