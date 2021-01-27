@@ -110,10 +110,13 @@ print_v4l2_rect(const MPERS_PTR_ARG(struct v4l2_rect *) const arg)
 	tprints("}");
 }
 
-#define PRINT_FIELD_FRACT(prefix_, where_, field_)			\
-	STRACE_PRINTF("%s%s=%u/%u", (prefix_), #field_,			\
-		      (where_).field_.numerator,			\
-		      (where_).field_.denominator)
+#define PRINT_FIELD_FRACT(where_, field_)			\
+	do {							\
+		tprints_field_name(#field_);			\
+		STRACE_PRINTF("%u/%u",				\
+			      (where_).field_.numerator,	\
+			      (where_).field_.denominator);	\
+	} while (0)
 
 static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
@@ -173,9 +176,9 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 	}
 }
 
-#define PRINT_FIELD_PIXFMT(prefix_, where_, field_, xlat_)	\
+#define PRINT_FIELD_PIXFMT(where_, field_, xlat_)	\
 	do {							\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		tprints_field_name(#field_);			\
 		print_pixelformat((where_).field_, (xlat_));	\
 	} while (0)
 
@@ -229,7 +232,8 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 				  v4l2_format_description_flags,
 				  "V4L2_FMT_FLAG_???");
 		PRINT_FIELD_CSTRING(", ", f, description);
-		PRINT_FIELD_PIXFMT(", ", f, pixelformat, v4l2_pix_fmts);
+		tprint_struct_next();
+		PRINT_FIELD_PIXFMT(f, pixelformat, v4l2_pix_fmts);
 	}
 	tprints("}");
 	return RVAL_IOCTL_DECODED;
@@ -258,7 +262,8 @@ DECL_print_v4l2_format_fmt(pix)
 {
 	PRINT_FIELD_U("{", *p, width);
 	PRINT_FIELD_U(", ", *p, height);
-	PRINT_FIELD_PIXFMT(", ", *p, pixelformat, v4l2_pix_fmts);
+	tprint_struct_next();
+	PRINT_FIELD_PIXFMT(*p, pixelformat, v4l2_pix_fmts);
 	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_U(", ", *p, bytesperline);
 	PRINT_FIELD_U(", ", *p, sizeimage);
@@ -286,7 +291,8 @@ DECL_print_v4l2_format_fmt(pix_mp)
 {
 	PRINT_FIELD_U("{", *p, width);
 	PRINT_FIELD_U(", ", *p, height);
-	PRINT_FIELD_PIXFMT(", ", *p, pixelformat, v4l2_pix_fmts);
+	tprint_struct_next();
+	PRINT_FIELD_PIXFMT(*p, pixelformat, v4l2_pix_fmts);
 	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_XVAL(", ", *p, colorspace, v4l2_colorspaces,
 			 "V4L2_COLORSPACE_???");
@@ -325,7 +331,8 @@ DECL_print_v4l2_format_fmt(vbi)
 	PRINT_FIELD_U("{", *p, sampling_rate);
 	PRINT_FIELD_U(", ", *p, offset);
 	PRINT_FIELD_U(", ", *p, samples_per_line);
-	PRINT_FIELD_PIXFMT(", ", *p, sample_format, v4l2_pix_fmts);
+	tprint_struct_next();
+	PRINT_FIELD_PIXFMT(*p, sample_format, v4l2_pix_fmts);
 	PRINT_FIELD_D_ARRAY(", ", *p, start);
 	PRINT_FIELD_U_ARRAY(", ", *p, count);
 	PRINT_FIELD_FLAGS(", ", *p, flags, v4l2_vbi_flags, "V4L2_VBI_???");
@@ -347,7 +354,8 @@ DECL_print_v4l2_format_fmt(sliced)
 static bool
 DECL_print_v4l2_format_fmt(sdr)
 {
-	PRINT_FIELD_PIXFMT("{", *p, pixelformat, v4l2_sdr_fmts);
+	tprint_struct_begin();
+	PRINT_FIELD_PIXFMT(*p, pixelformat, v4l2_sdr_fmts);
 	if (p->buffersize) {
 		PRINT_FIELD_U(", ", *p, buffersize);
 	}
@@ -358,17 +366,18 @@ DECL_print_v4l2_format_fmt(sdr)
 static bool
 DECL_print_v4l2_format_fmt(meta)
 {
-	PRINT_FIELD_PIXFMT("{", *p, dataformat, v4l2_meta_fmts);
+	tprint_struct_begin();
+	PRINT_FIELD_PIXFMT(*p, dataformat, v4l2_meta_fmts);
 	PRINT_FIELD_U(", ", *p, buffersize);
 	tprints("}");
 	return true;
 }
 
-#define PRINT_FIELD_V4L2_FORMAT_FMT(prefix_, where_, fmt_, field_, tcp_, ret_)	\
-	do {									\
-		STRACE_PRINTF("%s%s.%s=", (prefix_), #fmt_, #field_);		\
-		(ret_) = (print_v4l2_format_fmt_ ## field_)			\
-				((tcp_), &((where_).fmt_.field_));		\
+#define PRINT_FIELD_V4L2_FORMAT_FMT(where_, fmt_, field_, tcp_, ret_)	\
+	do {								\
+		tprints_field_name(#fmt_ "." #field_);			\
+		(ret_) = (print_v4l2_format_fmt_ ## field_)		\
+				((tcp_), &((where_).fmt_.field_));	\
 	} while (0)
 
 static bool
@@ -379,42 +388,49 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *const prefix,
 	switch (f->type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, pix, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, pix, tcp, ret);
 		break;
 
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, pix_mp, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, pix_mp, tcp, ret);
 		break;
 
 	/* OUTPUT_OVERLAY since Linux v2.6.22-rc1~1118^2~179 */
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, win, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, win, tcp, ret);
 		break;
 
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, vbi, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, vbi, tcp, ret);
 		break;
 
 	/* both since Linux v2.6.14-rc2~64 */
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, sliced, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, sliced, tcp, ret);
 		break;
 
 	/* since Linux v4.4-rc1~118^2~14 */
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
 	/* since Linux v3.15-rc1~85^2~213 */
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, sdr, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, sdr, tcp, ret);
 		break;
 	/* since Linux v5.0-rc1~181^2~21 */
 	case V4L2_BUF_TYPE_META_OUTPUT:
 	/* since Linux v4.12-rc1~85^2~71 */
 	case V4L2_BUF_TYPE_META_CAPTURE:
-		PRINT_FIELD_V4L2_FORMAT_FMT(prefix, *f, fmt, meta, tcp, ret);
+		tprints(prefix);
+		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, meta, tcp, ret);
 		break;
 	default:
 		return false;
@@ -513,9 +529,9 @@ print_v4l2_buffer_flags(uint32_t val)
 		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
 }
 
-#define PRINT_FIELD_V4L2_BUFFER_FLAGS(prefix_, where_, field_)	\
+#define PRINT_FIELD_V4L2_BUFFER_FLAGS(where_, field_)		\
 	do {							\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		tprints_field_name(#field_);			\
 		print_v4l2_buffer_flags((where_).field_);	\
 	} while (0)
 
@@ -535,10 +551,10 @@ print_v4l2_timeval(const MPERS_PTR_ARG(kernel_v4l2_timeval_t *) const arg)
 	}
 }
 
-#define PRINT_FIELD_V4L2_TIMEVAL(prefix_, where_, field_)	\
-	do {							\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
-		print_v4l2_timeval(&((where_).field_));		\
+#define PRINT_FIELD_V4L2_TIMEVAL(where_, field_)	\
+	do {						\
+		tprints_field_name(#field_);		\
+		print_v4l2_timeval(&((where_).field_));	\
 	} while (0)
 
 static int
@@ -575,9 +591,11 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 
 		PRINT_FIELD_U(", ", b, length);
 		PRINT_FIELD_U(", ", b, bytesused);
-		PRINT_FIELD_V4L2_BUFFER_FLAGS(", ", b, flags);
+		tprint_struct_next();
+		PRINT_FIELD_V4L2_BUFFER_FLAGS(b, flags);
 		if (code == VIDIOC_DQBUF) {
-			PRINT_FIELD_V4L2_TIMEVAL(", ", b, timestamp);
+			tprint_struct_next();
+			PRINT_FIELD_V4L2_TIMEVAL(b, timestamp);
 		}
 		tprints(", ...");
 	}
@@ -627,7 +645,8 @@ print_v4l2_streamparm_capture(const struct v4l2_captureparm *const p)
 			  "V4L2_CAP_???");
 	PRINT_FIELD_FLAGS(", ", *p, capturemode, v4l2_capture_modes,
 			  "V4L2_MODE_???");
-	PRINT_FIELD_FRACT(", ", *p, timeperframe);
+	tprint_struct_next();
+	PRINT_FIELD_FRACT(*p, timeperframe);
 	PRINT_FIELD_X(", ", *p, extendedmode);
 	PRINT_FIELD_U(", ", *p, readbuffers);
 	tprints("}");
@@ -640,15 +659,16 @@ print_v4l2_streamparm_output(const struct v4l2_outputparm *const p)
 			  "V4L2_CAP_???");
 	PRINT_FIELD_FLAGS(", ", *p, outputmode, v4l2_capture_modes,
 			  "V4L2_MODE_???");
-	PRINT_FIELD_FRACT(", ", *p, timeperframe);
+	tprint_struct_next();
+	PRINT_FIELD_FRACT(*p, timeperframe);
 	PRINT_FIELD_X(", ", *p, extendedmode);
 	PRINT_FIELD_U(", ", *p, writebuffers);
 	tprints("}");
 }
 
-#define PRINT_FIELD_V4L2_STREAMPARM_PARM(prefix_, where_, parm_, field_)	\
+#define PRINT_FIELD_V4L2_STREAMPARM_PARM(where_, parm_, field_)			\
 	do {									\
-		STRACE_PRINTF("%s%s.%s=", (prefix_), #parm_, #field_);		\
+		tprints_field_name(#parm_ "." #field_);				\
 		print_v4l2_streamparm_ ## field_(&((where_).parm_.field_));	\
 	} while (0)
 
@@ -684,9 +704,9 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
-		PRINT_FIELD_V4L2_STREAMPARM_PARM("", s, parm, capture);
+		PRINT_FIELD_V4L2_STREAMPARM_PARM(s, parm, capture);
 	} else {
-		PRINT_FIELD_V4L2_STREAMPARM_PARM("", s, parm, output);
+		PRINT_FIELD_V4L2_STREAMPARM_PARM(s, parm, output);
 	}
 
 	if (entering(tcp)) {
@@ -713,7 +733,8 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
 		PRINT_FIELD_CSTRING(", ", s, name);
-		PRINT_FIELD_FRACT(", ", s, frameperiod);
+		tprint_struct_next();
+		PRINT_FIELD_FRACT(s, frameperiod);
 		PRINT_FIELD_U(", ", s, framelines);
 	}
 
@@ -803,9 +824,9 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 	print_xlat_ex(cid, tmp_str, XLAT_STYLE_DEFAULT);
 }
 
-#define PRINT_FIELD_V4L2_CID(prefix_, where_, field_, next_)	\
+#define PRINT_FIELD_V4L2_CID(where_, field_, next_)		\
 	do {							\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		tprints_field_name(#field_);			\
 		print_v4l2_cid((where_).field_, (next_));	\
 	} while (0)
 
@@ -820,7 +841,8 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_V4L2_CID("{", c, id, false);
+		tprint_struct_begin();
+		PRINT_FIELD_V4L2_CID(c, id, false);
 		if (!is_get) {
 			PRINT_FIELD_D(", ", c, value);
 		}
@@ -900,7 +922,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 		set_tcb_priv_ulong(tcp, c.id);
-		PRINT_FIELD_V4L2_CID("{", c, id, true);
+		tprint_struct_begin();
+		PRINT_FIELD_V4L2_CID(c, id, true);
 
 		return 0;
 	}
@@ -950,7 +973,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 		set_tcb_priv_ulong(tcp, c.id);
-		PRINT_FIELD_V4L2_CID("{", c, id, true);
+		tprint_struct_begin();
+		PRINT_FIELD_V4L2_CID(c, id, true);
 
 		return 0;
 	}
@@ -1013,7 +1037,8 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
 		PRINT_FIELD_OBJ_PTR(", ", c, bounds, print_v4l2_rect);
 		PRINT_FIELD_OBJ_PTR(", ", c, defrect, print_v4l2_rect);
-		PRINT_FIELD_FRACT(", ", c, pixelaspect);
+		tprint_struct_next();
+		PRINT_FIELD_FRACT(c, pixelaspect);
 	}
 
 	tprints("}");
@@ -1138,9 +1163,9 @@ print_v4l2_frmsize_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmsize_stepwise *) 
 	tprints("}");
 }
 
-#define PRINT_FIELD_V4L2_FRMSIZE_TYPE(prefix_, where_, field_)		\
+#define PRINT_FIELD_V4L2_FRMSIZE_TYPE(where_, field_)			\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_v4l2_frmsize_ ## field_(&((where_).field_));	\
 	} while (0)
 
@@ -1154,7 +1179,8 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
 		PRINT_FIELD_U("{", s, index);
-		PRINT_FIELD_PIXFMT(", ", s, pixel_format, v4l2_pix_fmts);
+		tprint_struct_next();
+		PRINT_FIELD_PIXFMT(s, pixel_format, v4l2_pix_fmts);
 		return 0;
 	}
 
@@ -1163,10 +1189,12 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 				 "V4L2_FRMSIZE_TYPE_???");
 		switch (s.type) {
 		case V4L2_FRMSIZE_TYPE_DISCRETE:
-			PRINT_FIELD_V4L2_FRMSIZE_TYPE(", ", s, discrete);
+			tprint_struct_next();
+			PRINT_FIELD_V4L2_FRMSIZE_TYPE(s, discrete);
 			break;
 		case V4L2_FRMSIZE_TYPE_STEPWISE:
-			PRINT_FIELD_V4L2_FRMSIZE_TYPE(", ", s, stepwise);
+			tprint_struct_next();
+			PRINT_FIELD_V4L2_FRMSIZE_TYPE(s, stepwise);
 			break;
 		}
 	}
@@ -1180,15 +1208,18 @@ static void
 print_v4l2_frmival_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmival_stepwise *) const arg)
 {
 	const struct_v4l2_frmival_stepwise *const p = arg;
-	PRINT_FIELD_FRACT("{", *p, min);
-	PRINT_FIELD_FRACT(", ", *p, max);
-	PRINT_FIELD_FRACT(", ", *p, step);
+	tprint_struct_begin();
+	PRINT_FIELD_FRACT(*p, min);
+	tprint_struct_next();
+	PRINT_FIELD_FRACT(*p, max);
+	tprint_struct_next();
+	PRINT_FIELD_FRACT(*p, step);
 	tprints("}");
 }
 
-#define PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(prefix_, where_, field_)	\
+#define PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(where_, field_)		\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_v4l2_frmival_stepwise(&((where_).field_));	\
 	} while (0)
 
@@ -1202,7 +1233,8 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 		PRINT_FIELD_U("{", f, index);
-		PRINT_FIELD_PIXFMT(", ", f, pixel_format, v4l2_pix_fmts);
+		tprint_struct_next();
+		PRINT_FIELD_PIXFMT(f, pixel_format, v4l2_pix_fmts);
 		PRINT_FIELD_U(", ", f, width);
 		PRINT_FIELD_U(", ", f, height);
 		return 0;
@@ -1213,11 +1245,13 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 				 "V4L2_FRMIVAL_TYPE_???");
 		switch (f.type) {
 		case V4L2_FRMIVAL_TYPE_DISCRETE:
-			PRINT_FIELD_FRACT(", ", f, discrete);
+			tprint_struct_next();
+			PRINT_FIELD_FRACT(f, discrete);
 			break;
 		case V4L2_FRMIVAL_TYPE_STEPWISE:
 		case V4L2_FRMSIZE_TYPE_CONTINUOUS:
-			PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(", ", f, stepwise);
+			tprint_struct_next();
+			PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(f, stepwise);
 			break;
 		}
 	}
