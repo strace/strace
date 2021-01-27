@@ -455,15 +455,15 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 				    QUOTE_EMIT_COMMENT); \
 	} while (0)
 
-# define PRINT_FIELD_EBCDIC(prefix_, where_, field_) \
+# define PRINT_FIELD_EBCDIC(where_, field_) \
 	do { \
-		PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_); \
+		PRINT_FIELD_HEX_ARRAY("", where_, field_); \
 		PRINT_EBCDIC((where_).field_); \
 	} while (0)
 
-# define PRINT_FIELD_WEIGHT(prefix_, where_, field_) \
+# define PRINT_FIELD_WEIGHT(where_, field_) \
 	do { \
-		PRINT_FIELD_X(prefix_, where_, field_); \
+		PRINT_FIELD_X("", where_, field_); \
 		if ((where_).field_) \
 			tprintf_comment("%u %u/65536 cores", \
 				(where_).field_ >> 16, \
@@ -563,20 +563,25 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 
 	if (!abbrev(tcp)) {
 		if (name_val || hdr->infmname) {
-			PRINT_FIELD_EBCDIC(", ", *hdr, infmname);
+			tprint_struct_next();
+			PRINT_FIELD_EBCDIC(*hdr, infmname);
 		}
 
 		if (id_val || !IS_ARRAY_ZERO(hdr->infmtype)) {
-			PRINT_FIELD_EBCDIC(", ", *hdr, infmtype);
+			tprint_struct_next();
+			PRINT_FIELD_EBCDIC(*hdr, infmtype);
 		}
 		if (id_val || !IS_ARRAY_ZERO(hdr->infmmanu)) {
-			PRINT_FIELD_EBCDIC(", ", *hdr, infmmanu);
+			tprint_struct_next();
+			PRINT_FIELD_EBCDIC(*hdr, infmmanu);
 		}
 		if (id_val || !IS_ARRAY_ZERO(hdr->infmseq)) {
-			PRINT_FIELD_EBCDIC(", ", *hdr, infmseq);
+			tprint_struct_next();
+			PRINT_FIELD_EBCDIC(*hdr, infmseq);
 		}
 		if (id_val || !IS_ARRAY_ZERO(hdr->infmpman)) {
-			PRINT_FIELD_EBCDIC(", ", *hdr, infmpman);
+			tprint_struct_next();
+			PRINT_FIELD_EBCDIC(*hdr, infmpman);
 		}
 
 		if (size >= offsetofend(struct sthyi_machine, infmplnm)) {
@@ -588,7 +593,8 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 			}
 
 			if (!IS_ARRAY_ZERO(hdr->infmplnm)) {
-				PRINT_FIELD_EBCDIC(", ", *hdr, infmplnm);
+				tprint_struct_next();
+				PRINT_FIELD_EBCDIC(*hdr, infmplnm);
 			}
 		}
 
@@ -670,29 +676,37 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 	}
 
 	if (id_val || !IS_ARRAY_ZERO(hdr->infppnam)) {
-		PRINT_FIELD_EBCDIC(", ", *hdr, infppnam);
+		tprint_struct_next();
+		PRINT_FIELD_EBCDIC(*hdr, infppnam);
 	}
 
 	if (!abbrev(tcp)) {
 		if (wcap_val || hdr->infpwbcp) {
-			PRINT_FIELD_WEIGHT(", ", *hdr, infpwbcp);
+			tprint_struct_next();
+			PRINT_FIELD_WEIGHT(*hdr, infpwbcp);
 		}
 		if (acap_val || hdr->infpabcp) {
-			PRINT_FIELD_WEIGHT(", ", *hdr, infpabcp);
+			tprint_struct_next();
+			PRINT_FIELD_WEIGHT(*hdr, infpabcp);
 		}
 		if (wcap_val || hdr->infpwbif) {
-			PRINT_FIELD_WEIGHT(", ", *hdr, infpwbif);
+			tprint_struct_next();
+			PRINT_FIELD_WEIGHT(*hdr, infpwbif);
 		}
 		if (acap_val || hdr->infpabif) {
-			PRINT_FIELD_WEIGHT(", ", *hdr, infpabif);
+			tprint_struct_next();
+			PRINT_FIELD_WEIGHT(*hdr, infpabif);
 		}
 
 		if (size >= offsetofend(struct sthyi_partition, infplgif)) {
 			if (!IS_ARRAY_ZERO(hdr->infplgnm)) {
-				PRINT_FIELD_EBCDIC(", ", *hdr, infplgnm);
+				tprint_struct_next();
+				PRINT_FIELD_EBCDIC(*hdr, infplgnm);
 
-				PRINT_FIELD_WEIGHT(", ", *hdr, infplgcp);
-				PRINT_FIELD_WEIGHT(", ", *hdr, infplgif);
+				tprint_struct_next();
+				PRINT_FIELD_WEIGHT(*hdr, infplgcp);
+				tprint_struct_next();
+				PRINT_FIELD_WEIGHT(*hdr, infplgif);
 			} else {
 				if (lpar_val) {
 					PRINT_FIELD_HEX_ARRAY(", ", *hdr, infplgnm);
@@ -711,7 +725,8 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 						   infpplnm);
 
 			if (!IS_ARRAY_ZERO(hdr->infpplnm)) {
-				PRINT_FIELD_EBCDIC(", ", *hdr, infpplnm);
+				tprint_struct_next();
+				PRINT_FIELD_EBCDIC(*hdr, infpplnm);
 			}
 		}
 
@@ -824,10 +839,12 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 	}
 
 	if (!abbrev(tcp) || !IS_BLANK(hdr->infysyid)) {
-		PRINT_FIELD_EBCDIC(", ", *hdr, infysyid);
+		tprint_struct_next();
+		PRINT_FIELD_EBCDIC(*hdr, infysyid);
 	}
 	if (!abbrev(tcp) || !IS_BLANK(hdr->infyclnm)) {
-		PRINT_FIELD_EBCDIC(", ", *hdr, infyclnm);
+		tprint_struct_next();
+		PRINT_FIELD_EBCDIC(*hdr, infyclnm);
 	}
 
 	if (!abbrev(tcp) || hdr->infyscps) {
@@ -916,7 +933,8 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 		}
 	}
 
-	PRINT_FIELD_EBCDIC(", ", *hdr, infgusid);
+	tprint_struct_next();
+	PRINT_FIELD_EBCDIC(*hdr, infgusid);
 
 	if (!abbrev(tcp) || hdr->infgscps) {
 		PRINT_FIELD_U(", ", *hdr, infgscps);
@@ -941,7 +959,8 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	}
 
 	if (!abbrev(tcp) || hdr->infgcpcc) {
-		PRINT_FIELD_WEIGHT(", ", *hdr, infgcpcc);
+		tprint_struct_next();
+		PRINT_FIELD_WEIGHT(*hdr, infgcpcc);
 	}
 
 	if (!abbrev(tcp) || hdr->infgsifl) {
@@ -970,7 +989,8 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	}
 
 	if (!abbrev(tcp) || hdr->infgifcc) {
-		PRINT_FIELD_WEIGHT(", ", *hdr, infgifcc);
+		tprint_struct_next();
+		PRINT_FIELD_WEIGHT(*hdr, infgifcc);
 	}
 
 	PRINT_FIELD_0X(", ", *hdr, infgpflg);
@@ -1009,11 +1029,14 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 		}
 
 		if (!IS_BLANK(hdr->infgpnam)) {
-			PRINT_FIELD_EBCDIC(", ", *hdr, infgpnam);
+			tprint_struct_next();
+			PRINT_FIELD_EBCDIC(*hdr, infgpnam);
 		}
 
-		PRINT_FIELD_WEIGHT(", ", *hdr, infgpccc);
-		PRINT_FIELD_WEIGHT(", ", *hdr, infgpicc);
+		tprint_struct_next();
+		PRINT_FIELD_WEIGHT(*hdr, infgpccc);
+		tprint_struct_next();
+		PRINT_FIELD_WEIGHT(*hdr, infgpicc);
 
 		PRINT_UNKNOWN_TAIL(hdr, size);
 	} else {
