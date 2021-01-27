@@ -56,9 +56,9 @@ DECL_print_ff(replay)
 	tprints("}");
 }
 
-# define PRINT_FIELD_FF_EFFECT(prefix_, where_, field_)		\
+# define PRINT_FIELD_FF_EFFECT(where_, field_)			\
 	do {							\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);	\
+		tprints_field_name(#field_);			\
 		print_ff_ ## field_(&((where_).field_));	\
 	} while (0)
 
@@ -104,9 +104,9 @@ DECL_print_ff_effect(rumble)
 	tprints("}");
 }
 
-# define PRINT_FIELD_FF_TYPE_EFFECT(prefix_, where_, field_)		\
+# define PRINT_FIELD_FF_TYPE_EFFECT(where_, field_)			\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_ff_ ## field_ ## _effect(&((where_).field_));	\
 	} while (0)
 
@@ -129,21 +129,27 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 	}
 
-	PRINT_FIELD_FF_EFFECT(", ", ffe, trigger);
-	PRINT_FIELD_FF_EFFECT(", ", ffe, replay);
+	tprint_struct_next();
+	PRINT_FIELD_FF_EFFECT(ffe, trigger);
+	tprint_struct_next();
+	PRINT_FIELD_FF_EFFECT(ffe, replay);
 
 	switch (ffe.type) {
 	case FF_CONSTANT:
-		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, constant);
+		tprint_struct_next();
+		PRINT_FIELD_FF_TYPE_EFFECT(ffe.u, constant);
 		break;
 	case FF_RAMP:
-		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, ramp);
+		tprint_struct_next();
+		PRINT_FIELD_FF_TYPE_EFFECT(ffe.u, ramp);
 		break;
 	case FF_PERIODIC:
-		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, periodic);
+		tprint_struct_next();
+		PRINT_FIELD_FF_TYPE_EFFECT(ffe.u, periodic);
 		break;
 	case FF_RUMBLE:
-		PRINT_FIELD_FF_TYPE_EFFECT(", ", ffe.u, rumble);
+		tprint_struct_next();
+		PRINT_FIELD_FF_TYPE_EFFECT(ffe.u, rumble);
 		break;
 	default:
 		break;
