@@ -262,15 +262,16 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 		if (fetch_keyctl_kdf_params(tcp, kdf_addr, &kdf)) {
 			printaddr(kdf_addr);
 		} else {
-			PRINT_FIELD_STR("{", kdf, hashname, tcp);
+			PRINT_FIELD_OBJ_TCB_VAL("{", kdf, hashname, tcp,
+						printstr);
 
 			/*
 			 * Kernel doesn't touch otherinfo
 			 * if otherinfolen is zero.
 			 */
 			if (kdf.otherinfolen) {
-				PRINT_FIELD_STRN(", ", kdf, otherinfo,
-						 kdf.otherinfolen, tcp);
+				PRINT_FIELD_OBJ_TCB_VAL(", ", kdf, otherinfo,
+					tcp, printstrn, kdf.otherinfolen);
 			} else {
 				PRINT_FIELD_PTR(", ", kdf, otherinfo);
 			}
