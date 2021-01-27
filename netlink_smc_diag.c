@@ -49,7 +49,8 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 			 * AF_SMC protocol family socket handler
 			 * keeping the AF_INET sock address.
 			 */
-			PRINT_FIELD_INET_DIAG_SOCKID(", ", req, id, AF_INET);
+			tprint_struct_next();
+			PRINT_FIELD_INET_DIAG_SOCKID(req, id, AF_INET);
 		}
 	} else
 		tprints("...");
@@ -226,7 +227,8 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 			 * AF_SMC protocol family socket handler
 			 * keeping the AF_INET sock address.
 			 */
-			PRINT_FIELD_INET_DIAG_SOCKID(", ", msg, id, AF_INET);
+			tprint_struct_next();
+			PRINT_FIELD_INET_DIAG_SOCKID(msg, id, AF_INET);
 			PRINT_FIELD_U(", ", msg, diag_uid);
 			PRINT_FIELD_U(", ", msg, diag_inode);
 			decode_nla = true;

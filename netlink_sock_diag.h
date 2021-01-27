@@ -34,9 +34,9 @@ struct inet_diag_sockid;
 extern void
 print_inet_diag_sockid(const struct inet_diag_sockid *, const uint8_t family);
 
-# define PRINT_FIELD_INET_DIAG_SOCKID(prefix_, where_, field_, af_)	\
+# define PRINT_FIELD_INET_DIAG_SOCKID(where_, field_, af_)		\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_inet_diag_sockid(&(where_).field_, (af_));	\
 	} while (0)
 
