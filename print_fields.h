@@ -153,12 +153,6 @@ tprints_field_name(const char *name)
 	STRACE_PRINTF("%s%s=%#llx", (prefix_), #field_,			\
 		      zero_extend_signed_to_ull((type_) (where_).field_))
 
-# define PRINT_FIELD_ADDR(prefix_, where_, field_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printaddr((where_).field_);				\
-	} while (0)
-
 # define PRINT_FIELD_ADDR64(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
@@ -346,18 +340,6 @@ tprints_field_name(const char *name)
 				sizeof((where_).field_), #field_);	\
 	} while (0)
 
-# define PRINT_FIELD_AX25_ADDR(prefix_, where_, field_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_ax25_addr(&(where_).field_);			\
-	} while (0)
-
-# define PRINT_FIELD_X25_ADDR(prefix_, where_, field_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_x25_addr(&(where_).field_);			\
-	} while (0)
-
 # define PRINT_FIELD_NET_PORT(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
@@ -401,13 +383,6 @@ tprints_field_name(const char *name)
 		print_dev_t((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_NUMERIC_UMODE_T(prefix_, where_, field_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_numeric_ll_umode_t(				\
-			zero_extend_signed_to_ull((where_).field_));	\
-	} while (0)
-
 # define PRINT_FIELD_PTR(prefix_, where_, field_)			\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
@@ -420,47 +395,10 @@ tprints_field_name(const char *name)
 		printfd((tcp_), (where_).field_);			\
 	} while (0)
 
-# define PRINT_FIELD_TID(prefix_, where_, field_, tcp_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_TID);		\
-	} while (0)
-
 # define PRINT_FIELD_TGID(prefix_, where_, field_, tcp_)		\
 	do {								\
 		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
 		printpid((tcp_), (where_).field_, PT_TGID);		\
-	} while (0)
-
-# define PRINT_FIELD_PGID(prefix_, where_, field_, tcp_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_PGID);		\
-	} while (0)
-
-# define PRINT_FIELD_SID(prefix_, where_, field_, tcp_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpid((tcp_), (where_).field_, PT_SID);		\
-	} while (0)
-
-# define PRINT_FIELD_STRN(prefix_, where_, field_, len_, tcp_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printstrn((tcp_), (where_).field_, (len_));		\
-	} while (0)
-
-
-# define PRINT_FIELD_STR(prefix_, where_, field_, tcp_)			\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printstr((tcp_), (where_).field_);			\
-	} while (0)
-
-# define PRINT_FIELD_PATH(prefix_, where_, field_, tcp_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		printpath((tcp_), (where_).field_);			\
 	} while (0)
 
 # define PRINT_FIELD_MAC(prefix_, where_, field_)			\
@@ -498,12 +436,6 @@ tprints_field_name(const char *name)
 			print_quoted_string((void *)&where_.field_,	\
 					len_ - start, QUOTE_FORCE_HEX);	\
 		}							\
-	} while (0)
-
-# define PRINT_FIELD_KERNEL_VERSION(prefix_, where_, field_)		\
-	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
-		print_kernel_version((where_).field_);			\
 	} while (0)
 
 # define PRINT_FIELD_OBJ_PTR(prefix_, where_, field_, print_func_, ...)	\
