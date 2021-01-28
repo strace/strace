@@ -177,7 +177,7 @@ print_sockaddr_data_in(struct tcb *tcp, const void *const buf,
 {
 	const struct sockaddr_in *const sa_in = buf;
 
-	PRINT_FIELD_NET_PORT("", *sa_in, sin_port);
+	PRINT_FIELD_NET_PORT(*sa_in, sin_port);
 	tprint_struct_next();
 	PRINT_FIELD_INET_ADDR(*sa_in, sin_addr, AF_INET);
 }
@@ -190,7 +190,7 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 {
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
-	PRINT_FIELD_NET_PORT("", *sa_in6, sin6_port);
+	PRINT_FIELD_NET_PORT(*sa_in6, sin6_port);
 	tprints(", sin6_flowinfo=");
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		print_quoted_string((const char*) &sa_in6->sin6_flowinfo,
@@ -384,7 +384,7 @@ print_sockaddr_data_ipx(struct tcb *tcp, const void *const buf,
 	const struct sockaddr_ipx *const sa_ipx = buf;
 	unsigned int i;
 
-	PRINT_FIELD_NET_PORT("", *sa_ipx, sipx_port);
+	PRINT_FIELD_NET_PORT(*sa_ipx, sipx_port);
 	tprintf(", sipx_network=htonl(%#08x)"
 		", sipx_node=[",
 		ntohl(sa_ipx->sipx_network));

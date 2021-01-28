@@ -340,9 +340,9 @@ tprints_field_name(const char *name)
 	print_inet_addr((af_), &(where_).field_,			\
 			sizeof((where_).field_), #field_)
 
-# define PRINT_FIELD_NET_PORT(prefix_, where_, field_)			\
+# define PRINT_FIELD_NET_PORT(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 									\
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)	\
 			print_quoted_string((const char *)		\

@@ -29,8 +29,10 @@
 void
 print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 {
-	PRINT_FIELD_NET_PORT("{", *id, idiag_sport);
-	PRINT_FIELD_NET_PORT(", ", *id, idiag_dport);
+	tprint_struct_begin();
+	PRINT_FIELD_NET_PORT(*id, idiag_sport);
+	tprint_struct_next();
+	PRINT_FIELD_NET_PORT(*id, idiag_dport);
 	tprint_struct_next();
 	PRINT_FIELD_INET_ADDR(*id, idiag_src, family);
 	tprint_struct_next();
