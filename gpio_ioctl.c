@@ -356,7 +356,8 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U("{", lr, num_lines);
 	PRINT_FIELD_ARRAY_UPTO(", ", lr, offsets, lr.num_lines, tcp,
 			       print_uint32_array_member);
-	PRINT_FIELD_OBJ_TCB_PTR(", ", lr, config, tcp,
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_TCB_PTR(lr, config, tcp,
 				print_gpio_v2_line_config);
 	PRINT_FIELD_CSTRING(", ", lr, consumer);
 	if (lr.event_buffer_size) {

@@ -64,7 +64,8 @@ decode_rtc_wkalrm(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	PRINT_FIELD_U("{", wk, enabled);
 	PRINT_FIELD_U(", ", wk, pending);
-	PRINT_FIELD_OBJ_TCB_PTR(", ", wk, time, tcp, print_rtc_time);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_TCB_PTR(wk, time, tcp, print_rtc_time);
 	tprints("}");
 }
 
