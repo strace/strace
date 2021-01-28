@@ -364,9 +364,9 @@ tprints_field_name(const char *name)
 			STRACE_PRINTF(" */");				\
 	} while (0)
 
-# define PRINT_FIELD_IFINDEX(prefix_, where_, field_)			\
+# define PRINT_FIELD_IFINDEX(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_ifindex((where_).field_);				\
 	} while (0)
 

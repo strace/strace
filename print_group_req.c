@@ -29,7 +29,8 @@ MPERS_PRINTER_DECL(void, print_group_req, struct tcb *const tcp,
 	if (len < (int) sizeof(greq)) {
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &greq)) {
-		PRINT_FIELD_IFINDEX("{", greq, gr_interface);
+		tprint_struct_begin();
+		PRINT_FIELD_IFINDEX(greq, gr_interface);
 		tprint_struct_next();
 		PRINT_FIELD_SOCKADDR(greq, gr_group, tcp);
 		tprints("}");

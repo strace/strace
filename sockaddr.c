@@ -211,7 +211,8 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 #if defined IN6_IS_ADDR_LINKLOCAL && defined IN6_IS_ADDR_MC_LINKLOCAL
 	if (IN6_IS_ADDR_LINKLOCAL(&sa_in6->sin6_addr)
 	    || IN6_IS_ADDR_MC_LINKLOCAL(&sa_in6->sin6_addr)) {
-		PRINT_FIELD_IFINDEX(", ", *sa_in6, sin6_scope_id);
+		tprint_struct_next();
+		PRINT_FIELD_IFINDEX(*sa_in6, sin6_scope_id);
 	} else
 #endif
 	{
@@ -455,7 +456,8 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 	const struct sockaddr_ll *const sa_ll = buf;
 
 	print_sll_protocol(sa_ll);
-	PRINT_FIELD_IFINDEX(", ", *sa_ll, sll_ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(*sa_ll, sll_ifindex);
 	PRINT_FIELD_XVAL(", ", *sa_ll, sll_hatype, arp_hardware_types,
 			 "ARPHRD_???");
 	PRINT_FIELD_XVAL(", ", *sa_ll, sll_pkttype, af_packet_types,

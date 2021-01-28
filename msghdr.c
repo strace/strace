@@ -149,7 +149,8 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 {
 	const struct in_pktinfo *info = cmsg_data;
 
-	PRINT_FIELD_IFINDEX("{", *info, ipi_ifindex);
+	tprint_struct_begin();
+	PRINT_FIELD_IFINDEX(*info, ipi_ifindex);
 	tprint_struct_next();
 	PRINT_FIELD_INET_ADDR(*info, ipi_spec_dst, AF_INET);
 	tprint_struct_next();

@@ -213,7 +213,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	 */
 	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_ifindex))
 		break;
-	PRINT_FIELD_IFINDEX(", ", attr, map_ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(attr, map_ifindex);
 
 	/*
 	 * The following three fields were introduced by Linux commits
@@ -328,7 +329,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	 */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_ifindex))
 		break;
-	PRINT_FIELD_IFINDEX(", ", attr, prog_ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(attr, prog_ifindex);
 
 	/*
 	 * expected_attach_type was added in Linux commit
@@ -538,7 +540,8 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	 */
 	if (len <= offsetof(struct bpf_map_info_struct, ifindex))
 		goto print_bpf_map_info_end;
-	PRINT_FIELD_IFINDEX(", ", info, ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(info, ifindex);
 	/*
 	 * btf_vmlinux_value_type_id field was crammed in
 	 * by Linux commit v5.6-rc1~151^2~46^2~37^2~5.
@@ -649,7 +652,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	 */
 	if (len <= offsetof(struct bpf_prog_info_struct, ifindex))
 		goto print_bpf_prog_info_end;
-	PRINT_FIELD_IFINDEX(", ", info, ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(info, ifindex);
 	PRINT_FIELD_U_CAST(", ", info, gpl_compatible, unsigned int);
 	tprint_struct_next();
 	PRINT_FIELD_DEV(info, netns_dev);

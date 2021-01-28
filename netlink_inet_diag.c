@@ -37,7 +37,8 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	PRINT_FIELD_INET_ADDR(*id, idiag_src, family);
 	tprint_struct_next();
 	PRINT_FIELD_INET_ADDR(*id, idiag_dst, family);
-	PRINT_FIELD_IFINDEX(", ", *id, idiag_if);
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(*id, idiag_if);
 	tprint_struct_next();
 	PRINT_FIELD_COOKIE(*id, idiag_cookie);
 	tprints("}");

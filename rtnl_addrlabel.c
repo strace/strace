@@ -53,7 +53,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 					 (char *) &ifal + offset)) {
 			PRINT_FIELD_U("", ifal, ifal_prefixlen);
 			PRINT_FIELD_U(", ", ifal, ifal_flags);
-			PRINT_FIELD_IFINDEX(", ", ifal, ifal_index);
+			tprint_struct_next();
+			PRINT_FIELD_IFINDEX(ifal, ifal_index);
 			PRINT_FIELD_U(", ", ifal, ifal_seq);
 			decode_nla = true;
 		}

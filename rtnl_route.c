@@ -241,7 +241,8 @@ decode_rta_multipath(struct tcb *const tcp,
 		PRINT_FIELD_FLAGS(", ", nh, rtnh_flags,
 				  route_nexthop_flags, "RTNH_F_???");
 		PRINT_FIELD_U(", ", nh, rtnh_hops);
-		PRINT_FIELD_IFINDEX(", ", nh, rtnh_ifindex);
+		tprint_struct_next();
+		PRINT_FIELD_IFINDEX(nh, rtnh_ifindex);
 		tprints("}");
 
 		const unsigned short rtnh_len = MIN(len, nh.rtnh_len);

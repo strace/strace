@@ -103,7 +103,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 					  ifaddrflags, "IFA_F_???");
 			PRINT_FIELD_XVAL(", ", ifaddr, ifa_scope,
 					 routing_scopes, NULL);
-			PRINT_FIELD_IFINDEX(", ", ifaddr, ifa_index);
+			tprint_struct_next();
+			PRINT_FIELD_IFINDEX(ifaddr, ifa_index);
 			decode_nla = true;
 		}
 	} else

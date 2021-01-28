@@ -271,7 +271,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCBRDELIF:
 		tprints(", ");
 		if (!umove_or_printaddr(tcp, arg, &ifr)) {
-			PRINT_FIELD_IFINDEX("{", ifr, ifr_ifindex);
+			tprint_struct_begin();
+			PRINT_FIELD_IFINDEX(ifr, ifr_ifindex);
 			tprints("}");
 		}
 		break;

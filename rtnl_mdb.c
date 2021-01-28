@@ -41,7 +41,8 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 	if (len < sizeof(entry))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &entry)) {
-		PRINT_FIELD_IFINDEX("{", entry, ifindex);
+		tprint_struct_begin();
+		PRINT_FIELD_IFINDEX(entry, ifindex);
 		PRINT_FIELD_XVAL(", ", entry, state, mdb_states, "MDB_???");
 
 		/*
@@ -189,7 +190,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(bpm) - offset,
 					 (char *) &bpm + offset)) {
-			PRINT_FIELD_IFINDEX("", bpm, ifindex);
+			PRINT_FIELD_IFINDEX(bpm, ifindex);
 			decode_nla = true;
 		}
 	} else

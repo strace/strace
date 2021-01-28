@@ -62,7 +62,8 @@ decode_packet_diag_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &pinfo))
 		return true;
 
-	PRINT_FIELD_IFINDEX("{", pinfo, pdi_index);
+	tprint_struct_begin();
+	PRINT_FIELD_IFINDEX(pinfo, pdi_index);
 	PRINT_FIELD_XVAL(", ", pinfo, pdi_version, af_packet_versions,
 			 "TPACKET_???");
 	PRINT_FIELD_U(", ", pinfo, pdi_reserve);
@@ -82,7 +83,8 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 	struct packet_diag_mclist *dml = elem_buf;
 	uint16_t alen = MIN(dml->pdmc_alen, sizeof(dml->pdmc_addr));
 
-	PRINT_FIELD_IFINDEX("{", *dml, pdmc_index);
+	tprint_struct_begin();
+	PRINT_FIELD_IFINDEX(*dml, pdmc_index);
 	PRINT_FIELD_U(", ", *dml, pdmc_count);
 	PRINT_FIELD_U(", ", *dml, pdmc_type);
 	PRINT_FIELD_U(", ", *dml, pdmc_alen);
