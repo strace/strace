@@ -107,7 +107,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 	sub = tprint_lio_opcode(cb->aio_lio_opcode);
 
 	if (cb->aio_flags & IOCB_FLAG_IOPRIO) {
-		PRINT_FIELD_OBJ_U(", ", *cb, aio_reqprio, print_ioprio);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_U(*cb, aio_reqprio, print_ioprio);
 	} else if (cb->aio_reqprio) {
 		PRINT_FIELD_D(", ", *cb, aio_reqprio);
 	}

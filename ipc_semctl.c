@@ -36,7 +36,8 @@ print_ipc_perm(const typeof_field(semid_ds_t, sem_perm) *const p,
 {
 	PRINT_FIELD_UID("{", *p, uid);
 	PRINT_FIELD_UID(", ", *p, gid);
-	PRINT_FIELD_OBJ_U(", ", *p, mode, print_numeric_ll_umode_t);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_U(*p, mode, print_numeric_ll_umode_t);
 	if (cmd != IPC_SET) {
 		PRINT_FIELD_U(", ", *p, key);
 		PRINT_FIELD_UID(", ", *p, cuid);
