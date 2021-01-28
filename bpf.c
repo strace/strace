@@ -201,7 +201,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	/* map_name field was added in Linux commit v4.15-rc1~84^2~605^2~3. */
 	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_name))
 		break;
-	PRINT_FIELD_CSTRING_SZ(", ", attr, map_name,
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING_SZ(attr, map_name,
 			       MIN(sizeof(attr.map_name),
 				   len - offsetof(struct BPF_MAP_CREATE_struct,
 						  map_name)));
@@ -314,7 +315,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	/* prog_name field was added in Linux commit v4.15-rc1~84^2~605^2~4. */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_name))
 		break;
-	PRINT_FIELD_CSTRING_SZ(", ", attr, prog_name,
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING_SZ(attr, prog_name,
 			       MIN(sizeof(attr.prog_name),
 				   len - offsetof(struct BPF_PROG_LOAD_struct,
 						   prog_name)));

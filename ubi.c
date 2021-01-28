@@ -43,7 +43,8 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 #  undef flags
 # endif
 		PRINT_FIELD_D(", ", mkvol, name_len);
-		PRINT_FIELD_CSTRING_SZ(", ", mkvol, name,
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING_SZ(mkvol, name,
 				       1 + CLAMP(mkvol.name_len, 0,
 						 (int) sizeof(mkvol.name) - 1));
 		tprints("}");
@@ -81,7 +82,8 @@ print_ubi_rnvol_req_ent_array_member(struct tcb *tcp, void *elem_buf,
 
 	PRINT_FIELD_D("{", *p, vol_id);
 	PRINT_FIELD_D(", ", *p, name_len);
-	PRINT_FIELD_CSTRING_SZ(", ", *p, name,
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING_SZ(*p, name,
 			       1 + CLAMP(p->name_len, 0,
 				         (int) sizeof(p->name) - 1));
 	tprints("}");

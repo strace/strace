@@ -305,9 +305,9 @@ tprints_field_name(const char *name)
 					MUST_BE_ARRAY((where_).field_)); \
 	} while (0)
 
-# define PRINT_FIELD_CSTRING_SZ(prefix_, where_, field_, size_)		\
+# define PRINT_FIELD_CSTRING_SZ(where_, field_, size_)			\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_quoted_cstring((const char *) (where_).field_,	\
 				     (size_));				\
 	} while (0)
