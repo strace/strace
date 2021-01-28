@@ -137,7 +137,8 @@ btrfs_print_balance_args(const struct btrfs_balance_args *const bba)
 			  "BTRFS_BLOCK_GROUP_???");
 	tprint_struct_next();
 	PRINT_FIELD_U64(*bba, usage);
-	PRINT_FIELD_DEV(", ", *bba, devid);
+	tprint_struct_next();
+	PRINT_FIELD_DEV(*bba, devid);
 	tprint_struct_next();
 	PRINT_FIELD_U64(*bba, pstart);
 	tprint_struct_next();
@@ -488,7 +489,8 @@ print_btrfs_scrub_progress(const struct btrfs_scrub_progress *const p)
 static void
 print_btrfs_replace_start_params(const typeof_field(struct_btrfs_ioctl_dev_replace_args, start) *const p)
 {
-	PRINT_FIELD_DEV("{", *p, srcdevid);
+	tprint_struct_begin();
+	PRINT_FIELD_DEV(*p, srcdevid);
 	PRINT_FIELD_XVAL(", ", *p, cont_reading_from_srcdev_mode,
 			 btrfs_cont_reading_from_srcdev_mode,
 			 "BTRFS_IOCTL_DEV_REPLACE_CONT_READING"
@@ -642,7 +644,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			PRINT_FIELD_DEV("{", args, devid);
+			tprint_struct_begin();
+			PRINT_FIELD_DEV(args, devid);
 			if (!IS_ARRAY_ZERO(args.uuid)) {
 				tprint_struct_next();
 				PRINT_FIELD_UUID(args, uuid);
@@ -806,7 +809,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprints("{");
 
 		if (entering(tcp)) {
-			PRINT_FIELD_DEV("", args, devid);
+			PRINT_FIELD_DEV(args, devid);
 			tprints(", ");
 		}
 
@@ -1072,7 +1075,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			PRINT_FIELD_DEV("{", args, devid);
+			tprint_struct_begin();
+			PRINT_FIELD_DEV(args, devid);
 			if (code == BTRFS_IOC_SCRUB) {
 				PRINT_FIELD_U(", ", args, start);
 				tprint_struct_next();

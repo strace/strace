@@ -47,7 +47,8 @@ dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
 		break;
 	default:
 		if (ioc->dev) {
-			PRINT_FIELD_DEV(", ", *ioc, dev);
+			tprint_struct_next();
+			PRINT_FIELD_DEV(*ioc, dev);
 		}
 
 		if (ioc->name[0]) {
@@ -271,7 +272,8 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			break;
 
-		PRINT_FIELD_DEV("{", s, dev);
+		tprint_struct_begin();
+		PRINT_FIELD_DEV(s, dev);
 		tprints(", name=");
 		rc = printstr_ex(tcp, addr + offset_end,
 				 ioc->data_size - offset_end,

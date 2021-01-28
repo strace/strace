@@ -36,9 +36,11 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_D("{", info, lo_number);
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_DEV(", ", info, lo_device);
+		tprint_struct_next();
+		PRINT_FIELD_DEV(info, lo_device);
 		PRINT_FIELD_U(", ", info, lo_inode);
-		PRINT_FIELD_DEV(", ", info, lo_rdevice);
+		tprint_struct_next();
+		PRINT_FIELD_DEV(info, lo_rdevice);
 	}
 
 	PRINT_FIELD_X(", ", info, lo_offset);
@@ -82,9 +84,11 @@ static void
 print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 {
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_DEV("{", *info64, lo_device);
+		tprint_struct_begin();
+		PRINT_FIELD_DEV(*info64, lo_device);
 		PRINT_FIELD_U(", ", *info64, lo_inode);
-		PRINT_FIELD_DEV(", ", *info64, lo_rdevice);
+		tprint_struct_next();
+		PRINT_FIELD_DEV(*info64, lo_rdevice);
 		PRINT_FIELD_X(", ", *info64, lo_offset);
 		PRINT_FIELD_U(", ", *info64, lo_sizelimit);
 		PRINT_FIELD_U(", ", *info64, lo_number);

@@ -377,9 +377,9 @@ tprints_field_name(const char *name)
 			       sizeof((where_).field_));		\
 	} while (0)
 
-# define PRINT_FIELD_DEV(prefix_, where_, field_)			\
+# define PRINT_FIELD_DEV(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_dev_t((where_).field_);				\
 	} while (0)
 

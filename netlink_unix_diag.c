@@ -57,7 +57,8 @@ decode_unix_diag_vfs(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &uv))
 		return true;
 
-	PRINT_FIELD_DEV("{", uv, udiag_vfs_dev);
+	tprint_struct_begin();
+	PRINT_FIELD_DEV(uv, udiag_vfs_dev);
 	PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
 	tprints("}");
 

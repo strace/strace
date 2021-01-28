@@ -79,7 +79,7 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 {
 	tprints("{");
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_DEV("", *st, st_dev);
+		PRINT_FIELD_DEV(*st, st_dev);
 		PRINT_FIELD_U(", ", *st, st_ino);
 		PRINT_FIELD_OBJ_VAL(", ", *st, st_mode, print_symbolic_mode_t);
 		PRINT_FIELD_U(", ", *st, st_nlink);
@@ -93,7 +93,8 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 
 	switch (st->st_mode & S_IFMT) {
 	case S_IFCHR: case S_IFBLK:
-		PRINT_FIELD_DEV(", ", *st, st_rdev);
+		tprint_struct_next();
+		PRINT_FIELD_DEV(*st, st_rdev);
 		break;
 	default:
 		PRINT_FIELD_U(", ", *st, st_size);

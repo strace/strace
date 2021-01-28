@@ -544,7 +544,8 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	 * by Linux commit v5.6-rc1~151^2~46^2~37^2~5.
 	 */
 	PRINT_FIELD_U(", ", info, btf_vmlinux_value_type_id);
-	PRINT_FIELD_DEV(", ", info, netns_dev);
+	tprint_struct_next();
+	PRINT_FIELD_DEV(info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
 	/*
@@ -650,7 +651,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		goto print_bpf_prog_info_end;
 	PRINT_FIELD_IFINDEX(", ", info, ifindex);
 	PRINT_FIELD_U_CAST(", ", info, gpl_compatible, unsigned int);
-	PRINT_FIELD_DEV(", ", info, netns_dev);
+	tprint_struct_next();
+	PRINT_FIELD_DEV(info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);
 
 	/*
