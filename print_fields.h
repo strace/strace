@@ -274,9 +274,9 @@ tprints_field_name(const char *name)
 
 # define PRINT_FIELD_UID PRINT_FIELD_ID
 
-# define PRINT_FIELD_UUID(prefix_, where_, field_)			\
+# define PRINT_FIELD_UUID(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_uuid((const unsigned char *) ((where_).field_));	\
 	} while (0)
 

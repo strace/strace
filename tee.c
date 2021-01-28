@@ -176,7 +176,10 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 			return rval;
 
 		PRINT_FIELD_U("{", buf_data, buf_len);
-		PRINT_FIELD_UUID(", buf_ptr={", open_session, uuid);
+		tprint_struct_next();
+		tprints_field_name("buf_ptr");
+		tprint_struct_begin();
+		PRINT_FIELD_UUID(open_session, uuid);
 		PRINT_FIELD_XVAL(", ", open_session, clnt_login,
 				 tee_ioctl_login_types, "TEE_IOCTL_LOGIN_???");
 		/*

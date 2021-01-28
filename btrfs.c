@@ -633,7 +633,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			PRINT_FIELD_DEV("{", args, devid);
 			if (!IS_ARRAY_ZERO(args.uuid)) {
-				PRINT_FIELD_UUID(", ", args, uuid);
+				tprint_struct_next();
+				PRINT_FIELD_UUID(args, uuid);
 			}
 			tprints("}");
 			return 0;
@@ -642,7 +643,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprints("{");
 
 		if (!IS_ARRAY_ZERO(args.uuid)) {
-			PRINT_FIELD_UUID("", args, uuid);
+			PRINT_FIELD_UUID(args, uuid);
 			tprints(", ");
 		}
 
@@ -770,7 +771,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 # endif
 		PRINT_FIELD_U("{", args, max_id);
 		PRINT_FIELD_U(", ", args, num_devices);
-		PRINT_FIELD_UUID(", ", args, fsid);
+		tprint_struct_next();
+		PRINT_FIELD_UUID(args, fsid);
 		tprintf(", nodesize=%u, sectorsize=%u, clone_alignment=%u",
 			nodesize, sectorsize, clone_alignment);
 		tprints("}");
@@ -1029,7 +1031,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			PRINT_FIELD_UUID("{", args, uuid);
+			tprint_struct_begin();
+			PRINT_FIELD_UUID(args, uuid);
 			PRINT_FIELD_U(", ", args, stransid);
 			PRINT_FIELD_OBJ_PTR(", ", args, stime,
 					    print_btrfs_timespec);
