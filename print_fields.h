@@ -191,9 +191,9 @@ tprints_field_name(const char *name)
 # define PRINT_FIELD_X_ARRAY(prefix_, where_, field_)			\
 	PRINT_FIELD_UINT_ARRAY((prefix_), (where_), field_, "%#llx")
 
-# define PRINT_FIELD_UINT_ARRAY2D(prefix_, where_, field_, fmt_)		\
+# define PRINT_FIELD_UINT_ARRAY2D(where_, field_, fmt_)				\
 	do {									\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		tprints_field_name(#field_);					\
 		for (size_t i_ = 0; i_ < ARRAY_SIZE((where_).field_); ++i_) {	\
 			STRACE_PRINTF("%s", i_ ? ", " : "[");			\
 			for (size_t j_ = 0;					\
@@ -208,8 +208,8 @@ tprints_field_name(const char *name)
 		STRACE_PRINTF("]");						\
 	} while (0)
 
-# define PRINT_FIELD_X_ARRAY2D(prefix_, where_, field_)			\
-	PRINT_FIELD_UINT_ARRAY2D((prefix_), (where_), field_, "%#llx")
+# define PRINT_FIELD_X_ARRAY2D(where_, field_)				\
+	PRINT_FIELD_UINT_ARRAY2D((where_), field_, "%#llx")
 
 # define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
 	do {								\

@@ -346,7 +346,8 @@ DECL_print_v4l2_format_fmt(sliced)
 {
 	PRINT_FIELD_FLAGS("{", *p, service_set, v4l2_sliced_flags,
 			  "V4L2_SLICED_???");
-	PRINT_FIELD_X_ARRAY2D(", ", *p, service_lines);
+	tprint_struct_next();
+	PRINT_FIELD_X_ARRAY2D(*p, service_lines);
 	PRINT_FIELD_U(", ", *p, io_size);
 	tprints("}");
 	return true;
