@@ -333,7 +333,8 @@ DECL_print_v4l2_format_fmt(vbi)
 	PRINT_FIELD_U(", ", *p, samples_per_line);
 	tprint_struct_next();
 	PRINT_FIELD_PIXFMT(*p, sample_format, v4l2_pix_fmts);
-	PRINT_FIELD_D_ARRAY(", ", *p, start);
+	tprint_struct_next();
+	PRINT_FIELD_D_ARRAY(*p, start);
 	PRINT_FIELD_U_ARRAY(", ", *p, count);
 	PRINT_FIELD_FLAGS(", ", *p, flags, v4l2_vbi_flags, "V4L2_VBI_???");
 	tprints("}");
