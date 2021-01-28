@@ -252,9 +252,9 @@ tprints_field_name(const char *name)
 			  true);					\
 	} while (0)
 
-# define PRINT_FIELD_ERR_U(prefix_, where_, field_)			\
+# define PRINT_FIELD_ERR_U(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_err(zero_extend_signed_to_ull((where_).field_),	\
 			  false);					\
 	} while (0)

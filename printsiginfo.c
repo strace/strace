@@ -144,7 +144,8 @@ static void
 print_si_info(struct tcb *tcp, const siginfo_t *sip)
 {
 	if (sip->si_errno) {
-		PRINT_FIELD_ERR_U(", ", *sip, si_errno);
+		tprint_struct_next();
+		PRINT_FIELD_ERR_U(*sip, si_errno);
 	}
 
 	if (SI_FROMUSER(sip)) {
