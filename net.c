@@ -824,8 +824,10 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (len < (int) sizeof(mreq)) {
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &mreq)) {
-		PRINT_FIELD_INET_ADDR("{", mreq, imr_multiaddr, AF_INET);
-		PRINT_FIELD_INET_ADDR(", ", mreq, imr_interface, AF_INET);
+		tprint_struct_begin();
+		PRINT_FIELD_INET_ADDR(mreq, imr_multiaddr, AF_INET);
+		tprint_struct_next();
+		PRINT_FIELD_INET_ADDR(mreq, imr_interface, AF_INET);
 		tprints("}");
 	}
 }
@@ -841,7 +843,8 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (len < (int) sizeof(mreq)) {
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &mreq)) {
-		PRINT_FIELD_INET_ADDR("{", mreq, ipv6mr_multiaddr, AF_INET6);
+		tprint_struct_begin();
+		PRINT_FIELD_INET_ADDR(mreq, ipv6mr_multiaddr, AF_INET6);
 		PRINT_FIELD_IFINDEX(", ", mreq, ipv6mr_interface);
 		tprints("}");
 	}

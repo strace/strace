@@ -333,12 +333,9 @@ tprints_field_name(const char *name)
 				    QUOTE_FORCE_HEX); \
 	} while (0)
 
-# define PRINT_FIELD_INET_ADDR(prefix_, where_, field_, af_)		\
-	do {								\
-		STRACE_PRINTF(prefix_);					\
-		print_inet_addr((af_), &(where_).field_,		\
-				sizeof((where_).field_), #field_);	\
-	} while (0)
+# define PRINT_FIELD_INET_ADDR(where_, field_, af_)			\
+	print_inet_addr((af_), &(where_).field_,			\
+			sizeof((where_).field_), #field_)
 
 # define PRINT_FIELD_NET_PORT(prefix_, where_, field_)			\
 	do {								\

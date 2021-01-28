@@ -31,8 +31,10 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 {
 	PRINT_FIELD_NET_PORT("{", *id, idiag_sport);
 	PRINT_FIELD_NET_PORT(", ", *id, idiag_dport);
-	PRINT_FIELD_INET_ADDR(", ", *id, idiag_src, family);
-	PRINT_FIELD_INET_ADDR(", ", *id, idiag_dst, family);
+	tprint_struct_next();
+	PRINT_FIELD_INET_ADDR(*id, idiag_src, family);
+	tprint_struct_next();
+	PRINT_FIELD_INET_ADDR(*id, idiag_dst, family);
 	PRINT_FIELD_IFINDEX(", ", *id, idiag_if);
 	PRINT_FIELD_COOKIE(", ", *id, idiag_cookie);
 	tprints("}");

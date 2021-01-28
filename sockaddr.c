@@ -178,7 +178,8 @@ print_sockaddr_data_in(struct tcb *tcp, const void *const buf,
 	const struct sockaddr_in *const sa_in = buf;
 
 	PRINT_FIELD_NET_PORT("", *sa_in, sin_port);
-	PRINT_FIELD_INET_ADDR(", ", *sa_in, sin_addr, AF_INET);
+	tprint_struct_next();
+	PRINT_FIELD_INET_ADDR(*sa_in, sin_addr, AF_INET);
 }
 
 #define SIN6_MIN_LEN offsetof(struct sockaddr_in6, sin6_scope_id)
@@ -202,7 +203,8 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV)
 		tprintf("htonl(%u)", ntohl(sa_in6->sin6_flowinfo));
 
-	PRINT_FIELD_INET_ADDR(", ", *sa_in6, sin6_addr, AF_INET6);
+	tprint_struct_next();
+	PRINT_FIELD_INET_ADDR(*sa_in6, sin6_addr, AF_INET6);
 	if (addrlen <= (int) SIN6_MIN_LEN)
 		return;
 
