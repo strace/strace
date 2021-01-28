@@ -414,11 +414,11 @@ tprints_field_name(const char *name)
 			       (size_));				\
 	} while (0)
 
-# define PRINT_FIELD_HWADDR_SZ(prefix_, where_, field_, size_, hwtype_)	\
+# define PRINT_FIELD_HWADDR_SZ(where_, field_, size_, hwtype_)		\
 	do {								\
 		static_assert(sizeof(((where_).field_)[0]) == 1,	\
-			      "hwaddress is not a byte array");	\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+			      "hwaddress is not a byte array");		\
+		tprints_field_name(#field_);				\
 		print_hwaddr("", (const uint8_t *) ((where_).field_),	\
 			       (size_), (hwtype_));			\
 	} while (0)
