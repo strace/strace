@@ -203,11 +203,10 @@ btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 	tprints("}");
 }
 
-# define btrfs_print_key_type(prefix_, where_, field_) \
-	PRINT_FIELD_XVAL_U((prefix_), (where_), field_, btrfs_key_types, NULL)
-# define btrfs_print_objectid(prefix_, where_, field_) \
-	PRINT_FIELD_XVAL_U((prefix_), (where_), field_, btrfs_tree_objectids, \
-			   NULL)
+# define btrfs_print_key_type(where_, field_) \
+	PRINT_FIELD_XVAL_U((where_), field_, btrfs_key_types, NULL)
+# define btrfs_print_objectid(where_, field_) \
+	PRINT_FIELD_XVAL_U((where_), field_, btrfs_tree_objectids, NULL)
 
 static void
 btrfs_print_data_container_header(const struct btrfs_data_container *container)
@@ -342,16 +341,18 @@ print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
 {
 	tprints("{");
 	if (is_entering) {
-		btrfs_print_objectid("", *key, tree_id);
+		btrfs_print_objectid(*key, tree_id);
 
 		if (key->min_objectid != BTRFS_FIRST_FREE_OBJECTID ||
 		    is_not_abbrev) {
-			btrfs_print_objectid(", ", *key, min_objectid);
+			tprint_struct_next();
+			btrfs_print_objectid(*key, min_objectid);
 		}
 
 		if (key->max_objectid != BTRFS_LAST_FREE_OBJECTID ||
 		    is_not_abbrev) {
-			btrfs_print_objectid(", ", *key, max_objectid);
+			tprint_struct_next();
+			btrfs_print_objectid(*key, max_objectid);
 		}
 
 		PRINT_FIELD_U64(", ", *key, min_offset);
@@ -359,8 +360,10 @@ print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
 		PRINT_FIELD_U64(", ", *key, min_transid);
 		PRINT_FIELD_U64(", ", *key, max_transid);
 
-		btrfs_print_key_type(", ", *key, min_type);
-		btrfs_print_key_type(", ", *key, max_type);
+		tprint_struct_next();
+		btrfs_print_key_type(*key, min_type);
+		tprint_struct_next();
+		btrfs_print_key_type(*key, max_type);
 		PRINT_FIELD_U(", ", *key, nr_items);
 	} else {
 		PRINT_FIELD_U("", *key, nr_items);
@@ -372,9 +375,11 @@ static void
 print_btrfs_ioctl_search_header(const struct btrfs_ioctl_search_header *p)
 {
 	PRINT_FIELD_U("{", *p, transid);
-	btrfs_print_objectid(", ", *p, objectid);
+	tprint_struct_next();
+	btrfs_print_objectid(*p, objectid);
 	PRINT_FIELD_U(", ", *p, offset);
-	btrfs_print_key_type(", ", *p, type);
+	tprint_struct_next();
+	btrfs_print_key_type(*p, type);
 	PRINT_FIELD_U(", ", *p, len);
 	tprints("}");
 }
@@ -841,15 +846,17 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (args.treeid == 0)
 				set_tcb_priv_ulong(tcp, 1);
 
-			btrfs_print_objectid("{", args, treeid);
-			btrfs_print_objectid(", ", args, objectid);
+			tprint_struct_begin();
+			btrfs_print_objectid(args, treeid);
+			tprint_struct_next();
+			btrfs_print_objectid(args, objectid);
 			tprints("}");
 			return 0;
 		}
 
 		tprints("{");
 		if (get_tcb_priv_ulong(tcp)) {
-			btrfs_print_objectid("", args, treeid);
+			btrfs_print_objectid(args, treeid);
 			tprints(", ");
 		}
 
@@ -1002,7 +1009,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		PRINT_FIELD_U("{", args, flags);
-		btrfs_print_objectid(", ", args, progress);
+		tprint_struct_next();
+		btrfs_print_objectid(args, progress);
 		tprints("}");
 		break;
 	}
@@ -1145,7 +1153,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				    tfetch_mem,
 				    print_objectid_callback, 0);
 		}
-		btrfs_print_objectid(", ", args, parent_root);
+		tprint_struct_next();
+		btrfs_print_objectid(args, parent_root);
 		PRINT_FIELD_FLAGS(", ", args, flags, btrfs_send_flags,
 				  "BTRFS_SEND_FLAGS_???");
 		tprints("}");

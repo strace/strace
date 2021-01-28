@@ -174,7 +174,8 @@ print_io_uring_probe_op(struct tcb *tcp, void *elem_buf, size_t elem_size,
 {
 	struct_io_uring_probe_op *op = (struct_io_uring_probe_op *) elem_buf;
 
-	PRINT_FIELD_XVAL_U("{", *op, op, uring_ops, "IORING_OP_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL_U(*op, op, uring_ops, "IORING_OP_???");
 	if (op->resv) {
 		PRINT_FIELD_X(", ", *op, resv);
 	}
@@ -220,7 +221,8 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 		return 0;
 	set_tcb_priv_ulong(tcp, true);
 
-	PRINT_FIELD_XVAL_U("{", *probe, last_op, uring_ops, "IORING_OP_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL_U(*probe, last_op, uring_ops, "IORING_OP_???");
 	PRINT_FIELD_U(", ", *probe, ops_len);
 	if (probe->resv) {
 		PRINT_FIELD_X(", ", *probe, resv);
