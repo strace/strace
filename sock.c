@@ -60,19 +60,19 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	switch (code) {
 	case SIOCSIFADDR:
 	case SIOCGIFADDR:
-		PRINT_FIELD_SOCKADDR("", *ifr, ifr_addr, tcp);
+		PRINT_FIELD_SOCKADDR(*ifr, ifr_addr, tcp);
 		break;
 	case SIOCSIFDSTADDR:
 	case SIOCGIFDSTADDR:
-		PRINT_FIELD_SOCKADDR("", *ifr, ifr_dstaddr, tcp);
+		PRINT_FIELD_SOCKADDR(*ifr, ifr_dstaddr, tcp);
 		break;
 	case SIOCSIFBRDADDR:
 	case SIOCGIFBRDADDR:
-		PRINT_FIELD_SOCKADDR("", *ifr, ifr_broadaddr, tcp);
+		PRINT_FIELD_SOCKADDR(*ifr, ifr_broadaddr, tcp);
 		break;
 	case SIOCSIFNETMASK:
 	case SIOCGIFNETMASK:
-		PRINT_FIELD_SOCKADDR("", *ifr, ifr_netmask, tcp);
+		PRINT_FIELD_SOCKADDR(*ifr, ifr_netmask, tcp);
 		break;
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
@@ -137,7 +137,8 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	struct_ifreq *ifr = elem_buf;
 
 	PRINT_FIELD_CSTRING("{", *ifr, ifr_name);
-	PRINT_FIELD_SOCKADDR(", ", *ifr, ifr_addr, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_SOCKADDR(*ifr, ifr_addr, tcp);
 	tprints("}");
 
 	return true;

@@ -30,7 +30,8 @@ MPERS_PRINTER_DECL(void, print_group_req, struct tcb *const tcp,
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &greq)) {
 		PRINT_FIELD_IFINDEX("{", greq, gr_interface);
-		PRINT_FIELD_SOCKADDR(", ", greq, gr_group, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_SOCKADDR(greq, gr_group, tcp);
 		tprints("}");
 	}
 }

@@ -218,7 +218,8 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 	PRINT_FIELD_U(", ", *err, ee_code);
 	PRINT_FIELD_U(", ", *err, ee_info);
 	PRINT_FIELD_U(", ", *err, ee_data);
-	PRINT_FIELD_SOCKADDR(", ", *err, offender, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_SOCKADDR(*err, offender, tcp);
 	tprints("}");
 }
 
