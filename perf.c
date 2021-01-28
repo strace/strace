@@ -272,7 +272,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * are not aware about.
 	 */
 	if (attr->__reserved_1) {
-		PRINT_FIELD_X_CAST(", ", *attr, __reserved_1, uint64_t);
+		tprint_struct_next();
+		PRINT_FIELD_X_CAST(*attr, __reserved_1, uint64_t);
 		tprints_comment("Bits 63..29");
 	}
 
