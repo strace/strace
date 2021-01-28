@@ -36,7 +36,8 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_req)
 			PRINT_FIELD_U(", ", req, udiag_ino);
 			PRINT_FIELD_FLAGS(", ", req, udiag_show,
 					  unix_diag_show, "UDIAG_SHOW_???");
-			PRINT_FIELD_COOKIE(", ", req, udiag_cookie);
+			tprint_struct_next();
+			PRINT_FIELD_COOKIE(req, udiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -140,7 +141,8 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg)
 			PRINT_FIELD_XVAL(", ", msg, udiag_state,
 					 tcp_states, "TCP_???");
 			PRINT_FIELD_U(", ", msg, udiag_ino);
-			PRINT_FIELD_COOKIE(", ", msg, udiag_cookie);
+			tprint_struct_next();
+			PRINT_FIELD_COOKIE(msg, udiag_cookie);
 			decode_nla = true;
 		}
 	} else

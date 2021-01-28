@@ -41,7 +41,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 			PRINT_FIELD_U(", ", req, pdiag_ino);
 			PRINT_FIELD_FLAGS(", ", req, pdiag_show,
 					  packet_diag_show, "PACKET_SHOW_???");
-			PRINT_FIELD_COOKIE(", ", req, pdiag_cookie);
+			tprint_struct_next();
+			PRINT_FIELD_COOKIE(req, pdiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -177,7 +178,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg)
 			PRINT_FIELD_XVAL(", ", msg, pdiag_num,
 					 ethernet_protocols, "ETH_P_???");
 			PRINT_FIELD_U(", ", msg, pdiag_ino);
-			PRINT_FIELD_COOKIE(", ", msg, pdiag_cookie);
+			tprint_struct_next();
+			PRINT_FIELD_COOKIE(msg, pdiag_cookie);
 			decode_nla = true;
 		}
 	} else

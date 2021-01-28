@@ -43,7 +43,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 			PRINT_FIELD_U(", ", req, ndiag_ino);
 			PRINT_FIELD_FLAGS(", ", req, ndiag_show,
 					  netlink_diag_show, "NDIAG_SHOW_???");
-			PRINT_FIELD_COOKIE(", ", req, ndiag_cookie);
+			tprint_struct_next();
+			PRINT_FIELD_COOKIE(req, ndiag_cookie);
 		}
 	} else
 		tprints("...");
@@ -154,7 +155,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 			PRINT_FIELD_U(", ", msg, ndiag_dst_portid);
 			PRINT_FIELD_U(", ", msg, ndiag_dst_group);
 			PRINT_FIELD_U(", ", msg, ndiag_ino);
-			PRINT_FIELD_COOKIE(", ", msg, ndiag_cookie);
+			tprint_struct_next();
+			PRINT_FIELD_COOKIE(msg, ndiag_cookie);
 			decode_nla = true;
 		}
 	} else

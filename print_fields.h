@@ -167,9 +167,9 @@ tprints_field_name(const char *name)
 		      (int) sizeof((where_).field_) * 2,		\
 		      zero_extend_signed_to_ull((where_).field_))
 
-# define PRINT_FIELD_UINT_ARRAY(prefix_, where_, field_, fmt_)			\
+# define PRINT_FIELD_UINT_ARRAY(where_, field_, fmt_)				\
 	do {									\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);			\
+		tprints_field_name(#field_);					\
 		for (size_t i_ = 0; i_ < ARRAY_SIZE((where_).field_); ++i_)	\
 			STRACE_PRINTF("%s" fmt_, (i_ ? ", " : "["),		\
 				zero_extend_signed_to_ull((where_).field_[i_]));\
@@ -188,11 +188,11 @@ tprints_field_name(const char *name)
 # define PRINT_FIELD_D_ARRAY(where_, field_)				\
 	PRINT_FIELD_SINT_ARRAY((where_), field_, "%lld")
 
-# define PRINT_FIELD_U_ARRAY(prefix_, where_, field_)			\
-	PRINT_FIELD_UINT_ARRAY((prefix_), (where_), field_, "%llu")
+# define PRINT_FIELD_U_ARRAY(where_, field_)				\
+	PRINT_FIELD_UINT_ARRAY((where_), field_, "%llu")
 
-# define PRINT_FIELD_X_ARRAY(prefix_, where_, field_)			\
-	PRINT_FIELD_UINT_ARRAY((prefix_), (where_), field_, "%#llx")
+# define PRINT_FIELD_X_ARRAY(where_, field_)				\
+	PRINT_FIELD_UINT_ARRAY((where_), field_, "%#llx")
 
 # define PRINT_FIELD_UINT_ARRAY2D(where_, field_, fmt_)				\
 	do {									\
@@ -214,11 +214,11 @@ tprints_field_name(const char *name)
 # define PRINT_FIELD_X_ARRAY2D(where_, field_)				\
 	PRINT_FIELD_UINT_ARRAY2D((where_), field_, "%#llx")
 
-# define PRINT_FIELD_COOKIE(prefix_, where_, field_)			\
+# define PRINT_FIELD_COOKIE(where_, field_)				\
 	do {								\
 		static_assert(ARRAY_SIZE((where_).field_) == 2,		\
 			      "unexpected array size");			\
-		PRINT_FIELD_U_ARRAY((prefix_), (where_), field_);	\
+		PRINT_FIELD_U_ARRAY((where_), field_);			\
 	} while (0)
 
 # define PRINT_FIELD_FLAGS(prefix_, where_, field_, xlat_, dflt_)	\

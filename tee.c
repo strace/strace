@@ -200,7 +200,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 			printuid(", clnt_uuid=", gid);
 			break;
 		default:
-			PRINT_FIELD_X_ARRAY(", ", open_session, clnt_uuid);
+			tprint_struct_next();
+			PRINT_FIELD_X_ARRAY(open_session, clnt_uuid);
 		}
 		PRINT_FIELD_U(", ", open_session, cancel_id);
 		PRINT_FIELD_U(", ", open_session, num_params);

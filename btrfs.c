@@ -903,7 +903,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_U(", ", args, size);
 
 			if (!IS_ARRAY_ZERO(args.reserved)) {
-				PRINT_FIELD_X_ARRAY(", ", args, reserved);
+				tprint_struct_next();
+				PRINT_FIELD_X_ARRAY(args, reserved);
 			}
 
 			PRINT_FIELD_FLAGS(", ", args, flags,

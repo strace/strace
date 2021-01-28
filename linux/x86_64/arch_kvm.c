@@ -111,7 +111,8 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 	PRINT_FIELD_U(", ", *sregs, cr8);
 	PRINT_FIELD_U(", ", *sregs, efer);
 	PRINT_FIELD_X(", ", *sregs, apic_base);
-	PRINT_FIELD_X_ARRAY(", ", *sregs, interrupt_bitmap);
+	tprint_struct_next();
+	PRINT_FIELD_X_ARRAY(*sregs, interrupt_bitmap);
 	tprints("}");
 }
 #endif	/* HAVE_STRUCT_KVM_SREGS */

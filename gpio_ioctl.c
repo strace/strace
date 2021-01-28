@@ -282,7 +282,8 @@ print_gpio_v2_line_config(struct tcb *const tcp,
 			  "GPIO_V2_LINE_FLAG_???");
 	PRINT_FIELD_U(", ", *lc, num_attrs);
 	if (!IS_ARRAY_ZERO(lc->padding)) {
-		PRINT_FIELD_X_ARRAY(", ", *lc, padding);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(*lc, padding);
 	}
 	if (lc->num_attrs) {
 		PRINT_FIELD_ARRAY_UPTO(", ", *lc, attrs, lc->num_attrs, tcp,
@@ -322,7 +323,8 @@ print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 				       print_gpio_v2_line_attr_array_member);
 	}
 	if (!IS_ARRAY_ZERO(li.padding)) {
-		PRINT_FIELD_X_ARRAY(", ", li, padding);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(li, padding);
 	}
 	tprints("}");
 
@@ -361,7 +363,8 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(", ", lr, event_buffer_size);
 	}
 	if (!IS_ARRAY_ZERO(lr.padding)) {
-		PRINT_FIELD_X_ARRAY(", ", lr, padding);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(lr, padding);
 	}
 	tprints("}");
 	return 0;

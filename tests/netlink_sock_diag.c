@@ -221,7 +221,7 @@ test_unix_diag_req(const int fd)
 		       PRINT_FIELD_U("", req, udiag_ino);
 		       printf(", udiag_show=UDIAG_SHOW_NAME");
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req, udiag_cookie);
+		       PRINT_FIELD_COOKIE(req, udiag_cookie);
 		       printf("}"));
 }
 
@@ -244,7 +244,7 @@ test_unix_diag_msg(const int fd)
 		       printf(", ");
 		       PRINT_FIELD_U("", msg, udiag_ino);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", msg, udiag_cookie);
+		       PRINT_FIELD_COOKIE(msg, udiag_cookie);
 		       printf("}"));
 }
 
@@ -267,7 +267,7 @@ test_netlink_diag_req(const int fd)
 		       PRINT_FIELD_U("", req, ndiag_ino);
 		       printf(", ndiag_show=NDIAG_SHOW_MEMINFO");
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req, ndiag_cookie);
+		       PRINT_FIELD_COOKIE(req, ndiag_cookie);
 		       printf("}"));
 
 	req.sdiag_protocol = NETLINK_ROUTE;
@@ -280,7 +280,7 @@ test_netlink_diag_req(const int fd)
 		       PRINT_FIELD_U("", req, ndiag_ino);
 		       printf(", ndiag_show=NDIAG_SHOW_GROUPS");
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req, ndiag_cookie);
+		       PRINT_FIELD_COOKIE(req, ndiag_cookie);
 		       printf("}"));
 }
 
@@ -314,7 +314,7 @@ test_netlink_diag_msg(const int fd)
 		       printf(", ");
 		       PRINT_FIELD_U("", msg, ndiag_ino);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", msg, ndiag_cookie);
+		       PRINT_FIELD_COOKIE(msg, ndiag_cookie);
 		       printf("}"));
 }
 
@@ -337,7 +337,7 @@ test_packet_diag_req(const int fd)
 		       PRINT_FIELD_U("", req, pdiag_ino);
 		       printf(", pdiag_show=PACKET_SHOW_INFO");
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req, pdiag_cookie);
+		       PRINT_FIELD_COOKIE(req, pdiag_cookie);
 		       printf("}"));
 }
 
@@ -360,7 +360,7 @@ test_packet_diag_msg(const int fd)
 		       printf(", ");
 		       PRINT_FIELD_U("", msg, pdiag_ino);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", msg, pdiag_cookie);
+		       PRINT_FIELD_COOKIE(msg, pdiag_cookie);
 		       printf("}"));
 }
 
@@ -403,7 +403,7 @@ test_inet_diag_sockid(const int fd)
 			    address, address);
 		     printf(", idiag_if=" IFINDEX_LO_STR);
 		     printf(", ");
-		     PRINT_FIELD_COOKIE("", req.id, idiag_cookie);
+		     PRINT_FIELD_COOKIE(req.id, idiag_cookie);
 		     printf("}}"));
 
 	req.sdiag_family = AF_INET6;
@@ -427,7 +427,7 @@ test_inet_diag_sockid(const int fd)
 			    address6, address6);
 		     printf(", idiag_if=" IFINDEX_LO_STR);
 		     printf(", ");
-		     PRINT_FIELD_COOKIE("", req.id, idiag_cookie);
+		     PRINT_FIELD_COOKIE(req.id, idiag_cookie);
 		     printf("}}"));
 }
 
@@ -472,7 +472,7 @@ test_inet_diag_req(const int fd)
 			      address, address);
 		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req.id, idiag_cookie);
+		       PRINT_FIELD_COOKIE(req.id, idiag_cookie);
 		       printf("}, idiag_states=1<<TCP_LAST_ACK");
 		       printf(", ");
 		       PRINT_FIELD_U("", req, idiag_dbs);
@@ -516,7 +516,7 @@ test_inet_diag_req_v2(const int fd)
 			      address, address);
 		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req.id, idiag_cookie);
+		       PRINT_FIELD_COOKIE(req.id, idiag_cookie);
 		       printf("}}"));
 }
 
@@ -564,7 +564,7 @@ test_inet_diag_msg(const int fd)
 			      address, address);
 		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", msg.id, idiag_cookie);
+		       PRINT_FIELD_COOKIE(msg.id, idiag_cookie);
 		       printf("}, ");
 		       PRINT_FIELD_U("", msg, idiag_expires);
 		       printf(", ");
@@ -612,7 +612,7 @@ test_smc_diag_req(const int fd)
 			      address, address);
 		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", req.id, idiag_cookie);
+		       PRINT_FIELD_COOKIE(req.id, idiag_cookie);
 		       printf("}}"));
 }
 
@@ -656,7 +656,7 @@ test_smc_diag_msg(const int fd)
 			      address, address);
 		       printf(", idiag_if=" IFINDEX_LO_STR);
 		       printf(", ");
-		       PRINT_FIELD_COOKIE("", msg.id, idiag_cookie);
+		       PRINT_FIELD_COOKIE(msg.id, idiag_cookie);
 		       printf("}, ");
 		       PRINT_FIELD_U("", msg, diag_uid);
 		       printf(", ");

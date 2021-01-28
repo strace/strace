@@ -66,8 +66,10 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_X_ARRAY(", ", info, lo_init);
-		PRINT_FIELD_X_ARRAY(", ", info, reserved);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(info, lo_init);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(info, reserved);
 	} else {
 		tprints(", ...");
 	}
@@ -110,7 +112,8 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 	}
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_X_ARRAY(", ", *info64, lo_init);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(*info64, lo_init);
 	} else {
 		tprints(", ...");
 	}
@@ -144,7 +147,8 @@ decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_OBJ_TCB_PTR(", ", config, info, tcp, print_loop_info64);
 
 	if (!IS_ARRAY_ZERO(config.__reserved)) {
-		PRINT_FIELD_X_ARRAY(", ", config, __reserved);
+		tprint_struct_next();
+		PRINT_FIELD_X_ARRAY(config, __reserved);
 	}
 
 	tprints("}");
