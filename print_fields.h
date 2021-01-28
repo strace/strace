@@ -280,14 +280,14 @@ tprints_field_name(const char *name)
 		print_uuid((const unsigned char *) ((where_).field_));	\
 	} while (0)
 
-# define PRINT_FIELD_U64(prefix_, where_, field_)					\
-	do {										\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);				\
-		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX)		\
-			print_xlat_u(UINT64_MAX);					\
-		else									\
-			STRACE_PRINTF("%llu",						\
-				      zero_extend_signed_to_ull((where_).field_));	\
+# define PRINT_FIELD_U64(where_, field_)					\
+	do {									\
+		tprints_field_name(#field_);					\
+		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX)	\
+			print_xlat_u(UINT64_MAX);				\
+		else								\
+			STRACE_PRINTF("%llu",					\
+				zero_extend_signed_to_ull((where_).field_));	\
 	} while (0)
 
 # define PRINT_FIELD_STRING(where_, field_, len_, style_)		\

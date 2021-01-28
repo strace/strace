@@ -135,13 +135,19 @@ btrfs_print_balance_args(const struct btrfs_balance_args *const bba)
 {
 	PRINT_FIELD_FLAGS("{", *bba, profiles, btrfs_space_info_flags,
 			  "BTRFS_BLOCK_GROUP_???");
-	PRINT_FIELD_U64(", ", *bba, usage);
+	tprint_struct_next();
+	PRINT_FIELD_U64(*bba, usage);
 	PRINT_FIELD_DEV(", ", *bba, devid);
-	PRINT_FIELD_U64(", ", *bba, pstart);
-	PRINT_FIELD_U64(", ", *bba, pend);
-	PRINT_FIELD_U64(", ", *bba, vstart);
-	PRINT_FIELD_U64(", ", *bba, vend);
-	PRINT_FIELD_U64(", ", *bba, target);
+	tprint_struct_next();
+	PRINT_FIELD_U64(*bba, pstart);
+	tprint_struct_next();
+	PRINT_FIELD_U64(*bba, pend);
+	tprint_struct_next();
+	PRINT_FIELD_U64(*bba, vstart);
+	tprint_struct_next();
+	PRINT_FIELD_U64(*bba, vend);
+	tprint_struct_next();
+	PRINT_FIELD_U64(*bba, target);
 	PRINT_FIELD_FLAGS(", ", *bba, flags, btrfs_balance_args,
 			  "BTRFS_BALANCE_ARGS_???");
 	tprints("}");
@@ -355,10 +361,14 @@ print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
 			btrfs_print_objectid(*key, max_objectid);
 		}
 
-		PRINT_FIELD_U64(", ", *key, min_offset);
-		PRINT_FIELD_U64(", ", *key, max_offset);
-		PRINT_FIELD_U64(", ", *key, min_transid);
-		PRINT_FIELD_U64(", ", *key, max_transid);
+		tprint_struct_next();
+		PRINT_FIELD_U64(*key, min_offset);
+		tprint_struct_next();
+		PRINT_FIELD_U64(*key, max_offset);
+		tprint_struct_next();
+		PRINT_FIELD_U64(*key, min_transid);
+		tprint_struct_next();
+		PRINT_FIELD_U64(*key, max_transid);
 
 		tprint_struct_next();
 		btrfs_print_key_type(*key, min_type);
@@ -607,7 +617,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		PRINT_FIELD_U("{", args, start);
-		PRINT_FIELD_U64(", ", args, len);
+		tprint_struct_next();
+		PRINT_FIELD_U64(args, len);
 
 		PRINT_FIELD_FLAGS(", ", args, flags, btrfs_defrag_flags,
 				  "BTRFS_DEFRAG_RANGE_???");
@@ -1064,7 +1075,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_DEV("{", args, devid);
 			if (code == BTRFS_IOC_SCRUB) {
 				PRINT_FIELD_U(", ", args, start);
-				PRINT_FIELD_U64(", ", args, end);
+				tprint_struct_next();
+				PRINT_FIELD_U64(args, end);
 				PRINT_FIELD_FLAGS(", ", args, flags,
 						  btrfs_scrub_flags,
 						  "BTRFS_SCRUB_???");
