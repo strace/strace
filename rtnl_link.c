@@ -122,7 +122,8 @@ decode_ifla_bridge_id(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &id)) {
 		PRINT_FIELD_ARRAY("{", id, prio, tcp,
 				  print_uint8_array_member);
-		PRINT_FIELD_MAC(", ", id, addr);
+		tprint_struct_next();
+		PRINT_FIELD_MAC(id, addr);
 		tprints("}");
 	}
 

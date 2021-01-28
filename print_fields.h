@@ -401,17 +401,16 @@ tprints_field_name(const char *name)
 		printpid((tcp_), (where_).field_, PT_TGID);		\
 	} while (0)
 
-# define PRINT_FIELD_MAC(prefix_, where_, field_)			\
-	PRINT_FIELD_MAC_SZ((prefix_), (where_), field_,			\
-			   ARRAY_SIZE((where_).field_))
+# define PRINT_FIELD_MAC(where_, field_)				\
+	PRINT_FIELD_MAC_SZ((where_), field_, ARRAY_SIZE((where_).field_))
 
-# define PRINT_FIELD_MAC_SZ(prefix_, where_, field_, size_)		\
+# define PRINT_FIELD_MAC_SZ(where_, field_, size_)			\
 	do {								\
 		static_assert(sizeof(((where_).field_)[0]) == 1,	\
 			      "MAC address is not a byte array");	\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_mac_addr("", (const uint8_t *) ((where_).field_),	\
-			       (size_));				\
+			MIN((size_), ARRAY_SIZE((where_).field_)));	\
 	} while (0)
 
 # define PRINT_FIELD_HWADDR_SZ(where_, field_, size_, hwtype_)		\

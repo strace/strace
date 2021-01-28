@@ -886,9 +886,8 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 		PRINT_FIELD_XVAL(", ", mreq, mr_type, packet_mreq_type,
 				 "PACKET_MR_???");
 		PRINT_FIELD_U(", ", mreq, mr_alen);
-		PRINT_FIELD_MAC_SZ(", ", mreq, mr_address,
-				   (mreq.mr_alen > sizeof(mreq.mr_address)
-				    ? sizeof(mreq.mr_address) : mreq.mr_alen));
+		tprint_struct_next();
+		PRINT_FIELD_MAC_SZ(mreq, mr_address, mreq.mr_alen);
 		tprints("}");
 	}
 }
