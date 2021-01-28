@@ -496,8 +496,9 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 		return true;
 
 	PRINT_FIELD_U("{", vsi, vsi_mgr_id);
-	PRINT_FIELD_STRING(", ", vsi, vsi_type_id,
-			   sizeof(vsi.vsi_type_id), QUOTE_FORCE_HEX);
+	tprint_struct_next();
+	PRINT_FIELD_STRING(vsi, vsi_type_id, sizeof(vsi.vsi_type_id),
+			   QUOTE_FORCE_HEX);
 	PRINT_FIELD_U(", ", vsi, vsi_type_version);
 
 	if (!IS_ARRAY_ZERO(vsi.pad)) {

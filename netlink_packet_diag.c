@@ -86,7 +86,8 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 	PRINT_FIELD_U(", ", *dml, pdmc_count);
 	PRINT_FIELD_U(", ", *dml, pdmc_type);
 	PRINT_FIELD_U(", ", *dml, pdmc_alen);
-	PRINT_FIELD_STRING(", ", *dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
+	tprint_struct_next();
+	PRINT_FIELD_STRING(*dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
 	tprints("}");
 
 	return true;

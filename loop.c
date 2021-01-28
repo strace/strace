@@ -61,8 +61,9 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!abbrev(tcp) || info.lo_encrypt_type != LO_CRYPT_NONE) {
 		const unsigned int lo_encrypt_key_size =
 			MIN((unsigned) info.lo_encrypt_key_size, LO_KEY_SIZE);
-		PRINT_FIELD_STRING(", ", info, lo_encrypt_key,
-					  lo_encrypt_key_size, 0);
+		tprint_struct_next();
+		PRINT_FIELD_STRING(info, lo_encrypt_key,
+				   lo_encrypt_key_size, 0);
 	}
 
 	if (!abbrev(tcp)) {
@@ -107,8 +108,9 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 		PRINT_FIELD_CSTRING(", ", *info64, lo_crypt_name);
 		const unsigned int lo_encrypt_key_size =
 			MIN((unsigned) info64->lo_encrypt_key_size, LO_KEY_SIZE);
-		PRINT_FIELD_STRING(", ", *info64, lo_encrypt_key,
-					  lo_encrypt_key_size, 0);
+		tprint_struct_next();
+		PRINT_FIELD_STRING(*info64, lo_encrypt_key,
+				   lo_encrypt_key_size, 0);
 	}
 
 	if (!abbrev(tcp)) {

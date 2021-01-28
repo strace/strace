@@ -290,9 +290,9 @@ tprints_field_name(const char *name)
 				      zero_extend_signed_to_ull((where_).field_));	\
 	} while (0)
 
-# define PRINT_FIELD_STRING(prefix_, where_, field_, len_, style_)	\
+# define PRINT_FIELD_STRING(where_, field_, len_, style_)		\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_quoted_string((const char *)(where_).field_,	\
 				    (len_), (style_));			\
 	} while (0)
