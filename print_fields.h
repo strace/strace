@@ -245,9 +245,9 @@ tprints_field_name(const char *name)
 			      (dflt_));					\
 	} while (0)
 
-# define PRINT_FIELD_ERR_D(prefix_, where_, field_)			\
+# define PRINT_FIELD_ERR_D(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_err(sign_extend_unsigned_to_ll((where_).field_),	\
 			  true);					\
 	} while (0)

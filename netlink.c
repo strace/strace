@@ -508,7 +508,8 @@ decode_nlmsgerr(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &err.error))
 		return;
 
-	PRINT_FIELD_ERR_D("{", err, error);
+	tprint_struct_begin();
+	PRINT_FIELD_ERR_D(err, error);
 
 	addr += offsetof(struct nlmsgerr, msg);
 	len -= offsetof(struct nlmsgerr, msg);
