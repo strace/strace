@@ -38,7 +38,7 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 			 * AF_PACKET currently doesn't support protocol values
 			 * other than 0.
 			 */
-			PRINT_FIELD_X("", req, sdiag_protocol);
+			PRINT_FIELD_X(req, sdiag_protocol);
 			PRINT_FIELD_U(", ", req, pdiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, pdiag_show,

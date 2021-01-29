@@ -130,14 +130,19 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 						 sg_io.iovec_count, tcp);
 		}
 	}
-	PRINT_FIELD_X(", ", sg_io, status);
-	PRINT_FIELD_X(", ", sg_io, masked_status);
-	PRINT_FIELD_X(", ", sg_io, msg_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, masked_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, msg_status);
 	PRINT_FIELD_U(", ", sg_io, sb_len_wr);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, sbp, sg_io.sb_len_wr, 0, tcp);
-	PRINT_FIELD_X(", ", sg_io, host_status);
-	PRINT_FIELD_X(", ", sg_io, driver_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, host_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, driver_status);
 	PRINT_FIELD_D(", ", sg_io, resid);
 	PRINT_FIELD_U(", ", sg_io, duration);
 	tprint_struct_next();

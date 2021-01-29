@@ -200,7 +200,7 @@ test_rtnl_link(const int fd)
 			     ", ifi_index=" IFINDEX_LO_STR
 			     ", ifi_flags=IFF_UP");
 		      printf(", ");
-		      PRINT_FIELD_X("", ifinfo, ifi_change);
+		      PRINT_FIELD_X(ifinfo, ifi_change);
 		      printf("}"));
 }
 

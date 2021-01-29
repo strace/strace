@@ -355,8 +355,10 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &bbr))
 		return true;
 
-	PRINT_FIELD_X("{", bbr, bbr_bw_lo);
-	PRINT_FIELD_X(", ", bbr, bbr_bw_hi);
+	tprint_struct_begin();
+	PRINT_FIELD_X(bbr, bbr_bw_lo);
+	tprint_struct_next();
+	PRINT_FIELD_X(bbr, bbr_bw_hi);
 	PRINT_FIELD_U(", ", bbr, bbr_min_rtt);
 	PRINT_FIELD_U(", ", bbr, bbr_pacing_gain);
 	PRINT_FIELD_U(", ", bbr, bbr_cwnd_gain);

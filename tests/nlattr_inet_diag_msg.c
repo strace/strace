@@ -171,9 +171,9 @@ main(void)
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_BBRINFO, pattern, bbr,
 			   printf("{");
-			   PRINT_FIELD_X("", bbr, bbr_bw_lo);
+			   PRINT_FIELD_X(bbr, bbr_bw_lo);
 			   printf(", ");
-			   PRINT_FIELD_X("", bbr, bbr_bw_hi);
+			   PRINT_FIELD_X(bbr, bbr_bw_hi);
 			   printf(", ");
 			   PRINT_FIELD_U("", bbr, bbr_min_rtt);
 			   printf(", ");

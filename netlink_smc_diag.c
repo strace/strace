@@ -179,10 +179,14 @@ decode_smc_diag_dmbinfo(struct tcb *const tcp,
 		return true;
 
 	PRINT_FIELD_U("{", dinfo, linkid);
-	PRINT_FIELD_X(", ", dinfo, peer_gid);
-	PRINT_FIELD_X(", ", dinfo, my_gid);
-	PRINT_FIELD_X(", ", dinfo, token);
-	PRINT_FIELD_X(", ", dinfo, peer_token);
+	tprint_struct_next();
+	PRINT_FIELD_X(dinfo, peer_gid);
+	tprint_struct_next();
+	PRINT_FIELD_X(dinfo, my_gid);
+	tprint_struct_next();
+	PRINT_FIELD_X(dinfo, token);
+	tprint_struct_next();
+	PRINT_FIELD_X(dinfo, peer_token);
 	tprints("}");
 
 	return true;

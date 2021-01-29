@@ -137,7 +137,8 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 	printxval(ebpf_regs, insn->src_reg, "BPF_REG_???");
 
 	PRINT_FIELD_D(", ", *insn, off);
-	PRINT_FIELD_X(", ", *insn, imm);
+	tprint_struct_next();
+	PRINT_FIELD_X(*insn, imm);
 	tprints("}");
 
 	return true;
@@ -1015,8 +1016,10 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 	PRINT_FIELD_U(", ", attr, prog_id);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(attr, fd_type, bpf_task_fd_type, "BPF_FD_TYPE_???");
-	PRINT_FIELD_X(", ", attr, probe_offset);
-	PRINT_FIELD_X(", ", attr, probe_addr);
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, probe_offset);
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, probe_addr);
 
 	tprints("}");
 }
@@ -1043,7 +1046,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(attr, elem_flags,
 				  bpf_map_lookup_elem_flags, "BPF_???");
-		PRINT_FIELD_X(", ", attr, flags);
+		tprint_struct_next();
+		PRINT_FIELD_X(attr, flags);
 
 		tprints("}");
 	} else {
@@ -1078,7 +1082,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(attr, elem_flags,
 				  bpf_map_lookup_elem_flags, "BPF_???");
-		PRINT_FIELD_X(", ", attr, flags);
+		tprint_struct_next();
+		PRINT_FIELD_X(attr, flags);
 
 		tprints("}");
 	} else {
@@ -1109,7 +1114,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(attr, elem_flags,
 				  bpf_map_lookup_elem_flags, "BPF_???");
-		PRINT_FIELD_X(", ", attr, flags);
+		tprint_struct_next();
+		PRINT_FIELD_X(attr, flags);
 
 		tprints("}");
 	} else {
@@ -1135,7 +1141,8 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	PRINT_FIELD_FD(attr, target_fd, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
-	PRINT_FIELD_X(", ", attr, flags);
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, flags);
 	tprints("}");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)

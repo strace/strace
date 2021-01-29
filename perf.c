@@ -222,7 +222,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * to zero. Its parameters are set in other places."
 		 */
 	default:
-		PRINT_FIELD_X(", ", *attr, config);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, config);
 		break;
 	}
 
@@ -327,9 +328,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (attr->type == PERF_TYPE_BREAKPOINT) {
-		PRINT_FIELD_X(", ", *attr, bp_addr);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, bp_addr);
 	} else {
-		PRINT_FIELD_X(", ", *attr, config1);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, config1);
 	}
 
 	/*
@@ -341,7 +344,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (attr->type == PERF_TYPE_BREAKPOINT) {
 		PRINT_FIELD_U(", ", *attr, bp_len);
 	} else {
-		PRINT_FIELD_X(", ", *attr, config2);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, config2);
 	}
 
 	_PERF_CHECK_FIELD(branch_sample_type);
@@ -359,7 +363,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * described in the kernel header
 	 * arch/ARCH/include/uapi/asm/perf_regs.h."
 	 */
-	PRINT_FIELD_X(", ", *attr, sample_regs_user);
+	tprint_struct_next();
+	PRINT_FIELD_X(*attr, sample_regs_user);
 
 	_PERF_CHECK_FIELD(sample_stack_user);
 	/*
@@ -367,7 +372,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * specified."
 	 */
 	if (attr->sample_type & PERF_SAMPLE_STACK_USER) {
-		PRINT_FIELD_X(", ", *attr, sample_stack_user);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, sample_stack_user);
 	}
 
 	if (attr->use_clockid) {
@@ -377,7 +383,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	_PERF_CHECK_FIELD(sample_regs_intr);
-	PRINT_FIELD_X(", ", *attr, sample_regs_intr);
+	tprint_struct_next();
+	PRINT_FIELD_X(*attr, sample_regs_intr);
 
 	_PERF_CHECK_FIELD(aux_watermark);
 	PRINT_FIELD_U(", ", *attr, aux_watermark);
@@ -395,7 +402,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 #if 0
 	_PERF_CHECK_FIELD(__reserved_3);
 	if (attr->__reserved_3) {
-		PRINT_FIELD_X(", ", *attr, __reserved_3);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, __reserved_3);
 	}
 #endif
 

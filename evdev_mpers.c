@@ -33,7 +33,8 @@ print_ff_envelope(const MPERS_PTR_ARG(struct ff_envelope *) const arg)
 	PRINT_FIELD_U("{", *p, attack_length);
 	PRINT_FIELD_U(", ", *p, attack_level);
 	PRINT_FIELD_U(", ", *p, fade_length);
-	PRINT_FIELD_X(", ", *p, fade_level);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, fade_level);
 	tprints("}");
 }
 

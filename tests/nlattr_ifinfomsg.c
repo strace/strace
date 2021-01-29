@@ -280,11 +280,11 @@ main(void)
 		    init_ifinfomsg, print_ifinfomsg,
 		    IFLA_MAP, sizeof_ifmap, &map, sizeof_ifmap,
 		    printf("{");
-		    PRINT_FIELD_X("", map, mem_start);
+		    PRINT_FIELD_X(map, mem_start);
 		    printf(", ");
-		    PRINT_FIELD_X("", map, mem_end);
+		    PRINT_FIELD_X(map, mem_end);
 		    printf(", ");
-		    PRINT_FIELD_X("", map, base_addr);
+		    PRINT_FIELD_X(map, base_addr);
 		    printf(", ");
 		    PRINT_FIELD_U("", map, irq);
 		    printf(", ");

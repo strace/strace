@@ -176,10 +176,13 @@ decode_crypto_user_alg(struct tcb *const tcp,
 		PRINT_FIELD_CSTRING(alg, cru_driver_name);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(alg, cru_module_name);
-		PRINT_FIELD_X(", ", alg, cru_type);
-		PRINT_FIELD_X(", ", alg, cru_mask);
+		tprint_struct_next();
+		PRINT_FIELD_X(alg, cru_type);
+		tprint_struct_next();
+		PRINT_FIELD_X(alg, cru_mask);
 		PRINT_FIELD_U(", ", alg, cru_refcnt);
-		PRINT_FIELD_X(", ", alg, cru_flags);
+		tprint_struct_next();
+		PRINT_FIELD_X(alg, cru_flags);
 		tprints("}");
 
 		const size_t offset = NLMSG_ALIGN(sizeof(alg));

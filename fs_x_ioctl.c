@@ -20,7 +20,8 @@ decode_fstrim_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_fstrim_range range;
 
 	if (!umove_or_printaddr(tcp, arg, &range)) {
-		PRINT_FIELD_X("{", range, start);
+		tprint_struct_begin();
+		PRINT_FIELD_X(range, start);
 		PRINT_FIELD_U(", ", range, len);
 		PRINT_FIELD_U(", ", range, minlen);
 		tprints("}");
@@ -42,7 +43,8 @@ decode_fsxattr(struct tcb *const tcp, const kernel_ulong_t arg,
 		if (is_get) {
 			PRINT_FIELD_U(", ", fsxattr, fsx_nextents);
 		}
-		PRINT_FIELD_X(", ", fsxattr, fsx_projid);
+		tprint_struct_next();
+		PRINT_FIELD_X(fsxattr, fsx_projid);
 		PRINT_FIELD_U(", ", fsxattr, fsx_cowextsize);
 		tprints("}");
 	}

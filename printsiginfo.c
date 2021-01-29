@@ -159,7 +159,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			break;
 #if defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
 		case SI_TIMER:
-			PRINT_FIELD_X(", ", *sip, si_timerid);
+			tprint_struct_next();
+			PRINT_FIELD_X(*sip, si_timerid);
 			PRINT_FIELD_D(", ", *sip, si_overrun);
 			printsigval(sip);
 			break;

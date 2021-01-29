@@ -40,8 +40,10 @@ decode_erase_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &einfo))
 		return;
 
-	PRINT_FIELD_X("{", einfo, start);
-	PRINT_FIELD_X(", ", einfo, length);
+	tprint_struct_begin();
+	PRINT_FIELD_X(einfo, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(einfo, length);
 	tprints("}");
 }
 
@@ -54,8 +56,10 @@ decode_erase_info_user64(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &einfo64))
 		return;
 
-	PRINT_FIELD_X("{", einfo64, start);
-	PRINT_FIELD_X(", ", einfo64, length);
+	tprint_struct_begin();
+	PRINT_FIELD_X(einfo64, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(einfo64, length);
 	tprints("}");
 }
 
@@ -67,8 +71,10 @@ decode_mtd_oob_buf(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &mbuf))
 		return;
-	PRINT_FIELD_X("{", mbuf, start);
-	PRINT_FIELD_X(", ", mbuf, length);
+	tprint_struct_begin();
+	PRINT_FIELD_X(mbuf, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(mbuf, length);
 	tprint_struct_next();
 	PRINT_FIELD_PTR(mbuf, ptr);
 	tprints("}");
@@ -83,8 +89,10 @@ decode_mtd_oob_buf64(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &mbuf64))
 		return;
 
-	PRINT_FIELD_X("{", mbuf64, start);
-	PRINT_FIELD_X(", ", mbuf64, length);
+	tprint_struct_begin();
+	PRINT_FIELD_X(mbuf64, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(mbuf64, length);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(mbuf64, usr_ptr);
 	tprints("}");
@@ -99,8 +107,10 @@ decode_otp_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &oinfo))
 		return;
 
-	PRINT_FIELD_X("{", oinfo, start);
-	PRINT_FIELD_X(", ", oinfo, length);
+	tprint_struct_begin();
+	PRINT_FIELD_X(oinfo, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(oinfo, length);
 	PRINT_FIELD_U(", ", oinfo, locked);
 	tprints("}");
 }
@@ -128,9 +138,12 @@ decode_mtd_write_req(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &mreq))
 		return;
 
-	PRINT_FIELD_X("{", mreq, start);
-	PRINT_FIELD_X(", ", mreq, len);
-	PRINT_FIELD_X(", ", mreq, ooblen);
+	tprint_struct_begin();
+	PRINT_FIELD_X(mreq, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(mreq, len);
+	tprint_struct_next();
+	PRINT_FIELD_X(mreq, ooblen);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(mreq, usr_data);
 	tprint_struct_next();
@@ -153,11 +166,16 @@ decode_mtd_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_XVAL(minfo, type, mtd_type_options, "MTD_???");
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(minfo, flags, mtd_flags_options, "MTD_???");
-	PRINT_FIELD_X(", ", minfo, size);
-	PRINT_FIELD_X(", ", minfo, erasesize);
-	PRINT_FIELD_X(", ", minfo, writesize);
-	PRINT_FIELD_X(", ", minfo, oobsize);
-	PRINT_FIELD_X(", ", minfo, padding);
+	tprint_struct_next();
+	PRINT_FIELD_X(minfo, size);
+	tprint_struct_next();
+	PRINT_FIELD_X(minfo, erasesize);
+	tprint_struct_next();
+	PRINT_FIELD_X(minfo, writesize);
+	tprint_struct_next();
+	PRINT_FIELD_X(minfo, oobsize);
+	tprint_struct_next();
+	PRINT_FIELD_X(minfo, padding);
 	tprints("}");
 }
 
@@ -181,7 +199,8 @@ decode_nand_oobinfo(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(ninfo, useecc, mtd_nandecc_options, "MTD_NANDECC_???");
-	PRINT_FIELD_X(", ", ninfo, eccbytes);
+	tprint_struct_next();
+	PRINT_FIELD_X(ninfo, eccbytes);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(ninfo, oobfree, tcp, print_xint32x2_array_member);
 	tprint_struct_next();
@@ -194,8 +213,10 @@ print_nand_oobfree_array_member(struct tcb *tcp, void *elem_buf,
 				size_t elem_size, void *data)
 {
 	const struct nand_oobfree *p = elem_buf;
-	PRINT_FIELD_X("{", *p, offset);
-	PRINT_FIELD_X(", ", *p, length);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*p, offset);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, length);
 	tprints("}");
 	return true;
 }
@@ -209,10 +230,12 @@ decode_nand_ecclayout_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &nlay))
 		return;
 
-	PRINT_FIELD_X("{", nlay, eccbytes);
+	tprint_struct_begin();
+	PRINT_FIELD_X(nlay, eccbytes);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(nlay, eccpos, tcp, print_xint32_array_member);
-	PRINT_FIELD_X(", ", nlay, oobavail);
+	tprint_struct_next();
+	PRINT_FIELD_X(nlay, oobavail);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(nlay, oobfree, tcp, print_nand_oobfree_array_member);
 	tprints("}");
@@ -227,10 +250,14 @@ decode_mtd_ecc_stats(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &es))
 		return;
 
-	PRINT_FIELD_X("{", es, corrected);
-	PRINT_FIELD_X(", ", es, failed);
-	PRINT_FIELD_X(", ", es, badblocks);
-	PRINT_FIELD_X(", ", es, bbtblocks);
+	tprint_struct_begin();
+	PRINT_FIELD_X(es, corrected);
+	tprint_struct_next();
+	PRINT_FIELD_X(es, failed);
+	tprint_struct_next();
+	PRINT_FIELD_X(es, badblocks);
+	tprint_struct_next();
+	PRINT_FIELD_X(es, bbtblocks);
 	tprints("}");
 }
 
@@ -331,15 +358,19 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &rinfo))
 				break;
-			PRINT_FIELD_X("{", rinfo, regionindex);
+			tprint_struct_begin();
+			PRINT_FIELD_X(rinfo, regionindex);
 			return 0;
 		} else {
 			struct region_info_user rinfo;
 
 			if (!syserror(tcp) && !umove(tcp, arg, &rinfo)) {
-				PRINT_FIELD_X(", ", rinfo, offset);
-				PRINT_FIELD_X(", ", rinfo, erasesize);
-				PRINT_FIELD_X(", ", rinfo, numblocks);
+				tprint_struct_next();
+				PRINT_FIELD_X(rinfo, offset);
+				tprint_struct_next();
+				PRINT_FIELD_X(rinfo, erasesize);
+				tprint_struct_next();
+				PRINT_FIELD_X(rinfo, numblocks);
 			}
 			tprints("}");
 			break;

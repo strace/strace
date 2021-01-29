@@ -180,7 +180,8 @@ decode_UBI_IOCSETVOLPROP(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(prop, property,
 				 ubi_volume_props, "UBI_VOL_PROP_???");
-		PRINT_FIELD_X(", ", prop, value);
+		tprint_struct_next();
+		PRINT_FIELD_X(prop, value);
 		tprints("}");
 	}
 

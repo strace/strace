@@ -43,7 +43,8 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_DEV(info, lo_rdevice);
 	}
 
-	PRINT_FIELD_X(", ", info, lo_offset);
+	tprint_struct_next();
+	PRINT_FIELD_X(info, lo_offset);
 
 	if (!abbrev(tcp) || info.lo_encrypt_type != LO_CRYPT_NONE) {
 		tprint_struct_next();
@@ -91,11 +92,13 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 		PRINT_FIELD_U(", ", *info64, lo_inode);
 		tprint_struct_next();
 		PRINT_FIELD_DEV(*info64, lo_rdevice);
-		PRINT_FIELD_X(", ", *info64, lo_offset);
+		tprint_struct_next();
+		PRINT_FIELD_X(*info64, lo_offset);
 		PRINT_FIELD_U(", ", *info64, lo_sizelimit);
 		PRINT_FIELD_U(", ", *info64, lo_number);
 	} else {
-		PRINT_FIELD_X("{", *info64, lo_offset);
+		tprint_struct_begin();
+		PRINT_FIELD_X(*info64, lo_offset);
 		PRINT_FIELD_U(", ", *info64, lo_number);
 	}
 

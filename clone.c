@@ -200,7 +200,8 @@ SYS_FUNC(clone3)
 
 		tprint_struct_next();
 		PRINT_FIELD_ADDR64(arg, stack);
-		PRINT_FIELD_X(", ", arg, stack_size);
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, stack_size);
 
 		if (arg.flags & CLONE_SETTLS) {
 			tprint_struct_next();

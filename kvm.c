@@ -200,9 +200,11 @@ kvm_ioctl_set_user_memory_region(struct tcb *const tcp, const kernel_ulong_t arg
 	PRINT_FIELD_U("{", u_memory_region, slot);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(u_memory_region, flags, kvm_mem_flags, "KVM_MEM_???");
-	PRINT_FIELD_X(", ", u_memory_region, guest_phys_addr);
+	tprint_struct_next();
+	PRINT_FIELD_X(u_memory_region, guest_phys_addr);
 	PRINT_FIELD_U(", ", u_memory_region, memory_size);
-	PRINT_FIELD_X(", ", u_memory_region, userspace_addr);
+	tprint_struct_next();
+	PRINT_FIELD_X(u_memory_region, userspace_addr);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -234,14 +236,20 @@ print_kvm_cpuid_entry(struct tcb *const tcp,
 		      void* elem_buf, size_t elem_size, void* data)
 {
 	const struct kvm_cpuid_entry2 *entry = elem_buf;
-	PRINT_FIELD_X("{", *entry, function);
-	PRINT_FIELD_X(", ", *entry, index);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*entry, function);
+	tprint_struct_next();
+	PRINT_FIELD_X(*entry, index);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*entry, flags, kvm_cpuid_flags, "KVM_CPUID_FLAG_???");
-	PRINT_FIELD_X(", ", *entry, eax);
-	PRINT_FIELD_X(", ", *entry, ebx);
-	PRINT_FIELD_X(", ", *entry, ecx);
-	PRINT_FIELD_X(", ", *entry, edx);
+	tprint_struct_next();
+	PRINT_FIELD_X(*entry, eax);
+	tprint_struct_next();
+	PRINT_FIELD_X(*entry, ebx);
+	tprint_struct_next();
+	PRINT_FIELD_X(*entry, ecx);
+	tprint_struct_next();
+	PRINT_FIELD_X(*entry, edx);
 	tprints("}");
 
 	return true;

@@ -44,12 +44,18 @@ print_ifr_hwaddr(const typeof_field(struct_ifreq, ifr_hwaddr) *const p)
 static void
 print_ifr_map(const typeof_field(struct_ifreq, ifr_map) *const p)
 {
-	PRINT_FIELD_X("{", *p, mem_start);
-	PRINT_FIELD_X(", ", *p, mem_end);
-	PRINT_FIELD_X(", ", *p, base_addr);
-	PRINT_FIELD_X(", ", *p, irq);
-	PRINT_FIELD_X(", ", *p, dma);
-	PRINT_FIELD_X(", ", *p, port);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*p, mem_start);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, mem_end);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, base_addr);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, irq);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, dma);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, port);
 	tprints("}");
 }
 

@@ -325,7 +325,8 @@ DECL_print_v4l2_format_fmt(win)
 	PRINT_FIELD_OBJ_PTR(*p, w, print_v4l2_rect);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(*p, field, v4l2_fields, "V4L2_FIELD_???");
-	PRINT_FIELD_X(", ", *p, chromakey);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, chromakey);
 
 	tprints(", clips=");
 	struct_v4l2_clip clip;
@@ -337,7 +338,8 @@ DECL_print_v4l2_format_fmt(win)
 	tprint_struct_next();
 	PRINT_FIELD_PTR(*p, bitmap);
 	if (p->global_alpha) {
-		PRINT_FIELD_X(", ", *p, global_alpha);
+		tprint_struct_next();
+		PRINT_FIELD_X(*p, global_alpha);
 	}
 	tprints("}");
 	return rc;
@@ -612,7 +614,8 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 				 "V4L2_MEMORY_???");
 
 		if (b.memory == V4L2_MEMORY_MMAP) {
-			PRINT_FIELD_X(", ", b, m.offset);
+			tprint_struct_next();
+			PRINT_FIELD_X(b, m.offset);
 		} else if (b.memory == V4L2_MEMORY_USERPTR) {
 			tprint_struct_next();
 			PRINT_FIELD_PTR(b, m.userptr);
@@ -641,8 +644,10 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &b)) {
-		PRINT_FIELD_X("{", b, capability);
-		PRINT_FIELD_X(", ", b, flags);
+		tprint_struct_begin();
+		PRINT_FIELD_X(b, capability);
+		tprint_struct_next();
+		PRINT_FIELD_X(b, flags);
 		tprint_struct_next();
 		PRINT_FIELD_PTR(b, base);
 		tprints("}");
@@ -679,7 +684,8 @@ print_v4l2_streamparm_capture(const struct v4l2_captureparm *const p)
 			  "V4L2_MODE_???");
 	tprint_struct_next();
 	PRINT_FIELD_FRACT(*p, timeperframe);
-	PRINT_FIELD_X(", ", *p, extendedmode);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, extendedmode);
 	PRINT_FIELD_U(", ", *p, readbuffers);
 	tprints("}");
 }
@@ -695,7 +701,8 @@ print_v4l2_streamparm_output(const struct v4l2_outputparm *const p)
 			  "V4L2_MODE_???");
 	tprint_struct_next();
 	PRINT_FIELD_FRACT(*p, timeperframe);
-	PRINT_FIELD_X(", ", *p, extendedmode);
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, extendedmode);
 	PRINT_FIELD_U(", ", *p, writebuffers);
 	tprints("}");
 }

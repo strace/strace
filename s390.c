@@ -463,7 +463,7 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 
 # define PRINT_FIELD_WEIGHT(where_, field_) \
 	do { \
-		PRINT_FIELD_X("", where_, field_); \
+		PRINT_FIELD_X(where_, field_); \
 		if ((where_).field_) \
 			tprintf_comment("%u %u/65536 cores", \
 				(where_).field_ >> 16, \
@@ -723,10 +723,12 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 					PRINT_FIELD_HEX_ARRAY(*hdr, infplgnm);
 				}
 				if (hdr->infplgcp) {
-					PRINT_FIELD_X(", ", *hdr, infplgcp);
+					tprint_struct_next();
+					PRINT_FIELD_X(*hdr, infplgcp);
 				}
 				if (hdr->infplgif) {
-					PRINT_FIELD_X(", ", *hdr, infplgif);
+					tprint_struct_next();
+					PRINT_FIELD_X(*hdr, infplgif);
 				}
 			}
 		}
@@ -1346,13 +1348,17 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 		tprints(", ");
 	}
 
-	PRINT_FIELD_X("", gsepl, gs_eha);
+	PRINT_FIELD_X(gsepl, gs_eha);
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_X(", ", gsepl, gs_eia);
-		PRINT_FIELD_X(", ", gsepl, gs_eoa);
-		PRINT_FIELD_X(", ", gsepl, gs_eir);
-		PRINT_FIELD_X(", ", gsepl, gs_era);
+		tprint_struct_next();
+		PRINT_FIELD_X(gsepl, gs_eia);
+		tprint_struct_next();
+		PRINT_FIELD_X(gsepl, gs_eoa);
+		tprint_struct_next();
+		PRINT_FIELD_X(gsepl, gs_eir);
+		tprint_struct_next();
+		PRINT_FIELD_X(gsepl, gs_era);
 	} else {
 		tprints(", ...");
 	}

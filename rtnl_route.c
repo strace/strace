@@ -122,7 +122,8 @@ decode_rta_cacheinfo(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", ci, rta_expires);
 		PRINT_FIELD_U(", ", ci, rta_error);
 		PRINT_FIELD_U(", ", ci, rta_used);
-		PRINT_FIELD_X(", ", ci, rta_id);
+		tprint_struct_next();
+		PRINT_FIELD_X(ci, rta_id);
 		PRINT_FIELD_U(", ", ci, rta_ts);
 		PRINT_FIELD_U(", ", ci, rta_tsage);
 		tprints("}");

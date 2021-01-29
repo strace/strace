@@ -194,9 +194,12 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 	if (len < sizeof_ifmap)
 		return false;
 	else if (!umoven_or_printaddr(tcp, addr, sizeof_ifmap, &map)) {
-		PRINT_FIELD_X("{", map, mem_start);
-		PRINT_FIELD_X(", ", map, mem_end);
-		PRINT_FIELD_X(", ", map, base_addr);
+		tprint_struct_begin();
+		PRINT_FIELD_X(map, mem_start);
+		tprint_struct_next();
+		PRINT_FIELD_X(map, mem_end);
+		tprint_struct_next();
+		PRINT_FIELD_X(map, base_addr);
 		PRINT_FIELD_U(", ", map, irq);
 		PRINT_FIELD_U(", ", map, dma);
 		PRINT_FIELD_U(", ", map, port);
@@ -940,7 +943,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(ifinfo, ifi_flags,
 					  iffflags, "IFF_???");
-			PRINT_FIELD_X(", ", ifinfo, ifi_change);
+			tprint_struct_next();
+			PRINT_FIELD_X(ifinfo, ifi_change);
 			decode_nla = true;
 		}
 	} else

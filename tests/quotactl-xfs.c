@@ -83,7 +83,7 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	printflags(xfs_dqblk_flags, (uint8_t) dq->d_flags, "XFS_???_QUOTA");
 
 	printf(", ");
-	PRINT_FIELD_X("", *dq, d_fieldmask);
+	PRINT_FIELD_X(*dq, d_fieldmask);
 	printf(", ");
 	PRINT_FIELD_U("", *dq, d_id);
 	printf(", ");

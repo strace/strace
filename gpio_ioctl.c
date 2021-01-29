@@ -228,7 +228,8 @@ print_gpio_v2_line_attribute_raw(const struct_gpio_v2_line_attribute *attr,
 		tprints("attr={");
 	PRINT_FIELD_U("", *attr, id);
 	if (attr->padding) {
-		PRINT_FIELD_X(", ", *attr, padding);
+		tprint_struct_next();
+		PRINT_FIELD_X(*attr, padding);
 	}
 	tprintf(", data=%#" PRIx64, attr->values);
 	if (as_field)
@@ -250,7 +251,7 @@ print_gpio_v2_line_attribute(const struct_gpio_v2_line_attribute *attr,
 				  "GPIO_V2_LINE_FLAG_???");
 		break;
 	case GPIO_V2_LINE_ATTR_ID_OUTPUT_VALUES:
-		PRINT_FIELD_X("", *attr, values);
+		PRINT_FIELD_X(*attr, values);
 		break;
 	case GPIO_V2_LINE_ATTR_ID_DEBOUNCE:
 		PRINT_FIELD_U("", *attr, debounce_period_us);
@@ -267,7 +268,8 @@ print_gpio_v2_line_config_attribute(const struct_gpio_v2_line_config_attribute *
 {
 	tprints("{");
 	print_gpio_v2_line_attribute(&attr->attr, true);
-	PRINT_FIELD_X(", ", *attr, mask);
+	tprint_struct_next();
+	PRINT_FIELD_X(*attr, mask);
 	tprints("}");
 }
 
@@ -413,13 +415,15 @@ print_gpio_v2_line_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	if (entering(tcp)) {
-		PRINT_FIELD_X("{", vals, mask);
+		tprint_struct_begin();
+		PRINT_FIELD_X(vals, mask);
 		tprints("}");
 		return 0;
 	}
 
 	/* exiting */
-	PRINT_FIELD_X("{", vals, bits);
+	tprint_struct_begin();
+	PRINT_FIELD_X(vals, bits);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -432,8 +436,10 @@ print_gpio_v2_line_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &vals)) {
-		PRINT_FIELD_X("{", vals, bits);
-		PRINT_FIELD_X(", ", vals, mask);
+		tprint_struct_begin();
+		PRINT_FIELD_X(vals, bits);
+		tprint_struct_next();
+		PRINT_FIELD_X(vals, mask);
 		tprints("}");
 	}
 

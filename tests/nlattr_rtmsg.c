@@ -153,7 +153,7 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_U("", ci, rta_used);
 			   printf(", ");
-			   PRINT_FIELD_X("", ci, rta_id);
+			   PRINT_FIELD_X(ci, rta_id);
 			   printf(", ");
 			   PRINT_FIELD_U("", ci, rta_ts);
 			   printf(", ");

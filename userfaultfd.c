@@ -33,8 +33,10 @@ SYS_FUNC(userfaultfd)
 static void
 tprintf_uffdio_range(const struct uffdio_range *range)
 {
-	PRINT_FIELD_X("{", *range, start);
-	PRINT_FIELD_X(", ", *range, len);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*range, start);
+	tprint_struct_next();
+	PRINT_FIELD_X(*range, len);
 	tprints("}");
 }
 
@@ -51,7 +53,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ua))
 				break;
-			PRINT_FIELD_X("{", ua, api);
+			tprint_struct_begin();
+			PRINT_FIELD_X(ua, api);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(ua, features, uffd_api_features,
 					  "UFFD_FEATURE_???");
@@ -92,9 +95,12 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uc))
 				return RVAL_IOCTL_DECODED;
-			PRINT_FIELD_X("{", uc, dst);
-			PRINT_FIELD_X(", ", uc, src);
-			PRINT_FIELD_X(", ", uc, len);
+			tprint_struct_begin();
+			PRINT_FIELD_X(uc, dst);
+			tprint_struct_next();
+			PRINT_FIELD_X(uc, src);
+			tprint_struct_next();
+			PRINT_FIELD_X(uc, len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(uc, mode, uffd_copy_flags,
 					  "UFFDIO_COPY_???");
@@ -103,7 +109,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		}
 
 		if (!syserror(tcp) && !umove(tcp, arg, &uc)) {
-			PRINT_FIELD_X(", ", uc, copy);
+			tprint_struct_next();
+			PRINT_FIELD_X(uc, copy);
 		}
 
 		tprints("}");
@@ -171,7 +178,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		}
 
 		if (!syserror(tcp) && !umove(tcp, arg, &uz)) {
-			PRINT_FIELD_X(", ", uz, zeropage);
+			tprint_struct_next();
+			PRINT_FIELD_X(uz, zeropage);
 		}
 
 		tprints("}");

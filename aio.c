@@ -74,7 +74,8 @@ print_common_flags(struct tcb *tcp, const struct iocb *cb)
 		tprint_struct_next();
 		PRINT_FIELD_FD(*cb, aio_resfd, tcp);
 	} else if (cb->aio_resfd) {
-		PRINT_FIELD_X(", ", *cb, aio_resfd);
+		tprint_struct_next();
+		PRINT_FIELD_X(*cb, aio_resfd);
 	}
 #endif
 }
@@ -92,7 +93,7 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 {
 	enum iocb_sub sub;
 
-	PRINT_FIELD_X("", *cb, aio_data);
+	PRINT_FIELD_X(*cb, aio_data);
 
 	if (cb->aio_key) {
 		PRINT_FIELD_U(", ", *cb, aio_key);
@@ -136,7 +137,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 			PRINT_FIELD_OBJ_TCB_VAL(*cb, aio_buf, tcp,
 				printstrn, cb->aio_nbytes);
 		} else {
-			PRINT_FIELD_X(", ", *cb, aio_buf);
+			tprint_struct_next();
+			PRINT_FIELD_X(*cb, aio_buf);
 		}
 		PRINT_FIELD_U(", ", *cb, aio_nbytes);
 		PRINT_FIELD_D(", ", *cb, aio_offset);
@@ -150,7 +152,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 				   ? IOV_DECODE_STR
 				   : IOV_DECODE_ADDR);
 		} else {
-			PRINT_FIELD_X(", ", *cb, aio_buf);
+			tprint_struct_next();
+			PRINT_FIELD_X(*cb, aio_buf);
 			PRINT_FIELD_U(", ", *cb, aio_nbytes);
 		}
 		PRINT_FIELD_D(", ", *cb, aio_offset);
@@ -210,8 +213,10 @@ print_io_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	struct io_event *event = elem_buf;
 
-	PRINT_FIELD_X("{", *event, data);
-	PRINT_FIELD_X(", ", *event, obj);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*event, data);
+	tprint_struct_next();
+	PRINT_FIELD_X(*event, obj);
 	PRINT_FIELD_D(", ", *event, res);
 	PRINT_FIELD_D(", ", *event, res2);
 	tprints("}");

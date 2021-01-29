@@ -46,10 +46,12 @@ print_io_sqring_offsets(const struct_io_sqring_offsets *const p)
 	PRINT_FIELD_U(", ", *p, dropped);
 	PRINT_FIELD_U(", ", *p, array);
 	if (p->resv1) {
-		PRINT_FIELD_X(", ", *p, resv1);
+		tprint_struct_next();
+		PRINT_FIELD_X(*p, resv1);
 	}
 	if (p->resv2) {
-		PRINT_FIELD_X(", ", *p, resv2);
+		tprint_struct_next();
+		PRINT_FIELD_X(*p, resv2);
 	}
 	tprints("}");
 }
@@ -66,10 +68,12 @@ print_io_cqring_offsets(const struct_io_cqring_offsets *const p)
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*p, flags, uring_cqring_flags, "IORING_CQ_???");
 	if (p->resv1) {
-		PRINT_FIELD_X(", ", *p, resv1);
+		tprint_struct_next();
+		PRINT_FIELD_X(*p, resv1);
 	}
 	if (p->resv2) {
-		PRINT_FIELD_X(", ", *p, resv2);
+		tprint_struct_next();
+		PRINT_FIELD_X(*p, resv2);
 	}
 	tprints("}");
 }
@@ -89,7 +93,8 @@ SYS_FUNC(io_uring_setup)
 		tprint_struct_begin();
 		PRINT_FIELD_FLAGS(params, flags, uring_setup_flags,
 				  "IORING_SETUP_???");
-		PRINT_FIELD_X(", ", params, sq_thread_cpu);
+		tprint_struct_next();
+		PRINT_FIELD_X(params, sq_thread_cpu);
 		PRINT_FIELD_U(", ", params, sq_thread_idle);
 		if (params.flags & IORING_SETUP_ATTACH_WQ) {
 			tprint_struct_next();
@@ -166,7 +171,8 @@ print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 
 	PRINT_FIELD_U("{", arg, offset);
 	if (arg.resv) {
-		PRINT_FIELD_X(", ", arg, resv);
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, resv);
 	}
 	tprints(", fds=");
 	print_big_u64_addr(arg.fds);
@@ -184,12 +190,14 @@ print_io_uring_probe_op(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL_U(*op, op, uring_ops, "IORING_OP_???");
 	if (op->resv) {
-		PRINT_FIELD_X(", ", *op, resv);
+		tprint_struct_next();
+		PRINT_FIELD_X(*op, resv);
 	}
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*op, flags, uring_op_flags, "IO_URING_OP_???");
 	if (op->resv2) {
-		PRINT_FIELD_X(", ", *op, resv2);
+		tprint_struct_next();
+		PRINT_FIELD_X(*op, resv2);
 	}
 	tprints("}");
 
@@ -233,7 +241,8 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_XVAL_U(*probe, last_op, uring_ops, "IORING_OP_???");
 	PRINT_FIELD_U(", ", *probe, ops_len);
 	if (probe->resv) {
-		PRINT_FIELD_X(", ", *probe, resv);
+		tprint_struct_next();
+		PRINT_FIELD_X(*probe, resv);
 	}
 	if (!IS_ARRAY_ZERO(probe->resv2)) {
 		tprint_struct_next();

@@ -49,9 +49,11 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!umove_or_printaddr(tcp, arg, &id)) {
 		PRINT_FIELD_D("{", id, host_no);
 		PRINT_FIELD_D(", ", id, channel);
-		PRINT_FIELD_X(", ", id, scsi_id);
+		tprint_struct_next();
+		PRINT_FIELD_X(id, scsi_id);
 		PRINT_FIELD_D(", ", id, lun);
-		PRINT_FIELD_X(", ", id, scsi_type);
+		tprint_struct_next();
+		PRINT_FIELD_X(id, scsi_type);
 		PRINT_FIELD_D(", ", id, h_cmd_per_lun);
 		PRINT_FIELD_D(", ", id, d_queue_depth);
 		tprints("}");

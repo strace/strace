@@ -244,7 +244,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(dq, d_flags,
 				  xfs_dqblk_flags, "XFS_???_QUOTA");
-		PRINT_FIELD_X(", ", dq, d_fieldmask);
+		tprint_struct_next();
+		PRINT_FIELD_X(dq, d_fieldmask);
 		PRINT_FIELD_U(", ", dq, d_id);
 		PRINT_FIELD_U(", ", dq, d_blk_hardlimit);
 		PRINT_FIELD_U(", ", dq, d_blk_softlimit);

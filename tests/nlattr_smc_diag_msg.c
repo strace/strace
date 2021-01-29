@@ -223,13 +223,13 @@ int main(void)
 			   printf("{");
 			   PRINT_FIELD_U("", dinfo, linkid);
 			   printf(", ");
-			   PRINT_FIELD_X("", dinfo, peer_gid);
+			   PRINT_FIELD_X(dinfo, peer_gid);
 			   printf(", ");
-			   PRINT_FIELD_X("", dinfo, my_gid);
+			   PRINT_FIELD_X(dinfo, my_gid);
 			   printf(", ");
-			   PRINT_FIELD_X("", dinfo, token);
+			   PRINT_FIELD_X(dinfo, token);
 			   printf(", ");
-			   PRINT_FIELD_X("", dinfo, peer_token);
+			   PRINT_FIELD_X(dinfo, peer_token);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,

@@ -54,7 +54,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(", ", sg_io, request_len);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, request, sg_io.request_len, 0, tcp);
-	PRINT_FIELD_X(", ", sg_io, request_tag);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, request_tag);
 	PRINT_FIELD_U(", ", sg_io, request_attr);
 	PRINT_FIELD_U(", ", sg_io, request_priority);
 	PRINT_FIELD_U(", ", sg_io, request_extra);
@@ -70,7 +71,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(", ", sg_io, timeout);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sg_io, flags, bsg_flags, "BSG_FLAG_???");
-	PRINT_FIELD_X(", ", sg_io, usr_ptr);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, usr_ptr);
 
 	struct sg_io_v4 *entering_sg_io = malloc(sizeof(*entering_sg_io));
 	if (entering_sg_io) {
@@ -91,8 +93,10 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (umove(tcp, arg, &sg_io) < 0) {
 		/* print i/o fields fetched on entering syscall */
-		PRINT_FIELD_X(", ", *entering_sg_io, response);
-		PRINT_FIELD_X(", ", *entering_sg_io, din_xferp);
+		tprint_struct_next();
+		PRINT_FIELD_X(*entering_sg_io, response);
+		tprint_struct_next();
+		PRINT_FIELD_X(*entering_sg_io, din_xferp);
 		return RVAL_IOCTL_DECODED;
 	}
 
@@ -110,9 +114,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, din_xferp, din_len,
 				 sg_io.din_iovec_count, tcp);
-	PRINT_FIELD_X(", ", sg_io, driver_status);
-	PRINT_FIELD_X(", ", sg_io, transport_status);
-	PRINT_FIELD_X(", ", sg_io, device_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, driver_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, transport_status);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, device_status);
 	PRINT_FIELD_U(", ", sg_io, retry_delay);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sg_io, info, sg_io_info, "SG_INFO_???");
@@ -120,7 +127,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(", ", sg_io, response_len);
 	PRINT_FIELD_D(", ", sg_io, din_resid);
 	PRINT_FIELD_D(", ", sg_io, dout_resid);
-	PRINT_FIELD_X(", ", sg_io, generated_tag);
+	tprint_struct_next();
+	PRINT_FIELD_X(sg_io, generated_tag);
 
 	return RVAL_IOCTL_DECODED;
 }

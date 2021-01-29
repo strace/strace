@@ -11,34 +11,52 @@ arch_print_kvm_regs(struct tcb *const tcp,
 		    const kernel_ulong_t addr,
 		    const struct kvm_regs *const regs)
 {
-	PRINT_FIELD_X("{", *regs, rax);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*regs, rax);
 	if (abbrev(tcp))
 		tprints(", ...");
 	else {
-		PRINT_FIELD_X(", ",  *regs, rbx);
-		PRINT_FIELD_X(", ",  *regs, rcx);
-		PRINT_FIELD_X(", ",  *regs, rdx);
-		PRINT_FIELD_X(", ",  *regs, rsi);
-		PRINT_FIELD_X(", ",  *regs, rdi);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, rbx);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, rcx);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, rdx);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, rsi);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, rdi);
 	}
-	PRINT_FIELD_X(", ",  *regs, rsp);
-	PRINT_FIELD_X(", ",  *regs, rbp);
+	tprint_struct_next();
+	PRINT_FIELD_X(*regs, rsp);
+	tprint_struct_next();
+	PRINT_FIELD_X(*regs, rbp);
 	if (abbrev(tcp))
 		tprints(", ...");
 	else {
-		PRINT_FIELD_X(", ",  *regs, r8);
-		PRINT_FIELD_X(", ",  *regs, r9);
-		PRINT_FIELD_X(", ",  *regs, r10);
-		PRINT_FIELD_X(", ",  *regs, r11);
-		PRINT_FIELD_X(", ",  *regs, r12);
-		PRINT_FIELD_X(", ",  *regs, r13);
-		PRINT_FIELD_X(", ",  *regs, r14);
-		PRINT_FIELD_X(", ",  *regs, r15);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r8);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r9);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r10);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r11);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r12);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r13);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r14);
+		tprint_struct_next();
+		PRINT_FIELD_X(*regs, r15);
 	}
-	PRINT_FIELD_X(", ",  *regs, rip);
+	tprint_struct_next();
+	PRINT_FIELD_X(*regs, rip);
 
 	/* TODO: we can decode this more */
-	PRINT_FIELD_X(", ",  *regs, rflags);
+	tprint_struct_next();
+	PRINT_FIELD_X(*regs, rflags);
 
 	tprints("}");
 }
@@ -48,7 +66,8 @@ arch_print_kvm_regs(struct tcb *const tcp,
 static void
 kvm_ioctl_decode_regs_segment(const struct kvm_segment *const segment)
 {
-	PRINT_FIELD_X("{", *segment, base);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*segment, base);
 	PRINT_FIELD_U(", ", *segment, limit);
 	PRINT_FIELD_U(", ", *segment, selector);
 	PRINT_FIELD_U(", ", *segment, type);
@@ -65,7 +84,8 @@ kvm_ioctl_decode_regs_segment(const struct kvm_segment *const segment)
 static void
 kvm_ioctl_decode_regs_dtable(const struct kvm_dtable *const dtable)
 {
-	PRINT_FIELD_X("{", *dtable, base);
+	tprint_struct_begin();
+	PRINT_FIELD_X(*dtable, base);
 	PRINT_FIELD_U(", ", *dtable, limit);
 	tprints("}");
 }
@@ -110,7 +130,8 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 	PRINT_FIELD_U(", ", *sregs, cr4);
 	PRINT_FIELD_U(", ", *sregs, cr8);
 	PRINT_FIELD_U(", ", *sregs, efer);
-	PRINT_FIELD_X(", ", *sregs, apic_base);
+	tprint_struct_next();
+	PRINT_FIELD_X(*sregs, apic_base);
 	tprint_struct_next();
 	PRINT_FIELD_X_ARRAY(*sregs, interrupt_bitmap);
 	tprints("}");
