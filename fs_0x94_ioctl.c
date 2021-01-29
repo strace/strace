@@ -93,7 +93,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 	}
 
-	tprints("info=");
+	tprints_field_name("info");
 
 	/* Limit how many elements we print in abbrev mode. */
 	if (abbrev(tcp) && range.dest_count > count)

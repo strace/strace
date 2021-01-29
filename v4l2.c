@@ -1241,7 +1241,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(is_get ? ", " : "} => {");
 	}
 
-	tprints("controls=");
+	tprints_field_name("controls");
 	struct_v4l2_ext_control ctrl;
 	bool fail = !print_array(tcp, ptr_to_kulong(c.controls), c.count,
 				 &ctrl, sizeof(ctrl),

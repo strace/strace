@@ -445,7 +445,7 @@ dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 	uint32_t offset = ioc->data_start;
 
 	if (offset <= ioc->data_size) {
-		tprints("string=");
+		tprints_field_name("string");
 		printstr_ex(tcp, addr + offset, ioc->data_size - offset,
 			    QUOTE_0_TERMINATED);
 	} else {

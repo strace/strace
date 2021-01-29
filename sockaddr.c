@@ -54,7 +54,7 @@ print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen
 			   ? (int) sizeof(*sa_un) : addrlen;
 	const int path_len = un_len - SIZEOF_SA_FAMILY;
 
-	tprints("sun_path=");
+	tprints_field_name("sun_path");
 	if (sa_un->sun_path[0]) {
 		print_quoted_string(sa_un->sun_path, path_len + 1,
 				    QUOTE_0_TERMINATED);
@@ -437,7 +437,7 @@ print_sll_protocol(const struct sockaddr_ll *const sa_ll)
 {
 	int x_style = xlat_verbose(xlat_verbosity);
 
-	tprints("sll_protocol=");
+	tprints_field_name("sll_protocol");
 	if (x_style != XLAT_STYLE_ABBREV)
 		print_quoted_string((const char *) &sa_ll->sll_protocol,
 				    sizeof(sa_ll->sll_protocol),
@@ -498,7 +498,7 @@ print_sockaddr_data_raw(const void *const buf, const int addrlen)
 	const char *const data = buf + SIZEOF_SA_FAMILY;
 	const int datalen = addrlen - SIZEOF_SA_FAMILY;
 
-	tprints("sa_data=");
+	tprints_field_name("sa_data");
 	print_quoted_string(data, datalen, 0);
 }
 
