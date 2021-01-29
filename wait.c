@@ -81,7 +81,7 @@ printwaitn(struct tcb *const tcp,
 {
 	if (entering(tcp)) {
 		printpid_tgid_pgid(tcp, tcp->u_arg[0]);
-		tprintf(", ");
+		tprints(", ");
 	} else {
 		int status;
 
