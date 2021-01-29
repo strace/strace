@@ -322,10 +322,10 @@ tprints_field_name(const char *name)
 				  (print_func_));			\
 	} while (0)
 
-# define PRINT_FIELD_ARRAY_UPTO(prefix_, where_, field_,		\
+# define PRINT_FIELD_ARRAY_UPTO(where_, field_,				\
 				upto_, tcp_, print_func_)		\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_local_array_upto((tcp_), (where_).field_,		\
 				       (upto_), (print_func_));		\
 	} while (0)

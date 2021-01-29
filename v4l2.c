@@ -298,7 +298,8 @@ DECL_print_v4l2_format_fmt(pix_mp)
 	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_XVAL(", ", *p, colorspace, v4l2_colorspaces,
 			 "V4L2_COLORSPACE_???");
-	PRINT_FIELD_ARRAY_UPTO(", ", *p, plane_fmt, p->num_planes, tcp,
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY_UPTO(*p, plane_fmt, p->num_planes, tcp,
 			       print_v4l2_plane_pix_format_array_member);
 	PRINT_FIELD_U(", ", *p, num_planes);
 	tprints("}");
@@ -1014,7 +1015,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(", ", c, elem_size);
 		PRINT_FIELD_U(", ", c, elems);
 		PRINT_FIELD_U(", ", c, nr_of_dims);
-		PRINT_FIELD_ARRAY_UPTO(", ", c, dims, c.nr_of_dims, tcp,
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY_UPTO(c, dims, c.nr_of_dims, tcp,
 				       print_uint32_array_member);
 		if (!IS_ARRAY_ZERO(c.reserved)) {
 			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,

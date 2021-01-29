@@ -115,7 +115,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 					sysoff.n_samples > PTP_MAX_SAMPLES
 					? PTP_MAX_SAMPLES : sysoff.n_samples;
 				tprints(", ");
-				PRINT_FIELD_ARRAY_UPTO(", ", sysoff, ts,
+				tprint_struct_next();
+				PRINT_FIELD_ARRAY_UPTO(sysoff, ts,
 						       2 * n_samples + 1, tcp,
 						       print_ptp_clock_time_am);
 			}
