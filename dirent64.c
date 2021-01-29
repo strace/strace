@@ -39,7 +39,8 @@ decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
 
 	/* !abbrev(tcp) */
 
-	PRINT_FIELD_XVAL(", ", *dent, d_type, dirent_types, "DT_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*dent, d_type, dirent_types, "DT_???");
 
 	if (d_name_len) {
 		if (d_name_len > D_NAME_LEN_MAX)

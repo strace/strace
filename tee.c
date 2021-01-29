@@ -146,7 +146,8 @@ tee_version(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &version))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_XVAL("{", version, impl_id,
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(version, impl_id,
 			 tee_ioctl_impl_ids, "TEE_IMPL_ID_???");
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(version, gen_caps,
@@ -183,7 +184,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints_field_name("buf_ptr");
 		tprint_struct_begin();
 		PRINT_FIELD_UUID(open_session, uuid);
-		PRINT_FIELD_XVAL(", ", open_session, clnt_login,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(open_session, clnt_login,
 				 tee_ioctl_login_types, "TEE_IOCTL_LOGIN_???");
 		/*
 		 * tee_ioctl_open_session_arg.clnt_uuid is used to pass
@@ -232,7 +234,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_begin();
 		PRINT_FIELD_SESSION(open_session, session);
 		PRINT_FIELD_U(", ", open_session, ret);
-		PRINT_FIELD_XVAL(", ", open_session, ret_origin, tee_ioctl_origins,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(open_session, ret_origin, tee_ioctl_origins,
 				 "TEEC_ORIGIN_???");
 		tee_print_params(tcp, params, open_session.num_params);
 
@@ -275,7 +278,8 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 			return rval;
 
 		PRINT_FIELD_U("{", invoke, ret);
-		PRINT_FIELD_XVAL(", ", invoke, ret_origin, tee_ioctl_origins,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(invoke, ret_origin, tee_ioctl_origins,
 				 "TEEC_ORIGIN_???");
 		tee_print_params(tcp, params, invoke.num_params);
 

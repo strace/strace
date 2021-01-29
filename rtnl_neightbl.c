@@ -131,7 +131,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg)
 {
 	struct ndtmsg ndtmsg = { .ndtm_family = family };
 
-	PRINT_FIELD_XVAL("{", ndtmsg, ndtm_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ndtmsg, ndtm_family, addrfams, "AF_???");
 	tprints("}");
 
 	const size_t offset = NLMSG_ALIGN(sizeof(ndtmsg));

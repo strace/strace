@@ -27,7 +27,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 	struct packet_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
 
-	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
@@ -65,8 +66,8 @@ decode_packet_diag_info(struct tcb *const tcp,
 
 	tprint_struct_begin();
 	PRINT_FIELD_IFINDEX(pinfo, pdi_index);
-	PRINT_FIELD_XVAL(", ", pinfo, pdi_version, af_packet_versions,
-			 "TPACKET_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(pinfo, pdi_version, af_packet_versions, "TPACKET_???");
 	PRINT_FIELD_U(", ", pinfo, pdi_reserve);
 	PRINT_FIELD_U(", ", pinfo, pdi_copy_thresh);
 	PRINT_FIELD_U(", ", pinfo, pdi_tstamp);
@@ -171,15 +172,17 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg)
 	size_t offset = sizeof(msg.pdiag_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", msg, pdiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(msg, pdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (char *) &msg + offset)) {
-			PRINT_FIELD_XVAL("", msg, pdiag_type,
+			PRINT_FIELD_XVAL(msg, pdiag_type,
 					 socktypes, "SOCK_???");
-			PRINT_FIELD_XVAL(", ", msg, pdiag_num,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(msg, pdiag_num,
 					 ethernet_protocols, "ETH_P_???");
 			PRINT_FIELD_U(", ", msg, pdiag_ino);
 			tprint_struct_next();

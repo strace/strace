@@ -32,7 +32,8 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D("{", mkvol, vol_id);
 		PRINT_FIELD_D(", ", mkvol, alignment);
 		PRINT_FIELD_D(", ", mkvol, bytes);
-		PRINT_FIELD_XVAL(", ", mkvol, vol_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(mkvol, vol_type,
 				 ubi_volume_types, "UBI_???_VOLUME");
 # ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
 #  define flags padding1
@@ -119,7 +120,8 @@ decode_UBI_IOCEBCH(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!umove_or_printaddr(tcp, arg, &leb)) {
 		PRINT_FIELD_D("{", leb, lnum);
 		PRINT_FIELD_D(", ", leb, bytes);
-		PRINT_FIELD_XVAL(", ", leb, dtype, ubi_data_types, "UBI_???");
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(leb, dtype, ubi_data_types, "UBI_???");
 		tprints("}");
 	}
 
@@ -160,7 +162,8 @@ decode_UBI_IOCEBMAP(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &map)) {
 		PRINT_FIELD_D("{", map, lnum);
-		PRINT_FIELD_XVAL(", ", map, dtype, ubi_data_types, "UBI_???");
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(map, dtype, ubi_data_types, "UBI_???");
 		tprints("}");
 	}
 
@@ -174,7 +177,8 @@ decode_UBI_IOCSETVOLPROP(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &prop)) {
-		PRINT_FIELD_XVAL("{", prop, property,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(prop, property,
 				 ubi_volume_props, "UBI_VOL_PROP_???");
 		PRINT_FIELD_X(", ", prop, value);
 		tprints("}");

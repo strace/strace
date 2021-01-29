@@ -34,7 +34,8 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (!fetch_struct_statfs(tcp, addr, &b))
 		return;
 
-	PRINT_FIELD_XVAL("{", b, f_type, fsmagic, NULL);
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(b, f_type, fsmagic, NULL);
 	PRINT_FIELD_U(", ", b, f_bsize);
 	PRINT_FIELD_U(", ", b, f_blocks);
 	PRINT_FIELD_U(", ", b, f_bfree);
@@ -72,7 +73,8 @@ print_struct_statfs64(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (!fetch_struct_statfs64(tcp, addr, size, &b))
 		return;
 
-	PRINT_FIELD_XVAL("{", b, f_type, fsmagic, NULL);
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(b, f_type, fsmagic, NULL);
 	PRINT_FIELD_U(", ", b, f_bsize);
 	PRINT_FIELD_U(", ", b, f_blocks);
 	PRINT_FIELD_U(", ", b, f_bfree);

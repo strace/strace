@@ -336,11 +336,13 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_XVAL("{", info, op, ptrace_syscall_info_op,
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(info, op, ptrace_syscall_info_op,
 			 "PTRACE_SYSCALL_INFO_???");
 	if (fetch_size < offsetofend(struct_ptrace_syscall_info, arch))
 		goto printed;
-	PRINT_FIELD_XVAL(", ", info, arch, audit_arch, "AUDIT_ARCH_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(info, arch, audit_arch, "AUDIT_ARCH_???");
 
 	if (fetch_size < offsetofend(struct_ptrace_syscall_info,
 				     instruction_pointer))

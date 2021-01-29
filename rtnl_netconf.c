@@ -35,7 +35,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 {
 	struct netconfmsg ncm = { .ncm_family = family };
 
-	PRINT_FIELD_XVAL("{", ncm, ncm_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ncm, ncm_family, addrfams, "AF_???");
 	tprints("}");
 
 	const size_t offset = NLMSG_ALIGN(sizeof(ncm));

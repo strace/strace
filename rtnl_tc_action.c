@@ -65,7 +65,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcamsg)
 {
 	struct tcamsg tca = { .tca_family = family };
 
-	PRINT_FIELD_XVAL("{", tca, tca_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(tca, tca_family, addrfams, "AF_???");
 	tprints("}");
 
 	const size_t offset = NLMSG_ALIGN(sizeof(tca));

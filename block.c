@@ -61,7 +61,8 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 {
 	struct_blkpg_partition p;
 
-	PRINT_FIELD_XVAL("{", *blkpg, op, blkpg_ops, "BLKPG_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*blkpg, op, blkpg_ops, "BLKPG_???");
 	PRINT_FIELD_D(", ", *blkpg, flags);
 	PRINT_FIELD_D(", ", *blkpg, datalen);
 

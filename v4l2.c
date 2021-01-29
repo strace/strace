@@ -228,7 +228,8 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
 		PRINT_FIELD_U("{", f, index);
-		PRINT_FIELD_XVAL(", ", f, type, v4l2_buf_types,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(f, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
 		return 0;
 	}
@@ -273,10 +274,12 @@ DECL_print_v4l2_format_fmt(pix)
 	PRINT_FIELD_U(", ", *p, height);
 	tprint_struct_next();
 	PRINT_FIELD_PIXFMT(*p, pixelformat, v4l2_pix_fmts);
-	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_U(", ", *p, bytesperline);
 	PRINT_FIELD_U(", ", *p, sizeimage);
-	PRINT_FIELD_XVAL(", ", *p, colorspace, v4l2_colorspaces,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, colorspace, v4l2_colorspaces,
 			 "V4L2_COLORSPACE_???");
 	tprints("}");
 	return true;
@@ -302,8 +305,10 @@ DECL_print_v4l2_format_fmt(pix_mp)
 	PRINT_FIELD_U(", ", *p, height);
 	tprint_struct_next();
 	PRINT_FIELD_PIXFMT(*p, pixelformat, v4l2_pix_fmts);
-	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
-	PRINT_FIELD_XVAL(", ", *p, colorspace, v4l2_colorspaces,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, field, v4l2_fields, "V4L2_FIELD_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, colorspace, v4l2_colorspaces,
 			 "V4L2_COLORSPACE_???");
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(*p, plane_fmt, p->num_planes, tcp,
@@ -318,7 +323,8 @@ DECL_print_v4l2_format_fmt(win)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_OBJ_PTR(*p, w, print_v4l2_rect);
-	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_X(", ", *p, chromakey);
 
 	tprints(", clips=");
@@ -465,7 +471,8 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
-		PRINT_FIELD_XVAL("{", f, type, v4l2_buf_types,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(f, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
@@ -498,9 +505,11 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_XVAL("{", reqbufs, type, v4l2_buf_types,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(reqbufs, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
-		PRINT_FIELD_XVAL(", ", reqbufs, memory, v4l2_memories,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(reqbufs, memory, v4l2_memories,
 				 "V4L2_MEMORY_???");
 		PRINT_FIELD_U(", ", reqbufs, count);
 
@@ -584,7 +593,8 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
-		PRINT_FIELD_XVAL("{", b, type, v4l2_buf_types,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(b, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
 		if (code != VIDIOC_DQBUF) {
 			PRINT_FIELD_U(", ", b, index);
@@ -597,7 +607,8 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		if (code == VIDIOC_DQBUF) {
 			PRINT_FIELD_U(", ", b, index);
 		}
-		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(b, memory, v4l2_memories,
 				 "V4L2_MEMORY_???");
 
 		if (b.memory == V4L2_MEMORY_MMAP) {
@@ -705,7 +716,8 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
-		PRINT_FIELD_XVAL("{", s, type, v4l2_buf_types,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(s, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
 		switch (s.type) {
 			case V4L2_BUF_TYPE_VIDEO_CAPTURE:
@@ -786,7 +798,8 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!syserror(tcp) && !umove(tcp, arg, &i)) {
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(i, name);
-		PRINT_FIELD_XVAL(", ", i, type, v4l2_input_types,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(i, type, v4l2_input_types,
 				 "V4L2_INPUT_TYPE_???");
 	}
 
@@ -914,7 +927,8 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	PRINT_FIELD_CSTRING(c, name);
-	PRINT_FIELD_XVAL(", ", c, type, v4l2_tuner_types, "V4L2_TUNER_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(c, type, v4l2_tuner_types, "V4L2_TUNER_???");
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(c, capability, v4l2_tuner_capabilities,
 			  "V4L2_TUNER_CAP_???");
@@ -923,7 +937,8 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(c, rxsubchans, v4l2_tuner_rxsubchanses,
 			  "V4L2_TUNER_SUB_???");
-	PRINT_FIELD_XVAL(", ", c, audmode, v4l2_tuner_audmodes,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(c, audmode, v4l2_tuner_audmodes,
 			 "V4L2_TUNER_MODE_???");
 	PRINT_FIELD_D(", ", c, signal);
 	PRINT_FIELD_D(", ", c, afc);
@@ -968,7 +983,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		print_v4l2_cid(c.id, false);
 	}
 
-	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(c, type, v4l2_control_types,
 			 "V4L2_CTRL_TYPE_???");
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(c, name);
@@ -1022,7 +1038,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		print_v4l2_cid(c.id, false);
 	}
 
-	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(c, type, v4l2_control_types,
 			 "V4L2_CTRL_TYPE_???");
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(c, name);
@@ -1062,7 +1079,8 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
-		PRINT_FIELD_XVAL("{", c, type, v4l2_buf_types,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(c, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
 
 		return 0;
@@ -1092,7 +1110,8 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
-		PRINT_FIELD_XVAL("{", c, type, v4l2_buf_types,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(c, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
@@ -1115,7 +1134,8 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 {
 	const struct_v4l2_ext_control *p = elem_buf;
 
-	PRINT_FIELD_XVAL("{", *p, id, v4l2_control_ids, "V4L2_CID_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, id, v4l2_control_ids, "V4L2_CID_???");
 	PRINT_FIELD_U(", ", *p, size);
 	if (p->size > 0) {
 		tprints(", string=");
@@ -1139,7 +1159,8 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
-		PRINT_FIELD_XVAL("{", c, ctrl_class, v4l2_control_classes,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(c, ctrl_class, v4l2_control_classes,
 				 "V4L2_CTRL_CLASS_???");
 		PRINT_FIELD_U(", ", c, count);
 		if (!c.count) {
@@ -1223,7 +1244,8 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
-		PRINT_FIELD_XVAL(", ", s, type, v4l2_framesize_types,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(s, type, v4l2_framesize_types,
 				 "V4L2_FRMSIZE_TYPE_???");
 		switch (s.type) {
 		case V4L2_FRMSIZE_TYPE_DISCRETE:
@@ -1279,7 +1301,8 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-		PRINT_FIELD_XVAL(", ", f, type, v4l2_frameinterval_types,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(f, type, v4l2_frameinterval_types,
 				 "V4L2_FRMIVAL_TYPE_???");
 		switch (f.type) {
 		case V4L2_FRMIVAL_TYPE_DISCRETE:
@@ -1303,7 +1326,8 @@ static void
 print_v4l2_create_buffers_format(const typeof_field(struct_v4l2_create_buffers, format) *const p,
 				 struct tcb *const tcp)
 {
-	PRINT_FIELD_XVAL("{", *p, type, v4l2_buf_types,
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, type, v4l2_buf_types,
 			 "V4L2_BUF_TYPE_???");
 	print_v4l2_format_fmt(tcp, ", ", (const struct_v4l2_format *) p);
 	tprints("}");
@@ -1322,7 +1346,8 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
 		PRINT_FIELD_U("{", b, count);
-		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(b, memory, v4l2_memories,
 				 "V4L2_MEMORY_???");
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(b, format,

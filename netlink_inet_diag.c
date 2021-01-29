@@ -58,7 +58,8 @@ decode_inet_diag_hostcond(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &cond))
 		return;
 
-	PRINT_FIELD_XVAL("{", cond, family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(cond, family, addrfams, "AF_???");
 	PRINT_FIELD_U(", ", cond, prefix_len);
 	PRINT_FIELD_U(", ", cond, port);
 
@@ -73,8 +74,8 @@ decode_inet_diag_hostcond(struct tcb *const tcp,
 static void
 print_inet_diag_bc_op(const struct inet_diag_bc_op *const op)
 {
-	PRINT_FIELD_XVAL("{", *op, code, inet_diag_bytecodes,
-			 "INET_DIAG_BC_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*op, code, inet_diag_bytecodes, "INET_DIAG_BC_???");
 	PRINT_FIELD_U(", ", *op, yes);
 	PRINT_FIELD_U(", ", *op, no);
 	tprints("}");
@@ -183,7 +184,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 	size_t offset = sizeof(req.idiag_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", req, idiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(req, idiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
@@ -229,13 +231,14 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 	size_t offset = sizeof(req.sdiag_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
-			PRINT_FIELD_XVAL("", req, sdiag_protocol,
+			PRINT_FIELD_XVAL(req, sdiag_protocol,
 					 inet_protocols, "IPPROTO_???");
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, idiag_ext,
@@ -388,13 +391,14 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 	size_t offset = sizeof(msg.idiag_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", msg, idiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(msg, idiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (char *) &msg + offset)) {
-			PRINT_FIELD_XVAL("", msg, idiag_state,
+			PRINT_FIELD_XVAL(msg, idiag_state,
 					 tcp_states, "TCP_???");
 			PRINT_FIELD_U(", ", msg, idiag_timer);
 			PRINT_FIELD_U(", ", msg, idiag_retrans);

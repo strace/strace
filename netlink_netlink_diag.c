@@ -26,7 +26,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 	struct netlink_diag_req req = { .sdiag_family = family };
 	const size_t offset = sizeof(req.sdiag_family);
 
-	PRINT_FIELD_XVAL("{", req, sdiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(req, sdiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
@@ -36,7 +37,7 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 				tprintf("%s=%s",
 					"sdiag_protocol", "NDIAG_PROTO_ALL");
 			} else {
-				PRINT_FIELD_XVAL("", req, sdiag_protocol,
+				PRINT_FIELD_XVAL(req, sdiag_protocol,
 						 netlink_protocols,
 						 "NETLINK_???");
 			}
@@ -140,17 +141,20 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 	size_t offset = sizeof(msg.ndiag_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", msg, ndiag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(msg, ndiag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (char *) &msg + offset)) {
-			PRINT_FIELD_XVAL("", msg, ndiag_type,
+			PRINT_FIELD_XVAL(msg, ndiag_type,
 					 socktypes, "SOCK_???");
-			PRINT_FIELD_XVAL(", ", msg, ndiag_protocol,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(msg, ndiag_protocol,
 					 netlink_protocols, "NETLINK_???");
-			PRINT_FIELD_XVAL(", ", msg, ndiag_state,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(msg, ndiag_state,
 					 netlink_states, "NETLINK_???");
 			PRINT_FIELD_U(", ", msg, ndiag_portid);
 			PRINT_FIELD_U(", ", msg, ndiag_dst_portid);

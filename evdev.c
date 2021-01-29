@@ -130,7 +130,8 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_U(", ", ike, index);
-		PRINT_FIELD_XVAL(", ", ike, keycode, evdev_keycode, "KEY_???");
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(ike, keycode, evdev_keycode, "KEY_???");
 		tprint_struct_next();
 		PRINT_FIELD_X_ARRAY(ike, scancode);
 	} else {

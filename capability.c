@@ -68,7 +68,8 @@ print_cap_header(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_XVAL("{", *h, version, cap_version,
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*h, version, cap_version,
 			 "_LINUX_CAPABILITY_VERSION_???");
 	PRINT_FIELD_TGID(", ", *h, pid, tcp);
 	tprints("}");

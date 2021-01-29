@@ -885,7 +885,8 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	} else {
 		tprint_struct_begin();
 		PRINT_FIELD_IFINDEX(mreq, mr_ifindex);
-		PRINT_FIELD_XVAL(", ", mreq, mr_type, packet_mreq_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(mreq, mr_type, packet_mreq_type,
 				 "PACKET_MR_???");
 		PRINT_FIELD_U(", ", mreq, mr_alen);
 		tprint_struct_next();

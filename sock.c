@@ -34,8 +34,8 @@ typedef struct ifreq struct_ifreq;
 static void
 print_ifr_hwaddr(const typeof_field(struct_ifreq, ifr_hwaddr) *const p)
 {
-	PRINT_FIELD_XVAL("{", *p, sa_family,
-			 arp_hardware_types, "ARPHRD_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, sa_family, arp_hardware_types, "ARPHRD_???");
 	tprint_struct_next();
 	PRINT_FIELD_HWADDR_SZ(*p, sa_data, sizeof(p->sa_data), p->sa_family);
 	tprints("}");

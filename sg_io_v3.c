@@ -61,7 +61,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 	}
 
-	PRINT_FIELD_XVAL("", sg_io, dxfer_direction, sg_io_dxfer_direction,
+	PRINT_FIELD_XVAL(sg_io, dxfer_direction, sg_io_dxfer_direction,
 			 "SG_DXFER_???");
 	PRINT_FIELD_U(", ", sg_io, cmd_len);
 	tprint_struct_next();

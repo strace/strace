@@ -36,7 +36,8 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 	struct smc_diag_req req = { .diag_family = family };
 	const size_t offset = sizeof(req.diag_family);
 
-	PRINT_FIELD_XVAL("{", req, diag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(req, diag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
@@ -143,7 +144,8 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 	tprint_struct_begin();
 	PRINT_FIELD_ARRAY(linfo, lnk, tcp,
 			  print_smc_diag_linkinfo_array_member);
-	PRINT_FIELD_XVAL(", ", linfo, role, smc_link_group_roles, "SMC_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(linfo, role, smc_link_group_roles, "SMC_???");
 	tprints("}");
 
 	return true;
@@ -227,15 +229,17 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 	size_t offset = sizeof(msg.diag_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", msg, diag_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(msg, diag_family, addrfams, "AF_???");
 	tprints(", ");
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (void *) &msg + offset)) {
-			PRINT_FIELD_XVAL("", msg, diag_state,
+			PRINT_FIELD_XVAL(msg, diag_state,
 					 smc_states, "SMC_???");
-			PRINT_FIELD_XVAL(", ", msg, diag_fallback,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(msg, diag_fallback,
 					 smc_diag_mode, "SMC_DIAG_MODE_???");
 			PRINT_FIELD_U(", ", msg, diag_shutdown);
 			/*

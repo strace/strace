@@ -44,7 +44,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 	size_t offset = sizeof(ifal.ifal_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", ifal, ifal_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ifal, ifal_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(ifal)) {

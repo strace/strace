@@ -160,8 +160,8 @@ print_ebpf_prog(struct tcb *const tcp, const uint64_t addr, const uint32_t len)
 
 BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 {
-	PRINT_FIELD_XVAL("{", attr, map_type, bpf_map_types,
-			 "BPF_MAP_TYPE_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(attr, map_type, bpf_map_types, "BPF_MAP_TYPE_???");
 	PRINT_FIELD_U(", ", attr, key_size);
 	PRINT_FIELD_U(", ", attr, value_size);
 	PRINT_FIELD_U(", ", attr, max_entries);
@@ -266,8 +266,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_ELEM)
 	PRINT_FIELD_ADDR64(attr, key);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(attr, value);
-	PRINT_FIELD_XVAL(", ", attr, flags, bpf_map_update_elem_flags,
-			 "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, flags, bpf_map_update_elem_flags, "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -300,8 +300,8 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 {
-	PRINT_FIELD_XVAL("{", attr, prog_type, bpf_prog_types,
-			 "BPF_PROG_TYPE_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(attr, prog_type, bpf_prog_types, "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", attr, insn_cnt);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_VAL(attr, insns, tcp,
@@ -357,7 +357,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	 */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, expected_attach_type))
 		break;
-	PRINT_FIELD_XVAL(", ", attr, expected_attach_type, bpf_attach_type,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, expected_attach_type, bpf_attach_type,
 			 "BPF_???");
 
 	/*
@@ -415,7 +416,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 	PRINT_FIELD_FD(attr, target_fd, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, attach_bpf_fd, tcp);
-	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(attr, attach_flags, bpf_attach_flags, "BPF_F_???");
 
@@ -434,7 +436,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_DETACH)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_FD(attr, target_fd, tcp);
-	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -555,7 +558,8 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	memcpy(&info, info_buf, len);
 
-	PRINT_FIELD_XVAL("{", info, type, bpf_map_types, "BPF_MAP_TYPE_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(info, type, bpf_map_types, "BPF_MAP_TYPE_???");
 	PRINT_FIELD_U(", ", info, id);
 	PRINT_FIELD_U(", ", info, key_size);
 	PRINT_FIELD_U(", ", info, value_size);
@@ -636,7 +640,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		return;
 	}
 
-	PRINT_FIELD_XVAL("{", info, type, bpf_prog_types, "BPF_PROG_TYPE_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(info, type, bpf_prog_types, "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", info, id);
 	tprint_struct_next();
 	PRINT_FIELD_HEX_ARRAY(info, tag);
@@ -919,7 +924,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 		tprints_field_name("query");
 		tprint_struct_begin();
 		PRINT_FIELD_FD(attr, target_fd, tcp);
-		PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type,
 				 "BPF_???");
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(attr, query_flags, bpf_query_flags,
@@ -1007,8 +1013,8 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 	print_big_u64_addr(attr.buf);
 	printstr_ex(tcp, attr.buf, buf_len, QUOTE_0_TERMINATED);
 	PRINT_FIELD_U(", ", attr, prog_id);
-	PRINT_FIELD_XVAL(", ", attr, fd_type, bpf_task_fd_type,
-			 "BPF_FD_TYPE_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, fd_type, bpf_task_fd_type, "BPF_FD_TYPE_???");
 	PRINT_FIELD_X(", ", attr, probe_offset);
 	PRINT_FIELD_X(", ", attr, probe_addr);
 
@@ -1127,7 +1133,8 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	PRINT_FIELD_FD(attr, prog_fd, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, target_fd, tcp);
-	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 	PRINT_FIELD_X(", ", attr, flags);
 	tprints("}");
 }

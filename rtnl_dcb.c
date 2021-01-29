@@ -27,14 +27,15 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 	size_t offset = sizeof(dcb.dcb_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", dcb, dcb_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(dcb, dcb_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(dcb)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(dcb) - offset,
 					 (char *) &dcb + offset)) {
-			PRINT_FIELD_XVAL("", dcb, cmd,
+			PRINT_FIELD_XVAL(dcb, cmd,
 					 dcb_commands, "DCB_CMD_???");
 			decode_nla = true;
 		}

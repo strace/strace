@@ -49,7 +49,8 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 		PRINT_FIELD_U("", sev, sigev_signo);
 	}
 
-	PRINT_FIELD_XVAL(", ", sev, sigev_notify, sigev_value, "SIGEV_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(sev, sigev_notify, sigev_value, "SIGEV_???");
 
 	switch (sev.sigev_notify) {
 	case SIGEV_THREAD_ID:

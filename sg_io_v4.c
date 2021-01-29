@@ -47,8 +47,9 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 	}
 
-	PRINT_FIELD_XVAL("", sg_io, protocol, bsg_protocol, "BSG_PROTOCOL_???");
-	PRINT_FIELD_XVAL(", ", sg_io, subprotocol, bsg_subprotocol,
+	PRINT_FIELD_XVAL(sg_io, protocol, bsg_protocol, "BSG_PROTOCOL_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(sg_io, subprotocol, bsg_subprotocol,
 			 "BSG_SUB_PROTOCOL_???");
 	PRINT_FIELD_U(", ", sg_io, request_len);
 	tprint_struct_next();

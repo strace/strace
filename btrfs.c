@@ -505,7 +505,8 @@ print_btrfs_replace_start_params(const typeof_field(struct_btrfs_ioctl_dev_repla
 {
 	tprint_struct_begin();
 	PRINT_FIELD_DEV(*p, srcdevid);
-	PRINT_FIELD_XVAL(", ", *p, cont_reading_from_srcdev_mode,
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*p, cont_reading_from_srcdev_mode,
 			 btrfs_cont_reading_from_srcdev_mode,
 			 "BTRFS_IOCTL_DEV_REPLACE_CONT_READING"
 			 "_FROM_SRCDEV_MODE_???");
@@ -519,7 +520,8 @@ print_btrfs_replace_start_params(const typeof_field(struct_btrfs_ioctl_dev_repla
 static void
 print_btrfs_replace_status_params(const typeof_field(struct_btrfs_ioctl_dev_replace_args, status) *const p)
 {
-	PRINT_FIELD_XVAL("{", *p, replace_state, btrfs_dev_replace_state,
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*p, replace_state, btrfs_dev_replace_state,
 			 "BTRFS_IOCTL_DEV_REPLACE_STATE_???");
 
 	PRINT_FIELD_U(", ", *p, progress_1000);
@@ -642,7 +644,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_FLAGS(args, flags, btrfs_defrag_flags,
 				  "BTRFS_DEFRAG_RANGE_???");
 		PRINT_FIELD_U(", ", args, extent_thresh);
-		PRINT_FIELD_XVAL(", ", args, compress_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(args, compress_type,
 				 btrfs_compress_types, "BTRFS_COMPRESS_???");
 		tprints("}");
 		break;
@@ -701,7 +704,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			PRINT_FIELD_XVAL("{", args, cmd, btrfs_dev_replace_cmds,
+			tprint_struct_begin();
+			PRINT_FIELD_XVAL(args, cmd, btrfs_dev_replace_cmds,
 					 "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
 				tprint_struct_next();
@@ -712,7 +716,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		PRINT_FIELD_XVAL("{", args, result, btrfs_dev_replace_results,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(args, result, btrfs_dev_replace_results,
 				 "BTRFS_IOCTL_DEV_REPLACE_RESULT_???");
 		if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_STATUS) {
 			tprint_struct_next();
@@ -1022,7 +1027,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		PRINT_FIELD_XVAL("{", args, cmd, btrfs_qgroup_ctl_cmds,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(args, cmd, btrfs_qgroup_ctl_cmds,
 				 "BTRFS_QUOTA_CTL_???");
 		tprints("}");
 

@@ -134,9 +134,10 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 			use_new_size = 1;
 	}
 
-	PRINT_FIELD_XVAL("{", *attr, type, perf_type_id, "PERF_TYPE_???");
-	PRINT_FIELD_XVAL(", ", *attr, size, perf_attr_size,
-			 "PERF_ATTR_SIZE_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*attr, type, perf_type_id, "PERF_TYPE_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*attr, size, perf_attr_size, "PERF_ATTR_SIZE_???");
 
 	if (use_new_size) {
 		tprints(" => ");
@@ -150,11 +151,13 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	switch (attr->type) {
 	case PERF_TYPE_HARDWARE:
-		PRINT_FIELD_XVAL(", ", *attr, config, perf_hw_id,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*attr, config, perf_hw_id,
 				 "PERF_COUNT_HW_???");
 		break;
 	case PERF_TYPE_SOFTWARE:
-		PRINT_FIELD_XVAL(", ", *attr, config, perf_sw_ids,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*attr, config, perf_sw_ids,
 				 "PERF_COUNT_SW_???");
 		break;
 	case PERF_TYPE_TRACEPOINT:
@@ -315,7 +318,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	if (attr->type == PERF_TYPE_BREAKPOINT) {
 		/* Any combination of R/W with X is deemed invalid */
-		PRINT_FIELD_XVAL(", ", *attr, bp_type, hw_breakpoint_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*attr, bp_type, hw_breakpoint_type,
 				 (attr->bp_type <=
 					(HW_BREAKPOINT_X | HW_BREAKPOINT_RW))
 						? "HW_BREAKPOINT_INVALID"
@@ -368,7 +372,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	if (attr->use_clockid) {
 		_PERF_CHECK_FIELD(clockid);
-		PRINT_FIELD_XVAL(", ", *attr, clockid, clocknames, "CLOCK_???");
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*attr, clockid, clocknames, "CLOCK_???");
 	}
 
 	_PERF_CHECK_FIELD(sample_regs_intr);

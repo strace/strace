@@ -234,9 +234,9 @@ tprints_field_name(const char *name)
 			     (dflt_));					\
 	} while (0)
 
-# define PRINT_FIELD_XVAL(prefix_, where_, field_, xlat_, dflt_)	\
+# define PRINT_FIELD_XVAL(where_, field_, xlat_, dflt_)			\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		printxval64((xlat_),					\
 			    zero_extend_signed_to_ull((where_).field_),	\
 			    (dflt_));		\

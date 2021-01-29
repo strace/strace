@@ -58,7 +58,8 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_XVAL("{", c, command, hdio_drive_cmds,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(c, command, hdio_drive_cmds,
 				 "ATA_CMD_???");
 		PRINT_FIELD_U(", ", c, sector_number);
 		PRINT_FIELD_U(", ", c, feature);

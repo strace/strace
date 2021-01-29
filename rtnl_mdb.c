@@ -43,7 +43,8 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &entry)) {
 		tprint_struct_begin();
 		PRINT_FIELD_IFINDEX(entry, ifindex);
-		PRINT_FIELD_XVAL(", ", entry, state, mdb_states, "MDB_???");
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(entry, state, mdb_states, "MDB_???");
 
 		/*
 		 * Note that it's impossible to derive if flags/vid fields
@@ -184,7 +185,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 	size_t offset = sizeof(bpm.family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", bpm, family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(bpm, family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(bpm)) {

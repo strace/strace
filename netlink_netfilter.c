@@ -39,8 +39,10 @@ decode_netlink_netfilter(struct tcb *const tcp,
 		const uint8_t subsys_id = (uint8_t) (nlmsghdr->nlmsg_type >> 8);
 		uint16_t res_id = ntohs(nfmsg.res_id);
 
-		PRINT_FIELD_XVAL("{", nfmsg, nfgen_family, addrfams, "AF_???");
-		PRINT_FIELD_XVAL(", ", nfmsg, version, netfilter_versions,
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(nfmsg, nfgen_family, addrfams, "AF_???");
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(nfmsg, version, netfilter_versions,
 				 "NFNETLINK_???");
 
 		/*

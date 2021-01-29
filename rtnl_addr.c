@@ -91,7 +91,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 	size_t offset = sizeof(ifaddr.ifa_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", ifaddr, ifa_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ifaddr, ifa_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(ifaddr)) {
@@ -102,7 +103,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(ifaddr, ifa_flags,
 					  ifaddrflags, "IFA_F_???");
-			PRINT_FIELD_XVAL(", ", ifaddr, ifa_scope,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(ifaddr, ifa_scope,
 					 routing_scopes, NULL);
 			tprint_struct_next();
 			PRINT_FIELD_IFINDEX(ifaddr, ifa_index);

@@ -46,7 +46,8 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(", ", info, lo_offset);
 
 	if (!abbrev(tcp) || info.lo_encrypt_type != LO_CRYPT_NONE) {
-		PRINT_FIELD_XVAL(", ", info, lo_encrypt_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(info, lo_encrypt_type,
 				 loop_crypt_type_options, "LO_CRYPT_???");
 		/*
 		 * It is converted to unsigned before use in the kernel,
@@ -99,7 +100,8 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 	}
 
 	if (!abbrev(tcp) || info64->lo_encrypt_type != LO_CRYPT_NONE) {
-		PRINT_FIELD_XVAL(", ", *info64, lo_encrypt_type,
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*info64, lo_encrypt_type,
 				 loop_crypt_type_options, "LO_CRYPT_???");
 		PRINT_FIELD_U(", ", *info64, lo_encrypt_key_size);
 	}

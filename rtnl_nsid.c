@@ -29,7 +29,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg)
 {
 	struct rtgenmsg rtgenmsg = { .rtgen_family = family };
 
-	PRINT_FIELD_XVAL("{", rtgenmsg, rtgen_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(rtgenmsg, rtgen_family, addrfams, "AF_???");
 	tprints("}");
 
 	const size_t offset = NLMSG_ALIGN(sizeof(rtgenmsg));

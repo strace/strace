@@ -135,7 +135,8 @@ decode_mtd_write_req(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_ADDR64(mreq, usr_data);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(mreq, usr_oob);
-	PRINT_FIELD_XVAL(", ", mreq, mode, mtd_mode_options, "MTD_OPS_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(mreq, mode, mtd_mode_options, "MTD_OPS_???");
 	tprints("}");
 }
 
@@ -148,7 +149,8 @@ decode_mtd_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &minfo))
 		return;
 
-	PRINT_FIELD_XVAL("{", minfo, type, mtd_type_options, "MTD_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(minfo, type, mtd_type_options, "MTD_???");
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(minfo, flags, mtd_flags_options, "MTD_???");
 	PRINT_FIELD_X(", ", minfo, size);
@@ -177,8 +179,8 @@ decode_nand_oobinfo(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &ninfo))
 		return;
 
-	PRINT_FIELD_XVAL("{", ninfo, useecc, mtd_nandecc_options,
-			 "MTD_NANDECC_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ninfo, useecc, mtd_nandecc_options, "MTD_NANDECC_???");
 	PRINT_FIELD_X(", ", ninfo, eccbytes);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(ninfo, oobfree, tcp, print_xint32x2_array_member);

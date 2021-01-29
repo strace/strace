@@ -23,8 +23,10 @@
 static void
 print_struct_flock64(struct tcb *const tcp, const struct_kernel_flock64 *fl, const int getlk)
 {
-	PRINT_FIELD_XVAL("{", *fl, l_type, lockfcmds, "F_???");
-	PRINT_FIELD_XVAL(", ", *fl, l_whence, whence_codes, "SEEK_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*fl, l_type, lockfcmds, "F_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*fl, l_whence, whence_codes, "SEEK_???");
 	PRINT_FIELD_D(", ", *fl, l_start);
 	PRINT_FIELD_D(", ", *fl, l_len);
 	if (getlk) {
@@ -59,7 +61,8 @@ print_f_owner_ex(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &owner))
 		return;
 
-	PRINT_FIELD_XVAL("{", owner, type, f_owner_types, "F_OWNER_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(owner, type, f_owner_types, "F_OWNER_???");
 
 	enum pid_type pid_type = PT_NONE;
 	switch (owner.type)

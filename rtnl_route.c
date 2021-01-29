@@ -162,7 +162,8 @@ decode_rtvia(struct tcb *const tcp,
 	if (len < sizeof(via))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &via)) {
-		PRINT_FIELD_XVAL("{", via, rtvia_family, addrfams, "AF_???");
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(via, rtvia_family, addrfams, "AF_???");
 
 		const unsigned int offset = offsetof(struct_rtvia, rtvia_addr);
 
@@ -267,7 +268,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 	size_t offset = sizeof(rtmsg.rtm_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", rtmsg, rtm_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(rtmsg, rtm_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(rtmsg)) {
@@ -279,13 +281,17 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(rtmsg, rtm_tos,
 					  ip_type_of_services, "IPTOS_TOS_???");
-			PRINT_FIELD_XVAL(", ", rtmsg, rtm_table,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(rtmsg, rtm_table,
 					 routing_table_ids, NULL);
-			PRINT_FIELD_XVAL(", ", rtmsg, rtm_protocol,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(rtmsg, rtm_protocol,
 					 routing_protocols, "RTPROT_???");
-			PRINT_FIELD_XVAL(", ", rtmsg, rtm_scope,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(rtmsg, rtm_scope,
 					 routing_scopes, NULL);
-			PRINT_FIELD_XVAL(", ", rtmsg, rtm_type,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(rtmsg, rtm_type,
 					 routing_types, "RTN_???");
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(rtmsg, rtm_flags,

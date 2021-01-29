@@ -463,10 +463,10 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 	print_sll_protocol(sa_ll);
 	tprint_struct_next();
 	PRINT_FIELD_IFINDEX(*sa_ll, sll_ifindex);
-	PRINT_FIELD_XVAL(", ", *sa_ll, sll_hatype, arp_hardware_types,
-			 "ARPHRD_???");
-	PRINT_FIELD_XVAL(", ", *sa_ll, sll_pkttype, af_packet_types,
-			 "PACKET_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*sa_ll, sll_hatype, arp_hardware_types, "ARPHRD_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*sa_ll, sll_pkttype, af_packet_types, "PACKET_???");
 	PRINT_FIELD_U(", ", *sa_ll, sll_halen);
 	if (sa_ll->sll_halen) {
 		const unsigned int oob_halen =
@@ -625,7 +625,8 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 		 * Linux commit in v2.6.38-rc1~476^2~14^2~3^2~43^2~9.
 		 */
 		if (addrlen == sizeof(struct sockaddr_hci)) {
-			PRINT_FIELD_XVAL(", ", *hci, hci_channel, hci_channels,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(*hci, hci_channel, hci_channels,
 					 "HCI_CHANNEL_???");
 		}
 
@@ -654,7 +655,8 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 		PRINT_FIELD_OBJ_VAL(*l2, l2_cid, print_bluetooth_l2_cid);
 
 		if (addrlen == sizeof(struct sockaddr_l2)) {
-			PRINT_FIELD_XVAL(", ", *l2, l2_bdaddr_type,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(*l2, l2_bdaddr_type,
 					 bdaddr_types, "BDADDR_???");
 		}
 
@@ -688,7 +690,8 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 {
 	const struct sockaddr *const sa = buf;
 
-	PRINT_FIELD_XVAL("{", *sa, sa_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*sa, sa_family, addrfams, "AF_???");
 
 	if (addrlen > (int) SIZEOF_SA_FAMILY) {
 		tprints(", ");

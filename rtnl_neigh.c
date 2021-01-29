@@ -78,7 +78,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 	size_t offset = sizeof(ndmsg.ndm_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", ndmsg, ndm_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ndmsg, ndm_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(ndmsg)) {
@@ -94,7 +95,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 			PRINT_FIELD_FLAGS(ndmsg, ndm_flags,
 					  neighbor_cache_entry_flags,
 					  "NTF_???");
-			PRINT_FIELD_XVAL(", ", ndmsg, ndm_type,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(ndmsg, ndm_type,
 					 routing_types, "RTN_???");
 			decode_nla = true;
 		}

@@ -202,7 +202,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_VAL(*sip, si_syscall,
 					    print_si_syscall);
-			PRINT_FIELD_XVAL(", ", *sip, si_arch, audit_arch,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(*sip, si_arch, audit_arch,
 					 "AUDIT_ARCH_???");
 			break;
 #endif

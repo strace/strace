@@ -925,14 +925,15 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 	size_t offset = sizeof(ifinfo.ifi_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", ifinfo, ifi_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(ifinfo, ifi_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(ifinfo)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifinfo) - offset,
 					 (char *) &ifinfo + offset)) {
-			PRINT_FIELD_XVAL("", ifinfo, ifi_type,
+			PRINT_FIELD_XVAL(ifinfo, ifi_type,
 					 arp_hardware_types, "ARPHRD_???");
 			tprint_struct_next();
 			PRINT_FIELD_IFINDEX(ifinfo, ifi_index);

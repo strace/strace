@@ -100,7 +100,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 	size_t offset = sizeof(msg.family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", msg, family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(msg, family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(msg)) {
@@ -112,9 +113,11 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(msg, tos,
 					  ip_type_of_services, "IPTOS_TOS_???");
-			PRINT_FIELD_XVAL(", ", msg, table,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(msg, table,
 					 routing_table_ids, "RT_TABLE_???");
-			PRINT_FIELD_XVAL(", ", msg, action,
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(msg, action,
 					 fib_rule_actions, "FR_ACT_???");
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(msg, flags,

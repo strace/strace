@@ -288,7 +288,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 	size_t offset = sizeof(tcmsg.tcm_family);
 	bool decode_nla = false;
 
-	PRINT_FIELD_XVAL("{", tcmsg, tcm_family, addrfams, "AF_???");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(tcmsg, tcm_family, addrfams, "AF_???");
 
 	tprints(", ");
 	if (len >= sizeof(tcmsg)) {
