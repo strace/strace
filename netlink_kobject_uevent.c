@@ -27,7 +27,9 @@ decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_CSTRING("{{", uh, prefix);
+	tprint_struct_begin();
+	tprint_struct_begin();
+	PRINT_FIELD_CSTRING(uh, prefix);
 	tprintf(", magic=htonl(%#x)", ntohl(uh.magic));
 	PRINT_FIELD_U(", ", uh, header_size);
 	PRINT_FIELD_U(", ", uh, properties_off);

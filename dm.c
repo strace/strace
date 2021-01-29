@@ -52,11 +52,13 @@ dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
 		}
 
 		if (ioc->name[0]) {
-			PRINT_FIELD_CSTRING(", ", *ioc, name);
+			tprint_struct_next();
+			PRINT_FIELD_CSTRING(*ioc, name);
 		}
 
 		if (ioc->uuid[0]) {
-			PRINT_FIELD_CSTRING(", ", *ioc, uuid);
+			tprint_struct_next();
+			PRINT_FIELD_CSTRING(*ioc, uuid);
 		}
 
 		break;
@@ -155,7 +157,8 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 			PRINT_FIELD_D(", ", s, status);
 		}
 
-		PRINT_FIELD_CSTRING(", ", s, target_type);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(s, target_type);
 
 		tprints(", string=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,

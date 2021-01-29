@@ -70,8 +70,10 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 		PRINT_FIELD_D("{", p, start);
 		PRINT_FIELD_D(", ", p, length);
 		PRINT_FIELD_D(", ", p, pno);
-		PRINT_FIELD_CSTRING(", ", p, devname);
-		PRINT_FIELD_CSTRING(", ", p, volname);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(p, devname);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(p, volname);
 		tprints("}");
 	}
 	tprints("}");
@@ -185,7 +187,8 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 			struct_blk_user_trace_setup buts;
 
 			if (!syserror(tcp) && !umove(tcp, arg, &buts)) {
-				PRINT_FIELD_CSTRING(", ", buts, name);
+				tprint_struct_next();
+				PRINT_FIELD_CSTRING(buts, name);
 			}
 			tprints("}");
 			break;

@@ -194,9 +194,12 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints(", ");
 	if (umove_or_printaddr(tcp, arg, &caps))
 		return RVAL_IOCTL_DECODED;
-	PRINT_FIELD_CSTRING("{", caps, driver);
-	PRINT_FIELD_CSTRING(", ", caps, card);
-	PRINT_FIELD_CSTRING(", ", caps, bus_info);
+	tprint_struct_begin();
+	PRINT_FIELD_CSTRING(caps, driver);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(caps, card);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(caps, bus_info);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_VAL(caps, version, print_kernel_version);
 	PRINT_FIELD_FLAGS(", ", caps, capabilities,
@@ -232,7 +235,8 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_FLAGS(", ", f, flags,
 				  v4l2_format_description_flags,
 				  "V4L2_FMT_FLAG_???");
-		PRINT_FIELD_CSTRING(", ", f, description);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(f, description);
 		tprint_struct_next();
 		PRINT_FIELD_PIXFMT(f, pixelformat, v4l2_pix_fmts);
 	}
@@ -742,7 +746,8 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &s)) {
-		PRINT_FIELD_CSTRING(", ", s, name);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(s, name);
 		tprint_struct_next();
 		PRINT_FIELD_FRACT(s, frameperiod);
 		PRINT_FIELD_U(", ", s, framelines);
@@ -770,7 +775,8 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &i)) {
-		PRINT_FIELD_CSTRING(", ", i, name);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(i, name);
 		PRINT_FIELD_XVAL(", ", i, type, v4l2_input_types,
 				 "V4L2_INPUT_TYPE_???");
 	}
@@ -898,7 +904,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(is_get ? ", " : "} => {");
 	}
 
-	PRINT_FIELD_CSTRING("", c, name);
+	PRINT_FIELD_CSTRING(c, name);
 	PRINT_FIELD_XVAL(", ", c, type, v4l2_tuner_types, "V4L2_TUNER_???");
 	PRINT_FIELD_FLAGS(", ", c, capability, v4l2_tuner_capabilities,
 			  "V4L2_TUNER_CAP_???");
@@ -953,7 +959,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
 			 "V4L2_CTRL_TYPE_???");
-	PRINT_FIELD_CSTRING(", ", c, name);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(c, name);
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_D(", ", c, minimum);
 		PRINT_FIELD_D(", ", c, maximum);
@@ -1005,7 +1012,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	PRINT_FIELD_XVAL(", ", c, type, v4l2_control_types,
 			 "V4L2_CTRL_TYPE_???");
-	PRINT_FIELD_CSTRING(", ", c, name);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(c, name);
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_D(", ", c, minimum);
 		PRINT_FIELD_D(", ", c, maximum);

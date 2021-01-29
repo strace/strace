@@ -116,10 +116,13 @@ print_smc_diag_linkinfo_array_member(struct tcb *tcp, void *elem_buf,
 {
 	const struct smc_diag_linkinfo *const p = elem_buf;
 	PRINT_FIELD_U("{", *p, link_id);
-	PRINT_FIELD_CSTRING(", ", *p, ibname);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(*p, ibname);
 	PRINT_FIELD_U(", ", *p, ibport);
-	PRINT_FIELD_CSTRING(", ", *p, gid);
-	PRINT_FIELD_CSTRING(", ", *p, peer_gid);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(*p, gid);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(*p, peer_gid);
 	tprints("}");
 	return true;
 }

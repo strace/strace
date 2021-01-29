@@ -45,7 +45,8 @@ decode_crypto_report_hash(struct tcb *const tcp,
 	if (len < sizeof(rhash))
 		printstrn(tcp, addr, len);
 	else if (!umove_or_printaddr(tcp, addr, &rhash)) {
-		PRINT_FIELD_CSTRING("{", rhash, type);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(rhash, type);
 		PRINT_FIELD_U(", ", rhash, blocksize);
 		PRINT_FIELD_U(", ", rhash, digestsize);
 		tprints("}");
@@ -65,8 +66,10 @@ decode_crypto_report_blkcipher(struct tcb *const tcp,
 	if (len < sizeof(rblkcipher))
 		printstrn(tcp, addr, len);
 	else if (!umove_or_printaddr(tcp, addr, &rblkcipher)) {
-		PRINT_FIELD_CSTRING("{", rblkcipher, type);
-		PRINT_FIELD_CSTRING(", ", rblkcipher, geniv);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(rblkcipher, type);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(rblkcipher, geniv);
 		PRINT_FIELD_U(", ", rblkcipher, blocksize);
 		PRINT_FIELD_U(", ", rblkcipher, min_keysize);
 		PRINT_FIELD_U(", ", rblkcipher, max_keysize);
@@ -88,8 +91,10 @@ decode_crypto_report_aead(struct tcb *const tcp,
 	if (len < sizeof(raead))
 		printstrn(tcp, addr, len);
 	else if (!umove_or_printaddr(tcp, addr, &raead)) {
-		PRINT_FIELD_CSTRING("{", raead, type);
-		PRINT_FIELD_CSTRING(", ", raead, geniv);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(raead, type);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(raead, geniv);
 		PRINT_FIELD_U(", ", raead, blocksize);
 		PRINT_FIELD_U(", ", raead, maxauthsize);
 		PRINT_FIELD_U(", ", raead, ivsize);
@@ -110,7 +115,8 @@ decode_crypto_report_rng(struct tcb *const tcp,
 	if (len < sizeof(rrng))
 		printstrn(tcp, addr, len);
 	else if (!umove_or_printaddr(tcp, addr, &rrng)) {
-		PRINT_FIELD_CSTRING("{", rrng, type);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(rrng, type);
 		PRINT_FIELD_U(", ", rrng, seedsize);
 		tprints("}");
 	}
@@ -129,7 +135,8 @@ decode_crypto_report_cipher(struct tcb *const tcp,
 	if (len < sizeof(rcipher))
 		printstrn(tcp, addr, len);
 	else if (!umove_or_printaddr(tcp, addr, &rcipher)) {
-		PRINT_FIELD_CSTRING("{", rcipher, type);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(rcipher, type);
 		PRINT_FIELD_U(", ", rcipher, blocksize);
 		PRINT_FIELD_U(", ", rcipher, min_keysize);
 		PRINT_FIELD_U(", ", rcipher, max_keysize);
@@ -163,9 +170,12 @@ decode_crypto_user_alg(struct tcb *const tcp,
 	if (len < sizeof(alg))
 		printstrn(tcp, addr, len);
 	else if (!umove_or_printaddr(tcp, addr, &alg)) {
-		PRINT_FIELD_CSTRING("{", alg, cru_name);
-		PRINT_FIELD_CSTRING(", ", alg, cru_driver_name);
-		PRINT_FIELD_CSTRING(", ", alg, cru_module_name);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(alg, cru_name);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(alg, cru_driver_name);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(alg, cru_module_name);
 		PRINT_FIELD_X(", ", alg, cru_type);
 		PRINT_FIELD_X(", ", alg, cru_mask);
 		PRINT_FIELD_U(", ", alg, cru_refcnt);

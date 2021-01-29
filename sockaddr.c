@@ -404,7 +404,8 @@ print_x25_addr(const void /* struct x25_address */ *addr_void)
 {
 	const struct x25_address *addr = addr_void;
 
-	PRINT_FIELD_CSTRING("{", *addr, x25_addr);
+	tprint_struct_begin();
+	PRINT_FIELD_CSTRING(*addr, x25_addr);
 	tprints("}");
 }
 

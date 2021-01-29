@@ -22,17 +22,23 @@ SYS_FUNC(uname)
 		return 0;
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &uname)) {
-		PRINT_FIELD_CSTRING("{", uname, sysname);
-		PRINT_FIELD_CSTRING(", ", uname, nodename);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(uname, sysname);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(uname, nodename);
 		if (abbrev(tcp)) {
 			tprints(", ...}");
 			return 0;
 		}
-		PRINT_FIELD_CSTRING(", ", uname, release);
-		PRINT_FIELD_CSTRING(", ", uname, version);
-		PRINT_FIELD_CSTRING(", ", uname, machine);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(uname, release);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(uname, version);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(uname, machine);
 #ifdef HAVE_STRUCT_UTSNAME_DOMAINNAME
-		PRINT_FIELD_CSTRING(", ", uname, domainname);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(uname, domainname);
 #endif
 		tprints("}");
 	}

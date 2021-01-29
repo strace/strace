@@ -499,8 +499,10 @@ print_btrfs_replace_start_params(const typeof_field(struct_btrfs_ioctl_dev_repla
 			 btrfs_cont_reading_from_srcdev_mode,
 			 "BTRFS_IOCTL_DEV_REPLACE_CONT_READING"
 			 "_FROM_SRCDEV_MODE_???");
-	PRINT_FIELD_CSTRING(", ", *p, srcdev_name);
-	PRINT_FIELD_CSTRING(", ", *p, tgtdev_name);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(*p, srcdev_name);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(*p, tgtdev_name);
 	tprints("}");
 }
 
@@ -667,7 +669,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		PRINT_FIELD_U("", args, bytes_used);
 		PRINT_FIELD_U(", ", args, total_bytes);
-		PRINT_FIELD_CSTRING(", ", args, path);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(args, path);
 		tprints("}");
 
 		break;
@@ -882,7 +885,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints(", ");
 		}
 
-		PRINT_FIELD_CSTRING("", args, name);
+		PRINT_FIELD_CSTRING(args, name);
 		tprints("}");
 		break;
 	}
@@ -1257,7 +1260,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		tprint_struct_begin();
 		PRINT_FIELD_FD(args, fd, tcp);
-		PRINT_FIELD_CSTRING(", ", args, name);
+		tprint_struct_next();
+		PRINT_FIELD_CSTRING(args, name);
 		tprints("}");
 		break;
 	}
@@ -1288,7 +1292,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				btrfs_print_qgroup_inherit(tcp,
 					ptr_to_kulong(args.qgroup_inherit));
 			}
-			PRINT_FIELD_CSTRING(", ", args, name);
+			tprint_struct_next();
+			PRINT_FIELD_CSTRING(args, name);
 			tprints("}");
 			return 0;
 		}

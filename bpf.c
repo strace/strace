@@ -565,7 +565,8 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	 */
 	if (len <= offsetof(struct bpf_map_info_struct, name))
 		goto print_bpf_map_info_end;
-	PRINT_FIELD_CSTRING(", ", info, name);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(info, name);
 
 	/*
 	 * ifindex, netns_dev, and netns_ino fields were introduced
@@ -677,7 +678,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		    &map_id_buf, sizeof(map_id_buf),
 		    tfetch_mem, print_uint32_array_member, 0);
 
-	PRINT_FIELD_CSTRING(", ", info, name);
+	tprint_struct_next();
+	PRINT_FIELD_CSTRING(info, name);
 
 	/*
 	 * ifindex, netns_dev, and netns_ino fields were introduced

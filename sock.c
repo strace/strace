@@ -98,13 +98,13 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFSLAVE:
 	case SIOCGIFSLAVE:
-		PRINT_FIELD_CSTRING("", *ifr, ifr_slave);
+		PRINT_FIELD_CSTRING(*ifr, ifr_slave);
 		break;
 	case SIOCSIFNAME:
-		PRINT_FIELD_CSTRING("", *ifr, ifr_newname);
+		PRINT_FIELD_CSTRING(*ifr, ifr_newname);
 		break;
 	case SIOCGIFNAME:
-		PRINT_FIELD_CSTRING("", *ifr, ifr_name);
+		PRINT_FIELD_CSTRING(*ifr, ifr_name);
 		break;
 	case SIOCSIFTXQLEN:
 	case SIOCGIFTXQLEN:
@@ -136,7 +136,8 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 {
 	struct_ifreq *ifr = elem_buf;
 
-	PRINT_FIELD_CSTRING("{", *ifr, ifr_name);
+	tprint_struct_begin();
+	PRINT_FIELD_CSTRING(*ifr, ifr_name);
 	tprint_struct_next();
 	PRINT_FIELD_SOCKADDR(*ifr, ifr_addr, tcp);
 	tprints("}");
@@ -298,7 +299,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		if (umove_or_printaddr(tcp, arg, &ifr))
 			break;
 
-		PRINT_FIELD_CSTRING("{", ifr, ifr_name);
+		tprint_struct_begin();
+		PRINT_FIELD_CSTRING(ifr, ifr_name);
 		tprints(", ");
 		print_ifreq(tcp, code, arg, &ifr);
 		tprints("}");
@@ -325,7 +327,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 			if (SIOCGIFNAME == code) {
 				PRINT_FIELD_D("{", ifr, ifr_ifindex);
 			} else {
-				PRINT_FIELD_CSTRING("{", ifr, ifr_name);
+				tprint_struct_begin();
+				PRINT_FIELD_CSTRING(ifr, ifr_name);
 			}
 			return 0;
 		} else {

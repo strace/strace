@@ -79,7 +79,7 @@ print_loop_info(struct loop_info * const info, bool print_encrypt,
 		printf("%#x /* LO_FLAGS_??? */", info->lo_flags);
 
 	printf(", ");
-	PRINT_FIELD_CSTRING("", *info, lo_name);
+	PRINT_FIELD_CSTRING(*info, lo_name);
 
 	if (VERBOSE || print_encrypt)
 		printf(", lo_encrypt_key=\"%.*s\"",
@@ -142,11 +142,11 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 	else
 		printf("%#x /* LO_FLAGS_??? */", info64->lo_flags);
 	printf(", ");
-	PRINT_FIELD_CSTRING("", *info64, lo_file_name);
+	PRINT_FIELD_CSTRING(*info64, lo_file_name);
 
 	if (VERBOSE || print_encrypt) {
 		printf(", ");
-		PRINT_FIELD_CSTRING("", *info64, lo_crypt_name);
+		PRINT_FIELD_CSTRING(*info64, lo_crypt_name);
 		printf(", lo_encrypt_key=\"%.*s\"",
 		       encrypt_key ? (int) strlen(encrypt_key) :
 		       (int) sizeof(info64->lo_encrypt_key),
