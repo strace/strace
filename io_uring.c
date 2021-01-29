@@ -93,7 +93,8 @@ SYS_FUNC(io_uring_setup)
 			PRINT_FIELD_FD(", ", params, wq_fd, tcp);
 		}
 		if (!IS_ARRAY_ZERO(params.resv)) {
-			PRINT_FIELD_ARRAY(", ", params, resv, tcp,
+			tprint_struct_next();
+			PRINT_FIELD_ARRAY(params, resv, tcp,
 					  print_xint32_array_member);
 		}
 		return 0;
@@ -230,7 +231,8 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_X(", ", *probe, resv);
 	}
 	if (!IS_ARRAY_ZERO(probe->resv2)) {
-		PRINT_FIELD_ARRAY(", ", *probe, resv2, tcp,
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*probe, resv2, tcp,
 				  print_xint32_array_member);
 	}
 	tprint_struct_next();

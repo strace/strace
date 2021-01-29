@@ -133,7 +133,8 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &linfo))
 		return true;
 
-	PRINT_FIELD_ARRAY("{", linfo, lnk, tcp,
+	tprint_struct_begin();
+	PRINT_FIELD_ARRAY(linfo, lnk, tcp,
 			  print_smc_diag_linkinfo_array_member);
 	PRINT_FIELD_XVAL(", ", linfo, role, smc_link_group_roles, "SMC_???");
 	tprints("}");

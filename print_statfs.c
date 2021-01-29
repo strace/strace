@@ -19,7 +19,8 @@ static void
 print_f_fsid(const typeof_field(struct strace_statfs, f_fsid) *const p,
 	     struct tcb *const tcp)
 {
-	PRINT_FIELD_ARRAY("{", *p, val, tcp, print_xint64_array_member);
+	tprint_struct_begin();
+	PRINT_FIELD_ARRAY(*p, val, tcp, print_xint64_array_member);
 	tprints("}");
 }
 #endif

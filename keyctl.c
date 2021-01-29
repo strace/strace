@@ -285,7 +285,8 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 			PRINT_FIELD_U(", ", kdf, otherinfolen);
 
 			if (!IS_ARRAY_ZERO(kdf.__spare)) {
-				PRINT_FIELD_ARRAY(", ", kdf, __spare, tcp,
+				tprint_struct_next();
+				PRINT_FIELD_ARRAY(kdf, __spare, tcp,
 						  print_xint32_array_member);
 			}
 
@@ -311,7 +312,8 @@ print_pkey_query(struct tcb *tcp, kernel_ulong_t addr)
 	PRINT_FIELD_U(", ", query, max_dec_size);
 
 	if (!IS_ARRAY_ZERO(query.__spare)) {
-		PRINT_FIELD_ARRAY(", ", query, __spare, tcp,
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(query, __spare, tcp,
 				  print_xint32_array_member);
 	}
 
@@ -355,7 +357,8 @@ fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
 	}
 
 	if (!IS_ARRAY_ZERO(params->__spare)) {
-		PRINT_FIELD_ARRAY(", ", *params, __spare, tcp,
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*params, __spare, tcp,
 				  print_xint32_array_member);
 	}
 

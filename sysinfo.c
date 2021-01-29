@@ -29,7 +29,8 @@ SYS_FUNC(sysinfo)
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &si)) {
 		PRINT_FIELD_U("{", si, uptime);
-		PRINT_FIELD_ARRAY(", ", si, loads, tcp,
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(si, loads, tcp,
 				  print_kulong_array_member);
 		PRINT_FIELD_U(", ", si, totalram);
 		PRINT_FIELD_U(", ", si, freeram);

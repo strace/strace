@@ -962,7 +962,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
 				  "V4L2_CTRL_FLAG_???");
 		if (!IS_ARRAY_ZERO(c.reserved)) {
-			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,
+			tprint_struct_next();
+			PRINT_FIELD_ARRAY(c, reserved, tcp,
 					  print_xint32_array_member);
 		}
 	} else {
@@ -1019,7 +1020,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_ARRAY_UPTO(c, dims, c.nr_of_dims, tcp,
 				       print_uint32_array_member);
 		if (!IS_ARRAY_ZERO(c.reserved)) {
-			PRINT_FIELD_ARRAY(", ", c, reserved, tcp,
+			tprint_struct_next();
+			PRINT_FIELD_ARRAY(c, reserved, tcp,
 					  print_xint32_array_member);
 		}
 	} else {

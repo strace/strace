@@ -176,10 +176,10 @@ decode_nand_oobinfo(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_XVAL("{", ninfo, useecc, mtd_nandecc_options,
 			 "MTD_NANDECC_???");
 	PRINT_FIELD_X(", ", ninfo, eccbytes);
-	PRINT_FIELD_ARRAY(", ", ninfo, oobfree, tcp,
-			  print_xint32x2_array_member);
-	PRINT_FIELD_ARRAY(", ", ninfo, eccpos, tcp,
-			  print_xint32_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(ninfo, oobfree, tcp, print_xint32x2_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(ninfo, eccpos, tcp, print_xint32_array_member);
 	tprints("}");
 }
 
@@ -204,11 +204,11 @@ decode_nand_ecclayout_user(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	PRINT_FIELD_X("{", nlay, eccbytes);
-	PRINT_FIELD_ARRAY(", ", nlay, eccpos, tcp,
-			  print_xint32_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(nlay, eccpos, tcp, print_xint32_array_member);
 	PRINT_FIELD_X(", ", nlay, oobavail);
-	PRINT_FIELD_ARRAY(", ", nlay, oobfree, tcp,
-			  print_nand_oobfree_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(nlay, oobfree, tcp, print_nand_oobfree_array_member);
 	tprints("}");
 }
 

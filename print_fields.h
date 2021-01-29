@@ -315,9 +315,9 @@ tprints_field_name(const char *name)
 				     (size_));				\
 	} while (0)
 
-# define PRINT_FIELD_ARRAY(prefix_, where_, field_, tcp_, print_func_)	\
+# define PRINT_FIELD_ARRAY(where_, field_, tcp_, print_func_)		\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_local_array((tcp_), (where_).field_,		\
 				  (print_func_));			\
 	} while (0)

@@ -154,7 +154,8 @@ print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 static void
 print_gpiohandle_data(struct tcb *const tcp, const struct_gpiohandle_data *vals)
 {
-	PRINT_FIELD_ARRAY("{", *vals, values, tcp, print_uint8_array_member);
+	tprint_struct_begin();
+	PRINT_FIELD_ARRAY(*vals, values, tcp, print_uint8_array_member);
 	tprints("}");
 }
 
@@ -196,7 +197,8 @@ print_gpiohandle_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	PRINT_FIELD_FLAGS("{", hc, flags, gpio_handle_flags, "GPIOHANDLE_REQUEST_???");
-	PRINT_FIELD_ARRAY(", ", hc, default_values, tcp, print_uint8_array_member);
+	tprint_struct_next();
+	PRINT_FIELD_ARRAY(hc, default_values, tcp, print_uint8_array_member);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
