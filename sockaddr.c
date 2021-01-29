@@ -304,7 +304,8 @@ ax25_addr2str(const ax25_address *addr)
 static void
 print_ax25_addr_raw(const ax25_address *addr)
 {
-	PRINT_FIELD_HEX_ARRAY("{", *addr, ax25_call);
+	tprint_struct_begin();
+	PRINT_FIELD_HEX_ARRAY(*addr, ax25_call);
 	tprints("}");
 }
 

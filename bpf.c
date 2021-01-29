@@ -601,7 +601,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	PRINT_FIELD_XVAL("{", info, type, bpf_prog_types, "BPF_PROG_TYPE_???");
 	PRINT_FIELD_U(", ", info, id);
-	PRINT_FIELD_HEX_ARRAY(", ", info, tag);
+	tprint_struct_next();
+	PRINT_FIELD_HEX_ARRAY(info, tag);
 
 	tprints(", jited_prog_len=");
 	if (saved->jited_prog_len != info.jited_prog_len)

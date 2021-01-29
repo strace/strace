@@ -327,9 +327,9 @@ tprints_field_name(const char *name)
 				       (upto_), (print_func_));		\
 	} while (0)
 
-# define PRINT_FIELD_HEX_ARRAY(prefix_, where_, field_)			\
+# define PRINT_FIELD_HEX_ARRAY(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		print_quoted_string((const char *)(where_).field_,	\
 				    sizeof((where_).field_) +		\
 					    MUST_BE_ARRAY((where_).field_), \

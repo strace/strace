@@ -502,7 +502,8 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 	PRINT_FIELD_U(", ", vsi, vsi_type_version);
 
 	if (!IS_ARRAY_ZERO(vsi.pad)) {
-		PRINT_FIELD_HEX_ARRAY(", ", vsi, pad);
+		tprint_struct_next();
+		PRINT_FIELD_HEX_ARRAY(vsi, pad);
 	}
 
 	tprints("}");
