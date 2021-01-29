@@ -659,7 +659,8 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		goto print_bpf_prog_info_end;
 	tprint_struct_next();
 	PRINT_FIELD_IFINDEX(info, ifindex);
-	PRINT_FIELD_U_CAST(", ", info, gpl_compatible, unsigned int);
+	tprint_struct_next();
+	PRINT_FIELD_U_CAST(info, gpl_compatible, unsigned int);
 	tprint_struct_next();
 	PRINT_FIELD_DEV(info, netns_dev);
 	PRINT_FIELD_U(", ", info, netns_ino);

@@ -141,9 +141,12 @@ tprints_field_name(const char *name)
 	STRACE_PRINTF("%s%s=%llu", (prefix_), #field_,			\
 		      zero_extend_signed_to_ull((where_).field_))
 
-# define PRINT_FIELD_U_CAST(prefix_, where_, field_, type_)		\
-	STRACE_PRINTF("%s%s=%llu", (prefix_), #field_,			\
-		      zero_extend_signed_to_ull((type_) (where_).field_))
+# define PRINT_FIELD_U_CAST(where_, field_, type_)				\
+	do {									\
+		tprints_field_name(#field_);					\
+		STRACE_PRINTF("%llu",						\
+			zero_extend_signed_to_ull((type_)(where_).field_));	\
+	} while (0)
 
 # define PRINT_FIELD_X(prefix_, where_, field_)				\
 	STRACE_PRINTF("%s%s=%#llx", (prefix_), #field_,			\
