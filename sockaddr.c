@@ -394,7 +394,9 @@ print_sockaddr_data_ipx(struct tcb *tcp, const void *const buf,
 		tprintf("%s%#02x", i ? ", " : "",
 			sa_ipx->sipx_node[i]);
 	}
-	PRINT_FIELD_0X("], ", *sa_ipx, sipx_type);
+	tprint_array_end();
+	tprint_struct_next();
+	PRINT_FIELD_0X(*sa_ipx, sipx_type);
 }
 
 void
@@ -421,7 +423,8 @@ print_sockaddr_data_nl(struct tcb *tcp, const void *const buf, const int addrlen
 	const struct sockaddr_nl *const sa_nl = buf;
 
 	PRINT_FIELD_TGID("", *sa_nl, nl_pid, tcp);
-	PRINT_FIELD_0X(", ", *sa_nl, nl_groups);
+	tprint_struct_next();
+	PRINT_FIELD_0X(*sa_nl, nl_groups);
 }
 
 static void

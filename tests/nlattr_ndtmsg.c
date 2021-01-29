@@ -91,7 +91,7 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_U("", ndtc, ndtc_hash_rnd);
 			   printf(", ");
-			   PRINT_FIELD_0X("", ndtc, ndtc_hash_mask);
+			   PRINT_FIELD_0X(ndtc, ndtc_hash_mask);
 			   printf(", ");
 			   PRINT_FIELD_U("", ndtc, ndtc_hash_chain_gc);
 			   printf(", ");

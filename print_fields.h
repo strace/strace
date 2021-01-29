@@ -165,10 +165,12 @@ tprints_field_name(const char *name)
 		printaddr64((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_0X(prefix_, where_, field_)			\
-	STRACE_PRINTF("%s%s=%#0*llx", (prefix_), #field_,		\
-		      (int) sizeof((where_).field_) * 2,		\
-		      zero_extend_signed_to_ull((where_).field_))
+# define PRINT_FIELD_0X(where_, field_)						\
+	do {									\
+		tprints_field_name(#field_);					\
+		STRACE_PRINTF("%#0*llx", (int) sizeof((where_).field_) * 2,	\
+			      zero_extend_signed_to_ull((where_).field_));	\
+	} while (0)
 
 # define PRINT_FIELD_UINT_ARRAY(where_, field_, fmt_)				\
 	do {									\

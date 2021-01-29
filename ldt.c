@@ -93,8 +93,10 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 			}
 		}
 
-		PRINT_FIELD_0X(", ", desc, base_addr);
-		PRINT_FIELD_0X(", ", desc, limit);
+		tprint_struct_next();
+		PRINT_FIELD_0X(desc, base_addr);
+		tprint_struct_next();
+		PRINT_FIELD_0X(desc, limit);
 		tprint_struct_next();
 		PRINT_FIELD_U_CAST(desc, seg_32bit, unsigned int);
 		tprint_struct_next();

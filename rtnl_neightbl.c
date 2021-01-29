@@ -34,7 +34,8 @@ decode_ndt_config(struct tcb *const tcp,
 		PRINT_FIELD_U(", ", ndtc, ndtc_last_flush);
 		PRINT_FIELD_U(", ", ndtc, ndtc_last_rand);
 		PRINT_FIELD_U(", ", ndtc, ndtc_hash_rnd);
-		PRINT_FIELD_0X(", ", ndtc, ndtc_hash_mask);
+		tprint_struct_next();
+		PRINT_FIELD_0X(ndtc, ndtc_hash_mask);
 		PRINT_FIELD_U(", ", ndtc, ndtc_hash_chain_gc);
 		PRINT_FIELD_U(", ", ndtc, ndtc_proxy_qlen);
 		tprints("}");

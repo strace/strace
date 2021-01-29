@@ -517,19 +517,21 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 
 	CHECK_SIZE_EX(hdr, last_decoded, size, "machine structure");
 
-	tprints("/* machine */ {");
+	tprints("/* machine */ ");
+	tprint_struct_begin();
 	if (!abbrev(tcp)) {
 		if (hdr->infmflg1) { /* Reserved */
-			PRINT_FIELD_0X("", *hdr, infmflg1);
+			PRINT_FIELD_0X(*hdr, infmflg1);
 			tprints(", ");
 		}
 		if (hdr->infmflg2) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infmflg2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infmflg2);
 			tprints(", ");
 		}
 	}
 
-	PRINT_FIELD_0X("", *hdr, infmval1);
+	PRINT_FIELD_0X(*hdr, infmval1);
 	cnt_val  = !!(hdr->infmval1 & 0x80);
 	id_val   = !!(hdr->infmval1 & 0x40);
 	name_val = !!(hdr->infmval1 & 0x20);
@@ -544,7 +546,8 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 					hdr->infmval1 & 0x1F,
 					hdr->infmval1 & 0x1F ? " - ???" : "");
 		if (hdr->infmval2) {
-			PRINT_FIELD_0X(", ", *hdr, infmval2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infmval2);
 		}
 	}
 
@@ -620,7 +623,9 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 
 	*mt = !!(hdr->infpflg1 & 0x80);
 
-	PRINT_FIELD_0X("/* partition */ {", *hdr, infpflg1);
+	tprints("/* partition */ ");
+	tprint_struct_begin();
+	PRINT_FIELD_0X(*hdr, infpflg1);
 	if (!abbrev(tcp) && hdr->infpflg1)
 		tprintf_comment("%s%s%#.0x%s",
 			hdr->infpflg1 & 0x80 ?
@@ -630,10 +635,12 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 			hdr->infpflg1 & 0x7F,
 			hdr->infpflg1 & 0x7F ? " - ???" : "");
 	if (!abbrev(tcp) && hdr->infpflg2) { /* Reserved */
-		PRINT_FIELD_0X(", ", *hdr, infpflg2);
+		tprint_struct_next();
+		PRINT_FIELD_0X(*hdr, infpflg2);
 	}
 
-	PRINT_FIELD_0X(", ", *hdr, infpval1);
+	tprint_struct_next();
+	PRINT_FIELD_0X(*hdr, infpval1);
 	cnt_val  = !!(hdr->infpval1 & 0x80);
 	wcap_val = !!(hdr->infpval1 & 0x40);
 	acap_val = !!(hdr->infpval1 & 0x20);
@@ -652,7 +659,8 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 				hdr->infpval1 & 0x07,
 				hdr->infpval1 & 0x07 ? " - ???" : "");
 	if (!abbrev(tcp) && hdr->infpval2) { /* Reserved */
-		PRINT_FIELD_0X(", ", *hdr, infpval2);
+		tprint_struct_next();
+		PRINT_FIELD_0X(*hdr, infpval2);
 	}
 
 	if (id_val || hdr->infppnum) {
@@ -789,7 +797,8 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 	CHECK_SIZE_EX(hdr, last_decoded, size, "hypervisor %d structure", num);
 
 	tprintf("/* hypervisor %d */ ", num);
-	PRINT_FIELD_0X("{", *hdr, infyflg1);
+	tprint_struct_begin();
+	PRINT_FIELD_0X(*hdr, infyflg1);
 	if (!abbrev(tcp) && hdr->infyflg1)
 		tprintf_comment("%s%s%s%s%s%s%#.0x%s",
 			hdr->infyflg1 & 0x80 ?
@@ -811,13 +820,16 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 
 	if (!abbrev(tcp)) {
 		if (hdr->infyflg2) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infyflg2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infyflg2);
 		}
 		if (hdr->infyval1) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infyval1);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infyval1);
 		}
 		if (hdr->infyval2) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infyval2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infyval2);
 		}
 
 		PRINT_FIELD_U(", ", *hdr, infytype);
@@ -893,7 +905,8 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	CHECK_SIZE(hdr, size, "guest %d structure", num);
 
 	tprintf("/* guest %d */ ", num);
-	PRINT_FIELD_0X("{", *hdr, infgflg1);
+	tprint_struct_begin();
+	PRINT_FIELD_0X(*hdr, infgflg1);
 	if (!abbrev(tcp) && hdr->infgflg1)
 		tprintf_comment("%s%s%s%s%s%s%s%s%s%s%s%s%#.0x%s",
 			hdr->infgflg1 & 0x80 ?
@@ -929,13 +942,16 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 			hdr->infgflg1 & 0x03 ? " - ???" : "");
 	if (!abbrev(tcp)) {
 		if (hdr->infgflg2) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infgflg2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infgflg2);
 		}
 		if (hdr->infgval1) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infgval1);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infgval1);
 		}
 		if (hdr->infgval2) { /* Reserved */
-			PRINT_FIELD_0X(", ", *hdr, infgval2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(*hdr, infgval2);
 		}
 	}
 
@@ -1001,7 +1017,8 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 		PRINT_FIELD_WEIGHT(*hdr, infgifcc);
 	}
 
-	PRINT_FIELD_0X(", ", *hdr, infgpflg);
+	tprint_struct_next();
+	PRINT_FIELD_0X(*hdr, infgpflg);
 	if (!abbrev(tcp) && hdr->infgpflg)
 		tprintf_comment("%s%s%s%s%s%s%s%s%s%s%#.0x%s",
 			hdr->infgpflg & 0x80 ?
@@ -1090,7 +1107,9 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	tprints("{");
 
 	/* Header */
-	PRINT_FIELD_0X("/* header */ {", *hdr, infhflg1);
+	tprints("/* header */ ");
+	tprint_struct_begin();
+	PRINT_FIELD_0X(*hdr, infhflg1);
 
 	if (abbrev(tcp)) {
 		tprints(", ...");
@@ -1123,13 +1142,16 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 			hdr->infhflg1 & 0x0F,
 			hdr->infhflg1 & 0x0F ? " - ???" : "");
 	if (hdr->infhflg2) { /* Reserved */
-		PRINT_FIELD_0X(", ", *hdr, infhflg2);
+		tprint_struct_next();
+		PRINT_FIELD_0X(*hdr, infhflg2);
 	}
 	if (hdr->infhval1) { /* Reserved */
-		PRINT_FIELD_0X(", ", *hdr, infhval1);
+		tprint_struct_next();
+		PRINT_FIELD_0X(*hdr, infhval1);
 	}
 	if (hdr->infhval2) { /* Reserved */
-		PRINT_FIELD_0X(", ", *hdr, infhval2);
+		tprint_struct_next();
+		PRINT_FIELD_0X(*hdr, infhval2);
 	}
 
 	if (!IS_ARRAY_ZERO(hdr->reserved_1__)) {
@@ -1292,22 +1314,24 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 
 	if (!abbrev(tcp)) {
 		if (gsepl.pad1) {
-			PRINT_FIELD_0X("", gsepl, pad1);
+			PRINT_FIELD_0X(gsepl, pad1);
 			tprints(", ");
 		}
 
-		PRINT_FIELD_0X("",   gsepl, gs_eam);
+		PRINT_FIELD_0X(gsepl, gs_eam);
 		tprintf_comment("extended addressing mode: %u, "
 				"basic addressing mode: %u",
 				!!(gsepl.gs_eam & 0x2), !!(gsepl.gs_eam & 0x1));
 
-		PRINT_FIELD_0X(", ", gsepl, gs_eci);
+		tprint_struct_next();
+		PRINT_FIELD_0X(gsepl, gs_eci);
 		tprintf_comment("CPU in TX: %u, CPU in CX: %u, instruction: %s",
 				!!(gsepl.gs_eci & 0x80),
 				!!(gsepl.gs_eci & 0x40),
 				gsepl.gs_eci & 0x01 ? "LLGFGS" : "LGG");
 
-		PRINT_FIELD_0X(", ", gsepl, gs_eai);
+		tprint_struct_next();
+		PRINT_FIELD_0X(gsepl, gs_eai);
 		tprintf_comment("DAT: %u, address space indication: %u, "
 				"AR number: %u",
 				!!(gsepl.gs_eai & 0x40),
@@ -1315,7 +1339,8 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 				gsepl.gs_eai & 0xF);
 
 		if (gsepl.pad2) {
-			PRINT_FIELD_0X(", ", gsepl, pad2);
+			tprint_struct_next();
+			PRINT_FIELD_0X(gsepl, pad2);
 		}
 
 		tprints(", ");
@@ -1348,11 +1373,11 @@ guard_storage_print_gscb(struct tcb *tcp, kernel_ulong_t addr)
 	tprints("{");
 
 	if (gscb.reserved) {
-		PRINT_FIELD_0X("", gscb, reserved);
+		PRINT_FIELD_0X(gscb, reserved);
 		tprints(", ");
 	}
 
-	PRINT_FIELD_0X("", gscb, gsd);
+	PRINT_FIELD_0X(gscb, gsd);
 
 	if (!abbrev(tcp)) {
 		unsigned int gsc = gscb.gsd & 0x3F;
@@ -1367,7 +1392,8 @@ guard_storage_print_gscb(struct tcb *tcp, kernel_ulong_t addr)
 				(gscb.gsd >> 8) & 0x7, gsc);
 	}
 
-	PRINT_FIELD_0X(", ", gscb, gssm);
+	tprint_struct_next();
+	PRINT_FIELD_0X(gscb, gssm);
 
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_VAL(gscb, gs_epl_a, tcp,

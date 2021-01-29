@@ -91,10 +91,14 @@ decode_smc_diag_conninfo(struct tcb *const tcp,
 	PRINT_FIELD_OBJ_PTR(cinfo, tx_prod, print_smc_diag_cursor);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(cinfo, tx_cons, print_smc_diag_cursor);
-	PRINT_FIELD_0X(", ", cinfo, rx_prod_flags);
-	PRINT_FIELD_0X(", ", cinfo, rx_conn_state_flags);
-	PRINT_FIELD_0X(", ", cinfo, tx_prod_flags);
-	PRINT_FIELD_0X(", ", cinfo, tx_conn_state_flags);
+	tprint_struct_next();
+	PRINT_FIELD_0X(cinfo, rx_prod_flags);
+	tprint_struct_next();
+	PRINT_FIELD_0X(cinfo, rx_conn_state_flags);
+	tprint_struct_next();
+	PRINT_FIELD_0X(cinfo, tx_prod_flags);
+	tprint_struct_next();
+	PRINT_FIELD_0X(cinfo, tx_conn_state_flags);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(cinfo, tx_prep, print_smc_diag_cursor);
 	tprint_struct_next();
