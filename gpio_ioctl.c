@@ -97,7 +97,8 @@ print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	if (exiting(tcp)) {
-		PRINT_FIELD_FD("{", hr, fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(hr, fd, tcp);
 		tprints("}");
 		return RVAL_IOCTL_DECODED;
 	}
@@ -135,7 +136,8 @@ print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	if (exiting(tcp)) {
-		PRINT_FIELD_FD("{", er, fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(er, fd, tcp);
 		tprints("}");
 		return RVAL_IOCTL_DECODED;
 	}
@@ -353,7 +355,8 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	if (exiting(tcp)) {
-		PRINT_FIELD_FD("{", lr, fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(lr, fd, tcp);
 		tprints("}");
 		return RVAL_IOCTL_DECODED;
 	}

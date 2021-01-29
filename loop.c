@@ -146,7 +146,8 @@ decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &config))
 		return;
 
-	PRINT_FIELD_FD("{", config, fd, tcp);
+	tprint_struct_begin();
+	PRINT_FIELD_FD(config, fd, tcp);
 
 	PRINT_FIELD_U(", ", config, block_size);
 

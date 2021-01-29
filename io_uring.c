@@ -90,7 +90,8 @@ SYS_FUNC(io_uring_setup)
 		PRINT_FIELD_X(", ", params, sq_thread_cpu);
 		PRINT_FIELD_U(", ", params, sq_thread_idle);
 		if (params.flags & IORING_SETUP_ATTACH_WQ) {
-			PRINT_FIELD_FD(", ", params, wq_fd, tcp);
+			tprint_struct_next();
+			PRINT_FIELD_FD(params, wq_fd, tcp);
 		}
 		if (!IS_ARRAY_ZERO(params.resv)) {
 			tprint_struct_next();

@@ -435,7 +435,8 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &shm_register_fd))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_FD("{", shm_register_fd, fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(shm_register_fd, fd, tcp);
 		PRINT_FIELD_FLAGS(", ", shm_register_fd, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
 		tprints("}");

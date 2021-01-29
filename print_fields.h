@@ -394,9 +394,9 @@ tprints_field_name(const char *name)
 		printaddr((mpers_ptr_t) (where_).field_);		\
 	} while (0)
 
-# define PRINT_FIELD_FD(prefix_, where_, field_, tcp_)			\
+# define PRINT_FIELD_FD(where_, field_, tcp_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		printfd((tcp_), (where_).field_);			\
 	} while (0)
 

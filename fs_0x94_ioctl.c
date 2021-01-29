@@ -20,7 +20,8 @@ decode_file_clone_range(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &range)) {
-		PRINT_FIELD_FD("{", range, src_fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(range, src_fd, tcp);
 		PRINT_FIELD_U(", ", range, src_offset);
 		PRINT_FIELD_U(", ", range, src_length);
 		PRINT_FIELD_U(", ", range, dest_offset);
@@ -44,7 +45,8 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 	}
 
 	if (entering(tcp)) {
-		PRINT_FIELD_FD("{", *info, dest_fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(*info, dest_fd, tcp);
 		PRINT_FIELD_U(", ", *info, dest_offset);
 	} else {
 		PRINT_FIELD_U("{", *info, bytes_deduped);

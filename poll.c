@@ -19,7 +19,8 @@ print_pollfd(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct pollfd *fds = elem_buf;
 
-	PRINT_FIELD_FD("{", *fds, fd, tcp);
+	tprint_struct_begin();
+	PRINT_FIELD_FD(*fds, fd, tcp);
 	if (fds->fd >= 0) {
 		PRINT_FIELD_FLAGS(", ", *fds, events, pollflags, "POLL???");
 	}

@@ -1174,7 +1174,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		PRINT_FIELD_FD("{", args, send_fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(args, send_fd, tcp);
 		PRINT_FIELD_U(", ", args, clone_sources_count);
 
 		if (abbrev(tcp)) {
@@ -1254,7 +1255,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		PRINT_FIELD_FD("{", args, fd, tcp);
+		tprint_struct_begin();
+		PRINT_FIELD_FD(args, fd, tcp);
 		PRINT_FIELD_CSTRING(", ", args, name);
 		tprints("}");
 		break;
@@ -1275,7 +1277,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		if (entering(tcp)) {
-			PRINT_FIELD_FD("{", args, fd, tcp);
+			tprint_struct_begin();
+			PRINT_FIELD_FD(args, fd, tcp);
 			PRINT_FIELD_FLAGS(", ", args, flags,
 					  btrfs_snap_flags_v2,
 					  "BTRFS_SUBVOL_???");

@@ -70,7 +70,8 @@ print_common_flags(struct tcb *tcp, const struct iocb *cb)
 	}
 
 	if (cb->aio_flags & IOCB_FLAG_RESFD) {
-		PRINT_FIELD_FD(", ", *cb, aio_resfd, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_FD(*cb, aio_resfd, tcp);
 	} else if (cb->aio_resfd) {
 		PRINT_FIELD_X(", ", *cb, aio_resfd);
 	}
@@ -113,7 +114,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 		PRINT_FIELD_D(", ", *cb, aio_reqprio);
 	}
 
-	PRINT_FIELD_FD(", ", *cb, aio_fildes, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_FD(*cb, aio_fildes, tcp);
 
 	return sub;
 }
