@@ -191,7 +191,8 @@ print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		PRINT_FIELD_X(arg, resv);
 	}
-	tprints(", fds=");
+	tprint_struct_next();
+	tprints_field_name("fds");
 	print_big_u64_addr(arg.fds);
 	print_array(tcp, arg.fds, nargs, &buf, sizeof(buf),
 		    tfetch_mem, print_fd_array_member, NULL);

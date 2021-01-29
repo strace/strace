@@ -113,9 +113,11 @@ print_cap_data(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	tprints_field_name("effective");
 	print_cap_bits(data[0].effective, len > 1 ? data[1].effective : 0);
-	tprints(", permitted=");
+	tprint_struct_next();
+	tprints_field_name("permitted");
 	print_cap_bits(data[0].permitted, len > 1 ? data[1].permitted : 0);
-	tprints(", inheritable=");
+	tprint_struct_next();
+	tprints_field_name("inheritable");
 	print_cap_bits(data[0].inheritable, len > 1 ? data[1].inheritable : 0);
 	tprint_struct_end();
 }

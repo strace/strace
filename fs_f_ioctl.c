@@ -74,7 +74,8 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_more_data_follows();
 	} else {
 		struct_fiemap_extent fe;
-		tprints(", fm_extents=");
+		tprint_struct_next();
+		tprints_field_name("fm_extents");
 		print_array(tcp, arg + offsetof(typeof(args), fm_extents),
 			    args.fm_mapped_extents, &fe, sizeof(fe),
 			    tfetch_mem, print_fiemap_extent, 0);

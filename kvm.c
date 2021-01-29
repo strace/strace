@@ -275,7 +275,8 @@ kvm_ioctl_decode_cpuid2(struct tcb *const tcp, const unsigned int code,
 		tprint_struct_begin();
 		PRINT_FIELD_U(cpuid, nent);
 
-		tprints(", entries=");
+		tprint_struct_next();
+		tprints_field_name("entries");
 		if (abbrev(tcp)) {
 			tprints("[");
 			if (cpuid.nent)

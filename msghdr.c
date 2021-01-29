@@ -282,7 +282,8 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		if (utype < ARRAY_SIZE(cmsg_socket_printers)
 		    && cmsg_socket_printers[utype].printer
 		    && data_len >= cmsg_socket_printers[utype].min_len) {
-			tprints(", cmsg_data=");
+			tprint_struct_next();
+			tprints_field_name("cmsg_data");
 			cmsg_socket_printers[utype].printer(tcp, cmsg_data, data_len);
 		}
 		break;
@@ -291,7 +292,8 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		if (utype < ARRAY_SIZE(cmsg_ip_printers)
 		    && cmsg_ip_printers[utype].printer
 		    && data_len >= cmsg_ip_printers[utype].min_len) {
-			tprints(", cmsg_data=");
+			tprint_struct_next();
+			tprints_field_name("cmsg_data");
 			cmsg_ip_printers[utype].printer(tcp, cmsg_data, data_len);
 		}
 		break;
@@ -324,7 +326,8 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	if (!in_control_len)
 		return;
-	tprints(", msg_control=");
+	tprint_struct_next();
+	tprints_field_name("msg_control");
 
 	const unsigned int cmsg_size =
 #ifndef current_wordsize
@@ -366,7 +369,8 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 			tprints(", ");
 		tprintf("{cmsg_len=%" PRI_klu ", cmsg_level=", cmsg_len);
 		printxval(socketlayers, cmsg_level, "SOL_???");
-		tprints(", cmsg_type=");
+		tprint_struct_next();
+		tprints_field_name("cmsg_type");
 
 		kernel_ulong_t len = cmsg_len > buf_len ? buf_len : cmsg_len;
 
@@ -416,12 +420,14 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	const enum iov_decode decode =
 		(family == AF_NETLINK) ? IOV_DECODE_NETLINK : IOV_DECODE_STR;
 
-	tprints(", msg_namelen=");
+	tprint_struct_next();
+	tprints_field_name("msg_namelen");
 	if (p_user_msg_namelen && *p_user_msg_namelen != (int) msg->msg_namelen)
 		tprintf("%d->", *p_user_msg_namelen);
 	tprintf("%d", msg->msg_namelen);
 
-	tprints(", msg_iov=");
+	tprint_struct_next();
+	tprints_field_name("msg_iov");
 	tprint_iov_upto(tcp, msg->msg_iovlen,
 			ptr_to_kulong(msg->msg_iov), decode, data_size);
 	tprint_struct_next();

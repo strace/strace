@@ -232,7 +232,8 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	} else {
 		struct_ifreq ifr;
 
-		tprints(", ifc_buf=");
+		tprint_struct_next();
+		tprints_field_name("ifc_buf");
 		print_array(tcp, ptr_to_kulong(ifc->ifc_buf),
 			    ifc->ifc_len / sizeof(struct_ifreq),
 			    &ifr, sizeof(ifr),

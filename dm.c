@@ -171,7 +171,8 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(s, target_type);
 
-		tprints(", string=");
+		tprint_struct_next();
+		tprints_field_name("string");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			     QUOTE_0_TERMINATED);
 		tprint_struct_end();
@@ -235,7 +236,8 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_U(s, count);
 
-	tprints(", deps=");
+	tprint_struct_next();
+	tprints_field_name("deps");
 	print_array(tcp, addr + offset_end, s.count, &dev_buf, sizeof(dev_buf),
 		    tfetch_mem, dm_print_dev, NULL);
 
@@ -290,7 +292,8 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		tprint_struct_begin();
 		PRINT_FIELD_DEV(s, dev);
-		tprints(", name=");
+		tprint_struct_next();
+		tprints_field_name("name");
 		rc = printstr_ex(tcp, addr + offset_end,
 				 ioc->data_size - offset_end,
 				 QUOTE_0_TERMINATED);
@@ -422,7 +425,8 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		tprint_struct_begin();
 		PRINT_FIELD_U(s, sector);
-		tprints(", message=");
+		tprint_struct_next();
+		tprints_field_name("message");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
 		tprint_struct_end();

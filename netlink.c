@@ -520,7 +520,8 @@ decode_nlmsgerr(struct tcb *const tcp,
 	len -= offsetof(struct nlmsgerr, msg);
 
 	if (len) {
-		tprints(", msg=");
+		tprint_struct_next();
+		tprints_field_name("msg");
 		if (fetch_nlmsghdr(tcp, &err.msg, addr, len, false)) {
 			unsigned int payload =
 				capped ? sizeof(err.msg) : err.msg.nlmsg_len;

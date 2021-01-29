@@ -191,7 +191,8 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 	const struct sockaddr_in6 *const sa_in6 = buf;
 
 	PRINT_FIELD_NET_PORT(*sa_in6, sin6_port);
-	tprints(", sin6_flowinfo=");
+	tprint_struct_next();
+	tprints_field_name("sin6_flowinfo");
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		print_quoted_string((const char*) &sa_in6->sin6_flowinfo,
 				    sizeof(sa_in6->sin6_flowinfo),
@@ -364,7 +365,9 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 	if (want_digis == 0)
 		goto digis_end;
 
-	tprints(", fsa_digipeater=[");
+	tprint_struct_next();
+	tprints_field_name("fsa_digipeater");
+	tprints("[");
 	for (size_t i = 0; i < digis; i++) {
 		if (i)
 			tprints(", ");
@@ -480,7 +483,9 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 			addrlen - offsetof(struct sockaddr_ll, sll_addr);
 		unsigned int i;
 
-		tprints(", sll_addr=[");
+		tprint_struct_next();
+		tprints_field_name("sll_addr");
+		tprints("[");
 		for (i = 0; i < sa_ll->sll_halen; ++i) {
 			if (i)
 				tprints(", ");

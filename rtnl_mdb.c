@@ -59,12 +59,18 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 
 		const int proto = ntohs(entry.addr.proto);
 
-		tprints(", addr={");
+		tprint_struct_next();
+		tprints_field_name("addr");
+		tprint_struct_begin();
 		print_inet_addr(proto, &entry.addr.u,
 				sizeof(entry.addr.u), "u");
-		tprints(", proto=htons(");
+		tprint_struct_next();
+		tprints_field_name("proto");
+		tprints("htons(");
 		printxval(addrfams, proto, "AF_???");
-		tprints(")}}");
+		tprints(")");
+		tprint_struct_end();
+		tprint_struct_end();
 	}
 
 	const size_t offset = NLMSG_ALIGN(sizeof(entry));

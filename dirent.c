@@ -61,10 +61,12 @@ decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
 		if (d_name_len) {
 			if (d_name_len > D_NAME_LEN_MAX)
 				d_name_len = D_NAME_LEN_MAX;
-			tprints(", d_name=");
+			tprint_struct_next();
+			tprints_field_name("d_name");
 			rc = printpathn(tcp, addr, d_name_len - 1);
 		}
-		tprints(", d_type=");
+		tprint_struct_next();
+		tprints_field_name("d_type");
 		const kernel_ulong_t d_type_addr =
 			addr + (d_name_type_len - 1);
 		unsigned char d_type;
@@ -93,7 +95,8 @@ print_old_dirent(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	print_dentry_head(&dent);
-	tprints(", d_name=");
+	tprint_struct_next();
+	tprints_field_name("d_name");
 	printpathn(tcp, addr + header_size,
 		   MIN(dent.d_reclen, D_NAME_LEN_MAX));
 	tprint_struct_end();

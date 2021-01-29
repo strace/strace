@@ -133,7 +133,8 @@ tee_print_params(struct tcb *const tcp, uint64_t params_start, unsigned num_para
 {
 	struct_tee_ioctl_param param_buffer;
 
-	tprints(", params=");
+	tprint_struct_next();
+	tprints_field_name("params");
 	print_array(tcp, params_start, num_params, &param_buffer, sizeof(param_buffer),
 		    tfetch_mem, tee_print_param_fn, NULL);
 }

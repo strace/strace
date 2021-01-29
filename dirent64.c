@@ -48,7 +48,8 @@ decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
 	if (d_name_len) {
 		if (d_name_len > D_NAME_LEN_MAX)
 			d_name_len = D_NAME_LEN_MAX;
-		tprints(", d_name=");
+		tprint_struct_next();
+		tprints_field_name("d_name");
 		rc = printpathn(tcp, addr, d_name_len - 1);
 	}
 	tprint_struct_end();

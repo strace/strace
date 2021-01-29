@@ -288,7 +288,8 @@ btrfs_print_logical_ino_container(struct tcb *tcp,
 		const uint64_t val_addr =
 			inodes_addr + offsetof(typeof(container), val);
 		uint64_t record[3];
-		tprints(", val=");
+		tprint_struct_next();
+		tprints_field_name("val");
 		print_array(tcp, val_addr, container.elem_cnt / 3,
 			    record, sizeof(record),
 			    tfetch_mem,
@@ -328,7 +329,8 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 		uint64_t val_addr =
 			fspath_addr + offsetof(typeof(container), val);
 		uint64_t offset;
-		tprints(", val=");
+		tprint_struct_next();
+		tprints_field_name("val");
 		print_array(tcp, val_addr, container.elem_cnt,
 			    &offset, sizeof(offset),
 			    tfetch_mem,
@@ -364,7 +366,8 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 		tprint_more_data_follows();
 	} else {
 		uint64_t record;
-		tprints(", qgroups=");
+		tprint_struct_next();
+		tprints_field_name("qgroups");
 		print_array(tcp, qgi_addr + offsetof(typeof(inherit), qgroups),
 			    inherit.num_qgroups, &record, sizeof(record),
 			    tfetch_mem, print_uint64_array_member, 0);
@@ -1276,7 +1279,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprint_struct_next();
 			PRINT_FIELD_PTR(args, clone_sources);
 		} else {
-			tprints(", clone_sources=");
+			tprint_struct_next();
+			tprints_field_name("clone_sources");
 			uint64_t record;
 			print_array(tcp, ptr_to_kulong(args.clone_sources),
 				    args.clone_sources_count,
@@ -1326,7 +1330,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprint_more_data_follows();
 		} else {
 			struct btrfs_ioctl_space_info info;
-			tprints(", spaces=");
+			tprint_struct_next();
+			tprints_field_name("spaces");
 			print_array(tcp, arg + offsetof(typeof(args), spaces),
 				    args.total_spaces,
 				    &info, sizeof(info), tfetch_mem,
@@ -1385,7 +1390,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (args.flags & BTRFS_SUBVOL_QGROUP_INHERIT) {
 				tprint_struct_next();
 				PRINT_FIELD_U(args, size);
-				tprints(", qgroup_inherit=");
+				tprint_struct_next();
+				tprints_field_name("qgroup_inherit");
 				btrfs_print_qgroup_inherit(tcp,
 					ptr_to_kulong(args.qgroup_inherit));
 			}

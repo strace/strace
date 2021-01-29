@@ -80,7 +80,8 @@ print_f_owner_ex(struct tcb *const tcp, const kernel_ulong_t addr)
 		pid_type = PT_PGID;
 		break;
 	}
-	tprints(", pid=");
+	tprint_struct_next();
+	tprints_field_name("pid");
 	printpid(tcp, owner.pid, pid_type);
 	tprint_struct_end();
 }

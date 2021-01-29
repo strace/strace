@@ -290,7 +290,8 @@ SYS_FUNC(ptrace)
 				return 0;
 			}
 
-			tprints(", flags=");
+			tprint_struct_next();
+			tprints_field_name("flags");
 			printflags64(seccomp_filter_flags, flags,
 				     "SECCOMP_FILTER_FLAG_???");
 

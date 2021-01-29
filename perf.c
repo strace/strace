@@ -174,7 +174,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * (perf_hw_cache_id) | (perf_hw_cache_op_id << 8) |
 		 * (perf_hw_cache_op_result_id << 16)
 		 */
-		tprints(", config=");
+		tprint_struct_next();
+		tprints_field_name("config");
 		printxval(perf_hw_cache_id, attr->config & 0xFF,
 			  "PERF_COUNT_HW_CACHE_???");
 		tprints("|");

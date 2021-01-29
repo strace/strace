@@ -565,7 +565,8 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * with wrong sigset size (just returns EINVAL instead).
 	 * We just fetch the right size, which is NSIG_BYTES.
 	 */
-	tprints(", sa_mask=");
+	tprint_struct_next();
+	tprints_field_name("sa_mask");
 	tprintsigmask_val("", sa.sa_mask);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sa, sa_flags, sigact_flags, "SA_???");

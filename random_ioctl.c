@@ -44,7 +44,8 @@ random_ioctl(struct tcb *const tcp, const unsigned int code,
 			PRINT_FIELD_D(info, entropy_count);
 			tprint_struct_next();
 			PRINT_FIELD_D(info, buf_size);
-			tprints(", buf=");
+			tprint_struct_next();
+			tprints_field_name("buf");
 			buf = arg + offsetof(struct rand_pool_info, buf);
 			printstrn(tcp, buf, info.buf_size);
 			tprint_struct_end();

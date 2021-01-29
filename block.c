@@ -68,7 +68,8 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 	tprint_struct_next();
 	PRINT_FIELD_D(*blkpg, datalen);
 
-	tprints(", data=");
+	tprint_struct_next();
+	tprints_field_name("data");
 	if (!umove_or_printaddr(tcp, ptr_to_kulong(blkpg->data), &p)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(p, start);

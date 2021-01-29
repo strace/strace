@@ -268,7 +268,9 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 	tprints_field_name("code");
 	printxval(evdev_mtslots, buffer[0], "ABS_MT_???");
 
-	tprints(", values=[");
+	tprint_struct_next();
+	tprints_field_name("values");
+	tprints("[");
 
 	unsigned int i;
 	for (i = 1; i < ARRAY_SIZE(buffer); i++)

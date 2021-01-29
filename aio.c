@@ -108,7 +108,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 		PRINT_FIELD_FLAGS(*cb, aio_rw_flags, rwf_flags, "RWF_???");
 	}
 
-	tprints(", aio_lio_opcode=");
+	tprint_struct_next();
+	tprints_field_name("aio_lio_opcode");
 	sub = tprint_lio_opcode(cb->aio_lio_opcode);
 
 	if (cb->aio_flags & IOCB_FLAG_IOPRIO) {
@@ -150,7 +151,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 		break;
 	case SUB_VECTOR:
 		if (iocb_is_valid(cb)) {
-			tprints(", aio_buf=");
+			tprint_struct_next();
+			tprints_field_name("aio_buf");
 			tprint_iov(tcp, cb->aio_nbytes, cb->aio_buf,
 				   cb->aio_lio_opcode == 8
 				   ? IOV_DECODE_STR

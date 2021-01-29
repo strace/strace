@@ -342,7 +342,8 @@ DECL_print_v4l2_format_fmt(win)
 	tprint_struct_next();
 	PRINT_FIELD_X(*p, chromakey);
 
-	tprints(", clips=");
+	tprint_struct_next();
+	tprints_field_name("clips");
 	struct_v4l2_clip clip;
 	bool rc = print_array(tcp, ptr_to_kulong(p->clips),
 			   p->clipcount, &clip, sizeof(clip),
@@ -1198,7 +1199,8 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, size);
 	if (p->size > 0) {
-		tprints(", string=");
+		tprint_struct_next();
+		tprints_field_name("string");
 		printstrn(tcp, ptr_to_kulong(p->string), p->size);
 	} else {
 		tprint_struct_next();

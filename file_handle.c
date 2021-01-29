@@ -70,7 +70,9 @@ SYS_FUNC(name_to_handle_at)
 					h.handle_bytes = MAX_HANDLE_SZ;
 				if (!umoven(tcp, addr + sizeof(h), h.handle_bytes,
 					    f_handle)) {
-					tprints(", f_handle=0x");
+					tprint_struct_next();
+					tprints_field_name("f_handle");
+					tprints("0x");
 					for (i = 0; i < h.handle_bytes; ++i)
 						tprintf("%02x", f_handle[i]);
 				}
@@ -111,7 +113,9 @@ SYS_FUNC(open_by_handle_at)
 		if (!umoven(tcp, addr + sizeof(h), h.handle_bytes, &f_handle)) {
 			unsigned int i;
 
-			tprints(", f_handle=0x");
+			tprint_struct_next();
+			tprints_field_name("f_handle");
+			tprints("0x");
 			for (i = 0; i < h.handle_bytes; ++i)
 				tprintf("%02x", f_handle[i]);
 		}

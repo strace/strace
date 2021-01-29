@@ -119,18 +119,21 @@ SYS_FUNC(clone)
 		if (flags & (CLONE_PARENT_SETTID|CLONE_PIDFD)) {
 			kernel_ulong_t addr = tcp->u_arg[ARG_PTID];
 
-			tprints(", parent_tid=");
+			tprint_struct_next();
+			tprints_field_name("parent_tid");
 			if (flags & CLONE_PARENT_SETTID)
 				printnum_pid(tcp, addr, PT_TID);
 			else
 				printnum_fd(tcp, addr);
 		}
 		if (flags & CLONE_SETTLS) {
-			tprints(", tls=");
+			tprint_struct_next();
+			tprints_field_name("tls");
 			print_tls_arg(tcp, tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID)) {
-			tprints(", child_tidptr=");
+			tprint_struct_next();
+			tprints_field_name("child_tidptr");
 			printaddr(tcp->u_arg[ARG_CTID]);
 		}
 	}

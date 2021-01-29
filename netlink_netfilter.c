@@ -49,7 +49,8 @@ decode_netlink_netfilter(struct tcb *const tcp,
 		 * Work around wrong endianness in res_id field,
 		 * see linux commit v4.3-rc1~28^2~47^2~1
 		 */
-		tprints(", res_id=");
+		tprint_struct_next();
+		tprints_field_name("res_id");
 		if (subsys_id == NFNL_SUBSYS_NFTABLES
 		    && res_id == NFNL_SUBSYS_NFTABLES) {
 			print_xlat_ex(nfmsg.res_id,

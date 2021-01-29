@@ -52,7 +52,8 @@ print_nlattr(const struct nlattr *const nla,
 
 	tprint_struct_begin();
 	PRINT_FIELD_U(*nla, nla_len);
-	tprints(", nla_type=");
+	tprint_struct_next();
+	tprints_field_name("nla_type");
 	if (nla->nla_type & NLA_F_NESTED) {
 		print_xlat(NLA_F_NESTED);
 		tprints("|");
