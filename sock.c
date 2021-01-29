@@ -204,7 +204,9 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (entering(tcp)) {
-		tprints(", {ifc_len=");
+		tprints(", ");
+		tprint_struct_begin();
+		tprints_field_name("ifc_len");
 		if (ifc->ifc_buf)
 			print_ifc_len(ifc->ifc_len);
 

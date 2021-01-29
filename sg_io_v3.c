@@ -54,7 +54,10 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	static const size_t skip_iid =
 		offsetof(struct_sg_io_hdr, dxfer_direction);
 
-	tprints("{interface_id='S', ");
+	tprint_struct_begin();
+	tprints_field_name("interface_id");
+	tprints("'S'");
+	tprint_struct_next();
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.dxfer_direction)) {
 		tprint_struct_end();
@@ -165,7 +168,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprints("{interface_id='S', ...}");
+	tprint_struct_begin();
+	tprints_field_name("interface_id");
+	tprints("'S'");
+	tprint_struct_next();
+	tprint_more_data_follows();
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 

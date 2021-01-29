@@ -40,7 +40,10 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct sg_io_v4 sg_io;
 	static const size_t skip_iid = offsetof(struct sg_io_v4, protocol);
 
-	tprints("{guard='Q', ");
+	tprint_struct_begin();
+	tprints_field_name("guard");
+	tprints("'Q'");
+	tprint_struct_next();
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.protocol)) {
 		tprint_struct_end();
@@ -155,7 +158,12 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprints("{guard='Q', ...}");
+	tprint_struct_begin();
+	tprints_field_name("guard");
+	tprints("'Q'");
+	tprint_struct_next();
+	tprint_more_data_follows();
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 

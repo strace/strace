@@ -330,7 +330,8 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &sa))
 		return;
 
-	tprints("{sa_handler=");
+	tprint_struct_begin();
+	tprints_field_name("sa_handler");
 	print_sa_handler(sa.sa_handler__);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_VAL(sa, sa_mask, tprint_old_sigmask_val);
@@ -554,7 +555,8 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &sa))
 		return;
 
-	tprints("{sa_handler=");
+	tprint_struct_begin();
+	tprints_field_name("sa_handler");
 	print_sa_handler(sa.sa_handler__);
 	/*
 	 * Sigset size is in tcp->u_arg[4] (SPARC)

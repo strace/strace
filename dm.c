@@ -375,7 +375,8 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			break;
 
-		tprints("{name=");
+		tprint_struct_begin();
+		tprints_field_name("name");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
 		tprintf(", version=%" PRIu32 ".%" PRIu32 ".%" PRIu32 "}",

@@ -339,8 +339,10 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 	bool full = sax25->fsa_ax25.sax25_ndigis ||
 	(addrlen_us > sizeof(struct sockaddr_ax25));
 
-	if (full)
-		tprints("fsa_ax25={");
+	if (full) {
+		tprints_field_name("fsa_ax25");
+		tprint_struct_begin();
+	}
 
 	PRINT_FIELD_OBJ_PTR(sax25->fsa_ax25, sax25_call, print_ax25_addr);
 	tprint_struct_next();

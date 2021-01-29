@@ -110,7 +110,8 @@ print_cap_data(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len * sizeof(data[0]), data))
 		return;
 
-	tprints("{effective=");
+	tprint_struct_begin();
+	tprints_field_name("effective");
 	print_cap_bits(data[0].effective, len > 1 ? data[1].effective : 0);
 	tprints(", permitted=");
 	print_cap_bits(data[0].permitted, len > 1 ? data[1].permitted : 0);

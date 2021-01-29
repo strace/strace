@@ -409,7 +409,8 @@ END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
 BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 {
-	tprints("{pathname=");
+	tprint_struct_begin();
+	tprints_field_name("pathname");
 	print_big_u64_addr(attr.pathname);
 	printpath(tcp, attr.pathname);
 
@@ -1005,7 +1006,10 @@ BEGIN_BPF_CMD_DECODER(BPF_RAW_TRACEPOINT_OPEN)
 {
 	enum { TP_NAME_SIZE = 128 };
 
-	tprints("{raw_tracepoint={name=");
+	tprint_struct_begin();
+	tprints_field_name("raw_tracepoint");
+	tprint_struct_begin();
+	tprints_field_name("name");
 	print_big_u64_addr(attr.name);
 	printstr_ex(tcp, attr.name, TP_NAME_SIZE, QUOTE_0_TERMINATED);
 
@@ -1018,7 +1022,8 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_BTF_LOAD)
 {
-	tprints("{btf=");
+	tprint_struct_begin();
+	tprints_field_name("btf");
 	print_big_u64_addr(attr.btf);
 	printstrn(tcp, attr.btf, attr.btf_size);
 	tprint_struct_next();

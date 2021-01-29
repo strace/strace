@@ -229,8 +229,10 @@ static void
 print_gpio_v2_line_attribute_raw(const struct_gpio_v2_line_attribute *attr,
 				 bool as_field)
 {
-	if (as_field)
-		tprints("attr={");
+	if (as_field) {
+		tprints_field_name("attr");
+		tprint_struct_begin();
+	}
 	PRINT_FIELD_U(*attr, id);
 	if (attr->padding) {
 		tprint_struct_next();

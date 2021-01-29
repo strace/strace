@@ -439,7 +439,8 @@ decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_siz
 	if (abbrev(tcp)) {
 		tprint_more_data_follows();
 	} else {
-		tprints("buf=[");
+		tprints_field_name("buf");
+		tprints("[");
 		uint64_t off = 0;
 		for (unsigned int i = 0; i < nr_items; ++i) {
 			if (i)

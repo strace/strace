@@ -264,7 +264,8 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 	if (umove_or_printaddr(tcp, arg, &buffer))
 		return RVAL_IOCTL_DECODED;
 
-	tprints("{code=");
+	tprint_struct_begin();
+	tprints_field_name("code");
 	printxval(evdev_mtslots, buffer[0], "ABS_MT_???");
 
 	tprints(", values=[");

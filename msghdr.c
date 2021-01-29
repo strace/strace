@@ -409,7 +409,8 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 		p_user_msg_namelen && (int) msg->msg_namelen > *p_user_msg_namelen
 		? *p_user_msg_namelen : (int) msg->msg_namelen;
 
-	tprints("{msg_name=");
+	tprint_struct_begin();
+	tprints_field_name("msg_name");
 	const int family =
 		decode_sockaddr(tcp, ptr_to_kulong(msg->msg_name), msg_namelen);
 	const enum iov_decode decode =

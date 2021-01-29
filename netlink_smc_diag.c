@@ -218,7 +218,8 @@ decode_smc_diag_fallback(struct tcb *const tcp,
 	 * We print them verbose since they are defined in a non-UAPI header,
 	 * net/smc/smc_clc.h
 	 */
-	tprints("{reason=");
+	tprint_struct_begin();
+	tprints_field_name("reason");
 	printxval_ex(smc_decl_codes, fb.reason, "SMC_CLC_DECL_???",
 		     XLAT_STYLE_VERBOSE);
 	tprints(", peer_diagnosis=");

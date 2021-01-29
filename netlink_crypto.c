@@ -27,7 +27,8 @@ decode_crypto_report_generic(struct tcb *const tcp,
 			     const unsigned int len,
 			     const void *const opaque_data)
 {
-	tprints("{type=");
+	tprint_struct_begin();
+	tprints_field_name("type");
 	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
 	tprint_struct_end();
 
