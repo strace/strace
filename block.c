@@ -80,9 +80,9 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 		PRINT_FIELD_CSTRING(p, devname);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(p, volname);
-		tprints("}");
+		tprint_struct_end();
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
@@ -202,7 +202,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 				tprint_struct_next();
 				PRINT_FIELD_CSTRING(buts, name);
 			}
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 

@@ -31,7 +31,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(rtgenmsg, rtgen_family, addrfams, "AF_???");
-	tprints("}");
+	tprint_struct_end();
 
 	const size_t offset = NLMSG_ALIGN(sizeof(rtgenmsg));
 	if (len > offset) {

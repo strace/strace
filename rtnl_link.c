@@ -124,7 +124,7 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 			tprint_struct_next();
 			PRINT_FIELD_U(st, rx_nohandler);
 		}
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -149,7 +149,7 @@ decode_ifla_bridge_id(struct tcb *const tcp,
 				  print_uint8_array_member);
 		tprint_struct_next();
 		PRINT_FIELD_MAC(id, addr);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -230,7 +230,7 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 		PRINT_FIELD_U(map, dma);
 		tprint_struct_next();
 		PRINT_FIELD_U(map, port);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -294,7 +294,7 @@ decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
 	PRINT_FIELD_U(st, arbitration_lost);
 	tprint_struct_next();
 	PRINT_FIELD_U(st, restarts);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -537,7 +537,7 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 			tprint_struct_next();
 			PRINT_FIELD_U(st, rx_nohandler);
 		}
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -569,7 +569,7 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 		PRINT_FIELD_HEX_ARRAY(vsi, pad);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -788,7 +788,7 @@ decode_ifla_inet6_cacheinfo(struct tcb *const tcp,
 		PRINT_FIELD_U(ci, reachable_time);
 		tprint_struct_next();
 		PRINT_FIELD_U(ci, retrans_time);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -1012,7 +1012,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(ifinfo));
 	if (decode_nla && len > offset) {

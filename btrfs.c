@@ -153,7 +153,7 @@ btrfs_print_balance_args(const struct btrfs_balance_args *const bba)
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*bba, flags, btrfs_balance_args,
 			  "BTRFS_BALANCE_ARGS_???");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -189,7 +189,7 @@ btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 		PRINT_FIELD_OBJ_PTR(balance_args, sys,
 				    btrfs_print_balance_args);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -205,7 +205,7 @@ btrfs_print_features(const struct btrfs_ioctl_feature_flags *flags)
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*flags, incompat_flags, btrfs_features_incompat,
 			  "BTRFS_FEATURE_INCOMPAT_???");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -222,7 +222,7 @@ btrfs_print_qgroup_limit(const struct btrfs_qgroup_limit *lim)
 	PRINT_FIELD_U(*lim, rsv_rfer);
 	tprint_struct_next();
 	PRINT_FIELD_U(*lim, rsv_excl);
-	tprints("}");
+	tprint_struct_end();
 }
 
 # define btrfs_print_key_type(where_, field_) \
@@ -246,7 +246,7 @@ btrfs_print_data_container_header(const struct btrfs_data_container *container)
 static void
 btrfs_print_data_container_footer(void)
 {
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -265,7 +265,7 @@ print_btrfs_data_container_logical_ino(struct tcb *tcp, void *elem_buf,
 	PRINT_FIELD_U(*record, offset);
 	tprint_struct_next();
 	PRINT_FIELD_U(*record, root);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -366,7 +366,7 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 			    inherit.num_qgroups, &record, sizeof(record),
 			    tfetch_mem, print_uint64_array_member, 0);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -407,7 +407,7 @@ print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
 	} else {
 		PRINT_FIELD_U(*key, nr_items);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -423,7 +423,7 @@ print_btrfs_ioctl_search_header(const struct btrfs_ioctl_search_header *p)
 	btrfs_print_key_type(*p, type);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, len);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -484,7 +484,7 @@ print_btrfs_ioctl_space_info(struct tcb *tcp, void *elem_buf,
 	PRINT_FIELD_U(*info, total_bytes);
 	tprint_struct_next();
 	PRINT_FIELD_U(*info, used_bytes);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -497,7 +497,7 @@ print_btrfs_timespec(const MPERS_PTR_ARG(struct_btrfs_ioctl_timespec *) const ar
 	PRINT_FIELD_U(*p, sec);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, nsec);
-	tprints("}");
+	tprint_struct_end();
 	tprints_comment(sprinttime_nsec(p->sec, p->nsec));
 }
 
@@ -534,7 +534,7 @@ print_btrfs_scrub_progress(const struct btrfs_scrub_progress *const p)
 	PRINT_FIELD_U(*p, last_physical);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, unverified_errors);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -551,7 +551,7 @@ print_btrfs_replace_start_params(const typeof_field(struct_btrfs_ioctl_dev_repla
 	PRINT_FIELD_CSTRING(*p, srcdev_name);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(*p, tgtdev_name);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -580,7 +580,7 @@ print_btrfs_replace_status_params(const typeof_field(struct_btrfs_ioctl_dev_repl
 	PRINT_FIELD_U(*p, num_write_errors);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, num_uncorrectable_read_errors);
-	tprints("}");
+	tprint_struct_end();
 }
 
 MPERS_PRINTER_DECL(int, btrfs_ioctl,
@@ -691,7 +691,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(args, compress_type,
 				 btrfs_compress_types, "BTRFS_COMPRESS_???");
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -714,7 +714,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				tprint_struct_next();
 				PRINT_FIELD_UUID(args, uuid);
 			}
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
@@ -730,7 +730,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, total_bytes);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(args, path);
-		tprints("}");
+		tprint_struct_end();
 
 		break;
 	}
@@ -757,7 +757,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				PRINT_FIELD_OBJ_PTR(args, start,
 						    print_btrfs_replace_start_params);
 			}
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
@@ -769,7 +769,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_OBJ_PTR(args, status,
 					    print_btrfs_replace_status_params);
 		}
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -861,7 +861,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_UUID(args, fsid);
 		tprintf(", nodesize=%u, sectorsize=%u, clone_alignment=%u",
 			nodesize, sectorsize, clone_alignment);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -891,7 +891,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				  "BTRFS_DEV_STATS_???");
 
 		if (entering(tcp)) {
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
@@ -913,7 +913,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			printxval_u(btrfs_dev_stats_values, i, NULL);
 			tprintf("] = %" PRI__u64, args.values[i]);
 		}
-		tprints("]}");
+		tprints("]");
+		tprint_struct_end();
 		break;
 	}
 
@@ -939,7 +940,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			btrfs_print_objectid(args, treeid);
 			tprint_struct_next();
 			btrfs_print_objectid(args, objectid);
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
@@ -950,7 +951,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		}
 
 		PRINT_FIELD_CSTRING(args, name);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -974,14 +975,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_U(args, size);
 			tprint_struct_next();
 			PRINT_FIELD_ADDR64(args, fspath);
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
 		tprint_struct_begin();
 		PRINT_FIELD_OBJ_TCB_VAL(args, fspath, tcp,
 					btrfs_print_ino_path_container);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1015,7 +1016,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 					  "BTRFS_LOGICAL_INO_ARGS_???");
 			tprint_struct_next();
 			PRINT_FIELD_ADDR64(args, inodes);
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
@@ -1023,7 +1024,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_OBJ_TCB_VAL(args, inodes, tcp,
 					btrfs_print_logical_ino_container);
 
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1040,7 +1041,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, src);
 		tprint_struct_next();
 		PRINT_FIELD_U(args, dst);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1055,7 +1056,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, create);
 		tprint_struct_next();
 		PRINT_FIELD_U(args, qgroupid);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1073,7 +1074,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, qgroupid);
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(args, lim, btrfs_print_qgroup_limit);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1087,7 +1088,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(args, cmd, btrfs_qgroup_ctl_cmds,
 				 "BTRFS_QUOTA_CTL_???");
-		tprints("}");
+		tprint_struct_end();
 
 		break;
 	}
@@ -1101,7 +1102,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		tprint_struct_begin();
 		PRINT_FIELD_U(args, flags);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1119,7 +1120,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, flags);
 		tprint_struct_next();
 		btrfs_print_objectid(args, progress);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1146,14 +1147,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 					    print_btrfs_timespec);
 			tprint_struct_next();
 			PRINT_FIELD_U(args, flags);
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 		tprint_struct_begin();
 		PRINT_FIELD_U(args, rtransid);
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(args, rtime, print_btrfs_timespec);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1184,13 +1185,13 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 						  btrfs_scrub_flags,
 						  "BTRFS_SCRUB_???");
 			}
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 		tprint_struct_begin();
 		PRINT_FIELD_OBJ_PTR(args, progress,
 				    print_btrfs_scrub_progress);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1213,7 +1214,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				    entering(tcp), !abbrev(tcp));
 		decode_search_arg_buf(tcp, arg + offsetof(typeof(args), buf),
 				      sizeof(args.buf), args.key.nr_items);
-		tprints("}");
+		tprint_struct_end();
 		if (entering(tcp))
 			return 0;
 		break;
@@ -1231,7 +1232,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				    arg, &args)) {
 					tprint_struct_begin();
 					PRINT_FIELD_U(args, buf_size);
-					tprints("}");
+					tprint_struct_end();
 				}
 			}
 			break;
@@ -1249,7 +1250,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, buf_size);
 		decode_search_arg_buf(tcp, arg + offsetof(typeof(args), buf),
 				      args.buf_size, args.key.nr_items);
-		tprints("}");
+		tprint_struct_end();
 		if (entering(tcp))
 			return 0;
 		break;
@@ -1284,7 +1285,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(args, flags, btrfs_send_flags,
 				  "BTRFS_SEND_FLAGS_???");
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1304,7 +1305,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			tprint_struct_begin();
 			PRINT_FIELD_U(args, space_slots);
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 
@@ -1312,7 +1313,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, total_spaces);
 
 		if (args.space_slots == 0 && args.total_spaces) {
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 
@@ -1326,7 +1327,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				    &info, sizeof(info), tfetch_mem,
 				    print_btrfs_ioctl_space_info, 0);
 		}
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1351,7 +1352,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_FD(args, fd, tcp);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(args, name);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -1385,12 +1386,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			}
 			tprint_struct_next();
 			PRINT_FIELD_CSTRING(args, name);
-			tprints("}");
+			tprint_struct_end();
 			return 0;
 		}
 		tprint_struct_begin();
 		PRINT_FIELD_U(args, transid);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 

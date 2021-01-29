@@ -51,7 +51,7 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -109,7 +109,7 @@ decode_netlink_diag_ring(struct tcb *const tcp,
 	PRINT_FIELD_U(ndr, ndr_frame_size);
 	tprint_struct_next();
 	PRINT_FIELD_U(ndr, ndr_frame_nr);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -175,7 +175,7 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {

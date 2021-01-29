@@ -245,7 +245,7 @@ printsiginfo(struct tcb *tcp, const siginfo_t *sip)
 			print_si_info(tcp, sip);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 MPERS_PRINTER_DECL(void, printsiginfo_at,

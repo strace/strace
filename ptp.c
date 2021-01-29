@@ -42,7 +42,7 @@ print_ptp_clock_time(const struct ptp_clock_time *const p)
 	PRINT_FIELD_D(*p, sec);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, nsec);
-	tprints("}");
+	tprint_struct_end();
 	tprints_comment(sprinttime_nsec(p->sec, p->nsec));
 }
 
@@ -74,7 +74,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_D(extts, index);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(extts, flags, ptp_extts_flags, "PTP_???");
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -95,7 +95,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(perout, flags, ptp_perout_flags,
 				  "PTP_???");
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 
@@ -127,7 +127,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 						       2 * n_samples + 1, tcp,
 						       print_ptp_clock_time_am);
 			}
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 	}
@@ -152,7 +152,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_D(caps, n_per_out);
 		tprint_struct_next();
 		PRINT_FIELD_D(caps, pps);
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 

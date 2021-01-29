@@ -239,7 +239,7 @@ print_dh_params(struct tcb *tcp, kernel_ulong_t addr)
 	PRINT_FIELD_OBJ_VAL(params, prime, print_keyring_serial_number);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_VAL(params, base, print_keyring_serial_number);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -291,7 +291,7 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 						  print_xint32_array_member);
 			}
 
-			tprints("}");
+			tprint_struct_end();
 		}
 	}
 }
@@ -324,7 +324,7 @@ print_pkey_query(struct tcb *tcp, kernel_ulong_t addr)
 				  print_xint32_array_member);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -372,7 +372,7 @@ fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
 				  print_xint32_array_member);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }

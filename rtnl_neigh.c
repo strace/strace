@@ -54,7 +54,7 @@ decode_nda_cacheinfo(struct tcb *const tcp,
 		PRINT_FIELD_U(ci, ndm_updated);
 		tprint_struct_next();
 		PRINT_FIELD_U(ci, ndm_refcnt);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -106,7 +106,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(ndmsg));
 	if (decode_nla && len > offset) {

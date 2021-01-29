@@ -174,7 +174,7 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 		break;
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -227,7 +227,7 @@ print_io_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	PRINT_FIELD_D(*event, res);
 	tprint_struct_next();
 	PRINT_FIELD_D(*event, res2);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -243,7 +243,7 @@ SYS_FUNC(io_cancel)
 		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &cb)) {
 			tprints("{");
 			print_iocb_header(tcp, &cb);
-			tprints("}");
+			tprint_struct_end();
 		}
 		tprints(", ");
 	} else {

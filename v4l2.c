@@ -111,7 +111,7 @@ print_v4l2_rect(const MPERS_PTR_ARG(struct v4l2_rect *) const arg)
 	PRINT_FIELD_U(*p, width);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, height);
-	tprints("}");
+	tprint_struct_end();
 }
 
 #define PRINT_FIELD_FRACT(where_, field_)			\
@@ -215,7 +215,7 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 				  v4l2_device_capabilities_flags,
 				  "V4L2_CAP_???");
 	}
-	tprints("}");
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -249,7 +249,7 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_PIXFMT(f, pixelformat, v4l2_pix_fmts);
 	}
-	tprints("}");
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -264,7 +264,7 @@ print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	const struct_v4l2_clip *p = elem_buf;
 	tprint_struct_begin();
 	PRINT_FIELD_OBJ_PTR(*p, c, print_v4l2_rect);
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -290,7 +290,7 @@ DECL_print_v4l2_format_fmt(pix)
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(*p, colorspace, v4l2_colorspaces,
 			 "V4L2_COLORSPACE_???");
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -304,7 +304,7 @@ print_v4l2_plane_pix_format_array_member(struct tcb *tcp, void *elem_buf,
 	PRINT_FIELD_U(*p, sizeimage);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, bytesperline);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -328,7 +328,7 @@ DECL_print_v4l2_format_fmt(pix_mp)
 			       print_v4l2_plane_pix_format_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, num_planes);
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -356,7 +356,7 @@ DECL_print_v4l2_format_fmt(win)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, global_alpha);
 	}
-	tprints("}");
+	tprint_struct_end();
 	return rc;
 }
 
@@ -377,7 +377,7 @@ DECL_print_v4l2_format_fmt(vbi)
 	PRINT_FIELD_U_ARRAY(*p, count);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*p, flags, v4l2_vbi_flags, "V4L2_VBI_???");
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -391,7 +391,7 @@ DECL_print_v4l2_format_fmt(sliced)
 	PRINT_FIELD_X_ARRAY2D(*p, service_lines);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, io_size);
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -404,7 +404,7 @@ DECL_print_v4l2_format_fmt(sdr)
 		tprint_struct_next();
 		PRINT_FIELD_U(*p, buffersize);
 	}
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -415,7 +415,7 @@ DECL_print_v4l2_format_fmt(meta)
 	PRINT_FIELD_PIXFMT(*p, dataformat, v4l2_meta_fmts);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, buffersize);
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -500,7 +500,7 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 		if (is_get)
 			return 0;
 		if (!print_v4l2_format_fmt(tcp, ", ", &f)) {
-			tprints("}");
+			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
 
@@ -510,7 +510,7 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (!syserror(tcp) && !umove(tcp, arg, &f))
 		print_v4l2_format_fmt(tcp, is_get ? ", " : "} => {", &f);
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -543,7 +543,7 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs))
 		tprintf(" => %u", reqbufs.count);
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -658,7 +658,7 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -676,7 +676,7 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_X(b, flags);
 		tprint_struct_next();
 		PRINT_FIELD_PTR(b, base);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -714,7 +714,7 @@ print_v4l2_streamparm_capture(const struct v4l2_captureparm *const p)
 	PRINT_FIELD_X(*p, extendedmode);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, readbuffers);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -732,7 +732,7 @@ print_v4l2_streamparm_output(const struct v4l2_outputparm *const p)
 	PRINT_FIELD_X(*p, extendedmode);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, writebuffers);
-	tprints("}");
+	tprint_struct_end();
 }
 
 #define PRINT_FIELD_V4L2_STREAMPARM_PARM(where_, parm_, field_)			\
@@ -762,12 +762,12 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 				tprints(", ");
 				break;
 			default:
-				tprints("}");
+				tprint_struct_end();
 				return RVAL_IOCTL_DECODED;
 		}
 	} else {
 		if (syserror(tcp) || umove(tcp, arg, &s) < 0) {
-			tprints("}");
+			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
 		tprints(is_get ? ", " : "} => {");
@@ -782,7 +782,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (entering(tcp)) {
 		return 0;
 	} else {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -811,7 +811,7 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(s, framelines);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -841,7 +841,7 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 				 "V4L2_INPUT_TYPE_???");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -935,7 +935,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 		}
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -961,7 +961,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 	} else {
 		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
-			tprints("}");
+			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
 		tprints(is_get ? ", " : "} => {");
@@ -991,7 +991,7 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (entering(tcp)) {
 		return 0;
 	} else {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -1017,7 +1017,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	/* exiting */
 	if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 
@@ -1053,7 +1053,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	} else {
 		tprints(", ...");
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -1076,7 +1076,7 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	/* exiting */
 	if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 
@@ -1121,7 +1121,7 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	} else {
 		tprints(", ...");
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -1151,7 +1151,7 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_FRACT(c, pixelaspect);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -1180,7 +1180,7 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 		}
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -1203,7 +1203,7 @@ print_v4l2_ext_control(struct tcb *tcp, void *elem_buf, size_t elem_size, void *
 		tprint_struct_next();
 		PRINT_FIELD_D(*p, value64);
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -1224,7 +1224,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprint_struct_next();
 		PRINT_FIELD_U(c, count);
 		if (!c.count) {
-			tprints("}");
+			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
 		if (is_get)
@@ -1232,7 +1232,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		tprints(", ");
 	} else {
 		if (umove(tcp, arg, &c) < 0) {
-			tprints("}");
+			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
 		tprints(is_get ? ", " : "} => {");
@@ -1251,7 +1251,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (exiting(tcp) || fail) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 
@@ -1269,7 +1269,7 @@ print_v4l2_frmsize_discrete(const MPERS_PTR_ARG(struct_v4l2_frmsize_discrete *) 
 	PRINT_FIELD_U(*p, width);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, height);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -1288,7 +1288,7 @@ print_v4l2_frmsize_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmsize_stepwise *) 
 	PRINT_FIELD_U(*p, max_height);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, step_height);
-	tprints("}");
+	tprint_struct_end();
 }
 
 #define PRINT_FIELD_V4L2_FRMSIZE_TYPE(where_, field_)			\
@@ -1328,7 +1328,7 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 			break;
 		}
 	}
-	tprints("}");
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -1344,7 +1344,7 @@ print_v4l2_frmival_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmival_stepwise *) 
 	PRINT_FIELD_FRACT(*p, max);
 	tprint_struct_next();
 	PRINT_FIELD_FRACT(*p, step);
-	tprints("}");
+	tprint_struct_end();
 }
 
 #define PRINT_FIELD_V4L2_FRMIVAL_STEPWISE(where_, field_)		\
@@ -1390,7 +1390,7 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 		}
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -1403,7 +1403,7 @@ print_v4l2_create_buffers_format(const typeof_field(struct_v4l2_create_buffers, 
 	PRINT_FIELD_XVAL(*p, type, v4l2_buf_types,
 			 "V4L2_BUF_TYPE_???");
 	print_v4l2_format_fmt(tcp, ", ", (const struct_v4l2_format *) p);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static int
@@ -1426,7 +1426,7 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(b, format,
 				    print_v4l2_create_buffers_format, tcp);
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 	}
 

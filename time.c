@@ -27,7 +27,7 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_D(tz, tz_minuteswest);
 	tprint_struct_next();
 	PRINT_FIELD_D(tz, tz_dsttime);
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(gettimeofday)

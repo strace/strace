@@ -54,7 +54,7 @@ decode_ifa_cacheinfo(struct tcb *const tcp,
 		PRINT_FIELD_U(ci, cstamp);
 		tprint_struct_next();
 		PRINT_FIELD_U(ci, tstamp);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -116,7 +116,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(ifaddr));
 	if (decode_nla && len > offset) {

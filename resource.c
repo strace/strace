@@ -53,7 +53,7 @@ print_rlimit64(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_OBJ_VAL(rlim, rlim_cur, print_rlim64_t);
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_VAL(rlim, rlim_max, print_rlim64_t);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 
@@ -95,7 +95,7 @@ print_rlimit32(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_OBJ_VAL(rlim, rlim_cur, print_rlim32_t);
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_VAL(rlim, rlim_max, print_rlim32_t);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 

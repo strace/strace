@@ -125,7 +125,7 @@ print_fs_qfilestat(const struct fs_qfilestat *const p)
 	PRINT_FIELD_U(*p, qfs_nblks);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, qfs_nextents);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -137,7 +137,7 @@ print_fs_qfilestatv(const struct fs_qfilestatv *const p)
 	PRINT_FIELD_U(*p, qfs_nblks);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, qfs_nextents);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static int
@@ -197,7 +197,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		} else {
 			tprints(", ...");
 		}
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 	case Q_GETNEXTQUOTA:
@@ -240,7 +240,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			PRINT_FIELD_U(dq, dqb_id);
 			tprints(", ...");
 		}
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 	case Q_XGETQUOTA:
@@ -307,7 +307,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		} else {
 			tprints(", ...");
 		}
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 	case Q_GETFMT:
@@ -352,7 +352,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		PRINT_FIELD_FLAGS(dq, dqi_flags, if_dqinfo_flags, "DQF_???");
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(dq, dqi_valid, if_dqinfo_valid, "IIF_???");
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 	case Q_XGETQSTAT:
@@ -392,7 +392,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			} else {
 				tprints(", ...");
 			}
-			tprints("}");
+			tprint_struct_end();
 		}
 		break;
 	}
@@ -438,7 +438,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		} else {
 			tprints(", ...");
 		}
-		tprints("}");
+		tprint_struct_end();
 		break;
 	}
 	case Q_XQUOTAON:

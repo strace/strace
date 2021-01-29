@@ -76,7 +76,8 @@ SYS_FUNC(name_to_handle_at)
 				}
 			}
 		}
-		tprints("}, ");
+		tprint_struct_end();
+		tprints(", ");
 
 		/* mount_id */
 		printnum_int(tcp, tcp->u_arg[3], "%d");
@@ -114,7 +115,7 @@ SYS_FUNC(open_by_handle_at)
 			for (i = 0; i < h.handle_bytes; ++i)
 				tprintf("%02x", f_handle[i]);
 		}
-		tprints("}");
+		tprint_struct_end();
 	}
 	tprints(", ");
 

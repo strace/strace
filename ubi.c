@@ -53,7 +53,7 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_CSTRING_SZ(mkvol, name,
 				       1 + CLAMP(mkvol.name_len, 0,
 						 (int) sizeof(mkvol.name) - 1));
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 	}
 
@@ -76,7 +76,7 @@ decode_UBI_IOCRSVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(rsvol, bytes);
 		tprint_struct_next();
 		PRINT_FIELD_D(rsvol, vol_id);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -96,7 +96,7 @@ print_ubi_rnvol_req_ent_array_member(struct tcb *tcp, void *elem_buf,
 	PRINT_FIELD_CSTRING_SZ(*p, name,
 			       1 + CLAMP(p->name_len, 0,
 				         (int) sizeof(p->name) - 1));
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -115,7 +115,7 @@ decode_UBI_IOCRNVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(rnvol, ents, rnvol.count, tcp,
 			       print_ubi_rnvol_req_ent_array_member);
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -133,7 +133,7 @@ decode_UBI_IOCEBCH(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(leb, bytes);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(leb, dtype, ubi_data_types, "UBI_???");
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -157,7 +157,7 @@ decode_UBI_IOCATT(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(attach, vid_hdr_offset);
 		tprint_struct_next();
 		PRINT_FIELD_D(attach, max_beb_per1024);
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 	}
 
@@ -180,7 +180,7 @@ decode_UBI_IOCEBMAP(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(map, lnum);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(map, dtype, ubi_data_types, "UBI_???");
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -198,7 +198,7 @@ decode_UBI_IOCSETVOLPROP(struct tcb *const tcp, const kernel_ulong_t arg)
 				 ubi_volume_props, "UBI_VOL_PROP_???");
 		tprint_struct_next();
 		PRINT_FIELD_X(prop, value);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;

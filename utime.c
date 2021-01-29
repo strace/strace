@@ -30,7 +30,7 @@ SYS_FUNC(utime)
 		tprint_struct_next();
 		PRINT_FIELD_D(u, modtime);
 		tprints_comment(sprinttime(u.modtime));
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_DECODED;

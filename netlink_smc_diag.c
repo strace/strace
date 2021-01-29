@@ -55,7 +55,7 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -67,7 +67,7 @@ print_smc_diag_cursor(const struct smc_diag_cursor *const cursor)
 	PRINT_FIELD_U(*cursor, wrap);
 	tprint_struct_next();
 	PRINT_FIELD_U(*cursor, count);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -113,7 +113,7 @@ decode_smc_diag_conninfo(struct tcb *const tcp,
 	PRINT_FIELD_OBJ_PTR(cinfo, tx_sent, print_smc_diag_cursor);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(cinfo, tx_fin, print_smc_diag_cursor);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -133,7 +133,7 @@ print_smc_diag_linkinfo_array_member(struct tcb *tcp, void *elem_buf,
 	PRINT_FIELD_CSTRING(*p, gid);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(*p, peer_gid);
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -155,7 +155,7 @@ decode_smc_diag_lgrinfo(struct tcb *const tcp,
 			  print_smc_diag_linkinfo_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(linfo, role, smc_link_group_roles, "SMC_???");
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -197,7 +197,7 @@ decode_smc_diag_dmbinfo(struct tcb *const tcp,
 	PRINT_FIELD_X(dinfo, token);
 	tprint_struct_next();
 	PRINT_FIELD_X(dinfo, peer_token);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -224,7 +224,7 @@ decode_smc_diag_fallback(struct tcb *const tcp,
 	tprints(", peer_diagnosis=");
 	printxval_ex(smc_decl_codes, fb.peer_diagnosis, "SMC_CLC_DECL_???",
 		     XLAT_STYLE_VERBOSE);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -271,7 +271,7 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {

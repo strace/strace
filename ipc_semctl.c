@@ -48,7 +48,7 @@ print_ipc_perm(const typeof_field(semid_ds_t, sem_perm) *const p,
 		tprint_struct_next();
 		PRINT_FIELD_ID(*p, cgid);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -76,7 +76,7 @@ print_semid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		PRINT_FIELD_U(ds, sem_nsems);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -116,7 +116,7 @@ print_seminfo(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_D(info, semvmx);
 	tprint_struct_next();
 	PRINT_FIELD_D(info, semaem);
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(semctl)

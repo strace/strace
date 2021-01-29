@@ -31,7 +31,7 @@ SYS_FUNC(ustat)
 			PRINT_FIELD_U(ust, f_tfree);
 			tprint_struct_next();
 			PRINT_FIELD_U(ust, f_tinode);
-			tprints("}");
+			tprint_struct_end();
 		}
 #else /* !HAVE_USTAT_H */
 		printaddr(tcp->u_arg[1]);

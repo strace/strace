@@ -61,7 +61,7 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(id, h_cmd_per_lun);
 		tprint_struct_next();
 		PRINT_FIELD_D(id, d_queue_depth);
-		tprints("}");
+		tprint_struct_end();
 	}
 	return RVAL_IOCTL_DECODED;
 }
@@ -87,7 +87,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 			uint32_t *piid = get_tcb_priv_data(tcp);
 			if (piid)
 				decode_sg_io(tcp, *piid, arg);
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 

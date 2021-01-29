@@ -41,7 +41,7 @@ tee_print_buf(struct_tee_ioctl_buf_data *buf)
 	PRINT_FIELD_U(*buf, buf_len);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(*buf, buf_ptr);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static int
@@ -123,7 +123,7 @@ tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data
 		PRINT_FIELD_X(*param, c);
 		break;
 	}
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -165,7 +165,7 @@ tee_version(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_X(version, impl_caps);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -223,11 +223,11 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(open_session, num_params);
 		tee_print_params(tcp, params, open_session.num_params);
 
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 
 	} else {
@@ -248,7 +248,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 				 "TEEC_ORIGIN_???");
 		tee_print_params(tcp, params, open_session.num_params);
 
-		tprints("}}");
+		tprint_struct_end();
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -280,11 +281,11 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(invoke, num_params);
 		tee_print_params(tcp, params, invoke.num_params);
 
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 
 	} else {
@@ -299,7 +300,8 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 				 "TEEC_ORIGIN_???");
 		tee_print_params(tcp, params, invoke.num_params);
 
-		tprints("}}");
+		tprint_struct_end();
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -318,7 +320,7 @@ tee_cancel(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_SESSION(cancel, session);
 
-	tprints("}");
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -334,7 +336,7 @@ tee_close_session(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_begin();
 	PRINT_FIELD_SESSION(close_session, session);
 
-	tprints("}");
+	tprint_struct_end();
 	return RVAL_IOCTL_DECODED;
 }
 
@@ -361,11 +363,11 @@ tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(supp_recv, num_params);
 		tee_print_params(tcp, params, supp_recv.num_params);
 
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 
 	} else {
@@ -378,7 +380,8 @@ tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(supp_recv, num_params);
 		tee_print_params(tcp, params, supp_recv.num_params);
 
-		tprints("}}");
+		tprint_struct_end();
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -404,11 +407,11 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(supp_send, num_params);
 		tee_print_params(tcp, params, supp_send.num_params);
 
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 
 	} else {
@@ -420,7 +423,8 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(supp_send, ret);
 		tee_print_params(tcp, params, supp_send.num_params);
 
-		tprints("}}");
+		tprint_struct_end();
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -440,7 +444,7 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(shm_alloc, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
@@ -459,7 +463,7 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_D(shm_alloc, id);
 
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -479,7 +483,7 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(shm_register_fd, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
@@ -495,7 +499,7 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_D(shm_register_fd, id);
 
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }
@@ -517,7 +521,7 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(shm_register, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 
 	} else if (syserror(tcp)) {
@@ -536,7 +540,7 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_D(shm_register, id);
 
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 }

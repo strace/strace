@@ -45,7 +45,7 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 	PRINT_FIELD_D(attr, mq_msgsize);
 	tprint_struct_next();
 	PRINT_FIELD_D(attr, mq_curmsgs);
-	tprints("}");
+	tprint_struct_end();
 #else
 	printaddr(addr);
 #endif

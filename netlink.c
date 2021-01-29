@@ -454,7 +454,7 @@ print_nlmsghdr(struct tcb *tcp,
 
 	tprint_struct_next();
 	PRINT_FIELD_TGID(*nlmsghdr, nlmsg_pid, tcp);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -541,7 +541,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 		}
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static const netlink_decoder_t netlink_decoders[] = {
@@ -615,7 +615,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 		tprints(", ");
 		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
 						     nlmsg_len - NLMSG_HDRLEN);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 

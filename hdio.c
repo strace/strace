@@ -44,7 +44,7 @@ print_hdio_getgeo(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(geo, cylinders);
 	tprint_struct_next();
 	PRINT_FIELD_U(geo, start);
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -71,7 +71,7 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(c, feature);
 		tprint_struct_next();
 		PRINT_FIELD_U(c, sector_count);
-		tprints("}");
+		tprint_struct_end();
 
 		return 0;
 	}
@@ -89,7 +89,7 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 			    QUOTE_FORCE_HEX);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }

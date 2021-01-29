@@ -421,7 +421,7 @@ print_perf_event_attr_out:
 	    (!attr->size && (size < PERF_ATTR_SIZE_VER0)))
 		tprints(", ...");
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(perf_event_open)

@@ -112,7 +112,7 @@ MPERS_PRINTER_DECL(int, print_itimerval,
 	PRINT_FIELD_OBJ_PTR(t, it_interval, print_timeval_t);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(t, it_value, print_timeval_t);
-	tprints("}");
+	tprint_struct_end();
 	return 0;
 }
 
@@ -172,7 +172,7 @@ print_itimerval32(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_OBJ_PTR(t, it_interval, print_timeval32_t);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(t, it_value, print_timeval32_t);
-	tprints("}");
+	tprint_struct_end();
 	return 0;
 }
 

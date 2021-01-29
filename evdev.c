@@ -100,7 +100,7 @@ abs_ioctl(struct tcb *const tcp, const unsigned int code,
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -147,7 +147,7 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -168,7 +168,7 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(id, product);
 		tprint_struct_next();
 		PRINT_FIELD_U(id, version);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -268,7 +268,8 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 	for (i = 1; i < ARRAY_SIZE(buffer); i++)
 		tprintf("%s%d", i > 1 ? ", " : "", buffer[i]);
 
-	tprints("]}");
+	tprints("]");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }

@@ -42,7 +42,7 @@ print_epoll_data(const epoll_data_t data)
 	PRINT_FIELD_U(data, u32);
 	tprint_struct_next();
 	PRINT_FIELD_U(data, u64);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -54,7 +54,7 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	PRINT_FIELD_FLAGS(*ev, events, epollevents, "EPOLL???");
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_VAL(*ev, data, print_epoll_data);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }

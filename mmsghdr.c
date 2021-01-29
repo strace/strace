@@ -53,7 +53,7 @@ print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
 		PRINT_FIELD_U(*mmsg, msg_len);
 		--c->msg_len_vlen;
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	if (c->p_user_msg_namelen)
 		++c->p_user_msg_namelen;

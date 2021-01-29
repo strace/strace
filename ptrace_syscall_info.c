@@ -285,7 +285,7 @@ print_psi_entry(const typeof_field(struct_ptrace_syscall_info, entry) *const p,
 		PRINT_FIELD_ARRAY_UPTO(*p, args, nargs, tcp,
 				       print_xint64_array_member);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -306,7 +306,7 @@ print_psi_seccomp(const typeof_field(struct_ptrace_syscall_info, seccomp) *const
 		tprint_struct_next();
 		PRINT_FIELD_U(*p, ret_data);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -323,7 +323,7 @@ print_psi_exit(const typeof_field(struct_ptrace_syscall_info, exit) *const p,
 		tprint_struct_next();
 		PRINT_FIELD_U(*p, is_error);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 void
@@ -381,5 +381,5 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 	}
 
 printed:
-	tprints("}");
+	tprint_struct_end();
 }

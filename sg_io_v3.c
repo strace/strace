@@ -57,7 +57,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprints("{interface_id='S', ");
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.dxfer_direction)) {
-		tprints("}");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 

@@ -35,7 +35,7 @@ print_struct_flock64(struct tcb *const tcp, const struct_kernel_flock64 *fl, con
 		tprint_struct_next();
 		PRINT_FIELD_TGID(*fl, l_pid, tcp);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -82,7 +82,7 @@ print_f_owner_ex(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 	tprints(", pid=");
 	printpid(tcp, owner.pid, pid_type);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static int

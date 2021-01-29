@@ -41,7 +41,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(dcb));
 	if (decode_nla && len > offset) {

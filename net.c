@@ -602,7 +602,7 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 			      linger, l_onoff, len, PRINT_FIELD_D);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      linger, l_linger, len, PRINT_FIELD_D);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -628,7 +628,7 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 			      uc, uid, len, PRINT_FIELD_ID);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      uc, gid, len, PRINT_FIELD_ID);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -673,7 +673,7 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 			      stats, tp_drops, len, PRINT_FIELD_U);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
-	tprints("}");
+	tprint_struct_end();
 }
 #endif /* PACKET_STATISTICS */
 
@@ -839,7 +839,7 @@ print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_D(linger, l_onoff);
 		tprint_struct_next();
 		PRINT_FIELD_D(linger, l_linger);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 
@@ -857,7 +857,7 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_INET_ADDR(mreq, imr_multiaddr, AF_INET);
 		tprint_struct_next();
 		PRINT_FIELD_INET_ADDR(mreq, imr_interface, AF_INET);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 #endif /* IP_ADD_MEMBERSHIP */
@@ -876,7 +876,7 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_INET_ADDR(mreq, ipv6mr_multiaddr, AF_INET6);
 		tprint_struct_next();
 		PRINT_FIELD_IFINDEX(mreq, ipv6mr_interface);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 #endif /* IPV6_ADD_MEMBERSHIP */
@@ -899,7 +899,7 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 		PRINT_FIELD_U(req, tp_frame_size);
 		tprint_struct_next();
 		PRINT_FIELD_U(req, tp_frame_nr);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 #endif /* PACKET_RX_RING */
@@ -925,7 +925,7 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 		PRINT_FIELD_U(mreq, mr_alen);
 		tprint_struct_next();
 		PRINT_FIELD_MAC_SZ(mreq, mr_address, mreq.mr_alen);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 #endif /* PACKET_ADD_MEMBERSHIP */

@@ -33,7 +33,7 @@ MPERS_PRINTER_DECL(void, print_group_req, struct tcb *const tcp,
 		PRINT_FIELD_IFINDEX(greq, gr_interface);
 		tprint_struct_next();
 		PRINT_FIELD_SOCKADDR(greq, gr_group, tcp);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 

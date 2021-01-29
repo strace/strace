@@ -37,7 +37,7 @@ tprintf_uffdio_range(const struct uffdio_range *range)
 	PRINT_FIELD_X(*range, start);
 	tprint_struct_next();
 	PRINT_FIELD_X(*range, len);
-	tprints("}");
+	tprint_struct_end();
 }
 
 int
@@ -83,7 +83,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 					  "_UFFDIO_???");
 		}
 
-		tprints("}");
+		tprint_struct_end();
 
 		break;
 	}
@@ -113,7 +113,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			PRINT_FIELD_X(uc, copy);
 		}
 
-		tprints("}");
+		tprint_struct_end();
 
 		break;
 	}
@@ -143,7 +143,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 					  "UFFDIO_???");
 		}
 
-		tprints("}");
+		tprint_struct_end();
 
 		break;
 	}
@@ -182,7 +182,7 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			PRINT_FIELD_X(uz, zeropage);
 		}
 
-		tprints("}");
+		tprint_struct_end();
 
 		break;
 	}

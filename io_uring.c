@@ -60,7 +60,7 @@ print_io_sqring_offsets(const struct_io_sqring_offsets *const p)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv2);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -88,7 +88,7 @@ print_io_cqring_offsets(const struct_io_cqring_offsets *const p)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv2);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(io_uring_setup)
@@ -143,7 +143,7 @@ SYS_FUNC(io_uring_setup)
 		PRINT_FIELD_OBJ_PTR(params, cq_off,
 				    print_io_cqring_offsets);
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_DECODED | RVAL_FD;
 }
@@ -195,7 +195,7 @@ print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 	print_big_u64_addr(arg.fds);
 	print_array(tcp, arg.fds, nargs, &buf, sizeof(buf),
 		    tfetch_mem, print_fd_array_member, NULL);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -216,7 +216,7 @@ print_io_uring_probe_op(struct tcb *tcp, void *elem_buf, size_t elem_size,
 		tprint_struct_next();
 		PRINT_FIELD_X(*op, resv2);
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -272,7 +272,7 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 			entering(tcp) ? nargs : probe->ops_len,
 			sizeof(probe->ops[0]), print_io_uring_probe_op,
 			NULL, 0, NULL, NULL);
-	tprints("}");
+	tprint_struct_end();
 
 	return 0;
 }

@@ -342,7 +342,7 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_OBJ_VAL(sa, sa_restorer, printaddr);
 	}
 #endif
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(sigaction)
@@ -573,7 +573,7 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_OBJ_VAL(sa, sa_restorer, printaddr);
 	}
 #endif
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(rt_sigaction)

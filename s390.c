@@ -611,7 +611,7 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -757,7 +757,7 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -913,7 +913,7 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -1093,7 +1093,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 # define STHYI_PRINT_STRUCT(l_, name_) \
@@ -1227,7 +1227,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	PRINT_UNKNOWN_TAIL(hdr, hdr->infhdln);
 
 sthyi_sections:
-	tprints("}");
+	tprint_struct_end();
 
 	STHYI_PRINT_STRUCT(m, machine);
 	STHYI_PRINT_STRUCT(p, partition);
@@ -1239,7 +1239,7 @@ sthyi_sections:
 	STHYI_PRINT_HV_STRUCT(h, 3, hypervisor);
 	STHYI_PRINT_HV_STRUCT(g, 3, guest);
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 /**
@@ -1404,7 +1404,8 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 		tprints(", ...");
 	}
 
-	tprints("}]");
+	tprint_struct_end();
+	tprints("]");
 }
 
 # define DIV_ROUND_UP(x,y) (((x) + ((y) - 1)) / (y))
@@ -1446,7 +1447,7 @@ guard_storage_print_gscb(struct tcb *tcp, kernel_ulong_t addr)
 	PRINT_FIELD_OBJ_TCB_VAL(gscb, gs_epl_a, tcp,
 				guard_storage_print_gsepl);
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(s390_guarded_storage)

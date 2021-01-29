@@ -47,7 +47,7 @@ random_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", buf=");
 			buf = arg + offsetof(struct rand_pool_info, buf);
 			printstrn(tcp, buf, info.buf_size);
-			tprints("}");
+			tprint_struct_end();
 		}
 		break;
 

@@ -53,7 +53,7 @@ bpf_cmd_decoder(struct tcb *const tcp,					\
 #define END_BPF_CMD_DECODER(rval)					\
 			decode_attr_extra_data(tcp, data, size, attr_size); \
 		} while (0);						\
-		tprints("}");						\
+		tprint_struct_end();						\
 		return (rval);						\
 	}								\
 /* End of END_BPF_CMD_DECODER definition. */
@@ -140,7 +140,7 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 	PRINT_FIELD_D(*insn, off);
 	tprint_struct_next();
 	PRINT_FIELD_X(*insn, imm);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -491,7 +491,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
 		tprint_struct_next();
 		PRINT_FIELD_ADDR64(attr, ctx_out);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -643,7 +643,7 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	decode_attr_extra_data(tcp, info_buf, size, bpf_map_info_struct_size);
 
 print_bpf_map_info_end:
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -857,7 +857,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 
 print_bpf_prog_info_end:
-	tprints("}");
+	tprint_struct_end();
 }
 
 static const char *
@@ -957,7 +957,7 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 	if (entering(tcp))
 		return 0;
 
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -997,7 +997,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 	if (prog_cnt_entering != attr.prog_cnt)
 		tprintf("%" PRIu32 " => ", prog_cnt_entering);
 	tprintf("%" PRIu32, attr.prog_cnt);
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -1012,7 +1012,7 @@ BEGIN_BPF_CMD_DECODER(BPF_RAW_TRACEPOINT_OPEN)
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, prog_fd, tcp);
 
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -1076,7 +1076,7 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 	tprint_struct_next();
 	PRINT_FIELD_X(attr, probe_addr);
 
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -1105,7 +1105,7 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_X(attr, flags);
 
-		tprints("}");
+		tprint_struct_end();
 	} else {
 		unsigned long count = get_tcb_priv_ulong(tcp);
 
@@ -1115,7 +1115,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_BATCH)
 			tprints_field_name("batch");
 			tprint_struct_begin();
 			PRINT_FIELD_U(attr, count);
-			tprints("}}");
+			tprint_struct_end();
+			tprint_struct_end();
 		}
 
 		return RVAL_DECODED;
@@ -1146,7 +1147,7 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_X(attr, flags);
 
-		tprints("}");
+		tprint_struct_end();
 	} else {
 		unsigned long count = get_tcb_priv_ulong(tcp);
 
@@ -1156,7 +1157,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_BATCH)
 			tprints_field_name("batch");
 			tprint_struct_begin();
 			PRINT_FIELD_U(attr, count);
-			tprints("}}");
+			tprint_struct_end();
+			tprint_struct_end();
 		}
 
 		return RVAL_DECODED;
@@ -1183,7 +1185,7 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 		tprint_struct_next();
 		PRINT_FIELD_X(attr, flags);
 
-		tprints("}");
+		tprint_struct_end();
 	} else {
 		unsigned long count = get_tcb_priv_ulong(tcp);
 
@@ -1193,7 +1195,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 			tprints_field_name("batch");
 			tprint_struct_begin();
 			PRINT_FIELD_U(attr, count);
-			tprints("}}");
+			tprint_struct_end();
+			tprint_struct_end();
 		}
 
 		return RVAL_DECODED;
@@ -1213,7 +1216,7 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 	tprint_struct_next();
 	PRINT_FIELD_X(attr, flags);
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
@@ -1231,7 +1234,7 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_UPDATE)
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, old_prog_fd, tcp);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 

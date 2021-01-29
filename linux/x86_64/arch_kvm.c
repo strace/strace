@@ -58,7 +58,7 @@ arch_print_kvm_regs(struct tcb *const tcp,
 	tprint_struct_next();
 	PRINT_FIELD_X(*regs, rflags);
 
-	tprints("}");
+	tprint_struct_end();
 }
 #endif	/* HAVE_STRUCT_KVM_REGS */
 
@@ -88,7 +88,7 @@ kvm_ioctl_decode_regs_segment(const struct kvm_segment *const segment)
 	PRINT_FIELD_U(*segment, g);
 	tprint_struct_next();
 	PRINT_FIELD_U(*segment, avl);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -98,7 +98,7 @@ kvm_ioctl_decode_regs_dtable(const struct kvm_dtable *const dtable)
 	PRINT_FIELD_X(*dtable, base);
 	tprint_struct_next();
 	PRINT_FIELD_U(*dtable, limit);
-	tprints("}");
+	tprint_struct_end();
 }
 
 # define PRINT_FIELD_KVM_SREGS_STRUCT(where_, field_, type_)	\
@@ -113,7 +113,8 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 	tprint_struct_begin();
 	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, cs, segment);
 	if (abbrev(tcp)) {
-		tprints(", ...}");
+		tprints(", ...");
+		tprint_struct_end();
 		return;
 	}
 
@@ -151,6 +152,6 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 	PRINT_FIELD_X(*sregs, apic_base);
 	tprint_struct_next();
 	PRINT_FIELD_X_ARRAY(*sregs, interrupt_bitmap);
-	tprints("}");
+	tprint_struct_end();
 }
 #endif	/* HAVE_STRUCT_KVM_SREGS */

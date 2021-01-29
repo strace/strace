@@ -38,7 +38,7 @@ print_ff_envelope(const MPERS_PTR_ARG(struct ff_envelope *) const arg)
 	PRINT_FIELD_U(*p, fade_length);
 	tprint_struct_next();
 	PRINT_FIELD_X(*p, fade_level);
-	tprints("}");
+	tprint_struct_end();
 }
 
 #define DECL_print_ff(name_)	\
@@ -51,7 +51,7 @@ DECL_print_ff(trigger)
 	PRINT_FIELD_U(*p, button);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, interval);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -61,7 +61,7 @@ DECL_print_ff(replay)
 	PRINT_FIELD_U(*p, length);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, delay);
-	tprints("}");
+	tprint_struct_end();
 }
 
 # define PRINT_FIELD_FF_EFFECT(where_, field_)			\
@@ -80,7 +80,7 @@ DECL_print_ff_effect(constant)
 	PRINT_FIELD_D(*p, level);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(*p, envelope, print_ff_envelope);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -92,7 +92,7 @@ DECL_print_ff_effect(ramp)
 	PRINT_FIELD_D(*p, end_level);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(*p, envelope, print_ff_envelope);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -114,7 +114,7 @@ DECL_print_ff_effect(periodic)
 	PRINT_FIELD_U(*p, custom_len);
 	tprint_struct_next();
 	PRINT_FIELD_PTR(*p, custom_data);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -124,7 +124,7 @@ DECL_print_ff_effect(rumble)
 	PRINT_FIELD_U(*p, strong_magnitude);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, weak_magnitude);
-	tprints("}");
+	tprint_struct_end();
 }
 
 # define PRINT_FIELD_FF_TYPE_EFFECT(where_, field_)			\
@@ -151,7 +151,8 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(ffe, direction);
 
 	if (abbrev(tcp)) {
-		tprints(", ...}");
+		tprints(", ...");
+		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 
@@ -181,7 +182,7 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		break;
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }

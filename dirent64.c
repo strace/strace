@@ -51,7 +51,7 @@ decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
 		tprints(", d_name=");
 		rc = printpathn(tcp, addr, d_name_len - 1);
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return rc;
 }

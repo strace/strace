@@ -45,7 +45,7 @@ print_ipc_perm(const typeof_field(msqid_ds_t, msg_perm) *const p,
 		tprint_struct_next();
 		PRINT_FIELD_ID(*p, cgid);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -77,7 +77,7 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		PRINT_FIELD_D(msqid_ds, msg_lrpid);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -105,7 +105,7 @@ print_msginfo(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_D(info, msgtql);
 	tprint_struct_next();
 	PRINT_FIELD_U(info, msgseg);
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(msgctl)

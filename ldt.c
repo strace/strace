@@ -39,8 +39,10 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (!addr || !verbose(tcp))
 			return;
 		if (syserror(tcp) || umove(tcp, addr, &desc)) {
-			if (entry_number)
-				tprints(", ...}");
+			if (entry_number) {
+				tprints(", ...");
+				tprint_struct_end();
+			}
 
 			return;
 		}
@@ -121,7 +123,7 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 		}
 # endif /* HAVE_STRUCT_USER_DESC_LM */
 
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 

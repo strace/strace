@@ -241,7 +241,7 @@ SYS_FUNC(clone3)
 					    MIN(size, get_pagesize()),
 					    QUOTE_FORCE_HEX);
 
-		tprints("}");
+		tprint_struct_end();
 
 		if ((arg.flags & (CLONE_PIDFD | CLONE_PARENT_SETTID)) ||
 		    (size > fetch_size))
@@ -290,7 +290,7 @@ SYS_FUNC(clone3)
 	}
 
 	if (pfx != initial_pfx)
-		tprints("}");
+		tprint_struct_end();
 
 out:
 	tprintf(", %" PRI_klu, size);

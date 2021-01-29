@@ -53,7 +53,7 @@ SYS_FUNC(sysinfo)
 		PRINT_FIELD_U(si, freehigh);
 		tprint_struct_next();
 		PRINT_FIELD_U(si, mem_unit);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return 0;

@@ -62,7 +62,7 @@ print_nlattr(const struct nlattr *const nla,
 		tprints("|");
 	}
 	printxval(table, nla->nla_type & NLA_TYPE_MASK, dflt);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -99,7 +99,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 		    )
 			printstr_ex(tcp, addr + NLA_HDRLEN,
 				    nla_len - NLA_HDRLEN, QUOTE_FORCE_HEX);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 

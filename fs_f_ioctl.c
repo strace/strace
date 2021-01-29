@@ -31,7 +31,7 @@ print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*fe, fe_flags, fiemap_extent_flags,
 			  "FIEMAP_EXTENT_???");
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -61,7 +61,7 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 				  "FIEMAP_FLAG_???");
 		tprint_struct_next();
 		PRINT_FIELD_U(args, fm_extent_count);
-		tprints("}");
+		tprint_struct_end();
 		return 0;
 	}
 
@@ -78,7 +78,7 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 			    args.fm_mapped_extents, &fe, sizeof(fe),
 			    tfetch_mem, print_fiemap_extent, 0);
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }

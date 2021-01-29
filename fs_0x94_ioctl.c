@@ -28,7 +28,7 @@ decode_file_clone_range(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(range, src_length);
 		tprint_struct_next();
 		PRINT_FIELD_U(range, dest_offset);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 
@@ -58,7 +58,7 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 		tprint_struct_next();
 		PRINT_FIELD_D(*info, status);
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -104,7 +104,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 			 tfetch_mem,
 			 print_file_dedupe_range_info, limit);
 
-	tprints("}");
+	tprint_struct_end();
 
 	if (!rc || exiting(tcp))
 		return RVAL_IOCTL_DECODED;

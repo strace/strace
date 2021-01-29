@@ -172,7 +172,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprints(", string=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			     QUOTE_0_TERMINATED);
-		tprints("}");
+		tprint_struct_end();
 
 		if (entering(tcp))
 			offset += s.next;
@@ -237,7 +237,7 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	print_array(tcp, addr + offset_end, s.count, &dev_buf, sizeof(dev_buf),
 		    tfetch_mem, dm_print_dev, NULL);
 
-	tprints("}");
+	tprint_struct_end();
 
 	return;
 
@@ -318,7 +318,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 				tprintf(", event_nr=%" PRIu32, event_nr);
 		}
 
-		tprints("}");
+		tprint_struct_end();
 
 		if (!s.next)
 			break;
@@ -420,7 +420,7 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprints(", message=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
-		tprints("}");
+		tprint_struct_end();
 	} else {
 		tprints("???");
 		tprints_comment("misplaced struct dm_target_msg");
@@ -588,7 +588,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
  skip:
-	tprints("}");
+	tprint_struct_end();
 	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
 }
 

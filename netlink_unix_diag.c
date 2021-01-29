@@ -45,7 +45,7 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_req)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -65,7 +65,7 @@ decode_unix_diag_vfs(struct tcb *const tcp,
 	PRINT_FIELD_DEV(uv, udiag_vfs_dev);
 	tprint_struct_next();
 	PRINT_FIELD_U(uv, udiag_vfs_ino);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -116,7 +116,7 @@ decode_unix_diag_rqlen(struct tcb *const tcp,
 	PRINT_FIELD_U(rql, udiag_rqueue);
 	tprint_struct_next();
 	PRINT_FIELD_U(rql, udiag_wqueue);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -158,7 +158,7 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {

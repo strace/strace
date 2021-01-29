@@ -73,7 +73,7 @@ print_cap_header(struct tcb *const tcp, const kernel_ulong_t addr,
 			 "_LINUX_CAPABILITY_VERSION_???");
 	tprint_struct_next();
 	PRINT_FIELD_TGID(*h, pid, tcp);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -116,7 +116,7 @@ print_cap_data(struct tcb *const tcp, const kernel_ulong_t addr,
 	print_cap_bits(data[0].permitted, len > 1 ? data[1].permitted : 0);
 	tprints(", inheritable=");
 	print_cap_bits(data[0].inheritable, len > 1 ? data[1].inheritable : 0);
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(capget)

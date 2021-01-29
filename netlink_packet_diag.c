@@ -49,7 +49,7 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -77,7 +77,7 @@ decode_packet_diag_info(struct tcb *const tcp,
 	PRINT_FIELD_U(pinfo, pdi_tstamp);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(pinfo, pdi_flags, packet_diag_info_flags, "PDI_???");
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -99,7 +99,7 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 	PRINT_FIELD_U(*dml, pdmc_alen);
 	tprint_struct_next();
 	PRINT_FIELD_STRING(*dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -149,7 +149,7 @@ decode_packet_diag_ring(struct tcb *const tcp,
 	PRINT_FIELD_U(pdr, pdr_sizeof_priv);
 	tprint_struct_next();
 	PRINT_FIELD_U(pdr, pdr_features);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -206,7 +206,7 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {

@@ -27,7 +27,8 @@ SYS_FUNC(uname)
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(uname, nodename);
 		if (abbrev(tcp)) {
-			tprints(", ...}");
+			tprints(", ...");
+			tprint_struct_end();
 			return 0;
 		}
 		tprint_struct_next();
@@ -40,7 +41,7 @@ SYS_FUNC(uname)
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(uname, domainname);
 #endif
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return 0;

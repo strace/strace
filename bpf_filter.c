@@ -178,6 +178,6 @@ decode_bpf_fprog(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_TCB_VAL(fprog, filter, tcp,
 					print_bpf_fprog, fprog.len, print_k);
-		tprints("}");
+		tprint_struct_end();
 	}
 }

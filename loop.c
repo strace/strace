@@ -83,7 +83,7 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -140,7 +140,7 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 		tprints(", ...");
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -176,7 +176,7 @@ decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_X_ARRAY(config, __reserved);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 MPERS_PRINTER_DECL(int, loop_ioctl,

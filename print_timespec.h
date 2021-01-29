@@ -172,7 +172,7 @@ PRINT_ITIMERSPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_OBJ_PTR(t, it_interval, print_timespec_t);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(t, it_value, print_timespec_t);
-	tprints("}");
+	tprint_struct_end();
 	return 0;
 }
 #endif /* PRINT_ITIMERSPEC */

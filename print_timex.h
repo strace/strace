@@ -18,7 +18,7 @@ PRINT_TIMEX_TIME(const typeof_field(TIMEX_T, time) *const p)
 	PRINT_FIELD_D(*p, tv_sec);
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, tv_usec);
-	tprints("}");
+	tprint_struct_end();
 }
 
 int
@@ -69,6 +69,6 @@ PRINT_TIMEX(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_D(tx, stbcnt);
 	tprint_struct_next();
 	PRINT_FIELD_D(tx, tai);
-	tprints("}");
+	tprint_struct_end();
 	return 0;
 }

@@ -52,7 +52,7 @@ decode_tc_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(st, qlen);
 		tprint_struct_next();
 		PRINT_FIELD_U(st, backlog);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -73,7 +73,7 @@ decode_tc_estimator(struct tcb *const tcp,
 		PRINT_FIELD_D(est, interval);
 		tprint_struct_next();
 		PRINT_FIELD_U(est, ewma_log);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -97,7 +97,7 @@ decode_gnet_stats_basic(struct tcb *const tcp,
 		PRINT_FIELD_U(sb, bytes);
 		tprint_struct_next();
 		PRINT_FIELD_U(sb, packets);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -122,7 +122,7 @@ decode_gnet_stats_rate_est(struct tcb *const tcp,
 		PRINT_FIELD_U(est, bps);
 		tprint_struct_next();
 		PRINT_FIELD_U(est, pps);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -153,7 +153,7 @@ decode_gnet_stats_queue(struct tcb *const tcp,
 		PRINT_FIELD_U(qstats, requeues);
 		tprint_struct_next();
 		PRINT_FIELD_U(qstats, overlimits);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -178,7 +178,7 @@ decode_gnet_stats_rate_est64(struct tcb *const tcp,
 		PRINT_FIELD_U(est, bps);
 		tprint_struct_next();
 		PRINT_FIELD_U(est, pps);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -239,7 +239,7 @@ decode_tc_sizespec(struct tcb *const tcp,
 		PRINT_FIELD_U(s, mtu);
 		tprint_struct_next();
 		PRINT_FIELD_U(s, tsize);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -336,7 +336,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(tcmsg));
 	if (decode_nla && len > offset) {

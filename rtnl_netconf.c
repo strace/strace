@@ -37,7 +37,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(ncm, ncm_family, addrfams, "AF_???");
-	tprints("}");
+	tprint_struct_end();
 
 	const size_t offset = NLMSG_ALIGN(sizeof(ncm));
 	if (len > offset) {

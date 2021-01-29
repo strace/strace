@@ -29,7 +29,7 @@ decode_crypto_report_generic(struct tcb *const tcp,
 {
 	tprints("{type=");
 	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -51,7 +51,7 @@ decode_crypto_report_hash(struct tcb *const tcp,
 		PRINT_FIELD_U(rhash, blocksize);
 		tprint_struct_next();
 		PRINT_FIELD_U(rhash, digestsize);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -80,7 +80,7 @@ decode_crypto_report_blkcipher(struct tcb *const tcp,
 		PRINT_FIELD_U(rblkcipher, max_keysize);
 		tprint_struct_next();
 		PRINT_FIELD_U(rblkcipher, ivsize);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -107,7 +107,7 @@ decode_crypto_report_aead(struct tcb *const tcp,
 		PRINT_FIELD_U(raead, maxauthsize);
 		tprint_struct_next();
 		PRINT_FIELD_U(raead, ivsize);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -128,7 +128,7 @@ decode_crypto_report_rng(struct tcb *const tcp,
 		PRINT_FIELD_CSTRING(rrng, type);
 		tprint_struct_next();
 		PRINT_FIELD_U(rrng, seedsize);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -153,7 +153,7 @@ decode_crypto_report_cipher(struct tcb *const tcp,
 		PRINT_FIELD_U(rcipher, min_keysize);
 		tprint_struct_next();
 		PRINT_FIELD_U(rcipher, max_keysize);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -197,7 +197,7 @@ decode_crypto_user_alg(struct tcb *const tcp,
 		PRINT_FIELD_U(alg, cru_refcnt);
 		tprint_struct_next();
 		PRINT_FIELD_X(alg, cru_flags);
-		tprints("}");
+		tprint_struct_end();
 
 		const size_t offset = NLMSG_ALIGN(sizeof(alg));
 		if (len > offset) {

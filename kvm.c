@@ -207,7 +207,7 @@ kvm_ioctl_set_user_memory_region(struct tcb *const tcp, const kernel_ulong_t arg
 	PRINT_FIELD_U(u_memory_region, memory_size);
 	tprint_struct_next();
 	PRINT_FIELD_X(u_memory_region, userspace_addr);
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -252,7 +252,7 @@ print_kvm_cpuid_entry(struct tcb *const tcp,
 	PRINT_FIELD_X(*entry, ecx);
 	tprint_struct_next();
 	PRINT_FIELD_X(*entry, edx);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -288,7 +288,7 @@ kvm_ioctl_decode_cpuid2(struct tcb *const tcp, const unsigned int code,
 				    &entry, sizeof(entry), tfetch_mem,
 				    print_kvm_cpuid_entry, NULL);
 		}
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;

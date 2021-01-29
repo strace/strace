@@ -66,7 +66,7 @@ MPERS_PRINTER_DECL(void, printrusage,
 		tprint_struct_next();
 		PRINT_FIELD_U(ru, ru_nivcsw);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 #ifdef ALPHA
@@ -131,6 +131,6 @@ printrusage32(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		PRINT_FIELD_U(ru, ru_nivcsw);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 #endif

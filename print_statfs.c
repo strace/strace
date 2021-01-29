@@ -21,7 +21,7 @@ print_f_fsid(const typeof_field(struct strace_statfs, f_fsid) *const p,
 {
 	tprint_struct_begin();
 	PRINT_FIELD_ARRAY(*p, val, tcp, print_xint64_array_member);
-	tprints("}");
+	tprint_struct_end();
 }
 #endif
 
@@ -65,7 +65,7 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_FLAGS(b, f_flags, statfs_flags, "ST_???");
 	}
 # endif
-	tprints("}");
+	tprint_struct_end();
 #else
 	printaddr(addr);
 #endif
@@ -112,7 +112,7 @@ print_struct_statfs64(struct tcb *const tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_FLAGS(b, f_flags, statfs_flags, "ST_???");
 	}
 # endif
-	tprints("}");
+	tprint_struct_end();
 #else
 	printaddr(addr);
 #endif

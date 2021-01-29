@@ -73,7 +73,7 @@ decode_dentry_tail(struct tcb *const tcp, kernel_ulong_t addr,
 		else
 			printxval(dirent_types, d_type, "DT_???");
 	}
-	tprints("}");
+	tprint_struct_end();
 
 	return rc;
 }
@@ -96,7 +96,7 @@ print_old_dirent(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprints(", d_name=");
 	printpathn(tcp, addr + header_size,
 		   MIN(dent.d_reclen, D_NAME_LEN_MAX));
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(readdir)

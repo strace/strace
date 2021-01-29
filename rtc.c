@@ -51,7 +51,7 @@ print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 		tprint_struct_next();
 		PRINT_FIELD_D(*rt, tm_isdst);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -77,7 +77,7 @@ decode_rtc_wkalrm(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_U(wk, pending);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_PTR(wk, time, tcp, print_rtc_time);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -102,7 +102,7 @@ decode_rtc_pll_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_D(pll, pll_negmult);
 	tprint_struct_next();
 	PRINT_FIELD_D(pll, pll_clock);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void

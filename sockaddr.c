@@ -307,7 +307,7 @@ print_ax25_addr_raw(const ax25_address *addr)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_HEX_ARRAY(*addr, ax25_call);
-	tprints("}");
+	tprint_struct_end();
 }
 
 void
@@ -349,7 +349,7 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 	if (!full)
 		return;
 
-	tprints("}");
+	tprint_struct_end();
 
 	size_t has_digis = MIN((addrlen_us - sizeof(sax25->fsa_ax25))
 			       / sizeof(sax25->fsa_digipeater[0]),
@@ -408,7 +408,7 @@ print_x25_addr(const void /* struct x25_address */ *addr_void)
 
 	tprint_struct_begin();
 	PRINT_FIELD_CSTRING(*addr, x25_addr);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -709,7 +709,7 @@ print_sockaddr(struct tcb *tcp, const void *const buf, const int addrlen)
 		}
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 int

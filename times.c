@@ -32,7 +32,7 @@ SYS_FUNC(times)
 		PRINT_FIELD_U(tbuf, tms_cutime);
 		tprint_struct_next();
 		PRINT_FIELD_U(tbuf, tms_cstime);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return 0;

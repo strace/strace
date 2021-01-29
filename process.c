@@ -141,7 +141,7 @@ SYS_FUNC(ptrace)
 					  "PTRACE_PEEKSIGINFO_???");
 			tprint_struct_next();
 			PRINT_FIELD_U(psi, nr);
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 		default:
@@ -278,13 +278,14 @@ SYS_FUNC(ptrace)
 					      offset + sizeof(flags));
 
 			if (syserror(tcp) || ret_size <= offset) {
-				tprints("}");
+				tprint_struct_end();
 				return 0;
 			}
 
 			if (umoven(tcp, data + offset, ret_size - offset,
 				   &flags)) {
-				tprints(", ...}");
+				tprints(", ...");
+				tprint_struct_end();
 				return 0;
 			}
 
@@ -295,7 +296,7 @@ SYS_FUNC(ptrace)
 			if ((kernel_ulong_t) tcp->u_rval > ret_size)
 				tprints(", ...");
 
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 		case PTRACE_GET_SYSCALL_INFO:

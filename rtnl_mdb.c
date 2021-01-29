@@ -199,7 +199,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(bpm));
 	if (decode_nla && len > offset) {

@@ -41,10 +41,10 @@ decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 	tprintf(", filter_devtype_hash=htonl(%#x)", ntohl(uh.filter_devtype_hash));
 	tprintf(", filter_tag_bloom_hi=htonl(%#x)", ntohl(uh.filter_tag_bloom_hi));
 	tprintf(", filter_tag_bloom_lo=htonl(%#x)", ntohl(uh.filter_tag_bloom_lo));
-	tprints("}");
+	tprint_struct_end();
 	if (len > offset) {
 		tprints(", ");
 		printstrn(tcp, addr + offset, len - offset);
 	}
-	tprints("}");
+	tprint_struct_end();
 }

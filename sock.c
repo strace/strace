@@ -38,7 +38,7 @@ print_ifr_hwaddr(const typeof_field(struct_ifreq, ifr_hwaddr) *const p)
 	PRINT_FIELD_XVAL(*p, sa_family, arp_hardware_types, "ARPHRD_???");
 	tprint_struct_next();
 	PRINT_FIELD_HWADDR_SZ(*p, sa_data, sizeof(p->sa_data), p->sa_family);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -56,7 +56,7 @@ print_ifr_map(const typeof_field(struct_ifreq, ifr_map) *const p)
 	PRINT_FIELD_X(*p, dma);
 	tprint_struct_next();
 	PRINT_FIELD_X(*p, port);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -146,7 +146,7 @@ print_ifconf_ifreq(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	PRINT_FIELD_CSTRING(*ifr, ifr_name);
 	tprint_struct_next();
 	PRINT_FIELD_SOCKADDR(*ifr, ifr_addr, tcp);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -197,7 +197,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*entering_ifc, ifc_buf);
 
-			tprints("}");
+			tprint_struct_end();
 		}
 
 		return RVAL_IOCTL_DECODED;
@@ -237,7 +237,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 			    tfetch_mem, print_ifconf_ifreq, NULL);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -282,7 +282,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		if (!umove_or_printaddr(tcp, arg, &ifr)) {
 			tprint_struct_begin();
 			PRINT_FIELD_IFINDEX(ifr, ifr_ifindex);
-			tprints("}");
+			tprint_struct_end();
 		}
 		break;
 
@@ -309,7 +309,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 		PRINT_FIELD_CSTRING(ifr, ifr_name);
 		tprints(", ");
 		print_ifreq(tcp, code, arg, &ifr);
-		tprints("}");
+		tprint_struct_end();
 		break;
 
 	case SIOCGIFADDR:
@@ -343,7 +343,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 				tprints(", ");
 				print_ifreq(tcp, code, arg, &ifr);
 			}
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 

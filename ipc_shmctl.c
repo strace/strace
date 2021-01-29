@@ -49,7 +49,7 @@ print_ipc_perm(const typeof_field(shmid_ds_t, shm_perm) *const p,
 		tprint_struct_next();
 		PRINT_FIELD_ID(*p, cgid);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -79,7 +79,7 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		PRINT_FIELD_U(shmid_ds, shm_ctime);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -101,7 +101,7 @@ print_ipc_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_U(info, shmseg);
 	tprint_struct_next();
 	PRINT_FIELD_U(info, shmall);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -125,7 +125,7 @@ print_shm_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_U(info, swap_attempts);
 	tprint_struct_next();
 	PRINT_FIELD_U(info, swap_successes);
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(shmctl)

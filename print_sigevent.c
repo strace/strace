@@ -23,7 +23,7 @@ print_sigev_value(const typeof_field(struct_sigevent, sigev_value) v)
 	PRINT_FIELD_D(v, sival_int);
 	tprint_struct_next();
 	PRINT_FIELD_PTR(v, sival_ptr);
-	tprints("}");
+	tprint_struct_end();
 }
 
 MPERS_PRINTER_DECL(void, print_sigevent,
@@ -71,5 +71,5 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 		PRINT_FIELD_PTR(sev, sigev_notify_attributes);
 		break;
 	}
-	tprints("}");
+	tprint_struct_end();
 }

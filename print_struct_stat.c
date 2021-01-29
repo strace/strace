@@ -139,5 +139,5 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 	} else {
 		tprints(", ...");
 	}
-	tprints("}");
+	tprint_struct_end();
 }

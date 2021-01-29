@@ -41,7 +41,7 @@ print_inet_diag_sockid(const struct inet_diag_sockid *id, const uint8_t family)
 	PRINT_FIELD_IFINDEX(*id, idiag_if);
 	tprint_struct_next();
 	PRINT_FIELD_COOKIE(*id, idiag_cookie);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -70,7 +70,7 @@ decode_inet_diag_hostcond(struct tcb *const tcp,
 		decode_inet_addr(tcp, addr + sizeof(cond),
 				 len - sizeof(cond), cond.family, "addr");
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -82,7 +82,7 @@ print_inet_diag_bc_op(const struct inet_diag_bc_op *const op)
 	PRINT_FIELD_U(*op, yes);
 	tprint_struct_next();
 	PRINT_FIELD_U(*op, no);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -99,7 +99,7 @@ decode_inet_diag_markcond(struct tcb *const tcp,
 		PRINT_FIELD_U(markcond, mark);
 		tprint_struct_next();
 		PRINT_FIELD_U(markcond, mask);
-		tprints("}");
+		tprint_struct_end();
 	}
 }
 
@@ -169,7 +169,7 @@ decode_inet_diag_bc_op(struct tcb *const tcp,
 		tprints(", ");
 		decode_bytecode_data(tcp, addr + sizeof(op),
 				     len - sizeof(op), op.code);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -216,7 +216,7 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(req));
 	if (decode_nla && len > offset) {
@@ -262,7 +262,7 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(req));
 	if (decode_nla && len > offset) {
@@ -304,7 +304,7 @@ decode_inet_diag_meminfo(struct tcb *const tcp,
 	PRINT_FIELD_U(minfo, idiag_fmem);
 	tprint_struct_next();
 	PRINT_FIELD_U(minfo, idiag_tmem);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -330,7 +330,7 @@ decode_tcpvegas_info(struct tcb *const tcp,
 	PRINT_FIELD_U(vegas, tcpv_rtt);
 	tprint_struct_next();
 	PRINT_FIELD_U(vegas, tcpv_minrtt);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -358,7 +358,7 @@ decode_tcp_dctcp_info(struct tcb *const tcp,
 	PRINT_FIELD_U(dctcp, dctcp_ab_ecn);
 	tprint_struct_next();
 	PRINT_FIELD_U(dctcp, dctcp_ab_tot);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -386,7 +386,7 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	PRINT_FIELD_U(bbr, bbr_pacing_gain);
 	tprint_struct_next();
 	PRINT_FIELD_U(bbr, bbr_cwnd_gain);
-	tprints("}");
+	tprint_struct_end();
 
 	return true;
 }
@@ -447,7 +447,7 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {

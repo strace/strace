@@ -148,7 +148,7 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 				    MIN(size, get_pagesize()), QUOTE_FORCE_HEX);
 	}
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(openat)

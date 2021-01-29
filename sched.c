@@ -166,7 +166,7 @@ end:
 	if ((is_set ? usize : attr.size) > size)
 		tprints(", ...");
 
-	tprints("}");
+	tprint_struct_end();
 }
 
 SYS_FUNC(sched_setattr)
@@ -183,7 +183,7 @@ SYS_FUNC(sched_setattr)
 			tprint_value_changed();
 			tprint_struct_begin();
 			PRINT_FIELD_U(attr, size);
-			tprints("}");
+			tprint_struct_end();
 		}
 
 		tprintf(", %u", (unsigned int) tcp->u_arg[2]);

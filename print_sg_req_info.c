@@ -49,7 +49,7 @@ MPERS_PRINTER_DECL(int, decode_sg_req_info,
 		PRINT_FIELD_PTR(info, usr_ptr);
 		tprint_struct_next();
 		PRINT_FIELD_U(info, duration);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return RVAL_IOCTL_DECODED;

@@ -44,7 +44,7 @@ decode_erase_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(einfo, start);
 	tprint_struct_next();
 	PRINT_FIELD_X(einfo, length);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -60,7 +60,7 @@ decode_erase_info_user64(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(einfo64, start);
 	tprint_struct_next();
 	PRINT_FIELD_X(einfo64, length);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -77,7 +77,7 @@ decode_mtd_oob_buf(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(mbuf, length);
 	tprint_struct_next();
 	PRINT_FIELD_PTR(mbuf, ptr);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -95,7 +95,7 @@ decode_mtd_oob_buf64(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(mbuf64, length);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(mbuf64, usr_ptr);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -113,7 +113,7 @@ decode_otp_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(oinfo, length);
 	tprint_struct_next();
 	PRINT_FIELD_U(oinfo, locked);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -151,7 +151,7 @@ decode_mtd_write_req(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_ADDR64(mreq, usr_oob);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(mreq, mode, mtd_mode_options, "MTD_OPS_???");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -177,7 +177,7 @@ decode_mtd_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(minfo, oobsize);
 	tprint_struct_next();
 	PRINT_FIELD_X(minfo, padding);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -206,7 +206,7 @@ decode_nand_oobinfo(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_ARRAY(ninfo, oobfree, tcp, print_xint32x2_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(ninfo, eccpos, tcp, print_xint32_array_member);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool
@@ -218,7 +218,7 @@ print_nand_oobfree_array_member(struct tcb *tcp, void *elem_buf,
 	PRINT_FIELD_X(*p, offset);
 	tprint_struct_next();
 	PRINT_FIELD_X(*p, length);
-	tprints("}");
+	tprint_struct_end();
 	return true;
 }
 
@@ -239,7 +239,7 @@ decode_nand_ecclayout_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(nlay, oobavail);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(nlay, oobfree, tcp, print_nand_oobfree_array_member);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -259,7 +259,7 @@ decode_mtd_ecc_stats(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(es, badblocks);
 	tprint_struct_next();
 	PRINT_FIELD_X(es, bbtblocks);
-	tprints("}");
+	tprint_struct_end();
 }
 
 MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
@@ -373,7 +373,7 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 				tprint_struct_next();
 				PRINT_FIELD_X(rinfo, numblocks);
 			}
-			tprints("}");
+			tprint_struct_end();
 			break;
 		}
 

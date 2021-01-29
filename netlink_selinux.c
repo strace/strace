@@ -27,7 +27,7 @@ decode_netlink_selinux(struct tcb *const tcp,
 		else if (!umove_or_printaddr(tcp, addr, &msg)) {
 			tprint_struct_begin();
 			PRINT_FIELD_D(msg, val);
-			tprints("}");
+			tprint_struct_end();
 		}
 		break;
 	}
@@ -39,7 +39,7 @@ decode_netlink_selinux(struct tcb *const tcp,
 		else if (!umove_or_printaddr(tcp, addr, &msg)) {
 			tprint_struct_begin();
 			PRINT_FIELD_U(msg, seqno);
-			tprints("}");
+			tprint_struct_end();
 		}
 		break;
 	}

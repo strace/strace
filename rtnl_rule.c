@@ -48,7 +48,7 @@ decode_fib_rule_uid_range(struct tcb *const tcp,
 		PRINT_FIELD_U(range, start);
 		tprint_struct_next();
 		PRINT_FIELD_U(range, end);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -69,7 +69,7 @@ decode_rule_port_range(struct tcb *const tcp,
 		PRINT_FIELD_U(range, start);
 		tprint_struct_next();
 		PRINT_FIELD_U(range, end);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -131,7 +131,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {

@@ -75,7 +75,7 @@ print_scm_creds(struct tcb *tcp, const void *cmsg_data,
 	PRINT_FIELD_ID(*uc, uid);
 	tprint_struct_next();
 	PRINT_FIELD_ID(*uc, gid);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -158,7 +158,7 @@ print_cmsg_ip_pktinfo(struct tcb *tcp, const void *cmsg_data,
 	PRINT_FIELD_INET_ADDR(*info, ipi_spec_dst, AF_INET);
 	tprint_struct_next();
 	PRINT_FIELD_INET_ADDR(*info, ipi_addr, AF_INET);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -230,7 +230,7 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 	PRINT_FIELD_U(*err, ee_data);
 	tprint_struct_next();
 	PRINT_FIELD_SOCKADDR(*err, offender, tcp);
-	tprints("}");
+	tprint_struct_end();
 }
 
 static void
@@ -373,7 +373,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 		print_cmsg_type_data(tcp, cmsg_level, cmsg_type,
 				     (const void *) (u.ptr + cmsg_size),
 				     len > cmsg_size ? len - cmsg_size : 0);
-		tprints("}");
+		tprint_struct_end();
 
 		if (len < cmsg_size) {
 			buf_len -= cmsg_size;
@@ -431,7 +431,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*msg, msg_flags, msg_flags, "MSG_???");
-	tprints("}");
+	tprint_struct_end();
 }
 
 static bool

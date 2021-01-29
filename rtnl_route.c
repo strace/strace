@@ -133,7 +133,7 @@ decode_rta_cacheinfo(struct tcb *const tcp,
 		PRINT_FIELD_U(ci, rta_ts);
 		tprint_struct_next();
 		PRINT_FIELD_U(ci, rta_tsage);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -156,7 +156,7 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 		PRINT_FIELD_U(mfcs, mfcs_bytes);
 		tprint_struct_next();
 		PRINT_FIELD_U(mfcs, mfcs_wrong_if);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -183,7 +183,7 @@ decode_rtvia(struct tcb *const tcp,
 			decode_inet_addr(tcp, addr + offset, len - offset,
 					 via.rtvia_family, "rtvia_addr");
 		}
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -258,7 +258,7 @@ decode_rta_multipath(struct tcb *const tcp,
 		PRINT_FIELD_U(nh, rtnh_hops);
 		tprint_struct_next();
 		PRINT_FIELD_IFINDEX(nh, rtnh_ifindex);
-		tprints("}");
+		tprint_struct_end();
 
 		const unsigned short rtnh_len = MIN(len, nh.rtnh_len);
 		const size_t offset = RTNH_ALIGN(sizeof(nh));
@@ -314,7 +314,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 		}
 	} else
 		tprints("...");
-	tprints("}");
+	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(rtmsg));
 	if (decode_nla && len > offset) {

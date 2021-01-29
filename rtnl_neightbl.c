@@ -46,7 +46,7 @@ decode_ndt_config(struct tcb *const tcp,
 		PRINT_FIELD_U(ndtc, ndtc_hash_chain_gc);
 		tprint_struct_next();
 		PRINT_FIELD_U(ndtc, ndtc_proxy_qlen);
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -128,7 +128,7 @@ decode_ndt_stats(struct tcb *const tcp,
 			tprint_struct_next();
 			PRINT_FIELD_U(ndtst, ndts_table_fulls);
 		}
-		tprints("}");
+		tprint_struct_end();
 	}
 
 	return true;
@@ -152,7 +152,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(ndtmsg, ndtm_family, addrfams, "AF_???");
-	tprints("}");
+	tprint_struct_end();
 
 	const size_t offset = NLMSG_ALIGN(sizeof(ndtmsg));
 	if (len > offset) {
