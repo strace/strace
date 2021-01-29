@@ -177,15 +177,18 @@ SYS_FUNC(clone3)
 			      clone_flags, clone3_flags, NULL);
 
 		if (arg.flags & CLONE_PIDFD) {
-			PRINT_FIELD_ADDR64(", ", arg, pidfd);
+			tprint_struct_next();
+			PRINT_FIELD_ADDR64(arg, pidfd);
 		}
 
 		if (arg.flags & (CLONE_CHILD_SETTID | CLONE_CHILD_CLEARTID)) {
-			PRINT_FIELD_ADDR64(", ", arg, child_tid);
+			tprint_struct_next();
+			PRINT_FIELD_ADDR64(arg, child_tid);
 		}
 
 		if (arg.flags & CLONE_PARENT_SETTID) {
-			PRINT_FIELD_ADDR64(", ", arg, parent_tid);
+			tprint_struct_next();
+			PRINT_FIELD_ADDR64(arg, parent_tid);
 		}
 
 		if (arg.exit_signal < INT_MAX) {
@@ -195,7 +198,8 @@ SYS_FUNC(clone3)
 			PRINT_FIELD_U(", ", arg, exit_signal);
 		}
 
-		PRINT_FIELD_ADDR64(", ", arg, stack);
+		tprint_struct_next();
+		PRINT_FIELD_ADDR64(arg, stack);
 		PRINT_FIELD_X(", ", arg, stack_size);
 
 		if (arg.flags & CLONE_SETTLS) {
@@ -209,7 +213,8 @@ SYS_FUNC(clone3)
 
 			if (!arg.set_tid || !arg.set_tid_size ||
 			    arg.set_tid_size > max_set_tid_size) {
-				PRINT_FIELD_ADDR64(", ", arg, set_tid);
+				tprint_struct_next();
+				PRINT_FIELD_ADDR64(arg, set_tid);
 			} else {
 				int buf;
 

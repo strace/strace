@@ -85,7 +85,8 @@ decode_mtd_oob_buf64(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	PRINT_FIELD_X("{", mbuf64, start);
 	PRINT_FIELD_X(", ", mbuf64, length);
-	PRINT_FIELD_ADDR64(", ", mbuf64, usr_ptr);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(mbuf64, usr_ptr);
 	tprints("}");
 }
 
@@ -130,8 +131,10 @@ decode_mtd_write_req(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X("{", mreq, start);
 	PRINT_FIELD_X(", ", mreq, len);
 	PRINT_FIELD_X(", ", mreq, ooblen);
-	PRINT_FIELD_ADDR64(", ", mreq, usr_data);
-	PRINT_FIELD_ADDR64(", ", mreq, usr_oob);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(mreq, usr_data);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(mreq, usr_oob);
 	PRINT_FIELD_XVAL(", ", mreq, mode, mtd_mode_options, "MTD_OPS_???");
 	tprints("}");
 }

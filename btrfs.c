@@ -903,7 +903,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp)) {
 			PRINT_FIELD_U("{", args, inum);
 			PRINT_FIELD_U(", ", args, size);
-			PRINT_FIELD_ADDR64(", ", args, fspath);
+			tprint_struct_next();
+			PRINT_FIELD_ADDR64(args, fspath);
 			tprints("}");
 			return 0;
 		}
@@ -940,7 +941,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_FLAGS(", ", args, flags,
 					  btrfs_logical_ino_args_flags,
 					  "BTRFS_LOGICAL_INO_ARGS_???");
-			PRINT_FIELD_ADDR64(", ", args, inodes);
+			tprint_struct_next();
+			PRINT_FIELD_ADDR64(args, inodes);
 			tprints("}");
 			return 0;
 		}

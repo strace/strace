@@ -38,7 +38,8 @@ static void
 tee_print_buf(struct_tee_ioctl_buf_data *buf)
 {
 	PRINT_FIELD_U("{", *buf, buf_len);
-	PRINT_FIELD_ADDR64(", ", *buf, buf_ptr);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(*buf, buf_ptr);
 	tprints("}");
 }
 
@@ -466,7 +467,8 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &shm_register))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_ADDR64("{", shm_register, addr);
+		tprint_struct_begin();
+		PRINT_FIELD_ADDR64(shm_register, addr);
 		PRINT_FIELD_X(", ", shm_register, length);
 		PRINT_FIELD_FLAGS(", ", shm_register, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");

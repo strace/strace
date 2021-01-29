@@ -345,11 +345,13 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 	if (fetch_size < offsetofend(struct_ptrace_syscall_info,
 				     instruction_pointer))
 		goto printed;
-	PRINT_FIELD_ADDR64(", ", info, instruction_pointer);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(info, instruction_pointer);
 
 	if (fetch_size < offsetofend(struct_ptrace_syscall_info, stack_pointer))
 		goto printed;
-	PRINT_FIELD_ADDR64(", ", info, stack_pointer);
+	tprint_struct_next();
+	PRINT_FIELD_ADDR64(info, stack_pointer);
 
 	if (fetch_size < offsetofend(struct_ptrace_syscall_info, entry.nr))
 		goto printed;

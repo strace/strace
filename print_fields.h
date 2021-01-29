@@ -159,9 +159,9 @@ tprints_field_name(const char *name)
 			zero_extend_signed_to_ull((type_)(where_).field_));	\
 	} while (0)
 
-# define PRINT_FIELD_ADDR64(prefix_, where_, field_)			\
+# define PRINT_FIELD_ADDR64(where_, field_)				\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		printaddr64((where_).field_);				\
 	} while (0)
 
