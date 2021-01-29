@@ -81,14 +81,15 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_DEV(*st, st_dev);
 		PRINT_FIELD_U(", ", *st, st_ino);
-		PRINT_FIELD_OBJ_VAL(", ", *st, st_mode, print_symbolic_mode_t);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(*st, st_mode, print_symbolic_mode_t);
 		PRINT_FIELD_U(", ", *st, st_nlink);
 		PRINT_FIELD_U(", ", *st, st_uid);
 		PRINT_FIELD_U(", ", *st, st_gid);
 		PRINT_FIELD_U(", ", *st, st_blksize);
 		PRINT_FIELD_U(", ", *st, st_blocks);
 	} else {
-		PRINT_FIELD_OBJ_VAL("", *st, st_mode, print_symbolic_mode_t);
+		PRINT_FIELD_OBJ_VAL(*st, st_mode, print_symbolic_mode_t);
 	}
 
 	switch (st->st_mode & S_IFMT) {

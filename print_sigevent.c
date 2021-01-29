@@ -34,7 +34,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 
 	tprints("{");
 	if (sev.sigev_value.sival_ptr) {
-		PRINT_FIELD_OBJ_VAL("", sev, sigev_value, print_sigev_value);
+		PRINT_FIELD_OBJ_VAL(sev, sigev_value, print_sigev_value);
 		tprints(", ");
 	}
 
@@ -42,7 +42,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 	case SIGEV_SIGNAL:
 	case SIGEV_THREAD:
 	case SIGEV_THREAD_ID:
-		PRINT_FIELD_OBJ_VAL("", sev, sigev_signo, printsignal);
+		PRINT_FIELD_OBJ_VAL(sev, sigev_signo, printsignal);
 		break;
 	default:
 		PRINT_FIELD_U("", sev, sigev_signo);

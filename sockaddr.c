@@ -643,10 +643,11 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 	case offsetof(struct sockaddr_l2, l2_bdaddr_type):
 	case sizeof(struct sockaddr_l2): {
 		const struct sockaddr_l2 *const l2 = buf;
-		PRINT_FIELD_OBJ_VAL("", *l2, l2_psm, print_bluetooth_l2_psm);
+		PRINT_FIELD_OBJ_VAL(*l2, l2_psm, print_bluetooth_l2_psm);
 		print_mac_addr(", l2_bdaddr=", l2->l2_bdaddr.b,
 			       sizeof(l2->l2_bdaddr.b));
-		PRINT_FIELD_OBJ_VAL(", ", *l2, l2_cid, print_bluetooth_l2_cid);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(*l2, l2_cid, print_bluetooth_l2_cid);
 
 		if (addrlen == sizeof(struct sockaddr_l2)) {
 			PRINT_FIELD_XVAL(", ", *l2, l2_bdaddr_type,

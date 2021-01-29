@@ -66,7 +66,8 @@ SYS_FUNC(statx)
 			PRINT_FIELD_UID(", ", stx, stx_gid);
 		}
 
-		PRINT_FIELD_OBJ_VAL(", ", stx, stx_mode, print_symbolic_mode_t);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(stx, stx_mode, print_symbolic_mode_t);
 
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", stx, stx_ino);

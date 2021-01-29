@@ -189,7 +189,8 @@ SYS_FUNC(clone3)
 		}
 
 		if (arg.exit_signal < INT_MAX) {
-			PRINT_FIELD_OBJ_VAL(", ", arg, exit_signal, printsignal);
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_VAL(arg, exit_signal, printsignal);
 		} else {
 			PRINT_FIELD_U(", ", arg, exit_signal);
 		}

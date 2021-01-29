@@ -120,7 +120,8 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &ffe))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_OBJ_VAL("{", ffe, type, print_evdev_ff_type);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_VAL(ffe, type, print_evdev_ff_type);
 	PRINT_FIELD_D(", ", ffe, id);
 	PRINT_FIELD_U(", ", ffe, direction);
 

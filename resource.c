@@ -49,8 +49,10 @@ print_rlimit64(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		PRINT_FIELD_OBJ_VAL("{", rlim, rlim_cur, print_rlim64_t);
-		PRINT_FIELD_OBJ_VAL(", ", rlim, rlim_max, print_rlim64_t);
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_VAL(rlim, rlim_cur, print_rlim64_t);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(rlim, rlim_max, print_rlim64_t);
 		tprints("}");
 	}
 }
@@ -89,8 +91,10 @@ print_rlimit32(struct tcb *const tcp, const kernel_ulong_t addr)
 	} rlim;
 
 	if (!umove_or_printaddr(tcp, addr, &rlim)) {
-		PRINT_FIELD_OBJ_VAL("{", rlim, rlim_cur, print_rlim32_t);
-		PRINT_FIELD_OBJ_VAL(", ", rlim, rlim_max, print_rlim32_t);
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_VAL(rlim, rlim_cur, print_rlim32_t);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(rlim, rlim_max, print_rlim32_t);
 		tprints("}");
 	}
 }

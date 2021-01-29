@@ -176,7 +176,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			if (sip->si_code == CLD_EXITED) {
 				PRINT_FIELD_D(", ", *sip, si_status);
 			} else {
-				PRINT_FIELD_OBJ_VAL(", ", *sip, si_status, printsignal);
+				tprint_struct_next();
+				PRINT_FIELD_OBJ_VAL(*sip, si_status, printsignal);
 			}
 			PRINT_FIELD_U(", ", *sip, si_utime);
 			PRINT_FIELD_U(", ", *sip, si_stime);
@@ -195,7 +196,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS:
 			PRINT_FIELD_PTR(", ", *sip, si_call_addr);
-			PRINT_FIELD_OBJ_VAL(", ", *sip, si_syscall,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_VAL(*sip, si_syscall,
 					    print_si_syscall);
 			PRINT_FIELD_XVAL(", ", *sip, si_arch, audit_arch,
 					 "AUDIT_ARCH_???");
@@ -219,8 +221,9 @@ printsiginfo(struct tcb *tcp, const siginfo_t *sip)
 	tprints("{");
 
 	if (sip->si_signo) {
-		PRINT_FIELD_OBJ_VAL("", *sip, si_signo, printsignal);
-		PRINT_FIELD_OBJ_VAL(", ", *sip, si_code, print_si_code,
+		PRINT_FIELD_OBJ_VAL(*sip, si_signo, printsignal);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(*sip, si_code, print_si_code,
 				    sip->si_signo);
 
 #ifdef SI_NOINFO

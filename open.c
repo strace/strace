@@ -134,7 +134,8 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 	if (umoven_or_printaddr(tcp, addr, MIN(size, sizeof(how)), &how))
 		return;
 
-	PRINT_FIELD_OBJ_VAL("{", how, flags, tprint_open_modes64);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_VAL(how, flags, tprint_open_modes64);
 	if ((how.flags & (O_CREAT | __O_TMPFILE)) || how.mode) {
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_U(how, mode, print_numeric_ll_umode_t);

@@ -127,7 +127,8 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 		return false;
 	}
 
-	PRINT_FIELD_OBJ_VAL("{", *insn, code, print_bpf_filter_code, true);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_VAL(*insn, code, print_bpf_filter_code, true);
 
 	/* We can't use PRINT_FIELD_XVAL on bit fields */
 	tprints(", dst_reg=");
@@ -307,7 +308,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	/* kern_version field was added in Linux commit v4.1-rc1~84^2~50.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, kern_version))
 		break;
-	PRINT_FIELD_OBJ_VAL(", ", attr, kern_version, print_kernel_version);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_VAL(attr, kern_version, print_kernel_version);
 
 	/* prog_flags field was added in Linux commit v4.12-rc2~34^2~29^2~2.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_flags))

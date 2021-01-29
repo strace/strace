@@ -332,11 +332,13 @@ decode_old_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprints("{sa_handler=");
 	print_sa_handler(sa.sa_handler__);
-	PRINT_FIELD_OBJ_VAL(", ", sa, sa_mask, tprint_old_sigmask_val);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_VAL(sa, sa_mask, tprint_old_sigmask_val);
 	PRINT_FIELD_FLAGS(", ", sa, sa_flags, sigact_flags, "SA_???");
 #if !(defined ALPHA || defined MIPS)
 	if (sa.sa_flags & 0x04000000U) {
-		PRINT_FIELD_OBJ_VAL(", ", sa, sa_restorer, printaddr);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(sa, sa_restorer, printaddr);
 	}
 #endif
 	tprints("}");
@@ -565,7 +567,8 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_FLAGS(", ", sa, sa_flags, sigact_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
 	if (sa.sa_flags & SA_RESTORER) {
-		PRINT_FIELD_OBJ_VAL(", ", sa, sa_restorer, printaddr);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_VAL(sa, sa_restorer, printaddr);
 	}
 #endif
 	tprints("}");
