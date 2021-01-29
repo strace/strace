@@ -457,6 +457,25 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_tls_options.h"
 #include "xlat/sock_xdp_options.h"
 
+#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_, 		\
+			len_, print_func_, ...)				\
+	do {								\
+		unsigned int start = offsetof(typeof(where_), field_);	\
+		unsigned int end = start + sizeof(where_.field_);	\
+		if (len_ > start) {					\
+			print_prefix_;					\
+			if (len_ >= end) {				\
+				print_func_("", where_, field_,		\
+					    ##__VA_ARGS__);		\
+			} else {					\
+				tprints_field_name(#field_);		\
+				print_quoted_string(			\
+					(void *)&where_.field_,		\
+					len_ - start, QUOTE_FORCE_HEX);	\
+			}						\
+		}							\
+	} while (0)
+
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 			    unsigned int name, bool is_getsockopt)
@@ -579,8 +598,10 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &linger))
 		return;
 
-	PRINT_FIELD_LEN("{", linger, l_onoff, len, PRINT_FIELD_D);
-	PRINT_FIELD_LEN(", ", linger, l_linger, len, PRINT_FIELD_D);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      linger, l_onoff, len, PRINT_FIELD_D);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      linger, l_linger, len, PRINT_FIELD_D);
 	tprints("}");
 }
 
@@ -601,9 +622,12 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &uc))
 		return;
 
-	PRINT_FIELD_LEN("{", uc, pid, len, PRINT_FIELD_TGID, tcp);
-	PRINT_FIELD_LEN(", ", uc, uid, len, PRINT_FIELD_UID);
-	PRINT_FIELD_LEN(", ", uc, gid, len, PRINT_FIELD_UID);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      uc, pid, len, PRINT_FIELD_TGID, tcp);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      uc, uid, len, PRINT_FIELD_ID);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      uc, gid, len, PRINT_FIELD_ID);
 	tprints("}");
 }
 
@@ -643,9 +667,12 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &stats))
 		return;
 
-	PRINT_FIELD_LEN("{", stats, tp_packets, len, PRINT_FIELD_U);
-	PRINT_FIELD_LEN(", ", stats, tp_drops, len, PRINT_FIELD_U);
-	PRINT_FIELD_LEN(", ", stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      stats, tp_packets, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      stats, tp_drops, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
 	tprints("}");
 }
 #endif /* PACKET_STATISTICS */
