@@ -278,7 +278,8 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 				PRINT_FIELD_OBJ_TCB_VAL(kdf, otherinfo,
 					tcp, printstrn, kdf.otherinfolen);
 			} else {
-				PRINT_FIELD_PTR(", ", kdf, otherinfo);
+				tprint_struct_next();
+				PRINT_FIELD_PTR(kdf, otherinfo);
 			}
 
 			PRINT_FIELD_U(", ", kdf, otherinfolen);

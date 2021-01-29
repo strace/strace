@@ -30,7 +30,8 @@ print_stack_t(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &ss))
 		return;
 
-	PRINT_FIELD_PTR("{", ss, ss_sp);
+	tprint_struct_begin();
+	PRINT_FIELD_PTR(ss, ss_sp);
 	PRINT_FIELD_FLAGS(", ", ss, ss_flags, sigaltstack_flags, "SS_???");
 	PRINT_FIELD_U(", ", ss, ss_size);
 	tprints("}");

@@ -66,7 +66,8 @@ static void
 printsigval(const siginfo_t *sip)
 {
 	PRINT_FIELD_D(", ", *sip, si_int);
-	PRINT_FIELD_PTR(", ", *sip, si_ptr);
+	tprint_struct_next();
+	PRINT_FIELD_PTR(*sip, si_ptr);
 }
 
 static void
@@ -184,7 +185,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
-			PRINT_FIELD_PTR(", ", *sip, si_addr);
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_addr);
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
@@ -195,7 +197,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			break;
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 		case SIGSYS:
-			PRINT_FIELD_PTR(", ", *sip, si_call_addr);
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_call_addr);
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_VAL(*sip, si_syscall,
 					    print_si_syscall);

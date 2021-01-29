@@ -320,7 +320,8 @@ DECL_print_v4l2_format_fmt(win)
 			   tfetch_mem, print_v4l2_clip, 0);
 
 	PRINT_FIELD_U(", ", *p, clipcount);
-	PRINT_FIELD_PTR(", ", *p, bitmap);
+	tprint_struct_next();
+	PRINT_FIELD_PTR(*p, bitmap);
 	if (p->global_alpha) {
 		PRINT_FIELD_X(", ", *p, global_alpha);
 	}
@@ -592,7 +593,8 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 		if (b.memory == V4L2_MEMORY_MMAP) {
 			PRINT_FIELD_X(", ", b, m.offset);
 		} else if (b.memory == V4L2_MEMORY_USERPTR) {
-			PRINT_FIELD_PTR(", ", b, m.userptr);
+			tprint_struct_next();
+			PRINT_FIELD_PTR(b, m.userptr);
 		}
 
 		PRINT_FIELD_U(", ", b, length);
@@ -620,7 +622,8 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!umove_or_printaddr(tcp, arg, &b)) {
 		PRINT_FIELD_X("{", b, capability);
 		PRINT_FIELD_X(", ", b, flags);
-		PRINT_FIELD_PTR(", ", b, base);
+		tprint_struct_next();
+		PRINT_FIELD_PTR(b, base);
 		tprints("}");
 	}
 

@@ -97,9 +97,11 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove(tcp, arg, &sg_io) < 0) {
 		/* print i/o fields fetched on entering syscall */
 		if (entering_sg_io->dxfer_direction == SG_DXFER_FROM_DEV) {
-			PRINT_FIELD_PTR(", ", *entering_sg_io, dxferp);
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*entering_sg_io, dxferp);
 		}
-		PRINT_FIELD_PTR(", ", *entering_sg_io, sbp);
+		tprint_struct_next();
+		PRINT_FIELD_PTR(*entering_sg_io, sbp);
 		return RVAL_IOCTL_DECODED;
 	}
 

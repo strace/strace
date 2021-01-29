@@ -1176,7 +1176,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(", ", args, clone_sources_count);
 
 		if (abbrev(tcp)) {
-			PRINT_FIELD_PTR(", ", args, clone_sources);
+			tprint_struct_next();
+			PRINT_FIELD_PTR(args, clone_sources);
 		} else {
 			tprints(", clone_sources=");
 			uint64_t record;

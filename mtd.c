@@ -69,7 +69,8 @@ decode_mtd_oob_buf(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 	PRINT_FIELD_X("{", mbuf, start);
 	PRINT_FIELD_X(", ", mbuf, length);
-	PRINT_FIELD_PTR(", ", mbuf, ptr);
+	tprint_struct_next();
+	PRINT_FIELD_PTR(mbuf, ptr);
 	tprints("}");
 }
 
