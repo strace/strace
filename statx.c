@@ -79,13 +79,17 @@ SYS_FUNC(statx)
 			PRINT_FIELD_U(", ", stx, stx_blocks);
 			PRINT_FIELD_FLAGS(", ", stx, stx_attributes_mask,
 					  statx_attrs, "STATX_ATTR_???");
-			PRINT_FIELD_OBJ_PTR(", ", stx, stx_atime,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(stx, stx_atime,
 					    print_statx_timestamp);
-			PRINT_FIELD_OBJ_PTR(", ", stx, stx_btime,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(stx, stx_btime,
 					    print_statx_timestamp);
-			PRINT_FIELD_OBJ_PTR(", ", stx, stx_ctime,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(stx, stx_ctime,
 					    print_statx_timestamp);
-			PRINT_FIELD_OBJ_PTR(", ", stx, stx_mtime,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(stx, stx_mtime,
 					    print_statx_timestamp);
 			PRINT_FIELD_U(", ", stx, stx_rdev_major);
 			PRINT_FIELD_U(", ", stx, stx_rdev_minor);

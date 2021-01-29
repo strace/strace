@@ -341,7 +341,7 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 	if (full)
 		tprints("fsa_ax25={");
 
-	PRINT_FIELD_OBJ_PTR("", sax25->fsa_ax25, sax25_call, print_ax25_addr);
+	PRINT_FIELD_OBJ_PTR(sax25->fsa_ax25, sax25_call, print_ax25_addr);
 	PRINT_FIELD_D(", ", sax25->fsa_ax25, sax25_ndigis);
 
 	if (!full)
@@ -412,7 +412,7 @@ print_sockaddr_data_x25(struct tcb *tcp, const void *const buf,
 {
 	const struct sockaddr_x25 *const sa_x25 = buf;
 
-	PRINT_FIELD_OBJ_PTR("", *sa_x25, sx25_addr, print_x25_addr);
+	PRINT_FIELD_OBJ_PTR(*sa_x25, sx25_addr, print_x25_addr);
 }
 
 static void

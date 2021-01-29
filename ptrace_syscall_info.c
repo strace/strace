@@ -354,15 +354,18 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 
 	switch(info.op) {
 		case PTRACE_SYSCALL_INFO_ENTRY:
-			PRINT_FIELD_OBJ_PTR(", ", info, entry,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(info, entry,
 					    print_psi_entry, fetch_size, tcp);
 			break;
 		case PTRACE_SYSCALL_INFO_SECCOMP:
-			PRINT_FIELD_OBJ_PTR(", ", info, seccomp,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(info, seccomp,
 					    print_psi_seccomp, fetch_size, tcp);
 			break;
 		case PTRACE_SYSCALL_INFO_EXIT:
-			PRINT_FIELD_OBJ_PTR(", ", info, exit,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(info, exit,
 					    print_psi_exit, fetch_size, tcp);
 			break;
 	}

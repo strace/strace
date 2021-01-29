@@ -71,7 +71,7 @@ kvm_ioctl_decode_regs_dtable(const struct kvm_dtable *const dtable)
 }
 
 # define PRINT_FIELD_KVM_SREGS_STRUCT(where_, field_, type_)	\
-	PRINT_FIELD_OBJ_PTR("", where_, field_,			\
+	PRINT_FIELD_OBJ_PTR(where_, field_,			\
 			    kvm_ioctl_decode_regs_ ## type_)
 
 static void

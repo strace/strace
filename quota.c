@@ -320,9 +320,11 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			if (!abbrev(tcp)) {
 				PRINT_FIELD_FLAGS(", ", dq, qs_flags,
 						  xfs_quota_flags, "XFS_QUOTA_???");
-				PRINT_FIELD_OBJ_PTR(", ", dq, qs_uquota,
+				tprint_struct_next();
+				PRINT_FIELD_OBJ_PTR(dq, qs_uquota,
 						    print_fs_qfilestat);
-				PRINT_FIELD_OBJ_PTR(", ", dq, qs_gquota,
+				tprint_struct_next();
+				PRINT_FIELD_OBJ_PTR(dq, qs_gquota,
 						    print_fs_qfilestat);
 				PRINT_FIELD_U(", ", dq, qs_incoredqs);
 				PRINT_FIELD_D(", ", dq, qs_btimelimit);
@@ -354,11 +356,14 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			PRINT_FIELD_FLAGS(", ", dq, qs_flags,
 					  xfs_quota_flags, "XFS_QUOTA_???");
 			PRINT_FIELD_U(", ", dq, qs_incoredqs);
-			PRINT_FIELD_OBJ_PTR(", ", dq, qs_uquota,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(dq, qs_uquota,
 					    print_fs_qfilestatv);
-			PRINT_FIELD_OBJ_PTR(", ", dq, qs_gquota,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(dq, qs_gquota,
 					    print_fs_qfilestatv);
-			PRINT_FIELD_OBJ_PTR(", ", dq, qs_pquota,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(dq, qs_pquota,
 					    print_fs_qfilestatv);
 			PRINT_FIELD_D(", ", dq, qs_btimelimit);
 			PRINT_FIELD_D(", ", dq, qs_itimelimit);

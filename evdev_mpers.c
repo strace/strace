@@ -69,7 +69,8 @@ static void
 DECL_print_ff_effect(constant)
 {
 	PRINT_FIELD_D("{", *p, level);
-	PRINT_FIELD_OBJ_PTR(", ", *p, envelope, print_ff_envelope);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(*p, envelope, print_ff_envelope);
 	tprints("}");
 }
 
@@ -78,7 +79,8 @@ DECL_print_ff_effect(ramp)
 {
 	PRINT_FIELD_D("{", *p, start_level);
 	PRINT_FIELD_D(", ", *p, end_level);
-	PRINT_FIELD_OBJ_PTR(", ", *p, envelope, print_ff_envelope);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(*p, envelope, print_ff_envelope);
 	tprints("}");
 }
 
@@ -90,7 +92,8 @@ DECL_print_ff_effect(periodic)
 	PRINT_FIELD_D(", ", *p, magnitude);
 	PRINT_FIELD_D(", ", *p, offset);
 	PRINT_FIELD_U(", ", *p, phase);
-	PRINT_FIELD_OBJ_PTR(", ", *p, envelope, print_ff_envelope);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(*p, envelope, print_ff_envelope);
 	PRINT_FIELD_U(", ", *p, custom_len);
 	PRINT_FIELD_PTR(", ", *p, custom_data);
 	tprints("}");

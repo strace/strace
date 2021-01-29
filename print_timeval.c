@@ -108,8 +108,10 @@ MPERS_PRINTER_DECL(int, print_itimerval,
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	PRINT_FIELD_OBJ_PTR("{", t, it_interval, print_timeval_t);
-	PRINT_FIELD_OBJ_PTR(", ", t, it_value, print_timeval_t);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(t, it_interval, print_timeval_t);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(t, it_value, print_timeval_t);
 	tprints("}");
 	return 0;
 }
@@ -166,8 +168,10 @@ print_itimerval32(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	PRINT_FIELD_OBJ_PTR("{", t, it_interval, print_timeval32_t);
-	PRINT_FIELD_OBJ_PTR(", ", t, it_value, print_timeval32_t);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(t, it_interval, print_timeval32_t);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(t, it_value, print_timeval32_t);
 	tprints("}");
 	return 0;
 }

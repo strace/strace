@@ -61,7 +61,8 @@ print_semid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_OBJ_PTR("{", ds, sem_perm, print_ipc_perm, cmd);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(ds, sem_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
 		PRINT_FIELD_U(", ", ds, sem_otime);
 		PRINT_FIELD_U(", ", ds, sem_ctime);

@@ -114,7 +114,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &ur))
 				return RVAL_IOCTL_DECODED;
-			PRINT_FIELD_OBJ_PTR("{", ur, range,
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(ur, range,
 					    tprintf_uffdio_range);
 			PRINT_FIELD_FLAGS(", ", ur, mode,
 					  uffd_register_mode_flags,
@@ -153,7 +154,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &uz))
 				return RVAL_IOCTL_DECODED;
-			PRINT_FIELD_OBJ_PTR("{", uz, range,
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(uz, range,
 					    tprintf_uffdio_range);
 			PRINT_FIELD_FLAGS(", ", uz, mode, uffd_zeropage_flags,
 					  "UFFDIO_ZEROPAGE_???");

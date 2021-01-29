@@ -36,7 +36,8 @@ PRINT_TIMEX(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_D(", ", tx, constant);
 	PRINT_FIELD_D(", ", tx, precision);
 	PRINT_FIELD_D(", ", tx, tolerance);
-	PRINT_FIELD_OBJ_PTR(", ", tx, time, PRINT_TIMEX_TIME);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(tx, time, PRINT_TIMEX_TIME);
 	PRINT_FIELD_D(", ", tx, tick);
 	PRINT_FIELD_D(", ", tx, ppsfreq);
 	PRINT_FIELD_D(", ", tx, jitter);

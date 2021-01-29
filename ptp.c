@@ -82,8 +82,10 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &perout))
 			break;
 
-		PRINT_FIELD_OBJ_PTR("{", perout, start, print_ptp_clock_time);
-		PRINT_FIELD_OBJ_PTR(", ", perout, period, print_ptp_clock_time);
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_PTR(perout, start, print_ptp_clock_time);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(perout, period, print_ptp_clock_time);
 		PRINT_FIELD_D(", ", perout, index);
 		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_perout_flags,
 				  "PTP_???");

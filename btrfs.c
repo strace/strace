@@ -171,15 +171,18 @@ btrfs_print_balance(struct tcb *const tcp, const kernel_ulong_t arg, bool out)
 	}
 
 	if (balance_args.flags & BTRFS_BALANCE_DATA) {
-		PRINT_FIELD_OBJ_PTR(", ", balance_args, data,
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(balance_args, data,
 				    btrfs_print_balance_args);
 	}
 	if (balance_args.flags & BTRFS_BALANCE_METADATA) {
-		PRINT_FIELD_OBJ_PTR(", ", balance_args, meta,
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(balance_args, meta,
 				    btrfs_print_balance_args);
 	}
 	if (balance_args.flags & BTRFS_BALANCE_SYSTEM) {
-		PRINT_FIELD_OBJ_PTR(", ", balance_args, sys,
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(balance_args, sys,
 				    btrfs_print_balance_args);
 	}
 	tprints("}");
@@ -328,7 +331,8 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 	PRINT_FIELD_U(", ", inherit, num_ref_copies);
 	PRINT_FIELD_U(", ", inherit, num_excl_copies);
 
-	PRINT_FIELD_OBJ_PTR(", ", inherit, lim, btrfs_print_qgroup_limit);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(inherit, lim, btrfs_print_qgroup_limit);
 
 	if (abbrev(tcp)) {
 		tprints(", ...");
@@ -686,7 +690,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			PRINT_FIELD_XVAL("{", args, cmd, btrfs_dev_replace_cmds,
 					 "BTRFS_IOCTL_DEV_REPLACE_CMD_???");
 			if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_START) {
-				PRINT_FIELD_OBJ_PTR(", ", args, start,
+				tprint_struct_next();
+				PRINT_FIELD_OBJ_PTR(args, start,
 						    print_btrfs_replace_start_params);
 			}
 			tprints("}");
@@ -696,7 +701,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_XVAL("{", args, result, btrfs_dev_replace_results,
 				 "BTRFS_IOCTL_DEV_REPLACE_RESULT_???");
 		if (args.cmd == BTRFS_IOCTL_DEV_REPLACE_CMD_STATUS) {
-			PRINT_FIELD_OBJ_PTR(", ", args, status,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(args, status,
 					    print_btrfs_replace_status_params);
 		}
 		tprints("}");
@@ -985,7 +991,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			break;
 
 		PRINT_FIELD_U("{", args, qgroupid);
-		PRINT_FIELD_OBJ_PTR(", ", args, lim, btrfs_print_qgroup_limit);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(args, lim, btrfs_print_qgroup_limit);
 		tprints("}");
 		break;
 	}
@@ -1050,14 +1057,16 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprint_struct_begin();
 			PRINT_FIELD_UUID(args, uuid);
 			PRINT_FIELD_U(", ", args, stransid);
-			PRINT_FIELD_OBJ_PTR(", ", args, stime,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(args, stime,
 					    print_btrfs_timespec);
 			PRINT_FIELD_U(", ", args, flags);
 			tprints("}");
 			return 0;
 		}
 		PRINT_FIELD_U("{", args, rtransid);
-		PRINT_FIELD_OBJ_PTR(", ", args, rtime, print_btrfs_timespec);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(args, rtime, print_btrfs_timespec);
 		tprints("}");
 		break;
 	}
@@ -1090,7 +1099,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprints("}");
 			return 0;
 		}
-		PRINT_FIELD_OBJ_PTR("{", args, progress,
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_PTR(args, progress,
 				    print_btrfs_scrub_progress);
 		tprints("}");
 		break;
@@ -1109,7 +1119,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args.key))
 			break;
 
-		PRINT_FIELD_OBJ_PTR("{", args, key,
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_PTR(args, key,
 				    print_btrfs_ioctl_search_key,
 				    entering(tcp), !abbrev(tcp));
 		decode_search_arg_buf(tcp, arg + offsetof(typeof(args), buf),
@@ -1141,7 +1152,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		PRINT_FIELD_OBJ_PTR("{", args, key,
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_PTR(args, key,
 				    print_btrfs_ioctl_search_key,
 				    entering(tcp), !abbrev(tcp));
 		PRINT_FIELD_U(", ", args, buf_size);

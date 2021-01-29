@@ -42,7 +42,8 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_U(", ", b, f_ffree);
 # if defined HAVE_STRUCT_STATFS_F_FSID_VAL \
   || defined HAVE_STRUCT_STATFS_F_FSID___VAL
-	PRINT_FIELD_OBJ_PTR(", ", b, f_fsid, print_f_fsid, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(b, f_fsid, print_f_fsid, tcp);
 # endif
 	PRINT_FIELD_U(", ", b, f_namelen);
 # ifdef HAVE_STRUCT_STATFS_F_FRSIZE
@@ -78,7 +79,8 @@ print_struct_statfs64(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_U(", ", b, f_ffree);
 # if defined HAVE_STRUCT_STATFS64_F_FSID_VAL \
   || defined HAVE_STRUCT_STATFS64_F_FSID___VAL
-	PRINT_FIELD_OBJ_PTR(", ", b, f_fsid, print_f_fsid, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(b, f_fsid, print_f_fsid, tcp);
 # endif
 	PRINT_FIELD_U(", ", b, f_namelen);
 # ifdef HAVE_STRUCT_STATFS64_F_FRSIZE

@@ -52,7 +52,8 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &msqid_ds))
 		return;
 
-	PRINT_FIELD_OBJ_PTR("{", msqid_ds, msg_perm, print_ipc_perm, cmd);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(msqid_ds, msg_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
 		PRINT_FIELD_U(", ", msqid_ds, msg_stime);
 		PRINT_FIELD_U(", ", msqid_ds, msg_rtime);

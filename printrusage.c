@@ -28,9 +28,11 @@ MPERS_PRINTER_DECL(void, printrusage,
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
 
-	PRINT_FIELD_OBJ_PTR("{", ru, ru_utime,
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(ru, ru_utime,
 			    MPERS_FUNC_NAME(print_struct_timeval));
-	PRINT_FIELD_OBJ_PTR(", ", ru, ru_stime,
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(ru, ru_stime,
 			    MPERS_FUNC_NAME(print_struct_timeval));
 	if (abbrev(tcp)) {
 		tprints(", ...");
@@ -79,8 +81,10 @@ printrusage32(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &ru))
 		return;
 
-	PRINT_FIELD_OBJ_PTR("{", ru, ru_utime, print_timeval32_t);
-	PRINT_FIELD_OBJ_PTR(", ", ru, ru_stime, print_timeval32_t);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(ru, ru_utime, print_timeval32_t);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(ru, ru_stime, print_timeval32_t);
 	if (abbrev(tcp)) {
 		tprints(", ...");
 	} else {

@@ -56,7 +56,8 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &shmid_ds))
 		return;
 
-	PRINT_FIELD_OBJ_PTR("{", shmid_ds, shm_perm, print_ipc_perm, cmd);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(shmid_ds, shm_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
 		PRINT_FIELD_U(", ", shmid_ds, shm_segsz);
 		PRINT_FIELD_TGID(", ", shmid_ds, shm_cpid, tcp);

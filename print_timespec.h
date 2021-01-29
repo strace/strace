@@ -168,8 +168,10 @@ PRINT_ITIMERSPEC(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &t))
 		return -1;
 
-	PRINT_FIELD_OBJ_PTR("{", t, it_interval, print_timespec_t);
-	PRINT_FIELD_OBJ_PTR(", ", t, it_value, print_timespec_t);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(t, it_interval, print_timespec_t);
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_PTR(t, it_value, print_timespec_t);
 	tprints("}");
 	return 0;
 }

@@ -249,7 +249,8 @@ static bool
 print_v4l2_clip(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct_v4l2_clip *p = elem_buf;
-	PRINT_FIELD_OBJ_PTR("{", *p, c, print_v4l2_rect);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(*p, c, print_v4l2_rect);
 	tprints("}");
 	return true;
 }
@@ -307,7 +308,8 @@ DECL_print_v4l2_format_fmt(pix_mp)
 static bool
 DECL_print_v4l2_format_fmt(win)
 {
-	PRINT_FIELD_OBJ_PTR("{", *p, w, print_v4l2_rect);
+	tprint_struct_begin();
+	PRINT_FIELD_OBJ_PTR(*p, w, print_v4l2_rect);
 	PRINT_FIELD_XVAL(", ", *p, field, v4l2_fields, "V4L2_FIELD_???");
 	PRINT_FIELD_X(", ", *p, chromakey);
 
@@ -1039,8 +1041,10 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-		PRINT_FIELD_OBJ_PTR(", ", c, bounds, print_v4l2_rect);
-		PRINT_FIELD_OBJ_PTR(", ", c, defrect, print_v4l2_rect);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(c, bounds, print_v4l2_rect);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(c, defrect, print_v4l2_rect);
 		tprint_struct_next();
 		PRINT_FIELD_FRACT(c, pixelaspect);
 	}
@@ -1064,10 +1068,12 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
-		PRINT_FIELD_OBJ_PTR(", " , c, c, print_v4l2_rect);
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(c, c, print_v4l2_rect);
 	} else {
 		if (!syserror(tcp) && !umove(tcp, arg, &c)) {
-			PRINT_FIELD_OBJ_PTR(", " , c, c, print_v4l2_rect);
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_PTR(c, c, print_v4l2_rect);
 		}
 	}
 
@@ -1290,7 +1296,8 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U("{", b, count);
 		PRINT_FIELD_XVAL(", ", b, memory, v4l2_memories,
 				 "V4L2_MEMORY_???");
-		PRINT_FIELD_OBJ_PTR(", ", b, format,
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(b, format,
 				    print_v4l2_create_buffers_format, tcp);
 		tprints("}");
 		return 0;

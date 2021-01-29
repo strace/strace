@@ -79,7 +79,7 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 	case SIOCGIFHWADDR:
 	case SIOCSIFHWADDR:
 	case SIOCSIFHWBROADCAST:
-		PRINT_FIELD_OBJ_PTR("", *ifr, ifr_hwaddr, print_ifr_hwaddr);
+		PRINT_FIELD_OBJ_PTR(*ifr, ifr_hwaddr, print_ifr_hwaddr);
 		break;
 	case SIOCSIFFLAGS:
 	case SIOCGIFFLAGS:
@@ -112,7 +112,7 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFMAP:
 	case SIOCGIFMAP:
-		PRINT_FIELD_OBJ_PTR("", *ifr, ifr_map, print_ifr_map);
+		PRINT_FIELD_OBJ_PTR(*ifr, ifr_map, print_ifr_map);
 		break;
 	}
 }

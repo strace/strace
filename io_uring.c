@@ -110,9 +110,11 @@ SYS_FUNC(io_uring_setup)
 		PRINT_FIELD_FLAGS(", ", params, features,
 				  uring_setup_features,
 				  "IORING_FEAT_???");
-		PRINT_FIELD_OBJ_PTR(", ", params, sq_off,
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(params, sq_off,
 				    print_io_sqring_offsets);
-		PRINT_FIELD_OBJ_PTR(", ", params, cq_off,
+		tprint_struct_next();
+		PRINT_FIELD_OBJ_PTR(params, cq_off,
 				    print_io_cqring_offsets);
 	}
 	tprints("}");
