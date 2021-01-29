@@ -149,14 +149,14 @@ ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_D(ffe, id);
 	tprint_struct_next();
 	PRINT_FIELD_U(ffe, direction);
+	tprint_struct_next();
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_more_data_follows();
 		tprint_struct_end();
 		return RVAL_IOCTL_DECODED;
 	}
 
-	tprint_struct_next();
 	PRINT_FIELD_FF_EFFECT(ffe, trigger);
 	tprint_struct_next();
 	PRINT_FIELD_FF_EFFECT(ffe, replay);

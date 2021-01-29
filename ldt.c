@@ -40,7 +40,8 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 			return;
 		if (syserror(tcp) || umove(tcp, addr, &desc)) {
 			if (entry_number) {
-				tprints(", ...");
+				tprint_struct_next();
+				tprint_more_data_follows();
 				tprint_struct_end();
 			}
 

@@ -70,7 +70,8 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_U(args, fm_mapped_extents);
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	} else {
 		struct_fiemap_extent fe;
 		tprints(", fm_extents=");

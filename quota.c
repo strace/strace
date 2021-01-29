@@ -195,7 +195,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			PRINT_FIELD_FLAGS(dq, dqb_valid,
 					  if_dqblk_valid, "QIF_???");
 		} else {
-			tprints(", ...");
+			tprint_struct_next();
+			tprint_more_data_follows();
 		}
 		tprint_struct_end();
 		break;
@@ -238,7 +239,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		} else {
 			tprint_struct_next();
 			PRINT_FIELD_U(dq, dqb_id);
-			tprints(", ...");
+			tprint_struct_next();
+			tprint_more_data_follows();
 		}
 		tprint_struct_end();
 		break;
@@ -305,7 +307,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			tprint_struct_next();
 			PRINT_FIELD_U(dq, d_rtbwarns);
 		} else {
-			tprints(", ...");
+			tprint_struct_next();
+			tprint_more_data_follows();
 		}
 		tprint_struct_end();
 		break;
@@ -390,7 +393,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 				tprint_struct_next();
 				PRINT_FIELD_U(dq, qs_iwarnlimit);
 			} else {
-				tprints(", ...");
+				tprint_struct_next();
+				tprint_more_data_follows();
 			}
 			tprint_struct_end();
 		}
@@ -436,7 +440,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			tprint_struct_next();
 			PRINT_FIELD_U(dq, qs_iwarnlimit);
 		} else {
-			tprints(", ...");
+			tprint_struct_next();
+			tprint_more_data_follows();
 		}
 		tprint_struct_end();
 		break;

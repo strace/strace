@@ -137,7 +137,8 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 			PRINT_FIELD_U(*st, st_ctime_nsec);
 		}
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 	tprint_struct_end();
 }

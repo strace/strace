@@ -13,6 +13,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 static void
 printargv(struct tcb *const tcp, kernel_ulong_t addr)
@@ -38,7 +39,8 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 			if (sep == start_sep)
 				printaddr(addr);
 			else {
-				tprints(", ...");
+				tprints(", ");
+				tprint_more_data_follows();
 				printaddr_comment(addr);
 				tprints("]");
 			}
@@ -50,7 +52,8 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 			break;
 		}
 		if (abbrev(tcp) && n >= max_strlen) {
-			tprintf("%s...", sep);
+			tprints(sep);
+			tprint_more_data_follows();
 			break;
 		}
 		tprints(sep);

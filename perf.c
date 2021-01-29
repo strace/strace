@@ -418,8 +418,10 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 print_perf_event_attr_out:
 	if ((attr->size && (attr->size > size)) ||
-	    (!attr->size && (size < PERF_ATTR_SIZE_VER0)))
-		tprints(", ...");
+	    (!attr->size && (size < PERF_ATTR_SIZE_VER0))) {
+		tprint_struct_next();
+		tprint_more_data_follows();
+	}
 
 	tprint_struct_end();
 }

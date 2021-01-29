@@ -112,7 +112,8 @@ SYS_FUNC(statx)
 			tprint_struct_next();
 			PRINT_FIELD_U(stx, stx_dev_minor);
 		} else {
-			tprints(", ...");
+			tprint_struct_next();
+			tprint_more_data_follows();
 		}
 		tprint_struct_end();
 	}

@@ -282,7 +282,8 @@ btrfs_print_logical_ino_container(struct tcb *tcp,
 	btrfs_print_data_container_header(&container);
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	} else {
 		const uint64_t val_addr =
 			inodes_addr + offsetof(typeof(container), val);
@@ -321,7 +322,8 @@ btrfs_print_ino_path_container(struct tcb *tcp,
 	btrfs_print_data_container_header(&container);
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	} else {
 		uint64_t val_addr =
 			fspath_addr + offsetof(typeof(container), val);
@@ -358,7 +360,8 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 	PRINT_FIELD_OBJ_PTR(inherit, lim, btrfs_print_qgroup_limit);
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	} else {
 		uint64_t record;
 		tprints(", qgroups=");
@@ -1318,7 +1321,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		}
 
 		if (abbrev(tcp)) {
-			tprints(", ...");
+			tprint_struct_next();
+			tprint_more_data_follows();
 		} else {
 			struct btrfs_ioctl_space_info info;
 			tprints(", spaces=");

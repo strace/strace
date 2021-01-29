@@ -93,11 +93,14 @@ abs_ioctl(struct tcb *const tcp, const unsigned int code,
 				tprint_struct_next();
 				PRINT_FIELD_U(absinfo, resolution);
 			}
-			if (sz != res_sz)
-				tprints(", ...");
+			if (sz != res_sz) {
+				tprint_struct_next();
+				tprint_more_data_follows();
+			}
 		}
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -144,7 +147,8 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_X_ARRAY(ike, scancode);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -215,7 +219,8 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 			while ((i = next_set_bit(decoded_arg, i + 1,
 						 size_bits)) > 0) {
 				if (abbrev(tcp) && bit_displayed >= 3) {
-					tprints(", ...");
+					tprint_struct_next();
+					tprint_more_data_follows();
 					break;
 				}
 				tprints(", ");

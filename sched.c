@@ -163,8 +163,10 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 	PRINT_FIELD_U(attr, sched_util_max);
 
 end:
-	if ((is_set ? usize : attr.size) > size)
-		tprints(", ...");
+	if ((is_set ? usize : attr.size) > size) {
+		tprint_struct_next();
+		tprint_more_data_follows();
+	}
 
 	tprint_struct_end();
 }

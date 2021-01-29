@@ -80,7 +80,8 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		PRINT_FIELD_X_ARRAY(info, reserved);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -137,7 +138,8 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 		tprint_struct_next();
 		PRINT_FIELD_X_ARRAY(*info64, lo_init);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();

@@ -389,10 +389,12 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 		buf_len -= len;
 	}
 	if (buf_len) {
-		tprints(", ...");
+		tprint_array_next();
+		tprint_more_data_follows();
 		printaddr_comment(addr + (control_len - buf_len));
 	} else if (control_len < in_control_len) {
-		tprints(", ...");
+		tprint_array_next();
+		tprint_more_data_follows();
 	}
 	tprints("]");
 	free(buf);

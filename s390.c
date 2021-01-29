@@ -608,7 +608,8 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 
 		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -754,7 +755,8 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 
 		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -910,7 +912,8 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 
 		PRINT_UNKNOWN_TAIL_EX(hdr, last_decoded, size);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -1090,7 +1093,8 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 
 		PRINT_UNKNOWN_TAIL(hdr, size);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -1136,7 +1140,8 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	PRINT_FIELD_0X(*hdr, infhflg1);
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 		goto sthyi_sections;
 	}
 
@@ -1402,7 +1407,8 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 		tprint_struct_next();
 		PRINT_FIELD_X(gsepl, gs_era);
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();

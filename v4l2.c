@@ -655,7 +655,8 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 			tprint_struct_next();
 			PRINT_FIELD_V4L2_TIMEVAL(b, timestamp);
 		}
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 
 	tprint_struct_end();
@@ -1051,7 +1052,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 					  print_xint32_array_member);
 		}
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 	tprint_struct_end();
 
@@ -1119,7 +1121,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 					  print_xint32_array_member);
 		}
 	} else {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	}
 	tprint_struct_end();
 

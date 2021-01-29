@@ -129,8 +129,10 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 	uint32_t offset_end = 0;
 
 	if (abbrev(tcp)) {
-		if (ioc->target_count)
-			tprints(", ...");
+		if (ioc->target_count) {
+			tprints(", ");
+			tprint_more_data_follows();
+		}
 
 		return;
 	}
@@ -262,7 +264,8 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 		return;
 	}
 
@@ -348,7 +351,8 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 		return;
 	}
 

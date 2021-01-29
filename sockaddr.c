@@ -377,8 +377,10 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 
 digis_end:
 	if (addrlen_us > (has_digis * sizeof(sax25->fsa_digipeater[0])
-		       + sizeof(sax25->fsa_ax25)))
-		tprints(", ...");
+		       + sizeof(sax25->fsa_ax25))) {
+		tprints(", ");
+		tprint_more_data_follows();
+	}
 }
 
 static void

@@ -42,7 +42,8 @@ print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 	tprint_struct_next();
 	PRINT_FIELD_D(*rt, tm_year);
 	if (abbrev(tcp)) {
-		tprints(", ...");
+		tprint_struct_next();
+		tprint_more_data_follows();
 	} else {
 		tprint_struct_next();
 		PRINT_FIELD_D(*rt, tm_wday);
