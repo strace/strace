@@ -271,7 +271,7 @@ print_gpio_v2_line_attribute(const struct_gpio_v2_line_attribute *attr,
 static void
 print_gpio_v2_line_config_attribute(const struct_gpio_v2_line_config_attribute *attr)
 {
-	tprints("{");
+	tprint_struct_begin();
 	print_gpio_v2_line_attribute(&attr->attr, true);
 	tprint_struct_next();
 	PRINT_FIELD_X(*attr, mask);
@@ -282,7 +282,7 @@ static bool
 print_gpio_v2_line_attr_array_member(struct tcb *tcp, void *elem_buf,
 				     size_t elem_size, void *data)
 {
-	tprints("{");
+	tprint_struct_begin();
 	print_gpio_v2_line_attribute(elem_buf, false);
 	tprint_struct_end();
 

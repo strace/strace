@@ -82,7 +82,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &range))
 		return RVAL_IOCTL_DECODED;
 
-	tprints("{");
+	tprint_struct_begin();
 
 	if (entering(tcp)) {
 		PRINT_FIELD_U(range, src_offset);

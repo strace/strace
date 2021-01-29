@@ -373,7 +373,7 @@ static void
 print_btrfs_ioctl_search_key(const struct btrfs_ioctl_search_key *const key,
 			     const bool is_entering, const bool is_not_abbrev)
 {
-	tprints("{");
+	tprint_struct_begin();
 	if (is_entering) {
 		btrfs_print_objectid(*key, tree_id);
 
@@ -718,7 +718,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("{");
+		tprint_struct_begin();
 
 		if (!IS_ARRAY_ZERO(args.uuid)) {
 			PRINT_FIELD_UUID(args, uuid);
@@ -878,7 +878,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
-		tprints("{");
+		tprint_struct_begin();
 
 		if (entering(tcp)) {
 			PRINT_FIELD_DEV(args, devid);
@@ -944,7 +944,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		tprints("{");
+		tprint_struct_begin();
 		if (get_tcb_priv_ulong(tcp)) {
 			btrfs_print_objectid(args, treeid);
 			tprints(", ");

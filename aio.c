@@ -128,7 +128,7 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 static void
 print_iocb(struct tcb *tcp, const struct iocb *cb)
 {
-	tprints("{");
+	tprint_struct_begin();
 
 	enum iocb_sub sub = print_iocb_header(tcp, cb);
 
@@ -241,7 +241,7 @@ SYS_FUNC(io_cancel)
 		struct iocb cb;
 
 		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &cb)) {
-			tprints("{");
+			tprint_struct_begin();
 			print_iocb_header(tcp, &cb);
 			tprint_struct_end();
 		}

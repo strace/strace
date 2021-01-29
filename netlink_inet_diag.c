@@ -161,7 +161,7 @@ decode_inet_diag_bc_op(struct tcb *const tcp,
 		return true;
 
 	if (len > sizeof(op))
-		tprints("{");
+		tprint_struct_begin();
 
 	print_inet_diag_bc_op(&op);
 

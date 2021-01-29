@@ -77,7 +77,7 @@
 void
 print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 {
-	tprints("{");
+	tprint_struct_begin();
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_DEV(*st, st_dev);
 		tprint_struct_next();

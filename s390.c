@@ -1128,7 +1128,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	if (umove_or_printaddr(tcp, ptr, &data))
 		return;
 
-	tprints("{");
+	tprint_struct_begin();
 
 	/* Header */
 	tprints("/* header */ ");
@@ -1353,7 +1353,8 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 	if (umove_or_printaddr(tcp, addr, &gsepl))
 		return;
 
-	tprints("[{");
+	tprints("[");
+	tprint_struct_begin();
 
 	if (!abbrev(tcp)) {
 		if (gsepl.pad1) {
@@ -1418,7 +1419,7 @@ guard_storage_print_gscb(struct tcb *tcp, kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &gscb))
 		return;
 
-	tprints("{");
+	tprint_struct_begin();
 
 	if (gscb.reserved) {
 		PRINT_FIELD_0X(gscb, reserved);

@@ -34,7 +34,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 	if (umove_or_printaddr(tcp, addr, &sev))
 		return;
 
-	tprints("{");
+	tprint_struct_begin();
 	if (sev.sigev_value.sival_ptr) {
 		PRINT_FIELD_OBJ_VAL(sev, sigev_value, print_sigev_value);
 		tprints(", ");

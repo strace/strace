@@ -231,7 +231,7 @@ static
 void
 printsiginfo(struct tcb *tcp, const siginfo_t *sip)
 {
-	tprints("{");
+	tprint_struct_begin();
 
 	if (sip->si_signo) {
 		PRINT_FIELD_OBJ_VAL(*sip, si_signo, printsignal);

@@ -79,7 +79,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 	const unsigned int nla_len = MIN(nla->nla_len, len);
 
 	if (nla_len > NLA_HDRLEN)
-		tprints("{");
+		tprint_struct_begin();
 
 	print_nlattr(nla, table, dflt);
 
