@@ -1024,7 +1024,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned long entry_id = get_tcb_priv_ulong(tcp);
 
 	if (c.id != entry_id) {
-		tprints(" => ");
+		tprint_value_changed();
 		print_v4l2_cid(c.id, false);
 	}
 
@@ -1083,7 +1083,7 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned long entry_id = get_tcb_priv_ulong(tcp);
 
 	if (c.id != entry_id) {
-		tprints(" => ");
+		tprint_value_changed();
 		print_v4l2_cid(c.id, false);
 	}
 

@@ -46,7 +46,7 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
-		tprints(" => ");
+		tprint_value_changed();
 
 	if (umove_or_printaddr(tcp, arg, &args))
 		return RVAL_IOCTL_DECODED;

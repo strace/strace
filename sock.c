@@ -216,7 +216,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	/* exiting */
 
 	if (entering_ifc->ifc_buf && (entering_ifc->ifc_len != ifc->ifc_len))
-		tprints(" => ");
+		tprint_value_changed();
 	if (!entering_ifc->ifc_buf || (entering_ifc->ifc_len != ifc->ifc_len))
 		print_ifc_len(ifc->ifc_len);
 
@@ -224,7 +224,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		PRINT_FIELD_PTR(*entering_ifc, ifc_buf);
 		if (entering_ifc->ifc_buf != ifc->ifc_buf) {
-			tprints(" => ");
+			tprint_value_changed();
 			printaddr(ptr_to_kulong(ifc->ifc_buf));
 		}
 	} else {

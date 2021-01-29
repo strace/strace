@@ -231,7 +231,7 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		/*
 		 * Yes, params are [in/out] for TEE_IOC_OPEN_SESSION.
 		 * As for all other operations they are used in.
@@ -289,7 +289,7 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, invoke, &params)))
 			return rval;
 
@@ -371,7 +371,7 @@ tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_recv, &params)))
 			return rval;
 
@@ -415,7 +415,7 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_send, &params)))
 			return rval;
 
@@ -451,7 +451,7 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		if (umove_or_printaddr(tcp, arg, &shm_alloc))
 			return RVAL_IOCTL_DECODED;
 
@@ -490,7 +490,7 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		if (umove_or_printaddr(tcp, arg, &shm_register_fd))
 			return RVAL_IOCTL_DECODED;
 
@@ -528,7 +528,7 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	} else {
-		tprints(" => ");
+		tprint_value_changed();
 		if (umove_or_printaddr(tcp, arg, &shm_register))
 			return RVAL_IOCTL_DECODED;
 

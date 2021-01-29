@@ -256,7 +256,7 @@ SYS_FUNC(clone3)
 		goto out;
 
 	if (umoven(tcp, addr, fetch_size, &arg)) {
-		tprints(" => ");
+		tprint_value_changed();
 		printaddr(addr);
 		goto out;
 	}

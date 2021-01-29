@@ -140,7 +140,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_XVAL(*attr, size, perf_attr_size, "PERF_ATTR_SIZE_???");
 
 	if (use_new_size) {
-		tprints(" => ");
+		tprint_value_changed();
 
 		if (use_new_size > 0)
 			printxval(perf_attr_size, new_size,

@@ -238,7 +238,7 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 		return RVAL_DECODED;
 	}
 	if (printed)
-		tprints(" => ");
+		tprint_value_changed();
 
 	/* Maximum size is 8 * 256 + 16, a bit over 4k */
 	size_t probe_sz = sizeof(probe->ops[0]) * nargs + sizeof(*probe);

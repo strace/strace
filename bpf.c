@@ -767,14 +767,14 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprints(", jited_ksyms=");
 	if (saved->jited_ksyms != info.jited_ksyms) {
 		printaddr64(saved->jited_ksyms);
-		tprints(" => ");
+		tprint_value_changed();
 	}
 	printaddr64(info.jited_ksyms);
 
 	tprints(", jited_func_lens=");
 	if (saved->jited_func_lens != info.jited_func_lens) {
 		printaddr64(saved->jited_func_lens);
-		tprints(" => ");
+		tprint_value_changed();
 	}
 	printaddr64(info.jited_func_lens);
 
@@ -815,7 +815,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprints(", jited_line_info=");
 	if (saved->jited_line_info != info.jited_line_info) {
 		printaddr64(saved->jited_line_info);
-		tprints(" => ");
+		tprint_value_changed();
 	}
 	printaddr64(info.jited_line_info);
 

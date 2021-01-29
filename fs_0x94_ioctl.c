@@ -77,7 +77,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
-		tprints(" => ");
+		tprint_value_changed();
 
 	if (umove_or_printaddr(tcp, arg, &range))
 		return RVAL_IOCTL_DECODED;

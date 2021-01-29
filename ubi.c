@@ -58,7 +58,7 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp)) {
-		tprints(" => ");
+		tprint_value_changed();
 		printnum_int(tcp, arg, "%d");
 	}
 
@@ -162,7 +162,7 @@ decode_UBI_IOCATT(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp)) {
-		tprints(" => ");
+		tprint_value_changed();
 		printnum_int(tcp, arg, "%d");
 	}
 
