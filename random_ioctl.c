@@ -40,8 +40,10 @@ random_ioctl(struct tcb *const tcp, const unsigned int code,
 	case RNDADDENTROPY:
 		tprints(", ");
 		if (!umove_or_printaddr(tcp, arg, &info)) {
-			PRINT_FIELD_D("{", info, entropy_count);
-			PRINT_FIELD_D(", ", info, buf_size);
+			tprint_struct_begin();
+			PRINT_FIELD_D(info, entropy_count);
+			tprint_struct_next();
+			PRINT_FIELD_D(info, buf_size);
 			tprints(", buf=");
 			buf = arg + offsetof(struct rand_pool_info, buf);
 			printstrn(tcp, buf, info.buf_size);

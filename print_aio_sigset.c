@@ -27,7 +27,8 @@ MPERS_PRINTER_DECL(void, print_aio_sigset, struct tcb *tcp,
 		tprints("{sigmask=");
 		print_sigset_addr_len(tcp, (uintptr_t) sigset.sigmask,
 				      sigset.sigsetsize);
-		PRINT_FIELD_U(", ", sigset, sigsetsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(sigset, sigsetsize);
 		tprints("}");
 	}
 }

@@ -111,7 +111,8 @@ decode_otp_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(oinfo, start);
 	tprint_struct_next();
 	PRINT_FIELD_X(oinfo, length);
-	PRINT_FIELD_U(", ", oinfo, locked);
+	tprint_struct_next();
+	PRINT_FIELD_U(oinfo, locked);
 	tprints("}");
 }
 

@@ -31,9 +31,12 @@ decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_CSTRING(uh, prefix);
 	tprintf(", magic=htonl(%#x)", ntohl(uh.magic));
-	PRINT_FIELD_U(", ", uh, header_size);
-	PRINT_FIELD_U(", ", uh, properties_off);
-	PRINT_FIELD_U(", ", uh, properties_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(uh, header_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(uh, properties_off);
+	tprint_struct_next();
+	PRINT_FIELD_U(uh, properties_len);
 	tprintf(", filter_subsystem_hash=htonl(%#x)", ntohl(uh.filter_subsystem_hash));
 	tprintf(", filter_devtype_hash=htonl(%#x)", ntohl(uh.filter_devtype_hash));
 	tprintf(", filter_tag_bloom_hi=htonl(%#x)", ntohl(uh.filter_tag_bloom_hi));

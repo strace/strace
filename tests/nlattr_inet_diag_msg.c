@@ -129,26 +129,26 @@ main(void)
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_MEMINFO, pattern, minfo,
 			   printf("{");
-			   PRINT_FIELD_U("", minfo, idiag_rmem);
+			   PRINT_FIELD_U(minfo, idiag_rmem);
 			   printf(", ");
-			   PRINT_FIELD_U("", minfo, idiag_wmem);
+			   PRINT_FIELD_U(minfo, idiag_wmem);
 			   printf(", ");
-			   PRINT_FIELD_U("", minfo, idiag_fmem);
+			   PRINT_FIELD_U(minfo, idiag_fmem);
 			   printf(", ");
-			   PRINT_FIELD_U("", minfo, idiag_tmem);
+			   PRINT_FIELD_U(minfo, idiag_tmem);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_VEGASINFO, pattern, vegas,
 			   printf("{");
-			   PRINT_FIELD_U("", vegas, tcpv_enabled);
+			   PRINT_FIELD_U(vegas, tcpv_enabled);
 			   printf(", ");
-			   PRINT_FIELD_U("", vegas, tcpv_rttcnt);
+			   PRINT_FIELD_U(vegas, tcpv_rttcnt);
 			   printf(", ");
-			   PRINT_FIELD_U("", vegas, tcpv_rtt);
+			   PRINT_FIELD_U(vegas, tcpv_rtt);
 			   printf(", ");
-			   PRINT_FIELD_U("", vegas, tcpv_minrtt);
+			   PRINT_FIELD_U(vegas, tcpv_minrtt);
 			   printf("}"));
 
 
@@ -156,15 +156,15 @@ main(void)
 			   init_inet_diag_msg, print_inet_diag_msg,
 			   INET_DIAG_DCTCPINFO, pattern, dctcp,
 			   printf("{");
-			   PRINT_FIELD_U("", dctcp, dctcp_enabled);
+			   PRINT_FIELD_U(dctcp, dctcp_enabled);
 			   printf(", ");
-			   PRINT_FIELD_U("", dctcp, dctcp_ce_state);
+			   PRINT_FIELD_U(dctcp, dctcp_ce_state);
 			   printf(", ");
-			   PRINT_FIELD_U("", dctcp, dctcp_alpha);
+			   PRINT_FIELD_U(dctcp, dctcp_alpha);
 			   printf(", ");
-			   PRINT_FIELD_U("", dctcp, dctcp_ab_ecn);
+			   PRINT_FIELD_U(dctcp, dctcp_ab_ecn);
 			   printf(", ");
-			   PRINT_FIELD_U("", dctcp, dctcp_ab_tot);
+			   PRINT_FIELD_U(dctcp, dctcp_ab_tot);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
@@ -175,11 +175,11 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_X(bbr, bbr_bw_hi);
 			   printf(", ");
-			   PRINT_FIELD_U("", bbr, bbr_min_rtt);
+			   PRINT_FIELD_U(bbr, bbr_min_rtt);
 			   printf(", ");
-			   PRINT_FIELD_U("", bbr, bbr_pacing_gain);
+			   PRINT_FIELD_U(bbr, bbr_pacing_gain);
 			   printf(", ");
-			   PRINT_FIELD_U("", bbr, bbr_cwnd_gain);
+			   PRINT_FIELD_U(bbr, bbr_cwnd_gain);
 			   printf("}"));
 
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,

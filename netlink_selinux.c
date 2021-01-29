@@ -25,7 +25,8 @@ decode_netlink_selinux(struct tcb *const tcp,
 		if (len < sizeof(msg))
 			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		else if (!umove_or_printaddr(tcp, addr, &msg)) {
-			PRINT_FIELD_D("{", msg, val);
+			tprint_struct_begin();
+			PRINT_FIELD_D(msg, val);
 			tprints("}");
 		}
 		break;
@@ -36,7 +37,8 @@ decode_netlink_selinux(struct tcb *const tcp,
 		if (len < sizeof(msg))
 			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		else if (!umove_or_printaddr(tcp, addr, &msg)) {
-			PRINT_FIELD_U("{", msg, seqno);
+			tprint_struct_begin();
+			PRINT_FIELD_U(msg, seqno);
 			tprints("}");
 		}
 		break;

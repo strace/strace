@@ -79,23 +79,23 @@ main(void)
 			   init_ndtmsg, print_ndtmsg,
 			   NDTA_CONFIG, pattern, ndtc,
 			   printf("{");
-			   PRINT_FIELD_U("", ndtc, ndtc_key_len);
+			   PRINT_FIELD_U(ndtc, ndtc_key_len);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_entry_size);
+			   PRINT_FIELD_U(ndtc, ndtc_entry_size);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_entries);
+			   PRINT_FIELD_U(ndtc, ndtc_entries);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_last_flush);
+			   PRINT_FIELD_U(ndtc, ndtc_last_flush);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_last_rand);
+			   PRINT_FIELD_U(ndtc, ndtc_last_rand);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_hash_rnd);
+			   PRINT_FIELD_U(ndtc, ndtc_hash_rnd);
 			   printf(", ");
 			   PRINT_FIELD_0X(ndtc, ndtc_hash_mask);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_hash_chain_gc);
+			   PRINT_FIELD_U(ndtc, ndtc_hash_chain_gc);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtc, ndtc_proxy_qlen);
+			   PRINT_FIELD_U(ndtc, ndtc_proxy_qlen);
 			   printf("}"));
 #endif /* HAVE_STRUCT_NDT_CONFIG */
 
@@ -107,7 +107,7 @@ main(void)
 			   init_ndtmsg, print_ndtmsg,
 			   NDTA_PARMS, pattern, nla,
 			   printf("{");
-			   PRINT_FIELD_U("", nla, nla_len);
+			   PRINT_FIELD_U(nla, nla_len);
 			   printf(", nla_type=NDTPA_IFINDEX}"));
 
 #ifdef HAVE_STRUCT_NDT_STATS
@@ -130,28 +130,28 @@ main(void)
 			   init_ndtmsg, print_ndtmsg,
 			   NDTA_STATS, pattern, ndtst,
 			   printf("{");
-			   PRINT_FIELD_U("", ndtst, ndts_allocs);
+			   PRINT_FIELD_U(ndtst, ndts_allocs);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_destroys);
+			   PRINT_FIELD_U(ndtst, ndts_destroys);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_hash_grows);
+			   PRINT_FIELD_U(ndtst, ndts_hash_grows);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_res_failed);
+			   PRINT_FIELD_U(ndtst, ndts_res_failed);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_lookups);
+			   PRINT_FIELD_U(ndtst, ndts_lookups);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_hits);
+			   PRINT_FIELD_U(ndtst, ndts_hits);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_rcv_probes_mcast);
+			   PRINT_FIELD_U(ndtst, ndts_rcv_probes_mcast);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_rcv_probes_ucast);
+			   PRINT_FIELD_U(ndtst, ndts_rcv_probes_ucast);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_periodic_gc_runs);
+			   PRINT_FIELD_U(ndtst, ndts_periodic_gc_runs);
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_forced_gc_runs);
+			   PRINT_FIELD_U(ndtst, ndts_forced_gc_runs);
 # ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 			   printf(", ");
-			   PRINT_FIELD_U("", ndtst, ndts_table_fulls);
+			   PRINT_FIELD_U(ndtst, ndts_table_fulls);
 # endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
 			   printf("}"));
 #endif /* HAVE_STRUCT_NDT_STATS */

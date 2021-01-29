@@ -39,7 +39,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 			 * other than 0.
 			 */
 			PRINT_FIELD_X(req, sdiag_protocol);
-			PRINT_FIELD_U(", ", req, pdiag_ino);
+			tprint_struct_next();
+			PRINT_FIELD_U(req, pdiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, pdiag_show,
 					  packet_diag_show, "PACKET_SHOW_???");
@@ -68,9 +69,12 @@ decode_packet_diag_info(struct tcb *const tcp,
 	PRINT_FIELD_IFINDEX(pinfo, pdi_index);
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(pinfo, pdi_version, af_packet_versions, "TPACKET_???");
-	PRINT_FIELD_U(", ", pinfo, pdi_reserve);
-	PRINT_FIELD_U(", ", pinfo, pdi_copy_thresh);
-	PRINT_FIELD_U(", ", pinfo, pdi_tstamp);
+	tprint_struct_next();
+	PRINT_FIELD_U(pinfo, pdi_reserve);
+	tprint_struct_next();
+	PRINT_FIELD_U(pinfo, pdi_copy_thresh);
+	tprint_struct_next();
+	PRINT_FIELD_U(pinfo, pdi_tstamp);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(pinfo, pdi_flags, packet_diag_info_flags, "PDI_???");
 	tprints("}");
@@ -87,9 +91,12 @@ print_packet_diag_mclist(struct tcb *const tcp, void *const elem_buf,
 
 	tprint_struct_begin();
 	PRINT_FIELD_IFINDEX(*dml, pdmc_index);
-	PRINT_FIELD_U(", ", *dml, pdmc_count);
-	PRINT_FIELD_U(", ", *dml, pdmc_type);
-	PRINT_FIELD_U(", ", *dml, pdmc_alen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*dml, pdmc_count);
+	tprint_struct_next();
+	PRINT_FIELD_U(*dml, pdmc_type);
+	tprint_struct_next();
+	PRINT_FIELD_U(*dml, pdmc_alen);
 	tprint_struct_next();
 	PRINT_FIELD_STRING(*dml, pdmc_addr, alen, QUOTE_FORCE_HEX);
 	tprints("}");
@@ -128,13 +135,20 @@ decode_packet_diag_ring(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &pdr))
 		return true;
 
-	PRINT_FIELD_U("{", pdr, pdr_block_size);
-	PRINT_FIELD_U(", ", pdr, pdr_block_nr);
-	PRINT_FIELD_U(", ", pdr, pdr_frame_size);
-	PRINT_FIELD_U(", ", pdr, pdr_frame_nr);
-	PRINT_FIELD_U(", ", pdr, pdr_retire_tmo);
-	PRINT_FIELD_U(", ", pdr, pdr_sizeof_priv);
-	PRINT_FIELD_U(", ", pdr, pdr_features);
+	tprint_struct_begin();
+	PRINT_FIELD_U(pdr, pdr_block_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(pdr, pdr_block_nr);
+	tprint_struct_next();
+	PRINT_FIELD_U(pdr, pdr_frame_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(pdr, pdr_frame_nr);
+	tprint_struct_next();
+	PRINT_FIELD_U(pdr, pdr_retire_tmo);
+	tprint_struct_next();
+	PRINT_FIELD_U(pdr, pdr_sizeof_priv);
+	tprint_struct_next();
+	PRINT_FIELD_U(pdr, pdr_features);
 	tprints("}");
 
 	return true;
@@ -184,7 +198,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg)
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(msg, pdiag_num,
 					 ethernet_protocols, "ETH_P_???");
-			PRINT_FIELD_U(", ", msg, pdiag_ino);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, pdiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_COOKIE(msg, pdiag_cookie);
 			decode_nla = true;

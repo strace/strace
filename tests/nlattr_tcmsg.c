@@ -79,21 +79,21 @@ main(void)
 			   init_tcmsg, print_tcmsg,
 			   TCA_STATS, pattern, buf,
 			   printf("{");
-			   PRINT_FIELD_U("", st, bytes);
+			   PRINT_FIELD_U(st, bytes);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, packets);
+			   PRINT_FIELD_U(st, packets);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, drops);
+			   PRINT_FIELD_U(st, drops);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, overlimits);
+			   PRINT_FIELD_U(st, overlimits);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, bps);
+			   PRINT_FIELD_U(st, bps);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, pps);
+			   PRINT_FIELD_U(st, pps);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, qlen);
+			   PRINT_FIELD_U(st, qlen);
 			   printf(", ");
-			   PRINT_FIELD_U("", st, backlog);
+			   PRINT_FIELD_U(st, backlog);
 			   printf("}"));
 
 	static const struct tc_estimator est = {
@@ -104,9 +104,9 @@ main(void)
 			   init_tcmsg, print_tcmsg,
 			   TCA_RATE, pattern, est,
 			   printf("{");
-			   PRINT_FIELD_D("", est, interval);
+			   PRINT_FIELD_D(est, interval);
 			   printf(", ");
-			   PRINT_FIELD_U("", est, ewma_log);
+			   PRINT_FIELD_U(est, ewma_log);
 			   printf("}"));
 
 	puts("+++ exited with 0 +++");

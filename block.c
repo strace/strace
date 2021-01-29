@@ -63,14 +63,19 @@ print_blkpg_req(struct tcb *tcp, const struct_blkpg_ioctl_arg *blkpg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(*blkpg, op, blkpg_ops, "BLKPG_???");
-	PRINT_FIELD_D(", ", *blkpg, flags);
-	PRINT_FIELD_D(", ", *blkpg, datalen);
+	tprint_struct_next();
+	PRINT_FIELD_D(*blkpg, flags);
+	tprint_struct_next();
+	PRINT_FIELD_D(*blkpg, datalen);
 
 	tprints(", data=");
 	if (!umove_or_printaddr(tcp, ptr_to_kulong(blkpg->data), &p)) {
-		PRINT_FIELD_D("{", p, start);
-		PRINT_FIELD_D(", ", p, length);
-		PRINT_FIELD_D(", ", p, pno);
+		tprint_struct_begin();
+		PRINT_FIELD_D(p, start);
+		tprint_struct_next();
+		PRINT_FIELD_D(p, length);
+		tprint_struct_next();
+		PRINT_FIELD_D(p, pno);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(p, devname);
 		tprint_struct_next();
@@ -177,12 +182,18 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 			tprints(", ");
 			if (umove_or_printaddr(tcp, arg, &buts))
 				break;
-			PRINT_FIELD_U("{", buts, act_mask);
-			PRINT_FIELD_U(", ", buts, buf_size);
-			PRINT_FIELD_U(", ", buts, buf_nr);
-			PRINT_FIELD_U(", ", buts, start_lba);
-			PRINT_FIELD_U(", ", buts, end_lba);
-			PRINT_FIELD_TGID(", ", buts, pid, tcp);
+			tprint_struct_begin();
+			PRINT_FIELD_U(buts, act_mask);
+			tprint_struct_next();
+			PRINT_FIELD_U(buts, buf_size);
+			tprint_struct_next();
+			PRINT_FIELD_U(buts, buf_nr);
+			tprint_struct_next();
+			PRINT_FIELD_U(buts, start_lba);
+			tprint_struct_next();
+			PRINT_FIELD_U(buts, end_lba);
+			tprint_struct_next();
+			PRINT_FIELD_TGID(buts, pid, tcp);
 			return 0;
 		} else {
 			struct_blk_user_trace_setup buts;

@@ -60,8 +60,10 @@ decode_inet_diag_hostcond(struct tcb *const tcp,
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(cond, family, addrfams, "AF_???");
-	PRINT_FIELD_U(", ", cond, prefix_len);
-	PRINT_FIELD_U(", ", cond, port);
+	tprint_struct_next();
+	PRINT_FIELD_U(cond, prefix_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(cond, port);
 
 	if (len > sizeof(cond)) {
 		tprints(", ");
@@ -76,8 +78,10 @@ print_inet_diag_bc_op(const struct inet_diag_bc_op *const op)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(*op, code, inet_diag_bytecodes, "INET_DIAG_BC_???");
-	PRINT_FIELD_U(", ", *op, yes);
-	PRINT_FIELD_U(", ", *op, no);
+	tprint_struct_next();
+	PRINT_FIELD_U(*op, yes);
+	tprint_struct_next();
+	PRINT_FIELD_U(*op, no);
 	tprints("}");
 }
 
@@ -91,8 +95,10 @@ decode_inet_diag_markcond(struct tcb *const tcp,
 	if (len < sizeof(markcond))
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 	else if (!umove_or_printaddr(tcp, addr, &markcond)) {
-		PRINT_FIELD_U("{", markcond, mark);
-		PRINT_FIELD_U(", ", markcond, mask);
+		tprint_struct_begin();
+		PRINT_FIELD_U(markcond, mark);
+		tprint_struct_next();
+		PRINT_FIELD_U(markcond, mask);
 		tprints("}");
 	}
 }
@@ -191,8 +197,9 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
-			PRINT_FIELD_U("", req, idiag_src_len);
-			PRINT_FIELD_U(", ", req, idiag_dst_len);
+			PRINT_FIELD_U(req, idiag_src_len);
+			tprint_struct_next();
+			PRINT_FIELD_U(req, idiag_dst_len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, idiag_ext,
 					  inet_diag_extended_flags,
@@ -203,7 +210,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, idiag_states,
 					  tcp_state_flags, "1<<TCP_???");
-			PRINT_FIELD_U(", ", req, idiag_dbs);
+			tprint_struct_next();
+			PRINT_FIELD_U(req, idiag_dbs);
 			decode_nla = true;
 		}
 	} else
@@ -288,10 +296,14 @@ decode_inet_diag_meminfo(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &minfo))
 		return true;
 
-	PRINT_FIELD_U("{", minfo, idiag_rmem);
-	PRINT_FIELD_U(", ", minfo, idiag_wmem);
-	PRINT_FIELD_U(", ", minfo, idiag_fmem);
-	PRINT_FIELD_U(", ", minfo, idiag_tmem);
+	tprint_struct_begin();
+	PRINT_FIELD_U(minfo, idiag_rmem);
+	tprint_struct_next();
+	PRINT_FIELD_U(minfo, idiag_wmem);
+	tprint_struct_next();
+	PRINT_FIELD_U(minfo, idiag_fmem);
+	tprint_struct_next();
+	PRINT_FIELD_U(minfo, idiag_tmem);
 	tprints("}");
 
 	return true;
@@ -310,10 +322,14 @@ decode_tcpvegas_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &vegas))
 		return true;
 
-	PRINT_FIELD_U("{", vegas, tcpv_enabled);
-	PRINT_FIELD_U(", ", vegas, tcpv_rttcnt);
-	PRINT_FIELD_U(", ", vegas, tcpv_rtt);
-	PRINT_FIELD_U(", ", vegas, tcpv_minrtt);
+	tprint_struct_begin();
+	PRINT_FIELD_U(vegas, tcpv_enabled);
+	tprint_struct_next();
+	PRINT_FIELD_U(vegas, tcpv_rttcnt);
+	tprint_struct_next();
+	PRINT_FIELD_U(vegas, tcpv_rtt);
+	tprint_struct_next();
+	PRINT_FIELD_U(vegas, tcpv_minrtt);
 	tprints("}");
 
 	return true;
@@ -332,11 +348,16 @@ decode_tcp_dctcp_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &dctcp))
 		return true;
 
-	PRINT_FIELD_U("{", dctcp, dctcp_enabled);
-	PRINT_FIELD_U(", ", dctcp, dctcp_ce_state);
-	PRINT_FIELD_U(", ", dctcp, dctcp_alpha);
-	PRINT_FIELD_U(", ", dctcp, dctcp_ab_ecn);
-	PRINT_FIELD_U(", ", dctcp, dctcp_ab_tot);
+	tprint_struct_begin();
+	PRINT_FIELD_U(dctcp, dctcp_enabled);
+	tprint_struct_next();
+	PRINT_FIELD_U(dctcp, dctcp_ce_state);
+	tprint_struct_next();
+	PRINT_FIELD_U(dctcp, dctcp_alpha);
+	tprint_struct_next();
+	PRINT_FIELD_U(dctcp, dctcp_ab_ecn);
+	tprint_struct_next();
+	PRINT_FIELD_U(dctcp, dctcp_ab_tot);
 	tprints("}");
 
 	return true;
@@ -359,9 +380,12 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	PRINT_FIELD_X(bbr, bbr_bw_lo);
 	tprint_struct_next();
 	PRINT_FIELD_X(bbr, bbr_bw_hi);
-	PRINT_FIELD_U(", ", bbr, bbr_min_rtt);
-	PRINT_FIELD_U(", ", bbr, bbr_pacing_gain);
-	PRINT_FIELD_U(", ", bbr, bbr_cwnd_gain);
+	tprint_struct_next();
+	PRINT_FIELD_U(bbr, bbr_min_rtt);
+	tprint_struct_next();
+	PRINT_FIELD_U(bbr, bbr_pacing_gain);
+	tprint_struct_next();
+	PRINT_FIELD_U(bbr, bbr_cwnd_gain);
 	tprints("}");
 
 	return true;
@@ -402,16 +426,23 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 					 (char *) &msg + offset)) {
 			PRINT_FIELD_XVAL(msg, idiag_state,
 					 tcp_states, "TCP_???");
-			PRINT_FIELD_U(", ", msg, idiag_timer);
-			PRINT_FIELD_U(", ", msg, idiag_retrans);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_timer);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_retrans);
 			tprint_struct_next();
 			PRINT_FIELD_INET_DIAG_SOCKID(msg, id,
 						     msg.idiag_family);
-			PRINT_FIELD_U(", ", msg, idiag_expires);
-			PRINT_FIELD_U(", ", msg, idiag_rqueue);
-			PRINT_FIELD_U(", ", msg, idiag_wqueue);
-			PRINT_FIELD_U(", ", msg, idiag_uid);
-			PRINT_FIELD_U(", ", msg, idiag_inode);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_expires);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_rqueue);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_wqueue);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_uid);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, idiag_inode);
 			decode_nla = true;
 		}
 	} else

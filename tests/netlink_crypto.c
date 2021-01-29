@@ -100,7 +100,7 @@ test_crypto_msg_newalg(const int fd)
 			       printf(", ");
 			       PRINT_FIELD_X(alg, cru_mask);
 			       printf(", ");
-			       PRINT_FIELD_U("", alg, cru_refcnt);
+			       PRINT_FIELD_U(alg, cru_refcnt);
 			       printf(", ");
 			       PRINT_FIELD_X(alg, cru_flags);
 			       printf("}"));
@@ -128,7 +128,7 @@ test_crypto_msg_newalg(const int fd)
 			       printf(", ");
 			       PRINT_FIELD_X(alg, cru_mask);
 			       printf(", ");
-			       PRINT_FIELD_U("", alg, cru_refcnt);
+			       PRINT_FIELD_U(alg, cru_refcnt);
 			       printf(", ");
 			       PRINT_FIELD_X(alg, cru_flags);
 			       printf("}"));

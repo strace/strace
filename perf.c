@@ -166,7 +166,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * debugfs tracing/events/../../id if ftrace is enabled
 		 * in the kernel."
 		 */
-		PRINT_FIELD_U(", ", *attr, config);
+		tprint_struct_next();
+		PRINT_FIELD_U(*attr, config);
 		break;
 	case PERF_TYPE_HW_CACHE:
 		/*
@@ -231,9 +232,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		goto print_perf_event_attr_out;
 
 	if (attr->freq) {
-		PRINT_FIELD_U(", ", *attr, sample_freq);
+		tprint_struct_next();
+		PRINT_FIELD_U(*attr, sample_freq);
 	} else {
-		PRINT_FIELD_U(", ", *attr, sample_period);
+		tprint_struct_next();
+		PRINT_FIELD_U(*attr, sample_period);
 	}
 
 	tprint_struct_next();
@@ -312,9 +315,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (attr->watermark) {
-		PRINT_FIELD_U(", ", *attr, wakeup_watermark);
+		tprint_struct_next();
+		PRINT_FIELD_U(*attr, wakeup_watermark);
 	} else {
-		PRINT_FIELD_U(", ", *attr, wakeup_events);
+		tprint_struct_next();
+		PRINT_FIELD_U(*attr, wakeup_events);
 	}
 
 	if (attr->type == PERF_TYPE_BREAKPOINT) {
@@ -342,7 +347,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	_PERF_CHECK_FIELD(bp_len);
 	if (attr->type == PERF_TYPE_BREAKPOINT) {
-		PRINT_FIELD_U(", ", *attr, bp_len);
+		tprint_struct_next();
+		PRINT_FIELD_U(*attr, bp_len);
 	} else {
 		tprint_struct_next();
 		PRINT_FIELD_X(*attr, config2);
@@ -387,17 +393,20 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(*attr, sample_regs_intr);
 
 	_PERF_CHECK_FIELD(aux_watermark);
-	PRINT_FIELD_U(", ", *attr, aux_watermark);
+	tprint_struct_next();
+	PRINT_FIELD_U(*attr, aux_watermark);
 
 	_PERF_CHECK_FIELD(sample_max_stack);
-	PRINT_FIELD_U(", ", *attr, sample_max_stack);
+	tprint_struct_next();
+	PRINT_FIELD_U(*attr, sample_max_stack);
 
 	_PERF_CHECK_FIELD(__reserved_2);
 	if (attr->__reserved_2)
 		tprintf(" /* bytes 110..111: %#hx */", attr->__reserved_2);
 
 	_PERF_CHECK_FIELD(aux_sample_size);
-	PRINT_FIELD_U(", ", *attr, aux_sample_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(*attr, aux_sample_size);
 
 #if 0
 	_PERF_CHECK_FIELD(__reserved_3);

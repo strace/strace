@@ -19,7 +19,8 @@
 static void
 print_sigev_value(const typeof_field(struct_sigevent, sigev_value) v)
 {
-	PRINT_FIELD_D("{", v, sival_int);
+	tprint_struct_begin();
+	PRINT_FIELD_D(v, sival_int);
 	tprint_struct_next();
 	PRINT_FIELD_PTR(v, sival_ptr);
 	tprints("}");
@@ -46,7 +47,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 		PRINT_FIELD_OBJ_VAL(sev, sigev_signo, printsignal);
 		break;
 	default:
-		PRINT_FIELD_U("", sev, sigev_signo);
+		PRINT_FIELD_U(sev, sigev_signo);
 	}
 
 	tprint_struct_next();
@@ -56,7 +57,8 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 	case SIGEV_THREAD_ID:
 #undef sigev_notify_thread_id
 #define sigev_notify_thread_id sigev_un.tid
-		PRINT_FIELD_D(", ", sev, sigev_notify_thread_id);
+		tprint_struct_next();
+		PRINT_FIELD_D(sev, sigev_notify_thread_id);
 		break;
 	case SIGEV_THREAD:
 #undef sigev_notify_function

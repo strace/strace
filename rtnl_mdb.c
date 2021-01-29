@@ -54,7 +54,8 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(entry, flags,
 				  mdb_flags, "MDB_FLAGS_???");
-		PRINT_FIELD_U(", ", entry, vid);
+		tprint_struct_next();
+		PRINT_FIELD_U(entry, vid);
 
 		const int proto = ntohs(entry.addr.proto);
 

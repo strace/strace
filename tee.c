@@ -37,7 +37,8 @@
 static void
 tee_print_buf(struct_tee_ioctl_buf_data *buf)
 {
-	PRINT_FIELD_U("{", *buf, buf_len);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*buf, buf_len);
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(*buf, buf_ptr);
 	tprints("}");
@@ -183,7 +184,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, open_session, &params)))
 			return rval;
 
-		PRINT_FIELD_U("{", buf_data, buf_len);
+		tprint_struct_begin();
+		PRINT_FIELD_U(buf_data, buf_len);
 		tprint_struct_next();
 		tprints_field_name("buf_ptr");
 		tprint_struct_begin();
@@ -215,8 +217,10 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 			tprint_struct_next();
 			PRINT_FIELD_X_ARRAY(open_session, clnt_uuid);
 		}
-		PRINT_FIELD_U(", ", open_session, cancel_id);
-		PRINT_FIELD_U(", ", open_session, num_params);
+		tprint_struct_next();
+		PRINT_FIELD_U(open_session, cancel_id);
+		tprint_struct_next();
+		PRINT_FIELD_U(open_session, num_params);
 		tee_print_params(tcp, params, open_session.num_params);
 
 		tprints("}");
@@ -237,7 +241,8 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		tprint_struct_begin();
 		PRINT_FIELD_SESSION(open_session, session);
-		PRINT_FIELD_U(", ", open_session, ret);
+		tprint_struct_next();
+		PRINT_FIELD_U(open_session, ret);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(open_session, ret_origin, tee_ioctl_origins,
 				 "TEEC_ORIGIN_???");
@@ -261,12 +266,18 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, invoke, &params)))
 			return rval;
 
-		PRINT_FIELD_U("{", buf_data, buf_len);
-		PRINT_FIELD_U(", buf_ptr={", invoke, func);
+		tprint_struct_begin();
+		PRINT_FIELD_U(buf_data, buf_len);
+		tprint_struct_next();
+		tprints_field_name("buf_ptr");
+		tprint_struct_begin();
+		PRINT_FIELD_U(invoke, func);
 		tprint_struct_next();
 		PRINT_FIELD_SESSION(invoke, session);
-		PRINT_FIELD_U(", ", invoke, cancel_id);
-		PRINT_FIELD_U(", ", invoke, num_params);
+		tprint_struct_next();
+		PRINT_FIELD_U(invoke, cancel_id);
+		tprint_struct_next();
+		PRINT_FIELD_U(invoke, num_params);
 		tee_print_params(tcp, params, invoke.num_params);
 
 		tprints("}");
@@ -281,7 +292,8 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, invoke, &params)))
 			return rval;
 
-		PRINT_FIELD_U("{", invoke, ret);
+		tprint_struct_begin();
+		PRINT_FIELD_U(invoke, ret);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(invoke, ret_origin, tee_ioctl_origins,
 				 "TEEC_ORIGIN_???");
@@ -301,7 +313,8 @@ tee_cancel(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &cancel))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_U("{", cancel, cancel_id);
+	tprint_struct_begin();
+	PRINT_FIELD_U(cancel, cancel_id);
 	tprint_struct_next();
 	PRINT_FIELD_SESSION(cancel, session);
 
@@ -338,9 +351,14 @@ tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_recv, &params)))
 			return rval;
 
-		PRINT_FIELD_U("{", buf_data, buf_len);
-		PRINT_FIELD_U(", buf_ptr={", supp_recv, func);
-		PRINT_FIELD_U(", ", supp_recv, num_params);
+		tprint_struct_begin();
+		PRINT_FIELD_U(buf_data, buf_len);
+		tprint_struct_next();
+		tprints_field_name("buf_ptr");
+		tprint_struct_begin();
+		PRINT_FIELD_U(supp_recv, func);
+		tprint_struct_next();
+		PRINT_FIELD_U(supp_recv, num_params);
 		tee_print_params(tcp, params, supp_recv.num_params);
 
 		tprints("}");
@@ -356,7 +374,8 @@ tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 			return rval;
 
 		/* num_params is [in/out] for TEE_IOC_SUPPL_RECV only */
-		PRINT_FIELD_U("{", supp_recv, num_params);
+		tprint_struct_begin();
+		PRINT_FIELD_U(supp_recv, num_params);
 		tee_print_params(tcp, params, supp_recv.num_params);
 
 		tprints("}}");
@@ -377,8 +396,12 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_send, &params)))
 			return rval;
 
-		PRINT_FIELD_U("{", buf_data, buf_len);
-		PRINT_FIELD_U(", buf_ptr={", supp_send, num_params);
+		tprint_struct_begin();
+		PRINT_FIELD_U(buf_data, buf_len);
+		tprint_struct_next();
+		tprints_field_name("buf_ptr");
+		tprint_struct_begin();
+		PRINT_FIELD_U(supp_send, num_params);
 		tee_print_params(tcp, params, supp_send.num_params);
 
 		tprints("}");
@@ -393,7 +416,8 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_send, &params)))
 			return rval;
 
-		PRINT_FIELD_U("{", supp_send, ret);
+		tprint_struct_begin();
+		PRINT_FIELD_U(supp_send, ret);
 		tee_print_params(tcp, params, supp_send.num_params);
 
 		tprints("}}");
@@ -432,7 +456,8 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(shm_alloc, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
-		PRINT_FIELD_D(", ", shm_alloc, id);
+		tprint_struct_next();
+		PRINT_FIELD_D(shm_alloc, id);
 
 		tprints("}");
 		return RVAL_IOCTL_DECODED;
@@ -467,7 +492,8 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		tprint_struct_begin();
 		PRINT_FIELD_X(shm_register_fd, size);
-		PRINT_FIELD_D(", ", shm_register_fd, id);
+		tprint_struct_next();
+		PRINT_FIELD_D(shm_register_fd, id);
 
 		tprints("}");
 		return RVAL_IOCTL_DECODED;
@@ -507,7 +533,8 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(shm_register, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
-		PRINT_FIELD_D(", ", shm_register, id);
+		tprint_struct_next();
+		PRINT_FIELD_D(shm_register, id);
 
 		tprints("}");
 		return RVAL_IOCTL_DECODED;

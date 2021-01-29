@@ -29,9 +29,12 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &mkvol))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_D("{", mkvol, vol_id);
-		PRINT_FIELD_D(", ", mkvol, alignment);
-		PRINT_FIELD_D(", ", mkvol, bytes);
+		tprint_struct_begin();
+		PRINT_FIELD_D(mkvol, vol_id);
+		tprint_struct_next();
+		PRINT_FIELD_D(mkvol, alignment);
+		tprint_struct_next();
+		PRINT_FIELD_D(mkvol, bytes);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(mkvol, vol_type,
 				 ubi_volume_types, "UBI_???_VOLUME");
@@ -44,7 +47,8 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 # ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
 #  undef flags
 # endif
-		PRINT_FIELD_D(", ", mkvol, name_len);
+		tprint_struct_next();
+		PRINT_FIELD_D(mkvol, name_len);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING_SZ(mkvol, name,
 				       1 + CLAMP(mkvol.name_len, 0,
@@ -68,8 +72,10 @@ decode_UBI_IOCRSVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &rsvol)) {
-		PRINT_FIELD_D("{", rsvol, bytes);
-		PRINT_FIELD_D(", ", rsvol, vol_id);
+		tprint_struct_begin();
+		PRINT_FIELD_D(rsvol, bytes);
+		tprint_struct_next();
+		PRINT_FIELD_D(rsvol, vol_id);
 		tprints("}");
 	}
 
@@ -82,8 +88,10 @@ print_ubi_rnvol_req_ent_array_member(struct tcb *tcp, void *elem_buf,
 {
 	typeof(&((struct ubi_rnvol_req *) NULL)->ents[0]) p = elem_buf;
 
-	PRINT_FIELD_D("{", *p, vol_id);
-	PRINT_FIELD_D(", ", *p, name_len);
+	tprint_struct_begin();
+	PRINT_FIELD_D(*p, vol_id);
+	tprint_struct_next();
+	PRINT_FIELD_D(*p, name_len);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING_SZ(*p, name,
 			       1 + CLAMP(p->name_len, 0,
@@ -102,7 +110,8 @@ decode_UBI_IOCRNVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &rnvol))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_D("{", rnvol, count);
+	tprint_struct_begin();
+	PRINT_FIELD_D(rnvol, count);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(rnvol, ents, rnvol.count, tcp,
 			       print_ubi_rnvol_req_ent_array_member);
@@ -118,8 +127,10 @@ decode_UBI_IOCEBCH(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &leb)) {
-		PRINT_FIELD_D("{", leb, lnum);
-		PRINT_FIELD_D(", ", leb, bytes);
+		tprint_struct_begin();
+		PRINT_FIELD_D(leb, lnum);
+		tprint_struct_next();
+		PRINT_FIELD_D(leb, bytes);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(leb, dtype, ubi_data_types, "UBI_???");
 		tprints("}");
@@ -138,10 +149,14 @@ decode_UBI_IOCATT(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &attach))
 			return RVAL_IOCTL_DECODED;
 
-		PRINT_FIELD_D("{", attach, ubi_num);
-		PRINT_FIELD_D(", ", attach, mtd_num);
-		PRINT_FIELD_D(", ", attach, vid_hdr_offset);
-		PRINT_FIELD_D(", ", attach, max_beb_per1024);
+		tprint_struct_begin();
+		PRINT_FIELD_D(attach, ubi_num);
+		tprint_struct_next();
+		PRINT_FIELD_D(attach, mtd_num);
+		tprint_struct_next();
+		PRINT_FIELD_D(attach, vid_hdr_offset);
+		tprint_struct_next();
+		PRINT_FIELD_D(attach, max_beb_per1024);
 		tprints("}");
 		return 0;
 	}
@@ -161,7 +176,8 @@ decode_UBI_IOCEBMAP(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &map)) {
-		PRINT_FIELD_D("{", map, lnum);
+		tprint_struct_begin();
+		PRINT_FIELD_D(map, lnum);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(map, dtype, ubi_data_types, "UBI_???");
 		tprints("}");

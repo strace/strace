@@ -247,13 +247,13 @@ main(void)
 				      5, "IFLA_INET6_CACHEINFO", pattern,
 				      ci, print_quoted_hex, 2,
 				      printf("{");
-				      PRINT_FIELD_U("", ci, max_reasm_len);
+				      PRINT_FIELD_U(ci, max_reasm_len);
 				      printf(", ");
-				      PRINT_FIELD_U("", ci, tstamp);
+				      PRINT_FIELD_U(ci, tstamp);
 				      printf(", ");
-				      PRINT_FIELD_U("", ci, reachable_time);
+				      PRINT_FIELD_U(ci, reachable_time);
 				      printf(", ");
-				      PRINT_FIELD_U("", ci, retrans_time);
+				      PRINT_FIELD_U(ci, retrans_time);
 				      printf("}"));
 
 	/* AF_INET6: IFLA_INET6_ICMP6STATS */

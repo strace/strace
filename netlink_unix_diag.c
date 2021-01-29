@@ -31,11 +31,12 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_req)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
-			PRINT_FIELD_U("", req, sdiag_protocol);
+			PRINT_FIELD_U(req, sdiag_protocol);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, udiag_states,
 					  tcp_state_flags, "1<<TCP_???");
-			PRINT_FIELD_U(", ", req, udiag_ino);
+			tprint_struct_next();
+			PRINT_FIELD_U(req, udiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, udiag_show,
 					  unix_diag_show, "UDIAG_SHOW_???");
@@ -62,7 +63,8 @@ decode_unix_diag_vfs(struct tcb *const tcp,
 
 	tprint_struct_begin();
 	PRINT_FIELD_DEV(uv, udiag_vfs_dev);
-	PRINT_FIELD_U(", ", uv, udiag_vfs_ino);
+	tprint_struct_next();
+	PRINT_FIELD_U(uv, udiag_vfs_ino);
 	tprints("}");
 
 	return true;
@@ -110,8 +112,10 @@ decode_unix_diag_rqlen(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &rql))
 		return true;
 
-	PRINT_FIELD_U("{", rql, udiag_rqueue);
-	PRINT_FIELD_U(", ", rql, udiag_wqueue);
+	tprint_struct_begin();
+	PRINT_FIELD_U(rql, udiag_rqueue);
+	tprint_struct_next();
+	PRINT_FIELD_U(rql, udiag_wqueue);
 	tprints("}");
 
 	return true;
@@ -146,7 +150,8 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg)
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(msg, udiag_state,
 					 tcp_states, "TCP_???");
-			PRINT_FIELD_U(", ", msg, udiag_ino);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, udiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_COOKIE(msg, udiag_cookie);
 			decode_nla = true;

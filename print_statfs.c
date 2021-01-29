@@ -36,20 +36,28 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(b, f_type, fsmagic, NULL);
-	PRINT_FIELD_U(", ", b, f_bsize);
-	PRINT_FIELD_U(", ", b, f_blocks);
-	PRINT_FIELD_U(", ", b, f_bfree);
-	PRINT_FIELD_U(", ", b, f_bavail);
-	PRINT_FIELD_U(", ", b, f_files);
-	PRINT_FIELD_U(", ", b, f_ffree);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_bsize);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_blocks);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_bfree);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_bavail);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_files);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_ffree);
 # if defined HAVE_STRUCT_STATFS_F_FSID_VAL \
   || defined HAVE_STRUCT_STATFS_F_FSID___VAL
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(b, f_fsid, print_f_fsid, tcp);
 # endif
-	PRINT_FIELD_U(", ", b, f_namelen);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_namelen);
 # ifdef HAVE_STRUCT_STATFS_F_FRSIZE
-	PRINT_FIELD_U(", ", b, f_frsize);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_frsize);
 # endif
 # ifdef HAVE_STRUCT_STATFS_F_FLAGS
 	if (b.f_flags & ST_VALID) {
@@ -75,20 +83,28 @@ print_struct_statfs64(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(b, f_type, fsmagic, NULL);
-	PRINT_FIELD_U(", ", b, f_bsize);
-	PRINT_FIELD_U(", ", b, f_blocks);
-	PRINT_FIELD_U(", ", b, f_bfree);
-	PRINT_FIELD_U(", ", b, f_bavail);
-	PRINT_FIELD_U(", ", b, f_files);
-	PRINT_FIELD_U(", ", b, f_ffree);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_bsize);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_blocks);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_bfree);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_bavail);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_files);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_ffree);
 # if defined HAVE_STRUCT_STATFS64_F_FSID_VAL \
   || defined HAVE_STRUCT_STATFS64_F_FSID___VAL
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(b, f_fsid, print_f_fsid, tcp);
 # endif
-	PRINT_FIELD_U(", ", b, f_namelen);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_namelen);
 # ifdef HAVE_STRUCT_STATFS64_F_FRSIZE
-	PRINT_FIELD_U(", ", b, f_frsize);
+	tprint_struct_next();
+	PRINT_FIELD_U(b, f_frsize);
 # endif
 # ifdef HAVE_STRUCT_STATFS64_F_FLAGS
 	if (b.f_flags & ST_VALID) {

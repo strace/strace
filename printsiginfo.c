@@ -58,14 +58,17 @@
 static void
 printsigsource(struct tcb *tcp, const siginfo_t *sip)
 {
-	PRINT_FIELD_TGID(", ", *sip, si_pid, tcp);
-	PRINT_FIELD_UID(", ", *sip, si_uid);
+	tprint_struct_next();
+	PRINT_FIELD_TGID(*sip, si_pid, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_ID(*sip, si_uid);
 }
 
 static void
 printsigval(const siginfo_t *sip)
 {
-	PRINT_FIELD_D(", ", *sip, si_int);
+	tprint_struct_next();
+	PRINT_FIELD_D(*sip, si_int);
 	tprint_struct_next();
 	PRINT_FIELD_PTR(*sip, si_ptr);
 }
@@ -161,7 +164,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SI_TIMER:
 			tprint_struct_next();
 			PRINT_FIELD_X(*sip, si_timerid);
-			PRINT_FIELD_D(", ", *sip, si_overrun);
+			tprint_struct_next();
+			PRINT_FIELD_D(*sip, si_overrun);
 			printsigval(sip);
 			break;
 #endif
@@ -176,13 +180,16 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SIGCHLD:
 			printsigsource(tcp, sip);
 			if (sip->si_code == CLD_EXITED) {
-				PRINT_FIELD_D(", ", *sip, si_status);
+				tprint_struct_next();
+				PRINT_FIELD_D(*sip, si_status);
 			} else {
 				tprint_struct_next();
 				PRINT_FIELD_OBJ_VAL(*sip, si_status, printsignal);
 			}
-			PRINT_FIELD_U(", ", *sip, si_utime);
-			PRINT_FIELD_U(", ", *sip, si_stime);
+			tprint_struct_next();
+			PRINT_FIELD_U(*sip, si_utime);
+			tprint_struct_next();
+			PRINT_FIELD_U(*sip, si_stime);
 			break;
 		case SIGILL: case SIGFPE:
 		case SIGSEGV: case SIGBUS:
@@ -192,7 +199,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SIGPOLL:
 			switch (sip->si_code) {
 			case POLL_IN: case POLL_OUT: case POLL_MSG:
-				PRINT_FIELD_D(", ", *sip, si_band);
+				tprint_struct_next();
+				PRINT_FIELD_D(*sip, si_band);
 				break;
 			}
 			break;

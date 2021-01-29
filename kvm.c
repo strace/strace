@@ -197,12 +197,14 @@ kvm_ioctl_set_user_memory_region(struct tcb *const tcp, const kernel_ulong_t arg
 	if (umove_or_printaddr(tcp, arg, &u_memory_region))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_U("{", u_memory_region, slot);
+	tprint_struct_begin();
+	PRINT_FIELD_U(u_memory_region, slot);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(u_memory_region, flags, kvm_mem_flags, "KVM_MEM_???");
 	tprint_struct_next();
 	PRINT_FIELD_X(u_memory_region, guest_phys_addr);
-	PRINT_FIELD_U(", ", u_memory_region, memory_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(u_memory_region, memory_size);
 	tprint_struct_next();
 	PRINT_FIELD_X(u_memory_region, userspace_addr);
 	tprints("}");
@@ -270,7 +272,8 @@ kvm_ioctl_decode_cpuid2(struct tcb *const tcp, const unsigned int code,
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &cpuid)) {
-		PRINT_FIELD_U("{", cpuid, nent);
+		tprint_struct_begin();
+		PRINT_FIELD_U(cpuid, nent);
 
 		tprints(", entries=");
 		if (abbrev(tcp)) {

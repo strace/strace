@@ -143,21 +143,21 @@ main(void)
 			   init_rtmsg, print_rtmsg,
 			   RTA_CACHEINFO, pattern, ci,
 			   printf("{");
-			   PRINT_FIELD_U("", ci, rta_clntref);
+			   PRINT_FIELD_U(ci, rta_clntref);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, rta_lastuse);
+			   PRINT_FIELD_U(ci, rta_lastuse);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, rta_expires);
+			   PRINT_FIELD_U(ci, rta_expires);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, rta_error);
+			   PRINT_FIELD_U(ci, rta_error);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, rta_used);
+			   PRINT_FIELD_U(ci, rta_used);
 			   printf(", ");
 			   PRINT_FIELD_X(ci, rta_id);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, rta_ts);
+			   PRINT_FIELD_U(ci, rta_ts);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, rta_tsage);
+			   PRINT_FIELD_U(ci, rta_tsage);
 			   printf("}"));
 
 #ifdef HAVE_STRUCT_RTA_MFC_STATS
@@ -170,11 +170,11 @@ main(void)
 			   init_rtmsg, print_rtmsg,
 			   RTA_MFC_STATS, pattern, mfcs,
 			   printf("{");
-			   PRINT_FIELD_U("", mfcs, mfcs_packets);
+			   PRINT_FIELD_U(mfcs, mfcs_packets);
 			   printf(", ");
-			   PRINT_FIELD_U("", mfcs, mfcs_bytes);
+			   PRINT_FIELD_U(mfcs, mfcs_bytes);
 			   printf(", ");
-			   PRINT_FIELD_U("", mfcs, mfcs_wrong_if);
+			   PRINT_FIELD_U(mfcs, mfcs_wrong_if);
 			   printf("}"));
 #endif
 

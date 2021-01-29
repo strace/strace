@@ -216,7 +216,8 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 	} else
 #endif
 	{
-		PRINT_FIELD_U(", ", *sa_in6, sin6_scope_id);
+		tprint_struct_next();
+		PRINT_FIELD_U(*sa_in6, sin6_scope_id);
 	}
 }
 
@@ -342,7 +343,8 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 		tprints("fsa_ax25={");
 
 	PRINT_FIELD_OBJ_PTR(sax25->fsa_ax25, sax25_call, print_ax25_addr);
-	PRINT_FIELD_D(", ", sax25->fsa_ax25, sax25_ndigis);
+	tprint_struct_next();
+	PRINT_FIELD_D(sax25->fsa_ax25, sax25_ndigis);
 
 	if (!full)
 		return;
@@ -423,7 +425,7 @@ print_sockaddr_data_nl(struct tcb *tcp, const void *const buf, const int addrlen
 {
 	const struct sockaddr_nl *const sa_nl = buf;
 
-	PRINT_FIELD_TGID("", *sa_nl, nl_pid, tcp);
+	PRINT_FIELD_TGID(*sa_nl, nl_pid, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_0X(*sa_nl, nl_groups);
 }
@@ -467,7 +469,8 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 	PRINT_FIELD_XVAL(*sa_ll, sll_hatype, arp_hardware_types, "ARPHRD_???");
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(*sa_ll, sll_pkttype, af_packet_types, "PACKET_???");
-	PRINT_FIELD_U(", ", *sa_ll, sll_halen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sa_ll, sll_halen);
 	if (sa_ll->sll_halen) {
 		const unsigned int oob_halen =
 			addrlen - offsetof(struct sockaddr_ll, sll_addr);
@@ -642,7 +645,8 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 		const struct sockaddr_rc *const rc = buf;
 		print_mac_addr("rc_bdaddr=", rc->rc_bdaddr.b,
 			       sizeof(rc->rc_bdaddr.b));
-		PRINT_FIELD_U(", ", *rc, rc_channel);
+		tprint_struct_next();
+		PRINT_FIELD_U(*rc, rc_channel);
 		break;
 	}
 	case offsetof(struct sockaddr_l2, l2_bdaddr_type):

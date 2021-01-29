@@ -46,10 +46,14 @@ decode_nda_cacheinfo(struct tcb *const tcp,
 	if (len < sizeof(ci))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ci)) {
-		PRINT_FIELD_U("{", ci, ndm_confirmed);
-		PRINT_FIELD_U(", ", ci, ndm_used);
-		PRINT_FIELD_U(", ", ci, ndm_updated);
-		PRINT_FIELD_U(", ", ci, ndm_refcnt);
+		tprint_struct_begin();
+		PRINT_FIELD_U(ci, ndm_confirmed);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, ndm_used);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, ndm_updated);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, ndm_refcnt);
 		tprints("}");
 	}
 

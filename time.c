@@ -23,8 +23,10 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &tz))
 		return;
 
-	PRINT_FIELD_D("{", tz, tz_minuteswest);
-	PRINT_FIELD_D(", ", tz, tz_dsttime);
+	tprint_struct_begin();
+	PRINT_FIELD_D(tz, tz_minuteswest);
+	tprint_struct_next();
+	PRINT_FIELD_D(tz, tz_dsttime);
 	tprints("}");
 }
 

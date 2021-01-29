@@ -28,20 +28,31 @@ SYS_FUNC(sysinfo)
 		return 0;
 
 	if (!umove_or_printaddr(tcp, tcp->u_arg[0], &si)) {
-		PRINT_FIELD_U("{", si, uptime);
+		tprint_struct_begin();
+		PRINT_FIELD_U(si, uptime);
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY(si, loads, tcp,
 				  print_kulong_array_member);
-		PRINT_FIELD_U(", ", si, totalram);
-		PRINT_FIELD_U(", ", si, freeram);
-		PRINT_FIELD_U(", ", si, sharedram);
-		PRINT_FIELD_U(", ", si, bufferram);
-		PRINT_FIELD_U(", ", si, totalswap);
-		PRINT_FIELD_U(", ", si, freeswap);
-		PRINT_FIELD_U(", ", si, procs);
-		PRINT_FIELD_U(", ", si, totalhigh);
-		PRINT_FIELD_U(", ", si, freehigh);
-		PRINT_FIELD_U(", ", si, mem_unit);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, totalram);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, freeram);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, sharedram);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, bufferram);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, totalswap);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, freeswap);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, procs);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, totalhigh);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, freehigh);
+		tprint_struct_next();
+		PRINT_FIELD_U(si, mem_unit);
 		tprints("}");
 	}
 

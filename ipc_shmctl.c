@@ -35,14 +35,19 @@ static void
 print_ipc_perm(const typeof_field(shmid_ds_t, shm_perm) *const p,
 	       const unsigned int cmd)
 {
-	PRINT_FIELD_UID("{", *p, uid);
-	PRINT_FIELD_UID(", ", *p, gid);
+	tprint_struct_begin();
+	PRINT_FIELD_ID(*p, uid);
+	tprint_struct_next();
+	PRINT_FIELD_ID(*p, gid);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_U(*p, mode, print_numeric_ll_umode_t);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", *p, key);
-		PRINT_FIELD_UID(", ", *p, cuid);
-		PRINT_FIELD_UID(", ", *p, cgid);
+		tprint_struct_next();
+		PRINT_FIELD_U(*p, key);
+		tprint_struct_next();
+		PRINT_FIELD_ID(*p, cuid);
+		tprint_struct_next();
+		PRINT_FIELD_ID(*p, cgid);
 	}
 	tprints("}");
 }
@@ -59,13 +64,20 @@ print_shmid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_OBJ_PTR(shmid_ds, shm_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", shmid_ds, shm_segsz);
-		PRINT_FIELD_TGID(", ", shmid_ds, shm_cpid, tcp);
-		PRINT_FIELD_TGID(", ", shmid_ds, shm_lpid, tcp);
-		PRINT_FIELD_U(", ", shmid_ds, shm_nattch);
-		PRINT_FIELD_U(", ", shmid_ds, shm_atime);
-		PRINT_FIELD_U(", ", shmid_ds, shm_dtime);
-		PRINT_FIELD_U(", ", shmid_ds, shm_ctime);
+		tprint_struct_next();
+		PRINT_FIELD_U(shmid_ds, shm_segsz);
+		tprint_struct_next();
+		PRINT_FIELD_TGID(shmid_ds, shm_cpid, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_TGID(shmid_ds, shm_lpid, tcp);
+		tprint_struct_next();
+		PRINT_FIELD_U(shmid_ds, shm_nattch);
+		tprint_struct_next();
+		PRINT_FIELD_U(shmid_ds, shm_atime);
+		tprint_struct_next();
+		PRINT_FIELD_U(shmid_ds, shm_dtime);
+		tprint_struct_next();
+		PRINT_FIELD_U(shmid_ds, shm_ctime);
 	}
 	tprints("}");
 }
@@ -79,11 +91,16 @@ print_ipc_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &info))
 		return;
 
-	PRINT_FIELD_U("{", info, shmmax);
-	PRINT_FIELD_U(", ", info, shmmin);
-	PRINT_FIELD_U(", ", info, shmmni);
-	PRINT_FIELD_U(", ", info, shmseg);
-	PRINT_FIELD_U(", ", info, shmall);
+	tprint_struct_begin();
+	PRINT_FIELD_U(info, shmmax);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shmmin);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shmmni);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shmseg);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shmall);
 	tprints("}");
 }
 
@@ -96,12 +113,18 @@ print_shm_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &info))
 		return;
 
-	PRINT_FIELD_D("{", info, used_ids);
-	PRINT_FIELD_U(", ", info, shm_tot);
-	PRINT_FIELD_U(", ", info, shm_rss);
-	PRINT_FIELD_U(", ", info, shm_swp);
-	PRINT_FIELD_U(", ", info, swap_attempts);
-	PRINT_FIELD_U(", ", info, swap_successes);
+	tprint_struct_begin();
+	PRINT_FIELD_D(info, used_ids);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shm_tot);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shm_rss);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, shm_swp);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, swap_attempts);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, swap_successes);
 	tprints("}");
 }
 

@@ -126,7 +126,8 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 		}
 	}
 
-	PRINT_FIELD_U("{", attr, size);
+	tprint_struct_begin();
+	PRINT_FIELD_U(attr, size);
 
 	if (size < SCHED_ATTR_MIN_SIZE)
 		goto end;
@@ -141,18 +142,25 @@ print_sched_attr(struct tcb *const tcp, const kernel_ulong_t addr,
 
 
 	if (!is_set || !(attr.sched_flags & SCHED_FLAG_KEEP_PARAMS)) {
-		PRINT_FIELD_D(", ", attr, sched_nice);
-		PRINT_FIELD_U(", ", attr, sched_priority);
-		PRINT_FIELD_U(", ", attr, sched_runtime);
-		PRINT_FIELD_U(", ", attr, sched_deadline);
-		PRINT_FIELD_U(", ", attr, sched_period);
+		tprint_struct_next();
+		PRINT_FIELD_D(attr, sched_nice);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, sched_priority);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, sched_runtime);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, sched_deadline);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, sched_period);
 	}
 
 	if (size < SCHED_ATTR_SIZE_VER1)
 		goto end;
 
-	PRINT_FIELD_U(", ", attr, sched_util_min);
-	PRINT_FIELD_U(", ", attr, sched_util_max);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, sched_util_min);
+	tprint_struct_next();
+	PRINT_FIELD_U(attr, sched_util_max);
 
 end:
 	if ((is_set ? usize : attr.size) > size)
@@ -172,7 +180,9 @@ SYS_FUNC(sched_setattr)
 
 		if (verbose(tcp) && tcp->u_error == E2BIG
 		    && umove(tcp, tcp->u_arg[1], &attr.size) == 0) {
-			PRINT_FIELD_U(" => {", attr, size);
+			tprint_value_changed();
+			tprint_struct_begin();
+			PRINT_FIELD_U(attr, size);
 			tprints("}");
 		}
 

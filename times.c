@@ -24,10 +24,14 @@ SYS_FUNC(times)
 	tms_t tbuf;
 
 	if (exiting(tcp) && !umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
-		PRINT_FIELD_U("{", tbuf, tms_utime);
-		PRINT_FIELD_U(", ", tbuf, tms_stime);
-		PRINT_FIELD_U(", ", tbuf, tms_cutime);
-		PRINT_FIELD_U(", ", tbuf, tms_cstime);
+		tprint_struct_begin();
+		PRINT_FIELD_U(tbuf, tms_utime);
+		tprint_struct_next();
+		PRINT_FIELD_U(tbuf, tms_stime);
+		tprint_struct_next();
+		PRINT_FIELD_U(tbuf, tms_cutime);
+		tprint_struct_next();
+		PRINT_FIELD_U(tbuf, tms_cstime);
 		tprints("}");
 	}
 

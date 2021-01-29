@@ -81,16 +81,16 @@ main(void)
 				  major(uv.udiag_vfs_dev),
 				  minor(uv.udiag_vfs_dev));
 			   printf(", ");
-			   PRINT_FIELD_U("", uv, udiag_vfs_ino);
+			   PRINT_FIELD_U(uv, udiag_vfs_ino);
 			   printf("}"));
 
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_unix_diag_msg, print_unix_diag_msg,
 			   UNIX_DIAG_RQLEN, pattern, rql,
 			   printf("{");
-			   PRINT_FIELD_U("", rql, udiag_rqueue);
+			   PRINT_FIELD_U(rql, udiag_rqueue);
 			   printf(", ");
-			   PRINT_FIELD_U("", rql, udiag_wqueue);
+			   PRINT_FIELD_U(rql, udiag_wqueue);
 			   printf("}"));
 
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,

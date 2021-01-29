@@ -44,8 +44,10 @@ decode_fib_rule_uid_range(struct tcb *const tcp,
 	if (len < sizeof(range))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &range)) {
-		PRINT_FIELD_U("{", range, start);
-		PRINT_FIELD_U(", ", range, end);
+		tprint_struct_begin();
+		PRINT_FIELD_U(range, start);
+		tprint_struct_next();
+		PRINT_FIELD_U(range, end);
 		tprints("}");
 	}
 
@@ -63,8 +65,10 @@ decode_rule_port_range(struct tcb *const tcp,
 	if (len < sizeof(range))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &range)) {
-		PRINT_FIELD_U("{", range, start);
-		PRINT_FIELD_U(", ", range, end);
+		tprint_struct_begin();
+		PRINT_FIELD_U(range, start);
+		tprint_struct_next();
+		PRINT_FIELD_U(range, end);
 		tprints("}");
 	}
 
@@ -108,8 +112,9 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
 					 (char *) &msg + offset)) {
-			PRINT_FIELD_U("", msg, dst_len);
-			PRINT_FIELD_U(", ", msg, src_len);
+			PRINT_FIELD_U(msg, dst_len);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, src_len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(msg, tos,
 					  ip_type_of_services, "IPTOS_TOS_???");

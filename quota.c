@@ -119,18 +119,24 @@ struct fs_quota_statv {
 static void
 print_fs_qfilestat(const struct fs_qfilestat *const p)
 {
-	PRINT_FIELD_U("{", *p, qfs_ino);
-	PRINT_FIELD_U(", ", *p, qfs_nblks);
-	PRINT_FIELD_U(", ", *p, qfs_nextents);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, qfs_ino);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, qfs_nblks);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, qfs_nextents);
 	tprints("}");
 }
 
 static void
 print_fs_qfilestatv(const struct fs_qfilestatv *const p)
 {
-	PRINT_FIELD_U("{", *p, qfs_ino);
-	PRINT_FIELD_U(", ", *p, qfs_nblks);
-	PRINT_FIELD_U(", ", *p, qfs_nextents);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, qfs_ino);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, qfs_nblks);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, qfs_nextents);
 	tprints("}");
 }
 
@@ -168,15 +174,23 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
-		PRINT_FIELD_U("{", dq, dqb_bhardlimit);
-		PRINT_FIELD_U(", ", dq, dqb_bsoftlimit);
-		PRINT_FIELD_U(", ", dq, dqb_curspace);
-		PRINT_FIELD_U(", ", dq, dqb_ihardlimit);
-		PRINT_FIELD_U(", ", dq, dqb_isoftlimit);
-		PRINT_FIELD_U(", ", dq, dqb_curinodes);
+		tprint_struct_begin();
+		PRINT_FIELD_U(dq, dqb_bhardlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_bsoftlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_curspace);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_ihardlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_isoftlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_curinodes);
 		if (!abbrev(tcp)) {
-			PRINT_FIELD_U(", ", dq, dqb_btime);
-			PRINT_FIELD_U(", ", dq, dqb_itime);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, dqb_btime);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, dqb_itime);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(dq, dqb_valid,
 					  if_dqblk_valid, "QIF_???");
@@ -199,21 +213,31 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
-		PRINT_FIELD_U("{", dq, dqb_bhardlimit);
-		PRINT_FIELD_U(", ", dq, dqb_bsoftlimit);
-		PRINT_FIELD_U(", ", dq, dqb_curspace);
-		PRINT_FIELD_U(", ", dq, dqb_ihardlimit);
-		PRINT_FIELD_U(", ", dq, dqb_isoftlimit);
-		PRINT_FIELD_U(", ", dq, dqb_curinodes);
+		tprint_struct_begin();
+		PRINT_FIELD_U(dq, dqb_bhardlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_bsoftlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_curspace);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_ihardlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_isoftlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqb_curinodes);
 		if (!abbrev(tcp)) {
-			PRINT_FIELD_U(", ", dq, dqb_btime);
-			PRINT_FIELD_U(", ", dq, dqb_itime);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, dqb_btime);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, dqb_itime);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(dq, dqb_valid,
 					  if_dqblk_valid, "QIF_???");
-			PRINT_FIELD_U(", ", dq, dqb_id);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, dqb_id);
 		} else {
-			PRINT_FIELD_U(", ", dq, dqb_id);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, dqb_id);
 			tprints(", ...");
 		}
 		tprints("}");
@@ -240,29 +264,46 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
-		PRINT_FIELD_D("{", dq, d_version);
+		tprint_struct_begin();
+		PRINT_FIELD_D(dq, d_version);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(dq, d_flags,
 				  xfs_dqblk_flags, "XFS_???_QUOTA");
 		tprint_struct_next();
 		PRINT_FIELD_X(dq, d_fieldmask);
-		PRINT_FIELD_U(", ", dq, d_id);
-		PRINT_FIELD_U(", ", dq, d_blk_hardlimit);
-		PRINT_FIELD_U(", ", dq, d_blk_softlimit);
-		PRINT_FIELD_U(", ", dq, d_ino_hardlimit);
-		PRINT_FIELD_U(", ", dq, d_ino_softlimit);
-		PRINT_FIELD_U(", ", dq, d_bcount);
-		PRINT_FIELD_U(", ", dq, d_icount);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_id);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_blk_hardlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_blk_softlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_ino_hardlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_ino_softlimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_bcount);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, d_icount);
 		if (!abbrev(tcp)) {
-			PRINT_FIELD_D(", ", dq, d_itimer);
-			PRINT_FIELD_D(", ", dq, d_btimer);
-			PRINT_FIELD_U(", ", dq, d_iwarns);
-			PRINT_FIELD_U(", ", dq, d_bwarns);
-			PRINT_FIELD_U(", ", dq, d_rtb_hardlimit);
-			PRINT_FIELD_U(", ", dq, d_rtb_softlimit);
-			PRINT_FIELD_U(", ", dq, d_rtbcount);
-			PRINT_FIELD_D(", ", dq, d_rtbtimer);
-			PRINT_FIELD_U(", ", dq, d_rtbwarns);
+			tprint_struct_next();
+			PRINT_FIELD_D(dq, d_itimer);
+			tprint_struct_next();
+			PRINT_FIELD_D(dq, d_btimer);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, d_iwarns);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, d_bwarns);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, d_rtb_hardlimit);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, d_rtb_softlimit);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, d_rtbcount);
+			tprint_struct_next();
+			PRINT_FIELD_D(dq, d_rtbtimer);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, d_rtbwarns);
 		} else {
 			tprints(", ...");
 		}
@@ -303,8 +344,10 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
-		PRINT_FIELD_U("{", dq, dqi_bgrace);
-		PRINT_FIELD_U(", ", dq, dqi_igrace);
+		tprint_struct_begin();
+		PRINT_FIELD_U(dq, dqi_bgrace);
+		tprint_struct_next();
+		PRINT_FIELD_U(dq, dqi_igrace);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(dq, dqi_flags, if_dqinfo_flags, "DQF_???");
 		tprint_struct_next();
@@ -322,7 +365,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			return 0;
 		}
 		if (fetch_struct_quotastat(tcp, data, &dq)) {
-			PRINT_FIELD_D("{", dq, qs_version);
+			tprint_struct_begin();
+			PRINT_FIELD_D(dq, qs_version);
 			if (!abbrev(tcp)) {
 				tprint_struct_next();
 				PRINT_FIELD_FLAGS(dq, qs_flags,
@@ -333,12 +377,18 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 				tprint_struct_next();
 				PRINT_FIELD_OBJ_PTR(dq, qs_gquota,
 						    print_fs_qfilestat);
-				PRINT_FIELD_U(", ", dq, qs_incoredqs);
-				PRINT_FIELD_D(", ", dq, qs_btimelimit);
-				PRINT_FIELD_D(", ", dq, qs_itimelimit);
-				PRINT_FIELD_D(", ", dq, qs_rtbtimelimit);
-				PRINT_FIELD_U(", ", dq, qs_bwarnlimit);
-				PRINT_FIELD_U(", ", dq, qs_iwarnlimit);
+				tprint_struct_next();
+				PRINT_FIELD_U(dq, qs_incoredqs);
+				tprint_struct_next();
+				PRINT_FIELD_D(dq, qs_btimelimit);
+				tprint_struct_next();
+				PRINT_FIELD_D(dq, qs_itimelimit);
+				tprint_struct_next();
+				PRINT_FIELD_D(dq, qs_rtbtimelimit);
+				tprint_struct_next();
+				PRINT_FIELD_U(dq, qs_bwarnlimit);
+				tprint_struct_next();
+				PRINT_FIELD_U(dq, qs_iwarnlimit);
 			} else {
 				tprints(", ...");
 			}
@@ -358,12 +408,14 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
-		PRINT_FIELD_D("{", dq, qs_version);
+		tprint_struct_begin();
+		PRINT_FIELD_D(dq, qs_version);
 		if (!abbrev(tcp)) {
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(dq, qs_flags,
 					  xfs_quota_flags, "XFS_QUOTA_???");
-			PRINT_FIELD_U(", ", dq, qs_incoredqs);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, qs_incoredqs);
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_PTR(dq, qs_uquota,
 					    print_fs_qfilestatv);
@@ -373,11 +425,16 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_PTR(dq, qs_pquota,
 					    print_fs_qfilestatv);
-			PRINT_FIELD_D(", ", dq, qs_btimelimit);
-			PRINT_FIELD_D(", ", dq, qs_itimelimit);
-			PRINT_FIELD_D(", ", dq, qs_rtbtimelimit);
-			PRINT_FIELD_U(", ", dq, qs_bwarnlimit);
-			PRINT_FIELD_U(", ", dq, qs_iwarnlimit);
+			tprint_struct_next();
+			PRINT_FIELD_D(dq, qs_btimelimit);
+			tprint_struct_next();
+			PRINT_FIELD_D(dq, qs_itimelimit);
+			tprint_struct_next();
+			PRINT_FIELD_D(dq, qs_rtbtimelimit);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, qs_bwarnlimit);
+			tprint_struct_next();
+			PRINT_FIELD_U(dq, qs_iwarnlimit);
 		} else {
 			tprints(", ...");
 		}

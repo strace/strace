@@ -69,9 +69,12 @@ print_scm_creds(struct tcb *tcp, const void *cmsg_data,
 {
 	const struct ucred *uc = cmsg_data;
 
-	PRINT_FIELD_TGID("{", *uc, pid, tcp);
-	PRINT_FIELD_UID(", ", *uc, uid);
-	PRINT_FIELD_UID(", ", *uc, gid);
+	tprint_struct_begin();
+	PRINT_FIELD_TGID(*uc, pid, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_ID(*uc, uid);
+	tprint_struct_next();
+	PRINT_FIELD_ID(*uc, gid);
 	tprints("}");
 }
 
@@ -213,12 +216,18 @@ print_cmsg_ip_recverr(struct tcb *tcp, const void *cmsg_data,
 {
 	const struct sock_ee *const err = cmsg_data;
 
-	PRINT_FIELD_U("{", *err, ee_errno);
-	PRINT_FIELD_U(", ", *err, ee_origin);
-	PRINT_FIELD_U(", ", *err, ee_type);
-	PRINT_FIELD_U(", ", *err, ee_code);
-	PRINT_FIELD_U(", ", *err, ee_info);
-	PRINT_FIELD_U(", ", *err, ee_data);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*err, ee_errno);
+	tprint_struct_next();
+	PRINT_FIELD_U(*err, ee_origin);
+	tprint_struct_next();
+	PRINT_FIELD_U(*err, ee_type);
+	tprint_struct_next();
+	PRINT_FIELD_U(*err, ee_code);
+	tprint_struct_next();
+	PRINT_FIELD_U(*err, ee_info);
+	tprint_struct_next();
+	PRINT_FIELD_U(*err, ee_data);
 	tprint_struct_next();
 	PRINT_FIELD_SOCKADDR(*err, offender, tcp);
 	tprints("}");
@@ -412,11 +421,13 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprints(", msg_iov=");
 	tprint_iov_upto(tcp, msg->msg_iovlen,
 			ptr_to_kulong(msg->msg_iov), decode, data_size);
-	PRINT_FIELD_U(", ", *msg, msg_iovlen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*msg, msg_iovlen);
 
 	decode_msg_control(tcp, ptr_to_kulong(msg->msg_control),
 			   msg->msg_controllen);
-	PRINT_FIELD_U(", ", *msg, msg_controllen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*msg, msg_controllen);
 
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(*msg, msg_flags, msg_flags, "MSG_???");

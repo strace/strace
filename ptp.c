@@ -38,8 +38,10 @@
 static void
 print_ptp_clock_time(const struct ptp_clock_time *const p)
 {
-	PRINT_FIELD_D("{", *p, sec);
-	PRINT_FIELD_U(", ", *p, nsec);
+	tprint_struct_begin();
+	PRINT_FIELD_D(*p, sec);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, nsec);
 	tprints("}");
 	tprints_comment(sprinttime_nsec(p->sec, p->nsec));
 }
@@ -68,7 +70,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &extts))
 			break;
 
-		PRINT_FIELD_D("{", extts, index);
+		tprint_struct_begin();
+		PRINT_FIELD_D(extts, index);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(extts, flags, ptp_extts_flags, "PTP_???");
 		tprints("}");
@@ -87,7 +90,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_OBJ_PTR(perout, start, print_ptp_clock_time);
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(perout, period, print_ptp_clock_time);
-		PRINT_FIELD_D(", ", perout, index);
+		tprint_struct_next();
+		PRINT_FIELD_D(perout, index);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(perout, flags, ptp_perout_flags,
 				  "PTP_???");
@@ -109,7 +113,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 			if (umove_or_printaddr(tcp, arg, &sysoff))
 				break;
 
-			PRINT_FIELD_U("{", sysoff, n_samples);
+			tprint_struct_begin();
+			PRINT_FIELD_U(sysoff, n_samples);
 			return 0;
 		} else {
 			if (tfetch_mem(tcp, arg, sizeof(sysoff), &sysoff)) {
@@ -137,11 +142,16 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (umove_or_printaddr(tcp, arg, &caps))
 			break;
 
-		PRINT_FIELD_D("{", caps, max_adj);
-		PRINT_FIELD_D(", ", caps, n_alarm);
-		PRINT_FIELD_D(", ", caps, n_ext_ts);
-		PRINT_FIELD_D(", ", caps, n_per_out);
-		PRINT_FIELD_D(", ", caps, pps);
+		tprint_struct_begin();
+		PRINT_FIELD_D(caps, max_adj);
+		tprint_struct_next();
+		PRINT_FIELD_D(caps, n_alarm);
+		tprint_struct_next();
+		PRINT_FIELD_D(caps, n_ext_ts);
+		tprint_struct_next();
+		PRINT_FIELD_D(caps, n_per_out);
+		tprint_struct_next();
+		PRINT_FIELD_D(caps, pps);
 		tprints("}");
 		break;
 	}

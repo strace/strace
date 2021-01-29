@@ -91,21 +91,21 @@ main(void)
 				  init_tcmsg, print_tcmsg,
 				  TCA_STAB_BASE, pattern, s,
 				  printf("{");
-				  PRINT_FIELD_U("", s, cell_log);
+				  PRINT_FIELD_U(s, cell_log);
 				  printf(", ");
-				  PRINT_FIELD_U("", s, size_log);
+				  PRINT_FIELD_U(s, size_log);
 				  printf(", ");
-				  PRINT_FIELD_D("", s, cell_align);
+				  PRINT_FIELD_D(s, cell_align);
 				  printf(", ");
-				  PRINT_FIELD_D("", s, overhead);
+				  PRINT_FIELD_D(s, overhead);
 				  printf(", ");
-				  PRINT_FIELD_U("", s, linklayer);
+				  PRINT_FIELD_U(s, linklayer);
 				  printf(", ");
-				  PRINT_FIELD_U("", s, mpu);
+				  PRINT_FIELD_U(s, mpu);
 				  printf(", ");
-				  PRINT_FIELD_U("", s, mtu);
+				  PRINT_FIELD_U(s, mtu);
 				  printf(", ");
-				  PRINT_FIELD_U("", s, tsize);
+				  PRINT_FIELD_U(s, tsize);
 				  printf("}"));
 #endif
 

@@ -50,7 +50,8 @@ print_nlattr(const struct nlattr *const nla,
 	static_assert(NLA_TYPE_MASK == ~(NLA_F_NESTED | NLA_F_NET_BYTEORDER),
 		      "wrong NLA_TYPE_MASK");
 
-	PRINT_FIELD_U("{", *nla, nla_len);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*nla, nla_len);
 	tprints(", nla_type=");
 	if (nla->nla_type & NLA_F_NESTED) {
 		print_xlat(NLA_F_NESTED);

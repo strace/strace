@@ -63,13 +63,18 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	PRINT_FIELD_XVAL(sg_io, dxfer_direction, sg_io_dxfer_direction,
 			 "SG_DXFER_???");
-	PRINT_FIELD_U(", ", sg_io, cmd_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, cmd_len);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, cmdp, sg_io.cmd_len, 0, tcp);
-	PRINT_FIELD_U(", ", sg_io, mx_sb_len);
-	PRINT_FIELD_U(", ", sg_io, iovec_count);
-	PRINT_FIELD_U(", ", sg_io, dxfer_len);
-	PRINT_FIELD_U(", ", sg_io, timeout);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, mx_sb_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, iovec_count);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, dxfer_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, timeout);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sg_io, flags, sg_io_flags, "SG_FLAG_???");
 
@@ -107,7 +112,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (sg_io.interface_id != entering_sg_io->interface_id) {
-		PRINT_FIELD_U(" => ", sg_io, interface_id);
+		tprint_value_changed();
+		PRINT_FIELD_U(sg_io, interface_id);
 		return RVAL_IOCTL_DECODED;
 	}
 
@@ -136,15 +142,18 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_X(sg_io, masked_status);
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, msg_status);
-	PRINT_FIELD_U(", ", sg_io, sb_len_wr);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, sb_len_wr);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, sbp, sg_io.sb_len_wr, 0, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, host_status);
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, driver_status);
-	PRINT_FIELD_D(", ", sg_io, resid);
-	PRINT_FIELD_U(", ", sg_io, duration);
+	tprint_struct_next();
+	PRINT_FIELD_D(sg_io, resid);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, duration);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sg_io, info, sg_io_info, "SG_INFO_???");
 

@@ -34,14 +34,19 @@ static void
 print_ipc_perm(const typeof_field(semid_ds_t, sem_perm) *const p,
 	       const unsigned int cmd)
 {
-	PRINT_FIELD_UID("{", *p, uid);
-	PRINT_FIELD_UID(", ", *p, gid);
+	tprint_struct_begin();
+	PRINT_FIELD_ID(*p, uid);
+	tprint_struct_next();
+	PRINT_FIELD_ID(*p, gid);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_U(*p, mode, print_numeric_ll_umode_t);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", *p, key);
-		PRINT_FIELD_UID(", ", *p, cuid);
-		PRINT_FIELD_UID(", ", *p, cgid);
+		tprint_struct_next();
+		PRINT_FIELD_U(*p, key);
+		tprint_struct_next();
+		PRINT_FIELD_ID(*p, cuid);
+		tprint_struct_next();
+		PRINT_FIELD_ID(*p, cgid);
 	}
 	tprints("}");
 }
@@ -64,9 +69,12 @@ print_semid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_OBJ_PTR(ds, sem_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", ds, sem_otime);
-		PRINT_FIELD_U(", ", ds, sem_ctime);
-		PRINT_FIELD_U(", ", ds, sem_nsems);
+		tprint_struct_next();
+		PRINT_FIELD_U(ds, sem_otime);
+		tprint_struct_next();
+		PRINT_FIELD_U(ds, sem_ctime);
+		tprint_struct_next();
+		PRINT_FIELD_U(ds, sem_nsems);
 	}
 	tprints("}");
 }
@@ -88,16 +96,26 @@ print_seminfo(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	PRINT_FIELD_D("{", info, semmap);
-	PRINT_FIELD_D(", ", info, semmni);
-	PRINT_FIELD_D(", ", info, semmns);
-	PRINT_FIELD_D(", ", info, semmnu);
-	PRINT_FIELD_D(", ", info, semmsl);
-	PRINT_FIELD_D(", ", info, semopm);
-	PRINT_FIELD_D(", ", info, semume);
-	PRINT_FIELD_D(", ", info, semusz);
-	PRINT_FIELD_D(", ", info, semvmx);
-	PRINT_FIELD_D(", ", info, semaem);
+	tprint_struct_begin();
+	PRINT_FIELD_D(info, semmap);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semmni);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semmns);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semmnu);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semmsl);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semopm);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semume);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semusz);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semvmx);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, semaem);
 	tprints("}");
 }
 

@@ -31,14 +31,19 @@ static void
 print_ipc_perm(const typeof_field(msqid_ds_t, msg_perm) *const p,
 	       const unsigned int cmd)
 {
-	PRINT_FIELD_UID("{", *p, uid);
-	PRINT_FIELD_UID(", ", *p, gid);
+	tprint_struct_begin();
+	PRINT_FIELD_ID(*p, uid);
+	tprint_struct_next();
+	PRINT_FIELD_ID(*p, gid);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_U(*p, mode, print_numeric_ll_umode_t);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", *p, key);
-		PRINT_FIELD_UID(", ", *p, cuid);
-		PRINT_FIELD_UID(", ", *p, cgid);
+		tprint_struct_next();
+		PRINT_FIELD_U(*p, key);
+		tprint_struct_next();
+		PRINT_FIELD_ID(*p, cuid);
+		tprint_struct_next();
+		PRINT_FIELD_ID(*p, cgid);
 	}
 	tprints("}");
 }
@@ -55,15 +60,22 @@ print_msqid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_OBJ_PTR(msqid_ds, msg_perm, print_ipc_perm, cmd);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_U(", ", msqid_ds, msg_stime);
-		PRINT_FIELD_U(", ", msqid_ds, msg_rtime);
-		PRINT_FIELD_U(", ", msqid_ds, msg_ctime);
-		PRINT_FIELD_U(", ", msqid_ds, msg_qnum);
+		tprint_struct_next();
+		PRINT_FIELD_U(msqid_ds, msg_stime);
+		tprint_struct_next();
+		PRINT_FIELD_U(msqid_ds, msg_rtime);
+		tprint_struct_next();
+		PRINT_FIELD_U(msqid_ds, msg_ctime);
+		tprint_struct_next();
+		PRINT_FIELD_U(msqid_ds, msg_qnum);
 	}
-	PRINT_FIELD_U(", ", msqid_ds, msg_qbytes);
+	tprint_struct_next();
+	PRINT_FIELD_U(msqid_ds, msg_qbytes);
 	if (cmd != IPC_SET) {
-		PRINT_FIELD_D(", ", msqid_ds, msg_lspid);
-		PRINT_FIELD_D(", ", msqid_ds, msg_lrpid);
+		tprint_struct_next();
+		PRINT_FIELD_D(msqid_ds, msg_lspid);
+		tprint_struct_next();
+		PRINT_FIELD_D(msqid_ds, msg_lrpid);
 	}
 	tprints("}");
 }
@@ -77,14 +89,22 @@ print_msginfo(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umove_or_printaddr(tcp, addr, &info))
 		return;
 
-	PRINT_FIELD_D("{", info, msgpool);
-	PRINT_FIELD_D(", ", info, msgmap);
-	PRINT_FIELD_D(", ", info, msgmax);
-	PRINT_FIELD_D(", ", info, msgmnb);
-	PRINT_FIELD_D(", ", info, msgmni);
-	PRINT_FIELD_D(", ", info, msgssz);
-	PRINT_FIELD_D(", ", info, msgtql);
-	PRINT_FIELD_U(", ", info, msgseg);
+	tprint_struct_begin();
+	PRINT_FIELD_D(info, msgpool);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, msgmap);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, msgmax);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, msgmnb);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, msgmni);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, msgssz);
+	tprint_struct_next();
+	PRINT_FIELD_D(info, msgtql);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, msgseg);
 	tprints("}");
 }
 

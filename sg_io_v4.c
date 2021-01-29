@@ -51,24 +51,34 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_XVAL(sg_io, subprotocol, bsg_subprotocol,
 			 "BSG_SUB_PROTOCOL_???");
-	PRINT_FIELD_U(", ", sg_io, request_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, request_len);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, request, sg_io.request_len, 0, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, request_tag);
-	PRINT_FIELD_U(", ", sg_io, request_attr);
-	PRINT_FIELD_U(", ", sg_io, request_priority);
-	PRINT_FIELD_U(", ", sg_io, request_extra);
-	PRINT_FIELD_U(", ", sg_io, max_response_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, request_attr);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, request_priority);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, request_extra);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, max_response_len);
 
-	PRINT_FIELD_U(", ", sg_io, dout_iovec_count);
-	PRINT_FIELD_U(", ", sg_io, dout_xfer_len);
-	PRINT_FIELD_U(", ", sg_io, din_iovec_count);
-	PRINT_FIELD_U(", ", sg_io, din_xfer_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, dout_iovec_count);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, dout_xfer_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, din_iovec_count);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, din_xfer_len);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, dout_xferp, sg_io.dout_xfer_len,
 				 sg_io.dout_iovec_count, tcp);
-	PRINT_FIELD_U(", ", sg_io, timeout);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, timeout);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sg_io, flags, bsg_flags, "BSG_FLAG_???");
 	tprint_struct_next();
@@ -101,11 +111,13 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (sg_io.guard != entering_sg_io->guard) {
-		PRINT_FIELD_U(" => ", sg_io, guard);
+		tprint_value_changed();
+		PRINT_FIELD_U(sg_io, guard);
 		return RVAL_IOCTL_DECODED;
 	}
 
-	PRINT_FIELD_U(", ", sg_io, response_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, response_len);
 	tprint_struct_next();
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, response, sg_io.response_len, 0, tcp);
 	din_len = sg_io.din_xfer_len;
@@ -120,13 +132,18 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_X(sg_io, transport_status);
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, device_status);
-	PRINT_FIELD_U(", ", sg_io, retry_delay);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, retry_delay);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sg_io, info, sg_io_info, "SG_INFO_???");
-	PRINT_FIELD_U(", ", sg_io, duration);
-	PRINT_FIELD_U(", ", sg_io, response_len);
-	PRINT_FIELD_D(", ", sg_io, din_resid);
-	PRINT_FIELD_D(", ", sg_io, dout_resid);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, duration);
+	tprint_struct_next();
+	PRINT_FIELD_U(sg_io, response_len);
+	tprint_struct_next();
+	PRINT_FIELD_D(sg_io, din_resid);
+	tprint_struct_next();
+	PRINT_FIELD_D(sg_io, dout_resid);
 	tprint_struct_next();
 	PRINT_FIELD_X(sg_io, generated_tag);
 

@@ -41,7 +41,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 						 netlink_protocols,
 						 "NETLINK_???");
 			}
-			PRINT_FIELD_U(", ", req, ndiag_ino);
+			tprint_struct_next();
+			PRINT_FIELD_U(req, ndiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(req, ndiag_show,
 					  netlink_diag_show, "NDIAG_SHOW_???");
@@ -100,10 +101,14 @@ decode_netlink_diag_ring(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &ndr))
 		return true;
 
-	PRINT_FIELD_U("{", ndr, ndr_block_size);
-	PRINT_FIELD_U(", ", ndr, ndr_block_nr);
-	PRINT_FIELD_U(", ", ndr, ndr_frame_size);
-	PRINT_FIELD_U(", ", ndr, ndr_frame_nr);
+	tprint_struct_begin();
+	PRINT_FIELD_U(ndr, ndr_block_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(ndr, ndr_block_nr);
+	tprint_struct_next();
+	PRINT_FIELD_U(ndr, ndr_frame_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(ndr, ndr_frame_nr);
 	tprints("}");
 
 	return true;
@@ -156,10 +161,14 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(msg, ndiag_state,
 					 netlink_states, "NETLINK_???");
-			PRINT_FIELD_U(", ", msg, ndiag_portid);
-			PRINT_FIELD_U(", ", msg, ndiag_dst_portid);
-			PRINT_FIELD_U(", ", msg, ndiag_dst_group);
-			PRINT_FIELD_U(", ", msg, ndiag_ino);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, ndiag_portid);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, ndiag_dst_portid);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, ndiag_dst_group);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, ndiag_ino);
 			tprint_struct_next();
 			PRINT_FIELD_COOKIE(msg, ndiag_cookie);
 			decode_nla = true;

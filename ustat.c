@@ -27,8 +27,10 @@ SYS_FUNC(ustat)
 		struct_ustat ust;
 
 		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &ust)) {
-			PRINT_FIELD_U("{", ust, f_tfree);
-			PRINT_FIELD_U(", ", ust, f_tinode);
+			tprint_struct_begin();
+			PRINT_FIELD_U(ust, f_tfree);
+			tprint_struct_next();
+			PRINT_FIELD_U(ust, f_tinode);
 			tprints("}");
 		}
 #else /* !HAVE_USTAT_H */

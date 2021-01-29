@@ -70,35 +70,59 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 		return false;
 
 	if (!umoven_or_printaddr(tcp, addr, size, &st)) {
-		PRINT_FIELD_U("{", st, rx_packets);
-		PRINT_FIELD_U(", ", st, tx_packets);
-		PRINT_FIELD_U(", ", st, rx_bytes);
-		PRINT_FIELD_U(", ", st, tx_bytes);
-		PRINT_FIELD_U(", ", st, rx_errors);
-		PRINT_FIELD_U(", ", st, tx_errors);
-		PRINT_FIELD_U(", ", st, rx_dropped);
-		PRINT_FIELD_U(", ", st, tx_dropped);
-		PRINT_FIELD_U(", ", st, multicast);
-		PRINT_FIELD_U(", ", st, collisions);
+		tprint_struct_begin();
+		PRINT_FIELD_U(st, rx_packets);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_packets);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_dropped);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_dropped);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, multicast);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, collisions);
 
-		PRINT_FIELD_U(", ", st, rx_length_errors);
-		PRINT_FIELD_U(", ", st, rx_over_errors);
-		PRINT_FIELD_U(", ", st, rx_crc_errors);
-		PRINT_FIELD_U(", ", st, rx_frame_errors);
-		PRINT_FIELD_U(", ", st, rx_fifo_errors);
-		PRINT_FIELD_U(", ", st, rx_missed_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_length_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_over_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_crc_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_frame_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_fifo_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_missed_errors);
 
-		PRINT_FIELD_U(", ", st, tx_aborted_errors);
-		PRINT_FIELD_U(", ", st, tx_carrier_errors);
-		PRINT_FIELD_U(", ", st, tx_fifo_errors);
-		PRINT_FIELD_U(", ", st, tx_heartbeat_errors);
-		PRINT_FIELD_U(", ", st, tx_window_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_aborted_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_carrier_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_fifo_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_heartbeat_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_window_errors);
 
-		PRINT_FIELD_U(", ", st, rx_compressed);
-		PRINT_FIELD_U(", ", st, tx_compressed);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_compressed);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_compressed);
 
 		if (len >= def_size) {
-			PRINT_FIELD_U(", ", st, rx_nohandler);
+			tprint_struct_next();
+			PRINT_FIELD_U(st, rx_nohandler);
 		}
 		tprints("}");
 	}
@@ -200,9 +224,12 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 		PRINT_FIELD_X(map, mem_end);
 		tprint_struct_next();
 		PRINT_FIELD_X(map, base_addr);
-		PRINT_FIELD_U(", ", map, irq);
-		PRINT_FIELD_U(", ", map, dma);
-		PRINT_FIELD_U(", ", map, port);
+		tprint_struct_next();
+		PRINT_FIELD_U(map, irq);
+		tprint_struct_next();
+		PRINT_FIELD_U(map, dma);
+		tprint_struct_next();
+		PRINT_FIELD_U(map, port);
 		tprints("}");
 	}
 
@@ -255,12 +282,18 @@ decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
 	if (umoven_or_printaddr(tcp, addr, size, &st))
 		return true;
 
-	PRINT_FIELD_U("{", st, bus_error);
-	PRINT_FIELD_U(", ", st, error_warning);
-	PRINT_FIELD_U(", ", st, error_passive);
-	PRINT_FIELD_U(", ", st, bus_off);
-	PRINT_FIELD_U(", ", st, arbitration_lost);
-	PRINT_FIELD_U(", ", st, restarts);
+	tprint_struct_begin();
+	PRINT_FIELD_U(st, bus_error);
+	tprint_struct_next();
+	PRINT_FIELD_U(st, error_warning);
+	tprint_struct_next();
+	PRINT_FIELD_U(st, error_passive);
+	tprint_struct_next();
+	PRINT_FIELD_U(st, bus_off);
+	tprint_struct_next();
+	PRINT_FIELD_U(st, arbitration_lost);
+	tprint_struct_next();
+	PRINT_FIELD_U(st, restarts);
 	tprints("}");
 
 	return true;
@@ -450,35 +483,59 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 		return false;
 
 	if (!umoven_or_printaddr(tcp, addr, size, &st)) {
-		PRINT_FIELD_U("{", st, rx_packets);
-		PRINT_FIELD_U(", ", st, tx_packets);
-		PRINT_FIELD_U(", ", st, rx_bytes);
-		PRINT_FIELD_U(", ", st, tx_bytes);
-		PRINT_FIELD_U(", ", st, rx_errors);
-		PRINT_FIELD_U(", ", st, tx_errors);
-		PRINT_FIELD_U(", ", st, rx_dropped);
-		PRINT_FIELD_U(", ", st, tx_dropped);
-		PRINT_FIELD_U(", ", st, multicast);
-		PRINT_FIELD_U(", ", st, collisions);
+		tprint_struct_begin();
+		PRINT_FIELD_U(st, rx_packets);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_packets);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_dropped);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_dropped);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, multicast);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, collisions);
 
-		PRINT_FIELD_U(", ", st, rx_length_errors);
-		PRINT_FIELD_U(", ", st, rx_over_errors);
-		PRINT_FIELD_U(", ", st, rx_crc_errors);
-		PRINT_FIELD_U(", ", st, rx_frame_errors);
-		PRINT_FIELD_U(", ", st, rx_fifo_errors);
-		PRINT_FIELD_U(", ", st, rx_missed_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_length_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_over_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_crc_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_frame_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_fifo_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_missed_errors);
 
-		PRINT_FIELD_U(", ", st, tx_aborted_errors);
-		PRINT_FIELD_U(", ", st, tx_carrier_errors);
-		PRINT_FIELD_U(", ", st, tx_fifo_errors);
-		PRINT_FIELD_U(", ", st, tx_heartbeat_errors);
-		PRINT_FIELD_U(", ", st, tx_window_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_aborted_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_carrier_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_fifo_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_heartbeat_errors);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_window_errors);
 
-		PRINT_FIELD_U(", ", st, rx_compressed);
-		PRINT_FIELD_U(", ", st, tx_compressed);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, rx_compressed);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, tx_compressed);
 
 		if (len >= def_size) {
-			PRINT_FIELD_U(", ", st, rx_nohandler);
+			tprint_struct_next();
+			PRINT_FIELD_U(st, rx_nohandler);
 		}
 		tprints("}");
 	}
@@ -499,11 +556,13 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &vsi))
 		return true;
 
-	PRINT_FIELD_U("{", vsi, vsi_mgr_id);
+	tprint_struct_begin();
+	PRINT_FIELD_U(vsi, vsi_mgr_id);
 	tprint_struct_next();
 	PRINT_FIELD_STRING(vsi, vsi_type_id, sizeof(vsi.vsi_type_id),
 			   QUOTE_FORCE_HEX);
-	PRINT_FIELD_U(", ", vsi, vsi_type_version);
+	tprint_struct_next();
+	PRINT_FIELD_U(vsi, vsi_type_version);
 
 	if (!IS_ARRAY_ZERO(vsi.pad)) {
 		tprint_struct_next();
@@ -721,10 +780,14 @@ decode_ifla_inet6_cacheinfo(struct tcb *const tcp,
 	if (len < sizeof(ci))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ci)) {
-		PRINT_FIELD_U("{", ci, max_reasm_len);
-		PRINT_FIELD_U(", ", ci, tstamp);
-		PRINT_FIELD_U(", ", ci, reachable_time);
-		PRINT_FIELD_U(", ", ci, retrans_time);
+		tprint_struct_begin();
+		PRINT_FIELD_U(ci, max_reasm_len);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, tstamp);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, reachable_time);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, retrans_time);
 		tprints("}");
 	}
 

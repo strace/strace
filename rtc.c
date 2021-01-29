@@ -29,18 +29,27 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 static void
 print_rtc_time(struct tcb *tcp, const struct rtc_time *rt)
 {
-	PRINT_FIELD_D("{", *rt, tm_sec);
-	PRINT_FIELD_D(", ", *rt, tm_min);
-	PRINT_FIELD_D(", ", *rt, tm_hour);
-	PRINT_FIELD_D(", ", *rt, tm_mday);
-	PRINT_FIELD_D(", ", *rt, tm_mon);
-	PRINT_FIELD_D(", ", *rt, tm_year);
+	tprint_struct_begin();
+	PRINT_FIELD_D(*rt, tm_sec);
+	tprint_struct_next();
+	PRINT_FIELD_D(*rt, tm_min);
+	tprint_struct_next();
+	PRINT_FIELD_D(*rt, tm_hour);
+	tprint_struct_next();
+	PRINT_FIELD_D(*rt, tm_mday);
+	tprint_struct_next();
+	PRINT_FIELD_D(*rt, tm_mon);
+	tprint_struct_next();
+	PRINT_FIELD_D(*rt, tm_year);
 	if (abbrev(tcp)) {
 		tprints(", ...");
 	} else {
-		PRINT_FIELD_D(", ", *rt, tm_wday);
-		PRINT_FIELD_D(", ", *rt, tm_yday);
-		PRINT_FIELD_D(", ", *rt, tm_isdst);
+		tprint_struct_next();
+		PRINT_FIELD_D(*rt, tm_wday);
+		tprint_struct_next();
+		PRINT_FIELD_D(*rt, tm_yday);
+		tprint_struct_next();
+		PRINT_FIELD_D(*rt, tm_isdst);
 	}
 	tprints("}");
 }
@@ -62,8 +71,10 @@ decode_rtc_wkalrm(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &wk))
 		return;
 
-	PRINT_FIELD_U("{", wk, enabled);
-	PRINT_FIELD_U(", ", wk, pending);
+	tprint_struct_begin();
+	PRINT_FIELD_U(wk, enabled);
+	tprint_struct_next();
+	PRINT_FIELD_U(wk, pending);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_PTR(wk, time, tcp, print_rtc_time);
 	tprints("}");
@@ -77,13 +88,20 @@ decode_rtc_pll_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &pll))
 		return;
 
-	PRINT_FIELD_D("{", pll, pll_ctrl);
-	PRINT_FIELD_D(", ", pll, pll_value);
-	PRINT_FIELD_D(", ", pll, pll_max);
-	PRINT_FIELD_D(", ", pll, pll_min);
-	PRINT_FIELD_D(", ", pll, pll_posmult);
-	PRINT_FIELD_D(", ", pll, pll_negmult);
-	PRINT_FIELD_D(", ", pll, pll_clock);
+	tprint_struct_begin();
+	PRINT_FIELD_D(pll, pll_ctrl);
+	tprint_struct_next();
+	PRINT_FIELD_D(pll, pll_value);
+	tprint_struct_next();
+	PRINT_FIELD_D(pll, pll_max);
+	tprint_struct_next();
+	PRINT_FIELD_D(pll, pll_min);
+	tprint_struct_next();
+	PRINT_FIELD_D(pll, pll_posmult);
+	tprint_struct_next();
+	PRINT_FIELD_D(pll, pll_negmult);
+	tprint_struct_next();
+	PRINT_FIELD_D(pll, pll_clock);
 	tprints("}");
 }
 

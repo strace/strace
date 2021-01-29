@@ -215,10 +215,10 @@ test_unix_diag_req(const int fd)
 		       SOCK_DIAG_BY_FAMILY, NLM_F_REQUEST, req,
 		       printf("{sdiag_family=AF_UNIX"),
 		       printf(", ");
-		       PRINT_FIELD_U("", req, sdiag_protocol);
+		       PRINT_FIELD_U(req, sdiag_protocol);
 		       printf(", udiag_states=1<<TCP_ESTABLISHED|1<<TCP_LISTEN");
 		       printf(", ");
-		       PRINT_FIELD_U("", req, udiag_ino);
+		       PRINT_FIELD_U(req, udiag_ino);
 		       printf(", udiag_show=UDIAG_SHOW_NAME");
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(req, udiag_cookie);
@@ -242,7 +242,7 @@ test_unix_diag_msg(const int fd)
 		       printf(", udiag_type=SOCK_STREAM"
 			      ", udiag_state=TCP_FIN_WAIT1");
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, udiag_ino);
+		       PRINT_FIELD_U(msg, udiag_ino);
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(msg, udiag_cookie);
 		       printf("}"));
@@ -264,7 +264,7 @@ test_netlink_diag_req(const int fd)
 		       printf("{sdiag_family=AF_NETLINK"),
 		       printf(", sdiag_protocol=NDIAG_PROTO_ALL");
 		       printf(", ");
-		       PRINT_FIELD_U("", req, ndiag_ino);
+		       PRINT_FIELD_U(req, ndiag_ino);
 		       printf(", ndiag_show=NDIAG_SHOW_MEMINFO");
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(req, ndiag_cookie);
@@ -277,7 +277,7 @@ test_netlink_diag_req(const int fd)
 		       printf("{sdiag_family=AF_NETLINK"),
 		       printf(", sdiag_protocol=NETLINK_ROUTE");
 		       printf(", ");
-		       PRINT_FIELD_U("", req, ndiag_ino);
+		       PRINT_FIELD_U(req, ndiag_ino);
 		       printf(", ndiag_show=NDIAG_SHOW_GROUPS");
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(req, ndiag_cookie);
@@ -306,13 +306,13 @@ test_netlink_diag_msg(const int fd)
 			      ", ndiag_protocol=NETLINK_ROUTE"
 			      ", ndiag_state=NETLINK_CONNECTED");
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, ndiag_portid);
+		       PRINT_FIELD_U(msg, ndiag_portid);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, ndiag_dst_portid);
+		       PRINT_FIELD_U(msg, ndiag_dst_portid);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, ndiag_dst_group);
+		       PRINT_FIELD_U(msg, ndiag_dst_group);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, ndiag_ino);
+		       PRINT_FIELD_U(msg, ndiag_ino);
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(msg, ndiag_cookie);
 		       printf("}"));
@@ -334,7 +334,7 @@ test_packet_diag_req(const int fd)
 		       printf("{sdiag_family=AF_PACKET"),
 		       printf(", sdiag_protocol=%#x", req.sdiag_protocol);
 		       printf(", ");
-		       PRINT_FIELD_U("", req, pdiag_ino);
+		       PRINT_FIELD_U(req, pdiag_ino);
 		       printf(", pdiag_show=PACKET_SHOW_INFO");
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(req, pdiag_cookie);
@@ -358,7 +358,7 @@ test_packet_diag_msg(const int fd)
 		       printf(", pdiag_type=SOCK_STREAM");
 		       printf(", pdiag_num=ETH_P_QINQ1");
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, pdiag_ino);
+		       PRINT_FIELD_U(msg, pdiag_ino);
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(msg, pdiag_cookie);
 		       printf("}"));
@@ -459,9 +459,9 @@ test_inet_diag_req(const int fd)
 		       TCPDIAG_GETSOCK, NLM_F_REQUEST, req,
 		       printf("{idiag_family=AF_INET"),
 		       printf(", ");
-		       PRINT_FIELD_U("", req, idiag_src_len);
+		       PRINT_FIELD_U(req, idiag_src_len);
 		       printf(", ");
-		       PRINT_FIELD_U("", req, idiag_dst_len);
+		       PRINT_FIELD_U(req, idiag_dst_len);
 		       printf(", idiag_ext=1<<(INET_DIAG_TOS-1)");
 		       printf(", id={idiag_sport=htons(%u)"
 			      ", idiag_dport=htons(%u)"
@@ -475,7 +475,7 @@ test_inet_diag_req(const int fd)
 		       PRINT_FIELD_COOKIE(req.id, idiag_cookie);
 		       printf("}, idiag_states=1<<TCP_LAST_ACK");
 		       printf(", ");
-		       PRINT_FIELD_U("", req, idiag_dbs);
+		       PRINT_FIELD_U(req, idiag_dbs);
 		       printf("}"));
 }
 
@@ -552,9 +552,9 @@ test_inet_diag_msg(const int fd)
 		       printf("{idiag_family=AF_INET"),
 		       printf(", idiag_state=TCP_LISTEN");
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, idiag_timer);
+		       PRINT_FIELD_U(msg, idiag_timer);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, idiag_retrans);
+		       PRINT_FIELD_U(msg, idiag_retrans);
 		       printf(", id={idiag_sport=htons(%u)"
 			      ", idiag_dport=htons(%u)"
 			      ", idiag_src=inet_addr(\"%s\")"
@@ -566,15 +566,15 @@ test_inet_diag_msg(const int fd)
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(msg.id, idiag_cookie);
 		       printf("}, ");
-		       PRINT_FIELD_U("", msg, idiag_expires);
+		       PRINT_FIELD_U(msg, idiag_expires);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, idiag_rqueue);
+		       PRINT_FIELD_U(msg, idiag_rqueue);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, idiag_wqueue);
+		       PRINT_FIELD_U(msg, idiag_wqueue);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, idiag_uid);
+		       PRINT_FIELD_U(msg, idiag_uid);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, idiag_inode);
+		       PRINT_FIELD_U(msg, idiag_inode);
 		       printf("}"));
 }
 
@@ -646,7 +646,7 @@ test_smc_diag_msg(const int fd)
 		       printf(", diag_state=SMC_ACTIVE");
 		       printf(", diag_fallback=SMC_DIAG_MODE_FALLBACK_TCP");
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, diag_shutdown);
+		       PRINT_FIELD_U(msg, diag_shutdown);
 		       printf(", id={idiag_sport=htons(%u)"
 			      ", idiag_dport=htons(%u)"
 			      ", idiag_src=inet_addr(\"%s\")"
@@ -658,9 +658,9 @@ test_smc_diag_msg(const int fd)
 		       printf(", ");
 		       PRINT_FIELD_COOKIE(msg.id, idiag_cookie);
 		       printf("}, ");
-		       PRINT_FIELD_U("", msg, diag_uid);
+		       PRINT_FIELD_U(msg, diag_uid);
 		       printf(", ");
-		       PRINT_FIELD_U("", msg, diag_inode);
+		       PRINT_FIELD_U(msg, diag_inode);
 		       printf("}"));
 }
 #endif

@@ -61,9 +61,12 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 static void
 print_smc_diag_cursor(const struct smc_diag_cursor *const cursor)
 {
-	PRINT_FIELD_U("{", *cursor, reserved);
-	PRINT_FIELD_U(", ", *cursor, wrap);
-	PRINT_FIELD_U(", ", *cursor, count);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*cursor, reserved);
+	tprint_struct_next();
+	PRINT_FIELD_U(*cursor, wrap);
+	tprint_struct_next();
+	PRINT_FIELD_U(*cursor, count);
 	tprints("}");
 }
 
@@ -80,10 +83,14 @@ decode_smc_diag_conninfo(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &cinfo))
 		return true;
 
-	PRINT_FIELD_U("{", cinfo, token);
-	PRINT_FIELD_U(", ", cinfo, sndbuf_size);
-	PRINT_FIELD_U(", ", cinfo, rmbe_size);
-	PRINT_FIELD_U(", ", cinfo, peer_rmbe_size);
+	tprint_struct_begin();
+	PRINT_FIELD_U(cinfo, token);
+	tprint_struct_next();
+	PRINT_FIELD_U(cinfo, sndbuf_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(cinfo, rmbe_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(cinfo, peer_rmbe_size);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(cinfo, rx_prod, print_smc_diag_cursor);
 	tprint_struct_next();
@@ -116,10 +123,12 @@ print_smc_diag_linkinfo_array_member(struct tcb *tcp, void *elem_buf,
 				     size_t elem_size, void *data)
 {
 	const struct smc_diag_linkinfo *const p = elem_buf;
-	PRINT_FIELD_U("{", *p, link_id);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*p, link_id);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(*p, ibname);
-	PRINT_FIELD_U(", ", *p, ibport);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, ibport);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(*p, gid);
 	tprint_struct_next();
@@ -178,7 +187,8 @@ decode_smc_diag_dmbinfo(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &dinfo))
 		return true;
 
-	PRINT_FIELD_U("{", dinfo, linkid);
+	tprint_struct_begin();
+	PRINT_FIELD_U(dinfo, linkid);
 	tprint_struct_next();
 	PRINT_FIELD_X(dinfo, peer_gid);
 	tprint_struct_next();
@@ -245,15 +255,18 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(msg, diag_fallback,
 					 smc_diag_mode, "SMC_DIAG_MODE_???");
-			PRINT_FIELD_U(", ", msg, diag_shutdown);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, diag_shutdown);
 			/*
 			 * AF_SMC protocol family socket handler
 			 * keeping the AF_INET sock address.
 			 */
 			tprint_struct_next();
 			PRINT_FIELD_INET_DIAG_SOCKID(msg, id, AF_INET);
-			PRINT_FIELD_U(", ", msg, diag_uid);
-			PRINT_FIELD_U(", ", msg, diag_inode);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, diag_uid);
+			tprint_struct_next();
+			PRINT_FIELD_U(msg, diag_inode);
 			decode_nla = true;
 		}
 	} else

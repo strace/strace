@@ -48,7 +48,8 @@ SYS_FUNC(name_to_handle_at)
 
 			return RVAL_DECODED;
 		}
-		PRINT_FIELD_U("{", h, handle_bytes);
+		tprint_struct_begin();
+		PRINT_FIELD_U(h, handle_bytes);
 
 		set_tcb_priv_ulong(tcp, h.handle_bytes);
 
@@ -63,7 +64,8 @@ SYS_FUNC(name_to_handle_at)
 			if (i != h.handle_bytes)
 				tprintf(" => %u", h.handle_bytes);
 			if (!syserror(tcp)) {
-				PRINT_FIELD_D(", ", h, handle_type);
+				tprint_struct_next();
+				PRINT_FIELD_D(h, handle_type);
 				if (h.handle_bytes > MAX_HANDLE_SZ)
 					h.handle_bytes = MAX_HANDLE_SZ;
 				if (!umoven(tcp, addr + sizeof(h), h.handle_bytes,
@@ -99,8 +101,10 @@ SYS_FUNC(open_by_handle_at)
 	if (!umove_or_printaddr(tcp, addr, &h)) {
 		unsigned char f_handle[MAX_HANDLE_SZ];
 
-		PRINT_FIELD_U("{", h, handle_bytes);
-		PRINT_FIELD_D(", ", h, handle_type);
+		tprint_struct_begin();
+		PRINT_FIELD_U(h, handle_bytes);
+		tprint_struct_next();
+		PRINT_FIELD_D(h, handle_type);
 		if (h.handle_bytes > MAX_HANDLE_SZ)
 			h.handle_bytes = MAX_HANDLE_SZ;
 		if (!umoven(tcp, addr + sizeof(h), h.handle_bytes, &f_handle)) {

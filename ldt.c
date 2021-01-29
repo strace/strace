@@ -55,7 +55,8 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 
 	if (filter & USER_DESC_ENTERING) {
-		PRINT_FIELD_ID("{", desc, entry_number);
+		tprint_struct_begin();
+		PRINT_FIELD_ID(desc, entry_number);
 
 		/*
 		 * If we don't print the whole structure now, let's save it for
@@ -89,7 +90,9 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 				 * means that we failed on entering but somehow
 				 * succeeded on exiting.
 				 */
-				PRINT_FIELD_ID(" => {", desc, entry_number);
+				tprint_value_changed();
+				tprint_struct_begin();
+				PRINT_FIELD_ID(desc, entry_number);
 			}
 		}
 

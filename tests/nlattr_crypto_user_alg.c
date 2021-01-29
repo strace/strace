@@ -89,9 +89,9 @@ main(void)
 			      print_quoted_memory,
 			      printf("{type=\"efgh\"");
 			      printf(", ");
-			      PRINT_FIELD_U("", rhash, blocksize);
+			      PRINT_FIELD_U(rhash, blocksize);
 			      printf(", ");
-			      PRINT_FIELD_U("", rhash, digestsize);
+			      PRINT_FIELD_U(rhash, digestsize);
 			      printf("}"));
 # endif
 
@@ -111,13 +111,13 @@ main(void)
 			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
 			      printf(", ");
-			      PRINT_FIELD_U("", rblkcipher, blocksize);
+			      PRINT_FIELD_U(rblkcipher, blocksize);
 			      printf(", ");
-			      PRINT_FIELD_U("", rblkcipher, min_keysize);
+			      PRINT_FIELD_U(rblkcipher, min_keysize);
 			      printf(", ");
-			      PRINT_FIELD_U("", rblkcipher, max_keysize);
+			      PRINT_FIELD_U(rblkcipher, max_keysize);
 			      printf(", ");
-			      PRINT_FIELD_U("", rblkcipher, ivsize);
+			      PRINT_FIELD_U(rblkcipher, ivsize);
 			      printf("}"));
 # endif
 
@@ -136,11 +136,11 @@ main(void)
 			      print_quoted_memory,
 			      printf("{type=\"abcd\", geniv=\"efgh\"");
 			      printf(", ");
-			      PRINT_FIELD_U("", raead, blocksize);
+			      PRINT_FIELD_U(raead, blocksize);
 			      printf(", ");
-			      PRINT_FIELD_U("", raead, maxauthsize);
+			      PRINT_FIELD_U(raead, maxauthsize);
 			      printf(", ");
-			      PRINT_FIELD_U("", raead, ivsize);
+			      PRINT_FIELD_U(raead, ivsize);
 			      printf("}"));
 # endif
 
@@ -155,7 +155,7 @@ main(void)
 			      pattern, rrng, sizeof(rrng), print_quoted_memory,
 			      printf("{type=\"abcd\"");
 			      printf(", ");
-			      PRINT_FIELD_U("", rrng, seedsize);
+			      PRINT_FIELD_U(rrng, seedsize);
 			      printf("}"));
 # endif
 
@@ -173,11 +173,11 @@ main(void)
 			      print_quoted_memory,
 			      printf("{type=\"abcd\"");
 			      printf(", ");
-			      PRINT_FIELD_U("", rcipher, blocksize);
+			      PRINT_FIELD_U(rcipher, blocksize);
 			      printf(", ");
-			      PRINT_FIELD_U("", rcipher, min_keysize);
+			      PRINT_FIELD_U(rcipher, min_keysize);
 			      printf(", ");
-			      PRINT_FIELD_U("", rcipher, max_keysize);
+			      PRINT_FIELD_U(rcipher, max_keysize);
 			      printf("}"));
 # endif
 

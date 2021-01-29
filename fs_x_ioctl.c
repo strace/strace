@@ -22,8 +22,10 @@ decode_fstrim_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (!umove_or_printaddr(tcp, arg, &range)) {
 		tprint_struct_begin();
 		PRINT_FIELD_X(range, start);
-		PRINT_FIELD_U(", ", range, len);
-		PRINT_FIELD_U(", ", range, minlen);
+		tprint_struct_next();
+		PRINT_FIELD_U(range, len);
+		tprint_struct_next();
+		PRINT_FIELD_U(range, minlen);
 		tprints("}");
 	}
 }
@@ -39,13 +41,16 @@ decode_fsxattr(struct tcb *const tcp, const kernel_ulong_t arg,
 	if (!umove_or_printaddr(tcp, arg, &fsxattr)) {
 		tprint_struct_begin();
 		PRINT_FIELD_FLAGS(fsxattr, fsx_xflags, fs_xflags, "FS_XFLAG_???");
-		PRINT_FIELD_U(", ", fsxattr, fsx_extsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(fsxattr, fsx_extsize);
 		if (is_get) {
-			PRINT_FIELD_U(", ", fsxattr, fsx_nextents);
+			tprint_struct_next();
+			PRINT_FIELD_U(fsxattr, fsx_nextents);
 		}
 		tprint_struct_next();
 		PRINT_FIELD_X(fsxattr, fsx_projid);
-		PRINT_FIELD_U(", ", fsxattr, fsx_cowextsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(fsxattr, fsx_cowextsize);
 		tprints("}");
 	}
 }

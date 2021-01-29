@@ -90,12 +90,12 @@ main(void)
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
 	printf(", {");
-	PRINT_FIELD_D("", *peercred, pid);
+	PRINT_FIELD_D(*peercred, pid);
 	printf("%s", pid_str);
 	printf(", ");
-	PRINT_FIELD_UID("", *peercred, uid);
+	PRINT_FIELD_ID(*peercred, uid);
 	printf(", ");
-	PRINT_FIELD_UID("", *peercred, gid);
+	PRINT_FIELD_ID(*peercred, gid);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/* getsockopt with zero optlen */
@@ -111,12 +111,12 @@ main(void)
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
 	printf(", {");
-	PRINT_FIELD_D("", *peercred, pid);
+	PRINT_FIELD_D(*peercred, pid);
 	printf("%s", pid_str);
 	printf(", ");
-	PRINT_FIELD_UID("", *peercred, uid);
+	PRINT_FIELD_ID(*peercred, uid);
 	printf(", ");
-	PRINT_FIELD_UID("", *peercred, gid);
+	PRINT_FIELD_ID(*peercred, gid);
 	printf("}, [%u->%d]) = %s\n",
 	       (unsigned int) sizeof(*peercred) + 1, *len, errstr);
 
@@ -140,7 +140,7 @@ main(void)
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
 	printf(", {");
-	PRINT_FIELD_D("", *pid, pid);
+	PRINT_FIELD_D(*pid, pid);
 	printf("%s", pid_str);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
@@ -159,7 +159,7 @@ main(void)
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
 	printf(", {");
-	PRINT_FIELD_D("", *uid, pid);
+	PRINT_FIELD_D(*uid, pid);
 	printf("%s", pid_str);
 	printf(", uid=");
 	print_quoted_hex(&uid->uid, sizeof_uid_truncated -
@@ -175,10 +175,10 @@ main(void)
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
 	printf(", {");
-	PRINT_FIELD_D("", *uid, pid);
+	PRINT_FIELD_D(*uid, pid);
 	printf("%s", pid_str);
 	printf(", ");
-	PRINT_FIELD_UID("", *uid, uid);
+	PRINT_FIELD_ID(*uid, uid);
 	printf("}, [%d]) = %s\n", *len, errstr);
 
 	/*
@@ -196,10 +196,10 @@ main(void)
 	pidns_print_leader();
 	printf("getsockopt(%d, %s", sv[0], so_str());
 	printf(", {");
-	PRINT_FIELD_D("", *peercred, pid);
+	PRINT_FIELD_D(*peercred, pid);
 	printf("%s", pid_str);
 	printf(", ");
-	PRINT_FIELD_UID("", *peercred, uid);
+	PRINT_FIELD_ID(*peercred, uid);
 	printf(", gid=");
 	print_quoted_hex(&peercred->gid, sizeof_gid_truncated -
 				    offsetof(struct ucred, gid));

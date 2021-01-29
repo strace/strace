@@ -106,9 +106,9 @@ main(void)
 			   init_rtmsg, print_rtmsg,
 			   FRA_UID_RANGE, pattern, range,
 			   printf("{");
-			   PRINT_FIELD_U("", range, start);
+			   PRINT_FIELD_U(range, start);
 			   printf(", ");
-			   PRINT_FIELD_U("", range, end);
+			   PRINT_FIELD_U(range, end);
 			   printf("}"));
 # endif
 # if defined HAVE_BE64TOH || defined be64toh
@@ -166,17 +166,17 @@ main(void)
 			   init_rtmsg, print_rtmsg,
 			   FRA_SPORT_RANGE, pattern, prange,
 			   printf("{");
-			   PRINT_FIELD_U("", prange, start);
+			   PRINT_FIELD_U(prange, start);
 			   printf(", ");
-			   PRINT_FIELD_U("", prange, end);
+			   PRINT_FIELD_U(prange, end);
 			   printf("}"));
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_rtmsg, print_rtmsg,
 			   FRA_DPORT_RANGE, pattern, prange,
 			   printf("{");
-			   PRINT_FIELD_U("", prange, start);
+			   PRINT_FIELD_U(prange, start);
 			   printf(", ");
-			   PRINT_FIELD_U("", prange, end);
+			   PRINT_FIELD_U(prange, end);
 			   printf("}"));
 
 	puts("+++ exited with 0 +++");

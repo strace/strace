@@ -46,10 +46,14 @@ decode_ifa_cacheinfo(struct tcb *const tcp,
 	if (len < sizeof(ci))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ci)) {
-		PRINT_FIELD_U("{", ci, ifa_prefered);
-		PRINT_FIELD_U(", ", ci, ifa_valid);
-		PRINT_FIELD_U(", ", ci, cstamp);
-		PRINT_FIELD_U(", ", ci, tstamp);
+		tprint_struct_begin();
+		PRINT_FIELD_U(ci, ifa_prefered);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, ifa_valid);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, cstamp);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, tstamp);
 		tprints("}");
 	}
 
@@ -99,7 +103,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifaddr) - offset,
 					 (char *) &ifaddr + offset)) {
-			PRINT_FIELD_U("", ifaddr, ifa_prefixlen);
+			PRINT_FIELD_U(ifaddr, ifa_prefixlen);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(ifaddr, ifa_flags,
 					  ifaddrflags, "IFA_F_???");

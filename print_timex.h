@@ -14,8 +14,10 @@
 static void
 PRINT_TIMEX_TIME(const typeof_field(TIMEX_T, time) *const p)
 {
-	PRINT_FIELD_D("{", *p, tv_sec);
-	PRINT_FIELD_U(", ", *p, tv_usec);
+	tprint_struct_begin();
+	PRINT_FIELD_D(*p, tv_sec);
+	tprint_struct_next();
+	PRINT_FIELD_U(*p, tv_usec);
 	tprints("}");
 }
 
@@ -29,27 +31,44 @@ PRINT_TIMEX(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(tx, modes, adjtimex_modes, "ADJ_???");
-	PRINT_FIELD_D(", ", tx, offset);
-	PRINT_FIELD_D(", ", tx, freq);
-	PRINT_FIELD_D(", ", tx, maxerror);
-	PRINT_FIELD_D(", ", tx, esterror);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, offset);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, freq);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, maxerror);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, esterror);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(tx, status, adjtimex_status, "STA_???");
-	PRINT_FIELD_D(", ", tx, constant);
-	PRINT_FIELD_D(", ", tx, precision);
-	PRINT_FIELD_D(", ", tx, tolerance);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, constant);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, precision);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, tolerance);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_PTR(tx, time, PRINT_TIMEX_TIME);
-	PRINT_FIELD_D(", ", tx, tick);
-	PRINT_FIELD_D(", ", tx, ppsfreq);
-	PRINT_FIELD_D(", ", tx, jitter);
-	PRINT_FIELD_D(", ", tx, shift);
-	PRINT_FIELD_D(", ", tx, stabil);
-	PRINT_FIELD_D(", ", tx, jitcnt);
-	PRINT_FIELD_D(", ", tx, calcnt);
-	PRINT_FIELD_D(", ", tx, errcnt);
-	PRINT_FIELD_D(", ", tx, stbcnt);
-	PRINT_FIELD_D(", ", tx, tai);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, tick);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, ppsfreq);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, jitter);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, shift);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, stabil);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, jitcnt);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, calcnt);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, errcnt);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, stbcnt);
+	tprint_struct_next();
+	PRINT_FIELD_D(tx, tai);
 	tprints("}");
 	return 0;
 }

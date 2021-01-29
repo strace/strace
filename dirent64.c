@@ -14,9 +14,12 @@
 static void
 print_dentry_head(const kernel_dirent64_t *const dent)
 {
-	PRINT_FIELD_U("{", *dent, d_ino);
-	PRINT_FIELD_U(", ", *dent, d_off);
-	PRINT_FIELD_U(", ", *dent, d_reclen);
+	tprint_struct_begin();
+	PRINT_FIELD_U(*dent, d_ino);
+	tprint_struct_next();
+	PRINT_FIELD_U(*dent, d_off);
+	tprint_struct_next();
+	PRINT_FIELD_U(*dent, d_reclen);
 }
 
 static unsigned int

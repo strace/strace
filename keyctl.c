@@ -282,7 +282,8 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 				PRINT_FIELD_PTR(kdf, otherinfo);
 			}
 
-			PRINT_FIELD_U(", ", kdf, otherinfolen);
+			tprint_struct_next();
+			PRINT_FIELD_U(kdf, otherinfolen);
 
 			if (!IS_ARRAY_ZERO(kdf.__spare)) {
 				tprint_struct_next();
@@ -306,11 +307,16 @@ print_pkey_query(struct tcb *tcp, kernel_ulong_t addr)
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(query, supported_ops, keyctl_pkey_ops,
 			  "KEYCTL_SUPPORTS_???");
-	PRINT_FIELD_U(", ", query, key_size);
-	PRINT_FIELD_U(", ", query, max_data_size);
-	PRINT_FIELD_U(", ", query, max_sig_size);
-	PRINT_FIELD_U(", ", query, max_enc_size);
-	PRINT_FIELD_U(", ", query, max_dec_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(query, key_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(query, max_data_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(query, max_sig_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(query, max_enc_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(query, max_dec_size);
 
 	if (!IS_ARRAY_ZERO(query.__spare)) {
 		tprint_struct_next();
@@ -349,12 +355,15 @@ fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
 
 	tprint_struct_begin();
 	PRINT_FIELD_OBJ_VAL(*params, key_id, print_keyring_serial_number);
-	PRINT_FIELD_U(", ", *params, in_len);
+	tprint_struct_next();
+	PRINT_FIELD_U(*params, in_len);
 
 	if (out) {
-		PRINT_FIELD_U(", ", *params, out_len);
+		tprint_struct_next();
+		PRINT_FIELD_U(*params, out_len);
 	} else {
-		PRINT_FIELD_U(", ", *params, in2_len);
+		tprint_struct_next();
+		PRINT_FIELD_U(*params, in2_len);
 	}
 
 	if (!IS_ARRAY_ZERO(params->__spare)) {

@@ -47,8 +47,10 @@ decode_crypto_report_hash(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &rhash)) {
 		tprint_struct_begin();
 		PRINT_FIELD_CSTRING(rhash, type);
-		PRINT_FIELD_U(", ", rhash, blocksize);
-		PRINT_FIELD_U(", ", rhash, digestsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rhash, blocksize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rhash, digestsize);
 		tprints("}");
 	}
 
@@ -70,10 +72,14 @@ decode_crypto_report_blkcipher(struct tcb *const tcp,
 		PRINT_FIELD_CSTRING(rblkcipher, type);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(rblkcipher, geniv);
-		PRINT_FIELD_U(", ", rblkcipher, blocksize);
-		PRINT_FIELD_U(", ", rblkcipher, min_keysize);
-		PRINT_FIELD_U(", ", rblkcipher, max_keysize);
-		PRINT_FIELD_U(", ", rblkcipher, ivsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rblkcipher, blocksize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rblkcipher, min_keysize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rblkcipher, max_keysize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rblkcipher, ivsize);
 		tprints("}");
 	}
 
@@ -95,9 +101,12 @@ decode_crypto_report_aead(struct tcb *const tcp,
 		PRINT_FIELD_CSTRING(raead, type);
 		tprint_struct_next();
 		PRINT_FIELD_CSTRING(raead, geniv);
-		PRINT_FIELD_U(", ", raead, blocksize);
-		PRINT_FIELD_U(", ", raead, maxauthsize);
-		PRINT_FIELD_U(", ", raead, ivsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(raead, blocksize);
+		tprint_struct_next();
+		PRINT_FIELD_U(raead, maxauthsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(raead, ivsize);
 		tprints("}");
 	}
 
@@ -117,7 +126,8 @@ decode_crypto_report_rng(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &rrng)) {
 		tprint_struct_begin();
 		PRINT_FIELD_CSTRING(rrng, type);
-		PRINT_FIELD_U(", ", rrng, seedsize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rrng, seedsize);
 		tprints("}");
 	}
 
@@ -137,9 +147,12 @@ decode_crypto_report_cipher(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &rcipher)) {
 		tprint_struct_begin();
 		PRINT_FIELD_CSTRING(rcipher, type);
-		PRINT_FIELD_U(", ", rcipher, blocksize);
-		PRINT_FIELD_U(", ", rcipher, min_keysize);
-		PRINT_FIELD_U(", ", rcipher, max_keysize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rcipher, blocksize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rcipher, min_keysize);
+		tprint_struct_next();
+		PRINT_FIELD_U(rcipher, max_keysize);
 		tprints("}");
 	}
 
@@ -180,7 +193,8 @@ decode_crypto_user_alg(struct tcb *const tcp,
 		PRINT_FIELD_X(alg, cru_type);
 		tprint_struct_next();
 		PRINT_FIELD_X(alg, cru_mask);
-		PRINT_FIELD_U(", ", alg, cru_refcnt);
+		tprint_struct_next();
+		PRINT_FIELD_U(alg, cru_refcnt);
 		tprint_struct_next();
 		PRINT_FIELD_X(alg, cru_flags);
 		tprints("}");

@@ -117,15 +117,22 @@ decode_rta_cacheinfo(struct tcb *const tcp,
 	if (len < sizeof(ci))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ci)) {
-		PRINT_FIELD_U("{", ci, rta_clntref);
-		PRINT_FIELD_U(", ", ci, rta_lastuse);
-		PRINT_FIELD_U(", ", ci, rta_expires);
-		PRINT_FIELD_U(", ", ci, rta_error);
-		PRINT_FIELD_U(", ", ci, rta_used);
+		tprint_struct_begin();
+		PRINT_FIELD_U(ci, rta_clntref);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, rta_lastuse);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, rta_expires);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, rta_error);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, rta_used);
 		tprint_struct_next();
 		PRINT_FIELD_X(ci, rta_id);
-		PRINT_FIELD_U(", ", ci, rta_ts);
-		PRINT_FIELD_U(", ", ci, rta_tsage);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, rta_ts);
+		tprint_struct_next();
+		PRINT_FIELD_U(ci, rta_tsage);
 		tprints("}");
 	}
 
@@ -143,9 +150,12 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 	if (len < sizeof(mfcs))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &mfcs)) {
-		PRINT_FIELD_U("{", mfcs, mfcs_packets);
-		PRINT_FIELD_U(", ", mfcs, mfcs_bytes);
-		PRINT_FIELD_U(", ", mfcs, mfcs_wrong_if);
+		tprint_struct_begin();
+		PRINT_FIELD_U(mfcs, mfcs_packets);
+		tprint_struct_next();
+		PRINT_FIELD_U(mfcs, mfcs_bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(mfcs, mfcs_wrong_if);
 		tprints("}");
 	}
 
@@ -239,11 +249,13 @@ decode_rta_multipath(struct tcb *const tcp,
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &nh)) {
 		/* print the whole structure regardless of its rtnh_len */
-		PRINT_FIELD_U("{", nh, rtnh_len);
+		tprint_struct_begin();
+		PRINT_FIELD_U(nh, rtnh_len);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(nh, rtnh_flags,
 				  route_nexthop_flags, "RTNH_F_???");
-		PRINT_FIELD_U(", ", nh, rtnh_hops);
+		tprint_struct_next();
+		PRINT_FIELD_U(nh, rtnh_hops);
 		tprint_struct_next();
 		PRINT_FIELD_IFINDEX(nh, rtnh_ifindex);
 		tprints("}");
@@ -277,8 +289,9 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(rtmsg) - offset,
 					 (char *) &rtmsg + offset)) {
-			PRINT_FIELD_U("", rtmsg, rtm_dst_len);
-			PRINT_FIELD_U(", ", rtmsg, rtm_src_len);
+			PRINT_FIELD_U(rtmsg, rtm_dst_len);
+			tprint_struct_next();
+			PRINT_FIELD_U(rtmsg, rtm_src_len);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(rtmsg, rtm_tos,
 					  ip_type_of_services, "IPTOS_TOS_???");

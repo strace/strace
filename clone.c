@@ -195,7 +195,8 @@ SYS_FUNC(clone3)
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_VAL(arg, exit_signal, printsignal);
 		} else {
-			PRINT_FIELD_U(", ", arg, exit_signal);
+			tprint_struct_next();
+			PRINT_FIELD_U(arg, exit_signal);
 		}
 
 		tprint_struct_next();
@@ -225,12 +226,14 @@ SYS_FUNC(clone3)
 					&buf, sizeof(buf), tfetch_mem,
 					print_int32_array_member, 0);
 			}
-			PRINT_FIELD_U(", ", arg, set_tid_size);
+			tprint_struct_next();
+			PRINT_FIELD_U(arg, set_tid_size);
 		}
 
 		if (fetch_size > offsetof(struct strace_clone_args, cgroup)
 		    && (arg.cgroup || arg.flags & CLONE_INTO_CGROUP)) {
-			PRINT_FIELD_U(", ", arg, cgroup);
+			tprint_struct_next();
+			PRINT_FIELD_U(arg, cgroup);
 		}
 
 		if (size > fetch_size)

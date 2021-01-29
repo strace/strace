@@ -76,9 +76,9 @@ main(void)
 				  init_tcmsg, print_tcmsg,
 				  TCA_STATS_BASIC, pattern, buf,
 				  printf("{");
-				  PRINT_FIELD_U("", sb, bytes);
+				  PRINT_FIELD_U(sb, bytes);
 				  printf(", ");
-				  PRINT_FIELD_U("", sb, packets);
+				  PRINT_FIELD_U(sb, packets);
 				  printf("}"));
 
 # ifdef HAVE_STRUCT_GNET_STATS_RATE_EST
@@ -90,9 +90,9 @@ main(void)
 				  init_tcmsg, print_tcmsg,
 				  TCA_STATS_RATE_EST, pattern, est,
 				  printf("{");
-				  PRINT_FIELD_U("", est, bps);
+				  PRINT_FIELD_U(est, bps);
 				  printf(", ");
-				  PRINT_FIELD_U("", est, pps);
+				  PRINT_FIELD_U(est, pps);
 				  printf("}"));
 # endif
 
@@ -108,15 +108,15 @@ main(void)
 				  init_tcmsg, print_tcmsg,
 				  TCA_STATS_QUEUE, pattern, qstats,
 				  printf("{");
-				  PRINT_FIELD_U("", qstats, qlen);
+				  PRINT_FIELD_U(qstats, qlen);
 				  printf(", ");
-				  PRINT_FIELD_U("", qstats, backlog);
+				  PRINT_FIELD_U(qstats, backlog);
 				  printf(", ");
-				  PRINT_FIELD_U("", qstats, drops);
+				  PRINT_FIELD_U(qstats, drops);
 				  printf(", ");
-				  PRINT_FIELD_U("", qstats, requeues);
+				  PRINT_FIELD_U(qstats, requeues);
 				  printf(", ");
-				  PRINT_FIELD_U("", qstats, overlimits);
+				  PRINT_FIELD_U(qstats, overlimits);
 				  printf("}"));
 # endif
 
@@ -129,9 +129,9 @@ main(void)
 				  init_tcmsg, print_tcmsg,
 				  TCA_STATS_RATE_EST64, pattern, est64,
 				  printf("{");
-				  PRINT_FIELD_U("", est64, bps);
+				  PRINT_FIELD_U(est64, bps);
 				  printf(", ");
-				  PRINT_FIELD_U("", est64, pps);
+				  PRINT_FIELD_U(est64, pps);
 				  printf("}"));
 # endif
 

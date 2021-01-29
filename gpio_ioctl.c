@@ -29,7 +29,8 @@ print_gpiochip_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING(info, name);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(info, label);
-	PRINT_FIELD_U(", ", info, lines);
+	tprint_struct_next();
+	PRINT_FIELD_U(info, lines);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -53,7 +54,8 @@ print_gpioline_info(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	if (entering(tcp)) {
-		PRINT_FIELD_U("{", info, line_offset);
+		tprint_struct_begin();
+		PRINT_FIELD_U(info, line_offset);
 		tprints("}");
 		return 0;
 	}
@@ -77,7 +79,8 @@ print_gpioline_info_unwatch(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &data)) {
-		PRINT_FIELD_U("{", data, offset);
+		tprint_struct_begin();
+		PRINT_FIELD_U(data, offset);
 		tprints("}");
 	}
 
@@ -109,7 +112,8 @@ print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	/* entering */
-	PRINT_FIELD_U("{", hr, lines);
+	tprint_struct_begin();
+	PRINT_FIELD_U(hr, lines);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(hr, lineoffsets, hr.lines, tcp,
 			       print_uint32_array_member);
@@ -150,7 +154,8 @@ print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	/* entering */
-	PRINT_FIELD_U("{", er, lineoffset);
+	tprint_struct_begin();
+	PRINT_FIELD_U(er, lineoffset);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(er, handleflags, gpio_handle_flags,
 			  "GPIOHANDLE_REQUEST_???");
@@ -226,7 +231,7 @@ print_gpio_v2_line_attribute_raw(const struct_gpio_v2_line_attribute *attr,
 {
 	if (as_field)
 		tprints("attr={");
-	PRINT_FIELD_U("", *attr, id);
+	PRINT_FIELD_U(*attr, id);
 	if (attr->padding) {
 		tprint_struct_next();
 		PRINT_FIELD_X(*attr, padding);
@@ -254,7 +259,7 @@ print_gpio_v2_line_attribute(const struct_gpio_v2_line_attribute *attr,
 		PRINT_FIELD_X(*attr, values);
 		break;
 	case GPIO_V2_LINE_ATTR_ID_DEBOUNCE:
-		PRINT_FIELD_U("", *attr, debounce_period_us);
+		PRINT_FIELD_U(*attr, debounce_period_us);
 		break;
 	default:
 		/* unknown id so decode fields raw */
@@ -300,7 +305,8 @@ print_gpio_v2_line_config(struct tcb *const tcp,
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(*lc, flags, gpio_v2_line_flags,
 			  "GPIO_V2_LINE_FLAG_???");
-	PRINT_FIELD_U(", ", *lc, num_attrs);
+	tprint_struct_next();
+	PRINT_FIELD_U(*lc, num_attrs);
 	if (!IS_ARRAY_ZERO(lc->padding)) {
 		tprint_struct_next();
 		PRINT_FIELD_X_ARRAY(*lc, padding);
@@ -329,7 +335,8 @@ print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 		return RVAL_IOCTL_DECODED;
 
 	if (entering(tcp)) {
-		PRINT_FIELD_U("{", li, offset);
+		tprint_struct_begin();
+		PRINT_FIELD_U(li, offset);
 		tprints("}");
 		return 0;
 	}
@@ -341,7 +348,8 @@ print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING(li, consumer);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(li, flags, gpio_v2_line_flags, "GPIO_V2_LINE_FLAG_???");
-	PRINT_FIELD_U(", ", li, num_attrs);
+	tprint_struct_next();
+	PRINT_FIELD_U(li, num_attrs);
 	if (li.num_attrs) {
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY_UPTO(li, attrs, li.num_attrs, tcp,
@@ -379,7 +387,8 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	/* entering */
-	PRINT_FIELD_U("{", lr, num_lines);
+	tprint_struct_begin();
+	PRINT_FIELD_U(lr, num_lines);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(lr, offsets, lr.num_lines, tcp,
 			       print_uint32_array_member);
@@ -389,7 +398,8 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(lr, consumer);
 	if (lr.event_buffer_size) {
-		PRINT_FIELD_U(", ", lr, event_buffer_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(lr, event_buffer_size);
 	}
 	if (!IS_ARRAY_ZERO(lr.padding)) {
 		tprint_struct_next();

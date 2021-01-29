@@ -36,10 +36,14 @@ print_hdio_getgeo(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &geo))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_U("{", geo, heads);
-	PRINT_FIELD_U(", ", geo, sectors);
-	PRINT_FIELD_U(", ", geo, cylinders);
-	PRINT_FIELD_U(", ", geo, start);
+	tprint_struct_begin();
+	PRINT_FIELD_U(geo, heads);
+	tprint_struct_next();
+	PRINT_FIELD_U(geo, sectors);
+	tprint_struct_next();
+	PRINT_FIELD_U(geo, cylinders);
+	tprint_struct_next();
+	PRINT_FIELD_U(geo, start);
 	tprints("}");
 
 	return RVAL_IOCTL_DECODED;
@@ -61,9 +65,12 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(c, command, hdio_drive_cmds,
 				 "ATA_CMD_???");
-		PRINT_FIELD_U(", ", c, sector_number);
-		PRINT_FIELD_U(", ", c, feature);
-		PRINT_FIELD_U(", ", c, sector_count);
+		tprint_struct_next();
+		PRINT_FIELD_U(c, sector_number);
+		tprint_struct_next();
+		PRINT_FIELD_U(c, feature);
+		tprint_struct_next();
+		PRINT_FIELD_U(c, sector_count);
 		tprints("}");
 
 		return 0;

@@ -133,12 +133,14 @@ SYS_FUNC(ptrace)
 				printaddr(data);
 				return RVAL_DECODED;
 			}
-			PRINT_FIELD_U("{", psi, off);
+			tprint_struct_begin();
+			PRINT_FIELD_U(psi, off);
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(psi, flags,
 					  ptrace_peeksiginfo_flags,
 					  "PTRACE_PEEKSIGINFO_???");
-			PRINT_FIELD_U(", ", psi, nr);
+			tprint_struct_next();
+			PRINT_FIELD_U(psi, nr);
 			tprints("}");
 			break;
 		}

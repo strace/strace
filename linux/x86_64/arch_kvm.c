@@ -68,16 +68,26 @@ kvm_ioctl_decode_regs_segment(const struct kvm_segment *const segment)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_X(*segment, base);
-	PRINT_FIELD_U(", ", *segment, limit);
-	PRINT_FIELD_U(", ", *segment, selector);
-	PRINT_FIELD_U(", ", *segment, type);
-	PRINT_FIELD_U(", ", *segment, present);
-	PRINT_FIELD_U(", ", *segment, dpl);
-	PRINT_FIELD_U(", ", *segment, db);
-	PRINT_FIELD_U(", ", *segment, s);
-	PRINT_FIELD_U(", ", *segment, l);
-	PRINT_FIELD_U(", ", *segment, g);
-	PRINT_FIELD_U(", ", *segment, avl);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, limit);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, selector);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, type);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, present);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, dpl);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, db);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, s);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, l);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, g);
+	tprint_struct_next();
+	PRINT_FIELD_U(*segment, avl);
 	tprints("}");
 }
 
@@ -86,7 +96,8 @@ kvm_ioctl_decode_regs_dtable(const struct kvm_dtable *const dtable)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_X(*dtable, base);
-	PRINT_FIELD_U(", ", *dtable, limit);
+	tprint_struct_next();
+	PRINT_FIELD_U(*dtable, limit);
 	tprints("}");
 }
 
@@ -124,12 +135,18 @@ arch_print_kvm_sregs(struct tcb *const tcp,
 	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, gdt, dtable);
 	tprint_struct_next();
 	PRINT_FIELD_KVM_SREGS_STRUCT(*sregs, idt, dtable);
-	PRINT_FIELD_U(", ", *sregs, cr0);
-	PRINT_FIELD_U(", ", *sregs, cr2);
-	PRINT_FIELD_U(", ", *sregs, cr3);
-	PRINT_FIELD_U(", ", *sregs, cr4);
-	PRINT_FIELD_U(", ", *sregs, cr8);
-	PRINT_FIELD_U(", ", *sregs, efer);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sregs, cr0);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sregs, cr2);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sregs, cr3);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sregs, cr4);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sregs, cr8);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sregs, efer);
 	tprint_struct_next();
 	PRINT_FIELD_X(*sregs, apic_base);
 	tprint_struct_next();

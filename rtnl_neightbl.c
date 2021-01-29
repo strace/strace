@@ -28,16 +28,24 @@ decode_ndt_config(struct tcb *const tcp,
 	if (len < sizeof(ndtc))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &ndtc)) {
-		PRINT_FIELD_U("{", ndtc, ndtc_key_len);
-		PRINT_FIELD_U(", ", ndtc, ndtc_entry_size);
-		PRINT_FIELD_U(", ", ndtc, ndtc_entries);
-		PRINT_FIELD_U(", ", ndtc, ndtc_last_flush);
-		PRINT_FIELD_U(", ", ndtc, ndtc_last_rand);
-		PRINT_FIELD_U(", ", ndtc, ndtc_hash_rnd);
+		tprint_struct_begin();
+		PRINT_FIELD_U(ndtc, ndtc_key_len);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_entry_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_entries);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_last_flush);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_last_rand);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_hash_rnd);
 		tprint_struct_next();
 		PRINT_FIELD_0X(ndtc, ndtc_hash_mask);
-		PRINT_FIELD_U(", ", ndtc, ndtc_hash_chain_gc);
-		PRINT_FIELD_U(", ", ndtc, ndtc_proxy_qlen);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_hash_chain_gc);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtc, ndtc_proxy_qlen);
 		tprints("}");
 	}
 
@@ -96,18 +104,29 @@ decode_ndt_stats(struct tcb *const tcp,
 		return false;
 
 	if (!umoven_or_printaddr(tcp, addr, size, &ndtst)) {
-		PRINT_FIELD_U("{", ndtst, ndts_allocs);
-		PRINT_FIELD_U(", ", ndtst, ndts_destroys);
-		PRINT_FIELD_U(", ", ndtst, ndts_hash_grows);
-		PRINT_FIELD_U(", ", ndtst, ndts_res_failed);
-		PRINT_FIELD_U(", ", ndtst, ndts_lookups);
-		PRINT_FIELD_U(", ", ndtst, ndts_hits);
-		PRINT_FIELD_U(", ", ndtst, ndts_rcv_probes_mcast);
-		PRINT_FIELD_U(", ", ndtst, ndts_rcv_probes_ucast);
-		PRINT_FIELD_U(", ", ndtst, ndts_periodic_gc_runs);
-		PRINT_FIELD_U(", ", ndtst, ndts_forced_gc_runs);
+		tprint_struct_begin();
+		PRINT_FIELD_U(ndtst, ndts_allocs);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_destroys);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_hash_grows);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_res_failed);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_lookups);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_hits);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_rcv_probes_mcast);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_rcv_probes_ucast);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_periodic_gc_runs);
+		tprint_struct_next();
+		PRINT_FIELD_U(ndtst, ndts_forced_gc_runs);
 		if (len >= def_size) {
-			PRINT_FIELD_U(", ", ndtst, ndts_table_fulls);
+			tprint_struct_next();
+			PRINT_FIELD_U(ndtst, ndts_table_fulls);
 		}
 		tprints("}");
 	}

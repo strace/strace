@@ -465,7 +465,7 @@ SYS_FUNC(socketpair)
 		if (len_ > start) {					\
 			print_prefix_;					\
 			if (len_ >= end) {				\
-				print_func_("", where_, field_,		\
+				print_func_(where_, field_,		\
 					    ##__VA_ARGS__);		\
 			} else {					\
 				tprints_field_name(#field_);		\
@@ -835,8 +835,10 @@ print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (len < (int) sizeof(linger)) {
 		printaddr(addr);
 	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
-		PRINT_FIELD_D("{", linger, l_onoff);
-		PRINT_FIELD_D(", ", linger, l_linger);
+		tprint_struct_begin();
+		PRINT_FIELD_D(linger, l_onoff);
+		tprint_struct_next();
+		PRINT_FIELD_D(linger, l_linger);
 		tprints("}");
 	}
 }
@@ -889,10 +891,14 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	    umove(tcp, addr, &req) < 0) {
 		printaddr(addr);
 	} else {
-		PRINT_FIELD_U("{", req, tp_block_size);
-		PRINT_FIELD_U(", ", req, tp_block_nr);
-		PRINT_FIELD_U(", ", req, tp_frame_size);
-		PRINT_FIELD_U(", ", req, tp_frame_nr);
+		tprint_struct_begin();
+		PRINT_FIELD_U(req, tp_block_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(req, tp_block_nr);
+		tprint_struct_next();
+		PRINT_FIELD_U(req, tp_frame_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(req, tp_frame_nr);
 		tprints("}");
 	}
 }
@@ -915,7 +921,8 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(mreq, mr_type, packet_mreq_type,
 				 "PACKET_MR_???");
-		PRINT_FIELD_U(", ", mreq, mr_alen);
+		tprint_struct_next();
+		PRINT_FIELD_U(mreq, mr_alen);
 		tprint_struct_next();
 		PRINT_FIELD_MAC_SZ(mreq, mr_address, mreq.mr_alen);
 		tprints("}");

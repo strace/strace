@@ -38,8 +38,10 @@ print_epoll_data(const epoll_data_t data)
 	 * We cannot know what format the tracee uses, so
 	 * print both u32 and u66 which will cover every value.
 	 */
-	PRINT_FIELD_U("{", data, u32);
-	PRINT_FIELD_U(", ", data, u64);
+	tprint_struct_begin();
+	PRINT_FIELD_U(data, u32);
+	tprint_struct_next();
+	PRINT_FIELD_U(data, u64);
 	tprints("}");
 }
 

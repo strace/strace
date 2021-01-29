@@ -92,15 +92,15 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_FLAGS(*ifr, ifr_flags, iffflags, "IFF_???");
 		break;
 	case SIOCGIFINDEX:
-		PRINT_FIELD_D("", *ifr, ifr_ifindex);
+		PRINT_FIELD_D(*ifr, ifr_ifindex);
 		break;
 	case SIOCSIFMETRIC:
 	case SIOCGIFMETRIC:
-		PRINT_FIELD_D("", *ifr, ifr_metric);
+		PRINT_FIELD_D(*ifr, ifr_metric);
 		break;
 	case SIOCSIFMTU:
 	case SIOCGIFMTU:
-		PRINT_FIELD_D("", *ifr, ifr_mtu);
+		PRINT_FIELD_D(*ifr, ifr_mtu);
 		break;
 	case SIOCSIFSLAVE:
 	case SIOCGIFSLAVE:
@@ -114,7 +114,7 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 		break;
 	case SIOCSIFTXQLEN:
 	case SIOCGIFTXQLEN:
-		PRINT_FIELD_D("", *ifr, ifr_qlen);
+		PRINT_FIELD_D(*ifr, ifr_qlen);
 		break;
 	case SIOCSIFMAP:
 	case SIOCGIFMAP:
@@ -331,7 +331,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 				break;
 
 			if (SIOCGIFNAME == code) {
-				PRINT_FIELD_D("{", ifr, ifr_ifindex);
+				tprint_struct_begin();
+				PRINT_FIELD_D(ifr, ifr_ifindex);
 			} else {
 				tprint_struct_begin();
 				PRINT_FIELD_CSTRING(ifr, ifr_name);

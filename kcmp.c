@@ -59,7 +59,8 @@ SYS_FUNC(kcmp)
 			PRINT_FIELD_PIDFD(slot, efd, tcp, pid2);
 			tprint_struct_next();
 			PRINT_FIELD_PIDFD(slot, tfd, tcp, pid2);
-			PRINT_FIELD_U(", ", slot, toff);
+			tprint_struct_next();
+			PRINT_FIELD_U(slot, toff);
 			tprints("}");
 
 			break;

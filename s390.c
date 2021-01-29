@@ -552,16 +552,20 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 	}
 
 	if (cnt_val || hdr->infmscps) {
-		PRINT_FIELD_U(", ", *hdr, infmscps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infmscps);
 	}
 	if (cnt_val || hdr->infmdcps) {
-		PRINT_FIELD_U(", ", *hdr, infmdcps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infmdcps);
 	}
 	if (cnt_val || hdr->infmsifl) {
-		PRINT_FIELD_U(", ", *hdr, infmsifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infmsifl);
 	}
 	if (cnt_val || hdr->infmdifl) {
-		PRINT_FIELD_U(", ", *hdr, infmdifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infmdifl);
 	}
 
 	if (!abbrev(tcp)) {
@@ -664,20 +668,25 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 	}
 
 	if (id_val || hdr->infppnum) {
-		PRINT_FIELD_U(", ", *hdr, infppnum);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infppnum);
 	}
 
 	if (cnt_val || hdr->infpscps) {
-		PRINT_FIELD_U(", ", *hdr, infpscps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infpscps);
 	}
 	if (cnt_val || hdr->infpdcps) {
-		PRINT_FIELD_U(", ", *hdr, infpdcps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infpdcps);
 	}
 	if (cnt_val || hdr->infpsifl) {
-		PRINT_FIELD_U(", ", *hdr, infpsifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infpsifl);
 	}
 	if (cnt_val || hdr->infpdifl) {
-		PRINT_FIELD_U(", ", *hdr, infpdifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infpdifl);
 	}
 
 	if (!abbrev(tcp) && !IS_ARRAY_ZERO(hdr->reserved_1__)) {
@@ -834,7 +843,8 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 			PRINT_FIELD_0X(*hdr, infyval2);
 		}
 
-		PRINT_FIELD_U(", ", *hdr, infytype);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infytype);
 		switch (hdr->infytype) {
 		case 1:
 			tprints_comment("z/VM is the hypervisor");
@@ -849,10 +859,12 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 		}
 
 		if (mt || hdr->infycpt) {
-			PRINT_FIELD_U(", ", *hdr, infycpt);
+			tprint_struct_next();
+			PRINT_FIELD_U(*hdr, infycpt);
 		}
 		if (mt || hdr->infyiflt) {
-			PRINT_FIELD_U(", ", *hdr, infyiflt);
+			tprint_struct_next();
+			PRINT_FIELD_U(*hdr, infyiflt);
 		}
 	}
 
@@ -866,16 +878,20 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 	}
 
 	if (!abbrev(tcp) || hdr->infyscps) {
-		PRINT_FIELD_U(", ", *hdr, infyscps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infyscps);
 	}
 	if (!abbrev(tcp) || hdr->infydcps) {
-		PRINT_FIELD_U(", ", *hdr, infydcps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infydcps);
 	}
 	if (!abbrev(tcp) || hdr->infysifl) {
-		PRINT_FIELD_U(", ", *hdr, infysifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infysifl);
 	}
 	if (!abbrev(tcp) || hdr->infydifl) {
-		PRINT_FIELD_U(", ", *hdr, infydifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infydifl);
 	}
 
 	if (!abbrev(tcp)) {
@@ -961,14 +977,17 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	PRINT_FIELD_EBCDIC(*hdr, infgusid);
 
 	if (!abbrev(tcp) || hdr->infgscps) {
-		PRINT_FIELD_U(", ", *hdr, infgscps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infgscps);
 	}
 	if (!abbrev(tcp) || hdr->infgdcps) {
-		PRINT_FIELD_U(", ", *hdr, infgdcps);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infgdcps);
 	}
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_U(", ", *hdr, infgcpdt);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infgcpdt);
 		switch (hdr->infgcpdt) {
 		case 0:
 			tprints_comment("General Purpose (CP)");
@@ -989,14 +1008,17 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	}
 
 	if (!abbrev(tcp) || hdr->infgsifl) {
-		PRINT_FIELD_U(", ", *hdr, infgsifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infgsifl);
 	}
 	if (!abbrev(tcp) || hdr->infgdifl) {
-		PRINT_FIELD_U(", ", *hdr, infgdifl);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infgdifl);
 	}
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_U(", ", *hdr, infgifdt);
+		tprint_struct_next();
+		PRINT_FIELD_U(*hdr, infgifdt);
 		switch (hdr->infgifdt) {
 		case 0:
 			tprints_comment("General Purpose (CP)");
@@ -1161,27 +1183,46 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 		PRINT_FIELD_HEX_ARRAY(*hdr, reserved_1__);
 	}
 
-	PRINT_FIELD_U(", ", *hdr, infhygct);
-	PRINT_FIELD_U(", ", *hdr, infhtotl);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhygct);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhtotl);
 
-	PRINT_FIELD_U(", ", *hdr, infhdln);
-	PRINT_FIELD_U(", ", *hdr, infmoff);
-	PRINT_FIELD_U(", ", *hdr, infmlen);
-	PRINT_FIELD_U(", ", *hdr, infpoff);
-	PRINT_FIELD_U(", ", *hdr, infplen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhdln);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infmoff);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infmlen);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infpoff);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infplen);
 
-	PRINT_FIELD_U(", ", *hdr, infhoff1);
-	PRINT_FIELD_U(", ", *hdr, infhlen1);
-	PRINT_FIELD_U(", ", *hdr, infgoff1);
-	PRINT_FIELD_U(", ", *hdr, infglen1);
-	PRINT_FIELD_U(", ", *hdr, infhoff2);
-	PRINT_FIELD_U(", ", *hdr, infhlen2);
-	PRINT_FIELD_U(", ", *hdr, infgoff2);
-	PRINT_FIELD_U(", ", *hdr, infglen2);
-	PRINT_FIELD_U(", ", *hdr, infhoff3);
-	PRINT_FIELD_U(", ", *hdr, infhlen3);
-	PRINT_FIELD_U(", ", *hdr, infgoff3);
-	PRINT_FIELD_U(", ", *hdr, infglen3);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhoff1);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhlen1);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infgoff1);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infglen1);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhoff2);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhlen2);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infgoff2);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infglen2);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhoff3);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infhlen3);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infgoff3);
+	tprint_struct_next();
+	PRINT_FIELD_U(*hdr, infglen3);
 
 	PRINT_UNKNOWN_TAIL(hdr, hdr->infhdln);
 

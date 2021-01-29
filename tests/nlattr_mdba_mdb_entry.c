@@ -127,7 +127,7 @@ main(void)
 #  endif
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 				     printf(", ");
-				     PRINT_FIELD_U("", entry, vid);
+				     PRINT_FIELD_U(entry, vid);
 #  else
 				     printf(", vid=0");
 #  endif
@@ -155,7 +155,7 @@ main(void)
 #  endif
 #  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		    printf(", ");
-		    PRINT_FIELD_U("", entry, vid);
+		    PRINT_FIELD_U(entry, vid);
 #  else
 		    printf(", vid=0");
 #  endif

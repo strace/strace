@@ -342,13 +342,13 @@ main(int ac, char **av)
 	printf("{type=");
 	printxval(bpf_map_types, map_info->type, "BPF_MAP_TYPE_???");
 	printf(", ");
-	PRINT_FIELD_U("", *map_info, id);
+	PRINT_FIELD_U(*map_info, id);
 	printf(", ");
-	PRINT_FIELD_U("", *map_info, key_size);
+	PRINT_FIELD_U(*map_info, key_size);
 	printf(", ");
-	PRINT_FIELD_U("", *map_info, value_size);
+	PRINT_FIELD_U(*map_info, value_size);
 	printf(", ");
-	PRINT_FIELD_U("", *map_info, max_entries);
+	PRINT_FIELD_U(*map_info, max_entries);
 	printf(", map_flags=");
 	printflags(bpf_map_flags, map_info->map_flags, "BPF_F_???");
 
@@ -374,17 +374,17 @@ main(int ac, char **av)
 	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, btf_id)) {
 		printf(", ");
-		PRINT_FIELD_U("", *map_info, btf_id);
+		PRINT_FIELD_U(*map_info, btf_id);
 	}
 	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, btf_key_type_id)) {
 		printf(", ");
-		PRINT_FIELD_U("", *map_info, btf_key_type_id);
+		PRINT_FIELD_U(*map_info, btf_key_type_id);
 	}
 	if (bpf_map_get_info_attr.info_len >
 	    offsetof(struct bpf_map_info_struct, btf_value_type_id)) {
 		printf(", ");
-		PRINT_FIELD_U("", *map_info, btf_value_type_id);
+		PRINT_FIELD_U(*map_info, btf_value_type_id);
 	}
 	printf("}");
 #else /* !VERBOSE */
@@ -463,7 +463,7 @@ main(int ac, char **av)
 		printf("{type=");
 		printxval(bpf_prog_types, prog_info->type, "BPF_PROG_TYPE_???");
 		printf(", ");
-		PRINT_FIELD_U("", *prog_info, id);
+		PRINT_FIELD_U(*prog_info, id);
 		printf(", tag=");
 		print_quoted_hex(prog_info->tag, sizeof(prog_info->tag));
 		printf(", jited_prog_len=0");
@@ -571,7 +571,7 @@ main(int ac, char **av)
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, btf_id)) {
 			printf(", ");
-			PRINT_FIELD_U("", *prog_info, btf_id);
+			PRINT_FIELD_U(*prog_info, btf_id);
 		}
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, func_info_rec_size)) {

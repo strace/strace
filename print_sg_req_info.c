@@ -35,14 +35,20 @@ MPERS_PRINTER_DECL(int, decode_sg_req_info,
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &info)) {
-		PRINT_FIELD_D("{", info, req_state);
-		PRINT_FIELD_D(", ", info, orphan);
-		PRINT_FIELD_D(", ", info, sg_io_owned);
-		PRINT_FIELD_D(", ", info, problem);
-		PRINT_FIELD_D(", ", info, pack_id);
+		tprint_struct_begin();
+		PRINT_FIELD_D(info, req_state);
+		tprint_struct_next();
+		PRINT_FIELD_D(info, orphan);
+		tprint_struct_next();
+		PRINT_FIELD_D(info, sg_io_owned);
+		tprint_struct_next();
+		PRINT_FIELD_D(info, problem);
+		tprint_struct_next();
+		PRINT_FIELD_D(info, pack_id);
 		tprint_struct_next();
 		PRINT_FIELD_PTR(info, usr_ptr);
-		PRINT_FIELD_U(", ", info, duration);
+		tprint_struct_next();
+		PRINT_FIELD_U(info, duration);
 		tprints("}");
 	}
 

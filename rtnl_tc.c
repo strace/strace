@@ -36,14 +36,22 @@ decode_tc_stats(struct tcb *const tcp,
 	if (len < sizeof_tc_stats)
 		return false;
 	else if (!umoven_or_printaddr(tcp, addr, sizeof_tc_stats, &st)) {
-		PRINT_FIELD_U("{", st, bytes);
-		PRINT_FIELD_U(", ", st, packets);
-		PRINT_FIELD_U(", ", st, drops);
-		PRINT_FIELD_U(", ", st, overlimits);
-		PRINT_FIELD_U(", ", st, bps);
-		PRINT_FIELD_U(", ", st, pps);
-		PRINT_FIELD_U(", ", st, qlen);
-		PRINT_FIELD_U(", ", st, backlog);
+		tprint_struct_begin();
+		PRINT_FIELD_U(st, bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, packets);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, drops);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, overlimits);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, bps);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, pps);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, qlen);
+		tprint_struct_next();
+		PRINT_FIELD_U(st, backlog);
 		tprints("}");
 	}
 
@@ -61,8 +69,10 @@ decode_tc_estimator(struct tcb *const tcp,
 	if (len < sizeof(est))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &est)) {
-		PRINT_FIELD_D("{", est, interval);
-		PRINT_FIELD_U(", ", est, ewma_log);
+		tprint_struct_begin();
+		PRINT_FIELD_D(est, interval);
+		tprint_struct_next();
+		PRINT_FIELD_U(est, ewma_log);
 		tprints("}");
 	}
 
@@ -83,8 +93,10 @@ decode_gnet_stats_basic(struct tcb *const tcp,
 	if (len < sizeof_st_basic)
 		return false;
 	else if (!umoven_or_printaddr(tcp, addr, sizeof_st_basic, &sb)) {
-		PRINT_FIELD_U("{", sb, bytes);
-		PRINT_FIELD_U(", ", sb, packets);
+		tprint_struct_begin();
+		PRINT_FIELD_U(sb, bytes);
+		tprint_struct_next();
+		PRINT_FIELD_U(sb, packets);
 		tprints("}");
 	}
 
@@ -106,8 +118,10 @@ decode_gnet_stats_rate_est(struct tcb *const tcp,
 	if (len < sizeof(est))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &est)) {
-		PRINT_FIELD_U("{", est, bps);
-		PRINT_FIELD_U(", ", est, pps);
+		tprint_struct_begin();
+		PRINT_FIELD_U(est, bps);
+		tprint_struct_next();
+		PRINT_FIELD_U(est, pps);
 		tprints("}");
 	}
 
@@ -129,11 +143,16 @@ decode_gnet_stats_queue(struct tcb *const tcp,
 	if (len < sizeof(qstats))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &qstats)) {
-		PRINT_FIELD_U("{", qstats, qlen);
-		PRINT_FIELD_U(", ", qstats, backlog);
-		PRINT_FIELD_U(", ", qstats, drops);
-		PRINT_FIELD_U(", ", qstats, requeues);
-		PRINT_FIELD_U(", ", qstats, overlimits);
+		tprint_struct_begin();
+		PRINT_FIELD_U(qstats, qlen);
+		tprint_struct_next();
+		PRINT_FIELD_U(qstats, backlog);
+		tprint_struct_next();
+		PRINT_FIELD_U(qstats, drops);
+		tprint_struct_next();
+		PRINT_FIELD_U(qstats, requeues);
+		tprint_struct_next();
+		PRINT_FIELD_U(qstats, overlimits);
 		tprints("}");
 	}
 
@@ -155,8 +174,10 @@ decode_gnet_stats_rate_est64(struct tcb *const tcp,
 	if (len < sizeof(est))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &est)) {
-		PRINT_FIELD_U("{", est, bps);
-		PRINT_FIELD_U(", ", est, pps);
+		tprint_struct_begin();
+		PRINT_FIELD_U(est, bps);
+		tprint_struct_next();
+		PRINT_FIELD_U(est, pps);
 		tprints("}");
 	}
 
@@ -202,14 +223,22 @@ decode_tc_sizespec(struct tcb *const tcp,
 	if (len < sizeof(s))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &s)) {
-		PRINT_FIELD_U("{", s, cell_log);
-		PRINT_FIELD_U(", ", s, size_log);
-		PRINT_FIELD_D(", ", s, cell_align);
-		PRINT_FIELD_D(", ", s, overhead);
-		PRINT_FIELD_U(", ", s, linklayer);
-		PRINT_FIELD_U(", ", s, mpu);
-		PRINT_FIELD_U(", ", s, mtu);
-		PRINT_FIELD_U(", ", s, tsize);
+		tprint_struct_begin();
+		PRINT_FIELD_U(s, cell_log);
+		tprint_struct_next();
+		PRINT_FIELD_U(s, size_log);
+		tprint_struct_next();
+		PRINT_FIELD_D(s, cell_align);
+		tprint_struct_next();
+		PRINT_FIELD_D(s, overhead);
+		tprint_struct_next();
+		PRINT_FIELD_U(s, linklayer);
+		tprint_struct_next();
+		PRINT_FIELD_U(s, mpu);
+		tprint_struct_next();
+		PRINT_FIELD_U(s, mtu);
+		tprint_struct_next();
+		PRINT_FIELD_U(s, tsize);
 		tprints("}");
 	}
 
@@ -297,9 +326,12 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 					 sizeof(tcmsg) - offset,
 					 (char *) &tcmsg + offset)) {
 			PRINT_FIELD_IFINDEX(tcmsg, tcm_ifindex);
-			PRINT_FIELD_U(", ", tcmsg, tcm_handle);
-			PRINT_FIELD_U(", ", tcmsg, tcm_parent);
-			PRINT_FIELD_U(", ", tcmsg, tcm_info);
+			tprint_struct_next();
+			PRINT_FIELD_U(tcmsg, tcm_handle);
+			tprint_struct_next();
+			PRINT_FIELD_U(tcmsg, tcm_parent);
+			tprint_struct_next();
+			PRINT_FIELD_U(tcmsg, tcm_info);
 			decode_nla = true;
 		}
 	} else

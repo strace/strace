@@ -80,14 +80,20 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 	tprints("{");
 	if (!abbrev(tcp)) {
 		PRINT_FIELD_DEV(*st, st_dev);
-		PRINT_FIELD_U(", ", *st, st_ino);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_ino);
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_VAL(*st, st_mode, print_symbolic_mode_t);
-		PRINT_FIELD_U(", ", *st, st_nlink);
-		PRINT_FIELD_U(", ", *st, st_uid);
-		PRINT_FIELD_U(", ", *st, st_gid);
-		PRINT_FIELD_U(", ", *st, st_blksize);
-		PRINT_FIELD_U(", ", *st, st_blocks);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_nlink);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_uid);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_gid);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_blksize);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_blocks);
 	} else {
 		PRINT_FIELD_OBJ_VAL(*st, st_mode, print_symbolic_mode_t);
 	}
@@ -98,30 +104,37 @@ print_struct_stat(struct tcb *tcp, const struct strace_stat *const st)
 		PRINT_FIELD_DEV(*st, st_rdev);
 		break;
 	default:
-		PRINT_FIELD_U(", ", *st, st_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(*st, st_size);
 		break;
 	}
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_D(", ", *st, st_atime);
+		tprint_struct_next();
+		PRINT_FIELD_D(*st, st_atime);
 		tprints_comment(sprinttime_nsec(st->st_atime,
 						st->st_atime_nsec));
 		if (st->has_nsec) {
-			PRINT_FIELD_U(", ", *st, st_atime_nsec);
+			tprint_struct_next();
+			PRINT_FIELD_U(*st, st_atime_nsec);
 		}
 
-		PRINT_FIELD_D(", ", *st, st_mtime);
+		tprint_struct_next();
+		PRINT_FIELD_D(*st, st_mtime);
 		tprints_comment(sprinttime_nsec(st->st_mtime,
 						st->st_mtime_nsec));
 		if (st->has_nsec) {
-			PRINT_FIELD_U(", ", *st, st_mtime_nsec);
+			tprint_struct_next();
+			PRINT_FIELD_U(*st, st_mtime_nsec);
 		}
 
-		PRINT_FIELD_D(", ", *st, st_ctime);
+		tprint_struct_next();
+		PRINT_FIELD_D(*st, st_ctime);
 		tprints_comment(sprinttime_nsec(st->st_ctime,
 						st->st_ctime_nsec));
 		if (st->has_nsec) {
-			PRINT_FIELD_U(", ", *st, st_ctime_nsec);
+			tprint_struct_next();
+			PRINT_FIELD_U(*st, st_ctime_nsec);
 		}
 	} else {
 		tprints(", ...");

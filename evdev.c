@@ -76,16 +76,22 @@ abs_ioctl(struct tcb *const tcp, const unsigned int code,
 	if (umoven_or_printaddr(tcp, arg, read_sz, &absinfo))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_U("{", absinfo, value);
-	PRINT_FIELD_U(", ", absinfo, minimum);
+	tprint_struct_begin();
+	PRINT_FIELD_U(absinfo, value);
+	tprint_struct_next();
+	PRINT_FIELD_U(absinfo, minimum);
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_U(", ", absinfo, maximum);
-		PRINT_FIELD_U(", ", absinfo, fuzz);
-		PRINT_FIELD_U(", ", absinfo, flat);
+		tprint_struct_next();
+		PRINT_FIELD_U(absinfo, maximum);
+		tprint_struct_next();
+		PRINT_FIELD_U(absinfo, fuzz);
+		tprint_struct_next();
+		PRINT_FIELD_U(absinfo, flat);
 		if (sz > orig_sz) {
 			if (sz >= res_sz) {
-				PRINT_FIELD_U(", ", absinfo, resolution);
+				tprint_struct_next();
+				PRINT_FIELD_U(absinfo, resolution);
 			}
 			if (sz != res_sz)
 				tprints(", ...");
@@ -125,11 +131,14 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &ike))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_U("{", ike, flags);
-	PRINT_FIELD_U(", ", ike, len);
+	tprint_struct_begin();
+	PRINT_FIELD_U(ike, flags);
+	tprint_struct_next();
+	PRINT_FIELD_U(ike, len);
 
 	if (!abbrev(tcp)) {
-		PRINT_FIELD_U(", ", ike, index);
+		tprint_struct_next();
+		PRINT_FIELD_U(ike, index);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(ike, keycode, evdev_keycode, "KEY_???");
 		tprint_struct_next();
@@ -151,10 +160,14 @@ getid_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct input_id id;
 
 	if (!umove_or_printaddr(tcp, arg, &id)) {
-		PRINT_FIELD_U("{", id, bustype);
-		PRINT_FIELD_U(", ", id, vendor);
-		PRINT_FIELD_U(", ", id, product);
-		PRINT_FIELD_U(", ", id, version);
+		tprint_struct_begin();
+		PRINT_FIELD_U(id, bustype);
+		tprint_struct_next();
+		PRINT_FIELD_U(id, vendor);
+		tprint_struct_next();
+		PRINT_FIELD_U(id, product);
+		tprint_struct_next();
+		PRINT_FIELD_U(id, version);
 		tprints("}");
 	}
 

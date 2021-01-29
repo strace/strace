@@ -54,10 +54,10 @@ main(void)
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_PORT_VSI_TYPE, pattern, vsi,
 				  printf("{");
-				  PRINT_FIELD_U("", vsi, vsi_mgr_id);
+				  PRINT_FIELD_U(vsi, vsi_mgr_id);
 				  printf(", vsi_type_id=\"\\x61\\x62\\x63\"");
 				  printf(", ");
-				  PRINT_FIELD_U("", vsi, vsi_type_version);
+				  PRINT_FIELD_U(vsi, vsi_type_version);
 				  printf("}"));
 
 	static const struct ifla_port_vsi vsi2 = {
@@ -70,10 +70,10 @@ main(void)
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_PORT_VSI_TYPE, pattern, vsi2,
 				  printf("{");
-				  PRINT_FIELD_U("", vsi2, vsi_mgr_id);
+				  PRINT_FIELD_U(vsi2, vsi_mgr_id);
 				  printf(", vsi_type_id=\"\\x0a\\x00\\xff\"");
 				  printf(", ");
-				  PRINT_FIELD_U("", vsi2, vsi_type_version);
+				  PRINT_FIELD_U(vsi2, vsi_type_version);
 				  printf(", pad=\"\\x00\\x01\\x02\"");
 				  printf("}"));
 #endif

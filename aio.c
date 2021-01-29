@@ -96,7 +96,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 	PRINT_FIELD_X(*cb, aio_data);
 
 	if (cb->aio_key) {
-		PRINT_FIELD_U(", ", *cb, aio_key);
+		tprint_struct_next();
+		PRINT_FIELD_U(*cb, aio_key);
 	}
 
 #ifndef HAVE_STRUCT_IOCB_AIO_RW_FLAGS
@@ -114,7 +115,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_U(*cb, aio_reqprio, print_ioprio);
 	} else if (cb->aio_reqprio) {
-		PRINT_FIELD_D(", ", *cb, aio_reqprio);
+		tprint_struct_next();
+		PRINT_FIELD_D(*cb, aio_reqprio);
 	}
 
 	tprint_struct_next();
@@ -140,8 +142,10 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 			tprint_struct_next();
 			PRINT_FIELD_X(*cb, aio_buf);
 		}
-		PRINT_FIELD_U(", ", *cb, aio_nbytes);
-		PRINT_FIELD_D(", ", *cb, aio_offset);
+		tprint_struct_next();
+		PRINT_FIELD_U(*cb, aio_nbytes);
+		tprint_struct_next();
+		PRINT_FIELD_D(*cb, aio_offset);
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_VECTOR:
@@ -154,9 +158,11 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 		} else {
 			tprint_struct_next();
 			PRINT_FIELD_X(*cb, aio_buf);
-			PRINT_FIELD_U(", ", *cb, aio_nbytes);
+			tprint_struct_next();
+			PRINT_FIELD_U(*cb, aio_nbytes);
 		}
-		PRINT_FIELD_D(", ", *cb, aio_offset);
+		tprint_struct_next();
+		PRINT_FIELD_D(*cb, aio_offset);
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_POLL:
@@ -217,8 +223,10 @@ print_io_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	PRINT_FIELD_X(*event, data);
 	tprint_struct_next();
 	PRINT_FIELD_X(*event, obj);
-	PRINT_FIELD_D(", ", *event, res);
-	PRINT_FIELD_D(", ", *event, res2);
+	tprint_struct_next();
+	PRINT_FIELD_D(*event, res);
+	tprint_struct_next();
+	PRINT_FIELD_D(*event, res2);
 	tprints("}");
 
 	return true;

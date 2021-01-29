@@ -76,9 +76,9 @@ test_inet_diag_bc_op(const int fd)
 			   INET_DIAG_REQ_BYTECODE, pattern, op,
 			   printf("{code=INET_DIAG_BC_S_COND");
 			   printf(", ");
-			   PRINT_FIELD_U("", op, yes);
+			   PRINT_FIELD_U(op, yes);
 			   printf(", ");
-			   PRINT_FIELD_U("", op, no);
+			   PRINT_FIELD_U(op, no);
 			   printf("}"));
 }
 
@@ -128,9 +128,9 @@ test_inet_diag_bc_s_cond(const int fd)
 		    print_inet_diag_bc_op("INET_DIAG_BC_S_COND");
 		    printf("{family=AF_UNSPEC");
 		    printf(", ");
-		    PRINT_FIELD_U("", cond, prefix_len);
+		    PRINT_FIELD_U(cond, prefix_len);
 		    printf(", ");
-		    PRINT_FIELD_U("", cond, port);
+		    PRINT_FIELD_U(cond, port);
 		    printf("}}"));
 }
 
@@ -319,9 +319,9 @@ test_inet_diag_bc_s_le(const int fd)
 		    print_inet_diag_bc_op("INET_DIAG_BC_S_LE");
 		    printf("{code=INET_DIAG_BC_DEV_COND");
 		    printf(", ");
-		    PRINT_FIELD_U("", op[1], yes);
+		    PRINT_FIELD_U(op[1], yes);
 		    printf(", ");
-		    PRINT_FIELD_U("", op[1], no);
+		    PRINT_FIELD_U(op[1], no);
 		    printf("}}"));
 };
 
@@ -363,9 +363,9 @@ test_inet_diag_bc_mark_cond(const int fd)
 		    sizeof(buf), buf, sizeof(buf),
 		    print_inet_diag_bc_op("INET_DIAG_BC_MARK_COND");
 		    printf("{");
-		    PRINT_FIELD_U("", markcond, mark);
+		    PRINT_FIELD_U(markcond, mark);
 		    printf(", ");
-		    PRINT_FIELD_U("", markcond, mask);
+		    PRINT_FIELD_U(markcond, mask);
 		    printf("}}"));
 }
 

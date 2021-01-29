@@ -88,13 +88,13 @@ main(void)
 			   init_ndmsg, print_ndmsg,
 			   NDA_CACHEINFO, pattern, ci,
 			   printf("{");
-			   PRINT_FIELD_U("", ci, ndm_confirmed);
+			   PRINT_FIELD_U(ci, ndm_confirmed);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, ndm_used);
+			   PRINT_FIELD_U(ci, ndm_used);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, ndm_updated);
+			   PRINT_FIELD_U(ci, ndm_updated);
 			   printf(", ");
-			   PRINT_FIELD_U("", ci, ndm_refcnt);
+			   PRINT_FIELD_U(ci, ndm_refcnt);
 			   printf("}"));
 
 	const uint16_t port = 0xabcd;

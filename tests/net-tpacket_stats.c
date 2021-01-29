@@ -44,7 +44,7 @@ get_tpacket_stats(void *optval, socklen_t *len)
 		printf("}");
 	} else {
 		printf(", {");
-		PRINT_FIELD_U("", *tpstats, tp_packets);
+		PRINT_FIELD_U(*tpstats, tp_packets);
 
 		if (optlen > offsetof(struct tp_stats, tp_drops)) {
 			optlen -= offsetof(struct tp_stats, tp_drops);
@@ -53,7 +53,7 @@ get_tpacket_stats(void *optval, socklen_t *len)
 				print_quoted_hex(tpstats, optlen);
 			} else {
 				printf(", ");
-				PRINT_FIELD_U("", *tpstats, tp_drops);
+				PRINT_FIELD_U(*tpstats, tp_drops);
 
 				if (optlen > offsetof(struct tp_stats, tp_freeze_q_cnt) -
 					   offsetof(struct tp_stats, tp_drops)) {
@@ -64,7 +64,7 @@ get_tpacket_stats(void *optval, socklen_t *len)
 						print_quoted_hex(tpstats, optlen);
 					} else {
 						printf(", ");
-						PRINT_FIELD_U("", *tpstats, tp_freeze_q_cnt);
+						PRINT_FIELD_U(*tpstats, tp_freeze_q_cnt);
 					}
 				}
 			}

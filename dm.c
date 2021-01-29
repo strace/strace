@@ -72,7 +72,8 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 	if (entering(tcp)) {
 		switch (code) {
 		case DM_TABLE_LOAD:
-			PRINT_FIELD_U(", ", *ioc, target_count);
+			tprint_struct_next();
+			PRINT_FIELD_U(*ioc, target_count);
 			break;
 		case DM_DEV_SUSPEND:
 			if (ioc->flags & DM_SUSPEND_FLAG)
@@ -81,7 +82,8 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 		case DM_DEV_RENAME:
 		case DM_DEV_REMOVE:
 		case DM_DEV_WAIT:
-			PRINT_FIELD_U(", ", *ioc, event_nr);
+			tprint_struct_next();
+			PRINT_FIELD_U(*ioc, event_nr);
 			break;
 		}
 	} else if (!syserror(tcp)) {
@@ -96,9 +98,12 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 		case DM_TABLE_DEPS:
 		case DM_TABLE_STATUS:
 		case DM_TARGET_MSG:
-			PRINT_FIELD_U(", ", *ioc, target_count);
-			PRINT_FIELD_U(", ", *ioc, open_count);
-			PRINT_FIELD_U(", ", *ioc, event_nr);
+			tprint_struct_next();
+			PRINT_FIELD_U(*ioc, target_count);
+			tprint_struct_next();
+			PRINT_FIELD_U(*ioc, open_count);
+			tprint_struct_next();
+			PRINT_FIELD_U(*ioc, event_nr);
 			break;
 		}
 	}
@@ -151,11 +156,14 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			break;
 
-		PRINT_FIELD_U("{", s, sector_start);
-		PRINT_FIELD_U(", ", s, length);
+		tprint_struct_begin();
+		PRINT_FIELD_U(s, sector_start);
+		tprint_struct_next();
+		PRINT_FIELD_U(s, length);
 
 		if (exiting(tcp)) {
-			PRINT_FIELD_D(", ", s, status);
+			tprint_struct_next();
+			PRINT_FIELD_D(s, status);
 		}
 
 		tprint_struct_next();
@@ -222,7 +230,8 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (s.count > space)
 		goto misplaced;
 
-	PRINT_FIELD_U("{", s, count);
+	tprint_struct_begin();
+	PRINT_FIELD_U(s, count);
 
 	tprints(", deps=");
 	print_array(tcp, addr + offset_end, s.count, &dev_buf, sizeof(dev_buf),
@@ -406,7 +415,8 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (umove_or_printaddr(tcp, addr + offset, &s))
 			return;
 
-		PRINT_FIELD_U("{", s, sector);
+		tprint_struct_begin();
+		PRINT_FIELD_U(s, sector);
 		tprints(", message=");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
@@ -519,7 +529,8 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 		goto skip;
 	}
 
-	PRINT_FIELD_U(", ", *ioc, data_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(*ioc, data_size);
 
 	if (ioc->data_size < offsetof(struct dm_ioctl, data)) {
 		tprints_comment("data_size too small");
@@ -527,7 +538,8 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	if (dm_ioctl_has_params(code)) {
-		PRINT_FIELD_U(", ", *ioc, data_start);
+		tprint_struct_next();
+		PRINT_FIELD_U(*ioc, data_start);
 	}
 
 	dm_decode_device(code, ioc);

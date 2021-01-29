@@ -65,21 +65,21 @@ print_input_absinfo(long rc, const void *ptr, const void *arg)
 		return;
 	}
 	printf("{");
-	PRINT_FIELD_U("", *absinfo, value);
+	PRINT_FIELD_U(*absinfo, value);
 	printf(", ");
-	PRINT_FIELD_U("", *absinfo, minimum);
+	PRINT_FIELD_U(*absinfo, minimum);
 # if VERBOSE
 	printf(", ");
-	PRINT_FIELD_U("", *absinfo, maximum);
+	PRINT_FIELD_U(*absinfo, maximum);
 	printf(", ");
-	PRINT_FIELD_U("", *absinfo, fuzz);
+	PRINT_FIELD_U(*absinfo, fuzz);
 	printf(", ");
-	PRINT_FIELD_U("", *absinfo, flat);
+	PRINT_FIELD_U(*absinfo, flat);
 	if (sz > offsetofend(struct input_absinfo, flat)) {
 		if (sz >= 24) {
 #  ifdef HAVE_STRUCT_INPUT_ABSINFO_RESOLUTION
 			printf(", ");
-			PRINT_FIELD_U("", *absinfo, resolution);
+			PRINT_FIELD_U(*absinfo, resolution);
 #  else
 			printf(", resolution=%u", *((int *) ptr + 5));
 #  endif

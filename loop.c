@@ -33,12 +33,14 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &info))
 		return;
 
-	PRINT_FIELD_D("{", info, lo_number);
+	tprint_struct_begin();
+	PRINT_FIELD_D(info, lo_number);
 
 	if (!abbrev(tcp)) {
 		tprint_struct_next();
 		PRINT_FIELD_DEV(info, lo_device);
-		PRINT_FIELD_U(", ", info, lo_inode);
+		tprint_struct_next();
+		PRINT_FIELD_U(info, lo_inode);
 		tprint_struct_next();
 		PRINT_FIELD_DEV(info, lo_rdevice);
 	}
@@ -54,7 +56,8 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 		 * It is converted to unsigned before use in the kernel,
 		 * see loop_info64_from_old in drivers/block/loop.c
 		 */
-		PRINT_FIELD_U(", ", info, lo_encrypt_key_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(info, lo_encrypt_key_size);
 	}
 
 	tprint_struct_next();
@@ -89,24 +92,29 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 	if (!abbrev(tcp)) {
 		tprint_struct_begin();
 		PRINT_FIELD_DEV(*info64, lo_device);
-		PRINT_FIELD_U(", ", *info64, lo_inode);
+		tprint_struct_next();
+		PRINT_FIELD_U(*info64, lo_inode);
 		tprint_struct_next();
 		PRINT_FIELD_DEV(*info64, lo_rdevice);
 		tprint_struct_next();
 		PRINT_FIELD_X(*info64, lo_offset);
-		PRINT_FIELD_U(", ", *info64, lo_sizelimit);
-		PRINT_FIELD_U(", ", *info64, lo_number);
+		tprint_struct_next();
+		PRINT_FIELD_U(*info64, lo_sizelimit);
+		tprint_struct_next();
+		PRINT_FIELD_U(*info64, lo_number);
 	} else {
 		tprint_struct_begin();
 		PRINT_FIELD_X(*info64, lo_offset);
-		PRINT_FIELD_U(", ", *info64, lo_number);
+		tprint_struct_next();
+		PRINT_FIELD_U(*info64, lo_number);
 	}
 
 	if (!abbrev(tcp) || info64->lo_encrypt_type != LO_CRYPT_NONE) {
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(*info64, lo_encrypt_type,
 				 loop_crypt_type_options, "LO_CRYPT_???");
-		PRINT_FIELD_U(", ", *info64, lo_encrypt_key_size);
+		tprint_struct_next();
+		PRINT_FIELD_U(*info64, lo_encrypt_key_size);
 	}
 
 	tprint_struct_next();
@@ -157,7 +165,8 @@ decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_begin();
 	PRINT_FIELD_FD(config, fd, tcp);
 
-	PRINT_FIELD_U(", ", config, block_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(config, block_size);
 
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_PTR(config, info, tcp, print_loop_info64);

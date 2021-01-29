@@ -37,20 +37,34 @@ MPERS_PRINTER_DECL(void, printrusage,
 	if (abbrev(tcp)) {
 		tprints(", ...");
 	} else {
-		PRINT_FIELD_U(", ", ru, ru_maxrss);
-		PRINT_FIELD_U(", ", ru, ru_ixrss);
-		PRINT_FIELD_U(", ", ru, ru_idrss);
-		PRINT_FIELD_U(", ", ru, ru_isrss);
-		PRINT_FIELD_U(", ", ru, ru_minflt);
-		PRINT_FIELD_U(", ", ru, ru_majflt);
-		PRINT_FIELD_U(", ", ru, ru_nswap);
-		PRINT_FIELD_U(", ", ru, ru_inblock);
-		PRINT_FIELD_U(", ", ru, ru_oublock);
-		PRINT_FIELD_U(", ", ru, ru_msgsnd);
-		PRINT_FIELD_U(", ", ru, ru_msgrcv);
-		PRINT_FIELD_U(", ", ru, ru_nsignals);
-		PRINT_FIELD_U(", ", ru, ru_nvcsw);
-		PRINT_FIELD_U(", ", ru, ru_nivcsw);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_maxrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_ixrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_idrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_isrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_minflt);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_majflt);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nswap);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_inblock);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_oublock);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_msgsnd);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_msgrcv);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nsignals);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nvcsw);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nivcsw);
 	}
 	tprints("}");
 }
@@ -88,20 +102,34 @@ printrusage32(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (abbrev(tcp)) {
 		tprints(", ...");
 	} else {
-		PRINT_FIELD_U(", ", ru, ru_maxrss);
-		PRINT_FIELD_U(", ", ru, ru_ixrss);
-		PRINT_FIELD_U(", ", ru, ru_idrss);
-		PRINT_FIELD_U(", ", ru, ru_isrss);
-		PRINT_FIELD_U(", ", ru, ru_minflt);
-		PRINT_FIELD_U(", ", ru, ru_majflt);
-		PRINT_FIELD_U(", ", ru, ru_nswap);
-		PRINT_FIELD_U(", ", ru, ru_inblock);
-		PRINT_FIELD_U(", ", ru, ru_oublock);
-		PRINT_FIELD_U(", ", ru, ru_msgsnd);
-		PRINT_FIELD_U(", ", ru, ru_msgrcv);
-		PRINT_FIELD_U(", ", ru, ru_nsignals);
-		PRINT_FIELD_U(", ", ru, ru_nvcsw);
-		PRINT_FIELD_U(", ", ru, ru_nivcsw);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_maxrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_ixrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_idrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_isrss);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_minflt);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_majflt);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nswap);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_inblock);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_oublock);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_msgsnd);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_msgrcv);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nsignals);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nvcsw);
+		tprint_struct_next();
+		PRINT_FIELD_U(ru, ru_nivcsw);
 	}
 	tprints("}");
 }
