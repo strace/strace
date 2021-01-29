@@ -147,7 +147,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 			goto misplaced;
 
 		if (i >= max_strlen) {
-			tprints("...");
+			tprint_more_data_follows();
 			break;
 		}
 
@@ -207,7 +207,7 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints(", ");
 
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprint_more_data_follows();
 		return;
 	}
 
@@ -278,7 +278,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 			goto misplaced;
 
 		if (count >= max_strlen) {
-			tprints("...");
+			tprint_more_data_follows();
 			break;
 		}
 
@@ -364,7 +364,7 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 			goto misplaced;
 
 		if (count >= max_strlen) {
-			tprints("...");
+			tprint_more_data_follows();
 			break;
 		}
 
@@ -400,7 +400,7 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints(", ");
 
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprint_more_data_follows();
 		return;
 	}
 
@@ -434,7 +434,7 @@ dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprints(", ");
 
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprint_more_data_follows();
 		return;
 	}
 

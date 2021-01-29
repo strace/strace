@@ -481,7 +481,7 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 			if (i)
 				tprints(", ");
 			if (i >= oob_halen) {
-				tprints("...");
+				tprint_more_data_follows();
 				break;
 			}
 			tprintf("%#02x", sa_ll->sll_addr[i]);

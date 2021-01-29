@@ -61,7 +61,7 @@ fetch_nlmsghdr(struct tcb *const tcp, struct nlmsghdr *const nlmsghdr,
 		return true;
 
 	if (in_array) {
-		tprints("...");
+		tprint_more_data_follows();
 		printaddr_comment(addr);
 	} else {
 		printaddr(addr);
@@ -639,7 +639,7 @@ decode_netlink(struct tcb *const tcp,
 	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
 	     elt++) {
 		if (abbrev(tcp) && elt == max_strlen) {
-			tprints("...");
+			tprint_more_data_follows();
 			break;
 		}
 

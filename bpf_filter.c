@@ -139,7 +139,7 @@ print_bpf_filter_block(struct tcb *const tcp, void *const elem_buf,
 	struct bpf_filter_block_data *const fbd = data;
 
 	if (fbd->count++ >= BPF_MAXINSNS) {
-		tprints("...");
+		tprint_more_data_follows();
 		return false;
 	}
 

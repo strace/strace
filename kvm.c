@@ -279,7 +279,7 @@ kvm_ioctl_decode_cpuid2(struct tcb *const tcp, const unsigned int code,
 		if (abbrev(tcp)) {
 			tprints("[");
 			if (cpuid.nent)
-				tprints("...");
+				tprint_more_data_follows();
 			tprints("]");
 
 		} else {

@@ -1011,7 +1011,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 			decode_nla = true;
 		}
 	} else
-		tprints("...");
+		tprint_more_data_follows();
 	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(ifinfo));

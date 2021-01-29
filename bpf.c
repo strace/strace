@@ -89,7 +89,7 @@ decode_attr_extra_data(struct tcb *const tcp,
 		if (data[i]) {
 			tprints(", ");
 			if (abbrev(tcp)) {
-				tprints("...");
+				tprint_more_data_follows();
 			} else {
 				tprintf("/* bytes %zu..%zu */ ",
 					attr_size, attr_size + size - 1);
@@ -123,7 +123,7 @@ print_ebpf_insn(struct tcb * const tcp, void * const elem_buf,
 	struct ebpf_insn *insn = elem_buf;
 
 	if (eid->count++ >= BPF_MAXINSNS) {
-		tprints("...");
+		tprint_more_data_follows();
 		return false;
 	}
 

@@ -39,7 +39,7 @@ print_struct_mmsghdr(struct tcb *tcp, void *elem_buf,
 	struct print_struct_mmsghdr_config *const c = data;
 
 	if (!c->count) {
-		tprints("...");
+		tprint_more_data_follows();
 		return false;
 	}
 	--c->count;

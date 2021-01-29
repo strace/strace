@@ -41,7 +41,7 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 
 	if (count) {
 		if (*count == 0) {
-			tprints("...");
+			tprint_more_data_follows();
 			return false;
 		}
 		--*count;

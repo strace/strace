@@ -215,7 +215,7 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 			decode_nla = true;
 		}
 	} else
-		tprints("...");
+		tprint_more_data_follows();
 	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(req));
@@ -261,7 +261,7 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 			decode_nla = true;
 		}
 	} else
-		tprints("...");
+		tprint_more_data_follows();
 	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(req));
@@ -446,7 +446,7 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 			decode_nla = true;
 		}
 	} else
-		tprints("...");
+		tprint_more_data_follows();
 	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));

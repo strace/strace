@@ -434,7 +434,7 @@ decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_siz
 		return;
 	tprints(", ");
 	if (abbrev(tcp)) {
-		tprints("...");
+		tprint_more_data_follows();
 	} else {
 		tprints("buf=[");
 		uint64_t off = 0;
@@ -445,11 +445,11 @@ decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_siz
 			uint64_t addr = buf_addr + off;
 			if (addr < buf_addr || off + sizeof(sh) > buf_size ||
 			    i > max_strlen) {
-				tprints("...");
+				tprint_more_data_follows();
 				break;
 			}
 			if (!tfetch_mem(tcp, addr, sizeof(sh), &sh)) {
-				tprints("...");
+				tprint_more_data_follows();
 				printaddr_comment(addr);
 				break;
 			}
@@ -905,7 +905,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			if (i)
 				tprints(", ");
 			if (i >= ARRAY_SIZE(args.values)) {
-				tprints("...");
+				tprint_more_data_follows();
 				break;
 			}
 

@@ -48,7 +48,7 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 			PRINT_FIELD_COOKIE(req, pdiag_cookie);
 		}
 	} else
-		tprints("...");
+		tprint_more_data_follows();
 	tprint_struct_end();
 }
 
@@ -205,7 +205,7 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_msg)
 			decode_nla = true;
 		}
 	} else
-		tprints("...");
+		tprint_more_data_follows();
 	tprint_struct_end();
 
 	offset = NLMSG_ALIGN(sizeof(msg));

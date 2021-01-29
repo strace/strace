@@ -54,7 +54,7 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data,
 		if (i)
 			tprints(", ");
 		if (abbrev(tcp) && i >= max_strlen) {
-			tprints("...");
+			tprint_more_data_follows();
 			break;
 		}
 		printfd(tcp, fds[i]);
@@ -191,7 +191,7 @@ print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
 		if (i)
 			tprints(", ");
 		if (abbrev(tcp) && i >= max_strlen) {
-			tprints("...");
+			tprint_more_data_follows();
 			break;
 		}
 		tprintf("0x%02x", opts[i]);
