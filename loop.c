@@ -55,8 +55,8 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_U(", ", info, lo_encrypt_key_size);
 	}
 
-	PRINT_FIELD_FLAGS(", ", info, lo_flags,
-			  loop_flags_options, "LO_FLAGS_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(info, lo_flags, loop_flags_options, "LO_FLAGS_???");
 
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(info, lo_name);
@@ -104,8 +104,8 @@ print_loop_info64(struct tcb *const tcp, const struct loop_info64 *const info64)
 		PRINT_FIELD_U(", ", *info64, lo_encrypt_key_size);
 	}
 
-	PRINT_FIELD_FLAGS(", ", *info64, lo_flags,
-			  loop_flags_options, "LO_FLAGS_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*info64, lo_flags, loop_flags_options, "LO_FLAGS_???");
 
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(*info64, lo_file_name);

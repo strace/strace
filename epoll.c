@@ -48,7 +48,8 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	const struct epoll_event *ev = elem_buf;
 
-	PRINT_FIELD_FLAGS("{", *ev, events, epollevents, "EPOLL???");
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(*ev, events, epollevents, "EPOLL???");
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_VAL(*ev, data, print_epoll_data);
 	tprints("}");

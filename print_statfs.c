@@ -52,7 +52,8 @@ print_struct_statfs(struct tcb *const tcp, const kernel_ulong_t addr)
 # endif
 # ifdef HAVE_STRUCT_STATFS_F_FLAGS
 	if (b.f_flags & ST_VALID) {
-		PRINT_FIELD_FLAGS(", ", b, f_flags, statfs_flags, "ST_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(b, f_flags, statfs_flags, "ST_???");
 	}
 # endif
 	tprints("}");
@@ -89,7 +90,8 @@ print_struct_statfs64(struct tcb *const tcp, const kernel_ulong_t addr,
 # endif
 # ifdef HAVE_STRUCT_STATFS64_F_FLAGS
 	if (b.f_flags & ST_VALID) {
-		PRINT_FIELD_FLAGS(", ", b, f_flags, statfs_flags, "ST_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(b, f_flags, statfs_flags, "ST_???");
 	}
 # endif
 	tprints("}");

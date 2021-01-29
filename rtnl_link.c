@@ -936,7 +936,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)
 					 arp_hardware_types, "ARPHRD_???");
 			tprint_struct_next();
 			PRINT_FIELD_IFINDEX(ifinfo, ifi_index);
-			PRINT_FIELD_FLAGS(", ", ifinfo, ifi_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ifinfo, ifi_flags,
 					  iffflags, "IFF_???");
 			PRINT_FIELD_X(", ", ifinfo, ifi_change);
 			decode_nla = true;

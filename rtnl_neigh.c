@@ -86,10 +86,12 @@ DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
 					 sizeof(ndmsg) - offset,
 					 (char *) &ndmsg + offset)) {
 			PRINT_FIELD_IFINDEX(ndmsg, ndm_ifindex);
-			PRINT_FIELD_FLAGS(", ", ndmsg, ndm_state,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ndmsg, ndm_state,
 					  neighbor_cache_entry_states,
 					  "NUD_???");
-			PRINT_FIELD_FLAGS(", ", ndmsg, ndm_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ndmsg, ndm_flags,
 					  neighbor_cache_entry_flags,
 					  "NTF_???");
 			PRINT_FIELD_XVAL(", ", ndmsg, ndm_type,

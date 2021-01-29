@@ -69,7 +69,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 			break;
 
 		PRINT_FIELD_D("{", extts, index);
-		PRINT_FIELD_FLAGS(", ", extts, flags, ptp_extts_flags, "PTP_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(extts, flags, ptp_extts_flags, "PTP_???");
 		tprints("}");
 		break;
 	}
@@ -87,7 +88,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		tprint_struct_next();
 		PRINT_FIELD_OBJ_PTR(perout, period, print_ptp_clock_time);
 		PRINT_FIELD_D(", ", perout, index);
-		PRINT_FIELD_FLAGS(", ", perout, flags, ptp_perout_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(perout, flags, ptp_perout_flags,
 				  "PTP_???");
 		tprints("}");
 		break;

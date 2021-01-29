@@ -42,7 +42,7 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (void *) &req + offset)) {
-			PRINT_FIELD_FLAGS("", req, diag_ext,
+			PRINT_FIELD_FLAGS(req, diag_ext,
 					  smc_diag_extended_flags,
 					  "1<<SMC_DIAG_\?\?\?-1");
 			/*

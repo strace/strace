@@ -25,7 +25,8 @@ print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 	PRINT_FIELD_U("{", *fe, fe_logical);
 	PRINT_FIELD_U(", ", *fe, fe_physical);
 	PRINT_FIELD_U(", ", *fe, fe_length);
-	PRINT_FIELD_FLAGS(", ", *fe, fe_flags, fiemap_extent_flags,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*fe, fe_flags, fiemap_extent_flags,
 			  "FIEMAP_EXTENT_???");
 	tprints("}");
 
@@ -50,14 +51,16 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp)) {
 		PRINT_FIELD_U("{", args, fm_start);
 		PRINT_FIELD_U(", ", args, fm_length);
-		PRINT_FIELD_FLAGS(", ", args, fm_flags, fiemap_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(args, fm_flags, fiemap_flags,
 				  "FIEMAP_FLAG_???");
 		PRINT_FIELD_U(", ", args, fm_extent_count);
 		tprints("}");
 		return 0;
 	}
 
-	PRINT_FIELD_FLAGS("{", args, fm_flags, fiemap_flags, "FIEMAP_FLAG_???");
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(args, fm_flags, fiemap_flags, "FIEMAP_FLAG_???");
 	PRINT_FIELD_U(", ", args, fm_mapped_extents);
 	if (abbrev(tcp)) {
 		tprints(", ...");

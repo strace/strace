@@ -226,9 +226,9 @@ tprints_field_name(const char *name)
 		PRINT_FIELD_U_ARRAY((where_), field_);			\
 	} while (0)
 
-# define PRINT_FIELD_FLAGS(prefix_, where_, field_, xlat_, dflt_)	\
+# define PRINT_FIELD_FLAGS(where_, field_, xlat_, dflt_)		\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		printflags64((xlat_),					\
 			     zero_extend_signed_to_ull((where_).field_),\
 			     (dflt_));					\

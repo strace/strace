@@ -149,7 +149,8 @@ decode_mtd_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	PRINT_FIELD_XVAL("{", minfo, type, mtd_type_options, "MTD_???");
-	PRINT_FIELD_FLAGS(", ", minfo, flags, mtd_flags_options, "MTD_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(minfo, flags, mtd_flags_options, "MTD_???");
 	PRINT_FIELD_X(", ", minfo, size);
 	PRINT_FIELD_X(", ", minfo, erasesize);
 	PRINT_FIELD_X(", ", minfo, writesize);

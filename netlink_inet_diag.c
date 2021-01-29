@@ -191,13 +191,15 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 					 (char *) &req + offset)) {
 			PRINT_FIELD_U("", req, idiag_src_len);
 			PRINT_FIELD_U(", ", req, idiag_dst_len);
-			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(req, idiag_ext,
 					  inet_diag_extended_flags,
 					  "1<<INET_DIAG_\?\?\?-1");
 			tprint_struct_next();
 			PRINT_FIELD_INET_DIAG_SOCKID(req, id,
 						     req.idiag_family);
-			PRINT_FIELD_FLAGS(", ", req, idiag_states,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(req, idiag_states,
 					  tcp_state_flags, "1<<TCP_???");
 			PRINT_FIELD_U(", ", req, idiag_dbs);
 			decode_nla = true;
@@ -235,10 +237,12 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 					 (char *) &req + offset)) {
 			PRINT_FIELD_XVAL("", req, sdiag_protocol,
 					 inet_protocols, "IPPROTO_???");
-			PRINT_FIELD_FLAGS(", ", req, idiag_ext,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(req, idiag_ext,
 					  inet_diag_extended_flags,
 					  "1<<INET_DIAG_\?\?\?-1");
-			PRINT_FIELD_FLAGS(", ", req, idiag_states,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(req, idiag_states,
 					  tcp_state_flags, "1<<TCP_???");
 			tprint_struct_next();
 			PRINT_FIELD_INET_DIAG_SOCKID(req, id,

@@ -65,7 +65,8 @@ print_common_flags(struct tcb *tcp, const struct iocb *cb)
 /* aio_flags and aio_resfd fields are available since v2.6.22-rc1~47 */
 #ifdef HAVE_STRUCT_IOCB_AIO_FLAGS
 	if (cb->aio_flags) {
-		PRINT_FIELD_FLAGS(", ", *cb, aio_flags, aio_iocb_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(*cb, aio_flags, aio_iocb_flags,
 				  "IOCB_FLAG_???");
 	}
 
@@ -101,7 +102,8 @@ print_iocb_header(struct tcb *tcp, const struct iocb *cb)
 # define aio_rw_flags aio_reserved1
 #endif
 	if (cb->aio_rw_flags) {
-		PRINT_FIELD_FLAGS(", ", *cb, aio_rw_flags, rwf_flags, "RWF_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(*cb, aio_rw_flags, rwf_flags, "RWF_???");
 	}
 
 	tprints(", aio_lio_opcode=");
@@ -155,7 +157,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_POLL:
-		PRINT_FIELD_FLAGS(", ", *cb, aio_buf, pollflags, "POLL???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(*cb, aio_buf, pollflags, "POLL???");
 		print_common_flags(tcp, cb);
 		break;
 	case SUB_NONE:

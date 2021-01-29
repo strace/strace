@@ -99,7 +99,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 					 sizeof(ifaddr) - offset,
 					 (char *) &ifaddr + offset)) {
 			PRINT_FIELD_U("", ifaddr, ifa_prefixlen);
-			PRINT_FIELD_FLAGS(", ", ifaddr, ifa_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ifaddr, ifa_flags,
 					  ifaddrflags, "IFA_F_???");
 			PRINT_FIELD_XVAL(", ", ifaddr, ifa_scope,
 					 routing_scopes, NULL);

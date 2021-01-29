@@ -33,7 +33,8 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
 	if (decode_flags) {
-		PRINT_FIELD_FLAGS("{", attr, mq_flags, mq_attr_flags, "O_???");
+		tprint_struct_begin();
+		PRINT_FIELD_FLAGS(attr, mq_flags, mq_attr_flags, "O_???");
 	} else {
 		PRINT_FIELD_X("{", attr, mq_flags);
 	}

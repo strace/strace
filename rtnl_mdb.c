@@ -50,7 +50,8 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 		 * are present on all architectures except m68k; as a side note,
 		 * v4.3-rc1~96^2~365 has introduced an ABI breakage on m68k.
 		 */
-		PRINT_FIELD_FLAGS(", ", entry, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(entry, flags,
 				  mdb_flags, "MDB_FLAGS_???");
 		PRINT_FIELD_U(", ", entry, vid);
 

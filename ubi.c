@@ -37,7 +37,8 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 # ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
 #  define flags padding1
 # endif
-		PRINT_FIELD_FLAGS(", ", mkvol, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(mkvol, flags,
 				  ubi_volume_flags, "UBI_VOL_???");
 # ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
 #  undef flags

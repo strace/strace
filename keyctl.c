@@ -303,7 +303,8 @@ print_pkey_query(struct tcb *tcp, kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &query))
 		return;
 
-	PRINT_FIELD_FLAGS("{", query, supported_ops, keyctl_pkey_ops,
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(query, supported_ops, keyctl_pkey_ops,
 			  "KEYCTL_SUPPORTS_???");
 	PRINT_FIELD_U(", ", query, key_size);
 	PRINT_FIELD_U(", ", query, max_data_size);

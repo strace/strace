@@ -50,14 +50,16 @@ SYS_FUNC(statx)
 		if (umove_or_printaddr(tcp, tcp->u_arg[4], &stx))
 			return 0;
 
-		PRINT_FIELD_FLAGS("{", stx, stx_mask, statx_masks,
+		tprint_struct_begin();
+		PRINT_FIELD_FLAGS(stx, stx_mask, statx_masks,
 				  "STATX_???");
 
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", stx, stx_blksize);
 		}
 
-		PRINT_FIELD_FLAGS(", ", stx, stx_attributes, statx_attrs,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(stx, stx_attributes, statx_attrs,
 				  "STATX_ATTR_???");
 
 		if (!abbrev(tcp)) {
@@ -77,7 +79,8 @@ SYS_FUNC(statx)
 
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", stx, stx_blocks);
-			PRINT_FIELD_FLAGS(", ", stx, stx_attributes_mask,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(stx, stx_attributes_mask,
 					  statx_attrs, "STATX_ATTR_???");
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_PTR(stx, stx_atime,

@@ -70,7 +70,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(", ", sg_io, iovec_count);
 	PRINT_FIELD_U(", ", sg_io, dxfer_len);
 	PRINT_FIELD_U(", ", sg_io, timeout);
-	PRINT_FIELD_FLAGS(", ", sg_io, flags, sg_io_flags, "SG_FLAG_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(sg_io, flags, sg_io_flags, "SG_FLAG_???");
 
 	if (sg_io.dxfer_direction == SG_DXFER_TO_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
@@ -139,7 +140,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_X(", ", sg_io, driver_status);
 	PRINT_FIELD_D(", ", sg_io, resid);
 	PRINT_FIELD_U(", ", sg_io, duration);
-	PRINT_FIELD_FLAGS(", ", sg_io, info, sg_io_info, "SG_INFO_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(sg_io, info, sg_io_info, "SG_INFO_???");
 
 	return RVAL_IOCTL_DECODED;
 }

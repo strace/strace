@@ -109,7 +109,8 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 static void
 dm_decode_flags(const struct dm_ioctl *ioc)
 {
-	PRINT_FIELD_FLAGS(", ", *ioc, flags, dm_flags, "DM_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*ioc, flags, dm_flags, "DM_???");
 }
 
 static void

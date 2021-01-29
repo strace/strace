@@ -59,7 +59,8 @@ print_gpioline_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	/* exiting */
-	PRINT_FIELD_FLAGS("{", info, flags, gpio_line_flags, "GPIOLINE_FLAG_???");
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(info, flags, gpio_line_flags, "GPIOLINE_FLAG_???");
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(info, name);
 	tprint_struct_next();
@@ -112,7 +113,8 @@ print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(hr, lineoffsets, hr.lines, tcp,
 			       print_uint32_array_member);
-	PRINT_FIELD_FLAGS(", ", hr, flags, gpio_handle_flags,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(hr, flags, gpio_handle_flags,
 			  "GPIOHANDLE_REQUEST_???");
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(hr, default_values, hr.lines, tcp,
@@ -149,9 +151,11 @@ print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	/* entering */
 	PRINT_FIELD_U("{", er, lineoffset);
-	PRINT_FIELD_FLAGS(", ", er, handleflags, gpio_handle_flags,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(er, handleflags, gpio_handle_flags,
 			  "GPIOHANDLE_REQUEST_???");
-	PRINT_FIELD_FLAGS(", ", er, eventflags, gpio_event_flags,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(er, eventflags, gpio_event_flags,
 			  "GPIOEVENT_REQUEST_???");
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(er, consumer_label);
@@ -204,7 +208,8 @@ print_gpiohandle_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (umove_or_printaddr(tcp, arg, &hc))
 		return RVAL_IOCTL_DECODED;
 
-	PRINT_FIELD_FLAGS("{", hc, flags, gpio_handle_flags, "GPIOHANDLE_REQUEST_???");
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(hc, flags, gpio_handle_flags, "GPIOHANDLE_REQUEST_???");
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(hc, default_values, tcp, print_uint8_array_member);
 	tprints("}");
@@ -241,7 +246,7 @@ print_gpio_v2_line_attribute(const struct_gpio_v2_line_attribute *attr,
 	}
 	switch (attr->id) {
 	case GPIO_V2_LINE_ATTR_ID_FLAGS:
-		PRINT_FIELD_FLAGS("", *attr, flags, gpio_v2_line_flags,
+		PRINT_FIELD_FLAGS(*attr, flags, gpio_v2_line_flags,
 				  "GPIO_V2_LINE_FLAG_???");
 		break;
 	case GPIO_V2_LINE_ATTR_ID_OUTPUT_VALUES:
@@ -290,7 +295,8 @@ static void
 print_gpio_v2_line_config(struct tcb *const tcp,
 			  const struct_gpio_v2_line_config *lc)
 {
-	PRINT_FIELD_FLAGS("{", *lc, flags, gpio_v2_line_flags,
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(*lc, flags, gpio_v2_line_flags,
 			  "GPIO_V2_LINE_FLAG_???");
 	PRINT_FIELD_U(", ", *lc, num_attrs);
 	if (!IS_ARRAY_ZERO(lc->padding)) {
@@ -331,7 +337,8 @@ print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING(li, name);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(li, consumer);
-	PRINT_FIELD_FLAGS(", ", li, flags, gpio_v2_line_flags, "GPIO_V2_LINE_FLAG_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(li, flags, gpio_v2_line_flags, "GPIO_V2_LINE_FLAG_???");
 	PRINT_FIELD_U(", ", li, num_attrs);
 	if (li.num_attrs) {
 		tprint_struct_next();

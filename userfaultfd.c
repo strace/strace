@@ -52,7 +52,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			if (umove_or_printaddr(tcp, arg, &ua))
 				break;
 			PRINT_FIELD_X("{", ua, api);
-			PRINT_FIELD_FLAGS(", ", ua, features, uffd_api_features,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ua, features, uffd_api_features,
 					  "UFFD_FEATURE_???");
 			entering_features = malloc(sizeof(*entering_features));
 			if (entering_features) {
@@ -68,12 +69,14 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 
 			if (!entering_features
 			    || *entering_features != ua.features) {
-				PRINT_FIELD_FLAGS(" => ", ua, features,
+				tprint_value_changed();
+				PRINT_FIELD_FLAGS(ua, features,
 						  uffd_api_features,
 						  "UFFD_FEATURE_???");
 			}
 
-			PRINT_FIELD_FLAGS(", ", ua, ioctls, uffd_api_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ua, ioctls, uffd_api_flags,
 					  "_UFFDIO_???");
 		}
 
@@ -92,7 +95,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			PRINT_FIELD_X("{", uc, dst);
 			PRINT_FIELD_X(", ", uc, src);
 			PRINT_FIELD_X(", ", uc, len);
-			PRINT_FIELD_FLAGS(", ", uc, mode, uffd_copy_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(uc, mode, uffd_copy_flags,
 					  "UFFDIO_COPY_???");
 
 			return 0;
@@ -117,7 +121,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprint_struct_begin();
 			PRINT_FIELD_OBJ_PTR(ur, range,
 					    tprintf_uffdio_range);
-			PRINT_FIELD_FLAGS(", ", ur, mode,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ur, mode,
 					  uffd_register_mode_flags,
 					  "UFFDIO_REGISTER_MODE_???");
 
@@ -125,7 +130,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		}
 
 		if (!syserror(tcp) && !umove(tcp, arg, &ur)) {
-			PRINT_FIELD_FLAGS(", ", ur, ioctls,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(ur, ioctls,
 					  uffd_register_ioctl_flags,
 					  "UFFDIO_???");
 		}
@@ -157,7 +163,8 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprint_struct_begin();
 			PRINT_FIELD_OBJ_PTR(uz, range,
 					    tprintf_uffdio_range);
-			PRINT_FIELD_FLAGS(", ", uz, mode, uffd_zeropage_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(uz, mode, uffd_zeropage_flags,
 					  "UFFDIO_ZEROPAGE_???");
 
 			return 0;

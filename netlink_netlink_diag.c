@@ -41,7 +41,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 						 "NETLINK_???");
 			}
 			PRINT_FIELD_U(", ", req, ndiag_ino);
-			PRINT_FIELD_FLAGS(", ", req, ndiag_show,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(req, ndiag_show,
 					  netlink_diag_show, "NDIAG_SHOW_???");
 			tprint_struct_next();
 			PRINT_FIELD_COOKIE(req, ndiag_cookie);

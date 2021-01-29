@@ -67,7 +67,8 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_SG_IO_BUFFER(sg_io, dout_xferp, sg_io.dout_xfer_len,
 				 sg_io.dout_iovec_count, tcp);
 	PRINT_FIELD_U(", ", sg_io, timeout);
-	PRINT_FIELD_FLAGS(", ", sg_io, flags, bsg_flags, "BSG_FLAG_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(sg_io, flags, bsg_flags, "BSG_FLAG_???");
 	PRINT_FIELD_X(", ", sg_io, usr_ptr);
 
 	struct sg_io_v4 *entering_sg_io = malloc(sizeof(*entering_sg_io));
@@ -112,7 +113,8 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_X(", ", sg_io, transport_status);
 	PRINT_FIELD_X(", ", sg_io, device_status);
 	PRINT_FIELD_U(", ", sg_io, retry_delay);
-	PRINT_FIELD_FLAGS(", ", sg_io, info, sg_io_info, "SG_INFO_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(sg_io, info, sg_io_info, "SG_INFO_???");
 	PRINT_FIELD_U(", ", sg_io, duration);
 	PRINT_FIELD_U(", ", sg_io, response_len);
 	PRINT_FIELD_D(", ", sg_io, din_resid);

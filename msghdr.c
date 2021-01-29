@@ -418,7 +418,8 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 			   msg->msg_controllen);
 	PRINT_FIELD_U(", ", *msg, msg_controllen);
 
-	PRINT_FIELD_FLAGS(", ", *msg, msg_flags, msg_flags, "MSG_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*msg, msg_flags, msg_flags, "MSG_???");
 	tprints("}");
 }
 

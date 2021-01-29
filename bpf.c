@@ -169,7 +169,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 	/* map_flags field was added in Linux commit v4.6-rc1~91^2~108^2~6. */
 	if (len <= offsetof(struct BPF_MAP_CREATE_struct, map_flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, map_flags, bpf_map_flags, "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, map_flags, bpf_map_flags, "BPF_F_???");
 
 	/*
 	 * inner_map_fd field was added in Linux commit
@@ -250,8 +251,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_ELEM)
 	/* flags field was added in Linux commit v5.1-rc1~178^2~375^2~4^2~3.  */
 	if (len <= offsetof(struct BPF_MAP_LOOKUP_ELEM_struct, flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, flags, bpf_map_lookup_elem_flags,
-			  "BPF_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, flags, bpf_map_lookup_elem_flags, "BPF_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -328,7 +329,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_LOAD)
 	/* prog_flags field was added in Linux commit v4.12-rc2~34^2~29^2~2.  */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, prog_flags, bpf_prog_flags, "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, prog_flags, bpf_prog_flags, "BPF_F_???");
 
 	/* prog_name field was added in Linux commit v4.15-rc1~84^2~605^2~4. */
 	if (len <= offsetof(struct BPF_PROG_LOAD_struct, prog_name))
@@ -400,8 +402,8 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 	/* file_flags field was added in Linux v4.15-rc1~84^2~384^2~4 */
 	if (len <= offsetof(struct BPF_OBJ_PIN_struct, file_flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, file_flags, bpf_file_mode_flags,
-			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, file_flags, bpf_file_mode_flags, "BPF_F_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
@@ -414,8 +416,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_ATTACH)
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, attach_bpf_fd, tcp);
 	PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type, "BPF_???");
-	PRINT_FIELD_FLAGS(", ", attr, attach_flags, bpf_attach_flags,
-			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, attach_flags, bpf_attach_flags, "BPF_F_???");
 
 	/*
 	 * The following field was introduced by Linux commit
@@ -475,8 +477,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_NEXT_ID)
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
 	if (len <= offsetof(struct BPF_PROG_GET_NEXT_ID_struct, open_flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
-			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, open_flags, bpf_file_mode_flags, "BPF_F_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
 
@@ -491,8 +493,8 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_FD_BY_ID)
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
 	if (len <= offsetof(struct BPF_PROG_GET_FD_BY_ID_struct, open_flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
-			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, open_flags, bpf_file_mode_flags, "BPF_F_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
@@ -504,8 +506,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_GET_FD_BY_ID)
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
 	if (len <= offsetof(struct BPF_MAP_GET_FD_BY_ID_struct, open_flags))
 		break;
-	PRINT_FIELD_FLAGS(", ", attr, open_flags, bpf_file_mode_flags,
-			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, open_flags, bpf_file_mode_flags, "BPF_F_???");
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
@@ -558,7 +560,8 @@ print_bpf_map_info(struct tcb * const tcp, uint32_t bpf_fd,
 	PRINT_FIELD_U(", ", info, key_size);
 	PRINT_FIELD_U(", ", info, value_size);
 	PRINT_FIELD_U(", ", info, max_entries);
-	PRINT_FIELD_FLAGS(", ", info, map_flags, bpf_map_flags, "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(info, map_flags, bpf_map_flags, "BPF_F_???");
 
 	/*
 	 * "name" field was introduced by Linux commit v4.15-rc1~84^2~605^2~3.
@@ -918,9 +921,11 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 		PRINT_FIELD_FD(attr, target_fd, tcp);
 		PRINT_FIELD_XVAL(", ", attr, attach_type, bpf_attach_type,
 				 "BPF_???");
-		PRINT_FIELD_FLAGS(", ", attr, query_flags, bpf_query_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, query_flags, bpf_query_flags,
 				  "BPF_F_QUERY_???");
-		PRINT_FIELD_FLAGS(", ", attr, attach_flags, bpf_attach_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, attach_flags, bpf_attach_flags,
 				  "BPF_F_???");
 
 		tprints(", prog_ids=");
@@ -1029,7 +1034,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_LOOKUP_BATCH)
 		PRINT_FIELD_U(", ", attr, count);
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, map_fd, tcp);
-		PRINT_FIELD_FLAGS(", ", attr, elem_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, elem_flags,
 				  bpf_map_lookup_elem_flags, "BPF_???");
 		PRINT_FIELD_X(", ", attr, flags);
 
@@ -1063,7 +1069,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_UPDATE_BATCH)
 		PRINT_FIELD_U(", ", attr, count);
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, map_fd, tcp);
-		PRINT_FIELD_FLAGS(", ", attr, elem_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, elem_flags,
 				  bpf_map_lookup_elem_flags, "BPF_???");
 		PRINT_FIELD_X(", ", attr, flags);
 
@@ -1093,7 +1100,8 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 		PRINT_FIELD_U(", ", attr, count);
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, map_fd, tcp);
-		PRINT_FIELD_FLAGS(", ", attr, elem_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, elem_flags,
 				  bpf_map_lookup_elem_flags, "BPF_???");
 		PRINT_FIELD_X(", ", attr, flags);
 
@@ -1133,8 +1141,8 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_UPDATE)
 	PRINT_FIELD_FD(attr, link_fd, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_FD(attr, new_prog_fd, tcp);
-	PRINT_FIELD_FLAGS(", ", attr, flags, bpf_attach_flags,
-			  "BPF_F_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(attr, flags, bpf_attach_flags, "BPF_F_???");
 	if (attr.flags & BPF_F_REPLACE) {
 		tprint_struct_next();
 		PRINT_FIELD_FD(attr, old_prog_fd, tcp);

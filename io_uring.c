@@ -63,7 +63,8 @@ print_io_cqring_offsets(const struct_io_cqring_offsets *const p)
 	PRINT_FIELD_U(", ", *p, ring_entries);
 	PRINT_FIELD_U(", ", *p, overflow);
 	PRINT_FIELD_U(", ", *p, cqes);
-	PRINT_FIELD_FLAGS(", ", *p, flags, uring_cqring_flags, "IORING_CQ_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, flags, uring_cqring_flags, "IORING_CQ_???");
 	if (p->resv1) {
 		PRINT_FIELD_X(", ", *p, resv1);
 	}
@@ -85,7 +86,8 @@ SYS_FUNC(io_uring_setup)
 		if (umove_or_printaddr(tcp, params_addr, &params))
 			return RVAL_DECODED | RVAL_FD;
 
-		PRINT_FIELD_FLAGS("{", params, flags, uring_setup_flags,
+		tprint_struct_begin();
+		PRINT_FIELD_FLAGS(params, flags, uring_setup_flags,
 				  "IORING_SETUP_???");
 		PRINT_FIELD_X(", ", params, sq_thread_cpu);
 		PRINT_FIELD_U(", ", params, sq_thread_idle);
@@ -109,7 +111,8 @@ SYS_FUNC(io_uring_setup)
 	} else {
 		PRINT_FIELD_U(", ", params, sq_entries);
 		PRINT_FIELD_U(", ", params, cq_entries);
-		PRINT_FIELD_FLAGS(", ", params, features,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(params, features,
 				  uring_setup_features,
 				  "IORING_FEAT_???");
 		tprint_struct_next();
@@ -183,7 +186,8 @@ print_io_uring_probe_op(struct tcb *tcp, void *elem_buf, size_t elem_size,
 	if (op->resv) {
 		PRINT_FIELD_X(", ", *op, resv);
 	}
-	PRINT_FIELD_FLAGS(", ", *op, flags, uring_op_flags, "IO_URING_OP_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*op, flags, uring_op_flags, "IO_URING_OP_???");
 	if (op->resv2) {
 		PRINT_FIELD_X(", ", *op, resv2);
 	}

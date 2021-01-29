@@ -177,7 +177,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", dq, dqb_btime);
 			PRINT_FIELD_U(", ", dq, dqb_itime);
-			PRINT_FIELD_FLAGS(", ", dq, dqb_valid,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(dq, dqb_valid,
 					  if_dqblk_valid, "QIF_???");
 		} else {
 			tprints(", ...");
@@ -207,7 +208,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (!abbrev(tcp)) {
 			PRINT_FIELD_U(", ", dq, dqb_btime);
 			PRINT_FIELD_U(", ", dq, dqb_itime);
-			PRINT_FIELD_FLAGS(", ", dq, dqb_valid,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(dq, dqb_valid,
 					  if_dqblk_valid, "QIF_???");
 			PRINT_FIELD_U(", ", dq, dqb_id);
 		} else {
@@ -239,7 +241,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
 		PRINT_FIELD_D("{", dq, d_version);
-		PRINT_FIELD_FLAGS(", ", dq, d_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(dq, d_flags,
 				  xfs_dqblk_flags, "XFS_???_QUOTA");
 		PRINT_FIELD_X(", ", dq, d_fieldmask);
 		PRINT_FIELD_U(", ", dq, d_id);
@@ -301,8 +304,10 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			break;
 		PRINT_FIELD_U("{", dq, dqi_bgrace);
 		PRINT_FIELD_U(", ", dq, dqi_igrace);
-		PRINT_FIELD_FLAGS(", ", dq, dqi_flags, if_dqinfo_flags, "DQF_???");
-		PRINT_FIELD_FLAGS(", ", dq, dqi_valid, if_dqinfo_valid, "IIF_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(dq, dqi_flags, if_dqinfo_flags, "DQF_???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(dq, dqi_valid, if_dqinfo_valid, "IIF_???");
 		tprints("}");
 		break;
 	}
@@ -318,7 +323,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (fetch_struct_quotastat(tcp, data, &dq)) {
 			PRINT_FIELD_D("{", dq, qs_version);
 			if (!abbrev(tcp)) {
-				PRINT_FIELD_FLAGS(", ", dq, qs_flags,
+				tprint_struct_next();
+				PRINT_FIELD_FLAGS(dq, qs_flags,
 						  xfs_quota_flags, "XFS_QUOTA_???");
 				tprint_struct_next();
 				PRINT_FIELD_OBJ_PTR(dq, qs_uquota,
@@ -353,7 +359,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			break;
 		PRINT_FIELD_D("{", dq, qs_version);
 		if (!abbrev(tcp)) {
-			PRINT_FIELD_FLAGS(", ", dq, qs_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(dq, qs_flags,
 					  xfs_quota_flags, "XFS_QUOTA_???");
 			PRINT_FIELD_U(", ", dq, qs_incoredqs);
 			tprint_struct_next();

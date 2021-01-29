@@ -148,10 +148,12 @@ tee_version(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	PRINT_FIELD_XVAL("{", version, impl_id,
 			 tee_ioctl_impl_ids, "TEE_IMPL_ID_???");
-	PRINT_FIELD_FLAGS(", ", version, gen_caps,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(version, gen_caps,
 			  tee_ioctl_gen_caps, "TEE_GEN_CAP_???");
 	if (version.impl_id == TEE_IMPL_ID_OPTEE) {
-		PRINT_FIELD_FLAGS(", ", version, impl_caps,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(version, impl_caps,
 				  tee_ioctl_optee_caps, "TEE_OPTEE_CAP_???");
 	} else {
 		PRINT_FIELD_X(", ", version, impl_caps);
@@ -402,7 +404,8 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 			return RVAL_IOCTL_DECODED;
 
 		PRINT_FIELD_X("{", shm_alloc, size);
-		PRINT_FIELD_FLAGS(", ", shm_alloc, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(shm_alloc, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
 		tprints("}");
 		return 0;
@@ -416,7 +419,8 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 			return RVAL_IOCTL_DECODED;
 
 		PRINT_FIELD_X("{", shm_alloc, size);
-		PRINT_FIELD_FLAGS(", ", shm_alloc, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(shm_alloc, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
 		PRINT_FIELD_D(", ", shm_alloc, id);
 
@@ -437,7 +441,8 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 
 		tprint_struct_begin();
 		PRINT_FIELD_FD(shm_register_fd, fd, tcp);
-		PRINT_FIELD_FLAGS(", ", shm_register_fd, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(shm_register_fd, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
 		tprints("}");
 		return 0;
@@ -471,7 +476,8 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_begin();
 		PRINT_FIELD_ADDR64(shm_register, addr);
 		PRINT_FIELD_X(", ", shm_register, length);
-		PRINT_FIELD_FLAGS(", ", shm_register, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(shm_register, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
 		tprints("}");
 		return 0;
@@ -485,7 +491,8 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 			return RVAL_IOCTL_DECODED;
 
 		PRINT_FIELD_X("{", shm_register, length);
-		PRINT_FIELD_FLAGS(", ", shm_register, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(shm_register, flags,
 				  tee_ioctl_shm_flags, "TEE_IOCTL_SHM_???");
 		PRINT_FIELD_D(", ", shm_register, id);
 

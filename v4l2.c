@@ -202,10 +202,12 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_CSTRING(caps, bus_info);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_VAL(caps, version, print_kernel_version);
-	PRINT_FIELD_FLAGS(", ", caps, capabilities,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(caps, capabilities,
 			  v4l2_device_capabilities_flags, "V4L2_CAP_???");
 	if (caps.device_caps) {
-		PRINT_FIELD_FLAGS(", ", caps, device_caps,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(caps, device_caps,
 				  v4l2_device_capabilities_flags,
 				  "V4L2_CAP_???");
 	}
@@ -232,7 +234,8 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
-		PRINT_FIELD_FLAGS(", ", f, flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(f, flags,
 				  v4l2_format_description_flags,
 				  "V4L2_FMT_FLAG_???");
 		tprint_struct_next();
@@ -346,7 +349,8 @@ DECL_print_v4l2_format_fmt(vbi)
 	PRINT_FIELD_D_ARRAY(*p, start);
 	tprint_struct_next();
 	PRINT_FIELD_U_ARRAY(*p, count);
-	PRINT_FIELD_FLAGS(", ", *p, flags, v4l2_vbi_flags, "V4L2_VBI_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, flags, v4l2_vbi_flags, "V4L2_VBI_???");
 	tprints("}");
 	return true;
 }
@@ -354,7 +358,8 @@ DECL_print_v4l2_format_fmt(vbi)
 static bool
 DECL_print_v4l2_format_fmt(sliced)
 {
-	PRINT_FIELD_FLAGS("{", *p, service_set, v4l2_sliced_flags,
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(*p, service_set, v4l2_sliced_flags,
 			  "V4L2_SLICED_???");
 	tprint_struct_next();
 	PRINT_FIELD_X_ARRAY2D(*p, service_lines);
@@ -655,9 +660,11 @@ print_v4l2_buf_type(struct tcb *const tcp, const kernel_ulong_t arg)
 static void
 print_v4l2_streamparm_capture(const struct v4l2_captureparm *const p)
 {
-	PRINT_FIELD_FLAGS("{", *p, capability, v4l2_streaming_capabilities,
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(*p, capability, v4l2_streaming_capabilities,
 			  "V4L2_CAP_???");
-	PRINT_FIELD_FLAGS(", ", *p, capturemode, v4l2_capture_modes,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, capturemode, v4l2_capture_modes,
 			  "V4L2_MODE_???");
 	tprint_struct_next();
 	PRINT_FIELD_FRACT(*p, timeperframe);
@@ -669,9 +676,11 @@ print_v4l2_streamparm_capture(const struct v4l2_captureparm *const p)
 static void
 print_v4l2_streamparm_output(const struct v4l2_outputparm *const p)
 {
-	PRINT_FIELD_FLAGS("{", *p, capability, v4l2_streaming_capabilities,
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(*p, capability, v4l2_streaming_capabilities,
 			  "V4L2_CAP_???");
-	PRINT_FIELD_FLAGS(", ", *p, outputmode, v4l2_capture_modes,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*p, outputmode, v4l2_capture_modes,
 			  "V4L2_MODE_???");
 	tprint_struct_next();
 	PRINT_FIELD_FRACT(*p, timeperframe);
@@ -906,11 +915,13 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	PRINT_FIELD_CSTRING(c, name);
 	PRINT_FIELD_XVAL(", ", c, type, v4l2_tuner_types, "V4L2_TUNER_???");
-	PRINT_FIELD_FLAGS(", ", c, capability, v4l2_tuner_capabilities,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(c, capability, v4l2_tuner_capabilities,
 			  "V4L2_TUNER_CAP_???");
 	PRINT_FIELD_U(", ", c, rangelow);
 	PRINT_FIELD_U(", ", c, rangehigh);
-	PRINT_FIELD_FLAGS(", ", c, rxsubchans, v4l2_tuner_rxsubchanses,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(c, rxsubchans, v4l2_tuner_rxsubchanses,
 			  "V4L2_TUNER_SUB_???");
 	PRINT_FIELD_XVAL(", ", c, audmode, v4l2_tuner_audmodes,
 			 "V4L2_TUNER_MODE_???");
@@ -966,7 +977,8 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(", ", c, maximum);
 		PRINT_FIELD_D(", ", c, step);
 		PRINT_FIELD_D(", ", c, default_value);
-		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(c, flags, v4l2_control_flags,
 				  "V4L2_CTRL_FLAG_???");
 		if (!IS_ARRAY_ZERO(c.reserved)) {
 			tprint_struct_next();
@@ -1019,7 +1031,8 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_D(", ", c, maximum);
 		PRINT_FIELD_U(", ", c, step);
 		PRINT_FIELD_D(", ", c, default_value);
-		PRINT_FIELD_FLAGS(", ", c, flags, v4l2_control_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(c, flags, v4l2_control_flags,
 				  "V4L2_CTRL_FLAG_???");
 		PRINT_FIELD_U(", ", c, elem_size);
 		PRINT_FIELD_U(", ", c, elems);

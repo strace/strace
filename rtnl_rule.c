@@ -109,13 +109,15 @@ DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 					 (char *) &msg + offset)) {
 			PRINT_FIELD_U("", msg, dst_len);
 			PRINT_FIELD_U(", ", msg, src_len);
-			PRINT_FIELD_FLAGS(", ", msg, tos,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(msg, tos,
 					  ip_type_of_services, "IPTOS_TOS_???");
 			PRINT_FIELD_XVAL(", ", msg, table,
 					 routing_table_ids, "RT_TABLE_???");
 			PRINT_FIELD_XVAL(", ", msg, action,
 					 fib_rule_actions, "FR_ACT_???");
-			PRINT_FIELD_FLAGS(", ", msg, flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(msg, flags,
 					  fib_rule_flags, "FIB_RULE_???");
 			decode_nla = true;
 		}

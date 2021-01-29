@@ -27,12 +27,14 @@ PRINT_TIMEX(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &tx))
 		return -1;
 
-	PRINT_FIELD_FLAGS("{", tx, modes, adjtimex_modes, "ADJ_???");
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(tx, modes, adjtimex_modes, "ADJ_???");
 	PRINT_FIELD_D(", ", tx, offset);
 	PRINT_FIELD_D(", ", tx, freq);
 	PRINT_FIELD_D(", ", tx, maxerror);
 	PRINT_FIELD_D(", ", tx, esterror);
-	PRINT_FIELD_FLAGS(", ", tx, status, adjtimex_status, "STA_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(tx, status, adjtimex_status, "STA_???");
 	PRINT_FIELD_D(", ", tx, constant);
 	PRINT_FIELD_D(", ", tx, precision);
 	PRINT_FIELD_D(", ", tx, tolerance);

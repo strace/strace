@@ -232,9 +232,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_U(", ", *attr, sample_period);
 	}
 
-	PRINT_FIELD_FLAGS(", ", *attr, sample_type, perf_event_sample_format,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*attr, sample_type, perf_event_sample_format,
 			  "PERF_SAMPLE_???");
-	PRINT_FIELD_FLAGS(", ", *attr, read_format, perf_event_read_format,
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*attr, read_format, perf_event_read_format,
 			  "PERF_FORMAT_???");
 
 	tprint_struct_next();
@@ -340,7 +342,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	_PERF_CHECK_FIELD(branch_sample_type);
 	if (attr->sample_type & PERF_SAMPLE_BRANCH_STACK) {
-		PRINT_FIELD_FLAGS(", ", *attr, branch_sample_type,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(*attr, branch_sample_type,
 				  perf_branch_sample_type,
 				  "PERF_SAMPLE_BRANCH_???");
 	}

@@ -238,7 +238,8 @@ decode_rta_multipath(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &nh)) {
 		/* print the whole structure regardless of its rtnh_len */
 		PRINT_FIELD_U("{", nh, rtnh_len);
-		PRINT_FIELD_FLAGS(", ", nh, rtnh_flags,
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(nh, rtnh_flags,
 				  route_nexthop_flags, "RTNH_F_???");
 		PRINT_FIELD_U(", ", nh, rtnh_hops);
 		tprint_struct_next();
@@ -275,7 +276,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 					 (char *) &rtmsg + offset)) {
 			PRINT_FIELD_U("", rtmsg, rtm_dst_len);
 			PRINT_FIELD_U(", ", rtmsg, rtm_src_len);
-			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_tos,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(rtmsg, rtm_tos,
 					  ip_type_of_services, "IPTOS_TOS_???");
 			PRINT_FIELD_XVAL(", ", rtmsg, rtm_table,
 					 routing_table_ids, NULL);
@@ -285,7 +287,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 					 routing_scopes, NULL);
 			PRINT_FIELD_XVAL(", ", rtmsg, rtm_type,
 					 routing_types, "RTN_???");
-			PRINT_FIELD_FLAGS(", ", rtmsg, rtm_flags,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(rtmsg, rtm_flags,
 					  routing_flags, "RTM_F_???");
 			decode_nla = true;
 		}

@@ -22,7 +22,8 @@ print_pollfd(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	tprint_struct_begin();
 	PRINT_FIELD_FD(*fds, fd, tcp);
 	if (fds->fd >= 0) {
-		PRINT_FIELD_FLAGS(", ", *fds, events, pollflags, "POLL???");
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(*fds, events, pollflags, "POLL???");
 	}
 	tprints("}");
 

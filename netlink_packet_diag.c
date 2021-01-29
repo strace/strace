@@ -39,7 +39,8 @@ DECL_NETLINK_DIAG_DECODER(decode_packet_diag_req)
 			 */
 			PRINT_FIELD_X("", req, sdiag_protocol);
 			PRINT_FIELD_U(", ", req, pdiag_ino);
-			PRINT_FIELD_FLAGS(", ", req, pdiag_show,
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(req, pdiag_show,
 					  packet_diag_show, "PACKET_SHOW_???");
 			tprint_struct_next();
 			PRINT_FIELD_COOKIE(req, pdiag_cookie);
@@ -69,8 +70,8 @@ decode_packet_diag_info(struct tcb *const tcp,
 	PRINT_FIELD_U(", ", pinfo, pdi_reserve);
 	PRINT_FIELD_U(", ", pinfo, pdi_copy_thresh);
 	PRINT_FIELD_U(", ", pinfo, pdi_tstamp);
-	PRINT_FIELD_FLAGS(", ", pinfo, pdi_flags,
-			  packet_diag_info_flags, "PDI_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(pinfo, pdi_flags, packet_diag_info_flags, "PDI_???");
 	tprints("}");
 
 	return true;
