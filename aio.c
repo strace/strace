@@ -128,7 +128,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 	switch (sub) {
 	case SUB_COMMON:
 		if (cb->aio_lio_opcode == 1 && iocb_is_valid(cb)) {
-			PRINT_FIELD_OBJ_TCB_VAL(", ", *cb, aio_buf, tcp,
+			tprint_struct_next();
+			PRINT_FIELD_OBJ_TCB_VAL(*cb, aio_buf, tcp,
 				printstrn, cb->aio_nbytes);
 		} else {
 			PRINT_FIELD_X(", ", *cb, aio_buf);

@@ -440,7 +440,8 @@ print_nlmsghdr(struct tcb *tcp,
 
 	PRINT_FIELD_U("{", *nlmsghdr, nlmsg_len);
 
-	PRINT_FIELD_OBJ_TCB_VAL(", ", *nlmsghdr, nlmsg_type, tcp,
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_TCB_VAL(*nlmsghdr, nlmsg_type, tcp,
 				decode_nlmsg_type, family);
 
 	PRINT_FIELD_OBJ_VAL(", ", *nlmsghdr, nlmsg_flags, decode_nlmsg_flags,

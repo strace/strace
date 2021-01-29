@@ -231,7 +231,8 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 		PRINT_FIELD_ARRAY(", ", *probe, resv2, tcp,
 				  print_xint32_array_member);
 	}
-	PRINT_FIELD_OBJ_TCB_VAL(", ", *probe, ops, tcp, print_local_array_ex,
+	tprint_struct_next();
+	PRINT_FIELD_OBJ_TCB_VAL(*probe, ops, tcp, print_local_array_ex,
 			entering(tcp) ? nargs : probe->ops_len,
 			sizeof(probe->ops[0]), print_io_uring_probe_op,
 			NULL, 0, NULL, NULL);

@@ -902,7 +902,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		PRINT_FIELD_OBJ_TCB_VAL("{", args, fspath, tcp,
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_TCB_VAL(args, fspath, tcp,
 					btrfs_print_ino_path_container);
 		tprints("}");
 		break;
@@ -938,7 +939,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			return 0;
 		}
 
-		PRINT_FIELD_OBJ_TCB_VAL("{", args, inodes, tcp,
+		tprint_struct_begin();
+		PRINT_FIELD_OBJ_TCB_VAL(args, inodes, tcp,
 					btrfs_print_logical_ino_container);
 
 		tprints("}");

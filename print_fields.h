@@ -464,10 +464,10 @@ tprints_field_name(const char *name)
 			      ##__VA_ARGS__);				\
 	} while (0)
 
-# define PRINT_FIELD_OBJ_TCB_VAL(prefix_, where_, field_,		\
+# define PRINT_FIELD_OBJ_TCB_VAL(where_, field_,			\
 			     tcp_, print_func_, ...)			\
 	do {								\
-		STRACE_PRINTF("%s%s=", (prefix_), #field_);		\
+		tprints_field_name(#field_);				\
 		(print_func_)((tcp_), (where_).field_, ##__VA_ARGS__);	\
 	} while (0)
 
