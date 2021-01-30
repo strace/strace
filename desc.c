@@ -174,41 +174,13 @@ SYS_FUNC(select)
 }
 
 static int
-umove_kulong_array_or_printaddr(struct tcb *const tcp, const kernel_ulong_t addr,
-				kernel_ulong_t *const ptr, const size_t n)
-{
-#ifndef current_klongsize
-	if (current_klongsize < sizeof(*ptr)) {
-		uint32_t ptr32[n];
-		int r = umove_or_printaddr(tcp, addr, &ptr32);
-		if (!r) {
-			size_t i;
-
-			for (i = 0; i < n; ++i)
-				ptr[i] = ptr32[i];
-		}
-		return r;
-	}
-#endif /* !current_klongsize */
-	return umoven_or_printaddr(tcp, addr, n * sizeof(*ptr), ptr);
-}
-
-static int
 do_pselect6(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 	    const sprint_obj_by_addr_fn sprint_ts)
 {
 	int rc = decode_select(tcp, tcp->u_arg, print_ts, sprint_ts);
 	if (entering(tcp)) {
-		kernel_ulong_t data[2];
-
 		tprints(", ");
-		if (!umove_kulong_array_or_printaddr(tcp, tcp->u_arg[5],
-						     data, ARRAY_SIZE(data))) {
-			tprints("{");
-			/* NB: kernel requires data[1] == NSIG_BYTES */
-			print_sigset_addr_len(tcp, data[0], data[1]);
-			tprintf(", %" PRI_klu "}", data[1]);
-		}
+		print_kernel_sigset(tcp, tcp->u_arg[5]);
 	}
 
 	return rc;

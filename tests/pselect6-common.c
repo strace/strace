@@ -90,8 +90,8 @@ int main(int ac, char **av)
 	if (rc < 0)
 		perror_msg_and_skip("pselect6");
 	assert(rc == 1);
-	printf("%s(%d, [%d %d], [%d %d], [1 2], NULL, {NULL, %u}) "
-	       "= 1 (out [%d])\n",
+	printf("%s(%d, [%d %d], [%d %d], [1 2], NULL"
+	       ", {sigmask=NULL, sigsetsize=%u}) = 1 (out [%d])\n",
 	       SYSCALL_NAME, fds[1] + 1, fds[0], fds[1],
 	       fds[0], fds[1],
 	       NSIG_BYTES, fds[1]);
@@ -120,7 +120,8 @@ int main(int ac, char **av)
 	FD_ZERO(set[0]);
 	FD_SET(fds[1], set[0]);
 	assert(pselect6(-1, NULL, set[0], NULL, NULL, sigmask_arg) == -1);
-	printf("%s(-1, NULL, %p, NULL, NULL, {[HUP CHLD], %u}) = %s\n",
+	printf("%s(-1, NULL, %p, NULL, NULL"
+	       ", {sigmask=[HUP CHLD], sigsetsize=%u}) = %s\n",
 	       SYSCALL_NAME, set[0], NSIG_BYTES, errstr);
 
 	/*
@@ -133,7 +134,7 @@ int main(int ac, char **av)
 	ts->tv_nsec = 123;
 	assert(pselect6(FD_SETSIZE + 1, set[0], set[1], NULL, ts, sigmask_arg) == 0);
 	printf("%s(%d, [%d], [], NULL, {tv_sec=0, tv_nsec=123}"
-	       ", {[HUP CHLD], %u}) = 0 (Timeout)\n",
+	       ", {sigmask=[HUP CHLD], sigsetsize=%u}) = 0 (Timeout)\n",
 	       SYSCALL_NAME, FD_SETSIZE + 1, fds[0], NSIG_BYTES);
 
 	/*
@@ -142,8 +143,8 @@ int main(int ac, char **av)
 	ts->tv_sec = 0xdeadbeefU;
 	ts->tv_nsec = 0xfacefeedU;
 	assert(pselect6(0, NULL, NULL, NULL, ts, nullmask_arg) == -1);
-	printf("%s(0, NULL, NULL, NULL"
-	       ", {tv_sec=%lld, tv_nsec=%llu}, {NULL, %u}) = %s\n",
+	printf("%s(0, NULL, NULL, NULL, {tv_sec=%lld, tv_nsec=%llu}"
+	       ", {sigmask=NULL, sigsetsize=%u}) = %s\n",
 	       SYSCALL_NAME, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec),
 	       NSIG_BYTES, errstr);
@@ -151,8 +152,8 @@ int main(int ac, char **av)
 	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (typeof(ts->tv_nsec)) 0xbadc0dedfacefeedLL;
 	assert(pselect6(0, NULL, NULL, NULL, ts, nullmask_arg) == -1);
-	printf("%s(0, NULL, NULL, NULL"
-	       ", {tv_sec=%lld, tv_nsec=%llu}, {NULL, %u}) = %s\n",
+	printf("%s(0, NULL, NULL, NULL, {tv_sec=%lld, tv_nsec=%llu}"
+	       ", {sigmask=NULL, sigsetsize=%u}) = %s\n",
 	       SYSCALL_NAME, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec),
 	       NSIG_BYTES, errstr);
@@ -169,7 +170,7 @@ int main(int ac, char **av)
 	ts->tv_nsec = 222222222;
 	assert(pselect6(0, NULL, NULL, NULL, ts, sigmask_arg) == -1);
 	printf("%s(0, NULL, NULL, NULL, {tv_sec=0, tv_nsec=222222222}"
-	       ", {[HUP CHLD], %u})"
+	       ", {sigmask=[HUP CHLD], sigsetsize=%u})"
 	       " = ? ERESTARTNOHAND (To be restarted if no handler)\n",
 	       SYSCALL_NAME, NSIG_BYTES);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
