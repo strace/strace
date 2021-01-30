@@ -85,16 +85,16 @@ main(void)
 	typedef void (*atexit_func)(void);
 	atexit((atexit_func) cleanup);
 
-	printf("msgsnd\\(%d, \\{%lld, \"" text_string "\\\\0\"\\}, 14, 0\\)"
-	       " = 0\n",
+	printf("msgsnd\\(%d, \\{mtype=%lld, mtext=\"" text_string
+	       "\\\\0\"\\}, 14, 0\\) = 0\n",
 	       msqid, (long long) mtype);
 	if (msgsnd(msqid, &msg, msgsz, 0) == -1)
 		perror_msg_and_skip("msgsnd");
 
 	if (sys_msgrcv(msqid, &msg, msgsz, -mtype, 0) != msgsz)
 		perror_msg_and_skip("msgrcv");
-	printf("msgrcv\\(%d, \\{%lld, \"" text_string "\\\\0\"\\}, 14, %lld"
-	       ", 0\\) = 14\n",
+	printf("msgrcv\\(%d, \\{mtype=%lld, mtext=\"" text_string
+	       "\\\\0\"\\}, 14, %lld, 0\\) = 14\n",
 	       msqid, (long long) mtype, -(long long) mtype);
 
 	return cleanup();

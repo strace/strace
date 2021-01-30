@@ -19,6 +19,7 @@
 #include DEF_MPERS_TYPE(msgbuf_t)
 typedef struct msgbuf msgbuf_t;
 #include MPERS_DEFS
+#include "print_fields.h"
 
 MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
 		   const kernel_ulong_t addr, const kernel_ulong_t count)
@@ -26,9 +27,12 @@ MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
 	msgbuf_t msg;
 
 	if (!umove_or_printaddr(tcp, addr, &msg)) {
-		tprintf("{%" PRI_kld ", ", (kernel_long_t) msg.mtype);
+		tprint_struct_begin();
+		PRINT_FIELD_D(msg, mtype);
+		tprint_struct_next();
+		tprints_field_name("mtext");
 		printstrn(tcp, addr + sizeof(msg.mtype), count);
-		tprints("}");
+		tprint_struct_end();
 	}
 	tprintf(", %" PRI_klu ", ", count);
 }
