@@ -12,6 +12,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include "ipc_defs.h"
 
 #include SEM_H_PROVIDER
@@ -21,11 +22,15 @@
 static bool
 print_sembuf(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const struct sembuf *sb = elem_buf;
+	const struct sembuf *const sb = elem_buf;
 
-	tprintf("{%u, %d, ", sb->sem_num, sb->sem_op);
-	printflags(semop_flags, (unsigned short) sb->sem_flg, "SEM_???");
-	tprints("}");
+	tprint_struct_begin();
+	PRINT_FIELD_U(*sb, sem_num);
+	tprint_struct_next();
+	PRINT_FIELD_D(*sb, sem_op);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*sb, sem_flg, semop_flags, "SEM_???");
+	tprint_struct_end();
 
 	return true;
 }

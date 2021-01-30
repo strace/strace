@@ -94,8 +94,8 @@ main(void)
 	sem_b2->sem_flg = 0xbeef;
 
 	k_semtimedop(bogus_semid, sem_b2, 2, NULL);
-	printf("%s(%d, [{%hu, %hd, %s%s%#hx}, ... /* %p */], %u"
-	       ", NULL) = %s\n",
+	printf("%s(%d, [{sem_num=%hu, sem_op=%hd, sem_flg=%s%s%#hx}"
+	       ", ... /* %p */], %u, NULL) = %s\n",
 	       SYSCALL_NAME, bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 	       sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
 	       sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
@@ -104,12 +104,12 @@ main(void)
 
 	if (k_semtimedop(id, sem_b, 1, NULL))
 		perror_msg_and_skip(SYSCALL_NAME ", 1");
-	printf("%s(%d, [{0, 1, SEM_UNDO}], 1, NULL) = 0\n", SYSCALL_NAME, id);
+	printf("%s(%d, [{sem_num=0, sem_op=1, sem_flg=SEM_UNDO}], 1, NULL) = 0\n", SYSCALL_NAME, id);
 
 	sem_b->sem_op = -1;
 	if (k_semtimedop(id, sem_b, 1, NULL))
 		perror_msg_and_skip(SYSCALL_NAME ", -1");
-	printf("%s(%d, [{0, -1, SEM_UNDO}], 1, NULL) = 0\n", SYSCALL_NAME, id);
+	printf("%s(%d, [{sem_num=0, sem_op=-1, sem_flg=SEM_UNDO}], 1, NULL) = 0\n", SYSCALL_NAME, id);
 
 	k_semtimedop(bogus_semid, NULL, bogus_nsops, NULL);
 	printf("%s(%d, NULL, %u, NULL) = %s\n",
@@ -122,8 +122,8 @@ main(void)
 	ts->tv_sec = 1;
 	ts->tv_nsec = 123456789;
 	k_semtimedop(bogus_semid, sem_b2, 2, ts);
-	printf("%s(%d, [{%hu, %hd, %s%s%#hx}, ... /* %p */], %u"
-	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	printf("%s(%d, [{sem_num=%hu, sem_op=%hd, sem_flg=%s%s%#hx}"
+	       ", ... /* %p */], %u, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
 	       SYSCALL_NAME, bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
 	       sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
 	       sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
@@ -135,12 +135,12 @@ main(void)
 	sem_b->sem_op = 1;
 	if (k_semtimedop(id, sem_b, 1, NULL))
 		perror_msg_and_skip(SYSCALL_NAME ", 1");
-	printf("%s(%d, [{0, 1, SEM_UNDO}], 1, NULL) = 0\n", SYSCALL_NAME, id);
+	printf("%s(%d, [{sem_num=0, sem_op=1, sem_flg=SEM_UNDO}], 1, NULL) = 0\n", SYSCALL_NAME, id);
 
 	sem_b->sem_op = -1;
 	if (k_semtimedop(id, sem_b, 1, ts))
 		perror_msg_and_skip(SYSCALL_NAME ", -1");
-	printf("%s(%d, [{0, -1, SEM_UNDO}], 1"
+	printf("%s(%d, [{sem_num=0, sem_op=-1, sem_flg=SEM_UNDO}], 1"
 	       ", {tv_sec=%lld, tv_nsec=%llu}) = 0\n",
 	       SYSCALL_NAME, id,
 	       (long long) ts->tv_sec, zero_extend_signed_to_ull(ts->tv_nsec));
@@ -149,7 +149,7 @@ main(void)
 	ts->tv_sec = 0xdeadbeefU;
 	ts->tv_nsec = 0xfacefeedU;
 	k_semtimedop(id, sem_b, 1, ts);
-	printf("%s(%d, [{0, 1, SEM_UNDO}], 1"
+	printf("%s(%d, [{sem_num=0, sem_op=1, sem_flg=SEM_UNDO}], 1"
 	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
 	       SYSCALL_NAME, id, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec), errstr);
@@ -158,7 +158,7 @@ main(void)
 	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (typeof(ts->tv_nsec)) 0xbadc0dedfacefeedLL;
 	k_semtimedop(id, sem_b, 1, ts);
-	printf("%s(%d, [{0, -1, SEM_UNDO}], 1"
+	printf("%s(%d, [{sem_num=0, sem_op=-1, sem_flg=SEM_UNDO}], 1"
 	       ", {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
 	       SYSCALL_NAME, id, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec), errstr);

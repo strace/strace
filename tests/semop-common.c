@@ -69,12 +69,13 @@ main(void)
 	sem_b2->sem_flg = 0xbeef;
 
 	k_semop(bogus_semid, (uintptr_t) sem_b2, 2);
-	printf("semop(%d, [{%hu, %hd, %s%s%#hx}, ... /* %p */], %u) = %s\n",
-		bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
-		sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
-		sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
-		(short) (sem_b2->sem_flg & ~(SEM_UNDO | IPC_NOWAIT)),
-		sem_b2 + 1, 2, errstr);
+	printf("semop(%d, [{sem_num=%hu, sem_op=%hd, sem_flg=%s%s%#hx}"
+	       ", ... /* %p */], %u) = %s\n",
+	       bogus_semid, sem_b2->sem_num, sem_b2->sem_op,
+	       sem_b2->sem_flg & SEM_UNDO ? "SEM_UNDO|" : "",
+	       sem_b2->sem_flg & IPC_NOWAIT ? "IPC_NOWAIT|" : "",
+	       (short) (sem_b2->sem_flg & ~(SEM_UNDO | IPC_NOWAIT)),
+	       sem_b2 + 1, 2, errstr);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct sembuf, sem_b);
 	sem_b->sem_num = 0;
@@ -82,11 +83,13 @@ main(void)
 	sem_b->sem_flg = SEM_UNDO;
 
 	k_semop(id, (uintptr_t) sem_b, 1);
-	printf("semop(%d, [{0, 1, SEM_UNDO}], 1) = %s\n", id, errstr);
+	printf("semop(%d, [{sem_num=0, sem_op=1, sem_flg=SEM_UNDO}], 1) = %s\n",
+	       id, errstr);
 
 	sem_b->sem_op = -1;
 	k_semop(id, (uintptr_t) sem_b, 1);
-	printf("semop(%d, [{0, -1, SEM_UNDO}], 1) = %s\n", id, errstr);
+	printf("semop(%d, [{sem_num=0, sem_op=-1, sem_flg=SEM_UNDO}], 1) = %s\n",
+	       id, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
