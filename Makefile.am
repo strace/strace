@@ -246,7 +246,7 @@ libstrace_a_SOURCES =	\
 	pkeys.c		\
 	poll.c		\
 	prctl.c		\
-	print_aio_sigset.c \
+	print_kernel_sigset.c \
 	print_dev_t.c	\
 	print_fields.h	\
 	print_group_req.c \

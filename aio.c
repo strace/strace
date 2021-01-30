@@ -280,7 +280,7 @@ print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 		print_ts(tcp, tcp->u_arg[4]);
 		if (has_usig) {
 			tprints(", ");
-			print_aio_sigset(tcp, tcp->u_arg[5]);
+			print_kernel_sigset(tcp, tcp->u_arg[5]);
 		}
 		restore_cleared_syserror(tcp);
 	}

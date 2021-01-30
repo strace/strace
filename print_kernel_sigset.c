@@ -7,29 +7,29 @@
 
 #include "defs.h"
 
-#include DEF_MPERS_TYPE(strace_aio_sigset)
+#include DEF_MPERS_TYPE(struct_sigset_addr_size)
 
 typedef struct {
 	sigset_t *sigmask;
 	size_t sigsetsize;
-} strace_aio_sigset;
+} struct_sigset_addr_size;
 
 #include MPERS_DEFS
 
 #include "print_fields.h"
 
-MPERS_PRINTER_DECL(void, print_aio_sigset, struct tcb *tcp,
+MPERS_PRINTER_DECL(void, print_kernel_sigset, struct tcb *tcp,
 		   const kernel_ulong_t addr)
 {
-	strace_aio_sigset sigset;
+	struct_sigset_addr_size sas;
 
-	if (!umove_or_printaddr(tcp, addr, &sigset)) {
+	if (!umove_or_printaddr(tcp, addr, &sas)) {
 		tprint_struct_begin();
 		tprints_field_name("sigmask");
-		print_sigset_addr_len(tcp, (uintptr_t) sigset.sigmask,
-				      sigset.sigsetsize);
+		print_sigset_addr_len(tcp, (uintptr_t) sas.sigmask,
+				      sas.sigsetsize);
 		tprint_struct_next();
-		PRINT_FIELD_U(sigset, sigsetsize);
+		PRINT_FIELD_U(sas, sigsetsize);
 		tprint_struct_end();
 	}
 }
