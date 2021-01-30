@@ -118,6 +118,7 @@ print_si_code(const unsigned int si_code, const int si_signo)
 	print_xlat_ex(si_code, code, XLAT_STYLE_DEFAULT);
 }
 
+#ifdef HAVE_SIGINFO_T_SI_SYSCALL
 static void
 print_si_syscall(const unsigned int scno)
 {
@@ -143,6 +144,7 @@ print_si_syscall(const unsigned int scno)
 	else
 		tprintf("%u", scno);
 }
+#endif
 
 static void
 print_si_info(struct tcb *tcp, const siginfo_t *sip)
