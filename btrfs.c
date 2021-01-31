@@ -866,8 +866,15 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, num_devices);
 		tprint_struct_next();
 		PRINT_FIELD_UUID(args, fsid);
-		tprintf(", nodesize=%u, sectorsize=%u, clone_alignment=%u",
-			nodesize, sectorsize, clone_alignment);
+		tprint_struct_next();
+		tprints_field_name("nodesize");
+		tprintf("%u", nodesize);
+		tprint_struct_next();
+		tprints_field_name("sectorsize");
+		tprintf("%u", sectorsize);
+		tprint_struct_next();
+		tprints_field_name("clone_alignment");
+		tprintf("%u", clone_alignment);
 		tprint_struct_end();
 		break;
 	}

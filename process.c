@@ -215,7 +215,9 @@ SYS_FUNC(ptrace)
 					return RVAL_DECODED;
 				}
 
-				tprintf("{filter_off=%" PRIu64, filter_off);
+				tprint_struct_begin();
+				tprints_field_name("filter_off");
+				tprintf("%" PRIu64, filter_off);
 				return 0;
 			}
 

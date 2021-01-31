@@ -367,7 +367,11 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		if (u.ptr != buf)
 			tprints(", ");
-		tprintf("{cmsg_len=%" PRI_klu ", cmsg_level=", cmsg_len);
+		tprint_struct_begin();
+		tprints_field_name("cmsg_len");
+		tprintf("%" PRI_klu, cmsg_len);
+		tprint_struct_next();
+		tprints_field_name("cmsg_level");
 		printxval(socketlayers, cmsg_level, "SOL_???");
 		tprint_struct_next();
 		tprints_field_name("cmsg_type");
@@ -508,11 +512,15 @@ SYS_FUNC(recvmsg)
 	} else {
 		msg_namelen = get_tcb_priv_ulong(tcp);
 
-		if (syserror(tcp))
-			tprintf("{msg_namelen=%d}", msg_namelen);
-		else
+		if (syserror(tcp)) {
+			tprint_struct_begin();
+			tprints_field_name("msg_namelen");
+			tprintf("%d", msg_namelen);
+			tprint_struct_end();
+		} else {
 			decode_msghdr(tcp, &msg_namelen, tcp->u_arg[1],
 				      tcp->u_rval);
+		}
 	}
 
 	/* flags */

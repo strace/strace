@@ -10,6 +10,7 @@
 #include "defs.h"
 #include "netlink.h"
 #include "netlink_route.h"
+#include "print_fields.h"
 
 #include <linux/rtnetlink.h>
 
@@ -19,14 +20,15 @@ static void
 decode_family(struct tcb *const tcp, const uint8_t family,
 	      const kernel_ulong_t addr, const unsigned int len)
 {
-	tprints("{family=");
+	tprint_struct_begin();
+	tprints_field_name("family");
 	printxval(addrfams, family, "AF_???");
 	if (len > sizeof(family)) {
 		tprints(", ");
 		printstr_ex(tcp, addr + sizeof(family),
 			    len - sizeof(family), QUOTE_FORCE_HEX);
 	}
-	tprints("}");
+	tprint_struct_end();
 }
 
 typedef DECL_NETLINK_ROUTE_DECODER((*netlink_route_decoder_t));

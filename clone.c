@@ -182,7 +182,8 @@ SYS_FUNC(clone3)
 			goto out;
 		}
 
-		tprints("{flags=");
+		tprint_struct_begin();
+		tprints_field_name("flags");
 		printflags_ex(arg.flags, "CLONE_???", XLAT_STYLE_DEFAULT,
 			      clone_flags, clone3_flags, NULL);
 

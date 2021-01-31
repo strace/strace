@@ -10,6 +10,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include <fcntl.h>
 #include <sys/uio.h>
 
@@ -58,7 +59,8 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		iov = elem_buf;
 	}
 
-	tprints("{iov_base=");
+	tprint_struct_begin();
+	tprints_field_name("iov_base");
 
 	len = iov[1];
 
@@ -83,7 +85,10 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 			break;
 	}
 
-	tprintf(", iov_len=%" PRI_klu "}", iov[1]);
+	tprint_struct_next();
+	tprints_field_name("iov_len");
+	tprintf("%" PRI_klu, iov[1]);
+	tprint_struct_end();
 
 	return true;
 }

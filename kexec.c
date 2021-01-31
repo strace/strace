@@ -7,6 +7,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #include "xlat/kexec_load_flags.h"
 #include "xlat/kexec_arch_values.h"
@@ -34,11 +35,19 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 		seg = elem_buf;
 	}
 
-	tprints("{buf=");
+	tprint_struct_begin();
+	tprints_field_name("buf");
 	printaddr(seg[0]);
-	tprintf(", bufsz=%" PRI_klu ", mem=", seg[1]);
+	tprint_struct_next();
+	tprints_field_name("bufsz");
+	tprintf("%" PRI_klu, seg[1]);
+	tprint_struct_next();
+	tprints_field_name("mem");
 	printaddr(seg[2]);
-	tprintf(", memsz=%" PRI_klu "}", seg[3]);
+	tprint_struct_next();
+	tprints_field_name("memsz");
+	tprintf("%" PRI_klu, seg[3]);
+	tprint_struct_end();
 
 	return true;
 }

@@ -626,7 +626,8 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 	case offsetofend(struct sockaddr_hci, hci_dev):
 	case sizeof(struct sockaddr_hci): {
 		const struct sockaddr_hci *const hci = buf;
-		tprintf("hci_dev=htobs(%hu)", btohs(hci->hci_dev));
+		tprints_field_name("hci_dev");
+		tprintf("htobs(%hu)", btohs(hci->hci_dev));
 
 		/*
 		 * hci_channel field has been introduced

@@ -34,8 +34,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
 			if (NDIAG_PROTO_ALL == req.sdiag_protocol) {
-				tprintf("%s=%s",
-					"sdiag_protocol", "NDIAG_PROTO_ALL");
+				tprints_field_name("sdiag_protocol");
+				tprints("NDIAG_PROTO_ALL");
 			} else {
 				PRINT_FIELD_XVAL(req, sdiag_protocol,
 						 netlink_protocols,

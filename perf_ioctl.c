@@ -6,6 +6,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 #include <linux/ioctl.h>
 
@@ -30,7 +31,10 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (umove_or_printaddr(tcp, arg, &info))
 			return RVAL_IOCTL_DECODED;
 
-		tprintf("{ids_len=%u, ", info);
+		tprint_struct_begin();
+		tprints_field_name("ids_len");
+		tprintf("%u", info);
+		tprint_struct_next();
 
 		return 0;
 	}
@@ -38,18 +42,22 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (syserror(tcp) ||
 	    umove(tcp, arg + offsetof(struct perf_event_query_bpf, prog_cnt),
 		  &info)) {
-		tprints("...}");
+		tprint_more_data_follows();
+		tprint_struct_end();
 
 		return RVAL_IOCTL_DECODED;
 	}
 
-	tprintf("prog_cnt=%u, ids=", info);
+	tprints_field_name("prog_cnt");
+	tprintf("%u", info);
 
+	tprint_struct_next();
+	tprints_field_name("ids");
 	print_array(tcp, arg + offsetof(struct perf_event_query_bpf, ids), info,
 		    &info, sizeof(info),
 		    tfetch_mem, print_uint32_array_member, NULL);
 
-	tprints("}");
+	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
 }

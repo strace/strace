@@ -238,7 +238,9 @@ print_gpio_v2_line_attribute_raw(const struct_gpio_v2_line_attribute *attr,
 		tprint_struct_next();
 		PRINT_FIELD_X(*attr, padding);
 	}
-	tprintf(", data=%#" PRIx64, attr->values);
+	tprint_struct_next();
+	tprints_field_name("data");
+	tprintf("%#" PRIx64, attr->values);
 	if (as_field)
 		tprint_struct_end();
 }

@@ -107,9 +107,15 @@ tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data
 	case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INPUT:
 	case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT:
 	case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT:
-		tprintf(", shm_offs=%#llx", (unsigned long long) param->a);
-		tprintf(", size=%#llx", (unsigned long long) param->b);
-		tprintf(", shm_id=%llu", (unsigned long long) param->c);
+		tprint_struct_next();
+		tprints_field_name("shm_offs");
+		tprintf("%#llx", (unsigned long long) param->a);
+		tprint_struct_next();
+		tprints_field_name("size");
+		tprintf("%#llx", (unsigned long long) param->b);
+		tprint_struct_next();
+		tprints_field_name("shm_id");
+		tprintf("%llu", (unsigned long long) param->c);
 		break;
 
 	case TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT:
