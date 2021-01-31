@@ -76,7 +76,7 @@ print_inet_addr(const int af,
 	case AF_INET:
 		if (inet_ntop(af, addr, buf, sizeof(buf))) {
 			if (var_name)
-				tprintf("%s=", var_name);
+				tprints_field_name(var_name);
 
 			if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 				print_quoted_string((const char*) addr,
@@ -100,7 +100,7 @@ print_inet_addr(const int af,
 		if (inet_ntop(af, addr, buf, sizeof(buf))) {
 			if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
 				if (var_name)
-					tprintf("%s=", var_name);
+					tprints_field_name(var_name);
 				print_quoted_string(addr, len, QUOTE_FORCE_HEX);
 			}
 
@@ -127,7 +127,7 @@ print_inet_addr(const int af,
 	}
 
 	if (var_name)
-		tprintf("%s=", var_name);
+		tprints_field_name(var_name);
 	print_quoted_string(addr, len, QUOTE_FORCE_HEX);
 	return false;
 }
@@ -156,14 +156,14 @@ decode_inet_addr(struct tcb *const tcp,
 
 	if (!size || len < size) {
 		if (var_name)
-			tprintf("%s=", var_name);
+			tprints_field_name(var_name);
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return false;
 	}
 
 	if (umoven(tcp, addr, size, &addrbuf) < 0) {
 		if (var_name)
-			tprintf("%s=", var_name);
+			tprints_field_name(var_name);
 		printaddr(addr);
 		return false;
 	}
