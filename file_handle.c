@@ -61,8 +61,10 @@ SYS_FUNC(name_to_handle_at)
 		    && !umove(tcp, addr, &h)) {
 			unsigned char f_handle[MAX_HANDLE_SZ];
 
-			if (i != h.handle_bytes)
-				tprintf(" => %u", h.handle_bytes);
+			if (i != h.handle_bytes) {
+				tprint_value_changed();
+				tprintf("%u", h.handle_bytes);
+			}
 			if (!syserror(tcp)) {
 				tprint_struct_next();
 				PRINT_FIELD_D(h, handle_type);

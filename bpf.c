@@ -693,8 +693,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("jited_prog_len");
-	if (saved->jited_prog_len != info.jited_prog_len)
-		tprintf("%" PRIu32 " => ", saved->jited_prog_len);
+	if (saved->jited_prog_len != info.jited_prog_len) {
+		tprintf("%" PRIu32, saved->jited_prog_len);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.jited_prog_len);
 
 	tprint_struct_next();
@@ -705,8 +707,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("xlated_prog_len");
-	if (saved->xlated_prog_len != info.xlated_prog_len)
-		tprintf("%" PRIu32 " => ", saved->xlated_prog_len);
+	if (saved->xlated_prog_len != info.xlated_prog_len) {
+		tprintf("%" PRIu32, saved->xlated_prog_len);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.xlated_prog_len);
 
 	tprint_struct_next();
@@ -727,8 +731,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("nr_map_ids");
-	if (saved->nr_map_ids != info.nr_map_ids)
-		tprintf("%" PRIu32 " => ", saved->nr_map_ids);
+	if (saved->nr_map_ids != info.nr_map_ids) {
+		tprintf("%" PRIu32, saved->nr_map_ids);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_map_ids);
 
 	tprint_struct_next();
@@ -767,14 +773,18 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("nr_jited_ksyms");
-	if (saved->nr_jited_ksyms != info.nr_jited_ksyms)
-		tprintf("%" PRIu32 " => ", saved->nr_jited_ksyms);
+	if (saved->nr_jited_ksyms != info.nr_jited_ksyms) {
+		tprintf("%" PRIu32, saved->nr_jited_ksyms);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_jited_ksyms);
 
 	tprint_struct_next();
 	tprints_field_name("nr_jited_func_lens");
-	if (saved->nr_jited_func_lens != info.nr_jited_func_lens)
-		tprintf("%" PRIu32 " => ", saved->nr_jited_func_lens);
+	if (saved->nr_jited_func_lens != info.nr_jited_func_lens) {
+		tprintf("%" PRIu32, saved->nr_jited_func_lens);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_jited_func_lens);
 
 	tprint_struct_next();
@@ -808,8 +818,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("func_info_rec_size");
-	if (saved->func_info_rec_size != info.func_info_rec_size)
-		tprintf("%" PRIu32 " => ", saved->func_info_rec_size);
+	if (saved->func_info_rec_size != info.func_info_rec_size) {
+		tprintf("%" PRIu32, saved->func_info_rec_size);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.func_info_rec_size);
 
 	tprint_struct_next();
@@ -817,14 +829,18 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("nr_func_info");
-	if (saved->nr_func_info != info.nr_func_info)
-		tprintf("%" PRIu32 " => ", saved->nr_func_info);
+	if (saved->nr_func_info != info.nr_func_info) {
+		tprintf("%" PRIu32, saved->nr_func_info);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_func_info);
 
 	tprint_struct_next();
 	tprints_field_name("nr_line_info");
-	if (saved->nr_line_info != info.nr_line_info)
-		tprintf("%" PRIu32 " => ", saved->nr_line_info);
+	if (saved->nr_line_info != info.nr_line_info) {
+		tprintf("%" PRIu32, saved->nr_line_info);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_line_info);
 
 	tprint_struct_next();
@@ -840,26 +856,34 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 
 	tprint_struct_next();
 	tprints_field_name("nr_jited_line_info");
-	if (saved->nr_jited_line_info != info.nr_jited_line_info)
-		tprintf("%" PRIu32 " => ", saved->nr_jited_line_info);
+	if (saved->nr_jited_line_info != info.nr_jited_line_info) {
+		tprintf("%" PRIu32, saved->nr_jited_line_info);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_jited_line_info);
 
 	tprint_struct_next();
 	tprints_field_name("line_info_rec_size");
-	if (saved->line_info_rec_size != info.line_info_rec_size)
-		tprintf("%" PRIu32 " => ", saved->line_info_rec_size);
+	if (saved->line_info_rec_size != info.line_info_rec_size) {
+		tprintf("%" PRIu32, saved->line_info_rec_size);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.line_info_rec_size);
 
 	tprint_struct_next();
 	tprints_field_name("jited_line_info_rec_size");
-	if (saved->jited_line_info_rec_size != info.jited_line_info_rec_size)
-		tprintf("%" PRIu32 " => ", saved->jited_line_info_rec_size);
+	if (saved->jited_line_info_rec_size != info.jited_line_info_rec_size) {
+		tprintf("%" PRIu32, saved->jited_line_info_rec_size);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.jited_line_info_rec_size);
 
 	tprint_struct_next();
 	tprints_field_name("nr_prog_tags");
-	if (saved->nr_prog_tags != info.nr_prog_tags)
-		tprintf("%" PRIu32 " => ", saved->nr_prog_tags);
+	if (saved->nr_prog_tags != info.nr_prog_tags) {
+		tprintf("%" PRIu32, saved->nr_prog_tags);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, info.nr_prog_tags);
 
 	tprint_struct_next();
@@ -969,8 +993,10 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 	} else {
 		saved = get_tcb_priv_data(tcp);
 
-		if (saved && (saved->info_len != attr.info_len))
-			tprintf(" => %u", attr.info_len);
+		if (saved && (saved->info_len != attr.info_len)) {
+			tprint_value_changed();
+			tprintf("%u", attr.info_len);
+		}
 
 		tprint_struct_next();
 		tprints_field_name("info");
@@ -1020,8 +1046,10 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 	tprint_struct_next();
 	tprints_field_name("prog_cnt");
 	const uint32_t prog_cnt_entering = get_tcb_priv_ulong(tcp);
-	if (prog_cnt_entering != attr.prog_cnt)
-		tprintf("%" PRIu32 " => ", prog_cnt_entering);
+	if (prog_cnt_entering != attr.prog_cnt) {
+		tprintf("%" PRIu32, prog_cnt_entering);
+		tprint_value_changed();
+	}
 	tprintf("%" PRIu32, attr.prog_cnt);
 	tprint_struct_end();
 }
@@ -1090,8 +1118,10 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 
 	unsigned int saved_buf_len = get_tcb_priv_ulong(tcp);
 
-	if (saved_buf_len != attr.buf_len)
-		tprintf(" => %u", attr.buf_len);
+	if (saved_buf_len != attr.buf_len) {
+		tprint_value_changed();
+		tprintf("%u", attr.buf_len);
+	}
 
 	const unsigned int buf_len = MIN(saved_buf_len, attr.buf_len);
 	tprint_struct_next();

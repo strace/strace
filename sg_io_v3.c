@@ -123,18 +123,20 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV ||
 	    sg_io.dxfer_direction == SG_DXFER_TO_FROM_DEV) {
 		uint32_t din_len = sg_io.dxfer_len;
-		const char *prefix = NULL;
+		bool print_buffer = false;
 
 		if (sg_io.resid > 0 && (unsigned int) sg_io.resid <= din_len)
 			din_len -= sg_io.resid;
 
-		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV)
-			prefix = ", ";
-		else if (din_len)
-			prefix = " => ";
+		if (sg_io.dxfer_direction == SG_DXFER_FROM_DEV) {
+			tprint_struct_next();
+			print_buffer = true;
+		} else if (din_len) {
+			tprint_value_changed();
+			print_buffer = true;
+		}
 
-		if (prefix) {
-			tprints(prefix);
+		if (print_buffer) {
 			PRINT_FIELD_SG_IO_BUFFER(sg_io, dxferp, din_len,
 						 sg_io.iovec_count, tcp);
 		}

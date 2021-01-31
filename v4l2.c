@@ -553,8 +553,10 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 		return 0;
 	}
 
-	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs))
-		tprintf(" => %u", reqbufs.count);
+	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs)) {
+		tprint_value_changed();
+		tprintf("%u", reqbufs.count);
+	}
 
 	tprint_struct_end();
 
@@ -945,7 +947,8 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprint_struct_next();
 			PRINT_FIELD_D(c, value);
 		} else {
-			tprintf(" => %d", c.value);
+			tprint_value_changed();
+			tprintf("%d", c.value);
 		}
 	}
 

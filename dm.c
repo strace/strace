@@ -523,12 +523,18 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	if (exiting(tcp) && syserror(tcp) && !ioc_changed)
 		return RVAL_IOCTL_DECODED;
 
+	if (entering(tcp))
+		tprints(", ");
+	else
+		tprint_value_changed();
+
+	tprint_struct_begin();
 	/*
 	 * device mapper code uses %d in some places and %u in another, but
 	 * fields themselves are declared as __u32.
 	 */
-	tprintf("%s{version=%u.%u.%u",  entering(tcp) ? ", " : " => ",
-		ioc->version[0], ioc->version[1], ioc->version[2]);
+	tprints_field_name("version");
+	tprintf("%u.%u.%u", ioc->version[0], ioc->version[1], ioc->version[2]);
 	/*
 	 * if we use a different version of ABI, do not attempt to decode
 	 * ioctl fields

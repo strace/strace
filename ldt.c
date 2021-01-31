@@ -81,10 +81,11 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 		if (filter == USER_DESC_EXITING) {
 			if (entry_number) {
 				if (*entry_number != desc.entry_number) {
+					tprint_value_changed();
 					if ((int) desc.entry_number == -1)
-						tprints(" => -1");
+						tprints("-1");
 					else
-						tprintf(" => %u",
+						tprintf("%u",
 							desc.entry_number);
 				}
 			} else {

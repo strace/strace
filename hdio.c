@@ -80,7 +80,10 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 	if ((syserror(tcp) && tcp->u_error != EIO) || umove(tcp, arg, &c))
 		return RVAL_IOCTL_DECODED;
 
-	tprintf(" => {/* status */ %#x, /* error */ %u, /* nsector */ %u",
+	tprint_value_changed();
+	tprint_struct_begin();
+
+	tprintf("/* status */ %#x, /* error */ %u, /* nsector */ %u",
 		c.command, c.sector_number, c.feature);
 
 	if (c.sector_count) {

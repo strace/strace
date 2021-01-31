@@ -7,6 +7,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 
 SYS_FUNC(sendfile64)
 {
@@ -21,7 +22,7 @@ SYS_FUNC(sendfile64)
 		}
 	} else {
 		if (!syserror(tcp) && tcp->u_rval) {
-			tprints(" => ");
+			tprint_value_changed();
 			printnum_int64(tcp, tcp->u_arg[2], "%" PRIu64);
 		}
 		tprintf(", %" PRI_klu, tcp->u_arg[3]);
@@ -44,7 +45,7 @@ SYS_FUNC(sendfile)
 		}
 	} else {
 		if (!syserror(tcp) && tcp->u_rval) {
-			tprints(" => ");
+			tprint_value_changed();
 			printnum_ulong(tcp, tcp->u_arg[2]);
 		}
 		tprintf(", %" PRI_klu, tcp->u_arg[3]);
