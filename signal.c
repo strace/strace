@@ -266,7 +266,10 @@ print_sigset_addr_len(struct tcb *const tcp, const kernel_ulong_t addr,
 void
 print_sigset_addr(struct tcb *const tcp, const kernel_ulong_t addr)
 {
+	tprint_struct_begin();
+	tprints_field_name("mask");
 	print_sigset_addr_len_limit(tcp, addr, NSIG_BYTES, NSIG_BYTES);
+	tprint_struct_end();
 }
 
 SYS_FUNC(ssetmask)

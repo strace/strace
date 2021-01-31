@@ -25,9 +25,7 @@ SYS_FUNC(rt_sigreturn)
 	if (sf_addr) {
 		const kernel_ulong_t sm_addr =
 			sf_addr + OFFSETOF_SIGMASK_IN_RT_SIGFRAME;
-		tprints("{mask=");
 		print_sigset_addr(tcp, sm_addr);
-		tprints("}");
 	}
 
 	return RVAL_DECODED;

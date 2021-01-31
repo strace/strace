@@ -16,7 +16,5 @@ arch_sigreturn(struct tcb *tcp)
 #define SIGFRAME_UC_OFFSET C_ABI_SAVE_AREA_SIZE + sizeof(siginfo_t)
 	addr += SIGFRAME_UC_OFFSET + offsetof(ucontext_t, uc_sigmask);
 
-	tprints("{mask=");
 	print_sigset_addr(tcp, addr);
-	tprints("}");
 }

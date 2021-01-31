@@ -19,8 +19,6 @@ arch_sigreturn(struct tcb *tcp)
 	 */
 	addr += 6 * 4 + sizeof(struct sigcontext);
 
-	tprints("{mask=");
 	print_sigset_addr(tcp, addr);
-	tprints("}");
 #endif
 }
