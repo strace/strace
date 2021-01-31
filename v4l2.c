@@ -428,40 +428,40 @@ DECL_print_v4l2_format_fmt(meta)
 	} while (0)
 
 static bool
-print_v4l2_format_fmt(struct tcb *const tcp, const char *const prefix,
+print_v4l2_format_fmt(struct tcb *const tcp, void (*const prefix_fun)(void),
 		      const struct_v4l2_format *const f)
 {
 	bool ret = true;
 	switch (f->type) {
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, pix, tcp, ret);
 		break;
 
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, pix_mp, tcp, ret);
 		break;
 
 	/* OUTPUT_OVERLAY since Linux v2.6.22-rc1~1118^2~179 */
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, win, tcp, ret);
 		break;
 
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, vbi, tcp, ret);
 		break;
 
 	/* both since Linux v2.6.14-rc2~64 */
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, sliced, tcp, ret);
 		break;
 
@@ -469,20 +469,28 @@ print_v4l2_format_fmt(struct tcb *const tcp, const char *const prefix,
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
 	/* since Linux v3.15-rc1~85^2~213 */
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, sdr, tcp, ret);
 		break;
 	/* since Linux v5.0-rc1~181^2~21 */
 	case V4L2_BUF_TYPE_META_OUTPUT:
 	/* since Linux v4.12-rc1~85^2~71 */
 	case V4L2_BUF_TYPE_META_CAPTURE:
-		tprints(prefix);
+		prefix_fun();
 		PRINT_FIELD_V4L2_FORMAT_FMT(*f, fmt, meta, tcp, ret);
 		break;
 	default:
 		return false;
 	}
 	return ret;
+}
+
+static void
+tprint_struct_end_value_changed_struct_begin(void)
+{
+	tprint_struct_end();
+	tprint_value_changed();
+	tprint_struct_begin();
 }
 
 static int
@@ -500,7 +508,7 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 				 "V4L2_BUF_TYPE_???");
 		if (is_get)
 			return 0;
-		if (!print_v4l2_format_fmt(tcp, ", ", &f)) {
+		if (!print_v4l2_format_fmt(tcp, tprint_struct_next, &f)) {
 			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
@@ -508,8 +516,12 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 		return 0;
 	}
 
-	if (!syserror(tcp) && !umove(tcp, arg, &f))
-		print_v4l2_format_fmt(tcp, is_get ? ", " : "} => {", &f);
+	if (!syserror(tcp) && !umove(tcp, arg, &f)) {
+		void (*const prefix_fun)(void) =
+			is_get ? tprint_struct_next :
+			tprint_struct_end_value_changed_struct_begin;
+		print_v4l2_format_fmt(tcp, prefix_fun, &f);
+	}
 
 	tprint_struct_end();
 
@@ -1407,7 +1419,8 @@ print_v4l2_create_buffers_format(const typeof_field(struct_v4l2_create_buffers, 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(*p, type, v4l2_buf_types,
 			 "V4L2_BUF_TYPE_???");
-	print_v4l2_format_fmt(tcp, ", ", (const struct_v4l2_format *) p);
+	print_v4l2_format_fmt(tcp, tprint_struct_next,
+			      (const struct_v4l2_format *) p);
 	tprint_struct_end();
 }
 
