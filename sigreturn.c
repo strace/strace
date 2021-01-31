@@ -6,6 +6,7 @@
  */
 
 #include "defs.h"
+#include "print_fields.h"
 #include "ptrace.h"
 #include "nsig.h"
 #include "regs.h"
@@ -13,6 +14,18 @@
 #if defined HAVE_ASM_SIGCONTEXT_H && !defined HAVE_STRUCT_SIGCONTEXT
 # include <asm/sigcontext.h>
 #endif
+
+static inline void
+print_sigmask_addr_size(const void *const addr, const unsigned int size)
+{
+	tprint_struct_begin();
+	tprints_field_name("mask");
+	tprints(sprintsigmask_n("", addr, size));
+	tprint_struct_end();
+}
+
+#define tprintsigmask_addr(mask_) \
+	print_sigmask_addr_size((mask_), sizeof(mask_))
 
 #include "arch_sigreturn.c"
 

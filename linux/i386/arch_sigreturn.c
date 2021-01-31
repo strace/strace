@@ -25,7 +25,6 @@ arch_sigreturn(struct tcb *tcp)
 	if (get_stack_pointer(tcp, &sp) &&
 	    !umove_or_printaddr(tcp, sp, &frame)) {
 		uint32_t mask[2] = { frame.oldmask, frame.extramask };
-		tprintsigmask_addr("{mask=", mask);
-		tprints("}");
+		tprintsigmask_addr(mask);
 	}
 }

@@ -25,6 +25,5 @@ arch_sigreturn(struct tcb *tcp)
 	if (umoven_or_printaddr(tcp, addr, sizeof(mask) - sizeof(long), &mask[1]))
 		return;
 
-	tprintsigmask_addr("{mask=", mask);
-	tprints("}");
+	tprintsigmask_addr(mask);
 }

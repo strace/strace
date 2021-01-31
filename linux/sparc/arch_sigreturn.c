@@ -34,8 +34,7 @@ arch_sigreturn(struct tcb *tcp)
 
 		mask[0] = frame.mask;
 		memcpy(mask + 1, frame.extramask, sizeof(frame.extramask));
-		tprintsigmask_addr("{mask=", mask);
-		tprints("}");
+		tprintsigmask_addr(mask);
 	}
 }
 

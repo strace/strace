@@ -1158,8 +1158,6 @@ extern void
 print_sigset_addr(struct tcb *, kernel_ulong_t addr);
 
 extern const char *sprintsigmask_n(const char *, const void *, unsigned int);
-# define tprintsigmask_addr(prefix, mask) \
-	tprints(sprintsigmask_n((prefix), (mask), sizeof(mask)))
 extern void printsignal(int);
 
 extern void

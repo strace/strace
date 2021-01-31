@@ -23,7 +23,6 @@ arch_sigreturn(struct tcb *tcp)
 
 	PTR_TYPE mask[NSIG_BYTES / sizeof(PTR_TYPE)];
 	if (!umove_or_printaddr(tcp, addr, &mask)) {
-		tprintsigmask_addr("{mask=", mask);
-		tprints("}");
+		tprintsigmask_addr(mask);
 	}
 }

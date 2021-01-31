@@ -36,7 +36,6 @@ arch_sigreturn(struct tcb *tcp)
 			sc._unused[3]
 		};
 
-		tprintsigmask_addr("{mask=", mask);
-		tprints("}");
+		tprintsigmask_addr(mask);
 	}
 }
