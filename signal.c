@@ -201,8 +201,8 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 #define sprintsigmask_val(prefix, mask) \
 	sprintsigmask_n((prefix), &(mask), sizeof(mask))
 
-#define tprintsigmask_val(prefix, mask) \
-	tprints(sprintsigmask_n((prefix), &(mask), sizeof(mask)))
+#define tprintsigmask_val(mask) \
+	tprints(sprintsigmask_n("", &(mask), sizeof(mask)))
 
 static const char *
 sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
@@ -416,7 +416,8 @@ SYS_FUNC(osf_sigprocmask)
 {
 	if (entering(tcp)) {
 		printxval(sigprocmaskcmds, tcp->u_arg[0], "SIG_???");
-		tprintsigmask_val(", ", tcp->u_arg[1]);
+		tprints(", ");
+		tprintsigmask_val(tcp->u_arg[1]);
 	} else if (!syserror(tcp)) {
 		tcp->auxstr = sprintsigmask_val("old mask ", tcp->u_rval);
 		return RVAL_HEX | RVAL_STR;
@@ -567,7 +568,7 @@ decode_new_sigaction(struct tcb *const tcp, const kernel_ulong_t addr)
 	 */
 	tprint_struct_next();
 	tprints_field_name("sa_mask");
-	tprintsigmask_val("", sa.sa_mask);
+	tprintsigmask_val(sa.sa_mask);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(sa, sa_flags, sigact_flags, "SA_???");
 #if HAVE_SA_RESTORER && defined SA_RESTORER
