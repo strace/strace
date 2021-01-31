@@ -393,17 +393,13 @@ print_sockaddr_data_ipx(struct tcb *tcp, const void *const buf,
 			const int addrlen)
 {
 	const struct sockaddr_ipx *const sa_ipx = buf;
-	unsigned int i;
 
 	PRINT_FIELD_NET_PORT(*sa_ipx, sipx_port);
-	tprintf(", sipx_network=htonl(%#08x)"
-		", sipx_node=[",
-		ntohl(sa_ipx->sipx_network));
-	for (i = 0; i < IPX_NODE_LEN; ++i) {
-		tprintf("%s%#02x", i ? ", " : "",
-			sa_ipx->sipx_node[i]);
-	}
-	tprint_array_end();
+	tprint_struct_next();
+	tprints_field_name("sipx_network");
+	tprintf("htonl(%#08x)", ntohl(sa_ipx->sipx_network));
+	tprint_struct_next();
+	PRINT_FIELD_UINT_ARRAY(*sa_ipx, sipx_node, "%#02llx");
 	tprint_struct_next();
 	PRINT_FIELD_0X(*sa_ipx, sipx_type);
 }
