@@ -144,7 +144,7 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 	PRINT_FIELD_FLAGS(how, resolve, open_resolve_flags, "RESOLVE_???");
 
 	if (size > sizeof(how)) {
-		print_nonzero_bytes(tcp, ", ", addr, sizeof(how),
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(how),
 				    MIN(size, get_pagesize()), QUOTE_FORCE_HEX);
 	}
 

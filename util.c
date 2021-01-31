@@ -1033,7 +1033,8 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 }
 
 bool
-print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+print_nonzero_bytes(struct tcb *const tcp,
+		    void (*const prefix_fun)(void),
 		    const kernel_ulong_t start_addr,
 		    const unsigned int start_offs,
 		    const unsigned int total_len,
@@ -1051,18 +1052,20 @@ print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
 	if (!str) {
 		error_func_msg("memory exhausted when tried to allocate"
                                " %u bytes", len);
-		tprintf("%s???", prefix);
+		prefix_fun();
+		tprints("???");
 		return true;
 	}
 
 	bool ret = true;
 
 	if (umoven(tcp, addr, len, str)) {
-		tprintf("%s???", prefix);
+		prefix_fun();
+		tprints("???");
 	} else if (is_filled(str, 0, len)) {
 		ret = false;
 	} else {
-		tprints(prefix);
+		prefix_fun();
 		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
 
 		print_quoted_string(str, size, style);

@@ -155,6 +155,13 @@ struct strace_clone_args {
 	uint64_t cgroup;
 };
 
+static void
+tprint_value_changed_struct_begin(void)
+{
+	tprint_value_changed();
+	tprint_struct_begin();
+}
+
 SYS_FUNC(clone3)
 {
 	static const size_t minsz = offsetofend(struct strace_clone_args, tls);
@@ -240,7 +247,8 @@ SYS_FUNC(clone3)
 		}
 
 		if (size > fetch_size)
-			print_nonzero_bytes(tcp, ", ", addr, fetch_size,
+			print_nonzero_bytes(tcp, tprint_struct_next,
+					    addr, fetch_size,
 					    MIN(size, get_pagesize()),
 					    QUOTE_FORCE_HEX);
 
@@ -264,19 +272,20 @@ SYS_FUNC(clone3)
 		goto out;
 	}
 
-	static const char initial_pfx[] = " => {";
-	const char *pfx = initial_pfx;
+	void (*prefix_fun)(void) = tprint_value_changed_struct_begin;
 
 	if (arg.flags & CLONE_PIDFD) {
-		tprintf("%spidfd=", pfx);
+		prefix_fun();
+		prefix_fun = tprint_struct_next;
+		tprints_field_name("pidfd");
 		printnum_fd(tcp, arg.pidfd);
-		pfx = ", ";
 	}
 
 	if (arg.flags & CLONE_PARENT_SETTID) {
-		tprintf("%sparent_tid=", pfx);
+		prefix_fun();
+		prefix_fun = tprint_struct_next;
+		tprints_field_name("parent_tid");
 		printnum_pid(tcp, arg.parent_tid, PT_TID);
-		pfx = ", ";
 	}
 
 	if (size > fetch_size) {
@@ -286,13 +295,14 @@ SYS_FUNC(clone3)
 		 *       to avoid double-printing, but it would also require yet
 		 *       another complication of print_nonzero_bytes interface.
 		 */
-		if (print_nonzero_bytes(tcp, pfx, addr, fetch_size,
+		if (print_nonzero_bytes(tcp, prefix_fun, addr, fetch_size,
 					MIN(size, get_pagesize()),
-					QUOTE_FORCE_HEX))
-			pfx = ", ";
+					QUOTE_FORCE_HEX)) {
+			prefix_fun = tprint_struct_next;
+		}
 	}
 
-	if (pfx != initial_pfx)
+	if (prefix_fun != tprint_value_changed_struct_begin)
 		tprint_struct_end();
 
 out:

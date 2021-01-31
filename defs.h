@@ -1077,7 +1077,7 @@ printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
  * memory, it accepts a combination of start_addr/start_offs/total_len and does
  * the relevant calculations itself.
  *
- * @param prefix     A string printed in cases something is going to be printed.
+ * @param prefix_fun A function called before something is going to be printed.
  * @param start_addr Address of the beginning of a structure (whose tail
  *                   is supposedly to be printed) in tracee's memory.
  * @param start_offs Offset from the beginning of the structure where the tail
@@ -1090,7 +1090,8 @@ printstr_ex(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len,
  * @param style      Passed to string_quote as "style" parameter.
  * @return           Returns true is anything was printed, false otherwise.
  */
-extern bool print_nonzero_bytes(struct tcb *const tcp, const char *prefix,
+extern bool print_nonzero_bytes(struct tcb *const tcp,
+				void (*prefix_fun)(void),
 				const kernel_ulong_t start_addr,
 				const unsigned int start_offs,
 				const unsigned int total_len,
