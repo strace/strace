@@ -11,7 +11,6 @@
 
 #include "defs.h"
 #include "flock.h"
-#include "print_fields.h"
 
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"

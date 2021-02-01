@@ -17,7 +17,6 @@ typedef kernel_old_timeval_t timeval_t;
 #include MPERS_DEFS
 
 #include "xstring.h"
-#include "print_fields.h"
 
 static const char timeval_fmt[]  = "{tv_sec=%lld, tv_usec=%llu}";
 

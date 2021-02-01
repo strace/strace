@@ -6,7 +6,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "statfs.h"
 #include "xlat/fsmagic.h"
 #include "xlat/statfs_flags.h"

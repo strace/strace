@@ -12,7 +12,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "ipc_defs.h"
 
 #include SEM_H_PROVIDER

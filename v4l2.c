@@ -78,7 +78,6 @@ CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
 #include "print_utils.h"
 #include "xstring.h"
 

@@ -9,7 +9,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 /* these constants are the same as in <linux/capability.h> */
 enum {

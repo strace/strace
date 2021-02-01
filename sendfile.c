@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 SYS_FUNC(sendfile64)
 {

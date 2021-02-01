@@ -10,7 +10,6 @@
 #include "defs.h"
 #include "netlink.h"
 #include "netlink_route.h"
-#include "print_fields.h"
 
 #include <linux/rtnetlink.h>
 

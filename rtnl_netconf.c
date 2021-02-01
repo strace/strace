@@ -13,7 +13,6 @@
 
 # include "netlink_route.h"
 # include "nlattr.h"
-# include "print_fields.h"
 
 # include <linux/netconf.h>
 # include "netlink.h"

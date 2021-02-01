@@ -11,7 +11,6 @@
 
 #include "netlink_route.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include "netlink.h"
 #include "types/fib_rules.h"

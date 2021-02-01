@@ -13,8 +13,6 @@
 #include <sched.h>
 #include "sched_attr.h"
 
-#include "print_fields.h"
-
 #include "xlat/schedulers.h"
 #include "xlat/sched_flags.h"
 

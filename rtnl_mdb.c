@@ -11,7 +11,6 @@
 
 #include "netlink_route.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include "types/rtnl_mdb.h"
 #include "netlink.h"

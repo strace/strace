@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "xlat/kcmp_types.h"
 
 struct strace_kcmp_epoll_slot {

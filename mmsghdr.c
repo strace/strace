@@ -12,7 +12,6 @@
 #include "defs.h"
 #include "msghdr.h"
 #include "xstring.h"
-#include "print_fields.h"
 #include <limits.h>
 
 static bool

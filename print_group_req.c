@@ -19,8 +19,6 @@ typedef struct group_req struct_group_req;
 
 #ifdef MCAST_JOIN_GROUP
 
-# include "print_fields.h"
-
 MPERS_PRINTER_DECL(void, print_group_req, struct tcb *const tcp,
 		   const kernel_ulong_t addr, const int len)
 {

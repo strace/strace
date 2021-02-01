@@ -17,8 +17,6 @@ typedef struct hd_geometry struct_hd_geometry;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 #include "xlat/hdio_drive_cmds.h"
 
 static int

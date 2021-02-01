@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #include "types/io_uring.h"
 

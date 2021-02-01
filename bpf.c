@@ -8,7 +8,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #ifdef HAVE_LINUX_BPF_H
 # include <linux/bpf.h>

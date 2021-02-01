@@ -12,7 +12,6 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/timex.h>
-#include "print_fields.h"
 
 #if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_OLD_TIME64_SYSCALLS
 static void

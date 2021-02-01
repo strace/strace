@@ -10,7 +10,6 @@
 
 #include "netlink.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include "types/cryptouser.h"
 

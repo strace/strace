@@ -10,7 +10,6 @@
 #include "defs.h"
 #include <poll.h>
 #include "xstring.h"
-#include "print_fields.h"
 
 #include "xlat/pollflags.h"
 

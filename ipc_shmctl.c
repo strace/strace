@@ -26,7 +26,6 @@ typedef struct NAME_OF_STRUCT_SHMINFO struct_shm_ipc_info_t;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
 #include "xlat/shmctl_flags.h"
 
 #define key NAME_OF_STRUCT_IPC_PERM_KEY

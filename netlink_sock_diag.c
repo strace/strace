@@ -10,7 +10,6 @@
 #include "defs.h"
 #include "netlink.h"
 #include "netlink_sock_diag.h"
-#include "print_fields.h"
 
 #define XLAT_MACROS_ONLY
 #include "xlat/addrfams.h"

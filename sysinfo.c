@@ -18,7 +18,6 @@
 #include <sys/sysinfo.h>
 typedef struct sysinfo sysinfo_t;
 #include MPERS_DEFS
-#include "print_fields.h"
 
 SYS_FUNC(sysinfo)
 {

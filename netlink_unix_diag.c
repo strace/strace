@@ -11,7 +11,6 @@
 #include "netlink.h"
 #include "netlink_sock_diag.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include <linux/sock_diag.h>
 #include <linux/unix_diag.h>

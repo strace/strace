@@ -8,7 +8,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "types/fs_x.h"
 #define XLAT_MACROS_ONLY
 # include "xlat/fs_x_ioctl_cmds.h"

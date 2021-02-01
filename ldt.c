@@ -18,7 +18,6 @@
 
 # include <asm/ldt.h>
 
-# include "print_fields.h"
 # include "xstring.h"
 
 void

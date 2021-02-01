@@ -9,8 +9,6 @@
 
 #ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 
-# include "print_fields.h"
-
 # include <linux/ioctl.h>
 # include <mtd/ubi-user.h>
 

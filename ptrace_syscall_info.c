@@ -8,7 +8,6 @@
 
 #include "defs.h"
 #include "kill_save_errno.h"
-#include "print_fields.h"
 #include "ptrace.h"
 #include "ptrace_syscall_info.h"
 #include "scno.h"

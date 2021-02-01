@@ -18,7 +18,6 @@
 #include MPERS_DEFS
 
 #include <sys/resource.h>
-#include "print_fields.h"
 
 MPERS_PRINTER_DECL(void, printrusage,
 		   struct tcb *const tcp, const kernel_ulong_t addr)

@@ -11,7 +11,6 @@
 #include "defs.h"
 #include <fcntl.h>
 #include <sys/epoll.h>
-#include "print_fields.h"
 
 SYS_FUNC(epoll_create)
 {

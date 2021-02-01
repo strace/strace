@@ -21,8 +21,6 @@ typedef struct sg_req_info struct_sg_req_info;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 #ifdef HAVE_SCSI_SG_H
 
 MPERS_PRINTER_DECL(int, decode_sg_req_info,

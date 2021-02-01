@@ -24,7 +24,6 @@
 #include "ptrace.h"
 #include "ptrace_syscall_info.h"
 #include "regs.h"
-#include "print_fields.h"
 
 #include "xlat/nt_descriptor_types.h"
 #include "xlat/ptrace_cmds.h"

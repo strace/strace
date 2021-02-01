@@ -25,7 +25,6 @@ typedef kernel_ulong_t semun_ptr_t;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
 #include "xlat/semctl_flags.h"
 
 #define key NAME_OF_STRUCT_IPC_PERM_KEY

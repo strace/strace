@@ -18,8 +18,6 @@
 
 #include <asm/fcntl.h>
 
-#include "print_fields.h"
-
 #include "types/openat2.h"
 
 /* some libcs are guilty of messing up with O_ACCMODE */

@@ -15,8 +15,6 @@ typedef struct ustat struct_ustat;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 SYS_FUNC(ustat)
 {
 	if (entering(tcp))

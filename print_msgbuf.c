@@ -19,7 +19,6 @@
 #include DEF_MPERS_TYPE(msgbuf_t)
 typedef struct msgbuf msgbuf_t;
 #include MPERS_DEFS
-#include "print_fields.h"
 
 MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
 		   const kernel_ulong_t addr, const kernel_ulong_t count)

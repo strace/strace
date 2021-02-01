@@ -35,7 +35,6 @@ typedef struct btrfs_ioctl_vol_args_v2
 
 #ifdef HAVE_LINUX_BTRFS_H
 
-# include "print_fields.h"
 # include "types/btrfs.h"
 # include <linux/fs.h>
 

@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "netlink_kobject_uevent.h"
 
 #include <arpa/inet.h>

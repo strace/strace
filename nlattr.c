@@ -14,7 +14,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <linux/sock_diag.h>
-#include "print_fields.h"
 #include "static_assert.h"
 
 #include "xlat/netlink_sk_meminfo_indices.h"

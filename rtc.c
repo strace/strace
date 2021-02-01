@@ -18,8 +18,6 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 #include "xlat/rtc_vl_flags.h"
 
 #define XLAT_MACROS_ONLY

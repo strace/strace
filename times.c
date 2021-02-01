@@ -17,7 +17,6 @@
 #include <sys/times.h>
 typedef struct tms tms_t;
 #include MPERS_DEFS
-#include "print_fields.h"
 
 SYS_FUNC(times)
 {

@@ -12,7 +12,6 @@
 
 #include "bpf_filter.h"
 #include "bpf_fprog.h"
-#include "print_fields.h"
 
 #include <linux/filter.h>
 

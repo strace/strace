@@ -24,7 +24,6 @@ typedef struct sg_io_hdr struct_sg_io_hdr;
 #include "xlat/sg_io_info.h"
 
 #ifdef HAVE_SCSI_SG_H
-# include "print_fields.h"
 # include "xlat/sg_io_dxfer_direction.h"
 # include "xlat/sg_io_flags.h"
 

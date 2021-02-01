@@ -1845,4 +1845,6 @@ ilog2_32(uint32_t val)
 
 # undef ILOG2_ITER_
 
+# include "print_fields.h"
+
 #endif /* !STRACE_DEFS_H */

@@ -10,7 +10,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include <fcntl.h>
 #include <sys/uio.h>
 

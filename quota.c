@@ -11,7 +11,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "xfs_quota_stat.h"
 
 #define SUBCMDMASK  0x00ff

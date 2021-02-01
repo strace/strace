@@ -23,8 +23,6 @@ typedef struct ifreq struct_ifreq;
 #include <linux/sockios.h>
 #include <arpa/inet.h>
 
-#include "print_fields.h"
-
 #include "xlat/iffflags.h"
 
 #define XLAT_MACROS_ONLY

@@ -7,7 +7,6 @@
 
 #include "xgetdents.h"
 #include "kernel_dirent.h"
-#include "print_fields.h"
 
 #define D_NAME_LEN_MAX 256
 

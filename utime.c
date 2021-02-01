@@ -15,8 +15,6 @@ typedef struct utimbuf utimbuf_t;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 SYS_FUNC(utime)
 {
 	utimbuf_t u;

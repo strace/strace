@@ -7,7 +7,6 @@
  */
 
 #include "xstring.h"
-#include "print_fields.h"
 
 #ifndef TIMESPEC_NSEC
 # define TIMESPEC_NSEC tv_nsec

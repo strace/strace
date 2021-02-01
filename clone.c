@@ -18,8 +18,6 @@
 # define CSIGNAL 0x000000ff
 #endif
 
-#include "print_fields.h"
-
 #include "xlat/clone_flags.h"
 #include "xlat/clone3_flags.h"
 #include "xlat/setns_types.h"

@@ -22,7 +22,6 @@ typedef struct NAME_OF_STRUCT_MSQID_DS msqid_ds_t;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
 #include "xlat/msgctl_flags.h"
 
 #define key NAME_OF_STRUCT_IPC_PERM_KEY

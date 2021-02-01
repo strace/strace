@@ -13,7 +13,6 @@
 #include MPERS_DEFS
 
 #include <signal.h>
-#include "print_fields.h"
 #include "xlat/sigev_value.h"
 
 static void

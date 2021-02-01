@@ -11,8 +11,6 @@
 
 #ifdef HAVE_STRUCT_PTP_SYS_OFFSET
 
-# include "print_fields.h"
-
 # include <linux/ioctl.h>
 # include <linux/ptp_clock.h>
 

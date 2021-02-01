@@ -24,8 +24,6 @@
 
 #include "nr_prefix.c"
 
-#include "print_fields.h"
-
 #ifndef IN_MPERS
 # include "printsiginfo.h"
 #endif

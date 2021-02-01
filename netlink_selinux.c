@@ -8,7 +8,6 @@
 
 #include "defs.h"
 #include "netlink.h"
-#include "print_fields.h"
 
 #include <linux/selinux_netlink.h>
 

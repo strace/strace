@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include <fcntl.h>
 
 #include "xlat/uffd_flags.h"

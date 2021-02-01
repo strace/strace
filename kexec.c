@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #include "xlat/kexec_load_flags.h"
 #include "xlat/kexec_arch_values.h"

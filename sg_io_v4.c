@@ -10,7 +10,6 @@
 
 #ifdef HAVE_LINUX_BSG_H
 
-# include "print_fields.h"
 # include <linux/bsg.h>
 # include "xlat/bsg_protocol.h"
 # include "xlat/bsg_subprotocol.h"

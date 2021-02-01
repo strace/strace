@@ -11,7 +11,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "msghdr.h"
 #include <limits.h>
 #include <arpa/inet.h>

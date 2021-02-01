@@ -10,7 +10,6 @@
 #include "defs.h"
 #include "netlink_route.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include "netlink.h"
 #ifdef HAVE_STRUCT_GNET_STATS_BASIC

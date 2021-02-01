@@ -52,8 +52,6 @@ typedef struct blk_user_trace_setup {
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 #include "xlat/blkpg_ops.h"
 
 static void

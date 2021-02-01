@@ -11,7 +11,6 @@
 #include "defs.h"
 
 #include "perf_event_struct.h"
-#include "print_fields.h"
 
 #include "xlat/hw_breakpoint_len.h"
 #include "xlat/hw_breakpoint_type.h"

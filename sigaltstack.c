@@ -19,7 +19,6 @@
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
 #include "xlat/sigaltstack_flags.h"
 
 static void

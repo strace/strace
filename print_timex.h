@@ -9,8 +9,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "print_fields.h"
-
 static void
 PRINT_TIMEX_TIME(const typeof_field(TIMEX_T, time) *const p)
 {

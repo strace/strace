@@ -6,7 +6,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include <linux/ioctl.h>
 #include <linux/types.h>
 #include <linux/nbd.h>

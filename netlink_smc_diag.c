@@ -18,7 +18,6 @@
 #include "netlink.h"
 #include "netlink_sock_diag.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include <arpa/inet.h>
 #include <linux/smc_diag.h>

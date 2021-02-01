@@ -10,7 +10,6 @@
 
 #ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
 
-# include "print_fields.h"
 # include "nlattr.h"
 
 # include <netinet/in.h>

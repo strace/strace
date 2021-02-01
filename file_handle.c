@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #include "xlat/name_to_handle_at_flags.h"
 

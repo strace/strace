@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include "types/fs_0x94.h"
 #define XLAT_MACROS_ONLY
 # include "xlat/fs_0x94_ioctl_cmds.h"

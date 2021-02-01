@@ -10,7 +10,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #include <sys/stat.h>
 #include <sys/socket.h>

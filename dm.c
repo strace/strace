@@ -15,7 +15,6 @@
 
 #ifdef HAVE_LINUX_DM_IOCTL_H
 
-# include "print_fields.h"
 # include <linux/dm-ioctl.h>
 # include <linux/ioctl.h>
 

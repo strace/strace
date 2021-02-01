@@ -13,7 +13,6 @@
 
 #ifdef HAVE_LINUX_KVM_H
 # include <linux/kvm.h>
-# include "print_fields.h"
 # include "arch_kvm.c"
 # include "xmalloc.h"
 # include "mmap_cache.h"

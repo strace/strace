@@ -7,7 +7,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include <linux/fs.h>
 #include "types/fiemap.h"
 #include "xlat/fiemap_flags.h"

@@ -18,7 +18,6 @@
 #include MPERS_DEFS
 
 #include "xgetdents.h"
-#include "print_fields.h"
 
 #define D_NAME_LEN_MAX 256
 

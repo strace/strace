@@ -22,8 +22,6 @@ typedef struct mtd_oob_buf struct_mtd_oob_buf;
 
 #ifdef HAVE_STRUCT_MTD_WRITE_REQ
 
-# include "print_fields.h"
-
 # include "xlat/mtd_mode_options.h"
 # include "xlat/mtd_file_mode_options.h"
 # include "xlat/mtd_type_options.h"

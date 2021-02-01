@@ -8,7 +8,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #ifdef HAVE_SCSI_SG_H
 # include <scsi/sg.h>

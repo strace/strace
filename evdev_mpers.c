@@ -24,8 +24,6 @@ typedef struct ff_effect struct_ff_effect;
 
 #ifdef HAVE_LINUX_INPUT_H
 
-# include "print_fields.h"
-
 static void
 print_ff_envelope(const MPERS_PTR_ARG(struct ff_envelope *) const arg)
 {

@@ -13,7 +13,6 @@
 #include <sys/resource.h>
 
 #include "xstring.h"
-#include "print_fields.h"
 
 #include "xlat/resources.h"
 

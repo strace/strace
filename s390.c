@@ -13,8 +13,6 @@
 
 # include <sys/user.h>
 
-# include "print_fields.h"
-
 # include "xlat/s390_guarded_storage_commands.h"
 # include "xlat/s390_runtime_instr_commands.h"
 # include "xlat/s390_sthyi_function_codes.h"

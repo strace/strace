@@ -9,7 +9,6 @@
 #include "defs.h"
 
 #include "keyctl_kdf_params.h"
-#include "print_fields.h"
 
 #include "xlat/key_perms.h"
 #include "xlat/key_reqkeys.h"

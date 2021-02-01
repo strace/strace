@@ -10,7 +10,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include <linux/aio_abi.h>
 
 #include "xlat/aio_cmds.h"

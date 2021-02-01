@@ -16,8 +16,6 @@ typedef struct {
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 MPERS_PRINTER_DECL(void, print_kernel_sigset, struct tcb *tcp,
 		   const kernel_ulong_t addr)
 {

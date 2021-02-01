@@ -14,7 +14,6 @@
 
 #ifdef HAVE_LINUX_INPUT_H
 
-# include "print_fields.h"
 # include <linux/ioctl.h>
 # include "types/evdev.h"
 

@@ -14,7 +14,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 #include <sys/stat.h>
 #include "stat.h"
 

@@ -15,7 +15,6 @@
 #include "defs.h"
 #include "nsig.h"
 #include "xstring.h"
-#include "print_fields.h"
 
 /* The libc headers do not define this constant since it should only be
    used by the implementation.  So we define it here.  */

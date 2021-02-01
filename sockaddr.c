@@ -11,7 +11,6 @@
  */
 
 #include "defs.h"
-#include "print_fields.h"
 
 #include <sys/socket.h>
 #include <sys/un.h>

@@ -15,8 +15,6 @@ typedef struct loop_info struct_loop_info;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
-
 #define XLAT_MACROS_ONLY
 #include "xlat/loop_cmds.h"
 #undef XLAT_MACROS_ONLY

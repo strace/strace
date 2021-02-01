@@ -22,7 +22,6 @@ typedef struct mq_attr mq_attr_t;
 
 #include MPERS_DEFS
 
-#include "print_fields.h"
 #include "xlat/mq_attr_flags.h"
 
 MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,

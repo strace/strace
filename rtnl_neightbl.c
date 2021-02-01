@@ -10,7 +10,6 @@
 #include "defs.h"
 #include "netlink_route.h"
 #include "nlattr.h"
-#include "print_fields.h"
 
 #include "types/rtnl_neightbl.h"
 
