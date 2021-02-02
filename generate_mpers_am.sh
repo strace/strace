@@ -7,6 +7,8 @@
 
 [ "x${D:-0}" != x1 ] || set -x
 
+cd "$(dirname "$0")"
+
 list="$(sed -r -n '/^strace_SOURCES[[:space:]]*=/,/^[[:space:]]*# end of strace_SOURCES/ s/^[[:space:]]*([[:alnum:]][^.]*\.c)[[:space:]]*\\$/\1/p' Makefile.am |
 	xargs -r grep -Elx '#[[:space:]]*include[[:space:]]+MPERS_DEFS' |
 	tr '\n' ' ')"
