@@ -80,9 +80,6 @@ CFLAGS_FOR_BUILD="$RPM_OPT_FLAGS"; export CFLAGS_FOR_BUILD
 %install
 %make_install
 
-# remove unpackaged files from the buildroot
-rm -f %{buildroot}%{_bindir}/strace-graph
-
 # some say uncompressed changelog files are too big
 for f in ChangeLog ChangeLog-CVS; do
 	gzip -9n < "$f" > "$f".gz &
