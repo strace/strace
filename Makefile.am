@@ -438,7 +438,9 @@ EXTRA_DIST =				\
 	LGPL-2.1-or-later		\
 	README-configure		\
 	README-linux-ptrace		\
-	copyright-year-gen		\
+	build-aux/copyright-year-gen	\
+	build-aux/file-date-gen		\
+	build-aux/git-version-gen	\
 	debian/changelog		\
 	debian/compat			\
 	debian/control			\
@@ -454,10 +456,8 @@ EXTRA_DIST =				\
 	debian/strace64.manpages	\
 	debian/watch			\
 	disable_ptrace_request.c	\
-	file-date-gen			\
 	gen_bpf_attr_check.sh		\
 	generate_sen.sh			\
-	git-version-gen			\
 	ioctl_iocdef.c			\
 	ioctlsort.c			\
 	linux/32/ioctls_inc.h		\
@@ -1222,11 +1222,11 @@ clean-local:
 if MAINTAINER_MODE
 
 gen_changelog_start_date = 2009-07-08 20:00
-$(srcdir)/ChangeLog: $(srcdir)/gitlog-to-changelog $(srcdir)/Makefile.in \
+$(srcdir)/ChangeLog: $(srcdir)/build-aux/gitlog-to-changelog $(srcdir)/Makefile.in \
 		     $(srcdir)/.version
 	@rm -f $@.new
 	(cd $(srcdir); \
-	 ./gitlog-to-changelog --append-dot \
+	 ./build-aux/gitlog-to-changelog --append-dot \
 	   --since='$(gen_changelog_start_date)'; \
 	 echo; echo; echo 'See ChangeLog-CVS for older changes.' \
 	) > $@.new

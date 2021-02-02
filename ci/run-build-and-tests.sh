@@ -71,7 +71,7 @@ echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
 export CC_FOR_BUILD="$CC"
 
-./git-set-file-times
+./build-aux/git-set-file-times
 ./bootstrap
 ./configure --enable-maintainer-mode \
 	${DISTCHECK_CONFIGURE_FLAGS-} \

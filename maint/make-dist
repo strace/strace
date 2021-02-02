@@ -19,7 +19,7 @@ git clone -q -n -s .git "$distdir"
 cd $distdir
 git checkout -f "$id"
 
-./git-set-file-times
+./build-aux/git-set-file-times
 
 ./bootstrap
 

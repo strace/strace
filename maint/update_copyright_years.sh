@@ -24,8 +24,8 @@ LC_TIME=C; export LC_TIME
 
 # These files are only imported into strace and not changed.
 # Remove them from the list once they have been changed.
-IGNORED_FILES="git-set-file-times
-gitlog-to-changelog
+IGNORED_FILES="build-aux/git-set-file-times
+build-aux/gitlog-to-changelog
 ${ADDITIONAL_IGNORED_FILES-}"
 
 log()   { [ "$VERBOSE" -lt 1 ] || printf '%s\n' "$*"; }
