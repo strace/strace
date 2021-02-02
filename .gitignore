@@ -62,8 +62,6 @@
 /strace
 /strace-*.tar.gz
 /strace-*.tar.xz
-/strace-log-merge.1
-/strace.1
 /strace.dsc
 /strace.spec
 /sys_func.h

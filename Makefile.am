@@ -18,7 +18,7 @@ endif
 SUBDIRS = . tests $(TESTS_M32) $(TESTS_MX32)
 
 bin_PROGRAMS = strace
-man_MANS = strace.1 strace-log-merge.1
+man_MANS = doc/strace.1 doc/strace-log-merge.1
 bin_SCRIPTS = strace-log-merge
 
 OS		= linux
@@ -437,7 +437,6 @@ EXTRA_DIST =				\
 	ChangeLog-CVS			\
 	LGPL-2.1-or-later		\
 	README-configure		\
-	README-linux-ptrace		\
 	build-aux/copyright-year-gen	\
 	build-aux/file-date-gen		\
 	build-aux/git-version-gen	\
@@ -456,6 +455,7 @@ EXTRA_DIST =				\
 	debian/strace64.manpages	\
 	debian/watch			\
 	disable_ptrace_request.c	\
+	doc/README-linux-ptrace		\
 	gen_bpf_attr_check.sh		\
 	generate_sen.sh			\
 	ioctl_iocdef.c			\
@@ -1028,7 +1028,7 @@ sen.h: $(patsubst %,$(srcdir)/%,$(syscallent_files))
 dist-hook:
 	$(AM_V_GEN)echo $(VERSION) > $(distdir)/.tarball-version
 	${AM_V_GEN}echo $(COPYRIGHT_YEAR) > $(distdir)/.year
-	${AM_V_GEN}echo $(MANPAGE_DATE) > $(distdir)/.strace.1.in.date
+	${AM_V_GEN}echo $(MANPAGE_DATE) > $(distdir)/doc/.strace.1.in.date
 
 today = $(shell LC_TIME=C date -u +%Y-%m-%d)
 version_regexp = $(subst .,\.,$(VERSION))

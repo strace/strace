@@ -59,7 +59,7 @@ received by a process.
 %setup -q
 echo -n %version-%release > .tarball-version
 echo -n @COPYRIGHT_YEAR@ > .year
-echo -n @MANPAGE_DATE@ > .strace.1.in.date
+echo -n @MANPAGE_DATE@ > doc/.strace.1.in.date
 
 %build
 echo 'BEGIN OF BUILD ENVIRONMENT INFORMATION'

@@ -17,7 +17,7 @@ AC_INIT([strace],
 	[strace],
 	[https://strace.io])
 m4_define([copyright_year], st_esyscmd_s([./build-aux/copyright-year-gen .year]))
-m4_define([manpage_date], st_esyscmd_s([./build-aux/file-date-gen strace.1.in]))
+m4_define([manpage_date], st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))
 AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([strace.c])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -814,11 +814,11 @@ AX_VALGRIND_DFLT([sgcheck], [off])
 AX_VALGRIND_CHECK
 
 AC_CONFIG_FILES([Makefile
+		 debian/changelog
+		 doc/strace.1
+		 doc/strace-log-merge.1
+		 strace.spec
 		 tests/Makefile
 		 tests-m32/Makefile
-		 tests-mx32/Makefile
-		 strace.1
-		 strace-log-merge.1
-		 strace.spec
-		 debian/changelog])
+		 tests-mx32/Makefile])
 AC_OUTPUT

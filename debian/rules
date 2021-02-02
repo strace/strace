@@ -70,7 +70,7 @@ build64/Makefile: configure
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf build build-udeb build64 strace64.1 debian/strace64.substvars
+	rm -rf build build-udeb build64 debian/strace64.substvars
 	dh_clean
 
 binary: binary-indep binary-arch
@@ -82,7 +82,7 @@ binary-arch: build
 
 	# prepare 64bit executable and manpage, if it has been built
 	test -f build64-stamp && ( mv build64/strace build64/strace64 ; \
-		mv build64/strace.1 build64/strace64.1 ) || true
+		mv build64/doc/strace.1 build64/doc/strace64.1 ) || true
 
 	dh_testdir -a
 	dh_testroot -a
