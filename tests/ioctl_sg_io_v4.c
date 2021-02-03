@@ -16,6 +16,7 @@
 # include <stdio.h>
 # include <sys/ioctl.h>
 # include <sys/uio.h>
+# include <linux/types.h>
 # include <linux/bsg.h>
 # define XLAT_MACROS_ONLY
 #  include "xlat/scsi_sg_commands.h"

@@ -10,6 +10,7 @@
 
 #ifdef HAVE_LINUX_BSG_H
 
+# include <linux/types.h>
 # include <linux/bsg.h>
 # include "xlat/bsg_protocol.h"
 # include "xlat/bsg_subprotocol.h"
