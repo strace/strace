@@ -18,12 +18,12 @@ ARCH_MFLAGS =
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(builddir) \
-	      -I$(top_builddir)/$(OS)/$(ARCH) \
-	      -I$(top_srcdir)/$(OS)/$(ARCH) \
-	      -I$(top_builddir)/$(OS) \
-	      -I$(top_srcdir)/$(OS) \
-	      -I$(top_builddir) \
-	      -I$(top_srcdir) \
+	      -I$(top_builddir)/src/$(OS)/$(ARCH) \
+	      -I$(top_srcdir)/src/$(OS)/$(ARCH) \
+	      -I$(top_builddir)/src/$(OS) \
+	      -I$(top_srcdir)/src/$(OS) \
+	      -I$(top_builddir)/src \
+	      -I$(top_srcdir)/src \
 	      -DTESTS_SIZEOF_KERNEL_LONG_T=$(SIZEOF_KERNEL_LONG_T) \
 	      -DTESTS_SIZEOF_LONG=$(SIZEOF_LONG)
 AM_LDFLAGS = $(ARCH_MFLAGS)
@@ -681,4 +681,4 @@ check-valgrind-local: $(check_LIBRARIES) $(check_PROGRAMS)
 BUILT_SOURCES = ksysent.h
 CLEANFILES = ksysent.h
 
-include ../scno.am
+include ../src/scno.am

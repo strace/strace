@@ -14,7 +14,7 @@ echo "strace-log-merge: $LOG: strace output not found" > "$EXP"
 
 check_strace_log_merge()
 {
-	"$srcdir"/../strace-log-merge "$LOG" > "$OUT" 2> "$LOG"
+	"$srcdir"/../src/strace-log-merge "$LOG" > "$OUT" 2> "$LOG"
 	rc=$?
 
 	[ $rc -gt 0 ] ||

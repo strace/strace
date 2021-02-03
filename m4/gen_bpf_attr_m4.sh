@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-input=bpf_attr.h
+input=src/bpf_attr.h
 output="${0%/*}"/bpf_attr.m4
 exec > "$output"
 

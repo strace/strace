@@ -94,10 +94,10 @@ case "$arch" in
 		    [Define to 1 if you have the <gnu/stubs-x32.h> header file.])
 	pushdef([gnu_stubs], [gnu/stubs-][m4_substr([$1], 1)][.h])
 	AC_CHECK_HEADERS([gnu_stubs], [IFLAG=],
-			 [mkdir -p gnu
-			  : > gnu_stubs
+			 [mkdir -p src/gnu
+			  : > src/gnu_stubs
 			  AC_MSG_NOTICE([Created empty gnu_stubs])
-			  IFLAG=-I.])
+			  IFLAG=-Isrc])
 	popdef([gnu_stubs])
 	saved_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS${IFLAG:+ }$IFLAG"
@@ -121,7 +121,7 @@ case "$arch" in
 			[st_cv_mpers],
 			[if READELF="$READELF" \
 			    CC="$CC" CPP="$CPP" CPPFLAGS="$CPPFLAGS" \
-			    $srcdir/mpers_test.sh [$1] "MPERS_CFLAGS"; then
+			    $srcdir/src/mpers_test.sh [$1] "MPERS_CFLAGS"; then
 				st_cv_mpers=yes
 			 else
 				st_cv_mpers=no
@@ -144,7 +144,7 @@ case "$arch" in
 					MPERS_NAME[_SIZEOF_KERNEL_LONG_T])
 				st_MPERS_LOAD_AC_CV([sizeof_kernel_long_t])
 				AC_CHECK_SIZEOF([kernel_long_t],,
-						[#include "$srcdir/kernel_types.h"])
+						[#include "$srcdir/src/kernel_types.h"])
 				st_MPERS_SAVE_AC_CV([sizeof_kernel_long_t])
 				popdef([SIZEOF_KERNEL_LONG_T])
 

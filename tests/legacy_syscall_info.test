@@ -17,7 +17,7 @@ grep -x "[^:]*strace: PTRACE_GET_SYSCALL_INFO works" "$LOG" > /dev/null ||
 
 run_prog ../chdir > /dev/null
 
-helper='../../disable_ptrace_get_syscall_info'
+helper='../../src/disable_ptrace_get_syscall_info'
 $helper $args > /dev/null ||
 	skip_ "$helper does not work"
 
@@ -32,7 +32,7 @@ $helper $STRACE -o "$LOG" "$@" > "$EXP" ||
 
 match_diff "$LOG" "$EXP"
 
-helper2='../../disable_ptrace_getregset'
+helper2='../../src/disable_ptrace_getregset'
 $helper2 $helper $args > /dev/null ||
 	exit 0 # the second part of the test is not applicable
 

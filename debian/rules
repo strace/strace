@@ -49,7 +49,7 @@ configure:
 %-stamp: %/Makefile
 	$(MAKE) -C $*
 ifeq (,$(findstring nocheck,$(DEB_BUILD_OPTIONS)))
-	$*/strace -V
+	$*/src/strace -V
 	$(MAKE) -C $* check VERBOSE=1
 endif
 	touch $@
@@ -81,7 +81,7 @@ binary-arch: build
 	test -f build-stamp || make $(MFLAGS) -f debian/rules build
 
 	# prepare 64bit executable and manpage, if it has been built
-	test -f build64-stamp && ( mv build64/strace build64/strace64 ; \
+	test -f build64-stamp && ( mv build64/src/strace build64/src/strace64 ; \
 		mv build64/doc/strace.1 build64/doc/strace64.1 ) || true
 
 	dh_testdir -a

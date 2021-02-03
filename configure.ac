@@ -19,9 +19,9 @@ AC_INIT([strace],
 m4_define([copyright_year], st_esyscmd_s([./build-aux/copyright-year-gen .year]))
 m4_define([manpage_date], st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))
 AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
-AC_CONFIG_SRCDIR([strace.c])
+AC_CONFIG_SRCDIR([src/strace.c])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE([foreign nostdinc dist-xz silent-rules parallel-tests subdir-objects 1.13])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
@@ -577,8 +577,8 @@ AC_CACHE_CHECK([whether <linux/signal.h> can be used along with <signal.h>],
 				  [st_cv_linux_signal=yes],
 				  [st_cv_linux_signal=no])])
 if test "x$st_cv_linux_signal" = xno; then
-	mkdir -p linux/linux
-	cp $srcdir/linux/signal.h.in linux/linux/signal.h
+	mkdir -p src/linux/linux
+	cp $srcdir/src/linux/signal.h.in src/linux/linux/signal.h
 	CPPFLAGS="$CPPFLAGS -Ilinux"
 fi
 
@@ -630,7 +630,7 @@ SIZEOF_LONG="$ac_cv_sizeof_long"
 AC_SUBST(SIZEOF_LONG)
 AC_CHECK_SIZEOF([long long])
 AC_CHECK_SIZEOF([off_t],,[#include <sys/types.h>])
-AC_CHECK_SIZEOF([kernel_long_t],,[#include "$srcdir/kernel_types.h"])
+AC_CHECK_SIZEOF([kernel_long_t],,[#include "$srcdir/src/kernel_types.h"])
 SIZEOF_KERNEL_LONG_T="$ac_cv_sizeof_kernel_long_t"
 AC_SUBST(SIZEOF_KERNEL_LONG_T)
 AC_CHECK_SIZEOF([struct i64_i32],,[struct i64_i32 {long long i64; int i32;};])
@@ -749,11 +749,11 @@ AC_CHECK_TOOL([READELF], [readelf])
 st_STACKTRACE
 
 if test "$arch" = mips && test "$no_create" != yes; then
-	mkdir -p linux/mips
-	if $srcdir/linux/mips/genstub.sh \
-	   $srcdir/linux/mips linux/mips n32 n64 o32 &&
-	   $srcdir/linux/mips/genstub.sh \
-	   $srcdir/linux linux/mips common common-32; then
+	mkdir -p src/linux/mips
+	if $srcdir/src/linux/mips/genstub.sh \
+	   $srcdir/src/linux/mips src/linux/mips n32 n64 o32 &&
+	   $srcdir/src/linux/mips/genstub.sh \
+	   $srcdir/src/linux src/linux/mips common common-32; then
 		AC_MSG_RESULT([Generated MIPS syscallent stubs])
 	else
 		AC_MSG_ERROR([Failed to generate syscallent stubs])
@@ -817,6 +817,7 @@ AC_CONFIG_FILES([Makefile
 		 debian/changelog
 		 doc/strace.1
 		 doc/strace-log-merge.1
+		 src/Makefile
 		 strace.spec
 		 tests/Makefile
 		 tests-m32/Makefile

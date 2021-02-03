@@ -99,8 +99,10 @@ case "${CHECK-}" in
 			clang*) GCOV="llvm-cov${CC#clang} gcov" ;;
 			*) GCOV=gcov ;;
 		esac
-		./codecov.bash -Z -x "$GCOV" -a -abc
-		rm ./codecov.bash
+		cd src
+		../codecov.bash -Z -x "$GCOV" -a -abc
+		rm ../codecov.bash
+		cd -
 		;;
 	valgrind)
 		make -k $j all VERBOSE=${VERBOSE-}

@@ -392,9 +392,9 @@ gen_make()
 		printf 'xlat/%s.h ' "$@"
 		echo
 		for name; do
-			printf '$(top_srcdir)/xlat/%s.h: $(top_srcdir)/xlat/%s.in $(top_srcdir)/xlat/gen.sh\n' \
+			printf '$(top_srcdir)/src/xlat/%s.h: $(top_srcdir)/src/xlat/%s.in $(top_srcdir)/src/xlat/gen.sh\n' \
 				"${name}" "${name}"
-			echo '	$(AM_V_GEN)$(top_srcdir)/xlat/gen.sh $< $@'
+			echo '	$(AM_V_GEN)$(top_srcdir)/src/xlat/gen.sh $< $@'
 		done
 	) >"${output}"
 }

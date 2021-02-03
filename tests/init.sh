@@ -11,7 +11,7 @@ ME_="${0##*/}"
 LOG="log"
 OUT="out"
 EXP="exp"
-CONFIG_H="../../config.h"
+CONFIG_H="../../src/config.h"
 
 warn_() { printf >&2 '%s\n' "$*"; }
 fail_() { warn_ "$ME_: failed test: $*"; exit 1; }
@@ -107,7 +107,7 @@ run_strace_merge()
 {
 	rm -f -- "$LOG".[0-9]*
 	run_strace -ff -tt "$@"
-	"$srcdir"/../strace-log-merge "$LOG" > "$LOG" ||
+	"$srcdir"/../src/strace-log-merge "$LOG" > "$LOG" ||
 		dump_log_and_fail_with 'strace-log-merge failed with code $?'
 	rm -f -- "$LOG".[0-9]*
 }
@@ -439,7 +439,7 @@ if [ -n "$NAME" ]; then
 	esac
 
 	[ -n "${STRACE-}" ] || {
-		STRACE=../../strace
+		STRACE=../../src/strace
 		case "${LOG_COMPILER-} ${LOG_FLAGS-}" in
 			*--suppressions=*--error-exitcode=*--tool=*)
 			STRACE_EXE="$STRACE"
@@ -451,7 +451,7 @@ if [ -n "$NAME" ]; then
 
 	trap 'dump_log_and_fail_with "time limit ($TIMEOUT_DURATION) exceeded"' XCPU
 else
-	: "${STRACE:=../strace}"
+	: "${STRACE:=../src/strace}"
 fi
 
 # Export $STRACE_EXE to check_PROGRAMS.

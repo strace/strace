@@ -90,7 +90,7 @@ gen_m4_check()
 
 	local inc_expr1 inc_expr2 includes header_includes
 	inc_expr1='s/^#[[:space:]]*include[[:space:]]\+\(<[^>]\+>\).*/#include \1/p'
-	inc_expr2='s/^#[[:space:]]*include[[:space:]]\+"\([^"]\+\)".*/#include "\$srcdir\/\1"/p'
+	inc_expr2='s/^#[[:space:]]*include[[:space:]]\+"\([^"]\+\)".*/#include "\$srcdir\/src\/\1"/p'
 	includes="$(sed -n "$inc_expr1; $inc_expr2" "$input")"
 	header_includes="$(printf %s "$includes" |sed '$d')"
 
