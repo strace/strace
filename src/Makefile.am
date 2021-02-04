@@ -584,7 +584,6 @@ EXTRA_DIST =				\
 	linux/ia64/syscallent.h		\
 	linux/ia64/syscallent_base_nr.h	\
 	linux/ia64/userent.h		\
-	linux/inet_diag.h		\
 	linux/m68k/arch_defs_.h		\
 	linux/m68k/arch_regs.c		\
 	linux/m68k/arch_rt_sigframe.c	\
@@ -647,7 +646,6 @@ EXTRA_DIST =				\
 	linux/mips/syscallent-o32.h	\
 	linux/mips/syscallent.h		\
 	linux/mips/userent.h		\
-	linux/netlink_diag.h		\
 	linux/nios2/arch_defs_.h	\
 	linux/nios2/arch_regs.c		\
 	linux/nios2/get_error.c		\
@@ -671,7 +669,6 @@ EXTRA_DIST =				\
 	linux/or1k/set_scno.c		\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
-	linux/packet_diag.h		\
 	linux/powerpc/arch_defs_.h	\
 	linux/powerpc/arch_regs.c	\
 	linux/powerpc/arch_rt_sigframe.c	\
@@ -805,8 +802,6 @@ EXTRA_DIST =				\
 	linux/shuffle_scno.c		\
 	linux/signal.h.in		\
 	linux/signalent.h		\
-	linux/smc_diag.h		\
-	linux/sock_diag.h		\
 	linux/sparc/arch_defs_.h	\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_regs.c		\
@@ -871,7 +866,6 @@ EXTRA_DIST =				\
 	linux/tile/syscallent.h		\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
-	linux/unix_diag.h		\
 	linux/userent.h			\
 	linux/userent0.h		\
 	linux/x32/arch_defs_.h		\

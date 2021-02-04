@@ -21,6 +21,8 @@
 #include <linux/sock_diag.h>
 #include <linux/unix_diag.h>
 
+enum { UNIX_DIAG_FIRST_UNUSED = __UNIX_DIAG_MAX };
+
 static void
 test_nlattr(const int fd)
 {
