@@ -1,0 +1,16 @@
+The `linux' directory contains some of Linux kernel UAPI header files
+copied verbatim from the Linux kernel for compatibility purposes.
+
+These header files are not a part of the strace project,
+they are provided by the Linux Kernel under:
+
+	SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
+
+Being under the terms of the GNU General Public License version 2 only,
+according with:
+
+	GPL-2.0
+
+With an explicit syscall exception, as stated at:
+
+	Linux-syscall-note

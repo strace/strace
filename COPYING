@@ -18,3 +18,9 @@ or FITNESS FOR A PARTICULAR PURPOSE.  See LGPL-2.1-or-later for more details.
 
 strace test suite is provided under the terms of the GNU General Public License
 version 2 or later, see tests/COPYING for more details.
+
+The `bundled/linux' directory contains some of Linux kernel UAPI header files
+copied verbatim from the Linux kernel for compatibility purposes.
+These header files are provided by the Linux kernel under the terms of the
+GNU General Public License version 2 only with an explicit syscall exception,
+see bundled/linux/COPYING for more details.

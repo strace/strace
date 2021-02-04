@@ -814,6 +814,7 @@ AX_VALGRIND_DFLT([sgcheck], [off])
 AX_VALGRIND_CHECK
 
 AC_CONFIG_FILES([Makefile
+		 bundled/Makefile
 		 debian/changelog
 		 doc/strace.1
 		 doc/strace-log-merge.1

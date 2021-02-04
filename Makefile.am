@@ -15,7 +15,7 @@ endif
 if HAVE_MX32_RUNTIME
 TESTS_MX32 = tests-mx32
 endif
-SUBDIRS = src tests $(TESTS_M32) $(TESTS_MX32)
+SUBDIRS = bundled src tests $(TESTS_M32) $(TESTS_MX32)
 
 man_MANS = doc/strace.1 doc/strace-log-merge.1
 
