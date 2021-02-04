@@ -25,6 +25,8 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(top_srcdir)/src/$(OS) \
 	      -I$(top_builddir)/src \
 	      -I$(top_srcdir)/src \
+	      -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
+	      -I$(top_srcdir)/bundled/$(OS)/include/uapi \
 	      -DTESTS_SIZEOF_KERNEL_LONG_T=$(SIZEOF_KERNEL_LONG_T) \
 	      -DTESTS_SIZEOF_LONG=$(SIZEOF_LONG)
 AM_LDFLAGS = $(ARCH_MFLAGS)

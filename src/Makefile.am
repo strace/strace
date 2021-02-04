@@ -26,7 +26,9 @@ AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 	      -I$(builddir)/$(OS) \
 	      -I$(srcdir)/$(OS) \
 	      -I$(builddir) \
-	      -I$(srcdir)
+	      -I$(srcdir) \
+	      -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
+	      -I$(top_srcdir)/bundled/$(OS)/include/uapi
 
 AM_CFLAGS_FOR_BUILD = $(WARN_CFLAGS_FOR_BUILD)
 AM_CPPFLAGS_FOR_BUILD = $(AM_CPPFLAGS)
