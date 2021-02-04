@@ -26,6 +26,7 @@ LC_TIME=C; export LC_TIME
 # Remove them from the list once they have been changed.
 IGNORED_FILES="build-aux/git-set-file-times
 build-aux/gitlog-to-changelog
+bundled/linux/.*
 ${ADDITIONAL_IGNORED_FILES-}"
 
 log()   { [ "$VERBOSE" -lt 1 ] || printf '%s\n' "$*"; }
@@ -206,7 +207,7 @@ jobs=0
 pids=
 [ 1 -le "${MAX_JOBS}" ] || MAX_JOBS=2
 
-git ls-files -- "$@" | grep -vFx "$IGNORED_FILES" | while read f; do
+git ls-files -- "$@" | grep -vx "$IGNORED_FILES" | while read f; do
 	process_file "$f" &
 	pids="$pids $!"
 	: $(( jobs += 1 ))
