@@ -20,6 +20,7 @@ for m in m32 mx32; do
 	s='[[:space:]]*'
 	[ "$m" = m32 ] && k="s/^\\(SIZEOF_KERNEL_LONG_T$s=\\).*/\\1 4/;" || k=
 	sed "s/@arch@/@arch_$m@/;
+	     s/@karch@/@karch_$m@/;
 	     s/^\\(SIZEOF_LONG$s=\\).*/\\1 4/; $k
 	     s/^MPERS_NAME$s=.*/& $m/;
 	     s/^\\(CC$s=\\).*/\\1 @CC_FOR_${m_upper}@/;

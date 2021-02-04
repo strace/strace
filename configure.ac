@@ -56,9 +56,13 @@ arch_m32=
 arch_mx32=
 cc_flags_m32=-m32
 cc_flags_mx32=-mx32
+karch=
+karch_m32=
+karch_mx32=
 case "$host_cpu" in
 aarch64*)
 	arch=aarch64
+	karch=arm64
 	arch_m32=arm
 	cc_flags_m32=
 	AC_DEFINE([AARCH64], 1, [Define for the AArch64 architecture.])
@@ -91,10 +95,12 @@ csky*)
 	;;
 hppa*|parisc*)
 	arch=hppa
+	karch=parisc
 	AC_DEFINE([HPPA], 1, [Define for the HPPA architecture.])
 	;;
 i[[3456]]86|pentium)
 	arch=i386
+	karch=x86
 	AC_DEFINE([I386], 1, [Define for the i386 architecture.])
 	;;
 ia64)
@@ -127,6 +133,8 @@ or1k*)
 	AC_DEFINE([OR1K], 1, [Define for the OpenRISC 1000 architecture.])
 	;;
 powerpc*)
+	karch=powerpc
+	karch_m32=powerpc
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
 	AC_TRY_COMPILE(
 [#ifndef __LP64__
@@ -150,6 +158,7 @@ powerpc*)
 	;;
 riscv64*)
 	arch=riscv64
+	karch=riscv
 	AC_DEFINE([RISCV64], 1, [Define for the RISC-V 64-bit architecture])
 	;;
 s390)
@@ -158,6 +167,7 @@ s390)
 	;;
 s390x)
 	arch=s390x
+	karch=s390
 	arch_m32=s390
 	cc_flags_m32=-m31
 	AC_DEFINE([S390X], 1, [Define for the S390x architecture.])
@@ -172,6 +182,7 @@ sh*)
 	;;
 sparc64*)
 	arch=sparc64
+	karch=sparc
 	arch_m32=sparc
 	AC_DEFINE([SPARC64], 1, [Define for the SPARC64 architecture.])
 	;;
@@ -184,6 +195,9 @@ tile*)
 	AC_DEFINE([TILE], 1, [Define for the Tile architecture])
 	;;
 x86?64*)
+	karch=x86
+	karch_m32=x86
+	karch_mx32=x86
 	arch_m32=i386
 	AC_TRY_COMPILE(
 [#ifndef __ILP32__
@@ -213,9 +227,20 @@ test -n "$arch_m32" ||
 	arch_m32=$arch
 test -n "$arch_mx32" ||
 	arch_mx32=$arch
+
+test -n "$karch" ||
+	karch=$arch
+test -n "$karch_m32" ||
+	karch_m32=$arch_m32
+test -n "$karch_mx32" ||
+	karch_mx32=$arch_mx32
+
 AC_SUBST(arch)
 AC_SUBST(arch_m32)
 AC_SUBST(arch_mx32)
+AC_SUBST(karch)
+AC_SUBST(karch_m32)
+AC_SUBST(karch_mx32)
 AC_SUBST(cc_flags_m32)
 AC_SUBST(cc_flags_mx32)
 AC_SUBST(arch_native)

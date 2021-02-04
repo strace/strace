@@ -13,8 +13,10 @@ bin_PROGRAMS = strace
 bin_SCRIPTS = strace-log-merge
 
 OS		= linux
-# ARCH is `i386', `m68k', `sparc', etc.
+# ARCH is `x86_64', `i386', `aarch64', `powerpc64le', etc.
 ARCH		= @arch@
+# KARCH is `x86', `arm64', `arm', `powerpc', etc.
+KARCH		= @karch@
 
 READELF		= @READELF@
 

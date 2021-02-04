@@ -9,6 +9,7 @@
 OS = linux
 CC = @CC@
 ARCH = @arch@
+KARCH = @karch@
 NATIVE_ARCH = @arch_native@
 SIZEOF_KERNEL_LONG_T = @SIZEOF_KERNEL_LONG_T@
 SIZEOF_LONG = @SIZEOF_LONG@
