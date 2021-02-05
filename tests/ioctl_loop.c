@@ -22,16 +22,6 @@
 #include <linux/loop.h>
 #include "print_fields.h"
 
-#ifdef HAVE_STRUCT_LOOP_CONFIG
-typedef struct loop_config struct_loop_config;
-#else
-# include "types/loop.h"
-#endif
-
-#define XLAT_MACROS_ONLY
-#include "xlat/loop_cmds.h"
-#undef XLAT_MACROS_ONLY
-
 #ifndef ABBREV
 # define ABBREV 0
 #endif
@@ -165,7 +155,7 @@ print_loop_info64(struct loop_info64 * const info64, bool print_encrypt,
 }
 
 static void
-print_loop_config(struct_loop_config *config, bool print_reserved)
+print_loop_config(struct loop_config *config, bool print_reserved)
 {
 #if ABBREV
 	printf("%p", config);
@@ -197,7 +187,7 @@ main(void)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info, info);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_info64, info64);
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_loop_config, config);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct loop_config, config);
 
 	/* Unknown loop commands */
 	sys_ioctl(-1, unknown_loop_cmd, magic);

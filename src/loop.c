@@ -7,17 +7,14 @@
  */
 
 #include "defs.h"
-#include "types/loop.h"
-
-typedef struct loop_info struct_loop_info;
 
 #include DEF_MPERS_TYPE(struct_loop_info)
 
-#include MPERS_DEFS
+#include <linux/loop.h>
 
-#define XLAT_MACROS_ONLY
-#include "xlat/loop_cmds.h"
-#undef XLAT_MACROS_ONLY
+typedef struct loop_info struct_loop_info;
+
+#include MPERS_DEFS
 
 #include "xlat/loop_flags_options.h"
 #include "xlat/loop_crypt_type_options.h"
@@ -156,7 +153,7 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 static void
 decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	struct_loop_config config;
+	struct loop_config config;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &config))
