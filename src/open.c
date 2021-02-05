@@ -18,7 +18,7 @@
 
 #include <asm/fcntl.h>
 
-#include "types/openat2.h"
+#include <linux/openat2.h>
 
 /* some libcs are guilty of messing up with O_ACCMODE */
 #undef O_ACCMODE
@@ -123,7 +123,7 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 {
 	enum { OPEN_HOW_MIN_SIZE = 24 };
 
-	struct_open_how how;
+	struct open_how how;
 
 	if (size < OPEN_HOW_MIN_SIZE) {
 		printaddr(addr);

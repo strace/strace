@@ -19,18 +19,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <asm/fcntl.h>
-
-# ifdef HAVE_LINUX_OPENAT2
-#  include <linux/openat2.h>
-# endif
-
-# ifndef HAVE_LINUX_OPENAT2
-struct open_how {
-	uint64_t flags;
-	uint64_t mode;
-	uint64_t resolve;
-};
-# endif
+# include <linux/openat2.h>
 
 # ifndef AT_FDCWD
 #  define AT_FDCWD -100
