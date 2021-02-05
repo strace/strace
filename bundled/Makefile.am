@@ -9,6 +9,8 @@ EXTRA_DIST = \
 	linux/COPYING \
 	linux/GPL-2.0 \
 	linux/Linux-syscall-note \
+	linux/include/uapi/linux/const.h \
+	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/netlink_diag.h \
 	linux/include/uapi/linux/packet_diag.h \
