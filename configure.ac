@@ -245,6 +245,9 @@ AC_SUBST(cc_flags_m32)
 AC_SUBST(cc_flags_mx32)
 AC_SUBST(arch_native)
 
+CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/arch/$karch/include/uapi"
+CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/include/uapi"
+
 MIPS_ABI=
 if test "$arch" = mips; then
 	AC_CACHE_CHECK([for _MIPS_SIM], [st_cv__MIPS_SIM],
