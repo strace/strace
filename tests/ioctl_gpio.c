@@ -14,63 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include "types/gpio.h"
-#define XLAT_MACROS_ONLY
-# include "xlat/gpio_event_flags.h"
-# include "xlat/gpio_handle_flags.h"
-# include "xlat/gpio_ioctl_cmds.h"
-# include "xlat/gpio_line_flags.h"
-# include "xlat/gpio_v2_line_attr_ids.h"
-# include "xlat/gpio_v2_line_flags.h"
-#undef XLAT_MACROS_ONLY
-
-#ifdef HAVE_STRUCT_GPIOCHIP_INFO
-# define struct_gpiochip_info struct gpiochip_info
-#endif
-
-#ifdef HAVE_STRUCT_GPIOLINE_INFO
-# define struct_gpioline_info struct gpioline_info
-#endif
-
-#ifdef HAVE_STRUCT_GPIOHANDLE_REQUEST
-# define struct_gpiohandle_request struct gpiohandle_request
-#endif
-
-#ifdef HAVE_STRUCT_GPIOEVENT_REQUEST
-# define struct_gpioevent_request struct gpioevent_request
-#endif
-
-#ifdef HAVE_STRUCT_GPIOHANDLE_DATA
-# define struct_gpiohandle_data struct gpiohandle_data
-#endif
-
-#ifdef HAVE_STRUCT_GPIOHANDLE_CONFIG
-# define struct_gpiohandle_config struct gpiohandle_config
-#endif
-
-#ifdef HAVE_STRUCT_GPIO_V2_LINE_VALUES
-# define struct_gpio_v2_line_values struct gpio_v2_line_values
-#endif
-
-#ifdef HAVE_STRUCT_GPIO_V2_LINE_ATTRIBUTE
-# define struct_gpio_v2_line_attribute struct gpio_v2_line_attribute
-#endif
-
-#ifdef HAVE_STRUCT_GPIO_V2_LINE_CONFIG_ATTRIBUTE
-# define struct_gpio_v2_line_config_attribute struct gpio_v2_line_config_attribute
-#endif
-
-#ifdef HAVE_STRUCT_GPIO_V2_LINE_CONFIG
-# define struct_gpio_v2_line_config struct gpio_v2_line_config
-#endif
-
-#ifdef HAVE_STRUCT_GPIO_V2_LINE_REQUEST
-# define struct_gpio_v2_line_request struct gpio_v2_line_request
-#endif
-
-#ifdef HAVE_STRUCT_GPIO_V2_LINE_INFO
-# define struct_gpio_v2_line_info struct gpio_v2_line_info
-#endif
+#include <linux/gpio.h>
 
 # define str_event_flags	XLAT_KNOWN(0x3, "GPIOEVENT_REQUEST_BOTH_EDGES")
 # define str_handle_flags	XLAT_KNOWN(0x14, \
@@ -142,7 +86,7 @@ test_print_gpiochip_info(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_GET_CHIPINFO_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpiochip_info, p_chipinfo);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpiochip_info, p_chipinfo);
 
 	p_chipinfo->lines = 0xca;
 	strcpy(p_chipinfo->name, "chip name");
@@ -170,7 +114,7 @@ test_print_gpioline_info(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_GET_LINEINFO_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpioline_info, p_lineinfo);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpioline_info, p_lineinfo);
 
 	p_lineinfo->line_offset = 0x32;
 	p_lineinfo->flags = GPIOLINE_FLAG_ACTIVE_LOW|GPIOLINE_FLAG_OPEN_DRAIN;
@@ -239,7 +183,7 @@ test_print_gpiohandle_request(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_GET_LINEHANDLE_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpiohandle_request, p_handle_request);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpiohandle_request, p_handle_request);
 
 	p_handle_request->lines = 4;
 	p_handle_request->lineoffsets[0] = 0x12;
@@ -291,7 +235,7 @@ test_print_gpioevent_request(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_GET_LINEEVENT_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpioevent_request, p_event_request);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpioevent_request, p_event_request);
 
 	p_event_request->lineoffset = 4;
 	p_event_request->handleflags = GPIOHANDLE_REQUEST_ACTIVE_LOW|GPIOHANDLE_REQUEST_OPEN_SOURCE;
@@ -321,7 +265,7 @@ test_print_gpiohandle_get_values(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIOHANDLE_GET_LINE_VALUES_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpiohandle_data, p_handle_data);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpiohandle_data, p_handle_data);
 
 	for (int i = 0; i < GPIOHANDLES_MAX; i++)
 		p_handle_data->values[i] = i + 1;
@@ -346,7 +290,7 @@ test_print_gpiohandle_set_values(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIOHANDLE_SET_LINE_VALUES_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpiohandle_data, p_handle_data);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpiohandle_data, p_handle_data);
 
 	for (int i = 0; i < GPIOHANDLES_MAX; i++)
 		p_handle_data->values[i] = i + 1;
@@ -368,7 +312,7 @@ test_print_gpiohandle_set_config(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIOHANDLE_SET_CONFIG_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpiohandle_config, p_handle_config);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpiohandle_config, p_handle_config);
 
 	p_handle_config->flags = GPIOHANDLE_REQUEST_ACTIVE_LOW|GPIOHANDLE_REQUEST_OPEN_SOURCE;
 	for (int i = 0; i < GPIOHANDLES_MAX; i++)
@@ -392,7 +336,7 @@ test_print_gpiohandle_set_config(void)
 }
 
 static void
-print_gpio_v2_line_attr(struct_gpio_v2_line_attribute *attr)
+print_gpio_v2_line_attr(struct gpio_v2_line_attribute *attr)
 {
 	printf("{");
 	switch (attr->id) {
@@ -422,7 +366,7 @@ test_print_gpio_v2_line_info(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_V2_GET_LINEINFO_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_info, p_lineinfo);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpio_v2_line_info, p_lineinfo);
 
 	strcpy(p_lineinfo->name, "line name");
 	strcpy(p_lineinfo->consumer, "line consumer");
@@ -543,7 +487,7 @@ test_print_gpio_v2_line_request(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_request, p_line_request);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpio_v2_line_request, p_line_request);
 
 	p_line_request->offsets[0] = 0x12;
 	p_line_request->offsets[1] = 0x23;
@@ -614,7 +558,7 @@ test_print_gpio_v2_line_get_values(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_V2_LINE_GET_VALUES_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_values, p_line_values);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpio_v2_line_values, p_line_values);
 
 	p_line_values->bits = 0xcacafeedfacecafe;
 	p_line_values->mask = 0xfadebeaddeedbabe;
@@ -638,7 +582,7 @@ test_print_gpio_v2_line_set_values(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_V2_LINE_SET_VALUES_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_values, p_line_values);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpio_v2_line_values, p_line_values);
 
 	p_line_values->bits = 0xcacafeedfacecafe;
 	p_line_values->mask = 0xfadebeaddeedbabe;
@@ -660,7 +604,7 @@ test_print_gpio_v2_line_set_config(void)
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(GPIO_V2_LINE_SET_CONFIG_IOCTL), errstr);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_gpio_v2_line_config, p_line_config);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct gpio_v2_line_config, p_line_config);
 
 	p_line_config->flags = GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP;
 	p_line_config->num_attrs = 0;

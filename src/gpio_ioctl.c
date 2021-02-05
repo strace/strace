@@ -7,15 +7,12 @@
 
 #include "defs.h"
 
-#include "types/gpio.h"
-#define XLAT_MACROS_ONLY
-# include "xlat/gpio_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
+#include <linux/gpio.h>
 
 static int
 print_gpiochip_info(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpiochip_info info;
+	struct gpiochip_info info;
 
 	if (entering(tcp))
 		return 0;
@@ -40,7 +37,7 @@ print_gpiochip_info(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpioline_info(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpioline_info info;
+	struct gpioline_info info;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -91,7 +88,7 @@ print_gpioline_info_unwatch(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpiohandle_request hr;
+	struct gpiohandle_request hr;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -133,7 +130,7 @@ print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpioevent_request er;
+	struct gpioevent_request er;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -168,7 +165,7 @@ print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 }
 
 static void
-print_gpiohandle_data(struct tcb *const tcp, const struct_gpiohandle_data *vals)
+print_gpiohandle_data(struct tcb *const tcp, const struct gpiohandle_data *vals)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_ARRAY(*vals, values, tcp, print_uint8_array_member);
@@ -178,7 +175,7 @@ print_gpiohandle_data(struct tcb *const tcp, const struct_gpiohandle_data *vals)
 static int
 print_gpiohandle_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpiohandle_data vals;
+	struct gpiohandle_data vals;
 
 	if (entering(tcp))
 		return 0;
@@ -194,7 +191,7 @@ print_gpiohandle_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpiohandle_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpiohandle_data vals;
+	struct gpiohandle_data vals;
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &vals))
@@ -206,7 +203,7 @@ print_gpiohandle_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpiohandle_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpiohandle_config hc;
+	struct gpiohandle_config hc;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, arg, &hc))
@@ -225,7 +222,7 @@ print_gpiohandle_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/gpio_v2_line_attr_ids.h"
 
 static void
-print_gpio_v2_line_attribute_raw(const struct_gpio_v2_line_attribute *attr,
+print_gpio_v2_line_attribute_raw(const struct gpio_v2_line_attribute *attr,
 				 bool as_field)
 {
 	if (as_field) {
@@ -239,13 +236,13 @@ print_gpio_v2_line_attribute_raw(const struct_gpio_v2_line_attribute *attr,
 	}
 	tprint_struct_next();
 	tprints_field_name("data");
-	tprintf("%#" PRIx64, attr->values);
+	tprintf("%#" PRIx64, (uint64_t) attr->values);
 	if (as_field)
 		tprint_struct_end();
 }
 
 static void
-print_gpio_v2_line_attribute(const struct_gpio_v2_line_attribute *attr,
+print_gpio_v2_line_attribute(const struct gpio_v2_line_attribute *attr,
 			     bool as_field)
 {
 	if (attr->padding) {
@@ -272,7 +269,7 @@ print_gpio_v2_line_attribute(const struct_gpio_v2_line_attribute *attr,
 }
 
 static void
-print_gpio_v2_line_config_attribute(const struct_gpio_v2_line_config_attribute *attr)
+print_gpio_v2_line_config_attribute(const struct gpio_v2_line_config_attribute *attr)
 {
 	tprint_struct_begin();
 	print_gpio_v2_line_attribute(&attr->attr, true);
@@ -303,7 +300,7 @@ print_gpio_v2_line_config_attr_array_member(struct tcb *tcp, void *elem_buf,
 
 static void
 print_gpio_v2_line_config(struct tcb *const tcp,
-			  const struct_gpio_v2_line_config *lc)
+			  const struct gpio_v2_line_config *lc)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(*lc, flags, gpio_v2_line_flags,
@@ -325,7 +322,7 @@ print_gpio_v2_line_config(struct tcb *const tcp,
 static int
 print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpio_v2_line_info li;
+	struct gpio_v2_line_info li;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -370,7 +367,7 @@ print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpio_v2_line_request lr;
+	struct gpio_v2_line_request lr;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -415,7 +412,7 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpio_v2_line_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpio_v2_line_values vals;
+	struct gpio_v2_line_values vals;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -445,7 +442,7 @@ print_gpio_v2_line_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpio_v2_line_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpio_v2_line_values vals;
+	struct gpio_v2_line_values vals;
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &vals)) {
@@ -462,7 +459,7 @@ print_gpio_v2_line_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_gpio_v2_line_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_gpio_v2_line_config lc;
+	struct gpio_v2_line_config lc;
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &lc))
