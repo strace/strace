@@ -1,1 +1,2 @@
-FSOPEN_CLOEXEC	1
+#unconditional
+FSOPEN_CLOEXEC

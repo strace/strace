@@ -6,10 +6,10 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-#ifdef HAVE_LINUX_MOUNT_H
-# include <linux/mount.h>
-#endif
+#include <linux/mount.h>
+#define XLAT_MACROS_ONLY
+# include "xlat/open_mode_flags.h"
+#undef XLAT_MACROS_ONLY
 #include "xlat/open_tree_flags.h"
 
 SYS_FUNC(open_tree)

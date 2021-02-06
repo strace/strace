@@ -449,7 +449,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/kvm.h
 	linux/memfd.h
 	linux/mmtimer.h
-	linux/mount.h
 	linux/mqueue.h
 	linux/netfilter/ipset/ip_set.h
 	linux/netfilter/nf_tables.h

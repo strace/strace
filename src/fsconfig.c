@@ -6,9 +6,7 @@
  */
 
 #include "defs.h"
-#ifdef HAVE_LINUX_MOUNT_H
-# include <linux/mount.h>
-#endif
+#include <linux/mount.h>
 #include "xlat/fsconfig_cmds.h"
 
 SYS_FUNC(fsconfig)

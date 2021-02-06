@@ -6,9 +6,7 @@
  */
 
 #include "defs.h"
-#ifdef HAVE_LINUX_MOUNT_H
-# include <linux/mount.h>
-#endif
+#include <linux/mount.h>
 #include "xlat/fsmount_flags.h"
 #include "xlat/mount_attr_flags.h"
 

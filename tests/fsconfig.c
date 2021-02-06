@@ -17,10 +17,7 @@
 # include <stdio.h>
 # include <stdint.h>
 # include <unistd.h>
-
-# define XLAT_MACROS_ONLY
-# include "xlat/fsconfig_cmds.h"
-# undef XLAT_MACROS_ONLY
+# include <linux/mount.h>
 
 static const char *errstr;
 
