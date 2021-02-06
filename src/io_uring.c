@@ -8,7 +8,7 @@
 
 #include "defs.h"
 
-#include "types/io_uring.h"
+#include <linux/io_uring.h>
 
 #include "xlat/uring_op_flags.h"
 #include "xlat/uring_ops.h"
@@ -18,24 +18,8 @@
 #include "xlat/uring_register_opcodes.h"
 #include "xlat/uring_cqring_flags.h"
 
-#ifdef HAVE_STRUCT_IO_URING_PARAMS
-# ifdef HAVE_STRUCT_IO_URING_PARAMS_RESV
-static_assert(offsetof(struct_io_uring_params, resv)
-             >= offsetof(struct io_uring_params, resv),
-             "struct io_uring_params.resv offset mismatch"
-             ", please update the decoder");
-static_assert(sizeof_field(struct_io_uring_params, resv)
-             <= sizeof_field(struct io_uring_params, resv),
-             "struct io_uring_params.resv size mismatch"
-             ", please update the decoder");
-# else /* !HAVE_STRUCT_IO_URING_PARAMS_RESV */
-static_assert(0, "struct io_uring_params.resv is missing"
-		 ", please update the decoder");
-# endif
-#endif /* HAVE_STRUCT_IO_URING_PARAMS */
-
 static void
-print_io_sqring_offsets(const struct_io_sqring_offsets *const p)
+print_io_sqring_offsets(const struct io_sqring_offsets *const p)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(*p, head);
@@ -63,7 +47,7 @@ print_io_sqring_offsets(const struct_io_sqring_offsets *const p)
 }
 
 static void
-print_io_cqring_offsets(const struct_io_cqring_offsets *const p)
+print_io_cqring_offsets(const struct io_cqring_offsets *const p)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(*p, head);
@@ -94,7 +78,7 @@ SYS_FUNC(io_uring_setup)
 {
 	const uint32_t nentries = tcp->u_arg[0];
 	const kernel_ulong_t params_addr = tcp->u_arg[1];
-	struct_io_uring_params params;
+	struct io_uring_params params;
 
 	if (entering(tcp)) {
 		tprintf("%u, ", nentries);
@@ -178,7 +162,7 @@ static void
 print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 			    const unsigned int nargs)
 {
-	struct_io_uring_files_update arg;
+	struct io_uring_files_update arg;
 	int buf;
 
 	if (umove_or_printaddr(tcp, addr, &arg))
@@ -202,7 +186,7 @@ static bool
 print_io_uring_probe_op(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			void *data)
 {
-	struct_io_uring_probe_op *op = (struct_io_uring_probe_op *) elem_buf;
+	struct io_uring_probe_op *op = (struct io_uring_probe_op *) elem_buf;
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL_U(*op, op, uring_ops, "IORING_OP_???");
@@ -225,7 +209,7 @@ static int
 print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 		     const unsigned int nargs)
 {
-	struct_io_uring_probe *probe;
+	struct io_uring_probe *probe;
 	unsigned long printed = exiting(tcp) ? get_tcb_priv_ulong(tcp) : false;
 
 	if (exiting(tcp) && syserror(tcp)) {

@@ -9,7 +9,6 @@
  */
 
 #include "tests.h"
-#include <unistd.h>
 #include "scno.h"
 
 #ifdef __NR_io_uring_register
@@ -18,11 +17,8 @@
 # include <inttypes.h>
 # include <stdio.h>
 # include <string.h>
-# include <sys/uio.h>
-
-# ifdef HAVE_LINUX_IO_URING_H
-#  include <linux/io_uring.h>
-# endif
+#include <unistd.h>
+# include <linux/io_uring.h>
 
 /* From tests/bpf.c */
 # if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
@@ -149,7 +145,6 @@ main(void)
 		       (unsigned int) ARRAY_SIZE(fds), errstr);
 	}
 
-# ifdef HAVE_STRUCT_IO_URING_FILES_UPDATE
 	struct io_uring_files_update bogus_iufu;
 	struct io_uring_files_update iufu;
 
@@ -176,9 +171,7 @@ main(void)
 	       ", {offset=3735929054, fds=[%u<%s>, %u<%s>]}, %u) = %s\n",
 	       fd_null, path_null, fd_full, path_full, fd_null, path_null,
 	       (unsigned int) ARRAY_SIZE(fds), errstr);
-# endif
 
-# ifdef HAVE_STRUCT_IO_URING_PROBE
 	struct io_uring_probe *probe = tail_alloc(sizeof(*probe) +
 		       (DEFAULT_STRLEN + 1) * sizeof(struct io_uring_probe_op));
 
@@ -280,7 +273,6 @@ main(void)
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 8);
 	printf("io_uring_register(%u<%s>, IORING_REGISTER_PROBE, %p, 8) = %s\n",
 	       fd_null, path_null, probe, errstr);
-# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

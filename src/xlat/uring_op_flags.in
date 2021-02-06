@@ -1,1 +1,2 @@
-IO_URING_OP_SUPPORTED (1U << 0)
+#unconditional
+IO_URING_OP_SUPPORTED
