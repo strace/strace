@@ -10,11 +10,10 @@
 #include "tests.h"
 #include <linux/fs.h>
 
-#ifdef FIFREEZE
-# include <errno.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/ioctl.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
 
 static const char *errstr;
 
@@ -24,7 +23,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 	int rc = ioctl(-1, cmd, arg);
 	errstr = sprintrc(rc);
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
 		error_msg_and_fail("Return value [%d] does not match"
 				   " expectations [%d]", rc, INJECT_RETVAL);
@@ -33,7 +32,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 
 	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
 	errstr = inj_errstr;
-# endif
+#endif
 
 	return rc;
 }
@@ -44,7 +43,7 @@ do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
 	return do_ioctl(cmd, (uintptr_t) arg);
 }
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 static void
 skip_ioctls(int argc, const char *argv[])
 {
@@ -68,14 +67,14 @@ skip_ioctls(int argc, const char *argv[])
 			   " to detect an injected return code %d",
 			   num_skip, INJECT_RETVAL);
 }
-# endif /* INJECT_RETVAL */
+#endif /* INJECT_RETVAL */
 
 int
 main(int argc, const char *argv[])
 {
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	skip_ioctls(argc, argv);
-# endif
+#endif
 
 	static const struct {
 		uint32_t cmd;
@@ -114,18 +113,13 @@ main(int argc, const char *argv[])
 		}
 	}
 
-# if defined FITRIM || defined HAVE_STRUCT_FSXATTR_FSX_COWEXTSIZE
 	static const struct {
 		uint32_t cmd;
 		const char *str;
 	} null_arg_cmds[] = {
-#  ifdef FITRIM
 		{ ARG_STR(FITRIM) },
-#  endif
-#  ifdef HAVE_STRUCT_FSXATTR_FSX_COWEXTSIZE
 		{ ARG_STR(FS_IOC_FSSETXATTR) },
 		{ ARG_STR(FS_IOC_FSGETXATTR) },
-#  endif
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(null_arg_cmds); ++i) {
@@ -134,9 +128,7 @@ main(int argc, const char *argv[])
 		       XLAT_SEL(null_arg_cmds[i].cmd, null_arg_cmds[i].str),
 		       errstr);
 	}
-# endif /* FITRIM || HAVE_STRUCT_FSXATTR_FSX_COWEXTSIZE */
 
-# ifdef FITRIM
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fstrim_range, p_range);
 
 	do_ioctl_ptr(FITRIM, (char *) p_range + 1);
@@ -152,9 +144,7 @@ main(int argc, const char *argv[])
 	       XLAT_STR(FITRIM), (uintmax_t) p_range->start,
 	       (uintmax_t) p_range->len, (uintmax_t) p_range->minlen,
 	       errstr);
-# endif /* FITRIM */
 
-# ifdef HAVE_STRUCT_FSXATTR_FSX_COWEXTSIZE
 	/* FS_IOC_FSSETXATTR */
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct fsxattr, p_fsxattr);
 
@@ -162,8 +152,8 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FSSETXATTR), (char *) p_fsxattr + 1, errstr);
 
-#  define   VALID_FSX_XFLAGS 0x8001fffb
-#  define INVALID_FSX_XFLAGS 0x7ffe0004
+#define   VALID_FSX_XFLAGS 0x8001fffb
+#define INVALID_FSX_XFLAGS 0x7ffe0004
 
 	p_fsxattr->fsx_xflags = VALID_FSX_XFLAGS;
 	p_fsxattr->fsx_extsize = 0xdeadbeefU;
@@ -249,14 +239,7 @@ main(int argc, const char *argv[])
 		       p_fsxattr->fsx_cowextsize,
 		       errstr);
 	}
-# endif /* HAVE_STRUCT_FSXATTR_FSX_COWEXTSIZE */
 
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("FIFREEZE")
-
-#endif

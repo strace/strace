@@ -1,8 +1,0 @@
-/* Introduced by Linux kernel commit v2.6.29-rc1~10. */
-FIFREEZE	_IOWR('X', 119, int)
-FITHAW		_IOWR('X', 120, int)
-/* Introduced by Linux kernel commit v2.6.37-rc1~76^2^2~16. */
-FITRIM		_IOWR('X', 121, struct_fstrim_range)
-/* Introduced by Linux kernel commit v4.5-rc1~23^2~1^2~2. */
-FS_IOC_FSGETXATTR	_IOR('X', 31, struct_fsxattr)
-FS_IOC_FSSETXATTR	_IOW('X', 32, struct_fsxattr)

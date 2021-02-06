@@ -8,15 +8,12 @@
  */
 
 #include "defs.h"
-#include "types/fs_x.h"
-#define XLAT_MACROS_ONLY
-# include "xlat/fs_x_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
+#include <linux/fs.h>
 
 static void
 decode_fstrim_range(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_fstrim_range range;
+	struct fstrim_range range;
 
 	if (!umove_or_printaddr(tcp, arg, &range)) {
 		tprint_struct_begin();
@@ -35,7 +32,7 @@ static void
 decode_fsxattr(struct tcb *const tcp, const kernel_ulong_t arg,
 	       const bool is_get)
 {
-	struct_fsxattr fsxattr;
+	struct fsxattr fsxattr;
 
 	if (!umove_or_printaddr(tcp, arg, &fsxattr)) {
 		tprint_struct_begin();
