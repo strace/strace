@@ -8,14 +8,16 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_CRYPTOUSER_H
+#include <stdio.h>
+#include <stdint.h>
+#include "test_nlattr.h"
+#include <linux/cryptouser.h>
 
-# include <stdio.h>
-# include <stdint.h>
-# include "test_nlattr.h"
-# include <linux/cryptouser.h>
+#define XLAT_MACROS_ONLY
+# include "xlat/netlink_protocols.h"
+#undef XLAT_MACROS_ONLY
 
-# define CRYPTOCFGA_REPORT_LARVAL 2
+#define CRYPTOCFGA_REPORT_LARVAL 2
 
 static void
 init_crypto_user_alg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -76,7 +78,6 @@ main(void)
 		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
 		    printf("{type=\"%s\"}", str));
 
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_HASH
 	static const struct crypto_report_hash rhash = {
 		.type = "efgh",
 		.blocksize = 0xabcdefdc,
@@ -93,9 +94,7 @@ main(void)
 			      printf(", ");
 			      PRINT_FIELD_U(rhash, digestsize);
 			      printf("}"));
-# endif
 
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_BLKCIPHER
 	static const struct crypto_report_blkcipher rblkcipher = {
 		.type = "abcd",
 		.geniv = "efgh",
@@ -119,9 +118,7 @@ main(void)
 			      printf(", ");
 			      PRINT_FIELD_U(rblkcipher, ivsize);
 			      printf("}"));
-# endif
 
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_AEAD
 	static const struct crypto_report_aead raead = {
 		.type = "abcd",
 		.geniv = "efgh",
@@ -142,9 +139,7 @@ main(void)
 			      printf(", ");
 			      PRINT_FIELD_U(raead, ivsize);
 			      printf("}"));
-# endif
 
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_RNG
 	static const struct crypto_report_rng rrng = {
 		.type = "abcd",
 		.seedsize = 0xabcdefac
@@ -157,9 +152,7 @@ main(void)
 			      printf(", ");
 			      PRINT_FIELD_U(rrng, seedsize);
 			      printf("}"));
-# endif
 
-# ifdef HAVE_STRUCT_CRYPTO_REPORT_CIPHER
 	static const struct crypto_report_cipher rcipher = {
 		.type = "abcd",
 		.blocksize = 0xabcdefac,
@@ -179,14 +172,7 @@ main(void)
 			      printf(", ");
 			      PRINT_FIELD_U(rcipher, max_keysize);
 			      printf("}"));
-# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_CRYPTOUSER_H");
-
-#endif

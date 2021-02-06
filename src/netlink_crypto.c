@@ -11,13 +11,9 @@
 #include "netlink.h"
 #include "nlattr.h"
 
-#include "types/cryptouser.h"
+#include <linux/cryptouser.h>
 
 #include "xlat/crypto_nl_attrs.h"
-
-#define XLAT_MACROS_ONLY
-# include "xlat/crypto_msgs.h"
-#undef XLAT_MACROS_ONLY
 
 
 static bool
@@ -40,7 +36,7 @@ decode_crypto_report_hash(struct tcb *const tcp,
 			  const unsigned int len,
 			  const void *const opaque_data)
 {
-	struct_crypto_report_hash rhash;
+	struct crypto_report_hash rhash;
 
 	if (len < sizeof(rhash))
 		printstrn(tcp, addr, len);
@@ -63,7 +59,7 @@ decode_crypto_report_blkcipher(struct tcb *const tcp,
 			       const unsigned int len,
 			       const void *const opaque_data)
 {
-	struct_crypto_report_blkcipher rblkcipher;
+	struct crypto_report_blkcipher rblkcipher;
 
 	if (len < sizeof(rblkcipher))
 		printstrn(tcp, addr, len);
@@ -92,7 +88,7 @@ decode_crypto_report_aead(struct tcb *const tcp,
 			  const unsigned int len,
 			  const void *const opaque_data)
 {
-	struct_crypto_report_aead raead;
+	struct crypto_report_aead raead;
 
 	if (len < sizeof(raead))
 		printstrn(tcp, addr, len);
@@ -119,7 +115,7 @@ decode_crypto_report_rng(struct tcb *const tcp,
 			 const unsigned int len,
 			 const void *const opaque_data)
 {
-	struct_crypto_report_rng rrng;
+	struct crypto_report_rng rrng;
 
 	if (len < sizeof(rrng))
 		printstrn(tcp, addr, len);
@@ -140,7 +136,7 @@ decode_crypto_report_cipher(struct tcb *const tcp,
 			    const unsigned int len,
 			    const void *const opaque_data)
 {
-	struct_crypto_report_cipher rcipher;
+	struct crypto_report_cipher rcipher;
 
 	if (len < sizeof(rcipher))
 		printstrn(tcp, addr, len);
@@ -178,7 +174,7 @@ decode_crypto_user_alg(struct tcb *const tcp,
 		       const kernel_ulong_t addr,
 		       const unsigned int len)
 {
-	struct_crypto_user_alg alg;
+	struct crypto_user_alg alg;
 
 	if (len < sizeof(alg))
 		printstrn(tcp, addr, len);

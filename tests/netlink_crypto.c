@@ -8,13 +8,15 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_CRYPTOUSER_H
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <linux/cryptouser.h>
+#include "test_netlink.h"
 
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/socket.h>
-# include <linux/cryptouser.h>
-# include "test_netlink.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/netlink_protocols.h"
+#undef XLAT_MACROS_ONLY
 
 static void
 test_nlmsg_type(const int fd)
@@ -161,9 +163,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_CRYPTOUSER_H")
-
-#endif

@@ -12,6 +12,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
 	linux/include/uapi/linux/const.h \
+	linux/include/uapi/linux/cryptouser.h \
 	linux/include/uapi/linux/fiemap.h \
 	linux/include/uapi/linux/fs.h \
 	linux/include/uapi/linux/fscrypt.h \

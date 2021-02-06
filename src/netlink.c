@@ -13,6 +13,7 @@
 #include <linux/audit.h>
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
+#include <linux/cryptouser.h>
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
@@ -38,10 +39,6 @@
 #include "xlat/nl_sock_diag_types.h"
 #include "xlat/nl_xfrm_types.h"
 #include "xlat/nlmsgerr_attrs.h"
-
-#define XLAT_MACROS_ONLY
-# include "xlat/crypto_msgs.h"
-#undef XLAT_MACROS_ONLY
 
 /*
  * Fetch a struct nlmsghdr from the given address.
