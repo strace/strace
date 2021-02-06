@@ -12,9 +12,6 @@
 #include "xlat/fiemap_flags.h"
 #include "xlat/fiemap_extent_flags.h"
 #include "xlat/fs_ioc_flags.h"
-#define XLAT_MACROS_ONLY
-# include "xlat/fs_f_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
 
 static bool
 print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)

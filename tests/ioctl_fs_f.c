@@ -10,10 +10,9 @@
 #include "tests.h"
 #include <linux/fs.h>
 
-#ifdef FS_IOC_GETFLAGS
-# include <errno.h>
-# include <stdio.h>
-# include <sys/ioctl.h>
+#include <errno.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
 
 static const char *errstr;
 
@@ -69,8 +68,8 @@ main(int argc, const char *argv[])
 		       XLAT_SEL(cmds[i].cmd, cmds[i].str),
 		       p_flags + 1, errstr);
 
-#  define   VALID_FLAGS 0xf2ffffff
-#  define INVALID_FLAGS  0xd000000
+# define   VALID_FLAGS 0xf2ffffff
+# define INVALID_FLAGS  0xd000000
 		*p_flags = INVALID_FLAGS;
 
 		if (cmds[i].on_enter) {
@@ -127,9 +126,3 @@ main(int argc, const char *argv[])
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("FS_IOC_GETFLAGS")
-
-#endif
