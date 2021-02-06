@@ -303,10 +303,8 @@ ioctl_decode(struct tcb *tcp)
 	case '=': /* 0x3d */
 		return ptp_ioctl(tcp, code, arg);
 #endif
-#ifdef HAVE_LINUX_INPUT_H
 	case 'E':
 		return evdev_ioctl(tcp, code, arg);
-#endif
 	case 'I':
 		return inotify_ioctl(tcp, code, arg);
 	case 'L':

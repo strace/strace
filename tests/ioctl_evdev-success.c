@@ -7,17 +7,16 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_INPUT_H
+#include <assert.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+#include <linux/input.h>
+#include "print_fields.h"
 
-# include <assert.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/ioctl.h>
-# include <linux/input.h>
-# include "print_fields.h"
-
-# define NUM_WORDS 4
+#define NUM_WORDS 4
 
 static const char *errstr;
 
@@ -56,9 +55,9 @@ static void
 print_input_absinfo(long rc, const void *ptr, const void *arg)
 {
 	const struct input_absinfo *absinfo = ptr;
-# if VERBOSE
+#if VERBOSE
 	const uintptr_t sz = (uintptr_t) arg;
-# endif
+#endif
 
 	if (rc < 0) {
 		printf("%p", absinfo);
@@ -68,7 +67,7 @@ print_input_absinfo(long rc, const void *ptr, const void *arg)
 	PRINT_FIELD_U(*absinfo, value);
 	printf(", ");
 	PRINT_FIELD_U(*absinfo, minimum);
-# if VERBOSE
+#if VERBOSE
 	printf(", ");
 	PRINT_FIELD_U(*absinfo, maximum);
 	printf(", ");
@@ -77,12 +76,8 @@ print_input_absinfo(long rc, const void *ptr, const void *arg)
 	PRINT_FIELD_U(*absinfo, flat);
 	if (sz > offsetofend(struct input_absinfo, flat)) {
 		if (sz >= 24) {
-#  ifdef HAVE_STRUCT_INPUT_ABSINFO_RESOLUTION
 			printf(", ");
 			PRINT_FIELD_U(*absinfo, resolution);
-#  else
-			printf(", resolution=%u", *((int *) ptr + 5));
-#  endif
 
 			if (sz > 24)
 				printf(", ...");
@@ -90,9 +85,9 @@ print_input_absinfo(long rc, const void *ptr, const void *arg)
 			printf(", ...");
 		}
 	}
-# else
+#else
 	printf(", ...");
-# endif
+#endif
 	printf("}");
 }
 
@@ -112,7 +107,6 @@ print_input_id(long rc, const void *ptr, const void *arg)
 	       id->bustype, id->vendor, id->product, id->version);
 }
 
-# ifdef EVIOCGMTSLOTS
 static void
 print_mtslots(long rc, const void *ptr, const void *arg)
 {
@@ -130,16 +124,15 @@ print_mtslots(long rc, const void *ptr, const void *arg)
 		printf("%s%s", i > 1 ? ", " : "", str[i]);
 	printf("]}");
 }
-# endif
 
 static void
 print_getbit(long rc, const void *ptr, const void *arg)
 {
 	const char * const *str = arg + sizeof(char *);
-# if XLAT_RAW || XLAT_VERBOSE
+#if XLAT_RAW || XLAT_VERBOSE
 	const unsigned long *buf = ptr;
 	const unsigned long buf_size = (uintptr_t) (str[-1]);
-# endif
+#endif
 
 
 
@@ -148,27 +141,27 @@ print_getbit(long rc, const void *ptr, const void *arg)
 		return;
 	}
 
-# if !XLAT_RAW
+#if !XLAT_RAW
 	printf("[");
 	for (unsigned long i = 0; str[i]; i++) {
-#  if ! VERBOSE
+# if ! VERBOSE
 		if (i >= 4) {
 			printf(", ...");
 			break;
 		}
-#  endif
+# endif
 		if (i)
 			printf(", ");
 		printf("%s", str[i]);
 	}
 	printf("]");
-# endif /* !XLAT_RAW */
+#endif /* !XLAT_RAW */
 
-# if XLAT_VERBOSE
+#if XLAT_VERBOSE
 	printf(" /* ");
-# endif
+#endif
 
-# if XLAT_RAW || XLAT_VERBOSE
+#if XLAT_RAW || XLAT_VERBOSE
 	printf("[");
 	const unsigned long cnt =
 		(MIN((unsigned long) rc, buf_size) + sizeof(long) - 1)
@@ -176,11 +169,11 @@ print_getbit(long rc, const void *ptr, const void *arg)
 	for (unsigned long i = 0; i < cnt; i++)
 		printf("%s%#lx", i ? ", " : "", buf[i]);
 	printf("]");
-# endif
+#endif
 
-# if XLAT_VERBOSE
+#if XLAT_VERBOSE
 	printf(" */");
-# endif
+#endif
 }
 
 int
@@ -237,7 +230,6 @@ main(int argc, char **argv)
 	fill_memory(absinfo_24, 24);
 	fill_memory(absinfo_32, 32);
 
-# ifdef EVIOCGMTSLOTS
 	static const unsigned int mtslots[] = { ABS_MT_SLOT, 1, 3 };
 	static const char * const mtslots_str[] = {
 		"ABS_MT_SLOT", "1", "3", NULL };
@@ -246,18 +238,17 @@ main(int argc, char **argv)
 	static const unsigned int invalid_mtslot[] = { -1, 1 };
 	static const char * const invalid_mtslot_str[] = {
 		""
-#  if !XLAT_RAW && !XLAT_VERBOSE
+#if !XLAT_RAW && !XLAT_VERBOSE
 		"0xffffffff"
-#  endif
-#  if !XLAT_VERBOSE
+#endif
+#if !XLAT_VERBOSE
 		" /* "
-#  endif
+#endif
 		"ABS_MT_???"
-#  if !XLAT_VERBOSE
+#if !XLAT_VERBOSE
 		" */"
-#  endif
+#endif
 		, "1", NULL };
-# endif
 
 	enum { ULONG_BIT = sizeof(unsigned long) * 8 };
 
@@ -347,10 +338,8 @@ main(int argc, char **argv)
 			inject_retval * 8 <= KEY_F12
 				? (const void *) &key_str_8
 				: (const void *) &key_str_16 },
-# ifdef EVIOCGMTSLOTS
 		{ { ARG_STR(EVIOCGMTSLOTS(12)), mtslots, print_mtslots }, &mtslots_str },
 		{ { ARG_STR(EVIOCGMTSLOTS(8)), invalid_mtslot, print_mtslots }, &invalid_mtslot_str }
-# endif
 	};
 	for (unsigned int i = 0; i < ARRAY_SIZE(a); i++) {
 		test_evdev(&a[i].check, a[i].ptr);
@@ -359,8 +348,3 @@ main(int argc, char **argv)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_INPUT_H")
-
-#endif

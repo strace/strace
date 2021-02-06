@@ -1,4 +1,5 @@
+#unconditional
 #value_indexed
-SND_CLICK	0x00
-SND_BELL	0x01
-SND_TONE	0x02
+SND_CLICK
+SND_BELL
+SND_TONE

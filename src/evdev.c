@@ -8,62 +8,31 @@
  */
 
 #include "defs.h"
-
+#include <linux/ioctl.h>
+#include <linux/input.h>
 #include "xlat/evdev_abs.h"
 #include "xlat/evdev_ev.h"
-
-#ifdef HAVE_LINUX_INPUT_H
-
-# include <linux/ioctl.h>
-# include "types/evdev.h"
-
-# include "xlat/evdev_autorepeat.h"
-# include "xlat/evdev_ff_status.h"
-# include "xlat/evdev_ff_types.h"
-# include "xlat/evdev_keycode.h"
-# include "xlat/evdev_leds.h"
-# include "xlat/evdev_misc.h"
-# include "xlat/evdev_mtslots.h"
-# include "xlat/evdev_prop.h"
-# include "xlat/evdev_relative_axes.h"
-# include "xlat/evdev_snd.h"
-# include "xlat/evdev_switch.h"
-
-/** Added by Linux commit v2.6.38-rc1~247^2~1^2~2^2~5 */
-# ifndef INPUT_PROP_MAX
-#  define INPUT_PROP_MAX 0x1f
-# endif
-# ifndef SYN_MAX
-#  define SYN_MAX 0xf
-# endif
-
-/*
- * Has to be included after struct_* type definitions, since _IO* macros
- * used in fallback definitions require them for sizeof().
- */
-# define XLAT_MACROS_ONLY
-#  include "xlat/evdev_ioctl_cmds.h"
-# undef XLAT_MACROS_ONLY
-
-# ifndef EVIOCGPROP
-#  define EVIOCGPROP(len)	_IOR('E', 0x09, len)
-# endif
-# ifndef EVIOCGMTSLOTS
-#  define EVIOCGMTSLOTS(len)	_IOR('E', 0x0a, len)
-# endif
-# ifndef EVIOCGSW
-#  define EVIOCGSW(len)		_IOR('E', 0x1b, len)
-# endif
+#include "xlat/evdev_autorepeat.h"
+#include "xlat/evdev_ff_status.h"
+#include "xlat/evdev_ff_types.h"
+#include "xlat/evdev_keycode.h"
+#include "xlat/evdev_leds.h"
+#include "xlat/evdev_misc.h"
+#include "xlat/evdev_mtslots.h"
+#include "xlat/evdev_prop.h"
+#include "xlat/evdev_relative_axes.h"
+#include "xlat/evdev_snd.h"
+#include "xlat/evdev_switch.h"
 
 static int
 abs_ioctl(struct tcb *const tcp, const unsigned int code,
 	  const kernel_ulong_t arg)
 {
-	static const size_t orig_sz = offsetofend(struct_input_absinfo, flat);
-	static const size_t res_sz = offsetofend(struct_input_absinfo,
+	static const size_t orig_sz = offsetofend(struct input_absinfo, flat);
+	static const size_t res_sz = offsetofend(struct input_absinfo,
 						 resolution);
 
-	struct_input_absinfo absinfo;
+	struct input_absinfo absinfo;
 	size_t sz = _IOC_SIZE(code);
 	size_t read_sz = MIN(sz, sizeof(absinfo));
 
@@ -128,7 +97,7 @@ keycode_V2_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprints(", ");
 
-	struct_input_keymap_entry ike;
+	struct input_keymap_entry ike;
 
 	if (umove_or_printaddr(tcp, arg, &ike))
 		return RVAL_IOCTL_DECODED;
@@ -461,5 +430,3 @@ evdev_ioctl(struct tcb *const tcp,
 		return RVAL_DECODED;
 	}
 }
-
-#endif /* HAVE_LINUX_INPUT_H */

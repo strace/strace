@@ -9,20 +9,14 @@
 
 #include "defs.h"
 
-#ifdef HAVE_LINUX_INPUT_H
-
 # include DEF_MPERS_TYPE(struct_ff_effect)
 
-# include <linux/ioctl.h>
-# include <linux/input.h>
+#include <linux/ioctl.h>
+#include <linux/input.h>
 
 typedef struct ff_effect struct_ff_effect;
 
-#endif /* HAVE_LINUX_INPUT_H */
-
 #include MPERS_DEFS
-
-#ifdef HAVE_LINUX_INPUT_H
 
 static void
 print_ff_envelope(const MPERS_PTR_ARG(struct ff_envelope *) const arg)
@@ -195,5 +189,3 @@ MPERS_PRINTER_DECL(int, evdev_write_ioctl_mpers, struct tcb *const tcp,
 		return RVAL_DECODED;
 	}
 }
-
-#endif /* HAVE_LINUX_INPUT_H */

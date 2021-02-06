@@ -10,32 +10,24 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_INPUT_H
+#include <errno.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+#include <linux/input.h>
 
-# include <errno.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/ioctl.h>
-# include <linux/input.h>
-
-# ifndef EV_SW
-#  define EV_SW 5
-# endif
-# ifndef ABS_MT_TOOL_Y
-#  define ABS_MT_TOOL_Y 0x3d
-# endif
-
-# if XLAT_VERBOSE
-#  define UNK_CMD(val_, str_) val_
-# else
-#  define UNK_CMD(val_, str_) val_ " /* " str_ " */"
-# endif
+#if XLAT_VERBOSE
+# define UNK_CMD(val_, str_) val_
+#else
+# define UNK_CMD(val_, str_) val_ " /* " str_ " */"
+#endif
 
 static const unsigned int magic = 0xdeadbeef;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
-# if VERBOSE
+#if VERBOSE
 static void
 print_envelope(const struct ff_envelope *const e)
 {
@@ -44,7 +36,7 @@ print_envelope(const struct ff_envelope *const e)
 	       e->attack_length, e->attack_level,
 	       e->fade_length, e->fade_level);
 }
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 
 static void
 print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
@@ -54,22 +46,22 @@ print_ffe_common(const struct ff_effect *const ffe, const char *const type_str)
 	       ", direction=%" PRIu16 ", ",
 	       sprintxlat(type_str, ffe->type, NULL),
 	       ffe->id, ffe->direction);
-# if VERBOSE
+#if VERBOSE
 	printf("trigger={button=%hu, interval=%hu}"
 	       ", replay={length=%hu, delay=%hu}",
 	       ffe->trigger.button, ffe->trigger.interval,
 	       ffe->replay.length, ffe->replay.delay);
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 }
 
-# define TEST_NULL_ARG_EX(cmd, str)					\
+#define TEST_NULL_ARG_EX(cmd, str)					\
 	do {								\
 		ioctl(-1, cmd, 0);					\
 		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",		\
 		       sprintxlat(str, cmd, NULL));			\
 	} while (0)
 
-# define TEST_NULL_ARG(cmd) TEST_NULL_ARG_EX(cmd, #cmd)
+#define TEST_NULL_ARG(cmd) TEST_NULL_ARG_EX(cmd, #cmd)
 
 int
 main(void)
@@ -80,38 +72,22 @@ main(void)
 	TEST_NULL_ARG(EVIOCGKEYCODE);
 	TEST_NULL_ARG(EVIOCSKEYCODE);
 	TEST_NULL_ARG(EVIOCSFF);
-# ifdef EVIOCGKEYCODE_V2
 	TEST_NULL_ARG(EVIOCGKEYCODE_V2);
-# endif
-# ifdef EVIOCSKEYCODE_V2
 	TEST_NULL_ARG(EVIOCSKEYCODE_V2);
-# endif
-# ifdef EVIOCGREP
 	TEST_NULL_ARG(EVIOCGREP);
-# endif
-# ifdef EVIOCSREP
 	TEST_NULL_ARG(EVIOCSREP);
-# endif
-# ifdef EVIOCSCLOCKID
 	TEST_NULL_ARG(EVIOCSCLOCKID);
-# endif
 
 	TEST_NULL_ARG(EVIOCGNAME(0));
 	TEST_NULL_ARG(EVIOCGPHYS(0));
 	TEST_NULL_ARG(EVIOCGUNIQ(0));
 	TEST_NULL_ARG(EVIOCGKEY(0));
 	TEST_NULL_ARG(EVIOCGLED(0));
-# ifdef EVIOCGMTSLOTS
 	TEST_NULL_ARG(EVIOCGMTSLOTS(0));
 	TEST_NULL_ARG(EVIOCGMTSLOTS(8));
-# endif
-# ifdef EVIOCGPROP
 	TEST_NULL_ARG(EVIOCGPROP(0));
-# endif
 	TEST_NULL_ARG(EVIOCGSND(0));
-# ifdef EVIOCGSW
 	TEST_NULL_ARG(EVIOCGSW(0));
-# endif
 
 	TEST_NULL_ARG(EVIOCGABS(ABS_X));
 	TEST_NULL_ARG(EVIOCSABS(ABS_X));
@@ -156,13 +132,13 @@ main(void)
 
 	ioctl(-1, EVIOCGBIT(EV_MAX, 42), 0);
 	printf("ioctl(-1, ");
-# if XLAT_RAW
+#if XLAT_RAW
 	printf("%#x", EVIOCGBIT(EV_MAX, 42));
-# elif XLAT_VERBOSE
+#elif XLAT_VERBOSE
 	printf("%#x /* EVIOCGBIT(%#x, 42) */", EVIOCGBIT(EV_MAX, 42), EV_MAX);
-# else
+#else
 	printf("EVIOCGBIT(%#x /* EV_??? */, 42)", EV_MAX);
-# endif
+#endif
 	printf(", NULL) = -1 EBADF (%m)\n");
 
 	ioctl(-1, EVIOCRMFF, lmagic);
@@ -173,11 +149,9 @@ main(void)
 	printf("ioctl(-1, %s, %lu) = -1 EBADF (%m)\n",
 	       XLAT_STR(EVIOCGRAB), lmagic);
 
-# ifdef EVIOCREVOKE
 	ioctl(-1, EVIOCREVOKE, lmagic);
 	printf("ioctl(-1, %s, %lu) = -1 EBADF (%m)\n",
 	       XLAT_STR(EVIOCREVOKE), lmagic);
-# endif
 
 	const unsigned int size = get_page_size();
 	void *const page = tail_alloc(size);
@@ -186,21 +160,17 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, val_int);
 	*val_int = magic;
 
-# ifdef EVIOCSCLOCKID
 	ioctl(-1, EVIOCSCLOCKID, val_int);
 	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
 	       XLAT_STR(EVIOCSCLOCKID), *val_int);
-# endif
 
 	int *pair_int = tail_alloc(sizeof(*pair_int) * 2);
 	pair_int[0] = 0xdeadbeef;
 	pair_int[1] = 0xbadc0ded;
 
-# ifdef EVIOSGREP
 	ioctl(-1, EVIOCSREP, pair_int);
 	printf("ioctl(-1, %s, [%u, %u]) = -1 EBADF (%m)\n",
 	       XLAT_STR(EVIOCSREP), pair_int[0], pair_int[1]);
-# endif
 
 	pair_int[1] = 1;
 	ioctl(-1, EVIOCSKEYCODE, pair_int);
@@ -208,7 +178,6 @@ main(void)
 	       XLAT_STR(EVIOCSKEYCODE), pair_int[0],
 	       XLAT_KNOWN(0x1, "KEY_ESC"));
 
-# ifdef EVIOCSKEYCODE_V2
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct input_keymap_entry, ike);
 	fill_memory(ike, sizeof(*ike));
 	ike->keycode = 2;
@@ -216,7 +185,7 @@ main(void)
 	ioctl(-1, EVIOCSKEYCODE_V2, ike);
 	printf("ioctl(-1, %s, {flags=%" PRIu8 ", len=%" PRIu8 ", ",
 	       XLAT_STR(EVIOCSKEYCODE_V2), ike->flags, ike->len);
-#  if VERBOSE
+# if VERBOSE
 	printf("index=%" PRIu16 ", keycode=%s, scancode=[",
 	       ike->index, XLAT_STR(KEY_1));
 	unsigned int i;
@@ -226,12 +195,11 @@ main(void)
 		printf("%#" PRIx8, ike->scancode[i]);
 	}
 	printf("]");
-#  else
+# else
 	printf("...");
-#  endif
+# endif
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
-# endif
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct ff_effect, ffe);
 	fill_memory(ffe, sizeof(*ffe));
@@ -240,17 +208,17 @@ main(void)
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe, "FF_CONSTANT");
 
-# if VERBOSE
+#if VERBOSE
 	printf(", constant={level=%hd", ffe->u.constant.level);
 	print_envelope(&ffe->u.constant.envelope);
 	printf("}");
-# else
+#else
 	printf("...");
-# endif
+#endif
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
 
-# if VERBOSE
+#if VERBOSE
 	ffe->type = FF_RAMP;
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe, "FF_RAMP");
@@ -285,20 +253,20 @@ main(void)
 	ffe->type = 0xff;
 	ioctl(-1, EVIOCSFF, ffe);
 	print_ffe_common(ffe,
-#  if !XLAT_RAW && !XLAT_VERBOSE
+# if !XLAT_RAW && !XLAT_VERBOSE
 		"0xff"
-#  endif
-#  if !XLAT_VERBOSE
+# endif
+# if !XLAT_VERBOSE
 		" /* "
-#  endif
+# endif
 		"FF_???"
-#  if !XLAT_VERBOSE
+# if !XLAT_VERBOSE
 		" */"
-#  endif
+# endif
 		);
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
-# endif
+#endif
 
 	ioctl(-1, _IOC(_IOC_READ, 0x45, 0x1, 0xff), lmagic);
 	printf("ioctl(-1, %s, %#lx) = -1 EBADF (%m)\n",
@@ -319,8 +287,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_INPUT_H")
-
-#endif

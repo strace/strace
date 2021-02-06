@@ -22,18 +22,14 @@
 #ifdef HAVE_LINUX_HIDDEV_H
 # include <linux/hiddev.h>
 #endif
-#ifdef HAVE_LINUX_INPUT_H
-# include <linux/input.h>
-#endif
+#include <linux/input.h>
 
 #include <linux/videodev2.h>
 
 #if defined MMTIMER_GETRES \
  && defined VIDIOC_ENUMINPUT \
  && defined HIDIOCGVERSION \
- && defined HIDIOCGPHYS \
- && defined EVIOCGBIT \
- && defined EV_KEY
+ && defined HIDIOCGPHYS
 
 int
 main(void)
@@ -91,7 +87,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("MMTIMER_GETRES && VIDIOC_ENUMINPUT"
-		    " && HIDIOCGVERSION && HIDIOCGPHYS"
-		    " && EVIOCGBIT && EV_KEY")
+		    " && HIDIOCGVERSION && HIDIOCGPHYS")
 
 #endif

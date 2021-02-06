@@ -1,3 +1,4 @@
+#unconditional
 #value_indexed
-REP_DELAY	0x00
-REP_PERIOD	0x01
+REP_DELAY
+REP_PERIOD
