@@ -14,10 +14,6 @@
 #include <sys/ioctl.h>
 #include "kernel_v4l2_types.h"
 
-#define XLAT_MACROS_ONLY
-# include "xlat/v4l2_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
-
 static bool
 fill_fmt(struct v4l2_format *f)
 {
@@ -37,9 +33,7 @@ fill_fmt(struct v4l2_format *f)
 		break;
 
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
-#endif
 		f->fmt.win.w.left    = 0xa0a1a2a3;
 		f->fmt.win.w.top     = 0xb0b1b2b3;
 		f->fmt.win.w.width   = 0xc0c1c2c3;
@@ -91,7 +85,6 @@ fill_fmt(struct v4l2_format *f)
 			? 0x3 : 0x1ce50d1c;
 		break;
 
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
 		f->fmt.pix_mp.width        = 0xdeaffade;
@@ -107,25 +100,23 @@ fill_fmt(struct v4l2_format *f)
 				f->fmt.pix_mp.plane_fmt[i].bytesperline
 					= 0xd0decad1 ^ i;
 			} else {
-# ifdef WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 				f->fmt.pix_mp.plane_fmt[i].bytesperline
 					= 0xd0de;
 				f->fmt.pix_mp.plane_fmt[i].reserved[0]
 					= 0xcad1 ^ i;
-# else
+#else
 				f->fmt.pix_mp.plane_fmt[i].bytesperline
 					= 0xcad1 ^ i;
 				f->fmt.pix_mp.plane_fmt[i].reserved[0]
 					= 0xd0de;
-# endif
+#endif
 			}
 		}
 
 		f->fmt.pix_mp.num_planes   = f->type ==
 			V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE ? 0xd5 : 0;
 		break;
-#endif
-#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
 		f->fmt.sliced.service_set = 0xfeed;
@@ -137,39 +128,19 @@ fill_fmt(struct v4l2_format *f)
 		}
 		f->fmt.sliced.io_size = 0xdefaceed;
 		break;
-#endif
-#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
-# if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
-# endif
 		f->fmt.sdr.pixelformat = V4L2_SDR_FMT_CU8;
-# ifdef HAVE_STRUCT_V4L2_SDR_FORMAT_BUFFERSIZE
 		if (sizeof(f->fmt.sdr.buffersize == sizeof(uint32_t)))
 			f->fmt.sdr.buffersize = 0xbadc0ded;
 		else
 			((uint32_t *) &f->fmt.sdr)[1] = 0xbadc0ded;
-# else
-		((uint32_t *) &f->fmt.sdr)[1] = 0xbadc0ded;
-# endif
 		break;
-#endif
-#if HAVE_DECL_V4L2_BUF_TYPE_META_CAPTURE
 	case V4L2_BUF_TYPE_META_CAPTURE:
-# if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
 	case V4L2_BUF_TYPE_META_OUTPUT:
-# else
-	case 14:
-# endif
 		f->fmt.meta.dataformat = V4L2_META_FMT_VSP1_HGO;
 		f->fmt.meta.buffersize  = 0xbadc0ded;
 		break;
-#else
-	case 13: case 14:
-		((uint32_t *) &f->fmt)[0] = 0x48505356;
-		((uint32_t *) &f->fmt)[1] = 0xbadc0ded;
-		break;
-#endif
 	default:
 		return false;
 	}
@@ -196,9 +167,7 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 		break;
 
 	case V4L2_BUF_TYPE_VIDEO_OVERLAY:
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY:
-#endif
 		printf("%sfmt.win={w={left=-1600019805, top=-1330531661"
 		       ", width=3233923779, height=3503411923}, field=%s"
 		       ", chromakey=0xbeefface, clips=[",
@@ -222,21 +191,7 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 		else
 			printf("%p", f->fmt.win.bitmap);
 
-#ifdef HAVE_STRUCT_V4L2_WINDOW_GLOBAL_ALPHA
 		printf(", global_alpha=%#hhx}", f->fmt.win.global_alpha);
-#else
-		struct win_ga {
-			struct v4l2_rect w;
-			uint32_t field;
-			uint32_t chromakey;
-			struct v4l2_clip *clips;
-			uint32_t clipcount;
-			void *bitmap;
-			uint8_t global_alpha;
-		};
-		printf(", global_alpha=%#hhx}",
-		       ((struct win_ga *) &f->fmt.win)->global_alpha);
-#endif
 		break;
 
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
@@ -252,7 +207,6 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 			: XLAT_UNKNOWN(0x1ce50d1c, "V4L2_VBI_???"));
 		break;
 
-#if HAVE_DECL_V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE:
 		printf("%sfmt.pix_mp={width=3736074974, height=4208898469"
@@ -282,8 +236,6 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 			printf("], num_planes=0}");
 		}
 		break;
-#endif
-#if HAVE_DECL_V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT:
 		printf("%sfmt.sliced={service_set="
@@ -300,26 +252,17 @@ print_fmt(const char *pfx, struct v4l2_format *f)
 		       ", 0xdfbb, 0xdfba]], io_size=3740978925}",
 		       pfx);
 		break;
-#endif
-#if HAVE_DECL_V4L2_BUF_TYPE_SDR_CAPTURE
 	case V4L2_BUF_TYPE_SDR_CAPTURE:
-# if HAVE_DECL_V4L2_BUF_TYPE_SDR_OUTPUT
 	case V4L2_BUF_TYPE_SDR_OUTPUT:
-# endif
 		printf("%sfmt.sdr={pixelformat=" RAW("0x38305543")
 		       NRAW("v4l2_fourcc('C', 'U', '0', '8')"
 			    " /* V4L2_SDR_FMT_CU8 */")
 		       ", buffersize=3134983661}",
 		       pfx);
 		break;
-#endif
 
-#if HAVE_DECL_V4L2_BUF_TYPE_META_OUTPUT
 	case V4L2_BUF_TYPE_META_CAPTURE:
 	case V4L2_BUF_TYPE_META_OUTPUT:
-#else
-	case 13: case 14:
-#endif
 		printf("%sfmt.meta={dataformat=" RAW("0x48505356")
 		       NRAW("v4l2_fourcc('V', 'S', 'P', 'H')"
 			    " /* V4L2_META_FMT_VSP1_HGO */")
@@ -373,11 +316,7 @@ main(int argc, char **argv)
 
 	fill_memory(caps, sizeof(*caps));
 	caps->capabilities = 0xdeadbeef;
-#ifdef HAVE_STRUCT_V4L2_CAPABILITY_DEVICE_CAPS
 	caps->device_caps = 0xfacefeed;
-#else
-	caps->reserved[0] = 0xfacefeed;
-#endif
 
 	ioctl(-1, VIDIOC_QUERYCAP, 0);
 	printf("ioctl(-1, %s, NULL) = %ld (INJECTED)\n",
@@ -1307,7 +1246,6 @@ main(int argc, char **argv)
 	}
 
 
-#ifdef VIDIOC_S_EXT_CTRLS
 	/* VIDIOC_S_EXT_CTRLS, VIDIOC_TRY_EXT_CTRLS, VIDIOC_G_EXT_CTRLS */
 	static const struct strval32 ectrl_cmds[] = {
 		{ ARG_STR(VIDIOC_S_EXT_CTRLS) },
@@ -1334,10 +1272,7 @@ main(int argc, char **argv)
 		       (char *) ectrls + 1, inject_retval);
 	}
 
-#endif /* VIDIOC_S_EXT_CTRLS */
 
-
-#ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
 	/* VIDIOC_ENUM_FRAMESIZES */
 	static const struct strval32 frmsz_simple_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_FRMSIZE_TYPE_???") },
@@ -1396,10 +1331,8 @@ main(int argc, char **argv)
 		       frmsz_simple_types[i].str, inject_retval);
 
 	}
-#endif /* HAVE_STRUCT_V4L2_FRMSIZEENUM */
 
 
-#ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
 	/* VIDIOC_ENUM_FRAMEINTERVALS */
 	static const struct strval32 frmival_simple_types[] = {
 		{ ARG_XLAT_UNKNOWN(0, "V4L2_FRMIVAL_TYPE_???") },
@@ -1465,10 +1398,8 @@ main(int argc, char **argv)
 		       frmival_simple_types[i].str, inject_retval);
 
 	}
-#endif /* HAVE_STRUCT_V4L2_FRMIVALENUM */
 
 
-#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
 	/* VIDIOC_CREATE_BUFS */
 	struct v4l2_create_buffers *cbuf = tail_alloc(sizeof(*cbuf));
 
@@ -1499,9 +1430,7 @@ main(int argc, char **argv)
 		printf("}}) = %ld ({index=2158018784, count=2158018785})"
 		       " (INJECTED)\n", inject_retval);
 	}
-#endif /* HAVE_STRUCT_V4L2_CREATE_BUFFERS */
 
-#ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
 	/* VIDIOC_QUERY_EXT_CTRL */
 	static const struct strval32 qextc_nrdims[] = {
 		{ ARG_STR(0) },
@@ -1552,7 +1481,7 @@ main(int argc, char **argv)
 			       ctrl_types[i % ARRAY_SIZE(ctrl_types)].str);
 			print_quoted_cstring((char *) qextc->name,
 					     sizeof(qextc->name));
-# if VERBOSE
+#if VERBOSE
 			printf(", minimum=-4982091772484257074"
 			       ", maximum=-2392818855418269683"
 			       ", step=13739898750918873566"
@@ -1578,16 +1507,14 @@ main(int argc, char **argv)
 				", 0x80a0c116, 0x80a0c117, 0x80a0c118"
 				", 0x80a0c119]"
 			);
-# else
+#else
 			printf(", ...");
-# endif
+#endif
 			printf("}) = %ld (INJECTED)\n", inject_retval);
 
 			memset(qextc->reserved, 0, sizeof(qextc->reserved));
 		}
 	}
-
-#endif /* HAVE_STRUCT_V4L2_QUERY_EXT_CTRL */
 
 	puts("+++ exited with 0 +++");
 

@@ -1,6 +1,7 @@
+#unconditional
 #sorted sed -rn 's/.*v4l2_fourcc(_be)?\('"'(.)', '(.)', '(.)', '(.)'"'\).*/\10\5\4\3\2\t\0/p' |LC_COLLATE=C sort -k1,1 -t' ' |cut -f2-
-V4L2_META_FMT_VIVID	v4l2_fourcc('V', 'I', 'V', 'D') /* Vivid Metadata */
-V4L2_META_FMT_UVC	v4l2_fourcc('U', 'V', 'C', 'H') /* UVC Payload Header metadata */
-V4L2_META_FMT_VSP1_HGO	v4l2_fourcc('V', 'S', 'P', 'H') /* R-Car VSP1 1-D Histogram */
-V4L2_META_FMT_VSP1_HGT	v4l2_fourcc('V', 'S', 'P', 'T') /* R-Car VSP1 2-D Histogram */
-V4L2_META_FMT_D4XX	v4l2_fourcc('D', '4', 'X', 'X') /* D4XX Payload Header metadata */
+V4L2_META_FMT_VIVID
+V4L2_META_FMT_UVC
+V4L2_META_FMT_VSP1_HGO
+V4L2_META_FMT_VSP1_HGT
+V4L2_META_FMT_D4XX

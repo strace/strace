@@ -10,24 +10,6 @@
 
 #include "defs.h"
 
-#include "static_assert.h"
-
-#define CHECK_V4L2_STRUCT_SIZE(s_) \
-	static_assert(sizeof(struct s_) == sizeof(struct_##s_), \
-		      "Unexpected struct " #s_ " size")
-#define CHECK_V4L2_STRUCT_SIZE_LE(s_) \
-	static_assert(sizeof(struct s_) <= sizeof(struct_##s_), \
-		      "Unexpected struct " #s_ " size, " \
-		      "please update the decoder")
-#define CHECK_V4L2_RESERVED_SIZE(s_) \
-	static_assert(sizeof_field(struct s_, reserved) \
-		      >= sizeof_field(struct_##s_, reserved), \
-		      "Unexpected struct " #s_ ".reserved size, " \
-		      "please update the decoder")
-#define CHECK_V4L2_STRUCT_RESERVED_SIZE(s_) \
-	CHECK_V4L2_STRUCT_SIZE(s_); \
-	CHECK_V4L2_RESERVED_SIZE(s_)
-
 #include DEF_MPERS_TYPE(kernel_v4l2_buffer_t)
 #include DEF_MPERS_TYPE(kernel_v4l2_event_t)
 #include DEF_MPERS_TYPE(kernel_v4l2_timeval_t)
@@ -42,61 +24,24 @@
 #include DEF_MPERS_TYPE(struct_v4l2_window)
 
 #include "kernel_v4l2_types.h"
-
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_capability);
-CHECK_V4L2_STRUCT_SIZE_LE(v4l2_pix_format);
-#ifdef HAVE_STRUCT_V4L2_PLANE_PIX_FORMAT
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_plane_pix_format);
-#endif
-#ifdef HAVE_STRUCT_V4L2_PIX_FORMAT_MPLANE
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_pix_format_mplane);
-#endif
-CHECK_V4L2_STRUCT_SIZE(v4l2_clip);
-CHECK_V4L2_STRUCT_SIZE_LE(v4l2_window);
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_vbi_format);
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sliced_vbi_format);
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sliced_vbi_cap);
-#ifdef HAVE_STRUCT_V4L2_SDR_FORMAT
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_sdr_format);
-#endif
-#ifdef HAVE_STRUCT_V4L2_META_FORMAT
-CHECK_V4L2_STRUCT_SIZE(v4l2_meta_format);
-#endif
-CHECK_V4L2_STRUCT_SIZE(v4l2_format);
-#ifdef HAVE_STRUCT_V4L2_QUERY_EXT_CTRL
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_query_ext_ctrl);
-#endif
-#ifdef HAVE_STRUCT_V4L2_FRMSIZEENUM
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmsizeenum);
-#endif
-#ifdef HAVE_STRUCT_V4L2_FRMIVALENUM
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_frmivalenum);
-#endif
-#ifdef HAVE_STRUCT_V4L2_CREATE_BUFFERS
-CHECK_V4L2_STRUCT_RESERVED_SIZE(v4l2_create_buffers);
-#endif
+typedef struct v4l2_clip struct_v4l2_clip;
+typedef struct v4l2_create_buffers struct_v4l2_create_buffers;
+typedef struct v4l2_ext_control struct_v4l2_ext_control;
+typedef struct v4l2_ext_controls struct_v4l2_ext_controls;
+typedef struct v4l2_format struct_v4l2_format;
+typedef struct v4l2_framebuffer struct_v4l2_framebuffer;
+typedef struct v4l2_input struct_v4l2_input;
+typedef struct v4l2_standard struct_v4l2_standard;
+typedef struct v4l2_window struct_v4l2_window;
 
 #include MPERS_DEFS
 
 #include "print_utils.h"
 #include "xstring.h"
 
-/* v4l2_fourcc_be was added by Linux commit v3.18-rc1~101^2^2~127 */
-#ifndef v4l2_fourcc_be
-# define v4l2_fourcc_be(a, b, c, d) (v4l2_fourcc(a, b, c, d) | (1U << 31))
-#endif
-
-#ifndef VIDEO_MAX_PLANES
-# define VIDEO_MAX_PLANES 8
-#endif
-
 #include "xlat/v4l2_meta_fmts.h"
 #include "xlat/v4l2_pix_fmts.h"
 #include "xlat/v4l2_sdr_fmts.h"
-
-#define XLAT_MACROS_ONLY
-# include "xlat/v4l2_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
 
 static void
 print_v4l2_rect(const MPERS_PTR_ARG(struct v4l2_rect *) const arg)
@@ -190,7 +135,7 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 static int
 print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_v4l2_capability caps;
+	struct v4l2_capability caps;
 
 	if (entering(tcp))
 		return 0;
@@ -297,7 +242,7 @@ static bool
 print_v4l2_plane_pix_format_array_member(struct tcb *tcp, void *elem_buf,
 					 size_t elem_size, void *data)
 {
-	struct_v4l2_plane_pix_format *p = elem_buf;
+	struct v4l2_plane_pix_format *p = elem_buf;
 
 	tprint_struct_begin();
 	PRINT_FIELD_U(*p, sizeimage);
@@ -565,10 +510,6 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_buf_flags.h"
 #include "xlat/v4l2_buf_flags_ts_type.h"
 #include "xlat/v4l2_buf_flags_ts_src.h"
-
-#define XLAT_MACROS_ONLY
-# include "xlat/v4l2_buf_flags_masks.h"
-#undef XLAT_MACROS_ONLY
 
 static void
 print_v4l2_buffer_flags(uint32_t val)
@@ -1078,7 +1019,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_v4l2_query_ext_ctrl c;
+	struct v4l2_query_ext_ctrl c;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -1281,9 +1222,8 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 #include "xlat/v4l2_framesize_types.h"
 
 static void
-print_v4l2_frmsize_discrete(const MPERS_PTR_ARG(struct_v4l2_frmsize_discrete *) const arg)
+print_v4l2_frmsize_discrete(const struct v4l2_frmsize_discrete *const p)
 {
-	const struct_v4l2_frmsize_discrete *const p = arg;
 	tprint_struct_begin();
 	PRINT_FIELD_U(*p, width);
 	tprint_struct_next();
@@ -1292,9 +1232,8 @@ print_v4l2_frmsize_discrete(const MPERS_PTR_ARG(struct_v4l2_frmsize_discrete *) 
 }
 
 static void
-print_v4l2_frmsize_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmsize_stepwise *) const arg)
+print_v4l2_frmsize_stepwise(const struct v4l2_frmsize_stepwise *const p)
 {
-	const struct_v4l2_frmsize_stepwise *const p = arg;
 	tprint_struct_begin();
 	PRINT_FIELD_U(*p, min_width);
 	tprint_struct_next();
@@ -1319,7 +1258,7 @@ print_v4l2_frmsize_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmsize_stepwise *) 
 static int
 print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_v4l2_frmsizeenum s;
+	struct v4l2_frmsizeenum s;
 
 	if (entering(tcp)) {
 		tprints(", ");
@@ -1354,9 +1293,8 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 #include "xlat/v4l2_frameinterval_types.h"
 
 static void
-print_v4l2_frmival_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmival_stepwise *) const arg)
+print_v4l2_frmival_stepwise(const struct v4l2_frmival_stepwise *const p)
 {
-	const struct_v4l2_frmival_stepwise *const p = arg;
 	tprint_struct_begin();
 	PRINT_FIELD_FRACT(*p, min);
 	tprint_struct_next();
@@ -1375,7 +1313,7 @@ print_v4l2_frmival_stepwise(const MPERS_PTR_ARG(struct_v4l2_frmival_stepwise *) 
 static int
 print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_v4l2_frmivalenum f;
+	struct v4l2_frmivalenum f;
 
 	if (entering(tcp)) {
 		tprints(", ");
