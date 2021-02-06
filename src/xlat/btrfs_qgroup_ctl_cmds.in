@@ -1,3 +1,4 @@
+#unconditional
 #val_type uint64_t
 BTRFS_QUOTA_CTL_ENABLE
 BTRFS_QUOTA_CTL_DISABLE

@@ -1,3 +1,4 @@
+#unconditional
 #val_type uint64_t
 BTRFS_SUBVOL_CREATE_ASYNC
 BTRFS_SUBVOL_RDONLY

@@ -144,11 +144,7 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 		break;
 
 	default:
-#ifdef HAVE_LINUX_BTRFS_H
 		return btrfs_ioctl(tcp, code, arg);
-#else
-		return RVAL_DECODED;
-#endif
 	};
 
 	return RVAL_IOCTL_DECODED;

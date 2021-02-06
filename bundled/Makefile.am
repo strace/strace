@@ -9,6 +9,8 @@ EXTRA_DIST = \
 	linux/COPYING \
 	linux/GPL-2.0 \
 	linux/Linux-syscall-note \
+	linux/include/uapi/linux/btrfs.h \
+	linux/include/uapi/linux/btrfs_tree.h \
 	linux/include/uapi/linux/const.h \
 	linux/include/uapi/linux/fiemap.h \
 	linux/include/uapi/linux/fs.h \
