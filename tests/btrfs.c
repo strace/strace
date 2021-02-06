@@ -47,11 +47,9 @@
 # include "xlat/btrfs_features_incompat.h"
 # include "xlat/btrfs_key_types.h"
 
-# ifdef HAVE_LINUX_FIEMAP_H
-#  include <linux/fiemap.h>
-#  include "xlat/fiemap_flags.h"
-#  include "xlat/fiemap_extent_flags.h"
-# endif
+# include <linux/fiemap.h>
+# include "xlat/fiemap_flags.h"
+# include "xlat/fiemap_extent_flags.h"
 
 # ifndef BTRFS_LABEL_SIZE
 #  define BTRFS_LABEL_SIZE 256
@@ -1382,7 +1380,6 @@ btrfs_test_ino_path_ioctls(void)
 	       "}) = -1 EBADF (%m)\n",
 	       ioc(BTRFS_IOC_LOGICAL_INO), args.inum, args.size, args.fspath);
 
-# ifdef HAVE_LINUX_FIEMAP_H
 	if (btrfs_test_root) {
 		int size;
 		struct stat si;
@@ -1491,7 +1488,6 @@ btrfs_test_ino_path_ioctls(void)
 		close(fd);
 		free(fiemap);
 	}
-# endif /* HAVE_LINUX_FIEMAP_H */
 }
 
 /*

@@ -10,6 +10,7 @@ EXTRA_DIST = \
 	linux/GPL-2.0 \
 	linux/Linux-syscall-note \
 	linux/include/uapi/linux/const.h \
+	linux/include/uapi/linux/fiemap.h \
 	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/loop.h \

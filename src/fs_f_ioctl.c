@@ -8,7 +8,7 @@
 
 #include "defs.h"
 #include <linux/fs.h>
-#include "types/fiemap.h"
+#include <linux/fiemap.h>
 #include "xlat/fiemap_flags.h"
 #include "xlat/fiemap_extent_flags.h"
 #include "xlat/fs_ioc_flags.h"
@@ -19,7 +19,7 @@
 static bool
 print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	const struct_fiemap_extent *fe = elem_buf;
+	const struct fiemap_extent *fe = elem_buf;
 
 	tprint_struct_begin();
 	PRINT_FIELD_U(*fe, fe_logical);
@@ -38,7 +38,7 @@ print_fiemap_extent(struct tcb *tcp, void *elem_buf, size_t elem_size, void *dat
 static int
 decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_fiemap args;
+	struct fiemap args;
 
 	if (entering(tcp))
 		tprints(", ");
@@ -72,7 +72,7 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		tprint_more_data_follows();
 	} else {
-		struct_fiemap_extent fe;
+		struct fiemap_extent fe;
 		tprint_struct_next();
 		tprints_field_name("fm_extents");
 		print_array(tcp, arg + offsetof(typeof(args), fm_extents),

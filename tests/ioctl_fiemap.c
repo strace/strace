@@ -9,14 +9,12 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_FIEMAP_H
-
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/ioctl.h>
-# include <linux/types.h>
-# include <linux/fiemap.h>
-# include <linux/fs.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#include <linux/fiemap.h>
+#include <linux/fs.h>
 
 static const char *errstr;
 
@@ -26,7 +24,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 	int rc = ioctl(-1, cmd, arg);
 	errstr = sprintrc(rc);
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
 		error_msg_and_fail("Return value [%d] does not match"
 				   " expectations [%d]", rc, INJECT_RETVAL);
@@ -35,7 +33,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 
 	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
 	errstr = inj_errstr;
-# endif
+#endif
 
 	return rc;
 }
@@ -46,7 +44,7 @@ do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
 	return do_ioctl(cmd, (uintptr_t) arg);
 }
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 static void
 skip_ioctls(int argc, const char *argv[])
 {
@@ -70,14 +68,14 @@ skip_ioctls(int argc, const char *argv[])
 			   " to detect an injected return code %d",
 			   num_skip, INJECT_RETVAL);
 }
-# endif /* INJECT_RETVAL */
+#endif /* INJECT_RETVAL */
 
 int
 main(int argc, const char *argv[])
 {
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	skip_ioctls(argc, argv);
-# endif
+#endif
 
 	TAIL_ALLOC_OBJECT_VAR_PTR(struct fiemap, fiemap);
 
@@ -85,8 +83,8 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FIEMAP), (char *) fiemap + 1, errstr);
 
-# define   VALID_FM_FLAGS        0x7
-# define INVALID_FM_FLAGS 0xfffffff8
+#define   VALID_FM_FLAGS        0x7
+#define INVALID_FM_FLAGS 0xfffffff8
 
 	fiemap->fm_start = (typeof(fiemap->fm_start)) 0xdeadbeefcafef00dULL;
 	fiemap->fm_length = (typeof(fiemap->fm_length)) 0xfacefeedbabec0deULL;
@@ -111,16 +109,16 @@ main(int argc, const char *argv[])
 				  "FIEMAP_FLAG_SYNC|FIEMAP_FLAG_XATTR|"
 				  "FIEMAP_FLAG_CACHE"),
 		       fiemap->fm_mapped_extents);
-# if VERBOSE
+#if VERBOSE
 		printf("fm_extents=%p", fiemap + 1);
-# else
+#else
 		printf("...");
-# endif
+#endif
 		printf("}) = %s\n", errstr);
 	}
 
-# define   VALID_FE_FLAGS     0x3f8f
-# define INVALID_FE_FLAGS 0xffffc070
+#define   VALID_FE_FLAGS     0x3f8f
+#define INVALID_FE_FLAGS 0xffffc070
 
 	fiemap = tail_alloc(sizeof(*fiemap) + 2 * sizeof(fiemap->fm_extents[0]));
 	fiemap->fm_start = (typeof(fiemap->fm_start)) 0xdeadbeefcafef00dULL;
@@ -152,7 +150,7 @@ main(int argc, const char *argv[])
 		printf(" => {fm_flags=%s, fm_mapped_extents=%u, ",
 		       XLAT_UNKNOWN(INVALID_FM_FLAGS, "FIEMAP_FLAG_???"),
 		       fiemap->fm_mapped_extents);
-# if VERBOSE
+#if VERBOSE
 		printf("fm_extents=[{fe_logical=%ju, fe_physical=%ju"
 		       ", fe_length=%ju, fe_flags=%s}"
 		       ", {fe_logical=%ju, fe_physical=%ju"
@@ -176,9 +174,9 @@ main(int argc, const char *argv[])
 		       (uintmax_t) fiemap->fm_extents[1].fe_physical,
 		       (uintmax_t) fiemap->fm_extents[1].fe_length,
 		       XLAT_UNKNOWN(INVALID_FE_FLAGS, "FIEMAP_EXTENT_???"));
-# else
+#else
 		printf("...");
-# endif
+#endif
 		printf("}) = %s\n", errstr);
 	}
 
@@ -187,9 +185,3 @@ main(int argc, const char *argv[])
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_FIEMAP_H")
-
-#endif
