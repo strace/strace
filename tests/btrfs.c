@@ -59,14 +59,6 @@
 #  define BTRFS_NAME_LEN 255
 # endif
 
-# ifndef FS_IOC_GETFSLABEL
-#  define FS_IOC_GETFSLABEL BTRFS_IOC_GET_FSLABEL
-# endif
-
-# ifndef FS_IOC_SETFSLABEL
-#  define FS_IOC_SETFSLABEL BTRFS_IOC_SET_FSLABEL
-# endif
-
 /*
  * Prior to Linux 3.12, the BTRFS_IOC_DEFAULT_SUBVOL used u64 in
  * its definition, which isn't exported by the kernel.
@@ -129,32 +121,6 @@ struct btrfs_ioctl_defrag_range_args {
 	uint32_t extent_thresh;
 	uint32_t compress_type;
 	uint32_t unused[4];
-};
-# endif
-
-# ifndef FIDEDUPERANGE
-#  define FIDEDUPERANGE   _IOWR(0x94, 54, struct file_dedupe_range)
-struct file_dedupe_range_info {
-	int64_t dest_fd;	/* in - destination file */
-	uint64_t dest_offset;	/* in - start of extent in destination */
-	uint64_t bytes_deduped;	/* out - total # of bytes we were able
-				 * to dedupe from this file. */
-	/* status of this dedupe operation:
-	 * < 0 for error
-	 * == FILE_DEDUPE_RANGE_SAME if dedupe succeeds
-	 * == FILE_DEDUPE_RANGE_DIFFERS if data differs
-	 */
-	int32_t status;		/* out - see above description */
-	uint32_t reserved;	/* must be zero */
-};
-
-struct file_dedupe_range {
-	uint64_t src_offset;	/* in - start of extent in source */
-	uint64_t src_length;	/* in - length of extent */
-	uint16_t dest_count;	/* in - total elements in info array */
-	uint16_t reserved1;	/* must be zero */
-	uint32_t reserved2;	/* must be zero */
-	struct file_dedupe_range_info info[0];
 };
 # endif
 

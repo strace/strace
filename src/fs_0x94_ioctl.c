@@ -7,15 +7,12 @@
  */
 
 #include "defs.h"
-#include "types/fs_0x94.h"
-#define XLAT_MACROS_ONLY
-# include "xlat/fs_0x94_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
+#include <linux/fs.h>
 
 static void
 decode_file_clone_range(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_file_clone_range range;
+	struct file_clone_range range;
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &range)) {
@@ -35,7 +32,7 @@ static bool
 print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 			     size_t elem_size, void *data)
 {
-	const struct_file_dedupe_range_info *info = elem_buf;
+	const struct file_dedupe_range_info *info = elem_buf;
 	unsigned int *count = data;
 
 	if (count) {
@@ -65,8 +62,8 @@ print_file_dedupe_range_info(struct tcb *tcp, void *elem_buf,
 static int
 decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	struct_file_dedupe_range range;
-	struct_file_dedupe_range_info info;
+	struct file_dedupe_range range;
+	struct file_dedupe_range_info info;
 	unsigned int *limit = NULL;
 	unsigned int count = 2;
 	bool rc;
@@ -114,7 +111,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 static void
 decode_fslabel(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	fs_0x94_label_t label;
+	char label[FSLABEL_MAX];
 
 	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &label))
