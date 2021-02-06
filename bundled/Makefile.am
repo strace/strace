@@ -11,6 +11,8 @@ EXTRA_DIST = \
 	linux/Linux-syscall-note \
 	linux/include/uapi/linux/const.h \
 	linux/include/uapi/linux/fiemap.h \
+	linux/include/uapi/linux/fs.h \
+	linux/include/uapi/linux/fscrypt.h \
 	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/loop.h \
