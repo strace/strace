@@ -1,7 +1,7 @@
 .\" Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
 .\" Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
 .\" Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
-.\" Copyright (c) 1996-2017 The strace developers.
+.\" Copyright (c) 1996-2021 The strace developers.
 .\" All rights reserved.
 .\"
 .\" SPDX-License-Identifier: LGPL-2.1-or-later
@@ -1193,9 +1193,9 @@ Summarise the time difference between the beginning and end of
 each system call.  The default is to summarise the system time.
 .SS Tampering
 .TP 12
-\fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 .TQ
-\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\fIsyscall\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
 Perform syscall tampering for the specified set of syscalls.
 The syntax of the
 .I syscall_set
@@ -1246,6 +1246,23 @@ The format of
 .I delay
 specification is described in section
 .IR "Time specification format description".
+.IP
+If :\fBpoke_enter\fR=\fI@argN=DATAN,@argM=DATAM...\fR
+or :\fBpoke_exit\fR=\fI@argN=DATAN,@argM=DATAM...\fR options are specified,
+tracee's memory at locations, pointed to by system call arguments
+.IR argN
+and
+.IR argM
+(going from
+.IR arg1
+to
+.IR arg7 )
+is overwritten by data
+.IR DATAN
+and
+.IR DATAM
+(specified in hexadecimal format; for example :\fBpoke_enter\fR=\fI@arg1=0000DEAD0000BEEF\fR).
+:\fBpoke_enter\fR modifies memory on syscall enter, and :\fBpoke_exit\fR - on exit.
 .IP
 If :\fBsignal\fR=\,\fIsig\/\fR option is specified without
 :\fBerror\fR=\,\fIerrno\/\fR, :\fBretval\fR=\,\fIvalue\/\fR or

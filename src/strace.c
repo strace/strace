@@ -3,7 +3,7 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
- * Copyright (c) 1999-2020 The strace developers.
+ * Copyright (c) 1999-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -426,9 +426,15 @@ Statistics:\n\
 \n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
-            [:delay_enter=DELAY][:delay_exit=DELAY][:when=WHEN],\n\
+            [:delay_enter=DELAY][:delay_exit=DELAY]\n\
+            [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
+            [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
+            [:when=WHEN],\n\
   --inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
-           [:delay_enter=DELAY][:delay_exit=DELAY][:when=WHEN]\n\
+           [:delay_enter=DELAY][:delay_exit=DELAY]\n\
+           [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
+           [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
+           [:when=WHEN],\n\
                  perform syscall tampering for the syscalls in SET\n\
      delay:      microseconds or NUMBER{s|ms|us|ns}\n\
      when:       FIRST[..LAST][+[STEP]]\n\

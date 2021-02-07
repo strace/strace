@@ -6,7 +6,7 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2020 The strace developers.
+ * Copyright (c) 1999-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -21,6 +21,7 @@
 #include "nsig.h"
 #include "number_set.h"
 #include "delay.h"
+#include "poke.h"
 #include "retval.h"
 #include <limits.h>
 
@@ -540,6 +541,10 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 #endif
 			}
 		}
+		if (opts->data.flags & INJECT_F_POKE_ENTER)
+			poke_tcb(tcp, opts->data.poke_idx, true);
+		if (opts->data.flags & INJECT_F_POKE_EXIT)
+			tcp->flags |= TCB_INJECT_POKE_EXIT;
 		if (opts->data.flags & INJECT_F_DELAY_ENTER)
 			delay_tcb(tcp, opts->data.delay_idx, true);
 		if (opts->data.flags & INJECT_F_DELAY_EXIT)
@@ -555,6 +560,9 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 	struct inject_opts *opts = tcb_inject_opts(tcp);
 	if (!opts)
 		return 0;
+
+	if (inject_poke_exit(tcp))
+		poke_tcb(tcp, opts->data.poke_idx, false);
 
 	if (inject_delay_exit(tcp))
 		delay_tcb(tcp, opts->data.delay_idx, false);
@@ -768,7 +776,9 @@ print_syscall_resume(struct tcb *tcp)
 int
 syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 {
-	if (syscall_tampered(tcp) || inject_delay_exit(tcp))
+	if (syscall_tampered(tcp) ||
+	    inject_delay_exit(tcp) ||
+	    inject_poke_exit(tcp))
 		tamper_with_syscall_exiting(tcp);
 
 	if (cflag) {
@@ -992,7 +1002,8 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 void
 syscall_exiting_finish(struct tcb *tcp)
 {
-	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT);
+	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT |
+			TCB_INJECT_POKE_EXIT);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 

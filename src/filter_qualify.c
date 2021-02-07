@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2020 The strace developers.
+ * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -11,6 +11,7 @@
 #include "number_set.h"
 #include "filter.h"
 #include "delay.h"
+#include "poke.h"
 #include "retval.h"
 #include "static_assert.h"
 
@@ -137,6 +138,65 @@ parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
        fopts->data.flags |= flag;
 
        return true;
+}
+
+static bool
+parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
+{
+	char *token, *str_tokenized, *saveptr = NULL;
+	const char *val;
+	size_t data_len;
+	unsigned flag = isenter ? INJECT_F_POKE_ENTER : INJECT_F_POKE_EXIT;
+	struct poke_payload *poke;
+
+	/* disallow duplicates */
+	if (fopts->data.flags & flag)
+		return false;
+
+	/* empty strings */
+	if (input[0] == '\0')
+		return false;
+
+	if (fopts->data.poke_idx == (uint16_t) -1)
+		fopts->data.poke_idx = alloc_poke_data();
+
+	saveptr = NULL;
+	str_tokenized = xstrdup(input);
+	for (token = strtok_r(str_tokenized, ",", &saveptr);
+	     token;
+	     token = strtok_r(NULL, ",", &saveptr)) {
+		poke = xcalloc(1, sizeof(*poke));
+		poke->is_enter = isenter;
+
+		if ((val = STR_STRIP_PREFIX(token, "@arg")) == token)
+			return false;
+		if ((val[0] >= '1') && (val[0] <= '7')) {
+			poke->arg_no = val[0] - '0';
+		} else {
+			return false;
+		}
+		if (val[1] != '=')
+			return false;
+		val += 2;
+
+		data_len = strlen(val);
+		if ((data_len == 0) || (data_len % 2) || (data_len > 2048))
+			return false;
+		data_len /= 2;
+		poke->data_len = data_len;
+		poke->data = xmalloc(data_len);
+
+		for (size_t i = 0; i < data_len; i++)
+			if (sscanf(&val[2 * i], "%2hhx", &poke->data[i]) != 1)
+				return false;
+
+		if (poke_add(fopts->data.poke_idx, poke))
+			return false;
+	}
+	free(str_tokenized);
+
+	fopts->data.flags |= flag;
+	return true;
 }
 
 static bool
@@ -301,6 +361,14 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		fopts->data.signo = intval;
 		fopts->data.flags |= INJECT_F_SIGNAL;
 	} else if (!fault_tokens_only
+		   && (val = STR_STRIP_PREFIX(token, "poke_enter=")) != token) {
+		if (!parse_poke_token(val, fopts, true))
+			return false;
+	} else if (!fault_tokens_only
+		   && (val = STR_STRIP_PREFIX(token, "poke_exit=")) != token) {
+		if (!parse_poke_token(val, fopts, false))
+			return false;
+	} else if (!fault_tokens_only
 		&& (val = STR_STRIP_PREFIX(token, "delay_enter=")) != token) {
 		if (!parse_delay_token(val, fopts, true))
 			return false;
@@ -431,7 +499,8 @@ qualify_inject_common(const char *const str,
 		.last = INJECT_LAST_INF,
 		.step = 1,
 		.data = {
-			.delay_idx = -1
+			.delay_idx = -1,
+			.poke_idx = -1
 		}
 	};
 	struct inject_personality_data pdata[SUPPORTED_PERSONALITIES] = { { 0 } };

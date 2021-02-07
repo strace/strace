@@ -6,7 +6,7 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2020 The strace developers.
+ * Copyright (c) 1999-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -19,6 +19,7 @@
 #include "ptrace.h"
 
 static bool process_vm_readv_not_supported;
+static bool process_vm_writev_not_supported;
 
 #ifndef HAVE_PROCESS_VM_READV
 /*
@@ -39,6 +40,26 @@ static ssize_t strace_process_vm_readv(pid_t pid,
 }
 # define process_vm_readv strace_process_vm_readv
 #endif /* !HAVE_PROCESS_VM_READV */
+
+#ifndef HAVE_PROCESS_VM_WRITEV
+/*
+ * Need to do this since process_vm_writev() is not yet available in libc.
+ * When libc is updated, only "static bool process_vm_writev_not_supported"
+ * line remains.
+ * The name is different to avoid potential collision with OS headers.
+ */
+static ssize_t strace_process_vm_writev(pid_t pid,
+		 const struct iovec *lvec,
+		 unsigned long liovcnt,
+		 const struct iovec *rvec,
+		 unsigned long riovcnt,
+		 unsigned long flags)
+{
+	return syscall(__NR_process_vm_writev,
+		       (long) pid, lvec, liovcnt, rvec, riovcnt, flags);
+}
+# define process_vm_writev strace_process_vm_writev
+#endif /* !HAVE_PROCESS_VM_WRITEV */
 
 static ssize_t
 process_read_mem(const pid_t pid, void *const laddr,
@@ -172,6 +193,36 @@ vm_read_mem(const pid_t pid, void *laddr,
 
 	return total_read;
 }
+
+static ssize_t
+vm_write_mem(const pid_t pid, void *const laddr,
+	     const kernel_ulong_t raddr, const size_t len)
+{
+	const unsigned long truncated_raddr = raddr;
+
+#if SIZEOF_LONG < SIZEOF_KERNEL_LONG_T
+	if (raddr != (kernel_ulong_t) truncated_raddr) {
+		errno = EIO;
+		return -1;
+	}
+#endif
+
+	const struct iovec local = {
+		.iov_base = laddr,
+		.iov_len = len
+	};
+	const struct iovec remote = {
+		.iov_base = (void *) truncated_raddr,
+		.iov_len = len
+	};
+
+	const ssize_t rc = process_vm_writev(pid, &local, 1, &remote, 1, 0);
+	if (rc < 0 && errno == ENOSYS)
+		process_vm_writev_not_supported = true;
+
+	return rc;
+}
+
 
 static bool
 tracee_addr_is_invalid(kernel_ulong_t addr)
@@ -412,4 +463,97 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 	}
 
 	return 0;
+}
+
+static unsigned int
+upoken_pokedata(const int pid, kernel_ulong_t addr, unsigned int len,
+		void *our_addr)
+{
+	unsigned int nwritten = 0;
+
+	if (len & (sizeof(long) - 1)) {
+		error_func_msg("cannot poke unaligned data len %u", len);
+		return nwritten;
+	}
+	if (addr & (sizeof(long) - 1)) {
+		error_func_msg("cannot poke at unaligned address 0x%" PRI_klx,
+			       addr);
+		return nwritten;
+	}
+
+	while (len) {
+		errno = 0;
+		ptrace(PTRACE_POKEDATA, pid, addr, * (long *) our_addr);
+
+		switch (errno) {
+			case 0:
+				break;
+			case ESRCH: case EINVAL:
+				/* these could be seen if the process is gone */
+				return nwritten;
+			case EFAULT: case EIO: case EPERM:
+				/* address space is inaccessible */
+				if (nwritten) {
+					perror_func_msg("pid:%d short write (%u < %u)"
+							" @0x%" PRI_klx,
+							pid, nwritten, nwritten + len,
+							addr - nwritten);
+				}
+				return nwritten;
+			default:
+				/* all the rest is strange and should be reported */
+				perror_func_msg("pid:%d @0x%" PRI_klx,
+						pid, addr);
+				return nwritten;
+		}
+
+		addr += sizeof(long);
+		nwritten += sizeof(long);
+		our_addr += sizeof(long);
+		len -= sizeof(long);
+	}
+
+	return nwritten;
+}
+
+/*
+ * Copy `len' bytes of data from `our_addr'
+ * to process `pid' at address `addr'.
+ */
+unsigned int
+upoken(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
+       void *const our_addr)
+{
+	if (tracee_addr_is_invalid(addr))
+		return 0;
+
+	const int pid = tcp->pid;
+
+	if (process_vm_writev_not_supported)
+		return upoken_pokedata(pid, addr, len, our_addr);
+
+	ssize_t r = vm_write_mem(pid, our_addr, addr, len);
+	if ((unsigned int) r == len)
+		return len;
+	if (r >= 0) {
+		error_func_msg("pid:%d short write (%u < %u) @0x%" PRI_klx,
+			       pid, (unsigned int) r, len, addr);
+		return (unsigned int) r;
+	}
+	switch (errno) {
+		case ENOSYS:
+		case EPERM:
+			/* try PTRACE_POKEDATA */
+			return upoken_pokedata(pid, addr, len, our_addr);
+		case ESRCH:
+			/* the process is gone */
+			return 0;
+		case EFAULT: case EIO:
+			/* address space is inaccessible */
+			return 0;
+		default:
+			/* all the rest is strange and should be reported */
+			perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
+			return 0;
+	}
 }

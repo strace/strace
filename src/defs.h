@@ -2,7 +2,7 @@
  * Copyright (c) 1991, 1992 Paul Kranenburg <pk@cs.few.eur.nl>
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
- * Copyright (c) 1999-2020 The strace developers.
+ * Copyright (c) 1999-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -221,6 +221,8 @@ typedef struct ioctlent {
 # define INJECT_F_DELAY_ENTER	0x08
 # define INJECT_F_DELAY_EXIT	0x10
 # define INJECT_F_SYSCALL	0x20
+# define INJECT_F_POKE_ENTER	0x40
+# define INJECT_F_POKE_EXIT	0x80
 
 # define INJECT_ACTION_FLAGS	\
 	(INJECT_F_SIGNAL	\
@@ -228,13 +230,16 @@ typedef struct ioctlent {
 	|INJECT_F_RETVAL	\
 	|INJECT_F_DELAY_ENTER	\
 	|INJECT_F_DELAY_EXIT	\
+	|INJECT_F_POKE_ENTER	\
+	|INJECT_F_POKE_EXIT	\
 	)
 
 struct inject_data {
-	uint8_t flags;		/* 6 of 8 flags are used so far */
+	uint8_t flags;		/* 8 of 8 flags are used */
 	uint8_t signo;		/* NSIG <= 128 */
 	uint16_t rval_idx;	/* index in retval_vec */
 	uint16_t delay_idx;	/* index in delay_data_vec */
+	uint16_t poke_idx;	/* index in poke_vec */
 	uint16_t scno;		/* syscall to be injected instead of -1 */
 };
 
@@ -340,10 +345,12 @@ struct tcb {
 				 * syscall entering/exiting state */
 # define TCB_INJECT_DELAY_EXIT	0x1000	/* Current syscall needs to be delayed
 					   on exit */
-# define TCB_DELAYED	0x2000	/* Current syscall has been delayed */
-# define TCB_TAMPERED_NO_FAIL 0x4000	/* We tamper tcb with syscall
+# define TCB_INJECT_POKE_EXIT	0x2000	/* The processes memory should be tampered
+					   with on exit */
+# define TCB_DELAYED	0x4000	/* Current syscall has been delayed */
+# define TCB_TAMPERED_NO_FAIL 0x8000	/* We tamper tcb with syscall
 					   that should not fail. */
-# define TCB_SECCOMP_FILTER	0x8000	/* This process has a seccomp filter
+# define TCB_SECCOMP_FILTER	0x10000	/* This process has a seccomp filter
 					 * attached.
 					 */
 
@@ -370,6 +377,7 @@ struct tcb {
 # define syscall_tampered(tcp)	((tcp)->flags & TCB_TAMPERED)
 # define recovering(tcp)	((tcp)->flags & TCB_RECOVERING)
 # define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
+# define inject_poke_exit(tcp)	((tcp)->flags & TCB_INJECT_POKE_EXIT)
 # define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
 # define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
 # define has_seccomp_filter(tcp)	((tcp)->flags & TCB_SECCOMP_FILTER)
@@ -612,6 +620,12 @@ extern int
 umoven(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 # define umove(pid, addr, objp)	\
 	umoven((pid), (addr), sizeof(*(objp)), (void *) (objp))
+
+/**
+ * @return the number of bytes written.
+ */
+extern unsigned int
+upoken(struct tcb *, kernel_ulong_t addr, unsigned int len, void *laddr);
 
 /**
  * @return true on success, false on error.

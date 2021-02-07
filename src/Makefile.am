@@ -238,6 +238,8 @@ libstrace_a_SOURCES =	\
 	pidfd_open.c	\
 	pidns.c		\
 	pkeys.c		\
+	poke.c		\
+	poke.h		\
 	poll.c		\
 	prctl.c		\
 	print_kernel_sigset.c \
