@@ -331,28 +331,30 @@ struct tcb {
  * Use entering(tcp) / exiting(tcp) to check this bit to make code more
  * readable.
  */
-# define TCB_INSYSCALL	0x04
-# define TCB_ATTACHED	0x08	/* We attached to it already */
-# define TCB_REPRINT	0x10	/* We should reprint this syscall on exit */
-# define TCB_FILTERED	0x20	/* This system call has been filtered out */
-# define TCB_TAMPERED	0x40	/* A syscall has been tampered with */
-# define TCB_HIDE_LOG	0x80	/* We should hide everything (until execve) */
-# define TCB_CHECK_EXEC_SYSCALL	0x100	/* Check whether this execve syscall succeeded */
+# define TCB_INSYSCALL			0x04
+# define TCB_ATTACHED			0x08	/* We attached to it already */
+# define TCB_REPRINT			0x10	/* We should reprint this syscall on exit */
+# define TCB_FILTERED			0x20	/* This system call has been filtered out */
+# define TCB_TAMPERED			0x40	/* A syscall has been tampered with */
+# define TCB_HIDE_LOG			0x80	/* We should hide everything (until execve) */
+# define TCB_CHECK_EXEC_SYSCALL		0x100	/* Check whether this execve syscall succeeded */
 # define TCB_SKIP_DETACH_ON_FIRST_EXEC	0x200	/* -b execve should skip detach on first execve */
-# define TCB_GRABBED	0x400	/* We grab the process and can catch it
-				 * in the middle of a syscall */
-# define TCB_RECOVERING	0x800	/* We try to recover after detecting incorrect
-				 * syscall entering/exiting state */
-# define TCB_INJECT_DELAY_EXIT	0x1000	/* Current syscall needs to be delayed
-					   on exit */
-# define TCB_INJECT_POKE_EXIT	0x2000	/* The processes memory should be tampered
-					   with on exit */
-# define TCB_DELAYED	0x4000	/* Current syscall has been delayed */
-# define TCB_TAMPERED_NO_FAIL 0x8000	/* We tamper tcb with syscall
-					   that should not fail. */
-# define TCB_SECCOMP_FILTER	0x10000	/* This process has a seccomp filter
-					 * attached.
-					 */
+# define TCB_GRABBED			0x400	/* We grab the process and can catch it
+						 * in the middle of a syscall */
+# define TCB_RECOVERING			0x800	/* We try to recover after detecting incorrect
+						 * syscall entering/exiting state */
+# define TCB_INJECT_DELAY_EXIT		0x1000	/* Current syscall needs to be delayed
+						   on exit */
+# define TCB_INJECT_POKE_EXIT		0x2000	/* The processes memory should be tampered
+						   with on exit */
+# define TCB_DELAYED			0x4000	/* Current syscall is to be delayed */
+# define TCB_TAMPERED_DELAYED		0x8000	/* Current syscall has been delayed */
+# define TCB_TAMPERED_POKED		0x10000	/* Current syscall has been poked */
+# define TCB_TAMPERED_NO_FAIL		0x20000	/* We tamper tcb with syscall
+						   that should not fail. */
+# define TCB_SECCOMP_FILTER		0x40000	/* This process has a seccomp filter
+						 * attached.
+						 */
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -379,6 +381,8 @@ struct tcb {
 # define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
 # define inject_poke_exit(tcp)	((tcp)->flags & TCB_INJECT_POKE_EXIT)
 # define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)
+# define syscall_tampered_delayed(tcp)	((tcp)->flags & TCB_TAMPERED_DELAYED)
+# define syscall_tampered_poked(tcp)	((tcp)->flags & TCB_TAMPERED_POKED)
 # define syscall_tampered_nofail(tcp) ((tcp)->flags & TCB_TAMPERED_NO_FAIL)
 # define has_seccomp_filter(tcp)	((tcp)->flags & TCB_SECCOMP_FILTER)
 

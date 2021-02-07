@@ -64,6 +64,7 @@ poke_tcb(struct tcb *tcp, uint16_t poke_idx, bool is_enter)
 	debug_func_msg("poking pid %d on %s",
 		       tcp->pid, is_enter ? "enter" : "exit");
 
+	bool poked = false;
 	struct poke_payload *i;
 	list_foreach(i, &poke_data_vec[poke_idx], l) {
 		if (i->is_enter != is_enter)
@@ -83,5 +84,10 @@ poke_tcb(struct tcb *tcp, uint16_t poke_idx, bool is_enter)
 			error_func_msg("Failed to tamper with process %d:"
 				       " couldn't poke",
 				       tcp->pid);
+		else
+			poked = true;
 	}
+
+	if (poked)
+		tcp->flags |= TCB_TAMPERED_POKED;
 }

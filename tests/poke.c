@@ -36,7 +36,7 @@ main(int argc, char *argv[])
 	 * regular poke on entering syscall
 	 */
 	char *p = chdir_buf;
-	printf("chdir(\"%.*s\") = %s\n",
+	printf("chdir(\"%.*s\") = %s (INJECTED: args)\n",
 	       PATH_MAX - 1, p, sprintrc(chdir(p)));
 
 	/*
@@ -56,7 +56,10 @@ main(int argc, char *argv[])
 	 * if process_vm_writev is used: short write.
 	 */
 	--p;
-	printf("chdir(%p) = %s\n", p, sprintrc(chdir(p)));
+	printf("chdir(%p) = %s", p, sprintrc(chdir(p)));
+	if (*p != '/')
+		printf(" (INJECTED: args)");
+	printf("\n");
 	if (exp_err) {
 		fprintf(exp_err,
 			".*: short read \\(1 < [[:digit:]]+\\) @%p: .*\n", p);
@@ -75,7 +78,10 @@ main(int argc, char *argv[])
 	 * if process_vm_writev is used: short write is likely.
 	 */
 	p -= 7;
-	printf("chdir(%p) = %s\n", p, sprintrc(chdir(p)));
+	printf("chdir(%p) = %s", p, sprintrc(chdir(p)));
+	if (*p != '/')
+		printf(" (INJECTED: args)");
+	printf("\n");
 	if (exp_err) {
 		fprintf(exp_err,
 			".*: short read \\(8 < [[:digit:]]+\\) @%p: .*\n", p);
@@ -97,7 +103,7 @@ main(int argc, char *argv[])
 
 	printf("getcwd(");
 	print_quoted_string(p);
-	printf(", %u) = %ld\n", PATH_MAX, res);
+	printf(", %u) = %ld (INJECTED: args)\n", PATH_MAX, res);
 
 	if (exp_err)
 		fclose(exp_err);

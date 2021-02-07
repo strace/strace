@@ -773,6 +773,19 @@ print_syscall_resume(struct tcb *tcp)
 	}
 }
 
+void
+print_injected_note(struct tcb *tcp)
+{
+	if (syscall_tampered(tcp) && syscall_tampered_poked(tcp))
+		tprints(" (INJECTED: args, retval)");
+	else if (syscall_tampered_poked(tcp))
+		tprints(" (INJECTED: args)");
+	else if (syscall_tampered(tcp))
+		tprints(" (INJECTED)");
+	if (syscall_tampered_delayed(tcp))
+		tprints(" (DELAYED)");
+}
+
 int
 syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 {
@@ -838,8 +851,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		else
 			tprintf("= %#" PRI_klx, tcp->u_rval);
 
-		if (syscall_tampered(tcp))
-			tprints(" (INJECTED)");
+		print_injected_note(tcp);
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
 		switch (tcp->u_error) {
 		/* Blocked signals do not interrupt any syscalls.
@@ -899,8 +911,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			print_err_ret(tcp->u_rval, tcp->u_error);
 			break;
 		}
-		if (syscall_tampered(tcp))
-			tprints(" (INJECTED)");
+		print_injected_note(tcp);
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
 	} else {
@@ -976,8 +987,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf(" (%s)", tcp->auxstr);
-		if (syscall_tampered(tcp))
-			tprints(" (INJECTED)");
+		print_injected_note(tcp);
 	}
 	if (Tflag) {
 		ts_sub(ts, ts, &tcp->etime);
@@ -1003,7 +1013,7 @@ void
 syscall_exiting_finish(struct tcb *tcp)
 {
 	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT |
-			TCB_INJECT_POKE_EXIT);
+			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED | TCB_TAMPERED_POKED);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 

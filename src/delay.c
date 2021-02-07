@@ -105,6 +105,7 @@ delay_tcb(struct tcb *tcp, uint16_t delay_idx, bool isenter)
 	debug_func_msg("delaying pid %d on %s",
 		       tcp->pid, isenter ? "enter" : "exit");
 	tcp->flags |= TCB_DELAYED;
+	tcp->flags |= TCB_TAMPERED_DELAYED;
 
 	struct timespec *ts_diff;
 	if (isenter)
