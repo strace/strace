@@ -54,27 +54,20 @@ main(void)
 	if (ftruncate(reg_in, file_size))
 		perror_msg_and_fail("ftruncate(%d, %u)", reg_in, file_size);
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(uint32_t, p_off);
-	void *p = p_off + 1;
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_ulong_t, p_off);
+	void *const efault = p_off + 1;
 	*p_off = 0;
 
-	assert(syscall(__NR_sendfile, 0, 1, p, page_size) == -1);
-	printf("sendfile(0, 1, %p, %u) = -1 EFAULT (%m)\n", p, page_size);
+	assert(syscall(__NR_sendfile, 0, 1, efault, page_size) == -1);
+	printf("sendfile(0, 1, %p, %u) = -1 EFAULT (%m)\n", efault, page_size);
 
 	assert(syscall(__NR_sendfile, sv[1], reg_in, NULL, alen)
 	       == (long) alen);
 	printf("sendfile(%d, %d, NULL, %u) = %u\n",
 	       sv[1], reg_in, alen, alen);
 
-	p = p_off;
-	if (syscall(__NR_sendfile, sv[1], reg_in, p_off, alen) != (long) alen) {
-		printf("sendfile(%d, %d, %#lx, %u) = -1 EFAULT (%m)\n",
-		       sv[1], reg_in, (unsigned long) p_off, alen);
-		--p_off;
-		*p_off = 0;
-		assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, alen)
-		       == (long) alen);
-	}
+	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, alen)
+	       == (long) alen);
 	printf("sendfile(%d, %d, [0] => [%u], %u) = %u\n",
 	       sv[1], reg_in, alen, alen, alen);
 
@@ -83,19 +76,15 @@ main(void)
 	printf("sendfile(%d, %d, [%u] => [%u], %u) = %u\n",
 	       sv[1], reg_in, alen, file_size, file_size + 1, blen);
 
-	if (p_off != p) {
-		uint64_t *p_off64 = (uint64_t *) p_off;
-		*p_off64 = 0xcafef00dfacefeedULL;
-		assert(syscall(__NR_sendfile, sv[1], reg_in, p_off64, 1) == -1);
-		printf("sendfile(%d, %d, [14627392582579060461], 1)"
-		       " = -1 EINVAL (%m)\n", sv[1], reg_in);
-		*p_off64 = 0xdefaced;
-	} else {
-		*p_off = 0xdefaced;
-	}
+	*p_off = (typeof(*p_off)) 0xcafef00dfacefeedULL;
+	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, 1) == -1);
+	printf("sendfile(%d, %d, [%llu], 1) = -1 EINVAL (%m)\n",
+	       sv[1], reg_in, (unsigned long long) *p_off);
+
+	*p_off = 0xdefaced;
 	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, 1) == 0);
-	printf("sendfile(%d, %d, [233811181], 1) = 0\n",
-	       sv[1], reg_in);
+	printf("sendfile(%d, %d, [%u], 1) = 0\n",
+	       sv[1], reg_in, 0xdefaced);
 
 	puts("+++ exited with 0 +++");
 	return 0;
