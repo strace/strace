@@ -1,0 +1,28 @@
+#!/bin/sh -efu
+#
+# Check tampering notes.
+#
+# Copyright (c) 2021 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+run_prog ../tampering-notes 1 > /dev/null
+
+i=0
+for a in '' \
+	:delay_enter=1 \
+	:delay_exit=1 \
+	:retval=42 \
+	:delay_enter=1:retval=42 \
+	:delay_exit=1:retval=42 \
+	; do
+	i=$((i+1))
+	run_strace \
+		--inject="chdir:poke_enter=@arg1=3f5354524143453f7374726163653f00$a" \
+		--inject="getcwd:poke_exit=@arg1=5374726163652100$a" \
+		-a10 --trace=chdir,getcwd ../tampering-notes $i > "$EXP"
+	match_grep "$LOG" "$EXP"
+done

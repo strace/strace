@@ -818,6 +818,7 @@ syscallent.i
 sysinfo
 syslog
 syslog-success
+tampering-notes
 tee
 tgkill
 tgkill--pidns-translation

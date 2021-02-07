@@ -516,6 +516,7 @@ MISC_TESTS = \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
+	tampering-notes.test \
 	termsig.test \
 	threads-execve.test \
 	umovestr_cached.test \
