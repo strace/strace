@@ -1,6 +1,6 @@
 # Input for gen_tests.sh
 #
-# Copyright (c) 2017-2020 The strace developers.
+# Copyright (c) 2017-2021 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -527,6 +527,7 @@ pipe2	-a15
 pkey_alloc	-a17
 pkey_free	-a13
 pkey_mprotect	-a37
+poke-sendfile	--trace=/sendfile --inject=all:poke_enter=@arg3=0000000000000000:poke_exit=@arg3=ffffffffffffffff
 ppoll	-s2
 ppoll-P	-s2 -e trace=ppoll -P /dev/full 9>>/dev/full
 ppoll-v	-v -s2 -e trace=ppoll
@@ -765,12 +766,12 @@ trace_creds	test_trace_expr '([gs]et[^p]*([gu]id|groups)|caps|prctl|[fl]?chown|p
 trace_fstat	test_trace_expr '' -e%fstat -v -P stat.sample -P /dev/full
 trace_fstatfs	test_trace_expr '' -e%fstatfs
 trace_lstat	test_trace_expr '' -e%lstat -v -P stat.sample -P /dev/full
-trace_personality_32	+qualify_personality.sh 32 'getcwd' 'fsync-y'
-trace_personality_64	+qualify_personality.sh 64 'getcwd' 'fsync-y'
+trace_personality_32	+qualify_personality.sh 32 'getcwd' 'fsync-y|poke'
+trace_personality_64	+qualify_personality.sh 64 'getcwd' 'fsync-y|poke'
 trace_personality_regex_32	+qualify_personality.sh 32 '/clock.*' 'times|fcntl.*'
 trace_personality_regex_64	+qualify_personality.sh 64 '/clock.*' 'times|fcntl.*'
 trace_personality_regex_x32	+qualify_personality.sh x32 '/clock.*' 'times|fcntl.*'
-trace_personality_x32	+qualify_personality.sh x32 'getcwd' 'fsync-y'
+trace_personality_x32	+qualify_personality.sh x32 'getcwd' 'fsync-y|poke'
 trace_question	test_trace_expr '' -e?osf_utimes,?/^pkey_.*
 trace_stat	test_trace_expr '' -e%stat -v -P stat.sample -P /dev/full
 trace_stat_like	test_trace_expr '' -e%%stat -v -P stat.sample -P /dev/full

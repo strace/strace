@@ -583,6 +583,8 @@ pipe2
 pkey_alloc
 pkey_free
 pkey_mprotect
+poke
+poke-sendfile
 poll
 poll-P
 ppoll

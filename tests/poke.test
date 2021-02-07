@@ -1,0 +1,21 @@
+#!/bin/sh -efu
+#
+# Check poke injection.
+#
+# Copyright (c) 2021 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../poke "$EXP.err" > /dev/null
+
+args="-a10 -e trace=chdir,getcwd \
+      -einject=chdir:poke_enter=@arg1=3f5354524143453f7374726163653f00 \
+      -einject=getcwd:poke_exit=@arg1=5374726163652100 \
+      $args"
+
+run_strace $args >"$EXP" 2>"$LOG.err"
+match_diff "$LOG" "$EXP"
+match_grep "$LOG.err" "$EXP.err"

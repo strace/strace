@@ -1,0 +1,19 @@
+#!/bin/sh -efu
+#
+# Check poke injection argument range.
+#
+# Copyright (c) 2021 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog ../chdir > /dev/null
+run_strace -a10 -e trace=chdir \
+	   -einject=chdir:when=2+:poke_enter=@arg2=5374726163653f00 \
+	   $args >"$EXP" 2>"$LOG.err"
+
+match_diff "$LOG" "$EXP"
+
+match_grep "$LOG.err" "$srcdir/poke-range.expected"

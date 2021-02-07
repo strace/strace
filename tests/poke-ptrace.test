@@ -1,0 +1,27 @@
+#!/bin/sh -efu
+#
+# Check poke injection when process_vm_writev does not work.
+#
+# Copyright (c) 2021 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+run_prog ../poke "$EXP.err" > /dev/null
+
+args="-a10 -e trace=chdir,getcwd \
+      -einject=chdir:poke_enter=@arg1=3f5354524143453f7374726163653f00 \
+      -einject=getcwd:poke_exit=@arg1=5374726163652100 \
+      $args"
+
+fault_args='-qq -esignal=none -etrace=process_vm_writev -efault=process_vm_writev'
+
+$STRACE -o /dev/null $fault_args \
+	$STRACE -o "$LOG" $args >"$EXP" 2>"$LOG.err" ||
+	dump_log_and_fail_with "$STRACE $args failed with code $?"
+match_diff "$LOG" "$EXP"
+
+echo '.*: cannot poke at unaligned address 0x[[:xdigit:]]+' >> "$EXP.err"
+match_grep "$LOG.err" "$EXP.err"

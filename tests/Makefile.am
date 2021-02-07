@@ -1,7 +1,7 @@
 # Automake input for strace tests.
 #
 # Copyright (c) 2011-2016 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2011-2020 The strace developers.
+# Copyright (c) 2011-2021 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -473,6 +473,10 @@ MISC_TESTS = \
 	options-syntax.test \
 	pc.test \
 	pidns-cache.test \
+	poke.test \
+	poke-ptrace.test \
+	poke-range.test \
+	poke-unaligned.test \
 	printpath-umovestr-legacy.test \
 	printstrn-umoven-legacy.test \
 	qual_fault-syntax.test \
@@ -572,6 +576,8 @@ EXTRA_DIST = \
 	net.expected \
 	nlattr_ifla.h \
 	pipe.expected \
+	poke-range.expected \
+	poke-unaligned.expected \
 	print_user_desc.c \
 	printsignal.c \
 	printxval.c \

@@ -1,14 +1,16 @@
-#!/bin/sh
+#!/bin/sh -efu
 #
 # Check -e inject= syntax.
 #
 # Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
-# Copyright (c) 2017-2020 The strace developers.
+# Copyright (c) 2017-2021 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 . "${srcdir=.}/init.sh"
+
+zeroes=; i=0; while [ $i -lt 2050 ]; do zeroes="0$zeroes"; i=$(($i+1)); done
 
 #
 # F
@@ -110,6 +112,18 @@ for arg in 42 chdir \
 	   chdir:when=28..65535+ \
 	   chdir:when=65535..65535 \
 	   chdir:when=65535..65535+ \
+	   chdir:poke_enter= \
+	   chdir:poke_exit= \
+	   chdir:poke_enter=invalid \
+	   chdir:poke_enter=@arg8= \
+	   chdir:poke_enter=@arg0= \
+	   chdir:poke_enter=@arg1 \
+	   chdir:poke_enter=@arg1= \
+	   chdir:poke_enter=@arg1=000 \
+	   chdir:poke_enter=@arg1=nothex \
+	   chdir:poke_enter=@arg1=$zeroes \
+	   chdir:poke_enter=@arg1=5374726163652100,@arg1=5374726163652100 \
+	   chdir:poke_enter=@arg1=5374726163652100:poke_enter=@arg1=5374726163652100 \
 	   ; do
 	$STRACE -e inject="$arg" true 2> "$LOG" &&
 		fail_with "$arg"

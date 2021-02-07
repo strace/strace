@@ -1,6 +1,6 @@
 # Executables without side effects.
 #
-# Copyright (c) 2017-2020 The strace developers.
+# Copyright (c) 2017-2021 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -441,6 +441,8 @@ pipe2
 pkey_alloc
 pkey_free
 pkey_mprotect
+poke
+poke-sendfile
 poll
 ppoll
 prctl-arg2-intptr

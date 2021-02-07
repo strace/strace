@@ -1,0 +1,20 @@
+#!/bin/sh -efu
+#
+# Check unaligned access during poke injection.
+#
+# Copyright (c) 2021 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/scno_tampering.sh"
+
+run_prog ../poke > /dev/null
+
+args="-e trace=chdir -einject=chdir:poke_enter=@arg1=53747261636521 $args"
+fault_args='-qq -esignal=none -etrace=process_vm_writev -efault=process_vm_writev'
+
+$STRACE -o /dev/null $fault_args \
+	$STRACE -o /dev/null $args >/dev/null 2>"$LOG" ||
+	dump_log_and_fail_with "$STRACE $unaligned_args failed with code $?"
+match_grep
