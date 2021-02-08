@@ -71,4 +71,4 @@
 { 63,			"fp31" },
 { 64,			"pc" },
 /* Other fields in "struct user" */
-#include "../userent0.h"
+#include "userent0.h"

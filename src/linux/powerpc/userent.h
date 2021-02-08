@@ -51,4 +51,4 @@
 { REGSIZE*PT_FPR0,		"FPR0" },
 #undef REGSIZE
 /* Other fields in "struct user" */
-#include "../userent0.h"
+#include "userent0.h"

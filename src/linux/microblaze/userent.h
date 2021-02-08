@@ -44,4 +44,4 @@
 { PT_FSR,		"rfsr" },
 { PT_KERNEL_MODE,	"kernel_mode" },
 /* Other fields in "struct user" */
-#include "../userent0.h"
+#include "userent0.h"

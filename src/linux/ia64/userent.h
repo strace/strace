@@ -77,4 +77,4 @@
 #endif
 { PT_DBR, "dbr" }, { PT_IBR, "ibr" }, { PT_PMD, "pmd" },
 /* Other fields in "struct user" */
-#include "../userent0.h"
+#include "userent0.h"
