@@ -1,1 +1,2 @@
-TEE_MAX_ARG_SIZE	1024
+#unconditional
+TEE_MAX_ARG_SIZE

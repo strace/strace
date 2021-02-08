@@ -7,30 +7,24 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_TEE_H
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
 
-# include <fcntl.h>
-# include <stdio.h>
-# include <string.h>
+#include <linux/tee.h>
 
-# include <linux/tee.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-# include <sys/ioctl.h>
-# include <sys/stat.h>
-# include <sys/types.h>
+#include "xlat.h"
 
-# include "xlat.h"
+#define NUM_PARAMS 8
+#define RVAL_EBADF " = -1 EBADF (%m)\n"
 
-# define NUM_PARAMS 8
-# define RVAL_EBADF " = -1 EBADF (%m)\n"
+#define UUID_SIZE 16
 
-# define UUID_SIZE 16
-
-# ifndef TEE_IOCTL_PARAM_ATTR_META
-#  define TEE_IOCTL_PARAM_ATTR_META 0x100
-# endif
-
-# ifndef HAVE_STRUCT_TEE_IOCTL_SHM_REGISTER_FD_DATA
+/* Not in mainline.  */
 struct tee_ioctl_shm_register_fd_data {
 	__s64 fd;
 	__u64 size;
@@ -39,46 +33,28 @@ struct tee_ioctl_shm_register_fd_data {
 	__u32 id;
 	__u8  _pad2[4];
 } ATTRIBUTE_ALIGNED(8);
-# endif
 
-# ifndef HAVE_STRUCT_TEE_IOCTL_SHM_REGISTER_DATA
-struct tee_ioctl_shm_register_data {
-	__u64 addr;
-	__u64 length;
-	__u32 flags;
-	__s32 id;
-};
-# endif
-
-# ifndef TEE_IOC_SHM_REGISTER_FD
-#  define TEE_IOC_SHM_REGISTER_FD _IOWR(TEE_IOC_MAGIC, TEE_IOC_BASE + 8, \
+#define TEE_IOC_SHM_REGISTER_FD _IOWR(TEE_IOC_MAGIC, TEE_IOC_BASE + 8, \
 					struct tee_ioctl_shm_register_fd_data)
-# endif
-
-# ifndef TEE_IOC_SHM_REGISTER
-#  define TEE_IOC_SHM_REGISTER    _IOWR(TEE_IOC_MAGIC, TEE_IOC_BASE + 9, \
-					struct tee_ioctl_shm_register_data)
-# endif
-
 
 typedef struct {
 	uint8_t b[UUID_SIZE];
 } uuid_t;
 
-# define UUID_INIT(a_, b_, c_, d0, d1, d2, d3, d4, d5, d6, d7)		\
+#define UUID_INIT(a_, b_, c_, d0, d1, d2, d3, d4, d5, d6, d7)		\
 { .b = {((a_) >> 24) & 0xff, ((a_) >> 16) & 0xff,			\
         ((a_) >> 8) & 0xff, (a_) & 0xff,				\
         ((b_) >> 8) & 0xff, (b_) & 0xff,				\
         ((c_) >> 8) & 0xff, (c_) & 0xff,				\
         (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7)} }
 
-# define CHK_NULL(ioctl_)						\
+#define CHK_NULL(ioctl_)						\
 	do {								\
 		ioctl(-1, ioctl_, NULL);				\
 		printf("ioctl(-1, " #ioctl_ ", NULL)" RVAL_EBADF);	\
 	} while (0)
 
-# define CHK_BUF(ioctl_)						\
+#define CHK_BUF(ioctl_)						\
 	do {								\
 		ioctl(-1, ioctl_, &buf_data);				\
 		printf("ioctl(-1, " #ioctl_				\
@@ -87,7 +63,7 @@ typedef struct {
 		       (unsigned long long) buf_data.buf_ptr);		\
 	} while (0)
 
-# define DEFINE_BUF_W_PARAMS(type_, shorthand_)				\
+#define DEFINE_BUF_W_PARAMS(type_, shorthand_)				\
 	const size_t shorthand_ ## _size = sizeof(type_) +		\
 		NUM_PARAMS * sizeof(struct tee_ioctl_param);		\
 	union {								\
@@ -429,9 +405,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else /* !HAVE_LINUX_TEE_H */
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_TEE_H")
-
-#endif /* HAVE_LINUX_TEE_H */

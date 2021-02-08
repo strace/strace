@@ -28,6 +28,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/packet_diag.h \
 	linux/include/uapi/linux/smc_diag.h \
 	linux/include/uapi/linux/sock_diag.h \
+	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/types.h \
 	linux/include/uapi/linux/unix_diag.h \
 	linux/include/uapi/linux/v4l2-common.h \
