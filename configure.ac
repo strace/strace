@@ -603,9 +603,9 @@ AC_CACHE_CHECK([whether <linux/signal.h> can be used along with <signal.h>],
 				  [st_cv_linux_signal=yes],
 				  [st_cv_linux_signal=no])])
 if test "x$st_cv_linux_signal" = xno; then
-	mkdir -p src/linux/linux
-	cp $srcdir/src/linux/signal.h.in src/linux/linux/signal.h
-	CPPFLAGS="$CPPFLAGS -Ilinux"
+	mkdir -p src/linux/generic/linux
+	cp $srcdir/src/linux/generic/signal.h.in src/linux/generic/linux/signal.h
+	CPPFLAGS="$CPPFLAGS -Ilinux/generic"
 fi
 
 AC_CHECK_TYPES([struct __aio_sigset],,, [#include <linux/aio_abi.h>])
@@ -758,7 +758,7 @@ if test "$arch" = mips && test "$no_create" != yes; then
 	   $srcdir/src/linux/mips/genstub.sh \
 	   $srcdir/src/linux/32 src/linux/mips common-32 &&
 	   $srcdir/src/linux/mips/genstub.sh \
-	   $srcdir/src/linux src/linux/mips common; then
+	   $srcdir/src/linux/generic src/linux/mips common; then
 		AC_MSG_RESULT([Generated MIPS syscallent stubs])
 	else
 		AC_MSG_ERROR([Failed to generate syscallent stubs])

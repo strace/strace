@@ -5,5 +5,5 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "../errnoent.h"
+#include "../generic/errnoent.h"
 [ 58] = "EDEADLOCK",

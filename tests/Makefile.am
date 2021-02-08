@@ -21,8 +21,8 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(builddir) \
 	      -I$(top_builddir)/src/$(OS)/$(ARCH) \
 	      -I$(top_srcdir)/src/$(OS)/$(ARCH) \
-	      -I$(top_builddir)/src/$(OS) \
-	      -I$(top_srcdir)/src/$(OS) \
+	      -I$(top_builddir)/src/$(OS)/generic \
+	      -I$(top_srcdir)/src/$(OS)/generic \
 	      -I$(top_builddir)/src \
 	      -I$(top_srcdir)/src \
 	      -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \

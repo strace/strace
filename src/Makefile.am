@@ -23,8 +23,8 @@ READELF		= @READELF@
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 	      -I$(srcdir)/$(OS)/$(ARCH) \
-	      -I$(builddir)/$(OS) \
-	      -I$(srcdir)/$(OS) \
+	      -I$(builddir)/$(OS)/generic \
+	      -I$(srcdir)/$(OS)/generic \
 	      -I$(builddir) \
 	      -I$(srcdir) \
 	      -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
@@ -172,7 +172,6 @@ libstrace_a_SOURCES =	\
 	largefile_wrappers.h \
 	ldt.c		\
 	link.c		\
-	linux/asm_stat.h \
 	linux/x32/asm_stat.h \
 	linux/x86_64/asm_stat.h \
 	list.h		\
@@ -481,11 +480,6 @@ EXTRA_DIST =				\
 	linux/arc/set_error.c		\
 	linux/arc/set_scno.c		\
 	linux/arc/syscallent.h		\
-	linux/arch_defs_.h		\
-	linux/arch_kvm.c		\
-	linux/arch_regs.h		\
-	linux/arch_rt_sigframe.c	\
-	linux/arch_sigreturn.c		\
 	linux/arm/arch_defs_.h		\
 	linux/arm/arch_regs.c		\
 	linux/arm/arch_sigreturn.c	\
@@ -525,6 +519,7 @@ EXTRA_DIST =				\
 	linux/bfin/set_error.c		\
 	linux/bfin/set_scno.c		\
 	linux/bfin/syscallent.h		\
+	linux/bfin/userent.h		\
 	linux/csky/arch_regs.c		\
 	linux/csky/get_error.c		\
 	linux/csky/get_scno.c		\
@@ -535,10 +530,27 @@ EXTRA_DIST =				\
 	linux/csky/set_error.c		\
 	linux/csky/set_scno.c		\
 	linux/csky/syscallent.h		\
-	linux/bfin/userent.h		\
-	linux/check_scno.c		\
-	linux/errnoent.h		\
-	linux/getregs_old.h		\
+	linux/generic/arch_defs_.h		\
+	linux/generic/arch_kvm.c		\
+	linux/generic/arch_regs.h		\
+	linux/generic/arch_rt_sigframe.c	\
+	linux/generic/arch_sigreturn.c		\
+	linux/generic/asm_stat.h 		\
+	linux/generic/check_scno.c		\
+	linux/generic/errnoent.h		\
+	linux/generic/getregs_old.h		\
+	linux/generic/nr_prefix.c		\
+	linux/generic/ptrace_pokeuser.c		\
+	linux/generic/raw_syscall.h		\
+	linux/generic/rt_sigframe.h		\
+	linux/generic/shuffle_scno.c		\
+	linux/generic/signal.h.in		\
+	linux/generic/signalent.h		\
+	linux/generic/subcallent.h		\
+	linux/generic/syscallent-common.h	\
+	linux/generic/syscallent_base_nr.h	\
+	linux/generic/userent.h			\
+	linux/generic/userent0.h		\
 	linux/hppa/arch_defs_.h		\
 	linux/hppa/arch_regs.c		\
 	linux/hppa/arch_rt_sigframe.c	\
@@ -663,7 +675,6 @@ EXTRA_DIST =				\
 	linux/nios2/set_error.c		\
 	linux/nios2/set_scno.c		\
 	linux/nios2/syscallent.h	\
-	linux/nr_prefix.c		\
 	linux/or1k/arch_regs.c		\
 	linux/or1k/get_error.c		\
 	linux/or1k/get_scno.c		\
@@ -729,8 +740,6 @@ EXTRA_DIST =				\
 	linux/powerpc64le/set_scno.c	\
 	linux/powerpc64le/syscallent.h	\
 	linux/powerpc64le/userent.h	\
-	linux/ptrace_pokeuser.c		\
-	linux/raw_syscall.h		\
 	linux/riscv64/arch_regs.c		\
 	linux/riscv64/get_error.c		\
 	linux/riscv64/get_scno.c		\
@@ -741,7 +750,6 @@ EXTRA_DIST =				\
 	linux/riscv64/set_error.c		\
 	linux/riscv64/set_scno.c		\
 	linux/riscv64/syscallent.h	\
-	linux/rt_sigframe.h		\
 	linux/s390/arch_defs_.h		\
 	linux/s390/arch_regs.c		\
 	linux/s390/arch_sigreturn.c	\
@@ -805,9 +813,6 @@ EXTRA_DIST =				\
 	linux/sh64/set_scno.c		\
 	linux/sh64/syscallent.h		\
 	linux/sh64/userent.h		\
-	linux/shuffle_scno.c		\
-	linux/signal.h.in		\
-	linux/signalent.h		\
 	linux/sparc/arch_defs_.h	\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_regs.c		\
@@ -847,9 +852,6 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
-	linux/subcallent.h		\
-	linux/syscallent-common.h	\
-	linux/syscallent_base_nr.h	\
 	linux/tile/arch_defs_.h		\
 	linux/tile/arch_get_personality.c \
 	linux/tile/arch_regs.c		\
@@ -868,8 +870,6 @@ EXTRA_DIST =				\
 	linux/tile/syscallent.h		\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
-	linux/userent.h			\
-	linux/userent0.h		\
 	linux/x32/arch_defs_.h		\
 	linux/x32/arch_get_personality.c \
 	linux/x32/arch_kvm.c		\
@@ -1021,7 +1021,7 @@ CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
 		ioctl_iocdef.h ioctl_iocdef.i \
 		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
 		printers.h sen.h sys_func.h
-DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h linux/linux/signal.h
+DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h linux/generic/linux/signal.h
 
 include scno.am
 

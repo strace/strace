@@ -6,7 +6,7 @@
  */
 
 #ifndef __powerpc64__
-# include "../rt_sigframe.h"
+# include "../generic/rt_sigframe.h"
 #else
 # ifndef STRACE_RT_SIGFRAME_H
 #  define STRACE_RT_SIGFRAME_H

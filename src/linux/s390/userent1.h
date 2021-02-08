@@ -15,4 +15,4 @@ XLAT_UOFF(signal),
 XLAT_UOFF(u_ar0),
 XLAT_UOFF(magic),
 XLAT_UOFF(u_comm),
-#include "../userent0.h"
+#include "../generic/userent0.h"

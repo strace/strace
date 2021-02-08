@@ -19,4 +19,4 @@ XLAT_UOFF(u_fpstate),
 XLAT_UOFF(magic),
 XLAT_UOFF(u_comm),
 XLAT_UOFF(u_debugreg),
-#include "../userent0.h"
+#include "../generic/userent0.h"
