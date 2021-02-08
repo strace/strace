@@ -1,1 +1,1 @@
-#include "sparc/ioctls_inc0.h"
+#include "../sparc/ioctls_inc0.h"

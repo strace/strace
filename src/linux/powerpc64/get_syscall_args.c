@@ -1,1 +1,1 @@
-#include "powerpc/get_syscall_args.c"
+#include "../powerpc/get_syscall_args.c"

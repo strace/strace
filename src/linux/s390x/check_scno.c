@@ -1,1 +1,1 @@
-#include "s390/check_scno.c"
+#include "../s390/check_scno.c"

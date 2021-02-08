@@ -7,7 +7,7 @@
 
 #define arch_set_error arm_set_error
 #define arch_set_success arm_set_success
-#include "arm/set_error.c"
+#include "../arm/set_error.c"
 #undef arch_set_success
 #undef arch_set_error
 

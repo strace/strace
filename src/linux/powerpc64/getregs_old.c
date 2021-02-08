@@ -1,1 +1,1 @@
-#include "powerpc/getregs_old.c"
+#include "../powerpc/getregs_old.c"

@@ -8,7 +8,7 @@
 #include "negated_errno.h"
 
 #define arch_get_error arm_get_error
-#include "arm/get_error.c"
+#include "../arm/get_error.c"
 #undef arch_get_error
 
 static void

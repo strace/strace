@@ -1,1 +1,1 @@
-#include "powerpc/arch_sigreturn.c"
+#include "../powerpc/arch_sigreturn.c"

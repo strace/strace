@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "64/syscallent.h"
+#include "../64/syscallent.h"
 
 /*
  * Arch-specific block, not used on AArch64.

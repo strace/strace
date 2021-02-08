@@ -6,7 +6,7 @@
  */
 
 #ifndef __arch64__
-# include "sparc/rt_sigframe.h"
+# include "../sparc/rt_sigframe.h"
 #else
 # ifndef STRACE_RT_SIGFRAME_H
 #  define STRACE_RT_SIGFRAME_H

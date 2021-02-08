@@ -1,1 +1,1 @@
-#include "powerpc/set_scno.c"
+#include "../powerpc/set_scno.c"

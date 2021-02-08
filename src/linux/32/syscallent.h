@@ -293,7 +293,7 @@
 [293] = { 4,	0,		SEN(rseq),			"rseq"			},
 [294] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 #if HAVE_ARCH_TIME32_SYSCALLS
-# include "32/syscallent-time32.h"
+# include "../32/syscallent-time32.h"
 #endif
 /* [295 ... 402] - reserved to sync up with other architectures */
 #include "syscallent-common-32.h"

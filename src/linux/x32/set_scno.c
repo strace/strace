@@ -1,1 +1,1 @@
-#include "x86_64/set_scno.c"
+#include "../x86_64/set_scno.c"

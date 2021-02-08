@@ -6,7 +6,7 @@
  */
 
 #define arch_get_syscall_args arm_get_syscall_args
-#include "arm/get_syscall_args.c"
+#include "../arm/get_syscall_args.c"
 #undef arch_get_syscall_args
 
 /* Return -1 on error or 1 on success (never 0!). */

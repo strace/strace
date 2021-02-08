@@ -1,1 +1,1 @@
-#include "x32/ioctls_inc0.h"
+#include "../x32/ioctls_inc0.h"

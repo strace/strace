@@ -6,7 +6,7 @@
  */
 
 #ifdef __i386__
-# include "i386/rt_sigframe.h"
+# include "../i386/rt_sigframe.h"
 #else
 # ifndef STRACE_RT_SIGFRAME_H
 #  define STRACE_RT_SIGFRAME_H

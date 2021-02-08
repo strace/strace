@@ -6,7 +6,7 @@
  */
 
 #define sys_ARCH_mmap sys_mmap_pgoff
-#include "32/syscallent.h"
+#include "../32/syscallent.h"
 /* [244 ... 259] are arch specific */
 [244] = { 3,	0,	SEN(printargs),	"cacheflush"	},
 [245] = { 1,	0,	SEN(printargs),	"arc_settls"	},

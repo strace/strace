@@ -1,1 +1,1 @@
-#include "sparc/set_scno.c"
+#include "../sparc/set_scno.c"

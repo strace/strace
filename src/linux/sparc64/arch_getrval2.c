@@ -1,1 +1,1 @@
-#include "sparc/arch_getrval2.c"
+#include "../sparc/arch_getrval2.c"

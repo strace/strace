@@ -1,1 +1,1 @@
-#include "powerpc/arch_regs.c"
+#include "../powerpc/arch_regs.c"

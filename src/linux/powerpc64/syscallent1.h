@@ -1,1 +1,1 @@
-#include "powerpc/syscallent.h"
+#include "../powerpc/syscallent.h"
