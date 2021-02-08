@@ -430,6 +430,7 @@ EXTRA_DIST =				\
 	linux/32/ioctls_inc_align32.h	\
 	linux/32/ioctls_inc_align64.h	\
 	linux/32/subcallent.h		\
+	linux/32/syscallent-common-32.h	\
 	linux/32/syscallent-time32.h	\
 	linux/32/syscallent.h		\
 	linux/64/ioctls_inc.h		\
@@ -847,7 +848,6 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
 	linux/subcallent.h		\
-	linux/syscallent-common-32.h	\
 	linux/syscallent-common.h	\
 	linux/syscallent_base_nr.h	\
 	linux/tile/arch_defs_.h		\

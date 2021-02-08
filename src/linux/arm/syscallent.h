@@ -410,7 +410,7 @@
 [400] = { 4,	TM,		SEN(migrate_pages),		"migrate_pages"		},
 [401] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 /* [402] - unused */
-#include "syscallent-common-32.h"
+#include "../32/syscallent-common-32.h"
 #include "syscallent-common.h"
 
 #ifdef __ARM_EABI__

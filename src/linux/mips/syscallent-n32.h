@@ -341,7 +341,7 @@
 [BASE_NR + 330] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [BASE_NR + 331] = { 4,	0,		SEN(rseq),			"rseq"			},
 [BASE_NR + 332] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
-# include "syscallent-common-32.h"
+# include "../32/syscallent-common-32.h"
 # include "syscallent-common.h"
 
 # define SYS_socket_subcall      6500

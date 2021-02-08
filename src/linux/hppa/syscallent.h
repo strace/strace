@@ -360,5 +360,5 @@
 [354] = { 4,	0,		SEN(rseq),			"rseq"			},
 [355] = { 5,	TD,		SEN(kexec_file_load),		"kexec_file_load"	},
 /* [356 ... 402] - reserved to sync up with other architectures */
-#include "syscallent-common-32.h"
+#include "../32/syscallent-common-32.h"
 #include "syscallent-common.h"

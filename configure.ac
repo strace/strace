@@ -756,7 +756,9 @@ if test "$arch" = mips && test "$no_create" != yes; then
 	if $srcdir/src/linux/mips/genstub.sh \
 	   $srcdir/src/linux/mips src/linux/mips n32 n64 o32 &&
 	   $srcdir/src/linux/mips/genstub.sh \
-	   $srcdir/src/linux src/linux/mips common common-32; then
+	   $srcdir/src/linux/32 src/linux/mips common-32 &&
+	   $srcdir/src/linux/mips/genstub.sh \
+	   $srcdir/src/linux src/linux/mips common; then
 		AC_MSG_RESULT([Generated MIPS syscallent stubs])
 	else
 		AC_MSG_ERROR([Failed to generate syscallent stubs])

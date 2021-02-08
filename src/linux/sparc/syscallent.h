@@ -382,7 +382,7 @@
 [400] = { 4,	TI,		SEN(msgsnd),			"msgsnd"		},
 [401] = { 5,	TI,		SEN(msgrcv),			"msgrcv"		},
 [402] = { 3,	TI,		SEN(msgctl),			"msgctl"		},
-#include "syscallent-common-32.h"
+#include "../32/syscallent-common-32.h"
 #include "syscallent-common.h"
 
 #define SYS_socket_subcall	500

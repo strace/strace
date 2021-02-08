@@ -408,5 +408,5 @@
 [399] = { 6,	0,		SEN(io_pgetevents_time32),	"io_pgetevents"		},
 [400] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [401 ... 402] - unused */
-#include "syscallent-common-32.h"
+#include "../32/syscallent-common-32.h"
 #include "syscallent-common.h"

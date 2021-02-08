@@ -349,5 +349,5 @@
 [351] = { 5,	TD|TF|TFST|TSTA,SEN(statx),			"statx"			},
 [352] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [353 ... 402] - reserved to sync up with other architectures */
-#include "syscallent-common-32.h"
+#include "../32/syscallent-common-32.h"
 #include "syscallent-common.h"
