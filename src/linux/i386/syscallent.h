@@ -408,4 +408,4 @@
 #include "syscallent-common.h"
 
 #define SYS_socket_subcall	500
-#include "subcall32.h"
+#include "../32/subcallent.h"

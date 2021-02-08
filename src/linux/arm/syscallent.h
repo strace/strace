@@ -417,7 +417,7 @@
 # define ARM_FIRST_SHUFFLED_SYSCALL 500
 #else
 # define SYS_socket_subcall	500
-# include "subcall32.h"
+# include "../32/subcallent.h"
 # define ARM_FIRST_SHUFFLED_SYSCALL (SYS_ipc_subcall + SYS_ipc_nsubcalls)
 #endif /* !__ARM_EABI__ */
 

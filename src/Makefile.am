@@ -429,9 +429,11 @@ EXTRA_DIST =				\
 	linux/32/ioctls_inc_align16.h	\
 	linux/32/ioctls_inc_align32.h	\
 	linux/32/ioctls_inc_align64.h	\
+	linux/32/subcallent.h		\
 	linux/32/syscallent-time32.h	\
 	linux/32/syscallent.h		\
 	linux/64/ioctls_inc.h		\
+	linux/64/subcallent.h		\
 	linux/64/syscallent.h		\
 	linux/aarch64/arch_defs_.h	\
 	linux/aarch64/arch_get_personality.c \
@@ -844,9 +846,7 @@ EXTRA_DIST =				\
 	linux/sparc64/syscallent.h	\
 	linux/sparc64/syscallent1.h	\
 	linux/sparc64/userent.h		\
-	linux/subcall.h			\
-	linux/subcall32.h		\
-	linux/subcall64.h		\
+	linux/subcallent.h		\
 	linux/syscallent-common-32.h	\
 	linux/syscallent-common.h	\
 	linux/syscallent_base_nr.h	\
@@ -963,7 +963,7 @@ sys_func.h: $(patsubst %,$(srcdir)/%,$(sys_func_h_sources))
 		sed -n 's/^SYS_FUNC(.*/extern &;/p' $$f; \
 	done | sort -u > $@
 
-syscallent_names = subcall.h syscallent.h syscallent1.h \
+syscallent_names = subcallent.h syscallent.h syscallent1.h \
 		   syscallent-common.h syscallent-common-32.h \
 		   syscallent-n32.h syscallent-n64.h syscallent-o32.h
 syscallent_patterns = $(patsubst %,\%/%,$(syscallent_names))
