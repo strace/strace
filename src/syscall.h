@@ -10,7 +10,7 @@
 #ifndef STRACE_SYSCALL_H
 # define STRACE_SYSCALL_H
 
-# include "dummy.h"
+# include "syscall_dummy.h"
 # include "sys_func.h"
 # include "sen.h"
 

@@ -341,6 +341,7 @@ libstrace_a_SOURCES =	\
 	sync_file_range2.c \
 	syscall.c	\
 	syscall.h	\
+	syscall_dummy.h	\
 	sysctl.c	\
 	sysent.h	\
 	sysent_shorthand_defs.h \
@@ -533,7 +534,6 @@ EXTRA_DIST =				\
 	linux/csky/syscallent.h		\
 	linux/bfin/userent.h		\
 	linux/check_scno.c		\
-	linux/dummy.h			\
 	linux/errnoent.h		\
 	linux/getregs_old.h		\
 	linux/hppa/arch_defs_.h		\

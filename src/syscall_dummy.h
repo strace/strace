@@ -7,8 +7,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef STRACE_LINUX_DUMMY_H
-# define STRACE_LINUX_DUMMY_H
+#ifndef STRACE_SYSCALL_DUMMY_H
+# define STRACE_SYSCALL_DUMMY_H
 
 # ifndef HAVE_STRUCT___OLD_KERNEL_STAT
 #  define sys_oldfstat		printargs
@@ -138,4 +138,4 @@
 # define sys_olduname		printargs
 # define sys_sysfs		printargs
 
-#endif /* !STRACE_LINUX_DUMMY_H */
+#endif /* !STRACE_SYSCALL_DUMMY_H */
