@@ -12,7 +12,7 @@
 #  define stat redirect_kernel_stat
 # endif
 
-# include "linux/asm_stat.h"
+# include "../asm_stat.h"
 
 # if defined __x86_64__ && defined __ILP32__
 #  undef stat
