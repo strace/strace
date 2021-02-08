@@ -340,6 +340,7 @@ libstrace_a_SOURCES =	\
 	sync_file_range.c \
 	sync_file_range2.c \
 	syscall.c	\
+	syscall.h	\
 	sysctl.c	\
 	sysent.h	\
 	sysent_shorthand_defs.h \
@@ -846,7 +847,6 @@ EXTRA_DIST =				\
 	linux/subcall.h			\
 	linux/subcall32.h		\
 	linux/subcall64.h		\
-	linux/syscall.h			\
 	linux/syscallent-common-32.h	\
 	linux/syscallent-common.h	\
 	linux/syscallent_base_nr.h	\

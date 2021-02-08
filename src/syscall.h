@@ -7,8 +7,8 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef STRACE_LINUX_SYSCALL_H
-# define STRACE_LINUX_SYSCALL_H
+#ifndef STRACE_SYSCALL_H
+# define STRACE_SYSCALL_H
 
 # include "dummy.h"
 # include "sys_func.h"
@@ -27,4 +27,4 @@ extern SYS_FUNC(setreuid16);
 extern SYS_FUNC(setuid16);
 # endif /* HAVE_ARCH_UID16_SYSCALLS */
 
-#endif /* !STRACE_LINUX_SYSCALL_H */
+#endif /* !STRACE_SYSCALL_H */
