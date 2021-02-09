@@ -160,6 +160,18 @@ PTRACE_SINGLEBLOCK	0x100
 PTRACE_SINGLEBLOCK
 #endif
 
+/* aarch64 */
+#if defined __arm64__ || defined __aarch64__
+PTRACE_PEEKMTETAGS      0x21
+#else
+PTRACE_PEEKMTETAGS
+#endif
+#if defined __arm64__ || defined __aarch64__
+PTRACE_POKEMTETAGS      0x22
+#else
+PTRACE_POKEMTETAGS
+#endif
+
 /* arm */
 #if defined __arm__
 PTRACE_GETWMMXREGS	0x12
