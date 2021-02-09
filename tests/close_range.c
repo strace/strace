@@ -71,14 +71,15 @@ main(void)
 
 	k_close_range(-3, 0, 4);
 # ifndef PATH_TRACING
-	printf("close_range(-3, 0" FD0_PATH ", 0x4 /* CLOSE_RANGE_??? */)"
+	printf("close_range(-3, 0" FD0_PATH ", CLOSE_RANGE_CLOEXEC)"
 	       " = %s\n", errstr);
 # endif
 
 	k_close_range(0, -4, -1);
 # ifndef PATH_TRACING
-	printf("close_range(0" FD0_PATH ", -4, CLOSE_RANGE_UNSHARE|%#x) = %s\n",
-	       (-1U & ~CLOSE_RANGE_UNSHARE), errstr);
+	printf("close_range(0" FD0_PATH ", -4"
+	       ", CLOSE_RANGE_UNSHARE|CLOSE_RANGE_CLOEXEC|%#x) = %s\n",
+	       (-1U & ~(CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC)), errstr);
 # endif
 
 	k_close_range(-5, 7, 0);
@@ -88,13 +89,14 @@ main(void)
 	printf("close_range(7" FD7_PATH ", -6, 0x1 /* CLOSE_RANGE_??? */)"
 	       " = %s\n", errstr);
 
-	k_close_range(7, 7, 4);
+	k_close_range(7, 7, 8);
 	printf("close_range(7" FD7_PATH ", 7" FD7_PATH
-	       ", 0x4 /* CLOSE_RANGE_??? */) = %s\n", errstr);
+	       ", 0x8 /* CLOSE_RANGE_??? */) = %s\n", errstr);
 
 	k_close_range(-7, -7, 7);
 # ifndef PATH_TRACING
-	printf("close_range(-7, -7, CLOSE_RANGE_UNSHARE|0x5) = %s\n", errstr);
+	printf("close_range(-7, -7"
+	       ", CLOSE_RANGE_UNSHARE|CLOSE_RANGE_CLOEXEC|0x1) = %s\n", errstr);
 # endif
 
 	k_close_range(7, 0, 0);
