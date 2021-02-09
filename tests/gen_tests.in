@@ -789,7 +789,7 @@ umovestr_cached_adjacent	+umovestr_cached.test 3
 unlink	-a24
 unlinkat	-a35
 unshare	-a11
-userfaultfd	-a38
+userfaultfd	-a15
 ustat	-a33
 utime	-a16
 utimensat	-a33
