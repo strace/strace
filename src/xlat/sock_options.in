@@ -511,3 +511,19 @@ SO_DETACH_REUSEPORT_BPF	16450
 #else
 SO_DETACH_REUSEPORT_BPF	68
 #endif
+
+#if defined __sparc__
+SO_PREFER_BUSY_POLL	72
+#elif defined __hppa__
+SO_PREFER_BUSY_POLL	16451
+#else
+SO_PREFER_BUSY_POLL	69
+#endif
+
+#if defined __sparc__
+SO_BUSY_POLL_BUDGET	73
+#elif defined __hppa__
+SO_BUSY_POLL_BUDGET	16452
+#else
+SO_BUSY_POLL_BUDGET	70
+#endif
