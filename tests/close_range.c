@@ -15,12 +15,7 @@
 # include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
-
-# ifdef HAVE_LINUX_CLOSE_RANGE_H
-#  include <linux/close_range.h>
-# else
-#  define CLOSE_RANGE_UNSHARE	(1U << 1)
-# endif
+# include <linux/close_range.h>
 
 # ifndef FD0_PATH
 #  define FD0_PATH ""

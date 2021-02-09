@@ -11,6 +11,7 @@ EXTRA_DIST = \
 	linux/Linux-syscall-note \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
+	linux/include/uapi/linux/close_range.h \
 	linux/include/uapi/linux/const.h \
 	linux/include/uapi/linux/cryptouser.h \
 	linux/include/uapi/linux/fiemap.h \

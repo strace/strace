@@ -6,9 +6,7 @@
  */
 
 #include "defs.h"
-#ifdef HAVE_LINUX_CLOSE_RANGE_H
-# include <linux/close_range.h>
-#endif
+#include <linux/close_range.h>
 #include "xlat/close_range_flags.h"
 
 SYS_FUNC(close_range)
