@@ -2187,7 +2187,6 @@
 { "linux/usbdevice_fs.h", "USBDEVFS_RESETEP", _IOC_READ, 0x5503, 0x04 },
 { "linux/usbdevice_fs.h", "USBDEVFS_SETCONFIGURATION", _IOC_READ, 0x5505, 0x04 },
 { "linux/usbdevice_fs.h", "USBDEVFS_SETINTERFACE", _IOC_READ, 0x5504, 0x08 },
-{ "linux/usbdevice_fs.h", "USBDEVFS_SUBMITURB", _IOC_READ, 0x550a, 0x2a },
 { "linux/usbdevice_fs.h", "USBDEVFS_SUBMITURB32", _IOC_READ, 0x550a, 0x2a },
 { "linux/usbdevice_fs.h", "USBDEVFS_WAIT_FOR_RESUME", _IOC_NONE, 0x5523, 0x00 },
 { "linux/userfaultfd.h", "UFFDIO_API", _IOC_READ|_IOC_WRITE, 0xaa3f, 0x18 },
