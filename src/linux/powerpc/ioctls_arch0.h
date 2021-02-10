@@ -148,6 +148,7 @@
 { "linux/kvm.h", "KVM_PPC_SVM_OFF", _IOC_NONE, 0xaeb3, 0x00 },
 { "linux/kvm.h", "KVM_REGISTER_COALESCED_MMIO", _IOC_WRITE, 0xae67, 0x10 },
 { "linux/kvm.h", "KVM_REINJECT_CONTROL", _IOC_NONE, 0xae71, 0x00 },
+{ "linux/kvm.h", "KVM_RESET_DIRTY_RINGS", _IOC_NONE, 0xaec7, 0x00 },
 { "linux/kvm.h", "KVM_RUN", _IOC_NONE, 0xae80, 0x00 },
 { "linux/kvm.h", "KVM_SET_BOOT_CPU_ID", _IOC_NONE, 0xae78, 0x00 },
 { "linux/kvm.h", "KVM_SET_CLOCK", _IOC_WRITE, 0xae7b, 0x30 },
