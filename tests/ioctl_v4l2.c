@@ -951,7 +951,7 @@ main(void)
 		{ .id = V4L2_CTRL_CLASS_USER, .value = 0 },
 		{ .id = 0x990a64,             .value = 42 },
 		{ .id = 0xa31234,             .value = 1 },
-		{ .id = 0xa40000,             .value = -1 },
+		{ .id = 0xa50000,             .value = -1 },
 	};
 	static const char *id_strs[] = {
 		"0" NRAW(" /* V4L2_CID_??? */"),
@@ -959,7 +959,7 @@ main(void)
 		XLAT_KNOWN(0x980000, "V4L2_CTRL_CLASS_USER+0"),
 		XLAT_KNOWN(0x990a64, "V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE"),
 		XLAT_KNOWN(0xa31234, "V4L2_CTRL_CLASS_DETECT+0x1234"),
-		"0xa40000" NRAW(" /* V4L2_CID_??? */"),
+		"0xa50000" NRAW(" /* V4L2_CID_??? */"),
 	};
 
 	struct v4l2_control *const p_v4l2_control =
@@ -1141,21 +1141,21 @@ main(void)
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_DETECT),
 	       p_ext_controls->count, p_ext_controls->controls);
 
-	p_ext_controls->ctrl_class = 0x00a40000;
+	p_ext_controls->ctrl_class = 0x00a50000;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s"
-	       ", {ctrl_class=0xa40000" NRAW(" /* V4L2_CTRL_CLASS_??? */")
+	       ", {ctrl_class=0xa50000" NRAW(" /* V4L2_CTRL_CLASS_??? */")
 	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS),
 	       p_ext_controls->count, p_ext_controls->controls);
 
-	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_MPEG;
+	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_CODEC;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT
 	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_MPEG),
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_CODEC),
 	       p_ext_controls->count, p_ext_controls->controls);
 
 	p_ext_controls->count = 2;
@@ -1177,7 +1177,7 @@ main(void)
 	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
 	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
 	       "], error_idx=%u}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_MPEG),
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_CODEC),
 	       p_ext_controls->count, XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
 	       (long long) p_ext_controls->controls[0].value64,
@@ -1192,7 +1192,7 @@ main(void)
 	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
 	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
 	       ", ... /* %p */]}) = -1 EBADF (%m)\n",
-	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_MPEG),
+	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_CODEC),
 	       p_ext_controls->count, XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
 	       (long long) p_ext_controls->controls[0].value64,

@@ -1044,7 +1044,7 @@ main(int argc, char **argv)
 		{ ARG_XLAT_KNOWN(0x990a64,
 				 "V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE") },
 		{ ARG_XLAT_KNOWN(0xa31234, "V4L2_CTRL_CLASS_DETECT+0x1234") },
-		{ ARG_XLAT_UNKNOWN(0xa40000, "V4L2_CID_???") },
+		{ ARG_XLAT_UNKNOWN(0xa50000, "V4L2_CID_???") },
 		{ 0xdeadc0de,
 #if XLAT_RAW
 		  "0xdeadc0de"
