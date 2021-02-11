@@ -11,12 +11,8 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include "test_nlattr.h"
-#ifdef HAVE_LINUX_IF_ADDR_H
-# include <linux/if_addr.h>
-#endif
+#include <linux/if_addr.h>
 #include <linux/rtnetlink.h>
-
-#define IFA_FLAGS 8
 
 #define SET_IFA_FAMILY(af)		\
 	do {				\

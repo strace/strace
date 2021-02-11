@@ -20,9 +20,7 @@
 #ifdef HAVE_LINUX_FIB_RULES_H
 # include <linux/fib_rules.h>
 #endif
-#ifdef HAVE_LINUX_IF_ADDR_H
-# include <linux/if_addr.h>
-#endif
+#include <linux/if_addr.h>
 #ifdef HAVE_STRUCT_IFADDRLBLMSG
 # include <linux/if_addrlabel.h>
 #endif

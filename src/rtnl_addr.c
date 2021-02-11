@@ -13,9 +13,7 @@
 
 #include "netlink.h"
 #include <linux/rtnetlink.h>
-#ifdef HAVE_LINUX_IF_ADDR_H
-# include <linux/if_addr.h>
-#endif
+#include <linux/if_addr.h>
 
 #include "xlat/ifaddrflags.h"
 #include "xlat/routing_scopes.h"

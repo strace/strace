@@ -473,7 +473,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ])
 
 AC_CHECK_HEADERS(m4_normalize([
-	linux/if_addr.h
 	linux/if_link.h
 	linux/neighbour.h
 ]),,, [AC_INCLUDES_DEFAULT
