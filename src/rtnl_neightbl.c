@@ -11,7 +11,7 @@
 #include "netlink_route.h"
 #include "nlattr.h"
 
-#include "types/rtnl_neightbl.h"
+#include <linux/neighbour.h>
 
 #include "xlat/rtnl_neightbl_attrs.h"
 #include "xlat/rtnl_neightbl_parms_attrs.h"
@@ -22,7 +22,7 @@ decode_ndt_config(struct tcb *const tcp,
 		  const unsigned int len,
 		  const void *const opaque_data)
 {
-	struct_ndt_config ndtc;
+	struct ndt_config ndtc;
 
 	if (len < sizeof(ndtc))
 		return false;
@@ -91,7 +91,7 @@ decode_ndt_stats(struct tcb *const tcp,
 		 const unsigned int len,
 		 const void *const opaque_data)
 {
-	struct_ndt_stats ndtst;
+	struct ndt_stats ndtst;
 	const unsigned int min_size =
 		offsetofend(struct ndt_stats, ndts_forced_gc_runs);
 	const unsigned int def_size = sizeof(ndtst);

@@ -10,13 +10,8 @@
 
 #include <stdio.h>
 #include "test_nlattr.h"
-#ifdef HAVE_LINUX_NEIGHBOUR_H
-# include <linux/neighbour.h>
-#endif
+#include <linux/neighbour.h>
 #include <linux/rtnetlink.h>
-
-#define NDTA_PARMS 6
-#define NDTPA_IFINDEX 1
 
 static void
 init_ndtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -63,7 +58,6 @@ main(void)
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4));
 
-#ifdef HAVE_STRUCT_NDT_CONFIG
 	static const struct ndt_config ndtc = {
 		.ndtc_key_len = 0xabcd,
 		.ndtc_entry_size = 0xbcda,
@@ -97,7 +91,6 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_U(ndtc, ndtc_proxy_qlen);
 			   printf("}"));
-#endif /* HAVE_STRUCT_NDT_CONFIG */
 
 	static const struct nlattr nla = {
 		.nla_len = sizeof(nla),
@@ -110,7 +103,6 @@ main(void)
 			   PRINT_FIELD_U(nla, nla_len);
 			   printf(", nla_type=NDTPA_IFINDEX}"));
 
-#ifdef HAVE_STRUCT_NDT_STATS
 	static const struct ndt_stats ndtst = {
 		.ndts_allocs		= 0xabcdedabedadedfa,
 		.ndts_destroys		= 0xbcdefabefacdbaad,
@@ -122,9 +114,7 @@ main(void)
 		.ndts_rcv_probes_ucast	= 0xbcdefeacdadecdfe,
 		.ndts_periodic_gc_runs	= 0xedffeadedeffbecc,
 		.ndts_forced_gc_runs	= 0xfeefefeabedeedcd,
-# ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 		.ndts_table_fulls	= 0xadebfefaecdfeade
-# endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
 	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ndtmsg, print_ndtmsg,
@@ -149,12 +139,9 @@ main(void)
 			   PRINT_FIELD_U(ndtst, ndts_periodic_gc_runs);
 			   printf(", ");
 			   PRINT_FIELD_U(ndtst, ndts_forced_gc_runs);
-# ifdef HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS
 			   printf(", ");
 			   PRINT_FIELD_U(ndtst, ndts_table_fulls);
-# endif /* HAVE_STRUCT_NDT_STATS_NDTS_TABLE_FULLS */
 			   printf("}"));
-#endif /* HAVE_STRUCT_NDT_STATS */
 
 	puts("+++ exited with 0 +++");
 	return 0;

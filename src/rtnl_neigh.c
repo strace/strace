@@ -12,10 +12,7 @@
 #include "nlattr.h"
 
 #include "netlink.h"
-#include <linux/rtnetlink.h>
-#ifdef HAVE_LINUX_NEIGHBOUR_H
-# include <linux/neighbour.h>
-#endif
+#include <linux/neighbour.h>
 
 #include "xlat/neighbor_cache_entry_flags.h"
 #include "xlat/neighbor_cache_entry_states.h"

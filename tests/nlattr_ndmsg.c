@@ -12,12 +12,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "test_nlattr.h"
-#ifdef HAVE_LINUX_NEIGHBOUR_H
-# include <linux/neighbour.h>
-#endif
+#include <linux/neighbour.h>
 #include <linux/rtnetlink.h>
-
-#define NDA_PORT 6
 
 static void
 init_ndmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)

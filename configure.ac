@@ -472,13 +472,6 @@ AC_CHECK_HEADERS(m4_normalize([
 #include <linux/types.h>
 ])
 
-AC_CHECK_HEADERS(m4_normalize([
-	linux/neighbour.h
-]),,, [AC_INCLUDES_DEFAULT
-#include <sys/socket.h>
-#include <linux/types.h>
-])
-
 AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])
 
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])

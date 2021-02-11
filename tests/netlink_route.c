@@ -27,9 +27,7 @@
 #include <linux/if_arp.h>
 #include <linux/if_bridge.h>
 #include <linux/ip.h>
-#ifdef HAVE_LINUX_NEIGHBOUR_H
-# include <linux/neighbour.h>
-#endif
+#include <linux/neighbour.h>
 #ifdef HAVE_STRUCT_NETCONFMSG
 # include <linux/netconf.h>
 #endif

@@ -26,6 +26,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/io_uring.h \
 	linux/include/uapi/linux/loop.h \
 	linux/include/uapi/linux/mount.h \
+	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netlink.h \
 	linux/include/uapi/linux/netlink_diag.h \
 	linux/include/uapi/linux/openat2.h \
