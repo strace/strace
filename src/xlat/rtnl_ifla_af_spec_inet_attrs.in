@@ -1,3 +1,4 @@
+#unconditional
 #value_indexed
-IFLA_INET_UNSPEC	0
-IFLA_INET_CONF		1
+IFLA_INET_UNSPEC
+IFLA_INET_CONF

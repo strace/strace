@@ -18,9 +18,7 @@
 
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
+#include <linux/if_link.h>
 #include <linux/rtnetlink.h>
 
 #define XLAT_MACROS_ONLY

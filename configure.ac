@@ -473,7 +473,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ])
 
 AC_CHECK_HEADERS(m4_normalize([
-	linux/if_link.h
 	linux/neighbour.h
 ]),,, [AC_INCLUDES_DEFAULT
 #include <sys/socket.h>
@@ -531,11 +530,6 @@ AC_CHECK_MEMBERS(m4_normalize([
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
-
-AC_CHECK_TYPES(m4_normalize([
-	struct ifla_cacheinfo
-]),,, [#include <sys/socket.h>
-#include <linux/rtnetlink.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct gnet_stats_basic,

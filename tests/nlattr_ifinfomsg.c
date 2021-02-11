@@ -14,29 +14,8 @@
 
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
+#include <linux/if_link.h>
 #include <linux/rtnetlink.h>
-
-#ifndef IFLA_LINKINFO
-# define IFLA_LINKINFO 18
-#endif
-#ifndef IFLA_VF_PORTS
-# define IFLA_VF_PORTS 24
-#endif
-#define IFLA_LINK_NETNSID 37
-#define IFLA_EVENT 44
-#define IFLA_PROP_LIST 52
-#define IFLA_ALT_IFNAME 53
-
-#ifndef IFLA_INFO_KIND
-# define IFLA_INFO_KIND 1
-#endif
-
-#ifndef IFLA_VF_PORT
-# define IFLA_VF_PORT 1
-#endif
 
 static const unsigned int hdrlen = sizeof(struct ifinfomsg);
 
@@ -193,10 +172,8 @@ main(void)
 				 PRINT_FIELD_U(st, rx_compressed);
 				 printf(", ");
 				 PRINT_FIELD_U(st, tx_compressed);
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS_RX_NOHANDLER
 				 printf(", ");
 				 PRINT_FIELD_U(st, rx_nohandler);
-#endif
 			   printf("}"));
 
 	TEST_NLATTR(fd, nlh0, hdrlen,
@@ -293,7 +270,6 @@ main(void)
 		    PRINT_FIELD_U(map, port);
 		    printf("}"));
 
-#ifdef HAVE_STRUCT_RTNL_LINK_STATS64
 	static const struct rtnl_link_stats64 st64 = {
 		.rx_packets = 0xadcbefedefbcdedb,
 		.tx_packets = 0xbdabdedabdcdeabd,
@@ -368,13 +344,10 @@ main(void)
 			   PRINT_FIELD_U(st64, rx_compressed);
 			   printf(", ");
 			   PRINT_FIELD_U(st64, tx_compressed);
-# ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
 			   printf(", ");
 			   PRINT_FIELD_U(st64, rx_nohandler);
-# endif
 			   printf("}"));
 
-# ifdef HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER
 	const unsigned int sizeof_stats64 =
 		offsetofend(struct rtnl_link_stats64, tx_compressed);
 	TEST_NLATTR(fd, nlh0, hdrlen,
@@ -427,8 +400,6 @@ main(void)
 		    printf(", ");
 		    PRINT_FIELD_U(st64, tx_compressed);
 		    printf("}"));
-# endif /* HAVE_STRUCT_RTNL_LINK_STATS64_RX_NOHANDLER */
-#endif /* HAVE_STRUCT_RTNL_LINK_STATS64 */
 
 	struct nlattr nla = {
 		.nla_len = sizeof(nla),

@@ -19,6 +19,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/fscrypt.h \
 	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/if_addr.h \
+	linux/include/uapi/linux/if_link.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/input-event-codes.h \
 	linux/include/uapi/linux/input.h \

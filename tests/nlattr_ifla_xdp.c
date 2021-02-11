@@ -12,25 +12,12 @@
 #include "test_nlattr.h"
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
+#include <linux/if_link.h>
 #include <linux/rtnetlink.h>
 
 #define XLAT_MACROS_ONLY
 # include "xlat/rtnl_ifla_xdp_attrs.h"
 #undef XLAT_MACROS_ONLY
-
-#if !HAVE_DECL_IFLA_XDP
-enum { IFLA_XDP = 43 };
-#endif
-
-#if !HAVE_DECL_XDP_ATTACHED_NONE
-enum { XDP_ATTACHED_NONE = 0 };
-#endif
-#if !HAVE_DECL_XDP_ATTACHED_MULTI
-enum { XDP_ATTACHED_MULTI = 4 };
-#endif
 
 #define IFLA_ATTR IFLA_XDP
 #include "nlattr_ifla.h"
@@ -75,13 +62,11 @@ main(void)
 					  printf("%s", attach_types[i].str));
 	}
 
-#ifdef XDP_FLAGS_UPDATE_IF_NOEXIST
 	const uint32_t flags = XDP_FLAGS_UPDATE_IF_NOEXIST;
 	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
 				  init_ifinfomsg, print_ifinfomsg,
 				  IFLA_XDP_FLAGS, pattern, flags,
 				  printf("XDP_FLAGS_UPDATE_IF_NOEXIST"));
-#endif
 
 	static const struct {
 		uint32_t val;

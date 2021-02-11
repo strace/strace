@@ -1,3 +1,4 @@
+#unconditional
 #value_indexed
-IFLA_VF_PORT_UNSPEC	0
-IFLA_VF_PORT		1
+IFLA_VF_PORT_UNSPEC
+IFLA_VF_PORT

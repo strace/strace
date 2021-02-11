@@ -16,8 +16,7 @@
 #include <netinet/in.h>
 
 #include <linux/rtnetlink.h>
-
-#include "types/rtnl_link.h"
+#include <linux/if_link.h>
 
 #include "xlat/in6_addr_gen_mode.h"
 #include "xlat/inet_devconf_indices.h"
@@ -57,9 +56,9 @@ decode_rtnl_link_stats(struct tcb *const tcp,
 		       const unsigned int len,
 		       const void *const opaque_data)
 {
-	struct_rtnl_link_stats st;
+	struct rtnl_link_stats st;
 	const unsigned int min_size =
-		offsetofend(struct_rtnl_link_stats, tx_compressed);
+		offsetofend(struct rtnl_link_stats, tx_compressed);
 	const unsigned int def_size = sizeof(st);
 	const unsigned int size =
 		(len >= def_size) ? def_size :
@@ -135,10 +134,7 @@ decode_ifla_bridge_id(struct tcb *const tcp,
 		      const unsigned int len,
 		      const void *const opaque_data)
 {
-	struct {
-		uint8_t prio[2];
-		uint8_t addr[6];
-	} id;
+	struct ifla_bridge_id id;
 
 	if (len < sizeof(id))
 		return false;
@@ -470,9 +466,9 @@ decode_rtnl_link_stats64(struct tcb *const tcp,
 			 const unsigned int len,
 			 const void *const opaque_data)
 {
-	struct_rtnl_link_stats64 st;
+	struct rtnl_link_stats64 st;
 	const unsigned int min_size =
-		offsetofend(struct_rtnl_link_stats64, tx_compressed);
+		offsetofend(struct rtnl_link_stats64, tx_compressed);
 	const unsigned int def_size = sizeof(st);
 	const unsigned int size =
 		(len >= def_size) ? def_size :
@@ -548,7 +544,7 @@ decode_ifla_port_vsi(struct tcb *const tcp,
 		     const unsigned int len,
 		     const void *const opaque_data)
 {
-	struct_ifla_port_vsi vsi;
+	struct ifla_port_vsi vsi;
 
 	if (len < sizeof(vsi))
 		return false;

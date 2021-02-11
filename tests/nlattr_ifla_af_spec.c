@@ -16,28 +16,13 @@
 
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
+#include <linux/if_link.h>
 #include <linux/rtnetlink.h>
-
-#if !HAVE_DECL_IFLA_AF_SPEC
-enum { IFLA_AF_SPEC = 26 };
-#endif
 
 #define XLAT_MACROS_ONLY
 #include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
 #include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
 #undef XLAT_MACROS_ONLY
-
-#ifndef HAVE_STRUCT_IFLA_CACHEINFO
-struct ifla_cacheinfo {
-	uint32_t max_reasm_len;
-	uint32_t tstamp;
-	uint32_t reachable_time;
-	uint32_t retrans_time;
-};
-#endif
 
 #define IFLA_ATTR IFLA_AF_SPEC
 #include "nlattr_ifla.h"

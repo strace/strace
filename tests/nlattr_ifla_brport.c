@@ -13,17 +13,8 @@
 #include "test_nlattr.h"
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
+#include <linux/if_link.h>
 #include <linux/rtnetlink.h>
-
-#if !HAVE_DECL_IFLA_PROTINFO
-enum { IFLA_PROTINFO = 12 };
-#endif
-
-#define IFLA_BRPORT_PRIORITY 2
-#define IFLA_BRPORT_MESSAGE_AGE_TIMER 21
 
 #define IFLA_ATTR IFLA_PROTINFO
 #include "nlattr_ifla.h"
@@ -52,7 +43,6 @@ main(void)
 				  IFLA_BRPORT_MESSAGE_AGE_TIMER, pattern, u64,
 				  printf("%" PRIu64, u64));
 
-#ifdef HAVE_STRUCT_IFLA_BRIDGE_ID
 	static const struct ifla_bridge_id id = {
 		.prio = { 0xab, 0xcd },
 		.addr = { 0xab, 0xcd, 0xef, 0xac, 0xbc, 0xcd }
@@ -65,7 +55,6 @@ main(void)
 					 id.prio[0], id.prio[1],
 					 id.addr[0], id.addr[1], id.addr[2],
 					 id.addr[3], id.addr[4], id.addr[5]));
-#endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

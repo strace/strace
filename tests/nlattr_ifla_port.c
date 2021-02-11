@@ -12,17 +12,8 @@
 #include "test_nlattr.h"
 #include <linux/if.h>
 #include <linux/if_arp.h>
-#ifdef HAVE_LINUX_IF_LINK_H
-# include <linux/if_link.h>
-#endif
+#include <linux/if_link.h>
 #include <linux/rtnetlink.h>
-
-#if !HAVE_DECL_IFLA_PORT_SELF
-enum { IFLA_PORT_SELF = 25 };
-#endif
-#ifndef IFLA_PORT_VF
-# define IFLA_PORT_VF 1
-#endif
 
 #define IFLA_ATTR IFLA_PORT_SELF
 #include "nlattr_ifla.h"
@@ -44,7 +35,6 @@ main(void)
 				  IFLA_PORT_VF, pattern, num,
 				  printf("%u", num));
 
-#ifdef HAVE_STRUCT_IFLA_PORT_VSI
 	static const struct ifla_port_vsi vsi = {
 		.vsi_mgr_id = 0xab,
 		.vsi_type_id = "abc",
@@ -76,7 +66,6 @@ main(void)
 				  PRINT_FIELD_U(vsi2, vsi_type_version);
 				  printf(", pad=\"\\x00\\x01\\x02\"");
 				  printf("}"));
-#endif
 
 	puts("+++ exited with 0 +++");
 	return 0;
