@@ -11,10 +11,7 @@
 #include <stdio.h>
 #include "netlink.h"
 #include <linux/rtnetlink.h>
-
-#ifdef RTM_GETNSID
-
-# include "test_nlattr.h"
+#include "test_nlattr.h"
 
 static void
 init_rtgenmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -64,9 +61,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("RTM_GETNSID")
-
-#endif

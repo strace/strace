@@ -12,7 +12,7 @@
 #include "nlattr.h"
 
 #include <linux/ip.h>
-#include "types/rtnl_route.h"
+#include <linux/rtnetlink.h>
 
 #include "xlat/ip_type_of_services.h"
 #include "xlat/lwtunnel_encap_types.h"
@@ -144,7 +144,7 @@ decode_rta_mfc_stats(struct tcb *const tcp,
 		     const unsigned int len,
 		     const void *const opaque_data)
 {
-	struct_rta_mfc_stats mfcs;
+	struct rta_mfc_stats mfcs;
 
 	if (len < sizeof(mfcs))
 		return false;
@@ -167,7 +167,7 @@ decode_rtvia(struct tcb *const tcp,
 	     const unsigned int len,
 	     const void *const opaque_data)
 {
-	struct_rtvia via;
+	struct rtvia via;
 
 	if (len < sizeof(via))
 		return false;
@@ -175,7 +175,7 @@ decode_rtvia(struct tcb *const tcp,
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(via, rtvia_family, addrfams, "AF_???");
 
-		const unsigned int offset = offsetof(struct_rtvia, rtvia_addr);
+		const unsigned int offset = offsetof(struct rtvia, rtvia_addr);
 
 		if (len > offset) {
 			tprints(", ");

@@ -15,7 +15,6 @@
 #include <linux/ip.h>
 #include <linux/rtnetlink.h>
 
-#define RTA_ENCAP_TYPE 21
 #define LWTUNNEL_ENCAP_NONE 0
 
 static void
@@ -160,7 +159,6 @@ main(void)
 			   PRINT_FIELD_U(ci, rta_tsage);
 			   printf("}"));
 
-#ifdef HAVE_STRUCT_RTA_MFC_STATS
 	static const struct rta_mfc_stats mfcs = {
 		.mfcs_packets = 0xadcdedfdadefadcd,
 		.mfcs_bytes = 0xbaedadedcdedadbd,
@@ -176,9 +174,7 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_U(mfcs, mfcs_wrong_if);
 			   printf("}"));
-#endif
 
-#ifdef HAVE_STRUCT_RTVIA
 	static const struct rtvia via = {
 		.rtvia_family = AF_INET
 	};
@@ -201,7 +197,6 @@ main(void)
 		    RTA_VIA, sizeof(rtviabuf), rtviabuf, sizeof(rtviabuf),
 		    printf("{rtvia_family=AF_INET"
 			   ", rtvia_addr=inet_addr(\"%s\")}", address4));
-#endif
 
 	const uint16_t encap_type = LWTUNNEL_ENCAP_NONE;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,

@@ -13,9 +13,6 @@
 #include <linux/pkt_sched.h>
 #include <linux/rtnetlink.h>
 
-#ifndef TCA_STAB
-# define TCA_STAB 8
-#endif
 #if !HAVE_DECL_TCA_STAB_DATA
 enum { TCA_STAB_DATA = 2 };
 #endif

@@ -425,7 +425,6 @@ test_rtnl_mdb(const int fd)
 }
 #endif
 
-#ifdef RTM_NEWNSID
 static void
 test_rtnl_nsid(const int fd)
 {
@@ -439,7 +438,6 @@ test_rtnl_nsid(const int fd)
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{rtgen_family=AF_UNIX}"));
 }
-#endif
 
 int main(void)
 {
@@ -473,9 +471,7 @@ int main(void)
 #ifdef HAVE_STRUCT_BR_PORT_MSG
 	test_rtnl_mdb(fd);
 #endif
-#ifdef RTM_NEWNSID
 	test_rtnl_nsid(fd);
-#endif
 
 	printf("+++ exited with 0 +++\n");
 
