@@ -19,11 +19,14 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/fscrypt.h \
 	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/if_addr.h \
+	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_link.h \
+	linux/include/uapi/linux/in6.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/input-event-codes.h \
 	linux/include/uapi/linux/input.h \
 	linux/include/uapi/linux/io_uring.h \
+	linux/include/uapi/linux/libc-compat.h \
 	linux/include/uapi/linux/loop.h \
 	linux/include/uapi/linux/mount.h \
 	linux/include/uapi/linux/neighbour.h \

@@ -12,7 +12,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include "test_netlink.h"
 #ifdef HAVE_STRUCT_DCBMSG
 # include <linux/dcbnl.h>
@@ -409,7 +408,6 @@ test_rtnl_netconf(const int fd)
 }
 #endif
 
-#ifdef HAVE_STRUCT_BR_PORT_MSG
 static void
 test_rtnl_mdb(const int fd)
 {
@@ -423,7 +421,6 @@ test_rtnl_mdb(const int fd)
 		      printf("{family=AF_UNIX"),
 		      printf(", ifindex=" IFINDEX_LO_STR "}"));
 }
-#endif
 
 static void
 test_rtnl_nsid(const int fd)
@@ -468,9 +465,7 @@ int main(void)
 #ifdef HAVE_STRUCT_NETCONFMSG
 	test_rtnl_netconf(fd);
 #endif
-#ifdef HAVE_STRUCT_BR_PORT_MSG
 	test_rtnl_mdb(fd);
-#endif
 	test_rtnl_nsid(fd);
 
 	printf("+++ exited with 0 +++\n");

@@ -8,23 +8,11 @@
 
 #include "tests.h"
 
-#ifdef HAVE_STRUCT_BR_PORT_MSG
-
-# include <stdio.h>
-# include "test_nlattr.h"
-# include <arpa/inet.h>
-# include <linux/if_bridge.h>
-# include <linux/rtnetlink.h>
-
-# ifndef MDB_TEMPORARY
-#  define MDB_TEMPORARY 0
-# endif
-# ifndef MDBA_MDB_ENTRY_INFO
-#  define MDBA_MDB_ENTRY_INFO 1
-# endif
-# ifndef MDBA_MDB_EATTR_TIMER
-#  define MDBA_MDB_EATTR_TIMER 1
-# endif
+#include <stdio.h>
+#include "test_nlattr.h"
+#include <arpa/inet.h>
+#include <linux/if_bridge.h>
+#include <linux/rtnetlink.h>
 
 const unsigned int hdrlen = sizeof(struct br_port_msg);
 
@@ -80,10 +68,8 @@ main(void)
 	const int fd = create_nl_socket(NETLINK_ROUTE);
 
 	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), NLA_HDRLEN + 4
-# ifdef HAVE_STRUCT_BR_MDB_ENTRY
 			- 4 + NLA_HDRLEN * 2 + sizeof(struct nlattr)
 			+ sizeof(struct br_mdb_entry)
-# endif
 			);
 
 	static char pattern[4096];
@@ -99,16 +85,11 @@ main(void)
 		     print_quoted_hex(pattern, 4);
 		     printf("}}"));
 
-# ifdef HAVE_STRUCT_BR_MDB_ENTRY
 	struct br_mdb_entry entry = {
 		.ifindex = ifindex_lo(),
 		.state = MDB_TEMPORARY,
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 		.flags = MDB_FLAGS_OFFLOAD,
-#  endif
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		.vid = 0xcdef,
-#  endif
 		.addr = {
 			.proto = htons(AF_UNSPEC)
 		}
@@ -120,17 +101,9 @@ main(void)
 				     MDBA_MDB_ENTRY_INFO, pattern, entry, 2,
 				     printf("{ifindex=" IFINDEX_LO_STR);
 				     printf(", state=MDB_TEMPORARY");
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 				     printf(", flags=MDB_FLAGS_OFFLOAD");
-#  else
-				     printf(", flags=0");
-#  endif
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 				     printf(", ");
 				     PRINT_FIELD_U(entry, vid);
-#  else
-				     printf(", vid=0");
-#  endif
 				     printf(", addr={u=");
 				     print_quoted_hex(&entry.addr.u,
 						      sizeof(entry.addr.u));
@@ -148,30 +121,15 @@ main(void)
 		    MDBA_MDB_ENTRY_INFO, sizeof(buf), buf, sizeof(buf),
 		    printf("{ifindex=" IFINDEX_LO_STR);
 		    printf(", state=MDB_TEMPORARY");
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_FLAGS
 		    printf(", flags=MDB_FLAGS_OFFLOAD");
-#  else
-		    printf(", flags=0");
-#  endif
-#  ifdef HAVE_STRUCT_BR_MDB_ENTRY_VID
 		    printf(", ");
 		    PRINT_FIELD_U(entry, vid);
-#  else
-		    printf(", vid=0");
-#  endif
 		    printf(", addr={u=");
 		    print_quoted_hex(&entry.addr.u, sizeof(entry.addr.u));
 		    printf(", proto=htons(AF_UNSPEC)}}"
 			   ", {nla_len=%u, nla_type=MDBA_MDB_EATTR_TIMER}}}",
 			   nla.nla_len));
-# endif /* HAVE_STRUCT_BR_MDB_ENTRY */
 
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_BR_PORT_MSG")
-
-#endif

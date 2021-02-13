@@ -514,12 +514,6 @@ AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 			 #include <bluetooth/l2cap.h>])
 ])
 
-AC_CHECK_MEMBERS(m4_normalize([
-	struct br_mdb_entry.flags,
-	struct br_mdb_entry.vid
-]),,, [#include <netinet/in.h>
-#include <linux/if_bridge.h>])
-
 AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])

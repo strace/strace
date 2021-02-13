@@ -11,9 +11,9 @@
 
 #include "netlink_route.h"
 #include "nlattr.h"
-
-#include "types/rtnl_mdb.h"
 #include "netlink.h"
+#include <netinet/in.h>
+#include <linux/if_bridge.h>
 
 #include "xlat/mdb_flags.h"
 #include "xlat/mdb_states.h"
@@ -35,7 +35,7 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 			   const unsigned int len,
 			   const void *const opaque_data)
 {
-	struct_br_mdb_entry entry;
+	struct br_mdb_entry entry;
 
 	if (len < sizeof(entry))
 		return false;
@@ -187,7 +187,7 @@ static const nla_decoder_t br_port_msg_nla_decoders[] = {
 
 DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 {
-	struct_br_port_msg bpm = { .family = family };
+	struct br_port_msg bpm = { .family = family };
 	size_t offset = sizeof(bpm.family);
 	bool decode_nla = false;
 

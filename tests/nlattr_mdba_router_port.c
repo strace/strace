@@ -8,27 +8,10 @@
 
 #include "tests.h"
 
-#ifdef HAVE_STRUCT_BR_PORT_MSG
-
-# include <stdio.h>
-# include "test_nlattr.h"
-/* struct br_mdb_entry needs a definition of struct in6_addr.  */
-# include <netinet/in.h>
-# include <linux/if_bridge.h>
-# include <linux/rtnetlink.h>
-
-# ifndef MDBA_ROUTER
-#  define MDBA_ROUTER 2
-# endif
-# ifndef MDBA_ROUTER_PORT
-#  define MDBA_ROUTER_PORT 1
-# endif
-# ifndef MDBA_ROUTER_PATTR_TYPE
-#  define MDBA_ROUTER_PATTR_TYPE 2
-# endif
-# ifndef MDB_RTR_TYPE_DISABLED
-#  define MDB_RTR_TYPE_DISABLED 0
-# endif
+#include <stdio.h>
+#include "test_nlattr.h"
+#include <linux/if_bridge.h>
+#include <linux/rtnetlink.h>
 
 const unsigned int hdrlen = sizeof(struct br_port_msg);
 
@@ -104,9 +87,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_BR_PORT_MSG")
-
-#endif
