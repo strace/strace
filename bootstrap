@@ -7,7 +7,6 @@
 
 ./m4/gen_bpf_attr_m4.sh
 ./src/generate_mpers_am.sh
-./src/types/gen.sh
 ./src/xlat/gen.sh
 ./tests/gen_pure_executables.sh
 ./tests/gen_tests.sh

@@ -19,7 +19,7 @@ SUBDIRS = bundled src tests $(TESTS_M32) $(TESTS_MX32)
 
 man_MANS = doc/strace.1 doc/strace-log-merge.1
 
-ACLOCAL_AMFLAGS = -I m4 -I src/types -I src/xlat
+ACLOCAL_AMFLAGS = -I m4 -I src/xlat
 
 @CODE_COVERAGE_RULES@
 CODE_COVERAGE_BRANCH_COVERAGE = 1

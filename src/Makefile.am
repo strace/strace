@@ -33,7 +33,6 @@ AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 AM_CFLAGS_FOR_BUILD = $(WARN_CFLAGS_FOR_BUILD)
 AM_CPPFLAGS_FOR_BUILD = $(AM_CPPFLAGS)
 
-include types/Makemodule.am
 include xlat/Makemodule.am
 
 strace_CPPFLAGS = $(AM_CPPFLAGS) -DIN_STRACE=1
@@ -939,8 +938,6 @@ EXTRA_DIST =				\
 	scno.head			\
 	strace-graph			\
 	strace-log-merge		\
-	types/find_last_type_fields.awk	\
-	types/gen.sh			\
 	$(XLAT_INPUT_FILES)		\
 	$(XLAT_HEADER_FILES)		\
 	xlat/gen.sh			\

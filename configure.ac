@@ -598,7 +598,6 @@ AC_CHECK_MEMBERS([struct clone_args.cgroup],,, [#include <linux/sched.h>])
 
 CPPFLAGS="$saved_CPPFLAGS"
 
-st_CHECK_TYPES
 st_CHECK_ENUMS
 
 AC_CHECK_DECLS([sys_errlist])
