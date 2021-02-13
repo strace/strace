@@ -11,9 +11,8 @@
 
 #include "netlink_route.h"
 #include "nlattr.h"
-
 #include "netlink.h"
-#include "types/fib_rules.h"
+#include <linux/fib_rules.h>
 
 #include "xlat/fib_rule_actions.h"
 #include "xlat/fib_rule_flags.h"
@@ -25,7 +24,7 @@ decode_rule_addr(struct tcb *const tcp,
 		 const unsigned int len,
 		 const void *const opaque_data)
 {
-	const struct_fib_rule_hdr *const msg = opaque_data;
+	const struct fib_rule_hdr *const msg = opaque_data;
 
 	decode_inet_addr(tcp, addr, len, msg->family, NULL);
 
@@ -38,7 +37,7 @@ decode_fib_rule_uid_range(struct tcb *const tcp,
 			  const unsigned int len,
 			  const void *const opaque_data)
 {
-	struct_fib_rule_uid_range range;
+	struct fib_rule_uid_range range;
 
 	if (len < sizeof(range))
 		return false;
@@ -59,7 +58,7 @@ decode_rule_port_range(struct tcb *const tcp,
 		       const unsigned int len,
 		       const void *const opaque_data)
 {
-	struct_fib_rule_port_range range;
+	struct fib_rule_port_range range;
 
 	if (len < sizeof(range))
 		return false;
@@ -99,7 +98,7 @@ static const nla_decoder_t fib_rule_hdr_nla_decoders[] = {
 
 DECL_NETLINK_ROUTE_DECODER(decode_fib_rule_hdr)
 {
-	struct_fib_rule_hdr msg = { .family = family };
+	struct fib_rule_hdr msg = { .family = family };
 	size_t offset = sizeof(msg.family);
 	bool decode_nla = false;
 

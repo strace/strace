@@ -8,30 +8,12 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_FIB_RULES_H
-
-# include <stdio.h>
-# include <inttypes.h>
-# include "test_nlattr.h"
-# include <linux/fib_rules.h>
-# include <linux/in.h>
-# include <linux/ip.h>
-# include <linux/rtnetlink.h>
-
-# define FRA_TUN_ID 12
-# define FRA_TABLE 15
-# define FRA_UID_RANGE 20
-# define FRA_PROTOCOL 21
-# define FRA_IP_PROTO 22
-# define FRA_SPORT_RANGE 23
-# define FRA_DPORT_RANGE 24
-
-# ifndef HAVE_STRUCT_FIB_RULE_PORT_RANGE
-struct fib_rule_port_range {
-	uint16_t start;
-	uint16_t end;
-};
-# endif /* HAVE_STRUCT_FIB_RULE_PORT_RANGE */
+#include <stdio.h>
+#include <inttypes.h>
+#include "test_nlattr.h"
+#include <linux/fib_rules.h>
+#include <linux/in.h>
+#include <linux/ip.h>
 
 static void
 init_rtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -97,7 +79,6 @@ main(void)
 			   FRA_TABLE, pattern, table_id,
 			   printf("RT_TABLE_DEFAULT"));
 
-# ifdef HAVE_STRUCT_FIB_RULE_UID_RANGE
 	static const struct fib_rule_uid_range range = {
 		.start = 0xabcdedad,
 		.end = 0xbcdeadba
@@ -110,14 +91,13 @@ main(void)
 			   printf(", ");
 			   PRINT_FIELD_U(range, end);
 			   printf("}"));
-# endif
-# if defined HAVE_BE64TOH || defined be64toh
+#if defined HAVE_BE64TOH || defined be64toh
 	const uint64_t tun_id = 0xabcdcdbeedabadef;
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_rtmsg, print_rtmsg,
 			   FRA_TUN_ID, pattern, tun_id,
 			   printf("htobe64(%" PRIu64 ")", be64toh(tun_id)));
-# endif
+#endif
 
 	uint8_t proto;
 
@@ -182,9 +162,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_FIB_RULES_H")
-
-#endif

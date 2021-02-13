@@ -16,9 +16,7 @@
 #ifdef HAVE_STRUCT_DCBMSG
 # include <linux/dcbnl.h>
 #endif
-#ifdef HAVE_LINUX_FIB_RULES_H
-# include <linux/fib_rules.h>
-#endif
+#include <linux/fib_rules.h>
 #include <linux/if_addr.h>
 #ifdef HAVE_STRUCT_IFADDRLBLMSG
 # include <linux/if_addrlabel.h>
@@ -251,7 +249,6 @@ test_rtnl_route(const int fd)
 			     ", rtm_flags=RTM_F_NOTIFY}"));
 }
 
-#ifdef HAVE_LINUX_FIB_RULES_H
 static void
 test_rtnl_rule(const int fd)
 {
@@ -276,7 +273,6 @@ test_rtnl_rule(const int fd)
 			     msg.rtm_dst_len,
 			     msg.rtm_src_len));
 }
-#endif
 
 static void
 test_rtnl_neigh(const int fd)
@@ -449,9 +445,7 @@ int main(void)
 	test_rtnl_link(fd);
 	test_rtnl_addr(fd);
 	test_rtnl_route(fd);
-#ifdef HAVE_LINUX_FIB_RULES_H
 	test_rtnl_rule(fd);
-#endif
 	test_rtnl_neigh(fd);
 	test_rtnl_neightbl(fd);
 	test_rtnl_tc(fd);
