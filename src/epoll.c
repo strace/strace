@@ -79,7 +79,7 @@ SYS_FUNC(epoll_ctl)
 }
 
 static void
-epoll_wait_common(struct tcb *tcp)
+epoll_wait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
@@ -88,19 +88,30 @@ epoll_wait_common(struct tcb *tcp)
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
 			    tfetch_mem, print_epoll_event, 0);
-		tprintf(", %d, %d", (int) tcp->u_arg[2], (int) tcp->u_arg[3]);
+		tprints(", ");
+		tprintf("%d", (int) tcp->u_arg[2]);
+		tprints(", ");
+		print_timeout(tcp, tcp->u_arg[3]);
 	}
+}
+
+static int
+print_timeout_int(struct tcb *tcp, kernel_ulong_t arg)
+{
+	tprintf("%d", (int) arg);
+	return 0;
 }
 
 SYS_FUNC(epoll_wait)
 {
-	epoll_wait_common(tcp);
+	epoll_wait_common(tcp, print_timeout_int);
 	return 0;
 }
 
-SYS_FUNC(epoll_pwait)
+static int
+epoll_pwait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
-	epoll_wait_common(tcp);
+	epoll_wait_common(tcp, print_timeout);
 	if (exiting(tcp)) {
 		tprints(", ");
 		/* NB: kernel requires arg[5] == NSIG_BYTES */
@@ -108,4 +119,14 @@ SYS_FUNC(epoll_pwait)
 		tprintf(", %" PRI_klu, tcp->u_arg[5]);
 	}
 	return 0;
+}
+
+SYS_FUNC(epoll_pwait)
+{
+	return epoll_pwait_common(tcp, print_timeout_int);
+}
+
+SYS_FUNC(epoll_pwait2)
+{
+	return epoll_pwait_common(tcp, print_timespec64);
 }

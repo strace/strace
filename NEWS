@@ -4,6 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented poke injection (--inject=SET:poke_enter= and
     --inject=SET:poke_exit= options).
+  * Implemented decoding of epoll_pwait2 syscall introduced in Linux 5.11.
   * Implemented decoding of GPIO_* ioctl commands.
   * Implemented decoding of FS_IOC_FS[GS]ETXATTR, FS_IOC_[GS]ETFLAGS,
     and FS_IOC32_[GS]ETFLAGS ioctl commands.
