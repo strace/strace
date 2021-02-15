@@ -22,6 +22,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Fixed decoding of SIOCGIFINDEX, SIOCBRADDIF, and SIOCBRDELIF ioctl commands.
   * Fixed decoding of FIO[GS]ETOWN, SIOC[GS]PGRP, and SIOCATMARK ioctl commands
     on alpha, mips, sh, and xtensa architectures.
+  * Fixed fork--pidns-translation test on sparc and sparc64.
 
 Noteworthy changes in release 5.10 (2020-12-14)
 ===============================================

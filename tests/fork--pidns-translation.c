@@ -46,8 +46,11 @@ fork_chain(int depth)
 		_exit(fork_chain(depth - 1));
 
 	int status;
-	if (wait(&status) < 0)
+	if (waitpid(pid, &status, 0) < 0) {
+		if (errno == ECHILD)
+			_exit(fork_chain(depth - 1));
 		return errno;
+	}
 
 	if (!WIFEXITED(status))
 		return -1;
@@ -68,7 +71,8 @@ int main(void)
 
 	errno = fork_chain(2);
 	if (errno)
-		perror("fork_chain");
+		perror_msg_and_fail("fork_chain");
+	return 0;
 }
 
 #else
