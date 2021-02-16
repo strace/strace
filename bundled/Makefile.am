@@ -9,6 +9,16 @@ EXTRA_DIST = \
 	linux/COPYING \
 	linux/GPL-2.0 \
 	linux/Linux-syscall-note \
+	linux/arch/alpha/include/uapi/asm/fcntl.h \
+	linux/arch/arm/include/uapi/asm/fcntl.h \
+	linux/arch/arm64/include/uapi/asm/fcntl.h \
+	linux/arch/ia64/include/uapi/asm/fcntl.h \
+	linux/arch/m68k/include/uapi/asm/fcntl.h \
+	linux/arch/mips/include/uapi/asm/fcntl.h \
+	linux/arch/parisc/include/uapi/asm/fcntl.h \
+	linux/arch/powerpc/include/uapi/asm/fcntl.h \
+	linux/arch/sparc/include/uapi/asm/fcntl.h \
+	linux/include/uapi/asm-generic/fcntl.h \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
 	linux/include/uapi/linux/close_range.h \
@@ -47,3 +57,6 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/videodev2.h \
 	linux/include/uapi/rdma/ib_user_verbs.h \
 	# end of EXTRA_DIST
+
+dist-hook:
+	$(LN_S) asm-generic $(distdir)/linux/include/uapi/asm

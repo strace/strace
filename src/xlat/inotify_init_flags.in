@@ -1,4 +1,2 @@
 IN_NONBLOCK O_NONBLOCK
-#if defined IN_CLOEXEC || defined O_CLOEXEC
 IN_CLOEXEC  O_CLOEXEC
-#endif

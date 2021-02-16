@@ -7,7 +7,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
+#include "kernel_fcntl.h"
 
 #include "xlat/inotify_flags.h"
 #include "xlat/inotify_init_flags.h"

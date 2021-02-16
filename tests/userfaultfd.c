@@ -7,13 +7,13 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
 #include "scno.h"
 
-#if defined __NR_userfaultfd && defined O_CLOEXEC
+#if defined __NR_userfaultfd
 
 # include <stdio.h>
 # include <unistd.h>
+# include "kernel_fcntl.h"
 
 # define UFFD_USER_MODE_ONLY 1
 
@@ -63,6 +63,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_userfaultfd && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("__NR_userfaultfd")
 
 #endif

@@ -7,11 +7,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-#ifdef HAVE_SYS_EVENTFD_H
-# include <sys/eventfd.h>
-#endif
-
+#include "kernel_fcntl.h"
 #include "xlat/efd_flags.h"
 
 static int

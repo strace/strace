@@ -10,13 +10,14 @@
 
 #include "tests.h"
 #include "scno.h"
-#include "pidns.h"
 
 #ifdef __NR_pidfd_open
 
+# include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <fcntl.h>
+# include "kernel_fcntl.h"
+# include "pidns.h"
 
 static const char *errstr;
 

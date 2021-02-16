@@ -7,11 +7,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-#ifdef HAVE_SYS_SIGNALFD_H
-# include <sys/signalfd.h>
-#endif
-
+#include "kernel_fcntl.h"
 #include "xlat/sfd_flags.h"
 
 static int

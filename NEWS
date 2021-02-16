@@ -23,6 +23,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Fixed decoding of FIO[GS]ETOWN, SIOC[GS]PGRP, and SIOCATMARK ioctl commands
     on alpha, mips, sh, and xtensa architectures.
   * Fixed fork--pidns-translation test on sparc and sparc64.
+  * Fixed build on hppa with uapi headers from Linux >= 5.10.
 
 Noteworthy changes in release 5.10 (2020-12-14)
 ===============================================

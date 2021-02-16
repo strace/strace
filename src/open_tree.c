@@ -7,9 +7,7 @@
 
 #include "defs.h"
 #include <linux/mount.h>
-#define XLAT_MACROS_ONLY
-# include "xlat/open_mode_flags.h"
-#undef XLAT_MACROS_ONLY
+#include "kernel_fcntl.h"
 #include "xlat/open_tree_flags.h"
 
 SYS_FUNC(open_tree)

@@ -10,8 +10,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-
+#include "kernel_fcntl.h"
 #include "xlat/delete_module_flags.h"
 
 SYS_FUNC(delete_module)

@@ -9,7 +9,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
+#include "kernel_fcntl.h"
 #include <signal.h>
 #include <sys/timex.h>
 

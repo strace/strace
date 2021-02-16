@@ -8,9 +8,9 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
+#include "kernel_fcntl.h"
 
-#if defined HAVE_ACCEPT4 && defined O_CLOEXEC
+#if defined HAVE_ACCEPT4
 
 # define TEST_SYSCALL_NAME accept4
 # define SUFFIX_ARGS , O_CLOEXEC
@@ -19,6 +19,6 @@
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_ACCEPT4 && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("HAVE_ACCEPT4")
 
 #endif

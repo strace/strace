@@ -15,20 +15,8 @@
 
 #include "defs.h"
 #include "xstring.h"
-
-#include <asm/fcntl.h>
-
+#include "kernel_fcntl.h"
 #include <linux/openat2.h>
-
-/* some libcs are guilty of messing up with O_ACCMODE */
-#undef O_ACCMODE
-#define O_ACCMODE 03
-
-#ifdef O_LARGEFILE
-# if O_LARGEFILE == 0		/* biarch platforms in 64-bit mode */
-#  undef O_LARGEFILE
-# endif
-#endif
 
 #include "xlat/open_access_modes.h"
 #include "xlat/open_mode_flags.h"

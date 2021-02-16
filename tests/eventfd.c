@@ -7,11 +7,12 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
-#include <unistd.h>
 #include "scno.h"
 
-#if defined __NR_eventfd2 && defined O_CLOEXEC
+#if defined __NR_eventfd2
+
+# include <unistd.h>
+# include "kernel_fcntl.h"
 
 int
 main(void)
@@ -24,6 +25,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_eventfd2 && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("__NR_eventfd2")
 
 #endif

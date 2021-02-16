@@ -9,7 +9,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
+#include "kernel_fcntl.h"
 #include <sys/epoll.h>
 
 SYS_FUNC(epoll_create)

@@ -9,15 +9,14 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
 #if defined(__NR_delete_module)
 
-# include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
 
+# include "kernel_fcntl.h"
 # include "init_delete_module.h"
 
 int

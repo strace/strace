@@ -7,13 +7,13 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
 #include "scno.h"
 
-#if defined __NR_epoll_create1 && defined O_CLOEXEC
+#if defined __NR_epoll_create1
 
 # include <stdio.h>
 # include <unistd.h>
+# include "kernel_fcntl.h"
 
 int
 main(void)
@@ -31,6 +31,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_epoll_create1 && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("__NR_epoll_create1")
 
 #endif

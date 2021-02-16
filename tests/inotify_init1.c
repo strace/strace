@@ -9,21 +9,15 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
 #if defined(__NR_inotify_init1)
 
-# include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
+# include "kernel_fcntl.h"
 
-# ifdef O_CLOEXEC
-#  define cloexec_flag O_CLOEXEC
-# else
-#  define cloexec_flag 0
-# endif
-# define all_flags (O_NONBLOCK | cloexec_flag)
+# define all_flags (O_NONBLOCK | O_CLOEXEC)
 
 # ifdef PRINT_PATHS
 #  define RC_FMT "%ld<%s>"
@@ -47,7 +41,7 @@ main(void)
 
 	rc = syscall(__NR_inotify_init1, bogus_flags1);
 	printf("inotify_init1(IN_NONBLOCK|%s%#x) = %s\n",
-	       bogus_flags1 & cloexec_flag  ? "IN_CLOEXEC|" : "",
+	       bogus_flags1 & O_CLOEXEC ? "IN_CLOEXEC|" : "",
 	       (unsigned int) (bogus_flags1 & ~all_flags),
 	       sprintrc(rc));
 
@@ -93,8 +87,7 @@ main(void)
 	}
 # endif
 
-	printf("inotify_init1(IN_NONBLOCK%s) = " RC_FMT "\n",
-	       all_flags & cloexec_flag ? "|IN_CLOEXEC" : "",
+	printf("inotify_init1(IN_NONBLOCK|IN_CLOEXEC) = " RC_FMT "\n",
 # ifdef PRINT_PATHS
 	       rc, inotify_path
 # else

@@ -157,6 +157,7 @@ libstrace_a_SOURCES =	\
 	ipc_shmctl.c	\
 	kcmp.c		\
 	kernel_dirent.h	\
+	kernel_fcntl.h	\
 	kernel_rusage.h	\
 	kernel_timespec.h \
 	kernel_timeval.h \

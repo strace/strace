@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <stdint.h>
 # include <unistd.h>
+# include "kernel_fcntl.h"
 
 static const char *errstr;
 
@@ -67,23 +68,21 @@ main(void)
 	printf("open_tree(%d<%s>, \"%s\", %s) = %s\n",
 	       dfd, path, fname, "AT_RECURSIVE", errstr);
 
-# ifdef O_CLOEXEC
 	k_open_tree(-1, efault, O_CLOEXEC | 1);
-#  ifndef PATH_TRACING
+# ifndef PATH_TRACING
 	printf("open_tree(-1, %p, %s) = %s\n",
 	       efault, "OPEN_TREE_CLONE|OPEN_TREE_CLOEXEC", errstr);
-#  endif
+# endif
 
 	k_open_tree(-1, empty, -1);
-#  ifndef PATH_TRACING
+# ifndef PATH_TRACING
 	printf("open_tree(-1, \"\", %s|%#x) = %s\n",
 	       "OPEN_TREE_CLONE|OPEN_TREE_CLOEXEC"
 	       "|AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
 	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE",
 	       -1U & ~0x9f01 & ~O_CLOEXEC,
 	       errstr);
-#  endif
-# endif /* O_CLOEXEC */
+# endif
 
 	if (k_open_tree(-1, path, 0) < 0)
 		printf("open_tree(-1, \"%s\", 0) = %s\n",

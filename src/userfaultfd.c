@@ -7,8 +7,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-
+#include "kernel_fcntl.h"
 #include "xlat/uffd_flags.h"
 
 SYS_FUNC(userfaultfd)

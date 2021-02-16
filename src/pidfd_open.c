@@ -7,8 +7,7 @@
  */
 
 #include "defs.h"
-#include <fcntl.h>
-
+#include "kernel_fcntl.h"
 #include "xlat/pidfd_open_flags.h"
 
 SYS_FUNC(pidfd_open)

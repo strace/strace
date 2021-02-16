@@ -12,19 +12,9 @@
 
 #ifdef __NR_dup3
 
-# include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
-
-# ifndef O_CLOEXEC
-#  if defined __alpha__ || defined __hppa__
-#   define O_CLOEXEC	010000000
-#  elif defined __sparc__
-#   define O_CLOEXEC	020000000
-#  else
-#   define O_CLOEXEC	02000000
-#  endif
-# endif /* !O_CLOEXEC */
+# include "kernel_fcntl.h"
 
 # ifndef FD0_PATH
 #  define FD0_PATH ""
@@ -95,13 +85,7 @@ main(void)
 
 	k_dup3(-7, -7, 7);
 # ifndef PATH_TRACING
-	printf("dup3(-7, -7, %s) = %s\n",
-#  ifdef __sparc__
-	       "O_NDELAY|0x3"
-#  else
-	       "0x7 /* O_??? */"
-#  endif
-	       , errstr);
+	printf("dup3(-7, -7, 0x7 /* O_??? */) = %s\n", errstr);
 # endif
 
 	if (k_dup3(0, fd0, O_CLOEXEC) != fd0)

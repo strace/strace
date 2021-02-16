@@ -9,17 +9,16 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
 #include "scno.h"
 
 #if defined HAVE_SYS_SIGNALFD_H \
- && defined HAVE_SIGNALFD \
- && defined O_CLOEXEC
+ && defined HAVE_SIGNALFD
 
 # include <signal.h>
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/signalfd.h>
+# include "kernel_fcntl.h"
 
 int
 main(void)
@@ -42,6 +41,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_SYS_SIGNALFD_H && HAVE_SIGNALFD && O_CLOEXEC")
+SKIP_MAIN_UNDEFINED("HAVE_SYS_SIGNALFD_H && HAVE_SIGNALFD")
 
 #endif

@@ -13,9 +13,9 @@
 
 #ifdef __NR_pipe2
 
-# include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
+# include "kernel_fcntl.h"
 
 int
 main(void)

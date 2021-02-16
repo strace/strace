@@ -7,18 +7,17 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
 #include "scno.h"
 
 #if defined __NR_timerfd_create \
  && defined __NR_timerfd_gettime \
- && defined __NR_timerfd_settime \
- && defined O_CLOEXEC
+ && defined __NR_timerfd_settime
 
 # include <stdio.h>
 # include <stdint.h>
 # include <time.h>
 # include <unistd.h>
+# include "kernel_fcntl.h"
 
 int
 main(void)
@@ -89,6 +88,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("__NR_timerfd_create && __NR_timerfd_gettime"
-		    " && __NR_timerfd_settime && O_CLOEXEC")
+		    " && __NR_timerfd_settime")
 
 #endif
