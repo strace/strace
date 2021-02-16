@@ -68,8 +68,8 @@ main(int argc, const char *argv[])
 		       XLAT_SEL(cmds[i].cmd, cmds[i].str),
 		       p_flags + 1, errstr);
 
-# define   VALID_FLAGS 0xf2ffffff
-# define INVALID_FLAGS  0xd000000
+#define VALID_FLAGS 0xf2ffffff
+#define INVALID_FLAGS  0xd000000
 		*p_flags = INVALID_FLAGS;
 
 		if (cmds[i].on_enter) {

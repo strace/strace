@@ -26,7 +26,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 	int rc = ioctl(-1, cmd, arg);
 	errstr = sprintrc(rc);
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
 		error_msg_and_fail("Return value [%d] does not match"
 				   " expectations [%d]", rc, INJECT_RETVAL);
@@ -35,7 +35,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 
 	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
 	errstr = inj_errstr;
-# endif
+#endif
 
 	return rc;
 }
@@ -46,7 +46,7 @@ do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
 	return do_ioctl(cmd, (uintptr_t) arg);
 }
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 static void
 skip_ioctls(int argc, const char *argv[])
 {
@@ -67,7 +67,7 @@ skip_ioctls(int argc, const char *argv[])
 			   " to detect an injected return code %d",
 			   num_skip, INJECT_RETVAL);
 }
-# endif /* INJECT_RETVAL */
+#endif /* INJECT_RETVAL */
 
 static void
 print_rtc_time(const struct rtc_time *rt)
@@ -87,9 +87,9 @@ print_rtc_time(const struct rtc_time *rt)
 int
 main(int argc, const char *argv[])
 {
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	skip_ioctls(argc, argv);
-# endif
+#endif
 
 	static const struct {
 		unsigned int cmd;

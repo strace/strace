@@ -32,7 +32,7 @@
 # define TIMEX_T kernel_timex32_t
 # include "print_timex.h"
 # undef TIMEX_T
-#undef PRINT_TIMEX_TIME
+# undef PRINT_TIMEX_TIME
 # undef PRINT_TIMEX
 
 #endif /* HAVE_ARCH_TIME32_SYSCALLS */
@@ -44,7 +44,7 @@
 # define TIMEX_T kernel_sparc64_timex_t
 # include "print_timex.h"
 # undef TIMEX_T
-#undef PRINT_TIMEX_TIME
+# undef PRINT_TIMEX_TIME
 # undef PRINT_TIMEX
 
 #endif /* SPARC64 */

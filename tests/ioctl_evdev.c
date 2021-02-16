@@ -185,7 +185,7 @@ main(void)
 	ioctl(-1, EVIOCSKEYCODE_V2, ike);
 	printf("ioctl(-1, %s, {flags=%" PRIu8 ", len=%" PRIu8 ", ",
 	       XLAT_STR(EVIOCSKEYCODE_V2), ike->flags, ike->len);
-# if VERBOSE
+#if VERBOSE
 	printf("index=%" PRIu16 ", keycode=%s, scancode=[",
 	       ike->index, XLAT_STR(KEY_1));
 	unsigned int i;
@@ -195,9 +195,9 @@ main(void)
 		printf("%#" PRIx8, ike->scancode[i]);
 	}
 	printf("]");
-# else
+#else
 	printf("...");
-# endif
+#endif
 	errno = EBADF;
 	printf("}) = -1 EBADF (%m)\n");
 

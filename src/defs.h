@@ -1036,7 +1036,7 @@ print_local_array_ex(struct tcb *tcp,
 			     sizeof((start_addr_)[0]), (print_func_),        \
 			     NULL, 0, NULL, NULL)
 
-#define print_local_array_upto(tcp_, start_addr_, upto_, print_func_)	     \
+# define print_local_array_upto(tcp_, start_addr_, upto_, print_func_)	     \
 	print_local_array_ex((tcp_), (start_addr_),			     \
 			     CLAMP((upto_), 0,				     \
 				   (typeof(upto_)) ARRAY_SIZE(start_addr_)), \
@@ -1769,11 +1769,11 @@ extern void __gcov_dump(void);
 #  define MPERS_PRINTER_DECL(type, name, ...) type MPERS_FUNC_NAME(name)(__VA_ARGS__)
 # endif /* !IN_MPERS_BOOTSTRAP */
 
-#ifdef IN_MPERS
-# define MPERS_PTR_ARG(arg_) void *
-#else
-# define MPERS_PTR_ARG(arg_) arg_
-#endif
+# ifdef IN_MPERS
+#  define MPERS_PTR_ARG(arg_) void *
+# else
+#  define MPERS_PTR_ARG(arg_) arg_
+# endif
 
 /* Checks that sysent[scno] is not out of range. */
 static inline bool

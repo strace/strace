@@ -83,7 +83,7 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FIEMAP), (char *) fiemap + 1, errstr);
 
-#define   VALID_FM_FLAGS        0x7
+#define VALID_FM_FLAGS        0x7
 #define INVALID_FM_FLAGS 0xfffffff8
 
 	fiemap->fm_start = (typeof(fiemap->fm_start)) 0xdeadbeefcafef00dULL;
@@ -117,7 +117,7 @@ main(int argc, const char *argv[])
 		printf("}) = %s\n", errstr);
 	}
 
-#define   VALID_FE_FLAGS     0x3f8f
+#define VALID_FE_FLAGS     0x3f8f
 #define INVALID_FE_FLAGS 0xffffc070
 
 	fiemap = tail_alloc(sizeof(*fiemap) + 2 * sizeof(fiemap->fm_extents[0]));

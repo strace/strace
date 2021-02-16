@@ -9,7 +9,7 @@
 
 #include "defs.h"
 
-# include DEF_MPERS_TYPE(struct_ff_effect)
+#include DEF_MPERS_TYPE(struct_ff_effect)
 
 #include <linux/ioctl.h>
 #include <linux/input.h>
@@ -56,7 +56,7 @@ DECL_print_ff(replay)
 	tprint_struct_end();
 }
 
-# define PRINT_FIELD_FF_EFFECT(where_, field_)			\
+#define PRINT_FIELD_FF_EFFECT(where_, field_)			\
 	do {							\
 		tprints_field_name(#field_);			\
 		print_ff_ ## field_(&((where_).field_));	\
@@ -119,7 +119,7 @@ DECL_print_ff_effect(rumble)
 	tprint_struct_end();
 }
 
-# define PRINT_FIELD_FF_TYPE_EFFECT(where_, field_)			\
+#define PRINT_FIELD_FF_TYPE_EFFECT(where_, field_)			\
 	do {								\
 		tprints_field_name(#field_);				\
 		print_ff_ ## field_ ## _effect(&((where_).field_));	\

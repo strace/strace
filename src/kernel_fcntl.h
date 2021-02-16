@@ -100,4 +100,4 @@
  * On many architectures O_NDELAY is defined to O_NONBLOCK.
  * Both cases are wrong and have to be fixed.
  */
-# undef O_NDELAY
+#undef O_NDELAY

@@ -152,7 +152,7 @@ main(int argc, const char *argv[])
 	printf("ioctl(-1, %s, %p) = %s\n",
 	       XLAT_STR(FS_IOC_FSSETXATTR), (char *) p_fsxattr + 1, errstr);
 
-#define   VALID_FSX_XFLAGS 0x8001fffb
+#define VALID_FSX_XFLAGS 0x8001fffb
 #define INVALID_FSX_XFLAGS 0x7ffe0004
 
 	p_fsxattr->fsx_xflags = VALID_FSX_XFLAGS;

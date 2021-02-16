@@ -16,19 +16,19 @@
 #include <sys/ioctl.h>
 #include <linux/gpio.h>
 
-# define str_event_flags	XLAT_KNOWN(0x3, "GPIOEVENT_REQUEST_BOTH_EDGES")
-# define str_handle_flags	XLAT_KNOWN(0x14, \
+#define str_event_flags	XLAT_KNOWN(0x3, "GPIOEVENT_REQUEST_BOTH_EDGES")
+#define str_handle_flags	XLAT_KNOWN(0x14, \
 	"GPIOHANDLE_REQUEST_ACTIVE_LOW|GPIOHANDLE_REQUEST_OPEN_SOURCE")
-# define str_info_flags		XLAT_KNOWN(0xc, \
+#define str_info_flags		XLAT_KNOWN(0xc, \
 	"GPIOLINE_FLAG_ACTIVE_LOW|GPIOLINE_FLAG_OPEN_DRAIN")
-# define str_line_flags		XLAT_KNOWN(0x102, \
+#define str_line_flags		XLAT_KNOWN(0x102, \
 	"GPIO_V2_LINE_FLAG_ACTIVE_LOW|GPIO_V2_LINE_FLAG_BIAS_PULL_UP")
 
 #define UNK_GPIO_FLAG 0x8000
 
-# define str_handle_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIOHANDLE_REQUEST_???")
-# define str_info_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIOLINE_FLAG_???")
-# define str_line_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIO_V2_LINE_FLAG_???")
+#define str_handle_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIOHANDLE_REQUEST_???")
+#define str_info_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIOLINE_FLAG_???")
+#define str_line_unk_flag	XLAT_UNKNOWN(UNK_GPIO_FLAG, "GPIO_V2_LINE_FLAG_???")
 
 #if VERBOSE
 # define str_line_seq		"[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, " \

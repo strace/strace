@@ -283,14 +283,14 @@ update_personality(struct tcb *tcp, unsigned int personality)
 		need_mpers_warning[personality] = false;
 	}
 
-#if defined(ENABLE_STACKTRACE) && !defined(USE_LIBUNWIND)
+# if defined(ENABLE_STACKTRACE) && !defined(USE_LIBUNWIND)
 	if (stack_trace_enabled) {
 		unwind_tcb_fin(tcp);
 		unwind_tcb_init(tcp);
 	}
-#endif
+# endif
 }
-#endif
+#endif /* SUPPORTED_PERSONALITIES > 1 */
 
 #ifdef SYS_socket_subcall
 static void
@@ -969,11 +969,11 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			case RVAL_SID:
 			case RVAL_TGID:
 			case RVAL_PGID: {
-				#define _(_t) [RVAL_##_t - RVAL_TID] = PT_##_t
+#define _(_t) [RVAL_##_t - RVAL_TID] = PT_##_t
 				static const enum pid_type types[] = {
 					_(TID), _(SID), _(TGID), _(PGID),
 				};
-				#undef _
+#undef _
 
 				tprints("= ");
 				printpid(tcp, tcp->u_rval,
