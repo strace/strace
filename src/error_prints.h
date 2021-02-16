@@ -4,7 +4,7 @@
  * package.  Variable 'program_invocation_name' and function 'die()'
  * have to be defined globally.
  *
- * Copyright (c) 2001-2018 The strace developers.
+ * Copyright (c) 2001-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

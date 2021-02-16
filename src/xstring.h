@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2018-2021 Eugene Syromyatnikov <evgsyr@gmail.com>
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

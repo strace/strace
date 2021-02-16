@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2013 Luca Clementi <luca.clementi@gmail.com>
- * Copyright (c) 2013-2018 The strace developers.
+ * Copyright (c) 2013-2021 The strace developers.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */

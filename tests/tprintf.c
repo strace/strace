@@ -1,7 +1,7 @@
 /*
  * Close stdin, move stdout to a non-standard descriptor, and print.
  *
- * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2016-2021 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

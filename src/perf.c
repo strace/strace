@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Ben Noordhuis <info@bnoordhuis.nl>
  * Copyright (c) 2013-2015 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2015-2020 The strace developers.
+ * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

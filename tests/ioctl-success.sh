@@ -4,7 +4,7 @@
 #
 # Expects a binary that accepts IOCTL_INJECT_START as the first argument.
 #
-# Copyright (c) 2018-2020 The strace developers.
+# Copyright (c) 2018-2021 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later

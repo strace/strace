@@ -8,7 +8,7 @@
  * Copyright (c) 2012 H.J. Lu <hongjiu.lu@intel.com>
  * Copyright (c) 2013 Denys Vlasenko <vda.linux@googlemail.com>
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2018 The strace developers.
+ * Copyright (c) 2014-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

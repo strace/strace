@@ -7,7 +7,7 @@
  * Copyright (c) 2009-2010 Andreas Schwab <schwab@linux-m68k.org>
  * Copyright (c) 2012 H.J. Lu <hongjiu.lu@intel.com>
  * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2018 The strace developers.
+ * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

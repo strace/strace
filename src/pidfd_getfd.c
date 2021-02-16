@@ -1,7 +1,7 @@
 /*
  * pidfd_getfd() syscall decoder.
  *
- * Copyright (c) 2020 The strace developers.
+ * Copyright (c) 2020-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

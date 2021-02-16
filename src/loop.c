@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012 The Chromium OS Authors.
- * Copyright (c) 2012-2020 The strace developers.
+ * Copyright (c) 2012-2021 The strace developers.
  * Written by Mike Frysinger <vapier@gentoo.org>.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

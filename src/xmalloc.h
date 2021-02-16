@@ -4,7 +4,7 @@
  * These functions can be used by various binaries included in the strace
  * package.
  *
- * Copyright (c) 2001-2019 The strace developers.
+ * Copyright (c) 2001-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

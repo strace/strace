@@ -5,7 +5,7 @@
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2006 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2006 Bernhard Kaindl <bk@suse.de>
- * Copyright (c) 2006-2019 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2006-2021 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

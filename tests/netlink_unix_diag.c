@@ -2,7 +2,7 @@
  * This file is part of net-yy-unix strace test.
  *
  * Copyright (c) 2014-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2018 The strace developers.
+ * Copyright (c) 2014-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

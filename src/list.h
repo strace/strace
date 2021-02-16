@@ -1,7 +1,7 @@
 /*
  * Some simple implementation of lists similar to the one used in the kernel.
  *
- * Copyright (c) 2016-2020 The strace developers.
+ * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

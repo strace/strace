@@ -7,7 +7,7 @@
  * Copyright (c) 2006-2007 Ulrich Drepper <drepper@redhat.com>
  * Copyright (c) 2009-2013 Denys Vlasenko <dvlasenk@redhat.com>
  * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2020 The strace developers.
+ * Copyright (c) 2014-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

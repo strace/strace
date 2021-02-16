@@ -1,7 +1,7 @@
 /*
  * Execute the specified command with a blocked default signal handler.
  *
- * Copyright (c) 2017-2019 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2017-2021 Dmitry V. Levin <ldv@strace.io>
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

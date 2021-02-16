@@ -2,7 +2,7 @@
  * Check decoding of netlink attribute.
  *
  * Copyright (c) 2017 JingPiao Chen <chenjingpiao@gmail.com>
- * Copyright (c) 2017-2019 The strace developers.
+ * Copyright (c) 2017-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

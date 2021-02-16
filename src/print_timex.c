@@ -3,7 +3,7 @@
  * Copyright (c) 1993 Branko Lankester <branko@hacktic.nl>
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 2006-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2019 The strace developers.
+ * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

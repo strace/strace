@@ -2,7 +2,7 @@
  * Copyright (c) 1999 Ulrich Drepper <drepper@cygnus.com>
  * Copyright (c) 2005 Roland McGrath <roland@redhat.com>
  * Copyright (c) 2005-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2018 The strace developers.
+ * Copyright (c) 2014-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
