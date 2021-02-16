@@ -16,10 +16,3 @@ SYS_FUNC(pkey_alloc)
 
 	return RVAL_DECODED;
 }
-
-SYS_FUNC(pkey_free)
-{
-	tprintf("%d", (int) tcp->u_arg[0]);
-
-	return RVAL_DECODED;
-}
