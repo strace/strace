@@ -1,5 +1,5 @@
-Noteworthy changes in release ?.? (????-??-??)
-==============================================
+Noteworthy changes in release 5.11 (2021-02-17)
+===============================================
 
 * Improvements
   * Implemented poke injection (--inject=SET:poke_enter= and
