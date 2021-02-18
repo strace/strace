@@ -18,7 +18,7 @@ BuildRequires: xz
 %else
 Source: strace-%{version}.tar.gz
 %endif
-BuildRequires: gcc gzip
+BuildRequires: gcc gzip make
 
 # Install Bluetooth headers for AF_BLUETOOTH sockets decoding.
 %if 0%{?fedora} >= 18 || 0%{?centos} >= 6 || 0%{?rhel} >= 8 || 0%{?suse_version} >= 1200
@@ -105,6 +105,9 @@ echo 'END OF TEST SUITE INFORMATION'
 %changelog
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
+
+* Wed Feb 17 2021 Dmitry V. Levin <ldv@strace.io> - 5.11-1
+- v5.10 -> v5.11.
 
 * Mon Dec 14 2020 Dmitry V. Levin <ldv@strace.io> - 5.10-1
 - v5.9 -> v5.10.
