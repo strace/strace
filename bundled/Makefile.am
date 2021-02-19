@@ -44,6 +44,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/io_uring.h \
 	linux/include/uapi/linux/libc-compat.h \
 	linux/include/uapi/linux/loop.h \
+	linux/include/uapi/linux/mmtimer.h \
 	linux/include/uapi/linux/mount.h \
 	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netlink.h \

@@ -14,13 +14,9 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 
-#include <linux/types.h>
-
-#ifdef HAVE_LINUX_MMTIMER_H
-# include <linux/mmtimer.h>
-#endif
 #include <linux/hiddev.h>
 #include <linux/input.h>
+#include <linux/mmtimer.h>
 #include <linux/videodev2.h>
 
 int
@@ -35,11 +31,9 @@ main(void)
 	       " = -1 EBADF (%m)\n", &tty);
 #endif
 
-#ifdef MMTIMER_GETRES
 	(void) ioctl(-1, MMTIMER_GETRES, &data);
 	printf("ioctl(-1, MMTIMER_GETRES, %p)"
 	       " = -1 EBADF (%m)\n", &data);
-#endif
 
 	(void) ioctl(-1, VIDIOC_ENUMINPUT, 0);
 	printf("ioctl(-1, VIDIOC_ENUMINPUT, NULL)"
