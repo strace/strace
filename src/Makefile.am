@@ -545,6 +545,7 @@ EXTRA_DIST =				\
 	linux/generic/shuffle_scno.c		\
 	linux/generic/signal.h.in		\
 	linux/generic/signalent.h		\
+	linux/generic/socket.h.in		\
 	linux/generic/subcallent.h		\
 	linux/generic/syscallent-common.h	\
 	linux/generic/syscallent_base_nr.h	\
@@ -1018,7 +1019,11 @@ CLEANFILES    = $(ioctl_redefs_h) $(ioctlent_h) $(mpers_preproc_files) \
 		ioctl_iocdef.h ioctl_iocdef.i \
 		bpf_attr_check.c native_printer_decls.h native_printer_defs.h \
 		printers.h sen.h sys_func.h
-DISTCLEANFILES = gnu/stubs-32.h gnu/stubs-x32.h linux/generic/linux/signal.h
+DISTCLEANFILES = gnu/stubs-32.h \
+		 gnu/stubs-x32.h \
+		 linux/generic/linux/signal.h \
+		 linux/generic/linux/socket.h \
+		 #
 
 include scno.am
 

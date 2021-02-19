@@ -1,0 +1,7 @@
+#include_next <linux/socket.h>
+/*
+ * <sys/socket.h> expects <linux/socket.h> to define struct sockaddr_storage.
+ */
+#ifndef sockaddr_storage
+# define sockaddr_storage __kernel_sockaddr_storage
+#endif

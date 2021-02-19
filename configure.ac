@@ -329,6 +329,13 @@ AC_CHECK_FUNCS(m4_normalize([
 
 AC_CHECK_TYPES([sig_atomic_t, struct sigcontext],,, [#include <signal.h>])
 
+AC_CHECK_TYPES([struct sockaddr_storage],
+	       [],
+	       [mkdir -p src/linux/generic/linux
+		cp $srcdir/src/linux/generic/socket.h.in src/linux/generic/linux/socket.h
+		CPPFLAGS="-Isrc/linux/generic $CPPFLAGS"],
+	       [#include <sys/socket.h>])
+
 AC_CHECK_TYPES([struct mmsghdr],,, [#include <sys/socket.h>])
 
 AC_CHECK_TYPES([__kernel_long_t, __kernel_ulong_t],,,
