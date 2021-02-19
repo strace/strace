@@ -381,10 +381,6 @@ AC_CHECK_TYPES(m4_normalize([
 #include <linux/fcntl.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct kcmp_epoll_slot
-]),,, [#include <linux/kcmp.h>])
-
-AC_CHECK_TYPES(m4_normalize([
 	struct keyctl_kdf_params,
 	struct keyctl_pkey_params,
 	struct keyctl_pkey_query
@@ -447,7 +443,6 @@ AC_CHECK_HEADERS(m4_normalize([
 
 AC_CHECK_HEADERS(m4_normalize([
 	linux/ipc.h
-	linux/kcmp.h
 	linux/kvm.h
 	linux/memfd.h
 	linux/mqueue.h

@@ -20,37 +20,10 @@
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
+# include <linux/kcmp.h>
 
 # ifndef VERBOSE_FD
 #  define VERBOSE_FD 0
-# endif
-
-/*
- * We prefer to use system headers in order to catch some possible deviations in
- * system's headers from our perception of reality, but happy to include our own
- * definitions as well.
- */
-# ifdef HAVE_LINUX_KCMP_H
-#  include <linux/kcmp.h>
-# else
-#  define KCMP_FILE	0
-#  define KCMP_VM	1
-#  define KCMP_FILES	2
-#  define KCMP_FS	3
-#  define KCMP_SIGHAND	4
-#  define KCMP_IO	5
-#  define KCMP_SYSVSEM	6
-# endif
-
-/* All other kcmp types have been added atomically */
-# define KCMP_EPOLL_TFD	7
-
-# ifndef HAVE_STRUCT_KCMP_EPOLL_SLOT
-struct kcmp_epoll_slot {
-	uint32_t efd;
-	uint32_t tfd;
-	uint32_t toff;
-};
 # endif
 
 static const kernel_ulong_t kcmp_max_type = KCMP_EPOLL_TFD;

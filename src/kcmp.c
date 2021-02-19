@@ -7,13 +7,8 @@
  */
 
 #include "defs.h"
+#include <linux/kcmp.h>
 #include "xlat/kcmp_types.h"
-
-struct strace_kcmp_epoll_slot {
-	uint32_t efd;
-	uint32_t tfd;
-	uint32_t toff;
-};
 
 #define PRINT_FIELD_PIDFD(where_, field_, tcp_, pid_)			\
 	do {								\
@@ -45,7 +40,7 @@ SYS_FUNC(kcmp)
 			break;
 
 		case KCMP_EPOLL_TFD: {
-			struct strace_kcmp_epoll_slot slot;
+			struct kcmp_epoll_slot slot;
 
 			tprints(", ");
 			printfd_pid_tracee_ns(tcp, pid1, idx1);
