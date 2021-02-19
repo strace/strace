@@ -135,6 +135,8 @@ static struct ioctlent ioctls[] = {
 # include "ioctls_arch.h"
 # include "ioctls_inc.h"
 #endif
+
+#include "ioctls_zfs.h"
 };
 
 int

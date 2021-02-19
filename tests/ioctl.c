@@ -63,6 +63,22 @@ main(void)
 	printf("ioctl(-1, _IOC(_IOC_READ, 0xde, 0xad, 0x8), %p)"
 	       " = -1 EBADF (%m)\n", &data);
 
+	(void) ioctl(-1, 'Z' << 8, &data);
+	printf("ioctl(-1, ZFS_IOC_POOL_CREATE, %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, 'Z' << 8 | 'A', &data);
+	printf("ioctl(-1, ZFS_IOC_SEND_SPACE, %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, _IOR(0x12, 125, char[256]), &data);
+	printf("ioctl(-1, BLKZNAME, %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
+	(void) ioctl(-1, ('K' << 8) + 1, &data);
+	printf("ioctl(-1, KSTAT_IOC_CHAIN_ID, %p)"
+	       " = -1 EBADF (%m)\n", &data);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

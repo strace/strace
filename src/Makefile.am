@@ -428,6 +428,7 @@ EXTRA_DIST =				\
 	gen_bpf_attr_check.sh		\
 	generate_sen.sh			\
 	ioctl_iocdef.c			\
+	ioctls_zfs.h			\
 	ioctlsort.c			\
 	linux/32/ioctls_inc.h		\
 	linux/32/ioctls_inc_align16.h	\
@@ -1012,7 +1013,8 @@ ioctl_iocdef.h: ioctl_iocdef.i
 ioctlsort%$(BUILD_EXEEXT): ioctlsort%.o
 	$(ioctlsort_CC) $(ioctlsort_CFLAGS) $(ioctlsort_LDFLAGS) $< -o $@
 
-ioctlsort%.o: ioctls_all%.h ioctl_iocdef.h $(srcdir)/ioctlsort.c
+ioctlsort%.o: ioctls_all%.h \
+	      ioctl_iocdef.h $(srcdir)/ioctls_zfs.h $(srcdir)/ioctlsort.c
 	$(ioctlsort_CC) $(ioctlsort_DEFS) $(ioctlsort_INCLUDES) $(ioctlsort_CPPFLAGS) $(ioctlsort_CFLAGS) -DIOCTLSORT_INC=\"$<\" -c -o $@ $(srcdir)/ioctlsort.c
 
 ioctls_all%.h: $(srcdir)/$(OS)/$(ARCH)/ioctls_inc%.h $(srcdir)/$(OS)/$(ARCH)/ioctls_arch%.h
