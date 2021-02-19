@@ -446,7 +446,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ]))
 
 AC_CHECK_HEADERS(m4_normalize([
-	linux/ip_vs.h
 	linux/ipc.h
 	linux/kcmp.h
 	linux/kvm.h

@@ -34,9 +34,7 @@
 # include <linux/ipx.h>
 #endif
 
-#if defined(HAVE_LINUX_IP_VS_H)
-# include <linux/ip_vs.h>
-#endif
+#include <linux/ip_vs.h>
 #include "netlink.h"
 #if defined(HAVE_LINUX_NETFILTER_ARP_ARP_TABLES_H)
 # include <linux/netfilter_arp/arp_tables.h>

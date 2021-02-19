@@ -42,6 +42,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/input-event-codes.h \
 	linux/include/uapi/linux/input.h \
 	linux/include/uapi/linux/io_uring.h \
+	linux/include/uapi/linux/ip_vs.h \
 	linux/include/uapi/linux/libc-compat.h \
 	linux/include/uapi/linux/loop.h \
 	linux/include/uapi/linux/mmtimer.h \
