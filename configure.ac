@@ -585,7 +585,7 @@ AC_CACHE_CHECK([whether <linux/signal.h> can be used along with <signal.h>],
 if test "x$st_cv_linux_signal" = xno; then
 	mkdir -p src/linux/generic/linux
 	cp $srcdir/src/linux/generic/signal.h.in src/linux/generic/linux/signal.h
-	CPPFLAGS="$CPPFLAGS -Ilinux/generic"
+	CPPFLAGS="-Isrc/linux/generic $CPPFLAGS"
 fi
 
 AC_CHECK_TYPES([struct __aio_sigset],,, [#include <linux/aio_abi.h>])
