@@ -7,14 +7,10 @@
  */
 
 #include "defs.h"
-
-#ifdef HAVE_LINUX_BSG_H
-
-# include <linux/types.h>
-# include <linux/bsg.h>
-# include "xlat/bsg_protocol.h"
-# include "xlat/bsg_subprotocol.h"
-# include "xlat/bsg_flags.h"
+#include <linux/bsg.h>
+#include "xlat/bsg_protocol.h"
+#include "xlat/bsg_subprotocol.h"
+#include "xlat/bsg_flags.h"
 
 static void
 print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
@@ -28,7 +24,7 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-# define PRINT_FIELD_SG_IO_BUFFER(where_, field_, size_, count_, tcp_)		\
+#define PRINT_FIELD_SG_IO_BUFFER(where_, field_, size_, count_, tcp_)		\
 	do {									\
 		tprints_field_name(#field_);					\
 		print_sg_io_buffer((tcp_), (where_).field_, (size_), (count_));	\
@@ -152,28 +148,6 @@ decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#else /* !HAVE_LINUX_BSG_H */
-
-static int
-decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	tprint_struct_begin();
-	tprints_field_name("guard");
-	tprints("'Q'");
-	tprint_struct_next();
-	tprint_more_data_follows();
-	tprint_struct_end();
-	return RVAL_IOCTL_DECODED;
-}
-
-static int
-decode_response(struct tcb *const tcp, const kernel_ulong_t arg)
-{
-	return 0;
-}
-
-#endif
 
 int
 decode_sg_io_v4(struct tcb *const tcp, const kernel_ulong_t arg)

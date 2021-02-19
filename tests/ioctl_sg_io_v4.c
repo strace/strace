@@ -9,18 +9,14 @@
  */
 
 #include "tests.h"
-
-#ifdef HAVE_LINUX_BSG_H
-
-# include <inttypes.h>
-# include <stdio.h>
-# include <sys/ioctl.h>
-# include <sys/uio.h>
-# include <linux/types.h>
-# include <linux/bsg.h>
-# define XLAT_MACROS_ONLY
-#  include "xlat/scsi_sg_commands.h"
-# undef XLAT_MACROS_ONLY
+#include <inttypes.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <sys/uio.h>
+#include <linux/bsg.h>
+#define XLAT_MACROS_ONLY
+# include "xlat/scsi_sg_commands.h"
+#undef XLAT_MACROS_ONLY
 
 int
 main(void)
@@ -213,9 +209,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_BSG_H")
-
-#endif
