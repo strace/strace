@@ -363,10 +363,8 @@ ioctl_decode(struct tcb *tcp)
 		return gpio_ioctl(tcp, code, arg);
 	case 0xb7:
 		return nsfs_ioctl(tcp, code, arg);
-#ifdef HAVE_LINUX_DM_IOCTL_H
 	case 0xfd:
 		return dm_ioctl(tcp, code, arg);
-#endif
 	default:
 		break;
 	}

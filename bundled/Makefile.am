@@ -25,6 +25,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/close_range.h \
 	linux/include/uapi/linux/const.h \
 	linux/include/uapi/linux/cryptouser.h \
+	linux/include/uapi/linux/dm-ioctl.h \
 	linux/include/uapi/linux/fib_rules.h \
 	linux/include/uapi/linux/fiemap.h \
 	linux/include/uapi/linux/fs.h \

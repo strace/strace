@@ -10,32 +10,25 @@
  */
 
 #include "tests.h"
+#include <errno.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+#include <linux/dm-ioctl.h>
 
-#ifdef HAVE_LINUX_DM_IOCTL_H
+#ifndef VERBOSE
+# define VERBOSE 0
+#endif
 
-# include <errno.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <stddef.h>
-# include <string.h>
-# include <sys/ioctl.h>
-# include <linux/ioctl.h>
-# include <linux/dm-ioctl.h>
+#define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
 
-# ifndef VERBOSE
-#  define VERBOSE 0
-# endif
-
-# define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
-
-# define ALIGNED_SIZE(s_, t_) \
+#define ALIGNED_SIZE(s_, t_) \
 	(((s_) + (ALIGNOF(t_) - 1UL)) & ~(ALIGNOF(t_) - 1UL))
-# define ALIGNED_OFFSET(t_, m_) \
+#define ALIGNED_OFFSET(t_, m_) \
 	ALIGNED_SIZE(offsetof(t_, m_), t_)
-
-# ifndef DM_DEV_ARM_POLL
-#  define DM_DEV_ARM_POLL     _IOWR(DM_IOCTL, 0x10, struct dm_ioctl)
-# endif
 
 static const char str129[] = STR32 STR32 STR32 STR32 "6";
 
@@ -129,7 +122,7 @@ init_dm_target_spec(struct dm_target_spec *ptr, uint32_t id)
 		ptr->target_type[id % (sizeof(ptr->target_type) + 1)] = '\0';
 }
 
-# if VERBOSE
+#if VERBOSE
 static void
 print_dm_target_spec(struct dm_target_spec *ptr, uint32_t id)
 {
@@ -140,7 +133,7 @@ print_dm_target_spec(struct dm_target_spec *ptr, uint32_t id)
 	       (int) (id % (sizeof(ptr->target_type) + 1)),
 	       str129 + id % (sizeof(str129) - sizeof(ptr->target_type)));
 }
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 
 int
 main(void)
@@ -351,12 +344,12 @@ main(void)
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=1, flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "{sector_start=16, length=32, target_type=\"tgt\", "
 	       "string=\"tparams\"}"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n", s.ioc.data_size, s.ioc.data_start);
 
 	/* No targets */
@@ -379,11 +372,11 @@ main(void)
 	       "{version=4.1.2, data_size=%zu, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=1234, flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "??? /* misplaced struct dm_target_spec */"
-# else
+#else
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n", sizeof(*dm_arg), 0xfffffff8);
 
 	/* Inaccessible pointer */
@@ -396,17 +389,17 @@ main(void)
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=3735936673, flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "%p"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n", sizeof(*dm_arg_open1),
 	       offsetof(struct dm_table_open_test, target1)
-# if VERBOSE
+#if VERBOSE
 	       , (char *) dm_arg_open1 +
 	       offsetof(struct dm_table_open_test, target1)
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       );
 
 	/* Inaccessible string */
@@ -426,16 +419,16 @@ main(void)
 	       "target_count=2, flags=0, ",
 	       sizeof(*dm_arg_open2),
 	       offsetof(struct dm_table_open_test, target1));
-# if VERBOSE
+#if VERBOSE
 	print_dm_target_spec(&dm_arg_open2->target1, 7);
 	printf("%p}, %p",
 	       (char *) dm_arg_open2 +
 	       offsetof(struct dm_table_open_test, param1),
 	       (char *) dm_arg_open2 +
 	       offsetof(struct dm_table_open_test, target3));
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	printf("...");
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	printf("}) = %s\n", errstr);
 
 	/* Incorrect next */
@@ -470,19 +463,19 @@ main(void)
 	       "target_count=4, flags=0, ",
 	       offsetof(struct dm_table_open_test, target5),
 	       offsetof(struct dm_table_open_test, target0));
-# if VERBOSE
+#if VERBOSE
 	print_dm_target_spec(&dm_arg_open3->target0, 9);
 	printf("\"\"}, ");
 	print_dm_target_spec(&dm_arg_open3->target1, 15);
 	printf("\"\\377\"}, ");
 	print_dm_target_spec(&dm_arg_open3->target1, 42);
 	printf("\"\\1\\2\"}, ??? /* misplaced struct dm_target_spec */");
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	printf("...");
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	printf("}) = %s\n", errstr);
 
-# define FILL_DM_TARGET(id, id_next) \
+#define FILL_DM_TARGET(id, id_next) \
 		do { \
 			init_dm_target_spec(&dm_arg_open3->target##id, id); \
 			dm_arg_open3->target##id.next = \
@@ -493,7 +486,7 @@ main(void)
 			memcpy(dm_arg_open3->param##id, str129 + id * 2, id); \
 			dm_arg_open3->param##id[id] = '\0'; \
 		} while (0)
-# define PRINT_DM_TARGET(id) \
+#define PRINT_DM_TARGET(id) \
 		do { \
 			print_dm_target_spec(&dm_arg_open3->target##id, id); \
 			printf("\"%.*s\"}, ", id, str129 + id * 2); \
@@ -521,7 +514,7 @@ main(void)
 	       "target_count=3134983661, flags=0, ",
 	       sizeof(*dm_arg_open3),
 	       offsetof(struct dm_table_open_test, target0));
-# if VERBOSE
+#if VERBOSE
 	PRINT_DM_TARGET(0);
 	PRINT_DM_TARGET(1);
 	PRINT_DM_TARGET(2);
@@ -531,7 +524,7 @@ main(void)
 	PRINT_DM_TARGET(6);
 	PRINT_DM_TARGET(7);
 	PRINT_DM_TARGET(8);
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	printf("...}) = %s\n", errstr);
 
 
@@ -544,11 +537,11 @@ main(void)
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "{sector=4660, message=\"long targ\"...}"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       s.ioc.data_size, s.ioc.data_start);
 
@@ -559,11 +552,11 @@ main(void)
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "??? /* misplaced struct dm_target_msg */"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       sizeof(*dm_arg), min_sizeof_dm_ioctl);
 
@@ -574,11 +567,11 @@ main(void)
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "??? /* misplaced struct dm_target_msg */"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       sizeof(*dm_arg), 0xffffffff);
 
@@ -590,17 +583,17 @@ main(void)
 	printf("ioctl(-1, DM_TARGET_MSG, "
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "%p"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       sizeof(*dm_arg) + sizeof(struct dm_target_msg),
 	       sizeof(*dm_arg)
-# if VERBOSE
+#if VERBOSE
 	       , (char *) dm_arg + sizeof(*dm_arg)
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       );
 
 	/* Inaccessible string */
@@ -615,14 +608,14 @@ main(void)
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, ",
 	       sizeof(*dm_arg_msg) + 1,
 	       offsetof(struct dm_target_msg_test, msg));
-# if VERBOSE
+#if VERBOSE
 	printf("{sector=%" PRI__u64 ", message=%p}",
 	       (__u64) 0xdeadbeeffacef157ULL,
 	       (char *) dm_arg_msg +
 	       offsetof(struct dm_target_msg_test, msg.message));
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	printf("...");
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	printf("}) = %s\n", errstr);
 
 	/* Zero-sied string */
@@ -635,12 +628,12 @@ main(void)
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, ",
 	       sizeof(*dm_arg_msg), offsetof(struct dm_target_msg_test, msg));
-# if VERBOSE
+#if VERBOSE
 	printf("{sector=%" PRI__u64 ", message=\"\"}",
 	       (__u64) 0xdeadbeeffacef157ULL);
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	printf("...");
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	printf("}) = %s\n", errstr);
 
 
@@ -651,11 +644,11 @@ main(void)
 	printf("ioctl(-1, DM_DEV_SET_GEOMETRY, "
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "string=\"10 20 30 \"..."
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       s.ioc.data_size, s.ioc.data_start);
 
@@ -670,16 +663,16 @@ main(void)
 	       "{version=4.1.2, data_size=%zu, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "string=%p"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       sizeof(*unaligned_dm_arg), min_sizeof_dm_ioctl
-# if VERBOSE
+#if VERBOSE
 	       , (char *) unaligned_dm_arg + min_sizeof_dm_ioctl
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       );
 
 	/* Incorrect data_start data */
@@ -690,11 +683,11 @@ main(void)
 	       "{version=4.1.2, data_size=%u, data_start=3735928559, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "??? /* misplaced string */"
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       s.ioc.data_size);
 
@@ -707,11 +700,11 @@ main(void)
 	       "{version=4.1.2, data_size=%u, data_start=%zu, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "string=\"nn\""
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       s.ioc.data_size,
 	       offsetof(struct dm_ioctl, name) + 1);
@@ -724,11 +717,11 @@ main(void)
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", event_nr=0, "
 	       "flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "string=\"new long \"..."
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       s.ioc.data_size, s.ioc.data_start);
 
@@ -741,21 +734,15 @@ main(void)
 	       "{version=4.1.2, data_size=%u, data_start=%u, "
 	       "dev=makedev(0x12, 0x34), name=\"nnn\", uuid=\"uuu\", "
 	       "target_count=4294967295, flags=0, "
-# if VERBOSE
+#if VERBOSE
 	       "{sector_start=0, length=0, target_type=\"\", string=\"\"}"
 	       ", ??? /* misplaced struct dm_target_spec */"
-# else
+#else
 	       "..."
-# endif /* VERBOSE */
+#endif /* VERBOSE */
 	       "}) = -1 EBADF (%m)\n",
 	       s.ioc.data_size, s.ioc.data_start);
 
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else /* !HAVE_LINUX_DM_IOCTL_H */
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_DM_IOCTL_H")
-
-#endif /* HAVE_LINUX_DM_IOCTL_H */

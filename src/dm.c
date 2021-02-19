@@ -12,29 +12,13 @@
  */
 
 #include "defs.h"
+#include <linux/dm-ioctl.h>
+#include <linux/ioctl.h>
 
-#ifdef HAVE_LINUX_DM_IOCTL_H
+/* Defined in lvm2/libdm/ioctl/libdm-iface.c file.  */
+#define DM_EXISTS_FLAG 0x00000004
 
-# include <linux/dm-ioctl.h>
-# include <linux/ioctl.h>
-
-# if DM_VERSION_MAJOR == 4
-
-/* Definitions for command which have been added later */
-
-#  ifndef DM_LIST_VERSIONS
-#   define DM_LIST_VERSIONS    _IOWR(DM_IOCTL, 0x0d, struct dm_ioctl)
-#  endif
-#  ifndef DM_TARGET_MSG
-#   define DM_TARGET_MSG       _IOWR(DM_IOCTL, 0x0e, struct dm_ioctl)
-#  endif
-#  ifndef DM_DEV_SET_GEOMETRY
-#   define DM_DEV_SET_GEOMETRY _IOWR(DM_IOCTL, 0x0f, struct dm_ioctl)
-#  endif
-#  ifndef DM_DEV_ARM_POLL
-#   define DM_DEV_ARM_POLL     _IOWR(DM_IOCTL, 0x10, struct dm_ioctl)
-#  endif
-
+#include "xlat/dm_flags.h"
 
 static void
 dm_decode_device(const unsigned int code, const struct dm_ioctl *ioc)
@@ -107,8 +91,6 @@ dm_decode_values(struct tcb *tcp, const unsigned int code,
 		}
 	}
 }
-
-#  include "xlat/dm_flags.h"
 
 static void
 dm_decode_flags(const struct dm_ioctl *ioc)
@@ -638,14 +620,3 @@ dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t ar
 		return RVAL_DECODED;
 	}
 }
-
-# else /* !(DM_VERSION_MAJOR == 4) */
-
-int
-dm_ioctl(struct tcb *const tcp, const unsigned int code, const kernel_ulong_t arg)
-{
-	return RVAL_DECODED;
-}
-
-# endif /* DM_VERSION_MAJOR == 4 */
-#endif /* HAVE_LINUX_DM_IOCTL_H */

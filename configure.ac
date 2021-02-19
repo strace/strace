@@ -446,7 +446,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ]))
 
 AC_CHECK_HEADERS(m4_normalize([
-	linux/dm-ioctl.h
 	linux/dqblk_xfs.h
 	linux/falloc.h
 	linux/hiddev.h
