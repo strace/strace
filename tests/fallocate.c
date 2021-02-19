@@ -18,6 +18,17 @@
 # include <fcntl.h>
 # include <stdio.h>
 
+# ifndef FALLOC_FL_UNSHARE_RANGE
+/* Avoid conflicts between <fcntl.h> and <linux/falloc.h>.  */
+#  undef FALLOC_FL_KEEP_SIZE
+#  undef FALLOC_FL_PUNCH_HOLE
+#  undef FALLOC_FL_NO_HIDE_STALE
+#  undef FALLOC_FL_COLLAPSE_RANGE
+#  undef FALLOC_FL_ZERO_RANGE
+#  undef FALLOC_FL_INSERT_RANGE
+#  include <linux/falloc.h>
+# endif
+
 # include "xlat.h"
 # include "xlat/falloc_flags.h"
 

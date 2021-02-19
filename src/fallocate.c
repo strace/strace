@@ -6,11 +6,7 @@
  */
 
 #include "defs.h"
-
-#ifdef HAVE_LINUX_FALLOC_H
-# include <linux/falloc.h>
-#endif
-
+#include <linux/falloc.h>
 #include "xlat/falloc_flags.h"
 
 SYS_FUNC(fallocate)

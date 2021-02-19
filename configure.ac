@@ -446,7 +446,6 @@ AC_CHECK_HEADERS(m4_normalize([
 ]))
 
 AC_CHECK_HEADERS(m4_normalize([
-	linux/falloc.h
 	linux/hiddev.h
 	linux/ip_vs.h
 	linux/ipc.h
