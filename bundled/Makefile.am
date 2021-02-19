@@ -19,6 +19,7 @@ EXTRA_DIST = \
 	linux/arch/powerpc/include/uapi/asm/fcntl.h \
 	linux/arch/sparc/include/uapi/asm/fcntl.h \
 	linux/include/uapi/asm-generic/fcntl.h \
+	linux/include/uapi/asm-generic/hugetlb_encode.h \
 	linux/include/uapi/linux/bsg.h \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \
@@ -46,6 +47,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/kcmp.h \
 	linux/include/uapi/linux/libc-compat.h \
 	linux/include/uapi/linux/loop.h \
+	linux/include/uapi/linux/memfd.h \
 	linux/include/uapi/linux/mmtimer.h \
 	linux/include/uapi/linux/mount.h \
 	linux/include/uapi/linux/neighbour.h \

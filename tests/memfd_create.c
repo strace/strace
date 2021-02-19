@@ -16,18 +16,7 @@
 # include <stdio.h>
 # include <stdint.h>
 # include <unistd.h>
-
-# ifdef HAVE_LINUX_MEMFD_H
-#  include <linux/memfd.h>
-# endif
-
-# ifndef MFD_HUGE_SHIFT
-#  define MFD_HUGE_SHIFT 26
-# endif
-
-# ifndef MFD_HUGE_MASK
-#  define MFD_HUGE_MASK 0x3f
-# endif
+# include <linux/memfd.h>
 
 static const char *errstr;
 

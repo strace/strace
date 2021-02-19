@@ -7,20 +7,8 @@
  */
 
 #include "defs.h"
-
-#ifdef HAVE_LINUX_MEMFD_H
-# include <linux/memfd.h>
-#endif
-
+#include <linux/memfd.h>
 #include "xlat/memfd_create_flags.h"
-
-#ifndef MFD_HUGE_SHIFT
-# define MFD_HUGE_SHIFT 26
-#endif
-
-#ifndef MFD_HUGE_MASK
-# define MFD_HUGE_MASK 0x3f
-#endif
 
 SYS_FUNC(memfd_create)
 {
