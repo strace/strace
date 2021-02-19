@@ -374,7 +374,6 @@ libstrace_a_SOURCES =	\
 	wait.h		\
 	watchdog_ioctl.c \
 	xattr.c		\
-	xfs_quota_stat.h \
 	xgetdents.c	\
 	xgetdents.h	\
 	xlat.c		\

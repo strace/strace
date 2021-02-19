@@ -7,18 +7,17 @@
 
 #include "defs.h"
 
-#include DEF_MPERS_TYPE(struct_xfs_dqstats)
+#include DEF_MPERS_TYPE(fs_quota_stat_t)
 
-#include "xfs_quota_stat.h"
-typedef struct xfs_dqstats struct_xfs_dqstats;
+#include <linux/dqblk_xfs.h>
 
 #include MPERS_DEFS
 
 MPERS_PRINTER_DECL(bool, fetch_struct_quotastat, struct tcb *const tcp,
 		   const kernel_ulong_t data, void *p)
 {
-	struct xfs_dqstats *dq = p;
-	struct_xfs_dqstats dqstat;
+	struct fs_quota_stat *dq = p;
+	fs_quota_stat_t dqstat;
 
 	if (umove_or_printaddr(tcp, data, &dqstat))
 		return false;

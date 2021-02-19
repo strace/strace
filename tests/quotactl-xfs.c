@@ -10,12 +10,10 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
 #if defined(__NR_quotactl) && \
-	(defined(HAVE_LINUX_QUOTA_H) || defined(HAVE_SYS_QUOTA_H)) && \
-	defined(HAVE_LINUX_DQBLK_XFS_H)
+	(defined(HAVE_LINUX_QUOTA_H) || defined(HAVE_SYS_QUOTA_H))
 
 # include <stdio.h>
 # include <string.h>
@@ -24,40 +22,6 @@
 # include <linux/dqblk_xfs.h>
 
 # include "quotactl.h"
-
-# ifndef Q_GETNEXTQUOTA
-#  define Q_XGETNEXTQUOTA	XQM_CMD(0x9)
-# endif /* !Q_GETNEXTQUOTA */
-
-# ifndef Q_XGETQSTATV
-
-#  define Q_XGETQSTATV		XQM_CMD(8)
-#  define FS_QSTATV_VERSION1	1
-
-struct fs_qfilestatv {
-	uint64_t	qfs_ino;	/* inode number */
-	uint64_t	qfs_nblks;	/* number of BBs 512-byte-blks */
-	uint32_t	qfs_nextents;	/* number of extents */
-	uint32_t	qfs_pad;	/* pad for 8-byte alignment */
-};
-
-struct fs_quota_statv {
-	int8_t		qs_version;		/* version for future changes */
-	uint8_t		qs_pad1;		/* pad for 16bit alignment */
-	uint16_t	qs_flags;		/* XFS_QUOTA_.* flags */
-	uint32_t	qs_incoredqs;		/* number of dquots incore */
-	struct fs_qfilestatv	qs_uquota;	/* user quota information */
-	struct fs_qfilestatv	qs_gquota;	/* group quota information */
-	struct fs_qfilestatv	qs_pquota;	/* project quota information */
-	int32_t		qs_btimelimit;		/* limit for blks timer */
-	int32_t		qs_itimelimit;		/* limit for inodes timer */
-	int32_t		qs_rtbtimelimit;	/* limit for rt blks timer */
-	uint16_t	qs_bwarnlimit;		/* limit for num warnings */
-	uint16_t	qs_iwarnlimit;		/* limit for num warnings */
-	uint64_t	qs_pad2[8];		/* for future proofing */
-};
-
-# endif /* !Q_XGETQSTATV */
 
 # include "xlat.h"
 # include "xlat/xfs_dqblk_flags.h"
@@ -80,7 +44,7 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	printf("{");
 	PRINT_FIELD_D(*dq, d_version);
 	printf(", d_flags=");
-	printflags(xfs_dqblk_flags, (uint8_t) dq->d_flags, "XFS_???_QUOTA");
+	printflags(xfs_dqblk_flags, (uint8_t) dq->d_flags, "FS_???_QUOTA");
 
 	printf(", ");
 	PRINT_FIELD_X(*dq, d_fieldmask);
@@ -140,7 +104,7 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 
 # if VERBOSE
 	printf(", qs_flags=");
-	printflags(xfs_quota_flags, qs->qs_flags, "XFS_QUOTA_???");
+	printflags(xfs_quota_flags, qs->qs_flags, "FS_QUOTA_???");
 	printf(", qs_uquota={");
 	PRINT_FIELD_U(qs->qs_uquota, qfs_ino);
 	printf(", ");
@@ -187,7 +151,7 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 
 # if VERBOSE
 	printf(", qs_flags=");
-	printflags(xfs_quota_flags, qs->qs_flags, "XFS_QUOTA_???");
+	printflags(xfs_quota_flags, qs->qs_flags, "FS_QUOTA_???");
 	printf(", ");
 	PRINT_FIELD_U(*qs, qs_incoredqs);
 	printf(", qs_uquota={");
@@ -257,9 +221,9 @@ main(void)
 	check_quota(CQF_ID_SKIP | CQF_ADDR_STR,
 		    ARG_STR(QCMD(Q_XQUOTAON, USRQUOTA)),
 		    ARG_STR("/dev/bogus/"), flags,
-		    "[XFS_QUOTA_UDQ_ACCT|XFS_QUOTA_UDQ_ENFD"
-		    "|XFS_QUOTA_GDQ_ACCT|XFS_QUOTA_GDQ_ENFD"
-		    "|XFS_QUOTA_PDQ_ENFD|0xdeadbec0]");
+		    "[FS_QUOTA_UDQ_ACCT|FS_QUOTA_UDQ_ENFD"
+		    "|FS_QUOTA_GDQ_ACCT|FS_QUOTA_GDQ_ENFD"
+		    "|FS_QUOTA_PDQ_ENFD|0xdeadbec0]");
 
 	snprintf(invalid_cmd_str, sizeof(invalid_cmd_str),
 		 "QCMD(Q_XQUOTAON, %#x /* ???QUOTA */)",
@@ -283,9 +247,9 @@ main(void)
 		    QCMD(Q_XQUOTAOFF, 3),
 		    "QCMD(Q_XQUOTAOFF, 0x3 /* ???QUOTA */)",
 		    ARG_STR("/dev/bogus/"), flags,
-		    "[XFS_QUOTA_UDQ_ACCT|XFS_QUOTA_UDQ_ENFD"
-		    "|XFS_QUOTA_GDQ_ACCT|XFS_QUOTA_GDQ_ENFD"
-		    "|XFS_QUOTA_PDQ_ENFD|0xdeadbec0]");
+		    "[FS_QUOTA_UDQ_ACCT|FS_QUOTA_UDQ_ENFD"
+		    "|FS_QUOTA_GDQ_ACCT|FS_QUOTA_GDQ_ENFD"
+		    "|FS_QUOTA_PDQ_ENFD|0xdeadbec0]");
 
 
 	/* Q_XGETQUOTA */
@@ -363,8 +327,8 @@ main(void)
 	check_quota(CQF_ID_SKIP | CQF_ADDR_STR,
 		    ARG_STR(QCMD(Q_XQUOTARM, GRPQUOTA)),
 		    ARG_STR(NULL), flags,
-		    "[XFS_USER_QUOTA|XFS_PROJ_QUOTA"
-		    "|XFS_GROUP_QUOTA|0xdeadbee8]");
+		    "[FS_USER_QUOTA|FS_PROJ_QUOTA"
+		    "|FS_GROUP_QUOTA|0xdeadbee8]");
 
 
 	/* Q_XQUOTASYNC */
@@ -385,7 +349,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("__NR_quotactl && "
-	"(HAVE_LINUX_QUOTA_H || HAVE_SYS_QUOTA_H) && "
-	"HAVE_LINUX_DQBLK_XFS_H");
+	"(HAVE_LINUX_QUOTA_H || HAVE_SYS_QUOTA_H)");
 
 #endif

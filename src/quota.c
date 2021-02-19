@@ -11,7 +11,7 @@
  */
 
 #include "defs.h"
-#include "xfs_quota_stat.h"
+#include <linux/dqblk_xfs.h>
 
 #define SUBCMDMASK  0x00ff
 #define SUBCMDSHIFT 8
@@ -20,7 +20,6 @@
 
 #define OLD_CMD(cmd)	((uint32_t)(cmd) << SUBCMDSHIFT)
 #define NEW_CMD(cmd)	((uint32_t)(cmd) | 0x800000)
-#define XQM_CMD(cmd)	((uint32_t)(cmd) | ('X' << SUBCMDSHIFT))
 
 #include "xlat/quotacmds.h"
 #include "xlat/quotatypes.h"
@@ -62,57 +61,11 @@ struct if_nextdqblk {
 	uint32_t dqb_id;
 };
 
-struct xfs_dqblk {
-	int8_t  d_version;		/* version of this structure */
-	uint8_t  d_flags;		/* XFS_{USER,PROJ,GROUP}_QUOTA */
-	uint16_t d_fieldmask;		/* field specifier */
-	uint32_t d_id;			/* user, project, or group ID */
-	uint64_t d_blk_hardlimit;	/* absolute limit on disk blks */
-	uint64_t d_blk_softlimit;	/* preferred limit on disk blks */
-	uint64_t d_ino_hardlimit;	/* maximum # allocated inodes */
-	uint64_t d_ino_softlimit;	/* preferred inode limit */
-	uint64_t d_bcount;		/* # disk blocks owned by the user */
-	uint64_t d_icount;		/* # inodes owned by the user */
-	int32_t d_itimer;		/* zero if within inode limits */
-	int32_t d_btimer;		/* similar to above; for disk blocks */
-	uint16_t d_iwarns;		/* # warnings issued wrt num inodes */
-	uint16_t d_bwarns;		/* # warnings issued wrt disk blocks */
-	int32_t d_padding2;		/* padding2 - for future use */
-	uint64_t d_rtb_hardlimit;	/* absolute limit on realtime blks */
-	uint64_t d_rtb_softlimit;	/* preferred limit on RT disk blks */
-	uint64_t d_rtbcount;		/* # realtime blocks owned */
-	int32_t d_rtbtimer;		/* similar to above; for RT disk blks */
-	uint16_t d_rtbwarns;		/* # warnings issued wrt RT disk blks */
-	int16_t d_padding3;		/* padding3 - for future use */
-	char    d_padding4[8];		/* yet more padding */
-};
-
 struct if_dqinfo {
 	uint64_t dqi_bgrace;
 	uint64_t dqi_igrace;
 	uint32_t dqi_flags;
 	uint32_t dqi_valid;
-};
-
-struct fs_qfilestatv {
-	uint64_t qfs_ino, qfs_nblks;
-	uint32_t qfs_nextents, qfs_pad;
-};
-
-struct fs_quota_statv {
-	int8_t qs_version;
-	uint8_t qs_pad1;
-	uint16_t qs_flags;
-	uint32_t qs_incoredqs;
-	struct fs_qfilestatv qs_uquota;
-	struct fs_qfilestatv qs_gquota;
-	struct fs_qfilestatv qs_pquota;
-	int32_t qs_btimelimit;
-	int32_t qs_itimelimit;
-	int32_t qs_rtbtimelimit;
-	uint16_t qs_bwarnlimit;
-	uint16_t qs_iwarnlimit;
-	uint64_t qs_pad2[8];
 };
 
 static void
@@ -256,7 +209,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		ATTRIBUTE_FALLTHROUGH;
 	case Q_XSETQLIM:
 	{
-		struct xfs_dqblk dq;
+		fs_disk_quota_t dq;
 
 		if (entering(tcp)) {
 			printuid(", ", id);
@@ -269,7 +222,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		PRINT_FIELD_D(dq, d_version);
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(dq, d_flags,
-				  xfs_dqblk_flags, "XFS_???_QUOTA");
+				  xfs_dqblk_flags, "FS_???_QUOTA");
 		tprint_struct_next();
 		PRINT_FIELD_X(dq, d_fieldmask);
 		tprint_struct_next();
@@ -359,7 +312,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	}
 	case Q_XGETQSTAT:
 	{
-		struct xfs_dqstats dq;
+		fs_quota_stat_t dq;
 
 		if (entering(tcp)) {
 			tprints(", ");
@@ -372,7 +325,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 			if (!abbrev(tcp)) {
 				tprint_struct_next();
 				PRINT_FIELD_FLAGS(dq, qs_flags,
-						  xfs_quota_flags, "XFS_QUOTA_???");
+						  xfs_quota_flags, "FS_QUOTA_???");
 				tprint_struct_next();
 				PRINT_FIELD_OBJ_PTR(dq, qs_uquota,
 						    print_fs_qfilestat);
@@ -416,7 +369,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (!abbrev(tcp)) {
 			tprint_struct_next();
 			PRINT_FIELD_FLAGS(dq, qs_flags,
-					  xfs_quota_flags, "XFS_QUOTA_???");
+					  xfs_quota_flags, "FS_QUOTA_???");
 			tprint_struct_next();
 			PRINT_FIELD_U(dq, qs_incoredqs);
 			tprint_struct_next();
@@ -455,7 +408,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (umove_or_printaddr(tcp, data, &flag))
 			break;
 		tprints("[");
-		printflags(xfs_quota_flags, flag, "XFS_QUOTA_???");
+		printflags(xfs_quota_flags, flag, "FS_QUOTA_???");
 		tprints("]");
 		break;
 	}
@@ -468,7 +421,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		if (umove_or_printaddr(tcp, data, &flag))
 			break;
 		tprints("[");
-		printflags(xfs_dqblk_flags, flag, "XFS_???_QUOTA");
+		printflags(xfs_dqblk_flags, flag, "FS_???_QUOTA");
 		tprints("]");
 		break;
 	}
