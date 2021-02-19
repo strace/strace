@@ -33,6 +33,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/fs.h \
 	linux/include/uapi/linux/fscrypt.h \
 	linux/include/uapi/linux/gpio.h \
+	linux/include/uapi/linux/hiddev.h \
 	linux/include/uapi/linux/if_addr.h \
 	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_link.h \

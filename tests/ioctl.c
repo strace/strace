@@ -19,33 +19,27 @@
 #ifdef HAVE_LINUX_MMTIMER_H
 # include <linux/mmtimer.h>
 #endif
-#ifdef HAVE_LINUX_HIDDEV_H
-# include <linux/hiddev.h>
-#endif
+#include <linux/hiddev.h>
 #include <linux/input.h>
-
 #include <linux/videodev2.h>
-
-#if defined MMTIMER_GETRES \
- && defined VIDIOC_ENUMINPUT \
- && defined HIDIOCGVERSION \
- && defined HIDIOCGPHYS
 
 int
 main(void)
 {
 	uint64_t data = 0;
 
-# ifndef POWERPC
+#ifndef POWERPC
 	struct termios tty;
 	(void) ioctl(-1, TCGETS, &tty);
 	printf("ioctl(-1, TCGETS, %p)"
 	       " = -1 EBADF (%m)\n", &tty);
-# endif
+#endif
 
+#ifdef MMTIMER_GETRES
 	(void) ioctl(-1, MMTIMER_GETRES, &data);
 	printf("ioctl(-1, MMTIMER_GETRES, %p)"
 	       " = -1 EBADF (%m)\n", &data);
+#endif
 
 	(void) ioctl(-1, VIDIOC_ENUMINPUT, 0);
 	printf("ioctl(-1, VIDIOC_ENUMINPUT, NULL)"
@@ -83,10 +77,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("MMTIMER_GETRES && VIDIOC_ENUMINPUT"
-		    " && HIDIOCGVERSION && HIDIOCGPHYS")
-
-#endif
