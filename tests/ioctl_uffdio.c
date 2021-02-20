@@ -10,22 +10,21 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_userfaultfd && defined HAVE_LINUX_USERFAULTFD_H
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
-# include <fcntl.h>
-# include <inttypes.h>
-# include <stdint.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
 
-# include <sys/ioctl.h>
-# include <sys/mman.h>
-# include <linux/ioctl.h>
-# include <linux/userfaultfd.h>
+#include "kernel_fcntl.h"
+#include <linux/ioctl.h>
+#include <linux/userfaultfd.h>
 
-# include "xlat.h"
-# include "xlat/uffd_api_features.h"
+#include "xlat.h"
+#include "xlat/uffd_api_features.h"
 
 int
 main(void)
@@ -200,9 +199,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_userfaultfd && HAVE_LINUX_USERFAULTFD_H")
-
-#endif

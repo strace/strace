@@ -1,3 +1,4 @@
+#unconditional
 #val_type uint64_t
 UFFDIO_REGISTER_MODE_MISSING
 UFFDIO_REGISTER_MODE_WP

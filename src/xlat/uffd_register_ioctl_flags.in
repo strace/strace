@@ -1,3 +1,4 @@
+#unconditional
 #val_type uint64_t
 1<<_UFFDIO_WAKE
 1<<_UFFDIO_COPY

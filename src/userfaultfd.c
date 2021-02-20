@@ -8,6 +8,9 @@
 
 #include "defs.h"
 #include "kernel_fcntl.h"
+#include <linux/ioctl.h>
+#include <linux/userfaultfd.h>
+
 #include "xlat/uffd_flags.h"
 
 SYS_FUNC(userfaultfd)
@@ -17,16 +20,13 @@ SYS_FUNC(userfaultfd)
 	return RVAL_DECODED | RVAL_FD;
 }
 
-#ifdef HAVE_LINUX_USERFAULTFD_H
-# include <linux/ioctl.h>
-# include <linux/userfaultfd.h>
 
-# include "xlat/uffd_api_features.h"
-# include "xlat/uffd_api_flags.h"
-# include "xlat/uffd_copy_flags.h"
-# include "xlat/uffd_register_ioctl_flags.h"
-# include "xlat/uffd_register_mode_flags.h"
-# include "xlat/uffd_zeropage_flags.h"
+#include "xlat/uffd_api_features.h"
+#include "xlat/uffd_api_flags.h"
+#include "xlat/uffd_copy_flags.h"
+#include "xlat/uffd_register_ioctl_flags.h"
+#include "xlat/uffd_register_mode_flags.h"
+#include "xlat/uffd_zeropage_flags.h"
 
 static void
 tprintf_uffdio_range(const struct uffdio_range *range)
@@ -191,4 +191,3 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	return RVAL_IOCTL_DECODED;
 }
-#endif /* HAVE_LINUX_USERFAULTFD_H */

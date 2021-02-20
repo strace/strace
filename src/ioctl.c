@@ -349,10 +349,8 @@ ioctl_decode(struct tcb *tcp)
 		return fs_0x94_ioctl(tcp, code, arg);
 	case 0xa4:
 		return tee_ioctl(tcp, code, arg);
-#ifdef HAVE_LINUX_USERFAULTFD_H
 	case 0xaa:
 		return uffdio_ioctl(tcp, code, arg);
-#endif
 	case 0xab:
 		return nbd_ioctl(tcp, code, arg);
 #ifdef HAVE_LINUX_KVM_H

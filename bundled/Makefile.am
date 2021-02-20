@@ -63,6 +63,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/types.h \
 	linux/include/uapi/linux/unix_diag.h \
+	linux/include/uapi/linux/userfaultfd.h \
 	linux/include/uapi/linux/v4l2-common.h \
 	linux/include/uapi/linux/v4l2-controls.h \
 	linux/include/uapi/linux/videodev2.h \
