@@ -21,7 +21,7 @@ test_flock64_lk64(void)
 	TEST_FLOCK64_EINVAL(F_SETLK64);
 	TEST_FLOCK64_EINVAL(F_SETLKW64);
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_kernel_flock64, fl);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct flock64, fl);
 	memset(fl, 0, sizeof(*fl));
 	fl->l_type = F_RDLCK;
 	fl->l_len = FILE_LEN;

@@ -29,6 +29,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/dm-ioctl.h \
 	linux/include/uapi/linux/dqblk_xfs.h \
 	linux/include/uapi/linux/falloc.h \
+	linux/include/uapi/linux/fcntl.h \
 	linux/include/uapi/linux/fib_rules.h \
 	linux/include/uapi/linux/fiemap.h \
 	linux/include/uapi/linux/fs.h \

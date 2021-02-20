@@ -11,9 +11,9 @@
 #include DEF_MPERS_TYPE(struct_flock)
 #include DEF_MPERS_TYPE(struct_flock64)
 
-#include "flock.h"
-typedef struct_kernel_flock struct_flock;
-typedef struct_kernel_flock64 struct_flock64;
+#include <linux/fcntl.h>
+typedef struct flock struct_flock;
+typedef struct flock64 struct_flock64;
 
 #include MPERS_DEFS
 
@@ -21,11 +21,11 @@ typedef struct_kernel_flock64 struct_flock64;
 	sizeof(((type *) NULL)->member)
 
 #define FLOCK_MEMBERS_EQ(type, member) \
-	(SIZEOF_MEMBER(struct_kernel_flock64, member) == SIZEOF_MEMBER(type, member) \
-	 && offsetof(struct_kernel_flock64, member) == offsetof(type, member))
+	(SIZEOF_MEMBER(struct flock64, member) == SIZEOF_MEMBER(type, member) \
+	 && offsetof(struct flock64, member) == offsetof(type, member))
 
 #define FLOCK_STRUCTS_EQ(type) \
-	(sizeof(struct_kernel_flock64) == sizeof(type) \
+	(sizeof(struct flock64) == sizeof(type) \
 	 && FLOCK_MEMBERS_EQ(type, l_type) \
 	 && FLOCK_MEMBERS_EQ(type, l_whence) \
 	 && FLOCK_MEMBERS_EQ(type, l_start) \
@@ -35,7 +35,7 @@ typedef struct_kernel_flock64 struct_flock64;
 MPERS_PRINTER_DECL(bool, fetch_struct_flock, struct tcb *const tcp,
 		   const kernel_ulong_t addr, void *const p)
 {
-	struct_kernel_flock64 *pfl = p;
+	struct flock64 *pfl = p;
 	struct_flock mfl;
 
 	if (FLOCK_STRUCTS_EQ(struct_flock))
@@ -55,7 +55,7 @@ MPERS_PRINTER_DECL(bool, fetch_struct_flock, struct tcb *const tcp,
 MPERS_PRINTER_DECL(bool, fetch_struct_flock64, struct tcb *const tcp,
 		   const kernel_ulong_t addr, void *const p)
 {
-	struct_kernel_flock64 *pfl = p;
+	struct flock64 *pfl = p;
 	struct_flock64 mfl;
 
 	if (FLOCK_STRUCTS_EQ(struct_flock64))

@@ -18,7 +18,7 @@
 static void
 test_flock64_undecoded(const int cmd, const char *name)
 {
-	struct_kernel_flock64 fl = {
+	struct flock64 fl = {
 		.l_type = F_RDLCK,
 		.l_start = 0xdefaced1facefeedULL,
 		.l_len = 0xdefaced2cafef00dULL

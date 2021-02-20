@@ -9,6 +9,7 @@
 #include "statx.h"
 
 #include <sys/stat.h>
+#include <linux/fcntl.h>
 
 #include "xlat/statx_masks.h"
 #include "xlat/statx_attrs.h"

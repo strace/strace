@@ -8,6 +8,7 @@
 #include "defs.h"
 #include <linux/mount.h>
 #include "kernel_fcntl.h"
+#include <linux/fcntl.h>
 #include "xlat/open_tree_flags.h"
 
 SYS_FUNC(open_tree)

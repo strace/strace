@@ -7,7 +7,7 @@
  */
 
 #include "defs.h"
-
+#include <linux/fcntl.h>
 #include "xlat/name_to_handle_at_flags.h"
 
 #ifndef MAX_HANDLE_SZ

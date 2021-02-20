@@ -12,9 +12,7 @@
  */
 
 #include "defs.h"
-
-#include <fcntl.h>
-
+#include <linux/fcntl.h>
 #include "xlat/at_flags.h"
 
 SYS_FUNC(link)

@@ -17,14 +17,11 @@
 #include "xstring.h"
 #include "kernel_fcntl.h"
 #include <linux/openat2.h>
+#include <linux/fcntl.h>
 
 #include "xlat/open_access_modes.h"
 #include "xlat/open_mode_flags.h"
 #include "xlat/open_resolve_flags.h"
-
-#ifndef AT_FDCWD
-# define AT_FDCWD	-100
-#endif
 
 /* The fd is an "int", so when decoding x86 on x86_64, we need to force sign
  * extension to get the right value.  We do this by declaring fd as int here.

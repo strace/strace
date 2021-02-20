@@ -10,7 +10,7 @@
  */
 
 #include "defs.h"
-#include "flock.h"
+#include <linux/fcntl.h>
 
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"
@@ -20,7 +20,7 @@
 #include "xlat/notifyflags.h"
 
 static void
-print_struct_flock64(struct tcb *const tcp, const struct_kernel_flock64 *fl, const int getlk)
+print_struct_flock64(struct tcb *const tcp, const struct flock64 *fl, const int getlk)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(*fl, l_type, lockfcmds, "F_???");
@@ -40,7 +40,7 @@ print_struct_flock64(struct tcb *const tcp, const struct_kernel_flock64 *fl, con
 static void
 printflock64(struct tcb *const tcp, const kernel_ulong_t addr, const int getlk)
 {
-	struct_kernel_flock64 fl;
+	struct flock64 fl;
 
 	if (fetch_struct_flock64(tcp, addr, &fl))
 		print_struct_flock64(tcp, &fl, getlk);
@@ -49,7 +49,7 @@ printflock64(struct tcb *const tcp, const kernel_ulong_t addr, const int getlk)
 static void
 printflock(struct tcb *const tcp, const kernel_ulong_t addr, const int getlk)
 {
-	struct_kernel_flock64 fl;
+	struct flock64 fl;
 
 	if (fetch_struct_flock(tcp, addr, &fl))
 		print_struct_flock64(tcp, &fl, getlk);

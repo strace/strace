@@ -18,30 +18,7 @@
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
-# include <asm/fcntl.h>
-# include <linux/openat2.h>
-
-# ifndef AT_FDCWD
-#  define AT_FDCWD -100
-# endif
-# ifndef RESOLVE_NO_XDEV
-#  define RESOLVE_NO_XDEV 0x01
-# endif
-# ifndef RESOLVE_IN_ROOT
-#  define RESOLVE_IN_ROOT 0x10
-# endif
-
-# ifndef O_TMPFILE
-#  if defined __hppa__
-#   define __O_TMPFILE     040000000
-#  elif defined __alpha__
-#   define __O_TMPFILE     0100000000
-#  elif defined __sparc__
-#   define __O_TMPFILE     0200000000
-#  else
-#   define __O_TMPFILE     020000000
-#  endif
-# endif
+# include <linux/fcntl.h>
 
 # ifndef VERBOSE
 #  define VERBOSE 0
@@ -78,11 +55,7 @@ main(void)
 		{ ARG_STR(O_RDONLY|O_EXCL) },
 		{ ARG_STR(O_WRONLY|O_CREAT) },
 		{ ARG_STR(O_RDWR|O_LARGEFILE) },
-# ifdef O_TMPFILE
 		{ ARG_STR(O_ACCMODE|O_TMPFILE) },
-# else
-		{ ARG_STR(O_ACCMODE|__O_TMPFILE) },
-# endif
 		{ ARG_ULL_STR(O_RDONLY|0xdeadface80000000) },
 	};
 	static uint64_t modes[] = { 0, 0777, 0xbadc0dedfacebeefULL };

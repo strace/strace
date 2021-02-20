@@ -370,17 +370,6 @@ AC_CHECK_TYPES([struct ptrace_syscall_info],,, [#include <linux/ptrace.h>])
 AC_CHECK_TYPES([s390_compat_regs],,, [#include <asm/ptrace.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct flock,
-	struct flock64,
-	struct __kernel_flock,
-	struct __kernel_flock64,
-	struct f_owner_ex,
-	struct __kernel_f_owner_ex
-]),,,
-[#include <sys/types.h>
-#include <linux/fcntl.h>])
-
-AC_CHECK_TYPES(m4_normalize([
 	struct keyctl_kdf_params,
 	struct keyctl_pkey_params,
 	struct keyctl_pkey_query

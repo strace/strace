@@ -94,7 +94,6 @@ libstrace_a_SOURCES =	\
 	evdev_mpers.c	\
 	eventfd.c	\
 	execve.c	\
-	f_owner_ex.h	\
 	fadvise.c	\
 	fallocate.c	\
 	fanotify.c	\
@@ -116,7 +115,6 @@ libstrace_a_SOURCES =	\
 	filter_seccomp.c \
 	filter_seccomp.h \
 	flock.c		\
-	flock.h		\
 	fs_0x94_ioctl.c	\
 	fs_f_ioctl.c	\
 	fs_x_ioctl.c	\
