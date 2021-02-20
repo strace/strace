@@ -59,6 +59,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/prctl.h \
 	linux/include/uapi/linux/quota.h \
 	linux/include/uapi/linux/rtnetlink.h \
+	linux/include/uapi/linux/seccomp.h \
 	linux/include/uapi/linux/securebits.h \
 	linux/include/uapi/linux/smc_diag.h \
 	linux/include/uapi/linux/sock_diag.h \

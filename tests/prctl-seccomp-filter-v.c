@@ -14,16 +14,11 @@
 #include <stdio.h>
 #include <errno.h>
 #include <sys/prctl.h>
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
+#include <linux/seccomp.h>
 #include <linux/filter.h>
 #include "scno.h"
 
-#if defined SECCOMP_MODE_FILTER \
- && defined SECCOMP_RET_ERRNO \
- && defined BPF_JUMP \
- && defined BPF_STMT
+#if defined BPF_JUMP && defined BPF_STMT
 
 # define SOCK_FILTER_ALLOW_SYSCALL(nr) \
 		BPF_JUMP(BPF_JMP|BPF_K|BPF_JEQ, __NR_ ## nr, 0, 1), \
@@ -111,7 +106,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("SECCOMP_MODE_FILTER && SECCOMP_RET_ERRNO"
-		    " && BPF_JUMP && BPF_STMT")
+SKIP_MAIN_UNDEFINED("BPF_JUMP && BPF_STMT")
 
 #endif

@@ -10,19 +10,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_seccomp
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <stdint.h>
-# include <unistd.h>
-
-# ifdef HAVE_LINUX_SECCOMP_H
-#  include <linux/seccomp.h>
-# endif
-
-# ifndef SECCOMP_GET_ACTION_AVAIL
-#  define SECCOMP_GET_ACTION_AVAIL 2
-# endif
+#include <linux/seccomp.h>
 
 static const char *errstr;
 
@@ -49,27 +41,13 @@ main(void)
 		const char *str;
 	} actions [] = {
 		{ 0, "SECCOMP_RET_KILL_THREAD" },
-# ifdef SECCOMP_RET_KILL_PROCESS
 		{ ARG_STR(SECCOMP_RET_KILL_PROCESS) },
-# endif
-# ifdef SECCOMP_RET_TRAP
 		{ ARG_STR(SECCOMP_RET_TRAP) },
-# endif
-# ifdef SECCOMP_RET_ERRNO
 		{ ARG_STR(SECCOMP_RET_ERRNO) },
-# endif
-# ifdef SECCOMP_RET_USER_NOTIF
 		{ ARG_STR(SECCOMP_RET_USER_NOTIF) },
-# endif
-# ifdef SECCOMP_RET_TRACE
 		{ ARG_STR(SECCOMP_RET_TRACE) },
-# endif
-# ifdef SECCOMP_RET_LOG
 		{ ARG_STR(SECCOMP_RET_LOG) },
-# endif
-# ifdef SECCOMP_RET_ALLOW
 		{ ARG_STR(SECCOMP_RET_ALLOW) },
-# endif
 		{ 0xffffffff, "0xffffffff /* SECCOMP_RET_??? */" }
 	};
 
@@ -100,9 +78,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_seccomp")
-
-#endif

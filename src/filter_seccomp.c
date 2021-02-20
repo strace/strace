@@ -23,26 +23,7 @@
 bool seccomp_filtering;
 bool seccomp_before_sysentry;
 
-#ifdef HAVE_LINUX_SECCOMP_H
-
-# include <linux/seccomp.h>
-
-#else
-
-# define XLAT_MACROS_ONLY
-#  include "xlat/prctl_options.h"
-#  include "xlat/seccomp_mode.h"
-#  include "xlat/seccomp_ret_action.h"
-# undef XLAT_MACROS_ONLY
-
-struct seccomp_data {
-	int nr;
-	uint32_t arch;
-	uint64_t instruction_pointer;
-	uint64_t args[6];
-};
-
-#endif /* !HAVE_LINUX_SECCOMP_H */
+#include <linux/seccomp.h>
 
 /* PERSONALITY*_AUDIT_ARCH definitions depend on AUDIT_ARCH_* constants.  */
 #ifdef PERSONALITY0_AUDIT_ARCH

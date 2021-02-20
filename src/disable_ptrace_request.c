@@ -15,9 +15,7 @@
 #include <sys/prctl.h>
 #include <sys/wait.h>
 #include <linux/filter.h>
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
+#include <linux/seccomp.h>
 
 #ifndef HAVE_PROGRAM_INVOCATION_NAME
 char *program_invocation_name;
@@ -42,8 +40,6 @@ init(int argc, char **argv)
 #if defined DISABLE_PTRACE_REQUEST \
  && defined PR_SET_NO_NEW_PRIVS \
  && defined PR_SET_SECCOMP \
- && defined SECCOMP_MODE_FILTER \
- && defined SECCOMP_RET_ERRNO \
  && defined BPF_JUMP \
  && defined BPF_STMT
 

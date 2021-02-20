@@ -7,9 +7,7 @@
 
 #include "defs.h"
 
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
+#include <linux/seccomp.h>
 #include "xlat/seccomp_ops.h"
 #include "xlat/seccomp_filter_flags.h"
 

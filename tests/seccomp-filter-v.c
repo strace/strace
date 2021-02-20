@@ -15,16 +15,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/prctl.h>
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
+#include <linux/seccomp.h>
 #include <linux/filter.h>
 #include "scno.h"
 
 #if defined __NR_seccomp \
  && defined PR_SET_NO_NEW_PRIVS \
- && defined SECCOMP_SET_MODE_FILTER \
- && defined SECCOMP_RET_ERRNO \
  && defined BPF_JUMP \
  && defined BPF_STMT
 
@@ -183,7 +179,6 @@ main(void)
 #else
 
 SKIP_MAIN_UNDEFINED("__NR_seccomp && PR_SET_NO_NEW_PRIVS"
-		    " && SECCOMP_SET_MODE_FILTER && SECCOMP_RET_ERRNO"
 		    " && BPF_JUMP && BPF_STMT")
 
 #endif

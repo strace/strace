@@ -33,9 +33,7 @@
 # define TASK_COMM_LEN 16
 #endif
 
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
+#include <linux/seccomp.h>
 #include "xlat/seccomp_mode.h"
 
 #include <linux/securebits.h>

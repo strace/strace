@@ -12,12 +12,7 @@
 #include "bpf_filter.h"
 
 #include <linux/filter.h>
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
-#ifndef SECCOMP_RET_ACTION_FULL
-# define SECCOMP_RET_ACTION_FULL 0xffff0000U
-#endif
+#include <linux/seccomp.h>
 #include "xlat/seccomp_ret_action.h"
 
 static bool

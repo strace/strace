@@ -9,19 +9,13 @@
  */
 
 #include "tests.h"
-
-#include <stdio.h>
 #include "scno.h"
+#include <stdio.h>
 #include <unistd.h>
-
-#ifdef HAVE_LINUX_SECCOMP_H
-# include <linux/seccomp.h>
-#endif
+#include <linux/seccomp.h>
 #include <linux/filter.h>
 
-#if defined __NR_seccomp && defined SECCOMP_SET_MODE_FILTER
-
-# define N 7
+#define N 7
 
 int
 main(void)
@@ -50,9 +44,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_seccomp && SECCOMP_SET_MODE_FILTER")
-
-#endif
