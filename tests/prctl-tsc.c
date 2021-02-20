@@ -11,12 +11,9 @@
 
 #include "tests.h"
 #include "scno.h"
+#include <stdio.h>
+#include <unistd.h>
 #include <linux/prctl.h>
-
-#if defined __NR_prctl && defined PR_GET_TSC && defined PR_SET_TSC
-
-# include <stdio.h>
-# include <unistd.h>
 
 int
 main(void)
@@ -53,9 +50,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prctl && PR_GET_TSC && PR_SET_TSC")
-
-#endif

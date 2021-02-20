@@ -49,11 +49,6 @@ enum {
 
 #include "xlat/cap.h"
 
-#ifndef PR_SVE_VL_LEN_MASK
-# define PR_SVE_VL_LEN_MASK 0xffff
-#endif
-
-
 static void
 print_prctl_args(struct tcb *tcp, const unsigned int first)
 {

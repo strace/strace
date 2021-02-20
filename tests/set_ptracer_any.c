@@ -15,14 +15,10 @@ int main(int argc, char **argv)
 {
 	if (argc < 2)
 		return 99;
-	/* Turn off restrictions on tracing if applicable.  If the command
-	 * aren't available on this system, that's OK too.  */
-#ifndef PR_SET_PTRACER
-# define PR_SET_PTRACER 0x59616d61
-#endif
-#ifndef PR_SET_PTRACER_ANY
-# define PR_SET_PTRACER_ANY -1UL
-#endif
+	/*
+	 * Turn off restrictions on tracing if applicable.
+	 * If the command is not available on this system, that's OK too.
+	 */
 	(void) prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY, 0, 0, 0);
 	if (write(1, "\n", 1) != 1) {
 		perror("write");

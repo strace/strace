@@ -7,13 +7,10 @@
  */
 
 #include "tests.h"
-#include <sys/prctl.h>
 #include "scno.h"
-
-#if defined PR_SET_SECCOMP && defined __NR_exit
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/prctl.h>
 
 int
 main(void)
@@ -44,9 +41,3 @@ main(void)
 	rc += write(1, text2, LENGTH_OF(text2)) != LENGTH_OF(text2);
 	return !!syscall(__NR_exit, rc);
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("PR_SET_SECCOMP && __NR_exit")
-
-#endif

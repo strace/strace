@@ -13,8 +13,7 @@
 #include "scno.h"
 #include <linux/prctl.h>
 
-#if defined __NR_prctl && defined PR_GET_DUMPABLE && defined PR_SET_DUMPABLE \
- && !defined __ia64__
+#if !defined __ia64__
 
 # include <stdio.h>
 # include <unistd.h>
@@ -83,7 +82,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_prctl && PR_GET_DUMPABLE && PR_SET_DUMPABLE"
-		    " && !__ia64__")
+SKIP_MAIN_UNDEFINED("!__ia64__")
 
 #endif

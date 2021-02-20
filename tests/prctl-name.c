@@ -10,13 +10,10 @@
  */
 
 #include "tests.h"
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/prctl.h>
-
-#if defined PR_GET_NAME && defined PR_SET_NAME
-
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
 
 int
 main(void)
@@ -73,9 +70,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("PR_GET_NAME && PR_SET_NAME")
-
-#endif

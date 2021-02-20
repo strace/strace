@@ -1548,10 +1548,8 @@ startup_child(char **argv, char **env)
 	 */
 	params_for_tracee.pathname = NOMMU_SYSTEM ? xstrdup(pathname) : pathname;
 
-#if defined PR_SET_PTRACER && defined PR_SET_PTRACER_ANY
 	if (daemonized_tracer)
 		prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY);
-#endif
 
 	pid = fork();
 	if (pid < 0)

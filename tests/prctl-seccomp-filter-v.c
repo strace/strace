@@ -20,9 +20,7 @@
 #include <linux/filter.h>
 #include "scno.h"
 
-#if defined PR_SET_NO_NEW_PRIVS \
- && defined PR_SET_SECCOMP \
- && defined SECCOMP_MODE_FILTER \
+#if defined SECCOMP_MODE_FILTER \
  && defined SECCOMP_RET_ERRNO \
  && defined BPF_JUMP \
  && defined BPF_STMT
@@ -113,8 +111,7 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("PR_SET_NO_NEW_PRIVS && PR_SET_SECCOMP"
-		    " && SECCOMP_MODE_FILTER && SECCOMP_RET_ERRNO"
+SKIP_MAIN_UNDEFINED("SECCOMP_MODE_FILTER && SECCOMP_RET_ERRNO"
 		    " && BPF_JUMP && BPF_STMT")
 
 #endif

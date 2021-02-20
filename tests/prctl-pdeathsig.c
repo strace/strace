@@ -11,13 +11,10 @@
 
 #include "tests.h"
 #include "scno.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
 #include <linux/prctl.h>
-
-#if defined __NR_prctl && defined PR_GET_PDEATHSIG && defined PR_SET_PDEATHSIG
-
-# include <stdio.h>
-# include <unistd.h>
-# include <signal.h>
 
 int
 main(void)
@@ -54,9 +51,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prctl && PR_GET_PDEATHSIG && PR_SET_PDEATHSIG")
-
-#endif

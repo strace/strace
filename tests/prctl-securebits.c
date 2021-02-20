@@ -11,16 +11,13 @@
 
 #include "tests.h"
 #include "scno.h"
+#include <stdio.h>
+#include <unistd.h>
 #include <linux/prctl.h>
+#include <linux/securebits.h>
 
-#if defined __NR_prctl && defined PR_GET_SECUREBITS && defined PR_SET_SECUREBITS
-
-# include <stdio.h>
-# include <unistd.h>
-# include <linux/securebits.h>
-
-# include "xlat.h"
-# include "xlat/secbits.h"
+#include "xlat.h"
+#include "xlat/secbits.h"
 
 static const char *errstr;
 
@@ -80,9 +77,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prctl && PR_GET_SECUREBITS && PR_SET_SECUREBITS")
-
-#endif
