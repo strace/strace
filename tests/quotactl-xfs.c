@@ -12,22 +12,19 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined(__NR_quotactl) && \
-	(defined(HAVE_LINUX_QUOTA_H) || defined(HAVE_SYS_QUOTA_H))
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
+#include <linux/dqblk_xfs.h>
 
-# include <linux/dqblk_xfs.h>
+#include "quotactl.h"
 
-# include "quotactl.h"
-
-# include "xlat.h"
-# include "xlat/xfs_dqblk_flags.h"
-# if VERBOSE
-#  include "xlat/xfs_quota_flags.h"
-# endif
+#include "xlat.h"
+#include "xlat/xfs_dqblk_flags.h"
+#if VERBOSE
+# include "xlat/xfs_quota_flags.h"
+#endif
 
 
 void
@@ -63,7 +60,7 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	printf(", ");
 	PRINT_FIELD_U(*dq, d_icount);
 
-# if VERBOSE
+#if VERBOSE
 	printf(", ");
 	PRINT_FIELD_D(*dq, d_itimer);
 	printf(", ");
@@ -82,9 +79,9 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	PRINT_FIELD_D(*dq, d_rtbtimer);
 	printf(", ");
 	PRINT_FIELD_U(*dq, d_rtbwarns);
-# else
+#else
 	printf(", ...");
-# endif /* !VERBOSE */
+#endif /* !VERBOSE */
 	printf("}");
 }
 
@@ -102,7 +99,7 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 	printf("{");
 	PRINT_FIELD_D(*qs, qs_version);
 
-# if VERBOSE
+#if VERBOSE
 	printf(", qs_flags=");
 	printflags(xfs_quota_flags, qs->qs_flags, "FS_QUOTA_???");
 	printf(", qs_uquota={");
@@ -129,9 +126,9 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 	PRINT_FIELD_U(*qs, qs_bwarnlimit);
 	printf(", ");
 	PRINT_FIELD_U(*qs, qs_iwarnlimit);
-# else
+#else
 	printf(", ...");
-# endif /* !VERBOSE */
+#endif /* !VERBOSE */
 	printf("}");
 }
 
@@ -149,7 +146,7 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 	printf("{");
 	PRINT_FIELD_D(*qs, qs_version);
 
-# if VERBOSE
+#if VERBOSE
 	printf(", qs_flags=");
 	printflags(xfs_quota_flags, qs->qs_flags, "FS_QUOTA_???");
 	printf(", ");
@@ -182,9 +179,9 @@ print_xquota_statv(int rc, void *ptr, void *arg)
 	PRINT_FIELD_U(*qs, qs_bwarnlimit);
 	printf(", ");
 	PRINT_FIELD_U(*qs, qs_iwarnlimit);
-# else
+#else
 	printf(", ...");
-# endif /* !VERBOSE */
+#endif /* !VERBOSE */
 	printf("}");
 }
 
@@ -345,10 +342,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_quotactl && "
-	"(HAVE_LINUX_QUOTA_H || HAVE_SYS_QUOTA_H)");
-
-#endif

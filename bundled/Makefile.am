@@ -56,6 +56,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/nsfs.h \
 	linux/include/uapi/linux/openat2.h \
 	linux/include/uapi/linux/packet_diag.h \
+	linux/include/uapi/linux/quota.h \
 	linux/include/uapi/linux/rtnetlink.h \
 	linux/include/uapi/linux/securebits.h \
 	linux/include/uapi/linux/smc_diag.h \

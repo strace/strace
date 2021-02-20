@@ -17,15 +17,7 @@
 # include <stdio.h>
 # include "print_fields.h"
 
-# ifdef HAVE_LINUX_QUOTA_H
-/* Broken in CentOS 5: has extern spinlock_t dq_data_lock; declaration */
-#  include <linux/quota.h>
-# else
-#  include <linux/types.h>
-/* Broken in some new glibc versions: have Q_GETNEXTQUOTA definition but no
- * struct nextdqblk defined. Fixed in glibc-2.24-106-g4d72808. */
-#  include <sys/quota.h>
-# endif
+# include <linux/quota.h>
 
 # ifndef QCMD_CMD
 #  define QCMD_CMD(_val) ((unsigned) (_val) >> SUBCMDSHIFT)

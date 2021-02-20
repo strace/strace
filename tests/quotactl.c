@@ -10,11 +10,7 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
-
-#if defined(__NR_quotactl) && \
-	(defined(HAVE_LINUX_QUOTA_H) || defined(HAVE_SYS_QUOTA_H))
 
 # include <inttypes.h>
 # include <stdint.h>
@@ -23,33 +19,6 @@
 # include <unistd.h>
 
 # include "quotactl.h"
-
-# ifndef HAVE_LINUX_QUOTA_H
-/* Some dirty hacks in order to make sys/quota.h usable as a backup */
-
-#  define if_dqblk dqblk
-#  define if_nextdqblk nextdqblk
-#  define if_dqinfo dqinfo
-
-# endif /* !HAVE_LINUX_QUOTA_H */
-
-# ifndef Q_GETNEXTQUOTA
-
-#  define Q_GETNEXTQUOTA 0x800009
-
-struct if_nextdqblk {
-	uint64_t dqb_bhardlimit;
-	uint64_t dqb_bsoftlimit;
-	uint64_t dqb_curspace;
-	uint64_t dqb_ihardlimit;
-	uint64_t dqb_isoftlimit;
-	uint64_t dqb_curinodes;
-	uint64_t dqb_btime;
-	uint64_t dqb_itime;
-	uint32_t dqb_valid;
-	uint32_t dqb_id;
-};
-# endif /* !Q_GETNEXTQUOTA */
 
 # include "xlat.h"
 # include "xlat/quota_formats.h"
@@ -416,10 +385,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_quotactl && "
-	"(HAVE_LINUX_QUOTA_H || HAVE_SYS_QUOTA_H)");
-
-#endif
