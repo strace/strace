@@ -21,9 +21,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <linux/nsfs.h>
 #include "largefile_wrappers.h"
 #include "trie.h"
-#include "nsfs.h"
 #include "xmalloc.h"
 #include "xstring.h"
 

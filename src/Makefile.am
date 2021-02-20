@@ -218,7 +218,6 @@ libstrace_a_SOURCES =	\
 	nlattr.c	\
 	nlattr.h	\
 	nsfs.c          \
-	nsfs.h          \
 	nsig.h		\
 	numa.c		\
 	number_set.c	\

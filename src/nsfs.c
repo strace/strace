@@ -9,7 +9,7 @@
  */
 
 #include "defs.h"
-#include "nsfs.h"
+#include <linux/nsfs.h>
 
 int
 nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)

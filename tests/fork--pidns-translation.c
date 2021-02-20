@@ -23,7 +23,7 @@
 # include <sys/wait.h>
 # include <unistd.h>
 # include <linux/sched.h>
-# include "nsfs.h"
+# include <linux/nsfs.h>
 
 # ifndef CLONE_NEWUSER
 #  define CLONE_NEWUSER 0x10000000

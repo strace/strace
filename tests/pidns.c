@@ -8,7 +8,7 @@
  */
 #include "tests.h"
 #include "pidns.h"
-#include "nsfs.h"
+#include <linux/nsfs.h>
 
 #include <errno.h>
 #include <stdio.h>
