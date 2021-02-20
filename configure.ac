@@ -460,7 +460,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/sched.h
 	linux/seccomp.h
 	linux/securebits.h
-	linux/utsname.h
 ]),,, [AC_INCLUDES_DEFAULT
 #include <linux/types.h>
 ])

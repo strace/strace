@@ -11,15 +11,9 @@
 
 #ifdef MIPS
 
-# ifdef HAVE_LINUX_UTSNAME_H
-#  include <linux/utsname.h>
-# endif
+# include <linux/utsname.h>
 # ifdef HAVE_ASM_SYSMIPS_H
 #  include <asm/sysmips.h>
-# endif
-
-# ifndef __NEW_UTS_LEN
-#  define __NEW_UTS_LEN 64
 # endif
 
 # include "xlat/sysmips_operations.h"
