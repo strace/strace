@@ -17,6 +17,7 @@
 
 # include <stdio.h>
 # include <unistd.h>
+# include <linux/securebits.h>
 
 # include "xlat.h"
 # include "xlat/secbits.h"

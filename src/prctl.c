@@ -38,9 +38,7 @@
 #endif
 #include "xlat/seccomp_mode.h"
 
-#ifdef HAVE_LINUX_SECUREBITS_H
-# include <linux/securebits.h>
-#endif
+#include <linux/securebits.h>
 #include "xlat/secbits.h"
 
 /* these constants are the same as in <linux/capability.h> */
