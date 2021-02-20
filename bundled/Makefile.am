@@ -58,6 +58,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/openat2.h \
 	linux/include/uapi/linux/packet_diag.h \
 	linux/include/uapi/linux/prctl.h \
+	linux/include/uapi/linux/ptp_clock.h \
 	linux/include/uapi/linux/quota.h \
 	linux/include/uapi/linux/rtnetlink.h \
 	linux/include/uapi/linux/seccomp.h \

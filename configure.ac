@@ -540,10 +540,6 @@ AC_CHECK_MEMBERS(m4_normalize([struct ubi_mkvol_req.flags,
 		 [#include <mtd/ubi-user.h>])
 
 AC_CHECK_TYPES(m4_normalize([
-	struct ptp_sys_offset
-]),,, [#include <linux/ptp_clock.h>])
-
-AC_CHECK_TYPES(m4_normalize([
 	struct kvm_cpuid2,
 	struct kvm_regs,
 	struct kvm_sregs,

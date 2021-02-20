@@ -299,10 +299,8 @@ ioctl_decode(struct tcb *tcp)
 		return scsi_ioctl(tcp, code, arg);
 	case '$': /* 0x24 */
 		return perf_ioctl(tcp, code, arg);
-#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
 	case '=': /* 0x3d */
 		return ptp_ioctl(tcp, code, arg);
-#endif
 	case 'E':
 		return evdev_ioctl(tcp, code, arg);
 	case 'I':

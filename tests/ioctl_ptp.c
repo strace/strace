@@ -10,35 +10,17 @@
 
 #include "tests.h"
 
-#ifdef HAVE_STRUCT_PTP_SYS_OFFSET
+#include <fcntl.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/ptp_clock.h>
 
-# include <fcntl.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <sys/ioctl.h>
-# include <linux/ptp_clock.h>
-
-# ifndef PTP_CLOCK_GETCAPS2
-#  define PTP_CLOCK_GETCAPS2 _IOR(PTP_CLK_MAGIC, 10, struct ptp_clock_caps)
-# endif
-# ifndef PTP_EXTTS_REQUEST2
-#  define PTP_EXTTS_REQUEST2 _IOW(PTP_CLK_MAGIC, 11, struct ptp_extts_request)
-# endif
-# ifndef PTP_PEROUT_REQUEST2
-#  define PTP_PEROUT_REQUEST2 _IOW(PTP_CLK_MAGIC, 12, struct ptp_perout_request)
-# endif
-# ifndef PTP_ENABLE_PPS2
-#  define PTP_ENABLE_PPS2 _IOW(PTP_CLK_MAGIC, 13, int)
-# endif
-# ifndef PTP_SYS_OFFSET2
-#  define PTP_SYS_OFFSET2 _IOW(PTP_CLK_MAGIC, 14, struct ptp_sys_offset)
-# endif
-
-# include "xlat.h"
-# include "xlat/ptp_extts_flags.h"
-# include "xlat/ptp_perout_flags.h"
+#include "xlat.h"
+#include "xlat/ptp_extts_flags.h"
+#include "xlat/ptp_perout_flags.h"
 
 static void
 test_no_device(void)
@@ -157,9 +139,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_PTP_SYS_OFFSET")
-
-#endif /* HAVE_STRUCT_PTP_SYS_OFFSET */
