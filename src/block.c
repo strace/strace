@@ -15,32 +15,13 @@
 
 #include <linux/ioctl.h>
 #include <linux/fs.h>
+#include <linux/blkpg.h>
+#include <linux/blkzoned.h>
 #include <linux/blktrace_api.h>
 
-typedef struct {
-	int op;
-	int flags;
-	int datalen;
-	void *data;
-} struct_blkpg_ioctl_arg;
-
-#define BLKPG_DEVNAMELTH	64
-#define BLKPG_VOLNAMELTH	64
-typedef struct {
-	int64_t start;			/* starting offset in bytes */
-	int64_t length;			/* length in bytes */
-	int pno;			/* partition number */
-	char devname[BLKPG_DEVNAMELTH];	/* partition name, like sda5 or c0d1p2,
-					   to be used in kernel messages */
-	char volname[BLKPG_VOLNAMELTH];	/* volume label */
-} struct_blkpg_partition;
-
+typedef struct blkpg_ioctl_arg struct_blkpg_ioctl_arg;
+typedef struct blkpg_partition struct_blkpg_partition;
 typedef struct blk_user_trace_setup struct_blk_user_trace_setup;
-
-/* Provide fall-back definitions for BLK* ioctls */
-#define XLAT_MACROS_ONLY
-#include "xlat/block_ioctl_cmds.h"
-#undef XLAT_MACROS_ONLY
 
 #include MPERS_DEFS
 
