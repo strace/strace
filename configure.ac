@@ -468,15 +468,6 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 	st_BPF_ATTR
 ])
 
-AC_CHECK_HEADERS([linux/io_uring.h], [
-	AC_CHECK_MEMBERS(m4_normalize([
-		struct io_cqring_offsets.flags,
-		struct io_uring_params.features,
-		struct io_uring_params.wq_fd,
-		struct io_uring_params.resv
-	]),,, [#include <linux/io_uring.h>])
-])
-
 AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 	AC_CHECK_MEMBERS([struct sockaddr_hci.hci_channel],,,
 			 [#include <bluetooth/bluetooth.h>
