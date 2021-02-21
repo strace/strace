@@ -9,15 +9,13 @@
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_NETCONFMSG
+#include "netlink_route.h"
+#include "nlattr.h"
 
-# include "netlink_route.h"
-# include "nlattr.h"
+#include <linux/netconf.h>
+#include "netlink.h"
 
-# include <linux/netconf.h>
-# include "netlink.h"
-
-# include "xlat/rtnl_netconf_attrs.h"
+#include "xlat/rtnl_netconf_attrs.h"
 
 static const nla_decoder_t netconfmsg_nla_decoders[] = {
 	[NETCONFA_IFINDEX]			= decode_nla_ifindex,
@@ -47,5 +45,3 @@ DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg)
 			      ARRAY_SIZE(netconfmsg_nla_decoders), NULL);
 	}
 }
-
-#endif

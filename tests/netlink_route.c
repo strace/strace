@@ -21,9 +21,7 @@
 #include <linux/if_bridge.h>
 #include <linux/ip.h>
 #include <linux/neighbour.h>
-#ifdef HAVE_STRUCT_NETCONFMSG
-# include <linux/netconf.h>
-#endif
+#include <linux/netconf.h>
 #include <linux/rtnetlink.h>
 
 #define TEST_NL_ROUTE(fd_, nlh0_, type_, obj_, print_family_, ...)	\
@@ -380,7 +378,6 @@ test_rtnl_dcb(const int fd)
 		      printf(", cmd=DCB_CMD_UNDEFINED}"));
 }
 
-#ifdef HAVE_STRUCT_NETCONFMSG
 static void
 test_rtnl_netconf(const int fd)
 {
@@ -394,7 +391,6 @@ test_rtnl_netconf(const int fd)
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{ncm_family=AF_INET}"));
 }
-#endif
 
 static void
 test_rtnl_mdb(const int fd)
@@ -444,9 +440,7 @@ int main(void)
 	test_rtnl_tca(fd);
 	test_rtnl_addrlabel(fd);
 	test_rtnl_dcb(fd);
-#ifdef HAVE_STRUCT_NETCONFMSG
 	test_rtnl_netconf(fd);
-#endif
 	test_rtnl_mdb(fd);
 	test_rtnl_nsid(fd);
 

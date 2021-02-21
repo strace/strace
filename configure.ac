@@ -486,8 +486,6 @@ AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 			 #include <bluetooth/l2cap.h>])
 ])
 
-AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
-
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS(m4_normalize([
 		struct statfs.f_frsize,
