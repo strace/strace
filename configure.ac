@@ -486,7 +486,6 @@ AC_CHECK_HEADERS([bluetooth/bluetooth.h], [
 			 #include <bluetooth/l2cap.h>])
 ])
 
-AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 

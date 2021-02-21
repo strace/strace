@@ -9,16 +9,14 @@
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_DCBMSG
+#include "netlink_route.h"
+#include "nlattr.h"
 
-# include "netlink_route.h"
-# include "nlattr.h"
+#include <linux/dcbnl.h>
+#include "netlink.h"
 
-# include <linux/dcbnl.h>
-# include "netlink.h"
-
-# include "xlat/dcb_commands.h"
-# include "xlat/rtnl_dcb_attrs.h"
+#include "xlat/dcb_commands.h"
+#include "xlat/rtnl_dcb_attrs.h"
 
 DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 {
@@ -49,5 +47,3 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 			      rtnl_dcb_attrs, "DCB_ATTR_???", NULL, 0, NULL);
 	}
 }
-
-#endif

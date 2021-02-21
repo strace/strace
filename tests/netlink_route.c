@@ -13,9 +13,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include "test_netlink.h"
-#ifdef HAVE_STRUCT_DCBMSG
-# include <linux/dcbnl.h>
-#endif
+#include <linux/dcbnl.h>
 #include <linux/fib_rules.h>
 #include <linux/if_addr.h>
 #ifdef HAVE_STRUCT_IFADDRLBLMSG
@@ -372,7 +370,6 @@ test_rtnl_addrlabel(const int fd)
 }
 #endif
 
-#ifdef HAVE_STRUCT_DCBMSG
 static void
 test_rtnl_dcb(const int fd)
 {
@@ -386,7 +383,6 @@ test_rtnl_dcb(const int fd)
 		      printf("{dcb_family=AF_UNIX"),
 		      printf(", cmd=DCB_CMD_UNDEFINED}"));
 }
-#endif
 
 #ifdef HAVE_STRUCT_NETCONFMSG
 static void
@@ -453,9 +449,7 @@ int main(void)
 #ifdef HAVE_STRUCT_IFADDRLBLMSG
 	test_rtnl_addrlabel(fd);
 #endif
-#ifdef HAVE_STRUCT_DCBMSG
 	test_rtnl_dcb(fd);
-#endif
 #ifdef HAVE_STRUCT_NETCONFMSG
 	test_rtnl_netconf(fd);
 #endif
