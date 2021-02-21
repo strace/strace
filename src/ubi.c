@@ -7,15 +7,13 @@
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
+#include <linux/ioctl.h>
+#include <mtd/ubi-user.h>
 
-# include <linux/ioctl.h>
-# include <mtd/ubi-user.h>
-
-# include "xlat/ubi_volume_types.h"
-# include "xlat/ubi_volume_flags.h"
-# include "xlat/ubi_volume_props.h"
-# include "xlat/ubi_data_types.h"
+#include "xlat/ubi_volume_types.h"
+#include "xlat/ubi_volume_flags.h"
+#include "xlat/ubi_volume_props.h"
+#include "xlat/ubi_data_types.h"
 
 static int
 decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
@@ -36,15 +34,9 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(mkvol, vol_type,
 				 ubi_volume_types, "UBI_???_VOLUME");
-# ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
-#  define flags padding1
-# endif
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(mkvol, flags,
 				  ubi_volume_flags, "UBI_VOL_???");
-# ifndef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
-#  undef flags
-# endif
 		tprint_struct_next();
 		PRINT_FIELD_D(mkvol, name_len);
 		tprint_struct_next();
@@ -227,22 +219,14 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case UBI_IOCEBISMAP:
 	case UBI_IOCEBUNMAP:
 	case UBI_IOCRMVOL:
-# ifdef UBI_IOCRPEB
 	case UBI_IOCRPEB:
-# endif
-# ifdef UBI_IOCSPEB
 	case UBI_IOCSPEB:
-# endif
 		tprints(", ");
 		printnum_int(tcp, arg, "%d");
 		break;
 
-# ifdef UBI_IOCVOLCRBLK
 	case UBI_IOCVOLCRBLK:
-# endif
-# ifdef UBI_IOCVOLRMBLK
 	case UBI_IOCVOLRMBLK:
-# endif
 		/* no arguments */
 		break;
 
@@ -252,5 +236,3 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#endif /* HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024 */

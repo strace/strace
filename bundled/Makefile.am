@@ -84,6 +84,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/v4l2-controls.h \
 	linux/include/uapi/linux/videodev2.h \
 	linux/include/uapi/mtd/mtd-abi.h \
+	linux/include/uapi/mtd/ubi-user.h \
 	linux/include/uapi/rdma/ib_user_verbs.h \
 	# end of EXTRA_DIST
 

@@ -309,10 +309,8 @@ ioctl_decode(struct tcb *tcp)
 		return loop_ioctl(tcp, code, arg);
 	case 'M':
 		return mtd_ioctl(tcp, code, arg);
-#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 	case 'O':
 		return ubi_ioctl(tcp, code, arg);
-#endif
 	case 'R':
 		return random_ioctl(tcp, code, arg);
 	case 'T':
@@ -325,10 +323,8 @@ ioctl_decode(struct tcb *tcp)
 		return fs_x_ioctl(tcp, code, arg);
 	case 'f':
 		return f_ioctl(tcp, code, arg);
-#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 	case 'o':
 		return ubi_ioctl(tcp, code, arg);
-#endif
 	case 'p':
 		return rtc_ioctl(tcp, code, arg);
 #if defined ALPHA || defined MIPS || defined SH || defined XTENSA

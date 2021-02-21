@@ -9,13 +9,11 @@
 
 #include "tests.h"
 
-#ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
-
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <sys/ioctl.h>
-# include <mtd/ubi-user.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <mtd/ubi-user.h>
 
 static const unsigned long long llmagic = 0xdeadbeefbadc0dedULL;
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
@@ -29,7 +27,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 	int rc = ioctl(-1, cmd, arg);
 	errstr = sprintrc(rc);
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
 		error_msg_and_fail("Return value [%d] does not match"
 				   " expectations [%d]", rc, INJECT_RETVAL);
@@ -38,7 +36,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 
 	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
 	errstr = inj_errstr;
-# endif
+#endif
 
 	return rc;
 }
@@ -49,7 +47,7 @@ do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
 	return do_ioctl(cmd, (uintptr_t) arg);
 }
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 static void
 skip_ioctls(int argc, const char *argv[])
 {
@@ -70,41 +68,31 @@ skip_ioctls(int argc, const char *argv[])
 			   " to detect an injected return code %d",
 			   num_skip, INJECT_RETVAL);
 }
-# endif /* INJECT_RETVAL */
+#endif /* INJECT_RETVAL */
 
 int
 main(int argc, const char *argv[])
 {
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	skip_ioctls(argc, argv);
-# endif
+#endif
 
 	static const struct {
 		unsigned int cmd;
 		const char *str;
 	}
-# if defined UBI_IOCVOLCRBLK || defined UBI_IOCVOLRMBLK
 	noarg_cmds[] = {
-#  ifdef UBI_IOCVOLCRBLK
 		{ ARG_STR(UBI_IOCVOLCRBLK) },
-#  endif
-#  ifdef UBI_IOCVOLRMBLK
 		{ ARG_STR(UBI_IOCVOLRMBLK) },
-#  endif
 	},
-# endif /* UBI_IOCVOLCRBLK || UBI_IOCVOLRMBLK */
 	pint_cmds[] = {
 		{ ARG_STR(UBI_IOCDET) },
 		{ ARG_STR(UBI_IOCEBER) },
 		{ ARG_STR(UBI_IOCEBISMAP) },
 		{ ARG_STR(UBI_IOCEBUNMAP) },
 		{ ARG_STR(UBI_IOCRMVOL) },
-# ifdef UBI_IOCRPEB
 		{ ARG_STR(UBI_IOCRPEB) },
-# endif
-# ifdef UBI_IOCSPEB
 		{ ARG_STR(UBI_IOCSPEB) },
-# endif
 	}, pint64_cmds[] = {
 		{ ARG_STR(UBI_IOCVOLUP) },
 	}, ptr_cmds[] = {
@@ -131,13 +119,11 @@ main(int argc, const char *argv[])
 		{ ARG_STR(UBI_IOCSETVOLPROP) },
 	};
 
-# if defined UBI_IOCVOLCRBLK || defined UBI_IOCVOLRMBLK
 	for (size_t i = 0; i < ARRAY_SIZE(noarg_cmds); ++i) {
 		do_ioctl(noarg_cmds[i].cmd, lmagic);
 		printf("ioctl(-1, %s) = %s\n",
 		       noarg_cmds[i].str, errstr);
 	}
-# endif /* UBI_IOCVOLCRBLK || UBI_IOCVOLRMBLK */
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, pint);
 	*pint = imagic;
@@ -207,11 +193,7 @@ main(int argc, const char *argv[])
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct ubi_mkvol_req, mkvol);
 	fill_memory(mkvol, sizeof(*mkvol));
 	mkvol->vol_type = 4;
-# ifdef HAVE_STRUCT_UBI_MKVOL_REQ_FLAGS
 	mkvol->flags = 1;
-# else
-	mkvol->padding1 = 1;
-# endif
 	fill_memory_ex(mkvol->name, sizeof(mkvol->name), '0', 10);
 
 	for (size_t i = 0; i < ARRAY_SIZE(mkvol_cmds); ++i) {
@@ -317,9 +299,3 @@ main(int argc, const char *argv[])
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024")
-
-#endif
