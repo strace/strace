@@ -18,9 +18,7 @@
 #include <sys/ioctl.h>
 #include <linux/fs.h>
 #include <linux/blkpg.h>
-#ifdef HAVE_STRUCT_BLK_USER_TRACE_SETUP
-# include <linux/blktrace_api.h>
-#endif
+#include <linux/blktrace_api.h>
 #include "xlat.h"
 
 static const unsigned int magic = 0xdeadbeef;
@@ -91,7 +89,7 @@ main(void)
 #ifdef BLKZEROOUT
 	TEST_NULL_ARG(BLKZEROOUT);
 #endif
-#if defined BLKTRACESETUP && defined HAVE_STRUCT_BLK_USER_TRACE_SETUP
+#ifdef BLKTRACESETUP
 	TEST_NULL_ARG(BLKTRACESETUP);
 #endif
 
@@ -173,7 +171,7 @@ main(void)
 	       (int) sizeof(bp->devname) - 1, bp->devname,
 	       (int) sizeof(bp->volname) - 1, bp->volname);
 
-#if defined BLKTRACESETUP && defined HAVE_STRUCT_BLK_USER_TRACE_SETUP
+#ifdef BLKTRACESETUP
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct blk_user_trace_setup, buts);
 	fill_memory(buts, sizeof(*buts));
 	buts->pid = getpid();

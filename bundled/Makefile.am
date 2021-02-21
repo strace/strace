@@ -20,6 +20,7 @@ EXTRA_DIST = \
 	linux/arch/sparc/include/uapi/asm/fcntl.h \
 	linux/include/uapi/asm-generic/fcntl.h \
 	linux/include/uapi/asm-generic/hugetlb_encode.h \
+	linux/include/uapi/linux/blktrace_api.h \
 	linux/include/uapi/linux/bsg.h \
 	linux/include/uapi/linux/btrfs.h \
 	linux/include/uapi/linux/btrfs_tree.h \

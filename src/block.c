@@ -15,6 +15,7 @@
 
 #include <linux/ioctl.h>
 #include <linux/fs.h>
+#include <linux/blktrace_api.h>
 
 typedef struct {
 	int op;
@@ -34,16 +35,7 @@ typedef struct {
 	char volname[BLKPG_VOLNAMELTH];	/* volume label */
 } struct_blkpg_partition;
 
-#define BLKTRACE_BDEV_SIZE      32
-typedef struct blk_user_trace_setup {
-	char name[BLKTRACE_BDEV_SIZE];	/* output */
-	uint16_t act_mask;		/* input */
-	uint32_t buf_size;		/* input */
-	uint32_t buf_nr;		/* input */
-	uint64_t start_lba;
-	uint64_t end_lba;
-	uint32_t pid;
-} struct_blk_user_trace_setup;
+typedef struct blk_user_trace_setup struct_blk_user_trace_setup;
 
 /* Provide fall-back definitions for BLK* ioctls */
 #define XLAT_MACROS_ONLY
