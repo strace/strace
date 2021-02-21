@@ -490,9 +490,6 @@ AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 
-AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/types.h>
-#include <linux/pkt_sched.h>])
-
 AC_CHECK_TYPES([struct statfs], [
 	AC_CHECK_MEMBERS(m4_normalize([
 		struct statfs.f_frsize,

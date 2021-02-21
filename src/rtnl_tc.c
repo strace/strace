@@ -198,7 +198,6 @@ decode_tc_sizespec(struct tcb *const tcp,
 		   const unsigned int len,
 		   const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_TC_SIZESPEC
 	struct tc_sizespec s;
 
 	if (len < sizeof(s))
@@ -224,9 +223,6 @@ decode_tc_sizespec(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool

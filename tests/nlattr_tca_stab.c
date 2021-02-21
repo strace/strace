@@ -13,10 +13,6 @@
 #include <linux/pkt_sched.h>
 #include <linux/rtnetlink.h>
 
-#if !HAVE_DECL_TCA_STAB_DATA
-enum { TCA_STAB_DATA = 2 };
-#endif
-
 const unsigned int hdrlen = sizeof(struct tcmsg);
 
 static void
@@ -64,16 +60,12 @@ main(void)
 	skip_if_unavailable("/proc/self/fd/");
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
-	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen), NLA_HDRLEN + 4
-#ifdef HAVE_STRUCT_TC_SIZESPEC
-			- 4 + sizeof(struct tc_sizespec)
-#endif
-			);
+	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				   NLA_HDRLEN + sizeof(struct tc_sizespec));
 
 	static char pattern[4096];
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
-#ifdef HAVE_STRUCT_TC_SIZESPEC
 	static const struct tc_sizespec s = {
 		.cell_log = 0xab,
 		.size_log = 0xcd,
@@ -104,7 +96,6 @@ main(void)
 				  printf(", ");
 				  PRINT_FIELD_U(s, tsize);
 				  printf("}"));
-#endif
 
 	uint16_t data[2] = { 0xacbd, 0xefba };
 	TEST_NESTED_NLATTR_ARRAY(fd, nlh0, hdrlen,
