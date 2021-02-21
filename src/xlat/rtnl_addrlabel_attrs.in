@@ -1,3 +1,4 @@
+#unconditional
 #value_indexed
-IFAL_ADDRESS		1
-IFAL_LABEL		2
+IFAL_ADDRESS
+IFAL_LABEL

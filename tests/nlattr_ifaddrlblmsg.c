@@ -8,12 +8,10 @@
 
 #include "tests.h"
 
-#ifdef HAVE_STRUCT_IFADDRLBLMSG
-
-# include <stdio.h>
-# include "test_nlattr.h"
-# include <linux/if_addrlabel.h>
-# include <linux/rtnetlink.h>
+#include <stdio.h>
+#include "test_nlattr.h"
+#include <linux/if_addrlabel.h>
+#include <linux/rtnetlink.h>
 
 static void
 init_ifaddrlblmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -71,9 +69,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_IFADDRLBLMSG")
-
-#endif

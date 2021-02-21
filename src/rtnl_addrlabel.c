@@ -9,15 +9,13 @@
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_IFADDRLBLMSG
+#include "netlink_route.h"
+#include "nlattr.h"
 
-# include "netlink_route.h"
-# include "nlattr.h"
+#include <linux/if_addrlabel.h>
+#include "netlink.h"
 
-# include <linux/if_addrlabel.h>
-# include "netlink.h"
-
-# include "xlat/rtnl_addrlabel_attrs.h"
+#include "xlat/rtnl_addrlabel_attrs.h"
 
 static bool
 decode_ifal_address(struct tcb *const tcp,
@@ -73,5 +71,3 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrlblmsg)
 			      ARRAY_SIZE(ifaddrlblmsg_nla_decoders), &ifal);
 	}
 }
-
-#endif

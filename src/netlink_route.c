@@ -74,11 +74,9 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_GETACTION - RTM_BASE] = decode_tcamsg,
 	[RTM_NEWACTION - RTM_BASE] = decode_tcamsg,
 
-#ifdef HAVE_STRUCT_IFADDRLBLMSG
 	[RTM_DELADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
 	[RTM_GETADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
 	[RTM_NEWADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
-#endif
 
 	[RTM_GETDCB - RTM_BASE] = decode_dcbmsg,
 	[RTM_SETDCB - RTM_BASE] = decode_dcbmsg,

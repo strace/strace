@@ -16,9 +16,7 @@
 #include <linux/dcbnl.h>
 #include <linux/fib_rules.h>
 #include <linux/if_addr.h>
-#ifdef HAVE_STRUCT_IFADDRLBLMSG
-# include <linux/if_addrlabel.h>
-#endif
+#include <linux/if_addrlabel.h>
 #include <linux/if_arp.h>
 #include <linux/if_bridge.h>
 #include <linux/ip.h>
@@ -344,7 +342,6 @@ test_rtnl_tca(const int fd)
 		     printf("{tca_family=AF_INET}"));
 }
 
-#ifdef HAVE_STRUCT_IFADDRLBLMSG
 static void
 test_rtnl_addrlabel(const int fd)
 {
@@ -368,7 +365,6 @@ test_rtnl_addrlabel(const int fd)
 		      PRINT_FIELD_U(msg, ifal_seq);
 		      printf("}"));
 }
-#endif
 
 static void
 test_rtnl_dcb(const int fd)
@@ -446,9 +442,7 @@ int main(void)
 	test_rtnl_neightbl(fd);
 	test_rtnl_tc(fd);
 	test_rtnl_tca(fd);
-#ifdef HAVE_STRUCT_IFADDRLBLMSG
 	test_rtnl_addrlabel(fd);
-#endif
 	test_rtnl_dcb(fd);
 #ifdef HAVE_STRUCT_NETCONFMSG
 	test_rtnl_netconf(fd);
