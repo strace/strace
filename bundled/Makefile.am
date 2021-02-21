@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/fiemap.h \
 	linux/include/uapi/linux/fs.h \
 	linux/include/uapi/linux/fscrypt.h \
+	linux/include/uapi/linux/gen_stats.h \
 	linux/include/uapi/linux/gpio.h \
 	linux/include/uapi/linux/hiddev.h \
 	linux/include/uapi/linux/if_addr.h \

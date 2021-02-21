@@ -7,18 +7,11 @@
  */
 
 #include "tests.h"
-
-#ifdef HAVE_STRUCT_GNET_STATS_BASIC
-
-# include <stdio.h>
-# include <stddef.h>
-# include "test_nlattr.h"
-# include <linux/gen_stats.h>
-# include <linux/rtnetlink.h>
-
-# if !HAVE_DECL_TCA_STATS_PKT64
-enum { TCA_STATS_PKT64 = 8 };
-# endif
+#include <stdio.h>
+#include <stddef.h>
+#include "test_nlattr.h"
+#include <linux/gen_stats.h>
+#include <linux/rtnetlink.h>
 
 const unsigned int hdrlen = sizeof(struct tcmsg);
 
@@ -81,7 +74,6 @@ main(void)
 				  PRINT_FIELD_U(sb, packets);
 				  printf("}"));
 
-# ifdef HAVE_STRUCT_GNET_STATS_RATE_EST
 	static const struct gnet_stats_rate_est est = {
 		.bps = 0xebcdaebd,
 		.pps = 0xabdceade,
@@ -94,9 +86,7 @@ main(void)
 				  printf(", ");
 				  PRINT_FIELD_U(est, pps);
 				  printf("}"));
-# endif
 
-# ifdef HAVE_STRUCT_GNET_STATS_QUEUE
 	static const struct gnet_stats_queue qstats = {
 		.qlen = 0xabcdeabd,
 		.backlog = 0xbcdaebad,
@@ -118,9 +108,7 @@ main(void)
 				  printf(", ");
 				  PRINT_FIELD_U(qstats, overlimits);
 				  printf("}"));
-# endif
 
-# ifdef HAVE_STRUCT_GNET_STATS_RATE_EST64
 	static const struct gnet_stats_rate_est64 est64 = {
 		.bps = 0xacbdcdefafecaebf,
 		.pps = 0xcdabeabdfeabceaf
@@ -133,7 +121,6 @@ main(void)
 				  printf(", ");
 				  PRINT_FIELD_U(est64, pps);
 				  printf("}"));
-# endif
 
 	static const uint64_t pkt64 = 0xdeadc0defacefeedULL;
 	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
@@ -144,9 +131,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_GNET_STATS_BASIC")
-
-#endif

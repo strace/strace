@@ -490,13 +490,6 @@ AC_CHECK_TYPES([struct dcbmsg],,, [#include <linux/dcbnl.h>])
 AC_CHECK_TYPES([struct ifaddrlblmsg],,, [#include <linux/if_addrlabel.h>])
 AC_CHECK_TYPES([struct netconfmsg],,, [#include <linux/netconf.h>])
 
-AC_CHECK_TYPES(m4_normalize([
-	struct gnet_stats_basic,
-	struct gnet_stats_queue,
-	struct gnet_stats_rate_est,
-	struct gnet_stats_rate_est64
-]),,, [#include <linux/gen_stats.h>])
-
 AC_CHECK_TYPES([struct tc_sizespec],,, [#include <linux/types.h>
 #include <linux/pkt_sched.h>])
 

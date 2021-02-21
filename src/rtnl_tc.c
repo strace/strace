@@ -12,9 +12,7 @@
 #include "nlattr.h"
 
 #include "netlink.h"
-#ifdef HAVE_STRUCT_GNET_STATS_BASIC
-# include <linux/gen_stats.h>
-#endif
+#include <linux/gen_stats.h>
 #include <linux/pkt_sched.h>
 #include <linux/rtnetlink.h>
 
@@ -84,7 +82,6 @@ decode_gnet_stats_basic(struct tcb *const tcp,
 			const unsigned int len,
 			const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_GNET_STATS_BASIC
 	struct gnet_stats_basic sb;
 	const unsigned int sizeof_st_basic =
 		offsetofend(struct gnet_stats_basic, packets);
@@ -100,9 +97,6 @@ decode_gnet_stats_basic(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
@@ -111,7 +105,6 @@ decode_gnet_stats_rate_est(struct tcb *const tcp,
 			   const unsigned int len,
 			   const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_GNET_STATS_RATE_EST
 	struct gnet_stats_rate_est est;
 
 	if (len < sizeof(est))
@@ -125,9 +118,6 @@ decode_gnet_stats_rate_est(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
@@ -136,7 +126,6 @@ decode_gnet_stats_queue(struct tcb *const tcp,
 			const unsigned int len,
 			const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_GNET_STATS_QUEUE
 	struct gnet_stats_queue qstats;
 
 	if (len < sizeof(qstats))
@@ -156,9 +145,6 @@ decode_gnet_stats_queue(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static bool
@@ -167,7 +153,6 @@ decode_gnet_stats_rate_est64(struct tcb *const tcp,
 			     const unsigned int len,
 			     const void *const opaque_data)
 {
-#ifdef HAVE_STRUCT_GNET_STATS_RATE_EST64
 	struct gnet_stats_rate_est64 est;
 
 	if (len < sizeof(est))
@@ -181,9 +166,6 @@ decode_gnet_stats_rate_est64(struct tcb *const tcp,
 	}
 
 	return true;
-#else
-	return false;
-#endif
 }
 
 static const nla_decoder_t tca_stats_nla_decoders[] = {
