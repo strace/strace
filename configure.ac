@@ -369,12 +369,6 @@ AC_CHECK_TYPES([struct ptrace_syscall_info],,, [#include <linux/ptrace.h>])
 # For kernels that do not have v3.10-rc1~201^2~11
 AC_CHECK_TYPES([s390_compat_regs],,, [#include <asm/ptrace.h>])
 
-AC_CHECK_TYPES(m4_normalize([
-	struct keyctl_kdf_params,
-	struct keyctl_pkey_params,
-	struct keyctl_pkey_query
-]),,, [#include <linux/keyctl.h>])
-
 AC_CHECK_MEMBERS([struct utsname.domainname],,, [#include <sys/utsname.h>])
 
 AC_CHECK_MEMBERS(m4_normalize([

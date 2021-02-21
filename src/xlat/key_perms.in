@@ -1,3 +1,4 @@
+/* from include/linux/key.h */
 KEY_POS_VIEW	0x01000000
 KEY_POS_READ	0x02000000
 KEY_POS_WRITE	0x04000000

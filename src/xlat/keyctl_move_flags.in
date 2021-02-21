@@ -1,1 +1,2 @@
-KEYCTL_MOVE_EXCL	0x1
+#unconditional
+KEYCTL_MOVE_EXCL

@@ -19,35 +19,7 @@
 #include "xlat/keyctl_move_flags.h"
 #include "xlat/keyctl_pkey_ops.h"
 
-
 typedef int32_t key_serial_t;
-
-struct keyctl_dh_params {
-	int32_t private;
-	int32_t prime;
-	int32_t base;
-};
-
-struct keyctl_pkey_query {
-	uint32_t supported_ops;
-	uint32_t key_size;
-	uint16_t max_data_size;
-	uint16_t max_sig_size;
-	uint16_t max_enc_size;
-	uint16_t max_dec_size;
-	uint32_t __spare[10];
-};
-
-struct keyctl_pkey_params {
-	int32_t  key_id;
-	uint32_t in_len;
-	union {
-		uint32_t out_len;
-		uint32_t in2_len;
-	};
-	uint32_t __spare[7];
-};
-
 
 static void
 print_keyring_serial_number(key_serial_t id)
