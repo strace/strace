@@ -307,10 +307,8 @@ ioctl_decode(struct tcb *tcp)
 		return inotify_ioctl(tcp, code, arg);
 	case 'L':
 		return loop_ioctl(tcp, code, arg);
-#ifdef HAVE_STRUCT_MTD_WRITE_REQ
 	case 'M':
 		return mtd_ioctl(tcp, code, arg);
-#endif
 #ifdef HAVE_STRUCT_UBI_ATTACH_REQ_MAX_BEB_PER1024
 	case 'O':
 		return ubi_ioctl(tcp, code, arg);

@@ -7,27 +7,21 @@
 
 #include "defs.h"
 
-#ifdef HAVE_STRUCT_MTD_WRITE_REQ
+#include DEF_MPERS_TYPE(struct_mtd_oob_buf)
 
-# include DEF_MPERS_TYPE(struct_mtd_oob_buf)
-
-# include <linux/ioctl.h>
-# include <mtd/mtd-abi.h>
+#include <linux/ioctl.h>
+#include <mtd/mtd-abi.h>
 
 typedef struct mtd_oob_buf struct_mtd_oob_buf;
 
-#endif /* HAVE_STRUCT_MTD_WRITE_REQ */
-
 #include MPERS_DEFS
 
-#ifdef HAVE_STRUCT_MTD_WRITE_REQ
-
-# include "xlat/mtd_mode_options.h"
-# include "xlat/mtd_file_mode_options.h"
-# include "xlat/mtd_type_options.h"
-# include "xlat/mtd_flags_options.h"
-# include "xlat/mtd_otp_options.h"
-# include "xlat/mtd_nandecc_options.h"
+#include "xlat/mtd_mode_options.h"
+#include "xlat/mtd_file_mode_options.h"
+#include "xlat/mtd_type_options.h"
+#include "xlat/mtd_flags_options.h"
+#include "xlat/mtd_otp_options.h"
+#include "xlat/mtd_nandecc_options.h"
 
 static void
 decode_erase_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
@@ -381,5 +375,3 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 
 	return RVAL_IOCTL_DECODED;
 }
-
-#endif /* HAVE_STRUCT_MTD_WRITE_REQ */

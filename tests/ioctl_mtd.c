@@ -10,17 +10,15 @@
 
 #include "tests.h"
 
-#ifdef HAVE_STRUCT_MTD_WRITE_REQ
-
-# include <errno.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <sys/ioctl.h>
-# include <linux/ioctl.h>
-# include <linux/version.h>
-# include <mtd/mtd-abi.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+#include <linux/version.h>
+#include <mtd/mtd-abi.h>
 
 static const char *errstr;
 
@@ -30,7 +28,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 	int rc = ioctl(-1, cmd, arg);
 	errstr = sprintrc(rc);
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	if (rc != INJECT_RETVAL)
 		error_msg_and_fail("Return value [%d] does not match"
 				   " expectations [%d]", rc, INJECT_RETVAL);
@@ -39,7 +37,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 
 	snprintf(inj_errstr, sizeof(inj_errstr), "%s (INJECTED)", errstr);
 	errstr = inj_errstr;
-# endif
+#endif
 
 	return rc;
 }
@@ -50,7 +48,7 @@ do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
 	return do_ioctl(cmd, (uintptr_t) arg);
 }
 
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 static void
 skip_ioctls(int argc, const char *argv[])
 {
@@ -73,14 +71,14 @@ skip_ioctls(int argc, const char *argv[])
 			   " to detect an injected return code %d",
 			   num_skip, INJECT_RETVAL);
 }
-# endif /* INJECT_RETVAL */
+#endif /* INJECT_RETVAL */
 
 int
 main(int argc, const char *argv[])
 {
-# ifdef INJECT_RETVAL
+#ifdef INJECT_RETVAL
 	skip_ioctls(argc, argv);
-# endif
+#endif
 
 	static const struct {
 		uint32_t cmd;
@@ -155,16 +153,16 @@ main(int argc, const char *argv[])
 	if (do_ioctl(MEMGETREGIONINFO, 0) < 0) {
 		printf("ioctl(-1, %s, NULL) = %s\n",
 		       "MEMGETREGIONINFO"
-# ifdef __i386__
+#ifdef __i386__
 		       " or MTRRIOC_GET_PAGE_ENTRY"
-# endif
+#endif
 		       , errstr);
 	} else {
 		printf("ioctl(-1, %s, NULL) = %s\n",
 		       "MEMGETREGIONINFO"
-# ifdef __i386__
+#ifdef __i386__
 		       " or MTRRIOC_GET_PAGE_ENTRY"
-# endif
+#endif
 		       , errstr);
 	}
 
@@ -173,17 +171,17 @@ main(int argc, const char *argv[])
 	if (do_ioctl_ptr(MEMGETREGIONINFO, riu) < 0) {
 		printf("ioctl(-1, %s, {regionindex=%#x}) = %s\n",
 		       "MEMGETREGIONINFO"
-# ifdef __i386__
+#ifdef __i386__
 		       " or MTRRIOC_GET_PAGE_ENTRY"
-# endif
+#endif
 		       , riu->regionindex, errstr);
 	} else {
 		printf("ioctl(-1, %s, {regionindex=%#x, offset=%#x"
 		       ", erasesize=%#x, numblocks=%#x}) = %s\n",
 		       "MEMGETREGIONINFO"
-# ifdef __i386__
+#ifdef __i386__
 		       " or MTRRIOC_GET_PAGE_ENTRY"
-# endif
+#endif
 		       , riu->regionindex, riu->offset,
 		       riu->erasesize, riu->numblocks, errstr);
 	}
@@ -340,9 +338,3 @@ main(int argc, const char *argv[])
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_STRUCT_MTD_WRITE_REQ")
-
-#endif
