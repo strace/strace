@@ -1,1 +1,3 @@
-NFNL_MSG_COMPAT_GET	0
+#unconditional
+#value_indexed
+NFNL_MSG_COMPAT_GET

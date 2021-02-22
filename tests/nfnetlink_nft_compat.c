@@ -8,7 +8,7 @@
 
 #include "tests.h"
 
-#ifdef HAVE_LINUX_NETFILTER_NF_TABLES_COMPAT_H
+#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
 
 # include <stdio.h>
 # include <sys/socket.h>
@@ -78,6 +78,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_NETFILTER_NF_TABLES_COMPAT_H")
+SKIP_MAIN_UNDEFINED("HAVE_LINUX_NETFILTER_NFNETLINK_H")
 
 #endif

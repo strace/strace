@@ -427,7 +427,6 @@ AC_CHECK_HEADERS(m4_normalize([
 AC_CHECK_HEADERS(m4_normalize([
 	linux/ipc.h
 	linux/kvm.h
-	linux/netfilter/nf_tables_compat.h
 	linux/netfilter/nfnetlink.h
 	linux/netfilter/nfnetlink_acct.h
 	linux/netfilter/nfnetlink_conntrack.h
