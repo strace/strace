@@ -439,7 +439,6 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter/nfnetlink_log.h
 	linux/netfilter/nfnetlink_queue.h
 	linux/perf_event.h
-	linux/sched.h
 ]),,, [AC_INCLUDES_DEFAULT
 #include <linux/types.h>
 ])
@@ -530,8 +529,6 @@ AC_CHECK_MEMBERS(m4_normalize([
 		struct iocb.aio_flags,
 		struct iocb.aio_rw_flags
 		]),,, [#include <linux/aio_abi.h>])
-
-AC_CHECK_MEMBERS([struct clone_args.cgroup],,, [#include <linux/sched.h>])
 
 CPPFLAGS="$saved_CPPFLAGS"
 

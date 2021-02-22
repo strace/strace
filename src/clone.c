@@ -11,12 +11,8 @@
  */
 
 #include "defs.h"
-#include <sched.h>
 #include "scno.h"
-
-#ifndef CSIGNAL
-# define CSIGNAL 0x000000ff
-#endif
+#include <linux/sched.h>
 
 #include "xlat/clone_flags.h"
 #include "xlat/clone3_flags.h"
@@ -138,21 +134,6 @@ SYS_FUNC(clone)
 	return RVAL_TID;
 }
 
-
-struct strace_clone_args {
-	uint64_t flags;
-	uint64_t /* fd * */    pidfd;
-	uint64_t /* pid_t * */ child_tid;
-	uint64_t /* pid_t * */ parent_tid;
-	uint64_t /* int */     exit_signal;
-	uint64_t /* void * */  stack;
-	uint64_t stack_size;
-	uint64_t /* struct user_desc * / void * */ tls;
-	uint64_t /* pid_t * */ set_tid;
-	uint64_t set_tid_size;
-	uint64_t cgroup;
-};
-
 static void
 tprint_value_changed_struct_begin(void)
 {
@@ -162,12 +143,12 @@ tprint_value_changed_struct_begin(void)
 
 SYS_FUNC(clone3)
 {
-	static const size_t minsz = offsetofend(struct strace_clone_args, tls);
+	static const size_t minsz = offsetofend(struct clone_args, tls);
 
 	const kernel_ulong_t addr = tcp->u_arg[0];
 	const kernel_ulong_t size = tcp->u_arg[1];
 
-	struct strace_clone_args arg = { 0 };
+	struct clone_args arg = { 0 };
 	kernel_ulong_t fetch_size;
 
 	fetch_size = MIN(size, sizeof(arg));
@@ -239,7 +220,7 @@ SYS_FUNC(clone3)
 			PRINT_FIELD_U(arg, set_tid_size);
 		}
 
-		if (fetch_size > offsetof(struct strace_clone_args, cgroup)
+		if (fetch_size > offsetof(struct clone_args, cgroup)
 		    && (arg.cgroup || arg.flags & CLONE_INTO_CGROUP)) {
 			tprint_struct_next();
 			PRINT_FIELD_U(arg, cgroup);

@@ -17,18 +17,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#ifdef HAVE_LINUX_SCHED_H
-# include <linux/sched.h>
-#endif
+#include <linux/sched.h>
 
 #ifdef HAVE_STRUCT_USER_DESC
 # include <asm/ldt.h>
 #endif
-
-#define XLAT_MACROS_ONLY
-# include "xlat/clone_flags.h"
-# include "xlat/clone3_flags.h"
-#undef XLAT_MACROS_ONLY
 
 #include "scno.h"
 
@@ -37,26 +30,6 @@
 #endif
 #ifndef RETVAL_INJECTED
 # define RETVAL_INJECTED 0
-#endif
-
-struct test_clone_args {
-	uint64_t flags;
-	uint64_t pidfd;
-	uint64_t child_tid;
-	uint64_t parent_tid;
-	uint64_t exit_signal;
-	uint64_t stack;
-	uint64_t stack_size;
-	uint64_t tls;
-	uint64_t set_tid;
-	uint64_t set_tid_size;
-	uint64_t cgroup;
-};
-
-#ifdef HAVE_STRUCT_CLONE_ARGS_CGROUP
-typedef struct clone_args struct_clone_args;
-#else
-typedef struct test_clone_args struct_clone_args;
 #endif
 
 enum validity_flag_bits {
@@ -143,7 +116,7 @@ do_clone3_(void *args, kernel_ulong_t size, uint64_t possible_errors, int line)
 	if (!rc)
 		_exit(child_exit_status);
 
-	if (rc > 0 && ((struct_clone_args *) args)->exit_signal)
+	if (rc > 0 && ((struct clone_args *) args)->exit_signal)
 		wait_cloned(rc);
 #endif
 
@@ -215,7 +188,7 @@ print_set_tid(uint64_t set_tid, uint64_t set_tid_size)
 }
 
 static inline void
-print_clone3(struct_clone_args *const arg, long rc, kernel_ulong_t sz,
+print_clone3(struct clone_args *const arg, long rc, kernel_ulong_t sz,
 	     enum validity_flags valid,
 	     const char *flags_str, const char *es_str)
 {
@@ -260,11 +233,11 @@ print_clone3(struct_clone_args *const arg, long rc, kernel_ulong_t sz,
 	if (arg->flags & CLONE_SETTLS)
 		print_tls("tls=", arg->tls, valid);
 
-	if (sz >= offsetofend(struct_clone_args, set_tid_size) &&
+	if (sz >= offsetofend(struct clone_args, set_tid_size) &&
 	    (arg->set_tid || arg->set_tid_size))
 		print_set_tid(arg->set_tid, arg->set_tid_size);
 
-	if (sz > offsetof(struct_clone_args, cgroup) &&
+	if (sz > offsetof(struct clone_args, cgroup) &&
 	    (arg->cgroup || arg->flags & CLONE_INTO_CGROUP))
 		printf(", cgroup=%" PRIu64, (uint64_t) arg->cgroup);
 
@@ -308,7 +281,7 @@ int
 main(int argc, char *argv[])
 {
 	static const struct {
-		struct_clone_args args;
+		struct clone_args args;
 		uint64_t possible_errors;
 		enum validity_flags vf;
 		const char *flags_str;
@@ -334,11 +307,11 @@ main(int argc, char *argv[])
 		    .set_tid_size = MAX_SET_TID_SIZE + 1 },
 			ERR(E2BIG) | ERR(EINVAL), 0, "0", "0" },
 	};
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct_clone_args, arg);
-	const size_t arg1_size = offsetofend(struct_clone_args, tls);
-	struct_clone_args *const arg1 = tail_alloc(arg1_size);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct clone_args, arg);
+	const size_t arg1_size = offsetofend(struct clone_args, tls);
+	struct clone_args *const arg1 = tail_alloc(arg1_size);
 	const size_t arg2_size = sizeof(*arg) + 8;
-	struct_clone_args *const arg2 = tail_alloc(arg2_size);
+	struct clone_args *const arg2 = tail_alloc(arg2_size);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, pidfd);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, child_tid);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, parent_tid);

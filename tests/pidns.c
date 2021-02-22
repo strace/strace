@@ -23,14 +23,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
-#ifndef CLONE_NEWUSER
-# define CLONE_NEWUSER 0x10000000
-#endif
-
-#ifndef CLONE_NEWPID
-# define CLONE_NEWPID 0x20000000
-#endif
-
 static bool pidns_translation = false;
 static bool pidns_unshared = false;
 

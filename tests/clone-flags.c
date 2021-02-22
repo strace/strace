@@ -17,10 +17,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-#define XLAT_MACROS_ONLY
-#include "xlat/clone_flags.h"
-#undef XLAT_MACROS_ONLY
+#include <linux/sched.h>
 
 static const int child_exit_status = 42;
 static pid_t pid;
