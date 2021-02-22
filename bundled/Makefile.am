@@ -58,6 +58,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/memfd.h \
 	linux/include/uapi/linux/mmtimer.h \
 	linux/include/uapi/linux/mount.h \
+	linux/include/uapi/linux/mqueue.h \
 	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netconf.h \
 	linux/include/uapi/linux/netlink.h \

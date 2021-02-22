@@ -28,6 +28,13 @@ typedef unsigned long kernel_ulong_t;
 
 # endif
 
+# ifndef HAVE___KERNEL_LONG_T
+typedef kernel_long_t __kernel_long_t;
+# endif
+# ifndef HAVE___KERNEL_ULONG_T
+typedef kernel_ulong_t __kernel_ulong_t;
+# endif
+
 # if SIZEOF_KERNEL_LONG_T > SIZEOF_LONG
 #  define PRI_kl "ll"
 # else

@@ -11,23 +11,18 @@
 
 #include DEF_MPERS_TYPE(mq_attr_t)
 
-#ifdef HAVE_MQUEUE_H
-# include <mqueue.h>
+#include "kernel_types.h"
+#include <linux/mqueue.h>
 typedef struct mq_attr mq_attr_t;
-#elif defined HAVE_LINUX_MQUEUE_H
-# include <linux/types.h>
-# include <linux/mqueue.h>
-typedef struct mq_attr mq_attr_t;
-#endif
 
 #include MPERS_DEFS
 
+#include "kernel_fcntl.h"
 #include "xlat/mq_attr_flags.h"
 
 MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 		   const kernel_ulong_t addr, const bool decode_flags)
 {
-#if defined HAVE_MQUEUE_H || defined HAVE_LINUX_MQUEUE_H
 	mq_attr_t attr;
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
@@ -45,7 +40,4 @@ MPERS_PRINTER_DECL(void, printmqattr, struct tcb *const tcp,
 	tprint_struct_next();
 	PRINT_FIELD_D(attr, mq_curmsgs);
 	tprint_struct_end();
-#else
-	printaddr(addr);
-#endif
 }
