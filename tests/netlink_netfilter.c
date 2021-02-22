@@ -18,18 +18,13 @@
 # include <sys/socket.h>
 # include "test_netlink.h"
 # include <linux/netfilter/nfnetlink.h>
-# ifdef HAVE_LINUX_NETFILTER_NF_TABLES_H
-#  include <linux/netfilter/nf_tables.h>
-# endif
+# include <linux/netfilter/nf_tables.h>
 
 # ifndef NFNETLINK_V0
 #  define NFNETLINK_V0 0
 # endif
 # ifndef NFNL_SUBSYS_NFTABLES
 #  define NFNL_SUBSYS_NFTABLES 10
-# endif
-# ifndef NFT_MSG_NEWTABLE
-#  define NFT_MSG_NEWTABLE 0
 # endif
 
 static void
