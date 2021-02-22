@@ -1,3 +1,4 @@
+#unconditional
 #value_indexed
-OSF_MSG_ADD	0
-OSF_MSG_REMOVE	1
+OSF_MSG_ADD
+OSF_MSG_REMOVE

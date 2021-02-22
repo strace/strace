@@ -436,9 +436,6 @@ AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])
 
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
 
-AC_CHECK_HEADERS([linux/netfilter/xt_osf.h],,, [#include <linux/ip.h>
-#include <linux/tcp.h>])
-
 AC_CHECK_HEADERS(m4_normalize([
 	linux/netfilter_arp/arp_tables.h
 	linux/netfilter_bridge/ebtables.h
