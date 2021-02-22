@@ -61,6 +61,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/mqueue.h \
 	linux/include/uapi/linux/neighbour.h \
 	linux/include/uapi/linux/netconf.h \
+	linux/include/uapi/linux/netfilter/ipset/ip_set.h \
 	linux/include/uapi/linux/netlink.h \
 	linux/include/uapi/linux/netlink_diag.h \
 	linux/include/uapi/linux/nsfs.h \

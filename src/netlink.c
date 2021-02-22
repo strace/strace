@@ -14,6 +14,7 @@
 #include <linux/rtnetlink.h>
 #include <linux/xfrm.h>
 #include <linux/cryptouser.h>
+#include <linux/netfilter/ipset/ip_set.h>
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
