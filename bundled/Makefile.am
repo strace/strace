@@ -64,6 +64,8 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/netfilter/ipset/ip_set.h \
 	linux/include/uapi/linux/netfilter/nf_tables.h \
 	linux/include/uapi/linux/netfilter/nf_tables_compat.h \
+	linux/include/uapi/linux/netfilter/nfnetlink.h \
+	linux/include/uapi/linux/netfilter/nfnetlink_compat.h \
 	linux/include/uapi/linux/netlink.h \
 	linux/include/uapi/linux/netlink_diag.h \
 	linux/include/uapi/linux/nsfs.h \

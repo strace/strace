@@ -17,6 +17,7 @@
 #include <linux/netfilter/ipset/ip_set.h>
 #include <linux/netfilter/nf_tables.h>
 #include <linux/netfilter/nf_tables_compat.h>
+#include <linux/netfilter/nfnetlink.h>
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
@@ -546,9 +547,7 @@ decode_nlmsgerr(struct tcb *const tcp,
 
 static const netlink_decoder_t netlink_decoders[] = {
 	[NETLINK_CRYPTO] = decode_netlink_crypto,
-#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
 	[NETLINK_NETFILTER] = decode_netlink_netfilter,
-#endif
 	[NETLINK_ROUTE] = decode_netlink_route,
 	[NETLINK_SELINUX] = decode_netlink_selinux,
 	[NETLINK_SOCK_DIAG] = decode_netlink_sock_diag

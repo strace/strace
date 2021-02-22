@@ -7,19 +7,16 @@
  */
 
 #include "defs.h"
+#include "nlattr.h"
 
-#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include "netlink.h"
+#include <linux/netfilter/nfnetlink.h>
 
-# include "nlattr.h"
-
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include "netlink.h"
-# include <linux/netfilter/nfnetlink.h>
-
-# include "xlat/netfilter_versions.h"
-# include "xlat/nl_netfilter_msg_types.h"
-# include "xlat/nl_netfilter_subsys_ids.h"
+#include "xlat/netfilter_versions.h"
+#include "xlat/nl_netfilter_msg_types.h"
+#include "xlat/nl_netfilter_subsys_ids.h"
 
 bool
 decode_netlink_netfilter(struct tcb *const tcp,
@@ -79,5 +76,3 @@ decode_netlink_netfilter(struct tcb *const tcp,
 
 	return true;
 }
-
-#endif /* HAVE_LINUX_NETFILTER_NFNETLINK_H */

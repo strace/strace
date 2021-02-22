@@ -7,25 +7,15 @@
  */
 
 #include "tests.h"
-
-#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_H
-
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <sys/socket.h>
-# include "test_netlink.h"
-# include <linux/netfilter/nfnetlink.h>
-# include <linux/netfilter/nf_tables.h>
-
-# ifndef NFNETLINK_V0
-#  define NFNETLINK_V0 0
-# endif
-# ifndef NFNL_SUBSYS_NFTABLES
-#  define NFNL_SUBSYS_NFTABLES 10
-# endif
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include "test_netlink.h"
+#include <linux/netfilter/nfnetlink.h>
+#include <linux/netfilter/nf_tables.h>
 
 static void
 test_nlmsg_type(const int fd)
@@ -36,14 +26,12 @@ test_nlmsg_type(const int fd)
 		.nlmsg_flags = NLM_F_REQUEST,
 	};
 
-# ifdef NFNL_MSG_BATCH_BEGIN
 	nlh.nlmsg_type = NFNL_MSG_BATCH_BEGIN;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=NFNL_MSG_BATCH_BEGIN"
 	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-# endif
 
 	nlh.nlmsg_type = NFNL_SUBSYS_CTNETLINK << 8 | 0xff;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
@@ -125,7 +113,6 @@ test_nfgenmsg(const int fd)
 		      printf(", version=NFNETLINK_V0");
 		      printf(", res_id=htons(%d)", 0xabcd));
 
-# ifdef NFNL_MSG_BATCH_BEGIN
 	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
 	TEST_NETLINK(fd, nlh0,
 		     NFNL_MSG_BATCH_BEGIN, NLM_F_REQUEST,
@@ -145,7 +132,6 @@ test_nfgenmsg(const int fd)
 		     printf(", version=NFNETLINK_V0");
 		     printf(", res_id=htons(%d)"
 			    ", \"\\x31\\x32\\x33\\x34\"", 0xabcd));
-# endif /* NFNL_MSG_BATCH_BEGIN */
 
 	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
 	memcpy(nla_buf, &msg, sizeof(msg));
@@ -177,9 +163,3 @@ int main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_NETFILTER_NFNETLINK_H")
-
-#endif
