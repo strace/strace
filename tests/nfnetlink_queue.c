@@ -7,14 +7,11 @@
  */
 
 #include "tests.h"
-
-#ifdef HAVE_LINUX_NETFILTER_NFNETLINK_QUEUE_H
-
-# include <stdio.h>
-# include <sys/socket.h>
-# include "netlink.h"
-# include <linux/netfilter/nfnetlink.h>
-# include <linux/netfilter/nfnetlink_queue.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include "netlink.h"
+#include <linux/netfilter/nfnetlink.h>
+#include <linux/netfilter/nfnetlink_queue.h>
 
 static void
 test_nlmsg_type(const int fd)
@@ -55,9 +52,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_NETFILTER_NFNETLINK_QUEUE_H")
-
-#endif

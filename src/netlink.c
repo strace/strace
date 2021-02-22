@@ -26,6 +26,7 @@
 #undef nfnl_acct_msg_types
 #include <linux/netfilter/nfnetlink_cttimeout.h>
 #include <linux/netfilter/nfnetlink_log.h>
+#include <linux/netfilter/nfnetlink_queue.h>
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
