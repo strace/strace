@@ -20,6 +20,10 @@
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nfnetlink_acct.h>
 #include <linux/netfilter/nfnetlink_conntrack.h>
+/* workaround a typo in nfnetlink_cthelper.h */
+#define nfnl_acct_msg_types nfnl_cthelper_msg_types
+#include <linux/netfilter/nfnetlink_cthelper.h>
+#undef nfnl_acct_msg_types
 #include "xlat/netlink_ack_flags.h"
 #include "xlat/netlink_delete_flags.h"
 #include "xlat/netlink_flags.h"
