@@ -21,10 +21,8 @@ raw_syscall_0(const kernel_ulong_t nr, kernel_ulong_t *err)
 
 # ifdef __A7__
 #  define ARC_TRAP_INSN "trap0"
-# elif defined __HS__
-#  define ARC_TRAP_INSN "trap_s 0 "
 # else
-#  error unrecognized arc
+#  define ARC_TRAP_INSN "trap_s 0 "
 # endif
 
 	__asm__ __volatile__(ARC_TRAP_INSN
