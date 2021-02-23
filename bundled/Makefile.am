@@ -78,6 +78,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/nsfs.h \
 	linux/include/uapi/linux/openat2.h \
 	linux/include/uapi/linux/packet_diag.h \
+	linux/include/uapi/linux/perf_event.h \
 	linux/include/uapi/linux/pkt_sched.h \
 	linux/include/uapi/linux/prctl.h \
 	linux/include/uapi/linux/ptp_clock.h \

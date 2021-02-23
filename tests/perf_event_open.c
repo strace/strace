@@ -11,31 +11,25 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined(__NR_perf_event_open) && defined(HAVE_LINUX_PERF_EVENT_H)
+#include <inttypes.h>
+#include <limits.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-# include <inttypes.h>
-# include <limits.h>
-# include <stddef.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <string.h>
-# include <unistd.h>
+#include <linux/perf_event.h>
 
-# include <linux/perf_event.h>
+#include "xlat.h"
+#include "xlat/perf_event_open_flags.h"
+#include "xlat/perf_attr_size.h"
 
-# include "xlat.h"
-# include "xlat/perf_event_open_flags.h"
-# include "xlat/perf_attr_size.h"
-
-# if ULONG_MAX > UINT_MAX /* Poor man's "whether long is 8 bytes?" */
-#  define LONG_STR_PREFIX "ffffffff"
-# else /* !(ULONG_MAX > UINT_MAX) */
-#  define LONG_STR_PREFIX ""
-# endif /* ULONG_MAX > UINT_MAX */
-
-# ifndef PERF_TYPE_BREAKPOINT
-#  define PERF_TYPE_BREAKPOINT 5
-# endif
+#if ULONG_MAX > UINT_MAX /* Poor man's "whether long is 8 bytes?" */
+# define LONG_STR_PREFIX "ffffffff"
+#else /* !(ULONG_MAX > UINT_MAX) */
+# define LONG_STR_PREFIX ""
+#endif /* ULONG_MAX > UINT_MAX */
 
 struct s32_val_str {
 	int32_t val;
@@ -142,7 +136,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 
 	uint32_t read_size;
 	struct perf_event_attr *attr;
-# if VERBOSE
+#if VERBOSE
 	uint32_t cutoff;
 	uint64_t val;
 	uint64_t use_clockid;
@@ -150,15 +144,15 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		struct pea_flags flags;
 		uint64_t raw;
 	} flags_data;
-# endif
+#endif
 
 	read_size =
-# if !VERBOSE
+#if !VERBOSE
 		STRACE_PEA_ABBREV_SIZE;
-# else
+#else
 		size < STRACE_PEA_SIZE ?
 			(size ? size : PERF_ATTR_SIZE_VER0) : STRACE_PEA_SIZE;
-# endif
+#endif
 
 	if (read_size > available_size) {
 		printf("%s", printaddr(attr_ptr));
@@ -194,9 +188,9 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	if (!size)
 		size = PERF_ATTR_SIZE_VER0;
 
-# if !VERBOSE
+#if !VERBOSE
 	printf("...}");
-# else /* !VERBOSE */
+#else /* !VERBOSE */
 	printf("%s=%" PRI__u64", sample_type=%s, read_format=%s",
 	       attr->freq ? "sample_freq" : "sample_period",
 	       attr->freq ? attr->sample_freq : attr->sample_period,
@@ -235,108 +229,43 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 
 	flags_data.raw = ((uint64_t *) attr)[5];
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_PRECISE_IP
-		attr->precise_ip;
-#  else
-		flags_data.flags.precise_ip;
-#  endif
+	val = attr->precise_ip;
 	printf(", precise_ip=%" PRIu64 " /* %s */", val, precise_ip_desc);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_MMAP_DATA
-		attr->mmap_data;
-#  else
-		flags_data.flags.mmap_data;
-#  endif
+	val = attr->mmap_data;
 	printf(", mmap_data=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_SAMPLE_ID_ALL
-		attr->sample_id_all;
-#  else
-		flags_data.flags.sample_id_all;
-#  endif
+	val = attr->sample_id_all;
 	printf(", sample_id_all=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_EXCLUDE_HOST
-		attr->exclude_host;
-#  else
-		flags_data.flags.exclude_host;
-#  endif
+	val = attr->exclude_host;
 	printf(", exclude_host=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_EXCLUDE_GUEST
-		attr->exclude_guest;
-#  else
-		flags_data.flags.exclude_guest;
-#  endif
+	val = attr->exclude_guest;
 	printf(", exclude_guest=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_EXCLUDE_CALLCHAIN_KERNEL
-		attr->exclude_callchain_kernel;
-#  else
-		flags_data.flags.exclude_callchain_kernel;
-#  endif
+	val = attr->exclude_callchain_kernel;
 	printf(", exclude_callchain_kernel=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_EXCLUDE_CALLCHAIN_USER
-		attr->exclude_callchain_user;
-#  else
-		flags_data.flags.exclude_callchain_user;
-#  endif
+	val = attr->exclude_callchain_user;
 	printf(", exclude_callchain_user=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_MMAP2
-		attr->mmap2;
-#  else
-		flags_data.flags.mmap2;
-#  endif
+	val = attr->mmap2;
 	printf(", mmap2=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_COMM_EXEC
-		attr->comm_exec;
-#  else
-		flags_data.flags.comm_exec;
-#  endif
+	val = attr->comm_exec;
 	printf(", comm_exec=%" PRIu64, val);
 
-	use_clockid = val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_USE_CLOCKID
-		attr->use_clockid;
-#  else
-		flags_data.flags.use_clockid;
-#  endif
+	use_clockid = val = attr->use_clockid;
 	printf(", use_clockid=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_CONTEXT_SWITCH
-		attr->context_switch;
-#  else
-		flags_data.flags.context_switch;
-#  endif
+	val = attr->context_switch;
 	printf(", context_switch=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_WRITE_BACKWARD
-		attr->write_backward;
-#  else
-		flags_data.flags.write_backward;
-#  endif
+	val = attr->write_backward;
 	printf(", write_backward=%" PRIu64, val);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_NAMESPACES
-		attr->namespaces;
-#  else
-		flags_data.flags.namespaces;
-#  endif
+	val = attr->namespaces;
 	printf(", namespaces=%" PRIu64, val);
 
 	val = flags_data.flags.__reserved_1;
@@ -350,12 +279,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	if (attr->type == PERF_TYPE_BREAKPOINT)
 		printf(", bp_type=%s", bp_type);
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_CONFIG1
-		attr->config1;
-#  else
-		((uint64_t *) attr)[56 / sizeof(uint64_t)];
-#  endif
+	val = attr->config1;
 	printf(", %s=%#" PRIx64,
 	       attr->type == PERF_TYPE_BREAKPOINT ? "bp_addr" : "config1",
 	       val);
@@ -366,12 +290,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_CONFIG2
-		attr->config2;
-#  else
-		((uint64_t *) attr)[64 / sizeof(uint64_t)];
-#  endif
+	val = attr->config2;
 	if (attr->type == PERF_TYPE_BREAKPOINT)
 		printf(", bp_len=%" PRIu64, val);
 	else
@@ -396,12 +315,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_SAMPLE_REGS_USER
-		attr->sample_regs_user;
-#  else
-		((uint64_t *) attr)[80 / sizeof(uint64_t)];
-#  endif
+	val = attr->sample_regs_user;
 	printf(", sample_regs_user=%#" PRIx64, val);
 
 	if (size <= 88) {
@@ -409,12 +323,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_SAMPLE_STACK_USER
-		attr->sample_stack_user;
-#  else
-		((uint32_t *) attr)[88 / sizeof(uint32_t)];
-#  endif
+	val = attr->sample_stack_user;
 	/*
 	 * Print branch sample type only in case PERF_SAMPLE_STACK_USER
 	 * is set in the sample_type field.
@@ -436,12 +345,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_SAMPLE_REGS_INTR
-		attr->sample_regs_intr;
-#  else
-		((uint64_t *) attr)[96 / sizeof(uint64_t)];
-#  endif
+	val = attr->sample_regs_intr;
 	printf(", sample_regs_intr=%#" PRIx64, val);
 
 	/* End of version 4 of the structure */
@@ -450,12 +354,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_AUX_WATERMARK
-		attr->aux_watermark;
-#  else
-		((uint32_t *) attr)[104 / sizeof(uint32_t)];
-#  endif
+	val = attr->aux_watermark;
 	printf(", aux_watermark=%" PRIu32, (uint32_t) val);
 
 	if (size <= 108) {
@@ -463,12 +362,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_SAMPLE_MAX_STACK
-		attr->sample_max_stack;
-#  else
-		((uint16_t *) attr)[108 / sizeof(uint16_t)];
-#  endif
+	val = attr->sample_max_stack;
 	printf(", sample_max_stack=%" PRIu16, (uint16_t) val);
 
 	if (size <= 110) {
@@ -485,12 +379,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	val =
-#  ifdef HAVE_STRUCT_PERF_EVENT_ATTR_AUX_SAMPLE_SIZE
-		attr->aux_sample_size;
-#  else
-		((uint32_t *) attr)[112 / sizeof(uint32_t)];
-#  endif
+	val = attr->aux_sample_size;
 	printf(", aux_sample_size=%" PRIu32, (uint32_t) val);
 
 	if (size <= 116) {
@@ -505,19 +394,19 @@ end:
 		printf(", ...");
 
 	printf("}");
-# endif /* !VERBOSE */
+#endif /* !VERBOSE */
 
 	free(attr);
 }
 
 /* These require aligned access, so no byte-grain checks possible */
-# if defined SPARC || defined SPARC64 || defined POWERPC || defined POWERPC64 || defined ARM
-#  define ATTR_REC(sz) { tail_alloc((sz + 7) & ~7), sz }
-# else
-#  define ATTR_REC(sz) { tail_alloc(sz), sz }
-# endif
+#if defined SPARC || defined SPARC64 || defined POWERPC || defined POWERPC64 || defined ARM
+# define ATTR_REC(sz) { tail_alloc((sz + 7) & ~7), sz }
+#else
+# define ATTR_REC(sz) { tail_alloc(sz), sz }
+#endif
 
-# define BRANCH_TYPE_ALL \
+#define BRANCH_TYPE_ALL \
 	"PERF_SAMPLE_BRANCH_USER|" \
 	"PERF_SAMPLE_BRANCH_KERNEL|" \
 	"PERF_SAMPLE_BRANCH_HV|" \
@@ -774,43 +663,20 @@ main(void)
 		if ((i % 11) == 5)
 			attr->__reserved_1 = 0;
 
-# ifdef HAVE_STRUCT_PERF_EVENT_ATTR_BP_TYPE
-		attr->bp_type =
-# else
-		((uint32_t *) attr)[52 / sizeof(uint32_t)] =
-# endif
-			bp_types[bp_type_idx].val;
+		attr->bp_type = bp_types[bp_type_idx].val;
 
 		if (size >= 80)
-# ifdef HAVE_STRUCT_PERF_EVENT_ATTR_BRANCH_SAMPLE_TYPE
 			attr->branch_sample_type =
-# else
-			((uint64_t *) attr)[72 / sizeof(uint64_t)] =
-# endif
 				branch_sample_types[branch_sample_type_idx].val;
 
 		if (size >= 96)
-# ifdef HAVE_STRUCT_PERF_EVENT_ATTR_CLOCKID
 			attr->clockid =
-# else
-			((uint32_t *) attr)[92 / sizeof(uint32_t)] =
-# endif
 				clockids[clockid_idx].val;
 
-# ifdef HAVE_STRUCT_PERF_EVENT_ATTR_PRECISE_IP
 		ip_desc_str = precise_ip_descs[attr->precise_ip];
-# else
-		union {
-			struct pea_flags flags;
-			uint64_t raw;
-		} flags_data = { .raw = ((uint64_t *) attr)[5] };
-
-		ip_desc_str = precise_ip_descs[flags_data.flags.precise_ip];
-# endif
 
 		if (((i % 17) == 3) && (size >= 112))
 			((uint16_t *) attr)[110 / sizeof(uint16_t)] = 0;
-
 
 		if (i == 0)
 			attr->size = size + 8;
@@ -840,9 +706,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_perf_event_open && HAVE_LINUX_PERF_EVENT_H");
-
-#endif

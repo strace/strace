@@ -8,30 +8,15 @@
  */
 
 #include "tests.h"
+#include "scno.h"
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/perf_event.h>
 
-#ifdef HAVE_LINUX_PERF_EVENT_H
-
-# include <inttypes.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-# include <sys/ioctl.h>
-# include "scno.h"
-# include <linux/perf_event.h>
-
-/*
- * Workaround the bug in kernel UAPI that was fixed
- * in Linux commit v2.6.33-rc1~48^2~288^2~19.
- */
-# ifndef u64
-#  define u64 uint64_t
-# endif
-
-# define XLAT_MACROS_ONLY
-# include "xlat/perf_ioctl_cmds.h"
-# undef XLAT_MACROS_ONLY
-
-# define STR16 "0123456789abcdef"
+#define STR16 "0123456789abcdef"
 
 static long
 sys_ioctl(kernel_long_t fd, kernel_ulong_t cmd, kernel_ulong_t arg)
@@ -210,9 +195,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("HAVE_LINUX_PERF_EVENT_H");
-
-#endif
