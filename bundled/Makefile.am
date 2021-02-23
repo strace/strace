@@ -89,6 +89,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/smc_diag.h \
 	linux/include/uapi/linux/sock_diag.h \
 	linux/include/uapi/linux/socket.h \
+	linux/include/uapi/linux/stat.h \
 	linux/include/uapi/linux/tee.h \
 	linux/include/uapi/linux/types.h \
 	linux/include/uapi/linux/unix_diag.h \

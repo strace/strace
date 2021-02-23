@@ -484,9 +484,6 @@ AC_CHECK_TYPES([struct statfs64], [
 ],, [#include <linux/types.h>
 #include <asm/statfs.h>])
 
-AC_CHECK_TYPES([struct statx],,, [#include <linux/types.h>
-#include <linux/stat.h>])
-
 AC_CHECK_TYPES(m4_normalize([
 	struct kvm_cpuid2,
 	struct kvm_regs,
