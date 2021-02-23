@@ -29,7 +29,6 @@
 # include <sys/sysmacros.h>
 
 # include "print_fields.h"
-# include "statx.h"
 
 # ifndef STRUCT_STAT
 #  define STRUCT_STAT struct stat
