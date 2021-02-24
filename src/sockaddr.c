@@ -398,7 +398,7 @@ print_sockaddr_data_ipx(struct tcb *tcp, const void *const buf,
 	tprints_field_name("sipx_network");
 	tprintf("htonl(%#08x)", ntohl(sa_ipx->sipx_network));
 	tprint_struct_next();
-	PRINT_FIELD_UINT_ARRAY(*sa_ipx, sipx_node, "%#02llx");
+	PRINT_FIELD_VAL_ARRAY(*sa_ipx, sipx_node, PRINT_VAL_0X);
 	tprint_struct_next();
 	PRINT_FIELD_0X(*sa_ipx, sipx_type);
 }

@@ -188,32 +188,29 @@ tprints_field_name(const char *name)
 		PRINT_VAL_0X((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_UINT_ARRAY(where_, field_, fmt_)				\
-	do {									\
-		tprints_field_name(#field_);					\
-		for (size_t i_ = 0; i_ < ARRAY_SIZE((where_).field_); ++i_)	\
-			STRACE_PRINTF("%s" fmt_, (i_ ? ", " : "["),		\
-				zero_extend_signed_to_ull((where_).field_[i_]));\
-		STRACE_PRINTF("]");						\
-	} while (0)
-
-# define PRINT_FIELD_SINT_ARRAY(where_, field_, fmt_)				\
-	do {									\
-		tprints_field_name(#field_);					\
-		for (size_t i_ = 0; i_ < ARRAY_SIZE((where_).field_); ++i_)	\
-			STRACE_PRINTF("%s" fmt_, (i_ ? ", " : "["),		\
-				sign_extend_unsigned_to_ll((where_).field_[i_]));\
-		STRACE_PRINTF("]");						\
+# define PRINT_FIELD_VAL_ARRAY(where_, field_, print_val_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		for (size_t i_ = 0;					\
+		     i_ < ARRAY_SIZE((where_).field_);			\
+		     ++i_) {						\
+			if (i_)						\
+				tprint_array_next();			\
+			else						\
+				tprint_array_begin();			\
+			print_val_((where_).field_[i_]);		\
+		}							\
+		tprint_array_end();					\
 	} while (0)
 
 # define PRINT_FIELD_D_ARRAY(where_, field_)				\
-	PRINT_FIELD_SINT_ARRAY((where_), field_, "%lld")
+	PRINT_FIELD_VAL_ARRAY((where_), field_, PRINT_VAL_D)
 
 # define PRINT_FIELD_U_ARRAY(where_, field_)				\
-	PRINT_FIELD_UINT_ARRAY((where_), field_, "%llu")
+	PRINT_FIELD_VAL_ARRAY((where_), field_, PRINT_VAL_U)
 
 # define PRINT_FIELD_X_ARRAY(where_, field_)				\
-	PRINT_FIELD_UINT_ARRAY((where_), field_, "%#llx")
+	PRINT_FIELD_VAL_ARRAY((where_), field_, PRINT_VAL_X)
 
 # define PRINT_FIELD_UINT_ARRAY2D(where_, field_, fmt_)				\
 	do {									\
