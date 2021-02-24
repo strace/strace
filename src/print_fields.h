@@ -133,39 +133,47 @@ tprints_field_name(const char *name)
 	STRACE_PRINTF("%s=", name);
 }
 
+# define PRINT_VAL_D(val_)	\
+	STRACE_PRINTF("%lld", sign_extend_unsigned_to_ll(val_))
+
+# define PRINT_VAL_U(val_)	\
+	STRACE_PRINTF("%llu", zero_extend_signed_to_ull(val_))
+
+# define PRINT_VAL_X(val_)	\
+	STRACE_PRINTF("%#llx", zero_extend_signed_to_ull(val_))
+
+# define PRINT_VAL_0X(val_)						\
+	STRACE_PRINTF("%#0*llx", (int) sizeof(val_) * 2,		\
+		      zero_extend_signed_to_ull(val_))
+
 # define PRINT_FIELD_D(where_, field_)					\
 	do {								\
 		tprints_field_name(#field_);				\
-		STRACE_PRINTF("%lld",					\
-			sign_extend_unsigned_to_ll((where_).field_));	\
+		PRINT_VAL_D((where_).field_);				\
 	} while (0)
 
 # define PRINT_FIELD_U(where_, field_)					\
 	do {								\
 		tprints_field_name(#field_);				\
-		STRACE_PRINTF("%llu",					\
-			zero_extend_signed_to_ull((where_).field_));	\
+		PRINT_VAL_U((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_U_CAST(where_, field_, type_)				\
-	do {									\
-		tprints_field_name(#field_);					\
-		STRACE_PRINTF("%llu",						\
-			zero_extend_signed_to_ull((type_)(where_).field_));	\
+# define PRINT_FIELD_U_CAST(where_, field_, type_)			\
+	do {								\
+		tprints_field_name(#field_);				\
+		PRINT_VAL_U((type_)((where_).field_));			\
 	} while (0)
 
 # define PRINT_FIELD_X(where_, field_)					\
 	do {								\
 		tprints_field_name(#field_);				\
-		STRACE_PRINTF("%#llx",					\
-			zero_extend_signed_to_ull((where_).field_));	\
+		PRINT_VAL_X((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_X_CAST(where_, field_, type_)				\
-	do {									\
-		tprints_field_name(#field_);					\
-		STRACE_PRINTF("%#llx",						\
-			zero_extend_signed_to_ull((type_)(where_).field_));	\
+# define PRINT_FIELD_X_CAST(where_, field_, type_)			\
+	do {								\
+		tprints_field_name(#field_);				\
+		PRINT_VAL_X((type_)((where_).field_));			\
 	} while (0)
 
 # define PRINT_FIELD_ADDR64(where_, field_)				\
@@ -174,11 +182,10 @@ tprints_field_name(const char *name)
 		printaddr64((where_).field_);				\
 	} while (0)
 
-# define PRINT_FIELD_0X(where_, field_)						\
-	do {									\
-		tprints_field_name(#field_);					\
-		STRACE_PRINTF("%#0*llx", (int) sizeof((where_).field_) * 2,	\
-			      zero_extend_signed_to_ull((where_).field_));	\
+# define PRINT_FIELD_0X(where_, field_)					\
+	do {								\
+		tprints_field_name(#field_);				\
+		PRINT_VAL_0X((where_).field_);				\
 	} while (0)
 
 # define PRINT_FIELD_UINT_ARRAY(where_, field_, fmt_)				\
@@ -281,10 +288,9 @@ tprints_field_name(const char *name)
 	do {									\
 		tprints_field_name(#field_);					\
 		if (sign_extend_unsigned_to_ll((where_).field_) == -1LL)	\
-			STRACE_PRINTF("-1");					\
+			PRINT_VAL_D(-1);					\
 		else								\
-			STRACE_PRINTF("%llu",					\
-				zero_extend_signed_to_ull((where_).field_));	\
+			PRINT_VAL_U((where_).field_);				\
 	} while (0)
 
 # define PRINT_FIELD_UUID(where_, field_)				\
@@ -299,8 +305,7 @@ tprints_field_name(const char *name)
 		if (zero_extend_signed_to_ull((where_).field_) == UINT64_MAX)	\
 			print_xlat_u(UINT64_MAX);				\
 		else								\
-			STRACE_PRINTF("%llu",					\
-				zero_extend_signed_to_ull((where_).field_));	\
+			PRINT_VAL_U((where_).field_);				\
 	} while (0)
 
 # define PRINT_FIELD_STRING(where_, field_, len_, style_)		\
