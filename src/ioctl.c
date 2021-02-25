@@ -380,10 +380,12 @@ SYS_FUNC(ioctl)
 				iop = ioctl_lookup(tcp->u_arg[1]);
 				if (iop) {
 					if (ret)
-						tprints(" or ");
+						tprint_alternative_value();
 					tprints(iop->symbol);
-					while ((iop = ioctl_next_match(iop)))
-						tprintf(" or %s", iop->symbol);
+					while ((iop = ioctl_next_match(iop))) {
+						tprint_alternative_value();
+						tprints(iop->symbol);
+					}
 				} else if (!ret) {
 					ioctl_print_code(tcp->u_arg[1]);
 				}

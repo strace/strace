@@ -61,6 +61,12 @@ tprint_value_changed(void)
 	tprints(" => ");
 }
 
+static inline void
+tprint_alternative_value(void)
+{
+	tprints(" or ");
+}
+
 /*
  * The printf-like function to use in header files
  * shared between strace and its tests.
@@ -117,6 +123,12 @@ static inline void
 tprint_value_changed(void)
 {
 	fputs(" => ", stdout);
+}
+
+static inline void
+tprint_alternative_value(void)
+{
+	fputs(" or ", stdout);
 }
 
 /*
