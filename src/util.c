@@ -866,7 +866,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	if (alloc_size / 4 != size) {
 		error_func_msg("requested %u bytes exceeds %u bytes limit",
 			       size, -1U / 4);
-		tprints("???");
+		tprint_unavailable();
 		return -1;
 	}
 	alloc_size += 1 + (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES ? 0 : 2) +
@@ -880,7 +880,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 		if (!buf) {
 			error_func_msg("memory exhausted when tried to allocate"
 				       " %u bytes", alloc_size);
-			tprints("???");
+			tprint_unavailable();
 			return -1;
 		}
 	}
@@ -1053,7 +1053,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 		error_func_msg("memory exhausted when tried to allocate"
                                " %u bytes", len);
 		prefix_fun();
-		tprints("???");
+		tprint_unavailable();
 		return true;
 	}
 
@@ -1061,7 +1061,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 
 	if (umoven(tcp, addr, len, str)) {
 		prefix_fun();
-		tprints("???");
+		tprint_unavailable();
 	} else if (is_filled(str, 0, len)) {
 		ret = false;
 	} else {
@@ -1433,7 +1433,7 @@ print_array_ex(struct tcb *const tcp,
 		if (tfetch_mem_func)
 			printaddr(start_addr);
 		else
-			tprints("???");
+			tprint_unavailable();
 		return false;
 	}
 

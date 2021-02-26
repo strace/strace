@@ -67,6 +67,12 @@ tprint_alternative_value(void)
 	tprints(" or ");
 }
 
+static inline void
+tprint_unavailable(void)
+{
+	tprints("???");
+}
+
 /*
  * The printf-like function to use in header files
  * shared between strace and its tests.
@@ -129,6 +135,12 @@ static inline void
 tprint_alternative_value(void)
 {
 	fputs(" or ", stdout);
+}
+
+static inline void
+tprint_unavailable(void)
+{
+	fputs("???", stdout);
 }
 
 /*

@@ -47,7 +47,7 @@ MPERS_PRINTER_DECL(bool, print_struct_timeval_data_size,
 		   const void *arg, const size_t size)
 {
 	if (size < sizeof(timeval_t)) {
-		tprints("?");
+		tprint_unavailable();
 		return false;
 	}
 

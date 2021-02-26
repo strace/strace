@@ -53,7 +53,7 @@ bool
 PRINT_TIMESPEC_DATA_SIZE(const void *arg, const size_t size)
 {
 	if (size < sizeof(TIMESPEC_T)) {
-		tprints("?");
+		tprint_unavailable();
 		return false;
 	}
 
@@ -68,7 +68,7 @@ PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 			       const size_t size)
 {
 	if (nmemb > size / sizeof(TIMESPEC_T)) {
-		tprints("?");
+		tprint_unavailable();
 		return false;
 	}
 

@@ -145,7 +145,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 			printxval(perf_attr_size, new_size,
 				  "PERF_ATTR_SIZE_???");
 		else
-			tprints("???");
+			tprint_unavailable();
 	}
 
 	switch (attr->type) {

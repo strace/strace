@@ -167,7 +167,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 	return;
 
 misplaced:
-	tprints("???");
+	tprint_unavailable();
 	tprints_comment("misplaced struct dm_target_spec");
 }
 
@@ -227,7 +227,7 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	return;
 
 misplaced:
-	tprints("???");
+	tprint_unavailable();
 	tprints_comment("misplaced struct dm_target_deps");
 }
 
@@ -319,7 +319,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 	return;
 
 misplaced:
-	tprints("???");
+	tprint_unavailable();
 	tprints_comment("misplaced struct dm_name_list");
 }
 
@@ -381,7 +381,7 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 	return;
 
 misplaced:
-	tprints("???");
+	tprint_unavailable();
 	tprints_comment("misplaced struct dm_target_versions");
 }
 
@@ -418,7 +418,7 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 			    QUOTE_0_TERMINATED);
 		tprint_struct_end();
 	} else {
-		tprints("???");
+		tprint_unavailable();
 		tprints_comment("misplaced struct dm_target_msg");
 	}
 }
@@ -441,7 +441,7 @@ dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 		printstr_ex(tcp, addr + offset, ioc->data_size - offset,
 			    QUOTE_0_TERMINATED);
 	} else {
-		tprints("???");
+		tprint_unavailable();
 		tprints_comment("misplaced string");
 	}
 }
