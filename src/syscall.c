@@ -603,7 +603,8 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	if (res != 1 || (res = get_syscall_args(tcp)) != 1) {
 		printleader(tcp);
-		tprintf("%s(", tcp_sysent(tcp)->sys_name);
+		tprints(tcp_sysent(tcp)->sys_name);
+		tprint_arg_begin();
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -686,7 +687,8 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		strace_open_memstream(tcp);
 
 	printleader(tcp);
-	tprintf("%s(", tcp_sysent(tcp)->sys_name);
+	tprints(tcp_sysent(tcp)->sys_name);
+	tprint_arg_begin();
 	int res = raw(tcp) ? printargs(tcp) : tcp_sysent(tcp)->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;
@@ -807,7 +809,8 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	tcp->s_prev_ent = NULL;
 	if (res != 1) {
 		/* There was error in one of prior ptrace ops */
-		tprints(") ");
+		tprint_arg_end();
+		tprints(" ");
 		tabto();
 		tprints("= ? <unavailable>\n");
 		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
@@ -842,7 +845,8 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 	}
 
-	tprints(") ");
+	tprint_arg_end();
+	tprints(" ");
 	tabto();
 
 	if (raw(tcp)) {

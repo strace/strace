@@ -75,15 +75,17 @@ SYS_FUNC(clone)
 	if (entering(tcp)) {
 		const unsigned int sig = tcp->u_arg[ARG_FLAGS] & CSIGNAL;
 
-		tprints("child_stack=");
+		tprints_arg_name("child_stack");
 		printaddr(tcp->u_arg[ARG_STACK]);
-		tprints(", ");
+		tprint_arg_next();
 #ifdef ARG_STACKSIZE
-		if (ARG_STACKSIZE != -1)
-			tprintf("stack_size=%#" PRI_klx ", ",
-				tcp->u_arg[ARG_STACKSIZE]);
+		if (ARG_STACKSIZE != -1) {
+			tprints_arg_name("stack_size");
+			PRINT_VAL_X(tcp->u_arg[ARG_STACKSIZE]);
+			tprint_arg_next();
+		}
 #endif
-		tprints("flags=");
+		tprints_arg_name("flags");
 		if (flags) {
 			printflags64(clone_flags, flags, "CLONE_???");
 			if (sig) {
@@ -113,21 +115,21 @@ SYS_FUNC(clone)
 		if (flags & (CLONE_PARENT_SETTID|CLONE_PIDFD)) {
 			kernel_ulong_t addr = tcp->u_arg[ARG_PTID];
 
-			tprint_struct_next();
-			tprints_field_name("parent_tid");
+			tprint_arg_next();
+			tprints_arg_name("parent_tid");
 			if (flags & CLONE_PARENT_SETTID)
 				printnum_pid(tcp, addr, PT_TID);
 			else
 				printnum_fd(tcp, addr);
 		}
 		if (flags & CLONE_SETTLS) {
-			tprint_struct_next();
-			tprints_field_name("tls");
+			tprint_arg_next();
+			tprints_arg_name("tls");
 			print_tls_arg(tcp, tcp->u_arg[ARG_TLS]);
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID)) {
-			tprint_struct_next();
-			tprints_field_name("child_tidptr");
+			tprint_arg_next();
+			tprints_arg_name("child_tidptr");
 			printaddr(tcp->u_arg[ARG_CTID]);
 		}
 	}
@@ -286,7 +288,8 @@ SYS_FUNC(clone3)
 		tprint_struct_end();
 
 out:
-	tprintf(", %" PRI_klu, size);
+	tprint_arg_next();
+	PRINT_VAL_U(size);
 
 	return RVAL_DECODED | RVAL_TID;
 }
@@ -295,7 +298,7 @@ out:
 SYS_FUNC(setns)
 {
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
 	printxval(setns_types, tcp->u_arg[1], "CLONE_NEW???");
 
 	return RVAL_DECODED;

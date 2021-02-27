@@ -50,6 +50,24 @@ tprint_array_end(void)
 }
 
 static inline void
+tprint_arg_begin(void)
+{
+	tprints("(");
+}
+
+static inline void
+tprint_arg_next(void)
+{
+	tprints(", ");
+}
+
+static inline void
+tprint_arg_end(void)
+{
+	tprints(")");
+}
+
+static inline void
 tprint_more_data_follows(void)
 {
 	tprints("...");
@@ -120,6 +138,24 @@ tprint_array_end(void)
 }
 
 static inline void
+tprint_arg_begin(void)
+{
+	fputs("(", stdout);
+}
+
+static inline void
+tprint_arg_next(void)
+{
+	fputs(", ", stdout);
+}
+
+static inline void
+tprint_arg_end(void)
+{
+	fputs(")", stdout);
+}
+
+static inline void
 tprint_more_data_follows(void)
 {
 	fputs("...", stdout);
@@ -153,6 +189,12 @@ tprint_unavailable(void)
 
 static inline void
 tprints_field_name(const char *name)
+{
+	STRACE_PRINTF("%s=", name);
+}
+
+static inline void
+tprints_arg_name(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
 }
