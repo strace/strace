@@ -27,15 +27,14 @@ static const char timespec_fmt[] =
 	"{tv_sec=%lld, " STRINGIFY_VAL(TIMESPEC_NSEC) "=%llu}";
 
 static void
-print_sec_nsec(long long sec, unsigned long long nsec)
-{
-	tprintf(timespec_fmt, sec, nsec);
-}
-
-static void
 print_timespec_t(const TIMESPEC_T *t)
 {
-	print_sec_nsec(TIMESPEC_TO_SEC_NSEC(t));
+	tprint_struct_begin();
+	PRINT_FIELD_D(*t, tv_sec);
+	tprint_struct_next();
+	tprints_field_name(STRINGIFY_VAL(TIMESPEC_NSEC));
+	PRINT_VAL_U(t->TIMESPEC_NSEC);
+	tprint_struct_end();
 }
 
 #if defined PRINT_TIMESPEC_DATA_SIZE || defined PRINT_TIMESPEC_ARRAY_DATA_SIZE
@@ -72,15 +71,15 @@ PRINT_TIMESPEC_ARRAY_DATA_SIZE(const void *arg, const unsigned int nmemb,
 		return false;
 	}
 
-	tprints("[");
+	tprint_array_begin();
 
 	for (unsigned int i = 0; i < nmemb; i++, arg += sizeof(TIMESPEC_T)) {
 		if (i)
-			tprints(", ");
+			tprint_array_next();
 		print_unaligned_timespec_t(arg);
 	}
 
-	tprints("]");
+	tprint_array_end();
 	return true;
 }
 #endif /* PRINT_TIMESPEC_ARRAY_DATA_SIZE */
