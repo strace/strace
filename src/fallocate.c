@@ -11,18 +11,17 @@
 
 SYS_FUNC(fallocate)
 {
-	int argn;
-
 	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
 
 	/* mode */
 	printflags(falloc_flags, tcp->u_arg[1], "FALLOC_FL_???");
-	tprints(", ");
+	tprint_arg_next();
 
 	/* offset */
-	argn = printllval(tcp, "%lld, ", 2);
+	int argn = printllval(tcp, "%lld", 2);
+	tprint_arg_next();
 
 	/* len */
 	printllval(tcp, "%lld", argn);
