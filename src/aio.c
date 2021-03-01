@@ -20,15 +20,21 @@
 
 SYS_FUNC(io_setup)
 {
-	if (entering(tcp))
-		tprintf("%u, ", (unsigned int) tcp->u_arg[0]);
-	else
+	if (entering(tcp)) {
+		/* nr_events */
+		unsigned int nr_events = tcp->u_arg[0];
+		PRINT_VAL_U(nr_events);
+		tprint_arg_next();
+	} else {
+		/* ctx_idp */
 		printnum_ptr(tcp, tcp->u_arg[1]);
+	}
 	return 0;
 }
 
 SYS_FUNC(io_destroy)
 {
+	/* ctx_id */
 	printaddr(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
@@ -198,14 +204,20 @@ print_iocbp(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 SYS_FUNC(io_submit)
 {
-	const kernel_long_t nr =
-		truncate_klong_to_current_wordsize(tcp->u_arg[1]);
 	const kernel_ulong_t addr = tcp->u_arg[2];
 	kernel_ulong_t iocbp;
 
+	/* ctx_id */
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %" PRI_kld ", ", nr);
+	tprint_arg_next();
 
+	/* nr */
+	const kernel_long_t nr =
+		truncate_klong_to_current_wordsize(tcp->u_arg[1]);
+	PRINT_VAL_D(nr);
+	tprint_arg_next();
+
+	/* iocbpp */
 	if (nr < 0)
 		printaddr(addr);
 	else
@@ -236,20 +248,21 @@ print_io_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 SYS_FUNC(io_cancel)
 {
 	if (entering(tcp)) {
+		/* ctx_id */
 		printaddr(tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 
+		/* iocb */
 		struct iocb cb;
-
 		if (!umove_or_printaddr(tcp, tcp->u_arg[1], &cb)) {
 			tprint_struct_begin();
 			print_iocb_header(tcp, &cb);
 			tprint_struct_end();
 		}
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* result */
 		struct io_event event;
-
 		if (!umove_or_printaddr(tcp, tcp->u_arg[2], &event))
 			print_io_event(tcp, &event, sizeof(event), 0);
 	}
@@ -258,29 +271,48 @@ SYS_FUNC(io_cancel)
 
 static int
 print_io_getevents(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
-		   const bool has_usig)
+		   const bool has_sig)
 {
 	if (entering(tcp)) {
+		kernel_long_t nr;
+
+		/* ctx_id */
 		printaddr(tcp->u_arg[0]);
-		tprintf(", %" PRI_kld ", %" PRI_kld ", ",
-			truncate_klong_to_current_wordsize(tcp->u_arg[1]),
-			truncate_klong_to_current_wordsize(tcp->u_arg[2]));
+		tprint_arg_next();
+
+		/* min_nr */
+		nr = truncate_klong_to_current_wordsize(tcp->u_arg[1]);
+		PRINT_VAL_D(nr);
+		tprint_arg_next();
+
+		/* nr */
+		nr = truncate_klong_to_current_wordsize(tcp->u_arg[2]);
+		PRINT_VAL_D(nr);
+		tprint_arg_next();
 	} else {
+		/* events */
 		struct io_event buf;
 		print_array(tcp, tcp->u_arg[3], tcp->u_rval, &buf, sizeof(buf),
 			    tfetch_mem, print_io_event, 0);
-		tprints(", ");
+		tprint_arg_next();
+
 		/*
-		 * Since the timeout and usig parameters are read by the kernel
+		 * Since the timeout and sig parameters are read by the kernel
 		 * on entering syscall, it has to be decoded the same way
 		 * whether the syscall has failed or not.
 		 */
 		temporarily_clear_syserror(tcp);
+
+		/* timeout */
 		print_ts(tcp, tcp->u_arg[4]);
-		if (has_usig) {
-			tprints(", ");
+
+		if (has_sig) {
+			tprint_arg_next();
+
+			/* sig */
 			print_kernel_sigset(tcp, tcp->u_arg[5]);
 		}
+
 		restore_cleared_syserror(tcp);
 	}
 	return 0;
