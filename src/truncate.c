@@ -26,7 +26,7 @@ SYS_FUNC(truncate64)
 	tprint_arg_next();
 
 	/* length */
-	printllval(tcp, "%llu", 1);
+	print_arg_llu(tcp, 1);
 
 	return RVAL_DECODED;
 }
@@ -50,7 +50,7 @@ SYS_FUNC(ftruncate64)
 	tprint_arg_next();
 
 	/* length */
-	printllval(tcp, "%llu", 1);
+	print_arg_llu(tcp, 1);
 
 	return RVAL_DECODED;
 }

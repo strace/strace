@@ -175,7 +175,7 @@ SYS_FUNC(pread)
 		tprint_arg_next();
 
 		/* offset */
-		printllval(tcp, "%lld", 3);
+		print_arg_lld(tcp, 3);
 	}
 	return 0;
 }
@@ -195,7 +195,7 @@ SYS_FUNC(pwrite)
 	tprint_arg_next();
 
 	/* offset */
-	printllval(tcp, "%lld", 3);
+	print_arg_lld(tcp, 3);
 
 	return RVAL_DECODED;
 }

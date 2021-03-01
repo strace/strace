@@ -14,7 +14,7 @@ SYS_FUNC(readahead)
 	tprint_arg_next();
 
 	/* offset */
-	int argn = printllval(tcp, "%lld", 1);
+	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
 
 	/* count */

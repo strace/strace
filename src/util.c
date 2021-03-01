@@ -263,8 +263,8 @@ next_set_bit(const void *bit_array, unsigned cur_bit, unsigned size_bits)
  * Fetch 64bit argument at position arg_no and
  * return the index of the next argument.
  */
-int
-getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
+unsigned int
+getllval(struct tcb *tcp, unsigned long long *val, unsigned int arg_no)
 {
 #if SIZEOF_KERNEL_LONG_T > 4
 # ifndef current_klongsize
@@ -307,16 +307,30 @@ getllval(struct tcb *tcp, unsigned long long *val, int arg_no)
 }
 
 /*
- * Print 64bit argument at position arg_no and
- * return the index of the next argument.
+ * Print 64bit argument at position arg_no as a signed long long
+ * and return the index of the next argument.
  */
-int
-printllval(struct tcb *tcp, const char *format, int arg_no)
+unsigned int
+print_arg_lld(struct tcb *tcp, unsigned int arg_no)
 {
 	unsigned long long val = 0;
 
 	arg_no = getllval(tcp, &val, arg_no);
-	tprintf(format, val);
+	PRINT_VAL_D(val);
+	return arg_no;
+}
+
+/*
+ * Print 64bit argument at position arg_no as an unsigned long long
+ * and return the index of the next argument.
+ */
+unsigned int
+print_arg_llu(struct tcb *tcp, unsigned int arg_no)
+{
+	unsigned long long val = 0;
+
+	arg_no = getllval(tcp, &val, arg_no);
+	PRINT_VAL_U(val);
 	return arg_no;
 }
 

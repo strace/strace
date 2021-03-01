@@ -23,11 +23,11 @@ SYS_FUNC(sync_file_range2)
 	tprint_arg_next();
 
 	/* offset */
-	int argn = printllval(tcp, "%lld", 2);
+	unsigned int argn = print_arg_lld(tcp, 2);
 	tprint_arg_next();
 
 	/* nbytes */
-	printllval(tcp, "%lld", argn);
+	print_arg_lld(tcp, argn);
 
 	return RVAL_DECODED;
 }

@@ -48,7 +48,7 @@ SYS_FUNC(fanotify_mark)
 	 * but kernel uses the lower 32 bits only.
 	 */
 	unsigned long long mask = 0;
-	int argn = getllval(tcp, &mask, 2);
+	unsigned int argn = getllval(tcp, &mask, 2);
 #ifdef HPPA
 	/* Parsic is weird.  See arch/parisc/kernel/sys_parisc32.c.  */
 	mask = (mask << 32) | (mask >> 32);

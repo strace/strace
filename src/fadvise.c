@@ -24,7 +24,7 @@ SYS_FUNC(fadvise64)
 	tprint_arg_next();
 
 	/* offset */
-	int argn = printllval(tcp, "%lld", 1);
+	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
 
 	/* len */
@@ -45,11 +45,11 @@ SYS_FUNC(fadvise64_64)
 	tprint_arg_next();
 
 	/* offset */
-	int argn = printllval(tcp, "%lld", 1);
+	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
 
 	/* len */
-	argn = printllval(tcp, "%lld", argn);
+	argn = print_arg_lld(tcp, argn);
 	tprint_arg_next();
 
 	/* advice */

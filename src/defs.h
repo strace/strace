@@ -800,9 +800,9 @@ extern int print_quoted_cstring(const char *, unsigned int);
 #  define ULONG_LONG(a, b) \
 	((unsigned long long)(unsigned)(a) | ((unsigned long long)(b)<<32))
 # endif
-extern int getllval(struct tcb *, unsigned long long *, int);
-extern int printllval(struct tcb *, const char *, int)
-	ATTRIBUTE_FORMAT((printf, 2, 0));
+extern unsigned int getllval(struct tcb *, unsigned long long *, unsigned int);
+extern unsigned int print_arg_lld(struct tcb *, unsigned int);
+extern unsigned int print_arg_llu(struct tcb *, unsigned int);
 
 extern void printaddr64(uint64_t addr);
 

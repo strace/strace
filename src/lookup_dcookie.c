@@ -14,7 +14,7 @@ SYS_FUNC(lookup_dcookie)
 		return 0;
 
 	/* cookie */
-	int argn = printllval(tcp, "%llu", 0);
+	unsigned int argn = print_arg_llu(tcp, 0);
 	tprint_arg_next();
 
 	/* buffer */

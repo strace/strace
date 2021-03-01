@@ -296,7 +296,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	{
 		/* x, x, mask (64 bit), fd, path */
 		unsigned long long mask = 0;
-		int argn = getllval(tcp, &mask, 2);
+		unsigned int argn = getllval(tcp, &mask, 2);
 		return fdmatch(tcp, tcp->u_arg[argn], set) ||
 			upathmatch(tcp, tcp->u_arg[argn + 1], set);
 	}

@@ -18,11 +18,11 @@ SYS_FUNC(sync_file_range)
 	tprint_arg_next();
 
 	/* offset */
-	int argn = printllval(tcp, "%lld", 1);
+	unsigned int argn = print_arg_lld(tcp, 1);
 	tprint_arg_next();
 
 	/* nbytes */
-	argn = printllval(tcp, "%lld", argn);
+	argn = print_arg_lld(tcp, argn);
 	tprint_arg_next();
 
 	/* flags */
