@@ -59,20 +59,30 @@ print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 
 	if (!umoven_or_printaddr(tcp, addr, umove_size, cpu)) {
-		int i = 0;
-		const char *sep = "";
+		bool printed = false;
 
-		tprints("[");
-		for (;; i++) {
+		/*
+		 * XXX: this is a bitset printed as if it was an array,
+		 * should be fixed as soon as we decide on the right way
+		 * of printing such bitsets.
+		 */
+		tprint_array_begin();
+		for (int i = 0;; i++) {
 			i = next_set_bit(cpu, i, ncpu);
 			if (i < 0)
 				break;
-			tprintf("%s%d", sep, i);
-			sep = ", ";
+			if (printed)
+				tprint_array_next();
+			else
+				printed = true;
+			PRINT_VAL_D(i);
 		}
-		if (size < len)
-			tprintf("%s...", sep);
-		tprints("]");
+		if (size < len) {
+			if (printed)
+				tprint_array_next();
+			tprint_more_data_follows();
+		}
+		tprint_array_end();
 	}
 
 	free(cpu);
@@ -80,11 +90,17 @@ print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(sched_setaffinity)
 {
+	/* pid */
 	const int pid = tcp->u_arg[0];
-	const unsigned int len = tcp->u_arg[1];
-
 	printpid(tcp, pid, PT_TGID);
-	tprintf(", %u, ", len);
+	tprint_arg_next();
+
+	/* cpusetsize */
+	const unsigned int len = tcp->u_arg[1];
+	PRINT_VAL_U(len);
+	tprint_arg_next();
+
+	/* mask */
 	print_affinitylist(tcp, tcp->u_arg[2], len);
 
 	return RVAL_DECODED;
@@ -92,13 +108,18 @@ SYS_FUNC(sched_setaffinity)
 
 SYS_FUNC(sched_getaffinity)
 {
-	const int pid = tcp->u_arg[0];
-	const unsigned int len = tcp->u_arg[1];
-
 	if (entering(tcp)) {
+		/* pid */
+		const int pid = tcp->u_arg[0];
 		printpid(tcp, pid, PT_TGID);
-		tprintf(", %u, ", len);
+		tprint_arg_next();
+
+		/* cpusetsize */
+		const unsigned int len = tcp->u_arg[1];
+		PRINT_VAL_U(len);
+		tprint_arg_next();
 	} else {
+		/* mask */
 		print_affinitylist(tcp, tcp->u_arg[2], tcp->u_rval);
 	}
 	return 0;
