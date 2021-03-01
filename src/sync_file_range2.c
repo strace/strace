@@ -13,13 +13,20 @@
 
 SYS_FUNC(sync_file_range2)
 {
-	int argn;
-
+	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(sync_file_range_flags, tcp->u_arg[1],
 		   "SYNC_FILE_RANGE_???");
-	argn = printllval(tcp, ", %lld, ", 2);
+	tprint_arg_next();
+
+	/* offset */
+	int argn = printllval(tcp, "%lld", 2);
+	tprint_arg_next();
+
+	/* nbytes */
 	printllval(tcp, "%lld", argn);
 
 	return RVAL_DECODED;
