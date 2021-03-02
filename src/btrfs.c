@@ -366,16 +366,16 @@ decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_siz
 {
 	if (entering(tcp))
 		return;
-	tprints(", ");
+	tprint_struct_next();
 	if (abbrev(tcp)) {
 		tprint_more_data_follows();
 	} else {
 		tprints_field_name("buf");
-		tprints("[");
+		tprint_array_begin();
 		uint64_t off = 0;
 		for (unsigned int i = 0; i < nr_items; ++i) {
 			if (i)
-				tprints(", ");
+				tprint_array_next();
 			struct btrfs_ioctl_search_header sh;
 			uint64_t addr = buf_addr + off;
 			if (addr < buf_addr || off + sizeof(sh) > buf_size ||
@@ -392,7 +392,7 @@ decode_search_arg_buf(struct tcb *tcp, kernel_ulong_t buf_addr, uint64_t buf_siz
 			off += sizeof(sh) + sh.len;
 
 		}
-		tprints("]");
+		tprint_array_end();
 	}
 }
 
@@ -539,7 +539,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	/* takes a signed int */
 	case BTRFS_IOC_BALANCE_CTL:
-		tprints(", ");
+		tprint_arg_next();
 		printxval(btrfs_balance_ctl_cmds, arg, "BTRFS_BALANCE_CTL_???");
 		break;
 
@@ -551,7 +551,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	/* takes a u64 */
 	case BTRFS_IOC_DEFAULT_SUBVOL: /* W */
 	case BTRFS_IOC_WAIT_SYNC: /* W */
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
 
@@ -562,7 +562,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, arg, &flags))
 			break;
@@ -574,7 +574,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_SUBVOL_SETFLAGS: { /* W */
 		uint64_t flags;
 
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, arg, &flags))
 			break;
@@ -586,7 +586,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	/* More complex types */
 	case BTRFS_IOC_BALANCE_V2: /* RW */
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			btrfs_print_balance(tcp, arg, false);
 			return 0;
 		}
@@ -601,14 +601,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
 		btrfs_print_balance(tcp, arg, true);
 		break;
 
 	case BTRFS_IOC_DEFRAG_RANGE: { /* W */
 		struct btrfs_ioctl_defrag_range_args args;
 
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
@@ -634,11 +634,12 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_dev_info_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
 			tprint_value_changed();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -657,7 +658,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		if (!IS_ARRAY_ZERO(args.uuid)) {
 			PRINT_FIELD_UUID(args, uuid);
-			tprints(", ");
+			tprint_struct_next();
 		}
 
 		PRINT_FIELD_U(args, bytes_used);
@@ -674,7 +675,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct_btrfs_ioctl_dev_replace_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -714,7 +715,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &flags))
 			break;
 
@@ -725,16 +727,16 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_SET_FEATURES: { /* W */
 		struct btrfs_ioctl_feature_flags flarg[2];
 
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, arg, &flarg))
 			break;
 
-		tprints("[");
+		tprint_array_begin();
 		btrfs_print_features(&flarg[0]);
-		tprints(", ");
+		tprint_array_next();
 		btrfs_print_features(&flarg[1]);
-		tprints("]");
+		tprint_array_end();
 		break;
 	}
 
@@ -744,22 +746,23 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &flarg))
 			break;
 
-		tprints("[");
+		tprint_array_begin();
 		btrfs_print_features(&flarg[0]);
 		tprints_comment("supported");
 
-		tprints(", ");
+		tprint_array_next();
 		btrfs_print_features(&flarg[1]);
 		tprints_comment("safe to set");
 
-		tprints(", ");
+		tprint_array_next();
 		btrfs_print_features(&flarg[2]);
 		tprints_comment("safe to clear");
-		tprints("]");
+		tprint_array_end();
 
 		break;
 	}
@@ -770,7 +773,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -792,14 +796,14 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 	case BTRFS_IOC_GET_DEV_STATS: { /* RW */
 		struct btrfs_ioctl_get_dev_stats args;
-		uint64_t i;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
 			tprint_value_changed();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -807,7 +811,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 		if (entering(tcp)) {
 			PRINT_FIELD_DEV(args, devid);
-			tprints(", ");
+			tprint_struct_next();
 		}
 
 		PRINT_FIELD_U(args, nr_items);
@@ -825,10 +829,11 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		 * go off into the middle of nowhere with a bad nr_items
 		 * value.
 		 */
-		tprints(", [");
-		for (i = 0; i < args.nr_items; i++) {
+		tprint_struct_next();
+		tprint_array_begin();
+		for (uint64_t i = 0; i < args.nr_items; ++i) {
 			if (i)
-				tprints(", ");
+				tprint_array_next();
 			if (i >= ARRAY_SIZE(args.values)) {
 				tprint_more_data_follows();
 				break;
@@ -837,9 +842,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 			tprint_array_index_begin();
 			printxval_u(btrfs_dev_stats_values, i, NULL);
 			tprint_array_index_end();
-			tprintf("%" PRI__u64, args.values[i]);
+			PRINT_VAL_U(args.values[i]);
 		}
-		tprints("]");
+		tprint_array_end();
 		tprint_struct_end();
 		break;
 	}
@@ -848,7 +853,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_ino_lookup_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -873,7 +878,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		tprint_struct_begin();
 		if (get_tcb_priv_ulong(tcp)) {
 			btrfs_print_objectid(args, treeid);
-			tprints(", ");
+			tprint_struct_next();
 		}
 
 		PRINT_FIELD_CSTRING(args, name);
@@ -885,7 +890,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_ino_path_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -916,7 +921,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_logical_ino_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -957,7 +962,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_QGROUP_ASSIGN: { /* W */
 		struct btrfs_ioctl_qgroup_assign_args args;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -974,7 +980,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_QGROUP_CREATE: { /* W */
 		struct btrfs_ioctl_qgroup_create_args args;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -992,7 +999,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -1007,7 +1015,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_QUOTA_CTL: { /* W */
 		struct btrfs_ioctl_quota_ctl_args args;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -1022,7 +1031,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_QUOTA_RESCAN: { /* W */
 		struct btrfs_ioctl_quota_rescan_args args;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -1038,7 +1048,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -1054,7 +1065,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct_btrfs_ioctl_received_subvol_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -1089,7 +1100,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_scrub_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -1125,7 +1136,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_search_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -1150,7 +1161,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_search_args_v2 args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp)) {
 			if (tcp->u_error == EOVERFLOW) {
 				tprint_value_changed();
@@ -1185,7 +1196,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_SEND: { /* W */
 		struct_btrfs_ioctl_send_args args;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -1220,7 +1232,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct btrfs_ioctl_space_args args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
@@ -1271,7 +1283,8 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 	case BTRFS_IOC_DEVICES_READY: { /* W */
 		struct btrfs_ioctl_vol_args args;
 
-		tprints(", ");
+		tprint_arg_next();
+
 		if (umove_or_printaddr(tcp, arg, &args))
 			break;
 
@@ -1288,7 +1301,7 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		struct_btrfs_ioctl_vol_args_v2 args;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else if (syserror(tcp))
 			break;
 		else
