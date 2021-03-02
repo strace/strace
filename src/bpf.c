@@ -694,10 +694,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("jited_prog_len");
 	if (saved->jited_prog_len != info.jited_prog_len) {
-		tprintf("%" PRIu32, saved->jited_prog_len);
+		PRINT_VAL_U(saved->jited_prog_len);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.jited_prog_len);
+	PRINT_VAL_U(info.jited_prog_len);
 
 	tprint_struct_next();
 	tprints_field_name("jited_prog_insns");
@@ -708,10 +708,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("xlated_prog_len");
 	if (saved->xlated_prog_len != info.xlated_prog_len) {
-		tprintf("%" PRIu32, saved->xlated_prog_len);
+		PRINT_VAL_U(saved->xlated_prog_len);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.xlated_prog_len);
+	PRINT_VAL_U(info.xlated_prog_len);
 
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_VAL(info, xlated_prog_insns,
@@ -732,10 +732,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("nr_map_ids");
 	if (saved->nr_map_ids != info.nr_map_ids) {
-		tprintf("%" PRIu32, saved->nr_map_ids);
+		PRINT_VAL_U(saved->nr_map_ids);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_map_ids);
+	PRINT_VAL_U(info.nr_map_ids);
 
 	tprint_struct_next();
 	tprints_field_name("map_ids");
@@ -774,18 +774,18 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("nr_jited_ksyms");
 	if (saved->nr_jited_ksyms != info.nr_jited_ksyms) {
-		tprintf("%" PRIu32, saved->nr_jited_ksyms);
+		PRINT_VAL_U(saved->nr_jited_ksyms);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_jited_ksyms);
+	PRINT_VAL_U(info.nr_jited_ksyms);
 
 	tprint_struct_next();
 	tprints_field_name("nr_jited_func_lens");
 	if (saved->nr_jited_func_lens != info.nr_jited_func_lens) {
-		tprintf("%" PRIu32, saved->nr_jited_func_lens);
+		PRINT_VAL_U(saved->nr_jited_func_lens);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_jited_func_lens);
+	PRINT_VAL_U(info.nr_jited_func_lens);
 
 	tprint_struct_next();
 	tprints_field_name("jited_ksyms");
@@ -819,10 +819,10 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("func_info_rec_size");
 	if (saved->func_info_rec_size != info.func_info_rec_size) {
-		tprintf("%" PRIu32, saved->func_info_rec_size);
+		PRINT_VAL_U(saved->func_info_rec_size);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.func_info_rec_size);
+	PRINT_VAL_U(info.func_info_rec_size);
 
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(info, func_info);
@@ -830,18 +830,18 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("nr_func_info");
 	if (saved->nr_func_info != info.nr_func_info) {
-		tprintf("%" PRIu32, saved->nr_func_info);
+		PRINT_VAL_U(saved->nr_func_info);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_func_info);
+	PRINT_VAL_U(info.nr_func_info);
 
 	tprint_struct_next();
 	tprints_field_name("nr_line_info");
 	if (saved->nr_line_info != info.nr_line_info) {
-		tprintf("%" PRIu32, saved->nr_line_info);
+		PRINT_VAL_U(saved->nr_line_info);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_line_info);
+	PRINT_VAL_U(info.nr_line_info);
 
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(info, line_info);
@@ -857,34 +857,34 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	tprints_field_name("nr_jited_line_info");
 	if (saved->nr_jited_line_info != info.nr_jited_line_info) {
-		tprintf("%" PRIu32, saved->nr_jited_line_info);
+		PRINT_VAL_U(saved->nr_jited_line_info);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_jited_line_info);
+	PRINT_VAL_U(info.nr_jited_line_info);
 
 	tprint_struct_next();
 	tprints_field_name("line_info_rec_size");
 	if (saved->line_info_rec_size != info.line_info_rec_size) {
-		tprintf("%" PRIu32, saved->line_info_rec_size);
+		PRINT_VAL_U(saved->line_info_rec_size);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.line_info_rec_size);
+	PRINT_VAL_U(info.line_info_rec_size);
 
 	tprint_struct_next();
 	tprints_field_name("jited_line_info_rec_size");
 	if (saved->jited_line_info_rec_size != info.jited_line_info_rec_size) {
-		tprintf("%" PRIu32, saved->jited_line_info_rec_size);
+		PRINT_VAL_U(saved->jited_line_info_rec_size);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.jited_line_info_rec_size);
+	PRINT_VAL_U(info.jited_line_info_rec_size);
 
 	tprint_struct_next();
 	tprints_field_name("nr_prog_tags");
 	if (saved->nr_prog_tags != info.nr_prog_tags) {
-		tprintf("%" PRIu32, saved->nr_prog_tags);
+		PRINT_VAL_U(saved->nr_prog_tags);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, info.nr_prog_tags);
+	PRINT_VAL_U(info.nr_prog_tags);
 
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(info, prog_tags);
@@ -995,7 +995,7 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_GET_INFO_BY_FD)
 
 		if (saved && (saved->info_len != attr.info_len)) {
 			tprint_value_changed();
-			tprintf("%u", attr.info_len);
+			PRINT_VAL_U(attr.info_len);
 		}
 
 		tprint_struct_next();
@@ -1047,10 +1047,10 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 	tprints_field_name("prog_cnt");
 	const uint32_t prog_cnt_entering = get_tcb_priv_ulong(tcp);
 	if (prog_cnt_entering != attr.prog_cnt) {
-		tprintf("%" PRIu32, prog_cnt_entering);
+		PRINT_VAL_U(prog_cnt_entering);
 		tprint_value_changed();
 	}
-	tprintf("%" PRIu32, attr.prog_cnt);
+	PRINT_VAL_U(attr.prog_cnt);
 	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED)
@@ -1120,7 +1120,7 @@ BEGIN_BPF_CMD_DECODER(BPF_TASK_FD_QUERY)
 
 	if (saved_buf_len != attr.buf_len) {
 		tprint_value_changed();
-		tprintf("%u", attr.buf_len);
+		PRINT_VAL_U(attr.buf_len);
 	}
 
 	const unsigned int buf_len = MIN(saved_buf_len, attr.buf_len);
@@ -1340,10 +1340,12 @@ SYS_FUNC(bpf)
 	int rc = RVAL_DECODED;
 
 	if (entering(tcp)) {
+		/* cmd */
 		printxval(bpf_commands, cmd, "BPF_???");
-		tprints(", ");
+		tprint_arg_next();
 	}
 
+	/* attr */
 	if (size > 0
 	    && size <= get_pagesize()
 	    && cmd < ARRAY_SIZE(bpf_cmd_decoders)
@@ -1359,8 +1361,11 @@ SYS_FUNC(bpf)
 		printaddr(addr);
 	}
 
-	if (exiting(tcp) || (rc & RVAL_DECODED))
-		tprintf(", %u", size);
+	if (exiting(tcp) || (rc & RVAL_DECODED)) {
+		/* size */
+		tprint_arg_next();
+		PRINT_VAL_U(size);
+	}
 
 	return rc;
 }
