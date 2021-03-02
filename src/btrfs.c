@@ -834,9 +834,10 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 				break;
 			}
 
-			tprints("[");
+			tprint_array_index_begin();
 			printxval_u(btrfs_dev_stats_values, i, NULL);
-			tprintf("] = %" PRI__u64, args.values[i]);
+			tprint_array_index_end();
+			tprintf("%" PRI__u64, args.values[i]);
 		}
 		tprints("]");
 		tprint_struct_end();

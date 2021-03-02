@@ -50,6 +50,18 @@ tprint_array_end(void)
 }
 
 static inline void
+tprint_array_index_begin(void)
+{
+	tprints("[");
+}
+
+static inline void
+tprint_array_index_end(void)
+{
+	tprints("] = ");
+}
+
+static inline void
 tprint_arg_begin(void)
 {
 	tprints("(");
@@ -135,6 +147,18 @@ static inline void
 tprint_array_end(void)
 {
 	fputs("]", stdout);
+}
+
+static inline void
+tprint_array_index_begin(void)
+{
+	fputs("[", stdout);
+}
+
+static inline void
+tprint_array_index_end(void)
+{
+	fputs("] = ", stdout);
 }
 
 static inline void

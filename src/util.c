@@ -1489,7 +1489,7 @@ print_array_ex(struct tcb *const tcp,
 		}
 
 		if (flags & PAF_PRINT_INDICES) {
-			tprints("[");
+			tprint_array_index_begin();
 
 			if (!index_xlat) {
 				print_xlat_ex(idx, NULL, xlat_style);
@@ -1498,7 +1498,7 @@ print_array_ex(struct tcb *const tcp,
 					     index_dflt, xlat_style);
 			}
 
-			tprints("] = ");
+			tprint_array_index_end();
 		}
 
 		if (!print_func(tcp, elem_buf, elem_size, opaque_data)) {
