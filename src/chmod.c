@@ -10,8 +10,11 @@
 static void
 decode_chmod(struct tcb *tcp, const int offset)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[offset]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* mode */
 	print_numeric_umode_t(tcp->u_arg[offset + 1]);
 }
 
@@ -24,8 +27,10 @@ SYS_FUNC(chmod)
 
 SYS_FUNC(fchmodat)
 {
+	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
 	decode_chmod(tcp, 1);
 
 	return RVAL_DECODED;
@@ -33,8 +38,11 @@ SYS_FUNC(fchmodat)
 
 SYS_FUNC(fchmod)
 {
+	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* mode */
 	print_numeric_umode_t(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
