@@ -11,20 +11,27 @@ SYS_FUNC(copy_file_range)
 {
 	/* int fd_in */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* loff_t *off_in */
 	printnum_int64(tcp, tcp->u_arg[1], "%" PRId64);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* int fd_out */
 	printfd(tcp, tcp->u_arg[2]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* loff_t *off_out */
 	printnum_int64(tcp, tcp->u_arg[3], "%" PRId64);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* size_t len */
-	tprintf("%" PRI_klu ", ", tcp->u_arg[4]);
+	PRINT_VAL_U(tcp->u_arg[4]);
+	tprint_arg_next();
+
 	/* unsigned int flags */
-	tprintf("%u", (unsigned int) tcp->u_arg[5]);
+	unsigned int flags = tcp->u_arg[5];
+	PRINT_VAL_U(flags);
 
 	return RVAL_DECODED;
 }
