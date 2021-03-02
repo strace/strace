@@ -134,8 +134,9 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 #if VERBOSE
 # define print_extra_data(addr_, offs_, size_) \
 	do { \
-		printf("/* bytes %u..%u */ ", (offs_), (size_) + (offs_) - 1); \
+		printf("extra_data="); \
 		print_quoted_hex((addr_) + (offs_), (size_)); \
+		printf(" /* bytes %u..%u */", (offs_), (size_) + (offs_) - 1); \
 	} while (0)
 #else
 # define print_extra_data(addr_, offs_, size_) printf("...")
