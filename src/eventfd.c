@@ -13,9 +13,13 @@
 static int
 do_eventfd(struct tcb *tcp, int flags_arg)
 {
-	tprintf("%u", (unsigned int) tcp->u_arg[0]);
+	/* initval */
+	unsigned int initval = tcp->u_arg[0];
+	PRINT_VAL_U(initval);
+
 	if (flags_arg >= 0) {
-		tprints(", ");
+		/* flags */
+		tprint_arg_next();
 		printflags(efd_flags, tcp->u_arg[flags_arg], "EFD_???");
 	}
 
