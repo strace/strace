@@ -14,7 +14,9 @@
 
 SYS_FUNC(epoll_create)
 {
-	tprintf("%d", (int) tcp->u_arg[0]);
+	/* size */
+	int size = tcp->u_arg[0];
+	PRINT_VAL_D(size);
 
 	return RVAL_DECODED | RVAL_FD;
 }
@@ -23,6 +25,7 @@ SYS_FUNC(epoll_create)
 
 SYS_FUNC(epoll_create1)
 {
+	/* flags */
 	printflags(epollflags, tcp->u_arg[0], "EPOLL_???");
 
 	return RVAL_DECODED | RVAL_FD;
@@ -62,13 +65,20 @@ print_epoll_event(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 
 SYS_FUNC(epoll_ctl)
 {
+	/* epfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* op */
 	const unsigned int op = tcp->u_arg[1];
 	printxval(epollctls, op, "EPOLL_CTL_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* fd */
 	printfd(tcp, tcp->u_arg[2]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* event */
 	struct epoll_event ev;
 	if (EPOLL_CTL_DEL == op)
 		printaddr(tcp->u_arg[3]);
@@ -82,15 +92,22 @@ static void
 epoll_wait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
 	if (entering(tcp)) {
+		/* epfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* events */
 		struct epoll_event ev;
 		print_array(tcp, tcp->u_arg[1], tcp->u_rval, &ev, sizeof(ev),
 			    tfetch_mem, print_epoll_event, 0);
-		tprints(", ");
-		tprintf("%d", (int) tcp->u_arg[2]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* maxevents */
+		int maxevents = tcp->u_arg[2];
+		PRINT_VAL_D(maxevents);
+		tprint_arg_next();
+
+		/* timeout */
 		print_timeout(tcp, tcp->u_arg[3]);
 	}
 }
@@ -98,7 +115,8 @@ epoll_wait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 static int
 print_timeout_int(struct tcb *tcp, kernel_ulong_t arg)
 {
-	tprintf("%d", (int) arg);
+	int timeout = arg;
+	PRINT_VAL_D(timeout);
 	return 0;
 }
 
@@ -113,10 +131,14 @@ epoll_pwait_common(struct tcb *tcp, const print_obj_by_addr_fn print_timeout)
 {
 	epoll_wait_common(tcp, print_timeout);
 	if (exiting(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
+		/* sigmask */
 		/* NB: kernel requires arg[5] == NSIG_BYTES */
 		print_sigset_addr_len(tcp, tcp->u_arg[4], tcp->u_arg[5]);
-		tprintf(", %" PRI_klu, tcp->u_arg[5]);
+		tprint_arg_next();
+
+		/* sigsetsize */
+		PRINT_VAL_U(tcp->u_arg[5]);
 	}
 	return 0;
 }
