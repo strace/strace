@@ -22,42 +22,45 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 		return;
 	}
 
-	const char *const start_sep = "[";
-	const char *sep = start_sep;
 	const unsigned int wordsize = current_wordsize;
-	unsigned int n;
+	kernel_ulong_t prev_addr = 0;
+	unsigned int n = 0;
 
-	for (n = 0; addr; sep = ", ", addr += wordsize, ++n) {
+	for (;; prev_addr = addr, addr += wordsize, ++n) {
 		union {
-			unsigned int p32;
-			kernel_ulong_t p64;
+			unsigned int w32;
+			kernel_ulong_t wl;
 			char data[sizeof(kernel_ulong_t)];
 		} cp;
 
-		if (umoven(tcp, addr, wordsize, cp.data)) {
-			if (sep == start_sep)
+		if (addr < prev_addr || umoven(tcp, addr, wordsize, cp.data)) {
+			if (n == 0) {
 				printaddr(addr);
-			else {
-				tprints(", ");
-				tprint_more_data_follows();
-				printaddr_comment(addr);
-				tprints("]");
+				return;
 			}
-			return;
-		}
-		if (!(wordsize < sizeof(cp.p64) ? cp.p32 : cp.p64)) {
-			if (sep == start_sep)
-				tprints(start_sep);
+			tprints(", ");
+			tprint_more_data_follows();
+			printaddr_comment(addr);
 			break;
 		}
+
+		const kernel_ulong_t word = (wordsize == sizeof(cp.w32))
+					    ? (kernel_ulong_t) cp.w32 : cp.wl;
+		if (n == 0)
+			tprints("[");
+		if (word == 0)
+			break;
+		if (n != 0)
+			tprints(", ");
+
 		if (abbrev(tcp) && n >= max_strlen) {
-			tprints(sep);
 			tprint_more_data_follows();
 			break;
 		}
-		tprints(sep);
-		printstr(tcp, wordsize < sizeof(cp.p64) ? cp.p32 : cp.p64);
+
+		printstr(tcp, word);
 	}
+
 	tprints("]");
 }
 
@@ -69,24 +72,25 @@ printargc(struct tcb *const tcp, kernel_ulong_t addr)
 	if (!addr || !verbose(tcp))
 		return;
 
-	bool unterminated = false;
-	unsigned int count = 0;
-	char *cp = NULL;
+	const unsigned int wordsize = current_wordsize;
+	kernel_ulong_t prev_addr = 0;
+	unsigned int n;
 
-	for (; addr; addr += current_wordsize, ++count) {
-		if (umoven(tcp, addr, current_wordsize, &cp)) {
-			if (!count)
+	for (n = 0; addr > prev_addr; prev_addr = addr, addr += wordsize, ++n) {
+		kernel_ulong_t word = 0;
+		if (umoven(tcp, addr, wordsize, &word)) {
+			if (n == 0)
 				return;
 
-			unterminated = true;
+			addr = 0;
 			break;
 		}
-		if (!cp)
+		if (word == 0)
 			break;
 	}
 	tprintf_comment("%u var%s%s",
-		count, count == 1 ? "" : "s",
-		unterminated ? ", unterminated" : "");
+			n, n == 1 ? "" : "s",
+			addr < prev_addr ? ", unterminated" : "");
 }
 
 static void
