@@ -38,7 +38,7 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 				printaddr(addr);
 				return;
 			}
-			tprints(", ");
+			tprint_array_next();
 			tprint_more_data_follows();
 			printaddr_comment(addr);
 			break;
@@ -47,11 +47,11 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 		const kernel_ulong_t word = (wordsize == sizeof(cp.w32))
 					    ? (kernel_ulong_t) cp.w32 : cp.wl;
 		if (n == 0)
-			tprints("[");
+			tprint_array_begin();
 		if (word == 0)
 			break;
 		if (n != 0)
-			tprints(", ");
+			tprint_array_next();
 
 		if (abbrev(tcp) && n >= max_strlen) {
 			tprint_more_data_follows();
@@ -61,7 +61,7 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 		printstr(tcp, word);
 	}
 
-	tprints("]");
+	tprint_array_end();
 }
 
 static void
@@ -96,12 +96,15 @@ printargc(struct tcb *const tcp, kernel_ulong_t addr)
 static void
 decode_execve(struct tcb *tcp, const unsigned int index)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[index + 0]);
-	tprints(", ");
+	tprint_arg_next();
 
+	/* argv */
 	printargv(tcp, tcp->u_arg[index + 1]);
-	tprints(", ");
+	tprint_arg_next();
 
+	/* envp */
 	(abbrev(tcp) ? printargc : printargv) (tcp, tcp->u_arg[index + 2]);
 }
 
@@ -114,10 +117,15 @@ SYS_FUNC(execve)
 
 SYS_FUNC(execveat)
 {
+	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* pathname, argv, envp */
 	decode_execve(tcp, 1);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(at_flags, tcp->u_arg[4], "AT_???");
 
 	return RVAL_DECODED;
@@ -126,8 +134,11 @@ SYS_FUNC(execveat)
 #if defined(SPARC) || defined(SPARC64)
 SYS_FUNC(execv)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* argv */
 	printargv(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
