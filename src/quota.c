@@ -108,7 +108,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		break;
 	case Q_GETQUOTA:
 		if (entering(tcp)) {
-			printuid(", ", id);
+			tprints(", ");
+			printuid(id);
 			tprints(", ");
 
 			return 0;
@@ -120,7 +121,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		struct if_dqblk dq;
 
 		if (entering(tcp)) {
-			printuid(", ", id);
+			tprints(", ");
+			printuid(id);
 			tprints(", ");
 		}
 
@@ -158,7 +160,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		struct if_nextdqblk dq;
 
 		if (entering(tcp)) {
-			printuid(", ", id);
+			tprints(", ");
+			printuid(id);
 			tprints(", ");
 
 			return 0;
@@ -200,7 +203,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	case Q_XGETQUOTA:
 	case Q_XGETNEXTQUOTA:
 		if (entering(tcp)) {
-			printuid(", ", id);
+			tprints(", ");
+			printuid(id);
 			tprints(", ");
 
 			return 0;
@@ -212,7 +216,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		fs_disk_quota_t dq;
 
 		if (entering(tcp)) {
-			printuid(", ", id);
+			tprints(", ");
+			printuid(id);
 			tprints(", ");
 		}
 
@@ -426,7 +431,8 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		break;
 	}
 	default:
-		printuid(", ", id);
+		tprints(", ");
+		printuid(id);
 		tprints(", ");
 		printaddr(data);
 		break;

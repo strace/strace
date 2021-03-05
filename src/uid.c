@@ -56,27 +56,28 @@ SYS_FUNC(getuid)
 
 SYS_FUNC(setfsuid)
 {
-	printuid("", tcp->u_arg[0]);
+	/* fsuid */
+	printuid(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(setuid)
 {
-	printuid("", tcp->u_arg[0]);
+	/* uid */
+	printuid(tcp->u_arg[0]);
 
 	return RVAL_DECODED;
 }
 
 static void
-get_print_uid(struct tcb *const tcp, const char *const prefix,
-	      const kernel_ulong_t addr)
+get_print_uid(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	uid_t uid;
 
-	tprints(prefix);
 	if (!umove_or_printaddr(tcp, addr, &uid)) {
-		printuid("[", uid);
+		tprints("[");
+		printuid(uid);
 		tprints("]");
 	}
 }
@@ -86,61 +87,93 @@ SYS_FUNC(getresuid)
 	if (entering(tcp))
 		return 0;
 
-	get_print_uid(tcp, "", tcp->u_arg[0]);
-	get_print_uid(tcp, ", ", tcp->u_arg[1]);
-	get_print_uid(tcp, ", ", tcp->u_arg[2]);
+	/* ruid */
+	get_print_uid(tcp, tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* euid */
+	get_print_uid(tcp, tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* suid */
+	get_print_uid(tcp, tcp->u_arg[2]);
 
 	return 0;
 }
 
 SYS_FUNC(setreuid)
 {
-	printuid("", tcp->u_arg[0]);
-	printuid(", ", tcp->u_arg[1]);
+	/* ruid */
+	printuid(tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* euid */
+	printuid(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(setresuid)
 {
-	printuid("", tcp->u_arg[0]);
-	printuid(", ", tcp->u_arg[1]);
-	printuid(", ", tcp->u_arg[2]);
+	/* ruid */
+	printuid(tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* euid */
+	printuid(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* suid */
+	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(chown)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	printuid(", ", tcp->u_arg[1]);
-	printuid(", ", tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* owner */
+	printuid(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* group */
+	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(fchown)
 {
+	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	printuid(", ", tcp->u_arg[1]);
-	printuid(", ", tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* owner */
+	printuid(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* group */
+	printuid(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
 
 void
-printuid(const char *text, const unsigned int uid)
+printuid(const unsigned int uid)
 {
 	if ((uid_t) -1U == (uid_t) uid)
-		tprintf("%s-1", text);
+		PRINT_VAL_D(-1);
 	else
-		tprintf("%s%u", text, (uid_t) uid);
+		PRINT_VAL_U((uid_t) uid);
 }
 
 static bool
 print_gid(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
-	printuid("", (*(uid_t *) elem_buf));
+	printuid((*(uid_t *) elem_buf));
 
 	return true;
 }
@@ -165,19 +198,27 @@ print_groups(struct tcb *const tcp, const unsigned int len,
 
 SYS_FUNC(setgroups)
 {
+	/* size */
 	const int len = tcp->u_arg[0];
+	PRINT_VAL_D(len);
+	tprint_arg_next();
 
-	tprintf("%d, ", len);
+	/* list */
 	print_groups(tcp, len, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(getgroups)
 {
-	if (entering(tcp))
-		tprintf("%d, ", (int) tcp->u_arg[0]);
-	else
+	if (entering(tcp)) {
+		/* size */
+		int size = tcp->u_arg[0];
+		PRINT_VAL_D(size);
+		tprint_arg_next();
+	} else {
+		/* list */
 		print_groups(tcp, tcp->u_rval, tcp->u_arg[1]);
+	}
 	return 0;
 }
 

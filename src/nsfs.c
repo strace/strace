@@ -30,7 +30,8 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 			return 0;
 		tprints(", ");
 		if (!umove_or_printaddr(tcp, arg, &uid)) {
-			printuid("[", uid);
+			tprints("[");
+			printuid(uid);
 			tprints("]");
 		}
 		return RVAL_IOCTL_DECODED;

@@ -225,7 +225,9 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 		case TEE_IOCTL_LOGIN_GROUP:
 		case TEE_IOCTL_LOGIN_GROUP_APPLICATION:
 			memcpy(&gid, open_session.clnt_uuid, sizeof(gid));
-			printuid(", clnt_uuid=", gid);
+			tprint_struct_next();
+			tprints_field_name("clnt_uuid");
+			printuid(gid);
 			break;
 		default:
 			tprint_struct_next();

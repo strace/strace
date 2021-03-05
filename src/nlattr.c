@@ -233,7 +233,7 @@ decode_nla_uid(struct tcb *const tcp,
 	if (len < sizeof(uid))
 		return false;
 	else if (!umove_or_printaddr(tcp, addr, &uid))
-		printuid("", uid);
+		printuid(uid);
 
 	return true;
 }

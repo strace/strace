@@ -1169,7 +1169,7 @@ extern void print_dirfd(struct tcb *, int);
 extern int
 decode_sockaddr(struct tcb *, kernel_ulong_t addr, int addrlen);
 
-extern void printuid(const char *, const unsigned int);
+extern void printuid(const unsigned int);
 
 extern void
 print_sigset_addr_len(struct tcb *, kernel_ulong_t addr, kernel_ulong_t len);
