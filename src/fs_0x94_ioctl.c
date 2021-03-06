@@ -14,7 +14,6 @@ decode_file_clone_range(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct file_clone_range range;
 
-	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &range)) {
 		tprint_struct_begin();
 		PRINT_FIELD_FD(range, src_fd, tcp);
@@ -69,7 +68,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 	bool rc;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -86,7 +85,7 @@ decode_file_dedupe_range(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(range, src_length);
 		tprint_struct_next();
 		PRINT_FIELD_U(range, dest_count);
-		tprints(", ");
+		tprint_struct_next();
 	}
 
 	tprints_field_name("info");
@@ -113,7 +112,6 @@ decode_fslabel(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	char label[FSLABEL_MAX];
 
-	tprints(", ");
 	if (!umove_or_printaddr(tcp, arg, &label))
 		print_quoted_cstring(label, sizeof(label));
 }
@@ -124,10 +122,12 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case FICLONE:	/* W */
-		tprintf(", %d", (int) arg);
+		tprint_arg_next();
+		PRINT_VAL_D((int) arg);
 		break;
 
 	case FICLONERANGE:	/* W */
+		tprint_arg_next();
 		decode_file_clone_range(tcp, arg);
 		break;
 
@@ -140,6 +140,7 @@ fs_0x94_ioctl(struct tcb *const tcp, const unsigned int code,
 		ATTRIBUTE_FALLTHROUGH;
 
 	case FS_IOC_SETFSLABEL:	/* W */
+		tprint_arg_next();
 		decode_fslabel(tcp, arg);
 		break;
 
