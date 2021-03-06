@@ -92,52 +92,54 @@ print_fcntl(struct tcb *tcp)
 
 	switch (cmd) {
 	case F_SETFD:
-		tprints(", ");
+		tprint_arg_next();
 		printflags(fdflags, tcp->u_arg[2], "FD_???");
 		break;
 	case F_SETOWN:
-		tprints(", ");
+		tprint_arg_next();
 		printpid_tgid_pgid(tcp, tcp->u_arg[2]);
 		break;
 	case F_SETPIPE_SZ:
-		tprintf(", %" PRI_kld, tcp->u_arg[2]);
+		tprint_arg_next();
+		PRINT_VAL_D(tcp->u_arg[2]);
 		break;
 	case F_DUPFD:
 	case F_DUPFD_CLOEXEC:
-		tprintf(", %" PRI_kld, tcp->u_arg[2]);
+		tprint_arg_next();
+		PRINT_VAL_D(tcp->u_arg[2]);
 		return RVAL_DECODED | RVAL_FD;
 	case F_SETFL:
-		tprints(", ");
+		tprint_arg_next();
 		tprint_open_modes(tcp->u_arg[2]);
 		break;
 	case F_SETLK:
 	case F_SETLKW:
-		tprints(", ");
+		tprint_arg_next();
 		printflock(tcp, tcp->u_arg[2], 0);
 		break;
 	case F_OFD_SETLK:
 	case F_OFD_SETLKW:
-		tprints(", ");
+		tprint_arg_next();
 		printflock64(tcp, tcp->u_arg[2], 0);
 		break;
 	case F_SETOWN_EX:
-		tprints(", ");
+		tprint_arg_next();
 		print_f_owner_ex(tcp, tcp->u_arg[2]);
 		break;
 	case F_NOTIFY:
-		tprints(", ");
+		tprint_arg_next();
 		printflags64(notifyflags, tcp->u_arg[2], "DN_???");
 		break;
 	case F_SETLEASE:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(lockfcmds, tcp->u_arg[2], "F_???");
 		break;
 	case F_ADD_SEALS:
-		tprints(", ");
+		tprint_arg_next();
 		printflags64(f_seals, tcp->u_arg[2], "F_SEAL_???");
 		break;
 	case F_SETSIG:
-		tprints(", ");
+		tprint_arg_next();
 		printsignal(tcp->u_arg[2]);
 		break;
 	case F_GETOWN:
@@ -159,19 +161,19 @@ print_fcntl(struct tcb *tcp)
 	case F_GETLK:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		printflock(tcp, tcp->u_arg[2], 1);
 		break;
 	case F_OFD_GETLK:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		printflock64(tcp, tcp->u_arg[2], 1);
 		break;
 	case F_GETOWN_EX:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		print_f_owner_ex(tcp, tcp->u_arg[2]);
 		break;
 	case F_GETLEASE:
@@ -191,7 +193,8 @@ print_fcntl(struct tcb *tcp)
 		tcp->auxstr = signame(tcp->u_rval);
 		return RVAL_STR;
 	default:
-		tprintf(", %#" PRI_klx, tcp->u_arg[2]);
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[2]);
 		break;
 	}
 	return RVAL_DECODED;
@@ -200,8 +203,11 @@ print_fcntl(struct tcb *tcp)
 SYS_FUNC(fcntl)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* cmd */
 		printxval(fcntlcmds, tcp->u_arg[1], "F_???");
 	}
 	return print_fcntl(tcp);
@@ -211,19 +217,22 @@ SYS_FUNC(fcntl64)
 {
 	const unsigned int cmd = tcp->u_arg[1];
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* cmd */
 		printxval(fcntlcmds, cmd, "F_???");
 	}
 	switch (cmd) {
 		case F_SETLK64:
 		case F_SETLKW64:
-			tprints(", ");
+			tprint_arg_next();
 			printflock64(tcp, tcp->u_arg[2], 0);
 			return RVAL_DECODED;
 		case F_GETLK64:
 			if (exiting(tcp)) {
-				tprints(", ");
+				tprint_arg_next();
 				printflock64(tcp, tcp->u_arg[2], 1);
 			}
 			return 0;
