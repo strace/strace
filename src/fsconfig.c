@@ -18,10 +18,10 @@ SYS_FUNC(fsconfig)
 	const int aux = tcp->u_arg[4];
 
 	printfd(tcp, fs_fd);
-	tprints(", ");
+	tprint_arg_next();
 
 	printxval(fsconfig_cmds, cmd, "FSCONFIG_???");
-	tprints(", ");
+	tprint_arg_next();
 
 	switch (cmd) {
 		case FSCONFIG_SET_FLAG:
@@ -38,7 +38,7 @@ SYS_FUNC(fsconfig)
 			printaddr(key);
 			break;
 	}
-	tprints(", ");
+	tprint_arg_next();
 
 	switch (cmd) {
 		case FSCONFIG_SET_STRING:
@@ -62,7 +62,7 @@ SYS_FUNC(fsconfig)
 			printaddr(value);
 			break;
 	}
-	tprints(", ");
+	tprint_arg_next();
 
 	switch (cmd) {
 		case FSCONFIG_SET_PATH:
@@ -78,7 +78,7 @@ SYS_FUNC(fsconfig)
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
 		default:
-			tprintf("%d", aux);
+			PRINT_VAL_D(aux);
 			break;
 	}
 
