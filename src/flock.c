@@ -16,8 +16,11 @@
 
 SYS_FUNC(flock)
 {
+	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* operation */
 	printflags(flockcmds, tcp->u_arg[1], "LOCK_???");
 
 	return RVAL_DECODED;
