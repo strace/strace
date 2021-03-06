@@ -10,9 +10,11 @@
 SYS_FUNC(fstatfs)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* buf */
 		print_struct_statfs(tcp, tcp->u_arg[1]);
 	}
 	return 0;
