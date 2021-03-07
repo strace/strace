@@ -17,7 +17,7 @@ print_gpiochip_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp))
 		return 0;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &info))
 		return RVAL_IOCTL_DECODED;
 
@@ -40,7 +40,7 @@ print_gpioline_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct gpioline_info info;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -73,7 +73,7 @@ print_gpioline_info_unwatch(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct { uint32_t offset; } data;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &data)) {
 		tprint_struct_begin();
 		PRINT_FIELD_U(data, offset);
@@ -91,7 +91,7 @@ print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct gpiohandle_request hr;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -133,7 +133,7 @@ print_gpioevent_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct gpioevent_request er;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -181,7 +181,7 @@ print_gpiohandle_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 		return 0;
 
 	/* exiting */
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &vals))
 		print_gpiohandle_data(tcp, &vals);
 
@@ -193,7 +193,7 @@ print_gpiohandle_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct gpiohandle_data vals;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &vals))
 		print_gpiohandle_data(tcp, &vals);
 
@@ -205,7 +205,7 @@ print_gpiohandle_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct gpiohandle_config hc;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &hc))
 		return RVAL_IOCTL_DECODED;
 
@@ -236,7 +236,7 @@ print_gpio_v2_line_attribute_raw(const struct gpio_v2_line_attribute *attr,
 	}
 	tprint_struct_next();
 	tprints_field_name("data");
-	tprintf("%#" PRIx64, (uint64_t) attr->values);
+	PRINT_VAL_X(attr->values);
 	if (as_field)
 		tprint_struct_end();
 }
@@ -325,7 +325,7 @@ print_gpio_v2_line_info(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct gpio_v2_line_info li;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -370,7 +370,7 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct gpio_v2_line_request lr;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -415,7 +415,7 @@ print_gpio_v2_line_get_values(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct gpio_v2_line_values vals;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -444,7 +444,7 @@ print_gpio_v2_line_set_values(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct gpio_v2_line_values vals;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &vals)) {
 		tprint_struct_begin();
 		PRINT_FIELD_X(vals, bits);
@@ -461,7 +461,7 @@ print_gpio_v2_line_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct gpio_v2_line_config lc;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &lc))
 		print_gpio_v2_line_config(tcp, &lc);
 
