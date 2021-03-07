@@ -19,6 +19,22 @@ typedef struct {
 	int handle_type;
 } file_handle_header;
 
+static void
+print_f_handle(struct tcb *tcp, kernel_ulong_t addr, unsigned int handle_bytes)
+{
+	unsigned int len = MIN(handle_bytes, MAX_HANDLE_SZ);
+	char f_handle[MAX_HANDLE_SZ];
+	addr += sizeof(file_handle_header);
+	if (addr > sizeof(file_handle_header) &&
+	    !umoven(tcp, addr, len, f_handle)) {
+		print_quoted_string(f_handle, len, QUOTE_FORCE_HEX);
+		if (handle_bytes > len)
+			tprint_more_data_follows();
+	} else {
+		tprint_unavailable();
+	}
+}
+
 SYS_FUNC(name_to_handle_at)
 {
 	file_handle_header h;
@@ -54,29 +70,19 @@ SYS_FUNC(name_to_handle_at)
 
 		return 0;
 	} else {
-		unsigned int i = get_tcb_priv_ulong(tcp);
-
 		if ((!syserror(tcp) || EOVERFLOW == tcp->u_error)
 		    && !umove(tcp, addr, &h)) {
-			unsigned char f_handle[MAX_HANDLE_SZ];
 
-			if (i != h.handle_bytes) {
+			if (h.handle_bytes != get_tcb_priv_ulong(tcp)) {
 				tprint_value_changed();
 				tprintf("%u", h.handle_bytes);
 			}
 			if (!syserror(tcp)) {
 				tprint_struct_next();
 				PRINT_FIELD_D(h, handle_type);
-				if (h.handle_bytes > MAX_HANDLE_SZ)
-					h.handle_bytes = MAX_HANDLE_SZ;
-				if (!umoven(tcp, addr + sizeof(h), h.handle_bytes,
-					    f_handle)) {
-					tprint_struct_next();
-					tprints_field_name("f_handle");
-					tprints("0x");
-					for (i = 0; i < h.handle_bytes; ++i)
-						tprintf("%02x", f_handle[i]);
-				}
+				tprint_struct_next();
+				tprints_field_name("f_handle");
+				print_f_handle(tcp, addr, h.handle_bytes);
 			}
 		}
 		tprint_struct_end();
@@ -103,23 +109,13 @@ SYS_FUNC(open_by_handle_at)
 
 	/* handle */
 	if (!umove_or_printaddr(tcp, addr, &h)) {
-		unsigned char f_handle[MAX_HANDLE_SZ];
-
 		tprint_struct_begin();
 		PRINT_FIELD_U(h, handle_bytes);
 		tprint_struct_next();
 		PRINT_FIELD_D(h, handle_type);
-		if (h.handle_bytes > MAX_HANDLE_SZ)
-			h.handle_bytes = MAX_HANDLE_SZ;
-		if (!umoven(tcp, addr + sizeof(h), h.handle_bytes, &f_handle)) {
-			unsigned int i;
-
-			tprint_struct_next();
-			tprints_field_name("f_handle");
-			tprints("0x");
-			for (i = 0; i < h.handle_bytes; ++i)
-				tprintf("%02x", f_handle[i]);
-		}
+		tprint_struct_next();
+		tprints_field_name("f_handle");
+		print_f_handle(tcp, addr, h.handle_bytes);
 		tprint_struct_end();
 	}
 	tprints(", ");

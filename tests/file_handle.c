@@ -42,14 +42,10 @@ struct file_handle {
 void
 print_handle_data(unsigned char *bytes, unsigned int size)
 {
-	unsigned int i;
-
-	if (size > MAX_HANDLE_SZ)
-		size = MAX_HANDLE_SZ;
-
-	printf("0x");
-	for (i = 0; i < size; ++i)
-		printf("%02x", bytes[i]);
+	unsigned int len = MIN(size, MAX_HANDLE_SZ);
+	print_quoted_hex(bytes, len);
+	if (size > len)
+		printf("...");
 }
 
 void
@@ -111,11 +107,13 @@ do_open_by_handle_at(kernel_ulong_t mount_fd,
 		printf("{handle_bytes=%u, handle_type=%d", fh->handle_bytes,
 		       fh->handle_type);
 
+		printf(", f_handle=");
 		if (valid_data) {
-			printf(", f_handle=");
 			print_handle_data((unsigned char *) fh +
 					  sizeof(struct file_handle),
 					  fh->handle_bytes);
+		} else {
+			printf("???");
 		}
 
 		printf("}");
@@ -275,16 +273,14 @@ main(void)
 	assert(syscall(__NR_name_to_handle_at, fdcwd, ".", handle, &mount_id,
 		flags) == 0);
 	printf("name_to_handle_at(AT_FDCWD, \".\", {handle_bytes=%u"
-	       ", handle_type=%d, f_handle=0x",
+	       ", handle_type=%d, f_handle=",
 	       handle->handle_bytes, handle->handle_type);
-	for (i = 0; i < handle->handle_bytes; ++i)
-		printf("%02x", handle->f_handle[i]);
+	print_handle_data(handle->f_handle, handle->handle_bytes);
 	printf("}, [%d], AT_SYMLINK_FOLLOW) = 0\n", mount_id);
 
 	printf("open_by_handle_at(-1, {handle_bytes=%u, handle_type=%d"
-	       ", f_handle=0x", handle->handle_bytes, handle->handle_type);
-	for (i = 0; i < handle->handle_bytes; ++i)
-		printf("%02x", handle->f_handle[i]);
+	       ", f_handle=", handle->handle_bytes, handle->handle_type);
+	print_handle_data(handle->f_handle, handle->handle_bytes);
 	int rc = syscall(__NR_open_by_handle_at, -1, handle,
 		O_RDONLY | O_DIRECTORY);
 	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
