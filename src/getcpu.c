@@ -10,10 +10,15 @@
 SYS_FUNC(getcpu)
 {
 	if (exiting(tcp)) {
+		/* cpu */
 		printnum_int(tcp, tcp->u_arg[0], "%u");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* node */
 		printnum_int(tcp, tcp->u_arg[1], "%u");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* tcache */
 		printaddr(tcp->u_arg[2]);
 	}
 	return 0;
