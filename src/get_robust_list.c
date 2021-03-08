@@ -11,11 +11,15 @@
 SYS_FUNC(get_robust_list)
 {
 	if (entering(tcp)) {
+		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TID);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* head_ptr */
 		printnum_ptr(tcp, tcp->u_arg[1]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* len_ptr */
 		printnum_ulong(tcp, tcp->u_arg[2]);
 	}
 	return 0;
