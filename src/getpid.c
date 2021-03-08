@@ -38,8 +38,11 @@ SYS_FUNC(getsid)
 
 SYS_FUNC(setpgid)
 {
+	/* pid */
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* pgid */
 	printpid(tcp, tcp->u_arg[1], PT_PGID);
 
 	return RVAL_DECODED;
