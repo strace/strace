@@ -23,7 +23,7 @@ static int
 print_hdio_getgeo(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 
 		return 0;
 	}
@@ -52,11 +52,10 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	enum { SECTOR_SIZE = 512 };
 
-	struct hd_drive_cmd_hdr c;
-
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 
+		struct hd_drive_cmd_hdr c;
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -75,17 +74,27 @@ print_hdio_drive_cmd(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	/* exiting */
+	struct {
+		uint8_t status;
+		uint8_t error;
+		uint8_t nsector;
+		uint8_t sector_count;
+	} c;
+
 	if ((syserror(tcp) && tcp->u_error != EIO) || umove(tcp, arg, &c))
 		return RVAL_IOCTL_DECODED;
 
 	tprint_value_changed();
 	tprint_struct_begin();
-
-	tprintf("/* status */ %#x, /* error */ %u, /* nsector */ %u",
-		c.command, c.sector_number, c.feature);
+	PRINT_FIELD_X(c, status);
+	tprint_struct_next();
+	PRINT_FIELD_U(c, error);
+	tprint_struct_next();
+	PRINT_FIELD_U(c, nsector);
 
 	if (c.sector_count) {
-		tprints(", ");
+		tprint_struct_next();
+		tprints_field_name("buf");
 		printstr_ex(tcp, arg + 4, c.sector_count * SECTOR_SIZE,
 			    QUOTE_FORCE_HEX);
 	}

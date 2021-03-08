@@ -192,10 +192,9 @@ main(int argc, char *argv[])
 		       XLAT_STR(HDIO_DRIVE_CMD),
 		       XLAT_SEL(0xca, "ATA_CMD_WRITE"), i);
 		if (rc >= 0) {
-			printf("} => {/* status */ 0xca, /* error */ 255"
-			       ", /* nsector */ 238");
+			printf("} => {status=0xca, error=255, nsector=238");
 			if (i)
-				printf(", %p", p_hd_drive_cmd + 1);
+				printf(", buf=%p", p_hd_drive_cmd + 1);
 		}
 		printf("}) = %s\n", errstr);
 	}
@@ -205,8 +204,8 @@ main(int argc, char *argv[])
 	       ", sector_number=129, feature=130, sector_count=131",
 	       XLAT_STR(HDIO_DRIVE_CMD));
 	if (rc >= 0) {
-		printf("} => {/* status */ 0x80, /* error */ 129"
-		       ", /* nsector */ 130, %p", p_hd_drive_cmd2 + 1);
+		printf("} => {status=0x80, error=129, nsector=130, buf=%p",
+		       p_hd_drive_cmd2 + 1);
 	}
 	printf("}) = %s\n", errstr);
 
@@ -215,8 +214,7 @@ main(int argc, char *argv[])
 	       ", sector_number=129, feature=130, sector_count=131",
 	       XLAT_STR(HDIO_DRIVE_CMD));
 	if (rc >= 0) {
-		printf("} => {/* status */ 0x80, /* error */ 129"
-		       ", /* nsector */ 130, ");
+		printf("} => {status=0x80, error=129, nsector=130, buf=");
 		print_quoted_hex(p_hd_drive_cmd3 + 1, DEFAULT_STRLEN);
 		printf("...");
 	}
