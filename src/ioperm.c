@@ -9,8 +9,16 @@
 
 SYS_FUNC(ioperm)
 {
-	tprintf("%#" PRI_klx ", %#" PRI_klx ", %d",
-		tcp->u_arg[0], tcp->u_arg[1], (int) tcp->u_arg[2]);
+	/* from */
+	PRINT_VAL_X(tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* num */
+	PRINT_VAL_X(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* turn_on */
+	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
