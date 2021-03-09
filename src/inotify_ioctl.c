@@ -19,7 +19,8 @@ inotify_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	switch (code) {
 	case INOTIFY_IOC_SETNEXTWD:
-		tprintf(", %d", (int) arg);
+		tprint_arg_next();
+		PRINT_VAL_D((int) arg);
 
 		return RVAL_IOCTL_DECODED;
 	}
