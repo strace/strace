@@ -38,7 +38,7 @@ void
 print_ioprio(unsigned int ioprio)
 {
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#x", ioprio);
+		PRINT_VAL_X(ioprio);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -61,7 +61,7 @@ ioprio_print_who(struct tcb *tcp, int which, int who)
 		printpid(tcp, who, PT_PGID);
 		break;
 	default:
-		tprintf("%d", who);
+		PRINT_VAL_D(who);
 		break;
 	}
 }
@@ -69,9 +69,11 @@ ioprio_print_who(struct tcb *tcp, int which, int who)
 SYS_FUNC(ioprio_get)
 {
 	if (entering(tcp)) {
-		/* int which */
+		/* which */
 		printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* who */
 		ioprio_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 		return 0;
 	} else {
@@ -87,14 +89,17 @@ SYS_FUNC(ioprio_get)
 
 SYS_FUNC(ioprio_set)
 {
-	/* int which */
+	/* which */
 	printxval(ioprio_who, tcp->u_arg[0], "IOPRIO_WHO_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* who */
 	ioprio_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
-	tprints(", ");
-	/* int ioprio */
+	tprint_arg_next();
+
+	/* ioprio */
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%d", (int) tcp->u_arg[2]);
+		PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return RVAL_DECODED;
