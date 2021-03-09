@@ -76,13 +76,16 @@ print_io_cqring_offsets(const struct io_cqring_offsets *const p)
 
 SYS_FUNC(io_uring_setup)
 {
-	const uint32_t nentries = tcp->u_arg[0];
+	const uint32_t entries = tcp->u_arg[0];
 	const kernel_ulong_t params_addr = tcp->u_arg[1];
 	struct io_uring_params params;
 
 	if (entering(tcp)) {
-		tprintf("%u, ", nentries);
+		/* entries */
+		PRINT_VAL_U(entries);
+		tprint_arg_next();
 
+		/* params */
 		if (umove_or_printaddr(tcp, params_addr, &params))
 			return RVAL_DECODED | RVAL_FD;
 
@@ -106,11 +109,7 @@ SYS_FUNC(io_uring_setup)
 	}
 
 	/* exiting */
-	if (syserror(tcp)) {
-		/* The remaining part of params is irrelevant.  */
-	} else if (umove(tcp, params_addr, &params)) {
-		tprints(", ???");
-	} else {
+	if (tfetch_mem(tcp, params_addr, sizeof(params), &params)) {
 		tprint_struct_next();
 		PRINT_FIELD_U(params, sq_entries);
 		tprint_struct_next();
@@ -140,12 +139,28 @@ SYS_FUNC(io_uring_enter)
 	const kernel_ulong_t sigset_addr = tcp->u_arg[4];
 	const kernel_ulong_t sigset_size = tcp->u_arg[5];
 
+	/* fd */
 	printfd(tcp, fd);
-	tprintf(", %u, %u, ", to_submit, min_complete);
+	tprint_arg_next();
+
+	/* to_submit */
+	PRINT_VAL_U(to_submit);
+	tprint_arg_next();
+
+	/* min_complete */
+	PRINT_VAL_U(min_complete);
+	tprint_arg_next();
+
+	/* flags */
 	printflags(uring_enter_flags, flags, "IORING_ENTER_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* sigset */
 	print_sigset_addr_len(tcp, sigset_addr, sigset_size);
-	tprintf(", %" PRI_klu, sigset_size);
+	tprint_arg_next();
+
+	/* sigsetsize */
+	PRINT_VAL_U(sigset_size);
 
 	return RVAL_DECODED;
 }
@@ -271,13 +286,17 @@ SYS_FUNC(io_uring_register)
 	int buf;
 
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, fd);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* opcode */
 		printxval(uring_register_opcodes, opcode,
 			  "IORING_REGISTER_???");
-		tprints(", ");
+		tprint_arg_next();
 	}
 
+	/* arg */
 	switch (opcode) {
 	case IORING_REGISTER_BUFFERS:
 		tprint_iov(tcp, nargs, arg, IOV_DECODE_ADDR);
@@ -299,8 +318,11 @@ SYS_FUNC(io_uring_register)
 		break;
 	}
 
-	if (rc || exiting(tcp))
-		tprintf(", %u", nargs);
+	if (rc || exiting(tcp)) {
+		tprint_arg_next();
+		/* nr_args */
+		PRINT_VAL_U(nargs);
+	}
 
 	return rc;
 }
