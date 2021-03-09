@@ -16,10 +16,12 @@ SYS_FUNC(inotify_add_watch)
 {
 	/* file descriptor */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* pathname */
 	printpath(tcp, tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* mask */
 	printflags(inotify_flags, tcp->u_arg[2], "IN_???");
 
@@ -30,8 +32,10 @@ SYS_FUNC(inotify_rm_watch)
 {
 	/* file descriptor */
 	printfd(tcp, tcp->u_arg[0]);
+	tprint_arg_next();
+
 	/* watch descriptor */
-	tprintf(", %d", (int) tcp->u_arg[1]);
+	PRINT_VAL_D((int) tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
