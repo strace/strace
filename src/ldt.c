@@ -81,11 +81,7 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 			if (entry_number) {
 				if (*entry_number != desc.entry_number) {
 					tprint_value_changed();
-					if ((int) desc.entry_number == -1)
-						tprints("-1");
-					else
-						tprintf("%u",
-							desc.entry_number);
+					PRINT_VAL_ID(desc.entry_number);
 				}
 			} else {
 				/*
@@ -131,12 +127,18 @@ print_user_desc(struct tcb *const tcp, const kernel_ulong_t addr,
 SYS_FUNC(modify_ldt)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		/* func */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
+
+		/* ptr */
 		if (tcp->u_arg[2] != sizeof(struct user_desc))
 			printaddr(tcp->u_arg[1]);
 		else
 			print_user_desc(tcp, tcp->u_arg[1], USER_DESC_BOTH);
-		tprintf(", %" PRI_klu, tcp->u_arg[2]);
+		tprint_arg_next();
+
+		PRINT_VAL_U(tcp->u_arg[2]);
 
 		return 0;
 	}
