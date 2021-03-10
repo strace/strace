@@ -236,6 +236,14 @@ tprints_arg_name(const char *name)
 	STRACE_PRINTF("%#0*llx", (int) sizeof(val_) * 2,		\
 		      zero_extend_signed_to_ull(val_))
 
+# define PRINT_VAL_ID(val_)						\
+	do {								\
+		if (sign_extend_unsigned_to_ll(val_) == -1LL)		\
+			PRINT_VAL_D(-1);				\
+		else							\
+			PRINT_VAL_U(val_);				\
+	} while (0)
+
 # define PRINT_FIELD_D(where_, field_)					\
 	do {								\
 		tprints_field_name(#field_);				\
@@ -378,13 +386,10 @@ tprints_arg_name(const char *name)
  * Generic "ID" printing. ID is considered unsigned except for the special value
  * of -1.
  */
-# define PRINT_FIELD_ID(where_, field_)						\
-	do {									\
-		tprints_field_name(#field_);					\
-		if (sign_extend_unsigned_to_ll((where_).field_) == -1LL)	\
-			PRINT_VAL_D(-1);					\
-		else								\
-			PRINT_VAL_U((where_).field_);				\
+# define PRINT_FIELD_ID(where_, field_)					\
+	do {								\
+		tprints_field_name(#field_);				\
+		PRINT_VAL_ID((where_).field_);				\
 	} while (0)
 
 # define PRINT_FIELD_UUID(where_, field_)				\

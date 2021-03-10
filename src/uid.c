@@ -164,10 +164,7 @@ SYS_FUNC(fchown)
 void
 printuid(const unsigned int uid)
 {
-	if ((uid_t) -1U == (uid_t) uid)
-		PRINT_VAL_D(-1);
-	else
-		PRINT_VAL_U((uid_t) uid);
+	PRINT_VAL_ID((uid_t) uid);
 }
 
 static bool
