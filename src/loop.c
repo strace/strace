@@ -24,7 +24,6 @@ decode_loop_info(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct_loop_info info;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &info))
 		return;
 
@@ -145,7 +144,6 @@ decode_loop_info64(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct loop_info64 info64;
 
-	tprints(", ");
 	if (!umove_or_printaddr(tcp, addr, &info64))
 		print_loop_info64(tcp, &info64);
 }
@@ -155,7 +153,6 @@ decode_loop_config(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct loop_config config;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &config))
 		return;
 
@@ -186,6 +183,7 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS:
+		tprint_arg_next();
 		decode_loop_info(tcp, arg);
 		break;
 
@@ -194,10 +192,12 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case LOOP_SET_STATUS64:
+		tprint_arg_next();
 		decode_loop_info64(tcp, arg);
 		break;
 
 	case LOOP_CONFIGURE:
+		tprint_arg_next();
 		decode_loop_config(tcp, arg);
 		break;
 
@@ -210,19 +210,21 @@ MPERS_PRINTER_DECL(int, loop_ioctl,
 
 	case LOOP_SET_FD:
 	case LOOP_CHANGE_FD:
-		tprints(", ");
+		tprint_arg_next();
 		printfd(tcp, arg);
 		break;
 
 	/* newer loop-control stuff */
 	case LOOP_CTL_ADD:
 	case LOOP_CTL_REMOVE:
-		tprintf(", %d", (int) arg);
+		tprint_arg_next();
+		PRINT_VAL_D((int) arg);
 		break;
 
 	case LOOP_SET_DIRECT_IO:
 	case LOOP_SET_BLOCK_SIZE:
-		tprintf(", %" PRI_klu, arg);
+		tprint_arg_next();
+		PRINT_VAL_U(arg);
 		break;
 
 	default:
