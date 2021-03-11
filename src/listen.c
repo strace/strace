@@ -13,9 +13,12 @@
 
 SYS_FUNC(listen)
 {
+	/* sockfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
-	tprintf("%" PRI_klu, tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* backlog */
+	PRINT_VAL_D((int) tcp->u_arg[1]);
 
 	return RVAL_DECODED;
 }
