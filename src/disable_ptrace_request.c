@@ -41,7 +41,8 @@ init(int argc, char **argv)
  && defined PR_SET_NO_NEW_PRIVS \
  && defined PR_SET_SECCOMP \
  && defined BPF_JUMP \
- && defined BPF_STMT
+ && defined BPF_STMT \
+ && defined HAVE_FORK
 
 static unsigned int
 get_arch(void)
