@@ -43,9 +43,11 @@ print_old_kernel_stat(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(oldstat)
 {
 	if (entering(tcp)) {
+		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* statbuf */
 		print_old_kernel_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -54,9 +56,11 @@ SYS_FUNC(oldstat)
 SYS_FUNC(oldfstat)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* statbuf */
 		print_old_kernel_stat(tcp, tcp->u_arg[1]);
 	}
 	return 0;
