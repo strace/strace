@@ -25,27 +25,35 @@
 
 SYS_FUNC(or1k_atomic)
 {
+	/* type */
 	printxval64(atomic_ops, tcp->u_arg[0], "???");
+
 	switch (tcp->u_arg[0]) {
-	case OR1K_ATOMIC_SWAP:
-		tprintf(", 0x%lx, 0x%lx", tcp->u_arg[1], tcp->u_arg[2]);
-		break;
-	case OR1K_ATOMIC_CMPXCHG:
-		tprintf(", 0x%lx, %#lx, %#lx", tcp->u_arg[1], tcp->u_arg[2],
-			tcp->u_arg[3]);
+	case OR1K_ATOMIC_DECPOS:
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[1]);
 		break;
 
+	case OR1K_ATOMIC_SWAP:
 	case OR1K_ATOMIC_XCHG:
 	case OR1K_ATOMIC_ADD:
 	case OR1K_ATOMIC_AND:
 	case OR1K_ATOMIC_OR:
 	case OR1K_ATOMIC_UMAX:
 	case OR1K_ATOMIC_UMIN:
-		tprintf(", 0x%lx, %#lx", tcp->u_arg[1], tcp->u_arg[2]);
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[1]);
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[2]);
 		break;
 
-	case OR1K_ATOMIC_DECPOS:
-		tprintf(", 0x%lx", tcp->u_arg[1]);
+	case OR1K_ATOMIC_CMPXCHG:
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[1]);
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[2]);
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[3]);
 		break;
 
 	default:
