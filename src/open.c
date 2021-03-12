@@ -85,13 +85,17 @@ tprint_open_modes(unsigned int flags)
 static int
 decode_open(struct tcb *tcp, int offset)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[offset]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* flags */
 	tprint_open_modes(tcp->u_arg[offset + 1]);
+
 	if (tcp->u_arg[offset + 1] & (O_CREAT | __O_TMPFILE)) {
+		tprint_arg_next();
+
 		/* mode */
-		tprints(", ");
 		print_numeric_umode_t(tcp->u_arg[offset + 2]);
 	}
 
@@ -136,27 +140,40 @@ print_open_how(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size)
 
 SYS_FUNC(openat)
 {
+	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
 	return decode_open(tcp, 1);
 }
 
 SYS_FUNC(openat2)
 {
+	/* dirfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* pathname */
 	printpath(tcp, tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* how */
 	print_open_how(tcp, tcp->u_arg[2], tcp->u_arg[3]);
-	tprintf(", %" PRI_klu, tcp->u_arg[3]);
+	tprint_arg_next();
+
+	/* size */
+	PRINT_VAL_U(tcp->u_arg[3]);
 
 	return RVAL_DECODED | RVAL_FD;
 }
 
 SYS_FUNC(creat)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* mode */
 	print_numeric_umode_t(tcp->u_arg[1]);
 
 	return RVAL_DECODED | RVAL_FD;
