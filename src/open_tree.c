@@ -13,10 +13,16 @@
 
 SYS_FUNC(open_tree)
 {
+	/* dfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* pathname */
 	printpath(tcp, tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(open_tree_flags, tcp->u_arg[2], "OPEN_TREE_???");
+
 	return RVAL_DECODED | RVAL_FD;
 }
