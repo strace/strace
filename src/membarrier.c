@@ -18,12 +18,18 @@ SYS_FUNC(membarrier)
 		unsigned flags = tcp->u_arg[1];
 		int cpu_id = tcp->u_arg[2];
 
+		/* cmd */
 		printxval(membarrier_cmds, cmd, "MEMBARRIER_CMD_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* flags */
 		printflags(membarrier_flags, flags, "MEMBARRIER_CMD_FLAG_???");
 
 		if (flags & MEMBARRIER_CMD_FLAG_CPU) {
-			tprintf(", %d", cpu_id);
+			tprint_arg_next();
+
+			/* cpu_id */
+			PRINT_VAL_D(cpu_id);
 		}
 
 		return cmd ? RVAL_DECODED : 0;
