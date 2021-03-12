@@ -29,7 +29,7 @@ nbd_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 
 	case NBD_SET_SOCK:
-		tprints(", ");
+		tprint_arg_next();
 		printfd(tcp, arg);
 		return RVAL_IOCTL_DECODED;
 
@@ -37,12 +37,12 @@ nbd_ioctl(struct tcb *const tcp, const unsigned int code,
 	case NBD_SET_SIZE:
 	case NBD_SET_SIZE_BLOCKS:
 	case NBD_SET_TIMEOUT:
-		tprints(", ");
-		tprintf("%" PRI_klu, arg);
+		tprint_arg_next();
+		PRINT_VAL_U(arg);
 		return RVAL_IOCTL_DECODED;
 
 	case NBD_SET_FLAGS:
-		tprints(", ");
+		tprint_arg_next();
 		printflags(nbd_ioctl_flags, arg, "NBD_IOC_FLAG_???");
 		return RVAL_IOCTL_DECODED;
 
