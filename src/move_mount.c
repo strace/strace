@@ -11,14 +11,23 @@
 
 SYS_FUNC(move_mount)
 {
+	/* from_dfd */
 	print_dirfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* from_pathname */
 	printpath(tcp, tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* to_dfd */
 	print_dirfd(tcp, tcp->u_arg[2]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* to_pathname */
 	printpath(tcp, tcp->u_arg[3]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(move_mount_flags, tcp->u_arg[4], "MOVE_MOUNT_???");
 	return RVAL_DECODED;
 }
