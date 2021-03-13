@@ -59,6 +59,6 @@ print_ifindex(const unsigned int ifindex)
 #ifdef HAVE_IF_INDEXTONAME
 	print_xlat_ex(ifindex, sprint_ifname(ifindex), XLAT_STYLE_FMT_U);
 #else
-	tprintf("%u", ifindex);
+	PRINT_VAL_U(ifindex);
 #endif
 }
