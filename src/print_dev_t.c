@@ -20,10 +20,10 @@ print_dev_t(const unsigned long long dev)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	tprintf("makedev(%#x, %#x)", major(dev), minor(dev));
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 }

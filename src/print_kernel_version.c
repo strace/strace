@@ -19,7 +19,7 @@ print_kernel_version(const unsigned long version)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	tprintf("KERNEL_VERSION(%lu, %lu, %lu)",
 			version >> 16,
@@ -27,5 +27,5 @@ print_kernel_version(const unsigned long version)
 			version & 0xFF);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 }

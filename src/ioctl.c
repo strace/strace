@@ -373,7 +373,7 @@ SYS_FUNC(ioctl)
 		if (xlat_verbosity != XLAT_STYLE_ABBREV)
 			tprintf("%#x", (unsigned int) tcp->u_arg[1]);
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
-			tprints(" /* ");
+			tprint_comment_begin();
 		if (xlat_verbosity != XLAT_STYLE_RAW) {
 			ret = ioctl_decode_command_number(tcp);
 			if (!(ret & IOCTL_NUMBER_STOP_LOOKUP)) {
@@ -392,7 +392,7 @@ SYS_FUNC(ioctl)
 			}
 		}
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
-			tprints(" */");
+			tprint_comment_end();
 
 		ret = ioctl_decode(tcp);
 	} else {

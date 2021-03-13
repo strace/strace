@@ -201,7 +201,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
 		print_local_array_ex(tcp, decoded_arg, size / current_wordsize,
@@ -210,7 +210,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 
 	return RVAL_IOCTL_DECODED;
 }

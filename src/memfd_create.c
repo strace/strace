@@ -24,7 +24,7 @@ SYS_FUNC(memfd_create)
 		return RVAL_DECODED | RVAL_FD;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	const unsigned int mask = MFD_HUGE_MASK << MFD_HUGE_SHIFT;
 	const unsigned int hugetlb_value = flags & mask;
@@ -40,7 +40,7 @@ SYS_FUNC(memfd_create)
 			hugetlb_value >> MFD_HUGE_SHIFT);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 
 	return RVAL_DECODED | RVAL_FD;
 }

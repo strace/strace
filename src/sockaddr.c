@@ -85,12 +85,12 @@ print_inet_addr(const int af,
 				return true;
 
 			if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-				tprints(" /* ");
+				tprint_comment_begin();
 
 			tprintf("inet_addr(\"%s\")", buf);
 
 			if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-				tprints(" */");
+				tprint_comment_end();
 
 			return true;
 		}
@@ -107,7 +107,7 @@ print_inet_addr(const int af,
 				return true;
 
 			if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-				tprints(" /* ");
+				tprint_comment_begin();
 
 			if (var_name &&
 			    (xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV))
@@ -118,7 +118,7 @@ print_inet_addr(const int af,
 					"AF_INET6", buf);
 
 			if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-				tprints(" */");
+				tprint_comment_end();
 
 			return true;
 		}
@@ -447,7 +447,7 @@ print_sll_protocol(const struct sockaddr_ll *const sa_ll)
 		return;
 
 	if (x_style == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	tprints("htons(");
 	printxval_ex(ethernet_protocols, ntohs(sa_ll->sll_protocol),
@@ -455,7 +455,7 @@ print_sll_protocol(const struct sockaddr_ll *const sa_ll)
 	tprints(")");
 
 	if (x_style == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 }
 
 static void
@@ -532,7 +532,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 		goto print_bluetooth_l2_psm_end;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !psm_str)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	if (psm_name) {
 		tprints(psm_name);
@@ -548,7 +548,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !psm_str)
-		tprints(" */");
+		tprint_comment_end();
 
 print_bluetooth_l2_psm_end:
 	tprints(")");
@@ -570,7 +570,7 @@ print_bluetooth_l2_cid(uint16_t cid)
 		goto print_bluetooth_l2_cid_end;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !cid_str)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	if (cid_name) {
 		tprints(cid_name);
@@ -582,7 +582,7 @@ print_bluetooth_l2_cid(uint16_t cid)
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !cid_str)
-		tprints(" */");
+		tprint_comment_end();
 
 print_bluetooth_l2_cid_end:
 	tprints(")");

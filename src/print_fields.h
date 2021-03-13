@@ -74,6 +74,18 @@ tprint_arg_end(void)
 }
 
 static inline void
+tprint_comment_begin(void)
+{
+	tprints(" /* ");
+}
+
+static inline void
+tprint_comment_end(void)
+{
+	tprints(" */");
+}
+
+static inline void
 tprint_more_data_follows(void)
 {
 	tprints("...");
@@ -165,6 +177,18 @@ static inline void
 tprint_arg_end(void)
 {
 	fputs(")", stdout);
+}
+
+static inline void
+tprint_comment_begin(void)
+{
+	fputs(" /* ", stdout);
+}
+
+static inline void
+tprint_comment_end(void)
+{
+	fputs(" */", stdout);
 }
 
 static inline void
@@ -466,7 +490,7 @@ tprints_arg_begin(const char *name)
 									\
 		if (xlat_verbose(xlat_verbosity)			\
 				== XLAT_STYLE_VERBOSE)			\
-			STRACE_PRINTF(" /* ");				\
+			tprint_comment_begin();				\
 									\
 		tprints_arg_begin("htons");				\
 		unsigned short us_ = ntohs((where_).field_);		\
@@ -475,7 +499,7 @@ tprints_arg_begin(const char *name)
 									\
 		if (xlat_verbose(xlat_verbosity)			\
 				== XLAT_STYLE_VERBOSE)			\
-			STRACE_PRINTF(" */");				\
+			tprint_comment_end();				\
 	} while (0)
 
 # define PRINT_FIELD_IFINDEX(where_, field_)				\

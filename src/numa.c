@@ -83,14 +83,14 @@ print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	tprints(mode_str);
 	tprints("|");
 	printflags_ex(flags, NULL, XLAT_STYLE_ABBREV, mpol_mode_flags, NULL);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 }
 
 SYS_FUNC(mbind)

@@ -714,9 +714,9 @@ tprintf_comment(const char *fmt, ...)
 
 	va_list args;
 	va_start(args, fmt);
-	tprints(" /* ");
+	tprint_comment_begin();
 	tvprintf(fmt, args);
-	tprints(" */");
+	tprint_comment_end();
 	va_end(args);
 }
 

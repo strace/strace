@@ -63,7 +63,7 @@ print_user_offset_addr(const kernel_ulong_t addr)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	if (base_addr == addr)
 		tprints(str);
@@ -72,7 +72,7 @@ print_user_offset_addr(const kernel_ulong_t addr)
 			str, addr - (kernel_ulong_t) base_addr);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 }
 
 SYS_FUNC(ptrace)

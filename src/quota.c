@@ -453,7 +453,7 @@ print_qcmd(const uint32_t qcmd)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	tprints("QCMD(");
 	printxvals_ex(cmd, "Q_???", XLAT_STYLE_ABBREV, quotacmds, NULL);
@@ -462,7 +462,7 @@ print_qcmd(const uint32_t qcmd)
 	tprints(")");
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" */");
+		tprint_comment_end();
 }
 
 SYS_FUNC(quotactl)

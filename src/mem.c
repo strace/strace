@@ -63,7 +63,7 @@ print_mmap_flags(kernel_ulong_t flags)
 		return;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-		tprints(" /* ");
+		tprint_comment_begin();
 
 	printxvals_ex(flags & MAP_TYPE, "MAP_???", XLAT_STYLE_ABBREV,
 		      mmap_flags, NULL);
@@ -84,7 +84,7 @@ print_mmap_flags(kernel_ulong_t flags)
 			hugetlb_value >> MAP_HUGE_SHIFT);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-                tprints(" */");
+                tprint_comment_end();
 }
 
 static void

@@ -218,7 +218,7 @@ printclockname(int clockid)
 			return;
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-			tprints(" /* ");
+			tprint_comment_begin();
 
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
 			tprintf("FD_TO_CLOCKID(%d)", CLOCKID_TO_FD(clockid));
@@ -234,7 +234,7 @@ printclockname(int clockid)
 		}
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-			tprints(" */");
+			tprint_comment_end();
 	} else
 #endif
 		printxval(clocknames, clockid, "CLOCK_???");

@@ -429,12 +429,12 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 		return 0;
 	}
 
-	const char *init_sep = "";
+	bool need_comment = false;
 	unsigned int n = 0;
 	va_list args;
 
 	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
-		init_sep = " /* ";
+		need_comment = true;
 		if (flags)
 			print_xlat_val(flags, style);
 	}
@@ -448,9 +448,11 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 				if (xlat_verbose(style) == XLAT_STYLE_VERBOSE
 				    && !flags)
 					tprints("0");
-				tprintf("%s%s",
-					(n++ ? "|" : init_sep),
-					xlat->data[idx].str);
+				if (n++)
+					tprints("|");
+				else if (need_comment)
+					tprint_comment_begin();
+				tprints(xlat->data[idx].str);
 				flags &= ~v;
 			}
 			if (!flags)
@@ -467,7 +469,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 		}
 
 		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE)
-			tprints(" */");
+			tprint_comment_end();
 	} else {
 		if (flags) {
 			if (xlat_verbose(style) != XLAT_STYLE_VERBOSE)

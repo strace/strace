@@ -781,22 +781,27 @@ print_funcs(const uint8_t funcs[8])
 
 	bool cont = false;
 
-	for (size_t i = 0; i < ARRAY_SIZE(func_descs); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(func_descs); i++) {
 		if (!func_descs[i])
 			continue;
 
-		size_t b = i >> 3;
+		unsigned int b = i >> 3;
 		size_t f = 1 << (7 - (i & 7));
 
 		if (!(funcs[b] & f))
 			continue;
 
-		tprintf("%s%zu: %s", cont ? ", " : " /* ", i, func_descs[i]);
-		cont = true;
+		if (cont) {
+			tprints(", ");
+		} else {
+			tprint_comment_begin();
+			cont = true;
+		}
+		tprintf("%u: %s", i, func_descs[i]);
 	}
 
 	if (cont)
-		tprints(" */");
+		tprint_comment_end();
 }
 
 static void
