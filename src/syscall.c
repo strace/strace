@@ -603,8 +603,7 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	if (res != 1 || (res = get_syscall_args(tcp)) != 1) {
 		printleader(tcp);
-		tprints(tcp_sysent(tcp)->sys_name);
-		tprint_arg_begin();
+		tprints_arg_begin(tcp_sysent(tcp)->sys_name);
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -687,8 +686,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		strace_open_memstream(tcp);
 
 	printleader(tcp);
-	tprints(tcp_sysent(tcp)->sys_name);
-	tprint_arg_begin();
+	tprints_arg_begin(tcp_sysent(tcp)->sys_name);
 	int res = raw(tcp) ? printargs(tcp) : tcp_sysent(tcp)->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;

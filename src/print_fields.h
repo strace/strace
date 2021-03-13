@@ -62,12 +62,6 @@ tprint_array_index_end(void)
 }
 
 static inline void
-tprint_arg_begin(void)
-{
-	tprints("(");
-}
-
-static inline void
 tprint_arg_next(void)
 {
 	tprints(", ");
@@ -162,12 +156,6 @@ tprint_array_index_end(void)
 }
 
 static inline void
-tprint_arg_begin(void)
-{
-	fputs("(", stdout);
-}
-
-static inline void
 tprint_arg_next(void)
 {
 	fputs(", ", stdout);
@@ -221,6 +209,12 @@ static inline void
 tprints_arg_name(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
+}
+
+static inline void
+tprints_arg_begin(const char *name)
+{
+	STRACE_PRINTF("%s(", name);
 }
 
 # define PRINT_VAL_D(val_)	\
@@ -474,7 +468,10 @@ tprints_arg_name(const char *name)
 				== XLAT_STYLE_VERBOSE)			\
 			STRACE_PRINTF(" /* ");				\
 									\
-		STRACE_PRINTF("htons(%u)", ntohs((where_).field_));	\
+		tprints_arg_begin("htons");				\
+		unsigned short us_ = ntohs((where_).field_);		\
+		PRINT_VAL_U(us_);					\
+		tprint_arg_end();					\
 									\
 		if (xlat_verbose(xlat_verbosity)			\
 				== XLAT_STYLE_VERBOSE)			\
