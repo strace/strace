@@ -25,14 +25,14 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 	uint32_t info;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, arg, &info))
 			return RVAL_IOCTL_DECODED;
 
 		tprint_struct_begin();
 		tprints_field_name("ids_len");
-		tprintf("%u", info);
+		PRINT_VAL_U(info);
 		tprint_struct_next();
 
 		return 0;
@@ -48,7 +48,7 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 	}
 
 	tprints_field_name("prog_cnt");
-	tprintf("%u", info);
+	PRINT_VAL_U(info);
 
 	tprint_struct_next();
 	tprints_field_name("ids");
@@ -64,7 +64,7 @@ perf_ioctl_query_bpf(struct tcb *const tcp, const kernel_ulong_t arg)
 static int
 perf_ioctl_modify_attributes(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprints(", ");
+	tprint_arg_next();
 	if (!fetch_perf_event_attr(tcp, arg))
 		print_perf_event_attr(tcp, arg);
 
@@ -79,31 +79,33 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 	case PERF_EVENT_IOC_ENABLE:
 	case PERF_EVENT_IOC_DISABLE:
 	case PERF_EVENT_IOC_RESET:
-		tprints(", ");
+		tprint_arg_next();
 		printflags(perf_ioctl_flags, arg, "PERF_IOC_FLAG_???");
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_REFRESH:
-		tprintf(", %d", (int) arg);
+		tprint_arg_next();
+		PRINT_VAL_D((int) arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_PERIOD:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int64(tcp, arg, "%" PRIu64);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_SET_OUTPUT:
 	case PERF_EVENT_IOC_SET_BPF:
-		tprints(", ");
+		tprint_arg_next();
 		printfd(tcp, (int) arg);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_PAUSE_OUTPUT:
-		tprintf(", %" PRI_klu, arg);
+		tprint_arg_next();
+		PRINT_VAL_U(arg);
 
 		return RVAL_IOCTL_DECODED;
 
@@ -112,18 +114,16 @@ MPERS_PRINTER_DECL(int, perf_ioctl,
 	 * due to the pointer size.
 	 */
 	case PERF_EVENT_IOC_SET_FILTER:
-		tprints(", ");
+		tprint_arg_next();
 		printstr_ex(tcp, arg, get_pagesize(), QUOTE_0_TERMINATED);
 
 		return RVAL_IOCTL_DECODED;
 
 	case PERF_EVENT_IOC_ID:
-		if (entering(tcp)) {
-			tprints(", ");
-
+		if (entering(tcp))
 			return 0;
-		}
 
+		tprint_arg_next();
 		printnum_int64(tcp, arg, "%" PRIu64);
 
 		return RVAL_IOCTL_DECODED;
