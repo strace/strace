@@ -13,7 +13,7 @@ void
 print_kernel_version(const unsigned long version)
 {
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#lx", version);
+		PRINT_VAL_X(version);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -21,10 +21,20 @@ print_kernel_version(const unsigned long version)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
-	tprintf("KERNEL_VERSION(%lu, %lu, %lu)",
-			version >> 16,
-			(version >> 8) & 0xFF,
-			version & 0xFF);
+	const unsigned long ver_major = version >> 16;
+	const unsigned long ver_minor = (version >> 8) & 0xFF;
+	const unsigned long ver_patch = version & 0xFF;
+
+	tprints_arg_begin("KERNEL_VERSION");
+
+	PRINT_VAL_U(ver_major);
+	tprint_arg_next();
+
+	PRINT_VAL_U(ver_minor);
+	tprint_arg_next();
+
+	PRINT_VAL_U(ver_patch);
+	tprint_arg_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();
