@@ -137,11 +137,17 @@ SYS_FUNC(shmctl)
 		cmd &= ~IPC_64;
 
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		/* shmid */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
+
+		/* cmd */
 		PRINTCTL(shmctl_flags, tcp->u_arg[1], "SHM_???");
-		tprints(", ");
+		tprint_arg_next();
+
 		switch (cmd) {
 		case IPC_SET:
+			/* buf */
 			print_shmid_ds(tcp, addr, cmd);
 			return RVAL_DECODED;
 
@@ -154,6 +160,7 @@ SYS_FUNC(shmctl)
 			break;
 
 		default:
+			/* buf */
 			printaddr(addr);
 			return RVAL_DECODED;
 		}
@@ -162,14 +169,17 @@ SYS_FUNC(shmctl)
 		case IPC_STAT:
 		case SHM_STAT:
 		case SHM_STAT_ANY:
+			/* buf */
 			print_shmid_ds(tcp, addr, cmd);
 			break;
 
 		case IPC_INFO:
+			/* buf */
 			print_ipc_info(tcp, addr, cmd);
 			break;
 
 		case SHM_INFO:
+			/* buf */
 			print_shm_info(tcp, addr, cmd);
 			break;
 		}
