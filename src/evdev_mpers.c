@@ -128,8 +128,6 @@ DECL_print_ff_effect(rumble)
 static int
 ff_effect_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 {
-	tprints(", ");
-
 	struct_ff_effect ffe;
 
 	if (umove_or_printaddr(tcp, arg, &ffe))
@@ -184,6 +182,7 @@ MPERS_PRINTER_DECL(int, evdev_write_ioctl_mpers, struct tcb *const tcp,
 {
 	switch (code) {
 	case EVIOCSFF:
+		tprint_arg_next();
 		return ff_effect_ioctl(tcp, arg);
 	default:
 		return RVAL_DECODED;
