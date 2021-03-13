@@ -11,7 +11,11 @@
 
 SYS_FUNC(pkey_alloc)
 {
-	tprintf("%#" PRI_klx ", ", tcp->u_arg[0]);
+	/* flags */
+	PRINT_VAL_X(tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* access_rights */
 	printflags64(pkey_access, tcp->u_arg[1], "PKEY_???");
 
 	return RVAL_DECODED;
