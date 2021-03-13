@@ -35,6 +35,7 @@ tprint_msgsnd(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const unsigned int flags)
 {
 	tprint_msgbuf(tcp, addr, count);
+	tprintf(", %" PRI_klu ", ", count);
 	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
@@ -56,6 +57,7 @@ tprint_msgrcv(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const kernel_ulong_t msgtyp)
 {
 	tprint_msgbuf(tcp, addr, count);
+	tprintf(", %" PRI_klu ", ", count);
 	tprintf("%" PRI_kld ", ", msgtyp);
 }
 

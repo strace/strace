@@ -33,5 +33,4 @@ MPERS_PRINTER_DECL(void, tprint_msgbuf, struct tcb *const tcp,
 		printstrn(tcp, addr + sizeof(msg.mtype), count);
 		tprint_struct_end();
 	}
-	tprintf(", %" PRI_klu ", ", count);
 }
