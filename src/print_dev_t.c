@@ -14,7 +14,7 @@ void
 print_dev_t(const unsigned long long dev)
 {
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#llx", dev);
+		PRINT_VAL_X(dev);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -22,7 +22,16 @@ print_dev_t(const unsigned long long dev)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
-	tprintf("makedev(%#x, %#x)", major(dev), minor(dev));
+	const unsigned int dev_major = major(dev);
+	const unsigned int dev_minor = minor(dev);
+
+	tprints_arg_begin("makedev");
+
+	PRINT_VAL_X(dev_major);
+	tprint_arg_next();
+
+	PRINT_VAL_X(dev_minor);
+	tprint_arg_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();
