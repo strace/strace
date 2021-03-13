@@ -14,9 +14,9 @@ SYS_FUNC(pidfd_open)
 {
 	/* pid_t pid */
 	printpid(tcp, tcp->u_arg[0], PT_TGID);
+	tprint_arg_next();
 
 	/* unsigned int flags */
-	tprints(", ");
 	printflags(pidfd_open_flags, tcp->u_arg[1], "PIDFD_???");
 
 	return RVAL_DECODED | RVAL_FD;
