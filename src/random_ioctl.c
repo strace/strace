@@ -32,12 +32,12 @@ random_ioctl(struct tcb *const tcp, const unsigned int code,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case RNDADDTOENTCNT:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
 	case RNDADDENTROPY:
-		tprints(", ");
+		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, arg, &info)) {
 			tprint_struct_begin();
 			PRINT_FIELD_D(info, entropy_count);
