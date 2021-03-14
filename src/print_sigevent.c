@@ -36,7 +36,7 @@ MPERS_PRINTER_DECL(void, print_sigevent,
 	tprint_struct_begin();
 	if (sev.sigev_value.sival_ptr) {
 		PRINT_FIELD_OBJ_VAL(sev, sigev_value, print_sigev_value);
-		tprints(", ");
+		tprint_struct_next();
 	}
 
 	switch (sev.sigev_notify) {
