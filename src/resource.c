@@ -30,7 +30,7 @@ print_rlim64_t(uint64_t lim) {
 	}
 
 	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%" PRIu64, lim);
+		PRINT_VAL_U(lim);
 
 	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -72,7 +72,7 @@ print_rlim32_t(uint32_t lim) {
 	}
 
 	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%" PRIu32, lim);
+		PRINT_VAL_U(lim);
 
 	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -122,9 +122,11 @@ decode_rlimit(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(getrlimit)
 {
 	if (entering(tcp)) {
+		/* resource */
 		printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* rlim */
 		decode_rlimit(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -132,8 +134,11 @@ SYS_FUNC(getrlimit)
 
 SYS_FUNC(setrlimit)
 {
+	/* resource */
 	printxval(resources, tcp->u_arg[0], "RLIMIT_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* rlim */
 	decode_rlimit(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -142,13 +147,19 @@ SYS_FUNC(setrlimit)
 SYS_FUNC(prlimit64)
 {
 	if (entering(tcp)) {
+		/* pid */
 		printpid(tcp, tcp->u_arg[0], PT_TGID);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* resource */
 		printxval(resources, tcp->u_arg[1], "RLIMIT_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* new_limit */
 		print_rlimit64(tcp, tcp->u_arg[2]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* old_limit */
 		print_rlimit64(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -159,10 +170,13 @@ SYS_FUNC(prlimit64)
 SYS_FUNC(getrusage)
 {
 	if (entering(tcp)) {
+		/* who */
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-		tprints(", ");
-	} else
+		tprint_arg_next();
+	} else {
+		/* usage */
 		printrusage(tcp, tcp->u_arg[1]);
+	}
 	return 0;
 }
 
@@ -170,10 +184,13 @@ SYS_FUNC(getrusage)
 SYS_FUNC(osf_getrusage)
 {
 	if (entering(tcp)) {
+		/* who */
 		printxval(usagewho, tcp->u_arg[0], "RUSAGE_???");
-		tprints(", ");
-	} else
+		tprint_arg_next();
+	} else {
+		/* usage */
 		printrusage32(tcp, tcp->u_arg[1]);
+	}
 	return 0;
 }
 #endif /* ALPHA */
@@ -192,15 +209,18 @@ priority_print_who(struct tcb *tcp, int which, int who)
 		printpid(tcp, who, PT_PGID);
 		break;
 	default:
-		tprintf("%d", who);
+		PRINT_VAL_D(who);
 		break;
 	}
 }
 
 SYS_FUNC(getpriority)
 {
+	/* which */
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* who */
 	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -208,10 +228,16 @@ SYS_FUNC(getpriority)
 
 SYS_FUNC(setpriority)
 {
+	/* which */
 	printxval(priorities, tcp->u_arg[0], "PRIO_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* who */
 	priority_print_who(tcp, tcp->u_arg[0], tcp->u_arg[1]);
-	tprintf(", %d", (int) tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* prio */
+	PRINT_VAL_D((int) tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
