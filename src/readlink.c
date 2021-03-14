@@ -18,9 +18,11 @@ static int
 decode_readlink(struct tcb *tcp, int offset)
 {
 	if (entering(tcp)) {
+		/* pathname */
 		printpath(tcp, tcp->u_arg[offset]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* buf */
 		if (syserror(tcp))
 			printaddr(tcp->u_arg[offset + 1]);
 		else
@@ -32,7 +34,10 @@ decode_readlink(struct tcb *tcp, int offset)
 			 * past return buffer's end.
 			 */
 			printstrn(tcp, tcp->u_arg[offset + 1], tcp->u_rval);
-		tprintf(", %" PRI_klu, tcp->u_arg[offset + 2]);
+		tprint_arg_next();
+
+		/* bufsiz */
+		PRINT_VAL_U(tcp->u_arg[offset + 2]);
 	}
 	return 0;
 }
@@ -45,8 +50,9 @@ SYS_FUNC(readlink)
 SYS_FUNC(readlinkat)
 {
 	if (entering(tcp)) {
+		/* dirfd */
 		print_dirfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	}
 	return decode_readlink(tcp, 1);
 }
