@@ -46,7 +46,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	case PTP_EXTTS_REQUEST2: {
 		struct ptp_extts_request extts;
 
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &extts))
 			break;
 
@@ -62,7 +62,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	case PTP_PEROUT_REQUEST2: {
 		struct ptp_perout_request perout;
 
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &perout))
 			break;
 
@@ -81,7 +81,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 
 	case PTP_ENABLE_PPS:
 	case PTP_ENABLE_PPS2:
-		tprintf(", %" PRI_kld, arg);
+		tprint_arg_next();
+		PRINT_VAL_D(arg);
 		break;
 
 	case PTP_SYS_OFFSET:
@@ -89,7 +90,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		struct ptp_sys_offset sysoff;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			if (umove_or_printaddr(tcp, arg, &sysoff))
 				break;
 
@@ -101,7 +102,6 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 				unsigned int n_samples =
 					sysoff.n_samples > PTP_MAX_SAMPLES
 					? PTP_MAX_SAMPLES : sysoff.n_samples;
-				tprints(", ");
 				tprint_struct_next();
 				PRINT_FIELD_ARRAY_UPTO(sysoff, ts,
 						       2 * n_samples + 1, tcp,
@@ -118,7 +118,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp))
 			return 0;
 
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &caps))
 			break;
 
