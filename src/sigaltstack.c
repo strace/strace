@@ -41,9 +41,11 @@ print_stack_t(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(sigaltstack)
 {
 	if (entering(tcp)) {
+		/* ss */
 		print_stack_t(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* old_ss */
 		print_stack_t(tcp, tcp->u_arg[1]);
 	}
 	return 0;
