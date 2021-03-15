@@ -17,6 +17,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/stat.h>
+# include "xmalloc.h"
 
 int
 main(void)
@@ -24,9 +25,7 @@ main(void)
 	struct mq_attr attr;
 	(void) close(0);
 
-	char *name;
-	if (asprintf(&name, "/strace-mq-%u.sample", getpid()) < 0)
-		perror_msg_and_fail("asprintf");
+	char *name = xasprintf("/strace-mq-%u.sample", getpid());
 
 	if (mq_open(name, O_CREAT, 0700, NULL))
 		perror_msg_and_skip("mq_open");

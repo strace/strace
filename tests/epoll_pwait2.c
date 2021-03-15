@@ -9,6 +9,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "xmalloc.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,12 +56,10 @@ main(void)
 	int fd = open(fd_path, O_WRONLY);
 	if (fd < 0)
 		perror_msg_and_fail("open: %s", fd_path);
-	char *fd_str;
-	if (asprintf(&fd_str, "%d%s%s%s", fd,
-		     DECODE_FDS ? "<" : "",
-		     DECODE_FDS ? fd_path : "",
-		     DECODE_FDS ? ">" : "") < 0)
-		perror_msg_and_fail("asprintf");
+	char *fd_str = xasprintf("%d%s%s%s", fd,
+				 DECODE_FDS ? "<" : "",
+				 DECODE_FDS ? fd_path : "",
+				 DECODE_FDS ? ">" : "");
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct epoll_event, events);
 	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_timespec64_t, timeout);

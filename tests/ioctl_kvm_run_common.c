@@ -48,6 +48,7 @@
 #  define KVM_MAX_CPUID_ENTRIES 80
 # endif
 
+# include "xmalloc.h"
 # include "xlat.h"
 # include "xlat/kvm_cpuid_flags.h"
 
@@ -254,11 +255,8 @@ static int
 vcpu_dev_should_have_cpuid(int fd)
 {
 	int r = 0;
-	char *filename = NULL;
+	char *filename = xasprintf("/proc/%d/fd/%d", getpid(), fd);
 	char buf[sizeof(vcpu_dev)];
-
-	if (asprintf(&filename, "/proc/%d/fd/%d", getpid(), fd) < 0)
-		error_msg_and_fail("asprintf");
 
 	if (readlink(filename, buf, sizeof(buf)) == sizeof(buf) - 1
 	    && (memcmp(buf, vcpu_dev, sizeof(buf) - 1) == 0))

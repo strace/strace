@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "xmalloc.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -389,7 +390,6 @@ main(void)
 	struct iovec *key_iov = tail_alloc(sizeof(*key_iov) * IOV_SIZE);
 	char *bogus_buf1 = tail_alloc(9);
 	char *bogus_buf2 = tail_alloc(256);
-	char *key_iov_str1;
 	char *key_iov_str2 = tail_alloc(4096);
 	const char *errstr;
 	ssize_t ret;
@@ -416,21 +416,18 @@ main(void)
 			0x100000001ULL * i);
 	}
 
-	ret = asprintf(&key_iov_str1, "[{iov_base=%p, iov_len=%zu}, "
-		       "{iov_base=%p, iov_len=%zu}, "
-		       "{iov_base=%p, iov_len=%zu}, "
-		       "{iov_base=%p, iov_len=%zu}]",
-		       key_iov[IOV_SIZE - 4].iov_base,
-		       key_iov[IOV_SIZE - 4].iov_len,
-		       key_iov[IOV_SIZE - 3].iov_base,
-		       key_iov[IOV_SIZE - 3].iov_len,
-		       key_iov[IOV_SIZE - 2].iov_base,
-		       key_iov[IOV_SIZE - 2].iov_len,
-		       key_iov[IOV_SIZE - 1].iov_base,
-		       key_iov[IOV_SIZE - 1].iov_len);
-
-	if (ret < 0)
-		error_msg_and_fail("asprintf");
+	char *key_iov_str1 = xasprintf("[{iov_base=%p, iov_len=%zu}, "
+				       "{iov_base=%p, iov_len=%zu}, "
+				       "{iov_base=%p, iov_len=%zu}, "
+				       "{iov_base=%p, iov_len=%zu}]",
+				       key_iov[IOV_SIZE - 4].iov_base,
+				       key_iov[IOV_SIZE - 4].iov_len,
+				       key_iov[IOV_SIZE - 3].iov_base,
+				       key_iov[IOV_SIZE - 3].iov_len,
+				       key_iov[IOV_SIZE - 2].iov_base,
+				       key_iov[IOV_SIZE - 2].iov_len,
+				       key_iov[IOV_SIZE - 1].iov_base,
+				       key_iov[IOV_SIZE - 1].iov_len);
 
 	ret = snprintf(key_iov_str2, IOV_STR_SIZE,
 		       "[{iov_base=\"%s\\0\", iov_len=%zu}, "

@@ -8,6 +8,7 @@
  */
 
 #include "tests.h"
+#include "xmalloc.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,10 +56,7 @@ get_tracer_pid(void)
 static void
 get_ppid_pgid_sid(int pid, int *ppid, int *pgid, int *sid)
 {
-	char *stat;
-	if (asprintf(&stat, "/proc/%d/stat", pid) < 0)
-		perror_msg_and_fail("asprintf");
-
+	char *stat = xasprintf("/proc/%d/stat", pid);
 	FILE *fp = fopen(stat, "r");
 	if (!fp)
 		perror_msg_and_fail("fopen: %s", stat);

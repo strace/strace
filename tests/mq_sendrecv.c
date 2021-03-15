@@ -25,6 +25,7 @@
 # include <time.h>
 # include <unistd.h>
 
+# include "xmalloc.h"
 # include "kernel_fcntl.h"
 # include "sigevent.h"
 
@@ -407,8 +408,7 @@ main(void)
 
 	/* Sending and receiving test */
 
-	if (asprintf(&mq_name, "strace-mq_sendrecv-%u.sample", getpid()) < 0)
-		perror_msg_and_fail("asprintf");
+	mq_name = xasprintf("strace-mq_sendrecv-%u.sample", getpid());
 
 # if DUMPIO_READ || DUMPIO_WRITE
 	close(0);

@@ -12,6 +12,7 @@
 
 #ifdef __NR_faccessat
 
+# include "xmalloc.h"
 # include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
@@ -48,13 +49,9 @@ main(void)
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(const char, unterminated);
-	char *unterminated_str;
-	if (asprintf(&unterminated_str, "%p", unterminated) < 0)
-                perror_msg_and_fail("asprintf");
+	char *unterminated_str = xasprintf("%p", unterminated);
 	const void *const efault = unterminated + 1;
-	char *efault_str;
-	if (asprintf(&efault_str, "%p", efault) < 0)
-                perror_msg_and_fail("asprintf");
+	char *efault_str = xasprintf("%p", efault);
 
 	typedef struct {
 		char sym;
@@ -75,12 +72,8 @@ main(void)
         int fd = open(path, O_WRONLY);
         if (fd < 0)
                 perror_msg_and_fail("open: %s", path);
-	char *fd_str;
-	if (asprintf(&fd_str, "%d%s", fd, FD_PATH) < 0)
-                perror_msg_and_fail("asprintf");
-	char *path_quoted;
-	if (asprintf(&path_quoted, "\"%s\"", path) < 0)
-                perror_msg_and_fail("asprintf");
+	char *fd_str = xasprintf("%d%s", fd, FD_PATH);
+	char *path_quoted = xasprintf("\"%s\"", path);
 
 	struct {
 		int val;

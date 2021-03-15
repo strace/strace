@@ -8,6 +8,7 @@
  */
 
 #include "tests.h"
+#include "xmalloc.h"
 
 #include <errno.h>
 #include <limits.h>
@@ -131,9 +132,7 @@ main(void)
 		*ptid = 0;
 		pid = do_clone(child, child_stack, child_stack_size,
 			       CLONE_PIDFD|SIGCHLD, 0, ptid);
-		char *fname = 0;
-		if (asprintf(&fname, "/proc/self/fd/%d", *ptid) < 0)
-			perror_msg_and_fail("asprintf");
+		char *fname = xasprintf("/proc/self/fd/%d", *ptid);
 		int rc = readlink(fname, buf, sizeof(buf) - 1);
 		if ((unsigned int) rc >= sizeof(buf))
 			perror_msg_and_fail("readlink");

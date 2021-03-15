@@ -22,6 +22,7 @@
 # include "netlink.h"
 # include <linux/sock_diag.h>
 # include <linux/netlink_diag.h>
+# include "xmalloc.h"
 
 static void
 send_query(const int fd)
@@ -407,9 +408,7 @@ int main(void)
 {
 	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 
-	char *path;
-	if (asprintf(&path, "/proc/self/fd/%u", fd) < 0)
-		perror_msg_and_fail("asprintf");
+	char *path = xasprintf("/proc/self/fd/%u", fd);
 	char buf[256];
 	if (getxattr(path, "system.sockprotoname", buf, sizeof(buf) - 1) < 0)
 		perror_msg_and_skip("getxattr");

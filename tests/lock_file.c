@@ -6,6 +6,7 @@
  */
 
 #include "tests.h"
+#include "xmalloc.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -21,9 +22,7 @@ lock_file_by_dirname(const char *path_name, const char *lock_name)
 	const char *slash = path_name ? strrchr(path_name, '/') : NULL;
 	const int plen = slash ? (int) (slash - path_name) + 1 : 0;
 
-	char *lock_file = NULL;
-	if (asprintf(&lock_file, "%.*s%s", plen, path_name, lock_name) < 0)
-		perror_msg_and_fail("asprintf");
+	char *lock_file = xasprintf("%.*s%s", plen, path_name, lock_name);
 
 	int lock_fd = open(lock_file, O_RDONLY);
 	if (lock_fd < 0)
