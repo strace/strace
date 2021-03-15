@@ -77,4 +77,10 @@ void *xgrowarray(void *ptr, size_t *nmemb, size_t memb_size);
 char *xstrdup(const char *str) ATTRIBUTE_MALLOC;
 char *xstrndup(const char *str, size_t n) ATTRIBUTE_MALLOC;
 
+/**
+ * Analogous to asprintf, die in case of an error.
+ */
+char *xasprintf(const char *fmt, ...)
+	ATTRIBUTE_FORMAT((printf, 1, 2)) ATTRIBUTE_MALLOC;
+
 #endif /* !STRACE_XMALLOC_H */

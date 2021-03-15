@@ -10,6 +10,8 @@
 # include "config.h"
 #endif
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -145,4 +147,18 @@ xstrndup(const char *str, size_t n)
 #endif
 
 	return p;
+}
+
+char *
+xasprintf(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+
+	char *res;
+	if (vasprintf(&res, fmt, ap) < 0)
+		die_out_of_memory();
+
+	va_end(ap);
+	return res;
 }
