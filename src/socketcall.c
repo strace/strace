@@ -11,8 +11,11 @@
 
 SYS_FUNC(socketcall)
 {
+	/* call */
 	printxval_d(socketcalls, tcp->u_arg[0], NULL);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* args */
 	printaddr(tcp->u_arg[1]);
 
 	return RVAL_DECODED;
