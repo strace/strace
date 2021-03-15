@@ -16,7 +16,9 @@
 SYS_FUNC(sram_alloc)
 {
 	/* size */
-	tprintf("%lu, ", tcp->u_arg[0]);
+	PRINT_VAL_U(tcp->u_arg[0]);
+	tprint_arg_next();
+
 	/* flags */
 	printflags64(sram_alloc_flags, tcp->u_arg[1], "???_SRAM");
 
