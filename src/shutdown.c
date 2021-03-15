@@ -16,8 +16,11 @@
 
 SYS_FUNC(shutdown)
 {
+	/* sockfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* how */
 	printxval(shutdown_modes, tcp->u_arg[1], "SHUT_???");
 
 	return RVAL_DECODED;
