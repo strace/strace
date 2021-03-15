@@ -21,7 +21,7 @@
 SYS_FUNC(sysmips)
 {
 	printxval64(sysmips_operations, tcp->u_arg[0], "???");
-	tprints(", ");
+	tprint_arg_next();
 
 	switch (tcp->u_arg[0]) {
 	case SETNAME: {
@@ -39,15 +39,22 @@ SYS_FUNC(sysmips)
 	}
 	case MIPS_ATOMIC_SET:
 		printaddr(tcp->u_arg[1]);
-		tprintf(", %#" PRI_klx, tcp->u_arg[2]);
+		tprint_arg_next();
+
+		PRINT_VAL_X(tcp->u_arg[2]);
 		return RVAL_DECODED;
 	case MIPS_FIXADE:
-		tprintf("%#" PRI_klx, tcp->u_arg[1]);
+		PRINT_VAL_X(tcp->u_arg[1]);
 		return RVAL_DECODED;
 	}
 
-	tprintf("%" PRI_kld ", %" PRI_kld ", %" PRI_kld,
-		tcp->u_arg[1], tcp->u_arg[2], tcp->u_arg[3]);
+	PRINT_VAL_X(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	PRINT_VAL_X(tcp->u_arg[2]);
+	tprint_arg_next();
+
+	PRINT_VAL_X(tcp->u_arg[3]);
 	return RVAL_DECODED;
 }
 
