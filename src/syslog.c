@@ -36,36 +36,46 @@ SYS_FUNC(syslog)
 	case SYSLOG_ACTION_READ:
 	case SYSLOG_ACTION_READ_ALL:
 	case SYSLOG_ACTION_READ_CLEAR:
-		if (entering(tcp)) {
-			tprints(", ");
+		if (entering(tcp))
 			return 0;
-		}
 		break;
 
 	case SYSLOG_ACTION_CONSOLE_LEVEL: /* Uses len */
-		tprints(", ");
+		tprint_arg_next();
+
+		/* bufp */
 		printaddr64(tcp->u_arg[1]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* len */
 		printxval_ex(syslog_console_levels, len, "LOGLEVEL_???",
 			     XLAT_STYLE_VERBOSE | XLAT_STYLE_FMT_D);
 		return RVAL_DECODED;
 
 	default:
-		tprints(", ");
+		tprint_arg_next();
+
+		/* bufp */
 		printaddr64(tcp->u_arg[1]);
-		tprintf(", %d", len);
+		tprint_arg_next();
+
+		/* len */
+		PRINT_VAL_D(len);
 		return RVAL_DECODED;
 	}
 
 	/* syscall exit handler for SYSLOG_ACTION_READ* */
+	tprint_arg_next();
 
 	/* bufp */
 	if (syserror(tcp))
 		printaddr64(tcp->u_arg[1]);
 	else
 		printstrn(tcp, tcp->u_arg[1], tcp->u_rval);
+	tprint_arg_next();
+
 	/* len */
-	tprintf(", %d", len);
+	PRINT_VAL_D(len);
 
 	return 0;
 }
