@@ -37,7 +37,7 @@ main(void)
 
 	k_memfd_create((uintptr_t) pattern, 0);
 	printf("memfd_create(\"%.*s\"..., 0) = %s\n",
-	       (int) size - 1, pattern, errstr);
+	       (int) size, pattern, errstr);
 
 	kernel_ulong_t flags = (kernel_ulong_t) 0xfacefeed00000007ULL;
 # define flags1_str "MFD_CLOEXEC|MFD_ALLOW_SEALING|MFD_HUGETLB"
@@ -45,11 +45,11 @@ main(void)
 	k_memfd_create((uintptr_t) pattern, flags);
 # if XLAT_VERBOSE
 	printf("memfd_create(\"%.*s\"..., %s /* %s */) = %s\n",
-	       (int) size - 1, pattern,
+	       (int) size, pattern,
 	       "0x7", flags1_str, errstr);
 # else
 	printf("memfd_create(\"%.*s\"..., %s) = %s\n",
-	       (int) size - 1, pattern,
+	       (int) size, pattern,
 #  if XLAT_RAW
 	       "0x7",
 #  else
@@ -72,7 +72,6 @@ main(void)
 	       pattern, errstr);
 # endif
 
-	pattern += size - 1;
 	flags = (kernel_ulong_t) -1ULL;
 	k_memfd_create(0, flags);
 	flags = -1U & ~(7 | (MFD_HUGE_MASK << MFD_HUGE_SHIFT));

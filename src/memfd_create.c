@@ -10,15 +10,21 @@
 #include <linux/memfd.h>
 #include "xlat/memfd_create_flags.h"
 
+#ifndef MFD_NAME_MAX_LEN
+# define MFD_NAME_MAX_LEN (255 - (sizeof("memfd:") - 1))
+#endif
+
 SYS_FUNC(memfd_create)
 {
-	printpathn(tcp, tcp->u_arg[0], 255 - (sizeof("memfd:") - 1));
-	tprints(", ");
+	/* name */
+	printstr_ex(tcp, tcp->u_arg[0], MFD_NAME_MAX_LEN + 1,
+		    QUOTE_0_TERMINATED);
+	tprint_arg_next();
 
 	unsigned int flags = tcp->u_arg[1];
 
 	if (!flags || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#x", flags);
+		PRINT_VAL_X(flags);
 
 	if (!flags || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return RVAL_DECODED | RVAL_FD;

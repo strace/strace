@@ -363,10 +363,10 @@ mbind-Xabbrev	-Xabbrev -e trace=mbind
 mbind-Xraw	-a33 -Xraw -e trace=mbind
 mbind-Xverbose	-Xverbose -e trace=mbind
 membarrier	-a36
-memfd_create
-memfd_create-Xabbrev	-Xabbrev -e trace=memfd_create
-memfd_create-Xraw	-a30 -Xraw -e trace=memfd_create
-memfd_create-Xverbose	-Xverbose -e trace=memfd_create
+memfd_create	-s256
+memfd_create-Xabbrev	-s256 -Xabbrev -e trace=memfd_create
+memfd_create-Xraw	-a30 -s256 -Xraw -e trace=memfd_create
+memfd_create-Xverbose	-s256 -Xverbose -e trace=memfd_create
 migrate_pages	-a33
 migrate_pages--pidns-translation	test_pidns -a33 -e trace=migrate_pages
 mincore	-a22
