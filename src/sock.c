@@ -255,8 +255,8 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 
 	case SIOCBRADDBR:
 	case SIOCBRDELBR:
-		tprints(", ");
-		printpathn(tcp, arg, sizeof(ifr.ifr_name) - 1);
+		tprint_arg_next();
+		printstr_ex(tcp, arg, sizeof(ifr.ifr_name), QUOTE_0_TERMINATED);
 		break;
 
 	case FIOGETOWN:

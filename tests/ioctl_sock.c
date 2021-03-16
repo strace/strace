@@ -220,7 +220,7 @@ test_str(void)
 
 		do_ioctl_ptr(-1, cmd[i].cmd, buf);
 		printf("ioctl(%d, %s, \"%.*s\"...) = %s\n",
-		       -1, cmd[i].str, IFNAMSIZ - 1, buf, errstr);
+		       -1, cmd[i].str, IFNAMSIZ, buf, errstr);
 
 		buf[IFNAMSIZ - 1] = '\0';
 		do_ioctl_ptr(-1, cmd[i].cmd, buf);
