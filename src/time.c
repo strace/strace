@@ -32,8 +32,11 @@ print_timezone(struct tcb *const tcp, const kernel_ulong_t addr)
 SYS_FUNC(gettimeofday)
 {
 	if (exiting(tcp)) {
+		/* tv */
 		print_timeval(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* tz */
 		print_timezone(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -41,8 +44,11 @@ SYS_FUNC(gettimeofday)
 
 SYS_FUNC(settimeofday)
 {
+	/* tv */
 	print_timeval(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* tz */
 	print_timezone(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -53,8 +59,11 @@ SYS_FUNC(settimeofday)
 SYS_FUNC(osf_gettimeofday)
 {
 	if (exiting(tcp)) {
+		/* tv */
 		print_timeval32(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* tz */
 		print_timezone(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -64,8 +73,11 @@ SYS_FUNC(osf_gettimeofday)
 #ifdef ALPHA
 SYS_FUNC(osf_settimeofday)
 {
+	/* tv */
 	print_timeval32(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* tz */
 	print_timezone(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -77,10 +89,11 @@ static int
 do_nanosleep(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
+		/* req */
 		print_ts(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
-
+		/* rem */
 		/*
 		 * Second (returned) timespec is only significant if syscall
 		 * was interrupted.  On success and in case of other errors we
@@ -118,9 +131,11 @@ SYS_FUNC(nanosleep_time64)
 SYS_FUNC(getitimer)
 {
 	if (entering(tcp)) {
+		/* which */
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* curr_value */
 		print_itimerval(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -130,9 +145,11 @@ SYS_FUNC(getitimer)
 SYS_FUNC(osf_getitimer)
 {
 	if (entering(tcp)) {
+		/* which */
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* curr_value */
 		print_itimerval32(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -142,11 +159,15 @@ SYS_FUNC(osf_getitimer)
 SYS_FUNC(setitimer)
 {
 	if (entering(tcp)) {
+		/* which */
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* new_value */
 		print_itimerval(tcp, tcp->u_arg[1]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* old_value */
 		print_itimerval(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -156,11 +177,15 @@ SYS_FUNC(setitimer)
 SYS_FUNC(osf_setitimer)
 {
 	if (entering(tcp)) {
+		/* which */
 		printxval(itimer_which, tcp->u_arg[0], "ITIMER_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* new_value */
 		print_itimerval32(tcp, tcp->u_arg[1]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* old_value */
 		print_itimerval32(tcp, tcp->u_arg[2]);
 	}
 	return 0;
@@ -173,6 +198,7 @@ static int
 do_adjtimex(struct tcb *const tcp, const print_obj_by_addr_fn print_tx,
 	    const kernel_ulong_t addr)
 {
+	/* buf */
 	if (print_tx(tcp, addr))
 		return 0;
 	tcp->auxstr = xlookup(adjtimex_state, (kernel_ulong_t) tcp->u_rval);
@@ -212,7 +238,7 @@ printclockname(int clockid)
 
 	if (clockid < 0) {
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-			tprintf("%d", clockid);
+			PRINT_VAL_D(clockid);
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 			return;
@@ -221,17 +247,18 @@ printclockname(int clockid)
 			tprint_comment_begin();
 
 		if ((clockid & CLOCKFD_MASK) == CLOCKFD)
-			tprintf("FD_TO_CLOCKID(%d)", CLOCKID_TO_FD(clockid));
+			tprints_arg_begin("FD_TO_CLOCKID");
+			PRINT_VAL_D(CLOCKID_TO_FD(clockid));
 		else {
-			tprintf("%s(%d,",
-				CPUCLOCK_PERTHREAD(clockid) ?
-					"MAKE_THREAD_CPUCLOCK" :
-					"MAKE_PROCESS_CPUCLOCK",
-				CPUCLOCK_PID(clockid));
+			tprints_arg_begin(CPUCLOCK_PERTHREAD(clockid) ?
+					  "MAKE_THREAD_CPUCLOCK" :
+					  "MAKE_PROCESS_CPUCLOCK");
+			PRINT_VAL_D(CPUCLOCK_PID(clockid));
+			tprint_arg_next();
 			printxval(cpuclocknames, clockid & CLOCKFD_MASK,
 				  "CPUCLOCK_???");
-			tprints(")");
 		}
+		tprint_arg_end();
 
 		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 			tprint_comment_end();
@@ -243,8 +270,11 @@ printclockname(int clockid)
 static int
 do_clock_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
+	/* clockid */
 	printclockname(tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* tp */
 	print_ts(tcp, tcp->u_arg[1]);
 
 	return RVAL_DECODED;
@@ -266,9 +296,11 @@ static int
 do_clock_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
+		/* clockid */
 		printclockname(tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* tp */
 		print_ts(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -290,13 +322,19 @@ static int
 do_clock_nanosleep(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 {
 	if (entering(tcp)) {
+		/* clockid */
 		printclockname(tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* flags */
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* request */
 		print_ts(tcp, tcp->u_arg[2]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* remain */
 		/*
 		 * Second (returned) timespec is only significant
 		 * if syscall was interrupted and flags is not TIMER_ABSTIME.
@@ -327,11 +365,14 @@ SYS_FUNC(clock_nanosleep_time64)
 static int
 do_clock_adjtime(struct tcb *const tcp, const print_obj_by_addr_fn print_tx)
 {
-	if (exiting(tcp))
+	if (entering(tcp)) {
+		/* clockid */
+		printclockname(tcp->u_arg[0]);
+		tprint_arg_next();
+		return 0;
+	} else {
 		return do_adjtimex(tcp, print_tx, tcp->u_arg[1]);
-	printclockname(tcp->u_arg[0]);
-	tprints(", ");
-	return 0;
+	}
 }
 
 #if HAVE_ARCH_TIME32_SYSCALLS
@@ -356,11 +397,15 @@ SYS_FUNC(clock_sparc64_adjtime)
 SYS_FUNC(timer_create)
 {
 	if (entering(tcp)) {
+		/* clockid */
 		printclockname(tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* sevp */
 		print_sigevent(tcp, tcp->u_arg[1]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* timerid */
 		printnum_int(tcp, tcp->u_arg[2], "%d");
 	}
 	return 0;
@@ -370,12 +415,19 @@ static int
 do_timer_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		/* timerid */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
+
+		/* flags */
 		printflags(clockflags, tcp->u_arg[1], "TIMER_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* new_value */
 		print_its(tcp, tcp->u_arg[2]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* old_value */
 		print_its(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -397,8 +449,11 @@ static int
 do_timer_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		/* timerid */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
 	} else {
+		/* curr_value */
 		print_its(tcp, tcp->u_arg[1]);
 	}
 	return 0;
@@ -420,8 +475,11 @@ SYS_FUNC(timer_gettime64)
 
 SYS_FUNC(timerfd_create)
 {
+	/* clockid */
 	printclockname(tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
 
 	return RVAL_DECODED | RVAL_FD;
@@ -431,13 +489,19 @@ static int
 do_timerfd_settime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* flags */
 		printflags(timerfdflags, tcp->u_arg[1], "TFD_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* new_value */
 		print_its(tcp, tcp->u_arg[2]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* old_value */
 		print_its(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -459,9 +523,11 @@ static int
 do_timerfd_gettime(struct tcb *const tcp, const print_obj_by_addr_fn print_its)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* curr_value */
 		print_its(tcp, tcp->u_arg[1]);
 	}
 	return 0;
