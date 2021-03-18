@@ -1085,18 +1085,18 @@ and PIDs associated with pidfd file descriptors.
 .B \-\-pidns\-translation
 If strace and tracee are in different PID namespaces, print PIDs in
 strace's namespace, too.
-.TP
-.BR \-\-secontext "[=full]"
-Print SELinux contexts of processes and files in square brackets when SELinux
-is available and not disabled.
-When
-.B full
-is specified, print the complete context (user, role, type and category)
-instead of just the type.
-The current implementation has limitations, in particular, SELinux contexts
-cannot be printed when
-.B strace
-and the tracee belong to different mount namespaces.
+.if '@USE_SELINUX_FALSE@'#' .TP
+.if '@USE_SELINUX_FALSE@'#' .BR \-\-secontext "[=full]"
+.if '@USE_SELINUX_FALSE@'#' Print SELinux contexts of processes and files in
+.if '@USE_SELINUX_FALSE@'#' square brackets when SELinux is available and not
+.if '@USE_SELINUX_FALSE@'#' disabled. When
+.if '@USE_SELINUX_FALSE@'#' .B full
+.if '@USE_SELINUX_FALSE@'#' is specified, print the complete context (user,
+.if '@USE_SELINUX_FALSE@'#' role, type and category) instead of just the type.
+.if '@USE_SELINUX_FALSE@'#' The current implementation has limitations, in
+.if '@USE_SELINUX_FALSE@'#' particular, SELinux contexts cannot be printed when
+.if '@USE_SELINUX_FALSE@'#' .B strace
+.if '@USE_SELINUX_FALSE@'#' and the tracee belong to different mount namespaces.
 .SS Statistics
 .TP 12
 .B \-c
