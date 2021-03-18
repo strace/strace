@@ -21,7 +21,7 @@ decode_UBI_IOCMKVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct ubi_mkvol_req mkvol;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &mkvol))
 			return RVAL_IOCTL_DECODED;
 
@@ -60,7 +60,7 @@ decode_UBI_IOCRSVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_rsvol_req rsvol;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &rsvol)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(rsvol, bytes);
@@ -96,16 +96,15 @@ decode_UBI_IOCRNVOL(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_rnvol_req rnvol;
 
-	tprints(", ");
-	if (umove_or_printaddr(tcp, arg, &rnvol))
-		return RVAL_IOCTL_DECODED;
-
-	tprint_struct_begin();
-	PRINT_FIELD_D(rnvol, count);
-	tprint_struct_next();
-	PRINT_FIELD_ARRAY_UPTO(rnvol, ents, rnvol.count, tcp,
-			       print_ubi_rnvol_req_ent_array_member);
-	tprint_struct_end();
+	tprint_arg_next();
+	if (!umove_or_printaddr(tcp, arg, &rnvol)) {
+		tprint_struct_begin();
+		PRINT_FIELD_D(rnvol, count);
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY_UPTO(rnvol, ents, rnvol.count, tcp,
+				       print_ubi_rnvol_req_ent_array_member);
+		tprint_struct_end();
+	}
 
 	return RVAL_IOCTL_DECODED;
 }
@@ -115,7 +114,7 @@ decode_UBI_IOCEBCH(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_leb_change_req leb;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &leb)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(leb, lnum);
@@ -135,7 +134,7 @@ decode_UBI_IOCATT(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp)) {
 		struct ubi_attach_req attach;
 
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &attach))
 			return RVAL_IOCTL_DECODED;
 
@@ -164,7 +163,7 @@ decode_UBI_IOCEBMAP(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_map_req map;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &map)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(map, lnum);
@@ -181,7 +180,7 @@ decode_UBI_IOCSETVOLPROP(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct ubi_set_vol_prop_req prop;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &prop)) {
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(prop, property,
@@ -210,7 +209,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 # undef case_UBI
 
 	case UBI_IOCVOLUP:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int64(tcp, arg, "%" PRIi64);
 		break;
 
@@ -221,7 +220,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case UBI_IOCRMVOL:
 	case UBI_IOCRPEB:
 	case UBI_IOCSPEB:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
