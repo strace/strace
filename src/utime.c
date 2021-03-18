@@ -19,8 +19,11 @@ SYS_FUNC(utime)
 {
 	utimbuf_t u;
 
+	/* filename */
 	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* times */
 	if (!umove_or_printaddr(tcp, tcp->u_arg[1], &u)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(u, actime);
