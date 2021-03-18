@@ -17,10 +17,12 @@ typedef struct ustat struct_ustat;
 
 SYS_FUNC(ustat)
 {
-	if (entering(tcp))
+	if (entering(tcp)) {
+		/* dev */
 		print_dev_t((unsigned int) tcp->u_arg[0]);
-	else {
-		tprints(", ");
+		tprint_arg_next();
+	} else {
+		/* ubuf */
 #ifdef HAVE_USTAT_H
 		struct_ustat ust;
 
