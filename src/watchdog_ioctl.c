@@ -29,7 +29,7 @@ watchdog_ioctl(struct tcb *const tcp, const unsigned int code,
 		ATTRIBUTE_FALLTHROUGH;
 	case WDIOC_SETTIMEOUT:
 	case WDIOC_SETPRETIMEOUT:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
