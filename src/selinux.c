@@ -70,6 +70,29 @@ selinux_getpidcon(struct tcb *tcp, char **result)
 }
 
 /*
+ * Retrieves the SELinux context of the given pid and descriptor.
+ * Memory must be freed.
+ * Returns 0 on success, -1 on failure.
+ */
+int
+selinux_getfdcon(pid_t pid, int fd, char **result)
+{
+	if (!selinux_context || pid <= 0 || fd < 0)
+		return -1;
+
+	int proc_pid = 0;
+	translate_pid(NULL, pid, PT_TID, &proc_pid);
+	if (!proc_pid)
+		return -1;
+
+	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
+	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
+
+	char *secontext;
+	return getcontext(getfilecon(linkpath, &secontext), &secontext, result);
+}
+
+/*
  * Retrieves the SELinux context of the given path.
  * Memory must be freed.
  * Returns 0 on success, -1 on failure.
@@ -80,52 +103,27 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **result)
 	if (!selinux_context)
 		return -1;
 
-	/*
-	 * Current limitation: we cannot query the path if we are in different
-	 * mount namespaces.
-	 */
-	if (get_mnt_ns(tcp) != get_our_mnt_ns())
+	int proc_pid = 0;
+	translate_pid(NULL, tcp->pid, PT_TID, &proc_pid);
+	if (!proc_pid)
+		return -1;
+
+	int ret = -1;
+	char fname[PATH_MAX];
+
+	if (path[0] == '/')
+		ret = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
+			       proc_pid, path);
+	else if (tcp->last_dirfd == AT_FDCWD)
+		ret = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
+			       proc_pid, path);
+	else if (tcp->last_dirfd >= 0 )
+		ret = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
+			       proc_pid, tcp->last_dirfd, path);
+
+	if ((unsigned int) ret >= sizeof(fname))
 		return -1;
 
 	char *secontext;
-
-	if (path[0] == '/')
-		return getcontext(getfilecon(path, &secontext), &secontext, result);
-
-	char resolved[PATH_MAX + 1];
-
-	/*
-	 * If we have a relative pathname and 'last_dirfd' == AT_FDCWD, we need
-	 * to prepend by the CWD.
-	 */
-	if (tcp->last_dirfd == AT_FDCWD) {
-		int proc_pid = 0;
-		translate_pid(NULL, tcp->pid, PT_TID, &proc_pid);
-		if (!proc_pid)
-			return -1;
-
-		char linkpath[sizeof("/proc/%u/cwd") + sizeof(int)*3];
-		xsprintf(linkpath, "/proc/%u/cwd", proc_pid);
-
-		ssize_t n = readlink(linkpath, resolved, sizeof(resolved) - 1);
-		/*
-		 * NB: if buffer is too small, readlink doesn't fail,
-		 * it returns truncated result.
-		 */
-		if (n == sizeof(resolved) - 1)
-			return -1;
-		resolved[n] = '\0';
-	} else {
-		if (getfdpath_pid(tcp->pid, tcp->last_dirfd,
-				  resolved, sizeof(resolved)) < 0)
-			return -1;
-	}
-
-	if (resolved[0] != '/')
-		return -1;
-
-	char pathtoresolve[2 * PATH_MAX + 2];
-	xsprintf(pathtoresolve, "%s/%s", resolved, path);
-
-	return getcontext(getfilecon(pathtoresolve, &secontext), &secontext, result);
+	return getcontext(getfilecon(fname, &secontext), &secontext, result);
 }

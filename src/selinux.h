@@ -14,7 +14,8 @@
 extern bool selinux_context;
 extern bool selinux_context_full;
 
-int selinux_getpidcon(struct tcb *tcp, char **context);
+int selinux_getfdcon(pid_t pid, int fd, char **result);
 int selinux_getfilecon(struct tcb *tcp, const char *path, char **context);
+int selinux_getpidcon(struct tcb *tcp, char **context);
 
 #endif /* !STRACE_SELINUX_H */

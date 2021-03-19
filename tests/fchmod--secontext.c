@@ -37,19 +37,20 @@ main(void)
 	if (fname_realpath == NULL)
 		perror_msg_and_fail("realpath");
 
+	const char *fname_context = SELINUX_FILECONTEXT(fname);
 	long rc = syscall(__NR_fchmod, fd, 0600);
 	printf("%sfchmod(%d<%s>%s, 0600) = %s\n",
 	       SELINUX_MYCONTEXT(),
-	       fd, fname_realpath, SELINUX_FILECONTEXT(fname),
+	       fd, fname_realpath, fname_context,
 	       sprintrc(rc));
 
 	if (unlink(fname))
 		perror_msg_and_fail("unlink");
 
 	rc = syscall(__NR_fchmod, fd, 0600);
-	printf("%sfchmod(%d<%s (deleted)>, 0600) = %s\n",
+	printf("%sfchmod(%d<%s (deleted)>%s, 0600) = %s\n",
 	       SELINUX_MYCONTEXT(),
-	       fd, fname_realpath,
+	       fd, fname_realpath, fname_context,
 	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");

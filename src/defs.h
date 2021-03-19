@@ -294,13 +294,6 @@ struct tcb {
 	unsigned int pid_ns;
 
 #ifdef USE_SELINUX
-	/*
-	 * The ID of the MOUNT namespace of this process
-	 * (inode number of /proc/<pid>/ns/mnt)
-	 * (0: not initialized)
-	 */
-	unsigned int mnt_ns;
-
 	int last_dirfd; /* Use AT_FDCWD for 'not set' */
 #endif
 
@@ -1057,14 +1050,7 @@ print_local_array_ex(struct tcb *tcp,
 extern kernel_ulong_t *
 fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_args);
 
-#ifdef USE_SELINUX
-extern unsigned int get_mnt_ns(struct tcb *tcp);
-extern unsigned int get_our_mnt_ns(void);
-#endif
-
 extern void pidns_init(void);
-
-extern const char *pid_to_str(pid_t pid);
 
 /**
  * Returns the pid of the tracee as present in /proc of the tracer (can be

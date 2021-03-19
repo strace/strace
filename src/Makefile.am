@@ -408,7 +408,6 @@ endif
 
 if USE_SELINUX
 libstrace_a_SOURCES +=	\
-	mntns.c		\
 	selinux.c	\
 	selinux.h
 strace_CPPFLAGS += $(libselinux_CPPFLAGS)

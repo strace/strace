@@ -665,16 +665,16 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 
 printed:
 		tprints(">");
-#ifdef USE_SELINUX
-		char *context;
-		if (!selinux_getfilecon(tcp, path, &context)) {
-			tprintf(" [%s]", context);
-			free(context);
-		}
-#endif
 	} else {
 		tprintf("%d", fd);
 	}
+#ifdef USE_SELINUX
+	char *context;
+	if (!selinux_getfdcon(pid, fd, &context)) {
+		tprintf(" [%s]", context);
+		free(context);
+	}
+#endif
 }
 
 void

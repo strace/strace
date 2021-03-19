@@ -1093,10 +1093,6 @@ strace's namespace, too.
 .if '@USE_SELINUX_FALSE@'#' .B full
 .if '@USE_SELINUX_FALSE@'#' is specified, print the complete context (user,
 .if '@USE_SELINUX_FALSE@'#' role, type and category) instead of just the type.
-.if '@USE_SELINUX_FALSE@'#' The current implementation has limitations, in
-.if '@USE_SELINUX_FALSE@'#' particular, SELinux contexts cannot be printed when
-.if '@USE_SELINUX_FALSE@'#' .B strace
-.if '@USE_SELINUX_FALSE@'#' and the tracee belong to different mount namespaces.
 .SS Statistics
 .TP 12
 .B \-c

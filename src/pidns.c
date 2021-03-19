@@ -142,7 +142,7 @@ get_cached_proc_pid(unsigned int ns, int ns_pid, enum pid_type type)
  * Helper function, converts pid to string, or to "self" for pid == 0.
  * Uses static buffer for operation.
  */
-const char *
+static const char *
 pid_to_str(pid_t pid)
 {
 	if (!pid)
