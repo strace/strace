@@ -25,33 +25,49 @@ print_xattr_val(struct tcb *const tcp,
 		const kernel_ulong_t insize,
 		const kernel_ulong_t size)
 {
-	tprints(", ");
-
+	/* value */
 	if (size > XATTR_SIZE_MAX)
 		printaddr(addr);
 	else
 		printstr_ex(tcp, addr, size, QUOTE_OMIT_TRAILING_0);
-	tprintf(", %" PRI_klu, insize);
+	tprint_arg_next();
+
+	/* size */
+	PRINT_VAL_U(insize);
 }
 
 SYS_FUNC(setxattr)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* name */
 	printstr(tcp, tcp->u_arg[1]);
+	tprint_arg_next();
+
 	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(fsetxattr)
 {
+	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* name */
 	printstr(tcp, tcp->u_arg[1]);
+	tprint_arg_next();
+
 	print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_arg[3]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags(xattrflags, tcp->u_arg[4], "XATTR_???");
 	return RVAL_DECODED;
 }
@@ -59,9 +75,13 @@ SYS_FUNC(fsetxattr)
 SYS_FUNC(getxattr)
 {
 	if (entering(tcp)) {
+		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* name */
 		printstr(tcp, tcp->u_arg[1]);
+		tprint_arg_next();
 	} else {
 		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_rval);
 	}
@@ -71,9 +91,13 @@ SYS_FUNC(getxattr)
 SYS_FUNC(fgetxattr)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* name */
 		printstr(tcp, tcp->u_arg[1]);
+		tprint_arg_next();
 	} else {
 		print_xattr_val(tcp, tcp->u_arg[2], tcp->u_arg[3], tcp->u_rval);
 	}
@@ -84,19 +108,24 @@ static void
 print_xattr_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const kernel_ulong_t size)
 {
+	/* list */
 	if (!size || syserror(tcp)) {
 		printaddr(addr);
 	} else {
 		printstrn(tcp, addr, tcp->u_rval);
 	}
-	tprintf(", %" PRI_klu, size);
+	tprint_arg_next();
+
+	/* size */
+	PRINT_VAL_U(size);
 }
 
 SYS_FUNC(listxattr)
 {
 	if (entering(tcp)) {
+		/* pathname */
 		printpath(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
 		print_xattr_list(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
@@ -106,8 +135,9 @@ SYS_FUNC(listxattr)
 SYS_FUNC(flistxattr)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
 		print_xattr_list(tcp, tcp->u_arg[1], tcp->u_arg[2]);
 	}
@@ -116,16 +146,22 @@ SYS_FUNC(flistxattr)
 
 SYS_FUNC(removexattr)
 {
+	/* pathname */
 	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* name */
 	printstr(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
 
 SYS_FUNC(fremovexattr)
 {
+	/* fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* name */
 	printstr(tcp, tcp->u_arg[1]);
 	return RVAL_DECODED;
 }
