@@ -27,7 +27,7 @@ decode_dents(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		if (len < header_size) {
 			if (!abbrev(tcp)) {
 				if (!len) {
-					tprints("[");
+					tprint_array_begin();
 					++count;
 				} else {
 					printstr_ex(tcp, addr, len,
@@ -41,7 +41,7 @@ decode_dents(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		if (!tfetch_mem(tcp, addr, header_size, &dent)) {
 			if (!abbrev(tcp)) {
 				if (count) {
-					tprints("...");
+					tprint_more_data_follows();
 					printaddr_comment(addr);
 				} else {
 					printaddr(addr);
@@ -53,7 +53,7 @@ decode_dents(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 
 		if (!abbrev(tcp)) {
 			if (!count)
-				tprints("[");
+				tprint_array_begin();
 		}
 		++count;
 
@@ -94,9 +94,9 @@ decode_dents(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 						   &dent,
 						   d_reclen - header_size);
 			if (next_addr) {
-				tprints(", ");
+				tprint_array_next();
 				if (rc < 0) {
-					tprints("...");
+					tprint_more_data_follows();
 					break;
 				}
 			}
@@ -109,7 +109,7 @@ decode_dents(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 
 	if (!abbrev(tcp)) {
 		if (count)
-			tprints("]");
+			tprint_array_end();
 	} else {
 		tprintf_comment("%u%s entries", count, len ? "+" : "");
 	}
@@ -121,8 +121,9 @@ xgetdents(struct tcb *const tcp, const unsigned int header_size,
 	  const decode_dentry_tail_fn decode_dentry_tail)
 {
 	if (entering(tcp)) {
+		/* fd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 		return 0;
 	}
 
@@ -135,7 +136,8 @@ xgetdents(struct tcb *const tcp, const unsigned int header_size,
 		decode_dents(tcp, tcp->u_arg[1], tcp->u_rval, header_size,
 			     decode_dentry_head, decode_dentry_tail);
 	}
+	tprint_arg_next();
 
-	tprintf(", %u", count);
+	PRINT_VAL_U(count);
 	return 0;
 }
