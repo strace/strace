@@ -76,12 +76,21 @@ ioctl_print_code(const unsigned int code)
 {
 	const bool abbrev = xlat_verbose(xlat_verbosity) != XLAT_STYLE_VERBOSE;
 
-	tprints("_IOC(");
+	tprints_arg_begin("_IOC");
+
 	printflags_ex(_IOC_DIR(code), abbrev ? "_IOC_???" : NULL,
 		      abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV,
 		      ioctl_dirs, NULL);
-	tprintf(", %#x, %#x, %#x)",
-		_IOC_TYPE(code), _IOC_NR(code), _IOC_SIZE(code));
+	tprint_arg_next();
+
+	PRINT_VAL_X(_IOC_TYPE(code));
+	tprint_arg_next();
+
+	PRINT_VAL_X(_IOC_NR(code));
+	tprint_arg_next();
+
+	PRINT_VAL_X(_IOC_SIZE(code));
+	tprint_arg_end();
 }
 
 static int
@@ -92,12 +101,12 @@ evdev_decode_number(const unsigned int code)
 
 	if (_IOC_DIR(code) == _IOC_WRITE) {
 		if (nr >= 0xc0 && nr <= 0xc0 + 0x3f) {
-			tprints("EVIOCSABS(");
+			tprints_arg_begin("EVIOCSABS");
 			printxval_ex(evdev_abs, nr - 0xc0,
 				     abbrev ? "ABS_???" : NULL,
 				     abbrev ? XLAT_STYLE_DEFAULT
 					    : XLAT_STYLE_ABBREV);
-			tprints(")");
+			tprint_arg_end();
 			return 1;
 		}
 	}
@@ -106,51 +115,71 @@ evdev_decode_number(const unsigned int code)
 		return 0;
 
 	if (nr >= 0x20 && nr <= 0x20 + 0x1f) {
-		tprints("EVIOCGBIT(");
+		tprints_arg_begin("EVIOCGBIT");
 		if (nr == 0x20)
-			tprints("0");
+			PRINT_VAL_U(0);
 		else
 			printxval_ex(evdev_ev, nr - 0x20,
 				     abbrev ? "EV_???" : NULL,
 				     abbrev ? XLAT_STYLE_DEFAULT
 					    : XLAT_STYLE_ABBREV);
-		tprintf(", %u)", _IOC_SIZE(code));
+		tprint_arg_next();
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	} else if (nr >= 0x40 && nr <= 0x40 + 0x3f) {
-		tprints("EVIOCGABS(");
+		tprints_arg_begin("EVIOCGABS");
 		printxval_ex(evdev_abs, nr - 0x40, abbrev ? "ABS_???" : NULL,
 			     abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV);
-		tprints(")");
+		tprint_arg_end();
 		return 1;
 	}
 
 	switch (nr) {
 	case 0x06:
-		tprintf("EVIOCGNAME(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGNAME");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x07:
-		tprintf("EVIOCGPHYS(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGPHYS");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x08:
-		tprintf("EVIOCGUNIQ(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGUNIQ");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x09:
-		tprintf("EVIOCGPROP(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGPROP");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x0a:
-		tprintf("EVIOCGMTSLOTS(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGMTSLOTS");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x18:
-		tprintf("EVIOCGKEY(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGKEY");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x19:
-		tprintf("EVIOCGLED(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGLED");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x1a:
-		tprintf("EVIOCGSND(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGSND");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	case 0x1b:
-		tprintf("EVIOCGSW(%u)", _IOC_SIZE(code));
+		tprints_arg_begin("EVIOCGSW");
+		PRINT_VAL_U(_IOC_SIZE(code));
+		tprint_arg_end();
 		return 1;
 	default:
 		return 0;
@@ -163,19 +192,29 @@ hiddev_decode_number(const unsigned int code)
 	if (_IOC_DIR(code) == _IOC_READ) {
 		switch (_IOC_NR(code)) {
 		case 0x04:
-			tprintf("HIDIOCGRAWNAME(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCGRAWNAME");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		case 0x05:
-			tprintf("HIDIOCGRAWPHYS(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCGRAWPHYS");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		case 0x06:
-			tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCSFEATURE");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		case 0x08:
-			tprintf("HIDIOCGRAWUNIQ(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCGRAWUNIQ");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		case 0x12:
-			tprintf("HIDIOCGPHYS(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCGPHYS");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		default:
 			return 0;
@@ -183,10 +222,14 @@ hiddev_decode_number(const unsigned int code)
 	} else if (_IOC_DIR(code) == (_IOC_READ | _IOC_WRITE)) {
 		switch (_IOC_NR(code)) {
 		case 0x06:
-			tprintf("HIDIOCSFEATURE(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCSFEATURE");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		case 0x07:
-			tprintf("HIDIOCGFEATURE(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("HIDIOCGFEATURE");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		default:
 			return 0;
@@ -208,28 +251,38 @@ ioctl_decode_command_number(struct tcb *tcp)
 		return hiddev_decode_number(code);
 	case 'M':
 		if (_IOC_DIR(code) == _IOC_WRITE) {
-			tprintf("MIXER_WRITE(%u)", _IOC_NR(code));
+			tprints_arg_begin("MIXER_WRITE");
+			PRINT_VAL_U(_IOC_NR(code));
+			tprint_arg_end();
 			return 1;
 		} else if (_IOC_DIR(code) == _IOC_READ) {
-			tprintf("MIXER_READ(%u)", _IOC_NR(code));
+			tprints_arg_begin("MIXER_READ");
+			PRINT_VAL_U(_IOC_NR(code));
+			tprint_arg_end();
 			return 1;
 		}
 		return 0;
 	case 'U':
 		if (_IOC_DIR(code) == _IOC_READ && _IOC_NR(code) == 0x2c) {
-			tprintf("UI_GET_SYSNAME(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("UI_GET_SYSNAME");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		}
 		return 0;
 	case 'j':
 		if (_IOC_DIR(code) == _IOC_READ && _IOC_NR(code) == 0x13) {
-			tprintf("JSIOCGNAME(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("JSIOCGNAME");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		}
 		return 0;
 	case 'k':
 		if (_IOC_DIR(code) == _IOC_WRITE && _IOC_NR(code) == 0) {
-			tprintf("SPI_IOC_MESSAGE(%u)", _IOC_SIZE(code));
+			tprints_arg_begin("SPI_IOC_MESSAGE");
+			PRINT_VAL_U(_IOC_SIZE(code));
+			tprint_arg_end();
 			return 1;
 		}
 		return 0;
@@ -368,10 +421,10 @@ SYS_FUNC(ioctl)
 
 	if (entering(tcp)) {
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 
 		if (xlat_verbosity != XLAT_STYLE_ABBREV)
-			tprintf("%#x", (unsigned int) tcp->u_arg[1]);
+			PRINT_VAL_X((unsigned int) tcp->u_arg[1]);
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
 			tprint_comment_begin();
 		if (xlat_verbosity != XLAT_STYLE_RAW) {
@@ -403,7 +456,8 @@ SYS_FUNC(ioctl)
 		ret &= ~RVAL_IOCTL_DECODED;
 		ret |= RVAL_DECODED;
 	} else if (ret & RVAL_DECODED) {
-		tprintf(", %#" PRI_klx, tcp->u_arg[2]);
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[2]);
 	}
 
 	return ret;
