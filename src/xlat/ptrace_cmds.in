@@ -136,7 +136,7 @@ PTRACE_GETFDPIC
 
 #if defined __powerpc__
 PTRACE_SYSEMU	0x1d
-#elif defined __arm64__ || defined __aarch64__ || defined __x86_64__ || defined __i386__
+#elif defined __arm64__ || defined __aarch64__ || defined __x86_64__ || defined __i386__ || defined __s390__
 PTRACE_SYSEMU	0x1f
 #else
 PTRACE_SYSEMU
@@ -144,7 +144,7 @@ PTRACE_SYSEMU
 
 #if defined __powerpc__
 PTRACE_SYSEMU_SINGLESTEP	0x1e
-#elif defined __arm64__ || defined __aarch64__ || defined __x86_64__ || defined __i386__
+#elif defined __arm64__ || defined __aarch64__ || defined __x86_64__ || defined __i386__ || defined __s390__
 PTRACE_SYSEMU_SINGLESTEP	0x20
 #else
 PTRACE_SYSEMU_SINGLESTEP
