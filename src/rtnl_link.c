@@ -185,6 +185,10 @@ static const nla_decoder_t ifla_brport_nla_decoders[] = {
 	[IFLA_BRPORT_NEIGH_SUPPRESS]		= decode_nla_u8,
 	[IFLA_BRPORT_ISOLATED]			= decode_nla_u8,
 	[IFLA_BRPORT_BACKUP_PORT]		= decode_nla_ifindex,
+	[IFLA_BRPORT_MRP_RING_OPEN]		= decode_nla_u8,
+	[IFLA_BRPORT_MRP_IN_OPEN]		= decode_nla_u8,
+	[IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT]	= decode_nla_u32,
+	[IFLA_BRPORT_MCAST_EHT_HOSTS_CNT]	= decode_nla_u32,
 };
 
 static bool
