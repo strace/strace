@@ -34,6 +34,7 @@ AM_LDFLAGS = $(ARCH_MFLAGS)
 libtests_a_SOURCES = \
 	create_nl_socket.c \
 	create_tmpfile.c \
+	dirfd.c \
 	errno2name.c \
 	error_msg.c \
 	fill_memory.c \
@@ -88,10 +89,12 @@ secontext_EXECUTABLES = \
 	execveat--secontext_full \
 	faccessat--secontext \
 	faccessat--secontext_full \
+	faccessat-y--secontext \
 	fanotify_mark--secontext \
 	fanotify_mark--secontext_full \
 	fchmod--secontext \
 	fchmod--secontext_full \
+	fchmod-y--secontext \
 	fchmodat--secontext \
 	fchmodat--secontext_full \
 	fchownat--secontext \
@@ -100,6 +103,8 @@ secontext_EXECUTABLES = \
 	file_handle--secontext_full \
 	linkat--secontext \
 	linkat--secontext_full \
+	open--secontext \
+	open--secontext_full \
 	openat--secontext \
 	openat--secontext_full
 
@@ -335,10 +340,12 @@ execveat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 execveat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 faccessat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 faccessat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+faccessat_y__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 fanotify_mark__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 fanotify_mark__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 fchmod__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 fchmod__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+fchmod_y__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 fchmodat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 fchmodat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 fchownat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
@@ -347,6 +354,8 @@ file_handle__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 file_handle__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 linkat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 linkat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
+open__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
+open__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 openat__secontext_LDADD = $(libselinux_LDADD) $(LDADD)
 openat__secontext_full_LDADD = $(libselinux_LDADD) $(LDADD)
 

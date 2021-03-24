@@ -11,6 +11,11 @@
 #include "tests.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include "selinux.c"
 
 static const char *errstr;
 
@@ -46,9 +51,16 @@ main(void)
 {
 	char ** const tail_argv = tail_memdup(argv, sizeof(argv));
 	char ** const tail_envp = tail_memdup(envp, sizeof(envp));
+	char *my_secontext = SELINUX_MYCONTEXT();
+
+	unlink(FILENAME);
+	if (open(FILENAME, O_RDONLY | O_CREAT, 0400) < 0)
+		perror_msg_and_fail("open");
+
+	char *FILENAME_secontext = SELINUX_FILECONTEXT(FILENAME);
 
 	call_execve(FILENAME, tail_argv, tail_envp);
-	printf("execve(\"%s\""
+	printf("%sexecve(\"%s\"%s"
 	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
 #if VERBOSE
 	       ", [\"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
@@ -56,7 +68,9 @@ main(void)
 	       ", %p /* 5 vars, unterminated */"
 #endif
 	       ") = %s\n",
-	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
+	       my_secontext,
+	       Q_FILENAME, FILENAME_secontext,
+	       q_argv[0], q_argv[1], q_argv[2],
 	       argv[3], argv[4], argv[5], (char *) tail_argv + sizeof(argv)
 #if VERBOSE
 	       , q_envp[0], q_envp[1], envp[2], envp[3], envp[4],
@@ -71,14 +85,16 @@ main(void)
 	(void) q_envp;	/* workaround for clang bug #33068 */
 
 	call_execve(FILENAME, tail_argv, tail_envp);
-	printf("execve(\"%s\", [\"%s\", \"%s\", \"%s\"]"
+	printf("%sexecve(\"%s\"%s, [\"%s\", \"%s\", \"%s\"]"
 #if VERBOSE
 	       ", [\"%s\", \"%s\"]"
 #else
 	       ", %p /* 2 vars */"
 #endif
 	       ") = %s\n",
-	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2]
+	       my_secontext,
+	       Q_FILENAME, FILENAME_secontext,
+	       q_argv[0], q_argv[1], q_argv[2]
 #if VERBOSE
 	       , q_envp[0], q_envp[1]
 #else
@@ -87,14 +103,16 @@ main(void)
 	       , errstr);
 
 	call_execve(FILENAME, tail_argv + 2, tail_envp + 1);
-	printf("execve(\"%s\", [\"%s\"]"
+	printf("%sexecve(\"%s\"%s, [\"%s\"]"
 #if VERBOSE
 	       ", [\"%s\"]"
 #else
 	       ", %p /* 1 var */"
 #endif
 	       ") = %s\n",
-	       Q_FILENAME, q_argv[2]
+	       my_secontext,
+	       Q_FILENAME, FILENAME_secontext,
+	       q_argv[2]
 #if VERBOSE
 	       , q_envp[1]
 #else
@@ -107,13 +125,15 @@ main(void)
 	*empty = NULL;
 
 	call_execve(FILENAME, empty, empty);
-	printf("execve(\"%s\", []"
+	printf("%sexecve(\"%s\"%s, []"
 #if VERBOSE
 	       ", []"
 #else
 	       ", %p /* 0 vars */"
 #endif
-	       ") = %s\n", Q_FILENAME
+	       ") = %s\n",
+	       my_secontext,
+	       Q_FILENAME, FILENAME_secontext
 #if !VERBOSE
 	       , empty
 #endif
@@ -137,7 +157,10 @@ main(void)
 	a[i] = b[i] = NULL;
 
 	call_execve(FILENAME, a, b);
-	printf("execve(\"%s\", [\"%.*s\"...", Q_FILENAME, DEFAULT_STRLEN, a[0]);
+	printf("%sexecve(\"%s\"%s, [\"%.*s\"...",
+	       my_secontext,
+	       Q_FILENAME, FILENAME_secontext,
+	       DEFAULT_STRLEN, a[0]);
 	for (i = 1; i < DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
 #if VERBOSE
@@ -156,7 +179,10 @@ main(void)
 	printf(") = %s\n", errstr);
 
 	call_execve(FILENAME, a + 1, b + 1);
-	printf("execve(\"%s\", [\"%s\"", Q_FILENAME, a[1]);
+	printf("%sexecve(\"%s\"%s, [\"%s\"",
+	       my_secontext,
+	       Q_FILENAME, FILENAME_secontext,
+	       a[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
 #if VERBOSE
@@ -169,12 +195,17 @@ main(void)
 #endif
 	printf(") = %s\n", errstr);
 
+	if (unlink(FILENAME))
+		perror_msg_and_fail("unlink");
+
 	call_execve(FILENAME, (char **) tail_argv[ARRAY_SIZE(q_argv)], efault);
-	printf("execve(\"%s\", NULL, %p) = %s\n",
+	printf("%sexecve(\"%s\", NULL, %p) = %s\n",
+	       my_secontext,
 	       Q_FILENAME, efault, errstr);
 
 	call_execve(FILENAME, efault, NULL);
-	printf("execve(\"%s\", %p, NULL) = %s\n",
+	printf("%sexecve(\"%s\", %p, NULL) = %s\n",
+	       my_secontext,
 	       Q_FILENAME, efault, errstr);
 
 	return 0;

@@ -16,25 +16,28 @@
 #if defined HAVE_SYS_FANOTIFY_H && defined HAVE_FANOTIFY_MARK && \
 	defined __NR_fanotify_mark
 
-# include <limits.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/fanotify.h>
+#include <limits.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/fanotify.h>
 
-# if XLAT_RAW
-#  define str_fan_mark_add	"0x1"
-#  define str_fan_modify_ondir	"0x40000002"
-#  define str_at_fdcwd		"-100"
-# elif XLAT_VERBOSE
-#  define str_fan_mark_add	"0x1 /* FAN_MARK_ADD */"
-#  define str_fan_modify_ondir	"0x40000002 /* FAN_MODIFY|FAN_ONDIR */"
-#  define str_at_fdcwd		"-100 /* AT_FDCWD */"
-# else
-#  define str_fan_mark_add	"FAN_MARK_ADD"
-#  define str_fan_modify_ondir	"FAN_MODIFY|FAN_ONDIR"
-#  define str_at_fdcwd		"AT_FDCWD"
-# endif
+#include "selinux.c"
 
+#if XLAT_RAW
+#define str_fan_mark_add	"0x1"
+#define str_fan_modify_ondir	"0x40000002"
+#define str_at_fdcwd		"-100"
+#elif XLAT_VERBOSE
+#define str_fan_mark_add	"0x1 /* FAN_MARK_ADD */"
+#define str_fan_modify_ondir	"0x40000002 /* FAN_MODIFY|FAN_ONDIR */"
+#define str_at_fdcwd		"-100 /* AT_FDCWD */"
+#else
+#define str_fan_mark_add	"FAN_MARK_ADD"
+#define str_fan_modify_ondir	"FAN_MODIFY|FAN_ONDIR"
+#define str_at_fdcwd		"AT_FDCWD"
+#endif
+
+#ifndef TEST_SECONTEXT
 /* Performs fanotify_mark call via the syscall interface. */
 static void
 do_call(kernel_ulong_t fd, kernel_ulong_t flags, const char *flags_str,
@@ -70,10 +73,12 @@ struct strval {
 
 # define STR16 "0123456789abcdef"
 # define STR64 STR16 STR16 STR16 STR16
+#endif
 
 int
 main(void)
 {
+#ifndef TEST_SECONTEXT
 	enum {
 		PATH1_SIZE = 64,
 	};
@@ -202,12 +207,6 @@ main(void)
 	snprintf(bogus_path1_after_addr, sizeof(bogus_path1_after_addr), "%p",
 		bogus_path1 + PATH1_SIZE);
 
-	rc = fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY | FAN_ONDIR,
-			       -100, ".");
-	printf("fanotify_mark(-1, %s, %s, %s, \".\") = %s\n",
-	       str_fan_mark_add, str_fan_modify_ondir, str_at_fdcwd,
-	       sprintrc(rc));
-
 	for (i = 0; i < ARRAY_SIZE(fds); i++) {
 		for (j = 0; j < ARRAY_SIZE(flags); j++) {
 			for (k = 0; k < ARRAY_SIZE(masks); k++) {
@@ -226,7 +225,36 @@ main(void)
 			}
 		}
 	}
+#else
+	int rc;
+#endif
+	char *my_secontext = SELINUX_MYCONTEXT();
+	char path[] = ".";
+	char *path_secontext = SELINUX_FILECONTEXT(path);
 
+	rc = fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY | FAN_ONDIR,
+			       -100, path);
+	printf("%sfanotify_mark(-1, %s, %s, %s, \"%s\"%s) = %s\n",
+	       my_secontext,
+	       str_fan_mark_add, str_fan_modify_ondir, str_at_fdcwd,
+	       path, path_secontext,
+	       sprintrc(rc));
+
+	/*
+	 * Test with dirfd
+	 */
+
+	int cwd_fd = get_curdir_fd(NULL);
+	char *cwd_secontext = SELINUX_FILECONTEXT(".");
+
+	rc = fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY | FAN_ONDIR,
+			       cwd_fd, path);
+	printf("%sfanotify_mark(-1, %s, %s, %d%s, \"%s\"%s) = %s\n",
+	       my_secontext,
+	       str_fan_mark_add, str_fan_modify_ondir,
+	       cwd_fd, cwd_secontext,
+	       path, path_secontext,
+	       sprintrc(rc));
 	puts("+++ exited with 0 +++");
 	return 0;
 }

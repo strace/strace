@@ -15,6 +15,6 @@ SKIP_MAIN_UNDEFINED("HAVE_SELINUX_RUNTIME")
 
 #else
 
-#include "linkat.c"
+#include "fchmod-y.c"
 
 #endif

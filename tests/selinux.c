@@ -1,3 +1,5 @@
+#if defined TEST_SECONTEXT && HAVE_SELINUX_RUNTIME
+
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -180,3 +182,17 @@ update_context_type(const char *file, const char *newtype)
 	free(newcontext);
 	free(ctx);
 }
+
+#else
+
+#include "xmalloc.h"
+
+#define SELINUX_FILECONTEXT(filename)		xstrdup("")
+#define SELINUX_PIDCONTEXT(pid)			xstrdup("")
+#define SELINUX_FILECONTEXT_QUOTED(filename)	xstrdup("")
+#define SELINUX_PIDCONTEXT_QUOTED(pid)		xstrdup("")
+#define SELINUX_MYCONTEXT()			xstrdup("")
+#define SELINUX_MYCONTEXT_QUOTED()		xstrdup("")
+#define update_context_type(file, newtype)	do {} while(0)
+
+#endif

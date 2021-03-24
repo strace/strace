@@ -5,6 +5,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#define PRINT_SECONTEXT_FULL
+#define YFLAG
 
-#include "openat--secontext.c"
+#include "fchmod.c"

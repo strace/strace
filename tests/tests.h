@@ -141,6 +141,17 @@ void perror_msg_and_skip(const char *, ...)
 void skip_if_unavailable(const char *);
 
 /*
+ * Obtain the dirfd of the specified dir_name, dies on failure.
+ */
+int get_dir_fd(const char *dir_path);
+
+/*
+ * Obtain the dirfd of the current directory and returns the directory in
+ * curdir pointer if not NULL (memory must be freed), dies on failure.
+ */
+int get_curdir_fd(char **curdir);
+
+/*
  * Obtain an exclusive lock on dirname(path_name)/lock_name file
  * using open and flock.
  */

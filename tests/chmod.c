@@ -12,30 +12,43 @@
 
 #if defined __NR_chmod
 
-# include <fcntl.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+
+#include "selinux.c"
 
 int
 main(void)
 {
 	static const char fname[] = "chmod_test_file";
+	char *my_secontext = SELINUX_MYCONTEXT();
 
+	unlink(fname);
 	if (open(fname, O_CREAT|O_RDONLY, 0400) < 0)
 		perror_msg_and_fail("open");
 
 	long rc = syscall(__NR_chmod, fname, 0600);
-	printf("chmod(\"%s\", 0600) = %s\n", fname, sprintrc(rc));
+	printf("%schmod(\"%s\"%s, 0600) = %s\n",
+	       my_secontext,
+	       fname, SELINUX_FILECONTEXT(fname),
+	       sprintrc(rc));
 
 	if (unlink(fname))
 		perror_msg_and_fail("unlink");
 
 	rc = syscall(__NR_chmod, fname, 051);
-	printf("chmod(\"%s\", 051) = %s\n", fname, sprintrc(rc));
+	printf("%schmod(\"%s\", 051) = %s\n",
+	       my_secontext,
+	       fname,
+	       sprintrc(rc));
 
 	rc = syscall(__NR_chmod, fname, 004);
-	printf("chmod(\"%s\", 004) = %s\n", fname, sprintrc(rc));
+	printf("%schmod(\"%s\", 004) = %s\n",
+	       my_secontext,
+	       fname,
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

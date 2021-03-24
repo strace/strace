@@ -13,11 +13,94 @@
 
 #ifdef __NR_execveat
 
-# include <stdio.h>
-# include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
 
-# define FILENAME "test.execveat\nfilename"
-# define Q_FILENAME "test.execveat\\nfilename"
+#include "selinux.c"
+
+void
+tests_with_existing_file(void)
+{
+	static const char sample[] = "execveat_sample";
+	static const char *argv[] = { sample, NULL };
+	char *my_secontext = SELINUX_MYCONTEXT();
+
+	unlink(sample);
+	if (open(sample, O_RDONLY | O_CREAT, 0400) < 0)
+		perror_msg_and_fail("open");
+
+	char *sample_secontext = SELINUX_FILECONTEXT(sample);
+
+	long rc = syscall(__NR_execveat, -100, sample, argv, NULL, 0);
+	printf("%sexecveat(AT_FDCWD, \"%s\"%s, [\"%s\"], NULL, 0) = %s\n",
+	       my_secontext,
+	       sample, sample_secontext,
+	       argv[0],
+	       sprintrc(rc));
+
+	if (unlink(sample))
+		perror_msg_and_fail("unlink");
+
+	rc = syscall(__NR_execveat, -100, sample, argv, NULL, 0);
+	printf("%sexecveat(AT_FDCWD, \"%s\", [\"%s\"], NULL, 0) = %s\n",
+	       my_secontext,
+	       sample,
+	       argv[0],
+	       sprintrc(rc));
+
+	/*
+	 * Tests with dirfd
+	 */
+
+	char *cwd = NULL;
+	int cwd_fd = get_curdir_fd(&cwd);
+	char *cwd_secontext = SELINUX_FILECONTEXT(".");
+	char *sample_realpath = xasprintf("%s/%s", cwd, sample);
+
+	/* no file */
+	rc = syscall(__NR_execveat, cwd_fd, sample, argv, NULL, 0);
+	printf("%sexecveat(%d%s, \"%s\", [\"%s\"], NULL, 0) = %s\n",
+	       my_secontext,
+	       cwd_fd, cwd_secontext,
+	       sample,
+	       argv[0],
+	       sprintrc(rc));
+
+	if (open(sample, O_RDONLY | O_CREAT, 0400) < 0)
+		perror_msg_and_fail("open");
+
+	rc = syscall(__NR_execveat, cwd_fd, sample, argv, NULL, 0);
+	printf("%sexecveat(%d%s, \"%s\"%s, [\"%s\"], NULL, 0) = %s\n",
+	       my_secontext,
+	       cwd_fd, cwd_secontext,
+	       sample, sample_secontext,
+	       argv[0],
+	       sprintrc(rc));
+
+	/* cwd_fd ignored when path is absolute */
+	if (chdir("..") == -1)
+		perror_msg_and_fail("chdir");
+
+	rc = syscall(__NR_execveat, cwd_fd, sample_realpath, argv, NULL, 0);
+	printf("%sexecveat(%d%s, \"%s\"%s, [\"%s\"], NULL, 0) = %s\n",
+	       my_secontext,
+	       cwd_fd, cwd_secontext,
+	       sample_realpath, sample_secontext,
+	       argv[0],
+	       sprintrc(rc));
+
+	if (fchdir(cwd_fd))
+		perror_msg_and_fail("fchdir");
+
+	unlink(sample);
+}
+
+#define FILENAME "test.execveat\nfilename"
+#define Q_FILENAME "test.execveat\\nfilename"
 
 static const char * const argv[] = {
 	FILENAME, "first", "second", (const char *) -1L,
@@ -40,9 +123,10 @@ main(void)
 {
 	const char ** const tail_argv = tail_memdup(argv, sizeof(argv));
 	const char ** const tail_envp = tail_memdup(envp, sizeof(envp));
+	char *my_secontext = SELINUX_MYCONTEXT();
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\""
+	printf("%sexecveat(AT_FDCWD, \"%s\""
 	       ", [\"%s\", \"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
 # if VERBOSE
 	       ", [\"%s\", \"%s\", %p, %p, %p, ... /* %p */]"
@@ -50,6 +134,7 @@ main(void)
 	       ", %p /* 5 vars, unterminated */"
 # endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       my_secontext,
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 	       argv[3], argv[4], argv[5], (char *) tail_argv + sizeof(argv),
 # if VERBOSE
@@ -65,13 +150,14 @@ main(void)
 	(void) q_envp;	/* workaround for clang bug #33068 */
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv, tail_envp, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
+	printf("%sexecveat(AT_FDCWD, \"%s\", [\"%s\", \"%s\", \"%s\"]"
 # if VERBOSE
 	       ", [\"%s\", \"%s\"]"
 # else
 	       ", %p /* 2 vars */"
 # endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       my_secontext,
 	       Q_FILENAME, q_argv[0], q_argv[1], q_argv[2],
 # if VERBOSE
 	       q_envp[0], q_envp[1],
@@ -81,13 +167,14 @@ main(void)
 	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, tail_argv + 2, tail_envp + 1, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", [\"%s\"]"
+	printf("%sexecveat(AT_FDCWD, \"%s\", [\"%s\"]"
 # if VERBOSE
 	       ", [\"%s\"]"
 # else
 	       ", %p /* 1 var */"
 # endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       my_secontext,
 	       Q_FILENAME, q_argv[2],
 # if VERBOSE
 	       q_envp[1],
@@ -101,13 +188,14 @@ main(void)
 	*empty = NULL;
 
 	syscall(__NR_execveat, -100, FILENAME, empty, empty, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", []"
+	printf("%sexecveat(AT_FDCWD, \"%s\", []"
 # if VERBOSE
 	       ", []"
 # else
 	       ", %p /* 0 vars */"
 # endif
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       my_secontext,
 	       Q_FILENAME,
 # if !VERBOSE
 	       empty,
@@ -132,7 +220,9 @@ main(void)
 	a[i] = b[i] = NULL;
 
 	syscall(__NR_execveat, -100, FILENAME, a, b, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", [\"%.*s\"...", Q_FILENAME, DEFAULT_STRLEN, a[0]);
+	printf("%sexecveat(AT_FDCWD, \"%s\", [\"%.*s\"...",
+	       my_secontext,
+	       Q_FILENAME, DEFAULT_STRLEN, a[0]);
 	for (i = 1; i < DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
 # if VERBOSE
@@ -152,7 +242,9 @@ main(void)
 	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, a + 1, b + 1, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", [\"%s\"", Q_FILENAME, a[1]);
+	printf("%sexecveat(AT_FDCWD, \"%s\", [\"%s\"",
+	       my_secontext,
+	       Q_FILENAME, a[1]);
 	for (i = 2; i <= DEFAULT_STRLEN; ++i)
 		printf(", \"%s\"", a[i]);
 # if VERBOSE
@@ -167,14 +259,18 @@ main(void)
 	       errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, NULL, efault, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", NULL, %p"
+	printf("%sexecveat(AT_FDCWD, \"%s\", NULL, %p"
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       my_secontext,
 	       Q_FILENAME, efault, errno2name());
 
 	syscall(__NR_execveat, -100, FILENAME, efault, NULL, 0x1100);
-	printf("execveat(AT_FDCWD, \"%s\", %p, NULL"
+	printf("%sexecveat(AT_FDCWD, \"%s\", %p, NULL"
 	       ", AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH) = -1 %s (%m)\n",
+	       my_secontext,
 	       Q_FILENAME, efault, errno2name());
+
+	tests_with_existing_file();
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -123,6 +123,7 @@ fanotify_mark-Xraw
 fanotify_mark-Xverbose
 fchdir
 fchmod
+fchmod-y
 fchmodat
 fchown
 fchown32

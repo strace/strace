@@ -11,18 +11,22 @@
 
 #ifdef __NR_open
 
-# include <asm/fcntl.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <asm/fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#include "selinux.c"
 
 int
 main(void)
 {
 	static const char sample[] = "open.sample";
+	char *my_secontext = SELINUX_MYCONTEXT();
 
 	long fd = syscall(__NR_open, sample, O_RDONLY|O_CREAT, 0400);
-	printf("open(\"%s\", O_RDONLY|O_CREAT, 0400) = %s\n",
-	       sample, sprintrc(fd));
+	printf("%sopen(\"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+	       my_secontext,
+	       sample, sprintrc(fd), SELINUX_FILECONTEXT(sample));
 
 	if (fd != -1) {
 		close(fd);
@@ -30,16 +34,18 @@ main(void)
 			perror_msg_and_fail("unlink");
 
 		fd = syscall(__NR_open, sample, O_RDONLY);
-		printf("open(\"%s\", O_RDONLY) = %s\n", sample, sprintrc(fd));
+		printf("%sopen(\"%s\", O_RDONLY) = %s\n",
+		       my_secontext, sample, sprintrc(fd));
 
 		fd = syscall(__NR_open, sample, O_WRONLY|O_NONBLOCK|0x80000000);
-		printf("open(\"%s\", O_WRONLY|O_NONBLOCK|0x80000000) = %s\n",
-		       sample, sprintrc(fd));
+		printf("%sopen(\"%s\", O_WRONLY|O_NONBLOCK|0x80000000) = %s\n",
+		       my_secontext, sample, sprintrc(fd));
 	}
 
 # ifdef O_TMPFILE
 	fd = syscall(__NR_open, sample, O_WRONLY|O_TMPFILE, 0600);
-	printf("open(\"%s\", O_WRONLY|O_TMPFILE, 0600) = %s\n",
+	printf("%sopen(\"%s\", O_WRONLY|O_TMPFILE, 0600) = %s\n",
+	       my_secontext,
 	       sample, sprintrc(fd));
 # endif /* O_TMPFILE */
 
