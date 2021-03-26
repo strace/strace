@@ -33,9 +33,14 @@ get_curdir_fd(char **curdir)
 	int res = get_dir_fd(".");
 
 	if (curdir != NULL) {
-		*curdir = xmalloc(PATH_MAX);
-		if (readlink("/proc/self/cwd", *curdir, PATH_MAX) == -1)
-			perror_msg_and_fail("readlink");
+		char *buf = xmalloc(PATH_MAX);
+		ssize_t n = readlink("/proc/self/cwd", buf, PATH_MAX);
+		if (n == -1)
+			perror_msg_and_skip("/proc is not available");
+		if (n >= PATH_MAX)
+			perror_msg_and_fail("buffer is too small");
+		buf[n] = '\0';
+		*curdir = buf;
 	}
 
 	return res;
