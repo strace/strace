@@ -76,32 +76,40 @@ static struct {
 	{ ARG_STR(0x4001),
 	  "0x4001 /* MPOL_PREFERRED|MPOL_F_RELATIVE_NODES */",
 	  "MPOL_PREFERRED|MPOL_F_RELATIVE_NODES" },
-	{ ARG_STR(0xc002),
-	  "0xc002 /* MPOL_BIND|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES */",
-	  "MPOL_BIND|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES" },
+	{ ARG_STR(0x2002),
+	  "0x2002 /* MPOL_BIND|MPOL_F_NUMA_BALANCING */",
+	  "MPOL_BIND|MPOL_F_NUMA_BALANCING" },
+	{ ARG_STR(0xe003),
+	  "0xe003 /* MPOL_INTERLEAVE|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES"
+		"|MPOL_F_NUMA_BALANCING */",
+	  "MPOL_INTERLEAVE|MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES"
+		"|MPOL_F_NUMA_BALANCING" },
 	{ ARG_STR(0x5),
 	  "0x5 /* MPOL_??? */",
 	  "0x5 /* MPOL_??? */" },
-	{ ARG_STR(0xffff3fff),
-	  "0xffff3fff /* MPOL_??? */",
-	  "0xffff3fff /* MPOL_??? */" },
+	{ ARG_STR(0xffff1fff),
+	  "0xffff1fff /* MPOL_??? */",
+	  "0xffff1fff /* MPOL_??? */" },
 	{ ARG_STR(0xffffffff),
-	  "0xffffffff /* MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffff3fff */",
-	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffff3fff" },
+	  "0xffffffff /* MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES"
+		"|MPOL_F_NUMA_BALANCING|0xffff1fff */",
+	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|MPOL_F_NUMA_BALANCING"
+		"|0xffff1fff" },
 # if SIZEOF_LONG > 4
 	{ 0xffffffff00000000UL,
 	  "0xffffffff00000000",
 	  "0xffffffff00000000 /* MPOL_??? */",
 	  "0xffffffff00000000 /* MPOL_??? */" },
-	{ 0xffffffffffff3fffUL,
-	  "0xffffffffffff3fff",
-	  "0xffffffffffff3fff /* MPOL_??? */",
-	  "0xffffffffffff3fff /* MPOL_??? */" },
+	{ 0xffffffffffff1fffUL,
+	  "0xffffffffffff1fff",
+	  "0xffffffffffff1fff /* MPOL_??? */",
+	  "0xffffffffffff1fff /* MPOL_??? */" },
 	{ -1UL,
 	  "0xffffffffffffffff",
 	  "0xffffffffffffffff /* MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES"
-	  "|0xffffffffffff3fff */",
-	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|0xffffffffffff3fff" },
+		"|MPOL_F_NUMA_BALANCING|0xffffffffffff1fff */",
+	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|MPOL_F_NUMA_BALANCING"
+		"|0xffffffffffff1fff" },
 # endif
 };
 

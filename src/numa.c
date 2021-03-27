@@ -60,8 +60,9 @@ SYS_FUNC(migrate_pages)
 static void
 print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 {
-	const kernel_ulong_t flags_mask =
-		MPOL_F_STATIC_NODES | MPOL_F_RELATIVE_NODES;
+	const kernel_ulong_t flags_mask = MPOL_F_STATIC_NODES |
+					  MPOL_F_RELATIVE_NODES |
+					  MPOL_F_NUMA_BALANCING;
 	const kernel_ulong_t mode = mode_arg & ~flags_mask;
 	const unsigned int flags = mode_arg & flags_mask;
 
