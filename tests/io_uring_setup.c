@@ -9,25 +9,23 @@
  */
 
 #include "tests.h"
-#include <unistd.h>
 #include "scno.h"
 
-#ifdef __NR_io_uring_setup
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
+#include <linux/io_uring.h>
 
-# include <fcntl.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <string.h>
-# include <linux/io_uring.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-# include <sys/stat.h>
-# include <sys/types.h>
+#include "print_fields.h"
+#include "xlat.h"
 
-# include "print_fields.h"
-# include "xlat.h"
-
-# include "xlat/uring_setup_features.h"
-# include "xlat/uring_cqring_flags.h"
+#include "xlat/uring_setup_features.h"
+#include "xlat/uring_cqring_flags.h"
 
 static const char *errstr;
 
@@ -141,9 +139,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_io_uring_setup")
-
-#endif

@@ -10,22 +10,20 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_openat2
+#include <errno.h>
+#include <stdint.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <linux/fcntl.h>
 
-# include <errno.h>
-# include <stdint.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-# include <linux/fcntl.h>
-
-# ifndef VERBOSE
-#  define VERBOSE 0
-# endif
-# ifndef FD0_PATH
-#  define FD0_PATH ""
-# endif
+#ifndef VERBOSE
+# define VERBOSE 0
+#endif
+#ifndef FD0_PATH
+# define FD0_PATH ""
+#endif
 
 static const char sample[] = "openat2.sample";
 
@@ -126,9 +124,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_openat2");
-
-#endif

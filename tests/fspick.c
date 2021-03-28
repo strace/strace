@@ -10,13 +10,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_fspick
-
-# include <fcntl.h>
-# include <limits.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <unistd.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
 
 static const char *errstr;
 
@@ -52,15 +50,15 @@ main(void)
                 perror_msg_and_fail("open: %s", path);
 
 	k_fspick(-1, 0, 1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fspick(-1, NULL, %s) = %s\n", "FSPICK_CLOEXEC", errstr);
-# endif
+#endif
 
 	k_fspick(-100, fname, 0);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fspick(%s, \"%.*s\"..., 0) = %s\n",
 	       "AT_FDCWD", (int) PATH_MAX - 1, fname, errstr);
-# endif
+#endif
 
 	fname[PATH_MAX - 1] = '\0';
 	k_fspick(dfd, fname, 0xfffffff0);
@@ -68,21 +66,21 @@ main(void)
 	       dfd, path, fname, "0xfffffff0 /* FSPICK_??? */", errstr);
 
 	k_fspick(-1, efault, 0xf);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fspick(-1, %p, %s) = %s\n",
 	       efault,
 	       "FSPICK_CLOEXEC|FSPICK_SYMLINK_NOFOLLOW"
 	       "|FSPICK_NO_AUTOMOUNT|FSPICK_EMPTY_PATH",
 	       errstr);
-# endif
+#endif
 
 	k_fspick(-1, empty, -1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fspick(-1, \"\", %s|0xfffffff0) = %s\n",
 	       "FSPICK_CLOEXEC|FSPICK_SYMLINK_NOFOLLOW"
 	       "|FSPICK_NO_AUTOMOUNT|FSPICK_EMPTY_PATH",
 	       errstr);
-# endif
+#endif
 
 	if (k_fspick(-1, path, 0) < 0)
 		printf("fspick(-1, \"%s\", 0) = %s\n",
@@ -101,9 +99,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_fspick")
-
-#endif

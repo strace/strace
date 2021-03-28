@@ -10,14 +10,12 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_fsconfig
-
-# include <fcntl.h>
-# include <limits.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <unistd.h>
-# include <linux/mount.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <linux/mount.h>
 
 static const char *errstr;
 
@@ -61,129 +59,129 @@ static void
 test_fsconfig_unknown(void)
 {
 	k_fsconfig(fd, 8, empty, val, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, 0x8 /* FSCONFIG_??? */, %p, %p, -100) = %s\n",
 	       fd, fd_path, empty, val, errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, -1, empty, fd_path, fd);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, 0xffffffff /* FSCONFIG_??? */, %p, %p, %d)"
 	       " = %s\n",
 	       empty, fd_path, fd, errstr);
-# endif
+#endif
 }
 
 static void
 test_fsconfig_cmd(const unsigned int cmd, const char *cmd_str)
 {
 	k_fsconfig(fd, cmd, empty, val, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, %p, %p, -100) = %s\n",
 	       fd, fd_path, cmd_str, empty, val, errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, empty, fd_path, fd);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, %p, %p, %d) = %s\n",
 	       cmd_str, empty, fd_path, fd, errstr);
-# endif
+#endif
 }
 
 static void
 test_fsconfig_set_flag(const unsigned int cmd, const char *cmd_str)
 {
 	k_fsconfig(fd, cmd, key, val, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", %p, -100) = %s\n",
 	       fd, fd_path, cmd_str, key, val, errstr);
-# endif
+#endif
 
 	k_fsconfig(fd, cmd, key1, val, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%.*s\"..., %p, -100) = %s\n",
 	       fd, fd_path, cmd_str, max_string_size, key1, val, errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, key, fd_path, fd);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, \"%s\", %p, %d) = %s\n",
 	       cmd_str, key, fd_path, fd, errstr);
-# endif
+#endif
 }
 
 static void
 test_fsconfig_set_string(const unsigned int cmd, const char *cmd_str)
 {
 	k_fsconfig(fd, cmd, key, val, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", \"%s\", -100) = %s\n",
 	       fd, fd_path, cmd_str, key, val, errstr);
-# endif
+#endif
 
 	k_fsconfig(fd, cmd, key1, val1, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%.*s\"..., \"%.*s\"..., -100) = %s\n",
 	       fd, fd_path, cmd_str, max_string_size, key1, max_string_size, val1,
 	       errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, key, fd_path, fd);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, \"%s\", \"%s\", %d) = %s\n",
 	       cmd_str, key, fd_path, fd, errstr);
-# endif
+#endif
 }
 
 static void
 test_fsconfig_set_binary(const unsigned int cmd, const char *cmd_str)
 {
 	k_fsconfig(fd, cmd, key, blob, max_blob_size);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", ", fd, fd_path, cmd_str, key);
 	print_quoted_hex(blob, max_blob_size);
 	printf(", %d) = %s\n", max_blob_size, errstr);
-# endif
+#endif
 
 	k_fsconfig(fd, cmd, key1, blob1, max_blob_size + 1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%.*s\"..., ",
 	       fd, fd_path, cmd_str, max_string_size, key1);
 	print_quoted_hex(blob1, max_blob_size);
 	printf("..., %d) = %s\n", max_blob_size + 1, errstr);
-# endif
+#endif
 
 	k_fsconfig(fd, cmd, key, empty, 0);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", \"\", 0) = %s\n",
 	       fd, fd_path, cmd_str, key, errstr);
-# endif
+#endif
 
 	k_fsconfig(fd, cmd, key, fname, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", %p, -100) = %s\n",
 	       fd, fd_path, cmd_str, key, fname, errstr);
-# endif
+#endif
 
 	k_fsconfig(fd, cmd, key, fname, huge_blob_size);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", %p, %d) = %s\n",
 	       fd, fd_path, cmd_str, key, fname, huge_blob_size, errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, key, fd_path, sizeof(path_full));
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, \"%s\", ", cmd_str, key);
 	print_quoted_hex(fd_path, sizeof(path_full));
 	printf(", %d) = %s\n", (int) sizeof(path_full), errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, key, fname, fd);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, \"%s\", ", cmd_str, key);
 	print_quoted_hex(fname, fd);
 	printf(", %d) = %s\n", fd, errstr);
-# endif
+#endif
 }
 
 static void
@@ -191,17 +189,17 @@ test_fsconfig_set_path(const unsigned int cmd, const char *cmd_str)
 {
 	fill_memory_ex(fname, PATH_MAX, '0', 10);
 	k_fsconfig(fd, cmd, key, fname, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", \"%.*s\"..., AT_FDCWD) = %s\n",
 	       fd, fd_path, cmd_str, key, (int) PATH_MAX - 1, fname, errstr);
-# endif
+#endif
 
 	fname[PATH_MAX - 1] = '\0';
 	k_fsconfig(fd, cmd, key, fname, -1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", \"%s\", -1) = %s\n",
 	       fd, fd_path, cmd_str, key, fname, errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, key, empty, fd);
 	printf("fsconfig(-100, %s, \"%s\", \"\", %d<%s>) = %s\n",
@@ -216,20 +214,20 @@ test_fsconfig_set_path(const unsigned int cmd, const char *cmd_str)
 	       cmd_str, efault, efault + 1, fd, fd_path, errstr);
 
 	k_fsconfig(-100, cmd, key, fname, -1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, \"%s\", \"%s\", -1) = %s\n",
 	       cmd_str, key, fname, errstr);
-# endif
+#endif
 }
 
 static void
 test_fsconfig_set_fd(const unsigned int cmd, const char *cmd_str)
 {
 	k_fsconfig(fd, cmd, key, val, -100);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(%d<%s>, %s, \"%s\", %p, -100) = %s\n",
 	       fd, fd_path, cmd_str, key, val, errstr);
-# endif
+#endif
 
 	k_fsconfig(-100, cmd, key1, 0, fd);
 	printf("fsconfig(-100, %s, \"%.*s\"..., NULL, %d<%s>) = %s\n",
@@ -240,10 +238,10 @@ test_fsconfig_set_fd(const unsigned int cmd, const char *cmd_str)
 	       cmd_str, efault, efault + 1, fd, fd_path, errstr);
 
 	k_fsconfig(-100, cmd, key, fd_path, -1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("fsconfig(-100, %s, \"%s\", %p, -1) = %s\n",
 	       cmd_str, key, fd_path, errstr);
-# endif
+#endif
 }
 
 int
@@ -287,9 +285,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_fsconfig")
-
-#endif

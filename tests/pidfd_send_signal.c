@@ -12,11 +12,9 @@
 #include "scno.h"
 #include "pidns.h"
 
-#ifdef __NR_pidfd_send_signal
-
-# include <fcntl.h>
-# include <stdio.h>
-# include <signal.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <signal.h>
 
 static const char *errstr;
 
@@ -69,9 +67,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_pidfd_send_signal")
-
-#endif

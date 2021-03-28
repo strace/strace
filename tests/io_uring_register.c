@@ -11,31 +11,29 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_io_uring_register
-
-# include <fcntl.h>
-# include <inttypes.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-# include <linux/io_uring.h>
+#include <fcntl.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <linux/io_uring.h>
 
 /* From tests/bpf.c */
-# if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
-#  define BIG_ADDR_MAYBE(addr_)
-# elif defined __arm__ || defined __i386__ || defined __mips__ \
+#if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+# define BIG_ADDR_MAYBE(addr_)
+#elif defined __arm__ || defined __i386__ || defined __mips__ \
    || defined __powerpc__ || defined __riscv__ || defined __s390__ \
    || defined __sparc__ || defined __tile__
-#  define BIG_ADDR_MAYBE(addr_) addr_ " or "
-# else
-#  define BIG_ADDR_MAYBE(addr_)
-# endif
+# define BIG_ADDR_MAYBE(addr_) addr_ " or "
+#else
+# define BIG_ADDR_MAYBE(addr_)
+#endif
 
-# ifdef WORDS_BIGENDIAN
-#  define BE_LE(be_, le_) be_
-# else
-#  define BE_LE(be_, le_) le_
-# endif
+#ifdef WORDS_BIGENDIAN
+# define BE_LE(be_, le_) be_
+#else
+# define BE_LE(be_, le_) le_
+#endif
 
 static const char *errstr;
 
@@ -277,9 +275,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_io_uring_register")
-
-#endif

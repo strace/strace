@@ -10,13 +10,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_move_mount
-
-# include <fcntl.h>
-# include <limits.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <unistd.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
 
 static const char *errstr;
 
@@ -55,14 +53,14 @@ main(void)
                 perror_msg_and_fail("open: %s", path);
 
 	k_move_mount(-1, 0, -100, efault, 0);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("move_mount(-1, NULL, AT_FDCWD, %p, 0) = %s\n", efault, errstr);
-# endif
+#endif
 
 	k_move_mount(-100, efault, -1, 0, 0);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("move_mount(AT_FDCWD, %p, -1, NULL, 0) = %s\n", efault, errstr);
-# endif
+#endif
 
 	k_move_mount(dfd, fname, -100, empty, 1);
 	printf("move_mount(%d<%s>, \"%.*s\"..., AT_FDCWD, \"\", %s) = %s\n",
@@ -72,13 +70,13 @@ main(void)
 	printf("move_mount(AT_FDCWD, \"\", %d<%s>, \"%.*s\"..., %s) = %s\n",
 	       dfd, path, (int) PATH_MAX - 1, fname, "MOVE_MOUNT_T_SYMLINKS", errstr);
 
-# define f_flags_str "MOVE_MOUNT_F_SYMLINKS|MOVE_MOUNT_F_AUTOMOUNTS|MOVE_MOUNT_F_EMPTY_PATH"
+#define f_flags_str "MOVE_MOUNT_F_SYMLINKS|MOVE_MOUNT_F_AUTOMOUNTS|MOVE_MOUNT_F_EMPTY_PATH"
 	fname[PATH_MAX - 1] = '\0';
 	k_move_mount(dfd, fname, -100, empty, 7);
 	printf("move_mount(%d<%s>, \"%s\", AT_FDCWD, \"\", %s) = %s\n",
 	       dfd, path, fname, f_flags_str, errstr);
 
-# define t_flags_str "MOVE_MOUNT_T_SYMLINKS|MOVE_MOUNT_T_AUTOMOUNTS|MOVE_MOUNT_T_EMPTY_PATH"
+#define t_flags_str "MOVE_MOUNT_T_SYMLINKS|MOVE_MOUNT_T_AUTOMOUNTS|MOVE_MOUNT_T_EMPTY_PATH"
 	k_move_mount(-100, empty, dfd, fname, 0x70);
 	printf("move_mount(AT_FDCWD, \"\", %d<%s>, \"%s\", %s) = %s\n",
 	       dfd, path, fname, t_flags_str, errstr);
@@ -94,9 +92,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_move_mount")
-
-#endif

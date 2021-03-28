@@ -10,12 +10,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_fsmount
-
-# include <fcntl.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
 
 static const char *errstr;
 
@@ -89,9 +87,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_fsmount")
-
-#endif

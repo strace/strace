@@ -8,15 +8,13 @@
  */
 
 #include "tests.h"
-#include <unistd.h>
 #include "scno.h"
 
-#ifdef __NR_io_uring_enter
-
-# include <fcntl.h>
-# include <signal.h>
-# include <stdio.h>
-# include <string.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 static const char *errstr;
 
@@ -74,9 +72,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_io_uring_enter")
-
-#endif

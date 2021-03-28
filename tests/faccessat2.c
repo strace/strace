@@ -10,23 +10,21 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_faccessat2
+#include "xmalloc.h"
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 
-# include "xmalloc.h"
-# include <fcntl.h>
-# include <stdio.h>
-# include <unistd.h>
+#define XLAT_MACROS_ONLY
+# include "xlat/faccessat_flags.h"
+#undef XLAT_MACROS_ONLY
 
-# define XLAT_MACROS_ONLY
-#  include "xlat/faccessat_flags.h"
-# undef XLAT_MACROS_ONLY
-
-# ifndef FD_PATH
-#  define FD_PATH ""
-# endif
-# ifndef SKIP_IF_PROC_IS_UNAVAILABLE
-#  define SKIP_IF_PROC_IS_UNAVAILABLE
-# endif
+#ifndef FD_PATH
+# define FD_PATH ""
+#endif
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
 
 static const char *errstr;
 
@@ -141,10 +139,10 @@ main(void)
 						    paths[path_i].val,
 						    modes[mode_i].val,
 						    flags[flag_i].val);
-# ifdef PATH_TRACING
+#ifdef PATH_TRACING
 					if (dirfds[dirfd_i].val == fd ||
 					    paths[path_i].val == fd_path)
-# endif
+#endif
 					printf("faccessat2(%s, %s, %s, %s) = %s\n",
 					       dirfds[dirfd_i].str,
 					       paths[path_i].str,
@@ -159,9 +157,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_faccessat2")
-
-#endif

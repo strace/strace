@@ -10,22 +10,20 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_close_range
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <linux/close_range.h>
 
-# include <fcntl.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <linux/close_range.h>
-
-# ifndef FD0_PATH
-#  define FD0_PATH ""
-# endif
-# ifndef FD7_PATH
-#  define FD7_PATH ""
-# endif
-# ifndef SKIP_IF_PROC_IS_UNAVAILABLE
-#  define SKIP_IF_PROC_IS_UNAVAILABLE
-# endif
+#ifndef FD0_PATH
+# define FD0_PATH ""
+#endif
+#ifndef FD7_PATH
+# define FD7_PATH ""
+#endif
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
 
 static const char *errstr;
 
@@ -60,27 +58,27 @@ main(void)
 	const int fd7_max = MAX(7, fd7);
 
 	k_close_range(-2, -1, 1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(-2, -1, 0x1 /* CLOSE_RANGE_??? */) = %s\n", errstr);
-# endif
+#endif
 
 	k_close_range(-1, -2, 2);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(-1, -2, CLOSE_RANGE_UNSHARE) = %s\n", errstr);
-# endif
+#endif
 
 	k_close_range(-3, 0, 4);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(-3, 0" FD0_PATH ", CLOSE_RANGE_CLOEXEC)"
 	       " = %s\n", errstr);
-# endif
+#endif
 
 	k_close_range(0, -4, -1);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(0" FD0_PATH ", -4"
 	       ", CLOSE_RANGE_UNSHARE|CLOSE_RANGE_CLOEXEC|%#x) = %s\n",
 	       (-1U & ~(CLOSE_RANGE_UNSHARE | CLOSE_RANGE_CLOEXEC)), errstr);
-# endif
+#endif
 
 	k_close_range(-5, 7, 0);
 	printf("close_range(-5, 7" FD7_PATH ", 0) = %s\n", errstr);
@@ -94,10 +92,10 @@ main(void)
 	       ", 0x8 /* CLOSE_RANGE_??? */) = %s\n", errstr);
 
 	k_close_range(-7, -7, 7);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(-7, -7"
 	       ", CLOSE_RANGE_UNSHARE|CLOSE_RANGE_CLOEXEC|0x1) = %s\n", errstr);
-# endif
+#endif
 
 	k_close_range(7, 0, 0);
 	printf("close_range(7" FD7_PATH ", 0" FD0_PATH ", 0) = %s\n", errstr);
@@ -108,16 +106,16 @@ main(void)
 
 	if (k_close_range(0, 0, 0) == 0)
 		xdup2(fd0, 0);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(0" FD0_PATH ", 0" FD0_PATH ", 0) = %s\n", errstr);
-# endif
+#endif
 
 	if (k_close_range(fd0, fd0, 0) == 0)
 		xdup2(0, fd0);
-# ifndef PATH_TRACING
+#ifndef PATH_TRACING
 	printf("close_range(%d" FD0_PATH ", %d" FD0_PATH ", 0) = %s\n",
 	       fd0, fd0, errstr);
-# endif
+#endif
 
 	if (k_close_range(7, 7, 0) == 0)
 		xdup2(fd7, 7);
@@ -136,9 +134,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_close_range")
-
-#endif
