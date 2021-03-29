@@ -85,6 +85,8 @@ epoll_pwait2-P	--trace=epoll_pwait2 -P /dev/full
 epoll_pwait2-y	--trace=epoll_pwait2 -y
 epoll_wait	-a26
 erestartsys	-a34 -e signal=none -e trace=recvfrom
+execve--secontext	+execve.test --secontext
+execve--secontext_full	+execve.test --secontext=full
 execveat
 execveat--secontext	--secontext --trace=execveat
 execveat--secontext_full	--secontext=full --trace=execveat

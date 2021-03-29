@@ -7,14 +7,13 @@
 
 #include "tests.h"
 
-#define TEST_SECONTEXT
+#ifdef HAVE_SELINUX_RUNTIME
 
-#ifndef HAVE_SELINUX_RUNTIME
-
-SKIP_MAIN_UNDEFINED("HAVE_SELINUX_RUNTIME")
+# define TEST_SECONTEXT
+# include "open.c"
 
 #else
 
-#include "open.c"
+SKIP_MAIN_UNDEFINED("HAVE_SELINUX_RUNTIME")
 
 #endif

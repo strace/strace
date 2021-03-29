@@ -9,7 +9,6 @@
 
 #include <limits.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <dirent.h>
 
 #include "xmalloc.h"
@@ -17,10 +16,9 @@
 int
 get_dir_fd(const char *dir_path)
 {
-	DIR *dir = NULL;
-	dir = opendir(dir_path);
+	DIR *dir = opendir(dir_path);
 	if (dir == NULL)
-		perror_msg_and_fail("opendir");
+		perror_msg_and_fail("opendir(%s)", dir_path);
 	int dfd = dirfd(dir);
 	if (dfd == -1)
 		perror_msg_and_fail("dirfd");
@@ -36,9 +34,11 @@ get_curdir_fd(char **curdir)
 		char *buf = xmalloc(PATH_MAX);
 		ssize_t n = readlink("/proc/self/cwd", buf, PATH_MAX);
 		if (n == -1)
-			perror_msg_and_skip("/proc is not available");
+			perror_msg_and_skip("readlink: %s", "/proc/self/cwd");
 		if (n >= PATH_MAX)
-			perror_msg_and_fail("buffer is too small");
+			error_msg_and_fail("readlink: %s: %s",
+					   "/proc/self/cwd",
+					   "symlink value is too long");
 		buf[n] = '\0';
 		*curdir = buf;
 	}
