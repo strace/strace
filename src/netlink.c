@@ -20,10 +20,7 @@
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nfnetlink_acct.h>
 #include <linux/netfilter/nfnetlink_conntrack.h>
-/* workaround a typo in nfnetlink_cthelper.h */
-#define nfnl_acct_msg_types nfnl_cthelper_msg_types
 #include <linux/netfilter/nfnetlink_cthelper.h>
-#undef nfnl_acct_msg_types
 #include <linux/netfilter/nfnetlink_cttimeout.h>
 #include <linux/netfilter/nfnetlink_log.h>
 #include <linux/netfilter/nfnetlink_queue.h>
