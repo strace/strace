@@ -61,6 +61,22 @@ context_format(char *context, const char *fmt)
 	return res;
 }
 
+static char *
+strip_trailing_newlines(char *context)
+{
+	/*
+	 * On the CI at least, the context may have a trailing \n,
+	 * let's remove it just in case
+	 */
+	int index;
+	for (index = strlen(context) - 1; index >= 0; index--) {
+		if (context[index] != '\n')
+			break;
+		context[index] = '\0';
+	}
+	return context;
+}
+
 char *
 get_file_context_full(const char *filename)
 {
@@ -68,7 +84,7 @@ get_file_context_full(const char *filename)
 	char *full_context = NULL;
 	char *secontext;
 	if (getfilecon(filename, &secontext) >= 0) {
-		full_context = xstrdup(secontext);
+		full_context = strip_trailing_newlines(xstrdup(secontext));
 		freecon(secontext);
 	}
 	errno = saved_errno;
@@ -115,7 +131,7 @@ get_pid_context_full(pid_t pid)
 	char *secontext;
 
 	if (getpidcon(pid, &secontext) == 0) {
-		full_context = xstrdup(secontext);
+		full_context = strip_trailing_newlines(xstrdup(secontext));
 		freecon(secontext);
 	}
 	errno = saved_errno;

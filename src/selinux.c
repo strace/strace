@@ -44,8 +44,20 @@ getcontext(int rc, char **secontext, char **result)
 		free(secontext_copy);
 	}
 
-	if (*result == NULL)
-		*result = xstrdup(*secontext);
+	if (*result == NULL) {
+		char *res = xstrdup(*secontext);
+		/*
+		 * On the CI at least, the context may have a trailing \n,
+		 * let's remove it just in case
+		 */
+		int index;
+		for (index = strlen(res) - 1; index >= 0; index--) {
+			if (res[index] != '\n')
+				break;
+			res[index] = '\0';
+		}
+		*result = res;
+	}
 	freecon(*secontext);
 	return 0;
 }
