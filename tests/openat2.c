@@ -60,8 +60,8 @@ main(void)
 	static struct strval64 resolve[] = {
 		{ 0, NULL },
 		{ ARG_STR(RESOLVE_NO_XDEV) },
-		{ ARG_ULL_STR(RESOLVE_NO_XDEV|RESOLVE_IN_ROOT|0xfeedfacedcaffee0) },
-		{ 0xdec0dedbeefface0, NULL },
+		{ ARG_ULL_STR(RESOLVE_NO_XDEV|RESOLVE_IN_ROOT|RESOLVE_CACHED|0xfeedfacedcaffec0) },
+		{ 0xdec0dedbeeffffc0, NULL },
 	};
 	const size_t iters = MAX(MAX(ARRAY_SIZE(flags), ARRAY_SIZE(modes)),
 				 ARRAY_SIZE(resolve));
