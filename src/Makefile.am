@@ -237,12 +237,12 @@ libstrace_a_SOURCES =	\
 	poke.h		\
 	poll.c		\
 	prctl.c		\
-	print_kernel_sigset.c \
 	print_dev_t.c	\
 	print_fields.h	\
 	print_group_req.c \
 	print_ifindex.c	\
 	print_instruction_pointer.c \
+	print_kernel_sigset.c \
 	print_kernel_version.c \
 	print_mac.c	\
 	print_mq_attr.c	\

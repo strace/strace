@@ -96,6 +96,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	caps-abbrev \
 	check_sigblock \
 	check_sigign \
+	clone3-success \
+	clone3-success-Xabbrev \
+	clone3-success-Xraw \
+	clone3-success-Xverbose \
 	clone_parent \
 	clone_parent--quiet-exit \
 	clone_parent-q \
@@ -105,10 +109,6 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone_ptrace--quiet-exit \
 	clone_ptrace-q \
 	clone_ptrace-qq \
-	clone3-success \
-	clone3-success-Xabbrev \
-	clone3-success-Xraw \
-	clone3-success-Xverbose \
 	close_range \
 	close_range-P \
 	close_range-y \
@@ -119,11 +119,11 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	execveat-v \
 	fcntl--pidns-translation \
 	fcntl64--pidns-translation \
+	filter-unavailable \
 	filter_seccomp-flag \
 	filter_seccomp-perf \
-	filter-unavailable \
-	fork-f \
 	fork--pidns-translation \
+	fork-f \
 	fsync-y \
 	get_process_reaper \
 	getpgrp--pidns-translation	\
@@ -192,8 +192,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioprio--pidns-translation \
 	is_linux_mips_n64 \
 	kcmp-y--pidns-translation \
-	kill_child \
 	kill--pidns-translation \
+	kill_child \
 	ksysent \
 	list_sigaction_signum \
 	localtime \
@@ -206,11 +206,11 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	net-accept-connect \
 	net-sockaddr--pidns-translation \
 	net-tpacket_stats-success \
-	nlattr_ifla_xdp-y \
 	netlink_audit--pidns-translation \
 	netlink_inet_diag \
 	netlink_netlink_diag \
 	netlink_unix_diag \
+	nlattr_ifla_xdp-y \
 	nsyscalls \
 	nsyscalls-d \
 	oldselect-P \
@@ -225,12 +225,12 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	poll-P \
 	ppoll-P \
 	ppoll-v \
-	prlimit64--pidns-translation \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-spec-inject \
 	print_maxfd \
 	print_ppid_tracerpid \
+	prlimit64--pidns-translation \
 	process_vm_readv--pidns-translation \
 	process_vm_writev--pidns-translation \
 	qual_fault \
@@ -264,12 +264,12 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	signal_receive \
 	signal_receive--pidns-translation \
 	sleep \
+	so_peercred--pidns-translation \
 	stack-fcall \
 	stack-fcall-attach \
 	stack-fcall-mangled \
 	status-none-threads \
 	status-unfinished-threads \
-	so_peercred--pidns-translation \
 	syslog-success \
 	tgkill--pidns-translation \
 	threads-execve \
@@ -286,9 +286,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	vfork-f \
 	wait4-v \
 	waitid-v \
+	xet_robust_list--pidns-translation \
 	xetpgid--pidns-translation \
 	xetpriority--pidns-translation \
-	xet_robust_list--pidns-translation \
 	zeroargc \
 	# end of check_PROGRAMS
 
