@@ -12,12 +12,12 @@
 
 #if defined __NR_chmod
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <errno.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 int
 main(void)

@@ -14,14 +14,14 @@
 
 #ifdef __NR_fchmod
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <unistd.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 int
 main(void)
@@ -34,24 +34,24 @@ main(void)
 	if (fd == -1)
 		perror_msg_and_fail("open");
 
-#ifdef YFLAG
+# ifdef YFLAG
 	char *cwd = NULL;
 	get_curdir_fd(&cwd);
 	char *fname_realpath = xasprintf("%s/%s", cwd, fname);
-#endif
+# endif
 
 	const char *fname_context = SELINUX_FILECONTEXT(fname);
 	long rc = syscall(__NR_fchmod, fd, 0600);
-#ifdef YFLAG
+# ifdef YFLAG
 	printf("%sfchmod(%d<%s>%s, 0600) = %s\n",
-#else
+# else
 	printf("%sfchmod(%d%s, 0600) = %s\n",
-#endif
+# endif
 	       my_secontext,
 	       fd,
-#ifdef YFLAG
+# ifdef YFLAG
 	       fname_realpath,
-#endif
+# endif
 	       fname_context,
 	       sprintrc(rc));
 
@@ -59,30 +59,30 @@ main(void)
 		perror_msg_and_fail("unlink");
 
 	rc = syscall(__NR_fchmod, fd, 051);
-#ifdef YFLAG
+# ifdef YFLAG
 	printf("%sfchmod(%d<%s (deleted)>%s, 051) = %s\n",
-#else
+# else
 	printf("%sfchmod(%d%s, 051) = %s\n",
-#endif
+# endif
 	       my_secontext,
 	       fd,
-#ifdef YFLAG
+# ifdef YFLAG
 	       fname_realpath,
-#endif
+# endif
 	       fname_context,
 	       sprintrc(rc));
 
 	rc = syscall(__NR_fchmod, fd, 004);
-#ifdef YFLAG
+# ifdef YFLAG
 	printf("%sfchmod(%d<%s (deleted)>%s, 004) = %s\n",
-#else
+# else
 	printf("%sfchmod(%d%s, 004) = %s\n",
-#endif
+# endif
 	       my_secontext,
 	       fd,
-#ifdef YFLAG
+# ifdef YFLAG
 	       fname_realpath,
-#endif
+# endif
 	       fname_context,
 	       sprintrc(rc));
 

@@ -11,11 +11,11 @@
 
 #ifdef __NR_open
 
-#include <asm/fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
+# include <asm/fcntl.h>
+# include <stdio.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 int
 main(void)

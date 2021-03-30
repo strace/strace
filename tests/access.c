@@ -10,11 +10,11 @@
 
 #ifdef __NR_access
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 int
 main(void)

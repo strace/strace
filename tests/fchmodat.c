@@ -13,14 +13,14 @@
 
 #ifdef __NR_fchmodat
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <unistd.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 int
 main(void)

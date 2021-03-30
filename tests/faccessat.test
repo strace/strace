@@ -14,8 +14,6 @@ check_prog sed
 run_prog > /dev/null
 run_strace -a23 --trace=faccessat "$@" $args > "$EXP"
 
-# Removed this filtering since it breaks when enabling --secontext.
-# It looks like it's due to having square brackets in the lines ...
-## Filter out faccessat() calls made by ld.so and libc.
-#sed -n '/faccessat(-1, NULL,/,$p' < "$LOG" > "$OUT"
+# Filter out faccessat() calls made by ld.so and libc.
+sed -n '/faccessat(-1, NULL,/,$p' < "$LOG" > "$OUT"
 match_diff "$LOG" "$EXP"

@@ -14,15 +14,15 @@
 
 #if defined __NR_name_to_handle_at && defined __NR_open_by_handle_at
 
-#include <assert.h>
-#include <errno.h>
-#include <inttypes.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <limits.h>
-#include <unistd.h>
+# include <assert.h>
+# include <errno.h>
+# include <inttypes.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <limits.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 enum assert_rc {
 	ASSERT_NONE,
@@ -51,7 +51,7 @@ print_handle_data(unsigned char *bytes, unsigned int size)
 		printf("...");
 }
 
-#ifndef TEST_SECONTEXT
+# ifndef TEST_SECONTEXT
 void
 do_name_to_handle_at(kernel_ulong_t dirfd, const char *dirfd_str,
 		     kernel_ulong_t pathname, const char *pathname_str,
@@ -133,7 +133,7 @@ do_open_by_handle_at(kernel_ulong_t mount_fd,
 
 	printf("%s\n", sprintrc(rc));
 }
-#endif
+# endif
 
 struct strval {
 	kernel_ulong_t val;
@@ -226,7 +226,7 @@ main(void)
 		O_RDONLY | O_DIRECTORY);
 	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
 
-#ifndef TEST_SECONTEXT
+# ifndef TEST_SECONTEXT
 	static const struct strval dirfds[] = {
 		{ (kernel_ulong_t) 0xdeadca57badda7a1ULL, "-1159878751" },
 		{ (kernel_ulong_t) 0x12345678ffffff9cULL, "AT_FDCWD" },
@@ -336,7 +336,7 @@ main(void)
 			}
 		}
 	}
-#endif
+# endif
 
 	/*
 	 * Tests with dirfd

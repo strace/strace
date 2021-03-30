@@ -13,14 +13,14 @@
 
 #ifdef __NR_execveat
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <limits.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <limits.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 void
 tests_with_existing_file(void)
@@ -99,8 +99,8 @@ tests_with_existing_file(void)
 	unlink(sample);
 }
 
-#define FILENAME "test.execveat\nfilename"
-#define Q_FILENAME "test.execveat\\nfilename"
+# define FILENAME "test.execveat\nfilename"
+# define Q_FILENAME "test.execveat\\nfilename"
 
 static const char * const argv[] = {
 	FILENAME, "first", "second", (const char *) -1L,

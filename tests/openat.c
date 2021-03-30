@@ -11,13 +11,13 @@
 
 #ifdef __NR_openat
 
-#include <asm/fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <unistd.h>
+# include <asm/fcntl.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 # ifdef O_TMPFILE
 /* The kernel & C libraries often inline O_DIRECTORY. */

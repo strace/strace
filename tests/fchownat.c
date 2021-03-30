@@ -14,12 +14,12 @@
 
 #if defined __NR_fchownat && defined AT_FDCWD && defined AT_SYMLINK_NOFOLLOW
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <unistd.h>
 
-#include "selinux.c"
+# include "selinux.c"
 
 int
 main(void)

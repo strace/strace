@@ -1,55 +1,55 @@
 #if defined TEST_SECONTEXT && HAVE_SELINUX_RUNTIME
 
-#include <assert.h>
-#include <errno.h>
-#include <limits.h>
-#include <selinux/selinux.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+# include <assert.h>
+# include <errno.h>
+# include <limits.h>
+# include <selinux/selinux.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <unistd.h>
 
-#include "xmalloc.h"
+# include "xmalloc.h"
 
 /*
  * Contexts allocate memory which may be freed using a free() call.
  */
 
-#define CONTEXT_FORMAT_SPACE_BEFORE(string)		\
+# define CONTEXT_FORMAT_SPACE_BEFORE(string)		\
 	context_format(string, " [%s]")
-#define CONTEXT_FORMAT_SPACE_AFTER(string)		\
+# define CONTEXT_FORMAT_SPACE_AFTER(string)		\
 	context_format(string, "[%s] ")
-#define CONTEXT_FORMAT_SPACE_BEFORE_QUOTED(string)	\
+# define CONTEXT_FORMAT_SPACE_BEFORE_QUOTED(string)	\
 	context_format(string, " \\[%s\\]")
-#define CONTEXT_FORMAT_SPACE_AFTER_QUOTED(string)	\
+# define CONTEXT_FORMAT_SPACE_AFTER_QUOTED(string)	\
 	context_format(string, "\\[%s\\] ")
 
-#ifdef PRINT_SECONTEXT_FULL
+# ifdef PRINT_SECONTEXT_FULL
 
-#define SELINUX_FILECONTEXT(filename)		\
+#  define SELINUX_FILECONTEXT(filename)		\
 	CONTEXT_FORMAT_SPACE_BEFORE(get_file_context_full(filename))
-#define SELINUX_PIDCONTEXT(pid)			\
+#  define SELINUX_PIDCONTEXT(pid)			\
 	CONTEXT_FORMAT_SPACE_AFTER(get_pid_context_full(pid))
-#define SELINUX_FILECONTEXT_QUOTED(filename)	\
+#  define SELINUX_FILECONTEXT_QUOTED(filename)	\
 	CONTEXT_FORMAT_SPACE_BEFORE_QUOTED(get_file_context_full(filename))
-#define SELINUX_PIDCONTEXT_QUOTED(pid)		\
+#  define SELINUX_PIDCONTEXT_QUOTED(pid)		\
 	CONTEXT_FORMAT_SPACE_AFTER_QUOTED(get_pid_context_full(pid))
 
-#else
+# else
 
-#define SELINUX_FILECONTEXT(filename)		\
+#  define SELINUX_FILECONTEXT(filename)		\
 	CONTEXT_FORMAT_SPACE_BEFORE(get_file_context_short(filename))
-#define SELINUX_PIDCONTEXT(pid)			\
+#  define SELINUX_PIDCONTEXT(pid)			\
 	CONTEXT_FORMAT_SPACE_AFTER(get_pid_context_short(pid))
-#define SELINUX_FILECONTEXT_QUOTED(filename)	\
+#  define SELINUX_FILECONTEXT_QUOTED(filename)	\
 	CONTEXT_FORMAT_SPACE_BEFORE_QUOTED(get_file_context_short(filename))
-#define SELINUX_PIDCONTEXT_QUOTED(pid)		\
+#  define SELINUX_PIDCONTEXT_QUOTED(pid)		\
 	CONTEXT_FORMAT_SPACE_AFTER_QUOTED(get_pid_context_short(pid))
 
-#endif
+# endif
 
-#define SELINUX_MYCONTEXT()		SELINUX_PIDCONTEXT(getpid())
-#define SELINUX_MYCONTEXT_QUOTED()	SELINUX_PIDCONTEXT_QUOTED(getpid())
+# define SELINUX_MYCONTEXT()		SELINUX_PIDCONTEXT(getpid())
+# define SELINUX_MYCONTEXT_QUOTED()	SELINUX_PIDCONTEXT_QUOTED(getpid())
 
 char *
 context_format(char *context, const char *fmt)
@@ -201,14 +201,14 @@ update_context_type(const char *file, const char *newtype)
 
 #else
 
-#include "xmalloc.h"
+# include "xmalloc.h"
 
-#define SELINUX_FILECONTEXT(filename)		xstrdup("")
-#define SELINUX_PIDCONTEXT(pid)			xstrdup("")
-#define SELINUX_FILECONTEXT_QUOTED(filename)	xstrdup("")
-#define SELINUX_PIDCONTEXT_QUOTED(pid)		xstrdup("")
-#define SELINUX_MYCONTEXT()			xstrdup("")
-#define SELINUX_MYCONTEXT_QUOTED()		xstrdup("")
-#define update_context_type(file, newtype)	do {} while(0)
+# define SELINUX_FILECONTEXT(filename)		xstrdup("")
+# define SELINUX_PIDCONTEXT(pid)		xstrdup("")
+# define SELINUX_FILECONTEXT_QUOTED(filename)	xstrdup("")
+# define SELINUX_PIDCONTEXT_QUOTED(pid)		xstrdup("")
+# define SELINUX_MYCONTEXT()			xstrdup("")
+# define SELINUX_MYCONTEXT_QUOTED()		xstrdup("")
+# define update_context_type(file, newtype)	do {} while(0)
 
 #endif

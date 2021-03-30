@@ -10,16 +10,16 @@
 
 #ifdef __NR_linkat
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <limits.h>
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
 
-#include "selinux.c"
-#include "xmalloc.h"
+# include "selinux.c"
+# include "xmalloc.h"
 
 int
 main(void)

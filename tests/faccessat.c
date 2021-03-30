@@ -12,14 +12,14 @@
 
 #ifdef __NR_faccessat
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <limits.h>
+# include <fcntl.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <limits.h>
 
-#include "selinux.c"
-#include "xmalloc.h"
+# include "selinux.c"
+# include "xmalloc.h"
 
 # ifndef FD_PATH
 #  define FD_PATH ""
@@ -28,7 +28,7 @@
 #  define SKIP_IF_PROC_IS_UNAVAILABLE
 # endif
 
-#ifndef TEST_SECONTEXT
+# ifndef TEST_SECONTEXT
 static const char *errstr;
 
 static long
@@ -47,9 +47,9 @@ k_faccessat(const unsigned int dirfd,
 	errstr = sprintrc(rc);
 	return rc;
 }
-#endif
+# endif
 
-#ifndef PATH_TRACING
+# ifndef PATH_TRACING
 void
 tests_with_existing_file(void)
 {
@@ -89,16 +89,16 @@ tests_with_existing_file(void)
 
 	/* no file */
 	rc = syscall(__NR_faccessat, cwd_fd, sample, F_OK);
-#ifdef YFLAG
+#  ifdef YFLAG
 	printf("%sfaccessat(%d<%s>%s, \"%s\", F_OK) = %s\n",
-#else
+#  else
 	printf("%sfaccessat(%d%s, \"%s\", F_OK) = %s\n",
-#endif
+#  endif
 	       my_secontext,
 	       cwd_fd,
-#ifdef YFLAG
+#  ifdef YFLAG
 	       cwd,
-#endif
+#  endif
 	       cwd_secontext,
 	       sample,
 	       sprintrc(rc));
@@ -109,16 +109,16 @@ tests_with_existing_file(void)
 	close(fd);
 
 	rc = syscall(__NR_faccessat, cwd_fd, sample, F_OK);
-#ifdef YFLAG
+#  ifdef YFLAG
 	printf("%sfaccessat(%d<%s>%s, \"%s\"%s, F_OK) = %s\n",
-#else
+#  else
 	printf("%sfaccessat(%d%s, \"%s\"%s, F_OK) = %s\n",
-#endif
+#  endif
 	       my_secontext,
 	       cwd_fd,
-#ifdef YFLAG
+#  ifdef YFLAG
 	       cwd,
-#endif
+#  endif
 	       cwd_secontext,
 	       sample, sample_secontext,
 	       sprintrc(rc));
@@ -128,16 +128,16 @@ tests_with_existing_file(void)
 		perror_msg_and_fail("chdir");
 
 	rc = syscall(__NR_faccessat, cwd_fd, sample_realpath, F_OK);
-#ifdef YFLAG
+#  ifdef YFLAG
 	printf("%sfaccessat(%d<%s>%s, \"%s\"%s, F_OK) = %s\n",
-#else
+#  else
 	printf("%sfaccessat(%d%s, \"%s\"%s, F_OK) = %s\n",
-#endif
+#  endif
 	       my_secontext,
 	       cwd_fd,
-#ifdef YFLAG
+#  ifdef YFLAG
 	       cwd,
-#endif
+#  endif
 	       cwd_secontext,
 	       sample_realpath, sample_secontext,
 	       sprintrc(rc));
@@ -147,14 +147,14 @@ tests_with_existing_file(void)
 
 	unlink(sample);
 }
-#endif
+# endif
 
 int
 main(void)
 {
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
-#ifndef TEST_SECONTEXT
+# ifndef TEST_SECONTEXT
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(const char, unterminated);
 	char *unterminated_str = xasprintf("%p", unterminated);
@@ -228,10 +228,10 @@ main(void)
 				k_faccessat(dirfds[dirfd_i].val,
 					    paths[path_i].val,
 					    modes[mode_i].val);
-# ifdef PATH_TRACING
+#  ifdef PATH_TRACING
 				if (dirfds[dirfd_i].val == fd ||
 				    paths[path_i].val == fd_path)
-# endif
+#  endif
 				printf("faccessat(%s, %s, %s) = %s\n",
 				       dirfds[dirfd_i].str,
 				       paths[path_i].str,
@@ -241,11 +241,11 @@ main(void)
 		}
 	}
 
-#endif
+# endif
 
-#ifndef PATH_TRACING
+# ifndef PATH_TRACING
 	tests_with_existing_file();
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;
