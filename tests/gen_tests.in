@@ -98,6 +98,7 @@ fanotify_mark-Xraw	-a32 -Xraw -e trace=fanotify_mark
 fanotify_mark-Xverbose	-a32 -Xverbose -e trace=fanotify_mark
 fchdir	-a11
 fchmod	-a15
+fchmod-y	-y -e trace=fchmod
 fchmodat
 fchown	-a16
 fchown32	-a18

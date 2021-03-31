@@ -141,6 +141,18 @@ void perror_msg_and_skip(const char *, ...)
 void skip_if_unavailable(const char *);
 
 /*
+ * Obtain a file descriptor corresponding to the specified directory name,
+ * die on failure.
+ */
+int get_dir_fd(const char *dir_path);
+
+/*
+ * Obtain a path corresponding to the specified file descriptor,
+ * die on failure.
+ */
+char *get_fd_path(int fd) ATTRIBUTE_MALLOC;
+
+/*
  * Obtain an exclusive lock on dirname(path_name)/lock_name file
  * using open and flock.
  */
