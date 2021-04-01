@@ -2,7 +2,7 @@
  * This file is part of execve strace test.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2020 The strace developers.
+ * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -44,6 +44,12 @@ static const char * const q_envp[] = {
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("execve_subdir");
+
 	char ** const tail_argv = tail_memdup(argv, sizeof(argv));
 	char ** const tail_envp = tail_memdup(envp, sizeof(envp));
 
@@ -176,6 +182,8 @@ main(void)
 	call_execve(FILENAME, efault, NULL);
 	printf("execve(\"%s\", %p, NULL) = %s\n",
 	       Q_FILENAME, efault, errstr);
+
+	leave_and_remove_subdir();
 
 	return 0;
 }

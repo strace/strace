@@ -15,11 +15,16 @@
 # include <fcntl.h>
 # include <stdio.h>
 # include <unistd.h>
-# include <errno.h>
 
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("chmod_subdir");
+
 	static const char fname[] = "chmod_test_file";
 
 	if (open(fname, O_CREAT|O_RDONLY, 0400) < 0)
@@ -36,6 +41,8 @@ main(void)
 
 	rc = syscall(__NR_chmod, fname, 004);
 	printf("chmod(\"%s\", 004) = %s\n", fname, sprintrc(rc));
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;

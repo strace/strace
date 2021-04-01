@@ -153,6 +153,18 @@ int get_dir_fd(const char *dir_path);
 char *get_fd_path(int fd) ATTRIBUTE_MALLOC;
 
 /*
+ * Create the specified directory and chdir into it,
+ * die on chdir failure.
+ */
+void create_and_enter_subdir(const char *subdir);
+
+/*
+ * Leave from the directory entered by create_and_enter_subdir,
+ * remove that directory, die on failure.
+ */
+void leave_and_remove_subdir(void);
+
+/*
  * Obtain an exclusive lock on dirname(path_name)/lock_name file
  * using open and flock.
  */

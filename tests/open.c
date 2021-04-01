@@ -18,6 +18,12 @@
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("open_subdir");
+
 	static const char sample[] = "open.sample";
 
 	long fd = syscall(__NR_open, sample, O_RDONLY|O_CREAT, 0400);
@@ -42,6 +48,8 @@ main(void)
 	printf("open(\"%s\", O_WRONLY|O_TMPFILE, 0600) = %s\n",
 	       sample, sprintrc(fd));
 # endif /* O_TMPFILE */
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;

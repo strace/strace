@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -16,6 +16,12 @@
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("linkat_subdir");
+
 	static const char sample_1[] = "linkat_sample_old";
 	static const char sample_2[] = "linkat_sample_new";
 	const long fd_old = (long) 0xdeadbeefffffffffULL;
@@ -32,6 +38,8 @@ main(void)
 	       "AT_SYMLINK_NOFOLLOW|AT_REMOVEDIR|AT_SYMLINK_FOLLOW"
 	       "|AT_NO_AUTOMOUNT|AT_EMPTY_PATH|AT_RECURSIVE|0xffff60ff",
 	       rc, errno2name());
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;

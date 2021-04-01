@@ -20,6 +20,12 @@
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("fchownat_subdir");
+
 	static const char sample[] = "fchownat_sample";
 	uid_t uid = geteuid();
 	uid_t gid = getegid();
@@ -38,6 +44,8 @@ main(void)
 		     sample, -1, -1L, AT_SYMLINK_NOFOLLOW);
 	printf("fchownat(AT_FDCWD, \"%s\", -1, -1, AT_SYMLINK_NOFOLLOW) = %s\n",
 	       sample, sprintrc(rc));
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;

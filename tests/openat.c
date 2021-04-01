@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Katerina Koukiou <k.koukiou@gmail.com>
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -39,6 +39,12 @@ test_mode_flag(unsigned int mode_val, const char *mode_str,
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("openat_subdir");
+
 	long fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
 	printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400) = %s\n",
 	       sample, sprintrc(fd));
@@ -100,6 +106,8 @@ main(void)
 		for (unsigned int f = 0; f < ARRAY_SIZE(flags); ++f)
 			test_mode_flag(modes[m].val, modes[m].str,
 				       flags[f].val, flags[f].str);
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;

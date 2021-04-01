@@ -14,13 +14,18 @@
 #ifdef __NR_fchmodat
 
 # include <fcntl.h>
-# include <sys/stat.h>
 # include <stdio.h>
 # include <unistd.h>
 
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("fchmodat_subdir");
+
 	static const char sample[] = "fchmodat_sample";
 
 	if (open(sample, O_RDONLY | O_CREAT, 0400) < 0)
@@ -40,6 +45,8 @@ main(void)
 	rc = syscall(__NR_fchmodat, -100, sample, 004);
 	printf("fchmodat(AT_FDCWD, \"%s\", 004) = %s\n",
 	       sample, sprintrc(rc));
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;

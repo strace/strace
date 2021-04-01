@@ -61,6 +61,7 @@ libtests_a_SOURCES = \
 	skip_unavailable.c \
 	sprintrc.c \
 	status.c \
+	subdir.c \
 	tail_alloc.c \
 	test_netlink.h \
 	test_nlattr.h \

@@ -21,6 +21,12 @@
 int
 main(void)
 {
+	/*
+	 * Make sure the current workdir of the tracee
+	 * is different from the current workdir of the tracer.
+	 */
+	create_and_enter_subdir("fchmod_subdir");
+
 	static const char sample[] = "fchmod_sample_file";
 	(void) unlink(sample);
 	int fd = open(sample, O_CREAT|O_RDONLY, 0400);
@@ -69,6 +75,8 @@ main(void)
 	       sample_realpath,
 # endif
 	       sprintrc(rc));
+
+	leave_and_remove_subdir();
 
 	puts("+++ exited with 0 +++");
 	return 0;
