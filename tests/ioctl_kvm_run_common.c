@@ -255,13 +255,13 @@ static int
 vcpu_dev_should_have_cpuid(int fd)
 {
 	int r = 0;
-	char *filename = xasprintf("/proc/%d/fd/%d", getpid(), fd);
+	char *proc = xasprintf("/proc/self/fd/%u", fd);
 	char buf[sizeof(vcpu_dev)];
 
-	if (readlink(filename, buf, sizeof(buf)) == sizeof(buf) - 1
+	if (readlink(proc, buf, sizeof(buf)) == sizeof(buf) - 1
 	    && (memcmp(buf, vcpu_dev, sizeof(buf) - 1) == 0))
 		r = 1;
-	free(filename);
+	free(proc);
 	return r;
 }
 
