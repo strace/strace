@@ -4,7 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Updated decoding of IFLA_BRPORT_* netlink attributes to match Linux 5.12.
   * Updated lists of DEVCONF_*, IORING_*, KVM_*, MPOL_*, RESOLVE_*, RTM_*,
-    and ST_* constants.
+    ST_*, and V4L2_* constants.
 
 * Bug fixes
   * Fixed build using bionic libc.
