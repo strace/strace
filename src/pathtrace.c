@@ -396,7 +396,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_timerfd_settime64:
 	case SEN_userfaultfd:
 		/*
-		 * These have TRACE_FILE or TRACE_DESCRIPTOR or TRACE_NETWORK set,
+		 * These have TRACE_FILE or TRACE_DESC or TRACE_NETWORK set,
 		 * but they don't have any file descriptor or path args to test.
 		 */
 		return false;
