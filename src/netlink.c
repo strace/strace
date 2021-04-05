@@ -329,6 +329,7 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 		case NFT_MSG_NEWSETELEM:
 		case NFT_MSG_NEWGEN:
 		case NFT_MSG_NEWOBJ:
+		case NFT_MSG_NEWFLOWTABLE:
 			return netlink_new_flags;
 		case NFT_MSG_GETTABLE:
 		case NFT_MSG_GETCHAIN:
@@ -338,6 +339,7 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 		case NFT_MSG_GETGEN:
 		case NFT_MSG_GETOBJ:
 		case NFT_MSG_GETOBJ_RESET:
+		case NFT_MSG_GETFLOWTABLE:
 			return netlink_get_flags;
 		case NFT_MSG_DELTABLE:
 		case NFT_MSG_DELCHAIN:
@@ -345,6 +347,7 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 		case NFT_MSG_DELSET:
 		case NFT_MSG_DELSETELEM:
 		case NFT_MSG_DELOBJ:
+		case NFT_MSG_DELFLOWTABLE:
 			return netlink_delete_flags;
 		}
 		break;
