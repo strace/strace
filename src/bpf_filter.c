@@ -109,20 +109,34 @@ static void
 print_bpf_filter_stmt(const struct bpf_filter_block *const filter,
 		      const print_bpf_filter_fn print_k)
 {
-	tprints("BPF_STMT(");
+	tprints_arg_begin("BPF_STMT");
+
 	print_bpf_filter_code(filter->code, false);
-	tprints(", ");
+	tprint_arg_next();
+
 	if (!print_k || !print_k(filter))
-		tprintf("%#x", filter->k);
-	tprints(")");
+		PRINT_VAL_X(filter->k);
+
+	tprint_arg_end();
 }
 
 static void
 print_bpf_filter_jump(const struct bpf_filter_block *const filter)
 {
-	tprints("BPF_JUMP(");
+	tprints_arg_begin("BPF_JUMP");
+
 	print_bpf_filter_code(filter->code, false);
-	tprintf(", %#x, %#x, %#x)", filter->k, filter->jt, filter->jf);
+	tprint_arg_next();
+
+	PRINT_VAL_X(filter->k);
+	tprint_arg_next();
+
+	PRINT_VAL_X(filter->jt);
+	tprint_arg_next();
+
+	PRINT_VAL_X(filter->jf);
+
+	tprint_arg_end();
 }
 
 struct bpf_filter_block_data {
