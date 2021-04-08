@@ -48,13 +48,13 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
 
 	if (entering(tcp)) {
-		tprintf("%d", (int) args[0]);
+		PRINT_VAL_D((int) args[0]);
 
 		if (verbose(tcp) && fdsize > 0)
 			fds = malloc(fdsize);
 		for (i = 0; i < 3; i++) {
 			addr = args[i+1];
-			tprints(", ");
+			tprint_arg_next();
 			if (!fds) {
 				printaddr(addr);
 				continue;
@@ -73,7 +73,7 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 			tprints("]");
 		}
 		free(fds);
-		tprints(", ");
+		tprint_arg_next();
 		print_tv_ts(tcp, args[4]);
 	} else {
 		static char outstr[1024];
@@ -179,7 +179,7 @@ do_pselect6(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 {
 	int rc = decode_select(tcp, tcp->u_arg, print_ts, sprint_ts);
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		print_kernel_sigset(tcp, tcp->u_arg[5]);
 	}
 
