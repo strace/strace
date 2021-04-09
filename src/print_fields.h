@@ -86,6 +86,18 @@ tprint_comment_end(void)
 }
 
 static inline void
+tprint_indirect_begin(void)
+{
+	tprints("[");
+}
+
+static inline void
+tprint_indirect_end(void)
+{
+	tprints("]");
+}
+
+static inline void
 tprint_more_data_follows(void)
 {
 	tprints("...");
@@ -189,6 +201,18 @@ static inline void
 tprint_comment_end(void)
 {
 	fputs(" */", stdout);
+}
+
+static inline void
+tprint_indirect_begin(void)
+{
+	fputs("[", stdout);
+}
+
+static inline void
+tprint_indirect_end(void)
+{
+	fputs("]", stdout);
 }
 
 static inline void

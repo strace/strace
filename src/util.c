@@ -352,9 +352,9 @@ printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	type num;							\
 	if (umove_or_printaddr(tcp, addr, &num))			\
 		return false;						\
-	tprints("[");							\
+	tprint_indirect_begin();					\
 	tprintf(fmt, num);						\
-	tprints("]");							\
+	tprint_indirect_end();						\
 	return true;							\
 }
 
@@ -365,9 +365,9 @@ printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr)	\
 	type num;							\
 	if (umove_or_printaddr(tcp, addr, &num))			\
 		return false;						\
-	tprints("[");							\
+	tprint_indirect_begin();					\
 	printaddr64(num);						\
-	tprints("]");							\
+	tprint_indirect_end();						\
 	return true;							\
 }
 
@@ -379,11 +379,11 @@ printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	type pair[2];							\
 	if (umove_or_printaddr(tcp, addr, &pair))			\
 		return false;						\
-	tprints("[");							\
+	tprint_indirect_begin();					\
 	tprintf(fmt, pair[0]);						\
 	tprints(", ");							\
 	tprintf(fmt, pair[1]);						\
-	tprints("]");							\
+	tprint_indirect_end();						\
 	return true;							\
 }
 
@@ -401,9 +401,9 @@ printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 	int fd;
 	if (umove_or_printaddr(tcp, addr, &fd))
 		return false;
-	tprints("[");
+	tprint_indirect_begin();
 	printfd(tcp, fd);
-	tprints("]");
+	tprint_indirect_end();
 	return true;
 }
 
@@ -413,9 +413,9 @@ printnum_pid(struct tcb *const tcp, const kernel_ulong_t addr, enum pid_type typ
 	int pid;
 	if (umove_or_printaddr(tcp, addr, &pid))
 		return false;
-	tprints("[");
+	tprint_indirect_begin();
 	printpid(tcp, pid, type);
-	tprints("]");
+	tprint_indirect_end();
 	return true;
 }
 
