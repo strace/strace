@@ -227,24 +227,23 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 	}
 
-	int buffer[size];
-
-	if (umove_or_printaddr(tcp, arg, &buffer))
+	struct {
+		unsigned int code;
+		int values[0];
+	} mt;
+	if (umove_or_printaddr(tcp, arg, &mt))
 		return RVAL_IOCTL_DECODED;
 
 	tprint_struct_begin();
-	tprints_field_name("code");
-	printxval(evdev_mtslots, buffer[0], "ABS_MT_???");
 
+	PRINT_FIELD_XVAL(mt, code, evdev_mtslots, "ABS_MT_???");
 	tprint_struct_next();
+
 	tprints_field_name("values");
-	tprints("[");
+	int val;
+	print_array(tcp, arg + sizeof(val), size - 1, &val, sizeof(val),
+		    tfetch_mem, print_int32_array_member, NULL);
 
-	unsigned int i;
-	for (i = 1; i < ARRAY_SIZE(buffer); i++)
-		tprintf("%s%d", i > 1 ? ", " : "", buffer[i]);
-
-	tprints("]");
 	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
