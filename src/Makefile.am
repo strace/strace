@@ -187,6 +187,7 @@ libstrace_a_SOURCES =	\
 	mmap_notify.h	\
 	mmsghdr.c	\
 	mount.c		\
+	mount_setattr.c	\
 	move_mount.c	\
 	mpers_type.h	\
 	mq.c		\

@@ -26,3 +26,4 @@
 [BASE_NR + 439] = { 4,	TD|TF,		SEN(faccessat2),		"faccessat2"		},
 [BASE_NR + 440] = { 5,	TD,		SEN(process_madvise),		"process_madvise"	},
 [BASE_NR + 441] = { 6,	TD,		SEN(epoll_pwait2),		"epoll_pwait2"		},
+[BASE_NR + 442] = { 5,	TD|TF,		SEN(mount_setattr),		"mount_setattr"		},
