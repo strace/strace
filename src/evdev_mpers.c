@@ -182,7 +182,6 @@ MPERS_PRINTER_DECL(int, evdev_write_ioctl_mpers, struct tcb *const tcp,
 {
 	switch (code) {
 	case EVIOCSFF:
-		tprint_arg_next();
 		return ff_effect_ioctl(tcp, arg);
 	default:
 		return RVAL_DECODED;
