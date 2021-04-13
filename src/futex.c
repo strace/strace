@@ -39,48 +39,77 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 	const unsigned int val3 = tcp->u_arg[5];
 	const char *comment;
 
+	/* uaddr */
 	printaddr(uaddr);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* futex_op */
 	printxval(futexops, op, "FUTEX_???");
+
 	switch (cmd) {
 	case FUTEX_WAIT:
-		tprintf(", %u", val);
-		tprints(", ");
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
 		print_ts(tcp, timeout);
 		break;
 	case FUTEX_LOCK_PI:
-		tprints(", ");
+		tprint_arg_next();
 		print_ts(tcp, timeout);
 		break;
 	case FUTEX_WAIT_BITSET:
-		tprintf(", %u", val);
-		tprints(", ");
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
 		print_ts(tcp, timeout);
-		tprints(", ");
+
+		tprint_arg_next();
 		printxval(futexbitset, val3, NULL);
 		break;
 	case FUTEX_WAKE_BITSET:
-		tprintf(", %u", val);
-		tprints(", ");
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
 		printxval(futexbitset, val3, NULL);
 		break;
 	case FUTEX_REQUEUE:
-		tprintf(", %u", val);
-		tprintf(", %u, ", val2);
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
+		PRINT_VAL_U(val2);
+
+		tprint_arg_next();
 		printaddr(uaddr2);
 		break;
 	case FUTEX_CMP_REQUEUE:
 	case FUTEX_CMP_REQUEUE_PI:
-		tprintf(", %u", val);
-		tprintf(", %u, ", val2);
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
+		PRINT_VAL_U(val2);
+
+		tprint_arg_next();
 		printaddr(uaddr2);
-		tprintf(", %u", val3);
+
+		tprint_arg_next();
+		PRINT_VAL_U(val3);
 		break;
 	case FUTEX_WAKE_OP:
-		tprintf(", %u", val);
-		tprintf(", %u, ", val2);
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
+		PRINT_VAL_U(val2);
+
+		tprint_arg_next();
 		printaddr(uaddr2);
-		tprints(", ");
+
+		tprint_arg_next();
 		if ((val3 >> 28) & FUTEX_OP_OPARG_SHIFT) {
 			print_xlat(FUTEX_OP_OPARG_SHIFT);
 			tprints("<<28|");
@@ -97,26 +126,35 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		tprintf("|%#x", val3 & 0xfff);
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
-		tprintf(", %u", val);
-		tprints(", ");
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
 		print_ts(tcp, timeout);
-		tprints(", ");
+
+		tprint_arg_next();
 		printaddr(uaddr2);
 		break;
 	case FUTEX_FD:
 	case FUTEX_WAKE:
-		tprintf(", %u", val);
+		tprint_arg_next();
+		PRINT_VAL_U(val);
 		break;
 	case FUTEX_UNLOCK_PI:
 	case FUTEX_TRYLOCK_PI:
 		break;
 	default:
-		tprintf(", %u", val);
-		tprints(", ");
+		tprint_arg_next();
+		PRINT_VAL_U(val);
+
+		tprint_arg_next();
 		printaddr(timeout);
-		tprints(", ");
+
+		tprint_arg_next();
 		printaddr(uaddr2);
-		tprintf(", %#x", val3);
+
+		tprint_arg_next();
+		PRINT_VAL_X(val3);
 		break;
 	}
 
