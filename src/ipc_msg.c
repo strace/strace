@@ -22,8 +22,11 @@
 
 SYS_FUNC(msgget)
 {
+	/* key */
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* msgflg */
 	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprints("|");
 	print_numeric_umode_t(tcp->u_arg[1] & 0777);
@@ -34,14 +37,24 @@ static void
 tprint_msgsnd(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const unsigned int flags)
 {
+	/* msqid */
 	tprint_msgbuf(tcp, addr, count);
-	tprintf(", %" PRI_klu ", ", count);
+	tprint_arg_next();
+
+	/* msgsz */
+	PRINT_VAL_U(count);
+	tprint_arg_next();
+
+	/* msgflg */
 	printflags(ipc_msg_flags, flags, "MSG_???");
 }
 
 SYS_FUNC(msgsnd)
 {
-	tprintf("%d, ", (int) tcp->u_arg[0]);
+	/* msqid */
+	PRINT_VAL_D((int) tcp->u_arg[0]);
+	tprint_arg_next();
+
 	if (indirect_ipccall(tcp)) {
 		tprint_msgsnd(tcp, tcp->u_arg[3], tcp->u_arg[1],
 			      tcp->u_arg[2]);
@@ -56,9 +69,16 @@ static void
 tprint_msgrcv(struct tcb *const tcp, const kernel_ulong_t addr,
 	      const kernel_ulong_t count, const kernel_ulong_t msgtyp)
 {
+	/* msqid */
 	tprint_msgbuf(tcp, addr, count);
-	tprintf(", %" PRI_klu ", ", count);
-	tprintf("%" PRI_kld ", ", msgtyp);
+	tprint_arg_next();
+
+	/* msgsz */
+	PRINT_VAL_U(count);
+	tprint_arg_next();
+
+	/* msgtyp */
+	PRINT_VAL_D(msgtyp);
 }
 
 static int
@@ -82,7 +102,9 @@ fetch_msgrcv_args(struct tcb *const tcp, const kernel_ulong_t addr,
 SYS_FUNC(msgrcv)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
+		/* msqid */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
 	} else {
 		if (indirect_ipccall(tcp)) {
 			const bool direct =
@@ -96,16 +118,24 @@ SYS_FUNC(msgrcv)
 			} else {
 				kernel_ulong_t pair[2];
 
-				if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair))
-					tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
-				else
+				if (fetch_msgrcv_args(tcp, tcp->u_arg[3], pair)) {
+					tprint_arg_next();
+					PRINT_VAL_U(tcp->u_arg[1]);
+				} else {
 					tprint_msgrcv(tcp, pair[0],
 						      tcp->u_arg[1], pair[1]);
+				}
 			}
+			tprint_arg_next();
+
+			/* msgflg */
 			printflags(ipc_msg_flags, tcp->u_arg[2], "MSG_???");
 		} else {
 			tprint_msgrcv(tcp, tcp->u_arg[1],
 				tcp->u_arg[2], tcp->u_arg[3]);
+			tprint_arg_next();
+
+			/* msgflg */
 			printflags(ipc_msg_flags, tcp->u_arg[4], "MSG_???");
 		}
 	}
