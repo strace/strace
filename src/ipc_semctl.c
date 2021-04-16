@@ -58,10 +58,10 @@ print_semid_ds(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (!tfetch_mem(tcp, addr, sizeof(ds), &ds)) {
 		if (indirect_addr)
-			tprints("[");
+			tprint_indirect_begin();
 		printaddr(addr);
 		if (indirect_addr)
-			tprints("]");
+			tprint_indirect_end();
 		return;
 	}
 
@@ -88,10 +88,10 @@ print_seminfo(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	if (!tfetch_mem(tcp, addr, sizeof(info), &info)) {
 		if (indirect_addr)
-			tprints("[");
+			tprint_indirect_begin();
 		printaddr(addr);
 		if (indirect_addr)
-			tprints("]");
+			tprint_indirect_end();
 		return;
 	}
 
@@ -133,9 +133,17 @@ SYS_FUNC(semctl)
 		cmd &= ~IPC_64;
 
 	if (entering(tcp)) {
-		tprintf("%d, %d, ", (int) tcp->u_arg[0], (int) tcp->u_arg[1]);
+		/* semid */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
+
+		/* semnum */
+		PRINT_VAL_D((int) tcp->u_arg[1]);
+		tprint_arg_next();
+
+		/* cmd */
 		PRINTCTL(semctl_flags, tcp->u_arg[2], "SEM_???");
-		tprints(", ");
+		tprint_arg_next();
 
 		if (indirect_addr) {
 			semun_ptr_t ptr;
@@ -161,10 +169,10 @@ SYS_FUNC(semctl)
 
 		default:
 			if (indirect_addr)
-				tprints("[");
+				tprint_indirect_begin();
 			printaddr(addr);
 			if (indirect_addr)
-				tprints("]");
+				tprint_indirect_end();
 			return RVAL_DECODED;
 		}
 	} else {
