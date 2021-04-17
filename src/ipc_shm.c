@@ -29,9 +29,15 @@
 
 SYS_FUNC(shmget)
 {
+	/* key */
 	printxval(ipc_private, (unsigned int) tcp->u_arg[0], NULL);
-	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
+	tprint_arg_next();
 
+	/* size */
+	PRINT_VAL_U(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* shmflg */
 	unsigned int flags = tcp->u_arg[2] & ~0777;
 	const unsigned int mask = SHM_HUGE_MASK << SHM_HUGE_SHIFT;
 	const unsigned int hugetlb_value = flags & mask;
@@ -54,19 +60,28 @@ SYS_FUNC(shmget)
 	return RVAL_DECODED;
 }
 
+static void
+print_shmaddr_shmflg(const kernel_ulong_t shmaddr, const unsigned int shmflg)
+{
+	/* shmaddr */
+	printaddr(shmaddr);
+	tprints(", ");
+
+	/* shmflg */
+	printflags(shm_flags, shmflg, "SHM_???");
+}
+
 SYS_FUNC(shmat)
 {
 	if (entering(tcp)) {
-		tprintf("%d, ", (int) tcp->u_arg[0]);
-		if (indirect_ipccall(tcp)) {
-			printaddr(tcp->u_arg[3]);
-			tprints(", ");
-			printflags(shm_flags, tcp->u_arg[1], "SHM_???");
-		} else {
-			printaddr(tcp->u_arg[1]);
-			tprints(", ");
-			printflags(shm_flags, tcp->u_arg[2], "SHM_???");
-		}
+		/* shmid */
+		PRINT_VAL_D((int) tcp->u_arg[0]);
+		tprint_arg_next();
+
+		if (indirect_ipccall(tcp))
+			print_shmaddr_shmflg(tcp->u_arg[3], tcp->u_arg[1]);
+		else
+			print_shmaddr_shmflg(tcp->u_arg[1], tcp->u_arg[2]);
 		return 0;
 	} else {
 		if (syserror(tcp))
@@ -87,6 +102,7 @@ SYS_FUNC(shmat)
 
 SYS_FUNC(shmdt)
 {
+	/* shmaddr */
 	printaddr(tcp->u_arg[indirect_ipccall(tcp) ? 3 : 0]);
 	return RVAL_DECODED;
 }
