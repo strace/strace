@@ -8,7 +8,7 @@
 #include "defs.h"
 #include <linux/mount.h>
 #include "xlat/fsmount_flags.h"
-#include "xlat/mount_attr_flags.h"
+#include "xlat/fsmount_attr_flags.h"
 
 SYS_FUNC(fsmount)
 {
@@ -21,7 +21,7 @@ SYS_FUNC(fsmount)
 	tprint_arg_next();
 
 	/* attr_flags */
-	printflags(mount_attr_flags, tcp->u_arg[2], "MOUNT_ATTR_???");
+	printflags(fsmount_attr_flags, tcp->u_arg[2], "MOUNT_ATTR_???");
 
 	return RVAL_DECODED | RVAL_FD;
 }
