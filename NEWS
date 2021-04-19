@@ -7,6 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated decoding of IFLA_BRPORT_* netlink attributes to match Linux 5.12.
   * Updated lists of DEVCONF_*, IORING_*, KVM_*, MPOL_*, MTD_*, NFT_MSG_*,
     RESOLVE_*, RTM_*, ST_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 5.12.
 
 * Bug fixes
   * Fixed build using bionic libc.
