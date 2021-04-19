@@ -251,7 +251,7 @@ __EOF__
 			;;
 		*linux/kvm.h)
 			case "$uname_m" in
-				i?86|x86_64|aarch64|arm*|mips*|ppc*|s390*) ;;
+				i?86|x86_64|aarch64|mips*|ppc*|s390*) ;;
 				*) return 0 ;; # not applicable
 			esac
 			;;
