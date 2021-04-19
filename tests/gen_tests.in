@@ -420,6 +420,8 @@ mount		-a33
 mount-Xabbrev	-a33 -e trace=mount -Xabbrev
 mount-Xraw	-a33 -e trace=mount -Xraw
 mount-Xverbose	-a33 -e trace=mount -Xverbose
+mount_setattr	-y 9>>/dev/full
+mount_setattr-P	-y -P /dev/full -e trace=mount_setattr 9>>/dev/full
 move_mount	-y
 move_mount-P	-y -P /dev/full -e trace=move_mount
 move_pages	-s3
