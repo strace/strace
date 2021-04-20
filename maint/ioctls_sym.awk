@@ -42,21 +42,24 @@ function dir2str(dir, \
 	parent[level] = idx
 }
 /^DW_AT_name/ {
-	match($0, /:[[:space:]]+([[:alpha:]_][[:alnum:]_[:space:]]*)/,
-		temparray)
-	array[idx]["name"] = temparray[1]
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:alpha:]_][[:alnum:]_[:space:]]*)/,
+	      temparray)
+	array[idx]["name"] = temparray[2]
 }
 /^DW_AT_type/ {
-	match($0, /:[[:space:]]+<(0x[[:xdigit:]]*)>(, .*)?$/, temparray)
-	array[idx]["type"] = temparray[1]
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?<(0x[[:xdigit:]]*)>(, .*)?$/,
+	      temparray)
+	array[idx]["type"] = temparray[2]
 }
 /^DW_AT_upper_bound/ {
-	match($0, /[[:digit:]]+/, temparray)
-	array[array[idx]["parent"]]["size"] = temparray[0]
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:digit:]]+)/,
+	      temparray)
+	array[array[idx]["parent"]]["size"] = temparray[2]
 }
 /^DW_AT_count/ {
-	match($0, /[[:digit:]]+/, temparray)
-	array[array[idx]["parent"]]["size"] = temparray[0] - 1
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:digit:]]+)/,
+	      temparray)
+	array[array[idx]["parent"]]["size"] = temparray[2] - 1
 }
 /^Abbrev Number:[^(]+\(DW_TAG_/ {
 	if (match($0, /member|subrange_type|variable/, temparray)) {

@@ -12,6 +12,9 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Bug fixes
   * Fixed build using bionic libc.
 
+* Portability
+  * Added binutils 2.36 support to --enable-mpers builds.
+
 Noteworthy changes in release 5.11 (2021-02-17)
 ===============================================
 

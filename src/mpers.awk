@@ -156,30 +156,35 @@ BEGIN {
 	array[idx, "location"] = temparray[1]
 }
 /^DW_AT_name/ {
-	match($0, /:[[:space:]]+([[:alpha:]_][[:alnum:]_[:space:]]*)/, \
-		temparray)
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:alpha:]_][[:alnum:]_[:space:]]*)/,
+	      temparray)
 	array_names[idx] = 1
-	array[idx, "name"] = temparray[1]
+	array[idx, "name"] = temparray[2]
 }
 /^DW_AT_byte_size/ {
-	match($0, /[[:digit:]]+/, temparray)
-	array[idx, "byte_size"] = temparray[0]
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:digit:]]+)/,
+	      temparray)
+	array[idx, "byte_size"] = temparray[2]
 }
 /^DW_AT_encoding/ {
-	match($0, /[[:digit:]]+/, temparray)
-	array[idx, "encoding"] = temparray[0]
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:digit:]]+)/,
+	      temparray)
+	array[idx, "encoding"] = temparray[2]
 }
 /^DW_AT_type/ {
-	match($0, /:[[:space:]]+<0x([[:xdigit:]]*)>(, .*)?$/, temparray)
-	array[idx, "type"] = norm_idx(temparray[1])
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?<0x([[:xdigit:]]*)>(, .*)?$/,
+	      temparray)
+	array[idx, "type"] = norm_idx(temparray[2])
 }
 /^DW_AT_upper_bound/ {
-	match($0, /[[:digit:]]+/, temparray)
-	update_upper_bound(parent[level - 1], temparray[0] + 1)
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:digit:]]+)/,
+	      temparray)
+	update_upper_bound(parent[level - 1], temparray[2] + 1)
 }
 /^DW_AT_count/ {
-	match($0, /[[:digit:]]+/, temparray)
-	update_upper_bound(parent[level - 1], temparray[0])
+	match($0, /:[[:space:]]+(\([[:alpha:]][[:alnum:]]*\)[[:space:]]+)?([[:digit:]]+)/,
+	      temparray)
+	update_upper_bound(parent[level - 1], temparray[2])
 }
 /^Abbrev Number:[^(]+\(DW_TAG_/ {
 	if (match($0, /typedef|union_type|structure_type|pointer_type\
