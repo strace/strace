@@ -65,7 +65,7 @@ print_shmaddr_shmflg(const kernel_ulong_t shmaddr, const unsigned int shmflg)
 {
 	/* shmaddr */
 	printaddr(shmaddr);
-	tprints(", ");
+	tprint_arg_next();
 
 	/* shmflg */
 	printflags(shm_flags, shmflg, "SHM_???");
