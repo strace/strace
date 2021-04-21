@@ -39,13 +39,13 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	printaddr(seg[0]);
 	tprint_struct_next();
 	tprints_field_name("bufsz");
-	tprintf("%" PRI_klu, seg[1]);
+	PRINT_VAL_U(seg[1]);
 	tprint_struct_next();
 	tprints_field_name("mem");
 	printaddr(seg[2]);
 	tprint_struct_next();
 	tprints_field_name("memsz");
-	tprintf("%" PRI_klu, seg[3]);
+	PRINT_VAL_U(seg[3]);
 	tprint_struct_end();
 
 	return true;
@@ -69,13 +69,17 @@ print_kexec_segments(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(kexec_load)
 {
-	/* entry, nr_segments */
+	/* entry */
 	printaddr(tcp->u_arg[0]);
-	tprintf(", %" PRI_klu ", ", tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* nr_segments */
+	PRINT_VAL_U(tcp->u_arg[1]);
+	tprint_arg_next();
 
 	/* segments */
 	print_kexec_segments(tcp, tcp->u_arg[2], tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
 
 	/* flags */
 	kernel_ulong_t n = tcp->u_arg[3];
@@ -95,15 +99,20 @@ SYS_FUNC(kexec_file_load)
 {
 	/* kernel_fd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* initrd_fd */
 	printfd(tcp, tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* cmdline_len */
-	tprintf("%" PRI_klu ", ", tcp->u_arg[2]);
+	PRINT_VAL_U(tcp->u_arg[2]);
+	tprint_arg_next();
+
 	/* cmdline */
 	printstrn(tcp, tcp->u_arg[3], tcp->u_arg[2]);
-	tprints(", ");
+	tprint_arg_next();
+
 	/* flags */
 	printflags64(kexec_file_load_flags, tcp->u_arg[4], "KEXEC_FILE_???");
 
