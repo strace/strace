@@ -226,13 +226,11 @@ SYS_FUNC(mremap)
 	printaddr(tcp->u_arg[0]);
 	tprintf(", %" PRI_klu ", %" PRI_klu ", ", tcp->u_arg[1], tcp->u_arg[2]);
 	printflags64(mremap_flags, tcp->u_arg[3], "MREMAP_???");
-#ifdef MREMAP_FIXED
 	if ((tcp->u_arg[3] & (MREMAP_MAYMOVE | MREMAP_FIXED)) ==
 	    (MREMAP_MAYMOVE | MREMAP_FIXED)) {
 		tprints(", ");
 		printaddr(tcp->u_arg[4]);
 	}
-#endif
 	return RVAL_DECODED | RVAL_HEX;
 }
 
