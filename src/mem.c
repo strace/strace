@@ -301,6 +301,15 @@ SYS_FUNC(mlock2)
 	return RVAL_DECODED;
 }
 
+static bool
+print_mincore_entry(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+{
+	uint8_t val = (*(uint8_t *) elem_buf) & 1;
+	PRINT_VAL_U(val);
+
+	return true;
+}
+
 SYS_FUNC(mincore)
 {
 	if (entering(tcp)) {
@@ -309,29 +318,13 @@ SYS_FUNC(mincore)
 	} else {
 		const unsigned long page_size = get_pagesize();
 		const unsigned long page_mask = page_size - 1;
-		unsigned long len = tcp->u_arg[1];
-		unsigned char *vec = NULL;
-
-		len = len / page_size + (len & page_mask ? 1 : 0);
-		if (syserror(tcp) || !verbose(tcp) ||
-		    !tcp->u_arg[2] || !(vec = malloc(len)) ||
-		    umoven(tcp, tcp->u_arg[2], len, vec) < 0)
-			printaddr(tcp->u_arg[2]);
-		else {
-			unsigned long i;
-			tprints("[");
-			for (i = 0; i < len; i++) {
-				if (i)
-					tprints(", ");
-				if (abbrev(tcp) && i >= max_strlen) {
-					tprints("...");
-					break;
-				}
-				tprints((vec[i] & 1) ? "1" : "0");
-			}
-			tprints("]");
-		}
-		free(vec);
+		const kernel_ulong_t len = tcp->u_arg[1];
+		const kernel_ulong_t nmemb =
+			len / page_size + ((len & page_mask) ? 1 : 0);
+		const kernel_ulong_t vec = tcp->u_arg[2];
+		uint8_t entry;
+		print_array(tcp, vec, nmemb, &entry, sizeof(entry),
+			    tfetch_mem, print_mincore_entry, 0);
 	}
 	return 0;
 }
