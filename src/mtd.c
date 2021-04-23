@@ -28,7 +28,6 @@ decode_erase_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct erase_info_user einfo;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &einfo))
 		return;
 
@@ -44,7 +43,6 @@ decode_erase_info_user64(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct erase_info_user64 einfo64;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &einfo64))
 		return;
 
@@ -60,7 +58,6 @@ decode_mtd_oob_buf(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct_mtd_oob_buf mbuf;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &mbuf))
 		return;
 	tprint_struct_begin();
@@ -77,7 +74,6 @@ decode_mtd_oob_buf64(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct mtd_oob_buf64 mbuf64;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &mbuf64))
 		return;
 
@@ -95,7 +91,6 @@ decode_otp_info(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct otp_info oinfo;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &oinfo))
 		return;
 
@@ -113,13 +108,12 @@ decode_otp_select(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	unsigned int i;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &i))
 		return;
 
-	tprints("[");
+	tprint_indirect_begin();
 	printxval(mtd_otp_options, i, "MTD_OTP_???");
-	tprints("]");
+	tprint_indirect_end();
 }
 
 static void
@@ -127,7 +121,6 @@ decode_mtd_write_req(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct mtd_write_req mreq;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &mreq))
 		return;
 
@@ -151,7 +144,6 @@ decode_mtd_info_user(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct mtd_info_user minfo;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &minfo))
 		return;
 
@@ -186,7 +178,6 @@ decode_nand_oobinfo(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct nand_oobinfo ninfo;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &ninfo))
 		return;
 
@@ -219,7 +210,6 @@ decode_nand_ecclayout_user(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct nand_ecclayout_user nlay;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &nlay))
 		return;
 
@@ -239,7 +229,6 @@ decode_mtd_ecc_stats(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct mtd_ecc_stats es;
 
-	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &es))
 		return;
 
@@ -262,24 +251,29 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 	case MEMLOCK:
 	case MEMUNLOCK:
 	case MEMISLOCKED:
+		tprint_arg_next();
 		decode_erase_info_user(tcp, arg);
 		break;
 
 	case MEMERASE64:
+		tprint_arg_next();
 		decode_erase_info_user64(tcp, arg);
 		break;
 
 	case MEMWRITEOOB:
 	case MEMREADOOB:
+		tprint_arg_next();
 		decode_mtd_oob_buf(tcp, arg);
 		break;
 
 	case MEMWRITEOOB64:
 	case MEMREADOOB64:
+		tprint_arg_next();
 		decode_mtd_oob_buf64(tcp, arg);
 		break;
 
 	case MEMWRITE:
+		tprint_arg_next();
 		decode_mtd_write_req(tcp, arg);
 		break;
 
@@ -288,59 +282,65 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case OTPLOCK:
+		tprint_arg_next();
 		decode_otp_info(tcp, arg);
 		break;
 
 	case OTPSELECT:
+		tprint_arg_next();
 		decode_otp_select(tcp, arg);
 		break;
 
 	case MTDFILEMODE:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(mtd_file_mode_options, arg, "MTD_FILE_MODE_???");
 		break;
 
 	case MEMGETBADBLOCK:
 	case MEMSETBADBLOCK:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int64(tcp, arg, "%" PRIu64);
 		break;
 
 	case MEMGETINFO:
 		if (entering(tcp))
 			return 0;
+		tprint_arg_next();
 		decode_mtd_info_user(tcp, arg);
 		break;
 
 	case MEMGETOOBSEL:
 		if (entering(tcp))
 			return 0;
+		tprint_arg_next();
 		decode_nand_oobinfo(tcp, arg);
 		break;
 
 	case ECCGETLAYOUT:
 		if (entering(tcp))
 			return 0;
+		tprint_arg_next();
 		decode_nand_ecclayout_user(tcp, arg);
 		break;
 
 	case ECCGETSTATS:
 		if (entering(tcp))
 			return 0;
+		tprint_arg_next();
 		decode_mtd_ecc_stats(tcp, arg);
 		break;
 
 	case OTPGETREGIONCOUNT:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%u");
 		break;
 
 	case MEMGETREGIONCOUNT:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
@@ -348,7 +348,7 @@ MPERS_PRINTER_DECL(int, mtd_ioctl, struct tcb *const tcp,
 		if (entering(tcp)) {
 			struct region_info_user rinfo;
 
-			tprints(", ");
+			tprint_arg_next();
 			if (umove_or_printaddr(tcp, arg, &rinfo))
 				break;
 			tprint_struct_begin();
