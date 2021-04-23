@@ -38,7 +38,7 @@ decode_fiemap(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct fiemap args;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else if (syserror(tcp))
 		return RVAL_IOCTL_DECODED;
 	else
@@ -87,9 +87,9 @@ decode_fs_ioc_flags(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned int flags;
 
 	if (!umove_or_printaddr(tcp, arg, &flags)) {
-		tprints("[");
+		tprint_indirect_begin();
 		printflags(fs_ioc_flags, flags, "FS_???_FL");
-		tprints("]");
+		tprint_indirect_end();
 	}
 }
 
@@ -113,7 +113,7 @@ fs_f_ioctl(struct tcb *const tcp, const unsigned int code,
 #if SIZEOF_LONG > 4
 	case FS_IOC32_SETFLAGS:
 #endif
-		tprints(", ");
+		tprint_arg_next();
 		decode_fs_ioc_flags(tcp, arg);
 		break;
 
