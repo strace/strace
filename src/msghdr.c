@@ -45,21 +45,10 @@ print_scm_rights(struct tcb *tcp, const void *cmsg_data,
 {
 	const int *fds = cmsg_data;
 	const unsigned int nfds = data_len / sizeof(*fds);
-	unsigned int i;
 
-	tprints("[");
+	print_local_array_ex(tcp, fds, nfds, sizeof(*fds),
+			     print_fd_array_member, NULL, 0, NULL, NULL);
 
-	for (i = 0; i < nfds; ++i) {
-		if (i)
-			tprints(", ");
-		if (abbrev(tcp) && i >= max_strlen) {
-			tprint_more_data_follows();
-			break;
-		}
-		printfd(tcp, fds[i]);
-	}
-
-	tprints("]");
 }
 
 static void
@@ -166,36 +155,16 @@ print_cmsg_uint(struct tcb *tcp, const void *cmsg_data,
 {
 	const unsigned int *p = cmsg_data;
 
-	tprintf("[%u]", *p);
+	print_local_array_ex(tcp, p, data_len / sizeof(*p), sizeof(*p),
+			     print_uint32_array_member, NULL, 0, NULL, NULL);
 }
 
 static void
-print_cmsg_uint8_t(struct tcb *tcp, const void *cmsg_data,
+print_cmsg_xint8_t(struct tcb *tcp, const void *cmsg_data,
 		   const unsigned int data_len)
 {
-	const uint8_t *p = cmsg_data;
-
-	tprintf("[%#x]", *p);
-}
-
-static void
-print_cmsg_ip_opts(struct tcb *tcp, const void *cmsg_data,
-		   const unsigned int data_len)
-{
-	const unsigned char *opts = cmsg_data;
-	unsigned int i;
-
-	tprints("[");
-	for (i = 0; i < data_len; ++i) {
-		if (i)
-			tprints(", ");
-		if (abbrev(tcp) && i >= max_strlen) {
-			tprint_more_data_follows();
-			break;
-		}
-		tprintf("0x%02x", opts[i]);
-	}
-	tprints("]");
+	print_local_array_ex(tcp, cmsg_data, data_len, 1,
+			     print_xint8_array_member, NULL, 0, NULL, NULL);
 }
 
 struct sock_ee {
@@ -261,9 +230,9 @@ static const struct {
 }, cmsg_ip_printers[] = {
 	[IP_PKTINFO] = { print_cmsg_ip_pktinfo, sizeof(struct in_pktinfo) },
 	[IP_TTL] = { print_cmsg_uint, sizeof(unsigned int) },
-	[IP_TOS] = { print_cmsg_uint8_t, 1 },
-	[IP_RECVOPTS] = { print_cmsg_ip_opts, 1 },
-	[IP_RETOPTS] = { print_cmsg_ip_opts, 1 },
+	[IP_TOS] = { print_cmsg_xint8_t, 1 },
+	[IP_RECVOPTS] = { print_cmsg_xint8_t, 1 },
+	[IP_RETOPTS] = { print_cmsg_xint8_t, 1 },
 	[IP_RECVERR] = { print_cmsg_ip_recverr, sizeof(struct sock_ee) },
 	[IP_ORIGDSTADDR] = { print_cmsg_ip_origdstaddr, sizeof(struct sockaddr_in) },
 	[IP_CHECKSUM] = { print_cmsg_uint, sizeof(unsigned int) },

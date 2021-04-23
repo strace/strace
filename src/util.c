@@ -1358,6 +1358,15 @@ print_uint8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 }
 
 bool
+print_xint8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			  void *data)
+{
+	tprintf("%#" PRIx8, *(uint8_t *) elem_buf);
+
+	return true;
+}
+
+bool
 print_int32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			 void *data)
 {
@@ -1376,19 +1385,19 @@ print_uint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 }
 
 bool
-print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+print_xint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {
-	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
+	tprintf("%#" PRIx32, *(uint32_t *) elem_buf);
 
 	return true;
 }
 
 bool
-print_xint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {
-	tprintf("%#" PRIx32, *(uint32_t *) elem_buf);
+	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
 
 	return true;
 }

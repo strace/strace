@@ -925,13 +925,15 @@ extern bool print_int8_array_member(struct tcb *, void *elem_buf,
 				    size_t elem_size, void *data);
 extern bool print_uint8_array_member(struct tcb *, void *elem_buf,
 				     size_t elem_size, void *data);
+extern bool print_xint8_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
 extern bool print_int32_array_member(struct tcb *, void *elem_buf,
 				     size_t elem_size, void *data);
 extern bool print_uint32_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
-extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
-				      size_t elem_size, void *data);
 extern bool print_xint32_array_member(struct tcb *, void *elem_buf,
+				      size_t elem_size, void *data);
+extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
 extern bool print_xint64_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
