@@ -37,18 +37,22 @@ SYS_FUNC(mount)
 			  | MS_PRIVATE | MS_SLAVE | MS_UNBINDABLE))
 		ignore_type = ignore_data = true;
 
+	/* source */
 	printpath(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
 
+	/* target */
 	printpath(tcp, tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
 
+	/* filesystemtype */
 	if (ignore_type)
 		printaddr(tcp->u_arg[2]);
 	else
 		printstr(tcp, tcp->u_arg[2]);
-	tprints(", ");
+	tprint_arg_next();
 
+	/* mountflags */
 	if (old_magic) {
 		print_xlat(MS_MGC_VAL);
 		if (flags)
@@ -56,8 +60,9 @@ SYS_FUNC(mount)
 	}
 	if (flags || !old_magic)
 		printflags64(mount_flags, flags, "MS_???");
-	tprints(", ");
+	tprint_arg_next();
 
+	/* data */
 	if (ignore_data)
 		printaddr(tcp->u_arg[4]);
 	else
