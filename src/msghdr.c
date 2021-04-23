@@ -266,7 +266,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		}
 		break;
 	default:
-		tprintf("%#x", cmsg_type);
+		PRINT_VAL_X(cmsg_type);
 	}
 }
 
@@ -315,7 +315,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	union_cmsghdr u = { .ptr = buf };
 
-	tprints("[");
+	tprint_array_begin();
 	while (buf_len >= cmsg_size) {
 		const kernel_ulong_t cmsg_len =
 #ifndef current_wordsize
@@ -334,10 +334,10 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 				u.cmsg->cmsg_type;
 
 		if (u.ptr != buf)
-			tprints(", ");
+			tprint_array_next();
 		tprint_struct_begin();
 		tprints_field_name("cmsg_len");
-		tprintf("%" PRI_klu, cmsg_len);
+		PRINT_VAL_U(cmsg_len);
 		tprint_struct_next();
 		tprints_field_name("cmsg_level");
 		printxval(socketlayers, cmsg_level, "SOL_???");
@@ -372,7 +372,7 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_array_next();
 		tprint_more_data_follows();
 	}
-	tprints("]");
+	tprint_array_end();
 	free(buf);
 }
 
@@ -394,9 +394,11 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 
 	tprint_struct_next();
 	tprints_field_name("msg_namelen");
-	if (p_user_msg_namelen && *p_user_msg_namelen != (int) msg->msg_namelen)
-		tprintf("%d->", *p_user_msg_namelen);
-	tprintf("%d", msg->msg_namelen);
+	if (p_user_msg_namelen && *p_user_msg_namelen != (int) msg->msg_namelen) {
+		PRINT_VAL_D(*p_user_msg_namelen);
+		tprint_value_changed();
+	}
+	PRINT_VAL_D(msg->msg_namelen);
 
 	tprint_struct_next();
 	tprints_field_name("msg_iov");
@@ -455,11 +457,15 @@ dumpiov_in_msghdr(struct tcb *const tcp, const kernel_ulong_t addr,
 
 SYS_FUNC(sendmsg)
 {
+	/* sockfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* msg */
 	decode_msghdr(tcp, 0, tcp->u_arg[1], -1);
+	tprint_arg_next();
+
 	/* flags */
-	tprints(", ");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 
 	return RVAL_DECODED;
@@ -470,29 +476,33 @@ SYS_FUNC(recvmsg)
 	int msg_namelen;
 
 	if (entering(tcp)) {
+		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
 		if (fetch_msghdr_namelen(tcp, tcp->u_arg[1], &msg_namelen)) {
 			set_tcb_priv_ulong(tcp, msg_namelen);
 			return 0;
 		}
+		/* msg */
 		printaddr(tcp->u_arg[1]);
 	} else {
 		msg_namelen = get_tcb_priv_ulong(tcp);
 
+		/* msg */
 		if (syserror(tcp)) {
 			tprint_struct_begin();
 			tprints_field_name("msg_namelen");
-			tprintf("%d", msg_namelen);
+			PRINT_VAL_D(msg_namelen);
 			tprint_struct_end();
 		} else {
 			decode_msghdr(tcp, &msg_namelen, tcp->u_arg[1],
 				      tcp->u_rval);
 		}
 	}
+	tprint_arg_next();
 
 	/* flags */
-	tprints(", ");
 	printflags(msg_flags, tcp->u_arg[2], "MSG_???");
 
 	return RVAL_DECODED;

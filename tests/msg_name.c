@@ -47,7 +47,7 @@ test_msg_name(const int send_fd, const int recv_fd)
 	if (rc < 0)
 		perror_msg_and_skip("recvmsg");
 	printf("recvmsg(%d, {msg_name={sa_family=AF_UNIX, sun_path=\"%s\"}"
-	       ", msg_namelen=%d->%d, msg_iov=[{iov_base=\"A\", iov_len=1}]"
+	       ", msg_namelen=%d => %d, msg_iov=[{iov_base=\"A\", iov_len=1}]"
 	       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT)"
 	       " = %d\n",
 	       recv_fd, addr->sun_path, (int) sizeof(struct sockaddr_un),
@@ -74,7 +74,7 @@ test_msg_name(const int send_fd, const int recv_fd)
 	memset(addr->sun_path, 'A', sizeof(addr->sun_path));
 
 	rc = send_recv(send_fd, recv_fd, msg, MSG_DONTWAIT);
-	printf("recvmsg(%d, {msg_name={sa_family=AF_UNIX}, msg_namelen=%d->%d"
+	printf("recvmsg(%d, {msg_name={sa_family=AF_UNIX}, msg_namelen=%d => %d"
 	       ", msg_iov=[{iov_base=\"A\", iov_len=1}], msg_iovlen=1"
 	       ", msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = %d\n",
 	       recv_fd, (int) offsetof_sun_path, (int) msg->msg_namelen, rc);
@@ -83,7 +83,7 @@ test_msg_name(const int send_fd, const int recv_fd)
 	msg->msg_name = ((void *) (addr + 1)) - msg->msg_namelen;
 	rc = send_recv(send_fd, recv_fd, msg, MSG_DONTWAIT);
 	printf("recvmsg(%d, {msg_name={sa_family=AF_UNIX, sun_path=\"%.*s\"}"
-	       ", msg_namelen=%d->%d, msg_iov=[{iov_base=\"A\", iov_len=1}]"
+	       ", msg_namelen=%d => %d, msg_iov=[{iov_base=\"A\", iov_len=1}]"
 	       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT)"
 	       " = %d\n",
 	       recv_fd, (int) (sizeof(struct sockaddr) - offsetof_sun_path),

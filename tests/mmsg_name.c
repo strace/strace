@@ -52,7 +52,7 @@ print_msghdr(const struct msghdr *const msg, const int user_msg_namelen)
 	}
 	printf(", msg_namelen=");
 	if (user_msg_namelen != (int) msg->msg_namelen) {
-		printf("%d->", user_msg_namelen);
+		printf("%d => ", user_msg_namelen);
 	}
 	printf("%d, msg_iov=[{iov_base=\"%c\", iov_len=1}]"
 	       ", msg_iovlen=1, msg_controllen=0, msg_flags=0}",
