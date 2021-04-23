@@ -935,6 +935,8 @@ extern bool print_xint32_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
 extern bool print_xint64_array_member(struct tcb *, void *elem_buf,
 				      size_t elem_size, void *data);
+extern bool print_fd_array_member(struct tcb *, void *elem_buf,
+				  size_t elem_size, void *data);
 
 static inline bool
 print_xlong_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,

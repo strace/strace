@@ -165,14 +165,6 @@ SYS_FUNC(io_uring_enter)
 	return RVAL_DECODED;
 }
 
-static bool
-print_fd_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-		      void *data)
-{
-	printfd(tcp, *(int *) elem_buf);
-	return true;
-}
-
 static void
 print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 			    const unsigned int nargs)
