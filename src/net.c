@@ -357,24 +357,11 @@ SYS_FUNC(getsockname)
 }
 
 static void
-printpair_fd(struct tcb *tcp, const int i0, const int i1)
-{
-	tprints("[");
-	printfd(tcp, i0);
-	tprints(", ");
-	printfd(tcp, i1);
-	tprints("]");
-}
-
-static void
 decode_pair_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 {
-	int pair[2];
-
-	if (umove_or_printaddr(tcp, addr, &pair))
-		return;
-
-	printpair_fd(tcp, pair[0], pair[1]);
+	int fd;
+	print_array(tcp, addr, 2, &fd, sizeof(fd),
+		    tfetch_mem, print_fd_array_member, NULL);
 }
 
 static int
@@ -393,8 +380,13 @@ do_pipe(struct tcb *tcp, int flags_arg)
 SYS_FUNC(pipe)
 {
 #if HAVE_ARCH_GETRVAL2
-	if (exiting(tcp) && !syserror(tcp))
-		printpair_fd(tcp, tcp->u_rval, getrval2(tcp));
+	if (exiting(tcp) && !syserror(tcp)) {
+		tprint_array_begin();
+		printfd(tcp, tcp->u_rval);
+		tprint_array_next();
+		printfd(tcp, getrval2(tcp));
+		tprint_array_end();
+	}
 	return 0;
 #else
 	return do_pipe(tcp, -1);
