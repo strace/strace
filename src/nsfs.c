@@ -28,11 +28,11 @@ nsfs_ioctl(struct tcb *tcp, unsigned int code, kernel_ulong_t arg)
 	case NS_GET_OWNER_UID:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, arg, &uid)) {
-			tprints("[");
+			tprint_indirect_begin();
 			printuid(uid);
-			tprints("]");
+			tprint_indirect_end();
 		}
 		return RVAL_IOCTL_DECODED;
 	default:
