@@ -117,7 +117,7 @@ main(void)
 	PRINT_FIELD_ID(*peercred, uid);
 	printf(", ");
 	PRINT_FIELD_ID(*peercred, gid);
-	printf("}, [%u->%d]) = %s\n",
+	printf("}, [%u => %d]) = %s\n",
 	       (unsigned int) sizeof(*peercred) + 1, *len, errstr);
 
 	/*

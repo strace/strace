@@ -3,5 +3,5 @@
 [1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +bind\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="net-local-stream"\}, 19\) += 0
 [1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +listen\(0, 5\) += 0
 [1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +getsockname\(0, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="net-local-stream"\}, \[19\]\) += 0
-[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +accept4?\(0, \{sa_family=AF_(LOCAL|UNIX|FILE)\}, \[19->2\](, 0)?\) += 1
+[1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +accept4?\(0, \{sa_family=AF_(LOCAL|UNIX|FILE)\}, \[19 => 2\](, 0)?\) += 1
 [1-9][0-9]* +[0-9]+:[0-9]+:[0-9]+\.[0-9]+ +connect\(1, \{sa_family=AF_(LOCAL|UNIX|FILE), sun_path="net-local-stream"\}, 19\) += 0

@@ -65,7 +65,7 @@ test_sockname_syscall(const int fd)
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
 	printf("%s(%d%s, {sa_family=AF_UNIX, sun_path=\"%s\"}"
-	       ", [%d->%d]%s) = %d\n",
+	       ", [%d => %d]%s) = %d\n",
 	       TEST_SYSCALL_STR, fd, PREFIX_S_STR, addr->sun_path,
 	       (int) sizeof(struct sockaddr_un), (int) *plen, SUFFIX_STR, rc);
 
@@ -108,7 +108,7 @@ test_sockname_syscall(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s(%d%s, {sa_family=AF_UNIX}, [%d->%d]%s) = %d\n",
+	printf("%s(%d%s, {sa_family=AF_UNIX}, [%d => %d]%s) = %d\n",
 	       TEST_SYSCALL_STR, fd, PREFIX_S_STR,
 	       (int) offsetof_sun_path, (int) *plen, SUFFIX_STR, rc);
 
@@ -122,7 +122,7 @@ test_sockname_syscall(const int fd)
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
 	printf("%s(%d%s, {sa_family=AF_UNIX, sun_path=\"%.*s\"}"
-	       ", [%d->%d]%s) = %d\n",
+	       ", [%d => %d]%s) = %d\n",
 	       TEST_SYSCALL_STR, fd, PREFIX_S_STR,
 	       (int) (sizeof(struct sockaddr) - offsetof_sun_path),
 	       addr->sun_path, (int) sizeof(struct sockaddr),

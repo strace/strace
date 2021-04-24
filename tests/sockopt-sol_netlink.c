@@ -107,7 +107,7 @@ main(void)
 			printf("[%d]", *val);
 		printf(", [%d", (int) sizeof(*val) + 1);
 		if ((int) sizeof(*val) + 1 != *len)
-			printf("->%d", *len);
+			printf(" => %d", *len);
 		printf("]) = %s\n", errstr);
 
 		/* zero optlen - print returned optlen */
@@ -116,7 +116,7 @@ main(void)
 		printf("getsockopt(%d, SOL_NETLINK, %s, NULL, [0",
 		       fd, names[i].str);
 		if (*len)
-			printf("->%d", *len);
+			printf(" => %d", *len);
 		printf("]) = %s\n", errstr);
 
 #ifdef NETLINK_LIST_MEMBERSHIPS
@@ -128,7 +128,7 @@ main(void)
 			printf("getsockopt(%d, SOL_NETLINK, %s, %p, [%d",
 			       fd, names[i].str, val, (int) sizeof(*val) - 1);
 			if ((int) sizeof(*val) - 1 != *len)
-				printf("->%d", *len);
+				printf(" => %d", *len);
 			printf("]) = %s\n", errstr);
 #ifdef NETLINK_LIST_MEMBERSHIPS
 		} else {
@@ -143,7 +143,7 @@ main(void)
 				printf("[]");
 			printf(", [%d", (int) sizeof(*val) - 1);
 			if ((int) sizeof(*val) - 1 != *len)
-				printf("->%d", *len);
+				printf(" => %d", *len);
 			printf("]) = %s\n", errstr);
 		}
 #endif

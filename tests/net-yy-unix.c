@@ -70,7 +70,7 @@ main(void)
 	if (getsockname(listen_fd, listen_sa, len))
 		perror_msg_and_fail("getsockname");
 	printf("getsockname(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
-	       ", sun_path=\"%s\"}, [%d->%d]) = 0\n", listen_fd, listen_inode,
+	       ", sun_path=\"%s\"}, [%d => %d]) = 0\n", listen_fd, listen_inode,
 	       TEST_SOCKET, TEST_SOCKET, (int) sizeof(addr), (int) *len);
 
 	int connect_fd = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -94,7 +94,7 @@ main(void)
 		perror_msg_and_fail("accept");
 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
 	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX}"
-	       ", [%d->%d]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
+	       ", [%d => %d]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, listen_inode, TEST_SOCKET,
 	       (int) sizeof(addr), (int) *len,
 	       accept_fd, accept_inode, connect_inode, TEST_SOCKET);
@@ -104,7 +104,7 @@ main(void)
 	if (getpeername(connect_fd, listen_sa, len))
 		perror_msg_and_fail("getpeername");
 	printf("getpeername(%d<UNIX:[%lu->%lu]>, {sa_family=AF_UNIX"
-	       ", sun_path=\"%s\"}, [%d->%d]) = 0\n",
+	       ", sun_path=\"%s\"}, [%d => %d]) = 0\n",
 	       connect_fd, connect_inode,
 	       accept_inode, TEST_SOCKET, (int) sizeof(addr), (int) *len);
 
@@ -151,7 +151,7 @@ main(void)
 	if (getsockname(listen_fd, listen_sa, len))
 		perror_msg_and_fail("getsockname");
 	printf("getsockname(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
-	       ", sun_path=\"%s\"}, [%d->%d]) = 0\n", listen_fd, listen_inode,
+	       ", sun_path=\"%s\"}, [%d => %d]) = 0\n", listen_fd, listen_inode,
 	       TEST_SOCKET, TEST_SOCKET, (int) sizeof(addr), (int) *len);
 
 	if (connect(connect_fd, listen_sa, *len))
@@ -169,7 +169,7 @@ main(void)
 	const char * const sun_path1 =
 		((struct sockaddr_un *) accept_sa)->sun_path + 1;
 	printf("accept(%d<UNIX:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
-	       ", sun_path=@\"%s\"}, [%d->%d]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
+	       ", sun_path=@\"%s\"}, [%d => %d]) = %d<UNIX:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, listen_inode, TEST_SOCKET, sun_path1,
 	       (int) sizeof(addr), (int) *len,
 	       accept_fd, accept_inode, connect_inode, TEST_SOCKET);
@@ -179,8 +179,9 @@ main(void)
 	if (getpeername(connect_fd, listen_sa, len))
 		perror_msg_and_fail("getpeername");
 	printf("getpeername(%d<UNIX:[%lu->%lu,@\"%s\"]>, {sa_family=AF_UNIX"
-	       ", sun_path=\"%s\"}, [%d->%d]) = 0\n", connect_fd, connect_inode,
-	       accept_inode, sun_path1, TEST_SOCKET, (int) sizeof(addr), (int) *len);
+	       ", sun_path=\"%s\"}, [%d => %d]) = 0\n",
+	       connect_fd, connect_inode, accept_inode, sun_path1,
+	       TEST_SOCKET, (int) sizeof(addr), (int) *len);
 
 	assert(sendto(connect_fd, text, sizeof(text) - 1, MSG_DONTWAIT, NULL, 0)
 	       == sizeof(text) - 1);

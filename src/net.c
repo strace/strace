@@ -113,10 +113,15 @@ tprint_sock_type(unsigned int flags)
 
 SYS_FUNC(socket)
 {
+	/* domain */
 	printxval(addrfams, tcp->u_arg[0], "AF_???");
-	tprints(", ");
+	tprint_arg_next();
+
+	/* type */
 	tprint_sock_type(tcp->u_arg[1]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* protocol */
 	switch (tcp->u_arg[0]) {
 	case AF_INET:
 	case AF_INET6:
@@ -134,10 +139,10 @@ SYS_FUNC(socket)
 		break;
 
 	case AF_PACKET:
-		tprints("htons(");
+		tprints_arg_begin("htons");
 		printxval(ethernet_protocols, ntohs(tcp->u_arg[2]),
 			  "ETH_P_???");
-		tprints(")");
+		tprint_arg_end();
 		break;
 
 	case AF_IRDA:
@@ -181,7 +186,7 @@ SYS_FUNC(socket)
 		break;
 
 	default:
-		tprintf("%" PRI_klu, tcp->u_arg[2]);
+		PRINT_VAL_U(tcp->u_arg[2]);
 		break;
 	}
 
@@ -202,15 +207,21 @@ decode_sockname(struct tcb *tcp)
 	int ulen, rlen;
 
 	if (entering(tcp)) {
+		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
 		if (fetch_socklen(tcp, &ulen, tcp->u_arg[1], tcp->u_arg[2])) {
 			set_tcb_priv_ulong(tcp, ulen);
 			return 0;
 		} else {
+			/* addr */
 			printaddr(tcp->u_arg[1]);
-			tprints(", ");
+			tprint_arg_next();
+
+			/* addrlen */
 			printaddr(tcp->u_arg[2]);
+
 			return RVAL_DECODED;
 		}
 	}
@@ -218,14 +229,27 @@ decode_sockname(struct tcb *tcp)
 	ulen = get_tcb_priv_ulong(tcp);
 
 	if (syserror(tcp) || umove(tcp, tcp->u_arg[2], &rlen) < 0) {
+		/* addr */
 		printaddr(tcp->u_arg[1]);
-		tprintf(", [%d]", ulen);
+		tprint_arg_next();
+
+		/* addrlen */
+		tprint_indirect_begin();
+		PRINT_VAL_D(ulen);
+		tprint_indirect_end();
 	} else {
+		/* addr */
 		decode_sockaddr(tcp, tcp->u_arg[1], ulen > rlen ? rlen : ulen);
-		if (ulen != rlen)
-			tprintf(", [%d->%d]", ulen, rlen);
-		else
-			tprintf(", [%d]", rlen);
+		tprint_arg_next();
+
+		/* addrlen */
+		tprint_indirect_begin();
+		if (ulen != rlen) {
+			PRINT_VAL_D(ulen);
+			tprint_value_changed();
+		}
+		PRINT_VAL_D(rlen);
+		tprint_indirect_end();
 	}
 
 	return RVAL_DECODED;
@@ -241,7 +265,8 @@ SYS_FUNC(accept4)
 	int rc = decode_sockname(tcp);
 
 	if (rc & RVAL_DECODED) {
-		tprints(", ");
+		/* flags */
+		tprint_arg_next();
 		printflags(sock_type_flags, tcp->u_arg[3], "SOCK_???");
 	}
 
@@ -250,10 +275,18 @@ SYS_FUNC(accept4)
 
 SYS_FUNC(send)
 {
+	/* sockfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* buf */
 	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* len */
+	PRINT_VAL_U(tcp->u_arg[2]);
+	tprint_arg_next();
+
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 
@@ -262,18 +295,29 @@ SYS_FUNC(send)
 
 SYS_FUNC(sendto)
 {
+	/* sockfd */
 	printfd(tcp, tcp->u_arg[0]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* buf */
 	decode_sockbuf(tcp, tcp->u_arg[0], tcp->u_arg[1], tcp->u_arg[2]);
-	tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* len */
+	PRINT_VAL_U(tcp->u_arg[2]);
+	tprint_arg_next();
+
 	/* flags */
 	printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-	/* to address */
+	tprint_arg_next();
+
+	/* dest_addr */
 	const int addrlen = tcp->u_arg[5];
-	tprints(", ");
 	decode_sockaddr(tcp, tcp->u_arg[4], addrlen);
-	/* to length */
-	tprintf(", %d", addrlen);
+	tprint_arg_next();
+
+	/* addrlen */
+	PRINT_VAL_D(addrlen);
 
 	return RVAL_DECODED;
 }
@@ -281,9 +325,11 @@ SYS_FUNC(sendto)
 SYS_FUNC(recv)
 {
 	if (entering(tcp)) {
+		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* buf */
 		if (syserror(tcp)) {
 			printaddr(tcp->u_arg[1]);
 		} else {
@@ -291,8 +337,13 @@ SYS_FUNC(recv)
 				       MIN((kernel_ulong_t) tcp->u_rval,
 					   tcp->u_arg[2]));
 		}
+		tprint_arg_next();
 
-		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
+		/* len */
+		PRINT_VAL_U(tcp->u_arg[2]);
+		tprint_arg_next();
+
+		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
 	}
 	return 0;
@@ -303,8 +354,10 @@ SYS_FUNC(recvfrom)
 	int ulen, rlen;
 
 	if (entering(tcp)) {
+		/* sockfd */
 		printfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
+
 		if (fetch_socklen(tcp, &ulen, tcp->u_arg[4], tcp->u_arg[5])) {
 			set_tcb_priv_ulong(tcp, ulen);
 		}
@@ -317,36 +370,53 @@ SYS_FUNC(recvfrom)
 				       MIN((kernel_ulong_t) tcp->u_rval,
 					   tcp->u_arg[2]));
 		}
-		/* size */
-		tprintf(", %" PRI_klu ", ", tcp->u_arg[2]);
+		tprint_arg_next();
+
+		/* len */
+		PRINT_VAL_U(tcp->u_arg[2]);
+		tprint_arg_next();
+
 		/* flags */
 		printflags(msg_flags, tcp->u_arg[3], "MSG_???");
-		tprints(", ");
+		tprint_arg_next();
 
 		ulen = get_tcb_priv_ulong(tcp);
 
 		if (!fetch_socklen(tcp, &rlen, tcp->u_arg[4], tcp->u_arg[5])) {
-			/* from address */
+			/* src_addr */
 			printaddr(tcp->u_arg[4]);
-			tprints(", ");
-			/* from length */
+			tprint_arg_next();
+
+			/* addrlen */
 			printaddr(tcp->u_arg[5]);
+
 			return 0;
 		}
 		if (syserror(tcp)) {
-			/* from address */
+			/* src_addr */
 			printaddr(tcp->u_arg[4]);
-			/* from length */
-			tprintf(", [%d]", ulen);
+			tprint_arg_next();
+
+			/* addrlen */
+			tprint_indirect_begin();
+			PRINT_VAL_D(ulen);
+			tprint_indirect_end();
+
 			return 0;
 		}
-		/* from address */
+
+		/* src_addr */
 		decode_sockaddr(tcp, tcp->u_arg[4], ulen > rlen ? rlen : ulen);
-		/* from length */
-		if (ulen != rlen)
-			tprintf(", [%d->%d]", ulen, rlen);
-		else
-			tprintf(", [%d]", rlen);
+		tprint_arg_next();
+
+		/* addrlen */
+		tprint_indirect_begin();
+		if (ulen != rlen) {
+			PRINT_VAL_D(ulen);
+			tprint_value_changed();
+		}
+		PRINT_VAL_D(rlen);
+		tprint_indirect_end();
 	}
 	return 0;
 }
@@ -368,9 +438,11 @@ static int
 do_pipe(struct tcb *tcp, int flags_arg)
 {
 	if (exiting(tcp)) {
+		/* pipefd */
 		decode_pair_fd(tcp, tcp->u_arg[0]);
 		if (flags_arg >= 0) {
-			tprints(", ");
+			/* flags */
+			tprint_arg_next();
 			printflags(open_mode_flags, tcp->u_arg[flags_arg], "O_???");
 		}
 	}
@@ -401,12 +473,19 @@ SYS_FUNC(pipe2)
 SYS_FUNC(socketpair)
 {
 	if (entering(tcp)) {
+		/* domain */
 		printxval(addrfams, tcp->u_arg[0], "AF_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* type */
 		tprint_sock_type(tcp->u_arg[1]);
-		tprintf(", %" PRI_klu, tcp->u_arg[2]);
+		tprint_arg_next();
+
+		/* protocol */
+		PRINT_VAL_U(tcp->u_arg[2]);
+		tprint_arg_next();
 	} else {
-		tprints(", ");
+		/* sv */
 		decode_pair_fd(tcp, tcp->u_arg[3]);
 	}
 	return 0;
@@ -469,11 +548,15 @@ static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 			    unsigned int name, bool is_getsockopt)
 {
+	/* sockfd */
 	printfd(tcp, fd);
-	tprints(", ");
-	printxval(socketlayers, level, "SOL_??");
-	tprints(", ");
+	tprint_arg_next();
 
+	/* level */
+	printxval(socketlayers, level, "SOL_??");
+	tprint_arg_next();
+
+	/* optname */
 	switch (level) {
 	case SOL_SOCKET:
 		printxvals(name, "SO_???", sock_options,
@@ -566,10 +649,8 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		/* Other SOL_* protocol levels still need work. */
 
 	default:
-		tprintf("%u", name);
+		PRINT_VAL_U(name);
 	}
-
-	tprints(", ");
 }
 
 static void
@@ -632,9 +713,9 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &err))
 		return;
 
-	tprints("[");
+	tprint_indirect_begin();
 	print_err(err, false);
-	tprints("]");
+	tprint_indirect_end();
 }
 
 #ifdef PACKET_STATISTICS
@@ -786,14 +867,18 @@ SYS_FUNC(getsockopt)
 	if (entering(tcp)) {
 		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
 					    tcp->u_arg[1], tcp->u_arg[2], true);
+		tprint_arg_next();
 
 		if (verbose(tcp) && tcp->u_arg[4]
 		    && umove(tcp, tcp->u_arg[4], &ulen) == 0) {
 			set_tcb_priv_ulong(tcp, ulen);
 			return 0;
 		} else {
+			/* optval */
 			printaddr(tcp->u_arg[3]);
-			tprints(", ");
+			tprint_arg_next();
+
+			/* optlen */
 			printaddr(tcp->u_arg[4]);
 			return RVAL_DECODED;
 		}
@@ -801,15 +886,28 @@ SYS_FUNC(getsockopt)
 		ulen = get_tcb_priv_ulong(tcp);
 
 		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &rlen) < 0) {
+			/* optval */
 			printaddr(tcp->u_arg[3]);
-			tprintf(", [%d]", ulen);
+			tprint_arg_next();
+
+			/* optlen */
+			tprint_indirect_begin();
+			PRINT_VAL_D(ulen);
+			tprint_indirect_end();
 		} else {
+			/* optval */
 			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 					 tcp->u_arg[3], ulen, rlen);
-			if (ulen != rlen)
-				tprintf(", [%d->%d]", ulen, rlen);
-			else
-				tprintf(", [%d]", rlen);
+			tprint_arg_next();
+
+			/* optlen */
+			tprint_indirect_begin();
+			if (ulen != rlen) {
+				PRINT_VAL_D(ulen);
+				tprint_value_changed();
+			}
+			PRINT_VAL_D(rlen);
+			tprint_indirect_end();
 		}
 	}
 	return 0;
@@ -1033,9 +1131,15 @@ SYS_FUNC(setsockopt)
 {
 	print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
 				    tcp->u_arg[1], tcp->u_arg[2], false);
+	tprint_arg_next();
+
+	/* optval */
 	print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
 			 tcp->u_arg[3], tcp->u_arg[4]);
-	tprintf(", %d", (int) tcp->u_arg[4]);
+	tprint_arg_next();
+
+	/* optlen */
+	PRINT_VAL_D((int) tcp->u_arg[4]);
 
 	return RVAL_DECODED;
 }

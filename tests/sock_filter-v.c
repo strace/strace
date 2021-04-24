@@ -126,7 +126,7 @@ main(void)
 	rc = get_filter(fd, NULL, len);
 	if (rc)
 		perror_msg_and_skip("getsockopt SOL_SOCKET SO_GET_FILTER");
-	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", NULL, [%u->0]) "
+	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", NULL, [%u => 0]) "
 	       "= 0\n",
 	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER),
 	       BPF_MAXINSNS);
@@ -167,7 +167,7 @@ main(void)
 	/* query sock_filter program length -> ARRAY_SIZE(bpf_filter) */
 	*len = 0;
 	rc = get_filter(fd, efault, len);
-	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", %p, [0->%u]) "
+	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", %p, [0 => %u]) "
 	       "= %s\n",
 	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER), efault,
 	       (unsigned int) ARRAY_SIZE(bpf_filter), errstr);
@@ -192,7 +192,7 @@ main(void)
 	printf("getsockopt(%d, " XLAT_FMT ", " XLAT_FMT ", ",
 	       fd, XLAT_ARGS(SOL_SOCKET), XLAT_ARGS(SO_GET_FILTER));
 	print_filter();
-	printf(", [%u->%d]) = %s\n",
+	printf(", [%u => %d]) = %s\n",
 	       (unsigned int) ARRAY_SIZE(bpf_filter) + 1, *len, errstr);
 
 	puts("+++ exited with 0 +++");

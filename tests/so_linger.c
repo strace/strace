@@ -103,7 +103,7 @@ main(void)
 	*len = sizeof(*linger) + 1;
 	get_linger(fd, linger, len);
 	printf("getsockopt(%d, SOL_SOCKET, SO_LINGER, {l_onoff=%d, l_linger=%d}"
-	       ", [%u->%d]) = %s\n",
+	       ", [%u => %d]) = %s\n",
 	       fd, linger->l_onoff, linger->l_linger,
 	       (unsigned int) sizeof(*linger) + 1, *len, errstr);
 
