@@ -28,7 +28,9 @@ decode_sg_io(struct tcb *const tcp, const uint32_t iid,
 		case 'Q':
 			return decode_sg_io_v4(tcp, arg);
 		default:
-			tprintf("[%u]", iid);
+			tprint_indirect_begin();
+			PRINT_VAL_U(iid);
+			tprint_indirect_end();
 			return RVAL_IOCTL_DECODED;
 	}
 
@@ -44,7 +46,7 @@ decode_sg_scsi_id(struct tcb *const tcp, const kernel_ulong_t arg)
 	if (entering(tcp))
 		return 0;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &id)) {
 		tprint_struct_begin();
 		PRINT_FIELD_D(id, host_no);
@@ -76,7 +78,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (entering(tcp)) {
 			uint32_t iid;
 
-			tprints(", ");
+			tprint_arg_next();
 			if (umove_or_printaddr(tcp, arg, &iid)) {
 				break;
 			} else {
@@ -102,9 +104,9 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	/* takes a value by pointer */
 	case SG_SCSI_RESET: {
 		unsigned int val;
-		tprints(", ");
+		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, arg, &val)) {
-			tprints("[");
+			tprint_indirect_begin();
 			if (val & SG_SCSI_RESET_NO_ESCALATE) {
 				printxval(sg_scsi_reset,
 					  SG_SCSI_RESET_NO_ESCALATE, 0);
@@ -113,7 +115,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 			printxval(sg_scsi_reset,
 				  val & ~SG_SCSI_RESET_NO_ESCALATE,
 				  "SG_SCSI_RESET_???");
-			tprints("]");
+			tprint_indirect_end();
 
 		}
 		break;
@@ -128,7 +130,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SG_SET_KEEP_ORPHAN:
 	case SG_SET_RESERVED_SIZE:
 	case SG_SET_TIMEOUT:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
@@ -146,13 +148,14 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case SG_GET_VERSION_NUM:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
 	/* takes an integer by value */
 	case SG_SET_TRANSFORM:
-		tprintf(", %#x", (unsigned int) arg);
+		tprint_arg_next();
+		PRINT_VAL_X((unsigned int) arg);
 		break;
 
 	/* no arguments */
