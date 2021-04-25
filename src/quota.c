@@ -101,16 +101,16 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	case Q_XQUOTASYNC:
 		break;
 	case Q_QUOTAON:
-		tprints(", ");
+		tprint_arg_next();
 		printxval(quota_formats, id, "QFMT_VFS_???");
-		tprints(", ");
+		tprint_arg_next();
 		printpath(tcp, data);
 		break;
 	case Q_GETQUOTA:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			printuid(id);
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
@@ -121,9 +121,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		struct if_dqblk dq;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			printuid(id);
-			tprints(", ");
+			tprint_arg_next();
 		}
 
 		if (umove_or_printaddr(tcp, data, &dq))
@@ -160,9 +160,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		struct if_nextdqblk dq;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			printuid(id);
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
@@ -203,9 +203,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	case Q_XGETQUOTA:
 	case Q_XGETNEXTQUOTA:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			printuid(id);
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
@@ -216,9 +216,9 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		fs_disk_quota_t dq;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			printuid(id);
-			tprints(", ");
+			tprint_arg_next();
 		}
 
 		if (umove_or_printaddr(tcp, data, &dq))
@@ -275,21 +275,21 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		uint32_t fmt;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
 
 		if (umove_or_printaddr(tcp, data, &fmt))
 			break;
-		tprints("[");
+		tprint_indirect_begin();
 		printxval(quota_formats, fmt, "QFMT_VFS_???");
-		tprints("]");
+		tprint_indirect_end();
 		break;
 	}
 	case Q_GETINFO:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
@@ -300,7 +300,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		struct if_dqinfo dq;
 
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, data, &dq))
 			break;
@@ -320,7 +320,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		fs_quota_stat_t dq;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
@@ -362,7 +362,7 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 		struct fs_quota_statv dq;
 
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 
 			return 0;
 		}
@@ -408,32 +408,32 @@ decode_cmd_data(struct tcb *tcp, uint32_t id, uint32_t cmd, kernel_ulong_t data)
 	{
 		uint32_t flag;
 
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, data, &flag))
 			break;
-		tprints("[");
+		tprint_indirect_begin();
 		printflags(xfs_quota_flags, flag, "FS_QUOTA_???");
-		tprints("]");
+		tprint_indirect_end();
 		break;
 	}
 	case Q_XQUOTARM:
 	{
 		uint32_t flag;
 
-		tprints(", ");
+		tprint_arg_next();
 
 		if (umove_or_printaddr(tcp, data, &flag))
 			break;
-		tprints("[");
+		tprint_indirect_begin();
 		printflags(xfs_dqblk_flags, flag, "FS_???_QUOTA");
-		tprints("]");
+		tprint_indirect_end();
 		break;
 	}
 	default:
-		tprints(", ");
+		tprint_arg_next();
 		printuid(id);
-		tprints(", ");
+		tprint_arg_next();
 		printaddr(data);
 		break;
 	}
@@ -447,7 +447,7 @@ print_qcmd(const uint32_t qcmd)
 	const uint32_t type = QCMD_TYPE(qcmd);
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%u", qcmd);
+		PRINT_VAL_U(qcmd);
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -455,11 +455,11 @@ print_qcmd(const uint32_t qcmd)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
-	tprints("QCMD(");
+	tprints_arg_begin("QCMD");
 	printxvals_ex(cmd, "Q_???", XLAT_STYLE_ABBREV, quotacmds, NULL);
-	tprints(", ");
+	tprint_arg_next();
 	printxvals_ex(type, "???QUOTA", XLAT_STYLE_ABBREV, quotatypes, NULL);
-	tprints(")");
+	tprint_arg_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();
@@ -478,8 +478,11 @@ SYS_FUNC(quotactl)
 	uint32_t id = tcp->u_arg[2];
 
 	if (entering(tcp)) {
+		/* cmd */
 		print_qcmd(qcmd);
-		tprints(", ");
+		tprint_arg_next();
+
+		/* special */
 		printpath(tcp, tcp->u_arg[1]);
 	}
 	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);
