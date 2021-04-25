@@ -18,9 +18,10 @@ SYS_FUNC(time)
 		time_t t;
 
 		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t)) {
-			tprintf("[%lld", (long long) t);
+			tprint_indirect_begin();
+			PRINT_VAL_D(t);
 			tprints_comment(sprinttime(t));
-			tprints("]");
+			tprint_indirect_end();
 		}
 
 		if (!syserror(tcp)) {
