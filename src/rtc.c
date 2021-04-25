@@ -112,9 +112,9 @@ decode_rtc_vl(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (umove_or_printaddr(tcp, addr, &val))
 		return;
 
-	tprints("[");
+	tprint_indirect_begin();
 	printflags(rtc_vl_flags, val, "RTC_VL_???");
-	tprints("]");
+	tprint_indirect_end();
 }
 
 MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
@@ -128,18 +128,19 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		ATTRIBUTE_FALLTHROUGH;
 	case RTC_ALM_SET:
 	case RTC_SET_TIME:
-		tprints(", ");
+		tprint_arg_next();
 		decode_rtc_time(tcp, arg);
 		break;
 	case RTC_IRQP_SET:
 	case RTC_EPOCH_SET:
-		tprintf(", %" PRI_klu, arg);
+		tprint_arg_next();
+		PRINT_VAL_U(arg);
 		break;
 	case RTC_IRQP_READ:
 	case RTC_EPOCH_READ:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		printnum_ulong(tcp, arg);
 		break;
 	case RTC_WKALM_RD:
@@ -147,7 +148,7 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case RTC_WKALM_SET:
-		tprints(", ");
+		tprint_arg_next();
 		decode_rtc_wkalrm(tcp, arg);
 		break;
 	case RTC_PLL_GET:
@@ -155,13 +156,13 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case RTC_PLL_SET:
-		tprints(", ");
+		tprint_arg_next();
 		decode_rtc_pll_info(tcp, arg);
 		break;
 	case RTC_VL_READ:
 		if (entering(tcp))
 			return 0;
-		tprints(", ");
+		tprint_arg_next();
 		decode_rtc_vl(tcp, arg);
 		break;
 	case RTC_AIE_ON:
