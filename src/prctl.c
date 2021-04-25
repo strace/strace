@@ -50,10 +50,10 @@ enum {
 static void
 print_prctl_args(struct tcb *tcp, const unsigned int first)
 {
-	unsigned int i;
-
-	for (i = first; i < n_args(tcp); ++i)
-		tprintf(", %#" PRI_klx, tcp->u_arg[i]);
+	for (unsigned int i = first; i < n_args(tcp); ++i) {
+		tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[i]);
+	}
 }
 
 static char *
@@ -103,7 +103,7 @@ SYS_FUNC(prctl)
 	case PR_GET_FPEMU:
 	case PR_GET_FPEXC:
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else
 			printnum_int(tcp, arg2, "%u");
 		break;
@@ -118,7 +118,7 @@ SYS_FUNC(prctl)
 
 	case PR_GET_NAME:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 		} else {
 			if (syserror(tcp))
 				printaddr(arg2);
@@ -130,11 +130,11 @@ SYS_FUNC(prctl)
 
 	case PR_GET_PDEATHSIG:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
-			tprints("[");
+			tprint_indirect_begin();
 			printsignal(i);
-			tprints("]");
+			tprint_indirect_end();
 		}
 		break;
 
@@ -149,28 +149,28 @@ SYS_FUNC(prctl)
 
 	case PR_GET_TID_ADDRESS:
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else
 			printnum_kptr(tcp, arg2);
 		break;
 
 	case PR_GET_TSC:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
-			tprints("[");
+			tprint_indirect_begin();
 			printxval(pr_tsc, i, "PR_TSC_???");
-			tprints("]");
+			tprint_indirect_end();
 		}
 		break;
 
 	case PR_GET_UNALIGN:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 		} else if (!umove_or_printaddr(tcp, arg2, &i)) {
-			tprints("[");
+			tprint_indirect_begin();
 			printflags(pr_unalign_flags, i, "PR_UNALIGN_???");
-			tprints("]");
+			tprint_indirect_end();
 		}
 		break;
 
@@ -185,7 +185,8 @@ SYS_FUNC(prctl)
 
 	case PR_SVE_SET_VL:
 		if (entering(tcp)) {
-			tprintf(", %s", sprint_sve_val(arg2));
+			tprint_arg_next();
+			tprints(sprint_sve_val(arg2));
 			return 0;
 		}
 		ATTRIBUTE_FALLTHROUGH;
@@ -202,7 +203,7 @@ SYS_FUNC(prctl)
 
 	case PR_GET_SPECULATION_CTRL:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
 
 			break;
@@ -234,29 +235,30 @@ SYS_FUNC(prctl)
 	case PR_SET_KEEPCAPS:
 	case PR_SET_TIMING:
 	case PR_SET_TAGGED_ADDR_CTRL:
-		tprintf(", %" PRI_klu, arg2);
+		tprint_arg_next();
+		PRINT_VAL_U(arg2);
 		return RVAL_DECODED;
 
 	case PR_SET_DUMPABLE:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(pr_dumpable, arg2, "SUID_DUMP_???");
 		return RVAL_DECODED;
 
 	case PR_CAPBSET_DROP:
 	case PR_CAPBSET_READ:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(cap, arg2, "CAP_???");
 		return RVAL_DECODED;
 
 	case PR_CAP_AMBIENT:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(pr_cap_ambient, arg2,
 			       "PR_CAP_AMBIENT_???");
 		switch (arg2) {
 		case PR_CAP_AMBIENT_RAISE:
 		case PR_CAP_AMBIENT_LOWER:
 		case PR_CAP_AMBIENT_IS_SET:
-			tprints(", ");
+			tprint_arg_next();
 			printxval64(cap, arg3, "CAP_???");
 			print_prctl_args(tcp, 3);
 			break;
@@ -267,19 +269,19 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_MCE_KILL:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(pr_mce_kill, arg2, "PR_MCE_KILL_???");
-		tprints(", ");
+		tprint_arg_next();
 		if (PR_MCE_KILL_SET == arg2)
 			printxval64(pr_mce_kill_policy, arg3,
 				    "PR_MCE_KILL_???");
 		else
-			tprintf("%#" PRI_klx, arg3);
+			PRINT_VAL_X(arg3);
 		print_prctl_args(tcp, 3);
 		return RVAL_DECODED;
 
 	case PR_SET_NAME:
-		tprints(", ");
+		tprint_arg_next();
 		printstr_ex(tcp, arg2, TASK_COMM_LEN - 1,
 			    QUOTE_0_TERMINATED);
 		return RVAL_DECODED;
@@ -290,8 +292,13 @@ SYS_FUNC(prctl)
 # endif
 	case PR_SET_VMA:
 		if (arg2 == PR_SET_VMA_ANON_NAME) {
-			tprintf(", PR_SET_VMA_ANON_NAME, %#" PRI_klx, arg3);
-			tprintf(", %" PRI_klu ", ", arg4);
+			tprint_arg_next();
+			print_xlat(PR_SET_VMA_ANON_NAME);
+			tprint_arg_next();
+			PRINT_VAL_X(arg3);
+			tprint_arg_next();
+			PRINT_VAL_U(arg4);
+			tprint_arg_next();
 			printstr(tcp, arg5);
 		} else {
 			/* There are no other sub-options now, but there
@@ -302,37 +309,37 @@ SYS_FUNC(prctl)
 #endif
 
 	case PR_SET_MM:
-		tprints(", ");
+		tprint_arg_next();
 		printxval(pr_set_mm, arg2, "PR_SET_MM_???");
 		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
 	case PR_SET_PDEATHSIG:
-		tprints(", ");
+		tprint_arg_next();
 		if (arg2 > 128)
-			tprintf("%" PRI_klu, arg2);
+			PRINT_VAL_U(arg2);
 		else
 			printsignal(arg2);
 		return RVAL_DECODED;
 
 	case PR_SET_PTRACER:
-		tprints(", ");
+		tprint_arg_next();
 		if ((int) arg2 == -1) {
 			print_xlat_ex(arg2, "PR_SET_PTRACER_ANY",
 				      XLAT_STYLE_DEFAULT);
 		} else {
-			tprintf("%" PRI_klu, arg2);
+			PRINT_VAL_U(arg2);
 		}
 		return RVAL_DECODED;
 
 	case PR_SET_SECCOMP:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(seccomp_mode, arg2,
 			    "SECCOMP_MODE_???");
 		if (SECCOMP_MODE_STRICT == arg2)
 			return RVAL_DECODED;
 		if (SECCOMP_MODE_FILTER == arg2) {
-			tprints(", ");
+			tprint_arg_next();
 			decode_seccomp_fprog(tcp, arg3);
 			return RVAL_DECODED;
 		}
@@ -340,28 +347,30 @@ SYS_FUNC(prctl)
 		return RVAL_DECODED;
 
 	case PR_SET_SECUREBITS:
-		tprints(", ");
+		tprint_arg_next();
 		printflags64(secbits, arg2, "SECBIT_???");
 		return RVAL_DECODED;
 
 	case PR_SET_TIMERSLACK:
-		tprintf(", %" PRI_kld, arg2);
+		tprint_arg_next();
+		PRINT_VAL_D(arg2);
 		return RVAL_DECODED;
 
 	case PR_SET_TSC:
-		tprints(", ");
+		tprint_arg_next();
 		printxval(pr_tsc, arg2, "PR_TSC_???");
 		return RVAL_DECODED;
 
 	case PR_SET_UNALIGN:
-		tprints(", ");
+		tprint_arg_next();
 		printflags(pr_unalign_flags, arg2, "PR_UNALIGN_???");
 		return RVAL_DECODED;
 
 	case PR_SET_NO_NEW_PRIVS:
 	case PR_SET_THP_DISABLE:
 	case PR_SET_IO_FLUSHER:
-		tprintf(", %" PRI_klu, arg2);
+		tprint_arg_next();
+		PRINT_VAL_U(arg2);
 		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
@@ -377,14 +386,14 @@ SYS_FUNC(prctl)
 		return RVAL_STR;
 
 	case PR_SET_FP_MODE:
-		tprints(", ");
+		tprint_arg_next();
 		printflags(pr_fp_mode, arg2, "PR_FP_MODE_???");
 		return RVAL_DECODED;
 
 	case PR_SET_SPECULATION_CTRL:
-		tprints(", ");
+		tprint_arg_next();
 		printxval64(pr_spec_cmds, arg2, "PR_SPEC_???");
-		tprints(", ");
+		tprint_arg_next();
 
 		switch (arg2) {
 		case PR_SPEC_STORE_BYPASS:
@@ -394,7 +403,7 @@ SYS_FUNC(prctl)
 			break;
 
 		default:
-			tprintf("%#" PRI_klx, arg3);
+			PRINT_VAL_X(arg3);
 		}
 
 		return RVAL_DECODED;
@@ -426,7 +435,7 @@ SYS_FUNC(arch_prctl)
 	case ARCH_GET_GS:
 	case ARCH_GET_FS:
 		if (entering(tcp))
-			tprints(", ");
+			tprint_arg_next();
 		else
 			printnum_kptr(tcp, addr);
 		return 0;
@@ -435,7 +444,9 @@ SYS_FUNC(arch_prctl)
 		return RVAL_DECODED;
 	}
 
-	tprintf(", %#" PRI_klx, addr);
+	tprint_arg_next();
+	PRINT_VAL_X(addr);
+
 	return RVAL_DECODED;
 }
 #endif /* X86_64 || X32 || I386 */
