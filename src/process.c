@@ -92,7 +92,7 @@ SYS_FUNC(ptrace)
 		}
 
 		/* pid */
-		tprints(", ");
+		tprint_arg_next();
 		printpid(tcp, pid, PT_TGID);
 
 		/* addr */
@@ -105,12 +105,12 @@ SYS_FUNC(ptrace)
 			return RVAL_DECODED;
 		case PTRACE_PEEKUSER:
 		case PTRACE_POKEUSER:
-			tprints(", ");
+			tprint_arg_next();
 			print_user_offset_addr(addr);
 			break;
 		case PTRACE_GETREGSET:
 		case PTRACE_SETREGSET:
-			tprints(", ");
+			tprint_arg_next();
 			printxval(nt_descriptor_types, addr, "NT_???");
 			break;
 		case PTRACE_GETSIGMASK:
@@ -118,17 +118,18 @@ SYS_FUNC(ptrace)
 		case PTRACE_SECCOMP_GET_FILTER:
 		case PTRACE_SECCOMP_GET_METADATA:
 		case PTRACE_GET_SYSCALL_INFO:
-			tprintf(", %" PRI_klu, addr);
+			tprint_arg_next();
+			PRINT_VAL_U(addr);
 			break;
 		case PTRACE_PEEKSIGINFO: {
-			tprints(", ");
+			tprint_arg_next();
 			struct {
 				uint64_t off;
 				uint32_t flags;
 				uint32_t nr;
 			} psi;
 			if (umove_or_printaddr(tcp, addr, &psi)) {
-				tprints(", ");
+				tprint_arg_next();
 				printaddr(data);
 				return RVAL_DECODED;
 			}
@@ -144,7 +145,7 @@ SYS_FUNC(ptrace)
 			break;
 		}
 		default:
-			tprints(", ");
+			tprint_arg_next();
 			printaddr(addr);
 		}
 
@@ -168,7 +169,7 @@ SYS_FUNC(ptrace)
 		}
 #endif /* IA64 || SPARC || SPARC64 */
 
-		tprints(", ");
+		tprint_arg_next();
 
 		/* data */
 		switch (request) {
@@ -216,7 +217,7 @@ SYS_FUNC(ptrace)
 
 				tprint_struct_begin();
 				tprints_field_name("filter_off");
-				tprintf("%" PRIu64, filter_off);
+				PRINT_VAL_U(filter_off);
 				return 0;
 			}
 
