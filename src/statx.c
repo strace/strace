@@ -30,11 +30,15 @@ print_statx_timestamp(const struct_statx_timestamp *const p)
 SYS_FUNC(statx)
 {
 	if (entering(tcp)) {
+		/* dirfd */
 		print_dirfd(tcp, tcp->u_arg[0]);
-		tprints(", ");
-		printpath(tcp, tcp->u_arg[1]);
-		tprints(", ");
+		tprint_arg_next();
 
+		/* pathname */
+		printpath(tcp, tcp->u_arg[1]);
+		tprint_arg_next();
+
+		/* flags */
 		unsigned int flags = tcp->u_arg[2];
 		printflags(at_statx_sync_types, flags & AT_STATX_SYNC_TYPE,
 			   NULL);
@@ -43,11 +47,13 @@ SYS_FUNC(statx)
 			tprints("|");
 			printflags(at_flags, flags, NULL);
 		}
+		tprint_arg_next();
 
-		tprints(", ");
+		/* mask */
 		printflags(statx_masks, tcp->u_arg[3], "STATX_???");
-		tprints(", ");
+		tprint_arg_next();
 	} else {
+		/* statxbuf */
 		struct_statx stx;
 		if (umove_or_printaddr(tcp, tcp->u_arg[4], &stx))
 			return 0;
