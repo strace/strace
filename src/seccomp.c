@@ -17,29 +17,41 @@ SYS_FUNC(seccomp)
 	unsigned int flags = tcp->u_arg[1];
 	unsigned int act;
 
+	/* operation */
 	printxval(seccomp_ops, op, "SECCOMP_SET_MODE_???");
-	tprints(", ");
+	tprint_arg_next();
 
 	switch (op) {
 	case SECCOMP_GET_ACTION_AVAIL:
-		tprintf("%u, ", flags);
+		/* flags */
+		PRINT_VAL_U(flags);
+		tprint_arg_next();
+
+		/* args */
 		if (!umove_or_printaddr(tcp, tcp->u_arg[2], &act)) {
-			tprints("[");
+			tprint_indirect_begin();
 			printxval(seccomp_ret_action, act, "SECCOMP_RET_???");
-			tprints("]");
+			tprint_indirect_end();
 		}
 		break;
 
 	case SECCOMP_SET_MODE_FILTER:
+		/* flags */
 		printflags(seccomp_filter_flags, flags,
 			   "SECCOMP_FILTER_FLAG_???");
-		tprints(", ");
+		tprint_arg_next();
+
+		/* args */
 		decode_seccomp_fprog(tcp, tcp->u_arg[2]);
 		break;
 
 	case SECCOMP_SET_MODE_STRICT:
 	default:
-		tprintf("%u, ", flags);
+		/* flags */
+		PRINT_VAL_U(flags);
+		tprint_arg_next();
+
+		/* args */
 		printaddr(tcp->u_arg[2]);
 		break;
 	}
