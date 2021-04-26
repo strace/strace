@@ -293,9 +293,9 @@ struct tcb {
 	 */
 	unsigned int pid_ns;
 
-#ifdef ENABLE_SECONTEXT
+# ifdef ENABLE_SECONTEXT
 	int last_dirfd; /* Use AT_FDCWD for 'not set' */
-#endif
+# endif
 
 	struct mmap_cache_t *mmap_cache;
 

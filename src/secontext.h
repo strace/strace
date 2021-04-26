@@ -7,9 +7,9 @@
  */
 
 #ifndef STRACE_SECONTEXT_H
-#define STRACE_SECONTEXT_H
+# define STRACE_SECONTEXT_H
 
-#include "defs.h"
+# include "defs.h"
 
 extern bool selinux_context;
 extern bool selinux_context_full;

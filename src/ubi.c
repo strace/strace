@@ -198,7 +198,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	  const kernel_ulong_t arg)
 {
 	switch (code) {
-# define case_UBI(name)  case UBI_ ## name: return decode_UBI_ ## name(tcp, arg)
+#define case_UBI(name)  case UBI_ ## name: return decode_UBI_ ## name(tcp, arg)
 	case_UBI(IOCATT);
 	case_UBI(IOCEBCH);
 	case_UBI(IOCEBMAP);
@@ -206,7 +206,7 @@ ubi_ioctl(struct tcb *const tcp, const unsigned int code,
 	case_UBI(IOCRNVOL);
 	case_UBI(IOCRSVOL);
 	case_UBI(IOCSETVOLPROP);
-# undef case_UBI
+#undef case_UBI
 
 	case UBI_IOCVOLUP:
 		tprint_arg_next();
