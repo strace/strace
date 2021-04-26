@@ -2,7 +2,7 @@
  * Check decoding of NS_* commands of ioctl syscall.
  *
  * Copyright (c) 2017 Nikolay Marchuk <marchuk.nikolay.a@gmail.com>
- * Copyright (c) 2017-2020 The strace developers.
+ * Copyright (c) 2017-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
