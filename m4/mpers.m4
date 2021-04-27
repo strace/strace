@@ -107,14 +107,16 @@ case "$arch" in
 	CFLAGS="$CFLAGS MPERS_CFLAGS"
 	AC_CACHE_CHECK([for mpers_name personality compile support (using $CC $CPPFLAGS $CFLAGS)],
 		[st_cv_cc],
-		[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdint.h>]],
+		[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <stdint.h>
+#include <errno.h>]],
 						    [[return 0]])],
 				   [st_cv_cc=yes],
 				   [st_cv_cc=no])])
 	if test $st_cv_cc = yes; then
 		AC_CACHE_CHECK([for mpers_name personality runtime support],
 			[st_cv_runtime],
-			[AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <stdint.h>]],
+			[AC_RUN_IFELSE([AC_LANG_PROGRAM([[#include <stdint.h>
+#include <errno.h>]],
 							[[return 0]])],
 				       [st_cv_runtime=yes],
 				       [st_cv_runtime=no],
