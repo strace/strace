@@ -435,17 +435,28 @@ SYS_FUNC(perf_event_open)
 	 * of just size field because they could.
 	 */
 	if (entering(tcp)) {
+		/* attr */
 		if (!fetch_perf_event_attr(tcp, tcp->u_arg[0]))
 			return 0;
 	} else {
+		/* attr */
 		print_perf_event_attr(tcp, tcp->u_arg[0]);
 	}
+	tprint_arg_next();
 
-	tprintf(", %d, %d, ",
-		(int) tcp->u_arg[1],
-		(int) tcp->u_arg[2]);
+	/* pid */
+	PRINT_VAL_D((int) tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* cpu */
+	PRINT_VAL_D((int) tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* group_fd */
 	printfd(tcp, tcp->u_arg[3]);
-	tprints(", ");
+	tprint_arg_next();
+
+	/* flags */
 	printflags64(perf_event_open_flags, tcp->u_arg[4], "PERF_FLAG_???");
 
 	return RVAL_DECODED | RVAL_FD;
