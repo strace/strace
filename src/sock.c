@@ -124,12 +124,15 @@ print_ifreq(struct tcb *const tcp, const unsigned int code,
 static unsigned int
 print_ifc_len(int len)
 {
-	const unsigned int n = (unsigned int) len / sizeof(struct_ifreq);
+	PRINT_VAL_D(len);
 
-	if (len <= 0 || n * sizeof(struct_ifreq) != (unsigned int) len)
-		tprintf("%d", len);
-	else
-		tprintf("%u * sizeof(struct ifreq)", n);
+	const unsigned int n = (unsigned int) len / sizeof(struct_ifreq);
+	if (len > 0 && n * sizeof(struct_ifreq) == (unsigned int) len) {
+		tprint_comment_begin();
+		PRINT_VAL_U(n);
+		tprints(" * sizeof(struct ifreq)");
+		tprint_comment_end();
+	}
 
 	return n;
 }
@@ -182,7 +185,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 		if (entering(tcp)) {
 			free(ifc);
 
-			tprints(", ");
+			tprint_arg_next();
 			printaddr(addr);
 		} else {
 			/*
@@ -202,7 +205,7 @@ decode_ifconf(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		tprint_struct_begin();
 		tprints_field_name("ifc_len");
 		if (ifc->ifc_buf)
@@ -273,13 +276,13 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case FIOSETOWN:
 	case SIOCSIFENCAP:
 	case SIOCSPGRP:
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%d");
 		break;
 
 	case SIOCBRADDIF:
 	case SIOCBRDELIF:
-		tprints(", ");
+		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, arg, &ifr)) {
 			tprint_struct_begin();
 			PRINT_FIELD_IFINDEX(ifr, ifr_ifindex);
@@ -302,13 +305,13 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCSIFNETMASK:
 	case SIOCSIFSLAVE:
 	case SIOCSIFTXQLEN:
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &ifr))
 			break;
 
 		tprint_struct_begin();
 		PRINT_FIELD_CSTRING(ifr, ifr_name);
-		tprints(", ");
+		tprint_arg_next();
 		print_ifreq(tcp, code, arg, &ifr);
 		tprint_struct_end();
 		break;
@@ -327,7 +330,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCGIFSLAVE:
 	case SIOCGIFTXQLEN:
 		if (entering(tcp)) {
-			tprints(", ");
+			tprint_arg_next();
 			if (umove_or_printaddr(tcp, arg, &ifr))
 				break;
 
@@ -341,7 +344,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 			return 0;
 		} else {
 			if (!syserror(tcp) && !umove(tcp, arg, &ifr)) {
-				tprints(", ");
+				tprint_struct_next();
 				print_ifreq(tcp, code, arg, &ifr);
 			}
 			tprint_struct_end();
@@ -402,7 +405,7 @@ MPERS_PRINTER_DECL(int, sock_ioctl,
 	case SIOCSMIIREG:
 	case SIOCSRARP:
 	case SIOCWANDEV:
-		tprints(", ");
+		tprint_arg_next();
 		printaddr(arg);
 		break;
 

@@ -23,10 +23,9 @@
 static void
 print_ifc_len(int val)
 {
-	if (val <= 0 || val % (int) sizeof(struct ifreq))
-		printf("%d", val);
-	else
-		printf("%d * sizeof(struct ifreq)",
+	printf("%d", val);
+	if (val > 0 && val % (int) sizeof(struct ifreq) == 0)
+		printf(" /* %d * sizeof(struct ifreq) */",
 		       val / (int) sizeof(struct ifreq));
 }
 
