@@ -76,9 +76,9 @@ get_print_uid(struct tcb *const tcp, const kernel_ulong_t addr)
 	uid_t uid;
 
 	if (!umove_or_printaddr(tcp, addr, &uid)) {
-		tprints("[");
+		tprint_indirect_begin();
 		printuid(uid);
-		tprints("]");
+		tprint_indirect_end();
 	}
 }
 
