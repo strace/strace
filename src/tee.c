@@ -115,13 +115,13 @@ tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data
 	case TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT:
 		tprint_struct_next();
 		tprints_field_name("shm_offs");
-		tprintf("%#llx", (unsigned long long) param->a);
+		PRINT_VAL_X(param->a);
 		tprint_struct_next();
 		tprints_field_name("size");
-		tprintf("%#llx", (unsigned long long) param->b);
+		PRINT_VAL_X(param->b);
 		tprint_struct_next();
 		tprints_field_name("shm_id");
-		tprintf("%llu", (unsigned long long) param->c);
+		PRINT_VAL_U(param->c);
 		break;
 
 	case TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT:
@@ -157,7 +157,7 @@ tee_version(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct tee_ioctl_version_data version;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		return 0;
 	}
 
@@ -193,7 +193,7 @@ tee_open_session(struct tcb *const tcp, const kernel_ulong_t arg)
 	gid_t gid;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, open_session, &params)))
 			return rval;
@@ -279,7 +279,7 @@ tee_invoke(struct tcb *const tcp, const kernel_ulong_t arg)
 	uint64_t params;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, invoke, &params)))
 			return rval;
 
@@ -327,7 +327,7 @@ tee_cancel(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct tee_ioctl_cancel_arg cancel;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &cancel))
 		return RVAL_IOCTL_DECODED;
 
@@ -345,7 +345,7 @@ tee_close_session(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct tee_ioctl_close_session_arg close_session;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &close_session))
 		return RVAL_IOCTL_DECODED;
 
@@ -365,7 +365,7 @@ tee_suppl_recv(struct tcb *const tcp, const kernel_ulong_t arg)
 	uint64_t params;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_recv, &params)))
 			return rval;
 
@@ -411,7 +411,7 @@ tee_suppl_send(struct tcb *const tcp, const kernel_ulong_t arg)
 	uint64_t params;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if ((rval = TEE_FETCH_BUF_DATA(buf_data, supp_send, &params)))
 			return rval;
 
@@ -451,7 +451,7 @@ tee_shm_alloc(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct tee_ioctl_shm_alloc_data shm_alloc;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &shm_alloc))
 			return RVAL_IOCTL_DECODED;
 
@@ -490,7 +490,7 @@ tee_shm_register_fd(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct tee_ioctl_shm_register_fd_data shm_register_fd;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &shm_register_fd))
 			return RVAL_IOCTL_DECODED;
 
@@ -526,7 +526,7 @@ tee_shm_register(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct tee_ioctl_shm_register_data shm_register;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &shm_register))
 			return RVAL_IOCTL_DECODED;
 
