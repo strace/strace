@@ -87,7 +87,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sprintrc(sendto((fd_), nlh, msg_len,		\
 					MSG_DONTWAIT, NULL, 0));	\
 									\
-		print_sockfd((fd_), "sendto(", ", {");			\
+		print_sockfd((fd_), "sendto(", ", [");			\
 		(print_msg_)(msg_len);					\
 		print_nlattr(nla_len, (nla_type_str_),			\
 			     (nla_total_len_) > (nla_data_len_));	\
@@ -97,7 +97,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		if ((nla_total_len_) > (nla_data_len_))			\
 			printf("]");					\
 									\
-		printf("}}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
+		printf("}], %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
 		       msg_len, errstr);				\
 	} while (0)
 

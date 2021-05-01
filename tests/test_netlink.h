@@ -36,13 +36,13 @@
 					msg_len, MSG_DONTWAIT,		\
 					NULL, 0));			\
 									\
-		printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=%s"	\
+		printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=%s"	\
 		       ", nlmsg_flags=%s, nlmsg_seq=0, nlmsg_pid=0}, ",	\
 		       (fd_), msg_len, (type_str_), (flags_str_));	\
 									\
 		{ __VA_ARGS__; }					\
 									\
-		printf("}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
+		printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
 		       msg_len, errstr);				\
 	} while (0)
 

@@ -616,15 +616,15 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	const unsigned int nlmsg_len = MIN(nlmsghdr->nlmsg_len, len);
 
 	if (nlmsg_len > NLMSG_HDRLEN)
-		tprint_struct_begin();
+		tprint_array_begin();
 
 	print_nlmsghdr(tcp, fd, family, nlmsghdr);
 
 	if (nlmsg_len > NLMSG_HDRLEN) {
-		tprints(", ");
+		tprint_array_next();
 		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
 						     nlmsg_len - NLMSG_HDRLEN);
-		tprint_struct_end();
+		tprint_array_end();
 	}
 }
 

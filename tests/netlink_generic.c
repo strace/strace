@@ -39,9 +39,9 @@ test_nlmsg_type(const int fd)
 	};
 
 	rc = sendto(fd, &req, sizeof(req), MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, {{nlmsg_len=%u, nlmsg_type=nlctrl"
+	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=nlctrl"
 	       ", nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", \"\\x03\\x00\\x00\\x00\"}, %u"
+	       ", \"\\x03\\x00\\x00\\x00\"], %u"
 	       ", MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, req.nlh.nlmsg_len,
 	       (unsigned int) sizeof(req), sprintrc(rc));
