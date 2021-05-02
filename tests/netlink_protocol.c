@@ -285,6 +285,32 @@ test_nlmsgerr(const int fd)
 	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
 	       nlh->nlmsg_len, sprintrc(rc));
 
+	/* err->msg.nlmsg_len < sizeof(err->msg) */
+	err->msg.nlmsg_len = sizeof(err->msg.nlmsg_len);
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {error=-EACCES, msg={nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"
+	       ", nlmsg_flags=NLM_F_REQUEST|0x%x, nlmsg_seq=%u, nlmsg_pid=%d}}]"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, err->msg.nlmsg_len, NLM_F_DUMP,
+	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	/* nlh->nlmsg_len < NLMSG_HDRLEN + err->msg.nlmsg_len */
+	err->msg.nlmsg_len = NLMSG_HDRLEN + 4;
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {error=-EACCES, msg={nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"
+	       ", nlmsg_flags=NLM_F_REQUEST|0x%x, nlmsg_seq=%u, nlmsg_pid=%d}}]"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, err->msg.nlmsg_len, NLM_F_DUMP,
+	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
+	       nlh->nlmsg_len, sprintrc(rc));
+
 	/* error message with room for the error code, a header, and some data */
 	nlh = nlh0 - sizeof(*err) - 4;
 	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(*err) + 4;

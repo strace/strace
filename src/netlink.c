@@ -533,10 +533,20 @@ decode_nlmsgerr(struct tcb *const tcp,
 		tprint_struct_next();
 		tprints_field_name("msg");
 		if (fetch_nlmsghdr(tcp, &err.msg, addr, len, false)) {
-			unsigned int payload =
-				capped ? sizeof(err.msg) : err.msg.nlmsg_len;
-			if (payload > len)
-				payload = len;
+			/*
+			 * If err.msg.nlmsg_len < sizeof(err.msg), then it is
+			 * invalid and sizeof(err.msg) would be used instead.
+			 */
+			const unsigned int nlmsg_len =
+				MAX(sizeof(err.msg), err.msg.nlmsg_len);
+			/*
+			 * Despite of fetch_nlmsghdr guarantee that
+			 * len >= sizeof(err.msg)
+			 * a valid nlmsg_len can exceed sizeof(err.msg)
+			 * and an invalid nlmsg_len can exceed len.
+			 */
+			const unsigned int payload =
+				MIN(len, capped ? sizeof(err.msg) : nlmsg_len);
 
 			decode_nlmsghdr_with_payload(tcp, fd, family,
 						     &err.msg, addr, payload);
