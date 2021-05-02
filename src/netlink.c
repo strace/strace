@@ -515,51 +515,48 @@ decode_nlmsgerr(struct tcb *const tcp,
 {
 	struct nlmsgerr err;
 
-	if (len < sizeof(err.error)) {
+	if (len < sizeof(err)) {
 		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return;
 	}
 
-	if (umove_or_printaddr(tcp, addr, &err.error))
+	if (umove_or_printaddr(tcp, addr, &err))
 		return;
-
-	tprint_struct_begin();
-	PRINT_FIELD_ERR_D(err, error);
 
 	addr += offsetof(struct nlmsgerr, msg);
 	len -= offsetof(struct nlmsgerr, msg);
 
-	if (len) {
-		tprint_struct_next();
-		tprints_field_name("msg");
-		if (fetch_nlmsghdr(tcp, &err.msg, addr, len, false)) {
-			/*
-			 * If err.msg.nlmsg_len < sizeof(err.msg), then it is
-			 * invalid and sizeof(err.msg) would be used instead.
-			 */
-			const unsigned int nlmsg_len =
-				MAX(sizeof(err.msg), err.msg.nlmsg_len);
-			/*
-			 * Despite of fetch_nlmsghdr guarantee that
-			 * len >= sizeof(err.msg)
-			 * a valid nlmsg_len can exceed sizeof(err.msg)
-			 * and an invalid nlmsg_len can exceed len.
-			 */
-			const unsigned int payload =
-				MIN(len, capped ? sizeof(err.msg) : nlmsg_len);
+	/*
+	 * If err.msg.nlmsg_len < sizeof(err.msg), then it is
+	 * invalid and sizeof(err.msg) would be used instead.
+	 */
+	const unsigned int nlmsg_len =
+		MAX(sizeof(err.msg), err.msg.nlmsg_len);
 
-			decode_nlmsghdr_with_payload(tcp, fd, family,
-						     &err.msg, addr, payload);
-			if (len > payload) {
-				tprints(", ");
-				decode_nlattr(tcp, addr + payload,
-					      len - payload, nlmsgerr_attrs,
-					      "NLMSGERR_ATTR_???",
-					      nlmsgerr_nla_decoders,
-					      ARRAY_SIZE(nlmsgerr_nla_decoders),
-					      NULL);
-			}
-		}
+	/*
+	 * A valid nlmsg_len can exceed sizeof(err.msg),
+	 * an invalid nlmsg_len can exceed len.
+	 */
+	const unsigned int payload =
+		MIN(len, capped ? sizeof(err.msg) : nlmsg_len);
+
+	tprint_struct_begin();
+
+	PRINT_FIELD_ERR_D(err, error);
+	tprint_struct_next();
+
+	tprints_field_name("msg");
+	decode_nlmsghdr_with_payload(tcp, fd, family,
+				     &err.msg, addr, payload);
+
+	if (len > payload) {
+		tprints(", ");
+		decode_nlattr(tcp, addr + payload,
+			      len - payload, nlmsgerr_attrs,
+			      "NLMSGERR_ATTR_???",
+			      nlmsgerr_nla_decoders,
+			      ARRAY_SIZE(nlmsgerr_nla_decoders),
+			      NULL);
 	}
 
 	tprint_struct_end();

@@ -199,8 +199,9 @@ test_nlmsgerr(const int fd)
 	struct nlmsghdr *nlh;
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(*err) + 4);
 	long rc;
+	const char *rcstr;
 
-	/* error message without enough room for the error code */
+	/* error message with nlmsg_len exceeding the allocated room */
 	nlh = nlh0;
 	nlh->nlmsg_len = NLMSG_HDRLEN + 4;
 	nlh->nlmsg_type = NLMSG_ERROR;
@@ -215,6 +216,7 @@ test_nlmsgerr(const int fd)
 	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
 	       nlh->nlmsg_len, sprintrc(rc));
 
+	/* error message without enough room for the error code */
 	nlh->nlmsg_len = NLMSG_HDRLEN + 2;
 	nlh = nlh0 - 2;
 	memmove(nlh, nlh0, sizeof(*nlh));
@@ -234,31 +236,42 @@ test_nlmsgerr(const int fd)
 	nlh->nlmsg_seq = 0;
 	nlh->nlmsg_pid = 0;
 	err = NLMSG_DATA(nlh);
-	err->error = 42;
+	fill_memory(&err->error, sizeof(err->error));
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rcstr = sprintrc(rc);
+	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}, ",
+	       fd, nlh->nlmsg_len);
+	print_quoted_hex(&err->error, sizeof(err->error));
+	printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n", nlh->nlmsg_len, rcstr);
+
+	/* error message without enough room for the whole struct nlmsgerr */
+	nlh = nlh0 - (sizeof(*err) - 4);
+	nlh->nlmsg_len = NLMSG_HDRLEN + (sizeof(*err) - 4);
+	nlh->nlmsg_type = NLMSG_ERROR;
+	nlh->nlmsg_flags = NLM_F_REQUEST;
+	nlh->nlmsg_seq = 0;
+	nlh->nlmsg_pid = 0;
+	err = NLMSG_DATA(nlh);
+	fill_memory(err, sizeof(*err) - 4);
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	rcstr = sprintrc(rc);
+	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}, ",
+	       fd, nlh->nlmsg_len);
+	print_quoted_hex(err, sizeof(*err) - 4);
+	printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n", nlh->nlmsg_len, rcstr);
+
+	/* error message with nlmsg_len exceeding the allocated room */
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(*err);
 
 	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
 	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", {error=42}], %u, MSG_DONTWAIT, NULL, 0)"
-	       " = %s\n", fd, nlh->nlmsg_len, nlh->nlmsg_len, sprintrc(rc));
-
-	err->error = -1;
-
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
-	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", {error=-EPERM}], %u, MSG_DONTWAIT, NULL, 0)"
-	       " = %s\n", fd, nlh->nlmsg_len, nlh->nlmsg_len, sprintrc(rc));
-
-	err->error = -32767;
-	nlh->nlmsg_len += sizeof(err->msg.nlmsg_len);
-
-	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
-	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
-	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", {error=-32767, msg=%p}], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
-	       fd, nlh->nlmsg_len, nlh0 + NLMSG_HDRLEN,
-	       nlh->nlmsg_len, sprintrc(rc));
+	       ", %p], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, err, nlh->nlmsg_len, sprintrc(rc));
 
 	/* error message with room for the error code and a header */
 	nlh = nlh0 - sizeof(*err);
@@ -335,6 +348,25 @@ test_nlmsgerr(const int fd)
 	       ", \"\\x61\\x62\\x63\\x64\"]}], %u, MSG_DONTWAIT, NULL, 0)"
 	       " = %s\n",
 	       fd, nlh->nlmsg_len, err->msg.nlmsg_len, NLM_F_DUMP,
+	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
+	       nlh->nlmsg_len, sprintrc(rc));
+
+	nlh->nlmsg_len = NLMSG_HDRLEN + sizeof(*err) + 1;
+	err->msg.nlmsg_len = NLMSG_HDRLEN + 1;
+	err->msg.nlmsg_type = SOCK_DIAG_BY_FAMILY;
+	err->msg.nlmsg_flags = NLM_F_REQUEST;
+	err->msg.nlmsg_seq = 4213;
+	err->msg.nlmsg_pid = 123456;
+	memcpy(NLMSG_DATA(&err->msg), "", 1);
+
+	rc = sendto(fd, nlh, nlh->nlmsg_len, MSG_DONTWAIT, NULL, 0);
+	printf("sendto(%d, [{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}"
+	       ", {error=-EACCES, msg=[{nlmsg_len=%u"
+	       ", nlmsg_type=SOCK_DIAG_BY_FAMILY, nlmsg_flags=NLM_F_REQUEST"
+	       ", nlmsg_seq=%u, nlmsg_pid=%d}, {family=AF_UNSPEC}]}]"
+	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       fd, nlh->nlmsg_len, err->msg.nlmsg_len,
 	       err->msg.nlmsg_seq, err->msg.nlmsg_pid,
 	       nlh->nlmsg_len, sprintrc(rc));
 }
