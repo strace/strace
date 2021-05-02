@@ -365,7 +365,6 @@ test_nlmsg_done(const int fd)
 	       fd, nlh->nlmsg_len, num, nlh->nlmsg_len, sprintrc(rc));
 }
 
-# if defined NLM_F_CAPPED || defined NLM_F_ACK_TLVS
 static void
 test_ack_flags(const int fd)
 {
@@ -375,34 +374,27 @@ test_ack_flags(const int fd)
 		.nlmsg_type = NLMSG_ERROR,
 	};
 
-#  ifdef NLM_F_CAPPED
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_CAPPED,
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
 	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_CAPPED, nlmsg_seq=0"
 	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-#  endif
 
-#  ifdef NLM_F_ACK_TLVS
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK_TLVS;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
 	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK_TLVS, nlmsg_seq=0"
 	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-#  endif
 
-#  if defined NLM_F_CAPPED && defined NLM_F_ACK_TLVS
 	nlh.nlmsg_flags = NLM_F_REQUEST | NLM_F_CAPPED | NLM_F_ACK_TLVS;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
 	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_CAPPED|NLM_F_ACK_TLVS"
 	       ", nlmsg_seq=0, nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
-#  endif
 }
-# endif
 
 int main(void)
 {
@@ -417,9 +409,7 @@ int main(void)
 	send_query(fd);
 	test_nlmsgerr(fd);
 	test_nlmsg_done(fd);
-# if defined NLM_F_CAPPED || defined NLM_F_ACK_TLVS
 	test_ack_flags(fd);
-# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;
