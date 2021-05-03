@@ -182,7 +182,7 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 		printxval(nf_nlmsg_types[subsys_id].xlat,
 			  msg_type, nf_nlmsg_types[subsys_id].dflt);
 	else
-		tprintf("%#x", msg_type);
+		PRINT_VAL_X(msg_type);
 }
 
 typedef void (*nlmsg_types_decoder_t)(struct tcb *, const struct xlat *,
@@ -471,7 +471,7 @@ static bool
 print_cookie(struct tcb *const tcp, void *const elem_buf,
 	     const size_t elem_size, void *const opaque_data)
 {
-	tprintf("%" PRIu8, *(uint8_t *) elem_buf);
+	PRINT_VAL_U(*(uint8_t *) elem_buf);
 
 	return true;
 }
@@ -609,7 +609,7 @@ decode_payload(struct tcb *const tcp,
 		int num;
 
 		if (!umove_or_printaddr(tcp, addr, &num))
-			tprintf("%d", num);
+			PRINT_VAL_D(num);
 		return;
 	}
 
@@ -654,10 +654,10 @@ decode_netlink(struct tcb *const tcp,
 
 	struct nlmsghdr nlmsghdr;
 	bool is_array = false;
-	unsigned int elt;
 
-	for (elt = 0; fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
-	     elt++) {
+	for (unsigned int elt = 0;
+	     fetch_nlmsghdr(tcp, &nlmsghdr, addr, len, is_array);
+	     ++elt) {
 		if (abbrev(tcp) && elt == max_strlen) {
 			tprint_more_data_follows();
 			break;
@@ -675,7 +675,7 @@ decode_netlink(struct tcb *const tcp,
 		}
 
 		if (!is_array && next_addr) {
-			tprints("[");
+			tprint_array_begin();
 			is_array = true;
 		}
 
@@ -685,12 +685,12 @@ decode_netlink(struct tcb *const tcp,
 		if (!next_addr)
 			break;
 
-		tprints(", ");
+		tprint_array_next();
 		addr = next_addr;
 		len = next_len;
 	}
 
 	if (is_array) {
-		tprints("]");
+		tprint_array_end();
 	}
 }
