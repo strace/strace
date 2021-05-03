@@ -51,7 +51,7 @@ print_ifinfomsg(const unsigned int msg_len)
 	       ", ifi_type=ARPHRD_LOOPBACK"
 	       ", ifi_index=" IFINDEX_LO_STR
 	       ", ifi_flags=IFF_UP, ifi_change=0}"
-	       ", {{nla_len=%u, nla_type=" STRINGIFY_VAL(IFLA_ATTR) "}",
+	       ", [{nla_len=%u, nla_type=" STRINGIFY_VAL(IFLA_ATTR) "}",
 	       msg_len, msg_len - NLMSG_SPACE(hdrlen));
 }
 

@@ -54,8 +54,8 @@ print_br_port_msg(const unsigned int msg_len)
 	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETMDB, nlmsg_flags=NLM_F_DUMP"
 	       ", nlmsg_seq=0, nlmsg_pid=0}, {family=AF_UNIX"
 	       ", ifindex=" IFINDEX_LO_STR "}"
-	       ", {{nla_len=%u, nla_type=MDBA_MDB}"
-	       ", {{nla_len=%u, nla_type=MDBA_MDB_ENTRY}",
+	       ", [{nla_len=%u, nla_type=MDBA_MDB}"
+	       ", [{nla_len=%u, nla_type=MDBA_MDB_ENTRY}",
 	       msg_len, msg_len - NLMSG_SPACE(hdrlen),
 	       msg_len - NLMSG_SPACE(hdrlen) - NLA_HDRLEN);
 }
@@ -83,7 +83,7 @@ main(void)
 		     nla_type, nla_type_str,
 		     4, pattern, 4,
 		     print_quoted_hex(pattern, 4);
-		     printf("}}"));
+		     printf("]]"));
 
 	struct br_mdb_entry entry = {
 		.ifindex = ifindex_lo(),
@@ -127,7 +127,7 @@ main(void)
 		    printf(", addr={u=");
 		    print_quoted_hex(&entry.addr.u, sizeof(entry.addr.u));
 		    printf(", proto=htons(AF_UNSPEC)}}"
-			   ", {nla_len=%u, nla_type=MDBA_MDB_EATTR_TIMER}}}",
+			   ", {nla_len=%u, nla_type=MDBA_MDB_EATTR_TIMER}]]",
 			   nla.nla_len));
 
 	puts("+++ exited with 0 +++");

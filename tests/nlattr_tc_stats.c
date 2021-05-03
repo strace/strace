@@ -44,7 +44,7 @@ print_tcmsg(const unsigned int msg_len)
 	       ", nlmsg_seq=0, nlmsg_pid=0}, {tcm_family=AF_UNIX"
 	       ", tcm_ifindex=" IFINDEX_LO_STR
 	       ", tcm_handle=0, tcm_parent=0, tcm_info=0}"
-	       ", {{nla_len=%u, nla_type=TCA_STATS2}",
+	       ", [{nla_len=%u, nla_type=TCA_STATS2}",
 	       msg_len, msg_len - NLMSG_SPACE(hdrlen));
 }
 

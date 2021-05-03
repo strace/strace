@@ -540,6 +540,9 @@ decode_nlmsgerr(struct tcb *const tcp,
 	const unsigned int payload =
 		MIN(len, capped ? sizeof(err.msg) : nlmsg_len);
 
+	if (len > payload)
+		tprint_array_begin();
+
 	tprint_struct_begin();
 
 	PRINT_FIELD_ERR_D(err, error);
@@ -549,17 +552,18 @@ decode_nlmsgerr(struct tcb *const tcp,
 	decode_nlmsghdr_with_payload(tcp, fd, family,
 				     &err.msg, addr, payload);
 
+	tprint_struct_end();
+
 	if (len > payload) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + payload,
 			      len - payload, nlmsgerr_attrs,
 			      "NLMSGERR_ATTR_???",
 			      nlmsgerr_nla_decoders,
 			      ARRAY_SIZE(nlmsgerr_nla_decoders),
 			      NULL);
+		tprint_array_end();
 	}
-
-	tprint_struct_end();
 }
 
 static const netlink_decoder_t netlink_decoders[] = {

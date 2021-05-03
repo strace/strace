@@ -37,7 +37,7 @@ init_nlattr(struct nlattr *const nla,
 static void
 print_nlattr(const unsigned int nla_len, const char *const nla_type, bool add_data)
 {
-	printf(", %s{{nla_len=%u, nla_type=%s}, ",
+	printf(", %s[{nla_len=%u, nla_type=%s}, ",
 	       add_data ? "[" : "", nla_len, nla_type);
 }
 
@@ -97,7 +97,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		if ((nla_total_len_) > (nla_data_len_))			\
 			printf("]");					\
 									\
-		printf("}], %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
+		printf("]], %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
 		       msg_len, errstr);				\
 	} while (0)
 
@@ -253,7 +253,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 				(fallback_func)((pattern_), plen);	\
 				size_t i;				\
 				for (i = 0; i < depth_; ++i)		\
-					printf("}"));			\
+					printf("]"));			\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
 			(hdrlen_) + NLA_HDRLEN * depth_,		\
@@ -264,7 +264,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			printf("%p", RTA_DATA(TEST_NLATTR_nla));	\
 			size_t i;					\
 			for (i = 0; i < depth_; ++i)			\
-				printf("}"));				\
+				printf("]"));				\
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
 			(hdrlen_) + NLA_HDRLEN * depth_,		\
@@ -275,7 +275,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			__VA_ARGS__;					\
 			size_t i;					\
 			for (i = 0; i < depth_; ++i)			\
-				printf("}"));				\
+				printf("]"));				\
 	} while (0)
 
 #define TEST_NESTED_NLATTR_OBJECT_EX(fd_, nlh0_, hdrlen_,		\
@@ -315,7 +315,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			plen, (pattern_), plen,				\
 			print_quoted_hex((pattern_), plen);		\
 			for (size_t i = 0; i < depth_; ++i)		\
-				printf("}"));				\
+				printf("]"));				\
 		/* sizeof((obj_)[0]) < len < sizeof(obj_) */		\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
 			(hdrlen_) + NLA_HDRLEN * depth_,		\
@@ -331,7 +331,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			}						\
 			printf("]");					\
 			for (i = 0; i < depth_; ++i)			\
-				printf("}"));				\
+				printf("]"));				\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
 			(hdrlen_) + NLA_HDRLEN * depth_,		\
@@ -349,7 +349,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			       RTA_DATA(TEST_NLATTR_nla)		\
 			        + sizeof(obj_) - sizeof((obj_)[0]));	\
 			for (i = 0; i < depth_; ++i)			\
-				printf("}"));				\
+				printf("]"));				\
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
 			(hdrlen_) + NLA_HDRLEN * depth_,		\
@@ -365,7 +365,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			}						\
 			printf("]");					\
 			for (i = 0; i < depth_; ++i)			\
-				printf("}"));				\
+				printf("]"));				\
 	} while (0)
 
 #define TEST_NESTED_NLATTR_ARRAY(fd_, nlh0_, hdrlen_,			\

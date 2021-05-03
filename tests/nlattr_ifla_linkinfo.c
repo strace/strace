@@ -73,15 +73,15 @@
 					IFLA_INFO_KIND, "IFLA_INFO_KIND", \
 					type_len, objsz_ + (pos - buf),	\
 					buf, objsz_ + (pos - buf),	\
-					printf("\"%s\"}", type);	\
-					printf(", {{nla_len=%zu"	\
+					printf("\"%s\"]", type);	\
+					printf(", [{nla_len=%zu"	\
 				               ", nla_type=%s}, ",	\
 					       (objsz_) + NLA_HDRLEN,	\
 					       (objtype_str_));		\
 									\
 					{ __VA_ARGS__; }		\
 									\
-					printf("}"));			\
+					printf("]"));			\
 		}							\
 	} while (0)
 
@@ -113,14 +113,14 @@
 					tuntype_len,			\
 					objsz_ + (pos - buf) - 1,	\
 					buf, objsz_ + (pos - buf) - 1,	\
-					printf("\"%s\"}", (tuntype_));	\
-					printf(", {{nla_len=%zu"	\
+					printf("\"%s\"]", (tuntype_));	\
+					printf(", [{nla_len=%zu"	\
 					       ", nla_type=%s}, ",	\
 					       (objsz_) + NLA_HDRLEN,	\
 					       (nla_type_str_));	\
 					(fallback_func_)((obj_),	\
 							 (objsz_) - 1);	\
-					printf("}"));			\
+					printf("]"));			\
 		}							\
 									\
 		TEST_NLATTR_EX_((fd_), (nlh0_) - NLA_HDRLEN,		\
@@ -129,11 +129,11 @@
 				IFLA_INFO_KIND, "IFLA_INFO_KIND",	\
 				tuntype_len, objsz_ + (pos - buf),	\
 				buf, objsz_ + (pos - buf) - 1,		\
-				printf("\"%s\"}", (tuntype_));		\
-				printf(", {{nla_len=%zu, nla_type=%s}, ", \
+				printf("\"%s\"]", (tuntype_));		\
+				printf(", [{nla_len=%zu, nla_type=%s}, ", \
 				       (objsz_) + NLA_HDRLEN,		\
 				       (nla_type_str_));		\
-				printf("%p}",				\
+				printf("%p]",				\
 				       RTA_DATA(NLMSG_ATTR(nlh,		\
 				       (hdrlen + NLA_HDRLEN + (pos - buf)))) \
 				       )				\
@@ -145,14 +145,14 @@
 				IFLA_INFO_KIND, "IFLA_INFO_KIND",	\
 				tuntype_len, objsz_ + (pos - buf),	\
 				buf, objsz_ + (pos - buf),		\
-				printf("\"%s\"}", (tuntype_));		\
-				printf(", {{nla_len=%zu, nla_type=%s}, ", \
+				printf("\"%s\"]", (tuntype_));		\
+				printf(", [{nla_len=%zu, nla_type=%s}, ", \
 				       (objsz_) + NLA_HDRLEN,		\
 				       (nla_type_str_));		\
 									\
 				{ __VA_ARGS__; }			\
 									\
-				printf("}"));				\
+				printf("]"));				\
 	} while (0)
 
 #define TEST_LINKINFO(fd_, nlh0_, nla_type_, tuntype_,	\
@@ -218,8 +218,8 @@
 				IFLA_INFO_KIND, "IFLA_INFO_KIND",	\
 				tuntype_len, buflen,			\
 				buf, buflen,				\
-				printf("\"%s\"}", (tuntype_));		\
-				printf(", {{nla_len=%zu, nla_type=%s}, [", \
+				printf("\"%s\"]", (tuntype_));		\
+				printf(", [{nla_len=%zu, nla_type=%s}, [", \
 				       attrsz + NLA_HDRLEN,		\
 				       (nla_type_str_));		\
 									\
@@ -227,14 +227,14 @@
 					printf("%s%s{nla_len=%zu"	\
 					       ", nla_type=%s}%s%s%s",	\
 					       i ? ", " : "",		\
-					       attrs[i].str ? "{": "",	\
+					       attrs[i].str ? "[": "",	\
 					       attrs[i].sz + NLA_HDRLEN, \
 					       subnla_type_str_,	\
 					       attrs[i].str ? ", ": "", \
 					       attrs[i].str ?: "",	\
-					       attrs[i].str ? "}" : ""); \
+					       attrs[i].str ? "]" : ""); \
 									\
-				printf("]}"));				\
+				printf("]]"));				\
 	} while (0)
 
 int

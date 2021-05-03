@@ -65,7 +65,7 @@ static void
 print_prop_list_msg(const unsigned int msg_len)
 {
 	print_ifinfomsg(msg_len);
-	printf(", {{nla_len=%u, nla_type=IFLA_PROP_LIST}",
+	printf(", [{nla_len=%u, nla_type=IFLA_PROP_LIST}",
 	       msg_len - NLMSG_SPACE(hdrlen));
 }
 

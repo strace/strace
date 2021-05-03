@@ -38,9 +38,9 @@ print_nlmsgerr(const unsigned int msg_len)
 {
 	printf("{nlmsg_len=%u, nlmsg_type=NLMSG_ERROR"
 	       ", nlmsg_flags=NLM_F_REQUEST|NLM_F_CAPPED"
-	       ", nlmsg_seq=0, nlmsg_pid=0}, {error=-EACCES"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, [{error=-EACCES"
 	       ", msg={nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"
-	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}",
+	       ", nlmsg_flags=NLM_F_REQUEST, nlmsg_seq=0, nlmsg_pid=0}}",
 	       msg_len, NLMSG_HDRLEN + 4);
 }
 
@@ -61,7 +61,7 @@ main(void)
 		    NLMSGERR_ATTR_COOKIE,
 		    sizeof(cookie), cookie, sizeof(cookie),
 		    printf("[%u, %u]", cookie[0], cookie[1]);
-		    printf("}"));
+		    printf("]"));
 
 	printf("+++ exited with 0 +++\n");
 	return 0;

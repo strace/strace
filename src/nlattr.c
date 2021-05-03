@@ -79,7 +79,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 	const unsigned int nla_len = MIN(nla->nla_len, len);
 
 	if (nla_len > NLA_HDRLEN)
-		tprint_struct_begin();
+		tprint_array_begin();
 
 	print_nlattr(nla, table, dflt);
 
@@ -87,7 +87,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 		const unsigned int idx =
 			size ? nla->nla_type & NLA_TYPE_MASK : 0;
 
-		tprints(", ");
+		tprint_array_next();
 		if (!decoders
 		    || (size && idx >= size)
 		    || !decoders[idx]
@@ -99,7 +99,7 @@ decode_nlattr_with_data(struct tcb *const tcp,
 		    )
 			printstr_ex(tcp, addr + NLA_HDRLEN,
 				    nla_len - NLA_HDRLEN, QUOTE_FORCE_HEX);
-		tprint_struct_end();
+		tprint_array_end();
 	}
 }
 

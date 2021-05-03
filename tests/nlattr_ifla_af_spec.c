@@ -47,7 +47,7 @@
 	print_##family_##_msg(const unsigned int msg_len)		\
 	{								\
 		print_ifinfomsg(msg_len);				\
-		printf(", {{nla_len=%u, nla_type=" #family_ "}",	\
+		printf(", [{nla_len=%u, nla_type=" #family_ "}",	\
 		       msg_len - NLMSG_SPACE(hdrlen) - NLA_HDRLEN);	\
 	}								\
 	/* end of AF_SPEC_FUNCS definition */

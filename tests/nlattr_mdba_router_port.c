@@ -43,7 +43,7 @@ print_br_port_msg(const unsigned int msg_len)
 	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETMDB, nlmsg_flags=NLM_F_DUMP"
 	       ", nlmsg_seq=0, nlmsg_pid=0}, {family=AF_UNIX"
 	       ", ifindex=" IFINDEX_LO_STR "}"
-	       ", {{nla_len=%u, nla_type=MDBA_ROUTER}",
+	       ", [{nla_len=%u, nla_type=MDBA_ROUTER}",
 	       msg_len, msg_len - NLMSG_SPACE(hdrlen));
 }
 
@@ -80,8 +80,8 @@ main(void)
 		    init_br_port_msg, print_br_port_msg,
 		    MDBA_ROUTER_PORT, sizeof(buf), buf, sizeof(buf),
 		    printf(IFINDEX_LO_STR
-			   ", {{nla_len=%u, nla_type=MDBA_ROUTER_PATTR_TYPE}"
-			   ", MDB_RTR_TYPE_DISABLED}}",
+			   ", [{nla_len=%u, nla_type=MDBA_ROUTER_PATTR_TYPE}"
+			   ", MDB_RTR_TYPE_DISABLED]]",
 			   nla.nla_len));
 
 	puts("+++ exited with 0 +++");

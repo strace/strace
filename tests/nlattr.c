@@ -117,8 +117,8 @@ test_nlattr(const int fd)
 	       ", nlmsg_flags=NLM_F_DUMP, nlmsg_seq=0, nlmsg_pid=0}"
 	       ", {udiag_family=AF_UNIX, udiag_type=SOCK_STREAM"
 	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0, udiag_cookie=[0, 0]}"
-	       ", {{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}"
-	       ", \"\\x31\\x32\\x33\\x34\"}]"
+	       ", [{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}"
+	       ", \"\\x31\\x32\\x33\\x34\"]]"
 	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, msg_len, nla->nla_len, UNIX_DIAG_FIRST_UNUSED,
 	       msg_len, sprintrc(rc));
@@ -222,10 +222,10 @@ test_nlattr(const int fd)
 	for (i = 0; i < DEFAULT_STRLEN; ++i) {
 		if (i)
 			printf(", ");
-		printf("{{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}, ",
+		printf("[{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}, ",
 		       nla->nla_len, UNIX_DIAG_FIRST_UNUSED + i);
 		print_quoted_hex(&nla[i * 2 + 1], NLA_HDRLEN - 1);
-		printf("}");
+		printf("]");
 	}
 	printf(", ...]], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       msg_len, sprintrc(rc));
