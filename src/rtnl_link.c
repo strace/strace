@@ -883,7 +883,7 @@ decode_ifla_af_spec(struct tcb *const tcp,
 	nla_decoder_t af_spec_decoder = &decode_ifla_af;
 
 	decode_nlattr(tcp, addr, len, addrfams, "AF_???",
-		      &af_spec_decoder, 0, opaque_data);
+		      &af_spec_decoder, 0, 0);
 
 	return true;
 }
