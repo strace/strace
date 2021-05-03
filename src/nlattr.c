@@ -142,7 +142,7 @@ decode_nlattr(struct tcb *const tcp,
 		}
 
 		if (!is_array && next_addr) {
-			tprints("[");
+			tprint_array_begin();
 			is_array = true;
 		}
 
@@ -152,13 +152,13 @@ decode_nlattr(struct tcb *const tcp,
 		if (!next_addr)
 			break;
 
-		tprints(", ");
+		tprint_array_next();
 		addr = next_addr;
 		len = next_len;
 	}
 
 	if (is_array) {
-		tprints("]");
+		tprint_array_end();
 	}
 }
 
@@ -431,8 +431,11 @@ decode_nla_be16(struct tcb *const tcp,
 
 	if (len < sizeof(num))
 		return false;
-	else if (!umove_or_printaddr(tcp, addr, &num))
-		tprintf("htons(%u)", ntohs(num));
+	else if (!umove_or_printaddr(tcp, addr, &num)) {
+		tprints_arg_begin("htons");
+		PRINT_VAL_U(ntohs(num));
+		tprint_arg_end();
+	}
 
 	return true;
 }
@@ -448,8 +451,11 @@ decode_nla_be64(struct tcb *const tcp,
 
 	if (len < sizeof(num))
 		return false;
-	else if (!umove_or_printaddr(tcp, addr, &num))
-		tprintf("htobe64(%" PRIu64 ")", be64toh(num));
+	else if (!umove_or_printaddr(tcp, addr, &num)) {
+		tprints_arg_begin("htobe64");
+		PRINT_VAL_U(be64toh(num));
+		tprint_arg_end();
+	}
 
 	return true;
 #else
