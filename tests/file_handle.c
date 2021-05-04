@@ -206,8 +206,13 @@ main(void)
 	       path, path_secontext,
 	       handle->handle_bytes, &mount_id);
 
-	assert(syscall(__NR_name_to_handle_at, fdcwd, path, handle, &mount_id,
-		flags) == 0);
+	if (syscall(__NR_name_to_handle_at, fdcwd, path, handle, &mount_id,
+		    flags)) {
+		if (EOVERFLOW == errno)
+			perror_msg_and_skip("name_to_handle_at");
+		else
+			perror_msg_and_fail("name_to_handle_at");
+	}
 	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=%u"
 	       ", handle_type=%d, f_handle=",
 	       my_secontext, "name_to_handle_at",
