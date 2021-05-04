@@ -91,6 +91,7 @@ test_nfgenmsg(const int fd)
 					printf("htons(NFNL_SUBSYS_NFTABLES)");
 				else
 					printf("NFNL_SUBSYS_NFTABLES");
+				printf("}");
 				);
 
 	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
@@ -101,7 +102,7 @@ test_nfgenmsg(const int fd)
 		      sizeof(msg), &msg, sizeof(msg),
 		      printf("{nfgen_family=AF_UNIX");
 		      printf(", version=NFNETLINK_V0");
-		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)"));
+		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)}"));
 
 	msg.res_id = htons(0xabcd);
 	TEST_NETLINK_(fd, nlh0,
@@ -111,7 +112,7 @@ test_nfgenmsg(const int fd)
 		      sizeof(msg), &msg, sizeof(msg),
 		      printf("{nfgen_family=AF_UNIX");
 		      printf(", version=NFNETLINK_V0");
-		      printf(", res_id=htons(%d)", 0xabcd));
+		      printf(", res_id=htons(%d)}", 0xabcd));
 
 	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
 	TEST_NETLINK(fd, nlh0,
@@ -119,7 +120,7 @@ test_nfgenmsg(const int fd)
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{nfgen_family=AF_UNIX");
 		     printf(", version=NFNETLINK_V0");
-		     printf(", res_id=htons(%d)", NFNL_SUBSYS_NFTABLES));
+		     printf(", res_id=htons(%d)}", NFNL_SUBSYS_NFTABLES));
 
 	msg.res_id = htons(0xabcd);
 	memcpy(str_buf, &msg, sizeof(msg));
@@ -130,7 +131,7 @@ test_nfgenmsg(const int fd)
 		     sizeof(str_buf), str_buf, sizeof(str_buf),
 		     printf("{nfgen_family=AF_UNIX");
 		     printf(", version=NFNETLINK_V0");
-		     printf(", res_id=htons(%d)"
+		     printf(", res_id=htons(%d)}"
 			    ", \"\\x31\\x32\\x33\\x34\"", 0xabcd));
 
 	msg.res_id = htons(NFNL_SUBSYS_NFTABLES);
@@ -144,7 +145,7 @@ test_nfgenmsg(const int fd)
 		      sizeof(nla_buf), nla_buf, sizeof(nla_buf),
 		      printf("{nfgen_family=AF_UNIX");
 		      printf(", version=NFNETLINK_V0");
-		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)"
+		      printf(", res_id=htons(NFNL_SUBSYS_NFTABLES)}"
 			     ", {nla_len=%d, nla_type=%#x}",
 			     nla.nla_len, nla.nla_type));
 }

@@ -59,6 +59,7 @@ decode_netlink_netfilter(struct tcb *const tcp,
 		} else {
 			tprintf("htons(%d)", res_id);
 		}
+		tprint_struct_end();
 
 		const size_t offset = NLMSG_ALIGN(sizeof(nfmsg));
 		if (len > offset) {
