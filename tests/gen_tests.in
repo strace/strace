@@ -457,7 +457,7 @@ netlink_crypto	+netlink_sock_diag.test
 netlink_generic	+netlink_sock_diag.test
 netlink_kobject_uevent	+netlink_sock_diag.test
 netlink_netfilter	+netlink_sock_diag.test
-netlink_protocol	-e trace=sendto
+netlink_protocol	+netlink_sock_diag.test
 netlink_route	+netlink_sock_diag.test
 netlink_selinux	+netlink_sock_diag.test
 netlink_xfrm	+netlink_sock_diag.test
