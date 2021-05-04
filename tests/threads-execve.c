@@ -120,7 +120,7 @@ thread(void *arg)
 		perror_msg_and_fail("execve");
 
 	struct timespec ts = { .tv_nsec = 100000000 };
-	(void) clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL);
+	(void) syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &ts, NULL);
 
 	kernel_old_timespec_t ots = { .tv_nsec = 12345 };
 	printf("%-5d nanosleep({tv_sec=0, tv_nsec=%u}, NULL) = 0\n",
@@ -170,7 +170,7 @@ main(int ac, char **av)
 
 	if (ac < 3) {
 		struct timespec ts = { .tv_nsec = 1 };
-		if (clock_nanosleep(CLOCK_REALTIME, 0, &ts, NULL))
+		if (syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &ts, NULL))
 			perror_msg_and_skip("clock_nanosleep CLOCK_REALTIME");
 
 		get_sigsetsize();
