@@ -22,6 +22,10 @@
 # include <unistd.h>
 # include <linux/kcmp.h>
 
+# ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+#  define SKIP_IF_PROC_IS_UNAVAILABLE
+# endif
+
 # ifndef VERBOSE_FD
 #  define VERBOSE_FD 0
 # endif
@@ -123,6 +127,7 @@ do_kcmp(kernel_ulong_t pid1, kernel_ulong_t pid2, kernel_ulong_t type,
 int
 main(void)
 {
+	SKIP_IF_PROC_IS_UNAVAILABLE;
 	PIDNS_TEST_INIT;
 
 	static const kernel_ulong_t bogus_pid1 =
