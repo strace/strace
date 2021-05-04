@@ -27,6 +27,9 @@
 #ifndef PRINT_PIDFD
 # define PRINT_PIDFD 0
 #endif
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
 
 static const char *errstr;
 
@@ -48,6 +51,8 @@ k_pidfd_getfd(const unsigned int pidfd, const unsigned int fd,
 int
 main(void)
 {
+	SKIP_IF_PROC_IS_UNAVAILABLE;
+
 	long rc;
 
 	rc = k_pidfd_getfd(-1U, -1U, 0);
