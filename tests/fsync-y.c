@@ -17,6 +17,8 @@
 int
 main(void)
 {
+	skip_if_unavailable("/proc/self/fd/");
+
 	char dir[PATH_MAX + 1];
 
 	const struct {
