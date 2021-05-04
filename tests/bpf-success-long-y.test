@@ -1,4 +1,4 @@
-:#!/bin/sh -efu
+#!/bin/sh -efu
 #
 # Copyright (c) 2018-2020 The strace developers.
 # All rights reserved.
