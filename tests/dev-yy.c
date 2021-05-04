@@ -33,6 +33,8 @@
 int
 main(void)
 {
+	skip_if_unavailable("/proc/self/fd/");
+
 	static const struct {
 		const char *path;
 		unsigned int major;
