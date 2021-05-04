@@ -24,12 +24,17 @@
 #ifndef FD0_PATH
 # define FD0_PATH ""
 #endif
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
 
 static const char sample[] = "openat2.sample";
 
 int
 main(void)
 {
+	SKIP_IF_PROC_IS_UNAVAILABLE;
+
 	long rc;
 	const char *rcstr;
 	struct open_how *how = tail_alloc(sizeof(*how));
