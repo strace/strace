@@ -104,17 +104,17 @@ test_msg_name(const int send_fd, const int recv_fd)
 
 	/*
 	 * Sadly, musl recvmsg wrapper blindly dereferences 2nd argument,
-	 * so limit this test to glibc that doesn't.
+	 * so limit these tests to glibc that doesn't.
 	 */
 #ifdef __GLIBC__
 	rc = send_recv(send_fd, -1, msg + 1, 0);
 	printf("recvmsg(-1, %p, 0) = %d %s (%m)\n",
 	       msg + 1, rc, errno2name());
-#endif
 
 	rc = send_recv(send_fd, -1, 0, 0);
 	printf("recvmsg(-1, NULL, 0) = %d %s (%m)\n",
 	       rc, errno2name());
+#endif
 }
 
 int
