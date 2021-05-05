@@ -159,16 +159,12 @@ decode_inet_diag_bc_op(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &op))
 		return true;
 
-	if (len > sizeof(op))
-		tprint_struct_begin();
-
 	print_inet_diag_bc_op(&op);
 
 	if (len > sizeof(op)) {
 		tprints(", ");
 		decode_bytecode_data(tcp, addr + sizeof(op),
 				     len - sizeof(op), op.code);
-		tprint_struct_end();
 	}
 
 	return true;
