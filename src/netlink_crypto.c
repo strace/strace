@@ -197,7 +197,7 @@ decode_crypto_user_alg(struct tcb *const tcp,
 
 		const size_t offset = NLMSG_ALIGN(sizeof(alg));
 		if (len > offset) {
-			tprints(", ");
+			tprint_array_next();
 			decode_nlattr(tcp, addr + offset, len - offset,
 				      crypto_nl_attrs, "CRYPTOCFGA_???",
 				      crypto_user_alg_nla_decoders,
