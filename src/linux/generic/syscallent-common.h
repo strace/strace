@@ -20,7 +20,7 @@
 [BASE_NR + 433] = { 3,	TD|TF,		SEN(fspick),			"fspick"		},
 [BASE_NR + 434] = { 2,	TD,		SEN(pidfd_open),		"pidfd_open"		},
 [BASE_NR + 435] = { 2,	TP,		SEN(clone3),			"clone3"		},
-[BASE_NR + 436] = { 3,	TD,		SEN(close_range),		"close_range"		},
+[BASE_NR + 436] = { 3,	0,		SEN(close_range),		"close_range"		},
 [BASE_NR + 437] = { 4,	TD|TF,		SEN(openat2),			"openat2"		},
 [BASE_NR + 438] = { 3,	TD,		SEN(pidfd_getfd),		"pidfd_getfd"		},
 [BASE_NR + 439] = { 4,	TD|TF,		SEN(faccessat2),		"faccessat2"		},

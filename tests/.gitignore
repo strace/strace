@@ -69,9 +69,6 @@ clone_ptrace--quiet-exit
 clone_ptrace-q
 clone_ptrace-qq
 close_range
-close_range-P
-close_range-y
-close_range-yy
 copy_file_range
 count-f
 creat

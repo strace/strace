@@ -12,11 +12,11 @@
 SYS_FUNC(close_range)
 {
 	/* fd */
-	printfd(tcp, tcp->u_arg[0]);
+	PRINT_VAL_U((unsigned int) tcp->u_arg[0]);
 	tprint_arg_next();
 
 	/* max_fd */
-	printfd(tcp, tcp->u_arg[1]);
+	PRINT_VAL_U((unsigned int) tcp->u_arg[1]);
 	tprint_arg_next();
 
 	/* flags */

@@ -54,9 +54,6 @@ clone_ptrace--quiet-exit +clone_ptrace.test --quiet=exit,personality
 clone_ptrace-q +clone_ptrace.test -q
 clone_ptrace-qq +clone_ptrace.test -qq
 close_range	-a21 7>>/dev/full
-close_range-P	-a21 --trace=close_range -P /dev/full 7>>/dev/full
-close_range-y	-a33 --trace=close_range -y 7>>/dev/full
-close_range-yy	-a33 --trace=close_range -yy 7>>/dev/full
 copy_file_range
 creat	-a20
 delete_module	-a23

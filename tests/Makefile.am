@@ -123,9 +123,6 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	clone_ptrace-q \
 	clone_ptrace-qq \
 	close_range \
-	close_range-P \
-	close_range-y \
-	close_range-yy \
 	count-f \
 	delay \
 	execve-v \
