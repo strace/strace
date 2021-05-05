@@ -65,7 +65,7 @@ decode_inet_diag_hostcond(struct tcb *const tcp,
 	PRINT_FIELD_U(cond, port);
 
 	if (len > sizeof(cond)) {
-		tprints(", ");
+		tprint_struct_next();
 		decode_inet_addr(tcp, addr + sizeof(cond),
 				 len - sizeof(cond), cond.family, "addr");
 	}
@@ -162,7 +162,7 @@ decode_inet_diag_bc_op(struct tcb *const tcp,
 	print_inet_diag_bc_op(&op);
 
 	if (len > sizeof(op)) {
-		tprints(", ");
+		tprint_array_next();
 		decode_bytecode_data(tcp, addr + sizeof(op),
 				     len - sizeof(op), op.code);
 	}
@@ -187,7 +187,8 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(req, idiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
@@ -215,7 +216,7 @@ decode_inet_diag_req_compat(struct tcb *const tcp,
 
 	offset = NLMSG_ALIGN(sizeof(req));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      inet_diag_req_attrs, "INET_DIAG_REQ_???",
 			      inet_diag_req_nla_decoders,
@@ -236,7 +237,8 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(req, sdiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
@@ -261,7 +263,7 @@ decode_inet_diag_req_v2(struct tcb *const tcp,
 
 	offset = NLMSG_ALIGN(sizeof(req));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      inet_diag_req_attrs, "INET_DIAG_REQ_???",
 			      inet_diag_req_nla_decoders,
@@ -414,7 +416,8 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(msg, idiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
@@ -446,7 +449,7 @@ DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      inet_diag_attrs, "INET_DIAG_???",
 			      inet_diag_msg_nla_decoders,
