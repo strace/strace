@@ -57,13 +57,15 @@ decode_netlink_netfilter(struct tcb *const tcp,
 			print_xlat_ex(nfmsg.res_id, "NFNL_SUBSYS_NFTABLES",
 				      XLAT_STYLE_DEFAULT);
 		} else {
-			tprintf("htons(%d)", res_id);
+			tprints_arg_begin("htons");
+			PRINT_VAL_U(res_id);
+			tprint_arg_end();
 		}
 		tprint_struct_end();
 
 		const size_t offset = NLMSG_ALIGN(sizeof(nfmsg));
 		if (len > offset) {
-			tprints(", ");
+			tprint_array_next();
 			if ((nlmsghdr->nlmsg_type >= NFNL_MSG_BATCH_BEGIN
 			     && nlmsghdr->nlmsg_type <= NFNL_MSG_BATCH_END)
 			    || nlmsghdr->nlmsg_type < NLMSG_MIN_TYPE)
