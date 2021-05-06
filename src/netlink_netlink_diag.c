@@ -27,14 +27,15 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_req)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(req, sdiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
 					 (char *) &req + offset)) {
 			if (NDIAG_PROTO_ALL == req.sdiag_protocol) {
 				tprints_field_name("sdiag_protocol");
-				tprints("NDIAG_PROTO_ALL");
+				print_xlat(NDIAG_PROTO_ALL);
 			} else {
 				PRINT_FIELD_XVAL(req, sdiag_protocol,
 						 netlink_protocols,
@@ -147,7 +148,8 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(msg, ndiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
@@ -178,7 +180,7 @@ DECL_NETLINK_DIAG_DECODER(decode_netlink_diag_msg)
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      netlink_diag_attrs, "NETLINK_DIAG_???",
 			      netlink_diag_msg_nla_decoders,
