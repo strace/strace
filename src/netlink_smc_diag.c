@@ -37,7 +37,8 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_req)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(req, diag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
@@ -246,7 +247,8 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(msg, diag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
@@ -276,7 +278,7 @@ DECL_NETLINK_DIAG_DECODER(decode_smc_diag_msg)
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      smc_diag_attrs, "SMC_DIAG_???",
 			      smc_diag_msg_nla_decoders,
