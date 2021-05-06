@@ -25,7 +25,8 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_req)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(req, sdiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(req)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(req) - offset,
@@ -75,7 +76,7 @@ print_inode(struct tcb *const tcp,
 	    const size_t elem_size,
 	    void *const opaque_data)
 {
-	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+	PRINT_VAL_U(*(uint32_t *) elem_buf);
 
 	return true;
 }
@@ -139,7 +140,8 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(msg, udiag_family, addrfams, "AF_???");
-	tprints(", ");
+	tprint_struct_next();
+
 	if (len >= sizeof(msg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(msg) - offset,
@@ -161,7 +163,7 @@ DECL_NETLINK_DIAG_DECODER(decode_unix_diag_msg)
 
 	offset = NLMSG_ALIGN(sizeof(msg));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      unix_diag_attrs, "UNIX_DIAG_???",
 			      unix_diag_msg_nla_decoders,
