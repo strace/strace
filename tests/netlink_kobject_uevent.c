@@ -46,12 +46,12 @@ test_nlmsg_type_udev(const int fd)
 	memcpy(buf + extra_len, &uh, uh_len);
 
 	sys_send(fd, buf + extra_len, uh_len);
-	printf("sendto(%d, {{prefix=\"%s\", magic=htonl(%#x)"
+	printf("sendto(%d, {prefix=\"%s\", magic=htonl(%#x)"
 	       ", header_size=%u, properties_off=%u, properties_len=%u"
 	       ", filter_subsystem_hash=htonl(%#x)"
 	       ", filter_devtype_hash=htonl(%#x)"
 	       ", filter_tag_bloom_hi=htonl(%#x)"
-	       ", filter_tag_bloom_lo=htonl(%#x)}}, %u, MSG_DONTWAIT, NULL, "
+	       ", filter_tag_bloom_lo=htonl(%#x)}, %u, MSG_DONTWAIT, NULL, "
 	       "0) = %s\n"
 	       , fd, uh.prefix,
 	       ntohl(uh.magic), uh.header_size, uh.properties_off,
@@ -62,7 +62,7 @@ test_nlmsg_type_udev(const int fd)
 	memcpy(buf, &uh, uh_len);
 	memcpy(buf + uh_len, extra, extra_len);
 	sys_send(fd, buf, uh_len + extra_len);
-	printf("sendto(%d, {{prefix=\"%s\", magic=htonl(%#x)"
+	printf("sendto(%d, [{prefix=\"%s\", magic=htonl(%#x)"
 	       ", header_size=%u, properties_off=%u, properties_len=%u"
 	       ", filter_subsystem_hash=htonl(%#x)"
 	       ", filter_devtype_hash=htonl(%#x)"
@@ -74,7 +74,7 @@ test_nlmsg_type_udev(const int fd)
 	       ntohl(uh.filter_devtype_hash), ntohl(uh.filter_tag_bloom_hi),
 	       ntohl(uh.filter_tag_bloom_lo));
 	print_quoted_memory(buf + uh_len, extra_len);
-	printf("}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       uh_len + extra_len, errstr);
 
 	memcpy(buf + extra_len + 1, &uh, uh_len - 1);

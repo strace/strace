@@ -26,7 +26,8 @@ decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 		return;
 	}
 
-	tprint_struct_begin();
+	if (len > offset)
+		tprint_array_begin();
 	tprint_struct_begin();
 	PRINT_FIELD_CSTRING(uh, prefix);
 	tprint_struct_next();
@@ -52,8 +53,8 @@ decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 	tprintf("htonl(%#x)", ntohl(uh.filter_tag_bloom_lo));
 	tprint_struct_end();
 	if (len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		printstrn(tcp, addr + offset, len - offset);
+		tprint_array_end();
 	}
-	tprint_struct_end();
 }
