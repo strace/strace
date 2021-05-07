@@ -11,6 +11,14 @@
 
 #include <arpa/inet.h>
 
+#define PRINT_FIELD_HTONL_X(where_, field_)				\
+	do {								\
+		tprints_field_name(#field_);				\
+		tprints_arg_begin("htonl");				\
+		PRINT_VAL_X(ntohl((where_).field_));			\
+		tprint_arg_end();					\
+	} while (0)
+
 void
 decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 			      kernel_ulong_t len)
@@ -31,27 +39,31 @@ decode_netlink_kobject_uevent(struct tcb *tcp, kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_CSTRING(uh, prefix);
 	tprint_struct_next();
-	tprints_field_name("magic");
-	tprintf("htonl(%#x)", ntohl(uh.magic));
+
+	PRINT_FIELD_HTONL_X(uh, magic);
 	tprint_struct_next();
+
 	PRINT_FIELD_U(uh, header_size);
 	tprint_struct_next();
+
 	PRINT_FIELD_U(uh, properties_off);
 	tprint_struct_next();
+
 	PRINT_FIELD_U(uh, properties_len);
 	tprint_struct_next();
-	tprints_field_name("filter_subsystem_hash");
-	tprintf("htonl(%#x)", ntohl(uh.filter_subsystem_hash));
+
+	PRINT_FIELD_HTONL_X(uh, filter_subsystem_hash);
 	tprint_struct_next();
-	tprints_field_name("filter_devtype_hash");
-	tprintf("htonl(%#x)", ntohl(uh.filter_devtype_hash));
+
+	PRINT_FIELD_HTONL_X(uh, filter_devtype_hash);
 	tprint_struct_next();
-	tprints_field_name("filter_tag_bloom_hi");
-	tprintf("htonl(%#x)", ntohl(uh.filter_tag_bloom_hi));
+
+	PRINT_FIELD_HTONL_X(uh, filter_tag_bloom_hi);
 	tprint_struct_next();
-	tprints_field_name("filter_tag_bloom_lo");
-	tprintf("htonl(%#x)", ntohl(uh.filter_tag_bloom_lo));
+
+	PRINT_FIELD_HTONL_X(uh, filter_tag_bloom_lo);
 	tprint_struct_end();
+
 	if (len > offset) {
 		tprint_array_next();
 		printstrn(tcp, addr + offset, len - offset);
