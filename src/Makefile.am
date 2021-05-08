@@ -266,9 +266,9 @@ libstrace_a_SOURCES =	\
 	printrusage.c	\
 	printsiginfo.c	\
 	printsiginfo.h	\
-	process.c	\
 	process_vm.c	\
 	ptp.c		\
+	ptrace.c	\
 	ptrace.h	\
 	ptrace_syscall_info.c \
 	ptrace_syscall_info.h \
