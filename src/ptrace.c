@@ -95,7 +95,6 @@ decode_ptrace_entering(struct tcb *const tcp)
 	tprint_arg_next();
 	printpid(tcp, pid, PT_TGID);
 
-	/* addr */
 	switch (request) {
 	case PTRACE_ATTACH:
 	case PTRACE_INTERRUPT:
@@ -103,14 +102,17 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_LISTEN:
 		/* addr and data are ignored */
 		return RVAL_DECODED;
+	}
+
+	/* addr */
+	tprint_arg_next();
+	switch (request) {
 	case PTRACE_PEEKUSER:
 	case PTRACE_POKEUSER:
-		tprint_arg_next();
 		print_user_offset_addr(addr);
 		break;
 	case PTRACE_GETREGSET:
 	case PTRACE_SETREGSET:
-		tprint_arg_next();
 		printxval(nt_descriptor_types, addr, "NT_???");
 		break;
 	case PTRACE_GETSIGMASK:
@@ -118,11 +120,9 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_SECCOMP_GET_FILTER:
 	case PTRACE_SECCOMP_GET_METADATA:
 	case PTRACE_GET_SYSCALL_INFO:
-		tprint_arg_next();
 		PRINT_VAL_U(addr);
 		break;
 	case PTRACE_PEEKSIGINFO: {
-		tprint_arg_next();
 		struct {
 			uint64_t off;
 			uint32_t flags;
@@ -145,7 +145,6 @@ decode_ptrace_entering(struct tcb *const tcp)
 		break;
 	}
 	default:
-		tprint_arg_next();
 		printaddr(addr);
 	}
 
