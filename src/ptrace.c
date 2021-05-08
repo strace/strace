@@ -75,240 +75,254 @@ print_user_offset_addr(const kernel_ulong_t addr)
 		tprint_comment_end();
 }
 
-SYS_FUNC(ptrace)
+static int
+decode_ptrace_entering(struct tcb *const tcp)
 {
 	const kernel_ulong_t request = tcp->u_arg[0];
 	const int pid = tcp->u_arg[1];
 	const kernel_ulong_t addr = tcp->u_arg[2];
 	const kernel_ulong_t data = tcp->u_arg[3];
 
-	if (entering(tcp)) {
-		/* request */
-		printxval64(ptrace_cmds, request, "PTRACE_???");
+	/* request */
+	printxval64(ptrace_cmds, request, "PTRACE_???");
 
-		if (request == PTRACE_TRACEME) {
-			/* pid, addr, and data are ignored. */
+	if (request == PTRACE_TRACEME) {
+		/* pid, addr, and data are ignored. */
+		return RVAL_DECODED;
+	}
+
+	/* pid */
+	tprint_arg_next();
+	printpid(tcp, pid, PT_TGID);
+
+	/* addr */
+	switch (request) {
+	case PTRACE_ATTACH:
+	case PTRACE_INTERRUPT:
+	case PTRACE_KILL:
+	case PTRACE_LISTEN:
+		/* addr and data are ignored */
+		return RVAL_DECODED;
+	case PTRACE_PEEKUSER:
+	case PTRACE_POKEUSER:
+		tprint_arg_next();
+		print_user_offset_addr(addr);
+		break;
+	case PTRACE_GETREGSET:
+	case PTRACE_SETREGSET:
+		tprint_arg_next();
+		printxval(nt_descriptor_types, addr, "NT_???");
+		break;
+	case PTRACE_GETSIGMASK:
+	case PTRACE_SETSIGMASK:
+	case PTRACE_SECCOMP_GET_FILTER:
+	case PTRACE_SECCOMP_GET_METADATA:
+	case PTRACE_GET_SYSCALL_INFO:
+		tprint_arg_next();
+		PRINT_VAL_U(addr);
+		break;
+	case PTRACE_PEEKSIGINFO: {
+		tprint_arg_next();
+		struct {
+			uint64_t off;
+			uint32_t flags;
+			uint32_t nr;
+		} psi;
+		if (umove_or_printaddr(tcp, addr, &psi)) {
+			tprint_arg_next();
+			printaddr(data);
 			return RVAL_DECODED;
 		}
-
-		/* pid */
+		tprint_struct_begin();
+		PRINT_FIELD_U(psi, off);
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(psi, flags,
+				  ptrace_peeksiginfo_flags,
+				  "PTRACE_PEEKSIGINFO_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(psi, nr);
+		tprint_struct_end();
+		break;
+	}
+	default:
 		tprint_arg_next();
-		printpid(tcp, pid, PT_TGID);
+		printaddr(addr);
+	}
 
-		/* addr */
-		switch (request) {
-		case PTRACE_ATTACH:
-		case PTRACE_INTERRUPT:
-		case PTRACE_KILL:
-		case PTRACE_LISTEN:
-			/* addr and data are ignored */
-			return RVAL_DECODED;
-		case PTRACE_PEEKUSER:
-		case PTRACE_POKEUSER:
-			tprint_arg_next();
-			print_user_offset_addr(addr);
-			break;
-		case PTRACE_GETREGSET:
-		case PTRACE_SETREGSET:
-			tprint_arg_next();
-			printxval(nt_descriptor_types, addr, "NT_???");
-			break;
-		case PTRACE_GETSIGMASK:
-		case PTRACE_SETSIGMASK:
-		case PTRACE_SECCOMP_GET_FILTER:
-		case PTRACE_SECCOMP_GET_METADATA:
-		case PTRACE_GET_SYSCALL_INFO:
-			tprint_arg_next();
-			PRINT_VAL_U(addr);
-			break;
-		case PTRACE_PEEKSIGINFO: {
-			tprint_arg_next();
-			struct {
-				uint64_t off;
-				uint32_t flags;
-				uint32_t nr;
-			} psi;
-			if (umove_or_printaddr(tcp, addr, &psi)) {
-				tprint_arg_next();
+#if defined IA64 || defined SPARC || defined SPARC64
+	switch (request) {
+# ifdef IA64
+	case PTRACE_PEEKDATA:
+	case PTRACE_PEEKTEXT:
+	case PTRACE_PEEKUSER:
+		/* data is ignored */
+		return RVAL_DECODED | RVAL_HEX;
+# endif /* IA64 */
+# if defined SPARC || defined SPARC64
+	case PTRACE_GETREGS:
+	case PTRACE_SETREGS:
+	case PTRACE_GETFPREGS:
+	case PTRACE_SETFPREGS:
+		/* data is ignored */
+		return RVAL_DECODED;
+# endif /* SPARC || SPARC64 */
+	}
+#endif /* IA64 || SPARC || SPARC64 */
+
+	tprint_arg_next();
+
+	/* data */
+	switch (request) {
+	case PTRACE_CONT:
+	case PTRACE_DETACH:
+	case PTRACE_SYSCALL:
+#ifdef PTRACE_SINGLESTEP
+	case PTRACE_SINGLESTEP:
+#endif
+#ifdef PTRACE_SINGLEBLOCK
+	case PTRACE_SINGLEBLOCK:
+#endif
+#ifdef PTRACE_SYSEMU
+	case PTRACE_SYSEMU:
+#endif
+#ifdef PTRACE_SYSEMU_SINGLESTEP
+	case PTRACE_SYSEMU_SINGLESTEP:
+#endif
+		printsignal(data);
+		break;
+	case PTRACE_SEIZE:
+	case PTRACE_SETOPTIONS:
+#ifdef PTRACE_OLDSETOPTIONS
+	case PTRACE_OLDSETOPTIONS:
+#endif
+		printflags64(ptrace_setoptions_flags, data, "PTRACE_O_???");
+		break;
+	case PTRACE_SETSIGINFO:
+		printsiginfo_at(tcp, data);
+		break;
+	case PTRACE_SETSIGMASK:
+		print_sigset_addr_len(tcp, data, addr);
+		break;
+	case PTRACE_SETREGSET:
+		tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
+		break;
+	case PTRACE_SECCOMP_GET_METADATA:
+		if (verbose(tcp)) {
+			uint64_t filter_off;
+			if (addr < sizeof(filter_off) ||
+			    umove(tcp, data, &filter_off)) {
 				printaddr(data);
 				return RVAL_DECODED;
 			}
+
 			tprint_struct_begin();
-			PRINT_FIELD_U(psi, off);
-			tprint_struct_next();
-			PRINT_FIELD_FLAGS(psi, flags,
-					  ptrace_peeksiginfo_flags,
-					  "PTRACE_PEEKSIGINFO_???");
-			tprint_struct_next();
-			PRINT_FIELD_U(psi, nr);
-			tprint_struct_end();
-			break;
-		}
-		default:
-			tprint_arg_next();
-			printaddr(addr);
+			tprints_field_name("filter_off");
+			PRINT_VAL_U(filter_off);
+			return 0;
 		}
 
-#if defined IA64 || defined SPARC || defined SPARC64
-		switch (request) {
-# ifdef IA64
-		case PTRACE_PEEKDATA:
-		case PTRACE_PEEKTEXT:
-		case PTRACE_PEEKUSER:
-			/* data is ignored */
-			return RVAL_DECODED | RVAL_HEX;
-# endif /* IA64 */
-# if defined SPARC || defined SPARC64
-		case PTRACE_GETREGS:
-		case PTRACE_SETREGS:
-		case PTRACE_GETFPREGS:
-		case PTRACE_SETFPREGS:
-			/* data is ignored */
-			return RVAL_DECODED;
-# endif /* SPARC || SPARC64 */
-		}
-#endif /* IA64 || SPARC || SPARC64 */
-
-		tprint_arg_next();
-
-		/* data */
-		switch (request) {
-		case PTRACE_CONT:
-		case PTRACE_DETACH:
-		case PTRACE_SYSCALL:
-#ifdef PTRACE_SINGLESTEP
-		case PTRACE_SINGLESTEP:
-#endif
-#ifdef PTRACE_SINGLEBLOCK
-		case PTRACE_SINGLEBLOCK:
-#endif
-#ifdef PTRACE_SYSEMU
-		case PTRACE_SYSEMU:
-#endif
-#ifdef PTRACE_SYSEMU_SINGLESTEP
-		case PTRACE_SYSEMU_SINGLESTEP:
-#endif
-			printsignal(data);
-			break;
-		case PTRACE_SEIZE:
-		case PTRACE_SETOPTIONS:
-#ifdef PTRACE_OLDSETOPTIONS
-		case PTRACE_OLDSETOPTIONS:
-#endif
-			printflags64(ptrace_setoptions_flags, data, "PTRACE_O_???");
-			break;
-		case PTRACE_SETSIGINFO:
-			printsiginfo_at(tcp, data);
-			break;
-		case PTRACE_SETSIGMASK:
-			print_sigset_addr_len(tcp, data, addr);
-			break;
-		case PTRACE_SETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
-			break;
-		case PTRACE_SECCOMP_GET_METADATA:
-			if (verbose(tcp)) {
-				uint64_t filter_off;
-				if (addr < sizeof(filter_off) ||
-				    umove(tcp, data, &filter_off)) {
-					printaddr(data);
-					return RVAL_DECODED;
-				}
-
-				tprint_struct_begin();
-				tprints_field_name("filter_off");
-				PRINT_VAL_U(filter_off);
-				return 0;
-			}
-
-			printaddr(data);
-			break;
+		printaddr(data);
+		break;
 #ifndef IA64
-		case PTRACE_PEEKDATA:
-		case PTRACE_PEEKTEXT:
-		case PTRACE_PEEKUSER:
+	case PTRACE_PEEKDATA:
+	case PTRACE_PEEKTEXT:
+	case PTRACE_PEEKUSER:
 #endif
-		case PTRACE_GETEVENTMSG:
-		case PTRACE_GETREGSET:
-		case PTRACE_GETSIGINFO:
-		case PTRACE_GETSIGMASK:
-		case PTRACE_PEEKSIGINFO:
-		case PTRACE_SECCOMP_GET_FILTER:
-		case PTRACE_GET_SYSCALL_INFO:
-			if (verbose(tcp)) {
-				/* print data on exiting syscall */
-				return 0;
-			}
-			ATTRIBUTE_FALLTHROUGH;
-		default:
-			printaddr(data);
-			break;
+	case PTRACE_GETEVENTMSG:
+	case PTRACE_GETREGSET:
+	case PTRACE_GETSIGINFO:
+	case PTRACE_GETSIGMASK:
+	case PTRACE_PEEKSIGINFO:
+	case PTRACE_SECCOMP_GET_FILTER:
+	case PTRACE_GET_SYSCALL_INFO:
+		if (verbose(tcp)) {
+			/* print data on exiting syscall */
+			return 0;
 		}
-
-		return RVAL_DECODED;
-	} else {
-		switch (request) {
-#ifndef IA64
-		case PTRACE_PEEKDATA:
-		case PTRACE_PEEKTEXT:
-		case PTRACE_PEEKUSER:
-			printnum_ptr(tcp, data);
-			break;
-#endif
-		case PTRACE_GETEVENTMSG:
-			printnum_ulong(tcp, data);
-			break;
-		case PTRACE_GETREGSET:
-			tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
-			break;
-		case PTRACE_GETSIGINFO:
-			printsiginfo_at(tcp, data);
-			break;
-		case PTRACE_GETSIGMASK:
-			print_sigset_addr_len(tcp, data, addr);
-			break;
-		case PTRACE_PEEKSIGINFO:
-			print_siginfo_array(tcp, data, tcp->u_rval);
-			break;
-		case PTRACE_SECCOMP_GET_FILTER:
-			print_seccomp_fprog(tcp, data, tcp->u_rval);
-			break;
-		case PTRACE_SECCOMP_GET_METADATA: {
-			const size_t offset = sizeof(uint64_t);
-			uint64_t flags = 0;
-			size_t ret_size = MIN((kernel_ulong_t) tcp->u_rval,
-					      offset + sizeof(flags));
-
-			if (syserror(tcp) || ret_size <= offset) {
-				tprint_struct_end();
-				return 0;
-			}
-
-			if (umoven(tcp, data + offset, ret_size - offset,
-				   &flags)) {
-				tprint_struct_next();
-				tprint_more_data_follows();
-				tprint_struct_end();
-				return 0;
-			}
-
-			tprint_struct_next();
-			tprints_field_name("flags");
-			printflags64(seccomp_filter_flags, flags,
-				     "SECCOMP_FILTER_FLAG_???");
-
-			if ((kernel_ulong_t) tcp->u_rval > ret_size) {
-				tprint_struct_next();
-				tprint_more_data_follows();
-			}
-
-			tprint_struct_end();
-			break;
-		}
-		case PTRACE_GET_SYSCALL_INFO:
-			print_ptrace_syscall_info(tcp, data, addr);
-			break;
-		}
+		ATTRIBUTE_FALLTHROUGH;
+	default:
+		printaddr(data);
+		break;
 	}
+
+	return RVAL_DECODED;
+}
+
+static int
+decode_ptrace_exiting(struct tcb *const tcp)
+{
+	const kernel_ulong_t request = tcp->u_arg[0];
+	const kernel_ulong_t addr = tcp->u_arg[2];
+	const kernel_ulong_t data = tcp->u_arg[3];
+
+	switch (request) {
+#ifndef IA64
+	case PTRACE_PEEKDATA:
+	case PTRACE_PEEKTEXT:
+	case PTRACE_PEEKUSER:
+		printnum_ptr(tcp, data);
+		break;
+#endif
+	case PTRACE_GETEVENTMSG:
+		printnum_ulong(tcp, data);
+		break;
+	case PTRACE_GETREGSET:
+		tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
+		break;
+	case PTRACE_GETSIGINFO:
+		printsiginfo_at(tcp, data);
+		break;
+	case PTRACE_GETSIGMASK:
+		print_sigset_addr_len(tcp, data, addr);
+		break;
+	case PTRACE_PEEKSIGINFO:
+		print_siginfo_array(tcp, data, tcp->u_rval);
+		break;
+	case PTRACE_SECCOMP_GET_FILTER:
+		print_seccomp_fprog(tcp, data, tcp->u_rval);
+		break;
+	case PTRACE_SECCOMP_GET_METADATA: {
+		const size_t offset = sizeof(uint64_t);
+		uint64_t flags = 0;
+		size_t ret_size = MIN((kernel_ulong_t) tcp->u_rval,
+				      offset + sizeof(flags));
+
+		if (syserror(tcp) || ret_size <= offset) {
+			tprint_struct_end();
+			return 0;
+		}
+
+		if (umoven(tcp, data + offset, ret_size - offset,
+			   &flags)) {
+			tprint_struct_next();
+			tprint_more_data_follows();
+			tprint_struct_end();
+			return 0;
+		}
+
+		tprint_struct_next();
+		tprints_field_name("flags");
+		printflags64(seccomp_filter_flags, flags,
+			     "SECCOMP_FILTER_FLAG_???");
+
+		if ((kernel_ulong_t) tcp->u_rval > ret_size) {
+			tprint_struct_next();
+			tprint_more_data_follows();
+		}
+
+		tprint_struct_end();
+		break;
+	}
+	case PTRACE_GET_SYSCALL_INFO:
+		print_ptrace_syscall_info(tcp, data, addr);
+		break;
+	}
+
 	return 0;
+}
+
+SYS_FUNC(ptrace)
+{
+	return entering(tcp) ? decode_ptrace_entering(tcp)
+			     : decode_ptrace_exiting(tcp);
 }
