@@ -75,6 +75,29 @@ print_user_offset_addr(const kernel_ulong_t addr)
 		tprint_comment_end();
 }
 
+static void
+decode_peeksiginfo_args(struct tcb *const tcp, const kernel_ulong_t addr)
+{
+	struct {
+		uint64_t off;
+		uint32_t flags;
+		uint32_t nr;
+	} psi;
+
+	if (!umove_or_printaddr(tcp, addr, &psi)) {
+		tprint_struct_begin();
+		PRINT_FIELD_U(psi, off);
+		tprint_struct_next();
+
+		PRINT_FIELD_FLAGS(psi, flags, ptrace_peeksiginfo_flags,
+				  "PTRACE_PEEKSIGINFO_???");
+		tprint_struct_next();
+
+		PRINT_FIELD_U(psi, nr);
+		tprint_struct_end();
+	}
+}
+
 static int
 decode_ptrace_entering(struct tcb *const tcp)
 {
@@ -122,28 +145,9 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_GET_SYSCALL_INFO:
 		PRINT_VAL_U(addr);
 		break;
-	case PTRACE_PEEKSIGINFO: {
-		struct {
-			uint64_t off;
-			uint32_t flags;
-			uint32_t nr;
-		} psi;
-		if (umove_or_printaddr(tcp, addr, &psi)) {
-			tprint_arg_next();
-			printaddr(data);
-			return RVAL_DECODED;
-		}
-		tprint_struct_begin();
-		PRINT_FIELD_U(psi, off);
-		tprint_struct_next();
-		PRINT_FIELD_FLAGS(psi, flags,
-				  ptrace_peeksiginfo_flags,
-				  "PTRACE_PEEKSIGINFO_???");
-		tprint_struct_next();
-		PRINT_FIELD_U(psi, nr);
-		tprint_struct_end();
+	case PTRACE_PEEKSIGINFO:
+		decode_peeksiginfo_args(tcp, addr);
 		break;
-	}
 	default:
 		printaddr(addr);
 	}
