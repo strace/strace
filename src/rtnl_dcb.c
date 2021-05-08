@@ -26,8 +26,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(dcb, dcb_family, addrfams, "AF_???");
+	tprint_struct_next();
 
-	tprints(", ");
 	if (len >= sizeof(dcb)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(dcb) - offset,
@@ -42,7 +42,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_dcbmsg)
 
 	offset = NLMSG_ALIGN(sizeof(dcb));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_dcb_attrs, "DCB_ATTR_???", NULL, 0, NULL);
 	}
