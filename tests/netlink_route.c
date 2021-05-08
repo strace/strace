@@ -156,7 +156,7 @@ test_rtnl_unspec(const int fd)
 		      0xffff, "0xffff /* RTM_??? */",
 		      NLM_F_REQUEST, "NLM_F_REQUEST",
 		      sizeof(buf), buf, sizeof(buf),
-		      printf("{family=AF_UNSPEC, \"\\x31\\x32\\x33\\x34\"}"));
+		      printf("{family=AF_UNSPEC, data=\"\\x31\\x32\\x33\\x34\"}"));
 
 	/* unknown family and string */
 	family = 0xfd;
@@ -166,7 +166,7 @@ test_rtnl_unspec(const int fd)
 		      NLM_F_REQUEST, "NLM_F_REQUEST",
 		      sizeof(buf), buf, sizeof(buf),
 		      printf("{family=%#x /* AF_??? */"
-			     ", \"\\x31\\x32\\x33\\x34\"}", family));
+			     ", data=\"\\x31\\x32\\x33\\x34\"}", family));
 }
 
 static void
