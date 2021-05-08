@@ -23,7 +23,8 @@ decode_family(struct tcb *const tcp, const uint8_t family,
 	tprints_field_name("family");
 	printxval(addrfams, family, "AF_???");
 	if (len > sizeof(family)) {
-		tprints(", ");
+		tprint_struct_next();
+		tprints_field_name("data");
 		printstr_ex(tcp, addr + sizeof(family),
 			    len - sizeof(family), QUOTE_FORCE_HEX);
 	}
