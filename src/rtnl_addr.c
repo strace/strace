@@ -94,8 +94,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(ifaddr, ifa_family, addrfams, "AF_???");
+	tprint_struct_next();
 
-	tprints(", ");
 	if (len >= sizeof(ifaddr)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(ifaddr) - offset,
@@ -117,7 +117,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_ifaddrmsg)
 
 	offset = NLMSG_ALIGN(sizeof(ifaddr));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_addr_attrs, "IFA_???",
 			      ifaddrmsg_nla_decoders,
