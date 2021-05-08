@@ -99,6 +99,55 @@ decode_peeksiginfo_args(struct tcb *const tcp, const kernel_ulong_t addr)
 }
 
 static int
+decode_seccomp_metadata(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const kernel_ulong_t size)
+{
+	struct {
+		uint64_t filter_off;
+		uint64_t flags;
+	} md;
+
+	if (entering(tcp)) {
+		if (size < sizeof(md.filter_off)) {
+			printaddr(addr);
+			return RVAL_DECODED;
+		}
+
+		if (umove_or_printaddr(tcp, addr, &md.filter_off)) {
+			return RVAL_DECODED;
+		}
+
+		tprint_struct_begin();
+		PRINT_FIELD_U(md, filter_off);
+	} else {
+		const size_t offset = sizeof(md.filter_off);
+
+		if (!syserror(tcp) && size > offset) {
+			tprint_struct_next();
+
+			if (size < sizeof(md) ||
+			    !tfetch_mem(tcp, addr + offset,
+					sizeof(md.flags), &md.flags)) {
+				tprint_unavailable();
+			} else {
+				PRINT_FIELD_FLAGS(md, flags,
+						  seccomp_filter_flags,
+						  "SECCOMP_FILTER_FLAG_???");
+				if (size > sizeof(md)) {
+					tprint_struct_next();
+					tprint_more_data_follows();
+				}
+			}
+		}
+
+		tprint_struct_end();
+	}
+
+	return 0;
+}
+
+static int
 decode_ptrace_entering(struct tcb *const tcp)
 {
 	const kernel_ulong_t request = tcp->u_arg[0];
@@ -210,22 +259,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 		tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
 		break;
 	case PTRACE_SECCOMP_GET_METADATA:
-		if (verbose(tcp)) {
-			uint64_t filter_off;
-			if (addr < sizeof(filter_off) ||
-			    umove(tcp, data, &filter_off)) {
-				printaddr(data);
-				return RVAL_DECODED;
-			}
-
-			tprint_struct_begin();
-			tprints_field_name("filter_off");
-			PRINT_VAL_U(filter_off);
-			return 0;
-		}
-
-		printaddr(data);
-		break;
+		return decode_seccomp_metadata(tcp, data, addr);
 #ifndef IA64
 	case PTRACE_PEEKDATA:
 	case PTRACE_PEEKTEXT:
@@ -284,38 +318,8 @@ decode_ptrace_exiting(struct tcb *const tcp)
 	case PTRACE_SECCOMP_GET_FILTER:
 		print_seccomp_fprog(tcp, data, tcp->u_rval);
 		break;
-	case PTRACE_SECCOMP_GET_METADATA: {
-		const size_t offset = sizeof(uint64_t);
-		uint64_t flags = 0;
-		size_t ret_size = MIN((kernel_ulong_t) tcp->u_rval,
-				      offset + sizeof(flags));
-
-		if (syserror(tcp) || ret_size <= offset) {
-			tprint_struct_end();
-			return 0;
-		}
-
-		if (umoven(tcp, data + offset, ret_size - offset,
-			   &flags)) {
-			tprint_struct_next();
-			tprint_more_data_follows();
-			tprint_struct_end();
-			return 0;
-		}
-
-		tprint_struct_next();
-		tprints_field_name("flags");
-		printflags64(seccomp_filter_flags, flags,
-			     "SECCOMP_FILTER_FLAG_???");
-
-		if ((kernel_ulong_t) tcp->u_rval > ret_size) {
-			tprint_struct_next();
-			tprint_more_data_follows();
-		}
-
-		tprint_struct_end();
-		break;
-	}
+	case PTRACE_SECCOMP_GET_METADATA:
+		return decode_seccomp_metadata(tcp, data, tcp->u_rval);
 	case PTRACE_GET_SYSCALL_INFO:
 		print_ptrace_syscall_info(tcp, data, addr);
 		break;
