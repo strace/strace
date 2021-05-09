@@ -17,8 +17,8 @@ print_sg_io_buffer(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const unsigned int data_size, const unsigned int iovec_count)
 {
 	if (iovec_count) {
-		tprint_iov_upto(tcp, iovec_count, addr, IOV_DECODE_STR,
-				data_size);
+		tprint_iov_upto(tcp, iovec_count, addr, data_size,
+				iov_decode_str, NULL);
 	} else {
 		printstr_ex(tcp, addr, data_size, QUOTE_FORCE_HEX);
 	}

@@ -178,7 +178,7 @@ keyctl_instantiate_key_iov(struct tcb *tcp, key_serial_t id1,
 	print_keyring_serial_number(id1);
 	tprint_arg_next();
 
-	tprint_iov(tcp, len, addr, IOV_DECODE_STR);
+	tprint_iov(tcp, len, addr, iov_decode_str);
 	tprint_arg_next();
 
 	PRINT_VAL_U(len);

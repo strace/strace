@@ -49,9 +49,24 @@ SYS_FUNC(write)
 	return RVAL_DECODED;
 }
 
+void
+iov_decode_addr(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size,
+	       void *opaque_data)
+{
+	printaddr(addr);
+}
+
+void
+iov_decode_str(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size,
+	       void *opaque_data)
+{
+	printstrn(tcp, addr, size);
+}
+
 struct print_iovec_config {
-	enum iov_decode decode_iov;
 	kernel_ulong_t data_size;
+	print_obj_by_addr_size_fn print_func;
+	void *opaque_data;
 };
 
 static bool
@@ -69,18 +84,7 @@ print_iovec_klong(struct tcb *const tcp,
 
 	tprint_struct_begin();
 	tprints_field_name("iov_base");
-	switch (c->decode_iov) {
-		case IOV_DECODE_STR:
-			printstrn(tcp, iov_base, len);
-			break;
-		case IOV_DECODE_NETLINK:
-			/* assume that the descriptor is 1st syscall argument */
-			decode_netlink(tcp, tcp->u_arg[0], iov_base, len);
-			break;
-		default:
-			printaddr(iov_base);
-			break;
-	}
+	c->print_func(tcp, iov_base, len, c->opaque_data);
 	tprint_struct_next();
 
 	tprints_field_name("iov_len");
@@ -116,12 +120,16 @@ print_iovec_elem_klong(struct tcb *tcp, void *elem_buf, size_t elem_size,
  */
 void
 tprint_iov_upto(struct tcb *const tcp, const kernel_ulong_t len,
-		const kernel_ulong_t addr, const enum iov_decode decode_iov,
-		const kernel_ulong_t data_size)
+		const kernel_ulong_t addr,
+		const kernel_ulong_t data_size,
+		print_obj_by_addr_size_fn print_func,
+		void *opaque_data)
 {
 	kernel_ulong_t iov[2];
 	struct print_iovec_config config = {
-		.decode_iov = decode_iov, .data_size = data_size
+		.data_size = data_size,
+		.print_func = print_func,
+		.opaque_data = opaque_data
 	};
 	const print_fn print_elem_func =
 #if !ANY_WORDSIZE_EQUALS_TO_KERNEL_LONG
@@ -146,9 +154,10 @@ SYS_FUNC(readv)
 		tprint_arg_next();
 	} else {
 		/* iov */
-		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1],
-				syserror(tcp) ? IOV_DECODE_ADDR :
-				IOV_DECODE_STR, tcp->u_rval);
+		tprint_iov_upto(tcp, tcp->u_arg[2], tcp->u_arg[1], tcp->u_rval,
+				syserror(tcp) ? iov_decode_addr
+					      : iov_decode_str,
+				NULL);
 		tprint_arg_next();
 
 		/* iovcnt */
@@ -164,7 +173,7 @@ SYS_FUNC(writev)
 	tprint_arg_next();
 
 	/* iov */
-	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
+	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], iov_decode_str);
 	tprint_arg_next();
 
 	/* iovcnt */
@@ -247,9 +256,10 @@ do_preadv(struct tcb *tcp, const int flags_arg)
 			truncate_kulong_to_current_wordsize(tcp->u_arg[2]);
 
 		/* iov */
-		tprint_iov_upto(tcp, len, tcp->u_arg[1],
-				syserror(tcp) ? IOV_DECODE_ADDR :
-				IOV_DECODE_STR, tcp->u_rval);
+		tprint_iov_upto(tcp, len, tcp->u_arg[1], tcp->u_rval,
+				syserror(tcp) ? iov_decode_addr
+					      : iov_decode_str,
+				NULL);
 		tprint_arg_next();
 
 		/* iovcnt */
@@ -285,7 +295,7 @@ do_pwritev(struct tcb *tcp, const int flags_arg)
 	tprint_arg_next();
 
 	/* iov */
-	tprint_iov(tcp, len, tcp->u_arg[1], IOV_DECODE_STR);
+	tprint_iov(tcp, len, tcp->u_arg[1], iov_decode_str);
 	tprint_arg_next();
 
 	/* iovcnt */
@@ -392,7 +402,7 @@ SYS_FUNC(vmsplice)
 	tprint_arg_next();
 
 	/* const struct iovec *iov */
-	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], IOV_DECODE_STR);
+	tprint_iov(tcp, tcp->u_arg[2], tcp->u_arg[1], iov_decode_str);
 	tprint_arg_next();
 
 	/* unsigned long nr_segs */

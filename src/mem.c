@@ -305,7 +305,7 @@ SYS_FUNC(process_madvise)
 	printfd(tcp, pidfd);
 	tprint_arg_next();
 
-	tprint_iov(tcp, len, addr, IOV_DECODE_ADDR);
+	tprint_iov(tcp, len, addr, iov_decode_addr);
 	tprint_arg_next();
 
 	PRINT_VAL_U(len);

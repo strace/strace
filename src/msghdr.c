@@ -376,6 +376,14 @@ decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 	free(buf);
 }
 
+static void
+iov_decode_netlink(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size,
+		   void *opaque_data)
+{
+	const int *const fdp = opaque_data;
+	decode_netlink(tcp, *fdp, addr, size);
+}
+
 void
 print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 		    const int *const p_user_msg_namelen,
@@ -389,8 +397,10 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprints_field_name("msg_name");
 	const int family =
 		decode_sockaddr(tcp, ptr_to_kulong(msg->msg_name), msg_namelen);
-	const enum iov_decode decode =
-		(family == AF_NETLINK) ? IOV_DECODE_NETLINK : IOV_DECODE_STR;
+	const print_obj_by_addr_size_fn print_func =
+		(family == AF_NETLINK) ? iov_decode_netlink : iov_decode_str;
+	/* Assume that the descriptor is the 1st syscall argument. */
+	int fd = tcp->u_arg[0];
 
 	tprint_struct_next();
 	tprints_field_name("msg_namelen");
@@ -403,7 +413,7 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprint_struct_next();
 	tprints_field_name("msg_iov");
 	tprint_iov_upto(tcp, msg->msg_iovlen,
-			ptr_to_kulong(msg->msg_iov), decode, data_size);
+			ptr_to_kulong(msg->msg_iov), data_size, print_func, &fd);
 	tprint_struct_next();
 	PRINT_FIELD_U(*msg, msg_iovlen);
 

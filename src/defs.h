@@ -490,12 +490,6 @@ enum sock_proto {
 extern enum sock_proto get_proto_by_name(const char *);
 extern int get_family_by_proto(enum sock_proto proto);
 
-enum iov_decode {
-	IOV_DECODE_ADDR,
-	IOV_DECODE_STR,
-	IOV_DECODE_NETLINK
-};
-
 typedef enum {
 	CFLAG_NONE = 0,
 	CFLAG_ONLY_STATS,
@@ -965,6 +959,10 @@ typedef bool (*print_fn)(struct tcb *, void *elem_buf,
 			 size_t elem_size, void *opaque_data);
 typedef int (*print_obj_by_addr_fn)(struct tcb *, kernel_ulong_t);
 typedef const char * (*sprint_obj_by_addr_fn)(struct tcb *, kernel_ulong_t);
+typedef void (*print_obj_by_addr_size_fn)(struct tcb *,
+					  kernel_ulong_t addr,
+					  kernel_ulong_t size,
+					  void *opaque_data);
 
 
 /**
@@ -1194,7 +1192,14 @@ extern void printsignal(int);
 
 extern void
 tprint_iov_upto(struct tcb *, kernel_ulong_t len, kernel_ulong_t addr,
-		enum iov_decode, kernel_ulong_t data_size);
+		kernel_ulong_t data_size, print_obj_by_addr_size_fn,
+		void *opaque_data);
+extern void
+iov_decode_addr(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size,
+		void *opaque_data);
+extern void
+iov_decode_str(struct tcb *, kernel_ulong_t addr, kernel_ulong_t size,
+	       void *opaque_data);
 
 extern void
 decode_netlink(struct tcb *, int fd, kernel_ulong_t addr, kernel_ulong_t len);
@@ -1457,9 +1462,9 @@ printxval_d(const struct xlat *x, const int val, const char *dflt)
 
 static inline void
 tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
-	   enum iov_decode decode_iov)
+	   print_obj_by_addr_size_fn print_func)
 {
-	tprint_iov_upto(tcp, len, addr, decode_iov, -1);
+	tprint_iov_upto(tcp, len, addr, -1, print_func, NULL);
 }
 
 # if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32

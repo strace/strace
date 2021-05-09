@@ -256,7 +256,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 		print_sigset_addr_len(tcp, data, addr);
 		break;
 	case PTRACE_SETREGSET:
-		tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
+		tprint_iov(tcp, /*len:*/ 1, data, iov_decode_addr);
 		break;
 	case PTRACE_SECCOMP_GET_METADATA:
 		return decode_seccomp_metadata(tcp, data, addr);
@@ -304,7 +304,7 @@ decode_ptrace_exiting(struct tcb *const tcp)
 		printnum_ulong(tcp, data);
 		break;
 	case PTRACE_GETREGSET:
-		tprint_iov(tcp, /*len:*/ 1, data, IOV_DECODE_ADDR);
+		tprint_iov(tcp, /*len:*/ 1, data, iov_decode_addr);
 		break;
 	case PTRACE_GETSIGINFO:
 		printsiginfo_at(tcp, data);

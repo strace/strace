@@ -160,8 +160,8 @@ print_iocb(struct tcb *tcp, const struct iocb *cb)
 			tprints_field_name("aio_buf");
 			tprint_iov(tcp, cb->aio_nbytes, cb->aio_buf,
 				   cb->aio_lio_opcode == 8
-				   ? IOV_DECODE_STR
-				   : IOV_DECODE_ADDR);
+				   ? iov_decode_str
+				   : iov_decode_addr);
 		} else {
 			tprint_struct_next();
 			PRINT_FIELD_X(*cb, aio_buf);

@@ -291,7 +291,7 @@ SYS_FUNC(io_uring_register)
 	/* arg */
 	switch (opcode) {
 	case IORING_REGISTER_BUFFERS:
-		tprint_iov(tcp, nargs, arg, IOV_DECODE_ADDR);
+		tprint_iov(tcp, nargs, arg, iov_decode_addr);
 		break;
 	case IORING_REGISTER_FILES:
 	case IORING_REGISTER_EVENTFD:
