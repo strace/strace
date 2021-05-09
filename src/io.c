@@ -62,22 +62,18 @@ print_iovec_klong(struct tcb *const tcp,
 {
 	kernel_ulong_t len = iov_len;
 
+	if (len > c->data_size)
+		len = c->data_size;
+	if (c->data_size != (kernel_ulong_t) -1)
+		c->data_size -= len;
+
 	tprint_struct_begin();
 	tprints_field_name("iov_base");
-
 	switch (c->decode_iov) {
 		case IOV_DECODE_STR:
-			if (len > c->data_size)
-				len = c->data_size;
-			if (c->data_size != (kernel_ulong_t) -1)
-				c->data_size -= len;
 			printstrn(tcp, iov_base, len);
 			break;
 		case IOV_DECODE_NETLINK:
-			if (len > c->data_size)
-				len = c->data_size;
-			if (c->data_size != (kernel_ulong_t) -1)
-				c->data_size -= len;
 			/* assume that the descriptor is 1st syscall argument */
 			decode_netlink(tcp, tcp->u_arg[0], iov_base, len);
 			break;
@@ -85,8 +81,8 @@ print_iovec_klong(struct tcb *const tcp,
 			printaddr(iov_base);
 			break;
 	}
-
 	tprint_struct_next();
+
 	tprints_field_name("iov_len");
 	PRINT_VAL_U(iov_len);
 	tprint_struct_end();
