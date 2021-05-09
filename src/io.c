@@ -55,24 +55,15 @@ struct print_iovec_config {
 };
 
 static bool
-print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
+print_iovec_klong(struct tcb *const tcp,
+		  const kernel_ulong_t iov_base,
+		  const kernel_ulong_t iov_len,
+		  struct print_iovec_config *const c)
 {
-	const kernel_ulong_t *iov;
-	kernel_ulong_t iov_buf[2], len;
-	struct print_iovec_config *c = data;
-
-	if (elem_size < sizeof(iov_buf)) {
-		iov_buf[0] = ((unsigned int *) elem_buf)[0];
-		iov_buf[1] = ((unsigned int *) elem_buf)[1];
-		iov = iov_buf;
-	} else {
-		iov = elem_buf;
-	}
+	kernel_ulong_t len = iov_len;
 
 	tprint_struct_begin();
 	tprints_field_name("iov_base");
-
-	len = iov[1];
 
 	switch (c->decode_iov) {
 		case IOV_DECODE_STR:
@@ -80,7 +71,7 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 				len = c->data_size;
 			if (c->data_size != (kernel_ulong_t) -1)
 				c->data_size -= len;
-			printstrn(tcp, iov[0], len);
+			printstrn(tcp, iov_base, len);
 			break;
 		case IOV_DECODE_NETLINK:
 			if (len > c->data_size)
@@ -88,20 +79,40 @@ print_iovec(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 			if (c->data_size != (kernel_ulong_t) -1)
 				c->data_size -= len;
 			/* assume that the descriptor is 1st syscall argument */
-			decode_netlink(tcp, tcp->u_arg[0], iov[0], len);
+			decode_netlink(tcp, tcp->u_arg[0], iov_base, len);
 			break;
 		default:
-			printaddr(iov[0]);
+			printaddr(iov_base);
 			break;
 	}
 
 	tprint_struct_next();
 	tprints_field_name("iov_len");
-	PRINT_VAL_U(iov[1]);
+	PRINT_VAL_U(iov_len);
 	tprint_struct_end();
 
 	return true;
 }
+
+#if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+static bool
+print_iovec_elem_int(struct tcb *tcp, void *elem_buf, size_t elem_size,
+		     void *data)
+{
+	const unsigned int *const iov = elem_buf;
+	return print_iovec_klong(tcp, iov[0], iov[1], data);
+}
+#endif
+
+#if ANY_WORDSIZE_EQUALS_TO_KERNEL_LONG
+static bool
+print_iovec_elem_klong(struct tcb *tcp, void *elem_buf, size_t elem_size,
+		       void *data)
+{
+	const kernel_ulong_t *const iov = elem_buf;
+	return print_iovec_klong(tcp, iov[0], iov[1], data);
+}
+#endif
 
 /*
  * data_size limits the cumulative size of printed data.
@@ -116,9 +127,19 @@ tprint_iov_upto(struct tcb *const tcp, const kernel_ulong_t len,
 	struct print_iovec_config config = {
 		.decode_iov = decode_iov, .data_size = data_size
 	};
+	const print_fn print_elem_func =
+#if !ANY_WORDSIZE_EQUALS_TO_KERNEL_LONG
+			print_iovec_elem_int;
+#elif !ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+			print_iovec_elem_klong;
+#else
+		current_wordsize < sizeof(kernel_ulong_t) ?
+			print_iovec_elem_int :
+			print_iovec_elem_klong;
+#endif
 
 	print_array(tcp, addr, len, iov, current_wordsize * 2,
-		    tfetch_mem_ignore_syserror, print_iovec, &config);
+		    tfetch_mem_ignore_syserror, print_elem_func, &config);
 }
 
 SYS_FUNC(readv)
