@@ -152,6 +152,78 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 }
 
 static void
+print_prstatus_regset(const void *const rs, const size_t size)
+{
+	if (!size || size % sizeof(kernel_ulong_t)) {
+		printf("%p", rs);
+		return;
+	}
+
+	printf("%p", rs);
+}
+
+static unsigned int actual_prstatus_size;
+
+static void
+do_getregset_setregset(const unsigned int pid,
+		       const unsigned int nt,
+		       const char *const nt_str,
+		       void *const regbuf,
+		       const unsigned int regsize,
+		       struct iovec *const iov,
+		       void (*print_regset_fn)(const void *, size_t))
+{
+	iov->iov_base = regbuf;
+	iov->iov_len = regsize;
+	do_ptrace(PTRACE_GETREGSET, pid, nt, (uintptr_t) iov);
+	if (iov->iov_len == regsize) {
+		printf("ptrace(PTRACE_GETREGSET, %u, %s"
+		       ", {iov_base=", pid, nt_str);
+		print_prstatus_regset(iov->iov_base, iov->iov_len);
+		printf(", iov_len=%lu}) = %s\n",
+		       (unsigned long) iov->iov_len, errstr);
+		if (actual_prstatus_size)
+			return;	/* skip PTRACE_SETREGSET */
+	} else {
+		printf("ptrace(PTRACE_GETREGSET, %u, %s"
+		       ", {iov_base=", pid, nt_str);
+		print_prstatus_regset(iov->iov_base, iov->iov_len);
+		printf(", iov_len=%u => %lu}) = %s\n",
+		       regsize, (unsigned long) iov->iov_len, errstr);
+		if (actual_prstatus_size)
+			error_msg_and_fail("iov_len changed again"
+					   " from %u to %lu", regsize,
+					   (unsigned long) iov->iov_len);
+		actual_prstatus_size = iov->iov_len;
+	}
+
+#if defined __sparc__ && !defined __arch64__
+	/*
+	 * On sparc32 PTRACE_SETREGSET of size greater than 120
+	 * has interesting side effects.
+	 */
+	if (regsize > 120)
+		return;
+#endif /* __sparc__ && !__arch64__ */
+
+	iov->iov_len = regsize;
+	do_ptrace(PTRACE_SETREGSET, pid, nt, (uintptr_t) iov);
+	if (iov->iov_len == regsize) {
+		printf("ptrace(PTRACE_SETREGSET, %u, %s"
+		       ", {iov_base=", pid, nt_str);
+		print_prstatus_regset(iov->iov_base, regsize);
+		printf(", iov_len=%lu}) = %s\n",
+		       (unsigned long) iov->iov_len, errstr);
+	} else {
+		printf("ptrace(PTRACE_SETREGSET, %u, %s"
+		       ", {iov_base=", pid, nt_str);
+		print_prstatus_regset(iov->iov_base, regsize);
+		printf(", iov_len=%u => %lu}) = %s\n",
+		       regsize, (unsigned long) iov->iov_len, errstr);
+	}
+}
+
+static void
 test_getregset_setregset(unsigned int pid)
 {
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct iovec, iov);
@@ -178,6 +250,74 @@ test_getregset_setregset(unsigned int pid)
 		do_ptrace(PTRACE_SETREGSET, pid, 2, addr);
 		printf("ptrace(PTRACE_SETREGSET, %u, NT_FPREGSET, %#lx) = %s\n",
 		       pid, addr, errstr);
+	}
+
+	pid = fork();
+	if ((pid_t) pid < 0)
+		perror_msg_and_fail("fork");
+
+	if (!pid) {
+		if (do_ptrace(PTRACE_TRACEME, 0, 0, 0))
+			perror_msg_and_fail("child: PTRACE_TRACEME");
+
+		raise(SIGSTOP);
+		if (chdir("")) {
+			;
+		}
+		_exit(0);
+	}
+
+	const unsigned int prstatus_buf_size = 2048;
+	char *const prstatus_buf_endptr = midtail_alloc(0, prstatus_buf_size);
+
+	for (;;) {
+		int status, tracee, saved;
+
+		errno = 0;
+		tracee = wait(&status);
+		if (tracee <= 0) {
+			if (errno == EINTR)
+				continue;
+			saved = errno;
+			kill(pid, SIGKILL);
+			errno = saved;
+			perror_msg_and_fail("wait");
+		}
+		if (WIFEXITED(status)) {
+			if (WEXITSTATUS(status) == 0)
+				break;
+			error_msg_and_fail("unexpected exit status %#x",
+					   WEXITSTATUS(status));
+		}
+		if (WIFSIGNALED(status))
+			error_msg_and_fail("unexpected signal %u",
+					   WTERMSIG(status));
+		if (!WIFSTOPPED(status)) {
+			kill(pid, SIGKILL);
+			error_msg_and_fail("unexpected wait status %#x",
+					   status);
+		}
+
+		for (unsigned int i = actual_prstatus_size;
+		     i <= prstatus_buf_size &&
+		     (!actual_prstatus_size ||
+		      actual_prstatus_size + 1 >= i);
+		     ++i) {
+			do_getregset_setregset(pid, 1, "NT_PRSTATUS",
+					       prstatus_buf_endptr - i, i, iov,
+					       print_prstatus_regset);
+		}
+
+		if (WSTOPSIG(status) == SIGSTOP)
+			kill(pid, SIGCONT);
+
+		if (do_ptrace(PTRACE_SYSCALL, pid, 0, 0)) {
+			saved = errno;
+			kill(pid, SIGKILL);
+			errno = saved;
+			perror_msg_and_fail("ptrace");
+		}
+		printf("ptrace(PTRACE_SYSCALL, %u, NULL, 0) = 0\n", pid);
 	}
 }
 

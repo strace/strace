@@ -152,18 +152,30 @@ static int
 decode_getregset(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const unsigned int nt)
 {
-	if (exiting(tcp)) {
-		strace_iovec iov;
+	strace_iovec iov;
 
-		if (!fetch_struct_iovec(tcp, addr, &iov)) {
-			printaddr(addr);
-			return RVAL_DECODED;
-		}
+	if (!fetch_struct_iovec(tcp, addr, &iov)) {
+		printaddr(addr);
+		return RVAL_DECODED;
+	}
+
+	if (entering(tcp)) {
+		set_tcb_priv_ulong(tcp, iov.iov_len);
+	} else {
+		const unsigned long old_len = get_tcb_priv_ulong(tcp);
 
 		tprint_struct_begin();
 		PRINT_FIELD_X(iov, iov_base);
 		tprint_struct_next();
-		PRINT_FIELD_U(iov, iov_len);
+
+		if (old_len == iov.iov_len) {
+			PRINT_FIELD_U(iov, iov_len);
+		} else {
+			tprints_field_name("iov_len");
+			PRINT_VAL_U(old_len);
+			tprint_value_changed();
+			PRINT_VAL_U(iov.iov_len);
+		}
 		tprint_struct_end();
 	}
 
@@ -174,9 +186,9 @@ static int
 decode_setregset(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const unsigned int nt)
 {
-	if (entering(tcp)) {
-		strace_iovec iov;
+	strace_iovec iov;
 
+	if (entering(tcp)) {
 		if (!fetch_struct_iovec(tcp, addr, &iov)) {
 			printaddr(addr);
 			return RVAL_DECODED;
@@ -185,7 +197,17 @@ decode_setregset(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_begin();
 		PRINT_FIELD_X(iov, iov_base);
 		tprint_struct_next();
+
 		PRINT_FIELD_U(iov, iov_len);
+
+		set_tcb_priv_ulong(tcp, iov.iov_len);
+	} else {
+		if (fetch_struct_iovec(tcp, addr, &iov) &&
+		    get_tcb_priv_ulong(tcp) != iov.iov_len) {
+			tprint_value_changed();
+			PRINT_VAL_U(iov.iov_len);
+		}
+
 		tprint_struct_end();
 	}
 
