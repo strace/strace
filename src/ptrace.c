@@ -21,6 +21,7 @@
 # include <elf.h>
 #endif
 
+#include "iovec.h"
 #include "ptrace.h"
 #include "ptrace_syscall_info.h"
 #include "regs.h"
@@ -148,6 +149,50 @@ decode_seccomp_metadata(struct tcb *const tcp,
 }
 
 static int
+decode_getregset(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const unsigned int nt)
+{
+	if (exiting(tcp)) {
+		strace_iovec iov;
+
+		if (!fetch_struct_iovec(tcp, addr, &iov)) {
+			printaddr(addr);
+			return RVAL_DECODED;
+		}
+
+		tprint_struct_begin();
+		PRINT_FIELD_X(iov, iov_base);
+		tprint_struct_next();
+		PRINT_FIELD_U(iov, iov_len);
+		tprint_struct_end();
+	}
+
+	return 0;
+}
+
+static int
+decode_setregset(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const unsigned int nt)
+{
+	if (entering(tcp)) {
+		strace_iovec iov;
+
+		if (!fetch_struct_iovec(tcp, addr, &iov)) {
+			printaddr(addr);
+			return RVAL_DECODED;
+		}
+
+		tprint_struct_begin();
+		PRINT_FIELD_X(iov, iov_base);
+		tprint_struct_next();
+		PRINT_FIELD_U(iov, iov_len);
+		tprint_struct_end();
+	}
+
+	return 0;
+}
+
+static int
 decode_ptrace_entering(struct tcb *const tcp)
 {
 	const kernel_ulong_t request = tcp->u_arg[0];
@@ -255,8 +300,10 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_SETSIGMASK:
 		print_sigset_addr_len(tcp, data, addr);
 		break;
+	case PTRACE_GETREGSET:
+		return decode_getregset(tcp, data, addr);
 	case PTRACE_SETREGSET:
-		tprint_iov(tcp, /*len:*/ 1, data, iov_decode_addr);
+		return decode_setregset(tcp, data, addr);
 		break;
 	case PTRACE_SECCOMP_GET_METADATA:
 		return decode_seccomp_metadata(tcp, data, addr);
@@ -266,7 +313,6 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_PEEKUSER:
 #endif
 	case PTRACE_GETEVENTMSG:
-	case PTRACE_GETREGSET:
 	case PTRACE_GETSIGINFO:
 	case PTRACE_GETSIGMASK:
 	case PTRACE_PEEKSIGINFO:
@@ -304,8 +350,9 @@ decode_ptrace_exiting(struct tcb *const tcp)
 		printnum_ulong(tcp, data);
 		break;
 	case PTRACE_GETREGSET:
-		tprint_iov(tcp, /*len:*/ 1, data, iov_decode_addr);
-		break;
+		return decode_getregset(tcp, data, addr);
+	case PTRACE_SETREGSET:
+		return decode_setregset(tcp, data, addr);
 	case PTRACE_GETSIGINFO:
 		printsiginfo_at(tcp, data);
 		break;

@@ -21,6 +21,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <linux/audit.h>
+#include <sys/uio.h>
 
 static const char *errstr;
 
@@ -104,7 +105,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 		if (WIFEXITED(status)) {
 			if (WEXITSTATUS(status) == 0)
 				break;
-			error_msg_and_fail("unexpected exit status %u",
+			error_msg_and_fail("unexpected exit status %#x",
 					   WEXITSTATUS(status));
 		}
 		if (WIFSIGNALED(status))
@@ -112,7 +113,7 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 					   WTERMSIG(status));
 		if (!WIFSTOPPED(status) || WSTOPSIG(status) != SIGSTOP) {
 			kill(pid, SIGKILL);
-			error_msg_and_fail("unexpected wait status %x",
+			error_msg_and_fail("unexpected wait status %#x",
 					   status);
 		}
 
@@ -147,6 +148,36 @@ test_peeksiginfo(unsigned long pid, const unsigned long bad_request)
 			perror_msg_and_fail("ptrace");
 		}
 		printf("ptrace(PTRACE_CONT, %ld, NULL, 0) = 0\n", pid);
+	}
+}
+
+static void
+test_getregset_setregset(unsigned int pid)
+{
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct iovec, iov);
+	unsigned long addr = (uintptr_t) (iov + 1);
+
+	iov->iov_base = (void *) addr;
+	iov->iov_len = sizeof(kernel_ulong_t);
+
+	do_ptrace(PTRACE_GETREGSET, pid, 1, (uintptr_t) iov);
+	printf("ptrace(PTRACE_GETREGSET, %u, NT_PRSTATUS"
+	       ", {iov_base=%p, iov_len=%lu}) = %s\n",
+	       pid, iov->iov_base, (unsigned long) iov->iov_len, errstr);
+
+	do_ptrace(PTRACE_SETREGSET, pid, 3, (uintptr_t) iov);
+	printf("ptrace(PTRACE_SETREGSET, %u, NT_PRPSINFO"
+	       ", {iov_base=%p, iov_len=%lu}) = %s\n",
+	       pid, iov->iov_base, (unsigned long) iov->iov_len, errstr);
+
+	for (; addr > (uintptr_t) iov; --addr) {
+		do_ptrace(PTRACE_GETREGSET, pid, 1, addr);
+		printf("ptrace(PTRACE_GETREGSET, %u, NT_PRSTATUS, %#lx) = %s\n",
+		       pid, addr, errstr);
+
+		do_ptrace(PTRACE_SETREGSET, pid, 2, addr);
+		printf("ptrace(PTRACE_SETREGSET, %u, NT_FPREGSET, %#lx) = %s\n",
+		       pid, addr, errstr);
 	}
 }
 
@@ -422,15 +453,8 @@ main(void)
 	printf("ptrace(PTRACE_SEIZE, %u, %#lx, PTRACE_O_TRACESYSGOOD) = %s\n",
 	       (unsigned) pid, bad_request, errstr);
 
-	do_ptrace(PTRACE_SETREGSET, pid, 1, bad_request);
-	printf("ptrace(PTRACE_SETREGSET, %u, NT_PRSTATUS, %#lx) = %s\n",
-	       (unsigned) pid, bad_request, errstr);
-
-	do_ptrace(PTRACE_GETREGSET, pid, 3, bad_request);
-	printf("ptrace(PTRACE_GETREGSET, %u, NT_PRPSINFO, %#lx) = %s\n",
-	       (unsigned) pid, bad_request, errstr);
-
 	test_peeksiginfo(pid, bad_request);
+	test_getregset_setregset(pid);
 
 	do_ptrace(PTRACE_TRACEME, 0, 0, 0);
 	printf("ptrace(PTRACE_TRACEME) = %s\n", errstr);
