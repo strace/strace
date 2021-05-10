@@ -102,6 +102,7 @@ libstrace_a_SOURCES =	\
 	fetch_bpf_fprog.c \
 	fetch_indirect_syscall_args.c \
 	fetch_struct_flock.c \
+	fetch_struct_iovec.c \
 	fetch_struct_keyctl_kdf_params.c \
 	fetch_struct_mmsghdr.c \
 	fetch_struct_msghdr.c \
@@ -144,6 +145,7 @@ libstrace_a_SOURCES =	\
 	ioctl.c		\
 	ioperm.c	\
 	ioprio.c	\
+	iovec.h		\
 	ipc.c \
 	ipc_defs.h	\
 	ipc_msg.c	\
