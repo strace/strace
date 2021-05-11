@@ -148,6 +148,20 @@ decode_seccomp_metadata(struct tcb *const tcp,
 	return 0;
 }
 
+static void
+decode_regset(struct tcb *const tcp, const strace_iovec *iov,
+	      const unsigned int nt)
+{
+	switch (nt) {
+		case NT_PRSTATUS:
+			decode_prstatus_regset(tcp, iov->iov_base, iov->iov_len);
+			break;
+		default:
+			printaddr(iov->iov_base);
+			break;
+	}
+}
+
 static int
 decode_getregset(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const unsigned int nt)
@@ -165,7 +179,8 @@ decode_getregset(struct tcb *const tcp, const kernel_ulong_t addr,
 		const unsigned long old_len = get_tcb_priv_ulong(tcp);
 
 		tprint_struct_begin();
-		PRINT_FIELD_X(iov, iov_base);
+		tprints_field_name("iov_base");
+		decode_regset(tcp, &iov, nt);
 		tprint_struct_next();
 
 		if (old_len == iov.iov_len) {
@@ -195,7 +210,8 @@ decode_setregset(struct tcb *const tcp, const kernel_ulong_t addr,
 		}
 
 		tprint_struct_begin();
-		PRINT_FIELD_X(iov, iov_base);
+		tprints_field_name("iov_base");
+		decode_regset(tcp, &iov, nt);
 		tprint_struct_next();
 
 		PRINT_FIELD_U(iov, iov_len);

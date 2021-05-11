@@ -280,6 +280,7 @@ libstrace_a_SOURCES =	\
 	readlink.c	\
 	reboot.c	\
 	regs.h		\
+	regset.c	\
 	renameat.c	\
 	resource.c	\
 	retval.c	\
@@ -540,6 +541,8 @@ EXTRA_DIST =				\
 	linux/csky/syscallent.h		\
 	linux/generic/arch_defs_.h		\
 	linux/generic/arch_kvm.c		\
+	linux/generic/arch_prstatus_regset.c	\
+	linux/generic/arch_prstatus_regset.h	\
 	linux/generic/arch_regs.h		\
 	linux/generic/arch_rt_sigframe.c	\
 	linux/generic/arch_sigreturn.c		\
