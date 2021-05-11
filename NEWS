@@ -3,6 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Print netlink data in a more structured way.
+  * Implemented decoding of NT_PRSTATUS regsets of PTRACE_GETREGSET and
+    PTRACE_SETREGSET requests.
 
 * Bug fixes
 

@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "print_fields.h"
 
 #include <errno.h>
 #include "ptrace.h"
@@ -22,6 +23,7 @@
 #include <unistd.h>
 #include <linux/audit.h>
 #include <sys/uio.h>
+#include <sys/user.h>
 
 static const char *errstr;
 
@@ -159,7 +161,203 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		return;
 	}
 
+#undef TRACEE_REGS_STRUCT
+#if defined __x86_64__ || defined __i386__
+# define TRACEE_REGS_STRUCT struct user_regs_struct
+#endif
+
+#ifdef TRACEE_REGS_STRUCT
+	const TRACEE_REGS_STRUCT *const regs = rs;
+
+	fputs("{", stdout);
+
+# if defined __x86_64__
+
+	PRINT_FIELD_X(*regs, r15);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r14)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r14);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r13)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r13);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r12)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r12);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rbp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rbp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rbx)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rbx);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r11)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r11);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r10)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r10);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r9)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r9);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, r8)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, r8);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rax)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rax);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rcx)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rcx);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rdx)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rdx);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rsi)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rsi);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rdi)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rdi);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, orig_rax)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, orig_rax);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rip)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rip);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, cs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, cs);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, eflags)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, eflags);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rsp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rsp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ss)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ss);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fs_base)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fs_base);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, gs_base)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, gs_base);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ds)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ds);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, es)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, es);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fs);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, gs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, gs);
+	}
+
+# elif defined __i386__
+
+	PRINT_FIELD_X(*regs, ebx);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ecx)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ecx);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, edx)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, edx);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, esi)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, esi);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, edi)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, edi);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ebp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ebp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, eax)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, eax);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xds)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xds);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xes)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xes);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xfs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xfs);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xgs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xgs);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, orig_eax)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, orig_eax);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, eip)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, eip);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xcs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xcs);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, eflags)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, eflags);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, esp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, esp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xss)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xss);
+	}
+
+# endif /* __x86_64__ || __i386__ */
+
+	if (size > sizeof(*regs))
+		fputs(", ...", stdout);
+	fputs("}", stdout);
+
+#else /* !TRACEE_REGS_STRUCT */
+
 	printf("%p", rs);
+
+#endif /* TRACEE_REGS_STRUCT */
 }
 
 static unsigned int actual_prstatus_size;

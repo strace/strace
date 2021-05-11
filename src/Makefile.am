@@ -581,6 +581,8 @@ EXTRA_DIST =				\
 	linux/hppa/userent.h		\
 	linux/i386/arch_defs_.h		\
 	linux/i386/arch_kvm.c		\
+	linux/i386/arch_prstatus_regset.c \
+	linux/i386/arch_prstatus_regset.h \
 	linux/i386/arch_regs.c		\
 	linux/i386/arch_rt_sigframe.c	\
 	linux/i386/arch_sigreturn.c	\
@@ -885,6 +887,8 @@ EXTRA_DIST =				\
 	linux/x32/arch_defs_.h		\
 	linux/x32/arch_get_personality.c \
 	linux/x32/arch_kvm.c		\
+	linux/x32/arch_prstatus_regset.c \
+	linux/x32/arch_prstatus_regset.h \
 	linux/x32/arch_regs.c		\
 	linux/x32/arch_regs.h		\
 	linux/x32/arch_rt_sigframe.c	\
@@ -909,6 +913,8 @@ EXTRA_DIST =				\
 	linux/x86_64/arch_defs_.h	\
 	linux/x86_64/arch_get_personality.c \
 	linux/x86_64/arch_kvm.c		\
+	linux/x86_64/arch_prstatus_regset.c \
+	linux/x86_64/arch_prstatus_regset.h \
 	linux/x86_64/arch_regs.c	\
 	linux/x86_64/arch_regs.h	\
 	linux/x86_64/arch_rt_sigframe.c	\
