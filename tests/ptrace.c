@@ -164,6 +164,8 @@ print_prstatus_regset(const void *const rs, const size_t size)
 #undef TRACEE_REGS_STRUCT
 #if defined __x86_64__ || defined __i386__
 # define TRACEE_REGS_STRUCT struct user_regs_struct
+#elif defined __powerpc__ || defined __powerpc64__
+# define TRACEE_REGS_STRUCT struct pt_regs
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -347,7 +349,74 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		PRINT_FIELD_X(*regs, xss);
 	}
 
-# endif /* __x86_64__ || __i386__ */
+# elif defined __powerpc__ || defined __powerpc64__
+
+	fputs("gpr=[", stdout);
+	for (unsigned int i = 0; i < ARRAY_SIZE(regs->gpr); ++i) {
+		if (size > i * sizeof(regs->gpr[i])) {
+			if (i)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->gpr[i]);
+		}
+	}
+	fputs("]", stdout);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, nip)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, nip);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, msr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, msr);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, orig_gpr3)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, orig_gpr3);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ctr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ctr);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, link)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, link);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, xer)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, xer);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ccr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ccr);
+	}
+#  ifdef __powerpc64__
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, softe)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, softe);
+	}
+#  else
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, mq)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, mq);
+	}
+#  endif
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, trap)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, trap);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, dar)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, dar);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, dsisr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, dsisr);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, result)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, result);
+	}
+
+# endif /* __x86_64__ || __i386__ || __powerpc__ || __powerpc64__ */
 
 	if (size > sizeof(*regs))
 		fputs(", ...", stdout);
