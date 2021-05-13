@@ -166,6 +166,10 @@ print_prstatus_regset(const void *const rs, const size_t size)
 # define TRACEE_REGS_STRUCT struct user_regs_struct
 #elif defined __powerpc__ || defined __powerpc64__
 # define TRACEE_REGS_STRUCT struct pt_regs
+#elif defined __arm__
+# define TRACEE_REGS_STRUCT struct pt_regs
+#elif defined __arm64__ || defined __aarch64__
+# define TRACEE_REGS_STRUCT struct user_pt_regs
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -416,7 +420,51 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		PRINT_FIELD_X(*regs, result);
 	}
 
-# endif /* __x86_64__ || __i386__ || __powerpc__ || __powerpc64__ */
+# elif defined __arm__
+
+	fputs("uregs=[", stdout);
+	for (unsigned int i = 0; i < ARRAY_SIZE(regs->uregs); ++i) {
+		if (size > i * sizeof(regs->uregs[i])) {
+			if (i)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->uregs[i]);
+		}
+	}
+	fputs("]", stdout);
+
+# elif defined __arm64__ || defined __aarch64__
+
+	fputs("regs=[", stdout);
+	for (unsigned int i = 0; i < ARRAY_SIZE(regs->regs); ++i) {
+		if (size > i * sizeof(regs->regs[i])) {
+			if (i)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->regs[i]);
+		}
+	}
+	fputs("]", stdout);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, sp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, sp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, pc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, pc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, pstate)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, pstate);
+	}
+
+# endif /*
+	   __aarch64__ ||
+	   __arm64__ ||
+	   __arm__ ||
+	   __i386__ ||
+	   __powerpc64__ ||
+	   __powerpc__ ||
+	   __x86_64__
+	 */
 
 	if (size > sizeof(*regs))
 		fputs(", ...", stdout);

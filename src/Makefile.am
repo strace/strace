@@ -446,6 +446,8 @@ EXTRA_DIST =				\
 	linux/64/syscallent.h		\
 	linux/aarch64/arch_defs_.h	\
 	linux/aarch64/arch_get_personality.c \
+	linux/aarch64/arch_prstatus_regset.c \
+	linux/aarch64/arch_prstatus_regset.h \
 	linux/aarch64/arch_regs.c	\
 	linux/aarch64/arch_sigreturn.c	\
 	linux/aarch64/get_error.c	\
@@ -490,6 +492,8 @@ EXTRA_DIST =				\
 	linux/arc/set_scno.c		\
 	linux/arc/syscallent.h		\
 	linux/arm/arch_defs_.h		\
+	linux/arm/arch_prstatus_regset.c \
+	linux/arm/arch_prstatus_regset.h \
 	linux/arm/arch_regs.c		\
 	linux/arm/arch_sigreturn.c	\
 	linux/arm/get_error.c		\
