@@ -775,6 +775,8 @@ EXTRA_DIST =				\
 	linux/riscv64/set_scno.c		\
 	linux/riscv64/syscallent.h	\
 	linux/s390/arch_defs_.h		\
+	linux/s390/arch_prstatus_regset.c \
+	linux/s390/arch_prstatus_regset.h \
 	linux/s390/arch_regs.c		\
 	linux/s390/arch_sigreturn.c	\
 	linux/s390/check_scno.c		\
@@ -793,6 +795,8 @@ EXTRA_DIST =				\
 	linux/s390/userent1.h		\
 	linux/s390x/arch_defs_.h	\
 	linux/s390x/arch_get_personality.c \
+	linux/s390x/arch_prstatus_regset.c \
+	linux/s390x/arch_prstatus_regset.h \
 	linux/s390x/arch_regs.c		\
 	linux/s390x/arch_sigreturn.c	\
 	linux/s390x/check_scno.c	\

@@ -170,6 +170,8 @@ print_prstatus_regset(const void *const rs, const size_t size)
 # define TRACEE_REGS_STRUCT struct pt_regs
 #elif defined __arm64__ || defined __aarch64__
 # define TRACEE_REGS_STRUCT struct user_pt_regs
+#elif defined __s390__ || defined __s390x__
+# define TRACEE_REGS_STRUCT s390_regs
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -456,6 +458,44 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		PRINT_FIELD_X(*regs, pstate);
 	}
 
+# elif defined __s390__ || defined __s390x__
+
+	fputs("psw={", stdout);
+	PRINT_FIELD_X(regs->psw, mask);
+	if (size >= sizeof(regs->psw)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(regs->psw, addr);
+	}
+	fputs("}", stdout);
+	if (size > offsetof(TRACEE_REGS_STRUCT, gprs)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, gprs);
+		fputs(", gprs=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->gprs); ++i) {
+			if (len > i * sizeof(regs->gprs[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->gprs[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, acrs)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, acrs);
+		fputs(", acrs=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->acrs); ++i) {
+			if (len > i * sizeof(regs->acrs[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->acrs[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, orig_gpr2)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, orig_gpr2);
+	}
+
 # endif /*
 	   __aarch64__ ||
 	   __arm64__ ||
@@ -463,6 +503,8 @@ print_prstatus_regset(const void *const rs, const size_t size)
 	   __i386__ ||
 	   __powerpc64__ ||
 	   __powerpc__ ||
+	   __s390__ ||
+	   __s390x__ ||
 	   __x86_64__
 	 */
 
