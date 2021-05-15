@@ -172,6 +172,34 @@ print_prstatus_regset(const void *const rs, const size_t size)
 # define TRACEE_REGS_STRUCT struct user_pt_regs
 #elif defined __s390__ || defined __s390x__
 # define TRACEE_REGS_STRUCT s390_regs
+#elif defined __sparc__
+# ifdef __arch64__
+typedef struct {
+	unsigned long g[8];
+	unsigned long o[8];
+	unsigned long l[8];
+	unsigned long i[8];
+	unsigned long tstate;
+	unsigned long tpc;
+	unsigned long tnpc;
+	unsigned long y;
+} sparc64_regs;
+#  define TRACEE_REGS_STRUCT sparc64_regs
+# else /* sparc32 */
+typedef struct {
+	unsigned int g[8];
+	unsigned int o[8];
+	unsigned int l[8];
+	unsigned int i[8];
+	unsigned int psr;
+	unsigned int pc;
+	unsigned int npc;
+	unsigned int y;
+	unsigned int wim;
+	unsigned int tbr;
+} sparc32_regs;
+#  define TRACEE_REGS_STRUCT sparc32_regs
+# endif
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -496,6 +524,96 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		PRINT_FIELD_X(*regs, orig_gpr2);
 	}
 
+# elif defined __sparc__
+	fputs("g=[", stdout);
+	for (unsigned int j = 0; j < ARRAY_SIZE(regs->g); ++j) {
+		if (size > j * sizeof(regs->g[j])) {
+			if (j)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->g[j]);
+		}
+	}
+	fputs("]", stdout);
+	if (size > offsetof(TRACEE_REGS_STRUCT, o)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, o);
+		fputs(", o=[", stdout);
+		for (unsigned int j = 0; j < ARRAY_SIZE(regs->o); ++j) {
+			if (len > j * sizeof(regs->o[j])) {
+				if (j)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->o[j]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, l)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, l);
+		fputs(", l=[", stdout);
+		for (unsigned int j = 0; j < ARRAY_SIZE(regs->l); ++j) {
+			if (len > j * sizeof(regs->l[j])) {
+				if (j)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->l[j]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, i)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, i);
+		fputs(", i=[", stdout);
+		for (unsigned int j = 0; j < ARRAY_SIZE(regs->i); ++j) {
+			if (len > j * sizeof(regs->i[j])) {
+				if (j)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->i[j]);
+			}
+		}
+		fputs("]", stdout);
+	}
+#  ifdef __arch64__
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, tstate)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, tstate);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, tpc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, tpc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, tnpc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, tnpc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, y)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, y);
+	}
+#  else /* sparc32 */
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, psr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, psr);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, pc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, pc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, npc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, npc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, y)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, y);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, wim)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, wim);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, tbr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, tbr);
+	}
+#  endif
+
 # endif /*
 	   __aarch64__ ||
 	   __arm64__ ||
@@ -505,6 +623,7 @@ print_prstatus_regset(const void *const rs, const size_t size)
 	   __powerpc__ ||
 	   __s390__ ||
 	   __s390x__ ||
+	   __sparc__ ||
 	   __x86_64__
 	 */
 

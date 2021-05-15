@@ -843,6 +843,8 @@ EXTRA_DIST =				\
 	linux/sh64/userent.h		\
 	linux/sparc/arch_defs_.h	\
 	linux/sparc/arch_getrval2.c	\
+	linux/sparc/arch_prstatus_regset.c \
+	linux/sparc/arch_prstatus_regset.h \
 	linux/sparc/arch_regs.c		\
 	linux/sparc/arch_sigreturn.c	\
 	linux/sparc/errnoent.h		\
@@ -861,6 +863,8 @@ EXTRA_DIST =				\
 	linux/sparc64/arch_defs_.h	\
 	linux/sparc64/arch_get_personality.c \
 	linux/sparc64/arch_getrval2.c	\
+	linux/sparc64/arch_prstatus_regset.c \
+	linux/sparc64/arch_prstatus_regset.h \
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_rt_sigframe.c	\
 	linux/sparc64/arch_sigreturn.c	\
