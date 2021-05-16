@@ -200,6 +200,8 @@ typedef struct {
 } sparc32_regs;
 #  define TRACEE_REGS_STRUCT sparc32_regs
 # endif
+#elif defined __riscv__
+# define TRACEE_REGS_STRUCT struct user_regs_struct
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -525,6 +527,7 @@ typedef struct {
 	}
 
 # elif defined __sparc__
+
 	fputs("g=[", stdout);
 	for (unsigned int j = 0; j < ARRAY_SIZE(regs->g); ++j) {
 		if (size > j * sizeof(regs->g[j])) {
@@ -614,6 +617,137 @@ typedef struct {
 	}
 #  endif
 
+# elif defined __riscv__
+
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, pc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, pc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ra)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ra);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, sp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, sp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, gp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, gp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, tp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, tp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t0)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t0);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t1)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t1);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t2)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t2);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s0)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s0);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s1)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s1);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a0)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a0);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a1)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a1);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a2)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a2);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a3)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a3);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a4)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a4);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a5)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a5);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a6)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a6);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, a7)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, a7);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s2)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s2);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s3)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s3);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s4)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s4);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s5)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s5);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s6)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s6);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s7)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s7);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s8)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s8);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s9)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s9);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s10)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s10);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, s11)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, s11);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t3)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t3);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t4)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t4);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t5)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t5);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, t6)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, t6);
+	}
+
 # endif /*
 	   __aarch64__ ||
 	   __arm64__ ||
@@ -621,6 +755,7 @@ typedef struct {
 	   __i386__ ||
 	   __powerpc64__ ||
 	   __powerpc__ ||
+	   __riscv__ ||
 	   __s390__ ||
 	   __s390x__ ||
 	   __sparc__ ||

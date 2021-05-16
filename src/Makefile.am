@@ -764,6 +764,8 @@ EXTRA_DIST =				\
 	linux/powerpc64le/set_scno.c	\
 	linux/powerpc64le/syscallent.h	\
 	linux/powerpc64le/userent.h	\
+	linux/riscv64/arch_prstatus_regset.c \
+	linux/riscv64/arch_prstatus_regset.h \
 	linux/riscv64/arch_regs.c		\
 	linux/riscv64/get_error.c		\
 	linux/riscv64/get_scno.c		\
