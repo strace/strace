@@ -202,6 +202,17 @@ typedef struct {
 # endif
 #elif defined __riscv__
 # define TRACEE_REGS_STRUCT struct user_regs_struct
+#elif defined __mips__
+typedef struct {
+	unsigned long regs[32];
+	unsigned long lo;
+	unsigned long hi;
+	unsigned long cp0_epc;
+	unsigned long cp0_badvaddr;
+	unsigned long cp0_status;
+	unsigned long cp0_cause;
+} mips_regs;
+#  define TRACEE_REGS_STRUCT mips_regs
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -748,11 +759,48 @@ typedef struct {
 		PRINT_FIELD_X(*regs, t6);
 	}
 
+# elif defined __mips__
+
+	fputs("regs=[", stdout);
+	for (unsigned int i = 0; i < ARRAY_SIZE(regs->regs); ++i) {
+		if (size > i * sizeof(regs->regs[i])) {
+			if (i)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->regs[i]);
+		}
+	}
+	fputs("]", stdout);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, lo)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, lo);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, hi)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, hi);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, cp0_epc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, cp0_epc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, cp0_badvaddr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, cp0_badvaddr);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, cp0_status)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, cp0_status);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, cp0_cause)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, cp0_cause);
+	}
+
 # endif /*
 	   __aarch64__ ||
 	   __arm64__ ||
 	   __arm__ ||
 	   __i386__ ||
+	   __mips__ ||
 	   __powerpc64__ ||
 	   __powerpc__ ||
 	   __riscv__ ||

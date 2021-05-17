@@ -662,6 +662,8 @@ EXTRA_DIST =				\
 	linux/microblaze/userent.h	\
 	linux/mips/arch_defs_.h		\
 	linux/mips/arch_getrval2.c	\
+	linux/mips/arch_prstatus_regset.c \
+	linux/mips/arch_prstatus_regset.h \
 	linux/mips/arch_regs.c		\
 	linux/mips/arch_sigreturn.c	\
 	linux/mips/errnoent.h		\
