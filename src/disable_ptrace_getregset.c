@@ -16,8 +16,6 @@
 #ifdef HAVE_GETREGS_OLD
 # if defined __x86_64__
 #  define DISABLE_PTRACE_REQUEST PTRACE_GETREGSET
-# elif defined __powerpc__
-#  define DISABLE_PTRACE_REQUEST PTRACE_GETREGS
 # endif
 #endif
 #define DEFAULT_PROGRAM_INVOCATION_NAME	"disable_ptrace_getregset"

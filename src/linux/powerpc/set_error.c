@@ -9,17 +9,10 @@ static int
 arch_set_r3_ccr(struct tcb *tcp, const unsigned long r3,
 		const unsigned long ccr_set, const unsigned long ccr_clear)
 {
-	if (ptrace_syscall_info_is_valid() &&
-	    upeek(tcp, sizeof(long) * PT_CCR, &ppc_regs.ccr))
-                return -1;
-	const unsigned long old_ccr = ppc_regs.ccr;
 	ppc_regs.gpr[3] = r3;
 	ppc_regs.ccr |= ccr_set;
 	ppc_regs.ccr &= ~ccr_clear;
-	if (ppc_regs.ccr != old_ccr &&
-	    upoke(tcp, sizeof(long) * PT_CCR, ppc_regs.ccr))
-		return -1;
-	return upoke(tcp, sizeof(long) * (PT_R0 + 3), ppc_regs.gpr[3]);
+	return set_regs(tcp->pid);
 }
 
 static int

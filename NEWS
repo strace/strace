@@ -8,6 +8,10 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Bug fixes
 
+* Portability
+  * On powerpc and powerpc64, linux kernel >= 2.6.23 is required.
+    Older versions without a decent PTRACE_GETREGS support will not work.
+
 Noteworthy changes in release 5.12 (2021-04-26)
 ===============================================
 

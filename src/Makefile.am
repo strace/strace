@@ -716,8 +716,6 @@ EXTRA_DIST =				\
 	linux/powerpc/get_error.c	\
 	linux/powerpc/get_scno.c	\
 	linux/powerpc/get_syscall_args.c	\
-	linux/powerpc/getregs_old.c	\
-	linux/powerpc/getregs_old.h	\
 	linux/powerpc/ioctls_arch0.h	\
 	linux/powerpc/ioctls_inc0.h	\
 	linux/powerpc/raw_syscall.h	\
@@ -736,8 +734,6 @@ EXTRA_DIST =				\
 	linux/powerpc64/get_error.c	\
 	linux/powerpc64/get_scno.c	\
 	linux/powerpc64/get_syscall_args.c	\
-	linux/powerpc64/getregs_old.c	\
-	linux/powerpc64/getregs_old.h	\
 	linux/powerpc64/ioctls_arch0.h	\
 	linux/powerpc64/ioctls_arch1.h	\
 	linux/powerpc64/ioctls_inc0.h	\
