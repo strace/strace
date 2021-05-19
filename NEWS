@@ -5,6 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Print netlink data in a more structured way.
   * Implemented decoding of NT_PRSTATUS regsets of PTRACE_GETREGSET and
     PTRACE_SETREGSET requests.
+  * Implemented powerpc System Call Vectored ABI support.
 
 * Bug fixes
 

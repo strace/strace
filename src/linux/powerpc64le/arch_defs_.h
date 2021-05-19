@@ -6,4 +6,3 @@
  */
 
 #define HAVE_ARCH_OLD_SELECT 1
-#define HAVE_ARCH_DEDICATED_ERR_REG 1

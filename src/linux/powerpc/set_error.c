@@ -6,23 +6,22 @@
  */
 
 static int
-arch_set_r3_ccr(struct tcb *tcp, const unsigned long r3,
-		const unsigned long ccr_set, const unsigned long ccr_clear)
-{
-	ppc_regs.gpr[3] = r3;
-	ppc_regs.ccr |= ccr_set;
-	ppc_regs.ccr &= ~ccr_clear;
-	return set_regs(tcp->pid);
-}
-
-static int
 arch_set_error(struct tcb *tcp)
 {
-	return arch_set_r3_ccr(tcp, tcp->u_error, 0x10000000, 0);
+	if (PPC_TRAP_IS_SCV(ppc_regs.trap)) {
+		ppc_regs.gpr[3] = -tcp->u_error;
+	} else {
+		ppc_regs.gpr[3] = tcp->u_error;
+		ppc_regs.ccr |= 0x10000000;
+	}
+	return set_regs(tcp->pid);
 }
 
 static int
 arch_set_success(struct tcb *tcp)
 {
-	return arch_set_r3_ccr(tcp, tcp->u_rval, 0, 0x10000000);
+	ppc_regs.gpr[3] = tcp->u_rval;
+	if (!PPC_TRAP_IS_SCV(ppc_regs.trap))
+		ppc_regs.ccr &= ~0x10000000;
+	return set_regs(tcp->pid);
 }

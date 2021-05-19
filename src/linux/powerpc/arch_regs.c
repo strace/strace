@@ -10,3 +10,7 @@ static struct pt_regs ppc_regs;
 #define ARCH_REGS_FOR_GETREGS ppc_regs
 #define ARCH_PC_REG ppc_regs.nip
 #define ARCH_SP_REG ppc_regs.gpr[1]
+
+#define PPC_TRAP_FLAGS_MASK	0xf
+#define PPC_TRAP(trap)		(trap & ~PPC_TRAP_FLAGS_MASK)
+#define PPC_TRAP_IS_SCV(trap)	(PPC_TRAP(trap) == 0x3000)
