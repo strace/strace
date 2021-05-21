@@ -821,7 +821,19 @@ typedef struct {
 #endif /* TRACEE_REGS_STRUCT */
 }
 
+static void
+print_fpregset(const void *const rs, const size_t size)
+{
+	if (!size || size % sizeof(kernel_ulong_t)) {
+		printf("%p", rs);
+		return;
+	}
+
+	printf("%p", rs);
+}
+
 static unsigned int actual_prstatus_size;
+static unsigned int actual_fpregset_size;
 
 static void
 do_getregset_setregset(const unsigned int pid,
@@ -829,6 +841,7 @@ do_getregset_setregset(const unsigned int pid,
 		       const char *const nt_str,
 		       void *const regbuf,
 		       const unsigned int regsize,
+		       unsigned int *actual_size,
 		       struct iovec *const iov,
 		       void (*print_regset_fn)(const void *, size_t))
 {
@@ -838,30 +851,30 @@ do_getregset_setregset(const unsigned int pid,
 	if (iov->iov_len == regsize) {
 		printf("ptrace(PTRACE_GETREGSET, %u, %s"
 		       ", {iov_base=", pid, nt_str);
-		print_prstatus_regset(iov->iov_base, iov->iov_len);
+		print_regset_fn(iov->iov_base, iov->iov_len);
 		printf(", iov_len=%lu}) = %s\n",
 		       (unsigned long) iov->iov_len, errstr);
-		if (actual_prstatus_size)
+		if (*actual_size)
 			return;	/* skip PTRACE_SETREGSET */
 	} else {
 		printf("ptrace(PTRACE_GETREGSET, %u, %s"
 		       ", {iov_base=", pid, nt_str);
-		print_prstatus_regset(iov->iov_base, iov->iov_len);
+		print_regset_fn(iov->iov_base, iov->iov_len);
 		printf(", iov_len=%u => %lu}) = %s\n",
 		       regsize, (unsigned long) iov->iov_len, errstr);
-		if (actual_prstatus_size)
+		if (*actual_size)
 			error_msg_and_fail("iov_len changed again"
 					   " from %u to %lu", regsize,
 					   (unsigned long) iov->iov_len);
-		actual_prstatus_size = iov->iov_len;
+		*actual_size = iov->iov_len;
 	}
 
 #if defined __sparc__ && !defined __arch64__
 	/*
-	 * On sparc32 PTRACE_SETREGSET of size greater than 120
+	 * On sparc32 PTRACE_SETREGSET NT_PRSTATUS of size greater than 120
 	 * has interesting side effects.
 	 */
-	if (regsize > 120)
+	if (nt == 1 && regsize > 120)
 		return;
 #endif /* __sparc__ && !__arch64__ */
 
@@ -870,13 +883,13 @@ do_getregset_setregset(const unsigned int pid,
 	if (iov->iov_len == regsize) {
 		printf("ptrace(PTRACE_SETREGSET, %u, %s"
 		       ", {iov_base=", pid, nt_str);
-		print_prstatus_regset(iov->iov_base, regsize);
+		print_regset_fn(iov->iov_base, regsize);
 		printf(", iov_len=%lu}) = %s\n",
 		       (unsigned long) iov->iov_len, errstr);
 	} else {
 		printf("ptrace(PTRACE_SETREGSET, %u, %s"
 		       ", {iov_base=", pid, nt_str);
-		print_prstatus_regset(iov->iov_base, regsize);
+		print_regset_fn(iov->iov_base, regsize);
 		printf(", iov_len=%u => %lu}) = %s\n",
 		       regsize, (unsigned long) iov->iov_len, errstr);
 	}
@@ -926,8 +939,8 @@ test_getregset_setregset(unsigned int pid)
 		_exit(0);
 	}
 
-	const unsigned int prstatus_buf_size = 2048;
-	char *const prstatus_buf_endptr = midtail_alloc(0, prstatus_buf_size);
+	const unsigned int regset_buf_size = 2048;
+	char *const regset_buf_endptr = midtail_alloc(0, regset_buf_size);
 
 	for (;;) {
 		int status, tracee, saved;
@@ -958,13 +971,25 @@ test_getregset_setregset(unsigned int pid)
 		}
 
 		for (unsigned int i = actual_prstatus_size;
-		     i <= prstatus_buf_size &&
+		     i <= regset_buf_size &&
 		     (!actual_prstatus_size ||
 		      actual_prstatus_size + 1 >= i);
 		     ++i) {
 			do_getregset_setregset(pid, 1, "NT_PRSTATUS",
-					       prstatus_buf_endptr - i, i, iov,
-					       print_prstatus_regset);
+					       regset_buf_endptr - i, i,
+					       &actual_prstatus_size,
+					       iov, print_prstatus_regset);
+		}
+
+		for (unsigned int i = actual_fpregset_size;
+		     i <= regset_buf_size &&
+		     (!actual_fpregset_size ||
+		      actual_fpregset_size + 1 >= i);
+		     ++i) {
+			do_getregset_setregset(pid, 2, "NT_FPREGSET",
+					       regset_buf_endptr - i, i,
+					       &actual_fpregset_size,
+					       iov, print_fpregset);
 		}
 
 		if (WSTOPSIG(status) == SIGSTOP)

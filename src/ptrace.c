@@ -156,6 +156,9 @@ decode_regset(struct tcb *const tcp, const strace_iovec *iov,
 		case NT_PRSTATUS:
 			decode_prstatus_regset(tcp, iov->iov_base, iov->iov_len);
 			break;
+		case NT_FPREGSET:
+			decode_fpregset(tcp, iov->iov_base, iov->iov_len);
+			break;
 		default:
 			printaddr(iov->iov_base);
 			break;

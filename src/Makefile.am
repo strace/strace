@@ -544,6 +544,8 @@ EXTRA_DIST =				\
 	linux/csky/set_scno.c		\
 	linux/csky/syscallent.h		\
 	linux/generic/arch_defs_.h		\
+	linux/generic/arch_fpregset.c		\
+	linux/generic/arch_fpregset.h		\
 	linux/generic/arch_kvm.c		\
 	linux/generic/arch_prstatus_regset.c	\
 	linux/generic/arch_prstatus_regset.h	\
