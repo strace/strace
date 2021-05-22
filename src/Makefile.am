@@ -586,6 +586,8 @@ EXTRA_DIST =				\
 	linux/hppa/syscallent.h		\
 	linux/hppa/userent.h		\
 	linux/i386/arch_defs_.h		\
+	linux/i386/arch_fpregset.c	\
+	linux/i386/arch_fpregset.h	\
 	linux/i386/arch_kvm.c		\
 	linux/i386/arch_prstatus_regset.c \
 	linux/i386/arch_prstatus_regset.h \
@@ -905,6 +907,8 @@ EXTRA_DIST =				\
 	linux/tile/syscallent1.h	\
 	linux/tile/userent.h		\
 	linux/x32/arch_defs_.h		\
+	linux/x32/arch_fpregset.c	\
+	linux/x32/arch_fpregset.h	\
 	linux/x32/arch_get_personality.c \
 	linux/x32/arch_kvm.c		\
 	linux/x32/arch_prstatus_regset.c \
@@ -931,6 +935,8 @@ EXTRA_DIST =				\
 	linux/x32/syscallent1.h		\
 	linux/x32/userent.h		\
 	linux/x86_64/arch_defs_.h	\
+	linux/x86_64/arch_fpregset.c	\
+	linux/x86_64/arch_fpregset.h	\
 	linux/x86_64/arch_get_personality.c \
 	linux/x86_64/arch_kvm.c		\
 	linux/x86_64/arch_prstatus_regset.c \

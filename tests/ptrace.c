@@ -829,7 +829,142 @@ print_fpregset(const void *const rs, const size_t size)
 		return;
 	}
 
+#undef TRACEE_REGS_STRUCT
+#if defined __x86_64__ || defined __i386__
+# define TRACEE_REGS_STRUCT struct user_fpregs_struct
+#endif
+
+#ifdef TRACEE_REGS_STRUCT
+	const TRACEE_REGS_STRUCT *const regs = rs;
+
+	fputs("{", stdout);
+
+# if defined __i386__
+
+	PRINT_FIELD_X(*regs, cwd);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, swd)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, swd);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, twd)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, twd);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fip)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fip);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fcs)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fcs);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, foo)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, foo);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fos)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fos);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, st_space)) {
+		const size_t len =
+			size - offsetof(TRACEE_REGS_STRUCT, st_space);
+		fputs(", st_space=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->st_space); ++i) {
+			if (len > i * sizeof(regs->st_space[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->st_space[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+
+# elif defined __x86_64__
+
+	PRINT_FIELD_X(*regs, cwd);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, swd)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, swd);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, ftw)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, ftw);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fop)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fop);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rip)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rip);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, rdp)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, rdp);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, mxcsr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, mxcsr);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, mxcr_mask)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, mxcr_mask);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, st_space)) {
+		const size_t len =
+			size - offsetof(TRACEE_REGS_STRUCT, st_space);
+		fputs(", st_space=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->st_space); ++i) {
+			if (len > i * sizeof(regs->st_space[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->st_space[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, xmm_space)) {
+		const size_t len =
+			size - offsetof(TRACEE_REGS_STRUCT, xmm_space);
+		fputs(", xmm_space=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->xmm_space); ++i) {
+			if (len > i * sizeof(regs->xmm_space[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->xmm_space[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, padding)) {
+		const size_t len =
+			size - offsetof(TRACEE_REGS_STRUCT, padding);
+		fputs(", padding=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->padding); ++i) {
+			if (len > i * sizeof(regs->padding[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->padding[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+
+# endif /*
+	   __i386__ ||
+	   __x86_64__
+	 */
+
+	if (size > sizeof(*regs))
+		fputs(", ...", stdout);
+	fputs("}", stdout);
+
+#else /* !TRACEE_REGS_STRUCT */
+
 	printf("%p", rs);
+
+#endif /* TRACEE_REGS_STRUCT */
 }
 
 static unsigned int actual_prstatus_size;
