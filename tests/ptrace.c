@@ -821,10 +821,16 @@ typedef struct {
 #endif /* TRACEE_REGS_STRUCT */
 }
 
+#if defined __powerpc__ || defined __powerpc64__
+# define FPREGSET_SLOT_SIZE sizeof(uint64_t)
+#else
+# define FPREGSET_SLOT_SIZE sizeof(kernel_ulong_t)
+#endif
+
 static void
 print_fpregset(const void *const rs, const size_t size)
 {
-	if (!size || size % sizeof(kernel_ulong_t)) {
+	if (!size || size % FPREGSET_SLOT_SIZE) {
 		printf("%p", rs);
 		return;
 	}
@@ -832,6 +838,12 @@ print_fpregset(const void *const rs, const size_t size)
 #undef TRACEE_REGS_STRUCT
 #if defined __x86_64__ || defined __i386__
 # define TRACEE_REGS_STRUCT struct user_fpregs_struct
+#elif defined __powerpc__ || defined __powerpc64__
+typedef struct {
+	uint64_t fpr[32];
+	uint64_t fpscr;
+} ppc_fpregs_struct;
+# define TRACEE_REGS_STRUCT ppc_fpregs_struct
 #endif
 
 #ifdef TRACEE_REGS_STRUCT
@@ -951,8 +963,26 @@ print_fpregset(const void *const rs, const size_t size)
 		fputs("]", stdout);
 	}
 
+# elif defined __powerpc__ || defined __powerpc64__
+
+	fputs("fpr=[", stdout);
+	for (unsigned int i = 0; i < ARRAY_SIZE(regs->fpr); ++i) {
+		if (size > i * sizeof(regs->fpr[i])) {
+			if (i)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->fpr[i]);
+		}
+	}
+	fputs("]", stdout);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fpscr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fpscr);
+	}
+
 # endif /*
 	   __i386__ ||
+	   __powerpc64__ ||
+	   __powerpc__ ||
 	   __x86_64__
 	 */
 

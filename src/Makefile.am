@@ -711,6 +711,8 @@ EXTRA_DIST =				\
 	linux/or1k/syscallent.h		\
 	linux/or1k/userent.h		\
 	linux/powerpc/arch_defs_.h	\
+	linux/powerpc/arch_fpregset.c	\
+	linux/powerpc/arch_fpregset.h	\
 	linux/powerpc/arch_prstatus_regset.c \
 	linux/powerpc/arch_prstatus_regset.h \
 	linux/powerpc/arch_regs.c	\
@@ -728,6 +730,8 @@ EXTRA_DIST =				\
 	linux/powerpc/syscallent.h	\
 	linux/powerpc/userent.h		\
 	linux/powerpc64/arch_defs_.h	\
+	linux/powerpc64/arch_fpregset.c	\
+	linux/powerpc64/arch_fpregset.h	\
 	linux/powerpc64/arch_get_personality.c \
 	linux/powerpc64/arch_prstatus_regset.c \
 	linux/powerpc64/arch_prstatus_regset.h \
@@ -750,6 +754,8 @@ EXTRA_DIST =				\
 	linux/powerpc64/syscallent1.h	\
 	linux/powerpc64/userent.h	\
 	linux/powerpc64le/arch_defs_.h	\
+	linux/powerpc64le/arch_fpregset.c	\
+	linux/powerpc64le/arch_fpregset.h	\
 	linux/powerpc64le/arch_prstatus_regset.c \
 	linux/powerpc64le/arch_prstatus_regset.h \
 	linux/powerpc64le/arch_regs.c	\
