@@ -204,6 +204,9 @@ typedef struct {
 # define TRACEE_REGS_STRUCT struct user_regs_struct
 #elif defined __mips__
 typedef struct {
+# ifdef LINUX_MIPSO32
+	unsigned long unused[6];
+# endif
 	unsigned long regs[32];
 	unsigned long lo;
 	unsigned long hi;
@@ -761,15 +764,18 @@ typedef struct {
 
 # elif defined __mips__
 
-	fputs("regs=[", stdout);
-	for (unsigned int i = 0; i < ARRAY_SIZE(regs->regs); ++i) {
-		if (size > i * sizeof(regs->regs[i])) {
-			if (i)
-				fputs(", ", stdout);
-			PRINT_VAL_X(regs->regs[i]);
+	if (size > offsetof(TRACEE_REGS_STRUCT, regs)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, regs);
+		fputs("regs=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->regs); ++i) {
+			if (len > i * sizeof(regs->regs[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->regs[i]);
+			}
 		}
+		fputs("]", stdout);
 	}
-	fputs("]", stdout);
 	if (size >= offsetofend(TRACEE_REGS_STRUCT, lo)) {
 		fputs(", ", stdout);
 		PRINT_FIELD_X(*regs, lo);

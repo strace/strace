@@ -9,6 +9,9 @@
 # define STRACE_ARCH_PRSTATUS_REGSET_H
 
 typedef struct {
+# ifdef LINUX_MIPSO32
+	unsigned long unused[6];
+# endif
 	unsigned long regs[32];
 	unsigned long lo;
 	unsigned long hi;

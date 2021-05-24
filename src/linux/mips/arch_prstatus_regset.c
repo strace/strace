@@ -17,14 +17,18 @@ arch_decode_prstatus_regset(struct tcb *const tcp,
 		printaddr(addr);
 	} else if (!umoven_or_printaddr(tcp, addr, fetch_size, &regs)) {
 		tprint_struct_begin();
-		PRINT_FIELD_ARRAY_UPTO(regs, regs,
-				       fetch_size / SIZEOF_LONG, tcp,
+		if (fetch_size > offsetof(struct_prstatus_regset, regs)) {
+			const size_t len = fetch_size -
+				offsetof(struct_prstatus_regset, regs);
+			PRINT_FIELD_ARRAY_UPTO(regs, regs,
+					       len / SIZEOF_LONG, tcp,
 #if SIZEOF_LONG == 4
-				       print_xint32_array_member
+					       print_xint32_array_member
 #else
-				       print_xint64_array_member
+					       print_xint64_array_member
 #endif
-				       );
+					       );
+		}
 		if (fetch_size > offsetof(struct_prstatus_regset, lo)) {
 			tprint_struct_next();
 			PRINT_FIELD_X(regs, lo);
