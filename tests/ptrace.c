@@ -1151,6 +1151,12 @@ test_getregset_setregset(unsigned int pid)
 					       &actual_prstatus_size,
 					       iov, print_prstatus_regset);
 		}
+		/*
+		 * In an unlikely case NT_PRSTATUS is not supported,
+		 * use regset_buf_size.
+		 */
+		if (!actual_prstatus_size)
+			actual_prstatus_size = regset_buf_size;
 
 		for (unsigned int i = actual_fpregset_size;
 		     i <= regset_buf_size &&
