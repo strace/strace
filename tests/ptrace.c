@@ -1168,6 +1168,12 @@ test_getregset_setregset(unsigned int pid)
 					       &actual_fpregset_size,
 					       iov, print_fpregset);
 		}
+		/*
+		 * In an unlikely case NT_FPREGSET is not supported,
+		 * use regset_buf_size.
+		 */
+		if (!actual_fpregset_size)
+			actual_fpregset_size = regset_buf_size;
 
 		if (WSTOPSIG(status) == SIGSTOP)
 			kill(pid, SIGCONT);
