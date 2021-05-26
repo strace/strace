@@ -61,7 +61,7 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 	psi->flags = 1;
 	psi->nr = 42;
 
-	do_ptrace(PTRACE_PEEKSIGINFO, pid, (unsigned long) psi, bad_request);
+	do_ptrace(PTRACE_PEEKSIGINFO, pid, (uintptr_t) psi, bad_request);
 	printf("ptrace(PTRACE_PEEKSIGINFO, %d, {off=%llu"
 	       ", flags=PTRACE_PEEKSIGINFO_SHARED, nr=%u}, %#lx) = %s\n",
 	       pid, psi->off, psi->nr, bad_request, errstr);
@@ -128,7 +128,7 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 		}
 
 		long rc = do_ptrace(PTRACE_PEEKSIGINFO, pid,
-				    (unsigned long) psi, (unsigned long) sigs);
+				    (uintptr_t) psi, (uintptr_t) sigs);
 		if (rc < 0) {
 			printf("ptrace(PTRACE_PEEKSIGINFO, %d"
 			       ", {off=%llu, flags=0, nr=%u}, %p) = %s\n",
@@ -1263,11 +1263,11 @@ main(void)
 	sigaddset(&libc_set, SIGUSR1);
 	memcpy(k_set, &libc_set, sigset_size);
 
-	do_ptrace(PTRACE_SETSIGMASK, pid, sigset_size, (unsigned long) k_set);
+	do_ptrace(PTRACE_SETSIGMASK, pid, sigset_size, (uintptr_t) k_set);
 	printf("ptrace(PTRACE_SETSIGMASK, %d, %u, [USR1]) = %s\n",
 	       pid, sigset_size, errstr);
 
-	do_ptrace(PTRACE_GETSIGMASK, pid, sigset_size, (unsigned long) k_set);
+	do_ptrace(PTRACE_GETSIGMASK, pid, sigset_size, (uintptr_t) k_set);
 	printf("ptrace(PTRACE_GETSIGMASK, %d, %u, %p) = %s\n",
 	       pid, sigset_size, k_set, errstr);
 
@@ -1280,13 +1280,13 @@ main(void)
 	       pid, bad_data, errstr);
 
 	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, 7,
-		  (unsigned long) filter_off);
+		  (uintptr_t) filter_off);
 	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %d, 7, %p) = %s\n",
 	       pid, filter_off, errstr);
 
 	*filter_off = 0xfacefeeddeadc0deULL;
 	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data,
-		  (unsigned long) filter_off);
+		  (uintptr_t) filter_off);
 	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %d, %lu, "
 	       "{filter_off=%" PRIu64 "}) = %s\n",
 	       pid, bad_data, *filter_off, errstr);
@@ -1301,7 +1301,7 @@ main(void)
 	sip->si_errno = ENOENT;
 	sip->si_band = -2;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGIO"
 	       ", si_code=POLL_IN, si_errno=ENOENT, si_band=-2}) = %s\n",
 	       pid, bad_request, errstr);
@@ -1314,7 +1314,7 @@ main(void)
 	sip->si_uid = 3;
 	sip->si_ptr = (void *) bad_request;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGTRAP"
 	       ", si_code=TRAP_BRKPT, si_errno=ENOENT, si_pid=2, si_uid=3"
 	       ", si_int=%d, si_ptr=%p}) = %s\n",
@@ -1326,7 +1326,7 @@ main(void)
 	sip->si_errno = ENOENT;
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGILL"
 	       ", si_code=ILL_ILLOPC, si_errno=ENOENT, si_addr=%p}) = %s\n",
 	       pid, bad_request, sip->si_addr, errstr);
@@ -1337,7 +1337,7 @@ main(void)
 	sip->si_errno = ENOENT;
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGFPE"
 	       ", si_code=FPE_INTDIV, si_errno=ENOENT, si_addr=%p}) = %s\n",
 	       pid, bad_request, sip->si_addr, errstr);
@@ -1348,7 +1348,7 @@ main(void)
 	sip->si_errno = -2;
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGBUS"
 	       ", si_code=BUS_ADRALN, si_errno=%u, si_addr=%p}) = %s\n",
 	       pid, bad_request, sip->si_errno, sip->si_addr, errstr);
@@ -1361,7 +1361,7 @@ main(void)
 	sip->si_uid = 3;
 	sip->si_ptr = 0;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGPROF"
 	       ", si_code=%#x, si_errno=%u, si_pid=0, si_uid=3}) = %s\n",
 	       pid, bad_request, sip->si_code, sip->si_errno, errstr);
@@ -1375,7 +1375,7 @@ main(void)
 	sip->si_syscall = -1U;
 	sip->si_arch = AUDIT_ARCH_X86_64;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
 	       ", si_code=SYS_SECCOMP, si_errno=ENOENT, si_call_addr=%p"
 	       ", si_syscall=%u, si_arch=AUDIT_ARCH_X86_64}) = %s\n",
@@ -1386,7 +1386,7 @@ main(void)
 	sip->si_syscall = __NR_read;
 	sip->si_arch = 0xda7a1057;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
 	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
 	       ", si_syscall=__NR_read, si_arch=%#x /* AUDIT_ARCH_??? */})"
@@ -1403,7 +1403,7 @@ main(void)
 	sip->si_overrun = -1;
 	sip->si_ptr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGHUP"
 	       ", si_code=SI_TIMER, si_errno=ENOENT, si_timerid=%#x"
 	       ", si_overrun=%d, si_int=%d, si_ptr=%p}) = %s\n",
@@ -1411,7 +1411,7 @@ main(void)
 	       sip->si_int, sip->si_ptr, errstr);
 #endif
 
-	do_ptrace(PTRACE_GETSIGINFO, pid, bad_request, (unsigned long) sip);
+	do_ptrace(PTRACE_GETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_GETSIGINFO, %d, %#lx, %p) = %s\n",
 	       pid, bad_request, sip, errstr);
 
