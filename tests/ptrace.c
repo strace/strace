@@ -44,6 +44,24 @@ do_ptrace(const unsigned long request,
 	return rc;
 }
 
+#if defined PTRACE_GETREGS || defined PTRACE_GETFPREGS
+static long
+do_ptrace_regs(const unsigned long request,
+	       const unsigned int pid,
+	       const unsigned long regs_addr)
+{
+	const unsigned long bad = (unsigned long) 0xdeadbeefdeadbeefULL;
+# ifdef __sparc__
+	const unsigned long arg_addr = regs_addr;
+	const unsigned long arg_data = bad;
+# else
+	const unsigned long arg_addr = bad;
+	const unsigned long arg_data = regs_addr;
+# endif
+	return do_ptrace(request, pid, arg_addr, arg_data);
+}
+#endif /* PTRACE_GETREGS || PTRACE_GETFPREGS */
+
 static void
 test_peeksiginfo(int pid, const unsigned long bad_request)
 {
@@ -834,6 +852,49 @@ typedef struct {
 #endif /* TRACEE_REGS_STRUCT */
 }
 
+#ifdef PTRACE_GETREGS
+static void
+print_pt_regs(const void *const rs, const size_t size)
+{
+	printf("%p", rs);
+}
+
+static void
+do_getregs_setregs(const int pid,
+		   void *const regbuf,
+		   const unsigned int regsize,
+		   unsigned int *const actual_size)
+{
+	if (do_ptrace_regs(PTRACE_GETREGS, pid, (uintptr_t) regbuf)) {
+		printf("ptrace(PTRACE_GETREGS, %d, %p) = %s\n",
+		       pid, regbuf, errstr);
+		return;	/* skip PTRACE_SETREGS */
+	} else {
+		printf("ptrace(PTRACE_GETREGS, %d, ", pid);
+		print_pt_regs(regbuf, regsize);
+		printf(") = %s\n", errstr);
+		if (*actual_size)
+			return;	/* skip PTRACE_SETREGS */
+		else
+			*actual_size = regsize;
+	}
+
+# if defined __sparc__ && !defined __arch64__
+	/*
+	 * On sparc32 PTRACE_SETREGS of size greater than 120
+	 * has interesting side effects.
+	 */
+	if (regsize > 120)
+		return;
+# endif /* __sparc__ && !__arch64__ */
+
+	do_ptrace_regs(PTRACE_SETREGS, pid, (uintptr_t) regbuf);
+	printf("ptrace(PTRACE_SETREGS, %d, ", pid);
+	print_pt_regs(regbuf, regsize);
+	printf(") = %s\n", errstr);
+}
+#endif /* PTRACE_GETREGS */
+
 #if defined __powerpc__ || defined __powerpc64__
 # define FPREGSET_SLOT_SIZE sizeof(uint64_t)
 #else
@@ -1010,8 +1071,39 @@ typedef struct {
 #endif /* TRACEE_REGS_STRUCT */
 }
 
-static unsigned int actual_prstatus_size;
-static unsigned int actual_fpregset_size;
+#ifdef PTRACE_GETFPREGS
+static void
+print_pt_fpregs(const void *const rs, const size_t size)
+{
+	printf("%p", rs);
+}
+
+static void
+do_getfpregs_setfpregs(const int pid,
+		       void *const regbuf,
+		       const unsigned int regsize,
+		       unsigned int *const actual_size)
+{
+	if (do_ptrace_regs(PTRACE_GETFPREGS, pid, (uintptr_t) regbuf)) {
+		printf("ptrace(PTRACE_GETFPREGS, %d, %p) = %s\n",
+		       pid, regbuf, errstr);
+		return;	/* skip PTRACE_SETFPREGS */
+	} else {
+		printf("ptrace(PTRACE_GETFPREGS, %d, ", pid);
+		print_pt_fpregs(regbuf, regsize);
+		printf(") = %s\n", errstr);
+		if (*actual_size)
+			return;	/* skip PTRACE_SETFPREGS */
+		else
+			*actual_size = regsize;
+	}
+
+	do_ptrace_regs(PTRACE_SETFPREGS, pid, (uintptr_t) regbuf);
+	printf("ptrace(PTRACE_SETFPREGS, %d, ", pid);
+	print_pt_fpregs(regbuf, regsize);
+	printf(") = %s\n", errstr);
+}
+#endif /* PTRACE_GETFPREGS */
 
 static void
 do_getregset_setregset(const int pid,
@@ -1092,6 +1184,27 @@ test_getregset_setregset(int pid)
 	       ", {iov_base=%p, iov_len=%lu}) = %s\n",
 	       pid, iov->iov_base, (unsigned long) iov->iov_len, errstr);
 
+#ifdef PTRACE_GETREGS
+	do_ptrace_regs(PTRACE_GETREGS, pid, addr);
+	printf("ptrace(PTRACE_GETREGS, %d, %#lx) = %s\n",
+	       pid, addr, errstr);
+#endif
+#ifdef PTRACE_SETREGS
+	do_ptrace_regs(PTRACE_SETREGS, pid, addr);
+	printf("ptrace(PTRACE_SETREGS, %d, %#lx) = %s\n",
+	       pid, addr, errstr);
+#endif
+#ifdef PTRACE_GETFPREGS
+	do_ptrace_regs(PTRACE_GETFPREGS, pid, addr);
+	printf("ptrace(PTRACE_GETFPREGS, %d, %#lx) = %s\n",
+	       pid, addr, errstr);
+#endif
+#ifdef PTRACE_SETFPREGS
+	do_ptrace_regs(PTRACE_SETFPREGS, pid, addr);
+	printf("ptrace(PTRACE_SETFPREGS, %d, %#lx) = %s\n",
+	       pid, addr, errstr);
+#endif
+
 	for (; addr > (uintptr_t) iov; --addr) {
 		do_ptrace(PTRACE_GETREGSET, pid, 1, addr);
 		printf("ptrace(PTRACE_GETREGSET, %d, NT_PRSTATUS, %#lx) = %s\n",
@@ -1117,7 +1230,7 @@ test_getregset_setregset(int pid)
 		_exit(0);
 	}
 
-	const unsigned int regset_buf_size = 2048;
+	const unsigned int regset_buf_size = 4096 - 64;
 	char *const regset_buf_endptr = midtail_alloc(0, regset_buf_size);
 
 	for (;;) {
@@ -1148,6 +1261,7 @@ test_getregset_setregset(int pid)
 					   status);
 		}
 
+		static unsigned int actual_prstatus_size;
 		for (unsigned int i = actual_prstatus_size;
 		     i <= regset_buf_size &&
 		     (!actual_prstatus_size ||
@@ -1165,6 +1279,7 @@ test_getregset_setregset(int pid)
 		if (!actual_prstatus_size)
 			actual_prstatus_size = regset_buf_size;
 
+		static unsigned int actual_fpregset_size;
 		for (unsigned int i = actual_fpregset_size;
 		     i <= regset_buf_size &&
 		     (!actual_fpregset_size ||
@@ -1181,6 +1296,54 @@ test_getregset_setregset(int pid)
 		 */
 		if (!actual_fpregset_size)
 			actual_fpregset_size = regset_buf_size;
+
+#ifdef PTRACE_GETREGS
+		static unsigned int actual_pt_regs_size
+# ifdef __mips__
+			/*
+			 * For some reason MIPS kernels do not report
+			 * PTRACE_GETREGS EFAULT errors.
+			 */
+			= 38 * 8
+# endif
+			;
+		for (unsigned int i = actual_pt_regs_size;
+		     i <= (actual_pt_regs_size ?: regset_buf_size);
+		     ++i) {
+			do_getregs_setregs(pid, regset_buf_endptr - i, i,
+					   &actual_pt_regs_size);
+		}
+		/*
+		 * In an unlikely case PTRACE_GETREGS is not supported,
+		 * use regset_buf_size.
+		 */
+		if (!actual_pt_regs_size)
+			actual_pt_regs_size = regset_buf_size;
+#endif
+
+#ifdef PTRACE_GETFPREGS
+		static unsigned int actual_pt_fpregs_size
+# ifdef __mips__
+			/*
+			 * For some reason MIPS kernels do not report
+			 * PTRACE_GETFPREGS EFAULT errors.
+			 */
+			= 33 * 8
+# endif
+			;
+		for (unsigned int i = actual_pt_fpregs_size;
+		     i <= (actual_pt_fpregs_size ?: regset_buf_size);
+		     ++i) {
+			do_getfpregs_setfpregs(pid, regset_buf_endptr - i, i,
+					       &actual_pt_fpregs_size);
+		}
+		/*
+		 * In an unlikely case PTRACE_GETFPREGS is not supported,
+		 * use regset_buf_size.
+		 */
+		if (!actual_pt_fpregs_size)
+			actual_pt_fpregs_size = regset_buf_size;
+#endif
 
 		if (WSTOPSIG(status) == SIGSTOP)
 			kill(pid, SIGCONT);

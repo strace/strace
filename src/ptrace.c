@@ -241,6 +241,17 @@ decode_ptrace_entering(struct tcb *const tcp)
 	const kernel_ulong_t addr = tcp->u_arg[2];
 	const kernel_ulong_t data = tcp->u_arg[3];
 
+/*
+ * SPARC systems have the meaning of data and addr reversed
+ * for PTRACE_[GS]ETREGS and PTRACE_[GS]ETFPREGS:
+ * data is ignored and the registers are copied from/to the address addr.
+ */
+#if defined SPARC || defined SPARC64
+# define regs_addr	addr
+#else
+# define regs_addr	data
+#endif
+
 	/* request */
 	printxval64(ptrace_cmds, request, "PTRACE_???");
 
@@ -266,6 +277,11 @@ decode_ptrace_entering(struct tcb *const tcp)
 	tprint_arg_next();
 	switch (request) {
 	case PTRACE_PEEKUSER:
+#ifdef IA64
+		print_user_offset_addr(addr);
+		/* data is ignored */
+		return RVAL_DECODED | RVAL_HEX;
+#endif
 	case PTRACE_POKEUSER:
 		print_user_offset_addr(addr);
 		break;
@@ -283,30 +299,36 @@ decode_ptrace_entering(struct tcb *const tcp)
 	case PTRACE_PEEKSIGINFO:
 		decode_peeksiginfo_args(tcp, addr);
 		break;
+#ifdef PTRACE_SETREGS
+	case PTRACE_SETREGS:
+		printaddr(regs_addr);
+		return RVAL_DECODED;
+#endif
+#ifdef PTRACE_SETFPREGS
+	case PTRACE_SETFPREGS:
+		printaddr(regs_addr);
+		return RVAL_DECODED;
+#endif
+#ifdef PTRACE_GETREGS
+	case PTRACE_GETREGS:
+		/* print regs_addr on exiting syscall */
+		return 0;
+#endif
+#ifdef PTRACE_GETFPREGS
+	case PTRACE_GETFPREGS:
+		/* print regs_addr on exiting syscall */
+		return 0;
+#endif
+#ifdef IA64
+	case PTRACE_PEEKDATA:
+	case PTRACE_PEEKTEXT:
+		printaddr(addr);
+		/* data is ignored */
+		return RVAL_DECODED | RVAL_HEX;
+#endif /* IA64 */
 	default:
 		printaddr(addr);
 	}
-
-# ifdef IA64
-	switch (request) {
-	case PTRACE_PEEKDATA:
-	case PTRACE_PEEKTEXT:
-	case PTRACE_PEEKUSER:
-		/* data is ignored */
-		return RVAL_DECODED | RVAL_HEX;
-	}
-# endif /* IA64 */
-
-# if defined SPARC || defined SPARC64
-	switch (request) {
-	case PTRACE_GETREGS:
-	case PTRACE_SETREGS:
-	case PTRACE_GETFPREGS:
-	case PTRACE_SETFPREGS:
-		/* data is ignored */
-		return RVAL_DECODED;
-	}
-# endif /* SPARC || SPARC64 */
 
 	/* data */
 	tprint_arg_next();
@@ -411,6 +433,16 @@ decode_ptrace_exiting(struct tcb *const tcp)
 	case PTRACE_GET_SYSCALL_INFO:
 		print_ptrace_syscall_info(tcp, data, addr);
 		break;
+#ifdef PTRACE_GETREGS
+	case PTRACE_GETREGS:
+		printaddr(regs_addr);
+		break;
+#endif
+#ifdef PTRACE_GETFPREGS
+	case PTRACE_GETFPREGS:
+		printaddr(regs_addr);
+		break;
+#endif
 	}
 
 	return 0;
