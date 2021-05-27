@@ -7,6 +7,7 @@
  */
 
 #include "defs.h"
+#include "ptrace.h"
 #include "arch_prstatus_regset.h"
 #include "arch_fpregset.h"
 

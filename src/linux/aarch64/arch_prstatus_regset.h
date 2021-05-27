@@ -10,8 +10,6 @@
 #elif !defined STRACE_ARCH_PRSTATUS_REGSET_H
 # define STRACE_ARCH_PRSTATUS_REGSET_H
 
-# include "ptrace.h"
-
 typedef struct user_pt_regs struct_prstatus_regset;
 
 # define HAVE_ARCH_PRSTATUS_REGSET 1
