@@ -23,9 +23,10 @@
 
 #include "arch_prstatus_regset.c"
 #include "arch_fpregset.c"
+#include "arch_pt_regs.c"
 
 MPERS_PRINTER_DECL(void, decode_prstatus_regset,
-                   struct tcb *const tcp,
+		   struct tcb *const tcp,
 		   const kernel_ulong_t addr,
 		   const kernel_ulong_t size)
 {
@@ -38,4 +39,11 @@ MPERS_PRINTER_DECL(void, decode_fpregset,
 		   const kernel_ulong_t size)
 {
 	arch_decode_fpregset(tcp, addr, size);
+}
+
+MPERS_PRINTER_DECL(void, decode_pt_regs,
+		   struct tcb *const tcp,
+		   const kernel_ulong_t addr)
+{
+	arch_decode_pt_regs(tcp, addr);
 }

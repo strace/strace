@@ -301,7 +301,7 @@ decode_ptrace_entering(struct tcb *const tcp)
 		break;
 #ifdef PTRACE_SETREGS
 	case PTRACE_SETREGS:
-		printaddr(regs_addr);
+		decode_pt_regs(tcp, regs_addr);
 		return RVAL_DECODED;
 #endif
 #ifdef PTRACE_SETFPREGS
@@ -435,7 +435,7 @@ decode_ptrace_exiting(struct tcb *const tcp)
 		break;
 #ifdef PTRACE_GETREGS
 	case PTRACE_GETREGS:
-		printaddr(regs_addr);
+		decode_pt_regs(tcp, regs_addr);
 		break;
 #endif
 #ifdef PTRACE_GETFPREGS

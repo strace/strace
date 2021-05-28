@@ -178,14 +178,6 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 	}
 }
 
-static void
-print_prstatus_regset(const void *const rs, const size_t size)
-{
-	if (!size || size % sizeof(kernel_ulong_t)) {
-		printf("%p", rs);
-		return;
-	}
-
 #undef TRACEE_REGS_STRUCT
 #if defined __x86_64__ || defined __i386__
 # define TRACEE_REGS_STRUCT struct user_regs_struct
@@ -242,6 +234,14 @@ typedef struct {
 } mips_regs;
 #  define TRACEE_REGS_STRUCT mips_regs
 #endif
+
+static void
+print_prstatus_regset(const void *const rs, const size_t size)
+{
+	if (!size || size % sizeof(kernel_ulong_t)) {
+		printf("%p", rs);
+		return;
+	}
 
 #ifdef TRACEE_REGS_STRUCT
 	const TRACEE_REGS_STRUCT *const regs = rs;
@@ -856,7 +856,69 @@ typedef struct {
 static void
 print_pt_regs(const void *const rs, const size_t size)
 {
+# if defined __mips__
+
+	const struct pt_regs *const regs = rs;
+	if (size != sizeof(*regs))
+		error_msg_and_fail("expected size %zu, got size %zu",
+				   sizeof(*regs), size);
+	fputs("{regs=[", stdout);
+	for (unsigned int j = 0; j < ARRAY_SIZE(regs->regs); ++j) {
+		if (j)
+			fputs(", ", stdout);
+		printf("%#llx", (unsigned long long) regs->regs[j]);
+	}
+	fputs("], ", stdout);
+	PRINT_FIELD_X(*regs, lo);
+	fputs(", ", stdout);
+	PRINT_FIELD_X(*regs, hi);
+	fputs(", ", stdout);
+	PRINT_FIELD_X(*regs, cp0_epc);
+	fputs(", ", stdout);
+	PRINT_FIELD_X(*regs, cp0_badvaddr);
+	fputs(", ", stdout);
+	PRINT_FIELD_X(*regs, cp0_status);
+	fputs(", ", stdout);
+	PRINT_FIELD_X(*regs, cp0_cause);
+	fputs("}", stdout);
+
+# elif defined __sparc__
+
+#  ifdef __arch64__
 	printf("%p", rs);
+#  else
+	const struct {
+		unsigned int psr;
+		unsigned int pc;
+		unsigned int npc;
+		unsigned int y;
+		unsigned int u_regs[15];
+	} *const regs = rs;
+	if (size != sizeof(*regs))
+		error_msg_and_fail("expected size %zu, got size %zu",
+				   sizeof(*regs), size);
+	printf("{psr=%#x, pc=%#x, npc=%#x, y=%#x, u_regs=[",
+	       regs->psr, regs->pc, regs->npc, regs->y);
+	for (unsigned int j = 0; j < ARRAY_SIZE(regs->u_regs); ++j) {
+		if (j)
+			fputs(", ", stdout);
+		printf("%#x", regs->u_regs[j]);
+	}
+	fputs("]}", stdout);
+#  endif /* !__arch64__ */
+
+# elif defined TRACEE_REGS_STRUCT
+
+	if (size != sizeof(TRACEE_REGS_STRUCT))
+		error_msg_and_fail("expected size %zu, got size %zu",
+				   sizeof(TRACEE_REGS_STRUCT), size);
+	print_prstatus_regset(rs, size);
+
+# else /* !TRACEE_REGS_STRUCT */
+
+	printf("%p", rs);
+
+# endif
 }
 
 static void

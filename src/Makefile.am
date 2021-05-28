@@ -549,6 +549,7 @@ EXTRA_DIST =				\
 	linux/generic/arch_kvm.c		\
 	linux/generic/arch_prstatus_regset.c	\
 	linux/generic/arch_prstatus_regset.h	\
+	linux/generic/arch_pt_regs.c		\
 	linux/generic/arch_regs.h		\
 	linux/generic/arch_rt_sigframe.c	\
 	linux/generic/arch_sigreturn.c		\
@@ -668,6 +669,7 @@ EXTRA_DIST =				\
 	linux/mips/arch_getrval2.c	\
 	linux/mips/arch_prstatus_regset.c \
 	linux/mips/arch_prstatus_regset.h \
+	linux/mips/arch_pt_regs.c	\
 	linux/mips/arch_regs.c		\
 	linux/mips/arch_sigreturn.c	\
 	linux/mips/errnoent.h		\
@@ -855,6 +857,7 @@ EXTRA_DIST =				\
 	linux/sparc/arch_getrval2.c	\
 	linux/sparc/arch_prstatus_regset.c \
 	linux/sparc/arch_prstatus_regset.h \
+	linux/sparc/arch_pt_regs.c	\
 	linux/sparc/arch_regs.c		\
 	linux/sparc/arch_sigreturn.c	\
 	linux/sparc/errnoent.h		\
@@ -875,6 +878,7 @@ EXTRA_DIST =				\
 	linux/sparc64/arch_getrval2.c	\
 	linux/sparc64/arch_prstatus_regset.c \
 	linux/sparc64/arch_prstatus_regset.h \
+	linux/sparc64/arch_pt_regs.c	\
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_rt_sigframe.c	\
 	linux/sparc64/arch_sigreturn.c	\
