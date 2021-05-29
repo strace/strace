@@ -549,6 +549,7 @@ EXTRA_DIST =				\
 	linux/generic/arch_kvm.c		\
 	linux/generic/arch_prstatus_regset.c	\
 	linux/generic/arch_prstatus_regset.h	\
+	linux/generic/arch_pt_fpregs.c		\
 	linux/generic/arch_pt_regs.c		\
 	linux/generic/arch_regs.h		\
 	linux/generic/arch_rt_sigframe.c	\

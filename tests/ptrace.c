@@ -963,14 +963,6 @@ do_getregs_setregs(const int pid,
 # define FPREGSET_SLOT_SIZE sizeof(kernel_ulong_t)
 #endif
 
-static void
-print_fpregset(const void *const rs, const size_t size)
-{
-	if (!size || size % FPREGSET_SLOT_SIZE) {
-		printf("%p", rs);
-		return;
-	}
-
 #undef TRACEE_REGS_STRUCT
 #if defined __x86_64__ || defined __i386__
 # define TRACEE_REGS_STRUCT struct user_fpregs_struct
@@ -981,6 +973,14 @@ typedef struct {
 } ppc_fpregs_struct;
 # define TRACEE_REGS_STRUCT ppc_fpregs_struct
 #endif
+
+static void
+print_fpregset(const void *const rs, const size_t size)
+{
+	if (!size || size % FPREGSET_SLOT_SIZE) {
+		printf("%p", rs);
+		return;
+	}
 
 #ifdef TRACEE_REGS_STRUCT
 	const TRACEE_REGS_STRUCT *const regs = rs;
@@ -1137,7 +1137,18 @@ typedef struct {
 static void
 print_pt_fpregs(const void *const rs, const size_t size)
 {
+# ifdef TRACEE_REGS_STRUCT
+
+	if (size != sizeof(TRACEE_REGS_STRUCT))
+		error_msg_and_fail("expected size %zu, got size %zu",
+				   sizeof(TRACEE_REGS_STRUCT), size);
+	print_fpregset(rs, size);
+
+# else /* !TRACEE_REGS_STRUCT */
+
 	printf("%p", rs);
+
+# endif
 }
 
 static void
