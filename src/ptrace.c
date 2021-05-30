@@ -233,6 +233,10 @@ decode_setregset(struct tcb *const tcp, const kernel_ulong_t addr,
 	return 0;
 }
 
+#ifdef PTRACE_GETREGS64
+# include "arch_pt_regs64.c"
+#endif
+
 static int
 decode_ptrace_entering(struct tcb *const tcp)
 {
@@ -304,6 +308,11 @@ decode_ptrace_entering(struct tcb *const tcp)
 		decode_pt_regs(tcp, regs_addr);
 		return RVAL_DECODED;
 #endif
+#ifdef PTRACE_SETREGS64
+	case PTRACE_SETREGS64:
+		decode_pt_regs64(tcp, regs_addr);
+		return RVAL_DECODED;
+#endif
 #ifdef PTRACE_SETFPREGS
 	case PTRACE_SETFPREGS:
 		decode_pt_fpregs(tcp, regs_addr);
@@ -311,6 +320,11 @@ decode_ptrace_entering(struct tcb *const tcp)
 #endif
 #ifdef PTRACE_GETREGS
 	case PTRACE_GETREGS:
+		/* print regs_addr on exiting syscall */
+		return 0;
+#endif
+#ifdef PTRACE_GETREGS64
+	case PTRACE_GETREGS64:
 		/* print regs_addr on exiting syscall */
 		return 0;
 #endif
@@ -436,6 +450,11 @@ decode_ptrace_exiting(struct tcb *const tcp)
 #ifdef PTRACE_GETREGS
 	case PTRACE_GETREGS:
 		decode_pt_regs(tcp, regs_addr);
+		break;
+#endif
+#ifdef PTRACE_GETREGS64
+	case PTRACE_GETREGS64:
+		decode_pt_regs64(tcp, regs_addr);
 		break;
 #endif
 #ifdef PTRACE_GETFPREGS

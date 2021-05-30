@@ -44,7 +44,7 @@ do_ptrace(const unsigned long request,
 	return rc;
 }
 
-#if defined PTRACE_GETREGS || defined PTRACE_GETFPREGS
+#if defined PTRACE_GETREGS || defined PTRACE_GETREGS64 || defined PTRACE_GETFPREGS
 static long
 do_ptrace_regs(const unsigned long request,
 	       const unsigned int pid,
@@ -60,7 +60,7 @@ do_ptrace_regs(const unsigned long request,
 # endif
 	return do_ptrace(request, pid, arg_addr, arg_data);
 }
-#endif /* PTRACE_GETREGS || PTRACE_GETFPREGS */
+#endif /* PTRACE_GETREGS || PTRACE_GETREGS64 || PTRACE_GETFPREGS */
 
 static void
 test_peeksiginfo(int pid, const unsigned long bad_request)
@@ -957,6 +957,40 @@ do_getregs_setregs(const int pid,
 }
 #endif /* PTRACE_GETREGS */
 
+#ifdef PTRACE_GETREGS64
+static void
+print_pt_regs64(const void *const rs, const size_t size)
+{
+	printf("%p", rs);
+}
+
+static void
+do_getregs64_setregs64(const int pid,
+		       void *const regbuf,
+		       const unsigned int regsize,
+		       unsigned int *const actual_size)
+{
+	if (do_ptrace_regs(PTRACE_GETREGS64, pid, (uintptr_t) regbuf)) {
+		printf("ptrace(PTRACE_GETREGS64, %d, %p) = %s\n",
+		       pid, regbuf, errstr);
+		return;	/* skip PTRACE_SETREGS64 */
+	} else {
+		printf("ptrace(PTRACE_GETREGS64, %d, ", pid);
+		print_pt_regs64(regbuf, regsize);
+		printf(") = %s\n", errstr);
+		if (*actual_size)
+			return;	/* skip PTRACE_SETREGS64 */
+		else
+			*actual_size = regsize;
+	}
+
+	do_ptrace_regs(PTRACE_SETREGS64, pid, (uintptr_t) regbuf);
+	printf("ptrace(PTRACE_SETREGS64, %d, ", pid);
+	print_pt_regs64(regbuf, regsize);
+	printf(") = %s\n", errstr);
+}
+#endif /* PTRACE_GETREGS64 */
+
 #if defined __powerpc__ || defined __powerpc64__
 # define FPREGSET_SLOT_SIZE sizeof(uint64_t)
 #else
@@ -1392,6 +1426,22 @@ test_getregset_setregset(int pid)
 		 */
 		if (!actual_pt_regs_size)
 			actual_pt_regs_size = regset_buf_size;
+#endif
+
+#ifdef PTRACE_GETREGS64
+		static unsigned int actual_pt_regs64_size;
+		for (unsigned int i = actual_pt_regs64_size;
+		     i <= (actual_pt_regs64_size ?: regset_buf_size);
+		     ++i) {
+			do_getregs64_setregs64(pid, regset_buf_endptr - i, i,
+					       &actual_pt_regs64_size);
+		}
+		/*
+		 * In an unlikely case PTRACE_GETREGS64 is not supported,
+		 * use regset_buf_size.
+		 */
+		if (!actual_pt_regs64_size)
+			actual_pt_regs64_size = regset_buf_size;
 #endif
 
 #ifdef PTRACE_GETFPREGS
