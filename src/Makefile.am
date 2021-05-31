@@ -719,6 +719,8 @@ EXTRA_DIST =				\
 	linux/powerpc/arch_fpregset.h	\
 	linux/powerpc/arch_prstatus_regset.c \
 	linux/powerpc/arch_prstatus_regset.h \
+	linux/powerpc/arch_pt_regs64.c	\
+	linux/powerpc/arch_pt_regs64.h	\
 	linux/powerpc/arch_regs.c	\
 	linux/powerpc/arch_rt_sigframe.c	\
 	linux/powerpc/arch_sigreturn.c	\
@@ -739,6 +741,8 @@ EXTRA_DIST =				\
 	linux/powerpc64/arch_get_personality.c \
 	linux/powerpc64/arch_prstatus_regset.c \
 	linux/powerpc64/arch_prstatus_regset.h \
+	linux/powerpc64/arch_pt_regs64.c	\
+	linux/powerpc64/arch_pt_regs64.h	\
 	linux/powerpc64/arch_regs.c	\
 	linux/powerpc64/arch_rt_sigframe.c	\
 	linux/powerpc64/arch_sigreturn.c	\
@@ -762,6 +766,7 @@ EXTRA_DIST =				\
 	linux/powerpc64le/arch_fpregset.h	\
 	linux/powerpc64le/arch_prstatus_regset.c \
 	linux/powerpc64le/arch_prstatus_regset.h \
+	linux/powerpc64le/arch_pt_regs64.c	\
 	linux/powerpc64le/arch_regs.c	\
 	linux/powerpc64le/arch_rt_sigframe.c	\
 	linux/powerpc64le/errnoent.h	\

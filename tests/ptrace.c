@@ -961,7 +961,50 @@ do_getregs_setregs(const int pid,
 static void
 print_pt_regs64(const void *const rs, const size_t size)
 {
+# if defined __powerpc__ || defined __powerpc64__
+#  ifdef __powerpc64__
+	const struct pt_regs *const regs = rs;
+#  else /* __powerpc__ */
+	const struct {
+		unsigned long long gpr[32];
+		unsigned long long nip;
+		unsigned long long msr;
+		unsigned long long orig_gpr3;
+		unsigned long long ctr;
+		unsigned long long link;
+		unsigned long long xer;
+		unsigned long long ccr;
+		unsigned long long softe;
+		unsigned long long trap;
+		unsigned long long dar;
+		unsigned long long dsisr;
+		unsigned long long result;
+	} *const regs = rs;
+#  endif /* __powerpc__ */
+	if (size != sizeof(*regs))
+		error_msg_and_fail("expected size %zu, got size %zu",
+				   sizeof(*regs), size);
+	for (unsigned int j = 0; j < ARRAY_SIZE(regs->gpr); ++j)
+		printf("%s%#llx", j ? ", " : "{gpr=[",
+		       (unsigned long long) regs->gpr[j]);
+	printf("], nip=%#llx", (unsigned long long) regs->nip);
+	printf(", msr=%#llx", (unsigned long long) regs->msr);
+	printf(", orig_gpr3=%#llx", (unsigned long long) regs->orig_gpr3);
+	printf(", ctr=%#llx", (unsigned long long) regs->ctr);
+	printf(", link=%#llx", (unsigned long long) regs->link);
+	printf(", xer=%#llx", (unsigned long long) regs->xer);
+	printf(", ccr=%#llx", (unsigned long long) regs->ccr);
+	printf(", softe=%#llx", (unsigned long long) regs->softe);
+	printf(", trap=%#llx", (unsigned long long) regs->trap);
+	printf(", dar=%#llx", (unsigned long long) regs->dar);
+	printf(", dsisr=%#llx", (unsigned long long) regs->dsisr);
+	printf(", result=%#llx}", (unsigned long long) regs->result);
+
+# else /* !(__powerpc__ || __powerpc64__) */
+
 	printf("%p", rs);
+
+# endif
 }
 
 static void
