@@ -886,6 +886,7 @@ EXTRA_DIST =				\
 	linux/sparc64/arch_prstatus_regset.c \
 	linux/sparc64/arch_prstatus_regset.h \
 	linux/sparc64/arch_pt_regs.c	\
+	linux/sparc64/arch_pt_regs64.c	\
 	linux/sparc64/arch_regs.c	\
 	linux/sparc64/arch_rt_sigframe.c	\
 	linux/sparc64/arch_sigreturn.c	\

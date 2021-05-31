@@ -1000,7 +1000,24 @@ print_pt_regs64(const void *const rs, const size_t size)
 	printf(", dsisr=%#llx", (unsigned long long) regs->dsisr);
 	printf(", result=%#llx}", (unsigned long long) regs->result);
 
-# else /* !(__powerpc__ || __powerpc64__) */
+# elif defined __sparc__ && defined __arch64__
+
+	const struct {
+		unsigned long u_regs[16];
+		unsigned long tstate;
+		unsigned long tpc;
+		unsigned long tnpc;
+	} *const regs = rs;
+	if (size != sizeof(*regs))
+		error_msg_and_fail("expected size %zu, got size %zu",
+				   sizeof(*regs), size);
+	for (unsigned int j = 0; j < ARRAY_SIZE(regs->u_regs); ++j)
+		printf("%s%#lx", j ? ", " : "{u_regs=[", regs->u_regs[j]);
+	printf("], tstate=%#lx", regs->tstate);
+	printf(", tpc=%#lx", regs->tpc);
+	printf(", tnpc=%#lx}", regs->tnpc);
+
+# else /* !(__powerpc__ || __powerpc64__ || (__sparc__ && __arch64__)) */
 
 	printf("%p", rs);
 
