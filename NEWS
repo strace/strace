@@ -135,7 +135,7 @@ Noteworthy changes in release 5.7 (2020-06-01)
 * Improvements
   * Implemented interval specification in "when=" subexpression of syscall
     tampering expressions.
-  * Added -e trace=%clock option for tracing syscalls reading of modifying
+  * Added -e trace=%clock option for tracing syscalls reading or modifying
     system clocks.
   * Implemented decoding of BPF_LINK_CREATE and BPF_LINK_UPDATE bpf
     syscall commands.
