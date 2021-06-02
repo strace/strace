@@ -1,4 +1,6 @@
 /*
+ * Check decoding of linkat syscall.
+ *
  * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
@@ -8,16 +10,14 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_linkat
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
-# include <fcntl.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <sys/stat.h>
-
-# include "secontext.h"
-# include "xmalloc.h"
+#include "secontext.h"
+#include "xmalloc.h"
 
 int
 main(void)
@@ -190,9 +190,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_linkat")
-
-#endif
