@@ -11,11 +11,9 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_pkey_mprotect
-
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/mman.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/mman.h>
 
 const char *
 sprintptr(kernel_ulong_t ptr)
@@ -92,9 +90,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_pkey_mprotect");
-
-#endif
