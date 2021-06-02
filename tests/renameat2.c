@@ -11,10 +11,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_renameat2
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -35,9 +33,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_renameat2")
-
-#endif
