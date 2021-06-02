@@ -11,15 +11,13 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_getdents64
+#define kernel_dirent_type kernel_dirent64_t
+#define NR_getdents	__NR_getdents64
+#define STR_getdents	"getdents64"
 
-# define kernel_dirent_type kernel_dirent64_t
-# define NR_getdents	__NR_getdents64
-# define STR_getdents	"getdents64"
+#include "xgetdents.c"
 
-# include "xgetdents.c"
-
-# if VERBOSE
+#if VERBOSE
 static void
 print_dirent(const kernel_dirent_type *d)
 {
@@ -38,10 +36,4 @@ print_dirent(const kernel_dirent_type *d)
 	print_quoted_cstring(d->d_name, d_name_len);
 	printf("}");
 }
-# endif
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_getdents64")
-
 #endif
