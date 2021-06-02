@@ -1,4 +1,6 @@
 /*
+ * Check decoding of reboot syscall.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,17 +10,15 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_reboot
+#include <stdio.h>
+#include <linux/reboot.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <linux/reboot.h>
-# include <unistd.h>
+#define INVALID_MAGIC 319887762
+#define INVALID_CMD 0x01234568
 
-# define INVALID_MAGIC 319887762
-# define INVALID_CMD 0x01234568
-
-# define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
-# define STR128 STR32 STR32 STR32 STR32
+#define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
+#define STR128 STR32 STR32 STR32 STR32
 
 int
 main(void)
@@ -98,9 +98,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_reboot")
-
-#endif
