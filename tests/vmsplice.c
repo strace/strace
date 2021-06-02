@@ -1,5 +1,5 @@
 /*
- * This file is part of vmsplice strace test.
+ * Check decoding of vmsplice syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2021 The strace developers.
@@ -11,12 +11,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_vmsplice
-
-# include <assert.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/uio.h>
+#include <assert.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/uio.h>
 
 int
 main(void)
@@ -80,9 +78,3 @@ main(void)
 	tprintf("+++ exited with 0 +++\n");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_vmsplice")
-
-#endif
