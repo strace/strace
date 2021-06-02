@@ -11,12 +11,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_set_tid_address
-
-# include <inttypes.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <linux/prctl.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <linux/prctl.h>
 
 static const char *
 sprintaddr(kernel_ulong_t addr)
@@ -75,9 +73,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_set_tid_address")
-
-#endif
