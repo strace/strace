@@ -1,4 +1,6 @@
 /*
+ * Check decoding of sched_yield syscall.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,10 +10,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_sched_yield
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -21,9 +21,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_sched_yield")
-
-#endif
