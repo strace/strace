@@ -14,11 +14,9 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_prctl
-
-# include <stdio.h>
-# include <unistd.h>
-# include <linux/prctl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <linux/prctl.h>
 
 int
 main(void)
@@ -52,9 +50,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prctl")
-
-#endif

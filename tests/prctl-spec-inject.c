@@ -11,12 +11,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_prctl
-
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <linux/prctl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <linux/prctl.h>
 
 static long injected_val;
 
@@ -74,9 +72,9 @@ main(int argc, char **argv)
 		{ 16, "PR_SPEC_DISABLE_NOEXEC" },
 		{ 32, "0x20 /* PR_SPEC_??? */" },
 		{ (kernel_ulong_t) 0xdecafeedbeefda7eULL, "0x"
-# if SIZEOF_KERNEL_LONG_T == 8
+#if SIZEOF_KERNEL_LONG_T == 8
 			"decafeed"
-# endif
+#endif
 			"beefda7e /* PR_SPEC_??? */" },
 	};
 
@@ -140,9 +138,3 @@ main(int argc, char **argv)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prctl")
-
-#endif

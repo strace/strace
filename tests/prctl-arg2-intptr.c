@@ -1,5 +1,5 @@
 /*
- * Check decoding of prctl operations which use arg2 as pointer to an integer
+ * Check decoding of prctl operations which use arg2 as a pointer to an integer
  * value: PR_GET_CHILD_SUBREAPER, PR_GET_ENDIAN, PR_GET_FPEMU, and PR_GET_FPEXC.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
@@ -13,12 +13,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_prctl
-
-# include <stdint.h>
-# include <stdio.h>
-# include <unistd.h>
-# include <linux/prctl.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <linux/prctl.h>
 
 static const char *errstr;
 
@@ -93,9 +91,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prctl")
-
-#endif

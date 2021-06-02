@@ -10,14 +10,13 @@
 
 #include "tests.h"
 #include "scno.h"
-#include <linux/prctl.h>
 
-#if defined __NR_prctl && defined __NR_set_tid_address && \
-	defined PR_GET_TID_ADDRESS
+#ifdef __NR_set_tid_address
 
 # include <inttypes.h>
 # include <stdio.h>
 # include <unistd.h>
+# include <linux/prctl.h>
 
 static const char *
 sprintaddr(kernel_ulong_t addr)
@@ -79,6 +78,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_prctl && __NR_set_tid_address && PR_GET_TID_ADDRESS")
+SKIP_MAIN_UNDEFINED("__NR_set_tid_address")
 
 #endif
