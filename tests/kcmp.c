@@ -12,38 +12,36 @@
 #include "scno.h"
 #include "pidns.h"
 
-#ifdef __NR_kcmp
+#include <fcntl.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <linux/kcmp.h>
 
-# include <fcntl.h>
-# include <stdarg.h>
-# include <stdint.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-# include <linux/kcmp.h>
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
 
-# ifndef SKIP_IF_PROC_IS_UNAVAILABLE
-#  define SKIP_IF_PROC_IS_UNAVAILABLE
-# endif
-
-# ifndef VERBOSE_FD
-#  define VERBOSE_FD 0
-# endif
+#ifndef VERBOSE_FD
+# define VERBOSE_FD 0
+#endif
 
 static const kernel_ulong_t kcmp_max_type = KCMP_EPOLL_TFD;
 
 static const char null_path[] = "/dev/null";
 static const char zero_path[] = "/dev/zero";
 
-# define NULL_FD 23
-# define ZERO_FD 42
+#define NULL_FD 23
+#define ZERO_FD 42
 
 static void
 printpidfd(const char *prefix, pid_t pid, unsigned fd)
 {
 	const char *path = NULL;
 
-# if VERBOSE_FD
+#if VERBOSE_FD
 	if (pid == getpid()) {
 		switch (fd)
 		{
@@ -55,7 +53,7 @@ printpidfd(const char *prefix, pid_t pid, unsigned fd)
 			break;
 		}
 	}
-# endif
+#endif
 
 	if (path)
 		printf("%s%d<%s>", prefix, fd, path);
@@ -210,9 +208,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_kcmp");
-
-#endif
