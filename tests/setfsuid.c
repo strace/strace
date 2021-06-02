@@ -1,4 +1,6 @@
 /*
+ * Check decoding of setfsuid syscall.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,23 +10,15 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_setfsuid
+#define SYSCALL_NR	__NR_setfsuid
+#define SYSCALL_NAME	"setfsuid"
 
-# define SYSCALL_NR	__NR_setfsuid
-# define SYSCALL_NAME	"setfsuid"
-
-# if defined __NR_setfsuid32 && __NR_setfsuid != __NR_setfsuid32
-#  define UGID_TYPE	short
-#  define GETUGID	syscall(__NR_geteuid)
-# else
-#  define UGID_TYPE	int
-#  define GETUGID	geteuid()
-# endif
-
-# include "setfsugid.c"
-
+#if defined __NR_setfsuid32 && __NR_setfsuid != __NR_setfsuid32
+# define UGID_TYPE	short
+# define GETUGID	syscall(__NR_geteuid)
 #else
-
-SKIP_MAIN_UNDEFINED("__NR_setfsuid")
-
+# define UGID_TYPE	int
+# define GETUGID	geteuid()
 #endif
+
+#include "setfsugid.c"
