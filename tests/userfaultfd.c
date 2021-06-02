@@ -1,4 +1,6 @@
 /*
+ * Check decoding of userfaultfd syscall.
+ *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
@@ -9,13 +11,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_userfaultfd
+#include <stdio.h>
+#include <unistd.h>
+#include "kernel_fcntl.h"
 
-# include <stdio.h>
-# include <unistd.h>
-# include "kernel_fcntl.h"
-
-# define UFFD_USER_MODE_ONLY 1
+#define UFFD_USER_MODE_ONLY 1
 
 static const char *errstr;
 
@@ -60,9 +60,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_userfaultfd")
-
-#endif
