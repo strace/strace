@@ -19,8 +19,7 @@
 #include <linux/filter.h>
 #include "scno.h"
 
-#if defined __NR_seccomp \
- && defined PR_SET_NO_NEW_PRIVS \
+#if defined PR_SET_NO_NEW_PRIVS \
  && defined BPF_JUMP \
  && defined BPF_STMT
 
@@ -178,7 +177,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_seccomp && PR_SET_NO_NEW_PRIVS"
-		    " && BPF_JUMP && BPF_STMT")
+SKIP_MAIN_UNDEFINED("PR_SET_NO_NEW_PRIVS && BPF_JUMP && BPF_STMT")
 
 #endif

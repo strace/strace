@@ -11,10 +11,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_seccomp && defined __NR_exit
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -47,9 +45,3 @@ main(void)
 	rc += write(1, text2, LENGTH_OF(text2)) != LENGTH_OF(text2);
 	return !!syscall(__NR_exit, rc);
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_seccomp && __NR_exit")
-
-#endif
