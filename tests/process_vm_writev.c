@@ -1,4 +1,6 @@
 /*
+ * Check decoding of process_vm_writev syscall.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -6,20 +8,11 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#ifdef __NR_process_vm_writev
+#define OP     process_vm_writev
+#define OP_NR  __NR_process_vm_writev
+#define OP_STR "process_vm_writev"
+#define OP_WR  1
 
-# define OP     process_vm_writev
-# define OP_NR  __NR_process_vm_writev
-# define OP_STR "process_vm_writev"
-# define OP_WR  1
-
-# include "process_vm_readv_writev.c"
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_process_vm_writev");
-
-#endif
+#include "process_vm_readv_writev.c"
