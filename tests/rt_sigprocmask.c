@@ -1,5 +1,5 @@
 /*
- * This file is part of rt_sigprocmask strace test.
+ * Check decoding of rt_sigprocmask syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2021 The strace developers.
@@ -11,13 +11,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_rt_sigprocmask
-
-# include <assert.h>
-# include <signal.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
+#include <assert.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 static long
 k_sigprocmask(const unsigned long how, void *const new_set,
@@ -147,9 +145,3 @@ main(void)
 	tprintf("+++ exited with 0 +++\n");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_rt_sigprocmask")
-
-#endif
