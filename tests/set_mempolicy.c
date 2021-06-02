@@ -11,14 +11,12 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_set_mempolicy
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
-
-# define MAX_STRLEN 3
-# define NLONGS(n) ((n + 8 * sizeof(long) - 2) \
+#define MAX_STRLEN 3
+#define NLONGS(n) ((n + 8 * sizeof(long) - 2) \
 		      / (8 * sizeof(long)))
 
 static const char *errstr;
@@ -39,13 +37,13 @@ k_set_mempolicy(const unsigned int mode,
 	return rc;
 }
 
-# if XLAT_RAW
-#  define out_str	raw
-# elif XLAT_VERBOSE
-#  define out_str	verbose
-# else
-#  define out_str	abbrev
-# endif
+#if XLAT_RAW
+# define out_str	raw
+#elif XLAT_VERBOSE
+# define out_str	verbose
+#else
+# define out_str	abbrev
+#endif
 
 static struct {
 	unsigned int val;
@@ -196,9 +194,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_set_mempolicy")
-
-#endif
