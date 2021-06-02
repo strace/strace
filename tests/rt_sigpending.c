@@ -1,5 +1,5 @@
 /*
- * This file is part of rt_sigpending strace test.
+ * Check decoding of rt_sigpending syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2021 The strace developers.
@@ -11,13 +11,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_rt_sigpending
-
-# include <assert.h>
-# include <signal.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
+#include <assert.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 static long
 k_sigpending(void *const set, const unsigned long size)
@@ -35,12 +33,12 @@ iterate(const char *const text, unsigned int size, void *set)
 			break;
 		}
 		if (size) {
-# ifdef WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 			if (size < sizeof(long))
 				tprintf("rt_sigpending(%s, %u) = 0\n",
 					"[]", size);
 			else
-# endif
+#endif
 				tprintf("rt_sigpending(%s, %u) = 0\n",
 					text, size);
 		} else {
@@ -101,9 +99,3 @@ main(void)
 	tprintf("+++ exited with 0 +++\n");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_rt_sigpending")
-
-#endif
