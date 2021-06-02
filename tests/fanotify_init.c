@@ -9,14 +9,11 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#if defined __NR_fanotify_init
-
-# include <limits.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <limits.h>
+#include <stdio.h>
+#include <unistd.h>
 
 /* Performs fanotify_init call via the syscall interface. */
 static void
@@ -71,9 +68,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_fanotify_init")
-
-#endif
