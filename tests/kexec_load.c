@@ -9,13 +9,10 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#ifdef __NR_kexec_load
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 struct strval {
 	kernel_ulong_t val;
@@ -142,9 +139,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_kexec_load");
-
-#endif
