@@ -14,31 +14,25 @@
 # define SYSCALL_NAME	"getgroups32"
 # define GID_TYPE	unsigned int
 
-#else
+#else /* __NR_getgroups */
 
 # include "tests.h"
 # include "scno.h"
 
-# ifdef __NR_getgroups
-
-#  define SYSCALL_NR	__NR_getgroups
-#  define SYSCALL_NAME	"getgroups"
-#  if defined __NR_getgroups32 && __NR_getgroups != __NR_getgroups32
-#   define GID_TYPE	unsigned short
-#  else
-#   define GID_TYPE	unsigned int
-#  endif
-
+# define SYSCALL_NR	__NR_getgroups
+# define SYSCALL_NAME	"getgroups"
+# if defined __NR_getgroups32 && __NR_getgroups != __NR_getgroups32
+#  define GID_TYPE	unsigned short
+# else
+#  define GID_TYPE	unsigned int
 # endif
 
 #endif
 
-#ifdef GID_TYPE
+#include <stdio.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <unistd.h>
-
-# define MAX_STRLEN 32
+#define MAX_STRLEN 32
 static long ngroups;
 
 static void
@@ -108,9 +102,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_getgroups")
-
-#endif
