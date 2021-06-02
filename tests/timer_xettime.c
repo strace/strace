@@ -11,8 +11,7 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_timer_create \
- && defined __NR_timer_gettime \
+#if defined __NR_timer_gettime \
  && defined __NR_timer_settime
 
 # include <stdio.h>
@@ -99,6 +98,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_timer_create && __NR_timer_gettime && __NR_timer_settime")
+SKIP_MAIN_UNDEFINED("__NR_timer_gettime && __NR_timer_settime")
 
 #endif

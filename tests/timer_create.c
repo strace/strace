@@ -1,5 +1,5 @@
 /*
- * This file is part of timer_create strace test.
+ * Check decoding of timer_create syscall.
  *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
@@ -11,13 +11,11 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_timer_create
-
-# include <stdio.h>
-# include <signal.h>
-# include <time.h>
-# include <unistd.h>
-# include "sigevent.h"
+#include <stdio.h>
+#include <signal.h>
+#include <time.h>
+#include <unistd.h>
+#include "sigevent.h"
 
 int
 main(void)
@@ -80,9 +78,9 @@ main(void)
 	       sev.sigev_un.sigev_thread.attribute,
 	       tid[2]);
 
-# ifndef SIGEV_THREAD_ID
-#  define SIGEV_THREAD_ID 4
-# endif
+#ifndef SIGEV_THREAD_ID
+# define SIGEV_THREAD_ID 4
+#endif
 	sev.sigev_notify = SIGEV_THREAD_ID;
 	sev.sigev_un.tid = getpid();
 	if (syscall(__NR_timer_create, CLOCK_MONOTONIC, &sev, &tid[3]))
@@ -99,9 +97,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_timer_create")
-
-#endif
