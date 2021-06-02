@@ -1,4 +1,6 @@
 /*
+ * Check decoding of readlinkat syscall.
+ *
  * Copyright (c) 2015 Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
@@ -10,14 +12,12 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_readlinkat
+#include <stdio.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <unistd.h>
-
-# define PREFIX "test.readlinkat"
-# define TARGET (PREFIX ".target")
-# define LINKPATH (PREFIX ".link")
+#define PREFIX "test.readlinkat"
+#define TARGET (PREFIX ".target")
+#define LINKPATH (PREFIX ".link")
 
 int
 main(void)
@@ -54,9 +54,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_readlink")
-
-#endif
