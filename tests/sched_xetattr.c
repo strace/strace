@@ -1,4 +1,6 @@
 /*
+ * Check decoding of sched_getattr and sched_setattr syscalls.
+ *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
@@ -9,16 +11,14 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_sched_getattr && defined __NR_sched_setattr
-
-# include <inttypes.h>
-# include <stdio.h>
-# include <sched.h>
-# include <unistd.h>
-# include "pidns.h"
-# include "sched_attr.h"
-# include "xlat.h"
-# include "xlat/schedulers.h"
+#include <inttypes.h>
+#include <stdio.h>
+#include <sched.h>
+#include <unistd.h>
+#include "pidns.h"
+#include "sched_attr.h"
+#include "xlat.h"
+#include "xlat/schedulers.h"
 
 static const char *errstr;
 
@@ -75,11 +75,11 @@ main(void)
 	pidns_print_leader();
 	printf("sched_getattr(-1, %p, %s%u, %u) = %s\n",
 	       attr,
-# if defined __arm64__ || defined __aarch64__
+#if defined __arm64__ || defined __aarch64__
 	       "0xdefaced<<32|",
-# else
+#else
 	       "",
-# endif
+#endif
 	       (unsigned) bogus_size, (unsigned) bogus_flags, errstr);
 
 	sys_sched_getattr(0, (unsigned long) efault, SCHED_ATTR_MIN_SIZE, 0);
@@ -129,18 +129,18 @@ main(void)
 	}
 	printf("}, %u, 0) = 0\n", (unsigned) sizeof(*attr));
 
-# if defined __arm64__ || defined __aarch64__
+#if defined __arm64__ || defined __aarch64__
 	long rc =
-# endif
+#endif
 	sys_sched_getattr(F8ILL_KULONG_MASK, (unsigned long) attr,
 			  F8ILL_KULONG_MASK | sizeof(*attr), F8ILL_KULONG_MASK);
-# if defined __arm64__ || defined __aarch64__
+#if defined __arm64__ || defined __aarch64__
 	if (rc) {
 		pidns_print_leader();
 		printf("sched_getattr(0, %p, 0xffffffff<<32|%u, 0) = %s\n",
 		       attr, (unsigned) sizeof(*attr), errstr);
 	} else
-# endif
+#endif
 	{
 		pidns_print_leader();
 		printf("sched_getattr(0, {size=%u, sched_policy=", attr->size);
@@ -440,9 +440,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_sched_getattr && __NR_sched_setattr")
-
-#endif
