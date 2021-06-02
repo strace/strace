@@ -12,7 +12,7 @@
 #include "scno.h"
 #include <fcntl.h>
 
-#if defined __NR_fchownat && defined AT_FDCWD && defined AT_SYMLINK_NOFOLLOW
+#if defined AT_FDCWD && defined AT_SYMLINK_NOFOLLOW
 
 # include <stdio.h>
 # include <unistd.h>
@@ -116,6 +116,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_fchownat && AT_FDCWD && AT_SYMLINK_NOFOLLOW")
+SKIP_MAIN_UNDEFINED("AT_FDCWD && AT_SYMLINK_NOFOLLOW")
 
 #endif
