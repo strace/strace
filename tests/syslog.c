@@ -1,4 +1,6 @@
 /*
+ * Check decoding of syslog syscall.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,16 +10,14 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_syslog
+#include <stdio.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <unistd.h>
-
-# ifdef RETVAL_INJECTED
-#  define RET_SFX " (INJECTED)"
-# else
-#  define RET_SFX ""
-# endif
+#ifdef RETVAL_INJECTED
+# define RET_SFX " (INJECTED)"
+#else
+# define RET_SFX ""
+#endif
 
 bool
 valid_cmd(int cmd)
@@ -94,10 +94,10 @@ main(void)
 		printf("syslog(%s, NULL, -1) = %s" RET_SFX "\n",
 		       two_args[i].str, sprintrc(rc));
 
-# ifdef RETVAL_INJECTED
+#ifdef RETVAL_INJECTED
 		/* Avoid valid commands with a bogus address */
 		if (!valid_cmd(two_args[i].cmd))
-# endif
+#endif
 		{
 			rc = syscall(__NR_syslog, high | two_args[i].cmd, addr,
 				     -1);
@@ -138,9 +138,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_syslog")
-
-#endif
