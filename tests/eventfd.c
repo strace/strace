@@ -1,4 +1,6 @@
 /*
+ * Check decoding of eventfd2 syscall.
+ *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
@@ -9,10 +11,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_eventfd2
-
-# include <unistd.h>
-# include "kernel_fcntl.h"
+#include <unistd.h>
+#include "kernel_fcntl.h"
 
 int
 main(void)
@@ -22,9 +22,3 @@ main(void)
 		perror_msg_and_skip("eventfd2");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_eventfd2")
-
-#endif
