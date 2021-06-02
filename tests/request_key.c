@@ -9,14 +9,11 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#ifdef __NR_request_key
-
-# include <inttypes.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <unistd.h>
 
 void
 print_val_str(const void *ptr, const char *str)
@@ -121,9 +118,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_request_key");
-
-#endif
