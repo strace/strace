@@ -12,10 +12,8 @@
 #include "scno.h"
 #include "pidns.h"
 
-#ifdef __NR_migrate_pages
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -38,9 +36,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_migrate_pages")
-
-#endif
