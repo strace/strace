@@ -1,4 +1,6 @@
 /*
+ * Check decoding of epoll_ctl syscall.
+ *
  * Copyright (c) 2016-2021 The strace developers.
  * All rights reserved.
  *
@@ -8,12 +10,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_epoll_ctl
-
-# include <inttypes.h>
-# include <stdio.h>
-# include <sys/epoll.h>
-# include <unistd.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <sys/epoll.h>
+#include <unistd.h>
 
 static long
 invoke_syscall(unsigned long epfd, unsigned long op, unsigned long fd, void *ev)
@@ -44,9 +44,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_epoll_ctl")
-
-#endif
