@@ -14,29 +14,23 @@
 # define SYSCALL_NAME	"setgroups32"
 # define GID_TYPE	unsigned int
 
-#else
+#else /* __NR_setgroups */
 
 # include "tests.h"
 # include "scno.h"
 
-# ifdef __NR_setgroups
-
-#  define SYSCALL_NR	__NR_setgroups
-#  define SYSCALL_NAME	"setgroups"
-#  if defined __NR_setgroups32 && __NR_setgroups != __NR_setgroups32
-#   define GID_TYPE	unsigned short
-#  else
-#   define GID_TYPE	unsigned int
-#  endif
-
+# define SYSCALL_NR	__NR_setgroups
+# define SYSCALL_NAME	"setgroups"
+# if defined __NR_setgroups32 && __NR_setgroups != __NR_setgroups32
+#  define GID_TYPE	unsigned short
+# else
+#  define GID_TYPE	unsigned int
 # endif
 
 #endif
 
-#ifdef GID_TYPE
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 void
 printuid(GID_TYPE id)
@@ -161,9 +155,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_setgroups")
-
-#endif
