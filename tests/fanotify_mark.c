@@ -10,11 +10,9 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#if defined HAVE_SYS_FANOTIFY_H && defined HAVE_FANOTIFY_MARK && \
-	defined __NR_fanotify_mark
+#if defined HAVE_SYS_FANOTIFY_H && defined HAVE_FANOTIFY_MARK
 
 # include <limits.h>
 # include <stdio.h>
@@ -266,7 +264,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("HAVE_SYS_FANOTIFY_H && HAVE_FANOTIFY_MARK && "
-		    "__NR_fanotify_mark")
+SKIP_MAIN_UNDEFINED("HAVE_SYS_FANOTIFY_H && HAVE_FANOTIFY_MARK")
 
 #endif
