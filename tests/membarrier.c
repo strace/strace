@@ -1,4 +1,6 @@
 /*
+ * Check decoding of membarrier syscall.
+ *
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
@@ -9,12 +11,10 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_membarrier
-
-# include <assert.h>
-# include <errno.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -89,9 +89,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_membarrier")
-
-#endif
