@@ -13,11 +13,9 @@
 #include "scno.h"
 #include "pidns.h"
 
-#ifdef __NR_kill
-
-# include <signal.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
 
 static void
 handler(int sig)
@@ -60,9 +58,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_kill")
-
-#endif
