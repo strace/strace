@@ -1,4 +1,6 @@
 /*
+ * Check decoding of io_* syscalls.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
@@ -7,18 +9,14 @@
  */
 
 #include "tests.h"
-#include <fcntl.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <time.h>
-#include <unistd.h>
 #include "scno.h"
 
-#if defined __NR_io_setup \
- && defined __NR_io_submit \
- && defined __NR_io_getevents \
- && defined __NR_io_cancel \
- && defined __NR_io_destroy
+#ifdef __NR_io_getevents
+# include <fcntl.h>
+# include <inttypes.h>
+# include <stdio.h>
+# include <time.h>
+# include <unistd.h>
 # include <linux/aio_abi.h>
 
 int
@@ -371,6 +369,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_io_*")
+SKIP_MAIN_UNDEFINED("__NR_io_getevents")
 
 #endif

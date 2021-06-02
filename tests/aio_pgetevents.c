@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include "scno.h"
 
-#if defined __NR_io_setup && defined __NR_io_pgetevents
+#ifdef __NR_io_pgetevents
 
 # include <fcntl.h>
 # include <inttypes.h>
@@ -164,6 +164,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_io_setup && __NR_io_pgetevents")
+SKIP_MAIN_UNDEFINED("__NR_io_pgetevents")
 
 #endif
