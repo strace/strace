@@ -1,4 +1,6 @@
 /*
+ * Check decoding of sched_getscheduler and sched_setscheduler syscalls.
+ *
  * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
@@ -9,11 +11,9 @@
 #include "scno.h"
 #include "pidns.h"
 
-#if defined __NR_sched_getscheduler && defined __NR_sched_setscheduler
-
-# include <sched.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <sched.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -33,26 +33,26 @@ main(void)
 		case SCHED_RR:
 			scheduler = "SCHED_RR";
 			break;
-# ifdef SCHED_BATCH
+#ifdef SCHED_BATCH
 		case SCHED_BATCH:
 			scheduler = "SCHED_BATCH";
 			break;
-# endif
-# ifdef SCHED_IDLE
+#endif
+#ifdef SCHED_IDLE
 		case SCHED_IDLE:
 			scheduler = "SCHED_IDLE";
 			break;
-# endif
-# ifdef SCHED_ISO
+#endif
+#ifdef SCHED_ISO
 		case SCHED_ISO:
 			scheduler = "SCHED_ISO";
 			break;
-# endif
-# ifdef SCHED_DEADLINE
+#endif
+#ifdef SCHED_DEADLINE
 		case SCHED_DEADLINE:
 			scheduler = "SCHED_DEADLINE";
 			break;
-# endif
+#endif
 		default:
 			scheduler = "SCHED_OTHER";
 	}
@@ -96,9 +96,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_sched_getscheduler && __NR_sched_setscheduler")
-
-#endif
