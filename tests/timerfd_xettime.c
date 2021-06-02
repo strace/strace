@@ -1,4 +1,7 @@
 /*
+ * Check decoding of timerfd_create, timerfd_gettime, and timerfd_settime
+ * syscalls.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
@@ -9,8 +12,7 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_timerfd_create \
- && defined __NR_timerfd_gettime \
+#if defined __NR_timerfd_gettime \
  && defined __NR_timerfd_settime
 
 # include <stdio.h>
@@ -87,7 +89,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_timerfd_create && __NR_timerfd_gettime"
-		    " && __NR_timerfd_settime")
+SKIP_MAIN_UNDEFINED("__NR_timerfd_gettime && __NR_timerfd_settime")
 
 #endif
