@@ -1,4 +1,6 @@
 /*
+ * Check decoding of mlock2 syscall.
+ *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
@@ -9,10 +11,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_mlock2
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -27,9 +27,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_mlock2")
-
-#endif
