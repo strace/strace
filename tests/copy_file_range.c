@@ -1,5 +1,5 @@
 /*
- * This file is part of copy_file_range strace test.
+ * Check decoding of copy_file_range syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2021 The strace developers.
@@ -11,10 +11,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_copy_file_range
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -38,9 +36,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_copy_file_range")
-
-#endif
