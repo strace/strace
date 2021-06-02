@@ -1,4 +1,6 @@
 /*
+ * Check decoding of get_robust_list and set_robust_list syscalls.
+ *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2020 The strace developers.
  * All rights reserved.
@@ -10,10 +12,8 @@
 #include "scno.h"
 #include "pidns.h"
 
-#if defined __NR_get_robust_list && defined __NR_set_robust_list
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 static const char *
 sprintaddr(void *addr)
@@ -64,9 +64,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_get_robust_list && __NR_set_robust_list")
-
-#endif
