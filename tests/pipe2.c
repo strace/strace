@@ -11,11 +11,9 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_pipe2
-
-# include <stdio.h>
-# include <unistd.h>
-# include "kernel_fcntl.h"
+#include <stdio.h>
+#include <unistd.h>
+#include "kernel_fcntl.h"
 
 int
 main(void)
@@ -42,9 +40,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_pipe2")
-
-#endif
