@@ -11,17 +11,15 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_prlimit64
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <sys/resource.h>
+#include <unistd.h>
 
-# include <inttypes.h>
-# include <stdio.h>
-# include <stdint.h>
-# include <sys/resource.h>
-# include <unistd.h>
-
-# include "pidns.h"
-# include "xlat.h"
-# include "xlat/resources.h"
+#include "pidns.h"
+#include "xlat.h"
+#include "xlat/resources.h"
 
 const char *
 sprint_rlim(uint64_t lim)
@@ -78,9 +76,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_prlimit64")
-
-#endif
