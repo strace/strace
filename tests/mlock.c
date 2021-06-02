@@ -1,4 +1,6 @@
 /*
+ * Check decoding of mlock and munlock syscalls.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,7 +10,7 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_mlock && defined __NR_munlock
+#ifdef __NR_mlock
 
 # include <stdio.h>
 # include <unistd.h>
@@ -31,6 +33,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_mlock && __NR_munlock")
+SKIP_MAIN_UNDEFINED("__NR_mlock")
 
 #endif
