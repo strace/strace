@@ -1,4 +1,6 @@
 /*
+ * Check decoding of times syscall.
+ *
  * Copyright (c) 2015 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
@@ -78,21 +80,8 @@ main(void)
 	 * prefer direct times syscall over libc's times function because
 	 * the latter is more prone to return value truncation.
 	 */
-#undef USE_LIBC_SYSCALL
-#if defined __NR_times && \
-   !defined(LINUX_MIPSN32) && \
-   !(defined __x86_64__ && defined __ILP32__)
-# define USE_LIBC_SYSCALL 1
-#endif
 
-#if defined USE_LIBC_SYSCALL
-	long res = syscall(__NR_times, &tbuf);
-
-	if (-1L == res)
-		perror_msg_and_skip("times");
-	else
-		llres = (unsigned long) res;
-#elif defined __NR_times && defined __x86_64__ && defined __ILP32__
+#if defined __x86_64__ && defined __ILP32__
 	register long arg asm("rdi") = (long) &tbuf;
 	asm volatile("syscall\n\t"
 		     : "=a"(llres)
@@ -100,7 +89,7 @@ main(void)
 		     : "memory", "cc", "r11", "cx");
 	if (llres > 0xfffffffffffff000)
 		return 77;
-#else
+#elif defined LINUX_MIPSN32
 	clock_t res = times(&tbuf);
 
 	if ((clock_t) -1 == res)
@@ -109,6 +98,13 @@ main(void)
 		llres = (unsigned long) res;
 	else
 		llres = res;
+#else
+	long res = syscall(__NR_times, &tbuf);
+
+	if (-1L == res)
+		perror_msg_and_skip("times");
+	else
+		llres = (unsigned long) res;
 #endif
 
 	printf("times({tms_utime=%llu, tms_stime=%llu, ",
