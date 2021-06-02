@@ -21,7 +21,7 @@ main(void)
 {
 	int rc;
 
-#if defined __NR_socketcall
+#ifdef __NR_socketcall
 	if (syscall(__NR_socketcall, 0L, 0L, 0L, 0L, 0L) < 0
 		&& EINVAL == errno)
 	{
@@ -31,10 +31,8 @@ main(void)
 	}
 #endif
 
-#if defined __NR_listen
 	rc = syscall(__NR_listen, 0, 0);
 	printf("[%4u] listen(0, 0) = %s\n", __NR_listen, sprintrc(rc));
-#endif
 
 	return 0;
 }
