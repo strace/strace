@@ -1,4 +1,6 @@
 /*
+ * Check decoding of sched_get_priority_max and sched_get_priority_min syscalls.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,12 +10,9 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined(__NR_sched_get_priority_min) \
- && defined(__NR_sched_get_priority_max)
-
-# include <sched.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <sched.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -27,10 +26,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_sched_get_priority_min"
-		    " && defined __NR_sched_get_priority_max");
-
-#endif
