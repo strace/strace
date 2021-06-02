@@ -1,5 +1,5 @@
 /*
- * This file is part of sched_xetaffinity strace test.
+ * Check decoding of sched_getaffinity and sched_setaffinity syscalls.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2020 The strace developers.
@@ -13,8 +13,7 @@
 #include "pidns.h"
 #include <sched.h>
 
-#if defined __NR_sched_getaffinity && defined __NR_sched_setaffinity \
- && defined CPU_ISSET_S && defined CPU_ZERO_S && defined CPU_SET_S
+#if defined CPU_ISSET_S && defined CPU_ZERO_S && defined CPU_SET_S
 
 # include <assert.h>
 # include <errno.h>
@@ -121,7 +120,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("__NR_sched_getaffinity && __NR_sched_setaffinity"
-		    " && CPU_ISSET_S && CPU_ZERO_S && CPU_SET_S")
+SKIP_MAIN_UNDEFINED("CPU_ISSET_S && CPU_ZERO_S && CPU_SET_S")
 
 #endif
