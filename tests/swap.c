@@ -1,4 +1,6 @@
 /*
+ * Check decoding of swapon and swapoff tests.
+ *
  * Copyright (c) 2016-2019 The strace developers.
  * All rights reserved.
  *
@@ -8,11 +10,9 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_swapon && defined __NR_swapoff
-
-# include <stdio.h>
-# include <sys/swap.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <sys/swap.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -50,9 +50,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_swapon && __NR_swapoff")
-
-#endif
