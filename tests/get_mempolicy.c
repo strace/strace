@@ -10,17 +10,15 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_get_mempolicy
+#include <stdio.h>
+#include <unistd.h>
 
-# include <stdio.h>
-# include <unistd.h>
+#include "xlat.h"
+#include "xlat/mpol_modes.h"
 
-# include "xlat.h"
-# include "xlat/mpol_modes.h"
-
-# define MAX_STRLEN 3
-# define NLONGS(n) ((n + 8 * sizeof(long) - 2) \
-		      / (8 * sizeof(long)))
+#define MAX_STRLEN 3
+#define NLONGS(n) ((n + 8 * sizeof(long) - 2) \
+		     / (8 * sizeof(long)))
 
 static void
 print_nodes(unsigned long maxnode)
@@ -107,9 +105,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_get_mempolicy")
-
-#endif
