@@ -9,15 +9,12 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#ifdef __NR_lookup_dcookie
-
-# include <inttypes.h>
-# include <limits.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <stdio.h>
+#include <unistd.h>
 
 static void
 do_lookup_cookie(uint64_t cookie, char *buf, kernel_ulong_t len)
@@ -25,13 +22,13 @@ do_lookup_cookie(uint64_t cookie, char *buf, kernel_ulong_t len)
 	long rc;
 	const char *errstr;
 
-# if (LONG_MAX > INT_MAX) \
+#if (LONG_MAX > INT_MAX) \
   || (defined __x86_64__ && defined __ILP32__) \
   || defined LINUX_MIPSN32
 	rc = syscall(__NR_lookup_dcookie, cookie, buf, len);
-# else
+#else
 	rc = syscall(__NR_lookup_dcookie, LL_VAL_TO_PAIR(cookie), buf, len);
-# endif
+#endif
 
 	errstr = sprintrc(rc);
 	printf("lookup_dcookie(%" PRIu64 ", ", cookie);
@@ -69,9 +66,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_lookup_dcookie");
-
-#endif
