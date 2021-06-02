@@ -9,13 +9,10 @@
  */
 
 #include "tests.h"
-
 #include "scno.h"
 
-#ifdef __NR_getcpu
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -49,9 +46,3 @@ main(void)
 
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_getcpu");
-
-#endif
