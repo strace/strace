@@ -1,4 +1,6 @@
 /*
+ * Check decoding of sched_getparam and sched_setparam syscalls.
+ *
  * Copyright (c) 2016-2020 The strace developers.
  * All rights reserved.
  *
@@ -9,11 +11,9 @@
 #include "scno.h"
 #include "pidns.h"
 
-#if defined __NR_sched_getparam && defined __NR_sched_setparam
-
-# include <sched.h>
-# include <stdio.h>
-# include <unistd.h>
+#include <sched.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -42,9 +42,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_sched_getparam && __NR_sched_setparam")
-
-#endif
