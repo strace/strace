@@ -10,10 +10,8 @@
 #include "tests.h"
 #include "scno.h"
 
-#ifdef __NR_mbind
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 static const char *errstr;
 
@@ -37,17 +35,17 @@ k_mbind(const unsigned long start,
 	return rc;
 }
 
-# if XLAT_RAW
-#  define out_str	raw
-#  define flags_str	"0xffffffff"
-# elif XLAT_VERBOSE
-#  define out_str	verbose
-#  define flags_str	"0xffffffff /* MPOL_MF_STRICT|MPOL_MF_MOVE" \
+#if XLAT_RAW
+# define out_str	raw
+# define flags_str	"0xffffffff"
+#elif XLAT_VERBOSE
+# define out_str	verbose
+# define flags_str	"0xffffffff /* MPOL_MF_STRICT|MPOL_MF_MOVE" \
 			"|MPOL_MF_MOVE_ALL|0xfffffff8 */"
-# else
-#  define out_str	abbrev
-#  define flags_str	"MPOL_MF_STRICT|MPOL_MF_MOVE|MPOL_MF_MOVE_ALL|0xfffffff8"
-# endif
+#else
+# define out_str	abbrev
+# define flags_str	"MPOL_MF_STRICT|MPOL_MF_MOVE|MPOL_MF_MOVE_ALL|0xfffffff8"
+#endif
 
 static struct {
 	unsigned long val;
@@ -95,7 +93,7 @@ static struct {
 		"|MPOL_F_NUMA_BALANCING|0xffff1fff */",
 	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|MPOL_F_NUMA_BALANCING"
 		"|0xffff1fff" },
-# if SIZEOF_LONG > 4
+#if SIZEOF_LONG > 4
 	{ 0xffffffff00000000UL,
 	  "0xffffffff00000000",
 	  "0xffffffff00000000 /* MPOL_??? */",
@@ -110,7 +108,7 @@ static struct {
 		"|MPOL_F_NUMA_BALANCING|0xffffffffffff1fff */",
 	  "MPOL_F_STATIC_NODES|MPOL_F_RELATIVE_NODES|MPOL_F_NUMA_BALANCING"
 		"|0xffffffffffff1fff" },
-# endif
+#endif
 };
 
 int
@@ -146,9 +144,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_mbind")
-
-#endif
