@@ -12,16 +12,14 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_name_to_handle_at && defined __NR_open_by_handle_at
+#include <assert.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 
-# include <assert.h>
-# include <errno.h>
-# include <inttypes.h>
-# include <fcntl.h>
-# include <stdio.h>
-# include <unistd.h>
-
-# include "secontext.h"
+#include "secontext.h"
 
 enum assert_rc {
 	ASSERT_NONE,
@@ -29,16 +27,16 @@ enum assert_rc {
 	ASSERT_ERROR,
 };
 
-# ifndef MAX_HANDLE_SZ
+#ifndef MAX_HANDLE_SZ
 
-#  define MAX_HANDLE_SZ 128
+# define MAX_HANDLE_SZ 128
 
 struct file_handle {
 	unsigned int handle_bytes;
 	int handle_type;
 	unsigned char f_handle[0];
 };
-# endif /* !MAX_HANDLE_SZ */
+#endif /* !MAX_HANDLE_SZ */
 
 
 void
@@ -50,7 +48,7 @@ print_handle_data(unsigned char *bytes, unsigned int size)
 		printf("...");
 }
 
-# ifndef TEST_SECONTEXT
+#ifndef TEST_SECONTEXT
 void
 do_name_to_handle_at(kernel_ulong_t dirfd, const char *dirfd_str,
 		     kernel_ulong_t pathname, const char *pathname_str,
@@ -132,15 +130,15 @@ do_open_by_handle_at(kernel_ulong_t mount_fd,
 
 	printf("%s\n", sprintrc(rc));
 }
-# endif /* !TEST_SECONTEXT */
+#endif /* !TEST_SECONTEXT */
 
 struct strval {
 	kernel_ulong_t val;
 	const char *str;
 };
 
-# define STR16 "0123456789abcdef"
-# define STR64 STR16 STR16 STR16 STR16
+#define STR16 "0123456789abcdef"
+#define STR64 STR16 STR16 STR16 STR16
 
 int
 main(void)
@@ -229,7 +227,7 @@ main(void)
 		O_RDONLY | O_DIRECTORY);
 	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
 
-# ifndef TEST_SECONTEXT
+#ifndef TEST_SECONTEXT
 	static const struct strval dirfds[] = {
 		{ (kernel_ulong_t) 0xdeadca57badda7a1ULL, "-1159878751" },
 		{ (kernel_ulong_t) 0x12345678ffffff9cULL, "AT_FDCWD" },
@@ -339,7 +337,7 @@ main(void)
 			}
 		}
 	}
-# endif
+#endif
 
 	/*
 	 * Tests with dirfd.
@@ -405,9 +403,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_name_to_handle_at && __NR_open_by_handle_at")
-
-#endif
