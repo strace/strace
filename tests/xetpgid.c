@@ -1,5 +1,5 @@
 /*
- * This file is part of xetpgid strace test.
+ * Check decoding of getpgid and setpgid syscalls.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2020 The strace developers.
@@ -12,10 +12,8 @@
 #include "scno.h"
 #include "pidns.h"
 
-#if defined __NR_getpgid && defined __NR_setpgid
-
-# include <stdio.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 
 int
 main(void)
@@ -38,9 +36,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_getpgid && __NR_setpgid")
-
-#endif
