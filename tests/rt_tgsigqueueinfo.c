@@ -1,5 +1,5 @@
 /*
- * This file is part of rt_tgsigqueueinfo strace test.
+ * Check decoding of rt_tgsigqueueinfo syscall.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2016-2021 The strace developers.
@@ -12,13 +12,11 @@
 #include "scno.h"
 #include "pidns.h"
 
-#if defined __NR_rt_tgsigqueueinfo && defined __NR_gettid
-
-# include <errno.h>
-# include <signal.h>
-# include <stdio.h>
-# include <string.h>
-# include <unistd.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 static long
 k_tgsigqueueinfo(const pid_t tgid, const int tid, const int sig, const void *const info)
@@ -70,9 +68,3 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
-
-#else
-
-SKIP_MAIN_UNDEFINED("__NR_rt_tgsigqueueinfo")
-
-#endif
