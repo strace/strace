@@ -41,7 +41,7 @@
 # define PTRACE_SETREGS PTRACE_SETREGS64
 #endif
 
-#include "syscall.h"
+#include "sen.h"
 #include "xstring.h"
 #include "syscallent_base_nr.h"
 

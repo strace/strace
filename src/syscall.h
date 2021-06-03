@@ -12,7 +12,6 @@
 
 # include "syscall_dummy.h"
 # include "sys_func.h"
-# include "sen.h"
 
 # if HAVE_ARCH_UID16_SYSCALLS
 extern SYS_FUNC(chown16);

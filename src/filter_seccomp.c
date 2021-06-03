@@ -17,7 +17,6 @@
 
 #include "filter_seccomp.h"
 #include "number_set.h"
-#include "syscall.h"
 #include "scno.h"
 
 bool seccomp_filtering;

@@ -1889,4 +1889,8 @@ print_big_u64_addr(const uint64_t addr)
 #  define print_big_u64_addr(addr_) ((void) 0)
 # endif /* CAN_ARCH_BE_COMPAT_ON_64BIT_KERNEL */
 
+# ifndef IN_MPERS_BOOTSTRAP
+#  include "syscall.h"
+# endif
+
 #endif /* !STRACE_DEFS_H */

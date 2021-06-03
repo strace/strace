@@ -12,7 +12,7 @@
 #include <poll.h>
 
 #include "number_set.h"
-#include "syscall.h"
+#include "sen.h"
 #include "xstring.h"
 
 struct path_set global_path_set;
