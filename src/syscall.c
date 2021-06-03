@@ -774,7 +774,7 @@ print_syscall_resume(struct tcb *tcp)
 	}
 }
 
-void
+static void
 print_injected_note(struct tcb *tcp)
 {
 	if (syscall_tampered(tcp) && syscall_tampered_poked(tcp))
