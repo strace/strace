@@ -5,6 +5,9 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#ifdef shuffle_scno_is_static
+static
+#endif
 kernel_ulong_t
 shuffle_scno(kernel_ulong_t scno)
 {
