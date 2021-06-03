@@ -480,7 +480,7 @@ keyctl_move(struct tcb *const tcp,
 	printflags(keyctl_move_flags, flags, "KEYCTL_MOVE_???");
 }
 
-bool
+static bool
 print_keyctl_caps(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	static const struct {
