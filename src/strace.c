@@ -758,7 +758,7 @@ line_ended(void)
 	}
 }
 
-void
+static void
 set_current_tcp(const struct tcb *tcp)
 {
 	current_tcp = (struct tcb *) tcp;
