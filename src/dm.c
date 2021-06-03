@@ -171,7 +171,7 @@ misplaced:
 	tprints_comment("misplaced struct dm_target_spec");
 }
 
-bool
+static bool
 dm_print_dev(struct tcb *tcp, void *dev_ptr, size_t dev_size, void *dummy)
 {
 	uint64_t *dev = (uint64_t *) dev_ptr;
