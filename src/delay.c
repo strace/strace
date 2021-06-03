@@ -6,6 +6,7 @@
  */
 
 #include "defs.h"
+#include "delay.h"
 
 struct inject_delay_data {
 	struct timespec ts_enter;
