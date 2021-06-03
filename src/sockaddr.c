@@ -225,7 +225,7 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
  * Check that we can print an AX.25 address in its native form, otherwise it
  * makes sense to print it in raw also (or in raw only).
  */
-enum xlat_style
+static enum xlat_style
 check_ax25_address(const ax25_address *addr)
 {
 	enum xlat_style ret = XLAT_STYLE_DEFAULT;
