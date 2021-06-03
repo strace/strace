@@ -235,7 +235,7 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 	return true;
 }
 
-bool
+static bool
 decode_nla_linkinfo_kind(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
 			 const unsigned int len,
@@ -258,7 +258,7 @@ decode_nla_linkinfo_kind(struct tcb *const tcp,
 	return true;
 }
 
-bool
+static bool
 decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
 			       const kernel_ulong_t addr,
 			       const unsigned int len,
@@ -298,7 +298,7 @@ decode_nla_linkinfo_xstats_can(struct tcb *const tcp,
 	return true;
 }
 
-bool
+static bool
 decode_nla_linkinfo_xstats(struct tcb *const tcp,
 			   const kernel_ulong_t addr,
 			   const unsigned int len,
@@ -365,7 +365,7 @@ static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_VLAN_STATS_PER_PORT]		= decode_nla_u8,
 };
 
-bool
+static bool
 decode_nla_linkinfo_data_bridge(struct tcb *const tcp,
 				const kernel_ulong_t addr,
 				const unsigned int len,
@@ -407,7 +407,7 @@ static const nla_decoder_t ifla_info_data_tun_nla_decoders[] = {
 	[IFLA_TUN_NUM_DISABLED_QUEUES]	= decode_nla_u32,
 };
 
-bool
+static bool
 decode_nla_linkinfo_data_tun(struct tcb *const tcp,
 			     const kernel_ulong_t addr,
 			     const unsigned int len,
@@ -421,7 +421,7 @@ decode_nla_linkinfo_data_tun(struct tcb *const tcp,
 	return true;
 }
 
-bool
+static bool
 decode_nla_linkinfo_data(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
 			 const unsigned int len,
@@ -629,7 +629,7 @@ decode_ifla_xdp_flags(struct tcb *const tcp,
 	return true;
 }
 
-bool
+static bool
 decode_ifla_xdp_attached(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
 			 const unsigned int len,
