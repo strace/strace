@@ -115,7 +115,7 @@ sprint_makedev(unsigned long long val)
 
 #define ioc(x_) sprint_xlat_(x_, #x_)
 
-void
+static void
 prfl_btrfs(const struct xlat *xlat, const unsigned long long val,
 	   const char *str)
 {
@@ -126,7 +126,7 @@ prfl_btrfs(const struct xlat *xlat, const unsigned long long val,
 		printf(" */");
 }
 
-void
+static void
 prxval_btrfs(const struct xlat *xlat, const unsigned long long val,
 	     const char *str, bool known)
 {
