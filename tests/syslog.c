@@ -19,13 +19,13 @@
 # define RET_SFX ""
 #endif
 
-bool
+static bool
 valid_cmd(int cmd)
 {
 	return cmd >= 0 && cmd <= 10;
 }
 
-void
+static void
 printstr(const char *s, int cmd, long size)
 {
 	if (size < 0 || !valid_cmd(cmd))
