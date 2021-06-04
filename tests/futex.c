@@ -35,8 +35,9 @@
 # include "xlat/futexwakeops.h"
 # include "xlat/futexwakecmps.h"
 
-void futex_error(int *uaddr, int op, unsigned long val, unsigned long timeout,
-	int *uaddr2, unsigned long val3, int rc, const char *func, int line)
+static void
+futex_error(int *uaddr, int op, unsigned long val, unsigned long timeout,
+	    int *uaddr2, unsigned long val3, int rc, const char *func, int line)
 {
 	perror_msg_and_fail("%s:%d: futex(%p, %#x, %#x, %#lx, %p, %#x) = %d",
 		func, line, uaddr, op, (unsigned) val, timeout, uaddr,
@@ -73,7 +74,8 @@ enum argmask {
 	ARG6 = 1 << 3,
 };
 
-void invalid_op(int *val, int op, uint32_t argmask, ...)
+static void
+invalid_op(int *val, int op, uint32_t argmask, ...)
 {
 	static const unsigned long args[] = {
 		(unsigned long) 0xface1e55deadbee1ULL,
