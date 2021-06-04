@@ -23,7 +23,8 @@
 #   define TEST_SYSCALL_STR "accept"
 #  endif
 
-int do_accept(int sockfd, void *addr, void *addrlen)
+static int
+do_accept(int sockfd, void *addr, void *addrlen)
 {
 	return syscall(__NR_accept, sockfd, addr, addrlen);
 }
