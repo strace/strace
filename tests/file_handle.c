@@ -39,7 +39,7 @@ struct file_handle {
 #endif /* !MAX_HANDLE_SZ */
 
 
-void
+static void
 print_handle_data(unsigned char *bytes, unsigned int size)
 {
 	unsigned int len = MIN(size, MAX_HANDLE_SZ);
@@ -49,7 +49,7 @@ print_handle_data(unsigned char *bytes, unsigned int size)
 }
 
 #ifndef TEST_SECONTEXT
-void
+static void
 do_name_to_handle_at(kernel_ulong_t dirfd, const char *dirfd_str,
 		     kernel_ulong_t pathname, const char *pathname_str,
 		     kernel_ulong_t handle, const char *handle_str,
@@ -93,7 +93,7 @@ do_name_to_handle_at(kernel_ulong_t dirfd, const char *dirfd_str,
 	printf(", %s) = %s\n", flags_str, errstr);
 }
 
-void
+static void
 do_open_by_handle_at(kernel_ulong_t mount_fd,
 		     kernel_ulong_t handle, bool valid_handle, bool valid_data,
 		     kernel_ulong_t flags, const char *flags_str)
