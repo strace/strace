@@ -22,7 +22,7 @@
 #include "xlat.h"
 #include "xlat/usagewho.h"
 
-int
+static int
 invoke_print(int who, const char *who_str, kernel_rusage_t *usage)
 {
 	int rc = syscall(__NR_getrusage, who, usage);
