@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void
+static void
 printuid(unsigned UGID_TYPE id)
 {
 	if (id == (unsigned UGID_TYPE) -1U)
