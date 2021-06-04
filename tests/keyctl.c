@@ -57,7 +57,7 @@ bool buf_in_arg;
  * controls whether it is nul-terminated or not). If size is negative,
  * it contains "in" argument.
  */
-void
+static void
 print_quoted_string_limit(const char *str, size_t size, long rc)
 {
 	size_t print_size = ((rc >= 0) && (size > 0)) ?
@@ -99,7 +99,7 @@ print_arg(kernel_ulong_t arg, const char *str, const char *fmt, size_t size,
 	}
 }
 
-void
+static void
 print_flags(const struct xlat *xlat, unsigned long long flags,
 	    const char *const dflt)
 {
@@ -122,7 +122,7 @@ print_flags(const struct xlat *xlat, unsigned long long flags,
  *   used for argument printing. If sz is negative, in argument is assumed, out
  *   otherwise.
  */
-void
+static void
 do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 {
 	kernel_ulong_t args[4] = {
@@ -178,7 +178,7 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 	printf(") = %s\n", errstr);
 }
 
-int
+static int
 append_str(char **buf, size_t *left, const char *fmt, ...)
 {
 	int ret;
@@ -196,7 +196,7 @@ append_str(char **buf, size_t *left, const char *fmt, ...)
 	return ret;
 }
 
-const char *
+static const char *
 kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
 	       bool print_spare, const char *hash_str, const char *oi_str)
 {
@@ -257,7 +257,7 @@ kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
 	return buf;
 }
 
-const char *
+static const char *
 kcpp_to_str(struct keyctl_pkey_params *params, bool out, const char *key_str,
 	    bool print_spare)
 {
