@@ -17,7 +17,7 @@
 #include "xlat.h"
 #include "xlat/resources.h"
 
-const char *
+static const char *
 sprint_rlim(kernel_ulong_t lim)
 {
 	static char buf[2][ /* space for 2 llu strings */
