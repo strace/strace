@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-const char *
+static const char *
 sprintptr(kernel_ulong_t ptr)
 {
 	static char buf[sizeof(ptr) * 2 + sizeof("0x")];
