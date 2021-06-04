@@ -157,7 +157,7 @@ do_call(kernel_ulong_t pid, enum pid_type pid_type,
 		(unsigned long) flags, errstr);
 }
 
-kernel_ulong_t
+static kernel_ulong_t
 ptr_cast(void *ptr)
 {
 	return (kernel_ulong_t) (uintptr_t) ptr;
