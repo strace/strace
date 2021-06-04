@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void
+static void
 print_val_str(const void *ptr, const char *str)
 {
 	if (str)
@@ -24,7 +24,7 @@ print_val_str(const void *ptr, const char *str)
 		printf("%p, ", ptr);
 }
 
-void
+static void
 do_add_key(const char *type, const char *type_str, const char *desc,
 	const char *desc_str, const char *payload, const char *payload_str,
 	size_t plen, int32_t keyring, const char *keyring_str)
