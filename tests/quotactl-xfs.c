@@ -27,7 +27,7 @@
 #endif
 
 
-void
+static void
 print_xdisk_quota(int rc, void *ptr, void *arg)
 {
 	struct fs_disk_quota *dq = ptr;
@@ -85,7 +85,7 @@ print_xdisk_quota(int rc, void *ptr, void *arg)
 	printf("}");
 }
 
-void
+static void
 print_xquota_stat(int rc, void *ptr, void *arg)
 {
 	struct fs_quota_stat *qs = ptr;
@@ -132,7 +132,7 @@ print_xquota_stat(int rc, void *ptr, void *arg)
 	printf("}");
 }
 
-void
+static void
 print_xquota_statv(int rc, void *ptr, void *arg)
 {
 	struct fs_quota_statv *qs = ptr;
