@@ -13,6 +13,7 @@
 
 # define TEST_SYSCALL_NR __NR_fcntl64
 # define TEST_SYSCALL_STR "fcntl64"
+# define NEED_TEST_FLOCK64_EINVAL
 # include "fcntl-common.c"
 
 static void

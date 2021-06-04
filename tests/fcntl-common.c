@@ -21,6 +21,12 @@
 #define TEST_FLOCK_EINVAL(cmd) test_flock_einval(cmd, #cmd)
 #define TEST_FLOCK64_EINVAL(cmd) test_flock64_einval(cmd, #cmd)
 
+#ifndef NEED_TEST_FLOCK64_EINVAL
+# if defined F_OFD_GETLK && defined F_OFD_SETLK && defined F_OFD_SETLKW
+#  define NEED_TEST_FLOCK64_EINVAL
+# endif
+#endif
+
 #ifdef HAVE_TYPEOF
 # define TYPEOF_FLOCK_OFF_T typeof(((struct flock *) NULL)->l_len)
 #else
@@ -62,11 +68,8 @@ test_flock_einval(const int cmd, const char *name)
 	       TEST_SYSCALL_STR, name, bad_addr, errstr);
 }
 
-/*
- * This function is not declared static to avoid potential
- * "defined but not used" warning when included by fcntl.c
- */
-void
+#ifdef NEED_TEST_FLOCK64_EINVAL
+static void
 test_flock64_einval(const int cmd, const char *name)
 {
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct flock64, fl);
@@ -87,6 +90,7 @@ test_flock64_einval(const int cmd, const char *name)
 	printf("%s(0, %s, %p) = %s\n",
 	       TEST_SYSCALL_STR, name, bad_addr, errstr);
 }
+#endif /* NEED_TEST_FLOCK64_EINVAL */
 
 static void
 test_flock(void)
