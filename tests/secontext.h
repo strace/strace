@@ -9,22 +9,22 @@
 #include "xmalloc.h"
 #include <unistd.h>
 
+char *secontext_full_file(const char *) ATTRIBUTE_MALLOC;
+char *secontext_full_pid(pid_t) ATTRIBUTE_MALLOC;
+
+char *secontext_short_file(const char *) ATTRIBUTE_MALLOC;
+char *secontext_short_pid(pid_t) ATTRIBUTE_MALLOC;
+
 #if defined TEST_SECONTEXT && defined HAVE_SELINUX_RUNTIME
 
 void update_secontext_type(const char *file, const char *newtype);
 
 # ifdef PRINT_SECONTEXT_FULL
 
-char *secontext_full_file(const char *) ATTRIBUTE_MALLOC;
-char *secontext_full_pid(pid_t) ATTRIBUTE_MALLOC;
-
 #  define SECONTEXT_FILE(filename)	secontext_full_file(filename)
 #  define SECONTEXT_PID(pid)		secontext_full_pid(pid)
 
 # else
-
-char *secontext_short_file(const char *) ATTRIBUTE_MALLOC;
-char *secontext_short_pid(pid_t) ATTRIBUTE_MALLOC;
 
 #  define SECONTEXT_FILE(filename)	secontext_short_file(filename)
 #  define SECONTEXT_PID(pid)		secontext_short_pid(pid)
