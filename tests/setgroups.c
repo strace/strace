@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void
+static void
 printuid(GID_TYPE id)
 {
 	if (id == (GID_TYPE) -1U)
