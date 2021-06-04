@@ -53,7 +53,7 @@ cleanup(void)
 	return 0;
 }
 
-int
+static int
 sys_msgrcv(int msqid, void *msgp, size_t sz, kernel_long_t msgtyp,
 	   int msgflg)
 {
