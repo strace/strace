@@ -21,7 +21,7 @@
 #include "xlat.h"
 #include "xlat/resources.h"
 
-const char *
+static const char *
 sprint_rlim(uint64_t lim)
 {
 	if (lim == -1ULL)
