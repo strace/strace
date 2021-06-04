@@ -30,7 +30,7 @@
 #define QUOTA_ID_STR(_arg) (_arg), gen_quotaid(#_arg, _arg)
 #define QUOTA_STR_INVALID(_arg, str) (_arg), gen_quotacmd(str, _arg)
 
-void
+static void
 print_dqblk(long rc, void *ptr, void *arg)
 {
 	struct if_dqblk *db = ptr;
@@ -68,7 +68,7 @@ print_dqblk(long rc, void *ptr, void *arg)
 	printf("}");
 }
 
-void
+static void
 print_nextdqblk(long rc, void *ptr, void *arg)
 {
 	struct if_nextdqblk *db = ptr;
@@ -111,7 +111,7 @@ print_nextdqblk(long rc, void *ptr, void *arg)
 	printf("}");
 }
 
-void
+static void
 print_dqinfo(long rc, void *ptr, void *arg)
 {
 	struct if_dqinfo *di = ptr;
@@ -150,7 +150,7 @@ print_dqinfo(long rc, void *ptr, void *arg)
 	printf("}");
 }
 
-void
+static void
 print_dqfmt(long rc, void *ptr, void *arg)
 {
 	uint32_t *fmtval = ptr;
@@ -191,7 +191,7 @@ print_dqfmt(long rc, void *ptr, void *arg)
 #endif
 }
 
-const char *
+static const char *
 gen_quotacmd(const char *abbrev_str, const uint32_t cmd)
 {
 	static char quotacmd_str[2048];
@@ -206,7 +206,7 @@ gen_quotacmd(const char *abbrev_str, const uint32_t cmd)
 	return quotacmd_str;
 }
 
-const char *
+static const char *
 gen_quotaid(const char *abbrev_str, const uint32_t id)
 {
 	static char quotaid_str[1024];
