@@ -18,7 +18,7 @@
 
 static long injected_val;
 
-long
+static long
 do_prctl(kernel_ulong_t cmd, kernel_ulong_t arg2, kernel_ulong_t arg3)
 {
 	long rc = syscall(__NR_prctl, cmd, arg2, arg3);
