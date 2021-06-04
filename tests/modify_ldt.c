@@ -19,7 +19,7 @@
 
 # include "print_user_desc.c"
 
-void
+static void
 printrc(long rc)
 {
 # ifdef __x86_64__
