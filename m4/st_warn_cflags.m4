@@ -38,6 +38,7 @@ gl_WARN_ADD([-Wextra])
 gl_WARN_ADD([-Wno-missing-field-initializers])
 gl_WARN_ADD([-Wno-unused-parameter])
 
+gl_WARN_ADD([-Wdate-time])
 gl_WARN_ADD([-Wformat-security])
 gl_WARN_ADD([-Wimplicit-fallthrough=5])
 gl_WARN_ADD([-Winit-self])
