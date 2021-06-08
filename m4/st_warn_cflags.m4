@@ -47,6 +47,7 @@ gl_WARN_ADD([-Wlogical-op])
 gl_WARN_ADD([-Wmissing-prototypes])
 gl_WARN_ADD([-Wnested-externs])
 gl_WARN_ADD([-Wold-style-definition])
+gl_WARN_ADD([-Wtrampolines])
 gl_WARN_ADD([-Wwrite-strings])
 AC_ARG_ENABLE([gcc-Werror],
 	      [AS_HELP_STRING([--enable-gcc-Werror],
