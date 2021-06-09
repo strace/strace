@@ -187,12 +187,14 @@ extern unsigned current_klongsize;
 #  define dispatch_wordsize(call_64_, call_32_, ...) \
 	((current_wordsize > sizeof(uint32_t)) \
 		? (call_64_)(__VA_ARGS__) : (call_32_)(__VA_ARGS__))
-# elif current_wordsize > 4
-#  define opt_wordsize(opt_64_, opt_32_) (opt_64_)
-#  define dispatch_wordsize(call_64_, call_32_, ...) ((call_64_)(__VA_ARGS__))
-# else /* current_wordsize == 4 */
-#  define opt_wordsize(opt_64_, opt_32_) (opt_32_)
-#  define dispatch_wordsize(call_64_, call_32_, ...) ((call_32_)(__VA_ARGS__))
+# else /* defined current_wordsize */
+#  if current_wordsize > 4
+#   define opt_wordsize(opt_64_, opt_32_) (opt_64_)
+#   define dispatch_wordsize(call_64_, call_32_, ...) ((call_64_)(__VA_ARGS__))
+#  else /* current_wordsize == 4 */
+#   define opt_wordsize(opt_64_, opt_32_) (opt_32_)
+#   define dispatch_wordsize(call_64_, call_32_, ...) ((call_32_)(__VA_ARGS__))
+#  endif
 # endif
 
 # ifndef current_klongsize
@@ -201,12 +203,14 @@ extern unsigned current_klongsize;
 #  define dispatch_klongsize(call_64_, call_32_, ...) \
 	((current_klongsize > sizeof(uint32_t)) \
 		? (call_64_)(__VA_ARGS__) : (call_32_)(__VA_ARGS__))
-# elif current_klongsize > 4
-#  define opt_klongsize(opt_64_, opt_32_) (opt_64_)
-#  define dispatch_klongsize(call_64_, call_32_, ...) ((call_64_)(__VA_ARGS__))
-# else /* current_klongsize == 4 */
-#  define opt_klongsize(opt_64_, opt_32_) (opt_32_)
-#  define dispatch_klongsize(call_64_, call_32_, ...) ((call_32_)(__VA_ARGS__))
+# else /* defined current_klongsize */
+#  if current_klongsize > 4
+#   define opt_klongsize(opt_64_, opt_32_) (opt_64_)
+#   define dispatch_klongsize(call_64_, call_32_, ...) ((call_64_)(__VA_ARGS__))
+#  else /* current_klongsize == 4 */
+#   define opt_klongsize(opt_64_, opt_32_) (opt_32_)
+#   define dispatch_klongsize(call_64_, call_32_, ...) ((call_32_)(__VA_ARGS__))
+#  endif
 # endif
 
 
