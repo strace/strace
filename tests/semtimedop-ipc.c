@@ -17,7 +17,6 @@
 # if SIZEOF_LONG > 4
 #  define semtimedop_timespec_t kernel_timespec64_t
 # else
-#  include "arch_defs.h"
 #  define semtimedop_timespec_t kernel_timespec32_t
 # endif
 

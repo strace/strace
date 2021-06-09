@@ -26,7 +26,6 @@
 # if defined __NR_clock_gettime64 \
   || defined __NR_clock_settime64 \
   || defined __NR_clock_getres_time64
-#  include "arch_defs.h"
 #  define clock_timespec_t kernel_timespec32_t
 # else
 #  define clock_timespec_t kernel_timespec64_t

@@ -16,7 +16,6 @@
 # define SYSCALL_NAME "semtimedop"
 
 # ifdef __NR_semtimedop_time64
-#  include "arch_defs.h"
 #  define semtimedop_timespec_t kernel_timespec32_t
 # else
 #  define semtimedop_timespec_t kernel_timespec64_t

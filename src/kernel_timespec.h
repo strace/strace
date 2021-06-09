@@ -8,6 +8,8 @@
 #ifndef STRACE_KERNEL_TIMESPEC_H
 # define STRACE_KERNEL_TIMESPEC_H
 
+# include "arch_defs.h"
+
 typedef struct {
 	long long tv_sec;
 	long long tv_nsec;

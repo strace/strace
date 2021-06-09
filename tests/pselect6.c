@@ -16,7 +16,6 @@
 # define SYSCALL_NAME "pselect6"
 
 # ifdef __NR_pselect6_time64
-#  include "arch_defs.h"
 #  define pselect6_timespec_t kernel_timespec32_t
 # else
 #  define pselect6_timespec_t kernel_timespec64_t
