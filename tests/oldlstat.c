@@ -12,7 +12,7 @@
 #include "tests.h"
 #include "scno.h"
 
-#if defined __NR_oldlstat && HAVE_STRUCT___OLD_KERNEL_STAT
+#if defined __NR_oldlstat && defined HAVE_STRUCT___OLD_KERNEL_STAT
 
 # define OLD_STAT 1
 # define TEST_SYSCALL_NR __NR_oldlstat
