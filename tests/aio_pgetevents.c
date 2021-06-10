@@ -23,7 +23,7 @@
 
 # include <linux/aio_abi.h>
 
-# if !HAVE_STRUCT___AIO_SIGSET
+# ifndef HAVE_STRUCT___AIO_SIGSET
 struct __aio_sigset {
 	sigset_t *sigmask;
 	size_t sigsetsize;
