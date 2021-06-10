@@ -38,7 +38,7 @@
  */
 #if GLIBC_PREREQ_GE(2, 31) && \
  (defined __m68k__ || defined __s390__ || \
-  (WORDS_BIGENDIAN && \
+  (defined WORDS_BIGENDIAN && \
    (defined __arm__ || defined __microblaze__ || defined __sh__)))
 # define TEST_MSGCTL_BOGUS_ADDR 0
 #endif
