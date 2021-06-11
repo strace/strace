@@ -21,7 +21,7 @@
 #define MAX_STRLEN 1
 
 static void
-print_ifc_len(int val)
+print_ifc_len(const int val)
 {
 	printf("%d", val);
 	if (val > 0 && val % (int) sizeof(struct ifreq) == 0)
@@ -30,7 +30,8 @@ print_ifc_len(int val)
 }
 
 static void
-print_ifconf(struct ifconf *ifc, int in_len, char *in_buf, long rc)
+print_ifconf(const struct ifconf *const ifc, const int in_len,
+	     const char *const in_buf, const long rc)
 {
 	if (in_buf) {
 		printf("{ifc_len=");
@@ -81,20 +82,12 @@ print_ifconf(struct ifconf *ifc, int in_len, char *in_buf, long rc)
 }
 
 static void
-gifconf_ioctl(int fd, struct ifconf *ifc, bool ifc_valid)
+gifconf_ioctl(const int fd, struct ifconf *const ifc, const bool ifc_valid)
 {
-	const char *errstr;
-	int in_len;
-	char *in_buf;
-	long rc;
-
-	if (ifc_valid) {
-		in_len = ifc->ifc_len;
-		in_buf = ifc->ifc_buf;
-	}
-
-	rc = ioctl(fd, SIOCGIFCONF, ifc);
-	errstr = sprintrc(rc);
+	const int in_len = ifc_valid ? ifc->ifc_len : 0;
+	const char *const in_buf = ifc_valid ? ifc->ifc_buf : NULL;
+	long rc = ioctl(fd, SIOCGIFCONF, ifc);
+	const char *errstr = sprintrc(rc);
 
 	printf("ioctl(%d, SIOCGIFCONF, ", fd);
 	if (ifc_valid) {
@@ -112,17 +105,10 @@ gifconf_ioctl(int fd, struct ifconf *ifc, bool ifc_valid)
 int
 main(int argc, char *argv[])
 {
-	struct ifreq *ifr = tail_alloc(2 * sizeof(*ifr));
+	struct ifreq *const ifr = tail_alloc(2 * sizeof(*ifr));
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct ifconf, ifc);
-
-	struct sockaddr_in addr;
-	int fd;
-
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-
-	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	const int fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (fd < 0)
 		perror_msg_and_skip("socket AF_INET");
 
 	gifconf_ioctl(fd, NULL, false);
