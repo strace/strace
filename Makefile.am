@@ -31,7 +31,6 @@ CODE_COVERAGE_GENHTML_OPTIONS = $(CODE_COVERAGE_GENHTML_OPTIONS_DEFAULT) \
 CODE_COVERAGE_IGNORE_PATTERN = '/usr/include/*' '*/tests/*' '*/tests-m32/*' '*/tests-mx32/*'
 
 EXTRA_DIST =				\
-	$(man_MANS)			\
 	.version			\
 	COPYING				\
 	CREDITS				\
