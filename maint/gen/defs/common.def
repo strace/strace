@@ -1,0 +1,49 @@
+:fd %{ printfd(tcp, $$); %}
+:uid %{ printuid($$); %}
+:gid %{ printuid($$); %}
+
+:ptr[$9, stringnoz[$1]] %{
+	if (entering(tcp)) {
+		printstrn(tcp, $$, $1);
+	} else if (syserror(tcp)) {
+		printaddr($$);
+	} else {
+		printstrn(tcp, $$, $1);
+	}
+%}
+
+:ptr[$9, string] %{
+	if (entering(tcp)) {
+		printstr(tcp, $$);
+	} else if (syserror(tcp)) {
+		printaddr($$);
+	} else {
+		printstr(tcp, $$);
+	}
+%}
+
+:path %{
+	if (entering(tcp)) {
+		printpath(tcp, $$);
+	} else if (syserror(tcp)) {
+		printaddr($$);
+	} else {
+		printpath(tcp, $$);
+	}
+%}
+
+/* ptr[in, array[uint32_t, $length]] */
+:ptr[in, array[uint32_t, $1]] %{
+	{
+		uint32_t int_buffer;
+		print_array(tcp, $$, $1, &int_buffer, sizeof(int_buffer), tfetch_mem, print_uint_array_member, 0);
+	}
+%}
+
+:ptr[out, ulong] %{
+	if (exiting(tcp)) {
+		printnum_ulong(tcp, $$);
+	}
+%}
+
+ioctl(fd fd, code kernel_ulong_t, arg kernel_ulong_t)

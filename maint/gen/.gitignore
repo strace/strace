@@ -1,0 +1,6 @@
+lex.yy.c
+parse.tab.c
+parse.tab.h
+parse
+parse.output
+/gen
