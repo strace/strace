@@ -34,7 +34,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg)
 
 	const size_t offset = NLMSG_ALIGN(sizeof(rtgenmsg));
 	if (len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_nsid_attrs, "NETNSA_???",
 			      rtgenmsg_nla_decoders,
