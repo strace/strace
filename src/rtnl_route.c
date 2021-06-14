@@ -178,7 +178,7 @@ decode_rtvia(struct tcb *const tcp,
 		const unsigned int offset = offsetof(struct rtvia, rtvia_addr);
 
 		if (len > offset) {
-			tprints(", ");
+			tprint_struct_next();
 			decode_inet_addr(tcp, addr + offset, len - offset,
 					 via.rtvia_family, "rtvia_addr");
 		}
@@ -262,7 +262,7 @@ decode_rta_multipath(struct tcb *const tcp,
 		const unsigned short rtnh_len = MIN(len, nh.rtnh_len);
 		const size_t offset = RTNH_ALIGN(sizeof(nh));
 		if (rtnh_len > offset) {
-			tprints(", ");
+			tprint_array_next();
 			decode_nlattr(tcp, addr + offset, rtnh_len - offset,
 				      rtnl_route_attrs, "RTA_???",
 				      rtmsg_nla_decoders,
@@ -282,8 +282,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(rtmsg, rtm_family, addrfams, "AF_???");
+	tprint_struct_next();
 
-	tprints(", ");
 	if (len >= sizeof(rtmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(rtmsg) - offset,
@@ -317,7 +317,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_rtmsg)
 
 	offset = NLMSG_ALIGN(sizeof(rtmsg));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_route_attrs, "RTA_???",
 			      rtmsg_nla_decoders,
