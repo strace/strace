@@ -70,7 +70,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcamsg)
 
 	const size_t offset = NLMSG_ALIGN(sizeof(tca));
 	if (len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_tc_action_attrs, "TCA_ACT_???",
 			      tcamsg_nla_decoders,
