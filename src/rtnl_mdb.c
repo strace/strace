@@ -65,16 +65,16 @@ decode_mdba_mdb_entry_info(struct tcb *const tcp,
 				sizeof(entry.addr.u), "u");
 		tprint_struct_next();
 		tprints_field_name("proto");
-		tprints("htons(");
+		tprints_arg_begin("htons");
 		printxval(addrfams, proto, "AF_???");
-		tprints(")");
+		tprint_arg_end();
 		tprint_struct_end();
 		tprint_struct_end();
 	}
 
 	const size_t offset = NLMSG_ALIGN(sizeof(entry));
 	if (len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_mdba_mdb_eattr_attrs, "MDBA_MDB_EATTR_???",
 			      mdba_mdb_eattr_nla_decoders,
@@ -152,7 +152,7 @@ decode_mdba_router_port(struct tcb *const tcp,
 
 	const size_t offset = NLMSG_ALIGN(sizeof(ifindex));
 	if (len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_mdba_router_pattr_attrs,
 			      "MDBA_ROUTER_PATTR_???",
@@ -193,8 +193,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(bpm, family, addrfams, "AF_???");
+	tprint_struct_next();
 
-	tprints(", ");
 	if (len >= sizeof(bpm)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(bpm) - offset,
@@ -208,7 +208,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_br_port_msg)
 
 	offset = NLMSG_ALIGN(sizeof(bpm));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_mdb_attrs, "MDBA_???",
 			      br_port_msg_nla_decoders,
