@@ -229,7 +229,7 @@ static bool
 print_stab_data(struct tcb *const tcp, void *const elem_buf,
 		const size_t elem_size, void *const opaque_data)
 {
-	tprintf("%" PRIu16, *(uint16_t *) elem_buf);
+	PRINT_VAL_U(*(uint16_t *) elem_buf);
 
 	return true;
 }
@@ -296,8 +296,8 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 
 	tprint_struct_begin();
 	PRINT_FIELD_XVAL(tcmsg, tcm_family, addrfams, "AF_???");
+	tprint_struct_next();
 
-	tprints(", ");
 	if (len >= sizeof(tcmsg)) {
 		if (!umoven_or_printaddr(tcp, addr + offset,
 					 sizeof(tcmsg) - offset,
@@ -317,7 +317,7 @@ DECL_NETLINK_ROUTE_DECODER(decode_tcmsg)
 
 	offset = NLMSG_ALIGN(sizeof(tcmsg));
 	if (decode_nla && len > offset) {
-		tprints(", ");
+		tprint_array_next();
 		decode_nlattr(tcp, addr + offset, len - offset,
 			      rtnl_tc_attrs, "TCA_???", tcmsg_nla_decoders,
 			      ARRAY_SIZE(tcmsg_nla_decoders), NULL);
