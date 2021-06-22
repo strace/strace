@@ -7,16 +7,10 @@
  */
 
 #include "defs.h"
+#include <linux/kexec.h>
 
 #include "xlat/kexec_load_flags.h"
 #include "xlat/kexec_arch_values.h"
-
-#ifndef KEXEC_ARCH_MASK
-# define KEXEC_ARCH_MASK 0xffff0000
-#endif
-#ifndef KEXEC_SEGMENT_MAX
-# define KEXEC_SEGMENT_MAX 16
-#endif
 
 static bool
 print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
