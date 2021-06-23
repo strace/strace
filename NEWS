@@ -9,7 +9,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     PTRACE_SETREGS, PTRACE_SETREGS64, PTRACE_GETFPREGS, and PTRACE_SETFPREGS
     requests.
   * Implemented powerpc System Call Vectored ABI support.
-  * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, NT_*, and TRAP_*
+  * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, KVM_*, NT_*, and TRAP_*
     constants.
 
 * Bug fixes
