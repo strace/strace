@@ -39,6 +39,7 @@ PTRACE_SETSIGMASK		0x420b
 PTRACE_SECCOMP_GET_FILTER	0x420c
 PTRACE_SECCOMP_GET_METADATA	0x420d
 PTRACE_GET_SYSCALL_INFO		0x420e
+PTRACE_GET_RSEQ_CONFIGURATION	0x420f
 
 /* arch-specific */
 #if defined __arm__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__

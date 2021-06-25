@@ -163,6 +163,9 @@
 #  define PTRACE_SYSCALL_INFO_EXIT	2
 #  define PTRACE_SYSCALL_INFO_SECCOMP	3
 # endif
+# ifndef PTRACE_GET_RSEQ_CONFIGURATION
+#  define PTRACE_GET_RSEQ_CONFIGURATION	0x420f
+# endif
 
 # if defined HAVE_STRUCT_PTRACE_SYSCALL_INFO
 typedef struct ptrace_syscall_info struct_ptrace_syscall_info;
