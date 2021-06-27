@@ -10,7 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     requests.
   * Implemented powerpc System Call Vectored ABI support.
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, KVM_*, NT_*, PR_*,
-    PTRACE_*, RTM_*, and TRAP_* constants.
+    PTRACE_*, RTM_*, RTPROT_*, and TRAP_* constants.
 
 * Bug fixes
 
