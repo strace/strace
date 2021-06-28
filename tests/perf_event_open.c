@@ -76,7 +76,8 @@ struct pea_flags {
 		 context_switch			:1,
 		 write_backward			:1,
 		 namespaces			:1,
-		 __reserved_1			:35;
+		 ksymbol			:1,
+		 __reserved_1			:34;
 };
 
 static const char *
@@ -268,9 +269,12 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	val = attr->namespaces;
 	printf(", namespaces=%" PRIu64, val);
 
+	val = attr->ksymbol;
+	printf(", ksymbol=%" PRIu64, val);
+
 	val = flags_data.flags.__reserved_1;
 	if (val)
-		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..29 */", val);
+		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..30 */", val);
 
 	printf(", %s=%u",
 		attr->watermark ? "wakeup_watermark" : "wakeup_events",
