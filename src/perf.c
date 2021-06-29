@@ -319,6 +319,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_U_CAST(*attr, inherit_thread, unsigned int);
 	tprint_struct_next();
 	PRINT_FIELD_U_CAST(*attr, remove_on_exec, unsigned int);
+	tprint_struct_next();
+	PRINT_FIELD_U_CAST(*attr, sigtrap, unsigned int);
 
 	/*
 	 * Print it only in case it is non-zero, since it may contain flags we
@@ -327,7 +329,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (attr->__reserved_1) {
 		tprint_struct_next();
 		PRINT_FIELD_X_CAST(*attr, __reserved_1, uint64_t);
-		tprints_comment("Bits 63..37");
+		tprints_comment("Bits 63..38");
 	}
 
 	if (attr->watermark) {
@@ -424,13 +426,13 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(*attr, aux_sample_size);
 
-#if 0
 	_PERF_CHECK_FIELD(__reserved_3);
-	if (attr->__reserved_3) {
-		tprint_struct_next();
-		PRINT_FIELD_X(*attr, __reserved_3);
-	}
-#endif
+	if (attr->__reserved_3)
+		tprintf(" /* bytes 116..119: %#x */", attr->__reserved_3);
+
+	_PERF_CHECK_FIELD(sig_data);
+	tprint_struct_next();
+	PRINT_FIELD_X(*attr, sig_data);
 
 print_perf_event_attr_out:
 	if ((attr->size && (attr->size > size)) ||

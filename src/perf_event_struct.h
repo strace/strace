@@ -57,7 +57,8 @@ struct perf_event_attr {
 		 build_id			:1,
 		 inherit_thread			:1,
 		 remove_on_exec			:1,
-		 __reserved_1			:27;
+		 sigtrap			:1,
+		 __reserved_1			:26;
 	union {
 		uint32_t wakeup_events;
 		uint32_t wakeup_watermark;
@@ -88,6 +89,8 @@ struct perf_event_attr {
 	uint32_t aux_sample_size;
 	uint32_t __reserved_3;
 	/* End of ver 6 - 120 bytes */
+	uint64_t sig_data;
+	/* End of ver 7 - 128 bytes */
 };
 
 struct perf_event_query_bpf {

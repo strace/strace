@@ -84,7 +84,8 @@ struct pea_flags {
 		 build_id			:1,
 		 inherit_thread			:1,
 		 remove_on_exec			:1,
-		 __reserved_1			:27;
+		 sigtrap			:1,
+		 __reserved_1			:26;
 };
 
 static const char *
@@ -139,7 +140,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		STRACE_PEA_ABBREV_SIZE =
 			offsetof(struct perf_event_attr, config) +
 			sizeof(attr_ptr->config),
-		STRACE_PEA_SIZE = 120,
+		STRACE_PEA_SIZE = 128,
 	};
 
 	uint32_t read_size;
@@ -300,9 +301,12 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	val = attr->remove_on_exec;
 	printf(", remove_on_exec=%" PRIu64, val);
 
+	val = attr->sigtrap;
+	printf(", sigtrap=%" PRIu64, val);
+
 	val = flags_data.flags.__reserved_1;
 	if (val)
-		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..37 */", val);
+		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..38 */", val);
 
 	printf(", %s=%u",
 		attr->watermark ? "wakeup_watermark" : "wakeup_events",
@@ -419,6 +423,18 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
+	val = attr->__reserved_3;
+	if (val)
+		printf(" /* bytes 116..119: %#" PRIx32 " */", (uint32_t) val);
+
+	if (size <= 120) {
+		cutoff = 120;
+		goto end;
+	}
+
+	val = attr->sig_data;
+	printf(", sig_data=%#" PRIx64, (uint64_t) val);
+
 	cutoff = STRACE_PEA_SIZE;
 
 end:
@@ -477,7 +493,9 @@ main(void)
 	static const size_t attr_v5_5_size = PERF_ATTR_SIZE_VER5 + 4;
 	static const size_t attr_v5_75_size = PERF_ATTR_SIZE_VER5 + 6;
 	static const size_t attr_v6_size = PERF_ATTR_SIZE_VER6;
-	static const size_t attr_big_size = PERF_ATTR_SIZE_VER6 + 32;
+	static const size_t attr_v6_5_size = PERF_ATTR_SIZE_VER6 + 4;
+	static const size_t attr_v7_size = PERF_ATTR_SIZE_VER7;
+	static const size_t attr_big_size = PERF_ATTR_SIZE_VER7 + 32;
 
 	static const struct u64_val_str attr_types[] = {
 		{ ARG_STR(PERF_TYPE_HARDWARE) },
@@ -624,6 +642,8 @@ main(void)
 		ATTR_REC(attr_v5_5_size),
 		ATTR_REC(attr_v5_75_size),
 		ATTR_REC(attr_v6_size),
+		ATTR_REC(attr_v6_5_size),
+		ATTR_REC(attr_v7_size),
 		ATTR_REC(attr_big_size),
 	};
 
@@ -711,6 +731,9 @@ main(void)
 
 		if (((i % 17) == 3) && (size >= 112))
 			((uint16_t *) attr)[110 / sizeof(uint16_t)] = 0;
+
+		if (((i % 23) == 7) && (size >= 120))
+			((uint32_t *) attr)[116 / sizeof(uint32_t)] = 0;
 
 		if (i == 0)
 			attr->size = size + 8;
