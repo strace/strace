@@ -951,7 +951,7 @@ main(void)
 		{ .id = V4L2_CTRL_CLASS_USER, .value = 0 },
 		{ .id = 0x990a64,             .value = 42 },
 		{ .id = 0xa31234,             .value = 1 },
-		{ .id = 0xa50000,             .value = -1 },
+		{ .id = 0xa60000,             .value = -1 },
 	};
 	static const char *id_strs[] = {
 		"0" NRAW(" /* V4L2_CID_??? */"),
@@ -959,7 +959,7 @@ main(void)
 		XLAT_KNOWN(0x980000, "V4L2_CTRL_CLASS_USER+0"),
 		XLAT_KNOWN(0x990a64, "V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE"),
 		XLAT_KNOWN(0xa31234, "V4L2_CTRL_CLASS_DETECT+0x1234"),
-		"0xa50000" NRAW(" /* V4L2_CID_??? */"),
+		"0xa60000" NRAW(" /* V4L2_CID_??? */"),
 	};
 
 	struct v4l2_control *const p_v4l2_control =
@@ -1141,11 +1141,11 @@ main(void)
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_DETECT),
 	       p_ext_controls->count, p_ext_controls->controls);
 
-	p_ext_controls->ctrl_class = 0x00a50000;
+	p_ext_controls->ctrl_class = 0x00160000;
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s"
-	       ", {ctrl_class=0xa50000" NRAW(" /* V4L2_CTRL_CLASS_??? */")
+	       ", {ctrl_class=0x160000" NRAW(" /* V4L2_CTRL_CLASS_??? */")
 	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS),
 	       p_ext_controls->count, p_ext_controls->controls);
