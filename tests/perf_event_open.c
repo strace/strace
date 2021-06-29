@@ -78,7 +78,8 @@ struct pea_flags {
 		 namespaces			:1,
 		 ksymbol			:1,
 		 bpf_event			:1,
-		 __reserved_1			:33;
+		 aux_output			:1,
+		 __reserved_1			:32;
 };
 
 static const char *
@@ -276,9 +277,12 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	val = attr->bpf_event;
 	printf(", bpf_event=%" PRIu64, val);
 
+	val = attr->aux_output;
+	printf(", aux_output=%" PRIu64, val);
+
 	val = flags_data.flags.__reserved_1;
 	if (val)
-		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..31 */", val);
+		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..32 */", val);
 
 	printf(", %s=%u",
 		attr->watermark ? "wakeup_watermark" : "wakeup_events",
