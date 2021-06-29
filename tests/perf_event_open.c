@@ -516,8 +516,8 @@ main(void)
 				" /* PERF_COUNT_HW_??? */" },
 		},
 		/* PERF_TYPE_SOFTWARE */ {
-			{ 10, "PERF_COUNT_SW_BPF_OUTPUT" },
-			{ 11, "0xb /* PERF_COUNT_SW_??? */" },
+			{ 11, "PERF_COUNT_SW_CGROUP_SWITCHES" },
+			{ 12, "0xc /* PERF_COUNT_SW_??? */" },
 			{ ARG_ULL_STR(0xdec0ded1dec0ded2)
 				" /* PERF_COUNT_SW_??? */" },
 		},
