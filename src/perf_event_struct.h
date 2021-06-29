@@ -54,7 +54,8 @@ struct perf_event_attr {
 		 aux_output			:1,
 		 cgroup				:1,
 		 text_poke			:1,
-		 __reserved_1			:30;
+		 build_id			:1,
+		 __reserved_1			:29;
 	union {
 		uint32_t wakeup_events;
 		uint32_t wakeup_watermark;
