@@ -512,8 +512,8 @@ main(void)
 		/* PERF_TYPE_HARDWARE */ {
 			{ 9, "PERF_COUNT_HW_REF_CPU_CYCLES" },
 			{ 10, "0xa /* PERF_COUNT_HW_??? */" },
-			{ ARG_ULL_STR(0xfaceca75deadb0d4)
-				" /* PERF_COUNT_HW_??? */" },
+			{ 0xfaceca7500000004, "0xfaceca75<<32|"
+				"PERF_COUNT_HW_BRANCH_INSTRUCTIONS" },
 		},
 		/* PERF_TYPE_SOFTWARE */ {
 			{ 11, "PERF_COUNT_SW_CGROUP_SWITCHES" },
@@ -527,17 +527,17 @@ main(void)
 			{ ARG_ULL_STR(16051074073505095380) },
 		},
 		/* PERF_TYPE_HW_CACHE */ {
-			{ 0, "PERF_COUNT_HW_CACHE_L1D|"
+			{ 0, "PERF_COUNT_HW_CACHE_RESULT_ACCESS<<16|"
 				"PERF_COUNT_HW_CACHE_OP_READ<<8|"
-				"PERF_COUNT_HW_CACHE_RESULT_ACCESS<<16" },
-			{ 0x020207, "0x7 /* PERF_COUNT_HW_CACHE_??? */|"
+				"PERF_COUNT_HW_CACHE_L1D" },
+			{ 0x01020207, "0x1<<24|"
+				"0x2 /* PERF_COUNT_HW_CACHE_RESULT_??? */<<16|"
 				"PERF_COUNT_HW_CACHE_OP_PREFETCH<<8|"
-				"0x2 /* PERF_COUNT_HW_CACHE_RESULT_??? */<<16" },
-			{ 0xdeadf157ed010306ULL, "PERF_COUNT_HW_CACHE_NODE|"
-				"0x3 /* PERF_COUNT_HW_CACHE_OP_??? */<<8|"
+				"0x7 /* PERF_COUNT_HW_CACHE_??? */" },
+			{ 0xdeadf15700010306ULL, "0xdeadf157<<32|"
 				"PERF_COUNT_HW_CACHE_RESULT_MISS<<16|"
-				"0xdeadf157ed<<24 "
-				"/* PERF_COUNT_HW_CACHE_??? */" },
+				"0x3 /* PERF_COUNT_HW_CACHE_OP_??? */<<8|"
+				"PERF_COUNT_HW_CACHE_NODE" },
 		},
 		/* PERF_TYPE_RAW */ {
 			{ ARG_STR(0) },

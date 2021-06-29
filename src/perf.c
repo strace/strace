@@ -150,9 +150,18 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	switch (attr->type) {
 	case PERF_TYPE_HARDWARE:
+		/*
+		 * EEEEEEEE000000AA
+		 * EEEEEEEE - PMU type ID
+		 * AA - perf_hw_id
+		 */
 		tprint_struct_next();
-		PRINT_FIELD_XVAL(*attr, config, perf_hw_id,
-				 "PERF_COUNT_HW_???");
+		tprints_field_name("config");
+		if (attr->config >> 32) {
+			tprintf("%#" PRIx64 "<<32|", attr->config >> 32);
+		}
+		printxval(perf_hw_id, attr->config & PERF_HW_EVENT_MASK,
+			   "PERF_COUNT_HW_???");
 		break;
 	case PERF_TYPE_SOFTWARE:
 		tprint_struct_next();
@@ -170,40 +179,30 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		break;
 	case PERF_TYPE_HW_CACHE:
 		/*
-		 * (perf_hw_cache_id) | (perf_hw_cache_op_id << 8) |
-		 * (perf_hw_cache_op_result_id << 16)
+		 * EEEEEEEE00DDCCBB
+		 * EEEEEEEE - PMU type ID
+		 * BB - perf_hw_cache_id
+		 * CC - perf_hw_cache_op_id
+		 * DD - perf_hw_cache_op_result_id
 		 */
 		tprint_struct_next();
 		tprints_field_name("config");
-		printxval(perf_hw_cache_id, attr->config & 0xFF,
-			  "PERF_COUNT_HW_CACHE_???");
-		tprints("|");
-		printxval(perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
-			   "PERF_COUNT_HW_CACHE_OP_???");
-		tprints("<<8|");
-		/*
-		 * Current code (see set_ext_hw_attr in arch/x86/events/core.c,
-		 * tile_map_cache_event in arch/tile/kernel/perf_event.c,
-		 * arc_pmu_cache_event in arch/arc/kernel/perf_event.c,
-		 * hw_perf_cache_event in arch/blackfin/kernel/perf_event.c,
-		 * _hw_perf_cache_event in arch/metag/kernel/perf/perf_event.c,
-		 * mipspmu_map_cache_event in arch/mips/kernel/perf_event_mipsxx.c,
-		 * hw_perf_cache_event in arch/powerpc/perf/core-book3s.c,
-		 * hw_perf_cache_event in arch/powerpc/perf/core-fsl-emb.c,
-		 * hw_perf_cache_event in arch/sh/kernel/perf_event.c,
-		 * sparc_map_cache_event in arch/sparc/kernel/perf_event.c,
-		 * xtensa_pmu_cache_event in arch/xtensa/kernel/perf_event.c,
-		 * armpmu_map_cache_event in drivers/perf/arm_pmu.c) assumes
-		 * that cache result is 8 bits in size.
-		 */
+		if (attr->config >> 32){
+			tprintf("%#" PRIx64 "<<32|", attr->config >> 32);
+		}
+		if ((attr->config & PERF_HW_EVENT_MASK) >> 24) {
+			tprintf("%#" PRIx64 "<<24|",
+				(attr->config & PERF_HW_EVENT_MASK) >> 24);
+		}
 		printxval(perf_hw_cache_op_result_id,
 			  (attr->config >> 16) & 0xFF,
 			  "PERF_COUNT_HW_CACHE_RESULT_???");
-		tprints("<<16");
-		if (attr->config >> 24) {
-			tprintf("|%#" PRIx64 "<<24", attr->config >> 24);
-			tprints_comment("PERF_COUNT_HW_CACHE_???");
-		}
+		tprints("<<16|");
+		printxval(perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
+			   "PERF_COUNT_HW_CACHE_OP_???");
+		tprints("<<8|");
+		printxval(perf_hw_cache_id, attr->config & 0xFF,
+			  "PERF_COUNT_HW_CACHE_???");
 		break;
 	case PERF_TYPE_RAW:
 		/*
