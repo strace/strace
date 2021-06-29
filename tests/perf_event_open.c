@@ -533,7 +533,7 @@ main(void)
 	static const struct u64_val_str sample_types[] = {
 		{ ARG_STR(0) },
 		{ 0x800, "PERF_SAMPLE_BRANCH_STACK" },
-		{ ARG_ULL_STR(0xdeadc0deda400000) " /* PERF_SAMPLE_??? */" },
+		{ ARG_ULL_STR(0xdeadc0deda000000) " /* PERF_SAMPLE_??? */" },
 		{ 0xffffffffffffffffULL,
 			"PERF_SAMPLE_IP|PERF_SAMPLE_TID|PERF_SAMPLE_TIME|"
 			"PERF_SAMPLE_ADDR|PERF_SAMPLE_READ|"
@@ -545,7 +545,8 @@ main(void)
 			"PERF_SAMPLE_IDENTIFIER|PERF_SAMPLE_TRANSACTION|"
 			"PERF_SAMPLE_REGS_INTR|PERF_SAMPLE_PHYS_ADDR|"
 			"PERF_SAMPLE_AUX|PERF_SAMPLE_CGROUP|"
-			"0xffffffffffc00000" },
+			"PERF_SAMPLE_DATA_PAGE_SIZE|PERF_SAMPLE_CODE_PAGE_SIZE|"
+			"0xffffffffff000000" },
 	};
 	static const struct u64_val_str read_formats[] = {
 		{ ARG_STR(0) },
