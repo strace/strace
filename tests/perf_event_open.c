@@ -550,7 +550,8 @@ main(void)
 			"PERF_SAMPLE_REGS_INTR|PERF_SAMPLE_PHYS_ADDR|"
 			"PERF_SAMPLE_AUX|PERF_SAMPLE_CGROUP|"
 			"PERF_SAMPLE_DATA_PAGE_SIZE|PERF_SAMPLE_CODE_PAGE_SIZE|"
-			"0xffffffffff000000" },
+			"PERF_SAMPLE_WEIGHT_STRUCT|"
+			"0xfffffffffe000000" },
 	};
 	static const struct u64_val_str read_formats[] = {
 		{ ARG_STR(0) },
