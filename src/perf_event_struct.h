@@ -56,7 +56,8 @@ struct perf_event_attr {
 		 text_poke			:1,
 		 build_id			:1,
 		 inherit_thread			:1,
-		 __reserved_1			:28;
+		 remove_on_exec			:1,
+		 __reserved_1			:27;
 	union {
 		uint32_t wakeup_events;
 		uint32_t wakeup_watermark;
