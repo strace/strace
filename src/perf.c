@@ -309,6 +309,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_U_CAST(*attr, bpf_event, unsigned int);
 	tprint_struct_next();
 	PRINT_FIELD_U_CAST(*attr, aux_output, unsigned int);
+	tprint_struct_next();
+	PRINT_FIELD_U_CAST(*attr, cgroup, unsigned int);
 
 	/*
 	 * Print it only in case it is non-zero, since it may contain flags we
@@ -317,7 +319,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	if (attr->__reserved_1) {
 		tprint_struct_next();
 		PRINT_FIELD_X_CAST(*attr, __reserved_1, uint64_t);
-		tprints_comment("Bits 63..32");
+		tprints_comment("Bits 63..33");
 	}
 
 	if (attr->watermark) {

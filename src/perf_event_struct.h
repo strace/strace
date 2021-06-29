@@ -52,7 +52,8 @@ struct perf_event_attr {
 		 ksymbol			:1,
 		 bpf_event			:1,
 		 aux_output			:1,
-		 __reserved_1			:32;
+		 cgroup				:1,
+		 __reserved_1			:31;
 	union {
 		uint32_t wakeup_events;
 		uint32_t wakeup_watermark;
