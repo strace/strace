@@ -80,7 +80,8 @@ struct pea_flags {
 		 bpf_event			:1,
 		 aux_output			:1,
 		 cgroup				:1,
-		 __reserved_1			:31;
+		 text_poke			:1,
+		 __reserved_1			:30;
 };
 
 static const char *
@@ -284,9 +285,12 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	val = attr->cgroup;
 	printf(", cgroup=%" PRIu64, val);
 
+	val = attr->text_poke;
+	printf(", text_poke=%" PRIu64, val);
+
 	val = flags_data.flags.__reserved_1;
 	if (val)
-		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..33 */", val);
+		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..34 */", val);
 
 	printf(", %s=%u",
 		attr->watermark ? "wakeup_watermark" : "wakeup_events",

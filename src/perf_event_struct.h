@@ -53,7 +53,8 @@ struct perf_event_attr {
 		 bpf_event			:1,
 		 aux_output			:1,
 		 cgroup				:1,
-		 __reserved_1			:31;
+		 text_poke			:1,
+		 __reserved_1			:30;
 	union {
 		uint32_t wakeup_events;
 		uint32_t wakeup_watermark;
