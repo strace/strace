@@ -186,10 +186,43 @@ main(void)
 	printf("ioctl(-1, PERF_EVENT_IOC_MODIFY_ATTRIBUTES"
 	       ", {type=%#x /* PERF_TYPE_??? */"
 	       ", size=%#x /* PERF_ATTR_SIZE_??? */"
-	       ", config=%#llx, ...}) = -1 EBADF (%m)\n",
+	       ", config=%#llx, sample_period=%llu%s, ...}) = -1 EBADF (%m)\n",
 	       (unsigned int) pea_ptr->type,
 	       (unsigned int) pea_ptr->size,
-	       (unsigned long long) pea_ptr->config);
+	       (unsigned long long) pea_ptr->config,
+	       (unsigned long long) pea_ptr->sample_period,
+#ifdef WORDS_BIGENDIAN
+	       ", sample_type=PERF_SAMPLE_IP|PERF_SAMPLE_ADDR|PERF_SAMPLE_ID|"
+	       "PERF_SAMPLE_CPU|PERF_SAMPLE_BRANCH_STACK|PERF_SAMPLE_WEIGHT|"
+	       "PERF_SAMPLE_DATA_SRC|PERF_SAMPLE_IDENTIFIER|"
+	       "PERF_SAMPLE_TRANSACTION|PERF_SAMPLE_REGS_INTR|"
+	       "PERF_SAMPLE_DATA_PAGE_SIZE|PERF_SAMPLE_CODE_PAGE_SIZE|"
+	       "0xc2c3c4c5c6000000"
+	       ", read_format=PERF_FORMAT_TOTAL_TIME_ENABLED|0xcacbcccdcecfd0d0"
+	       ", disabled=1, inherit=1, exclusive=1, exclude_hv=1, mmap=1"
+	       ", comm=1, inherit_stat=1, watermark=1"
+	       ", precise_ip=3 /* must have 0 skid */, mmap_data=1"
+	       ", exclude_host=1, exclude_callchain_kernel=1, comm_exec=1"
+	       ", use_clockid=1, write_backward=1, ksymbol=1, aux_output=1"
+	       ", cgroup=1, text_poke=1, inherit_thread=1, sigtrap=1"
+	       ", __reserved_1=0x2d7d8d9 /* Bits 63..38 */"
+#else
+	       ", sample_type=PERF_SAMPLE_TID|PERF_SAMPLE_ID|PERF_SAMPLE_CPU|"
+	       "PERF_SAMPLE_PERIOD|PERF_SAMPLE_STREAM_ID|PERF_SAMPLE_WEIGHT|"
+	       "PERF_SAMPLE_DATA_SRC|PERF_SAMPLE_REGS_INTR|"
+	       "PERF_SAMPLE_DATA_PAGE_SIZE|PERF_SAMPLE_CODE_PAGE_SIZE|"
+	       "PERF_SAMPLE_WEIGHT_STRUCT|0xc9c8c7c6c4000000"
+	       ", read_format=PERF_FORMAT_TOTAL_TIME_RUNNING|PERF_FORMAT_GROUP|"
+	       "0xd1d0cfcecdcccbc0"
+	       ", inherit=1, exclude_user=1, exclude_hv=1, exclude_idle=1"
+	       ", mmap=1, comm=1, enable_on_exec=1, watermark=1"
+	       ", precise_ip=1 /* constant skid */, sample_id_all=1"
+	       ", exclude_guest=1, exclude_callchain_user=1, mmap2=1"
+	       ", comm_exec=1, context_switch=1, namespaces=1, bpf_event=1"
+	       ", aux_output=1, text_poke=1, build_id=1, remove_on_exec=1"
+	       ", __reserved_1=0x367635f /* Bits 63..38 */"
+#endif
+	       );
 	ioctl(-1, PERF_EVENT_IOC_MODIFY_ATTRIBUTES, pea_ptr);
 
 	puts("+++ exited with 0 +++");

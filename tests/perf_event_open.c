@@ -138,21 +138,19 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	 */
 	enum {
 		STRACE_PEA_ABBREV_SIZE =
-			offsetof(struct perf_event_attr, config) +
-			sizeof(attr_ptr->config),
+			offsetof(struct perf_event_attr, wakeup_events),
 		STRACE_PEA_SIZE = 128,
 	};
 
 	uint32_t read_size;
 	struct perf_event_attr *attr;
-#if VERBOSE
-	uint32_t cutoff;
 	uint64_t val;
-	uint64_t use_clockid;
 	union {
 		struct pea_flags flags;
 		uint64_t raw;
 	} flags_data;
+#if VERBOSE
+	uint32_t cutoff;
 #endif
 
 	read_size =
@@ -197,117 +195,69 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 	if (!size)
 		size = PERF_ATTR_SIZE_VER0;
 
-#if !VERBOSE
-	printf("...}");
-#else /* !VERBOSE */
 	printf("%s=%" PRI__u64", sample_type=%s, read_format=%s",
 	       attr->freq ? "sample_freq" : "sample_period",
 	       attr->freq ? attr->sample_freq : attr->sample_period,
 	       sample_type, read_format);
 
-	printf(", disabled=%u"
-	       ", inherit=%u"
-	       ", pinned=%u"
-	       ", exclusive=%u"
-	       ", exclude_user=%u"
-	       ", exclude_kernel=%u"
-	       ", exclude_hv=%u"
-	       ", exclude_idle=%u"
-	       ", mmap=%u"
-	       ", comm=%u"
-	       ", freq=%u"
-	       ", inherit_stat=%u"
-	       ", enable_on_exec=%u"
-	       ", task=%u"
-	       ", watermark=%u",
-	       attr->disabled,
-	       attr->inherit,
-	       attr->pinned,
-	       attr->exclusive,
-	       attr->exclude_user,
-	       attr->exclude_kernel,
-	       attr->exclude_hv,
-	       attr->exclude_idle,
-	       attr->mmap,
-	       attr->comm,
-	       attr->freq,
-	       attr->inherit_stat,
-	       attr->enable_on_exec,
-	       attr->task,
-	       attr->watermark);
+#define PRINT_FLAG(flag_) \
+	do { \
+		if (VERBOSE || attr->flag_) { \
+			val = attr->flag_; \
+			printf(", " #flag_ "=%" PRIu64, val); \
+		} \
+	} while (0)
+
+	PRINT_FLAG(disabled);
+	PRINT_FLAG(inherit);
+	PRINT_FLAG(pinned);
+	PRINT_FLAG(exclusive);
+	PRINT_FLAG(exclude_user);
+	PRINT_FLAG(exclude_kernel);
+	PRINT_FLAG(exclude_hv);
+	PRINT_FLAG(exclude_idle);
+	PRINT_FLAG(mmap);
+	PRINT_FLAG(comm);
+	PRINT_FLAG(freq);
+	PRINT_FLAG(inherit_stat);
+	PRINT_FLAG(enable_on_exec);
+	PRINT_FLAG(task);
+	PRINT_FLAG(watermark);
 
 	flags_data.raw = ((uint64_t *) attr)[5];
 
 	val = attr->precise_ip;
 	printf(", precise_ip=%" PRIu64 " /* %s */", val, precise_ip_desc);
 
-	val = attr->mmap_data;
-	printf(", mmap_data=%" PRIu64, val);
-
-	val = attr->sample_id_all;
-	printf(", sample_id_all=%" PRIu64, val);
-
-	val = attr->exclude_host;
-	printf(", exclude_host=%" PRIu64, val);
-
-	val = attr->exclude_guest;
-	printf(", exclude_guest=%" PRIu64, val);
-
-	val = attr->exclude_callchain_kernel;
-	printf(", exclude_callchain_kernel=%" PRIu64, val);
-
-	val = attr->exclude_callchain_user;
-	printf(", exclude_callchain_user=%" PRIu64, val);
-
-	val = attr->mmap2;
-	printf(", mmap2=%" PRIu64, val);
-
-	val = attr->comm_exec;
-	printf(", comm_exec=%" PRIu64, val);
-
-	use_clockid = val = attr->use_clockid;
-	printf(", use_clockid=%" PRIu64, val);
-
-	val = attr->context_switch;
-	printf(", context_switch=%" PRIu64, val);
-
-	val = attr->write_backward;
-	printf(", write_backward=%" PRIu64, val);
-
-	val = attr->namespaces;
-	printf(", namespaces=%" PRIu64, val);
-
-	val = attr->ksymbol;
-	printf(", ksymbol=%" PRIu64, val);
-
-	val = attr->bpf_event;
-	printf(", bpf_event=%" PRIu64, val);
-
-	val = attr->aux_output;
-	printf(", aux_output=%" PRIu64, val);
-
-	val = attr->cgroup;
-	printf(", cgroup=%" PRIu64, val);
-
-	val = attr->text_poke;
-	printf(", text_poke=%" PRIu64, val);
-
-	val = attr->build_id;
-	printf(", build_id=%" PRIu64, val);
-
-	val = attr->inherit_thread;
-	printf(", inherit_thread=%" PRIu64, val);
-
-	val = attr->remove_on_exec;
-	printf(", remove_on_exec=%" PRIu64, val);
-
-	val = attr->sigtrap;
-	printf(", sigtrap=%" PRIu64, val);
+	PRINT_FLAG(mmap_data);
+	PRINT_FLAG(sample_id_all);
+	PRINT_FLAG(exclude_host);
+	PRINT_FLAG(exclude_guest);
+	PRINT_FLAG(exclude_callchain_kernel);
+	PRINT_FLAG(exclude_callchain_user);
+	PRINT_FLAG(mmap2);
+	PRINT_FLAG(comm_exec);
+	PRINT_FLAG(use_clockid);
+	PRINT_FLAG(context_switch);
+	PRINT_FLAG(write_backward);
+	PRINT_FLAG(namespaces);
+	PRINT_FLAG(ksymbol);
+	PRINT_FLAG(bpf_event);
+	PRINT_FLAG(aux_output);
+	PRINT_FLAG(cgroup);
+	PRINT_FLAG(text_poke);
+	PRINT_FLAG(build_id);
+	PRINT_FLAG(inherit_thread);
+	PRINT_FLAG(remove_on_exec);
+	PRINT_FLAG(sigtrap);
 
 	val = flags_data.flags.__reserved_1;
 	if (val)
 		printf(", __reserved_1=%#" PRIx64 " /* Bits 63..38 */", val);
 
+#if !VERBOSE
+	printf(", ...}");
+#else /* !VERBOSE */
 	printf(", %s=%u",
 		attr->watermark ? "wakeup_watermark" : "wakeup_events",
 		attr->watermark ? attr->wakeup_watermark : attr->wakeup_events);
@@ -372,7 +322,7 @@ print_event_attr(struct perf_event_attr *attr_ptr, size_t size,
 		goto end;
 	}
 
-	if (use_clockid)
+	if (attr->use_clockid)
 		printf(", clockid=%s", clockid);
 
 	/* End of version 3 of the structure */

@@ -68,7 +68,7 @@ fetch_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (abbrev(tcp))
-		size = offsetofend(struct perf_event_attr, config);
+		size = offsetof(struct perf_event_attr, wakeup_events);
 
 	/* Size should be multiple of 8, but kernel doesn't check for it */
 	/* size &= ~7; */
@@ -227,9 +227,6 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		break;
 	}
 
-	if (abbrev(tcp))
-		goto print_perf_event_attr_out;
-
 	if (attr->freq) {
 		tprint_struct_next();
 		PRINT_FIELD_U(*attr, sample_freq);
@@ -248,8 +245,10 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	/*** A shorthand for printing struct perf_event_attr bit flags */
 #define STRACE_PERF_PRINT_FLAG(flag_) \
 	do { \
-		tprint_struct_next(); \
-		PRINT_FIELD_U_CAST(*attr, flag_, unsigned int); \
+		if (!abbrev(tcp) || attr->flag_) { \
+			tprint_struct_next(); \
+			PRINT_FIELD_U_CAST(*attr, flag_, unsigned int); \
+		}  \
 	} while (0)
 
 	STRACE_PERF_PRINT_FLAG(disabled);
@@ -301,6 +300,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_X_CAST(*attr, __reserved_1, uint64_t);
 		tprints_comment("Bits 63..38");
 	}
+
+	if (abbrev(tcp))
+		goto print_perf_event_attr_out;
 
 	if (attr->watermark) {
 		tprint_struct_next();
