@@ -245,81 +245,52 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_FLAGS(*attr, read_format, perf_event_read_format,
 			  "PERF_FORMAT_???");
 
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, disabled, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, inherit, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, pinned, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclusive, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_user, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_kernel, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_hv, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_idle, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, mmap, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, comm, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, freq, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, inherit_stat, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, enable_on_exec, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, task, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, watermark, unsigned int);
+	/*** A shorthand for printing struct perf_event_attr bit flags */
+#define STRACE_PERF_PRINT_FLAG(flag_) \
+	do { \
+		tprint_struct_next(); \
+		PRINT_FIELD_U_CAST(*attr, flag_, unsigned int); \
+	} while (0)
+
+	STRACE_PERF_PRINT_FLAG(disabled);
+	STRACE_PERF_PRINT_FLAG(inherit);
+	STRACE_PERF_PRINT_FLAG(pinned);
+	STRACE_PERF_PRINT_FLAG(exclusive);
+	STRACE_PERF_PRINT_FLAG(exclude_user);
+	STRACE_PERF_PRINT_FLAG(exclude_kernel);
+	STRACE_PERF_PRINT_FLAG(exclude_hv);
+	STRACE_PERF_PRINT_FLAG(exclude_idle);
+	STRACE_PERF_PRINT_FLAG(mmap);
+	STRACE_PERF_PRINT_FLAG(comm);
+	STRACE_PERF_PRINT_FLAG(freq);
+	STRACE_PERF_PRINT_FLAG(inherit_stat);
+	STRACE_PERF_PRINT_FLAG(enable_on_exec);
+	STRACE_PERF_PRINT_FLAG(task);
+	STRACE_PERF_PRINT_FLAG(watermark);
 	tprint_struct_next();
 	PRINT_FIELD_U_CAST(*attr, precise_ip, unsigned int);
 	tprints_comment(precise_ip_desc[attr->precise_ip]);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, mmap_data, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, sample_id_all, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_host, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_guest, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_callchain_kernel, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, exclude_callchain_user, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, mmap2, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, comm_exec, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, use_clockid, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, context_switch, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, write_backward, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, namespaces, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, ksymbol, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, bpf_event, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, aux_output, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, cgroup, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, text_poke, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, build_id, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, inherit_thread, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, remove_on_exec, unsigned int);
-	tprint_struct_next();
-	PRINT_FIELD_U_CAST(*attr, sigtrap, unsigned int);
+	STRACE_PERF_PRINT_FLAG(mmap_data);
+	STRACE_PERF_PRINT_FLAG(sample_id_all);
+	STRACE_PERF_PRINT_FLAG(exclude_host);
+	STRACE_PERF_PRINT_FLAG(exclude_guest);
+	STRACE_PERF_PRINT_FLAG(exclude_callchain_kernel);
+	STRACE_PERF_PRINT_FLAG(exclude_callchain_user);
+	STRACE_PERF_PRINT_FLAG(mmap2);
+	STRACE_PERF_PRINT_FLAG(comm_exec);
+	STRACE_PERF_PRINT_FLAG(use_clockid);
+	STRACE_PERF_PRINT_FLAG(context_switch);
+	STRACE_PERF_PRINT_FLAG(write_backward);
+	STRACE_PERF_PRINT_FLAG(namespaces);
+	STRACE_PERF_PRINT_FLAG(ksymbol);
+	STRACE_PERF_PRINT_FLAG(bpf_event);
+	STRACE_PERF_PRINT_FLAG(aux_output);
+	STRACE_PERF_PRINT_FLAG(cgroup);
+	STRACE_PERF_PRINT_FLAG(text_poke);
+	STRACE_PERF_PRINT_FLAG(build_id);
+	STRACE_PERF_PRINT_FLAG(inherit_thread);
+	STRACE_PERF_PRINT_FLAG(remove_on_exec);
+	STRACE_PERF_PRINT_FLAG(sigtrap);
 
 	/*
 	 * Print it only in case it is non-zero, since it may contain flags we
