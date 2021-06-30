@@ -108,14 +108,14 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	int use_new_size = 0;
 
 	/*
-	 * Amusingly, kernel accepts structures with only part of the field
-	 * present, so we making check like this (instead of checking
+	 * Amusingly, the kernel accepts structures with only part of the field
+	 * present, so we perform the check like this (instead of checking
 	 * offsetofend against size) in order to print fields as kernel sees
-	 * them. This also should work great on big endian architectures.
+	 * them.  This also should work great on big endian architectures.
 	 */
-#define _PERF_CHECK_FIELD(_field) \
+#define STRACE_PERF_CHECK_FIELD(field_) \
 		do { \
-			if (offsetof(struct perf_event_attr, _field) >= size) \
+			if (offsetof(struct perf_event_attr, field_) >= size) \
 				goto print_perf_event_attr_out; \
 		} while (0)
 
@@ -362,7 +362,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * against size is needed.
 	 */
 
-	_PERF_CHECK_FIELD(bp_len);
+	STRACE_PERF_CHECK_FIELD(bp_len);
 	if (attr->type == PERF_TYPE_BREAKPOINT) {
 		tprint_struct_next();
 		PRINT_FIELD_U(*attr, bp_len);
@@ -371,7 +371,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		PRINT_FIELD_X(*attr, config2);
 	}
 
-	_PERF_CHECK_FIELD(branch_sample_type);
+	STRACE_PERF_CHECK_FIELD(branch_sample_type);
 	if (attr->sample_type & PERF_SAMPLE_BRANCH_STACK) {
 		tprint_struct_next();
 		PRINT_FIELD_FLAGS(*attr, branch_sample_type,
@@ -379,7 +379,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 				  "PERF_SAMPLE_BRANCH_???");
 	}
 
-	_PERF_CHECK_FIELD(sample_regs_user);
+	STRACE_PERF_CHECK_FIELD(sample_regs_user);
 	/*
 	 * "This bit mask defines the set of user CPU registers to dump on
 	 * samples. The layout of the register mask is architecture-specific and
@@ -389,7 +389,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_X(*attr, sample_regs_user);
 
-	_PERF_CHECK_FIELD(sample_stack_user);
+	STRACE_PERF_CHECK_FIELD(sample_stack_user);
 	/*
 	 * "size of the user stack to dump if PERF_SAMPLE_STACK_USER is
 	 * specified."
@@ -400,36 +400,36 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	}
 
 	if (attr->use_clockid) {
-		_PERF_CHECK_FIELD(clockid);
+		STRACE_PERF_CHECK_FIELD(clockid);
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(*attr, clockid, clocknames, "CLOCK_???");
 	}
 
-	_PERF_CHECK_FIELD(sample_regs_intr);
+	STRACE_PERF_CHECK_FIELD(sample_regs_intr);
 	tprint_struct_next();
 	PRINT_FIELD_X(*attr, sample_regs_intr);
 
-	_PERF_CHECK_FIELD(aux_watermark);
+	STRACE_PERF_CHECK_FIELD(aux_watermark);
 	tprint_struct_next();
 	PRINT_FIELD_U(*attr, aux_watermark);
 
-	_PERF_CHECK_FIELD(sample_max_stack);
+	STRACE_PERF_CHECK_FIELD(sample_max_stack);
 	tprint_struct_next();
 	PRINT_FIELD_U(*attr, sample_max_stack);
 
-	_PERF_CHECK_FIELD(__reserved_2);
+	STRACE_PERF_CHECK_FIELD(__reserved_2);
 	if (attr->__reserved_2)
 		tprintf(" /* bytes 110..111: %#hx */", attr->__reserved_2);
 
-	_PERF_CHECK_FIELD(aux_sample_size);
+	STRACE_PERF_CHECK_FIELD(aux_sample_size);
 	tprint_struct_next();
 	PRINT_FIELD_U(*attr, aux_sample_size);
 
-	_PERF_CHECK_FIELD(__reserved_3);
+	STRACE_PERF_CHECK_FIELD(__reserved_3);
 	if (attr->__reserved_3)
 		tprintf(" /* bytes 116..119: %#x */", attr->__reserved_3);
 
-	_PERF_CHECK_FIELD(sig_data);
+	STRACE_PERF_CHECK_FIELD(sig_data);
 	tprint_struct_next();
 	PRINT_FIELD_X(*attr, sig_data);
 
