@@ -74,6 +74,24 @@ tprint_arg_end(void)
 }
 
 static inline void
+tprint_bitset_begin(void)
+{
+	tprints("[");
+}
+
+static inline void
+tprint_bitset_next(void)
+{
+	tprints(" ");
+}
+
+static inline void
+tprint_bitset_end(void)
+{
+	tprints("]");
+}
+
+static inline void
 tprint_comment_begin(void)
 {
 	tprints(" /* ");
@@ -189,6 +207,24 @@ static inline void
 tprint_arg_end(void)
 {
 	fputs(")", stdout);
+}
+
+static inline void
+tprint_bitset_begin(void)
+{
+	fputs("[", stdout);
+}
+
+static inline void
+tprint_bitset_next(void)
+{
+	fputs(" ", stdout);
+}
+
+static inline void
+tprint_bitset_end(void)
+{
+	fputs("]", stdout);
 }
 
 static inline void
