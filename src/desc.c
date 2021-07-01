@@ -24,14 +24,8 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	      const print_obj_by_addr_fn print_tv_ts,
 	      const sprint_obj_by_addr_fn sprint_tv_ts)
 {
-	int i, j;
-	int nfds, fdsize;
-	fd_set *fds = NULL;
-	const char *sep;
-	kernel_ulong_t addr;
-
 	/* Kernel truncates args[0] to int, we do the same. */
-	nfds = (int) args[0];
+	int nfds = (int) args[0];
 
 	/* Kernel rejects negative nfds, so we don't parse it either. */
 	if (nfds < 0)
@@ -45,15 +39,17 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 	 * We had bugs a-la "while (j < args[0])" and "umoven(args[0])" below.
 	 * Instead of args[0], use nfds for fd count, fdsize for array lengths.
 	 */
-	fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
+	int fdsize = (((nfds + 7) / 8) + current_wordsize-1) & -current_wordsize;
+	fd_set *fds = NULL;
 
 	if (entering(tcp)) {
 		PRINT_VAL_D((int) args[0]);
 
 		if (verbose(tcp) && fdsize > 0)
 			fds = malloc(fdsize);
-		for (i = 0; i < 3; i++) {
-			addr = args[i+1];
+		for (unsigned int i = 0; i < 3; ++i) {
+			kernel_ulong_t addr = args[i + 1];
+
 			tprint_arg_next();
 			if (!fds) {
 				printaddr(addr);
@@ -61,16 +57,19 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 			}
 			if (umoven_or_printaddr(tcp, addr, fdsize, fds))
 				continue;
-			tprints("[");
-			for (j = 0, sep = "";; j++) {
+			tprint_bitset_begin();
+			bool next = false;
+			for (int j = 0;; ++j) {
 				j = next_set_bit(fds, j, nfds);
 				if (j < 0)
 					break;
-				tprints(sep);
+				if (next)
+					tprint_bitset_next();
+				else
+					next = true;
 				printfd(tcp, j);
-				sep = " ";
 			}
-			tprints("]");
+			tprint_bitset_end();
 		}
 		free(fds);
 		tprint_arg_next();
@@ -93,14 +92,14 @@ decode_select(struct tcb *const tcp, const kernel_ulong_t *const args,
 		fds = malloc(fdsize);
 
 		outptr = outstr;
-		sep = "";
-		for (i = 0; i < 3 && ready_fds > 0; i++) {
+		const char *sep = "";
+		for (unsigned int i = 0; i < 3 && ready_fds > 0; ++i) {
 			int first = 1;
+			kernel_ulong_t addr = args[i + 1];
 
-			addr = args[i+1];
 			if (!addr || !fds || umoven(tcp, addr, fdsize, fds) < 0)
 				continue;
-			for (j = 0;; j++) {
+			for (int j = 0;; ++j) {
 				j = next_set_bit(fds, j, nfds);
 				if (j < 0)
 					break;
