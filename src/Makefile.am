@@ -168,6 +168,7 @@ libstrace_a_SOURCES =	\
 	keyctl_kdf_params.h \
 	kill_save_errno.h \
 	kvm.c		\
+	landlock.c	\
 	largefile_wrappers.h \
 	ldt.c		\
 	link.c		\

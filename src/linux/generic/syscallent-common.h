@@ -27,3 +27,7 @@
 [BASE_NR + 440] = { 5,	TD,		SEN(process_madvise),		"process_madvise"	},
 [BASE_NR + 441] = { 6,	TD,		SEN(epoll_pwait2),		"epoll_pwait2"		},
 [BASE_NR + 442] = { 5,	TD|TF,		SEN(mount_setattr),		"mount_setattr"		},
+/* 443 is reserved for quotactl_fd */
+[BASE_NR + 444] = { 3,	TD,		SEN(landlock_create_ruleset),	"landlock_create_ruleset"	},
+[BASE_NR + 445] = { 4,	TD,		SEN(landlock_add_rule),		"landlock_add_rule"		},
+[BASE_NR + 446] = { 2,	TD,		SEN(landlock_restrict_self),	"landlock_restrict_self"	},

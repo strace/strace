@@ -54,6 +54,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/kcmp.h \
 	linux/include/uapi/linux/kexec.h \
 	linux/include/uapi/linux/keyctl.h \
+	linux/include/uapi/linux/landlock.h \
 	linux/include/uapi/linux/libc-compat.h \
 	linux/include/uapi/linux/loop.h \
 	linux/include/uapi/linux/memfd.h \

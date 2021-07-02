@@ -9,6 +9,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     PTRACE_SETREGS, PTRACE_SETREGS64, PTRACE_GETFPREGS, and PTRACE_SETFPREGS
     requests.
   * Implemented powerpc System Call Vectored ABI support.
+  * Implemented decoding of landlock_add_rule, landlock_create_ruleset,
+    and landlock_restrict_self syscalls introduced in Linux 5.13.
   * Enhanced decoding of perf_event_open syscall.
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, KVM_*, NT_*, PR_*,
     PTRACE_*, RTM_*, RTPROT_*, TRAP_*, UFFD_*, UFFDIO_*, and V4L2_* constants.

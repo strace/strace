@@ -205,6 +205,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	kill--pidns-translation \
 	kill_child \
 	ksysent \
+	landlock_create_ruleset-success \
+	landlock_create_ruleset-success-y \
 	list_sigaction_signum \
 	localtime \
 	looping_threads \
@@ -401,6 +403,7 @@ DECODER_TESTS = \
 	ioctl_evdev-success.test \
 	ipc_msgbuf.test \
 	kern_features-fault.test \
+	landlock_create_ruleset-success.test \
 	llseek.test \
 	lseek.test \
 	mmap.test \
