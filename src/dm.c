@@ -304,7 +304,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 			    !umove(tcp, event_addr, &event_nr)) {
 				tprint_struct_next();
 				tprints_field_name("event_nr");
-				tprintf("%" PRIu32, event_nr);
+				PRINT_VAL_U(event_nr);
 			}
 		}
 
@@ -367,9 +367,7 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
 			    QUOTE_0_TERMINATED);
 		tprint_struct_next();
-		tprints_field_name("version");
-		tprintf("%" PRIu32 ".%" PRIu32 ".%" PRIu32,
-			s.version[0], s.version[1], s.version[2]);
+		PRINT_FIELD_U_ARRAY(s, version);
 		tprint_struct_end();
 
 		if (!s.next)
@@ -511,7 +509,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 		return RVAL_IOCTL_DECODED;
 
 	if (entering(tcp))
-		tprints(", ");
+		tprint_arg_next();
 	else
 		tprint_value_changed();
 
@@ -520,8 +518,7 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	 * device mapper code uses %d in some places and %u in another, but
 	 * fields themselves are declared as __u32.
 	 */
-	tprints_field_name("version");
-	tprintf("%u.%u.%u", ioc->version[0], ioc->version[1], ioc->version[2]);
+	PRINT_FIELD_U_ARRAY(*ioc, version);
 	/*
 	 * if we use a different version of ABI, do not attempt to decode
 	 * ioctl fields
