@@ -82,9 +82,12 @@ keycode_ioctl(struct tcb *const tcp, const kernel_ulong_t arg)
 	unsigned int keycode[2];
 
 	if (!umove_or_printaddr(tcp, arg, &keycode)) {
-		tprintf("[%u, ", keycode[0]);
+		tprint_array_begin();
+		PRINT_VAL_U(keycode[0]);
+		tprint_array_next();
+
 		printxval(evdev_keycode, keycode[1], "KEY_???");
-		tprints("]");
+		tprint_array_end();
 	}
 
 	return RVAL_IOCTL_DECODED;
@@ -167,29 +170,27 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 		return RVAL_IOCTL_DECODED;
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
-		tprints("[");
+		tprint_bitset_begin();
 
 		int bit_displayed = 0;
 		int i = next_set_bit(decoded_arg, 0, size_bits);
-		if (i < 0) {
-			tprints(" 0 ");
-		} else {
+		if (i >= 0) {
 			printxval(decode_nr, i, dflt);
 
 			while ((i = next_set_bit(decoded_arg, i + 1,
 						 size_bits)) > 0) {
 				if (abbrev(tcp) && bit_displayed >= 3) {
-					tprint_struct_next();
+					tprint_bitset_next();
 					tprint_more_data_follows();
 					break;
 				}
-				tprints(", ");
+				tprint_bitset_next();
 				printxval(decode_nr, i, dflt);
 				bit_displayed++;
 			}
 		}
 
-		tprints("]");
+		tprint_bitset_end();
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)

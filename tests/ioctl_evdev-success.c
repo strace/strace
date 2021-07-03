@@ -146,12 +146,12 @@ print_getbit(long rc, const void *ptr, const void *arg)
 	for (unsigned long i = 0; str[i]; i++) {
 # if ! VERBOSE
 		if (i >= 4) {
-			printf(", ...");
+			printf(" ...");
 			break;
 		}
 # endif
 		if (i)
-			printf(", ");
+			printf(" ");
 		printf("%s", str[i]);
 	}
 	printf("]");
@@ -280,7 +280,7 @@ main(int argc, char **argv)
 	static const unsigned long ev_zero[NUM_WORDS] = { 0x0 };
 	static const char * const ev_zero_str[] = {
 		(char *) (uintptr_t) 1,
-		" 0 ", NULL };
+		"", NULL };
 
 	/* KEY_MAX is 0x2ff which is greater than retval * 8 */
 	static const unsigned long key[NUM_WORDS] = {
