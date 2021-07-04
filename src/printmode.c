@@ -26,7 +26,7 @@ print_symbolic_mode_t(const unsigned int mode)
 		ifmt = xlookup(modetypes, mode & S_IFMT);
 
 	if (!ifmt || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf("%#03o", mode);
+		PRINT_VAL_03O(mode);
 
 	if (!ifmt || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
@@ -43,11 +43,11 @@ print_symbolic_mode_t(const unsigned int mode)
 void
 print_numeric_umode_t(const unsigned short mode)
 {
-	tprintf("%#03ho", mode);
+	PRINT_VAL_03O(mode);
 }
 
 void
 print_numeric_ll_umode_t(const unsigned long long mode)
 {
-	tprintf("%#03llo", mode);
+	PRINT_VAL_03O(mode);
 }

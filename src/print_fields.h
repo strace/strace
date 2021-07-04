@@ -310,6 +310,9 @@ tprints_arg_begin(const char *name)
 # define PRINT_VAL_X(val_)	\
 	STRACE_PRINTF("%#llx", zero_extend_signed_to_ull(val_))
 
+# define PRINT_VAL_03O(val_)	\
+	STRACE_PRINTF("%#03llo", zero_extend_signed_to_ull(val_))
+
 # define PRINT_VAL_0X(val_)						\
 	STRACE_PRINTF("%#0*llx", (int) sizeof(val_) * 2,		\
 		      zero_extend_signed_to_ull(val_))
