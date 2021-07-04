@@ -122,6 +122,23 @@
 #  define DIAG_POP_IGNORE_OVERRIDE_INIT	/* empty */
 # endif
 
+# if CLANG_PREREQ(1, 0)
+#  define DIAG_PUSH_IGNORE_NONNULL					\
+	_Pragma("clang diagnostic push");				\
+	_Pragma("clang diagnostic ignored \"-Wnonnull\"");
+#  define DIAG_POP_IGNORE_NONNULL					\
+	_Pragma("clang diagnostic pop");
+# elif GNUC_PREREQ(3, 3)
+#  define DIAG_PUSH_IGNORE_NONNULL					\
+	_Pragma("GCC diagnostic push");					\
+	_Pragma("GCC diagnostic ignored \"-Wnonnull\"");
+#  define DIAG_POP_IGNORE_NONNULL					\
+	_Pragma("GCC diagnostic pop");
+# else
+#  define DIAG_PUSH_IGNORE_NONNULL	/* empty */
+#  define DIAG_POP_IGNORE_NONNULL	/* empty */
+# endif
+
 # if GNUC_PREREQ(6, 0)
 #  define DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE				\
 	_Pragma("GCC diagnostic push");					\

@@ -66,8 +66,10 @@ main(void)
 	printf("preadv(0, [{iov_base=%p, iov_len=%zu}], 1, -1) = "
 	       "-1 EINVAL (%m)\n", iov->iov_base, iov->iov_len);
 
+	DIAG_PUSH_IGNORE_NONNULL
 	if (preadv(0, NULL, 1, -2) != -1)
 		perror_msg_and_fail("preadv");
+	DIAG_POP_IGNORE_NONNULL
 	printf("preadv(0, NULL, 1, -2) = -1 EINVAL (%m)\n");
 
 	if (preadv(0, iov, 0, -3) != -1)
