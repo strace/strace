@@ -122,7 +122,7 @@ print_si_syscall(const unsigned int scno)
 {
 	/*
 	 * Note that we can safely use the personality set in
-	 * current_personality  here (and don't have to guess it
+	 * current_personality here (and don't have to guess it
 	 * based on X32_SYSCALL_BIT and si_arch, for example):
 	 *  - The signal is delivered as a result of seccomp
 	 *    filtering to the process executing forbidden
@@ -140,7 +140,7 @@ print_si_syscall(const unsigned int scno)
 	if (scname)
 		tprintf("%s%s", nr_prefix(scno), scname);
 	else
-		tprintf("%u", scno);
+		PRINT_VAL_U(scno);
 }
 #endif
 
