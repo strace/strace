@@ -348,7 +348,7 @@ check_ax25(void)
 	rc = connect(-1, sax_void, sizeof(struct sockaddr_ax25));
 	pidns_print_leader();
 	printf("connect(-1, {sa_family=AF_AX25, fsa_ax25={sax25_call=VALID-13"
-	       ", sax25_ndigis=8}, fsa_digipeater=[/* ??? */]}, %zu) = %s\n",
+	       ", sax25_ndigis=8}, fsa_digipeater=[???]}, %zu) = %s\n",
 	       sizeof(struct sockaddr_ax25), sprintrc(rc));
 
 	sax->fsa_ax25.sax25_ndigis = 0;
@@ -369,7 +369,7 @@ check_ax25(void)
 	       ", {ax25_call=\"\\xa6\\xa6\\x92\\x88\\x40\\x40\\x20\""
 	           "} /* SSID-0 */"
 	       ", *"
-	       ", /* ??? */], ...}, %zu) = %s\n",
+	       ", ???], ...}, %zu) = %s\n",
 	       size, sprintrc(rc));
 
 	sax->fsa_digipeater[2].ax25_call[6] = 0x4;
@@ -384,7 +384,7 @@ check_ax25(void)
 	           "} /* SSID-0 */"
 	       ", {ax25_call=\"\\x40\\x40\\x40\\x40\\x40\\x40\\x04\"} /* -2 */"
 	       ", {ax25_call=\"\\x9c\\xaa\\x98\\x98\\x00\\x00\\x06\"}"
-	       ", /* ??? */]}, %zu) = %s\n",
+	       ", ???]}, %zu) = %s\n",
 	       size, sprintrc(rc));
 
 	memcpy(sax->fsa_digipeater, aux_addrs, sizeof(aux_addrs));
