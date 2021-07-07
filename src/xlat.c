@@ -447,7 +447,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 			    && ((flags == v) || (v && (flags & v) == v))) {
 				if (xlat_verbose(style) == XLAT_STYLE_VERBOSE
 				    && !flags)
-					tprints("0");
+					PRINT_VAL_U(0);
 				if (n++)
 					tprints("|");
 				else if (need_comment)
@@ -477,7 +477,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 			tprints_comment(dflt);
 		} else {
 			if (dflt)
-				tprints("0");
+				PRINT_VAL_U(0);
 		}
 	}
 
