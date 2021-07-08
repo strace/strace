@@ -39,6 +39,11 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(void *, p_head);
 	TAIL_ALLOC_OBJECT_CONST_PTR(size_t, p_len);
 
+	/* It has dual-use as a marker of the beginning of the test output */
+	long rc = syscall(__NR_get_robust_list, 0, 0, 0);
+	pidns_print_leader();
+	printf("get_robust_list(0, NULL, NULL) = %s\n", sprintrc(rc));
+
 	if (syscall(__NR_get_robust_list, long_pid, p_head, p_len))
 		perror_msg_and_skip("get_robust_list");
 	pidns_print_leader();

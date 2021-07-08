@@ -847,8 +847,8 @@ waitid-v	-v -e signal=none -e trace=waitid
 waitpid	-a28
 xattr	-a22 -e trace=getxattr,fgetxattr,lgetxattr,setxattr,fsetxattr,lsetxattr,listxattr,flistxattr,llistxattr,removexattr,fremovexattr,lremovexattr
 xattr-strings	-a22 -s 4 -e trace=fsetxattr
-xet_robust_list	-a24 -e trace=get_robust_list,set_robust_list
-xet_robust_list--pidns-translation	test_pidns -a24 -e trace=get_robust_list,set_robust_list
+xet_robust_list	-a24 -e trace=get_robust_list,set_robust_list "QUIRK:START-OF-TEST-OUTPUT:get_robust_list(0, NULL, NULL)"
+xet_robust_list--pidns-translation	test_pidns -a24 -e trace=get_robust_list,set_robust_list "QUIRK:START-OF-TEST-OUTPUT:get_robust_list(0, NULL, NULL)"
 xetitimer	-a29 -e trace=setitimer,getitimer
 xetpgid	-a11 -e trace=getpgid,setpgid
 xetpgid--pidns-translation	test_pidns -a11 -e trace=getpgid,setpgid
