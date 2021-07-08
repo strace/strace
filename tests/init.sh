@@ -19,6 +19,13 @@ skip_() { warn_ "$ME_: skipped test: $*"; exit 77; }
 framework_failure_() { warn_ "$ME_: framework failure: $*"; exit 99; }
 framework_skip_() { warn_ "$ME_: framework skip: $*"; exit 77; }
 
+# Enable using string in sed regular expressions by escaping all the special
+# characters.
+sed_re_escape()
+{
+	printf "%s" "$*" | sed 's/[].*&^$[\/]/\\&/g'
+}
+
 # get_config_str OPTION
 #
 # Returns the value of OPTION from config.h (path to which set
@@ -239,12 +246,31 @@ match_grep()
 # Usage: run_strace_match_diff [args to run_strace]
 run_strace_match_diff()
 {
+	local sed_cmd
+	sed_cmd='p'
+
 	args="$*"
 	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o -z "${args##*--trace=*}" \) ] ||
 		set -- -e trace="$NAME" "$@"
+
+	set -- "$@" END_OF_ARGUMENTS
+	while :; do
+		arg="$1"
+		shift
+		[ "x${arg#QUIRK:START-OF-TEST-OUTPUT:}" = "x${arg}" ] || {
+			str="${arg#QUIRK:START-OF-TEST-OUTPUT:}"
+			sed_cmd="/$(sed_re_escape "$str")/,\$p"
+			continue
+		}
+		[ "x$arg" != "xEND_OF_ARGUMENTS" ] || break
+
+		set -- "$@" "$arg"
+	done
+
 	run_prog > /dev/null
 	run_strace "$@" $args > "$EXP"
-	match_diff "$LOG" "$EXP"
+	sed -n "$sed_cmd" < "$LOG" > "$OUT"
+	match_diff "$OUT" "$EXP"
 }
 
 # Usage: run_strace_match_grep [args to run_strace]
@@ -389,19 +415,36 @@ test_prog_set()
 
 test_pidns_run_strace()
 {
-	local parent_pid init_pid
+	local parent_pid init_pid sed_cmd
+	sed_cmd='p'
 
 	check_prog tail
 	check_prog cut
 	check_prog grep
 
+	set -- "$@" END_OF_ARGUMENTS
+	while :; do
+		arg="$1"
+		shift
+		[ "x${arg#QUIRK:START-OF-TEST-OUTPUT:}" = "x${arg}" ] || {
+			str="${arg#QUIRK:START-OF-TEST-OUTPUT:}"
+			str="$(sed_re_escape "${str}")"
+			# There could be -r/-t output between pid and "+++"
+			sed_cmd="/${str}/,/^[1-9][0-9]* .*+++ exited with 0 +++\$/p"
+			continue
+		}
+		[ "x$arg" != "xEND_OF_ARGUMENTS" ] || break
+
+		set -- "$@" "$arg"
+	done
+
 	run_prog > /dev/null
-	run_strace --pidns-translation -f $@ $args > "$EXP"
+	run_strace --pidns-translation -f "$@" $args > "$EXP"
 
 	# filter out logs made by the parent or init process of the pidns test
 	parent_pid="$(tail -n 2 $LOG | head -n 1 | cut -d' ' -f1)"
 	init_pid="$(tail -n 1 $LOG | cut -d' ' -f1)"
-	grep -E -v "^($parent_pid|$init_pid) " "$LOG" > "$OUT"
+	grep -E -v "^($parent_pid|$init_pid) " "$LOG" | sed -n "$sed_cmd" > "$OUT"
 	match_diff "$OUT" "$EXP"
 }
 
