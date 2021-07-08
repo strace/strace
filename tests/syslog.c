@@ -49,18 +49,24 @@ main(void)
 	} no_args[] = {
 		{ 0,  "0 /* SYSLOG_ACTION_CLOSE */" },
 		{ 1,  "1 /* SYSLOG_ACTION_OPEN */" },
+#ifdef RETVAL_INJECTED
+		/* Avoid commands with side effects without syscall injection */
 		{ 5,  "5 /* SYSLOG_ACTION_CLEAR */" },
 		{ 6,  "6 /* SYSLOG_ACTION_CONSOLE_OFF */" },
 		{ 7,  "7 /* SYSLOG_ACTION_CONSOLE_ON */" },
+#endif
 		{ 9,  "9 /* SYSLOG_ACTION_SIZE_UNREAD */" },
 		{ 10, "10 /* SYSLOG_ACTION_SIZE_BUFFER */" },
 	};
 	static const struct cmd_str two_args[] = {
 		{ 0xfeedbeef, "-17973521 /* SYSLOG_ACTION_??? */" },
 		{ -1U, "-1 /* SYSLOG_ACTION_??? */" },
+#ifdef RETVAL_INJECTED
+		/* Avoid commands with side effects without syscall injection */
 		{ 2,  "2 /* SYSLOG_ACTION_READ */" },
 		{ 3,  "3 /* SYSLOG_ACTION_READ_ALL */" },
 		{ 4,  "4 /* SYSLOG_ACTION_READ_CLEAR */" },
+#endif
 		{ 11, "11 /* SYSLOG_ACTION_??? */" },
 		{ (1U << 31) - 1, "2147483647 /* SYSLOG_ACTION_??? */" },
 	};
