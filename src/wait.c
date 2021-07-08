@@ -31,31 +31,33 @@ printstatus(int status)
 	 * is still not entirely satisfactory but since there
 	 * are no wait status constructors it will have to do.
 	 */
+	tprint_indirect_begin();
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
-		tprintf("[{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
+		tprintf("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
 			sprintsigname(sig & 0x7f),
 			sig & 0x80 ? " | 0x80" : "");
 		status &= ~W_STOPCODE(sig);
 	} else if (WIFSIGNALED(status)) {
-		tprintf("[{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
+		tprintf("{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
 			sprintsigname(WTERMSIG(status)),
 			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
 		status &= ~(W_EXITCODE(0, WTERMSIG(status)) | WCOREFLAG);
 	} else if (WIFEXITED(status)) {
-		tprintf("[{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
+		tprintf("{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
 			WEXITSTATUS(status));
 		exited = 1;
 		status &= ~W_EXITCODE(WEXITSTATUS(status), 0);
 	}
 #ifdef WIFCONTINUED
 	else if (WIFCONTINUED(status)) {
-		tprints("[{WIFCONTINUED(s)}");
+		tprints("{WIFCONTINUED(s)}");
 		status &= ~W_CONTINUED;
 	}
 #endif
 	else {
-		tprintf("[%#x]", status);
+		PRINT_VAL_X(status);
+		tprint_indirect_end();
 		return 0;
 	}
 
@@ -67,10 +69,12 @@ printstatus(int status)
 			tprints(" << 16");
 			status &= 0xffff;
 		}
-		if (status)
-			tprintf(" | %#x", status);
+		if (status) {
+			tprints(" | ");
+			PRINT_VAL_X(status);
+		}
 	}
-	tprints("]");
+	tprint_indirect_end();
 
 	return exited;
 }
@@ -80,8 +84,9 @@ printwaitn(struct tcb *const tcp,
 	   void (*const print_rusage)(struct tcb *, kernel_ulong_t))
 {
 	if (entering(tcp)) {
+		/* pid */
 		printpid_tgid_pgid(tcp, tcp->u_arg[0]);
-		tprints(", ");
+		tprint_arg_next();
 	} else {
 		int status;
 
@@ -90,12 +95,14 @@ printwaitn(struct tcb *const tcp,
 			printaddr(tcp->u_arg[1]);
 		else if (!umove_or_printaddr(tcp, tcp->u_arg[1], &status))
 			printstatus(status);
+		tprint_arg_next();
+
 		/* options */
-		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[2], "W???");
 		if (print_rusage) {
+			tprint_arg_next();
+
 			/* usage */
-			tprints(", ");
 			if (tcp->u_rval > 0)
 				print_rusage(tcp, tcp->u_arg[3]);
 			else
@@ -132,10 +139,11 @@ SYS_FUNC(waitid)
 	int id = tcp->u_arg[1];
 
 	if (entering(tcp)) {
+		/* idtype */
 		printxval(waitid_types, idtype, "P_???");
-		tprints(", ");
-		switch (idtype)
-		{
+		tprint_arg_next();
+
+		switch (idtype) {
 		case P_PID:
 			printpid(tcp, id, PT_TGID);
 			break;
@@ -146,18 +154,20 @@ SYS_FUNC(waitid)
 			printpid(tcp, id, PT_PGID);
 			break;
 		default:
-			tprintf("%d", id);
+			PRINT_VAL_D(id);
 			break;
 		}
-		tprints(", ");
+		tprint_arg_next();
 	} else {
 		/* siginfo */
 		printsiginfo_at(tcp, tcp->u_arg[2]);
+		tprint_arg_next();
+
 		/* options */
-		tprints(", ");
 		printflags(wait4_options, tcp->u_arg[3], "W???");
+		tprint_arg_next();
+
 		/* usage */
-		tprints(", ");
 		printrusage(tcp, tcp->u_arg[4]);
 	}
 	return 0;
