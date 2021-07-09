@@ -70,7 +70,7 @@ static void
 print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 {
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
-		tprintf("%#x", fourcc);
+		PRINT_VAL_X(fourcc);
 		return;
 	}
 
@@ -82,13 +82,13 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 	};
 	unsigned int i;
 
-	tprints("v4l2_fourcc(");
+	tprints_arg_begin("v4l2_fourcc");
 	/* Generic char array printing routine.  */
 	for (i = 0; i < ARRAY_SIZE(a); ++i) {
 		unsigned char c = a[i];
 
 		if (i)
-			tprints(", ");
+			tprint_arg_next();
 		if (c == '\'' || c == '\\') {
 			char sym[] = {
 				'\'',
@@ -114,7 +114,7 @@ print_pixelformat(uint32_t fourcc, const struct xlat *xlat)
 			tprints(hex);
 		}
 	}
-	tprints(")");
+	tprint_arg_end();
 
 	if (xlat) {
 		const char *pixfmt_name = xlookup(xlat, fourcc);
@@ -139,9 +139,11 @@ print_v4l2_capability(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (entering(tcp))
 		return 0;
-	tprints(", ");
+
+	tprint_arg_next();
 	if (umove_or_printaddr(tcp, arg, &caps))
 		return RVAL_IOCTL_DECODED;
+
 	tprint_struct_begin();
 	PRINT_FIELD_CSTRING(caps, driver);
 	tprint_struct_next();
@@ -172,9 +174,10 @@ print_v4l2_fmtdesc(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_fmtdesc f;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(f, index);
 		tprint_struct_next();
@@ -444,9 +447,10 @@ print_v4l2_format(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct_v4l2_format f;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(f, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
@@ -480,8 +484,7 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_requestbuffers reqbufs;
 
 	if (entering(tcp)) {
-		tprints(", ");
-
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &reqbufs))
 			return RVAL_IOCTL_DECODED;
 
@@ -499,7 +502,7 @@ print_v4l2_requestbuffers(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	if (!syserror(tcp) && !umove(tcp, arg, &reqbufs)) {
 		tprint_value_changed();
-		tprintf("%u", reqbufs.count);
+		PRINT_VAL_U(reqbufs.count);
 	}
 
 	tprint_struct_end();
@@ -519,7 +522,7 @@ print_v4l2_buffer_flags(uint32_t val)
 	const uint32_t flags   = val & ~ts_type & ~ts_src;
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
-		tprintf("%#" PRIx32, val);
+		PRINT_VAL_X(val);
 		return;
 	}
 
@@ -569,9 +572,10 @@ print_v4l2_buffer(struct tcb *const tcp, const unsigned int code,
 	kernel_v4l2_buffer_t b;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(b, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
@@ -624,7 +628,7 @@ print_v4l2_framebuffer(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	struct_v4l2_framebuffer b;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &b)) {
 		tprint_struct_begin();
 		PRINT_FIELD_X(b, capability);
@@ -643,11 +647,11 @@ print_v4l2_buf_type(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	int type;
 
-	tprints(", ");
+	tprint_arg_next();
 	if (!umove_or_printaddr(tcp, arg, &type)) {
-		tprints("[");
+		tprint_indirect_begin();
 		printxval(v4l2_buf_types, type, "V4L2_BUF_TYPE_???");
-		tprints("]");
+		tprint_indirect_end();
 	}
 	return RVAL_IOCTL_DECODED;
 }
@@ -704,9 +708,10 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct v4l2_streamparm s;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(s, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
@@ -715,7 +720,7 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 			case V4L2_BUF_TYPE_VIDEO_OUTPUT:
 				if (is_get)
 					return 0;
-				tprints(", ");
+				tprint_struct_next();
 				break;
 			default:
 				tprint_struct_end();
@@ -749,9 +754,10 @@ print_v4l2_standard(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_v4l2_standard s;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(s, index);
 
@@ -780,9 +786,10 @@ print_v4l2_input(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_v4l2_input i;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &i))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(i, index);
 
@@ -815,7 +822,7 @@ static void
 print_v4l2_cid(uint32_t cid, bool next_flags)
 {
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
-		tprintf("%#x", cid);
+		PRINT_VAL_X(cid);
 		return;
 	}
 
@@ -869,7 +876,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct v4l2_control c;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
 
@@ -888,7 +895,7 @@ print_v4l2_control(struct tcb *const tcp, const kernel_ulong_t arg,
 			PRINT_FIELD_D(c, value);
 		} else {
 			tprint_value_changed();
-			tprintf("%d", c.value);
+			PRINT_VAL_D(c.value);
 		}
 	}
 
@@ -908,14 +915,15 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 {
 	struct v4l2_tuner c;
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(c, index);
 		if (is_get)
 			return 0;
-		tprints(", ");
+		tprint_struct_next();
 	} else {
 		if (syserror(tcp) || umove(tcp, arg, &c) < 0) {
 			tprint_struct_end();
@@ -962,9 +970,10 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_queryctrl c;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		set_tcb_priv_ulong(tcp, c.id);
 		tprint_struct_begin();
 		PRINT_FIELD_V4L2_CID(c, id, true);
@@ -1022,9 +1031,10 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_query_ext_ctrl c;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		set_tcb_priv_ulong(tcp, c.id);
 		tprint_struct_begin();
 		PRINT_FIELD_V4L2_CID(c, id, true);
@@ -1091,9 +1101,10 @@ print_v4l2_cropcap(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_cropcap c;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(c, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
@@ -1122,9 +1133,10 @@ print_v4l2_crop(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct v4l2_crop c;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(c, type, v4l2_buf_types,
 				 "V4L2_BUF_TYPE_???");
@@ -1175,9 +1187,10 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 	struct_v4l2_ext_controls c;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &c))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_XVAL(c, ctrl_class, v4l2_control_classes,
 				 "V4L2_CTRL_CLASS_???");
@@ -1189,7 +1202,7 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 		}
 		if (is_get)
 			return 0;
-		tprints(", ");
+		tprint_struct_next();
 	} else {
 		if (umove(tcp, arg, &c) < 0) {
 			tprint_struct_end();
@@ -1261,9 +1274,10 @@ print_v4l2_frmsizeenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_frmsizeenum s;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &s))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(s, index);
 		tprint_struct_next();
@@ -1316,9 +1330,10 @@ print_v4l2_frmivalenum(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct v4l2_frmivalenum f;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &f))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(f, index);
 		tprint_struct_next();
@@ -1373,9 +1388,10 @@ print_v4l2_create_buffers(struct tcb *const tcp, const kernel_ulong_t arg)
 	struct_v4l2_create_buffers b;
 
 	if (entering(tcp)) {
-		tprints(", ");
+		tprint_arg_next();
 		if (umove_or_printaddr(tcp, arg, &b))
 			return RVAL_IOCTL_DECODED;
+
 		tprint_struct_begin();
 		PRINT_FIELD_U(b, count);
 		tprint_struct_next();
@@ -1443,7 +1459,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_STD: /* W */
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int64(tcp, arg, "%#" PRIx64);
 		break;
 
@@ -1472,7 +1488,7 @@ MPERS_PRINTER_DECL(int, v4l2_ioctl, struct tcb *const tcp,
 			return 0;
 		ATTRIBUTE_FALLTHROUGH;
 	case VIDIOC_S_INPUT: /* RW */
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int(tcp, arg, "%u");
 		break;
 
