@@ -341,7 +341,7 @@ printaddr64(const uint64_t addr)
 	if (!addr)
 		tprints("NULL");
 	else
-		tprintf("%#" PRIx64, addr);
+		PRINT_VAL_X(addr);
 }
 
 #define DEF_PRINTNUM(name, type) \
@@ -379,11 +379,11 @@ printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	type pair[2];							\
 	if (umove_or_printaddr(tcp, addr, &pair))			\
 		return false;						\
-	tprint_indirect_begin();					\
+	tprint_array_begin();						\
 	tprintf(fmt, pair[0]);						\
-	tprints(", ");							\
+	tprint_array_next();						\
 	tprintf(fmt, pair[1]);						\
-	tprint_indirect_end();						\
+	tprint_array_end();						\
 	return true;							\
 }
 
@@ -640,7 +640,8 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	if (pid <= 0)
 		return false;
 
-	tprintf("pid:%d", pid);
+	tprints("pid:");
+	PRINT_VAL_D(pid);
 	return true;
 }
 
@@ -650,7 +651,8 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 	char path[PATH_MAX + 1];
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
 	    && getfdpath_pid(pid, fd, path, sizeof(path)) >= 0) {
-		tprintf("%d<", (int) fd);
+		PRINT_VAL_D(fd);
+		tprints("<");
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
@@ -666,7 +668,7 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 printed:
 		tprints(">");
 	} else {
-		tprintf("%d", fd);
+		PRINT_VAL_D(fd);
 	}
 #ifdef ENABLE_SECONTEXT
 	char *context;
@@ -934,7 +936,7 @@ print_quoted_cstring(const char *str, unsigned int size)
 		print_quoted_string(str, size, QUOTE_0_TERMINATED);
 
 	if (unterminated)
-		tprints("...");
+		tprint_more_data_follows();
 
 	return unterminated;
 }
@@ -1057,7 +1059,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	tprints(outstr);
 	if (ellipsis)
-		tprints("...");
+		tprint_more_data_follows();
 
 	return rc;
 }
@@ -1101,7 +1103,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 		print_quoted_string(str, size, style);
 
 		if (size < len)
-			tprints("...");
+			tprint_more_data_follows();
 	}
 
 	free(str);
@@ -1343,7 +1345,7 @@ bool
 print_int8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			void *data)
 {
-	tprintf("%" PRId8, *(int8_t *) elem_buf);
+	PRINT_VAL_D(*(int8_t *) elem_buf);
 
 	return true;
 }
@@ -1352,16 +1354,16 @@ bool
 print_uint8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			 void *data)
 {
-	tprintf("%" PRIu8, *(uint8_t *) elem_buf);
+	PRINT_VAL_U(*(uint8_t *) elem_buf);
 
 	return true;
 }
 
 bool
 print_xint8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			  void *data)
+			 void *data)
 {
-	tprintf("%#" PRIx8, *(uint8_t *) elem_buf);
+	PRINT_VAL_X(*(uint8_t *) elem_buf);
 
 	return true;
 }
@@ -1370,7 +1372,7 @@ bool
 print_int32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			 void *data)
 {
-	tprintf("%" PRId32, *(int32_t *) elem_buf);
+	PRINT_VAL_D(*(int32_t *) elem_buf);
 
 	return true;
 }
@@ -1379,7 +1381,7 @@ bool
 print_uint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {
-	tprintf("%" PRIu32, *(uint32_t *) elem_buf);
+	PRINT_VAL_U(*(uint32_t *) elem_buf);
 
 	return true;
 }
@@ -1388,7 +1390,7 @@ bool
 print_xint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {
-	tprintf("%#" PRIx32, *(uint32_t *) elem_buf);
+	PRINT_VAL_X(*(uint32_t *) elem_buf);
 
 	return true;
 }
@@ -1397,7 +1399,7 @@ bool
 print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {
-	tprintf("%" PRIu64, *(uint64_t *) elem_buf);
+	PRINT_VAL_U(*(uint64_t *) elem_buf);
 
 	return true;
 }
@@ -1406,7 +1408,7 @@ bool
 print_xint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			  void *data)
 {
-	tprintf("%#" PRIx64, *(uint64_t *) elem_buf);
+	PRINT_VAL_X(*(uint64_t *) elem_buf);
 
 	return true;
 }
@@ -1469,7 +1471,8 @@ print_array_ex(struct tcb *const tcp,
 	}
 
 	if (!nmemb) {
-		tprints("[]");
+		tprint_array_begin();
+		tprint_array_end();
 		return false;
 	}
 
@@ -1494,14 +1497,14 @@ print_array_ex(struct tcb *const tcp,
 
 	for (cur = start_addr; cur < end_addr; cur += elem_size, idx++) {
 		if (cur != start_addr)
-			tprints(", ");
+			tprint_array_next();
 
 		if (tfetch_mem_func) {
 			if (!tfetch_mem_func(tcp, cur, elem_size, elem_buf)) {
 				if (cur == start_addr)
 					printaddr(cur);
 				else {
-					tprints("...");
+					tprint_more_data_follows();
 					printaddr_comment(cur);
 					truncated = true;
 				}
@@ -1512,10 +1515,10 @@ print_array_ex(struct tcb *const tcp,
 		}
 
 		if (cur == start_addr)
-			tprints("[");
+			tprint_array_begin();
 
 		if (cur >= abbrev_end) {
-			tprints("...");
+			tprint_more_data_follows();
 			cur = end_addr;
 			truncated = true;
 			break;
@@ -1543,12 +1546,12 @@ print_array_ex(struct tcb *const tcp,
 	if ((cur != start_addr) || !tfetch_mem_func) {
 		if ((flags & PAF_ARRAY_TRUNCATED) && !truncated) {
 			if (cur != start_addr)
-				tprints(", ");
+				tprint_array_next();
 
-			tprints("...");
+			tprint_more_data_follows();
 		}
 
-		tprints("]");
+		tprint_array_end();
 	}
 
 	return cur >= end_addr;
@@ -1557,32 +1560,36 @@ print_array_ex(struct tcb *const tcp,
 int
 printargs(struct tcb *tcp)
 {
-	const int n = n_args(tcp);
-	int i;
-	for (i = 0; i < n; ++i)
-		tprintf("%s%#" PRI_klx, i ? ", " : "", tcp->u_arg[i]);
+	const unsigned int n = n_args(tcp);
+	for (unsigned int i = 0; i < n; ++i) {
+		if (i)
+			tprint_arg_next();
+		PRINT_VAL_X(tcp->u_arg[i]);
+	}
 	return RVAL_DECODED;
 }
 
 int
 printargs_u(struct tcb *tcp)
 {
-	const int n = n_args(tcp);
-	int i;
-	for (i = 0; i < n; ++i)
-		tprintf("%s%u", i ? ", " : "",
-			(unsigned int) tcp->u_arg[i]);
+	const unsigned int n = n_args(tcp);
+	for (unsigned int i = 0; i < n; ++i) {
+		if (i)
+			tprint_arg_next();
+		PRINT_VAL_U((unsigned int) tcp->u_arg[i]);
+	}
 	return RVAL_DECODED;
 }
 
 int
 printargs_d(struct tcb *tcp)
 {
-	const int n = n_args(tcp);
-	int i;
-	for (i = 0; i < n; ++i)
-		tprintf("%s%d", i ? ", " : "",
-			(int) tcp->u_arg[i]);
+	const unsigned int n = n_args(tcp);
+	for (unsigned int i = 0; i < n; ++i) {
+		if (i)
+			tprint_arg_next();
+		PRINT_VAL_D((int) tcp->u_arg[i]);
+	}
 	return RVAL_DECODED;
 }
 
