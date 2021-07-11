@@ -43,7 +43,8 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 	case BPF_STX:
 		if (!extended) {
 			if (i) {
-				tprintf("|%#x", i);
+				tprints("|");
+				PRINT_VAL_X(i);
 				tprints_comment("BPF_???");
 			}
 			break;
@@ -65,7 +66,8 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 			printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
 			i &= ~BPF_MISCOP(code);
 			if (i) {
-				tprintf("|%#x", i);
+				tprints("|");
+				PRINT_VAL_X(i);
 				tprints_comment("BPF_???");
 			}
 			break;
@@ -97,7 +99,8 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 		}
 
 		if (i) {
-			tprintf("|%#x", i);
+			tprints("|");
+			PRINT_VAL_X(i);
 			tprints_comment("BPF_???");
 		}
 
