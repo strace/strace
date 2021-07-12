@@ -19,5 +19,5 @@ set -- "../$NAME"
 	esac
 }
 run_strace -eprctl "$@" > "$EXP"
-grep -v '^prctl(PR_GET_' < "$LOG" > "$OUT"
+sed '0,/^prctl(0xffffffff \/\* PR_??? \*\/, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb) = -1 /d' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"

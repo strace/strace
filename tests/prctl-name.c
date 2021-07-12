@@ -10,6 +10,7 @@
  */
 
 #include "tests.h"
+#include "scno.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -18,6 +19,8 @@
 int
 main(void)
 {
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	static const char str[] = "0123456789abcdef";
 	static const int len = sizeof(str) - 1;
 	char *name = tail_memdup(str, sizeof(str));

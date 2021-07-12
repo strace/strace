@@ -21,8 +21,7 @@ test_run_rval()
 	injexpr="$1"; shift
 
 	run_strace $fault_args$injexpr $prog $rval > "$EXP"
-	LC_ALL=C grep -Ev '^prctl\(PR_[GS]ET_([^S][^P][^E][^C]])' \
-		< "$LOG" > "$OUT"
+	sed '0,/^prctl(0xffffffff \/\* PR_??? \*\/, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb) = .\+ (INJECTED)/d' < "$LOG" > "$OUT"
 	match_diff "$OUT" "$EXP"
 }
 

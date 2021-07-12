@@ -86,6 +86,8 @@ main(int argc, char **argv)
 
 	injected_val = strtol(argv[1], NULL, 0);
 
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	/* PR_GET_SPECULATION_CTRL */
 	rc = do_prctl(52, 2, bogus_arg3);
 	printf("prctl(PR_GET_SPECULATION_CTRL, 0x2 /* PR_SPEC_??? */) "

@@ -39,6 +39,9 @@ main(void)
 	};
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
+
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE(options); i++) {

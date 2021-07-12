@@ -22,6 +22,9 @@ main(void)
 		(kernel_ulong_t) 0xdeadc0defacebeefULL;
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, tsc);
+
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	long rc;
 
 	rc = syscall(__NR_prctl, PR_SET_TSC, 0);

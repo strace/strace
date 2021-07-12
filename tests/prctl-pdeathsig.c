@@ -23,6 +23,9 @@ main(void)
 		(kernel_ulong_t) 0xbadc0deddeadfeedULL;
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, pdeathsig);
+
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	long rc;
 
 	rc = syscall(__NR_prctl, PR_SET_PDEATHSIG, bogus_signal);

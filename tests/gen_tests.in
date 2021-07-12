@@ -571,6 +571,15 @@ poke-sendfile	--trace=/sendfile --inject=all:poke_enter=@arg3=0000000000000000:p
 ppoll	-s2
 ppoll-P	-s2 -e trace=ppoll -P /dev/full 9>>/dev/full
 ppoll-v	-v -s2 -e trace=ppoll
+prctl-arg2-intptr	    +prctl.sh -a25
+prctl-dumpable		    +prctl.sh -a23
+prctl-name			    +prctl.sh -a23
+prctl-no-args		    +prctl.sh -a21
+prctl-pdeathsig		    +prctl.sh -a30
+prctl-seccomp-filter-v	+prctl.sh -v
+prctl-securebits    	+prctl.sh -a25
+prctl-tid_address   	+prctl.sh -a23
+prctl-tsc		    	+prctl.sh -a24
 pread64-pwrite64	-a21 -eread=0 -ewrite=1 -e trace=pread64,pwrite64 -P pread64-pwrite64-tmpfile -P /dev/zero -P /dev/null
 preadv	-a21
 preadv-pwritev	-a19 -eread=0 -ewrite=1 -e trace=preadv,pwritev

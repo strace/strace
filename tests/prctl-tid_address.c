@@ -38,6 +38,9 @@ main(void)
 
 	/* Note that kernel puts kernel-sized pointer even on x32 */
 	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_ulong_t, ptr);
+
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	long rc;
 	long set_ok;
 

@@ -68,6 +68,8 @@ main(void)
 {
 	int fds[2];
 
+	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+
 	puts("prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)  = 0");
 
 	printf("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, {len=%u, filter=[",
