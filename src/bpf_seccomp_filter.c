@@ -23,8 +23,10 @@ print_seccomp_filter_k(const struct bpf_filter_block *const fp)
 		unsigned int data = fp->k & ~action;
 
 		printxval(seccomp_ret_action, action, "SECCOMP_RET_???");
-		if (data)
-			tprintf("|%#x", data);
+		if (data) {
+			tprints("|");
+			PRINT_VAL_X(data);
+		}
 
 		return true;
 	}
