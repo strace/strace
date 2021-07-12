@@ -237,6 +237,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	poll-P \
 	ppoll-P \
 	ppoll-v \
+	prctl-fp-mode \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-spec-inject \
@@ -421,6 +422,7 @@ DECODER_TESTS = \
 	pipe.test \
 	poll-P.test \
 	poll.test \
+	prctl-fp-mode.test \
 	prctl-seccomp-strict.test \
 	prctl-spec-inject.test \
 	qual_fault-exit_group.test \

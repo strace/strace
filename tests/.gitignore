@@ -607,7 +607,11 @@ ppoll
 ppoll-P
 ppoll-v
 prctl-arg2-intptr
+prctl-cap-ambient
+prctl-capbset
 prctl-dumpable
+prctl-fp-mode
+prctl-mce-kill
 prctl-name
 prctl-no-args
 prctl-pdeathsig
@@ -615,8 +619,10 @@ prctl-seccomp-filter-v
 prctl-seccomp-strict
 prctl-securebits
 prctl-spec-inject
+prctl-sve
 prctl-tid_address
 prctl-tsc
+prctl-unalign
 pread64-pwrite64
 preadv
 preadv-pwritev
