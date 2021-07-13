@@ -30,11 +30,13 @@ print_sock_filter_k(const struct bpf_filter_block *const fp)
 			return true;
 		} else if (fp->k >= (unsigned int) SKF_NET_OFF) {
 			print_xlat32(SKF_NET_OFF);
-			tprintf("+%u", fp->k - (unsigned int) SKF_NET_OFF);
+			tprints("+");
+			PRINT_VAL_U(fp->k - (unsigned int) SKF_NET_OFF);
 			return true;
 		} else if (fp->k >= (unsigned int) SKF_LL_OFF) {
 			print_xlat32(SKF_LL_OFF);
-			tprintf("+%u", fp->k - (unsigned int) SKF_LL_OFF);
+			tprints("+");
+			PRINT_VAL_U(fp->k - (unsigned int) SKF_LL_OFF);
 			return true;
 		}
 	}
