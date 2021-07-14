@@ -158,7 +158,8 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		tprints_field_name("config");
 		if (attr->config >> 32) {
-			tprintf("%#" PRIx64 "<<32|", attr->config >> 32);
+			PRINT_VAL_X(attr->config >> 32);
+			tprints("<<32|");
 		}
 		printxval(perf_hw_id, attr->config & PERF_HW_EVENT_MASK,
 			   "PERF_COUNT_HW_???");
@@ -188,11 +189,12 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		tprints_field_name("config");
 		if (attr->config >> 32){
-			tprintf("%#" PRIx64 "<<32|", attr->config >> 32);
+			PRINT_VAL_X(attr->config >> 32);
+			tprints("<<32|");
 		}
 		if ((attr->config & PERF_HW_EVENT_MASK) >> 24) {
-			tprintf("%#" PRIx64 "<<24|",
-				(attr->config & PERF_HW_EVENT_MASK) >> 24);
+			PRINT_VAL_X((attr->config & PERF_HW_EVENT_MASK) >> 24);
+			tprints("<<24|");
 		}
 		printxval(perf_hw_cache_op_result_id,
 			  (attr->config >> 16) & 0xFF,
@@ -392,7 +394,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	STRACE_PERF_CHECK_FIELD(__reserved_2);
 	if (attr->__reserved_2)
-		tprintf(" /* bytes 110..111: %#hx */", attr->__reserved_2);
+		tprintf_comment("bytes 110..111: %#hx", attr->__reserved_2);
 
 	STRACE_PERF_CHECK_FIELD(aux_sample_size);
 	tprint_struct_next();
@@ -400,7 +402,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 
 	STRACE_PERF_CHECK_FIELD(__reserved_3);
 	if (attr->__reserved_3)
-		tprintf(" /* bytes 116..119: %#x */", attr->__reserved_3);
+		tprintf_comment("bytes 116..119: %#x", attr->__reserved_3);
 
 	STRACE_PERF_CHECK_FIELD(sig_data);
 	tprint_struct_next();
