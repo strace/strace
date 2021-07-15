@@ -118,12 +118,15 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 			? NULL : "FUTEX_OP_???";
 		tprints("<<28");
 		tprints_comment(comment);
-		tprintf("|%#x<<12|", (val3 >> 12) & 0xfff);
+		tprints("|");
+		PRINT_VAL_X((val3 >> 12) & 0xfff);
+		tprints("<<12|");
 		comment = printxval(futexwakecmps, (val3 >> 24) & 0xf, NULL)
 			? NULL : "FUTEX_OP_CMP_???";
 		tprints("<<24");
 		tprints_comment(comment);
-		tprintf("|%#x", val3 & 0xfff);
+		tprints("|");
+		PRINT_VAL_X(val3 & 0xfff);
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprint_arg_next();
