@@ -50,12 +50,17 @@ main(void)
 	const struct xlat_data *xlat;
 	size_t i = 0;
 
+	long rc = syscall(__NR_prlimit64, 0, 16, 0, 0);
+	pidns_print_leader();
+	printf("prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL) = %s\n",
+	       sprintrc(rc));
+
 	for (xlat = resources->data; i < resources->size; ++xlat, ++i) {
 		if (!xlat->str)
 			continue;
 
 		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
-		long rc = syscall(__NR_prlimit64, pid, res, 0, rlimit);
+		rc = syscall(__NR_prlimit64, pid, res, 0, rlimit);
 		pidns_print_leader();
 		if (rc)
 			printf("prlimit64(%d%s, %s, NULL, %p) ="
