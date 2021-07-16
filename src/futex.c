@@ -55,6 +55,7 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		print_ts(tcp, timeout);
 		break;
 	case FUTEX_LOCK_PI:
+	case FUTEX_LOCK_PI2:
 		tprint_arg_next();
 		print_ts(tcp, timeout);
 		break;

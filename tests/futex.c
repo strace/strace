@@ -86,8 +86,9 @@ invalid_op(int *val, int op, uint32_t argmask, ...)
 	/* Since timeout value is copied before full op check, we should provide
 	 * some valid timeout address or NULL */
 	int cmd = op & FUTEX_CMD_MASK;
-	bool valid_timeout = (cmd == FUTEX_WAIT) || (cmd == FUTEX_LOCK_PI) ||
-		(cmd == FUTEX_WAIT_BITSET) || (cmd == FUTEX_WAIT_REQUEUE_PI);
+	bool valid_timeout = (cmd == FUTEX_WAIT) || (cmd == FUTEX_LOCK_PI) || \
+		(cmd == FUTEX_LOCK_PI2) || (cmd == FUTEX_WAIT_BITSET) || \
+		(cmd == FUTEX_WAIT_REQUEUE_PI);
 	bool timeout_is_val2 = (cmd == FUTEX_REQUEUE) ||
 		(cmd == FUTEX_CMP_REQUEUE) || (cmd == FUTEX_WAKE_OP) ||
 		(cmd == FUTEX_CMP_REQUEUE_PI);
@@ -769,13 +770,40 @@ main(int argc, char *argv[])
 	CHECK_INVALID_CLOCKRT(FUTEX_CMP_REQUEUE_PI, ARG3 | ARG4 | ARG5 | ARG6,
 		"%u", "%u", "%#lx", "%u");
 
+	/* FUTEX_LOCK_PI2 - same as FUTEX_LOCK_PI, but with CLOCK_MONOTONIC
+	 *                  instead of CLOCK_REALTIME.
+	 * Possible flags: PRIVATE
+	 * 1. uaddr   - futex address
+	 * 2. op      - FUTEX_LOCK_PI2
+	 * 3. val     - not used
+	 * 4. timeout - timeout
+	 * 5. uaddr2  - not used
+	 * 6. val3    - not used
+	 */
+
+	*uaddr = getpid();
+
+	CHECK_FUTEX_ENOSYS(uaddr + 1, FUTEX_LOCK_PI2, VAL, tmout, uaddr2 + 1,
+		VAL3, (rc == -1) && (errno == EFAULT));
+	printf("futex(%p, FUTEX_LOCK_PI2, {tv_sec=%lld, tv_nsec=%llu}) = %s\n",
+	       uaddr + 1, (long long) tmout->tv_sec,
+	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
+
+	CHECK_FUTEX_ENOSYS(uaddr + 1, FUTEX_PRIVATE_FLAG | FUTEX_LOCK_PI2, VAL,
+		tmout, uaddr2 + 1, VAL3, (rc == -1) && (errno == EFAULT));
+	printf("futex(%p, FUTEX_LOCK_PI2_PRIVATE, {tv_sec=%lld, tv_nsec=%llu})"
+	       " = %s\n",
+	       uaddr + 1, (long long) tmout->tv_sec,
+	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
+
+
 	/*
 	 * Unknown commands
 	 */
 
-	CHECK_FUTEX(uaddr, 0xd, VAL, tmout + 1, uaddr2 + 1, VAL3,
+	CHECK_FUTEX(uaddr, 0xe, VAL, tmout + 1, uaddr2 + 1, VAL3,
 		(rc == -1) && (errno == ENOSYS));
-	printf("futex(%p, 0xd /* FUTEX_??? */, %u, %p, %p, %#x) = %s\n",
+	printf("futex(%p, 0xe /* FUTEX_??? */, %u, %p, %p, %#x) = %s\n",
 		uaddr, VAL_PR, tmout + 1, uaddr2 + 1, VAL3_PR, sprintrc(rc));
 
 	CHECK_FUTEX(uaddr, 0xbefeeded, VAL, tmout + 1, uaddr2, VAL3,
