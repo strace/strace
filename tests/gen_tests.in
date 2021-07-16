@@ -184,7 +184,7 @@ getpgrp--pidns-translation	test_pidns -e trace=getpgrp -a10
 getpid	-a9
 getpid--pidns-translation	test_pidns -e trace=getpid -a9
 getppid	-a10
-getrandom	-a32 -s3
+getrandom	-a22 -s3 "QUIRK:START-OF-TEST-OUTPUT:getrandom(NULL, 0, 0)"
 getresgid	-a25
 getresgid32	-a27
 getresuid	-a25

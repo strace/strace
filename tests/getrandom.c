@@ -19,6 +19,14 @@ main(void)
 {
 	unsigned char buf[4];
 
+	/*
+	 * syscall/printf are in the inverted order to trigger tcache
+	 * initialisation first see glibc-2.33.9000-879-gfc859c3.
+	 */
+	printf("getrandom(NULL, 0, 0) = 0\n");
+	if (syscall(__NR_getrandom, 0, 0, 0) != 0)
+		perror_msg_and_skip("getrandom(NULL, 0, 0)");
+
 	if (syscall(__NR_getrandom, buf, sizeof(buf) - 1, 0) != sizeof(buf) - 1)
 		perror_msg_and_skip("getrandom");
 	printf("getrandom(\"\\x%02x\\x%02x\\x%02x\", 3, 0) = 3\n",
