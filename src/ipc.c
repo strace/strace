@@ -15,8 +15,10 @@ SYS_FUNC(ipc)
 	unsigned int version = call >> 16;
 	call &= 0xffff;
 
-	if (version)
-		tprintf("%u<<16|", version);
+	if (version) {
+		PRINT_VAL_U(version);
+		tprints("<<16|");
+	}
 
 	printxval_u(ipccalls, call, NULL);
 
