@@ -40,7 +40,8 @@ main(void)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
 
-	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
+				 (unsigned long) -4U, (unsigned long) -5U);
 
 	unsigned int i;
 

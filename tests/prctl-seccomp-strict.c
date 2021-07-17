@@ -19,7 +19,8 @@ main(void)
 		"prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) = 0\n";
 	static const char text2[] = "+++ exited with 0 +++\n";
 
-	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
+				 (unsigned long) -4U, (unsigned long) -5U);
 
 	int rc = prctl(PR_SET_SECCOMP, -1L, 1, 2, 3);
 	printf("prctl(PR_SET_SECCOMP, %#lx /* SECCOMP_MODE_??? */, 0x1, 0x2, 0x3)"

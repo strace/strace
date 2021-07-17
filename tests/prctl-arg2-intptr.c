@@ -53,7 +53,8 @@ main(void)
 	long rc;
 	unsigned int i;
 
-	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
+				 (unsigned long) -4U, (unsigned long) -5U);
 
 	for (i = 0; i < ARRAY_SIZE(options); ++i) {
 		prctl(options[i].val | bogus_op_bits, 0);

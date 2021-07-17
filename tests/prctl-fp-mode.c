@@ -69,7 +69,8 @@ main(int argc, char **argv)
 
 	injected_val = strtol(argv[1], NULL, 0);
 
-	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
+				 (unsigned long) -4U, (unsigned long) -5U);
 
 	/* PR_GET_FP_MODE */
 	rc = do_prctl(PR_GET_FP_MODE, bogus_arg2, bogus_arg3);

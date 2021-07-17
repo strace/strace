@@ -34,7 +34,8 @@ prctl(kernel_ulong_t arg1, kernel_ulong_t arg2)
 int
 main(void)
 {
-	syscall(__NR_prctl, -1U, -2U, -3U, -4U, -5U);
+	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
+				 (unsigned long) -4U, (unsigned long) -5U);
 
 	static const kernel_ulong_t bits1 =
 		(kernel_ulong_t) 0xdeadc0defacebeefULL;
