@@ -1,7 +1,7 @@
 /*
  * Check decoding of pselect6 syscall.
  *
- * Copyright (c) 2020 The strace developers.
+ * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

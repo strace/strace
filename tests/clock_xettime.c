@@ -2,7 +2,7 @@
  * Check decoding of clock_gettime, clock_settime, and
  * clock_getres syscalls.
  *
- * Copyright (c) 2020 The strace developers.
+ * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
