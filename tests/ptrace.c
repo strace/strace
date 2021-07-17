@@ -232,7 +232,7 @@ typedef struct {
 	unsigned long cp0_status;
 	unsigned long cp0_cause;
 } mips_regs;
-#  define TRACEE_REGS_STRUCT mips_regs
+# define TRACEE_REGS_STRUCT mips_regs
 #endif
 
 static void

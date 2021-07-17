@@ -11,8 +11,8 @@
 
 # include <stdint.h>
 
-#define PERF_PMU_TYPE_SHIFT            32
-#define PERF_HW_EVENT_MASK             0xffffffff
+# define PERF_PMU_TYPE_SHIFT            32
+# define PERF_HW_EVENT_MASK             0xffffffff
 
 struct perf_event_attr {
 	uint32_t type;
