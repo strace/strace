@@ -16,6 +16,30 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#undef TEST_RECVMSG_BOGUS_ADDR
+
+/*
+ * Sadly, musl recvmsg wrapper blindly dereferences the 2nd argument,
+ * so limit these tests to glibc that hopefully doesn't.
+ */
+#ifndef __GLIBC__
+# define TEST_RECVMSG_BOGUS_ADDR 0
+#endif
+
+/*
+ * Sadly, starting with commit
+ * glibc-2.33.9000-707-g13c51549e2077f2f3bf84e8fd0b46d8b0c615912, on every
+ * 32-bit architecture where 32-bit time_t support is enabled, glibc blindly
+ * dereferences the 2nd argument of recvmsg call.
+ */
+#if GLIBC_PREREQ_GE(2, 33) && defined __TIMESIZE && __TIMESIZE != 64
+# define TEST_RECVMSG_BOGUS_ADDR 0
+#endif
+
+#ifndef TEST_RECVMSG_BOGUS_ADDR
+# define TEST_RECVMSG_BOGUS_ADDR 1
+#endif
+
 static int
 send_recv(const int send_fd, const int recv_fd,
 	 struct msghdr *const msg, const int flags)
@@ -94,6 +118,7 @@ test_msg_name(const int send_fd, const int recv_fd)
 	printf("recvmsg(%d, {msg_namelen=%d}, MSG_DONTWAIT) = %d %s (%m)\n",
 	       recv_fd, (int) msg->msg_namelen, rc, errno2name());
 
+#if TEST_RECVMSG_BOGUS_ADDR
 	/*
 	 * When recvmsg is called with a valid descriptor
 	 * but inaccessible memory, it causes segfaults on some architectures.
@@ -101,12 +126,6 @@ test_msg_name(const int send_fd, const int recv_fd)
 	 * it's ok to fail recvmsg with any reason as long as
 	 * it doesn't read that inaccessible memory.
 	 */
-
-	/*
-	 * Sadly, musl recvmsg wrapper blindly dereferences 2nd argument,
-	 * so limit these tests to glibc that doesn't.
-	 */
-#ifdef __GLIBC__
 	rc = send_recv(send_fd, -1, msg + 1, 0);
 	printf("recvmsg(-1, %p, 0) = %d %s (%m)\n",
 	       msg + 1, rc, errno2name());
