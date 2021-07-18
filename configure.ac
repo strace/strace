@@ -18,6 +18,8 @@ AC_INIT([strace],
 	[https://strace.io])
 m4_define([copyright_year], st_esyscmd_s([./build-aux/copyright-year-gen .year]))
 m4_define([manpage_date], st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))
+m4_define([linux_version_code],
+	  st_esyscmd_s([sed '/^#define LINUX_VERSION_CODE /!d;s///;q' bundled/linux/include/uapi/linux/version.h]))
 AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
 AC_CONFIG_SRCDIR([src/strace.c])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -246,8 +248,19 @@ AC_SUBST(cc_flags_m32)
 AC_SUBST(cc_flags_mx32)
 AC_SUBST(arch_native)
 
-CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/arch/$karch/include/uapi"
-CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/include/uapi"
+AC_CACHE_CHECK(
+	[whether to use bundled linux kernel headers],
+	[st_cv_use_bundled_headers],
+	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <linux/version.h>
+#define USE_OS_HEADERS (LINUX_VERSION_CODE > ]linux_version_code[ ? 1 : -1)],
+					    [[int i[USE_OS_HEADERS];]])],
+			   [st_cv_use_bundled_headers=no],
+			   [st_cv_use_bundled_headers=yes])])
+AM_CONDITIONAL([USE_BUNDLED_HEADERS], [test $st_cv_use_bundled_headers = yes])
+if test $st_cv_use_bundled_headers = yes; then
+	CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/arch/$karch/include/uapi"
+	CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/include/uapi"
+fi
 
 MIPS_ABI=
 if test "$arch" = mips; then

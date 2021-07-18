@@ -20,6 +20,12 @@ KARCH		= @karch@
 
 READELF		= @READELF@
 
+bundled_CPPFLAGS =
+if USE_BUNDLED_HEADERS
+bundled_CPPFLAGS += -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
+		    -I$(top_srcdir)/bundled/$(OS)/include/uapi
+endif
+
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 	      -I$(srcdir)/$(OS)/$(ARCH) \
@@ -27,8 +33,7 @@ AM_CPPFLAGS = -I$(builddir)/$(OS)/$(ARCH) \
 	      -I$(srcdir)/$(OS)/generic \
 	      -I$(builddir) \
 	      -I$(srcdir) \
-	      -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
-	      -I$(top_srcdir)/bundled/$(OS)/include/uapi
+	      $(bundled_CPPFLAGS)
 
 AM_CFLAGS_FOR_BUILD = $(WARN_CFLAGS_FOR_BUILD)
 AM_CPPFLAGS_FOR_BUILD = $(AM_CPPFLAGS)

@@ -17,6 +17,11 @@ MPERS_NAME =
 MPERS_CC_FLAGS =
 ARCH_MFLAGS =
 AM_CFLAGS = $(WARN_CFLAGS)
+bundled_CPPFLAGS =
+if USE_BUNDLED_HEADERS
+bundled_CPPFLAGS += -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
+		    -I$(top_srcdir)/bundled/$(OS)/include/uapi
+endif
 AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(builddir) \
 	      -I$(top_builddir)/src/$(OS)/$(ARCH) \
@@ -25,8 +30,7 @@ AM_CPPFLAGS = $(ARCH_MFLAGS) \
 	      -I$(top_srcdir)/src/$(OS)/generic \
 	      -I$(top_builddir)/src \
 	      -I$(top_srcdir)/src \
-	      -I$(top_srcdir)/bundled/$(OS)/arch/$(KARCH)/include/uapi \
-	      -I$(top_srcdir)/bundled/$(OS)/include/uapi \
+	      $(bundled_CPPFLAGS) \
 	      -DTESTS_SIZEOF_KERNEL_LONG_T=$(SIZEOF_KERNEL_LONG_T) \
 	      -DTESTS_SIZEOF_LONG=$(SIZEOF_LONG)
 AM_LDFLAGS = $(ARCH_MFLAGS)

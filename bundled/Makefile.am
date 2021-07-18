@@ -100,6 +100,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/utsname.h \
 	linux/include/uapi/linux/v4l2-common.h \
 	linux/include/uapi/linux/v4l2-controls.h \
+	linux/include/uapi/linux/version.h \
 	linux/include/uapi/linux/videodev2.h \
 	linux/include/uapi/mtd/mtd-abi.h \
 	linux/include/uapi/mtd/ubi-user.h \
