@@ -189,7 +189,7 @@ getresgid	-a25
 getresgid32	-a27
 getresuid	-a25
 getresuid32	-a27
-getrlimit	-a27
+getrlimit	-a27 'QUIRK:START-OF-TEST-OUTPUT:getrlimit(0x10 /* RLIMIT_??? */, NULL)'
 getrusage	-v
 getsid	-a10
 getsid--pidns-translation	test_pidns -e trace=getsid -a10
@@ -834,7 +834,7 @@ trace_statfs_like	test_trace_expr '' -e%%statfs
 trie_test    run_prog
 truncate
 truncate64
-ugetrlimit	-a28
+ugetrlimit	-a28 'QUIRK:START-OF-TEST-OUTPUT:ugetrlimit(0x10 /* RLIMIT_??? */, NULL)'
 umask	-a11
 umoven-illptr	-a36 -e trace=nanosleep
 umovestr-illptr	-a11 -e trace=chdir

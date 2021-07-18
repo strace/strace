@@ -79,13 +79,18 @@ main(void)
 	kernel_ulong_t *const rlimit = tail_alloc(sizeof(*rlimit) * 2);
 	const struct xlat_data *xlat;
 	size_t i;
+	long rc;
+
+	rc = syscall(NR_GETRLIMIT, 16, 0);
+	printf("%s(0x10 /* RLIMIT_??? */, NULL) = %s\n",
+	       STR_GETRLIMIT, sprintrc(rc));
 
 	for (xlat = resources->data, i = 0; i < resources->size; ++xlat, ++i) {
 		if (!xlat->str)
 			continue;
 
 		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
-		long rc = syscall(NR_GETRLIMIT, res, 0);
+		rc = syscall(NR_GETRLIMIT, res, 0);
 		if (rc && ENOSYS == errno)
 			perror_msg_and_skip(STR_GETRLIMIT);
 		printf("%s(%s, NULL) = %s\n",
