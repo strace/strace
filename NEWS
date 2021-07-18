@@ -1,4 +1,4 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 5.13 (2021-07-18)
 ===============================================
 
 * Improvements
@@ -15,8 +15,6 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of BPF_*, IORING_*, KEXEC_*, KEY_*, KVM_*, NT_*, PR_*,
     PTRACE_*, RTM_*, RTPROT_*, TRAP_*, UFFD_*, UFFDIO_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 5.13.
-
-* Bug fixes
 
 * Portability
   * On powerpc and powerpc64, linux kernel >= 2.6.23 is required.
