@@ -248,19 +248,45 @@ AC_SUBST(cc_flags_m32)
 AC_SUBST(cc_flags_mx32)
 AC_SUBST(arch_native)
 
+AC_ARG_ENABLE([bundled],
+	[AS_HELP_STRING([--enable-bundled=yes|no|check],
+		[whether to use bundled linux kernel headers,
+		 default is check.])],
+	[case "$enableval" in
+		yes|no|check) enable_bundled="$enableval" ;;
+		*) AC_MSG_ERROR([bad value $enableval for enable-bundled option.
+Valid options are: yes, no, check.]
+		   )
+		;;
+	 esac],
+	[enable_bundled=check]
+)
+
 AC_CACHE_CHECK(
 	[whether to use bundled linux kernel headers],
 	[st_cv_use_bundled_headers],
-	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <linux/version.h>
+	[AS_IF([test $enable_bundled = check],
+	       [AC_COMPILE_IFELSE(
+			[AC_LANG_PROGRAM([#include <linux/version.h>
 #define USE_OS_HEADERS (LINUX_VERSION_CODE > ]linux_version_code[ ? 1 : -1)],
-					    [[int i[USE_OS_HEADERS];]])],
-			   [st_cv_use_bundled_headers=no],
-			   [st_cv_use_bundled_headers=yes])])
+					 [[int i[USE_OS_HEADERS];]]
+			 )
+			],
+			[st_cv_use_bundled_headers=no],
+			[st_cv_use_bundled_headers=yes]
+		)
+	       ],
+	       [st_cv_use_bundled_headers=$enable_bundled]
+	 )
+	]
+)
+
 AM_CONDITIONAL([USE_BUNDLED_HEADERS], [test $st_cv_use_bundled_headers = yes])
-if test $st_cv_use_bundled_headers = yes; then
-	CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/arch/$karch/include/uapi"
-	CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/include/uapi"
-fi
+AS_IF([test $st_cv_use_bundled_headers = yes],
+      [CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/arch/$karch/include/uapi"
+       CPPFLAGS="$CPPFLAGS -I$srcdir/bundled/linux/include/uapi"
+      ]
+)
 
 MIPS_ABI=
 if test "$arch" = mips; then
