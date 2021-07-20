@@ -180,11 +180,20 @@ check_ns_ioctl(void)
 
 	int userns_fd = ioctl(fd, NS_GET_USERNS);
 	if (userns_fd < 0) {
-		if (errno == ENOTTY)
-			error_msg_and_skip("NS_* ioctl commands are not "
-			                   "supported by the kernel");
-		else
+		switch (errno) {
+		case ENOTTY:
+			error_msg_and_skip(
+				"NS_* ioctl commands are not "
+				"supported by the kernel");
+			break;
+		case EPERM:
+			error_msg_and_skip(
+				"NS_* ioctl commands are not "
+				"available while chrooted");
+			break;
+		default:
 			perror_msg_and_fail("ioctl(NS_GET_USERNS)");
+		}
 	}
 
 	close(userns_fd);
