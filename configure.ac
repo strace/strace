@@ -683,7 +683,7 @@ AC_ARG_ENABLE([mpers],
 	[case "$enableval" in
 		yes|no|check|m32|mx32) enable_mpers="$enableval" ;;
 		*) AC_MSG_ERROR([bad value $enableval for enable-mpers option.
-				 Valid options are: yes, no, check, m32, mx32.])
+Valid options are: yes, no, check, m32, mx32.])
 		;;
 	 esac],
 	[enable_mpers=yes])

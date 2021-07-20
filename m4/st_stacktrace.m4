@@ -13,7 +13,7 @@ AC_ARG_ENABLE([stacktrace],
 	[case "$enableval" in
 		yes|no|check) enable_stacktrace="$enableval" ;;
 		*) AC_MSG_ERROR([bad value $enableval for enable-stacktrace option.
-				 Valid options are: yes, no, check.])
+Valid options are: yes, no, check.])
 		;;
 	 esac],
 	[enable_stacktrace=check])
