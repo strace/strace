@@ -58,6 +58,9 @@ print_iovec(const struct iovec *iov, unsigned int cnt, unsigned int size)
 	putchar(']');
 }
 
+/* for pwritev(0, NULL, 1, -3) */
+DIAG_PUSH_IGNORE_NONNULL
+
 int
 main(void)
 {
@@ -109,9 +112,7 @@ main(void)
 	printf("pwritev(0, %p, 42, -2) = %ld %s (%m)\n",
 	       iov, rc, errno2name());
 
-	DIAG_PUSH_IGNORE_NONNULL
 	rc = pwritev(0, NULL, 1, -3);
-	DIAG_POP_IGNORE_NONNULL
 	printf("pwritev(0, NULL, 1, -3) = %ld %s (%m)\n",
 	       rc, errno2name());
 
@@ -122,6 +123,8 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+DIAG_POP_IGNORE_NONNULL
 
 #else
 

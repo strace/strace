@@ -42,6 +42,9 @@ print_iovec(const struct iovec *iov, unsigned int cnt)
 	putchar(']');
 }
 
+/* for preadv(0, NULL, 1, -2) */
+DIAG_PUSH_IGNORE_NONNULL
+
 int
 main(void)
 {
@@ -66,10 +69,8 @@ main(void)
 	printf("preadv(0, [{iov_base=%p, iov_len=%zu}], 1, -1) = "
 	       "-1 EINVAL (%m)\n", iov->iov_base, iov->iov_len);
 
-	DIAG_PUSH_IGNORE_NONNULL
 	if (preadv(0, NULL, 1, -2) != -1)
 		perror_msg_and_fail("preadv");
-	DIAG_POP_IGNORE_NONNULL
 	printf("preadv(0, NULL, 1, -2) = -1 EINVAL (%m)\n");
 
 	if (preadv(0, iov, 0, -3) != -1)
@@ -131,6 +132,8 @@ main(void)
 	puts("+++ exited with 0 +++");
 	return 0;
 }
+
+DIAG_POP_IGNORE_NONNULL
 
 #else
 
