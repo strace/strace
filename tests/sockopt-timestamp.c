@@ -182,7 +182,8 @@ test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
 			if (c->cmsg_level == SOL_SOCKET) {
 				printf("SOL_SOCKET");
 			} else {
-				printf("%d", c->cmsg_level);
+				printf("%d /* expected SOL_SOCKET == %d */",
+				       c->cmsg_level, (int) SOL_SOCKET);
 			}
 			printf(", cmsg_type=");
 			if (c->cmsg_type == so_val) {
@@ -190,7 +191,8 @@ test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
 				fun(c);
 				tested = 1;
 			} else {
-				printf("%d", c->cmsg_type);
+				printf("%d /* expected %d */",
+				       c->cmsg_type, so_val);
 			}
 			printf("}");
 		}
