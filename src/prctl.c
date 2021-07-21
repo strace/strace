@@ -13,6 +13,12 @@
 
 #include <linux/prctl.h>
 
+#ifdef __ANDROID__
+# ifndef PR_SET_VMA
+#  define PR_SET_VMA 0x53564d41 /* "SVMA" */
+# endif
+#endif
+
 #include "xstring.h"
 
 #include "xlat/prctl_options.h"

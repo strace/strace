@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
 
 * Bug fixes
+  * Fixed build using bionic libc.
 
 Noteworthy changes in release 5.13 (2021-07-18)
 ===============================================
