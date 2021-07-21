@@ -55,6 +55,11 @@ main(void)
 	printf("prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL) = %s\n",
 	       sprintrc(rc));
 
+	/* The shortest output */
+	rc = syscall(__NR_prlimit64, 0, RLIMIT_AS, 0, 0);
+	pidns_print_leader();
+	printf("prlimit64(0, RLIMIT_AS, NULL, NULL) = %s\n", sprintrc(rc));
+
 	for (xlat = resources->data; i < resources->size; ++xlat, ++i) {
 		if (!xlat->str)
 			continue;
