@@ -9,44 +9,45 @@
  */
 
 #include "tests.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
+#include "scno.h"
 
-#if defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL	\
- || defined HAVE_STRUCT___KERNEL_TIMESPEC
-# include <linux/time_types.h>
-#endif
+#ifdef __NR_recvmsg
 
-#include "kernel_timeval.h"
-#include "kernel_old_timespec.h"
+# include <errno.h>
+# include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/socket.h>
 
-#define XLAT_MACROS_ONLY
-# include "xlat/sock_options.h"
-#undef XLAT_MACROS_ONLY
+# if defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL	\
+  || defined HAVE_STRUCT___KERNEL_TIMESPEC
+#  include <linux/time_types.h>
+# endif
 
-#undef TEST_OLD_SCM_TIMESTAMPS
+# include "kernel_timeval.h"
+# include "kernel_old_timespec.h"
 
-/*
- * Sadly, starting with commit
- * glibc-2.33.9000-707-g13c51549e2077f2f3bf84e8fd0b46d8b0c615912, on every
- * 32-bit architecture where 32-bit time_t support is enabled,
- * glibc mangles old scm timestamps.
- */
-#if GLIBC_PREREQ_GE(2, 33) && defined __TIMESIZE && __TIMESIZE != 64
-# define TEST_OLD_SCM_TIMESTAMPS 0
-#endif
+# define XLAT_MACROS_ONLY
+#  include "xlat/sock_options.h"
+# undef XLAT_MACROS_ONLY
 
-#ifndef TEST_OLD_SCM_TIMESTAMPS
-# define TEST_OLD_SCM_TIMESTAMPS 1
-#endif
+static const char *errstr;
 
-#if TEST_OLD_SCM_TIMESTAMPS \
- || defined HAVE_STRUCT___KERNEL_TIMESPEC \
- || defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
+static long
+k_recvmsg(const unsigned int fd, const void *const ptr, const unsigned int flags)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
+	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
+	const kernel_ulong_t arg1 = fill | fd;
+	const kernel_ulong_t arg2 = (uintptr_t) ptr;
+	const kernel_ulong_t arg3 = fill | flags;
+	const long rc = syscall(__NR_recvmsg, arg1, arg2, arg3, bad, bad, bad);
+	if (rc && errno == ENOSYS)
+		perror_msg_and_skip("recvmsg");
+	errstr = sprintrc(rc);
+	return rc;
+}
 
-# if TEST_OLD_SCM_TIMESTAMPS
 static void
 print_timestamp_old(const struct cmsghdr *c)
 {
@@ -84,7 +85,6 @@ print_timestampns_old(const struct cmsghdr *c)
 	printf("{tv_sec=%lld, tv_nsec=%lld}",
 	       (long long) ts.tv_sec, (long long) ts.tv_nsec);
 }
-# endif /* TEST_OLD_SCM_TIMESTAMPS */
 
 # ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
 static void
@@ -162,7 +162,7 @@ test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
 		.msg_controllen = sizeof(control)
 	};
 
-	if (recvmsg(sv[0], &mh, 0) != (int) size)
+	if (k_recvmsg(sv[0], &mh, 0) != (int) size)
 		perror_msg_and_fail("recvmsg");
 	if (close(sv[0]))
 		perror_msg_and_fail("close recv");
@@ -212,10 +212,8 @@ main(void)
 		const char *str;
 		void (*fun)(const struct cmsghdr *);
 	} tests[] = {
-# if TEST_OLD_SCM_TIMESTAMPS
 		{ SO_TIMESTAMP_OLD, "SO_TIMESTAMP_OLD", print_timestamp_old },
 		{ SO_TIMESTAMPNS_OLD, "SO_TIMESTAMPNS_OLD", print_timestampns_old },
-# endif
 # ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
 		{ SO_TIMESTAMP_NEW, "SO_TIMESTAMP_NEW", print_timestamp_new },
 # endif
@@ -237,8 +235,6 @@ main(void)
 
 #else
 
-SKIP_MAIN_UNDEFINED("TEST_OLD_SCM_TIMESTAMPS"
-		    " || HAVE_STRUCT___KERNEL_TIMESPEC"
-		    " || HAVE_STRUCT___KERNEL_SOCK_TIMEVAL")
+SKIP_MAIN_UNDEFINED("__NR_recvmsg")
 
 #endif
