@@ -27,10 +27,6 @@
 #  define QCMD_TYPE(_val) ((unsigned) (_val) & SUBCMDMASK)
 # endif /* !QCMD_TYPE */
 
-# ifndef PRJQUOTA
-#  define PRJQUOTA 2
-# endif
-
 typedef void (*print_cb)(long rc, void *addr, void *arg);
 
 enum check_quotactl_flag_bits {
