@@ -66,7 +66,7 @@
 [ 56] = { 5,	0,		SEN(printargs),			"osf_revoke"		}, /* not implemented */
 [ 57] = { 2,	TF,		SEN(symlink),			"symlink"		},
 [ 58] = { 3,	TF,		SEN(readlink),			"readlink"		},
-[ 59] = { 3,	TF|TP|TSD|SE|SI,	SEN(execve),			"execve"		},
+[ 59] = { 3,	TF|TP|TSD|SE|SI|CC,	SEN(execve),			"execve"		},
 [ 60] = { 1,	NF,		SEN(umask),			"umask"			},
 [ 61] = { 1,	TF,		SEN(chroot),			"chroot"		},
 [ 62] = { 5,	TD|TFST|TSTA,	SEN(printargs),			"osf_old_fstat"		}, /* not implemented */
@@ -292,7 +292,7 @@
 [345] = { 5,	0,		SEN(printargs),			"pciconfig_read"	},
 [346] = { 5,	0,		SEN(printargs),			"pciconfig_write"	},
 [347] = { 5,	0,		SEN(query_module),		"query_module"		}, /* not implemented */
-[348] = { 5,	TC,		SEN(prctl),			"prctl"			},
+[348] = { 5,	TC|CC,		SEN(prctl),			"prctl"			},
 [349] = { 4,	TD,		SEN(pread),			"pread64"		},
 [350] = { 4,	TD,		SEN(pwrite),			"pwrite64"		},
 [351] = { 0,	TS,		SEN(rt_sigreturn),		"rt_sigreturn"		},
@@ -456,7 +456,7 @@
 [510] = { 5,	TD|TF,		SEN(renameat2),			"renameat2"		},
 [511] = { 3,	0,		SEN(getrandom),			"getrandom"		},
 [512] = { 2,	TD,		SEN(memfd_create),		"memfd_create"		},
-[513] = { 5,	TD|TF|TP|TSD|SE|SI,	SEN(execveat),			"execveat"		},
+[513] = { 5,	TD|TF|TP|TSD|SE|SI|CC,	SEN(execveat),			"execveat"		},
 [514] = { 3,	0,		SEN(seccomp),			"seccomp"		},
 [515] = { 3,	TD,		SEN(bpf),			"bpf"			},
 [516] = { 1,	TD,		SEN(userfaultfd),		"userfaultfd"		},

@@ -29,6 +29,9 @@
 /* for struct iovec */
 #include <sys/uio.h>
 
+/* for PR_SET_NAME */
+#include <linux/prctl.h>
+
 /* for __X32_SYSCALL_BIT */
 #include "scno.h"
 
@@ -738,6 +741,11 @@ syscall_exiting_decode(struct tcb *tcp, struct timespec *pts)
 
 	if (tcp_sysent(tcp)->sys_flags & MEMORY_MAPPING_CHANGE)
 		mmap_notify_report(tcp);
+
+	if ((tcp_sysent(tcp)->sys_flags & COMM_CHANGE)
+	    && ((tcp_sysent(tcp)->sen == SEN_prctl && tcp->u_arg[0] == PR_SET_NAME)
+		|| tcp_sysent(tcp)->sen != SEN_prctl))
+		load_task_comm(tcp);
 
 	if (filtered(tcp))
 		return 0;

@@ -28,4 +28,5 @@
 #undef TSD
 #undef TC
 #undef TCL
+#undef CC
 #undef SEN

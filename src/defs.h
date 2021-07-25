@@ -322,6 +322,9 @@ struct tcb {
 	void *unwind_ctx;
 	struct unwind_queue_t *unwind_queue;
 # endif
+
+# define PROC_COMM_LEN 16
+	char comm[PROC_COMM_LEN];
 };
 
 /* TCB flags */
@@ -532,6 +535,7 @@ extern bool stack_trace_enabled;
 extern unsigned ptrace_setoptions;
 extern unsigned max_strlen;
 extern unsigned os_release;
+extern bool decode_pids_enabled;
 # undef KERNEL_VERSION
 # define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 
@@ -1897,4 +1901,5 @@ print_big_u64_addr(const uint64_t addr)
 #  include "syscall.h"
 # endif
 
+void load_task_comm(struct tcb *tcp);
 #endif /* !STRACE_DEFS_H */

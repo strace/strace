@@ -30,6 +30,7 @@
 # define TSD	0
 # define TC	0
 # define TCL	0
+# define CC     0
 # define SEN(a)	0, 0
 
 #else	/*	!STRACE_TESTS_H	*/
@@ -57,6 +58,7 @@
 # define TSD	TRACE_SECCOMP_DEFAULT
 # define TC	TRACE_CREDS
 # define TCL	TRACE_CLOCK
+# define CC	COMM_CHANGE
 /* SEN(a) is defined elsewhere */
 
 #endif

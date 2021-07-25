@@ -52,6 +52,9 @@ extern char *optarg;
 bool stack_trace_enabled;
 #endif
 
+/* if this is true print the process names read from /proc/$pid/comm files */
+bool decode_pids_enabled;
+
 #define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
 
 /* Glue for systems without a MMU that cannot provide fork() */
@@ -905,6 +908,40 @@ expand_tcbtab(void)
 		*tcb_ptr = newtcbs;
 }
 
+/* load the contenst of /proc/$pid/comm into $buf. */
+static void
+load_pid_comm(int pid, char *buf, size_t buf_size)
+{
+	static const char comm_path[] = "/proc/%d/comm";
+	char procfile[sizeof(comm_path) + sizeof(int) * 3];
+
+	if (buf_size == 0)
+		return;
+
+	buf [0] = '\0';
+
+	xsprintf(procfile, comm_path, pid);
+	FILE *fp = fopen_stream(procfile, "r");
+	if (!fp)
+		return;
+
+	if (fgets(buf, buf_size, fp)) {
+		/* Trim the last newline. */
+		char *nl = strrchr(buf, '\n');
+		if (nl)
+			*nl = '\0';
+	}
+	fclose(fp);
+}
+
+void
+load_task_comm(struct tcb *tcp)
+{
+	if (!decode_pids_enabled)
+		return;
+	load_pid_comm(get_proc_pid(tcp), tcp->comm, sizeof(tcp->comm));
+}
+
 static struct tcb *
 alloctcb(int pid)
 {
@@ -920,6 +957,7 @@ alloctcb(int pid)
 			memset(tcp, 0, sizeof(*tcp));
 			list_init(&tcp->wait_list);
 			tcp->pid = pid;
+			load_task_comm(tcp);
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
