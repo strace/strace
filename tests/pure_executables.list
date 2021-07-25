@@ -500,6 +500,9 @@ quotactl-Xabbrev
 quotactl-Xraw
 quotactl-Xverbose
 quotactl-xfs
+quotactl_fd
+quotactl_fd-P
+quotactl_fd-y
 read-write
 readahead
 readdir

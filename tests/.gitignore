@@ -670,6 +670,9 @@ quotactl-xfs
 quotactl-xfs-success
 quotactl-xfs-success-v
 quotactl-xfs-v
+quotactl_fd
+quotactl_fd-P
+quotactl_fd-y
 read-write
 readahead
 readdir

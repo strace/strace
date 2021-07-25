@@ -620,6 +620,9 @@ quotactl-Xverbose	-Xverbose -e trace=quotactl
 quotactl-v	-v -e trace=quotactl
 quotactl-xfs	-e trace=quotactl
 quotactl-xfs-v	-v -e trace=quotactl
+quotactl_fd
+quotactl_fd-P	--trace=quotactl_fd -P /dev/full
+quotactl_fd-y	--trace=quotactl_fd -y
 read-write	-a15 -eread=0,5 -ewrite=1,4 -e trace=read,write -P read-write-tmpfile -P /dev/zero -P /dev/null
 readahead	-a1
 readdir	-a16

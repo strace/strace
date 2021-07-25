@@ -487,3 +487,22 @@ SYS_FUNC(quotactl)
 	}
 	return decode_cmd_data(tcp, id, cmd, tcp->u_arg[3]);
 }
+
+SYS_FUNC(quotactl_fd)
+{
+	const unsigned int fd = tcp->u_arg[0];
+	const unsigned int qcmd = tcp->u_arg[1];
+	const uint32_t id = tcp->u_arg[2];
+	const kernel_ulong_t addr = tcp->u_arg[3];
+
+	if (entering(tcp)) {
+		/* fd */
+		printfd(tcp, fd);
+		tprint_arg_next();
+
+		/* cmd */
+		print_qcmd(qcmd);
+	}
+
+	return decode_cmd_data(tcp, id, QCMD_CMD(qcmd), addr);
+}

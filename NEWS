@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Implemented decoding of quotactl_fd syscall introduced in Linux 5.14.
 
 * Bug fixes
   * Fixed build using bionic libc.
