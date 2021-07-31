@@ -152,7 +152,7 @@ case "$arch" in
 			[st_cv_selinux_runtime=no])
 		if test $st_cv_mpers = yes; then
 			AC_DEFINE(HAVE_MPERS, [1],
-				  [Define to 1 if you have mpers_name mpers support])
+				  [Define to 1 if you have ]mpers_name[ mpers support])
 			st_MPERS_STRUCT_STAT([])
 			st_MPERS_STRUCT_STAT([64])
 
