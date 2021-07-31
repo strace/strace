@@ -181,6 +181,10 @@ case "$arch" in
 				popdef([SIZEOF_STRUCT_MSQID64_DS])
 			fi
 		fi
+		if test "x$st_cv_selinux_runtime" = xyes; then
+			AC_DEFINE([HAVE_SELINUX_RUNTIME], [1],
+				  [Define to enable SELinux security contexts testing for ]mpers_name[ personality])
+		fi
 	fi
 	CPPFLAGS="$saved_CPPFLAGS"
 	CFLAGS="$saved_CFLAGS"
