@@ -57,6 +57,17 @@ while read -r name arg0 args; do {
 		EOF
 		;;
 
+		# Tests that rely on syscall tampering require additional checks
+		# implemented in the scno_tamperng.sh.
+		-einject=*|--inject=*)
+		cat <<-EOF
+		$hdr
+		. "\${srcdir=.}/scno_tampering.sh"
+		run_strace $arg0 $args "../$name" > "\$EXP"
+		match_diff "\$LOG" "\$EXP"
+		EOF
+		;;
+
 		''|-*)
 		cat <<-EOF
 		$hdr
