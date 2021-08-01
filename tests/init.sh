@@ -250,7 +250,9 @@ run_strace_match_diff()
 	sed_cmd='p'
 
 	args="$*"
-	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o -z "${args##*--trace=*}" \) ] ||
+	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o \
+			   -z "${args##*-etrace=*}" -o \
+			   -z "${args##*--trace=*}" \) ] ||
 		set -- -e trace="$NAME" "$@"
 
 	set -- "$@" END_OF_ARGUMENTS
@@ -277,7 +279,9 @@ run_strace_match_diff()
 run_strace_match_grep()
 {
 	args="$*"
-	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o -z "${args##*--trace=*}" \) ] ||
+	[ -n "$args" -a \( -z "${args##*-e trace=*}" -o \
+			   -z "${args##*-etrace=*}" -o \
+			   -z "${args##*--trace=*}" \) ] ||
 		set -- -e trace="$NAME" "$@"
 	run_prog > /dev/null
 	run_strace "$@" $args > "$EXP"
