@@ -379,8 +379,6 @@ endif
 
 DECODER_TESTS = \
 	bpf-success-long-y.test \
-	bpf-success-v.test \
-	bpf-success.test \
 	brk.test \
 	btrfs-X.test \
 	btrfs-v.test \
@@ -392,7 +390,6 @@ DECODER_TESTS = \
 	caps-abbrev.test \
 	caps.test \
 	clone-flags.test \
-	clone3-success.test \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
@@ -408,11 +405,9 @@ DECODER_TESTS = \
 	ioctl_evdev-success.test \
 	ipc_msgbuf.test \
 	kern_features-fault.test \
-	landlock_create_ruleset-success.test \
 	llseek.test \
 	lseek.test \
 	mmap.test \
-	net-tpacket_stats-success.test \
 	net-y-unix.test \
 	net-yy-inet.test \
 	net-yy-netlink.test \
@@ -430,10 +425,6 @@ DECODER_TESTS = \
 	prctl-seccomp-strict.test \
 	prctl-spec-inject.test \
 	qual_fault-exit_group.test \
-	quotactl-success-v.test \
-	quotactl-success.test \
-	quotactl-xfs-success-v.test \
-	quotactl-xfs-success.test \
 	readv.test \
 	rt_sigaction.test \
 	scm_rights-fd.test \
