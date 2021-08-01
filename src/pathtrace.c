@@ -376,6 +376,7 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_landlock_create_ruleset:
 	case SEN_landlock_restrict_self:
 	case SEN_memfd_create:
+	case SEN_memfd_secret:
 	case SEN_mq_getsetattr:
 	case SEN_mq_notify:
 	case SEN_mq_open:

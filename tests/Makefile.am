@@ -214,6 +214,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	list_sigaction_signum \
 	localtime \
 	looping_threads \
+	memfd_secret-success \
+	memfd_secret-success-y \
 	migrate_pages--pidns-translation \
 	mmsg-silent \
 	mmsg_name-v \

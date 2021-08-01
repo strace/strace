@@ -294,6 +294,7 @@ memfd_create
 memfd_create-Xabbrev
 memfd_create-Xraw
 memfd_create-Xverbose
+memfd_secret
 migrate_pages
 mincore
 mkdir

@@ -402,6 +402,9 @@ memfd_create	-s256
 memfd_create-Xabbrev	-s256 -Xabbrev -e trace=memfd_create
 memfd_create-Xraw	-a30 -s256 -Xraw -e trace=memfd_create
 memfd_create-Xverbose	-s256 -Xverbose -e trace=memfd_create
+memfd_secret -a16
+memfd_secret-success -einject=memfd_secret:retval=7 -a16 -etrace=memfd_secret 7> /dev/null
+memfd_secret-success-y -einject=memfd_secret:retval=7 -a16 -etrace=memfd_secret -y 7> /dev/null
 migrate_pages	-a33
 migrate_pages--pidns-translation	test_pidns -a33 -e trace=migrate_pages
 mincore	-a22

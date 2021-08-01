@@ -416,6 +416,9 @@ memfd_create
 memfd_create-Xabbrev
 memfd_create-Xraw
 memfd_create-Xverbose
+memfd_secret
+memfd_secret-success
+memfd_secret-success-y
 migrate_pages
 migrate_pages--pidns-translation
 mincore

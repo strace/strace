@@ -188,6 +188,7 @@ libstrace_a_SOURCES =	\
 	mem.c		\
 	membarrier.c	\
 	memfd_create.c	\
+	memfd_secret.c	\
 	mknod.c		\
 	mmap_cache.c	\
 	mmap_cache.h	\
