@@ -85,7 +85,7 @@ main(void)
 	int fds[] = { fd_full, fd_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 17 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 19 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,

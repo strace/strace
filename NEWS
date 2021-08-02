@@ -4,7 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented decoding of memfd_secret and quotactl_fd syscalls,
     introduced in Linux 5.14.
-  * Updated lists of MADV_*, SCTP_*, and UFFD_* constants.
+  * Updated lists of IORING_*, MADV_*, SCTP_*, and UFFD_* constants.
 
 * Bug fixes
   * Fixed build using bionic libc.
