@@ -1003,6 +1003,8 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_ALT_IFNAME]	= decode_nla_str,
 	[IFLA_PERM_ADDRESS]	= decode_ifla_hwaddr,
 	[IFLA_PROTO_DOWN_REASON]	= decode_ifla_proto_down_reason,
+	[IFLA_PARENT_DEV_NAME]	= decode_nla_str,
+	[IFLA_PARENT_DEV_BUS_NAME]	= decode_nla_str,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)

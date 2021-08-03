@@ -446,20 +446,30 @@ main(void)
 				      print_quoted_memory(&buf, sizeof(buf));
 				      printf("..."));
 
-	/* IFLA_ALT_IFNAME */
-	static const char alt_ifname[] = "OH HAI THAR\r\n\t\377\0\v\x7e";
-	TEST_NLATTR(fd, nlh0, hdrlen,
-		    init_ifinfomsg, print_ifinfomsg,
-		    IFLA_ALT_IFNAME,
-		    sizeof(alt_ifname), alt_ifname, sizeof(alt_ifname),
-		    print_quoted_memory(alt_ifname, sizeof(alt_ifname) - 1));
+	/* IFLA_ALT_IFNAME, IFLA_PARENT_DEV_NAME, IFLA_PARENT_DEV_BUS_NAME */
+	static const char str[] = "OH HAI THAR\r\n\t\377\0\v\x7e";
+	static const struct {
+		uint32_t val;
+		const char *str;
+	} attrs[] = {
+		{ ARG_STR(IFLA_ALT_IFNAME) },
+		{ ARG_STR(IFLA_PARENT_DEV_NAME) },
+		{ ARG_STR(IFLA_PARENT_DEV_BUS_NAME) },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(attrs); i++) {
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_ifinfomsg, print_ifinfomsg,
+			     attrs[i].val, attrs[i].str,
+			     sizeof(str), str, sizeof(str),
+			     print_quoted_memory(str, sizeof(str) - 1));
 
-	TEST_NLATTR(fd, nlh0, hdrlen,
-		    init_ifinfomsg, print_ifinfomsg,
-		    IFLA_ALT_IFNAME,
-		    sizeof(alt_ifname) - 1, alt_ifname, sizeof(alt_ifname) - 1,
-		    print_quoted_memory(alt_ifname, sizeof(alt_ifname) - 1);
-		    printf("..."));
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_ifinfomsg, print_ifinfomsg,
+			     attrs[i].val, attrs[i].str,
+			     sizeof(str) - 1, str, sizeof(str) - 1,
+			     print_quoted_memory(str, sizeof(str) - 1);
+			     printf("..."));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
