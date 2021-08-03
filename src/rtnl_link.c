@@ -30,6 +30,7 @@
 #include "xlat/rtnl_ifla_info_data_bridge_attrs.h"
 #include "xlat/rtnl_ifla_info_data_tun_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
+#include "xlat/rtnl_ifla_proto_down_reason_attrs.h"
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
 #include "xlat/rtnl_ifla_xdp_attached_mode.h"
 #include "xlat/rtnl_ifla_xdp_attrs.h"
@@ -926,6 +927,25 @@ decode_ifla_prop_list(struct tcb *const tcp,
 	return true;
 }
 
+static const nla_decoder_t ifla_proto_down_reason_nla_decoders[] = {
+	[IFLA_PROTO_DOWN_REASON_UNSPEC]	= NULL,
+	[IFLA_PROTO_DOWN_REASON_MASK]	= decode_nla_x32,
+	[IFLA_PROTO_DOWN_REASON_VALUE]	= decode_nla_x32,
+};
+
+static bool
+decode_ifla_proto_down_reason(struct tcb *const tcp,
+			      const kernel_ulong_t addr,
+			      const unsigned int len,
+			      const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_proto_down_reason_attrs,
+		      "IFLA_PROTO_DOWN_REASON_???",
+		      ARRSZ_PAIR(ifla_proto_down_reason_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
 
 static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_ADDRESS]		= decode_ifla_hwaddr,
@@ -982,6 +1002,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_PROP_LIST]	= decode_ifla_prop_list,
 	[IFLA_ALT_IFNAME]	= decode_nla_str,
 	[IFLA_PERM_ADDRESS]	= decode_ifla_hwaddr,
+	[IFLA_PROTO_DOWN_REASON]	= decode_ifla_proto_down_reason,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ifinfomsg)

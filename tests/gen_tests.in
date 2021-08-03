@@ -497,6 +497,7 @@ nlattr_ifla_af_spec		+netlink_sock_diag.test
 nlattr_ifla_brport		+netlink_sock_diag.test
 nlattr_ifla_linkinfo		+netlink_sock_diag.test
 nlattr_ifla_port		+netlink_sock_diag.test
+nlattr_ifla_proto_down_reason	+netlink_sock_diag.test
 nlattr_ifla_xdp			+netlink_sock_diag.test
 nlattr_ifla_xdp-y		+netlink_sock_diag.test -y; exec 9</dev/full
 nlattr_inet_diag_msg		+netlink_sock_diag.test

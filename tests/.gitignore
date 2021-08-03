@@ -522,6 +522,7 @@ nlattr_ifla_af_spec
 nlattr_ifla_brport
 nlattr_ifla_linkinfo
 nlattr_ifla_port
+nlattr_ifla_proto_down_reason
 nlattr_ifla_xdp
 nlattr_ifla_xdp-y
 nlattr_inet_diag_msg
