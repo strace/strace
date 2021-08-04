@@ -31,6 +31,7 @@
 #include "xlat/pr_spec_cmds.h"
 #include "xlat/pr_spec_get_store_bypass_flags.h"
 #include "xlat/pr_spec_set_store_bypass_flags.h"
+#include "xlat/pr_sud_cmds.h"
 #include "xlat/pr_sve_vl_flags.h"
 #include "xlat/pr_tsc.h"
 #include "xlat/pr_unalign_flags.h"
@@ -83,14 +84,8 @@ SYS_FUNC(prctl)
 	const unsigned int option = tcp->u_arg[0];
 	const kernel_ulong_t arg2 = tcp->u_arg[1];
 	const kernel_ulong_t arg3 = tcp->u_arg[2];
-	/*
-	 * PR_SET_VMA is the only command which actually uses these arguments
-	 * currently, and it is available only on Android for now.
-	 */
-#ifdef __ANDROID__
 	const kernel_ulong_t arg4 = tcp->u_arg[3];
 	const kernel_ulong_t arg5 = tcp->u_arg[4];
-#endif
 	unsigned int i;
 
 	if (entering(tcp))
@@ -411,6 +406,18 @@ SYS_FUNC(prctl)
 		default:
 			PRINT_VAL_X(arg3);
 		}
+
+		return RVAL_DECODED;
+
+	case PR_SET_SYSCALL_USER_DISPATCH:
+		tprint_arg_next();
+		printxval64(pr_sud_cmds, arg2, "PR_SYS_DISPATCH_???");
+		tprint_arg_next();
+		PRINT_VAL_X(arg3);
+		tprint_arg_next();
+		PRINT_VAL_X(arg4);
+		tprint_arg_next();
+		printaddr(arg5);
 
 		return RVAL_DECODED;
 

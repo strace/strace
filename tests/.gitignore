@@ -624,6 +624,7 @@ prctl-seccomp-strict
 prctl-securebits
 prctl-spec-inject
 prctl-sve
+prctl-syscall-user-dispatch
 prctl-tid_address
 prctl-tsc
 prctl-unalign

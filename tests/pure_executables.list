@@ -469,6 +469,7 @@ prctl-no-args
 prctl-pdeathsig
 prctl-securebits
 prctl-sve
+prctl-syscall-user-dispatch
 prctl-tid_address
 prctl-tsc
 prctl-unalign
