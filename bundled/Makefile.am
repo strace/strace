@@ -72,6 +72,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/netfilter/nfnetlink_conntrack.h \
 	linux/include/uapi/linux/netfilter/nfnetlink_cthelper.h \
 	linux/include/uapi/linux/netfilter/nfnetlink_cttimeout.h \
+	linux/include/uapi/linux/netfilter/nfnetlink_hook.h \
 	linux/include/uapi/linux/netfilter/nfnetlink_log.h \
 	linux/include/uapi/linux/netfilter/nfnetlink_osf.h \
 	linux/include/uapi/linux/netfilter/nfnetlink_queue.h \

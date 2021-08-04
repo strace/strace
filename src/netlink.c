@@ -22,6 +22,7 @@
 #include <linux/netfilter/nfnetlink_conntrack.h>
 #include <linux/netfilter/nfnetlink_cthelper.h>
 #include <linux/netfilter/nfnetlink_cttimeout.h>
+#include <linux/netfilter/nfnetlink_hook.h>
 #include <linux/netfilter/nfnetlink_log.h>
 #include <linux/netfilter/nfnetlink_queue.h>
 #include <linux/netfilter/nfnetlink_osf.h>
@@ -37,6 +38,7 @@
 #include "xlat/nf_ctnetlink_exp_msg_types.h"
 #include "xlat/nf_ctnetlink_msg_types.h"
 #include "xlat/nf_cttimeout_msg_types.h"
+#include "xlat/nf_hook_msg_types.h"
 #include "xlat/nf_ipset_msg_types.h"
 #include "xlat/nf_nft_compat_msg_types.h"
 #include "xlat/nf_nftables_msg_types.h"
@@ -153,7 +155,8 @@ static const struct {
 	[NFNL_SUBSYS_NFT_COMPAT] = {
 		nf_nft_compat_msg_types,
 		"NFNL_MSG_COMPAT_???"
-	}
+	},
+	[NFNL_SUBSYS_HOOK] = { nf_hook_msg_types, "NFT_MSG_HOOK_???" },
 };
 
 static void
@@ -354,6 +357,12 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 	case NFNL_SUBSYS_NFT_COMPAT:
 		switch (msg_type) {
 		case NFNL_MSG_COMPAT_GET:
+			return netlink_get_flags;
+		}
+		break;
+	case NFNL_SUBSYS_HOOK:
+		switch (msg_type) {
+		case NFNL_MSG_HOOK_GET:
 			return netlink_get_flags;
 		}
 		break;
