@@ -134,7 +134,9 @@ decode_multicast_router_type(struct tcb *const tcp,
 
 static const nla_decoder_t mdba_router_pattr_nla_decoders[] = {
 	[MDBA_ROUTER_PATTR_TIMER]	= decode_nla_u32,
-	[MDBA_ROUTER_PATTR_TYPE]	= decode_multicast_router_type
+	[MDBA_ROUTER_PATTR_TYPE]	= decode_multicast_router_type,
+	[MDBA_ROUTER_PATTR_INET_TIMER]	= decode_nla_u32,
+	[MDBA_ROUTER_PATTR_INET6_TIMER]	= decode_nla_u32,
 };
 
 static bool

@@ -84,6 +84,40 @@ main(void)
 			   ", MDB_RTR_TYPE_DISABLED]]",
 			   nla.nla_len));
 
+	/* timers */
+	static const struct {
+		uint32_t val;
+		const char *str;
+	} pattrs[] = {
+		{ ARG_STR(MDBA_ROUTER_PATTR_TIMER) },
+		{ ARG_STR(MDBA_ROUTER_PATTR_INET_TIMER) },
+		{ ARG_STR(MDBA_ROUTER_PATTR_INET6_TIMER) },
+	};
+	static const uint32_t timer = 0xdabcefcd;
+
+	struct nlattr nla_timer = {
+		.nla_len = NLA_HDRLEN + sizeof(timer),
+	};
+	char buf_timer[NLMSG_ALIGN(ifindex) + NLA_HDRLEN + sizeof(timer)];
+
+	memcpy(buf_timer, &ifindex, sizeof(ifindex));
+	memcpy(buf_timer + NLMSG_ALIGN(ifindex) + NLA_HDRLEN,
+	       &timer, sizeof(timer));
+
+	for (size_t i = 0; i < ARRAY_SIZE(pattrs); i++) {
+		nla_timer.nla_type = pattrs[i].val;
+		memcpy(buf_timer + NLMSG_ALIGN(ifindex),
+		       &nla_timer, sizeof(nla_timer));
+
+		TEST_NLATTR(fd, nlh0 - NLA_HDRLEN, hdrlen + NLA_HDRLEN,
+			    init_br_port_msg, print_br_port_msg,
+			    MDBA_ROUTER_PORT,
+			    sizeof(buf_timer), buf_timer, sizeof(buf_timer),
+			    printf(IFINDEX_LO_STR
+				   ", [{nla_len=%u, nla_type=%s}, 3669815245]]",
+				   nla_timer.nla_len, pattrs[i].str));
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
