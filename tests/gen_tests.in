@@ -587,6 +587,7 @@ prctl-dumpable		+prctl.sh -a23
 prctl-mce-kill		+prctl.sh -a21
 prctl-name		+prctl.sh -a23
 prctl-no-args		+prctl.sh -a21
+prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
 prctl-seccomp-filter-v	+prctl.sh -v
 prctl-securebits	+prctl.sh -a25

@@ -618,6 +618,7 @@ prctl-fp-mode
 prctl-mce-kill
 prctl-name
 prctl-no-args
+prctl-pac-reset-keys
 prctl-pdeathsig
 prctl-seccomp-filter-v
 prctl-seccomp-strict

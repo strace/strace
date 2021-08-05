@@ -466,6 +466,7 @@ prctl-dumpable
 prctl-mce-kill
 prctl-name
 prctl-no-args
+prctl-pac-reset-keys
 prctl-pdeathsig
 prctl-securebits
 prctl-sve
