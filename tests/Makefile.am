@@ -247,6 +247,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-spec-inject \
+	prctl-tagged-addr-success \
+	prctl-tagged-addr-success-Xabbrev \
+	prctl-tagged-addr-success-Xraw \
+	prctl-tagged-addr-success-Xverbose \
 	print_maxfd \
 	print_ppid_tracerpid \
 	prlimit64--pidns-translation \
@@ -583,6 +587,7 @@ EXTRA_DIST = \
 	poke-range.expected \
 	poke-unaligned.expected \
 	prctl.sh \
+	prctl-success.sh \
 	print_user_desc.c \
 	printsignal.c \
 	printxval.c \

@@ -593,6 +593,14 @@ prctl-seccomp-filter-v	+prctl.sh -v
 prctl-securebits	+prctl.sh -a25
 prctl-sve		+prctl.sh -a21
 prctl-syscall-user-dispatch	+prctl.sh -a68
+prctl-tagged-addr		+prctl.sh -a43
+prctl-tagged-addr-Xabbrev	+prctl.sh -Xabbrev -a43
+prctl-tagged-addr-Xraw		+prctl.sh -Xraw -a24
+prctl-tagged-addr-Xverbose	+prctl.sh -Xverbose -a54
+prctl-tagged-addr-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 5 6 7 8 13 42 0xbeef 0x57ae57f4" -a43
+prctl-tagged-addr-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 5 6 7 8 13 42 0xbeef 0x57ae57f4" -a43 -Xabbrev
+prctl-tagged-addr-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 5 6 7 8 13 42 0xbeef 0x57ae57f4" -a24 -Xraw
+prctl-tagged-addr-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 2 3 4 5 6 7 8 13 42 0xbeef 0x57ae57f4" -a54 -Xverbose
 prctl-tid_address	+prctl.sh -a23
 prctl-tsc		+prctl.sh -a24
 prctl-unalign		+prctl.sh -a28

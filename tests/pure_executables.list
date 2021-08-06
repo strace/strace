@@ -471,6 +471,10 @@ prctl-pdeathsig
 prctl-securebits
 prctl-sve
 prctl-syscall-user-dispatch
+prctl-tagged-addr
+prctl-tagged-addr-Xabbrev
+prctl-tagged-addr-Xraw
+prctl-tagged-addr-Xverbose
 prctl-tid_address
 prctl-tsc
 prctl-unalign

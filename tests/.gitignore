@@ -626,6 +626,14 @@ prctl-securebits
 prctl-spec-inject
 prctl-sve
 prctl-syscall-user-dispatch
+prctl-tagged-addr
+prctl-tagged-addr-Xabbrev
+prctl-tagged-addr-Xraw
+prctl-tagged-addr-Xverbose
+prctl-tagged-addr-success
+prctl-tagged-addr-success-Xabbrev
+prctl-tagged-addr-success-Xraw
+prctl-tagged-addr-success-Xverbose
 prctl-tid_address
 prctl-tsc
 prctl-unalign

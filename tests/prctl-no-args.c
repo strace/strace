@@ -35,7 +35,6 @@ main(void)
 		{ 30, "PR_GET_TIMERSLACK" },
 		{ 31, "PR_TASK_PERF_EVENTS_DISABLE" },
 		{ 32, "PR_TASK_PERF_EVENTS_ENABLE" },
-		{ 56, "PR_GET_TAGGED_ADDR_CTRL" },
 	};
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);

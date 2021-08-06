@@ -34,6 +34,8 @@
 #include "xlat/pr_spec_set_store_bypass_flags.h"
 #include "xlat/pr_sud_cmds.h"
 #include "xlat/pr_sve_vl_flags.h"
+#include "xlat/pr_tagged_addr_enable.h"
+#include "xlat/pr_tagged_addr_mte_tcf.h"
 #include "xlat/pr_tsc.h"
 #include "xlat/pr_unalign_flags.h"
 
@@ -80,6 +82,47 @@ sprint_sve_val(kernel_ulong_t arg)
 	return out;
 }
 
+static char *
+sprint_tagged_addr_val(const kernel_ulong_t arg, bool rval)
+{
+	static char out[sizeof("0x /* !PR_TAGGED_ADDR_ENABLE|PR_MTE_TCF_ASYNC"
+			"|0xffff<<PR_MTE_TAG_SHIFT|0x */") +
+			sizeof(kernel_ulong_t) * 2 * 2];
+
+	const kernel_ulong_t enabled = arg & PR_TAGGED_ADDR_ENABLE;
+	const kernel_ulong_t mte_tcf = arg & PR_MTE_TCF_MASK;
+	const kernel_ulong_t mte_tag = arg & PR_MTE_TAG_MASK;
+	const kernel_ulong_t rest = arg &
+		~((kernel_ulong_t) PR_TAGGED_ADDR_ENABLE | PR_MTE_TCF_MASK
+		  | PR_MTE_TAG_MASK);
+	char *pos = out;
+
+	if (!rval && (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV))
+		pos = xappendstr(out, pos, "%#" PRI_klx, arg);
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return rval ? NULL : out;
+	if (!rval && (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE))
+		pos = xappendstr(out, pos, " /* ");
+
+	pos = xappendstr(out, pos, "%s|",
+			 sprintflags_ex("", pr_tagged_addr_enable, enabled,
+					'\0', XLAT_STYLE_ABBREV));
+	pos += sprintxval_ex(pos, sizeof(out) - (pos - out),
+			     pr_tagged_addr_mte_tcf, mte_tcf, NULL,
+			     XLAT_STYLE_ABBREV);
+	if (mte_tag) {
+		pos = xappendstr(out, pos, "|%#" PRI_klx "<<PR_MTE_TAG_SHIFT",
+				 mte_tag >> PR_MTE_TAG_SHIFT);
+	}
+	if (rest)
+		pos = xappendstr(out, pos, "|%#" PRI_klx, rest);
+
+	if (!rval && (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE))
+		pos = xappendstr(out, pos, " */");
+
+	return out;
+}
+
 SYS_FUNC(prctl)
 {
 	const unsigned int option = tcp->u_arg[0];
@@ -97,7 +140,6 @@ SYS_FUNC(prctl)
 	case PR_GET_SECCOMP:
 	case PR_GET_TIMERSLACK:
 	case PR_GET_TIMING:
-	case PR_GET_TAGGED_ADDR_CTRL:
 		return RVAL_DECODED;
 
 	case PR_GET_CHILD_SUBREAPER:
@@ -225,6 +267,23 @@ SYS_FUNC(prctl)
 
 		return RVAL_STR;
 
+	case PR_SET_TAGGED_ADDR_CTRL:
+		tprint_arg_next();
+		tprints(sprint_tagged_addr_val(arg2, false));
+		print_prctl_args(tcp, 2);
+		return RVAL_DECODED;
+
+	case PR_GET_TAGGED_ADDR_CTRL:
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			break;
+		}
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = sprint_tagged_addr_val(tcp->u_rval, true);
+
+		return RVAL_HEX | RVAL_STR;
+
 	/* PR_TASK_PERF_EVENTS_* take no arguments. */
 	case PR_TASK_PERF_EVENTS_DISABLE:
 	case PR_TASK_PERF_EVENTS_ENABLE:
@@ -236,7 +295,6 @@ SYS_FUNC(prctl)
 	case PR_SET_FPEXC:
 	case PR_SET_KEEPCAPS:
 	case PR_SET_TIMING:
-	case PR_SET_TAGGED_ADDR_CTRL:
 		tprint_arg_next();
 		PRINT_VAL_U(arg2);
 		return RVAL_DECODED;
