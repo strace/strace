@@ -57,7 +57,7 @@ xsnprintf_(char *str, size_t size, const char *func, const char *argstr,
  */
 # define xsnprintf(str_, size_, fmt_, ...) \
 	xsnprintf_((str_), (size_), __func__, #fmt_ ", " #__VA_ARGS__, \
-		   (fmt_), __VA_ARGS__)
+		   (fmt_), ##__VA_ARGS__)
 
 /**
  * Print to a character array buffer and die on (really unexpected) errors and
@@ -69,7 +69,7 @@ xsnprintf_(char *str, size_t size, const char *func, const char *argstr,
  */
 # define xsprintf(str_, fmt_, ...) \
 	xsnprintf((str_), sizeof(str_) + MUST_BE_ARRAY(str_), (fmt_), \
-		  __VA_ARGS__)
+		  ##__VA_ARGS__)
 
 static inline size_t
 get_pos_diff_(char *str, size_t size, char *pos, const char *func,
