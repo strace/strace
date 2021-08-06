@@ -287,7 +287,7 @@ gen_header()
 		'#val_type '*)
 			val_type="${line#\#val_type }"
 			;;
-		[A-Z_]*)	# symbolic constants
+		[A-Z_!]*)	# symbolic constants
 			if [ -n "${unconditional}" ]; then
 				print_xlat "${line}"
 			else
