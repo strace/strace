@@ -844,6 +844,9 @@ enum xlat_style_private_flag_bits {
 
 	/* print_xlat */
 	PXF_DEFAULT_STR_BIT,
+
+	/* sprintflags_ex */
+	SPFF_AUXSTR_MODE_BIT,
 };
 
 enum xlat_style_private_flags {
@@ -853,6 +856,9 @@ enum xlat_style_private_flags {
 
 	/* print_xlat */
 	FLAG(PXF_DEFAULT_STR),
+
+	/* sprintflags_ex */
+	FLAG(SPFF_AUXSTR_MODE),
 };
 
 /**

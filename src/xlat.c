@@ -324,7 +324,7 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	style = get_xlat_style(style);
 
 	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
-		if (!flags)
+		if (!flags || ((style & SPFF_AUXSTR_MODE) && !sep))
 			return NULL;
 
 		if (sep)
@@ -338,7 +338,8 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	if (flags == 0 && xlat->data->val == 0 && xlat->data->str) {
 		if (sep)
 			*outptr++ = sep;
-		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
+		if (xlat_verbose(style) == XLAT_STYLE_VERBOSE &&
+		    !(style & SPFF_AUXSTR_MODE)) {
 			outptr = xappendstr(outstr, outptr, "0 /* %s */",
 					    xlat->data->str);
 		} else {
@@ -348,7 +349,8 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 		return outstr;
 	}
 
-	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE && flags) {
+	if (xlat_verbose(style) == XLAT_STYLE_VERBOSE && flags &&
+	    !(style & SPFF_AUXSTR_MODE)) {
 		if (sep) {
 			*outptr++ = sep;
 			sep = '\0';
@@ -362,7 +364,8 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 		    && (flags & xlat->data[idx].val) == xlat->data[idx].val) {
 			if (sep) {
 				*outptr++ = sep;
-			} else if (xlat_verbose(style) == XLAT_STYLE_VERBOSE) {
+			} else if (xlat_verbose(style) == XLAT_STYLE_VERBOSE &&
+				   !(style & SPFF_AUXSTR_MODE)) {
 				outptr = stpcpy(outptr, " /* ");
 			}
 
@@ -376,7 +379,8 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 	if (flags) {
 		if (sep)
 			*outptr++ = sep;
-		if (found || xlat_verbose(style) != XLAT_STYLE_VERBOSE)
+		if (found || (xlat_verbose(style) != XLAT_STYLE_VERBOSE &&
+			      (!(style & SPFF_AUXSTR_MODE) || sep)))
 			outptr = xappendstr(outstr, outptr, "%s",
 					    sprint_xlat_val(flags, style));
 	} else {
@@ -384,10 +388,11 @@ sprintflags_ex(const char *prefix, const struct xlat *xlat, uint64_t flags,
 			return NULL;
 	}
 
-	if (found && xlat_verbose(style) == XLAT_STYLE_VERBOSE)
+	if (found && xlat_verbose(style) == XLAT_STYLE_VERBOSE &&
+	    !(style & SPFF_AUXSTR_MODE))
 		outptr = stpcpy(outptr, " */");
 
-	return outstr;
+	return outptr != outstr ? outstr : NULL;
 }
 
 /**
