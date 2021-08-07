@@ -330,7 +330,7 @@ SYS_FUNC(prctl)
 			print_xlat_ex(arg2, "PR_SET_PTRACER_ANY",
 				      XLAT_STYLE_DEFAULT);
 		} else {
-			PRINT_VAL_U(arg2);
+			printpid(tcp, arg2, PT_TGID);
 		}
 		return RVAL_DECODED;
 
