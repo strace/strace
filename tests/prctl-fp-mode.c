@@ -46,7 +46,7 @@ main(int argc, char **argv)
 			{1,        " (PR_FP_MODE_FR)"},
 			{2,        " (PR_FP_MODE_FRE)"},
 			{3,        " (PR_FP_MODE_FR|PR_FP_MODE_FRE)"},
-			{0x20,     " (0x20)"},
+			{0x20,     ""},
 			{0x20 | 3, " (PR_FP_MODE_FR|PR_FP_MODE_FRE|0x20)"}
 	};
 	static const struct {
@@ -84,7 +84,13 @@ main(int argc, char **argv)
 	if (!str)
 		error_msg_and_fail("Unknown return value: %ld", rc);
 
-	printf("prctl(PR_GET_FP_MODE) = %s%s (INJECTED)\n", sprintrc(rc), str);
+	if (rc < 0) {
+		printf("prctl(PR_GET_FP_MODE) = %s%s (INJECTED)\n",
+		       sprintrc(rc), str);
+	} else {
+		printf("prctl(PR_GET_FP_MODE) = %#lx%s (INJECTED)\n",
+		       rc, str);
+	}
 
 	/* PR_SET_FP_MODE */
 	for (size_t i = 0; i < ARRAY_SIZE(set_strs); i++) {

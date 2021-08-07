@@ -57,7 +57,7 @@ main(int argc, char **argv)
 		{ 3, " (PR_SPEC_PRCTL|PR_SPEC_ENABLE)" },
 		{ 8, " (PR_SPEC_FORCE_DISABLE)" },
 		{ 16, " (PR_SPEC_DISABLE_NOEXEC)" },
-		{ 32, " (0x20)" },
+		{ 32, "" },
 		{ 42, " (PR_SPEC_ENABLE|PR_SPEC_FORCE_DISABLE|0x20)" },
 	};
 	static const struct {
@@ -111,8 +111,15 @@ main(int argc, char **argv)
 		if (!str)
 			error_msg_and_fail("Unknown return value: %ld", rc);
 
-		printf("prctl(PR_GET_SPECULATION_CTRL, %s) = %s%s (INJECTED)\n",
-		       spec_strs[c].str, sprintrc(rc), str);
+		if (rc < 0) {
+			printf("prctl(PR_GET_SPECULATION_CTRL, %s) = %s%s"
+			       " (INJECTED)\n",
+			       spec_strs[c].str, sprintrc(rc), str);
+		} else {
+			printf("prctl(PR_GET_SPECULATION_CTRL, %s) = %#lx%s"
+			       " (INJECTED)\n",
+			       spec_strs[c].str, rc, str);
+		}
 	}
 
 

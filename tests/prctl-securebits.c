@@ -107,21 +107,19 @@ main(int argc, char *argv[])
 	       ") = %s" INJ_STR "\n", errstr);
 
 	long rc = prctl(PR_GET_SECUREBITS, bits1);
-	printf("prctl(" XLAT_KNOWN(0x1b, "PR_GET_SECUREBITS") ") = %s", errstr);
+	printf("prctl(" XLAT_KNOWN(0x1b, "PR_GET_SECUREBITS") ") = ");
 	if (rc > 0) {
-		printf(" (");
-		if (XLAT_RAW || ((rc & 0xff) && XLAT_VERBOSE))
-			printf("%#lx", rc);
-		if ((rc & 0xff) && XLAT_VERBOSE)
-			printf(" /* ");
-		if (!XLAT_RAW)
+		printf("%#lx", rc);
+		if ((rc & 0xff) && !XLAT_RAW) {
+			printf(" (");
 			printflags(secbits, rc, NULL);
-		if ((rc & 0xff) && XLAT_VERBOSE)
-			printf(" */");
-		printf(")");
+			printf(")");
+		}
+		puts(INJ_STR);
+	} else {
+		printf("%s" INJ_STR "\n", errstr);
 	}
 
-	puts(INJ_STR);
 	puts("+++ exited with 0 +++");
 	return 0;
 }

@@ -187,9 +187,10 @@ SYS_FUNC(prctl)
 			break;
 		if (syserror(tcp) || tcp->u_rval == 0)
 			return 0;
-		tcp->auxstr = sprintflags("", secbits,
-					  (kernel_ulong_t) tcp->u_rval);
-		return RVAL_STR;
+		tcp->auxstr = sprintflags_ex("", secbits,
+				(kernel_ulong_t) tcp->u_rval, '\0',
+				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
 
 	case PR_GET_TID_ADDRESS:
 		if (entering(tcp))
@@ -223,9 +224,10 @@ SYS_FUNC(prctl)
 			break;
 		if (syserror(tcp) || tcp->u_rval == 0)
 			return 0;
-		tcp->auxstr = sprintflags("", pr_fp_mode,
-					  (kernel_ulong_t) tcp->u_rval);
-		return RVAL_STR;
+		tcp->auxstr = sprintflags_ex("", pr_fp_mode,
+				(kernel_ulong_t) tcp->u_rval, '\0',
+				XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
 
 	case PR_SVE_SET_VL:
 		if (entering(tcp)) {
@@ -259,10 +261,11 @@ SYS_FUNC(prctl)
 		switch (arg2) {
 		case PR_SPEC_STORE_BYPASS:
 		case PR_SPEC_INDIRECT_BRANCH:
-			tcp->auxstr = sprintflags("",
-						  pr_spec_get_store_bypass_flags,
-						  (kernel_ulong_t) tcp->u_rval);
-			break;
+			tcp->auxstr = sprintflags_ex("",
+					pr_spec_get_store_bypass_flags,
+					(kernel_ulong_t) tcp->u_rval, '\0',
+					XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+			return RVAL_HEX | RVAL_STR;
 		}
 
 		return RVAL_STR;
