@@ -244,6 +244,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ppoll-P \
 	ppoll-v \
 	prctl-fp-mode \
+	prctl-pac-enabled-keys-success \
+	prctl-pac-enabled-keys-success-Xabbrev \
+	prctl-pac-enabled-keys-success-Xraw \
+	prctl-pac-enabled-keys-success-Xverbose \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-securebits-success \

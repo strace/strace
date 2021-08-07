@@ -587,6 +587,14 @@ prctl-dumpable		+prctl.sh -a23
 prctl-mce-kill		+prctl.sh -a21
 prctl-name		+prctl.sh -a23
 prctl-no-args		+prctl.sh -a21
+prctl-pac-enabled-keys		+prctl.sh -a43
+prctl-pac-enabled-keys-Xabbrev	+prctl.sh -a43 -Xabbrev
+prctl-pac-enabled-keys-Xraw	+prctl.sh -a24 -Xraw
+prctl-pac-enabled-keys-Xverbose	+prctl.sh -a54 -Xverbose
+prctl-pac-enabled-keys-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a43
+prctl-pac-enabled-keys-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a43 -Xabbrev
+prctl-pac-enabled-keys-success-Xraw	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a24 -Xraw
+prctl-pac-enabled-keys-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 30 0xbeef0" -a54 -Xverbose
 prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
 prctl-seccomp-filter-v	+prctl.sh -v

@@ -27,6 +27,7 @@
 #include "xlat/pr_fp_mode.h"
 #include "xlat/pr_mce_kill.h"
 #include "xlat/pr_mce_kill_policy.h"
+#include "xlat/pr_pac_enabled_keys.h"
 #include "xlat/pr_pac_keys.h"
 #include "xlat/pr_set_mm.h"
 #include "xlat/pr_spec_cmds.h"
@@ -473,10 +474,32 @@ SYS_FUNC(prctl)
 
 	case PR_PAC_RESET_KEYS:
 		tprint_arg_next();
-		printflags64(pr_pac_keys, arg2, "PR_PAC_???");
+		printflags_ex(arg2, "PR_PAC_???", XLAT_STYLE_DEFAULT,
+			      pr_pac_enabled_keys, pr_pac_keys, NULL);
 		print_prctl_args(tcp, 2);
 
 		return RVAL_DECODED;
+
+	case PR_PAC_SET_ENABLED_KEYS:
+		tprint_arg_next();
+		printflags64(pr_pac_enabled_keys, arg2, "PR_PAC_???");
+		tprint_arg_next();
+		printflags64(pr_pac_enabled_keys, arg3, "PR_PAC_???");
+		print_prctl_args(tcp, 3);
+
+		return RVAL_DECODED;
+
+	case PR_PAC_GET_ENABLED_KEYS:
+		if (entering(tcp)) {
+			print_prctl_args(tcp, 1);
+			return 0;
+		}
+		if (syserror(tcp))
+			return 0;
+		tcp->auxstr = sprintflags_ex("", pr_pac_enabled_keys,
+					     (kernel_ulong_t) tcp->u_rval, '\0',
+					     XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+		return RVAL_HEX | RVAL_STR;
 
 	case PR_SET_SYSCALL_USER_DISPATCH:
 		tprint_arg_next();

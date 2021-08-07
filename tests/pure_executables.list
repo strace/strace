@@ -466,6 +466,10 @@ prctl-dumpable
 prctl-mce-kill
 prctl-name
 prctl-no-args
+prctl-pac-enabled-keys
+prctl-pac-enabled-keys-Xabbrev
+prctl-pac-enabled-keys-Xraw
+prctl-pac-enabled-keys-Xverbose
 prctl-pac-reset-keys
 prctl-pdeathsig
 prctl-securebits

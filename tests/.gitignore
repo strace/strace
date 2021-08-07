@@ -618,6 +618,14 @@ prctl-fp-mode
 prctl-mce-kill
 prctl-name
 prctl-no-args
+prctl-pac-enabled-keys
+prctl-pac-enabled-keys-Xabbrev
+prctl-pac-enabled-keys-Xraw
+prctl-pac-enabled-keys-Xverbose
+prctl-pac-enabled-keys-success
+prctl-pac-enabled-keys-success-Xabbrev
+prctl-pac-enabled-keys-success-Xraw
+prctl-pac-enabled-keys-success-Xverbose
 prctl-pac-reset-keys
 prctl-pdeathsig
 prctl-seccomp-filter-v
