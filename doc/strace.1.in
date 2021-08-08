@@ -1082,6 +1082,11 @@ protocol-specific information associated with socket file descriptors,
 block/character device number associated with device file descriptors,
 and PIDs associated with pidfd file descriptors.
 .TP
+.B \-Y
+.TQ
+.BR \-\-decode\-pids
+Print command names for PIDs that appear as the prefixes of trace lines.
+.TP
 .B \-\-pidns\-translation
 If strace and tracee are in different PID namespaces, print PIDs in
 strace's namespace, too.

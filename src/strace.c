@@ -417,6 +417,8 @@ Output format:\n\
   -yy, --decode-fds=all\n\
                  print all available information associated with file\n\
                  descriptors in addition to paths\n\
+  -Y, --decode-pids\n\
+                 print command names associated with the pids\n\
 "
 #ifdef ENABLE_SECONTEXT
 "\
@@ -799,10 +801,18 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
-	if (print_pid_pfx)
-		tprintf("%-5d ", tcp->pid);
-	else if (nprocs > 1 && !outfname)
-		tprintf("[pid %5u] ", tcp->pid);
+	if (print_pid_pfx) {
+		if (decode_pids_enabled)
+			tprintf("%-5d<%s> ", tcp->pid, tcp->comm);
+		else
+			tprintf("%-5d ", tcp->pid);
+	}
+	else if (nprocs > 1 && !outfname) {
+		if (decode_pids_enabled)
+			tprintf("[pid %5u<%s>] ", tcp->pid, tcp->comm);
+		else
+			tprintf("[pid %5u] ", tcp->pid);
+	}
 
 #ifdef ENABLE_SECONTEXT
 	char *context;
@@ -2094,7 +2104,7 @@ init(int argc, char *argv[])
 	qualify_signals("all");
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yzZ";
+		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2158,6 +2168,7 @@ init(int argc, char *argv[])
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
 		{ "strings-in-hex",	optional_argument, 0, GETOPT_HEX_STR },
 		{ "const-print-style",	required_argument, 0, 'X' },
+		{ "decode-pids",	optional_argument, 0, 'Y' },
 		{ "pidns-translation",	no_argument      , 0, GETOPT_PIDNS_TRANSLATION },
 		{ "successful-only",	no_argument,	   0, 'z' },
 		{ "failed-only",	no_argument,	   0, 'Z' },
@@ -2377,6 +2388,9 @@ init(int argc, char *argv[])
 			break;
 		case 'y':
 			yflag_short++;
+			break;
+		case 'Y':
+			decode_pids_enabled = true;
 			break;
 		case GETOPT_PIDNS_TRANSLATION:
 			pidns_translation++;
