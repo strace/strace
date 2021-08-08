@@ -809,6 +809,7 @@ strace--timestamps-unix-us +strace-ttt.test 6 --timestamps=unix,us
 strace-n	-e trace=listen -n -qq -a 12
 strace-x	-e trace=chdir -x -a 12
 strace-xx	-e trace=chdir -xx -a 18
+strace-Y-0123456789	-e trace=getppid -e signal='!SIGCHLD' -q -f -Y -a 18
 swap	-a23 -e trace=swapon,swapoff
 sxetmask	-a11 -e trace=sgetmask,ssetmask
 symlink	-a34

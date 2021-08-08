@@ -838,6 +838,7 @@ strace--strings-in-hex-non-ascii
 strace-n
 strace-x
 strace-xx
+strace-Y-0123456789
 swap
 sxetmask
 symlink

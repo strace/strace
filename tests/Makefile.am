@@ -289,6 +289,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	stack-fcall-mangled \
 	status-none-threads \
 	status-unfinished-threads \
+	strace-Y-0123456789 \
 	syslog-success \
 	tgkill--pidns-translation \
 	threads-execve \
