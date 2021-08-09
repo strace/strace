@@ -115,6 +115,11 @@ ia64)
 	arch=ia64
 	AC_DEFINE([IA64], 1, [Define for the IA64 architecture.])
 	;;
+loongarch64)
+	arch=loongarch64
+	karch=loongarch
+	AC_DEFINE([LOONGARCH64], 1, [Define for the 64-bit LoongArch architecture.])
+	;;
 m68k)
 	arch=m68k
 	AC_DEFINE([M68K], 1, [Define for the m68k architecture.])

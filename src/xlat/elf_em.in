@@ -190,6 +190,7 @@ EM_AMDGPU		224 /* AMD GPU architecture */
 EM_RISCV		243 /* RISC-V */
 EM_BPF			247 /* Linux BPF - in-kernel virtual machine */
 EM_CSKY			252 /* C-SKY */
+EM_LOONGARCH		258 /* LoongArch */
 EM_AVR32		0x18ad /* Atmel AVR32, removed in v4.12-rc1~159^2~5 */
 EM_FRV			0x5441 /* Fujitsu FR-V */
 EM_OR32			0x8472 /* arch/openrisc/include/uapi/asm/elf.h */

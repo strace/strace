@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Added 64-bit LoongArch architecture support.
 
 * Bug fixes
 

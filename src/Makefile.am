@@ -646,6 +646,17 @@ EXTRA_DIST =				\
 	linux/ia64/syscallent.h		\
 	linux/ia64/syscallent_base_nr.h	\
 	linux/ia64/userent.h		\
+	linux/loongarch64/arch_defs_.h	\
+	linux/loongarch64/arch_regs.c	\
+	linux/loongarch64/get_error.c	\
+	linux/loongarch64/get_scno.c	\
+	linux/loongarch64/get_syscall_args.c	\
+	linux/loongarch64/ioctls_arch0.h	\
+	linux/loongarch64/ioctls_inc0.h	\
+	linux/loongarch64/raw_syscall.h	\
+	linux/loongarch64/set_error.c	\
+	linux/loongarch64/set_scno.c	\
+	linux/loongarch64/syscallent.h	\
 	linux/m68k/arch_defs_.h		\
 	linux/m68k/arch_regs.c		\
 	linux/m68k/arch_rt_sigframe.c	\
