@@ -257,6 +257,7 @@ gen_header()
 		EOF
 	fi
 
+	echo "DIAG_PUSH_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE"
 	echo "static const struct xlat_data ${name}_xdata[] = {"
 
 	unconditional= val_type=
@@ -363,6 +364,7 @@ gen_header()
 
 	cat <<-EOF
 		} };
+		DIAG_POP_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE
 
 	EOF
 

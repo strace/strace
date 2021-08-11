@@ -150,4 +150,15 @@
 #  define DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE	/* empty */
 # endif
 
+# if CLANG_PREREQ(6, 0)
+#  define DIAG_PUSH_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE		\
+	_Pragma("clang diagnostic push");				\
+	_Pragma("clang diagnostic ignored \"-Wtautological-constant-compare\"");
+#  define DIAG_POP_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE			\
+	_Pragma("clang diagnostic pop");
+# else
+#  define DIAG_PUSH_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE	/* empty */
+#  define DIAG_POP_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE		/* empty */
+# endif
+
 #endif /* !STRACE_GCC_COMPAT_H */
