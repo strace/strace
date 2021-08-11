@@ -360,8 +360,8 @@ libstrace_a_SOURCES =	\
 	time.c		\
 	times.c		\
 	trace_event.h	\
-	trie.c 		\
-	trie.h 		\
+	trie.c		\
+	trie.h		\
 	truncate.c	\
 	ubi.c		\
 	ucopy.c		\
@@ -562,7 +562,7 @@ EXTRA_DIST =				\
 	linux/generic/arch_regs.h		\
 	linux/generic/arch_rt_sigframe.c	\
 	linux/generic/arch_sigreturn.c		\
-	linux/generic/asm_stat.h 		\
+	linux/generic/asm_stat.h		\
 	linux/generic/check_scno.c		\
 	linux/generic/errnoent.h		\
 	linux/generic/getregs_old.h		\
