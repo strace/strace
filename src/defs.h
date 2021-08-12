@@ -924,6 +924,9 @@ extern void print_dev_t(unsigned long long dev);
 extern void print_kernel_version(unsigned long version);
 extern void print_abnormal_hi(kernel_ulong_t);
 extern void print_ioprio(unsigned int ioprio);
+extern void print_auxv32(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size);
+extern void print_auxv64(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size);
+extern void print_auxv(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t size);
 
 extern bool print_int8_array_member(struct tcb *, void *elem_buf,
 				    size_t elem_size, void *data);

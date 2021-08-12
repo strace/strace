@@ -375,9 +375,37 @@ SYS_FUNC(prctl)
 #endif
 
 	case PR_SET_MM:
-		tprint_arg_next();
-		printxval(pr_set_mm, arg2, "PR_SET_MM_???");
-		print_prctl_args(tcp, 2);
+		if (entering(tcp)) {
+			tprint_arg_next();
+			printxval(pr_set_mm, arg2, "PR_SET_MM_???");
+			tprint_arg_next();
+
+			switch (arg2) {
+			case PR_SET_MM_AUXV:
+				print_auxv(tcp, arg3, arg4);
+				break;
+			case PR_SET_MM_EXE_FILE:
+				printfd(tcp, arg3);
+				break;
+			case PR_SET_MM_MAP:
+				print_struct_prctl_mm_map(tcp, arg3, arg4);
+				print_prctl_args(tcp, 3);
+				break;
+			case PR_SET_MM_MAP_SIZE:
+				return 0;
+			default:
+				PRINT_VAL_X(arg3);
+			}
+
+			print_prctl_args(tcp, 3);
+		} else {
+			/* PR_SET_MM_MAP_SIZE */
+			if (syserror(tcp))
+				printaddr(arg3);
+			else
+				printnum_int(tcp, arg3, "%u");
+			print_prctl_args(tcp, 3);
+		}
 		return RVAL_DECODED;
 
 	case PR_SET_PDEATHSIG:

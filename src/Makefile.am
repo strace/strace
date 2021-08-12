@@ -247,6 +247,7 @@ libstrace_a_SOURCES =	\
 	poke.h		\
 	poll.c		\
 	prctl.c		\
+	print_auxv.c	\
 	print_dev_t.c	\
 	print_fields.h	\
 	print_group_req.c \
@@ -261,6 +262,7 @@ libstrace_a_SOURCES =	\
 	print_sigevent.c \
 	print_statfs.c	\
 	print_struct_stat.c \
+	print_struct_prctl_mm_map.c \
 	print_syscall_number.c \
 	print_time.c	\
 	print_timespec.h \
