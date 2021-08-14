@@ -38,9 +38,19 @@ done
 }
 
 for i in $(echo "$PRCTL_INJECT_RETVALS"); do
+	if [ "x${i}" = "x${i#error=}" ]; then
+		inj_str="retval=$((i))"
+		ret_val="${i}"
+		sed_match="$((i))"
+	else
+		inj_str="${i}"
+		ret_val="-1"
+		sed_match="-1 ${i#error=}"
+	fi
+
 	run_strace -a80 "$@" -e trace=prctl \
-		-e inject=prctl:retval="${i}":when="${PRCTL_INJECT_START}+" \
-		"../$NAME" "${PRCTL_INJECT_START}" "${i}" > "$EXP.$i"
-	sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb) = '"$((i))"' /d' < "$LOG" > "$OUT.$i"
+		-e inject=prctl:"${inj_str}":when="${PRCTL_INJECT_START}+" \
+		"../$NAME" "${PRCTL_INJECT_START}" "${ret_val}" > "$EXP.$i"
+	sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb) = '"${sed_match}"' /d' < "$LOG" > "$OUT.$i"
 	match_diff "$OUT.$i" "$EXP.$i"
 done
