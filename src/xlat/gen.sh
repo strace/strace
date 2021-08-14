@@ -172,7 +172,7 @@ gen_header()
 
 	local unconditional= line
 	# 1st pass: output directives.
-	while read line; do
+	while read -r line; do
 		case "$line" in
 			*/\**)
 			line=$(printf "%s" "$line" |
@@ -262,7 +262,7 @@ gen_header()
 
 	unconditional= val_type=
 	# 2nd pass: output everything.
-	while read line; do
+	while read -r line; do
 		case "$line" in
 			*/\**)
 			line=$(printf "%s" "$line" |
