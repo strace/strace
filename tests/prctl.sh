@@ -12,5 +12,5 @@
 check_prog sed
 run_prog > /dev/null
 run_strace -eprctl "$@" $args > "$EXP"
-sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb) = -1 /d' < "$LOG" > "$OUT"
+sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)  *= -1 /d' < "$LOG" > "$OUT"
 match_diff "$OUT" "$EXP"
