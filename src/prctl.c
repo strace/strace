@@ -29,6 +29,8 @@
 #include "xlat/pr_mce_kill_policy.h"
 #include "xlat/pr_pac_enabled_keys.h"
 #include "xlat/pr_pac_keys.h"
+#include "xlat/pr_sched_core_cmds.h"
+#include "xlat/pr_sched_core_pidtypes.h"
 #include "xlat/pr_set_mm.h"
 #include "xlat/pr_spec_cmds.h"
 #include "xlat/pr_spec_get_store_bypass_flags.h"
@@ -510,6 +512,48 @@ SYS_FUNC(prctl)
 		PRINT_VAL_X(arg4);
 		tprint_arg_next();
 		printaddr(arg5);
+
+		return RVAL_DECODED;
+
+	case PR_SCHED_CORE:
+		if (entering(tcp)) {
+			tprint_arg_next();
+			printxval(pr_sched_core_cmds, arg2, "PR_SCHED_CORE_???");
+
+			tprint_arg_next();
+			enum pid_type pt;
+			switch ((unsigned int) arg4) {
+			case PIDTYPE_PID:  pt = PT_TID;  break;
+			case PIDTYPE_TGID: pt = PT_TGID; break;
+			case PIDTYPE_PGID: pt = PT_PGID; break;
+			case PIDTYPE_SID:  pt = PT_SID;  break;
+			default:           pt = PT_NONE;
+			}
+			printpid(tcp, arg3, pt);
+
+			tprint_arg_next();
+			printxval_ex(pr_sched_core_pidtypes,
+				     (unsigned int) arg4, "PIDTYPE_???",
+				     (xlat_verbose(xlat_verbosity)
+							== XLAT_STYLE_RAW)
+					? XLAT_STYLE_DEFAULT
+					: XLAT_STYLE_VERBOSE);
+
+			tprint_arg_next();
+			switch ((unsigned int) arg2) {
+			case PR_SCHED_CORE_GET:
+				/* arg5 is to be decoded on exiting */
+				return 0;
+			default:
+				printaddr(arg5);
+			}
+		} else {
+			/* PR_SCHED_CORE_GET */
+			if (syserror(tcp))
+				printaddr(arg5);
+			else
+				printnum_int64(tcp, arg5, "%#" PRIx64);
+		}
 
 		return RVAL_DECODED;
 
