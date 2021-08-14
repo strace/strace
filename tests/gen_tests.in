@@ -591,6 +591,10 @@ prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
 prctl-seccomp-filter-v	+prctl.sh -v
 prctl-securebits	+prctl.sh -a25
+prctl-securebits-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a25
+prctl-securebits-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a25 -Xabbrev
+prctl-securebits-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a12 -Xraw
+prctl-securebits-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a36 -Xverbose
 prctl-sve		+prctl.sh -a21
 prctl-syscall-user-dispatch	+prctl.sh -a68
 prctl-tagged-addr		+prctl.sh -a43

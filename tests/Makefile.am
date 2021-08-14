@@ -246,6 +246,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-fp-mode \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
+	prctl-securebits-success \
+	prctl-securebits-success-Xabbrev \
+	prctl-securebits-success-Xraw \
+	prctl-securebits-success-Xverbose \
 	prctl-spec-inject \
 	prctl-tagged-addr-success \
 	prctl-tagged-addr-success-Xabbrev \

@@ -623,6 +623,10 @@ prctl-pdeathsig
 prctl-seccomp-filter-v
 prctl-seccomp-strict
 prctl-securebits
+prctl-securebits-success
+prctl-securebits-success-Xabbrev
+prctl-securebits-success-Xraw
+prctl-securebits-success-Xverbose
 prctl-spec-inject
 prctl-sve
 prctl-syscall-user-dispatch
