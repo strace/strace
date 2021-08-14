@@ -267,6 +267,14 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-securebits-success-Xabbrev \
 	prctl-securebits-success-Xraw \
 	prctl-securebits-success-Xverbose \
+	prctl-set-ptracer-success \
+	prctl-set-ptracer-success-Xabbrev \
+	prctl-set-ptracer-success-Xraw \
+	prctl-set-ptracer-success-Xverbose \
+	prctl-set-ptracer-success--pidns-translation \
+	prctl-set-ptracer-success-Xabbrev--pidns-translation \
+	prctl-set-ptracer-success-Xraw--pidns-translation \
+	prctl-set-ptracer-success-Xverbose--pidns-translation \
 	prctl-spec-inject \
 	prctl-tagged-addr-success \
 	prctl-tagged-addr-success-Xabbrev \
