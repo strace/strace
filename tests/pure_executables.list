@@ -472,6 +472,10 @@ prctl-pac-enabled-keys-Xraw
 prctl-pac-enabled-keys-Xverbose
 prctl-pac-reset-keys
 prctl-pdeathsig
+prctl-sched-core
+prctl-sched-core-Xabbrev
+prctl-sched-core-Xraw
+prctl-sched-core-Xverbose
 prctl-securebits
 prctl-sve
 prctl-syscall-user-dispatch

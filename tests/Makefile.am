@@ -249,6 +249,18 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-pac-enabled-keys-success-Xabbrev \
 	prctl-pac-enabled-keys-success-Xraw \
 	prctl-pac-enabled-keys-success-Xverbose \
+	prctl-sched-core--pidns-translation \
+	prctl-sched-core--pidns-translation-Xabbrev \
+	prctl-sched-core--pidns-translation-Xraw \
+	prctl-sched-core--pidns-translation-Xverbose \
+	prctl-sched-core-success \
+	prctl-sched-core-success-Xabbrev \
+	prctl-sched-core-success-Xraw \
+	prctl-sched-core-success-Xverbose \
+	prctl-sched-core-success--pidns-translation \
+	prctl-sched-core-success--pidns-translation-Xabbrev \
+	prctl-sched-core-success--pidns-translation-Xraw \
+	prctl-sched-core-success--pidns-translation-Xverbose \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-securebits-success \
