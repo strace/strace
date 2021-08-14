@@ -389,8 +389,8 @@ SYS_FUNC(prctl)
 	case PR_SET_PTRACER:
 		tprint_arg_next();
 		if ((int) arg2 == -1) {
-			print_xlat_ex(arg2, "PR_SET_PTRACER_ANY",
-				      XLAT_STYLE_DEFAULT);
+			print_xlat_ex((int) arg2, "PR_SET_PTRACER_ANY",
+				      XLAT_STYLE_FMT_D);
 		} else {
 			printpid(tcp, arg2, PT_TGID);
 		}
