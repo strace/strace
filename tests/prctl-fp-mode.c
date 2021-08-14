@@ -9,6 +9,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -62,15 +63,32 @@ main(int argc, char **argv)
 	};
 
 	long rc;
+	unsigned long num_skip;
 	const char *str = NULL;
+	bool locked = false;
 
-	if (argc < 2)
-		error_msg_and_fail("Usage: %s INJECTED_VAL", argv[0]);
+	if (argc < 3)
+		error_msg_and_fail("Usage: %s NUM_SKIP INJECT_RETVAL", argv[0]);
 
-	injected_val = strtol(argv[1], NULL, 0);
+	num_skip = strtoul(argv[1], NULL, 0);
+	injected_val = strtol(argv[2], NULL, 0);
 
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
+	for (size_t i = 0; i < num_skip; i++) {
+		long ret = syscall(__NR_prctl, -1U, (unsigned long) -2U,
+				   (unsigned long) -3U, (unsigned long) -4U,
+				   (unsigned long) -5U);
+
+		if ((ret != injected_val) ||
+		    ((injected_val == -1) && (errno != ENOTTY)))
+			continue;
+
+		locked = true;
+		break;
+	}
+
+	if (!locked)
+		error_msg_and_fail("Have not locked on prctl(-1, -2, -3, -4"
+				   ", -5) returning %ld", injected_val);
 
 	/* PR_GET_FP_MODE */
 	rc = do_prctl(PR_GET_FP_MODE, bogus_arg2, bogus_arg3);

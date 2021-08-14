@@ -584,6 +584,7 @@ prctl-arg2-intptr	+prctl.sh -a25
 prctl-cap-ambient	+prctl.sh -a21
 prctl-capbset		+prctl.sh -a21
 prctl-dumpable		+prctl.sh -a23
+prctl-fp-mode		+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 2 3 32 35" -a21
 prctl-mce-kill		+prctl.sh -a21
 prctl-name		+prctl.sh -a23
 prctl-no-args		+prctl.sh -a21
@@ -603,6 +604,7 @@ prctl-securebits-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256
 prctl-securebits-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a25 -Xabbrev
 prctl-securebits-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a12 -Xraw
 prctl-securebits-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a36 -Xverbose
+prctl-spec-inject	+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 3 8 16 32 42" -a53
 prctl-sve		+prctl.sh -a21
 prctl-syscall-user-dispatch	+prctl.sh -a68
 prctl-tagged-addr		+prctl.sh -a43

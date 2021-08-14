@@ -435,9 +435,7 @@ DECODER_TESTS = \
 	pipe.test \
 	poll-P.test \
 	poll.test \
-	prctl-fp-mode.test \
 	prctl-seccomp-strict.test \
-	prctl-spec-inject.test \
 	qual_fault-exit_group.test \
 	readv.test \
 	rt_sigaction.test \
