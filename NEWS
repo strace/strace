@@ -9,6 +9,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of MDBA_ROUTER_PATTR_* mdb router port netlink attributes.
   * Updated lists of BPF_*, IORING_*, MADV_*, MOUNT_ATTR_*, SCTP_*,
     and UFFD_* constants.
+  * Updated lists of ioctl commands from Linux 5.14.
 
 * Bug fixes
   * Fixed build using bionic libc.

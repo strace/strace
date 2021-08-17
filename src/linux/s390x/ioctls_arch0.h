@@ -112,6 +112,7 @@
 { "linux/kvm.h", "KVM_GET_REGS", _IOC_READ, 0xae81, 0x80 },
 { "linux/kvm.h", "KVM_GET_REG_LIST", _IOC_READ|_IOC_WRITE, 0xaeb0, 0x08 },
 { "linux/kvm.h", "KVM_GET_SREGS", _IOC_READ, 0xae83, 0xc0 },
+{ "linux/kvm.h", "KVM_GET_STATS_FD", _IOC_NONE, 0xaece, 0x00 },
 { "linux/kvm.h", "KVM_GET_TSC_KHZ", _IOC_NONE, 0xaea3, 0x00 },
 { "linux/kvm.h", "KVM_GET_VCPU_MMAP_SIZE", _IOC_NONE, 0xae04, 0x00 },
 { "linux/kvm.h", "KVM_HAS_DEVICE_ATTR", _IOC_WRITE, 0xaee3, 0x18 },
