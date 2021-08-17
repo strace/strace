@@ -51,6 +51,6 @@ for i in $(echo "$PRCTL_INJECT_RETVALS"); do
 	run_strace -a80 "$@" -e trace=prctl \
 		-e inject=prctl:"${inj_str}":when="${PRCTL_INJECT_START}+" \
 		"../$NAME" "${PRCTL_INJECT_START}" "${ret_val}" > "$EXP.$i"
-	sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb) = '"${sed_match}"' /d' < "$LOG" > "$OUT.$i"
+	sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)  *= '"${sed_match}"' /d' < "$LOG" > "$OUT.$i"
 	match_diff "$OUT.$i" "$EXP.$i"
 done
