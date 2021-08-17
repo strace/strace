@@ -17,10 +17,9 @@
 int
 main(void)
 {
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
-
 	long rc;
+
+	prctl_marker();
 
 	rc = syscall(__NR_prctl, PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE,
 				 CAP_NET_RAW, 0, 0);

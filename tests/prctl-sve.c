@@ -16,10 +16,9 @@
 int
 main(void)
 {
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
-
 	long rc;
+
+	prctl_marker();
 
 	rc = syscall(__NR_prctl, PR_SVE_SET_VL, 0xf);
 	printf("prctl(PR_SVE_SET_VL, %#lx) = %s\n", (unsigned long) 0xf,

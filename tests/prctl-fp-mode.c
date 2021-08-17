@@ -74,11 +74,7 @@ main(int argc, char **argv)
 	injected_val = strtol(argv[2], NULL, 0);
 
 	for (size_t i = 0; i < num_skip; i++) {
-		long ret = syscall(__NR_prctl, -1U, (unsigned long) -2U,
-				   (unsigned long) -3U, (unsigned long) -4U,
-				   (unsigned long) -5U);
-
-		if ((ret != injected_val) ||
+		if ((prctl_marker() != injected_val) ||
 		    ((injected_val == -1) && (errno != ENOTTY)))
 			continue;
 

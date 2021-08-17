@@ -68,8 +68,7 @@ main(void)
 {
 	int fds[2];
 
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
+	prctl_marker();
 
 	puts("prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)  = 0");
 

@@ -18,11 +18,11 @@ main(void)
 	static const char text1[] =
 		"prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT) = 0\n";
 	static const char text2[] = "+++ exited with 0 +++\n";
+	int rc;
 
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
+	prctl_marker();
 
-	int rc = prctl(PR_SET_SECCOMP, -1L, 1, 2, 3);
+	rc = prctl(PR_SET_SECCOMP, -1L, 1, 2, 3);
 	printf("prctl(PR_SET_SECCOMP, %#lx /* SECCOMP_MODE_??? */, 0x1, 0x2, 0x3)"
 	       " = %d %s (%m)\n", -1L, rc, errno2name());
 	fflush(stdout);

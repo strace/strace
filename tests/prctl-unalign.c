@@ -17,11 +17,9 @@ int
 main(void)
 {
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, unalign);
-
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
-
 	long rc;
+
+	prctl_marker();
 
 	rc = syscall(__NR_prctl, PR_SET_UNALIGN, PR_UNALIGN_NOPRINT | PR_UNALIGN_SIGBUS);
 	printf("prctl(PR_SET_UNALIGN, PR_UNALIGN_NOPRINT|PR_UNALIGN_SIGBUS) = %s\n",

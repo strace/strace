@@ -57,8 +57,7 @@ print_tagged_addr_arg(kernel_ulong_t arg)
 int
 main(int argc, char *argv[])
 {
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
+	prctl_marker();
 
 #ifdef INJECT_RETVAL
 	unsigned long num_skip;
@@ -72,11 +71,7 @@ main(int argc, char *argv[])
 	inject_retval = strtol(argv[2], NULL, 0);
 
 	for (size_t i = 0; i < num_skip; i++) {
-		long ret = syscall(__NR_prctl, -1U, (unsigned long) -2U,
-				   (unsigned long) -3U, (unsigned long) -4U,
-				   (unsigned long) -5U);
-
-		if (ret != inject_retval)
+		if (prctl_marker() != inject_retval)
 			continue;
 
 		locked = true;

@@ -33,9 +33,6 @@ prctl(kernel_ulong_t arg1, kernel_ulong_t arg2)
 int
 main(void)
 {
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
-
 	static const kernel_ulong_t bogus_dumpable1 =
 		(kernel_ulong_t) 0xdeadc0de00000001ULL;
 	static const kernel_ulong_t bogus_dumpable2 =
@@ -47,7 +44,7 @@ main(void)
 		"SUID_DUMP_ROOT",
 	};
 
-	unsigned int i;
+	prctl_marker();
 
 	prctl(PR_SET_DUMPABLE, 3);
 	printf("prctl(PR_SET_DUMPABLE, 0x3 /* SUID_DUMP_??? */) = %s\n",
@@ -66,7 +63,7 @@ main(void)
 	printf("prctl(PR_SET_DUMPABLE, %#llx /* SUID_DUMP_??? */) = %s\n",
 	       (unsigned long long) bogus_dumpable2, errstr);
 
-	for (i = 0; i < ARRAY_SIZE(args); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(args); ++i) {
 		prctl(PR_SET_DUMPABLE, i);
 		printf("prctl(PR_SET_DUMPABLE, %s) = %s\n", args[i], errstr);
 

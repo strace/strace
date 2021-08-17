@@ -41,8 +41,7 @@ prctl(kernel_ulong_t arg1, kernel_ulong_t arg2)
 int
 main(int argc, char *argv[])
 {
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
+	prctl_marker();
 
 #ifdef INJECT_RETVAL
 	unsigned long num_skip;
@@ -54,11 +53,7 @@ main(int argc, char *argv[])
 	num_skip = strtoul(argv[1], NULL, 0);
 
 	for (size_t i = 0; i < num_skip; i++) {
-		long ret = syscall(__NR_prctl, -1U, (unsigned long) -2U,
-				   (unsigned long) -3U, (unsigned long) -4U,
-				   (unsigned long) -5U);
-
-		if (ret < 0)
+		if (prctl_marker() < 0)
 			continue;
 
 		locked = true;

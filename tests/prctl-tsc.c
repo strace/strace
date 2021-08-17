@@ -22,11 +22,9 @@ main(void)
 		(kernel_ulong_t) 0xdeadc0defacebeefULL;
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, tsc);
-
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
-
 	long rc;
+
+	prctl_marker();
 
 	rc = syscall(__NR_prctl, PR_SET_TSC, 0);
 	printf("prctl(PR_SET_TSC, 0 /* PR_TSC_??? */) = %s\n", sprintrc(rc));

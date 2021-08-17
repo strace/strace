@@ -39,12 +39,9 @@ main(void)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
 
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
+	prctl_marker();
 
-	unsigned int i;
-
-	for (i = 0; i < ARRAY_SIZE(options); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(options); i++) {
 		long rc = syscall(__NR_prctl, options[i].val | bogus_op_bits,
 				  bogus_arg);
 		printf("prctl(%s) = %s\n", options[i].str, sprintrc(rc));

@@ -19,14 +19,13 @@
 int
 main(void)
 {
-	syscall(__NR_prctl, -1U, (unsigned long) -2U, (unsigned long) -3U,
-				 (unsigned long) -4U, (unsigned long) -5U);
-
 	static const char str[] = "0123456789abcdef";
 	static const int len = sizeof(str) - 1;
 	char *name = tail_memdup(str, sizeof(str));
 	int i;
 	int rc;
+
+	prctl_marker();
 
 	rc = prctl(PR_SET_NAME, NULL);
 	printf("prctl(PR_SET_NAME, NULL) = %s\n", sprintrc(rc));
