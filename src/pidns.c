@@ -29,7 +29,7 @@
 
 /**
  * Key:   PID NS ID
- * Value: a btree:
+ * Value: a trie:
  *           Key:   a process PID in NS
  *           Value: the process's PID as present in /proc
  */
