@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 #include "trie.h"
+#include "macros.h"
 #include "xmalloc.h"
 
 static const uint8_t ptr_sz_lg = (sizeof(void *) == 8 ? 6 : 5);
@@ -87,7 +88,7 @@ trie_create(uint8_t key_size, uint8_t item_size_lg, uint8_t node_key_bits,
 		/ t->node_key_bits;
 
 	if (item_size_lg != 6)
-		t->empty_value &= (((uint64_t) 1 << (1 << t->item_size_lg)) - 1);
+		t->empty_value &= MASK64(BIT32(t->item_size_lg));
 
 	return t;
 }
@@ -96,8 +97,8 @@ static void *
 trie_create_data_block(struct trie *t)
 {
 	uint64_t fill_value = t->empty_value;
-	for (int i = 1; i < 1 << (6 - t->item_size_lg); i++) {
-		fill_value <<= (1 << t->item_size_lg);
+	for (size_t i = 1; i < BIT32(6 - t->item_size_lg); i++) {
+		fill_value <<= BIT32(t->item_size_lg);
 		fill_value |= t->empty_value;
 	}
 
@@ -105,7 +106,7 @@ trie_create_data_block(struct trie *t)
 	if (sz < 6)
 		sz = 6;
 
-	size_t count = 1 << (sz - 6);
+	size_t count = BIT32(sz - 6);
 	uint64_t *data_block = xcalloc(count, 8);
 
 	for (size_t i = 0; i < count; i++)
@@ -119,7 +120,7 @@ trie_get_node(struct trie *t, uint64_t key, bool auto_create)
 {
 	void **cur_node = &(t->data);
 
-	if (t->key_size < 64 && key > (uint64_t) 1 << t->key_size)
+	if (t->key_size < 64 && key > MASK64(t->key_size))
 		return NULL;
 
 	for (uint8_t cur_depth = 0; cur_depth <= t->max_depth; cur_depth++) {
@@ -133,13 +134,13 @@ trie_get_node(struct trie *t, uint64_t key, bool auto_create)
 			if (cur_depth == t->max_depth)
 				*cur_node = trie_create_data_block(t);
 			else
-				*cur_node = xcalloc(1 << sz, 1);
+				*cur_node = xcalloc(BIT64(sz), 1);
 		}
 
 		if (cur_depth == t->max_depth)
 			break;
 
-		size_t pos = (key >> offs) & ((1 << (sz - ptr_sz_lg)) - 1);
+		size_t pos = (key >> offs) & MASK64(sz - ptr_sz_lg);
 		cur_node = (((void **) (*cur_node)) + pos);
 	}
 
@@ -152,7 +153,7 @@ trie_data_block_calc_pos(struct trie *t, uint64_t key,
 {
 	uint64_t key_mask;
 
-	key_mask = (1 << t->data_block_key_bits) - 1;
+	key_mask = MASK64(t->data_block_key_bits);
 	*pos = (key & key_mask) >> (6 - t->item_size_lg);
 
 	if (t->item_size_lg == 6) {
@@ -161,10 +162,10 @@ trie_data_block_calc_pos(struct trie *t, uint64_t key,
 		return;
 	}
 
-	key_mask = (1 << (6 - t->item_size_lg)) - 1;
-	*offs = (key & key_mask) * (1 << t->item_size_lg);
+	key_mask = MASK64(6 - t->item_size_lg);
+	*offs = (key & key_mask) << t->item_size_lg;
 
-	*mask = (((uint64_t) 1 << (1 << t->item_size_lg)) - 1) << *offs;
+	*mask = MASK64_SAFE(BIT32(t->item_size_lg)) << *offs;
 }
 
 bool
@@ -211,7 +212,7 @@ trie_iterate_keys_node(struct trie *t,
 		return 0;
 
 	if (t->key_size < 64) {
-		uint64_t key_max = ((uint64_t) 1 << t->key_size) - 1;
+		uint64_t key_max = MASK64(t->key_size);
 		if (end > key_max)
 			end = key_max;
 	}
@@ -228,15 +229,14 @@ trie_iterate_keys_node(struct trie *t,
 		t->key_size :
 		trie_get_node_bit_offs(t, depth - 1);
 
-	uint64_t first_key_in_node = start &
-		(uint64_t) -1 << parent_node_bit_off;
+	uint64_t first_key_in_node = start & ~MASK64_SAFE(parent_node_bit_off);
 
 	uint8_t node_bit_off = trie_get_node_bit_offs(t, depth);
 	uint8_t node_key_bits = parent_node_bit_off - node_bit_off;
-	uint64_t mask = ((uint64_t) 1 << (node_key_bits)) - 1;
+	uint64_t mask = MASK64_SAFE(node_key_bits);
 	uint64_t start_index = (start >> node_bit_off) & mask;
 	uint64_t end_index = (end >> node_bit_off) & mask;
-	uint64_t child_key_count = (uint64_t) 1 << node_bit_off;
+	uint64_t child_key_count = BIT64(node_bit_off);
 
 	uint64_t count = 0;
 
@@ -274,7 +274,7 @@ trie_free_node(struct trie *t, void *node, uint8_t depth)
 	if (depth >= t->max_depth)
 		goto free_node;
 
-	size_t sz = 1 << (trie_get_node_size(t, depth) - ptr_sz_lg);
+	size_t sz = BIT64(trie_get_node_size(t, depth) - ptr_sz_lg);
 	for (size_t i = 0; i < sz; i++)
 		trie_free_node(t, ((void **) node)[i], depth + 1);
 
