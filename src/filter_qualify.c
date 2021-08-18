@@ -169,34 +169,40 @@ parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 		poke->is_enter = isenter;
 
 		if ((val = STR_STRIP_PREFIX(token, "@arg")) == token)
-			return false;
+			goto err;
 		if ((val[0] >= '1') && (val[0] <= '7')) {
 			poke->arg_no = val[0] - '0';
 		} else {
-			return false;
+			goto err;
 		}
 		if (val[1] != '=')
-			return false;
+			goto err;
 		val += 2;
 
 		data_len = strlen(val);
 		if ((data_len == 0) || (data_len % 2) || (data_len > 2048))
-			return false;
+			goto err;
 		data_len /= 2;
 		poke->data_len = data_len;
 		poke->data = xmalloc(data_len);
 
 		for (size_t i = 0; i < data_len; i++)
 			if (sscanf(&val[2 * i], "%2hhx", &poke->data[i]) != 1)
-				return false;
+				goto err;
 
 		if (poke_add(fopts->data.poke_idx, poke))
-			return false;
+			goto err;
 	}
 	free(str_tokenized);
 
 	fopts->data.flags |= flag;
 	return true;
+
+err:
+	free(poke->data);
+	free(poke);
+	free(str_tokenized);
+	return false;
 }
 
 static bool
