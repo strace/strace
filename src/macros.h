@@ -78,10 +78,34 @@ is_filled(const char *ptr, char fill, size_t size)
 # define IS_ARRAY_ZERO(arr_)	\
 	is_filled((const char *) (arr_), 0, sizeof(arr_) + MUST_BE_ARRAY(arr_))
 
-# ifndef BIT
-#  define BIT(x_) (1U << (x_))
+# ifndef BIT32
+#  define BIT32(x_) (1U << (x_))
 # endif
 
-# define FLAG(name_) name_ = BIT(name_##_BIT)
+# ifndef BIT64
+#  define BIT64(x_) (1ULL << (x_))
+# endif
+
+# ifndef MASK32
+#  define MASK32(x_) (BIT32(x_) - 1U)
+# endif
+
+# ifndef MASK64
+#  define MASK64(x_) (BIT64(x_) - 1ULL)
+# endif
+
+/*
+ * "Safe" versions that avoid UB for values that are >= type bit size
+ * (the usually expected behaviour of the bit shift in that case is zero,
+ * but at least powerpc is notorious for returning the input value when shift
+ * by 64 bits is performed).
+ */
+
+# define BIT32_SAFE(x_) ((x_) < 32 ? BIT32(x_) : 0)
+# define BIT64_SAFE(x_) ((x_) < 64 ? BIT64(x_) : 0)
+# define MASK32_SAFE(x_) (BIT32_SAFE(x_) - 1U)
+# define MASK64_SAFE(x_) (BIT64_SAFE(x_) - 1ULL)
+
+# define FLAG(name_) name_ = BIT32(name_##_BIT)
 
 #endif /* !STRACE_MACROS_H */
