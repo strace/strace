@@ -36,6 +36,11 @@
 struct trie {
 	/** Return value of trie_get if key is not found */
 	uint64_t empty_value;
+	/**
+	 * Empty value copied over to fill the whole uint64_t.
+	 * Pre-calculated in trie_create to be used in trie_create_data_block.
+	 */
+	uint64_t fill_value;
 
 	/** Pointer to root node */
 	void *data;

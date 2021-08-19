@@ -78,7 +78,14 @@ trie_create(uint8_t key_size, uint8_t item_size_lg, uint8_t node_key_bits,
 	if (!t)
 		return NULL;
 
-	t->empty_value = empty_value;
+	uint64_t fill_value = t->empty_value =
+			empty_value & MASK64_SAFE(BIT32(item_size_lg));
+	for (size_t i = 1; i < BIT32(6 - item_size_lg); i++) {
+		fill_value <<= BIT32(item_size_lg);
+		fill_value |= t->empty_value;
+	}
+	t->fill_value = fill_value;
+
 	t->data = NULL;
 	t->item_size_lg = item_size_lg;
 	t->node_key_bits = node_key_bits;
@@ -87,21 +94,12 @@ trie_create(uint8_t key_size, uint8_t item_size_lg, uint8_t node_key_bits,
 	t->max_depth = (key_size - data_block_key_bits + node_key_bits - 1)
 		/ t->node_key_bits;
 
-	if (item_size_lg != 6)
-		t->empty_value &= MASK64(BIT32(t->item_size_lg));
-
 	return t;
 }
 
 static void *
 trie_create_data_block(struct trie *t)
 {
-	uint64_t fill_value = t->empty_value;
-	for (size_t i = 1; i < BIT32(6 - t->item_size_lg); i++) {
-		fill_value <<= BIT32(t->item_size_lg);
-		fill_value |= t->empty_value;
-	}
-
 	uint8_t sz = t->data_block_key_bits + t->item_size_lg;
 	if (sz < 6)
 		sz = 6;
@@ -110,7 +108,7 @@ trie_create_data_block(struct trie *t)
 	uint64_t *data_block = xcalloc(count, 8);
 
 	for (size_t i = 0; i < count; i++)
-		data_block[i] = fill_value;
+		data_block[i] = t->fill_value;
 
 	return data_block;
 }
