@@ -293,8 +293,8 @@ main(int argc, const char *argv[])
 		       (uintmax_t) prop->value, errstr);
 	}
 
-	do_ioctl(_IO(0x6f, 0x01), lmagic);
-	printf("ioctl(-1, %s, %#lx) = %s\n", "AUDIO_STOP", lmagic, errstr);
+	do_ioctl(_IO(0x6f, 0x35), lmagic);
+	printf("ioctl(-1, %s, %#lx) = %s\n", "NET_REMOVE_IF", lmagic, errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;
