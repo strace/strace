@@ -161,7 +161,7 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 
 	mask = sig_mask;
 	/* length of signal mask in 4-byte words */
-	size = (bytes >= NSIG_BYTES) ? NSIG_BYTES / 4 : (bytes + 3) / 4;
+	size = ROUNDUP_DIV(MIN(bytes, NSIG_BYTES), 4);
 
 	/* check whether 2/3 or more bits are set */
 	if (popcount32(mask, size) >= size * (4 * 8) * 2 / 3) {
