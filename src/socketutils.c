@@ -629,7 +629,7 @@ genl_families_xlat(struct tcb *tcp)
 	static struct dyxlat *dyxlat;
 
 	if (!dyxlat) {
-		dyxlat = dyxlat_alloc(32);
+		dyxlat = dyxlat_alloc(32, XT_NORMAL);
 
 		int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
 		if (fd < 0)

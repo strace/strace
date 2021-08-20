@@ -13,11 +13,11 @@ struct dyxlat {
 };
 
 struct dyxlat *
-dyxlat_alloc(const size_t nmemb)
+dyxlat_alloc(const size_t nmemb, enum xlat_type type)
 {
 	struct dyxlat *const dyxlat = xmalloc(sizeof(*dyxlat));
 
-	dyxlat->xlat.type = XT_NORMAL;
+	dyxlat->xlat.type = type;
 	dyxlat->xlat.size = 0;
 	dyxlat->allocated = nmemb;
 	dyxlat->xlat.data = dyxlat->data = xgrowarray(NULL, &dyxlat->allocated,
