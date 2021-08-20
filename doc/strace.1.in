@@ -1116,7 +1116,7 @@ but also print regular output while processes are running.
 .TP
 .BI "\-O " overhead
 .TQ
-.BR "\-\-summary\-syscall\-overhead " = \fIoverhead\fR
+.BR "\-\-summary\-syscall\-overhead" = \fIoverhead\fR
 Set the overhead for tracing system calls to
 .IR overhead .
 This is useful for overriding the default heuristic for guessing
