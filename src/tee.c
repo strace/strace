@@ -33,7 +33,7 @@ struct tee_ioctl_shm_register_fd_data {
 
 #define TEE_FETCH_BUF_DATA(buf_, arg_, params_) \
 	tee_fetch_buf_data(tcp, arg, &buf_, sizeof(arg_), \
-			   &arg_, &arg_.num_params, \
+			   &arg_, offsetof(typeof(arg_), num_params), \
 			   params_)
 
 /* session id is printed as 0x%x in libteec */
@@ -56,7 +56,7 @@ tee_fetch_buf_data(struct tcb *const tcp,
 		   struct tee_ioctl_buf_data *buf,
 		   size_t arg_size,
 		   void *arg_struct,
-		   unsigned *num_params,
+		   size_t num_params_offs,
 		   uint64_t *params)
 {
 	if (umove_or_printaddr(tcp, arg, buf))
@@ -69,6 +69,7 @@ tee_fetch_buf_data(struct tcb *const tcp,
 		tee_print_buf(buf);
 		return RVAL_IOCTL_DECODED;
 	}
+	uint32_t *num_params = (uint32_t *) (arg_struct + num_params_offs);
 	if (entering(tcp) &&
 	    (arg_size + TEE_IOCTL_PARAM_SIZE(*num_params) != buf->buf_len)) {
 		/*
