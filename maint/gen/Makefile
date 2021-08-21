@@ -9,7 +9,15 @@ TARGET = gen
 OBJ = parse.tab.o lex.yy.o ast.o codegen.o symbols.o preprocess.o xmalloc.o
 DEPS = $(OBJ:.o=.d)
 
-all: $(TARGET)
+GEN_IN = hdio.def
+GEN_OUT_DIR=../../src/gen
+GEN_OUT = $(patsubst %.def,$(GEN_OUT_DIR)/gen_%.c,$(GEN_IN))
+
+all: $(TARGET) $(GEN_OUT)
+
+$(GEN_OUT_DIR)/gen_%.c: defs/%.def $(TARGET)
+	mkdir -p $(GEN_OUT_DIR)
+	./gen $< $@
 
 gen: $(OBJ)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ -o $@

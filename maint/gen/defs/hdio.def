@@ -1,0 +1,59 @@
+/*
+ * Copyright (c) 2021 Srikavin Ramkumar <srikavinramkumar@gmail.com>
+ * Copyright (c) 2021 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+#import "defs/common.def"
+
+include <linux/hdreg.h>
+
+include "xlat/hdio_ide_nice.h"
+include "xlat/hdio_busstates.h"
+
+ioctl$HDIO(fd fd, code kernel_ulong_t, arg3 kernel_ulong_t)
+
+ioctl$HDIO$GET_UNMASKINTR(fd fd, code const[HDIO_GET_UNMASKINTR], unmaskintr ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_UNMASKINTR(fd fd, code const[HDIO_SET_UNMASKINTR], unmaskintr kernel_ulong_t)
+
+ioctl$HDIO$GET_MULTCOUNT(fd fd, code const[HDIO_GET_MULTCOUNT], multcount ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_MULTCOUNT(fd fd, code const[HDIO_SET_MULTCOUNT], multcount kernel_ulong_t)
+
+ioctl$HDIO$OBSOLETE_IDENTITY(fd fd, code const[HDIO_OBSOLETE_IDENTITY], identity ptr[out, stringnoz[142]])
+ioctl$HDIO$GET_IDENTITY(fd fd, code const[HDIO_GET_IDENTITY], identity ptr[out, stringnoz[512]])
+
+ioctl$HDIO$GET_KEEPSETTINGS(fd fd, code const[HDIO_GET_KEEPSETTINGS], keep_settings ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_KEEPSETTINGS(fd fd, code const[HDIO_SET_KEEPSETTINGS], keep_settings kernel_ulong_t)
+
+ioctl$HDIO$GET_32BIT(fd fd, code const[HDIO_GET_32BIT], arg ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_32BIT(fd fd, code const[HDIO_SET_32BIT], arg kernel_ulong_t)
+
+ioctl$HDIO$GET_NOWERR(fd fd, code const[HDIO_GET_NOWERR], arg ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_NOWERR(fd fd, code const[HDIO_SET_NOWERR], arg kernel_ulong_t)
+
+ioctl$HDIO$GET_DMA(fd fd, code const[HDIO_GET_DMA], arg ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_DMA(fd fd, code const[HDIO_SET_DMA], arg kernel_ulong_t)
+
+ioctl$HDIO$GET_NICE(fd fd, code const[HDIO_GET_NICE], arg ptr[out, or_flags[hdio_ide_nice, IDE_NICE_???, kernel_ulong_t]])
+ioctl$HDIO$SET_NICE(fd fd, code const[HDIO_SET_NICE], arg or_flags[hdio_ide_nice, IDE_NICE_???, kernel_ulong_t])
+
+ioctl$HDIO$GET_WCACHE(fd fd, code const[HDIO_GET_WCACHE], arg ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_WCACHE(fd fd, code const[HDIO_SET_WCACHE], arg kernel_ulong_t)
+
+ioctl$HDIO$GET_ACOUSTIC(fd fd, code const[HDIO_GET_ACOUSTIC], arg ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_ACOUSTIC(fd fd, code const[HDIO_SET_ACOUSTIC], arg kernel_ulong_t)
+
+ioctl$HDIO$GET_ADDRESS(fd fd, code const[HDIO_GET_ADDRESS], arg ptr[out, kernel_ulong_t])
+ioctl$HDIO$SET_ADDRESS(fd fd, code const[HDIO_SET_ADDRESS], arg kernel_ulong_t)
+
+ioctl$HDIO$GET_BUSSTATE(fd fd, code const[HDIO_GET_BUSSTATE], arg ptr[out, xor_flags[hdio_busstates, BUSSTATE_???, kernel_ulong_t]])
+ioctl$HDIO$SET_BUSSTATE(fd fd, code const[HDIO_SET_BUSSTATE], arg xor_flags[hdio_busstates, BUSSTATE_???, kernel_ulong_t])
+
+ioctl$HDIO$SET_PIO_MODE(fd fd, code const[HDIO_SET_PIO_MODE], arg kernel_ulong_t)
+
+ioctl$HDIO$UNREGISTER_HWIF(fd fd, code const[HDIO_UNREGISTER_HWIF], arg kernel_ulong_t)
+
+ioctl$HDIO$DRIVE_RESET(fd fd, code const[HDIO_DRIVE_RESET], arg ptr[in, array[uint32_t, 3]])
+ioctl$HDIO$SCAN_HWIF(fd fd, code const[HDIO_SCAN_HWIF], arg ptr[in, array[uint32_t, 3]])

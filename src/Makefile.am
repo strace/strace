@@ -132,6 +132,8 @@ libstrace_a_SOURCES =	\
 	fstatfs64.c \
 	futex.c		\
 	gcc_compat.h	\
+	gen/gen_hdio.c	\
+	gen/generated.h	\
 	get_personality.c \
 	get_personality.h \
 	get_robust_list.c \
