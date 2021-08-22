@@ -150,6 +150,25 @@ xstrndup(const char *str, size_t n)
 	return p;
 }
 
+void *
+xmemdup(const void *src, size_t size)
+{
+	if (!src)
+		return NULL;
+
+	return memcpy(xmalloc(size), src, size);
+}
+
+void *
+xarraydup(const void *src, size_t nmemb, size_t memb_size)
+{
+	if (!src)
+		return NULL;
+
+	/* (nmemb * memb_size) checks are already done inside xallocarray */
+	return memcpy(xallocarray(nmemb, memb_size), src, nmemb * memb_size);
+}
+
 char *
 xasprintf(const char *fmt, ...)
 {
