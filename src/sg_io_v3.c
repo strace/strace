@@ -86,12 +86,9 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_SG_IO_BUFFER(sg_io, dxferp, sg_io.dxfer_len, sg_io.iovec_count, tcp);
 	}
 
-	struct_sg_io_hdr *entering_sg_io = malloc(sizeof(*entering_sg_io));
-	if (entering_sg_io) {
-		memcpy(entering_sg_io, &sg_io, sizeof(sg_io));
-		entering_sg_io->interface_id = (unsigned char) 'S';
-		set_tcb_priv_data(tcp, entering_sg_io, free);
-	}
+	struct_sg_io_hdr *entering_sg_io = xobjdup(&sg_io);
+	entering_sg_io->interface_id = (unsigned char) 'S';
+	set_tcb_priv_data(tcp, entering_sg_io, free);
 
 	return 0;
 }

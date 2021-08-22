@@ -3114,11 +3114,7 @@ init_trace_wait_data(void *p)
 static struct tcb_wait_data *
 copy_trace_wait_data(const struct tcb_wait_data *wd)
 {
-	struct tcb_wait_data *new_wd = xmalloc(sizeof(*new_wd));
-
-	memcpy(new_wd, wd, sizeof(*wd));
-
-	return new_wd;
+	return xobjdup(wd);
 }
 
 static void

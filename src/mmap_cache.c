@@ -176,8 +176,7 @@ mmap_cache_rebuild_if_invalid(struct tcb *tcp, const char *caller)
 	if (!cache.size)
 		return MMAP_CACHE_REBUILD_NOCACHE;
 
-	tcp->mmap_cache = xmalloc(sizeof(*tcp->mmap_cache));
-	memcpy(tcp->mmap_cache, &cache, sizeof(cache));
+	tcp->mmap_cache = xobjdup(&cache);
 
 	debug_func_msg("tgen=%u, ggen=%u, tcp=%p, cache=%p, caller=%s",
 		       tcp->mmap_cache->generation, mmap_cache_generation,
