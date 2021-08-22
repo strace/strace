@@ -492,7 +492,7 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 {
 	if (!tcp->inject_vec[current_personality]) {
 		tcp->inject_vec[current_personality] =
-			xcalloc(nsyscalls, sizeof(**inject_vec));
+			xallocarray(nsyscalls, sizeof(**inject_vec));
 		memcpy(tcp->inject_vec[current_personality],
 		       inject_vec[current_personality],
 		       nsyscalls * sizeof(**inject_vec));
