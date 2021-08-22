@@ -78,13 +78,10 @@ trie_create(uint8_t key_size, uint8_t item_size_lg, uint8_t node_key_bits,
 	if (!t)
 		return NULL;
 
-	uint64_t fill_value = t->empty_value =
+	t->fill_value = t->empty_value =
 			empty_value & MASK64_SAFE(BIT32(item_size_lg));
-	for (size_t i = 1; i < BIT32(6 - item_size_lg); i++) {
-		fill_value <<= BIT32(item_size_lg);
-		fill_value |= t->empty_value;
-	}
-	t->fill_value = fill_value;
+	for (size_t i = 0; i < 6U - item_size_lg; i++)
+		t->fill_value |= t->fill_value << BIT32(item_size_lg + i);
 
 	t->data = NULL;
 	t->item_size_lg = item_size_lg;
