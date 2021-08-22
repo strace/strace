@@ -1217,8 +1217,10 @@ At least one of
 .BR retval ,
 .BR signal ,
 .BR delay_enter ,
+.BR delay_exit ,
+.BR poke_enter ,
 or
-.B delay_exit
+.B poke_exit
 options has to be specified.
 .B error
 and
