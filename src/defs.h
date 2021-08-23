@@ -219,9 +219,9 @@ typedef struct ioctlent {
 	unsigned int code;
 } struct_ioctlent;
 
-# define INJECT_F_SIGNAL		0x01
+# define INJECT_F_SIGNAL	0x01
 # define INJECT_F_ERROR		0x02
-# define INJECT_F_RETVAL		0x04
+# define INJECT_F_RETVAL	0x04
 # define INJECT_F_DELAY_ENTER	0x08
 # define INJECT_F_DELAY_EXIT	0x10
 # define INJECT_F_SYSCALL	0x20
