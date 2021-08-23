@@ -1381,12 +1381,11 @@ use
 \fB\-e\ inject\fR=\,\fIchdir\/\fR:\fBerror\fR=\,\fIENOENT\/\fR:\fBwhen\fR=\,\fI3\/\fB+\fR.
 .IP
 The valid range for numbers
-.I first
+.IR first ,
+.IR step ,
 and
-.I step
-is 1..65535, and for number
 .I last
-is 1..65534.
+is 1..4294967294.
 .IP
 An injection expression can contain only one
 .BR error =

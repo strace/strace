@@ -255,9 +255,9 @@ struct inject_data {
 };
 
 struct inject_opts_item {
-	uint16_t first;
-	uint16_t last;
-	uint16_t step;
+	uint32_t first;
+	uint32_t last;
+	uint32_t step;
 	struct inject_data data;
 };
 
@@ -266,7 +266,8 @@ struct inject_opts {
 	size_t cnt;
 };
 
-# define INJECT_LAST_INF	((uint16_t) -1)
+# define INJECT_WHEN_MAX	0xfffffffeU
+# define INJECT_LAST_INF	(-1U)
 
 # define MAX_ERRNO_VALUE			4095
 

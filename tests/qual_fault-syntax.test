@@ -18,9 +18,20 @@
 fail_with()
 {
 	dump_log_and_fail_with \
-		"strace -e fault=$* failed to handle an argument error properly"
+		"strace -e fault=$* failed to handle an argument properly"
 }
 
+# Expected to succeed
+for arg in chdir:when=42..4294967294+ \
+	   chdir:when=4294967294 \
+	   chdir:when=4294967294+ \
+	   chdir:when=42+4294967294 \
+	   chdir:when=4294967294..4294967294+4294967294 \
+	   ; do
+	$STRACE -e fault="$arg" true 2> "$LOG" || fail_with "$arg"
+done
+
+# Expected to fail
 for arg in chdir:42 \!chdir:42 \
 	   chdir:42:when=7 \
 	   chdir:invalid \
@@ -60,10 +71,10 @@ for arg in chdir:42 \!chdir:42 \
 	   chdir:when=8+-1:error=28 \
 	   chdir:when=9+1+ \
 	   chdir:when=9+1+:error=29 \
-	   chdir:when=65536 \
-	   chdir:when=65536:error=30 \
-	   chdir:when=1+65536 \
-	   chdir:when=1+65536:error=31 \
+	   chdir:when=4294967295 \
+	   chdir:when=4294967295:error=30 \
+	   chdir:when=1+4294967295 \
+	   chdir:when=1+4294967295:error=31 \
 	   chdir:retval=0 \
 	   chdir:signal=1 \
 	   chdir:error=1:error=2 \
@@ -90,10 +101,10 @@ for arg in chdir:42 \!chdir:42 \
 	   chdir:when=..22+3 \
 	   chdir:when=24..23 \
 	   chdir:when=25..26+0 \
-	   chdir:when=27..65535 \
-	   chdir:when=28..65535+ \
-	   chdir:when=65535..65535 \
-	   chdir:when=65535..65535+ \
+	   chdir:when=27..4294967295 \
+	   chdir:when=28..4294967295+ \
+	   chdir:when=4294967295..4294967295 \
+	   chdir:when=4294967295..4294967295+ \
 	   ; do
 	$STRACE -e fault="$arg" true 2> "$LOG" &&
 		fail_with "$arg"

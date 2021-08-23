@@ -63,10 +63,10 @@ for arg in 42 chdir \
 	   chdir:when=8+-1:error=28 \
 	   chdir:when=9+1+ \
 	   chdir:when=9+1+:error=29 \
-	   chdir:when=65536 \
-	   chdir:when=65536:error=30 \
-	   chdir:when=1+65536 \
-	   chdir:when=1+65536:error=31 \
+	   chdir:when=4294967295 \
+	   chdir:when=4294967295:error=30 \
+	   chdir:when=1+4294967295 \
+	   chdir:when=1+4294967295:error=31 \
 	   chdir:retval=a \
 	   chdir:retval=0b \
 	   chdir:retval=0x10000000000000000 \
@@ -108,10 +108,10 @@ for arg in 42 chdir \
 	   chdir:when=..22+3 \
 	   chdir:when=24..23 \
 	   chdir:when=25..26+0 \
-	   chdir:when=27..65535 \
-	   chdir:when=28..65535+ \
-	   chdir:when=65535..65535 \
-	   chdir:when=65535..65535+ \
+	   chdir:when=27..4294967295 \
+	   chdir:when=28..4294967295+ \
+	   chdir:when=4294967295..4294967295 \
+	   chdir:when=4294967295..4294967295+ \
 	   chdir:poke_enter= \
 	   chdir:poke_exit= \
 	   chdir:poke_enter=invalid \
