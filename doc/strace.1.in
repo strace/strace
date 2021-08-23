@@ -1288,9 +1288,11 @@ Conversely, :\fBerror\fR=\,\fIerrno\/\fR or
 :\fBsignal\fR=\,\fIsig\/\fR options injects a fault without delivering a signal
 or injecting a delay, etc.
 .IP
-If both :\fBerror\fR=\,\fIerrno\/\fR or :\fBretval\fR=\,\fIvalue\/\fR
-and :\fBsignal\fR=\,\fIsig\/\fR options are specified, then both
-a fault or success is injected and a signal is delivered.
+If
+:\fBsignal\fR=\,\fIsig\/\fR
+option is specified together with
+:\fBerror\fR=\,\fIerrno\/\fR or :\fBretval\fR=\,\fIvalue\/\fR,
+then both injection of a fault or success and signal delivery are performed.
 .IP
 if :\fBsyscall\fR=\fIsyscall\fR option is specified, the corresponding syscall
 with no side effects is injected instead of -1.
