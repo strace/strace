@@ -120,10 +120,13 @@ find_errno_by_name(const char *name)
 }
 
 static bool
-parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
+parse_delay_token(const char *input, struct inject_opts_item *fopts,
+		  bool isenter)
 {
        unsigned flag = isenter ? INJECT_F_DELAY_ENTER : INJECT_F_DELAY_EXIT;
 
+	if (fopts->data.flags == INJECT_F_NONE)
+		return false;
        if (fopts->data.flags & flag) /* duplicate */
                return false;
        struct timespec tsval;
@@ -141,7 +144,8 @@ parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
 }
 
 static bool
-parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
+parse_poke_token(const char *input, struct inject_opts_item *fopts,
+		 bool isenter)
 {
 	char *token, *str_tokenized, *saveptr = NULL;
 	const char *val;
@@ -149,6 +153,8 @@ parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 	unsigned flag = isenter ? INJECT_F_POKE_ENTER : INJECT_F_POKE_EXIT;
 	struct poke_payload *poke;
 
+	if (fopts->data.flags == INJECT_F_NONE)
+		return false;
 	/* disallow duplicates */
 	if (fopts->data.flags & flag)
 		return false;
@@ -243,7 +249,8 @@ check_inadvertent_fault_injection(unsigned long long ullval)
 }
 
 static bool
-parse_inject_token(const char *const token, struct inject_opts *const fopts,
+parse_inject_token(const char *const token,
+		   struct inject_opts_item *const fopts,
 		   struct inject_personality_data *const pdata,
 		   const bool fault_tokens_only)
 {
@@ -314,7 +321,13 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 				fopts->step = 1;
 			}
 		}
+	} else if ((val = STR_STRIP_PREFIX(token, "none")) != token) {
+		if (fopts->data.flags)
+			return false;
+		fopts->data.flags = INJECT_F_NONE;
 	} else if ((val = STR_STRIP_PREFIX(token, "syscall=")) != token) {
+		if (fopts->data.flags == INJECT_F_NONE)
+			return false;
 		if (fopts->data.flags & INJECT_F_SYSCALL)
 			return false;
 
@@ -336,6 +349,8 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 
 		fopts->data.flags |= INJECT_F_SYSCALL;
 	} else if ((val = STR_STRIP_PREFIX(token, "error=")) != token) {
+		if (fopts->data.flags == INJECT_F_NONE)
+			return false;
 		if (fopts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL))
 			return false;
 		intval = string_to_uint_upto(val, MAX_ERRNO_VALUE);
@@ -348,6 +363,8 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "retval=")) != token) {
 
+		if (fopts->data.flags == INJECT_F_NONE)
+			return false;
 		if (fopts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL))
 			return false;
 
@@ -363,6 +380,8 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 		fopts->data.flags |= INJECT_F_RETVAL;
 	} else if (!fault_tokens_only
 		   && (val = STR_STRIP_PREFIX(token, "signal=")) != token) {
+		if (fopts->data.flags == INJECT_F_NONE)
+			return false;
 		if (fopts->data.flags & INJECT_F_SIGNAL)
 			return false;
 		intval = sigstr_to_uint(val);
@@ -395,7 +414,7 @@ parse_inject_token(const char *const token, struct inject_opts *const fopts,
 
 static const char *
 parse_inject_expression(char *const str,
-			struct inject_opts *const fopts,
+			struct inject_opts_item *const fopts,
 			struct inject_personality_data *const pdata,
 			const bool fault_tokens_only)
 {
@@ -504,7 +523,7 @@ qualify_inject_common(const char *const str,
 		      const bool fault_tokens_only,
 		      const char *const description)
 {
-	struct inject_opts opts = {
+	struct inject_opts_item opts = {
 		.first = 1,
 		.last = INJECT_LAST_INF,
 		.step = 1,
@@ -557,12 +576,17 @@ qualify_inject_common(const char *const str,
 
 		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 			if (is_number_in_set_array(i, tmp_set, p)) {
-				add_number_to_set_array(i, inject_set, p);
-				inject_vec[p][i] = opts;
-
 				/* Copy per-personality data.  */
-				inject_vec[p][i].data.scno =
-					pdata[p].scno;
+				opts.data.scno = pdata[p].scno;
+
+				add_number_to_set_array(i, inject_set, p);
+				inject_vec[p][i].cnt += 1,
+				inject_vec[p][i].items = xreallocarray(
+					inject_vec[p][i].items,
+					inject_vec[p][i].cnt,
+					sizeof(inject_vec[p][i].items[0]));
+				inject_vec[p][i].items[inject_vec[p][i].cnt - 1]
+						= opts;
 			}
 		}
 	}

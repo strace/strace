@@ -20,6 +20,7 @@ N=100
 : ${suffix=}
 [ -z "${name_override-}" ] || NAME="$name_override"
 
+# check_fault_injection trace_expr fault error first last step num_procs extra_args
 check_fault_injection()
 {
 	local trace fault err first last step procs extra
@@ -30,7 +31,6 @@ check_fault_injection()
 	last=$1; shift
 	step=$1; shift
 	procs=$1; shift
-	extra="$*"
 
 	local when=
 	if [ -z "$first$last$step" ]; then
@@ -53,26 +53,44 @@ check_fault_injection()
 
 	local error=
 	local raw=reg
-	set --
 	case "$err" in
 		'') ;;
-		[123456789]*)
+		[1-9]*)
 			error=":error=$err"
 			raw=raw
-			set -- -e raw=all
+			set -- -e raw=all "$@"
 			;;
 		*) error=":error=$err" ;;
 	esac
+
+	set -- -e "fault=$fault$when$error$suffix" "$@"
+
+	run_fault_injection_check "$trace" "$raw" "$err" \
+				  "$first" "$last" "$step" \
+				  "$procs" '' "$@"
+}
+
+# run_fault_injection_check trace raw err first last step procs fail_list args...
+run_fault_injection_check()
+{
+	local trace raw err first last step procs extra
+	trace=$1; shift
+	raw=$1; shift
+	err=$1; shift
+	first=$1; shift
+	last=$1; shift
+	step=$1; shift
+	procs=$1; shift
+	fail_list=$1; shift
 
 	outexp="$NAME.out.exp"
 	outgot="$NAME.out.got"
 	outout="$NAME.out.out"
 	outpid="$NAME.pid"
 
-	run_strace -a11 -ff -e trace=$trace \
-		"$@" -e fault=$fault$when$error$suffix $extra \
-		../$NAME $raw "$err" "$first" "$last" "$step" $N \
-		"$procs" "$outexp" "$outgot" "$outout" "$outpid"
+	run_strace -a11 -ff -e trace=$trace "$@" \
+		../$NAME $raw "$err" "$first" "$last" "$step" "$N" \
+		"$procs" "$outexp" "$outgot" "$outout" "$outpid" "$fail_list"
 
 	for i in $(seq 0 $((procs - 1)) )
 	do
@@ -119,5 +137,22 @@ for err in '' ENOSYS 22 einval; do
 				done
 			done
 		done
+	done
+done
+
+for i in 'writev:none writev:when=3..5 writev:when=7:error=einval writev:when=9..14+3 writev:when=98+|3 4 5 7:22 9 12 98 99 100' \
+	 'writev:when=3..17 chdir,writev:when=5..11+2:none chdir:when=1..6:none writev:when=16+:none|3 4 6 8 10 12 13 14 15' \
+	 'writev:when=1..17 writev:when=1..5:none writev:when=12..20:none writev:when=20:error=23 writev:when=16..22 writev:when=19:error=42|6 7 8 9 10 11 16 17 18 19:42 20 21 22'
+do
+	args="${i%|*}"
+	fail_list="${i#*|}"
+	opts=""
+	for arg in $args; do
+		opts="$opts -efault=$arg"
+	done
+
+	for procs in 1 5; do
+		run_fault_injection_check writev reg ENOSYS 1 1 1 \
+			"$procs" "$fail_list" $opts
 	done
 done

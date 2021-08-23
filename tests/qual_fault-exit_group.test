@@ -28,7 +28,7 @@ test_with -eexit,exit_group -efault=exit_group:error=ENOSYS \
 	  -efault=\!process:error=1 ../answer
 
 test_with -eexit,exit_group -efault=all:error=ENOSYS \
-	  -efault=exit:error=1:when=2+ ../answer
+	  -einject=exit:none:when=1+ -efault=exit:error=1:when=2+ ../answer
 
 test_with -eexit,exit_group -efault=exit_group:error=ENOSYS \
 	  -efault=\!%desc,%file,%memory,%process,%signal,%network,%ipc:error=1 ../answer

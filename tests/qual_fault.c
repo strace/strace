@@ -28,11 +28,10 @@ static int out_fd;
 
 #define DEFAULT_ERRNO ENOSYS
 
-static const char *errstr;
-static int is_raw, err;
+static int is_raw;
 
 static void
-invoke(int iter, int fail)
+invoke(int iter, int fail, int err, const char *errstr)
 {
 	static char buf[sizeof(int) * 3 + 3];
 	static int try;
@@ -97,29 +96,86 @@ open_file(const char *prefix, int proc)
 	return fd;
 }
 
-int
-main(int argc, char *argv[])
+static char *
+parse_next_uint(const char *str, int *val_ptr)
 {
-	assert(argc == 12);
+	char *endptr;
+	long val;
 
-	is_raw = !strcmp("raw", argv[1]);
+	if (str == NULL) {
+		*val_ptr = -1;
+		return NULL;
+	}
 
-	errstr = argv[2];
-	err = atoi(errstr);
-	assert(err >= 0);
+	errno = 0;
+	val = strtol(str, &endptr, 0);
+
+	if (errno) {
+		perror_msg_and_fail("strtol");
+	} else if (val < 0 || val > INT_MAX) {
+		error_msg_and_fail("strtol(\"%s\") returned a value "
+				   "out of 0..INT_MAX", str);
+	}
+
+	*val_ptr = val;
+	return *endptr ? endptr : NULL;
+}
+
+static int
+parse_err(const char *str, char **endptr, const char **errstr)
+{
+	int err = str ? strtol(str, endptr, 0) : DEFAULT_ERRNO;
+	assert(err >= 0 && err < 4096);
 
 	if (!err) {
-		if (!*errstr)
+		if (!*str)
 			err = DEFAULT_ERRNO;
-		else if (!strcasecmp(errstr, "EINVAL"))
+		else if (!strcasecmp(str, "EINVAL"))
 			err = EINVAL;
 		else
 			err = ENOSYS;
 	}
 
-	errno = err;
-	errstr = errno2name();
+	if (errstr) {
+		errno = err;
+		*errstr = errno2name();
+	}
 
+	return err;
+}
+
+/*
+ * Fault list is whitespace-separated list of iter[:err] speifications,
+ * where iter is to grow monotonically.
+ */
+static const char *
+parse_fault(const char *str, int *val, int *err, const char **errstr)
+{
+	const char *pos = parse_next_uint(str, val);
+
+	if (pos == NULL)
+		return NULL;
+	if (pos[0] == ':') {
+		char *endptr;
+		*err = parse_err(pos + 1, &endptr, errstr);
+		pos = endptr;
+	} else {
+		*err = DEFAULT_ERRNO;
+		errno = *err;
+		*errstr = errno2name();
+	}
+
+	return pos;
+}
+
+int
+main(int argc, char *argv[])
+{
+	assert(argc == 12 || argc == 13);
+
+	is_raw = !strcmp("raw", argv[1]);
+	const char *errstr;
+	int err = parse_err(argv[2], NULL, &errstr);
 	int first = atoi(argv[3]);
 	int last = atoi(argv[4]);
 	int step = atoi(argv[5]);
@@ -129,6 +185,13 @@ main(int argc, char *argv[])
 	char *got_prefix = argv[9];
 	char *out_prefix = argv[10];
 	char *pid_prefix = argv[11];
+	/* Overrides first/last/step calculation */
+	const char *iter_list = argc > 12 && argv[12][0] ? argv[12] : NULL;
+	int next_err = err;
+	const char *next_errstr = errstr;
+	int next_fail = -1;
+
+	iter_list = parse_fault(iter_list, &next_fail, &next_err, &next_errstr);
 
 	assert(first > 0);
 	assert(step >= 0);
@@ -166,16 +229,27 @@ main(int argc, char *argv[])
 		int i;
 		for (i = 1; i <= iter; ++i) {
 			int fail = 0;
-			if (last != 0) {
-				--first;
-				if (last != -1)
-					--last;
-				if (first == 0) {
-					fail = 1;
-					first = step;
+			if (argc > 12 && argv[12][0]) {
+				if (i == next_fail) {
+					invoke(i, true, next_err, next_errstr);
+					iter_list = parse_fault(iter_list,
+								&next_fail,
+								&next_err,
+								&next_errstr);
+					continue;
+				}
+			} else {
+				if (last != 0) {
+					--first;
+					if (last != -1)
+						--last;
+					if (first == 0) {
+						fail = 1;
+						first = step;
+					}
 				}
 			}
-			invoke(i, fail);
+			invoke(i, fail, err, errstr);
 		}
 
 		tprintf("%s\n", "+++ exited with 0 +++");

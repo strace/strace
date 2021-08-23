@@ -479,45 +479,66 @@ static void arch_get_syscall_args_extra(struct tcb *, unsigned int);
 
 struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
 
+static inline void
+copy_tcb_inject_vec(struct tcb *tcp)
+{
+	if (tcp->inject_vec[current_personality])
+		return;
+
+	tcp->inject_vec[current_personality] =
+		xarraydup(inject_vec[current_personality],
+			  nsyscalls, sizeof(**inject_vec));
+
+	for (size_t i = 0 ; i < nsyscalls; i++) {
+		struct inject_opts *tcp_opts =
+			tcp->inject_vec[current_personality] + i;
+		struct inject_opts *opts = inject_vec[current_personality] + i;
+
+		if (opts->cnt) {
+			tcp_opts->items =
+				xarraydup(opts->items, opts->cnt,
+					  sizeof(inject_vec[0][0].items[0]));
+		}
+	}
+}
+
 static struct inject_opts *
 tcb_inject_opts(struct tcb *tcp)
 {
+	copy_tcb_inject_vec(tcp);
+
 	return (scno_in_range(tcp->scno) && tcp->inject_vec[current_personality])
 	       ? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
 }
 
-
 static long
 tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 {
-	if (!tcp->inject_vec[current_personality]) {
-		tcp->inject_vec[current_personality] =
-			xarraydup(inject_vec[current_personality],
-				  nsyscalls, sizeof(**inject_vec));
-	}
-
 	struct inject_opts *opts = tcb_inject_opts(tcp);
+	uint8_t flags = 0;
 
-	if (!opts || opts->first == 0 || opts->last == 0)
+	if (!opts)
 		return 0;
 
-	if (opts->last != INJECT_LAST_INF)
-		--opts->last;
+	if (recovering(tcp))
+		goto update_counters;
 
-	--opts->first;
+	for (ssize_t i = opts->cnt - 1; i >= 0; i--) {
+		struct inject_opts_item *opt = opts->items + i;
 
-	if (opts->first != 0)
-		return 0;
+		if (opt->first != 1 || opt->last == 0)
+			continue;
+		if (opt->data.flags == INJECT_F_NONE)
+			break;
+		if (flags & opt->data.flags)
+			continue;
 
-	opts->first = opts->step;
-
-	if (!recovering(tcp)) {
-		if (opts->data.flags & INJECT_F_SIGNAL)
-			*signo = opts->data.signo;
-		if (opts->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL)) {
+		if (opt->data.flags & INJECT_F_SIGNAL)
+			*signo = opt->data.signo;
+		if (opt->data.flags & (INJECT_F_ERROR | INJECT_F_RETVAL)) {
 			kernel_long_t scno =
-				(opts->data.flags & INJECT_F_SYSCALL)
-				? (kernel_long_t) shuffle_scno(opts->data.scno)
+				(opt->data.flags & INJECT_F_SYSCALL)
+				? (kernel_long_t) shuffle_scno(opt->data.scno)
 				: -1;
 
 			if (!arch_set_scno(tcp, scno)) {
@@ -531,23 +552,52 @@ tamper_with_syscall_entering(struct tcb *tcp, unsigned int *signo)
 				 */
 				else {
 					kernel_long_t rval =
-						(opts->data.flags & INJECT_F_RETVAL) ?
-						ENOSYS : retval_get(opts->data.rval_idx);
+						(opt->data.flags & INJECT_F_RETVAL) ?
+						ENOSYS : retval_get(opt->data.rval_idx);
 
 					tcp->u_error = 0; /* force reset */
 					set_error(tcp, rval);
 				}
 #endif
 			}
+			tcp->flags |= opt->data.flags & INJECT_F_RETVAL
+				? TCB_INJECT_RETVAL_EXIT
+				: TCB_INJECT_ERROR_EXIT;
+			tcp->rval_idx = opt->data.rval_idx;
+			flags |= INJECT_F_ERROR | INJECT_F_RETVAL;
 		}
-		if (opts->data.flags & INJECT_F_POKE_ENTER)
-			poke_tcb(tcp, opts->data.poke_idx, true);
-		if (opts->data.flags & INJECT_F_POKE_EXIT)
+		if (opt->data.flags & INJECT_F_POKE_ENTER)
+			poke_tcb(tcp, opt->data.poke_idx, true);
+		if (opt->data.flags & INJECT_F_POKE_EXIT) {
 			tcp->flags |= TCB_INJECT_POKE_EXIT;
-		if (opts->data.flags & INJECT_F_DELAY_ENTER)
-			delay_tcb(tcp, opts->data.delay_idx, true);
-		if (opts->data.flags & INJECT_F_DELAY_EXIT)
+			tcp->poke_idx = opt->data.poke_idx;
+		}
+		if (opt->data.flags & INJECT_F_DELAY_ENTER)
+			delay_tcb(tcp, opt->data.delay_idx, true);
+		if (opt->data.flags & INJECT_F_DELAY_EXIT) {
 			tcp->flags |= TCB_INJECT_DELAY_EXIT;
+			tcp->delay_idx = opt->data.delay_idx;
+		}
+
+		flags |= opt->data.flags;
+	}
+
+update_counters:
+	for (ssize_t i = opts->cnt - 1; i >= 0; i--) {
+		struct inject_opts_item *opt = opts->items + i;
+
+		if (opt->first == 0 || opt->last == 0)
+			continue;
+
+		if (opt->last != INJECT_LAST_INF)
+			--opt->last;
+
+		--opt->first;
+
+		if (opt->first != 0)
+			continue;
+
+		opt->first = opt->step;
 	}
 
 	return 0;
@@ -561,10 +611,10 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 		return 0;
 
 	if (inject_poke_exit(tcp))
-		poke_tcb(tcp, opts->data.poke_idx, false);
+		poke_tcb(tcp, tcp->poke_idx, false);
 
 	if (inject_delay_exit(tcp))
-		delay_tcb(tcp, opts->data.delay_idx, false);
+		delay_tcb(tcp, tcp->delay_idx, false);
 
 	if (!syscall_tampered(tcp))
 		return 0;
@@ -578,10 +628,10 @@ tamper_with_syscall_exiting(struct tcb *tcp)
 		return 1;
 	}
 
-	if (opts->data.flags & INJECT_F_RETVAL)
-		set_success(tcp, retval_get(opts->data.rval_idx));
-	else
-		set_error(tcp, retval_get(opts->data.rval_idx));
+	if (inject_retval_exit(tcp))
+		set_success(tcp, retval_get(tcp->rval_idx));
+	else if (inject_error_exit(tcp))
+		set_error(tcp, retval_get(tcp->rval_idx));
 
 	return 0;
 }
@@ -1013,8 +1063,10 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 void
 syscall_exiting_finish(struct tcb *tcp)
 {
-	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_DELAY_EXIT |
-			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED | TCB_TAMPERED_POKED);
+	tcp->flags &= ~(TCB_INSYSCALL | TCB_TAMPERED | TCB_INJECT_RETVAL_EXIT |
+			TCB_INJECT_ERROR_EXIT | TCB_INJECT_DELAY_EXIT |
+			TCB_INJECT_POKE_EXIT | TCB_TAMPERED_DELAYED |
+			TCB_TAMPERED_POKED);
 	tcp->sys_func_rval = 0;
 	free_tcb_priv_data(tcp);
 

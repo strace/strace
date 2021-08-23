@@ -1202,9 +1202,9 @@ Summarise the time difference between the beginning and end of
 each system call.  The default is to summarise the system time.
 .SS Tampering
 .TP 12
-\fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR][:none]
 .TQ
-\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR][:none]
 Perform syscall tampering for the specified set of syscalls.
 The syntax of the
 .I syscall_set
@@ -1219,13 +1219,16 @@ At least one of
 .BR delay_enter ,
 .BR delay_exit ,
 .BR poke_enter ,
+.BR poke_exit ,
 or
-.B poke_exit
+. B none
 options has to be specified.
 .B error
 and
 .B retval
-are mutually exclusive.
+are mutually exclusive;
+.B none
+is mutually exclusive with any other action.
 .IP
 If :\fBerror\fR=\,\fIerrno\/\fR option is specified,
 a fault is injected into a syscall invocation:
@@ -1299,6 +1302,11 @@ with no side effects is injected instead of -1.
 Currently, only "pure" (see
 .BR "-e trace" = "%pure"
 description) syscalls can be specified there.
+.IP
+If
+.RB : none
+option is specified, it prevents previously specified injections
+(in accordance with its syscall and :\fBwhen\fR=\,\fIexpr\fR filter).
 .IP
 Unless a :\fBwhen\fR=\,\fIexpr\fR subexpression is specified,
 an injection is being made into every invocation of each syscall from the
@@ -1392,6 +1400,34 @@ specifications, the last one takes precedence.
 .IP
 Accounting of syscalls that are subject to injection
 is done per syscall and per tracee.
+.IP
+Multiple injection expressions for the same syscall are evaluated in the order
+of their specification, for example:
+.CW
+$ src/strace -a 34 -e trace=ioctl \\
+             -e inject=ioctl:when=3..9:retval=42 \\
+             -e inject=ioctl:when=2+2:none \\
+             -e fault=ioctl:when=5..9+3 ioctl_test
+ioctl(-1, EVIOCGID, NULL)         = -1 EBADF (Bad file descriptor)
+ioctl(1, TCGETS, 0x7ffd411a3dc0)  = -1 ENOTTY (Inappropriate ioctl for device)
+ioctl(-1, EVIOCGID, NULL)         = 42 (INJECTED)
+ioctl(-1, EVIOCGID, NULL)         = -1 EBADF (Bad file descriptor)
+ioctl(-1, EVIOCGID, NULL)         = -1 ENOSYS (Function not implemented) (INJECTED)
+ioctl(-1, EVIOCGID, NULL)         = -1 EBADF (Bad file descriptor)
+ioctl(-1, EVIOCGID, NULL)         = 42 (INJECTED)
+ioctl(-1, EVIOCGID, NULL)         = -1 ENOSYS (Function not implemented) (INJECTED)
+ioctl(-1, EVIOCGID, NULL)         = 42 (INJECTED)
+ioctl(-1, EVIOCGID, NULL)         = -1 EBADF (Bad file descriptor)
+.CE
+Here, the first injection specification injects 42 to ioctl calls 3 thorugh 9;
+however, calls 4, 5, 6, and 8 are overridden by the following injection
+specifications: in case of calls 4 and 6 the injection was cancelled by the
+\fB\-e inject\fR=\fBioctl\fR:\fBwhen\fR=2+2:\fBnone\fR specification,
+and the calls 5 and 8 were mangled in accordance with the
+\fB\-e fault\fR=\fBioctl\fR:\fBwhen\fR=5..9+3 specification
+that also has taken precedence over the
+,B none
+injection action in the 8th call.
 .IP
 Specification of syscall injection can be combined
 with other syscall filtering options, for example,

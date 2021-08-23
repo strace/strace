@@ -227,6 +227,12 @@ typedef struct ioctlent {
 # define INJECT_F_SYSCALL	0x20
 # define INJECT_F_POKE_ENTER	0x40
 # define INJECT_F_POKE_EXIT	0x80
+/*
+ * This abomination of an impossible flag combination is used to avoid
+ * increasing the size of the flags variable.  Please allocate a separate bit
+ * once flags is inevitably increased in size.
+ */
+# define INJECT_F_NONE		(INJECT_F_ERROR | INJECT_F_RETVAL)
 
 # define INJECT_ACTION_FLAGS	\
 	(INJECT_F_SIGNAL	\
@@ -236,6 +242,7 @@ typedef struct ioctlent {
 	|INJECT_F_DELAY_EXIT	\
 	|INJECT_F_POKE_ENTER	\
 	|INJECT_F_POKE_EXIT	\
+	|INJECT_F_NONE		\
 	)
 
 struct inject_data {
@@ -247,11 +254,16 @@ struct inject_data {
 	uint16_t scno;		/* syscall to be injected instead of -1 */
 };
 
-struct inject_opts {
+struct inject_opts_item {
 	uint16_t first;
 	uint16_t last;
 	uint16_t step;
 	struct inject_data data;
+};
+
+struct inject_opts {
+	struct inject_opts_item *items;
+	size_t cnt;
 };
 
 # define INJECT_LAST_INF	((uint16_t) -1)
@@ -283,7 +295,12 @@ struct tcb {
 				     * scno.  Use tcp_sysent() macro for access.
 				     */
 	const struct_sysent *s_prev_ent; /* for "resuming interrupted SYSCALL" msg */
+
 	struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
+	uint16_t poke_idx;
+	uint16_t delay_idx;
+	uint16_t rval_idx;
+
 	struct timespec stime;	/* System time usage as of last process wait */
 	struct timespec ltime;	/* System time usage as of last syscall entry */
 	struct timespec atime;	/* System time right after attach */
@@ -351,18 +368,20 @@ struct tcb {
 						 * in the middle of a syscall */
 # define TCB_RECOVERING			0x800	/* We try to recover after detecting incorrect
 						 * syscall entering/exiting state */
-# define TCB_INJECT_DELAY_EXIT		0x1000	/* Current syscall needs to be delayed
+# define TCB_INJECT_RETVAL_EXIT		0x1000  /* return value to be injected on exit */
+# define TCB_INJECT_ERROR_EXIT		0x2000  /* error to be injected on exit */
+# define TCB_INJECT_DELAY_EXIT		0x4000	/* Current syscall needs to be delayed
 						   on exit */
-# define TCB_INJECT_POKE_EXIT		0x2000	/* The processes memory should be tampered
+# define TCB_INJECT_POKE_EXIT		0x8000	/* The processes memory should be tampered
 						   with on exit */
-# define TCB_DELAYED			0x4000	/* Current syscall is to be delayed */
-# define TCB_TAMPERED_DELAYED		0x8000	/* Current syscall has been delayed */
-# define TCB_TAMPERED_POKED		0x10000	/* Current syscall has been poked */
-# define TCB_TAMPERED_NO_FAIL		0x20000	/* We tamper tcb with syscall
+# define TCB_DELAYED			0x10000	/* Current syscall is to be delayed */
+# define TCB_TAMPERED_DELAYED		0x20000	/* Current syscall has been delayed */
+# define TCB_TAMPERED_POKED		0x40000	/* Current syscall has been poked */
+# define TCB_TAMPERED_NO_FAIL		0x80000	/* We tamper tcb with syscall
 						   that should not fail. */
-# define TCB_SECCOMP_FILTER		0x40000	/* This process has a seccomp filter
-						 * attached.
-						 */
+# define TCB_SECCOMP_FILTER		0x100000 /* This process has a seccomp filter
+						  * attached.
+						  */
 
 /* qualifier flags */
 # define QUAL_TRACE	0x001	/* this system call should be traced */
@@ -386,6 +405,8 @@ struct tcb {
 # define check_exec_syscall(tcp)	((tcp)->flags & TCB_CHECK_EXEC_SYSCALL)
 # define syscall_tampered(tcp)	((tcp)->flags & TCB_TAMPERED)
 # define recovering(tcp)	((tcp)->flags & TCB_RECOVERING)
+# define inject_retval_exit(tcp) ((tcp)->flags & TCB_INJECT_RETVAL_EXIT)
+# define inject_error_exit(tcp) ((tcp)->flags & TCB_INJECT_ERROR_EXIT)
 # define inject_delay_exit(tcp)	((tcp)->flags & TCB_INJECT_DELAY_EXIT)
 # define inject_poke_exit(tcp)	((tcp)->flags & TCB_INJECT_POKE_EXIT)
 # define syscall_delayed(tcp)	((tcp)->flags & TCB_DELAYED)

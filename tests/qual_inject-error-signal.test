@@ -16,3 +16,8 @@ run_strace -a12 -echdir,exit_group \
 	-einject=chdir:error=ENOENT:signal=USR1"$suffix" \
 	"../$NAME"
 match_diff
+
+run_strace -a12 -echdir,exit_group \
+	-einject=chdir:signal=sigusr1 -einject=chdir:error=ENOENT"$suffix" \
+	"../$NAME"
+match_diff

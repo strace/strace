@@ -964,6 +964,21 @@ free_tcb_priv_data(struct tcb *tcp)
 	}
 }
 
+static inline void
+free_tcb_inject_vec(struct tcb *tcp)
+{
+	for (size_t p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
+		if (!tcp->inject_vec[p])
+			continue;
+
+		for (size_t i = 0 ; i < nsyscalls; i++)
+			if (tcp->inject_vec[p][i].cnt)
+				free(tcp->inject_vec[p][i].items);
+
+		free(tcp->inject_vec[p]);
+	}
+}
+
 static void
 droptcb(struct tcb *tcp)
 {
@@ -978,10 +993,7 @@ droptcb(struct tcb *tcp)
 			       "since attach", tcp->pid, ts_float(&dt));
 	}
 
-	int p;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
-		free(tcp->inject_vec[p]);
-
+	free_tcb_inject_vec(tcp);
 	free_tcb_priv_data(tcp);
 
 #ifdef ENABLE_STACKTRACE

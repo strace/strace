@@ -1,7 +1,16 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behaviour
+ * Successive injection specifications for the same syscall no longer override
+   each other.
+
 * Improvements
+  * Added support for multiple injection specification for the same syscall,
+    with when= specifications accounted independently and "last wins" strategy
+    with respect to specific injection actions;  "none" pseudo-action added
+    to prevent syscall injection in accordance with its syscall and when=
+    specification.
   * Improved printing of syscall names in places where the associated
     AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request,
     SIGSYS siginfo_t).
