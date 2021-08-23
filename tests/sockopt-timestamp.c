@@ -48,6 +48,30 @@ k_recvmsg(const unsigned int fd, const void *const ptr, const unsigned int flags
 	return rc;
 }
 
+#define SC_setsockopt 14
+static long
+k_setsockopt(const unsigned int fd, const unsigned int level,
+	     const unsigned int optname, const void *const optval,
+	     const unsigned int len)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
+#ifdef __NR_setsockopt
+	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
+#endif
+
+	return syscall(
+#ifdef __NR_setsockopt
+		__NR_setsockopt,
+#else /* socketcall */
+		__NR_socketcall, SC_setsockopt,
+#endif
+		fill | fd , fill | level, fill | optname, optval, fill | len
+#ifdef __NR_setsockopt
+		, bad
+#endif
+		);
+}
+
 static void
 print_timestamp_old(const struct cmsghdr *c)
 {
@@ -139,7 +163,12 @@ test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
 		perror_msg_and_skip(data);
 
 	const int opt_1 = 1;
-	if (setsockopt(sv[0], SOL_SOCKET, so_val, &opt_1, sizeof(opt_1))) {
+	/*
+	 * glibc-2.34~294 adds a fallback for SO_TIMESTAMP{,NS}_NEW that calls
+	 * SO_TIMESTAMP{,NS}_OLD, so we have to call the setsockopt directly
+	 * in order to avoid unexpected recvmsg msg types.
+	 */
+	if (k_setsockopt(sv[0], SOL_SOCKET, so_val, &opt_1, sizeof(opt_1))) {
 		perror(str);
 		return 0;
 	}
