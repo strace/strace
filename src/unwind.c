@@ -9,12 +9,15 @@
 #include "unwind.h"
 
 #ifdef USE_DEMANGLE
+/* Avoids including libiberty.h that has several undesirable definitions */
+# define LIBIBERTY_H
+
 # if defined HAVE_DEMANGLE_H
 #  include <demangle.h>
 # elif defined HAVE_LIBIBERTY_DEMANGLE_H
 #  include <libiberty/demangle.h>
-# endif
-#endif
+# endif /* HAVE_DEMANGLE_H */
+#endif /* USE_DEMANGLE */
 
 /*
  * Type used in stacktrace capturing
