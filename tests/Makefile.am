@@ -283,6 +283,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	print_maxfd \
 	print_ppid_tracerpid \
 	prlimit64--pidns-translation \
+	prlimit64-success \
+	prlimit64-success--pidns-translation \
 	process_vm_readv--pidns-translation \
 	process_vm_writev--pidns-translation \
 	qual_fault \

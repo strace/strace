@@ -14,12 +14,24 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <sys/resource.h>
 #include <unistd.h>
 
 #include "pidns.h"
 #include "xlat.h"
 #include "xlat/resources.h"
+
+#ifndef RETVAL_INJECTED
+# define RETVAL_INJECTED 0
+#endif
+
+#if RETVAL_INJECTED
+# define INJ_STR " (INJECTED)"
+#else
+# define INJ_STR ""
+#endif
+#define INJECT_RETVAL 42
 
 static const char *
 sprint_rlim(uint64_t lim)
@@ -39,7 +51,7 @@ sprint_rlim(uint64_t lim)
 }
 
 int
-main(void)
+main(int argc, char *argv[])
 {
 	PIDNS_TEST_INIT;
 
@@ -48,38 +60,49 @@ main(void)
 	const char *pid_str = pidns_pid2str(PT_TGID);
 	uint64_t *const rlimit = tail_alloc(sizeof(*rlimit) * 2);
 	const struct xlat_data *xlat;
+	long rc;
+	unsigned long num_skip = 256;
 	size_t i = 0;
 
-	long rc = syscall(__NR_prlimit64, 0, 16, 0, 0);
-	pidns_print_leader();
-	printf("prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL) = %s\n",
-	       sprintrc(rc));
+	if (argc >= 2)
+		num_skip = strtoul(argv[1], NULL, 0);
+
+	for (i = 0; i < num_skip; i++) {
+		long rc = syscall(__NR_prlimit64, 0, 16, 0, 0);
+		pidns_print_leader();
+		printf("prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
+		       " = %s%s\n",
+		       sprintrc(rc), rc == INJECT_RETVAL ? INJ_STR : "");
+	}
 
 	/* The shortest output */
 	rc = syscall(__NR_prlimit64, 0, RLIMIT_AS, 0, 0);
 	pidns_print_leader();
-	printf("prlimit64(0, RLIMIT_AS, NULL, NULL) = %s\n", sprintrc(rc));
+	printf("prlimit64(0, RLIMIT_AS, NULL, NULL) = %s" INJ_STR "\n",
+	       sprintrc(rc));
 
-	for (xlat = resources->data; i < resources->size; ++xlat, ++i) {
+	for (i = 0, xlat = resources->data; i < resources->size; ++xlat, ++i) {
 		if (!xlat->str)
 			continue;
 
 		unsigned long res = 0xfacefeed00000000ULL | xlat->val;
 		rc = syscall(__NR_prlimit64, pid, res, 0, rlimit);
 		pidns_print_leader();
-		if (rc)
-			printf("prlimit64(%d%s, %s, NULL, %p) ="
-				     " %ld %s (%m)\n",
+		if (!RETVAL_INJECTED && (rc < 0)) {
+			printf("prlimit64(%d%s, %s, NULL, %p) = %s\n",
 			       (unsigned) pid, pid_str,
 			       xlat->str, rlimit,
-			       rc, errno2name());
-		else
+			       sprintrc(rc));
+		} else {
 			printf("prlimit64(%d%s, %s, NULL"
-			       ", {rlim_cur=%s, rlim_max=%s}) = 0\n",
+			       ", {rlim_cur=%s, rlim_max=%s})"
+			       " = %d" INJ_STR "\n",
 			       (unsigned) pid, pid_str,
 			       xlat->str,
 			       sprint_rlim(rlimit[0]),
-			       sprint_rlim(rlimit[1]));
+			       sprint_rlim(rlimit[1]),
+			       RETVAL_INJECTED ? INJECT_RETVAL : 0);
+		}
 	}
 
 	pidns_print_leader();

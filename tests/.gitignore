@@ -691,6 +691,8 @@ printstrn-umoven-peekdata
 printstrn-umoven-undumpable
 prlimit64
 prlimit64--pidns-translation
+prlimit64-success
+prlimit64-success--pidns-translation
 process_madvise
 process_madvise-y
 process_madvise-yy

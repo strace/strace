@@ -656,8 +656,10 @@ printstr	-e trace=writev
 printstrn-umoven	-s4096 -e signal=none -e trace=add_key
 printstrn-umoven-peekdata	-e signal=none -e trace=add_key
 printstrn-umoven-undumpable	-e signal=none -e trace=add_key
-prlimit64 -a36 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
-prlimit64--pidns-translation     test_pidns -a36 -e trace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
+prlimit64			-a36 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
+prlimit64--pidns-translation	test_pidns -a36 -e trace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
+prlimit64-success			-a36 -einject=prlimit64:retval=42:when=256+ -etrace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
+prlimit64-success--pidns-translation	check_scno_tampering; test_pidns -a36 -einject=prlimit64:retval=42:when=256+ -etrace=prlimit64 "QUIRK:START-OF-TEST-OUTPUT:prlimit64(0, 0x10 /* RLIMIT_??? */, NULL, NULL)"
 process_madvise
 process_madvise-y	--trace=process_madvise -y
 process_madvise-yy	--trace=process_madvise -yy
