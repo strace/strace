@@ -516,7 +516,7 @@ getfdproto(struct tcb *tcp, int fd)
 	if (fd < 0)
 		return SOCK_PROTO_UNKNOWN;
 
-	xsprintf(path, "/proc/%u/fd/%u", get_proc_pid(tcp), fd);
+	xsprintf(path, "/proc/%u/fd/%u", get_proc_pid(tcp->pid), fd);
 	r = getxattr(path, "system.sockprotoname", buf, bufsize - 1);
 	if (r <= 0)
 		return SOCK_PROTO_UNKNOWN;

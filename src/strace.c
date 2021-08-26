@@ -1237,7 +1237,7 @@ attach_tcb(struct tcb *const tcp)
 	unsigned int ntid = 0, nerr = 0;
 
 	if (followfork && tcp->pid != strace_child &&
-	    xsprintf(procdir, task_path, get_proc_pid(tcp)) > 0 &&
+	    xsprintf(procdir, task_path, get_proc_pid(tcp->pid)) > 0 &&
 	    (dir = opendir(procdir)) != NULL) {
 		struct_dirent *de;
 

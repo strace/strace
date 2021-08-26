@@ -517,10 +517,10 @@ exit:
 }
 
 int
-get_proc_pid(struct tcb *tcp)
+get_proc_pid(int pid)
 {
 	int proc_pid = 0;
-	translate_pid(NULL, tcp->pid, PT_TID, &proc_pid);
+	translate_pid(NULL, pid, PT_TID, &proc_pid);
 	return proc_pid;
 }
 

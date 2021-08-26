@@ -1065,11 +1065,10 @@ fetch_indirect_syscall_args(struct tcb *, kernel_ulong_t addr, unsigned int n_ar
 extern void pidns_init(void);
 
 /**
- * Returns the pid of the tracee as present in /proc of the tracer (can be
- * different from tcp->pid if /proc and the tracer process are in different PID
- * namespaces).
+ * Returns PID as present in /proc of the tracer (can be different from tracee
+ * PID if /proc and the tracer process are in different PID namespaces).
  */
-extern int get_proc_pid(struct tcb *);
+extern int get_proc_pid(int pid);
 
 /**
  * Translates a pid from tracee's namespace to our namespace.
