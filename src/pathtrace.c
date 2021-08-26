@@ -87,8 +87,7 @@ getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize)
 	if (fd < 0)
 		return -1;
 
-	int proc_pid = 0;
-	translate_pid(NULL, pid, PT_TID, &proc_pid);
+	int proc_pid = get_proc_pid(pid);
 	if (!proc_pid)
 		return -1;
 

@@ -70,8 +70,7 @@ selinux_getpidcon(struct tcb *tcp, char **result)
 	if (!selinux_context)
 		return -1;
 
-	int proc_pid = 0;
-	translate_pid(NULL, tcp->pid, PT_TID, &proc_pid);
+	int proc_pid = get_proc_pid(tcp->pid);
 	if (!proc_pid)
 		return -1;
 
@@ -90,8 +89,7 @@ selinux_getfdcon(pid_t pid, int fd, char **result)
 	if (!selinux_context || pid <= 0 || fd < 0)
 		return -1;
 
-	int proc_pid = 0;
-	translate_pid(NULL, pid, PT_TID, &proc_pid);
+	int proc_pid = get_proc_pid(pid);
 	if (!proc_pid)
 		return -1;
 
@@ -113,8 +111,7 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **result)
 	if (!selinux_context)
 		return -1;
 
-	int proc_pid = 0;
-	translate_pid(NULL, tcp->pid, PT_TID, &proc_pid);
+	int proc_pid = get_proc_pid(tcp->pid);
 	if (!proc_pid)
 		return -1;
 
