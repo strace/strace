@@ -686,6 +686,65 @@ printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd)
 	printfd_pid(tcp, strace_pid, fd);
 }
 
+const char *
+pid_to_str(pid_t pid)
+{
+	if (!pid)
+		return "self";
+
+	static char buf[sizeof("-2147483648")];
+	xsprintf(buf, "%d", pid);
+	return buf;
+}
+
+size_t
+proc_status_get_id_list(int proc_pid, int *id_buf, size_t id_buf_size,
+			const char *str, size_t str_size)
+{
+	size_t n = 0;
+
+	if (!str_size)
+		str_size = strlen(str);
+
+	char status_path[PATH_MAX + 1];
+	xsprintf(status_path, "/proc/%s/status", pid_to_str(proc_pid));
+	FILE *f = fopen_stream(status_path, "r");
+	if (!f)
+		return 0;
+
+	char *line = NULL;
+	size_t linesize = 0;
+	char *p = NULL;
+
+	while (getline(&line, &linesize, f) > 0) {
+		if (strncmp(line, str, str_size) == 0) {
+			p = line + str_size;
+			break;
+		}
+	}
+
+	while (p) {
+		errno = 0;
+		long id = strtol(p, NULL, 10);
+
+		if (id < 0 || id > INT_MAX || errno) {
+			debug_func_perror_msg("converting \"%s\" to int", p);
+			break;
+		}
+
+		if (id_buf && n < id_buf_size)
+			id_buf[n] = (int) id;
+
+		n++;
+		strsep(&p, "\t");
+	}
+
+	free(line);
+	fclose(f);
+
+	return n;
+}
+
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.

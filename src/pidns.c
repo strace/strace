@@ -139,21 +139,6 @@ get_cached_proc_pid(unsigned int ns, int ns_pid, enum pid_type type)
 }
 
 /**
- * Helper function, converts pid to string, or to "self" for pid == 0.
- * Uses static buffer for operation.
- */
-static const char *
-pid_to_str(pid_t pid)
-{
-	if (!pid)
-		return "self";
-
-	static char buf[sizeof("-2147483648")];
-	xsprintf(buf, "%d", pid);
-	return buf;
-}
-
-/**
  * Returns a list of PID NS IDs for the specified PID.
  *
  * @param proc_pid PID (as present in /proc) to get information for.
@@ -226,48 +211,8 @@ get_ns_hierarchy(int proc_pid, unsigned int *ns_buf, size_t ns_buf_size)
 static size_t
 get_id_list(int proc_pid, int *id_buf, enum pid_type type)
 {
-	const char *ns_str = id_strs[type].str;
-	size_t ns_str_size = id_strs[type].size;
-
-	size_t n = 0;
-
-	char status_path[PATH_MAX + 1];
-	xsprintf(status_path, "/proc/%s/status", pid_to_str(proc_pid));
-	FILE *f = fopen_stream(status_path, "r");
-	if (!f)
-		return 0;
-
-	char *line = NULL;
-	size_t linesize = 0;
-	char *p = NULL;
-
-	while (getline(&line, &linesize, f) > 0) {
-		if (strncmp(line, ns_str, ns_str_size) == 0) {
-			p = line + ns_str_size;
-			break;
-		}
-	}
-
-	while (p) {
-		errno = 0;
-		long id = strtol(p, NULL, 10);
-
-		if (id < 0 || id > INT_MAX || errno) {
-			perror_func_msg("converting pid (%ld) to int", id);
-			break;
-		}
-
-		if (id_buf)
-			id_buf[n] = (int) id;
-
-		n++;
-		strsep(&p, "\t");
-	}
-
-	free(line);
-	fclose(f);
-
-	return n;
+	return proc_status_get_id_list(proc_pid, id_buf, MAX_NS_DEPTH,
+				       id_strs[type].str, id_strs[type].size);
 }
 
 /**

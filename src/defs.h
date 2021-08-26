@@ -1157,6 +1157,33 @@ printfd(struct tcb *tcp, int fd)
 }
 
 /**
+ * Helper function, converts pid to string, or to "self" for pid == 0.
+ * Uses static buffer for operation.
+ */
+extern const char *pid_to_str(pid_t pid);
+
+/**
+ * Get list of IDs present in a proc status record. IDs are placed in the array
+ * in the order they are stored in /proc.
+ *
+ * @param proc_pid    PID (as present in /proc) to get information for.
+ * @param id_buf      Pointer to buffer where parsed IDs are stored.
+ *                    Can be NULL.
+ * @param id_buf_size Number of items id_buf can store.  If there are more IDs
+ *                    than id_buf can store, the excess IDs are not stored
+ *                    but still counted.
+ * @param str         (Prefix) string IDs from which are to be read.
+ * @param str_size    Size of the prefix string.  Can be 0, in this case str
+ *                    has to be '\0'-terminated in order to be able to obtain
+ *                    its length.
+ * @return            Number of items read (even if they are not written).
+ *                    0 indicates error.
+ */
+extern size_t proc_status_get_id_list(int proc_pid,
+				      int *id_buf, size_t id_buf_size,
+				      const char *str, size_t str_size);
+
+/**
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracee).
  */
