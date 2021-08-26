@@ -496,20 +496,18 @@ error_opt_arg(int opt, const struct option *lopt, const char *arg)
 	}
 }
 
-static const char *ptrace_attach_cmd;
-
 static int
-ptrace_attach_or_seize(int pid)
+ptrace_attach_or_seize(int pid, const char **ptrace_attach_cmd)
 {
 	int r;
 	if (!use_seize)
-		return ptrace_attach_cmd = "PTRACE_ATTACH",
+		return *ptrace_attach_cmd = "PTRACE_ATTACH",
 		       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
 	r = ptrace(PTRACE_SEIZE, pid, 0L, (unsigned long) ptrace_setoptions);
 	if (r)
-		return ptrace_attach_cmd = "PTRACE_SEIZE", r;
+		return *ptrace_attach_cmd = "PTRACE_SEIZE", r;
 	r = ptrace(PTRACE_INTERRUPT, pid, 0L, 0L);
-	return ptrace_attach_cmd = "PTRACE_INTERRUPT", r;
+	return *ptrace_attach_cmd = "PTRACE_INTERRUPT", r;
 }
 
 static const char *
@@ -1221,7 +1219,9 @@ process_opt_p_list(char *opt)
 static void
 attach_tcb(struct tcb *const tcp)
 {
-	if (ptrace_attach_or_seize(tcp->pid) < 0) {
+	const char *ptrace_attach_cmd;
+
+	if (ptrace_attach_or_seize(tcp->pid, &ptrace_attach_cmd) < 0) {
 		perror_msg("attach: ptrace(%s, %d)",
 			   ptrace_attach_cmd, tcp->pid);
 		droptcb(tcp);
@@ -1250,7 +1250,8 @@ attach_tcb(struct tcb *const tcp)
 				continue;
 
 			++ntid;
-			if (ptrace_attach_or_seize(tid) < 0) {
+			if (ptrace_attach_or_seize(tid, &ptrace_attach_cmd) < 0)
+			{
 				++nerr;
 				debug_perror_msg("attach: ptrace(%s, %d)",
 						 ptrace_attach_cmd, tid);
@@ -1620,7 +1621,8 @@ startup_child(char **argv, char **env)
 			 * This means that we may miss a few first syscalls...
 			 */
 
-			if (ptrace_attach_or_seize(pid)) {
+			const char *ptrace_attach_cmd;
+			if (ptrace_attach_or_seize(pid, &ptrace_attach_cmd)) {
 				kill_save_errno(pid, SIGKILL);
 				perror_msg_and_die("attach: ptrace(%s, %d)",
 						   ptrace_attach_cmd, pid);
