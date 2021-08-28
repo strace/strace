@@ -11,6 +11,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     with respect to specific injection actions;  "none" pseudo-action added
     to prevent syscall injection in accordance with its syscall and when=
     specification.
+  * When strace fails to attach to a process due to insufficient permissions,
+    a probable reason for that is printed (addresses Fedora bug #1242641).
   * Improved printing of syscall names in places where the associated
     AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request,
     SIGSYS siginfo_t).

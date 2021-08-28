@@ -1228,6 +1228,168 @@ process_opt_p_list(char *opt)
 	}
 }
 
+/**
+ * The function tries its best to help user with diagnosing the issue
+ * of being unable to attach to a process.  Unfortunately, the diagnostics
+ * can't be precise in the most common case: when strace is run under
+ * an ordinary user.  In short, the following checks are possible in place
+ * when a ptrace attach is performed:
+ *  - Attaching to a thread in the same thread group is always allowed;
+ *    it is not the strace's case, however.
+ *  - Tracer's UID/GID (real, or, in not currently uilised by strace case
+ *    of PTRACE_MODE_FSCREDS, FS, which, in turn, is almost always inherited
+ *    from effective) are checked for equivalency against effective/saved
+ *    UID/GID;  if they are not equal, tracer is checked for CAP_SYS_PTRACE
+ *    capability in tracee's user NS
+ *  - If process is not dumpable (because it has been reset to zero
+ *    /proc/sys/fs/suid_dumpable value during change of effective/FS UID, or
+ *    exec'ed a setuid/setgid/fscaps executabe)
+ *  - LSM are being checked:
+ *    - SELinux
+ *      - Fedora and derivatives have "deny_ptrace" boolean
+ *        ("/sys/fs/selinux/enforce" + "/sys/fs/selinux/booleans/deny_ptrace")
+ *    - YAMA - "/proc/sys/kernel/yama/ptrace_scope"
+ *      - 0 - unrestricted
+ *      - 1 - children, PR_SET_PTRACER, PTRACE_TRACEME, CAP_SYS_PTRACE
+ *      - 2 - CAP_SYS_PTRACE, PTRACE_TRACEME
+ *      - 3 - nothing is allowed
+ *    - Smack - "/sys/fs/smackfs/ptrace"
+ *      - 0 - RW access is needed
+ *      - 1 - labels ("/proc/self/attr/current") must be the same
+ *            or CAP_SYS_PTRACE
+ *      - 2 - labels must be the same
+ *    - AppArmor
+ *      - It seems that the best we can do is to check for its presence,
+ *        for example, by checking for "/sys/kernel/security/apparmor/"
+ *        directory presence.
+ *   - Landlock
+ *      - Seems to be of no concern for strace, as strace doesn't setup
+ *        landlock rules.
+ *   - commoncap
+ *      - When CAP_SYS_PTRACE is not present, than tracer has to have
+ *        all the tracee permitted capabities in its permitted
+ *        (PTRACE_MODE_REALCREDS) or effective (PTRACE_MODE_FSCREDS)
+ *        capabilities set.
+ *
+ * Moreover, non-dumpable processes have the ownership of their /proc/pid
+ * directory changed to root:root, which may prevent inspecting tracee's
+ * UID/GID.
+ */
+static void
+guess_attach_error_cause(int pid)
+{
+	enum { REAL_ID, EFFECTIVE_ID, SAVED_ID, FS_ID, ID_CNT };
+
+	int ret;
+
+	int our_uid = getuid();
+	int our_gid = getgid();
+
+	int proc_pid = get_proc_pid(pid);
+	if (proc_pid < 0) {
+		debug_func_msg("Can't translate PID %d", pid);
+		return;
+	}
+
+	char path[sizeof("/proc/") + 3 * sizeof(int)];
+	strace_stat_t st;
+
+	xsprintf(path, "/proc/%u", proc_pid);
+	stat_file(path, &st);
+
+	int proc_errno = 0;
+	int tid_uids[ID_CNT];
+	int tid_gids[ID_CNT];
+	const struct {
+		int *ids;
+		const char *name;
+		const char *prefix;
+		size_t prefix_size;
+	} id_params[] = {
+		{ tid_uids, "UID", "Uid:\t", sizeof("Uid:\t") - 1 },
+		{ tid_gids, "GID", "Gid:\t", sizeof("Gid:\t") - 1 },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(id_params); i++) {
+		errno = 0;
+		ret = proc_status_get_id_list(proc_pid, id_params[i].ids,
+					      ID_CNT, id_params[i].prefix,
+					      id_params[i].prefix_size);
+		if (ret < ID_CNT) {
+			debug_func_msg("Can't get %ss for PID %d from "
+				       "/proc/%d/status: got %d records "
+				       "instead of %d",
+				       id_params[i].name, pid, proc_pid, ret,
+				       ID_CNT);
+			proc_errno = errno ?: INT_MAX;
+			break;
+		}
+	}
+
+	if (proc_errno == EPERM) {
+		debug_func_msg("Can't retrieve UID/GID information for PID %d"
+			       " (from /proc/%d/stat)", pid, proc_pid);
+		return;
+	}
+
+	bool ids_match =
+		(our_uid == tid_uids[REAL_ID]) &&
+		(our_uid == tid_uids[EFFECTIVE_ID]) &&
+		(our_uid == tid_uids[SAVED_ID]) &&
+		(our_gid == tid_gids[REAL_ID]) &&
+		(our_gid == tid_gids[EFFECTIVE_ID]) &&
+		(our_gid == tid_gids[SAVED_ID]);
+
+	struct {
+		uint32_t version;
+		int pid;
+	} cap_hdr = { 0x19980330 /* _LINUX_CAPABILITY_VERSION_1 */, 0 };
+	struct {
+		uint32_t effective;
+		uint32_t permitted;
+		uint32_t inheritable;
+	} caps = { 0 };
+
+	ret = syscall(__NR_capget, &cap_hdr, &caps);
+
+	bool cap_sys_ptrace = !ret && (caps.effective & (1 << 19));
+
+	if (!ids_match && !cap_sys_ptrace) {
+		static const char *id_strs[] = {
+			[REAL_ID]      = "real",
+			[EFFECTIVE_ID] = "effective",
+			[SAVED_ID]     = "saved",
+		};
+
+		char buf[(sizeof("strace's real UID () != effective process  "
+				 "UID ()") + sizeof(int) * 2 * 3)];
+
+		for (size_t j = 0; j < 2; j++) {
+			for (size_t i = 0; i <= SAVED_ID; i++) {
+				if (j ? our_gid == tid_gids[i]
+				      : our_uid == tid_uids[i])
+					continue;
+
+				xsprintf(buf,
+					 "strace's real %s (%d) != "
+					 "process %d %s %s (%d)",
+					 j ? "GID" : "UID",
+					 j ? our_gid : our_uid,
+					 pid,
+					 id_strs[i],
+					 j ? "GID" : "UID",
+					 (j ? tid_gids : tid_uids)[i]);
+				goto print_err;
+			}
+		}
+
+print_err:
+		error_msg("  (%s, and strace does not have CAP_SYS_PTRACE)",
+			  buf);
+
+		return;
+	}
+}
+
 static void
 attach_tcb(struct tcb *const tcp)
 {
@@ -1236,6 +1398,8 @@ attach_tcb(struct tcb *const tcp)
 	if (ptrace_attach_or_seize(tcp->pid, &ptrace_attach_cmd) < 0) {
 		perror_msg("attach: ptrace(%s, %d)",
 			   ptrace_attach_cmd, tcp->pid);
+		if (errno == EPERM)
+			guess_attach_error_cause(tcp->pid);
 		droptcb(tcp);
 		return;
 	}
