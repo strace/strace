@@ -209,37 +209,36 @@ static inline void
 check_inadvertent_fault_injection(unsigned long long ullval)
 {
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-		bool inadvertent_fault_injection = false;
+	bool inadvertent_fault_injection = false;
 #endif
 
 #if !HAVE_ARCH_DEDICATED_ERR_REG
-		if ((kernel_long_t) ullval < 0
-		    && (kernel_long_t) ullval >= -MAX_ERRNO_VALUE) {
+	if ((kernel_long_t) ullval < 0
+	    && (kernel_long_t) ullval >= -MAX_ERRNO_VALUE) {
 # if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-			inadvertent_fault_injection = true;
+		inadvertent_fault_injection = true;
 # endif
-			error_msg("Inadvertent injection of error %" PRI_kld
-				  " is possible for retval=%llu",
-				  -(kernel_long_t) ullval, ullval);
-		}
+		error_msg("Inadvertent injection of error %" PRI_kld
+			  " is possible for retval=%llu",
+			  -(kernel_long_t) ullval, ullval);
+	}
 # if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-		else if ((int) ullval < 0 && (int) ullval >= -MAX_ERRNO_VALUE) {
-			inadvertent_fault_injection = true;
-			error_msg("Inadvertent injection of error %d is"
-				  " possible in compat personality for"
-				  " retval=%llu",
-				  -(int) ullval, ullval);
-		}
+	else if ((int) ullval < 0 && (int) ullval >= -MAX_ERRNO_VALUE) {
+		inadvertent_fault_injection = true;
+		error_msg("Inadvertent injection of error %d is possible"
+			  " in compat personality for retval=%llu",
+			  -(int) ullval, ullval);
+	}
 # endif
 #endif
 
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
-		if (!inadvertent_fault_injection
-		    && (unsigned int) ullval != ullval) {
-			error_msg("Injected return value %llu will be"
-				  " clipped to %u in compat personality",
-				  ullval, (unsigned int) ullval);
-		}
+	if (!inadvertent_fault_injection
+	    && (unsigned int) ullval != ullval) {
+		error_msg("Injected return value %llu will be"
+			  " clipped to %u in compat personality",
+			  ullval, (unsigned int) ullval);
+	}
 #endif
 }
 
