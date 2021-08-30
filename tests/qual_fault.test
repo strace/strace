@@ -89,13 +89,13 @@ for err in '' ENOSYS 22 einval; do
 			writev $fault "$err" '' '' '' 1 -efault=chdir
 		check_fault_injection \
 			writev $fault "$err" '' '' '' 1 -efault=chdir -efault=none
-		for F in 1 2 3 5 7 11; do
+		for F in 1 2 3 7; do
 			check_fault_injection \
 				writev $fault "$err" $F '' '' 1
 			check_fault_injection \
 				writev $fault "$err" $F '' + 1
 
-			for L in 1 2 3 5 7 11; do
+			for L in 1 2 5 11; do
 				[ "$L" -ge "$F" ] ||
 					continue
 				check_fault_injection \
@@ -104,12 +104,12 @@ for err in '' ENOSYS 22 einval; do
 					writev $fault "$err" $F $L + 1
 			done
 
-			for S in 1 2 3 5 7 11; do
+			for S in 1 2 3 7; do
 				check_fault_injection \
 					writev $fault "$err" $F '' $S 1
 				check_fault_injection \
 					writev $fault "$err" $F '' $S 4
-				for L in 1 2 3 5 7 11; do
+				for L in 1 2 7 11; do
 					[ "$L" -ge "$F" ] ||
 						continue
 					check_fault_injection \
