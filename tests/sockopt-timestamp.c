@@ -48,27 +48,27 @@ k_recvmsg(const unsigned int fd, const void *const ptr, const unsigned int flags
 	return rc;
 }
 
-#define SC_setsockopt 14
+# define SC_setsockopt 14
 static long
 k_setsockopt(const unsigned int fd, const unsigned int level,
 	     const unsigned int optname, const void *const optval,
 	     const unsigned int len)
 {
 	const kernel_ulong_t fill = (kernel_ulong_t) 0xdefaced00000000ULL;
-#ifdef __NR_setsockopt
+# ifdef __NR_setsockopt
 	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
-#endif
+# endif
 
 	return syscall(
-#ifdef __NR_setsockopt
+# ifdef __NR_setsockopt
 		__NR_setsockopt,
-#else /* socketcall */
+# else /* socketcall */
 		__NR_socketcall, SC_setsockopt,
-#endif
+# endif
 		fill | fd , fill | level, fill | optname, optval, fill | len
-#ifdef __NR_setsockopt
+# ifdef __NR_setsockopt
 		, bad
-#endif
+# endif
 		);
 }
 

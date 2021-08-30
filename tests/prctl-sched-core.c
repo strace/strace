@@ -45,7 +45,7 @@ main(int argc, char *argv[])
 
 	for (size_t i = 0; i < num_skip; i++) {
 		rc = prctl_marker();
-# ifdef PIDNS_TRANSLATION
+#ifdef PIDNS_TRANSLATION
 		const char *errstr = sprintrc(rc);
 		pidns_print_leader();
 		printf("prctl(" XLAT_UNKNOWN(0xffffffff, "PR_???")
@@ -56,7 +56,7 @@ main(int argc, char *argv[])
 		} else {
 			printf("%ld (INJECTED)\n", rc);
 		}
-# endif
+#endif
 
 		if (rc < 0)
 			continue;

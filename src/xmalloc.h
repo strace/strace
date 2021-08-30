@@ -84,7 +84,7 @@ void *xmemdup(const void *src, size_t size)
 void *xarraydup(const void *src, size_t nmemb, size_t memb_size)
 	ATTRIBUTE_MALLOC ATTRIBUTE_ALLOC_SIZE((2, 3));
 
-#define xobjdup(src_) xmemdup(src_, sizeof(*(src_)))
+# define xobjdup(src_) xmemdup(src_, sizeof(*(src_)))
 
 /**
  * Analogous to asprintf, die in case of an error.
