@@ -2,7 +2,7 @@
  * Check decoding of timestamp control messages.
  *
  * Copyright (c) 2019 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2019-2020 The strace developers.
+ * Copyright (c) 2019-2021 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
