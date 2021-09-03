@@ -32,7 +32,7 @@ static const char *errstr;
 static int is_raw, err, first, last, step, iter, try;
 
 static void
-invoke(int fail)
+invoke(int iter, int fail)
 {
 	static char buf[sizeof(int) * 3 + 3];
 	const struct iovec io = {
@@ -44,7 +44,7 @@ invoke(int fail)
 	if (!fail) {
 		rc = write(exp_fd, io.iov_base, io.iov_len);
 		if (rc != (int) io.iov_len)
-			perror_msg_and_fail("write");
+			perror_msg_and_fail("iter %d: write", iter);
 	}
 
 	errno = 0;
@@ -52,9 +52,9 @@ invoke(int fail)
 
 	if (fail) {
 		if (!(rc == -1 && errno == err))
-			perror_msg_and_fail("expected errno %d"
+			perror_msg_and_fail("iter %d: expected errno %d"
 					    ", got rc == %d, errno == %d",
-					    err, rc, errno);
+					    iter, err, rc, errno);
 
 		if (is_raw)
 			tprintf("writev(%#x, %p, 0x1)"
@@ -66,9 +66,9 @@ invoke(int fail)
 				got_fd, buf, (int) io.iov_len, errstr);
 	} else {
 		if (rc != (int) io.iov_len)
-			perror_msg_and_fail("expected %d"
+			perror_msg_and_fail("iter %d: expected %d"
 					    ", got rc == %d, errno == %d",
-					    (int) io.iov_len, rc, errno);
+					    iter, (int) io.iov_len, rc, errno);
 
 		if (is_raw)
 			tprintf("writev(%#x, %p, 0x1) = %#x\n",
@@ -174,7 +174,7 @@ main(int argc, char *argv[])
 					first = step;
 				}
 			}
-			invoke(fail);
+			invoke(i, fail);
 		}
 
 		tprintf("%s\n", "+++ exited with 0 +++");
