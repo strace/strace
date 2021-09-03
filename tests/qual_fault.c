@@ -29,12 +29,13 @@ static int out_fd;
 #define DEFAULT_ERRNO ENOSYS
 
 static const char *errstr;
-static int is_raw, err, first, last, step, iter, try;
+static int is_raw, err;
 
 static void
 invoke(int iter, int fail)
 {
 	static char buf[sizeof(int) * 3 + 3];
+	static int try;
 	const struct iovec io = {
 		.iov_base = buf,
 		.iov_len = sprintf(buf, "%d.", ++try)
@@ -119,10 +120,10 @@ main(int argc, char *argv[])
 	errno = err;
 	errstr = errno2name();
 
-	first = atoi(argv[3]);
-	last = atoi(argv[4]);
-	step = atoi(argv[5]);
-	iter = atoi(argv[6]);
+	int first = atoi(argv[3]);
+	int last = atoi(argv[4]);
+	int step = atoi(argv[5]);
+	int iter = atoi(argv[6]);
 	int num_procs = atoi(argv[7]);
 	char *exp_prefix = argv[8];
 	char *got_prefix = argv[9];
