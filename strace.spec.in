@@ -109,6 +109,9 @@ echo 'END OF TEST SUITE INFORMATION'
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Thu Sep 02 2021 Dmitry V. Levin <ldv@strace.io> - 5.14-1
+- v5.13 -> v5.14.
+
 * Sun Jul 18 2021 Dmitry V. Levin <ldv@strace.io> - 5.13-1
 - v5.12 -> v5.13.
 
