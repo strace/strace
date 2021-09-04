@@ -205,7 +205,7 @@ err:
 	return false;
 }
 
-static inline void
+static void
 check_inadvertent_fault_injection(unsigned long long ullval)
 {
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG

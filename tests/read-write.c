@@ -41,7 +41,7 @@ dump_str_ex(const char *str, const unsigned int len, const int idx_w)
 	}
 }
 
-static inline void
+static void
 dump_str(const char *str, const unsigned int len)
 {
 	dump_str_ex(str, len, 5);

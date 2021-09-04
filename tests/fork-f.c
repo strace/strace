@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-static inline int
+static int
 logit_(const char *const str)
 {
 	return !chdir(str);

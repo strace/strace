@@ -13,7 +13,7 @@
 #include "xstring.h"
 #include <stdarg.h>
 
-static inline enum xlat_style
+static enum xlat_style
 get_xlat_style(enum xlat_style style)
 {
 	if (xlat_verbose(style) == XLAT_STYLE_DEFAULT)
@@ -22,7 +22,7 @@ get_xlat_style(enum xlat_style style)
 	return style;
 }
 
-static inline const char *
+static const char *
 sprint_xlat_val(uint64_t val, enum xlat_style style)
 {
 	static char buf[sizeof(val) * 3];
@@ -44,7 +44,7 @@ sprint_xlat_val(uint64_t val, enum xlat_style style)
 	return buf;
 }
 
-static inline void
+static void
 print_xlat_val(uint64_t val, enum xlat_style style)
 {
 	tprints(sprint_xlat_val(val, style));

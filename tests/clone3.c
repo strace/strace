@@ -126,7 +126,7 @@ do_clone3_(void *args, kernel_ulong_t size, uint64_t possible_errors, int line)
 #define do_clone3(args_, size_, errors_) \
 	do_clone3_((args_), (size_), (errors_), __LINE__)
 
-static inline void
+static void
 print_addr64(const char *pfx, uint64_t addr)
 {
 	if (addr)
@@ -187,7 +187,7 @@ print_set_tid(uint64_t set_tid, uint64_t set_tid_size)
 	printf(", set_tid_size=%" PRIu64, set_tid_size);
 }
 
-static inline void
+static void
 print_clone3(struct clone_args *const arg, long rc, kernel_ulong_t sz,
 	     enum validity_flags valid,
 	     const char *flags_str, const char *es_str)

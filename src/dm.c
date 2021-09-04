@@ -444,7 +444,7 @@ dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-static inline bool
+static bool
 dm_ioctl_has_params(const unsigned int code)
 {
 	switch (code) {

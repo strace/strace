@@ -27,7 +27,7 @@
 #  define VERBOSE 0
 # endif
 
-static inline bool
+static bool
 print_0x8(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 {
 	if (!zero && !buf[offs])
@@ -38,7 +38,8 @@ print_0x8(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 	return true;
 }
 
-static inline bool
+# if VERBOSE
+static bool
 print_u8(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 {
 	if (!zero && !buf[offs])
@@ -48,8 +49,9 @@ print_u8(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 
 	return true;
 }
+# endif
 
-static inline bool
+static bool
 print_u16(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 {
 	uint16_t val = *(uint16_t *) (buf + offs);
@@ -62,7 +64,7 @@ print_u16(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 	return true;
 }
 
-static inline bool
+static bool
 print_x32(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 {
 	uint32_t val = *(uint32_t *) (buf + offs);
@@ -75,7 +77,7 @@ print_x32(const char *prefix, unsigned char *buf, unsigned int offs, bool zero)
 	return true;
 }
 
-static inline bool
+static bool
 print_weight(const char *prefix, unsigned char *buf, unsigned int offs,
 	     bool zero)
 {
@@ -94,7 +96,7 @@ print_weight(const char *prefix, unsigned char *buf, unsigned int offs,
 	return false;
 }
 
-static inline char *
+static char *
 ebcdic2ascii(unsigned char *ebcdic, size_t size)
 {
 	static char ascii_buf[EBCDIC_MAX_LEN];
@@ -148,7 +150,8 @@ ebcdic2ascii_end:
 	return ascii_buf;
 }
 
-static inline bool
+# if VERBOSE
+static bool
 is_empty(unsigned char *ptr, size_t size)
 {
 	size_t i;
@@ -158,8 +161,9 @@ is_empty(unsigned char *ptr, size_t size)
 
 	return i == size;
 }
+# endif
 
-static inline bool
+static bool
 print_ebcdic(const char *prefix, unsigned char *addr, unsigned int offs,
 	     size_t size, bool zero, bool blank)
 {
@@ -185,7 +189,8 @@ print_ebcdic(const char *prefix, unsigned char *addr, unsigned int offs,
 	return true;
 }
 
-static inline void
+# if VERBOSE
+static void
 print_funcs(unsigned char *addr, unsigned int offs)
 {
 	bool cont;
@@ -222,6 +227,7 @@ print_funcs(unsigned char *addr, unsigned int offs)
 
 	printf(" */");
 }
+# endif
 
 static void
 print_hypervisor_header(unsigned char *buf, int level, unsigned int offs_pos,

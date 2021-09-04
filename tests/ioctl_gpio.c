@@ -71,7 +71,7 @@ do_ioctl(kernel_ulong_t cmd, kernel_ulong_t arg)
 	return rc;
 }
 
-static inline long
+static long
 do_ioctl_ptr(kernel_ulong_t cmd, const void *arg)
 {
 	return do_ioctl(cmd, (uintptr_t) arg);

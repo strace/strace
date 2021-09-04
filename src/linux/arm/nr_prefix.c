@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-static inline const char *
+static const char *
 nr_prefix(kernel_ulong_t scno)
 {
 	/*

@@ -571,7 +571,7 @@ static char *log_buf;
  */
 #define log_buf_size 4096U
 
-static inline char *
+static char *
 get_log_buf(void)
 {
 	if (!log_buf)
@@ -579,7 +579,7 @@ get_log_buf(void)
 	return log_buf;
 }
 
-static inline char *
+static char *
 get_log_buf_tail(void)
 {
 	return get_log_buf() + log_buf_size;

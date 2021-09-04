@@ -26,7 +26,7 @@ enum sprintrc_fmt {
  *            representation of return code and errno/error message in case @rc
  *            is equal to -1.
  */
-static inline const char *
+static const char *
 sprintrc_ex(long rc, enum sprintrc_fmt fmt)
 {
 	static const char *formats[] = {
