@@ -744,6 +744,8 @@ sched_yield	-a14
 seccomp-filter	-e trace=seccomp
 seccomp-filter-v	-v -e trace=seccomp
 seccomp_get_action_avail	-e trace=seccomp
+seccomp_get_notif_sizes		-etrace=seccomp -a42
+seccomp_get_notif_sizes-success	-einject=seccomp:retval=42 -etrace=seccomp -a42
 select	-a36
 select-P	-a36 -e trace=select -P /dev/full 9>>/dev/full
 semop	-a32

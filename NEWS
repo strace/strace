@@ -5,6 +5,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Improved printing of syscall names in places where the associated
     AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request,
     SIGSYS siginfo_t).
+  * Implemented decoding of SECCOMP_GET_NOTIF_SIZES operation of seccomp
+    syscall.
 
 * Bug fixes
 

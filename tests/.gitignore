@@ -789,6 +789,8 @@ seccomp-filter
 seccomp-filter-v
 seccomp-strict
 seccomp_get_action_avail
+seccomp_get_notif_sizes
+seccomp_get_notif_sizes-success
 secontext.am
 select
 select-P

@@ -570,6 +570,7 @@ sched_xetscheduler
 sched_yield
 seccomp-filter
 seccomp_get_action_avail
+seccomp_get_notif_sizes
 select
 semop
 semop-indirect

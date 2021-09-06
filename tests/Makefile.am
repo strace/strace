@@ -310,6 +310,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	scm_rights \
 	seccomp-filter-v \
 	seccomp-strict \
+	seccomp_get_notif_sizes-success \
 	select-P \
 	set_ptracer_any \
 	set_sigblock \
