@@ -6,9 +6,9 @@
  */
 
 kernel_ulong_t
-shuffle_scno(kernel_ulong_t scno)
+shuffle_scno_pers(kernel_ulong_t scno, int pers)
 {
-	if (current_personality == 0 && scno != (kernel_ulong_t) -1)
+	if (pers == 0 && scno != (kernel_ulong_t) -1)
 		scno ^= __X32_SYSCALL_BIT;
 
 	return scno;

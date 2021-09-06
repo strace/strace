@@ -6,7 +6,7 @@
  */
 
 kernel_ulong_t
-shuffle_scno(kernel_ulong_t scno)
+shuffle_scno_pers(kernel_ulong_t scno, int pers)
 {
 	return scno;
 }

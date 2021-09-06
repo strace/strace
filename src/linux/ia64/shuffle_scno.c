@@ -5,7 +5,7 @@ static_assert(nsyscalls0 < SYSCALLENT_BASE_NR,
 	      "shuffling will only make everything worse");
 
 kernel_ulong_t
-shuffle_scno(kernel_ulong_t scno)
+shuffle_scno_pers(kernel_ulong_t scno, int pers)
 {
 	return scno ^ SYSCALLENT_BASE_NR;
 }

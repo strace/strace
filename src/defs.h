@@ -588,9 +588,21 @@ extern kernel_long_t scno_by_name(const char *s, unsigned p,
  * The shuffling should be an involution: shuffle_scno(shuffle_scno(n)) == n.
  *
  * @param scno Raw or shuffled syscall number.
+ * @param pers Personality to shuffle scno for.
  * @return     Shuffled or raw syscall number, respectively.
  */
-extern kernel_ulong_t shuffle_scno(kernel_ulong_t scno);
+extern kernel_ulong_t shuffle_scno_pers(kernel_ulong_t scno, int pers);
+/**
+ * Shorthand for shuffle_scno_pers() for the current personality.
+ *
+ * @param scno Raw or shuffled syscall number.
+ * @return     Shuffled or raw syscall number, respectively.
+ */
+static inline kernel_ulong_t
+shuffle_scno(kernel_ulong_t scno)
+{
+	return shuffle_scno_pers(scno, current_personality);
+}
 /**
  * Print error name in accordance with current xlat style setting.
  *

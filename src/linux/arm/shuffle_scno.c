@@ -5,11 +5,11 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifdef shuffle_scno_is_static
+#ifdef shuffle_scno_pers_is_static
 static
 #endif
 kernel_ulong_t
-shuffle_scno(kernel_ulong_t scno)
+shuffle_scno_pers(kernel_ulong_t scno, int pers)
 {
 	if (scno < ARM_FIRST_SHUFFLED_SYSCALL)
 		return scno;
