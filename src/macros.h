@@ -13,6 +13,7 @@
 # include <sys/types.h>
 
 # include "gcc_compat.h"
+# include "static_assert.h"
 
 # define ARRAY_SIZE(a_)	(sizeof(a_) / sizeof((a_)[0]) + MUST_BE_ARRAY(a_))
 
@@ -107,5 +108,15 @@ is_filled(const char *ptr, char fill, size_t size)
 # define MASK64_SAFE(x_) (BIT64_SAFE(x_) - 1ULL)
 
 # define FLAG(name_) name_ = BIT32(name_##_BIT)
+
+/**
+ * A shorthand for a build-time check of a type size that provides
+ * a corresponding "update the decoder" message in a case of failure.
+ * @param type_ Type whose size is to be checked.
+ * @param sz_   Expected type size in bytes.
+ */
+#define CHECK_TYPE_SIZE(type_, sz_) \
+	static_assert(sizeof(type_) == (sz_), \
+		      "Unexpected size of " #type_ "(" #sz_ " expected)")
 
 #endif /* !STRACE_MACROS_H */

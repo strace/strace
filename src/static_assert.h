@@ -10,7 +10,7 @@
 
 # include "assert.h"
 
-# if defined HAVE_STATIC_ASSERT
+# if defined HAVE_STATIC_ASSERT || defined static_assert
 
 /* static_assert is already available */
 
