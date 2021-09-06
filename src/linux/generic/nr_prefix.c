@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifdef HAVE_SIGINFO_T_SI_SYSCALL
+#if defined HAVE_SIGINFO_T_SI_SYSCALL || defined PERSONALITY0_AUDIT_ARCH
 /**
  * Returns prefix for a syscall constant literal.  It is has to be that way
  * thanks to ARM that decided to prefix their special system calls like sys32

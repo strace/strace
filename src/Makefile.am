@@ -348,6 +348,7 @@ libstrace_a_SOURCES =	\
 	syscall.c	\
 	syscall.h	\
 	syscall_dummy.h	\
+	syscall_name.c	\
 	sysctl.c	\
 	sysent.h	\
 	sysent_shorthand_defs.h \

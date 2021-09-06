@@ -24,15 +24,6 @@ bool seccomp_before_sysentry;
 
 #include <linux/seccomp.h>
 
-/* PERSONALITY*_AUDIT_ARCH definitions depend on AUDIT_ARCH_* constants.  */
-#ifdef PERSONALITY0_AUDIT_ARCH
-# include <linux/audit.h>
-# define XLAT_MACROS_ONLY
-#  include "xlat/elf_em.h"
-#  include "xlat/audit_arch.h"
-# undef XLAT_MACROS_ONLY
-#endif
-
 #ifndef BPF_MAXINSNS
 # define BPF_MAXINSNS 4096
 #endif
@@ -49,21 +40,6 @@ bool seccomp_before_sysentry;
 
 #define SET_BPF_JUMP(filter, code, k, jt, jf) \
 	SET_BPF(filter, BPF_JMP | code, jt, jf, k)
-
-struct audit_arch_t {
-	unsigned int arch;
-	unsigned int flag;
-};
-
-static const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
-#if SUPPORTED_PERSONALITIES > 1
-	PERSONALITY0_AUDIT_ARCH,
-	PERSONALITY1_AUDIT_ARCH,
-# if SUPPORTED_PERSONALITIES > 2
-	PERSONALITY2_AUDIT_ARCH,
-# endif
-#endif
-};
 
 typedef unsigned short (*filter_generator_t)(struct sock_filter *,
 					     bool *overflow);

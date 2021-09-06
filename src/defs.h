@@ -573,6 +573,23 @@ extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
  */
 extern const char *syscall_name(kernel_ulong_t scno);
 /**
+ * Convert a pair of (raw) syscall number and arch (defined by an AUDIT_ARCH_*
+ * constant) to the corresponding syscall name.  So far works only for arches
+ * that are present in personalities supported by strace binary.
+ *
+ * @param nr     Raw syscall number.
+ * @param arch   AUDIT_ARCH_* constant that identifies the architecture.
+ * @param prefix If arch corresponds to current personality (and the argument
+ *               is non-NULL), an appropriate __NR_* constant prefix
+ *               is to be stored at the address pointed by the argument.
+ *               If arch corresponds to a different personality, or syscall
+ *               name has not been found, NULL is stored.
+ * @return       String literal corresponding to the syscall number in case
+ *               the latter is valid;  NULL otherwise.
+ */
+extern const char *syscall_name_arch(kernel_ulong_t nr, unsigned int arch,
+				     const char **prefix);
+/**
  * Convert a syscall name to the corresponding (shuffled) syscall number.
  *
  * @param s     Syscall name.
@@ -1792,6 +1809,13 @@ extern unsigned nioctlents;
 extern const unsigned int nsyscall_vec[SUPPORTED_PERSONALITIES];
 extern const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES];
 extern struct inject_opts *inject_vec[SUPPORTED_PERSONALITIES];
+
+struct audit_arch_t {
+	unsigned int arch; /* AUDIT_ARCH_* */
+	unsigned int flag;
+};
+
+extern const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES];
 
 # ifdef ENABLE_COVERAGE_GCOV
 #  ifdef HAVE_GCOV_H

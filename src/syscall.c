@@ -1567,9 +1567,3 @@ set_success(struct tcb *tcp, kernel_long_t new_rval)
 # include "getregs_old.c"
 #endif
 #include "shuffle_scno.c"
-
-const char *
-syscall_name(kernel_ulong_t scno)
-{
-	return scno_is_valid(scno) ? sysent[scno].sys_name : NULL;
-}

@@ -602,6 +602,29 @@ tprints_arg_begin(const char *name)
 		printpid((tcp_), (where_).field_, PT_TGID);		\
 	} while (0)
 
+# define PRINT_FIELD_SYSCALL_NAME(where_, field_, audit_arch_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		const char *nr_prefix_ = NULL;				\
+		const char *name = syscall_name_arch((where_).field_,	\
+					(audit_arch_), &nr_prefix_);	\
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV	\
+		    || !nr_prefix_)					\
+			PRINT_VAL_U((where_).field_);			\
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW	\
+		    || !name)						\
+			break;						\
+		if (!nr_prefix_ ||					\
+		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
+			tprint_comment_begin();				\
+		if (nr_prefix_)						\
+			tprints(nr_prefix_);				\
+		tprints(name);						\
+		if (!nr_prefix_ ||					\
+		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
+			tprint_comment_end();				\
+	} while (0)
+
 # define PRINT_FIELD_MAC(where_, field_)				\
 	PRINT_FIELD_MAC_SZ((where_), field_, ARRAY_SIZE((where_).field_))
 
