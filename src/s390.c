@@ -72,8 +72,7 @@ struct sthyi_hdr {
 	uint16_t infgoff3; /**< Offset to Guest Section3 mapped by INF0GST */
 	uint16_t infglen3; /**< Length of Guest Section3 */
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_hdr) == 44,
-	      "Unexpected struct sthyi_hdr size");
+CHECK_TYPE_SIZE(struct sthyi_hdr, 44);
 
 struct sthyi_machine {
 	uint8_t  infmflg1; /**< Machine Flag Byte 1 reserved for IBM use */
@@ -125,8 +124,7 @@ struct sthyi_machine {
 	char     reserved_1__[4]; /**< Reserved for future IBM use */
 	char     infmplnm[8];  /**< EBCDIC Reserved for IBM use */
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_machine) == 72,
-	      "Unexpected struct sthyi_machine size");
+CHECK_TYPE_SIZE(struct sthyi_machine, 72);
 
 struct sthyi_partition {
 	/**
@@ -229,8 +227,7 @@ struct sthyi_partition {
 	uint32_t infplgif;
 	char     infpplnm[8]; /**< Reserved for future IBM use. */
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_partition) == 64,
-	      "Unexpected struct sthyi_partition size");
+CHECK_TYPE_SIZE(struct sthyi_partition, 64);
 
 struct sthyi_hypervisor {
 	/**
@@ -318,8 +315,7 @@ struct sthyi_hypervisor {
 	 */
 	uint8_t  infyautf[8];
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_hypervisor) == 48,
-	      "Unexpected struct sthyi_hypervisor size");
+CHECK_TYPE_SIZE(struct sthyi_hypervisor, 48);
 
 struct sthyi_guest {
 	/**
@@ -406,8 +402,7 @@ struct sthyi_guest {
 	 */
 	uint32_t infgpicc;
 } ATTRIBUTE_PACKED;
-static_assert(sizeof(struct sthyi_guest) == 56,
-	      "Unexpected struct sthyi_guest size");
+CHECK_TYPE_SIZE(struct sthyi_guest, 56);
 
 
 static void
