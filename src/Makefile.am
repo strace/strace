@@ -314,6 +314,7 @@ libstrace_a_SOURCES =	\
 	sched_attr.h	\
 	scsi.c		\
 	seccomp.c	\
+	seccomp_ioctl.c	\
 	sendfile.c	\
 	sg_io_v3.c	\
 	sg_io_v4.c	\

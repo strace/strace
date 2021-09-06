@@ -195,6 +195,18 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_perf-success \
 	ioctl_rtc-success \
 	ioctl_rtc-v \
+	ioctl_seccomp \
+	ioctl_seccomp--pidns-translation \
+	ioctl_seccomp-success \
+	ioctl_seccomp-y \
+	ioctl_seccomp-y-success \
+	ioctl_seccomp-y-success-Xabbrev \
+	ioctl_seccomp-y-success-Xraw \
+	ioctl_seccomp-y-success-Xverbose \
+	ioctl_seccomp-y-success--pidns-translation \
+	ioctl_seccomp-y-success--pidns-translation-Xabbrev \
+	ioctl_seccomp-y-success--pidns-translation-Xraw \
+	ioctl_seccomp-y-success--pidns-translation-Xverbose \
 	ioctl_ubi-success \
 	ioctl_v4l2-success \
 	ioctl_v4l2-success-Xabbrev \

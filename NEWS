@@ -7,6 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     SIGSYS siginfo_t).
   * Implemented decoding of SECCOMP_GET_NOTIF_SIZES operation of seccomp
     syscall.
+  * Implemented decoding of SECCOMP_* ioctl commands.
 
 * Bug fixes
 

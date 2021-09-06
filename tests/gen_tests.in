@@ -307,6 +307,18 @@ ioctl_rtc	+ioctl.test
 ioctl_rtc-success	+ioctl-success.sh -a22
 ioctl_rtc-v	+ioctl.test -v
 ioctl_scsi	+ioctl.test
+ioctl_seccomp						+ioctl.test -a42
+ioctl_seccomp--pidns-translation			test_pidns -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT:ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, NULL)" "QUIRK:PROG-ARGS:256 42" -a48
+ioctl_seccomp-success					+ioctl-success.sh -a42
+ioctl_seccomp-y						+ioctl.test -a42 -y
+ioctl_seccomp-y-success					+ioctl-success.sh -a42 -y
+ioctl_seccomp-y-success-Xabbrev				+ioctl-success.sh -a42 -y -Xabbrev
+ioctl_seccomp-y-success-Xraw				+ioctl-success.sh -a27 -y -Xraw
+ioctl_seccomp-y-success-Xverbose			+ioctl-success.sh -a59 -y -Xverbose
+ioctl_seccomp-y-success--pidns-translation		check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT:ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a48
+ioctl_seccomp-y-success--pidns-translation-Xabbrev	check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT:ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a48 -Xabbrev
+ioctl_seccomp-y-success--pidns-translation-Xraw		check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT-REGEX:ioctl(-1, 0x[0-9a-f]*, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a33 -Xraw
+ioctl_seccomp-y-success--pidns-translation-Xverbose	check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT-REGEX:ioctl(-1, 0x[0-9a-f]* /\* SECCOMP_IOCTL_NOTIF_RECV \*/, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a65 -Xverbose
 ioctl_sg_io_v3	+ioctl.test
 ioctl_sg_io_v4	+ioctl.test
 ioctl_sock	+ioctl.test -a23

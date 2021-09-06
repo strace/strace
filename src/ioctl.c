@@ -245,6 +245,12 @@ ioctl_decode_command_number(struct tcb *tcp)
 	const unsigned int code = tcp->u_arg[1];
 
 	switch (_IOC_TYPE(code)) {
+	case '!': /* 0x21 */
+		if (code == _IOC(_IOC_READ, '!', 2, sizeof(uint64_t))) {
+			tprints("SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR");
+			return 1;
+		}
+		return 0;
 	case 'E':
 		return evdev_decode_number(code);
 	case 'H':
@@ -348,6 +354,8 @@ ioctl_decode(struct tcb *tcp)
 		return hdio_ioctl(tcp, code, arg);
 	case 0x12:
 		return block_ioctl(tcp, code, arg);
+	case '!': /* 0x21 */
+		return seccomp_ioctl(tcp, code, arg);
 	case '"': /* 0x22 */
 		return scsi_ioctl(tcp, code, arg);
 	case '$': /* 0x24 */
