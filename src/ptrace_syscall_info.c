@@ -272,10 +272,11 @@ done:
 
 static void
 print_psi_entry(const typeof_field(struct_ptrace_syscall_info, entry) *const p,
-		const kernel_ulong_t fetch_size, struct tcb *const tcp)
+		const kernel_ulong_t fetch_size, struct tcb *const tcp,
+		unsigned int arch)
 {
 	tprint_struct_begin();
-	PRINT_FIELD_U(*p, nr);
+	PRINT_FIELD_SYSCALL_NAME(*p, nr, arch);
 	const kernel_ulong_t nargs =
 		(fetch_size - offsetof(struct_ptrace_syscall_info, entry.args))
 		/ sizeof(p->args[0]);
@@ -289,10 +290,11 @@ print_psi_entry(const typeof_field(struct_ptrace_syscall_info, entry) *const p,
 
 static void
 print_psi_seccomp(const typeof_field(struct_ptrace_syscall_info, seccomp) *const p,
-		const kernel_ulong_t fetch_size, struct tcb *const tcp)
+		const kernel_ulong_t fetch_size, struct tcb *const tcp,
+		unsigned int arch)
 {
 	tprint_struct_begin();
-	PRINT_FIELD_U(*p, nr);
+	PRINT_FIELD_SYSCALL_NAME(*p, nr, arch);
 	const kernel_ulong_t nargs =
 		(fetch_size - offsetof(struct_ptrace_syscall_info, seccomp.args))
 		/ sizeof(p->args[0]);
@@ -365,12 +367,14 @@ print_ptrace_syscall_info(struct tcb *tcp, kernel_ulong_t addr,
 		case PTRACE_SYSCALL_INFO_ENTRY:
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_PTR(info, entry,
-					    print_psi_entry, fetch_size, tcp);
+					    print_psi_entry, fetch_size, tcp,
+					    info.arch);
 			break;
 		case PTRACE_SYSCALL_INFO_SECCOMP:
 			tprint_struct_next();
 			PRINT_FIELD_OBJ_PTR(info, seccomp,
-					    print_psi_seccomp, fetch_size, tcp);
+					    print_psi_seccomp, fetch_size, tcp,
+					    info.arch);
 			break;
 		case PTRACE_SYSCALL_INFO_EXIT:
 			tprint_struct_next();

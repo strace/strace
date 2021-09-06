@@ -97,6 +97,12 @@ static const unsigned long args[][7] = {
 	}
 };
 
+static const char *sc_names[] = {
+	"chdir",
+	"gettid",
+	"exit_group"
+};
+
 static const unsigned int expected_none_size =
 	offsetof(struct_ptrace_syscall_info, entry);
 static const unsigned int expected_entry_size =
@@ -236,7 +242,10 @@ test_entry(void)
 		const unsigned long *exp_args = args[ptrace_stop / 2];
 		if (info.entry.nr != exp_args[0])
 			FAIL("#%d: entry stop mismatch", ptrace_stop);
-		printf(", entry={nr=%llu", (unsigned long long) info.entry.nr);
+		printf(", entry={nr="
+		       NABBR("%llu") VERB(" /* ") NRAW("__NR_%s") VERB(" */"),
+		       XLAT_SEL((unsigned long long) info.entry.nr,
+				sc_names[ptrace_stop / 2]));
 
 		for (unsigned int i = 0; i < ARRAY_SIZE(info.entry.args); ++i) {
 			const unsigned int i_size =
