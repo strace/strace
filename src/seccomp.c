@@ -24,7 +24,7 @@ SYS_FUNC(seccomp)
 	switch (op) {
 	case SECCOMP_GET_ACTION_AVAIL:
 		/* flags */
-		PRINT_VAL_U(flags);
+		PRINT_VAL_X(flags);
 		tprint_arg_next();
 
 		/* args */
@@ -48,7 +48,7 @@ SYS_FUNC(seccomp)
 	case SECCOMP_SET_MODE_STRICT:
 	default:
 		/* flags */
-		PRINT_VAL_U(flags);
+		PRINT_VAL_X(flags);
 		tprint_arg_next();
 
 		/* args */

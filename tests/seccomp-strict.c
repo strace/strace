@@ -24,7 +24,7 @@ main(void)
 	long rc;
 
 	rc = syscall(__NR_seccomp, -1L, -1L, addr);
-	printf("seccomp(%#x /* SECCOMP_SET_MODE_??? */, %u, %#llx)"
+	printf("seccomp(%#x /* SECCOMP_SET_MODE_??? */, %#x, %#llx)"
 	       " = %s\n", -1, -1, (unsigned long long) addr, sprintrc(rc));
 	fflush(stdout);
 

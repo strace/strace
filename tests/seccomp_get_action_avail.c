@@ -72,7 +72,7 @@ main(void)
 
 	flags |= 0xcafef00d;
 	k_seccomp(op, flags, 0);
-	printf("seccomp(SECCOMP_GET_ACTION_AVAIL, %u, NULL) = %s\n",
+	printf("seccomp(SECCOMP_GET_ACTION_AVAIL, %#x, NULL) = %s\n",
 	       (unsigned int) flags, errstr);
 
 	puts("+++ exited with 0 +++");
