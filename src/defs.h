@@ -322,6 +322,9 @@ struct tcb {
 	void *unwind_ctx;
 	struct unwind_queue_t *unwind_queue;
 # endif
+
+# define PROC_COMM_LEN 16
+	char comm[PROC_COMM_LEN];
 };
 
 /* TCB flags */
@@ -511,6 +514,7 @@ extern bool count_wallclock;
 extern unsigned int pid_decoding;
 enum pid_decoding_flags {
 	PID_DECODING_NS_TRANSLATION = 1 << 0,
+	PID_DECODING_COMM	    = 1 << 1,
 };
 /* are we filtering traces based on paths? */
 extern struct path_set {
@@ -1486,6 +1490,8 @@ extern void unwind_tcb_capture(struct tcb *);
 extern void kvm_run_structure_decoder_init(void);
 extern void kvm_vcpu_info_free(struct tcb *);
 # endif
+
+extern void maybe_load_task_comm(struct tcb *tcp);
 
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)

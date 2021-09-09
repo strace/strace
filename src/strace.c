@@ -909,6 +909,44 @@ expand_tcbtab(void)
 		*tcb_ptr = newtcbs;
 }
 
+static char *
+strip_trailing_newlines(char *str)
+{
+	size_t len = strlen(str);
+	for (; len > 0; --len) {
+		if (str[len - 1] != '\n')
+			break;
+	}
+	str[len] = '\0';
+	return str;
+}
+
+/* Load the contents of /proc/$pid/comm into `buf'. */
+static void
+load_pid_comm(int pid, char *buf, size_t buf_size)
+{
+	static const char comm_path[] = "/proc/%d/comm";
+	char procfile[sizeof(comm_path) + sizeof(int) * 3];
+
+	buf[0] = '\0';
+	xsprintf(procfile, comm_path, pid);
+	FILE *fp = fopen_stream(procfile, "r");
+	if (fp) {
+		if (fgets(buf, buf_size, fp))
+			strip_trailing_newlines(buf);
+		fclose(fp);
+	}
+}
+
+void
+maybe_load_task_comm(struct tcb *tcp)
+{
+	if (!(pid_decoding & PID_DECODING_COMM))
+		return;
+
+	load_pid_comm(get_proc_pid(tcp->pid), tcp->comm, sizeof(tcp->comm));
+}
+
 static struct tcb *
 alloctcb(int pid)
 {
@@ -921,6 +959,7 @@ alloctcb(int pid)
 			memset(tcp, 0, sizeof(*tcp));
 			list_init(&tcp->wait_list);
 			tcp->pid = pid;
+			maybe_load_task_comm(tcp);
 #if SUPPORTED_PERSONALITIES > 1
 			tcp->currpers = current_personality;
 #endif
