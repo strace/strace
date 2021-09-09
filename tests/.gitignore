@@ -945,11 +945,13 @@ status-successful-status
 status-unfinished
 status-unfinished-threads
 statx
+strace--decode-pids-comm
 strace--strings-in-hex
 strace--strings-in-hex-all
 strace--strings-in-hex-non-ascii
 strace--strings-in-hex-non-ascii-chars
 strace--strings-in-hex-none
+strace-Y-0123456789
 strace-n
 strace-no-x
 strace-x

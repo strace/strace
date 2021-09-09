@@ -897,6 +897,7 @@ strace--absolute-timestamps-format-unix-precision-ms +strace-ttt.test 3 --absolu
 strace--absolute-timestamps-format-unix-precision-ns +strace-ttt.test 9 --absolute-timestamps=format:unix --absolute-timestamps=precision:ns
 strace--absolute-timestamps-format-unix-precision-s +strace-ttt.test 0 --absolute-timestamps=format:unix --absolute-timestamps=precision:s
 strace--absolute-timestamps-format-unix-precision-us +strace-ttt.test 6 --absolute-timestamps=precision:us --absolute-timestamps=format:unix
+strace--decode-pids-comm	--decode-pids=comm --trace=getppid,tgkill --signal='!SIGCHLD,SIGCONT' -q -f -a 18
 strace--follow-forks-output-separately +strace-ff.test --follow-forks --output-separately
 strace--relative-timestamps +strace-r.test --relative-timestamps
 strace--relative-timestamps-ms +strace-r.test --relative-timestamps=ms
@@ -923,6 +924,7 @@ strace--timestamps-unix-ms +strace-ttt.test 3 --timestamps=unix,ms
 strace--timestamps-unix-ns +strace-ttt.test 9 --timestamps=unix,ns
 strace--timestamps-unix-s +strace-ttt.test 0 --timestamps=unix,s
 strace--timestamps-unix-us +strace-ttt.test 6 --timestamps=unix,us
+strace-Y-0123456789	-Y --trace=getppid,tgkill --signal='!SIGCHLD,SIGCONT' -q -f -a 18
 strace-n	-e trace=listen -n -qq -a 12
 strace-no-x	-e trace=chdir -a 12
 strace-x	-e trace=chdir -x -a 12
