@@ -704,7 +704,11 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 		return false;
 
 	tprints("pid:");
-	PRINT_VAL_D(pid);
+	/*
+	 * The pid translation is not needed because
+	 * the pid is in strace's namespace.
+	 */
+	printpid(NULL, pid, PT_TID);
 	return true;
 }
 
