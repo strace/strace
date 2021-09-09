@@ -1124,6 +1124,8 @@ block/character device number associated with device file descriptors,
 and PIDs associated with pidfd file descriptors.
 .TP
 .B \-\-pidns\-translation
+.TQ
+.BR \-\-decode\-pids = pidns
 If strace and tracee are in different PID namespaces, print PIDs in
 strace's namespace, too.
 .if '@ENABLE_SECONTEXT_FALSE@'#' .TP

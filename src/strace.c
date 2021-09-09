@@ -137,7 +137,7 @@ static unsigned int daemonized_tracer;
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
-unsigned int pidns_translation;
+unsigned int pid_decoding;
 
 static bool detach_on_execve;
 
@@ -418,6 +418,8 @@ Output format:\n\
   -yy, --decode-fds=all\n\
                  print all available information associated with file\n\
                  descriptors in addition to paths\n\
+  --decode-pids=pidns\n\
+                 print PIDs in strace's namespace, too\n\
 "
 #ifdef ENABLE_SECONTEXT
 "\
@@ -2082,6 +2084,7 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_KVM,
 		GETOPT_QUAL_QUIET,
 		GETOPT_QUAL_DECODE_FD,
+		GETOPT_QUAL_DECODE_PID,
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -2143,6 +2146,7 @@ init(int argc, char *argv[])
 		{ "silent",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "silence",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "decode-fds",	optional_argument, 0, GETOPT_QUAL_DECODE_FD },
+		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
 
 		{ 0, 0, 0, 0 }
 	};
@@ -2340,7 +2344,7 @@ init(int argc, char *argv[])
 			yflag_short++;
 			break;
 		case GETOPT_PIDNS_TRANSLATION:
-			pidns_translation++;
+			qualify_decode_pid("pidns");
 			break;
 		case 'z':
 			clear_number_set_array(status_set, 1);
@@ -2404,6 +2408,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_QUAL_DECODE_FD:
 			qualify_decode_fd(optarg ?: yflag_qual);
+			break;
+		case GETOPT_QUAL_DECODE_PID:
+			qualify_decode_pid(optarg);
 			break;
 		default:
 			error_msg_and_help(NULL);

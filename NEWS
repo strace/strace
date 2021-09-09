@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented --strings-in-hex=non-ascii-chars option for using hexadecimal
     numbers instead of octal ones in escape sequences in the output strings.
+  * Implemented --decode-pids=pidns as an alias to --pidns-translation option.
   * Improved printing of syscall names in places where the associated
     AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request,
     SIGSYS siginfo_t).

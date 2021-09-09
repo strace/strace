@@ -527,7 +527,7 @@ get_proc_pid(int pid)
 static void
 printpid_translation(struct tcb *tcp, int pid, enum pid_type type)
 {
-	if (!pidns_translation)
+	if (!(pid_decoding & PID_DECODING_NS_TRANSLATION))
 		return;
 
 	int strace_pid = translate_pid(tcp, pid, type, NULL);

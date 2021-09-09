@@ -466,6 +466,15 @@ qualify_decode_fd(const char *const str)
 }
 
 void
+qualify_decode_pid(const char *const str)
+{
+	if (strcmp(str, "pidns") == 0)
+		pid_decoding |= PID_DECODING_NS_TRANSLATION;
+	else
+		error_msg_and_die("invalid --decode-pids= argument: '%s'", str);
+}
+
+void
 qualify_trace(const char *const str)
 {
 	if (!trace_set)

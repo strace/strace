@@ -508,7 +508,10 @@ extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
-extern unsigned int pidns_translation;
+extern unsigned int pid_decoding;
+enum pid_decoding_flags {
+	PID_DECODING_NS_TRANSLATION = 1 << 0,
+};
 /* are we filtering traces based on paths? */
 extern struct path_set {
 	const char **paths_selected;
@@ -1328,6 +1331,7 @@ extern void qualify_signals(const char *);
 extern void qualify_status(const char *);
 extern void qualify_quiet(const char *);
 extern void qualify_decode_fd(const char *);
+extern void qualify_decode_pid(const char *);
 extern void qualify_read(const char *);
 extern void qualify_write(const char *);
 extern void qualify_fault(const char *);
