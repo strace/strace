@@ -470,6 +470,8 @@ qualify_decode_pid(const char *const str)
 {
 	if (strcmp(str, "pidns") == 0)
 		pid_decoding |= PID_DECODING_NS_TRANSLATION;
+	else if (strcmp(str, "comm") == 0)
+		pid_decoding |= PID_DECODING_COMM;
 	else
 		error_msg_and_die("invalid --decode-pids= argument: '%s'", str);
 }

@@ -420,6 +420,8 @@ Output format:\n\
                  descriptors in addition to paths\n\
   --decode-pids=pidns\n\
                  print PIDs in strace's namespace, too\n\
+  -Y, --decode-pids=comm\n\
+                 print command names associated with PIDs\n\
 "
 #ifdef ENABLE_SECONTEXT
 "\
@@ -800,10 +802,17 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
-	if (print_pid_pfx)
-		tprintf("%-5d ", tcp->pid);
-	else if (nprocs > 1 && !outfname)
-		tprintf("[pid %5u] ", tcp->pid);
+	if (print_pid_pfx) {
+		if (pid_decoding & PID_DECODING_COMM)
+			tprintf("%-5d<%s> ", tcp->pid, tcp->comm);
+		else
+			tprintf("%-5d ", tcp->pid);
+	} else if (nprocs > 1 && !outfname) {
+		if (pid_decoding & PID_DECODING_COMM)
+			tprintf("[pid %5u<%s>] ", tcp->pid, tcp->comm);
+		else
+			tprintf("[pid %5u] ", tcp->pid);
+	}
 
 #ifdef ENABLE_SECONTEXT
 	char *context;
@@ -2028,6 +2037,7 @@ init(int argc, char *argv[])
 	static const char qqqflag_qual[] = "all";
 	static const char yflag_qual[] = "path";
 	static const char yyflag_qual[] = "all";
+	static const char Yflag_qual[] = "comm";
 	static const char tflag_str[] = "format:time";
 	static const char ttflag_str[] = "precision:us,format:time";
 	static const char tttflag_str[] = "format:unix,precision:us";
@@ -2096,7 +2106,7 @@ init(int argc, char *argv[])
 	qualify_signals("all");
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yzZ";
+		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2382,6 +2392,9 @@ init(int argc, char *argv[])
 		case 'y':
 			yflag_short++;
 			break;
+		case 'Y':
+			qualify_decode_pid(Yflag_qual);
+			break;
 		case GETOPT_PIDNS_TRANSLATION:
 			qualify_decode_pid("pidns");
 			break;
@@ -2509,6 +2522,19 @@ init(int argc, char *argv[])
 		}
 
 		qualify_decode_fd(yflag_short == 1 ? yflag_qual : yyflag_qual);
+	}
+
+	if ((pid_decoding & PID_DECODING_COMM)) {
+		/*
+		 * If --decode-pids=comm option comes after -p, comm fields
+		 * of tcbs are not filled though tcbs are initialized.
+		 * We must fill the fields here.
+		 */
+		for (unsigned int i = 0; i < tcbtabsize; ++i) {
+			struct tcb *tcp = tcbtab[i];
+			if (tcp->comm[0] == 0)
+				maybe_load_task_comm(tcp);
+		}
 	}
 
 	if (seccomp_filtering && detach_on_execve) {

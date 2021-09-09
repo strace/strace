@@ -1128,6 +1128,11 @@ and PIDs associated with pidfd file descriptors.
 .BR \-\-decode\-pids = pidns
 If strace and tracee are in different PID namespaces, print PIDs in
 strace's namespace, too.
+.TP
+.B \-Y
+.TQ
+.BR \-\-decode\-pids = comm
+Print command names for PIDs.
 .if '@ENABLE_SECONTEXT_FALSE@'#' .TP
 .if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext [= full ]
 .if '@ENABLE_SECONTEXT_FALSE@'#' When SELinux is available and is not disabled,
