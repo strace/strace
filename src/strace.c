@@ -948,6 +948,19 @@ load_pid_comm(int pid, char *buf, size_t buf_size)
 }
 
 void
+maybe_printpid_comm(int pid)
+{
+	if (!(pid_decoding & PID_DECODING_COMM))
+		return;
+
+	char buf[PROC_COMM_LEN];
+	load_pid_comm(pid, buf, sizeof(buf));
+	tprints("<");
+	tprints(buf);
+	tprints(">");
+}
+
+void
 maybe_load_task_comm(struct tcb *tcp)
 {
 	if (!(pid_decoding & PID_DECODING_COMM))

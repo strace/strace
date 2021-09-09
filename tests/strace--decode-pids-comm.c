@@ -39,11 +39,13 @@ do_default_action(void)
 	char comm[sizeof(NEW_NAME)];
 	if (prctl(PR_GET_NAME, comm))
 		perror_msg_and_skip("PR_GET_NAME");
+	char ocomm[sizeof(comm)];
+	strcpy(ocomm, comm);
 
 	pid_t pid  = getpid();
 	pid_t ppid = getppid();
 
-	printf("%-5d<%s> getppid() = %d\n", pid, comm, ppid);
+	printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
 	fflush(stdout);
 
 	pid_t child = fork();
@@ -52,18 +54,18 @@ do_default_action(void)
 	else if (child == 0) {
 		pid = getpid();
 		ppid = getppid();
-		printf("%-5d<%s> getppid() = %d\n", pid, comm, ppid);
+		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
 
 		strcpy(comm, NEW_NAME);
 		prctl(PR_SET_NAME, comm);
 		prctl(PR_GET_NAME, comm);
 
 		ppid = getppid();
-		printf("%-5d<%s> getppid() = %d\n", pid, comm, ppid);
+		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
 
 		long rc = syscall(__NR_tgkill, ppid, ppid, SIGCONT);
-		printf("%-5d<%s> tgkill(%d, %d, SIGCONT) = %s\n",
-		       pid, comm, ppid, ppid, sprintrc(rc));
+		printf("%-5d<%s> tgkill(%d<%s>, %d<%s>, SIGCONT) = %s\n",
+		       pid, comm, ppid, ocomm, ppid, ocomm, sprintrc(rc));
 
 		fflush(stdout);
 		char *args[] = { (char *) "unused", (char *) "execve", NULL };
@@ -79,7 +81,7 @@ do_default_action(void)
 		printf("%-5d<exe> +++ exited with 0 +++\n", child);
 
 		ppid = getppid();
-		printf("%-5d<%s> getppid() = %d\n", pid, comm, ppid);
+		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
 		printf("%-5d<%s> +++ exited with 0 +++\n", pid, comm);
 		return WEXITSTATUS(status);
 	}

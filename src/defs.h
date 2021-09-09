@@ -1492,6 +1492,8 @@ extern void kvm_vcpu_info_free(struct tcb *);
 # endif
 
 extern void maybe_load_task_comm(struct tcb *tcp);
+/* Print the contents of /proc/$pid/comm. */
+extern void maybe_printpid_comm(int pid);
 
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
