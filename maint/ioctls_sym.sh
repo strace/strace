@@ -103,70 +103,70 @@ process_file()
 	local f="$1"; shift
 
 	# Common code for every processed file.
-	cat > "$tmpdir"/printents.c <<__EOF__
-#include <linux/compiler_attributes.h>
-#include <asm/termbits.h>
-#include <asm/ioctl.h>
-#include <linux/types.h>
-#include <linux/limits.h>
-#include <linux/major.h>
+	cat > "$tmpdir"/printents.c <<-__EOF__
+		#include <linux/compiler_attributes.h>
+		#include <asm/termbits.h>
+		#include <asm/ioctl.h>
+		#include <linux/types.h>
+		#include <linux/limits.h>
+		#include <linux/major.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <stdint.h>
-#include <stdbool.h>
+		#include <sys/types.h>
+		#include <sys/socket.h>
+		#include <stdint.h>
+		#include <stdbool.h>
 
-#ifndef NULL
-# define NULL ((void*)0)
-#endif
-#ifndef __user
-# define __user
-#endif
-#ifndef __iomem
-# define __iomem
-#endif
-#ifndef __noreturn
-# define __noreturn __attribute__((noreturn))
-#endif
-#ifndef __packed
-# define __packed __attribute__((packed))
-#endif
-#ifndef __no_sanitize_or_inline
-# define __no_sanitize_or_inline
-#endif
-#ifndef __no_kasan_or_inline
-# define __no_kasan_or_inline
-#endif
+		#ifndef NULL
+		# define NULL ((void*)0)
+		#endif
+		#ifndef __user
+		# define __user
+		#endif
+		#ifndef __iomem
+		# define __iomem
+		#endif
+		#ifndef __noreturn
+		# define __noreturn __attribute__((noreturn))
+		#endif
+		#ifndef __packed
+		# define __packed __attribute__((packed))
+		#endif
+		#ifndef __no_sanitize_or_inline
+		# define __no_sanitize_or_inline
+		#endif
+		#ifndef __no_kasan_or_inline
+		# define __no_kasan_or_inline
+		#endif
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
+		typedef signed char s8;
+		typedef unsigned char u8;
+		typedef signed short s16;
+		typedef unsigned short u16;
+		typedef signed int s32;
+		typedef unsigned int u32;
+		typedef signed long long s64;
+		typedef unsigned long long u64;
 
-#include "fixes.h"
+		#include "fixes.h"
 
-#ifndef UL
-# define UL(x) (_UL(x))
-#endif
+		#ifndef UL
+		# define UL(x) (_UL(x))
+		#endif
 
-#ifndef ULL
-# define ULL(x) (_ULL(x))
-#endif
+		#ifndef ULL
+		# define ULL(x) (_ULL(x))
+		#endif
 
-#include <asm/bitsperlong.h>
-#ifndef BITS_PER_LONG
-# define BITS_PER_LONG __BITS_PER_LONG
-#endif
+		#include <asm/bitsperlong.h>
+		#ifndef BITS_PER_LONG
+		# define BITS_PER_LONG __BITS_PER_LONG
+		#endif
 
-#include "$f"
+		#include "$f"
 
-#include "defs.h"
+		#include "defs.h"
 
-__EOF__
+		__EOF__
 
 	# Soft pre-include workarounds for some processed files.  Fragile.
 	case "$f" in
@@ -180,10 +180,10 @@ __EOF__
 			return 0 # false positives
 			;;
 		*asm*/ioctls.h)
-			cat <<'__EOF__'
-#include <asm/termios.h>
-#include <linux/serial.h>
-__EOF__
+			cat <<-'__EOF__'
+				#include <asm/termios.h>
+				#include <linux/serial.h>
+				__EOF__
 			;;
 		drm/sis_drm.h)
 			echo '#include <drm/drm.h>'
@@ -192,22 +192,22 @@ __EOF__
 			echo '#include <drm/drm.h>' > "$tmpdir/drm.h"
 			;;
 		fbio.h|*/fbio.h)
-			cat <<'__EOF__'
-#include <linux/fb.h>
-#undef FBIOGETCMAP
-#undef FBIOPUTCMAP
-__EOF__
+			cat <<-'__EOF__'
+				#include <linux/fb.h>
+				#undef FBIOGETCMAP
+				#undef FBIOPUTCMAP
+				__EOF__
 			;;
 		*linux/atm_zatm.h)
-			cat <<'__EOF__'
-#include <linux/atm.h>
-#ifndef _LINUX_TIME_H
-# define _LINUX_TIME_H
-#endif
-#ifndef _UAPI_LINUX_TIME_H
-# define _UAPI_LINUX_TIME_H
-#endif
-__EOF__
+			cat <<-'__EOF__'
+				#include <linux/atm.h>
+				#ifndef _LINUX_TIME_H
+				# define _LINUX_TIME_H
+				#endif
+				#ifndef _UAPI_LINUX_TIME_H
+				# define _UAPI_LINUX_TIME_H
+				#endif
+				__EOF__
 			;;
 		*linux/atm?*.h)
 			echo '#include <linux/atm.h>'
@@ -216,20 +216,20 @@ __EOF__
 			echo 'typedef u32 compat_ulong_t;'
 			;;
 		*linux/coda.h|*android_alarm.h)
-			cat <<'__EOF__'
-#ifndef _LINUX_TIME_H
-# define _LINUX_TIME_H
-#endif
-#ifndef _UAPI_LINUX_TIME_H
-# define _UAPI_LINUX_TIME_H
-#endif
-__EOF__
+			cat <<-'__EOF__'
+				#ifndef _LINUX_TIME_H
+				# define _LINUX_TIME_H
+				#endif
+				#ifndef _UAPI_LINUX_TIME_H
+				# define _UAPI_LINUX_TIME_H
+				#endif
+				__EOF__
 			;;
 		*linux/fs.h|*linux/ncp_fs.h)
-			cat <<'__EOF__'
-#include <linux/blktrace_api.h>
-#include <linux/fiemap.h>
-__EOF__
+			cat <<-'__EOF__'
+				#include <linux/blktrace_api.h>
+				#include <linux/fiemap.h>
+				__EOF__
 			;;
 		*linux/ndctl.h)
 			echo '#define PAGE_SIZE 0'
@@ -265,41 +265,41 @@ __EOF__
 			echo '#include <linux/atmioc.h>'
 			;;
 		*linux/usbdevice_fs.h)
-			cat <<'__EOF__'
-struct usbdevfs_ctrltransfer32 { __u32 unused[4]; };
-struct usbdevfs_bulktransfer32 { __u32 unused[4]; };
-struct usbdevfs_disconnectsignal32 { __u32 unused[2]; };
-struct usbdevfs_urb32 { __u8 unused[42]; };
-struct usbdevfs_ioctl32 { __u32 unused[3]; };
-__EOF__
+			cat <<-'__EOF__'
+				struct usbdevfs_ctrltransfer32 { __u32 unused[4]; };
+				struct usbdevfs_bulktransfer32 { __u32 unused[4]; };
+				struct usbdevfs_disconnectsignal32 { __u32 unused[2]; };
+				struct usbdevfs_urb32 { __u8 unused[42]; };
+				struct usbdevfs_ioctl32 { __u32 unused[3]; };
+				__EOF__
 			;;
 		logger.h|*/logger.h)
 			echo 'typedef __u32 kuid_t;'
 			;;
 		*sound/asequencer.h)
-			cat <<'__EOF__'
-#include <sound/asound.h>
-struct snd_seq_queue_owner { __u32 unused[0]; };
-__EOF__
+			cat <<-'__EOF__'
+				#include <sound/asound.h>
+				struct snd_seq_queue_owner { __u32 unused[0]; };
+				__EOF__
 			;;
 		*sound/emu10k1.h)
-			cat <<'__EOF__'
-#include <sound/asound.h>
-#ifndef DECLARE_BITMAP
-# define DIV_ROUND_UP(x,y) (((x) + ((y) - 1)) / (y))
-# define BITS_TO_LONGS(nr) DIV_ROUND_UP(nr, 8 * sizeof(long))
-# define DECLARE_BITMAP(name,bits) unsigned long name[BITS_TO_LONGS(bits)]
-#endif
-__EOF__
+			cat <<-'__EOF__'
+				#include <sound/asound.h>
+				#ifndef DECLARE_BITMAP
+				# define DIV_ROUND_UP(x,y) (((x) + ((y) - 1)) / (y))
+				# define BITS_TO_LONGS(nr) DIV_ROUND_UP(nr, 8 * sizeof(long))
+				# define DECLARE_BITMAP(name,bits) unsigned long name[BITS_TO_LONGS(bits)]
+				#endif
+				__EOF__
 			;;
 		*video/sstfb.h)
 			echo 'struct fb_info;'
 			;;
 		*xen/evtchn.h|*xen/gntdev.h)
-			cat <<'__EOF__'
-typedef uint32_t grant_ref_t;
-typedef uint16_t domid_t;
-__EOF__
+			cat <<-'__EOF__'
+				typedef uint32_t grant_ref_t;
+				typedef uint16_t domid_t;
+				__EOF__
 			;;
 		*xen/interface/*.h)
 			return 0 # false positives
@@ -309,13 +309,13 @@ __EOF__
 			;;
 	esac > "$tmpdir"/fixes.h
 
-	cat > "$tmpdir"/header.in <<__EOF__
-#include <asm/bitsperlong.h>
-#ifndef BITS_PER_LONG
-# define BITS_PER_LONG __BITS_PER_LONG
-#endif
-#include "$f"
-__EOF__
+	cat > "$tmpdir"/header.in <<-__EOF__
+		#include <asm/bitsperlong.h>
+		#ifndef BITS_PER_LONG
+		# define BITS_PER_LONG __BITS_PER_LONG
+		#endif
+		#include "$f"
+		__EOF__
 
 	if [ -f "$inc_dir/uapi/$f" ]; then
 		s="$inc_dir/uapi/$f"
