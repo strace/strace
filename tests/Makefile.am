@@ -587,6 +587,7 @@ EXTRA_DIST = \
 	clock_adjtime-common.c \
 	clock_xettime-common.c \
 	count-f.expected \
+	cur_audit_arch.h \
 	eventfd.expected \
 	fadvise.h \
 	fcntl-common.c \
