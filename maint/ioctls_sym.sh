@@ -346,11 +346,10 @@ process_file()
 			# Convert enums to macros.
 			sed '/^enum binder/,/^};/d' < "$s" > "$tmpdir/$f"
 			sed -n '/^enum binder/,/^};/ s/^[[:space:]].*/&/p' < "$s" |
-			sed -e '
-s/^[[:space:]]*\([A-Z][A-Z_0-9]*\)[[:space:]]*=[[:space:]]*_\(IO\|IOW\|IOR\|IOWR\|IOC\)[[:space:]]*(/#define \1 _\2(/
-s/^\(#define .*)\),$/\1/
-s/^\(#define .*,\)$/\1 \\/
-s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
+			sed -e 's/^[[:space:]]*\([A-Z][A-Z_0-9]*\)[[:space:]]*=[[:space:]]*_\(IO\|IOW\|IOR\|IOWR\|IOC\)[[:space:]]*(/#define \1 _\2(/
+				s/^\(#define .*)\),$/\1/
+				s/^\(#define .*,\)$/\1 \\/
+				s/^\([[:space:]]\+[^),]\+)\),$/\1/' >> "$tmpdir/$f"
 			;;
 		*drm/r128_drm.h)
 			# Filter out the code that references unknown types.
