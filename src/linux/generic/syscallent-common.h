@@ -32,3 +32,4 @@
 [BASE_NR + 445] = { 4,	TD,		SEN(landlock_add_rule),		"landlock_add_rule"		},
 [BASE_NR + 446] = { 2,	TD,		SEN(landlock_restrict_self),	"landlock_restrict_self"	},
 [BASE_NR + 447] = { 1,	TD,		SEN(memfd_secret),		"memfd_secret"			},
+[BASE_NR + 448] = { 2,	TD,		SEN(process_mrelease),		"process_mrelease"	},

@@ -504,6 +504,8 @@ prlimit64
 process_madvise
 process_madvise-y
 process_madvise-yy
+process_mrelease
+process_mrelease-y
 process_vm_readv
 process_vm_writev
 pselect6

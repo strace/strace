@@ -319,6 +319,19 @@ SYS_FUNC(process_madvise)
 	return RVAL_DECODED;
 }
 
+SYS_FUNC(process_mrelease)
+{
+	const int pidfd = tcp->u_arg[0];
+	const unsigned int flags = tcp->u_arg[1];
+
+	printfd(tcp, pidfd);
+	tprint_arg_next();
+
+	PRINT_VAL_X(flags);
+
+	return RVAL_DECODED;
+}
+
 #include "xlat/mlockall_flags.h"
 
 SYS_FUNC(mlockall)

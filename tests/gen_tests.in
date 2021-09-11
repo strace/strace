@@ -675,6 +675,8 @@ prlimit64-success--pidns-translation	check_scno_tampering; test_pidns -a36 -einj
 process_madvise
 process_madvise-y	--trace=process_madvise -y
 process_madvise-yy	--trace=process_madvise -yy
+process_mrelease	-a24
+process_mrelease-y	-e trace=process_mrelease -y -a24 </dev/full
 process_vm_readv	-s5 -a37
 process_vm_readv--pidns-translation	test_pidns -s5 -a37 -e trace=process_vm_readv
 process_vm_writev	-s5 -a38
