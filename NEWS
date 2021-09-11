@@ -3,7 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Improved printing of syscall names in places where the associated
-    AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request).
+    AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request,
+    SIGSYS siginfo_t).
 
 * Bug fixes
 

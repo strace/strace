@@ -22,8 +22,6 @@
 
 #include MPERS_DEFS
 
-#include "nr_prefix.c"
-
 #ifndef IN_MPERS
 # include "printsiginfo.h"
 #endif
@@ -116,34 +114,6 @@ print_si_code(const unsigned int si_code, const int si_signo)
 	print_xlat_ex(si_code, code, XLAT_STYLE_DEFAULT);
 }
 
-#ifdef HAVE_SIGINFO_T_SI_SYSCALL
-static void
-print_si_syscall(const unsigned int scno)
-{
-	/*
-	 * Note that we can safely use the personality set in
-	 * current_personality here (and don't have to guess it
-	 * based on X32_SYSCALL_BIT and si_arch, for example):
-	 *  - The signal is delivered as a result of seccomp
-	 *    filtering to the process executing forbidden
-	 *    syscall.
-	 *  - We have set the personality for the tracee during
-	 *    the syscall entering.
-	 *  - The current_personality is reliably switched in
-	 *    the next_event routine, it is set to the
-	 *    personality of the last call made (the one that
-	 *    triggered the signal delivery).
-	 *  - Looks like there are no other cases where SIGSYS
-	 *    is delivered from the kernel so far.
-	 */
-	const char *scname = syscall_name(shuffle_scno(scno));
-	if (scname)
-		tprintf("%s%s", nr_prefix(scno), scname);
-	else
-		PRINT_VAL_U(scno);
-}
-#endif
-
 static void
 print_si_info(struct tcb *tcp, const siginfo_t *sip)
 {
@@ -209,8 +179,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_call_addr);
 			tprint_struct_next();
-			PRINT_FIELD_OBJ_VAL(*sip, si_syscall,
-					    print_si_syscall);
+			PRINT_FIELD_SYSCALL_NAME(*sip, si_syscall,
+						 sip->si_arch);
 			tprint_struct_next();
 			PRINT_FIELD_XVAL(*sip, si_arch, audit_arch,
 					 "AUDIT_ARCH_???");

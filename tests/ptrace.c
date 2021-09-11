@@ -25,6 +25,14 @@
 #include <sys/uio.h>
 #include <sys/user.h>
 
+#include "cur_audit_arch.h"
+
+#include "xlat.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/elf_em.h"
+#undef XLAT_MACROS_ONLY
+#include "xlat/audit_arch.h"
+
 static const char *errstr;
 
 static long
@@ -1735,9 +1743,62 @@ main(void)
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
 	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
-	       ", si_syscall=__NR_read, si_arch=%#x /* AUDIT_ARCH_??? */})"
+	       ", si_syscall=%u, si_arch=%#x /* AUDIT_ARCH_??? */})"
 	       " = %s\n",
-	       pid, bad_request, sip->si_errno, sip->si_arch, errstr);
+	       pid, bad_request, sip->si_errno, sip->si_syscall, sip->si_arch,
+	       errstr);
+
+# ifdef CUR_AUDIT_ARCH
+	sip->si_arch = CUR_AUDIT_ARCH;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
+	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
+	       ", si_syscall=__NR_read, si_arch=%s"
+	       "}) = %s\n",
+	       pid, bad_request, sip->si_errno,
+	       sprintxval(audit_arch, CUR_AUDIT_ARCH, "AUDIT_ARCH_???"),
+	       errstr);
+# endif
+# if defined(PERS0_AUDIT_ARCH)
+	sip->si_arch = PERS0_AUDIT_ARCH;
+	sip->si_syscall = PERS0__NR_gettid;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
+	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
+	       ", si_syscall=%u /* gettid */, si_arch=%s"
+	       "}) = %s\n",
+	       pid, bad_request, sip->si_errno, PERS0__NR_gettid,
+	       sprintxval(audit_arch, PERS0_AUDIT_ARCH, "AUDIT_ARCH_???"),
+	       errstr);
+# endif
+# if defined(M32_AUDIT_ARCH)
+	sip->si_arch = M32_AUDIT_ARCH;
+	sip->si_syscall = M32__NR_gettid;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
+	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
+	       ", si_syscall=%u /* gettid */, si_arch=%s"
+	       "}) = %s\n",
+	       pid, bad_request, sip->si_errno, M32__NR_gettid,
+	       sprintxval(audit_arch, M32_AUDIT_ARCH, "AUDIT_ARCH_???"),
+	       errstr);
+# endif
+# if defined(MX32_AUDIT_ARCH)
+	sip->si_arch = MX32_AUDIT_ARCH;
+	sip->si_syscall = MX32__NR_gettid;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
+	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
+	       ", si_syscall=%u /* gettid */, si_arch=%s"
+	       "}) = %s\n",
+	       pid, bad_request, sip->si_errno, MX32__NR_gettid,
+	       sprintxval(audit_arch, MX32_AUDIT_ARCH, "AUDIT_ARCH_???"),
+	       errstr);
+# endif
 #endif
 
 #if defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
