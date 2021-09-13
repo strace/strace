@@ -169,7 +169,7 @@ print_xint32x2_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			    void *data)
 {
 	print_local_array_ex(tcp, elem_buf, 2, sizeof(int),
-			     print_xint32_array_member, NULL, 0, NULL, NULL);
+			     print_xint_array_member, NULL, 0, NULL, NULL);
 	return true;
 }
 
@@ -188,7 +188,7 @@ decode_nand_oobinfo(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY(ninfo, oobfree, tcp, print_xint32x2_array_member);
 	tprint_struct_next();
-	PRINT_FIELD_ARRAY(ninfo, eccpos, tcp, print_xint32_array_member);
+	PRINT_FIELD_ARRAY(ninfo, eccpos, tcp, print_xint_array_member);
 	tprint_struct_end();
 }
 
@@ -216,7 +216,7 @@ decode_nand_ecclayout_user(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_struct_begin();
 	PRINT_FIELD_X(nlay, eccbytes);
 	tprint_struct_next();
-	PRINT_FIELD_ARRAY(nlay, eccpos, tcp, print_xint32_array_member);
+	PRINT_FIELD_ARRAY(nlay, eccpos, tcp, print_xint_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_X(nlay, oobavail);
 	tprint_struct_next();

@@ -216,7 +216,7 @@ SYS_FUNC(clone3)
 				PRINT_FIELD_OBJ_TCB_VAL(arg, set_tid, tcp,
 					print_array, arg.set_tid_size,
 					&buf, sizeof(buf), tfetch_mem,
-					print_int32_array_member, 0);
+					print_int_array_member, 0);
 			}
 			tprint_struct_next();
 			PRINT_FIELD_U(arg, set_tid_size);

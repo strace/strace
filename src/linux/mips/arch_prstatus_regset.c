@@ -20,14 +20,8 @@ arch_decode_prstatus_regset(struct tcb *const tcp,
 		if (fetch_size > offsetof(struct_prstatus_regset, regs)) {
 			const size_t len = fetch_size -
 				offsetof(struct_prstatus_regset, regs);
-			PRINT_FIELD_ARRAY_UPTO(regs, regs,
-					       len / SIZEOF_LONG, tcp,
-#if SIZEOF_LONG == 4
-					       print_xint32_array_member
-#else
-					       print_xint64_array_member
-#endif
-					       );
+			PRINT_FIELD_ARRAY_UPTO(regs, regs, len / SIZEOF_LONG,
+					       tcp, print_xint_array_member);
 		}
 		if (fetch_size > offsetof(struct_prstatus_regset, lo)) {
 			tprint_struct_next();

@@ -37,12 +37,7 @@ arch_decode_prstatus_regset(struct tcb *const tcp,
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, gprs,
 					       len / sizeof(regs.gprs[0]), tcp,
-#if TRACEE_KLONGSIZE == 4
-					       print_xint32_array_member
-#else
-					       print_xint64_array_member
-#endif
-					       );
+					       print_xint_array_member);
 		}
 		if (fetch_size > offsetof(struct_prstatus_regset, acrs)) {
 			const size_t len =
@@ -50,7 +45,7 @@ arch_decode_prstatus_regset(struct tcb *const tcp,
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, acrs,
 					       len / sizeof(regs.acrs[0]), tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 
 		if (fetch_size > offsetof(struct_prstatus_regset, orig_gpr2)) {

@@ -32,7 +32,7 @@ arch_decode_pt_regs(struct tcb *const tcp, const kernel_ulong_t addr)
 	PRINT_FIELD_X(regs, y);
 
 	tprint_struct_next();
-	PRINT_FIELD_ARRAY(regs, u_regs, tcp, print_xint32_array_member);
+	PRINT_FIELD_ARRAY(regs, u_regs, tcp, print_xint_array_member);
 
 	tprint_struct_end();
 }

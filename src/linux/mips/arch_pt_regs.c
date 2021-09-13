@@ -16,7 +16,7 @@ arch_decode_pt_regs(struct tcb *const tcp, const kernel_ulong_t addr)
 		return;
 
 	tprint_struct_begin();
-	PRINT_FIELD_ARRAY(regs, regs, tcp, print_xint64_array_member);
+	PRINT_FIELD_ARRAY(regs, regs, tcp, print_xint_array_member);
 
 	tprint_struct_next();
 	PRINT_FIELD_X(regs, lo);

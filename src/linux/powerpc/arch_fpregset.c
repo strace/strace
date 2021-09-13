@@ -18,7 +18,7 @@ arch_decode_fpregset(struct tcb *const tcp,
 	} else if (!umoven_or_printaddr(tcp, addr, fetch_size, &regs)) {
 		tprint_struct_begin();
 		PRINT_FIELD_ARRAY_UPTO(regs, fpr, fetch_size / 8, tcp,
-				       print_xint64_array_member);
+				       print_xint_array_member);
 		if (fetch_size > offsetof(struct_fpregset, fpscr)) {
 			tprint_struct_next();
 			PRINT_FIELD_X(regs, fpscr);

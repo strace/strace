@@ -19,7 +19,7 @@ arch_decode_prstatus_regset(struct tcb *const tcp,
 		tprint_struct_begin();
 		PRINT_FIELD_ARRAY_UPTO(regs, uregs,
 				       fetch_size / 4, tcp,
-				       print_xint32_array_member);
+				       print_xint_array_member);
 		if (size > sizeof(regs)) {
 			tprint_struct_next();
 			tprint_more_data_follows();

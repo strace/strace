@@ -298,7 +298,7 @@ btrfs_print_qgroup_inherit(struct tcb *const tcp, const kernel_ulong_t qgi_addr)
 		tprints_field_name("qgroups");
 		print_array(tcp, qgi_addr + offsetof(typeof(inherit), qgroups),
 			    inherit.num_qgroups, &record, sizeof(record),
-			    tfetch_mem, print_uint64_array_member, 0);
+			    tfetch_mem, print_uint_array_member, 0);
 	}
 	tprint_struct_end();
 }

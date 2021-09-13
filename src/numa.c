@@ -228,7 +228,7 @@ SYS_FUNC(move_pages)
 
 		/* nodes */
 		print_array(tcp, tcp->u_arg[3], npages, &buf, sizeof(int),
-			    tfetch_mem, print_int32_array_member, 0);
+			    tfetch_mem, print_int_array_member, 0);
 		tprint_arg_next();
 	} else {
 		/* status */

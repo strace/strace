@@ -309,7 +309,7 @@ keyctl_dh_compute(struct tcb *tcp, kernel_ulong_t params, kernel_ulong_t buf,
 			if (!IS_ARRAY_ZERO(kdf.__spare)) {
 				tprint_struct_next();
 				PRINT_FIELD_ARRAY(kdf, __spare, tcp,
-						  print_xint32_array_member);
+						  print_xint_array_member);
 			}
 
 			tprint_struct_end();
@@ -342,7 +342,7 @@ print_pkey_query(struct tcb *tcp, kernel_ulong_t addr)
 	if (!IS_ARRAY_ZERO(query.__spare)) {
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY(query, __spare, tcp,
-				  print_xint32_array_member);
+				  print_xint_array_member);
 	}
 
 	tprint_struct_end();
@@ -392,7 +392,7 @@ fetch_print_pkey_params(struct tcb *tcp, kernel_ulong_t addr,
 	if (!IS_ARRAY_ZERO(params->__spare)) {
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY(*params, __spare, tcp,
-				  print_xint32_array_member);
+				  print_xint_array_member);
 	}
 
 	tprint_struct_end();

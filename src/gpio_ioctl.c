@@ -112,13 +112,13 @@ print_gpiohandle_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(hr, lines);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(hr, lineoffsets, hr.lines, tcp,
-			       print_uint32_array_member);
+			       print_uint_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_FLAGS(hr, flags, gpio_handle_flags,
 			  "GPIOHANDLE_REQUEST_???");
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(hr, default_values, hr.lines, tcp,
-			       print_uint8_array_member);
+			       print_uint_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(hr, consumer_label);
 	tprint_struct_end();
@@ -168,7 +168,7 @@ static void
 print_gpiohandle_data(struct tcb *const tcp, const struct gpiohandle_data *vals)
 {
 	tprint_struct_begin();
-	PRINT_FIELD_ARRAY(*vals, values, tcp, print_uint8_array_member);
+	PRINT_FIELD_ARRAY(*vals, values, tcp, print_uint_array_member);
 	tprint_struct_end();
 }
 
@@ -212,7 +212,7 @@ print_gpiohandle_set_config(struct tcb *const tcp, const kernel_ulong_t arg)
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(hc, flags, gpio_handle_flags, "GPIOHANDLE_REQUEST_???");
 	tprint_struct_next();
-	PRINT_FIELD_ARRAY(hc, default_values, tcp, print_uint8_array_member);
+	PRINT_FIELD_ARRAY(hc, default_values, tcp, print_uint_array_member);
 	tprint_struct_end();
 
 	return RVAL_IOCTL_DECODED;
@@ -391,7 +391,7 @@ print_gpio_v2_line_request(struct tcb *const tcp, const kernel_ulong_t arg)
 	PRINT_FIELD_U(lr, num_lines);
 	tprint_struct_next();
 	PRINT_FIELD_ARRAY_UPTO(lr, offsets, lr.num_lines, tcp,
-			       print_uint32_array_member);
+			       print_uint_array_member);
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_PTR(lr, config, tcp,
 				print_gpio_v2_line_config);

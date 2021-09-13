@@ -31,7 +31,7 @@ SYS_FUNC(sysinfo)
 		PRINT_FIELD_U(si, uptime);
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY(si, loads, tcp,
-				  print_kulong_array_member);
+				  print_uint_array_member);
 		tprint_struct_next();
 		PRINT_FIELD_U(si, totalram);
 		tprint_struct_next();

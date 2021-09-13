@@ -198,7 +198,7 @@ decode_bitset(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
 		print_local_array_ex(tcp, decoded_arg, size / current_wordsize,
-				     current_wordsize, print_xlong_array_member,
+				     current_wordsize, print_xint_array_member,
 				     NULL, 0, NULL, NULL);
 	}
 
@@ -233,7 +233,7 @@ mtslots_ioctl(struct tcb *const tcp, const unsigned int code,
 	tprints_field_name("values");
 	int val;
 	print_array(tcp, arg + sizeof(val), size - 1, &val, sizeof(val),
-		    tfetch_mem, print_int32_array_member, NULL);
+		    tfetch_mem, print_int_array_member, NULL);
 
 	tprint_struct_end();
 

@@ -972,43 +972,14 @@ extern void print_kernel_version(unsigned long version);
 extern void print_abnormal_hi(kernel_ulong_t);
 extern void print_ioprio(unsigned int ioprio);
 
-extern bool print_int8_array_member(struct tcb *, void *elem_buf,
+extern bool print_int_array_member(struct tcb *, void *elem_buf,
+				   size_t elem_size, void *data);
+extern bool print_uint_array_member(struct tcb *, void *elem_buf,
 				    size_t elem_size, void *data);
-extern bool print_uint8_array_member(struct tcb *, void *elem_buf,
-				     size_t elem_size, void *data);
-extern bool print_xint8_array_member(struct tcb *, void *elem_buf,
-				      size_t elem_size, void *data);
-extern bool print_int32_array_member(struct tcb *, void *elem_buf,
-				     size_t elem_size, void *data);
-extern bool print_uint32_array_member(struct tcb *, void *elem_buf,
-				      size_t elem_size, void *data);
-extern bool print_xint32_array_member(struct tcb *, void *elem_buf,
-				      size_t elem_size, void *data);
-extern bool print_uint64_array_member(struct tcb *, void *elem_buf,
-				      size_t elem_size, void *data);
-extern bool print_xint64_array_member(struct tcb *, void *elem_buf,
-				      size_t elem_size, void *data);
+extern bool print_xint_array_member(struct tcb *, void *elem_buf,
+				    size_t elem_size, void *data);
 extern bool print_fd_array_member(struct tcb *, void *elem_buf,
 				  size_t elem_size, void *data);
-
-static inline bool
-print_xlong_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			 void *data)
-{
-	return dispatch_wordsize(print_xint64_array_member,
-				 print_xint32_array_member,
-				 tcp, elem_buf, elem_size, data);
-}
-
-static inline bool
-print_kulong_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			  void *data)
-{
-	return dispatch_klongsize(print_uint64_array_member,
-				  print_uint32_array_member,
-				  tcp, elem_buf, elem_size, data);
-}
-
 
 typedef bool (*tfetch_mem_fn)(struct tcb *, kernel_ulong_t addr,
 			      unsigned int size, void *dest);

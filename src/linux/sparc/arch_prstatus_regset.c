@@ -18,27 +18,27 @@ arch_decode_prstatus_regset(struct tcb *const tcp,
 	} else if (!umoven_or_printaddr(tcp, addr, fetch_size, &regs)) {
 		tprint_struct_begin();
 		PRINT_FIELD_ARRAY_UPTO(regs, g, fetch_size / 4, tcp,
-				       print_xint32_array_member);
+				       print_xint_array_member);
 		if (fetch_size > offsetof(struct_prstatus_regset, o)) {
 			const size_t len =
 				fetch_size - offsetof(struct_prstatus_regset, o);
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, o, len / 4, tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 		if (fetch_size > offsetof(struct_prstatus_regset, l)) {
 			const size_t len =
 				fetch_size - offsetof(struct_prstatus_regset, l);
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, l, len / 4, tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 		if (fetch_size > offsetof(struct_prstatus_regset, i)) {
 			const size_t len =
 				fetch_size - offsetof(struct_prstatus_regset, i);
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, i, len / 4, tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 
 		if (fetch_size > offsetof(struct_prstatus_regset, psr)) {

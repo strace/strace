@@ -103,7 +103,7 @@ SYS_FUNC(io_uring_setup)
 		if (!IS_ARRAY_ZERO(params.resv)) {
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY(params, resv, tcp,
-					  print_xint32_array_member);
+					  print_xint_array_member);
 		}
 		return 0;
 	}
@@ -256,7 +256,7 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 	if (!IS_ARRAY_ZERO(probe->resv2)) {
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY(*probe, resv2, tcp,
-				  print_xint32_array_member);
+				  print_xint_array_member);
 	}
 	tprint_struct_next();
 	PRINT_FIELD_OBJ_TCB_VAL(*probe, ops, tcp, print_local_array_ex,

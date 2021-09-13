@@ -742,7 +742,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	print_big_u64_addr(info.map_ids);
 	print_array(tcp, info.map_ids, MIN(saved->nr_map_ids, info.nr_map_ids),
 		    &map_id_buf, sizeof(map_id_buf),
-		    tfetch_mem, print_uint32_array_member, 0);
+		    tfetch_mem, print_uint_array_member, 0);
 
 	tprint_struct_next();
 	PRINT_FIELD_CSTRING(info, name);
@@ -1041,7 +1041,7 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_QUERY)
 	print_big_u64_addr(attr.prog_ids);
 	print_array(tcp, attr.prog_ids, attr.prog_cnt, &prog_id_buf,
 		    sizeof(prog_id_buf), tfetch_mem,
-		    print_uint32_array_member, 0);
+		    print_uint_array_member, 0);
 
 	tprint_struct_next();
 	tprints_field_name("prog_cnt");

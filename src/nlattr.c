@@ -199,7 +199,7 @@ decode_nla_meminfo(struct tcb *const tcp,
 
 	unsigned int count = 0;
 	print_array_ex(tcp, addr, nmemb, &mem, sizeof(mem),
-		       tfetch_mem, print_uint32_array_member, &count,
+		       tfetch_mem, print_uint_array_member, &count,
 		       PAF_PRINT_INDICES | XLAT_STYLE_FMT_U,
 		       netlink_sk_meminfo_indices, "SK_MEMINFO_???");
 

@@ -55,21 +55,21 @@ arch_decode_fpregset(struct tcb *const tcp,
 				offsetof(struct_fpregset, st_space);
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, st_space, len / 4, tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 		if (fetch_size > offsetof(struct_fpregset, xmm_space)) {
 			const size_t len = fetch_size -
 				offsetof(struct_fpregset, xmm_space);
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, xmm_space, len / 4, tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 		if (fetch_size > offsetof(struct_fpregset, padding)) {
 			const size_t len = fetch_size -
 				offsetof(struct_fpregset, padding);
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY_UPTO(regs, padding, len / 4, tcp,
-					       print_xint32_array_member);
+					       print_xint_array_member);
 		}
 		if (size > sizeof(regs)) {
 			tprint_struct_next();

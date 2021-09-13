@@ -142,7 +142,7 @@ decode_ifla_bridge_id(struct tcb *const tcp,
 	else if (!umove_or_printaddr(tcp, addr, &id)) {
 		tprint_struct_begin();
 		PRINT_FIELD_ARRAY(id, prio, tcp,
-				  print_uint8_array_member);
+				  print_uint_array_member);
 		tprint_struct_next();
 		PRINT_FIELD_MAC(id, addr);
 		tprint_struct_end();
@@ -699,7 +699,7 @@ decode_ifla_inet_conf(struct tcb *const tcp,
 		return false;
 
 	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
-		       tfetch_mem, print_int32_array_member, NULL,
+		       tfetch_mem, print_int_array_member, NULL,
 		       PAF_PRINT_INDICES | XLAT_STYLE_FMT_D,
 		       inet_devconf_indices, "IPV4_DEVCONF_???");
 
@@ -737,7 +737,7 @@ decode_ifla_inet6_conf(struct tcb *const tcp,
 		return false;
 
 	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
-		       tfetch_mem, print_int32_array_member, NULL,
+		       tfetch_mem, print_int_array_member, NULL,
 		       PAF_PRINT_INDICES | XLAT_STYLE_FMT_D,
 		       inet6_devconf_indices, "DEVCONF_???");
 
@@ -757,7 +757,7 @@ decode_ifla_inet6_stats(struct tcb *const tcp,
 		return false;
 
 	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
-		       tfetch_mem, print_uint64_array_member, NULL,
+		       tfetch_mem, print_uint_array_member, NULL,
 		       PAF_PRINT_INDICES | XLAT_STYLE_FMT_U,
 		       snmp_ip_stats, "IPSTATS_MIB_???");
 
@@ -807,7 +807,7 @@ decode_ifla_inet6_icmp6_stats(struct tcb *const tcp,
 		return false;
 
 	print_array_ex(tcp, addr, cnt, &elem, sizeof(elem),
-		       tfetch_mem, print_uint64_array_member, NULL,
+		       tfetch_mem, print_uint_array_member, NULL,
 		       PAF_PRINT_INDICES | XLAT_STYLE_FMT_U,
 		       snmp_icmp6_stats, "ICMP6_MIB_???");
 

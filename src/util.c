@@ -1483,73 +1483,52 @@ umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
 }
 
 bool
-print_int8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+print_int_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+		       void *data)
+{
+	switch (elem_size) {
+	case sizeof(int8_t):  PRINT_VAL_D(*(int8_t *) elem_buf);  break;
+	case sizeof(int16_t): PRINT_VAL_D(*(int16_t *) elem_buf); break;
+	case sizeof(int32_t): PRINT_VAL_D(*(int32_t *) elem_buf); break;
+	case sizeof(int64_t): PRINT_VAL_D(*(int64_t *) elem_buf); break;
+	default:
+		error_func_msg("Unexpected elem_size: %zu", elem_size);
+		return false;
+	}
+
+	return true;
+}
+
+bool
+print_uint_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			void *data)
 {
-	PRINT_VAL_D(*(int8_t *) elem_buf);
+	switch (elem_size) {
+	case sizeof(uint8_t):  PRINT_VAL_U(*(uint8_t *) elem_buf);  break;
+	case sizeof(uint16_t): PRINT_VAL_U(*(uint16_t *) elem_buf); break;
+	case sizeof(uint32_t): PRINT_VAL_U(*(uint32_t *) elem_buf); break;
+	case sizeof(uint64_t): PRINT_VAL_U(*(uint64_t *) elem_buf); break;
+	default:
+		error_func_msg("Unexpected elem_size: %zu", elem_size);
+		return false;
+	}
 
 	return true;
 }
 
 bool
-print_uint8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			 void *data)
+print_xint_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			void *data)
 {
-	PRINT_VAL_U(*(uint8_t *) elem_buf);
-
-	return true;
-}
-
-bool
-print_xint8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			 void *data)
-{
-	PRINT_VAL_X(*(uint8_t *) elem_buf);
-
-	return true;
-}
-
-bool
-print_int32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			 void *data)
-{
-	PRINT_VAL_D(*(int32_t *) elem_buf);
-
-	return true;
-}
-
-bool
-print_uint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			  void *data)
-{
-	PRINT_VAL_U(*(uint32_t *) elem_buf);
-
-	return true;
-}
-
-bool
-print_xint32_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			  void *data)
-{
-	PRINT_VAL_X(*(uint32_t *) elem_buf);
-
-	return true;
-}
-
-bool
-print_uint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			  void *data)
-{
-	PRINT_VAL_U(*(uint64_t *) elem_buf);
-
-	return true;
-}
-
-bool
-print_xint64_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
-			  void *data)
-{
-	PRINT_VAL_X(*(uint64_t *) elem_buf);
+	switch (elem_size) {
+	case sizeof(uint8_t):  PRINT_VAL_X(*(uint8_t *) elem_buf);  break;
+	case sizeof(uint16_t): PRINT_VAL_X(*(uint16_t *) elem_buf); break;
+	case sizeof(uint32_t): PRINT_VAL_X(*(uint32_t *) elem_buf); break;
+	case sizeof(uint64_t): PRINT_VAL_X(*(uint64_t *) elem_buf); break;
+	default:
+		error_func_msg("Unexpected elem_size: %zu", elem_size);
+		return false;
+	}
 
 	return true;
 }

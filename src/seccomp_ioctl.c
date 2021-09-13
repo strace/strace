@@ -31,7 +31,7 @@ print_struct_seccomp_data(struct tcb *const tcp,
 	tprint_struct_next();
 	PRINT_FIELD_ADDR64(*data, instruction_pointer);
 	tprint_struct_next();
-	PRINT_FIELD_ARRAY(*data, args, tcp, print_xint64_array_member);
+	PRINT_FIELD_ARRAY(*data, args, tcp, print_xint_array_member);
 	tprint_struct_end();
 }
 

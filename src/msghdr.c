@@ -156,7 +156,7 @@ print_cmsg_uint(struct tcb *tcp, const void *cmsg_data,
 	const unsigned int *p = cmsg_data;
 
 	print_local_array_ex(tcp, p, data_len / sizeof(*p), sizeof(*p),
-			     print_uint32_array_member, NULL, 0, NULL, NULL);
+			     print_uint_array_member, NULL, 0, NULL, NULL);
 }
 
 static void
@@ -164,7 +164,7 @@ print_cmsg_xint8_t(struct tcb *tcp, const void *cmsg_data,
 		   const unsigned int data_len)
 {
 	print_local_array_ex(tcp, cmsg_data, data_len, 1,
-			     print_xint8_array_member, NULL, 0, NULL, NULL);
+			     print_xint_array_member, NULL, 0, NULL, NULL);
 }
 
 struct sock_ee {

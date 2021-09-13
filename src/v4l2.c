@@ -1014,7 +1014,7 @@ print_v4l2_queryctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		if (!IS_ARRAY_ZERO(c.reserved)) {
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY(c, reserved, tcp,
-					  print_xint32_array_member);
+					  print_xint_array_member);
 		}
 	} else {
 		tprint_struct_next();
@@ -1080,11 +1080,11 @@ print_v4l2_query_ext_ctrl(struct tcb *const tcp, const kernel_ulong_t arg)
 		PRINT_FIELD_U(c, nr_of_dims);
 		tprint_struct_next();
 		PRINT_FIELD_ARRAY_UPTO(c, dims, c.nr_of_dims, tcp,
-				       print_uint32_array_member);
+				       print_uint_array_member);
 		if (!IS_ARRAY_ZERO(c.reserved)) {
 			tprint_struct_next();
 			PRINT_FIELD_ARRAY(c, reserved, tcp,
-					  print_xint32_array_member);
+					  print_xint_array_member);
 		}
 	} else {
 		tprint_struct_next();
