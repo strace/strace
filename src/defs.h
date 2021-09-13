@@ -994,29 +994,32 @@ typedef void (*print_obj_by_addr_size_fn)(struct tcb *,
 
 
 /**
- * Array printing function with over-engineered interface.
+ * Array printing function with an over-engineered interface.
  *
- * @param start_addr       If tfetch_mem_fn is non-NULL: address in tracee's
+ * @param start_addr       If tfetch_mem_fn is non-NULL: an address in tracee's
  *                         memory where the start of the array is located.
  *                         If tfetch_mem_fn is NULL: ignored.
- * @param nmemb            Number of elements in array.
+ * @param nmemb            Number of elements in the array.
  * @param elem_buf         If tfetch_mem_fn is non-NULL: a buffer where each
  *                         element fetched by tfetch_mem_fn is stored.
- *                         If tfetch_mem_fn is NULL: address of the start of
- *                         the array in local memory.
- * @param elem_size        Size (in bytes) of each element in the array.
- * @param tfetch_mem_fn    Fetching function. If NULL, then elem_buf is treated
- *                         as local array of nmemb members elem_size each;
- *                         start_addr is ignored.
+ *                         If tfetch_mem_fn is NULL: an address of the start
+ *                         of the array in strace's memory.
+ * @param elem_size        Size (in bytes) of the each element in the array.
+ * @param tfetch_mem_fn    Fetching function.  If it is NULL, then elem_buf
+ *                         is treated as a local array of nmemb members
+ *                         of elem_size each, and start_addr is ignored.
  * @param print_func       Element printing callback.
  * @param opaque_data      A value that is unconditionally passed to print_func
- *                         in opaque_data argument.
+ *                         in the opaque_data argument.
  * @param flags            Combination of xlat style settings and additional
- *                         flags from enum print_array_flags.
- * @param index_xlat       Xlat array that is used for printing indices.
- * @param index_xlat_size  The size of xlat array.
+ *                         flags from enum print_array_flags that are appled
+ *                         to index printing.
+ * @param index_xlat       xlat that is used for printing indices.
  * @param index_dflt       Default string for the values not found
  *                         in index_xlat.
+ * @return                 true if at least one element has been fetched
+ *                         successfully (tfetch_mem_fn returned true);
+ *                         false otherwise.
  */
 extern bool
 print_array_ex(struct tcb *,
