@@ -99,6 +99,8 @@ main(void)
 		{ 5, "IORING_UNREGISTER_EVENTFD" },
 		{ 9, "IORING_REGISTER_PERSONALITY" },
 		{ 10, "IORING_UNREGISTER_PERSONALITY" },
+		{ 12, "IORING_REGISTER_ENABLE_RINGS" },
+		{ 18, "IORING_UNREGISTER_IOWQ_AFF" },
 	};
 
 	for (size_t i = 0; i < ARRAY_SIZE(no_arg_ops); i++) {

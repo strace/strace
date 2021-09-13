@@ -305,6 +305,13 @@ SYS_FUNC(io_uring_register)
 	case IORING_REGISTER_PROBE:
 		rc = print_io_uring_probe(tcp, arg, nargs);
 		break;
+	case IORING_UNREGISTER_BUFFERS:
+	case IORING_UNREGISTER_FILES:
+	case IORING_UNREGISTER_EVENTFD:
+	case IORING_REGISTER_PERSONALITY:
+	case IORING_UNREGISTER_PERSONALITY:
+	case IORING_REGISTER_ENABLE_RINGS:
+	case IORING_UNREGISTER_IOWQ_AFF:
 	default:
 		printaddr(arg);
 		break;
