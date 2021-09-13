@@ -13,6 +13,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated the list of MPOL_* constants.
 
 * Bug fixes
+  * Fixed printing of struct bpf_prog_info.map_ids array.
 
 Noteworthy changes in release 5.14 (2021-09-02)
 ===============================================

@@ -659,7 +659,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 {
 	struct bpf_prog_info_struct info = { 0 };
 	const unsigned int len = MIN(size, bpf_prog_info_struct_size);
-	uint64_t map_id_buf;
+	uint32_t map_id_buf;
 
 	memcpy(&info, info_buf, len);
 

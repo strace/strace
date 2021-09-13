@@ -71,16 +71,17 @@ sys_bpf(kernel_ulong_t cmd, void *attr, kernel_ulong_t size)
 static void
 print_map_create(void *attr_void, size_t size, long rc)
 {
-	/* struct BPF_MAP_CREATE_struct *attr = attr_void; */
+	struct BPF_MAP_CREATE_struct *attr = attr_void;
 
 	printf("bpf(BPF_MAP_CREATE, {map_type=BPF_MAP_TYPE_ARRAY, key_size=4"
-	       ", value_size=8, max_entries=1");
+	       ", value_size=%u, max_entries=%u",
+	       attr->value_size, attr->max_entries);
 	if (size > offsetof(struct BPF_MAP_CREATE_struct, map_flags))
 		printf(", map_flags=0");
 	if (size > offsetof(struct BPF_MAP_CREATE_struct, inner_map_fd))
 		printf(", inner_map_fd=0</dev/null>");
 	if (size > offsetof(struct BPF_MAP_CREATE_struct, map_name))
-		printf(", map_name=\"test_map\"");
+		printf(", map_name=\"%s\"", attr->map_name);
 	if (size > offsetof(struct BPF_MAP_CREATE_struct, map_ifindex))
 		printf(", map_ifindex=0");
 	if (size > offsetof(struct BPF_MAP_CREATE_struct, btf_fd)) {
@@ -125,21 +126,30 @@ static struct bpf_insn socket_prog[] = {
 		.code    = BPF_LD | BPF_DW | BPF_IMM,
 		.dst_reg = BPF_REG_1,
 		.src_reg = 1 /* BPF_PSEUDO_MAP_FD */,
-		.imm     = 0, /* to be set to map fd */
+		.imm     = 0, /* to be set to map fd2 */
 	},
 	{ /* 5 */
 		.imm     = 0,
 	},
 	{ /* 6 */
+		.code    = BPF_LD | BPF_DW | BPF_IMM,
+		.dst_reg = BPF_REG_1,
+		.src_reg = 1 /* BPF_PSEUDO_MAP_FD */,
+		.imm     = 0, /* to be set to map fd */
+	},
+	{ /* 7 */
+		.imm     = 0,
+	},
+	{ /* 8 */
 		.code    = BPF_JMP | BPF_K | BPF_CALL,
 		.imm     = 0x1, /* BPF_FUNC_map_lookup_elem */
 	},
-	{ /* 7 */
+	{ /* 9 */
 		.code    = BPF_ALU64 | BPF_K | BPF_MOV,
 		.dst_reg = BPF_REG_0,
 		.imm     = 0,
 	},
-	{ /* 8 */
+	{ /* 10 */
 		.code    = BPF_JMP | BPF_K | BPF_EXIT,
 	},
 };
@@ -154,6 +164,10 @@ static const char *socket_prog_fmt =
 		", dst_reg=BPF_REG_2, src_reg=BPF_REG_10, off=0, imm=0}"
 	", {code=BPF_ALU64|BPF_K|BPF_ADD"
 		", dst_reg=BPF_REG_2, src_reg=BPF_REG_0, off=0, imm=0xfffffffc}"
+	", {code=BPF_LD|BPF_DW|BPF_IMM"
+		", dst_reg=BPF_REG_1, src_reg=BPF_REG_1, off=0, imm=%#x}"
+	", {code=BPF_LD|BPF_W|BPF_IMM"
+		", dst_reg=BPF_REG_0, src_reg=BPF_REG_0, off=0, imm=0}"
 	", {code=BPF_LD|BPF_DW|BPF_IMM"
 		", dst_reg=BPF_REG_1, src_reg=BPF_REG_1, off=0, imm=%#x}"
 	", {code=BPF_LD|BPF_W|BPF_IMM"
@@ -176,7 +190,7 @@ print_prog_load(void *attr_void, size_t size, long rc)
 	printf("bpf(BPF_PROG_LOAD, {prog_type=BPF_PROG_TYPE_SOCKET_FILTER"
 	       ", insn_cnt=%zu, insns=", ARRAY_SIZE(socket_prog));
 # if VERBOSE
-	printf(socket_prog_fmt, socket_prog[4].imm);
+	printf(socket_prog_fmt, socket_prog[4].imm, socket_prog[6].imm);
 # else
 	printf("%p", socket_prog);
 # endif
@@ -259,12 +273,21 @@ main(int ac, char **av)
 	lock_file_by_dirname(av[0], "bpf-obj_get_info_by_fd");
 	sleep(1);
 
+	int ret;
+
 	struct BPF_MAP_CREATE_struct bpf_map_create_attr = {
 		.map_type    = BPF_MAP_TYPE_ARRAY,
 		.key_size    = 4,
 		.value_size  = 8,
 		.max_entries = 1,
 		.map_name    = "test_map",
+	};
+	struct BPF_MAP_CREATE_struct bpf_map_create_attr2 = {
+		.map_type    = BPF_MAP_TYPE_ARRAY,
+		.key_size    = 4,
+		.value_size  = 1,
+		.max_entries = 5,
+		.map_name    = "test_map_too",
 	};
 	size_t bpf_map_create_attr_sizes[] = {
 		sizeof(bpf_map_create_attr),
@@ -300,10 +323,15 @@ main(int ac, char **av)
 	int map_fd = try_bpf(BPF_MAP_CREATE, print_map_create,
 			     &bpf_map_create_attr, &bpf_map_create_attr_size);
 	if (map_fd < 0)
-		perror_msg_and_skip("BPF_MAP_CREATE failed");
+		perror_msg_and_skip("First BPF_MAP_CREATE failed");
+	int map_fd2 = try_bpf(BPF_MAP_CREATE, print_map_create,
+			     &bpf_map_create_attr2, &bpf_map_create_attr_size);
+	if (map_fd2 < 0)
+		perror_msg_and_skip("Second BPF_MAP_CREATE failed");
 
 #if CHECK_OBJ_PROG
-	socket_prog[4].imm = map_fd;
+	socket_prog[4].imm = map_fd2;
+	socket_prog[6].imm = map_fd;
 
 	size_t *bpf_prog_load_attr_size = bpf_prog_load_attr_sizes;
 	int prog_fd = try_bpf(BPF_PROG_LOAD, print_prog_load,
@@ -318,79 +346,97 @@ main(int ac, char **av)
 	 * initializer element is not constant.
 	 */
 #define MAP_INFO_SZ (sizeof(*map_info) + 64)
-	struct bpf_map_info_struct *map_info = tail_alloc(MAP_INFO_SZ);
-	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_map_get_info_attr = {
-		.bpf_fd   = map_fd,
-		.info_len = MAP_INFO_SZ,
-		.info     = (uintptr_t) map_info,
+	struct bpf_map_info_struct *map_info = tail_alloc(MAP_INFO_SZ
+							  + sizeof(*map_info));
+	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_map_get_info_attr[] = {
+		{
+			.bpf_fd   = map_fd,
+			.info_len = sizeof(*map_info),
+			.info     = (uintptr_t) map_info,
+		},
+		{
+			.bpf_fd   = map_fd2,
+			.info_len = MAP_INFO_SZ,
+			.info     = (uintptr_t) (map_info + 1),
+		},
 	};
 
-	memset(map_info, 0, MAP_INFO_SZ);
-	int ret = sys_bpf(BPF_OBJ_GET_INFO_BY_FD, &bpf_map_get_info_attr,
-			  sizeof(bpf_map_get_info_attr));
-	if (ret < 0)
-		perror_msg_and_skip("BPF_OBJ_GET_INFO_BY_FD map failed");
+	for (size_t i = 0; i < 2; i++) {
+		memset(map_info + i, 0, MAP_INFO_SZ);
+		ret = sys_bpf(BPF_OBJ_GET_INFO_BY_FD,
+				  &bpf_map_get_info_attr[i],
+				  sizeof(bpf_map_get_info_attr[i]));
+		if (ret < 0)
+			perror_msg_and_skip("BPF_OBJ_GET_INFO_BY_FD map failed");
 
-	printf("bpf(BPF_OBJ_GET_INFO_BY_FD"
-	       ", {info={bpf_fd=%d<anon_inode:bpf-map>, info_len=%zu",
-	       map_fd, MAP_INFO_SZ);
-	if (bpf_map_get_info_attr.info_len != MAP_INFO_SZ)
-		printf(" => %u", bpf_map_get_info_attr.info_len);
+		printf("bpf(BPF_OBJ_GET_INFO_BY_FD"
+		       ", {info={bpf_fd=%d<anon_inode:bpf-map>, info_len=%zu",
+		       i ? map_fd2 : map_fd,
+		       i ? MAP_INFO_SZ : sizeof(*map_info));
+		if (bpf_map_get_info_attr[i].info_len !=
+		    (i ? MAP_INFO_SZ : sizeof(*map_info)))
+			printf(" => %u", bpf_map_get_info_attr[i].info_len);
 
-	printf(", info=");
+		printf(", info=");
 #if VERBOSE
-	printf("{type=");
-	printxval(bpf_map_types, map_info->type, "BPF_MAP_TYPE_???");
-	printf(", ");
-	PRINT_FIELD_U(*map_info, id);
-	printf(", ");
-	PRINT_FIELD_U(*map_info, key_size);
-	printf(", ");
-	PRINT_FIELD_U(*map_info, value_size);
-	printf(", ");
-	PRINT_FIELD_U(*map_info, max_entries);
-	printf(", map_flags=");
-	printflags(bpf_map_flags, map_info->map_flags, "BPF_F_???");
+		printf("{type=");
+		printxval(bpf_map_types, map_info[i].type, "BPF_MAP_TYPE_???");
+		printf(", ");
+		PRINT_FIELD_U(map_info[i], id);
+		printf(", ");
+		PRINT_FIELD_U(map_info[i], key_size);
+		printf(", ");
+		PRINT_FIELD_U(map_info[i], value_size);
+		printf(", ");
+		PRINT_FIELD_U(map_info[i], max_entries);
+		printf(", map_flags=");
+		printflags(bpf_map_flags, map_info[i].map_flags, "BPF_F_???");
 
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, name)) {
-		printf(", name=");
-		print_quoted_cstring(map_info->name, sizeof(map_info->name));
-	}
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, ifindex))
-		printf(", ifindex=%u", map_info->ifindex);
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, btf_vmlinux_value_type_id))
-		printf(", btf_vmlinux_value_type_id=%u",
-		       map_info->btf_vmlinux_value_type_id);
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, netns_dev))
-		printf(", netns_dev=makedev(%#x, %#x)",
-		       major(map_info->netns_dev), minor(map_info->netns_dev));
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, netns_ino))
-		printf(", netns_ino=%" PRIu64, map_info->netns_ino);
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, btf_id)) {
-		printf(", ");
-		PRINT_FIELD_U(*map_info, btf_id);
-	}
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, btf_key_type_id)) {
-		printf(", ");
-		PRINT_FIELD_U(*map_info, btf_key_type_id);
-	}
-	if (bpf_map_get_info_attr.info_len >
-	    offsetof(struct bpf_map_info_struct, btf_value_type_id)) {
-		printf(", ");
-		PRINT_FIELD_U(*map_info, btf_value_type_id);
-	}
-	printf("}");
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, name)) {
+			printf(", name=");
+			print_quoted_cstring(map_info[i].name,
+					     sizeof(map_info[i].name));
+		}
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, ifindex))
+			printf(", ifindex=%u", map_info[i].ifindex);
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct,
+			     btf_vmlinux_value_type_id)) {
+			printf(", btf_vmlinux_value_type_id=%u",
+			       map_info[i].btf_vmlinux_value_type_id);
+		}
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, netns_dev))
+			printf(", netns_dev=makedev(%#x, %#x)",
+			       major(map_info[i].netns_dev),
+			       minor(map_info[i].netns_dev));
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, netns_ino))
+			printf(", netns_ino=%" PRIu64, map_info[i].netns_ino);
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, btf_id)) {
+			printf(", ");
+			PRINT_FIELD_U(map_info[i], btf_id);
+		}
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, btf_key_type_id)) {
+			printf(", ");
+			PRINT_FIELD_U(map_info[i], btf_key_type_id);
+		}
+		if (bpf_map_get_info_attr[i].info_len >
+		    offsetof(struct bpf_map_info_struct, btf_value_type_id)) {
+			printf(", ");
+			PRINT_FIELD_U(map_info[i], btf_value_type_id);
+		}
+		printf("}");
 #else /* !VERBOSE */
-	printf("%p", map_info);
+		printf("%p", map_info + i);
 #endif /* VERBOSE */
-	printf("}}, %zu) = %s\n", sizeof(bpf_map_get_info_attr), errstr);
+		printf("}}, %zu) = %s\n", sizeof(bpf_map_get_info_attr[i]),
+		       errstr);
+	}
 
 #if CHECK_OBJ_PROG
 	/*
@@ -400,7 +446,7 @@ main(int ac, char **av)
 # define PROG_INFO_SZ (sizeof(*prog_info) + 64)
 	struct bpf_prog_info_struct *prog_info = tail_alloc(PROG_INFO_SZ);
 	struct bpf_insn *xlated_prog = tail_alloc(sizeof(*xlated_prog) * 42);
-	uint32_t *map_ids = tail_alloc(sizeof(*map_ids) * 2);
+	uint32_t *map_ids = tail_alloc(sizeof(*map_ids) * 3);
 	struct BPF_OBJ_GET_INFO_BY_FD_struct bpf_prog_get_info_attr = {
 		.bpf_fd   = prog_fd,
 		.info_len = PROG_INFO_SZ,
@@ -409,7 +455,7 @@ main(int ac, char **av)
 	size_t old_prog_info_len = PROG_INFO_SZ;
 
 	memset(prog_info, 0, PROG_INFO_SZ);
-	for (unsigned int i = 0; i < 4; i++) {
+	for (unsigned int i = 0; i < 5; i++) {
 		prog_info->jited_prog_len = 0;
 		prog_info->nr_jited_ksyms = 0;
 		prog_info->nr_jited_func_lens = 0;
@@ -427,8 +473,8 @@ main(int ac, char **av)
 			prog_info->xlated_prog_insns =
 				(uintptr_t) (xlated_prog + 42);
 			prog_info->xlated_prog_len = 336;
-			prog_info->map_ids = (uintptr_t) (map_ids + 2);
-			prog_info->nr_map_ids = 2;
+			prog_info->map_ids = (uintptr_t) (map_ids + 3);
+			prog_info->nr_map_ids = 3;
 			break;
 		case 2:
 			prog_info->xlated_prog_insns = (uintptr_t) xlated_prog;
@@ -441,13 +487,18 @@ main(int ac, char **av)
 			prog_info->xlated_prog_insns = (uintptr_t) xlated_prog;
 			prog_info->xlated_prog_len = 0;
 			prog_info->map_ids = (uintptr_t) map_ids;
-			prog_info->nr_map_ids = 2;
+			prog_info->nr_map_ids = 3;
 			break;
+		case 4:
+			prog_info->xlated_prog_insns = (uintptr_t) xlated_prog;
+			prog_info->xlated_prog_len = 1;
+			prog_info->map_ids = (uintptr_t) (map_ids + 1);
+			prog_info->nr_map_ids = 1;
 		}
 
 		ret = sys_bpf(BPF_OBJ_GET_INFO_BY_FD, &bpf_prog_get_info_attr,
 			      sizeof(bpf_prog_get_info_attr));
-		if (i != 1 && ret < 0)
+		if (i != 1 && i != 4  && ret < 0)
 			perror_msg_and_skip("BPF_OBJ_GET_INFO_BY_FD"
 					    " prog %u failed", i);
 
@@ -493,6 +544,10 @@ main(int ac, char **av)
 				printf(" => %u", prog_info->xlated_prog_len);
 			printf(", xlated_prog_insns=[]");
 			break;
+		case 4:
+			printf(", xlated_prog_len=1 => 0");
+			printf(", xlated_prog_insns=[]");
+			break;
 		}
 
 		if (bpf_prog_get_info_attr.info_len >
@@ -509,24 +564,31 @@ main(int ac, char **av)
 			case 0:
 				printf(", nr_map_ids=0");
 				if (prog_info->nr_map_ids)
-					printf(" => 1");
+					printf(" => 2");
 				printf(", map_ids=NULL");
 				break;
 			case 1:
-				printf(", nr_map_ids=2, map_ids=%p",
-				       map_ids + 2);
+				printf(", nr_map_ids=3, map_ids=%p",
+				       map_ids + 3);
 				break;
 			case 2:
 				printf(", nr_map_ids=0");
 				if (prog_info->nr_map_ids)
-					printf(" => 1");
+					printf(" => 2");
 				printf(", map_ids=[]");
 				break;
 			case 3:
-				printf(", nr_map_ids=2");
-				if (prog_info->nr_map_ids != 2)
-					printf(" => 1");
-				printf(", map_ids=[%u]", map_info->id);
+				printf(", nr_map_ids=3");
+				if (prog_info->nr_map_ids != 3)
+					printf(" => 2");
+				printf(", map_ids=[%u, %u]",
+				       map_info[1].id, map_info[0].id);
+				break;
+			case 4:
+				printf(", nr_map_ids=1");
+				if (prog_info->nr_map_ids != 1)
+					printf(" => 2");
+				printf(", map_ids=[%u]", map_info[1].id);
 				break;
 			}
 		}
