@@ -10,13 +10,13 @@
 
 #include <linux/io_uring.h>
 
+#include "xlat/uring_cqring_flags.h"
+#include "xlat/uring_enter_flags.h"
 #include "xlat/uring_op_flags.h"
 #include "xlat/uring_ops.h"
 #include "xlat/uring_setup_features.h"
 #include "xlat/uring_setup_flags.h"
-#include "xlat/uring_enter_flags.h"
 #include "xlat/uring_register_opcodes.h"
-#include "xlat/uring_cqring_flags.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
