@@ -213,6 +213,9 @@ inotify_init1	-a27
 inotify_init1-y	-a27 -y -e trace=inotify_init1
 io_uring_enter	-y
 io_uring_register	-y
+io_uring_register-Xabbrev	-etrace=io_uring_register -y -Xabbrev
+io_uring_register-Xraw		-etrace=io_uring_register -y -Xraw
+io_uring_register-Xverbose	-etrace=io_uring_register -y -Xverbose
 io_uring_setup	-a26 -y
 ioctl_block	+ioctl.test
 ioctl_dm	+ioctl.test -s9

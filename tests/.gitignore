@@ -216,6 +216,9 @@ inotify_init1-y
 int_0x80
 io_uring_enter
 io_uring_register
+io_uring_register-Xabbrev
+io_uring_register-Xraw
+io_uring_register-Xverbose
 io_uring_setup
 ioctl
 ioctl_block
