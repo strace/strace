@@ -522,11 +522,7 @@ print_sockaddr_data_raw(const void *const buf, const int addrlen)
 static uint16_t
 btohs(uint16_t val)
 {
-#ifdef WORDS_BIGENDIAN
-	return (val << 8) | (val >> 8);
-#else
-	return val;
-#endif
+	return is_bigendian ? (val << 8) | (val >> 8) : val;
 }
 
 static void

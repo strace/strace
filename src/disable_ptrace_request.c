@@ -104,12 +104,6 @@ main(int argc, char **argv)
 	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0))
 		perror_msg_and_die("PR_SET_NO_NEW_PRIVS");
 
-# ifdef WORDS_BIGENDIAN
-#  define ARG_OFFSET sizeof(uint32_t)
-# else
-#  define ARG_OFFSET 0
-# endif
-
 	struct sock_filter filter[] = {
 		/* load the architecture */
 		BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
@@ -123,7 +117,8 @@ main(int argc, char **argv)
 		BPF_JUMP(BPF_JMP | BPF_K | BPF_JEQ, __NR_ptrace, 0, 3),
 		/* load the 1st syscall argument */
 		BPF_STMT(BPF_LD | BPF_W | BPF_ABS, \
-			 offsetof(struct seccomp_data, args[0]) + ARG_OFFSET),
+			 offsetof(struct seccomp_data, args[0])
+			 + (is_bigendian ? sizeof(uint32_t) : 0)),
 		/* jump to "allow" if it is not equal to DISABLE_PTRACE_REQUEST */
 		BPF_JUMP(BPF_JMP | BPF_K | BPF_JEQ, DISABLE_PTRACE_REQUEST, 0, 1),
 		/* reject */
