@@ -16,7 +16,9 @@
 #include "xlat/uring_ops.h"
 #include "xlat/uring_setup_features.h"
 #include "xlat/uring_setup_flags.h"
+#include "xlat/uring_sqe_flags.h"
 #include "xlat/uring_register_opcodes.h"
+#include "xlat/uring_restriction_opcodes.h"
 
 static void
 print_io_sqring_offsets(const struct io_sqring_offsets *const p)
@@ -268,6 +270,58 @@ print_io_uring_probe(struct tcb *tcp, const kernel_ulong_t addr,
 	return 0;
 }
 
+static bool
+print_io_uring_restriction(struct tcb *tcp, void *elem_buf, size_t elem_size,
+			   void *data)
+{
+	struct io_uring_restriction *r =
+		(struct io_uring_restriction *) elem_buf;
+	CHECK_TYPE_SIZE(*r, 16);
+	CHECK_TYPE_SIZE(r->resv2, 12);
+
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*r, opcode, uring_restriction_opcodes,
+			 "IORING_RESTRICTION_???");
+	switch (r->opcode) {
+	case IORING_RESTRICTION_REGISTER_OP:
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*r, register_op, uring_register_opcodes,
+				   "IORING_REGISTER_???");
+		break;
+	case IORING_RESTRICTION_SQE_OP:
+		tprint_struct_next();
+		PRINT_FIELD_XVAL(*r, sqe_op, uring_ops, "IORING_OP_???");
+		break;
+	case IORING_RESTRICTION_SQE_FLAGS_ALLOWED:
+	case IORING_RESTRICTION_SQE_FLAGS_REQUIRED:
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(*r, sqe_flags, uring_sqe_flags, "IOSQE_???");
+		break;
+	default:
+		tprintf_comment("op: %#x", r->register_op);
+	}
+	if (r->resv) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*r, resv);
+	}
+	if (!IS_ARRAY_ZERO(r->resv2)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(*r, resv2, tcp, print_xint_array_member);
+	}
+	tprint_struct_end();
+
+	return true;
+}
+
+static void
+print_io_uring_restrictions(struct tcb *tcp, const kernel_ulong_t addr,
+			    const unsigned int nargs)
+{
+	struct io_uring_restriction buf;
+	print_array(tcp, addr, nargs, &buf, sizeof(buf),
+		    tfetch_mem, print_io_uring_restriction, NULL);
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -304,6 +358,9 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_PROBE:
 		rc = print_io_uring_probe(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_RESTRICTIONS:
+		print_io_uring_restrictions(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

@@ -301,6 +301,199 @@ main(void)
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE), probe,
 	       errstr);
 
+
+	/* IORING_REGISTER_RESTRICTIONS */
+	static const struct {
+		uint16_t    opcode;
+		const char *opcode_str;
+		bool        opcode_known;
+		const char *op_pfx;
+		uint8_t     op;
+		const char *op_str;
+		bool op_known;
+	} restrictions_data[] = {
+		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
+		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
+		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
+		  "register_op=", ARG_STR(IORING_UNREGISTER_IOWQ_AFF),
+		  true },
+		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
+		  "register_op=", 19, " /* IORING_REGISTER_??? */", false },
+		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
+		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
+		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
+		  "sqe_op=", ARG_STR(IORING_OP_NOP), true },
+		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
+		  "sqe_op=", ARG_STR(IORING_OP_LINKAT), true },
+		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
+		  "sqe_op=", 40, " /* IORING_OP_??? */", false },
+		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
+		  "sqe_op=", 255, " /* IORING_OP_??? */", false },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
+		  "sqe_flags=", 0, "", false },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
+		  "sqe_flags=", 32, "IOSQE_BUFFER_SELECT", true },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
+		  "sqe_flags=", 0xff, "IOSQE_FIXED_FILE|IOSQE_IO_DRAIN"
+				      "|IOSQE_IO_LINK|IOSQE_IO_HARDLINK"
+				      "|IOSQE_ASYNC|IOSQE_BUFFER_SELECT"
+				      "|0xc0",
+		  true },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
+		  "sqe_flags=", 192, " /* IOSQE_??? */", false },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
+		  "sqe_flags=", 0, "", false },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
+		  "sqe_flags=", 1, "IOSQE_FIXED_FILE", true },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
+		  "sqe_flags=", 96, "IOSQE_BUFFER_SELECT|0x40", true },
+		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
+		  "sqe_flags=",	128, " /* IOSQE_??? */", false },
+		{ 4, " /* IORING_RESTRICTION_??? */", false, "", 0 },
+		{ 4, " /* IORING_RESTRICTION_??? */", false, "", 239 },
+		{ 137, " /* IORING_RESTRICTION_??? */", false, "", 0 },
+	};
+	struct io_uring_restriction *restrictions =
+			tail_alloc(sizeof(*restrictions)
+				   * ARRAY_SIZE(restrictions_data));
+	char *restrictions_end = (char *) (restrictions
+					   + ARRAY_SIZE(restrictions_data));
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS, NULL,
+			      0xfacefeed);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT
+	       ", NULL, 4207869677) = %s\n",
+	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_RESTRICTIONS),
+	       errstr);
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS,
+			      restrictions_end, 0);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", [], 0) = %s\n",
+	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_RESTRICTIONS),
+	       errstr);
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS,
+			      restrictions_end, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_RESTRICTIONS),
+	       restrictions_end, errstr);
+
+	sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS,
+			      restrictions_end - sizeof(*restrictions) + 1, 1);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1) = %s\n",
+	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_RESTRICTIONS),
+	       restrictions_end - sizeof(*restrictions) + 1, errstr);
+
+	struct io_uring_restriction *p =
+			restrictions + ARRAY_SIZE(restrictions_data) - 1;
+	for (size_t i = 0; i < ARRAY_SIZE(restrictions_data); i++) {
+		memset(p, 0, sizeof(*restrictions));
+		p->opcode = restrictions_data[i].opcode;
+		p->sqe_flags = restrictions_data[i].op;
+
+		sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS,
+				      p, 1);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", [{opcode=",
+		       fd_null, path_null,
+		       XLAT_ARGS(IORING_REGISTER_RESTRICTIONS));
+		if (restrictions_data[i].opcode_known) {
+			printf(XLAT_FMT,
+			       XLAT_SEL(restrictions_data[i].opcode,
+					restrictions_data[i].opcode_str));
+			printf(", %s", restrictions_data[i].op_pfx);
+			if (restrictions_data[i].op_known) {
+				printf(XLAT_FMT,
+				       XLAT_SEL(restrictions_data[i].op,
+						restrictions_data[i].op_str));
+			} else {
+				printf("%#x%s",
+				       restrictions_data[i].op,
+				       NRAW(restrictions_data[i].op_str));
+			}
+		} else {
+			printf("%#x%s /* op: %#x */",
+			       restrictions_data[i].opcode,
+			       NRAW(restrictions_data[i].opcode_str),
+			       restrictions_data[i].op);
+		}
+		printf("}], 1) = %s\n", errstr);
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(restrictions_data); i++) {
+		restrictions[i].opcode = restrictions_data[i].opcode;
+		restrictions[i].sqe_op = restrictions_data[i].op;
+		restrictions[i].resv = i & 1 ? 0x70 + i * 7 : 0;
+		restrictions[i].resv2[0] = i & 2 ? 0x80808080 | i * 0x1020304
+						 : 0;
+		restrictions[i].resv2[1] = i & 4 ? 0x80808080 | i * 0x4030201
+						 : 0;
+		restrictions[i].resv2[2] = i & 8 ? 0x08080808 | i * 0x40302010
+						 : 0;
+	}
+
+	for (size_t j = 0; j < 3; j++) {
+		if (j == 2) {
+			memmove(((char *) restrictions) + 4, restrictions,
+				sizeof(*restrictions)
+				* ARRAY_SIZE(restrictions_data) - 4);
+		}
+
+		sys_io_uring_register(fd_null, IORING_REGISTER_RESTRICTIONS,
+				      ((char *) restrictions) + 4 * !!(j == 2),
+				      ARRAY_SIZE(restrictions_data)
+				      + !!(j == 1));
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", [",
+		       fd_null, path_null,
+		       XLAT_ARGS(IORING_REGISTER_RESTRICTIONS));
+
+		for (unsigned int i = 0;
+		     i < ARRAY_SIZE(restrictions_data) - !!(j == 2); i++) {
+			printf("%s{opcode=", i ? ", " : "");
+			if (restrictions_data[i].opcode_known) {
+				printf(XLAT_FMT,
+				       XLAT_SEL(restrictions_data[i].opcode,
+						restrictions_data[i].opcode_str));
+				printf(", %s", restrictions_data[i].op_pfx);
+				if (restrictions_data[i].op_known) {
+					printf(XLAT_FMT,
+					       XLAT_SEL(restrictions_data[i].op,
+							restrictions_data[i].op_str));
+				} else {
+					printf("%#x%s",
+					       restrictions_data[i].op,
+					       NRAW(restrictions_data[i].op_str));
+				}
+			} else {
+				printf("%#x%s /* op: %#x */",
+				       restrictions_data[i].opcode,
+				       NRAW(restrictions_data[i].opcode_str),
+				       restrictions_data[i].op);
+			}
+
+			if (i & 1) {
+				printf(", resv=%#hhx",
+				       (unsigned char) (0x70 + i * 7));
+			}
+			if (i & 0xe) {
+				printf(", resv2=[%#x, %#x, %#x]",
+				       i & 2 ? 0x80808080 | i * 0x1020304 : 0,
+				       i & 4 ? 0x80808080 | i * 0x4030201 : 0,
+				       i & 8 ? 0x08080808 | i * 0x40302010 : 0);
+			}
+
+			printf("}");
+		}
+
+		if (j) {
+			printf(", ... /* %p */",
+			       j == 1 ? restrictions_end
+				      : restrictions_end - sizeof(*restrictions)
+				        + 4);
+		}
+		printf("], %zu) = %s\n",
+		       ARRAY_SIZE(restrictions_data) + !!(j == 1), errstr);
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
