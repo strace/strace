@@ -29,12 +29,6 @@
 # define BIG_ADDR_MAYBE(addr_)
 #endif
 
-#ifdef WORDS_BIGENDIAN
-# define BE_LE(be_, le_) be_
-#else
-# define BE_LE(be_, le_) le_
-#endif
-
 static const char *errstr;
 
 static long

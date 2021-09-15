@@ -402,18 +402,12 @@ main(int argc, char *argv[])
 	rc = do_clone3(arg2, sizeof(*arg2) + 8, ERR(E2BIG));
 	printf("clone3({flags=0, exit_signal=%llu, stack=NULL, stack_size=0"
 	       ", /* bytes %zu..%zu */ "
-#ifdef WORDS_BIGENDIAN
-	       "\"\\xfa\\xce\\xfe\\xed\\xde\\xad\\xc0\\xde\""
-#else
-	       "\"\\xde\\xc0\\xad\\xde\\xed\\xfe\\xce\\xfa\""
-#endif
+	       BE_LE("\"\\xfa\\xce\\xfe\\xed\\xde\\xad\\xc0\\xde\"",
+		     "\"\\xde\\xc0\\xad\\xde\\xed\\xfe\\xce\\xfa\"")
 #if RETVAL_INJECTED
 	       "} => {/* bytes %zu..%zu */ "
-# ifdef WORDS_BIGENDIAN
-	       "\"\\xfa\\xce\\xfe\\xed\\xde\\xad\\xc0\\xde\""
-# else
-	       "\"\\xde\\xc0\\xad\\xde\\xed\\xfe\\xce\\xfa\""
-# endif
+	       BE_LE("\"\\xfa\\xce\\xfe\\xed\\xde\\xad\\xc0\\xde\"",
+		     "\"\\xde\\xc0\\xad\\xde\\xed\\xfe\\xce\\xfa\"")
 #endif /* RETVAL_INJECTED */
 	       "}, %zu) = %s" INJ_STR,
 	       0xdeadface00000000ULL | SIGCHLD,

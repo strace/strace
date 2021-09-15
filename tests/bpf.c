@@ -955,13 +955,8 @@ static const struct bpf_attr_check BPF_PROG_GET_NEXT_ID_checks[] = {
 			.start_id = 0xdeadbeef
 		} },
 		.size = 1,
-		.str = "start_id="
-#ifdef WORDS_BIGENDIAN
-		       "3724541952"	/* 0xde000000 */
-#else
-		       "239"		/* 0x000000ef */
-#endif
-		       ", next_id=0"
+		/*                        0xde000000 0x000000ef */
+		.str = "start_id=" BE_LE("3724541952", "239") ", next_id=0"
 	},
 	{
 		.data = { .BPF_PROG_GET_NEXT_ID_data = {

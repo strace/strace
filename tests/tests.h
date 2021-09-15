@@ -431,8 +431,10 @@ f8ill_ptr_to_kulong(const void *const ptr)
 	int main(void) { error_msg_and_skip("undefined: %s", arg); }
 
 # ifdef WORDS_BIGENDIAN
+#  define BE_LE(be_, le_) be_
 #  define LL_PAIR(HI, LO) (HI), (LO)
 # else
+#  define BE_LE(be_, le_) le_
 #  define LL_PAIR(HI, LO) (LO), (HI)
 # endif
 # define LL_VAL_TO_PAIR(llval) LL_PAIR((long) ((llval) >> 32), (long) (llval))

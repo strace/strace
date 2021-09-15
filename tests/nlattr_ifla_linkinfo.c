@@ -396,12 +396,9 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
 				     u64_br_attrs[k].val, u64_br_attrs[k].name,
 				     u64_val, pattern,
-				     { 7, "\""
-#ifdef WORDS_BIGENDIAN
-					"\\xde\\xad\\xc0\\xde\\xfa\\xce\\xfe"
-#else
-					"\\xed\\xfe\\xce\\xfa\\xde\\xc0\\xad"
-#endif
+				     { 7, "\"" BE_LE(
+					"\\xde\\xad\\xc0\\xde\\xfa\\xce\\xfe",
+					"\\xed\\xfe\\xce\\xfa\\xde\\xc0\\xad")
 					"\"" },
 				     { 8, "16045693111314087661" },
 				     { 9, "16045693111314087661" });
@@ -424,13 +421,8 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
 				     u32_br_attrs[k].val, u32_br_attrs[k].name,
 				     u32_val, pattern,
-				     { 3, "\""
-#ifdef WORDS_BIGENDIAN
-					"\\xba\\xdc\\x0d"
-#else
-					"\\xed\\x0d\\xdc"
-#endif
-					"\"" },
+				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
+						"\"\\xed\\x0d\\xdc\"") },
 				     { 4, "3134983661" },
 				     { 5, "3134983661" });
 	}
@@ -445,13 +437,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
 				     u16_br_attrs[k].val, u16_br_attrs[k].name,
 				     u16_val, pattern,
-				     { 1, "\""
-#ifdef WORDS_BIGENDIAN
-					"\\xde"
-#else
-					"\\xed"
-#endif
-					"\"" },
+				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "57069" },
 				     { 3, "57069" });
 	}
@@ -465,13 +451,7 @@ main(void)
 		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
 				     x16_br_attrs[k].val, x16_br_attrs[k].name,
 				     u16_val, pattern,
-				     { 1, "\""
-#ifdef WORDS_BIGENDIAN
-					"\\xde"
-#else
-					"\\xed"
-#endif
-					"\"" },
+				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "0xdeed" },
 				     { 3, "0xdeed" });
 	}
@@ -557,13 +537,8 @@ main(void)
 				     u32_tun_attrs[k].val,
 				     u32_tun_attrs[k].name,
 				     u32_val, pattern,
-				     { 3, "\""
-#ifdef WORDS_BIGENDIAN
-					"\\xba\\xdc\\x0d"
-#else
-					"\\xed\\x0d\\xdc"
-#endif
-					"\"" },
+				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
+						"\"\\xed\\x0d\\xdc\"") },
 				     { 4, "3134983661" },
 				     { 5, "3134983661" });
 	}
@@ -599,13 +574,8 @@ main(void)
 				     uid_tun_attrs[k].val,
 				     uid_tun_attrs[k].name,
 				     u32_val, pattern,
-				     { 3, "\""
-#ifdef WORDS_BIGENDIAN
-					"\\xba\\xdc\\x0d"
-#else
-					"\\xed\\x0d\\xdc"
-#endif
-					"\"" },
+				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
+						"\"\\xed\\x0d\\xdc\"") },
 				     { 4, "3134983661" },
 				     { 5, "3134983661" });
 
