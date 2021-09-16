@@ -76,7 +76,7 @@ main(void)
 	if (fd_full < 0)
 		perror_msg_and_fail("open: %s", path_full);
 
-	int fds[] = { fd_full, fd_null };
+	int fds[] = { fd_full, fd_null, -1, -2, -3 };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
 
@@ -143,7 +143,7 @@ main(void)
 		sys_io_uring_register(fd_null, fd_arr_ops[i].op, arg_fds,
 				      ARRAY_SIZE(fds));
 		printf("io_uring_register(%u<%s>, " XLAT_FMT
-		       ", [%u<%s>, %u<%s>], %u) = %s\n",
+		       ", [%u<%s>, %u<%s>, -1, -2, -3], %u) = %s\n",
 		       fd_null, path_null,
 		       XLAT_SEL(fd_arr_ops[i].op, fd_arr_ops[i].str),
 		       fd_full, path_full, fd_null, path_null,
@@ -178,7 +178,9 @@ main(void)
 	sys_io_uring_register(fd_null, 6, &iufu, ARRAY_SIZE(fds));
 	printf("io_uring_register(%u<%s>, "
 	       XLAT_KNOWN(0x6, "IORING_REGISTER_FILES_UPDATE")
-	       ", {offset=3735929054, fds=[%u<%s>, %u<%s>]}, %u) = %s\n",
+	       ", {offset=3735929054, fds=[%u<%s>, %u<%s>, -1, "
+	       XLAT_KNOWN(-2, "IORING_REGISTER_FILES_SKIP")
+	       ", -3]}, %u) = %s\n",
 	       fd_null, path_null, fd_full, path_full, fd_null, path_null,
 	       (unsigned int) ARRAY_SIZE(fds), errstr);
 

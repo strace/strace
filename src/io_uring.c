@@ -12,6 +12,7 @@
 
 #include "xlat/uring_cqring_flags.h"
 #include "xlat/uring_enter_flags.h"
+#include "xlat/uring_files_update_fds.h"
 #include "xlat/uring_op_flags.h"
 #include "xlat/uring_ops.h"
 #include "xlat/uring_setup_features.h"
@@ -167,6 +168,20 @@ SYS_FUNC(io_uring_enter)
 	return RVAL_DECODED;
 }
 
+static bool
+print_files_update_array_member(struct tcb *tcp, void *elem_buf,
+				size_t elem_size, void *data)
+{
+	int fd = *(int *) elem_buf;
+
+	if (fd < -1)
+		printxval_d(uring_files_update_fds, fd, NULL);
+	else
+		printfd(tcp, fd);
+
+	return true;
+}
+
 static void
 print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 			    const unsigned int nargs)
@@ -187,7 +202,7 @@ print_io_uring_files_update(struct tcb *tcp, const kernel_ulong_t addr,
 	tprints_field_name("fds");
 	print_big_u64_addr(arg.fds);
 	print_array(tcp, arg.fds, nargs, &buf, sizeof(buf),
-		    tfetch_mem, print_fd_array_member, NULL);
+		    tfetch_mem, print_files_update_array_member, NULL);
 	tprint_struct_end();
 }
 
