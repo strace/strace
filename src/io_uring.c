@@ -337,6 +337,139 @@ print_io_uring_restrictions(struct tcb *tcp, const kernel_ulong_t addr,
 		    tfetch_mem, print_io_uring_restriction, NULL);
 }
 
+static void
+print_io_uring_rsrc_data(struct tcb *tcp, const uint64_t data,
+			 const unsigned int nr, const unsigned int opcode)
+{
+	int fd_buf;
+
+	switch (opcode) {
+	case IORING_REGISTER_FILES2:
+	case IORING_REGISTER_BUFFERS2:
+	case IORING_REGISTER_BUFFERS_UPDATE:
+	case IORING_REGISTER_FILES_UPDATE2:
+		tprint_struct_next();
+		tprints_field_name("data");
+		print_big_u64_addr(data);
+		break;
+	}
+
+	switch (opcode) {
+	case IORING_REGISTER_FILES2:
+		print_array(tcp, data, nr, &fd_buf, sizeof(fd_buf),
+			    tfetch_mem, print_fd_array_member, NULL);
+		break;
+	case IORING_REGISTER_FILES_UPDATE2:
+		print_array(tcp, data, nr, &fd_buf, sizeof(fd_buf),
+			    tfetch_mem, print_files_update_array_member, NULL);
+		break;
+	case IORING_REGISTER_BUFFERS2:
+	case IORING_REGISTER_BUFFERS_UPDATE:
+		tprint_iov(tcp, nr, data, iov_decode_addr);
+		break;
+	}
+}
+
+static void
+print_io_uring_rsrc_tags(struct tcb *tcp, const uint64_t tags,
+			 const unsigned int nr)
+{
+	uint64_t tag_buf;
+
+	tprint_struct_next();
+	tprints_field_name("tags");
+	print_big_u64_addr(tags);
+	print_array(tcp, tags, nr, &tag_buf, sizeof(tag_buf),
+		    tfetch_mem, print_xint_array_member, NULL);
+}
+
+static void
+print_io_uring_register_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
+			     const unsigned int size, const unsigned int opcode)
+{
+	struct io_uring_rsrc_register arg;
+	CHECK_TYPE_SIZE(arg, 32);
+	CHECK_TYPE_SIZE(arg.resv, sizeof(uint32_t));
+	CHECK_TYPE_SIZE(arg.resv2, sizeof(uint64_t));
+
+	if (size < 32) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(arg, nr);
+
+	if (arg.resv) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, resv);
+	}
+
+	if (arg.resv2) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, resv2);
+	}
+
+	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode);
+
+	print_io_uring_rsrc_tags(tcp, arg.tags, arg.nr);
+
+	if (size > sizeof(arg)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(arg),
+				    MIN(size, get_pagesize()), QUOTE_FORCE_HEX);
+	}
+
+	tprint_struct_end();
+}
+
+static void
+print_io_uring_update_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
+			   const unsigned int size, const unsigned int opcode)
+{
+	struct io_uring_rsrc_update2 arg;
+	CHECK_TYPE_SIZE(arg, 32);
+	CHECK_TYPE_SIZE(arg.resv, sizeof(uint32_t));
+	CHECK_TYPE_SIZE(arg.resv2, sizeof(uint32_t));
+
+	if (size < 32) {
+		printaddr(addr);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(arg, offset);
+
+	if (arg.resv) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, resv);
+	}
+
+	print_io_uring_rsrc_data(tcp, arg.data, arg.nr, opcode);
+
+	print_io_uring_rsrc_tags(tcp, arg.tags, arg.nr);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, nr);
+
+	if (arg.resv2) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, resv2);
+	}
+
+	if (size > sizeof(arg)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(arg),
+				    MIN(size, get_pagesize()), QUOTE_FORCE_HEX);
+	}
+
+	tprint_struct_end();
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -376,6 +509,14 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_RESTRICTIONS:
 		print_io_uring_restrictions(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_FILES2:
+	case IORING_REGISTER_BUFFERS2:
+		print_io_uring_register_rsrc(tcp, arg, nargs, opcode);
+		break;
+	case IORING_REGISTER_FILES_UPDATE2:
+	case IORING_REGISTER_BUFFERS_UPDATE:
+		print_io_uring_update_rsrc(tcp, arg, nargs, opcode);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:

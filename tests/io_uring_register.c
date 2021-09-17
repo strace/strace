@@ -21,13 +21,19 @@
 /* From tests/bpf.c */
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
 # define BIG_ADDR_MAYBE(addr_)
+# define BIG_ADDR_MASK 0
 #elif defined __arm__ || defined __i386__ || defined __mips__ \
    || defined __powerpc__ || defined __riscv__ || defined __s390__ \
    || defined __sparc__ || defined __tile__
 # define BIG_ADDR_MAYBE(addr_) addr_ " or "
+# define BIG_ADDR_MASK 0xffffffff00000000ULL
 #else
 # define BIG_ADDR_MAYBE(addr_)
+# define BIG_ADDR_MASK 0
 #endif
+
+static const char path_null[] = "/dev/null";
+static const char path_full[] = "/dev/full";
 
 static const char *errstr;
 
@@ -49,11 +55,79 @@ sys_io_uring_register(unsigned int fd, unsigned int opcode,
 	return rc;
 }
 
+static void
+print_rsrc_data(const struct iovec *arg_iov, const struct iovec *iov,
+		const int *arg_fds, const int *fds, const size_t i,
+		const size_t j, const void *endptr, bool upd)
+{
+	printf(", data=");
+	if (BIG_ADDR_MASK && (j & 2)) {
+		printf("%#llx or ", (unsigned long long) (BIG_ADDR_MASK |
+		       (j & 1 ? i ? (uintptr_t) arg_iov
+				  : (uintptr_t) arg_fds : 0)));
+	}
+	if (!(j & 1)) {
+		printf("NULL");
+		return;
+	}
+
+	printf("[");
+	if (!(j & 32))
+		goto print_rsrc_data_end;
+	if (i) {
+		printf("{iov_base=%p, iov_len=%lu}, {iov_base=%p, iov_len=%lu}",
+		       iov[0].iov_base, (unsigned long) iov[0].iov_len,
+		       iov[1].iov_base, (unsigned long) iov[1].iov_len);
+	} else {
+		printf("%u<%s>, %u<%s>, -1, %s, -3",
+		       fds[0], path_full, fds[1], path_null,
+		       upd ? XLAT_KNOWN(-2, "IORING_REGISTER_FILES_SKIP")
+			   : "-2");
+	}
+	if (j & 16)
+		printf(", ... /* %p */", endptr);
+print_rsrc_data_end:
+	printf("]");
+}
+
+static void
+print_rsrc_tags(const uint64_t *arg_tags, const uint64_t *tags, const size_t i,
+		const size_t j, const void *endptr)
+{
+	printf(", tags=");
+	if (BIG_ADDR_MASK && (j & 8)) {
+		printf("%#llx or ", (unsigned long long) (
+		       BIG_ADDR_MASK | (j & 4 ? 0
+			: (uintptr_t) (arg_tags + 1  + i * 3 - !!(j & 64)))));
+	}
+	if (j & 4) {
+		printf("NULL");
+		return;
+	}
+
+	printf("[");
+	if (!(j & 32))
+		goto print_rsrc_tags_end;
+	if (i) {
+		printf("%s0xbadc0deddadfaced%s",
+		       j & 64 ? "0xfacefeed, " : "", j & 64 ? "" : ", 0");
+	} else {
+		printf("%s0x1, 0xdead, 0xfacefeed, 0xbadc0deddadfaced%s",
+		       j & 64 ? "0x1337, " : "", j & 64 ? "" : ", 0");
+	}
+	if (j & 16) {
+		if (j & 64)
+			printf(", 0");
+		else
+			printf(", ... /* %p */", endptr);
+	}
+print_rsrc_tags_end:
+	printf("]");
+}
+
 int
 main(void)
 {
-	static const char path_null[] = "/dev/null";
-	static const char path_full[] = "/dev/full";
 	const struct iovec iov[] = {
 		{
 			.iov_base = (void *) (unsigned long) 0xfacefeedcafef00d,
@@ -494,6 +568,219 @@ main(void)
 		}
 		printf("], %zu) = %s\n",
 		       ARRAY_SIZE(restrictions_data) + !!(j == 1), errstr);
+	}
+
+
+	/* IORING_REGISTER_FILES2, IORING_REGISTER_BUFFERS2 */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} rsrc_reg_ops[] = {
+		{ 13, "IORING_REGISTER_FILES2" },
+		{ 15, "IORING_REGISTER_BUFFERS2" },
+	};
+	static const uint64_t tags[] = { 0x1337, 1, 0xdead, 0xfacefeed,
+					 0xbadc0deddadfacedULL, 0 };
+	const uint64_t *arg_tags = tail_memdup(tags, sizeof(tags));
+
+	struct io_uring_rsrc_register *bogus_rsrc_reg = tail_alloc(24);
+	struct io_uring_rsrc_register *rsrc_reg = tail_alloc(sizeof(*rsrc_reg));
+	struct io_uring_rsrc_register *big_rsrc_reg =
+		tail_alloc(sizeof(*big_rsrc_reg) + 8);
+
+	fill_memory(big_rsrc_reg, sizeof(*big_rsrc_reg) + 8);
+
+	for (size_t i = 0; i < ARRAY_SIZE(rsrc_reg_ops); i++) {
+		sys_io_uring_register(fd_null, rsrc_reg_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(rsrc_reg_ops[i].op, rsrc_reg_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		struct {
+			void *ptr;
+			unsigned int sz;
+		} ptr_args[] = {
+			{ bogus_rsrc_reg, 24 },
+			{ bogus_rsrc_reg, 32 },
+		};
+		for (size_t j = 0; j < ARRAY_SIZE(ptr_args); j++) {
+			sys_io_uring_register(fd_null, rsrc_reg_ops[i].op,
+					      ptr_args[j].ptr, ptr_args[j].sz);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, %u)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(rsrc_reg_ops[i].op,
+					rsrc_reg_ops[i].str),
+			       ptr_args[j].ptr, ptr_args[j].sz, errstr);
+		}
+
+		for (size_t j = 0; j < 256; j++) {
+			void *endptr = i ? (void *) (arg_iov + ARRAY_SIZE(iov))
+					 : (void *) (arg_fds + ARRAY_SIZE(fds));
+
+			rsrc_reg->data = i ? (uintptr_t) arg_iov
+					  : (uintptr_t) arg_fds;
+			rsrc_reg->nr = i ? ARRAY_SIZE(iov) : ARRAY_SIZE(fds);
+			rsrc_reg->tags = (uintptr_t) (arg_tags
+						      + ARRAY_SIZE(tags)
+						      - rsrc_reg->nr);
+
+			rsrc_reg->data &= ~-!(j & 1);
+			rsrc_reg->data |= j & 2 ? BIG_ADDR_MASK : 0;
+			rsrc_reg->tags -= !!(j & 64) * sizeof(uint64_t);
+			rsrc_reg->tags &= ~-!!(j & 4);
+			rsrc_reg->tags |= j & 8 ? BIG_ADDR_MASK : 0;
+			rsrc_reg->nr += !!(j & 16);
+			rsrc_reg->nr &= ~-!(j & 32);
+
+			rsrc_reg->resv = j & 64 ? 0xbadc0ded : 0;
+			rsrc_reg->resv2 = j & 128 ? 0xfacecafebeeffeedULL : 0;
+
+			memcpy(big_rsrc_reg, rsrc_reg, sizeof(*rsrc_reg));
+
+			for (size_t k = 1; k < 5; k++) {
+				sys_io_uring_register(fd_null,
+						      rsrc_reg_ops[i].op,
+						      k > 2 ? big_rsrc_reg
+						             : rsrc_reg,
+						      sizeof(*rsrc_reg)
+						      + (k / 2) * 8);
+				printf("io_uring_register(%u<%s>, " XLAT_FMT
+				       ", {nr=%zu%s%s",
+				       fd_null, path_null,
+				       XLAT_SEL(rsrc_reg_ops[i].op,
+						rsrc_reg_ops[i].str),
+				       j & 32 ? (i ? ARRAY_SIZE(iov)
+						   : ARRAY_SIZE(fds))
+						+ !!(j & 16) : 0,
+				       j & 64 ? ", resv=0xbadc0ded" : "",
+				       j & 128 ? ", resv2=0xfacecafebeeffeed"
+					       : "");
+				print_rsrc_data(arg_iov, iov, arg_fds, fds,
+						i, j, endptr, false);
+				print_rsrc_tags(arg_tags, tags, i, j,
+						arg_tags + ARRAY_SIZE(tags));
+				if (!(k & 1))
+					printf(", ???");
+				if (k == 3) {
+					printf(", /* bytes 32..39 */ \"\\xa0"
+					       "\\xa1\\xa2\\xa3\\xa4\\xa5\\xa6"
+					       "\\xa7\"");
+				}
+				printf("}, %zu) = %s\n",
+				       sizeof(*rsrc_reg) + (k / 2) * 8, errstr);
+			}
+		}
+	}
+
+
+	/* IORING_REGISTER_FILES_UPDATE2, IORING_REGISTER_BUFFERS_UPDATE */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} rsrc_upd_ops[] = {
+		{ 14, "IORING_REGISTER_FILES_UPDATE2" },
+		{ 16, "IORING_REGISTER_BUFFERS_UPDATE" },
+	};
+
+	struct io_uring_rsrc_update2 *bogus_rsrc_upd = tail_alloc(24);
+	struct io_uring_rsrc_update2 *rsrc_upd = tail_alloc(sizeof(*rsrc_upd));
+	struct io_uring_rsrc_update2 *big_rsrc_upd =
+		tail_alloc(sizeof(*big_rsrc_upd) + 8);
+
+	fill_memory(big_rsrc_upd, sizeof(*big_rsrc_upd) + 8);
+
+	for (size_t i = 0; i < ARRAY_SIZE(rsrc_upd_ops); i++) {
+		sys_io_uring_register(fd_null, rsrc_upd_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(rsrc_upd_ops[i].op, rsrc_upd_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		struct {
+			void *ptr;
+			unsigned int sz;
+		} ptr_args[] = {
+			{ bogus_rsrc_upd, 24 },
+			{ bogus_rsrc_upd, 32 },
+		};
+		for (size_t j = 0; j < ARRAY_SIZE(ptr_args); j++) {
+			sys_io_uring_register(fd_null, rsrc_upd_ops[i].op,
+					      ptr_args[j].ptr, ptr_args[j].sz);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, %u)"
+			       " = %s\n",
+			       fd_null, path_null,
+			       XLAT_SEL(rsrc_upd_ops[i].op,
+					rsrc_upd_ops[i].str),
+			       ptr_args[j].ptr, ptr_args[j].sz, errstr);
+		}
+
+		for (size_t j = 0; j < 256; j++) {
+			void *endptr = i ? (void *) (arg_iov + ARRAY_SIZE(iov))
+					 : (void *) (arg_fds + ARRAY_SIZE(fds));
+
+			rsrc_upd->data = i ? (uintptr_t) arg_iov
+					  : (uintptr_t) arg_fds;
+			rsrc_upd->nr = i ? ARRAY_SIZE(iov) : ARRAY_SIZE(fds);
+			rsrc_upd->tags = (uintptr_t) (arg_tags
+						      + ARRAY_SIZE(tags)
+						      - rsrc_upd->nr);
+
+			rsrc_upd->data &= ~-!(j & 1);
+			rsrc_upd->data |= j & 2 ? BIG_ADDR_MASK : 0;
+			rsrc_upd->tags -= !!(j & 64) * sizeof(uint64_t);
+			rsrc_upd->tags &= ~-!!(j & 4);
+			rsrc_upd->tags |= j & 8 ? BIG_ADDR_MASK : 0;
+			rsrc_upd->nr += !!(j & 16);
+			rsrc_upd->nr &= ~-!(j & 32);
+
+			rsrc_upd->resv = j & 64 ? 0xbadc0ded : 0;
+			rsrc_upd->resv2 = j & 128 ? 0xfacecafe : 0;
+
+			rsrc_upd->offset = j % 3 ? 0 : 0xdeadface;
+
+			memcpy(big_rsrc_upd, rsrc_upd, sizeof(*rsrc_upd));
+
+			for (size_t k = 1; k < 5; k++) {
+				sys_io_uring_register(fd_null,
+						      rsrc_upd_ops[i].op,
+						      k > 2 ? big_rsrc_upd
+						             : rsrc_upd,
+						      sizeof(*rsrc_upd)
+						      + (k / 2) * 8);
+				printf("io_uring_register(%u<%s>, " XLAT_FMT
+				       ", {offset=%s%s",
+				       fd_null, path_null,
+				       XLAT_SEL(rsrc_upd_ops[i].op,
+						rsrc_upd_ops[i].str),
+				       j % 3 ? "0" : "3735943886",
+				       j & 64 ? ", resv=0xbadc0ded" : "");
+				print_rsrc_data(arg_iov, iov, arg_fds, fds,
+						i, j, endptr, true);
+				print_rsrc_tags(arg_tags, tags, i, j,
+						arg_tags + ARRAY_SIZE(tags));
+				printf(", nr=%zu%s",
+				       j & 32 ? (i ? ARRAY_SIZE(iov)
+						   : ARRAY_SIZE(fds))
+						+ !!(j & 16) : 0,
+				       j & 128 ? ", resv2=0xfacecafe"
+					       : "");
+				if (!(k & 1))
+					printf(", ???");
+				if (k == 3) {
+					printf(", /* bytes 32..39 */ \"\\xa0"
+					       "\\xa1\\xa2\\xa3\\xa4\\xa5\\xa6"
+					       "\\xa7\"");
+				}
+				printf("}, %zu) = %s\n",
+				       sizeof(*rsrc_upd) + (k / 2) * 8, errstr);
+			}
+		}
 	}
 
 	puts("+++ exited with 0 +++");
