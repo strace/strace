@@ -59,16 +59,10 @@ xlat_bsearch_compare(const void *a, const void *b)
 }
 
 const char *
-xlookup(const struct xlat *xlat, const uint64_t val)
+xlookup(const struct xlat *x, const uint64_t val)
 {
-	static const struct xlat *x;
-	static size_t idx;
+	size_t idx = 0;
 	const struct xlat_data *e;
-
-	if (xlat) {
-		x = xlat;
-		idx = 0;
-	}
 
 	if (!x || !x->data)
 		return NULL;
@@ -220,8 +214,6 @@ int
 printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 	      const struct xlat *xlat, ...)
 {
-	static const struct xlat *last;
-
 	style = get_xlat_style(style);
 
 	if (xlat_verbose(style) == XLAT_STYLE_RAW) {
@@ -234,12 +226,7 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 
 	va_start(args, xlat);
 
-	if (!xlat)
-		xlat = last;
-
 	for (; xlat; xlat = va_arg(args, const struct xlat *)) {
-		last = xlat;
-
 		str = xlookup(xlat, val);
 
 		if (str) {

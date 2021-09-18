@@ -1650,8 +1650,8 @@ print_array_ex(struct tcb *const tcp,
 			if (!index_xlat) {
 				print_xlat_ex(idx, NULL, xlat_style);
 			} else {
-				printxval_ex(idx ? NULL : index_xlat, idx,
-					     index_dflt, xlat_style);
+				printxval_ex(index_xlat, idx, index_dflt,
+					     xlat_style);
 			}
 
 			tprint_array_index_end();
