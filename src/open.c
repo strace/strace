@@ -19,6 +19,7 @@
 #include <linux/openat2.h>
 #include <linux/fcntl.h>
 
+#include "number_set.h"
 #include "xlat/open_access_modes.h"
 #include "xlat/open_mode_flags.h"
 #include "xlat/open_resolve_flags.h"
@@ -29,9 +30,29 @@
 void
 print_dirfd(struct tcb *tcp, int fd)
 {
-	if (fd == AT_FDCWD)
+	if (fd == AT_FDCWD) {
 		print_xlat_d(AT_FDCWD);
-	else
+		if (!is_number_in_set(DECODE_FD_PATH, decode_fd_set))
+			goto done;
+
+		char linkpath[sizeof("/proc/%u/cwd") + sizeof(int)*3];
+		char buf[PATH_MAX];
+		ssize_t n;
+		int proc_pid = get_proc_pid(tcp->pid);
+		if (!proc_pid)
+			goto done;
+
+		xsprintf(linkpath, "/proc/%u/cwd", proc_pid);
+		n = readlink(linkpath, buf, sizeof (buf));
+		if (n == -1 || n == sizeof (buf))
+			goto done;
+
+		tprints("<");
+		print_quoted_string_ex(buf, n,
+			QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+		tprints(">");
+done:		;
+	} else
 		printfd(tcp, fd);
 #ifdef ENABLE_SECONTEXT
 	tcp->last_dirfd = fd;
