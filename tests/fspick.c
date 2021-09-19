@@ -38,6 +38,9 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+#ifndef PATH_TRACING
+	char *cwd = get_fd_path(get_dir_fd("."));
+#endif
 	static const char path_full[] = "/dev/full";
 	const char *const path = tail_memdup(path_full, sizeof(path_full));
 	char *const fname = tail_alloc(PATH_MAX);
@@ -56,8 +59,8 @@ main(void)
 
 	k_fspick(-100, fname, 0);
 #ifndef PATH_TRACING
-	printf("fspick(%s, \"%.*s\"..., 0) = %s\n",
-	       "AT_FDCWD", (int) PATH_MAX - 1, fname, errstr);
+	printf("fspick(AT_FDCWD<%s>, \"%.*s\"..., 0) = %s\n",
+	       cwd, (int) PATH_MAX - 1, fname, errstr);
 #endif
 
 	fname[PATH_MAX - 1] = '\0';

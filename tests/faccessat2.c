@@ -21,6 +21,8 @@
 
 #ifndef FD_PATH
 # define FD_PATH ""
+#else
+# define YFLAG
 #endif
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 # define SKIP_IF_PROC_IS_UNAVAILABLE
@@ -77,6 +79,13 @@ main(void)
         if (fd < 0)
                 perror_msg_and_fail("open: %s", path);
 	char *fd_str = xasprintf("%d%s", fd, FD_PATH);
+	const char *at_fdcwd_str =
+#ifdef YFLAG
+		xasprintf("AT_FDCWD<%s>", get_fd_path(get_dir_fd(".")));
+#else
+		"AT_FDCWD";
+#endif
+
 	char *path_quoted = xasprintf("\"%s\"", path);
 
 	struct {
@@ -84,7 +93,7 @@ main(void)
 		const char *str;
 	} dirfds[] = {
 		{ ARG_STR(-1) },
-		{ -100, "AT_FDCWD" },
+		{ -100, at_fdcwd_str },
 		{ fd, fd_str },
 	}, modes[] = {
 		{ ARG_STR(F_OK) },

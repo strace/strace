@@ -23,9 +23,19 @@
 #endif
 #ifndef FD0_PATH
 # define FD0_PATH ""
+#else
+# define YFLAG
 #endif
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 # define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
+
+#ifdef YFLAG
+# define AT_FDCWD_FMT "<%s>"
+# define AT_FDCWD_ARG(arg) arg,
+#else
+# define AT_FDCWD_FMT
+# define AT_FDCWD_ARG(arg)
 #endif
 
 static const char sample[] = "openat2.sample";
@@ -35,6 +45,9 @@ main(void)
 {
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
+# ifdef YFLAG
+	char *cwd = get_fd_path(get_dir_fd("."));
+# endif
 	long rc;
 	const char *rcstr;
 	struct open_how *how = tail_alloc(sizeof(*how));
@@ -47,8 +60,10 @@ main(void)
 	       sprintrc(rc));
 
 	rc = syscall(__NR_openat2, -100, "", how + 1, sizeof(*how));
-	printf("openat2(%s, \"\", %p, %zu) = %s\n",
-	       XLAT_KNOWN(-100, "AT_FDCWD"), how + 1, sizeof(*how),
+	printf("openat2(%s" AT_FDCWD_FMT ", \"\", %p, %zu) = %s\n",
+	       XLAT_KNOWN(-100, "AT_FDCWD"),
+	       AT_FDCWD_ARG(cwd)
+	       how + 1, sizeof(*how),
 	       sprintrc(rc));
 
 	rc = syscall(__NR_openat2, -1, sample, how, 11);
@@ -121,9 +136,11 @@ main(void)
 	how->mode = 0;
 	how->resolve = 0;
 	rc = syscall(__NR_openat2, -100, "/dev/full", how, sizeof(*how));
-	printf("openat2(%s, \"/dev/full\", {flags=%s, resolve=0}, %zu)"
-	       " = %s%s\n",
-	       XLAT_KNOWN(-100, "AT_FDCWD"), XLAT_STR(O_RDONLY|O_NOCTTY),
+	printf("openat2(%s" AT_FDCWD_FMT ", \"/dev/full\""
+	       ", {flags=%s, resolve=0}, %zu) = %s%s\n",
+	       XLAT_KNOWN(-100, "AT_FDCWD"),
+	       AT_FDCWD_ARG(cwd)
+	       XLAT_STR(O_RDONLY|O_NOCTTY),
 	       sizeof(*how), sprintrc(rc), rc >= 0 ? FD0_PATH : "");
 
 	puts("+++ exited with 0 +++");

@@ -28,6 +28,14 @@
 #  define SKIP_IF_PROC_IS_UNAVAILABLE
 # endif
 
+# ifdef YFLAG
+#  define AT_FDCWD_FMT "<%s>"
+#  define AT_FDCWD_ARG(arg) arg,
+# else
+#  define AT_FDCWD_FMT
+#  define AT_FDCWD_ARG(arg)
+# endif
+
 static const char *errstr;
 
 static long
@@ -57,6 +65,9 @@ tests_with_existing_file(void)
 	 */
 	create_and_enter_subdir("faccessat_subdir");
 
+	int cwd_fd = get_dir_fd(".");
+	char *cwd = get_fd_path(cwd_fd);
+
 	char *my_secontext = SECONTEXT_PID_MY();
 
 	k_faccessat(-1, NULL, F_OK);
@@ -76,8 +87,9 @@ tests_with_existing_file(void)
 	 */
 
 	k_faccessat(-100, sample, F_OK);
-	printf("%s%s(AT_FDCWD, \"%s\"%s, F_OK) = %s\n",
+	printf("%s%s(AT_FDCWD" AT_FDCWD_FMT ", \"%s\"%s, F_OK) = %s\n",
 	       my_secontext, "faccessat",
+	       AT_FDCWD_ARG(cwd)
 	       sample, sample_secontext,
 	       errstr);
 
@@ -85,8 +97,9 @@ tests_with_existing_file(void)
 		perror_msg_and_fail("unlink");
 
 	k_faccessat(-100, sample, F_OK);
-	printf("%s%s(AT_FDCWD, \"%s\", F_OK) = %s\n",
+	printf("%s%s(AT_FDCWD" AT_FDCWD_FMT ", \"%s\", F_OK) = %s\n",
 	       my_secontext, "faccessat",
+	       AT_FDCWD_ARG(cwd)
 	       sample,
 	       errstr);
 
@@ -94,8 +107,6 @@ tests_with_existing_file(void)
 	 * Tests with dirfd.
 	 */
 
-	int cwd_fd = get_dir_fd(".");
-	char *cwd = get_fd_path(cwd_fd);
 	char *cwd_secontext = SECONTEXT_FILE(".");
 	char *sample_realpath = xasprintf("%s/%s", cwd, sample);
 
@@ -196,6 +207,12 @@ main(void)
         if (fd < 0)
                 perror_msg_and_fail("open: %s", path);
 	char *fd_str = xasprintf("%d%s", fd, FD_PATH);
+	const char *at_fdcwd_str =
+#  ifdef YFLAG
+		xasprintf("AT_FDCWD<%s>", get_fd_path(get_dir_fd(".")));
+#  else
+		"AT_FDCWD";
+#  endif
 	char *path_quoted = xasprintf("\"%s\"", path);
 
 	struct {
@@ -203,7 +220,7 @@ main(void)
 		const char *str;
 	} dirfds[] = {
 		{ ARG_STR(-1) },
-		{ -100, "AT_FDCWD" },
+		{ -100, at_fdcwd_str },
 		{ fd, fd_str },
 	}, modes[] = {
 		{ ARG_STR(F_OK) },

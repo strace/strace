@@ -16,6 +16,7 @@
 #include "defs.h"
 #include "xstring.h"
 #include "kernel_fcntl.h"
+#include "number_set.h"
 #include <linux/openat2.h>
 #include <linux/fcntl.h>
 
@@ -29,10 +30,34 @@
 void
 print_dirfd(struct tcb *tcp, int fd)
 {
-	if (fd == AT_FDCWD)
+	if (fd == AT_FDCWD) {
 		print_xlat_d(AT_FDCWD);
-	else
+
+		if (!is_number_in_set(DECODE_FD_PATH, decode_fd_set))
+			goto done;
+
+		int proc_pid = get_proc_pid(tcp->pid);
+		if (!proc_pid)
+			goto done;
+
+		static const char cwd_path[] = "/proc/%u/cwd";
+		char linkpath[sizeof(cwd_path) + sizeof(int) * 3];
+		xsprintf(linkpath, cwd_path, proc_pid);
+
+		char buf[PATH_MAX];
+		ssize_t n = readlink(linkpath, buf, sizeof(buf));
+		if ((size_t) n >= sizeof(buf))
+			goto done;
+
+		tprints("<");
+		print_quoted_string_ex(buf, n,
+				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+				       "<>");
+		tprints(">");
+done:		;
+	} else {
 		printfd(tcp, fd);
+	}
 #ifdef ENABLE_SECONTEXT
 	tcp->last_dirfd = fd;
 #endif

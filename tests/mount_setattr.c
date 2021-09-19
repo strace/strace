@@ -45,6 +45,9 @@ main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
+#ifndef PATH_TRACING
+	char *cwd = get_fd_path(get_dir_fd("."));
+#endif
 	static const char path_full[] = "/dev/full";
 	const char *const path = tail_memdup(path_full, sizeof(path_full));
 	char *const fname = tail_alloc(PATH_MAX);
@@ -65,8 +68,8 @@ main(void)
 
 	k_mount_setattr(-100, fname, 0, attr, MOUNT_ATTR_SIZE_VER0 - 1);
 #ifndef PATH_TRACING
-	printf("mount_setattr(%s, \"%.*s\"..., 0, %p, %u) = %s\n",
-	       "AT_FDCWD", (int) PATH_MAX - 1, fname,
+	printf("mount_setattr(AT_FDCWD<%s>, \"%.*s\"..., 0, %p, %u) = %s\n",
+	       cwd, (int) PATH_MAX - 1, fname,
 	       attr, MOUNT_ATTR_SIZE_VER0 - 1, rcstr);
 #endif
 

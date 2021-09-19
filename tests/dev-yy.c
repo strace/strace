@@ -30,6 +30,10 @@
 # endif
 #endif
 
+#ifndef PRINT_AT_FDCWD_PATH
+# define PRINT_AT_FDCWD_PATH PRINT_DEVNUM
+#endif
+
 #if PRINT_DEVNUM
 # define DEV_FMT "<%s<%s %u:%u>>"
 #elif PRINT_PATH
@@ -44,6 +48,9 @@ int
 main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
+# if PRINT_AT_FDCWD_PATH
+	char *cwd = get_fd_path(get_dir_fd("."));
+# endif
 
 	static const struct {
 		const char *path;
@@ -66,7 +73,14 @@ main(void)
 		long fd = syscall(__NR_openat, AT_FDCWD, checks[i].path,
 				  O_RDONLY|O_PATH);
 
-		printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_PATH) = %s",
+		printf("openat(AT_FDCWD"
+# if PRINT_AT_FDCWD_PATH
+		       "<%s>"
+# endif
+		       ", \"%s\", O_RDONLY|O_PATH) = %s",
+# if PRINT_AT_FDCWD_PATH
+		       cwd,
+# endif
 		       checks[i].path, sprintrc(fd));
 # if PRINT_PATH
 		if (fd >= 0)
