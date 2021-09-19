@@ -46,9 +46,8 @@ print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const unsigned int len)
 {
 	const unsigned int max_size = get_cpuset_size();
-	const unsigned int umove_size = len < max_size ? len : max_size;
-	const unsigned int size =
-		(umove_size + current_wordsize - 1) & -current_wordsize;
+	const unsigned int umove_size = MIN(len, max_size);
+	const unsigned int size = ROUNDUP(umove_size, current_wordsize);
 	const unsigned int ncpu = size * 8;
 	void *cpu;
 
