@@ -79,14 +79,27 @@ main(void)
 	printf("sched_getaffinity(%d%s, %u, [", pid, pid_str, cpuset_size);
 	const char *sep;
 	unsigned int i, cpu;
+	unsigned int first_cpu = -1U;
 	for (i = 0, cpu = 0, sep = ""; i < (unsigned) ret_size * 8; ++i) {
 		if (CPU_ISSET_S(i, (unsigned) ret_size, cpuset)) {
 			printf("%s%u", sep, i);
 			sep = ", ";
 			cpu = i;
+			if (first_cpu == -1U)
+				first_cpu = i;
 		}
 	}
 	printf("]) = %s\n", errstr);
+
+	long rc = setaffinity(pid, 0, ((char *) cpuset) + cpuset_size);
+	pidns_print_leader();
+	printf("sched_setaffinity(%d%s, 0, []) = %s\n",
+	       pid, pid_str, sprintrc(rc));
+
+	rc = setaffinity(pid, 1, ((char *) cpuset) + cpuset_size);
+	pidns_print_leader();
+	printf("sched_setaffinity(%d%s, 1, %p) = %s\n",
+	       pid, pid_str, ((char *) cpuset) + cpuset_size, sprintrc(rc));
 
 	CPU_ZERO_S(cpuset_size, cpuset);
 	CPU_SET_S(cpu, cpuset_size, cpuset);

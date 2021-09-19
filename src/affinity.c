@@ -52,7 +52,18 @@ print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 	void *cpu;
 
 	if (!verbose(tcp) || (exiting(tcp) && syserror(tcp)) ||
-	    !addr || !len || !(cpu = calloc(size, 1))) {
+	    !addr) {
+		printaddr(addr);
+		return;
+	}
+
+	if (!len) {
+		tprint_array_begin();
+		tprint_array_end();
+		return;
+	}
+
+	if (!(cpu = calloc(size, 1))) {
 		printaddr(addr);
 		return;
 	}
