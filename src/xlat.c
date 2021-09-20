@@ -200,15 +200,16 @@ xlookup_le(const struct xlat *xlat, uint64_t *val)
 }
 
 /**
- * Print entry in struct xlat table, if there.
+ * Print an entry in struct xlat table, if it is there.
  *
- * @param val   Value to search a literal representation for.
- * @param dflt  String (abbreviated in comment syntax) which should be emitted
+ * @param val   A value to search a literal representation for.
+ * @param dflt  A string (encased in comment syntax) which is to be emitted
  *              if no appropriate xlat value has been found.
- * @param style Style in which xlat value should be printed.
- * @param xlat  (And the following arguments) Pointers to arrays of xlat values.
+ * @param style A style which is to be used for xlat value printing.
+ * @param xlat  (and the following arguments) Pointers xlat description
+ *              structures.
  *              The last argument should be NULL.
- * @return      1 if appropriate xlat value has been found, 0 otherwise.
+ * @return      1 if an appropriate xlat value has been found, 0 otherwise.
  */
 int
 printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
