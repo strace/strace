@@ -165,7 +165,7 @@ main(void)
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 19 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 20 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -455,7 +455,7 @@ main(void)
 		  "register_op=", ARG_STR(IORING_UNREGISTER_IOWQ_AFF),
 		  true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 19, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 20, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
@@ -909,6 +909,57 @@ main(void)
 #endif
 	       "], %zu) = %s\n",
 	       fd_null, path_null, sizeof(aff), errstr);
+
+
+	/* IORING_REGISTER_IOWQ_MAX_WORKERS */
+	unsigned int maxw[] = { 0, 1, 0xbedfaced };
+	const unsigned int *arg_maxw = tail_memdup(maxw, sizeof(maxw));
+	const unsigned int *arg_maxw_end = arg_maxw + ARRAY_SIZE(maxw);
+
+	sys_io_uring_register(fd_null, 19, NULL, 0xfacefeed);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS")
+	       ", NULL, 4207869677) = %s\n",
+	       fd_null, path_null, errstr);
+
+	sys_io_uring_register(fd_null, 19, arg_maxw_end, 0);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS")
+	       ", [], 0) = %s\n",
+	       fd_null, path_null, errstr);
+
+	sys_io_uring_register(fd_null, 19, arg_maxw_end, 1);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS")
+	       ", %p, 1) = %s\n",
+	       fd_null, path_null, arg_maxw_end, errstr);
+
+	sys_io_uring_register(fd_null, 19, arg_maxw_end - 1, 2);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS") ", [["
+	       XLAT_KNOWN(0, "IO_WQ_BOUND") "] = 3202329837, ... /* %p */]"
+	       ", 2) = %s\n",
+	       fd_null, path_null, arg_maxw_end, errstr);
+
+	sys_io_uring_register(fd_null, 19, arg_maxw, 3);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS") ", "
+	       "[[" XLAT_KNOWN(0, "IO_WQ_BOUND") "] = 0, ["
+	       XLAT_KNOWN(1, "IO_WQ_UNBOUND") "] = 1, ["
+	       XLAT_UNKNOWN(2, "IO_WQ_???") "] = 3202329837] => "
+#if RETVAL_INJECTED
+	       "[[" XLAT_KNOWN(0, "IO_WQ_BOUND") "] = 0, ["
+	       XLAT_KNOWN(1, "IO_WQ_UNBOUND") "] = 1, ["
+	       XLAT_UNKNOWN(2, "IO_WQ_???") "] = 3202329837]"
+#else
+	       "%p"
+#endif
+	       ", 3) = %s\n",
+	       fd_null, path_null,
+#if !RETVAL_INJECTED
+	       arg_maxw,
+#endif
+	       errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

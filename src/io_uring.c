@@ -12,6 +12,7 @@
 
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_files_update_fds.h"
+#include "xlat/uring_iowq_acct.h"
 #include "xlat/uring_op_flags.h"
 #include "xlat/uring_ops.h"
 #include "xlat/uring_setup_features.h"
@@ -471,6 +472,19 @@ print_io_uring_update_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_end();
 }
 
+static int
+print_io_uring_iowq_acct(struct tcb *tcp, const kernel_ulong_t addr,
+		     const unsigned int nargs)
+{
+	uint32_t val;
+	bool ret = print_array_ex(tcp, addr, nargs, &val, sizeof(val),
+				  tfetch_mem, print_uint_array_member, NULL,
+				  PAF_PRINT_INDICES | XLAT_STYLE_FMT_U,
+				  uring_iowq_acct, "IO_WQ_???");
+
+	return ret ? 0 : RVAL_DECODED;
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -521,6 +535,11 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_REGISTER_IOWQ_AFF:
 		print_affinitylist(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_IOWQ_MAX_WORKERS:
+		rc = print_io_uring_iowq_acct(tcp, arg, nargs);
+		if (entering(tcp) && !rc)
+			tprint_value_changed();
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
