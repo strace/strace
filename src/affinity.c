@@ -41,7 +41,7 @@ get_cpuset_size(void)
 	return cpuset_size;
 }
 
-static void
+void
 print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const unsigned int len)
 {

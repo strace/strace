@@ -1298,6 +1298,18 @@ extern void print_ifindex(unsigned int);
 
 extern void print_bpf_filter_code(const uint16_t code, bool extended);
 
+/**
+ * Prints a CPU set, pointed at by addr, as a list of CPU IDs.  CPU set
+ * (CPU mask, CPU affinity set, CPU affinity list) is a bit set represented
+ * as an array of elements of unsigned long type.
+ *
+ * @param tcp  TCB pointer.
+ * @param addr An address of the CPU set.
+ * @param len  Length of CPU set in bytes.
+ */
+extern void print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
+			       const unsigned int len);
+
 extern void qualify(const char *);
 extern void qualify_trace(const char *);
 extern void qualify_abbrev(const char *);
