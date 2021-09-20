@@ -25,7 +25,6 @@
 #include "xlat.h"
 
 #include "xlat/uring_setup_features.h"
-#include "xlat/uring_cqring_flags.h"
 
 static const char *errstr;
 
@@ -115,16 +114,15 @@ main(void)
 						params->sq_off.resv2);
 
 			printf("}, cq_off={head=%u, tail=%u, ring_mask=%u"
-			       ", ring_entries=%u, overflow=%u, cqes=%u, flags=",
+			       ", ring_entries=%u, overflow=%u, cqes=%u"
+			       ", flags=%u",
 			       params->cq_off.head,
 			       params->cq_off.tail,
 			       params->cq_off.ring_mask,
 			       params->cq_off.ring_entries,
 			       params->cq_off.overflow,
-			       params->cq_off.cqes);
-			printflags(uring_cqring_flags,
-			       params->cq_off.flags,
-			       "IORING_CQ_???");
+			       params->cq_off.cqes,
+			       params->cq_off.flags);
 			if (params->cq_off.resv1)
 				printf(", resv1=%#x", params->cq_off.resv1);
 			if (params->cq_off.resv2)

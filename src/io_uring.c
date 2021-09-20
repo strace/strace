@@ -10,7 +10,6 @@
 
 #include <linux/io_uring.h>
 
-#include "xlat/uring_cqring_flags.h"
 #include "xlat/uring_enter_flags.h"
 #include "xlat/uring_files_update_fds.h"
 #include "xlat/uring_op_flags.h"
@@ -65,7 +64,7 @@ print_io_cqring_offsets(const struct io_cqring_offsets *const p)
 	tprint_struct_next();
 	PRINT_FIELD_U(*p, cqes);
 	tprint_struct_next();
-	PRINT_FIELD_FLAGS(*p, flags, uring_cqring_flags, "IORING_CQ_???");
+	PRINT_FIELD_U(*p, flags);
 	if (p->resv1) {
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv1);
