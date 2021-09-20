@@ -32,7 +32,7 @@ print_dirfd(struct tcb *tcp, int fd)
 {
 	if (fd == AT_FDCWD) {
 		print_xlat_d(AT_FDCWD);
-		if (!is_number_in_set(DECODE_FD_PATH, decode_fd_set))
+		if (number_set_array_is_empty(decode_fd_set, 0))
 			goto done;
 
 		char linkpath[sizeof("/proc/%u/cwd") + sizeof(int)*3];
