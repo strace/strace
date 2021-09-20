@@ -1592,6 +1592,8 @@ print_array_ex(struct tcb *const tcp,
 
 	if (!nmemb) {
 		tprint_array_begin();
+		if (flags & PAF_ARRAY_TRUNCATED)
+			tprint_more_data_follows();
 		tprint_array_end();
 		return false;
 	}
