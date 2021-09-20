@@ -216,6 +216,10 @@ io_uring_register	-y
 io_uring_register-Xabbrev	-etrace=io_uring_register -y -Xabbrev
 io_uring_register-Xraw		-etrace=io_uring_register -y -Xraw
 io_uring_register-Xverbose	-etrace=io_uring_register -y -Xverbose
+io_uring_register-success		-einject=io_uring_register:retval=42 -etrace=io_uring_register -y
+io_uring_register-success-Xabbrev	-einject=io_uring_register:retval=42 -etrace=io_uring_register -y -Xabbrev
+io_uring_register-success-Xraw		-einject=io_uring_register:retval=42 -etrace=io_uring_register -y -Xraw
+io_uring_register-success-Xverbose	-einject=io_uring_register:retval=42 -etrace=io_uring_register -y -Xverbose
 io_uring_setup	-a26 -y
 ioctl_block	+ioctl.test
 ioctl_dm	+ioctl.test -s9

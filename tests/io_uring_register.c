@@ -32,10 +32,20 @@
 # define BIG_ADDR_MASK 0
 #endif
 
+#ifndef RETVAL_INJECTED
+# define RETVAL_INJECTED 0
+#endif
+
+#if RETVAL_INJECTED
+# define INJ_STR " (INJECTED)"
+#else
+# define INJ_STR ""
+#endif
+
 static const char path_null[] = "/dev/null";
 static const char path_full[] = "/dev/full";
 
-static const char *errstr;
+char errstr[1024];
 
 static long
 sys_io_uring_register(unsigned int fd, unsigned int opcode,
@@ -51,7 +61,7 @@ sys_io_uring_register(unsigned int fd, unsigned int opcode,
 
 	long rc = syscall(__NR_io_uring_register,
 			  arg1, arg2, arg3, arg4, bad, bad);
-	errstr = sprintrc(rc);
+	snprintf(errstr, sizeof(errstr), "%s%s", sprintrc(rc), INJ_STR);
 	return rc;
 }
 
@@ -283,19 +293,39 @@ main(void)
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 0);
 	printf("io_uring_register(%u<%s>, " XLAT_FMT ", {last_op=%u"
 	       NRAW(" /* IORING_OP_??? */") ", ops_len=%hhu, resv=%#hx"
-	       ", resv2=[%#x, %#x, %#x], ops=[]}, 0) = %s\n",
+	       ", resv2=[%#x, %#x, %#x], ops=[]}"
+#if RETVAL_INJECTED
+	       " => {last_op=%u" NRAW(" /* IORING_OP_??? */") ", ops_len=%hhu"
+	       ", resv=%#hx, resv2=[%#x, %#x, %#x], ops=[...]}"
+#endif
+	       ", 0) = %s\n",
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
 	       probe->last_op, probe->ops_len, probe->resv,
-	       probe->resv2[0], probe->resv2[1], probe->resv2[2], errstr);
+	       probe->resv2[0], probe->resv2[1], probe->resv2[2],
+#if RETVAL_INJECTED
+	       probe->last_op, probe->ops_len, probe->resv,
+	       probe->resv2[0], probe->resv2[1], probe->resv2[2],
+#endif
+	       errstr);
 
 	probe->last_op = IORING_OP_READV;
 	probe->resv = 0;
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 0);
 	printf("io_uring_register(%u<%s>, " XLAT_FMT ", {last_op=" XLAT_FMT_U
-	       ", ops_len=%hhu, resv2=[%#x, %#x, %#x], ops=[]}, 0) = %s\n",
+	       ", ops_len=%hhu, resv2=[%#x, %#x, %#x], ops=[]}"
+#if RETVAL_INJECTED
+	       " => {last_op=" XLAT_FMT_U ", ops_len=%hhu"
+	       ", resv2=[%#x, %#x, %#x], ops=[...]}"
+#endif
+	       ", 0) = %s\n",
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
 	       XLAT_ARGS(IORING_OP_READV), probe->ops_len,
-	       probe->resv2[0], probe->resv2[1], probe->resv2[2], errstr);
+	       probe->resv2[0], probe->resv2[1], probe->resv2[2],
+#if RETVAL_INJECTED
+	       XLAT_ARGS(IORING_OP_READV), probe->ops_len,
+	       probe->resv2[0], probe->resv2[1], probe->resv2[2],
+#endif
+	       errstr);
 
 	probe->last_op = IORING_OP_EPOLL_CTL;
 	probe->resv2[0] = 0;
@@ -328,12 +358,28 @@ main(void)
 	       "{op=" XLAT_FMT_U ", flags=" XLAT_FMT ", resv2=0xdeadc0de}, "
 	       "{op=40" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
 	       XLAT_FMT "}, {op=254" NRAW(" /* IORING_OP_??? */")
-	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}]}, 4) = %s\n",
+	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}]}"
+#if RETVAL_INJECTED
+	       " => {last_op=" XLAT_FMT_U ", ops_len=%hhu, resv2=[0, %#x, 0], "
+	       "ops=[{op=" XLAT_FMT_U ", resv=0xde, flags=0, resv2=0xbeefface}"
+	       ", {op=" XLAT_FMT_U ", flags=" XLAT_FMT ", resv2=0xdeadc0de}"
+	       ", {op=40" NRAW(" /* IORING_OP_??? */") ", resv=0xaf, flags="
+	       XLAT_FMT "}, {op=254" NRAW(" /* IORING_OP_??? */")
+	       ", flags=0xc0de" NRAW(" /* IO_URING_OP_??? */") "}, ...]}"
+#endif
+	       ", 4) = %s\n",
 	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
 	       XLAT_ARGS(IORING_OP_EPOLL_CTL), probe->ops_len, probe->resv2[1],
 	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_LINKAT),
 	       XLAT_ARGS(IO_URING_OP_SUPPORTED),
-	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee), errstr);
+	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee),
+#if RETVAL_INJECTED
+	       XLAT_ARGS(IORING_OP_EPOLL_CTL), probe->ops_len, probe->resv2[1],
+	       XLAT_ARGS(IORING_OP_NOP), XLAT_ARGS(IORING_OP_LINKAT),
+	       XLAT_ARGS(IO_URING_OP_SUPPORTED),
+	       XLAT_ARGS(IO_URING_OP_SUPPORTED|0xbeee),
+#endif
+	       errstr);
 
 	probe->last_op = 40;
 	probe->resv2[1] = 0;
@@ -341,40 +387,55 @@ main(void)
 		    0x40, 0x80);
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe,
 			      DEFAULT_STRLEN + 1);
-	printf("io_uring_register(%u<%s>, " XLAT_FMT ", {last_op=40"
-	       NRAW(" /* IORING_OP_??? */") ", ops_len=%hhu, ops=[",
-	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
-	       probe->ops_len);
-	for (size_t i = 0; i < DEFAULT_STRLEN; i++) {
-		printf("%s{op=%u" NRAW(" /* IORING_OP_??? */") ", resv=%#hhx"
-		       ", flags=",
-		       i ? ", " : "", probe->ops[i].op, probe->ops[i].resv);
+	printf("io_uring_register(%u<%s>, " XLAT_FMT,
+	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE));
+	for (size_t c = 0; c < 1 + RETVAL_INJECTED; c++) {
+		printf("%s{last_op=40" NRAW(" /* IORING_OP_??? */")
+		       ", ops_len=%hhu, ops=[",
+		       c ? " => " : ", ", probe->ops_len);
+		for (size_t i = 0; i < DEFAULT_STRLEN; i++) {
+			printf("%s{op=%u" NRAW(" /* IORING_OP_??? */")
+			       ", resv=%#hhx, flags=",
+			       i ? ", " : "", probe->ops[i].op,
+			       probe->ops[i].resv);
 #if XLAT_RAW
-		printf("%#hx",
-		       (typeof(probe->ops[i].flags)) (probe->ops[i].flags));
+			printf("%#hx",
+			       (typeof(probe->ops[i].flags))
+					(probe->ops[i].flags));
 #else /* !XLAT_RAW */
-		if (probe->ops[i].flags & 1) {
-			printf(VERB("%#hx /* ") "IO_URING_OP_SUPPORTED|%#hx"
-			       VERB(" */"),
+			if (probe->ops[i].flags & 1) {
+				printf(VERB("%#hx /* ") "IO_URING_OP_SUPPORTED"
+				       "|%#hx" VERB(" */"),
 # if XLAT_VERBOSE
-			       probe->ops[i].flags,
+				       probe->ops[i].flags,
 # endif
-			       (uint16_t) (probe->ops[i].flags & ~1));
-		} else {
-			printf("%#hx /* IO_URING_OP_??? */",
-			       probe->ops[i].flags);
-		}
+				       (uint16_t) (probe->ops[i].flags & ~1));
+			} else {
+				printf("%#hx /* IO_URING_OP_??? */",
+				       probe->ops[i].flags);
+			}
 #endif /* XLAT_RAW */
-		printf(", resv2=%#x}", probe->ops[i].resv2);
+			printf(", resv2=%#x}", probe->ops[i].resv2);
+		}
+		printf(", ...]}");
 	}
-	printf(", ...]}, %d) = %s\n", DEFAULT_STRLEN + 1, errstr);
+	printf(", %d) = %s\n", DEFAULT_STRLEN + 1, errstr);
 
 	probe->last_op = 0;
 	probe->ops_len = 0;
 	memset(probe->ops, 0, sizeof(probe->ops[0]) * (DEFAULT_STRLEN + 1));
 	sys_io_uring_register(fd_null, IORING_REGISTER_PROBE, probe, 8);
-	printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 8) = %s\n",
-	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE), probe,
+	printf("io_uring_register(%u<%s>, " XLAT_FMT ", "
+#if RETVAL_INJECTED
+	       "{last_op=" XLAT_KNOWN(0, "IORING_OP_NOP") ", ops_len=0, ops=[]}"
+#else
+	       "%p"
+#endif
+	       ", 8) = %s\n",
+	       fd_null, path_null, XLAT_ARGS(IORING_REGISTER_PROBE),
+#if !RETVAL_INJECTED
+	       probe,
+#endif
 	       errstr);
 
 

@@ -150,6 +150,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	gettid--pidns-translation \
 	inject-nf \
 	int_0x80 \
+	io_uring_register-success \
+	io_uring_register-success-Xabbrev \
+	io_uring_register-success-Xraw \
+	io_uring_register-success-Xverbose \
 	ioctl_block--pidns-translation \
 	ioctl_dm-v \
 	ioctl_evdev-success \

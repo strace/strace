@@ -219,6 +219,10 @@ io_uring_register
 io_uring_register-Xabbrev
 io_uring_register-Xraw
 io_uring_register-Xverbose
+io_uring_register-success
+io_uring_register-success-Xabbrev
+io_uring_register-success-Xraw
+io_uring_register-success-Xverbose
 io_uring_setup
 ioctl
 ioctl_block
