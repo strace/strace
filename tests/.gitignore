@@ -703,6 +703,9 @@ process_vm_writev--pidns-translation
 pselect6
 pselect6_time64
 ptrace
+ptrace-Xabbrev
+ptrace-Xraw
+ptrace-Xverbose
 ptrace_syscall_info
 ptrace_syscall_info-Xabbrev
 ptrace_syscall_info-Xraw

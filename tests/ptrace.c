@@ -70,12 +70,16 @@ do_ptrace_regs(const unsigned long request,
 }
 #endif /* PTRACE_GETREGS || PTRACE_GETREGS64 || PTRACE_GETFPREGS */
 
+#ifndef PTRACE_PEEKSIGINFO_SHARED
+# define PTRACE_PEEKSIGINFO_SHARED   (1 << 0)
+#endif
+
 static void
 test_peeksiginfo(int pid, const unsigned long bad_request)
 {
 	do_ptrace(PTRACE_PEEKSIGINFO, pid, 0, bad_request);
-	printf("ptrace(PTRACE_PEEKSIGINFO, %d, NULL, %#lx) = %s\n",
-	       pid, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKSIGINFO), pid, bad_request, errstr);
 
 	struct psi {
 		unsigned long long off;
@@ -88,9 +92,11 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 	psi->nr = 42;
 
 	do_ptrace(PTRACE_PEEKSIGINFO, pid, (uintptr_t) psi, bad_request);
-	printf("ptrace(PTRACE_PEEKSIGINFO, %d, {off=%llu"
-	       ", flags=PTRACE_PEEKSIGINFO_SHARED, nr=%u}, %#lx) = %s\n",
-	       pid, psi->off, psi->nr, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, {off=%llu"
+	       ", flags=" XLAT_FMT ", nr=%u}, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKSIGINFO), pid, psi->off,
+	       XLAT_ARGS(PTRACE_PEEKSIGINFO_SHARED),
+	       psi->nr, bad_request, errstr);
 
 	pid = fork();
 	if (pid < 0)
@@ -156,22 +162,27 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 		long rc = do_ptrace(PTRACE_PEEKSIGINFO, pid,
 				    (uintptr_t) psi, (uintptr_t) sigs);
 		if (rc < 0) {
-			printf("ptrace(PTRACE_PEEKSIGINFO, %d"
-			       ", {off=%llu, flags=0, nr=%u}, %p) = %s\n",
+			printf("ptrace(" XLAT_FMT ", %d, {off=%llu, flags=0"
+			       ", nr=%u}, %p) = %s\n",
+			       XLAT_ARGS(PTRACE_PEEKSIGINFO),
 			       pid, psi->off, psi->nr, sigs, errstr);
 		} else {
-			printf("ptrace(PTRACE_PEEKSIGINFO, %d"
+			printf("ptrace(" XLAT_FMT ", %d"
 			       ", {off=%llu, flags=0, nr=%u}"
-			       ", [{si_signo=SIGUSR1, si_code=SI_TKILL"
+			       ", [{si_signo=" XLAT_FMT_U ", si_code=" XLAT_FMT
 			       ", si_pid=%d, si_uid=%d}"
-			       ", {si_signo=SIGUSR2, si_code=SI_TKILL"
+			       ", {si_signo=" XLAT_FMT_U ", si_code=" XLAT_FMT
 			       ", si_pid=%d, si_uid=%d}"
-			       ", {si_signo=SIGALRM, si_code=SI_TKILL"
+			       ", {si_signo=" XLAT_FMT_U ", si_code=" XLAT_FMT
 			       ", si_pid=%d, si_uid=%d}"
 			       "]) = %s\n",
+			       XLAT_ARGS(PTRACE_PEEKSIGINFO),
 			       pid, psi->off, psi->nr,
+			       XLAT_ARGS(SIGUSR1), XLAT_ARGS(SI_TKILL),
 			       pid, (int) uid,
+			       XLAT_ARGS(SIGUSR2), XLAT_ARGS(SI_TKILL),
 			       pid, (int) uid,
+			       XLAT_ARGS(SIGALRM), XLAT_ARGS(SI_TKILL),
 			       pid, (int) uid,
 			       errstr);
 		}
@@ -182,7 +193,8 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 			errno = saved;
 			perror_msg_and_fail("ptrace");
 		}
-		printf("ptrace(PTRACE_CONT, %d, NULL, 0) = 0\n", pid);
+		printf("ptrace(" XLAT_FMT ", %d, NULL, 0) = 0\n",
+		       XLAT_ARGS(PTRACE_CONT), pid);
 	}
 }
 
@@ -936,11 +948,12 @@ do_getregs_setregs(const int pid,
 		   unsigned int *const actual_size)
 {
 	if (do_ptrace_regs(PTRACE_GETREGS, pid, (uintptr_t) regbuf)) {
-		printf("ptrace(PTRACE_GETREGS, %d, %p) = %s\n",
-		       pid, regbuf, errstr);
+		printf("ptrace(" XLAT_FMT ", %d, %p) = %s\n",
+		       XLAT_ARGS(PTRACE_GETREGS), pid, regbuf, errstr);
 		return;	/* skip PTRACE_SETREGS */
 	} else {
-		printf("ptrace(PTRACE_GETREGS, %d, ", pid);
+		printf("ptrace(" XLAT_FMT ", %d, ",
+		       XLAT_ARGS(PTRACE_GETREGS), pid);
 		print_pt_regs(regbuf, regsize);
 		printf(") = %s\n", errstr);
 		if (*actual_size)
@@ -959,7 +972,7 @@ do_getregs_setregs(const int pid,
 # endif /* __sparc__ && !__arch64__ */
 
 	do_ptrace_regs(PTRACE_SETREGS, pid, (uintptr_t) regbuf);
-	printf("ptrace(PTRACE_SETREGS, %d, ", pid);
+	printf("ptrace(" XLAT_FMT ", %d, ", XLAT_ARGS(PTRACE_SETREGS), pid);
 	print_pt_regs(regbuf, regsize);
 	printf(") = %s\n", errstr);
 }
@@ -1039,11 +1052,12 @@ do_getregs64_setregs64(const int pid,
 		       unsigned int *const actual_size)
 {
 	if (do_ptrace_regs(PTRACE_GETREGS64, pid, (uintptr_t) regbuf)) {
-		printf("ptrace(PTRACE_GETREGS64, %d, %p) = %s\n",
-		       pid, regbuf, errstr);
+		printf("ptrace(" XLAT_FMT ", %d, %p) = %s\n",
+		       XLAT_ARGS(PTRACE_GETREGS64), pid, regbuf, errstr);
 		return;	/* skip PTRACE_SETREGS64 */
 	} else {
-		printf("ptrace(PTRACE_GETREGS64, %d, ", pid);
+		printf("ptrace(" XLAT_FMT ", %d, ",
+		       XLAT_ARGS(PTRACE_GETREGS64), pid);
 		print_pt_regs64(regbuf, regsize);
 		printf(") = %s\n", errstr);
 		if (*actual_size)
@@ -1053,7 +1067,7 @@ do_getregs64_setregs64(const int pid,
 	}
 
 	do_ptrace_regs(PTRACE_SETREGS64, pid, (uintptr_t) regbuf);
-	printf("ptrace(PTRACE_SETREGS64, %d, ", pid);
+	printf("ptrace(" XLAT_FMT ", %d, ", XLAT_ARGS(PTRACE_SETREGS64), pid);
 	print_pt_regs64(regbuf, regsize);
 	printf(") = %s\n", errstr);
 }
@@ -1260,11 +1274,12 @@ do_getfpregs_setfpregs(const int pid,
 		       unsigned int *const actual_size)
 {
 	if (do_ptrace_regs(PTRACE_GETFPREGS, pid, (uintptr_t) regbuf)) {
-		printf("ptrace(PTRACE_GETFPREGS, %d, %p) = %s\n",
-		       pid, regbuf, errstr);
+		printf("ptrace(" XLAT_FMT ", %d, %p) = %s\n",
+		       XLAT_ARGS(PTRACE_GETFPREGS), pid, regbuf, errstr);
 		return;	/* skip PTRACE_SETFPREGS */
 	} else {
-		printf("ptrace(PTRACE_GETFPREGS, %d, ", pid);
+		printf("ptrace(" XLAT_FMT ", %d, ",
+		       XLAT_ARGS(PTRACE_GETFPREGS), pid);
 		print_pt_fpregs(regbuf, regsize);
 		printf(") = %s\n", errstr);
 		if (*actual_size)
@@ -1274,7 +1289,7 @@ do_getfpregs_setfpregs(const int pid,
 	}
 
 	do_ptrace_regs(PTRACE_SETFPREGS, pid, (uintptr_t) regbuf);
-	printf("ptrace(PTRACE_SETFPREGS, %d, ", pid);
+	printf("ptrace(" XLAT_FMT ", %d, ", XLAT_ARGS(PTRACE_SETFPREGS), pid);
 	print_pt_fpregs(regbuf, regsize);
 	printf(") = %s\n", errstr);
 }
@@ -1294,16 +1309,16 @@ do_getregset_setregset(const int pid,
 	iov->iov_len = regsize;
 	do_ptrace(PTRACE_GETREGSET, pid, nt, (uintptr_t) iov);
 	if (iov->iov_len == regsize) {
-		printf("ptrace(PTRACE_GETREGSET, %d, %s"
-		       ", {iov_base=", pid, nt_str);
+		printf("ptrace(" XLAT_FMT ", %d, " XLAT_FMT ", {iov_base=",
+		       XLAT_ARGS(PTRACE_GETREGSET), pid, XLAT_SEL(nt, nt_str));
 		print_regset_fn(iov->iov_base, iov->iov_len);
 		printf(", iov_len=%lu}) = %s\n",
 		       (unsigned long) iov->iov_len, errstr);
 		if (*actual_size)
 			return;	/* skip PTRACE_SETREGSET */
 	} else {
-		printf("ptrace(PTRACE_GETREGSET, %d, %s"
-		       ", {iov_base=", pid, nt_str);
+		printf("ptrace(" XLAT_FMT ", %d, " XLAT_FMT ", {iov_base=",
+		       XLAT_ARGS(PTRACE_GETREGSET), pid, XLAT_SEL(nt, nt_str));
 		print_regset_fn(iov->iov_base, iov->iov_len);
 		printf(", iov_len=%u => %lu}) = %s\n",
 		       regsize, (unsigned long) iov->iov_len, errstr);
@@ -1326,14 +1341,14 @@ do_getregset_setregset(const int pid,
 	iov->iov_len = regsize;
 	do_ptrace(PTRACE_SETREGSET, pid, nt, (uintptr_t) iov);
 	if (iov->iov_len == regsize) {
-		printf("ptrace(PTRACE_SETREGSET, %d, %s"
-		       ", {iov_base=", pid, nt_str);
+		printf("ptrace(" XLAT_FMT ", %d, " XLAT_FMT ", {iov_base=",
+		       XLAT_ARGS(PTRACE_SETREGSET), pid, XLAT_SEL(nt, nt_str));
 		print_regset_fn(iov->iov_base, regsize);
 		printf(", iov_len=%lu}) = %s\n",
 		       (unsigned long) iov->iov_len, errstr);
 	} else {
-		printf("ptrace(PTRACE_SETREGSET, %d, %s"
-		       ", {iov_base=", pid, nt_str);
+		printf("ptrace(" XLAT_FMT ", %d, " XLAT_FMT ", {iov_base=",
+		       XLAT_ARGS(PTRACE_SETREGSET), pid, XLAT_SEL(nt, nt_str));
 		print_regset_fn(iov->iov_base, regsize);
 		printf(", iov_len=%u => %lu}) = %s\n",
 		       regsize, (unsigned long) iov->iov_len, errstr);
@@ -1350,44 +1365,48 @@ test_getregset_setregset(int pid)
 	iov->iov_len = sizeof(kernel_ulong_t);
 
 	do_ptrace(PTRACE_GETREGSET, pid, 1, (uintptr_t) iov);
-	printf("ptrace(PTRACE_GETREGSET, %d, NT_PRSTATUS"
+	printf("ptrace(" XLAT_FMT ", %d, " XLAT_KNOWN(0x1, "NT_PRSTATUS")
 	       ", {iov_base=%p, iov_len=%lu}) = %s\n",
-	       pid, iov->iov_base, (unsigned long) iov->iov_len, errstr);
+	       XLAT_ARGS(PTRACE_GETREGSET), pid,
+	       iov->iov_base, (unsigned long) iov->iov_len, errstr);
 
 	do_ptrace(PTRACE_SETREGSET, pid, 3, (uintptr_t) iov);
-	printf("ptrace(PTRACE_SETREGSET, %d, NT_PRPSINFO"
+	printf("ptrace(" XLAT_FMT ", %d, " XLAT_KNOWN(0x3, "NT_PRPSINFO")
 	       ", {iov_base=%p, iov_len=%lu}) = %s\n",
-	       pid, iov->iov_base, (unsigned long) iov->iov_len, errstr);
+	       XLAT_ARGS(PTRACE_SETREGSET), pid,
+	       iov->iov_base, (unsigned long) iov->iov_len, errstr);
 
 #ifdef PTRACE_GETREGS
 	do_ptrace_regs(PTRACE_GETREGS, pid, addr);
-	printf("ptrace(PTRACE_GETREGS, %d, %#lx) = %s\n",
-	       pid, addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_GETREGS), pid, addr, errstr);
 #endif
 #ifdef PTRACE_SETREGS
 	do_ptrace_regs(PTRACE_SETREGS, pid, addr);
-	printf("ptrace(PTRACE_SETREGS, %d, %#lx) = %s\n",
-	       pid, addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_SETREGS), pid, addr, errstr);
 #endif
 #ifdef PTRACE_GETFPREGS
 	do_ptrace_regs(PTRACE_GETFPREGS, pid, addr);
-	printf("ptrace(PTRACE_GETFPREGS, %d, %#lx) = %s\n",
-	       pid, addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_GETFPREGS), pid, addr, errstr);
 #endif
 #ifdef PTRACE_SETFPREGS
 	do_ptrace_regs(PTRACE_SETFPREGS, pid, addr);
-	printf("ptrace(PTRACE_SETFPREGS, %d, %#lx) = %s\n",
-	       pid, addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_SETFPREGS), pid, addr, errstr);
 #endif
 
 	for (; addr > (uintptr_t) iov; --addr) {
 		do_ptrace(PTRACE_GETREGSET, pid, 1, addr);
-		printf("ptrace(PTRACE_GETREGSET, %d, NT_PRSTATUS, %#lx) = %s\n",
-		       pid, addr, errstr);
+		printf("ptrace(" XLAT_FMT ", %d, "
+		       XLAT_KNOWN(0x1, "NT_PRSTATUS") ", %#lx) = %s\n",
+		       XLAT_ARGS(PTRACE_GETREGSET), pid, addr, errstr);
 
 		do_ptrace(PTRACE_SETREGSET, pid, 2, addr);
-		printf("ptrace(PTRACE_SETREGSET, %d, NT_FPREGSET, %#lx) = %s\n",
-		       pid, addr, errstr);
+		printf("ptrace(" XLAT_FMT ", %d, "
+		       XLAT_KNOWN(0x2, "NT_FPREGSET") ", %#lx) = %s\n",
+		       XLAT_ARGS(PTRACE_SETREGSET), pid, addr, errstr);
 	}
 
 	pid = fork();
@@ -1545,7 +1564,8 @@ test_getregset_setregset(int pid)
 			errno = saved;
 			perror_msg_and_fail("ptrace");
 		}
-		printf("ptrace(PTRACE_SYSCALL, %d, NULL, 0) = 0\n", pid);
+		printf("ptrace(" XLAT_FMT ", %d, NULL, 0) = 0\n",
+		       XLAT_ARGS(PTRACE_SYSCALL), pid);
 	}
 }
 
@@ -1566,51 +1586,56 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, sip);
 
 	do_ptrace(bad_request, pid, 0, 0);
-	printf("ptrace(%#lx /* PTRACE_??? */, %d, NULL, NULL) = %s\n",
+	printf("ptrace(%#lx" NRAW(" /* PTRACE_??? */")
+	       ", %d, NULL, NULL) = %s\n",
 	       bad_request, pid, errstr);
 
 	do_ptrace(PTRACE_PEEKDATA, pid, bad_request, bad_data);
 #ifdef IA64
-	printf("ptrace(PTRACE_PEEKDATA, %d, %#lx) = %s\n",
-	       pid, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKDATA), pid, bad_request, errstr);
 #else
-	printf("ptrace(PTRACE_PEEKDATA, %d, %#lx, %#lx) = %s\n",
-	       pid, bad_request, bad_data, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKDATA), pid, bad_request, bad_data, errstr);
 #endif
 
 	do_ptrace(PTRACE_PEEKTEXT, pid, bad_request, bad_data);
 #ifdef IA64
-	printf("ptrace(PTRACE_PEEKTEXT, %d, %#lx) = %s\n",
-	       pid, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKTEXT), pid, bad_request, errstr);
 #else
-	printf("ptrace(PTRACE_PEEKTEXT, %d, %#lx, %#lx) = %s\n",
-	       pid, bad_request, bad_data, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKTEXT), pid, bad_request, bad_data, errstr);
 #endif
 
 	do_ptrace(PTRACE_PEEKUSER, pid, bad_request, bad_data);
 #ifdef IA64
-	printf("ptrace(PTRACE_PEEKUSER, %d, %#lx) = %s\n",
-	       pid, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKUSER), pid, bad_request, errstr);
 #else
-	printf("ptrace(PTRACE_PEEKUSER, %d, %#lx, %#lx) = %s\n",
-	       pid, bad_request, bad_data, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_PEEKUSER), pid, bad_request, bad_data, errstr);
 #endif
 
 	do_ptrace(PTRACE_POKEUSER, pid, bad_request, bad_data);
-	printf("ptrace(PTRACE_POKEUSER, %d, %#lx, %#lx) = %s\n",
-	       pid, bad_request, bad_data, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_POKEUSER), pid, bad_request, bad_data, errstr);
 
 	do_ptrace(PTRACE_ATTACH, pid, 0, 0);
-	printf("ptrace(PTRACE_ATTACH, %d) = %s\n", pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d) = %s\n",
+	       XLAT_ARGS(PTRACE_ATTACH), pid, errstr);
 
 	do_ptrace(PTRACE_INTERRUPT, pid, 0, 0);
-	printf("ptrace(PTRACE_INTERRUPT, %d) = %s\n", pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d) = %s\n",
+	       XLAT_ARGS(PTRACE_INTERRUPT), pid, errstr);
 
 	do_ptrace(PTRACE_KILL, pid, 0, 0);
-	printf("ptrace(PTRACE_KILL, %d) = %s\n", pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d) = %s\n",
+	       XLAT_ARGS(PTRACE_KILL), pid, errstr);
 
 	do_ptrace(PTRACE_LISTEN, pid, 0, 0);
-	printf("ptrace(PTRACE_LISTEN, %d) = %s\n", pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d) = %s\n",
+	       XLAT_ARGS(PTRACE_LISTEN), pid, errstr);
 
 	sigset_t libc_set;
 	sigemptyset(&libc_set);
@@ -1618,35 +1643,37 @@ main(void)
 	memcpy(k_set, &libc_set, sigset_size);
 
 	do_ptrace(PTRACE_SETSIGMASK, pid, sigset_size, (uintptr_t) k_set);
-	printf("ptrace(PTRACE_SETSIGMASK, %d, %u, [USR1]) = %s\n",
-	       pid, sigset_size, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %u, [" XLAT_FMT_U "]) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGMASK), pid, sigset_size,
+	       XLAT_SEL(SIGUSR1, "USR1"), errstr);
 
 	do_ptrace(PTRACE_GETSIGMASK, pid, sigset_size, (uintptr_t) k_set);
-	printf("ptrace(PTRACE_GETSIGMASK, %d, %u, %p) = %s\n",
-	       pid, sigset_size, k_set, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %u, %p) = %s\n",
+	       XLAT_ARGS(PTRACE_GETSIGMASK), pid, sigset_size, k_set, errstr);
 
 	do_ptrace(PTRACE_SECCOMP_GET_FILTER, pid, 42, 0);
-	printf("ptrace(PTRACE_SECCOMP_GET_FILTER, %d, 42, NULL) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, 42, NULL) = %s\n",
+	       XLAT_ARGS(PTRACE_SECCOMP_GET_FILTER), pid, errstr);
 
 	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data, 0);
-	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %d, %lu, NULL) = %s\n",
-	       pid, bad_data, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %lu, NULL) = %s\n",
+	       XLAT_ARGS(PTRACE_SECCOMP_GET_METADATA), pid, bad_data, errstr);
 
 	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, 7,
 		  (uintptr_t) filter_off);
-	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %d, 7, %p) = %s\n",
-	       pid, filter_off, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, 7, %p) = %s\n",
+	       XLAT_ARGS(PTRACE_SECCOMP_GET_METADATA), pid, filter_off, errstr);
 
 	*filter_off = 0xfacefeeddeadc0deULL;
 	do_ptrace(PTRACE_SECCOMP_GET_METADATA, pid, bad_data,
 		  (uintptr_t) filter_off);
-	printf("ptrace(PTRACE_SECCOMP_GET_METADATA, %d, %lu, "
-	       "{filter_off=%" PRIu64 "}) = %s\n",
+	printf("ptrace(" XLAT_FMT ", %d, %lu, {filter_off=%" PRIu64 "}) = %s\n",
+	       XLAT_ARGS(PTRACE_SECCOMP_GET_METADATA),
 	       pid, bad_data, *filter_off, errstr);
 
 	do_ptrace(PTRACE_GETEVENTMSG, pid, bad_request, bad_data);
-	printf("ptrace(PTRACE_GETEVENTMSG, %d, %#lx, %#lx) = %s\n",
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, %#lx) = %s\n",
+	       XLAT_ARGS(PTRACE_GETEVENTMSG),
 	       pid, bad_request, bad_data, errstr);
 
 	memset(sip, -1, sizeof(*sip));
@@ -1656,9 +1683,11 @@ main(void)
 	sip->si_band = -2;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGIO"
-	       ", si_code=POLL_IN, si_errno=ENOENT, si_band=-2}) = %s\n",
-	       pid, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_band=-2}"
+	       ") = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request, XLAT_ARGS(SIGIO),
+	       XLAT_ARGS(POLL_IN), XLAT_ARGS(ENOENT), errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGTRAP;
@@ -1669,10 +1698,12 @@ main(void)
 	sip->si_ptr = (void *) bad_request;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGTRAP"
-	       ", si_code=TRAP_BRKPT, si_errno=ENOENT, si_pid=2, si_uid=3"
-	       ", si_int=%d, si_ptr=%p}) = %s\n",
-	       pid, bad_request, sip->si_int, sip->si_ptr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_pid=2"
+	       ", si_uid=3, si_int=%d, si_ptr=%p}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGTRAP), XLAT_ARGS(TRAP_BRKPT), XLAT_ARGS(ENOENT),
+	       sip->si_int, sip->si_ptr, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGILL;
@@ -1681,9 +1712,12 @@ main(void)
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGILL"
-	       ", si_code=ILL_ILLOPC, si_errno=ENOENT, si_addr=%p}) = %s\n",
-	       pid, bad_request, sip->si_addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_addr=%p}"
+	       ") = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGILL), XLAT_ARGS(ILL_ILLOPC), XLAT_ARGS(ENOENT),
+	       sip->si_addr, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGFPE;
@@ -1692,9 +1726,12 @@ main(void)
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGFPE"
-	       ", si_code=FPE_INTDIV, si_errno=ENOENT, si_addr=%p}) = %s\n",
-	       pid, bad_request, sip->si_addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_addr=%p}"
+	       ") = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGFPE), XLAT_ARGS(FPE_INTDIV), XLAT_ARGS(ENOENT),
+	       sip->si_addr, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGBUS;
@@ -1703,9 +1740,11 @@ main(void)
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGBUS"
-	       ", si_code=BUS_ADRALN, si_errno=%u, si_addr=%p}) = %s\n",
-	       pid, bad_request, sip->si_errno, sip->si_addr, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=%u, si_addr=%p}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGBUS), XLAT_ARGS(BUS_ADRALN),
+	       sip->si_errno, sip->si_addr, errstr);
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGPROF;
@@ -1716,9 +1755,10 @@ main(void)
 	sip->si_ptr = 0;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGPROF"
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
 	       ", si_code=%#x, si_errno=%u, si_pid=0, si_uid=3}) = %s\n",
-	       pid, bad_request, sip->si_code, sip->si_errno, errstr);
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGPROF), sip->si_code, sip->si_errno, errstr);
 
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 	memset(sip, -1, sizeof(*sip));
@@ -1730,10 +1770,13 @@ main(void)
 	sip->si_arch = AUDIT_ARCH_X86_64;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=ENOENT, si_call_addr=%p"
-	       ", si_syscall=%u, si_arch=AUDIT_ARCH_X86_64}) = %s\n",
-	       pid, bad_request, sip->si_call_addr, sip->si_syscall, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_KNOWN(0x1, "SYS_SECCOMP") ", si_errno="
+	       XLAT_FMT_U ", si_call_addr=%p, si_syscall=%u, si_arch=" XLAT_FMT
+	       "}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSYS), XLAT_ARGS(ENOENT), sip->si_call_addr,
+	       sip->si_syscall, XLAT_ARGS(AUDIT_ARCH_X86_64), errstr);
 
 	sip->si_errno = 3141592653U;
 	sip->si_call_addr = NULL;
@@ -1741,22 +1784,24 @@ main(void)
 	sip->si_arch = 0xda7a1057;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
-	       ", si_syscall=%u, si_arch=%#x /* AUDIT_ARCH_??? */})"
-	       " = %s\n",
-	       pid, bad_request, sip->si_errno, sip->si_syscall, sip->si_arch,
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_KNOWN(0x1, "SYS_SECCOMP") ", si_errno=%u"
+	       ", si_call_addr=NULL, si_syscall=%u, si_arch=%#x"
+	       NRAW(" /* AUDIT_ARCH_??? */") "}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSYS), sip->si_errno, sip->si_syscall, sip->si_arch,
 	       errstr);
 
 # ifdef CUR_AUDIT_ARCH
 	sip->si_arch = CUR_AUDIT_ARCH;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
-	       ", si_syscall=__NR_read, si_arch=%s"
-	       "}) = %s\n",
-	       pid, bad_request, sip->si_errno,
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_KNOWN(0x1, "SYS_SECCOMP") ", si_errno=%u"
+	       ", si_call_addr=NULL, si_syscall=" XLAT_FMT_U ", si_arch=%s}"
+	       ") = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSYS), sip->si_errno, XLAT_ARGS(__NR_read),
 	       sprintxval(audit_arch, CUR_AUDIT_ARCH, "AUDIT_ARCH_???"),
 	       errstr);
 # endif
@@ -1765,11 +1810,12 @@ main(void)
 	sip->si_syscall = PERS0__NR_gettid;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
-	       ", si_syscall=%u /* gettid */, si_arch=%s"
-	       "}) = %s\n",
-	       pid, bad_request, sip->si_errno, PERS0__NR_gettid,
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_KNOWN(0x1, "SYS_SECCOMP") ", si_errno=%u"
+	       ", si_call_addr=NULL, si_syscall=%u" NRAW(" /* gettid */")
+	       ", si_arch=%s}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSYS), sip->si_errno, PERS0__NR_gettid,
 	       sprintxval(audit_arch, PERS0_AUDIT_ARCH, "AUDIT_ARCH_???"),
 	       errstr);
 # endif
@@ -1778,11 +1824,12 @@ main(void)
 	sip->si_syscall = M32__NR_gettid;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
-	       ", si_syscall=%u /* gettid */, si_arch=%s"
-	       "}) = %s\n",
-	       pid, bad_request, sip->si_errno, M32__NR_gettid,
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_KNOWN(0x1, "SYS_SECCOMP") ", si_errno=%u"
+	       ", si_call_addr=NULL, si_syscall=%u" NRAW(" /* gettid */")
+	       ", si_arch=%s}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSYS), sip->si_errno, M32__NR_gettid,
 	       sprintxval(audit_arch, M32_AUDIT_ARCH, "AUDIT_ARCH_???"),
 	       errstr);
 # endif
@@ -1791,11 +1838,12 @@ main(void)
 	sip->si_syscall = MX32__NR_gettid;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGSYS"
-	       ", si_code=SYS_SECCOMP, si_errno=%u, si_call_addr=NULL"
-	       ", si_syscall=%u /* gettid */, si_arch=%s"
-	       "}) = %s\n",
-	       pid, bad_request, sip->si_errno, MX32__NR_gettid,
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_KNOWN(0x1, "SYS_SECCOMP") ", si_errno=%u"
+	       ", si_call_addr=NULL, si_syscall=%u" NRAW(" /* gettid */")
+	       ", si_arch=%s}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSYS), sip->si_errno, MX32__NR_gettid,
 	       sprintxval(audit_arch, MX32_AUDIT_ARCH, "AUDIT_ARCH_???"),
 	       errstr);
 # endif
@@ -1811,67 +1859,72 @@ main(void)
 	sip->si_ptr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_SETSIGINFO, %d, %#lx, {si_signo=SIGHUP"
-	       ", si_code=SI_TIMER, si_errno=ENOENT, si_timerid=%#x"
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_timerid=%#x"
 	       ", si_overrun=%d, si_int=%d, si_ptr=%p}) = %s\n",
-	       pid, bad_request, sip->si_timerid, sip->si_overrun,
-	       sip->si_int, sip->si_ptr, errstr);
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGHUP), XLAT_ARGS(SI_TIMER), XLAT_ARGS(ENOENT),
+	       sip->si_timerid, sip->si_overrun, sip->si_int, sip->si_ptr,
+	       errstr);
 #endif
 
 	do_ptrace(PTRACE_GETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(PTRACE_GETSIGINFO, %d, %#lx, %p) = %s\n",
-	       pid, bad_request, sip, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, %p) = %s\n",
+	       XLAT_ARGS(PTRACE_GETSIGINFO), pid, bad_request, sip, errstr);
 
 	do_ptrace(PTRACE_CONT, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_CONT, %d, NULL, SIGUSR1) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_CONT), pid, XLAT_ARGS(SIGUSR1), errstr);
 
 	do_ptrace(PTRACE_DETACH, pid, 0, SIGUSR2);
-	printf("ptrace(PTRACE_DETACH, %d, NULL, SIGUSR2) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_DETACH), pid, XLAT_ARGS(SIGUSR2), errstr);
 
 	do_ptrace(PTRACE_SYSCALL, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_SYSCALL, %d, NULL, SIGUSR1) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_SYSCALL), pid, XLAT_ARGS(SIGUSR1), errstr);
 
 #ifdef PTRACE_SINGLESTEP
 	do_ptrace(PTRACE_SINGLESTEP, pid, 0, SIGUSR2);
-	printf("ptrace(PTRACE_SINGLESTEP, %d, NULL, SIGUSR2) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_SINGLESTEP), pid, XLAT_ARGS(SIGUSR2), errstr);
 #endif
 
 #ifdef PTRACE_SINGLEBLOCK
 	do_ptrace(PTRACE_SINGLEBLOCK, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_SINGLEBLOCK, %d, NULL, SIGUSR1) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_SINGLEBLOCK), pid, XLAT_ARGS(SIGUSR1), errstr);
 #endif
 
 #ifdef PTRACE_SYSEMU
 	do_ptrace(PTRACE_SYSEMU, pid, 0, SIGUSR2);
-	printf("ptrace(PTRACE_SYSEMU, %d, NULL, SIGUSR2) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_SYSEMU), pid, XLAT_ARGS(SIGUSR2), errstr);
 #endif
 #ifdef PTRACE_SYSEMU_SINGLESTEP
 	do_ptrace(PTRACE_SYSEMU_SINGLESTEP, pid, 0, SIGUSR1);
-	printf("ptrace(PTRACE_SYSEMU_SINGLESTEP, %d, NULL, SIGUSR1) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT_U ") = %s\n",
+	       XLAT_ARGS(PTRACE_SYSEMU_SINGLESTEP), pid, XLAT_ARGS(SIGUSR1),
+	       errstr);
 #endif
 
 	do_ptrace(PTRACE_SETOPTIONS,
 		  pid, 0, PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE);
-	printf("ptrace(PTRACE_SETOPTIONS, %d, NULL"
-	       ", PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE) = %s\n",
-	       pid, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, NULL, " XLAT_FMT ") = %s\n",
+	       XLAT_ARGS(PTRACE_SETOPTIONS), pid,
+	       XLAT_ARGS(PTRACE_O_TRACEFORK|PTRACE_O_TRACECLONE), errstr);
 
 	do_ptrace(PTRACE_SEIZE, pid, bad_request, PTRACE_O_TRACESYSGOOD);
-	printf("ptrace(PTRACE_SEIZE, %d, %#lx, PTRACE_O_TRACESYSGOOD) = %s\n",
-	       pid, bad_request, errstr);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, " XLAT_FMT ") = %s\n",
+	       XLAT_ARGS(PTRACE_SEIZE), pid, bad_request,
+	       XLAT_ARGS(PTRACE_O_TRACESYSGOOD), errstr);
 
 	test_peeksiginfo(pid, bad_request);
 	test_getregset_setregset(pid);
 
 	do_ptrace(PTRACE_TRACEME, 0, 0, 0);
-	printf("ptrace(PTRACE_TRACEME) = %s\n", errstr);
+	printf("ptrace(" XLAT_FMT ") = %s\n",
+	       XLAT_ARGS(PTRACE_TRACEME), errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

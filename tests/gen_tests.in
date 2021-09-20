@@ -670,6 +670,9 @@ process_vm_writev--pidns-translation	test_pidns -s5 -a38 -e trace=process_vm_wri
 pselect6
 pselect6_time64
 ptrace	-a23 -s64 -e signal=none
+ptrace-Xabbrev	-a23 -s64 -e signal=none -e trace=ptrace -Xabbrev
+ptrace-Xraw	-a10 -s64 -e signal=none -e trace=ptrace -Xraw
+ptrace-Xverbose	-a23 -s64 -e signal=none -e trace=ptrace -Xverbose
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
 ptrace_syscall_info-Xabbrev	-a35 -e signal=none -e trace=ptrace -Xabbrev
 ptrace_syscall_info-Xraw	-a26 -e signal=none -e trace=ptrace -Xraw
