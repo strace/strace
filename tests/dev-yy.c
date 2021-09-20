@@ -34,6 +34,7 @@ int
 main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
+	char *cwd = get_fd_path(get_dir_fd("."));
 
 	static const struct {
 		const char *path;
@@ -56,8 +57,8 @@ main(void)
 		long fd = syscall(__NR_openat, AT_FDCWD, checks[i].path,
 				  O_RDONLY|O_PATH);
 
-		printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_PATH) = %s",
-		       checks[i].path, sprintrc(fd));
+		printf("openat(AT_FDCWD<%s>, \"%s\", O_RDONLY|O_PATH) = %s",
+		       cwd, checks[i].path, sprintrc(fd));
 		if (fd >= 0)
 			printf(DEV_FMT,
 			       checks[i].path

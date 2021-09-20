@@ -57,6 +57,9 @@ tests_with_existing_file(void)
 	 */
 	create_and_enter_subdir("faccessat_subdir");
 
+	int cwd_fd = get_dir_fd(".");
+	char *cwd = get_fd_path(cwd_fd);
+
 	char *my_secontext = SECONTEXT_PID_MY();
 
 	k_faccessat(-1, NULL, F_OK);
@@ -76,8 +79,15 @@ tests_with_existing_file(void)
 	 */
 
 	k_faccessat(-100, sample, F_OK);
+#  ifdef YFLAG
+	printf("%s%s(AT_FDCWD<%s>, \"%s\"%s, F_OK) = %s\n",
+#  else
 	printf("%s%s(AT_FDCWD, \"%s\"%s, F_OK) = %s\n",
+#  endif
 	       my_secontext, "faccessat",
+#  ifdef YFLAG
+	       cwd,
+#  endif
 	       sample, sample_secontext,
 	       errstr);
 
@@ -85,8 +95,15 @@ tests_with_existing_file(void)
 		perror_msg_and_fail("unlink");
 
 	k_faccessat(-100, sample, F_OK);
+#  ifdef YFLAG
+	printf("%s%s(AT_FDCWD<%s>, \"%s\", F_OK) = %s\n",
+#  else
 	printf("%s%s(AT_FDCWD, \"%s\", F_OK) = %s\n",
+#  endif
 	       my_secontext, "faccessat",
+#  ifdef YFLAG
+	       cwd,
+#  endif
 	       sample,
 	       errstr);
 
@@ -94,8 +111,6 @@ tests_with_existing_file(void)
 	 * Tests with dirfd.
 	 */
 
-	int cwd_fd = get_dir_fd(".");
-	char *cwd = get_fd_path(cwd_fd);
 	char *cwd_secontext = SECONTEXT_FILE(".");
 	char *sample_realpath = xasprintf("%s/%s", cwd, sample);
 
@@ -203,7 +218,9 @@ main(void)
 		const char *str;
 	} dirfds[] = {
 		{ ARG_STR(-1) },
+#  ifndef YFLAG
 		{ -100, "AT_FDCWD" },
+#  endif
 		{ fd, fd_str },
 	}, modes[] = {
 		{ ARG_STR(F_OK) },

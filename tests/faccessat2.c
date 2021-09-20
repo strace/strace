@@ -21,6 +21,8 @@
 
 #ifndef FD_PATH
 # define FD_PATH ""
+#else
+# define YFLAG
 #endif
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 # define SKIP_IF_PROC_IS_UNAVAILABLE
@@ -84,7 +86,9 @@ main(void)
 		const char *str;
 	} dirfds[] = {
 		{ ARG_STR(-1) },
+#ifndef YFLAG
 		{ -100, "AT_FDCWD" },
+#endif
 		{ fd, fd_str },
 	}, modes[] = {
 		{ ARG_STR(F_OK) },

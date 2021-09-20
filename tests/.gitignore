@@ -563,6 +563,7 @@ open
 open_tree
 open_tree-P
 openat
+openat-y
 openat2
 openat2-Xabbrev
 openat2-Xraw

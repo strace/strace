@@ -15,6 +15,10 @@
 # include <stdio.h>
 # include <unistd.h>
 
+# ifdef YFLAG
+#  include <stdlib.h>
+# endif
+
 # include "secontext.h"
 
 # ifdef O_TMPFILE
@@ -103,6 +107,10 @@ main(void)
 	 * Tests with AT_FDCWD.
 	 */
 
+# ifdef YFLAG
+	char *cwd = get_fd_path(get_dir_fd("."));
+#endif
+
 	(void) unlink(sample);
 	long fd = syscall(__NR_openat, -100, sample, O_RDONLY|O_CREAT, 0400);
 
@@ -112,23 +120,45 @@ main(void)
 	 * File context in openat() is not displayed because file doesn't exist
 	 * yet, but is displayed in return value since the file got created.
 	 */
+# ifdef YFLAG
+	char *sample_rp = get_fd_path(fd);
+
+	printf("%s%s(AT_FDCWD<%s>, \"%s\", O_RDONLY|O_CREAT, 0400) = %s<%s>%s\n",
+# else
 	printf("%s%s(AT_FDCWD, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+# endif
 	       my_secontext, "openat",
-	       sample,
-	       sprintrc(fd), sample_secontext);
+# ifdef YFLAG
+	       cwd,
+# endif
+	       sample, sprintrc(fd),
+# ifdef YFLAG
+	       sample_rp,
+# endif
+	       sample_secontext);
 
 	close(fd);
 
 	fd = syscall(__NR_openat, -100, sample, O_RDONLY);
+# ifdef YFLAG
+	printf("%s%s(AT_FDCWD<%s>, \"%s\"%s, O_RDONLY) = %s<%s>%s\n",
+# else
 	printf("%s%s(AT_FDCWD, \"%s\"%s, O_RDONLY) = %s%s\n",
+# endif
 	       my_secontext, "openat",
+# ifdef YFLAG
+	       cwd,
+# endif
 	       sample, sample_secontext,
-	       sprintrc(fd), sample_secontext);
-	if (fd != -1) {
-		close(fd);
-		if (unlink(sample))
-			perror_msg_and_fail("unlink");
-	}
+	       sprintrc(fd),
+# ifdef YFLAG
+	       sample_rp,
+# endif
+	       sample_secontext);
+	close(fd);
+
+	if (unlink(sample))
+		perror_msg_and_fail("unlink");
 
 	/*
 	 * Tests with dirfd.
@@ -146,18 +176,42 @@ main(void)
 	 * File context in openat() is not displayed because file doesn't exist
 	 * yet, but is displayed in return value since the file got created.
 	 */
+# ifdef YFLAG
+	printf("%s%s(%d<%s>%s, \"%s\", O_RDONLY|O_CREAT, 0400) = %s<%s>%s\n",
+# else
 	printf("%s%s(%d%s, \"%s\", O_RDONLY|O_CREAT, 0400) = %s%s\n",
+# endif
 	       my_secontext, "openat",
-	       cwd_fd, cwd_secontext,
+	       cwd_fd,
+# ifdef YFLAG
+	       cwd,
+# endif
+	       cwd_secontext,
 	       sample,
-	       sprintrc(fd), sample_secontext);
+	       sprintrc(fd),
+# ifdef YFLAG
+	       sample_rp,
+# endif
+	       sample_secontext);
 
 	fd = syscall(__NR_openat, cwd_fd, sample, O_RDONLY);
+# ifdef YFLAG
+	printf("%s%s(%d<%s>%s, \"%s\"%s, O_RDONLY) = %s<%s>%s\n",
+# else
 	printf("%s%s(%d%s, \"%s\"%s, O_RDONLY) = %s%s\n",
+# endif
 	       my_secontext, "openat",
-	       cwd_fd, cwd_secontext,
+	       cwd_fd,
+# ifdef YFLAG
+	       cwd,
+# endif
+	       cwd_secontext,
 	       sample, sample_secontext,
-	       sprintrc(fd), sample_secontext);
+	       sprintrc(fd),
+# ifdef YFLAG
+	       sample_rp,
+# endif
+	       sample_secontext);
 	if (fd != -1) {
 		close(fd);
 		if (unlink(sample))

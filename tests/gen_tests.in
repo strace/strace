@@ -538,6 +538,7 @@ open--secontext_full	-a30 -P open.sample --secontext=full --trace=open
 open_tree -a30 -y
 open_tree-P -a30 --decode-fds -P /dev/full -e trace=open_tree
 openat	-a36 -P $NAME.sample
+openat-y	-a36 -P openat.sample -P $PWD/openat_subdir/openat.sample -y -e trace=openat
 openat--secontext	-a36 -P openat.sample -P $PWD/openat.sample --secontext -e trace=openat
 openat--secontext_full	-a36 -P openat.sample -P $PWD/openat.sample --secontext=full -e trace=openat
 openat2	-a35

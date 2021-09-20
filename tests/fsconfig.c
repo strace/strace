@@ -187,11 +187,13 @@ test_fsconfig_set_binary(const unsigned int cmd, const char *cmd_str)
 static void
 test_fsconfig_set_path(const unsigned int cmd, const char *cmd_str)
 {
+	char *cwd = get_fd_path(get_dir_fd("."));
+
 	fill_memory_ex(fname, PATH_MAX, '0', 10);
 	k_fsconfig(fd, cmd, key, fname, -100);
 #ifndef PATH_TRACING
-	printf("fsconfig(%d<%s>, %s, \"%s\", \"%.*s\"..., AT_FDCWD) = %s\n",
-	       fd, fd_path, cmd_str, key, (int) PATH_MAX - 1, fname, errstr);
+	printf("fsconfig(%d<%s>, %s, \"%s\", \"%.*s\"..., AT_FDCWD<%s>) = %s\n",
+	       fd, fd_path, cmd_str, key, (int) PATH_MAX - 1, fname, cwd, errstr);
 #endif
 
 	fname[PATH_MAX - 1] = '\0';
@@ -206,8 +208,8 @@ test_fsconfig_set_path(const unsigned int cmd, const char *cmd_str)
 	       cmd_str, key, fd, fd_path, errstr);
 
 	k_fsconfig(-1, cmd, 0, fd_path, -100);
-	printf("fsconfig(-1, %s, NULL, \"%s\", AT_FDCWD) = %s\n",
-	       cmd_str, fd_path, errstr);
+	printf("fsconfig(-1, %s, NULL, \"%s\", AT_FDCWD<%s>) = %s\n",
+	       cmd_str, fd_path, cwd, errstr);
 
 	k_fsconfig(-1, cmd, efault, efault + 1, fd);
 	printf("fsconfig(-1, %s, %p, %p, %d<%s>) = %s\n",
