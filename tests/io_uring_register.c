@@ -783,6 +783,72 @@ main(void)
 		}
 	}
 
+
+	/* IORING_REGISTER_IOWQ_AFF */
+	unsigned long aff[] = {
+		(unsigned long) 0xbadc0deddadfacedULL,
+		(unsigned long) 0xfacefeeddeadbeefULL,
+	};
+	const unsigned long *arg_aff = tail_memdup(aff, sizeof(aff));
+	const unsigned long *arg_aff_end = arg_aff + ARRAY_SIZE(aff);
+
+	sys_io_uring_register(fd_null, 17, NULL, 0xfacefeed);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x11, "IORING_REGISTER_IOWQ_AFF")
+	       ", NULL, 4207869677) = %s\n",
+	       fd_null, path_null, errstr);
+
+	sys_io_uring_register(fd_null, 17, arg_aff_end, 0);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x11, "IORING_REGISTER_IOWQ_AFF") ", [], 0) = %s\n",
+	       fd_null, path_null, errstr);
+
+	sys_io_uring_register(fd_null, 17, arg_aff_end, 1);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x11, "IORING_REGISTER_IOWQ_AFF")
+	       ", %p, 1) = %s\n",
+	       fd_null, path_null, arg_aff_end, errstr);
+
+	sys_io_uring_register(fd_null, 17, arg_aff + 1, 2);
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x11, "IORING_REGISTER_IOWQ_AFF")
+#ifdef WORDS_BIGENDIAN
+# if SIZEOF_LONG > 4
+	       ", [49, 50, 51, 54, 55, 57, 59, 60, 61, 62, 63]" /* face */
+# else
+	       ", [16, 18, 19, 21, 23, 25, 26, 27, 28, 30, 31]" /* dead */
+# endif
+#else
+	       ", [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 12, 13, 15]" /* beef */
+#endif /* WORDS_BIGENDIAN */
+	       ", 2) = %s\n",
+	       fd_null, path_null, errstr);
+
+	sys_io_uring_register(fd_null, 17, arg_aff + 1, sizeof(aff));
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x11, "IORING_REGISTER_IOWQ_AFF")
+	       ", %p, %zu) = %s\n",
+	       fd_null, path_null, arg_aff + 1, sizeof(aff), errstr);
+
+	sys_io_uring_register(fd_null, 17, arg_aff, sizeof(aff));
+	printf("io_uring_register(%u<%s>, "
+	       XLAT_KNOWN(0x11, "IORING_REGISTER_IOWQ_AFF") ", "
+	       "[0, 2, 3, 5, 6, 7, 10, 11, 13, 15" /* aced */
+	       ", 16, 17, 18, 19, 20, 22, 23, 25, 27, 28, 30, 31" /* dadf */
+#if SIZEOF_LONG > 4
+	       ", 32, 34, 35, 37, 38, 39, 40, 42, 43" /* 0ded */
+	       ", 50, 51, 52, 54, 55, 57, 59, 60, 61, 63" /* badc */
+	       ", 64, 65, 66, 67, 69, 70, 71, 73, 74, 75, 76, 77, 79" /* beef */
+	       ", 80, 82, 83, 85, 87, 89, 90, 91, 92, 94, 95" /* dead feed */
+	       ", 96, 98, 99, 101, 102, 103, 105, 106, 107, 108, 109, 110, 111"
+	       ", 113, 114, 115, 118, 119, 121, 123, 124, 125, 126, 127"/*face*/
+#else
+	       ", 32, 33, 34, 35, 37, 38, 39, 41, 42, 43, 44, 45, 47" /* beef */
+	       ", 48, 50, 51, 53, 55, 57, 58, 59, 60, 62, 63" /* dead */
+#endif
+	       "], %zu) = %s\n",
+	       fd_null, path_null, sizeof(aff), errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

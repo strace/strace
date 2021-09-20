@@ -518,6 +518,9 @@ SYS_FUNC(io_uring_register)
 	case IORING_REGISTER_BUFFERS_UPDATE:
 		print_io_uring_update_rsrc(tcp, arg, nargs, opcode);
 		break;
+	case IORING_REGISTER_IOWQ_AFF:
+		print_affinitylist(tcp, arg, nargs);
+		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
 	case IORING_UNREGISTER_EVENTFD:
