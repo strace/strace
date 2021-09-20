@@ -124,6 +124,7 @@ MPERS_PRINTER_DECL(int, block_ioctl, struct tcb *const tcp,
 
 	/* returns an uint64_t */
 	case BLKGETSIZE64:
+	case BLKGETDISKSEQ:
 		if (entering(tcp))
 			return 0;
 		tprint_arg_next();

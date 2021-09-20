@@ -1090,6 +1090,7 @@
 { "linux/fs.h", "BLKTRACESTOP", _IOC_NONE, 0x1275, 0x00 },
 { "linux/fs.h", "BLKTRACETEARDOWN", _IOC_NONE, 0x1276, 0x00 },
 { "linux/fs.h", "BLKZEROOUT", _IOC_NONE, 0x127f, 0x00 },
+{ "linux/fs.h", "BLKGETDISKSEQ", _IOC_READ, 0x1280, 0x08 },
 { "linux/fs.h", "FIBMAP", _IOC_NONE, 0x0001, 0x00 },
 { "linux/fs.h", "FICLONE", _IOC_WRITE, 0x9409, 0x04 },
 { "linux/fs.h", "FICLONERANGE", _IOC_WRITE, 0x940d, 0x20 },
