@@ -46,9 +46,9 @@ main(void)
 		{ (kernel_ulong_t) 0xffffffffffffffffULL,
 			"0xc /* FAN_CLASS_??? */|FAN_CLOEXEC|FAN_NONBLOCK|"
 			"FAN_UNLIMITED_QUEUE|FAN_UNLIMITED_MARKS|"
-			"FAN_ENABLE_AUDIT|FAN_REPORT_TID|FAN_REPORT_FID|"
-			"FAN_REPORT_DIR_FID|FAN_REPORT_NAME|"
-			"0xfffff080" },
+			"FAN_ENABLE_AUDIT|FAN_REPORT_PIDFD|FAN_REPORT_TID|"
+			"FAN_REPORT_FID|FAN_REPORT_DIR_FID|FAN_REPORT_NAME|"
+			"0xfffff000" },
 	};
 	static const struct strval event_f_flags[] = {
 		{ F8ILL_KULONG_MASK, "O_RDONLY" },

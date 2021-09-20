@@ -10,7 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     syscall.
   * Implemented decoding of SECCOMP_* ioctl commands.
   * Enhanced decoding of io_uring_register and times syscalls.
-  * Updated lists of IORING_* and MPOL_* constants.
+  * Updated lists of FAN_REPORT_*, IORING_* and MPOL_* constants.
 
 * Bug fixes
   * Fixed printing of struct bpf_prog_info.map_ids array.
