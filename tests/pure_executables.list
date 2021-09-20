@@ -510,6 +510,9 @@ pselect6
 pselect6_time64
 ptrace
 ptrace_syscall_info
+ptrace_syscall_info-Xabbrev
+ptrace_syscall_info-Xraw
+ptrace_syscall_info-Xverbose
 pwritev
 quotactl
 quotactl-Xabbrev

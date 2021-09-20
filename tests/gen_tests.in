@@ -671,6 +671,9 @@ pselect6
 pselect6_time64
 ptrace	-a23 -s64 -e signal=none
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
+ptrace_syscall_info-Xabbrev	-a35 -e signal=none -e trace=ptrace -Xabbrev
+ptrace_syscall_info-Xraw	-a26 -e signal=none -e trace=ptrace -Xraw
+ptrace_syscall_info-Xverbose	-a47 -e signal=none -e trace=ptrace -Xverbose
 pwritev	-a22 -s7
 quotactl
 quotactl-success	-einject=quotactl:retval=42 -etrace=quotactl
