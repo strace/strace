@@ -80,6 +80,7 @@ main(void)
 	const char *sep;
 	unsigned int i, cpu;
 	unsigned int first_cpu = -1U;
+	unsigned int first_crop_cpu = -1U;
 	for (i = 0, cpu = 0, sep = ""; i < (unsigned) ret_size * 8; ++i) {
 		if (CPU_ISSET_S(i, (unsigned) ret_size, cpuset)) {
 			printf("%s%u", sep, i);
@@ -87,6 +88,8 @@ main(void)
 			cpu = i;
 			if (first_cpu == -1U)
 				first_cpu = i;
+			if (first_crop_cpu == -1U && i >= 8)
+				first_crop_cpu = i;
 		}
 	}
 	printf("]) = %s\n", errstr);
@@ -100,6 +103,18 @@ main(void)
 	pidns_print_leader();
 	printf("sched_setaffinity(%d%s, 1, %p) = %s\n",
 	       pid, pid_str, ((char *) cpuset) + cpuset_size, sprintrc(rc));
+
+	static const uint8_t first_oob = BE_LE(SIZEOF_LONG == 4 ? 39 : 7, 56);
+	if (first_crop_cpu != -1U && first_crop_cpu < 56) {
+		CPU_ZERO_S(cpuset_size, cpuset);
+		CPU_SET_S(first_crop_cpu, cpuset_size, cpuset);
+		CPU_SET_S(first_oob, cpuset_size, cpuset);
+		if (setaffinity(pid, 7, cpuset))
+			perror_msg_and_skip("sched_setaffinity()");
+		pidns_print_leader();
+		printf("sched_setaffinity(%d%s, 7, [%u]) = 0\n",
+		       pid, pid_str, first_crop_cpu);
+	}
 
 	CPU_ZERO_S(cpuset_size, cpuset);
 	CPU_SET_S(cpu, cpuset_size, cpuset);
