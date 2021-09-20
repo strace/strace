@@ -177,17 +177,27 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 	for (i = 0; (i = next_set_bit(mask, i, size * (4 * 8))) >= 0; ) {
 		++i;
 		*s++ = sep;
-		if ((unsigned) i < nsignals) {
-			s = stpcpy(s, signalent[i] + 3);
-		}
-#ifdef ASM_SIGRTMAX
-		else if (i >= ASM_SIGRTMIN && i <= ASM_SIGRTMAX) {
-			s = xappendstr(outstr, s, "RT_%u", i - ASM_SIGRTMIN);
-		}
-#endif
-		else {
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 			s = xappendstr(outstr, s, "%u", i);
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			s = xappendstr(outstr, s, " /* ");
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
+			if ((unsigned) i < nsignals) {
+				s = stpcpy(s, signalent[i] + 3);
+			}
+#ifdef ASM_SIGRTMAX
+			else if (i >= ASM_SIGRTMIN && i <= ASM_SIGRTMAX) {
+				s = xappendstr(outstr, s, "RT_%u",
+					       i - ASM_SIGRTMIN);
+			}
+#endif
+			else if (xlat_verbose(xlat_verbosity)
+				 != XLAT_STYLE_ABBREV) {
+				s = xappendstr(outstr, s, "%u", i);
+			}
 		}
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			s = xappendstr(outstr, s, " */");
 		sep = ' ';
 	}
 	if (sep == '[')
