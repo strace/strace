@@ -434,6 +434,7 @@ openat2-v-y-Xraw
 openat2-v-y-Xverbose
 openat2-y
 osf_utimes
+pathmax
 pause
 perf_event_open
 personality

@@ -576,6 +576,7 @@ openat2-v-y-Xverbose
 openat2-y
 orphaned_process_group
 osf_utimes
+pathmax
 pause
 pc
 perf_event_open
