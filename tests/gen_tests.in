@@ -18,6 +18,7 @@ adjtimex	-a15
 aio	-a14 -e trace=io_setup,io_submit,io_getevents,io_cancel,io_destroy
 aio_pgetevents	-e trace=io_pgetevents
 alarm	-a10
+at_fdcwd-pathmax	-a36 --trace=openat -y -P sample
 bpf	-a20
 bpf-obj_get_info_by_fd	-a20 -y -e trace=bpf
 bpf-obj_get_info_by_fd-prog	-a20 -y -e trace=bpf
