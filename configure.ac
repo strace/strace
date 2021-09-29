@@ -352,6 +352,7 @@ AC_CHECK_FUNCS(m4_normalize([
 	futimens
 	iconv_open
 	if_indextoname
+	mempcpy
 	open64
 	open_memstream
 	preadv

@@ -236,17 +236,42 @@ static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_DPORT]		= decode_nla_u16
 };
 
+/*
+ * RTA_MULTIPATH payload is a list of struct rtnexthop-headed RTA_* netlink
+ * attributes:
+ *
+ * {RTA_MULTIPATH nlattr hdr} [ [{struct rtnexthop}, {RTA_* nlattr}],
+ *                              [{struct rtnexthop}, {RTA_* nlattr}], ... ]
+ */
 static bool
 decode_rta_multipath(struct tcb *const tcp,
 		     const kernel_ulong_t addr,
 		     const unsigned int len,
 		     const void *const opaque_data)
 {
+	bool is_array = false;
 	struct rtnexthop nh;
+	kernel_ulong_t cur = addr;
+	kernel_ulong_t left = len;
 
 	if (len < sizeof(nh))
 		return false;
-	else if (!umove_or_printaddr(tcp, addr, &nh)) {
+
+	while (!umove_or_printaddr(tcp, cur, &nh)) {
+		static const size_t offset = RTNH_ALIGN(sizeof(nh));
+		const unsigned int rtnh_len = MIN(left, nh.rtnh_len);
+
+		if (cur == addr && nh.rtnh_len < len) {
+			tprint_array_begin();
+			is_array = true;
+		}
+
+		if (cur > addr)
+			tprint_array_next();
+
+		if (rtnh_len > offset)
+			tprint_array_begin();
+
 		/* print the whole structure regardless of its rtnh_len */
 		tprint_struct_begin();
 		PRINT_FIELD_U(nh, rtnh_len);
@@ -259,17 +284,27 @@ decode_rta_multipath(struct tcb *const tcp,
 		PRINT_FIELD_IFINDEX(nh, rtnh_ifindex);
 		tprint_struct_end();
 
-		const unsigned short rtnh_len = MIN(len, nh.rtnh_len);
-		const size_t offset = RTNH_ALIGN(sizeof(nh));
 		if (rtnh_len > offset) {
 			tprint_array_next();
-			decode_nlattr(tcp, addr + offset, rtnh_len - offset,
+			decode_nlattr(tcp, cur + offset, rtnh_len - offset,
 				      rtnl_route_attrs, "RTA_???",
 				      rtmsg_nla_decoders,
 				      ARRAY_SIZE(rtmsg_nla_decoders),
 				      opaque_data);
 		}
+
+		if (rtnh_len > offset)
+			tprint_array_end();
+
+		if (RTNH_ALIGN(rtnh_len) >= left)
+			break;
+
+		cur += RTNH_ALIGN(rtnh_len);
+		left -= RTNH_ALIGN(rtnh_len);
 	}
+
+	if (is_array)
+		tprint_array_end();
 
 	return true;
 }

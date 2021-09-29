@@ -15,43 +15,61 @@
 #include <linux/ip.h>
 #include <linux/rtnetlink.h>
 
+#if !defined HAVE_MEMPCPY
+# undef mempcpy
+# define mempcpy strace_mempcpy
+static void *
+mempcpy(void *dest, const void *src, size_t n)
+{
+	memcpy(dest, src, n);
+
+	return dest + n;
+}
+#endif
+
 #define LWTUNNEL_ENCAP_NONE 0
 
-static void
-init_rtmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
-{
-	SET_STRUCT(struct nlmsghdr, nlh,
-		.nlmsg_len = msg_len,
-		.nlmsg_type = RTM_GETROUTE,
-		.nlmsg_flags = NLM_F_DUMP
-	);
+#define DEF_NLATTR_RTMSG_FUNCS(sfx_, af_)				\
+	static void							\
+	init_##sfx_(struct nlmsghdr *const nlh, const unsigned int msg_len) \
+	{								\
+		SET_STRUCT(struct nlmsghdr, nlh,			\
+			.nlmsg_len = msg_len,				\
+			.nlmsg_type = RTM_GETROUTE,			\
+			.nlmsg_flags = NLM_F_DUMP			\
+		);							\
+									\
+		struct rtmsg *const msg = NLMSG_DATA(nlh);		\
+		SET_STRUCT(struct rtmsg, msg,				\
+			.rtm_family = (af_),				\
+			.rtm_tos = IPTOS_LOWDELAY,			\
+			.rtm_table = RT_TABLE_DEFAULT,			\
+			.rtm_protocol = RTPROT_KERNEL,			\
+			.rtm_scope = RT_SCOPE_UNIVERSE,			\
+			.rtm_type = RTN_LOCAL,				\
+			.rtm_flags = RTM_F_NOTIFY			\
+		);							\
+	}								\
+									\
+	static void							\
+	print_##sfx_(const unsigned int msg_len)			\
+	{								\
+		printf("{nlmsg_len=%u, nlmsg_type=RTM_GETROUTE"		\
+		       ", nlmsg_flags=NLM_F_DUMP"			\
+		       ", nlmsg_seq=0, nlmsg_pid=0}, {rtm_family=" #af_	\
+		       ", rtm_dst_len=0, rtm_src_len=0"			\
+		       ", rtm_tos=IPTOS_LOWDELAY"			\
+		       ", rtm_table=RT_TABLE_DEFAULT"			\
+		       ", rtm_protocol=RTPROT_KERNEL"			\
+		       ", rtm_scope=RT_SCOPE_UNIVERSE"			\
+		       ", rtm_type=RTN_LOCAL"				\
+		       ", rtm_flags=RTM_F_NOTIFY}",			\
+		       msg_len);					\
+	}								\
+	/* End of DEF_NLATTR_RTMSG_FUNCS */
 
-	struct rtmsg *const msg = NLMSG_DATA(nlh);
-	SET_STRUCT(struct rtmsg, msg,
-		.rtm_family = AF_UNIX,
-		.rtm_tos = IPTOS_LOWDELAY,
-		.rtm_table = RT_TABLE_DEFAULT,
-		.rtm_protocol = RTPROT_KERNEL,
-		.rtm_scope = RT_SCOPE_UNIVERSE,
-		.rtm_type = RTN_LOCAL,
-		.rtm_flags = RTM_F_NOTIFY
-	);
-}
-
-static void
-print_rtmsg(const unsigned int msg_len)
-{
-	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETROUTE, nlmsg_flags=NLM_F_DUMP"
-	       ", nlmsg_seq=0, nlmsg_pid=0}, {rtm_family=AF_UNIX"
-	       ", rtm_dst_len=0, rtm_src_len=0"
-	       ", rtm_tos=IPTOS_LOWDELAY"
-	       ", rtm_table=RT_TABLE_DEFAULT"
-	       ", rtm_protocol=RTPROT_KERNEL"
-	       ", rtm_scope=RT_SCOPE_UNIVERSE"
-	       ", rtm_type=RTN_LOCAL"
-	       ", rtm_flags=RTM_F_NOTIFY}",
-	       msg_len);
-}
+DEF_NLATTR_RTMSG_FUNCS(rtmsg, AF_UNIX)
+DEF_NLATTR_RTMSG_FUNCS(rtmsg_inet, AF_INET)
 
 int
 main(void)
@@ -110,9 +128,9 @@ main(void)
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_rtmsg, print_rtmsg,
 			   RTA_MULTIPATH, pattern, nh,
-			   printf("{rtnh_len=%u, rtnh_flags=RTNH_F_DEAD"
+			   printf("[{rtnh_len=%u, rtnh_flags=RTNH_F_DEAD"
 				  ", rtnh_hops=%u"
-				  ", rtnh_ifindex=" IFINDEX_LO_STR "}",
+				  ", rtnh_ifindex=" IFINDEX_LO_STR "}]",
 				  nh.rtnh_len, nh.rtnh_hops));
 
 	char buf[RTNH_ALIGN(sizeof(nh)) + sizeof(nla)];
@@ -123,10 +141,72 @@ main(void)
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_rtmsg, print_rtmsg,
 		    RTA_MULTIPATH, sizeof(buf), buf, sizeof(buf),
-		    printf("{rtnh_len=%u, rtnh_flags=RTNH_F_DEAD"
+		    printf("[{rtnh_len=%u, rtnh_flags=RTNH_F_DEAD"
 			   ", rtnh_hops=%u, rtnh_ifindex=" IFINDEX_LO_STR "}"
-			   ", {nla_len=%u, nla_type=RTA_DST}",
+			   ", {nla_len=%u, nla_type=RTA_DST}]",
 			   nh.rtnh_len, nh.rtnh_hops, nla.nla_len));
+
+	static const struct in_addr gw_inet_addr = { .s_addr = BE32(0xdeadbeef) };
+	static const uint8_t via_inet6_addr[16] = {
+		0xde, 0xad, 0xfa, 0xce, 0xbe, 0xef, 0xca, 0xfe,
+		0xfe, 0xed, 0xba, 0x5e, 0x00, 0x00, 0xfa, 0xde };
+	static const struct rtvia rtvia = { .rtvia_family = AF_INET6 };
+	char buf2[2 * (RTNH_ALIGN(sizeof(nh)) + NLMSG_ALIGN(sizeof(nla))) +
+		       + NLMSG_ALIGN(sizeof(gw_inet_addr))
+		       + NLMSG_ALIGN(offsetof(struct rtvia, rtvia_addr)
+				     + sizeof(via_inet6_addr))];
+	char *pos = buf2;
+
+	nh.rtnh_len = RTNH_ALIGN(sizeof(nh)) + NLMSG_ALIGN(sizeof(nla))
+		      + NLMSG_ALIGN(sizeof(gw_inet_addr));
+	nh.rtnh_flags = 0xc0;
+	nla.nla_type = RTA_GATEWAY;
+	nla.nla_len = NLMSG_ALIGN(sizeof(nla))
+		      + NLMSG_ALIGN(sizeof(gw_inet_addr));
+	pos = mempcpy(pos, &nh, sizeof(nh));
+	pos = mempcpy(pos, &nla, sizeof(nla));
+	pos = mempcpy(pos, &gw_inet_addr, sizeof(gw_inet_addr));
+
+	nh.rtnh_len = RTNH_ALIGN(sizeof(nh)) + NLMSG_ALIGN(sizeof(nla))
+		      + NLMSG_ALIGN(offsetof(struct rtvia, rtvia_addr)
+				    + sizeof(via_inet6_addr));
+	nla.nla_type = RTA_VIA;
+	nla.nla_len = NLMSG_ALIGN(sizeof(nla))
+		      + NLMSG_ALIGN(offsetof(struct rtvia, rtvia_addr)
+				    + sizeof(via_inet6_addr));
+	pos = mempcpy(pos, &nh, sizeof(nh));
+	pos = mempcpy(pos, &nla, sizeof(nla));
+	pos = mempcpy(pos, &rtvia, sizeof(rtvia));
+	pos = mempcpy(pos, &via_inet6_addr, sizeof(via_inet6_addr));
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_rtmsg_inet, print_rtmsg_inet,
+		    RTA_MULTIPATH, sizeof(buf2), buf2, sizeof(buf2),
+		    printf("[[{rtnh_len=%u, rtnh_flags=RTNH_F_TRAP|0x80"
+			   ", rtnh_hops=%u, rtnh_ifindex=" IFINDEX_LO_STR "}"
+			   ", [{nla_len=%u, nla_type=RTA_GATEWAY}"
+			   ", inet_addr(\"222.173.190.239\")]]"
+			   ", [{rtnh_len=%u, rtnh_flags=RTNH_F_TRAP|0x80"
+			   ", rtnh_hops=%u, rtnh_ifindex=" IFINDEX_LO_STR "}"
+			   ", [{nla_len=%u, nla_type=RTA_VIA}"
+			   ", {rtvia_family=AF_INET6"
+			   ", inet_pton(AF_INET6"
+			   ", \"dead:face:beef:cafe:feed:ba5e:0:fade\""
+			   ", &rtvia_addr)}]]]",
+			   (uint32_t) (RTNH_ALIGN(sizeof(nh))
+			   + NLMSG_ALIGN(sizeof(nla))
+			   + NLMSG_ALIGN(sizeof(gw_inet_addr))),
+			   nh.rtnh_hops,
+			   (uint32_t) (NLMSG_ALIGN(sizeof(nla))
+			   + NLMSG_ALIGN(sizeof(gw_inet_addr))),
+			   (uint32_t) (RTNH_ALIGN(sizeof(nh))
+			   + NLMSG_ALIGN(sizeof(nla))
+			   + NLMSG_ALIGN(offsetof(struct rtvia, rtvia_addr)
+					 + sizeof(via_inet6_addr))),
+			   nh.rtnh_hops,
+			   (uint32_t) (NLMSG_ALIGN(sizeof(nla))
+			   + NLMSG_ALIGN(offsetof(struct rtvia, rtvia_addr)
+					 + sizeof(via_inet6_addr)))
+			   ));
 
 	static const struct rta_cacheinfo ci = {
 		.rta_clntref = 0xabcdefab,
