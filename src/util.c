@@ -1171,6 +1171,12 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	else
 		str[size] = '\xff';
 
+	if ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
+	    == (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0)
+	    && size == len && size) {
+		--size;
+	}
+
 	/* If string_quote didn't see NUL and (it was supposed to be ASCIZ str
 	 * or we were requested to print more than -s NUM chars)...
 	 */
