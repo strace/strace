@@ -119,4 +119,14 @@ is_filled(const char *ptr, char fill, size_t size)
 	static_assert(sizeof(type_) == (sz_), \
 		      "Unexpected size of " #type_ "(" #sz_ " expected)")
 
+#ifdef WORDS_BIGENDIAN
+# define BE16(val_) val_
+# define BE32(val_) val_
+# define BE64(val_) val_
+#else
+# define BE16(val_) ((((val_) & 0xff) << 8) | (((val_) >> 8) & 0xff))
+# define BE32(val_) ((BE16(val_) << 16) | BE16((val_) >> 16))
+# define BE64(val_) ((BE32(val_) << 32) | BE32((val_) >> 32))
+#endif
+
 #endif /* !STRACE_MACROS_H */
