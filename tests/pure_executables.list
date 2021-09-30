@@ -674,6 +674,9 @@ timer_create
 timer_xettime
 timerfd_xettime
 times
+times-Xabbrev
+times-Xraw
+times-Xverbose
 times-fail
 tkill
 truncate

@@ -24,13 +24,13 @@ SYS_FUNC(times)
 
 	if (exiting(tcp) && !umove_or_printaddr(tcp, tcp->u_arg[0], &tbuf)) {
 		tprint_struct_begin();
-		PRINT_FIELD_U(tbuf, tms_utime);
+		PRINT_FIELD_CLOCK_T(tbuf, tms_utime);
 		tprint_struct_next();
-		PRINT_FIELD_U(tbuf, tms_stime);
+		PRINT_FIELD_CLOCK_T(tbuf, tms_stime);
 		tprint_struct_next();
-		PRINT_FIELD_U(tbuf, tms_cutime);
+		PRINT_FIELD_CLOCK_T(tbuf, tms_cutime);
 		tprint_struct_next();
-		PRINT_FIELD_U(tbuf, tms_cstime);
+		PRINT_FIELD_CLOCK_T(tbuf, tms_cstime);
 		tprint_struct_end();
 	}
 

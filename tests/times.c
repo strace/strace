@@ -1,7 +1,7 @@
 /*
  * Check decoding of times syscall.
  *
- * Copyright (c) 2015 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2015-2021 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2015-2021 The strace developers.
  * All rights reserved.
@@ -129,13 +129,41 @@ main(void)
 		llres = (unsigned long) res;
 #endif
 
-	printf("times({tms_utime=%llu, tms_stime=%llu, ",
-		(unsigned long long) tbuf.tms_utime,
-		(unsigned long long) tbuf.tms_stime);
-	printf("tms_cutime=%llu, tms_cstime=%llu}) = %llu\n",
-		(unsigned long long) tbuf.tms_cutime,
-		(unsigned long long) tbuf.tms_cstime,
-		llres);
+	long clk_tck = sysconf(_SC_CLK_TCK);
+	int precision = clk_tck > 100000000 ? 9
+			: clk_tck > 10000000 ? 8
+			: clk_tck > 1000000 ? 7
+			: clk_tck > 100000 ? 6
+			: clk_tck > 10000 ? 5
+			: clk_tck > 1000 ? 4
+			: clk_tck > 100 ? 3
+			: clk_tck > 10 ? 2
+			: clk_tck > 1 ? 1 : 0;
+
+	if (!XLAT_RAW && clk_tck > 0) {
+		printf("times({tms_utime=%llu /* %.*f s */"
+		       ", tms_stime=%llu /* %.*f s */"
+		       ", tms_cutime=%llu /* %.*f s */"
+		       ", tms_cstime=%llu /* %.*f s */}) = %llu\n",
+		       (unsigned long long) tbuf.tms_utime,
+		       precision, (double) tbuf.tms_utime / clk_tck,
+		       (unsigned long long) tbuf.tms_stime,
+		       precision, (double) tbuf.tms_stime / clk_tck,
+		       (unsigned long long) tbuf.tms_cutime,
+		       precision, (double) tbuf.tms_cutime / clk_tck,
+		       (unsigned long long) tbuf.tms_cstime,
+		       precision, (double) tbuf.tms_cstime / clk_tck,
+		       llres);
+	} else {
+		printf("times({tms_utime=%llu, tms_stime=%llu"
+		       ", tms_cutime=%llu, tms_cstime=%llu}) = %llu\n",
+		       (unsigned long long) tbuf.tms_utime,
+		       (unsigned long long) tbuf.tms_stime,
+		       (unsigned long long) tbuf.tms_cutime,
+		       (unsigned long long) tbuf.tms_cstime,
+		       llres);
+	}
+
 	puts("+++ exited with 0 +++");
 
 	return 0;

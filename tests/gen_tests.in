@@ -34,7 +34,7 @@ chmod--secontext_full	-a28 --secontext=full -e trace=chmod
 chown	-a28
 chown32	-a31
 chroot	-a13
-clock	test_trace_expr 'times|fcntl.*' -e/clock
+clock	test_trace_expr 'times|times-.*|fcntl.*' -e/clock
 clock_adjtime	-a37
 clock_adjtime64	-a39
 clock_nanosleep	-e trace=clock_nanosleep,clock_gettime
@@ -741,7 +741,7 @@ s390_pci_mmio_read_write	-e trace=s390_pci_mmio_read,s390_pci_mmio_write -a30
 s390_runtime_instr	-a44
 s390_sthyi	-a47
 s390_sthyi-v	-e trace=s390_sthyi -a47 -v
-sched	test_trace_expr times -e/sched
+sched	test_trace_expr 'times|times-.*' -e/sched
 sched_get_priority_mxx	-a33 -e trace=sched_get_priority_min,sched_get_priority_max
 sched_rr_get_interval	-a31
 sched_xetaffinity	-a28 -e trace=sched_getaffinity,sched_setaffinity
@@ -898,19 +898,22 @@ timer_create
 timer_xettime	-e trace=timer_create,timer_settime,timer_gettime
 timerfd_xettime	-e trace=timerfd_create,timerfd_settime,timerfd_gettime
 times	-esignal=none
+times-Xabbrev	-esignal=none -e trace=times -Xabbrev
+times-Xraw	-esignal=none -e trace=times -Xraw
+times-Xverbose	-esignal=none -e trace=times -Xverbose
 times-fail	-a12 -e trace=times
 tkill	-a12 --signal='!cont'
 tkill--pidns-translation       test_pidns --signal='!cont' -a12 -e trace=tkill
-trace_clock	test_trace_expr 'clock_nanosleep|times' -e%clock
+trace_clock	test_trace_expr 'clock_nanosleep|times|times-.*' -e%clock
 trace_creds	test_trace_expr '([gs]et[^p]*([gu]id|groups)|caps|prctl|[fl]?chown|print(path-umovestr|strn-umoven)-undumpable|ptrace|quotactl|rt_sigtimedwait|rt_(tg)?sigqueueinfo).*' -e%creds
 trace_fstat	test_trace_expr '' -e%fstat -v -P stat.sample -P /dev/full
 trace_fstatfs	test_trace_expr '' -e%fstatfs
 trace_lstat	test_trace_expr '' -e%lstat -v -P stat.sample -P /dev/full
 trace_personality_32	+qualify_personality.sh 32 'getcwd' 'fsync-y|poke'
 trace_personality_64	+qualify_personality.sh 64 'getcwd' 'fsync-y|poke'
-trace_personality_regex_32	+qualify_personality.sh 32 '/clock.*' 'times|fcntl.*'
-trace_personality_regex_64	+qualify_personality.sh 64 '/clock.*' 'times|fcntl.*'
-trace_personality_regex_x32	+qualify_personality.sh x32 '/clock.*' 'times|fcntl.*'
+trace_personality_regex_32	+qualify_personality.sh 32 '/clock.*' 'times|times-.*|fcntl.*'
+trace_personality_regex_64	+qualify_personality.sh 64 '/clock.*' 'times|times-.*|fcntl.*'
+trace_personality_regex_x32	+qualify_personality.sh x32 '/clock.*' 'times|times-.*|fcntl.*'
 trace_personality_x32	+qualify_personality.sh x32 'getcwd' 'fsync-y|poke'
 trace_question	test_trace_expr '' -e?osf_utimes,?/^pkey_.*
 trace_stat	test_trace_expr '' -e%stat -v -P stat.sample -P /dev/full

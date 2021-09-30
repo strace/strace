@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of SECCOMP_GET_NOTIF_SIZES operation of seccomp
     syscall.
   * Implemented decoding of SECCOMP_* ioctl commands.
+  * Enhanced decoding of times syscall.
 
 * Bug fixes
 

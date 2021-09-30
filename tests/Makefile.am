@@ -392,6 +392,9 @@ threads_execve_q_LDADD = -lpthread $(clock_LIBS) $(LDADD)
 threads_execve_qq_LDADD = -lpthread $(clock_LIBS) $(LDADD)
 threads_execve_qqq_LDADD = -lpthread $(clock_LIBS) $(LDADD)
 times_LDADD = $(clock_LIBS) $(LDADD)
+times_Xabbrev_LDADD = $(clock_LIBS) $(LDADD)
+times_Xraw_LDADD = $(clock_LIBS) $(LDADD)
+times_Xverbose_LDADD = $(clock_LIBS) $(LDADD)
 truncate64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 
