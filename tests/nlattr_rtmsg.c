@@ -27,6 +27,20 @@ mempcpy(void *dest, const void *src, size_t n)
 }
 #endif
 
+static void
+print_quoted_hex_ellipsis(const void *const instr, const size_t len)
+{
+	const unsigned char *str = instr;
+	size_t i;
+
+	printf("\"");
+	for (i = 0; i < MIN(len, DEFAULT_STRLEN); i++)
+		printf("\\x%02x", str[i]);
+	printf("\"");
+	if (len > DEFAULT_STRLEN)
+		printf("...");
+}
+
 #define LWTUNNEL_ENCAP_NONE 0
 
 #define DEF_NLATTR_RTMSG_FUNCS(sfx_, af_)				\
@@ -70,6 +84,7 @@ mempcpy(void *dest, const void *src, size_t n)
 
 DEF_NLATTR_RTMSG_FUNCS(rtmsg, AF_UNIX)
 DEF_NLATTR_RTMSG_FUNCS(rtmsg_inet, AF_INET)
+DEF_NLATTR_RTMSG_FUNCS(rtmsg_inet6, AF_INET6)
 
 int
 main(void)
@@ -97,6 +112,62 @@ main(void)
 		    init_rtmsg, print_rtmsg,
 		    RTA_DST, 4, pattern, 4,
 		    print_quoted_hex(pattern, 4));
+
+#define MAX_ADDR_SZ 35
+	static const struct {
+		uint8_t af;
+		uint8_t addr[MAX_ADDR_SZ];
+		const char *str;
+		void (* init_fn)(struct nlmsghdr *, unsigned int);
+		void (* print_fn)(unsigned int);
+		uint32_t len;
+	} addrs[] = {
+		{ AF_UNIX,  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+		  "\"\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\x08\\x09\"",
+		  init_rtmsg,       print_rtmsg,       10 },
+		{ AF_UNIX,
+		  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, [MAX_ADDR_SZ - 1] = 0xea },
+		  "\"\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\x08\\x09"
+		    "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
+		    "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
+		    "\\x00\\x00"
+#if DEFAULT_STRLEN == 32
+		    "\"...",
+#else
+		    "\\x00\\x00\\xea\"",
+#endif
+		  init_rtmsg,       print_rtmsg,       MAX_ADDR_SZ },
+		{ AF_INET,  { 0xde, 0xca, 0xff, 0xed },
+		  "inet_addr(\"222.202.255.237\")",
+		  init_rtmsg_inet,  print_rtmsg_inet,  4 },
+		{ AF_INET6, { 0xfa, 0xce, 0xbe, 0xef, [15] = 0xda },
+		  "inet_pton(AF_INET6, \"face:beef::da\")",
+		  init_rtmsg_inet6, print_rtmsg_inet6, 16 },
+	};
+	static const struct strval32 addr_attrs[] = {
+		{ ARG_STR(RTA_DST) },
+		{ ARG_STR(RTA_SRC) },
+		{ ARG_STR(RTA_GATEWAY) },
+		{ ARG_STR(RTA_PREFSRC) },
+		{ ARG_STR(RTA_NEWDST) },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(addrs); i++) {
+		for (size_t j = 0; j < ARRAY_SIZE(addr_attrs); j++) {
+			TEST_NLATTR_(fd, nlh0, hdrlen,
+				     addrs[i].init_fn, addrs[i].print_fn,
+				     addr_attrs[j].val, addr_attrs[j].str,
+				     addrs[i].len - 1, addrs[i].addr,
+				     addrs[i].len - 1,
+				     print_quoted_hex_ellipsis(addrs[i].addr,
+							       addrs[i].len - 1)
+				     );
+			TEST_NLATTR_(fd, nlh0, hdrlen,
+				     addrs[i].init_fn, addrs[i].print_fn,
+				     addr_attrs[j].val, addr_attrs[j].str,
+				     addrs[i].len, addrs[i].addr, addrs[i].len,
+				     printf("%s", addrs[i].str));
+		}
+	}
 
 	const uint32_t ifindex = ifindex_lo();
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
