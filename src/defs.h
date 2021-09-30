@@ -422,6 +422,8 @@ extern const struct xlat open_mode_flags[];
 extern const struct xlat pollflags[];
 extern const struct xlat ptrace_cmds[];
 extern const struct xlat resource_flags[];
+extern const struct xlat route_nexthop_flags[];
+extern const struct xlat routing_protocols[];
 extern const struct xlat routing_scopes[];
 extern const struct xlat routing_table_ids[];
 extern const struct xlat routing_types[];

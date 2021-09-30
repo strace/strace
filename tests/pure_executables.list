@@ -400,6 +400,10 @@ nlattr_ndmsg
 nlattr_ndtmsg
 nlattr_netconfmsg
 nlattr_netlink_diag_msg
+nlattr_nhmsg
+nlattr_nhmsg-Xabbrev
+nlattr_nhmsg-Xraw
+nlattr_nhmsg-Xverbose
 nlattr_nlmsgerr
 nlattr_packet_diag_msg
 nlattr_rtgenmsg

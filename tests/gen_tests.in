@@ -528,6 +528,10 @@ nlattr_ndmsg			+netlink_sock_diag.test
 nlattr_ndtmsg			+netlink_sock_diag.test
 nlattr_netconfmsg		+netlink_sock_diag.test
 nlattr_netlink_diag_msg		+netlink_sock_diag.test
+nlattr_nhmsg			+netlink_sock_diag.test
+nlattr_nhmsg-Xabbrev		+netlink_sock_diag.test -Xabbrev
+nlattr_nhmsg-Xraw		+netlink_sock_diag.test -Xraw
+nlattr_nhmsg-Xverbose		+netlink_sock_diag.test -Xverbose
 nlattr_nlmsgerr			+netlink_sock_diag.test
 nlattr_packet_diag_msg		+netlink_sock_diag.test -v
 nlattr_rtgenmsg			+netlink_sock_diag.test
