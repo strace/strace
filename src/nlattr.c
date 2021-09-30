@@ -270,10 +270,7 @@ decode_nla_xval(struct tcb *const tcp,
 		const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts * const opts = opaque_data;
-	union {
-		uint64_t val;
-		uint8_t  bytes[sizeof(uint64_t)];
-	} data = { .val = 0 };
+	uint64_t data;
 
 	if (len > sizeof(data) || len < opts->size)
 		return false;
@@ -281,14 +278,12 @@ decode_nla_xval(struct tcb *const tcp,
 	if (opts->size)
 		len = MIN(len, opts->size);
 
-	const size_t bytes_offs = is_bigendian ? sizeof(data) - len : 0;
-
-	if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs)) {
+	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &data)) {
 		if (opts->process_fn)
-			data.val = opts->process_fn(data.val);
+			data = opts->process_fn(data);
 		if (opts->prefix)
 			tprints(opts->prefix);
-		printxval_ex(opts->xlat, data.val, opts->dflt, opts->style);
+		printxval_ex(opts->xlat, data, opts->dflt, opts->style);
 		if (opts->suffix)
 			tprints(opts->suffix);
 	}
@@ -394,10 +389,7 @@ decode_nla_flags(struct tcb *const tcp,
 		 const void *const opaque_data)
 {
 	const struct decode_nla_xlat_opts * const opts = opaque_data;
-	union {
-		uint64_t flags;
-		uint8_t  bytes[sizeof(uint64_t)];
-	} data = { .flags = 0 };
+	uint64_t data;
 
 	if (len > sizeof(data) || len < opts->size)
 		return false;
@@ -405,15 +397,12 @@ decode_nla_flags(struct tcb *const tcp,
 	if (opts->size)
 		len = MIN(len, opts->size);
 
-	const size_t bytes_offs = is_bigendian ? sizeof(data) - len : 0;
-
-	if (!umoven_or_printaddr(tcp, addr, len, data.bytes + bytes_offs)) {
+	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &data)) {
 		if (opts->process_fn)
-			data.flags = opts->process_fn(data.flags);
+			data = opts->process_fn(data);
 		if (opts->prefix)
 			tprints(opts->prefix);
-		printflags_ex(data.flags, opts->dflt, opts->style, opts->xlat,
-			      NULL);
+		printflags_ex(data, opts->dflt, opts->style, opts->xlat, NULL);
 		if (opts->suffix)
 			tprints(opts->suffix);
 	}

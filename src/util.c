@@ -1400,6 +1400,25 @@ umoven_or_printaddr64_ignore_syserror(struct tcb *const tcp,
 	return -1;
 }
 
+int
+umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
+				unsigned int len, uint64_t *const our_addr)
+{
+	union {
+		uint64_t val;
+		uint8_t  bytes[sizeof(uint64_t)];
+	} data = { .val = 0 };
+	const size_t offs = is_bigendian ? sizeof(data) - len : 0;
+
+	if (len <= sizeof(data) &&
+	    tfetch_mem64_ignore_syserror(tcp, addr, len, data.bytes + offs)) {
+		*our_addr = data.val;
+		return 0;
+	}
+	printaddr64(addr);
+	return -1;
+}
+
 bool
 print_int8_array_member(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			void *data)

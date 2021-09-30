@@ -710,6 +710,24 @@ umoven_or_printaddr(struct tcb *tcp, const kernel_ulong_t addr,
 	umoven_or_printaddr((pid), (addr), sizeof(*(objp)), (void *) (objp))
 
 /**
+ * Retrieves up to 8 bytes (that are treated as a single unsigned integer value)
+ * and puts it into variable pointed by laddr;
+ *
+ * @return 0 on success, -1 (and print addr) on error or if len is more
+ *         than size of uint64_t.
+ */
+extern int
+umoven_to_uint64_or_printaddr64(struct tcb *, uint64_t addr,
+				unsigned int len, uint64_t *laddr);
+
+static inline int
+umoven_to_uint64_or_printaddr(struct tcb *tcp, const kernel_ulong_t addr,
+			      unsigned int len, uint64_t *laddr)
+{
+	return umoven_to_uint64_or_printaddr64(tcp, addr, len, laddr);
+}
+
+/**
  * @return 0 on success, -1 on error (and print addr).
  */
 extern int
