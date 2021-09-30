@@ -78,6 +78,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/netfilter/nfnetlink_queue.h \
 	linux/include/uapi/linux/netlink.h \
 	linux/include/uapi/linux/netlink_diag.h \
+	linux/include/uapi/linux/nexthop.h \
 	linux/include/uapi/linux/nsfs.h \
 	linux/include/uapi/linux/openat2.h \
 	linux/include/uapi/linux/packet_diag.h \

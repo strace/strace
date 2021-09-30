@@ -24,6 +24,19 @@
 #include <linux/netconf.h>
 #include <linux/rtnetlink.h>
 
+#ifdef HAVE_LINUX_NEXTHOP_H
+# include <linux/nexthop.h>
+# define struct_nhmsg struct nhmsg
+#else
+typedef struct {
+	uint8_t  nh_family;
+	uint8_t  nh_scope;
+	uint8_t  nh_protocol;
+	uint8_t  resvd;
+	uint32_t nh_flags;
+} struct_nhmsg;
+#endif
+
 #define TEST_NL_ROUTE(fd_, nlh0_, type_, obj_, print_family_, ...)	\
 	do {								\
 		/* family and string */					\
@@ -420,6 +433,45 @@ test_rtnl_nsid(const int fd)
 		     printf("{rtgen_family=AF_UNIX}"));
 }
 
+static void
+test_rtnl_nexthop(const int fd)
+{
+	static const struct {
+		struct_nhmsg msg;
+		const char *af_str;
+		const char *rest_str;
+	} msgs[] = {
+		{ { .nh_family = AF_UNIX, .nh_scope = RT_SCOPE_UNIVERSE,
+		    .nh_protocol = RTPROT_KERNEL, .nh_flags = RTNH_F_DEAD, },
+		  "{nh_family=AF_UNIX", ", nh_scope=RT_SCOPE_UNIVERSE"
+		  ", nh_protocol=RTPROT_KERNEL, nh_flags=RTNH_F_DEAD}" },
+		{ { .nh_family = 44, .nh_scope = 200,
+		    .nh_protocol = 5, .resvd=1, .nh_flags = 0x80, },
+		  "{nh_family=AF_XDP", ", nh_scope=RT_SCOPE_SITE"
+		  ", nh_protocol=0x5 /* RTPROT_??? */, resvd=0x1"
+		  ", nh_flags=0x80 /* RTNH_F_??? */}" },
+		{ { .nh_family = 45, .nh_scope = 201,
+		    .nh_protocol = 99, .resvd=0xff, .nh_flags = 0xdeadbeef, },
+		  "{nh_family=0x2d /* AF_??? */", ", nh_scope=0xc9"
+		  ", nh_protocol=RTPROT_OPENR, resvd=0xff, nh_flags=RTNH_F_DEAD"
+		  "|RTNH_F_PERVASIVE|RTNH_F_ONLINK|RTNH_F_OFFLOAD"
+		  "|RTNH_F_UNRESOLVED|RTNH_F_TRAP|0xdeadbe80}" },
+	};
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msgs[0].msg));
+
+	for (size_t i = 0; i < ARRAY_SIZE(msgs); i++) {
+		TEST_NL_ROUTE(fd, nlh0, RTM_NEWNEXTHOP, msgs[i].msg,
+			      printf("%s", msgs[i].af_str),
+			      printf("%s", msgs[i].rest_str));
+		TEST_NL_ROUTE(fd, nlh0, RTM_DELNEXTHOP, msgs[i].msg,
+			      printf("%s", msgs[i].af_str),
+			      printf("%s", msgs[i].rest_str));
+		TEST_NL_ROUTE(fd, nlh0, RTM_GETNEXTHOP, msgs[i].msg,
+			      printf("%s", msgs[i].af_str),
+			      printf("%s", msgs[i].rest_str));
+	}
+}
+
 int main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
@@ -443,6 +495,7 @@ int main(void)
 	test_rtnl_netconf(fd);
 	test_rtnl_mdb(fd);
 	test_rtnl_nsid(fd);
+	test_rtnl_nexthop(fd);
 
 	printf("+++ exited with 0 +++\n");
 

@@ -304,6 +304,7 @@ libstrace_a_SOURCES =	\
 	rtnl_neigh.c	\
 	rtnl_neightbl.c	\
 	rtnl_netconf.c	\
+	rtnl_nh.c	\
 	rtnl_nsid.c	\
 	rtnl_route.c	\
 	rtnl_rule.c	\

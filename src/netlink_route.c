@@ -97,6 +97,10 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_NEWCHAIN - RTM_BASE] = decode_tcmsg,
 	[RTM_DELCHAIN - RTM_BASE] = decode_tcmsg,
 	[RTM_GETCHAIN - RTM_BASE] = decode_tcmsg,
+
+	[RTM_NEWNEXTHOP - RTM_BASE] = decode_nhmsg,
+	[RTM_DELNEXTHOP - RTM_BASE] = decode_nhmsg,
+	[RTM_GETNEXTHOP - RTM_BASE] = decode_nhmsg,
 };
 
 bool
