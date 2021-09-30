@@ -248,6 +248,23 @@ decode_nla_gid(struct tcb *const tcp,
 }
 
 bool
+decode_nla_clock_t(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	uint64_t val;
+
+	if (len > sizeof(val))
+		return false;
+
+	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &val))
+		print_clock_t(val);
+
+	return true;
+}
+
+bool
 decode_nla_ifindex(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
 	       const unsigned int len,

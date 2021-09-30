@@ -1471,6 +1471,9 @@ extern const struct timespec *ts_min(const struct timespec *, const struct times
 extern const struct timespec *ts_max(const struct timespec *, const struct timespec *);
 extern int parse_ts(const char *s, struct timespec *t);
 
+/** Print a clock_t value, as used by times(2) (and not clock(3)). */
+extern void print_clock_t(uint64_t val);
+
 # ifdef ENABLE_STACKTRACE
 extern void unwind_init(void);
 extern void unwind_tcb_init(struct tcb *);

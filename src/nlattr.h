@@ -77,6 +77,7 @@ DECL_NLA(strn);
 DECL_NLA(fd);
 DECL_NLA(uid);
 DECL_NLA(gid);
+DECL_NLA(clock_t);
 DECL_NLA(ifindex);
 DECL_NLA(ether_proto);
 DECL_NLA(ip_proto);

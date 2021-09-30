@@ -488,6 +488,12 @@ tprints_arg_begin(const char *name)
 			PRINT_VAL_U((where_).field_);				\
 	} while (0)
 
+# define PRINT_FIELD_CLOCK_T(where_, field_)				\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_clock_t((where_).field_);				\
+	} while (0)
+
 # define PRINT_FIELD_STRING(where_, field_, len_, style_)		\
 	do {								\
 		tprints_field_name(#field_);				\
