@@ -188,11 +188,11 @@ decode_rtvia(struct tcb *const tcp,
 	return true;
 }
 
-static bool
-decode_rta_encap_type(struct tcb *const tcp,
-		      const kernel_ulong_t addr,
-		      const unsigned int len,
-		      const void *const opaque_data)
+bool
+decode_nla_lwt_encap_type(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
 {
 	uint16_t type;
 
@@ -225,7 +225,7 @@ static const nla_decoder_t rtmsg_nla_decoders[] = {
 	[RTA_VIA]		= decode_rtvia,
 	[RTA_NEWDST]		= decode_route_addr,
 	[RTA_PREF]		= decode_nla_u8,
-	[RTA_ENCAP_TYPE]	= decode_rta_encap_type,
+	[RTA_ENCAP_TYPE]	= decode_nla_lwt_encap_type,
 	[RTA_ENCAP]		= NULL, /* unimplemented */
 	[RTA_EXPIRES]		= decode_nla_u64,
 	[RTA_PAD]		= NULL,
