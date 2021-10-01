@@ -34,65 +34,78 @@ decode_family(struct tcb *const tcp, const uint8_t family,
 typedef DECL_NETLINK_ROUTE_DECODER((*netlink_route_decoder_t));
 
 static const netlink_route_decoder_t route_decoders[] = {
+	[RTM_NEWLINK - RTM_BASE] = decode_ifinfomsg,
 	[RTM_DELLINK - RTM_BASE] = decode_ifinfomsg,
 	[RTM_GETLINK - RTM_BASE] = decode_ifinfomsg,
-	[RTM_NEWLINK - RTM_BASE] = decode_ifinfomsg,
 	[RTM_SETLINK - RTM_BASE] = decode_ifinfomsg,
 
+	[RTM_NEWADDR - RTM_BASE] = decode_ifaddrmsg,
 	[RTM_DELADDR - RTM_BASE] = decode_ifaddrmsg,
 	[RTM_GETADDR - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_GETANYCAST - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_GETMULTICAST - RTM_BASE] = decode_ifaddrmsg,
-	[RTM_NEWADDR - RTM_BASE] = decode_ifaddrmsg,
 
+	[RTM_NEWROUTE - RTM_BASE] = decode_rtmsg,
 	[RTM_DELROUTE - RTM_BASE] = decode_rtmsg,
 	[RTM_GETROUTE - RTM_BASE] = decode_rtmsg,
-	[RTM_NEWROUTE - RTM_BASE] = decode_rtmsg,
 
-	[RTM_DELRULE - RTM_BASE] = decode_fib_rule_hdr,
-	[RTM_GETRULE - RTM_BASE] = decode_fib_rule_hdr,
-	[RTM_NEWRULE - RTM_BASE] = decode_fib_rule_hdr,
-
+	[RTM_NEWNEIGH - RTM_BASE] = decode_ndmsg,
 	[RTM_DELNEIGH - RTM_BASE] = decode_ndmsg,
 	[RTM_GETNEIGH - RTM_BASE] = decode_rtm_getneigh,
-	[RTM_NEWNEIGH - RTM_BASE] = decode_ndmsg,
 
-	[RTM_GETNEIGHTBL - RTM_BASE] = decode_ndtmsg,
-	[RTM_NEWNEIGHTBL - RTM_BASE] = decode_ndtmsg,
-	[RTM_SETNEIGHTBL - RTM_BASE] = decode_ndtmsg,
+	[RTM_NEWRULE - RTM_BASE] = decode_fib_rule_hdr,
+	[RTM_DELRULE - RTM_BASE] = decode_fib_rule_hdr,
+	[RTM_GETRULE - RTM_BASE] = decode_fib_rule_hdr,
 
+	[RTM_NEWQDISC - RTM_BASE] = decode_tcmsg,
 	[RTM_DELQDISC - RTM_BASE] = decode_tcmsg,
 	[RTM_GETQDISC - RTM_BASE] = decode_tcmsg,
-	[RTM_NEWQDISC - RTM_BASE] = decode_tcmsg,
+
+	[RTM_NEWTCLASS - RTM_BASE] = decode_tcmsg,
 	[RTM_DELTCLASS - RTM_BASE] = decode_tcmsg,
 	[RTM_GETTCLASS - RTM_BASE] = decode_tcmsg,
-	[RTM_NEWTCLASS - RTM_BASE] = decode_tcmsg,
+
+	[RTM_NEWTFILTER - RTM_BASE] = decode_tcmsg,
 	[RTM_DELTFILTER - RTM_BASE] = decode_tcmsg,
 	[RTM_GETTFILTER - RTM_BASE] = decode_tcmsg,
-	[RTM_NEWTFILTER - RTM_BASE] = decode_tcmsg,
 
+	[RTM_NEWACTION - RTM_BASE] = decode_tcamsg,
 	[RTM_DELACTION - RTM_BASE] = decode_tcamsg,
 	[RTM_GETACTION - RTM_BASE] = decode_tcamsg,
-	[RTM_NEWACTION - RTM_BASE] = decode_tcamsg,
 
+	/* RTM_NEWPREFIX */
+
+	[RTM_GETMULTICAST - RTM_BASE] = decode_ifaddrmsg,
+
+	[RTM_GETANYCAST - RTM_BASE] = decode_ifaddrmsg,
+
+	[RTM_NEWNEIGHTBL - RTM_BASE] = decode_ndtmsg,
+	[RTM_GETNEIGHTBL - RTM_BASE] = decode_ndtmsg,
+	[RTM_SETNEIGHTBL - RTM_BASE] = decode_ndtmsg,
+
+	/* RTM_NEWNDUSEROPT */
+
+	[RTM_NEWADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
 	[RTM_DELADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
 	[RTM_GETADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
-	[RTM_NEWADDRLABEL - RTM_BASE] = decode_ifaddrlblmsg,
 
 	[RTM_GETDCB - RTM_BASE] = decode_dcbmsg,
 	[RTM_SETDCB - RTM_BASE] = decode_dcbmsg,
 
+	[RTM_NEWNETCONF - RTM_BASE] = decode_netconfmsg,
 	[RTM_DELNETCONF - RTM_BASE] = decode_netconfmsg,
 	[RTM_GETNETCONF - RTM_BASE] = decode_netconfmsg,
-	[RTM_NEWNETCONF - RTM_BASE] = decode_netconfmsg,
 
+	[RTM_NEWMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_DELMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_GETMDB - RTM_BASE] = decode_br_port_msg,
-	[RTM_NEWMDB - RTM_BASE] = decode_br_port_msg,
 
+	[RTM_NEWNSID - RTM_BASE] = decode_rtgenmsg,
 	[RTM_DELNSID - RTM_BASE] = decode_rtgenmsg,
 	[RTM_GETNSID - RTM_BASE] = decode_rtgenmsg,
-	[RTM_NEWNSID - RTM_BASE] = decode_rtgenmsg,
+
+	/* RTM_NEWSTATS */
+	/* RTM_GETSTATS */
+
+	/* RTM_NEWCACHEREPORT */
 
 	[RTM_NEWCHAIN - RTM_BASE] = decode_tcmsg,
 	[RTM_DELCHAIN - RTM_BASE] = decode_tcmsg,
