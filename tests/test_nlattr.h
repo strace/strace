@@ -393,3 +393,52 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 				    (init_msg_), (print_msg_),		\
 				    nla_type_, (pattern_), (obj_), 1,	\
 				    (print_elem_))
+
+
+/* Checks for specific typical decoders */
+#define DEF_NLATTR_INTEGER_CHECK_(nla_data_name_, nla_data_type_, fmt_)	\
+	static inline void						\
+	check_##nla_data_name_##_nlattr(int fd, void *nlh0, size_t hdrlen, \
+					void (*init_msg)(struct nlmsghdr *, \
+							 unsigned int),	\
+					void (*print_msg)(unsigned int), \
+					unsigned int nla_type,		\
+					const char *nla_type_str,	\
+					void *pattern, size_t depth)	\
+	{								\
+		static const nla_data_type_ vecs[] = {			\
+			(nla_data_type_) 0,				\
+			(nla_data_type_) 1,				\
+			(nla_data_type_) 0xdeadfacebeeffeedULL,		\
+		};							\
+		static char buf[sizeof(nla_data_type_) + 8];		\
+		for (size_t i = 0; i < ARRAY_SIZE(vecs); i++) {		\
+			TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,	\
+						      init_msg, print_msg, \
+						      nla_type, nla_type_str, \
+						      pattern, vecs[i],	\
+						      print_quoted_hex,	depth, \
+						      printf(fmt_, vecs[i])); \
+			fill_memory(buf, sizeof(buf));			\
+			memcpy(buf, vecs + i, sizeof(vecs[i]));		\
+			TEST_NLATTR_(fd, nlh0 - NLA_HDRLEN * depth,	\
+				    hdrlen + NLA_HDRLEN * depth,	\
+				    init_msg, print_msg,		\
+				    nla_type, nla_type_str,		\
+				    sizeof(vecs[i]) + 8,		\
+				    buf, sizeof(vecs[i]) + 8,		\
+				    printf(fmt_, vecs[i]);		\
+				    for (size_t i = 0; i < depth; i++)	\
+					    printf("]"));		\
+		}							\
+	}
+
+DEF_NLATTR_INTEGER_CHECK_(u16, uint16_t, "%hu")
+DEF_NLATTR_INTEGER_CHECK_(u32, uint32_t, "%u")
+
+#define TEST_NLATTR_VAL(type_, fd_, nlh0_, hdrlen_,			\
+			init_msg_, print_msg_,				\
+			nla_type_, pattern_, depth_)			\
+	check_##type_##_nlattr((fd_), (nlh0_), (hdrlen_),		\
+			       (init_msg_), (print_msg_),		\
+			       (nla_type_), #nla_type_, (pattern_), (depth_))
