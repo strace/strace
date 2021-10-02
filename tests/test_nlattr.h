@@ -97,8 +97,8 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		if ((nla_total_len_) > (nla_data_len_))			\
 			printf("]");					\
 									\
-		printf("]], %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
-		       msg_len, errstr);				\
+		printf("]], %u, " XLAT_FMT ", NULL, 0) = %s\n",		\
+		       msg_len, XLAT_ARGS(MSG_DONTWAIT), errstr);	\
 	} while (0)
 
 #define TEST_NLATTR_(fd_, nlh0_, hdrlen_,				\
