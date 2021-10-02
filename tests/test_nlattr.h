@@ -169,6 +169,15 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			       (pattern_), (obj_), sizeof(obj_),	\
 			       print_quoted_hex, __VA_ARGS__)
 
+#define TEST_NLATTR_OBJECT_(fd_, nlh0_, hdrlen_,			\
+			    init_msg_, print_msg_,			\
+			    nla_type_, nla_type_str_, pattern_, obj_, ...) \
+	TEST_NLATTR_OBJECT_EX_((fd_), (nlh0_), (hdrlen_),		\
+			       (init_msg_), (print_msg_),		\
+			       (nla_type_), (nla_type_str_),		\
+			       (pattern_), (obj_), sizeof(obj_),	\
+			       print_quoted_hex, __VA_ARGS__)
+
 #define TEST_NLATTR_OBJECT_MINSZ(fd_, nlh0_, hdrlen_,			\
 			   init_msg_, print_msg_,			\
 			   nla_type_, pattern_, obj_, minsz_, ...)	\
@@ -178,9 +187,10 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			       (pattern_), (obj_), (minsz_),		\
 			       print_quoted_hex, __VA_ARGS__)
 
-#define TEST_NLATTR_ARRAY(fd_, nlh0_, hdrlen_,				\
-			  init_msg_, print_msg_,			\
-			  nla_type_, pattern_, obj_, print_elem_)	\
+#define TEST_NLATTR_ARRAY_(fd_, nlh0_, hdrlen_,				\
+			   init_msg_, print_msg_,			\
+			   nla_type_, nla_type_str_,			\
+			   pattern_, obj_, print_elem_)			\
 	do {								\
 		const unsigned int plen =				\
 			sizeof((obj_)[0]) - 1 > DEFAULT_STRLEN		\
@@ -188,13 +198,13 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		/* len < sizeof((obj_)[0]) */				\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
-			(nla_type_), #nla_type_,			\
+			(nla_type_), (nla_type_str_),			\
 			plen, (pattern_), plen,				\
 			print_quoted_hex((pattern_), plen));		\
 		/* sizeof((obj_)[0]) < len < sizeof(obj_) */		\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
-			(nla_type_), #nla_type_,			\
+			(nla_type_), (nla_type_str_),			\
 			sizeof(obj_) - 1,				\
 			&(obj_), sizeof(obj_) - 1,			\
 			printf("[");					\
@@ -207,7 +217,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
-			(nla_type_), #nla_type_,			\
+			(nla_type_), (nla_type_str_),			\
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_) - 1,			\
 			printf("[");					\
@@ -222,7 +232,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_), (hdrlen_),			\
 			(init_msg_), (print_msg_),			\
-			(nla_type_), #nla_type_,			\
+			(nla_type_), (nla_type_str_),			\
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_),				\
 			printf("[");					\
@@ -233,6 +243,14 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			}						\
 			printf("]"));					\
 	} while (0)
+
+#define TEST_NLATTR_ARRAY(fd_, nlh0_, hdrlen_,				\
+			  init_msg_, print_msg_,			\
+			  nla_type_, pattern_, obj_, print_elem_)	\
+	TEST_NLATTR_ARRAY_((fd_), (nlh0_), (hdrlen_),			\
+			   (init_msg_), (print_msg_),			\
+			   (nla_type_), #nla_type_,			\
+			   (pattern_), (obj_), (print_elem_))
 
 #define TEST_NESTED_NLATTR_OBJECT_EX_(fd_, nlh0_, hdrlen_,		\
 				      init_msg_, print_msg_,		\
