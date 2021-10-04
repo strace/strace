@@ -600,7 +600,7 @@ test_rtnl_mdb(const int fd)
 }
 
 static void
-test_rtnl_nsid(const int fd)
+test_rtnl_rtgen(const int fd)
 {
 	static const struct strval32 types[] = {
 		{ ARG_STR(RTM_NEWNSID) },
@@ -751,7 +751,7 @@ int main(void)
 	test_rtnl_dcb(fd);		/* 76 */
 	test_rtnl_netconf(fd);		/* 80 */
 	test_rtnl_mdb(fd);		/* 84 */
-	test_rtnl_nsid(fd);		/* 88 */
+	test_rtnl_rtgen(fd);		/* 88, 96 */
 	test_rtnl_ifstats(fd);		/* 92 */
 
 	/* cachereport */		/* 96 */
