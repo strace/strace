@@ -37,31 +37,39 @@ typedef struct {
 } struct_nhmsg;
 #endif
 
-#define TEST_NL_ROUTE(fd_, nlh0_, type_, obj_, print_family_, ...)	\
+#define TEST_NL_ROUTE_(fd_, nlh0_, type_, type_str_, obj_, print_family_, ...) \
 	do {								\
 		/* family and string */					\
-		TEST_NETLINK((fd_), (nlh0_),				\
-			     type_, NLM_F_REQUEST,			\
-			     sizeof(obj_) - 1,				\
-			     &(obj_), sizeof(obj_) - 1,			\
-			     (print_family_);				\
-			     printf(", ...}"));				\
+		TEST_NETLINK_((fd_), (nlh0_),				\
+			      (type_), (type_str_),			\
+			      NLM_F_REQUEST, "NLM_F_REQUEST",		\
+			      sizeof(obj_) - 1,				\
+			      &(obj_), sizeof(obj_) - 1,		\
+			      (print_family_);				\
+			      printf(", ...}"));			\
 									\
 		/* sizeof(obj_) */					\
-		TEST_NETLINK((fd_), (nlh0_),				\
-			     type_, NLM_F_REQUEST,			\
-			     sizeof(obj_), &(obj_), sizeof(obj_),	\
-			     (print_family_);				\
-			      __VA_ARGS__);				\
+		TEST_NETLINK_((fd_), (nlh0_),				\
+			      (type_), (type_str_),			\
+			      NLM_F_REQUEST, "NLM_F_REQUEST",		\
+			      sizeof(obj_), &(obj_), sizeof(obj_),	\
+			      (print_family_);				\
+			       __VA_ARGS__);				\
 									\
 		/* short read of sizeof(obj_) */			\
-		TEST_NETLINK((fd_), (nlh0_),				\
-			     type_, NLM_F_REQUEST,			\
-			     sizeof(obj_), &(obj_), sizeof(obj_) - 1,	\
-			     (print_family_);				\
-			     printf(", %p}",				\
-				    NLMSG_DATA(TEST_NETLINK_nlh) + 1));	\
+		TEST_NETLINK_((fd_), (nlh0_),				\
+			      (type_), (type_str_),			\
+			      NLM_F_REQUEST, "NLM_F_REQUEST",		\
+			      sizeof(obj_), &(obj_), sizeof(obj_) - 1,	\
+			      (print_family_);				\
+			      printf(", %p}",				\
+				     NLMSG_DATA(TEST_NETLINK_nlh) + 1)); \
 	} while (0)
+
+#define TEST_NL_ROUTE(fd_, nlh0_, type_, obj_, print_family_, ...)	\
+	TEST_NL_ROUTE_((fd_), (nlh0_), (type_), #type_, (obj_),		\
+		       (print_family_), __VA_ARGS__)			\
+	/* End of TEST_NL_ROUTE definition */
 
 static void
 test_nlmsg_type(const int fd)
@@ -217,6 +225,12 @@ test_rtnl_unknown_msg(const int fd, uint16_t msg)
 static void
 test_rtnl_link(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWLINK) },
+		{ ARG_STR(RTM_DELLINK) },
+		{ ARG_STR(RTM_GETLINK) },
+		{ ARG_STR(RTM_SETLINK) },
+	};
 	const struct ifinfomsg ifinfo = {
 		.ifi_family = AF_UNIX,
 		.ifi_type = ARPHRD_LOOPBACK,
@@ -226,19 +240,28 @@ test_rtnl_link(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(ifinfo));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETLINK, ifinfo,
-		      printf("{ifi_family=AF_UNIX"),
-		      printf(", ifi_type=ARPHRD_LOOPBACK"
-			     ", ifi_index=" IFINDEX_LO_STR
-			     ", ifi_flags=IFF_UP");
-		      printf(", ");
-		      PRINT_FIELD_X(ifinfo, ifi_change);
-		      printf("}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, ifinfo,
+			       printf("{ifi_family=AF_UNIX"),
+			       printf(", ifi_type=ARPHRD_LOOPBACK"
+				      ", ifi_index=" IFINDEX_LO_STR
+				      ", ifi_flags=IFF_UP");
+			       printf(", ");
+			       PRINT_FIELD_X(ifinfo, ifi_change);
+			       printf("}"));
+	}
 }
 
 static void
 test_rtnl_addr(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWADDR) },
+		{ ARG_STR(RTM_DELADDR) },
+		{ ARG_STR(RTM_GETADDR) },
+		{ ARG_STR(RTM_GETMULTICAST) },
+		{ ARG_STR(RTM_GETANYCAST) },
+	};
 	const struct ifaddrmsg msg = {
 		.ifa_family = AF_UNIX,
 		.ifa_prefixlen = 0xde,
@@ -248,14 +271,16 @@ test_rtnl_addr(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDR, msg,
-		      printf("{ifa_family=AF_UNIX"),
-		      printf(", ");
-		      PRINT_FIELD_U(msg, ifa_prefixlen);
-		      printf(", ifa_flags=IFA_F_SECONDARY"
-			     ", ifa_scope=RT_SCOPE_UNIVERSE"
-			     ", ifa_index=" IFINDEX_LO_STR);
-		      printf("}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{ifa_family=AF_UNIX"),
+			       printf(", ");
+			       PRINT_FIELD_U(msg, ifa_prefixlen);
+			       printf(", ifa_flags=IFA_F_SECONDARY"
+				      ", ifa_scope=RT_SCOPE_UNIVERSE"
+				      ", ifa_index=" IFINDEX_LO_STR);
+			       printf("}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWADDR + 3);
 	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST - 2);
@@ -269,6 +294,11 @@ test_rtnl_addr(const int fd)
 static void
 test_rtnl_route(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWROUTE) },
+		{ ARG_STR(RTM_DELROUTE) },
+		{ ARG_STR(RTM_GETROUTE) },
+	};
 	static const struct rtmsg msg = {
 		.rtm_family = AF_UNIX,
 		.rtm_dst_len = 0xaf,
@@ -282,18 +312,20 @@ test_rtnl_route(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETROUTE, msg,
-		      printf("{rtm_family=AF_UNIX"),
-		      printf(", ");
-		      PRINT_FIELD_U(msg, rtm_dst_len);
-		      printf(", ");
-		      PRINT_FIELD_U(msg, rtm_src_len);
-		      printf(", rtm_tos=IPTOS_LOWDELAY"
-			     ", rtm_table=RT_TABLE_DEFAULT"
-			     ", rtm_protocol=RTPROT_KERNEL"
-			     ", rtm_scope=RT_SCOPE_UNIVERSE"
-			     ", rtm_type=RTN_LOCAL"
-			     ", rtm_flags=RTM_F_NOTIFY}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{rtm_family=AF_UNIX"),
+			       printf(", ");
+			       PRINT_FIELD_U(msg, rtm_dst_len);
+			       printf(", ");
+			       PRINT_FIELD_U(msg, rtm_src_len);
+			       printf(", rtm_tos=IPTOS_LOWDELAY"
+				      ", rtm_table=RT_TABLE_DEFAULT"
+				      ", rtm_protocol=RTPROT_KERNEL"
+				      ", rtm_scope=RT_SCOPE_UNIVERSE"
+				      ", rtm_type=RTN_LOCAL"
+				      ", rtm_flags=RTM_F_NOTIFY}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWROUTE + 3);
 }
@@ -301,6 +333,11 @@ test_rtnl_route(const int fd)
 static void
 test_rtnl_rule(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWRULE) },
+		{ ARG_STR(RTM_DELRULE) },
+		{ ARG_STR(RTM_GETRULE) },
+	};
 	struct rtmsg msg = {
 		.rtm_family = AF_UNIX,
 		.rtm_dst_len = 0xaf,
@@ -312,15 +349,17 @@ test_rtnl_rule(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETRULE, msg,
-		      printf("{family=AF_UNIX"),
-		      printf(", dst_len=%u, src_len=%u"
-			     ", tos=IPTOS_LOWDELAY"
-			     ", table=RT_TABLE_UNSPEC"
-			     ", action=FR_ACT_TO_TBL"
-			     ", flags=FIB_RULE_INVERT}",
-			     msg.rtm_dst_len,
-			     msg.rtm_src_len));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{family=AF_UNIX"),
+			       printf(", dst_len=%u, src_len=%u"
+				      ", tos=IPTOS_LOWDELAY"
+				      ", table=RT_TABLE_UNSPEC"
+				      ", action=FR_ACT_TO_TBL"
+				      ", flags=FIB_RULE_INVERT}",
+				      msg.rtm_dst_len,
+				      msg.rtm_src_len));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWRULE + 3);
 }
@@ -328,6 +367,11 @@ test_rtnl_rule(const int fd)
 static void
 test_rtnl_neigh(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWNEIGH) },
+		{ ARG_STR(RTM_DELNEIGH) },
+		{ ARG_STR(RTM_GETNEIGH) },
+	};
 	const struct ndmsg msg = {
 		.ndm_family = AF_UNIX,
 		.ndm_ifindex = ifindex_lo(),
@@ -337,12 +381,14 @@ test_rtnl_neigh(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETNEIGH, msg,
-		      printf("{ndm_family=AF_UNIX"),
-		      printf(", ndm_ifindex=" IFINDEX_LO_STR
-			     ", ndm_state=NUD_PERMANENT"
-			     ", ndm_flags=NTF_PROXY"
-			     ", ndm_type=RTN_UNSPEC}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{ndm_family=AF_UNIX"),
+			       printf(", ndm_ifindex=" IFINDEX_LO_STR
+				      ", ndm_state=NUD_PERMANENT"
+				      ", ndm_flags=NTF_PROXY"
+				      ", ndm_type=RTN_UNSPEC}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWNEIGH + 3);
 }
@@ -350,15 +396,22 @@ test_rtnl_neigh(const int fd)
 static void
 test_rtnl_neightbl(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWNEIGHTBL) },
+		{ ARG_STR(RTM_GETNEIGHTBL) },
+		{ ARG_STR(RTM_SETNEIGHTBL) },
+	};
 	static const struct ndtmsg msg = {
 		.ndtm_family = AF_NETLINK
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NETLINK(fd, nlh0,
-		     RTM_GETNEIGHTBL, NLM_F_REQUEST,
-		     sizeof(msg), &msg, sizeof(msg),
-		     printf("{ndtm_family=AF_NETLINK}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NETLINK_(fd, nlh0, types[i].val, types[i].str,
+			      NLM_F_REQUEST, "NLM_F_REQUEST",
+			      sizeof(msg), &msg, sizeof(msg),
+			      printf("{ndtm_family=AF_NETLINK}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWNEIGHTBL + 1);
 }
@@ -366,6 +419,20 @@ test_rtnl_neightbl(const int fd)
 static void
 test_rtnl_tc(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWQDISC) },
+		{ ARG_STR(RTM_DELQDISC) },
+		{ ARG_STR(RTM_GETQDISC) },
+		{ ARG_STR(RTM_NEWTCLASS) },
+		{ ARG_STR(RTM_DELTCLASS) },
+		{ ARG_STR(RTM_GETTCLASS) },
+		{ ARG_STR(RTM_NEWTFILTER) },
+		{ ARG_STR(RTM_DELTFILTER) },
+		{ ARG_STR(RTM_GETTFILTER) },
+		{ ARG_STR(RTM_NEWCHAIN) },
+		{ ARG_STR(RTM_DELCHAIN) },
+		{ ARG_STR(RTM_GETCHAIN) },
+	};
 	const struct tcmsg msg = {
 		.tcm_family = AF_UNIX,
 		.tcm_ifindex = ifindex_lo(),
@@ -375,16 +442,18 @@ test_rtnl_tc(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETQDISC, msg,
-		      printf("{tcm_family=AF_UNIX"),
-		      printf(", tcm_ifindex=" IFINDEX_LO_STR);
-		      printf(", ");
-		      PRINT_FIELD_U(msg, tcm_handle);
-		      printf(", ");
-		      PRINT_FIELD_U(msg, tcm_parent);
-		      printf(", ");
-		      PRINT_FIELD_U(msg, tcm_info);
-		      printf("}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{tcm_family=AF_UNIX"),
+			       printf(", tcm_ifindex=" IFINDEX_LO_STR);
+			       printf(", ");
+			       PRINT_FIELD_U(msg, tcm_handle);
+			       printf(", ");
+			       PRINT_FIELD_U(msg, tcm_parent);
+			       printf(", ");
+			       PRINT_FIELD_U(msg, tcm_info);
+			       printf("}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWQDISC + 3);
 	test_rtnl_unknown_msg(fd, RTM_NEWTCLASS + 3);
@@ -395,15 +464,22 @@ test_rtnl_tc(const int fd)
 static void
 test_rtnl_tca(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWACTION) },
+		{ ARG_STR(RTM_DELACTION) },
+		{ ARG_STR(RTM_GETACTION) },
+	};
 	struct tcamsg msg = {
 		.tca_family = AF_INET
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NETLINK(fd, nlh0,
-		     RTM_GETACTION, NLM_F_REQUEST,
-		     sizeof(msg), &msg, sizeof(msg),
-		     printf("{tca_family=AF_INET}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NETLINK_(fd, nlh0, types[i].val, types[i].str,
+			      NLM_F_REQUEST, "NLM_F_REQUEST",
+			      sizeof(msg), &msg, sizeof(msg),
+			      printf("{tca_family=AF_INET}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWACTION + 3);
 }
@@ -411,6 +487,11 @@ test_rtnl_tca(const int fd)
 static void
 test_rtnl_addrlabel(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWADDRLABEL) },
+		{ ARG_STR(RTM_DELADDRLABEL) },
+		{ ARG_STR(RTM_GETADDRLABEL) },
+	};
 	const struct ifaddrlblmsg msg = {
 		.ifal_family = AF_UNIX,
 		.ifal_prefixlen = 0xaf,
@@ -420,16 +501,18 @@ test_rtnl_addrlabel(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETADDRLABEL, msg,
-		      printf("{ifal_family=AF_UNIX"),
-		      printf(", ");
-		      PRINT_FIELD_U(msg, ifal_prefixlen);
-		      printf(", ");
-		      PRINT_FIELD_U(msg, ifal_flags);
-		      printf(", ifal_index=" IFINDEX_LO_STR);
-		      printf(", ");
-		      PRINT_FIELD_U(msg, ifal_seq);
-		      printf("}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{ifal_family=AF_UNIX"),
+			       printf(", ");
+			       PRINT_FIELD_U(msg, ifal_prefixlen);
+			       printf(", ");
+			       PRINT_FIELD_U(msg, ifal_flags);
+			       printf(", ifal_index=" IFINDEX_LO_STR);
+			       printf(", ");
+			       PRINT_FIELD_U(msg, ifal_seq);
+			       printf("}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWADDRLABEL + 3);
 }
@@ -437,15 +520,21 @@ test_rtnl_addrlabel(const int fd)
 static void
 test_rtnl_dcb(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_GETDCB) },
+		{ ARG_STR(RTM_SETDCB) },
+	};
 	static const struct dcbmsg msg = {
 		.dcb_family = AF_UNIX,
 		.cmd = DCB_CMD_UNDEFINED
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETDCB, msg,
-		      printf("{dcb_family=AF_UNIX"),
-		      printf(", cmd=DCB_CMD_UNDEFINED}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			       printf("{dcb_family=AF_UNIX"),
+			       printf(", cmd=DCB_CMD_UNDEFINED}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_GETDCB - 2);
 	test_rtnl_unknown_msg(fd, RTM_GETDCB - 1);
@@ -454,15 +543,22 @@ test_rtnl_dcb(const int fd)
 static void
 test_rtnl_netconf(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWNETCONF) },
+		{ ARG_STR(RTM_DELNETCONF) },
+		{ ARG_STR(RTM_GETNETCONF) },
+	};
 	static const struct netconfmsg msg = {
 		.ncm_family = AF_INET
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NETLINK(fd, nlh0,
-		     RTM_GETNETCONF, NLM_F_REQUEST,
-		     sizeof(msg), &msg, sizeof(msg),
-		     printf("{ncm_family=AF_INET}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NETLINK_(fd, nlh0, types[i].val, types[i].str,
+			      NLM_F_REQUEST, "NLM_F_REQUEST",
+			      sizeof(msg), &msg, sizeof(msg),
+			      printf("{ncm_family=AF_INET}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWNETCONF + 3);
 }
@@ -470,15 +566,22 @@ test_rtnl_netconf(const int fd)
 static void
 test_rtnl_mdb(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWMDB) },
+		{ ARG_STR(RTM_DELMDB) },
+		{ ARG_STR(RTM_GETMDB) },
+	};
 	const struct br_port_msg msg = {
 		.family = AF_UNIX,
 		.ifindex = ifindex_lo()
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NL_ROUTE(fd, nlh0, RTM_GETMDB, msg,
-		      printf("{family=AF_UNIX"),
-		      printf(", ifindex=" IFINDEX_LO_STR "}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str, msg,
+			      printf("{family=AF_UNIX"),
+			      printf(", ifindex=" IFINDEX_LO_STR "}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWMDB + 3);
 }
@@ -486,15 +589,22 @@ test_rtnl_mdb(const int fd)
 static void
 test_rtnl_nsid(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWNSID) },
+		{ ARG_STR(RTM_DELNSID) },
+		{ ARG_STR(RTM_GETNSID) },
+	};
 	static const struct rtgenmsg msg = {
 		.rtgen_family = AF_UNIX
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msg));
 
-	TEST_NETLINK(fd, nlh0,
-		     RTM_GETNSID, NLM_F_REQUEST,
-		     sizeof(msg), &msg, sizeof(msg),
-		     printf("{rtgen_family=AF_UNIX}"));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		TEST_NETLINK_(fd, nlh0, types[i].val, types[i].str,
+			      NLM_F_REQUEST, "NLM_F_REQUEST",
+			      sizeof(msg), &msg, sizeof(msg),
+			      printf("{rtgen_family=AF_UNIX}"));
+	}
 
 	test_rtnl_unknown_msg(fd, RTM_NEWNSID + 3);
 }
@@ -502,6 +612,11 @@ test_rtnl_nsid(const int fd)
 static void
 test_rtnl_nexthop(const int fd)
 {
+	static const struct strval32 types[] = {
+		{ ARG_STR(RTM_NEWNEXTHOP) },
+		{ ARG_STR(RTM_DELNEXTHOP) },
+		{ ARG_STR(RTM_GETNEXTHOP) },
+	};
 	static const struct {
 		struct_nhmsg msg;
 		const char *af_str;
@@ -525,17 +640,16 @@ test_rtnl_nexthop(const int fd)
 	};
 	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(msgs[0].msg));
 
-	for (size_t i = 0; i < ARRAY_SIZE(msgs); i++) {
-		TEST_NL_ROUTE(fd, nlh0, RTM_NEWNEXTHOP, msgs[i].msg,
-			      printf("%s", msgs[i].af_str),
-			      printf("%s", msgs[i].rest_str));
-		TEST_NL_ROUTE(fd, nlh0, RTM_DELNEXTHOP, msgs[i].msg,
-			      printf("%s", msgs[i].af_str),
-			      printf("%s", msgs[i].rest_str));
-		TEST_NL_ROUTE(fd, nlh0, RTM_GETNEXTHOP, msgs[i].msg,
-			      printf("%s", msgs[i].af_str),
-			      printf("%s", msgs[i].rest_str));
+	for (size_t i = 0; i < ARRAY_SIZE(types); i++) {
+		for (size_t j = 0; j < ARRAY_SIZE(msgs); j++) {
+			TEST_NL_ROUTE_(fd, nlh0, types[i].val, types[i].str,
+				       msgs[j].msg,
+				       printf("%s", msgs[j].af_str),
+				       printf("%s", msgs[j].rest_str));
+		}
 	}
+
+	test_rtnl_unknown_msg(fd, RTM_NEWNEXTHOP + 3);
 }
 
 int main(void)
