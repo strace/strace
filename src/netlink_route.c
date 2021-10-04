@@ -98,9 +98,9 @@ static const netlink_route_decoder_t route_decoders[] = {
 	[RTM_DELMDB - RTM_BASE] = decode_br_port_msg,
 	[RTM_GETMDB - RTM_BASE] = decode_br_port_msg,
 
-	[RTM_NEWNSID - RTM_BASE] = decode_rtgenmsg,
-	[RTM_DELNSID - RTM_BASE] = decode_rtgenmsg,
-	[RTM_GETNSID - RTM_BASE] = decode_rtgenmsg,
+	[RTM_NEWNSID - RTM_BASE] = decode_nsid,
+	[RTM_DELNSID - RTM_BASE] = decode_nsid,
+	[RTM_GETNSID - RTM_BASE] = decode_nsid,
 
 	[RTM_NEWSTATS - RTM_BASE] = decode_ifstatsmsg,
 	[RTM_GETSTATS - RTM_BASE] = decode_ifstatsmsg,

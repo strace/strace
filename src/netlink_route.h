@@ -30,7 +30,7 @@ extern DECL_NETLINK_ROUTE_DECODER(decode_ndmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_ndtmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_netconfmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_nhmsg);
-extern DECL_NETLINK_ROUTE_DECODER(decode_rtgenmsg);
+extern DECL_NETLINK_ROUTE_DECODER(decode_nsid);
 extern DECL_NETLINK_ROUTE_DECODER(decode_rtm_getneigh);
 extern DECL_NETLINK_ROUTE_DECODER(decode_rtmsg);
 extern DECL_NETLINK_ROUTE_DECODER(decode_tcamsg);
