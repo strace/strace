@@ -183,6 +183,38 @@ test_rtnl_unspec(const int fd)
 }
 
 static void
+test_rtnl_unsupported_msg(const int fd, uint16_t msg, const char *str)
+{
+	char buf[64];
+	char name[sizeof("0xffff /* RTM_??? */")];
+	void *const nlh0 = midtail_alloc(NLMSG_HDRLEN, sizeof(buf));
+
+	fill_memory(buf, sizeof(buf));
+	buf[0] = AF_INET;
+
+	if (!str)
+		snprintf(name, sizeof(name), "%#hx /* RTM_??? */", msg);
+
+	TEST_NETLINK_(fd, nlh0, msg, str ?: name,
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      1, buf, 1,
+		      printf("{family=AF_INET}"));
+
+	TEST_NETLINK_(fd, nlh0, msg, str ?: name,
+		      NLM_F_REQUEST, "NLM_F_REQUEST",
+		      sizeof(buf), buf, sizeof(buf),
+		      printf("{family=AF_INET, data=");
+		      print_quoted_hex(buf + 1, DEFAULT_STRLEN);
+		      printf("...}"));
+}
+
+static void
+test_rtnl_unknown_msg(const int fd, uint16_t msg)
+{
+	test_rtnl_unsupported_msg(fd, msg, NULL);
+}
+
+static void
 test_rtnl_link(const int fd)
 {
 	const struct ifinfomsg ifinfo = {
@@ -224,6 +256,14 @@ test_rtnl_addr(const int fd)
 			     ", ifa_scope=RT_SCOPE_UNIVERSE"
 			     ", ifa_index=" IFINDEX_LO_STR);
 		      printf("}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWADDR + 3);
+	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST - 2);
+	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST - 1);
+	test_rtnl_unknown_msg(fd, RTM_GETMULTICAST + 1);
+	test_rtnl_unknown_msg(fd, RTM_GETANYCAST - 2);
+	test_rtnl_unknown_msg(fd, RTM_GETANYCAST - 1);
+	test_rtnl_unknown_msg(fd, RTM_GETANYCAST + 1);
 }
 
 static void
@@ -254,6 +294,8 @@ test_rtnl_route(const int fd)
 			     ", rtm_scope=RT_SCOPE_UNIVERSE"
 			     ", rtm_type=RTN_LOCAL"
 			     ", rtm_flags=RTM_F_NOTIFY}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWROUTE + 3);
 }
 
 static void
@@ -279,6 +321,8 @@ test_rtnl_rule(const int fd)
 			     ", flags=FIB_RULE_INVERT}",
 			     msg.rtm_dst_len,
 			     msg.rtm_src_len));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWRULE + 3);
 }
 
 static void
@@ -299,6 +343,8 @@ test_rtnl_neigh(const int fd)
 			     ", ndm_state=NUD_PERMANENT"
 			     ", ndm_flags=NTF_PROXY"
 			     ", ndm_type=RTN_UNSPEC}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWNEIGH + 3);
 }
 
 static void
@@ -313,6 +359,8 @@ test_rtnl_neightbl(const int fd)
 		     RTM_GETNEIGHTBL, NLM_F_REQUEST,
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{ndtm_family=AF_NETLINK}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWNEIGHTBL + 1);
 }
 
 static void
@@ -337,6 +385,11 @@ test_rtnl_tc(const int fd)
 		      printf(", ");
 		      PRINT_FIELD_U(msg, tcm_info);
 		      printf("}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWQDISC + 3);
+	test_rtnl_unknown_msg(fd, RTM_NEWTCLASS + 3);
+	test_rtnl_unknown_msg(fd, RTM_NEWTFILTER + 3);
+	test_rtnl_unknown_msg(fd, RTM_NEWCHAIN + 3);
 }
 
 static void
@@ -351,6 +404,8 @@ test_rtnl_tca(const int fd)
 		     RTM_GETACTION, NLM_F_REQUEST,
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{tca_family=AF_INET}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWACTION + 3);
 }
 
 static void
@@ -375,6 +430,8 @@ test_rtnl_addrlabel(const int fd)
 		      printf(", ");
 		      PRINT_FIELD_U(msg, ifal_seq);
 		      printf("}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWADDRLABEL + 3);
 }
 
 static void
@@ -389,6 +446,9 @@ test_rtnl_dcb(const int fd)
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETDCB, msg,
 		      printf("{dcb_family=AF_UNIX"),
 		      printf(", cmd=DCB_CMD_UNDEFINED}"));
+
+	test_rtnl_unknown_msg(fd, RTM_GETDCB - 2);
+	test_rtnl_unknown_msg(fd, RTM_GETDCB - 1);
 }
 
 static void
@@ -403,6 +463,8 @@ test_rtnl_netconf(const int fd)
 		     RTM_GETNETCONF, NLM_F_REQUEST,
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{ncm_family=AF_INET}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWNETCONF + 3);
 }
 
 static void
@@ -417,6 +479,8 @@ test_rtnl_mdb(const int fd)
 	TEST_NL_ROUTE(fd, nlh0, RTM_GETMDB, msg,
 		      printf("{family=AF_UNIX"),
 		      printf(", ifindex=" IFINDEX_LO_STR "}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWMDB + 3);
 }
 
 static void
@@ -431,6 +495,8 @@ test_rtnl_nsid(const int fd)
 		     RTM_GETNSID, NLM_F_REQUEST,
 		     sizeof(msg), &msg, sizeof(msg),
 		     printf("{rtgen_family=AF_UNIX}"));
+
+	test_rtnl_unknown_msg(fd, RTM_NEWNSID + 3);
 }
 
 static void
@@ -482,20 +548,69 @@ int main(void)
 	test_nlmsg_flags(fd);
 	test_nlmsg_done(fd);
 	test_rtnl_unspec(fd);
-	test_rtnl_link(fd);
-	test_rtnl_addr(fd);
-	test_rtnl_route(fd);
-	test_rtnl_rule(fd);
-	test_rtnl_neigh(fd);
-	test_rtnl_neightbl(fd);
-	test_rtnl_tc(fd);
-	test_rtnl_tca(fd);
-	test_rtnl_addrlabel(fd);
-	test_rtnl_dcb(fd);
-	test_rtnl_netconf(fd);
-	test_rtnl_mdb(fd);
-	test_rtnl_nsid(fd);
-	test_rtnl_nexthop(fd);
+
+	test_rtnl_link(fd);		/* 16 */
+	test_rtnl_addr(fd);		/* 20, 56, 60 */
+	test_rtnl_route(fd);		/* 24 */
+	test_rtnl_neigh(fd);		/* 28 */
+	test_rtnl_rule(fd);		/* 32 */
+	test_rtnl_tc(fd);		/* 36, 40, 44, 100 */
+	test_rtnl_tca(fd);		/* 48 */
+
+	/* prefix */			/* 52 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWPREFIX));
+	test_rtnl_unknown_msg(fd, RTM_NEWPREFIX + 1);
+	test_rtnl_unknown_msg(fd, RTM_NEWPREFIX + 2);
+	test_rtnl_unknown_msg(fd, RTM_NEWPREFIX + 3);
+
+	test_rtnl_neightbl(fd);		/* 64 */
+
+	/* nduserport */		/* 68 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWNDUSEROPT));
+	test_rtnl_unknown_msg(fd, RTM_NEWNDUSEROPT + 1);
+	test_rtnl_unknown_msg(fd, RTM_NEWNDUSEROPT + 2);
+	test_rtnl_unknown_msg(fd, RTM_NEWNDUSEROPT + 3);
+
+	test_rtnl_addrlabel(fd);	/* 72 */
+	test_rtnl_dcb(fd);		/* 76 */
+	test_rtnl_netconf(fd);		/* 80 */
+	test_rtnl_mdb(fd);		/* 84 */
+	test_rtnl_nsid(fd);		/* 88 */
+
+	/* stats */			/* 92 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWSTATS));
+	test_rtnl_unknown_msg(fd, RTM_NEWSTATS + 1);
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_GETSTATS));
+	test_rtnl_unknown_msg(fd, RTM_NEWSTATS + 3);
+
+	/* cachereport */		/* 96 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWCACHEREPORT));
+	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 1);
+	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 2);
+	test_rtnl_unknown_msg(fd, RTM_NEWCACHEREPORT + 3);
+
+	test_rtnl_nexthop(fd);		/* 104 */
+
+	/* linkprop */			/* 108 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWLINKPROP));
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_DELLINKPROP));
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_GETLINKPROP));
+	test_rtnl_unknown_msg(fd, RTM_NEWLINKPROP + 3);
+
+	/* vlan */			/* 112 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWVLAN));
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_DELVLAN));
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_GETVLAN));
+	test_rtnl_unknown_msg(fd, RTM_NEWVLAN + 3);
+
+	/* nexthopbucket */		/* 116 */
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_NEWNEXTHOPBUCKET));
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_DELNEXTHOPBUCKET));
+	test_rtnl_unsupported_msg(fd, ARG_STR(RTM_GETNEXTHOPBUCKET));
+	test_rtnl_unknown_msg(fd, RTM_NEWNEXTHOPBUCKET + 3);
+
+	for (uint16_t i = 120; i < 124; i++)
+		test_rtnl_unknown_msg(fd, i);
 
 	printf("+++ exited with 0 +++\n");
 
