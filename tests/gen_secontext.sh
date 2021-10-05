@@ -30,12 +30,12 @@ dir="$(dirname "$input")"
 
 secontext_EXECUTABLES = \\
 EOF
-	sed -r -n 's/^([^#[:space:]]+--secontext(_full)?)[[:space:]].*/  \1 \\/p' < "$input"
+	sed -r -n 's/^([^#[:space:]]+--secontext(_full)?(_mismatch)?)[[:space:]].*/  \1 \\/p' < "$input"
 	cat <<EOF
   #
 
 EOF
-	sed -r -n 's/-/_/g; s/^([^#[:space:]]+__secontext(_full)?)[[:space:]].*/\1_LDADD = \$(LDADD) \$(libselinux_LDADD)/p' < "$input"
+	sed -r -n 's/-/_/g; s/^([^#[:space:]]+__secontext(_full)?(_mismatch)?)[[:space:]].*/\1_LDADD = \$(LDADD) \$(libselinux_LDADD)/p' < "$input"
 } > "$dir/secontext.am"
 
 sed -r -n 's/^([^#[:space:]]+--secontext)[[:space:]].*/\1/p' < "$input" |
@@ -68,5 +68,13 @@ while read -r name; do {
 	cat <<-EOF > "$dir/$name.c"
 		#define PRINT_SECONTEXT_FULL
 		#include "${name%_full}.c"
+	EOF
+} < /dev/null; done
+
+sed -r -n 's/^([^#[:space:]]+--secontext(_full)?_mismatch)[[:space:]].*/\1/p' < "$input" |
+while read -r name; do {
+	cat <<-EOF > "$dir/$name.c"
+		#define PRINT_SECONTEXT_MISMATCH
+		#include "${name%_mismatch}.c"
 	EOF
 } < /dev/null; done

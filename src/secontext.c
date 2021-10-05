@@ -10,13 +10,16 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <selinux/selinux.h>
+#include <selinux/label.h>
 
+#include "largefile_wrappers.h"
+#include "number_set.h"
 #include "secontext.h"
+#include "xmalloc.h"
 #include "xstring.h"
-
-bool selinux_context = false;
-bool selinux_context_full = false;
 
 static int
 getcontext(int rc, char **secontext, char **result)
@@ -25,7 +28,7 @@ getcontext(int rc, char **secontext, char **result)
 		return rc;
 
 	*result = NULL;
-	if (!selinux_context_full) {
+	if (!is_number_in_set(SECONTEXT_FULL, secontext_set)) {
 		char *saveptr = NULL;
 		char *secontext_copy = xstrdup(*secontext);
 		const char *token;
@@ -59,6 +62,36 @@ getcontext(int rc, char **secontext, char **result)
 	freecon(*secontext);
 	return 0;
 }
+
+static int
+get_expected_filecontext(const char *path, char **result)
+{
+	static struct selabel_handle *hdl;
+
+	if (!hdl) {
+		static bool disabled;
+		if (disabled)
+			return -1;
+
+		hdl = selabel_open(SELABEL_CTX_FILE, NULL, 0);
+		if (!hdl) {
+			perror_msg("could not open SELinux database, disabling "
+				   "context mismatch checking");
+			disabled = true;
+			return -1;
+		}
+	}
+
+	strace_stat_t stb;
+	if (stat_file(path, &stb) < 0) {
+		return -1;
+	}
+
+	char *secontext;
+	return getcontext(selabel_lookup(hdl, &secontext, path, stb.st_mode),
+			  &secontext, result);
+}
+
 /*
  * Retrieves the SELinux context of the given PID (extracted from the tcb).
  * Memory must be freed.
@@ -67,7 +100,7 @@ getcontext(int rc, char **secontext, char **result)
 int
 selinux_getpidcon(struct tcb *tcp, char **result)
 {
-	if (!selinux_context)
+	if (number_set_array_is_empty(secontext_set, 0))
 		return -1;
 
 	int proc_pid = get_proc_pid(tcp->pid);
@@ -86,7 +119,7 @@ selinux_getpidcon(struct tcb *tcp, char **result)
 int
 selinux_getfdcon(pid_t pid, int fd, char **result)
 {
-	if (!selinux_context || pid <= 0 || fd < 0)
+	if (number_set_array_is_empty(secontext_set, 0) || pid <= 0 || fd < 0)
 		return -1;
 
 	int proc_pid = get_proc_pid(pid);
@@ -97,7 +130,33 @@ selinux_getfdcon(pid_t pid, int fd, char **result)
 	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
 
 	char *secontext;
-	return getcontext(getfilecon(linkpath, &secontext), &secontext, result);
+	int rc = getcontext(getfilecon(linkpath, &secontext), &secontext, result);
+	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
+		return rc;
+
+	/*
+	 * We need to resolve the path, because selabel_lookup() doesn't
+	 * resolve anything.  Using readlink() is sufficient here.
+	 */
+
+	char buf[PATH_MAX];
+	ssize_t n = readlink(linkpath, buf, sizeof(buf));
+	if ((size_t) n >= sizeof(buf))
+		return 0;
+	buf[n] = '\0';
+
+	char *expected;
+	if (get_expected_filecontext(buf, &expected) < 0)
+		return 0;
+	if (strcmp(expected, *result) == 0) {
+		free(expected);
+		return 0;
+	}
+	char *final_result = xasprintf("%s!!%s", *result, expected);
+	free(expected);
+	free(*result);
+	*result = final_result;
+	return 0;
 }
 
 /*
@@ -108,29 +167,56 @@ selinux_getfdcon(pid_t pid, int fd, char **result)
 int
 selinux_getfilecon(struct tcb *tcp, const char *path, char **result)
 {
-	if (!selinux_context)
+	if (number_set_array_is_empty(secontext_set, 0))
 		return -1;
 
 	int proc_pid = get_proc_pid(tcp->pid);
 	if (!proc_pid)
 		return -1;
 
-	int ret = -1;
+	int rc = -1;
 	char fname[PATH_MAX];
 
 	if (path[0] == '/')
-		ret = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
+		rc = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
 			       proc_pid, path);
 	else if (tcp->last_dirfd == AT_FDCWD)
-		ret = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
+		rc = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
 			       proc_pid, path);
 	else if (tcp->last_dirfd >= 0 )
-		ret = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
+		rc = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
 			       proc_pid, tcp->last_dirfd, path);
 
-	if ((unsigned int) ret >= sizeof(fname))
+	if ((unsigned int) rc >= sizeof(fname))
 		return -1;
 
 	char *secontext;
-	return getcontext(getfilecon(fname, &secontext), &secontext, result);
+	rc = getcontext(getfilecon(fname, &secontext), &secontext, result);
+	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
+		return rc;
+
+	/*
+	 * We need to fully resolve the path, because selabel_lookup() doesn't
+	 * resolve anything.  Using realpath() is the only solution here to make
+	 * sure the path is canonicalized.
+	 */
+
+	char *resolved = realpath(fname, NULL);
+	if (!resolved)
+		return 0;
+
+	char *expected;
+	rc = get_expected_filecontext(resolved, &expected);
+	free(resolved);
+	if (rc < 0)
+		return 0;
+	if (strcmp(expected, *result) == 0) {
+		free(expected);
+		return 0;
+	}
+	char *final_result = xasprintf("%s!!%s", *result, expected);
+	free(expected);
+	free(*result);
+	*result = final_result;
+	return 0;
 }

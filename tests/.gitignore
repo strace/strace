@@ -2,6 +2,10 @@
 *--secontext.c
 *--secontext_full
 *--secontext_full.c
+*--secontext_full_mismatch
+*--secontext_full_mismatch.c
+*--secontext_mismatch
+*--secontext_mismatch.c
 *.dir
 *.gen.test
 *.log

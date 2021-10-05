@@ -53,7 +53,7 @@ strace \- trace system calls and signals
 .OM \-P path
 .OM \-p pid
 .OP \-\-seccomp\-bpf
-.if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=full]
+.if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -259,6 +259,7 @@ is one of
 .BR inject ,
 .BR status ,
 .BR quiet " (or " silent " or " silence " or " q ),
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR secontext ,
 .BR decode\-fds " (or " decode\-fd ),
 .BR decode\-pids " (or " decode\-pid ),
 or
@@ -1166,13 +1167,33 @@ strace's namespace, too.
 .BR \-\-decode\-pids = comm
 Print command names for PIDs.
 .if '@ENABLE_SECONTEXT_FALSE@'#' .TP
-.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext [= full ]
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext\fR[=\fIformat\fR]
+.if '@ENABLE_SECONTEXT_FALSE@'#' .TQ
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-e\ secontext\fR=\fIformat\fR
 .if '@ENABLE_SECONTEXT_FALSE@'#' When SELinux is available and is not disabled,
 .if '@ENABLE_SECONTEXT_FALSE@'#' print in square brackets SELinux contexts of
-.if '@ENABLE_SECONTEXT_FALSE@'#' processes, files, and descriptors.  When
-.if '@ENABLE_SECONTEXT_FALSE@'#' .B full
-.if '@ENABLE_SECONTEXT_FALSE@'#' is specified, print the complete context (user,
-.if '@ENABLE_SECONTEXT_FALSE@'#' role, type and category) instead of just the type.
+.if '@ENABLE_SECONTEXT_FALSE@'#' processes, files, and descriptors.  The
+.if '@ENABLE_SECONTEXT_FALSE@'#' .I format
+.if '@ENABLE_SECONTEXT_FALSE@'#' argument is a comma-separated list of items
+.if '@ENABLE_SECONTEXT_FALSE@'#' being one of the following:
+.if '@ENABLE_SECONTEXT_FALSE@'#' .RS
+.if '@ENABLE_SECONTEXT_FALSE@'#' .TP 18
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR full
+.if '@ENABLE_SECONTEXT_FALSE@'#' Print the full context (user, role, type level
+.if '@ENABLE_SECONTEXT_FALSE@'#' and category).
+.if '@ENABLE_SECONTEXT_FALSE@'#' .TQ
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR mismatch
+.if '@ENABLE_SECONTEXT_FALSE@'#' Also print the context recorded by the SELinux
+.if '@ENABLE_SECONTEXT_FALSE@'#' database in case the current context differs.
+.if '@ENABLE_SECONTEXT_FALSE@'#' The latter is printed after two exclamation marks (!!).
+.if '@ENABLE_SECONTEXT_FALSE@'#' .RE
+.if '@ENABLE_SECONTEXT_FALSE@'#' .IP
+.if '@ENABLE_SECONTEXT_FALSE@'#' The default value for
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext
+.if '@ENABLE_SECONTEXT_FALSE@'#' is
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR !full,mismatch
+.if '@ENABLE_SECONTEXT_FALSE@'#' which prints only the type instead of full context
+.if '@ENABLE_SECONTEXT_FALSE@'#' and doesn't check for context mismatches.
 .SS Statistics
 .TP 12
 .B \-c

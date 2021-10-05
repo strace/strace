@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include "secontext.h"
 #include "xmalloc.h"
@@ -88,9 +89,41 @@ main(void)
 		perror_msg_and_fail("close");
 
 	free(sample_1_secontext);
-	update_secontext_type(sample_1, "default_t");
+
+#ifdef PRINT_SECONTEXT_MISMATCH
+	update_secontext_field(sample_1, SECONTEXT_USER, "system_u");
+	sample_1_secontext = SECONTEXT_FILE(sample_1);
+
+# ifdef PRINT_SECONTEXT_FULL
+	/* The mismatch should be detected */
+	if (*sample_1_secontext && strstr(sample_1_secontext, "!!") == NULL)
+		perror_msg_and_fail("Context mismatch not detected: %s",
+				    sample_1_secontext);
+	if (*sample_1_secontext && strstr(sample_1_secontext, "system_u") == NULL)
+		perror_msg_and_fail("Context mismatch not detected: %s",
+				    sample_1_secontext);
+# else
+	/* The mismatch cannot be detected since it's on user part */
+	if (*sample_1_secontext && strstr(sample_1_secontext, "!!") != NULL)
+		perror_msg_and_fail("Context mismatch detected: %s",
+				    sample_1_secontext);
+# endif
+
+	free(sample_1_secontext);
+#endif
+
+	update_secontext_field(sample_1, SECONTEXT_TYPE, "default_t");
 	sample_1_secontext = SECONTEXT_FILE(sample_1);
 	sample_2_secontext = sample_1_secontext;
+
+#ifdef PRINT_SECONTEXT_MISMATCH
+	if (*sample_1_secontext && strstr(sample_1_secontext, "!!") == NULL)
+		perror_msg_and_fail("Context mismatch not detected: %s",
+				    sample_1_secontext);
+	if (*sample_1_secontext && strstr(sample_1_secontext, "default_t") == NULL)
+		perror_msg_and_fail("Context mismatch not detected: %s",
+				    sample_1_secontext);
+#endif
 
 	rc = syscall(__NR_linkat, -100, sample_1, -100, sample_2, 0);
 	printf("%s%s(AT_FDCWD, \"%s\"%s, AT_FDCWD, \"%s\"%s, 0) = %s\n",
@@ -108,7 +141,18 @@ main(void)
 
 	int dfd_old = get_dir_fd(".");
 	char *cwd = get_fd_path(dfd_old);
+
+	update_secontext_field(".", SECONTEXT_TYPE, "default_t");
 	char *dfd_old_secontext = SECONTEXT_FILE(".");
+
+#ifdef PRINT_SECONTEXT_MISMATCH
+	if (*dfd_old_secontext && strstr(dfd_old_secontext, "!!") == NULL)
+		perror_msg_and_fail("Context mismatch not detected: %s",
+				    dfd_old_secontext);
+	if (*dfd_old_secontext && strstr(dfd_old_secontext, "default_t") == NULL)
+		perror_msg_and_fail("Context mismatch not detected: %s",
+				    dfd_old_secontext);
+#endif
 
 	rc = syscall(__NR_linkat, dfd_old, sample_1, -100, sample_2, 0);
 	/* no context printed for sample_2 since file doesn't exist yet */

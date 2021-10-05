@@ -264,9 +264,11 @@ usage(void)
 # define K_OPT ""
 #endif
 #ifdef ENABLE_SECONTEXT
-# define SECONTEXT_OPT "[--secontext[=full]]\n"
+# define SECONTEXT_OPT "              [--secontext[=FORMAT]]\n"
+# define SECONTEXT_E_QUAL ", secontext"
 #else
 # define SECONTEXT_OPT ""
+# define SECONTEXT_E_QUAL ""
 #endif
 
 	printf("\
@@ -282,7 +284,7 @@ Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]..
 General:\n\
   -e EXPR        a qualifying expression: OPTION=[!]all or OPTION=[!]VAL1[,VAL2]...\n\
      options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
-                 inject, status, quiet, kvm, decode-fds\n\
+                 inject, status, quiet, kvm, decode-fds" SECONTEXT_E_QUAL "\n\
 \n\
 Startup:\n\
   -E VAR=VAL, --env=VAR=VAL\n\
@@ -358,6 +360,19 @@ Output format:\n\
                  path (file path),\n\
                  pidfd (associated PID for pidfds),\n\
                  socket (protocol-specific information for socket descriptors)\n\
+"
+#ifdef ENABLE_SECONTEXT
+"\
+  -e secontext=FORMAT, --secontext[=FORMAT]\n\
+                 print SELinux contexts in square brackets\n\
+     formats:    comma-separated list of all, full, mismatch, none\n\
+                 all: equivalent to full,mismatch\n\
+                 full: print the full context instead of the type only\n\
+                 mismatch: print expected context when actual is not matching\n\
+                 none: equivalent to not specifying the option at all\n\
+"
+#endif
+"\
   -i, --instruction-pointer\n\
                  print instruction pointer at time of syscall\n\
 "
@@ -420,14 +435,6 @@ Output format:\n\
                  print PIDs in strace's namespace, too\n\
   -Y, --decode-pids=comm\n\
                  print command names associated with PIDs\n\
-"
-#ifdef ENABLE_SECONTEXT
-"\
-  --secontext[=full]\n\
-                 print SELinux contexts (type only unless 'full' is specified)\n\
-"
-#endif
-"\
 \n\
 Statistics:\n\
   -c, --summary-only\n\
@@ -2066,6 +2073,9 @@ init(int argc, char *argv[])
 	static const char tflag_str[] = "format:time";
 	static const char ttflag_str[] = "precision:us,format:time";
 	static const char tttflag_str[] = "format:unix,precision:us";
+#ifdef ENABLE_SECONTEXT
+	static const char secontext_qual[] = "!full,mismatch";
+#endif
 
 	int c, i;
 	int optF = 0, zflags = 0;
@@ -2129,6 +2139,9 @@ init(int argc, char *argv[])
 	qualify_quiet("none");
 	qualify_decode_fd("none");
 	qualify_signals("all");
+#ifdef ENABLE_SECONTEXT
+	qualify_secontext("none");
+#endif
 
 	static const char optstring[] =
 		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
@@ -2141,9 +2154,6 @@ init(int argc, char *argv[])
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_TS,
 		GETOPT_PIDNS_TRANSLATION,
-#ifdef ENABLE_SECONTEXT
-		GETOPT_SECONTEXT,
-#endif
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -2159,6 +2169,9 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_QUIET,
 		GETOPT_QUAL_DECODE_FD,
 		GETOPT_QUAL_DECODE_PID,
+#ifdef ENABLE_SECONTEXT
+		GETOPT_QUAL_SECONTEXT,
+#endif
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -2201,9 +2214,6 @@ init(int argc, char *argv[])
 		{ "failed-only",	no_argument,	   0, 'Z' },
 		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
-#ifdef ENABLE_SECONTEXT
-		{ "secontext",		optional_argument, 0, GETOPT_SECONTEXT },
-#endif
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2221,6 +2231,9 @@ init(int argc, char *argv[])
 		{ "silence",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "decode-fds",	optional_argument, 0, GETOPT_QUAL_DECODE_FD },
 		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
+#ifdef ENABLE_SECONTEXT
+		{ "secontext",	optional_argument, 0, GETOPT_QUAL_SECONTEXT },
+#endif
 
 		{ 0, 0, 0, 0 }
 	};
@@ -2437,14 +2450,8 @@ init(int argc, char *argv[])
 			seccomp_filtering = true;
 			break;
 #ifdef ENABLE_SECONTEXT
-		case GETOPT_SECONTEXT:
-			selinux_context = true;
-			if (optarg) {
-				if (!strcmp(optarg, "full"))
-					selinux_context_full = true;
-				else
-					error_opt_arg(c, lopt, optarg);
-			}
+		case GETOPT_QUAL_SECONTEXT:
+			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
 #endif
 		case GETOPT_QUAL_TRACE:
@@ -2646,7 +2653,7 @@ init(int argc, char *argv[])
 			error_msg("-y/--decode-fds has no effect "
 				  "with -c/--summary-only");
 #ifdef ENABLE_SECONTEXT
-		if (selinux_context)
+		if (!number_set_array_is_empty(secontext_set, 0))
 			error_msg("--secontext has no effect with "
 				  "-c/--summary-only");
 #endif

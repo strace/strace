@@ -14,6 +14,9 @@
 #include "poke.h"
 #include "retval.h"
 #include "static_assert.h"
+#ifdef ENABLE_SECONTEXT
+# include "secontext.h"
+#endif
 
 struct number_set *read_set;
 struct number_set *write_set;
@@ -620,6 +623,29 @@ qualify_kvm(const char *const str)
 	}
 }
 
+#ifdef ENABLE_SECONTEXT
+struct number_set *secontext_set;
+
+static int
+secontextstr_to_uint(const char *s)
+{
+	static const struct xlat_data secontext_strs[] = {
+		{ SECONTEXT_FULL,	"full" },
+		{ SECONTEXT_MISMATCH,	"mismatch" },
+	};
+
+	return (int) find_arg_val(s, secontext_strs, -1ULL, -1ULL);
+}
+
+void
+qualify_secontext(const char *const str)
+{
+	if (!secontext_set)
+		secontext_set = alloc_number_set_array(1);
+	qualify_tokens(str, secontext_set, secontextstr_to_uint, "secontext");
+}
+#endif
+
 static const struct qual_options {
 	const char *name;
 	void (*qualify)(const char *);
@@ -653,6 +679,9 @@ static const struct qual_options {
 	{ "decode-fds",	qualify_decode_fd },
 	{ "decode-pid",	qualify_decode_pid },
 	{ "decode-pids", qualify_decode_pid },
+#ifdef ENABLE_SECONTEXT
+	{ "secontext",  qualify_secontext },
+#endif
 };
 
 void

@@ -13,8 +13,10 @@
 # include <errno.h>
 # include <stdlib.h>
 # include <string.h>
+# include <sys/stat.h>
 # include <unistd.h>
 # include <selinux/selinux.h>
+# include <selinux/label.h>
 
 # include "xmalloc.h"
 
@@ -55,6 +57,79 @@ strip_trailing_newlines(char *context)
 }
 
 static char *
+get_type_from_context(const char *full_context)
+{
+	int saved_errno = errno;
+
+	if (!full_context)
+		return NULL;
+
+	char *saveptr = NULL;
+	const char *token;
+	unsigned int i;
+
+	char *ctx_copy = xstrdup(full_context);
+	char *context = NULL;
+	for (token = strtok_r(ctx_copy, ":", &saveptr), i = 0;
+	     token; token = strtok_r(NULL, ":", &saveptr), i++) {
+		if (i == 2) {
+			context = xstrdup(token);
+			break;
+		}
+	}
+	if (!context)
+		context = xstrdup(full_context);
+	free(ctx_copy);
+
+	errno = saved_errno;
+	return context;
+}
+
+static char *
+raw_expected_secontext_full_file(const char *filename)
+{
+	int saved_errno = errno;
+	char *secontext;
+
+	static struct selabel_handle *hdl;
+	if (!hdl) {
+		hdl = selabel_open(SELABEL_CTX_FILE, NULL, 0);
+		if (!hdl)
+			perror_msg_and_skip("selabel_open");
+	}
+
+	char *resolved = realpath(filename, NULL);
+	if (!resolved)
+		perror_msg_and_fail("realpath: %s", filename);
+
+	struct stat statbuf;
+	if (stat(resolved, &statbuf) < 0)
+		perror_msg_and_fail("stat: %s", resolved);
+
+	if (selabel_lookup(hdl, &secontext, resolved, statbuf.st_mode) < 0)
+		perror_msg_and_skip("selabel_lookup: %s", resolved);
+	free(resolved);
+
+	char *full_secontext = xstrdup(secontext);
+	freecon(secontext);
+	errno = saved_errno;
+	return full_secontext;
+}
+
+static char *
+raw_expected_secontext_short_file(const char *filename)
+{
+	int saved_errno = errno;
+
+	char *ctx = raw_expected_secontext_full_file(filename);
+	char *type = get_type_from_context(ctx);
+	free(ctx);
+
+	errno = saved_errno;
+	return type;
+}
+
+static char *
 raw_secontext_full_file(const char *filename)
 {
 	int saved_errno = errno;
@@ -75,29 +150,11 @@ raw_secontext_short_file(const char *filename)
 	int saved_errno = errno;
 
 	char *ctx = raw_secontext_full_file(filename);
-	if (ctx == NULL)
-		return ctx;
-
-	char *saveptr = NULL;
-	const char *token;
-	unsigned int i;
-
-	char *ctx_copy = xstrdup(ctx);
-	char *context = NULL;
-	for (token = strtok_r(ctx_copy, ":", &saveptr), i = 0;
-	     token; token = strtok_r(NULL, ":", &saveptr), i++) {
-		if (i == 2) {
-			context = xstrdup(token);
-			break;
-		}
-	}
-	if (context == NULL)
-		context = xstrdup(ctx);
-	free(ctx_copy);
+	char *type = get_type_from_context(ctx);
 	free(ctx);
 
 	errno = saved_errno;
-	return context;
+	return type;
 }
 
 static char *
@@ -121,35 +178,30 @@ raw_secontext_short_pid(pid_t pid)
 	int saved_errno = errno;
 
 	char *ctx = raw_secontext_full_pid(pid);
-	if (ctx == NULL)
-		return ctx;
-
-	char *saveptr = NULL;
-	const char *token;
-	int i;
-
-	char *ctx_copy = xstrdup(ctx);
-	char *context = NULL;
-	for (token = strtok_r(ctx_copy, ":", &saveptr), i = 0;
-	     token; token = strtok_r(NULL, ":", &saveptr), i++) {
-		if (i == 2) {
-			context = xstrdup(token);
-			break;
-		}
-	}
-	if (context == NULL)
-		context = xstrdup(ctx);
-	free(ctx_copy);
+	char *type = get_type_from_context(ctx);
 	free(ctx);
 
 	errno = saved_errno;
-	return context;
+	return type;
 }
 
 char *
-secontext_full_file(const char *filename)
+secontext_full_file(const char *filename, bool mismatch)
 {
-	return FORMAT_SPACE_BEFORE(raw_secontext_full_file(filename));
+	int saved_errno = errno;
+	char *context = raw_secontext_full_file(filename);
+	if (context && mismatch) {
+		char *expected = raw_expected_secontext_full_file(filename);
+		if (expected && strcmp(context, expected)) {
+			char *context_mismatch =
+				xasprintf("%s!!%s", context, expected);
+			free(context);
+			context = context_mismatch;
+		}
+		free(expected);
+	}
+	errno = saved_errno;
+	return FORMAT_SPACE_BEFORE(context);
 }
 
 char *
@@ -159,9 +211,22 @@ secontext_full_pid(pid_t pid)
 }
 
 char *
-secontext_short_file(const char *filename)
+secontext_short_file(const char *filename, bool mismatch)
 {
-	return FORMAT_SPACE_BEFORE(raw_secontext_short_file(filename));
+	int saved_errno = errno;
+	char *context = raw_secontext_short_file(filename);
+	if (context && mismatch) {
+		char *expected = raw_expected_secontext_short_file(filename);
+		if (expected && strcmp(context, expected)) {
+			char *context_mismatch =
+				xasprintf("%s!!%s", context, expected);
+			free(context);
+			context = context_mismatch;
+		}
+		free(expected);
+	}
+	errno = saved_errno;
+	return FORMAT_SPACE_BEFORE(context);
 }
 
 char *
@@ -171,31 +236,38 @@ secontext_short_pid(pid_t pid)
 }
 
 void
-update_secontext_type(const char *file, const char *newtype)
+update_secontext_field(const char *file, enum secontext_field field,
+		       const char *newvalue)
 {
+	int saved_errno = errno;
+	assert(field >= SECONTEXT_USER && field <= SECONTEXT_TYPE);
+
 	char *ctx = raw_secontext_full_file(file);
 	if (ctx == NULL)
 		return;
 
 	char *saveptr = NULL;
 	char *token;
-	int field;
+	int nfields;
 	char *split[4];
 
-	for (token = strtok_r(ctx, ":", &saveptr), field = 0;
-	     token; token = strtok_r(NULL, ":", &saveptr), field++) {
-		assert(field < 4);
-		split[field] = token;
+	for (token = strtok_r(ctx, ":", &saveptr), nfields = 0;
+	     token; token = strtok_r(NULL, ":", &saveptr), nfields++) {
+		assert(nfields < 4);
+		split[nfields] = token;
 	}
-	assert(field == 4);
+	assert(nfields == 4);
+
+	split[field] = (char *)newvalue;
 
 	char *newcontext = xasprintf("%s:%s:%s:%s", split[0], split[1],
-				     newtype, split[3]);
+				     split[2], split[3]);
 
 	(void) setfilecon(file, newcontext);
 
 	free(newcontext);
 	free(ctx);
+	errno = saved_errno;
 }
 
 #endif /* HAVE_SELINUX_RUNTIME */
