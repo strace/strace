@@ -10,8 +10,10 @@
 #include "tests.h"
 
 #include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
 #include <stddef.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 
 #include "test_nlattr.h"
@@ -237,6 +239,30 @@
 				printf("]]"));				\
 	} while (0)
 
+static const char *
+clock_t_str(uint64_t val, char *str, size_t str_size)
+{
+	static long clk_tck;
+	static int precision;
+
+	if (!clk_tck) {
+		clk_tck = sysconf(_SC_CLK_TCK);
+		precision = clk_tck > 1 ? MIN((int) ceil(log10(clk_tck - 1)), 9)
+					: 0;
+	}
+
+	if ((clk_tck > 0) && val) {
+		snprintf(str, str_size, "%" PRIu64 " /* %" PRIu64 ".%0*u s */",
+			 val, val / clk_tck, precision,
+			 (unsigned) round(((double) (val % clk_tck) / clk_tck)
+					  * pow(10, precision)));
+	} else {
+		snprintf(str, str_size, "%" PRIu64, val);
+	}
+
+	return str;
+}
+
 int
 main(void)
 {
@@ -381,7 +407,11 @@ main(void)
 				     { 10, "ab:ac:db:cd:61:62:63:64:65:66" });
 	}
 
-	static const struct val_name u64_br_attrs[] = {
+	static const struct val_name c_t_br_attrs[] = {
+		{  1, "IFLA_BR_FORWARD_DELAY" },
+		{  2, "IFLA_BR_HELLO_TIME" },
+		{  3, "IFLA_BR_MAX_AGE" },
+		{  4, "IFLA_BR_AGEING_TIME" },
 		{ 16, "IFLA_BR_HELLO_TIMER" },
 		{ 17, "IFLA_BR_TCN_TIMER" },
 		{ 18, "IFLA_BR_TOPOLOGY_CHANGE_TIMER" },
@@ -393,24 +423,27 @@ main(void)
 		{ 34, "IFLA_BR_MCAST_QUERY_RESPONSE_INTVL" },
 		{ 35, "IFLA_BR_MCAST_STARTUP_QUERY_INTVL" },
 	};
+	char sz7_str[64];
+	char sz8_str[64];
 
-	for (size_t k = 0; k < ARRAY_SIZE(u64_br_attrs); k++) {
+	clock_t_str(BE_LE(0xdeadc0defacefe, 0xadc0defacefeed),
+		    ARRSZ_PAIR(sz7_str));
+	clock_t_str(0xdeadc0defacefeed, ARRSZ_PAIR(sz8_str));
+
+	for (size_t k = 0; k < ARRAY_SIZE(c_t_br_attrs); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
-				     u64_br_attrs[k].val, u64_br_attrs[k].name,
+				     c_t_br_attrs[k].val, c_t_br_attrs[k].name,
 				     u64_val, pattern,
-				     { 7, "\"" BE_LE(
-					"\\xde\\xad\\xc0\\xde\\xfa\\xce\\xfe",
-					"\\xed\\xfe\\xce\\xfa\\xde\\xc0\\xad")
-					"\"" },
-				     { 8, "16045693111314087661" },
-				     { 9, "16045693111314087661" });
+				     { 7, sz7_str },
+				     { 8, sz8_str },
+				     { 9, "\"" BE_LE("\\xde\\xad\\xc0\\xde"
+						     "\\xfa\\xce\\xfe\\xed",
+						     "\\xed\\xfe\\xce\\xfa"
+						     "\\xde\\xc0\\xad\\xde")
+					  "\\x61\"" });
 	}
 
 	static const struct val_name u32_br_attrs[] = {
-		{  1, "IFLA_BR_FORWARD_DELAY" },
-		{  2, "IFLA_BR_HELLO_TIME" },
-		{  3, "IFLA_BR_MAX_AGE" },
-		{  4, "IFLA_BR_AGEING_TIME" },
 		{  5, "IFLA_BR_STP_STATE" },
 		{ 13, "IFLA_BR_ROOT_PATH_COST" },
 		{ 26, "IFLA_BR_MCAST_HASH_ELASTICITY" },

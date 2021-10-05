@@ -653,6 +653,16 @@ esac
 AC_SUBST(clock_LIBS)
 
 saved_LIBS="$LIBS"
+AC_SEARCH_LIBS([log10], [m])
+LIBS="$saved_LIBS"
+case "$ac_cv_search_log10" in
+	no) AC_MSG_FAILURE([failed to find log10]) ;;
+	-l*) m_LIBS="$ac_cv_search_log10" ;;
+	*) m_LIBS= ;;
+esac
+AC_SUBST(m_LIBS)
+
+saved_LIBS="$LIBS"
 AC_SEARCH_LIBS([mq_open], [rt])
 LIBS="$saved_LIBS"
 case "$ac_cv_search_mq_open" in

@@ -121,19 +121,18 @@ main(void)
 	}
 
 
-	/* u64 attrs */
-	static const struct strval16 u64_attrs[] = {
+	/* clock_t attrs */
+	static const struct strval16 c_t_attrs[] = {
 		{ ENUM_KNOWN(0x15, IFLA_BRPORT_MESSAGE_AGE_TIMER) },
 		{ ENUM_KNOWN(0x16, IFLA_BRPORT_FORWARD_DELAY_TIMER) },
 		{ ENUM_KNOWN(0x17, IFLA_BRPORT_HOLD_TIMER) },
 	};
-	void *nlh_u64 = midtail_alloc(NLMSG_SPACE(hdrlen),
+	void *nlh_c_t = midtail_alloc(NLMSG_SPACE(hdrlen),
 				     NLA_HDRLEN * 2 + sizeof(uint64_t));
-	for (size_t i = 0; i < ARRAY_SIZE(u64_attrs); i++) {
-		check_u64_nlattr(fd, nlh_u64, hdrlen,
-				 init_ifinfomsg, print_ifinfomsg,
-				 u64_attrs[i].val, u64_attrs[i].str,
-				 pattern, 1);
+	for (size_t i = 0; i < ARRAY_SIZE(c_t_attrs); i++) {
+		check_clock_t_nlattr(fd, nlh_c_t, hdrlen,
+				     init_ifinfomsg, print_ifinfomsg,
+				     c_t_attrs[i].val, c_t_attrs[i].str, 1);
 	}
 
 

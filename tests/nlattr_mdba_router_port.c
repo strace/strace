@@ -8,7 +8,9 @@
 
 #include "tests.h"
 
+#include <math.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "test_nlattr.h"
 #include <linux/if_bridge.h>
 #include <linux/rtnetlink.h>
@@ -93,7 +95,16 @@ main(void)
 		{ ARG_STR(MDBA_ROUTER_PATTR_INET_TIMER) },
 		{ ARG_STR(MDBA_ROUTER_PATTR_INET6_TIMER) },
 	};
-	static const uint32_t timer = 0xdabcefcd;
+	uint32_t timer = 0xdead;
+	long clk_tck;
+	int precision = 0;
+
+	clk_tck = sysconf(_SC_CLK_TCK);
+	if (clk_tck > 0) {
+		precision = clk_tck > 1 ? MIN((int) ceil(log10(clk_tck - 1)), 9)
+					: 0;
+		timer *= clk_tck;
+	}
 
 	struct nlattr nla_timer = {
 		.nla_len = NLA_HDRLEN + sizeof(timer),
@@ -114,8 +125,11 @@ main(void)
 			    MDBA_ROUTER_PORT,
 			    sizeof(buf_timer), buf_timer, sizeof(buf_timer),
 			    printf(IFINDEX_LO_STR
-				   ", [{nla_len=%u, nla_type=%s}, 3669815245]]",
-				   nla_timer.nla_len, pattrs[i].str));
+				   ", [{nla_len=%u, nla_type=%s}, %u",
+				   nla_timer.nla_len, pattrs[i].str, timer);
+			    if (clk_tck > 0)
+				    printf(" /* 57005.%0*u s */", precision, 0);
+			    printf("]]"));
 	}
 
 	puts("+++ exited with 0 +++");

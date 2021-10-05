@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include "netlink.h"
 #include <linux/rtnetlink.h>
 
@@ -462,3 +463,71 @@ DEF_NLATTR_INTEGER_CHECK_(u64, uint64_t, "%" PRIu64)
 	check_##type_##_nlattr((fd_), (nlh0_), (hdrlen_),		\
 			       (init_msg_), (print_msg_),		\
 			       (nla_type_), #nla_type_, (pattern_), (depth_))
+
+static inline void
+check_clock_t_nlattr(int fd, void *nlh0, size_t hdrlen,
+		     void (*init_msg)(struct nlmsghdr *, unsigned int),
+		     void (*print_msg)(unsigned int),
+		     unsigned int nla_type, const char *nla_type_str,
+		     size_t depth)
+{
+	static const uint64_t vecs[] = { 0, 1, 9, 10, 99, 100, 249, 250, 999,
+					 1000, 1023, 1024, 0xdefacebeeffedULL };
+	static char buf[sizeof(uint64_t) + 1];
+#if !XLAT_RAW
+	static long clk_tck;
+	static int precision;
+
+	if (!clk_tck) {
+		clk_tck = sysconf(_SC_CLK_TCK);
+		precision = clk_tck > 100000000 ? 9
+				: clk_tck > 10000000 ? 8
+				: clk_tck > 1000000 ? 7
+				: clk_tck > 100000 ? 6
+				: clk_tck > 10000 ? 5
+				: clk_tck > 1000 ? 4
+				: clk_tck > 100 ? 3
+				: clk_tck > 10 ? 2
+				: clk_tck > 1 ? 1 : 0;
+	}
+#endif
+
+	fill_memory(buf, sizeof(buf));
+	TEST_NLATTR_(fd, nlh0 - NLA_HDRLEN * depth, hdrlen + NLA_HDRLEN * depth,
+		     init_msg, print_msg, nla_type, nla_type_str,
+		     sizeof(vecs[0]) + 1, buf, sizeof(vecs[0]) + 1,
+		     print_quoted_hex(buf, sizeof(vecs[0]) + 1);
+		     for (size_t i = 0; i < depth; i++)
+			    printf("]"));
+
+	for (size_t i = 0; i < ARRAY_SIZE(vecs); i++) {
+		memcpy(buf, vecs + i, sizeof(vecs[i]));
+		TEST_NLATTR_(fd, nlh0 - NLA_HDRLEN * depth,
+			     hdrlen + NLA_HDRLEN * depth,
+			     init_msg, print_msg, nla_type, nla_type_str,
+			     sizeof(vecs[i]),
+			     buf, sizeof(vecs[i]),
+			     printf("%" PRIu64, vecs[i]);
+#if !XLAT_RAW
+			     if (i)
+				     printf(" /* %.*f s */", precision,
+					    (double) vecs[i] / clk_tck);
+#endif
+			     for (size_t i = 0; i < depth; i++)
+				    printf("]"));
+	}
+	for (size_t i = 1; i < sizeof(vecs[0]); i++) {
+		uint64_t val = vecs[ARRAY_SIZE(vecs) - 1] & MASK64(i * 8);
+		TEST_NLATTR_(fd, nlh0 - NLA_HDRLEN * depth,
+			     hdrlen + NLA_HDRLEN * depth,
+			     init_msg, print_msg, nla_type, nla_type_str,
+			     i, buf + BE_LE(sizeof(vecs[0]) - i, 0), i,
+			     printf("%" PRIu64, val);
+#if !XLAT_RAW
+			     printf(" /* %.*f s */", precision,
+				    (double) val / clk_tck);
+#endif
+			     for (size_t i = 0; i < depth; i++)
+				    printf("]"));
+	}
+}
