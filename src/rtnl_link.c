@@ -28,6 +28,7 @@
 #include "xlat/rtnl_ifla_brport_attrs.h"
 #include "xlat/rtnl_ifla_br_boolopts.h"
 #include "xlat/rtnl_ifla_br_boolopt_flags.h"
+#include "xlat/rtnl_ifla_br_mcast_querier_attrs.h"
 #include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
 #include "xlat/rtnl_ifla_info_data_bridge_attrs.h"
@@ -345,6 +346,30 @@ decode_ifla_br_boolopt(struct tcb *const tcp,
 	return true;
 }
 
+static const nla_decoder_t ifla_br_mcast_querier_decoders[] = {
+	[BRIDGE_QUERIER_UNSPEC]			= NULL,
+	[BRIDGE_QUERIER_IP_ADDRESS]		= decode_nla_in_addr,
+	[BRIDGE_QUERIER_IP_PORT]		= decode_nla_ifindex,
+	[BRIDGE_QUERIER_IP_OTHER_TIMER]		= decode_nla_clock_t,
+	[BRIDGE_QUERIER_PAD]			= NULL,
+	[BRIDGE_QUERIER_IPV6_ADDRESS]		= decode_nla_in6_addr,
+	[BRIDGE_QUERIER_IPV6_PORT]		= decode_nla_ifindex,
+	[BRIDGE_QUERIER_IPV6_OTHER_TIMER]	= decode_nla_clock_t,
+};
+
+static bool
+decode_ifla_br_mcast_qstate(struct tcb *const tcp,
+			    const kernel_ulong_t addr,
+			    const unsigned int len,
+			    const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_br_mcast_querier_attrs,
+		      "BRIDGE_QUERIER_???",
+		      ARRSZ_PAIR(ifla_br_mcast_querier_decoders), opaque_data);
+
+	return true;
+}
+
 static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_UNSPEC]			= NULL,
 	[IFLA_BR_FORWARD_DELAY]			= decode_nla_u32,
@@ -393,6 +418,7 @@ static const nla_decoder_t ifla_info_data_bridge_nla_decoders[] = {
 	[IFLA_BR_MCAST_MLD_VERSION]		= decode_nla_u8,
 	[IFLA_BR_VLAN_STATS_PER_PORT]		= decode_nla_u8,
 	[IFLA_BR_MULTI_BOOLOPT]			= decode_ifla_br_boolopt,
+	[IFLA_BR_MCAST_QUERIER_STATE]		= decode_ifla_br_mcast_qstate,
 };
 
 static bool
