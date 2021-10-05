@@ -265,7 +265,7 @@ main(void)
 					     ", \"badc:ded:face:beef"
 					     ":deca:feed:dead:feed\")"));
 
-	/* AF_INET6: IFLA_INET6_ */
+	/* AF_INET6: IFLA_INET6_ADDR_GEN_MODE */
 	static const struct {
 		uint8_t flags;
 		const char *str;
@@ -286,6 +286,13 @@ main(void)
 					      printf("%s", agms[i].str));
 	}
 
+	/* AF_INET6: IFLA_INET6_RA_MTU */
+	static const uint32_t ra_mtu = 0xdeadc0de;
+	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen, init_AF_INET6_msg,
+				      print_AF_INET6_msg,
+				      9, "IFLA_INET6_RA_MTU",
+				      pattern, ra_mtu, print_quoted_hex, 2,
+				      printf("0xdeadc0de"));
 
 	puts("+++ exited with 0 +++");
 	return 0;

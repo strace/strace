@@ -892,6 +892,7 @@ static const nla_decoder_t ifla_inet6_nla_decoders[] = {
 	[IFLA_INET6_ICMP6STATS]		= decode_ifla_inet6_icmp6_stats,
 	[IFLA_INET6_TOKEN]		= decode_nla_in6_addr,
 	[IFLA_INET6_ADDR_GEN_MODE]	= decode_ifla_inet6_agm,
+	[IFLA_INET6_RA_MTU]		= decode_nla_u32,
 };
 
 static const struct nla_decoder_table_desc {
