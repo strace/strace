@@ -13,8 +13,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     NETLINK_ROUTE netlink messages.
   * Implemented decoding of AF_MCTP socket addresses.
   * Implemented decoding of AF_MCTP protocol for IFLA_AF_SPEC netlink attribute.
-  * Implemented decoding of IFLA_BR_MULTI_BOOLOPT and IFLA_INET6_RA_MTU netlink
-    attributes.
+  * Implemented decoding of IFLA_BR_MCAST_QUERIER_STATE, IFLA_BR_MULTI_BOOLOPT,
+    and IFLA_INET6_RA_MTU netlink attributes.
   * Enhanced decoding of io_uring_register and times syscalls.
   * Enhanced IFLA_BR_FORWARD_DELAY, IFLA_BR_MAX_AGE, IFLA_PROTINFO, *_INTVL,
     and *_TIMER netlink attribute decoding.
