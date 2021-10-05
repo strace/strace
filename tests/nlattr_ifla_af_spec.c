@@ -191,7 +191,7 @@ main(void)
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
 				      init_AF_INET6_msg, print_AF_INET6_msg,
-				      9, "0x9 /* IFLA_INET6_??? */", pattern,
+				      10, "0xa /* IFLA_INET6_??? */", pattern,
 				      unknown_msg, print_quoted_hex, 2,
 				      printf("\"\\xab\\xac\\xdb\\xcd\""));
 
@@ -280,7 +280,7 @@ main(void)
 					     ", \"badc:ded:face:beef"
 					     ":deca:feed:dead:feed\")"));
 
-	/* AF_INET6: IFLA_INET6_ */
+	/* AF_INET6: IFLA_INET6_ADDR_GEN_MODE */
 	static const struct {
 		uint8_t flags;
 		const char *str;
@@ -301,6 +301,13 @@ main(void)
 					      printf("%s", agms[i].str));
 	}
 
+	/* AF_INET6: IFLA_INET6_RA_MTU */
+	static const uint32_t ra_mtu = 0xdeadc0de;
+	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen, init_AF_INET6_msg,
+				      print_AF_INET6_msg,
+				      9, "IFLA_INET6_RA_MTU",
+				      pattern, ra_mtu, print_quoted_hex, 2,
+				      printf("3735929054"));
 
 	/* AF_MCTP */
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
