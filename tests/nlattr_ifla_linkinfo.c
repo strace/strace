@@ -20,6 +20,7 @@
 
 #include <linux/if.h>
 #include <linux/if_arp.h>
+#include <linux/if_bridge.h>
 #include <linux/if_link.h>
 #include <linux/rtnetlink.h>
 
@@ -543,6 +544,41 @@ main(void)
 					  ", addr=fa:ce:de:c0:de:ad}" },
 				     { 9, "{prio=[190, 239]"
 					  ", addr=fa:ce:de:c0:de:ad}" });
+	}
+
+	static const struct {
+		struct br_boolopt_multi val;
+		const char *crop_str;
+		const char *str;
+	} boolopts[] = {
+		{ { .optval = 0, .optmask = 0 },
+		  "\"\\x00\\x00\\x00\\x00\\x00\\x00\\x00\"",
+		  "{optval=0, optmask=0}" },
+		{ { .optval = 1, .optmask = 2 },
+		  BE_LE("\"\\x00\\x00\\x00\\x01\\x00\\x00\\x00\"",
+			"\"\\x01\\x00\\x00\\x00\\x02\\x00\\x00\""),
+		  "{optval=1<<BR_BOOLOPT_NO_LL_LEARN"
+		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING}" },
+		{ { .optval = 0xdeadfaec, .optmask = 0xbadc0dec },
+		  BE_LE("\"\\xde\\xad\\xfa\\xec\\xba\\xdc\\x0d\"",
+			"\"\\xec\\xfa\\xad\\xde\\xec\\x0d\\xdc\""),
+		  "{optval=0xdeadfaec /* 1<<BR_BOOLOPT_??? */"
+		  ", optmask=0xbadc0dec /* 1<<BR_BOOLOPT_??? */}" },
+		{ { .optval = 0xfacebeef, .optmask = 0xfeedcafe },
+		  BE_LE("\"\\xfa\\xce\\xbe\\xef\\xfe\\xed\\xca\"",
+			"\"\\xef\\xbe\\xce\\xfa\\xfe\\xca\\xed\""),
+		  "{optval=1<<BR_BOOLOPT_NO_LL_LEARN"
+			  "|1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING|0xfacebeec"
+		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING|0xfeedcafc}" },
+	};
+	for (size_t k = 0; k < ARRAY_SIZE(boolopts); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+				     IFLA_BR_MULTI_BOOLOPT,
+				     "IFLA_BR_MULTI_BOOLOPT",
+				     boolopts[k].val, pattern,
+				     { 7, boolopts[k].crop_str },
+				     { 9, boolopts[k].str },
+				     { 9, boolopts[k].str });
 	}
 
 	/* tun attrs */

@@ -1,0 +1,4 @@
+#unconditional
+#value_indexed
+BR_BOOLOPT_NO_LL_LEARN		0
+BR_BOOLOPT_MCAST_VLAN_SNOOPING	1
