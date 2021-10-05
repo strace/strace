@@ -26,7 +26,7 @@
 #include "xlat/rtnl_mdba_router_pattr_attrs.h"
 
 static const nla_decoder_t mdba_mdb_eattr_nla_decoders[] = {
-	[MDBA_MDB_EATTR_TIMER]	= decode_nla_u32
+	[MDBA_MDB_EATTR_TIMER]	= decode_nla_clock_t,
 };
 
 static bool
@@ -133,10 +133,10 @@ decode_multicast_router_type(struct tcb *const tcp,
 }
 
 static const nla_decoder_t mdba_router_pattr_nla_decoders[] = {
-	[MDBA_ROUTER_PATTR_TIMER]	= decode_nla_u32,
+	[MDBA_ROUTER_PATTR_TIMER]	= decode_nla_clock_t,
 	[MDBA_ROUTER_PATTR_TYPE]	= decode_multicast_router_type,
-	[MDBA_ROUTER_PATTR_INET_TIMER]	= decode_nla_u32,
-	[MDBA_ROUTER_PATTR_INET6_TIMER]	= decode_nla_u32,
+	[MDBA_ROUTER_PATTR_INET_TIMER]	= decode_nla_clock_t,
+	[MDBA_ROUTER_PATTR_INET6_TIMER]	= decode_nla_clock_t,
 };
 
 static bool
