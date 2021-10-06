@@ -16,8 +16,7 @@ struct decode_nla_xlat_opts {
 	const struct xlat *xlat;
 	const char *dflt;
 	enum xlat_style style;
-	const char *prefix;
-	const char *suffix;
+	const char *fn_str;
 	uint64_t (*process_fn)(uint64_t val);
 	size_t size;
 };

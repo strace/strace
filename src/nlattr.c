@@ -298,11 +298,11 @@ decode_nla_xval(struct tcb *const tcp,
 	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &data)) {
 		if (opts->process_fn)
 			data = opts->process_fn(data);
-		if (opts->prefix)
-			tprints(opts->prefix);
+		if (opts->fn_str)
+			tprints_arg_begin(opts->fn_str);
 		printxval_ex(opts->xlat, data, opts->dflt, opts->style);
-		if (opts->suffix)
-			tprints(opts->suffix);
+		if (opts->fn_str)
+			tprint_arg_end();
 	}
 
 	return true;
@@ -323,10 +323,9 @@ decode_nla_ether_proto(struct tcb *const tcp,
 	static const struct decode_nla_xlat_opts opts = {
 		.xlat = ethernet_protocols,
 		.dflt = "ETHER_P_???",
-		.prefix = "htons(",
-		.suffix = ")",
 		.size = 2,
 		.process_fn = process_host_order,
+		.fn_str     = "htons",
 	};
 
 	return decode_nla_xval(tcp, addr, len, &opts);
@@ -417,11 +416,11 @@ decode_nla_flags(struct tcb *const tcp,
 	if (!umoven_to_uint64_or_printaddr(tcp, addr, len, &data)) {
 		if (opts->process_fn)
 			data = opts->process_fn(data);
-		if (opts->prefix)
-			tprints(opts->prefix);
+		if (opts->fn_str)
+			tprints_arg_begin(opts->fn_str);
 		printflags_ex(data, opts->dflt, opts->style, opts->xlat, NULL);
-		if (opts->suffix)
-			tprints(opts->suffix);
+		if (opts->fn_str)
+			tprint_arg_end();
 	}
 
 	return true;
