@@ -42,9 +42,6 @@
 
 #define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
 
-const size_t arp_hardware_types_size = ARRAY_SIZE(arp_hardware_types) - 1;
-const size_t ethernet_protocols_size = ARRAY_SIZE(ethernet_protocols) - 1;
-
 static void
 print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen)
 {

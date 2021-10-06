@@ -76,8 +76,6 @@
 #include "xlat/kcm_protocols.h"
 #include "xlat/smc_protocols.h"
 
-const size_t inet_protocols_size = ARRAY_SIZE(inet_protocols) - 1;
-
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
 	       const kernel_ulong_t addrlen)
