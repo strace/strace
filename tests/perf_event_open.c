@@ -398,7 +398,7 @@ end:
 }
 
 /* These require aligned access, so no byte-grain checks possible */
-#if defined SPARC || defined SPARC64 || defined POWERPC || defined POWERPC64 || defined ARM
+#if defined SPARC || defined SPARC64 || defined POWERPC || defined POWERPC64 || defined ARM || defined AARCH64
 # define ATTR_REC(sz) { tail_alloc((sz + 7) & ~7), sz }
 #else
 # define ATTR_REC(sz) { tail_alloc(sz), sz }
