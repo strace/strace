@@ -1569,6 +1569,40 @@ test_getregset_setregset(int pid)
 	}
 }
 
+#if defined __arm64__ || defined __aarch64__
+static void
+check_compat_ptrace_req(const unsigned int req, const char *const s,
+			const int pid)
+{
+	do_ptrace(req, pid, 0, 0);
+	printf("ptrace(%#x" NRAW(" /* ") "%s" NRAW(" */")
+	       ", %d, NULL, NULL) = %s\n",
+	       req, NRAW(s), pid, errstr);
+
+	do_ptrace(req, pid, 0xbadc0deddeadface, 0xfacefeeddecaffed);
+	printf("ptrace(%#x" NRAW(" /* ") "%s" NRAW(" */")
+	       ", %d, 0xbadc0deddeadface, 0xfacefeeddecaffed) = %s\n",
+	       req, NRAW(s), pid, errstr);
+}
+
+static void
+test_compat_ptrace(const int pid)
+{
+	check_compat_ptrace_req(12, "COMPAT_PTRACE_GETREGS", pid);
+	check_compat_ptrace_req(13, "COMPAT_PTRACE_SETREGS", pid);
+	check_compat_ptrace_req(14, "COMPAT_PTRACE_GETFPREGS", pid);
+	check_compat_ptrace_req(15, "COMPAT_PTRACE_SETFPREGS", pid);
+	check_compat_ptrace_req(22, "COMPAT_PTRACE_GET_THREAD_AREA", pid);
+	check_compat_ptrace_req(23, "COMPAT_PTRACE_SET_SYSCALL", pid);
+	check_compat_ptrace_req(27, "COMPAT_PTRACE_GETVFPREGS", pid);
+	check_compat_ptrace_req(28, "COMPAT_PTRACE_SETVFPREGS", pid);
+	check_compat_ptrace_req(29, "COMPAT_PTRACE_GETHBPREGS", pid);
+	check_compat_ptrace_req(30, "COMPAT_PTRACE_SETHBPREGS", pid);
+}
+#else /* !(__arm64__ || __aarch64__) */
+static void test_compat_ptrace(const int pid) {}
+#endif
+
 int
 main(void)
 {
@@ -1921,6 +1955,7 @@ main(void)
 
 	test_peeksiginfo(pid, bad_request);
 	test_getregset_setregset(pid);
+	test_compat_ptrace(pid);
 
 	do_ptrace(PTRACE_TRACEME, 0, 0, 0);
 	printf("ptrace(" XLAT_FMT ") = %s\n",

@@ -28,11 +28,18 @@
 
 #include "xlat/nt_descriptor_types.h"
 #include "xlat/ptrace_cmds.h"
+#include "xlat/compat_ptrace_cmds.h"
 #include "xlat/ptrace_setoptions_flags.h"
 #include "xlat/ptrace_peeksiginfo_flags.h"
 
 #define uoff(member)	offsetof(struct user, member)
 #define XLAT_UOFF(member)	{ uoff(member), "offsetof(struct user, " #member ")" }
+
+#ifdef COMPAT_PTRACE_GETREGS
+# define HAVE_COMPAT_PTRACE_MACROS 1
+#else
+# define HAVE_COMPAT_PTRACE_MACROS 0
+#endif
 
 static const struct xlat_data struct_user_offsets_data[] = {
 #include "userent.h"
@@ -255,6 +262,36 @@ decode_ptrace_entering(struct tcb *const tcp)
 #else
 # define regs_addr	data
 #endif
+
+	/* COMPAT_PTRACE_* */
+#if HAVE_COMPAT_PTRACE_MACROS
+	if (current_personality != 1) {
+		switch (request) {
+		case COMPAT_PTRACE_GETREGS:
+		case COMPAT_PTRACE_SETREGS:
+		case COMPAT_PTRACE_GETFPREGS:
+		case COMPAT_PTRACE_SETFPREGS:
+		case COMPAT_PTRACE_GET_THREAD_AREA:
+		case COMPAT_PTRACE_SET_SYSCALL:
+		case COMPAT_PTRACE_GETVFPREGS:
+		case COMPAT_PTRACE_SETVFPREGS:
+		case COMPAT_PTRACE_GETHBPREGS:
+		case COMPAT_PTRACE_SETHBPREGS:
+			printxvals_ex(request, "COMPAT_PTRACE_???",
+				      xlat_verbose(xlat_verbosity)
+					== XLAT_STYLE_RAW ? XLAT_STYLE_RAW
+							  : XLAT_STYLE_VERBOSE,
+				      compat_ptrace_cmds, NULL);
+			tprint_arg_next();
+			printpid(tcp, pid, PT_TGID);
+			tprint_arg_next();
+			printaddr(addr);
+			tprint_arg_next();
+			printaddr(data);
+			return RVAL_DECODED;
+		}
+	}
+#endif /* HAVE_COMPAT_PTRACE_MACROS */
 
 	/* request */
 	printxval64(ptrace_cmds, request, "PTRACE_???");

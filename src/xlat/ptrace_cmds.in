@@ -42,7 +42,7 @@ PTRACE_GET_SYSCALL_INFO		0x420e
 PTRACE_GET_RSEQ_CONFIGURATION	0x420f
 
 /* arch-specific */
-#if defined __arm__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__
 PTRACE_GETREGS		0xc
 #elif defined __hppa__ || defined __ia64__
 PTRACE_GETREGS		0x12
@@ -50,7 +50,7 @@ PTRACE_GETREGS		0x12
 PTRACE_GETREGS
 #endif
 
-#if defined __arm__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__ || defined __xtensa__
 PTRACE_SETREGS		0xd
 #elif defined __hppa__ || defined __ia64__
 PTRACE_SETREGS		0x13
@@ -58,13 +58,13 @@ PTRACE_SETREGS		0x13
 PTRACE_SETREGS
 #endif
 
-#if defined __arm__ || defined __hppa__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __hppa__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__
 PTRACE_GETFPREGS	0xe
 #else
 PTRACE_GETFPREGS
 #endif
 
-#if defined __arm__ || defined __hppa__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __hppa__ || defined __m68k__ || defined __mips__ || defined __powerpc__ || defined __sh__ || defined __sparc__ || defined __x86_64__ || defined __i386__
 PTRACE_SETFPREGS	0xf
 #else
 PTRACE_SETFPREGS
@@ -84,7 +84,7 @@ PTRACE_SETFPXREGS
 
 #if defined __xtensa__
 PTRACE_GETHBPREGS	0x14
-#elif defined __arm__
+#elif defined __arm__ || defined __arm64__ || defined __aarch64__
 PTRACE_GETHBPREGS	0x1d
 #else
 PTRACE_GETHBPREGS
@@ -92,7 +92,7 @@ PTRACE_GETHBPREGS
 
 #if defined __xtensa__
 PTRACE_SETHBPREGS	0x15
-#elif defined __arm__
+#elif defined __arm__ || defined __arm64__ || defined __aarch64__
 PTRACE_SETHBPREGS	0x1e
 #else
 PTRACE_SETHBPREGS
@@ -115,7 +115,7 @@ PTRACE_SETREGS64	0x17
 PTRACE_SETREGS64
 #endif
 
-#if defined __arm__ || defined __unicore32__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__ || defined __unicore32__
 PTRACE_GET_THREAD_AREA	0x16
 #elif defined __arc__ || defined __m68k__ || defined __mips__ || defined __x86_64__ || defined __i386__
 PTRACE_GET_THREAD_AREA	0x19
@@ -184,7 +184,7 @@ PTRACE_SETWMMXREGS	0x13
 #else
 PTRACE_SETWMMXREGS
 #endif
-#if defined __arm__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__
 PTRACE_SET_SYSCALL	0x17
 #else
 PTRACE_SET_SYSCALL
@@ -199,12 +199,12 @@ PTRACE_SETCRUNCHREGS	0x1a
 #else
 PTRACE_SETCRUNCHREGS
 #endif
-#if defined __arm__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__
 PTRACE_GETVFPREGS	0x1b
 #else
 PTRACE_GETVFPREGS
 #endif
-#if defined __arm__
+#if defined __arm__ || defined __arm64__ || defined __aarch64__
 PTRACE_SETVFPREGS	0x1c
 #else
 PTRACE_SETVFPREGS
