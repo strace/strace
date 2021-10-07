@@ -244,6 +244,13 @@ void fill_memory32_ex(void *ptr, size_t size, uint32_t start,
 		      unsigned int period);
 /** Shortcut for fill_memory32_ex(ptr, size, 0x80a0c0e0, 0x80000000) */
 void fill_memory32(void *ptr, size_t size);
+/** Variant of fill_memory_ex for arrays of 64-bit (8-byte) values. */
+void fill_memory64_ex(void *ptr, size_t size, uint64_t start, uint64_t period);
+/**
+ * Shortcut for
+ * fill_memory64_ex(ptr, size, 0x8090a0b0c0d0e0f0, 0x8000000000000000)
+ */
+void fill_memory64(void *ptr, size_t size);
 
 
 /* Close stdin, move stdout to a non-standard descriptor, and print. */
