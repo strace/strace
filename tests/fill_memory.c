@@ -60,3 +60,21 @@ fill_memory32(void *ptr, size_t size)
 {
 	fill_memory32_ex(ptr, size, 0x80a0c0e0, 0x80000000);
 }
+
+void
+fill_memory64_ex(void *ptr, size_t size, uint64_t start, uint64_t period)
+{
+	uint64_t *p = ptr;
+	size_t i;
+
+	for (i = 0; i < size / sizeof(uint64_t); i++) {
+		p[i] = start + i % period;
+	}
+}
+
+void
+fill_memory64(void *ptr, size_t size)
+{
+	fill_memory64_ex(ptr, size,
+			 0x8090a0b0c0d0e0f0ULL, 0x8000000000000000ULL);
+}
