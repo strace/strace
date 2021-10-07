@@ -1758,6 +1758,32 @@ truncate_kulong_to_current_wordsize(const kernel_ulong_t v)
 	}
 }
 
+static inline kernel_long_t
+truncate_klong_to_current_klongsize(const kernel_long_t v)
+{
+# if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+	if (current_klongsize < sizeof(v)) {
+		return (int) v;
+	} else
+# endif
+	{
+		return v;
+	}
+}
+
+static inline kernel_ulong_t
+truncate_kulong_to_current_klongsize(const kernel_ulong_t v)
+{
+# if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
+	if (current_klongsize < sizeof(v)) {
+		return (unsigned int) v;
+	} else
+# endif
+	{
+		return v;
+	}
+}
+
 /*
  * Cast a pointer or a pointer-sized integer to kernel_ulong_t.
  */
