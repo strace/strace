@@ -78,7 +78,7 @@ tprint_msgrcv(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_arg_next();
 
 	/* msgtyp */
-	PRINT_VAL_D(msgtyp);
+	PRINT_VAL_D(truncate_klong_to_current_klongsize(msgtyp));
 }
 
 static int
