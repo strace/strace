@@ -16,20 +16,25 @@
  */
 
 #include "tests.h"
+#include <fcntl.h>
 #include <sched.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
 
 #include "scno.h"
+#include <sys/stat.h>
 #include <sys/times.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 
 enum {
 	NUM_USER_ITERS_SQRT = 1000,
 	NUM_USER_ITERS = NUM_USER_ITERS_SQRT * NUM_USER_ITERS_SQRT,
-	PARENT_CPUTIME_LIMIT_NSEC = 200000000,
-	CHILD_CPUTIME_LIMIT_NSEC = 300000000
+	READ_BUF_SIZE = 65536,
+	READ_ITER = 128,
+	PARENT_CPUTIME_LIMIT_NSEC = 300000000,
+	CHILD_CPUTIME_LIMIT_NSEC = 500000000,
 };
 
 int
@@ -59,8 +64,25 @@ main(void)
 	}
 
 	/* Enjoying my system time */
+	ssize_t ret;
+	int fd;
+	char buf[READ_BUF_SIZE];
+
 	while (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
-		if (ts.tv_sec || ts.tv_nsec >= cputime_limit * 2)
+		for (size_t i = 0; i < READ_ITER; i++) {
+			/* We are fine even if the calls fail. */
+			fd = open("/proc/self/status", O_RDONLY);
+			/*
+			 * Working around "ignoring return value of 'read'
+			 * declared with attribute 'warn_unused_result'".
+			 */
+			ret = read(fd, buf, sizeof(buf));
+			close(fd);
+			if (ret)
+				continue;
+		}
+
+		if (ts.tv_sec || ts.tv_nsec >= cputime_limit * 3)
 			break;
 
 		sched_yield();
