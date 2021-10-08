@@ -8,6 +8,7 @@
 #include "tests.h"
 #include "print_fields.h"
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -435,6 +436,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 
 DEF_NLATTR_INTEGER_CHECK_(u16, uint16_t, "%hu")
 DEF_NLATTR_INTEGER_CHECK_(u32, uint32_t, "%u")
+DEF_NLATTR_INTEGER_CHECK_(u64, uint64_t, "%" PRIu64)
 
 #define TEST_NLATTR_VAL(type_, fd_, nlh0_, hdrlen_,			\
 			init_msg_, print_msg_,				\
