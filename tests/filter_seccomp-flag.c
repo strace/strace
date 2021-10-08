@@ -14,13 +14,11 @@
 #include "scno.h"
 
 /* PERSONALITY*_AUDIT_ARCH definitions depend on AUDIT_ARCH_* constants.  */
-#ifdef PERSONALITY0_AUDIT_ARCH
-# include <linux/audit.h>
-# define XLAT_MACROS_ONLY
-#  include "xlat/elf_em.h"
-#  include "xlat/audit_arch.h"
-# undef XLAT_MACROS_ONLY
-#endif
+#include <linux/audit.h>
+#define XLAT_MACROS_ONLY
+# include "xlat/elf_em.h"
+# include "xlat/audit_arch.h"
+#undef XLAT_MACROS_ONLY
 
 /* Define these shorthand notations to simplify the syscallent files. */
 #include "sysent_shorthand_defs.h"

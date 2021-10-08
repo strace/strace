@@ -15,24 +15,20 @@
 #include "scno.h"
 
 /* PERSONALITY*_AUDIT_ARCH definitions depend on AUDIT_ARCH_* constants.  */
-#ifdef PERSONALITY0_AUDIT_ARCH
-# include <linux/audit.h>
-# define XLAT_MACROS_ONLY
-#  include "xlat/elf_em.h"
-#  include "xlat/audit_arch.h"
-# undef XLAT_MACROS_ONLY
-#endif
+#include <linux/audit.h>
+#define XLAT_MACROS_ONLY
+# include "xlat/elf_em.h"
+# include "xlat/audit_arch.h"
+#undef XLAT_MACROS_ONLY
 
 #include "nr_prefix.c"
 
 const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
-#ifdef PERSONALITY0_AUDIT_ARCH
 	PERSONALITY0_AUDIT_ARCH,
-# if SUPPORTED_PERSONALITIES > 1
+#if SUPPORTED_PERSONALITIES > 1
 	PERSONALITY1_AUDIT_ARCH,
-#  if SUPPORTED_PERSONALITIES > 2
+# if SUPPORTED_PERSONALITIES > 2
 	PERSONALITY2_AUDIT_ARCH,
-#  endif
 # endif
 #endif
 };
@@ -47,7 +43,6 @@ syscall_name(kernel_ulong_t scno)
 const char *
 syscall_name_arch(kernel_ulong_t nr, unsigned int arch, const char **prefix)
 {
-#ifdef PERSONALITY0_AUDIT_ARCH
 	for (size_t i = 0; i < SUPPORTED_PERSONALITIES; i++) {
 		if (arch != audit_arch_vec[i].arch)
 			continue;
@@ -69,7 +64,6 @@ syscall_name_arch(kernel_ulong_t nr, unsigned int arch, const char **prefix)
 		}
 		return sysent_vec[i][scno].sys_name;
 	}
-#endif
 
 	if (prefix)
 		*prefix = NULL;
