@@ -1,4 +1,5 @@
 #unconditional
+#sorted
 /* User-class control IDs */
 V4L2_CID_BRIGHTNESS
 V4L2_CID_CONTRAST
