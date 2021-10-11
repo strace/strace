@@ -46,6 +46,7 @@ main(int argc, char **argv)
 	} spec_strs[] = {
 		{ 0, "PR_SPEC_STORE_BYPASS" },
 		{ 1, "PR_SPEC_INDIRECT_BRANCH" },
+		{ 2, "PR_SPEC_L1D_FLUSH" },
 	};
 
 	static const struct {
@@ -104,8 +105,8 @@ main(int argc, char **argv)
 				   ", -5) returning %ld", injected_val);
 
 	/* PR_GET_SPECULATION_CTRL */
-	rc = do_prctl(52, 2, bogus_arg3);
-	printf("prctl(PR_GET_SPECULATION_CTRL, 0x2 /* PR_SPEC_??? */) "
+	rc = do_prctl(52, 3, bogus_arg3);
+	printf("prctl(PR_GET_SPECULATION_CTRL, 0x3 /* PR_SPEC_??? */) "
 	       "= %s (INJECTED)\n", sprintrc(rc));
 
 	rc = do_prctl(52, bogus_arg2, bogus_arg3);
@@ -138,8 +139,8 @@ main(int argc, char **argv)
 
 
 	/* PR_SET_SPECULATION_CTRL*/
-	rc = do_prctl(53, 2, bogus_arg3);
-	printf("prctl(PR_SET_SPECULATION_CTRL, 0x2 /* PR_SPEC_??? */, %#llx) "
+	rc = do_prctl(53, 3, bogus_arg3);
+	printf("prctl(PR_SET_SPECULATION_CTRL, 0x3 /* PR_SPEC_??? */, %#llx) "
 	       "= %s (INJECTED)\n",
 	       (unsigned long long) bogus_arg3, sprintrc(rc));
 

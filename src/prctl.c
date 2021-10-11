@@ -264,6 +264,7 @@ SYS_FUNC(prctl)
 		switch (arg2) {
 		case PR_SPEC_STORE_BYPASS:
 		case PR_SPEC_INDIRECT_BRANCH:
+		case PR_SPEC_L1D_FLUSH:
 			tcp->auxstr = sprintflags_ex("",
 					pr_spec_get_store_bypass_flags,
 					(kernel_ulong_t) tcp->u_rval, '\0',
@@ -464,6 +465,7 @@ SYS_FUNC(prctl)
 		switch (arg2) {
 		case PR_SPEC_STORE_BYPASS:
 		case PR_SPEC_INDIRECT_BRANCH:
+		case PR_SPEC_L1D_FLUSH:
 			printxval64(pr_spec_set_store_bypass_flags, arg3,
 				    "PR_SPEC_???");
 			break;
