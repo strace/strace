@@ -15,7 +15,7 @@
 # include <unistd.h>
 # include <sys/time.h>
 
-# define SYSCALL_COUNT 1000
+# define SYSCALL_COUNT 10000
 
 /**
  * Max ratio of the execution time with and without pidns translation.
@@ -43,11 +43,17 @@ execute_syscalls(void)
 int
 main(void)
 {
-	long max_us = execute_syscalls() * MAX_TIME_RATIO;
+	long orig_us = execute_syscalls();
+	long max_us = orig_us * MAX_TIME_RATIO;
 
 	pidns_test_init();
 
 	long us = execute_syscalls();
+
+	fprintf(stderr, "Before PID NS test init: %ld\n"
+			"After PID NS test init:  %ld (%.2f times slower)\n",
+		orig_us, us, (float) us / orig_us);
+
 	if (us > max_us)
 		error_msg_and_fail("pidns translation took too long: %ld us "
 		                   "(max: %ld us)", us, max_us);
