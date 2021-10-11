@@ -140,8 +140,15 @@ pidns_fork(pid_t pgid, bool new_sid)
 	siginfo_t siginfo;
 	if (waitid(P_PID, pid, &siginfo, WEXITED | WNOWAIT) < 0)
 		perror_msg_and_fail("wait");
-	if (siginfo.si_code != CLD_EXITED || siginfo.si_status)
-		error_msg_and_fail("child terminated with nonzero exit status");
+	if (siginfo.si_code != CLD_EXITED || siginfo.si_status) {
+		if (siginfo.si_code == CLD_EXITED && siginfo.si_status == 77) {
+			error_msg_and_skip("child terminated with skip exit"
+					   " status");
+		} else {
+			error_msg_and_fail("child terminated with nonzero exit"
+					   " status");
+		}
+	}
 
 	return pid;
 }
