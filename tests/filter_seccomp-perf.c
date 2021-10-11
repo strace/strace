@@ -29,7 +29,7 @@ main(void)
 	int rc = 0;
 
 	signal(SIGALRM, handler);
-	alarm(1);
+	alarm(3);
 
 	for (i = 0; !stop; i++) {
 		rc |= chdir(".");
