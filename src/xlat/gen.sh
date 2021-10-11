@@ -40,6 +40,8 @@ cond_def()
 {
 	local line
 	line="$1"; shift
+	local xlat_type
+	xlat_type="$1"; shift
 
 	local val
 	val="${line%%[!A-Za-z0-9_]*}"
@@ -63,6 +65,26 @@ cond_def()
 			"# define $val $def" \
 			"#endif"
 	fi
+
+	[ XT_SORTED != "$xlat_type" ] ||
+		check_sort_order "$val"
+}
+
+check_sort_order()
+{
+	local val
+	val="$1"; shift
+
+	cat <<-EOF
+		#if defined XLAT_PREV_VAL
+		static_assert((unsigned long long) ($val)
+			      > (unsigned long long) (XLAT_PREV_VAL),
+			      "Incorrect order in #sorted xlat: $val"
+			      " is not larger than the previous value");
+		#endif
+		#undef XLAT_PREV_VAL
+		#define XLAT_PREV_VAL ($val)
+	EOF
 }
 
 print_xlat()
@@ -207,13 +229,26 @@ gen_header()
 			echo "${line}"
 			;;
 		[A-Z_]*)
-			[ -n "$unconditional" ] ||
-				cond_def "$line"
+			if [ -n "$unconditional" ]; then
+				[ XT_SORTED != "$xlat_type" ] ||
+					check_sort_order "${line}"
+			else
+				cond_def "$line" "$xlat_type"
+			fi
+			;;
+		'1<<'[A-Z_]*)	# symbolic constants with shift
+			[ XT_SORTED != "$xlat_type" ] ||
+				check_sort_order "1ULL<<${line#1<<}"
+			;;
+		[0-9]*)	# numeric constants
+			[ XT_SORTED != "$xlat_type" ] ||
+				check_sort_order "${line}"
 			;;
 		esac
 	done < "$input"
 
 	cat <<-EOF
+		#undef XLAT_PREV_VAL
 
 		#ifndef XLAT_MACROS_ONLY
 
