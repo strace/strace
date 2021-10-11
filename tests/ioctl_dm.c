@@ -265,7 +265,7 @@ main(void)
 	       "DM_NOFLUSH_FLAG|DM_QUERY_INACTIVE_TABLE_FLAG|"
 	       "DM_UEVENT_GENERATED_FLAG|DM_UUID_FLAG|DM_SECURE_DATA_FLAG|"
 	       "DM_DATA_OUT_FLAG|DM_DEFERRED_REMOVE|DM_INTERNAL_SUSPEND_FLAG|"
-	       "0xfff80080}) = -1 EBADF (%m)\n",
+	       "DM_IMA_MEASUREMENT_FLAG|0xfff00080}) = -1 EBADF (%m)\n",
 	       min_sizeof_dm_ioctl);
 
 	/* Normal call */
