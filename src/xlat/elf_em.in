@@ -194,8 +194,8 @@ EM_AVR32		0x18ad /* Atmel AVR32, removed in v4.12-rc1~159^2~5 */
 EM_FRV			0x5441 /* Fujitsu FR-V */
 EM_OR32			0x8472 /* arch/openrisc/include/uapi/asm/elf.h */
 EM_ALPHA		0x9026 /* "This is an interim value that we will use until the committee comes up with a final number."; see also 41 */
-EM_CYGNUS_V850		0x9080 /* Bogus old v850 magic number, used by old tools, removed in v4.6-rc1~95^2~36 */
 EM_CYGNUS_M32R		0x9041 /* Bogus old m32r magic number, used by old tools. */
+EM_CYGNUS_V850		0x9080 /* Bogus old v850 magic number, used by old tools, removed in v4.6-rc1~95^2~36 */
 EM_S390_OLD		0xa390 /* This is the old interim value for S/390 architecture */
 EM_XTENSA_OLD		0xabc7 /* arch/xtensa/include/asm/elf.h */
 EM_MICROBLAZE_OLD	0xbaab /* arch/microblaze/include/uapi/asm/elf.h */
