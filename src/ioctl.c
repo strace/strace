@@ -78,7 +78,7 @@ ioctl_print_code(const unsigned int code)
 
 	tprints_arg_begin("_IOC");
 
-	printflags_ex(_IOC_DIR(code), abbrev ? "_IOC_???" : NULL,
+	printflags_ex(_IOC_DIR(code), abbrev ? "_IOC_???" : "",
 		      abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV,
 		      ioctl_dirs, NULL);
 	tprint_arg_next();
@@ -103,7 +103,7 @@ evdev_decode_number(const unsigned int code)
 		if (nr >= 0xc0 && nr <= 0xc0 + 0x3f) {
 			tprints_arg_begin("EVIOCSABS");
 			printxval_ex(evdev_abs, nr - 0xc0,
-				     abbrev ? "ABS_???" : NULL,
+				     abbrev ? "ABS_???" : "",
 				     abbrev ? XLAT_STYLE_DEFAULT
 					    : XLAT_STYLE_ABBREV);
 			tprint_arg_end();
@@ -120,7 +120,7 @@ evdev_decode_number(const unsigned int code)
 			PRINT_VAL_U(0);
 		else
 			printxval_ex(evdev_ev, nr - 0x20,
-				     abbrev ? "EV_???" : NULL,
+				     abbrev ? "EV_???" : "",
 				     abbrev ? XLAT_STYLE_DEFAULT
 					    : XLAT_STYLE_ABBREV);
 		tprint_arg_next();
@@ -129,7 +129,7 @@ evdev_decode_number(const unsigned int code)
 		return 1;
 	} else if (nr >= 0x40 && nr <= 0x40 + 0x3f) {
 		tprints_arg_begin("EVIOCGABS");
-		printxval_ex(evdev_abs, nr - 0x40, abbrev ? "ABS_???" : NULL,
+		printxval_ex(evdev_abs, nr - 0x40, abbrev ? "ABS_???" : "",
 			     abbrev ? XLAT_STYLE_DEFAULT : XLAT_STYLE_ABBREV);
 		tprint_arg_end();
 		return 1;
