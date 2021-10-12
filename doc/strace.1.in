@@ -853,13 +853,19 @@ can include the following elements:
 Print file paths.
 .TQ
 .B socket
-Print socket protocol-specific information,
+Print socket protocol-specific information.
+Implies
+.BR \-\-decode\-fds = path .
 .TQ
 .B dev
 Print character/block device numbers.
+Implies
+.BR \-\-decode\-fds = path .
 .TQ
 .B pidfd
 Print PIDs associated with pidfd file descriptors.
+Implies
+.BR \-\-decode\-fds = path .
 .RE
 .TP
 .BR "\-e\ kvm" = vcpu
