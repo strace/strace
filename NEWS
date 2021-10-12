@@ -12,6 +12,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of io_uring_register and times syscalls.
   * Updated lists of BTRFS_*, DM_*, FAN_REPORT_*, IORING_*, MPOL_*, and PACKET_*
     constants.
+  * Updated lists of ioctl commands from Linux 5.15.
 
 * Bug fixes
   * Fixed printing of struct bpf_prog_info.map_ids array.
