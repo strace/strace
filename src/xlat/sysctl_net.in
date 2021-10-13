@@ -1,26 +1,48 @@
+#sorted
 #enum
 #include <sys/types.h>
 #include <linux/sysctl.h>
-#unconditional
-NET_CORE
-NET_ETHER
-NET_802
-NET_UNIX
-NET_IPV4
-NET_IPX
-NET_ATALK
-NET_NETROM
-NET_AX25
-NET_BRIDGE
-NET_ROSE
-NET_IPV6
-NET_X25
-NET_TR
-NET_DECNET
-NET_ECONET
-NET_SCTP
-#conditional
-NET_LLC
-NET_NETFILTER
-NET_DCCP
-NET_IRDA
+/* NET_CORE was 0x01000000 in 1.3.82-pre2.0.11 */
+NET_CORE	1
+/* NET_ETHER was 0x02000000 in 1.3.82-pre2.0.11 */
+NET_ETHER	2
+/* NET_802 was 0x03000000 in 1.3.82-pre2.0.11 */
+NET_802		3
+/* NET_UNIX was 0x04000000 in 1.3.82-pre2.0.11 */
+NET_UNIX	4
+/* NET_IPV4 was 0x05000000 in 1.3.82-pre2.0.11 */
+NET_IPV4	5
+/* NET_IPX was 0x06000000 in 1.3.82-pre2.0.11 */
+NET_IPX		6
+/* NET_ATALK was 0x07000000 in 1.3.82-pre2.0.11 */
+NET_ATALK	7
+/* NET_NETROM was 0x08000000 in 1.3.82-pre2.0.11 */
+NET_NETROM	8
+/* NET_AX25 was 0x09000000 in 1.3.82-pre2.0.11 */
+NET_AX25	9
+/* pre2.0.11 */
+NET_BRIDGE	10
+/* 2.1.9, was 12 before 2.1.117pre1 */
+NET_ROSE	11
+/* 2.1.8, was 11 before 2.1.117pre1 */
+NET_IPV6	12
+/* 2.1.9 */
+NET_X25		13
+/* 2.1.26 */
+NET_TR		14
+/* 2.1.43pre1 */
+NET_DECNET	15
+/* 2.3.4pre2 */
+NET_ECONET	16
+/* 2.3.14, removed in 2.5.30, ba04edba */
+/* NET_KHTTPD	17 */
+/* 2.5.33, 08707d54 */
+NET_SCTP	17
+/* 2.6.14, 590232a7 */
+NET_LLC		18
+/* 2.6.15, 9fb9cbb1 */
+NET_NETFILTER	19
+/* 2.6.17, e55d912f */
+NET_DCCP	20
+/* Added in pre-2.1.132-2, moved to sysctl.h in 2.6.24, f429cd37 */
+NET_IRDA	412

@@ -1,25 +1,100 @@
+#sorted
 #enum
 #include <sys/types.h>
 #include <linux/sysctl.h>
-#unconditional
-VM_OVERCOMMIT_MEMORY
-VM_PAGE_CLUSTER
-VM_DIRTY_BACKGROUND
-VM_DIRTY_RATIO
-VM_DIRTY_WB_CS
-VM_DIRTY_EXPIRE_CS
-VM_NR_PDFLUSH_THREADS
-VM_OVERCOMMIT_RATIO
-VM_PAGEBUF
-VM_HUGETLB_PAGES
-VM_SWAPPINESS
-VM_LOWMEM_RESERVE_RATIO
-VM_MIN_FREE_KBYTES
-#conditional
-VM_MAX_MAP_COUNT
-VM_LAPTOP_MODE
-VM_BLOCK_DUMP
-VM_HUGETLB_GROUP
-VM_VFS_CACHE_PRESSURE
-VM_LEGACY_VA_LAYOUT
-VM_SWAP_TOKEN_TIMEOUT
+/* 1.3.57 */
+/* Was VM_SWAPCTL before 2.5.23, e3e529bf -  struct: Set vm swapping control */
+VM_UNUSED1		1	/* was: struct: Set vm swapping control */
+/* 1.3.57 */
+/* VM_KSWAPD 2 - removed in 2.1.43pre1 */
+/* Was 3 before 2.1.43pre1 */
+/* int: Background pageout interval */
+/* Was VM_SWAPOUT before 2.5.23, e3e529bf - int: Linear or sqrt() swapout for hogs */
+VM_UNUSED2		2	/* was; int: Linear or sqrt() swapout for hogs */
+/* 1.3.60 */
+/* Was 4 before 2.1.43pre1 */
+/* Was VM_FREEPG before 2.5.23, e3e529bf - struct: Set free page thresholds */
+VM_UNUSED3		3	/* was: struct: Set free page thresholds */
+/* 1.3.69 */
+/* Was 4 before 2.1.36, was 5 before 2.1.43pre1 */
+/* Was VM_BDFLUSH before 2.5.12, 090da372 */
+/* Was VM_BDFLUSH_UNUSED before 2.5.30, a074f680 */
+VM_UNUSED4		4	/* Spare */
+/* 2.1.27, Was 7 before 2.1.36, was 6 before 2.1.43pre1 */
+VM_OVERCOMMIT_MEMORY	5	/* Turn off the virtual memory safety limit */
+/* Was 7 before 2.1.43pre1 */
+/* Was VM_BUFFERMEM before 2.5.23, e3e529bf - struct: Set buffer memory thresholds */
+/* Was VM_UNUSED4 before 2.5.30, a074f680 */
+VM_UNUSED5		6	/* was: struct: Set buffer memory thresholds */
+/* 2.1.91 */
+/* Was VM_PAGECACHE before 2.5.23, e3e529bf - struct: Set cache memory thresholds */
+/* Was VM_UNUSED5 before 2.5.30, a074f680 */
+VM_UNUSED7		7	/* was: struct: Set cache memory thresholds */
+/* 2.1.100pre2 */
+/* Was VM_PAGERDAEMON before 2.5.30, a074f680 */
+VM_UNUSED8		8	/* was: struct: Control kswapd behaviour */
+/* 2.1.106 */
+/* Was VM_PGT_CACHE before 2.5.23, e3e529bf - struct: Set page table cache parameters */
+/* Was VM_UNUSED6 before 2.5.30, a074f680 */
+VM_UNUSED9		9	/* was: struct: Set page table cache parameters */
+/* 2.1.132pre3 */
+/* Before 2.2.0pre2 - int: set number of pages to swap together */
+VM_PAGE_CLUSTER		10	/* int: set number of pages to swap together */
+/* 2.5.23, e3e529bf */
+VM_DIRTY_BACKGROUND	11	/* dirty_background_ratio */
+/* 2.5.23, e3e529bf, was VM_DIRTY_ASYNC before 2.5.43, bf175bc4 */
+VM_DIRTY_RATIO		12	/* dirty_ratio */
+/* VM_DIRTY_SYNC 13 - dirty_sync_ratio, added in 2.5.23, e3e529bf, removed in 2.5.37, da1eca60 */
+/* 2.5.23, e3e529bf, was 14 before 2.5.37, da1eca60 */
+VM_DIRTY_WB_CS		13	/* dirty_writeback_centisecs */
+/* 2.5.23, e3e529bf, was 15 before 2.5.37, da1eca60 */
+VM_DIRTY_EXPIRE_CS	14	/* dirty_expire_centisecs */
+/* 2.5.25, f0e10c64, was 16 before 2.5.37, da1eca60 */
+VM_NR_PDFLUSH_THREADS	15	/* nr_pdflush_threads */
+/* 2.5.30, 502bff06, was 17 before 2.5.37, da1eca60 */
+VM_OVERCOMMIT_RATIO	16	/* percent of RAM to allow overcommit in */
+/* 2.5.36, ef5cc2fd, was 18 before 2.5.37, da1eca60 */
+VM_PAGEBUF		17	/* struct: Control pagebuf parameters */
+/* 2.5.37, a7d2851c */
+VM_HUGETLB_PAGES	18	/* int: Number of available Huge Pages */
+/* 2.5.43, 8f7a1404 */
+VM_SWAPPINESS		19	/* Tendency to steal mapped memory */
+/* 2.5.52, c1859213 */
+/* Was VM_LOWER_ZONE_PROTECTION before 2.6.11-rc3, 96fa06f4 */
+VM_LOWMEM_RESERVE_RATIO	20	/* reservation ratio for lower memory zones */
+/* 2.5.71, cefe53f8 */
+VM_MIN_FREE_KBYTES	21	/* Minimum free kilobytes to maintain */
+/* 2.6.5, 56d93842 */
+VM_MAX_MAP_COUNT	22	/* int: Maximum number of mmaps/address-space */
+/* 2.6.6-rc1, 93d33a48 */
+VM_LAPTOP_MODE		23	/* vm laptop mode */
+VM_BLOCK_DUMP		24	/* block dump mode */
+/* 2.6.7, cd053a94 */
+VM_HUGETLB_GROUP	25	/* permitted hugetlb group */
+/* 2.6.9-rc1, a4411519 */
+VM_VFS_CACHE_PRESSURE	26	/* dcache/icache reclaim pressure */
+/* 2.6.9-rc2, 64e3b6b6 */
+VM_LEGACY_VA_LAYOUT	27	/* legacy/compatibility virtual address space layout */
+/* 2.6.10-rc3, 1caf076b */
+VM_SWAP_TOKEN_TIMEOUT	28	/* default time for token time out */
+/* 2.6.16-rc1, 9d0243bc */
+VM_DROP_PAGECACHE	29	/* int: nuke lots of pagecache */
+/* 2.6.16-rc1, 8ad4b1fb */
+VM_PERCPU_PAGELIST_FRACTION	30	/* int: fraction of pages in each percpu_pagelist */
+/* 2.6.16-rc2, 1743660b */
+VM_ZONE_RECLAIM_MODE	31	/* reclaim local zone memory before going off node */
+/* 2.6.16-rc2, 2a11ff06 */
+/* Was VM_ZONE_RECLAIM_INTERVAL before 2.6.18-rc1, 9614634f */
+VM_MIN_UNMAPPED		32	/* Set min percent of unmapped pages */
+/* 2.6.18-rc1, fadd8fbd */
+VM_PANIC_ON_OOM		33	/* panic at out-of-memory */
+/* 2.6.18-rc1, e6e5494c */
+VM_VDSO_ENABLED		34	/* map VDSO into new processes? */
+/* 2.6.19-rc1, 0ff38490 */
+VM_MIN_SLAB		35	/* Percent pages ignored by zone reclaim */
+
+/* Added in 2.6.21-rc1, feceb63ec, removed in 2.6.24-rc4, 43ebbf11 */
+/* s390 vm cmm sysctls */
+VM_CMM_PAGES		1111
+VM_CMM_TIMED_PAGES	1112
+VM_CMM_TIMEOUT		1113

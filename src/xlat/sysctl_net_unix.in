@@ -1,4 +1,9 @@
-#unconditional
-NET_UNIX_DESTROY_DELAY
-NET_UNIX_DELETE_DELAY
-NET_UNIX_MAX_DGRAM_QLEN
+#value_indexed
+#enum
+#include <sys/types.h>
+#include <linux/sysctl.h>
+/* 2.1.43pre1 */
+NET_UNIX_DESTROY_DELAY	1
+NET_UNIX_DELETE_DELAY	2
+/* 2.2.4pre6 */
+NET_UNIX_MAX_DGRAM_QLEN	3

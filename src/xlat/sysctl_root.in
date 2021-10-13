@@ -1,20 +1,42 @@
+#sorted
 #enum
 #include <sys/types.h>
 #include <linux/sysctl.h>
-#unconditional
-CTL_KERN
-CTL_VM
-CTL_NET
-CTL_FS
-CTL_DEBUG
-CTL_DEV
-CTL_BUS
-CTL_ABI
-CTL_CPU
-#conditional
-CTL_PROC
-CTL_ARLAN
-CTL_S390DBF
-CTL_SUNRPC
-CTL_PM
-CTL_FRV
+/* 1.3.57 */
+CTL_KERN	1
+CTL_VM		2
+CTL_NET		3
+/* Removed in 2.6.18-rc1, eab03ac7 */
+/* Reappeared in 2.6.23-rc2, 0d0ed42e */
+CTL_PROC	4
+CTL_FS		5
+CTL_DEBUG	6
+CTL_DEV		7
+/* 2.2.7pre4 */
+CTL_BUS		8
+/* 2.4.9.8, 932f485f */
+CTL_ABI		9
+/* 2.4.14.3, d40d1af9 */
+CTL_CPU		10
+/* Added in 2.6.13-rc3, 0eeca283 */
+/* Removed in 2.6.13-rc4, 0399cb08, 2005-07-13 */
+CTL_INOTIFY	11
+/* Appeared in 2.5.63, 973d11a7 */
+/* Moved to sysctl.h. in 2.6.21-rc1, 59fc5313 */
+CTL_ARLAN	254
+/* Appeared in 2.6.4-rc1, 457ed08f */
+/* Moved to sysctl.h. in 2.6.21-rc1, feceb63ec */
+/* Removed in v2.6.24-rc4, 37e3a6ac, 2007-11-20 */
+CTL_APPLDATA	2120
+/* Appeared in 2.6.11-rc4, 464f3583 */
+/* Moved to sysctl.h. in 2.6.21-rc1, feceb63e */
+CTL_S390DBF	5677
+/* Appeared (probably) in 2.1.32 */
+/* Moved to sysctl.h in 2.6.21-rc1, 50d851f7 */
+CTL_SUNRPC	7249
+/* Appeared in 2.6.11-rc1, 1e1f2e5d */
+/* Moved to sysctl.h. in 2.6.21-rc1, 77f6dfb1 */
+CTL_FRV		9898
+/* Appeared in 2.6.11-rc1, d4c48371 */
+/* Moved to sysctl.h in 2.6.21-rc1, 462591b8 */
+CTL_PM		9899
