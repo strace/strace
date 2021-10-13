@@ -64,10 +64,15 @@ cond_def()
 			"#else" \
 			"# define $val $def" \
 			"#endif"
+
 	fi
 
-	[ XT_SORTED != "$xlat_type" ] ||
+	[ XT_SORTED != "$xlat_type" ] || {
+		printf "%s\n" "#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)"
 		check_sort_order "$val"
+		printf "%s\n" "#endif"
+	}
+
 }
 
 check_sort_order()
