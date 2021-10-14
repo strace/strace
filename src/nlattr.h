@@ -120,4 +120,30 @@ decode_nla_hwaddr_nofamily(struct tcb *const tcp,
 	return decode_nla_hwaddr(tcp, addr, len, NULL);
 }
 
+/* Common handling for AF_SPEC-type decoders */
+
+struct af_spec_decoder_desc {
+	uint8_t af;
+	const struct xlat *xlat;
+	const char *dflt;
+	const nla_decoder_t *table;
+	size_t size;
+};
+
+/**
+ * Non-standard decoder for handling AF_SPEC-type netlink attributes.
+ *
+ * @param af        Address family (AF_*), as passed to decoder in opaque_data
+ *                  parameter through zero-sized decoder table decode_nlattr
+ *                  hack.
+ * @param descs     List of supported decoders.
+ * @param desc_cnt  Number of items in descs.
+ */
+extern void decode_nla_af_spec(struct tcb *const tcp,
+			       const kernel_ulong_t addr,
+			       const unsigned int len,
+			       uint8_t af,
+			       const struct af_spec_decoder_desc *descs,
+			       size_t desc_cnt);
+
 #endif /* !STRACE_NLATTR_H */

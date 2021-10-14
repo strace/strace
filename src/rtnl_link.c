@@ -839,38 +839,21 @@ static const nla_decoder_t ifla_inet6_nla_decoders[] = {
 	[IFLA_INET6_ADDR_GEN_MODE]	= decode_ifla_inet6_agm,
 };
 
-static const struct nla_decoder_table_desc {
-	const struct xlat *xlat;
-	const char *dflt;
-	const nla_decoder_t *table;
-	size_t size;
-} ifla_af_spec_protos[] = {
-	[AF_INET]	= {
-		rtnl_ifla_af_spec_inet_attrs, "IFLA_INET_???",
-		ARRSZ_PAIR(ifla_inet_nla_decoders),
-	},
-	[AF_INET6]	= {
-		rtnl_ifla_af_spec_inet6_attrs, "IFLA_INET6_???",
-		ARRSZ_PAIR(ifla_inet6_nla_decoders),
-	},
-};
-
 static bool
 decode_ifla_af(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
 	       const unsigned int len,
 	       const void *const opaque_data)
 {
-	uintptr_t proto = (uintptr_t) opaque_data;
-	const struct nla_decoder_table_desc *desc
-		= proto < ARRAY_SIZE(ifla_af_spec_protos)
-			? ifla_af_spec_protos + proto : NULL;
+	static const struct af_spec_decoder_desc protos[] = {
+		{ AF_INET,  rtnl_ifla_af_spec_inet_attrs,  "IFLA_INET_???",
+		  ARRSZ_PAIR(ifla_inet_nla_decoders) },
+		{ AF_INET6, rtnl_ifla_af_spec_inet6_attrs, "IFLA_INET6_???",
+		  ARRSZ_PAIR(ifla_inet6_nla_decoders) },
+	};
 
-	if (!desc || !desc->table)
-		return false;
-
-	decode_nlattr(tcp, addr, len,
-		      desc->xlat, desc->dflt, desc->table, desc->size, NULL);
+	decode_nla_af_spec(tcp, addr, len,
+			   (uintptr_t) opaque_data, ARRSZ_PAIR(protos));
 
 	return true;
 }

@@ -340,32 +340,13 @@ decode_ifstats_af(struct tcb *const tcp,
 		  const unsigned int len,
 		  const void *const opaque_data)
 {
-	static const struct decoder_desc {
-		uint8_t af;
-		const struct xlat *xlat;
-		const char *dflt;
-		const nla_decoder_t *table;
-		size_t size;
-	} protos[] = {
+	static const struct af_spec_decoder_desc protos[] = {
 		{ AF_MPLS, ifstats_af_spec_mpls_attrs, "MPLS_STATS_???",
 		  ARRSZ_PAIR(ifla_stats_mpls_nla_decoders) },
 	};
 
-	uintptr_t proto = (uintptr_t) opaque_data;
-	const struct decoder_desc *desc = NULL;
-
-	for (size_t i = 0; i < ARRAY_SIZE(protos); i++) {
-		if (protos[i].af == proto) {
-			desc = protos + i;
-			break;
-		}
-	}
-
-	if (!desc)
-		return false;
-
-	decode_nlattr(tcp, addr, len,
-		      desc->xlat, desc->dflt, desc->table, desc->size, NULL);
+	decode_nla_af_spec(tcp, addr, len,
+			   (uintptr_t) opaque_data, ARRSZ_PAIR(protos));
 
 	return true;
 }
