@@ -19,6 +19,9 @@
 #include <linux/if_link.h>
 #include <linux/rtnetlink.h>
 
+#include "xlat.h"
+#include "xlat/addrfams.h"
+
 #define XLAT_MACROS_ONLY
 #include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
 #include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
@@ -144,10 +147,21 @@ main(void)
 
 
 	/* unknown AF_* */
-	TEST_NESTED_NLATTR_OBJECT(fd, nlh0, hdrlen,
-				  init_ifinfomsg, print_ifinfomsg,
-				  AF_UNIX, pattern, unknown_msg,
-				  printf("\"\\xab\\xac\\xdb\\xcd\""));
+	static uint8_t skip_afs[] = { AF_INET, AF_INET6 };
+	size_t pos = 0;
+	for (size_t i = 0; i < 256; i++) {
+		if (pos < ARRAY_SIZE(skip_afs) && skip_afs[pos] == i) {
+			pos += 1;
+			continue;
+		}
+
+		const char *af_str = sprintxval(addrfams, i, "AF_???");
+		TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
+					   init_ifinfomsg, print_ifinfomsg,
+					   i, af_str, pattern, unknown_msg,
+					   print_quoted_hex, 1,
+					   printf("\"\\xab\\xac\\xdb\\xcd\""));
+	}
 
 	/* AF_INET */
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
