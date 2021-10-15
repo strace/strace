@@ -26,6 +26,7 @@ ETH_P_IEEE802154 0x00F6		/* IEEE802.15.4 frame		*/
 ETH_P_CAIF	0x00F7		/* ST-Ericsson CAIF protocol	*/
 ETH_P_XDSA	0x00F8		/* Multiplexed DSA protocol	*/
 ETH_P_MAP	0x00F9		/* Qualcomm multiplexing and aggregation protocol */
+ETH_P_MCTP	0x00FA		/* Management component transport protocol (MCTP) packets */
 ETH_P_PUP	0x0200		/* Xerox PUP packet		*/
 ETH_P_PUPAT	0x0201		/* Xerox PUP Addr Trans packet	*/
 ETH_P_802_3_MIN	0x0600		/* If the value in the ethernet type is less than this value then the frame is Ethernet II. Else it is 802.3 */

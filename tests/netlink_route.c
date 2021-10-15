@@ -615,14 +615,14 @@ test_rtnl_nexthop(const int fd)
 		    .nh_protocol = RTPROT_KERNEL, .nh_flags = RTNH_F_DEAD, },
 		  "{nh_family=AF_UNIX", ", nh_scope=RT_SCOPE_UNIVERSE"
 		  ", nh_protocol=RTPROT_KERNEL, nh_flags=RTNH_F_DEAD}" },
-		{ { .nh_family = 44, .nh_scope = 200,
+		{ { .nh_family = 45, .nh_scope = 200,
 		    .nh_protocol = 5, .resvd=1, .nh_flags = 0x80, },
-		  "{nh_family=AF_XDP", ", nh_scope=RT_SCOPE_SITE"
+		  "{nh_family=AF_MCTP", ", nh_scope=RT_SCOPE_SITE"
 		  ", nh_protocol=0x5 /* RTPROT_??? */, resvd=0x1"
 		  ", nh_flags=0x80 /* RTNH_F_??? */}" },
-		{ { .nh_family = 45, .nh_scope = 201,
+		{ { .nh_family = 46, .nh_scope = 201,
 		    .nh_protocol = 99, .resvd=0xff, .nh_flags = 0xdeadbeef, },
-		  "{nh_family=0x2d /* AF_??? */", ", nh_scope=0xc9"
+		  "{nh_family=0x2e /* AF_??? */", ", nh_scope=0xc9"
 		  ", nh_protocol=RTPROT_OPENR, resvd=0xff, nh_flags=RTNH_F_DEAD"
 		  "|RTNH_F_PERVASIVE|RTNH_F_ONLINK|RTNH_F_OFFLOAD"
 		  "|RTNH_F_UNRESOLVED|RTNH_F_TRAP|0xdeadbe80}" },
@@ -657,13 +657,13 @@ test_rtnl_ifstats(const int fd)
 		    .ifindex = ifindex_lo(), .filter_mask = 0, },
 		  "{family=AF_UNIX", ", ifindex=" IFINDEX_LO_STR
 		  ", filter_mask=0}" },
-		{ { .family = 44, .pad1 = 0, .pad2 = 0xdead,
+		{ { .family = 45, .pad1 = 0, .pad2 = 0xdead,
 		    .ifindex = 0xdeadbeef, .filter_mask = 1, },
-		  "{family=AF_XDP", ", pad2=0xdead, ifindex=3735928559"
+		  "{family=AF_MCTP", ", pad2=0xdead, ifindex=3735928559"
 		  ", filter_mask=1<<IFLA_STATS_UNSPEC}" },
-		{ { .family = 45, .pad1 = 0xca, .pad2 = 0,
+		{ { .family = 46, .pad1 = 0xca, .pad2 = 0,
 		    .ifindex = ifindex_lo(), .filter_mask = 0xff, },
-		  "{family=0x2d /* AF_??? */", ", pad1=0xca"
+		  "{family=0x2e /* AF_??? */", ", pad1=0xca"
 		  ", ifindex=" IFINDEX_LO_STR
 		  ", filter_mask=1<<IFLA_STATS_UNSPEC|1<<IFLA_STATS_LINK_64"
 		  "|1<<IFLA_STATS_LINK_XSTATS|1<<IFLA_STATS_LINK_XSTATS_SLAVE"

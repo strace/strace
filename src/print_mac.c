@@ -44,6 +44,7 @@ static uint8_t hwaddr_sizes[] = {
 	[ARPHRD_X25]        =  0,
 	/* ARPHRD_HWX25 - no actual devices in Linux */
 	[ARPHRD_CAN]        =  0,
+	[ARPHRD_MCTP]       =  1,
 	[ARPHRD_PPP]        =  0,
 	/* ARPHRD_CISCO - no actual devices in Linux */
 	/* ARPHRD_LAPB - no actual devices in Linux */
