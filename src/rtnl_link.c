@@ -24,6 +24,7 @@
 #include "xlat/inet6_if_flags.h"
 #include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
 #include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
+#include "xlat/rtnl_ifla_af_spec_mctp_attrs.h"
 #include "xlat/rtnl_ifla_brport_attrs.h"
 #include "xlat/rtnl_ifla_events.h"
 #include "xlat/rtnl_ifla_info_attrs.h"
@@ -39,6 +40,10 @@
 #include "xlat/snmp_ip_stats.h"
 #include "xlat/tun_device_types.h"
 #include "xlat/xdp_flags.h"
+
+#define XLAT_MACROS_ONLY
+# include "xlat/addrfams.h"
+#undef XLAT_MACROS_ONLY
 
 static bool
 decode_ifla_hwaddr(struct tcb *const tcp,
@@ -839,6 +844,11 @@ static const nla_decoder_t ifla_inet6_nla_decoders[] = {
 	[IFLA_INET6_ADDR_GEN_MODE]	= decode_ifla_inet6_agm,
 };
 
+static const nla_decoder_t ifla_mctp_nla_decoders[] = {
+	[IFLA_MCTP_UNSPEC]	= NULL,
+	[IFLA_MCTP_NET]		= decode_nla_u32,
+};
+
 static bool
 decode_ifla_af(struct tcb *const tcp,
 	       const kernel_ulong_t addr,
@@ -850,6 +860,8 @@ decode_ifla_af(struct tcb *const tcp,
 		  ARRSZ_PAIR(ifla_inet_nla_decoders) },
 		{ AF_INET6, rtnl_ifla_af_spec_inet6_attrs, "IFLA_INET6_???",
 		  ARRSZ_PAIR(ifla_inet6_nla_decoders) },
+		{ AF_MCTP,  rtnl_ifla_af_spec_mctp_attrs,  "IFLA_MCTP_???",
+		  ARRSZ_PAIR(ifla_mctp_nla_decoders) },
 	};
 
 	decode_nla_af_spec(tcp, addr, len,

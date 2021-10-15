@@ -1,0 +1,4 @@
+#unconditional
+#value_indexed
+IFLA_MCTP_UNSPEC	0
+IFLA_MCTP_NET		1

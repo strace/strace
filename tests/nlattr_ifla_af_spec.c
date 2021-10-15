@@ -57,6 +57,7 @@
 
 AF_SPEC_FUNCS(AF_INET)
 AF_SPEC_FUNCS(AF_INET6)
+AF_SPEC_FUNCS(AF_MCTP)
 
 static void
 print_arr_val(uint32_t *val, size_t idx, const char *idx_str)
@@ -147,7 +148,7 @@ main(void)
 
 
 	/* unknown AF_* */
-	static uint8_t skip_afs[] = { AF_INET, AF_INET6 };
+	static uint8_t skip_afs[] = { AF_INET, AF_INET6, AF_MCTP };
 	size_t pos = 0;
 	for (size_t i = 0; i < 256; i++) {
 		if (pos < ARRAY_SIZE(skip_afs) && skip_afs[pos] == i) {
@@ -300,6 +301,22 @@ main(void)
 					      printf("%s", agms[i].str));
 	}
 
+
+	/* AF_MCTP */
+	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
+				      init_AF_MCTP_msg, print_AF_MCTP_msg,
+				      0, "IFLA_MCTP_UNSPEC", pattern,
+				      unknown_msg, print_quoted_hex, 2,
+				      printf("\"\\xab\\xac\\xdb\\xcd\""));
+	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
+				      init_AF_MCTP_msg, print_AF_MCTP_msg,
+				      2, "0x2 /* IFLA_MCTP_??? */", pattern,
+				      unknown_msg, print_quoted_hex, 2,
+				      printf("\"\\xab\\xac\\xdb\\xcd\""));
+
+	/* AF_MCTP: IFLA_MCTP_NET */
+	check_u32_nlattr(fd, nlh0, hdrlen, init_AF_MCTP_msg, print_AF_MCTP_msg,
+			 1, "IFLA_MCTP_NET", pattern, 2);
 
 	puts("+++ exited with 0 +++");
 	return 0;

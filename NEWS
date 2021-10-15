@@ -12,6 +12,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of RTM_{NEW,DEL,GET}NEXTHOP and RTM_{NEW,GET}STATS
     NETLINK_ROUTE netlink messages.
   * Implemented decoding of AF_MCTP socket addresses.
+  * Implemented decoding of AF_MCTP protocol for IFLA_AF_SPEC netlink attribute.
   * Enhanced decoding of io_uring_register and times syscalls.
   * Enhanced AF_IPX socket address decoding.
   * Updated lists o AF_*, ARPHRD_*, BTRFS_*, DM_*, ETH_P_*, FAN_REPORT_*,
