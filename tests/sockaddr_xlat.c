@@ -15,6 +15,8 @@
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
+#include <linux/mctp.h>
+
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
 # include <bluetooth/hci.h>
@@ -22,6 +24,11 @@
 # include <bluetooth/rfcomm.h>
 # include <bluetooth/sco.h>
 #endif
+
+#include "xlat.h"
+#define XLAT_MACROS_ONLY
+# include "xlat/addrfams.h"
+#undef XLAT_MACROS_ONLY
 
 static void
 check_ll(void)
@@ -256,6 +263,82 @@ check_rc(void)
 }
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
 
+static void
+check_mctp(void)
+{
+	static const struct {
+		struct sockaddr_mctp sa;
+		const char *str;
+	} mctp_vecs[] = {
+		{ { AF_MCTP },
+		  "{sa_family=" XLAT_KNOWN(0x2d, "AF_MCTP")
+		  ", smctp_network=" XLAT_KNOWN(0, "MCTP_NET_ANY")
+		  ", smctp_addr={s_addr=" XLAT_KNOWN(0, "MCTP_ADDR_NULL") "}"
+		  ", smctp_type=0, smctp_tag=0}" },
+		{ { AF_MCTP, .__smctp_pad0 = 0xdead,
+		    .smctp_network = MCTP_NET_ANY,
+		    .smctp_addr = { .s_addr = MCTP_ADDR_NULL } },
+		  "{sa_family=" XLAT_KNOWN(0x2d, "AF_MCTP")
+		  ", __smctp_pad0=0xdead"
+		  ", smctp_network=" XLAT_KNOWN(0, "MCTP_NET_ANY")
+		  ", smctp_addr={s_addr=" XLAT_KNOWN(0, "MCTP_ADDR_NULL") "}"
+		  ", smctp_type=0, smctp_tag=0}" },
+		{ { AF_MCTP, .smctp_network = -1234567890,
+		    .smctp_addr = { .s_addr = MCTP_ADDR_ANY },
+		    .smctp_type = 1, .smctp_tag = 8, .__smctp_pad1 = 0xea },
+		  "{sa_family=" XLAT_KNOWN(0x2d, "AF_MCTP")
+		  ", smctp_network=0xb669fd2e"
+		  ", smctp_addr={s_addr=" XLAT_KNOWN(0xff, "MCTP_ADDR_ANY") "}"
+		  ", smctp_type=0x1, smctp_tag=0x8, __smctp_pad1=0xea}" },
+		{ { AF_MCTP, .__smctp_pad0 = 0xface,
+		    .smctp_network = 2134567890,
+		    .smctp_addr = { .s_addr = 0x42 },
+		    .smctp_type = 0x23, .smctp_tag = 0x69,
+		    .__smctp_pad1= 0xda },
+		  "{sa_family=" XLAT_KNOWN(0x2d, "AF_MCTP")
+		  ", __smctp_pad0=0xface, smctp_network=0x7f3aebd2"
+		  ", smctp_addr={s_addr=0x42}, smctp_type=0x23"
+		  ", smctp_tag=0x69, __smctp_pad1=0xda}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_mctp, sa_mctp);
+	int rc;
+
+	fill_memory(sa_mctp, sizeof(*sa_mctp));
+	sa_mctp->smctp_family = AF_MCTP;
+
+	rc = connect(-1, (void *) sa_mctp, sizeof(*sa_mctp) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_mctp, sizeof(*sa_mctp) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_mctp, sizeof(*sa_mctp) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x2d, "AF_MCTP")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_mctp + sizeof(sa_mctp->smctp_family),
+			    sizeof(*sa_mctp) - sizeof(sa_mctp->smctp_family)
+					     - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_mctp) - 1, errstr);
+
+	rc = connect(-1, (void *) sa_mctp, sizeof(*sa_mctp));
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x2d, "AF_MCTP")
+	       ", __smctp_pad0=%#hx, smctp_network=%#x"
+	       ", smctp_addr={s_addr=%#hhx}, smctp_type=%#hhx, smctp_tag=%#hhx"
+	       ", __smctp_pad1=%#hhx}, %zu) = %s\n",
+	       sa_mctp->__smctp_pad0, sa_mctp->smctp_network,
+	       sa_mctp->smctp_addr.s_addr, sa_mctp->smctp_type,
+	       sa_mctp->smctp_tag, sa_mctp->__smctp_pad1, sizeof(*sa_mctp),
+	       sprintrc(rc));
+
+	for (size_t i = 0; i < ARRAY_SIZE(mctp_vecs); i++) {
+		*sa_mctp = mctp_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_mctp, sizeof(*sa_mctp));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       mctp_vecs[i].str, sizeof(*sa_mctp), sprintrc(rc));
+	}
+}
+
 int
 main(void)
 {
@@ -266,6 +349,8 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_mctp();
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

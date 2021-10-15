@@ -848,9 +848,9 @@ sock_filter-v	-v -e trace=getsockopt,setsockopt
 sock_filter-v-Xabbrev	-v -e trace=getsockopt,setsockopt -X abbrev
 sock_filter-v-Xraw	-a 37 -v -e trace=getsockopt,setsockopt -X raw
 sock_filter-v-Xverbose	-v -e trace=getsockopt,setsockopt -X verbose
-sockaddr_xlat-Xabbrev	-Xabbrev -e trace=connect
-sockaddr_xlat-Xraw	-Xraw -e trace=connect
-sockaddr_xlat-Xverbose	-Xverbose -e trace=connect
+sockaddr_xlat-Xabbrev	-Xabbrev -e trace=connect -a22
+sockaddr_xlat-Xraw	-Xraw -e trace=connect -a22
+sockaddr_xlat-Xverbose	-Xverbose -e trace=connect -a22
 socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
 sockopt-timestamp	-e trace=recvmsg

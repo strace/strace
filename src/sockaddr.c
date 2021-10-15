@@ -22,6 +22,7 @@
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
+#include <linux/mctp.h>
 #include <linux/x25.h>
 
 #include "xlat/addrfams.h"
@@ -33,6 +34,9 @@
 #include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
+
+#include "xlat/mctp_addrs.h"
+#include "xlat/mctp_nets.h"
 
 #define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
 
@@ -700,6 +704,33 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 	}
 }
 
+static void
+print_sockaddr_data_mctp(struct tcb *tcp, const void *const buf,
+			 const int addrlen)
+{
+	const struct sockaddr_mctp *const sa_mctp = buf;
+
+	if (sa_mctp->__smctp_pad0) {
+		PRINT_FIELD_X(*sa_mctp, __smctp_pad0);
+		tprint_struct_next();
+	}
+	PRINT_FIELD_XVAL(*sa_mctp, smctp_network, mctp_nets, NULL);
+	tprint_struct_next();
+	tprints_field_name("smctp_addr");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(sa_mctp->smctp_addr, s_addr, mctp_addrs, NULL);
+	tprint_struct_end();
+	tprint_struct_next();
+	PRINT_FIELD_X(*sa_mctp, smctp_type);
+	tprint_struct_next();
+	PRINT_FIELD_X(*sa_mctp, smctp_tag);
+	if (sa_mctp->__smctp_pad1) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*sa_mctp, __smctp_pad1);
+	}
+
+}
+
 typedef void (* const sockaddr_printer)(struct tcb *tcp, const void *const, const int);
 
 static const struct {
@@ -715,6 +746,7 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_MCTP] = { print_sockaddr_data_mctp, sizeof(struct sockaddr_mctp) },
 };
 
 void
