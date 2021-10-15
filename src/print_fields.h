@@ -441,6 +441,14 @@ tprints_arg_begin(const char *name)
 			    (dflt_));		\
 	} while (0)
 
+# define PRINT_FIELD_XVAL_D(where_, field_, xlat_, dflt_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		printxval64_d((xlat_),					\
+			      sign_extend_unsigned_to_ll((where_).field_), \
+			      (dflt_));					\
+	} while (0)
+
 # define PRINT_FIELD_XVAL_U(where_, field_, xlat_, dflt_)		\
 	do {								\
 		tprints_field_name(#field_);				\
