@@ -64,11 +64,18 @@ main(void)
 
 	k_move_mount(dfd, fname, -100, empty, 1);
 	printf("move_mount(%d<%s>, \"%.*s\"..., AT_FDCWD, \"\", %s) = %s\n",
-	       dfd, path, (int) PATH_MAX - 1, fname, "MOVE_MOUNT_F_SYMLINKS", errstr);
+	       dfd, path, (int) PATH_MAX - 1, fname, "MOVE_MOUNT_F_SYMLINKS",
+	       errstr);
 
 	k_move_mount(-100, empty, dfd, fname, 0x10);
 	printf("move_mount(AT_FDCWD, \"\", %d<%s>, \"%.*s\"..., %s) = %s\n",
-	       dfd, path, (int) PATH_MAX - 1, fname, "MOVE_MOUNT_T_SYMLINKS", errstr);
+	       dfd, path, (int) PATH_MAX - 1, fname, "MOVE_MOUNT_T_SYMLINKS",
+	       errstr);
+
+	k_move_mount(-100, empty, dfd, fname, 0x100);
+	printf("move_mount(AT_FDCWD, \"\", %d<%s>, \"%.*s\"..., %s) = %s\n",
+	       dfd, path, (int) PATH_MAX - 1, fname, "MOVE_MOUNT_SET_GROUP",
+	       errstr);
 
 #define f_flags_str "MOVE_MOUNT_F_SYMLINKS|MOVE_MOUNT_F_AUTOMOUNTS|MOVE_MOUNT_F_EMPTY_PATH"
 	fname[PATH_MAX - 1] = '\0';
@@ -81,13 +88,20 @@ main(void)
 	printf("move_mount(AT_FDCWD, \"\", %d<%s>, \"%s\", %s) = %s\n",
 	       dfd, path, fname, t_flags_str, errstr);
 
-	k_move_mount(-1, path, -100, empty, 0x77);
+#define set_group_str "MOVE_MOUNT_SET_GROUP"
+	k_move_mount(-100, empty, dfd, fname, 0x100);
+	printf("move_mount(AT_FDCWD, \"\", %d<%s>, \"%s\", %s) = %s\n",
+	       dfd, path, fname, set_group_str, errstr);
+
+	k_move_mount(-1, path, -100, empty, 0x177);
 	printf("move_mount(-1, \"%s\", AT_FDCWD, \"\", %s) = %s\n",
-	       path, f_flags_str "|" t_flags_str, errstr);
+	       path, f_flags_str "|" t_flags_str "|" set_group_str, errstr);
 
 	k_move_mount(-100, empty, -1, path, -1);
 	printf("move_mount(AT_FDCWD, \"\", -1, \"%s\", %s) = %s\n",
-	       path, f_flags_str "|" t_flags_str "|0xffffff88", errstr);
+	       path,
+	       f_flags_str "|" t_flags_str "|" set_group_str "|0xfffffe88",
+	       errstr);
 
 	puts("+++ exited with 0 +++");
 	return 0;

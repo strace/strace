@@ -16,7 +16,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of io_uring_register and times syscalls.
   * Enhanced AF_IPX socket address decoding.
   * Updated lists o AF_*, ARPHRD_*, BTRFS_*, DM_*, ETH_P_*, FAN_REPORT_*,
-    IORING_*, MPOL_*, PACKET_*, and RTM_* constants.
+    IORING_*, MOVE_MOUNT_*, MPOL_*, PACKET_*, and RTM_* constants.
   * Updated lists of ioctl commands from Linux 5.15.
 
 * Bug fixes
