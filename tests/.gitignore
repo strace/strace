@@ -556,6 +556,10 @@ nlattr_ifla_brport-Xraw
 nlattr_ifla_brport-Xverbose
 nlattr_ifla_linkinfo
 nlattr_ifla_port
+nlattr_ifla_protinfo
+nlattr_ifla_protinfo-Xabbrev
+nlattr_ifla_protinfo-Xraw
+nlattr_ifla_protinfo-Xverbose
 nlattr_ifla_proto_down_reason
 nlattr_ifla_xdp
 nlattr_ifla_xdp-y

@@ -15,6 +15,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of AF_MCTP protocol for IFLA_AF_SPEC netlink attribute.
   * Implemented decoding of IFLA_INET6_RA_MTU netlink attribute.
   * Enhanced decoding of io_uring_register and times syscalls.
+  * Enhanced IFLA_PROTINFO netlink attribute decoding.
   * Enhanced AF_IPX socket address decoding.
   * Updated lists o AF_*, ARPHRD_*, BTRFS_*, DEVCONF_*, DM_*, ETH_P_*,
     FAN_REPORT_*, IORING_*, MOVE_MOUNT_*, MPOL_*, PACKET_*, RTM_*, SO_*,

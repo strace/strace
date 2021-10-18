@@ -17,6 +17,8 @@
 #include <linux/rtnetlink.h>
 
 #define IFLA_ATTR IFLA_PROTINFO
+#define IFLA_AF AF_BRIDGE
+#define IFLA_AF_STR "AF_BRIDGE"
 #include "nlattr_ifla.h"
 
 #define ENUM_KNOWN(val_, enum_) enum_, XLAT_KNOWN(val_, #enum_)

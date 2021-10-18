@@ -531,6 +531,10 @@ nlattr_ifla_brport-Xraw		+netlink_sock_diag.test -Xraw
 nlattr_ifla_brport-Xverbose	+netlink_sock_diag.test -Xverbose
 nlattr_ifla_linkinfo		+netlink_sock_diag.test
 nlattr_ifla_port		+netlink_sock_diag.test
+nlattr_ifla_protinfo		+netlink_sock_diag.test
+nlattr_ifla_protinfo-Xabbrev	+netlink_sock_diag.test -Xabbrev
+nlattr_ifla_protinfo-Xraw	+netlink_sock_diag.test -Xraw
+nlattr_ifla_protinfo-Xverbose	+netlink_sock_diag.test -Xverbose
 nlattr_ifla_proto_down_reason	+netlink_sock_diag.test
 nlattr_ifla_xdp			+netlink_sock_diag.test
 nlattr_ifla_xdp-y		+netlink_sock_diag.test -y; exec 9</dev/full

@@ -641,6 +641,7 @@ EXTRA_DIST = \
 	match.awk \
 	net.expected \
 	nlattr_ifla.h \
+	nlattr_ifla_af_inet6.h \
 	pipe.expected \
 	poke-range.expected \
 	poke-unaligned.expected \
