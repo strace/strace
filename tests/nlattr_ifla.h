@@ -17,6 +17,13 @@
 #  error "Please define IFLA_ATTR before including this file"
 # endif
 
+# ifndef IFLA_AF
+#  define IFLA_AF AF_UNIX
+# endif
+# ifndef IFLA_AF_STR
+#  define IFLA_AF_STR "AF_UNIX"
+# endif
+
 static const unsigned int hdrlen = sizeof(struct ifinfomsg);
 
 static void
@@ -30,7 +37,7 @@ init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 
 	struct ifinfomsg *const msg = NLMSG_DATA(nlh);
 	SET_STRUCT(struct ifinfomsg, msg,
-		.ifi_family = AF_UNIX,
+		.ifi_family = IFLA_AF,
 		.ifi_type = ARPHRD_LOOPBACK,
 		.ifi_index = ifindex_lo(),
 		.ifi_flags = IFF_UP,
@@ -47,12 +54,12 @@ static void
 print_ifinfomsg(const unsigned int msg_len)
 {
 	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETLINK, nlmsg_flags=NLM_F_DUMP"
-	       ", nlmsg_seq=0, nlmsg_pid=0}, {ifi_family=AF_UNIX"
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {ifi_family=%s"
 	       ", ifi_type=ARPHRD_LOOPBACK"
 	       ", ifi_index=" IFINDEX_LO_STR
 	       ", ifi_flags=IFF_UP, ifi_change=0}"
 	       ", [{nla_len=%u, nla_type=" STRINGIFY_VAL(IFLA_ATTR) "}",
-	       msg_len, msg_len - NLMSG_SPACE(hdrlen));
+	       msg_len, IFLA_AF_STR, msg_len - NLMSG_SPACE(hdrlen));
 }
 
 #endif /* STRACE_TESTS_NLATTR_IFLA_H */
