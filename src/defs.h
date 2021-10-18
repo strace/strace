@@ -415,6 +415,7 @@ extern const struct xlat ip_type_of_services[];
 extern const struct xlat ipc_private[];
 extern const struct xlat msg_flags[];
 extern const struct xlat netlink_protocols[];
+extern const struct xlat nl_bridge_vlan_flags[];
 extern const struct xlat nl_netfilter_msg_types[];
 extern const struct xlat nl_route_types[];
 extern const struct xlat open_access_modes[];

@@ -15,7 +15,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     and RTM_{NEW,GET}STATS NETLINK_ROUTE netlink messages.
   * Implemented decoding of AF_ALG, AF_IEEE802154, AF_MCTP, AF_NFC, AF_QIPCRTR,
     AF_RRPC, AF_VSOCK, and AF_XDP socket addresses.
-  * Implemented decoding of AF_MCTP protocol for IFLA_AF_SPEC netlink attribute.
+  * Implemented decoding of AF_BRIDGE and AF_MCTP protocols for IFLA_AF_SPEC
+    netlink attribute.
   * Implemented decoding of IFLA_BR_MCAST_QUERIER_STATE, IFLA_BR_MULTI_BOOLOPT,
     IFLA_INET6_RA_MTU, IFLA_INFO_SLAVE_DATA, and IFLA_VFINFO_LIST netlink
     attributes.

@@ -1,0 +1,3 @@
+#unconditional
+BRIDGE_FLAGS_MASTER	1
+BRIDGE_FLAGS_SELF	2

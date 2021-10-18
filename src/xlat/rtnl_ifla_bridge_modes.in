@@ -1,0 +1,5 @@
+#unconditional
+#sorted
+BRIDGE_MODE_VEB		0
+BRIDGE_MODE_VEPA	1
+BRIDGE_MODE_UNDEF	0xffff

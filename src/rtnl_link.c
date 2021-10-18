@@ -16,6 +16,7 @@
 #include <netinet/in.h>
 
 #include <linux/rtnetlink.h>
+#include <linux/if_bridge.h>
 #include <linux/if_link.h>
 #include <linux/if_bridge.h>
 
@@ -23,9 +24,13 @@
 #include "xlat/inet_devconf_indices.h"
 #include "xlat/inet6_devconf_indices.h"
 #include "xlat/inet6_if_flags.h"
+#include "xlat/rtnl_ifla_af_spec_bridge_attrs.h"
+#include "xlat/rtnl_ifla_af_spec_bridge_vlan_tunnel_info_attrs.h"
 #include "xlat/rtnl_ifla_af_spec_inet_attrs.h"
 #include "xlat/rtnl_ifla_af_spec_inet6_attrs.h"
 #include "xlat/rtnl_ifla_af_spec_mctp_attrs.h"
+#include "xlat/rtnl_ifla_bridge_flags.h"
+#include "xlat/rtnl_ifla_bridge_modes.h"
 #include "xlat/rtnl_ifla_brport_attrs.h"
 #include "xlat/rtnl_ifla_br_boolopts.h"
 #include "xlat/rtnl_ifla_br_boolopt_flags.h"
@@ -1395,15 +1400,158 @@ decode_ifla_af(struct tcb *const tcp,
 }
 
 static bool
+decode_ifla_bridge_flags(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		rtnl_ifla_bridge_flags, "BRIDGE_FLAGS_???", .size = 2,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static bool
+decode_ifla_bridge_mode(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		rtnl_ifla_bridge_modes, "BRIDGE_MODE_???", .size = 2,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static bool
+decode_ifla_bridge_vlan_info(struct tcb *const tcp,
+			     const kernel_ulong_t addr,
+			     const unsigned int len,
+			     const void *const opaque_data)
+{
+	struct bridge_vlan_info bvi;
+
+	if (len < sizeof(bvi))
+		return false;
+
+	if (umove_or_printaddr(tcp, addr, &bvi))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS(bvi, flags, nl_bridge_vlan_flags,
+			  "BRIDGE_VLAN_INFO_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(bvi, vid);
+	tprint_struct_end();
+
+	if (len > sizeof(bvi)) {
+		tprint_array_next();
+		printstr_ex(tcp, addr + sizeof(bvi), len - sizeof(bvi),
+			    QUOTE_FORCE_HEX);
+	}
+
+	return true;
+}
+
+static bool
+decode_bridge_vlan_info_flags(struct tcb *const tcp,
+			      const kernel_ulong_t addr,
+			      const unsigned int len,
+			      const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		nl_bridge_vlan_flags, "BRIDGE_VLAN_INFO_???", .size = 2,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t ifla_af_spec_bridge_vlan_tunnel_info_decoders[] = {
+	[IFLA_BRIDGE_VLAN_TUNNEL_UNSPEC]	= NULL,
+	[IFLA_BRIDGE_VLAN_TUNNEL_ID]		= decode_nla_u32,
+	[IFLA_BRIDGE_VLAN_TUNNEL_VID]		= decode_nla_u16,
+	[IFLA_BRIDGE_VLAN_TUNNEL_FLAGS]		= decode_bridge_vlan_info_flags,
+};
+
+static bool
+decode_ifla_bridge_vlan_tunnel_info(struct tcb *const tcp,
+				    const kernel_ulong_t addr,
+				    const unsigned int len,
+				    const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len,
+		      rtnl_ifla_af_spec_bridge_vlan_tunnel_info_attrs,
+		      "IFLA_BRIDGE_VLAN_TUNNEL_???",
+		      ARRSZ_PAIR(ifla_af_spec_bridge_vlan_tunnel_info_decoders),
+		      opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t ifla_af_spec_bridge_nla_decoders[] = {
+	[IFLA_BRIDGE_FLAGS]		= decode_ifla_bridge_flags,
+	[IFLA_BRIDGE_MODE]		= decode_ifla_bridge_mode,
+	[IFLA_BRIDGE_VLAN_INFO]		= decode_ifla_bridge_vlan_info,
+	[IFLA_BRIDGE_VLAN_TUNNEL_INFO]	= decode_ifla_bridge_vlan_tunnel_info,
+	[IFLA_BRIDGE_MRP]		= NULL, /* unimplemented */
+	[IFLA_BRIDGE_CFM]		= NULL, /* unimplemented */
+};
+
+/**
+ * In a wonderful world of netlink interfaces (thanks, the author
+ * of Linux commit v3.8-rc1~139^2~542 who completely ignored the original
+ * IFLA_AF_SPEC attribute description provided in if_link.h since
+ * v2.6.38-rc1~476^2~532!), IFLA_AF_SPEC has different structure depending
+ * on context, cf. the original IFLA_AF_SPEC comment in if_link.h
+ * and the IFLA_AF_SPEC description in if_bridge.h:
+ *
+ * <if_link.h>
+ * IFLA_AF_SPEC
+ *   Contains nested attributes for address family specific attributes.
+ *   Each address family may create a attribute with the address family
+ *   number as type and create its own attribute structure in it.
+ *
+ *   Example:
+ *   [IFLA_AF_SPEC] = {
+ *       [AF_INET] = {
+ *           [IFLA_INET_CONF] = ...,
+ *       },
+ *       [AF_INET6] = {
+ *           [IFLA_INET6_FLAGS] = ...,
+ *           [IFLA_INET6_CONF] = ...,
+ *       }
+ *   }
+ *
+ * <if_bridge.h>
+ * Bridge management nested attributes
+ * [IFLA_AF_SPEC] = {
+ *     [IFLA_BRIDGE_FLAGS]
+ *     [IFLA_BRIDGE_MODE]
+ *     [IFLA_BRIDGE_VLAN_INFO]
+ * }
+ */
+static bool
 decode_ifla_af_spec(struct tcb *const tcp,
 		    const kernel_ulong_t addr,
 		    const unsigned int len,
 		    const void *const opaque_data)
 {
-	nla_decoder_t af_spec_decoder = &decode_ifla_af;
+	const struct ifinfomsg *ifinfo = (const struct ifinfomsg *) opaque_data;
 
-	decode_nlattr(tcp, addr, len, addrfams, "AF_???",
-		      &af_spec_decoder, 0, 0);
+	/* AF_BRIDGE is a special snowflake */
+	if (ifinfo->ifi_family == AF_BRIDGE) {
+		decode_nlattr(tcp, addr, len, rtnl_ifla_af_spec_bridge_attrs,
+			      "IFLA_BRIDGE_???",
+			      ARRSZ_PAIR(ifla_af_spec_bridge_nla_decoders),
+			      opaque_data);
+	} else {
+		nla_decoder_t af_spec_decoder = &decode_ifla_af;
+
+		decode_nlattr(tcp, addr, len, addrfams, "AF_???",
+			      &af_spec_decoder, 0, 0);
+	}
 
 	return true;
 }
