@@ -53,13 +53,16 @@ init_ifinfomsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 static void
 print_ifinfomsg(const unsigned int msg_len)
 {
-	printf("{nlmsg_len=%u, nlmsg_type=RTM_GETLINK, nlmsg_flags=NLM_F_DUMP"
-	       ", nlmsg_seq=0, nlmsg_pid=0}, {ifi_family=%s"
-	       ", ifi_type=ARPHRD_LOOPBACK"
-	       ", ifi_index=" IFINDEX_LO_STR
-	       ", ifi_flags=IFF_UP, ifi_change=0}"
-	       ", [{nla_len=%u, nla_type=" STRINGIFY_VAL(IFLA_ATTR) "}",
-	       msg_len, IFLA_AF_STR, msg_len - NLMSG_SPACE(hdrlen));
+	printf("{nlmsg_len=%u, nlmsg_type=" XLAT_FMT ", nlmsg_flags=" XLAT_FMT
+	       ", nlmsg_seq=0, nlmsg_pid=0}, {ifi_family=" XLAT_FMT
+	       ", ifi_type=" XLAT_FMT ", ifi_index=" XLAT_FMT_U
+	       ", ifi_flags=" XLAT_FMT ", ifi_change=0}"
+	       ", [{nla_len=%u, nla_type=" XLAT_FMT "}",
+	       msg_len, XLAT_ARGS(RTM_GETLINK), XLAT_ARGS(NLM_F_DUMP),
+	       XLAT_SEL(IFLA_AF, IFLA_AF_STR), XLAT_ARGS(ARPHRD_LOOPBACK),
+	       XLAT_SEL(ifindex_lo(), IFINDEX_LO_STR), XLAT_ARGS(IFF_UP),
+	       msg_len - NLMSG_SPACE(hdrlen),
+	       XLAT_SEL(IFLA_ATTR, STRINGIFY_VAL(IFLA_ATTR)));
 }
 
 #endif /* STRACE_TESTS_NLATTR_IFLA_H */
