@@ -526,6 +526,9 @@ nlattr_ifaddrmsg		+netlink_sock_diag.test
 nlattr_ifinfomsg		+netlink_sock_diag.test
 nlattr_ifla_af_spec		+netlink_sock_diag.test
 nlattr_ifla_brport		+netlink_sock_diag.test
+nlattr_ifla_brport-Xabbrev	+netlink_sock_diag.test -Xabbrev
+nlattr_ifla_brport-Xraw		+netlink_sock_diag.test -Xraw
+nlattr_ifla_brport-Xverbose	+netlink_sock_diag.test -Xverbose
 nlattr_ifla_linkinfo		+netlink_sock_diag.test
 nlattr_ifla_port		+netlink_sock_diag.test
 nlattr_ifla_proto_down_reason	+netlink_sock_diag.test
