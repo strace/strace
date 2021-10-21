@@ -625,6 +625,11 @@ tprints_arg_begin(const char *name)
 			       (size_), (hwtype_));			\
 	} while (0)
 
+#define PRINT_FIELD_PIXFMT(where_, field_, xlat_)			\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_pixelformat((where_).field_, (xlat_));		\
+	} while (0)
 
 # define PRINT_FIELD_OBJ_PTR(where_, field_, print_func_, ...)		\
 	do {								\

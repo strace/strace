@@ -440,6 +440,7 @@ extern const struct xlat socketlayers[];
 extern const struct xlat socktypes[];
 extern const struct xlat tcp_state_flags[];
 extern const struct xlat tcp_states[];
+extern const struct xlat v4l2_pix_fmts[];
 extern const struct xlat whence_codes[];
 
 /* Format of syscall return values */
@@ -1014,6 +1015,7 @@ extern void print_dev_t(unsigned long long dev);
 extern void print_kernel_version(unsigned long version);
 extern void print_abnormal_hi(kernel_ulong_t);
 extern void print_ioprio(unsigned int ioprio);
+extern void print_pixelformat(uint32_t fourcc, const struct xlat *xlat);
 
 extern bool print_int_array_member(struct tcb *, void *elem_buf,
 				   size_t elem_size, void *data);
