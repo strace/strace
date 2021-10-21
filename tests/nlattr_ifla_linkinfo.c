@@ -242,7 +242,7 @@ main(void)
 {
 	static const uint8_t unknown_msg[] = { 0xab, 0xac, 0xdb, 0xcd };
 	static const char *unsupported_tunnel_types[] = {
-		"batadv", "bond",
+		"batadv", "bareudp", "bond",
 		"caif", "cfhsi",
 		"dummy",
 		"erspan",
@@ -260,6 +260,8 @@ main(void)
 		"team",
 		"vcan", "veth", "vlan", "vrf", "vsockmon",
 		"vti", "vti6", "vxcan", "vxlan",
+		"wireguard", "wwan",
+		"xfrm",
 		NULL
 	};
 	static const char *unsupported_xstats_types[] = {
