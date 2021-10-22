@@ -33,3 +33,4 @@
 [BASE_NR + 446] = { 2,	TD,		SEN(landlock_restrict_self),	"landlock_restrict_self"	},
 [BASE_NR + 447] = { 1,	TD,		SEN(memfd_secret),		"memfd_secret"			},
 [BASE_NR + 448] = { 2,	TD,		SEN(process_mrelease),		"process_mrelease"	},
+[BASE_NR + 449] = { 5,	0,		SEN(futex_waitv),		"futex_waitv"	},
