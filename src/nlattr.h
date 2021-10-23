@@ -28,7 +28,8 @@ struct decode_nla_xlat_opts {
  * between calls as an opaque data.
  */
 struct ifla_linkinfo_ctx {
-	char kind[16];
+	char kind[64];
+	char slave_kind[64];
 };
 
 typedef bool (*nla_decoder_t)(struct tcb *, kernel_ulong_t addr,

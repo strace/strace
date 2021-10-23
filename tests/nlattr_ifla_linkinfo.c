@@ -34,7 +34,7 @@
 #include "nlattr_ifla.h"
 
 #define COMMA ,
-#define TEST_UNKNOWN_TUNNELS(fd_, nlh0_, objtype_, objtype_str_,	\
+#define TEST_UNKNOWN_TUNNELS(fd_, nlh0_, kindtype_, objtype_, objtype_str_, \
 			     obj_, objsz_, arrstrs_, ...)		\
 	do {								\
 		/* 64 is guestimate for maximum unknown type len */	\
@@ -74,7 +74,7 @@
 					(nlh0_) - hdrlen - (pos - buf),	\
 					hdrlen + NLA_HDRLEN,		\
 					init_ifinfomsg, print_ifinfomsg, \
-					IFLA_INFO_KIND, "IFLA_INFO_KIND", \
+					(kindtype_), #kindtype_,	\
 					type_len, objsz_ + (pos - buf),	\
 					buf, objsz_ + (pos - buf),	\
 					printf("\"%s\"]", type);	\
@@ -89,8 +89,8 @@
 		}							\
 	} while (0)
 
-#define TEST_LINKINFO_(fd_, nlh0_, nla_type_, nla_type_str_, tuntype_,	\
-		       obj_, objsz_, pattern_, fallback_func_, ...)	\
+#define TEST_LINKINFO_(fd_, nlh0_, kindtype_, nla_type_, nla_type_str_,	\
+		       tuntype_, obj_, objsz_, pattern_, fallback_func_, ...) \
 	do {								\
 		size_t tuntype_len = strlen(tuntype_) + 1;		\
 		char *buf = tail_alloc(NLA_ALIGN(tuntype_len)		\
@@ -113,7 +113,7 @@
 					(nlh0_) - NLA_HDRLEN,		\
 					hdrlen + NLA_HDRLEN,		\
 					init_ifinfomsg, print_ifinfomsg, \
-					IFLA_INFO_KIND, "IFLA_INFO_KIND", \
+					(kindtype_), #kindtype_,	\
 					tuntype_len,			\
 					objsz_ + (pos - buf) - 1,	\
 					buf, objsz_ + (pos - buf) - 1,	\
@@ -130,7 +130,7 @@
 		TEST_NLATTR_EX_((fd_), (nlh0_) - NLA_HDRLEN,		\
 				hdrlen + NLA_HDRLEN,			\
 				init_ifinfomsg, print_ifinfomsg,	\
-				IFLA_INFO_KIND, "IFLA_INFO_KIND",	\
+				(kindtype_), #kindtype_,		\
 				tuntype_len, objsz_ + (pos - buf),	\
 				buf, objsz_ + (pos - buf) - 1,		\
 				printf("\"%s\"]", (tuntype_));		\
@@ -146,7 +146,7 @@
 		TEST_NLATTR_EX_((fd_), (nlh0_) - NLA_HDRLEN,		\
 				hdrlen + NLA_HDRLEN,			\
 				init_ifinfomsg, print_ifinfomsg,	\
-				IFLA_INFO_KIND, "IFLA_INFO_KIND",	\
+				(kindtype_), #kindtype_,		\
 				tuntype_len, objsz_ + (pos - buf),	\
 				buf, objsz_ + (pos - buf),		\
 				printf("\"%s\"]", (tuntype_));		\
@@ -159,13 +159,13 @@
 				printf("]"));				\
 	} while (0)
 
-#define TEST_LINKINFO(fd_, nlh0_, nla_type_, tuntype_,	\
-		      obj_, pattern_, fallback_func_, ...)	\
-	TEST_LINKINFO_((fd_), (nlh0_), nla_type_, #nla_type_, (tuntype_), \
-		       (obj_), sizeof(obj_), pattern_, fallback_func_,	\
-		       __VA_ARGS__)
+#define TEST_LINKINFO(fd_, nlh0_, kindtype_, nla_type_, tuntype_,	\
+		      obj_, pattern_, fallback_func_, ...)		\
+	TEST_LINKINFO_((fd_), (nlh0_), kindtype_, nla_type_, #nla_type_, \
+		       (tuntype_), (obj_), sizeof(obj_), pattern_,	\
+		       fallback_func_, __VA_ARGS__)
 
-#define TEST_NESTED_LINKINFO(fd_, nlh0_,				\
+#define TEST_NESTED_LINKINFO(fd_, nlh0_, kindtype_,			\
 			     nla_type_, nla_type_str_, tuntype_,	\
 			     subnla_type_, subnla_type_str_,		\
 			     obj_, pattern_, ...)			\
@@ -219,7 +219,7 @@
 		TEST_NLATTR_EX_((fd_), (nlh0_) - hdrlen - tunhdrlen,	\
 				hdrlen + NLA_HDRLEN,			\
 				init_ifinfomsg, print_ifinfomsg,	\
-				IFLA_INFO_KIND, "IFLA_INFO_KIND",	\
+				(kindtype_), #kindtype_,		\
 				tuntype_len, buflen,			\
 				buf, buflen,				\
 				printf("\"%s\"]", (tuntype_));		\
@@ -301,6 +301,18 @@ main(void)
 		"can",
 		NULL
 	};
+	static const char *const unsupported_slave_data_types[] = {
+		"can",
+		"tun",
+		NULL
+	};
+	/* supported by at least one attribute */
+	static const char *const supported_tunnel_types[] = {
+		"bridge",
+		"can",
+		"tun",
+		NULL
+	};
 
 	skip_if_unavailable("/proc/self/fd/");
 
@@ -335,27 +347,28 @@ main(void)
 
 
 	/* IFLA_INFO_KIND + IFLA_INFO_UNSPEC */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_UNSPEC, "IFLA_INFO_UNSPEC",
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
+			     IFLA_INFO_UNSPEC, "IFLA_INFO_UNSPEC",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
-			      unsupported_xstats_types COMMA
-			      unsupported_data_types COMMA
+			      supported_tunnel_types COMMA
 			      NULL},
 			     printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 
 	/* IFLA_INFO_KIND + IFLA_INFO_KIND */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND, "IFLA_INFO_KIND",
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
+			     IFLA_INFO_KIND, "IFLA_INFO_KIND",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
-			      unsupported_xstats_types COMMA
-			      unsupported_data_types COMMA
+			      supported_tunnel_types COMMA
 			      NULL},
 			     printf("\"\\253\\254\\333\\315\"..."));
 
 
 	/* IFLA_INFO_KIND + IFLA_INFO_DATA */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_DATA, "IFLA_INFO_DATA",
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
+			     IFLA_INFO_DATA, "IFLA_INFO_DATA",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
 			      unsupported_data_types COMMA
@@ -381,7 +394,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(und_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     und_br_attrs[k].val, und_br_attrs[k].name,
 				     unknown_msg, pattern,
 				     { 2, "\"\\xab\\xac\"" },
@@ -399,7 +413,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(hwa_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     hwa_br_attrs[k].val, hwa_br_attrs[k].name,
 				     unknown_msg, pattern,
 				     { 2, "ab:ac" },
@@ -433,7 +448,8 @@ main(void)
 	clock_t_str(0xdeadc0defacefeed, ARRSZ_PAIR(sz8_str));
 
 	for (size_t k = 0; k < ARRAY_SIZE(c_t_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     c_t_br_attrs[k].val, c_t_br_attrs[k].name,
 				     u64_val, pattern,
 				     { 7, sz7_str },
@@ -455,7 +471,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u32_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     u32_br_attrs[k].val, u32_br_attrs[k].name,
 				     u32_val, pattern,
 				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
@@ -471,7 +488,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u16_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     u16_br_attrs[k].val, u16_br_attrs[k].name,
 				     u16_val, pattern,
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
@@ -479,13 +497,13 @@ main(void)
 				     { 3, "57069" });
 	}
 
-
 	static const struct val_name x16_br_attrs[] = {
 		{  9, "IFLA_BR_GROUP_FWD_MASK" },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(x16_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     x16_br_attrs[k].val, x16_br_attrs[k].name,
 				     u16_val, pattern,
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
@@ -512,7 +530,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u8_br_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     u8_br_attrs[k].val, u8_br_attrs[k].name,
 				     u8_val, pattern,
 				     { 0, NULL },
@@ -521,7 +540,8 @@ main(void)
 	}
 
 	unsigned short eth_p = htons(0x88C7);
-	TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+	TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+			     2, "IFLA_INFO_DATA", "bridge",
 			     8, "IFLA_BR_VLAN_PROTOCOL",
 			     eth_p, pattern,
 			     { 1, "\"\\x88\"" },
@@ -536,7 +556,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(br_id_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     br_id_attrs[k].val, br_id_attrs[k].name,
 				     bridge_id, pattern,
 				     { 7, "\"\\xbe\\xef\\xfa\\xce"
@@ -573,7 +594,8 @@ main(void)
 		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING|0xfeedcafc}" },
 	};
 	for (size_t k = 0; k < ARRAY_SIZE(boolopts); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     IFLA_BR_MULTI_BOOLOPT,
 				     "IFLA_BR_MULTI_BOOLOPT",
 				     boolopts[k].val, pattern,
@@ -672,7 +694,8 @@ main(void)
 		snprintf(str, sizeof(str), "[{nla_len=%zu, nla_type=%s}, %s]",
 			 qstate_attrs[k].sz, qstate_attrs[k].type_str,
 			 qstate_attrs[k].str);
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "bridge",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "bridge",
 				     IFLA_BR_MCAST_QUERIER_STATE,
 				     "IFLA_BR_MCAST_QUERIER_STATE",
 				     qstate_attrs[k].val, pattern,
@@ -689,7 +712,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u8_tun_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "tun",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "tun",
 				     u8_tun_attrs[k].val, u8_tun_attrs[k].name,
 				     u8_val, pattern,
 				     { 0, NULL },
@@ -703,7 +727,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u32_tun_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "tun",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "tun",
 				     u32_tun_attrs[k].val,
 				     u32_tun_attrs[k].name,
 				     u32_val, pattern,
@@ -719,7 +744,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(und_tun_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "tun",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "tun",
 				     und_tun_attrs[k].val,
 				     und_tun_attrs[k].name,
 				     unknown_msg, pattern,
@@ -740,7 +766,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(uid_tun_attrs); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "tun",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "tun",
 				     uid_tun_attrs[k].val,
 				     uid_tun_attrs[k].name,
 				     u32_val, pattern,
@@ -749,7 +776,8 @@ main(void)
 				     { 4, "3134983661" },
 				     { 5, "3134983661" });
 
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "tun",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "tun",
 				     uid_tun_attrs[k].val,
 				     uid_tun_attrs[k].name,
 				     minus_one, pattern,
@@ -770,7 +798,8 @@ main(void)
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(tun_types); k++) {
-		TEST_NESTED_LINKINFO(fd, nlh0, 2, "IFLA_INFO_DATA", "tun",
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
+				     2, "IFLA_INFO_DATA", "tun",
 				     3, "IFLA_TUN_TYPE",
 				     tun_types[k].val, pattern,
 				     { 0, NULL },
@@ -780,7 +809,8 @@ main(void)
 
 
 	/* IFLA_INFO_KIND + IFLA_INFO_XSTATS */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_XSTATS, "IFLA_INFO_XSTATS",
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
+			     IFLA_INFO_XSTATS, "IFLA_INFO_XSTATS",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
 			     /*
@@ -797,7 +827,7 @@ main(void)
 		0xbadc0de4, 0xbadc0de5,
 	};
 
-	TEST_LINKINFO(fd, nlh0, IFLA_INFO_XSTATS, "can",
+	TEST_LINKINFO(fd, nlh0, IFLA_INFO_KIND, IFLA_INFO_XSTATS, "can",
 		      can_stats_data, pattern, print_quoted_hex,
 		      printf("{bus_error=3134983648"
 			     ", error_warning=3134983649"
@@ -807,34 +837,254 @@ main(void)
 			     ", restarts=3134983653}"));
 
 
-	/* IFLA_INFO_KIND + IFLA_INFO_SLVAE_KIND */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0,
+	/* IFLA_INFO_KIND + IFLA_INFO_SLAVE_KIND */
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
 			     IFLA_INFO_SLAVE_KIND, "IFLA_INFO_SLAVE_KIND",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
-			      unsupported_xstats_types COMMA
-			      unsupported_data_types COMMA
+			      supported_tunnel_types COMMA
 			      NULL},
 			     printf("\"\\253\\254\\333\\315\"..."));
 
 
 	/* IFLA_INFO_KIND + IFLA_INFO_SLAVE_DATA */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0,
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
 			     IFLA_INFO_SLAVE_DATA, "IFLA_INFO_SLAVE_DATA",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
-			      unsupported_xstats_types COMMA
-			      unsupported_data_types COMMA
+			      supported_tunnel_types COMMA
 			      NULL},
 			     printf("\"\\xab\\xac\\xdb\\xcd\""));
 
 
 	/* IFLA_INFO_KIND + unknown type */
-	TEST_UNKNOWN_TUNNELS(fd, nlh0, 6, "0x6 /* IFLA_INFO_??? */",
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_KIND,
+			     6, "0x6 /* IFLA_INFO_??? */",
 			     unknown_msg, sizeof(unknown_msg),
 			     {unsupported_tunnel_types COMMA
-			      unsupported_xstats_types COMMA
+			      supported_tunnel_types COMMA
+			      NULL},
+			     printf("\"\\xab\\xac\\xdb\\xcd\""));
+
+
+	/* IFLA_INFO_SLAVE_KIND */
+	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh0, hdrlen,
+				      init_ifinfomsg, print_ifinfomsg,
+				      IFLA_INFO_SLAVE_KIND,
+				      "IFLA_INFO_SLAVE_KIND", pattern,
+				      unknown_msg, print_quoted_stringn, 1,
+				      printf("\"\\253\\254\\333\\315\"..."));
+
+
+	/* IFLA_INFO_SLAVE_KIND + IFLA_INFO_UNSPEC */
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+			     IFLA_INFO_UNSPEC, "IFLA_INFO_UNSPEC",
+			     unknown_msg, sizeof(unknown_msg),
+			     {unsupported_tunnel_types COMMA
+			      supported_tunnel_types COMMA
+			      NULL},
+			     printf("\"\\xab\\xac\\xdb\\xcd\""));
+
+
+	/* IFLA_INFO_SLAVE_KIND + IFLA_INFO_KIND */
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+			     IFLA_INFO_KIND, "IFLA_INFO_KIND",
+			     unknown_msg, sizeof(unknown_msg),
+			     {unsupported_tunnel_types COMMA
+			      supported_tunnel_types COMMA
+			      NULL},
+			     printf("\"\\253\\254\\333\\315\"..."));
+
+
+	/* IFLA_INFO_SLAVE_KIND + IFLA_INFO_DATA */
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+			     IFLA_INFO_DATA, "IFLA_INFO_DATA",
+			     unknown_msg, sizeof(unknown_msg),
+			     {unsupported_tunnel_types COMMA
 			      unsupported_data_types COMMA
+			      NULL},
+			     printf("\"\\xab\\xac\\xdb\\xcd\""));
+
+	/* IFLA_INFO_SLAVE_KIND + IFLA_INFO_SLAVE_DATA */
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+			     IFLA_INFO_SLAVE_DATA, "IFLA_INFO_SLAVE_DATA",
+			     unknown_msg, sizeof(unknown_msg),
+			     {unsupported_tunnel_types COMMA
+			      unsupported_slave_data_types COMMA
+			      NULL},
+			     printf("\"\\xab\\xac\\xdb\\xcd\""));
+
+	/* bridge attrs */
+	static const struct val_name und_brport_attrs[] = {
+		{ 0, "IFLA_BRPORT_UNSPEC" },
+		{ 24, "IFLA_BRPORT_FLUSH" },
+		{ 26, "IFLA_BRPORT_PAD" },
+		{ 39, "0x27 /* IFLA_BRPORT_??? */" },
+		{ 2989, "0xbad /* IFLA_BRPORT_??? */" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(und_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     und_brport_attrs[k].val,
+				     und_brport_attrs[k].name,
+				     unknown_msg, pattern,
+				     { 2, "\"\\xab\\xac\"" },
+				     { 4, "\"\\xab\\xac\\xdb\\xcd\"" },
+				     { 6,
+					"\"\\xab\\xac\\xdb\\xcd\\x61\\x62\"" },
+				     { 8, "\"\\xab\\xac\\xdb\\xcd\\x61\\x62"
+					"\\x63\\x64\"" },
+				     { 10, "\"\\xab\\xac\\xdb\\xcd\\x61\\x62"
+					"\\x63\\x64\\x65\\x66\"" });
+	}
+
+	static const struct val_name u8_brport_attrs[] = {
+		{ ARG_STR(IFLA_BRPORT_STATE) },
+		{ ARG_STR(IFLA_BRPORT_MODE) },
+		{ ARG_STR(IFLA_BRPORT_GUARD) },
+		{ ARG_STR(IFLA_BRPORT_PROTECT) },
+		{ ARG_STR(IFLA_BRPORT_FAST_LEAVE) },
+		{ ARG_STR(IFLA_BRPORT_LEARNING) },
+		{ ARG_STR(IFLA_BRPORT_UNICAST_FLOOD) },
+		{ ARG_STR(IFLA_BRPORT_PROXYARP) },
+		{ ARG_STR(IFLA_BRPORT_LEARNING_SYNC) },
+		{ ARG_STR(IFLA_BRPORT_PROXYARP_WIFI) },
+		{ ARG_STR(IFLA_BRPORT_TOPOLOGY_CHANGE_ACK) },
+		{ ARG_STR(IFLA_BRPORT_CONFIG_PENDING) },
+		{ ARG_STR(IFLA_BRPORT_MULTICAST_ROUTER) },
+		{ ARG_STR(IFLA_BRPORT_MCAST_FLOOD) },
+		{ ARG_STR(IFLA_BRPORT_MCAST_TO_UCAST) },
+		{ ARG_STR(IFLA_BRPORT_VLAN_TUNNEL) },
+		{ ARG_STR(IFLA_BRPORT_BCAST_FLOOD) },
+		{ ARG_STR(IFLA_BRPORT_NEIGH_SUPPRESS) },
+		{ ARG_STR(IFLA_BRPORT_ISOLATED) },
+		{ ARG_STR(IFLA_BRPORT_MRP_RING_OPEN) },
+		{ ARG_STR(IFLA_BRPORT_MRP_IN_OPEN) },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(u8_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     u8_brport_attrs[k].val,
+				     u8_brport_attrs[k].name,
+				     u8_val, pattern,
+				     { 0, NULL },
+				     { 1, "161" },
+				     { 2, "161" });
+	}
+
+	static const struct val_name u16_brport_attrs[] = {
+		{ ARG_STR(IFLA_BRPORT_PRIORITY) },
+		{ ARG_STR(IFLA_BRPORT_DESIGNATED_PORT) },
+		{ ARG_STR(IFLA_BRPORT_DESIGNATED_COST) },
+		{ ARG_STR(IFLA_BRPORT_ID) },
+		{ ARG_STR(IFLA_BRPORT_NO) },
+		{ ARG_STR(IFLA_BRPORT_GROUP_FWD_MASK) },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(u16_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     u16_brport_attrs[k].val,
+				     u16_brport_attrs[k].name,
+				     u16_val, pattern,
+				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
+				     { 2, "57069" },
+				     { 3, "57069" });
+	}
+
+	static const struct val_name u32_brport_attrs[] = {
+		{  3, "IFLA_BRPORT_COST" },
+		{ 37, "IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT" },
+		{ 38, "IFLA_BRPORT_MCAST_EHT_HOSTS_CNT" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(u32_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     u32_brport_attrs[k].val,
+				     u32_brport_attrs[k].name,
+				     u32_val, pattern,
+				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
+						"\"\\xed\\x0d\\xdc\"") },
+				     { 4, "3134983661" },
+				     { 5, "3134983661" });
+	}
+
+	static const struct val_name brport_id_attrs[] = {
+		{ 13, "IFLA_BRPORT_ROOT_ID" },
+		{ 14, "IFLA_BRPORT_BRIDGE_ID" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(brport_id_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     brport_id_attrs[k].val,
+				     brport_id_attrs[k].name,
+				     bridge_id, pattern,
+				     { 7, "\"\\xbe\\xef\\xfa\\xce"
+					  "\\xde\\xc0\\xde\"" },
+				     { 8, "{prio=[190, 239]"
+					  ", addr=fa:ce:de:c0:de:ad}" },
+				     { 9, "{prio=[190, 239]"
+					  ", addr=fa:ce:de:c0:de:ad}" });
+	}
+
+	static const struct val_name c_t_brport_attrs[] = {
+		{ 21, "IFLA_BRPORT_MESSAGE_AGE_TIMER" },
+		{ 22, "IFLA_BRPORT_FORWARD_DELAY_TIMER" },
+		{ 23, "IFLA_BRPORT_HOLD_TIMER" },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(c_t_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     c_t_brport_attrs[k].val,
+				     c_t_brport_attrs[k].name,
+				     u64_val, pattern,
+				     { 7, sz7_str },
+				     { 8, sz8_str },
+				     { 9, "\"" BE_LE("\\xde\\xad\\xc0\\xde"
+						     "\\xfa\\xce\\xfe\\xed",
+						     "\\xed\\xfe\\xce\\xfa"
+						     "\\xde\\xc0\\xad\\xde")
+					  "\\x61\"" });
+	}
+
+	static const struct val_name ifidx_brport_attrs[] = {
+		{ 34, "IFLA_BRPORT_BACKUP_PORT" },
+	};
+	const uint32_t ifidx_lo = ifindex_lo();
+
+	for (size_t k = 0; k < ARRAY_SIZE(ifidx_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     ifidx_brport_attrs[k].val,
+				     ifidx_brport_attrs[k].name,
+				     u32_val, pattern,
+				     { 3, BE_LE("\"\\xba\\xdc\\x0d\"",
+						"\"\\xed\\x0d\\xdc\"") },
+				     { 4, "3134983661" },
+				     { 5, "3134983661" });
+
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     ifidx_brport_attrs[k].val,
+				     ifidx_brport_attrs[k].name,
+				     ifidx_lo, pattern,
+				     { 3, BE_LE("\"\\x00\\x00\\x00\"",
+						"\"\\x01\\x00\\x00\"") },
+				     { 4, IFINDEX_LO_STR },
+				     { 5, IFINDEX_LO_STR });
+	}
+
+	/* IFLA_INFO_SLAVE_KIND + unknown type */
+	TEST_UNKNOWN_TUNNELS(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+			     6, "0x6 /* IFLA_INFO_??? */",
+			     unknown_msg, sizeof(unknown_msg),
+			     {unsupported_tunnel_types COMMA
+			      supported_tunnel_types COMMA
 			      NULL},
 			     printf("\"\\xab\\xac\\xdb\\xcd\""));
 

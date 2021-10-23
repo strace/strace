@@ -651,12 +651,59 @@ decode_nla_linkinfo_data(struct tcb *const tcp,
 	return false;
 }
 
+static bool
+decode_nla_linkinfo_slave_kind(struct tcb *const tcp,
+			       const kernel_ulong_t addr,
+			       const unsigned int len,
+			       const void *const opaque_data)
+{
+	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
+
+	update_ctx_str(tcp, addr, len, ARRSZ_PAIR(ctx->slave_kind));
+
+	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
+
+	return true;
+}
+
+static bool
+decode_nla_linkinfo_slave_data_bridge(struct tcb *const tcp,
+				      const kernel_ulong_t addr,
+				      const unsigned int len,
+				      const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_brport_attrs,
+		      "IFLA_BRPORT_???",
+		      ARRSZ_PAIR(ifla_brport_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
+static bool
+decode_nla_linkinfo_slave_data(struct tcb *const tcp,
+			       const kernel_ulong_t addr,
+			       const unsigned int len,
+			       const void *const opaque_data)
+{
+	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
+	nla_decoder_t func = NULL;
+
+	if (!strcmp(ctx->slave_kind, "bridge"))
+		func = decode_nla_linkinfo_slave_data_bridge;
+
+	if (func)
+		return func(tcp, addr, len, opaque_data);
+
+	return false;
+}
+
 static const nla_decoder_t ifla_linkinfo_nla_decoders[] = {
 	[IFLA_INFO_KIND]	= decode_nla_linkinfo_kind,
 	[IFLA_INFO_DATA]	= decode_nla_linkinfo_data,
 	[IFLA_INFO_XSTATS]	= decode_nla_linkinfo_xstats,
-	[IFLA_INFO_SLAVE_KIND]	= decode_nla_str,
-	[IFLA_INFO_SLAVE_DATA]	= NULL, /* unimplemented */
+	[IFLA_INFO_SLAVE_KIND]	= decode_nla_linkinfo_slave_kind,
+	[IFLA_INFO_SLAVE_DATA]	= decode_nla_linkinfo_slave_data,
 };
 
 static bool
