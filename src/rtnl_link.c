@@ -241,6 +241,26 @@ decode_rtnl_link_ifmap(struct tcb *const tcp,
 	return true;
 }
 
+static void
+update_ctx_str(struct tcb *const tcp,
+	       const kernel_ulong_t addr, const unsigned int len,
+	       char *const str, const size_t sz)
+{
+	memset(str, '\0', sz);
+
+	if (len >= sz)
+		return;
+
+	if (umoven(tcp, addr, len, str) < 0 || strnlen(str, sz) > len) {
+		/*
+		 * If we haven't seen NUL or an error occurred, set str
+		 * to an empty string.
+		 */
+		str[0] = '\0';
+		return;
+	}
+}
+
 static bool
 decode_nla_linkinfo_kind(struct tcb *const tcp,
 			 const kernel_ulong_t addr,
@@ -249,15 +269,7 @@ decode_nla_linkinfo_kind(struct tcb *const tcp,
 {
 	struct ifla_linkinfo_ctx *ctx = (void *) opaque_data;
 
-	memset(ctx->kind, '\0', sizeof(ctx->kind));
-
-	if (umovestr(tcp, addr, sizeof(ctx->kind), ctx->kind) <= 0) {
-		/*
-		 * If we haven't seen NUL or an error occurred, set kind to
-		 * an empty string.
-		 */
-		ctx->kind[0] = '\0';
-	}
+	update_ctx_str(tcp, addr, len, ARRSZ_PAIR(ctx->kind));
 
 	printstr_ex(tcp, addr, len, QUOTE_0_TERMINATED);
 
