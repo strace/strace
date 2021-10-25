@@ -37,7 +37,12 @@
 #include "xlat/rtnl_ifla_info_data_tun_attrs.h"
 #include "xlat/rtnl_ifla_port_attrs.h"
 #include "xlat/rtnl_ifla_proto_down_reason_attrs.h"
+#include "xlat/rtnl_ifla_vf_info_attrs.h"
+#include "xlat/rtnl_ifla_vf_link_states.h"
 #include "xlat/rtnl_ifla_vf_port_attrs.h"
+#include "xlat/rtnl_ifla_vf_stats_attrs.h"
+#include "xlat/rtnl_ifla_vf_vlan_list_attrs.h"
+#include "xlat/rtnl_ifla_vfinfo_list_attrs.h"
 #include "xlat/rtnl_ifla_xdp_attached_mode.h"
 #include "xlat/rtnl_ifla_xdp_attrs.h"
 #include "xlat/rtnl_link_attrs.h"
@@ -722,6 +727,389 @@ decode_ifla_linkinfo(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_ifla_vf_mac(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	struct ifla_vf_mac ivm;
+
+	if (len < sizeof(ivm))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivm))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivm, vf);
+	tprint_struct_next();
+	PRINT_FIELD_MAC(ivm, mac);
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_vlan(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	struct ifla_vf_vlan ivv;
+
+	if (len < sizeof(ivv))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivv))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivv, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivv, vlan);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivv, qos);
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_tx_rate(struct tcb *const tcp,
+		       const kernel_ulong_t addr,
+		       const unsigned int len,
+		       const void *const opaque_data)
+{
+	struct ifla_vf_tx_rate ivtr;
+
+	if (len < sizeof(ivtr))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivtr))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivtr, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivtr, rate);
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_spoofchk(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	struct ifla_vf_spoofchk ivs;
+
+	if (len < sizeof(ivs))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivs))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivs, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivs, setting);
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_link_state(struct tcb *const tcp,
+			  const kernel_ulong_t addr,
+			  const unsigned int len,
+			  const void *const opaque_data)
+{
+	struct ifla_vf_link_state ivls;
+
+	if (len < sizeof(ivls))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivls))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivls, vf);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(ivls, link_state, rtnl_ifla_vf_link_states,
+			 "IFLA_VF_LINK_STATE_???");
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_rate(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	struct ifla_vf_rate ivr;
+
+	if (len < sizeof(ivr))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivr))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivr, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivr, min_tx_rate);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivr, max_tx_rate);
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_rss_query_en(struct tcb *const tcp,
+			    const kernel_ulong_t addr,
+			    const unsigned int len,
+			    const void *const opaque_data)
+{
+	struct ifla_vf_rss_query_en ivrqe;
+
+	if (len < sizeof(ivrqe))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivrqe))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivrqe, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivrqe, setting);
+	tprint_struct_end();
+
+	return true;
+}
+
+static const nla_decoder_t ifla_vf_stats_nla_decoders[] = {
+	[IFLA_VF_STATS_RX_PACKETS]	= decode_nla_u64,
+	[IFLA_VF_STATS_TX_PACKETS]	= decode_nla_u64,
+	[IFLA_VF_STATS_RX_BYTES]	= decode_nla_u64,
+	[IFLA_VF_STATS_TX_BYTES]	= decode_nla_u64,
+	[IFLA_VF_STATS_BROADCAST]	= decode_nla_u64,
+	[IFLA_VF_STATS_MULTICAST]	= decode_nla_u64,
+	[IFLA_VF_STATS_PAD]		= NULL,
+	[IFLA_VF_STATS_RX_DROPPED]	= decode_nla_u64,
+	[IFLA_VF_STATS_TX_DROPPED]	= decode_nla_u64,
+};
+
+static bool
+decode_ifla_vf_stats(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_vf_stats_attrs,
+		      "IFLA_VF_STATS_???",
+		      ARRSZ_PAIR(ifla_vf_stats_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_trust(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	struct ifla_vf_trust ivt;
+
+	if (len < sizeof(ivt))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivt))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivt, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivt, setting);
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_guid(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	/*
+	 * This all is broken because struct ifla_vf_guid.guid is not naturally
+	 * aligned;  trying to handle both possible attribute sizes.
+	 */
+	union {
+		struct {
+			uint32_t vf;
+			uint64_t guid;
+		} ATTRIBUTE_PACKED ivg_32;
+		struct {
+			uint32_t vf;
+			uint64_t ATTRIBUTE_ALIGNED(8) guid;
+		} ivg_64;
+	} ivg;
+
+	static_assert(sizeof(struct ifla_vf_guid) == sizeof(ivg.ivg_32)
+		      || sizeof(struct ifla_vf_guid) == sizeof(ivg.ivg_64),
+		      "Unexpected struct ifla_vf_guid size");
+	CHECK_TYPE_SIZE(ivg.ivg_32, 12);
+	CHECK_TYPE_SIZE(ivg.ivg_64, 16);
+
+	switch (len) {
+	case sizeof(ivg.ivg_32):
+	case sizeof(ivg.ivg_64):
+		break;
+	default:
+		return false;
+	}
+
+	if (umoven_or_printaddr(tcp, addr, len, &ivg))
+		return true;
+
+	switch (len) {
+	case sizeof(ivg.ivg_32):
+		tprint_struct_begin();
+		PRINT_FIELD_U(ivg.ivg_32, vf);
+		tprint_struct_next();
+		PRINT_FIELD_X(ivg.ivg_32, guid);
+		tprint_struct_end();
+		break;
+
+	case sizeof(ivg.ivg_64):
+		tprint_struct_begin();
+		PRINT_FIELD_U(ivg.ivg_64, vf);
+		tprint_struct_next();
+		PRINT_FIELD_X(ivg.ivg_64, guid);
+		tprint_struct_end();
+		break;
+	}
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_vlan_info(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	struct ifla_vf_vlan_info ivvi;
+
+	if (len < sizeof(ivvi))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivvi))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(ivvi, vf);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivvi, vlan);
+	tprint_struct_next();
+	PRINT_FIELD_U(ivvi, qos);
+	tprint_struct_next();
+	tprints_field_name("vlan_proto");
+	tprints_arg_begin("htons");
+	printxval(ethernet_protocols, ntohs(ivvi.vlan_proto), "ETH_P_???");
+	tprint_arg_end();
+	tprint_struct_end();
+
+	return true;
+}
+
+static const nla_decoder_t ifla_vf_vlan_list_nla_decoders[] = {
+	[IFLA_VF_VLAN_INFO_UNSPEC]	= NULL,
+	[IFLA_VF_VLAN_INFO]		= decode_ifla_vf_vlan_info,
+};
+
+static bool
+decode_ifla_vf_vlan_list(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_vf_vlan_list_attrs,
+		      "IFLA_VF_VLAN_INFO_???",
+		      ARRSZ_PAIR(ifla_vf_vlan_list_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
+static bool
+decode_ifla_vf_broadcast(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	struct ifla_vf_broadcast ivb;
+
+	if (len < sizeof(ivb))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &ivb))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_MAC(ivb, broadcast);
+	tprint_struct_end();
+
+	return true;
+}
+
+static const nla_decoder_t ifla_vf_info_nla_decoders[] = {
+	[IFLA_VF_UNSPEC]	= NULL,
+	[IFLA_VF_MAC]		= decode_ifla_vf_mac,
+	[IFLA_VF_VLAN]		= decode_ifla_vf_vlan,
+	[IFLA_VF_TX_RATE]	= decode_ifla_vf_tx_rate,
+	[IFLA_VF_SPOOFCHK]	= decode_ifla_vf_spoofchk,
+	[IFLA_VF_LINK_STATE]	= decode_ifla_vf_link_state,
+	[IFLA_VF_RATE]		= decode_ifla_vf_rate,
+	[IFLA_VF_RSS_QUERY_EN]	= decode_ifla_vf_rss_query_en,
+	[IFLA_VF_STATS]		= decode_ifla_vf_stats,
+	[IFLA_VF_TRUST]		= decode_ifla_vf_trust,
+	[IFLA_VF_IB_NODE_GUID]	= decode_ifla_vf_guid,
+	[IFLA_VF_IB_PORT_GUID]	= decode_ifla_vf_guid,
+	[IFLA_VF_VLAN_LIST]	= decode_ifla_vf_vlan_list,
+	[IFLA_VF_BROADCAST]	= decode_ifla_vf_broadcast,
+};
+
+static bool
+decode_ifla_vf_info(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_vf_info_attrs,
+		      "IFLA_VF_???", ARRSZ_PAIR(ifla_vf_info_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
+static const nla_decoder_t ifla_vfinfo_list_nla_decoders[] = {
+	[IFLA_VF_INFO_UNSPEC]	= NULL,
+	[IFLA_VF_INFO]		= decode_ifla_vf_info,
+};
+
+static bool
+decode_ifla_vfinfo_list(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_ifla_vfinfo_list_attrs,
+		      "IFLA_VF_INFO_???",
+		      ARRSZ_PAIR(ifla_vfinfo_list_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
 bool
 decode_nla_rtnl_link_stats64(struct tcb *const tcp,
 			     const kernel_ulong_t addr,
@@ -1100,7 +1488,7 @@ static const nla_decoder_t ifinfomsg_nla_decoders[] = {
 	[IFLA_NET_NS_PID]	= decode_nla_u32,
 	[IFLA_IFALIAS]		= decode_nla_str,
 	[IFLA_NUM_VF]		= decode_nla_u32,
-	[IFLA_VFINFO_LIST]	= NULL, /* unimplemented */
+	[IFLA_VFINFO_LIST]	= decode_ifla_vfinfo_list,
 	[IFLA_STATS64]		= decode_nla_rtnl_link_stats64,
 	[IFLA_VF_PORTS]		= decode_ifla_vf_ports,
 	[IFLA_PORT_SELF]	= decode_ifla_port,

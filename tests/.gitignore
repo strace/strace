@@ -561,6 +561,10 @@ nlattr_ifla_protinfo-Xabbrev
 nlattr_ifla_protinfo-Xraw
 nlattr_ifla_protinfo-Xverbose
 nlattr_ifla_proto_down_reason
+nlattr_ifla_vfinfo
+nlattr_ifla_vfinfo-Xabbrev
+nlattr_ifla_vfinfo-Xraw
+nlattr_ifla_vfinfo-Xverbose
 nlattr_ifla_xdp
 nlattr_ifla_xdp-y
 nlattr_inet_diag_msg

@@ -1,0 +1,4 @@
+#unconditional
+#value_indexed
+IFLA_VF_INFO_UNSPEC	0
+IFLA_VF_INFO		1
