@@ -411,6 +411,7 @@ main(void)
 		    printf("{nla_len=%u, nla_type=IFLA_INFO_KIND}",
 			   nla.nla_len));
 
+	/* IFLA_VF_PORTS */
 	nla.nla_type = IFLA_VF_PORT;
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_ifinfomsg, print_ifinfomsg,
@@ -418,6 +419,24 @@ main(void)
 		    printf("{nla_len=%u, nla_type=IFLA_VF_PORT}",
 			   nla.nla_len));
 
+	/* IFLA_EXT_MASK */
+	static const struct strval32 ifla_ext_masks[] = {
+		{ ARG_STR(0) },
+		{ ARG_STR(RTEXT_FILTER_VF) },
+		{ ARG_STR(0xdeface80) " /* RTEXT_FILTER_??? */" },
+		{ 0xdeadfeed, "RTEXT_FILTER_VF|RTEXT_FILTER_BRVLAN_COMPRESSED"
+			      "|RTEXT_FILTER_SKIP_STATS|RTEXT_FILTER_CFM_CONFIG"
+			      "|RTEXT_FILTER_CFM_STATUS|0xdeadfe80" },
+	};
+	for (size_t i = 0; i < ARRAY_SIZE(ifla_ext_masks); i++) {
+		TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
+				   init_ifinfomsg, print_ifinfomsg,
+				   IFLA_EXT_MASK, pattern,
+				   ifla_ext_masks[i].val,
+				   printf("%s", ifla_ext_masks[i].str));
+	}
+
+	/* IFLA_EVENT */
 	static const struct {
 		uint32_t val;
 		const char *str;
