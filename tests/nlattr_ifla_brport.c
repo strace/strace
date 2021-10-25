@@ -93,7 +93,6 @@ main(void)
 		{ ENUM_KNOWN(0x10, IFLA_BRPORT_DESIGNATED_COST) },
 		{ ENUM_KNOWN(0x11, IFLA_BRPORT_ID) },
 		{ ENUM_KNOWN(0x12, IFLA_BRPORT_NO) },
-		{ ENUM_KNOWN(0x1f, IFLA_BRPORT_GROUP_FWD_MASK) },
 	};
 	void *nlh_u16 = midtail_alloc(NLMSG_SPACE(hdrlen),
 				     NLA_HDRLEN * 2 + sizeof(uint16_t));
@@ -101,6 +100,20 @@ main(void)
 		check_u16_nlattr(fd, nlh_u16, hdrlen,
 				 init_ifinfomsg, print_ifinfomsg,
 				 u16_attrs[i].val, u16_attrs[i].str,
+				 pattern, 1);
+	}
+
+
+	/* x16 attrs */
+	static const struct strval16 x16_attrs[] = {
+		{ ENUM_KNOWN(0x1f, IFLA_BRPORT_GROUP_FWD_MASK) },
+	};
+	void *nlh_x16 = midtail_alloc(NLMSG_SPACE(hdrlen),
+				     NLA_HDRLEN * 2 + sizeof(uint16_t));
+	for (size_t i = 0; i < ARRAY_SIZE(x16_attrs); i++) {
+		check_x16_nlattr(fd, nlh_x16, hdrlen,
+				 init_ifinfomsg, print_ifinfomsg,
+				 x16_attrs[i].val, x16_attrs[i].str,
 				 pattern, 1);
 	}
 

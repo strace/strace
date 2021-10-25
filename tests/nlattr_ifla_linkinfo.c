@@ -980,7 +980,6 @@ main(void)
 		{ ARG_STR(IFLA_BRPORT_DESIGNATED_COST) },
 		{ ARG_STR(IFLA_BRPORT_ID) },
 		{ ARG_STR(IFLA_BRPORT_NO) },
-		{ ARG_STR(IFLA_BRPORT_GROUP_FWD_MASK) },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u16_brport_attrs); k++) {
@@ -992,6 +991,21 @@ main(void)
 				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
 				     { 2, "57069" },
 				     { 3, "57069" });
+	}
+
+	static const struct val_name x16_brport_attrs[] = {
+		{ ARG_STR(IFLA_BRPORT_GROUP_FWD_MASK) },
+	};
+
+	for (size_t k = 0; k < ARRAY_SIZE(x16_brport_attrs); k++) {
+		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_SLAVE_KIND,
+				     5, "IFLA_INFO_SLAVE_DATA", "bridge",
+				     x16_brport_attrs[k].val,
+				     x16_brport_attrs[k].name,
+				     u16_val, pattern,
+				     { 1, "\"" BE_LE("\\xde", "\\xed") "\"" },
+				     { 2, "0xdeed" },
+				     { 3, "0xdeed" });
 	}
 
 	static const struct val_name u32_brport_attrs[] = {
