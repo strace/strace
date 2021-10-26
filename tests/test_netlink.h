@@ -42,8 +42,8 @@
 									\
 		{ __VA_ARGS__; }					\
 									\
-		printf("], %u, MSG_DONTWAIT, NULL, 0) = %s\n",		\
-		       msg_len, errstr);				\
+		printf("], %u, " XLAT_FMT ", NULL, 0) = %s\n",		\
+		       msg_len, XLAT_ARGS(MSG_DONTWAIT), errstr);	\
 	} while (0)
 
 #define TEST_NETLINK(fd_, nlh0_, type_, flags_,				\
