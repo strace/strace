@@ -120,6 +120,11 @@
 #  define DEFAULT_STRLEN 32
 # endif
 
+struct strval8 {
+	uint8_t val;
+	const char *str;
+};
+
 struct strval16 {
 	uint16_t val;
 	const char *str;
