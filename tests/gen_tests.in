@@ -866,6 +866,9 @@ sock_filter-v-Xverbose	-v -e trace=getsockopt,setsockopt -X verbose
 sockaddr_xlat-Xabbrev	-Xabbrev -e trace=connect -a22
 sockaddr_xlat-Xraw	-Xraw -e trace=connect -a22
 sockaddr_xlat-Xverbose	-Xverbose -e trace=connect -a22
+sockaddr_xlat-Xabbrev-y		-Xabbrev -y -e trace=connect -a22 </dev/null 7>/dev/zero
+sockaddr_xlat-Xraw-y		-Xraw -y -e trace=connect -a22 </dev/null 7>/dev/zero
+sockaddr_xlat-Xverbose-y	-Xverbose -y -e trace=connect -a22 </dev/null 7>/dev/zero
 socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
 sockopt-timestamp	-e trace=recvmsg

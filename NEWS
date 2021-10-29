@@ -13,7 +13,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of KD* and SECCOMP_* ioctl commands.
   * Implemented decoding of RTM_NEWCACHEREPORT, RTM_{NEW,DEL,GET}NEXTHOP,
     and RTM_{NEW,GET}STATS NETLINK_ROUTE netlink messages.
-  * Implemented decoding of AF_MCTP socket addresses.
+  * Implemented decoding of AF_MCTP and AF_XDP socket addresses.
   * Implemented decoding of AF_MCTP protocol for IFLA_AF_SPEC netlink attribute.
   * Implemented decoding of IFLA_BR_MCAST_QUERIER_STATE, IFLA_BR_MULTI_BOOLOPT,
     IFLA_INET6_RA_MTU, IFLA_INFO_SLAVE_DATA, and IFLA_VFINFO_LIST netlink

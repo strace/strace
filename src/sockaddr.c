@@ -22,6 +22,7 @@
 #include <linux/if_packet.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
+#include <linux/if_xdp.h>
 #include <linux/mctp.h>
 #include <linux/x25.h>
 
@@ -34,6 +35,8 @@
 #include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
+
+#include "xlat/xdp_sockaddr_flags.h"
 
 #include "xlat/mctp_addrs.h"
 #include "xlat/mctp_nets.h"
@@ -705,6 +708,27 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_xdp(struct tcb *tcp, const void *const buf,
+			const int addrlen)
+{
+	const struct sockaddr_xdp *const sa_xdp = buf;
+
+	PRINT_FIELD_FLAGS(*sa_xdp, sxdp_flags, xdp_sockaddr_flags, "XDP_???");
+	tprint_struct_next();
+	PRINT_FIELD_IFINDEX(*sa_xdp, sxdp_ifindex);
+	tprint_struct_next();
+	PRINT_FIELD_U(*sa_xdp, sxdp_queue_id);
+
+	if (sa_xdp->sxdp_flags & XDP_SHARED_UMEM) {
+		tprint_struct_next();
+		PRINT_FIELD_FD(*sa_xdp, sxdp_shared_umem_fd, tcp);
+	} else if (sa_xdp->sxdp_shared_umem_fd) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*sa_xdp, sxdp_shared_umem_fd);
+	}
+}
+
+static void
 print_sockaddr_data_mctp(struct tcb *tcp, const void *const buf,
 			 const int addrlen)
 {
@@ -746,6 +770,7 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_XDP] = { print_sockaddr_data_xdp, sizeof(struct sockaddr_xdp) },
 	[AF_MCTP] = { print_sockaddr_data_mctp, sizeof(struct sockaddr_mctp) },
 };
 

@@ -46,6 +46,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/if_bonding.h \
 	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_link.h \
+	linux/include/uapi/linux/if_xdp.h \
 	linux/include/uapi/linux/in6.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/input-event-codes.h \

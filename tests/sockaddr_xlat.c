@@ -25,10 +25,35 @@
 # include <bluetooth/sco.h>
 #endif
 
+#ifdef HAVE_LINUX_IF_XDP_H
+# include <linux/if_xdp.h>
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_XDP
+struct sockaddr_xdp {
+	uint16_t sxdp_family;
+	uint16_t sxdp_flags;
+	uint32_t sxdp_ifindex;
+	uint32_t sxdp_queue_id;
+	uint32_t sxdp_shared_umem_fd;
+};
+#endif
+
 #include "xlat.h"
+#include "xlat/xdp_sockaddr_flags.h"
 #define XLAT_MACROS_ONLY
 # include "xlat/addrfams.h"
 #undef XLAT_MACROS_ONLY
+
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
+#ifndef FD0_PATH
+# define FD0_PATH ""
+#endif
+#ifndef FD7_PATH
+# define FD7_PATH ""
+#endif
 
 static void
 check_ll(void)
@@ -264,6 +289,83 @@ check_rc(void)
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
 
 static void
+check_xdp(void)
+{
+	const struct {
+		struct sockaddr_xdp sa;
+		const char *str;
+	} xdp_vecs[] = {
+		{ { AF_XDP },
+		  "{sa_family=" XLAT_KNOWN(0x2c, "AF_XDP")
+		  ", sxdp_flags=0, sxdp_ifindex=0, sxdp_queue_id=0}" },
+		{ { AF_XDP, XDP_SHARED_UMEM },
+		  "{sa_family=" XLAT_KNOWN(0x2c, "AF_XDP")
+		  ", sxdp_flags=" XLAT_KNOWN(0x1, "XDP_SHARED_UMEM")
+		  ", sxdp_ifindex=0, sxdp_queue_id=0"
+		  ", sxdp_shared_umem_fd=0" FD0_PATH "}" },
+		{ { AF_XDP, .sxdp_flags = 0xdead,
+		    .sxdp_ifindex = ifindex_lo(),
+		    .sxdp_queue_id = 0xfacebeef,
+		    .sxdp_shared_umem_fd = 7 },
+		  "{sa_family=" XLAT_KNOWN(0x2c, "AF_XDP") ", sxdp_flags="
+		  XLAT_KNOWN(0xdead, "XDP_SHARED_UMEM|XDP_ZEROCOPY"
+				     "|XDP_USE_NEED_WAKEUP|0xdea0")
+		  ", sxdp_ifindex=" XLAT_KNOWN(1, IFINDEX_LO_STR)
+		  ", sxdp_queue_id=4207853295"
+		  ", sxdp_shared_umem_fd=7" FD7_PATH "}" },
+		{ { AF_XDP, .sxdp_flags = 0xbad0,
+		    .sxdp_ifindex = 0xcafefade,
+		    .sxdp_queue_id = 0xba5ed,
+		    .sxdp_shared_umem_fd = 0xfeedbead },
+		  "{sa_family=" XLAT_KNOWN(0x2c, "AF_XDP") ", sxdp_flags=0xbad0"
+		  NRAW(" /* XDP_??? */") ", sxdp_ifindex=3405707998"
+		  ", sxdp_queue_id=763373, sxdp_shared_umem_fd=0xfeedbead}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_xdp, sa_xdp);
+	int rc;
+
+	fill_memory(sa_xdp, sizeof(*sa_xdp));
+	sa_xdp->sxdp_family = AF_XDP;
+
+	rc = connect(-1, (void *) sa_xdp, sizeof(*sa_xdp) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_xdp, sizeof(*sa_xdp) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_xdp, sizeof(*sa_xdp) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x2c, "AF_XDP")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_xdp + sizeof(sa_xdp->sxdp_family),
+			    sizeof(*sa_xdp) - sizeof(sa_xdp->sxdp_family)
+					     - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_xdp) - 1, errstr);
+
+	rc = connect(-1, (void *) sa_xdp, sizeof(*sa_xdp));
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x2c, "AF_XDP")
+	       ", sxdp_flags=");
+#if XLAT_RAW || XLAT_VERBOSE
+	printf("%#x" VERB(" /* "), sa_xdp->sxdp_flags);
+#endif
+#if !XLAT_RAW
+	printflags(xdp_sockaddr_flags, sa_xdp->sxdp_flags, "XDP_???");
+#endif
+	printf(VERB(" */") ", sxdp_ifindex=%u, sxdp_queue_id=%u"
+	       ", sxdp_shared_umem_fd=" BE_LE("%d", "%#x") "}, %zu) = %s\n",
+	       sa_xdp->sxdp_ifindex, sa_xdp->sxdp_queue_id,
+	       sa_xdp->sxdp_shared_umem_fd, sizeof(*sa_xdp), errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(xdp_vecs); i++) {
+		*sa_xdp = xdp_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_xdp, sizeof(*sa_xdp));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       xdp_vecs[i].str, sizeof(*sa_xdp), sprintrc(rc));
+	}
+}
+
+static void
 check_mctp(void)
 {
 	static const struct {
@@ -342,6 +444,8 @@ check_mctp(void)
 int
 main(void)
 {
+	SKIP_IF_PROC_IS_UNAVAILABLE;
+
 	check_ll();
 	check_in();
 	check_in6();
@@ -349,6 +453,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_xdp();
 	check_mctp();
 
 	puts("+++ exited with 0 +++");

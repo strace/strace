@@ -424,6 +424,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
+	linux/if_xdp.h
 	linux/ipx.h
 	mqueue.h
 	netinet/sctp.h
@@ -509,6 +510,11 @@ AC_CHECK_TYPES(m4_normalize([
 	struct kvm_sregs,
 	struct kvm_userspace_memory_region
 ]),,, [#include <linux/kvm.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct sockaddr_xdp
+]),,, [#include <netinet/in.h>
+#include <linux/if_xdp.h>])
 
 saved_CPPFLAGS="$CPPFLAGS"
 
