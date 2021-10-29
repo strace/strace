@@ -349,6 +349,15 @@ print_ax25_addr(const void /* ax25_address */ *addr_void)
 	(xs == XLAT_STYLE_VERBOSE ? tprints_comment : tprints)(addr_str);
 }
 
+static bool
+print_ax25_array_member(struct tcb *const tcp, void *const elem_buf,
+			const size_t elem_size, void *const data)
+{
+	print_ax25_addr(elem_buf);
+
+	return true;
+}
+
 static void
 print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 			 const int addrlen)
@@ -385,25 +394,16 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 
 	tprint_struct_next();
 	tprints_field_name("fsa_digipeater");
-	tprint_array_begin();
-	for (size_t i = 0; i < digis; i++) {
-		if (i)
-			tprint_array_next();
-		print_ax25_addr(sax25->fsa_digipeater + i);
-	}
-
-	if (want_digis > has_digis) {
-		if (digis)
-			tprint_array_next();
-		tprint_unavailable();
-	}
-
-	tprint_array_end();
+	print_local_array_ex(tcp, sax25->fsa_digipeater, digis,
+			     sizeof(sax25->fsa_digipeater[0]),
+			     print_ax25_array_member, NULL,
+			     want_digis > has_digis ? PAF_ARRAY_TRUNCATED : 0,
+			     NULL, NULL);
 
 digis_end:
 	if (addrlen_us > (has_digis * sizeof(sax25->fsa_digipeater[0])
 		       + sizeof(sax25->fsa_ax25))) {
-		tprints(", ");
+		tprint_struct_next();
 		tprint_more_data_follows();
 	}
 }
