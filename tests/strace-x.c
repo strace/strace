@@ -12,14 +12,18 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#ifndef STRACE_XX
-# define STRACE_XX 0
+#ifndef STRACE_X
+# define STRACE_X 1
 #endif
 
-#if STRACE_XX
-# define XOUT(x_, xx_) xx_
-#else
-# define XOUT(x_, xx_) x_
+#if STRACE_X == 1
+# define XOUT(_, x_chars_, x_, xx_) x_
+#elif STRACE_X == 2
+# define XOUT(_, x_chars_, x_, xx_) xx_
+#elif STRACE_X == 3
+# define XOUT(_, x_chars_, x_, xx_) x_chars_
+#elif STRACE_X == 0
+# define XOUT(_, x_chars_, x_, xx_) _
 #endif
 
 int
@@ -29,25 +33,33 @@ main(void)
 		const char *path;
 		const char *out;
 	} test_vecs[] = {
-		{ "test", XOUT("test", "\\x74\\x65\\x73\\x74") },
+		{ "test",
+		  XOUT("test", "test", "test", "\\x74\\x65\\x73\\x74") },
 		{ "\t\n\v\f\r hi~", XOUT("\\t\\n\\v\\f\\r hi~",
+		  "\\t\\n\\v\\f\\r hi~", "\\t\\n\\v\\f\\r hi~",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e") },
-		{ "\t\n\v\f\r\16 hi~", XOUT(
+		{ "\t\n\v\f\r\16 hi~", XOUT("\\t\\n\\v\\f\\r\\16 hi~",
+		  "\\t\\n\\v\\f\\r\\x0e hi~",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x0e\\x20\\x68\\x69\\x7e",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x0e\\x20\\x68\\x69\\x7e") },
-		{ "\10\t\n\v\f\r hi~", XOUT(
+		{ "\10\t\n\v\f\r hi~", XOUT("\\10\\t\\n\\v\\f\\r hi~",
+		  "\\x08\\t\\n\\v\\f\\r hi~",
 		  "\\x08\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e",
 		  "\\x08\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e") },
-		{ "\t\n\v\f\r\37 hi~", XOUT(
+		{ "\t\n\v\f\r\37 hi~", XOUT("\\t\\n\\v\\f\\r\\37 hi~",
+		  "\\t\\n\\v\\f\\r\\x1f hi~",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x1f\\x20\\x68\\x69\\x7e",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x1f\\x20\\x68\\x69\\x7e") },
-		{ "\t\n\v\f\r hi~\177", XOUT(
+		{ "\t\n\v\f\r hi~\177", XOUT("\\t\\n\\v\\f\\r hi~\\177",
+		  "\\t\\n\\v\\f\\r hi~\\x7f",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e\\x7f",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e\\x7f") },
-		{ "\t\n\v\f\r hi~\222", XOUT(
+		{ "\t\n\v\f\r hi~\222", XOUT("\\t\\n\\v\\f\\r hi~\\222",
+		  "\\t\\n\\v\\f\\r hi~\\x92",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e\\x92",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e\\x92") },
-		{ "\t\n\v\f\r hi~\377", XOUT(
+		{ "\t\n\v\f\r hi~\377", XOUT("\\t\\n\\v\\f\\r hi~\\377",
+		  "\\t\\n\\v\\f\\r hi~\\xff",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e\\xff",
 		  "\\x09\\x0a\\x0b\\x0c\\x0d\\x20\\x68\\x69\\x7e\\xff") },
 	};
@@ -65,13 +77,19 @@ main(void)
 		rc_str = sprintrc(chdir(path));
 
 		printf("chdir(");
-#if STRACE_XX
+#if STRACE_X == 2
 		print_quoted_hex(path, sizeof(path) - 1);
 #else
+# if STRACE_X != 0
 		if (((c < ' ') || (c >= 0x7f)) && (c != '\t') && (c != '\n') &&
 		    (c != '\v') && (c != '\f') && (c != '\r'))
+#  if STRACE_X == 3
+			printf("\"%c\\x%02hhx\"", path[0], path[1]);
+#  else
 			print_quoted_hex(path, sizeof(path) - 1);
+#  endif
 		else
+# endif
 			print_quoted_string(path);
 #endif
 		printf(") = %s\n", rc_str);

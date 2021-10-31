@@ -1,2 +1,2 @@
-#define STRACE_XX 1
+#define STRACE_X 2
 #include "strace-x.c"

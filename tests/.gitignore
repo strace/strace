@@ -945,7 +945,10 @@ statx
 strace--strings-in-hex
 strace--strings-in-hex-all
 strace--strings-in-hex-non-ascii
+strace--strings-in-hex-non-ascii-chars
+strace--strings-in-hex-none
 strace-n
+strace-no-x
 strace-x
 strace-xx
 swap

@@ -1032,16 +1032,57 @@ calls.  These structures are very common in calls and so the default
 behavior displays a reasonable subset of structure members.  Use
 this option to get all of the gory details.
 .TP
+.BR \-\-strings\-in\-hex [= \fIoption\fR ]
+Control usage of escape sequences with hexadecimal numbers
+in the printed strings.
+Normally (when no
+.BR \-\-strings\-in\-hex " or " \-x
+option is supplied),
+escape sequences are used to print non-printable and non-ASCII characters
+(that is, characters with a character code less than 32 or greater than 127),
+or to disambiguate the output
+(so, for quotes and other characters that encase the printed string,
+for example, angle brackets, in case of file descriptor path output);
+for the former use case, unless it is a white space character
+that has a symbolic escape sequence defined in the C standard
+(that is, \(lq\fB\\t\fR\(rq for a horizontal tab,
+\(lq\fB\\n\fR\(rq for a newline,
+\(lq\fB\\v\fR\(rq for a vertical tab,
+\(lq\fB\\f\fR\(rq for a form feed page break,
+and \(lq\fB\\r\fR\(rq for a carriage return)
+are printed using escape sequences with numbers that correspond
+to their byte values, with octal number format being the default.
+.I option
+can be one of the following:
+.RS
+.TP 17
+.B none
+Hexadecimal numbers are not used in the output at all.
+When there is a need to emit an escape sequence, octal numbers are used.
+.TQ
+.B non-ascii-chars
+Hexadecimal numbers are used instead of octal in the escape sequences.
+.TQ
+.B non-ascii
+Strings that contain non-ASCII characters are printed using escape sequences
+with hexadecimal numbers.
+.TQ
+.B all
+All strings are printed using escape sequences with hexadecimal numbers.
+.RE
+.IP
+When the option is supplied without an argument,
+.B all
+is assumed.
+.TP
 .B \-x
 .TQ
-.BR \-\-strings\-in\-hex = \fInon\-ascii\fR
+.BR \-\-strings\-in\-hex = non\-ascii
 Print all non-ASCII strings in hexadecimal string format.
 .TP
 .B \-xx
 .TQ
-.B \-\-strings\-in\-hex
-.TQ
-.BR \-\-strings\-in\-hex = \fIall\fR
+.BR \-\-strings\-in\-hex [= all ]
 Print all strings in hexadecimal string format.
 .TP
 .BI "\-X " format

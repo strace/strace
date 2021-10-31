@@ -519,6 +519,12 @@ enum xflag_opts {
 	HEXSTR_NONE,
 	HEXSTR_NON_ASCII,
 	HEXSTR_ALL,
+	/*
+	 * It is here (after HEXSTR_ALL and not before HEXSTR_NON_ASCII) because
+	 * none/non-ascii/all are historic options values that are supported
+	 * via -x option.
+	 */
+	HEXSTR_NON_ASCII_CHARS,
 
 	NUM_HEXSTR_OPTS
 };

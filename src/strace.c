@@ -71,8 +71,10 @@ bool output_separately;
 unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
 				 | PTRACE_O_TRACEEXIT;
 static struct xlat_data xflag_str[] = {
-	{ HEXSTR_NON_ASCII,	"non-ascii" },
-	{ HEXSTR_ALL,		"all" },
+	{ HEXSTR_NONE,			"none" },
+	{ HEXSTR_NON_ASCII_CHARS,	"non-ascii-chars" },
+	{ HEXSTR_NON_ASCII,		"non-ascii" },
+	{ HEXSTR_ALL,			"all" },
 };
 unsigned int xflag;
 bool debug_flag;
@@ -402,8 +404,10 @@ Output format:\n\
      precision:  one of s, ms, us, ns; default is microseconds\n\
   -v, --no-abbrev\n\
                  verbose mode: print entities unabbreviated\n\
+  --strings-in-hex=non-ascii-chars\n\
+                 use hex instead of octal in escape sequences\n\
   -x, --strings-in-hex=non-ascii\n\
-                 print non-ascii strings in hex\n\
+                 print non-ASCII strings in hex\n\
   -xx, --strings-in-hex[=all]\n\
                  print all strings in hex\n\
   -X FORMAT, --const-print-style=FORMAT\n\
@@ -1991,7 +1995,7 @@ init(int argc, char *argv[])
 	int optF = 0, zflags = 0;
 	int lopt_idx;
 	int daemonized_tracer_long = DAEMONIZE_NONE;
-	int xflag_long = HEXSTR_NONE;
+	int xflag_long = -1;
 	int qflag_short = 0;
 	int followfork_short = 0;
 	int yflag_short = 0;
@@ -2314,12 +2318,12 @@ init(int argc, char *argv[])
 			count_wallclock = 1;
 			break;
 		case 'x':
-			xflag++;
+			xflag = MIN(xflag + 1, HEXSTR_ALL);
 			break;
 		case GETOPT_HEX_STR:
 			xflag_long = find_arg_val(optarg, xflag_str,
-						  HEXSTR_ALL, HEXSTR_NONE);
-			if (xflag_long <= HEXSTR_NONE)
+						  HEXSTR_ALL, -1);
+			if (xflag_long < HEXSTR_NONE)
 				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'X':
@@ -2443,7 +2447,7 @@ init(int argc, char *argv[])
 			     tflag_short == 2 ? ttflag_str : tttflag_str);
 	}
 
-	if (xflag_long) {
+	if (xflag_long >= 0) {
 		if (xflag) {
 			error_msg_and_die("-x and --strings-in-hex cannot"
 					  " be provided simultaneously");
