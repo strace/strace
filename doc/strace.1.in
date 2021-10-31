@@ -1086,7 +1086,7 @@ and PIDs associated with pidfd file descriptors.
 If strace and tracee are in different PID namespaces, print PIDs in
 strace's namespace, too.
 .if '@ENABLE_SECONTEXT_FALSE@'#' .TP
-.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext "[=full]"
+.if '@ENABLE_SECONTEXT_FALSE@'#' .BR \-\-secontext [= full ]
 .if '@ENABLE_SECONTEXT_FALSE@'#' When SELinux is available and is not disabled,
 .if '@ENABLE_SECONTEXT_FALSE@'#' print in square brackets SELinux contexts of
 .if '@ENABLE_SECONTEXT_FALSE@'#' processes, files, and descriptors.  When
