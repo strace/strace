@@ -931,22 +931,10 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			} else {
 				/* Print \octal */
 				*s++ = '\\';
-				if (i + 1 < size
-				    && ustr[i + 1] >= '0'
-				    && ustr[i + 1] <= '7'
-				) {
-					/* Print \ooo */
-					*s++ = '0' + (c >> 6);
-					*s++ = '0' + ((c >> 3) & 0x7);
-				} else {
-					/* Print \[[o]o]o */
-					if ((c >> 3) != 0) {
-						if ((c >> 6) != 0)
-							*s++ = '0' + (c >> 6);
-						*s++ = '0' + ((c >> 3) & 0x7);
-					}
-				}
-				*s++ = '0' + (c & 0x7);
+				s = sprint_byte_oct(s, c,
+						    i + 1 < size
+						    && ustr[i + 1] >= '0'
+						    && ustr[i + 1] <= '7');
 			}
 		}
 	}

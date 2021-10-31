@@ -25,6 +25,27 @@ is_print(uint8_t c)
 
 /* Character printing functions */
 
+/** @param unabbrev Whether to always print \ooo instead of \[[o]o]o. */
+static inline char *
+sprint_byte_oct(char *s, uint8_t c, bool unabbrev)
+{
+	if (unabbrev) {
+		/* Print \ooo */
+		*s++ = '0' + (c >> 6);
+		*s++ = '0' + ((c >> 3) & 0x7);
+	} else {
+		/* Print \[[o]o]o */
+		if ((c >> 3) != 0) {
+			if ((c >> 6) != 0)
+				*s++ = '0' + (c >> 6);
+			*s++ = '0' + ((c >> 3) & 0x7);
+		}
+	}
+	*s++ = '0' + (c & 0x7);
+
+	return s;
+}
+
 static inline char *
 sprint_byte_hex(char *buf, uint8_t val)
 {
