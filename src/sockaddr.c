@@ -24,6 +24,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_xdp.h>
 #include <linux/mctp.h>
+#include <linux/qrtr.h>
 #include <linux/x25.h>
 
 #include "xlat/addrfams.h"
@@ -35,6 +36,9 @@
 #include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
+
+#include "xlat/qipcrtr_nodes.h"
+#include "xlat/qipcrtr_ports.h"
 
 #include "xlat/xdp_sockaddr_flags.h"
 
@@ -708,6 +712,17 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_qrtr(struct tcb *tcp, const void *const buf,
+			 const int addrlen)
+{
+	const struct sockaddr_qrtr *const sa_qrtr = buf;
+
+	PRINT_FIELD_XVAL(*sa_qrtr, sq_node, qipcrtr_nodes, NULL);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*sa_qrtr, sq_port, qipcrtr_ports, NULL);
+}
+
+static void
 print_sockaddr_data_xdp(struct tcb *tcp, const void *const buf,
 			const int addrlen)
 {
@@ -770,6 +785,8 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_QIPCRTR] = { print_sockaddr_data_qrtr, sizeof(struct sockaddr_qrtr) },
+	/* AF_SMC doesn't have sockaddr (INET{,6} sockaddrs are used instead) */
 	[AF_XDP] = { print_sockaddr_data_xdp, sizeof(struct sockaddr_xdp) },
 	[AF_MCTP] = { print_sockaddr_data_mctp, sizeof(struct sockaddr_mctp) },
 };

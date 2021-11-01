@@ -25,6 +25,16 @@
 # include <bluetooth/sco.h>
 #endif
 
+#ifdef HAVE_LINUX_QRTR_H
+# include <linux/qrtr.h>
+#else
+struct sockaddr_qrtr {
+	uint16_t sq_family;
+	uint32_t sq_node;
+	uint32_t sq_port;
+};
+#endif
+
 #ifdef HAVE_LINUX_IF_XDP_H
 # include <linux/if_xdp.h>
 #endif
@@ -289,6 +299,69 @@ check_rc(void)
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
 
 static void
+check_qrtr(void)
+{
+	static const struct {
+		struct sockaddr_qrtr sa;
+		const char *str;
+	} qrtr_vecs[] = {
+		{ { AF_QIPCRTR },
+		  "{sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+		  ", sq_node=0, sq_port=0}" },
+		{ { AF_QIPCRTR, .sq_node = 0xdeadface },
+		  "{sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+		  ", sq_node=0xdeadface, sq_port=0}" },
+		{ { AF_QIPCRTR, .sq_port = 0xdeedfade },
+		  "{sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+		  ", sq_node=0, sq_port=0xdeedfade}" },
+		{ { AF_QIPCRTR, .sq_node = 0xfffffffd, .sq_port = 0xfffffffd },
+		  "{sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+		  ", sq_node=0xfffffffd, sq_port=0xfffffffd}" },
+		{ { AF_QIPCRTR, .sq_node = 0xfffffffe, .sq_port = 0xfffffffe },
+		  "{sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+		  ", sq_node=0xfffffffe, sq_port="
+		  XLAT_KNOWN(0xfffffffe, "QRTR_PORT_CTRL") "}" },
+		{ { AF_QIPCRTR, .sq_node = 0xffffffff, .sq_port = 0xffffffff },
+		  "{sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+		  ", sq_node=" XLAT_KNOWN(0xffffffff, "QRTR_NODE_BCAST")
+		  ", sq_port=0xffffffff}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_qrtr, sa_qrtr);
+	int rc;
+
+	fill_memory(sa_qrtr, sizeof(*sa_qrtr));
+	sa_qrtr->sq_family = AF_QIPCRTR;
+
+	rc = connect(-1, (void *) sa_qrtr, sizeof(*sa_qrtr) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_qrtr, sizeof(*sa_qrtr) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_qrtr, sizeof(*sa_qrtr) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_qrtr + sizeof(sa_qrtr->sq_family),
+			    sizeof(*sa_qrtr) - sizeof(sa_qrtr->sq_family)
+					     - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_qrtr) - 1, errstr);
+
+	rc = connect(-1, (void *) sa_qrtr, sizeof(*sa_qrtr));
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x2a, "AF_QIPCRTR")
+	       ", sq_node=%#x, sq_port=%#x}, %zu) = %s\n",
+	       sa_qrtr->sq_node, sa_qrtr->sq_port, sizeof(*sa_qrtr), errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(qrtr_vecs); i++) {
+		*sa_qrtr = qrtr_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_qrtr, sizeof(*sa_qrtr));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       qrtr_vecs[i].str, sizeof(*sa_qrtr), sprintrc(rc));
+	}
+}
+
+static void
 check_xdp(void)
 {
 	const struct {
@@ -453,6 +526,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_qrtr();
 	check_xdp();
 	check_mctp();
 

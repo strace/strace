@@ -92,6 +92,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/pkt_sched.h \
 	linux/include/uapi/linux/prctl.h \
 	linux/include/uapi/linux/ptp_clock.h \
+	linux/include/uapi/linux/qrtr.h \
 	linux/include/uapi/linux/quota.h \
 	linux/include/uapi/linux/rtnetlink.h \
 	linux/include/uapi/linux/sched.h \
