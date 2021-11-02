@@ -28,11 +28,6 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <asm/types.h>
-#ifdef HAVE_NETIPX_IPX_H
-# include <netipx/ipx.h>
-#else
-# include <linux/ipx.h>
-#endif
 
 #include <linux/ip_vs.h>
 #include "netlink.h"

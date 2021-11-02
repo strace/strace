@@ -24,7 +24,11 @@
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
 #include <linux/x25.h>
-#include <linux/ipx.h>
+#if defined HAVE_LINUX_IPX_H
+# include <linux/ipx.h>
+#elif defined HAVE_NETIPX_IPX_H
+# include <netipx/ipx.h>
+#endif
 #ifdef HAVE_BLUETOOTH_BLUETOOTH_H
 # include <bluetooth/bluetooth.h>
 # include <bluetooth/hci.h>
@@ -269,6 +273,7 @@ check_in6(void)
 	printf("connect(-1, %p, %u) = %d EBADF (%m)\n", in6, len, ret);
 }
 
+#if defined HAVE_LINUX_IPX_H || defined HAVE_NETIPX_IPX_H
 static void
 check_ipx(void)
 {
@@ -295,6 +300,7 @@ check_ipx(void)
 	       c_ipx.sipx_node[4], c_ipx.sipx_node[5],
 	       c_ipx.sipx_type, len, ret);
 }
+#endif /* HAVE_LINUX_IPX_H || defined HAVE_NETIPX_IPX_H */
 
 /* for a bit more compact AX.25 address definitions */
 #define AX25_ADDR(c_, s_) \
@@ -773,7 +779,9 @@ main(void)
 	check_un();
 	check_in();
 	check_in6();
+#if defined HAVE_LINUX_IPX_H || defined HAVE_NETIPX_IPX_H
 	check_ipx();
+#endif
 	check_ax25();
 	check_x25();
 	check_nl();

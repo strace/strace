@@ -24,12 +24,6 @@
 #include <linux/if_ether.h>
 #include <linux/x25.h>
 
-#ifdef HAVE_NETIPX_IPX_H
-# include <netipx/ipx.h>
-#else
-# include <linux/ipx.h>
-#endif
-
 #include "xlat/addrfams.h"
 #include "xlat/arp_hardware_types.h"
 #include "xlat/ethernet_protocols.h"
@@ -41,6 +35,16 @@
 #include "xlat/hci_channels.h"
 
 #define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
+
+#define IPX_NODE_LEN	6
+struct sockaddr_ipx {
+	uint16_t sipx_family;
+	uint16_t sipx_port;
+	uint32_t sipx_network;
+	unsigned char sipx_node[IPX_NODE_LEN];
+	uint8_t sipx_type;
+	unsigned char sipx_zero;
+};
 
 static void
 print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen)
