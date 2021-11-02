@@ -45,6 +45,7 @@
 #endif
 #include <linux/if_packet.h>
 #include <linux/icmp.h>
+#include <linux/vm_sockets.h>
 
 #include "xlat/socktypes.h"
 #include "xlat/sock_type_flags.h"
@@ -490,6 +491,7 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_ip_options.h"
 #include "xlat/getsock_ip_options.h"
 #include "xlat/setsock_ip_options.h"
+#include "xlat/sock_vsock_options.h"
 #include "xlat/sock_ipv6_options.h"
 #include "xlat/getsock_ipv6_options.h"
 #include "xlat/setsock_ipv6_options.h"
@@ -519,7 +521,7 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_tls_options.h"
 #include "xlat/sock_xdp_options.h"
 
-#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_, 		\
+#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
 			len_, print_func_, ...)				\
 	do {								\
 		unsigned int start = offsetof(typeof(where_), field_);	\
@@ -561,6 +563,14 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		printxvals(name, "IP_???", sock_ip_options,
 			   is_getsockopt ? getsock_ip_options :
 					   setsock_ip_options, NULL);
+		break;
+	/*
+	 * Yes, VMWare in their infinite wisdom have decided to use address
+	 * family instead of a socket option layer for the socket option layer
+	 * check, see net/vmw_vsock/af_vsock.c:vsock_connectible_[gs]etsockopt.
+	 */
+	case AF_VSOCK:
+		printxval(sock_vsock_options, name, "SO_VM_???");
 		break;
 	case SOL_IPV6:
 		printxvals(name, "IPV6_???", sock_ipv6_options,
