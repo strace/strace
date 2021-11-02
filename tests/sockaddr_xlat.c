@@ -25,6 +25,34 @@
 # include <bluetooth/sco.h>
 #endif
 
+#ifdef HAVE_LINUX_VM_SOCKETS_H
+# include <linux/vm_sockets.h>
+#endif
+
+#ifdef HAVE_STRUCT_SOCKADDR_VM
+# ifdef HAVE_STRUCT_SOCKADDR_VM_SVM_FLAGS
+#  define SVM_FLAGS		svm_flags
+#  define SVM_ZERO		svm_zero
+#  define SVM_ZERO_FIRST	svm_zero[0]
+# else
+#  define SVM_FLAGS		svm_zero[0]
+#  define SVM_ZERO		svm_zero + 1
+#  define SVM_ZERO_FIRST	svm_zero[1]
+# endif
+#else
+struct sockaddr_vm {
+	uint16_t  svm_family;
+	uint16_t svm_reserved1;
+	uint32_t svm_port;
+	uint32_t svm_cid;
+	uint8_t svm_flags;
+	uint8_t svm_zero[sizeof(struct sockaddr) - 13];
+};
+# define SVM_FLAGS	svm_flags
+# define SVM_ZERO	svm_zero
+# define SVM_ZERO_FIRST	svm_zero[0]
+#endif
+
 #ifdef HAVE_LINUX_QRTR_H
 # include <linux/qrtr.h>
 #else
@@ -299,6 +327,87 @@ check_rc(void)
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
 
 static void
+check_vsock(void)
+{
+	static const struct {
+		struct sockaddr_vm sa;
+		const char *str;
+	} vsock_vecs[] = {
+		{ { AF_VSOCK },
+		  "{sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+		  ", svm_cid=" XLAT_KNOWN(0, "VMADDR_CID_HYPERVISOR")
+		  ", svm_port=0, svm_flags=0}" },
+		{ { AF_VSOCK, .svm_cid = 1, .svm_port = 1, .SVM_FLAGS = 1 },
+		  "{sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+		  ", svm_cid=" XLAT_KNOWN(0x1, "VMADDR_CID_LOCAL")
+		  ", svm_port=0x1"
+		  ", svm_flags=" XLAT_KNOWN(0x1, "VMADDR_FLAG_TO_HOST") "}" },
+		{ { AF_VSOCK, .svm_reserved1 = 0xdead, .svm_cid = 2,
+		    .svm_port = 0xfacebeef, .SVM_FLAGS = 2, },
+		  "{sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+		  ", svm_reserved1=0xdead"
+		  ", svm_cid=" XLAT_KNOWN(0x2, "VMADDR_CID_HOST")
+		  ", svm_port=0xfacebeef"
+		  ", svm_flags=" XLAT_UNKNOWN(0x2, "VMADDR_FLAG_???") "}" },
+		{ { AF_VSOCK, .svm_cid = 3,
+		    .svm_port = 0xfffffffe, .SVM_FLAGS = 0xef,
+		    .SVM_ZERO_FIRST = 0x42 },
+		  "{sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+		  ", svm_cid=0x3, svm_port=0xfffffffe, svm_flags="
+		  XLAT_KNOWN(0xef, "VMADDR_FLAG_TO_HOST|0xee")
+		  ", svm_zero=\"\\x42\\x00\\x00\"}" },
+		{ { AF_VSOCK, .svm_reserved1 = 0x1, .svm_cid = -1U,
+		    .svm_port = -1U, .SVM_FLAGS = 0xfe,
+		    .SVM_ZERO_FIRST = 0xae },
+		  "{sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+		  ", svm_reserved1=0x1"
+		  ", svm_cid=" XLAT_KNOWN(0xffffffff, "VMADDR_CID_ANY")
+		  ", svm_port=" XLAT_KNOWN(0xffffffff, "VMADDR_PORT_ANY")
+		  ", svm_flags=" XLAT_UNKNOWN(0xfe, "VMADDR_FLAG_???")
+		  ", svm_zero=\"\\xae\\x00\\x00\"}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_vm, sa_vm);
+	int rc;
+
+	fill_memory(sa_vm, sizeof(*sa_vm));
+	sa_vm->svm_family = AF_VSOCK;
+
+	rc = connect(-1, (void *) sa_vm, sizeof(*sa_vm) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_vm, sizeof(*sa_vm) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_vm, sizeof(*sa_vm) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_vm + sizeof(sa_vm->svm_family),
+			    sizeof(*sa_vm) - sizeof(sa_vm->svm_family)
+					     - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_vm) - 1, errstr);
+
+	rc = connect(-1, (void *) sa_vm, sizeof(*sa_vm));
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x28, "AF_VSOCK")
+	       ", svm_reserved1=%#x, svm_cid=%#x, svm_port=%#x, svm_flags=%#x"
+	       NRAW(" /* VMADDR_FLAG_??? */") ", svm_zero=",
+	       sa_vm->svm_reserved1, sa_vm->svm_cid, sa_vm->svm_port,
+	       sa_vm->SVM_FLAGS);
+	print_quoted_hex(sa_vm->SVM_ZERO,
+			 (uint8_t *) sa_vm + sizeof(*sa_vm)
+					   - (sa_vm->SVM_ZERO));
+	printf("}, %zu) = %s\n",  sizeof(*sa_vm), errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(vsock_vecs); i++) {
+		*sa_vm = vsock_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_vm, sizeof(*sa_vm));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       vsock_vecs[i].str, sizeof(*sa_vm), sprintrc(rc));
+	}
+}
+
+static void
 check_qrtr(void)
 {
 	static const struct {
@@ -526,6 +635,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_vsock();
 	check_qrtr();
 	check_xdp();
 	check_mctp();

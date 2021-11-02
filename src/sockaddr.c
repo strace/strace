@@ -25,6 +25,7 @@
 #include <linux/if_xdp.h>
 #include <linux/mctp.h>
 #include <linux/qrtr.h>
+#include <linux/vm_sockets.h>
 #include <linux/x25.h>
 
 #include "xlat/addrfams.h"
@@ -36,6 +37,10 @@
 #include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
+
+#include "xlat/vsock_cids.h"
+#include "xlat/vsock_flags.h"
+#include "xlat/vsock_ports.h"
 
 #include "xlat/qipcrtr_nodes.h"
 #include "xlat/qipcrtr_ports.h"
@@ -712,6 +717,27 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_vsock(struct tcb *tcp, const void *const buf,
+			  const int addrlen)
+{
+	const struct sockaddr_vm *const sa_vm = buf;
+
+	if (sa_vm->svm_reserved1) {
+		PRINT_FIELD_X(*sa_vm, svm_reserved1);
+		tprint_struct_next();
+	}
+	PRINT_FIELD_XVAL(*sa_vm, svm_cid, vsock_cids, NULL);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*sa_vm, svm_port, vsock_ports, NULL);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS(*sa_vm, svm_flags, vsock_flags, "VMADDR_FLAG_???");
+	if (!IS_ARRAY_ZERO(sa_vm->svm_zero)) {
+		tprint_struct_next();
+		PRINT_FIELD_HEX_ARRAY(*sa_vm, svm_zero);
+	}
+}
+
+static void
 print_sockaddr_data_qrtr(struct tcb *tcp, const void *const buf,
 			 const int addrlen)
 {
@@ -785,6 +811,8 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_VSOCK] = { print_sockaddr_data_vsock, sizeof(struct sockaddr_vm) },
+	/* AF_KCM does not support connect/bind calls on its sockets */
 	[AF_QIPCRTR] = { print_sockaddr_data_qrtr, sizeof(struct sockaddr_qrtr) },
 	/* AF_SMC doesn't have sockaddr (INET{,6} sockaddrs are used instead) */
 	[AF_XDP] = { print_sockaddr_data_xdp, sizeof(struct sockaddr_xdp) },

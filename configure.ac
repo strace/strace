@@ -448,6 +448,12 @@ AC_CHECK_HEADERS(m4_normalize([
 #include <linux/types.h>
 ])
 
+AC_CHECK_HEADERS(m4_normalize([
+	linux/vm_sockets.h
+]),,, [AC_INCLUDES_DEFAULT
+#include <sys/socket.h>
+])
+
 AC_CHECK_HEADERS([asm/sigcontext.h],,, [#include <signal.h>])
 
 AC_CHECK_HEADERS([netinet/tcp.h netinet/udp.h],,, [#include <netinet/in.h>])
@@ -516,6 +522,14 @@ AC_CHECK_TYPES(m4_normalize([
 	struct sockaddr_xdp
 ]),,, [#include <netinet/in.h>
 #include <linux/if_xdp.h>])
+
+AC_CHECK_TYPES(m4_normalize([struct sockaddr_vm]),[
+	AC_CHECK_MEMBERS(m4_normalize([
+		struct sockaddr_vm.svm_flags
+	]),,, [#include <netinet/in.h>
+#include <linux/vm_sockets.h>])
+],, [#include <netinet/in.h>
+#include <linux/vm_sockets.h>])
 
 saved_CPPFLAGS="$CPPFLAGS"
 
