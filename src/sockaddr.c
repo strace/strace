@@ -420,6 +420,10 @@ print_sockaddr_data_ipx(struct tcb *tcp, const void *const buf,
 	PRINT_FIELD_VAL_ARRAY(*sa_ipx, sipx_node, PRINT_VAL_0X);
 	tprint_struct_next();
 	PRINT_FIELD_0X(*sa_ipx, sipx_type);
+	if (sa_ipx->sipx_zero) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*sa_ipx, sipx_zero);
+	}
 }
 
 void

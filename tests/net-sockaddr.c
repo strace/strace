@@ -286,19 +286,25 @@ check_ipx(void)
 		.sipx_node = "ABCDEF",
 		.sipx_type = -1
 	};
-	void *ipx = tail_memdup(&c_ipx, sizeof(c_ipx));
+	struct sockaddr_ipx *ipx = tail_memdup(&c_ipx, sizeof(c_ipx));
 	unsigned int len = sizeof(c_ipx);
-	int ret = connect(-1, ipx, len);
-	pidns_print_leader();
-	printf("connect(-1, {sa_family=AF_IPX, sipx_port=htons(%u)"
-	       ", sipx_network=htonl(%#x)"
-	       ", sipx_node=[%#02x, %#02x, %#02x, %#02x, %#02x, %#02x]"
-	       ", sipx_type=%#02x}, %u) = %d EBADF (%m)\n",
-	       h_port, h_network,
-	       c_ipx.sipx_node[0], c_ipx.sipx_node[1],
-	       c_ipx.sipx_node[2], c_ipx.sipx_node[3],
-	       c_ipx.sipx_node[4], c_ipx.sipx_node[5],
-	       c_ipx.sipx_type, len, ret);
+
+	for (size_t i = 0; i < 2; i++) {
+		int ret = connect(-1, (void *) ipx, len);
+		pidns_print_leader();
+		printf("connect(-1, {sa_family=AF_IPX, sipx_port=htons(%u)"
+		       ", sipx_network=htonl(%#x)"
+		       ", sipx_node=[%#02x, %#02x, %#02x, %#02x, %#02x, %#02x]"
+		       ", sipx_type=%#02x%s}, %u) = %d EBADF (%m)\n",
+		       h_port, h_network,
+		       c_ipx.sipx_node[0], c_ipx.sipx_node[1],
+		       c_ipx.sipx_node[2], c_ipx.sipx_node[3],
+		       c_ipx.sipx_node[4], c_ipx.sipx_node[5],
+		       c_ipx.sipx_type, i ? ", sipx_zero=0x42" : "",
+		       len, ret);
+
+		ipx->sipx_zero = 0x42;
+	}
 }
 #endif /* HAVE_LINUX_IPX_H || defined HAVE_NETIPX_IPX_H */
 
