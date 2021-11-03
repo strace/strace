@@ -37,18 +37,11 @@ enum {
 	CHILD_CPUTIME_LIMIT_NSEC = 500000000,
 };
 
-int
-main(void)
+static void
+enjoy_time(uint64_t cputime_limit)
 {
 	struct timespec ts = { 0 };
 	volatile int dummy = 0;
-
-	pid_t pid = fork();
-	if (pid < 0)
-		perror_msg_and_fail("fork");
-
-	const long cputime_limit =
-		pid ? PARENT_CPUTIME_LIMIT_NSEC : CHILD_CPUTIME_LIMIT_NSEC;
 
 	/* Enjoying my user time */
 	for (size_t i = 0; i < NUM_USER_ITERS_SQRT; ++i) {
@@ -85,8 +78,20 @@ main(void)
 
 		sched_yield();
 	}
+}
+
+int
+main(void)
+{
+	enjoy_time(PARENT_CPUTIME_LIMIT_NSEC);
+
+	pid_t pid = fork();
+	if (pid < 0)
+		perror_msg_and_fail("fork");
 
 	if (pid == 0) {
+		enjoy_time(CHILD_CPUTIME_LIMIT_NSEC);
+
 		return 0;
 	} else {
 		wait(NULL);
