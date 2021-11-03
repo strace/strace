@@ -37,6 +37,12 @@ enum {
 	CHILD_CPUTIME_LIMIT_NSEC = 500000000,
 };
 
+static uint64_t
+nsecs(struct timespec *ts)
+{
+	return (uint64_t) ts->tv_sec * 1000000000 + ts->tv_nsec;
+}
+
 static void
 enjoy_time(uint64_t cputime_limit)
 {
@@ -46,7 +52,7 @@ enjoy_time(uint64_t cputime_limit)
 	/* Enjoying my user time */
 	for (size_t i = 0; i < NUM_USER_ITERS_SQRT; ++i) {
 		if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
-			if (ts.tv_sec || ts.tv_nsec >= cputime_limit)
+			if (nsecs(&ts) >= cputime_limit)
 				break;
 		}
 
@@ -73,7 +79,7 @@ enjoy_time(uint64_t cputime_limit)
 				continue;
 		}
 
-		if (ts.tv_sec || ts.tv_nsec >= cputime_limit * 3)
+		if (nsecs(&ts) >= cputime_limit * 3)
 			break;
 
 		sched_yield();
