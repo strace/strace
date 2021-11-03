@@ -29,7 +29,7 @@
 #include <sys/wait.h>
 
 enum {
-	NUM_USER_ITERS_SQRT = 1000,
+	NUM_USER_ITERS_SQRT = 2000,
 	NUM_USER_ITERS = NUM_USER_ITERS_SQRT * NUM_USER_ITERS_SQRT,
 	READ_BUF_SIZE = 65536,
 	READ_ITER = 128,
@@ -40,9 +40,8 @@ enum {
 int
 main(void)
 {
-	struct timespec ts;
+	struct timespec ts = { 0 };
 	volatile int dummy = 0;
-	int i = 0;
 
 	pid_t pid = fork();
 	if (pid < 0)
@@ -52,14 +51,13 @@ main(void)
 		pid ? PARENT_CPUTIME_LIMIT_NSEC : CHILD_CPUTIME_LIMIT_NSEC;
 
 	/* Enjoying my user time */
-	while (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
-		if (ts.tv_sec || ts.tv_nsec >= cputime_limit)
-			break;
+	for (size_t i = 0; i < NUM_USER_ITERS_SQRT; ++i) {
+		if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) == 0) {
+			if (ts.tv_sec || ts.tv_nsec >= cputime_limit)
+				break;
+		}
 
-		if ((i > NUM_USER_ITERS_SQRT) && !(ts.tv_sec || ts.tv_nsec))
-			error_msg_and_skip("clock_gettime(CLOCK_PROCESS_CPUTIME_ID, {0, 0})");
-
-		for (i = 0; i < NUM_USER_ITERS; ++i)
+		for (size_t j = 0; j < NUM_USER_ITERS; ++j)
 			++dummy;
 	}
 
