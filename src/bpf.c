@@ -202,10 +202,7 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_CREATE)
 		 * without the access to the kernel headers.
 		 */
 		tprint_struct_next();
-		tprints_field_name("numa_node");
-		printxvals_ex(attr.numa_node, NULL,
-			      XLAT_STYLE_FMT_U | XLAT_STYLE_VERBOSE,
-			      numa_node, NULL);
+		PRINT_FIELD_XVAL_U_VERBOSE(attr, numa_node, numa_node, NULL);
 	}
 
 	/* map_name field was added in Linux commit v4.15-rc1~84^2~605^2~3. */

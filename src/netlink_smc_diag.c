@@ -219,13 +219,11 @@ decode_smc_diag_fallback(struct tcb *const tcp,
 	 * net/smc/smc_clc.h
 	 */
 	tprint_struct_begin();
-	tprints_field_name("reason");
-	printxval_ex(smc_decl_codes, fb.reason, "SMC_CLC_DECL_???",
-		     XLAT_STYLE_VERBOSE);
+	PRINT_FIELD_XVAL_VERBOSE(fb, reason, smc_decl_codes,
+				 "SMC_CLC_DECL_???");
 	tprint_struct_next();
-	tprints_field_name("peer_diagnosis");
-	printxval_ex(smc_decl_codes, fb.peer_diagnosis, "SMC_CLC_DECL_???",
-		     XLAT_STYLE_VERBOSE);
+	PRINT_FIELD_XVAL_VERBOSE(fb, peer_diagnosis, smc_decl_codes,
+				 "SMC_CLC_DECL_???");
 	tprint_struct_end();
 
 	return true;

@@ -438,7 +438,17 @@ tprints_arg_begin(const char *name)
 		tprints_field_name(#field_);				\
 		printxval64((xlat_),					\
 			    zero_extend_signed_to_ull((where_).field_),	\
-			    (dflt_));		\
+			    (dflt_));					\
+	} while (0)
+
+# define PRINT_FIELD_XVAL_VERBOSE(where_, field_, xlat_, dflt_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		printxval_ex((xlat_),					\
+			     zero_extend_signed_to_ull((where_).field_), \
+			     (dflt_),					\
+			     xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
+				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE);	\
 	} while (0)
 
 # define PRINT_FIELD_XVAL_D(where_, field_, xlat_, dflt_)		\
@@ -455,6 +465,17 @@ tprints_arg_begin(const char *name)
 		printxval64_u((xlat_),					\
 			      zero_extend_signed_to_ull((where_).field_), \
 			      (dflt_));					\
+	} while (0)
+
+# define PRINT_FIELD_XVAL_U_VERBOSE(where_, field_, xlat_, dflt_)	\
+	do {								\
+		tprints_field_name(#field_);				\
+		printxval_ex((xlat_),					\
+			     zero_extend_signed_to_ull((where_).field_), \
+			     (dflt_),					\
+			     (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
+				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE)	\
+			     | XLAT_STYLE_FMT_U);			\
 	} while (0)
 
 # define PRINT_FIELD_ERR_D(where_, field_)				\
