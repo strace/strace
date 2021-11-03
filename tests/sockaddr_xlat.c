@@ -25,6 +25,29 @@
 # include <bluetooth/sco.h>
 #endif
 
+#ifdef HAVE_LINUX_NFC_H
+# include <linux/nfc.h>
+#else
+struct sockaddr_nfc {
+	uint16_t sa_family;
+	uint32_t dev_idx;
+	uint32_t target_idx;
+	uint32_t nfc_protocol;
+};
+
+# define NFC_LLCP_MAX_SERVICE_NAME 63
+struct sockaddr_nfc_llcp {
+	uint16_t sa_family;
+	uint32_t dev_idx;
+	uint32_t target_idx;
+	uint32_t nfc_protocol;
+	uint8_t dsap;
+	uint8_t ssap;
+	char service_name[NFC_LLCP_MAX_SERVICE_NAME];
+	size_t service_name_len;
+};
+#endif
+
 #ifdef HAVE_LINUX_VM_SOCKETS_H
 # include <linux/vm_sockets.h>
 #endif
@@ -325,6 +348,137 @@ check_rc(void)
 # endif
 }
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
+
+static void
+check_nfc(void)
+{
+	const struct {
+		struct sockaddr_nfc sa;
+		const char *str;
+	} nfc_vecs[] = {
+		{ { AF_NFC },
+		  "{sa_family=" XLAT_KNOWN(0x27, "AF_NFC") ", dev_idx=0"
+		  ", target_idx=0, nfc_protocol=0" NRAW(" /* NFC_PROTO_??? */")
+		  "}" },
+		{ { AF_NFC, .dev_idx = ifindex_lo(), .target_idx = 1,
+		    .nfc_protocol = 1 },
+		  "{sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+		  ", dev_idx=" XLAT_KNOWN(1, IFINDEX_LO_STR) ", target_idx=0x1"
+		  ", nfc_protocol=" XLAT_KNOWN(0x1, "NFC_PROTO_JEWEL") "}" },
+		{ { AF_NFC, .dev_idx = 0xcafebeef, .target_idx = 0xdeadface,
+		    .nfc_protocol = 0xfeedbabe },
+		  "{sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+		  ", dev_idx=3405692655, target_idx=0xdeadface"
+		  ", nfc_protocol=0xfeedbabe" NRAW(" /* NFC_PROTO_??? */")
+		  "}" },
+	};
+	const struct {
+		struct sockaddr_nfc_llcp sa;
+		const char *str;
+	} nfc_llcp_vecs[] = {
+		{ { AF_NFC },
+		  "{sa_family=" XLAT_KNOWN(0x27, "AF_NFC") ", dev_idx=0"
+		  ", target_idx=0, nfc_protocol=0" NRAW(" /* NFC_PROTO_??? */")
+		  ", dsap=0, ssap=0, service_name=\"\", service_name_len=0}" },
+		{ { AF_NFC, .dev_idx = ifindex_lo(), .target_idx = 0x42,
+		    .nfc_protocol = 7, .dsap = 1, .ssap = 5,
+		    .service_name_len = 1 },
+		  "{sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+		  ", dev_idx=" XLAT_KNOWN(1, IFINDEX_LO_STR) ", target_idx=0x42"
+		  ", nfc_protocol=" XLAT_KNOWN(0x7, "NFC_PROTO_ISO15693")
+		  ", dsap=0x1" NRAW(" /* LLCP_SAP_SDP */")
+		  ", ssap=0x5, service_name=\"\\0\", service_name_len=1}" },
+		{ { AF_NFC, .dev_idx = 0xcafed1ce, .target_idx = 0x42,
+		    .nfc_protocol = 8, .dsap = 42, .ssap = 0xff,
+		    .service_name="OH HAI THAR\0EHLO\n\t\v\f'\"\\\177\333",
+		    .service_name_len = 42 },
+		  "{sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+		  ", dev_idx=3405697486, target_idx=0x42"
+		  ", nfc_protocol=0x8" NRAW(" /* NFC_PROTO_??? */")
+		  ", dsap=0x2a, ssap=0xff" NRAW(" /* LLCP_SAP_MAX */")
+		  ", service_name=\"OH HAI THAR\\0EHLO\\n\\t\\v\\f'\\\""
+		  "\\\\\\177\\333\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		  "\\0\\0\\0\\0\\0\", service_name_len=42}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_nfc, sa_nfc);
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_nfc_llcp, sa_nfc_llcp);
+	int rc;
+
+	fill_memory(sa_nfc, sizeof(*sa_nfc));
+	sa_nfc->sa_family = AF_NFC;
+
+	rc = connect(-1, (void *) sa_nfc, sizeof(*sa_nfc) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_nfc, sizeof(*sa_nfc) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_nfc, sizeof(*sa_nfc) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_nfc + sizeof(sa_nfc->sa_family),
+			    sizeof(*sa_nfc) - sizeof(sa_nfc->sa_family) - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_nfc) - 1, errstr);
+
+	rc = connect(-1, (void *) sa_nfc, sizeof(*sa_nfc));
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+	       ", dev_idx=%u, target_idx=%#x, nfc_protocol=%#x"
+	       NRAW(" /* NFC_PROTO_??? */") "}, %zu) = %s\n",
+	       sa_nfc->dev_idx, sa_nfc->target_idx, sa_nfc->nfc_protocol,
+	       sizeof(*sa_nfc), errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(nfc_vecs); i++) {
+		*sa_nfc = nfc_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_nfc, sizeof(*sa_nfc));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       nfc_vecs[i].str, sizeof(*sa_nfc), sprintrc(rc));
+	}
+
+	fill_memory(sa_nfc_llcp, sizeof(*sa_nfc_llcp));
+	sa_nfc_llcp->sa_family = AF_NFC;
+
+	rc = connect(-1, (void *) sa_nfc_llcp, sizeof(*sa_nfc_llcp) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_nfc_llcp, sizeof(*sa_nfc_llcp) + 1, sprintrc(rc));
+
+	for (size_t i = 0; i < 3; i++) {
+		size_t sz = i ? i == 2 ? sizeof(*sa_nfc_llcp) - 1
+				       : sizeof(struct sockaddr_nfc) + 1
+			      : sizeof(struct sockaddr_nfc);
+
+		rc = connect(-1, (void *) sa_nfc_llcp, sz);
+		errstr = sprintrc(rc);
+		printf("connect(-1, {sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+		       ", dev_idx=%u, target_idx=%#x, nfc_protocol=%#x"
+		       NRAW(" /* NFC_PROTO_??? */") "%s}, %zu) = %s\n",
+		       sa_nfc_llcp->dev_idx, sa_nfc_llcp->target_idx,
+		       sa_nfc_llcp->nfc_protocol, i ? ", ..." : "", sz, errstr);
+	}
+
+	rc = connect(-1, (void *) sa_nfc_llcp, sizeof(*sa_nfc_llcp));
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x27, "AF_NFC")
+	       ", dev_idx=%u, target_idx=%#x, nfc_protocol=%#x"
+	       NRAW(" /* NFC_PROTO_??? */") ", dsap=%#hhx, ssap=%#hhx"
+	       ", service_name=",
+	       sa_nfc_llcp->dev_idx, sa_nfc_llcp->target_idx,
+	       sa_nfc_llcp->nfc_protocol, sa_nfc_llcp->dsap, sa_nfc_llcp->ssap);
+	print_quoted_memory(sa_nfc_llcp->service_name,
+			    sizeof(sa_nfc_llcp->service_name));
+	printf(", service_name_len=%zu}, %zu) = %s\n",
+	       sa_nfc_llcp->service_name_len, sizeof(*sa_nfc_llcp), errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(nfc_llcp_vecs); i++) {
+		*sa_nfc_llcp = nfc_llcp_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_nfc_llcp, sizeof(*sa_nfc_llcp));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       nfc_llcp_vecs[i].str, sizeof(*sa_nfc_llcp),
+		       sprintrc(rc));
+	}
+}
 
 static void
 check_vsock(void)
@@ -635,6 +789,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_nfc();
 	check_vsock();
 	check_qrtr();
 	check_xdp();

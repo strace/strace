@@ -24,6 +24,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_xdp.h>
 #include <linux/mctp.h>
+#include <linux/nfc.h>
 #include <linux/qrtr.h>
 #include <linux/vm_sockets.h>
 #include <linux/x25.h>
@@ -37,6 +38,9 @@
 #include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
+
+#include "xlat/nfc_saps.h"
+#include "xlat/nfc_sockaddr_protocols.h"
 
 #include "xlat/vsock_cids.h"
 #include "xlat/vsock_flags.h"
@@ -717,6 +721,67 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_nfc(struct tcb *tcp, const void *const buf,
+			const int addrlen)
+{
+	const union {
+		struct {
+			uint16_t sa_family;
+			uint32_t dev_idx;
+			uint32_t target_idx;
+			uint32_t nfc_protocol;
+			uint8_t dsap;
+			uint8_t ssap;
+			char service_name[NFC_LLCP_MAX_SERVICE_NAME];
+			uint32_t service_name_len;
+		} nfc_32;
+		struct {
+			uint16_t sa_family;
+			uint32_t dev_idx;
+			uint32_t target_idx;
+			uint32_t nfc_protocol;
+			uint8_t dsap;
+			uint8_t ssap;
+			char service_name[NFC_LLCP_MAX_SERVICE_NAME];
+			uint64_t ATTRIBUTE_ALIGNED(8) service_name_len;
+		} nfc_64;
+	} *const sa_nfc = buf;
+
+	PRINT_FIELD_IFINDEX(sa_nfc->nfc_32, dev_idx);
+	tprint_struct_next();
+	PRINT_FIELD_X(sa_nfc->nfc_32, target_idx);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(sa_nfc->nfc_32, nfc_protocol, nfc_sockaddr_protocols,
+			 "NFC_PROTO_???");
+
+	size_t sa_nfc_llcp_len = current_wordsize == 8 ? sizeof(sa_nfc->nfc_64)
+						       : sizeof(sa_nfc->nfc_32);
+	if ((uint32_t) addrlen < sa_nfc_llcp_len)
+	{
+		if ((uint32_t) addrlen > sizeof(struct sockaddr_nfc)) {
+			tprint_struct_next();
+			tprint_more_data_follows();
+		}
+
+		return;
+	}
+
+	uint64_t snsz = current_wordsize == 8 ? sa_nfc->nfc_64.service_name_len
+					      : sa_nfc->nfc_32.service_name_len;
+
+	tprint_struct_next();
+	PRINT_FIELD_XVAL_VERBOSE(sa_nfc->nfc_32, dsap, nfc_saps, NULL);
+	tprint_struct_next();
+	PRINT_FIELD_XVAL_VERBOSE(sa_nfc->nfc_32, ssap, nfc_saps, NULL);
+	tprint_struct_next();
+	PRINT_FIELD_STRING(sa_nfc->nfc_32, service_name,
+			   MIN(sizeof(sa_nfc->nfc_32.service_name), snsz), 0);
+	tprint_struct_next();
+	tprints_field_name("service_name_len");
+	PRINT_VAL_U(snsz);
+}
+
+static void
 print_sockaddr_data_vsock(struct tcb *tcp, const void *const buf,
 			  const int addrlen)
 {
@@ -811,6 +876,7 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_NFC] = { print_sockaddr_data_nfc, sizeof(struct sockaddr_nfc) },
 	[AF_VSOCK] = { print_sockaddr_data_vsock, sizeof(struct sockaddr_vm) },
 	/* AF_KCM does not support connect/bind calls on its sockets */
 	[AF_QIPCRTR] = { print_sockaddr_data_qrtr, sizeof(struct sockaddr_qrtr) },
