@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 env:
-  KBRANCH: v5.14
+  KBRANCH: v5.15
   SLEEP_A_BIT: sleep 0.2
   VERBOSE: 1
 
