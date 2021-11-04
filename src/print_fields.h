@@ -433,6 +433,16 @@ tprints_arg_begin(const char *name)
 			     (dflt_));					\
 	} while (0)
 
+# define PRINT_FIELD_FLAGS_VERBOSE(where_, field_, xlat_, dflt_)	\
+	do {								\
+		tprints_field_name(#field_);				\
+		printflags_ex(zero_extend_signed_to_ull((where_).field_), \
+			      (dflt_),					\
+			      xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
+				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,	\
+			      (xlat_), NULL);	\
+	} while (0)
+
 # define PRINT_FIELD_XVAL(where_, field_, xlat_, dflt_)			\
 	do {								\
 		tprints_field_name(#field_);				\
