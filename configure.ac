@@ -424,6 +424,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	elf.h
 	gcov.h
 	iconv.h
+	linux/if_alg.h
 	linux/if_xdp.h
 	linux/ipx.h
 	linux/nfc.h
@@ -518,6 +519,11 @@ AC_CHECK_TYPES(m4_normalize([
 	struct kvm_sregs,
 	struct kvm_userspace_memory_region
 ]),,, [#include <linux/kvm.h>])
+
+AC_CHECK_TYPES(m4_normalize([
+	struct sockaddr_alg_new
+]),,, [#include <netinet/in.h>
+#include <linux/if_alg.h>])
 
 AC_CHECK_TYPES(m4_normalize([
 	struct sockaddr_xdp

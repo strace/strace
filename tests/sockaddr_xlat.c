@@ -25,6 +25,32 @@
 # include <bluetooth/sco.h>
 #endif
 
+#ifdef HAVE_LINUX_IF_ALG_H
+# include <linux/if_alg.h>
+#else
+struct sockaddr_alg {
+	uint16_t salg_family;
+	uint8_t salg_type[14];
+	uint32_t salg_feat;
+	uint32_t salg_mask;
+	uint8_t salg_name[64];
+};
+#endif
+
+#ifndef CRYPTO_ALG_KERN_DRIVER_ONLY
+# define CRYPTO_ALG_KERN_DRIVER_ONLY 0x1000
+#endif
+
+#ifndef HAVE_STRUCT_SOCKADDR_ALG_NEW
+struct sockaddr_alg_new {
+	uint16_t salg_family;
+	uint8_t salg_type[14];
+	uint32_t salg_feat;
+	uint32_t salg_mask;
+	uint8_t salg_name[];
+};
+#endif
+
 #ifdef HAVE_LINUX_NFC_H
 # include <linux/nfc.h>
 #else
@@ -348,6 +374,112 @@ check_rc(void)
 # endif
 }
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
+
+static void
+check_alg(void)
+{
+	static const struct {
+		struct sockaddr_alg sa;
+		const char *str;
+		const char *str8;
+		const char *str64;
+	} alg_vecs[] = {
+		{ { AF_ALG },
+		  "{sa_family="XLAT_KNOWN(0x26, "AF_ALG") ", salg_type=\"\""
+		  ", salg_feat=0, salg_mask=0, salg_name=\"\"}", "", "" },
+		{ { AF_ALG, .salg_feat = CRYPTO_ALG_KERN_DRIVER_ONLY,
+		    .salg_mask = CRYPTO_ALG_KERN_DRIVER_ONLY },
+		  "{sa_family="XLAT_KNOWN(0x26, "AF_ALG") ", salg_type=\"\""
+		  ", salg_feat=0x1000" NRAW(" /* CRYPTO_ALG_KERN_DRIVER_ONLY */")
+		  ", salg_mask=0x1000" NRAW(" /* CRYPTO_ALG_KERN_DRIVER_ONLY */")
+		  ", salg_name=\"\"}", "", "" },
+		{ { AF_ALG, .salg_type = "OH HAI\1\n\377\\\"\0\t\v",
+		    .salg_feat = 0xdeadcafe, .salg_mask = 0xbeefaead,
+		    .salg_name = "1234567890abcdef1234567890ABCEF\1\2\3\4\5\6\7"
+				 "\x08\x09\0\x0A\x0B\x0C\x0D\x0E\x0F" },
+		  "{sa_family="XLAT_KNOWN(0x26, "AF_ALG")
+		  ", salg_type=\"OH HAI\\1\\n\\377\\\\\\\"\""
+		  ", salg_feat=0xdeadcafe" NRAW(" /* CRYPTO_ALG_??? */")
+		  ", salg_mask=0xbeefaead" NRAW(" /* CRYPTO_ALG_??? */")
+		  ", salg_name=\"1234567", "\"...}",
+		  "890abcdef1234567890ABCEF\\1\\2\\3\\4\\5\\6\\7\\10\\t\"}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_alg, sa_alg);
+	int rc;
+
+	fill_memory(sa_alg, sizeof(*sa_alg));
+	sa_alg->salg_family = AF_ALG;
+
+	rc = connect(-1, (void *) sa_alg, sizeof(*sa_alg) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_alg, sizeof(*sa_alg) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_alg, sizeof(struct sockaddr_alg_new));
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x26, "AF_ALG")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_alg + sizeof(sa_alg->salg_family),
+			    sizeof(struct sockaddr_alg_new)
+			    - sizeof(sa_alg->salg_family));
+	printf("}, %zu) = %s\n", sizeof(struct sockaddr_alg_new), errstr);
+
+	rc = connect(-1, (void *) sa_alg, sizeof(struct sockaddr_alg_new) + 1);
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x26, "AF_ALG")
+	       ", salg_type=");
+	print_quoted_stringn((const char *) sa_alg->salg_type,
+			     sizeof(sa_alg->salg_type) - 1);
+	printf(", salg_feat=%#x" NRAW(" /* CRYPTO_ALG_KERN_DRIVER_ONLY|%#x */")
+	       ", salg_mask=%#x" NRAW(" /* CRYPTO_ALG_KERN_DRIVER_ONLY|%#x */")
+	       ", salg_name=\"\"...}, %zu) = %s\n",
+	       sa_alg->salg_feat,
+#if !XLAT_RAW
+	       sa_alg->salg_feat & ~CRYPTO_ALG_KERN_DRIVER_ONLY,
+#endif
+	       sa_alg->salg_mask,
+#if !XLAT_RAW
+	       sa_alg->salg_mask & ~CRYPTO_ALG_KERN_DRIVER_ONLY,
+#endif
+	       sizeof(struct sockaddr_alg_new) + 1, errstr);
+
+	rc = connect(-1, (void *) sa_alg, sizeof(*sa_alg) - 1);
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x26, "AF_ALG")
+	       ", salg_type=");
+	print_quoted_stringn((const char *) sa_alg->salg_type,
+			     sizeof(sa_alg->salg_type) - 1);
+	printf(", salg_feat=%#x" NRAW(" /* CRYPTO_ALG_KERN_DRIVER_ONLY|%#x */")
+	       ", salg_mask=%#x" NRAW(" /* CRYPTO_ALG_KERN_DRIVER_ONLY|%#x */")
+	       ", salg_name=",
+	       sa_alg->salg_feat,
+#if !XLAT_RAW
+	       sa_alg->salg_feat & ~CRYPTO_ALG_KERN_DRIVER_ONLY,
+#endif
+	       sa_alg->salg_mask
+#if !XLAT_RAW
+	       , sa_alg->salg_mask & ~CRYPTO_ALG_KERN_DRIVER_ONLY
+#endif
+	       );
+	print_quoted_stringn((const char *) sa_alg->salg_name,
+			     sizeof(sa_alg->salg_name) - 2);
+	printf("}, %zu) = %s\n",  sizeof(*sa_alg) - 1, errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(alg_vecs); i++) {
+		*sa_alg = alg_vecs[i].sa;
+
+		for (size_t j = 0; j < 2; j++) {
+			rc = connect(-1, (void *) sa_alg,
+				     sizeof(struct sockaddr_alg_new)
+				     + (j ? 64 : 8));
+			printf("connect(-1, %s%s, %zu) = %s\n",
+			       alg_vecs[i].str,
+			       j ? alg_vecs[i].str64 : alg_vecs[i].str8,
+			       sizeof(struct sockaddr_alg_new) + (j ? 64 : 8),
+			       sprintrc(rc));
+		}
+	}
+}
 
 static void
 check_nfc(void)
@@ -789,6 +921,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_alg();
 	check_nfc();
 	check_vsock();
 	check_qrtr();

@@ -20,6 +20,7 @@
 #include "netlink.h"
 #include <linux/ax25.h>
 #include <linux/if_packet.h>
+#include <linux/if_alg.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_xdp.h>
@@ -38,6 +39,8 @@
 #include "xlat/bluetooth_l2_cid.h"
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
+
+#include "xlat/alg_sockaddr_flags.h"
 
 #include "xlat/nfc_saps.h"
 #include "xlat/nfc_sockaddr_protocols.h"
@@ -721,6 +724,26 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_alg(struct tcb *tcp, const void *const buf,
+			const int len)
+{
+	const struct sockaddr_alg_new *const sa_alg = buf;
+
+	PRINT_FIELD_STRING(*sa_alg, salg_type, sizeof(sa_alg->salg_type),
+			   QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0);
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS_VERBOSE(*sa_alg, salg_feat, alg_sockaddr_flags,
+				  "CRYPTO_ALG_???");
+	tprint_struct_next();
+	PRINT_FIELD_FLAGS_VERBOSE(*sa_alg, salg_mask, alg_sockaddr_flags,
+				  "CRYPTO_ALG_???");
+	tprint_struct_next();
+	PRINT_FIELD_STRING(*sa_alg, salg_name,
+			   len - offsetof(struct sockaddr_alg_new, salg_name),
+			   QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0);
+}
+
+static void
 print_sockaddr_data_nfc(struct tcb *tcp, const void *const buf,
 			const int addrlen)
 {
@@ -876,6 +899,7 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_ALG] = { print_sockaddr_data_alg, sizeof(struct sockaddr_alg_new) + 1 },
 	[AF_NFC] = { print_sockaddr_data_nfc, sizeof(struct sockaddr_nfc) },
 	[AF_VSOCK] = { print_sockaddr_data_vsock, sizeof(struct sockaddr_vm) },
 	/* AF_KCM does not support connect/bind calls on its sockets */

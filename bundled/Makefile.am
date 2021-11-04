@@ -43,6 +43,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/hiddev.h \
 	linux/include/uapi/linux/if_addr.h \
 	linux/include/uapi/linux/if_addrlabel.h \
+	linux/include/uapi/linux/if_alg.h \
 	linux/include/uapi/linux/if_bonding.h \
 	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_link.h \
