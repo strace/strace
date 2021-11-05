@@ -59,8 +59,7 @@ main(void)
 	const unsigned long *const args = tail_alloc(sizeof(*args) * 6);
 	efault = tail_alloc(1) + 1;
 
-	int i;
-	for (i = sc_min - 3; i <= sc_max + 3; ++i) {
+	for (int i = sc_min - 3; i <= sc_max + 3; ++i) {
 		test_socketcall(i, efault);
 		test_socketcall(i, args);
 	}

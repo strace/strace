@@ -37,9 +37,7 @@ main(void)
 		(long) 0xfacefeeddeadbeefULL
 	};
 
-	unsigned int i;
-
-	for (i = 0; i < ARRAY_SIZE(tests); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(tests); ++i) {
 		const unsigned int num = (unsigned UGID_TYPE) tests[i];
 		unsigned int rc;
 

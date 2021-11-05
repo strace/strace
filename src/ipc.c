@@ -22,8 +22,7 @@ SYS_FUNC(ipc)
 
 	printxval_u(ipccalls, call, NULL);
 
-	unsigned int i;
-	for (i = 1; i < n_args(tcp); ++i) {
+	for (unsigned int i = 1; i < n_args(tcp); ++i) {
 		tprint_arg_next();
 		PRINT_VAL_X(tcp->u_arg[i]);
 	}

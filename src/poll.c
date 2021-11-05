@@ -55,10 +55,9 @@ decode_poll_exiting(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts
 	const unsigned long size = sizeof(fds) * nfds;
 	const kernel_ulong_t start = tcp->u_arg[0];
 	const kernel_ulong_t end = start + size;
-	kernel_ulong_t cur;
 	const unsigned int max_printed =
 		abbrev(tcp) ? max_strlen : -1U;
-	unsigned int printed;
+	unsigned int printed = 0;
 
 	static char outstr[1024];
 	char *outptr;
@@ -77,7 +76,7 @@ decode_poll_exiting(struct tcb *const tcp, const sprint_obj_by_addr_fn sprint_ts
 
 	outptr = outstr;
 
-	for (printed = 0, cur = start; cur < end; cur += sizeof(fds)) {
+	for (kernel_ulong_t cur = start; cur < end; cur += sizeof(fds)) {
 		if (umove(tcp, cur, &fds) < 0) {
 			if (outptr == outstr)
 				*outptr++ = '[';

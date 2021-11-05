@@ -19,9 +19,8 @@ static void
 dump_str(const char *str, const unsigned int len)
 {
 	static const char dots[16] = "................";
-	unsigned int i;
 
-	for (i = 0; i < len; i += 16) {
+	for (unsigned int i = 0; i < len; i += 16) {
 		unsigned int n = len - i > 16 ? 16 : len - i;
 		const char *dump = hexdump_memdup(str + i, n);
 
@@ -36,9 +35,8 @@ static void
 print_hex(const char *str, const unsigned int len)
 {
 	const unsigned char *ustr = (const unsigned char *) str;
-	unsigned int i;
 
-	for (i = 0; i < len; ++i) {
+	for (unsigned int i = 0; i < len; ++i) {
 		unsigned int c = ustr[i];
 
 		switch (c) {
@@ -81,8 +79,7 @@ test_dump(const unsigned int len)
 	tprintf("\", %d, %lld) = %ld\n", len, (long long) offset, rc);
 	dump_str(buf, len);
 
-	unsigned int i;
-	for (i = 0; i < len; ++i)
+	for (unsigned int i = 0; i < len; ++i)
 		buf[i] = i;
 
 	rc = pwrite(1, buf, len, offset);
@@ -198,8 +195,7 @@ main(void)
 	if (open("/dev/null", O_WRONLY) != 1)
 		perror_msg_and_fail("open");
 
-	unsigned int i;
-	for (i = 0; i <= 32; ++i)
+	for (unsigned int i = 0; i <= 32; ++i)
 		test_dump(i);
 
 	tprintf("+++ exited with 0 +++\n");

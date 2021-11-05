@@ -80,12 +80,11 @@ print_quoted_memory_ex(const void *const instr, const size_t len,
 		       bool quote, const char *escape_chars)
 {
 	const unsigned char *str = (const unsigned char *) instr;
-	size_t i;
 
 	if (quote)
 		putchar('"');
 
-	for (i = 0; i < len; ++i) {
+	for (size_t i = 0; i < len; ++i) {
 		const int c = str[i];
 		switch (c) {
 			case '\"':
@@ -136,10 +135,9 @@ void
 print_quoted_hex(const void *const instr, const size_t len)
 {
 	const unsigned char *str = instr;
-	size_t i;
 
 	printf("\"");
-	for (i = 0; i < len; i++)
+	for (size_t i = 0; i < len; ++i)
 		printf("\\x%02x", str[i]);
 	printf("\"");
 }

@@ -29,9 +29,7 @@ static void
 iterate(const char *const text, const int sig,
 	const void *const set, unsigned int size)
 {
-	const void *mask;
-
-	for (mask = set;; size >>= 1, mask += size) {
+	for (const void *mask = set;; size >>= 1, mask += size) {
 		raise(sig);
 		assert(k_sigsuspend(mask, size) == -1);
 		if (EINTR == errno) {

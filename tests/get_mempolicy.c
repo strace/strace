@@ -35,8 +35,7 @@ print_nodes(unsigned long maxnode)
 	printf("get_mempolicy(NULL, [");
 
 	unsigned int nlongs = NLONGS(maxnode);
-	unsigned int i;
-	for (i = 0; i < nlongs; ++i) {
+	for (unsigned int i = 0; i < nlongs; ++i) {
 		if (i)
 			fputs(", ", stdout);
 		if (i >= MAX_STRLEN) {

@@ -188,8 +188,7 @@ main(void)
 #if VERBOSE
 	printf("index=%" PRIu16 ", keycode=%s, scancode=[",
 	       ike->index, XLAT_STR(KEY_1));
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(ike->scancode); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(ike->scancode); ++i) {
 		if (i > 0)
 			printf(", ");
 		printf("%#" PRIx8, ike->scancode[i]);

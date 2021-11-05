@@ -51,11 +51,10 @@ main(void)
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, ptr);
 	long rc;
-	unsigned int i;
 
 	prctl_marker();
 
-	for (i = 0; i < ARRAY_SIZE(options); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(options); ++i) {
 		prctl(options[i].val | bogus_op_bits, 0);
 		printf("prctl(%s, NULL) = %s\n", options[i].str, errstr);
 

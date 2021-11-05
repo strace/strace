@@ -115,7 +115,6 @@ decode_nlattr(struct tcb *const tcp,
 {
 	struct nlattr nla;
 	bool is_array = false;
-	unsigned int elt;
 
 	if (decoders && !size && opaque_data)
 		error_func_msg("[xlat %p, dflt \"%s\", decoders %p] "
@@ -124,7 +123,9 @@ decode_nlattr(struct tcb *const tcp,
 			       "- will be ignored",
 			       table, dflt, decoders, opaque_data);
 
-	for (elt = 0; fetch_nlattr(tcp, &nla, addr, len, is_array); elt++) {
+	for (unsigned int elt = 0;
+	     fetch_nlattr(tcp, &nla, addr, len, is_array);
+	     ++elt) {
 		if (abbrev(tcp) && elt == max_strlen) {
 			tprint_more_data_follows();
 			break;

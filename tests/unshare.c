@@ -33,14 +33,11 @@ main(void)
 		{ ARG_STR(0x81f8f07f) " /* CLONE_??? */" },
 	};
 
-	long rc;
-	unsigned int i;
-
-	rc = syscall(__NR_unshare, bogus_flags);
+	long rc = syscall(__NR_unshare, bogus_flags);
 	printf("unshare(%#llx /* CLONE_??? */) = %s\n",
 	       (unsigned long long) bogus_flags, sprintrc(rc));
 
-	for (i = 0; i < ARRAY_SIZE(unshare_flags); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(unshare_flags); ++i) {
 		rc = syscall(__NR_unshare, unshare_flags[i].val);
 		printf("unshare(%s) = %s\n",
 		       unshare_flags[i].str, sprintrc(rc));

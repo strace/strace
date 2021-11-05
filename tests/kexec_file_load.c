@@ -61,8 +61,6 @@ main(void)
 		tail_memdup(cmdline_short_str, sizeof(cmdline_short_str));
 	char cmdline_ptr[sizeof("0x") + sizeof(void *) * 2];
 	char cmdline_short_ptr[sizeof("0x") + sizeof(void *) * 2];
-	unsigned int i;
-	unsigned int j;
 
 	struct strval cmdlines[] = {
 		{ (uintptr_t) NULL, "", "", "NULL" },
@@ -81,8 +79,8 @@ main(void)
 	snprintf(cmdline_short_ptr, sizeof(cmdline_short_ptr), "%p",
 		cmdline_short);
 
-	for (i = 0; i < ARRAY_SIZE(flags); i++) {
-		for (j = 0; j < ARRAY_SIZE(cmdlines); j++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(flags); ++i) {
+		for (unsigned int j = 0; j < ARRAY_SIZE(cmdlines); ++j) {
 			rc = syscall(__NR_kexec_file_load, bogus_kernel_fd,
 				     bogus_initrd_fd, cmdline_lens[j],
 				     cmdlines[j].val, flags[i].val);

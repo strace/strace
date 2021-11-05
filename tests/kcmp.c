@@ -147,7 +147,6 @@ main(void)
 		F8ILL_KULONG_SUPPORTED ? F8ILL_KULONG_MASK : 0;
 
 	int fd;
-	unsigned i;
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct kcmp_epoll_slot, slot);
 
 	/* Open some files to test printpidfd */
@@ -196,7 +195,7 @@ main(void)
 	do_kcmp(-1, -1, ARG_STR(KCMP_EPOLL_TFD),
 		3141592653U, (uintptr_t) slot + 1, 0);
 
-	for (i = 0; i < ARRAY_SIZE(slot_data); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(slot_data); ++i) {
 		memcpy(slot, slot_data + i, sizeof(*slot));
 
 		do_kcmp(getpid(), -1, ARG_STR(KCMP_EPOLL_TFD), NULL_FD,

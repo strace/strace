@@ -28,9 +28,8 @@ dump_str_ex(const char *str, const unsigned int len, const int idx_w)
 		"................................"
 		"................................"
 		"................................";
-	unsigned int i;
 
-	for (i = 0; i < len; i += 16) {
+	for (unsigned int i = 0; i < len; i += 16) {
 		unsigned int n = len - i > 16 ? 16 : len - i;
 		const char *dump = hexdump_memdup(str + i, n);
 
@@ -51,11 +50,10 @@ static void
 print_hex(const char *str, const unsigned int len)
 {
 	const unsigned char *ustr = (const unsigned char *) str;
-	unsigned int i;
 
 	tprintf("\"");
 
-	for (i = 0; i < len; ++i) {
+	for (unsigned int i = 0; i < len; ++i) {
 		unsigned int c = ustr[i];
 
 		if (i >= DEFAULT_STRLEN) {
@@ -126,8 +124,7 @@ test_dump(const unsigned int len, bool err_desc)
 	if (!err_desc)
 		dump_str(buf, len);
 
-	unsigned int i;
-	for (i = 0; i < len; ++i)
+	for (unsigned int i = 0; i < len; ++i)
 		buf[i] = i;
 
 	rc = k_write(out_fd, buf, len);
@@ -284,8 +281,7 @@ main(void)
 	if (open("/dev/null", O_WRONLY) != 5)
 		perror_msg_and_fail("open");
 
-	unsigned int i;
-	for (i = 0; i <= DEFAULT_STRLEN; ++i)
+	for (unsigned int i = 0; i <= DEFAULT_STRLEN; ++i)
 		test_dump(i, false);
 
 	test_dump(256, true);

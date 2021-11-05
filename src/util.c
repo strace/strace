@@ -1255,7 +1255,6 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 # define iov_iov_base(i) ptr_to_kulong(iov[i].iov_base)
 # define iov_iov_len(i) iov[i].iov_len
 #endif
-	int i;
 	unsigned int size = sizeof_iov * len;
 	if (size / sizeof_iov != (unsigned int) len) {
 		error_func_msg("requested %u iovec elements exceeds"
@@ -1270,7 +1269,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 		return;
 	}
 	if (umoven(tcp, addr, size, iov) >= 0) {
-		for (i = 0; i < len; i++) {
+		for (int i = 0; i < len; ++i) {
 			kernel_ulong_t iov_len = iov_iov_len(i);
 			if (iov_len > data_size)
 				iov_len = data_size;

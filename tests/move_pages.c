@@ -32,8 +32,7 @@ print_page_array(const void **const pages,
 		return;
 	}
 	printf("[");
-	unsigned long i;
-	for (i = 0; i < count; ++i) {
+	for (unsigned long i = 0; i < count; ++i) {
 		if (i)
 			printf(", ");
 		if (i + offset < count) {
@@ -68,8 +67,7 @@ print_node_array(const int *const nodes,
 		return;
 	}
 	printf("[");
-	unsigned long i;
-	for (i = 0; i < count; ++i) {
+	for (unsigned long i = 0; i < count; ++i) {
 		if (i)
 			printf(", ");
 		if (i + offset < count) {
@@ -94,8 +92,7 @@ print_status_array(const int *const status, const unsigned long count)
 		return;
 	}
 	printf("[");
-	unsigned long i;
-	for (i = 0; i < count; ++i) {
+	for (unsigned long i = 0; i < count; ++i) {
 		if (i)
 			printf(", ");
 		if (i >= MAX_STRLEN) {

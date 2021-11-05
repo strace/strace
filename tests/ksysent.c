@@ -31,9 +31,8 @@ int
 main(void)
 {
 	int rc = 0;
-	unsigned int i;
 
-	for (i = 0; i < ARRAY_SIZE(ksyslist); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(ksyslist); ++i) {
 		if (!ksyslist[i])
 			continue;
 		if (i >= ARRAY_SIZE(syscallent) || !syscallent[i].sys_name) {
@@ -71,7 +70,7 @@ main(void)
 		}
 	}
 
-	for (i = 0; i < ARRAY_SIZE(syscallent); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(syscallent); ++i) {
 		if (!syscallent[i].sys_name
 #ifdef SYS_socket_nsubcalls
 		    || (i >= SYS_socket_subcall &&

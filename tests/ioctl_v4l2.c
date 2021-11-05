@@ -51,8 +51,6 @@ init_v4l2_format(struct v4l2_format *const f,
 		break;
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
-		unsigned int i;
-
 		f->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
 		f->fmt.pix_mp.width = 0x1f3b774b;
 		f->fmt.pix_mp.height = 0xab96a8d6;
@@ -64,7 +62,7 @@ init_v4l2_format(struct v4l2_format *const f,
 		f->fmt.pix_mp.colorspace = V4L2_COLORSPACE_JPEG;
 		struct v4l2_plane_pix_format *cur_pix =
 		       f->fmt.pix_mp.plane_fmt;
-		for (i = 0;
+		for (unsigned int i = 0;
 		     i < ARRAY_SIZE(f->fmt.pix_mp.plane_fmt);
 		     i++) {
 			cur_pix[i].sizeimage = 0x1e3c531c | i;
@@ -126,11 +124,9 @@ init_v4l2_format(struct v4l2_format *const f,
 		break;
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
-		unsigned int i;
-
 		f->fmt.sliced.service_set = V4L2_SLICED_VPS;
 		f->fmt.sliced.io_size = 0xd897925a;
-		for (i = 0;
+		for (unsigned int i = 0;
 		     i < ARRAY_SIZE(f->fmt.sliced.service_lines[0]);
 		     i++) {
 			f->fmt.sliced.service_lines[0][i] = 0xc38e | i;
@@ -201,8 +197,6 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		break;
 	case V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE:
 	case V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE: {
-		unsigned int i;
-
 		saved_errno = errno;
 		printf("ioctl(-1, " XLAT_FMT
 		       ", {type=" XLAT_FMT
@@ -229,7 +223,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       ", plane_fmt=[",
 		       XLAT_ARGS(V4L2_FIELD_NONE),
 		       XLAT_ARGS(V4L2_COLORSPACE_JPEG));
-		for (i = 0;
+		for (unsigned int i = 0;
 		     i < (buf_type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
 		          ? 1 : ARRAY_SIZE(f->fmt.pix_mp.plane_fmt));
 		     ++i) {
@@ -321,8 +315,6 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		break;
 	case V4L2_BUF_TYPE_SLICED_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_SLICED_VBI_OUTPUT: {
-		unsigned int i, j;
-
 		saved_errno = errno;
 		printf("ioctl(-1, " XLAT_FMT ", {type=" XLAT_FMT
 		       ", fmt.sliced={service_set=" XLAT_FMT
@@ -330,15 +322,15 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 		       XLAT_SEL(reqval, reqstr),
 		       XLAT_SEL(buf_type, buf_type_string),
 		       XLAT_ARGS(V4L2_SLICED_VPS));
-		for (i = 0;
+		for (unsigned int i = 0;
 		     i < ARRAY_SIZE(f->fmt.sliced.service_lines);
-		     i++) {
+		     ++i) {
 			if (i > 0)
 				printf(", ");
 			printf("[");
-			for (j = 0;
+			for (unsigned int j = 0;
 			     j < ARRAY_SIZE(f->fmt.sliced.service_lines[0]);
-			     j++) {
+			     ++j) {
 				if (j > 0)
 					printf(", ");
 				printf("%#x",

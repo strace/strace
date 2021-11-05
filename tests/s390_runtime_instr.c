@@ -42,16 +42,15 @@ main(void)
 		{ 63, "SIGRT_31" },
 	};
 
-	unsigned int i;
 	long rc;
 
-	for (i = 0; i < ARRAY_SIZE(cmd_args); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(cmd_args); ++i) {
 		rc = syscall(__NR_s390_runtime_instr, cmd_args[i].cmd, 0xdead);
 		printf("s390_runtime_instr(%s) = %s\n",
 		       cmd_args[i].cmd_str, sprintrc(rc));
 	}
 
-	for (i = 0; i < ARRAY_SIZE(start_sig_args); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(start_sig_args); ++i) {
 		long saved_errno;
 
 		rc = syscall(__NR_s390_runtime_instr, 1, start_sig_args[i].sig);

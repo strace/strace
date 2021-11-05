@@ -83,8 +83,7 @@ decode_attr_extra_data(struct tcb *const tcp,
 	data += attr_size;
 	size -= attr_size;
 
-	unsigned int i;
-	for (i = 0; i < size; ++i) {
+	for (unsigned int i = 0; i < size; ++i) {
 		if (data[i]) {
 			tprint_struct_next();
 			if (abbrev(tcp)) {

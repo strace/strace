@@ -45,8 +45,8 @@ main(int ac, char **av)
 {
 	assert(ac == 1 + N_FDS);
 
-	int rc = 0, fd;
-	for (fd = 1; fd < 1 + N_FDS; ++fd)
+	int rc = 0;
+	for (int fd = 1; fd < 1 + N_FDS; ++fd)
 		if ((rc = check_fd(fd - 1, av[fd])))
 			break;
 

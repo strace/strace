@@ -25,11 +25,8 @@ main(void)
 		(kernel_ulong_t) 0x123456789abcdef0ULL,
 	};
 
-	long rc;
-	unsigned int i;
-
-	for (i = 0; i < ARRAY_SIZE(keys); i++) {
-		rc = syscall(__NR_pkey_free, keys[i]);
+	for (unsigned int i = 0; i < ARRAY_SIZE(keys); ++i) {
+		long rc = syscall(__NR_pkey_free, keys[i]);
 		printf("pkey_free(%d) = %s\n", (int) keys[i], sprintrc(rc));
 	}
 

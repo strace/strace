@@ -12,9 +12,8 @@ fill_memory_ex(void *ptr, size_t size, unsigned char start,
 	       unsigned int period)
 {
 	unsigned char *p = ptr;
-	size_t i;
 
-	for (i = 0; i < size; i++) {
+	for (typeof(size) i = 0; i < size; ++i) {
 		p[i] = start + i % period;
 	}
 }
@@ -30,9 +29,8 @@ fill_memory16_ex(void *ptr, size_t size, uint16_t start,
 	         unsigned int period)
 {
 	uint16_t *p = ptr;
-	size_t i;
 
-	for (i = 0; i < size / sizeof(uint16_t); i++) {
+	for (typeof(size) i = 0; i < size / sizeof(uint16_t); ++i) {
 		p[i] = start + i % period;
 	}
 }
@@ -48,9 +46,8 @@ fill_memory32_ex(void *ptr, size_t size, uint32_t start,
 	         unsigned int period)
 {
 	uint32_t *p = ptr;
-	size_t i;
 
-	for (i = 0; i < size / sizeof(uint32_t); i++) {
+	for (typeof(size) i = 0; i < size / sizeof(uint32_t); ++i) {
 		p[i] = start + i % period;
 	}
 }

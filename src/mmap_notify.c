@@ -27,8 +27,7 @@ mmap_notify_register_client(mmap_notify_fn fn, void *data)
 void
 mmap_notify_report(struct tcb *tcp)
 {
-	struct mmap_notify_client *client;
-
-	for (client = clients; client; client = client->next)
+	for (struct mmap_notify_client *client = clients;
+	     client; client = client->next)
 		client->fn(tcp, client->data);
 }

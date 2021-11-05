@@ -62,19 +62,17 @@ main(void)
 		(kernel_ulong_t) 0xbadc0ded00000001,
 	};
 
-	long rc;
-	unsigned int i;
-	unsigned int j;
-	unsigned int k;
-	unsigned int l;
-
-	for (i = 0; i < ARRAY_SIZE(ptrs); i++) {
-		for (j = 0; j < ARRAY_SIZE(sizes); j++) {
-			for (k = 0; k < ARRAY_SIZE(prots); k++) {
-				for (l = 0; l < ARRAY_SIZE(pkeys); l++) {
-					rc = syscall(__NR_pkey_mprotect,
-						     ptrs[i], sizes[j],
-						     prots[k].val, pkeys[l]);
+	for (unsigned int i = 0;
+	     i < ARRAY_SIZE(ptrs); ++i) {
+		for (unsigned int j = 0;
+		     j < ARRAY_SIZE(sizes); ++j) {
+			for (unsigned int k = 0;
+			     k < ARRAY_SIZE(prots); ++k) {
+				for (unsigned int l = 0;
+				     l < ARRAY_SIZE(pkeys); ++l) {
+					long rc = syscall(__NR_pkey_mprotect,
+							  ptrs[i], sizes[j],
+							  prots[k].val, pkeys[l]);
 					printf("pkey_mprotect(%s, %llu, %s, %d)"
 					       " = %s\n",
 					       sprintptr(ptrs[i]),

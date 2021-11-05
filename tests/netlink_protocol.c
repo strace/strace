@@ -169,8 +169,7 @@ send_query(const int fd)
 # define ABBREV_LEN (DEFAULT_STRLEN + 1)
 	const unsigned int msg_len = sizeof(struct nlmsghdr) * ABBREV_LEN;
 	struct nlmsghdr *const msgs = tail_alloc(msg_len);
-	unsigned int i;
-	for (i = 0; i < ABBREV_LEN; ++i) {
+	for (unsigned int i = 0; i < ABBREV_LEN; ++i) {
 		msgs[i].nlmsg_len = sizeof(*msgs);
 		msgs[i].nlmsg_type = NLMSG_NOOP;
 		msgs[i].nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
@@ -181,7 +180,7 @@ send_query(const int fd)
 	rc = sendto(fd, msgs, msg_len, MSG_DONTWAIT, NULL, 0);
 	errstr = sprintrc(rc);
 	printf("sendto(%d, [", fd);
-	for (i = 0; i < DEFAULT_STRLEN; ++i) {
+	for (unsigned int i = 0; i < DEFAULT_STRLEN; ++i) {
 		if (i)
 			printf(", ");
 		printf("{nlmsg_len=%u, nlmsg_type=NLMSG_NOOP"

@@ -16,9 +16,8 @@ arch_get_syscall_args(struct tcb *tcp)
 	unsigned long sof = (ia64_regs.cfm >> 0) & 0x7f;
 	unsigned long sol = (ia64_regs.cfm >> 7) & 0x7f;
 	unsigned long *out0 = ia64_rse_skip_regs(rbs_end, -sof + sol);
-	unsigned int i;
 
-	for (i = 0; i < n_args(tcp); ++i) {
+	for (unsigned int i = 0; i < n_args(tcp); ++i) {
 		if (umove(tcp,
 			  (unsigned long) ia64_rse_skip_regs(out0, i),
 			  &tcp->u_arg[i]) < 0) {

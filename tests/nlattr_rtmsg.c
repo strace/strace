@@ -31,10 +31,9 @@ static void
 print_quoted_hex_ellipsis(const void *const instr, const size_t len)
 {
 	const unsigned char *str = instr;
-	size_t i;
 
 	printf("\"");
-	for (i = 0; i < MIN(len, DEFAULT_STRLEN); i++)
+	for (size_t i = 0; i < MIN(len, DEFAULT_STRLEN); ++i)
 		printf("\\x%02x", str[i]);
 	printf("\"");
 	if (len > DEFAULT_STRLEN)

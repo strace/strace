@@ -25,8 +25,7 @@ hexdump_memdup(const char *src, size_t len)
 
 	char *p = dst;
 	const unsigned char *usrc = (const unsigned char *) src;
-	size_t i;
-	for (i = 0; i < len; ++i) {
+	for (size_t i = 0; i < len; ++i) {
 		unsigned int c = usrc[i];
 		*(p++) = ' ';
 		if (i == 8)

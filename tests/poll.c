@@ -71,8 +71,7 @@ print_pollfd_array_entering(const struct pollfd *const pfd,
 			    const unsigned int abbrev)
 {
 	tprintf("[");
-	unsigned int i;
-	for (i = 0; i < size; ++i) {
+	for (unsigned int i = 0; i < size; ++i) {
 		if (i)
 			tprintf(", ");
 		if (i >= valid) {
@@ -135,8 +134,7 @@ print_pollfd_array_exiting(const struct pollfd *const pfd,
 {
 	tprintf("[");
 	unsigned int seen = 0;
-	unsigned int i;
-	for (i = 0; i < size; ++i)
+	for (unsigned int i = 0; i < size; ++i)
 		print_pollfd_exiting(&pfd[i], &seen, abbrev);
 	tprintf("]");
 }

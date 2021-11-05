@@ -30,11 +30,8 @@ main(void)
 		{ (kernel_ulong_t) 0xca75f15702000000ULL, "CLONE_NEWCGROUP" },
 	};
 
-	long rc;
-	unsigned int i;
-
-	for (i = 0; i < ARRAY_SIZE(nstypes); i++) {
-		rc = syscall(__NR_setns, bogus_fd, nstypes[i].val);
+	for (unsigned int i = 0; i < ARRAY_SIZE(nstypes); ++i) {
+		long rc = syscall(__NR_setns, bogus_fd, nstypes[i].val);
 		printf("setns(%d, %s) = %s\n",
 			(int) bogus_fd, nstypes[i].str, sprintrc(rc));
 	}

@@ -116,9 +116,7 @@ add_number_to_set_array(const unsigned int number, struct number_set *const set,
 void
 clear_number_set_array(struct number_set *const set, const unsigned int nmemb)
 {
-	unsigned int i;
-
-	for (i = 0; i < nmemb; ++i) {
+	for (unsigned int i = 0; i < nmemb; ++i) {
 		if (set[i].nslots)
 			memset(set[i].vec, 0,
 			       sizeof(*set[i].vec) * set[i].nslots);
@@ -129,9 +127,7 @@ clear_number_set_array(struct number_set *const set, const unsigned int nmemb)
 void
 invert_number_set_array(struct number_set *const set, const unsigned int nmemb)
 {
-	unsigned int i;
-
-	for (i = 0; i < nmemb; ++i)
+	for (unsigned int i = 0; i < nmemb; ++i)
 		set[i].not = !set[i].not;
 }
 

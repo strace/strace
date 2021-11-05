@@ -625,13 +625,12 @@ main(void)
 			PERF_FLAG_FD_CLOEXEC, "PERF_FLAG_FD_CLOEXEC" },
 	};
 
-	size_t i;
 	int rc;
 
 	fill_memory(small_attr, sizeof(*small_attr));
 	small_attr->size = attr_small_size;
 
-	for (i = 0; i < ARRAY_SIZE(args); i++) {
+	for (size_t i = 0; i < ARRAY_SIZE(args); ++i) {
 		rc = syscall(__NR_perf_event_open, args[i].attr, args[i].pid,
 			     args[i].cpu, args[i].group_fd, args[i].flags);
 		printf("perf_event_open(%s, %d, %d, %d, %s) = %s\n",
@@ -639,8 +638,8 @@ main(void)
 		       args[i].group_fd, args[i].flags_str, sprintrc(rc));
 	}
 
-	for (i = 0; i < ARRAY_SIZE(attrs) * ARRAY_SIZE(attr_types) *
-	    ARRAY_SIZE(attr_configs[0]) + 1; i++) {
+	for (size_t i = 0; i < ARRAY_SIZE(attrs) * ARRAY_SIZE(attr_types) *
+	    ARRAY_SIZE(attr_configs[0]) + 1; ++i) {
 		struct perf_event_attr *attr = attrs[i % ARRAY_SIZE(attrs)].ptr;
 		uint32_t size = attrs[i % ARRAY_SIZE(attrs)].size;
 		unsigned char fill_start = 0x80 + i;

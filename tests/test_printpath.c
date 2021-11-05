@@ -32,8 +32,7 @@ test_printpath_at(char *const p, const unsigned int test_max)
 
 	char *const eop = p + (test_max - 1);
 	*eop = '\0';
-	unsigned int i;
-	for (i = 1; i < test_max; ++i) {
+	for (unsigned int i = 1; i < test_max; ++i) {
 		const unsigned int i_1 = i - 1;
 		memmove(eop - i, eop - i_1, i_1);
 		eop[-1] = "/.."[i_1 % 3];
@@ -81,10 +80,9 @@ test_printpath(const unsigned int test_max)
 	 */
 	const unsigned int page_size = get_page_size();
 	char *p = tail_alloc(test_max + page_size);
-	unsigned int i;
-	for (i = 1; i < sizeof(long); ++i)
+	for (unsigned int i = 1; i < sizeof(long); ++i)
 		test_printpath_at(p + i, test_max);
-	for (i = 0; i < sizeof(long); ++i)
+	for (unsigned int i = 0; i < sizeof(long); ++i)
 		test_printpath_at(p + page_size - i, test_max);
 	test_efault(test_max);
 	test_enametoolong();

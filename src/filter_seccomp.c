@@ -103,9 +103,7 @@ check_seccomp_order_do_child(void)
 static int
 check_seccomp_order_tracer(int pid)
 {
-	unsigned int step;
-
-	for (step = 0; ; ++step) {
+	for (unsigned int step = 0; ; ++step) {
 		int status;
 
 		for (;;) {

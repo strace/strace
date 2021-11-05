@@ -26,7 +26,6 @@ thread(void *arg)
 static int
 process(void)
 {
-	int i;
 	int fds[2];
 	pthread_t t;
 	struct timespec ts = { .tv_nsec = 10000000 };
@@ -36,9 +35,9 @@ process(void)
 	if (pipe(fds))
 		perror_msg_and_fail("pipe");
 
-	for (i = 0; i < T; ++i)
+	for (int i = 0; i < T; ++i)
 		assert(pthread_create(&t, NULL, thread, NULL) == 0);
-	for (i = 0; i < T; ++i)
+	for (int i = 0; i < T; ++i)
 		assert(read(0, fds, 1) == 1);
 
 	(void) nanosleep(&ts, 0);
@@ -48,15 +47,13 @@ process(void)
 int
 main(void)
 {
-	int i, s;
-	pid_t p;
-
-	for (i = 0; i < P; ++i) {
-		p = fork();
+	for (int i = 0; i < P; ++i) {
+		pid_t p = fork();
 		if (p < 0)
 			perror_msg_and_fail("fork");
 		if (p == 0)
 			return process();
+		int s;
 		assert(waitpid(p, &s, 0) == p);
 		assert(WIFEXITED(s));
 		if (WEXITSTATUS(s))

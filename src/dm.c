@@ -105,7 +105,6 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	static const uint32_t target_spec_size =
 		sizeof(struct dm_target_spec);
-	uint32_t i;
 	uint32_t offset = ioc->data_start;
 	uint32_t offset_end = 0;
 
@@ -118,7 +117,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	for (i = 0; i < ioc->target_count; i++) {
+	for (uint32_t i = 0; i < ioc->target_count; ++i) {
 		tprints(", ");
 
 		if (i && offset <= offset_end)
@@ -240,7 +239,6 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 	struct dm_name_list s;
 	uint32_t offset = ioc->data_start;
 	uint32_t offset_end = 0;
-	uint32_t count;
 	int rc;
 
 	if (ioc->data_start == ioc->data_size)
@@ -252,7 +250,7 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	for (count = 0;; count++) {
+	for (uint32_t count = 0;; ++count) {
 		tprints(", ");
 
 		if (count && offset <= offset_end)
@@ -332,7 +330,6 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 	struct dm_target_versions s;
 	uint32_t offset = ioc->data_start;
 	uint32_t offset_end = 0;
-	uint32_t count;
 
 	if (ioc->data_start == ioc->data_size)
 		return;
@@ -343,7 +340,7 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 	}
 
-	for (count = 0;; count++) {
+	for (uint32_t count = 0;; ++count) {
 		tprints(", ");
 
 		if (count && offset <= offset_end)

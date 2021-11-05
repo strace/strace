@@ -22,7 +22,6 @@ main(void)
 	static const char str[] = "0123456789abcdef";
 	static const int len = sizeof(str) - 1;
 	char *name = tail_memdup(str, sizeof(str));
-	int i;
 	int rc;
 
 	prctl_marker();
@@ -30,7 +29,7 @@ main(void)
 	rc = prctl(PR_SET_NAME, NULL);
 	printf("prctl(PR_SET_NAME, NULL) = %s\n", sprintrc(rc));
 
-	for (i = 0; i <= len; ++i) {
+	for (int i = 0; i <= len; ++i) {
 		rc = prctl(PR_SET_NAME, name + len - i);
 		printf("prctl(PR_SET_NAME, \"%.*s\"%s) = %s\n",
 		       i < len - 1 ? i : len - 1,
@@ -43,7 +42,7 @@ main(void)
 	++name;
 	memcpy(name, str, len);
 
-	for (i = 0; i <= len; ++i) {
+	for (int i = 0; i <= len; ++i) {
 		rc = prctl(PR_SET_NAME, name + len - i);
 		if (i < len - 1)
 			printf("prctl(PR_SET_NAME, %p) = %s\n",
@@ -56,7 +55,7 @@ main(void)
 	rc = prctl(PR_GET_NAME, NULL);
 	printf("prctl(PR_GET_NAME, NULL) = %s\n", sprintrc(rc));
 
-	for (i = 0; i < len; ++i) {
+	for (int i = 0; i < len; ++i) {
 		rc = prctl(PR_GET_NAME, name + len - i);
 		printf("prctl(PR_GET_NAME, %p) = %s\n",
 		       name + len - i, sprintrc(rc));

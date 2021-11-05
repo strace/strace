@@ -66,8 +66,7 @@ main(void)
 		perror_msg_and_skip("ipc");
 	printf("semctl(0, 0, IPC_RMID, %p) = -1 EFAULT (%m)\n", efault);
 
-	unsigned short call;
-	for (call = 0; call <= 40; call += 10) {
+	for (unsigned short call = 0; call <= 40; call += 10) {
 		ipc_call0(0, call);
 		ipc_call0(42, call);
 	}

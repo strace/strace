@@ -57,9 +57,9 @@ vcpu_alloc(struct tcb *const tcp, int fd, int cpuid)
 void
 kvm_vcpu_info_free(struct tcb *tcp)
 {
-	struct vcpu_info *head, *next;
+	struct vcpu_info *next;
 
-	for (head = tcp->vcpu_info_list; head; head = next) {
+	for (struct vcpu_info *head = tcp->vcpu_info_list; head; head = next) {
 		next = head->next;
 		free(head);
 	}

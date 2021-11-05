@@ -201,9 +201,8 @@ test_nlattr(const int fd)
 	msg = tail_alloc(msg_len);
 	memcpy(msg, &c_msg, sizeof(c_msg));
 	msg->nlh.nlmsg_len = msg_len;
-	unsigned int i;
 	nla = NLMSG_ATTR(msg, sizeof(msg->udm));
-	for (i = 0; i < ABBREV_LEN; ++i) {
+	for (unsigned int i = 0; i < ABBREV_LEN; ++i) {
 		nla[i * 2] = (struct nlattr) {
 			.nla_len = NLA_HDRLEN * 2 - 1,
 			.nla_type = UNIX_DIAG_FIRST_UNUSED + i
@@ -219,7 +218,7 @@ test_nlattr(const int fd)
 	       ", udiag_state=TCP_FIN_WAIT1, udiag_ino=0"
 	       ", udiag_cookie=[0, 0]}, [",
 	       fd, msg_len);
-	for (i = 0; i < DEFAULT_STRLEN; ++i) {
+	for (unsigned int i = 0; i < DEFAULT_STRLEN; ++i) {
 		if (i)
 			printf(", ");
 		printf("[{nla_len=%u, nla_type=%#x /* UNIX_DIAG_??? */}, ",

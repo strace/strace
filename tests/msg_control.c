@@ -57,8 +57,7 @@ print_fds(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 
 	printf(", cmsg_data=[");
 	int *fdp = (int *) CMSG_DATA(cmsg);
-	size_t i;
-	for (i = 0; i < nfd; ++i) {
+	for (size_t i = 0; i < nfd; ++i) {
 		if (i)
 			printf(", ");
 #if !VERBOSE
@@ -197,8 +196,7 @@ test_scm_rights3(struct msghdr *const mh, void *const page, const size_t nfds)
 	cmsg->cmsg_level = SOL_SOCKET;
 	cmsg->cmsg_type = SCM_RIGHTS;
 	int *fdp = (int *) CMSG_DATA(cmsg);
-	size_t i;
-	for (i = 0; i < nfds; ++i)
+	for (size_t i = 0; i < nfds; ++i)
 		fdp[i] = i;
 
 	mh->msg_control = cmsg;
@@ -603,15 +601,13 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 {
 	static const int fds0[] = { -10, -11, -12, -13 };
 	static const int fds1[] = { -15, -16, -17, -18 };
-	size_t msg_controllen, max_msg_controllen;
+	size_t max_msg_controllen;
 
 	max_msg_controllen = CMSG_SPACE(sizeof(fds0)) + sizeof(*fds0) - 1;
-	for (msg_controllen = 0;
+	for (size_t msg_controllen = 0;
 	     msg_controllen <= max_msg_controllen;
 	     msg_controllen++) {
-		size_t cmsg_len;
-
-		for (cmsg_len = 0;
+		for (size_t cmsg_len = 0;
 		     cmsg_len <= msg_controllen + CMSG_LEN(0);
 		     cmsg_len++) {
 			test_scm_rights1(mh, msg_controllen,
@@ -622,7 +618,7 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 	max_msg_controllen =
 		CMSG_SPACE(sizeof(fds0)) + CMSG_SPACE(sizeof(fds1)) +
 		sizeof(*fds0) - 1;
-	for (msg_controllen = CMSG_LEN(0) * 2;
+	for (size_t msg_controllen = CMSG_LEN(0) * 2;
 	     msg_controllen <= max_msg_controllen;
 	     msg_controllen++) {
 		static const int *const fdps[] = { fds0, fds1 };
@@ -646,12 +642,10 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 
 	static const char text[16] = "0123456789abcdef";
 	max_msg_controllen = CMSG_SPACE(sizeof(text)) + CMSG_LEN(0) - 1;
-	for (msg_controllen = CMSG_LEN(0);
+	for (size_t msg_controllen = CMSG_LEN(0);
 	     msg_controllen <= max_msg_controllen;
 	     msg_controllen++) {
-		size_t cmsg_len;
-
-		for (cmsg_len = 0;
+		for (size_t cmsg_len = 0;
 		     cmsg_len <= msg_controllen + CMSG_LEN(0)
 		     && cmsg_len <= CMSG_LEN(sizeof(text));
 		     cmsg_len++) {
@@ -763,8 +757,7 @@ static void
 print_ip_opts(const void *const cmsg_data, const unsigned int data_len)
 {
 	const unsigned char *const opts = cmsg_data;
-	unsigned int i;
-	for (i = 0; i < data_len; ++i) {
+	for (unsigned int i = 0; i < data_len; ++i) {
 		if (i)
 			printf(", ");
 #if !VERBOSE
@@ -788,8 +781,7 @@ test_ip_opts(struct msghdr *const mh, void *const page,
 	cmsg->cmsg_len = CMSG_LEN(opts_len);
 	cmsg->cmsg_level = SOL_IP;
 	cmsg->cmsg_type = cmsg_type;
-	unsigned int i;
-	for (i = 0; i < opts_len; ++i)
+	for (unsigned int i = 0; i < opts_len; ++i)
 		CMSG_DATA(cmsg)[i] = 'A' + i;
 
 	mh->msg_control = cmsg;

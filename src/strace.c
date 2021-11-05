@@ -891,29 +891,26 @@ expand_tcbtab(void)
 	   free the TCBs, we allocate a single chunk of many.  */
 	size_t old_tcbtabsize;
 	struct tcb *newtcbs;
-	struct tcb **tcb_ptr;
 
 	old_tcbtabsize = tcbtabsize;
 
 	tcbtab = xgrowarray(tcbtab, &tcbtabsize, sizeof(tcbtab[0]));
 	newtcbs = xcalloc(tcbtabsize - old_tcbtabsize, sizeof(newtcbs[0]));
 
-	for (tcb_ptr = tcbtab + old_tcbtabsize;
-	    tcb_ptr < tcbtab + tcbtabsize; tcb_ptr++, newtcbs++)
+	for (struct tcb **tcb_ptr = tcbtab + old_tcbtabsize;
+	     tcb_ptr < tcbtab + tcbtabsize;
+	     ++tcb_ptr, ++newtcbs)
 		*tcb_ptr = newtcbs;
 }
 
 static struct tcb *
 alloctcb(int pid)
 {
-	unsigned int i;
-	struct tcb *tcp;
-
 	if (nprocs == tcbtabsize)
 		expand_tcbtab();
 
-	for (i = 0; i < tcbtabsize; i++) {
-		tcp = tcbtab[i];
+	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+		struct tcb *tcp = tcbtab[i];
 		if (!tcp->pid) {
 			memset(tcp, 0, sizeof(*tcp));
 			list_init(&tcp->wait_list);
@@ -978,8 +975,7 @@ droptcb(struct tcb *tcp)
 			       "since attach", tcp->pid, ts_float(&dt));
 	}
 
-	int p;
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+	for (int p = 0; p < SUPPORTED_PERSONALITIES; ++p)
 		free(tcp->inject_vec[p]);
 
 	free_tcb_priv_data(tcp);
@@ -1281,7 +1277,6 @@ static void
 startup_attach(void)
 {
 	pid_t parent_pid = strace_tracer_pid;
-	unsigned int tcbi;
 	struct tcb *tcp;
 
 	if (daemonized_tracer) {
@@ -1325,7 +1320,7 @@ startup_attach(void)
 		}
 	}
 
-	for (tcbi = 0; tcbi < tcbtabsize; tcbi++) {
+	for (unsigned int tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
 		tcp = tcbtab[tcbi];
 
 		if (!tcp->pid)
@@ -1483,13 +1478,11 @@ ensure_standard_fds_opened(void)
 static void
 redirect_standard_fds(void)
 {
-	int i;
-
 	/*
 	 * It might be a good idea to redirect stderr as well,
 	 * but we sometimes need to print error messages.
 	 */
-	for (i = 0; i <= 1; ++i) {
+	for (int i = 0; i <= 1; ++i) {
 		if (!fd_is_placeholder[i]) {
 			close(i);
 			open_dummy_desc();
@@ -2781,14 +2774,11 @@ pid2tcb(const int pid)
 static void
 cleanup(int fatal_sig)
 {
-	unsigned int i;
-	struct tcb *tcp;
-
 	if (!fatal_sig)
 		fatal_sig = SIGTERM;
 
-	for (i = 0; i < tcbtabsize; i++) {
-		tcp = tcbtab[i];
+	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+		struct tcb *tcp = tcbtab[i];
 		if (!tcp->pid)
 			continue;
 		debug_func_msg("looking at pid %u", tcp->pid);

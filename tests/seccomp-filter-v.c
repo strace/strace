@@ -98,8 +98,7 @@ main(void)
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=0, filter=[]})"
 		" = -1 EINVAL (%m)\n");
 
-	unsigned int i;
-	for (i = 0; i <= BPF_MAXINSNS; ++i) {
+	for (unsigned int i = 0; i <= BPF_MAXINSNS; ++i) {
 		const struct sock_filter stmt =
 			BPF_STMT(BPF_CLASS(i), i << 16);
 		big_filter[i] = stmt;
@@ -113,7 +112,7 @@ main(void)
 		"SECCOMP_FILTER_FLAG_NEW_LISTENER|"
 		"SECCOMP_FILTER_FLAG_TSYNC_ESRCH|0xffffffe0",
 		prog->len);
-	for (i = 0; i < BPF_MAXINSNS; ++i) {
+	for (unsigned int i = 0; i < BPF_MAXINSNS; ++i) {
 		if (i)
 			tprintf(", ");
 		switch (BPF_CLASS(i)) {

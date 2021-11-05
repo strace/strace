@@ -82,9 +82,8 @@ main(void)
         int fd = socket(AF_NETLINK, SOCK_RAW, 0);
         if (fd < 0)
                 perror_msg_and_skip("socket AF_NETLINK SOCK_RAW");
-	unsigned int i;
 
-	for (i = 0; i < ARRAY_SIZE(names); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(names); ++i) {
 		/* getsockopt */
 
 		/* classic */

@@ -56,9 +56,7 @@ main(void)
 		TRIPLE(0xc0deffffU)
 	};
 
-	unsigned int i;
-
-	for (i = 0; i < ARRAY_SIZE(tests); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(tests); ++i) {
 		const unsigned int rn = ugid2int(tests[i].r);
 		const unsigned int en = ugid2int(tests[i].e);
 		const unsigned int sn = ugid2int(tests[i].s);

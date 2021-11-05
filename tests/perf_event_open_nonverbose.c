@@ -70,10 +70,9 @@ main(void)
 			"PERF_FLAG_FD_NO_GROUP|PERF_FLAG_FD_OUTPUT|"
 			"PERF_FLAG_PID_CGROUP|PERF_FLAG_FD_CLOEXEC" },
 	};
-	size_t i;
 	int rc;
 
-	for (i = 0; i < ARRAY_SIZE(args); i++) {
+	for (size_t i = 0; i < ARRAY_SIZE(args); ++i) {
 		rc = syscall(__NR_perf_event_open, args[i].attr, args[i].pid,
 			args[i].cpu, args[i].group_fd, args[i].flags);
 		printf("perf_event_open(%s, %d, %d, %d, %s) = %s\n",

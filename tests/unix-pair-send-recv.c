@@ -48,9 +48,7 @@ sys_recv(int sockfd, const void *buf, size_t len, int flags)
 static void
 transpose(char *str, const size_t len)
 {
-	size_t i;
-
-	for (i = 0; i < len / 2; ++i) {
+	for (size_t i = 0; i < len / 2; ++i) {
 		char c = str[i];
 		str[i] = str[len - 1 - i];
 		str[len - 1 - i] = c;

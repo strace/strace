@@ -313,8 +313,7 @@ decode_socket_subcall(struct tcb *tcp)
 	tcp->qual_flg = qual_flags(scno);
 	tcp->s_ent = &sysent[scno];
 
-	unsigned int i;
-	for (i = 0; i < nargs; ++i)
+	for (unsigned int i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
 				? ((uint32_t *) (void *) buf)[i] : buf[i];
 }
@@ -354,8 +353,7 @@ decode_ipc_subcall(struct tcb *tcp)
 	tcp->s_ent = &sysent[tcp->scno];
 
 	const unsigned int n = n_args(tcp);
-	unsigned int i;
-	for (i = 0; i < n; i++)
+	for (unsigned int i = 0; i < n; ++i)
 		tcp->u_arg[i] = tcp->u_arg[i + 1];
 }
 #endif /* SYS_ipc_subcall */

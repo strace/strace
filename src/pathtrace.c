@@ -23,9 +23,7 @@ struct path_set global_path_set;
 static bool
 pathmatch(const char *path, struct path_set *set)
 {
-	unsigned i;
-
-	for (i = 0; i < set->num_selected; ++i) {
+	for (unsigned int i = 0; i < set->num_selected; ++i) {
 		if (strcmp(path, set->paths_selected[i]) == 0)
 			return true;
 	}
@@ -318,20 +316,17 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set)
 	case SEN_ppoll_time64:
 	{
 		struct pollfd fds;
-		unsigned nfds;
-		kernel_ulong_t start, cur, end;
 
-		start = tcp->u_arg[0];
-		nfds = tcp->u_arg[1];
-
+		const kernel_ulong_t start = tcp->u_arg[0];
+		unsigned int nfds = tcp->u_arg[1];
 		if (nfds > 1024 * 1024)
 			nfds = 1024 * 1024;
-		end = start + sizeof(fds) * nfds;
+		const kernel_ulong_t end = start + sizeof(fds) * nfds;
 
 		if (nfds == 0 || end < start)
 			return false;
 
-		for (cur = start; cur < end; cur += sizeof(fds)) {
+		for (kernel_ulong_t cur = start; cur < end; cur += sizeof(fds)) {
 			if (umove(tcp, cur, &fds))
 				break;
 			if (fdmatch(tcp, fds.fd, set))

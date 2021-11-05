@@ -50,8 +50,7 @@ print_opts(const char *name, const struct cmsghdr *c)
 	printf("%s", name);
 	if (len) {
 		printf(", cmsg_data=[");
-		size_t i;
-		for (i = 0; i < len; ++i)
+		for (size_t i = 0; i < len; ++i)
 			printf("%s%#x", i ? ", " : "", opts[i]);
 		printf("]");
 	}
@@ -134,8 +133,8 @@ main(void)
 	       ntohs(addr.sin_port), (unsigned) mh.msg_namelen,
 	       data, (unsigned) size);
 
-	struct cmsghdr *c;
-	for (c = CMSG_FIRSTHDR(&mh); c; c = CMSG_NXTHDR(&mh, c)) {
+	for (struct cmsghdr *c = CMSG_FIRSTHDR(&mh);
+	     c; c = CMSG_NXTHDR(&mh, c)) {
 		if (IPPROTO_IP != c->cmsg_level)
 			continue;
 		if (c != control)

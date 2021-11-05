@@ -108,10 +108,9 @@ main(void)
 
 	CLEANUP_CMD;
 
-	unsigned int i;
 	long expected = 0;
 
-	for (i = 0; i < ARRAY_SIZE(tests); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(tests); ++i) {
 		const unsigned int unum = ugid2int(tests[i].uid);
 		const unsigned int gnum = ugid2int(tests[i].gid);
 

@@ -38,9 +38,9 @@
 		const char **arrstrs[] = arrstrs_;			\
 		const char ***arrstrs_pos = arrstrs;			\
 		const char **arrstr = *arrstrs_pos;			\
-		const char *type = NULL;				\
 									\
-		for (type = arrstr ? arrstr[0] : NULL; type && arrstr;	\
+		for (const char *type = arrstr ? arrstr[0] : NULL;	\
+		     type && arrstr;					\
 		     type = (++arrstr)[0] ? arrstr[0]			\
 					  : (++arrstrs_pos)[0]		\
 				             ? (arrstr = arrstrs_pos[0])[0] \

@@ -267,7 +267,6 @@ unix_parse_response(const void *data, const int data_len,
 {
 	const char *proto_name = opaque_data;
 	const struct unix_diag_msg *diag_msg = data;
-	struct rtattr *attr;
 	int rta_len = data_len - NLMSG_LENGTH(sizeof(*diag_msg));
 	uint32_t peer = 0;
 	size_t path_len = 0;
@@ -280,7 +279,7 @@ unix_parse_response(const void *data, const int data_len,
 	if (diag_msg->udiag_family != AF_UNIX)
 		return -1;
 
-	for (attr = (struct rtattr *) (diag_msg + 1);
+	for (struct rtattr *attr = (struct rtattr *) (diag_msg + 1);
 	     RTA_OK(attr, rta_len);
 	     attr = RTA_NEXT(attr, rta_len)) {
 		switch (attr->rta_type) {
@@ -476,8 +475,7 @@ static const struct {
 enum sock_proto
 get_proto_by_name(const char *const name)
 {
-	unsigned int i;
-	for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
+	for (unsigned int i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
 	     i < ARRAY_SIZE(protocols); ++i) {
 		if (protocols[i].name && !strcmp(name, protocols[i].name))
 			return (enum sock_proto) i;
@@ -512,8 +510,7 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 					       protocols[proto].proto, inode,
 					       protocols[proto].name);
 	} else {
-		unsigned int i;
-		for (i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
+		for (unsigned int i = (unsigned int) SOCK_PROTO_UNKNOWN + 1;
 		     i < ARRAY_SIZE(protocols); ++i) {
 			if (!protocols[i].get)
 				continue;
@@ -606,7 +603,6 @@ genl_parse_families_response(const void *const data,
 {
 	struct dyxlat *const dyxlat = opaque_data;
 	const struct genlmsghdr *const gnlh = data;
-	struct rtattr *attr;
 	int rta_len = data_len - NLMSG_LENGTH(sizeof(*gnlh));
 
 	char *name = NULL;
@@ -620,7 +616,7 @@ genl_parse_families_response(const void *const data,
 	if (gnlh->version != 2)
 		return -1;
 
-	for (attr = (struct rtattr *) (gnlh + 1);
+	for (struct rtattr *attr = (struct rtattr *) (gnlh + 1);
 	     RTA_OK(attr, rta_len);
 	     attr = RTA_NEXT(attr, rta_len)) {
 		switch (attr->rta_type) {

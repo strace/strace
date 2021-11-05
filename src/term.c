@@ -53,7 +53,6 @@ static void
 decode_termio(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	struct termio tio;
-	int i;
 
 	tprints(", ");
 	if (umove_or_printaddr(tcp, addr, &tio))
@@ -83,7 +82,7 @@ decode_termio(struct tcb *const tcp, const kernel_ulong_t addr)
 			tio.c_cc[VMIN], tio.c_cc[VTIME]);
 #endif /* !_VMIN */
 	tprints("c_cc=\"");
-	for (i = 0; i < NCC; i++)
+	for (int i = 0; i < NCC; ++i)
 		tprintf("\\x%02x", tio.c_cc[i]);
 	tprints("\"}");
 }

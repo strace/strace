@@ -134,8 +134,7 @@ main(int argc, char *argv[])
 	assert(step >= 0);
 	assert(num_procs > 0);
 
-	int proc;
-	for (proc = 0; proc < num_procs; ++proc) {
+	for (int proc = 0; proc < num_procs; ++proc) {
 		int ret = fork();
 
 		if (ret < 0)
@@ -163,8 +162,7 @@ main(int argc, char *argv[])
 		/* This magic forces tprintf to write where we want it. */
 		dup2(out_fd, 3);
 
-		int i;
-		for (i = 1; i <= iter; ++i) {
+		for (int i = 1; i <= iter; ++i) {
 			int fail = 0;
 			if (last != 0) {
 				--first;
@@ -182,7 +180,7 @@ main(int argc, char *argv[])
 		return 0;
 	}
 
-	for (proc = 0; proc < num_procs; ++proc) {
+	for (int proc = 0; proc < num_procs; ++proc) {
 		int status;
 		int ret = wait(&status);
 		if (ret <= 0)

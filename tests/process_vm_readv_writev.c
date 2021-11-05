@@ -45,7 +45,6 @@ static void
 print_iov(const struct iovec *iov, const void *arg_ptr, long rc)
 {
 	const struct print_iov_arg *arg = arg_ptr;
-	uint32_t i;
 	uint32_t num_segm = 0;
 	uint64_t segm_offs = 0;
 
@@ -60,7 +59,7 @@ print_iov(const struct iovec *iov, const void *arg_ptr, long rc)
 
 	printf("[");
 
-	for (i = 0; i < arg->count; i++) {
+	for (uint32_t i = 0; i < arg->count; ++i) {
 		if (i)
 			printf(", ");
 

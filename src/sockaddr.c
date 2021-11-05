@@ -499,12 +499,11 @@ print_sockaddr_data_ll(struct tcb *tcp, const void *const buf,
 	if (sa_ll->sll_halen) {
 		const unsigned int oob_halen =
 			addrlen - offsetof(struct sockaddr_ll, sll_addr);
-		unsigned int i;
 
 		tprint_struct_next();
 		tprints_field_name("sll_addr");
 		tprint_array_begin();
-		for (i = 0; i < sa_ll->sll_halen; ++i) {
+		for (unsigned int i = 0; i < sa_ll->sll_halen; ++i) {
 			if (i)
 				tprint_array_next();
 			if (i >= oob_halen) {

@@ -27,9 +27,7 @@ static void add_key(const char *addr, const unsigned int len)
 static void
 test_printstrn_at(char *const p, const unsigned int test_max)
 {
-	unsigned int i;
-
-	for (i = 0; i <= test_max; ++i) {
+	for (unsigned int i = 0; i <= test_max; ++i) {
 		add_key(p + (test_max - i), i);
 		printf("add_key(NULL, NULL, \"%.*s\", %u"
 		       ", KEY_SPEC_THREAD_KEYRING) = %s\n",
@@ -42,11 +40,9 @@ test_efault(const unsigned int test_max)
 {
 	char *p = tail_alloc(test_max);
 	memset(p, '/', test_max);
-	unsigned int i;
 
-	for (i = 0; i <= test_max; ++i) {
-		unsigned int j;
-		for (j = 1; j <= sizeof(long); ++j) {
+	for (unsigned int i = 0; i <= test_max; ++i) {
+		for (unsigned int j = 1; j <= sizeof(long); ++j) {
 			add_key(p + (test_max - i), i + j);
 			printf("add_key(NULL, NULL, %p, %u"
 			       ", KEY_SPEC_THREAD_KEYRING) = %s\n",
@@ -82,16 +78,15 @@ test_printstrn(const unsigned int test_max)
 	char *p = tail_alloc(test_max + page_size);
 	fill_memory_ex(p, test_max + page_size, 'a', 'z' - 'a' + 1);
 
-	unsigned int i;
-	for (i = 1; i <= sizeof(long); ++i)
+	for (unsigned int i = 1; i <= sizeof(long); ++i)
 		test_printstrn_at(p + i, test_max);
-	for (i = 0; i < sizeof(long); ++i)
+	for (unsigned int i = 0; i < sizeof(long); ++i)
 		test_printstrn_at(p + page_size - i, test_max);
 	test_efault(test_max);
 
 	fill_memory_ex(p, test_max + page_size, 0x00, 0xFF);
 	/* Test corner cases when octal quoting goes before digit */
-	for (i = 0; i < 11; i++)
+	for (unsigned int i = 0; i < 11; ++i)
 		p[2 + 3 * i] = '0' + i - 1;
 
 	test_print_memory(p, test_max);

@@ -504,9 +504,9 @@ call_summary_pers(FILE *outf)
 void
 call_summary(FILE *outf)
 {
-	unsigned int i, old_pers = current_personality;
+	const unsigned int old_pers = current_personality;
 
-	for (i = 0; i < SUPPORTED_PERSONALITIES; ++i) {
+	for (unsigned int i = 0; i < SUPPORTED_PERSONALITIES; ++i) {
 		if (!countv[i])
 			continue;
 

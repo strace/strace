@@ -292,22 +292,20 @@ main(void)
 		(kernel_ulong_t) (uintptr_t) bogus_mount_id,
 	};
 
-	unsigned int i;
-	unsigned int j;
-	unsigned int k;
-	unsigned int l;
-	unsigned int m;
-
 	snprintf(bogus_path1_addr, sizeof(bogus_path1_addr), "%p", bogus_path1);
 	snprintf(bogus_path1_after_addr, sizeof(bogus_path1_after_addr), "%p",
 		bogus_path1 + PATH1_SIZE);
 
-	for (i = 0; i < ARRAY_SIZE(dirfds); i++) {
-		for (j = 0; j < ARRAY_SIZE(paths); j++) {
-			for (k = 0; k < ARRAY_SIZE(name_handles); k++) {
-				for (l = 0; l < ARRAY_SIZE(mount_ids); l++) {
-					for (m = 0; m < ARRAY_SIZE(name_flags);
-					    m++) {
+	for (unsigned int i = 0;
+	     i < ARRAY_SIZE(dirfds); ++i) {
+		for (unsigned int j = 0;
+		     j < ARRAY_SIZE(paths); ++j) {
+			for (unsigned int k = 0;
+			     k < ARRAY_SIZE(name_handles); ++k) {
+				for (unsigned int l = 0;
+				     l < ARRAY_SIZE(mount_ids); ++l) {
+					for (unsigned int m = 0;
+					     m < ARRAY_SIZE(name_flags); ++m) {
 						do_name_to_handle_at(
 							dirfds[i].val,
 							dirfds[i].str,
@@ -325,9 +323,12 @@ main(void)
 		}
 	}
 
-	for (i = 0; i < ARRAY_SIZE(mount_fds); i++) {
-		for (j = 0; j < ARRAY_SIZE(open_handles); j++) {
-			for (k = 0; k < ARRAY_SIZE(open_flags); k++) {
+	for (unsigned int i = 0;
+	     i < ARRAY_SIZE(mount_fds); ++i) {
+		for (unsigned int j = 0;
+		     j < ARRAY_SIZE(open_handles); ++j) {
+			for (unsigned int k = 0;
+			     k < ARRAY_SIZE(open_flags); ++k) {
 				do_open_by_handle_at(mount_fds[i],
 						     open_handles[j].addr,
 						     open_handles[j].valid,

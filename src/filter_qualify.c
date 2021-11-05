@@ -143,11 +143,7 @@ parse_delay_token(const char *input, struct inject_opts *fopts, bool isenter)
 static bool
 parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 {
-	char *token, *str_tokenized, *saveptr = NULL;
-	const char *val;
-	size_t data_len;
 	unsigned flag = isenter ? INJECT_F_POKE_ENTER : INJECT_F_POKE_EXIT;
-	struct poke_payload *poke;
 
 	/* disallow duplicates */
 	if (fopts->data.flags & flag)
@@ -160,15 +156,17 @@ parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 	if (fopts->data.poke_idx == (uint16_t) -1)
 		fopts->data.poke_idx = alloc_poke_data();
 
-	saveptr = NULL;
-	str_tokenized = xstrdup(input);
-	for (token = strtok_r(str_tokenized, ",", &saveptr);
+	char *saveptr = NULL;
+	char *str_tokenized = xstrdup(input);
+	struct poke_payload *poke;
+	for (char *token = strtok_r(str_tokenized, ",", &saveptr);
 	     token;
 	     token = strtok_r(NULL, ",", &saveptr)) {
 		poke = xcalloc(1, sizeof(*poke));
 		poke->is_enter = isenter;
 
-		if ((val = STR_STRIP_PREFIX(token, "@arg")) == token)
+		const char *val = STR_STRIP_PREFIX(token, "@arg");
+		if (val == token)
 			goto err;
 		if ((val[0] >= '1') && (val[0] <= '7')) {
 			poke->arg_no = val[0] - '0';
@@ -179,7 +177,7 @@ parse_poke_token(const char *input, struct inject_opts *fopts, bool isenter)
 			goto err;
 		val += 2;
 
-		data_len = strlen(val);
+		size_t data_len = strlen(val);
 		if ((data_len == 0) || (data_len % 2) || (data_len > 2048))
 			goto err;
 		data_len /= 2;

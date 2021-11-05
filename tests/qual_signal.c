@@ -53,8 +53,7 @@ main(int ac, const char **av)
 	pid = getpid();
 	uid = geteuid();
 
-	int i;
-	for (i = 1; i < ac; i += 2)
+	for (int i = 1; i < ac; i += 2)
 		test_sig(atoi(av[i]), av[i + 1]);
 
 	puts("+++ exited with 0 +++");

@@ -114,8 +114,7 @@ print_nodes(const unsigned long maxnode, unsigned int offset)
 
 	if (nlongs) {
 		putc('[', stdout);
-		unsigned int i;
-		for (i = 0; i < nlongs + offset; ++i) {
+		for (unsigned int i = 0; i < nlongs + offset; ++i) {
 			if (i)
 				fputs(", ", stdout);
 			if (i < nlongs) {

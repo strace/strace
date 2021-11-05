@@ -19,9 +19,7 @@ print_seg(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 	kernel_ulong_t seg_buf[4];
 
 	if (elem_size < sizeof(seg_buf)) {
-		unsigned int i;
-
-		for (i = 0; i < ARRAY_SIZE(seg_buf); ++i)
+		for (unsigned int i = 0; i < ARRAY_SIZE(seg_buf); ++i)
 			seg_buf[i] = ((unsigned int *) elem_buf)[i];
 		seg = seg_buf;
 	} else {

@@ -139,7 +139,6 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 		sizeof(kernel_ulong_t),
 		sizeof(kernel_ulong_t),
 	};
-	unsigned i;
 	unsigned cnt = 0;
 
 	va_list ap;
@@ -171,7 +170,7 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 #else
 	printf("keyctl(%s", cmd_str);
 #endif
-	for (i = 0; i < cnt; i++) {
+	for (unsigned int i = 0; i < cnt; ++i) {
 		printf(", ");
 		print_arg(args[i], arg_str[i], arg_fmt[i], arg_sz[i], rc);
 	}
@@ -238,11 +237,9 @@ kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
 	append_str(&pos, &left, ", otherinfolen=%u", kdf->otherinfolen);
 
 	if (print_spare) {
-		size_t i;
-
 		append_str(&pos, &left, ", __spare=[");
 
-		for (i = 0; i < ARRAY_SIZE(kdf->__spare); i++) {
+		for (size_t i = 0; i < ARRAY_SIZE(kdf->__spare); ++i) {
 			if  (i)
 				append_str(&pos, &left, ", ");
 
@@ -395,7 +392,6 @@ main(void)
 	ssize_t ret;
 	ssize_t kis_size = 0;
 	long rc;
-	size_t i;
 
 	key_iov[0].iov_base = short_type;
 	key_iov[0].iov_len = sizeof(short_type_str);
@@ -408,7 +404,7 @@ main(void)
 	key_iov[4].iov_base = bogus_str;
 	key_iov[4].iov_len = 32;
 
-	for (i = 5; i < IOV_SIZE; i++) {
+	for (size_t i = 5; i < IOV_SIZE; ++i) {
 		key_iov[i].iov_base =
 			(void *) (uintptr_t) (0xfffffacefffff00dULL +
 			0x100000001ULL * i);
@@ -442,7 +438,7 @@ main(void)
 	if ((ret < 0) || (ret >= IOV_STR_SIZE))
 		error_msg_and_fail("snprintf");
 
-	for (i = 4; i < PR_LIMIT; i++) {
+	for (size_t i = 4; i < PR_LIMIT; ++i) {
 		kis_size += ret;
 
 		ret = snprintf(key_iov_str2 + kis_size, IOV_STR_SIZE - kis_size,
@@ -1067,7 +1063,7 @@ main(void)
 
 	/* KEYCTL_DH_COMPUTE + KDF */
 
-	for (i = 0; i < ARRAY_SIZE(kckdfp_data); i++) {
+	for (size_t i = 0; i < ARRAY_SIZE(kckdfp_data); ++i) {
 		struct keyctl_kdf_params *kckdfp =
 			(struct keyctl_kdf_params *) kckdfp_char;
 		bool deref_hash = true;
@@ -1182,7 +1178,7 @@ main(void)
 	struct keyctl_pkey_params *pkey_params =
 		tail_alloc(sizeof(*pkey_params));
 
-	for (i = 0; i < ARRAY_SIZE(pkey_ops); i++) {
+	for (size_t i = 0; i < ARRAY_SIZE(pkey_ops); ++i) {
 		do_keyctl(pkey_ops[i].op, pkey_ops[i].str,
 			  sizeof(char *), ARG_STR(NULL), ptr_fmt,
 			  sizeof(char *), ARG_STR(NULL), ptr_fmt,
@@ -1243,7 +1239,8 @@ main(void)
 		  XSTR(0xffffffff, "KEYCTL_MOVE_EXCL|0xfffffffe") },
 	};
 
-	for (i = 0; i < ARRAY_SIZE(move_keys) * ARRAY_SIZE(move_flags); i++) {
+	for (size_t i = 0;
+	     i < ARRAY_SIZE(move_keys) * ARRAY_SIZE(move_flags); ++i) {
 		do_keyctl(ARG_STR(KEYCTL_MOVE),
 			  sizeof(kernel_ulong_t),
 				move_keys[i % ARRAY_SIZE(move_keys)].key,

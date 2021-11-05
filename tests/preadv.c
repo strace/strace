@@ -20,11 +20,10 @@
 static void
 print_iov(const struct iovec *iov)
 {
-	unsigned int i;
 	unsigned char *buf = iov->iov_base;
 
 	fputs("{iov_base=\"", stdout);
-	for (i = 0; i < iov->iov_len; ++i)
+	for (unsigned int i = 0; i < iov->iov_len; ++i)
 		printf("\\%d", (int) buf[i]);
 	printf("\", iov_len=%u}", (unsigned) iov->iov_len);
 }
@@ -32,9 +31,8 @@ print_iov(const struct iovec *iov)
 static void
 print_iovec(const struct iovec *iov, unsigned int cnt)
 {
-	unsigned int i;
 	putchar('[');
-	for (i = 0; i < cnt; ++i) {
+	for (unsigned int i = 0; i < cnt; ++i) {
 		if (i)
 			fputs(", ", stdout);
 		print_iov(&iov[i]);

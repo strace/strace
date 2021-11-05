@@ -40,9 +40,8 @@ print_iovec(const struct iovec *iov, unsigned int cnt, unsigned int size)
 		printf("%p", iov);
 		return;
 	}
-	unsigned int i;
 	putchar('[');
-	for (i = 0; i < cnt; ++i) {
+	for (unsigned int i = 0; i < cnt; ++i) {
 		if (i)
 			fputs(", ", stdout);
 		if (i == size) {
@@ -69,12 +68,11 @@ main(void)
 		perror_msg_and_fail("open");
 
 	char *buf = tail_alloc(LEN);
-	unsigned i;
-	for (i = 0; i < LEN; ++i)
+	for (unsigned int i = 0; i < LEN; ++i)
 		buf[i] = i;
 
 	struct iovec *iov = tail_alloc(sizeof(*iov) * LEN);
-	for (i = 0; i < LEN; ++i) {
+	for (unsigned int i = 0; i < LEN; ++i) {
 		buf[i] = i;
 		iov[i].iov_base = &buf[i];
 		iov[i].iov_len = LEN - i;
@@ -83,7 +81,7 @@ main(void)
 	const off_t offset = 0xdefaceddeadbeefLL;
 	long rc;
 	int written = 0;
-	for (i = 0; i < LEN; ++i) {
+	for (unsigned int i = 0; i < LEN; ++i) {
 		written += iov[i].iov_len;
 		if (pwritev(0, iov, i + 1, offset + i) != written)
 			perror_msg_and_fail("pwritev");
@@ -93,7 +91,7 @@ main(void)
 		       i + 1, (long long) offset + i, written);
 	}
 
-	for (i = 0; i <= LEN; ++i) {
+	for (unsigned int i = 0; i <= LEN; ++i) {
 		unsigned int n = LEN + 1 - i;
 		fputs("pwritev(0, ", stdout);
 		print_iovec(iov + i, n, LEN - i);

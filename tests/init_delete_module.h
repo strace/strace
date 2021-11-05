@@ -26,17 +26,14 @@ enum {
 static void
 print_str(unsigned int base, unsigned int len, bool escape)
 {
-	unsigned int i;
-
 	if (!escape) {
-		for (i = base; i < (base + len); i++)
+		for (unsigned int i = base; i < (base + len); ++i)
 			putc(i, stdout);
-
-		return;
+	} else {
+		for (unsigned int i = base; i < (base + len); ++i)
+			printf("\\%u%u%u",
+			       (i >> 6) & 0x3, (i >> 3) & 0x7, i & 0x7);
 	}
-
-	for (i = base; i < (base + len); i++)
-		printf("\\%u%u%u", (i >> 6) & 0x3, (i >> 3) & 0x7, i & 0x7);
 }
 
 #endif /* !STRACE_TESTS_INIT_DELETE_MODULE_H */

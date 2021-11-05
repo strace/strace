@@ -131,10 +131,10 @@ void
 dumpiov_in_mmsghdr(struct tcb *const tcp, kernel_ulong_t addr)
 {
 	unsigned int len = tcp->u_rval;
-	unsigned int i, fetched;
-	struct mmsghdr mmsg;
+	unsigned int fetched;
 
-	for (i = 0; i < len; ++i, addr += fetched) {
+	for (unsigned int i = 0; i < len; ++i, addr += fetched) {
+		struct mmsghdr mmsg;
 		fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
 		if (!fetched)
 			break;

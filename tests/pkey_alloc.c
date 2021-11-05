@@ -39,13 +39,10 @@ main(void)
 		{ 0xbadc0de8, "0xbadc0de8 /* PKEY_??? */" },
 	};
 
-	long rc;
-	unsigned int i;
-	unsigned int j;
-
-	for (i = 0; i < ARRAY_SIZE(flags); i++) {
-		for (j = 0; j < ARRAY_SIZE(rights); j++) {
-			rc = syscall(__NR_pkey_alloc, flags[i], rights[j].val);
+	for (unsigned int i = 0; i < ARRAY_SIZE(flags); ++i) {
+		for (unsigned int j = 0; j < ARRAY_SIZE(rights); ++j) {
+			long rc = syscall(__NR_pkey_alloc,
+					  flags[i], rights[j].val);
 			printf("pkey_alloc(%#llx, %s) = %s\n",
 			       (unsigned long long) flags[i], rights[j].str,
 			       sprintrc(rc));

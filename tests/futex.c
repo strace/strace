@@ -95,7 +95,6 @@ invalid_op(int *val, int op, uint32_t argmask, ...)
 	const char *fmt;
 	int saved_errno;
 	int rc;
-	int i;
 	va_list ap;
 
 
@@ -106,7 +105,7 @@ invalid_op(int *val, int op, uint32_t argmask, ...)
 
 	va_start(ap, argmask);
 
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; ++i) {
 		if (argmask & (1 << i)) {
 			fmt = va_arg(ap, const char *);
 
@@ -158,8 +157,6 @@ main(int argc, char *argv[])
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, uaddr);
 	TAIL_ALLOC_OBJECT_CONST_PTR(int, uaddr2);
 	int rc;
-	unsigned i;
-	unsigned j;
 
 	uaddr[0] = 0x1deadead;
 	uaddr2[0] = 0xbadf00d;
@@ -582,8 +579,8 @@ main(int argc, char *argv[])
 			ENOSYS, EINVAL },
 	};
 
-	for (i = 0; i < ARRAY_SIZE(wake_ops); i++) {
-		for (j = 0; j < 2; j++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(wake_ops); ++i) {
+		for (unsigned int j = 0; j < 2; ++j) {
 			CHECK_FUTEX_ENOSYS(uaddr,
 				j ? FUTEX_WAKE_OP_PRIVATE : FUTEX_WAKE_OP,
 				VAL, i, uaddr2, wake_ops[i].val,

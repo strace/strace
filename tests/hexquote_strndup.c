@@ -24,8 +24,7 @@ hexquote_strndup(const char *src, const size_t src_len)
 		perror_msg_and_fail("malloc(%zu)", dst_size);
 
 	char *p = dst;
-	size_t i;
-	for (i = 0; i < src_len; ++i) {
+	for (size_t i = 0; i < src_len; ++i) {
 		unsigned int c = ((const unsigned char *) src)[i];
 		*(p++) = '\\';
 		*(p++) = 'x';

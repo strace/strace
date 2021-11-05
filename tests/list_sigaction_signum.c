@@ -15,9 +15,7 @@
 int
 main(void)
 {
-	unsigned int i;
-
-	for (i = 1; i < 32; ++i) {
+	for (unsigned int i = 1; i < 32; ++i) {
 		static const struct sigaction ign = { .sa_handler = SIG_IGN };
 		static const struct sigaction dfl = { .sa_handler = SIG_DFL };
 		struct sigaction act;

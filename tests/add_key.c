@@ -54,11 +54,6 @@ main(void)
 	char *bogus_desc = tail_memdup(unterminated2, sizeof(unterminated2));
 	char *bogus_payload = tail_memdup(unterminated3, sizeof(unterminated3));
 
-	unsigned i;
-	unsigned j;
-	unsigned k;
-	unsigned l;
-
 	struct {
 		const char *type;
 		const char *str;
@@ -106,10 +101,14 @@ main(void)
 		{ -1, "KEY_SPEC_THREAD_KEYRING" },
 	};
 
-	for (i = 0; i < ARRAY_SIZE(types); i++)
-		for (j = 0; j < ARRAY_SIZE(descs); j++)
-			for (k = 0; k < ARRAY_SIZE(payloads); k++)
-				for (l = 0; l < ARRAY_SIZE(keyrings); l++)
+	for (unsigned int i = 0;
+	     i < ARRAY_SIZE(types); ++i)
+		for (unsigned int j = 0;
+		     j < ARRAY_SIZE(descs); ++j)
+			for (unsigned int k = 0;
+			     k < ARRAY_SIZE(payloads); ++k)
+				for (unsigned int l = 0;
+				     l < ARRAY_SIZE(keyrings); ++l)
 					do_add_key(types[i].type, types[i].str,
 						descs[j].desc, descs[j].str,
 						payloads[k].pload,

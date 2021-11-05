@@ -56,12 +56,8 @@ main(void)
 			"O_WRONLY|0x80000000" }
 	};
 
-	unsigned int i;
-	unsigned int j;
-
-
-	for (i = 0; i < ARRAY_SIZE(flags); i++)
-		for (j = 0; j < ARRAY_SIZE(event_f_flags); j++)
+	for (unsigned int i = 0; i < ARRAY_SIZE(flags); ++i)
+		for (unsigned int j = 0; j < ARRAY_SIZE(event_f_flags); ++j)
 			do_call(flags[i].val, flags[i].str,
 				event_f_flags[j].val, event_f_flags[j].str);
 

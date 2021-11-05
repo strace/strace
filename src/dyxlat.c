@@ -29,9 +29,7 @@ dyxlat_alloc(const size_t nmemb)
 void
 dyxlat_free(struct dyxlat *const dyxlat)
 {
-	size_t i;
-
-	for (i = 0; i < dyxlat->xlat.size; ++i) {
+	for (size_t i = 0; i < dyxlat->xlat.size; ++i) {
 		free((void *) dyxlat->data[i].str);
 		dyxlat->data[i].str = NULL;
 	}
@@ -51,9 +49,7 @@ void
 dyxlat_add_pair(struct dyxlat *const dyxlat, const uint64_t val,
 		const char *const str, const size_t len)
 {
-	size_t i;
-
-	for (i = 0; i < dyxlat->xlat.size; ++i) {
+	for (size_t i = 0; i < dyxlat->xlat.size; ++i) {
 		if (dyxlat->data[i].val == val) {
 			if (strncmp(dyxlat->data[i].str, str, len) == 0
 			    && dyxlat->data[i].str[len] == '\0')

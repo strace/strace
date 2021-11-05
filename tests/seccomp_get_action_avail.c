@@ -34,7 +34,6 @@ main(void)
 	kernel_ulong_t op = (kernel_ulong_t) 0xfacefeed00000000ULL
 				| SECCOMP_GET_ACTION_AVAIL;
 	kernel_ulong_t flags = (kernel_ulong_t) 0xdeadbeef00000000ULL;
-	unsigned int i;
 
 	struct {
 		uint32_t val;
@@ -51,7 +50,7 @@ main(void)
 		{ 0xffffffff, "0xffffffff /* SECCOMP_RET_??? */" }
 	};
 
-	for (i = 0; i < ARRAY_SIZE(actions); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(actions); ++i) {
 		*act = actions[i].val;
 		k_seccomp(op, flags, (uintptr_t) act);
 		printf("seccomp(SECCOMP_GET_ACTION_AVAIL, 0, [%s]) = %s\n",

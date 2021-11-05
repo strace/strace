@@ -50,10 +50,8 @@ enum {
 static void
 printstr(unsigned char start, unsigned int count)
 {
-	unsigned int i;
-
 	printf("\"");
-	for (i = 0; i < count; i++) {
+	for (unsigned int i = 0; i < count; ++i) {
 		printf("\\%hho", (unsigned char) (start + i));
 	}
 	printf("\"");
@@ -63,10 +61,7 @@ printstr(unsigned char start, unsigned int count)
 static void
 dumpstr(unsigned char start, unsigned int count)
 {
-	unsigned int i;
-	unsigned int j;
-
-	for (i = 0; i < count; i++) {
+	for (unsigned int i = 0; i < count; ++i) {
 		if (i < count) {
 			if (!(i % 16))
 				printf(" | %05x ", i);
@@ -83,9 +78,9 @@ dumpstr(unsigned char start, unsigned int count)
 
 			printf(" ");
 
-			for (j = 0; j <= (i % 16); j++)
+			for (unsigned int j = 0; j <= (i % 16); ++j)
 				printf(".");
-			for (j = i % 16; j < 15; j++)
+			for (unsigned int j = i % 16; j < 15; ++j)
 				printf(" ");
 
 			printf(" |\n");

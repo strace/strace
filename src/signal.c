@@ -154,7 +154,6 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 	const uint32_t *mask;
 	uint32_t inverted_mask[NSIG_BYTES / 4];
 	unsigned int size;
-	int i;
 	char sep;
 
 	s = stpcpy(outstr, prefix);
@@ -166,15 +165,14 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 	/* check whether 2/3 or more bits are set */
 	if (popcount32(mask, size) >= size * (4 * 8) * 2 / 3) {
 		/* show those signals that are NOT in the mask */
-		unsigned int j;
-		for (j = 0; j < size; ++j)
+		for (unsigned int j = 0; j < size; ++j)
 			inverted_mask[j] = ~mask[j];
 		mask = inverted_mask;
 		*s++ = '~';
 	}
 
 	sep = '[';
-	for (i = 0; (i = next_set_bit(mask, i, size * (4 * 8))) >= 0; ) {
+	for (int i = 0; (i = next_set_bit(mask, i, size * (4 * 8))) >= 0; ) {
 		++i;
 		*s++ = sep;
 		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)

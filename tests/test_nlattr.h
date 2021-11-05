@@ -208,8 +208,8 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_) - 1,				\
 			&(obj_), sizeof(obj_) - 1,			\
 			printf("[");					\
-			size_t i;					\
-			for (i = 0; i < ARRAY_SIZE(obj_) - 1; ++i) {	\
+			for (size_t i = 0;				\
+			    i < ARRAY_SIZE(obj_) - 1; ++i) {		\
 				if (i) printf(", ");			\
 				(print_elem_)(&(obj_)[i], i);		\
 			}						\
@@ -221,8 +221,8 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_) - 1,			\
 			printf("[");					\
-			size_t i;					\
-			for (i = 0; i < ARRAY_SIZE(obj_) - 1; ++i) {	\
+			for (size_t i = 0;				\
+			     i < ARRAY_SIZE(obj_) - 1; ++i) {		\
 				if (i) printf(", ");			\
 				(print_elem_)(&(obj_)[i], i);		\
 			}						\
@@ -236,8 +236,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_),				\
 			printf("[");					\
-			size_t i;					\
-			for (i = 0; i < ARRAY_SIZE(obj_); ++i) {	\
+			for (size_t i = 0; i < ARRAY_SIZE(obj_); ++i) {	\
 				if (i) printf(", ");			\
 				(print_elem_)(&(obj_)[i], i);		\
 			}						\
@@ -269,8 +268,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 				(nla_type_), (nla_type_str_),		\
 				plen, (pattern_), plen,			\
 				(fallback_func)((pattern_), plen);	\
-				size_t i;				\
-				for (i = 0; i < depth_; ++i)		\
+				for (size_t i = 0; i < depth_; ++i)	\
 					printf("]"));			\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
@@ -280,8 +278,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_),					\
 			(pattern_), sizeof(obj_) - 1,			\
 			printf("%p", RTA_DATA(TEST_NLATTR_nla));	\
-			size_t i;					\
-			for (i = 0; i < depth_; ++i)			\
+			for (size_t i = 0; i < depth_; ++i)		\
 				printf("]"));				\
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
@@ -291,8 +288,7 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_),				\
 			__VA_ARGS__;					\
-			size_t i;					\
-			for (i = 0; i < depth_; ++i)			\
+			for (size_t i = 0; i < depth_; ++i)		\
 				printf("]"));				\
 	} while (0)
 
@@ -342,13 +338,13 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_) - 1,				\
 			&(obj_), sizeof(obj_) - 1,			\
 			printf("[");					\
-			size_t i;					\
-			for (i = 0; i < ARRAY_SIZE(obj_) - 1; ++i) {	\
+			for (size_t i = 0;				\
+			     i < ARRAY_SIZE(obj_) - 1; ++i) {		\
 				if (i) printf(", ");			\
 				(print_elem_)(&(obj_)[i], i);		\
 			}						\
 			printf("]");					\
-			for (i = 0; i < depth_; ++i)			\
+			for (size_t i = 0; i < depth_; ++i)		\
 				printf("]"));				\
 		/* short read of sizeof(obj_) */			\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
@@ -358,15 +354,15 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_) - 1,			\
 			printf("[");					\
-			size_t i;					\
-			for (i = 0; i < ARRAY_SIZE(obj_) - 1; ++i) {	\
+			for (size_t i = 0;				\
+			     i < ARRAY_SIZE(obj_) - 1; ++i) {		\
 				if (i) printf(", ");			\
 				(print_elem_)(&(obj_)[i], i);		\
 			}						\
 			printf(", ... /* %p */]",			\
 			       RTA_DATA(TEST_NLATTR_nla)		\
 			        + sizeof(obj_) - sizeof((obj_)[0]));	\
-			for (i = 0; i < depth_; ++i)			\
+			for (size_t i = 0; i < depth_; ++i)		\
 				printf("]"));				\
 		/* sizeof(obj_) */					\
 		TEST_NLATTR_((fd_), (nlh0_) - NLA_HDRLEN * depth_,	\
@@ -376,13 +372,12 @@ print_sockfd(int sockfd, const char *pfx, const char *sfx)
 			sizeof(obj_),					\
 			&(obj_), sizeof(obj_),				\
 			printf("[");					\
-			size_t i;					\
-			for (i = 0; i < ARRAY_SIZE(obj_); ++i) {	\
+			for (size_t i = 0; i < ARRAY_SIZE(obj_); ++i) {	\
 				if (i) printf(", ");			\
 				(print_elem_)(&(obj_)[i], i);		\
 			}						\
 			printf("]");					\
-			for (i = 0; i < depth_; ++i)			\
+			for (size_t i = 0; i < depth_; ++i)		\
 				printf("]"));				\
 	} while (0)
 

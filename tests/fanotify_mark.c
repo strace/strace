@@ -193,23 +193,20 @@ main(void)
 		{ (kernel_ulong_t) (uintptr_t) bogus_path2, "\"" STR64 "\"" },
 	};
 
-	unsigned int i;
-	unsigned int j;
-	unsigned int k;
-	unsigned int l;
-	unsigned int m;
-	int rc;
-
-
 	snprintf(bogus_path1_addr, sizeof(bogus_path1_addr), "%p", bogus_path1);
 	snprintf(bogus_path1_after_addr, sizeof(bogus_path1_after_addr), "%p",
 		bogus_path1 + PATH1_SIZE);
 
-	for (i = 0; i < ARRAY_SIZE(fds); i++) {
-		for (j = 0; j < ARRAY_SIZE(flags); j++) {
-			for (k = 0; k < ARRAY_SIZE(masks); k++) {
-				for (l = 0; l < ARRAY_SIZE(dirfds); l++) {
-					for (m = 0; m < ARRAY_SIZE(paths); m++)
+	for (unsigned int i = 0;
+	     i < ARRAY_SIZE(fds); ++i) {
+		for (unsigned int j = 0;
+		     j < ARRAY_SIZE(flags); ++j) {
+			for (unsigned int k = 0;
+			     k < ARRAY_SIZE(masks); ++k) {
+				for (unsigned int l = 0;
+				     l < ARRAY_SIZE(dirfds); ++l) {
+					for (unsigned int m = 0;
+					     m < ARRAY_SIZE(paths); ++m)
 						do_call(fds[i],
 							flags[j].val,
 							flags[j].str,
@@ -223,8 +220,6 @@ main(void)
 			}
 		}
 	}
-# else /* TEST_SECONTEXT */
-	int rc;
 # endif
 	/*
 	 * Test with AT_FDCWD.
@@ -234,7 +229,7 @@ main(void)
 	char path[] = ".";
 	char *path_secontext = SECONTEXT_FILE(path);
 
-	rc = fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY | FAN_ONDIR,
+	int rc = fanotify_mark(-1, FAN_MARK_ADD, FAN_MODIFY | FAN_ONDIR,
 			   -100, path);
 	printf("%s%s(-1, %s, %s, %s, \"%s\"%s) = %s\n",
 	       my_secontext, "fanotify_mark",

@@ -51,12 +51,11 @@ int
 main(void)
 {
 	pthread_t t[N];
-	unsigned int i;
 
 	if (write(1, "", 0) != 0)
 		perror_msg_and_fail("write");
 
-	for (i = 0; i < N; ++i) {
+	for (unsigned int i = 0; i < N; ++i) {
 		if (pipe(pipes[i]))
 			perror_msg_and_fail("pipe");
 
@@ -69,15 +68,16 @@ main(void)
 		perror_msg_and_fail("write");
 
 	/* wait for the peer to write to stdout */
-	struct stat st;
 	for (;;) {
+		struct stat st;
+
 		if (fstat(1, &st))
 			perror_msg_and_fail("fstat");
 		if (st.st_size >= 103)
 			break;
 	}
 
-	for (i = 0; i < N; ++i) {
+	for (unsigned int i = 0; i < N; ++i) {
 		/* sleep a bit to let the tracer catch up */
 		sleep(1);
 		if (write(pipes[i][1], &i, sizeof(i)) != (int) sizeof(i))

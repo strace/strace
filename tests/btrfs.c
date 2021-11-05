@@ -154,11 +154,10 @@ print_uint64(const char *prefix, uint64_t val)
 static uint64_t
 max_flags_plus_one(int bit)
 {
-	int i;
 	uint64_t val = 0;
 	if (bit == -1)
 		return 1;
-	for (i = 0; i <= bit + 1 && i < 64; i++)
+	for (int i = 0; i <= bit + 1 && i < 64; ++i)
 		val |= (1ULL << i);
 	return val;
 }
@@ -228,9 +227,8 @@ btrfs_print_qgroup_inherit(struct btrfs_qgroup_inherit *inherit)
 	       inherit->lim.max_rfer, inherit->lim.max_excl,
 	       inherit->lim.rsv_rfer, inherit->lim.rsv_excl);
 	if (verbose) {
-		unsigned int i;
 		printf("qgroups=[");
-		for (i = 0; i < inherit->num_qgroups; i++) {
+		for (unsigned int i = 0; i < inherit->num_qgroups; ++i) {
 			if (i > 0)
 				printf(", ");
 			printf("%" PRI__u64, inherit->qgroups[i]);
@@ -370,7 +368,6 @@ btrfs_test_subvol_ioctls(void)
 	printf(") = -1 EBADF (%m)\n");
 
 	const unsigned int n_qgroups = 8;
-	unsigned int i;
 	struct btrfs_qgroup_inherit *inherit;
 	vol_args_v2.size =
 		sizeof(*inherit) + n_qgroups * sizeof(inherit->qgroups[0]);
@@ -380,7 +377,7 @@ btrfs_test_subvol_ioctls(void)
 	inherit->num_ref_copies = 0;
 	inherit->num_excl_copies = 0;
 	inherit->num_qgroups = n_qgroups;
-	for (i = 0; i < n_qgroups; i++)
+	for (unsigned int i = 0; i < n_qgroups; ++i)
 		inherit->qgroups[i] = 1ULL << i;
 	inherit->lim.flags = 0x7f;
 	inherit->lim.max_rfer = u64val;
@@ -844,10 +841,9 @@ btrfs_print_tree_search_buf(struct btrfs_ioctl_search_key *key,
 			    void *buf, uint64_t buf_size)
 {
 	if (verbose) {
-		uint64_t i;
 		uint64_t off = 0;
 		printf("buf=[");
-		for (i = 0; i < key->nr_items; i++) {
+		for (uint64_t i = 0; i < key->nr_items; ++i) {
 			struct btrfs_ioctl_search_header *sh;
 			sh = (typeof(sh))(buf + off);
 			if (i)
@@ -1100,9 +1096,8 @@ btrfs_test_space_info_ioctl(void)
 		printf(" => {total_spaces=%" PRI__u64 ", ",
 			argsp->total_spaces);
 		if (verbose) {
-			unsigned int i;
 			printf("spaces=[");
-			for (i = 0; i < argsp->total_spaces; i++) {
+			for (unsigned int i = 0; i < argsp->total_spaces; ++i) {
 				struct btrfs_ioctl_space_info *info;
 				info = &argsp->spaces[i];
 				if (i)
@@ -1330,8 +1325,8 @@ btrfs_test_ino_path_ioctls(void)
 			fiemap->fm_mapped_extents);
 		if (verbose) {
 			printf("fm_extents=[");
-			unsigned int i;
-			for (i = 0; i < fiemap->fm_mapped_extents; i++) {
+			for (unsigned int i = 0;
+			     i < fiemap->fm_mapped_extents; ++i) {
 				struct fiemap_extent *fe;
 				fe = &fiemap->fm_extents[i];
 				if (i)
@@ -1628,7 +1623,6 @@ btrfs_test_get_dev_stats_ioctl(void)
 	printf("}) = -1 EBADF (%m)\n");
 
 	if (write_ok) {
-		unsigned int i;
 		args.flags = BTRFS_DEV_STATS_RESET;
 		printf("ioctl(%d, %s, {devid=%s"
 			", nr_items=%" PRI__u64 ", flags=",
@@ -1642,7 +1636,7 @@ btrfs_test_get_dev_stats_ioctl(void)
 		prfl_btrfs(btrfs_dev_stats_flags, args.flags,
 			   "BTRFS_DEV_STATS_???");
 		printf(", [");
-		for (i = 0; i < args.nr_items; i++) {
+		for (unsigned int i = 0; i < args.nr_items; ++i) {
 			const char *name = xlookup(btrfs_dev_stats_values, i);
 			if (i)
 				printf(", ");
@@ -1955,8 +1949,7 @@ btrfs_test_read_ioctls(void)
 		XLAT(BTRFS_IOC_SUBVOL_GETFLAGS),
 	};
 
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(btrfs_read_cmd); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(btrfs_read_cmd); ++i) {
 		ioctl(-1, (unsigned long) btrfs_read_cmd[i].val, 0);
 		printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
 		       sprint_xlat_(btrfs_read_cmd[i].val,

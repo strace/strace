@@ -176,7 +176,6 @@ main(void)
 
 	long rc;
 	const char *errstr;
-	unsigned int i;
 
 
 	/* Incorrect operation */
@@ -280,7 +279,7 @@ main(void)
 	/* DM_REMOVE_ALL */
 	/* DM_LIST_DEVICES */
 	/* DM_LIST_VERSIONS */
-	for (i = 0; i < ARRAY_SIZE(dummy_check_cmds_nodev); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(dummy_check_cmds_nodev); ++i) {
 		init_s(dm_arg, min_sizeof_dm_ioctl, 0);
 		ioctl(-1, dummy_check_cmds_nodev[i].arg, dm_arg);
 		printf("ioctl(-1, %s, {version=[4, 1, 2], data_size=%zu%s, "
@@ -299,7 +298,7 @@ main(void)
 	/* DM_TABLE_CLEAR */
 	/* DM_TABLE_DEPS */
 	/* DM_TABLE_STATUS */
-	for (i = 0; i < ARRAY_SIZE(dummy_check_cmds); i++) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(dummy_check_cmds); ++i) {
 		init_s(dm_arg, min_sizeof_dm_ioctl, 0);
 		ioctl(-1, dummy_check_cmds[i].arg, dm_arg);
 		printf("ioctl(-1, %s, {version=[4, 1, 2], data_size=%zu%s, "

@@ -154,8 +154,7 @@ main(void)
 	       buts->start_lba, buts->end_lba, buts->pid,
 	       pidns_pid2str(PT_TGID));
 
-	unsigned int i;
-	for (i = 0; i < ARRAY_SIZE(block_argless); ++i) {
+	for (unsigned int i = 0; i < ARRAY_SIZE(block_argless); ++i) {
 		ioctl(-1, (unsigned long) block_argless[i].val, lmagic);
 		pidns_print_leader();
 		printf("ioctl(-1, %s) = -1 EBADF (%m)\n", block_argless[i].str);

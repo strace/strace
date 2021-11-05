@@ -14,13 +14,11 @@ static void
 print_mincore(const unsigned int pages, void *const addr,
 	      const size_t size, unsigned char *const vec)
 {
-	unsigned int i;
-
 	if (mincore(addr, size, vec))
 		perror_msg_and_skip("mincore");
 
 	printf("mincore(%p, %zu, [", addr, size);
-	for (i = 0; i < pages; ++i) {
+	for (unsigned int i = 0; i < pages; ++i) {
 		if (i)
 			printf(", ");
 		if (i >= DEFAULT_STRLEN) {
