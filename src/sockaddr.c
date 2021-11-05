@@ -40,6 +40,10 @@
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
 
+#include "xlat/ieee802154_addr_types.h"
+#include "xlat/ieee802154_addrs.h"
+#include "xlat/ieee802154_pan_ids.h"
+
 #include "xlat/alg_sockaddr_flags.h"
 
 #include "xlat/nfc_saps.h"
@@ -58,6 +62,22 @@
 #include "xlat/mctp_nets.h"
 
 #define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
+
+#define IEEE802154_ADDR_LEN	8
+struct ieee802154_addr_sa {
+	int addr_type;
+	uint16_t pan_id;
+	union {
+		uint8_t hwaddr[IEEE802154_ADDR_LEN];
+		uint16_t short_addr;
+	};
+};
+
+
+struct sockaddr_ieee802154 {
+	uint16_t family;
+	struct ieee802154_addr_sa addr;
+};
 
 #define IPX_NODE_LEN	6
 struct sockaddr_ipx {
@@ -724,6 +744,35 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_ieee802154(struct tcb *tcp, const void *const buf,
+			       const int len)
+{
+	const struct sockaddr_ieee802154 *const sa = buf;
+
+	tprints_field_name("addr");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL_VERBOSE(sa->addr, addr_type, ieee802154_addr_types,
+				 "IEEE802154_ADDR_???");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL_VERBOSE(sa->addr, pan_id, ieee802154_pan_ids, NULL);
+	switch (sa->addr.addr_type) {
+	case IEEE802154_ADDR_NONE:
+		break;
+	case IEEE802154_ADDR_SHORT:
+		tprint_struct_next();
+		PRINT_FIELD_XVAL_VERBOSE(sa->addr, short_addr, ieee802154_addrs,
+					 NULL);
+		break;
+	case IEEE802154_ADDR_LONG:
+	default:
+		tprint_struct_next();
+		PRINT_FIELD_HWADDR_SZ(sa->addr, hwaddr, sizeof(sa->addr.hwaddr),
+				      ARPHRD_IEEE802154);
+	}
+	tprint_struct_end();
+}
+
+static void
 print_sockaddr_data_alg(struct tcb *tcp, const void *const buf,
 			const int len)
 {
@@ -899,6 +948,7 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_IEEE802154] = { print_sockaddr_data_ieee802154, sizeof(struct sockaddr_ieee802154) },
 	[AF_ALG] = { print_sockaddr_data_alg, sizeof(struct sockaddr_alg_new) + 1 },
 	[AF_NFC] = { print_sockaddr_data_nfc, sizeof(struct sockaddr_nfc) },
 	[AF_VSOCK] = { print_sockaddr_data_vsock, sizeof(struct sockaddr_vm) },

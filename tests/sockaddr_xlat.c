@@ -25,6 +25,36 @@
 # include <bluetooth/sco.h>
 #endif
 
+/* From include/net/af_ieee802154.h */
+enum {
+	IEEE802154_ADDR_NONE = 0x0,
+	/* RESERVED = 0x01, */
+	IEEE802154_ADDR_SHORT = 0x2, /* 16-bit address + PANid */
+	IEEE802154_ADDR_LONG = 0x3, /* 64-bit address + PANid */
+};
+
+/* address length, octets */
+#define IEEE802154_ADDR_LEN	8
+
+struct ieee802154_addr_sa {
+	int addr_type;
+	uint16_t pan_id;
+	union {
+		uint8_t hwaddr[IEEE802154_ADDR_LEN];
+		uint16_t short_addr;
+	};
+};
+
+#define IEEE802154_PANID_BROADCAST	0xffff
+#define IEEE802154_ADDR_BROADCAST	0xffff
+#define IEEE802154_ADDR_UNDEF		0xfffe
+
+struct sockaddr_ieee802154 {
+	__kernel_sa_family_t family; /* AF_IEEE802154 */
+	struct ieee802154_addr_sa addr;
+};
+/* End of include/net/af_ieee802154.h copy-paste */
+
 #ifdef HAVE_LINUX_IF_ALG_H
 # include <linux/if_alg.h>
 #else
@@ -374,6 +404,125 @@ check_rc(void)
 # endif
 }
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
+
+static void
+check_ieee802154(void)
+{
+	static const struct {
+		struct sockaddr_ieee802154 sa;
+		const char *str;
+	} ieee802154_vecs[] = {
+		{ { AF_IEEE802154 },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0" NRAW(" /* IEEE802154_ADDR_NONE */")
+		  ", pan_id=0}}" },
+		{ { AF_IEEE802154, { .addr_type = 1, .pan_id = 1 } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x1" NRAW(" /* IEEE802154_ADDR_??? */")
+		  ", pan_id=0x1, hwaddr="
+		  XLAT_KNOWN_FMT("\"\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\"",
+				 "00:00:00:00:00:00:00:00") "}}" },
+		{ { AF_IEEE802154, { .addr_type = 4, .pan_id = 0xcafe,
+		    .short_addr = 0xfeed } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x4" NRAW(" /* IEEE802154_ADDR_??? */")
+		  ", pan_id=0xcafe, hwaddr="
+		  XLAT_KNOWN_FMT("\"" BE_LE("\\xfe\\xed", "\\xed\\xfe")
+				 "\\x00\\x00\\x00\\x00\\x00\\x00\"",
+				 BE_LE("fe:ed", "ed:fe") ":00:00:00:00:00:00")
+		  "}}" },
+		{ { AF_IEEE802154, { .addr_type = 2, .pan_id = 0xfffe } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
+		  ", pan_id=0xfffe, short_addr=0}}" },
+		{ { AF_IEEE802154, { .addr_type = 2, .pan_id = 0xffff,
+		    .hwaddr = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff" } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
+		  ", pan_id=0xffff" NRAW(" /* IEEE802154_PANID_BROADCAST */")
+		  ", short_addr=" BE_LE("0xf8f9", "0xf9f8") "}}" },
+		{ { AF_IEEE802154, { .addr_type = 2, .short_addr = 0xfffd } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
+		  ", pan_id=0, short_addr=0xfffd}}" },
+		{ { AF_IEEE802154, { .addr_type = 2, .short_addr = 0xfffe } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
+		  ", pan_id=0, short_addr=0xfffe"
+		  NRAW(" /* IEEE802154_ADDR_UNDEF */") "}}" },
+		{ { AF_IEEE802154, { .addr_type = 2, .short_addr = 0xffff } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
+		  ", pan_id=0, short_addr=0xffff"
+		  NRAW(" /* IEEE802154_ADDR_BROADCAST */") "}}" },
+		{ { AF_IEEE802154, { .addr_type = 3, .pan_id = 0xface,
+		    .short_addr = 0xdead } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x3" NRAW(" /* IEEE802154_ADDR_LONG */")
+		  ", pan_id=0xface, hwaddr="
+		  XLAT_KNOWN_FMT("\"" BE_LE("\\xde\\xad", "\\xad\\xde")
+				 "\\x00\\x00\\x00\\x00\\x00\\x00\"",
+				 BE_LE("de:ad", "ad:de") ":00:00:00:00:00:00")
+		  "}}" },
+		{ { AF_IEEE802154, { .addr_type = 3, .hwaddr = "Oh Hai!" } },
+		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+		  ", addr={addr_type=0x3" NRAW(" /* IEEE802154_ADDR_LONG */")
+		  ", pan_id=0, hwaddr="
+		  XLAT_KNOWN_FMT("\"\\x4f\\x68\\x20\\x48\\x61\\x69\\x21\\x00\"",
+				 "4f:68:20:48:61:69:21:00") "}}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_ieee802154, sa_ieee802154);
+	int rc;
+
+	fill_memory(sa_ieee802154, sizeof(*sa_ieee802154));
+	sa_ieee802154->family = AF_IEEE802154;
+
+	rc = connect(-1, (void *) sa_ieee802154, sizeof(*sa_ieee802154) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_ieee802154, sizeof(*sa_ieee802154) + 1,
+	       sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_ieee802154, sizeof(*sa_ieee802154) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_ieee802154
+			    + sizeof(sa_ieee802154->family),
+			    sizeof(*sa_ieee802154)
+			    - sizeof(sa_ieee802154->family) - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_ieee802154) - 1, errstr);
+
+	rc = connect(-1, (void *) sa_ieee802154, sizeof(*sa_ieee802154));
+	errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
+	       ", addr={addr_type=%#x" NRAW(" /* IEEE802154_ADDR_??? */")
+	       ", pan_id=%#hx, hwaddr=",
+	       sa_ieee802154->addr.addr_type, sa_ieee802154->addr.pan_id);
+#if XLAT_RAW || XLAT_VERBOSE
+	print_quoted_hex(sa_ieee802154->addr.hwaddr,
+			 sizeof(sa_ieee802154->addr.hwaddr));
+#endif
+#if !XLAT_RAW
+	printf(VERB(" /* ") "%02hhx:%02hhx:%02hhx:%02hhx"
+	       ":%02hhx:%02hhx:%02hhx:%02hhx" VERB(" */"),
+	       sa_ieee802154->addr.hwaddr[0], sa_ieee802154->addr.hwaddr[1],
+	       sa_ieee802154->addr.hwaddr[2], sa_ieee802154->addr.hwaddr[3],
+	       sa_ieee802154->addr.hwaddr[4], sa_ieee802154->addr.hwaddr[5],
+	       sa_ieee802154->addr.hwaddr[6], sa_ieee802154->addr.hwaddr[7]);
+#endif
+	printf("}}, %zu) = %s\n",  sizeof(*sa_ieee802154), errstr);
+
+	for (size_t i = 0; i < ARRAY_SIZE(ieee802154_vecs); i++) {
+		*sa_ieee802154 = ieee802154_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_ieee802154,
+			     sizeof(*sa_ieee802154));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       ieee802154_vecs[i].str, sizeof(*sa_ieee802154),
+		       sprintrc(rc));
+	}
+}
 
 static void
 check_alg(void)
@@ -921,6 +1070,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_ieee802154();
 	check_alg();
 	check_nfc();
 	check_vsock();
