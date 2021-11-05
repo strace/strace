@@ -1029,6 +1029,11 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	rc = string_quote(str, outstr, size, style, escape_chars);
 	tprints(outstr);
 
+	if (((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
+	     == (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0)) && rc) {
+		tprint_more_data_follows();
+	}
+
 	free(buf);
 	return rc;
 }
