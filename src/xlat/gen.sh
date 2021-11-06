@@ -56,22 +56,28 @@ cond_def()
 	fi
 
 	if [ -n "$def" ]; then
-		printf "%s\n" \
-			"#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)" \
+		[ -n "$unconditional" ] ||
+			printf '%s\n' \
+				"#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)"
+		printf '%s\n' \
 			"DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE" \
 			"static_assert(($val) == ($def), \"$val != $def\");" \
-			"DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE" \
-			"#else" \
-			"# define $val $def" \
-			"#endif"
-
+			"DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE"
+		[ -n "$unconditional" ] ||
+			printf '%s\n' \
+				"#else" \
+				"# define $val $def" \
+				"#endif"
 	fi
 
-	[ XT_SORTED != "$xlat_type" ] || {
-		printf "%s\n" "#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)"
+	if [ XT_SORTED = "$xlat_type" ]; then
+		[ -n "$unconditional" ] ||
+			printf '%s\n' \
+				"#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)"
 		check_sort_order "$val"
-		printf "%s\n" "#endif"
-	}
+		[ -n "$unconditional" ] ||
+			printf '%s\n' "#endif"
+	fi
 
 }
 
@@ -148,13 +154,13 @@ cond_xlat()
 			xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}" "$m")"
 		fi
 
-		if [ -z "${def}" ]; then
-			printf "%s\n" \
+		if [ -z "${def}${unconditional}" ]; then
+			printf '%s\n' \
 				"#if defined(${m}) || (defined(HAVE_DECL_${m}) && HAVE_DECL_${m})" \
 				" ${xlat}" \
 				"#endif"
 		else
-			echo "$xlat"
+			printf '%s\n' "$xlat"
 		fi
 	}
 
@@ -234,12 +240,7 @@ gen_header()
 			echo "${line}"
 			;;
 		[A-Z_]*)
-			if [ -n "$unconditional" ]; then
-				[ XT_SORTED != "$xlat_type" ] ||
-					check_sort_order "${line}"
-			else
-				cond_def "$line" "$xlat_type"
-			fi
+			cond_def "$line" "$xlat_type"
 			;;
 		'1<<'[A-Z_]*)	# symbolic constants with shift
 			[ XT_SORTED != "$xlat_type" ] ||
@@ -329,18 +330,10 @@ gen_header()
 			val_type="${line#\#val_type }"
 			;;
 		[A-Z_!]*)	# symbolic constants
-			if [ -n "${unconditional}" ]; then
-				print_xlat "${line}"
-			else
-				cond_xlat "${line}"
-			fi
+			cond_xlat "${line}"
 			;;
 		'1<<'[A-Z_]*)	# symbolic constants with shift
-			if [ -n "${unconditional}" ]; then
-				print_xlat_pair "1ULL<<${line#1<<}" "${line}" "${line#1<<}"
-			else
-				cond_xlat "${line}"
-			fi
+			cond_xlat "${line}"
 			;;
 		[0-9]*)	# numeric constants
 			print_xlat "${line}"
