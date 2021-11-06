@@ -429,6 +429,7 @@ AC_CHECK_HEADERS(m4_normalize([
 	linux/ipx.h
 	linux/nfc.h
 	linux/qrtr.h
+	linux/rxrpc.h
 	mqueue.h
 	netinet/sctp.h
 	netipx/ipx.h

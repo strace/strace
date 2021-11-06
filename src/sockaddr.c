@@ -40,6 +40,8 @@
 #include "xlat/bluetooth_l2_psm.h"
 #include "xlat/hci_channels.h"
 
+#include "xlat/rxrpc_services.h"
+
 #include "xlat/ieee802154_addr_types.h"
 #include "xlat/ieee802154_addrs.h"
 #include "xlat/ieee802154_pan_ids.h"
@@ -62,6 +64,18 @@
 #include "xlat/mctp_nets.h"
 
 #define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
+
+struct sockaddr_rxrpc {
+	uint16_t srx_family;
+	uint16_t srx_service;
+	uint16_t transport_type;
+	uint16_t transport_len;
+	union {
+		uint16_t family;
+		struct sockaddr_in sin;
+		struct sockaddr_in6 sin6;
+	} transport;
+};
 
 #define IEEE802154_ADDR_LEN	8
 struct ieee802154_addr_sa {
@@ -744,6 +758,75 @@ print_sockaddr_data_bt(struct tcb *tcp, const void *const buf,
 }
 
 static void
+print_sockaddr_data_rxrpc(struct tcb *tcp, const void *const buf,
+			  const int len)
+{
+	const struct sockaddr_rxrpc *const sa = buf;
+
+	PRINT_FIELD_XVAL_VERBOSE(*sa, srx_service, rxrpc_services,
+				 "???_SERVICE");
+	tprint_struct_next();
+	PRINT_FIELD_XVAL(*sa, transport_type, socktypes, "SOCK_???");
+	tprint_struct_next();
+	PRINT_FIELD_U(*sa, transport_len);
+	tprint_struct_next();
+	tprints_field_name("transport");
+	tprint_struct_begin();
+
+	const void *const transport_buf = (void *) &sa->transport
+					  + sizeof(sa->transport.family);
+	const int transport_len = MIN(sa->transport_len,
+				      len - offsetof(struct sockaddr_rxrpc,
+						     transport.family));
+	const int transport_rest = MAX(0, transport_len
+					  - (int) sizeof(sa->transport.family));
+
+	/* Only AF_INET and AF_INET6 are supported as RxRPC transports */
+	switch (sa->transport.family) {
+	case AF_INET:
+		tprints_field_name("sin");
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(sa->transport.sin, sin_family, addrfams,
+				 "AF_???");
+		if (sa->transport_len >= sizeof(struct sockaddr_in)) {
+			tprint_struct_next();
+			print_sockaddr_data_in(tcp, &sa->transport,
+					       transport_len);
+		} else if (transport_rest > 0) {
+			tprint_struct_next();
+			print_quoted_string(transport_buf, transport_rest, 0);
+		}
+		tprint_struct_end();
+		break;
+
+	case AF_INET6:
+		tprints_field_name("sin6");
+		tprint_struct_begin();
+		PRINT_FIELD_XVAL(sa->transport.sin6, sin6_family, addrfams,
+				 "AF_???");
+		if (sa->transport_len >= SIN6_MIN_LEN) {
+			tprint_struct_next();
+			print_sockaddr_data_in6(tcp, &sa->transport,
+						transport_len);
+		} else if (transport_rest > 0) {
+			tprint_struct_next();
+			print_quoted_string(transport_buf, transport_rest, 0);
+		}
+		tprint_struct_end();
+		break;
+
+	default:
+		PRINT_FIELD_XVAL(sa->transport, family, addrfams, "AF_???");
+		if (transport_rest > 0) {
+			tprint_struct_next();
+			print_quoted_string(transport_buf, transport_rest, 0);
+		}
+	}
+
+	tprint_struct_end();
+}
+
+static void
 print_sockaddr_data_ieee802154(struct tcb *tcp, const void *const buf,
 			       const int len)
 {
@@ -948,6 +1031,7 @@ static const struct {
 	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
+	[AF_RXRPC] = { print_sockaddr_data_rxrpc, sizeof(struct sockaddr_rxrpc) },
 	[AF_IEEE802154] = { print_sockaddr_data_ieee802154, sizeof(struct sockaddr_ieee802154) },
 	[AF_ALG] = { print_sockaddr_data_alg, sizeof(struct sockaddr_alg_new) + 1 },
 	[AF_NFC] = { print_sockaddr_data_nfc, sizeof(struct sockaddr_nfc) },

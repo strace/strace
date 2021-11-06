@@ -25,6 +25,22 @@
 # include <bluetooth/sco.h>
 #endif
 
+#ifdef HAVE_LINUX_RXRPC_H
+# include <linux/rxrpc.h>
+#else
+struct sockaddr_rxrpc {
+	uint16_t srx_family;
+	uint16_t srx_service;
+	uint16_t transport_type;
+	uint16_t transport_len;
+	union {
+		uint16_t family;
+		struct sockaddr_in sin;
+		struct sockaddr_in6 sin6;
+	} transport;
+};
+#endif
+
 /* From include/net/af_ieee802154.h */
 enum {
 	IEEE802154_ADDR_NONE = 0x0,
@@ -157,10 +173,8 @@ struct sockaddr_xdp {
 #endif
 
 #include "xlat.h"
+#include "xlat/addrfams.h"
 #include "xlat/xdp_sockaddr_flags.h"
-#define XLAT_MACROS_ONLY
-# include "xlat/addrfams.h"
-#undef XLAT_MACROS_ONLY
 
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
 # define SKIP_IF_PROC_IS_UNAVAILABLE
@@ -404,6 +418,179 @@ check_rc(void)
 # endif
 }
 #endif /* HAVE_BLUETOOTH_BLUETOOTH_H */
+
+static void
+check_rxrpc(void)
+{
+	static const struct {
+		struct sockaddr_rxrpc sa;
+		const char *str;
+	} rxrpc_vecs[] = {
+		{ { AF_RXRPC },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0" NRAW(" /* ???_SERVICE */")
+		  ", transport_type=0" NRAW(" /* SOCK_??? */")
+		  ", transport_len=0, transport="
+		  "{family=" XLAT_KNOWN(AF_UNSPEC, "AF_UNSPEC") "}}" },
+		{ { AF_RXRPC, .srx_service = 1, .transport_type = 1,
+		    .transport_len = 42, .transport = { .family = 1 } },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x1" NRAW(" /* CM_SERVICE */")
+		  ", transport_type="
+#ifdef __mips__
+		  XLAT_KNOWN(0x1, "SOCK_DGRAM")
+#else
+		  XLAT_KNOWN(0x1, "SOCK_STREAM")
+#endif
+		  ", transport_len=42, transport={family="
+		  XLAT_KNOWN(0x1, "AF_UNIX") ", \"\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		  "\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\"}}" },
+		{ { AF_RXRPC, .srx_service = 2, .transport_type = 2,
+		    .transport_len = 5,
+		    .transport = { .sin = { 1, 0xdead, { 0xfacefeed } } } },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x2" NRAW(" /* ???_SERVICE */")
+		  ", transport_type="
+#ifdef __mips__
+		  XLAT_KNOWN(0x2, "SOCK_STREAM")
+#else
+		  XLAT_KNOWN(0x2, "SOCK_DGRAM")
+#endif
+		  ", transport_len=5, transport="
+		  "{family=" XLAT_KNOWN(0x1, "AF_UNIX") ", \""
+		  BE_LE("\\336\\255", "\\255\\336") BE_LE("\\372", "\\355")
+		  "\"}}" },
+		{ { AF_RXRPC, .srx_service = 2500, .transport_type = 3,
+		    .transport_len = 7,
+		    .transport = { .sin = { 2, 0xdead, { 0xfacefeed } } } },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x9c4" NRAW(" /* YFS_FS_SERVICE */")
+		  ", transport_type=" XLAT_KNOWN(0x3, "SOCK_RAW")
+		  ", transport_len=7, transport="
+		  "{sin={sin_family=" XLAT_KNOWN(0x2, "AF_INET") ", \""
+		  BE_LE("\\336\\255", "\\255\\336")
+		  BE_LE("\\372\\316\\376", "\\355\\376\\316") "\"}}}" },
+		{ { AF_RXRPC, .srx_service = 2501, .transport_type = 4,
+		    .transport_len = 16,
+		    .transport = { .sin = { 2, 0xdead, { 0xfacefeed } } } },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x9c5" NRAW(" /* YFS_CM_SERVICE */")
+		  ", transport_type=" XLAT_KNOWN(0x4, "SOCK_RDM")
+		  ", transport_len=16, transport="
+		  "{sin={sin_family=" XLAT_KNOWN(0x2, "AF_INET") ", sin_port="
+		  XLAT_KNOWN_FMT("\"" BE_LE("\\xde\\xad", "\\xad\\xde") "\"",
+				 "htons(" BE_LE("57005", "44510") ")")
+		  ", sin_addr="
+		  XLAT_KNOWN_FMT("\"" BE_LE("\\xfa\\xce\\xfe\\xed",
+					    "\\xed\\xfe\\xce\\xfa") "\"",
+				 "inet_addr(\"" BE_LE("250.206.254.237",
+						      "237.254.206.250") "\")")
+		  "}}}" },
+		{ { AF_RXRPC, .srx_service = 2502, .transport_type = 5,
+		    .transport_len = 20,
+		    .transport = { .sin = { 2, BE16(0xdead),
+					    { BE32(0xfacefeed) }, "OH HAI" } }
+		  },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x9c6" NRAW(" /* ???_SERVICE */")
+		  ", transport_type=" XLAT_KNOWN(0x5, "SOCK_SEQPACKET")
+		  ", transport_len=20, transport="
+		  "{sin={sin_family=" XLAT_KNOWN(0x2, "AF_INET")
+		  ", sin_port=" XLAT_KNOWN_FMT("\"\\xde\\xad\"", "htons(57005)")
+		  ", sin_addr="
+		  XLAT_KNOWN_FMT("\"\\xfa\\xce\\xfe\\xed\"",
+				 "inet_addr(\"250.206.254.237\")")
+		  "}}}" },
+		{ { AF_RXRPC, .srx_service = 2503, .transport_type = 6,
+		    .transport_len = 23,
+		    .transport = { .sin6 = { 10, 0xdead, 0xcafeface,
+				   { .s6_addr = "OH HAI THAR!\0\0\0\xf" } } } },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x9c7" NRAW(" /* YFS_VL_SERVICE */")
+		  ", transport_type=" XLAT_KNOWN(0x6, "SOCK_DCCP")
+		  ", transport_len=23, transport="
+		  "{sin6={sin6_family=" XLAT_KNOWN(0xa, "AF_INET6") ", \""
+		  BE_LE("\\336\\255", "\\255\\336")
+		  BE_LE("\\312\\376\\372\\316", "\\316\\372\\376\\312")
+		  "OH HAI THAR!\\0\\0\\0\"}}}" },
+		{ { AF_RXRPC, .srx_service = 2504, .transport_type = 7,
+		    .transport_len = 24,
+		    .transport = { .sin6 = { 10, 0xdead, 0xcafeface,
+				   { .s6_addr = "OH HAI THAR!\0\0\0\xf" } } } },
+		  "{sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		  ", srx_service=0x9c8" NRAW(" /* ???_SERVICE */")
+		  ", transport_type=0x7" NRAW(" /* SOCK_??? */")
+		  ", transport_len=24, transport="
+		  "{sin6={sin6_family=" XLAT_KNOWN(0xa, "AF_INET6")
+		  ", sin6_port="
+		  XLAT_KNOWN_FMT("\"" BE_LE("\\xde\\xad", "\\xad\\xde") "\"",
+				 "htons(" BE_LE("57005", "44510") ")")
+		  ", sin6_flowinfo="
+		  XLAT_KNOWN_FMT("\"" BE_LE("\\xca\\xfe\\xfa\\xce",
+					    "\\xce\\xfa\\xfe\\xca") "\"",
+				 "htonl(" BE_LE("3405707982", "3472555722") ")")
+		  ", " XLAT_KNOWN_FMT("sin6_addr="
+				   "\"\\x4f\\x48\\x20\\x48\\x41\\x49\\x20\\x54"
+				   "\\x48\\x41\\x52\\x21\\x00\\x00\\x00\\x0f\"",
+				   "inet_pton(AF_INET6, \"4f48:2048:4149:2054"
+				   ":4841:5221:0:f\"" NVERB(", &sin6_addr") ")")
+		  "}}}" },
+	};
+
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct sockaddr_rxrpc, sa_rxrpc);
+	int rc;
+
+	fill_memory(sa_rxrpc, sizeof(*sa_rxrpc));
+	sa_rxrpc->srx_family = AF_RXRPC;
+
+	rc = connect(-1, (void *) sa_rxrpc, sizeof(*sa_rxrpc) + 1);
+	printf("connect(-1, %p, %zu) = %s\n",
+	       (void *) sa_rxrpc, sizeof(*sa_rxrpc) + 1, sprintrc(rc));
+
+	rc = connect(-1, (void *) sa_rxrpc, sizeof(*sa_rxrpc) - 1);
+	const char *errstr = sprintrc(rc);
+	printf("connect(-1, {sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+	       ", sa_data=");
+	print_quoted_memory((void *) sa_rxrpc + sizeof(sa_rxrpc->srx_family),
+			    sizeof(*sa_rxrpc) - sizeof(sa_rxrpc->srx_family)
+					     - 1);
+	printf("}, %zu) = %s\n", sizeof(*sa_rxrpc) - 1, errstr);
+
+	static const uint8_t skip_af[] = { AF_INET, AF_INET6 };
+	size_t skip_pos = 0;
+	for (size_t i = 0; i < 512; i++) {
+		if (skip_pos < ARRAY_SIZE(skip_af) && skip_af[skip_pos] == i) {
+			++skip_pos;
+			continue;
+		}
+
+		sa_rxrpc->transport.family = i;
+		rc = connect(-1, (void *) sa_rxrpc, sizeof(*sa_rxrpc));
+		errstr = sprintrc(rc);
+		printf("connect(-1, {sa_family=" XLAT_KNOWN(0x21, "AF_RXRPC")
+		       ", srx_service=%#x" NRAW(" /* ???_SERVICE */")
+		       ", transport_type=%#x" NRAW(" /* SOCK_??? */")
+		       ", transport_len=%u"
+		       ", transport={family=%s, ",
+		       sa_rxrpc->srx_service, sa_rxrpc->transport_type,
+		       sa_rxrpc->transport_len,
+		       sprintxval(addrfams, sa_rxrpc->transport.family,
+				  "AF_???"));
+		const size_t offs = offsetofend(struct sockaddr_rxrpc,
+						transport.family);
+		print_quoted_memory((char *) sa_rxrpc + offs,
+				    sizeof(*sa_rxrpc) - offs);
+		printf("}}, %zu) = %s\n",  sizeof(*sa_rxrpc), errstr);
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(rxrpc_vecs); i++) {
+		*sa_rxrpc = rxrpc_vecs[i].sa;
+
+		rc = connect(-1, (void *) sa_rxrpc, sizeof(*sa_rxrpc));
+		printf("connect(-1, %s, %zu) = %s\n",
+		       rxrpc_vecs[i].str, sizeof(*sa_rxrpc), sprintrc(rc));
+	}
+}
 
 static void
 check_ieee802154(void)
@@ -1070,6 +1257,7 @@ main(void)
 	check_sco();
 	check_rc();
 #endif
+	check_rxrpc();
 	check_ieee802154();
 	check_alg();
 	check_nfc();

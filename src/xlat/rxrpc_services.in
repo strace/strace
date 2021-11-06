@@ -1,0 +1,5 @@
+#sorted
+CM_SERVICE	1	/* fs/afs/afs_cm.h */
+YFS_FS_SERVICE	2500	/* fs/afs/protocol_yfs.h */
+YFS_CM_SERVICE	2501	/* fs/afs/protocol_yfs.h */
+YFS_VL_SERVICE	2503	/* fs/afs/afs_vl.h */
