@@ -11,31 +11,13 @@
 #include <inttypes.h>
 #include <linux/ip.h>
 #include <linux/rtnetlink.h>
+#include <linux/nexthop.h>
 #include <netinet/in.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include "test_nlattr.h"
-
-#ifdef HAVE_LINUX_NEXTHOP_H
-# include <linux/nexthop.h>
-#else
-struct nhmsg {
-	uint8_t  nh_family;
-	uint8_t  nh_scope;
-	uint8_t  nh_protocol;
-	uint8_t  resvd;
-	uint32_t nh_flags;
-};
-
-struct nexthop_grp {
-	uint32_t id;
-	uint8_t  weight;
-	uint8_t  resvd1;
-	uint16_t resvd2;
-};
-#endif /* HAVE_LINUX_NEXTHOP_H */
 
 #include "xlat.h"
 #define XLAT_MACROS_ONLY

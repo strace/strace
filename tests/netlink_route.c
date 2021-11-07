@@ -23,19 +23,7 @@
 #include <linux/neighbour.h>
 #include <linux/netconf.h>
 #include <linux/rtnetlink.h>
-
-#ifdef HAVE_LINUX_NEXTHOP_H
-# include <linux/nexthop.h>
-# define struct_nhmsg struct nhmsg
-#else
-typedef struct {
-	uint8_t  nh_family;
-	uint8_t  nh_scope;
-	uint8_t  nh_protocol;
-	uint8_t  resvd;
-	uint32_t nh_flags;
-} struct_nhmsg;
-#endif
+#include <linux/nexthop.h>
 
 #define TEST_NL_ROUTE_(fd_, nlh0_, type_, type_str_, obj_, print_family_, ...) \
 	do {								\
@@ -618,7 +606,7 @@ test_rtnl_nexthop(const int fd)
 		{ ARG_STR(RTM_GETNEXTHOP) },
 	};
 	static const struct {
-		struct_nhmsg msg;
+		struct nhmsg msg;
 		const char *af_str;
 		const char *rest_str;
 	} msgs[] = {

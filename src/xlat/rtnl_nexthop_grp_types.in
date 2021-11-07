@@ -1,5 +1,4 @@
+#unconditional
 #value_indexed
-#enum
-#include <linux/nexthop.h>
 NEXTHOP_GRP_TYPE_MPATH	0
 NEXTHOP_GRP_TYPE_RES	1

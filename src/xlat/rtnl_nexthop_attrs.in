@@ -1,6 +1,5 @@
+#unconditional
 #value_indexed
-#enum
-#include <linux/nexthop.h>
 NHA_UNSPEC	0
 NHA_ID		1
 NHA_GROUP	2

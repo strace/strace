@@ -1,6 +1,5 @@
+#unconditional
 #value_indexed
-#enum
-#include <linux/nexthop.h>
 NHA_RES_BUCKET_PAD		0
 NHA_RES_BUCKET_INDEX		1
 NHA_RES_BUCKET_IDLE_TIME	2
