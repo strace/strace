@@ -787,12 +787,7 @@ decode_ifla_inet6_cacheinfo(struct tcb *const tcp,
 			    const unsigned int len,
 			    const void *const opaque_data)
 {
-	struct {
-		uint32_t max_reasm_len;
-		uint32_t tstamp;
-		uint32_t reachable_time;
-		uint32_t retrans_time;
-	} ci;
+	struct ifla_cacheinfo ci;
 
 	if (len < sizeof(ci))
 		return false;
