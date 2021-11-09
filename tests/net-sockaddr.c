@@ -500,7 +500,23 @@ check_nl(void)
 	nl->nl_pid = 1234567890;
 	nl->nl_groups = 0xfacefeed;
 	unsigned int len = sizeof(*nl);
-	int ret = connect(-1, (void *) nl, len);
+
+	int ret = connect(-1, (void *) nl, len - 1);
+	pidns_print_leader();
+	printf("connect(-1, {sa_family=AF_NETLINK, sa_data=\"\\377\\377"
+	       BE_LE("I\\226\\2\\322", "\\322\\2\\226I")
+	       BE_LE("\\372\\316\\376", "\\355\\376\\316")
+	       "\"}, %u) = %d EBADF (%m)\n",
+	       len - 1, ret);
+
+	ret = connect(-1, (void *) nl, len);
+	pidns_print_leader();
+	printf("connect(-1, {sa_family=AF_NETLINK, nl_pad=%#x, nl_pid=%d"
+	       ", nl_groups=%#08x}, %u) = %d EBADF (%m)\n",
+	       nl->nl_pad, nl->nl_pid, nl->nl_groups, len, ret);
+
+	nl->nl_pad = 0;
+	ret = connect(-1, (void *) nl, len);
 	pidns_print_leader();
 	printf("connect(-1, {sa_family=AF_NETLINK, nl_pid=%d"
 	       ", nl_groups=%#08x}, %u) = %d EBADF (%m)\n",
@@ -508,6 +524,7 @@ check_nl(void)
 
 	nl = ((void *) nl) - 4;
 	nl->nl_family = AF_NETLINK;
+	nl->nl_pad = 0;
 	nl->nl_pid = getpid();
 	nl->nl_groups = 0xfacefeed;
 	len = sizeof(*nl) + 4;

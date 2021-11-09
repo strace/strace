@@ -507,6 +507,10 @@ print_sockaddr_data_nl(struct tcb *tcp, const void *const buf, const int addrlen
 {
 	const struct sockaddr_nl *const sa_nl = buf;
 
+	if (sa_nl->nl_pad) {
+		PRINT_FIELD_X(*sa_nl, nl_pad);
+		tprint_struct_next();
+	}
 	PRINT_FIELD_TGID(*sa_nl, nl_pid, tcp);
 	tprint_struct_next();
 	PRINT_FIELD_0X(*sa_nl, nl_groups);
@@ -1028,7 +1032,7 @@ static const struct {
 	[AF_IPX] = { print_sockaddr_data_ipx, sizeof(struct sockaddr_ipx) },
 	[AF_X25] = { print_sockaddr_data_x25, sizeof(struct sockaddr_x25) },
 	[AF_INET6] = { print_sockaddr_data_in6, SIN6_MIN_LEN },
-	[AF_NETLINK] = { print_sockaddr_data_nl, SIZEOF_SA_FAMILY + 1 },
+	[AF_NETLINK] = { print_sockaddr_data_nl, sizeof(struct sockaddr_nl) },
 	[AF_PACKET] = { print_sockaddr_data_ll, sizeof(struct sockaddr_ll) },
 	[AF_BLUETOOTH] = { print_sockaddr_data_bt, SIZEOF_SA_FAMILY + 1 },
 	[AF_RXRPC] = { print_sockaddr_data_rxrpc, sizeof(struct sockaddr_rxrpc) },

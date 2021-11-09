@@ -22,7 +22,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of io_uring_register and times syscalls.
   * Enhanced IFLA_BR_FORWARD_DELAY, IFLA_BR_MAX_AGE, IFLA_EXT_MASK,
     IFLA_PROTINFO, *_INTVL, and *_TIMER netlink attribute decoding.
-  * Enhanced AF_IPX socket address decoding.
+  * Enhanced decoding of AF_IPX and AF_NETLINK socket addresses.
   * Updated lists o AF_*, ARPHRD_*, BTRFS_*, DEVCONF_*, DM_*, ETH_P_*,
     FAN_REPORT_*, IORING_*, MOVE_MOUNT_*, MPOL_*, PACKET_*, RTM_*, SO_*,
     and XFRM_MSG_* constants.
