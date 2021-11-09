@@ -17,9 +17,7 @@ static void
 print_landlock_ruleset_attr(struct tcb *tcp, const kernel_ulong_t addr,
 			    const kernel_ulong_t size)
 {
-	struct {
-		uint64_t handled_access_fs;
-	} attr;
+	struct landlock_ruleset_attr attr;
 
 	if (size < offsetofend(typeof(attr), handled_access_fs)) {
 		printaddr(addr);
@@ -66,10 +64,7 @@ SYS_FUNC(landlock_create_ruleset)
 static void
 print_landlock_path_beneath_attr(struct tcb *tcp, const kernel_ulong_t addr)
 {
-	struct {
-		uint64_t allowed_access;
-		int32_t parent_fd;
-	} ATTRIBUTE_PACKED attr;
+	struct landlock_path_beneath_attr attr;
 
 	if (umove_or_printaddr(tcp, addr, &attr))
 		return;
