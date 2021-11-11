@@ -78,7 +78,7 @@
 #   else
 #    define CUR_AUDIT_ARCH AUDIT_ARCH_MIPSEL64
 #   endif
-#  elif _MIPS_SIM == _MIPS_SIM_ABIN32
+#  elif _MIPS_SIM == _MIPS_SIM_NABI32
 #   ifdef WORDS_BIGENDIAN
 #    define CUR_AUDIT_ARCH AUDIT_ARCH_MIPS64N32
 #   else
