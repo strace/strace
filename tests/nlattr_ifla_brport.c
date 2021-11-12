@@ -21,8 +21,6 @@
 #define IFLA_AF_STR "AF_BRIDGE"
 #include "nlattr_ifla.h"
 
-#define ENUM_KNOWN(val_, enum_) enum_, XLAT_KNOWN(val_, #enum_)
-
 int
 main(void)
 {

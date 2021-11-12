@@ -115,6 +115,8 @@
 # define ARG_XLAT_KNOWN(val_, str_) val_, XLAT_KNOWN(val_, str_)
 # define ARG_XLAT_UNKNOWN(val_, str_) val_, XLAT_UNKNOWN(val_, str_)
 
+# define ENUM_KNOWN(val_, enum_) enum_, XLAT_KNOWN(val_, #enum_)
+
 # ifndef DEFAULT_STRLEN
 /* Default maximum # of bytes printed in printstr et al. */
 #  define DEFAULT_STRLEN 32

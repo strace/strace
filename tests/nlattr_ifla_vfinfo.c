@@ -27,8 +27,6 @@
 #define IFLA_ATTR IFLA_VFINFO_LIST
 #include "nlattr_ifla.h"
 
-#define ENUM_KNOWN(val_, enum_) enum_, XLAT_KNOWN(val_, #enum_)
-
 static void
 init_vf_info_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 {

@@ -24,8 +24,6 @@
 #include "xlat.h"
 #include "xlat/addrfams.h"
 
-#define ENUM_KNOWN(val_, enum_) enum_, XLAT_KNOWN(val_, #enum_)
-
 static uint8_t af;
 static char af_str[256];
 
