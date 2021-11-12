@@ -235,6 +235,11 @@ tracee_addr_is_invalid(kernel_ulong_t addr)
 #endif
 }
 
+typedef union {
+	long val;
+	char data[sizeof(long)];
+} dissected_long_t;
+
 /* legacy method of copying from tracee */
 static int
 umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
@@ -247,10 +252,9 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		addr &= -sizeof(long);		/* aligned address */
 
 		errno = 0;
-		union {
-			long val;
-			char x[sizeof(long)];
-		} u = { .val = ptrace(PTRACE_PEEKDATA, pid, addr, 0) };
+		dissected_long_t u = {
+			.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0)
+		};
 
 		switch (errno) {
 			case 0:
@@ -275,7 +279,7 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		}
 
 		unsigned int m = MIN(sizeof(long) - residue, len);
-		memcpy(laddr, &u.x[residue], m);
+		memcpy(laddr, &u.data[residue], m);
 		residue = 0;
 		addr += sizeof(long);
 		laddr += m;
@@ -344,10 +348,9 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		addr &= -sizeof(long);		/* aligned address */
 
 		errno = 0;
-		union {
-			unsigned long val;
-			char x[sizeof(long)];
-		} u = { .val = ptrace(PTRACE_PEEKDATA, pid, addr, 0) };
+		dissected_long_t u = {
+			.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0)
+		};
 
 		switch (errno) {
 			case 0:
@@ -372,9 +375,9 @@ umovestr_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
 		}
 
 		unsigned int m = MIN(sizeof(long) - residue, len);
-		memcpy(laddr, &u.x[residue], m);
+		memcpy(laddr, &u.data[residue], m);
 		while (residue < sizeof(long))
-			if (u.x[residue++] == '\0')
+			if (u.data[residue++] == '\0')
 				return (laddr - orig_addr) + residue;
 		residue = 0;
 		addr += sizeof(long);
