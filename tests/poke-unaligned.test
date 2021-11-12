@@ -16,5 +16,5 @@ fault_args='-qq -esignal=none -etrace=process_vm_writev -efault=process_vm_write
 
 $STRACE -o /dev/null $fault_args \
 	$STRACE -o /dev/null $args >/dev/null 2>"$LOG" ||
-	dump_log_and_fail_with "$STRACE $unaligned_args failed with code $?"
+	dump_log_and_fail_with "$STRACE $args failed with code $?"
 match_grep

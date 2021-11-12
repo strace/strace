@@ -12,7 +12,7 @@
 run_prog ../poke "$EXP.err" > /dev/null
 
 args="-a10 -e trace=chdir,getcwd \
-      -einject=chdir:poke_enter=@arg1=3f5354524143453f7374726163653f00 \
+      -einject=chdir:poke_enter=@arg1=3f5354524143457374726163653f00 \
       -einject=getcwd:poke_exit=@arg1=5374726163652100 \
       $args"
 
@@ -23,5 +23,4 @@ $STRACE -o /dev/null $fault_args \
 	dump_log_and_fail_with "$STRACE $args failed with code $?"
 match_diff "$LOG" "$EXP"
 
-echo '.*: cannot poke at unaligned address 0x[[:xdigit:]]+' >> "$EXP.err"
 match_grep "$LOG.err" "$EXP.err"

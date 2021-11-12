@@ -29,20 +29,33 @@ main(int argc, char *argv[])
 
 	pid_t pid = getpid();
 	char *const chdir_buf = tail_alloc(PATH_MAX);
-	memset(chdir_buf, '/', PATH_MAX);
 	char *const getcwd_buf = tail_alloc(PATH_MAX);
+	char *p;
 
 	/*
-	 * regular poke on entering syscall
+	 * regular poke at a properly aligned address on entering syscall
 	 */
-	char *p = chdir_buf;
+	memset(chdir_buf, '/', PATH_MAX);
+	p = chdir_buf;
 	printf("chdir(\"%.*s\") = %s (INJECTED: args)\n",
 	       PATH_MAX - 1, p, sprintrc(chdir(p)));
 
 	/*
-	 * poke at inaccessible address
+	 * regular poke at an unaligned address on entering syscall
 	 */
-	p += PATH_MAX;
+	memset(chdir_buf, '/', PATH_MAX);
+	chdir_buf[PATH_MAX - 1] = '\0';
+	p = chdir_buf + 1;
+	printf("chdir(\"%.*s\") = %s (INJECTED: args)\n",
+	       PATH_MAX - 2, p, sprintrc(chdir(p)));
+	if (chdir_buf[0] != '/')
+		error_msg_and_fail("failed to poke at unaligned address"
+				   " %p properly", p);
+
+	/*
+	 * poke at an inaccessible but properly aligned address
+	 */
+	p = chdir_buf + PATH_MAX;
 	printf("chdir(%p) = %s\n", p, sprintrc(chdir(p)));
 	if (exp_err) {
 		fprintf(exp_err,
@@ -51,46 +64,44 @@ main(int argc, char *argv[])
 	}
 
 	/*
-	 * poke at unaligned address,
-	 * short read,
-	 * if process_vm_writev is used: short write.
+	 * poke at an inaccessible unaligned address
 	 */
-	--p;
-	printf("chdir(%p) = %s", p, sprintrc(chdir(p)));
-	if (*p != '/')
-		printf(" (INJECTED: args)");
-	printf("\n");
+	++p;
+	printf("chdir(%p) = %s\n", p, sprintrc(chdir(p)));
 	if (exp_err) {
 		fprintf(exp_err,
-			".*: short read \\(1 < [[:digit:]]+\\) @%p: .*\n", p);
-		if (*p != '/') {
-			fprintf(exp_err,
-				".*: pid:%d short write"
-				" \\(1 < [[:digit:]]+\\) @%p\n",
-				pid, p);
-		}
+			".*: Failed to tamper with process %d: couldn't poke\n",
+			pid);
 	}
 
 	/*
-	 * poke at a properly aligned address,
-	 * short read,
-	 * if process_vm_writev is not used: short write,
-	 * if process_vm_writev is used: short write is likely.
+	 * poke at a partially accessible unaligned address
 	 */
-	p -= 7;
-	printf("chdir(%p) = %s", p, sprintrc(chdir(p)));
-	if (*p != '/')
-		printf(" (INJECTED: args)");
-	printf("\n");
+	memset(chdir_buf, '/', PATH_MAX);
+	p = chdir_buf + PATH_MAX - 1;
+	printf("chdir(%p) = %s (INJECTED: args)\n", p, sprintrc(chdir(p)));
 	if (exp_err) {
 		fprintf(exp_err,
+			".*: pid:%d short write"
+			" \\(1 < [[:digit:]]+\\) @%p(: .*)?\n",
+			pid, p);
+		fprintf(exp_err,
+			".*: short read \\(1 < [[:digit:]]+\\) @%p: .*\n", p);
+	}
+
+	/*
+	 * poke at a partially accessible properly aligned address
+	 */
+	memset(chdir_buf, '/', PATH_MAX);
+	p -= 7;
+	printf("chdir(%p) = %s (INJECTED: args)\n", p, sprintrc(chdir(p)));
+	if (exp_err) {
+		fprintf(exp_err,
+			".*: pid:%d short write"
+			" \\(8 < [[:digit:]]+\\) @%p(: .*)?\n",
+			pid, p);
+		fprintf(exp_err,
 			".*: short read \\(8 < [[:digit:]]+\\) @%p: .*\n", p);
-		if (*p != '/') {
-			fprintf(exp_err,
-				".*: pid:%d short write"
-				" \\(8 < [[:digit:]]+\\) @%p(: .*)?\n",
-				pid, p);
-		}
 	}
 
 	/*

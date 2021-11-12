@@ -468,52 +468,83 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 	return 0;
 }
 
+static bool
+upoken_peekpoke(const int pid, const kernel_ulong_t addr,
+		const unsigned int len, void *const our_addr,
+		const unsigned int offset)
+{
+	errno = 0;
+	dissected_long_t u = {
+		.val = ptrace(PTRACE_PEEKDATA, pid, addr, 0)
+	};
+	if (errno)
+		return false;
+
+	memcpy(u.data + offset, our_addr, len);
+
+	/* write it back */
+	return ptrace(PTRACE_POKEDATA, pid, addr, u.val) == 0;
+}
+
 static unsigned int
 upoken_pokedata(const int pid, kernel_ulong_t addr, unsigned int len,
 		void *our_addr)
 {
 	unsigned int nwritten = 0;
 
-	if (len & (sizeof(long) - 1)) {
-		error_func_msg("cannot poke unaligned data len %u", len);
-		return nwritten;
-	}
-	if (addr & (sizeof(long) - 1)) {
-		error_func_msg("cannot poke at unaligned address 0x%" PRI_klx,
-			       addr);
-		return nwritten;
+	if (len && (addr & (sizeof(long) - 1))) {
+		/* addr is not a multiple of sizeof(long) */
+		unsigned int residue = addr & (sizeof(long) - 1);
+		unsigned int npoke = MIN(sizeof(long) - residue, len);
+		addr &= -sizeof(long);		/* aligned address */
+		if (!upoken_peekpoke(pid, addr, npoke, our_addr, residue))
+			goto poke_error;
+
+		addr += sizeof(long);
+		nwritten += npoke;
+		our_addr += npoke;
+		len -= npoke;
 	}
 
-	while (len) {
-		errno = 0;
-		ptrace(PTRACE_POKEDATA, pid, addr, * (long *) our_addr);
-
-		switch (errno) {
-			case 0:
-				break;
-			case ESRCH: case EINVAL:
-				/* these could be seen if the process is gone */
-				return nwritten;
-			case EFAULT: case EIO: case EPERM:
-				/* address space is inaccessible */
-				if (nwritten) {
-					perror_func_msg("pid:%d short write (%u < %u)"
-							" @0x%" PRI_klx,
-							pid, nwritten, nwritten + len,
-							addr - nwritten);
-				}
-				return nwritten;
-			default:
-				/* all the rest is strange and should be reported */
-				perror_func_msg("pid:%d @0x%" PRI_klx,
-						pid, addr);
-				return nwritten;
-		}
+	while (len >= sizeof(long)) {
+		/* our_addr may be unaligned */
+		long word;
+		memcpy(&word, our_addr, sizeof(word));
+		if (ptrace(PTRACE_POKEDATA, pid, addr, word) < 0)
+			goto poke_error;
 
 		addr += sizeof(long);
 		nwritten += sizeof(long);
 		our_addr += sizeof(long);
 		len -= sizeof(long);
+	}
+
+	if (len) {
+		if (!upoken_peekpoke(pid, addr, len, our_addr, 0))
+			goto poke_error;
+		nwritten += len;
+	}
+
+	return nwritten;
+
+poke_error:
+	switch (errno) {
+		case ESRCH: case EINVAL:
+			/* these could be seen if the process is gone */
+			break;
+		case EFAULT: case EIO: case EPERM:
+			/* address space is inaccessible */
+			if (nwritten) {
+				perror_func_msg("pid:%d short write (%u < %u)"
+						" @0x%" PRI_klx,
+						pid, nwritten, nwritten + len,
+						addr - nwritten);
+			}
+			break;
+		default:
+			/* all the rest is strange and should be reported */
+			perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
+			break;
 	}
 
 	return nwritten;
