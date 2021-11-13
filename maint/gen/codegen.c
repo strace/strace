@@ -572,11 +572,11 @@ generate_printer(FILE *out, struct syscall *syscall,
 		generate_printer_ptr(out, syscall, argname, arg, entering, type,
 				     indent_level);
 	} else if (type->type == TYPE_ORFLAGS) {
-		OUTFI("printflags(%s, %s, \"%s\");\n",
+		OUTFI("printflags64(%s, zero_extend_signed_to_ull(%s), \"%s\");\n",
 		      type->orflags.flag_type->type->name, arg,
 		      type->orflags.dflt);
 	} else if (type->type == TYPE_XORFLAGS) {
-		OUTFI("printxval(%s, %s, \"%s\");\n",
+		OUTFI("printxval64(%s, zero_extend_signed_to_ull(%s), \"%s\");\n",
 		      type->xorflags.flag_type->type->name, arg,
 		      type->xorflags.dflt);
 	} else if (strcmp(type->name, "stringnoz") == 0 ||
