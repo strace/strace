@@ -1,16 +1,34 @@
-CFLAGS += -ggdb -std=gnu99 -Wall -Wextra
+# Copyright (c) 2021 Dmitry V. Levin <ldv@strace.io>
+# Copyright (c) 2021 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-or-later
 
-all: gen
+CPPFLAGS = -std=gnu99 -O2 -D_GNU_SOURCE=1 -Wall -Wextra
+TARGET = gen
+OBJ = parse.tab.o lex.yy.o ast.o codegen.o symbols.o preprocess.o xmalloc.o
+DEPS = $(OBJ:.o=.d)
 
-gen: parse.tab.o lex.yy.o ast.o codegen.o symbols.o parse.tab.h lex.yy.c preprocess.o
-	$(CC) $(CFLAGS) parse.tab.o lex.yy.o ast.o codegen.o symbols.o preprocess.o -o ./gen
+all: $(TARGET)
+
+gen: $(OBJ)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 lex.yy.c: lex.l parse.tab.h
-	flex lex.l
+	flex $<
 
 parse.tab.c parse.tab.h: parse.y
-	bison -d parse.y
+	bison -d $<
 
 clean:
-	rm -f lex.yy.o ast.o parse.tab.o codegen.o preprocess.o symbols.o
-	rm -f gen parse.tab.c parse.tab.h lex.yy.c lex.yy.h
+	$(RM) $(TARGET) $(OBJ) $(DEPS) \
+		parse.tab.c parse.tab.h lex.yy.c
+
+%.d: %.c
+	$(CC) -MM $(CPPFLAGS) $< -o $@
+
+$(DEPS): parse.tab.h
+
+ifneq ($(MAKECMDGOALS),clean)
+-include $(DEPS)
+endif

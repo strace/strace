@@ -1,8 +1,16 @@
-#ifndef AST_H
-#define AST_H
+/*
+ * Copyright (c) 2021 Srikavin Ramkumar <srikavinramkumar@gmail.com>
+ * Copyright (c) 2021 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
 
-#include <stdbool.h>
-#include <stdint.h>
+#ifndef AST_H
+# define AST_H
+
+# include <stdbool.h>
+# include <stdint.h>
 
 struct ast_number {
 	char *raw;
@@ -44,27 +52,27 @@ struct ast_syscall_arg {
 };
 
 enum standard_types {
-	// non-special type
+	/* non-special type */
 	TYPE_BASIC,
-	// const[typ, val]
+	/* const[typ, val] */
 	TYPE_CONST,
-	// ptr[dir, typ]
+	/* ptr[dir, typ] */
 	TYPE_PTR,
-	// ref[argname]
+	/* ref[argname] */
 	TYPE_REF,
-	// xorflags[flag_typ]
+	/* xorflags[flag_typ] */
 	TYPE_XORFLAGS,
-	// orflags[flag_typ]
+	/* orflags[flag_typ] */
 	TYPE_ORFLAGS
 };
 
-#define IS_IN_PTR(x) ((x)->type == TYPE_PTR && \
+# define IS_IN_PTR(x) ((x)->type == TYPE_PTR && \
 ((x)->ptr.dir == PTR_DIR_INOUT || (x)->ptr.dir == PTR_DIR_IN))
 
-#define IS_OUT_PTR(x) ((x)->type == TYPE_PTR && \
+# define IS_OUT_PTR(x) ((x)->type == TYPE_PTR && \
 ((x)->ptr.dir == PTR_DIR_INOUT || (x)->ptr.dir == PTR_DIR_OUT))
 
-#define IS_INOUT_PTR(x) ((x)->type == TYPE_PTR && (x)->ptr.dir == PTR_DIR_INOUT)
+# define IS_INOUT_PTR(x) ((x)->type == TYPE_PTR && (x)->ptr.dir == PTR_DIR_INOUT)
 
 enum ptr_dir {
 	PTR_DIR_IN,
@@ -94,7 +102,7 @@ struct ast_type {
 		} array;
 		struct {
 			bool return_value;
-			// only set if return_value is false
+			/* only set if return_value is false */
 			char *argname;
 		} ref;
 		struct {
@@ -152,7 +160,7 @@ struct ast_node {
 	enum ast_node_type type;
 	struct ast_loc loc;
 
-	// used when this node's parent is AST_COMPOUND
+	/* used when this node's parent is AST_COMPOUND */
 	struct ast_node *next;
 
 	union {
@@ -187,26 +195,28 @@ struct ast_node *
 create_ast_node(enum ast_node_type type, void *location);
 
 struct ast_type_option_list *
-create_ast_type_option_list(struct ast_type_option *cur, struct ast_type_option_list *next);
+create_ast_type_option_list(struct ast_type_option *cur,
+			    struct ast_type_option_list *next);
 
 struct ast_struct_element *
-create_ast_struct_element(char *name, struct ast_type *type, struct ast_struct_element *next);
+create_ast_struct_element(char *name, struct ast_type *type,
+			  struct ast_struct_element *next);
 
 struct ast_syscall_arg *
-create_ast_syscall_arg(char *name, struct ast_type *type, struct ast_syscall_arg *next);
+create_ast_syscall_arg(char *name, struct ast_type *type,
+		       struct ast_syscall_arg *next);
 
 struct ast_flag_values *
 create_ast_flag_values(char *name, struct ast_flag_values *next);
 
-// returns true if two types are equal; false otherwise
+/* Returns true if two types are equal; false otherwise.  */
 bool
 ast_type_matching(struct ast_type *a, struct ast_type *b);
 
-/*
- * On error, returns NULL and sets an error string to error.
- */
+/* On error, returns NULL and sets an error string to error.  */
 struct ast_type *
-create_or_get_type(char **error, char *name, struct ast_type_option_list *options);
+create_or_get_type(char **error, char *name,
+		   struct ast_type_option_list *options);
 
 struct ast_type_option *
 create_or_get_type_option_number(struct ast_number number);
@@ -215,7 +225,8 @@ struct ast_type_option *
 create_or_get_type_option_nested(struct ast_type *child);
 
 struct ast_type_option *
-create_type_option_range(struct ast_type_option *min, struct ast_type_option *max);
+create_type_option_range(struct ast_type_option *min,
+			 struct ast_type_option *max);
 
 struct ast_type_option *
 create_type_template_identifier(struct ast_number number);

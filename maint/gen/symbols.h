@@ -7,11 +7,9 @@
  */
 
 #ifndef SYMBOLS_H
-#define SYMBOLS_H
+# define SYMBOLS_H
 
-#include <stdbool.h>
-
-#include "ast.h"
+# include "ast.h"
 
 /*
  * Returns a error string if the given type is
@@ -19,7 +17,8 @@
  * valid.
  */
 char *
-resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *options);
+resolve_type(struct ast_type *out, char *name,
+	     struct ast_type_option_list *options);
 
 /*
  * Returns NULL if successfully added a symbol.

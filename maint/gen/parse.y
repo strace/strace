@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2021 Srikavin Ramkumar <srikavinramkumar@gmail.com>
+ * Copyright (c) 2021 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 %define api.token.prefix {T_}
 %define parse.lac full
 %define parse.error detailed
@@ -20,6 +28,8 @@
 static struct ast_node *root;
 
 static void error_prev_decl(char *identifier, struct ast_node *prev);
+
+int yylex(void);
 %}
 
 %union {
@@ -317,49 +327,53 @@ flag_elements: IDENTIFIER "," flag_elements
 
 static void error_prev_decl(char *identifier, struct ast_node *prev)
 {
-	yyerror("Previous declaration of %s at line %d col %d", identifier,
-			prev->loc.lineno, prev->loc.colno);
+	yyerror("Previous declaration of %s at line %d col %d",
+		identifier, prev->loc.lineno, prev->loc.colno);
 }
 
 void
-yyerror (const char* fmt, ...)
+yyerror(const char* fmt, ...)
 {
-	char buffer[257] = {0};
+	fprintf(stderr, "error %d: %s: line %d column %d\n",
+		yynerrs, cur_filename, yylloc.first_line, yylloc.first_column);
+	if (yyin) {
+		char buffer[257];
+		long int saved = ftell(yyin);
+		if (saved == -1 ||
+		    fseek(yyin, last_line_location, SEEK_SET) != 0 ||
+		    fgets(buffer, sizeof(buffer) - 1, yyin) == NULL) {
+			buffer[0] = '\0';
+		}
+		if (saved != -1) {
+			fseek(yyin, saved, SEEK_SET);
+		}
 
-	if (yyin == NULL) {
-		return;
+		/* add a new line if necessary */
+		size_t len = strlen(buffer);
+		if (len > 0) {
+			if (buffer[len - 1] != '\n') {
+				buffer[len] = '\n';
+				buffer[len + 1] = '\0';
+			}
+			fprintf(stderr, "\t%s", buffer);
+		}
 	}
-
-	long int saved = ftell(yyin);
-	fseek(yyin, last_line_location, SEEK_SET);
-	fgets(buffer, 256, yyin);
-	fseek(yyin, saved, SEEK_SET);
-
-	// add a new line if necessary
-	size_t len = strlen(buffer);
-	if (len > 0 && buffer[len - 1] != '\n') {
-		buffer[len] = '\n';
-		buffer[len + 1] = '\0';
-	}
+	fprintf(stderr, "\t%*s ", yylloc.first_column, "^");
 
 	va_list args;
 	va_start(args, fmt);
-
-	fprintf(stderr, "error %d: %s: line %d column %d\n", yynerrs, cur_filename,
-			yylloc.first_line, yylloc.first_column);
-	fprintf(stderr, "\t%s", buffer);
-	fprintf(stderr, "\t%*s ", yylloc.first_column, "^");
 	vfprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
-
 	va_end(args);
+
+	fprintf(stderr, "\n");
 }
 
 int
 main(int argc, char **argv)
 {
 	if (argc < 3) {
-		fprintf(stderr, "Usage: %s [input file] [output file]\n", argv[0]);
+		fprintf(stderr, "Usage: %s [input file] [output file]\n",
+			argv[0]);
 		return EXIT_FAILURE;
 	}
 

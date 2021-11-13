@@ -1,5 +1,12 @@
-%option noyywrap yylineno nodefault warn
-/* %option debug */
+/*
+ * Copyright (c) 2021 Srikavin Ramkumar <srikavinramkumar@gmail.com>
+ * Copyright (c) 2021 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+%option noyywrap nounput yylineno warn
 
 %{
 #include <stdio.h>
@@ -7,9 +14,6 @@
 #include "deflang.h"
 #include "ast.h"
 #include "parse.tab.h"
-
-YYSTYPE yylval;
-YYLTYPE yylloc;
 
 static void
 update_yylloc();
@@ -25,9 +29,9 @@ struct saved_import_state {
 	int last_line_location;
 };
 
-// a stack to store state before an import
+/* a stack to store state before an import */
 static struct saved_import_state import_states[MAX_IMPORT_LEVEL];
-// the current index into import_states
+/* the current index into import_states */
 static int import_level = 0;
 
 char *cur_filename;
@@ -53,13 +57,13 @@ int last_line_location;
 ":" return T_COLON;
 
 (-)?"0x"[0-9A-Fa-f]+ {
-	yylval.number.raw = strdup(yytext);
+	yylval.number.raw = xstrdup(yytext);
 	yylval.number.val = strtol(yytext, NULL, 16);
 	return T_NUMBER;
 }
 
 (-)?[0-9]+ {
-	yylval.number.raw = strdup(yytext);
+	yylval.number.raw = xstrdup(yytext);
 	yylval.number.val = strtol(yytext, NULL, 10);
 	return T_NUMBER;
 }
@@ -68,14 +72,14 @@ int last_line_location;
 	int sign = (yytext[0] == '-') ? -1 : +1;
 	int offset = ((sign == -1) ? sizeof("-0b") : sizeof("0b")) - 1;
 
-	// binary literals are supported in C by GNU extension
-	yylval.number.raw = strdup(yytext);
+	/* binary literals are supported in C by GNU extension */
+	yylval.number.raw = xstrdup(yytext);
 	yylval.number.val = sign * strtol(yytext + offset, NULL, 2);
 	return T_NUMBER;
 }
 
 \'.\' {
-	yylval.number.raw = strdup(yytext);
+	yylval.number.raw = xstrdup(yytext);
 	yylval.number.val = yytext[1];
 	return T_NUMBER;
 }
@@ -91,31 +95,31 @@ int last_line_location;
 		yyerror("@ can only be used in @ret");
 		yyterminate();
 	}
-	yylval.str = strdup(yytext);
+	yylval.str = xstrdup(yytext);
 	return T_IDENTIFIER;
 }
 
 (?x: "%{" ( [^%] | %+ [^}] )* %* "%}" ) {
-	yylval.str = strdup(yytext + 2);
+	yylval.str = xstrdup(yytext + 2);
 	yylval.str[strlen(yylval.str) - 2] ='\0';
 
 	return T_DECODER_SOURCE;
 }
 
 "define".+ {
-	yylval.str = strdup(yytext);
+	yylval.str = xstrdup(yytext);
 	return T_DEFINE;
 }
 "#ifdef".+ {
-	yylval.str = strdup(yytext);
+	yylval.str = xstrdup(yytext);
 	return T_IFDEF;
 }
 "#ifndef".+ {
-	yylval.str = strdup(yytext);
+	yylval.str = xstrdup(yytext);
 	return T_IFNDEF;
 }
 "include".+ {
-	yylval.str = strdup(yytext);
+	yylval.str = xstrdup(yytext);
 	return T_INCLUDE;
 }
 "#endif".* {
@@ -127,23 +131,24 @@ int last_line_location;
 }
 <IMPORT>[^\n\"]+ {
 	if (import_level >= MAX_IMPORT_LEVEL) {
-		fprintf(stderr, "imports are nested more than %d levels\n", MAX_IMPORT_LEVEL);
+		fprintf(stderr, "imports are nested more than %d levels\n",
+			MAX_IMPORT_LEVEL);
 		yyterminate();
 	}
 
-	// eat characters until newline
+	/* eat characters until newline */
 	int c = input();
 	cur_location++;
 	while(c && c != '\n'){
 		cur_location++;
 		c = input();
 	}
-	// update current location
+	/* update current location */
 	yylloc.last_line++;
 	yylloc.last_column = 1;
 	last_line_location = cur_location;
 
-	// save current state
+	/* save current state */
 	import_states[import_level++] = (struct saved_import_state) {
 		.filename = cur_filename,
 		.location = yylloc,
@@ -151,7 +156,7 @@ int last_line_location;
 		.last_line_location = last_line_location
 	};
 
-	cur_filename = strdup(yytext);
+	cur_filename = xstrdup(yytext);
 
 	yylloc = (struct YYLTYPE) {1, 1, 1, 1};
 	cur_location = 0;
@@ -160,7 +165,8 @@ int last_line_location;
 	yyin = fopen(yytext, "r");
 
 	if (yyin == NULL) {
-		fprintf(stderr, "failed to import file '%s' on line %d\n", yytext, yylineno);
+		fprintf(stderr, "failed to import file '%s' on line %d\n",
+			yytext, yylineno);
 		yyterminate();
 	}
 
@@ -169,8 +175,10 @@ int last_line_location;
 }
 
 <<EOF>> {
-	// emit a newline at the end of a file before EOF
-	// to ensure the last statement in the file is terminated
+	/*
+	 * Emit a newline at the end of a file before EOF
+	 * to ensure the last statement in the file is terminated.
+	 */
 	static int emitted_newline;
 
 	if (!emitted_newline) {
@@ -248,7 +256,7 @@ update_yylloc()
 bool
 lexer_init_newfile(char *filename)
 {
-	// clean up internal state managed by flex
+	/* clean up internal state managed by flex */
 	yylex_destroy();
 
 	yyin = fopen(filename, "r");

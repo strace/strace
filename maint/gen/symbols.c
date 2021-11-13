@@ -24,7 +24,8 @@ struct symbol_entry *symbol_table;
 struct ast_node *
 symbol_get(char *name)
 {
-	for (struct symbol_entry *cur = symbol_table; cur != NULL; cur = cur->next) {
+	for (struct symbol_entry *cur = symbol_table;
+	     cur != NULL; cur = cur->next) {
 		if (strcmp(cur->name, name) == 0) {
 			return cur->source;
 		}
@@ -55,7 +56,8 @@ symbol_add(char *name, struct ast_node *source)
 
 
 char *
-resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *options)
+resolve_type(struct ast_type *out, char *name,
+	     struct ast_type_option_list *options)
 {
 	out->name = name;
 	out->options = options;
@@ -73,7 +75,8 @@ resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *opti
 	};
 
 	size_t options_len = 0;
-	for (struct ast_type_option_list *cur = options; cur != NULL; cur = cur->next) {
+	for (struct ast_type_option_list *cur = options;
+	     cur != NULL; cur = cur->next) {
 		if (cur->option->child_type == AST_TYPE_CHILD_TEMPLATE_ID) {
 			return NULL;
 		}
@@ -84,10 +87,11 @@ resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *opti
 	for (size_t i = 0; i < ARRAY_LEN(expected_options_len); ++i) {
 		if (strcmp(name, expected_options_len[i].name) == 0) {
 			if (options_len != expected_options_len[i].expected_args) {
-				char *error = xmalloc(128);
-				snprintf(error, 128, "type '%s' expects %zu type options; got %zu",
-						 name, expected_options_len[i].expected_args, options_len);
-				return error;
+				return xasprintf("type '%s' expects %zu "
+						 "type options; got %zu",
+						 name,
+						 expected_options_len[i].expected_args,
+						 options_len);
 			}
 		}
 	}
@@ -99,7 +103,8 @@ resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *opti
 	} else if (strcmp(name, "ptr") == 0) {
 		out->type = TYPE_PTR;
 		if (options->option->child_type != AST_TYPE_CHILD_TYPE) {
-			return "first type option for ptr must be 'in', 'out' or 'inout'";
+			return "first type option for ptr must be"
+			       " 'in', 'out' or 'inout'";
 		}
 		if (strcmp(options->option->type->name, "in") == 0) {
 			out->ptr.dir = PTR_DIR_IN;
@@ -108,13 +113,15 @@ resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *opti
 		} else if (strcmp(options->option->type->name, "inout") == 0) {
 			out->ptr.dir = PTR_DIR_INOUT;
 		} else {
-			return "first type option for ptr must be 'in', 'out' or 'inout'";
+			return "first type option for ptr must be"
+			       " 'in', 'out' or 'inout'";
 		}
 		out->ptr.type = options->next->option->type;
 	} else if (strcmp(name, "ref") == 0) {
 		out->type = TYPE_REF;
 		if (options->option->child_type != AST_TYPE_CHILD_TYPE) {
-			return "first type option for len must be the name of another argument or $ret";
+			return "first type option for len must be"
+			       " the name of another argument or $ret";
 		}
 		if (strcmp(options->option->type->name, "@ret") == 0) {
 			out->ref.return_value = true;
@@ -129,8 +136,10 @@ resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *opti
 			return "first type option for ptr must be a string";
 		}
 		out->xorflags.dflt = options->next->option->type->name;
-		if (options->next->next->option->child_type != AST_TYPE_CHILD_TYPE) {
-			return "third type option for xor_flags must be the underlying flag type";
+		if (options->next->next->option->child_type !=
+		    AST_TYPE_CHILD_TYPE) {
+			return "third type option for xor_flags must be"
+			       " the underlying flag type";
 		}
 		out->xorflags.underlying = options->next->next->option->type;
 	} else if (strcmp(name, "or_flags") == 0) {
@@ -140,8 +149,10 @@ resolve_type(struct ast_type *out, char *name, struct ast_type_option_list *opti
 			return "first type option for ptr must be a string";
 		}
 		out->orflags.dflt = options->next->option->type->name;
-		if (options->next->next->option->child_type != AST_TYPE_CHILD_TYPE) {
-			return "third type option for or_flags must be the underlying flag type";
+		if (options->next->next->option->child_type !=
+		    AST_TYPE_CHILD_TYPE) {
+			return "third type option for or_flags must be"
+			       " the underlying flag type";
 		}
 		out->orflags.underlying = options->next->next->option->type;
 	}

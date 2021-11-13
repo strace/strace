@@ -1,3 +1,11 @@
+/*
+ * Copyright (c) 2021 Srikavin Ramkumar <srikavinramkumar@gmail.com>
+ * Copyright (c) 2021 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 :fd %{ printfd(tcp, $$); %}
 :uid %{ printuid($$); %}
 :gid %{ printuid($$); %}
@@ -36,7 +44,8 @@
 :ptr[in, array[uint32_t, $1]] %{
 	{
 		uint32_t int_buffer;
-		print_array(tcp, $$, $1, &int_buffer, sizeof(int_buffer), tfetch_mem, print_uint_array_member, 0);
+		print_array(tcp, $$, $1, &int_buffer, sizeof(int_buffer),
+			    tfetch_mem, print_uint_array_member, 0);
 	}
 %}
 

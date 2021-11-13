@@ -1,14 +1,19 @@
+/*
+ * Copyright (c) 2021 Srikavin Ramkumar <srikavinramkumar@gmail.com>
+ * Copyright (c) 2021 The strace developers.
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include <assert.h>
 #include <ctype.h>
-#include <memory.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "ast.h"
 #include "deflang.h"
 #include "symbols.h"
-#include "printf.h"
 
 #define MAX_PREPROCESSOR_NEST 16
 #define MAX_SYSCALL_COUNT 4096
@@ -31,7 +36,8 @@ create_statement_condition(struct condition_stack *stack)
 	if (stack->idx == 0) {
 		return NULL;
 	}
-	struct statement_condition *ret = xmalloc((sizeof *ret) + stack->idx * (sizeof(char *)));
+	struct statement_condition *ret =
+		xmalloc((sizeof *ret) + stack->idx * (sizeof(char *)));
 	ret->count = stack->idx;
 	memcpy(ret->values, stack->stack, stack->idx * (sizeof(char *)));
 	return ret;
@@ -121,7 +127,8 @@ preprocess_rec(struct ast_node *root, struct condition_stack *cur,
 			arg_count++;
 		}
 
-		struct syscall *new = xmalloc(sizeof(*new) + sizeof(struct syscall_argument) * arg_count);
+		struct syscall *new =
+			xmalloc(sizeof(*new) + sizeof(struct syscall_argument) * arg_count);
 		*new = (struct syscall) {
 			.name = root->syscall.name,
 			.conditions = create_statement_condition(cur),
@@ -156,7 +163,7 @@ preprocess_rec(struct ast_node *root, struct condition_stack *cur,
  */
 static size_t
 find_matching(struct syscall **syscall_buffer, size_t syscall_count,
-			  struct syscall_group *out)
+	      struct syscall_group *out)
 {
 	struct syscall *base = syscall_buffer[0];
 	assert(base != NULL);
@@ -165,11 +172,11 @@ find_matching(struct syscall **syscall_buffer, size_t syscall_count,
 	size_t matching = 0;
 	for (size_t i = 1; i < syscall_count; i++) {
 		struct syscall *cur = syscall_buffer[i];
-		// all variants start with the same name as the base
+		/* all variants start with the same name as the base */
 		if (strncmp(cur->name, base->name, base_name_len) != 0) {
 			break;
 		}
-		// and their last '$' is immediately after the base name
+		/* and their last '$' is immediately after the base name */
 		char *last_dollar = strrchr(cur->name, '$');
 		if (last_dollar == cur->name + base_name_len) {
 			matching++;
@@ -185,7 +192,8 @@ find_matching(struct syscall **syscall_buffer, size_t syscall_count,
 		return 1;
 	}
 
-	struct syscall_group *children = xmalloc(sizeof(struct syscall_group) * matching);
+	struct syscall_group *children =
+		xmalloc(sizeof(struct syscall_group) * matching);
 	size_t children_idx = 0;
 
 	size_t i = 1;
@@ -196,13 +204,14 @@ find_matching(struct syscall **syscall_buffer, size_t syscall_count,
 		}
 		char *last_dollar = strrchr(cur->name, '$');
 		if (last_dollar != cur->name + base_name_len) {
-			// not a direct subvariant
-			fprintf(stderr, "not subvariant %s -> %s \n", base->name, cur->name);
+			/* not a direct subvariant */
+			fprintf(stderr, "not subvariant %s -> %s \n",
+				base->name, cur->name);
 			i += 1;
 			continue;
 		}
 		i += find_matching(syscall_buffer + i, syscall_count - i,
-						   children + children_idx);
+				   children + children_idx);
 		children_idx++;
 	}
 
@@ -228,29 +237,40 @@ syscall_comparator(const void *a, const void *b)
 static struct syscall_group *
 group_syscall_variants(struct processing_state *state, size_t *out_count)
 {
-	// The idea is to sort the syscalls by name:
-	// "prctl" "prctl$GET_FP_MODE"
-	//         "prctl$PR_CAP_AMBIENT" "prctl$PR_CAP_AMBIENT$PR_CAP_AMBIENT_LOWER"
-	// This way, every variant will immediately follow the base syscall and will
-	// be grouped into a syscall_group 'find_matching'.
+	/*
+	 * The idea is to sort the syscalls by name:
+	 * "prctl" "prctl$GET_FP_MODE"
+	 *         "prctl$PR_CAP_AMBIENT"
+	 *         "prctl$PR_CAP_AMBIENT$PR_CAP_AMBIENT_LOWER"
+	 * This way, every variant will immediately follow the base syscall
+	 * and will be grouped into a syscall_group 'find_matching'.
+	 */
 
 	qsort(state->syscall_buffer, state->syscall_index,
-		  sizeof(struct syscall *), syscall_comparator);
+	      sizeof(struct syscall *), syscall_comparator);
 
-	// in the worst case (no variants), there can be MAX_SYSCALL_COUNT syscall groups
-	struct syscall_group *scratch = xcalloc(sizeof(*scratch) * MAX_SYSCALL_COUNT);
+	/*
+	 * In the worst case (no variants),
+	 * there can be MAX_SYSCALL_COUNT syscall groups.
+	 */
+	struct syscall_group *scratch =
+		xcalloc(MAX_SYSCALL_COUNT, sizeof(*scratch));
 
 	size_t groups = 0;
 	size_t i = 0;
 	while (i < state->syscall_index) {
-		i += find_matching(state->syscall_buffer + i, state->syscall_index - i, scratch + groups);
+		i += find_matching(state->syscall_buffer + i,
+				   state->syscall_index - i,
+				   scratch + groups);
 		groups++;
 	}
 
-	struct syscall_group *ret = realloc(scratch, sizeof(*scratch) * (groups + 1));
+	struct syscall_group *ret =
+		realloc(scratch, sizeof(*scratch) * (groups + 1));
 
 	if (ret == NULL) {
-		fprintf(stderr, "realloc failed for %zu bytes\n", sizeof(*scratch) * groups);
+		fprintf(stderr, "realloc failed for %zu bytes\n",
+			sizeof(*scratch) * groups);
 		exit(1);
 	}
 
@@ -264,7 +284,8 @@ preprocess(struct ast_node *root)
 	struct processed_ast *ret = xmalloc(sizeof *ret);
 
 	struct processing_state state = (struct processing_state) {
-		.syscall_buffer = xcalloc(sizeof(struct syscall *) * MAX_SYSCALL_COUNT),
+		.syscall_buffer =
+			xcalloc(MAX_SYSCALL_COUNT, sizeof(struct syscall *)),
 		.syscall_index = 0,
 		.struct_stmts = NULL,
 		.preprocessor_head = NULL,
@@ -277,7 +298,8 @@ preprocess(struct ast_node *root)
 
 	ret->preprocessor_stmts = state.preprocessor_head;
 	ret->struct_stmts = state.struct_stmts;
-	ret->syscall_groups = group_syscall_variants(&state, &ret->syscall_group_count);
+	ret->syscall_groups =
+		group_syscall_variants(&state, &ret->syscall_group_count);
 	ret->decoders = state.decoder_head;
 
 	return ret;
