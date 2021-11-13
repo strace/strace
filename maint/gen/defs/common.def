@@ -45,7 +45,7 @@
 	{
 		uint32_t int_buffer;
 		print_array(tcp, $$, $1, &int_buffer, sizeof(int_buffer),
-			    tfetch_mem, print_uint_array_member, 0);
+			    tfetch_mem, print_xint_array_member, 0);
 	}
 %}
 
