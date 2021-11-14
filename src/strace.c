@@ -803,15 +803,29 @@ printleader(struct tcb *tcp)
 	current_tcp->curcol = 0;
 
 	if (print_pid_pfx) {
-		if (pid_decoding & PID_DECODING_COMM)
-			tprintf("%-5d<%s> ", tcp->pid, tcp->comm);
-		else
-			tprintf("%-5d ", tcp->pid);
+		tprintf("%-5d", tcp->pid);
+		size_t len =
+			(pid_decoding & PID_DECODING_COMM) ? strlen(tcp->comm) : 0;
+		if (len) {
+			tprints("<");
+			print_quoted_string_ex(tcp->comm, len,
+					       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+					       "<>");
+			tprints(">");
+		}
+		tprints(" ");
 	} else if (nprocs > 1 && !outfname) {
-		if (pid_decoding & PID_DECODING_COMM)
-			tprintf("[pid %5u<%s>] ", tcp->pid, tcp->comm);
-		else
-			tprintf("[pid %5u] ", tcp->pid);
+		tprintf("[pid %5u", tcp->pid);
+		size_t len =
+			(pid_decoding & PID_DECODING_COMM) ? strlen(tcp->comm) : 0;
+		if (len) {
+			tprints("<");
+			print_quoted_string_ex(tcp->comm, len,
+					       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+					       "<>");
+			tprints(">");
+		}
+		tprints("] ");
 	}
 
 #ifdef ENABLE_SECONTEXT
@@ -955,9 +969,14 @@ maybe_printpid_comm(int pid)
 
 	char buf[PROC_COMM_LEN];
 	load_pid_comm(pid, buf, sizeof(buf));
-	tprints("<");
-	tprints(buf);
-	tprints(">");
+	size_t len = strlen(buf);
+	if (len) {
+		tprints("<");
+		print_quoted_string_ex(buf, len,
+				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
+				       "<>");
+		tprints(">");
+	}
 }
 
 void

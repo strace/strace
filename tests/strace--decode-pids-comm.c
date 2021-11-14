@@ -56,12 +56,30 @@ do_default_action(void)
 		ppid = getppid();
 		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
 
-		strcpy(comm, NEW_NAME);
-		prctl(PR_SET_NAME, comm);
-		prctl(PR_GET_NAME, comm);
+		const char *names[] = {
+			"foo\33[2Jbar",
+			"foo<bar>",
+			NEW_NAME,
+		};
+		for (size_t i = 0; i < ARRAY_SIZE(names); ++i) {
+			strcpy(comm, names[i]);
+			prctl(PR_SET_NAME, comm);
+			prctl(PR_GET_NAME, comm);
 
-		ppid = getppid();
-		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
+			ppid = getppid();
+			printf("%-5d<", pid);
+			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
+			printf("> getppid() = %d<%s>\n", ppid, ocomm);
+
+			long rc = syscall(__NR_tgkill, pid, pid, SIGCONT);
+			printf("%-5d<", pid);
+			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
+			printf("> tgkill(%d<", pid);
+			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
+			printf(">, %d<", pid);
+			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
+			printf(">, SIGCONT) = %s\n", sprintrc(rc));
+		}
 
 		long rc = syscall(__NR_tgkill, ppid, ppid, SIGCONT);
 		printf("%-5d<%s> tgkill(%d<%s>, %d<%s>, SIGCONT) = %s\n",
