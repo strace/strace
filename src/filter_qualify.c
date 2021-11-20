@@ -21,6 +21,7 @@ struct number_set *signal_set;
 struct number_set *status_set;
 struct number_set *quiet_set;
 struct number_set *decode_fd_set;
+struct number_set *decode_pid_set;
 struct number_set *trace_set;
 
 bool quiet_set_updated = false;
@@ -106,6 +107,17 @@ decode_fd_str_to_uint(const char *str)
 	};
 
 	return (int) find_arg_val(str, decode_fd_strs, -1ULL, -1ULL);
+}
+
+static int
+decode_pid_str_to_uint(const char *str)
+{
+	static const struct xlat_data decode_pid_strs[] = {
+		{ DECODE_PID_NS_TRANSLATION,	"pidns" },
+		{ DECODE_PID_COMM,		"comm" },
+	};
+
+	return (int) find_arg_val(str, decode_pid_strs, -1ULL, -1ULL);
 }
 
 static int
@@ -468,12 +480,10 @@ qualify_decode_fd(const char *const str)
 void
 qualify_decode_pid(const char *const str)
 {
-	if (strcmp(str, "pidns") == 0)
-		pid_decoding |= PID_DECODING_NS_TRANSLATION;
-	else if (strcmp(str, "comm") == 0)
-		pid_decoding |= PID_DECODING_COMM;
-	else
-		error_msg_and_die("invalid --decode-pids= argument: '%s'", str);
+	if (!decode_pid_set)
+		decode_pid_set = alloc_number_set_array(1);
+	qualify_tokens(str, decode_pid_set, decode_pid_str_to_uint,
+		       "decode-pids");
 }
 
 void

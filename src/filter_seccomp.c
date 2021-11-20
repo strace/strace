@@ -258,7 +258,8 @@ traced_by_seccomp(unsigned int scno, unsigned int p)
 	unsigned int always_trace_flags =
 		TRACE_INDIRECT_SUBCALL | TRACE_SECCOMP_DEFAULT |
 		(stack_trace_enabled ? MEMORY_MAPPING_CHANGE : 0) |
-		((pid_decoding & PID_DECODING_COMM) ? COMM_CHANGE : 0);
+		(is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
+		 COMM_CHANGE : 0);
 	return sysent_vec[p][scno].sys_flags & always_trace_flags ||
 		is_number_in_set_array(scno, trace_set, p);
 }

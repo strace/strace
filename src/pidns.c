@@ -23,6 +23,7 @@
 
 #include <linux/nsfs.h>
 #include "largefile_wrappers.h"
+#include "number_set.h"
 #include "trie.h"
 #include "xmalloc.h"
 #include "xstring.h"
@@ -527,14 +528,18 @@ get_proc_pid(int pid)
 static void
 printpid_translation(struct tcb *tcp, int pid, enum pid_type type)
 {
-	if ((pid_decoding & (PID_DECODING_COMM|PID_DECODING_NS_TRANSLATION))) {
+	bool print_ns_translation =
+		is_number_in_set(DECODE_PID_NS_TRANSLATION, decode_pid_set);
+	bool print_comm =
+		is_number_in_set(DECODE_PID_COMM, decode_pid_set) &&
+		(type == PT_TID || type == PT_TGID);
+
+	if (print_ns_translation || print_comm) {
 		int strace_pid = translate_pid(tcp, pid, type, NULL);
 		if (strace_pid) {
-			if ((pid_decoding & PID_DECODING_COMM) &&
-			    (type == PT_TID || type == PT_TGID))
-				maybe_printpid_comm(strace_pid);
-			if ((pid_decoding & PID_DECODING_NS_TRANSLATION) &&
-			    strace_pid != pid)
+			if (print_comm)
+				print_pid_comm(strace_pid);
+			if (print_ns_translation && strace_pid != pid)
 				tprintf_comment("%d in strace's PID NS",
 						strace_pid);
 		}

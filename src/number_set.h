@@ -80,6 +80,13 @@ enum decode_fd_bits {
 	NUM_DECODE_FD_BITS
 };
 
+enum decode_pid_bits {
+	DECODE_PID_NS_TRANSLATION,
+	DECODE_PID_COMM,
+
+	NUM_DECODE_PID_BITS
+};
+
 extern bool quiet_set_updated;
 extern bool decode_fd_set_updated;
 
@@ -89,6 +96,7 @@ extern struct number_set *signal_set;
 extern struct number_set *status_set;
 extern struct number_set *quiet_set;
 extern struct number_set *decode_fd_set;
+extern struct number_set *decode_pid_set;
 extern struct number_set *trace_set;
 
 #endif /* !STRACE_NUMBER_SET_H */

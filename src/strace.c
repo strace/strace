@@ -137,8 +137,6 @@ static unsigned int daemonized_tracer;
 static int post_attach_sigstop = TCB_IGNORE_ONE_SIGSTOP;
 #define use_seize (post_attach_sigstop == 0)
 
-unsigned int pid_decoding;
-
 static bool detach_on_execve;
 
 static int exit_code;
@@ -804,8 +802,8 @@ printleader(struct tcb *tcp)
 
 	if (print_pid_pfx) {
 		tprintf("%-5d", tcp->pid);
-		size_t len =
-			(pid_decoding & PID_DECODING_COMM) ? strlen(tcp->comm) : 0;
+		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
+			strlen(tcp->comm) : 0;
 		if (len) {
 			tprints("<");
 			print_quoted_string_ex(tcp->comm, len,
@@ -816,8 +814,8 @@ printleader(struct tcb *tcp)
 		tprints(" ");
 	} else if (nprocs > 1 && !outfname) {
 		tprintf("[pid %5u", tcp->pid);
-		size_t len =
-			(pid_decoding & PID_DECODING_COMM) ? strlen(tcp->comm) : 0;
+		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
+			strlen(tcp->comm) : 0;
 		if (len) {
 			tprints("<");
 			print_quoted_string_ex(tcp->comm, len,
@@ -962,11 +960,8 @@ load_pid_comm(int pid, char *buf, size_t buf_size)
 }
 
 void
-maybe_printpid_comm(int pid)
+print_pid_comm(int pid)
 {
-	if (!(pid_decoding & PID_DECODING_COMM))
-		return;
-
 	char buf[PROC_COMM_LEN];
 	load_pid_comm(pid, buf, sizeof(buf));
 	size_t len = strlen(buf);
@@ -982,7 +977,7 @@ maybe_printpid_comm(int pid)
 void
 maybe_load_task_comm(struct tcb *tcp)
 {
-	if (!(pid_decoding & PID_DECODING_COMM))
+	if (!is_number_in_set(DECODE_PID_COMM, decode_pid_set))
 		return;
 
 	load_pid_comm(get_proc_pid(tcp->pid), tcp->comm, sizeof(tcp->comm));
@@ -2556,7 +2551,7 @@ init(int argc, char *argv[])
 		qualify_decode_fd(yflag_short == 1 ? yflag_qual : yyflag_qual);
 	}
 
-	if ((pid_decoding & PID_DECODING_COMM)) {
+	if (is_number_in_set(DECODE_PID_COMM, decode_pid_set)) {
 		/*
 		 * If --decode-pids=comm option comes after -p, comm fields
 		 * of tcbs are not filled though tcbs are initialized.

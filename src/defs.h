@@ -511,11 +511,7 @@ extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
-extern unsigned int pid_decoding;
-enum pid_decoding_flags {
-	PID_DECODING_NS_TRANSLATION = 1 << 0,
-	PID_DECODING_COMM	    = 1 << 1,
-};
+
 /* are we filtering traces based on paths? */
 extern struct path_set {
 	const char **paths_selected;
@@ -1493,7 +1489,7 @@ extern void kvm_vcpu_info_free(struct tcb *);
 
 extern void maybe_load_task_comm(struct tcb *tcp);
 /* Print the contents of /proc/$pid/comm. */
-extern void maybe_printpid_comm(int pid);
+extern void print_pid_comm(int pid);
 
 static inline int
 printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
