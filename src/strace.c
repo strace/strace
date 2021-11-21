@@ -772,6 +772,17 @@ set_current_tcp(const struct tcb *tcp)
 		set_personality(current_tcp->currpers);
 }
 
+static void
+print_comm_str(const char *str, const size_t len)
+{
+	if (!len)
+		return;
+	tprints("<");
+	print_quoted_string_ex(str, len,
+			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+	tprints(">");
+}
+
 void
 printleader(struct tcb *tcp)
 {
@@ -800,30 +811,19 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
-	if (print_pid_pfx) {
-		tprintf("%-5d", tcp->pid);
-		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
-			strlen(tcp->comm) : 0;
-		if (len) {
-			tprints("<");
-			print_quoted_string_ex(tcp->comm, len,
-					       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
-					       "<>");
-			tprints(">");
-		}
+	if (print_pid_pfx || (nprocs > 1 && !outfname)) {
+		if (print_pid_pfx)
+			tprintf("%-5u", tcp->pid);
+		else
+			tprintf("[pid %5u", tcp->pid);
+
+		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set)
+			     ? strlen(tcp->comm) : 0;
+		print_comm_str(tcp->comm, len);
+
+		if (!print_pid_pfx)
+			tprints("]");
 		tprints(" ");
-	} else if (nprocs > 1 && !outfname) {
-		tprintf("[pid %5u", tcp->pid);
-		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set) ?
-			strlen(tcp->comm) : 0;
-		if (len) {
-			tprints("<");
-			print_quoted_string_ex(tcp->comm, len,
-					       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
-					       "<>");
-			tprints(">");
-		}
-		tprints("] ");
 	}
 
 #ifdef ENABLE_SECONTEXT
@@ -964,14 +964,7 @@ print_pid_comm(int pid)
 {
 	char buf[PROC_COMM_LEN];
 	load_pid_comm(pid, buf, sizeof(buf));
-	size_t len = strlen(buf);
-	if (len) {
-		tprints("<");
-		print_quoted_string_ex(buf, len,
-				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
-				       "<>");
-		tprints(">");
-	}
+	print_comm_str(buf, strlen(buf));
 }
 
 void
