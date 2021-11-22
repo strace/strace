@@ -40,6 +40,8 @@
 # define termio_cc termios_cc
 #endif
 
+#include "xlat/term_cmds_overlapping.h"
+
 static void
 decode_oflag(uint64_t val)
 {
@@ -448,4 +450,41 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	return RVAL_IOCTL_DECODED;
+}
+
+/*
+ * TTY and SND ioctl commands may clash, for example:
+ *
+ *    0x00005404
+ *    { "SNDCTL_TMR_CONTINUE", 0x00005404 },
+ *    { "TCSETSF", 0x00005404 },
+ *    0x00005403
+ *    { "SNDCTL_TMR_STOP", 0x00005403 },
+ *    { "TCSETSW", 0x00005403 },
+ *    0x00005402
+ *    { "SNDCTL_TMR_START", 0x00005402 },
+ *    { "TCSETS", 0x00005402 },
+ *
+ * This function tries to resolve the collision using the device information
+ * associated with the specified file descriptor.
+ */
+int
+term_ioctl_decode_command_number(struct tcb *tcp,
+				 const struct finfo *finfo,
+				 unsigned int code)
+{
+   /*
+    * See Linux kernel Documentation/admin-guide/devices.txt
+    */
+   if (finfo
+       && finfo->type == FINFO_DEV_CHR
+       && ((3 <= finfo->dev.major && finfo->dev.major <= 5) ||
+	   (136 <= finfo->dev.major && finfo->dev.major <= 143))) {
+	   const char *str = xlookup(term_cmds_overlapping, code);
+	   if (str) {
+		   tprints_string(str);
+		   return IOCTL_NUMBER_STOP_LOOKUP;
+	   }
+   }
+   return 0;
 }

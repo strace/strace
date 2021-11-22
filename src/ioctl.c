@@ -242,7 +242,7 @@ hiddev_decode_number(const unsigned int code)
 }
 
 static int
-ioctl_decode_command_number(struct tcb *tcp)
+ioctl_decode_command_number(struct tcb *tcp, const struct finfo *finfo)
 {
 	const unsigned int code = tcp->u_arg[1];
 
@@ -270,6 +270,8 @@ ioctl_decode_command_number(struct tcb *tcp)
 			return 1;
 		}
 		return 0;
+	case 'T':
+		return term_ioctl_decode_command_number(tcp, finfo, code);
 	case 'U':
 		if (_IOC_DIR(code) == _IOC_READ && _IOC_NR(code) == 0x2c) {
 			tprints_arg_begin("UI_GET_SYSNAME");
@@ -472,7 +474,7 @@ SYS_FUNC(ioctl)
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
 			tprint_comment_begin();
 		if (xlat_verbosity != XLAT_STYLE_RAW) {
-			ret = ioctl_decode_command_number(tcp);
+			ret = ioctl_decode_command_number(tcp, finfo);
 			if (!(ret & IOCTL_NUMBER_STOP_LOOKUP)) {
 				iop = ioctl_lookup(tcp->u_arg[1]);
 				if (iop) {
