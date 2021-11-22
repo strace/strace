@@ -40,6 +40,8 @@
 # define termio_cc termios_cc
 #endif
 
+#include "xlat/term_cmds_overlapping.h"
+
 static void
 decode_oflag(uint64_t val)
 {
@@ -448,4 +450,53 @@ term_ioctl(struct tcb *const tcp, const unsigned int code,
 	}
 
 	return RVAL_IOCTL_DECODED;
+}
+
+/* The command numbers for TCSETSF, TCSETSW, and TCSETS
+ * overlap that for SND:
+ *
+ *    0x00005404
+ *    { "SNDCTL_TMR_CONTINUE", 0x00005404 },
+ *    { "TCSETSF", 0x00005404 },
+ *    0x00005403
+ *    { "SNDCTL_TMR_STOP", 0x00005403 },
+ *    { "TCSETSW", 0x00005403 },
+ *    0x00005402
+ *    { "SNDCTL_TMR_START", 0x00005402 },
+ *    { "TCSETS", 0x00005402 },
+ *
+ * This function tries to solve the command name with the
+ * device information associated with FD.
+ *
+ * Above overlapping is observed on x86_64.
+ * On parisc and sparc, TCSETA, TCSETAW, and TCSETAF conflict
+ * with the SNDCTL commands:
+ *
+ *   $ cd linux/arch
+ *   $ grep "'T'" *\/include/uapi/asm/ioctls.h | grep '\<[234]\>'
+ *   parisc/include/uapi/asm/ioctls.h:#define TCSETA		_IOW('T', 2, struct termio)
+ *   parisc/include/uapi/asm/ioctls.h:#define TCSETAW		_IOW('T', 3, struct termio)
+ *   parisc/include/uapi/asm/ioctls.h:#define TCSETAF		_IOW('T', 4, struct termio)
+ *   sparc/include/uapi/asm/ioctls.h:#define TCSETA		_IOW('T', 2, struct termio)
+ *   sparc/include/uapi/asm/ioctls.h:#define TCSETAW		_IOW('T', 3, struct termio)
+ *   sparc/include/uapi/asm/ioctls.h:#define TCSETAF		_IOW('T', 4, struct termio)
+ */
+int
+term_ioctl_decode_command_number(int code,
+				 struct tcb *tcp, struct finfo *finfo)
+{
+   /* See Documentation/admin-guide/devices.txt of
+    * Linux kernel source tree about the number 3, 4, 5, 136 ~ 143.
+    */
+   if (finfo
+       && finfo->type == FINFO_DEV_CHR
+       && ((136 <= finfo->dev.major && finfo->dev.major <= 143)
+	   || (3 <= finfo->dev.major && finfo->dev.major <= 5))) {
+	   const char *str = xlookup(term_cmds_overlapping, (uint64_t)code);
+	   if (str) {
+		   tprints_string(str);
+		   return IOCTL_NUMBER_STOP_LOOKUP;
+	   }
+   }
+   return 0;
 }

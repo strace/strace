@@ -674,6 +674,10 @@ struct finfo {
 extern
 struct finfo *get_finfo_for_dev(const char *path, struct finfo *finfo);
 
+extern int
+term_ioctl_decode_command_number(int code,
+                struct tcb *tcp, struct finfo *finfo);
+
 /**
  * @return 0 on success, -1 on error.
  */
