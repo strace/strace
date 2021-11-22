@@ -954,6 +954,8 @@ strace--strings-in-hex-none
 strace-Y-0123456789
 strace-n
 strace-no-x
+strace-p-Y-p2
+strace-p1-Y-p
 strace-x
 strace-xx
 swap

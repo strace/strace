@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# Check that -p pid1 -Y -p pid2 prints /proc/$pid1/comm properly.
+#
+# Copyright (c) 2021 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+run_prog_skip_if_failed kill -0 $$
+run_prog ../strace-p1-Y-p 0 > /dev/null 3>&1
+run_prog ../strace-p-Y-p2 0 > /dev/null 3>&1
+
+run_tracee()
+{
+	local file
+	file="$1"; shift
+	../set_ptracer_any $@ > /dev/null 3> "$file" &
+	pid=$!
+	while ! [ -s "$file" ]; do
+		kill -0 $pid 2> /dev/null ||
+			fail_ 'set_ptracer_any "$*" failed'
+	done
+}
+
+run_tracee "$EXP" ../strace-p1-Y-p 2
+pid1=$pid
+
+run_tracee "$OUT" ../strace-p-Y-p2 3
+pid2=$pid
+
+run_strace -enone -p "$pid1" -Y -p "$pid2"
+
+# merge expected output
+cat "$OUT" >> "$EXP"
+
+# filter out unrelated strace output
+grep -F +++ "$LOG" > "$OUT"
+
+match_diff "$OUT" "$EXP"

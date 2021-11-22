@@ -351,6 +351,8 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	status-unfinished-threads \
 	strace--decode-pids-comm \
 	strace-Y-0123456789 \
+	strace-p-Y-p2 \
+	strace-p1-Y-p \
 	syslog-success \
 	tgkill--pidns-translation \
 	threads-execve \
@@ -580,6 +582,7 @@ MISC_TESTS = \
 	strace-ff.test \
 	strace-log-merge-error.test \
 	strace-log-merge-suffix.test \
+	strace-p-Y-p.test \
 	strace-r.test \
 	strace-t.test \
 	strace-tt.test \
