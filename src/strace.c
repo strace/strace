@@ -812,13 +812,18 @@ printleader(struct tcb *tcp)
 	current_tcp->curcol = 0;
 
 	if (print_pid_pfx || (nprocs > 1 && !outfname)) {
-		if (print_pid_pfx)
-			tprintf("%-5u", tcp->pid);
-		else
-			tprintf("[pid %5u", tcp->pid);
-
 		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set)
 			     ? strlen(tcp->comm) : 0;
+
+		if (print_pid_pfx) {
+			if (len)
+				tprintf("%u", tcp->pid);
+			else
+				tprintf("%-5u", tcp->pid);
+		} else {
+			tprintf("[pid %5u", tcp->pid);
+		}
+
 		print_comm_str(tcp->comm, len);
 
 		if (!print_pid_pfx)

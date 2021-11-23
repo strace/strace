@@ -45,7 +45,7 @@ do_default_action(void)
 	pid_t pid  = getpid();
 	pid_t ppid = getppid();
 
-	printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
+	printf("%u<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
 	fflush(stdout);
 
 	pid_t child = fork();
@@ -54,7 +54,7 @@ do_default_action(void)
 	else if (child == 0) {
 		pid = getpid();
 		ppid = getppid();
-		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
+		printf("%u<%s> getppid() = %d<%s>\n", pid, comm, ppid, ocomm);
 
 		const char *names[] = {
 			"foo\33[2Jbar",
@@ -67,12 +67,12 @@ do_default_action(void)
 			prctl(PR_GET_NAME, comm);
 
 			ppid = getppid();
-			printf("%-5d<", pid);
+			printf("%u<", pid);
 			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
 			printf("> getppid() = %d<%s>\n", ppid, ocomm);
 
 			long rc = syscall(__NR_tgkill, pid, pid, SIGCONT);
-			printf("%-5d<", pid);
+			printf("%u<", pid);
 			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
 			printf("> tgkill(%d<", pid);
 			print_quoted_memory_ex(comm, strlen(comm), 0, "<>");
@@ -82,7 +82,7 @@ do_default_action(void)
 		}
 
 		long rc = syscall(__NR_tgkill, ppid, ppid, SIGCONT);
-		printf("%-5d<%s> tgkill(%d<%s>, %d<%s>, SIGCONT) = %s\n",
+		printf("%u<%s> tgkill(%d<%s>, %d<%s>, SIGCONT) = %s\n",
 		       pid, comm, ppid, ocomm, ppid, ocomm, sprintrc(rc));
 
 		fflush(stdout);
@@ -96,11 +96,11 @@ do_default_action(void)
 				continue;
 			perror_msg_and_fail("waitpid: %d", child);
 		}
-		printf("%-5d<exe> +++ exited with 0 +++\n", child);
+		printf("%u<exe> +++ exited with 0 +++\n", child);
 
 		ppid = getppid();
-		printf("%-5d<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
-		printf("%-5d<%s> +++ exited with 0 +++\n", pid, comm);
+		printf("%u<%s> getppid() = %d<%s>\n", pid, comm, ppid, "strace");
+		printf("%u<%s> +++ exited with 0 +++\n", pid, comm);
 		return WEXITSTATUS(status);
 	}
 	return 0;

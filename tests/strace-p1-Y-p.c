@@ -33,7 +33,7 @@ main(int ac, char **av)
 	if (!fp)
 		error_msg_and_fail("fdopen(3, \"a\")");
 
-	fprintf(fp, "%-5u<%s> +++ exited with 0 +++\n", getpid(), MY_COMM);
+	fprintf(fp, "%u<%s> +++ exited with 0 +++\n", getpid(), MY_COMM);
 	fclose(fp);
 
 	if (sleep(seconds))
