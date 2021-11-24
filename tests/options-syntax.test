@@ -11,6 +11,7 @@
 . "${srcdir=.}/syntax.sh"
 
 compiled_with_secontext=$(get_config_option ENABLE_SECONTEXT "y")
+compiled_with_stacktrace="$(get_config_option ENABLE_STACKTRACE 1)"
 
 check_e "Invalid process id: '0'" -p 0
 check_e "Invalid process id: '0'" --attach=0
@@ -292,6 +293,11 @@ $STRACE_EXE: $umsg" -u :nosuchuser: -cinrtTyzZ true
 $STRACE_EXE: $umsg" -u :nosuchuser: -c --secontext true
 	fi
 
+	if [ -n "$compiled_with_stacktrace" ]; then
+		check_e "-k/--stack-traces has no effect with -c/--summary-only
+$STRACE_EXE: $umsg" -u :nosuchuser: -c -k true
+	fi
+
 	for c in --output-separately -A/--output-append-mode; do
 		check_e "$c has no effect without -o/--output
 $STRACE_EXE: $umsg" -u :nosuchuser: ${c%%/*} true
@@ -324,7 +330,7 @@ fi
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' -d /
 check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
 
-if [ -z "$(get_config_option ENABLE_STACKTRACE 1)" ]; then
+if [ -z "$compiled_with_stacktrace" ]; then
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" -k
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces
 fi
