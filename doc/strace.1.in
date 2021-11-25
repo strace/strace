@@ -323,8 +323,15 @@ options can be used to attach to many processes in addition to
 (which is optional if at least one
 .B \-p
 option is given).
+Multiple process IDs, separated by either
+comma (\(lq,\(rq), space (\(lq \(rq), tab, or newline character,
+can be provided as an argument to a single
 .B \-p
-"`pidof PROG`" syntax is supported.
+option, so, for example,
+.B \-p
+"$(pidof PROG)" and
+.B \-p
+"$(pgrep PROG)" syntaxes are supported.
 .TP
 .BI "\-u " username
 .TQ
