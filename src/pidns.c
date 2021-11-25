@@ -315,17 +315,17 @@ fail:
  * Parameters for id translation
  */
 struct translate_id_params {
-	/* The result (output) */
-	int result_id;
-	/* The proc data of the process (output) */
-	struct proc_data *pd;
-
 	/* The namespace to be translated from */
 	unsigned int from_ns;
 	/* The id to be translated */
 	int from_id;
 	/* The type of the id */
 	enum pid_type type;
+
+	/* The result (output) */
+	int result_id;
+	/* The proc data of the process (output) */
+	struct proc_data *pd;
 };
 
 /**
@@ -472,11 +472,11 @@ translate_pid(struct tcb *tcp, int from_id, enum pid_type type,
 	}
 
 	struct translate_id_params tip = {
-		.result_id = 0,
-		.pd = NULL,
 		.from_ns = tcp ? get_ns(tcp) : get_our_ns(),
 		.from_id = from_id,
 		.type = type,
+		.result_id = 0,
+		.pd = NULL,
 	};
 
 	if (!tip.from_ns)
