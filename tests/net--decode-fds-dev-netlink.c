@@ -1,2 +1,1 @@
-#define PRINT_SOCK 1
-#include "net-yy-netlink.c"
+#include "net--decode-fds-none-netlink.c"

@@ -60,9 +60,11 @@ close_range	-a21 7>>/dev/full
 copy_file_range
 creat	-a20
 delete_module	-a23
+dev--decode-fds-all	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=all
 dev--decode-fds-dev	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=dev
+dev--decode-fds-none	-a9 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" --decode-fds=none
 dev--decode-fds-path	-a19 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -e decode-fds=path
-dev--decode-fds-socket	-a19 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" --decode-fds=socket
+dev--decode-fds-socket	-a9 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" --decode-fds=socket
 dev-yy	-a30 -e trace=openat,fsync -P "/dev/full" -P "/dev/zero" -P "/dev/sda" -yy
 dup	-a7 9>>/dev/full
 dup-P	-a7 --trace=dup -P /dev/full 9>>/dev/full
@@ -480,7 +482,8 @@ msg_control-v	-v -a21 -e trace=sendmsg
 msg_name	-a20 -e trace=recvmsg
 munlockall	-a13
 nanosleep	-a20
-net--decode-fds-dev-netlink	+net-yy-netlink.test --decode-fds=dev
+net--decode-fds-all-netlink	+net-yy-netlink.test --decode-fds=all
+net--decode-fds-dev-netlink	+net-yy-netlink.test --decode-fds=dev -a9
 net--decode-fds-none-netlink	+net-yy-netlink.test --decode-fds=none -a9
 net--decode-fds-path-netlink	+net-yy-netlink.test --decode-fds=path
 net--decode-fds-socket-netlink	+net-yy-netlink.test --decode-fds=socket
@@ -617,6 +620,8 @@ pidfd_getfd	-a18 -Xverbose -e signal=none </dev/full
 pidfd_getfd-y	--trace=pidfd_getfd -a18 -e signal=none -y </dev/full
 pidfd_getfd-yy	--trace=pidfd_getfd -a18 -e signal=none -yy </dev/full
 pidfd_open	-a17
+pidfd_open--decode-fd-all	-a17 -e decode-fd=all -e trace=pidfd_open
+pidfd_open--decode-fd-none	-a17 -e decode-fd=none -e trace=pidfd_open
 pidfd_open--decode-fd-path	-a17 -e decode-fd=path -e trace=pidfd_open
 pidfd_open--decode-fd-pidfd	-a17 -e decode-fd=pidfd -e trace=pidfd_open
 pidfd_open--decode-fd-socket	-a17 -e decode-fd=socket -e trace=pidfd_open

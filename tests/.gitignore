@@ -74,7 +74,9 @@ count-f
 creat
 delay
 delete_module
+dev--decode-fds-all
 dev--decode-fds-dev
+dev--decode-fds-none
 dev--decode-fds-path
 dev--decode-fds-socket
 dev-yy
@@ -495,6 +497,7 @@ msg_control-v
 msg_name
 munlockall
 nanosleep
+net--decode-fds-all-netlink
 net--decode-fds-dev-netlink
 net--decode-fds-none-netlink
 net--decode-fds-path-netlink
@@ -642,6 +645,8 @@ pidfd_getfd
 pidfd_getfd-y
 pidfd_getfd-yy
 pidfd_open
+pidfd_open--decode-fd-all
+pidfd_open--decode-fd-none
 pidfd_open--decode-fd-path
 pidfd_open--decode-fd-pidfd
 pidfd_open--decode-fd-socket

@@ -18,14 +18,24 @@
 
 #include <sys/sysmacros.h>
 
+#ifndef PRINT_PATH
+# define PRINT_PATH 1
+#endif
+
 #ifndef PRINT_DEVNUM
-# define PRINT_DEVNUM 1
+# if PRINT_PATH
+#  define PRINT_DEVNUM 1
+# else
+#  define PRINT_DEVNUM 0
+# endif
 #endif
 
 #if PRINT_DEVNUM
 # define DEV_FMT "<%s<%s %u:%u>>"
-#else
+#elif PRINT_PATH
 # define DEV_FMT "<%s>"
+#else
+# define DEV_FMT ""
 #endif
 
 #if defined __NR_openat && defined O_PATH
@@ -58,14 +68,16 @@ main(void)
 
 		printf("openat(AT_FDCWD, \"%s\", O_RDONLY|O_PATH) = %s",
 		       checks[i].path, sprintrc(fd));
+# if PRINT_PATH
 		if (fd >= 0)
 			printf(DEV_FMT,
 			       checks[i].path
-# if PRINT_DEVNUM
+#  if PRINT_DEVNUM
 			       , checks[i].blk ? "block" : "char",
 			       checks[i].major, checks[i].minor
-# endif
+#  endif
 			       );
+# endif
 		puts("");
 
 		if (fd < 0) {
@@ -79,10 +91,13 @@ main(void)
 		int rc = fsync(fd);
 
 		printf("fsync(%ld" DEV_FMT ") = %s\n",
-		       fd, checks[i].path,
-# if PRINT_DEVNUM
+		       fd,
+# if PRINT_PATH
+		       checks[i].path,
+#  if PRINT_DEVNUM
 		       checks[i].blk ? "block" : "char",
 		       checks[i].major, checks[i].minor,
+#  endif
 # endif
 		       sprintrc(rc));
 

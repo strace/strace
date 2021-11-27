@@ -724,6 +724,15 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	return true;
 }
 
+static void
+print_quoted_string_in_angle_brackets(const char *str)
+{
+	tprints("<");
+	print_quoted_string_ex(str, strlen(str),
+			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+	tprints(">");
+}
+
 void
 printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 {
@@ -741,10 +750,8 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
 			goto printed;
-		tprints("<");
-		print_quoted_string_ex(path, strlen(path),
-			QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
-		tprints(">");
+		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
+			print_quoted_string_in_angle_brackets(path);
 printed:	;
 	}
 
