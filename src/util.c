@@ -621,12 +621,22 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 	const char *str = STR_STRIP_PREFIX(path, "socket:[");
 	size_t len;
 	unsigned long inode;
+	const char *details = NULL;
 
-	return (str != path)
-		&& (len = strlen(str))
-		&& (str[len - 1] == ']')
-		&& (inode = strtoul(str, NULL, 10))
-		&& print_sockaddr_by_inode(tcp, fd, inode);
+	if ((str != path)
+	    && (len = strlen(str))
+	    && (str[len - 1] == ']')
+	    && (inode = strtoul(str, NULL, 10)))
+		details = get_sockaddr_by_inode(tcp, fd, inode);
+
+	if (details) {
+		tprints("<");
+		tprints(details);
+		tprints(">");
+		return true;
+	}
+
+	return false;
 }
 
 static bool
@@ -645,10 +655,11 @@ printdev(struct tcb *tcp, int fd, const char *path)
 	switch (st.st_mode & S_IFMT) {
 	case S_IFBLK:
 	case S_IFCHR:
+		tprints("<");
 		print_quoted_string_ex(path, strlen(path),
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
-		tprintf("<%s %u:%u>",
+		tprintf("<%s %u:%u>>",
 			S_ISBLK(st.st_mode)? "block" : "char",
 			major(st.st_rdev), minor(st.st_rdev));
 		return true;
@@ -703,23 +714,24 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	if (pid <= 0)
 		return false;
 
-	tprints("pid:");
+	tprints("<pid:");
 	/*
 	 * The pid translation is not needed because
 	 * the pid is in strace's namespace.
 	 */
 	printpid(NULL, pid, PT_TID);
+	tprints(">");
 	return true;
 }
 
 void
 printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 {
+	PRINT_VAL_D(fd);
+
 	char path[PATH_MAX + 1];
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
 	    && getfdpath_pid(pid, fd, path, sizeof(path)) >= 0) {
-		PRINT_VAL_D(fd);
-		tprints("<");
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
@@ -729,14 +741,13 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
 			goto printed;
+		tprints("<");
 		print_quoted_string_ex(path, strlen(path),
 			QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
-
-printed:
 		tprints(">");
-	} else {
-		PRINT_VAL_D(fd);
+printed:	;
 	}
+
 #ifdef ENABLE_SECONTEXT
 	char *context;
 	if (!selinux_getfdcon(pid, fd, &context)) {

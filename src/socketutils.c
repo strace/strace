@@ -58,17 +58,6 @@ get_sockaddr_by_inode_cached(const unsigned long inode)
 }
 
 static bool
-print_sockaddr_by_inode_cached(const unsigned long inode)
-{
-	const char *const details = get_sockaddr_by_inode_cached(inode);
-	if (details) {
-		tprints(details);
-		return true;
-	}
-	return false;
-}
-
-static bool
 send_query(struct tcb *tcp, const int fd, void *req, size_t req_size)
 {
 	struct sockaddr_nl nladdr = {
@@ -493,8 +482,8 @@ get_family_by_proto(enum sock_proto proto)
 }
 
 static const char *
-get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
-			       const enum sock_proto proto)
+get_sockaddr_by_inode_lookup(struct tcb *tcp, const unsigned long inode,
+			     const enum sock_proto proto)
 {
 	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
 	    (proto != SOCK_PROTO_UNKNOWN && !protocols[proto].get))
@@ -528,24 +517,25 @@ get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
 	return details;
 }
 
-static bool
-print_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
-				 const enum sock_proto proto)
+static const char *
+get_sockaddr_by_inode_uncached(struct tcb *tcp, const unsigned long inode,
+			       const enum sock_proto proto)
 {
-	const char *details = get_sockaddr_by_inode_uncached(tcp, inode, proto);
+	const char *details = get_sockaddr_by_inode_lookup(tcp, inode, proto);
 
-	if (details) {
-		tprints(details);
-		return true;
-	}
+	if (details)
+		return details;
 
-	if ((unsigned int) proto < ARRAY_SIZE(protocols) &&
-	    protocols[proto].name) {
-		tprintf("%s:[%lu]", protocols[proto].name, inode);
-		return true;
-	}
+	if ((unsigned int) proto >= ARRAY_SIZE(protocols) ||
+	    !protocols[proto].name)
+		return NULL;
 
-	return false;
+	static char *str;
+	free(str);
+	if (asprintf(&str, "%s:[%lu]", protocols[proto].name, inode) < 0)
+		return str = NULL;
+
+	return str;
 }
 
 /* Given an inode number of a socket, return its protocol details.  */
@@ -556,16 +546,6 @@ get_sockaddr_by_inode(struct tcb *const tcp, const int fd,
 	const char *details = get_sockaddr_by_inode_cached(inode);
 	return details ? details :
 		get_sockaddr_by_inode_uncached(tcp, inode, getfdproto(tcp, fd));
-}
-
-/* Given an inode number of a socket, print out its protocol details.  */
-bool
-print_sockaddr_by_inode(struct tcb *const tcp, const int fd,
-			const unsigned long inode)
-{
-	return print_sockaddr_by_inode_cached(inode) ? true :
-		print_sockaddr_by_inode_uncached(tcp, inode,
-						 getfdproto(tcp, fd));
 }
 
 /*
