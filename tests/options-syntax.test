@@ -222,7 +222,21 @@ check_h 'deprecated option -F ignored
 check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
 check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
 check_e "invalid -e kvm= argument: 'chdir'" --kvm=chdir
+
+check_h "must have PROG [ARGS] or -p PID" -e decode-pid=all
+check_h "must have PROG [ARGS] or -p PID" --decode-pid=none
+check_h "must have PROG [ARGS] or -p PID" -e decode-pids=comm
+check_h "must have PROG [ARGS] or -p PID" --decode-pid=pidns,comm
+check_h "must have PROG [ARGS] or -p PID" -e decode-pid=\!pidns
+check_h "must have PROG [ARGS] or -p PID" --decode-pids=\!comm,pidns
+check_h "must have PROG [ARGS] or -p PID" -Y -e decode-pids=\!comm,pidns
+check_h "must have PROG [ARGS] or -p PID" --decode-pids=\!comm,pidns -Y
+check_h "must have PROG [ARGS] or -p PID" --pidns-translation -e decode-pids=\!comm,pidns -Y
+check_h "must have PROG [ARGS] or -p PID" --decode-pids=\!comm,pidns --pidns-translation
+check_e "invalid decode-pids ''" --decode-pids=
+check_e "invalid decode-pids ''" -e decode-pids=
 check_e "invalid decode-pids 'chdir'" --decode-pids=chdir
+check_e "invalid decode-pids 'gettid'" -e decode-pid=comm,gettid
 
 case "$STRACE_NATIVE_ARCH" in
 x86_64)

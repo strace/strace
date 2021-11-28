@@ -260,6 +260,7 @@ is one of
 .BR status ,
 .BR quiet " (or " silent " or " silence " or " q ),
 .BR decode\-fds " (or " decode\-fd ),
+.BR decode\-pids " (or " decode\-pid ),
 or
 .BR kvm ,
 and
@@ -867,6 +868,25 @@ Print character/block device numbers.
 .TQ
 .B pidfd
 Print PIDs associated with pidfd file descriptors.
+.RE
+.TP
+\fB\-e\ decode\-pids\fR=\,\fIset\fR
+.TQ
+\fB\-\-decode\-pids\fR=\,\fIset\fR
+Decode various information associated with process IDs
+(and also thread IDs, process group IDs, and session IDs).
+The default is
+.BR decode\-pids = none .
+.I set
+can include the following elements:
+.RS
+.TP 8
+.B comm
+Print command names associated with thread or process IDs.
+.TQ
+.B pidns
+Print thread, process, process group, and session IDs in strace's PID namespace
+if the tracee is in a different PID namespace.
 .RE
 .TP
 .BR "\-e\ kvm" = vcpu

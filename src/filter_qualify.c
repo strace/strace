@@ -651,6 +651,8 @@ static const struct qual_options {
 	{ "kvm",	qualify_kvm	},
 	{ "decode-fd",	qualify_decode_fd },
 	{ "decode-fds",	qualify_decode_fd },
+	{ "decode-pid",	qualify_decode_pid },
+	{ "decode-pids", qualify_decode_pid },
 };
 
 void
