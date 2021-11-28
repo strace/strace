@@ -209,18 +209,10 @@ int lock_file_by_dirname(const char *path_name, const char *lock_name);
  * and followed also by an unmapped page.
  */
 void *tail_alloc(const size_t)
-	ATTRIBUTE_MALLOC
-# ifndef HAVE_BROKEN_CC
-	ATTRIBUTE_ALLOC_SIZE((1))
-# endif
-	;
+	ATTRIBUTE_MALLOC;
 /* Allocate memory using tail_alloc, then memcpy. */
 void *tail_memdup(const void *, const size_t)
-	ATTRIBUTE_MALLOC
-# ifndef HAVE_BROKEN_CC
-	ATTRIBUTE_ALLOC_SIZE((2))
-# endif
-	;
+	ATTRIBUTE_MALLOC;
 
 # define midtail_alloc(after_, before_) \
 	((void *) ((char *) tail_alloc(((before_) + (after_))) + (before_)))
