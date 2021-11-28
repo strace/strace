@@ -545,7 +545,9 @@ main(int ac, char **av)
 			printf(", xlated_prog_insns=[]");
 			break;
 		case 4:
-			printf(", xlated_prog_len=1 => 0");
+			printf(", xlated_prog_len=1");
+			if (prog_info->xlated_prog_len != 1)
+				printf(" => %u", prog_info->xlated_prog_len);
 			printf(", xlated_prog_insns=[]");
 			break;
 		}
