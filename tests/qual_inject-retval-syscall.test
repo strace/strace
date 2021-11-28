@@ -1,3 +1,4 @@
+#!/bin/sh
 suffix=:syscall=gettid
 name_override=qual_inject-retval
 . "${srcdir=.}/qual_inject-retval.test"
