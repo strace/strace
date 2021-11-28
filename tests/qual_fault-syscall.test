@@ -1,3 +1,4 @@
+#!/bin/sh -efu
 suffix=:syscall=gettid
 name_override=qual_fault
 . "${srcdir=.}/qual_fault.test"
