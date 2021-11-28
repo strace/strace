@@ -2062,7 +2062,6 @@ init(int argc, char *argv[])
 	static const char qqqflag_qual[] = "all";
 	static const char yflag_qual[] = "path";
 	static const char yyflag_qual[] = "all";
-	static const char Yflag_qual[] = "comm";
 	static const char tflag_str[] = "format:time";
 	static const char ttflag_str[] = "precision:us,format:time";
 	static const char tttflag_str[] = "format:unix,precision:us";
@@ -2418,7 +2417,7 @@ init(int argc, char *argv[])
 			yflag_short++;
 			break;
 		case 'Y':
-			qualify_decode_pid(Yflag_qual);
+			qualify_decode_pid("comm");
 			break;
 		case GETOPT_PIDNS_TRANSLATION:
 			qualify_decode_pid("pidns");
