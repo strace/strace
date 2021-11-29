@@ -34,29 +34,25 @@ AS_IF([test "x$with_libselinux" != xno],
        AS_IF([test "x$found_selinux_h" = xyes],
 	     [saved_LDFLAGS="$LDFLAGS"
 	      LDFLAGS="$LDFLAGS $libselinux_LDFLAGS"
-	      AC_CHECK_LIB([selinux],[getpidcon],
-		[libselinux_LIBS="-lselinux"
-		 enable_secontext=yes
-		],
-		[if test "x$with_libselinux" != xcheck; then
-		   AC_MSG_FAILURE([failed to find getpidcon in libselinux])
-		 fi
-		]
-	      )
-	      AC_CHECK_LIB([selinux],[getfilecon],
-		[libselinux_LIBS="-lselinux"
-		 enable_secontext=yes
-		],
-		[if test "x$with_libselinux" != xcheck; then
-		   AC_MSG_FAILURE([failed to find getfilecon in libselinux])
-		 fi
-		]
+	      missing=
+	      for func in getpidcon getfilecon; do
+		AC_CHECK_LIB([selinux], [$func], [:],
+			     [missing="$missing $func"])
+	      done
+	      AS_IF([test "x$missing" = x],
+	            [libselinux_LIBS="-lselinux"
+		     enable_secontext=yes
+		    ],
+		    [AS_IF([test "x$with_libselinux" != xcheck],
+			   [AC_MSG_FAILURE([failed to find in libselinux:$missing])]
+		     )
+		    ]
 	      )
 	      LDFLAGS="$saved_LDFLAGS"
 	     ],
-	     [if test "x$with_libselinux" != xcheck; then
-		AC_MSG_FAILURE([failed to find selinux.h])
-	      fi
+	     [AS_IF([test "x$with_libselinux" != xcheck],
+		    [AC_MSG_FAILURE([failed to find selinux.h])]
+	      )
 	     ]
        )
       ]
