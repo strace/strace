@@ -67,8 +67,13 @@ main(void)
 	}
 	for (unsigned int i = 0; i < P; ++i) {
 		int s;
+		pid_t rc;
 
-		assert(waitpid(p[i], &s, 0) == p[i]);
+		while ((rc = waitpid(p[i], &s, 0)) != p[i]) {
+			if (rc < 0 && errno == EINTR)
+				continue;
+			perror_msg_and_fail("waitpid: %d", p[i]);
+		}
 		assert(WIFEXITED(s));
 		if (WEXITSTATUS(s))
 			return WEXITSTATUS(s);
