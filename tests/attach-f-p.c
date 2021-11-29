@@ -38,10 +38,13 @@ static void *
 thread(void *a)
 {
 	unsigned int no = (long) a;
-	int i;
+	int i, rc;
 
-	if (read(pipes[no][0], &i, sizeof(i)) != (int) sizeof(i))
+	while ((rc = read(pipes[no][0], &i, sizeof(i))) != (int) sizeof(i)) {
+		if (rc < 0 && errno == EINTR)
+			continue;
 		perror_msg_and_fail("read[%u]", no);
+	}
 	assert(chdir(child[no]) == -1);
 	retval_t retval = { .pid = syscall(__NR_gettid) };
 	return retval.ptr;
