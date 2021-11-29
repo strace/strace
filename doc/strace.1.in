@@ -859,6 +859,9 @@ can include the following elements:
 .TP 8
 .B path
 Print file paths.
+Also enables printing of tracee's current working directory when
+.B AT_FDCWD
+constant is used.
 .TQ
 .B socket
 Print socket protocol-specific information,
@@ -1140,7 +1143,9 @@ Output both the raw value and the decoded string (as a comment).
 .B \-\-decode\-fds
 .TQ
 .BR \-\-decode\-fds = path
-Print paths associated with file descriptor arguments.
+Print paths associated with file descriptor arguments and with the
+.B AT_FDCWD
+constant.
 .TP
 .B \-yy
 .TQ

@@ -7,6 +7,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented --decode-pids=comm option (and its alias -Y) for printing
     command names for PIDs.
   * Implemented --decode-pids=pidns as an alias to --pidns-translation option.
+  * Implemented printing of current working directory when AT_FDCWD constant
+    is used with --decode-fds=path option enabled.
   * Improved printing of syscall names in places where the associated
     AUDIT_ARCH_* value is present (ptrace PTRACE_GET_SYSCALL_INFO request,
     SIGSYS siginfo_t).
