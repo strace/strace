@@ -36,6 +36,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Bug fixes
   * Fixed printing of struct bpf_prog_info.map_ids array.
+  * Fixed behaviour of "dev", "pidfd", and "socket" arguments of the --print-fds
+    option to no longer imply the "path" argument.
 
 Noteworthy changes in release 5.14 (2021-09-02)
 ===============================================
