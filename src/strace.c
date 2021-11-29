@@ -1492,7 +1492,8 @@ exec_or_die(void)
 		alarm(3);
 		/* we depend on SIGCHLD set to SIG_DFL by init code */
 		/* if it happens to be SIG_IGN'ed, wait won't block */
-		wait(NULL);
+		while (wait(NULL) < 0 && errno == EINTR)
+			;
 		alarm(0);
 	}
 
