@@ -21,6 +21,11 @@
 
 # else /* !HAVE_STATIC_ASSERT && !HAVE__STATIC_ASSERT */
 
+/* Otherwise it is impossible to use the fallback inside functions. */
+#  if defined __GNUC__
+#   pragma GCC diagnostic ignored "-Wnested-externs"
+#  endif
+
 #  define static_assert(expr, message) \
 	extern int (*strace_static_assert(int))[sizeof(int[2 * !!(expr) - 1])]
 
