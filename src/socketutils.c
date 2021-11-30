@@ -504,10 +504,10 @@ get_sockaddr_by_inode_lookup(struct tcb *tcp, const unsigned long inode,
 			if (!protocols[i].get)
 				continue;
 			details = protocols[i].get(tcp, fd,
-						   protocols[proto].family,
-						   protocols[proto].proto,
+						   protocols[i].family,
+						   protocols[i].proto,
 						   inode,
-						   protocols[proto].name);
+						   protocols[i].name);
 			if (details)
 				break;
 		}
