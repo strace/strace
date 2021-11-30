@@ -431,6 +431,16 @@ ioctl_decode(struct tcb *tcp)
 	return 0;
 }
 
+/*
+ * Return true if the specified ioctl command may overlap.
+ */
+static bool
+ioctl_command_overlaps(unsigned int code)
+{
+	/* see <asm-generic/ioctls.h> and <linux/soundcard.h> */
+	return (0x5401 <= code && code <= 0x5408);
+}
+
 SYS_FUNC(ioctl)
 {
 	const struct_ioctlent *iop;
@@ -441,7 +451,8 @@ SYS_FUNC(ioctl)
 		struct finfo *finfo = NULL;
 		char path[PATH_MAX + 1];
 		bool deleted;
-		if (getfdpath_pid(tcp->pid, tcp->u_arg[0], path, sizeof(path),
+		if (ioctl_command_overlaps(tcp->u_arg[1]) &&
+		    getfdpath_pid(tcp->pid, tcp->u_arg[0], path, sizeof(path),
 				  &deleted) >= 0) {
 			finfo = get_finfo_for_dev(path, &finfoa);
 			finfo->deleted = deleted;
