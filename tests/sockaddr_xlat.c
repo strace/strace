@@ -610,7 +610,7 @@ check_ieee802154(void)
 		  XLAT_KNOWN_FMT("\"\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\"",
 				 "00:00:00:00:00:00:00:00") "}}" },
 		{ { AF_IEEE802154, { .addr_type = 4, .pan_id = 0xcafe,
-		    .short_addr = 0xfeed } },
+		    { .short_addr = 0xfeed } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x4" NRAW(" /* IEEE802154_ADDR_??? */")
 		  ", pan_id=0xcafe, hwaddr="
@@ -623,27 +623,30 @@ check_ieee802154(void)
 		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
 		  ", pan_id=0xfffe, short_addr=0}}" },
 		{ { AF_IEEE802154, { .addr_type = 2, .pan_id = 0xffff,
-		    .hwaddr = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff" } },
+		    { .hwaddr = "\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff" } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
 		  ", pan_id=0xffff" NRAW(" /* IEEE802154_PANID_BROADCAST */")
 		  ", short_addr=" BE_LE("0xf8f9", "0xf9f8") "}}" },
-		{ { AF_IEEE802154, { .addr_type = 2, .short_addr = 0xfffd } },
+		{ { AF_IEEE802154, { .addr_type = 2, .pan_id = 0,
+		    { .short_addr = 0xfffd } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
 		  ", pan_id=0, short_addr=0xfffd}}" },
-		{ { AF_IEEE802154, { .addr_type = 2, .short_addr = 0xfffe } },
+		{ { AF_IEEE802154, { .addr_type = 2, .pan_id = 0,
+		    { .short_addr = 0xfffe } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
 		  ", pan_id=0, short_addr=0xfffe"
 		  NRAW(" /* IEEE802154_ADDR_UNDEF */") "}}" },
-		{ { AF_IEEE802154, { .addr_type = 2, .short_addr = 0xffff } },
+		{ { AF_IEEE802154, { .addr_type = 2, .pan_id = 0,
+		    { .short_addr = 0xffff } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x2" NRAW(" /* IEEE802154_ADDR_SHORT */")
 		  ", pan_id=0, short_addr=0xffff"
 		  NRAW(" /* IEEE802154_ADDR_BROADCAST */") "}}" },
 		{ { AF_IEEE802154, { .addr_type = 3, .pan_id = 0xface,
-		    .short_addr = 0xdead } },
+		    { .short_addr = 0xdead } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x3" NRAW(" /* IEEE802154_ADDR_LONG */")
 		  ", pan_id=0xface, hwaddr="
@@ -651,7 +654,8 @@ check_ieee802154(void)
 				 "\\x00\\x00\\x00\\x00\\x00\\x00\"",
 				 BE_LE("de:ad", "ad:de") ":00:00:00:00:00:00")
 		  "}}" },
-		{ { AF_IEEE802154, { .addr_type = 3, .hwaddr = "Oh Hai!" } },
+		{ { AF_IEEE802154, { .addr_type = 3, .pan_id = 0,
+		    { .hwaddr = "Oh Hai!" } } },
 		  "{sa_family=" XLAT_KNOWN(0x24, "AF_IEEE802154")
 		  ", addr={addr_type=0x3" NRAW(" /* IEEE802154_ADDR_LONG */")
 		  ", pan_id=0, hwaddr="
