@@ -27,8 +27,13 @@
  * Starting with commit glibc-2.32.9000-147-ga16d2abd496bd974a882,
  * glibc skips semctl syscall invocations and returns EINVAL
  * for invalid semctl commands.
+ *
+ * Apparently, this change was later backported to vendor packages, e.g.:
+ * Thu Mar 18 2021 Carlos O'Donell <carlos@redhat.com> - 2.28-153
+ * - Support SEM_STAT_ANY via semctl. Return EINVAL for unknown commands
+ *   to semctl, msgctl, and shmctl. (#1912670)
  */
-#if GLIBC_PREREQ_GE(2, 32)
+#if GLIBC_PREREQ_GE(2, 28)
 # define TEST_SEMCTL_BOGUS_CMD 0
 #endif
 
