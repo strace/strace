@@ -34,8 +34,8 @@ static const size_t limit = 10;
  * DH_COMPUTE and I see no ability to pass this information without
  * significantly breaking interface.
  */
-bool nul_terminated_buf = true;
-bool buf_in_arg;
+static bool nul_terminated_buf = true;
+static bool buf_in_arg;
 
 /* From ioctl_dm.c */
 #define STR32 "AbCdEfGhIjKlMnOpQrStUvWxYz012345"
