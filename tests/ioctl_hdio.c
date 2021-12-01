@@ -229,14 +229,16 @@ main(int argc, char *argv[])
 /* HDIO compat has never been supported by the kernel.  */
 #ifndef MPERS_IS_m32
 
+	void *const efault = tail_alloc(1) + 1;
+
 	/* HDIO_DRIVE_RESET */
 	printf("ioctl(-1, %s, NULL) = %s\n",
 	       XLAT_STR(HDIO_DRIVE_RESET), errstr);
 	do_ioctl_ptr(HDIO_DRIVE_RESET, 0);
 
 	printf("ioctl(-1, %s, %p) = %s\n",
-	       XLAT_STR(HDIO_DRIVE_RESET), (void *) 0xdeadbeef, errstr);
-	do_ioctl(HDIO_DRIVE_RESET, 0xdeadbeef);
+	       XLAT_STR(HDIO_DRIVE_RESET), efault, errstr);
+	do_ioctl(HDIO_DRIVE_RESET, (uintptr_t) efault);
 
 	printf("ioctl(-1, %s, [%#x, %#x, %#x]) = %s\n",
 	       XLAT_STR(HDIO_DRIVE_RESET),
@@ -252,8 +254,8 @@ main(int argc, char *argv[])
 	do_ioctl_ptr(HDIO_SCAN_HWIF, 0);
 
 	printf("ioctl(-1, %s, %p) = %s\n",
-	       XLAT_STR(HDIO_SCAN_HWIF), (void *) 0xdeadbeef, errstr);
-	do_ioctl(HDIO_SCAN_HWIF, 0xdeadbeef);
+	       XLAT_STR(HDIO_SCAN_HWIF), efault, errstr);
+	do_ioctl(HDIO_SCAN_HWIF, (uintptr_t) efault);
 
 	printf("ioctl(-1, %s, [%#x, %#x, %#x]) = %s\n",
 	       XLAT_STR(HDIO_SCAN_HWIF),
