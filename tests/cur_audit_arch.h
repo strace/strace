@@ -1,6 +1,6 @@
 /*
  * Provides an AUDIT_ARCH_* constant for the current process in CUR_AUDIT_ARCH
- * macro for some arcitectures (where such a constant defined).
+ * macro for some architectures (where such a constant defined).
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>
  * All rights reserved.
