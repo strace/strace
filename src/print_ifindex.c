@@ -13,7 +13,7 @@
 
 # define INI_PFX "if_nametoindex(\""
 # define INI_SFX "\")"
-# define IFNAME_QUOTED_SZ (sizeof(IFNAMSIZ) * 4 + 3)
+# define IFNAME_QUOTED_SZ (IFNAMSIZ * 4 + 3)
 
 const char *
 get_ifname(const unsigned int ifindex)
