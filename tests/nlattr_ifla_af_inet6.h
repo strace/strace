@@ -8,9 +8,9 @@
  */
 
 #ifndef STRACE_TESTS_NLATTR_IFLA_AF_INET6
-#define STRACE_TESTS_NLATTR_IFLA_AF_INET6
+# define STRACE_TESTS_NLATTR_IFLA_AF_INET6
 
-#include "tests.h"
+# include "tests.h"
 
 static void
 print_arr_val(uint32_t *val, size_t idx, const char *idx_str)

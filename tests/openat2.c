@@ -45,9 +45,9 @@ main(void)
 {
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
-# ifdef YFLAG
+#ifdef YFLAG
 	char *cwd = get_fd_path(get_dir_fd("."));
-# endif
+#endif
 	long rc;
 	const char *rcstr;
 	struct open_how *how = tail_alloc(sizeof(*how));
