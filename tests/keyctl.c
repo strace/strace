@@ -21,6 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/uio.h>
+#include <sys/wait.h>
 #include <linux/keyctl.h>
 
 #include "xlat.h"
@@ -28,6 +29,8 @@
 #include "xlat/keyctl_caps1.h"
 
 static const size_t limit = 10;
+
+static pid_t pid;
 
 /*
  * Well, this is true for DESCRIBE and GET_SECURITY, and false for READ and
@@ -164,11 +167,11 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 	long rc = syscall(__NR_keyctl, cmd, args[0], args[1], args[2], args[3]);
 	const char *errstr = sprintrc(rc);
 #if XLAT_RAW
-	printf("keyctl(%#x", (unsigned) cmd);
+	printf("%-5u keyctl(%#x", pid, (unsigned) cmd);
 #elif XLAT_VERBOSE
-	printf("keyctl(%#x /* %s */", (unsigned) cmd, cmd_str);
+	printf("%-5u keyctl(%#x /* %s */", pid, (unsigned) cmd, cmd_str);
 #else
-	printf("keyctl(%s", cmd_str);
+	printf("%-5u keyctl(%s", pid, cmd_str);
 #endif
 	for (unsigned int i = 0; i < cnt; ++i) {
 		printf(", ");
@@ -302,6 +305,23 @@ kcpp_to_str(struct keyctl_pkey_params *params, bool out, const char *key_str,
 int
 main(void)
 {
+	pid = fork();
+	if (pid < 0)
+		perror_msg_and_fail("fork");
+	if (pid) {
+		int s;
+		pid_t rc;
+		while ((rc = waitpid(pid, &s, 0)) != pid) {
+			if (rc < 0 && errno == EINTR)
+				continue;
+			perror_msg_and_fail("waitpid: %d", pid);
+		}
+		printf("%-5u +++ exited with 0 +++\n", getpid());
+		return WIFEXITED(s) ? WEXITSTATUS(s)
+				    : (WIFSIGNALED(s) ? 128 + WTERMSIG(s) : 9);
+	}
+	pid = getpid();
+
 	enum { PR_LIMIT = 10, IOV_SIZE = 11, IOV_STR_SIZE = 4096 };
 
 	static const char *kulong_fmt =
@@ -1275,7 +1295,7 @@ main(void)
 	const kernel_ulong_t bad_len = (kernel_ulong_t) 0xbadc0ded00000001LLU;
 	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps1, bad_len);
 	errstr = sprintrc(rc);
-	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	printf("%-5u keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ", pid);
 	if (rc >= 0) {
 		printf("[");
 		if (rc >= 1)
@@ -1288,7 +1308,7 @@ main(void)
 
 	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps1, 2);
 	errstr = sprintrc(rc);
-	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	printf("%-5u keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ", pid);
 	if (rc >= 0) {
 		printf("[");
 		if (rc == 1)
@@ -1301,7 +1321,7 @@ main(void)
 
 	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps2, 2);
 	errstr = sprintrc(rc);
-	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	printf("%-5u keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ", pid);
 	if (rc >= 0) {
 		printf("[");
 		if (rc >= 1)
@@ -1318,7 +1338,7 @@ main(void)
 
 	rc = syscall(__NR_keyctl, KEYCTL_CAPABILITIES, caps4, 4);
 	errstr = sprintrc(rc);
-	printf("keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ");
+	printf("%-5u keyctl(" XSTR(0x1f, "KEYCTL_CAPABILITIES") ", ", pid);
 	if (rc >= 0) {
 		printf("[");
 		if (rc >= 1)
@@ -1337,7 +1357,7 @@ main(void)
 	}
 	printf(", 4) = %s\n", errstr);
 
-	puts("+++ exited with 0 +++");
+	printf("%-5u +++ exited with 0 +++\n", pid);
 
 	return 0;
 }

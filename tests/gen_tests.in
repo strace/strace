@@ -400,10 +400,10 @@ kernel_version-Xraw	-a16 -Xraw -v -e trace=bpf
 kernel_version-Xverbose	-a16 -Xverbose -v -e trace=bpf
 kexec_file_load	-s9
 kexec_load	-s9
-keyctl	-a31 -s10
-keyctl-Xabbrev	-a31 -s10 -e trace=keyctl -Xabbrev
-keyctl-Xraw	-a13 -s10 -e trace=keyctl -Xraw
-keyctl-Xverbose	-a41 -s10 -e trace=keyctl -Xverbose
+keyctl	-a31 -s10 -f --signal='!chld'
+keyctl-Xabbrev	-a31 -s10 -f --signal='!chld' -e trace=keyctl -Xabbrev
+keyctl-Xraw	-a13 -s10 -f --signal='!chld' -e trace=keyctl -Xraw
+keyctl-Xverbose	-a41 -s10 -f --signal='!chld' -e trace=keyctl -Xverbose
 kill	-a12 -esignal=none
 kill--pidns-translation	test_pidns -a12 -e trace=kill -esignal=none
 ksysent	../$NAME
