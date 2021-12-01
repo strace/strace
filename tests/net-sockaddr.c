@@ -290,6 +290,7 @@ check_ipx(void)
 	unsigned int len = sizeof(c_ipx);
 
 	for (size_t i = 0; i < 2; i++) {
+		ipx->sipx_zero = i ? 0x42 : 0;
 		int ret = connect(-1, (void *) ipx, len);
 		pidns_print_leader();
 		printf("connect(-1, {sa_family=AF_IPX, sipx_port=htons(%u)"
@@ -302,8 +303,6 @@ check_ipx(void)
 		       c_ipx.sipx_node[4], c_ipx.sipx_node[5],
 		       c_ipx.sipx_type, i ? ", sipx_zero=0x42" : "",
 		       len, ret);
-
-		ipx->sipx_zero = 0x42;
 	}
 }
 #endif /* HAVE_LINUX_IPX_H || defined HAVE_NETIPX_IPX_H */
