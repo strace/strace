@@ -575,15 +575,12 @@ upoken(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 		return (unsigned int) r;
 	}
 	switch (errno) {
-		case ENOSYS:
-		case EPERM:
+		case ENOSYS: case EPERM: /* could not use process_vm_writev */
+		case EFAULT: case EIO: /* address space is inaccessible */
 			/* try PTRACE_POKEDATA */
 			return upoken_pokedata(pid, addr, len, our_addr);
 		case ESRCH:
 			/* the process is gone */
-			return 0;
-		case EFAULT: case EIO:
-			/* address space is inaccessible */
 			return 0;
 		default:
 			/* all the rest is strange and should be reported */
