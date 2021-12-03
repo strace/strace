@@ -421,6 +421,7 @@ static const struct {
 	int proto;
 } protocols[] = {
 	[SOCK_PROTO_UNIX]	= { "UNIX",	unix_get,	AF_UNIX},
+	[SOCK_PROTO_UNIX_STREAM]= { "UNIX-STREAM", unix_get,	AF_UNIX},
 	/*
 	 * inet_diag handlers are currently implemented only for TCP,
 	 * UDP(lite), SCTP, RAW, and DCCP, but we try to resolve it for all
