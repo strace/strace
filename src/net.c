@@ -726,6 +726,145 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 }
 
 static void
+print_tcp_info(struct tcb *const tcp, const kernel_ulong_t addr,
+	       unsigned int len)
+{
+	struct tcp_info ti;
+
+	if (len > sizeof(ti))
+		len = sizeof(ti);
+
+	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      ti, tcpi_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+	tprint_struct_end();
+
+static void
+print_tcpct(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
+{
+	struct  tcp_cookie_transactions {
+		uint16_t tcpct_flags;                    /* see above */
+		uint8_t  __tcpct_pad1;                   /* zero */
+		uint8_t  tcpct_cookie_desired;           /* bytes */
+		uint16_t tcpct_s_data_desired;           /* bytes of variable data */
+		uint16_t tcpct_used;                     /* bytes in value */
+		uint8_t  tcpct_value[TCP_MSS_DEFAULT /* 536 */];
+	} tct;
+
+	if (len > sizeof(tct))
+		len = sizeof(tct);
+
+	if (umoven_or_printaddr(tcp, addr, len, &tct))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      tct, tcpct_flags, len, PRINT_FIELD_U);
+	if (tct.__tcpct_pad1) {
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+				      tct, __tcpct_pad1, len, PRINT_FIELD_U);
+	}
+	tprint_struct_end();
+}
+
+static void
+print_tcp_cc_info(struct tcb *const tcp, const kernel_ulong_t addr,
+		  unsigned int len)
+{
+	struct tcp_info ti;
+
+	if (len > sizeof(ti))
+		len = sizeof(ti);
+
+	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      ti, tcpi_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+	tprint_struct_end();
+}
+
+static void
+print_tcp_saved_syn(struct tcb *const tcp, const kernel_ulong_t addr,
+		    unsigned int len)
+{
+	struct tcp_info ti;
+
+	if (len > sizeof(ti))
+		len = sizeof(ti);
+
+	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      ti, tcpi_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+	tprint_struct_end();
+}
+
+static void
+print_tcp_repair_window(struct tcb *const tcp, const kernel_ulong_t addr,
+			unsigned int len)
+{
+	struct tcp_info ti;
+
+	if (len > sizeof(ti))
+		len = sizeof(ti);
+
+	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      ti, tcpi_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+	tprint_struct_end();
+}
+
+static void
+print_tcp_fastopen_key(struct tcb *const tcp, const kernel_ulong_t addr,
+		       unsigned int len)
+{
+	struct tcp_info ti;
+
+	if (len > sizeof(ti))
+		len = sizeof(ti);
+
+	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      ti, tcpi_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+	tprint_struct_end();
+}
+
+static void
+print_tcp_zc(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
+{
+	struct tcp_info ti;
+
+	if (len > sizeof(ti))
+		len = sizeof(ti);
+
+	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      ti, tcpi_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+	tprint_struct_end();
+}
+
+static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
 {
@@ -818,6 +957,77 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		}
 		break;
 
+	case SOL_TCP:
+		switch (name) {
+		case TCP_INFO:
+			print_tcp_info(tcp, addr, rlen);
+			return;
+
+		/* Removed in Linux commit v3.10-rc1~66^2~439 */
+		case TCP_COOKIE_TRANSACTIONS:
+			print_tcpct(tcp, addr, rlen)
+			return;
+
+		case TCP_CC_INFO:
+			print_tcp_cc_info(tcp, addr, rlen);
+			return;
+
+		case TCP_SAVED_SYN:
+			print_tcp_saved_syn(tcp, addr, rlen);
+			return;
+
+		case TCP_REPAIR_WINDOW:
+			print_tcp_repair_window(tcp, addr, rlen);
+			return;
+
+		case TCP_ULP:
+			printstrn(tcp, addr, rlen);
+			return;
+
+		case TCP_FASTOPEN_KEY:
+			print_tcp_fastopen_key(tcp, addr, rlen);
+			return;
+
+		case TCP_ZEROCOPY_RECEIVE:
+			print_tcp_zc(tcp, addr, rlen);
+			return;
+
+		/* Return int */
+		case TCP_NODELAY:
+		case TCP_MAXSEG:
+		case TCP_CORK:
+		case TCP_KEEPIDLE:
+		case TCP_KEEPINTVL:
+		case TCP_KEEPCNT:
+		case TCP_SYNCNT:
+		case TCP_LINGER2:
+		case TCP_DEFER_ACCEPT:
+		case TCP_WINDOW_CLAMP:
+		case TCP_QUICKACK:
+		case TCP_CONGESTION:
+		/* setsockopt only: TCP_MD5SIG */
+		case TCP_THIN_LINEAR_TIMEOUTS:
+		case TCP_THIN_DUPACK:
+		case TCP_USER_TIMEOUT:
+		case TCP_REPAIR:
+		case TCP_REPAIR_QUEUE:
+		case TCP_QUEUE_SEQ:
+		/* setsockopt only: TCP_REPAIR_OPTIONS */
+		case TCP_FASTOPEN:
+		case TCP_TIMESTAMP:
+		case TCP_NOTSENT_LOWAT:
+		case TCP_SAVE_SYN:
+		case TCP_FASTOPEN_CONNECT:
+		/* setsockopt only: TCP_MD5SIG */
+		/* setsockopt only: TCP_FASTOPEN_KEY */
+		case TCP_FASTOPEN_NO_COOKIE:
+		case TCP_INQ:
+		case TCP_TX_DELAY:
+		default:
+			break
+		}
+		break;
+
 	case SOL_PACKET:
 		switch (name) {
 		case PACKET_STATISTICS:
@@ -886,9 +1096,9 @@ SYS_FUNC(getsockopt)
 			return RVAL_DECODED;
 		}
 	} else {
-		ulen = get_tcb_priv_ulong(tcp);
+		rlen = ulen = get_tcb_priv_ulong(tcp);
 
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &rlen) < 0) {
+		if (umove(tcp, tcp->u_arg[4], &rlen) < 0 || syserror(tcp)) {
 			/* optval */
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
@@ -896,6 +1106,12 @@ SYS_FUNC(getsockopt)
 			/* optlen */
 			tprint_indirect_begin();
 			PRINT_VAL_D(ulen);
+			if ((unsigned int) tcp->u_arg[1] == SOL_TCP
+			    && (unsigned int) tcp->u_arg[2] == TCP_SAVED_SYN
+			    && ulen != rlen) {
+				tprint_value_changed();
+				PRINT_VAL_D(rlen);
+			}
 			tprint_indirect_end();
 		} else {
 			/* optval */
