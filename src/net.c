@@ -725,7 +725,6 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_indirect_end();
 }
 
-#ifdef PACKET_STATISTICS
 static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
@@ -752,7 +751,6 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 			      stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
 	tprint_struct_end();
 }
-#endif /* PACKET_STATISTICS */
 
 #include "xlat/icmpfilterflags.h"
 
@@ -822,11 +820,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 
 	case SOL_PACKET:
 		switch (name) {
-#ifdef PACKET_STATISTICS
 		case PACKET_STATISTICS:
 			print_tpacket_stats(tcp, addr, rlen);
 			return;
-#endif
 		}
 		break;
 
