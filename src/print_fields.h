@@ -500,6 +500,13 @@ tprints_arg_begin(const char *name)
 				    QUOTE_FORCE_HEX); \
 	} while (0)
 
+# define PRINT_FIELD_HEX_ARRAY_UPTO(where_, field_, upto_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_quoted_string((const char *)(where_).field_,	\
+				    (upto_), QUOTE_FORCE_HEX);		\
+	} while (0)
+
 # define PRINT_FIELD_INET_ADDR(where_, field_, af_)			\
 	print_inet_addr((af_), &(where_).field_,			\
 			sizeof((where_).field_), #field_)
