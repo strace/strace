@@ -520,6 +520,7 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_kcm_options.h"
 #include "xlat/sock_tls_options.h"
 #include "xlat/sock_xdp_options.h"
+#include "xlat/sock_mptcp_options.h"
 
 #define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
 			len_, print_func_, ...)				\
@@ -651,6 +652,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_XDP:
 		printxval(sock_xdp_options, name, "XDP_???");
+		break;
+	case SOL_MPTCP:
+		printxval(sock_xdp_options, name, "MPTCP_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
@@ -1058,6 +1062,15 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			break;
 		}
 		return;
+
+	case SOL_MPTCP:
+		switch (name) {
+		case MPTCP_INFO:
+			
+		case MPTCP_TCPINFO:
+		case MPTCP_SUBFLOW_ADDRS:
+		}
+		break;
 	}
 
 	/* default arg printing */
