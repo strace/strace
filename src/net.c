@@ -719,7 +719,7 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 	unsigned int err;
 
 	if (len > sizeof(err))
-		err = sizeof(err);
+		len = sizeof(err);
 
 	if (umoven_or_printaddr(tcp, addr, len, &err))
 		return;
