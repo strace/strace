@@ -306,6 +306,21 @@ decode_inet_diag_meminfo(struct tcb *const tcp,
 	return true;
 }
 
+void
+print_tcpvegas_info(struct tcb *tcp, const struct tcpvegas_info *const vegas,
+		    const unsigned int len)
+{
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      *vegas, tcpv_enabled, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *vegas, tcpv_rttcnt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *vegas, tcpv_rtt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *vegas, tcpv_minrtt, len, PRINT_FIELD_U);
+	tprint_struct_end();
+}
+
 static bool
 decode_tcpvegas_info(struct tcb *const tcp,
 		     const kernel_ulong_t addr,
@@ -319,17 +334,26 @@ decode_tcpvegas_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &vegas))
 		return true;
 
-	tprint_struct_begin();
-	PRINT_FIELD_U(vegas, tcpv_enabled);
-	tprint_struct_next();
-	PRINT_FIELD_U(vegas, tcpv_rttcnt);
-	tprint_struct_next();
-	PRINT_FIELD_U(vegas, tcpv_rtt);
-	tprint_struct_next();
-	PRINT_FIELD_U(vegas, tcpv_minrtt);
-	tprint_struct_end();
+	print_tcpvegas_info(tcp, &vegas, len);
 
 	return true;
+}
+
+void
+print_tcp_dctcp_info(struct tcb *tcp, const struct tcp_dctcp_info *const dctcp,
+		     const unsigned int len)
+{
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      *dctcp, dctcp_enabled, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *dctcp, dctcp_ce_state, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *dctcp, dctcp_alpha, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *dctcp, dctcp_ab_ecn, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *dctcp, dctcp_ab_tot, len, PRINT_FIELD_U);
+	tprint_struct_end();
 }
 
 static bool
@@ -345,19 +369,26 @@ decode_tcp_dctcp_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &dctcp))
 		return true;
 
-	tprint_struct_begin();
-	PRINT_FIELD_U(dctcp, dctcp_enabled);
-	tprint_struct_next();
-	PRINT_FIELD_U(dctcp, dctcp_ce_state);
-	tprint_struct_next();
-	PRINT_FIELD_U(dctcp, dctcp_alpha);
-	tprint_struct_next();
-	PRINT_FIELD_U(dctcp, dctcp_ab_ecn);
-	tprint_struct_next();
-	PRINT_FIELD_U(dctcp, dctcp_ab_tot);
-	tprint_struct_end();
+	print_tcp_dctcp_info(tcp, &dctcp, len);
 
 	return true;
+}
+
+void
+print_tcp_bbr_info(struct tcb *tcp, const struct tcp_bbr_info *const bbr,
+		   const unsigned int len)
+{
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      *bbr, bbr_bw_lo, len, PRINT_FIELD_X);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *bbr, bbr_bw_hi, len, PRINT_FIELD_X);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *bbr, bbr_min_rtt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *bbr, bbr_pacing_gain, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      *bbr, bbr_cwnd_gain, len, PRINT_FIELD_U);
+	tprint_struct_end();
 }
 
 static bool
@@ -373,17 +404,7 @@ decode_tcp_bbr_info(struct tcb *const tcp,
 	if (umove_or_printaddr(tcp, addr, &bbr))
 		return true;
 
-	tprint_struct_begin();
-	PRINT_FIELD_X(bbr, bbr_bw_lo);
-	tprint_struct_next();
-	PRINT_FIELD_X(bbr, bbr_bw_hi);
-	tprint_struct_next();
-	PRINT_FIELD_U(bbr, bbr_min_rtt);
-	tprint_struct_next();
-	PRINT_FIELD_U(bbr, bbr_pacing_gain);
-	tprint_struct_next();
-	PRINT_FIELD_U(bbr, bbr_cwnd_gain);
-	tprint_struct_end();
+	print_tcp_bbr_info(tcp, &bbr, len);
 
 	return true;
 }

@@ -1338,6 +1338,18 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr);
 extern const char *get_ifname(const unsigned int ifindex);
 extern void print_ifindex(unsigned int);
 
+struct tcpvegas_info;
+extern void print_tcpvegas_info(struct tcb *tcp,
+				const struct tcpvegas_info *vegas,
+				unsigned int len);
+struct tcp_dctcp_info;
+extern void print_tcp_dctcp_info(struct tcb *tcp,
+				 const struct tcp_dctcp_info *dctcp,
+				 unsigned int len);
+struct tcp_bbr_info;
+extern void print_tcp_bbr_info(struct tcb *tcp, const struct tcp_bbr_info *bbr,
+			       unsigned int len);
+
 extern void print_bpf_filter_code(const uint16_t code, bool extended);
 
 /**
