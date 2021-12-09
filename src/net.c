@@ -898,16 +898,13 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 #include "xlat/icmpfilterflags.h"
 
 static void
-print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
+print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr,
+		  unsigned int len)
 {
 	struct icmp_filter filter = {};
 
-	if (len > (int) sizeof(filter))
+	if (len > sizeof(filter))
 		len = sizeof(filter);
-	else if (len <= 0) {
-		printaddr(addr);
-		return;
-	}
 
 	if (umoven_or_printaddr(tcp, addr, len, &filter))
 		return;
