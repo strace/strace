@@ -759,7 +759,7 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 static void
 print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 {
-	struct icmp_filter filter = {};
+	struct icmp_filter filter = { ~0U };
 
 	if (len > (int) sizeof(filter))
 		len = sizeof(filter);
