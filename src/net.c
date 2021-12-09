@@ -29,6 +29,9 @@
 #include <net/if.h>
 #include <asm/types.h>
 
+#include <linux/sock_diag.h>
+#include <linux/inet_diag.h>
+
 #include <linux/ip_vs.h>
 #include "netlink.h"
 #if defined(HAVE_LINUX_NETFILTER_ARP_ARP_TABLES_H)
@@ -71,6 +74,12 @@
 #include "xlat/nfc_protocols.h"
 #include "xlat/kcm_protocols.h"
 #include "xlat/smc_protocols.h"
+
+#include "xlat/sockopt_tcpct_flags.h"
+#include "xlat/tcp_ca_states.h"
+#include "xlat/tcp_info_options.h"
+#include "xlat/tcp_repair_vals.h"
+
 
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
@@ -714,52 +723,299 @@ static void
 print_tcp_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	       unsigned int len)
 {
-	struct tcp_info ti;
+	struct tcp_info {
+		uint8_t  tcpi_state;
+		uint8_t  tcpi_ca_state;
+		uint8_t  tcpi_retransmits;
+		uint8_t  tcpi_probes;
+		uint8_t  tcpi_backoff;
+		uint8_t  tcpi_options;
+		uint8_t  tcpi_snd_wscale : 4,
+		         tcpi_rcv_wscale : 4;
+		uint8_t  tcpi_delivery_rate_app_limited:1,
+		         tcpi_fastopen_client_fail:2
+			 __unused:5;
 
-	if (len > sizeof(ti))
-		len = sizeof(ti);
+		uint32_t tcpi_rto;
+		uint32_t tcpi_ato;
+		uint32_t tcpi_snd_mss;
+		uint32_t tcpi_rcv_mss;
 
-	if (umoven_or_printaddr(tcp, addr, len, &ti))
+		uint32_t tcpi_unacked;
+		uint32_t tcpi_sacked;
+		uint32_t tcpi_lost;
+		uint32_t tcpi_retrans;
+		uint32_t tcpi_fackets;
+
+		uint32_t tcpi_last_data_sent;
+		uint32_t tcpi_last_ack_sent;
+		uint32_t tcpi_last_data_recv;
+		uint32_t tcpi_last_ack_recv;
+
+		uint32_t tcpi_pmtu;
+		uint32_t tcpi_rcv_ssthresh;
+		uint32_t tcpi_rtt;
+		uint32_t tcpi_rttvar;
+		uint32_t tcpi_snd_ssthresh;
+		uint32_t tcpi_snd_cwnd;
+		uint32_t tcpi_advmss;
+		uint32_t tcpi_reordering;
+
+		uint32_t tcpi_rcv_rtt;
+		uint32_t tcpi_rcv_space;
+
+		uint32_t tcpi_total_retrans;
+
+		uint64_t tcpi_pacing_rate;
+		uint64_t tcpi_max_pacing_rate;
+		uint64_t tcpi_bytes_acked;
+		uint64_t tcpi_bytes_received;
+		uint32_t tcpi_segs_out;
+		uint32_t tcpi_segs_in;
+
+		uint32_t tcpi_notsent_bytes;
+		uint32_t tcpi_min_rtt;
+		uint32_t tcpi_data_segs_in;
+		uint32_t tcpi_data_segs_out;
+
+		uint64_t tcpi_delivery_rate;
+
+		uint64_t tcpi_busy_time;
+		uint64_t tcpi_rwnd_limited;
+		uint64_t tcpi_sndbuf_limited;
+
+		uint32_t tcpi_delivered;
+		uint32_t tcpi_delivered_ce;
+
+		uint64_t tcpi_bytes_sent;
+		uint64_t tcpi_bytes_retrans;
+		uint32_t tcpi_dsack_dups;
+		uint32_t tcpi_reord_seen;
+
+		uint32_t tcpi_rcv_ooopack;
+
+		uint32_t tcpi_snd_wnd;
+	} ti;
+
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(ti)), &ti))
 		return;
 
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      ti, tcpi_state, len, PRINT_FIELD_U);
+			      ti, tcpi_state, len, PRINT_FIELD_XVAL,
+			      tcp_states, "TCP_???");
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+			      ti, tcpi_ca_state, len, PRINT_FIELD_XVAL,
+			      tcp_ca_states, "TCP_CA_???");
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_retransmits, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_probes, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_backoff, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_options, len, PRINT_FIELD_FLAGS,
+			      tcp_ca_states, "TCPI_OPT_???");
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_snd_wscale, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_wscale, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_wscale, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_delivery_rate_app_limited, len,
+			      PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_fastopen_client_fail, len,
+			      PRINT_FIELD_U);
+	if (ti.__unused)
+		tprintf_commend("bits 3..7: %#x", ti.__unused);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rto, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_ato, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_snd_mss, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_mss, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_unacked, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_sacked, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_lost, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_retrans, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_fackets, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_last_data_sent, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_last_ack_sent, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_last_data_recv, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_last_ack_recv, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_pmtu, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_ssthresh, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rtt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rttvar, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_snd_ssthresh, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_snd_cwnd, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_advmss, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_reordering, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_rtt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_space, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_total_retrans, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_pacing_rate, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_max_pacing_rate, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_bytes_acked, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_bytes_received, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_segs_out, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_segs_in, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_notsent_bytes, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_min_rtt, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_data_segs_in, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_data_segs_out, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_delivery_rate, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_busy_time, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rwnd_limited, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_sndbuf_limited, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_delivered, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_delivered_ce, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_bytes_sent, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_bytes_retrans, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_dsack_dups, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_reord_seen, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_rcv_ooopack, len, PRINT_FIELD_U);
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      ti, tcpi_snd_wnd, len, PRINT_FIELD_U);
+
+	if (len > sizeof(ti)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(ti),
+				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
+	}
+
 	tprint_struct_end();
+}
 
 static void
 print_tcpct(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
 {
-	struct  tcp_cookie_transactions {
+	struct tcp_cookie_transactions {
 		uint16_t tcpct_flags;                    /* see above */
 		uint8_t  __tcpct_pad1;                   /* zero */
 		uint8_t  tcpct_cookie_desired;           /* bytes */
 		uint16_t tcpct_s_data_desired;           /* bytes of variable data */
 		uint16_t tcpct_used;                     /* bytes in value */
-		uint8_t  tcpct_value[TCP_MSS_DEFAULT /* 536 */];
+		uint8_t  tcpct_value[536 /* TCP_MSS_DEFAULT */];
 	} tct;
 
-	if (len > sizeof(tct))
-		len = sizeof(tct);
+	/*
+	 * [gs]etsockopt(TCP_COOKIE_TRANSACTIONS) returned -EINVAL
+	 * if optlen < sizeof(struct tcp_cookie_transactions), so we can
+	 * opt out of trying to decode partial structure as well
+	 * (that also means no need for MAYBE_PRINT_FIELD_LEN).
+	 */
+	if (len < sizeof(tct)) {
+		printaddr(addr);
+		return;
+	}
 
-	if (umoven_or_printaddr(tcp, addr, len, &tct))
+	if (umove_or_printaddr(tcp, addr, &tct))
 		return;
 
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      tct, tcpct_flags, len, PRINT_FIELD_U);
+	tprint_struct_begin();
+	PRINT_FIELD_FLAGS_VERBOSE(tct, tcpct_flags, sockopt_tcpct_flags,
+				  "TCP_COOKIE_???");
 	if (tct.__tcpct_pad1) {
-		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-				      tct, __tcpct_pad1, len, PRINT_FIELD_U);
+		tprint_struct_next();
+		PRINT_FIELD_X(tct, __tcpct_pad1);
+	}
+	tprint_struct_next();
+	PRINT_FIELD_U(tct, tcpct_cookie_desired);
+	tprint_struct_next();
+	PRINT_FIELD_U(tct, tcpct_s_data_desired);
+	tprint_struct_next();
+	PRINT_FIELD_U(tct, tcpct_used);
+	tprint_struct_next();
+	PRINT_FIELD_HEX_ARRAY_UPTO(tct, tcpct_value,
+				   MIN(tct.tcpct_used, sizeof(tcpct_value)));
+	if (len > sizeof(tct)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(tct),
+				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	}
 	tprint_struct_end();
+}
+
+static void
+print_tcp_repair(struct tcb *const tcp, const kernel_ulong_t addr,
+		 unsigned int len)
+{
+	int repair;
+
+	if (len > sizeof(repair))
+		len = sizeof(repair);
+
+	if (umoven_or_printaddr(tcp, addr, len, &err))
+		return;
+
+	tprint_indirect_begin();
+	printxval_d(tcp_repair_vals, repair, "TCP_REPAIR_???");
+	tprint_indirect_end();
 }
 
 static void
 print_tcp_cc_info(struct tcb *const tcp, const kernel_ulong_t addr,
 		  unsigned int len)
 {
-	struct tcp_info ti;
+	union tcp_cc_info tci;
 
 	if (len > sizeof(ti))
 		len = sizeof(ti);
@@ -767,74 +1023,70 @@ print_tcp_cc_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &ti))
 		return;
 
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      ti, tcpi_state, len, PRINT_FIELD_U);
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
-	tprint_struct_end();
-}
+	/*
+	 * We have no idea what is the actual congestion algorithm used so far
+	 * (TODO: it is possible to get it via inet_diag
+	 * (idiag_ext |= 1<<INET_DIAG_CONG should do the trick), but the current
+	 * API is unsuitable for performing such a request, and also we need
+	 * to pass over socket fd through here), so we decode all the union
+	 * members.
+	 */
 
-static void
-print_tcp_saved_syn(struct tcb *const tcp, const kernel_ulong_t addr,
-		    unsigned int len)
-{
-	struct tcp_info ti;
-
-	if (len > sizeof(ti))
-		len = sizeof(ti);
-
-	if (umoven_or_printaddr(tcp, addr, len, &ti))
-		return;
-
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      ti, tcpi_state, len, PRINT_FIELD_U);
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
-	tprint_struct_end();
+	tprint_union_begin();
+	PRINT_FIELD_OBJ_TCB_PTR(tci, vegas, tcp, print_tcpvegas_info, len);
+	tprint_union_next();
+	PRINT_FIELD_OBJ_TCB_PTR(tci, dctcp, tcp, print_tcp_dctcp_info, len);
+	tprint_union_next();
+	PRINT_FIELD_OBJ_TCB_PTR(tci, bbr, tcp, print_tcp_bbr_info, len);
+	tprint_union_end();
 }
 
 static void
 print_tcp_repair_window(struct tcb *const tcp, const kernel_ulong_t addr,
 			unsigned int len)
 {
-	struct tcp_info ti;
+	struct tcp_repair_window trw;
 
-	if (len > sizeof(ti))
-		len = sizeof(ti);
+	if (len > sizeof(trw))
+		len = sizeof(trw);
 
-	if (umoven_or_printaddr(tcp, addr, len, &ti))
+	if (umoven_or_printaddr(tcp, addr, len, &trw))
 		return;
 
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      ti, tcpi_state, len, PRINT_FIELD_U);
+			      trw, snd_wl1, len, PRINT_FIELD_U);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
-	tprint_struct_end();
-}
-
-static void
-print_tcp_fastopen_key(struct tcb *const tcp, const kernel_ulong_t addr,
-		       unsigned int len)
-{
-	struct tcp_info ti;
-
-	if (len > sizeof(ti))
-		len = sizeof(ti);
-
-	if (umoven_or_printaddr(tcp, addr, len, &ti))
-		return;
-
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      ti, tcpi_state, len, PRINT_FIELD_U);
+			      trw, snd_wnd, len, PRINT_FIELD_U);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+			      trw, max_window, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      trw, rcv_wnd, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      trw, rcv_wup, len, PRINT_FIELD_U);
+	if (len > sizeof(trw)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(trw),
+				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
+	}
 	tprint_struct_end();
 }
 
 static void
 print_tcp_zc(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
 {
-	struct tcp_info ti;
+	struct tcp_zerocopy_receive {
+		uint64_t address;		/* in: address of mapping */
+		uint32_t length;		/* in/out: number of bytes to map/mapped */
+		uint32_t recv_skip_hint;	/* out: amount of bytes to skip */
+		uint32_t inq; /* out: amount of bytes in read queue */
+		int32_t  err; /* out: socket error */
+		uint64_t copybuf_address;	/* in: copybuf address (small reads) */
+		int32_t  copybuf_len; /* in/out: copybuf bytes avail/used or error */
+		uint32_t flags; /* in: flags */
+		uint64_t msg_control; /* ancillary data */
+		uint64_t msg_controllen;
+		uint32_t msg_flags;
+		uint32_t reserved; 
+	} tzc;
 
 	if (len > sizeof(ti))
 		len = sizeof(ti);
@@ -950,12 +1202,16 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			print_tcpct(tcp, addr, rlen)
 			return;
 
+		case TCP_REPAIR:
+			print_tcp_repair(tcp, addr, rlen);
+			return;
+
 		case TCP_CC_INFO:
 			print_tcp_cc_info(tcp, addr, rlen);
 			return;
 
 		case TCP_SAVED_SYN:
-			print_tcp_saved_syn(tcp, addr, rlen);
+			printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
 			return;
 
 		case TCP_REPAIR_WINDOW:
@@ -967,7 +1223,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 
 		case TCP_FASTOPEN_KEY:
-			print_tcp_fastopen_key(tcp, addr, rlen);
+			printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
 			return;
 
 		case TCP_ZEROCOPY_RECEIVE:
@@ -991,7 +1247,6 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case TCP_THIN_LINEAR_TIMEOUTS:
 		case TCP_THIN_DUPACK:
 		case TCP_USER_TIMEOUT:
-		case TCP_REPAIR:
 		case TCP_REPAIR_QUEUE:
 		case TCP_QUEUE_SEQ:
 		/* setsockopt only: TCP_REPAIR_OPTIONS */
@@ -1073,9 +1328,13 @@ SYS_FUNC(getsockopt)
 					    tcp->u_arg[1], tcp->u_arg[2], true);
 		tprint_arg_next();
 
-		if (verbose(tcp) && tcp->u_arg[4]
-		    && umove(tcp, tcp->u_arg[4], &ulen) == 0) {
+		if (verbose(tcp) && tcp->u_arg[4] && umove(tcp, tcp->u_arg[4], &ulen) == 0) {
 			set_tcb_priv_ulong(tcp, ulen);
+
+			/* optval; so far, only SOL_TCP/ */
+			if (level == SOL_TCP && optname == TCP_ZEROCOPY_RECEIVE)
+				print_tcp_zc(tcp, optval, ulen);
+
 			return 0;
 		} else {
 			/* optval */
@@ -1097,8 +1356,7 @@ SYS_FUNC(getsockopt)
 			/* optlen */
 			tprint_indirect_begin();
 			PRINT_VAL_D(ulen);
-			if ((unsigned int) tcp->u_arg[1] == SOL_TCP
-			    && (unsigned int) tcp->u_arg[2] == TCP_SAVED_SYN
+			if (level == SOL_TCP && optname == TCP_SAVED_SYN
 			    && ulen != rlen) {
 				tprint_value_changed();
 				PRINT_VAL_D(rlen);

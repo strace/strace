@@ -1,0 +1,6 @@
+#value_indexed
+TCP_CA_Open	0
+TCP_CA_Disorder	1
+TCP_CA_CWR	2
+TCP_CA_Recovery	3
+TCP_CA_Loss	4
