@@ -13,131 +13,7 @@
 
 # ifdef IN_STRACE
 
-static inline void
-tprint_struct_begin(void)
-{
-	tprints("{");
-}
-
-static inline void
-tprint_struct_next(void)
-{
-	tprints(", ");
-}
-
-static inline void
-tprint_struct_end(void)
-{
-	tprints("}");
-}
-
-static inline void
-tprint_array_begin(void)
-{
-	tprints("[");
-}
-
-static inline void
-tprint_array_next(void)
-{
-	tprints(", ");
-}
-
-static inline void
-tprint_array_end(void)
-{
-	tprints("]");
-}
-
-static inline void
-tprint_array_index_begin(void)
-{
-	tprints("[");
-}
-
-static inline void
-tprint_array_index_end(void)
-{
-	tprints("] = ");
-}
-
-static inline void
-tprint_arg_next(void)
-{
-	tprints(", ");
-}
-
-static inline void
-tprint_arg_end(void)
-{
-	tprints(")");
-}
-
-static inline void
-tprint_bitset_begin(void)
-{
-	tprints("[");
-}
-
-static inline void
-tprint_bitset_next(void)
-{
-	tprints(" ");
-}
-
-static inline void
-tprint_bitset_end(void)
-{
-	tprints("]");
-}
-
-static inline void
-tprint_comment_begin(void)
-{
-	tprints(" /* ");
-}
-
-static inline void
-tprint_comment_end(void)
-{
-	tprints(" */");
-}
-
-static inline void
-tprint_indirect_begin(void)
-{
-	tprints("[");
-}
-
-static inline void
-tprint_indirect_end(void)
-{
-	tprints("]");
-}
-
-static inline void
-tprint_more_data_follows(void)
-{
-	tprints("...");
-}
-
-static inline void
-tprint_value_changed(void)
-{
-	tprints(" => ");
-}
-
-static inline void
-tprint_alternative_value(void)
-{
-	tprints(" or ");
-}
-
-static inline void
-tprint_unavailable(void)
-{
-	tprints("???");
-}
+#  define STRACE_PRINTS(s_) tprints(s_)
 
 /*
  * The printf-like function to use in header files
@@ -149,131 +25,7 @@ tprint_unavailable(void)
 
 #  include <stdio.h>
 
-static inline void
-tprint_struct_begin(void)
-{
-	fputs("{", stdout);
-}
-
-static inline void
-tprint_struct_next(void)
-{
-	fputs(", ", stdout);
-}
-
-static inline void
-tprint_struct_end(void)
-{
-	fputs("}", stdout);
-}
-
-static inline void
-tprint_array_begin(void)
-{
-	fputs("[", stdout);
-}
-
-static inline void
-tprint_array_next(void)
-{
-	fputs(", ", stdout);
-}
-
-static inline void
-tprint_array_end(void)
-{
-	fputs("]", stdout);
-}
-
-static inline void
-tprint_array_index_begin(void)
-{
-	fputs("[", stdout);
-}
-
-static inline void
-tprint_array_index_end(void)
-{
-	fputs("] = ", stdout);
-}
-
-static inline void
-tprint_arg_next(void)
-{
-	fputs(", ", stdout);
-}
-
-static inline void
-tprint_arg_end(void)
-{
-	fputs(")", stdout);
-}
-
-static inline void
-tprint_bitset_begin(void)
-{
-	fputs("[", stdout);
-}
-
-static inline void
-tprint_bitset_next(void)
-{
-	fputs(" ", stdout);
-}
-
-static inline void
-tprint_bitset_end(void)
-{
-	fputs("]", stdout);
-}
-
-static inline void
-tprint_comment_begin(void)
-{
-	fputs(" /* ", stdout);
-}
-
-static inline void
-tprint_comment_end(void)
-{
-	fputs(" */", stdout);
-}
-
-static inline void
-tprint_indirect_begin(void)
-{
-	fputs("[", stdout);
-}
-
-static inline void
-tprint_indirect_end(void)
-{
-	fputs("]", stdout);
-}
-
-static inline void
-tprint_more_data_follows(void)
-{
-	fputs("...", stdout);
-}
-
-static inline void
-tprint_value_changed(void)
-{
-	fputs(" => ", stdout);
-}
-
-static inline void
-tprint_alternative_value(void)
-{
-	fputs(" or ", stdout);
-}
-
-static inline void
-tprint_unavailable(void)
-{
-	fputs("???", stdout);
-}
+#  define STRACE_PRINTS(s_) fputs((s_), stdout)
 
 /*
  * The printf-like function to use in header files
@@ -282,6 +34,133 @@ tprint_unavailable(void)
 #  define STRACE_PRINTF printf
 
 # endif /* !IN_STRACE */
+
+
+static inline void
+tprint_struct_begin(void)
+{
+	STRACE_PRINTS("{");
+}
+
+static inline void
+tprint_struct_next(void)
+{
+	STRACE_PRINTS(", ");
+}
+
+static inline void
+tprint_struct_end(void)
+{
+	STRACE_PRINTS("}");
+}
+
+static inline void
+tprint_array_begin(void)
+{
+	STRACE_PRINTS("[");
+}
+
+static inline void
+tprint_array_next(void)
+{
+	STRACE_PRINTS(", ");
+}
+
+static inline void
+tprint_array_end(void)
+{
+	STRACE_PRINTS("]");
+}
+
+static inline void
+tprint_array_index_begin(void)
+{
+	STRACE_PRINTS("[");
+}
+
+static inline void
+tprint_array_index_end(void)
+{
+	STRACE_PRINTS("] = ");
+}
+
+static inline void
+tprint_arg_next(void)
+{
+	STRACE_PRINTS(", ");
+}
+
+static inline void
+tprint_arg_end(void)
+{
+	STRACE_PRINTS(")");
+}
+
+static inline void
+tprint_bitset_begin(void)
+{
+	STRACE_PRINTS("[");
+}
+
+static inline void
+tprint_bitset_next(void)
+{
+	STRACE_PRINTS(" ");
+}
+
+static inline void
+tprint_bitset_end(void)
+{
+	STRACE_PRINTS("]");
+}
+
+static inline void
+tprint_comment_begin(void)
+{
+	STRACE_PRINTS(" /* ");
+}
+
+static inline void
+tprint_comment_end(void)
+{
+	STRACE_PRINTS(" */");
+}
+
+static inline void
+tprint_indirect_begin(void)
+{
+	STRACE_PRINTS("[");
+}
+
+static inline void
+tprint_indirect_end(void)
+{
+	STRACE_PRINTS("]");
+}
+
+static inline void
+tprint_more_data_follows(void)
+{
+	STRACE_PRINTS("...");
+}
+
+static inline void
+tprint_value_changed(void)
+{
+	STRACE_PRINTS(" => ");
+}
+
+static inline void
+tprint_alternative_value(void)
+{
+	STRACE_PRINTS(" or ");
+}
+
+static inline void
+tprint_unavailable(void)
+{
+	STRACE_PRINTS("???");
+}
 
 static inline void
 tprints_field_name(const char *name)
