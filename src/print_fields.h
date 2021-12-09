@@ -567,8 +567,8 @@ tprints_arg_begin(const char *name)
 		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
 			tprint_comment_begin();				\
 		if (nr_prefix_)						\
-			tprints(nr_prefix_);				\
-		tprints(name);						\
+			STRACE_PRINTS(nr_prefix_);			\
+		STRACE_PRINTS(name);					\
 		if (!nr_prefix_ ||					\
 		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
 			tprint_comment_end();				\
