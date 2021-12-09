@@ -521,25 +521,6 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_tls_options.h"
 #include "xlat/sock_xdp_options.h"
 
-#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
-			len_, print_func_, ...)				\
-	do {								\
-		unsigned int start = offsetof(typeof(where_), field_);	\
-		unsigned int end = start + sizeof(where_.field_);	\
-		if (len_ > start) {					\
-			print_prefix_;					\
-			if (len_ >= end) {				\
-				print_func_(where_, field_,		\
-					    ##__VA_ARGS__);		\
-			} else {					\
-				tprints_field_name(#field_);		\
-				print_quoted_string(			\
-					(void *)&where_.field_,		\
-					len_ - start, QUOTE_FORCE_HEX);	\
-			}						\
-		}							\
-	} while (0)
-
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 			    unsigned int name, bool is_getsockopt)

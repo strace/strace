@@ -625,6 +625,7 @@ tprints_arg_begin(const char *name)
 			       (size_), (hwtype_));			\
 	} while (0)
 
+
 # define PRINT_FIELD_OBJ_PTR(where_, field_, print_func_, ...)		\
 	do {								\
 		tprints_field_name(#field_);				\
@@ -657,6 +658,26 @@ tprints_arg_begin(const char *name)
 	do {								\
 		tprints_field_name(#field_);				\
 		(print_func_)((tcp_), (where_).field_, ##__VA_ARGS__);	\
+	} while (0)
+
+
+#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
+			len_, print_func_, ...)				\
+	do {								\
+		unsigned int start = offsetof(typeof(where_), field_);	\
+		unsigned int end = start + sizeof((where_).field_);	\
+		if (len_ > start) {					\
+			print_prefix_;					\
+			if (len_ >= end) {				\
+				print_func_((where_), field_,		\
+					    ##__VA_ARGS__);		\
+			} else {					\
+				tprints_field_name(#field_);		\
+				print_quoted_string(			\
+					(void *)&(where_).field_,	\
+					len_ - start, QUOTE_FORCE_HEX);	\
+			}						\
+		}							\
 	} while (0)
 
 #endif /* !STRACE_PRINT_FIELDS_H */
