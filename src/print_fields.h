@@ -55,6 +55,24 @@ tprint_struct_end(void)
 }
 
 static inline void
+tprint_union_begin(void)
+{
+	STRACE_PRINTS("{");
+}
+
+static inline void
+tprint_union_next(void)
+{
+	STRACE_PRINTS(", ");
+}
+
+static inline void
+tprint_union_end(void)
+{
+	STRACE_PRINTS("}");
+}
+
+static inline void
 tprint_array_begin(void)
 {
 	STRACE_PRINTS("[");
