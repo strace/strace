@@ -1142,9 +1142,12 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (umoven_or_printaddr(tcp, addr, len, &filter))
 		return;
 
+	tprint_struct_begin();
+	tprints_field_name("data");
 	tprints("~(");
 	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
 	tprints(")");
+	tprint_struct_end();
 }
 
 static void
