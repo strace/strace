@@ -901,7 +901,7 @@ static void
 print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr,
 		  unsigned int len)
 {
-	struct icmp_filter filter = {};
+	struct icmp_filter filter = { ~0U };
 
 	if (len > sizeof(filter))
 		len = sizeof(filter);
