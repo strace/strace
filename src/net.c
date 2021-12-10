@@ -1317,14 +1317,19 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 
 SYS_FUNC(getsockopt)
 {
-	int ulen, rlen;
+	const int fd = tcp->u_arg[0];
+	const int level = tcp->u_arg[1];
+	const int optname = tcp->u_arg[2];
+	const kernel_ulong_t optval = tcp->u_arg[3];
+	const kernel_ulong_t optlen = tcp->u_arg[4];
+	int ulen;
+	int rlen;
 
 	if (entering(tcp)) {
-		print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
-					    tcp->u_arg[1], tcp->u_arg[2], true);
+		print_sockopt_fd_level_name(tcp, fd, level, optname, true);
 		tprint_arg_next();
 
-		if (verbose(tcp) && tcp->u_arg[4] && umove(tcp, tcp->u_arg[4], &ulen) == 0) {
+		if (verbose(tcp) && optlen && umove(tcp, optlen, &ulen) == 0) {
 			set_tcb_priv_ulong(tcp, ulen);
 
 			/* optval; so far, only SOL_TCP/ */
@@ -1334,19 +1339,19 @@ SYS_FUNC(getsockopt)
 			return 0;
 		} else {
 			/* optval */
-			printaddr(tcp->u_arg[3]);
+			printaddr(optval);
 			tprint_arg_next();
 
 			/* optlen */
-			printaddr(tcp->u_arg[4]);
+			printaddr(optlen);
 			return RVAL_DECODED;
 		}
 	} else {
 		rlen = ulen = get_tcb_priv_ulong(tcp);
 
-		if (umove(tcp, tcp->u_arg[4], &rlen) < 0 || syserror(tcp)) {
+		if (umove(tcp, optlen, &rlen) < 0 || syserror(tcp)) {
 			/* optval */
-			printaddr(tcp->u_arg[3]);
+			printaddr(optval);
 			tprint_arg_next();
 
 			/* optlen */
@@ -1360,8 +1365,8 @@ SYS_FUNC(getsockopt)
 			tprint_indirect_end();
 		} else {
 			/* optval */
-			print_getsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
-					 tcp->u_arg[3], ulen, rlen);
+			print_getsockopt(tcp, level, optname, optval,
+					 ulen, rlen);
 			tprint_arg_next();
 
 			/* optlen */
@@ -1593,17 +1598,21 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 
 SYS_FUNC(setsockopt)
 {
-	print_sockopt_fd_level_name(tcp, tcp->u_arg[0],
-				    tcp->u_arg[1], tcp->u_arg[2], false);
+	const int fd = tcp->u_arg[0];
+	const int level = tcp->u_arg[1];
+	const int optname = tcp->u_arg[2];
+	const kernel_ulong_t optval = tcp->u_arg[3];
+	const int optlen = tcp->u_arg[4];
+
+	print_sockopt_fd_level_name(tcp, fd, level, optname, false);
 	tprint_arg_next();
 
 	/* optval */
-	print_setsockopt(tcp, tcp->u_arg[1], tcp->u_arg[2],
-			 tcp->u_arg[3], tcp->u_arg[4]);
+	print_setsockopt(tcp, level, optname, optval, optlen);
 	tprint_arg_next();
 
 	/* optlen */
-	PRINT_VAL_D((int) tcp->u_arg[4]);
+	PRINT_VAL_D(optlen);
 
 	return RVAL_DECODED;
 }
