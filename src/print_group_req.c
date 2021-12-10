@@ -8,16 +8,10 @@
 #include "defs.h"
 #include <netinet/in.h>
 
-#ifdef MCAST_JOIN_GROUP
-
 # include DEF_MPERS_TYPE(struct_group_req)
 typedef struct group_req struct_group_req;
 
-#endif /* MCAST_JOIN_GROUP */
-
 #include MPERS_DEFS
-
-#ifdef MCAST_JOIN_GROUP
 
 MPERS_PRINTER_DECL(void, print_group_req, struct tcb *const tcp,
 		   const kernel_ulong_t addr, const int len)
@@ -34,5 +28,3 @@ MPERS_PRINTER_DECL(void, print_group_req, struct tcb *const tcp,
 		tprint_struct_end();
 	}
 }
-
-#endif /* MCAST_JOIN_GROUP */
