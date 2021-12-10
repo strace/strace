@@ -79,6 +79,8 @@
 #include "xlat/tcp_ca_states.h"
 #include "xlat/tcp_info_options.h"
 #include "xlat/tcp_repair_vals.h"
+#include "xlat/tcp_zerocopy_flags.h"
+#include "xlat/tcp_zerocopy_msg_flags.h"
 
 
 static void
@@ -1065,35 +1067,76 @@ print_tcp_repair_window(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_end();
 }
 
-static void
+static long
 print_tcp_zc(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
 {
 	struct tcp_zerocopy_receive {
-		uint64_t address;		/* in: address of mapping */
-		uint32_t length;		/* in/out: number of bytes to map/mapped */
-		uint32_t recv_skip_hint;	/* out: amount of bytes to skip */
-		uint32_t inq; /* out: amount of bytes in read queue */
-		int32_t  err; /* out: socket error */
-		uint64_t copybuf_address;	/* in: copybuf address (small reads) */
-		int32_t  copybuf_len; /* in/out: copybuf bytes avail/used or error */
-		uint32_t flags; /* in: flags */
-		uint64_t msg_control; /* ancillary data */
-		uint64_t msg_controllen;
-		uint32_t msg_flags;
-		uint32_t reserved; 
+		uint64_t address;		/* in     */
+		uint32_t length;		/* in/out */
+		uint32_t recv_skip_hint;	/*    out */
+		uint32_t inq;			/*    out */
+		int32_t  err;			/*    out */
+		uint64_t copybuf_address;	/* in     */
+		int32_t  copybuf_len;		/* in/out */
+		uint32_t flags;			/* in     */
+		uint64_t msg_control;		/* in/out */
+		uint64_t msg_controllen;	/* in/out */
+		uint32_t msg_flags;		/* in/out */
+		uint32_t reserved;
 	} tzc;
 
-	if (len > sizeof(ti))
-		len = sizeof(ti);
+	if (umoven(tcp, addr, MIN(len, sizeof(tzc)), &tzc))
+		return RVAL_DECODED;
 
-	if (umoven_or_printaddr(tcp, addr, len, &ti))
-		return;
+	if (exiting(tcp))
+		tprint_value_changed();
 
-	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
-			      ti, tcpi_state, len, PRINT_FIELD_U);
+	if (entering(tcp)) {
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+				      tzc, address, len, PRINT_FIELD_ADDR64);
+	}
+	MAYBE_PRINT_FIELD_LEN(entering(tcp) ? tprint_struct_next()
+					    : tprint_struct_begin(),
+			      tzc, length, len, PRINT_FIELD_X);
+	if (exiting(tcp)) {
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+				      tzc, recv_skip_hint, len, PRINT_FIELD_U);
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+				      tzc, inq, len, PRINT_FIELD_U);
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+				      tzc, err, len, PRINT_FIELD_ERR_D);
+	}
+	if (entering(tcp)) {
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+				      tzc, copybuf_addr, len,
+				      PRINT_FIELD_ADDR64);
+	}
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
-			      ti, tcpi_ca_state, len, PRINT_FIELD_U);
+			      tzc, copybuf_len, len, PRINT_FIELD_X);
+	if (entering(tcp)) {
+		MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+				      tzc, flags, len, PRINT_FIELD_FLAGS,
+				      tcp_zerocopy_flags,
+				      "TCP_RECEIVE_ZEROCOPY_FLAG_???");
+	}
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      tzc, msg_control, len, PRINT_FIELD_OBJ_TCB_PTR,
+			      tcp, decode_msg_control, tzc.msg_controllen);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      tzc, msg_controllen, len, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      tzc, msg_flags, len, PRINT_FIELD_FLAGS_VERBOSE,
+			      tcp_zerocopy_msg_flags, "TCP_CMSG_???");
+	if (tzc.reserved) {
+		PRINT_FIELD_X(tzc, reserved);
+	}
+	if (len > sizeof(tzc)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(tzc),
+				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
+	}
 	tprint_struct_end();
+
+	return 0;
 }
 
 static void
@@ -1251,13 +1294,13 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case TCP_NOTSENT_LOWAT:
 		case TCP_SAVE_SYN:
 		case TCP_FASTOPEN_CONNECT:
-		/* setsockopt only: TCP_MD5SIG */
+		/* setsockopt only: TCP_MD5SIG_EXT */
 		/* setsockopt only: TCP_FASTOPEN_KEY */
 		case TCP_FASTOPEN_NO_COOKIE:
 		case TCP_INQ:
 		case TCP_TX_DELAY:
 		default:
-			break
+			break;
 		}
 		break;
 
@@ -1326,26 +1369,34 @@ SYS_FUNC(getsockopt)
 	int rlen;
 
 	if (entering(tcp)) {
+		long ret = RVAL_DECODED;
+
 		print_sockopt_fd_level_name(tcp, fd, level, optname, true);
 		tprint_arg_next();
 
 		if (verbose(tcp) && optlen && umove(tcp, optlen, &ulen) == 0) {
+			ret = 0;
+
 			set_tcb_priv_ulong(tcp, ulen);
 
-			/* optval; so far, only SOL_TCP/ */
+			/*
+			 * optval: so far, only TCP_ZEROCOPY_RECEIVE is RW,
+			 *         the rest is saner and only returns data.
+			 */
 			if (level == SOL_TCP && optname == TCP_ZEROCOPY_RECEIVE)
-				print_tcp_zc(tcp, optval, ulen);
+				ret = print_tcp_zc(tcp, optval, ulen);
+		}
 
-			return 0;
-		} else {
+		if (ret) {
 			/* optval */
 			printaddr(optval);
 			tprint_arg_next();
 
 			/* optlen */
 			printaddr(optlen);
-			return RVAL_DECODED;
 		}
+
+		return RVAL_DECODED;
 	} else {
 		rlen = ulen = get_tcb_priv_ulong(tcp);
 
