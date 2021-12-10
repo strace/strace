@@ -1046,12 +1046,10 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case IP_DROP_MEMBERSHIP:
 			print_mreq(tcp, addr, len);
 			return;
-#ifdef MCAST_JOIN_GROUP
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
 			return;
-#endif /* MCAST_JOIN_GROUP */
 		}
 		break;
 
@@ -1069,12 +1067,10 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 			print_mreq6(tcp, addr, len);
 			return;
 #endif /* IPV6_ADD_MEMBERSHIP */
-#ifdef MCAST_JOIN_GROUP
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
 			return;
-#endif /* MCAST_JOIN_GROUP */
 		}
 		break;
 
