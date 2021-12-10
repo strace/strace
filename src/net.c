@@ -950,7 +950,6 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-#ifdef IPV6_ADD_MEMBERSHIP
 static void
 print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 	    const int len)
@@ -967,7 +966,6 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_end();
 	}
 }
-#endif /* IPV6_ADD_MEMBERSHIP */
 
 #ifdef PACKET_RX_RING
 static void
@@ -1055,18 +1053,12 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 
 	case SOL_IPV6:
 		switch (name) {
-#ifdef IPV6_ADD_MEMBERSHIP
 		case IPV6_ADD_MEMBERSHIP:
 		case IPV6_DROP_MEMBERSHIP:
-# ifdef IPV6_JOIN_ANYCAST
 		case IPV6_JOIN_ANYCAST:
-# endif
-# ifdef IPV6_LEAVE_ANYCAST
 		case IPV6_LEAVE_ANYCAST:
-# endif
 			print_mreq6(tcp, addr, len);
 			return;
-#endif /* IPV6_ADD_MEMBERSHIP */
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
