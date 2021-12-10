@@ -933,7 +933,6 @@ print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-#ifdef IP_ADD_MEMBERSHIP
 static void
 print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 	   const int len)
@@ -950,7 +949,6 @@ print_mreq(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_end();
 	}
 }
-#endif /* IP_ADD_MEMBERSHIP */
 
 #ifdef IPV6_ADD_MEMBERSHIP
 static void
@@ -1044,12 +1042,10 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 
 	case SOL_IP:
 		switch (name) {
-#ifdef IP_ADD_MEMBERSHIP
 		case IP_ADD_MEMBERSHIP:
 		case IP_DROP_MEMBERSHIP:
 			print_mreq(tcp, addr, len);
 			return;
-#endif /* IP_ADD_MEMBERSHIP */
 #ifdef MCAST_JOIN_GROUP
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
