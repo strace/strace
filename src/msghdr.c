@@ -288,7 +288,7 @@ get_optmem_max(struct tcb *tcp)
 	return optmem_max;
 }
 
-static void
+void
 decode_msg_control(struct tcb *const tcp, const kernel_ulong_t addr,
 		   const kernel_ulong_t in_control_len)
 {

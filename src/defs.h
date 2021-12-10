@@ -1249,6 +1249,9 @@ extern void print_dirfd(struct tcb *, int);
 extern int
 decode_sockaddr(struct tcb *, kernel_ulong_t addr, int addrlen);
 
+extern void decode_msg_control(struct tcb *const tcp, kernel_ulong_t addr,
+			       kernel_ulong_t in_control_len);
+
 extern void printuid(const unsigned int);
 
 extern void
