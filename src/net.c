@@ -660,19 +660,18 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct linger linger;
 
-	/*
-	 * The kernel cannot return len > sizeof(linger) because struct linger
-	 * cannot change, but extra safety won't harm either.
-	 */
-	if (len > sizeof(linger))
-		len = sizeof(linger);
-	if (umoven_or_printaddr(tcp, addr, len, &linger))
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(linger)), &linger))
 		return;
 
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
 			      linger, l_onoff, len, PRINT_FIELD_D);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      linger, l_linger, len, PRINT_FIELD_D);
+	if (len > sizeof(linger)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr,
+				    sizeof(linger), MIN(linger, get_pagesize()),
+				    QUOTE_FORCE_HEX);
+	}
 	tprint_struct_end();
 }
 
@@ -682,15 +681,7 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct ucred uc;
 
-	/*
-	 * The kernel is very unlikely to return len > sizeof(uc)
-	 * because struct ucred is very unlikely to change,
-	 * but extra safety won't harm either.
-	 */
-	if (len > sizeof(uc))
-		len = sizeof(uc);
-
-	if (umoven_or_printaddr(tcp, addr, len, &uc))
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(uc)), &uc))
 		return;
 
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
@@ -699,6 +690,10 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 			      uc, uid, len, PRINT_FIELD_ID);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      uc, gid, len, PRINT_FIELD_ID);
+	if (len > sizeof(uc)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(uc),
+				    MIN(uc, get_pagesize()), QUOTE_FORCE_HEX);
+	}
 	tprint_struct_end();
 }
 
@@ -1109,14 +1104,7 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		unsigned int tp_packets, tp_drops, tp_freeze_q_cnt;
 	} stats;
 
-	/*
-	 * The kernel may return len > sizeof(stats) if the kernel structure
-	 * grew as it happened when tpacket_stats_v3 was introduced.
-	 */
-	if (len > sizeof(stats))
-		len = sizeof(stats);
-
-	if (umoven_or_printaddr(tcp, addr, len, &stats))
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(stats)), &stats))
 		return;
 
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
@@ -1125,6 +1113,11 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 			      stats, tp_drops, len, PRINT_FIELD_U);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
+	if (len > sizeof(stats)) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr,
+				    sizeof(stats), MIN(stats, get_pagesize()),
+				    QUOTE_FORCE_HEX);
+	}
 	tprint_struct_end();
 }
 
