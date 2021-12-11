@@ -967,7 +967,6 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
-#ifdef PACKET_RX_RING
 static void
 print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
@@ -988,7 +987,6 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 		tprint_struct_end();
 	}
 }
-#endif /* PACKET_RX_RING */
 
 #ifdef PACKET_ADD_MEMBERSHIP
 # include "xlat/packet_mreq_type.h"
@@ -1068,14 +1066,10 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 
 	case SOL_PACKET:
 		switch (name) {
-#ifdef PACKET_RX_RING
 		case PACKET_RX_RING:
-# ifdef PACKET_TX_RING
 		case PACKET_TX_RING:
-# endif
 			print_tpacket_req(tcp, addr, len);
 			return;
-#endif /* PACKET_RX_RING */
 #ifdef PACKET_ADD_MEMBERSHIP
 		case PACKET_ADD_MEMBERSHIP:
 		case PACKET_DROP_MEMBERSHIP:
