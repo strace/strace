@@ -988,8 +988,7 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 	}
 }
 
-#ifdef PACKET_ADD_MEMBERSHIP
-# include "xlat/packet_mreq_type.h"
+#include "xlat/packet_mreq_type.h"
 
 static void
 print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
@@ -1012,7 +1011,6 @@ print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 		tprint_struct_end();
 	}
 }
-#endif /* PACKET_ADD_MEMBERSHIP */
 
 static void
 print_setsockopt(struct tcb *const tcp, const unsigned int level,
@@ -1070,12 +1068,10 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case PACKET_TX_RING:
 			print_tpacket_req(tcp, addr, len);
 			return;
-#ifdef PACKET_ADD_MEMBERSHIP
 		case PACKET_ADD_MEMBERSHIP:
 		case PACKET_DROP_MEMBERSHIP:
 			print_packet_mreq(tcp, addr, len);
 			return;
-#endif /* PACKET_ADD_MEMBERSHIP */
 		}
 		break;
 
