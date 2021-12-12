@@ -82,6 +82,8 @@
 #include "xlat/tcp_zerocopy_flags.h"
 #include "xlat/tcp_zerocopy_msg_flags.h"
 
+#include "xlat/sock_packet_tpacket_req_features.h"
+
 
 static void
 decode_sockbuf(struct tcb *const tcp, const int fd, const kernel_ulong_t addr,
@@ -1486,22 +1488,41 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 static void
 print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
-	struct tpacket_req req;
+	struct tpacket_req3 {
+		uint32_t tp_block_size;
+		uint32_t tp_block_nr;
+		uint32_t tp_frame_size;
+		uint32_t tp_frame_nr;
+		uint32_t tp_retire_blk_tov;
+		uint32_t tp_sizeof_priv;
+		uint32_t tp_feature_req_word;
+	} req;
 
-	if (len != sizeof(req) ||
-	    umove(tcp, addr, &req) < 0) {
+	if (!(len >= sizeof(req) || len != sizeof(struct tpacket_req)) ||
+	    umoven(tcp, addr, MIN(len, sizeof(req)), &req) < 0) {
 		printaddr(addr);
-	} else {
-		tprint_struct_begin();
-		PRINT_FIELD_U(req, tp_block_size);
-		tprint_struct_next();
-		PRINT_FIELD_U(req, tp_block_nr);
-		tprint_struct_next();
-		PRINT_FIELD_U(req, tp_frame_size);
-		tprint_struct_next();
-		PRINT_FIELD_U(req, tp_frame_nr);
-		tprint_struct_end();
+		return;
 	}
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(req, tp_block_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(req, tp_block_nr);
+	tprint_struct_next();
+	PRINT_FIELD_U(req, tp_frame_size);
+	tprint_struct_next();
+	PRINT_FIELD_U(req, tp_frame_nr);
+	if (len > sizeof(struct tcpacket_req)) {
+		tprint_struct_next();
+		PRINT_FIELD_U(req, tp_retire_blk_tov);
+		tprint_struct_next();
+		PRINT_FIELD_U(req, tp_sizeof_priv);
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(req, tp_feature_req_word,
+				  sock_packet_tpacket_req_features,
+				  "TP_FT_REQ_???");
+	}
+	tprint_struct_end();
 }
 
 #include "xlat/packet_mreq_type.h"
