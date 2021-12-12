@@ -1439,15 +1439,14 @@ print_set_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct linger linger;
 
-	if (len < (int) sizeof(linger)) {
-		printaddr(addr);
-	} else if (!umove_or_printaddr(tcp, addr, &linger)) {
-		tprint_struct_begin();
-		PRINT_FIELD_D(linger, l_onoff);
-		tprint_struct_next();
-		PRINT_FIELD_D(linger, l_linger);
-		tprint_struct_end();
-	}
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(linger)), &linger))
+		return;
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      linger, l_onoff, PRINT_FIELD_D);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      linger, l_linger, PRINT_FIELD_D);
+	tprint_struct_end();
 }
 
 static void
