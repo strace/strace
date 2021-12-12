@@ -1509,23 +1509,30 @@ print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int le
 static void
 print_packet_mreq(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
-	struct packet_mreq mreq;
+	struct packet_mreq_max {
+		int		mr_ifindex;
+		unsigned short	mr_type;
+		unsigned short	mr_alen;
+		unsigned char	mr_address[MAX_ADDR_LEN];
+	} mreq;
 
-	if (len != sizeof(mreq) ||
-	    umove(tcp, addr, &mreq) < 0) {
+	if (len < sizeof(struct packet_mreq) ||
+	    umoven(tcp, addr, MIN(len, sizeof(mreq)), &mreq) < 0) {
 		printaddr(addr);
-	} else {
-		tprint_struct_begin();
-		PRINT_FIELD_IFINDEX(mreq, mr_ifindex);
-		tprint_struct_next();
-		PRINT_FIELD_XVAL(mreq, mr_type, packet_mreq_type,
-				 "PACKET_MR_???");
-		tprint_struct_next();
-		PRINT_FIELD_U(mreq, mr_alen);
-		tprint_struct_next();
-		PRINT_FIELD_MAC_SZ(mreq, mr_address, mreq.mr_alen);
-		tprint_struct_end();
+		return;
 	}
+
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
+			      mreq, mr_ifindex, PRINT_FIELD_IFINDEX);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      mreq, mr_type, PRINT_FIELD_XVAL,
+			      packet_mreq_type, "PACKET_MR_???");
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      mreq, mr_alen, PRINT_FIELD_U);
+	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
+			      mreq, mr_address, PRINT_FIELD_MAC_SZ,
+			      MIN(mreq.mr_alen, sizeof(mreq.mr_alen)));
+	tprint_struct_end();
 }
 
 static void
