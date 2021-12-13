@@ -362,6 +362,8 @@ ioctl_decode(struct tcb *tcp)
 		return perf_ioctl(tcp, code, arg);
 	case '=': /* 0x3d */
 		return ptp_ioctl(tcp, code, arg);
+	case '>': /* 0x3e */
+		return counter_ioctl(tcp, code, arg);
 	case 'E':
 		return evdev_ioctl(tcp, code, arg);
 	case 'I':

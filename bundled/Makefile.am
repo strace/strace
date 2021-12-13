@@ -28,6 +28,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/btrfs_tree.h \
 	linux/include/uapi/linux/close_range.h \
 	linux/include/uapi/linux/const.h \
+	linux/include/uapi/linux/counter.h \
 	linux/include/uapi/linux/cryptouser.h \
 	linux/include/uapi/linux/dcbnl.h \
 	linux/include/uapi/linux/dm-ioctl.h \
