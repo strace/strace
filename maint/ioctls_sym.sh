@@ -105,6 +105,7 @@ process_file()
 	# Common code for every processed file.
 	cat > "$tmpdir"/printents.c <<-__EOF__
 		#include <linux/compiler_attributes.h>
+		#undef __alloc_size__
 		#include <asm/termbits.h>
 		#include <asm/ioctl.h>
 		#include <linux/types.h>
