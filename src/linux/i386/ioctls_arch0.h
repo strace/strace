@@ -18,6 +18,7 @@
 { "asm/sgx.h", "SGX_IOC_ENCLAVE_CREATE", _IOC_WRITE, 0xa400, 0x08 },
 { "asm/sgx.h", "SGX_IOC_ENCLAVE_INIT", _IOC_WRITE, 0xa402, 0x08 },
 { "asm/sgx.h", "SGX_IOC_ENCLAVE_PROVISION", _IOC_WRITE, 0xa403, 0x08 },
+{ "asm/sgx.h", "SGX_IOC_VEPC_REMOVE_ALL", _IOC_NONE, 0xa404, 0x00 },
 { "linux/kvm.h", "KVM_ASSIGN_DEV_IRQ", _IOC_WRITE, 0xae70, 0x40 },
 { "linux/kvm.h", "KVM_ASSIGN_PCI_DEVICE", _IOC_READ, 0xae69, 0x40 },
 { "linux/kvm.h", "KVM_ASSIGN_SET_INTX_MASK", _IOC_WRITE, 0xaea4, 0x40 },
