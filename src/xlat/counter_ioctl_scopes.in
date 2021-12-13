@@ -1,0 +1,6 @@
+#enum
+#value_indexed
+#unconditional
+COUNTER_SCOPE_DEVICE	0
+COUNTER_SCOPE_SIGNAL	1
+COUNTER_SCOPE_COUNT	2

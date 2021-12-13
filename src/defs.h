@@ -1353,6 +1353,7 @@ extern int								\
 name ## _ioctl(struct tcb *, unsigned int request, kernel_ulong_t arg)	\
 /* End of DECL_IOCTL definition. */
 
+DECL_IOCTL(counter);
 DECL_IOCTL(dm);
 DECL_IOCTL(evdev);
 DECL_IOCTL(fs_0x94);

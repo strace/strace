@@ -252,6 +252,10 @@ io_uring_setup	-a26 -y
 ioctl_block	+ioctl.test
 ioctl_dm	+ioctl.test -s9
 ioctl_dm-v	+ioctl.test -v -s9
+ioctl_counter	+ioctl.test -a39
+ioctl_counter-Xabbrev	+ioctl.test -a39 -Xabbrev
+ioctl_counter-Xraw	+ioctl.test -a18 -Xraw
+ioctl_counter-Xverbose	+ioctl.test -a52 -Xverbose
 ioctl_evdev	+ioctl.test -a26
 ioctl_evdev-Xabbrev	+ioctl.test -a26 -Xabbrev
 ioctl_evdev-Xraw	+ioctl.test -a28 -Xraw

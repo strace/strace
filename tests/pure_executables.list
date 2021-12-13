@@ -171,6 +171,10 @@ io_uring_register-Xverbose
 io_uring_setup
 ioctl
 ioctl_block
+ioctl_counter
+ioctl_counter-Xabbrev
+ioctl_counter-Xraw
+ioctl_counter-Xverbose
 ioctl_dm
 ioctl_evdev
 ioctl_evdev-Xabbrev

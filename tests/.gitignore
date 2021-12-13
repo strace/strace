@@ -235,6 +235,10 @@ io_uring_setup
 ioctl
 ioctl_block
 ioctl_block--pidns-translation
+ioctl_counter
+ioctl_counter-Xabbrev
+ioctl_counter-Xraw
+ioctl_counter-Xverbose
 ioctl_dm
 ioctl_dm-v
 ioctl_evdev

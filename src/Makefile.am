@@ -81,6 +81,7 @@ libstrace_a_SOURCES =	\
 	close_range.c	\
 	copy_file_range.c \
 	count.c		\
+	counter_ioctl.c	\
 	defs.h		\
 	delay.c		\
 	delay.h		\

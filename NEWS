@@ -6,6 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added --tips option to print strace tips, tricks, and tweaks
     at the end of the tracing session.
   * Enhanced decoding of bpf and io_uring_register syscalls.
+  * Implemented decoding of COUNTER_* ioctl commands.
   * Updated lists of BPF_*, BR_*, BTRFS_*, IFA_*, IFLA_*, IORING_*, KEY_*,
     KVM_*, MADV_*, and UFFD_* constants.
   * Updated lists of ioctl commands from Linux 5.18.
