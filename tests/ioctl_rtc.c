@@ -23,6 +23,23 @@
 # define RTC_VL_CLR _IO ('p', 0x14)
 #endif
 
+#ifndef RTC_PARAM_GET
+struct rtc_param {
+	__u64 param;
+	union {
+		__u64 uvalue;
+		__s64 svalue;
+		__u64 ptr;
+	};
+	__u32 index;
+	__u32 __pad;
+};
+# define RTC_PARAM_GET _IOW('p', 0x13, struct rtc_param)
+#endif /* !TC_PARAM_GET */
+#ifndef RTC_PARAM_SET
+# define RTC_PARAM_SET _IOW('p', 0x14, struct rtc_param)
+#endif
+
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
 static const char *errstr;
@@ -281,6 +298,121 @@ main(int argc, const char *argv[])
 
 	do_ioctl(_IO(0x70, 0x40), lmagic);
 	printf("ioctl(-1, %s, %#lx) = %s\n", "NVRAM_INIT", lmagic, errstr);
+
+	static const struct strval32 param_cmds[] = {
+		{ ARG_STR(RTC_PARAM_GET) },
+		{ ARG_STR(RTC_PARAM_SET) },
+	};
+	static const struct {
+		struct rtc_param val;
+		const char *get_in;
+		const char *get_out;
+		const char *set;
+	} param_vecs[] = {
+		{ { 0 },
+		  "{param=RTC_PARAM_FEATURES, index=0}",
+		  "{uvalue=0}",
+		  "{param=RTC_PARAM_FEATURES, uvalue=0, index=0}" },
+		{ { .param = 0, .uvalue = (__u64) 0xdeadfacebeeffeedULL,
+		    .index= 0xfacecafe, .__pad = 0xbadc0ded },
+		  "{param=RTC_PARAM_FEATURES, index=4207856382"
+		  ", __pad=0xbadc0ded}",
+		  "{uvalue=1<<RTC_FEATURE_ALARM|1<<RTC_FEATURE_NEED_WEEK_DAY"
+		  "|1<<RTC_FEATURE_ALARM_RES_2S|1<<RTC_FEATURE_CORRECTION"
+		  "|1<<RTC_FEATURE_BACKUP_SWITCH_MODE"
+		  "|1<<RTC_FEATURE_ALARM_WAKEUP_ONLY|0xdeadfacebeeffe00"
+		  ", __pad=0xbadc0ded}",
+		  "{param=RTC_PARAM_FEATURES, uvalue=1<<RTC_FEATURE_ALARM"
+		  "|1<<RTC_FEATURE_NEED_WEEK_DAY|1<<RTC_FEATURE_ALARM_RES_2S"
+		  "|1<<RTC_FEATURE_CORRECTION|1<<RTC_FEATURE_BACKUP_SWITCH_MODE"
+		  "|1<<RTC_FEATURE_ALARM_WAKEUP_ONLY|0xdeadfacebeeffe00"
+		  ", index=4207856382, __pad=0xbadc0ded}" },
+		{ { .param = 0, .uvalue = 0xbeef00, .__pad = 1 },
+		  "{param=RTC_PARAM_FEATURES, index=0, __pad=0x1}",
+		  "{uvalue=0xbeef00 /* 1<<RTC_FEATURE_??? */, __pad=0x1}",
+		  "{param=RTC_PARAM_FEATURES"
+		  ", uvalue=0xbeef00 /* 1<<RTC_FEATURE_??? */, index=0"
+		  ", __pad=0x1}" },
+		{ { .param = 1 },
+		  "{param=RTC_PARAM_CORRECTION, index=0}",
+		  "{svalue=0}",
+		  "{param=RTC_PARAM_CORRECTION, svalue=0, index=0}" },
+		{ { .param = 1, .svalue = (__s64) 0xfacefeeddeadcafeULL,
+		    .index = 0xdeffaced, .__pad = 0xcafeface },
+		  "{param=RTC_PARAM_CORRECTION, index=3741297901"
+		  ", __pad=0xcafeface}",
+		  "{svalue=-374081421428536578, __pad=0xcafeface}",
+		  "{param=RTC_PARAM_CORRECTION, svalue=-374081421428536578"
+		  ", index=3741297901, __pad=0xcafeface}" },
+		{ { .param = 1, .svalue = -1337, .index = 0x42 },
+		  "{param=RTC_PARAM_CORRECTION, index=66}",
+		  "{svalue=-1337}",
+		  "{param=RTC_PARAM_CORRECTION, svalue=-1337, index=66}" },
+		{ { .param = 2 },
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE, index=0}",
+		  "{uvalue=RTC_BSM_DISABLED}",
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE, uvalue=RTC_BSM_DISABLED"
+		  ", index=0}" },
+		{ { .param = 2, .uvalue = 3, .index = 0xdecaffed,
+		    .__pad = 0xfacebeef },
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE, index=3737845741"
+		  ", __pad=0xfacebeef}",
+		  "{uvalue=RTC_BSM_STANDBY, __pad=0xfacebeef}",
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE, uvalue=RTC_BSM_STANDBY"
+		  ", index=3737845741, __pad=0xfacebeef}" },
+		{ { .param = 2, .uvalue = 4, .__pad = 23 },
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE, index=0, __pad=0x17}",
+		  "{uvalue=0x4 /* RTC_BSM_??? */, __pad=0x17}",
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE"
+		  ", uvalue=0x4 /* RTC_BSM_??? */, index=0, __pad=0x17}" },
+		{ { .param = 2, .uvalue = (__u64) 0xface1e55beefcafeULL,
+		    .index = 42 },
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE, index=42}",
+		  "{uvalue=0xface1e55beefcafe /* RTC_BSM_??? */}",
+		  "{param=RTC_PARAM_BACKUP_SWITCH_MODE"
+		  ", uvalue=0xface1e55beefcafe /* RTC_BSM_??? */"
+		  ", index=42}" },
+		{ { .param = 3 },
+		  "{param=0x3 /* RTC_PARAM_??? */, index=0}",
+		  "{uvalue=0}",
+		  "{param=0x3 /* RTC_PARAM_??? */, uvalue=0, index=0}" },
+		{ { .param = (__u64) 0xbeeffacedeadc0deULL,
+		    .uvalue = (__u64) 0xdefc0dedbadfacedULL,
+		    .index = 3141592653, .__pad = 2718281828 },
+		  "{param=0xbeeffacedeadc0de /* RTC_PARAM_??? */"
+		  ", index=3141592653, __pad=0xa205b064}",
+		  "{uvalue=0xdefc0dedbadfaced, __pad=0xa205b064}",
+		  "{param=0xbeeffacedeadc0de /* RTC_PARAM_??? */"
+		  ", uvalue=0xdefc0dedbadfaced, index=3141592653"
+		  ", __pad=0xa205b064}" },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct rtc_param, pparam);
+
+	for (size_t i = 0; i < ARRAY_SIZE(param_cmds); i++) {
+		do_ioctl(param_cmds[i].val, 0);
+		printf("ioctl(-1, %s, NULL) = %s\n",
+		       param_cmds[i].str, errstr);
+
+		do_ioctl_ptr(param_cmds[i].val, pparam + 1);
+		printf("ioctl(-1, %s, %p) = %s\n",
+		       param_cmds[i].str, pparam + 1, errstr);
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(param_vecs); i++) {
+		*pparam = param_vecs[i].val;
+
+		int ret = do_ioctl_ptr(RTC_PARAM_GET, pparam);
+		printf("ioctl(-1, RTC_PARAM_GET, %s => ", param_vecs[i].get_in);
+		if (ret < 0)
+			printf("%p", pparam);
+		else
+			printf("%s", param_vecs[i].get_out);
+		printf(") = %s\n", errstr);
+
+		do_ioctl_ptr(RTC_PARAM_SET, pparam);
+		printf("ioctl(-1, RTC_PARAM_SET, %s) = %s\n",
+		       param_vecs[i].set, errstr);
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;
