@@ -19,6 +19,20 @@ typedef struct rtc_pll_info struct_rtc_pll_info;
 #include MPERS_DEFS
 
 #include "xlat/rtc_vl_flags.h"
+#include "xlat/rtc_params.h"
+#include "xlat/rtc_features.h"
+#include "xlat/rtc_backup_switch_modes.h"
+
+typedef struct {
+	uint64_t param;
+	union {
+		uint64_t uvalue;
+		int64_t  svalue;
+		uint64_t ptr;
+	};
+	uint32_t index;
+	uint32_t __pad;
+} struct_rtc_param;
 
 #define XLAT_MACROS_ONLY
 # include "xlat/rtc_ioctl_cmds.h"
@@ -117,6 +131,48 @@ decode_rtc_vl(struct tcb *const tcp, const kernel_ulong_t addr)
 	tprint_indirect_end();
 }
 
+static long
+decode_rtc_vl(struct tcb *const tcp, const kernel_ulong_t addr, const bool get)
+{
+	struct_rtc_param param;
+
+	if (umove_or_printaddr_ignore_syserror(tcp, addr, &val))
+		return RVAL_IOCTL_DECODED;
+
+	tprint_struct_begin();
+	if (entering(tcp)) {
+		PRINT_FIELD_XVAL(param, param, rtc_params, "RTC_PARAM_???");
+		tprint_struct_next();
+	}
+	if (entering(tcp) ^ get) {
+		switch (param.param) {
+		case RTC_PARAM_FEATURES:
+			PRINT_FIELD_FLAGS(param, uvalue, rtc_features,
+					  "RTC_FEATURE_???");
+			break;
+		case RTC_PARAM_CORRECTION:
+			PRINT_FIELD_D(param, svalue);
+			break;
+		case RTC_PARAM_BACKUP_SWITCH_MODE:
+			PRINT_FIELD_XVAL(param, uvalue, rtc_backup_switch_modes,
+					 "RTC_BSM_???");
+			break;
+		default:
+			PRINT_FIELD_X(param, uvalue);
+		}
+		tprint_field_next();
+	}
+	if (entering(tcp)) {
+		PRINT_FIELD_U(param, index);
+		tprint_struct_next();
+	}
+	if (param.__pad)
+		PRINT_FIELD_X(param, __pad);
+	tprint_struct_end();
+
+	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
+}
+
 MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		   const unsigned int code, const kernel_ulong_t arg)
 {
@@ -165,6 +221,13 @@ MPERS_PRINTER_DECL(int, rtc_ioctl, struct tcb *const tcp,
 		tprint_arg_next();
 		decode_rtc_vl(tcp, arg);
 		break;
+	case RTC_PARAM_GET:
+	case RTC_PARAM_SET:
+		if (entering(tcp))
+			tprint_arg_next();
+		else
+			tprint_value_changed();
+		return decode_rtc_param(tcp, arg, code == RTC_PARAM_GET);
 	case RTC_AIE_ON:
 	case RTC_AIE_OFF:
 	case RTC_UIE_ON:
