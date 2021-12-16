@@ -695,6 +695,67 @@ decode_diag_bpf_storages(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_diag_sockopt(struct tcb *const tcp,
+		    const kernel_ulong_t addr,
+		    const unsigned int len,
+		    const void *const opaque_data)
+{
+	struct inet_diag_sockopt {
+		uint8_t	recverr			:1,
+			is_icsk			:1,
+			freebind		:1,
+			hdrincl			:1,
+			mc_loop			:1,
+			transparent		:1,
+			mc_all			:1,
+			nodefrag		:1;
+		uint8_t	bind_address_no_port	:1,
+			recverr_rfc4884		:1,
+			defer_connect		:1,
+			unused			:5;
+	} sockopt;
+
+	if (len < sizeof(sockopt))
+		return false;
+	if (umove_or_printaddr(tcp, addr, &sockopt))
+		return true;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(sockopt, recverr);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, is_icsk);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, freebind);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, hdrincl);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, mc_loop);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, transparent);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, mc_all);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, nodefrag);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, bind_address_no_port);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, recverr_rfc4884);
+	tprint_struct_next();
+	PRINT_FIELD_U(sockopt, defer_connect);
+	if (sockopt.unused) {
+		tprint_struct_next();
+		PRINT_FIELD_U(sockopt, unused);
+		tprints_comment("bits 3..8");
+	}
+	tprint_struct_end();
+
+	print_nonzero_bytes(tcp, tprint_array_next, addr, sizeof(sockopt),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
+
+	return true;
+}
+
 static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_MEMINFO]		= decode_inet_diag_meminfo,
 	[INET_DIAG_INFO]		= NULL,		/* unimplemented */
@@ -717,6 +778,7 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_ULP_INFO]		= decode_diag_ulp_info,
 	[INET_DIAG_SK_BPF_STORAGES]	= decode_diag_bpf_storages,
 	[INET_DIAG_CGROUP_ID]		= decode_nla_u64,
+	[INET_DIAG_SOCKOPT]		= decode_diag_sockopt,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
