@@ -615,6 +615,114 @@ main(void)
 				    printf("%s", mptcp_flags[i].str));
 	}
 
+	/* INET_DIAG_SK_BPF_STORAGES */
+	attr1 = INET_DIAG_SK_BPF_STORAGES;
+	attr1_str = "INET_DIAG_SK_BPF_STORAGES";
+
+	/* INET_DIAG_SK_BPF_STORAGES: unknown, undecoded */
+	static const struct strval16 bpfsts_unk_attrs[] = {
+		{ ENUM_KNOWN(0, SK_DIAG_BPF_STORAGE_REP_NONE) },
+		{ ARG_XLAT_UNKNOWN(0x2, "SK_DIAG_BPF_STORAGE_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "SK_DIAG_BPF_STORAGE_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(bpfsts_unk_attrs); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_1,
+				    print_inet_diag_nest_1,
+				    bpfsts_unk_attrs[i].val,
+				    bpfsts_unk_attrs[i].str,
+				    sizeof(dummy), &dummy, sizeof(dummy), 1,
+				    printf("\"\\xde\\xad\\xc0\\xde\""));
+	}
+
+	/* INET_DIAG_SK_BPF_STORAGES: SK_DIAG_BPF_STORAGE */
+	attr2 = SK_DIAG_BPF_STORAGE;
+	attr2_str = "SK_DIAG_BPF_STORAGE";
+
+	/* INET_DIAG_SK_BPF_STORAGES: SK_DIAG_BPF_STORAGE: unknown, undecoded */
+	static const struct strval16 bpfst_unk_attrs[] = {
+		{ ENUM_KNOWN(0, SK_DIAG_BPF_STORAGE_NONE) },
+		{ ENUM_KNOWN(0x1, SK_DIAG_BPF_STORAGE_NONE) },
+		{ ARG_XLAT_UNKNOWN(0x4, "SK_DIAG_BPF_STORAGE_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "SK_DIAG_BPF_STORAGE_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(bpfst_unk_attrs); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    bpfst_unk_attrs[i].val,
+				    bpfst_unk_attrs[i].str,
+				    sizeof(dummy), &dummy, sizeof(dummy), 2,
+				    printf("\"\\xde\\xad\\xc0\\xde\""));
+	}
+
+	/* INET_DIAG_SK_BPF_STORAGES: SK_DIAG_BPF_STORAGE: u32 */
+	static const struct strval16 bpfst_u32_attrs[] = {
+		{ ENUM_KNOWN(0x2, SK_DIAG_BPF_STORAGE_MAP_ID) },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(bpfst_u32_attrs); i++) {
+		check_u32_nlattr(fd, nlh_u32, hdrlen,
+				init_inet_diag_nest_2,
+				print_inet_diag_nest_2,
+				bpfst_u32_attrs[i].val, bpfst_u32_attrs[i].str,
+				pattern, 2);
+	}
+
+	/*
+	 * INET_DIAG_SK_BPF_STORAGES: SK_DIAG_BPF_STORAGE:
+	 *                            SK_DIAG_BPF_STORAGE_MAP_VALUE
+	 */
+	static const struct {
+		ssize_t sz;
+		const char *val;
+		const char *str;
+	} bpfst_vals[] = {
+		{ 1, "\xbe", "0xbe" },
+		{ 2, BE_LE("\xde\xad", "\xad\xde"), "0xdead" },
+		{ 3, "\xca\xff\xee", "\"\\xca\\xff\\xee\"" },
+		{ 4, BE_LE("\xba\xdc\x0d\xed", "\xed\x0d\xdc\xba"),
+		     "0xbadc0ded" },
+		{ 5, "\x00\x09\x0a\x0b\x0c",
+		     "\"\\x00\\x09\\x0a\\x0b\\x0c\"" },
+		{ 6, "012345",
+		     "\"\\x30\\x31\\x32\\x33\\x34\\x35\"" },
+		{ 7, "abcdefg",
+		     "\"\\x61\\x62\\x63\\x64\\x65\\x66\\x67\"" },
+		{ 8, BE_LE("\xbe\xef\xfa\xce\xde\xad\xc0\xde",
+			   "\xde\xc0\xad\xde\xce\xfa\xef\xbe"),
+		     "0xbeeffacedeadc0de" },
+		{ 9, "ABCDEFGHI",
+		     "\"\\x41\\x42\\x43\\x44\\x45\\x46\\x47\\x48\\x49\"" },
+		{ 10, "1234567890",
+		      "\"\\x31\\x32\\x33\\x34\\x35"
+		      "\\x36\\x37\\x38\\x39\\x30\"" },
+		{ 12, "a1b2c3d4e5f6",
+		      "\"\\x61\\x31\\x62\\x32\\x63\\x33"
+		      "\\x64\\x34\\x65\\x35\\x66\\x36\"" },
+		{ 16, "A1B2C3D4E5F6G7H8",
+		      "\"\\x41\\x31\\x42\\x32\\x43\\x33\\x44\\x34"
+		      "\\x45\\x35\\x46\\x36\\x47\\x37\\x48\\x38\"" },
+		{ 36, "abcdefghijklmnopqrstuvwxyz0123456789",
+		      "\"\\x61\\x62\\x63\\x64\\x65\\x66\\x67\\x68\\x69\\x6a"
+		      "\\x6b\\x6c\\x6d\\x6e\\x6f\\x70\\x71\\x72\\x73\\x74\\x75"
+		      "\\x76\\x77\\x78\\x79\\x7a\\x30\\x31\\x32\\x33\\x34\\x35"
+		      "\"..." },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(bpfst_vals); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    SK_DIAG_BPF_STORAGE_MAP_VALUE,
+				    "SK_DIAG_BPF_STORAGE_MAP_VALUE",
+				    bpfst_vals[i].sz, bpfst_vals[i].val,
+				    bpfst_vals[i].sz, 2,
+				    printf("%s", bpfst_vals[i].str));
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

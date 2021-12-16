@@ -21,6 +21,8 @@
 #include <linux/tls.h>
 
 #include "xlat/inet_diag_attrs.h"
+#include "xlat/inet_diag_bpf_storage_attrs.h"
+#include "xlat/inet_diag_bpf_storages_attrs.h"
 #include "xlat/inet_diag_bytecodes.h"
 #include "xlat/inet_diag_extended_flags.h"
 #include "xlat/inet_diag_req_attrs.h"
@@ -624,26 +626,65 @@ decode_diag_ulp_info(struct tcb *const tcp,
 	return true;
 }
 
+static const nla_decoder_t diag_bpf_storage_nla_decoders[] = {
+	[SK_DIAG_BPF_STORAGE_NONE]	= NULL,
+	[SK_DIAG_BPF_STORAGE_PAD]	= NULL,
+	[SK_DIAG_BPF_STORAGE_MAP_ID]	= decode_nla_u32,
+	[SK_DIAG_BPF_STORAGE_MAP_VALUE]	= decode_nla_xint,
+};
+
+static bool
+decode_diag_bpf_storage(struct tcb *const tcp,
+			const kernel_ulong_t addr,
+			const unsigned int len,
+			const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, inet_diag_bpf_storage_attrs,
+		      "SK_DIAG_BPF_STORAGE_???",
+		      ARRSZ_PAIR(diag_bpf_storage_nla_decoders), NULL);
+
+	return true;
+}
+
+static const nla_decoder_t diag_bpf_storages_nla_decoders[] = {
+	[SK_DIAG_BPF_STORAGE_REP_NONE]	= NULL,
+	[SK_DIAG_BPF_STORAGE]		= decode_diag_bpf_storage,
+};
+
+static bool
+decode_diag_bpf_storages(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, inet_diag_bpf_storages_attrs,
+		      "SK_DIAG_BPF_STORAGE_???",
+		      ARRSZ_PAIR(diag_bpf_storages_nla_decoders), NULL);
+
+	return true;
+}
+
 static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
-	[INET_DIAG_MEMINFO]	= decode_inet_diag_meminfo,
-	[INET_DIAG_INFO]	= NULL,			/* unimplemented */
-	[INET_DIAG_VEGASINFO]	= decode_tcpvegas_info,
-	[INET_DIAG_CONG]	= decode_nla_str,
-	[INET_DIAG_TOS]		= decode_nla_u8,
-	[INET_DIAG_TCLASS]	= decode_nla_u8,
-	[INET_DIAG_SKMEMINFO]	= decode_nla_meminfo,
-	[INET_DIAG_SHUTDOWN]	= decode_diag_shutdown,
-	[INET_DIAG_DCTCPINFO]	= decode_tcp_dctcp_info,
-	[INET_DIAG_PROTOCOL]	= decode_nla_u8,
-	[INET_DIAG_SKV6ONLY]	= decode_nla_u8,
-	[INET_DIAG_LOCALS]	= NULL,			/* unimplemented */
-	[INET_DIAG_PEERS]	= NULL,			/* unimplemented */
-	[INET_DIAG_PAD]		= NULL,
-	[INET_DIAG_MARK]	= decode_nla_u32,
-	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info,
-	[INET_DIAG_CLASS_ID]	= decode_nla_u32,
-	[INET_DIAG_MD5SIG]	= decode_tcp_md5sig,
-	[INET_DIAG_ULP_INFO]	= decode_diag_ulp_info,
+	[INET_DIAG_MEMINFO]		= decode_inet_diag_meminfo,
+	[INET_DIAG_INFO]		= NULL,		/* unimplemented */
+	[INET_DIAG_VEGASINFO]		= decode_tcpvegas_info,
+	[INET_DIAG_CONG]		= decode_nla_str,
+	[INET_DIAG_TOS]			= decode_nla_u8,
+	[INET_DIAG_TCLASS]		= decode_nla_u8,
+	[INET_DIAG_SKMEMINFO]		= decode_nla_meminfo,
+	[INET_DIAG_SHUTDOWN]		= decode_diag_shutdown,
+	[INET_DIAG_DCTCPINFO]		= decode_tcp_dctcp_info,
+	[INET_DIAG_PROTOCOL]		= decode_nla_u8,
+	[INET_DIAG_SKV6ONLY]		= decode_nla_u8,
+	[INET_DIAG_LOCALS]		= NULL,		/* unimplemented */
+	[INET_DIAG_PEERS]		= NULL,		/* unimplemented */
+	[INET_DIAG_PAD]			= NULL,
+	[INET_DIAG_MARK]		= decode_nla_u32,
+	[INET_DIAG_BBRINFO]		= decode_tcp_bbr_info,
+	[INET_DIAG_CLASS_ID]		= decode_nla_u32,
+	[INET_DIAG_MD5SIG]		= decode_tcp_md5sig,
+	[INET_DIAG_ULP_INFO]		= decode_diag_ulp_info,
+	[INET_DIAG_SK_BPF_STORAGES]	= decode_diag_bpf_storages,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)

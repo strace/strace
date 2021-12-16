@@ -1,0 +1,4 @@
+#value_indexed
+#unconditional
+SK_DIAG_BPF_STORAGE_REP_NONE	0
+SK_DIAG_BPF_STORAGE		1
