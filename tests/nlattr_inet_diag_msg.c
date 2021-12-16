@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <linux/mptcp.h>
+#include <linux/tls.h>
 #include <net/if.h>
 #include <netinet/tcp.h>
 #include "test_nlattr.h"
@@ -41,6 +43,12 @@ static const char * const sk_meminfo_strs[] = {
 };
 
 static const char address[] = "10.11.12.13";
+static const unsigned int hdrlen = sizeof(struct inet_diag_msg);
+static uint16_t  attr1;
+static const char *attr1_str = NULL;
+static uint16_t  attr2;
+static const char *attr2_str = NULL;
+
 
 static void
 init_inet_diag_msg(struct nlmsghdr *const nlh, const unsigned int msg_len)
@@ -78,6 +86,47 @@ print_inet_diag_msg(const unsigned int msg_len)
 	       ", idiag_expires=0, idiag_rqueue=0, idiag_wqueue=0"
 	       ", idiag_uid=0, idiag_inode=0}",
 	       msg_len, address, address);
+}
+
+static void
+init_inet_diag_nest_1(struct nlmsghdr *const nlh, const unsigned int msg_len)
+{
+	init_inet_diag_msg(nlh, msg_len);
+
+	struct nlattr *nla = NLMSG_ATTR(nlh, hdrlen);
+	SET_STRUCT(struct nlattr, nla,
+		.nla_len = msg_len - NLMSG_SPACE(hdrlen),
+		.nla_type = attr1,
+	);
+}
+
+static void
+print_inet_diag_nest_1(const unsigned int msg_len)
+{
+	print_inet_diag_msg(msg_len);
+	printf(", [{nla_len=%u, nla_type=%s}",
+	       msg_len - NLMSG_SPACE(hdrlen), attr1_str);
+}
+
+static void
+init_inet_diag_nest_2(struct nlmsghdr *const nlh, const unsigned int msg_len)
+{
+	init_inet_diag_nest_1(nlh, msg_len);
+
+	struct nlattr *nla = NLMSG_ATTR(nlh, hdrlen);
+	nla += 1;
+	SET_STRUCT(struct nlattr, nla,
+		.nla_len = msg_len - NLMSG_SPACE(hdrlen) - NLA_HDRLEN,
+		.nla_type = attr2,
+	);
+}
+
+static void
+print_inet_diag_nest_2(const unsigned int msg_len)
+{
+	print_inet_diag_nest_1(msg_len);
+	printf(", [{nla_len=%u, nla_type=%s}",
+	       msg_len - NLMSG_SPACE(hdrlen) - NLA_HDRLEN, attr2_str);
 }
 
 static void
@@ -172,7 +221,6 @@ main(void)
 	static const uint32_t mark = 0xabdfadca;
 
 	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
-	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
 	void *const nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
 					 NLA_HDRLEN +
 					 MAX(sizeof(bigmem), DEFAULT_STRLEN));
@@ -304,6 +352,268 @@ main(void)
 	TEST_NLATTR_ARRAY(fd, nlh0, hdrlen,
 			  init_inet_diag_msg, print_inet_diag_msg,
 			  INET_DIAG_MD5SIG, pattern, md5s_arr, print_md5sig);
+
+	/* INET_DIAG_ULP_INFO */
+	attr1 = INET_DIAG_ULP_INFO;
+	attr1_str = "INET_DIAG_ULP_INFO";
+
+	/* INET_DIAG_ULP_INFO: unknown, undecoded */
+	static const struct strval16 ulp_unk_attrs[] = {
+		{ ENUM_KNOWN(0, INET_ULP_INFO_UNSPEC) },
+		{ ARG_XLAT_UNKNOWN(0x4, "INET_ULP_INFO_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "INET_ULP_INFO_???") },
+	};
+	static const uint32_t dummy = BE_LE(0xdeadc0de, 0xdec0adde);
+
+	for (size_t i = 0; i < ARRAY_SIZE(ulp_unk_attrs); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_1,
+				    print_inet_diag_nest_1,
+				    ulp_unk_attrs[i].val,
+				    ulp_unk_attrs[i].str,
+				    sizeof(dummy), &dummy, sizeof(dummy), 1,
+				    printf("\"\\xde\\xad\\xc0\\xde\""));
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_NAME */
+	static const struct {
+		const char *val;
+		const char *str;
+		ssize_t sz;
+	} ulp_names[] = {
+		{ "OH HAI", "\"OH HAI\"", 7 },
+		{ "\0\0\0", "\"\\0\\0\\0\"", 4 },
+		{ "\1\2\3\4\5\6\7\10\11\12\13\14",
+		  "\"\\1\\2\\3\\4\\5\\6\\7\\10\\t\\n\\v\\f\"...", 12 },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(ulp_names); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_1,
+				    print_inet_diag_nest_1,
+				    INET_ULP_INFO_NAME, "INET_ULP_INFO_NAME",
+				    ulp_names[i].sz, ulp_names[i].val,
+				    ulp_names[i].sz, 1,
+				    printf("%s", ulp_names[i].str));
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_TLS */
+	attr2 = INET_ULP_INFO_TLS;
+	attr2_str = "INET_ULP_INFO_TLS";
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_TLS: unknown, undecoded */
+	static const struct strval16 tls_unk_attrs[] = {
+		{ ENUM_KNOWN(0, TLS_INFO_UNSPEC) },
+		{ ENUM_KNOWN(0x5, TLS_INFO_ZC_RO_TX) },
+		{ ARG_XLAT_UNKNOWN(0x6, "TLS_INFO_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "TLS_INFO_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(tls_unk_attrs); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    tls_unk_attrs[i].val,
+				    tls_unk_attrs[i].str,
+				    sizeof(dummy), &dummy, sizeof(dummy), 2,
+				    printf("\"\\xde\\xad\\xc0\\xde\""));
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_TLS: TLS_INFO_VERSION */
+	static const struct strval16 tls_vers[] = {
+		{ ARG_XLAT_UNKNOWN(0, "TLS_???_VERSION") },
+		{ ARG_XLAT_UNKNOWN(0x200, "TLS_???_VERSION") },
+		{ ARG_XLAT_UNKNOWN(0x300, "TLS_???_VERSION") },
+		{ ARG_XLAT_UNKNOWN(0x301, "TLS_???_VERSION") },
+		{ ARG_XLAT_UNKNOWN(0x302, "TLS_???_VERSION") },
+		{ ENUM_KNOWN(0x303, TLS_1_2_VERSION) },
+		{ ENUM_KNOWN(0x304, TLS_1_3_VERSION) },
+		{ ARG_XLAT_UNKNOWN(0x305, "TLS_???_VERSION") },
+		{ ARG_XLAT_UNKNOWN(0xdead, "TLS_???_VERSION") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(tls_vers); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    TLS_INFO_VERSION, "TLS_INFO_VERSION",
+				    2, &tls_vers[i].val, 2, 2,
+				    printf("%s", tls_vers[i].str));
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_TLS: TLS_INFO_CIPHER */
+	static const struct strval16 tls_ciphers[] = {
+		{ ARG_XLAT_UNKNOWN(0, "TLS_CIPHER_???") },
+		{ ARG_XLAT_UNKNOWN(0x32, "TLS_CIPHER_???") },
+		{ ENUM_KNOWN(0x33, TLS_CIPHER_AES_GCM_128) },
+		{ ENUM_KNOWN(0x34, TLS_CIPHER_AES_GCM_256) },
+		{ ENUM_KNOWN(0x35, TLS_CIPHER_AES_CCM_128) },
+		{ ENUM_KNOWN(0x36, TLS_CIPHER_CHACHA20_POLY1305) },
+		{ ENUM_KNOWN(0x37, TLS_CIPHER_SM4_GCM) },
+		{ ENUM_KNOWN(0x38, TLS_CIPHER_SM4_CCM) },
+		{ ARG_XLAT_UNKNOWN(0x39, "TLS_CIPHER_???") },
+		{ ARG_XLAT_UNKNOWN(0xcafe, "TLS_CIPHER_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(tls_ciphers); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    TLS_INFO_CIPHER, "TLS_INFO_CIPHER",
+				    2, &tls_ciphers[i].val, 2, 2,
+				    printf("%s", tls_ciphers[i].str));
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_TLS: TLS_INFO_[RT]XCONF */
+	static const struct strval16 tls_cfg_attrs[] = {
+		{ ENUM_KNOWN(0, TLS_INFO_TXCONF) },
+		{ ENUM_KNOWN(0, TLS_INFO_RXCONF) },
+	};
+	static const struct strval16 tls_cfgs[] = {
+		{ ARG_XLAT_UNKNOWN(0, "TLS_CONF_???") },
+		{ ENUM_KNOWN(0x1, TLS_CONF_BASE) },
+		{ ENUM_KNOWN(0x2, TLS_CONF_SW) },
+		{ ENUM_KNOWN(0x3, TLS_CONF_HW) },
+		{ ENUM_KNOWN(0x4, TLS_CONF_HW_RECORD) },
+		{ ARG_XLAT_UNKNOWN(0x5, "TLS_CONF_???") },
+		{ ARG_XLAT_UNKNOWN(0xface, "TLS_CONF_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(tls_cfg_attrs); i++) {
+		for (size_t j = 0; j < ARRAY_SIZE(tls_cfgs); j++) {
+			TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+					    init_inet_diag_nest_2,
+					    print_inet_diag_nest_2,
+					    tls_cfg_attrs[i].val,
+					    tls_cfg_attrs[i].str,
+					    2, &tls_cfgs[i].val, 2, 2,
+					    printf("%s", tls_cfgs[i].str));
+		}
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP */
+	attr2 = INET_ULP_INFO_MPTCP;
+	attr2_str = "INET_ULP_INFO_MPTCP";
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: unknown, undecoded */
+	static const struct strval16 mptcp_unk_attrs[] = {
+		{ ENUM_KNOWN(0, MPTCP_SUBFLOW_ATTR_UNSPEC) },
+		{ ENUM_KNOWN(0xb, MPTCP_SUBFLOW_ATTR_PAD) },
+		{ ARG_XLAT_UNKNOWN(0xc, "MPTCP_SUBFLOW_ATTR_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "MPTCP_SUBFLOW_ATTR_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_unk_attrs); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    mptcp_unk_attrs[i].val,
+				    mptcp_unk_attrs[i].str,
+				    sizeof(dummy), &dummy, sizeof(dummy), 2,
+				    printf("\"\\xde\\xad\\xc0\\xde\""));
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: u8 */
+	static const struct strval16 mptcp_u8_attrs[] = {
+		{ ENUM_KNOWN(0x9, MPTCP_SUBFLOW_ATTR_ID_REM) },
+		{ ENUM_KNOWN(0xa, MPTCP_SUBFLOW_ATTR_ID_LOC) },
+	};
+	void *nlh_n2_u8 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					NLA_HDRLEN * 2 + sizeof(uint8_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_u8_attrs); i++) {
+		check_u8_nlattr(fd, nlh_n2_u8, hdrlen,
+				init_inet_diag_nest_2,
+				print_inet_diag_nest_2,
+				mptcp_u8_attrs[i].val, mptcp_u8_attrs[i].str,
+				pattern, 2);
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: u16 */
+	static const struct strval16 mptcp_u16_attrs[] = {
+		{ ENUM_KNOWN(0x7, MPTCP_SUBFLOW_ATTR_MAP_DATALEN) },
+	};
+	void *nlh_n2_u16 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN * 2 + sizeof(uint16_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_u16_attrs); i++) {
+		check_u16_nlattr(fd, nlh_n2_u16, hdrlen,
+				init_inet_diag_nest_2,
+				print_inet_diag_nest_2,
+				mptcp_u16_attrs[i].val, mptcp_u16_attrs[i].str,
+				pattern, 2);
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: u32 */
+	static const struct strval16 mptcp_u32_attrs[] = {
+		{ ENUM_KNOWN(0x3, MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ) },
+		{ ENUM_KNOWN(0x5, MPTCP_SUBFLOW_ATTR_MAP_SFSEQ) },
+		{ ENUM_KNOWN(0x6, MPTCP_SUBFLOW_ATTR_SSN_OFFSET) },
+	};
+	void *nlh_n2_u32 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN * 2 + sizeof(uint32_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_u32_attrs); i++) {
+		check_u32_nlattr(fd, nlh_n2_u32, hdrlen,
+				init_inet_diag_nest_2,
+				print_inet_diag_nest_2,
+				mptcp_u32_attrs[i].val, mptcp_u32_attrs[i].str,
+				pattern, 2);
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: u64 */
+	static const struct strval16 mptcp_u64_attrs[] = {
+		{ ENUM_KNOWN(0x4, MPTCP_SUBFLOW_ATTR_MAP_SEQ) },
+	};
+	void *nlh_n2_u64 = midtail_alloc(NLMSG_SPACE(hdrlen),
+					 NLA_HDRLEN * 2 + sizeof(uint64_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_u64_attrs); i++) {
+		check_u64_nlattr(fd, nlh_n2_u64, hdrlen,
+				init_inet_diag_nest_2,
+				print_inet_diag_nest_2,
+				mptcp_u64_attrs[i].val, mptcp_u64_attrs[i].str,
+				pattern, 2);
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: x32 */
+	static const struct strval16 mptcp_x32_attrs[] = {
+		{ ENUM_KNOWN(0x1, MPTCP_SUBFLOW_ATTR_TOKEN_REM) },
+		{ ENUM_KNOWN(0x2, MPTCP_SUBFLOW_ATTR_TOKEN_LOC) },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_x32_attrs); i++) {
+		check_x32_nlattr(fd, nlh_u32, hdrlen,
+				init_inet_diag_nest_2,
+				print_inet_diag_nest_2,
+				mptcp_x32_attrs[i].val, mptcp_x32_attrs[i].str,
+				pattern, 2);
+	}
+
+	/* INET_DIAG_ULP_INFO: INET_ULP_INFO_MPTCP: MPTCP_SUBFLOW_ATTR_FLAGS */
+	static const struct strval32 mptcp_flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "MPTCP_SUBFLOW_FLAG_MCAP_REM") },
+		{ ARG_XLAT_KNOWN(0xdecaffed,
+				 "MPTCP_SUBFLOW_FLAG_MCAP_REM"
+				 "|MPTCP_SUBFLOW_FLAG_JOIN_REM"
+				 "|MPTCP_SUBFLOW_FLAG_JOIN_LOC"
+				 "|MPTCP_SUBFLOW_FLAG_BKUP_LOC"
+				 "|MPTCP_SUBFLOW_FLAG_FULLY_ESTABLISHED"
+				 "|MPTCP_SUBFLOW_FLAG_CONNECTED"
+				 "|MPTCP_SUBFLOW_FLAG_MAPVALID|0xdecafe00") },
+		{ ARG_XLAT_UNKNOWN(0xfffffe00, "MPTCP_SUBFLOW_FLAG_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(mptcp_flags); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_inet_diag_nest_2,
+				    print_inet_diag_nest_2,
+				    MPTCP_SUBFLOW_ATTR_FLAGS,
+				    "MPTCP_SUBFLOW_ATTR_FLAGS",
+				    4, &mptcp_flags[i].val, 4, 2,
+				    printf("%s", mptcp_flags[i].str));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

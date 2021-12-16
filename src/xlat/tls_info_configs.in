@@ -1,0 +1,6 @@
+#value_indexed
+#unconditional
+TLS_CONF_BASE		1
+TLS_CONF_SW		2
+TLS_CONF_HW		3
+TLS_CONF_HW_RECORD	4

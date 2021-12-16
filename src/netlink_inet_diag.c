@@ -16,16 +16,27 @@
 
 #include <linux/sock_diag.h>
 #include <linux/inet_diag.h>
+#include <linux/mptcp.h>
 #include <linux/tcp.h>
+#include <linux/tls.h>
 
 #include "xlat/inet_diag_attrs.h"
 #include "xlat/inet_diag_bytecodes.h"
 #include "xlat/inet_diag_extended_flags.h"
 #include "xlat/inet_diag_req_attrs.h"
 #include "xlat/inet_diag_shutdown_flags.h"
+#include "xlat/inet_diag_ulp_info_attrs.h"
+#include "xlat/inet_diag_ulp_info_mptcp_attrs.h"
+#include "xlat/inet_diag_ulp_info_tls_attrs.h"
+
+#include "xlat/mptcp_subflow_flags.h"
 
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
+
+#include "xlat/tls_info_ciphers.h"
+#include "xlat/tls_info_configs.h"
+#include "xlat/tls_info_versions.h"
 
 
 void
@@ -477,6 +488,142 @@ decode_tcp_md5sig(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_tls_version(struct tcb *const tcp,
+		   const kernel_ulong_t addr,
+		   const unsigned int len,
+		   const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat  = tls_info_versions,
+		.dflt  = "TLS_???_VERSION",
+		.size  = 2,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static bool
+decode_tls_cipher(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat  = tls_info_ciphers,
+		.dflt  = "TLS_CIPHER_???",
+		.size  = 2,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static bool
+decode_tls_config(struct tcb *const tcp,
+		  const kernel_ulong_t addr,
+		  const unsigned int len,
+		  const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat  = tls_info_configs,
+		.dflt  = "TLS_CONF_???",
+		.size  = 2,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t diag_ulp_info_tls_nla_decoders[] = {
+	[TLS_INFO_UNSPEC]	= NULL,
+	[TLS_INFO_VERSION]	= decode_tls_version,
+	[TLS_INFO_CIPHER]	= decode_tls_cipher,
+	[TLS_INFO_TXCONF]	= decode_tls_config,
+	[TLS_INFO_RXCONF]	= decode_tls_config,
+	[TLS_INFO_ZC_RO_TX]	= NULL, /* flag nlattr, no payload */
+};
+
+static bool
+decode_diag_ulp_info_tls(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, inet_diag_ulp_info_tls_attrs,
+		      "TLS_INFO_???",
+		      ARRSZ_PAIR(diag_ulp_info_tls_nla_decoders), NULL);
+
+	return true;
+}
+
+static bool
+decode_mptcp_subflow_flags(struct tcb *const tcp,
+			   const kernel_ulong_t addr,
+			   const unsigned int len,
+			   const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		.xlat  = mptcp_subflow_flags,
+		.dflt  = "MPTCP_SUBFLOW_FLAG_???",
+		.size  = 4,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t diag_ulp_info_mptcp_nla_decoders[] = {
+	[MPTCP_SUBFLOW_ATTR_UNSPEC]		= NULL,
+	[MPTCP_SUBFLOW_ATTR_TOKEN_REM]		= decode_nla_x32,
+	[MPTCP_SUBFLOW_ATTR_TOKEN_LOC]		= decode_nla_x32,
+	[MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ]	= decode_nla_u32,
+	[MPTCP_SUBFLOW_ATTR_MAP_SEQ]		= decode_nla_u64,
+	[MPTCP_SUBFLOW_ATTR_MAP_SFSEQ]		= decode_nla_u32,
+	[MPTCP_SUBFLOW_ATTR_SSN_OFFSET]		= decode_nla_u32,
+	[MPTCP_SUBFLOW_ATTR_MAP_DATALEN]	= decode_nla_u16,
+	[MPTCP_SUBFLOW_ATTR_FLAGS]		= decode_mptcp_subflow_flags,
+	[MPTCP_SUBFLOW_ATTR_ID_REM]		= decode_nla_u8,
+	[MPTCP_SUBFLOW_ATTR_ID_LOC]		= decode_nla_u8,
+	[MPTCP_SUBFLOW_ATTR_PAD]		= NULL,
+};
+
+static bool
+decode_diag_ulp_info_mptcp(struct tcb *const tcp,
+			   const kernel_ulong_t addr,
+			   const unsigned int len,
+			   const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, inet_diag_ulp_info_mptcp_attrs,
+		      "MPTCP_SUBFLOW_ATTR_???",
+		      ARRSZ_PAIR(diag_ulp_info_mptcp_nla_decoders), NULL);
+
+	return true;
+}
+
+static const nla_decoder_t diag_ulp_info_nla_decoders[] = {
+	[INET_ULP_INFO_UNSPEC]	= NULL,
+	[INET_ULP_INFO_NAME]	= decode_nla_str,
+	/*
+	 * In theory, the decoding of INTEL_ULP_* attributes depends
+	 * on the value of INET_ULP_INFO_NAME attribute, but, luckily,
+	 * all currently implemented ULPs that return information
+	 * simply use their own attribute types.
+	 */
+	[INET_ULP_INFO_TLS]	= decode_diag_ulp_info_tls,
+	[INET_ULP_INFO_MPTCP]	= decode_diag_ulp_info_mptcp,
+};
+
+static bool
+decode_diag_ulp_info(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, inet_diag_ulp_info_attrs,
+		      "INET_ULP_INFO_???",
+		      ARRSZ_PAIR(diag_ulp_info_nla_decoders), NULL);
+
+	return true;
+}
+
 static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_MEMINFO]	= decode_inet_diag_meminfo,
 	[INET_DIAG_INFO]	= NULL,			/* unimplemented */
@@ -496,6 +643,7 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_BBRINFO]	= decode_tcp_bbr_info,
 	[INET_DIAG_CLASS_ID]	= decode_nla_u32,
 	[INET_DIAG_MD5SIG]	= decode_tcp_md5sig,
+	[INET_DIAG_ULP_INFO]	= decode_diag_ulp_info,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)

@@ -50,6 +50,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/if_bridge.h \
 	linux/include/uapi/linux/if_link.h \
 	linux/include/uapi/linux/if_xdp.h \
+	linux/include/uapi/linux/in.h \
 	linux/include/uapi/linux/in6.h \
 	linux/include/uapi/linux/inet_diag.h \
 	linux/include/uapi/linux/input-event-codes.h \
@@ -68,6 +69,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/mmtimer.h \
 	linux/include/uapi/linux/mount.h \
 	linux/include/uapi/linux/mpls.h \
+	linux/include/uapi/linux/mptcp.h \
 	linux/include/uapi/linux/mqueue.h \
 	linux/include/uapi/linux/mroute.h \
 	linux/include/uapi/linux/mroute6.h \
@@ -109,6 +111,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/stat.h \
 	linux/include/uapi/linux/tcp.h \
 	linux/include/uapi/linux/tee.h \
+	linux/include/uapi/linux/tls.h \
 	linux/include/uapi/linux/types.h \
 	linux/include/uapi/linux/unix_diag.h \
 	linux/include/uapi/linux/userfaultfd.h \
