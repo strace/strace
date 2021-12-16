@@ -16,6 +16,9 @@
 
 #include <linux/sock_diag.h>
 #include <linux/inet_diag.h>
+#ifdef HAVE_LINUX_TCP_H
+# include <linux/tcp.h>
+#endif
 
 #include "xlat/inet_diag_attrs.h"
 #include "xlat/inet_diag_bytecodes.h"
