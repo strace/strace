@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented printing of Unix socket sun_path field's SELinux context.
+  * Improved decoding of INET_DIAG_SHUTDOWN NETLINK_SOCK_DIAG netlink attribute.
   * Updated lists of ioctl commands from Linux 5.19.
 
 * Bug fixes

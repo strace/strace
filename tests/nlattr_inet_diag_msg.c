@@ -114,7 +114,6 @@ main(void)
 	static const uint32_t mem[] = { 0xaffacbad, 0xffadbcab };
 	static uint32_t bigmem[SK_MEMINFO_VARS + 1];
 	static const uint32_t mark = 0xabdfadca;
-	static const uint8_t shutdown = 0xcd;
 
 	const int fd = create_nl_socket(NETLINK_SOCK_DIAG);
 	const unsigned int hdrlen = sizeof(struct inet_diag_msg);
@@ -202,10 +201,24 @@ main(void)
 			   INET_DIAG_CLASS_ID, pattern, mark,
 			   printf("%u", mark));
 
-	TEST_NLATTR(fd, nlh0, hdrlen,
-		    init_inet_diag_msg, print_inet_diag_msg, INET_DIAG_SHUTDOWN,
-		    sizeof(shutdown), &shutdown, sizeof(shutdown),
-		    printf("%u", shutdown));
+	static const struct strval8 shutdown_vecs[] = {
+		{ ARG_STR(0) },
+		{ 1, "0x1 /* RCV_SHUTDOWN */" },
+		{ 2, "0x2 /* SEND_SHUTDOWN */" },
+		{ 3, "0x3 /* RCV_SHUTDOWN|SEND_SHUTDOWN */" },
+		{ 4, "0x4 /* ???_SHUTDOWN */" },
+		{ 23, "0x17 /* RCV_SHUTDOWN|SEND_SHUTDOWN|0x14 */" },
+		{ 252, "0xfc /* ???_SHUTDOWN */" },
+	};
+	TAIL_ALLOC_OBJECT_CONST_PTR(uint8_t, shutdown);
+	for (size_t i = 0; i < ARRAY_SIZE(shutdown_vecs); i++) {
+		*shutdown = shutdown_vecs[i].val;
+		TEST_NLATTR(fd, nlh0, hdrlen,
+			    init_inet_diag_msg, print_inet_diag_msg,
+			    INET_DIAG_SHUTDOWN,
+			    sizeof(*shutdown), shutdown, sizeof(*shutdown),
+			    printf("%s", shutdown_vecs[i].str));
+	}
 
 	char *const str = tail_alloc(DEFAULT_STRLEN);
 	fill_memory_ex(str, DEFAULT_STRLEN, '0', 10);
