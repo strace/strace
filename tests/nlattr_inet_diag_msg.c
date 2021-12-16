@@ -11,9 +11,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <linux/atalk.h>
 #include <linux/mptcp.h>
 #include <linux/tls.h>
 #include <net/if.h>
+#include <netinet/in.h>
 #include <netinet/tcp.h>
 #include "test_nlattr.h"
 #include <linux/inet_diag.h>
@@ -183,6 +185,29 @@ static void
 print_md5sig(const struct tcp_diag_md5sig *p, size_t i)
 {
 	printf("%s", md5sig_vecs[i].str);
+}
+
+static void
+print_sa(const struct sockaddr_storage *p, size_t i)
+{
+	static const char *strs[] = {
+		"{sa_family=AF_INET, sin_port=htons(42069)"
+		", sin_addr=inet_addr(\"18.52.86.120\")}",
+		"{sa_family=AF_INET6, sin6_port=htons(23456)"
+		", sin6_flowinfo=htonl(324508639)"
+		", inet_pton(AF_INET6, \"1234:5678::9abc:def0\", &sin6_addr)"
+		", sin6_scope_id=610839776}",
+		"{sa_family=AF_APPLETALK"
+		", sa_data=\"i\\0" BE_LE("\\207e", "e\\207") "B\\0\\0\\0\\0\\0"
+		"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0"
+		"\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\"}"
+	};
+
+	printf("%s", strs[i]);
 }
 
 int
@@ -811,6 +836,45 @@ main(void)
 			    INET_DIAG_SOCKOPT,
 			    sockopts[i].sz, sockopts[i].val, sockopts[i].sz,
 			    printf("%s", sockopts[i].str));
+	}
+
+	/* INET_DIAG_LOCALS, INET_DIAG_PEERS */
+	static const struct strval16 sa_attrs[] = {
+		{ ENUM_KNOWN(0xc, INET_DIAG_LOCALS) },
+		{ ENUM_KNOWN(0xd, INET_DIAG_PEERS) },
+	};
+	enum {
+		SA_CNT = 3,
+		SA_SZ  = sizeof(struct sockaddr_storage) * SA_CNT,
+	};
+	void *nlh_sa = midtail_alloc(NLMSG_SPACE(hdrlen), SA_SZ);
+	struct sockaddr_storage buf[SA_CNT] = { { 0 } };
+
+	struct sockaddr_in *sa_in = (struct sockaddr_in *) (buf);
+	sa_in->sin_family = AF_INET;
+	sa_in->sin_port = htons(42069);
+	sa_in->sin_addr.s_addr = htonl(0x12345678);
+
+	struct sockaddr_in6 *sa_in6 = (struct sockaddr_in6 *) (buf + 1);
+	sa_in6->sin6_family = AF_INET6;
+	sa_in6->sin6_port = htons(23456);
+	sa_in6->sin6_flowinfo = htonl(0x13579bdf);
+	sa_in6->sin6_scope_id = 0x2468ace0;
+	memcpy(sa_in6->sin6_addr.s6_addr,
+	       "\x12\x34\x56\x78\0\0\0\0\0\0\0\0\x9a\xbc\xde\xf0",
+	       sizeof(sa_in6->sin6_addr.s6_addr));
+
+	struct sockaddr_at *sa_at = (struct sockaddr_at *) (buf + 2);
+	sa_at->sat_family = AF_APPLETALK;
+	sa_at->sat_port = 0x69;
+	sa_at->sat_addr.s_net = 0x8765;
+	sa_at->sat_addr.s_node = 0x42;
+
+	for (size_t i = 0; i < ARRAY_SIZE(sa_attrs); i++) {
+		TEST_NLATTR_ARRAY_(fd, nlh_sa, hdrlen,
+				   init_inet_diag_msg, print_inet_diag_msg,
+				   sa_attrs[i].val, sa_attrs[i].str,
+				   pattern, buf, print_sa);
 	}
 
 	puts("+++ exited with 0 +++");

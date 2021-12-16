@@ -416,6 +416,33 @@ decode_tcp_dctcp_info(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+print_sockaddr_array_member(struct tcb *const tcp, void *const elem_buf,
+			    const size_t elem_size, void *const data)
+{
+	print_sockaddr(tcp, elem_buf, elem_size);
+
+	return true;
+}
+
+static bool
+decode_nla_sockaddrs(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	struct sockaddr_storage sas;
+	const size_t nmemb = len / sizeof(sas);
+
+	if (!nmemb)
+		return false;
+
+	print_array(tcp, addr, nmemb, &sas, sizeof(sas),
+		    tfetch_mem, print_sockaddr_array_member, 0);
+
+	return true;
+}
+
 void
 print_tcp_bbr_info(struct tcb *tcp, const struct tcp_bbr_info *const bbr,
 		   const unsigned int len)
@@ -753,8 +780,8 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_DCTCPINFO]		= decode_tcp_dctcp_info,
 	[INET_DIAG_PROTOCOL]		= decode_nla_ip_proto,
 	[INET_DIAG_SKV6ONLY]		= decode_nla_u8,
-	[INET_DIAG_LOCALS]		= NULL,		/* unimplemented */
-	[INET_DIAG_PEERS]		= NULL,		/* unimplemented */
+	[INET_DIAG_LOCALS]		= decode_nla_sockaddrs,
+	[INET_DIAG_PEERS]		= decode_nla_sockaddrs,
 	[INET_DIAG_PAD]			= NULL,
 	[INET_DIAG_MARK]		= decode_nla_u32,
 	[INET_DIAG_BBRINFO]		= decode_tcp_bbr_info,
