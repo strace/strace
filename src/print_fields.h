@@ -163,6 +163,18 @@ tprint_unavailable(void)
 }
 
 static inline void
+tprint_shift(void)
+{
+	STRACE_PRINTS("<<");
+}
+
+static inline void
+tprint_or(void)
+{
+	STRACE_PRINTS("|");
+}
+
+static inline void
 tprints_field_name(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
