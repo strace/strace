@@ -336,6 +336,47 @@ main(void)
 		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
 		    printf("\"%s\"", str));
 
+	/* u8 INET_DIAG_* attrs */
+	static const struct strval16 u8_attrs[] = {
+		{ ENUM_KNOWN(0x5, INET_DIAG_TOS) },
+		{ ENUM_KNOWN(0x6, INET_DIAG_TCLASS) },
+		{ ENUM_KNOWN(0xb, INET_DIAG_SKV6ONLY) },
+	};
+	void *nlh_u8 = midtail_alloc(NLMSG_SPACE(hdrlen), sizeof(uint8_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(u8_attrs); i++) {
+		check_u8_nlattr(fd, nlh_u8, hdrlen,
+				init_inet_diag_msg, print_inet_diag_msg,
+				u8_attrs[i].val, u8_attrs[i].str, pattern, 0);
+	}
+
+	/* u32 INET_DIAG_* attrs */
+	static const struct strval16 u32_attrs[] = {
+		{ ENUM_KNOWN(0xf, INET_DIAG_MARK) },
+		{ ENUM_KNOWN(0x11, INET_DIAG_CLASS_ID) },
+	};
+	void *nlh_u32 = midtail_alloc(NLMSG_SPACE(hdrlen), sizeof(uint32_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(u32_attrs); i++) {
+		check_u32_nlattr(fd, nlh_u32, hdrlen,
+				 init_inet_diag_msg, print_inet_diag_msg,
+				 u32_attrs[i].val, u32_attrs[i].str,
+				 pattern, 0);
+	}
+
+	/* u64 INET_DIAG_* attrs */
+	static const struct strval16 u64_attrs[] = {
+		{ ENUM_KNOWN(0x15, INET_DIAG_CGROUP_ID) },
+	};
+	void *nlh_u64 = midtail_alloc(NLMSG_SPACE(hdrlen), sizeof(uint64_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(u64_attrs); i++) {
+		check_u64_nlattr(fd, nlh_u64, hdrlen,
+				 init_inet_diag_msg, print_inet_diag_msg,
+				 u64_attrs[i].val, u64_attrs[i].str,
+				 pattern, 0);
+	}
+
 	/* INET_DIAG_PROTOCOL */
 	static const struct strval8 protos[] = {
 		{ 0, "IPPROTO_IP" },

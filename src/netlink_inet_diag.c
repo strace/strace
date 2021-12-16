@@ -688,6 +688,7 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_MD5SIG]		= decode_tcp_md5sig,
 	[INET_DIAG_ULP_INFO]		= decode_diag_ulp_info,
 	[INET_DIAG_SK_BPF_STORAGES]	= decode_diag_bpf_storages,
+	[INET_DIAG_CGROUP_ID]		= decode_nla_u64,
 };
 
 DECL_NETLINK_DIAG_DECODER(decode_inet_diag_msg)
