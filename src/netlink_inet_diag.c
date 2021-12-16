@@ -21,6 +21,7 @@
 #include "xlat/inet_diag_bytecodes.h"
 #include "xlat/inet_diag_extended_flags.h"
 #include "xlat/inet_diag_req_attrs.h"
+#include "xlat/inet_diag_shutdown_flags.h"
 
 #include "xlat/tcp_states.h"
 #include "xlat/tcp_state_flags.h"
@@ -340,6 +341,23 @@ decode_tcpvegas_info(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_diag_shutdown(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	struct decode_nla_xlat_opts opts = {
+		.xlat  = inet_diag_shutdown_flags,
+		.dflt  = "???_SHUTDOWN",
+		.style = xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW
+			 ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,
+		.size  = 1,
+	};
+
+	return decode_nla_xval(tcp, addr, len, &opts);
+}
+
 void
 print_tcp_dctcp_info(struct tcb *tcp, const struct tcp_dctcp_info *const dctcp,
 		     const unsigned int len)
@@ -473,7 +491,7 @@ static const nla_decoder_t inet_diag_msg_nla_decoders[] = {
 	[INET_DIAG_TOS]		= decode_nla_u8,
 	[INET_DIAG_TCLASS]	= decode_nla_u8,
 	[INET_DIAG_SKMEMINFO]	= decode_nla_meminfo,
-	[INET_DIAG_SHUTDOWN]	= decode_nla_u8,
+	[INET_DIAG_SHUTDOWN]	= decode_diag_shutdown,
 	[INET_DIAG_DCTCPINFO]	= decode_tcp_dctcp_info,
 	[INET_DIAG_PROTOCOL]	= decode_nla_u8,
 	[INET_DIAG_SKV6ONLY]	= decode_nla_u8,
