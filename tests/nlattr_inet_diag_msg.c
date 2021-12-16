@@ -782,6 +782,37 @@ main(void)
 				    printf("%s", bpfst_vals[i].str));
 	}
 
+	/* INET_DIAG_SOCKOPT */
+	static const struct {
+		ssize_t sz;
+		const char *val;
+		const char *str;
+	} sockopts[] = {
+		{ 1, "\xbe", "\"\\xbe\"" },
+		{ 2, "\x00\x00", "{}" },
+		{ 2, BE_LE("\xca\xa0", "\x53\x05"),
+		  "{recverr=1, is_icsk=1, mc_loop=1, mc_all=1"
+		  ", bind_address_no_port=1, defer_connect=1}" },
+		{ 3, BE_LE("\x1e\xad", "\x78\xb5"),
+		  "{hdrincl=1, mc_loop=1, transparent=1, mc_all=1"
+		  ", bind_address_no_port=1, defer_connect=1"
+		  ", unused=0x16 /* bits 3..8 */}" },
+		{ 4, "\xff\xff\x00\xff",
+		  "{recverr=1, is_icsk=1, freebind=1, hdrincl=1, mc_loop=1"
+		  ", transparent=1, mc_all=1, nodefrag=1"
+		  ", bind_address_no_port=1, recverr_rfc4884=1, defer_connect=1"
+		  ", unused=0x1f /* bits 3..8 */}"
+		  ", /* bytes 2..3 */ \"\\x00\\xff\"" },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(sockopts); i++) {
+		TEST_NLATTR(fd, nlh0, hdrlen,
+			    init_inet_diag_msg, print_inet_diag_msg,
+			    INET_DIAG_SOCKOPT,
+			    sockopts[i].sz, sockopts[i].val, sockopts[i].sz,
+			    printf("%s", sockopts[i].str));
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
