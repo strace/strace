@@ -534,6 +534,7 @@ SYS_FUNC(socketpair)
 #include "xlat/sock_tls_options.h"
 #include "xlat/sock_xdp_options.h"
 #include "xlat/sock_mptcp_options.h"
+#include "xlat/sock_mctp_options.h"
 
 static void
 print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
@@ -649,6 +650,9 @@ print_sockopt_fd_level_name(struct tcb *tcp, int fd, unsigned int level,
 		break;
 	case SOL_MPTCP:
 		printxval(sock_xdp_options, name, "MPTCP_???");
+		break;
+	case SOL_MCTP:
+		printxval(sock_xdp_options, name, "MCTP_OPT_???");
 		break;
 
 		/* Other SOL_* protocol levels still need work. */
