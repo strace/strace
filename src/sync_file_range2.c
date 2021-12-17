@@ -9,6 +9,7 @@
 
 #include "defs.h"
 #include <fcntl.h>
+#include <linux/fs.h>
 #include "xlat/sync_file_range_flags.h"
 
 SYS_FUNC(sync_file_range2)
