@@ -78,6 +78,8 @@
 #include "xlat/sockopt_tcpct_flags.h"
 #include "xlat/tcp_ca_states.h"
 #include "xlat/tcp_info_options.h"
+#include "xlat/tcp_md5sig_flags.h"
+#include "xlat/tcp_options.h"
 #include "xlat/tcp_repair_vals.h"
 #include "xlat/tcp_zerocopy_flags.h"
 #include "xlat/tcp_zerocopy_msg_flags.h"
@@ -722,7 +724,7 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_indirect_end();
 }
 
-static void
+void
 print_tcp_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	       unsigned int len)
 {
@@ -940,10 +942,8 @@ print_tcp_info(struct tcb *const tcp, const kernel_ulong_t addr,
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      ti, tcpi_snd_wnd, len, PRINT_FIELD_U);
 
-	if (len > sizeof(ti)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(ti),
-				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
-	}
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(ti),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 
 	tprint_struct_end();
 }
@@ -989,11 +989,11 @@ print_tcpct(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
 	PRINT_FIELD_U(tct, tcpct_used);
 	tprint_struct_next();
 	PRINT_FIELD_HEX_ARRAY_UPTO(tct, tcpct_value,
-				   MIN(tct.tcpct_used, sizeof(tcpct_value)));
-	if (len > sizeof(tct)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(tct),
-				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
-	}
+				   MIN(MIN(tct.tcpct_used, sizeof(tcpct_value)),
+				       MAX(len, offsetof(tct, tcpct_value))
+				       - offsetof(tct, tcpct_value)));
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(tct),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	tprint_struct_end();
 }
 
@@ -1003,15 +1003,13 @@ print_tcp_repair(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	int repair;
 
-	if (len > sizeof(repair))
-		len = sizeof(repair);
-
-	if (umoven_or_printaddr(tcp, addr, len, &err))
-		return;
-
-	tprint_indirect_begin();
-	printxval_d(tcp_repair_vals, repair, "TCP_REPAIR_???");
-	tprint_indirect_end();
+	if (len < sizeof(opt) || umove(tcp, addr, &repair)) {
+		printaddr(addr);
+	} else {
+		tprint_indirect_begin();
+		printxval_d(tcp_repair_vals, repair, "TCP_REPAIR_???");
+		tprint_indirect_end();
+	}
 }
 
 static void
@@ -1027,7 +1025,7 @@ print_tcp_cc_info(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	/*
-	 * We have no idea what is the actual congestion algorithm used so far
+	 * We have no idea what the actual congestion algorithm is used so far
 	 * (TODO: it is possible to get it via inet_diag
 	 * (idiag_ext |= 1<<INET_DIAG_CONG should do the trick), but the current
 	 * API is unsuitable for performing such a request, and also we need
@@ -1050,10 +1048,7 @@ print_tcp_repair_window(struct tcb *const tcp, const kernel_ulong_t addr,
 {
 	struct tcp_repair_window trw;
 
-	if (len > sizeof(trw))
-		len = sizeof(trw);
-
-	if (umoven_or_printaddr(tcp, addr, len, &trw))
+	if (umoven_or_printaddr(tcp, addr, MIN(len, sizeof(trw)), &trw))
 		return;
 
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_begin(),
@@ -1066,10 +1061,8 @@ print_tcp_repair_window(struct tcb *const tcp, const kernel_ulong_t addr,
 			      trw, rcv_wnd, len, PRINT_FIELD_U);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      trw, rcv_wup, len, PRINT_FIELD_U);
-	if (len > sizeof(trw)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(trw),
-				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
-	}
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(trw),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	tprint_struct_end();
 }
 
@@ -1136,10 +1129,8 @@ print_tcp_zc(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int len)
 	if (tzc.reserved) {
 		PRINT_FIELD_X(tzc, reserved);
 	}
-	if (len > sizeof(tzc)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(tzc),
-				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
-	}
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(tzc),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	tprint_struct_end();
 
 	return 0;
@@ -1242,9 +1233,13 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			print_tcp_info(tcp, addr, rlen);
 			return;
 
+		case TCP_CONGESTION:
+			printstrn(tcp, addr, rlen);
+			return;
+
 		/* Removed in Linux commit v3.10-rc1~66^2~439 */
 		case TCP_COOKIE_TRANSACTIONS:
-			print_tcpct(tcp, addr, rlen)
+			print_tcpct(tcp, addr, rlen);
 			return;
 
 		case TCP_REPAIR:
@@ -1287,7 +1282,6 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case TCP_DEFER_ACCEPT:
 		case TCP_WINDOW_CLAMP:
 		case TCP_QUICKACK:
-		case TCP_CONGESTION:
 		/* setsockopt only: TCP_MD5SIG */
 		case TCP_THIN_LINEAR_TIMEOUTS:
 		case TCP_THIN_DUPACK:
@@ -1301,7 +1295,6 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case TCP_SAVE_SYN:
 		case TCP_FASTOPEN_CONNECT:
 		/* setsockopt only: TCP_MD5SIG_EXT */
-		/* setsockopt only: TCP_FASTOPEN_KEY */
 		case TCP_FASTOPEN_NO_COOKIE:
 		case TCP_INQ:
 		case TCP_TX_DELAY:
@@ -1489,6 +1482,92 @@ print_mreq6(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 }
 
+static bool
+print_tcp_repair_options_elem(struct tcb *const tcp, void *elem_ptr,
+			      size_t elem_size, void *opaque_data)
+{
+	struct tcp_repair_opt *tro = (struct tcp_repair_opt *) elem_ptr;
+
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(*tro, opt_code, tcp_options, "TCPOPT_???");
+	tprint_struct_next();
+	switch (tr->opt_code) {
+	case TCPOPT_MSS:
+		PRIN_FIELD_U(*tro, opt_val);
+		break;
+	case TCPOPT_WINDOW:
+		PRINT_FIELD_X(*tro, opt_val);
+		tprintf_comment("%u snd_wscale, %u rcv_wscale",
+				tro->opt_val >> 16, tro->opt_val & 0xffff);
+		break;
+	default:
+		PRIN_FIELD_X(*tro, opt_val);
+	}
+	tprint_struct_end();
+
+	return true;
+}
+
+static void
+print_tcp_repair_options(struct tcb *const tcp, const kernel_ulong_t addr,
+			 unsigned int len)
+{
+	struct tcp_repair_opt buf;
+
+	print_array(tcp, addr, len / sizeof(buf), &buf, sizeof(buf),
+		    tfetch_mem, print_tcp_repair_options_elem, NULL);
+}
+
+static void
+print_tcp_md5sig(struct tcb *const tcp, const kernel_ulong_t addr,
+		 unsigned int len, bool ext)
+{
+	struct tcp_md5sig {
+		struct sockaddr_storage tcpm_addr;
+		uint8_t  tcpm_flags; /* Ignored by TCP_MD5SIG */
+		/** Ignored if TCP_MD5SIG_FLAG_PREFIX is not in tcpm_flags */
+		uint8_t  tcpm_prefixlen;
+		uint16_t tcpm_keylen;
+		/** Ignored if TCP_MD5SIG_FLAG_IFINDEX is not in tcpm_flags */
+		int      tcpm_ifindex;
+		uint8_t  tcpm_key[80 /* TCP_MD5SIG_MAXKEYLEN */];
+	} sig;
+
+	if (len < sig || umove(tcp, addr, &sig)) {
+		printaddr(addr);
+		return;
+	}
+
+	tprint_struct_begin();
+	PRINT_FIELD_SOCKADDR(sig, tcpm_addr, tcp);
+	if (ext) {
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(sig, tcpm_flags, tcp_md5sig_flags,
+				  "TCP_MD5SIG_FLAG_???");
+		if (sig.tcpm_flags &
+		    (TCP_MD5SIG_FLAG_PREFIX | ~tcp_md5sig_flags->flags_mask)) {
+			tprint_struct_next();
+			PRINT_FIELD_U(sig, tcpm_prefixlen);
+		}
+	}
+	tprint_struct_next();
+	PRINT_FIELD_U(sig, tcpm_keylen);
+	if (ext && (sig.tcpm_flags &
+		   (TCP_MD5SIG_FLAG_IFINDEX | ~tcp_md5sig_flags->flags_mask))) {
+		tprint_struct_next();
+		PRINT_FIELD_IFINDEX(sig, tcpm_ifindex);
+	}
+	tprint_struct_next();
+	PRINT_FIELD_HEX_ARRAY_UPTO(sig, tcpm_key,
+				   MIN(sig.tcpm_keylen, sizeof(sig.tcpm_key)));
+	if (ext) {
+		print_nonzero_bytes(tcp, tprint_struct_next, addr,
+				    offsetofend(struct tcp_md5sig, tcpm_key),
+				    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
+	}
+	tprint_struct_end();
+}
+
 static void
 print_tpacket_req(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 {
@@ -1592,6 +1671,76 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
 			return;
+		}
+		break;
+
+	case SOL_TCP:
+		switch (name) {
+		case TCP_CONGESTION:
+			printstrn(tcp, addr, rlen);
+			return;
+
+		case TCP_MD5SIG:
+		case TCP_MD5SIG_EXT:
+			print_tcp_md5sig(tcp, addr, rlen, name != TCP_MD5SIG);
+			return;
+
+		/* Removed in Linux commit v3.10-rc1~66^2~439 */
+		case TCP_COOKIE_TRANSACTIONS:
+			print_tcpct(tcp, addr, rlen);
+			return;
+
+		case TCP_REPAIR:
+			print_tcp_repair(tcp, addr, rlen);
+			return;
+
+		case TCP_REPAIR_OPTIONS:
+			print_tcp_repair_options(tcp, addr, rlen);
+			return;
+
+		case TCP_REPAIR_WINDOW:
+			print_tcp_repair_window(tcp, addr, rlen);
+			return;
+
+		case TCP_ULP:
+			printstrn(tcp, addr, rlen);
+			return;
+
+		case TCP_FASTOPEN_KEY:
+			printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
+			return;
+
+		/* Write int */
+		case TCP_NODELAY:
+		case TCP_MAXSEG:
+		case TCP_CORK:
+		case TCP_KEEPIDLE:
+		case TCP_KEEPINTVL:
+		case TCP_KEEPCNT:
+		case TCP_SYNCNT:
+		case TCP_LINGER2:
+		case TCP_DEFER_ACCEPT:
+		case TCP_WINDOW_CLAMP:
+		/* getsockopt only: TCP_INFO */
+		case TCP_QUICKACK:
+		case TCP_THIN_LINEAR_TIMEOUTS:
+		case TCP_THIN_DUPACK:
+		case TCP_USER_TIMEOUT:
+		case TCP_REPAIR_QUEUE:
+		case TCP_QUEUE_SEQ:
+		case TCP_FASTOPEN:
+		case TCP_TIMESTAMP:
+		case TCP_NOTSENT_LOWAT:
+		/* getsockopt only: TCP_CC_INFO */
+		case TCP_SAVE_SYN:
+		/* getsockopt only: TCP_SAVED_SYN */
+		case TCP_FASTOPEN_CONNECT:
+		case TCP_FASTOPEN_NO_COOKIE:
+		/* getsockopt only: TCP_ZEROCOPY_RECEIVE */
+		case TCP_INQ:
+		case TCP_TX_DELAY:
+		default:
+			break;
 		}
 		break;
 
