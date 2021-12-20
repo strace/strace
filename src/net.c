@@ -677,11 +677,8 @@ print_get_linger(struct tcb *const tcp, const kernel_ulong_t addr,
 			      linger, l_onoff, len, PRINT_FIELD_D);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      linger, l_linger, len, PRINT_FIELD_D);
-	if (len > sizeof(linger)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr,
-				    sizeof(linger), MIN(linger, get_pagesize()),
-				    QUOTE_FORCE_HEX);
-	}
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(linger),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	tprint_struct_end();
 }
 
@@ -700,10 +697,8 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 			      uc, uid, len, PRINT_FIELD_ID);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      uc, gid, len, PRINT_FIELD_ID);
-	if (len > sizeof(uc)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(uc),
-				    MIN(uc, get_pagesize()), QUOTE_FORCE_HEX);
-	}
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(uc),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	tprint_struct_end();
 }
 
@@ -1153,11 +1148,8 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 			      stats, tp_drops, len, PRINT_FIELD_U);
 	MAYBE_PRINT_FIELD_LEN(tprint_struct_next(),
 			      stats, tp_freeze_q_cnt, len, PRINT_FIELD_U);
-	if (len > sizeof(stats)) {
-		print_nonzero_bytes(tcp, tprint_struct_next, addr,
-				    sizeof(stats), MIN(stats, get_pagesize()),
-				    QUOTE_FORCE_HEX);
-	}
+	print_nonzero_bytes(tcp, tprint_struct_next, addr, sizeof(stats),
+			    MIN(len, get_pagesize()), QUOTE_FORCE_HEX);
 	tprint_struct_end();
 }
 
