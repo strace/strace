@@ -678,10 +678,7 @@ print_prstatus_regset(const void *const rs, const size_t size)
 
 # elif defined __riscv
 
-	if (size >= offsetofend(TRACEE_REGS_STRUCT, pc)) {
-		fputs(", ", stdout);
-		PRINT_FIELD_X(*regs, pc);
-	}
+	PRINT_FIELD_X(*regs, pc);
 	if (size >= offsetofend(TRACEE_REGS_STRUCT, ra)) {
 		fputs(", ", stdout);
 		PRINT_FIELD_X(*regs, ra);
