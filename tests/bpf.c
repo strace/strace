@@ -34,7 +34,7 @@
 # define BIG_ADDR(addr64_, addr32_) addr64_
 # define BIG_ADDR_MAYBE(addr_)
 #elif defined __arm__ || defined __i386__ || defined __mips__ \
-   || defined __powerpc__ || defined __riscv__ || defined __s390__ \
+   || defined __powerpc__ || defined __riscv || defined __s390__ \
    || defined __sparc__ || defined __tile__
 # define BIG_ADDR(addr64_, addr32_) addr64_ " or " addr32_
 # define BIG_ADDR_MAYBE(addr_) addr_ " or "

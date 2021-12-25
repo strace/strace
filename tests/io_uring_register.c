@@ -23,7 +23,7 @@
 # define BIG_ADDR_MAYBE(addr_)
 # define BIG_ADDR_MASK 0
 #elif defined __arm__ || defined __i386__ || defined __mips__ \
-   || defined __powerpc__ || defined __riscv__ || defined __s390__ \
+   || defined __powerpc__ || defined __riscv || defined __s390__ \
    || defined __sparc__ || defined __tile__
 # define BIG_ADDR_MAYBE(addr_) addr_ " or "
 # define BIG_ADDR_MASK 0xffffffff00000000ULL

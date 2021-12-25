@@ -237,7 +237,7 @@ typedef struct {
 } sparc32_regs;
 #  define TRACEE_REGS_STRUCT sparc32_regs
 # endif
-#elif defined __riscv__
+#elif defined __riscv
 # define TRACEE_REGS_STRUCT struct user_regs_struct
 #elif defined __mips__
 typedef struct {
@@ -676,7 +676,7 @@ print_prstatus_regset(const void *const rs, const size_t size)
 	}
 #  endif
 
-# elif defined __riscv__
+# elif defined __riscv
 
 	if (size >= offsetofend(TRACEE_REGS_STRUCT, pc)) {
 		fputs(", ", stdout);
@@ -854,7 +854,7 @@ print_prstatus_regset(const void *const rs, const size_t size)
 	   __mips__ ||
 	   __powerpc64__ ||
 	   __powerpc__ ||
-	   __riscv__ ||
+	   __riscv ||
 	   __s390__ ||
 	   __s390x__ ||
 	   __sparc__ ||

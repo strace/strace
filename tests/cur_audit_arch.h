@@ -105,7 +105,7 @@
 #  define PERS0__NR_gettid 207
 #  define CUR_AUDIT_ARCH AUDIT_ARCH_PPC
 
-# elif defined __riscv__
+# elif defined __riscv
 #  define CUR_AUDIT_ARCH AUDIT_ARCH_RISCV64
 
 # elif defined __s390x__
