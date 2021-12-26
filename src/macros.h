@@ -15,6 +15,28 @@
 # include "gcc_compat.h"
 # include "static_assert.h"
 
+/*
+ * Evaluates to:
+ * a syntax error, if the argument is 0;
+ * 0, otherwise.
+ */
+# define FAIL_BUILD_ON_ZERO(e_)	(sizeof(int[-1 + 2 * !!(e_)]) * 0)
+
+/*
+ * Evaluates to:
+ * 1, if the given type is known to be a non-array type;
+ * 0, otherwise.
+ */
+# define IS_NOT_ARRAY(a_)	IS_SAME_TYPE((a_), &(a_)[0])
+
+/*
+ * Evaluates to:
+ * a syntax error, if the argument is not an array;
+ * 0, otherwise.
+ */
+# define MUST_BE_ARRAY(a_)	FAIL_BUILD_ON_ZERO(!IS_NOT_ARRAY(a_))
+
+/* Evaluates to the number of elements in the specified array.  */
 # define ARRAY_SIZE(a_)	(sizeof(a_) / sizeof((a_)[0]) + MUST_BE_ARRAY(a_))
 
 # define ARRSZ_PAIR(a_) a_, ARRAY_SIZE(a_)

@@ -12,7 +12,7 @@
 # include <stdio.h>
 
 # include "error_prints.h"
-# include "gcc_compat.h"
+# include "macros.h"
 
 /**
  * Print to static buffer and die on (really unexpected) errors and overflows.
