@@ -469,6 +469,26 @@ static struct bpf_attr_check BPF_MAP_CREATE_checks[] = {
 		       ", btf_value_type_id=3405705229"
 		       ", btf_vmlinux_value_type_id=3735929054"
 	},
+	{ /* 10 */
+		.data = { .BPF_MAP_CREATE_data = {
+			.map_type = BPF_MAP_TYPE_BLOOM_FILTER,
+			.map_extra = 4
+		} },
+		.size = offsetofend(struct BPF_MAP_CREATE_struct, map_extra),
+		.str = "map_type=BPF_MAP_TYPE_BLOOM_FILTER"
+		       ", key_size=0"
+		       ", value_size=0"
+		       ", max_entries=0"
+		       ", map_flags=0"
+		       ", inner_map_fd=0" FD0_PATH
+		       ", map_name=\"\""
+		       ", map_ifindex=0"
+		       ", btf_fd=0" FD0_PATH
+		       ", btf_key_type_id=0"
+		       ", btf_value_type_id=0"
+		       ", btf_vmlinux_value_type_id=0"
+		       ", map_extra=4"
+	},
 };
 
 static const struct bpf_attr_check BPF_MAP_LOOKUP_ELEM_checks[] = {
