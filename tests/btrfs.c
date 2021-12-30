@@ -22,6 +22,7 @@
 #include <sys/vfs.h>
 #include <linux/fs.h>
 #include <linux/btrfs_tree.h>
+#include "print_utils.h"
 #include "xlat.h"
 
 #define XLAT_MACROS_ONLY
@@ -33,6 +34,7 @@
 #include "xlat/btrfs_balance_state.h"
 #include "xlat/btrfs_compress_types.h"
 #include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
+#include "xlat/btrfs_csum_types.h"
 #include "xlat/btrfs_defrag_flags.h"
 #include "xlat/btrfs_dev_stats_values.h"
 #include "xlat/btrfs_dev_stats_flags.h"
@@ -46,6 +48,7 @@
 #include "xlat/btrfs_features_compat.h"
 #include "xlat/btrfs_features_compat_ro.h"
 #include "xlat/btrfs_features_incompat.h"
+#include "xlat/btrfs_fs_info_flags.h"
 #include "xlat/btrfs_key_types.h"
 
 #include <linux/fiemap.h>
@@ -148,6 +151,39 @@ print_uint64(const char *prefix, uint64_t val)
 	} else {
 		printf("%s%" PRIu64, prefix, val);
 	}
+}
+
+static void
+print_hex(uint8_t byte)
+{
+	printf("%c%c", BYTE_HEX_CHARS(byte));
+}
+
+static void
+print_uuid(const char * const prefix, const uint8_t * const uuid)
+{
+	size_t i = 0;
+
+	printf("%s", prefix);
+
+	for (; i < 4; i++)
+		print_hex(uuid[i]);
+	printf("-");
+
+	for (; i < 6; i++)
+		print_hex(uuid[i]);
+	printf("-");
+
+	for (; i < 8; i++)
+		print_hex(uuid[i]);
+	printf("-");
+
+	for (; i < 10; i++)
+		print_hex(uuid[i]);
+	printf("-");
+
+	for (; i < 16; i++)
+		print_hex(uuid[i]);
 }
 
 /* takes highest valid flag bit */
@@ -1953,6 +1989,81 @@ btrfs_test_read_ioctls(void)
 }
 
 static void
+btrfs_print_fs_info_args(const struct btrfs_ioctl_fs_info_args * const args)
+{
+	print_uint64("{max_id=", args->max_id);
+	print_uint64(", num_devices=", args->num_devices);
+	print_uuid(", fsid=", args->fsid);
+	printf(", nodesize=%" PRIu32, args->nodesize);
+	printf(", sectorsize=%" PRIu32, args->sectorsize);
+	printf(", clone_alignment=%" PRIu32, args->clone_alignment);
+
+	if (args->flags & BTRFS_FS_INFO_FLAG_CSUM_INFO) {
+		printf(", csum_type=");
+		prxval_btrfs(btrfs_csum_types, args->csum_type,
+			     "BTRFS_CSUM_TYPE_???", true);
+		printf(", csum_size=%" PRIu16, args->csum_size);
+	}
+
+	printf(", flags=");
+	prfl_btrfs(btrfs_fs_info_flags, args->flags, "BTRFS_FS_INFO_FLAG_???");
+
+	if (args->flags & BTRFS_FS_INFO_FLAG_GENERATION)
+		print_uint64(", generation=", args->generation);
+
+	if (args->flags & BTRFS_FS_INFO_FLAG_METADATA_UUID)
+		print_uuid(", metadata_uuid=", args->metadata_uuid);
+
+	printf("}");
+}
+
+static void
+btrfs_fs_info_args_subtest(const struct btrfs_ioctl_fs_info_args * const args)
+{
+	ioctl(btrfs_test_dir_fd, BTRFS_IOC_FS_INFO, args);
+	printf("ioctl(%d, %s, ", btrfs_test_dir_fd, ioc(BTRFS_IOC_FS_INFO));
+	btrfs_print_fs_info_args(args);
+	printf(") = 0\n");
+}
+
+static void
+btrfs_test_fs_info_ioctl(void)
+{
+	struct btrfs_ioctl_fs_info_args args = {};
+
+	if (!write_ok)
+		return;
+
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_CSUM_INFO;
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_GENERATION;
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_METADATA_UUID;
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_CSUM_INFO
+		| BTRFS_FS_INFO_FLAG_GENERATION;
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_CSUM_INFO
+		| BTRFS_FS_INFO_FLAG_METADATA_UUID;
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_GENERATION
+		| BTRFS_FS_INFO_FLAG_METADATA_UUID;
+	btrfs_fs_info_args_subtest(&args);
+
+	args.flags = BTRFS_FS_INFO_FLAG_CSUM_INFO
+		| BTRFS_FS_INFO_FLAG_GENERATION
+		| BTRFS_FS_INFO_FLAG_METADATA_UUID;
+	btrfs_fs_info_args_subtest(&args);
+}
+
+static void
 rm_test_dir(void)
 {
 	int rootfd = open(path, O_RDONLY|O_DIRECTORY);
@@ -2058,6 +2169,7 @@ main(int argc, char *argv[])
 	btrfs_test_dev_replace_ioctl();
 	btrfs_test_extent_same_ioctl();
 	btrfs_test_features_ioctls();
+	btrfs_test_fs_info_ioctl();
 
 	puts("+++ exited with 0 +++");
 

@@ -37,6 +37,7 @@ typedef struct btrfs_ioctl_vol_args_v2
 #include "xlat/btrfs_balance_state.h"
 #include "xlat/btrfs_compress_types.h"
 #include "xlat/btrfs_cont_reading_from_srcdev_mode.h"
+#include "xlat/btrfs_csum_types.h"
 #include "xlat/btrfs_defrag_flags.h"
 #include "xlat/btrfs_dev_replace_cmds.h"
 #include "xlat/btrfs_dev_replace_results.h"
@@ -46,6 +47,7 @@ typedef struct btrfs_ioctl_vol_args_v2
 #include "xlat/btrfs_features_compat.h"
 #include "xlat/btrfs_features_compat_ro.h"
 #include "xlat/btrfs_features_incompat.h"
+#include "xlat/btrfs_fs_info_flags.h"
 #include "xlat/btrfs_key_types.h"
 #include "xlat/btrfs_logical_ino_args_flags.h"
 #include "xlat/btrfs_qgroup_ctl_cmds.h"
@@ -790,6 +792,24 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 		PRINT_FIELD_U(args, sectorsize);
 		tprint_struct_next();
 		PRINT_FIELD_U(args, clone_alignment);
+		if (args.flags & BTRFS_FS_INFO_FLAG_CSUM_INFO) {
+			tprint_struct_next();
+			PRINT_FIELD_XVAL(args, csum_type, btrfs_csum_types,
+					 "BTRFS_CSUM_TYPE_???");
+			tprint_struct_next();
+			PRINT_FIELD_U(args, csum_size);
+		}
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(args, flags, btrfs_fs_info_flags,
+				  "BTRFS_FS_INFO_FLAG_???");
+		if (args.flags & BTRFS_FS_INFO_FLAG_GENERATION) {
+			tprint_struct_next();
+			PRINT_FIELD_U(args, generation);
+		}
+		if (args.flags & BTRFS_FS_INFO_FLAG_METADATA_UUID) {
+			tprint_struct_next();
+			PRINT_FIELD_UUID(args, metadata_uuid);
+		}
 		tprint_struct_end();
 		break;
 	}
