@@ -71,7 +71,8 @@ print_bpf_attr(void)
 		", line_info=NULL"
 		", line_info_cnt=0"
 		", attach_btf_id=0"
-		", attach_prog_fd=0}");
+		", attach_prog_fd=0"
+		", fd_array=NULL}");
 }
 
 int

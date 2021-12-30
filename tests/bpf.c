@@ -786,9 +786,9 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 			.line_info_cnt = 0xdad7bef8,
 			.attach_btf_id = 0xdad7befa,
 			.attach_prog_fd = 0xbadc0def,
+			.fd_array = 0xfaceb00c,
 		} },
-		.size = offsetofend(struct BPF_PROG_LOAD_struct,
-				    attach_prog_fd),
+		.size = offsetofend(struct BPF_PROG_LOAD_struct, fd_array),
 		.str = "prog_type=BPF_PROG_TYPE_UNSPEC"
 		       ", insn_cnt=0"
 		       ", insns=NULL"
@@ -810,6 +810,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 		       ", line_info_cnt=3671572216"
 		       ", attach_btf_id=3671572218"
 		       ", attach_prog_fd=-1159983633"
+		       ", fd_array=0xfaceb00c"
 	},
 };
 
