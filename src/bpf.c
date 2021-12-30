@@ -923,6 +923,26 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 	tprint_struct_next();
 	PRINT_FIELD_U(info, run_cnt);
 
+	/*
+	 * The following field was introduced by Linux commit
+	 * v5.12-rc1~200^2~28^2~28.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, recursion_misses))
+		goto print_bpf_prog_info_end;
+
+	tprint_struct_next();
+	PRINT_FIELD_U64(info, recursion_misses);
+
+	/*
+	 * The following field was introduced by Linux commit
+	 * v5.16-rc1~159^2~2^2~43^2~1.
+	 */
+	if (len <= offsetof(struct bpf_prog_info_struct, verified_insns))
+		goto print_bpf_prog_info_end;
+
+	tprint_struct_next();
+	PRINT_FIELD_U(info, verified_insns);
+
 	decode_attr_extra_data(tcp, info_buf, size, bpf_prog_info_struct_size);
 
 print_bpf_prog_info_end:

@@ -705,6 +705,13 @@ main(int ac, char **av)
 		    offsetof(struct bpf_prog_info_struct, run_cnt))
 			printf(", run_cnt=%llu",
 			       (unsigned long long) prog_info->run_cnt);
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, recursion_misses))
+			printf(", recursion_misses=%llu",
+			       (unsigned long long) prog_info->recursion_misses);
+		if (bpf_prog_get_info_attr.info_len >
+		    offsetof(struct bpf_prog_info_struct, verified_insns))
+			printf(", verified_insns=%u", prog_info->verified_insns);
 
 		printf("}");
 # else /* !VERBOSE */
