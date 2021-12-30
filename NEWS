@@ -2,6 +2,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
+  * Updated lists of BPF_* constants.
   * Updated lists of ioctl commands from Linux 5.16.
 
 * Bug fixes
