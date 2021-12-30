@@ -2,7 +2,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
 * Improvements
-  * Enhanced decoding of BPF_MAP_CREATE and BPF_PROG_LOAD bpf syscall commands.
+  * Enhanced decoding of BPF_MAP_CREATE, BPF_PROG_TEST_RUN, and BPF_PROG_LOAD
+    bpf syscall commands.
   * Updated lists of BPF_* constants.
   * Updated lists of ioctl commands from Linux 5.16.
 

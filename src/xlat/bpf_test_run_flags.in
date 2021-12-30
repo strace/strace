@@ -1,0 +1,1 @@
+BPF_F_TEST_RUN_ON_CPU	(1U << 0)

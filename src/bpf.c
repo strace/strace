@@ -28,6 +28,7 @@
 #include "xlat/bpf_attach_flags.h"
 #include "xlat/bpf_query_flags.h"
 #include "xlat/bpf_task_fd_type.h"
+#include "xlat/bpf_test_run_flags.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -507,6 +508,15 @@ BEGIN_BPF_CMD_DECODER(BPF_PROG_TEST_RUN)
 		PRINT_FIELD_ADDR64(attr, ctx_in);
 		tprint_struct_next();
 		PRINT_FIELD_ADDR64(attr, ctx_out);
+	}
+	/* The following two fields were introduced in Linux commit
+	 * v5.10-rc1~107^2~96^2~36.
+	 */
+	if (len > offsetof(struct BPF_PROG_TEST_RUN_struct, flags)) {
+		tprint_struct_next();
+		PRINT_FIELD_FLAGS(attr, flags, bpf_test_run_flags, "BPF_F_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, cpu);
 	}
 	tprint_struct_end();
 }

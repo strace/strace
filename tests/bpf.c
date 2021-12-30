@@ -29,6 +29,7 @@
 #include "xlat/bpf_commands.h"
 #include "xlat/bpf_map_types.h"
 #include "xlat/bpf_prog_types.h"
+#include "xlat/bpf_test_run_flags.h"
 
 #if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
 # define BIG_ADDR(addr64_, addr32_) addr64_
@@ -947,9 +948,11 @@ static const struct bpf_attr_check BPF_PROG_TEST_RUN_checks[] = {
 			.ctx_size_in = 0xfacbfedc,
 			.ctx_size_out = 0xfacdfede,
 			.ctx_in = (uint64_t) 0xfacef55dbadc6dedULL,
-			.ctx_out = (uint64_t) 0xfacef77dbadc8dedULL
+			.ctx_out = (uint64_t) 0xfacef77dbadc8dedULL,
+			.flags = BPF_F_TEST_RUN_ON_CPU,
+			.cpu = 1,
 		} },
-		.size = offsetofend(struct BPF_PROG_TEST_RUN_struct, ctx_out),
+		.size = offsetofend(struct BPF_PROG_TEST_RUN_struct, cpu),
 		.str = "test={prog_fd=-1, retval=4207017682"
 		       ", data_size_in=4207148756, data_size_out=4207279830"
 		       ", data_in=0xfacef11dbadc2ded"
@@ -959,7 +962,9 @@ static const struct bpf_attr_check BPF_PROG_TEST_RUN_checks[] = {
 		       ", ctx_size_in=4207673052"
 		       ", ctx_size_out=4207804126"
 		       ", ctx_in=0xfacef55dbadc6ded"
-		       ", ctx_out=0xfacef77dbadc8ded}"
+		       ", ctx_out=0xfacef77dbadc8ded"
+		       ", flags=BPF_F_TEST_RUN_ON_CPU"
+		       ", cpu=1}"
 	}
 };
 
