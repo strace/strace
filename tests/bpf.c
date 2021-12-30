@@ -86,6 +86,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_MAP_DELETE_BATCH);
 	BPF_ATTR_DATA_FIELD(BPF_LINK_CREATE);
 	BPF_ATTR_DATA_FIELD(BPF_LINK_UPDATE);
+	BPF_ATTR_DATA_FIELD(BPF_LINK_GET_FD_BY_ID);
 	char char_data[256];
 };
 
@@ -1006,6 +1007,7 @@ static const struct bpf_attr_check BPF_PROG_GET_NEXT_ID_checks[] = {
 
 #define BPF_MAP_GET_NEXT_ID_checks BPF_PROG_GET_NEXT_ID_checks
 #define BPF_BTF_GET_NEXT_ID_checks BPF_PROG_GET_NEXT_ID_checks
+#define BPF_LINK_GET_NEXT_ID_checks BPF_PROG_GET_NEXT_ID_checks
 
 static const struct bpf_attr_check BPF_PROG_GET_FD_BY_ID_checks[] = {
 	{
@@ -1459,6 +1461,14 @@ static const struct bpf_attr_check BPF_LINK_UPDATE_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_LINK_GET_FD_BY_ID_checks[] = {
+	{
+		.data = { .BPF_LINK_GET_FD_BY_ID_data = { .link_id = 0xdeadbeef } },
+		.size = offsetofend(struct BPF_LINK_GET_FD_BY_ID_struct, link_id),
+		.str = "link_id=3735928559"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1500,6 +1510,8 @@ main(void)
 		CHK(BPF_MAP_DELETE_BATCH),
 		CHK(BPF_LINK_CREATE),
 		CHK(BPF_LINK_UPDATE),
+		CHK(BPF_LINK_GET_NEXT_ID),
+		CHK(BPF_LINK_GET_FD_BY_ID),
 	};
 
 	page_size = get_page_size();

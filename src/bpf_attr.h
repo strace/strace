@@ -414,4 +414,12 @@ struct BPF_LINK_UPDATE_struct /* link_update */ {
 	sizeof(struct BPF_LINK_UPDATE_struct)
 # define expected_BPF_LINK_UPDATE_struct_size 16
 
+struct BPF_LINK_GET_FD_BY_ID_struct {
+	uint32_t link_id;
+};
+
+# define BPF_LINK_GET_FD_BY_ID_struct_size \
+	sizeof(struct BPF_LINK_GET_FD_BY_ID_struct)
+# define expected_BPF_LINK_GET_FD_BY_ID_struct_size 4
+
 #endif /* !STRACE_BPF_ATTR_H */
