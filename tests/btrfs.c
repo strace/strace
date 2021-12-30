@@ -413,16 +413,11 @@ btrfs_test_subvol_ioctls(void)
 	if (write_ok) {
 		struct btrfs_ioctl_vol_args_v2 args_passed;
 		long ret;
-		/*
-		 * Returns transid if flags & BTRFS_SUBVOL_CREATE_ASYNC
-		 * - BTRFS_IOC_SNAP_CREATE_V2
-		 * - BTRFS_IOC_SUBVOL_CREATE_V2
-		 */
 		int subvolfd;
 
 		strncpy(vol_args_v2.name, subvol_name,
 			sizeof(vol_args_v2.name));
-		vol_args_v2.flags = BTRFS_SUBVOL_CREATE_ASYNC;
+		vol_args_v2.flags = 0;
 		vol_args_v2.size = 0;
 		vol_args_v2.qgroup_inherit = NULL;
 		args_passed = vol_args_v2;
@@ -1334,7 +1329,7 @@ btrfs_test_ino_path_ioctls(void)
 				printf("{fe_logical=%" PRI__u64
 				       ", fe_physical=%" PRI__u64
 				       ", fe_length=%" PRI__u64
-				       ", ",
+				       ", fe_flags=",
 				       fe->fe_logical, fe->fe_physical,
 				       fe->fe_length);
 				prfl_btrfs(fiemap_extent_flags, fe->fe_flags,
