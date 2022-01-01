@@ -11,7 +11,7 @@
 .    BR "\\$1"
 ..
 .\"
-.TH STRACE-LOG-MERGE 1 "@MANPAGE_DATE@" "strace @VERSION@"
+.TH STRACE-LOG-MERGE 1 "@SLM_MANPAGE_DATE@" "strace @VERSION@"
 .\"
 .SH NAME
 strace-log-merge \- merge strace \-ff \-tt output

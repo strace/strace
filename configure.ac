@@ -17,7 +17,10 @@ AC_INIT([strace],
 	[strace],
 	[https://strace.io])
 m4_define([copyright_year], st_esyscmd_s([./build-aux/copyright-year-gen .year]))
-m4_define([manpage_date], st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))
+m4_define([strace_manpage_date],
+	  st_esyscmd_s([./build-aux/file-date-gen doc/strace.1.in]))
+m4_define([slm_manpage_date],
+	  st_esyscmd_s([./build-aux/file-date-gen doc/strace-log-merge.1.in]))
 m4_define([linux_version_code],
 	  st_esyscmd_s([sed '/^#define LINUX_VERSION_CODE /!d;s///;q' bundled/linux/include/uapi/linux/version.h]))
 AC_COPYRIGHT([Copyright (c) 1999-]copyright_year[ The strace developers.])
@@ -46,8 +49,10 @@ AX_CODE_COVERAGE
 AC_DEFINE([COPYRIGHT_YEAR], "[copyright_year]", [Current copyright year.])
 AC_SUBST([COPYRIGHT_YEAR], [copyright_year])
 
-AC_DEFINE([MANPAGE_DATE], "[manpage_date]", [Date])
-AC_SUBST([MANPAGE_DATE], [manpage_date])
+AC_DEFINE([STRACE_MANPAGE_DATE], "[strace_manpage_date]", [Date])
+AC_SUBST([STRACE_MANPAGE_DATE], [strace_manpage_date])
+AC_DEFINE([SLM_MANPAGE_DATE], "[slm_manpage_date]", [Date])
+AC_SUBST([SLM_MANPAGE_DATE], [slm_manpage_date])
 
 AC_C_BIGENDIAN
 

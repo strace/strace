@@ -72,7 +72,10 @@ $(srcdir)/.version:
 dist-hook:
 	$(AM_V_GEN)echo $(VERSION) > $(distdir)/.tarball-version
 	${AM_V_GEN}echo $(COPYRIGHT_YEAR) > $(distdir)/.year
-	${AM_V_GEN}echo $(MANPAGE_DATE) > $(distdir)/doc/.strace.1.in.date
+	${AM_V_GEN}echo $(STRACE_MANPAGE_DATE) \
+		> $(distdir)/doc/.strace.1.in.date
+	${AM_V_GEN}echo $(SLM_MANPAGE_DATE) \
+		> $(distdir)/doc/.strace-log-merge.1.in.date
 
 today = $(shell LC_TIME=C date -u +%Y-%m-%d)
 version_regexp = $(subst .,\.,$(VERSION))

@@ -33,7 +33,7 @@
 .  el \
 .    BR "\\$1"
 ..
-.TH STRACE 1 "@MANPAGE_DATE@" "strace @VERSION@"
+.TH STRACE 1 "@STRACE_MANPAGE_DATE@" "strace @VERSION@"
 .SH NAME
 strace \- trace system calls and signals
 .SH SYNOPSIS
