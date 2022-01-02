@@ -334,13 +334,13 @@ ioctl_seccomp--pidns-translation			test_pidns -etrace=ioctl "QUIRK:START-OF-TEST
 ioctl_seccomp-success					+ioctl-success.sh -a42
 ioctl_seccomp-y						+ioctl.test -a42 -y
 ioctl_seccomp-y-success					+ioctl-success.sh -a42 -y
-ioctl_seccomp-y-success-Xabbrev				+ioctl-success.sh -a42 -y -Xabbrev
-ioctl_seccomp-y-success-Xraw				+ioctl-success.sh -a27 -y -Xraw
-ioctl_seccomp-y-success-Xverbose			+ioctl-success.sh -a59 -y -Xverbose
 ioctl_seccomp-y-success--pidns-translation		check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT:ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a48
 ioctl_seccomp-y-success--pidns-translation-Xabbrev	check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT:ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a48 -Xabbrev
 ioctl_seccomp-y-success--pidns-translation-Xraw		check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT-REGEX:ioctl(-1, 0x[0-9a-f]*, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a33 -Xraw
 ioctl_seccomp-y-success--pidns-translation-Xverbose	check_scno_tampering; test_pidns -einject=ioctl:when=256+:retval=42 -etrace=ioctl "QUIRK:START-OF-TEST-OUTPUT-REGEX:ioctl(-1, 0x[0-9a-f]* /\* SECCOMP_IOCTL_NOTIF_RECV \*/, NULL)" "QUIRK:PROG-ARGS:256 42" -y -a65 -Xverbose
+ioctl_seccomp-y-success-Xabbrev				+ioctl-success.sh -a42 -y -Xabbrev
+ioctl_seccomp-y-success-Xraw				+ioctl-success.sh -a27 -y -Xraw
+ioctl_seccomp-y-success-Xverbose			+ioctl-success.sh -a59 -y -Xverbose
 ioctl_sg_io_v3	+ioctl.test
 ioctl_sg_io_v4	+ioctl.test
 ioctl_sock	+ioctl.test -a23
@@ -550,13 +550,13 @@ nlattr_ifla_vfinfo-Xraw		+netlink_sock_diag.test -Xraw
 nlattr_ifla_vfinfo-Xverbose	+netlink_sock_diag.test -Xverbose
 nlattr_ifla_xdp			+netlink_sock_diag.test
 nlattr_ifla_xdp-y		+netlink_sock_diag.test -y; exec 9</dev/full
-nlattr_inet_diag_msg		+netlink_sock_diag.test
-nlattr_inet_diag_req_compat	+netlink_sock_diag.test
-nlattr_inet_diag_req_v2		+netlink_sock_diag.test
 nlattr_ifstats			+netlink_sock_diag.test
 nlattr_ifstats-Xabbrev		+netlink_sock_diag.test -Xabbrev
 nlattr_ifstats-Xraw		+netlink_sock_diag.test -Xraw
 nlattr_ifstats-Xverbose		+netlink_sock_diag.test -Xverbose
+nlattr_inet_diag_msg		+netlink_sock_diag.test
+nlattr_inet_diag_req_compat	+netlink_sock_diag.test
+nlattr_inet_diag_req_v2		+netlink_sock_diag.test
 nlattr_mdba_mdb_entry		+netlink_sock_diag.test
 nlattr_mdba_router_port		+netlink_sock_diag.test
 nlattr_ndmsg			+netlink_sock_diag.test
@@ -659,21 +659,21 @@ prctl-pac-enabled-keys-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="
 prctl-pac-reset-keys	+prctl.sh -a43
 prctl-pdeathsig		+prctl.sh -a30
 prctl-sched-core		+prctl.sh -a71
-prctl-sched-core-Xabbrev	+prctl.sh -a71 -Xabbrev
-prctl-sched-core-Xraw		+prctl.sh -a28 -Xraw
-prctl-sched-core-Xverbose	+prctl.sh -a83 -Xverbose
 prctl-sched-core--pidns-translation		test_pidns -etrace=prctl -a73 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)"
 prctl-sched-core--pidns-translation-Xabbrev	test_pidns -etrace=prctl -a73 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xabbrev
 prctl-sched-core--pidns-translation-Xraw	test_pidns -etrace=prctl -a30 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xraw
 prctl-sched-core--pidns-translation-Xverbose	test_pidns -etrace=prctl -a85 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xverbose
+prctl-sched-core-Xabbrev	+prctl.sh -a71 -Xabbrev
+prctl-sched-core-Xraw		+prctl.sh -a28 -Xraw
+prctl-sched-core-Xverbose	+prctl.sh -a83 -Xverbose
 prctl-sched-core-success		+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a71
-prctl-sched-core-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a71 -Xabbrev
-prctl-sched-core-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a28 -Xraw
-prctl-sched-core-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a83 -Xverbose
 prctl-sched-core-success--pidns-translation		check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a73 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)"
 prctl-sched-core-success--pidns-translation-Xabbrev	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a73 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xabbrev
 prctl-sched-core-success--pidns-translation-Xraw	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a30 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xraw
 prctl-sched-core-success--pidns-translation-Xverbose	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a85 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xverbose
+prctl-sched-core-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a71 -Xabbrev
+prctl-sched-core-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a28 -Xraw
+prctl-sched-core-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a83 -Xverbose
 prctl-seccomp-filter-v	+prctl.sh -v
 prctl-securebits	+prctl.sh -a25
 prctl-securebits-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a25
@@ -681,12 +681,12 @@ prctl-securebits-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 
 prctl-securebits-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a12 -Xraw
 prctl-securebits-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 1 42 255 256 511" -a36 -Xverbose
 prctl-set-ptracer-success		+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a25
-prctl-set-ptracer-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a25 -Xabbrev
-prctl-set-ptracer-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a20 -Xraw
-prctl-set-ptracer-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a42 -Xverbose
 prctl-set-ptracer-success--pidns-translation		check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a31 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)"
+prctl-set-ptracer-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a25 -Xabbrev
 prctl-set-ptracer-success-Xabbrev--pidns-translation	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a31 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xabbrev
+prctl-set-ptracer-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a20 -Xraw
 prctl-set-ptracer-success-Xraw--pidns-translation	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a27 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xraw
+prctl-set-ptracer-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a42 -Xverbose
 prctl-set-ptracer-success-Xverbose--pidns-translation	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a48 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xverbose
 prctl-spec-inject	+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 3 8 16 32 42" -a50
 prctl-sve		+prctl.sh -a21
@@ -741,11 +741,11 @@ ptrace_syscall_info-Xraw	-a26 -e signal=none -e trace=ptrace -Xraw
 ptrace_syscall_info-Xverbose	-a47 -e signal=none -e trace=ptrace -Xverbose
 pwritev	-a22 -s7
 quotactl
-quotactl-success	-einject=quotactl:retval=42 -etrace=quotactl
-quotactl-success-v	-einject=quotactl:retval=42 -etrace=quotactl -v
 quotactl-Xabbrev	-Xabbrev -e trace=quotactl
 quotactl-Xraw	-a27 -Xraw -e trace=quotactl
 quotactl-Xverbose	-Xverbose -e trace=quotactl
+quotactl-success	-einject=quotactl:retval=42 -etrace=quotactl
+quotactl-success-v	-einject=quotactl:retval=42 -etrace=quotactl -v
 quotactl-v	-v -e trace=quotactl
 quotactl-xfs	-e trace=quotactl
 quotactl-xfs-success	-einject=quotactl:retval=42 -etrace=quotactl
@@ -870,10 +870,10 @@ sock_filter-v-Xabbrev	-v -e trace=getsockopt,setsockopt -X abbrev
 sock_filter-v-Xraw	-a 37 -v -e trace=getsockopt,setsockopt -X raw
 sock_filter-v-Xverbose	-v -e trace=getsockopt,setsockopt -X verbose
 sockaddr_xlat-Xabbrev	-Xabbrev -e trace=connect -a22
-sockaddr_xlat-Xraw	-Xraw -e trace=connect -a22
-sockaddr_xlat-Xverbose	-Xverbose -e trace=connect -a22
 sockaddr_xlat-Xabbrev-y		-Xabbrev -y -e trace=connect -a22 </dev/null 7>/dev/zero
+sockaddr_xlat-Xraw	-Xraw -e trace=connect -a22
 sockaddr_xlat-Xraw-y		-Xraw -y -e trace=connect -a22 </dev/null 7>/dev/zero
+sockaddr_xlat-Xverbose	-Xverbose -e trace=connect -a22
 sockaddr_xlat-Xverbose-y	-Xverbose -y -e trace=connect -a22 </dev/null 7>/dev/zero
 socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt

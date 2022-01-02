@@ -212,13 +212,13 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_seccomp-success \
 	ioctl_seccomp-y \
 	ioctl_seccomp-y-success \
-	ioctl_seccomp-y-success-Xabbrev \
-	ioctl_seccomp-y-success-Xraw \
-	ioctl_seccomp-y-success-Xverbose \
 	ioctl_seccomp-y-success--pidns-translation \
 	ioctl_seccomp-y-success--pidns-translation-Xabbrev \
 	ioctl_seccomp-y-success--pidns-translation-Xraw \
 	ioctl_seccomp-y-success--pidns-translation-Xverbose \
+	ioctl_seccomp-y-success-Xabbrev \
+	ioctl_seccomp-y-success-Xraw \
+	ioctl_seccomp-y-success-Xverbose \
 	ioctl_ubi-success \
 	ioctl_v4l2-success \
 	ioctl_v4l2-success-Xabbrev \
@@ -278,13 +278,13 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-sched-core--pidns-translation-Xraw \
 	prctl-sched-core--pidns-translation-Xverbose \
 	prctl-sched-core-success \
-	prctl-sched-core-success-Xabbrev \
-	prctl-sched-core-success-Xraw \
-	prctl-sched-core-success-Xverbose \
 	prctl-sched-core-success--pidns-translation \
 	prctl-sched-core-success--pidns-translation-Xabbrev \
 	prctl-sched-core-success--pidns-translation-Xraw \
 	prctl-sched-core-success--pidns-translation-Xverbose \
+	prctl-sched-core-success-Xabbrev \
+	prctl-sched-core-success-Xraw \
+	prctl-sched-core-success-Xverbose \
 	prctl-seccomp-filter-v \
 	prctl-seccomp-strict \
 	prctl-securebits-success \
@@ -292,12 +292,12 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-securebits-success-Xraw \
 	prctl-securebits-success-Xverbose \
 	prctl-set-ptracer-success \
-	prctl-set-ptracer-success-Xabbrev \
-	prctl-set-ptracer-success-Xraw \
-	prctl-set-ptracer-success-Xverbose \
 	prctl-set-ptracer-success--pidns-translation \
+	prctl-set-ptracer-success-Xabbrev \
 	prctl-set-ptracer-success-Xabbrev--pidns-translation \
+	prctl-set-ptracer-success-Xraw \
 	prctl-set-ptracer-success-Xraw--pidns-translation \
+	prctl-set-ptracer-success-Xverbose \
 	prctl-set-ptracer-success-Xverbose--pidns-translation \
 	prctl-spec-inject \
 	prctl-tagged-addr-success \
