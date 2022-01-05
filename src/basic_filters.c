@@ -14,6 +14,10 @@
 #include "number_set.h"
 #include "xstring.h"
 
+/* Personality designators to be used for specifying personality */
+static const char *const personality_designators[] = PERSONALITY_DESIGNATORS;
+static_assert(ARRAY_SIZE(personality_designators) == SUPPORTED_PERSONALITIES,
+	      "ARRAY_SIZE(personality_designators) != SUPPORTED_PERSONALITIES");
 
 /**
  * Checks whether a @-separated personality specification suffix is present.

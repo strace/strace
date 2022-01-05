@@ -167,29 +167,9 @@ const struct_sysent *const sysent_vec[SUPPORTED_PERSONALITIES] = {
 #endif
 };
 
-const char *const personality_names[] =
-#if defined X86_64
-	{"64 bit", "32 bit", "x32"}
-#elif defined X32
-	{"x32", "32 bit"}
-#elif SUPPORTED_PERSONALITIES == 2
-	{"64 bit", "32 bit"}
-#else
-	{STRINGIFY_VAL(__WORDSIZE) " bit"}
-#endif
-	;
-
-const char *const personality_designators[] =
-#if defined X86_64
-	{ "64", "32", "x32" }
-#elif defined X32
-	{ "x32", "32" }
-#elif SUPPORTED_PERSONALITIES == 2
-	{ "64", "32" }
-#else
-	{ STRINGIFY_VAL(__WORDSIZE) }
-#endif
-	;
+const char *const personality_names[] = PERSONALITY_NAMES;
+static_assert(ARRAY_SIZE(personality_names) == SUPPORTED_PERSONALITIES,
+	      "ARRAY_SIZE(personality_names) != SUPPORTED_PERSONALITIES");
 
 #if SUPPORTED_PERSONALITIES > 1
 
