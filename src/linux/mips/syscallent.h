@@ -1,4 +1,3 @@
-#include "syscall_dummy.h"
 #include "syscallent-compat.h"
 #include "syscallent-o32.h"
 #include "syscallent-n64.h"
