@@ -535,11 +535,19 @@ SO_NETNS_COOKIE		16453
 #else
 SO_NETNS_COOKIE		71
 #endif
-#
+
 #if defined __sparc__
 SO_BUF_LOCK		81
 #elif defined __hppa__
 SO_BUF_LOCK		16454
 #else
 SO_BUF_LOCK		72
+#endif
+
+#if defined __sparc__
+SO_RESERVE_MEM		82
+#elif defined __hppa__
+SO_RESERVE_MEM		16455
+#else
+SO_RESERVE_MEM		73
 #endif
