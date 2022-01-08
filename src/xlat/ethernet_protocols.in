@@ -65,6 +65,7 @@ ETH_P_PPP_SES	0x8864		/* PPPoE session messages	*/
 ETH_P_LINK_CTL	0x886c		/* HPNA, wlan link local tunnel */
 ETH_P_ATMFATE	0x8884		/* Frame-based ATM Transport over Ethernet */
 ETH_P_PAE	0x888E		/* Port Access Entity (IEEE 802.1X) */
+ETH_P_REALTEK	0x8899		/* Multiple proprietary protocols */
 ETH_P_AOE	0x88A2		/* ATA over Ethernet		*/
 ETH_P_8021AD	0x88A8          /* 802.1ad Service VLAN		*/
 ETH_P_802_EX1	0x88B5		/* 802.1 Local Experimental 1.  */
