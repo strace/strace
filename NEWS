@@ -10,7 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     bpf syscall commands.
   * Enhanced decoding of BTRFS_IOC_FS_INFO ioctl command.
   * Updated lists of AUDIT_*, BPF_*, BTRFS_*, DEVCONF_*, FAN_*, ETH_P_*,
-    IPV4_DEVCONF_*, KVM_*, SO_*, and V4L2_* constants.
+    IPV4_DEVCONF_*, KVM_*, NDA_*, SO_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 5.16.
 
 * Bug fixes
