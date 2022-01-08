@@ -9,7 +9,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of BPF_MAP_CREATE, BPF_PROG_TEST_RUN, and BPF_PROG_LOAD
     bpf syscall commands.
   * Enhanced decoding of BTRFS_IOC_FS_INFO ioctl command.
-  * Updated lists of AUDIT_*, BPF_*, BTRFS_*, FAN_*, ETH_P_*,
+  * Updated lists of AUDIT_*, BPF_*, BTRFS_*, FAN_*, ETH_P_*, IPV4_DEVCONF_*,
     and SO_* constants.
   * Updated lists of ioctl commands from Linux 5.16.
 
