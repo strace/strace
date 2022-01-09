@@ -186,6 +186,7 @@ fsync	-a10
 fsync-y -y -e trace=fsync
 ftruncate	-a24
 ftruncate64	-a36
+futex_waitv	-s256
 futimesat	-a28
 get_mempolicy	-s3 -a38
 getcpu	-a25

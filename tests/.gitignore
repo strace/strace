@@ -170,6 +170,7 @@ fsync-y
 ftruncate
 ftruncate64
 futex
+futex_waitv
 futimesat
 gen_tests.am
 get_mempolicy

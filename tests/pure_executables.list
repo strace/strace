@@ -120,6 +120,7 @@ fsync
 ftruncate
 ftruncate64
 futex
+futex_waitv
 futimesat
 get_mempolicy
 getcpu
