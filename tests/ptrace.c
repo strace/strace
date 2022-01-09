@@ -205,7 +205,7 @@ test_peeksiginfo(int pid, const unsigned long bad_request)
 # define TRACEE_REGS_STRUCT struct pt_regs
 #elif defined __arm__
 # define TRACEE_REGS_STRUCT struct pt_regs
-#elif defined __arm64__ || defined __aarch64__
+#elif defined __arm64__ || defined __aarch64__ || defined __loongarch__
 # define TRACEE_REGS_STRUCT struct user_pt_regs
 #elif defined __s390__ || defined __s390x__
 # define TRACEE_REGS_STRUCT s390_regs
@@ -843,11 +843,47 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		PRINT_FIELD_X(*regs, cp0_cause);
 	}
 
+# elif defined __loongarch__
+
+	if (size > offsetof(TRACEE_REGS_STRUCT, regs)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, regs);
+		fputs("regs=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->regs); ++i) {
+			if (len > i * sizeof(regs->regs[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->regs[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, csr_era)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, csr_era);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, csr_badv)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, csr_badv);
+	}
+	if (size > offsetof(TRACEE_REGS_STRUCT, reserved)) {
+		const size_t len = size - offsetof(TRACEE_REGS_STRUCT, reserved);
+		fputs(", reserved=[", stdout);
+		for (unsigned int i = 0; i < ARRAY_SIZE(regs->reserved); ++i) {
+			if (len > i * sizeof(regs->reserved[i])) {
+				if (i)
+					fputs(", ", stdout);
+				PRINT_VAL_X(regs->reserved[i]);
+			}
+		}
+		fputs("]", stdout);
+	}
+
 # endif /*
 	   __aarch64__ ||
 	   __arm64__ ||
 	   __arm__ ||
 	   __i386__ ||
+	   __loongarch__ ||
 	   __mips__ ||
 	   __powerpc64__ ||
 	   __powerpc__ ||
@@ -1085,6 +1121,8 @@ typedef struct {
 	uint64_t fpscr;
 } ppc_fpregs_struct;
 # define TRACEE_REGS_STRUCT ppc_fpregs_struct
+#elif defined __loongarch__
+# define TRACEE_REGS_STRUCT struct user_fp_state
 #endif
 
 static void
@@ -1228,8 +1266,29 @@ print_fpregset(const void *const rs, const size_t size)
 		PRINT_FIELD_X(*regs, fpscr);
 	}
 
+# elif defined __loongarch__
+
+	fputs("fpr=[", stdout);
+	for (unsigned int i = 0; i < ARRAY_SIZE(regs->fpr); ++i) {
+		if (size > i * sizeof(regs->fpr[i])) {
+			if (i)
+				fputs(", ", stdout);
+			PRINT_VAL_X(regs->fpr[i]);
+		}
+	}
+	fputs("]", stdout);
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fcc)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fcc);
+	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, fcsr)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, fcsr);
+	}
+
 # endif /*
 	   __i386__ ||
+	   __loongarch__ ||
 	   __powerpc64__ ||
 	   __powerpc__ ||
 	   __x86_64__
