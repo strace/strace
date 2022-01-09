@@ -6,7 +6,7 @@
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
  *                     Linux for s390 port by D.J. Barrow
  *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
- * Copyright (c) 1999-2021 The strace developers.
+ * Copyright (c) 1999-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
