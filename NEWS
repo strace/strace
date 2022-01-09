@@ -4,6 +4,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 * Improvements
   * Implemented --secontext=mismatch option to find mismatches in SELinux
     contexts.
+  * Implemented decoding of futex_waitv syscall introduced in Linux 5.16.
   * Implemented decoding of BPF_LINK_GET_NEXT_ID and BPF_LINK_GET_FD_BY_ID bpf
     syscall commands.
   * Enhanced decoding of BPF_MAP_CREATE, BPF_PROG_TEST_RUN, and BPF_PROG_LOAD
