@@ -63,13 +63,13 @@
  * 1, if the given two types are known to be the same;
  * 0, otherwise.
  */
-#if GNUC_PREREQ(3, 0)
-# define IS_SAME_TYPE(x_, y_)						\
+# if GNUC_PREREQ(3, 0)
+#  define IS_SAME_TYPE(x_, y_)						\
 	__builtin_types_compatible_p(__typeof__(x_), __typeof__(y_))
-#else
+# else
 /* Cannot tell whether these types are the same.  */
-# define IS_SAME_TYPE(x_, y_)	0
-#endif
+#  define IS_SAME_TYPE(x_, y_)	0
+# endif
 
 # if GNUC_PREREQ(3, 0)
 #  define ATTRIBUTE_MALLOC	__attribute__((__malloc__))
