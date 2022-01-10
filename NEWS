@@ -1,4 +1,4 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 5.16 (2022-01-10)
 ===============================================
 
 * Improvements
@@ -15,6 +15,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of ioctl commands from Linux 5.16.
 
 * Bug fixes
+  * Fixed build for older Android.
 
 Noteworthy changes in release 5.15 (2021-12-01)
 ===============================================
