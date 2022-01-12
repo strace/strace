@@ -1307,10 +1307,12 @@ field is not supplied explicitly, it is added as the last column.
 Summarise the time difference between the beginning and end of
 each system call.  The default is to summarise the system time.
 .SS Tampering
+.ad l
 .TP 12
-\fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-e\ inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR]\:[:\fBsignal\fR=\,\fIsig\/\fR]\:[:\fBsyscall\fR=\,\fIsyscall\/\fR]\:[:\fBdelay_enter\fR=\,\fIdelay\/\fR]\:[:\fBdelay_exit\fR=\,\fIdelay\/\fR]\:[:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR]\:[:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR]\:[:\fBwhen\fR=\,\fIexpr\/\fR] \{
 .TQ
-\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR][:\fBsignal\fR=\,\fIsig\/\fR][:\fBsyscall\fR=\,\fIsyscall\/\fR][:\fBdelay_enter\fR=\,\fIdelay\/\fR][:\fBdelay_exit\fR=\,\fIdelay\/\fR][:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR][:\fBwhen\fR=\,\fIexpr\/\fR]
+\fB\-\-inject\fR=\,\fIsyscall_set\/\fR[:\fBerror\fR=\,\fIerrno\/\fR|:\fBretval\fR=\,\fIvalue\/\fR]\:[:\fBsignal\fR=\,\fIsig\/\fR]\:[:\fBsyscall\fR=\,\fIsyscall\/\fR]\:[:\fBdelay_enter\fR=\,\fIdelay\/\fR]\:[:\fBdelay_exit\fR=\,\fIdelay\/\fR]\:[:\fBpoke_enter\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR]\:[:\fBpoke_exit\fR=\,\fI@argN=DATAN,@argM=DATAM...\/\fR]\:[:\fBwhen\fR=\,\fIexpr\/\fR] \{
+.ad b
 Perform syscall tampering for the specified set of syscalls.
 The syntax of the
 .I syscall_set
