@@ -211,9 +211,9 @@ library routine is reading the password file:
 .CW
 read(3, "root::0:0:System Administrator:/"..., 1024) = 422
 .CE
-While structures are annotated using curly braces, simple pointers
+While structures are annotated using curly braces, pointers to basic types
 and arrays are printed using square brackets with commas separating
-elements.  Here is an example from the command
+the elements.  Here is an example from the command
 .BR id (1)
 on a system with supplementary group ids:
 .CW
