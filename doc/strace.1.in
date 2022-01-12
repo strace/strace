@@ -141,7 +141,7 @@ When the call returns it will be marked as
 .IR resumed .
 .CW
 [pid 28772] select(4, [3], NULL, NULL, NULL <unfinished ...>
-[pid 28779] clock_gettime(CLOCK_REALTIME, {1130322148, 939977000}) = 0
+[pid 28779] clock_gettime(CLOCK_REALTIME, {tv_sec=1130322148, tv_nsec=3977000}) = 0
 [pid 28772] <... select resumed> )      = 1 (in [3])
 .CE
 Interruption of a (restartable) system call by a signal delivery is processed
@@ -149,8 +149,8 @@ differently as kernel terminates the system call and also arranges its
 immediate reexecution after the signal handler completes.
 .CW
 read(0, 0x7ffff72cf5cf, 1)              = ? ERESTARTSYS (To be restarted)
---- SIGALRM ... ---
-rt_sigreturn(0xe)                       = 0
+--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---
+rt_sigreturn({mask=[]})                 = 0
 read(0, "", 1)                          = 0
 .CE
 Arguments are printed in symbolic form with passion.
