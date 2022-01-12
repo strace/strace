@@ -578,14 +578,6 @@ extern int get_scno(struct tcb *);
 extern kernel_ulong_t get_rt_sigframe_addr(struct tcb *);
 
 /**
- * Convert a (shuffled) syscall number to the corresponding syscall name.
- *
- * @param scno Syscall number.
- * @return     String literal corresponding to the syscall number in case latter
- *             is valid; NULL otherwise.
- */
-extern const char *syscall_name(kernel_ulong_t scno);
-/**
  * Convert a pair of (raw) syscall number and arch (defined by an AUDIT_ARCH_*
  * constant) to the corresponding syscall name.  So far works only for arches
  * that are present in personalities supported by strace binary.

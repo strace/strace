@@ -35,12 +35,6 @@ const struct audit_arch_t audit_arch_vec[SUPPORTED_PERSONALITIES] = {
 
 
 const char *
-syscall_name(kernel_ulong_t scno)
-{
-	return scno_is_valid(scno) ? sysent[scno].sys_name : NULL;
-}
-
-const char *
 syscall_name_arch(kernel_ulong_t nr, unsigned int arch, const char **prefix)
 {
 	for (size_t i = 0; i < SUPPORTED_PERSONALITIES; i++) {
