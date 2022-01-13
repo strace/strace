@@ -136,14 +136,6 @@ ts_div(struct timespec *tv, const struct timespec *a, uint64_t n)
 	tv->tv_nsec = nsec % 1000000000;
 }
 
-void
-ts_mul(struct timespec *tv, const struct timespec *a, uint64_t n)
-{
-	long long nsec = a->tv_nsec * n;
-	tv->tv_sec = a->tv_sec * n + nsec / 1000000000;
-	tv->tv_nsec = nsec % 1000000000;
-}
-
 const struct timespec *
 ts_min(const struct timespec *a, const struct timespec *b)
 {
