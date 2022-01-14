@@ -91,7 +91,7 @@ static uint8_t hwaddr_sizes[] = {
 
 DIAG_POP_IGNORE_OVERRIDE_INIT
 
-const char *
+static const char *
 sprint_mac_addr(const uint8_t addr[], size_t size)
 {
 	static char res[MAX_ADDR_LEN * 3];
@@ -126,7 +126,7 @@ print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
 		? tprints_comment : tprints)(sprint_mac_addr(addr, size));
 }
 
-const char *
+static const char *
 sprint_hwaddr(const uint8_t hwaddr[], size_t size, uint32_t devtype)
 {
 	uint8_t sz = (devtype < ARRAY_SIZE(hwaddr_sizes))
