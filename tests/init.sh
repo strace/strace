@@ -59,6 +59,29 @@ get_config_option()
 	fi
 }
 
+# Prints personality designator of the current personality:
+# 64, 32, or x32.
+print_current_personality_designator()
+{
+	if [ "x$STRACE_NATIVE_ARCH" = "x$STRACE_ARCH" ]; then
+		if [ 'x32' = "$STRACE_NATIVE_ARCH" ]; then
+			echo x32
+		else
+			echo "$(($SIZEOF_LONG * 8))"
+		fi
+	else
+		[ 4 -eq "$SIZEOF_LONG" ] ||
+			fail_ "sizeof(long) = $SIZEOF_LONG != 4"
+		if [ "x$SIZEOF_KERNEL_LONG_T" = "x$SIZEOF_LONG" ]; then
+			echo 32
+		else
+			[ 8 -eq "$SIZEOF_KERNEL_LONG_T" ] ||
+				fail_ "sizeof(kernel_long_t) = $SIZEOF_KERNEL_LONG_T != 8"
+			echo x32
+		fi
+	fi
+}
+
 check_prog()
 {
 	type "$@" > /dev/null 2>&1 ||
