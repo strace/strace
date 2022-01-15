@@ -27,14 +27,14 @@ static_assert(ARRAY_SIZE(personality_designators) == SUPPORTED_PERSONALITIES,
  * @param[in]  s Specification string to check.
  * @param[out] p Where to store personality number if it is found.
  * @return       If personality is found, the provided string is copied without
- *               suffix and returned as a result (callee should de-alllocate it
+ *               suffix and returned as a result (callee should de-allocate it
  *               with free() after use), and personality number is written to p.
  *               Otherwise, NULL is returned and p is untouched.
  */
 static char *
 qualify_syscall_separate_personality(const char *s, unsigned int *p)
 {
-	char *pos = strchr(s, '@');
+	const char *pos = strrchr(s, '@');
 
 	if (!pos)
 		return NULL;
