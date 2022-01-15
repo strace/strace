@@ -65,6 +65,8 @@ check_syscall()
 	check_e "invalid system call '$1'" -e fault="$2:when=4"
 }
 
+pers=$(print_current_personality_designator)
+
 for arg in '' , ,, ,,, ; do
 	check_syscall "$arg" "$arg"
 	check_syscall "!$arg" "!$arg"
@@ -84,6 +86,7 @@ for arg in -1 -2 -3 -4 -5 \
 	check_syscall "$arg" "$arg"
 	check_syscall "$arg" "!$arg"
 	check_syscall "$arg" "1,$arg"
+	check_syscall "$arg@$pers" "$arg@$pers"
 done
 
 for arg in '!chdir' none all; do
@@ -103,10 +106,12 @@ for arg in %desc \
 	   ?%not_a_class \
 	   ?/non_syscall \
 	   ; do
-	check_syscall nonsense "$arg,nonsense"
-	check_syscall nonsense "!$arg,nonsense"
-	check_syscall nonsense "nonsense,$arg"
-	check_syscall nonsense "!nonsense,$arg"
+	for pfx in '' '!'; do
+		for token in "$arg" "$arg@$pers"; do
+			check_syscall nonsense "${pfx}$token,nonsense"
+			check_syscall nonsense "${pfx}nonsense,$token"
+		done
+	done
 done
 
 check_e_using_grep 'regcomp: \+id: [[:alpha:]].+' -e trace='/+id'
