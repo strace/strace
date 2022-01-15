@@ -3,6 +3,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Added 64-bit LoongArch architecture support.
+  * Extended personality designation syntax of syscall specification expressions
+    to support %class@pers.
 
 * Bug fixes
 

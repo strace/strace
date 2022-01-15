@@ -51,44 +51,15 @@ qualify_syscall_separate_personality(const char *s, unsigned int *p)
 }
 
 static bool
-qualify_syscall_number_personality(int n, unsigned int p,
-				   struct number_set *set)
+qualify_syscall_number(const char *str, unsigned int p, struct number_set *set)
 {
-	if ((unsigned int) n >= nsyscall_vec[p])
+	unsigned int n = string_to_uint(str);
+
+	if (n >= nsyscall_vec[p])
 		return false;
 
 	add_number_to_set_array(n, set, p);
-
 	return true;
-}
-
-static bool
-qualify_syscall_number(const char *s, struct number_set *set)
-{
-	unsigned int p;
-	char *num_str = qualify_syscall_separate_personality(s, &p);
-	int n;
-
-	if (num_str) {
-		n = string_to_uint(num_str);
-		free(num_str);
-
-		if (n < 0)
-			return false;
-
-		return qualify_syscall_number_personality(n, p, set);
-	}
-
-	n = string_to_uint(s);
-	if (n < 0)
-		return false;
-
-	bool done = false;
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
-		done |= qualify_syscall_number_personality(n, p, set);
-
-	return done;
 }
 
 static void
@@ -102,43 +73,29 @@ regerror_msg_and_die(int errcode, const regex_t *preg,
 }
 
 static bool
-qualify_syscall_regex(const char *s, struct number_set *set)
+qualify_syscall_regex(const char *str, unsigned int p, struct number_set *set)
 {
 	regex_t preg;
 	int rc;
 
-	if ((rc = regcomp(&preg, s, REG_EXTENDED | REG_NOSUB)) != 0)
-		regerror_msg_and_die(rc, &preg, "regcomp", s);
+	if ((rc = regcomp(&preg, str, REG_EXTENDED | REG_NOSUB)) != 0)
+		regerror_msg_and_die(rc, &preg, "regcomp", str);
 
 	bool found = false;
 
-	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
-			if (!sysent_vec[p][i].sys_name)
-				continue;
+	for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
+		if (!sysent_vec[p][i].sys_name)
+			continue;
 
-			rc = regexec(&preg, sysent_vec[p][i].sys_name,
-				     0, NULL, 0);
+		rc = regexec(&preg, sysent_vec[p][i].sys_name,
+			     0, NULL, 0);
+		if (rc == REG_NOMATCH)
+			continue;
+		else if (rc)
+			regerror_msg_and_die(rc, &preg, "regexec", str);
 
-			if (rc == REG_NOMATCH) {
-				char name_buf[128];
-				char *pos = stpcpy(name_buf,
-						   sysent_vec[p][i].sys_name);
-
-				(void) xappendstr(name_buf, pos, "@%s",
-						  personality_designators[p]);
-
-				rc = regexec(&preg, name_buf, 0, NULL, 0);
-			}
-
-			if (rc == REG_NOMATCH)
-				continue;
-			else if (rc)
-				regerror_msg_and_die(rc, &preg, "regexec", s);
-
-			add_number_to_set_array(i, set, p);
-			found = true;
-		}
+		add_number_to_set_array(i, set, p);
+		found = true;
 	}
 
 	regfree(&preg);
@@ -189,18 +146,16 @@ lookup_class(const char *s)
 }
 
 static bool
-qualify_syscall_class(const char *s, struct number_set *set)
+qualify_syscall_class(const char *str, unsigned int p, struct number_set *set)
 {
-	const unsigned int n = lookup_class(s);
+	const unsigned int n = lookup_class(str);
 	if (!n)
 		return false;
 
-	for (unsigned int p = 0; p < SUPPORTED_PERSONALITIES; ++p) {
-		for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
-			if (sysent_vec[p][i].sys_name &&
-			    (sysent_vec[p][i].sys_flags & n) == n)
-				add_number_to_set_array(i, set, p);
-		}
+	for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
+		if (sysent_vec[p][i].sys_name &&
+		    (sysent_vec[p][i].sys_flags & n) == n)
+			add_number_to_set_array(i, set, p);
 	}
 
 	return true;
@@ -222,8 +177,7 @@ scno_by_name(const char *s, unsigned int p, kernel_long_t start)
 }
 
 static bool
-qualify_syscall_name_personality(const char *s, unsigned int p,
-				 struct number_set *set)
+qualify_syscall_name(const char *s, unsigned int p, struct number_set *set)
 {
 	bool found = false;
 
@@ -237,41 +191,36 @@ qualify_syscall_name_personality(const char *s, unsigned int p,
 }
 
 static bool
-qualify_syscall_name(const char *s, struct number_set *set)
+qualify_syscall_pers(const char *token, unsigned int p, struct number_set *set)
 {
-	unsigned int p;
-	char *name_str = qualify_syscall_separate_personality(s, &p);
-	bool found = false;
-
-	if (name_str) {
-		found = qualify_syscall_name_personality(name_str, p, set);
-		free(name_str);
-
-		return found;
-	}
-
-	for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
-		found |= qualify_syscall_name_personality(s, p, set);
-
-	return found;
+	if (*token >= '0' && *token <= '9')
+		return qualify_syscall_number(token, p, set);
+	if (*token == '/')
+		return qualify_syscall_regex(token + 1, p, set);
+	return qualify_syscall_class(token, p, set)
+	       || qualify_syscall_name(token, p, set);
 }
 
 static bool
 qualify_syscall(const char *token, struct number_set *set)
 {
-	bool ignore_fail = false;
-
+	bool rc = false;
 	while (*token == '?') {
-		token++;
-		ignore_fail = true;
+		++token;
+		rc = true;
 	}
-	if (*token >= '0' && *token <= '9')
-		return qualify_syscall_number(token, set) || ignore_fail;
-	if (*token == '/')
-		return qualify_syscall_regex(token + 1, set) || ignore_fail;
-	return qualify_syscall_class(token, set)
-	       || qualify_syscall_name(token, set)
-	       || ignore_fail;
+
+	unsigned int p;
+	char *str = qualify_syscall_separate_personality(token, &p);
+	if (str) {
+		rc |= qualify_syscall_pers(str, p, set);
+		free(str);
+	} else {
+		for (p = 0; p < SUPPORTED_PERSONALITIES; ++p)
+			rc |= qualify_syscall_pers(token, p, set);
+	}
+
+	return rc;
 }
 
 /*

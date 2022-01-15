@@ -216,6 +216,8 @@ check_h "incorrect personality designator '' in qualification 'getcwd@'" -e trac
 check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=getcwd@42
 check_h "incorrect personality designator '42' in qualification 'getcwd@42'" -e trace=gettid,getcwd@42
 check_h "incorrect personality designator '42' in qualification '23@42'" -e trace=23@42,123
+check_h "incorrect personality designator 'ohmy' in qualification '/getcwd@ohmy'" \
+	-e trace=/getcwd@ohmy
 
 check_h '--seccomp-bpf cannot be used without -f/--follow-forks, disabling
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' --seccomp-bpf -w /
@@ -229,7 +231,6 @@ check_h 'option -F is deprecated, please use -f/--follow-forks instead
 check_h 'deprecated option -F ignored
 -w/--summary-wall-clock must be given with (-c/--summary-only or -C/--summary)' -fF -w /
 
-check_e "invalid system call '/getcwd@ohmy'" -e trace=/getcwd@ohmy
 check_e "invalid -e kvm= argument: 'chdir'" -e kvm=chdir
 check_e "invalid -e kvm= argument: 'chdir'" --kvm=chdir
 

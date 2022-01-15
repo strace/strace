@@ -725,6 +725,9 @@ EXTRA_DIST = \
 	trace_personality_regex_32.in \
 	trace_personality_regex_64.in \
 	trace_personality_regex_x32.in \
+	trace_personality_statfs_32.in \
+	trace_personality_statfs_64.in \
+	trace_personality_statfs_x32.in \
 	trace_personality_x32.in \
 	trace_question.in \
 	trace_stat.in \

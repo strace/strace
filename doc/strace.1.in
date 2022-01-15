@@ -487,6 +487,21 @@ Trace specific syscall, specified by its name (but see
 Question mark before the syscall qualification allows suppression of error
 in case no syscalls matched the qualification provided.
 .TP
+.IB value @64
+Limit the syscall specification described by
+.I value
+to 64-bit personality.
+.TP
+.IB value @32
+Limit the syscall specification described by
+.I value
+to 32-bit personality.
+.TP
+.IB value @x32
+Limit the syscall specification described by
+.I value
+to x32 personality.
+.TP
 .BI / regex
 Trace only those system calls that match the
 .IR regex .
@@ -494,21 +509,6 @@ You can use
 .B POSIX
 Extended Regular Expression syntax (see
 .BR regex (7)).
-.TP
-.IB syscall @64
-Trace
-.I syscall
-only for the 64-bit personality.
-.TP
-.IB syscall @32
-Trace
-.I syscall
-only for the 32-bit personality.
-.TP
-.IB syscall @x32
-Trace
-.I syscall
-only for the 32-on-64-bit personality.
 .TP
 .B %file
 .TQ
