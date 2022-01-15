@@ -654,6 +654,7 @@ EXTRA_DIST = \
 	poke-unaligned.expected \
 	prctl.sh \
 	prctl-success.sh \
+	print_scno_getcwd.sh \
 	print_user_desc.c \
 	printsignal.c \
 	printxval.c \
@@ -718,6 +719,9 @@ EXTRA_DIST = \
 	trace_lstat.in \
 	trace_personality_32.in \
 	trace_personality_64.in \
+	trace_personality_number_32.in \
+	trace_personality_number_64.in \
+	trace_personality_number_x32.in \
 	trace_personality_regex_32.in \
 	trace_personality_regex_64.in \
 	trace_personality_regex_x32.in \

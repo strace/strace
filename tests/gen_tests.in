@@ -1000,6 +1000,9 @@ trace_fstatfs	test_trace_expr '' -e%fstatfs
 trace_lstat	test_trace_expr '' -e%lstat -v -P stat.sample -P /dev/full
 trace_personality_32	+qualify_personality.sh 32 'getcwd' 'fsync-y|poke'
 trace_personality_64	+qualify_personality.sh 64 'getcwd' 'fsync-y|poke'
+trace_personality_number_32	+qualify_personality.sh 32 "$(${srcdir=.}/print_scno_getcwd.sh)" 'fsync-y|poke'
+trace_personality_number_64	+qualify_personality.sh 64 "$(${srcdir=.}/print_scno_getcwd.sh)" 'fsync-y|poke'
+trace_personality_number_x32	+qualify_personality.sh x32 "$(${srcdir=.}/print_scno_getcwd.sh)" 'fsync-y|poke'
 trace_personality_regex_32	+qualify_personality.sh 32 '/clock.*' 'times|times-.*|fcntl.*'
 trace_personality_regex_64	+qualify_personality.sh 64 '/clock.*' 'times|times-.*|fcntl.*'
 trace_personality_regex_x32	+qualify_personality.sh x32 '/clock.*' 'times|times-.*|fcntl.*'
