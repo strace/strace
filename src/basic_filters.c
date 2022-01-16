@@ -102,8 +102,8 @@ qualify_syscall_regex(const char *str, unsigned int p, struct number_set *set)
 	return found;
 }
 
-static unsigned int
-lookup_class(const char *s)
+static bool
+lookup_class(const char *s, unsigned int *v)
 {
 	static const struct {
 		const char *name;
@@ -128,6 +128,7 @@ lookup_class(const char *s)
 		{ "%pure",	TRACE_PURE	},
 		{ "%clock",	TRACE_CLOCK	},
 		/* legacy class names */
+		{ "all",	0		},
 		{ "desc",	TRACE_DESC	},
 		{ "file",	TRACE_FILE	},
 		{ "memory",	TRACE_MEMORY	},
@@ -138,18 +139,20 @@ lookup_class(const char *s)
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
-		if (strcmp(s, syscall_class[i].name) == 0)
-			return syscall_class[i].value;
+		if (strcmp(s, syscall_class[i].name) == 0) {
+			*v = syscall_class[i].value;
+			return true;
+		}
 	}
 
-	return 0;
+	return false;
 }
 
 static bool
 qualify_syscall_class(const char *str, unsigned int p, struct number_set *set)
 {
-	const unsigned int n = lookup_class(str);
-	if (!n)
+	unsigned int n;
+	if (!lookup_class(str, &n))
 		return false;
 
 	for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {

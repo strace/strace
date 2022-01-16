@@ -665,6 +665,7 @@ EXTRA_DIST = \
 	qual_inject-error-signal.expected \
 	qual_inject-signal.expected \
 	qualify_personality.sh \
+	qualify_personality_all.sh \
 	qualify_personality_empty.in \
 	quotactl.h \
 	regex.in \

@@ -89,7 +89,7 @@ for arg in -1 -2 -3 -4 -5 \
 	check_syscall "$arg@$pers" "$arg@$pers"
 done
 
-for arg in '!chdir' none all; do
+for arg in '!chdir' none; do
 	check_syscall "$arg" "1,$arg"
 done
 
@@ -101,6 +101,7 @@ for arg in %desc \
 	   %network \
 	   chdir \
 	   1 \
+	   all \
 	   ?32767 \
 	   ?invalid \
 	   ?%not_a_class \

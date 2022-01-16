@@ -317,8 +317,8 @@ Tracing:\n\
                     (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 \n\
 Filtering:\n\
-  -e trace=[!][?]{{SYSCALL|GROUP|/REGEX}[@64|@32|@x32]|all|none},\n\
-   --trace=[!][?]{{SYSCALL|GROUP|/REGEX}[@64|@32|@x32]|all|none}\n\
+  -e trace=[!][?]{{SYSCALL|GROUP|all|/REGEX}[@64|@32|@x32]|none},\n\
+   --trace=[!][?]{{SYSCALL|GROUP|all|/REGEX}[@64|@32|@x32]|none}\n\
                  trace only specified syscalls.\n\
      groups:     %%clock, %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
                  %%memory, %%net, %%process, %%pure, %%signal, %%stat, %%%%stat,\n\
