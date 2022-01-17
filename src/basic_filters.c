@@ -53,12 +53,17 @@ qualify_syscall_separate_personality(const char *s, unsigned int *p)
 static bool
 qualify_syscall_number(const char *str, unsigned int p, struct number_set *set)
 {
-	unsigned int n = string_to_uint(str);
+	unsigned int nr = string_to_uint(str);
+	unsigned int scno = shuffle_scno_pers(nr, p);
+	if (!scno_pers_is_valid(scno, p)) {
+		if (ARCH_NEEDS_NON_SHUFFLED_SCNO_CHECK &&
+		    scno_pers_is_valid(nr, p))
+			scno = nr;
+		else
+			return false;
+	}
 
-	if (n >= nsyscall_vec[p])
-		return false;
-
-	add_number_to_set_array(n, set, p);
+	add_number_to_set_array(scno, set, p);
 	return true;
 }
 

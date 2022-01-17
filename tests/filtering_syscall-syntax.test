@@ -72,6 +72,15 @@ for arg in '' , ,, ,,, ; do
 	check_syscall "!$arg" "!$arg"
 done
 
+case "$STRACE_ARCH" in
+	alpha)	invalid_scno1=299
+		invalid_scno2=404
+		;;
+	*)	invalid_scno1=415
+		invalid_scno2=501
+		;;
+esac
+
 for arg in -1 -2 -3 -4 -5 \
 	   invalid_syscall_name \
 	   0x 0y \
@@ -80,6 +89,8 @@ for arg in -1 -2 -3 -4 -5 \
 	   2147483648 \
 	   4294967295 \
 	   4294967296 \
+	   $invalid_scno1 \
+	   $invalid_scno2 \
 	   /non_syscall \
 	   % %not_a_class \
 	   ; do
