@@ -42,14 +42,7 @@ syscall_name_arch(kernel_ulong_t nr, unsigned int arch, const char **prefix)
 			continue;
 
 		kernel_ulong_t scno = shuffle_scno_pers(nr, i);
-
-		/*
-		 * checks from scno_is_in_range/scno_is_valid,
-		 * but for an arbitrary personality.
-		 */
-		if ((scno >= nsyscall_vec[i])
-		    || !(sysent_vec[i][scno].sys_func)
-		    || (sysent_vec[i][scno].sys_flags & TRACE_INDIRECT_SUBCALL))
+		if (!scno_pers_is_valid(scno, i))
 			continue;
 
 		if (prefix) {

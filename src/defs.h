@@ -1891,6 +1891,13 @@ scno_in_range(kernel_ulong_t scno)
 	return scno < nsyscalls;
 }
 
+/* Like scno_in_range but for the specified personality.  */
+static inline bool
+scno_pers_in_range(kernel_ulong_t scno, unsigned int pers)
+{
+	return scno < nsyscall_vec[pers];
+}
+
 /*
  * Checks whether scno is not out of range,
  * its corresponding sysent[scno].sys_func is non-NULL,
@@ -1902,6 +1909,15 @@ scno_is_valid(kernel_ulong_t scno)
 	return scno_in_range(scno)
 	       && sysent[scno].sys_func
 	       && !(sysent[scno].sys_flags & TRACE_INDIRECT_SUBCALL);
+}
+
+/* Like scno_is_valid but for the specified personality.  */
+static inline bool
+scno_pers_is_valid(kernel_ulong_t scno, unsigned int pers)
+{
+	return scno_pers_in_range(scno, pers)
+	       && sysent_vec[pers][scno].sys_func
+	       && !(sysent_vec[pers][scno].sys_flags & TRACE_INDIRECT_SUBCALL);
 }
 
 # define MPERS_FUNC_NAME__(prefix, name) prefix ## name
