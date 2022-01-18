@@ -32,6 +32,8 @@ char *get_secontext_field(const char *full_context, enum secontext_field field);
 
 char *get_secontext_field_file(const char *file, enum secontext_field field);
 
+void reset_secontext_file(const char *file);
+
 void update_secontext_field(const char *file, enum secontext_field field,
 			    const char *newvalue);
 
@@ -66,6 +68,11 @@ static inline char *
 get_secontext_field_file(const char *file, enum secontext_field field)
 {
 	return NULL;
+}
+
+static inline void
+reset_secontext_file(const char *file)
+{
 }
 
 static inline void

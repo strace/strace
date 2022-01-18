@@ -103,6 +103,9 @@ main(void)
 	if (close(fd_sample_2))
 		perror_msg_and_fail("close");
 
+	if (*sample_1_secontext && strstr(sample_1_secontext, "!!"))
+		reset_secontext_file(sample_1);
+
 	free(sample_1_secontext);
 
 #ifdef PRINT_SECONTEXT_MISMATCH

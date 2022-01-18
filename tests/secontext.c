@@ -235,6 +235,13 @@ secontext_short_pid(pid_t pid)
 	return FORMAT_SPACE_AFTER(raw_secontext_short_pid(pid));
 }
 
+void reset_secontext_file(const char *file)
+{
+	char *proper_ctx = raw_expected_secontext_full_file(file);
+	(void) setfilecon(file, proper_ctx);
+	free(proper_ctx);
+}
+
 void
 update_secontext_field(const char *file, enum secontext_field field,
 		       const char *newvalue)
