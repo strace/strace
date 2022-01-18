@@ -23,6 +23,15 @@ enum secontext_field {
 
 #if defined TEST_SECONTEXT && defined HAVE_SELINUX_RUNTIME
 
+/**
+ * Parse a SELinux context string and return a specified field, duplicated
+ * in a separate string.  The caller is responsible for freeing the memory
+ * pointed by the returned value.
+ */
+char *get_secontext_field(const char *full_context, enum secontext_field field);
+
+char *get_secontext_field_file(const char *file, enum secontext_field field);
+
 void update_secontext_field(const char *file, enum secontext_field field,
 			    const char *newvalue);
 
@@ -47,6 +56,17 @@ void update_secontext_field(const char *file, enum secontext_field field,
 # endif
 
 #else
+
+static inline char *
+get_secontext_field(const char *ctx, enum secontext_field field)
+{
+	return NULL;
+}
+static inline char *
+get_secontext_field_file(const char *file, enum secontext_field field)
+{
+	return NULL;
+}
 
 static inline void
 update_secontext_field(const char *file, enum secontext_field field,

@@ -56,8 +56,8 @@ strip_trailing_newlines(char *context)
 	return context;
 }
 
-static char *
-get_type_from_context(const char *full_context)
+char *
+get_secontext_field(const char *full_context, enum secontext_field field)
 {
 	int saved_errno = errno;
 
@@ -72,7 +72,7 @@ get_type_from_context(const char *full_context)
 	char *context = NULL;
 	for (token = strtok_r(ctx_copy, ":", &saveptr), i = 0;
 	     token; token = strtok_r(NULL, ":", &saveptr), i++) {
-		if (i == 2) {
+		if (i == field) {
 			context = xstrdup(token);
 			break;
 		}
@@ -122,7 +122,7 @@ raw_expected_secontext_short_file(const char *filename)
 	int saved_errno = errno;
 
 	char *ctx = raw_expected_secontext_full_file(filename);
-	char *type = get_type_from_context(ctx);
+	char *type = get_secontext_field(ctx, SECONTEXT_TYPE);
 	free(ctx);
 
 	errno = saved_errno;
@@ -144,17 +144,20 @@ raw_secontext_full_file(const char *filename)
 	return full_secontext;
 }
 
+char *
+get_secontext_field_file(const char *file, enum secontext_field field)
+{
+	char *ctx = raw_secontext_full_file(file);
+	char *type =  get_secontext_field(ctx, field);
+	free(ctx);
+
+	return type;
+}
+
 static char *
 raw_secontext_short_file(const char *filename)
 {
-	int saved_errno = errno;
-
-	char *ctx = raw_secontext_full_file(filename);
-	char *type = get_type_from_context(ctx);
-	free(ctx);
-
-	errno = saved_errno;
-	return type;
+	return get_secontext_field_file(filename, SECONTEXT_TYPE);
 }
 
 static char *
@@ -178,7 +181,7 @@ raw_secontext_short_pid(pid_t pid)
 	int saved_errno = errno;
 
 	char *ctx = raw_secontext_full_pid(pid);
-	char *type = get_type_from_context(ctx);
+	char *type = get_secontext_field(ctx, SECONTEXT_TYPE);
 	free(ctx);
 
 	errno = saved_errno;
