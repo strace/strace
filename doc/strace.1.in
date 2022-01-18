@@ -480,7 +480,9 @@ can be one of the following:
 .RS
 .TP 13
 .I syscall
-Trace specific syscall, specified by its name (but see
+Trace specific syscall, specified by its name (see
+.BR syscalls (2)
+for a reference, but also see
 .BR NOTES ).
 .TP
 .BI ? value
