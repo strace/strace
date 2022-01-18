@@ -21,6 +21,20 @@
 #include "secontext.h"
 #include "xmalloc.h"
 
+static void
+mangle_secontext_field(const char *path, enum secontext_field field,
+		       const char *new_val, const char *fallback_val)
+{
+	char *orig = get_secontext_field_file(path, field);
+	if (!orig)
+		return;
+
+	update_secontext_field(path, field,
+			       strcmp(new_val, orig) ? new_val : fallback_val);
+
+	free(orig);
+}
+
 int
 main(void)
 {
@@ -93,7 +107,8 @@ main(void)
 
 #ifdef PRINT_SECONTEXT_MISMATCH
 	errno = 0;
-	update_secontext_field(sample_1, SECONTEXT_USER, "system_u");
+	mangle_secontext_field(sample_1, SECONTEXT_USER, "system_u",
+							 "unconfined_u");
 	sample_1_secontext = SECONTEXT_FILE(sample_1);
 
 # ifdef PRINT_SECONTEXT_FULL
@@ -115,7 +130,8 @@ main(void)
 #endif
 
 	errno = 0;
-	update_secontext_field(sample_1, SECONTEXT_TYPE, "default_t");
+	mangle_secontext_field(sample_1, SECONTEXT_TYPE, "default_t",
+							 "unconfined_t");
 	sample_1_secontext = SECONTEXT_FILE(sample_1);
 	sample_2_secontext = sample_1_secontext;
 
@@ -146,7 +162,8 @@ main(void)
 	char *cwd = get_fd_path(dfd_old);
 
 	errno = 0;
-	update_secontext_field(".", SECONTEXT_TYPE, "default_t");
+	mangle_secontext_field(".", SECONTEXT_TYPE, "default_t",
+						    "unconfined_t");
 	char *dfd_old_secontext = SECONTEXT_FILE(".");
 
 #ifdef PRINT_SECONTEXT_MISMATCH
