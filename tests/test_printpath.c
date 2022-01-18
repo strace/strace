@@ -24,7 +24,7 @@ test_printpath_at(char *const p, const unsigned int test_max)
 	 *       /
 	 *      /.
 	 *     /..
-	 *    /...
+	 *    /../
 	 *   /../.
 	 *  /../..
 	 * /../../
