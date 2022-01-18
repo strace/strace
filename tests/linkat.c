@@ -10,6 +10,7 @@
 #include "tests.h"
 #include "scno.h"
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,6 +92,7 @@ main(void)
 	free(sample_1_secontext);
 
 #ifdef PRINT_SECONTEXT_MISMATCH
+	errno = 0;
 	update_secontext_field(sample_1, SECONTEXT_USER, "system_u");
 	sample_1_secontext = SECONTEXT_FILE(sample_1);
 
@@ -112,6 +114,7 @@ main(void)
 	free(sample_1_secontext);
 #endif
 
+	errno = 0;
 	update_secontext_field(sample_1, SECONTEXT_TYPE, "default_t");
 	sample_1_secontext = SECONTEXT_FILE(sample_1);
 	sample_2_secontext = sample_1_secontext;
@@ -142,6 +145,7 @@ main(void)
 	int dfd_old = get_dir_fd(".");
 	char *cwd = get_fd_path(dfd_old);
 
+	errno = 0;
 	update_secontext_field(".", SECONTEXT_TYPE, "default_t");
 	char *dfd_old_secontext = SECONTEXT_FILE(".");
 
