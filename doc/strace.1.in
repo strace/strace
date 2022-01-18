@@ -1887,7 +1887,9 @@ mailing list
 .BR trace-cmd (1),
 .BR time (1),
 .BR ptrace (2),
-.BR proc (5)
+.BR syscall (2),
+.BR proc (5),
+.BR signal (7)
 .PP
 .UR https://strace.io/
 .B strace
