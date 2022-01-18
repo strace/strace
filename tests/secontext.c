@@ -23,10 +23,7 @@
 # define TEST_SECONTEXT
 # include "secontext.h"
 
-static char *
-secontext_format(char *context, const char *fmt)
-	ATTRIBUTE_FORMAT((printf, 2, 0)) ATTRIBUTE_MALLOC;
-
+ATTRIBUTE_FORMAT((printf, 2, 0)) ATTRIBUTE_MALLOC
 static char *
 secontext_format(char *context, const char *fmt)
 {
