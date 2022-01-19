@@ -48,7 +48,7 @@ main(void)
 			"FAN_UNLIMITED_QUEUE|FAN_UNLIMITED_MARKS|"
 			"FAN_ENABLE_AUDIT|FAN_REPORT_PIDFD|FAN_REPORT_TID|"
 			"FAN_REPORT_FID|FAN_REPORT_DIR_FID|FAN_REPORT_NAME|"
-			"0xfffff000" },
+			"FAN_REPORT_TARGET_FID|0xffffe000" },
 	};
 	static const struct strval event_f_flags[] = {
 		{ F8ILL_KULONG_MASK, "O_RDONLY" },

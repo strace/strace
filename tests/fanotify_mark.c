@@ -152,13 +152,14 @@ main(void)
 			"FAN_DIR_MODIFY|"
 			"FAN_ONDIR|"
 			"FAN_EVENT_ON_CHILD|"
-			"0xdeadfeedb7f02000"
+			"FAN_RENAME|"
+			"0xdeadfeeda7f02000"
 #  endif
 #  if XLAT_VERBOSE
 			" */"
 #  endif
 			},
-		{ ARG_ULL_STR(0xffffffffb7f02000)
+		{ ARG_ULL_STR(0xffffffffa7f02000)
 #  if !XLAT_RAW
 			" /* FAN_??? */"
 #  endif
