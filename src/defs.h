@@ -833,9 +833,29 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 /** Print ellipsis if the last character is not '\0' */
 # define QUOTE_EXPECT_TRAILING_0		0x10
 /** Print string in hex (using '\xHH' notation). */
-# define QUOTE_FORCE_HEX			0x20
+# define QUOTE_FORCE_HEX			(QUOTE_OVERWRITE_HEXSTR | QUOTE_HEXSTR_ALL)
 /** Enclose the string in C comment syntax. */
 # define QUOTE_EMIT_COMMENT			0x40
+/** Override xflag setting with one of QUOTE_HEXSTR_[NA]* styles */
+# define QUOTE_OVERWRITE_HEXSTR			0x80
+
+/*
+ * bits 8..9 (mask 0x300) are used for supplying the respective hexstr setting
+ * if QUOTE_OVERWRITE_HEXSTR is set.
+ */
+# define QUOTE_HEXSTR_SHIFT			8
+/**
+ * Mask to be applied to a quoting style to extract the xflag overriding style
+ * part.
+ */
+# define QUOTE_HEXSTR_MASK			(0x3 << QUOTE_HEXSTR_SHIFT)
+static_assert((NUM_HEXSTR_OPTS - 1) <= (QUOTE_HEXSTR_MASK >> QUOTE_HEXSTR_SHIFT),
+	      "xflag options do not fit into QUOTE_HEXSTR_MASK");
+
+# define QUOTE_HEXSTR_NONE			(HEXSTR_NONE << QUOTE_HEXSTR_SHIFT)
+# define QUOTE_HEXSTR_ALL			(HEXSTR_ALL << QUOTE_HEXSTR_SHIFT)
+# define QUOTE_HEXSTR_NON_ASCII			(HEXSTR_NON_ASCII << QUOTE_HEXSTR_SHIFT)
+# define QUOTE_HEXSTR_NON_ASCII_CHARS		(HEXSTR_NON_ASCII_CHARS << QUOTE_HEXSTR_SHIFT)
 
 extern int string_quote(const char *, char *, unsigned int, unsigned int,
 			const char *escape_chars);

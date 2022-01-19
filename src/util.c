@@ -848,6 +848,10 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 	unsigned int i;
 	int usehex, c, eol;
 	bool printable;
+	enum xflag_opts xstyle = style & QUOTE_OVERWRITE_HEXSTR
+					? ((style & QUOTE_HEXSTR_MASK)
+					   >> QUOTE_HEXSTR_SHIFT)
+					: xflag;
 
 	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
@@ -855,9 +859,9 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 		eol = 0x100; /* this can never match a char */
 
 	usehex = 0;
-	if ((xflag == HEXSTR_ALL) || (style & QUOTE_FORCE_HEX)) {
+	if (xstyle == HEXSTR_ALL) {
 		usehex = 1;
-	} else if (xflag == HEXSTR_NON_ASCII) {
+	} else if (xstyle == HEXSTR_NON_ASCII) {
 		/* Check for presence of symbol which require
 		   to hex-quote the whole string. */
 		for (i = 0; i < size; ++i) {
@@ -943,7 +947,7 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			if (printable) {
 				*s++ = c;
 			} else {
-				if (xflag == HEXSTR_NON_ASCII_CHARS) {
+				if (xstyle == HEXSTR_NON_ASCII_CHARS) {
 					/* Print he\x */
 					*s++ = '\\';
 					*s++ = 'x';
