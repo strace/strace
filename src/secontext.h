@@ -11,6 +11,8 @@
 
 # include "defs.h"
 
+# ifdef ENABLE_SECONTEXT
+
 void qualify_secontext(const char *const str);
 
 enum secontext_bits {
@@ -24,9 +26,16 @@ enum secontext_bits {
 
 extern struct number_set *secontext_set;
 
-int selinux_getfdcon(pid_t pid, int fd, char **context);
-int selinux_getfilecon(struct tcb *tcp, const char *path, char **context);
-int selinux_getpidcon(struct tcb *tcp, char **context);
-void selinux_set_format(const char *optarg);
+void selinux_printfdcon(pid_t pid, int fd);
+void selinux_printfilecon(struct tcb *tcp, const char *path);
+void selinux_printpidcon(struct tcb *tcp);
+
+# else
+
+static inline void selinux_printfdcon(pid_t pid, int fd) {}
+static inline void selinux_printfilecon(struct tcb *tcp, const char *path) {}
+static inline void selinux_printpidcon(struct tcb *tcp) {}
+
+# endif /* ENABLE_SECONTEXT */
 
 #endif /* !STRACE_SECONTEXT_H */

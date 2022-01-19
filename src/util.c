@@ -747,13 +747,7 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 printed:	;
 	}
 
-#ifdef ENABLE_SECONTEXT
-	char *context;
-	if (!selinux_getfdcon(pid, fd, &context)) {
-		tprintf(" [%s]", context);
-		free(context);
-	}
-#endif
+	selinux_printfdcon(pid, fd);
 }
 
 void
@@ -1110,13 +1104,8 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 		path[n++] = !nul_seen;
 		print_quoted_cstring(path, n);
 
-#ifdef ENABLE_SECONTEXT
-		char *context;
-		if (nul_seen && !selinux_getfilecon(tcp, path, &context)) {
-			tprintf(" [%s]", context);
-			free(context);
-		}
-#endif
+		if (nul_seen)
+			selinux_printfilecon(tcp, path);
 	}
 
 	return nul_seen;

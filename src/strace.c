@@ -838,13 +838,7 @@ printleader(struct tcb *tcp)
 		tprints(" ");
 	}
 
-#ifdef ENABLE_SECONTEXT
-	char *context;
-	if (!selinux_getpidcon(tcp, &context)) {
-		tprintf("[%s] ", context);
-		free(context);
-	}
-#endif
+	selinux_printpidcon(tcp);
 
 	if (tflag_format) {
 		struct timespec ts;

@@ -21,50 +21,48 @@
 #include "xmalloc.h"
 #include "xstring.h"
 
-static int
-getcontext(int rc, char **secontext, char **result)
+/**
+ * @param secontext Pointer to security context string.
+ * @param result    Stores pointer to the beginning of the part to print.
+ * @return          Number of characters of the string to be printed.
+ */
+static size_t
+parse_secontext(char *secontext, char **result)
 {
-	if (rc < 0)
-		return rc;
+	char *end_pos = NULL;
 
-	*result = NULL;
 	if (!is_number_in_set(SECONTEXT_FULL, secontext_set)) {
-		char *saveptr = NULL;
-		char *secontext_copy = xstrdup(*secontext);
-		const char *token;
-		unsigned int i;
+		/* We're looking for the type wihch is the third field */
+		enum { SECONTEXT_TYPE = 2 };
+		char *start_pos = secontext;
 
-		/*
-		 * We only want to keep the type (3rd field, ':' separator).
-		 */
-		for (token = strtok_r(secontext_copy, ":", &saveptr), i = 0;
-		     token; token = strtok_r(NULL, ":", &saveptr), i++) {
-			if (i == 2) {
-				*result = xstrdup(token);
+		for (unsigned int i = 0; i <= SECONTEXT_TYPE; i++) {
+			end_pos = strchr(start_pos, ':');
+
+			if (i == SECONTEXT_TYPE) {
+				secontext = start_pos;
 				break;
 			}
+
+			if (!end_pos)
+				break;
+
+			start_pos = end_pos + 1;
 		}
-		free(secontext_copy);
 	}
 
-	if (*result == NULL) {
-		/*
-		 * On the CI at least, the context may have a trailing \n,
-		 * let's remove it just in case.
-		 */
-		size_t len = strlen(*secontext);
-		for (; len > 0; --len) {
-			if ((*secontext)[len - 1] != '\n')
-				break;
-		}
-		*result = xstrndup(*secontext, len);
-	}
-	freecon(*secontext);
-	return 0;
+	size_t len = end_pos ? (size_t) (end_pos - secontext)
+			     : strlen(secontext);
+
+	/* Strip terminating \n as these tend to be present sometimes */
+	while (len && secontext[len - 1] == '\n')
+		len--;
+
+	return *result = secontext, len;
 }
 
 static int
-get_expected_filecontext(const char *path, char **result)
+get_expected_filecontext(const char *path, char **secontext)
 {
 	static struct selabel_handle *hdl;
 
@@ -87,9 +85,7 @@ get_expected_filecontext(const char *path, char **result)
 		return -1;
 	}
 
-	char *secontext;
-	return getcontext(selabel_lookup(hdl, &secontext, path, stb.st_mode),
-			  &secontext, result);
+	return selabel_lookup(hdl, secontext, path, stb.st_mode);
 }
 
 /*
@@ -97,8 +93,8 @@ get_expected_filecontext(const char *path, char **result)
  * Memory must be freed.
  * Returns 0 on success, -1 on failure.
  */
-int
-selinux_getpidcon(struct tcb *tcp, char **result)
+static int
+selinux_getpidcon(struct tcb *tcp, char **secontext)
 {
 	if (number_set_array_is_empty(secontext_set, 0))
 		return -1;
@@ -107,8 +103,7 @@ selinux_getpidcon(struct tcb *tcp, char **result)
 	if (!proc_pid)
 		return -1;
 
-	char *secontext;
-	return getcontext(getpidcon(proc_pid, &secontext), &secontext, result);
+	return getpidcon(proc_pid, secontext);
 }
 
 /*
@@ -116,8 +111,8 @@ selinux_getpidcon(struct tcb *tcp, char **result)
  * Memory must be freed.
  * Returns 0 on success, -1 on failure.
  */
-int
-selinux_getfdcon(pid_t pid, int fd, char **result)
+static int
+selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 {
 	if (number_set_array_is_empty(secontext_set, 0) || pid <= 0 || fd < 0)
 		return -1;
@@ -129,8 +124,7 @@ selinux_getfdcon(pid_t pid, int fd, char **result)
 	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
 
-	char *secontext;
-	int rc = getcontext(getfilecon(linkpath, &secontext), &secontext, result);
+	int rc = getfilecon(linkpath, secontext);
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -145,17 +139,8 @@ selinux_getfdcon(pid_t pid, int fd, char **result)
 		return 0;
 	buf[n] = '\0';
 
-	char *expected;
-	if (get_expected_filecontext(buf, &expected) < 0)
-		return 0;
-	if (strcmp(expected, *result) == 0) {
-		free(expected);
-		return 0;
-	}
-	char *final_result = xasprintf("%s!!%s", *result, expected);
-	free(expected);
-	free(*result);
-	*result = final_result;
+	get_expected_filecontext(buf, expected);
+
 	return 0;
 }
 
@@ -164,8 +149,9 @@ selinux_getfdcon(pid_t pid, int fd, char **result)
  * Memory must be freed.
  * Returns 0 on success, -1 on failure.
  */
-int
-selinux_getfilecon(struct tcb *tcp, const char *path, char **result)
+static int
+selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
+		   char **expected)
 {
 	if (number_set_array_is_empty(secontext_set, 0))
 		return -1;
@@ -190,8 +176,7 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **result)
 	if ((unsigned int) rc >= sizeof(fname))
 		return -1;
 
-	char *secontext;
-	rc = getcontext(getfilecon(fname, &secontext), &secontext, result);
+	rc = getfilecon(fname, secontext);
 	if (rc < 0 || !is_number_in_set(SECONTEXT_MISMATCH, secontext_set))
 		return rc;
 
@@ -205,18 +190,82 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **result)
 	if (!resolved)
 		return 0;
 
-	char *expected;
-	rc = get_expected_filecontext(resolved, &expected);
+	get_expected_filecontext(resolved, expected);
 	free(resolved);
-	if (rc < 0)
-		return 0;
-	if (strcmp(expected, *result) == 0) {
-		free(expected);
-		return 0;
-	}
-	char *final_result = xasprintf("%s!!%s", *result, expected);
-	free(expected);
-	free(*result);
-	*result = final_result;
+
 	return 0;
+}
+
+static void
+print_context(char *secontext, char *expected)
+{
+	if (!secontext)
+		return;
+
+	unsigned int style = QUOTE_OMIT_LEADING_TRAILING_QUOTES
+			     | QUOTE_OVERWRITE_HEXSTR |
+			     (xflag == HEXSTR_NONE
+			      ? QUOTE_HEXSTR_NONE
+			      : QUOTE_HEXSTR_NON_ASCII_CHARS);
+
+	char *ctx_str;
+	ssize_t ctx_len = parse_secontext(secontext, &ctx_str);
+
+	print_quoted_string_ex(ctx_str, ctx_len, style, "[]!");
+
+	if (!expected)
+		goto freecon_secontext;
+
+	char *exp_str;
+	ssize_t exp_len = parse_secontext(expected, &exp_str);
+
+	if (ctx_len != exp_len || strncmp(ctx_str, exp_str, ctx_len)) {
+		tprints("!!");
+		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
+	}
+
+	freecon(expected);
+freecon_secontext:
+	freecon(secontext);
+}
+
+void
+selinux_printfdcon(pid_t pid, int fd)
+{
+	char *ctx = NULL;
+	char *exp = NULL;
+
+	if (selinux_getfdcon(pid, fd, &ctx, &exp) < 0)
+		return;
+
+	tprints(" [");
+	print_context(ctx, exp);
+	tprints("]");
+}
+
+void
+selinux_printfilecon(struct tcb *tcp, const char *path)
+{
+	char *ctx = NULL;
+	char *exp = NULL;
+
+	if (selinux_getfilecon(tcp, path, &ctx, &exp) < 0)
+		return;
+
+	tprints(" [");
+	print_context(ctx, exp);
+	tprints("]");
+}
+
+void
+selinux_printpidcon(struct tcb *tcp)
+{
+	char *ctx = NULL;
+
+	if (selinux_getpidcon(tcp, &ctx) < 0)
+		return;
+
+	tprints("[");
+	print_context(ctx, NULL);
+	tprints("] ");
 }
