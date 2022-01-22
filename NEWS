@@ -7,7 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     to support all@pers and %class@pers.
   * Enhanced rejection of invalid syscall numbers in syscall specification
     expressions.
-  * Updated lists of FAN_*, KVM_*, and *_MAGIC constants.
+  * Updated lists of FAN_*, KVM_*, MODULE_INIT_*, and *_MAGIC constants.
 
 * Bug fixes
 

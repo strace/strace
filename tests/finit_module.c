@@ -37,7 +37,8 @@ main(void)
 		{ (kernel_ulong_t) 0xfacef157dec0ded1ULL,
 			"MODULE_INIT_IGNORE_MODVERSIONS|0xdec0ded0" },
 		{ -1LL, "MODULE_INIT_IGNORE_MODVERSIONS|"
-			"MODULE_INIT_IGNORE_VERMAGIC|0xfffffffc" },
+			"MODULE_INIT_IGNORE_VERMAGIC|"
+			"MODULE_INIT_COMPRESSED_FILE|0xfffffff8" },
 	};
 
 	long rc;
