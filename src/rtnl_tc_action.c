@@ -58,6 +58,7 @@ static const nla_decoder_t tcamsg_nla_decoders[] = {
 	[TCA_ACT_FLAGS]		= decode_tca_act_flags,
 	[TCA_ACT_HW_STATS]	= decode_tca_act_hw_stats,
 	[TCA_ACT_USED_HW_STATS]	= decode_tca_act_hw_stats,
+	[TCA_ACT_IN_HW_COUNT]	= decode_nla_u32,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_tcamsg)

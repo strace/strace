@@ -28,6 +28,9 @@ enum { TCA_ACT_HW_STATS = 8 };
 #if !HAVE_DECL_TCA_ACT_USED_HW_STATS
 enum { TCA_ACT_USED_HW_STATS = 9 };
 #endif
+#if !HAVE_DECL_TCA_ACT_IN_HW_COUNT
+enum { TCA_ACT_IN_HW_COUNT = 10 };
+#endif
 
 
 static void
@@ -133,6 +136,13 @@ main(void)
 			     printf("TCA_ACT_HW_STATS_IMMEDIATE|"
 				    "TCA_ACT_HW_STATS_DELAYED|0xfacebeec"));
 	}
+
+	/* TCA_ACT_IN_HW_COUNT */
+	static uint32_t hw_count = 0xdeadface;
+	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
+		    TCA_ACT_IN_HW_COUNT, sizeof(hw_count),
+		    &hw_count, sizeof(hw_count),
+		    printf("%u", hw_count));
 
 	puts("+++ exited with 0 +++");
 	return 0;

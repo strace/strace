@@ -7,6 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     to support all@pers and %class@pers.
   * Enhanced rejection of invalid syscall numbers in syscall specification
     expressions.
+  * Implemented decoding of TCA_ACT_IN_HW_COUNT netlink attribute.
   * Updated lists of FAN_*, KVM_*, MODULE_INIT_*, TCA_ACT_*,
     and *_MAGIC constants.
 
