@@ -66,7 +66,7 @@ main(void)
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
 	/* Invalid */
-	static const unsigned int nla_invalid[] = { 10, 0xffff & NLA_TYPE_MASK };
+	static const unsigned int nla_invalid[] = { 11, 0xffff & NLA_TYPE_MASK };
 	for (size_t i = 0; i < ARRAY_SIZE(nla_invalid); i++) {
 		char nla_type_str[256];
 		sprintf(nla_type_str, "%#x /* TCA_ACT_??? */", nla_invalid[i]);
@@ -112,10 +112,12 @@ main(void)
 		    printf("%u", idx));
 
 	/* TCA_ACT_FLAGS */
-	static uint32_t flags = 0xfacebeef;
+	static uint32_t flags = 0xfacebeff;
 	TEST_NLATTR(fd, nlh0, hdrlen, init_tcamsg, print_tcamsg,
 		    TCA_ACT_FLAGS, sizeof(flags), &flags, sizeof(flags),
-		    printf("TCA_ACT_FLAGS_NO_PERCPU_STATS|0xfacebeee"));
+		    printf("TCA_ACT_FLAGS_NO_PERCPU_STATS|"
+			   "TCA_ACT_FLAGS_SKIP_HW|"
+			   "TCA_ACT_FLAGS_SKIP_SW|0xfacebef8"));
 
 	/* TCA_ACT_HW_STATS, TCA_ACT_USED_HW_STATS */
 	static const struct strval32 nla_hw_st[] = {
