@@ -32,7 +32,6 @@
 /tags
 /tests-m32
 /tests-mx32
-/travis_wait_*.log
 Makefile
 Makefile.in
 core
