@@ -9,7 +9,7 @@
 static int
 arch_get_syscall_args(struct tcb *tcp)
 {
-	tcp->u_arg[0] = loongarch_regs.regs[4];
+	tcp->u_arg[0] = loongarch_regs.orig_a0;
 	tcp->u_arg[1] = loongarch_regs.regs[5];
 	tcp->u_arg[2] = loongarch_regs.regs[6];
 	tcp->u_arg[3] = loongarch_regs.regs[7];

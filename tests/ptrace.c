@@ -857,6 +857,10 @@ print_prstatus_regset(const void *const rs, const size_t size)
 		}
 		fputs("]", stdout);
 	}
+	if (size >= offsetofend(TRACEE_REGS_STRUCT, orig_a0)) {
+		fputs(", ", stdout);
+		PRINT_FIELD_X(*regs, orig_a0);
+	}
 	if (size >= offsetofend(TRACEE_REGS_STRUCT, csr_era)) {
 		fputs(", ", stdout);
 		PRINT_FIELD_X(*regs, csr_era);
