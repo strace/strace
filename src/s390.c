@@ -562,7 +562,7 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 	}
 
 	if (!abbrev(tcp)) {
-		if (name_val || hdr->infmname) {
+		if (name_val || !IS_ARRAY_ZERO(hdr->infmname)) {
 			tprint_struct_next();
 			PRINT_FIELD_EBCDIC(*hdr, infmname);
 		}
