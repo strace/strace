@@ -209,6 +209,7 @@ ioctl_hdio-v-Xabbrev
 ioctl_hdio-v-Xraw
 ioctl_hdio-v-Xverbose
 ioctl_inotify
+ioctl_lirc
 ioctl_kd
 ioctl_kd-Xabbrev
 ioctl_kd-Xraw

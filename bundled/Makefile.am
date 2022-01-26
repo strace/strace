@@ -60,6 +60,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/keyctl.h \
 	linux/include/uapi/linux/landlock.h \
 	linux/include/uapi/linux/libc-compat.h \
+	linux/include/uapi/linux/lirc.h \
 	linux/include/uapi/linux/loop.h \
 	linux/include/uapi/linux/mctp.h \
 	linux/include/uapi/linux/memfd.h \

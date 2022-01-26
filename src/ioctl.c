@@ -386,6 +386,8 @@ ioctl_decode(struct tcb *tcp)
 		return fs_x_ioctl(tcp, code, arg);
 	case 'f':
 		return f_ioctl(tcp, code, arg);
+	case 'i':
+		return lirc_ioctl(tcp, code, arg);
 	case 'o':
 		return ubi_ioctl(tcp, code, arg);
 	case 'p':

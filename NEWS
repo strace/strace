@@ -11,6 +11,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     attributes.
   * Implemented decoding of PR_SET_VMA operation of prctl syscall.
   * Implemented decoding of siginfo_t.si_pkey field.
+  * Implemented decoding of LIRC ioctl commands.
   * Updated lists of FAN_*, IORING_*, IOSQE_*, KVM_*, MODULE_INIT_*, TCA_ACT_*,
     and *_MAGIC constants.
 

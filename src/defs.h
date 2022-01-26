@@ -1362,6 +1362,7 @@ DECL_IOCTL(gpio);
 DECL_IOCTL(inotify);
 DECL_IOCTL(kd);
 DECL_IOCTL(kvm);
+DECL_IOCTL(lirc);
 DECL_IOCTL(nbd);
 DECL_IOCTL(nsfs);
 DECL_IOCTL(ptp);
