@@ -184,7 +184,7 @@ libstrace_a_SOURCES =	\
 	link.c		\
 	linux/x32/asm_stat.h \
 	linux/x86_64/asm_stat.h \
-	lirc.c		\
+	lirc_ioctl.c	\
 	list.h		\
 	listen.c	\
 	lookup_dcookie.c \
