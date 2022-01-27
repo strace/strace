@@ -29,7 +29,7 @@ int
 lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 	   const kernel_ulong_t arg)
 {
-	int value;
+	uint32_t value;
 
 	if (_IOC_DIR(code) == _IOC_READ && entering(tcp))
 		return 0;
@@ -75,12 +75,12 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 			tprintf(", mode=lirccode");
 			break;
 		default:
-			tprintf(", mode=%d", value);
+			tprintf(", mode=%u", value);
 			break;
 		}
 		break;
 	default:
-		tprintf(", %d", value);
+		tprintf(", %u", value);
 		break;
 	}
 
