@@ -8,6 +8,7 @@
 #include <linux/lirc.h>
 
 #include "xlat/lirc_features.h"
+#include "xlat/lirc_modes.h"
 
 int
 lirc_ioctl(struct tcb *const tcp, const unsigned int code,
@@ -33,26 +34,10 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 	case LIRC_GET_REC_MODE:
 	case LIRC_SET_SEND_MODE:
 	case LIRC_SET_REC_MODE:
-		switch (value) {
-		case LIRC_MODE_RAW:
-			tprintf(", mode=raw");
-			break;
-		case LIRC_MODE_PULSE:
-			tprintf(", mode=pulse");
-			break;
-		case LIRC_MODE_MODE2:
-			tprintf(", mode=mode2");
-			break;
-		case LIRC_MODE_SCANCODE:
-			tprintf(", mode=scancode");
-			break;
-		case LIRC_MODE_LIRCCODE:
-			tprintf(", mode=lirccode");
-			break;
-		default:
-			tprintf(", mode=%u", value);
-			break;
-		}
+		tprint_arg_next();
+		tprint_indirect_begin();
+		printxval(lirc_modes, value, "LIRC_MODE_???");
+		tprint_indirect_end();
 		break;
 
 	case LIRC_GET_REC_RESOLUTION:
