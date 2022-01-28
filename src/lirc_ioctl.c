@@ -50,14 +50,16 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 	case LIRC_SET_SEND_DUTY_CYCLE:
 	case LIRC_SET_REC_TIMEOUT:
 	case LIRC_SET_REC_CARRIER_RANGE:
-		tprintf(", %u", value);
+		tprint_arg_next();
+		printnum_int(tcp, arg, "%u");
 		break;
 
 	case LIRC_SET_TRANSMITTER_MASK:
 	case LIRC_SET_REC_TIMEOUT_REPORTS:
 	case LIRC_SET_MEASURE_CARRIER_MODE:
 	case LIRC_SET_WIDEBAND_RECEIVER:
-		tprintf(", %#x", value);
+		tprint_arg_next();
+		printnum_int(tcp, arg, "%#x");
 		return RVAL_IOCTL_DECODED;
 	}
 
