@@ -16,43 +16,61 @@ lirc_ioctl(struct tcb *const tcp, const unsigned int code,
 {
 	uint32_t value;
 
-	if (_IOC_DIR(code) == _IOC_READ && entering(tcp))
-		return 0;
-
-	if (umove_or_printaddr(tcp, arg, &value))
-		return RVAL_IOCTL_DECODED;
-
 	switch (code) {
 	case LIRC_GET_FEATURES:
-		tprint_arg_next();
+		if (entering(tcp)) {
+			tprint_arg_next();
+			return 0;
+		}
+
+		if (umove_or_printaddr(tcp, arg, &value))
+			return RVAL_IOCTL_DECODED;
+
 		tprint_indirect_begin();
 		printflags(lirc_features, value, "LIRC_CAN_???");
 		tprint_indirect_end();
-		break;
+		return RVAL_IOCTL_DECODED;
 
 	case LIRC_GET_SEND_MODE:
 	case LIRC_GET_REC_MODE:
+		if (entering(tcp)) {
+			tprint_arg_next();
+			return 0;
+		}
+		ATTRIBUTE_FALLTHROUGH;
 	case LIRC_SET_SEND_MODE:
 	case LIRC_SET_REC_MODE:
-		tprint_arg_next();
+		if (_IOC_DIR(code) == _IOC_WRITE)
+			tprint_arg_next();
+
+		if (umove_or_printaddr(tcp, arg, &value))
+			return RVAL_IOCTL_DECODED;
+
 		tprint_indirect_begin();
 		printxval(lirc_modes, value, "LIRC_MODE_???");
 		tprint_indirect_end();
-		break;
+		return RVAL_IOCTL_DECODED;
 
 	case LIRC_GET_REC_RESOLUTION:
 	case LIRC_GET_MIN_TIMEOUT:
 	case LIRC_GET_MAX_TIMEOUT:
 	case LIRC_GET_LENGTH:
 	case LIRC_GET_REC_TIMEOUT:
+		if (entering(tcp)) {
+			tprint_arg_next();
+			return 0;
+		}
+		ATTRIBUTE_FALLTHROUGH;
 	case LIRC_SET_SEND_CARRIER:
 	case LIRC_SET_REC_CARRIER:
 	case LIRC_SET_SEND_DUTY_CYCLE:
 	case LIRC_SET_REC_TIMEOUT:
 	case LIRC_SET_REC_CARRIER_RANGE:
-		tprint_arg_next();
+		if (_IOC_DIR(code) == _IOC_WRITE)
+			tprint_arg_next();
+
 		printnum_int(tcp, arg, "%u");
-		break;
+		return RVAL_IOCTL_DECODED;
 
 	case LIRC_SET_TRANSMITTER_MASK:
 	case LIRC_SET_REC_TIMEOUT_REPORTS:
