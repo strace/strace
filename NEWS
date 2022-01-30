@@ -9,7 +9,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     expressions.
   * Implemented decoding of IFLA_GRO_MAX_SIZE and TCA_ACT_IN_HW_COUNT netlink
     attributes.
-  * Updated lists of FAN_*, KVM_*, MODULE_INIT_*, TCA_ACT_*,
+  * Updated lists of FAN_*, IORING_*, IOSQE_*, KVM_*, MODULE_INIT_*, TCA_ACT_*,
     and *_MAGIC constants.
 
 * Bug fixes

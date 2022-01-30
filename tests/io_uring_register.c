@@ -469,21 +469,22 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
 		  "sqe_flags=", 0, "", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
-		  "sqe_flags=", 32, "IOSQE_BUFFER_SELECT", true },
+		  "sqe_flags=", 64, "IOSQE_CQE_SKIP_SUCCESS", true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
 		  "sqe_flags=", 0xff, "IOSQE_FIXED_FILE|IOSQE_IO_DRAIN"
 				      "|IOSQE_IO_LINK|IOSQE_IO_HARDLINK"
 				      "|IOSQE_ASYNC|IOSQE_BUFFER_SELECT"
-				      "|0xc0",
+				      "|IOSQE_CQE_SKIP_SUCCESS"
+				      "|0x80",
 		  true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_ALLOWED), true,
-		  "sqe_flags=", 192, " /* IOSQE_??? */", false },
+		  "sqe_flags=", 128, " /* IOSQE_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
 		  "sqe_flags=", 0, "", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
 		  "sqe_flags=", 1, "IOSQE_FIXED_FILE", true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
-		  "sqe_flags=", 96, "IOSQE_BUFFER_SELECT|0x40", true },
+		  "sqe_flags=", 192, "IOSQE_CQE_SKIP_SUCCESS|0x80", true },
 		{ ARG_STR(IORING_RESTRICTION_SQE_FLAGS_REQUIRED), true,
 		  "sqe_flags=",	128, " /* IOSQE_??? */", false },
 		{ 4, " /* IORING_RESTRICTION_??? */", false, "", 0 },
