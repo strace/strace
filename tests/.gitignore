@@ -724,6 +724,7 @@ prctl-set-ptracer-success-Xraw
 prctl-set-ptracer-success-Xraw--pidns-translation
 prctl-set-ptracer-success-Xverbose
 prctl-set-ptracer-success-Xverbose--pidns-translation
+prctl-set_vma
 prctl-spec-inject
 prctl-sve
 prctl-syscall-user-dispatch

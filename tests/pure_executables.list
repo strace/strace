@@ -514,6 +514,7 @@ prctl-sched-core-Xabbrev
 prctl-sched-core-Xraw
 prctl-sched-core-Xverbose
 prctl-securebits
+prctl-set_vma
 prctl-sve
 prctl-syscall-user-dispatch
 prctl-tagged-addr

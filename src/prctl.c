@@ -10,16 +10,9 @@
  */
 
 #include "defs.h"
+#include "xstring.h"
 
 #include <linux/prctl.h>
-
-#ifdef __ANDROID__
-# ifndef PR_SET_VMA
-#  define PR_SET_VMA 0x53564d41 /* "SVMA" */
-# endif
-#endif
-
-#include "xstring.h"
 
 #include "xlat/prctl_options.h"
 #include "xlat/pr_cap_ambient.h"
@@ -32,6 +25,7 @@
 #include "xlat/pr_sched_core_cmds.h"
 #include "xlat/pr_sched_core_pidtypes.h"
 #include "xlat/pr_set_mm.h"
+#include "xlat/pr_set_vma.h"
 #include "xlat/pr_spec_cmds.h"
 #include "xlat/pr_spec_get_store_bypass_flags.h"
 #include "xlat/pr_spec_set_store_bypass_flags.h"
@@ -353,16 +347,12 @@ SYS_FUNC(prctl)
 			    QUOTE_0_TERMINATED);
 		return RVAL_DECODED;
 
-#ifdef __ANDROID__
-# ifndef PR_SET_VMA_ANON_NAME
-#  define PR_SET_VMA_ANON_NAME    0
-# endif
 	case PR_SET_VMA:
+		tprint_arg_next();
+		printxval64(pr_set_vma, arg2, "PR_SET_VMA_???");
 		if (arg2 == PR_SET_VMA_ANON_NAME) {
 			tprint_arg_next();
-			print_xlat(PR_SET_VMA_ANON_NAME);
-			tprint_arg_next();
-			PRINT_VAL_X(arg3);
+			printaddr(arg3);
 			tprint_arg_next();
 			PRINT_VAL_U(arg4);
 			tprint_arg_next();
@@ -370,10 +360,9 @@ SYS_FUNC(prctl)
 		} else {
 			/* There are no other sub-options now, but there
 			 * might be in future... */
-			print_prctl_args(tcp, 1);
+			print_prctl_args(tcp, 2);
 		}
 		return RVAL_DECODED;
-#endif
 
 	case PR_SET_MM:
 		tprint_arg_next();
