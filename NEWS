@@ -10,6 +10,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Implemented decoding of IFLA_GRO_MAX_SIZE and TCA_ACT_IN_HW_COUNT netlink
     attributes.
   * Implemented decoding of PR_SET_VMA operation of prctl syscall.
+  * Implemented decoding of siginfo_t.si_pkey field.
   * Updated lists of FAN_*, IORING_*, IOSQE_*, KVM_*, MODULE_INIT_*, TCA_ACT_*,
     and *_MAGIC constants.
 

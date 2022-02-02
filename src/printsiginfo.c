@@ -161,10 +161,23 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			tprint_struct_next();
 			PRINT_FIELD_U(*sip, si_stime);
 			break;
-		case SIGILL: case SIGFPE:
-		case SIGSEGV: case SIGBUS:
+		case SIGILL:
+		case SIGFPE:
+		case SIGBUS:
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_addr);
+			break;
+		case SIGSEGV:
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_addr);
+#ifdef HAVE_SIGINFO_T_SI_PKEY
+			switch (sip->si_code) {
+			case SEGV_PKUERR:
+				tprint_struct_next();
+				PRINT_FIELD_U(*sip, si_pkey);
+				break;
+			}
+#endif
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {
