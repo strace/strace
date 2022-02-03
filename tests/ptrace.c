@@ -1854,6 +1854,22 @@ main(void)
 	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
 	       XLAT_ARGS(SIGPROF), sip->si_code, sip->si_errno, errstr);
 
+#ifdef HAVE_SIGINFO_T_SI_PKEY
+	memset(sip, -1, sizeof(*sip));
+	sip->si_signo = SIGSEGV;
+	sip->si_code = SEGV_PKUERR;
+	sip->si_errno = 0;
+	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
+	sip->si_pkey = 0xbadc0ded;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_addr=%p, si_pkey=%u}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSEGV), XLAT_ARGS(SEGV_PKUERR),
+	       sip->si_addr, sip->si_pkey, errstr);
+#endif
+
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGSYS;

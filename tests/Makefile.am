@@ -335,6 +335,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	seccomp-filter-v \
 	seccomp-strict \
 	seccomp_get_notif_sizes-success \
+	segv_pkuerr \
 	select-P \
 	set_ptracer_any \
 	set_sigblock \
