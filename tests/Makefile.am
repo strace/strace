@@ -200,6 +200,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ioctl_kd-success-s1024-Xabbrev \
 	ioctl_kd-success-s1024-Xraw \
 	ioctl_kd-success-s1024-Xverbose \
+	ioctl_lirc-success \
+	ioctl_lirc-success-Xabbrev \
+	ioctl_lirc-success-Xraw \
+	ioctl_lirc-success-Xverbose \
 	ioctl_loop-nv \
 	ioctl_loop-v \
 	ioctl_mtd-success \

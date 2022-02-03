@@ -325,6 +325,14 @@ ioctl_kd-success-s1024-Xverbose
 ioctl_kvm_run
 ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu
+ioctl_lirc
+ioctl_lirc-Xabbrev
+ioctl_lirc-Xraw
+ioctl_lirc-Xverbose
+ioctl_lirc-success
+ioctl_lirc-success-Xabbrev
+ioctl_lirc-success-Xraw
+ioctl_lirc-success-Xverbose
 ioctl_loop
 ioctl_loop-nv
 ioctl_loop-v
