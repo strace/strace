@@ -860,6 +860,7 @@ seccomp_get_action_avail
 seccomp_get_notif_sizes
 seccomp_get_notif_sizes-success
 secontext.am
+segv_accerr
 segv_pkuerr
 select
 select-P
