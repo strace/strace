@@ -15,6 +15,7 @@
 #if defined HAVE_SYS_FANOTIFY_H && defined HAVE_FANOTIFY_MARK
 
 # include <limits.h>
+# include <stdint.h>
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/fanotify.h>
