@@ -180,7 +180,7 @@ do_keyctl(kernel_ulong_t cmd, const char *cmd_str, ...)
 	printf(") = %s\n", errstr);
 }
 
-static int
+static int ATTRIBUTE_FORMAT((__printf__, 3, 4))
 append_str(char **buf, size_t *left, const char *fmt, ...)
 {
 	int ret;
@@ -214,7 +214,7 @@ kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
 	} else if (!kdf->hashname) {
 		append_str(&pos, &left, "NULL");
 	} else if (deref_hash) {
-		append_str(&pos, &left, "\"%.*s\"", limit, kdf->hashname);
+		append_str(&pos, &left, "\"%.*s\"", (int) limit, kdf->hashname);
 
 		if (strnlen(kdf->hashname, limit + 1) > limit)
 			append_str(&pos, &left, "...");
@@ -229,7 +229,7 @@ kckdfp_to_str(struct keyctl_kdf_params *kdf, bool deref_hash, bool deref_oi,
 	} else if (!kdf->otherinfo) {
 		append_str(&pos, &left, "NULL");
 	} else if (deref_oi) {
-		append_str(&pos, &left, "\"%.*s\"", limit, kdf->otherinfo);
+		append_str(&pos, &left, "\"%.*s\"", (int) limit, kdf->otherinfo);
 
 		if (strnlen(kdf->otherinfo, limit + 1) > limit)
 			append_str(&pos, &left, "...");
