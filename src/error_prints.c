@@ -21,15 +21,16 @@
 extern char *program_invocation_name;
 #endif
 
-static void
+static void ATTRIBUTE_FORMAT((__printf__, 2, 0))
 verror_msg(int err_no, const char *fmt, va_list p)
 {
 	char *msg;
 
 	fflush(NULL);
 
-	/* We want to print entire message with single fprintf to ensure
-	 * message integrity if stderr is shared with other programs.
+	/*
+	 * We want to print the entire message with a single fprintf to ensure
+	 * the message integrity if stderr is shared with other programs.
 	 * Thus we use vasprintf + single fprintf.
 	 */
 	msg = NULL;
@@ -50,9 +51,11 @@ verror_msg(int err_no, const char *fmt, va_list p)
 		else
 			putc('\n', stderr);
 	}
-	/* We don't switch stderr to buffered, thus fprintf(stderr)
-	 * always flushes its output and this is not necessary: */
-	/* fflush(stderr); */
+	/*
+	 * We don't switch stderr to buffered, thus fprintf(stderr)
+	 * always flushes its output and this is not necessary:
+	 * fflush(stderr);
+	 */
 }
 
 void
