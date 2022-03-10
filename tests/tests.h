@@ -165,7 +165,7 @@ void perror_msg_and_skip(const char *, ...)
 #  define perror_msg_and_fail(fmt_, ...) \
 	perror_msg_and_fail("%s:%d: " fmt_, __FILE__, __LINE__, ##__VA_ARGS__)
 # endif
-# ifndef perror_msg_and_fail
+# ifndef error_msg_and_fail
 #  define error_msg_and_fail(fmt_, ...) \
 	error_msg_and_fail("%s:%d: " fmt_, __FILE__, __LINE__, ##__VA_ARGS__)
 # endif
