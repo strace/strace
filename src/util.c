@@ -654,6 +654,7 @@ get_finfo_for_dev(const char *path, struct finfo *finfo)
 
 	finfo->path = path;
 	finfo->type = FINFO_UNSET;
+	finfo->deleted = false;
 
 	if (path[0] != '/')
 		return finfo;
@@ -681,10 +682,11 @@ get_finfo_for_dev(const char *path, struct finfo *finfo)
 }
 
 static bool
-printdev(struct tcb *tcp, int fd, const char *path)
+printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 {
 	struct finfo finfo_buf;
-	const struct finfo *finfo = get_finfo_for_dev(path, &finfo_buf);
+	if (!finfo)
+		finfo = get_finfo_for_dev(path, &finfo_buf);
 
 	switch (finfo->type) {
 	case FINFO_DEV_BLK:
@@ -779,25 +781,27 @@ print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 }
 
 void
-printfd_pid(struct tcb *tcp, pid_t pid, int fd)
+printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *finfo)
 {
 	PRINT_VAL_D(fd);
 
-	char path[PATH_MAX + 1];
+	char patha[PATH_MAX + 1];
 	bool deleted;
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
-	    && getfdpath_pid(pid, fd, path, sizeof(path), &deleted) >= 0) {
+	    && (finfo || (getfdpath_pid(pid, fd, patha, sizeof(patha), &deleted) >= 0))) {
+		const char *path = finfo? finfo->path: patha;
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_DEV, decode_fd_set) &&
-		    printdev(tcp, fd, path))
+		    printdev(tcp, fd, path, finfo))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
-			print_quoted_string_in_angle_brackets(path, deleted);
+			print_quoted_string_in_angle_brackets(path,
+							      finfo? finfo->deleted: deleted);
 printed:	;
 	}
 

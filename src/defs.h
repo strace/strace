@@ -665,6 +665,7 @@ struct finfo {
 		FINFO_DEV_BLK,
 		FINFO_DEV_CHR,
 	} type;
+	bool deleted;
 	struct {
 		unsigned int major, minor;
 	} dev;
@@ -1224,7 +1225,14 @@ extern pid_t pidfd_get_pid(pid_t pid_of_fd, int fd);
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracer).
  */
-extern void printfd_pid(struct tcb *tcp, pid_t pid, int fd);
+extern void printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd,
+				   const struct finfo *finfo);
+
+static inline void
+printfd_pid(struct tcb *tcp, pid_t pid, int fd)
+{
+	printfd_pid_with_finfo(tcp, pid, fd, NULL);
+}
 
 static inline void
 printfd(struct tcb *tcp, int fd)
