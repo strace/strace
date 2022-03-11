@@ -437,7 +437,18 @@ SYS_FUNC(ioctl)
 	int ret;
 
 	if (entering(tcp)) {
-		printfd(tcp, tcp->u_arg[0]);
+		struct finfo finfoa;
+		struct finfo *finfo = NULL;
+		char path[PATH_MAX + 1];
+		bool deleted;
+		if (getfdpath_pid(tcp->pid, tcp->u_arg[0], path, sizeof(path),
+				  &deleted) >= 0) {
+			finfo = get_finfo_for_dev(path, &finfoa);
+			finfo->deleted = deleted;
+			printfd_with_finfo(tcp, tcp->u_arg[0], finfo);
+		} else
+			printfd(tcp, tcp->u_arg[0]);
+
 		tprint_arg_next();
 
 		if (xlat_verbosity != XLAT_STYLE_ABBREV)

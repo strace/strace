@@ -647,7 +647,7 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 	return true;
 }
 
-static struct finfo *
+struct finfo *
 get_finfo_for_dev(const char *path, struct finfo *finfo)
 {
 	strace_stat_t st;

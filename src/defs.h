@@ -671,6 +671,9 @@ struct finfo {
 	} dev;
 };
 
+extern struct finfo *
+get_finfo_for_dev(const char *path, struct finfo *finfo);
+
 /**
  * @return 0 on success, -1 on error.
  */
@@ -1238,6 +1241,12 @@ static inline void
 printfd(struct tcb *tcp, int fd)
 {
 	printfd_pid(tcp, tcp->pid, fd);
+}
+
+static inline void
+printfd_with_finfo(struct tcb *tcp, int fd, const struct finfo *finfo)
+{
+	printfd_pid_with_finfo(tcp, tcp->pid, fd, finfo);
 }
 
 /**
