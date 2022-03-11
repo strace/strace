@@ -658,6 +658,18 @@ static inline int set_tcb_priv_ulong(struct tcb *tcp, unsigned long val)
 	return set_tcb_priv_data(tcp, (void *) val, 0);
 }
 
+struct finfo {
+	const char *path;
+	enum {
+		FINFO_UNSET,
+		FINFO_DEV_BLK,
+		FINFO_DEV_CHR,
+	} type;
+	struct {
+		unsigned int major, minor;
+	} dev;
+};
+
 /**
  * @return 0 on success, -1 on error.
  */

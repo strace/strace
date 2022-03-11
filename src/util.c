@@ -647,33 +647,61 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 	return true;
 }
 
-static bool
-printdev(struct tcb *tcp, int fd, const char *path)
+static struct finfo *
+get_finfo_for_dev(const char *path, struct finfo *finfo)
 {
 	strace_stat_t st;
 
+	finfo->path = path;
+	finfo->type = FINFO_UNSET;
+
 	if (path[0] != '/')
-		return false;
+		return finfo;
 
 	if (stat_file(path, &st)) {
 		debug_func_perror_msg("stat(\"%s\")", path);
-		return false;
+		return finfo;
 	}
 
 	switch (st.st_mode & S_IFMT) {
 	case S_IFBLK:
+		finfo->type = FINFO_DEV_BLK;
+		break;
 	case S_IFCHR:
+		finfo->type = FINFO_DEV_CHR;
+		break;
+	default:
+		return finfo;
+	}
+
+	finfo->dev.major = major(st.st_rdev);
+	finfo->dev.minor = minor(st.st_rdev);
+
+	return finfo;
+}
+
+static bool
+printdev(struct tcb *tcp, int fd, const char *path)
+{
+	struct finfo finfo_buf;
+	const struct finfo *finfo = get_finfo_for_dev(path, &finfo_buf);
+
+	switch (finfo->type) {
+	case FINFO_DEV_BLK:
+	case FINFO_DEV_CHR:
 		tprint_associated_info_begin();
-		print_quoted_string_ex(path, strlen(path),
+		print_quoted_string_ex(finfo->path, strlen(finfo->path),
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
 		tprint_associated_info_begin();
 		tprintf_string("%s %u:%u",
-			       S_ISBLK(st.st_mode)? "block" : "char",
-			       major(st.st_rdev), minor(st.st_rdev));
+			       (finfo->type == FINFO_DEV_BLK)? "block" : "char",
+			       finfo->dev.major, finfo->dev.minor);
 		tprint_associated_info_end();
 		tprint_associated_info_end();
 		return true;
+	default:
+		break;
 	}
 
 	return false;
