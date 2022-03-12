@@ -634,12 +634,9 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 		return false;
 
 	const char *details = get_sockaddr_by_inode(tcp, fd, inode);
-	if (details) {
-		print_string_in_angle_brackets(details);
-		return true;
-	}
+	print_string_in_angle_brackets(details ?: path);
 
-	return false;
+	return true;
 }
 
 static bool
