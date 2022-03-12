@@ -589,20 +589,31 @@ getfdproto(struct tcb *tcp, int fd)
 #endif
 }
 
+static unsigned long
+get_inode_of_socket_path(const char *path)
+{
+	const char *str = STR_STRIP_PREFIX(path, "socket:[");
+	char *end;
+	size_t len;
+	unsigned long r;
+
+	if ((str != path)
+	    && (len = strlen(str))
+	    && (str[len - 1] == ']')
+	    && (r = strtoul(str, &end, 10))
+	    && (end == &str[len - 1]))
+		return r;
+
+	return 0;
+}
+
 unsigned long
 getfdinode(struct tcb *tcp, int fd)
 {
 	char path[PATH_MAX + 1];
 
-	if (getfdpath(tcp, fd, path, sizeof(path)) >= 0) {
-		const char *str = STR_STRIP_PREFIX(path, "socket:[");
-
-		if (str != path) {
-			const size_t str_len = strlen(str);
-			if (str_len && str[str_len - 1] == ']')
-				return strtoul(str, NULL, 10);
-		}
-	}
+	if (getfdpath(tcp, fd, path, sizeof(path)) >= 0)
+		return get_inode_of_socket_path(path);
 
 	return 0;
 }
@@ -618,17 +629,11 @@ print_string_in_angle_brackets(const char *str)
 static bool
 printsocket(struct tcb *tcp, int fd, const char *path)
 {
-	const char *str = STR_STRIP_PREFIX(path, "socket:[");
-	size_t len;
-	unsigned long inode;
-	const char *details = NULL;
+	unsigned long inode = get_inode_of_socket_path(path);
+	if (!inode)
+		return false;
 
-	if ((str != path)
-	    && (len = strlen(str))
-	    && (str[len - 1] == ']')
-	    && (inode = strtoul(str, NULL, 10)))
-		details = get_sockaddr_by_inode(tcp, fd, inode);
-
+	const char *details = get_sockaddr_by_inode(tcp, fd, inode);
 	if (details) {
 		print_string_in_angle_brackets(details);
 		return true;
