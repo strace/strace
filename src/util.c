@@ -607,6 +607,14 @@ getfdinode(struct tcb *tcp, int fd)
 	return 0;
 }
 
+static void
+print_string_in_angle_brackets(const char *str)
+{
+	tprints("<");
+	tprints(str);
+	tprints(">");
+}
+
 static bool
 printsocket(struct tcb *tcp, int fd, const char *path)
 {
@@ -622,9 +630,7 @@ printsocket(struct tcb *tcp, int fd, const char *path)
 		details = get_sockaddr_by_inode(tcp, fd, inode);
 
 	if (details) {
-		tprints("<");
-		tprints(details);
-		tprints(">");
+		print_string_in_angle_brackets(details);
 		return true;
 	}
 
