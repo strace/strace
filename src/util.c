@@ -711,16 +711,18 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 		return false;
 
 	pid_t pid = pidfd_get_pid(pid_of_fd, fd);
-	if (pid <= 0)
-		return false;
+	if (pid > 0) {
+		tprints("<pid:");
+		/*
+		 * The pid translation is not needed because
+		 * the pid is in strace's namespace.
+		 */
+		printpid(NULL, pid, PT_TID);
+		tprints(">");
+	} else {
+		print_string_in_angle_brackets(path);
+	}
 
-	tprints("<pid:");
-	/*
-	 * The pid translation is not needed because
-	 * the pid is in strace's namespace.
-	 */
-	printpid(NULL, pid, PT_TID);
-	tprints(">");
 	return true;
 }
 
