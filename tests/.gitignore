@@ -1043,6 +1043,7 @@ vmsplice
 wait4
 wait4-v
 waitid
+waitid-Y
 waitid-v
 waitpid
 xattr

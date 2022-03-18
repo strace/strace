@@ -18,6 +18,13 @@
 #include "kernel_rusage.h"
 #include "scno.h"
 
+#ifndef MY_COMM
+# define MY_COMM ""
+#endif
+#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+# define SKIP_IF_PROC_IS_UNAVAILABLE
+#endif
+
 static const char *
 sprint_rusage(const kernel_rusage_t *const ru)
 {
@@ -97,19 +104,21 @@ si_code_2_name(const int code)
 }
 
 static const char *
-sprint_siginfo(const siginfo_t *const si, const char *const status_text)
+sprint_siginfo(const siginfo_t *const si, const char *const status_text,
+	       const char *const comm)
 {
 	static char buf[1024];
 	snprintf(buf, sizeof(buf),
 		 "{si_signo=SIGCHLD"
 		 ", si_code=%s"
-		 ", si_pid=%d"
+		 ", si_pid=%d%s"
 		 ", si_uid=%d"
 		 ", si_status=%s"
 		 ", si_utime=%llu"
 		 ", si_stime=%llu}",
 		 si_code_2_name(si->si_code),
 		 si->si_pid,
+		 comm,
 		 si->si_uid,
 		 status_text,
 		 zero_extend_signed_to_ull(si->si_utime),
@@ -143,6 +152,8 @@ do_waitid(const unsigned int idtype,
 int
 main(void)
 {
+	SKIP_IF_PROC_IS_UNAVAILABLE;
+
 	tprintf("%s", "");
 
 	int fds[2];
@@ -165,23 +176,24 @@ main(void)
 
 	if (do_waitid(P_PID, pid, 0, WNOHANG|WEXITED, 0))
 		perror_msg_and_fail("waitid #1");
-	tprintf("waitid(P_PID, %d, NULL, WNOHANG|WEXITED, NULL) = 0\n", pid);
+	tprintf("waitid(P_PID, %d%s, NULL, WNOHANG|WEXITED, NULL) = 0\n",
+		pid, MY_COMM);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, sinfo);
 	memset(sinfo, 0, sizeof(*sinfo));
 	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_rusage_t, rusage);
 	if (do_waitid(P_PID, pid, sinfo, WNOHANG|WEXITED|WSTOPPED, rusage))
 		perror_msg_and_fail("waitid #2");
-	tprintf("waitid(P_PID, %d, {}, WNOHANG|WEXITED|WSTOPPED, %s) = 0\n",
-		pid, sprint_rusage(rusage));
+	tprintf("waitid(P_PID, %d%s, {}, WNOHANG|WEXITED|WSTOPPED, %s) = 0\n",
+		pid, MY_COMM, sprint_rusage(rusage));
 
 	assert(write(1, "", 1) == 1);
 	(void) close(1);
 
 	if (do_waitid(P_PID, pid, sinfo, WEXITED, rusage))
 		perror_msg_and_fail("waitid #3");
-	tprintf("waitid(P_PID, %d, %s, WEXITED, %s) = 0\n",
-		pid, sprint_siginfo(sinfo, "42"), sprint_rusage(rusage));
+	tprintf("waitid(P_PID, %d%s, %s, WEXITED, %s) = 0\n",
+		pid, MY_COMM, sprint_siginfo(sinfo, "42", ""), sprint_rusage(rusage));
 
 	pid = fork();
 	if (pid < 0)
@@ -194,8 +206,9 @@ main(void)
 
 	if (do_waitid(P_PID, pid, sinfo, WEXITED, rusage))
 		perror_msg_and_fail("waitid #4");
-	tprintf("waitid(P_PID, %d, %s, WEXITED, %s) = 0\n",
-		pid, sprint_siginfo(sinfo, "SIGUSR1"), sprint_rusage(rusage));
+	tprintf("waitid(P_PID, %d%s, %s, WEXITED, %s) = 0\n",
+		pid, MY_COMM, sprint_siginfo(sinfo, "SIGUSR1", ""),
+		sprint_rusage(rusage));
 
 	if (pipe(fds))
 		perror_msg_and_fail("pipe");
@@ -215,8 +228,9 @@ main(void)
 
 	if (do_waitid(P_PID, pid, sinfo, WSTOPPED, rusage))
 		perror_msg_and_fail("waitid #5");
-	tprintf("waitid(P_PID, %d, %s, WSTOPPED, %s) = 0\n",
-		pid, sprint_siginfo(sinfo, "SIGSTOP"), sprint_rusage(rusage));
+	tprintf("waitid(P_PID, %d%s, %s, WSTOPPED, %s) = 0\n",
+		pid, MY_COMM, sprint_siginfo(sinfo, "SIGSTOP", MY_COMM),
+		sprint_rusage(rusage));
 
 	if (kill(pid, SIGCONT))
 		perror_msg_and_fail("kill(SIGCONT)");
@@ -224,8 +238,9 @@ main(void)
 #if defined WCONTINUED
 	if (do_waitid(P_PID, pid, sinfo, WCONTINUED, rusage))
 		perror_msg_and_fail("waitid #6");
-	tprintf("waitid(P_PID, %d, %s, WCONTINUED, %s) = 0\n",
-		pid, sprint_siginfo(sinfo, "SIGCONT"), sprint_rusage(rusage));
+	tprintf("waitid(P_PID, %d%s, %s, WCONTINUED, %s) = 0\n",
+		pid, MY_COMM, sprint_siginfo(sinfo, "SIGCONT", MY_COMM),
+		sprint_rusage(rusage));
 #endif /* WCONTINUED */
 
 	assert(write(1, "", 1) == 1);
@@ -233,8 +248,9 @@ main(void)
 
 	if (do_waitid(P_PID, pid, sinfo, WEXITED, rusage))
 		perror_msg_and_fail("waitid #7");
-	tprintf("waitid(P_PID, %d, %s, WEXITED, %s) = 0\n",
-		pid, sprint_siginfo(sinfo, "0"), sprint_rusage(rusage));
+	tprintf("waitid(P_PID, %d%s, %s, WEXITED, %s) = 0\n",
+		pid, MY_COMM, sprint_siginfo(sinfo, "0", ""),
+		sprint_rusage(rusage));
 
 	long rc = do_waitid(P_ALL, -1, sinfo, WEXITED|WSTOPPED, rusage);
 	tprintf("waitid(P_ALL, -1, %p, WEXITED|WSTOPPED, %p)"

@@ -371,6 +371,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	unix-pair-sendto-recvfrom \
 	vfork-f \
 	wait4-v \
+	waitid-Y \
 	waitid-v \
 	xet_robust_list--pidns-translation \
 	xetpgid--pidns-translation \

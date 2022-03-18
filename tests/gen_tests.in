@@ -1050,6 +1050,7 @@ vmsplice	-ewrite=1
 wait4	-esignal=none
 wait4-v	-v -e signal=none -e trace=wait4
 waitid	-esignal=none
+waitid-Y	-Y -e signal=none -e trace=waitid
 waitid-v	-v -e signal=none -e trace=waitid
 waitpid	-a28
 xattr	-a22 -e trace=getxattr,fgetxattr,lgetxattr,setxattr,fsetxattr,lsetxattr,listxattr,flistxattr,llistxattr,removexattr,fremovexattr,lremovexattr
