@@ -252,6 +252,11 @@ main(void)
 		pid, MY_COMM, sprint_siginfo(sinfo, "0", ""),
 		sprint_rusage(rusage));
 
+	pid_t pgid = getpgid(pid);
+	long pgrc = do_waitid(P_PGID, pgid, sinfo, WEXITED, rusage);
+	tprintf("waitid(P_PGID, %d, %p, WEXITED, %p)"
+		" = %ld %s (%m)\n", pgid, sinfo, rusage, pgrc, errno2name());
+
 	long rc = do_waitid(P_ALL, -1, sinfo, WEXITED|WSTOPPED, rusage);
 	tprintf("waitid(P_ALL, -1, %p, WEXITED|WSTOPPED, %p)"
 		" = %ld %s (%m)\n", sinfo, rusage, rc, errno2name());
