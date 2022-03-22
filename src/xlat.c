@@ -102,6 +102,19 @@ xlookup(const struct xlat *x, const uint64_t val)
 	return NULL;
 }
 
+uint64_t
+xrlookup(const struct xlat *x, const char *str, uint64_t unknown_val)
+{
+	if (!x || !x->data || !str)
+		return unknown_val;
+
+	for (size_t idx = 0; idx < x->size; idx++)
+		if (x->data[idx].str && strcmp(str, x->data[idx].str) == 0)
+			return x->data[idx].val;
+
+	return unknown_val;
+}
+
 static const char *
 xlat_search_eq_or_less(const struct xlat *xlat, uint64_t *val)
 {
