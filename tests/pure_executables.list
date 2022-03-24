@@ -624,6 +624,7 @@ set_mempolicy
 set_mempolicy-Xabbrev
 set_mempolicy-Xraw
 set_mempolicy-Xverbose
+set_mempolicy_home_node
 setdomainname
 setfsgid
 setfsgid32

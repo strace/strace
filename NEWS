@@ -7,6 +7,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     to support all@pers and %class@pers.
   * Enhanced rejection of invalid syscall numbers in syscall specification
     expressions.
+  * Implemented decoding of set_mempolicy_home_node syscall, introduced
+    in Linux 5.17.
   * Implemented decoding of IFLA_GRO_MAX_SIZE and TCA_ACT_IN_HW_COUNT netlink
     attributes.
   * Implemented decoding of PR_SET_VMA operation of prctl syscall.

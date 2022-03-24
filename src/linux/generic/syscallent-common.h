@@ -34,3 +34,4 @@
 [BASE_NR + 447] = { 1,	TD,		SEN(memfd_secret),		"memfd_secret"			},
 [BASE_NR + 448] = { 2,	TD,		SEN(process_mrelease),		"process_mrelease"	},
 [BASE_NR + 449] = { 5,	0,		SEN(futex_waitv),		"futex_waitv"	},
+[BASE_NR + 450] = { 4,	TM,		SEN(set_mempolicy_home_node),	"set_mempolicy_home_node"	},

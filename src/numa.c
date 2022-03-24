@@ -179,6 +179,26 @@ SYS_FUNC(get_mempolicy)
 	return 0;
 }
 
+SYS_FUNC(set_mempolicy_home_node)
+{
+	/* start */
+	printaddr(tcp->u_arg[0]);
+	tprint_arg_next();
+
+	/* len */
+	PRINT_VAL_U(tcp->u_arg[1]);
+	tprint_arg_next();
+
+	/* home_node */
+	PRINT_VAL_U(tcp->u_arg[2]);
+	tprint_arg_next();
+
+	/* flags */
+	PRINT_VAL_X(tcp->u_arg[3]);
+
+	return RVAL_DECODED;
+}
+
 #include "xlat/move_pages_flags.h"
 
 static bool

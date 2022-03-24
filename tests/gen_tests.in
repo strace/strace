@@ -857,6 +857,7 @@ set_mempolicy	-a34 -s3
 set_mempolicy-Xabbrev	-a34 -s3 -Xabbrev -e trace=set_mempolicy
 set_mempolicy-Xraw	-a24 -s3 -Xraw -e trace=set_mempolicy
 set_mempolicy-Xverbose	-s3 -Xverbose -e trace=set_mempolicy
+set_mempolicy_home_node	-a39
 setdomainname	-a24
 setfsgid	-a12
 setfsgid32	-a14
