@@ -4,6 +4,7 @@
  * Copyright (c) 2016-2021 Eugene Syromyatnikov <evgsyr@gmail.com>
  * Copyright (c) 2017 Chen Jingpiao <chenjingpiao@gmail.com>
  * Copyright (c) 2018 Paul Chaignon <paul.chaignon@gmail.com>
+ * Copyright (c) 2021-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later

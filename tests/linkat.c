@@ -1,7 +1,7 @@
 /*
  * Check decoding of linkat syscall.
  *
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

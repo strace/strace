@@ -1,7 +1,7 @@
 /*
  * SELinux interface.
  *
- * Copyright (c) 2020-2021 The strace developers.
+ * Copyright (c) 2020-2022 The strace developers.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
