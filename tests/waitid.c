@@ -132,6 +132,8 @@ poison(unsigned int v)
 	return (unsigned long) 0xfacefeed00000000ULL | v;
 }
 
+static const char *errstr;
+
 static long
 do_waitid(const unsigned int idtype,
 	  const unsigned int id,
@@ -146,6 +148,7 @@ do_waitid(const unsigned int idtype,
 	long rc = syscall(__NR_waitid, poison(idtype), poison(id),
 			  infop, poison(options), rusage);
 	assert(sigprocmask(SIG_UNBLOCK, &mask, NULL) == 0);
+	errstr = sprintrc(rc);
 	return rc;
 }
 
@@ -253,13 +256,13 @@ main(void)
 		sprint_rusage(rusage));
 
 	pid_t pgid = getpgid(pid);
-	long pgrc = do_waitid(P_PGID, pgid, sinfo, WEXITED, rusage);
-	tprintf("waitid(P_PGID, %d, %p, WEXITED, %p)"
-		" = %ld %s (%m)\n", pgid, sinfo, rusage, pgrc, errno2name());
+	do_waitid(P_PGID, pgid, sinfo, WEXITED, rusage);
+	tprintf("waitid(P_PGID, %d, %p, WEXITED, %p) = %s\n",
+		pgid, sinfo, rusage, errstr);
 
-	long rc = do_waitid(P_ALL, -1, sinfo, WEXITED|WSTOPPED, rusage);
-	tprintf("waitid(P_ALL, -1, %p, WEXITED|WSTOPPED, %p)"
-		" = %ld %s (%m)\n", sinfo, rusage, rc, errno2name());
+	do_waitid(P_ALL, -1, sinfo, WEXITED|WSTOPPED, rusage);
+	tprintf("waitid(P_ALL, -1, %p, WEXITED|WSTOPPED, %p) = %s\n",
+		sinfo, rusage, errstr);
 
 	tprintf("%s\n", "+++ exited with 0 +++");
 	return 0;
