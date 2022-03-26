@@ -1,4 +1,4 @@
-Noteworthy changes in release ?.?? (????-??-??)
+Noteworthy changes in release 5.17 (2022-03-26)
 ===============================================
 
 * Improvements
@@ -17,8 +17,6 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of FAN_*, IORING_*, IOSQE_*, KEY_*, KVM_*, MODULE_INIT_*,
     TCA_ACT_*, and *_MAGIC constants.
   * Updated lists of ioctl commands from Linux 5.17.
-
-* Bug fixes
 
 Noteworthy changes in release 5.16 (2022-01-10)
 ===============================================
