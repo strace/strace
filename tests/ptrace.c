@@ -1854,7 +1854,7 @@ main(void)
 	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
 	       XLAT_ARGS(SIGPROF), sip->si_code, sip->si_errno, errstr);
 
-#ifdef HAVE_SIGINFO_T_SI_PKEY
+#if defined HAVE_SIGINFO_T_SI_PKEY && defined SEGV_PKUERR
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGSEGV;
 	sip->si_code = SEGV_PKUERR;
