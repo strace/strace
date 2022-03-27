@@ -4,6 +4,12 @@ strace (@PACKAGE_VERSION@-1) experimental; urgency=low
 
  -- Strace <@PACKAGE_BUGREPORT@>  @DEB_CHANGELOGTIME@
 
+strace (5.17-1) unstable; urgency=medium
+
+  * New upstream version.
+
+ -- Dmitry V. Levin <ldv@strace.io>  Sat, 26 Mar 2022 08:00:00 +0000
+
 strace (5.16-1) unstable; urgency=medium
 
   * New upstream version.
