@@ -10,10 +10,12 @@
 static void
 arch_get_error(struct tcb *tcp, const bool check_errno)
 {
-	if (check_errno && is_negated_errno(xtensa_regs.a[2])) {
+	unsigned int status_reg = xtensa_regs.windowbase * 4 + 2;
+
+	if (check_errno && is_negated_errno(xtensa_regs.a[status_reg])) {
 		tcp->u_rval = -1;
-		tcp->u_error = -xtensa_regs.a[2];
+		tcp->u_error = -xtensa_regs.a[status_reg];
 	} else {
-		tcp->u_rval = xtensa_regs.a[2];
+		tcp->u_rval = xtensa_regs.a[status_reg];
 	}
 }

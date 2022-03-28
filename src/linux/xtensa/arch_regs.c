@@ -8,4 +8,4 @@
 static struct user_pt_regs xtensa_regs;
 #define ARCH_REGS_FOR_GETREGS xtensa_regs
 #define ARCH_PC_REG xtensa_regs.pc
-#define ARCH_SP_REG xtensa_regs.a[1]
+#define ARCH_SP_REG xtensa_regs.a[xtensa_regs.windowbase * 4 + 1]
