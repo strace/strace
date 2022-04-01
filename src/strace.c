@@ -482,6 +482,10 @@ Miscellaneous:\n\
   -d, --debug    enable debug output to stderr\n\
   -h, --help     print help message\n\
   --seccomp-bpf  enable seccomp-bpf filtering\n\
+  --tips[=[[id:]ID][,[format:]FORMAT]]\n\
+                 show strace tips, tricks, and tweaks on exit\n\
+     id:         non-negative integer or random; default is random\n\
+     format:     none, compact, full; default is compact\n\
   -V, --version  print version\n\
 "
 /* ancient, no one should use it
@@ -1951,6 +1955,71 @@ parse_ts_arg(const char *in_arg)
 	return 0;
 }
 
+static int
+parse_tips_arg(const char *in_arg)
+{
+	static const char id_pfx[] = "id:";
+	static const char fmt_pfx[] = "format:";
+
+	enum {
+		TOKEN_ID = 1 << 0,
+		TOKEN_FORMAT = 1 << 1,
+	} token_type;
+	int id = tip_id;
+	enum tips_fmt fmt = show_tips == TIPS_NONE ? TIPS_COMPACT : show_tips;
+	char *arg = xstrdup(in_arg);
+	char *saveptr = NULL;
+
+	for (const char *token = strtok_r(arg, ",", &saveptr);
+	     token; token = strtok_r(NULL, ",", &saveptr)) {
+		token_type = TOKEN_ID | TOKEN_FORMAT;
+
+		if (!strncasecmp(token, id_pfx, sizeof(id_pfx) - 1)) {
+			token += sizeof(id_pfx) - 1;
+			token_type = TOKEN_ID;
+		} else if (!strncasecmp(token, fmt_pfx,
+					sizeof(fmt_pfx) - 1)) {
+			token += sizeof(fmt_pfx) - 1;
+			token_type = TOKEN_FORMAT;
+
+		}
+
+		if (token_type & TOKEN_ID) {
+			int ret;
+
+			if (!strcasecmp(token, "random")) {
+				id = TIP_ID_RANDOM;
+				continue;
+			} else if ((ret = string_to_uint(token)) >= 0) {
+				id = ret;
+				continue;
+			}
+		}
+
+		if (token_type & TOKEN_FORMAT) {
+			if (!strcasecmp(token, "none")) {
+				fmt = TIPS_NONE;
+				continue;
+			} else if (!strcasecmp(token, "compact")) {
+				fmt = TIPS_COMPACT;
+				continue;
+			} else if (!strcasecmp(token, "full")) {
+				fmt = TIPS_FULL;
+				continue;
+			}
+		}
+
+		free(arg);
+		return -1;
+	}
+
+	tip_id = id;
+	show_tips = fmt;
+
+	free(arg);
+	return 0;
+}
+
 static void
 remove_from_env(char **env, size_t *env_count, const char *var)
 {
@@ -2159,6 +2228,7 @@ init(int argc, char *argv[])
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_TS,
 		GETOPT_PIDNS_TRANSLATION,
+		GETOPT_TIPS,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_ABBREV,
@@ -2217,6 +2287,7 @@ init(int argc, char *argv[])
 		{ "failed-only",	no_argument,	   0, 'Z' },
 		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
+		{ "tips",		optional_argument, 0, GETOPT_TIPS },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
@@ -2448,6 +2519,10 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_SECCOMP:
 			seccomp_filtering = true;
+			break;
+		case GETOPT_TIPS:
+			if (parse_tips_arg(optarg ?: ""))
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
@@ -3850,6 +3925,7 @@ terminate(void)
 		/* Child was killed by a signal, mimic that.  */
 		exit_code &= 0xff;
 		signal(exit_code, SIG_DFL);
+		print_totd();
 		GCOV_DUMP;
 		raise(exit_code);
 
@@ -3864,6 +3940,8 @@ terminate(void)
 		   Exit with 128 + signo then.  */
 		exit_code += 128;
 	}
+
+	print_totd();
 	exit(exit_code);
 }
 

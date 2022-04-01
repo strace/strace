@@ -1,0 +1,6 @@
+#!/bin/sh -efu
+
+# Check --tips=full option.
+TIPS_FULL=1
+export TIPS_FULL
+. ${srcdir=.}/strace--tips.test

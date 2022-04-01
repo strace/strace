@@ -1561,6 +1561,34 @@ In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
 .TP
+.BR \-\-tips [=[[ id: ] \fIid\fR ],[[ format: ] \fIformat\fR ]]
+Show strace tips, tricks, and tweaks before exit.
+.I id
+can be a non-negative integer number,
+which enables printing of specific tip, trick, or tweak
+(these ID are not guaranteed to be stable),
+or
+.B random
+(the default),
+in which case a random tip is printed.
+.I format
+can be one of the following:
+.RS
+.TP 9
+.B none
+No tip is printed.
+Can be used to override the previous setting.
+.TQ
+.B compact
+Print the tip just big enough to contain all the text.
+.TQ
+.B full
+Print the tip in its full glory.
+.RE
+.IP
+Default is
+.BR id:random,format:compact .
+.TP
 .B \-V
 .TQ
 .B \-\-version

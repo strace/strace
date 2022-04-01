@@ -1,0 +1,82 @@
+#!/bin/sh -efu
+
+# Check --tips option.
+. "${srcdir=.}/init.sh"
+
+: "${TIPS_FULL:=0}"
+RAND_TIPS=5
+MAX_TIPS=500
+
+tips_fmt_opt=""
+[ 1 -ne "$TIPS_FULL" ] || tips_fmt_opt="--tips=full"
+
+
+# Check that random tip is random
+"$STRACE" -qqq -enone $tips_fmt_opt ../sleep 0 2> "${OUT}.r0"
+i=0
+ret=0
+while [ "$i" -lt "$RAND_TIPS" ]; do
+	i=$((i + 1))
+	"$STRACE" -qqq -enone --tips $tips_fmt_opt ../sleep 0 2> "${OUT}.r${i}"
+	diff -q "${OUT}.r$((i - 1))" "${OUT}.r${i}" || { ret=1; break; }
+done
+
+[ 0 != "$ret" ] || fail_ "Tips do not seem to be randomised"
+
+# Check that each tip looks sane
+i=0
+while [ "$i" -lt "$MAX_TIPS" ]; do
+	"$STRACE" -qqq -enone $tips_fmt_opt --tips="id:$i" ../sleep 0 2> "${OUT}.${i}"
+
+	j=0
+	end_seen=0
+	cat $srcdir/strace--tips.exp | while read line; do
+		j="$((j + 1))"
+		case "$j" in
+		1) pat='  ______________________________________________         '"$(sed_re_escape "$line")";;
+		2) pat=' /                                              \\        '"$(sed_re_escape "$line")";;
+		3) pat=' | .{44} |   '"$(sed_re_escape "$line")";;
+		4) pat=' | .{44} \   '"$(sed_re_escape "$line")";;
+		5) pat=' | .{44}  \  '"$(sed_re_escape "$line")";;
+		6) pat=' | .{44}  _\ '"$(sed_re_escape "$line")";;
+		7) pat=' | .{44} /   '"$(sed_re_escape "$line")";;
+		*) pat=' | .{44} |   '"$(sed_re_escape "$line")";;
+		esac
+		end=' \______________________________________________/        '"$(sed_re_escape "$line")"
+		btm='                                                         '"$(sed_re_escape "$line")"
+		s=$(tail -n"+$j" "${OUT}.${i}" | head -n1)
+
+		if [ 0 -ne "$end_seen" ]; then
+			printf '%s' "$s" | grep -Eq "$btm" || \
+				fail_ "Can't match line $j of ${OUT}.${i}" \
+					"('$s') against '$btm'"
+		fi
+
+		printf '%s' "$s" | grep -Eqv "$pat" || continue
+		if [ 8 -lt "$j" ]; then
+			printf '%s' "$s" | grep -Eq "$end" || \
+				fail_ "Can't match line $j of ${OUT}.${i}" \
+					"('$s') against neither '$pat' nor '$end'"
+
+			if [ 0 -ne "$TIPS_FULL" ]; then
+				end_seen=1
+			else
+				break
+			fi
+		else
+			fail_ "Can't match line $j of ${OUT}.${i} ('$s')" \
+				"against '$pat'"
+		fi
+	done
+
+	# Finish when come accross the same tip
+	if [ 0 != "$i" ]; then
+		if diff -q "${OUT}.0" "${OUT}.$i"; then
+			break
+		fi
+	fi
+	i="$((i + 1))"
+done
+
+[ "$i" -lt "$MAX_TIPS" ] || \
+	fail_ "Cannot find end of tips after $i iterations"

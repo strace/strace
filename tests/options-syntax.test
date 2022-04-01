@@ -65,6 +65,39 @@ else
 		check_e "SELinux context printing (--secontext option) is not supported by this build of strace" $opt
 	done
 fi
+
+for opt in 'id' \
+	   'id:' \
+	   '-1' \
+	   '2147483648' \
+	   'id:rand' \
+	   'id:randomm' \
+	   '2,3,radomm,4' \
+	   'format' \
+	   'format:' \
+	   'id:format' \
+	   'id:format:full' \
+	   'format:id:0'
+do
+	check_h "invalid --tips argument: '$opt'" --tips="$opt"
+done
+for opt in '--tips' \
+	   '--tips=' \
+	   '--tips=0' \
+	   '--tips=id:0 --tips' \
+	   '--tips=1,id:42' \
+	   '--tips=1 --tips=id:42' \
+	   '--tips=random' \
+	   '--tips --tips=random' \
+	   '--tips=id:random,23' \
+	   '--tips=id:random,23 --tips=random,2,3,id:4,5' \
+	   '--tips=format:none' \
+	   '--tips=format:compact --tips' \
+	   '--tips --tips=format:full,3,none,id:42,compact'
+do
+	check_h "must have PROG [ARGS] or -p PID" $opt
+done
+
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDD -p $$

@@ -572,6 +572,8 @@ MISC_TESTS = \
 	status-detached.test \
 	status-none-threads.test \
 	status-unfinished-threads.test \
+	strace--tips.test \
+	strace--tips-full.test \
 	strace-C.test \
 	strace-D.test \
 	strace-DD.test \
@@ -699,6 +701,7 @@ EXTRA_DIST = \
 	strace--syscall-times-ms.expected \
 	strace--syscall-times-us.expected \
 	strace--syscall-times-ns.expected \
+	strace--tips.exp \
 	strace-C.expected \
 	strace-D.expected \
 	strace-DDD.expected \
