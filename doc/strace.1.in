@@ -1566,6 +1566,8 @@ proceeds as usual and stops traced processes on every system call.
 .B \-\-version
 Print the version number of
 .BR strace .
+Multiple instances of the option beyond specific threshold tend to increase
+Strauss awareness.
 .SS "Time specification format description"
 .PP
 Time values can be specified as a decimal floating point number

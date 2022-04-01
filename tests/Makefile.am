@@ -714,6 +714,8 @@ EXTRA_DIST = \
 	strace-k.test \
 	strace-r.expected \
 	strace.supp \
+	strauss_body.exp \
+	strauss_head.exp \
 	sun_path.expected \
 	syntax.sh \
 	trace_clock.in \

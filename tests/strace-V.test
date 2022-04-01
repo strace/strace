@@ -38,13 +38,32 @@ option_secontext=$(get_config_option ENABLE_SECONTEXT " secontext")
 features="${option_unwind}${option_demangle}${option_m32}${option_mx32}${option_secontext}"
 [ -n "$features" ] || features=" (none)"
 
-cat > "$EXP" << __EOF__
-$(get_config_str PACKAGE_NAME) -- version $(get_config_str PACKAGE_VERSION)
-Copyright (c) 1991-${config_year} The strace developers <$(get_config_str PACKAGE_URL)>.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+for i in $(seq 4); do
+	case "$i" in
+		1) opt="-V";;
+		2) opt="-V -V -V -V";;
+		3) opt="-VVVV -VVVV -VVVV -VVVV";;
+		4) opt="-VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";;
+	esac
 
-Optional features enabled:${features}
-__EOF__
+	run_strace ${opt} > "${LOG}.${opt}"
 
-match_diff "$OUT" "$EXP"
+	cat > "${EXP}.${opt}" <<-__EOF__
+		$(get_config_str PACKAGE_NAME) -- version $(get_config_str PACKAGE_VERSION)
+		Copyright (c) 1991-${config_year} The strace developers <$(get_config_str PACKAGE_URL)>.
+		This is free software; see the source for copying conditions.  There is NO
+		warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+		Optional features enabled:${features}
+	__EOF__
+
+	if [ 3 -le "$i" ]; then
+		cat $srcdir/strauss_head.exp >> "${EXP}.${opt}"
+	fi
+
+	if [ 4 -le "$i" ]; then
+		cat $srcdir/strauss_body.exp >> "${EXP}.${opt}"
+	fi
+
+	match_diff "${LOG}.${opt}" "${EXP}.${opt}"
+done
