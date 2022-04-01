@@ -2067,9 +2067,7 @@ init(int argc, char *argv[])
 	static const char tflag_str[] = "format:time";
 	static const char ttflag_str[] = "precision:us,format:time";
 	static const char tttflag_str[] = "format:unix,precision:us";
-#ifdef ENABLE_SECONTEXT
 	static const char secontext_qual[] = "!full,mismatch";
-#endif
 
 	int c, i;
 	int optF = 0, zflags = 0;
@@ -2163,9 +2161,7 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_QUIET,
 		GETOPT_QUAL_DECODE_FD,
 		GETOPT_QUAL_DECODE_PID,
-#ifdef ENABLE_SECONTEXT
 		GETOPT_QUAL_SECONTEXT,
-#endif
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -2225,9 +2221,7 @@ init(int argc, char *argv[])
 		{ "silence",	optional_argument, 0, GETOPT_QUAL_QUIET },
 		{ "decode-fds",	optional_argument, 0, GETOPT_QUAL_DECODE_FD },
 		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
-#ifdef ENABLE_SECONTEXT
 		{ "secontext",	optional_argument, 0, GETOPT_QUAL_SECONTEXT },
-#endif
 
 		{ 0, 0, 0, 0 }
 	};
@@ -2443,11 +2437,9 @@ init(int argc, char *argv[])
 		case GETOPT_SECCOMP:
 			seccomp_filtering = true;
 			break;
-#ifdef ENABLE_SECONTEXT
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
-#endif
 		case GETOPT_QUAL_TRACE:
 			qualify_trace(optarg);
 			break;

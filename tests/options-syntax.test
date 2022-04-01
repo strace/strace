@@ -60,6 +60,10 @@ if [ -n "$compiled_with_secontext" ]; then
 		check_e "invalid secontext 'ss'" $opt=!full,ss
 		check_e "invalid secontext 'ss'" $opt=!full,mismatch,ss
 	done
+else
+	for opt in '--secontext' '--secontext=full' '-e secontext=mismatch'; do
+		check_e "SELinux context printing (--secontext option) is not supported by this build of strace" $opt
+	done
 fi
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
@@ -316,6 +320,8 @@ $STRACE_EXE: $umsg" -u :nosuchuser: -cinrtTyzZ true
 	if [ -n "$compiled_with_secontext" ]; then
 		check_e "--secontext has no effect with -c/--summary-only
 $STRACE_EXE: $umsg" -u :nosuchuser: -c --secontext true
+	else
+		check_e "SELinux context printing (--secontext option) is not supported by this build of strace" -c --secontext true
 	fi
 
 	if [ -n "$compiled_with_stacktrace" ]; then

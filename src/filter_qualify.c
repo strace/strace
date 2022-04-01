@@ -14,9 +14,7 @@
 #include "poke.h"
 #include "retval.h"
 #include "static_assert.h"
-#ifdef ENABLE_SECONTEXT
-# include "secontext.h"
-#endif
+#include "secontext.h"
 
 struct number_set *read_set;
 struct number_set *write_set;
@@ -636,15 +634,20 @@ secontextstr_to_uint(const char *s)
 
 	return (int) find_arg_val(s, secontext_strs, -1ULL, -1ULL);
 }
+#endif
 
 void
 qualify_secontext(const char *const str)
 {
+#ifdef ENABLE_SECONTEXT
 	if (!secontext_set)
 		secontext_set = alloc_number_set_array(1);
 	qualify_tokens(str, secontext_set, secontextstr_to_uint, "secontext");
-}
+#else
+	error_msg_and_die("SELinux context printing (--secontext option) "
+			  "is not supported by this build of strace");
 #endif
+}
 
 static const struct qual_options {
 	const char *name;
@@ -679,9 +682,7 @@ static const struct qual_options {
 	{ "decode-fds",	qualify_decode_fd },
 	{ "decode-pid",	qualify_decode_pid },
 	{ "decode-pids", qualify_decode_pid },
-#ifdef ENABLE_SECONTEXT
 	{ "secontext",  qualify_secontext },
-#endif
 };
 
 void

@@ -11,9 +11,9 @@
 
 # include "defs.h"
 
-# ifdef ENABLE_SECONTEXT
-
 void qualify_secontext(const char *const str);
+
+# ifdef ENABLE_SECONTEXT
 
 enum secontext_bits {
 	/* Display full context instead of type only */
