@@ -53,9 +53,9 @@
  */
 struct kexec_segment {
 	const void *buf;
-	size_t bufsz;
+	__kernel_size_t bufsz;
 	const void *mem;
-	size_t memsz;
+	__kernel_size_t memsz;
 };
 
 
