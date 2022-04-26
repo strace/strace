@@ -5,7 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added an interface of raising des Strausses awareness.
   * Added --tips option to print strace tips, tricks, and tweaks
     at the end of the tracing session.
-  * Updated the list of MADV_* constants.
+  * Updated lists of BTRFS_* and MADV_* constants.
 
 * Bug fixes
 
