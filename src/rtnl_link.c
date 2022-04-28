@@ -210,6 +210,7 @@ static const nla_decoder_t ifla_brport_nla_decoders[] = {
 	[IFLA_BRPORT_MRP_IN_OPEN]		= decode_nla_u8,
 	[IFLA_BRPORT_MCAST_EHT_HOSTS_LIMIT]	= decode_nla_u32,
 	[IFLA_BRPORT_MCAST_EHT_HOSTS_CNT]	= decode_nla_u32,
+	[IFLA_BRPORT_LOCKED]			= decode_nla_u8,
 };
 
 static bool
@@ -1497,6 +1498,7 @@ static const nla_decoder_t ifla_af_spec_bridge_nla_decoders[] = {
 	[IFLA_BRIDGE_VLAN_TUNNEL_INFO]	= decode_ifla_bridge_vlan_tunnel_info,
 	[IFLA_BRIDGE_MRP]		= NULL, /* unimplemented */
 	[IFLA_BRIDGE_CFM]		= NULL, /* unimplemented */
+	[IFLA_BRIDGE_MST]		= NULL, /* unimplemented */
 };
 
 /**

@@ -159,7 +159,8 @@ main(void)
 	static const struct strval16 unk_attrs[] = {
 		{ ENUM_KNOWN(0x4, IFLA_BRIDGE_MRP) },
 		{ ENUM_KNOWN(0x5, IFLA_BRIDGE_CFM) },
-		{ ARG_XLAT_UNKNOWN(0x6, "IFLA_BRIDGE_???") },
+		{ ENUM_KNOWN(0x6, IFLA_BRIDGE_MST) },
+		{ ARG_XLAT_UNKNOWN(0x7, "IFLA_BRIDGE_???") },
 		{ ARG_XLAT_UNKNOWN(0xbad, "IFLA_BRIDGE_???") },
 	};
 	for (size_t i = 0; i < ARRAY_SIZE(unk_attrs); i++) {
