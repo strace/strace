@@ -581,17 +581,19 @@ main(void)
 			"\"\\x01\\x00\\x00\\x00\\x02\\x00\\x00\""),
 		  "{optval=1<<BR_BOOLOPT_NO_LL_LEARN"
 		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING}" },
-		{ { .optval = 0xdeadfaec, .optmask = 0xbadc0dec },
-		  BE_LE("\"\\xde\\xad\\xfa\\xec\\xba\\xdc\\x0d\"",
-			"\"\\xec\\xfa\\xad\\xde\\xec\\x0d\\xdc\""),
-		  "{optval=0xdeadfaec /* 1<<BR_BOOLOPT_??? */"
-		  ", optmask=0xbadc0dec /* 1<<BR_BOOLOPT_??? */}" },
+		{ { .optval = 0xdeadfae8, .optmask = 0xbadc0de8 },
+		  BE_LE("\"\\xde\\xad\\xfa\\xe8\\xba\\xdc\\x0d\"",
+			"\"\\xe8\\xfa\\xad\\xde\\xe8\\x0d\\xdc\""),
+		  "{optval=0xdeadfae8 /* 1<<BR_BOOLOPT_??? */"
+		  ", optmask=0xbadc0de8 /* 1<<BR_BOOLOPT_??? */}" },
 		{ { .optval = 0xfacebeef, .optmask = 0xfeedcafe },
 		  BE_LE("\"\\xfa\\xce\\xbe\\xef\\xfe\\xed\\xca\"",
 			"\"\\xef\\xbe\\xce\\xfa\\xfe\\xca\\xed\""),
 		  "{optval=1<<BR_BOOLOPT_NO_LL_LEARN"
-			  "|1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING|0xfacebeec"
-		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING|0xfeedcafc}" },
+			 "|1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING"
+			 "|1<<BR_BOOLOPT_MST_ENABLE|0xfacebee8"
+		  ", optmask=1<<BR_BOOLOPT_MCAST_VLAN_SNOOPING"
+		           "|1<<BR_BOOLOPT_MST_ENABLE|0xfeedcaf8}" },
 	};
 	for (size_t k = 0; k < ARRAY_SIZE(boolopts); k++) {
 		TEST_NESTED_LINKINFO(fd, nlh0, IFLA_INFO_KIND,
