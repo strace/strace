@@ -152,6 +152,7 @@ main(void)
 
 	skip_if_unavailable("/proc/self/fd/");
 
+	close(0); /* Trying to get fd 0 for /dev/null */
 	int fd_null = open(path_null, O_RDONLY);
 	if (fd_null < 0)
 		perror_msg_and_fail("open: %s", path_null);
@@ -161,11 +162,12 @@ main(void)
 		perror_msg_and_fail("open: %s", path_full);
 
 	int fds[] = { fd_full, fd_null, -1, -2, -3 };
+	const char *paths[ARRAY_SIZE(fds)] = { path_full, path_null };
 	const int *arg_fds = tail_memdup(fds, sizeof(fds));
 
 
 	/* Invalid op */
-	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 20 };
+	static const unsigned int invalid_ops[] = { 0xbadc0dedU, 22 };
 
 	for (size_t i = 0; i < ARRAY_SIZE(invalid_ops); i++) {
 		sys_io_uring_register(fd_null, invalid_ops[i], path_null,
@@ -452,10 +454,10 @@ main(void)
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", ARG_STR(IORING_REGISTER_BUFFERS), true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", ARG_STR(IORING_UNREGISTER_IOWQ_AFF),
+		  "register_op=", ARG_STR(IORING_UNREGISTER_RING_FDS),
 		  true },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
-		  "register_op=", 20, " /* IORING_REGISTER_??? */", false },
+		  "register_op=", 22, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_REGISTER_OP), true,
 		  "register_op=", 255, " /* IORING_REGISTER_??? */", false },
 		{ ARG_STR(IORING_RESTRICTION_SQE_OP), true,
@@ -961,6 +963,100 @@ main(void)
 	       arg_maxw,
 #endif
 	       errstr);
+
+
+	/* IORING_REGISTER_RING_FDS, IORING_UNREGISTER_RING_FDS */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} ringfd_ops[] = {
+		{ 20, "IORING_REGISTER_RING_FDS" },
+		{ 21, "IORING_UNREGISTER_RING_FDS" },
+	};
+
+	static const size_t ringfd_count = DEFAULT_STRLEN + 1;
+	static const uint32_t ringfd_off[] =
+		{ -1U, 0, 1, 2, 161803398, 3141592653, -2U };
+	TAIL_ALLOC_OBJECT_VAR_ARR(struct io_uring_rsrc_update, ringfds,
+				  ringfd_count);
+
+	fill_memory(ringfds, sizeof(*ringfds) * ringfd_count);
+	for (size_t i = 0; i < ringfd_count; i++) {
+		ringfds[i].offset = ringfd_off[i % ARRAY_SIZE(ringfd_off)];
+		ringfds[i].resv = i % 2 ? i * 0x1010101 : 0;
+		ringfds[i].data = (i % 4 ? 0xbadc0ded00000000ULL : 0)
+				  | fds[i % ARRAY_SIZE(fds)];
+	}
+
+	for (size_t i = 0; i < ARRAY_SIZE(ringfd_ops); i++) {
+		sys_io_uring_register(fd_null, ringfd_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, ringfd_ops[i].op,
+				      ringfds + ringfd_count, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", [], 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str),
+		       errstr);
+
+		sys_io_uring_register(fd_null, ringfd_ops[i].op,
+				      ringfds + ringfd_count, 1);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 1)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str),
+		       ringfds + ringfd_count, errstr);
+
+		/* offs:sz: 33-31:32, 33-32:32, 33-32:33, 33-33:33 */
+		for (size_t j = 0; j < 4; j++) {
+			const size_t offs = (4 - j) / 2;
+			const size_t sz = 32 + j / 2;
+
+			sys_io_uring_register(fd_null, ringfd_ops[i].op,
+					      ringfds + offs, sz);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT ", [",
+			       fd_null, path_null,
+			       XLAT_SEL(ringfd_ops[i].op, ringfd_ops[i].str));
+			for (uint32_t k = offs; k < MIN(ringfd_count,
+							DEFAULT_STRLEN + offs);
+			     k++) {
+				printf("%s{offset=", k != offs ? ", " : "");
+				printf(ringfd_ops[i].op == 21 ||
+				       k % ARRAY_SIZE(ringfd_off) ? "%u" : "%d",
+				       ringfd_off[k % ARRAY_SIZE(ringfd_off)]);
+				if (k % 2)
+					printf(", resv=%#x", k * 0x1010101);
+
+				const size_t fdid = k % ARRAY_SIZE(fds);
+				if (ringfd_ops[i].op == 20) {
+					printf(", data=%d%s%s%s",
+					       fds[fdid],
+					       paths[fdid] ? "<": "",
+					       paths[fdid] ? paths[fdid] : "",
+					       paths[fdid] ? ">": "");
+				} else {
+					if (!((k % ARRAY_SIZE(fds) == 1)
+					      && !(k % 4))) {
+						printf(", data=%#llx",
+						       (k % 4
+						        ? 0xbadc0ded00000000ULL
+							: 0) | fds[fdid]);
+					}
+				}
+				printf("}");
+			}
+			if (j != 1)
+				printf(", ...");
+			if (!(j % 2))
+				printf(" /* %p */", ringfds + ringfd_count);
+			printf("], %zu) = %s\n", sz, errstr);
+		}
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

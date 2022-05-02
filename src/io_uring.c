@@ -485,6 +485,82 @@ print_io_uring_iowq_acct(struct tcb *tcp, const kernel_ulong_t addr,
 	return ret ? 0 : RVAL_DECODED;
 }
 
+static bool
+print_ringfd_register_array_member(struct tcb *tcp, void *buf,
+				   size_t elem_size, void *data)
+{
+	/* offset - offset to insert at or -1 for the first free place */
+	/* resv - reserved */
+	/* data - FD to register */
+	struct io_uring_rsrc_update *elem = buf;
+
+	tprint_struct_begin();
+	if (elem->offset == -1U)
+		PRINT_FIELD_D(*elem, offset);
+	else
+		PRINT_FIELD_U(*elem, offset);
+
+	if (elem->resv) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*elem, resv);
+	}
+
+	tprint_struct_next();
+	PRINT_FIELD_FD(*elem, data, tcp);
+
+	tprint_struct_end();
+
+	return true;
+}
+static void
+print_io_uring_ringfds_register(struct tcb *tcp, const kernel_ulong_t arg,
+				const unsigned int nargs)
+{
+	struct io_uring_rsrc_update buf;
+	CHECK_TYPE_SIZE(buf, 16);
+	CHECK_TYPE_SIZE(buf.resv, sizeof(uint32_t));
+
+	print_array(tcp, arg, nargs, &buf, sizeof(buf),
+		    tfetch_mem, print_ringfd_register_array_member, NULL);
+}
+
+
+static bool
+print_ringfd_unregister_array_member(struct tcb *tcp, void *buf,
+				     size_t elem_size, void *data)
+{
+	/* offset - offset to unregister FD */
+	/* resv - reserved */
+	/* data - unused */
+	struct io_uring_rsrc_update *elem = buf;
+
+	tprint_struct_begin();
+	PRINT_FIELD_U(*elem, offset);
+
+	if (elem->resv) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*elem, resv);
+	}
+
+	if (elem->data) {
+		tprint_struct_next();
+		PRINT_FIELD_X(*elem, data);
+	}
+
+	tprint_struct_end();
+
+	return true;
+}
+static void
+print_io_uring_ringfds_unregister(struct tcb *tcp, const kernel_ulong_t arg,
+				  const unsigned int nargs)
+{
+	struct io_uring_rsrc_update buf;
+
+	print_array(tcp, arg, nargs, &buf, sizeof(buf),
+		    tfetch_mem, print_ringfd_unregister_array_member, NULL);
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -540,6 +616,12 @@ SYS_FUNC(io_uring_register)
 		rc = print_io_uring_iowq_acct(tcp, arg, nargs);
 		if (entering(tcp) && !rc)
 			tprint_value_changed();
+		break;
+	case IORING_REGISTER_RING_FDS:
+		print_io_uring_ringfds_register(tcp, arg, nargs);
+		break;
+	case IORING_UNREGISTER_RING_FDS:
+		print_io_uring_ringfds_unregister(tcp, arg, nargs);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
