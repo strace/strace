@@ -7,7 +7,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     at the end of the tracing session.
   * Enhanced decoding of io_uring_register syscall.
   * Updated lists of BR_*, BTRFS_*, IFA_*, IFLA_*, IORING_*, KEY_*,
-    and MADV_* constants.
+    MADV_*, and UFFD_* constants.
 
 * Bug fixes
 
