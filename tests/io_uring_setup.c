@@ -68,9 +68,9 @@ main(void)
 	printf("io_uring_setup(%u, {flags=IORING_SETUP_IOPOLL"
 	       "|IORING_SETUP_SQPOLL|IORING_SETUP_SQ_AFF|IORING_SETUP_CQSIZE"
 	       "|IORING_SETUP_CLAMP|IORING_SETUP_ATTACH_WQ"
-	       "|IORING_SETUP_R_DISABLED|%#x"
+	       "|IORING_SETUP_R_DISABLED|IORING_SETUP_SUBMIT_ALL|%#x"
 	       ", sq_thread_cpu=%#x, sq_thread_idle=%u, wq_fd=%d, resv=[",
-	       1, -1U - 127, params->sq_thread_cpu, params->sq_thread_idle,
+	       1, -1U - 255, params->sq_thread_cpu, params->sq_thread_idle,
 	       params->wq_fd);
 	for (unsigned int i = 0; i < ARRAY_SIZE(params->resv); ++i)
 		printf("%s%#x", i != 0 ? ", " : "", params->resv[i]);
