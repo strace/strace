@@ -226,12 +226,28 @@ void *tail_memdup(const void *, const size_t)
 	type_name *const type_ptr = tail_alloc(sizeof(*type_ptr))
 
 /*
+ * Allocate an array of the specified type at the end
+ * of a mapped memory region.
+ * Assign its address to the specified constant pointer.
+ */
+# define TAIL_ALLOC_OBJECT_CONST_ARR(type_name, type_ptr, cnt)	\
+	type_name *const type_ptr = tail_alloc(sizeof(*type_ptr) * (cnt))
+
+/*
  * Allocate an object of the specified type at the end
  * of a mapped memory region.
  * Assign its address to the specified variable pointer.
  */
 # define TAIL_ALLOC_OBJECT_VAR_PTR(type_name, type_ptr)		\
 	type_name *type_ptr = tail_alloc(sizeof(*type_ptr))
+
+/*
+ * Allocate an array of the specified type at the end
+ * of a mapped memory region.
+ * Assign its address to the specified variable pointer.
+ */
+# define TAIL_ALLOC_OBJECT_VAR_ARR(type_name, type_ptr, cnt)	\
+	type_name *type_ptr = tail_alloc(sizeof(*type_ptr) * (cnt))
 
 /**
  * Fill memory (pointed by ptr, having size bytes) with different bytes (with
