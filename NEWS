@@ -6,7 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added --tips option to print strace tips, tricks, and tweaks
     at the end of the tracing session.
   * Enhanced decoding of io_uring_register syscall.
-  * Updated lists of BR_*, BTRFS_*, IFA_*, IFLA_*, IORING_*, KEY_*,
+  * Updated lists of BR_*, BTRFS_*, IFA_*, IFLA_*, IORING_*, KEY_*, KVM_*,
     MADV_*, and UFFD_* constants.
 
 * Bug fixes
