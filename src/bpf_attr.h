@@ -186,11 +186,13 @@ struct BPF_PROG_TEST_RUN_struct /* test */ {
 	uint64_t ATTRIBUTE_ALIGNED(8) ctx_out;
 	uint32_t flags;
 	uint32_t cpu;
+	uint32_t batch_size;
 };
 
 # define BPF_PROG_TEST_RUN_struct_size \
-	sizeof(struct BPF_PROG_TEST_RUN_struct)
-# define expected_BPF_PROG_TEST_RUN_struct_size 72
+	offsetofend(struct BPF_PROG_TEST_RUN_struct, batch_size)
+	/* sizeof(struct BPF_PROG_TEST_RUN_struct) */
+# define expected_BPF_PROG_TEST_RUN_struct_size 76
 
 struct BPF_PROG_GET_NEXT_ID_struct {
 	uint32_t start_id;
