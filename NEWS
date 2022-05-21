@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of io_uring_register syscall.
   * Updated lists of BR_*, BTRFS_*, IFA_*, IFLA_*, IORING_*, KEY_*, KVM_*,
     MADV_*, and UFFD_* constants.
+  * Updated lists of ioctl commands from Linux 5.18.
 
 * Bug fixes
 
