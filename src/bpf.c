@@ -29,6 +29,7 @@
 #include "xlat/bpf_query_flags.h"
 #include "xlat/bpf_task_fd_type.h"
 #include "xlat/bpf_test_run_flags.h"
+#include "xlat/bpf_link_create_kprobe_multi_flags.h"
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
@@ -48,7 +49,7 @@ bpf_cmd_decoder(struct tcb *const tcp,					\
 	static DECL_BPF_CMD_DECODER(decode_ ## bpf_cmd)			\
 	{								\
 		struct bpf_cmd ## _struct attr = {};			\
-		const size_t attr_size = bpf_cmd ## _struct_size;	\
+		size_t attr_size = bpf_cmd ## _struct_size;	\
 		const unsigned int len = MIN(size, attr_size);		\
 		memcpy(&attr, data, len);				\
 		do {							\
@@ -1367,6 +1368,41 @@ BEGIN_BPF_CMD_DECODER(BPF_MAP_DELETE_BATCH)
 }
 END_BPF_CMD_DECODER(0)
 
+union strace_bpf_iter_link_info {
+	struct {
+		uint32_t map_fd;
+	} map;
+};
+
+static bool
+print_iter_info_array_member(struct tcb *tcp, void *elem_buf,
+			     size_t elem_size, void *data)
+{
+	union strace_bpf_iter_link_info *bili =
+		(union strace_bpf_iter_link_info *) elem_buf;
+
+	tprint_struct_begin();
+	tprints_field_name("map");
+	tprint_struct_begin();
+	PRINT_FIELD_FD(bili->map, map_fd, tcp);
+	tprint_struct_end();
+	tprint_struct_end();
+
+	return true;
+}
+
+static bool
+print_str_array_member(struct tcb *tcp, void *elem_buf,
+		       size_t elem_size, void *data)
+{
+	kernel_ulong_t ptr = opt_wordsize(*(uint64_t *) elem_buf,
+					  *(uint32_t *) elem_buf);
+
+	printstr(tcp, ptr);
+
+	return true;
+}
+
 BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 {
 	tprint_struct_begin();
@@ -1379,6 +1415,105 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_CREATE)
 	PRINT_FIELD_XVAL(attr, attach_type, bpf_attach_type, "BPF_???");
 	tprint_struct_next();
 	PRINT_FIELD_X(attr, flags);
+
+	if (len <= offsetof(struct BPF_LINK_CREATE_struct, target_btf_id))
+		goto print_bpf_link_create_end;
+
+	/* Trying to guess the union decoding based on the attach type */
+	switch (attr.attach_type) {
+	/* TODO: check that prog type == BPF_PROG_TYPE_EXT */
+	/*
+	 * Yes, it is BPF_CGROUP_INET_INGRESS, see the inconceivable genius
+	 * of the expected_attach_type check in v5.6-rc1~151^2~46^2~1^2~2.
+	 */
+	case 0:
+		/* Introduced in Linux commit v5.10-rc1~107^2~96^2~12^2~5 */
+		if (attr.target_btf_id) {
+			tprint_struct_next();
+			PRINT_FIELD_U(attr, target_btf_id);
+		}
+		attr_size = offsetofend(typeof(attr), target_btf_id);
+		break;
+
+	/* TODO: prog type == BPF_PROG_TYPE_TRACING */
+	case BPF_TRACE_ITER: {
+		/* Introduced in Linux commit v5.9-rc1~36^2~30^2~8^2~1 */
+		union strace_bpf_iter_link_info buf;
+
+		tprint_struct_next();
+		tprints_field_name("iter_info");
+		print_big_u64_addr(attr.iter_info);
+		print_array(tcp, attr.iter_info, attr.iter_info_len,
+			    &buf, sizeof(buf), tfetch_mem,
+			    print_iter_info_array_member, 0);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, iter_info_len);
+		attr_size = offsetofend(typeof(attr), iter_info_len);
+		break;
+	}
+
+	/* TODO: prog type == BPF_PROG_TYPE_{KPROBE,PERF_EVENT,TRACEPOINT} */
+	case BPF_PERF_EVENT:
+		/* Introduced in Linux commit v5.15-rc1~157^2~22^2~33^2~11 */
+		tprint_struct_next();
+		tprints_field_name("perf_event");
+		tprint_struct_begin();
+		PRINT_FIELD_X(attr.perf_event, bpf_cookie);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), perf_event.bpf_cookie);
+		break;
+
+	/* TODO: prog type == BPF_PROG_TYPE_KPROBE */
+	case BPF_TRACE_KPROBE_MULTI: {
+		/* Introduced in Linux commit v5.18-rc1~136^2~11^2~28^2~10 */
+		union {
+			kernel_ulong_t ptr;
+			uint64_t addr;
+			uint64_t cookie;
+		} buf;
+
+		tprint_struct_next();
+		tprints_field_name("kprobe_multi");
+		tprint_struct_begin();
+		PRINT_FIELD_FLAGS(attr.kprobe_multi, flags,
+				  bpf_link_create_kprobe_multi_flags,
+				  "BPF_F_???");
+		tprint_struct_next();
+		PRINT_FIELD_U(attr.kprobe_multi, cnt);
+		tprint_struct_next();
+		tprints_field_name("syms");
+		print_big_u64_addr(attr.kprobe_multi.syms);
+		print_array(tcp, attr.kprobe_multi.syms, attr.kprobe_multi.cnt,
+			    &buf.ptr, current_wordsize,
+			    tfetch_mem, print_str_array_member, 0);
+		tprint_struct_next();
+		tprints_field_name("addrs");
+		print_big_u64_addr(attr.kprobe_multi.addrs);
+		print_array(tcp, attr.kprobe_multi.addrs, attr.kprobe_multi.cnt,
+			    &buf.ptr, sizeof(buf.addr),
+			    tfetch_mem, print_xint_array_member, 0);
+		tprint_struct_next();
+		tprints_field_name("cookies");
+		print_big_u64_addr(attr.kprobe_multi.cookies);
+		print_array(tcp, attr.kprobe_multi.cookies,
+			    attr.kprobe_multi.cnt,
+			    &buf.cookie, sizeof(buf.cookie),
+			    tfetch_mem, print_xint_array_member, 0);
+		tprint_struct_end();
+		attr_size = offsetofend(typeof(attr), kprobe_multi.cookies);
+		break;
+	}
+
+	default:
+		/*
+		 * NB: resetting attr_size, so decode_attr_extra_data
+		 *     can pick up non-zero values in the union at the end
+		 *     of the link_create struct.
+		 */
+		attr_size = offsetofend(typeof(attr), flags);
+	}
+
+print_bpf_link_create_end:
 	tprint_struct_end();
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)

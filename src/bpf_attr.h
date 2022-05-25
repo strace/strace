@@ -401,11 +401,31 @@ struct BPF_LINK_CREATE_struct /* link_create */ {
 	uint32_t target_fd;
 	uint32_t attach_type;
 	uint32_t flags;
+	union {
+		uint32_t target_btf_id;
+
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) iter_info;
+			uint32_t iter_info_len;
+		};
+
+		struct {
+			uint64_t ATTRIBUTE_ALIGNED(8) bpf_cookie;
+		} perf_event;
+
+		struct {
+			uint32_t flags;
+			uint32_t cnt;
+			uint64_t ATTRIBUTE_ALIGNED(8) syms;
+			uint64_t ATTRIBUTE_ALIGNED(8) addrs;
+			uint64_t ATTRIBUTE_ALIGNED(8) cookies;
+		} kprobe_multi;
+	};
 };
 
 # define BPF_LINK_CREATE_struct_size \
 	sizeof(struct BPF_LINK_CREATE_struct)
-# define expected_BPF_LINK_CREATE_struct_size 16
+# define expected_BPF_LINK_CREATE_struct_size 48
 
 struct BPF_LINK_UPDATE_struct /* link_update */ {
 	uint32_t link_fd;
