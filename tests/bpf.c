@@ -108,7 +108,7 @@ struct bpf_check {
 
 static const kernel_ulong_t long_bits = (kernel_ulong_t) 0xfacefeed00000000ULL;
 static const char *errstr;
-static unsigned int sizeof_attr = sizeof(union bpf_attr_data);
+static const unsigned int sizeof_attr = sizeof(union bpf_attr_data);
 static unsigned int page_size;
 static unsigned long end_of_page;
 
