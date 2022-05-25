@@ -11,6 +11,8 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of ioctl commands from Linux 5.18.
 
 * Bug fixes
+  * Fixed printing of the updated value of union bpf_attr.next_id
+    on the exiting of bpf(BPF_*_GET_NEXT_ID) calls.
 
 Noteworthy changes in release 5.17 (2022-03-26)
 ===============================================

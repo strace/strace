@@ -537,10 +537,23 @@ END_BPF_CMD_DECODER(RVAL_DECODED)
 
 BEGIN_BPF_CMD_DECODER(BPF_PROG_GET_NEXT_ID)
 {
-	tprint_struct_begin();
-	PRINT_FIELD_U(attr, start_id);
-	tprint_struct_next();
-	PRINT_FIELD_U(attr, next_id);
+	if (entering(tcp)) {
+		set_tcb_priv_ulong(tcp, attr.next_id);
+
+		tprint_struct_begin();
+		PRINT_FIELD_U(attr, start_id);
+		tprint_struct_next();
+		PRINT_FIELD_U(attr, next_id);
+
+		return 0;
+	}
+
+	uint32_t saved_next_id = get_tcb_priv_ulong(tcp);
+
+	if (saved_next_id != attr.next_id) {
+		tprint_value_changed();
+		PRINT_VAL_U(attr.next_id);
+	}
 
 	/* open_flags field has been added in Linux v4.15-rc1~84^2~384^2~4 */
 	if (len <= offsetof(struct BPF_PROG_GET_NEXT_ID_struct, open_flags))
