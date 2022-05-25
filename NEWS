@@ -5,7 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Added an interface of raising des Strausses awareness.
   * Added --tips option to print strace tips, tricks, and tweaks
     at the end of the tracing session.
-  * Enhanced decoding of io_uring_register syscall.
+  * Enhanced decoding of bpf and io_uring_register syscalls.
   * Updated lists of BPF_*, BR_*, BTRFS_*, IFA_*, IFLA_*, IORING_*, KEY_*,
     KVM_*, MADV_*, and UFFD_* constants.
   * Updated lists of ioctl commands from Linux 5.18.

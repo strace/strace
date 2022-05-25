@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <sys/sysmacros.h>
 
@@ -42,6 +43,7 @@
 #include "xlat/bpf_op_jmp.h"
 #include "xlat/bpf_size.h"
 #include "xlat/bpf_src.h"
+#include "xlat/clocknames.h"
 #include "xlat/ebpf_class.h"
 #include "xlat/ebpf_mode.h"
 #include "xlat/ebpf_op_alu.h"
@@ -559,8 +561,35 @@ main(int ac, char **av)
 		}
 
 		if (bpf_prog_get_info_attr.info_len >
-		    offsetof(struct bpf_prog_info_struct, load_time))
+		    offsetof(struct bpf_prog_info_struct, load_time)) {
+			enum { S_NS = 1000000000 };
+
 			printf(", load_time=%" PRIu64, prog_info->load_time);
+
+			/*
+			 * NB: this is janky, as strace can get somewhat
+			 *     different results.
+			 */
+			struct timespec boot;
+			struct timespec rtc;
+
+			if (!clock_gettime(CLOCK_BOOTTIME, &boot) &&
+			    !clock_gettime(CLOCK_REALTIME, &rtc)) {
+				rtc.tv_nsec = rtc.tv_nsec - boot.tv_nsec;
+				rtc.tv_sec  = rtc.tv_sec  - boot.tv_sec
+					      - !!(rtc.tv_nsec < 0);
+				if (rtc.tv_nsec < 0)
+					rtc.tv_nsec += S_NS;
+
+				boot.tv_nsec = rtc.tv_nsec
+					       + prog_info->load_time % S_NS;
+				boot.tv_sec = rtc.tv_sec
+					      + prog_info->load_time / S_NS
+					      + boot.tv_nsec / S_NS;
+
+				print_time_t_nsec(boot.tv_sec, 0, true);
+			}
+		}
 		if (bpf_prog_get_info_attr.info_len >
 		    offsetof(struct bpf_prog_info_struct, created_by_uid))
 			printf(", created_by_uid=%u",

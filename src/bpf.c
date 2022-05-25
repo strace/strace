@@ -32,6 +32,10 @@
 #include "xlat/ebpf_regs.h"
 #include "xlat/numa_node.h"
 
+#define XLAT_MACROS_ONLY
+# include "xlat/clocknames.h" /* For CLOCK_BOOTTIME */
+#undef XLAT_MACROS_ONLY
+
 #define DECL_BPF_CMD_DECODER(bpf_cmd_decoder)				\
 int									\
 bpf_cmd_decoder(struct tcb *const tcp,					\
@@ -683,6 +687,39 @@ print_bpf_map_info_end:
 	tprint_struct_end();
 }
 
+/* Prints approximation of local time for a boot time */
+static void
+print_boottime(uint64_t boottime_ns)
+{
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+		return;
+
+	static struct timespec ts_rtc;
+	struct timespec ts_boottime;
+
+	/*
+	 * There is no good way to obtain RTC-boot time offset directly,
+	 * it seems;  there is some information present in /proc/stat,
+	 * in "btime" field, but it has only second precision.
+	 */
+	if (!ts_rtc.tv_sec) {
+		if (clock_gettime(CLOCK_BOOTTIME, &ts_boottime) ||
+		    clock_gettime(CLOCK_REALTIME, &ts_rtc))
+			return;
+
+		/* Calculating offset */
+		ts_sub(&ts_rtc, &ts_rtc, &ts_boottime);
+	}
+
+	/* Converting boottime */
+	ts_boottime.tv_sec  = boottime_ns / 1000000000;
+	ts_boottime.tv_nsec = boottime_ns % 1000000000;
+	ts_add(&ts_boottime, &ts_boottime, &ts_rtc);
+
+	/* Print only seconds, as the offset calculation is approximate */
+	tprints_comment(sprinttime(ts_boottime.tv_sec));
+}
+
 static void
 print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		    const char *info_buf, uint32_t size,
@@ -757,6 +794,7 @@ print_bpf_prog_info(struct tcb * const tcp, uint32_t bpf_fd,
 		goto print_bpf_prog_info_end;
 	tprint_struct_next();
 	PRINT_FIELD_U(info, load_time);
+	print_boottime(info.load_time);
 	tprint_struct_next();
 	PRINT_FIELD_ID(info, created_by_uid);
 
