@@ -93,10 +93,11 @@ union bpf_attr_data {
 struct bpf_attr_check {
 	union bpf_attr_data data;
 	size_t size;
+	size_t iters;
 	const char *str;
-	void (*init_fn)(struct bpf_attr_check *check);
+	void (*init_fn)(struct bpf_attr_check *check, size_t idx);
 	void (*print_fn)(const struct bpf_attr_check *check,
-			 unsigned long addr);
+			 unsigned long addr, size_t idx);
 };
 
 struct bpf_check {
@@ -145,10 +146,11 @@ sys_bpf(kernel_ulong_t cmd, kernel_ulong_t attr, kernel_ulong_t size)
 #endif
 
 static void
-print_bpf_attr(const struct bpf_attr_check *check, unsigned long addr)
+print_bpf_attr(const struct bpf_attr_check *check, unsigned long addr,
+	       size_t idx)
 {
 	if (check->print_fn)
-		check->print_fn(check, addr);
+		check->print_fn(check, addr, idx);
 	else
 		printf("%s", check->str);
 }
@@ -159,6 +161,7 @@ test_bpf(const struct bpf_check *cmd_check)
 	const struct bpf_attr_check *check = 0;
 	const union bpf_attr_data *data = 0;
 	unsigned int offset = 0;
+	size_t j = 0;
 
 	/* zero addr */
 	sys_bpf(cmd_check->cmd, 0, long_bits | sizeof(union bpf_attr_data));
@@ -173,25 +176,29 @@ test_bpf(const struct bpf_check *cmd_check)
 
 	for (size_t i = 0; i < cmd_check->count; i++) {
 		check = &cmd_check->checks[i];
-		if (check->init_fn)
-			check->init_fn((struct bpf_attr_check *) check);
-		data = &check->data;
-		offset = check->size;
+		for (j = 0; j < MAX(check->iters, 1); j++) {
+			if (check->init_fn)
+				check->init_fn((struct bpf_attr_check *) check, j);
+			data = &check->data;
+			offset = check->size;
 
-		addr = end_of_page - offset;
-		memcpy((void *) addr, data, offset);
+			addr = end_of_page - offset;
+			memcpy((void *) addr, data, offset);
 
-		/* starting piece of bpf_attr_data */
-		sys_bpf(cmd_check->cmd, addr, offset);
-		printf("bpf(%s, {", cmd_check->cmd_str);
-		print_bpf_attr(check, addr);
-		printf("}, %u) = %s\n", offset, errstr);
+			/* starting piece of bpf_attr_data */
+			sys_bpf(cmd_check->cmd, addr, offset);
+			printf("bpf(%s, {", cmd_check->cmd_str);
+			print_bpf_attr(check, addr, j);
+			printf("}, %u) = %s\n", offset, errstr);
 
-		/* short read of the starting piece */
-		sys_bpf(cmd_check->cmd, addr + 1, offset);
-		printf("bpf(%s, %#lx, %u) = %s\n",
-		       cmd_check->cmd_str, addr + 1, offset, errstr);
+			/* short read of the starting piece */
+			sys_bpf(cmd_check->cmd, addr + 1, offset);
+			printf("bpf(%s, %#lx, %u) = %s\n",
+			       cmd_check->cmd_str, addr + 1, offset, errstr);
+		}
 	}
+
+	j = MAX(check->iters, 1) - 1;
 
 	if (offset < sizeof_attr) {
 		/* short read of the whole bpf_attr_data */
@@ -208,7 +215,7 @@ test_bpf(const struct bpf_check *cmd_check)
 		memset((void *) addr + offset, 0, sizeof_attr - offset);
 		sys_bpf(cmd_check->cmd, addr, sizeof_attr);
 		printf("bpf(%s, {", cmd_check->cmd_str);
-		print_bpf_attr(check, addr);
+		print_bpf_attr(check, addr, j);
 		printf("}, %u) = %s\n", sizeof_attr, errstr);
 
 		/* non-zero bytes after the relevant part */
@@ -216,7 +223,7 @@ test_bpf(const struct bpf_check *cmd_check)
 			       sizeof_attr - offset, '0', 10);
 		sys_bpf(cmd_check->cmd, addr, sizeof_attr);
 		printf("bpf(%s, {", cmd_check->cmd_str);
-		print_bpf_attr(check, addr);
+		print_bpf_attr(check, addr, j);
 		printf(", ");
 		print_extra_data((char *) addr, offset,
 				 sizeof_attr - offset);
@@ -237,7 +244,7 @@ test_bpf(const struct bpf_check *cmd_check)
 	memset((void *) addr + offset, 0, page_size - offset);
 	sys_bpf(cmd_check->cmd, addr, page_size);
 	printf("bpf(%s, {", cmd_check->cmd_str);
-	print_bpf_attr(check, addr);
+	print_bpf_attr(check, addr, j);
 	printf("}, %u) = %s\n", page_size, errstr);
 
 	/* non-zero bytes after the whole bpf_attr_data */
@@ -245,7 +252,7 @@ test_bpf(const struct bpf_check *cmd_check)
 		       page_size - offset, '0', 10);
 	sys_bpf(cmd_check->cmd, addr, page_size);
 	printf("bpf(%s, {", cmd_check->cmd_str);
-	print_bpf_attr(check, addr);
+	print_bpf_attr(check, addr, j);
 	printf(", ");
 	print_extra_data((char *) addr, offset,
 			 page_size - offset);
@@ -258,7 +265,7 @@ test_bpf(const struct bpf_check *cmd_check)
 }
 
 static void
-init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check)
+init_BPF_MAP_CREATE_attr7(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_MAP_CREATE_struct *attr = &check->data.BPF_MAP_CREATE_data;
 	attr->map_ifindex = ifindex_lo();
@@ -618,7 +625,7 @@ get_log_buf_tail(void)
 #endif
 
 static void
-init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check)
+init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
 
@@ -628,7 +635,8 @@ init_BPF_PROG_LOAD_attr3(struct bpf_attr_check *check)
 }
 
 static void
-print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check, unsigned long addr)
+print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check,
+			  unsigned long addr, size_t idx)
 {
 	printf("prog_type=BPF_PROG_TYPE_SOCKET_FILTER, insn_cnt=%u"
 	       ", insns=" INSNS_FMT ", license=\"%s\", log_level=2718281828"
@@ -641,7 +649,7 @@ print_BPF_PROG_LOAD_attr3(const struct bpf_attr_check *check, unsigned long addr
 }
 
 static void
-init_BPF_PROG_LOAD_attr4(struct bpf_attr_check *check)
+init_BPF_PROG_LOAD_attr4(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_PROG_LOAD_struct *attr = &check->data.BPF_PROG_LOAD_data;
 
@@ -654,7 +662,8 @@ init_BPF_PROG_LOAD_attr4(struct bpf_attr_check *check)
 }
 
 static void
-print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check, unsigned long addr)
+print_BPF_PROG_LOAD_attr4(const struct bpf_attr_check *check,
+			  unsigned long addr, size_t idx)
 {
 	printf("prog_type=BPF_PROG_TYPE_UNSPEC, insn_cnt=%u, insns=" INSNS_FMT
 	       ", license=\"%s\", log_level=2718281828, log_size=4"
@@ -817,7 +826,7 @@ static struct bpf_attr_check BPF_PROG_LOAD_checks[] = {
 };
 
 static void
-init_BPF_OBJ_PIN_attr(struct bpf_attr_check *check)
+init_BPF_OBJ_PIN_attr(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_OBJ_PIN_struct *attr = &check->data.BPF_OBJ_PIN_data;
 	attr->pathname = (uintptr_t) pathname;
@@ -1142,7 +1151,7 @@ static uint32_t prog_load_ids[] = { 0, 1, 0xffffffff, 2718281828, };
 uint32_t *prog_load_ids_ptr;
 
 static void
-init_BPF_PROG_QUERY_attr4(struct bpf_attr_check *check)
+init_BPF_PROG_QUERY_attr4(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_PROG_QUERY_struct *attr = &check->data.BPF_PROG_QUERY_data;
 
@@ -1155,7 +1164,8 @@ init_BPF_PROG_QUERY_attr4(struct bpf_attr_check *check)
 }
 
 static void
-print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check, unsigned long addr)
+print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check,
+			   unsigned long addr, size_t idx)
 {
 	printf("query={target_fd=-1153374643"
 	       ", attach_type=0xfeedface /* BPF_??? */"
@@ -1170,7 +1180,7 @@ print_BPF_PROG_QUERY_attr4(const struct bpf_attr_check *check, unsigned long add
 }
 
 static void
-init_BPF_PROG_QUERY_attr5(struct bpf_attr_check *check)
+init_BPF_PROG_QUERY_attr5(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_PROG_QUERY_struct *attr = &check->data.BPF_PROG_QUERY_data;
 
@@ -1183,7 +1193,8 @@ init_BPF_PROG_QUERY_attr5(struct bpf_attr_check *check)
 }
 
 static void
-print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check, unsigned long addr)
+print_BPF_PROG_QUERY_attr5(const struct bpf_attr_check *check,
+			   unsigned long addr, size_t idx)
 {
 	printf("query={target_fd=-1153374643"
 	       ", attach_type=0xfeedface /* BPF_??? */"
@@ -1282,7 +1293,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 
 
 static void
-init_BPF_RAW_TRACEPOINT_attr2(struct bpf_attr_check *check)
+init_BPF_RAW_TRACEPOINT_attr2(struct bpf_attr_check *check, size_t idx)
 {
 	/* TODO: test the 128 byte limit */
 	static const char tp_name[] = "0123456789qwertyuiop0123456789qwe";
@@ -1325,7 +1336,7 @@ static struct bpf_attr_check BPF_RAW_TRACEPOINT_OPEN_checks[] = {
 };
 
 static void
-init_BPF_BTF_LOAD_attr(struct bpf_attr_check *check)
+init_BPF_BTF_LOAD_attr(struct bpf_attr_check *check, size_t idx)
 {
 	static const char sample_btf_data[] = "bPf\0daTum";
 
