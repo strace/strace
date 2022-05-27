@@ -9,16 +9,21 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "xmalloc.h"
 
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <linux/landlock.h>
 
 #ifndef RETVAL_INJECTED
 # define RETVAL_INJECTED 0
+#endif
+#ifndef DECODE_FD
+# define DECODE_FD 0
 #endif
 
 #ifndef SKIP_IF_PROC_IS_UNAVAILABLE
@@ -124,14 +129,40 @@ main(void)
 	static const kernel_ulong_t sizes[] = { 8, 12, 16 };
 	for (size_t i = 0; i < ARRAY_SIZE(attr_vals); i++) {
 		for (size_t j = 0; j < ARRAY_SIZE(sizes); j++) {
+			const char *fd_str = FD_PATH;
+
 			attr->handled_access_fs = attr_vals[i].val;
 			rc = sys_landlock_create_ruleset(attr, sizes[j], 0);
+
+#if DECODE_FD
+			/*
+			 * The ABI has been broken in commit v5.18-rc1~88^2
+			 * by adding brackets to the link value, hence, we can't
+			 * rely on a specific name anymore and have to fetch it
+			 * ourselves.
+			 */
+			if (rc >= 0) {
+				static char buf[256];
+				char *path = xasprintf("/proc/self/fd/%ld", rc);
+				ssize_t ret = readlink(path, buf + 1,
+						       sizeof(buf) - 3);
+				free(path);
+
+				if (ret >= 0) {
+					buf[0] = '<';
+					buf[ret + 1] = '>';
+					buf[ret + 2] = '\0';
+					fd_str = buf;
+				}
+			}
+#endif
+
 			printf("landlock_create_ruleset({handled_access_fs=%s"
 			       "%s}, %llu, 0) = %s%s" INJ_STR,
 			       attr_vals[i].str,
 			       sizes[j] > sizeof(*attr) ? ", ..." : "",
 			       (unsigned long long) sizes[j],
-			       errstr, rc > 0 ? FD_PATH : "");
+			       errstr, rc >= 0 ? fd_str : "");
 		}
 	}
 
