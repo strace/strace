@@ -141,6 +141,11 @@ is_filled(const char *ptr, char fill, size_t size)
 	static_assert(sizeof(type_) == (sz_), \
 		      "Unexpected size of " #type_ "(" #sz_ " expected)")
 
+/** Checks that ioctl code's size field contains the expected value. */
+#define CHECK_IOCTL_SIZE(ioc_, sz_) \
+	static_assert(_IOC_SIZE(ioc_) == (sz_), \
+		"Unexpected size field value in " #ioc_ " (" #sz_" expected)")
+
 # ifdef WORDS_BIGENDIAN
 #  define BE16(val_) val_
 #  define BE32(val_) val_

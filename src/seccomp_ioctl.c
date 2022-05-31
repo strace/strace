@@ -15,11 +15,6 @@
 
 #define SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR SECCOMP_IOR(2, __u64)
 
-/** Checks that ioctl code's size field contains the expected value. */
-#define CHECK_IOCTL_SIZE(ioc_, sz_) \
-	static_assert(_IOC_SIZE(ioc_) == (sz_), \
-		"Unexpected size field value in " #ioc_ " (" #sz_" expected)")
-
 static void
 print_struct_seccomp_data(struct tcb *const tcp,
 			  const struct seccomp_data *const data)
