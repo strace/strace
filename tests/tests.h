@@ -58,6 +58,7 @@
 #  define XLAT_FMT_L "%#lx"
 #  define XLAT_FMT_LL "%#llx"
 #  define XLAT_ARGS(a_) (a_)
+#  define XLAT_ARGS_U(a_) (unsigned int) (a_)
 #  define XLAT_SEL(v_, s_) v_
 
 #  define ABBR(s_) ""
@@ -79,6 +80,7 @@
 #  define XLAT_FMT_L "%#lx /* %s */"
 #  define XLAT_FMT_LL "%#llx /* %s */"
 #  define XLAT_ARGS(a_) a_, #a_
+#  define XLAT_ARGS_U(a_) (unsigned int) (a_), #a_
 #  define XLAT_SEL(v_, s_) v_, s_
 
 #  define ABBR(s_) ""
@@ -100,6 +102,7 @@
 #  define XLAT_FMT_L "%s"
 #  define XLAT_FMT_LL "%s"
 #  define XLAT_ARGS(a_) #a_
+#  define XLAT_ARGS_U(a_) #a_
 #  define XLAT_SEL(v_, s_) s_
 
 #  define ABBR(s_) s_

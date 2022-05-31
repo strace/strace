@@ -58,15 +58,6 @@ static const char zero_path[] = "/dev/zero";
 # define PATH_FMT "%s"
 #endif
 
-/* A hack for handling different types of _IOC() on various platforms */
-#if XLAT_RAW
-# define XLAT_ARGS_U(a_) (unsigned int) (a_)
-#elif XLAT_VERBOSE
-# define XLAT_ARGS_U(a_) (unsigned int) (a_), #a_
-#else
-# define XLAT_ARGS_U(a_) #a_
-#endif
-
 /**
  * Generate an ioctl command with a different direction based
  * on the existing one.
