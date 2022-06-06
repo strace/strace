@@ -256,14 +256,27 @@ main(int argc, const char *argv[])
 		}
 	}
 
+	static const struct strval32 vl_vecs[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x10, "RTC_VL_BACKUP_SWITCH") },
+		{ ARG_XLAT_KNOWN(0xbeef, "RTC_VL_DATA_INVALID"
+					 "|RTC_VL_BACKUP_LOW"
+					 "|RTC_VL_BACKUP_EMPTY"
+					 "|RTC_VL_ACCURACY_LOW|0xbee0") },
+		{ ARG_XLAT_UNKNOWN(0xbadc0de0, "RTC_VL_???") },
+	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, pint);
-	*pint = 1U << 4;
 
-	if (do_ioctl_ptr(RTC_VL_READ, pint) < 0) {
-		printf("ioctl(-1, RTC_VL_READ, %p) = %s\n", pint, errstr);
-	} else {
-		printf("ioctl(-1, RTC_VL_READ, [RTC_VL_BACKUP_SWITCH]) = %s\n",
-		       errstr);
+	for (size_t i = 0; i < ARRAY_SIZE(vl_vecs); i++) {
+		*pint = vl_vecs[i].val;
+
+		if (do_ioctl_ptr(RTC_VL_READ, pint) < 0) {
+			printf("ioctl(-1, RTC_VL_READ, %p) = %s\n",
+			       pint, errstr);
+		} else {
+			printf("ioctl(-1, RTC_VL_READ, [%s]) = %s\n",
+			       vl_vecs[i].str, errstr);
+		}
 	}
 
 	do_ioctl(_IO(0x70, 0x40), lmagic);
