@@ -16,6 +16,13 @@
 #include <linux/types.h>
 #include <linux/rtc.h>
 
+#ifndef RTC_VL_READ
+# define RTC_VL_READ _IOR('p', 0x13, unsigned int)
+#endif
+#ifndef RTC_VL_CLR
+# define RTC_VL_CLR _IO ('p', 0x14)
+#endif
+
 static const unsigned long lmagic = (unsigned long) 0xdeadbeefbadc0dedULL;
 
 static const char *errstr;
@@ -105,9 +112,7 @@ main(int argc, const char *argv[])
 		{ ARG_STR(RTC_PIE_ON) },
 		{ RTC_UIE_OFF, "PHN_NOT_OH or RTC_UIE_OFF" },
 		{ ARG_STR(RTC_UIE_ON) },
-#ifdef RTC_VL_CLR
 		{ ARG_STR(RTC_VL_CLR), },
-#endif
 		{ ARG_STR(RTC_WIE_OFF) },
 		{ ARG_STR(RTC_WIE_ON) },
 	}, long_cmds[] = {
@@ -125,9 +130,7 @@ main(int argc, const char *argv[])
 		{ ARG_STR(RTC_PLL_SET) },
 		{ ARG_STR(RTC_RD_TIME) },
 		{ ARG_STR(RTC_SET_TIME) },
-#ifdef RTC_VL_READ
 		{ ARG_STR(RTC_VL_READ) },
-#endif
 		{ ARG_STR(RTC_WKALM_RD) },
 		{ ARG_STR(RTC_WKALM_SET) },
 	}, r_time_cmds[] = {
@@ -253,7 +256,6 @@ main(int argc, const char *argv[])
 		}
 	}
 
-#ifdef RTC_VL_READ
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned int, pint);
 	*pint = 1U << 4;
 
@@ -263,7 +265,6 @@ main(int argc, const char *argv[])
 		printf("ioctl(-1, RTC_VL_READ, [RTC_VL_BACKUP_SWITCH]) = %s\n",
 		       errstr);
 	}
-#endif
 
 	do_ioctl(_IO(0x70, 0x40), lmagic);
 	printf("ioctl(-1, %s, %#lx) = %s\n", "NVRAM_INIT", lmagic, errstr);
