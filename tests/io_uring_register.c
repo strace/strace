@@ -1067,6 +1067,67 @@ main(void)
 		}
 	}
 
+
+	/* IORING_REGISTER_PBUF_RING, IORING_UNREGISTER_PBUF_RING */
+	static const struct {
+		unsigned int op;
+		const char *str;
+	} buf_reg_ops[] = {
+		{ 22, "IORING_REGISTER_PBUF_RING" },
+		{ 23, "IORING_UNREGISTER_PBUF_RING" },
+	};
+	TAIL_ALLOC_OBJECT_VAR_PTR(struct io_uring_buf_reg, buf_reg);
+
+	for (size_t i = 0; i < ARRAY_SIZE(buf_reg_ops); i++) {
+		sys_io_uring_register(fd_null, buf_reg_ops[i].op, 0,
+				      0xdeadbeef);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", NULL, %u)"
+		       " = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
+		       0xdeadbeef, errstr);
+
+		sys_io_uring_register(fd_null, buf_reg_ops[i].op,
+				      buf_reg + 1, 0);
+		printf("io_uring_register(%u<%s>, " XLAT_FMT ", %p, 0) = %s\n",
+		       fd_null, path_null,
+		       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str),
+		       buf_reg + 1, errstr);
+
+		for (size_t j = 0; j < 256; j++) {
+			memset(buf_reg, 0, sizeof(*buf_reg));
+			buf_reg->ring_addr = j & 2 ? (uintptr_t) buf_reg : 0;
+			buf_reg->ring_entries = j & 4 ? 3141592653 : 0;
+			buf_reg->bgid = j & 8 ? 42069 : 0;
+			buf_reg->pad = j & 16 ? 31337 : 0;
+			buf_reg->resv[0] = j &  32 ? 0xbadc0deddeadfaceULL : 0;
+			buf_reg->resv[1] = j &  64 ? 0xdecaffedbeefdeadULL : 0;
+			buf_reg->resv[2] = j & 128 ? 0xbadc0dedfacefeedULL : 0;
+
+			sys_io_uring_register(fd_null, buf_reg_ops[i].op,
+					      buf_reg, 0x42);
+			printf("io_uring_register(%u<%s>, " XLAT_FMT
+			       ", {ring_addr=",
+			       fd_null, path_null,
+			       XLAT_SEL(buf_reg_ops[i].op, buf_reg_ops[i].str));
+			if (j & 2)
+				printf("%p", buf_reg);
+			else
+				printf("NULL");
+			printf(", ring_entries=%s, bgid=%s%s",
+			       j & 4 ? "3141592653" : "0",
+			       j & 8 ? "42069" : "0",
+			       j & 16 ? ", pad=0x7a69" : "");
+			if (j & 0xe0) {
+				printf(", resv=[%s, %s, %s]",
+				       j &  32 ? "0xbadc0deddeadface" : "0",
+				       j &  64 ? "0xdecaffedbeefdead" : "0",
+				       j & 128 ? "0xbadc0dedfacefeed" : "0");
+			}
+			printf("}, 66) = %s\n", errstr);
+		}
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

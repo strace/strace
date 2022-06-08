@@ -560,6 +560,39 @@ print_io_uring_ringfds_unregister(struct tcb *tcp, const kernel_ulong_t arg,
 		    tfetch_mem, print_ringfd_unregister_array_member, NULL);
 }
 
+static void
+print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr)
+{
+	struct io_uring_buf_reg arg;
+	CHECK_TYPE_SIZE(arg, 40);
+	CHECK_TYPE_SIZE(arg.pad, sizeof(uint16_t));
+	CHECK_TYPE_SIZE(arg.resv, sizeof(uint64_t) * 3);
+
+	if (umove_or_printaddr(tcp, addr, &arg))
+		return;
+
+	tprint_struct_begin();
+	PRINT_FIELD_ADDR64(arg, ring_addr);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, ring_entries);
+
+	tprint_struct_next();
+	PRINT_FIELD_U(arg, bgid);
+
+	if (arg.pad) {
+		tprint_struct_next();
+		PRINT_FIELD_X(arg, pad);
+	}
+
+	if (!IS_ARRAY_ZERO(arg.resv)) {
+		tprint_struct_next();
+		PRINT_FIELD_ARRAY(arg, resv, tcp, print_xint_array_member);
+	}
+
+	tprint_struct_end();
+}
+
 SYS_FUNC(io_uring_register)
 {
 	const int fd = tcp->u_arg[0];
@@ -621,6 +654,10 @@ SYS_FUNC(io_uring_register)
 		break;
 	case IORING_UNREGISTER_RING_FDS:
 		print_io_uring_ringfds_unregister(tcp, arg, nargs);
+		break;
+	case IORING_REGISTER_PBUF_RING:
+	case IORING_UNREGISTER_PBUF_RING:
+		print_io_uring_buf_reg(tcp, arg);
 		break;
 	case IORING_UNREGISTER_BUFFERS:
 	case IORING_UNREGISTER_FILES:
