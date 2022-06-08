@@ -12,6 +12,19 @@
 #include "defs.h"
 #include <linux/fcntl.h>
 
+/* Working around UAPI breakage in v5.19-rc1~89^2~9^2~18 */
+#ifndef F_GETLK64
+# ifdef __mips__
+#  define F_GETLK64	33
+#  define F_SETLK64	34
+#  define F_SETLKW64	35
+# else
+#  define F_GETLK64	12
+#  define F_SETLK64	13
+#  define F_SETLKW64	14
+# endif
+#endif /* !F_GETLK64 */
+
 #include "xlat/f_owner_types.h"
 #include "xlat/f_seals.h"
 #include "xlat/fcntlcmds.h"
