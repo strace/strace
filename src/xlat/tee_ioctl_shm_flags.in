@@ -1,6 +1,6 @@
+/* These ones aren't in uapi */
 TEE_IOCTL_SHM_MAPPED		0x1
 TEE_IOCTL_SHM_DMA_BUF		0x2
-/* These ones aren't in uapi */
 TEE_IOCTL_SHM_EXT_DMA_BUF	0x4
 TEE_IOCTL_SHM_REGISTER		0x8
 TEE_IOCTL_SHM_USER_MAPPED	0x10

@@ -24,6 +24,13 @@
 
 #define UUID_SIZE 16
 
+#ifndef TEE_IOCTL_SHM_MAPPED
+# define TEE_IOCTL_SHM_MAPPED 0x1
+#endif
+#ifndef TEE_IOCTL_SHM_DMA_BUF
+# define TEE_IOCTL_SHM_DMA_BUF 0x2
+#endif
+
 /* Not in mainline.  */
 struct tee_ioctl_shm_register_fd_data {
 	__s64 fd;
