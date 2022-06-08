@@ -42,6 +42,8 @@
 # define INJ_STR ""
 #endif
 
+#define ARR_ITEM(arr_, idx_) ((arr_)[(idx_) % ARRAY_SIZE(arr_)])
+
 static const char path_null[] = "/dev/null";
 static const char path_full[] = "/dev/full";
 
@@ -982,10 +984,10 @@ main(void)
 
 	fill_memory(ringfds, sizeof(*ringfds) * ringfd_count);
 	for (size_t i = 0; i < ringfd_count; i++) {
-		ringfds[i].offset = ringfd_off[i % ARRAY_SIZE(ringfd_off)];
+		ringfds[i].offset = ARR_ITEM(ringfd_off, i);
 		ringfds[i].resv = i % 2 ? i * 0x1010101 : 0;
 		ringfds[i].data = (i % 4 ? 0xbadc0ded00000000ULL : 0)
-				  | fds[i % ARRAY_SIZE(fds)];
+				  | ARR_ITEM(fds, i);
 	}
 
 	for (size_t i = 0; i < ARRAY_SIZE(ringfd_ops); i++) {
@@ -1028,7 +1030,7 @@ main(void)
 				printf("%s{offset=", k != offs ? ", " : "");
 				printf(ringfd_ops[i].op == 21 ||
 				       k % ARRAY_SIZE(ringfd_off) ? "%u" : "%d",
-				       ringfd_off[k % ARRAY_SIZE(ringfd_off)]);
+				       ARR_ITEM(ringfd_off, k));
 				if (k % 2)
 					printf(", resv=%#x", k * 0x1010101);
 
