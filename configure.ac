@@ -571,6 +571,12 @@ AC_CHECK_MEMBERS(m4_normalize([
 		struct iocb.aio_rw_flags
 		]),,, [#include <linux/aio_abi.h>])
 
+AC_CHECK_TYPES([struct io_uring_rsrc_register], [
+	AC_CHECK_MEMBERS(m4_normalize([
+		struct io_uring_rsrc_register.resv
+	]),,, [#include <linux/io_uring.h>])
+],, [#include <linux/io_uring.h>])
+
 CPPFLAGS="$saved_CPPFLAGS"
 
 st_CHECK_ENUMS

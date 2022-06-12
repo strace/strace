@@ -385,13 +385,20 @@ print_io_uring_rsrc_tags(struct tcb *tcp, const uint64_t tags,
 		    tfetch_mem, print_xint_array_member, NULL);
 }
 
+/* Work around field name change in Linux commit v5.19-rc1~251^2~20. */
+#ifdef HAVE_STRUCT_IO_URING_RSRC_REGISTER_RESV
+# define RESV resv
+#else
+# define RESV flags
+#endif
+
 static void
 print_io_uring_register_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 			     const unsigned int size, const unsigned int opcode)
 {
 	struct io_uring_rsrc_register arg;
 	CHECK_TYPE_SIZE(arg, 32);
-	CHECK_TYPE_SIZE(arg.resv, sizeof(uint32_t));
+	CHECK_TYPE_SIZE(arg.RESV, sizeof(uint32_t));
 	CHECK_TYPE_SIZE(arg.resv2, sizeof(uint64_t));
 
 	if (size < 32) {
@@ -405,9 +412,10 @@ print_io_uring_register_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 	tprint_struct_begin();
 	PRINT_FIELD_U(arg, nr);
 
-	if (arg.resv) {
+	if (arg.RESV) {
 		tprint_struct_next();
-		PRINT_FIELD_X(arg, resv);
+		tprints_field_name("resv");
+		PRINT_VAL_X(arg.RESV);
 	}
 
 	if (arg.resv2) {
@@ -426,6 +434,8 @@ print_io_uring_register_rsrc(struct tcb *tcp, const kernel_ulong_t addr,
 
 	tprint_struct_end();
 }
+
+#undef RESV
 
 static void
 print_io_uring_update_rsrc(struct tcb *tcp, const kernel_ulong_t addr,

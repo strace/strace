@@ -44,6 +44,13 @@
 
 #define ARR_ITEM(arr_, idx_) ((arr_)[(idx_) % ARRAY_SIZE(arr_)])
 
+/* Work around field name change in Linux commit v5.19-rc1~251^2~20. */
+#ifdef HAVE_STRUCT_IO_URING_RSRC_REGISTER_RESV
+# define RESV resv
+#else
+# define RESV flags
+#endif
+
 static const char path_null[] = "/dev/null";
 static const char path_full[] = "/dev/full";
 
@@ -702,7 +709,7 @@ main(void)
 			rsrc_reg->nr += !!(j & 16);
 			rsrc_reg->nr &= ~-!(j & 32);
 
-			rsrc_reg->resv = j & 64 ? 0xbadc0ded : 0;
+			rsrc_reg->RESV = j & 64 ? 0xbadc0ded : 0;
 			rsrc_reg->resv2 = j & 128 ? 0xfacecafebeeffeedULL : 0;
 
 			memcpy(big_rsrc_reg, rsrc_reg, sizeof(*rsrc_reg));
