@@ -934,11 +934,11 @@ status-successful-long	-a10 -e trace=chdir --successful-only
 status-successful-status	-a10 -e trace=chdir --status=successful
 status-unfinished	-a10 -e trace=all --status=unfinished
 statx	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
-strace--absolute-timestamps +strace-t.test --absolute-timestamps
-strace--absolute-timestamps-format-time +strace-t.test --absolute-timestamps=format:time
+strace--absolute-timestamps +strace-t_lower.test --absolute-timestamps
+strace--absolute-timestamps-format-time +strace-t_lower.test --absolute-timestamps=format:time
 strace--absolute-timestamps-format-time-precision-ms +strace-tt.test 3 --absolute-timestamps=format:time --absolute-timestamps=precision:ms
 strace--absolute-timestamps-format-time-precision-ns +strace-tt.test 9 --absolute-timestamps=format:time --absolute-timestamps=precision:ns
-strace--absolute-timestamps-format-time-precision-s +strace-t.test --absolute-timestamps=format:time --absolute-timestamps=precision:s
+strace--absolute-timestamps-format-time-precision-s +strace-t_lower.test --absolute-timestamps=format:time --absolute-timestamps=precision:s
 strace--absolute-timestamps-format-time-precision-us +strace-tt.test 6 --absolute-timestamps=format:time --absolute-timestamps=precision:us
 strace--absolute-timestamps-format-unix-precision-ms +strace-ttt.test 3 --absolute-timestamps=precision:ms --absolute-timestamps=format:unix
 strace--absolute-timestamps-format-unix-precision-ns +strace-ttt.test 9 --absolute-timestamps=format:unix --absolute-timestamps=precision:ns
@@ -956,16 +956,16 @@ strace--strings-in-hex-all		--trace=chdir --strings-in-hex=all --columns=18
 strace--strings-in-hex-non-ascii	--trace=chdir --strings-in-hex=non-ascii --columns=12
 strace--strings-in-hex-non-ascii-chars	--trace=chdir --strings-in-hex=non-ascii-chars --columns=12
 strace--strings-in-hex-none		--trace=chdir --strings-in-hex=none --columns=12
-strace--syscall-times +strace-T.test --syscall-times
-strace--syscall-times-ms +strace-T.test --syscall-times=ms
-strace--syscall-times-ns +strace-T.test --syscall-times=ns
-strace--syscall-times-s +strace-T.test --syscall-times=s
-strace--syscall-times-us +strace-T.test --syscall-times=us
-strace--timestamps +strace-t.test --timestamps
-strace--timestamps-time +strace-t.test --timestamps=time
+strace--syscall-times +strace-T_upper.test --syscall-times
+strace--syscall-times-ms +strace-T_upper.test --syscall-times=ms
+strace--syscall-times-ns +strace-T_upper.test --syscall-times=ns
+strace--syscall-times-s +strace-T_upper.test --syscall-times=s
+strace--syscall-times-us +strace-T_upper.test --syscall-times=us
+strace--timestamps +strace-t_lower.test --timestamps
+strace--timestamps-time +strace-t_lower.test --timestamps=time
 strace--timestamps-time-ms +strace-tt.test 3 --timestamps=time,ms
 strace--timestamps-time-ns +strace-tt.test 9 --timestamps=time,ns
-strace--timestamps-time-s +strace-t.test --timestamps=time,s
+strace--timestamps-time-s +strace-t_lower.test --timestamps=time,s
 strace--timestamps-time-us +strace-tt.test 6 --timestamps=time,us
 strace--timestamps-unix-ms +strace-ttt.test 3 --timestamps=unix,ms
 strace--timestamps-unix-ns +strace-ttt.test 9 --timestamps=unix,ns

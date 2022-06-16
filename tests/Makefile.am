@@ -583,14 +583,14 @@ MISC_TESTS = \
 	strace-E-override.test \
 	strace-E-unset.test \
 	strace-S.test \
-	strace-T.test \
+	strace-T_upper.test \
 	strace-V.test \
 	strace-ff.test \
 	strace-log-merge-error.test \
 	strace-log-merge-suffix.test \
 	strace-p-Y-p.test \
 	strace-r.test \
-	strace-t.test \
+	strace-t_lower.test \
 	strace-tt.test \
 	strace-ttt.test \
 	tampering-notes.test \
