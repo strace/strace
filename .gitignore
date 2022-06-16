@@ -35,3 +35,4 @@
 Makefile
 Makefile.in
 core
+strace-*-dirty
