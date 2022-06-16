@@ -708,7 +708,7 @@ EXTRA_DIST = \
 	strace-DDD.expected \
 	strace-E.expected \
 	strace-E-unset.expected \
-	strace-T.expected \
+	strace-T_upper.expected \
 	strace-ff.expected \
 	strace-k-demangle.expected \
 	strace-k-demangle.test \
