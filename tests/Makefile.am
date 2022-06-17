@@ -583,7 +583,7 @@ MISC_TESTS = \
 	strace-E-override.test \
 	strace-E-unset.test \
 	strace-S.test \
-	strace-T.test \
+	strace-T_upper.test \
 	strace-V.test \
 	strace-ff.test \
 	strace-log-merge-error.test \
@@ -708,7 +708,7 @@ EXTRA_DIST = \
 	strace-DDD.expected \
 	strace-E.expected \
 	strace-E-unset.expected \
-	strace-T.expected \
+	strace-T_upper.expected \
 	strace-ff.expected \
 	strace-k-demangle.expected \
 	strace-k-demangle.test \

@@ -956,11 +956,11 @@ strace--strings-in-hex-all		--trace=chdir --strings-in-hex=all --columns=18
 strace--strings-in-hex-non-ascii	--trace=chdir --strings-in-hex=non-ascii --columns=12
 strace--strings-in-hex-non-ascii-chars	--trace=chdir --strings-in-hex=non-ascii-chars --columns=12
 strace--strings-in-hex-none		--trace=chdir --strings-in-hex=none --columns=12
-strace--syscall-times +strace-T.test --syscall-times
-strace--syscall-times-ms +strace-T.test --syscall-times=ms
-strace--syscall-times-ns +strace-T.test --syscall-times=ns
-strace--syscall-times-s +strace-T.test --syscall-times=s
-strace--syscall-times-us +strace-T.test --syscall-times=us
+strace--syscall-times +strace-T_upper.test --syscall-times
+strace--syscall-times-ms +strace-T_upper.test --syscall-times=ms
+strace--syscall-times-ns +strace-T_upper.test --syscall-times=ns
+strace--syscall-times-s +strace-T_upper.test --syscall-times=s
+strace--syscall-times-us +strace-T_upper.test --syscall-times=us
 strace--timestamps +strace-t.test --timestamps
 strace--timestamps-time +strace-t.test --timestamps=time
 strace--timestamps-time-ms +strace-tt.test 3 --timestamps=time,ms
