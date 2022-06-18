@@ -2,6 +2,7 @@
  * Check decoding of landlock_create_ruleset syscall.
  *
  * Copyright (c) 2021 Eugene Syromyatnikov <evgsyr@gmail.com>
+ * Copyright (c) 2021-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
