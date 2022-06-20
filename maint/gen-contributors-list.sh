@@ -31,7 +31,7 @@ get_commit_id()
 	git rev-parse --verify "$1^{commit}"
 }
 
-SCRIPT='s/^[^:@<]+:[[:space:]]*"?([^"<@[:space:]][^"<@]*)"?[[:space:]](<[^<@]+@[^>]+>).*/\1 \2/p'
+SCRIPT='s/^ {4}?[^:@<[:space:]]+:[[:space:]]*"?([^"<@[:space:]][^"<@]*)"?[[:space:]](<[^<@]+@[^>]+>).*/\1 \2/p'
 # Script for adding angle brackets to e-mail addresses in case they are absent
 SCRIPT_NORM_EMAILS='s/[^[:space:]<@]+@[^>]+$/<\0>/'
 MATCH_OUT='^([^<@[:space:]][^<@]*)[[:space:]](<[^<@]+@[^>]+>)$'
