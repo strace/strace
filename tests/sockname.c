@@ -18,6 +18,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#include "secontext.h"
+
 #ifndef TEST_SYSCALL_NAME
 # error TEST_SYSCALL_NAME must be defined
 #endif
@@ -59,14 +61,19 @@ test_sockname_syscall(const int fd)
 	*plen = sizeof(struct sockaddr_un);
 	struct sockaddr_un *addr = tail_alloc(*plen);
 
+	char *my_secontext = SECONTEXT_PID_MY();
+	char *fd_secontext = SECONTEXT_FD(fd);
+
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	int rc = TEST_SYSCALL_NAME(fd PREFIX_S_ARGS, (void *) addr,
 				   plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s(%d%s, {sa_family=AF_UNIX, sun_path=\"%s\"}"
+	printf("%s%s(%d%s%s, {sa_family=AF_UNIX, sun_path=\"%s\"%s}"
 	       ", [%d => %d]%s) = %d\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_S_STR, addr->sun_path,
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
+	       addr->sun_path, SECONTEXT_FILE(addr->sun_path),
 	       (int) sizeof(struct sockaddr_un), (int) *plen, SUFFIX_STR, rc);
 
 	memset(addr, 0, sizeof(*addr));
@@ -75,28 +82,34 @@ test_sockname_syscall(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s(%d%s, {sa_family=AF_UNIX, sun_path=\"%s\"}"
+	printf("%s%s(%d%s%s, {sa_family=AF_UNIX, sun_path=\"%s\"%s}"
 	       ", [%d]%s) = %d\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_S_STR, addr->sun_path,
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
+	       addr->sun_path, SECONTEXT_FILE(addr->sun_path),
 	       (int) *plen, SUFFIX_STR, rc);
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr, 0 SUFFIX_ARGS);
-	printf("%s(%d%s, %p, NULL%s) = %s\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr, SUFFIX_STR,
-	       sprintrc(rc));
+	printf("%s%s(%d%s%s, %p, NULL%s) = %s\n",
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_F_STR,
+	       addr, SUFFIX_STR, sprintrc(rc));
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_S_ARGS, 0, 0 SUFFIX_ARGS);
-	printf("%s(%d%s, NULL, NULL%s) = %s\n",
-	       TEST_SYSCALL_STR, fd, rc == -1 ? PREFIX_F_STR : PREFIX_S_STR,
+	printf("%s%s(%d%s%s, NULL, NULL%s) = %s\n",
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext,
+	       rc == -1 ? PREFIX_F_STR : PREFIX_S_STR,
 	       SUFFIX_STR, sprintrc(rc));
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen + 1 SUFFIX_ARGS);
-	printf("%s(%d%s, %p, %p%s) = %s\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr,
+	printf("%s%s(%d%s%s, %p, %p%s) = %s\n",
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_F_STR, addr,
 	       plen + 1, SUFFIX_STR, sprintrc(rc));
 
 	const size_t offsetof_sun_path = offsetof(struct sockaddr_un, sun_path);
@@ -108,8 +121,9 @@ test_sockname_syscall(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s(%d%s, {sa_family=AF_UNIX}, [%d => %d]%s) = %d\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_S_STR,
+	printf("%s%s(%d%s%s, {sa_family=AF_UNIX}, [%d => %d]%s) = %d\n",
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
 	       (int) offsetof_sun_path, (int) *plen, SUFFIX_STR, rc);
 
 	++addr;
@@ -121,17 +135,19 @@ test_sockname_syscall(const int fd)
 			       plen SUFFIX_ARGS);
 	if (rc < 0)
 		perror_msg_and_skip(TEST_SYSCALL_STR);
-	printf("%s(%d%s, {sa_family=AF_UNIX, sun_path=\"%.*s\"}"
+	printf("%s%s(%d%s%s, {sa_family=AF_UNIX, sun_path=\"%.*s\"%s}"
 	       ", [%d => %d]%s) = %d\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_S_STR,
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_S_STR,
 	       (int) (sizeof(struct sockaddr) - offsetof_sun_path),
-	       addr->sun_path, (int) sizeof(struct sockaddr),
-	       (int) *plen, SUFFIX_STR, rc);
+	       addr->sun_path, SECONTEXT_FILE(addr->sun_path),
+	       (int) sizeof(struct sockaddr), (int) *plen, SUFFIX_STR, rc);
 
 	PREPARE_TEST_SYSCALL_INVOCATION;
 	rc = TEST_SYSCALL_NAME(fd PREFIX_F_ARGS, (void *) addr,
 			       plen SUFFIX_ARGS);
-	printf("%s(%d%s, %p, [%d]%s) = %s\n",
-	       TEST_SYSCALL_STR, fd, PREFIX_F_STR, addr,
+	printf("%s%s(%d%s%s, %p, [%d]%s) = %s\n",
+	       my_secontext,
+	       TEST_SYSCALL_STR, fd, fd_secontext, PREFIX_F_STR, addr,
 	       *plen, SUFFIX_STR, sprintrc(rc));
 }

@@ -63,6 +63,8 @@
 #include "xlat/mctp_addrs.h"
 #include "xlat/mctp_nets.h"
 
+#include "secontext.h"
+
 #define SIZEOF_SA_FAMILY sizeof_field(struct sockaddr, sa_family)
 
 struct sockaddr_rxrpc {
@@ -115,6 +117,7 @@ print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen
 	if (sa_un->sun_path[0]) {
 		print_quoted_string(sa_un->sun_path, path_len + 1,
 				    QUOTE_0_TERMINATED);
+		selinux_printfilecon(tcp, sa_un->sun_path);
 	} else {
 		tprints("@");
 		print_quoted_string(sa_un->sun_path + 1, path_len - 1, 0);

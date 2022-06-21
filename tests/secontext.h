@@ -9,9 +9,11 @@
 #include "xmalloc.h"
 #include <unistd.h>
 
+char *secontext_full_fd(int) ATTRIBUTE_MALLOC;
 char *secontext_full_file(const char *, bool) ATTRIBUTE_MALLOC;
 char *secontext_full_pid(pid_t) ATTRIBUTE_MALLOC;
 
+char *secontext_short_fd(int) ATTRIBUTE_MALLOC;
 char *secontext_short_file(const char *, bool) ATTRIBUTE_MALLOC;
 char *secontext_short_pid(pid_t) ATTRIBUTE_MALLOC;
 
@@ -30,6 +32,7 @@ enum secontext_field {
  */
 char *get_secontext_field(const char *full_context, enum secontext_field field);
 
+char *get_secontext_field_fd(int fd, enum secontext_field field);
 char *get_secontext_field_file(const char *file, enum secontext_field field);
 
 void reset_secontext_file(const char *file);
@@ -44,6 +47,7 @@ void update_secontext_field(const char *file, enum secontext_field field,
 #  else
 #   define SECONTEXT_FILE(filename)	secontext_full_file(filename, false)
 #  endif
+#  define SECONTEXT_FD(fd)		secontext_full_fd(fd)
 #  define SECONTEXT_PID(pid)		secontext_full_pid(pid)
 
 # else
@@ -53,6 +57,7 @@ void update_secontext_field(const char *file, enum secontext_field field,
 #  else
 #   define SECONTEXT_FILE(filename)	secontext_short_file(filename, false)
 #  endif
+#  define SECONTEXT_FD(fd)		secontext_short_fd(fd)
 #  define SECONTEXT_PID(pid)		secontext_short_pid(pid)
 
 # endif
@@ -64,6 +69,12 @@ get_secontext_field(const char *ctx, enum secontext_field field)
 {
 	return NULL;
 }
+static inline char *
+get_secontext_field_fd(int fd, enum secontext_field field)
+{
+	return NULL;
+}
+
 static inline char *
 get_secontext_field_file(const char *file, enum secontext_field field)
 {
@@ -81,6 +92,7 @@ update_secontext_field(const char *file, enum secontext_field field,
 {
 }
 
+# define SECONTEXT_FD(fd)			xstrdup("")
 # define SECONTEXT_FILE(filename)		xstrdup("")
 # define SECONTEXT_PID(pid)			xstrdup("")
 

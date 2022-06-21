@@ -225,6 +225,10 @@ getrusage	-v
 getsid	-a10
 getsid--pidns-translation	test_pidns -e trace=getsid -a10
 getsockname	-a27
+getsockname--secontext	-a27 --secontext -e trace=getsockname
+getsockname--secontext_full	-a27 --secontext=full -e trace=getsockname
+getsockname--secontext_full_mismatch	-a27 --secontext=full,mismatch -e trace=getsockname
+getsockname--secontext_mismatch	-a27 --secontext=mismatch -e trace=getsockname
 gettid	-a9
 getuid-creds	+getuid.test
 getuid32	+getuid.test

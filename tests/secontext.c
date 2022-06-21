@@ -141,6 +141,21 @@ raw_secontext_full_file(const char *filename)
 	return full_secontext;
 }
 
+static char *
+raw_secontext_full_fd(int fd)
+{
+	int saved_errno = errno;
+	char *full_secontext = NULL;
+	char *secontext;
+
+	if (fgetfilecon(fd, &secontext) >= 0) {
+		full_secontext = strip_trailing_newlines(xstrdup(secontext));
+		freecon(secontext);
+	}
+	errno = saved_errno;
+	return full_secontext;
+}
+
 char *
 get_secontext_field_file(const char *file, enum secontext_field field)
 {
@@ -151,10 +166,26 @@ get_secontext_field_file(const char *file, enum secontext_field field)
 	return type;
 }
 
+char *
+get_secontext_field_fd(int fd, enum secontext_field field)
+{
+	char *ctx = raw_secontext_full_fd(fd);
+	char *type =  get_secontext_field(ctx, field);
+	free(ctx);
+
+	return type;
+}
+
 static char *
 raw_secontext_short_file(const char *filename)
 {
 	return get_secontext_field_file(filename, SECONTEXT_TYPE);
+}
+
+static char *
+raw_secontext_short_fd(int fd)
+{
+	return get_secontext_field_fd(fd, SECONTEXT_TYPE);
 }
 
 static char *
@@ -205,6 +236,15 @@ secontext_full_file(const char *filename, bool mismatch)
 }
 
 char *
+secontext_full_fd(int fd)
+{
+	int saved_errno = errno;
+	char *context = raw_secontext_full_fd(fd);
+	errno = saved_errno;
+	return FORMAT_SPACE_BEFORE(context);
+}
+
+char *
 secontext_full_pid(pid_t pid)
 {
 	return FORMAT_SPACE_AFTER(raw_secontext_full_pid(pid));
@@ -225,6 +265,15 @@ secontext_short_file(const char *filename, bool mismatch)
 		}
 		free(expected);
 	}
+	errno = saved_errno;
+	return FORMAT_SPACE_BEFORE(context);
+}
+
+char *
+secontext_short_fd(int fd)
+{
+	int saved_errno = errno;
+	char *context = raw_secontext_short_fd(fd);
 	errno = saved_errno;
 	return FORMAT_SPACE_BEFORE(context);
 }
