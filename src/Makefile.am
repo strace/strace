@@ -1150,8 +1150,11 @@ libmpers_CFLAGS = $(strace_CFLAGS)
 
 # mpers targets
 
-mpers-m%.stamp: $(srcdir_mpers_source_files) | printers.h
-	for f in $^; do \
+# sys_func.h is an auto-generated file. Make sure it's present before
+# preprocessor is ran against it. Example use:
+#   struct_blk_user_trace_setup.c => syscall.h => sys_func.h (generated)
+mpers-m%.stamp: $(srcdir_mpers_source_files) printers.h sys_func.h
+	for f in $(srcdir_mpers_source_files); do \
 		D="$(D)" \
 		READELF="$(READELF)" \
 		CC="$(mpers_CC)" \
