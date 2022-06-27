@@ -61,7 +61,6 @@ xlat_bsearch_compare(const void *a, const void *b)
 const char *
 xlookup(const struct xlat *x, const uint64_t val)
 {
-	size_t idx = 0;
 	const struct xlat_data *e;
 
 	if (!x || !x->data)
@@ -69,21 +68,18 @@ xlookup(const struct xlat *x, const uint64_t val)
 
 	switch (x->type) {
 	case XT_NORMAL:
-		for (; idx < x->size; idx++)
+		for (size_t idx = 0; idx < x->size; idx++)
 			if (x->data[idx].val == val)
 				return x->data[idx].str;
 		break;
 
 	case XT_SORTED:
 		e = bsearch((const void *) &val,
-			    x->data + idx,
-			    x->size - idx,
+			    x->data, x->size,
 			    sizeof(x->data[0]),
 			    xlat_bsearch_compare);
-		if (e) {
-			idx = e - x->data;
+		if (e)
 			return e->str;
-		}
 		break;
 
 	case XT_INDEXED:
