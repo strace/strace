@@ -108,57 +108,42 @@ qualify_syscall_regex(const char *str, unsigned int p, struct number_set *set)
 }
 
 static bool
-lookup_class(const char *s, unsigned int *v)
-{
-	static const struct {
-		const char *name;
-		unsigned int value;
-	} syscall_class[] = {
-		{ "%desc",	TRACE_DESC	},
-		{ "%file",	TRACE_FILE	},
-		{ "%memory",	TRACE_MEMORY	},
-		{ "%process",	TRACE_PROCESS	},
-		{ "%creds",	TRACE_CREDS	},
-		{ "%signal",	TRACE_SIGNAL	},
-		{ "%ipc",	TRACE_IPC	},
-		{ "%net",	TRACE_NETWORK	},
-		{ "%network",	TRACE_NETWORK	},
-		{ "%stat",	TRACE_STAT	},
-		{ "%lstat",	TRACE_LSTAT	},
-		{ "%fstat",	TRACE_FSTAT	},
-		{ "%%stat",	TRACE_STAT_LIKE	},
-		{ "%statfs",	TRACE_STATFS	},
-		{ "%fstatfs",	TRACE_FSTATFS	},
-		{ "%%statfs",	TRACE_STATFS_LIKE	},
-		{ "%pure",	TRACE_PURE	},
-		{ "%clock",	TRACE_CLOCK	},
-		/* legacy class names */
-		{ "all",	0		},
-		{ "desc",	TRACE_DESC	},
-		{ "file",	TRACE_FILE	},
-		{ "memory",	TRACE_MEMORY	},
-		{ "process",	TRACE_PROCESS	},
-		{ "signal",	TRACE_SIGNAL	},
-		{ "ipc",	TRACE_IPC	},
-		{ "network",	TRACE_NETWORK	},
-	};
-
-	for (unsigned int i = 0; i < ARRAY_SIZE(syscall_class); ++i) {
-		if (strcmp(s, syscall_class[i].name) == 0) {
-			*v = syscall_class[i].value;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-static bool
 qualify_syscall_class(const char *str, unsigned int p, struct number_set *set)
 {
-	unsigned int n;
-	if (!lookup_class(str, &n))
+	static const struct xlat_data syscall_class[] = {
+		{ TRACE_DESC,		"%desc" },
+		{ TRACE_FILE,		"%file" },
+		{ TRACE_MEMORY,		"%memory" },
+		{ TRACE_PROCESS,	"%process" },
+		{ TRACE_CREDS,		"%creds" },
+		{ TRACE_SIGNAL,		"%signal" },
+		{ TRACE_IPC,		"%ipc" },
+		{ TRACE_NETWORK,	"%net" },
+		{ TRACE_NETWORK,	"%network" },
+		{ TRACE_STAT,		"%stat" },
+		{ TRACE_LSTAT,		"%lstat" },
+		{ TRACE_FSTAT,		"%fstat" },
+		{ TRACE_STAT_LIKE,	"%%stat" },
+		{ TRACE_STATFS,		"%statfs" },
+		{ TRACE_FSTATFS,	"%fstatfs" },
+		{ TRACE_STATFS_LIKE,	"%%statfs" },
+		{ TRACE_PURE,		"%pure" },
+		{ TRACE_CLOCK,		"%clock" },
+		/* legacy class names */
+		{ 0,			"all" },
+		{ TRACE_DESC,		"desc" },
+		{ TRACE_FILE,		"file" },
+		{ TRACE_MEMORY,		"memory" },
+		{ TRACE_PROCESS,	"process" },
+		{ TRACE_SIGNAL,		"signal" },
+		{ TRACE_IPC,		"ipc" },
+		{ TRACE_NETWORK,	"network" },
+	};
+	const struct xlat_data *class = find_xlat_val_case(syscall_class, str);
+	if (!class)
 		return false;
+
+	unsigned int n = class->val;
 
 	for (unsigned int i = 0; i < nsyscall_vec[p]; ++i) {
 		if (sysent_vec[p][i].sys_name &&
