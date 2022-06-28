@@ -12,7 +12,7 @@ tips_fmt_opt=""
 
 
 # Check that random tip is random
-"$STRACE" -qqq -enone $tips_fmt_opt ../sleep 0 2> "${OUT}.r0"
+"$STRACE" -qqq -enone --tips $tips_fmt_opt ../sleep 0 2> "${OUT}.r0"
 i=0
 ret=0
 while [ "$i" -lt "$RAND_TIPS" ]; do
