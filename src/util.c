@@ -34,8 +34,8 @@
 #include "xstring.h"
 
 const struct xlat_data *
-find_xlat_val_ex(const struct xlat_data *items, const char *s, size_t num_items,
-		 unsigned int flags)
+find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
+		 const size_t num_items, const unsigned int flags)
 {
 	for (size_t i = 0; i < num_items; i++) {
 		if (!(flags & FXL_CASE_SENSITIVE ? strcmp
