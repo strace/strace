@@ -246,6 +246,14 @@ print_clock_t(uint64_t val)
 		 */
 		char buf[sizeof(uint64_t) * 3 + sizeof("0.0 s")];
 		size_t offs = ilog10(val / clk_tck);
+		/*
+		 * This check is mostly to appease covscan, which thinks
+		 * that offs can go as high as 31 (it cannot), but since
+		 * there is no proper sanity checks against offs overrunning
+		 * buf down the code, it may as well be here.
+		 */
+		if (offs > (sizeof(buf) - sizeof("0.0 s")))
+			return;
 		int ret = snprintf(buf + offs, sizeof(buf) - offs, "%.*f s",
 				   frac_width,
 				   (double) (val % clk_tck) / clk_tck);
