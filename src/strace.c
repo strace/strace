@@ -71,7 +71,7 @@ bool followfork;
 bool output_separately;
 unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
 				 | PTRACE_O_TRACEEXIT;
-static struct xlat_data xflag_str[] = {
+static const struct xlat_data xflag_str[] = {
 	{ HEXSTR_NONE,			"none" },
 	{ HEXSTR_NON_ASCII_CHARS,	"non-ascii-chars" },
 	{ HEXSTR_NON_ASCII,		"non-ascii" },
@@ -117,7 +117,7 @@ enum {
 	DAEMONIZE_OPTS_GUARD__,
 	MAX_DAEMONIZE_OPTS    = DAEMONIZE_OPTS_GUARD__ - 1
 };
-static struct xlat_data daemonize_str[] = {
+static const struct xlat_data daemonize_str[] = {
 	{ DAEMONIZE_GRANDCHILD,		"grandchild" },
 	{ DAEMONIZE_NEW_PGROUP,		"pgroup" },
 	{ DAEMONIZE_NEW_PGROUP,		"pgrp" },
