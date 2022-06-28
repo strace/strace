@@ -373,16 +373,16 @@ print_totd(void)
 			tip_left[MIN(i + 1, ARRAY_SIZE(tip_left) - 1)],
 			w, w, tips_tricks_tweaks[id][i] ?: "",
 			tip_right[MIN(i + 1, ARRAY_SIZE(tip_right) - 1)],
-			strauss[MIN(3 + i, strauss_lines)]);
+			strauss[MIN(3 + i, strauss_lines - 1)]);
 	}
 	fprintf(stderr, "%s%s\n",
-		tip_bottom, strauss[MIN(3 + i, strauss_lines)]);
+		tip_bottom, strauss[MIN(3 + i, strauss_lines - 1)]);
 	do {
 		fprintf(stderr, "%*s%*s%*s%s\n",
 			(int) strlen(tip_left[0]), "",
 			w, "",
 			(int) strlen(tip_right[0]), "",
-			strauss[MIN(4 + i, strauss_lines)]);
+			strauss[MIN(4 + i, strauss_lines - 1)]);
 	} while ((show_tips == TIPS_FULL) && (4 + ++i < strauss_lines));
 
 	printed = true;
