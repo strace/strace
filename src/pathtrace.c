@@ -10,7 +10,11 @@
 #include "defs.h"
 #include <limits.h>
 #include <poll.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
+#include "largefile_wrappers.h"
 #include "number_set.h"
 #include "sen.h"
 #include "xstring.h"
@@ -77,7 +81,7 @@ storepath(const char *path, struct path_set *set)
  * Get path associated with fd of a process with pid.
  */
 int
-getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize)
+getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize, bool *deleted)
 {
 	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 	ssize_t n;
@@ -91,12 +95,50 @@ getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize)
 
 	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
 	n = readlink(linkpath, buf, bufsize - 1);
+	if (n < 0)
+		goto end;
+
 	/*
 	 * NB: if buf is too small, readlink doesn't fail,
 	 * it returns truncated result (IOW: n == bufsize - 1).
 	 */
-	if (n >= 0)
-		buf[n] = '\0';
+	buf[n] = '\0';
+	if (deleted)
+		*deleted = false;
+
+	/*
+	 * Try to figure out if the kernel has appended " (deleted)"
+	 * to the end of a potentially unlinked path and set deleted
+	 * if it is the case.
+	 */
+	static const char del_sfx[] = " (deleted)";
+	if ((size_t) n <= sizeof(del_sfx))
+		goto end;
+
+	char *del = buf + n + 1 - sizeof(del_sfx);
+
+	if (memcmp(del, del_sfx, sizeof(del_sfx)))
+		goto end;
+
+	strace_stat_t st_link;
+	strace_stat_t st_path;
+	int rc = stat_file(linkpath, &st_link);
+
+	if (rc)
+		goto end;
+
+	rc = lstat_file(buf, &st_path);
+
+	if (rc ||
+	    (st_link.st_ino != st_path.st_ino) ||
+	    (st_link.st_dev != st_path.st_dev)) {
+		*del = '\0';
+		n = del - buf + 1;
+		if (deleted)
+			*deleted = true;
+	}
+
+end:
 	return n;
 }
 

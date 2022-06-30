@@ -785,12 +785,13 @@ pathtrace_match(struct tcb *tcp)
 	return pathtrace_match_set(tcp, &global_path_set);
 }
 
-extern int getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize);
+extern int getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize,
+			 bool *deleted);
 
 static inline int
 getfdpath(struct tcb *tcp, int fd, char *buf, unsigned bufsize)
 {
-	return getfdpath_pid(tcp->pid, fd, buf, bufsize);
+	return getfdpath_pid(tcp->pid, fd, buf, bufsize, NULL);
 }
 
 extern unsigned long getfdinode(struct tcb *, int);

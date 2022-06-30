@@ -735,12 +735,15 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 }
 
 static void
-print_quoted_string_in_angle_brackets(const char *str)
+print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 {
 	tprints("<");
 	print_quoted_string_ex(str, strlen(str),
 			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
 	tprints(">");
+
+	if (deleted)
+		tprints("(deleted)");
 }
 
 void
@@ -749,8 +752,9 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 	PRINT_VAL_D(fd);
 
 	char path[PATH_MAX + 1];
+	bool deleted;
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
-	    && getfdpath_pid(pid, fd, path, sizeof(path)) >= 0) {
+	    && getfdpath_pid(pid, fd, path, sizeof(path), &deleted) >= 0) {
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
@@ -761,7 +765,7 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 		    printpidfd(pid, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
-			print_quoted_string_in_angle_brackets(path);
+			print_quoted_string_in_angle_brackets(path, deleted);
 printed:	;
 	}
 

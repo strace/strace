@@ -31,6 +31,7 @@
 #  endif
 #  define fstat_fd fstat64
 #  define strace_stat_t struct stat64
+#  define lstat_file lstat64
 #  define stat_file stat64
 #  define struct_dirent struct dirent64
 #  define read_dir readdir64
@@ -42,6 +43,7 @@
 #  define fcntl_fd fcntl
 #  define fstat_fd fstat
 #  define strace_stat_t struct stat
+#  define lstat_file lstat
 #  define stat_file stat
 #  define struct_dirent struct dirent
 #  define read_dir readdir

@@ -1,6 +1,11 @@
 Noteworthy changes in release ?.?? (????-??-??)
 ===============================================
 
+* Changes in behaviour
+  * The "(deleted)" marker for unlinked paths of file descriptors is now printed
+    outside angle brackets;  the matching of unlinked paths of file descriptors
+    no longer includes the " (deleted)" part into consideration.
+
 * Improvements
   * Implemented printing of Unix socket sun_path field's SELinux context.
 
