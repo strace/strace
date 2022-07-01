@@ -77,20 +77,14 @@ storepath(const char *path, struct path_set *set)
 	set->paths_selected[set->num_selected++] = path;
 }
 
-/*
- * Get path associated with fd of a process with pid.
- */
 int
-getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize, bool *deleted)
+get_proc_pid_fd_path(int proc_pid, int fd, char *buf, unsigned bufsize,
+		     bool *deleted)
 {
 	char linkpath[sizeof("/proc/%u/fd/%u") + 2 * sizeof(int)*3];
 	ssize_t n;
 
 	if (fd < 0)
-		return -1;
-
-	int proc_pid = get_proc_pid(pid);
-	if (!proc_pid)
 		return -1;
 
 	xsprintf(linkpath, "/proc/%u/fd/%u", proc_pid, fd);
@@ -140,6 +134,22 @@ getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize, bool *deleted)
 
 end:
 	return n;
+}
+
+/*
+ * Get path associated with fd of a process with pid.
+ */
+int
+getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize, bool *deleted)
+{
+	if (fd < 0)
+		return -1;
+
+	int proc_pid = get_proc_pid(pid);
+	if (!proc_pid)
+		return -1;
+
+	return get_proc_pid_fd_path(proc_pid, fd, buf, bufsize, deleted);
 }
 
 /*

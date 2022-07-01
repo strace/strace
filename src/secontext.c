@@ -62,7 +62,7 @@ parse_secontext(char *secontext, char **result)
 }
 
 static int
-get_expected_filecontext(const char *path, char **secontext)
+get_expected_filecontext(const char *path, char **secontext, int mode)
 {
 	static struct selabel_handle *hdl;
 
@@ -80,12 +80,7 @@ get_expected_filecontext(const char *path, char **secontext)
 		}
 	}
 
-	strace_stat_t stb;
-	if (stat_file(path, &stb) < 0) {
-		return -1;
-	}
-
-	return selabel_lookup(hdl, secontext, path, stb.st_mode);
+	return selabel_lookup(hdl, secontext, path, mode);
 }
 
 /*
@@ -130,16 +125,22 @@ selinux_getfdcon(pid_t pid, int fd, char **secontext, char **expected)
 
 	/*
 	 * We need to resolve the path, because selabel_lookup() doesn't
-	 * resolve anything.  Using readlink() is sufficient here.
+	 * resolve anything.
 	 */
-
-	char buf[PATH_MAX];
-	ssize_t n = readlink(linkpath, buf, sizeof(buf));
-	if ((size_t) n >= sizeof(buf))
+	char buf[PATH_MAX + 1];
+	ssize_t n = get_proc_pid_fd_path(proc_pid, fd, buf, sizeof(buf), NULL);
+	if ((size_t) n >= (sizeof(buf) - 1))
 		return 0;
-	buf[n] = '\0';
 
-	get_expected_filecontext(buf, expected);
+	/*
+	 * We retrieve stat() here since the path the procfs link resolves into
+	 * may be reused by a different file with different context.
+	 */
+	strace_stat_t st;
+	if (stat_file(linkpath, &st))
+		return 0;
+
+	get_expected_filecontext(buf, expected, st.st_mode);
 
 	return 0;
 }
@@ -190,7 +191,13 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 	if (!resolved)
 		return 0;
 
-	get_expected_filecontext(resolved, expected);
+	strace_stat_t st;
+	if (stat_file(resolved, &st) < 0)
+		goto out;
+
+	get_expected_filecontext(resolved, expected, st.st_mode);
+
+out:
 	free(resolved);
 
 	return 0;

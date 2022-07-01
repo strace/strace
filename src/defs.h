@@ -785,6 +785,21 @@ pathtrace_match(struct tcb *tcp)
 	return pathtrace_match_set(tcp, &global_path_set);
 }
 
+/**
+ * Resolves a path for a fd procfs PID proc_pid (the one got from
+ * get_proc_pid()).
+ *
+ * @param proc_pid PID number in /proc, obtained with get_proc_pid().
+ * @param fd       FD to resolve path for.
+ * @param buf      Buffer to store the resolved path in.
+ * @param bufsize  The size of buf.
+ * @param deleted  If non-NULL, set to true if the path associated with the FD
+ *                 seems to have been unlinked and to false otherwise.
+ * @return         Number of bytes written including terminating '\0'.
+ */
+extern int get_proc_pid_fd_path(int proc_pid, int fd, char *buf,
+				unsigned bufsize, bool *deleted);
+
 extern int getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize,
 			 bool *deleted);
 
