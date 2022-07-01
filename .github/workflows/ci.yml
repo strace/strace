@@ -15,7 +15,7 @@ jobs:
       run: git diff-index --check --cached 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 
   coverage: # the longest of all build jobs
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       CHECK: coverage
       CC: gcc
