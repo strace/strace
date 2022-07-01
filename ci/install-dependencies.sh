@@ -150,3 +150,5 @@ case "${CHECK-}" in
 		apt_get_install valgrind
 		;;
 esac
+
+[ -c /dev/kvm ] && $sudo chmod 666 /dev/kvm ||:
