@@ -3,7 +3,14 @@ Name: strace
 Version: @PACKAGE_VERSION@
 Release: 1%{?dist}
 # The test suite is GPLv2+, all the rest is LGPLv2.1+.
+%if 0%{?fedora} >= 35 || 0%{?centos} >= 9 || 0%{?rhel} >= 9
+# Some distros are special and have decided that they do not recognise
+# the existence of deprecated forms of SPDX license identifiers,
+# so they complain about them being "Unapproved".
+License: LGPL-2.1-or-later and GPL-2.0-or-later
+%else
 License: LGPL-2.1+ and GPL-2.0+
+%endif
 # Some distros require Group tag to be present,
 # some require Group tag to be absent,
 # some do not care about Group tag at all,
