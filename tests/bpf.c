@@ -1557,6 +1557,8 @@ init_BPF_LINK_CREATE_attr7(struct bpf_attr_check *check, size_t idx)
 {
 	struct BPF_LINK_CREATE_struct *attr = &check->data.BPF_LINK_CREATE_data;
 
+	close(iter_info_data[1]);
+
 	if (!iter_info_data_p) {
 		iter_info_data_p = tail_memdup(iter_info_data,
 					       sizeof(iter_info_data));
