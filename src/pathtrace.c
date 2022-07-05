@@ -28,7 +28,7 @@ static bool
 pathmatch(const char *path, struct path_set *set)
 {
 	for (unsigned int i = 0; i < set->num_selected; ++i) {
-		if (strcmp(path, set->paths_selected[i]) == 0)
+		if (strcmp(path, set->paths_selected[i].path) == 0)
 			return true;
 	}
 	return false;
@@ -74,7 +74,7 @@ storepath(const char *path, struct path_set *set)
 			xgrowarray(set->paths_selected, &set->size,
 				   sizeof(set->paths_selected[0]));
 
-	set->paths_selected[set->num_selected++] = path;
+	set->paths_selected[set->num_selected++].path = path;
 }
 
 int

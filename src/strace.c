@@ -2130,6 +2130,24 @@ increase_version_verbosity(void)
 		version_verbosity++;
 }
 
+struct pathtrace {
+	struct path_set_item *paths;
+	size_t size;
+	size_t count;
+};
+
+static void
+add_path_trace(struct pathtrace *pt, const char *path)
+{
+	if (pt->count >= pt->size) {
+		pt->paths = xgrowarray(pt->paths, &pt->size,
+				       sizeof(pt->paths[0]));
+	}
+
+	pt->paths[pt->count].path = path;
+	pt->count++;
+}
+
 /*
  * Initialization part of main() was eating much stack (~0.5k),
  * which was unused after init.
@@ -2171,9 +2189,7 @@ init(int argc, char *argv[])
 	 * after the successful backend initialisation, iterate over it
 	 * in order to add them to global_path_set.
 	 */
-	const char **pathtrace_paths = NULL;
-	size_t pathtrace_size = 0;
-	size_t pathtrace_count = 0;
+	struct pathtrace pathtrace = { NULL };
 
 	/**
 	 * Storage for environment changes requested for command.  They
@@ -2419,12 +2435,7 @@ init(int argc, char *argv[])
 			process_opt_p_list(optarg);
 			break;
 		case 'P':
-			if (pathtrace_count >= pathtrace_size)
-				pathtrace_paths = xgrowarray(pathtrace_paths,
-					&pathtrace_size,
-					sizeof(pathtrace_paths[0]));
-
-			pathtrace_paths[pathtrace_count++] = optarg;
+			add_path_trace(&pathtrace, optarg);
 			break;
 		case 'q':
 			qflag_short++;
@@ -2757,9 +2768,9 @@ init(int argc, char *argv[])
 			  "take effect. "
 			  "See status qualifier for more complex filters.");
 
-	for (size_t cnt = 0; cnt < pathtrace_count; ++cnt)
-		pathtrace_select(pathtrace_paths[cnt]);
-	free(pathtrace_paths);
+	for (size_t cnt = 0; cnt < pathtrace.count; ++cnt)
+		pathtrace_select(pathtrace.paths[cnt].path);
+	free(pathtrace.paths);
 
 	acolumn_spaces = xmalloc(acolumn + 1);
 	memset(acolumn_spaces, ' ', acolumn);

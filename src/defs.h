@@ -513,9 +513,13 @@ extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
 
+struct path_set_item {
+	const char *path;
+};
+
 /* are we filtering traces based on paths? */
 extern struct path_set {
-	const char **paths_selected;
+	struct path_set_item *paths_selected;
 	size_t num_selected;
 	size_t size;
 } global_path_set;
@@ -770,6 +774,7 @@ extern long getrval2(struct tcb *);
 
 extern const char *signame(const int);
 extern const char *sprintsigname(const int);
+
 extern void pathtrace_select_set(const char *, struct path_set *);
 extern bool pathtrace_match_set(struct tcb *, struct path_set *);
 
