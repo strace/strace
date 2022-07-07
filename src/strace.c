@@ -280,11 +280,13 @@ usage(void)
 	printf("\
 Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]...\n\
               [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-O OVERHEAD]\n\
-              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n"\
+              [-S SORTBY] [-P PATH]... [-H PATH_FILTER]... [-p PID]...\n\
+	      [-U COLUMNS] [--seccomp-bpf]\n"\
               SECONTEXT_OPT "\
               { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
    or: strace -c[dfwzZ] [-I N] [-b execve] [-e EXPR]... [-O OVERHEAD]\n\
-              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
+              [-S SORTBY] [-P PATH]... [-H PATH_FILTER] [-p PID]...\n\
+	      [-U COLUMNS] [--seccomp-bpf]\n\
               { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
 \n\
 General:\n\
@@ -335,6 +337,13 @@ Filtering:\n\
   -e status=SET, --status=SET\n\
                  print only system calls with the return statuses in SET\n\
      statuses:   successful, failed, unfinished, unavailable, detached\n\
+  -H [QUALIFIER:]...PATH_STR, --path-filter=[QUALIFIER:]...PATH_STR\n\
+                 specify a path filter entry\n\
+     qualifiers: path-str, pathstr (PATH_STR is used as a string),\n\
+                 fd-deleted (fd is unlinked from PATH_STR),\n\
+                 fd-not-deleted (fd that is linked to PATH_STR)\n\
+     path_str:   string with \\\\. \\:, \\a, \\b, \\f, \\n, \\r, \\t, \\v, \\0nnn, \\xnn\n\
+                 escape sequences.\n\
   -P PATH, --trace-path=PATH\n\
                  trace accesses to PATH\n\
   -z, --successful-only\n\
@@ -2137,7 +2146,8 @@ struct pathtrace {
 };
 
 static void
-add_path_trace(struct pathtrace *pt, const char *path)
+add_path_trace(struct pathtrace *pt, const char *path,
+	       enum path_trace_flags flags)
 {
 	if (pt->count >= pt->size) {
 		pt->paths = xgrowarray(pt->paths, &pt->size,
@@ -2145,7 +2155,72 @@ add_path_trace(struct pathtrace *pt, const char *path)
 	}
 
 	pt->paths[pt->count].path = path;
+	pt->paths[pt->count].flags = flags;
 	pt->count++;
+}
+
+/* Checks if a string is equal to some expected string literal */
+#define CHECK_STR(str_, chk_, sz_) \
+	(!strnncmp((str_), (chk_), (sz_), sizeof(chk_) - 1))
+
+static void
+parse_path_filter_arg(struct pathtrace *pt, char *optarg)
+{
+	char *arg = optarg;
+	enum path_trace_flags flags = 0;
+
+	while (true) {
+		char *search_arg = arg;
+		char *pos;
+		while ((pos = strchr(search_arg, ':'))) {
+			if ((pos > search_arg) && (pos[-1] == '\\')) {
+				search_arg = pos + 1;
+				continue;
+			}
+			break;
+		}
+
+		if (!pos)
+			break;
+
+		pos += 1;
+
+		if (CHECK_STR(arg, "pathstr:", pos - arg)) {
+			flags |= PTF_PATH_STR;
+		} else if (CHECK_STR(arg, "path-str:", pos - arg)) {
+			flags |= PTF_PATH_STR;
+		} else if (CHECK_STR(arg, "fd-deleted:", pos - arg)) {
+			flags |= PTF_FD_DELETED;
+		} else if (CHECK_STR(arg, "fd-not-deleted:", pos - arg)) {
+			flags |= PTF_FD_NOT_DELETED;
+		} else {
+			error_msg_and_die("invalid path trace filter qualifier:"
+					  " '%*s'", (int) (pos - arg), arg);
+		}
+
+		arg = pos;
+	}
+
+	unsigned int argsz;
+	size_t arglen = strlen(arg);
+	int ret = string_unescape(arg, arg, arglen, ":", &argsz);
+
+	if (ret == INT_MIN) {
+		error_msg_and_die("path trace filter argument is too big"
+				  " (size is %zu)", arglen);
+	} else if (ret < 0) {
+		error_msg_and_die("invalid escaping: \\%c at position %d",
+				  arg[-ret], -ret);
+	}
+
+	arglen = strlen(arg);
+	if (arglen < argsz) {
+		error_msg_and_die("embedded '\\0' in the path trace filter"
+				  " argument (length %zu < size %u)",
+				  arglen, argsz);
+	}
+
+	add_path_trace(pt, arg, flags);
 }
 
 /*
@@ -2234,7 +2309,7 @@ init(int argc, char *argv[])
 #endif
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
+		"+a:Ab:cCdDe:E:fFhH:iI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2277,6 +2352,7 @@ init(int argc, char *argv[])
 		{ "output-separately",	no_argument,	   0,
 			GETOPT_OUTPUT_SEPARATELY },
 		{ "help",		no_argument,	   0, 'h' },
+		{ "path-filter",	required_argument, 0, 'H' },
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
@@ -2404,6 +2480,9 @@ init(int argc, char *argv[])
 		case 'h':
 			usage();
 			break;
+		case 'H':
+			parse_path_filter_arg(&pathtrace, optarg);
+			break;
 		case 'i':
 			iflag = 1;
 			break;
@@ -2435,7 +2514,7 @@ init(int argc, char *argv[])
 			process_opt_p_list(optarg);
 			break;
 		case 'P':
-			add_path_trace(&pathtrace, optarg);
+			add_path_trace(&pathtrace, optarg, 0);
 			break;
 		case 'q':
 			qflag_short++;
@@ -2768,8 +2847,10 @@ init(int argc, char *argv[])
 			  "take effect. "
 			  "See status qualifier for more complex filters.");
 
-	for (size_t cnt = 0; cnt < pathtrace.count; ++cnt)
-		pathtrace_select(pathtrace.paths[cnt].path);
+	for (size_t cnt = 0; cnt < pathtrace.count; ++cnt) {
+		pathtrace_select(pathtrace.paths[cnt].path,
+				 pathtrace.paths[cnt].flags);
+	}
 	free(pathtrace.paths);
 
 	acolumn_spaces = xmalloc(acolumn + 1);

@@ -21,14 +21,19 @@
 
 struct path_set global_path_set;
 
+enum { PTF_DELETED_MASK = PTF_PATH_STR | PTF_FD_DELETED | PTF_FD_NOT_DELETED };
+
 /*
  * Return true if specified path matches one that we're tracing.
  */
 static bool
-pathmatch(const char *path, struct path_set *set)
+pathmatch(const char *path, struct path_set *set, enum path_trace_flags flags)
 {
 	for (unsigned int i = 0; i < set->num_selected; ++i) {
-		if (strcmp(path, set->paths_selected[i].path) == 0)
+		if (strcmp(path, set->paths_selected[i].path))
+			continue;
+
+		if (flags & set->paths_selected[i].flags & PTF_DELETED_MASK)
 			return true;
 	}
 	return false;
@@ -44,7 +49,7 @@ upathmatch(struct tcb *const tcp, const kernel_ulong_t upath,
 	char path[PATH_MAX + 1];
 
 	return umovestr(tcp, upath, sizeof(path), path) > 0 &&
-		pathmatch(path, set);
+		pathmatch(path, set, PTF_PATH_STR);
 }
 
 /*
@@ -54,9 +59,12 @@ static bool
 fdmatch(struct tcb *tcp, int fd, struct path_set *set)
 {
 	char path[PATH_MAX + 1];
-	int n = getfdpath(tcp, fd, path, sizeof(path));
+	bool deleted;
+	int n = getfdpath_pid(tcp->pid, fd, path, sizeof(path), &deleted);
 
-	return n >= 0 && pathmatch(path, set);
+	return n >= 0 && pathmatch(path, set,
+				   deleted ? PTF_FD_DELETED
+					   : PTF_FD_NOT_DELETED);
 }
 
 /*
@@ -64,17 +72,19 @@ fdmatch(struct tcb *tcp, int fd, struct path_set *set)
  * Specifying NULL will delete all paths.
  */
 static void
-storepath(const char *path, struct path_set *set)
+storepath(const char *path, enum path_trace_flags flags, struct path_set *set)
 {
-	if (pathmatch(path, set))
-		return; /* already in table */
+	debug_func_msg("adding '%s' with flags %#x", path, flags);
 
 	if (set->num_selected >= set->size)
 		set->paths_selected =
 			xgrowarray(set->paths_selected, &set->size,
 				   sizeof(set->paths_selected[0]));
 
-	set->paths_selected[set->num_selected++].path = path;
+	set->paths_selected[set->num_selected].path = path;
+	set->paths_selected[set->num_selected].flags =
+		flags | (!(flags & PTF_DELETED_MASK) ? PTF_DELETED_MASK : 0);
+	set->num_selected++;
 }
 
 int
@@ -157,11 +167,12 @@ getfdpath_pid(pid_t pid, int fd, char *buf, unsigned bufsize, bool *deleted)
  * version of the path.  Specifying NULL will delete all paths.
  */
 void
-pathtrace_select_set(const char *path, struct path_set *set)
+pathtrace_select_set(const char *path, enum path_trace_flags flags,
+		     struct path_set *set)
 {
 	char *rpath;
 
-	storepath(path, set);
+	storepath(path, flags, set);
 
 	rpath = realpath(path, NULL);
 
@@ -189,7 +200,7 @@ pathtrace_select_set(const char *path, struct path_set *set)
 		free(path_quoted);
 		free(rpath_quoted);
 	}
-	storepath(rpath, set);
+	storepath(rpath, flags, set);
 }
 
 static bool

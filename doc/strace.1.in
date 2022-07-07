@@ -51,6 +51,7 @@ strace \- trace system calls and signals
 .OP \-s strsize
 .OP \-X format
 .OM \-P path
+.OM \-H path_filter
 .OM \-p pid
 .OP \-\-seccomp\-bpf
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
@@ -73,6 +74,7 @@ strace \- trace system calls and signals
 .OP \-S sortby
 .OP \-U columns
 .OM \-P path
+.OM \-H path_filter
 .OM \-p pid
 .OP \-\-seccomp\-bpf
 .BR "" {
@@ -717,11 +719,107 @@ Trace system calls that returned but strace failed to fetch the error status.
 Trace system calls for which strace detached before the return.
 .RE
 .TP
+.BR "\-H " [ \fIqualifier\fR\fB:\fR ]... \fIpath_filter\fR
+.TQ
+.BR "\-\-path\-filter " [ \fIqualifier\fR\fB:\fR ]... \fIpath_filter\fR
+Add a path tracing filter entry.
+It restricts the printing of the trace only to syscalls that operate
+on file paths and/or descriptors
+(that is, the syscalls that are included in either
+.BR %file ", " %desc ", or " %network
+syscall tracing class)
+and conform to at least one of the supplied path tracing specifications.
+The set of qualifiers at the beginning of the filter specification affect
+the way a certain path tracing filter specification entry is applied:
+.RS
+.TP 19
+.BR path\-str ", " pathstr
+Match the syscalls that use the string provided in
+.I path_filter
+as a path string.
+.TQ
+.BR fd\-deleted
+Match the syscalls that operate on the file descriptor that is associated
+with path provided in
+.I path_filter
+and the path
+.I is
+unlinked from the file descriptor.
+.TQ
+.BR fd\-not\-deleted
+Match the syscalls that operate on the file descriptor that is associated
+with path provided in
+.I path_filter
+and the path
+.I is not
+unlinked from the file descriptor.
+.RE
+.IP
+If neither of
+.BR pathstr ", " fd-deleted ", or " fd-not-deleted
+qualifiers has been provided, all three are assumed.
+.IP
+.I path_filter
+is a byte string in which the following escape sequences are recognised:
+.RS
+.TP 4
+.B \e\e
+Backslash (ASCII code 92).
+.TQ
+.B \e:
+Colon (ASCII code 58).
+.TQ
+.B \ea
+Alert (ASCII code 7).
+.TQ
+.B \eb
+Backspace (ASCII code 8).
+.TQ
+.B \ef
+Form feed (ASCII code 12).
+.TQ
+.B \en
+New line (ASCII code 10).
+.TQ
+.B \er
+Carriage return (ASCII code 13).
+.TQ
+.B \et
+Horizontal tab (ASCII code 9).
+.TQ
+.B \ev
+Vertical tab (ASCII code 11).
+.TQ
+.BR \e0 ", " \e0\fIn\fR ", " \e0\fInn\fR ", or " \e0\fInnn\fR
+Byte with octal value
+.IR nnn .
+The sequence ends after specification of three digits
+or on the first character that is not an octal digit.
+.TQ
+.BR \ex ", " \ex\fIn\fR ", or " \ex\fInn\fR
+Byte with hexadecimal value
+.IR nn .
+The sequence ends after specification of two digits
+or on the first character that is not an hexadecimal digit.
+.RE
+.IP
+It is advisable to enquote the
+.I path_filter
+string in single quotes in the shell invocations
+to avoid the need of double escaping.
+.IP
+Multiple
+.B \-H
+options can be used to specify multiple path tracing filter entries.
+.TP
 .BI "\-P " path
 .TQ
 .BR "\-\-trace\-path" = \fIpath\fR
 Trace only system calls accessing
-.IR path .
+.I path
+(equivalent to
+.BR \-H escape( \fIpath\fI ),
+where escape() escapes all non-printable characters and ":").
 Multiple
 .B \-P
 options can be used to specify several paths.
@@ -863,8 +961,8 @@ Suppress messages about process exits
 .TQ
 .B path-resolution
 Suppress messages about resolution of paths provided via the
-.B \-P
-option
+.BR \-P and \-H
+options
 .RB (\[dq] "Requested path \[dq]...\[dq] resolved into \[dq]...\[dq]" \[dq]).
 .TQ
 .B personality

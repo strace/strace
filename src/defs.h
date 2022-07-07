@@ -514,8 +514,21 @@ extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
 
+enum path_trace_flag_bits {
+	PTF_PATH_STR_BIT,
+	PTF_FD_NOT_DELETED_BIT,
+	PTF_FD_DELETED_BIT,
+};
+
+enum path_trace_flags {
+	FLAG(PTF_PATH_STR),
+	FLAG(PTF_FD_NOT_DELETED),
+	FLAG(PTF_FD_DELETED),
+};
+
 struct path_set_item {
 	const char *path;
+	enum path_trace_flags flags;
 };
 
 /* are we filtering traces based on paths? */
@@ -776,13 +789,14 @@ extern long getrval2(struct tcb *);
 extern const char *signame(const int);
 extern const char *sprintsigname(const int);
 
-extern void pathtrace_select_set(const char *, struct path_set *);
+extern void pathtrace_select_set(const char *, enum path_trace_flags flags,
+				 struct path_set *);
 extern bool pathtrace_match_set(struct tcb *, struct path_set *);
 
 static inline void
-pathtrace_select(const char *path)
+pathtrace_select(const char *path, enum path_trace_flags flags)
 {
-	return pathtrace_select_set(path, &global_path_set);
+	return pathtrace_select_set(path, flags, &global_path_set);
 }
 
 static inline bool
@@ -845,6 +859,43 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
 
 # define STR_STRIP_PREFIX(str, prefix)	\
 	str_strip_prefix_len((str), (prefix), sizeof(prefix) - 1)
+
+/**
+ * Compare two strings of a known maximum size.
+ */
+extern int strnncmp(const char *s1, const char *s2, size_t n1, size_t n2);
+
+/**
+ * Un-escapes a string that is escaped using the following rules:
+ *  * A backslash followed by '\', 'a', 'b', 'f', 'n', 'r', 't', 'v',
+ *    is translated into '\', '\a', '\b', '\f', '\n', '\r', '\t', '\v'.
+ *  * \0, \0n, \0nn, or \0nnn (up to the first character that is not 0-7)
+ *    is translated into a byte with octal code 0nnn.
+ *  * \x, \xn, or \xnn (up to the first character that is not in 0-9,A-F,a-f)
+ *    is translated into a byte with hexadecimal code 0xnn (this deviates
+ *    from the C standard that allows unlimited number of digits in the \x
+ *    escaping notation).
+ *  * A backslash followed by a character from escape_chars is translated
+ *    into the character.
+ *  * Any other character or end-of-string are considered an error.
+ *
+ * instr and outstr can point at the same memory, as un-escaping only shrinks
+ * the string and doesn't perform any lookback.
+ *
+ * instr parsing terminates after an \0 or reaching instr+size;
+ * \0 is appended to outstr unless there's no room.
+ *
+ * @return Returns one of the following:
+ *         * 0 - everything has been been processed.
+ *         * positive number NUM - finished early (\0 occurred in instr)
+ *                                 at position NUM.
+ *         * negative number NUM - incorrect escaped character at position NUM.
+ *         * INT_MIN - size is too big (larger than INT_MAX or wraps around
+ *                     the instr).
+ */
+extern int string_unescape(const char *instr, char *outstr,
+			   const unsigned int size, const char *escape_chars,
+			   unsigned int *outsize);
 
 /** String is '\0'-terminated. */
 # define QUOTE_0_TERMINATED			0x01

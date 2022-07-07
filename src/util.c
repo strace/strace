@@ -838,6 +838,116 @@ proc_status_get_id_list(int proc_pid, int *id_buf, size_t id_buf_size,
 	return n;
 }
 
+int
+strnncmp(const char *s1, const char *s2, size_t n1, size_t n2)
+{
+	size_t n = MIN(n1, n2);
+
+	int ret = strncmp(s1, s2, n);
+	if (ret)
+		return ret;
+
+	if ((n2 == n1) || (n2 < n1 && !s1[n2]) || (n2 > n1 && !s2[n1]))
+		return 0;
+
+	return n1 < n2 ? -256 : 256;
+}
+
+int
+string_unescape(const char *instr, char *outstr, const unsigned int size,
+		const char *escape_chars, unsigned int *outsize)
+{
+	const char *inpos = instr;
+	char *outpos = outstr;
+	enum {
+		NORMAL,
+		ESC,
+		ESC_OCT,
+		ESC_HEX,
+	} state = NORMAL;
+	size_t cnt = 0;
+	size_t val = 0;
+
+	if ((size > INT_MAX) || ((uintptr_t) instr + size < (uintptr_t) instr))
+		return INT_MIN;
+
+	while (inpos < instr + size) {
+		switch (state) {
+		case NORMAL:
+			if (!*inpos)
+				goto out;
+			if (*inpos == '\\') {
+				state = ESC;
+				break;
+			}
+
+			*outpos++ = *inpos;
+			break;
+
+		case ESC:
+			switch (*inpos) {
+			case '\\': *outpos++ = '\\'; break;
+			case 'a': *outpos++ = '\a'; break;
+			case 'b': *outpos++ = '\b'; break;
+			case 'f': *outpos++ = '\f'; break;
+			case 'n': *outpos++ = '\n'; break;
+			case 'r': *outpos++ = '\r'; break;
+			case 't': *outpos++ = '\t'; break;
+			case 'v': *outpos++ = '\v'; break;
+			case '0': state = ESC_OCT; cnt = val = 0; break;
+			case 'x': state = ESC_HEX; cnt = val = 0; break;
+			default:
+				if (strchr(escape_chars, *inpos))
+					*outpos++ = *inpos;
+				else
+					return -(inpos - instr);
+			}
+			break;
+
+		case ESC_OCT:
+			if (cnt >= 3 || *inpos < '0' || *inpos > '7') {
+				*outpos++ = val;
+				state = NORMAL;
+				inpos -= 1;
+				break;
+			}
+			val = val * 8 + (*inpos - '0');
+			cnt++;
+			break;
+
+		case ESC_HEX:
+			if (cnt >= 2 || !is_hex(*inpos))
+				state = NORMAL;
+			else if (*inpos >= '0' && *inpos <= '9')
+				val = val * 16 + (*inpos - '0');
+			else if (*inpos >= 'A' && *inpos <= 'F')
+				val = val * 16 + (*inpos + 10 - 'A');
+			else if (*inpos >= 'a' && *inpos <= 'f')
+				val = val * 16 + (*inpos + 10 - 'a');
+			else
+				state = NORMAL;
+
+			if (state == NORMAL) {
+				*outpos++ = val;
+				inpos -= 1;
+			} else {
+				cnt++;
+			}
+
+			break;
+		}
+
+		inpos += 1;
+	}
+out:
+	if (outpos - outstr < size)
+		*outpos = '\0';
+	if (outsize)
+		*outsize = outpos - outstr;
+
+	return inpos - instr < size ? inpos - instr : 0;
+}
+
 /*
  * Quote string `instr' of length `size'
  * Write up to (3 + `size' * 4) bytes to `outstr' buffer.

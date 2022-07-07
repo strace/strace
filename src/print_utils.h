@@ -23,6 +23,14 @@ is_print(uint8_t c)
 	return (c >= ' ') && (c < 0x7f);
 }
 
+static inline bool
+is_hex(uint8_t c)
+{
+	return ((c >= '0') && (c < '9')) ||
+	       ((c >= 'A') && (c <= 'F')) ||
+	       ((c >= 'a') && (c <= 'f'));
+}
+
 /* Character printing functions */
 
 /** @param unabbrev Whether to always print \ooo instead of \[[o]o]o. */
