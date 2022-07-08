@@ -8,6 +8,7 @@
  */
 
 #include "defs.h"
+#include <fnmatch.h>
 #include <limits.h>
 #include <poll.h>
 #include <sys/stat.h>
@@ -30,8 +31,16 @@ static bool
 pathmatch(const char *path, struct path_set *set, enum path_trace_flags flags)
 {
 	for (unsigned int i = 0; i < set->num_selected; ++i) {
-		if (strcmp(path, set->paths_selected[i].path))
-			continue;
+		enum path_trace_flags type =
+			ptf_type(set->paths_selected[i].flags);
+		if (type == PTF_TYPE_STR) {
+			if (strcmp(path, set->paths_selected[i].path))
+				continue;
+		} else if (type == PTF_TYPE_GLOB) {
+			if (fnmatch(set->paths_selected[i].path, path,
+				    set->paths_selected[i].fnmatch_flags))
+				continue;
+		}
 
 		if (flags & set->paths_selected[i].flags & PTF_DELETED_MASK)
 			return true;
@@ -81,9 +90,24 @@ storepath(const char *path, enum path_trace_flags flags, struct path_set *set)
 			xgrowarray(set->paths_selected, &set->size,
 				   sizeof(set->paths_selected[0]));
 
+	if (!(flags & PTF_DELETED_MASK))
+		flags |= PTF_DELETED_MASK;
+	if (!ptf_type(flags))
+		flags |= PTF_TYPE_STR;
+
+	if (ptf_type(flags) == PTF_TYPE_GLOB) {
+		int fnmf = 0;
+
+		if (!(flags & PTF_GLOB_PATH))
+			fnmf |= FNM_PATHNAME;
+		if (!(flags & PTF_GLOB_ALL))
+			fnmf |= FNM_PERIOD;
+
+		set->paths_selected[set->num_selected].fnmatch_flags = fnmf;
+	}
+
 	set->paths_selected[set->num_selected].path = path;
-	set->paths_selected[set->num_selected].flags =
-		flags | (!(flags & PTF_DELETED_MASK) ? PTF_DELETED_MASK : 0);
+	set->paths_selected[set->num_selected].flags = flags;
 	set->num_selected++;
 }
 

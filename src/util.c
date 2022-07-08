@@ -855,8 +855,10 @@ strnncmp(const char *s1, const char *s2, size_t n1, size_t n2)
 
 int
 string_unescape(const char *instr, char *outstr, const unsigned int size,
+		const enum string_unescape_style style,
 		const char *escape_chars, unsigned int *outsize)
 {
+	enum { UNINT_CHAR = 256 };
 	const char *inpos = instr;
 	char *outpos = outstr;
 	enum {
@@ -867,6 +869,7 @@ string_unescape(const char *instr, char *outstr, const unsigned int size,
 	} state = NORMAL;
 	size_t cnt = 0;
 	size_t val = 0;
+	uint16_t outchr;
 
 	if ((size > INT_MAX) || ((uintptr_t) instr + size < (uintptr_t) instr))
 		return INT_MIN;
@@ -885,27 +888,38 @@ string_unescape(const char *instr, char *outstr, const unsigned int size,
 			break;
 
 		case ESC:
+			outchr = UNINT_CHAR;
 			switch (*inpos) {
-			case '\\': *outpos++ = '\\'; break;
-			case 'a': *outpos++ = '\a'; break;
-			case 'b': *outpos++ = '\b'; break;
-			case 'f': *outpos++ = '\f'; break;
-			case 'n': *outpos++ = '\n'; break;
-			case 'r': *outpos++ = '\r'; break;
-			case 't': *outpos++ = '\t'; break;
-			case 'v': *outpos++ = '\v'; break;
+			case '\\': outchr = '\\'; break;
+			case 'a': outchr = '\a'; break;
+			case 'b': outchr = '\b'; break;
+			case 'f': outchr = '\f'; break;
+			case 'n': outchr = '\n'; break;
+			case 'r': outchr = '\r'; break;
+			case 't': outchr = '\t'; break;
+			case 'v': outchr = '\v'; break;
 			case '0': state = ESC_OCT; cnt = val = 0; break;
 			case 'x': state = ESC_HEX; cnt = val = 0; break;
 			default:
-				if (strchr(escape_chars, *inpos))
-					*outpos++ = *inpos;
+				if ((style == SUE_GLOB) ||
+				    strchr(escape_chars, *inpos))
+					outchr = *inpos;
 				else
 					return -(inpos - instr);
 			}
+
+			if (outchr != UNINT_CHAR) {
+				if (style == SUE_GLOB)
+					*outpos++ = '\\';
+				*outpos++ = outchr;
+			}
+
 			break;
 
 		case ESC_OCT:
 			if (cnt >= 3 || *inpos < '0' || *inpos > '7') {
+				if (style == SUE_GLOB)
+					*outpos++ = '\\';
 				*outpos++ = val;
 				state = NORMAL;
 				inpos -= 1;
@@ -928,6 +942,8 @@ string_unescape(const char *instr, char *outstr, const unsigned int size,
 				state = NORMAL;
 
 			if (state == NORMAL) {
+				if (style == SUE_GLOB)
+					*outpos++ = '\\';
 				*outpos++ = val;
 				inpos -= 1;
 			} else {
@@ -940,12 +956,12 @@ string_unescape(const char *instr, char *outstr, const unsigned int size,
 		inpos += 1;
 	}
 out:
-	if (outpos - outstr < size)
+	if ((size_t) (outpos - outstr) < size)
 		*outpos = '\0';
 	if (outsize)
 		*outsize = outpos - outstr;
 
-	return inpos - instr < size ? inpos - instr : 0;
+	return (size_t) (inpos - instr) < size ? inpos - instr : 0;
 }
 
 /*

@@ -514,21 +514,41 @@ extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
 
+enum {
+	PTF_TYPE_BITS = 2,
+	PTF_TYPE_MASK = MASK32(PTF_TYPE_BITS),
+};
+
+#define ptf_type(flags_) ((flags_) & PTF_TYPE_MASK)
+
 enum path_trace_flag_bits {
-	PTF_PATH_STR_BIT,
+	PTF_PATH_STR_BIT = PTF_TYPE_BITS,
 	PTF_FD_NOT_DELETED_BIT,
 	PTF_FD_DELETED_BIT,
+
+	PTF_GLOB_PATH_BIT,
+	PTF_GLOB_ALL_BIT,
 };
 
 enum path_trace_flags {
+	/* filter types */
+	PTF_TYPE_STR = 1,
+	PTF_TYPE_GLOB,
+
+	/* filter options */
 	FLAG(PTF_PATH_STR),
 	FLAG(PTF_FD_NOT_DELETED),
 	FLAG(PTF_FD_DELETED),
+
+	/* glob options */
+	FLAG(PTF_GLOB_PATH),
+	FLAG(PTF_GLOB_ALL),
 };
 
 struct path_set_item {
 	const char *path;
 	enum path_trace_flags flags;
+	int fnmatch_flags;
 };
 
 /* are we filtering traces based on paths? */
@@ -865,6 +885,11 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
  */
 extern int strnncmp(const char *s1, const char *s2, size_t n1, size_t n2);
 
+enum string_unescape_style {
+	SUE_LITERAL,
+	SUE_GLOB,
+};
+
 /**
  * Un-escapes a string that is escaped using the following rules:
  *  * A backslash followed by '\', 'a', 'b', 'f', 'n', 'r', 't', 'v',
@@ -894,8 +919,9 @@ extern int strnncmp(const char *s1, const char *s2, size_t n1, size_t n2);
  *                     the instr).
  */
 extern int string_unescape(const char *instr, char *outstr,
-			   const unsigned int size, const char *escape_chars,
-			   unsigned int *outsize);
+			   const unsigned int size,
+			   const enum string_unescape_style,
+			   const char *escape_chars, unsigned int *outsize);
 
 /** String is '\0'-terminated. */
 # define QUOTE_0_TERMINATED			0x01

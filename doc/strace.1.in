@@ -753,11 +753,57 @@ with path provided in
 and the path
 .I is not
 unlinked from the file descriptor.
+.TQ
+.BR str
+Indicates that
+.I path_filter
+is supposed to be interpreted as a literal string.
+.TQ
+.BR glob
+Indicates that
+.I path_filter
+is supposed to be interpreted as a wildcard pattern
+(as defined in
+.BR glob (7)
+manual page).
+.TQ
+.BR glob\-path
+Indicates that
+.I path_filter
+is supposed to be interpreted as a wildcard pattern
+with wildcards matching parts of the path and not only file name
+(see the description of
+.B FNM_PATHNAME
+flag in the
+.BR fnmatch (3)
+manual page).
+.TQ
+.BR glob\-all
+Indicates that
+.I path_filter
+is supposed to be interpreted as a wildcard pattern
+with wildcards matching the leading dots of the file names
+(see the description of
+.B FNM_PERIOD
+flag in the
+.BR fnmatch (3)
+manual page).
+.TQ
+.BR glob\-all\-path ", " glob\-path\-all
+Indicates that
+.I path_filter
+is supposed to be interpreted as a wildcard pattern
+with wildcards matching parts of the path and the leading dots.
 .RE
 .IP
 If neither of
 .BR pathstr ", " fd-deleted ", or " fd-not-deleted
 qualifiers has been provided, all three are assumed.
+If neither of
+.BR str ", " glob ", " glob\-all ", " glob\-path ", or " glob\-all-path
+qualifiers has been provided,
+.B str
+is assumed.
 .IP
 .I path_filter
 is a byte string in which the following escape sequences are recognised:

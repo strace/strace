@@ -341,7 +341,12 @@ Filtering:\n\
                  specify a path filter entry\n\
      qualifiers: path-str, pathstr (PATH_STR is used as a string),\n\
                  fd-deleted (fd is unlinked from PATH_STR),\n\
-                 fd-not-deleted (fd that is linked to PATH_STR)\n\
+                 fd-not-deleted (fd that is linked to PATH_STR),\n\
+                 str (PATH_STR is a lieral string),\n\
+                 glob (PATH_STR is a glob expression),\n\
+                 glob-all (glob with wildcards matching leading dots),\n\
+                 glob-path (glob with wildcards matching slashes),\n\
+                 glob-all-path, glob-path-all (glob-all + glob-path)\n\
      path_str:   string with \\\\. \\:, \\a, \\b, \\f, \\n, \\r, \\t, \\v, \\0nnn, \\xnn\n\
                  escape sequences.\n\
   -P PATH, --trace-path=PATH\n\
@@ -2162,10 +2167,25 @@ add_path_trace(struct pathtrace *pt, const char *path,
 /* Checks if a string is equal to some expected string literal */
 #define CHECK_STR(str_, chk_, sz_) \
 	(!strnncmp((str_), (chk_), (sz_), sizeof(chk_) - 1))
+#define SET_PTF_TYPE(type_) \
+	do { \
+		if (ptf_type(flags) && (ptf_type(flags) != (type_))) { \
+			error_msg_and_die("cannot set path filter type" \
+					  " to '%s' for '%s' since the type " \
+					  "'%s' is set already", \
+					  type_names[(type_)], optarg, \
+					  type_names[ptf_type(flags)]); \
+		} \
+		flags |= (type_); \
+	} while (0)
 
 static void
 parse_path_filter_arg(struct pathtrace *pt, char *optarg)
 {
+	static const char *type_names[] = {
+		[PTF_TYPE_STR] = "string",
+		[PTF_TYPE_GLOB] = "glob",
+	};
 	char *arg = optarg;
 	enum path_trace_flags flags = 0;
 
@@ -2185,7 +2205,11 @@ parse_path_filter_arg(struct pathtrace *pt, char *optarg)
 
 		pos += 1;
 
-		if (CHECK_STR(arg, "pathstr:", pos - arg)) {
+		if (CHECK_STR(arg, "str:", pos - arg)) {
+			SET_PTF_TYPE(PTF_TYPE_STR);
+		} else if (CHECK_STR(arg, "glob:", pos - arg)) {
+			SET_PTF_TYPE(PTF_TYPE_GLOB);
+		} else if (CHECK_STR(arg, "pathstr:", pos - arg)) {
 			flags |= PTF_PATH_STR;
 		} else if (CHECK_STR(arg, "path-str:", pos - arg)) {
 			flags |= PTF_PATH_STR;
@@ -2193,9 +2217,19 @@ parse_path_filter_arg(struct pathtrace *pt, char *optarg)
 			flags |= PTF_FD_DELETED;
 		} else if (CHECK_STR(arg, "fd-not-deleted:", pos - arg)) {
 			flags |= PTF_FD_NOT_DELETED;
+		} else if (CHECK_STR(arg, "glob-path:", pos - arg)) {
+			SET_PTF_TYPE(PTF_TYPE_GLOB);
+			flags |= PTF_GLOB_PATH;
+		} else if (CHECK_STR(arg, "glob-all:", pos - arg)) {
+			SET_PTF_TYPE(PTF_TYPE_GLOB);
+			flags |= PTF_GLOB_ALL;
+		} else if (CHECK_STR(arg, "glob-path-all:", pos - arg) ||
+			   CHECK_STR(arg, "glob-all-path:", pos - arg)) {
+			SET_PTF_TYPE(PTF_TYPE_GLOB);
+			flags |= PTF_GLOB_ALL | PTF_GLOB_PATH;
 		} else {
 			error_msg_and_die("invalid path trace filter qualifier:"
-					  " '%*s'", (int) (pos - arg), arg);
+					  " '%.*s'", (int) (pos - arg), arg);
 		}
 
 		arg = pos;
@@ -2203,14 +2237,22 @@ parse_path_filter_arg(struct pathtrace *pt, char *optarg)
 
 	unsigned int argsz;
 	size_t arglen = strlen(arg);
-	int ret = string_unescape(arg, arg, arglen, ":", &argsz);
+	int ret = string_unescape(arg, arg, arglen,
+				  ptf_type(flags) == PTF_TYPE_GLOB
+					? SUE_GLOB : SUE_LITERAL,
+				  ":", &argsz);
 
 	if (ret == INT_MIN) {
 		error_msg_and_die("path trace filter argument is too big"
 				  " (size is %zu)", arglen);
 	} else if (ret < 0) {
-		error_msg_and_die("invalid escaping: \\%c at position %d",
-				  arg[-ret], -ret);
+		if (arg[-ret]) {
+			error_msg_and_die("invalid escaping: \\%c at position %d",
+					  arg[-ret], -ret);
+		} else {
+			error_msg_and_die("backslash at the end of string"
+					  " at position %d", -ret);
+		}
 	}
 
 	arglen = strlen(arg);
