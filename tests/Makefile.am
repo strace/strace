@@ -380,6 +380,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	# end of check_PROGRAMS
 
 attach_f_p_LDADD = -lpthread $(LDADD)
+bpf_obj_get_info_by_fd_LDADD = $(clock_LIBS) $(LDADD)
+bpf_obj_get_info_by_fd_v_LDADD = $(clock_LIBS) $(LDADD)
+bpf_obj_get_info_by_fd_prog_LDADD = $(clock_LIBS) $(LDADD)
+bpf_obj_get_info_by_fd_prog_v_LDADD = $(clock_LIBS) $(LDADD)
 count_f_LDADD = -lpthread $(LDADD)
 delay_LDADD = $(clock_LIBS) $(LDADD)
 filter_unavailable_LDADD = -lpthread $(LDADD)
