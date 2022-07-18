@@ -152,6 +152,7 @@
 { "linux/kvm.h", "KVM_TPR_ACCESS_REPORTING", _IOC_READ|_IOC_WRITE, 0xae92, 0x28 },
 { "linux/kvm.h", "KVM_TRANSLATE", _IOC_READ|_IOC_WRITE, 0xae85, 0x18 },
 { "linux/kvm.h", "KVM_UNREGISTER_COALESCED_MMIO", _IOC_WRITE, 0xae68, 0x10 },
+{ "linux/kvm.h", "KVM_XEN_HVM_EVTCHN_SEND", _IOC_WRITE, 0xaed0, 0x0c },
 { "linux/kvm.h", "KVM_XEN_HVM_GET_ATTR", _IOC_READ|_IOC_WRITE, 0xaec8, 0x48 },
 { "linux/kvm.h", "KVM_XEN_HVM_SET_ATTR", _IOC_WRITE, 0xaec9, 0x48 },
 { "linux/kvm.h", "KVM_XEN_VCPU_GET_ATTR", _IOC_READ|_IOC_WRITE, 0xaeca, 0x48 },

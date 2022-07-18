@@ -128,6 +128,7 @@
 { "linux/kvm.h", "KVM_X86_SET_MCE", _IOC_WRITE, 0xae9e, 0x40 },
 { "linux/kvm.h", "KVM_X86_SET_MSR_FILTER", _IOC_WRITE, 0xaec6, 0x188 },
 { "linux/kvm.h", "KVM_XEN_HVM_CONFIG", _IOC_WRITE, 0xae7a, 0x38 },
+{ "linux/kvm.h", "KVM_XEN_HVM_EVTCHN_SEND", _IOC_WRITE, 0xaed0, 0x0c },
 { "linux/kvm.h", "KVM_XEN_HVM_GET_ATTR", _IOC_READ|_IOC_WRITE, 0xaec8, 0x48 },
 { "linux/kvm.h", "KVM_XEN_HVM_SET_ATTR", _IOC_WRITE, 0xaec9, 0x48 },
 { "linux/kvm.h", "KVM_XEN_VCPU_GET_ATTR", _IOC_READ|_IOC_WRITE, 0xaeca, 0x48 },
