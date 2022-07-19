@@ -504,7 +504,7 @@ test_pidns_run_strace()
 
 	run_prog > /dev/null
 	args="$prog_args"
-	run_strace --decode-pids=pidns -f "$@" $args > "$EXP"
+	run_strace --decode-pids=pidns --status=!unavailable -f "$@" $args > "$EXP"
 
 	# filter out logs made by the parent or init process of the pidns test
 	parent_pid="$(tail -n 2 $LOG | head -n 1 | cut -d' ' -f1)"
