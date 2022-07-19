@@ -469,6 +469,8 @@ default if
 .TP 12
 \fB\-e\ trace\fR=\,\fIsyscall_set\fR
 .TQ
+\fB\-e\ t\fR=\,\fIsyscall_set\fR
+.TQ
 \fB\-\-trace\fR=\,\fIsyscall_set\fR
 Trace only the specified set of system calls.
 .I syscall_set
@@ -645,6 +647,10 @@ are being monitored.  The default is
 .TP
 \fB\-e\ signal\fR=\,\fIset\fR
 .TQ
+\fB\-e\ signals\fR=\,\fIset\fR
+.TQ
+\fB\-e\ s\fR=\,\fIset\fR
+.TQ
 \fB\-\-signal\fR=\,\fIset\fR
 Trace only the specified subset of signals.  The default is
 .BR signal = all .
@@ -738,6 +744,8 @@ Align return values in a specific column (default column 40).
 .TP
 \fB\-e\ abbrev\fR=\,\fIsyscall_set\fR
 .TQ
+\fB\-e\ a\fR=\,\fIsyscall_set\fR
+.TQ
 \fB\-\-abbrev\fR=\,\fIsyscall_set\fR
 Abbreviate the output from printing each member of large structures.
 The syntax of the
@@ -754,6 +762,8 @@ option has the effect of
 .TP
 \fB\-e\ verbose\fR=\,\fIsyscall_set\fR
 .TQ
+\fB\-e\ v\fR=\,\fIsyscall_set\fR
+.TQ
 \fB\-\-verbose\fR=\,\fIsyscall_set\fR
 Dereference structures for the specified set of system calls.
 The syntax of the
@@ -765,6 +775,8 @@ The default is
 .BR verbose = all .
 .TP
 \fB\-e\ raw\fR=\,\fIsyscall_set\fR
+.TQ
+\fB\-e\ x\fR=\,\fIsyscall_set\fR
 .TQ
 \fB\-\-raw\fR=\,\fIsyscall_set\fR
 Print raw, undecoded arguments for the specified set of system calls.
@@ -783,6 +795,10 @@ option.
 .TP
 \fB\-e\ read\fR=\,\fIset\fR
 .TQ
+\fB\-e\ reads\fR=\,\fIset\fR
+.TQ
+\fB\-e\ r\fR=\,\fIset\fR
+.TQ
 \fB\-\-read\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data read from
 file descriptors listed in the specified set.  For example, to see
@@ -799,6 +815,10 @@ system call which is controlled by the option
 .TP
 \fB\-e\ write\fR=\,\fIset\fR
 .TQ
+\fB\-e\ writes\fR=\,\fIset\fR
+.TQ
+\fB\-e\ w\fR=\,\fIset\fR
+.TQ
 \fB\-\-write\fR=\,\fIset\fR
 Perform a full hexadecimal and ASCII dump of all the data written to
 file descriptors listed in the specified set.  For example, to see
@@ -814,6 +834,12 @@ system call which is controlled by the option
 .BR -e "\ " trace = write .
 .TP
 \fB\-e\ quiet\fR=\,\fIset\fR
+.TQ
+\fB\-e\ silent\fR=\,\fIset\fR
+.TQ
+\fB\-e\ silence\fR=\,\fIset\fR
+.TQ
+\fB\-e\ q\fR=\,\fIset\fR
 .TQ
 \fB\-\-quiet\fR=\,\fIset\fR
 .TQ
