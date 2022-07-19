@@ -22,10 +22,12 @@ static const struct_sysent syscallent[] = {
 
 #include "sysent_shorthand_undefs.h"
 
+DIAG_PUSH_IGNORE_OVERRIDE_INIT
 typedef const char *pstr_t;
 static const pstr_t ksyslist[] = {
 #include "ksysent.h"
 };
+DIAG_POP_IGNORE_OVERRIDE_INIT
 
 int
 main(void)
