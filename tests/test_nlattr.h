@@ -447,6 +447,7 @@ DEF_NLATTR_INTEGER_CHECK_(u32, uint32_t, "%u")
 DEF_NLATTR_INTEGER_CHECK_(u64, uint64_t, "%" PRIu64)
 
 DEF_NLATTR_INTEGER_CHECK_(x16, uint16_t, "%#hx")
+DEF_NLATTR_INTEGER_CHECK_(x32, uint32_t, "%#x")
 
 #define TEST_NLATTR_VAL(type_, fd_, nlh0_, hdrlen_,			\
 			init_msg_, print_msg_,				\
