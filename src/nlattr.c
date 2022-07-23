@@ -524,3 +524,24 @@ DECODE_NLA_INTEGER(s8, int8_t, "%" PRId8)
 DECODE_NLA_INTEGER(s16, int16_t, "%" PRId16)
 DECODE_NLA_INTEGER(s32, int32_t, "%" PRId32)
 DECODE_NLA_INTEGER(s64, int64_t, "%" PRId64)
+
+bool
+decode_nla_xint(struct tcb *const tcp,
+		const kernel_ulong_t addr,
+		const unsigned int len,
+		const void *const opaque_data)
+{
+	nla_decoder_t f = NULL;
+
+	switch (len) {
+	case sizeof(uint8_t):  f = decode_nla_x8;  break;
+	case sizeof(uint16_t): f = decode_nla_x16; break;
+	case sizeof(uint32_t): f = decode_nla_x32; break;
+	case sizeof(uint64_t): f = decode_nla_x64; break;
+	}
+
+	if (f)
+		return f(tcp, addr, len, opaque_data);
+
+	return false;
+}
