@@ -64,6 +64,26 @@ print_inet_diag_req_v2(const unsigned int msg_len)
 }
 
 static void
+test_unk_attrs(const int fd)
+{
+	static const struct strval16 unk_attrs[] = {
+		{ ENUM_KNOWN(0, INET_DIAG_REQ_NONE) },
+		{ ENUM_KNOWN(0x2, INET_DIAG_REQ_SK_BPF_STORAGES) },
+		{ ARG_XLAT_UNKNOWN(0x4, "INET_DIAG_REQ_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "INET_DIAG_REQ_???") },
+	};
+	static const char buf[4] = { 0xde, 0xad, 0xfa, 0xce };
+
+	for (size_t i = 0; i < ARRAY_SIZE(unk_attrs); i++) {
+		TEST_NLATTR_(fd, nlh0, hdrlen,
+			     init_inet_diag_req_v2, print_inet_diag_req_v2,
+			     unk_attrs[i].val, unk_attrs[i].str,
+			     sizeof(buf), buf, sizeof(buf),
+			     print_quoted_hex(buf, sizeof(buf)));
+	}
+}
+
+static void
 test_inet_diag_bc_op(const int fd)
 {
 	static const struct inet_diag_bc_op op = {
@@ -384,6 +404,28 @@ test_inet_diag_bc_nop(const int fd)
 				     sizeof(buf) - sizeof(op)));
 }
 
+static void
+test_inet_diag_proto(const int fd)
+{
+	static const struct strval32 protos[] = {
+		{ 0, "IPPROTO_IP" },
+		{ 3, "0x3 /* IPPROTO_??? */" },
+		{ 6, "IPPROTO_TCP" },
+		{ 255, "IPPROTO_RAW" },
+		{ 256, "0x100 /* IPPROTO_??? */" },
+		{ 262, "IPPROTO_MPTCP" },
+		{ 0xcafeface, "0xcafeface /* IPPROTO_??? */" },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(protos); i++) {
+		TEST_NLATTR(fd, nlh0, hdrlen,
+			    init_inet_diag_req_v2, print_inet_diag_req_v2,
+			    INET_DIAG_REQ_PROTOCOL,
+			    sizeof(uint32_t), &protos[i].val, sizeof(uint32_t),
+			    printf("%s", protos[i].str));
+	}
+}
+
 int
 main(void)
 {
@@ -396,6 +438,7 @@ main(void)
 				sizeof(struct in6_addr) + DEFAULT_STRLEN);
 	fill_memory_ex(pattern, sizeof(pattern), 'a', 'z' - 'a' + 1);
 
+	test_unk_attrs(fd);
 	test_inet_diag_bc_op(fd);
 	test_inet_diag_bc_s_cond(fd);
 	test_in_addr(fd);
@@ -404,6 +447,7 @@ main(void)
 	test_inet_diag_bc_s_le(fd);
 	test_inet_diag_bc_mark_cond(fd);
 	test_inet_diag_bc_nop(fd);
+	test_inet_diag_proto(fd);
 
 	printf("+++ exited with 0 +++\n");
 	return 0;

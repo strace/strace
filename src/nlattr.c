@@ -341,7 +341,6 @@ decode_nla_ip_proto(struct tcb *const tcp,
 	static const struct decode_nla_xlat_opts opts = {
 		.xlat = inet_protocols,
 		.dflt = "IPPROTO_???",
-		.size = 1,
 	};
 
 	return decode_nla_xval(tcp, addr, len, &opts);

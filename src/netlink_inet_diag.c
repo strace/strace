@@ -187,7 +187,10 @@ decode_inet_diag_bc_op(struct tcb *const tcp,
 }
 
 static const nla_decoder_t inet_diag_req_nla_decoders[] = {
-	[INET_DIAG_REQ_BYTECODE] = decode_inet_diag_bc_op
+	[INET_DIAG_REQ_NONE]		= NULL,
+	[INET_DIAG_REQ_BYTECODE]	= decode_inet_diag_bc_op,
+	[INET_DIAG_REQ_SK_BPF_STORAGES]	= NULL, /* no payload */
+	[INET_DIAG_REQ_PROTOCOL]	= decode_nla_ip_proto,
 };
 
 static void
