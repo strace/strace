@@ -506,7 +506,7 @@ test_print_gpio_v2_line_request(void)
 
 	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
 	printf("ioctl(-1, %s, {num_lines=4, offsets=[18, 35, 52, 69], "
-	       "config={flags=0, num_attrs=0}, consumer=\"line consumer\"}",
+	       "consumer=\"line consumer\", config={flags=0, num_attrs=0}}",
 	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
 	if (rc >= 0)
 		printf(" => {fd=100}");
@@ -516,7 +516,7 @@ test_print_gpio_v2_line_request(void)
 	p_line_request->event_buffer_size = 0xdeafdace;
 	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
 	printf("ioctl(-1, %s, {num_lines=4, offsets=[18, 35, 52, 69], "
-	       "config={flags=0, num_attrs=0}, consumer=\"line consumer\", "
+	       "consumer=\"line consumer\", config={flags=0, num_attrs=0}, "
 	       "event_buffer_size=3736066766}",
 	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
 	if (rc >= 0)
@@ -528,7 +528,7 @@ test_print_gpio_v2_line_request(void)
 	p_line_request->padding[1] = 0xfeedface;
 	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
 	printf("ioctl(-1, %s, {num_lines=4, offsets=[18, 35, 52, 69], "
-	       "config={flags=0, num_attrs=0}, consumer=\"line consumer\", "
+	       "consumer=\"line consumer\", config={flags=0, num_attrs=0}, "
 	       "padding=[0, 0xfeedface, 0, 0, 0]}",
 	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
 	if (rc >= 0)
@@ -542,7 +542,7 @@ test_print_gpio_v2_line_request(void)
 		p_line_request->offsets[i] = i + 1;
 	rc = do_ioctl_ptr(GPIO_V2_GET_LINE_IOCTL, p_line_request);
 	printf("ioctl(-1, %s, {num_lines=65, offsets=" str_line_seq
-	       ", config={flags=0, num_attrs=0}, consumer=\"line consumer\"}",
+	       ", consumer=\"line consumer\", config={flags=0, num_attrs=0}}",
 	       XLAT_STR(GPIO_V2_GET_LINE_IOCTL));
 	if (rc >= 0)
 		printf(" => {fd=100}");
