@@ -336,6 +336,24 @@ main(void)
 		    DEFAULT_STRLEN, str, DEFAULT_STRLEN,
 		    printf("\"%s\"", str));
 
+	/* INET_DIAG_PROTOCOL */
+	static const struct strval8 protos[] = {
+		{ 0, "IPPROTO_IP" },
+		{ 2, "IPPROTO_IGMP" },
+		{ 5, "0x5 /* IPPROTO_??? */" },
+		{ 6, "IPPROTO_TCP" },
+		{ 190, "0xbe /* IPPROTO_??? */" },
+		{ 255, "IPPROTO_RAW" },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(protos); i++) {
+		TEST_NLATTR(fd, nlh0, hdrlen,
+			    init_inet_diag_msg, print_inet_diag_msg,
+			    INET_DIAG_PROTOCOL,
+			    sizeof(uint8_t), &protos[i].val, sizeof(uint8_t),
+			    printf("%s", protos[i].str));
+	}
+
 	/* INET_DIAG_MD5SIG */
 	struct tcp_diag_md5sig md5s_arr[ARRAY_SIZE(md5sig_vecs)];
 
