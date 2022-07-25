@@ -14,7 +14,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     INET_DIAG_PROTOCOL, INET_DIAG_REQ_PROTOCOL, INET_DIAG_SHUTDOWN,
     INET_DIAG_SK_BPF_STORAGES, INET_DIAG_SOCKOPT, and INET_DIAG_ULP_INFO
     NETLINK_SOCK_DIAG netlink attributes.
-  * Updated lists of FAN_MARK_*, GPIO_V2_LINE_FLAG_*, and NET_IPV4_CONF_*
+  * Updated lists of FAN_MARK_*, GPIO_V2_LINE_FLAG_*, NET_IPV4_CONF_*, and NT_*
     constants.
   * Updated lists of ioctl commands from Linux 5.19.
 
