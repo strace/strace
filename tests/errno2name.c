@@ -11,6 +11,10 @@
 
 #define CASE(x) case x: return #x
 
+#ifndef ENOTSUPP
+# define ENOTSUPP 524
+#endif
+
 const char *
 errno2name(void)
 {
