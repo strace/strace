@@ -683,6 +683,10 @@ sockaddr_xlat-Xverbose
 sockaddr_xlat-Xverbose-y
 socketcall
 sockopt-sol_netlink
+sockopt-sol_socket
+sockopt-sol_socket-Xabbrev
+sockopt-sol_socket-Xraw
+sockopt-sol_socket-Xverbose
 sockopt-timestamp
 splice
 stat

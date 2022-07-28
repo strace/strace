@@ -944,6 +944,14 @@ sockaddr_xlat-Xverbose
 sockaddr_xlat-Xverbose-y
 socketcall
 sockopt-sol_netlink
+sockopt-sol_socket
+sockopt-sol_socket-Xabbrev
+sockopt-sol_socket-Xraw
+sockopt-sol_socket-Xverbose
+sockopt-sol_socket-success
+sockopt-sol_socket-success-Xabbrev
+sockopt-sol_socket-success-Xraw
+sockopt-sol_socket-success-Xverbose
 sockopt-timestamp
 splice
 stack-fcall

@@ -922,6 +922,14 @@ sockaddr_xlat-Xverbose	-Xverbose -e trace=connect -a22
 sockaddr_xlat-Xverbose-y	-Xverbose -y -e trace=connect -a22 </dev/null 7>/dev/zero
 socketcall	-a20
 sockopt-sol_netlink	-e trace=getsockopt,setsockopt
+sockopt-sol_socket			-e trace=getsockopt,setsockopt
+sockopt-sol_socket-Xabbrev		-e trace=getsockopt,setsockopt -Xabbrev
+sockopt-sol_socket-Xraw			-e trace=getsockopt,setsockopt -Xraw -a32
+sockopt-sol_socket-Xverbose		-e trace=getsockopt,setsockopt -Xverbose
+sockopt-sol_socket-success		-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt
+sockopt-sol_socket-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xabbrev
+sockopt-sol_socket-success-Xraw		-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a32
+sockopt-sol_socket-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose
 sockopt-timestamp	-e trace=recvmsg
 splice
 stat	-a30 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full

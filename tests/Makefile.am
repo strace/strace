@@ -347,6 +347,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	signal_receive--pidns-translation \
 	sleep \
 	so_peercred--pidns-translation \
+	sockopt-sol_socket-success \
+	sockopt-sol_socket-success-Xabbrev \
+	sockopt-sol_socket-success-Xraw \
+	sockopt-sol_socket-success-Xverbose \
 	stack-fcall \
 	stack-fcall-attach \
 	stack-fcall-mangled \
