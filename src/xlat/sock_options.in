@@ -551,3 +551,11 @@ SO_RESERVE_MEM		16455
 #else
 SO_RESERVE_MEM		73
 #endif
+
+#if defined __sparc__
+SO_RCVMARK		84
+#elif defined __hppa__
+SO_RCVMARK		16457
+#else
+SO_RCVMARK		75
+#endif

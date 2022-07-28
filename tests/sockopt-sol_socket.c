@@ -133,7 +133,8 @@ main(void)
 		{ ARG_STR(SO_NETNS_COOKIE), /* TODO */ },
 		{ ARG_STR(SO_BUF_LOCK), /* TODO */ },
 		{ ARG_STR(SO_RESERVE_MEM), .optsz = sizeof(int) },
-		{ 74, NULL },
+		{ ARG_STR(SO_RCVMARK), .optsz = sizeof(int) },
+		{ 76, NULL },
 		{ -1, NULL },
 	};
 
