@@ -706,6 +706,29 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_indirect_end();
 }
 
+#include "xlat/sockopt_txrehash_vals.h"
+
+static void
+print_txrehash(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
+{
+	int val = 0;
+
+	if (len < (int) sizeof(val)) {
+		if (entering(tcp))
+			printaddr(addr);
+		else
+			printstrn(tcp, addr, len);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &val))
+		return;
+
+	tprint_indirect_begin();
+	printxval_d(sockopt_txrehash_vals, val, "SOCK_TXREHASH_???");
+	tprint_indirect_end();
+}
+
 static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
@@ -795,6 +818,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 		case SO_ERROR:
 			print_get_error(tcp, addr, rlen);
+			return;
+		case SO_TXREHASH:
+			print_txrehash(tcp, addr, rlen);
 			return;
 
 		/* All known int-like options */
@@ -1061,6 +1087,9 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 				decode_sock_fprog(tcp, addr);
 			else
 				printaddr(addr);
+			return;
+		case SO_TXREHASH:
+			print_txrehash(tcp, addr, len);
 			return;
 
 		/* All known int-like options */

@@ -553,6 +553,14 @@ SO_RESERVE_MEM		73
 #endif
 
 #if defined __sparc__
+SO_TXREHASH		83
+#elif defined __hppa__
+SO_TXREHASH		16456
+#else
+SO_TXREHASH		74
+#endif
+
+#if defined __sparc__
 SO_RCVMARK		84
 #elif defined __hppa__
 SO_RCVMARK		16457

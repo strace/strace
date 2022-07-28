@@ -47,6 +47,19 @@ set_sockopt(int fd, int name, void *val, socklen_t len)
 	return rc;
 }
 
+static void
+print_optval(int val, const struct intstr *vecs, size_t vecs_sz)
+{
+	for (size_t k = 0; k < vecs_sz; k++) {
+		if (vecs[k].val == val) {
+			printf("[%s]", vecs[k].str);
+			return;
+		}
+	}
+
+	printf("[%d]", val);
+}
+
 int
 main(void)
 {
@@ -55,6 +68,16 @@ main(void)
 		{ ARG_STR(1) },
 		{ ARG_STR(1234567890) },
 		{ ARG_STR(-1234567890) },
+	};
+	static const struct intstr txrehash_vecs[] = {
+		{ ARG_XLAT_KNOWN(0, "SOCK_TXREHASH_DISABLED") },
+		{ ARG_XLAT_KNOWN(1, "SOCK_TXREHASH_ENABLED") },
+		{ ARG_XLAT_UNKNOWN(2, "SOCK_TXREHASH_???") },
+		{ ARG_XLAT_UNKNOWN(254, "SOCK_TXREHASH_???") },
+		{ ARG_XLAT_KNOWN(255, "SOCK_TXREHASH_DEFAULT") },
+		{ ARG_XLAT_UNKNOWN(256, "SOCK_TXREHASH_???") },
+		{ ARG_XLAT_UNKNOWN(511, "SOCK_TXREHASH_???") },
+		{ ARG_XLAT_UNKNOWN(-1, "SOCK_TXREHASH_???") },
 	};
 	static const struct {
 		int val;
@@ -133,6 +156,7 @@ main(void)
 		{ ARG_STR(SO_NETNS_COOKIE), /* TODO */ },
 		{ ARG_STR(SO_BUF_LOCK), /* TODO */ },
 		{ ARG_STR(SO_RESERVE_MEM), .optsz = sizeof(int) },
+		{ ARG_STR(SO_TXREHASH), ARRSZ_PAIR(txrehash_vecs), sizeof(int) },
 		{ ARG_STR(SO_RCVMARK), .optsz = sizeof(int) },
 		{ 76, NULL },
 		{ -1, NULL },
@@ -176,10 +200,8 @@ main(void)
 			printf("g%s", pfx_str);
 			if (rc < 0)
 				printf("%p", val);
-			else if (!rc)
-				printf("[%d]", *val);
 			else
-				printf("[%s]", vecs[j].str);
+				print_optval(*val, vecs, vecs_sz);
 			printf(", [%d]) = %s" INJSTR "\n", *len, errstr);
 
 			/* optlen larger than accessible memory */
@@ -188,10 +210,8 @@ main(void)
 			printf("g%s", pfx_str);
 			if (rc < 0 || (!names[i].optsz && *len > sizeof(*val)))
 				printf("%p", val);
-			else if (rc > 0)
-				printf("[%s]", vecs[j].str);
 			else
-				printf("[%d]", *val);
+				print_optval(*val, vecs, vecs_sz);
 			printf(", [%d", (int) sizeof(*val) + 1);
 			if ((int) sizeof(*val) + 1 != *len)
 				printf(" => %d", *len);
@@ -205,14 +225,10 @@ main(void)
 			if (rc < 0) {
 				printf("%p", bigval);
 			} else {
-				if (*len == sizeof(*val) || names[i].optsz) {
-					if (rc)
-						printf("[%s]", vecs[j].str);
-					else
-						printf("[%d]", *val);
-				} else {
+				if (*len == sizeof(*val) || names[i].optsz)
+					print_optval(*val, vecs, vecs_sz);
+				else
 					print_quoted_memory(bigval, *len);
-				}
 			}
 			printf(", [%d", (int) sizeof(*val) + 1);
 			if ((int) sizeof(*val) + 1 != *len)

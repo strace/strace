@@ -8,6 +8,7 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented printing of Unix socket sun_path field's SELinux context.
+  * Implemented decoding of SO_TXREHASH socket option.
   * Implemented decoding of IFLA_TSO_MAX_SIZE, IFLA_TSO_MAX_SEGS,
     NDA_FDB_EXT_ATTRS, NDA_FLAGS_EXT, NDA_NDM_FLAGS_MASK,
     and NDA_NDM_STATE_MASK netlink attributes.
