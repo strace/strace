@@ -796,6 +796,55 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_ERROR:
 			print_get_error(tcp, addr, rlen);
 			return;
+
+		/* All known int-like options */
+		case SO_DEBUG:
+		case SO_REUSEADDR:
+		case SO_DONTROUTE:
+		case SO_BROADCAST:
+		case SO_SNDBUF:
+		case SO_RCVBUF:
+		case SO_KEEPALIVE:
+		case SO_OOBINLINE:
+		case SO_NO_CHECK:
+		case SO_PRIORITY:
+		case SO_BSDCOMPAT:
+		case SO_REUSEPORT:
+		case SO_PASSCRED:
+		case SO_RCVLOWAT:
+		case SO_SNDLOWAT:
+		case SO_DETACH_FILTER:
+		case SO_TIMESTAMP_OLD:
+		case SO_ACCEPTCONN:
+		case SO_SNDBUFFORCE:
+		case SO_RCVBUFFORCE:
+		case SO_PASSSEC:
+		case SO_TIMESTAMPNS_OLD:
+		case SO_MARK:
+		case SO_TIMESTAMPING_OLD:
+		case SO_RXQ_OVFL:
+		case SO_WIFI_STATUS:
+		case SO_PEEK_OFF:
+		case SO_NOFCS:
+		case SO_LOCK_FILTER:
+		case SO_SELECT_ERR_QUEUE:
+		case SO_BUSY_POLL:
+		case SO_INCOMING_CPU:
+		case SO_CNX_ADVICE:
+		case SO_INCOMING_NAPI_ID:
+		case SO_ZEROCOPY:
+		case SO_TIMESTAMP_NEW:
+		case SO_TIMESTAMPNS_NEW:
+		case SO_TIMESTAMPING_NEW:
+		case SO_DETACH_REUSEPORT_BPF:
+		case SO_PREFER_BUSY_POLL:
+		case SO_BUSY_POLL_BUDGET:
+		case SO_RESERVE_MEM:
+			if (rlen >= (int) sizeof(int))
+				printnum_int(tcp, addr, "%d");
+			else
+				printstrn(tcp, addr, rlen);
+			return;
 		}
 		break;
 
@@ -1011,6 +1060,55 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 				decode_sock_fprog(tcp, addr);
 			else
 				printaddr(addr);
+			return;
+
+		/* All known int-like options */
+		case SO_DEBUG:
+		case SO_REUSEADDR:
+		case SO_DONTROUTE:
+		case SO_BROADCAST:
+		case SO_SNDBUF:
+		case SO_RCVBUF:
+		case SO_KEEPALIVE:
+		case SO_OOBINLINE:
+		case SO_NO_CHECK:
+		case SO_PRIORITY:
+		case SO_BSDCOMPAT:
+		case SO_REUSEPORT:
+		case SO_PASSCRED:
+		case SO_RCVLOWAT:
+		case SO_SNDLOWAT:
+		case SO_DETACH_FILTER:
+		case SO_TIMESTAMP_OLD:
+		case SO_ACCEPTCONN:
+		case SO_SNDBUFFORCE:
+		case SO_RCVBUFFORCE:
+		case SO_PASSSEC:
+		case SO_TIMESTAMPNS_OLD:
+		case SO_MARK:
+		case SO_TIMESTAMPING_OLD:
+		case SO_RXQ_OVFL:
+		case SO_WIFI_STATUS:
+		case SO_PEEK_OFF:
+		case SO_NOFCS:
+		case SO_LOCK_FILTER:
+		case SO_SELECT_ERR_QUEUE:
+		case SO_BUSY_POLL:
+		case SO_INCOMING_CPU:
+		case SO_CNX_ADVICE:
+		case SO_INCOMING_NAPI_ID:
+		case SO_ZEROCOPY:
+		case SO_TIMESTAMP_NEW:
+		case SO_TIMESTAMPNS_NEW:
+		case SO_TIMESTAMPING_NEW:
+		case SO_DETACH_REUSEPORT_BPF:
+		case SO_PREFER_BUSY_POLL:
+		case SO_BUSY_POLL_BUDGET:
+		case SO_RESERVE_MEM:
+			if (len < (int) sizeof(int))
+				printaddr(addr);
+			else
+				printnum_int(tcp, addr, "%d");
 			return;
 		}
 		break;
