@@ -167,6 +167,20 @@ main(void)
 				    printf("%s", fan_flags[i].str));
 	}
 
+	/* NDA_FLAGS_EXT */
+	static const struct strval32 ntfe_flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "NTF_EXT_MANAGED") },
+		{ ARG_XLAT_KNOWN(0xdeadbeef, "NTF_EXT_MANAGED|0xdeadbeee") },
+		{ ARG_XLAT_UNKNOWN(0xfeedcafe, "NTF_EXT_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(ntfe_flags); i++) {
+		TEST_NLATTR(fd, nlh0, hdrlen, init_ndmsg, print_ndmsg,
+			    NDA_FLAGS_EXT, 4, &ntfe_flags[i].val, 4,
+			    printf("%s", ntfe_flags[i].str));
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
