@@ -196,6 +196,37 @@ main(void)
 			    printf("%s", ntfe_flags[i].str));
 	}
 
+	/* NDA_NDM_STATE_MASK */
+	static const struct strval16 states_flags[] = {
+		{ ARG_XLAT_KNOWN(0, "NUD_NONE") },
+		{ ARG_XLAT_KNOWN(0x1, "NUD_INCOMPLETE") },
+		{ ARG_XLAT_KNOWN(0xabed, "NUD_INCOMPLETE|NUD_STALE|NUD_DELAY"
+					 "|NUD_FAILED|NUD_NOARP|NUD_PERMANENT"
+					 "|0xab00") },
+		{ ARG_XLAT_UNKNOWN(0xff00, "NUD_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(states_flags); i++) {
+		TEST_NLATTR(fd, nlh0, hdrlen, init_ndmsg, print_ndmsg,
+			    NDA_NDM_STATE_MASK, 2, &states_flags[i].val, 2,
+			    printf("%s", states_flags[i].str));
+	}
+
+	/* NDA_NDM_FLAGS_MASK */
+	static const struct strval8 ndm_flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "NTF_USE") },
+		{ ARG_XLAT_KNOWN(0xbe, "NTF_SELF|NTF_MASTER|NTF_PROXY"
+					"|NTF_EXT_LEARNED|NTF_OFFLOADED"
+					"|NTF_ROUTER") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(ndm_flags); i++) {
+		TEST_NLATTR(fd, nlh0, hdrlen, init_ndmsg, print_ndmsg,
+			    NDA_NDM_FLAGS_MASK, 1, &ndm_flags[i].val, 1,
+			    printf("%s", ndm_flags[i].str));
+	}
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

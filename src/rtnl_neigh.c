@@ -106,6 +106,34 @@ decode_nda_ext_flags(struct tcb *const tcp,
 	return decode_nla_flags(tcp, addr, len, &opts);
 }
 
+static bool
+decode_nda_ndm_states(struct tcb *const tcp,
+		      const kernel_ulong_t addr,
+		      const unsigned int len,
+		      const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		neighbor_cache_entry_states, "NUD_???",
+		.size = 2,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static bool
+decode_nda_ndm_flags(struct tcb *const tcp,
+		     const kernel_ulong_t addr,
+		     const unsigned int len,
+		     const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		neighbor_cache_entry_flags, "NTF_???",
+		.size = 1,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
 static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_DST]		= decode_neigh_addr,
 	[NDA_LLADDR]		= decode_nla_hwaddr_nofamily,
@@ -122,6 +150,8 @@ static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_NH_ID]		= decode_nla_u32,
 	[NDA_FDB_EXT_ATTRS]	= decode_nda_fdb_ext_attrs,
 	[NDA_FLAGS_EXT]		= decode_nda_ext_flags,
+	[NDA_NDM_STATE_MASK]	= decode_nda_ndm_states,
+	[NDA_NDM_FLAGS_MASK]	= decode_nda_ndm_flags,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
