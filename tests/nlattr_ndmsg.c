@@ -131,6 +131,21 @@ main(void)
 		    for (unsigned int i = 0; i < sizeof(mac); ++i)
 			printf("%s%02x", i ? ":" : "", mac[i]));
 
+	/* u32 attrs */
+	static const struct strval16 u32_attrs[] = {
+		{ ENUM_KNOWN(0x4, NDA_PROBES) },
+		{ ENUM_KNOWN(0x7, NDA_VNI) },
+		{ ENUM_KNOWN(0xa, NDA_LINK_NETNSID) },
+		{ ENUM_KNOWN(0xb, NDA_SRC_VNI) },
+		{ ENUM_KNOWN(0xd, NDA_NH_ID) },
+	};
+	void *nlh_u32 = midtail_alloc(NLMSG_SPACE(hdrlen), sizeof(uint32_t));
+
+	for (size_t i = 0; i < ARRAY_SIZE(u32_attrs); i++) {
+		check_u32_nlattr(fd, nlh_u32, hdrlen, init_ndmsg, print_ndmsg,
+				u32_attrs[i].val, u32_attrs[i].str, pattern, 0);
+	}
+
 	/* NDA_FDB_EXT_ATTRS: unknown, undecoded */
 	static const struct strval16 nfea_unk_attrs[] = {
 		{ ENUM_KNOWN(0, NFEA_UNSPEC) },
