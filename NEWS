@@ -8,8 +8,8 @@ Noteworthy changes in release ?.?? (????-??-??)
 
 * Improvements
   * Implemented printing of Unix socket sun_path field's SELinux context.
-  * Implemented decoding of IFLA_TSO_MAX_SIZE and IFLA_TSO_MAX_SEGS netlink
-    attributes.
+  * Implemented decoding of IFLA_TSO_MAX_SIZE, IFLA_TSO_MAX_SEGS,
+    and NDA_FDB_EXT_ATTRS netlink attributes.
   * Improved decoding of INET_DIAG_LOCALS, INET_DIAG_MD5SIG, INET_DIAG_PEERS,
     INET_DIAG_PROTOCOL, INET_DIAG_REQ_PROTOCOL, INET_DIAG_SHUTDOWN,
     INET_DIAG_SK_BPF_STORAGES, INET_DIAG_SOCKOPT, and INET_DIAG_ULP_INFO

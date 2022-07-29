@@ -15,6 +15,8 @@
 #include <linux/neighbour.h>
 #include <linux/rtnetlink.h>
 
+static const unsigned int hdrlen = sizeof(struct ndmsg);
+
 static void
 init_ndmsg(struct nlmsghdr *const nlh, const unsigned int msg_len)
 {
@@ -46,13 +48,32 @@ print_ndmsg(const unsigned int msg_len)
 	       msg_len);
 }
 
+static void
+init_ndmsg_nfea(struct nlmsghdr *const nlh, const unsigned int msg_len)
+{
+	init_ndmsg(nlh, msg_len);
+
+	struct nlattr *nla = NLMSG_ATTR(nlh, hdrlen);
+	SET_STRUCT(struct nlattr, nla,
+		.nla_len = msg_len - NLMSG_SPACE(hdrlen),
+		.nla_type = NDA_FDB_EXT_ATTRS,
+	);
+}
+
+static void
+print_ndmsg_nfea(const unsigned int msg_len)
+{
+	print_ndmsg(msg_len);
+	printf(", [{nla_len=%u, nla_type=NDA_FDB_EXT_ATTRS}",
+	       msg_len - NLMSG_SPACE(hdrlen));
+}
+
 int
 main(void)
 {
 	skip_if_unavailable("/proc/self/fd/");
 
 	const int fd = create_nl_socket(NETLINK_ROUTE);
-	const unsigned int hdrlen = sizeof(struct ndmsg);
 	void *nlh0 = midtail_alloc(NLMSG_SPACE(hdrlen),
 				   NLA_HDRLEN + sizeof(struct nda_cacheinfo));
 
@@ -109,6 +130,42 @@ main(void)
 		    NDA_LLADDR, sizeof(mac), mac, sizeof(mac),
 		    for (unsigned int i = 0; i < sizeof(mac); ++i)
 			printf("%s%02x", i ? ":" : "", mac[i]));
+
+	/* NDA_FDB_EXT_ATTRS: unknown, undecoded */
+	static const struct strval16 nfea_unk_attrs[] = {
+		{ ENUM_KNOWN(0, NFEA_UNSPEC) },
+		{ ENUM_KNOWN(0x2, NFEA_DONT_REFRESH) },
+		{ ARG_XLAT_UNKNOWN(0x3, "NFEA_???") },
+		{ ARG_XLAT_UNKNOWN(0x1ace, "NFEA_???") },
+	};
+	static const uint32_t dummy = BE_LE(0xbadc0ded, 0xed0ddcba);
+
+	for (size_t i = 0; i < ARRAY_SIZE(nfea_unk_attrs); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_ndmsg_nfea, print_ndmsg_nfea,
+				    nfea_unk_attrs[i].val,
+				    nfea_unk_attrs[i].str,
+				    sizeof(dummy), &dummy, sizeof(dummy), 1,
+				    printf("\"\\xba\\xdc\\x0d\\xed\""));
+	}
+
+	/* NDA_FDB_EXT_ATTRS: NFEA_ACTIVITY_NOTIFY */
+	static const struct strval8 fan_flags[] = {
+		{ ARG_STR(0) },
+		{ ARG_XLAT_KNOWN(0x1, "FDB_NOTIFY_BIT") },
+		{ ARG_XLAT_KNOWN(0xef, "FDB_NOTIFY_BIT"
+				       "|FDB_NOTIFY_INACTIVE_BIT|0xec") },
+		{ ARG_XLAT_UNKNOWN(0xfc, "FDB_NOTIFY_???") },
+	};
+
+	for (size_t i = 0; i < ARRAY_SIZE(fan_flags); i++) {
+		TEST_NESTED_NLATTR_(fd, nlh0, hdrlen,
+				    init_ndmsg_nfea, print_ndmsg_nfea,
+				    NFEA_ACTIVITY_NOTIFY,
+				    "NFEA_ACTIVITY_NOTIFY",
+				    1, &fan_flags[i].val, 1, 1,
+				    printf("%s", fan_flags[i].str));
+	}
 
 	puts("+++ exited with 0 +++");
 	return 0;

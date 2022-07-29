@@ -14,9 +14,11 @@
 #include "netlink.h"
 #include <linux/neighbour.h>
 
+#include "xlat/fdb_notify_flags.h"
 #include "xlat/neighbor_cache_entry_flags.h"
 #include "xlat/neighbor_cache_entry_states.h"
 #include "xlat/rtnl_neigh_attrs.h"
+#include "xlat/rtnl_neigh_fdb_ext_attrs.h"
 
 static bool
 decode_neigh_addr(struct tcb *const tcp,
@@ -56,6 +58,39 @@ decode_nda_cacheinfo(struct tcb *const tcp,
 	return true;
 }
 
+static bool
+decode_fdb_notify_flags(struct tcb *const tcp,
+		        const kernel_ulong_t addr,
+		        const unsigned int len,
+		        const void *const opaque_data)
+{
+	static const struct decode_nla_xlat_opts opts = {
+		fdb_notify_flags, "FDB_NOTIFY_???",
+		.size = 1,
+	};
+
+	return decode_nla_flags(tcp, addr, len, &opts);
+}
+
+static const nla_decoder_t nda_fdb_ext_attrs_nla_decoders[] = {
+	[NFEA_UNSPEC]		= NULL,
+	[NFEA_ACTIVITY_NOTIFY]	= decode_fdb_notify_flags,
+	[NFEA_DONT_REFRESH]	= NULL, /* flag attr, no payload is expected */
+};
+
+static bool
+decode_nda_fdb_ext_attrs(struct tcb *const tcp,
+			 const kernel_ulong_t addr,
+			 const unsigned int len,
+			 const void *const opaque_data)
+{
+	decode_nlattr(tcp, addr, len, rtnl_neigh_fdb_ext_attrs,
+		      "NFEA_???", ARRSZ_PAIR(nda_fdb_ext_attrs_nla_decoders),
+		      opaque_data);
+
+	return true;
+}
+
 static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_DST]		= decode_neigh_addr,
 	[NDA_LLADDR]		= decode_nla_hwaddr_nofamily,
@@ -70,6 +105,7 @@ static const nla_decoder_t ndmsg_nla_decoders[] = {
 	[NDA_SRC_VNI]		= NULL,
 	[NDA_PROTOCOL]		= decode_nla_u8,
 	[NDA_NH_ID]		= decode_nla_u32,
+	[NDA_FDB_EXT_ATTRS]	= decode_nda_fdb_ext_attrs,
 };
 
 DECL_NETLINK_ROUTE_DECODER(decode_ndmsg)
