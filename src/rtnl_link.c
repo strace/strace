@@ -1125,10 +1125,15 @@ decode_nla_rtnl_link_stats64(struct tcb *const tcp,
 	struct rtnl_link_stats64 st;
 	const unsigned int min_size =
 		offsetofend(struct rtnl_link_stats64, tx_compressed);
+	const unsigned int rx_nohandler_size =
+		offsetofend(struct rtnl_link_stats64, rx_nohandler);
 	const unsigned int def_size = sizeof(st);
 	const unsigned int size =
-		(len >= def_size) ? def_size :
-				    ((len == min_size) ? min_size : 0);
+		(len >= def_size)
+			? def_size
+			: ((len == rx_nohandler_size)
+				? rx_nohandler_size
+				: ((len == min_size) ? min_size : 0));
 
 	if (!size)
 		return false;
@@ -1184,9 +1189,14 @@ decode_nla_rtnl_link_stats64(struct tcb *const tcp,
 		tprint_struct_next();
 		PRINT_FIELD_U(st, tx_compressed);
 
-		if (len >= def_size) {
+		if (len >= rx_nohandler_size) {
 			tprint_struct_next();
 			PRINT_FIELD_U(st, rx_nohandler);
+
+			if (len >= def_size) {
+				tprint_struct_next();
+				PRINT_FIELD_U(st, rx_otherhost_dropped);
+			}
 		}
 		tprint_struct_end();
 	}

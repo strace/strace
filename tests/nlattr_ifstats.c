@@ -145,9 +145,13 @@ print_stats_64(struct rtnl_link_stats64 *st, size_t sz)
 	printf(", "); PRINT_FIELD_U(*st, tx_window_errors);
 	printf(", "); PRINT_FIELD_U(*st, rx_compressed);
 	printf(", "); PRINT_FIELD_U(*st, tx_compressed);
-	if (sz > offsetofend(struct rtnl_link_stats64, tx_compressed)) {
+	if (sz >= offsetofend(struct rtnl_link_stats64, rx_nohandler)) {
 		printf(", ");
 		PRINT_FIELD_U(*st, rx_nohandler);
+	}
+	if (sz >= offsetofend(struct rtnl_link_stats64, rx_otherhost_dropped)) {
+		printf(", ");
+		PRINT_FIELD_U(*st, rx_otherhost_dropped);
 	}
 	printf("}");
 }

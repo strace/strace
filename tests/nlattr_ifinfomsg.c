@@ -293,7 +293,9 @@ main(void)
 		.tx_heartbeat_errors = 0xedaededdadcdea,
 		.tx_window_errors = 0xfdacdeaccedcda,
 		.rx_compressed = 0xacdbbcacdbccef,
-		.tx_compressed = 0xbcdadefcdedfea
+		.tx_compressed = 0xbcdadefcdedfea,
+		.rx_nohandler = 0xcbdbacbfbafffd,
+		.rx_otherhost_dropped = 0xbefdafcfeeadcbfb
 	};
 	TEST_NLATTR_OBJECT(fd, nlh0, hdrlen,
 			   init_ifinfomsg, print_ifinfomsg,
@@ -346,13 +348,72 @@ main(void)
 			   PRINT_FIELD_U(st64, tx_compressed);
 			   printf(", ");
 			   PRINT_FIELD_U(st64, rx_nohandler);
+			   printf(", ");
+			   PRINT_FIELD_U(st64, rx_otherhost_dropped);
 			   printf("}"));
 
-	const unsigned int sizeof_stats64 =
+	const unsigned int stats64_rx_nohandler_size =
+		offsetofend(struct rtnl_link_stats64, rx_nohandler);
+	TEST_NLATTR(fd, nlh0, hdrlen,
+		    init_ifinfomsg, print_ifinfomsg,
+		    IFLA_STATS64, stats64_rx_nohandler_size,
+		    &st64, stats64_rx_nohandler_size,
+		    printf("{");
+		    PRINT_FIELD_U(st64, rx_packets);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_packets);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_bytes);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_bytes);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_dropped);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_dropped);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, multicast);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, collisions);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_length_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_over_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_crc_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_frame_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_fifo_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_missed_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_aborted_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_carrier_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_fifo_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_heartbeat_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_window_errors);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_compressed);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, tx_compressed);
+		    printf(", ");
+		    PRINT_FIELD_U(st64, rx_nohandler);
+		    printf("}"));
+
+	const unsigned int stats64_tx_compressed_size =
 		offsetofend(struct rtnl_link_stats64, tx_compressed);
 	TEST_NLATTR(fd, nlh0, hdrlen,
 		    init_ifinfomsg, print_ifinfomsg,
-		    IFLA_STATS64, sizeof_stats64, &st64, sizeof_stats64,
+		    IFLA_STATS64, stats64_tx_compressed_size,
+		    &st64, stats64_tx_compressed_size,
 		    printf("{");
 		    PRINT_FIELD_U(st64, rx_packets);
 		    printf(", ");
