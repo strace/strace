@@ -147,6 +147,12 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			printsigval(sip);
 			break;
 #endif
+		case SI_SIGIO:
+			tprint_struct_next();
+			PRINT_FIELD_D(*sip, si_band);
+			tprint_struct_next();
+			PRINT_FIELD_FD(*sip, si_fd, tcp);
+			break;
 		default:
 			printsigsource(tcp, sip);
 			if (sip->si_ptr)

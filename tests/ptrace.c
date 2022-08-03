@@ -2231,6 +2231,22 @@ main(void)
 	       errstr);
 #endif
 
+	/* SI_SIGIO */
+	memset(sip, -1, sizeof(*sip));
+	sip->si_signo = SIGSEGV;
+	sip->si_code = SI_SIGIO;
+	sip->si_errno = ENOENT;
+	sip->si_band = -1234567890;
+	sip->si_fd = NULL_FD;
+
+	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U
+	       ", si_band=-1234567890, si_fd=%d%s}) = %s\n",
+	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+	       XLAT_ARGS(SIGSEGV), XLAT_ARGS(SI_SIGIO), XLAT_ARGS(ENOENT),
+	       NULL_FD, NULL_FD_STR, errstr);
+
 	do_ptrace(PTRACE_GETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(" XLAT_FMT ", %d, %#lx, %p) = %s\n",
 	       XLAT_ARGS(PTRACE_GETSIGINFO), pid, bad_request, sip, errstr);
