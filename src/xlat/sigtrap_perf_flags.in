@@ -1,0 +1,1 @@
+TRAP_PERF_FLAG_ASYNC	(1 << 0)

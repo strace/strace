@@ -43,8 +43,16 @@
 #include "xlat/sigsys_codes.h"
 #include "xlat/sigtrap_codes.h"
 
+#ifdef ALPHA
+# include "xlat/alpha_trap_codes.h"
+#endif
+
 #ifdef SIGEMT
 # include "xlat/sigemt_codes.h"
+#endif
+
+#ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+# include "xlat/sigtrap_perf_flags.h"
 #endif
 
 #ifndef SI_FROMUSER
@@ -199,6 +207,37 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			}
 #endif /* !SEGV_STACKFLOW && HAVE_SIGINFO_T_SI_LOWER
 	* || !__SEGV_PSTKOVF && HAVE_SIGINFO_T_SI_PKEY */
+			break;
+		case SIGTRAP:
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_addr);
+#if defined(ALPHA) || defined(HAVE_SIGINFO_T_SI_PERF_DATA)
+			switch (sip->si_code) {
+# ifdef ALPHA
+			case TRAP_UNK:
+				tprint_struct_next();
+				PRINT_FIELD_XVAL_D(*sip, si_trapno,
+						   alpha_trap_codes, "GEN_???");
+				break;
+# endif /* ALPHA */
+# ifdef HAVE_SIGINFO_T_SI_PERF_DATA
+			case TRAP_PERF:
+				tprint_struct_next();
+				PRINT_FIELD_X(*sip, si_perf_data);
+#  ifdef HAVE_SIGINFO_T_SI_PERF_TYPE
+				tprint_struct_next();
+				PRINT_FIELD_XVAL(*sip, si_perf_type,
+						 perf_type_id, "PERF_TYPE_???");
+#  endif /* HAVE_SIGINFO_T_SI_PERF_TYPE */
+#  ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+				tprint_struct_next();
+				PRINT_FIELD_FLAGS(*sip, si_perf_flags,
+						  sigtrap_perf_flags,
+						  "TRAP_PERF_FLAG_???");
+#  endif /* HAVE_SIGINFO_T_SI_PERF_FLAGS */
+# endif /* HAVE_SIGINFO_T_SI_PERF_DATA */
+			}
+#endif /* ALPHA || HAVE_SIGINFO_T_SI_PERF_DATA */
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {

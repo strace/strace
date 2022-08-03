@@ -427,7 +427,10 @@ AC_CHECK_MEMBERS(m4_normalize([
 	siginfo_t.si_pkey,
 	siginfo_t.si_addr_lsb,
 	siginfo_t.si_lower,
-	siginfo_t.si_upper
+	siginfo_t.si_upper,
+	siginfo_t.si_perf_data,
+	siginfo_t.si_perf_type,
+	siginfo_t.si_perf_flags
 ]),,, [#include <signal.h>])
 
 AC_CHECK_HEADERS(m4_normalize([

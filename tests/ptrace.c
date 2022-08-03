@@ -1795,21 +1795,135 @@ main(void)
 	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request, XLAT_ARGS(SIGIO),
 	       XLAT_ARGS(POLL_IN), XLAT_ARGS(ENOENT), errstr);
 
+	/* SIGTRAP */
+	struct valstraux trap_codes[] = {
+		{ ARG_XLAT_KNOWN(0x1, "TRAP_BRKPT") },
+#ifdef TRAP_TRACEFLOW
+		{ ARG_XLAT_KNOWN(0x2, "TRAP_TRACEFLOW") },
+#else
+		{ ARG_XLAT_KNOWN(0x2, "TRAP_TRACE") },
+#endif
+#ifdef TRAP_WATCHPT
+		{ ARG_XLAT_KNOWN(0x3, "TRAP_WATCHPT") },
+#else
+		{ ARG_XLAT_KNOWN(0x3, "TRAP_BRANCH") },
+#endif
+#ifdef TRAP_ILLTRAP
+		{ ARG_XLAT_KNOWN(0x4, "TRAP_ILLTRAP") },
+#else
+		{ ARG_XLAT_KNOWN(0x4, "TRAP_HWBKPT") },
+#endif
+		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
+#ifdef __alpha__
+		  ", si_trapno=0 /* GEN_??? */"
+		},
+		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"),
+		  ", si_trapno=" XLAT_KNOWN(-1, "GEN_INTOVF" },
+		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"),
+		  ", si_trapno=" XLAT_KNOWN(-25, "GEN_SUBRNG7" },
+		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
+		  ", si_trapno=-26 /* GEN_??? */" },
+		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
+		  ", si_trapno=-1234567890 /* GEN_??? */"
+#endif /* __alpha__ */
+		},
+		{ ARG_XLAT_KNOWN(0x6, "TRAP_PERF"), ""
+#ifdef HAVE_SIGINFO_T_SI_PERF_DATA
+		  ", si_perf_data=0"
+# ifdef HAVE_SIGINFO_T_SI_PERF_TYPE
+		  ", si_perf_type=" XLAT_KNOWN(0, "PERF_TYPE_HARDWARE")
+# endif
+# ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+		  ", si_perf_flags=0"
+# endif
+		},
+		{ ARG_XLAT_KNOWN(0x6, "TRAP_PERF"), ""
+		  ", si_perf_data=0x1"
+# ifdef HAVE_SIGINFO_T_SI_PERF_TYPE
+		  ", si_perf_type=" XLAT_KNOWN(0x1, "PERF_TYPE_SOFTWARE")
+# endif
+# ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+		  ", si_perf_flags=" XLAT_KNOWN(0x1, "TRAP_PERF_FLAG_ASYNC")
+# endif
+		},
+		{ ARG_XLAT_KNOWN(0x6, "TRAP_PERF"), ""
+		  ", si_perf_data=0x" UP64BIT("12345678") "90abcdef"
+# ifdef HAVE_SIGINFO_T_SI_PERF_TYPE
+		  ", si_perf_type=" XLAT_KNOWN(0x5, "PERF_TYPE_BREAKPOINT")
+# endif
+# ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+		  ", si_perf_flags="
+		  XLAT_KNOWN(0xdeadbeef, "TRAP_PERF_FLAG_ASYNC|0xdeadbeee")
+# endif
+		},
+		{ ARG_XLAT_KNOWN(0x6, "TRAP_PERF"), ""
+		  ", si_perf_data=0x" UP64BIT("badc0ded") "deadface"
+# ifdef HAVE_SIGINFO_T_SI_PERF_TYPE
+		  ", si_perf_type=" XLAT_UNKNOWN(0x6, "PERF_TYPE_???")
+# endif
+# ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+		  ", si_perf_flags="
+		  XLAT_UNKNOWN(0xcafec0de, "TRAP_PERF_FLAG_???")
+# endif
+#endif /* HAVE_SIGINFO_T_SI_PERF_DATA */
+		},
+		{ ARG_STR(0x7) },
+		{ ARG_STR(0x499602d2) },
+	};
+	int trap_unk_vecs[] = { 0, 1234567890, -1234567890 };
+	struct {
+		unsigned long data;
+		uint32_t type;
+		uint32_t flags;
+	} trap_perf_vecs[] = {
+		{ 0, 0, 0 },
+		{ 1, 1, 1 },
+		{ (unsigned long) 0x1234567890abcdefULL, 5, 0xdeadbeef },
+		{ (unsigned long) 0xbadc0deddeadfaceULL, 6, 0xcafec0de },
+	};
+	size_t trap_unk_pos = 0;
+	size_t trap_perf_pos = 0;
+
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGTRAP;
 	sip->si_code = 1;
 	sip->si_errno = ENOENT;
-	sip->si_pid = 2;
-	sip->si_uid = 3;
-	sip->si_ptr = (void *) bad_request;
+	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
-	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_pid=2"
-	       ", si_uid=3, si_int=%d, si_ptr=%p}) = %s\n",
-	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
-	       XLAT_ARGS(SIGTRAP), XLAT_ARGS(TRAP_BRKPT), XLAT_ARGS(ENOENT),
-	       sip->si_int, sip->si_ptr, errstr);
+	for (size_t i = 0; i < ARRAY_SIZE(trap_codes); i++) {
+		sip->si_code = trap_codes[i].val;
+
+		switch (sip->si_code) {
+		case 5: /* TRAP_UNK */
+#ifdef __alpha__
+			sip->si_trapno = trap_unk_vecs[trap_unk_pos];
+#endif
+			trap_unk_pos = (trap_unk_pos + 1)
+				       % ARRAY_SIZE(trap_unk_vecs);
+			break;
+		case 6: /* TRAP_PERF */
+#ifdef HAVE_SIGINFO_T_SI_PERF_DATA
+			sip->si_perf_data = trap_perf_vecs[trap_perf_pos].data;
+#endif
+#ifdef HAVE_SIGINFO_T_SI_PERF_TYPE
+			sip->si_perf_type = trap_perf_vecs[trap_perf_pos].type;
+#endif
+#ifdef HAVE_SIGINFO_T_SI_PERF_FLAGS
+			sip->si_perf_flags = trap_perf_vecs[trap_perf_pos].flags;
+#endif
+			trap_perf_pos = (trap_perf_pos + 1)
+					% ARRAY_SIZE(trap_perf_vecs);
+			break;
+		};
+
+		do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+		printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+		       ", si_code=%s, si_errno=" XLAT_FMT_U ", si_addr=%p%s}"
+		       ") = %s\n",
+		       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+		       XLAT_ARGS(SIGTRAP), trap_codes[i].str, XLAT_ARGS(ENOENT),
+		       sip->si_addr, trap_codes[i].aux ?: "", errstr);
+	}
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGILL;
