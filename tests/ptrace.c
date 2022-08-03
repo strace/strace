@@ -2032,6 +2032,7 @@ main(void)
 		       errstr);
 	}
 
+	/* SIGPROF */
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGPROF;
 	sip->si_code = 0xbadc0ded;
@@ -2137,6 +2138,7 @@ main(void)
 		       sip->si_addr, segv_codes[i].aux ?: "", errstr);
 	}
 
+	/* SIGSYS */
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGSYS;
@@ -2226,6 +2228,7 @@ main(void)
 # endif
 #endif
 
+	/* SI_TIMER */
 #if defined HAVE_SIGINFO_T_SI_TIMERID && defined HAVE_SIGINFO_T_SI_OVERRUN
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGHUP;
