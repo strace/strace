@@ -90,7 +90,7 @@ print_si_code(const unsigned int si_code, const int si_signo)
 		case SIGCHLD:
 			code = xlookup(sigchld_codes, si_code);
 			break;
-		case SIGPOLL:
+		case SIGIO: /* SIGPOLL */
 			code = xlookup(sigpoll_codes, si_code);
 			break;
 		case SIGPROF:
@@ -239,11 +239,13 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			}
 #endif /* ALPHA || HAVE_SIGINFO_T_SI_PERF_DATA */
 			break;
-		case SIGPOLL:
+		case SIGIO: /* SIGPOLL */
 			switch (sip->si_code) {
 			case POLL_IN: case POLL_OUT: case POLL_MSG:
 				tprint_struct_next();
 				PRINT_FIELD_D(*sip, si_band);
+				tprint_struct_next();
+				PRINT_FIELD_FD(*sip, si_fd, tcp);
 				break;
 			}
 			break;

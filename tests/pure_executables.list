@@ -557,6 +557,10 @@ ptrace
 ptrace-Xabbrev
 ptrace-Xraw
 ptrace-Xverbose
+ptrace-y
+ptrace-y-Xabbrev
+ptrace-y-Xraw
+ptrace-y-Xverbose
 ptrace_syscall_info
 ptrace_syscall_info-Xabbrev
 ptrace_syscall_info-Xraw

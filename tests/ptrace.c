@@ -15,6 +15,7 @@
 #include <errno.h>
 #include "ptrace.h"
 #include <inttypes.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -32,6 +33,15 @@
 # include "xlat/elf_em.h"
 #undef XLAT_MACROS_ONLY
 #include "xlat/audit_arch.h"
+
+#define NULL_FD 23
+#define NULL_STR "/dev/null"
+
+#ifndef NULL_FD_STR
+# define NULL_FD_STR ""
+#endif
+
+static const char null_path[] = "/dev/null";
 
 #if SIZEOF_LONG > 4
 # define UP64BIT(a_) a_
@@ -1684,6 +1694,15 @@ main(void)
 		(unsigned long) 0xdeadcafefffff00dULL;
 	const int pid = getpid();
 
+	int null_fd = open(null_path, O_RDONLY);
+	if (null_fd < 0)
+		perror_msg_and_fail("open(\"%s\")", null_path);
+	if (null_fd != NULL_FD) {
+		if (dup2(null_fd, NULL_FD) < 0)
+			perror_msg_and_fail("dup2(%d, NULL_FD)", null_fd);
+		close(null_fd);
+	}
+
 	TAIL_ALLOC_OBJECT_CONST_PTR(uint64_t, filter_off);
 
 	const unsigned int sigset_size = get_sigset_size();
@@ -1782,18 +1801,21 @@ main(void)
 	       XLAT_ARGS(PTRACE_GETEVENTMSG),
 	       pid, bad_request, bad_data, errstr);
 
+	/* SIGIO */
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGIO;
 	sip->si_code = 1;
 	sip->si_errno = ENOENT;
 	sip->si_band = -2;
+	sip->si_fd = NULL_FD;
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
-	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_band=-2}"
-	       ") = %s\n",
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_band=-2"
+	       ", si_fd=%d%s}) = %s\n",
 	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request, XLAT_ARGS(SIGIO),
-	       XLAT_ARGS(POLL_IN), XLAT_ARGS(ENOENT), errstr);
+	       XLAT_ARGS(POLL_IN), XLAT_ARGS(ENOENT), NULL_FD, NULL_FD_STR,
+	       errstr);
 
 	/* SIGTRAP */
 	struct valstraux trap_codes[] = {

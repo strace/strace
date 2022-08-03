@@ -777,6 +777,10 @@ ptrace	-a23 -s64 -e signal=none
 ptrace-Xabbrev	-a23 -s64 -e signal=none -e trace=ptrace -Xabbrev
 ptrace-Xraw	-a10 -s64 -e signal=none -e trace=ptrace -Xraw
 ptrace-Xverbose	-a23 -s64 -e signal=none -e trace=ptrace -Xverbose
+ptrace-y		-a23 -s64 -y -e signal=none -e trace=ptrace
+ptrace-y-Xabbrev	-a23 -s64 -y -e signal=none -e trace=ptrace -Xabbrev
+ptrace-y-Xraw		-a10 -s64 -y -e signal=none -e trace=ptrace -Xraw
+ptrace-y-Xverbose	-a23 -s64 -y -e signal=none -e trace=ptrace -Xverbose
 ptrace_syscall_info	-a35 -e signal=none -e trace=ptrace
 ptrace_syscall_info-Xabbrev	-a35 -e signal=none -e trace=ptrace -Xabbrev
 ptrace_syscall_info-Xraw	-a26 -e signal=none -e trace=ptrace -Xraw
