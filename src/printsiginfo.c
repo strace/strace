@@ -166,6 +166,15 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SIGBUS:
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_addr);
+#if !defined(BUS_OPFETCH) && defined(HAVE_SIGINFO_T_SI_ADDR_LSB)
+			switch (sip->si_code) {
+			case BUS_MCEERR_AR:
+			case BUS_MCEERR_AO:
+				tprint_struct_next();
+				PRINT_FIELD_X(*sip, si_addr_lsb);
+				break;
+			}
+#endif /* !BUS_OPFETCH && HAVE_SIGINFO_T_SI_ADDR_LSB */
 			break;
 		case SIGSEGV:
 			tprint_struct_next();

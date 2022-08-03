@@ -33,6 +33,12 @@
 #undef XLAT_MACROS_ONLY
 #include "xlat/audit_arch.h"
 
+struct valstraux {
+	int val;
+	const char *str;
+	const char *aux;
+};
+
 static const char *errstr;
 
 static long
@@ -1827,18 +1833,48 @@ main(void)
 	       XLAT_ARGS(SIGFPE), XLAT_ARGS(FPE_INTDIV), XLAT_ARGS(ENOENT),
 	       sip->si_addr, errstr);
 
+	/* SIGBUS */
+	struct valstraux bus_codes[] = {
+		{ ARG_XLAT_KNOWN(0x1, "BUS_ADRALN") },
+		{ ARG_XLAT_KNOWN(0x2, "BUS_ADRERR") },
+		{ ARG_XLAT_KNOWN(0x3, "BUS_OBJERR") },
+#ifdef BUS_OPFETCH
+		{ ARG_XLAT_KNOWN(0x4, "BUS_OPFETCH") },
+#else
+		{ ARG_XLAT_KNOWN(0x4, "BUS_MCEERR_AR"),
+# ifdef HAVE_SIGINFO_T_SI_ADDR_LSB
+		  ", si_addr_lsb=0xdead"
+# endif
+		},
+#endif
+		{ ARG_XLAT_KNOWN(0x5, "BUS_MCEERR_AO"),
+# if !defined(BUS_OPFETCH) && defined(HAVE_SIGINFO_T_SI_ADDR_LSB)
+		  ", si_addr_lsb=0xdead"
+# endif
+		},
+		{ ARG_STR(0x6) },
+		{ ARG_STR(0x499602d2) },
+	};
+
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGBUS;
 	sip->si_code = 1;
 	sip->si_errno = -2;
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
+#ifdef HAVE_SIGINFO_T_SI_ADDR_LSB
+	sip->si_addr_lsb = 0xdead;
+#endif
+	for (size_t i = 0; i < ARRAY_SIZE(bus_codes); i++) {
+		sip->si_code = bus_codes[i].val;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
-	       ", si_code=" XLAT_FMT ", si_errno=%u, si_addr=%p}) = %s\n",
-	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
-	       XLAT_ARGS(SIGBUS), XLAT_ARGS(BUS_ADRALN),
-	       sip->si_errno, sip->si_addr, errstr);
+		do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+		printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+		       ", si_code=%s, si_errno=%u, si_addr=%p%s}) = %s\n",
+		       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+		       XLAT_ARGS(SIGBUS), bus_codes[i].str,
+		       sip->si_errno, sip->si_addr, bus_codes[i].aux ?: "",
+		       errstr);
+	}
 
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGPROF;
