@@ -1947,16 +1947,23 @@ main(void)
 		       sip->si_addr, trap_codes[i].aux ?: "", errstr);
 	}
 
+	/* SIGILL */
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGILL;
 	sip->si_code = 1;
 	sip->si_errno = ENOENT;
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
+#ifdef si_trapno
+	sip->si_trapno = -12;
+#endif
 
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
-	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_addr=%p}"
-	       ") = %s\n",
+	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_addr=%p"
+#ifdef __sparc__
+	       ", si_trapno=-12"
+#endif
+	       "}) = %s\n",
 	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
 	       XLAT_ARGS(SIGILL), XLAT_ARGS(ILL_ILLOPC), XLAT_ARGS(ENOENT),
 	       sip->si_addr, errstr);

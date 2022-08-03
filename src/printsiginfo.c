@@ -176,6 +176,13 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 			PRINT_FIELD_CLOCK_T(*sip, si_stime);
 			break;
 		case SIGILL:
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_addr);
+#if defined(SPARC) || defined(SPARC64)
+			tprint_struct_next();
+			PRINT_FIELD_D(*sip, si_trapno);
+#endif /* SPARC || SPARC64 */
+			break;
 		case SIGFPE:
 		case SIGBUS:
 			tprint_struct_next();
