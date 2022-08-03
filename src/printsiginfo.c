@@ -184,6 +184,14 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 #endif /* SPARC || SPARC64 */
 			break;
 		case SIGFPE:
+			tprint_struct_next();
+			PRINT_FIELD_PTR(*sip, si_addr);
+#ifdef ALPHA
+			tprint_struct_next();
+			PRINT_FIELD_XVAL_D(*sip, si_trapno, alpha_trap_codes,
+					   "GEN_???");
+#endif /* ALPHA */
+			break;
 		case SIGBUS:
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_addr);
