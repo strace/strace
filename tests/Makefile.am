@@ -730,6 +730,7 @@ EXTRA_DIST = \
 	strauss_head.exp \
 	sun_path.expected \
 	syntax.sh \
+	time_enjoyment.h \
 	trace_clock.in \
 	trace_creds.in \
 	trace_fstat.in \
