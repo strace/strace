@@ -108,21 +108,26 @@ sprint_siginfo(const siginfo_t *const si, const char *const status_text,
 	       const char *const comm)
 {
 	static char buf[1024];
+	char utime_str[64];
+	char stime_str[64];
+
 	snprintf(buf, sizeof(buf),
 		 "{si_signo=SIGCHLD"
 		 ", si_code=%s"
 		 ", si_pid=%d%s"
 		 ", si_uid=%d"
 		 ", si_status=%s"
-		 ", si_utime=%llu"
-		 ", si_stime=%llu}",
+		 ", si_utime=%s"
+		 ", si_stime=%s}",
 		 si_code_2_name(si->si_code),
 		 si->si_pid,
 		 comm,
 		 si->si_uid,
 		 status_text,
-		 zero_extend_signed_to_ull(si->si_utime),
-		 zero_extend_signed_to_ull(si->si_stime));
+		 clock_t_str(zero_extend_signed_to_ull(si->si_utime),
+			     ARRSZ_PAIR(utime_str)),
+		 clock_t_str(zero_extend_signed_to_ull(si->si_stime),
+			     ARRSZ_PAIR(stime_str)));
 	return buf;
 }
 

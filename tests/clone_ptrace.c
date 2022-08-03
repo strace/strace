@@ -95,13 +95,16 @@ main(void)
 	if (!WIFSIGNALED(status) || WTERMSIG(status) != sig)
 		error_msg_and_fail("unexpected child exit status %d", status);
 
+	char utm_str[64];
+	char stm_str[64];
 	printf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_KILLED, si_pid=%d"
-	       ", si_uid=%d, si_status=%s, si_utime=%u, si_stime=%u} ---\n"
+	       ", si_uid=%d, si_status=%s, si_utime=%s, si_stime=%s} ---\n"
 #if !QUIET_EXIT
 	       "+++ exited with 0 +++\n"
 #endif
 	       , pid, geteuid(), "SIGUSR1",
-	       (unsigned int) sinfo.si_utime, (unsigned int) sinfo.si_stime);
+	       clock_t_str((unsigned int) sinfo.si_utime, ARRSZ_PAIR(utm_str)),
+	       clock_t_str((unsigned int) sinfo.si_stime, ARRSZ_PAIR(stm_str)));
 
 	return 0;
 }

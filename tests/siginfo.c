@@ -15,6 +15,12 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#include "time_enjoyment.h"
+
+enum {
+	CPUTIME_LIMIT_NSEC = 100000000,
+};
+
 static siginfo_t sinfo;
 
 static void
@@ -26,6 +32,9 @@ handler(int no, siginfo_t *si, void *uc)
 int
 main(void)
 {
+	char utime_str[64];
+	char stime_str[64];
+
 	tprintf("%s", "");
 
 	int fds[2];
@@ -65,10 +74,12 @@ main(void)
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED"
 		", si_pid=%d, si_uid=%d, si_status=%d"
-		", si_utime=%llu, si_stime=%llu} ---\n",
+		", si_utime=%s, si_stime=%s} ---\n",
 		sinfo.si_pid, sinfo.si_uid, sinfo.si_status,
-		zero_extend_signed_to_ull(sinfo.si_utime),
-		zero_extend_signed_to_ull(sinfo.si_stime));
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_utime),
+			    ARRSZ_PAIR(utime_str)),
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_stime),
+			    ARRSZ_PAIR(stime_str)));
 
 	int s;
 	assert(wait(&s) == pid);
@@ -84,6 +95,7 @@ main(void)
 		(void) close(1);
 		char c;
 		assert(read(0, &c, sizeof(c)) == 1);
+		enjoy_time(CPUTIME_LIMIT_NSEC);
 		(void) raise(SIGUSR1);
 		return 1;
 	}
@@ -96,10 +108,12 @@ main(void)
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_KILLED"
 		", si_pid=%d, si_uid=%d, si_status=SIGUSR1"
-		", si_utime=%llu, si_stime=%llu} ---\n",
+		", si_utime=%s, si_stime=%s} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		zero_extend_signed_to_ull(sinfo.si_utime),
-		zero_extend_signed_to_ull(sinfo.si_stime));
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_utime),
+			    ARRSZ_PAIR(utime_str)),
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_stime),
+			    ARRSZ_PAIR(stime_str)));
 
 	assert(wait(&s) == pid);
 	assert(WIFSIGNALED(s) && WTERMSIG(s) == SIGUSR1);
@@ -112,6 +126,7 @@ main(void)
 
 	if (!pid) {
 		(void) close(1);
+		enjoy_time(CPUTIME_LIMIT_NSEC);
 		raise(SIGSTOP);
 		char c;
 		assert(read(0, &c, sizeof(c)) == 1);
@@ -123,20 +138,24 @@ main(void)
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_STOPPED"
 		", si_pid=%d, si_uid=%d, si_status=SIGSTOP"
-		", si_utime=%llu, si_stime=%llu} ---\n",
+		", si_utime=%s, si_stime=%s} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		zero_extend_signed_to_ull(sinfo.si_utime),
-		zero_extend_signed_to_ull(sinfo.si_stime));
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_utime),
+			    ARRSZ_PAIR(utime_str)),
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_stime),
+			    ARRSZ_PAIR(stime_str)));
 
 	assert(kill(pid, SIGCONT) == 0);
 
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_CONTINUED"
 		", si_pid=%d, si_uid=%d, si_status=SIGCONT"
-		", si_utime=%llu, si_stime=%llu} ---\n",
+		", si_utime=%s, si_stime=%s} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		zero_extend_signed_to_ull(sinfo.si_utime),
-		zero_extend_signed_to_ull(sinfo.si_stime));
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_utime),
+			    ARRSZ_PAIR(utime_str)),
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_stime),
+			    ARRSZ_PAIR(stime_str)));
 
 	assert(write(1, "", 1) == 1);
 	(void) close(1);
@@ -144,10 +163,12 @@ main(void)
 	sigsuspend(&unblock_mask);
 	tprintf("--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED"
 		", si_pid=%d, si_uid=%d, si_status=0"
-		", si_utime=%llu, si_stime=%llu} ---\n",
+		", si_utime=%s, si_stime=%s} ---\n",
 		sinfo.si_pid, sinfo.si_uid,
-		zero_extend_signed_to_ull(sinfo.si_utime),
-		zero_extend_signed_to_ull(sinfo.si_stime));
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_utime),
+			    ARRSZ_PAIR(utime_str)),
+		clock_t_str(zero_extend_signed_to_ull(sinfo.si_stime),
+			    ARRSZ_PAIR(stime_str)));
 
 	assert(wait(&s) == pid && s == 0);
 

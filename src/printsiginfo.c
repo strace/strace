@@ -171,9 +171,9 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 				PRINT_FIELD_OBJ_VAL(*sip, si_status, printsignal);
 			}
 			tprint_struct_next();
-			PRINT_FIELD_U(*sip, si_utime);
+			PRINT_FIELD_CLOCK_T(*sip, si_utime);
 			tprint_struct_next();
-			PRINT_FIELD_U(*sip, si_stime);
+			PRINT_FIELD_CLOCK_T(*sip, si_stime);
 			break;
 		case SIGILL:
 		case SIGFPE:
