@@ -42,6 +42,7 @@ libselinux_LDADD =
 endif
 
 libtests_a_SOURCES = \
+	clock_t_str.c \
 	create_nl_socket.c \
 	create_tmpfile.c \
 	dirfd.c \
@@ -88,7 +89,7 @@ libtests_a_SOURCES = \
 	# end of libtests_a_SOURCES
 libtests_a_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 check_LIBRARIES = libtests.a
-LDADD = libtests.a
+LDADD = libtests.a ${m_LIBS}
 
 include pure_executables.am
 
@@ -405,7 +406,6 @@ mmap64_Xraw_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mmap64_Xverbose_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 mq_LDADD = $(mq_LIBS) $(LDADD)
 newfstatat_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
-nlattr_ifla_linkinfo_LDADD = ${m_LIBS} $(LDADD)
 nlattr_mdba_router_port_LDADD = ${m_LIBS} $(LDADD)
 pc_LDADD = $(dl_LIBS) $(LDADD)
 pread64_pwrite64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64

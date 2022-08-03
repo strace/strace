@@ -330,6 +330,9 @@ void print_time_t_nsec(time_t, unsigned long long, int);
 /* Print time_t and microseconds in symbolic format. */
 void print_time_t_usec(time_t, unsigned long long, int);
 
+/* Put a formatted clock_t string representation into a string. */
+const char *clock_t_str(uint64_t val, char *str, size_t str_size);
+
 /* Read an int from the file. */
 int read_int_from_file(const char *, int *);
 
