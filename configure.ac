@@ -425,7 +425,9 @@ AC_CHECK_MEMBERS(m4_normalize([
 	siginfo_t.si_timerid,
 	siginfo_t.si_overrun,
 	siginfo_t.si_pkey,
-	siginfo_t.si_addr_lsb
+	siginfo_t.si_addr_lsb,
+	siginfo_t.si_lower,
+	siginfo_t.si_upper
 ]),,, [#include <signal.h>])
 
 AC_CHECK_HEADERS(m4_normalize([

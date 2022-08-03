@@ -179,14 +179,26 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SIGSEGV:
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_addr);
-#ifdef HAVE_SIGINFO_T_SI_PKEY
+#if (!defined(SEGV_STACKFLOW) && defined(HAVE_SIGINFO_T_SI_LOWER)) \
+    || (!defined(__SEGV_PSTKOVF) && defined(HAVE_SIGINFO_T_SI_PKEY))
 			switch (sip->si_code) {
+# if !defined(SEGV_STACKFLOW) && defined(HAVE_SIGINFO_T_SI_LOWER)
+			case SEGV_BNDERR:
+				tprint_struct_next();
+				PRINT_FIELD_PTR(*sip, si_lower);
+				tprint_struct_next();
+				PRINT_FIELD_PTR(*sip, si_upper);
+				break;
+# endif /* !SEGV_STACKFLOW && HAVE_SIGINFO_T_SI_LOWER */
+# if !defined(__SEGV_PSTKOVF) && defined(HAVE_SIGINFO_T_SI_PKEY)
 			case SEGV_PKUERR:
 				tprint_struct_next();
 				PRINT_FIELD_U(*sip, si_pkey);
 				break;
+# endif /* !__SEGV_PSTKOVF && HAVE_SIGINFO_T_SI_PKEY */
 			}
-#endif
+#endif /* !SEGV_STACKFLOW && HAVE_SIGINFO_T_SI_LOWER
+	* || !__SEGV_PSTKOVF && HAVE_SIGINFO_T_SI_PKEY */
 			break;
 		case SIGPOLL:
 			switch (sip->si_code) {

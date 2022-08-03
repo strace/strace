@@ -33,6 +33,12 @@
 #undef XLAT_MACROS_ONLY
 #include "xlat/audit_arch.h"
 
+#if SIZEOF_LONG > 4
+# define UP64BIT(a_) a_
+#else
+# define UP64BIT(a_)
+#endif
+
 struct valstraux {
 	int val;
 	const char *str;
@@ -1890,21 +1896,96 @@ main(void)
 	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
 	       XLAT_ARGS(SIGPROF), sip->si_code, sip->si_errno, errstr);
 
-#if defined HAVE_SIGINFO_T_SI_PKEY && defined SEGV_PKUERR
+	/* SIGSEGV */
+	struct valstraux segv_codes[] = {
+		{ ARG_XLAT_KNOWN(0x1, "SEGV_MAPERR") },
+		{ ARG_XLAT_KNOWN(0x2, "SEGV_ACCERR") },
+#ifdef SEGV_STACKFLOW
+		{ ARG_XLAT_KNOWN(0x3, "SEGV_STACKFLOW") },
+#else
+		{ ARG_XLAT_KNOWN(0x3, "SEGV_BNDERR"), ""
+# ifdef HAVE_SIGINFO_T_SI_LOWER
+		  ", si_lower=NULL, si_upper=NULL"
+		},
+		{ ARG_XLAT_KNOWN(0x3, "SEGV_BNDERR"),
+		  ", si_lower=NULL"
+		  ", si_upper=0x" UP64BIT("deadc0de") "beadfeed" },
+		{ ARG_XLAT_KNOWN(0x3, "SEGV_BNDERR"),
+		  ", si_lower=0x" UP64BIT("facecafe") "befeeded"
+		  ", si_upper=NULL" },
+		{ ARG_XLAT_KNOWN(0x3, "SEGV_BNDERR"),
+		  ", si_lower=0x" UP64BIT("beefface") "cafedead"
+		  ", si_upper=0x" UP64BIT("badc0ded") "dadfaced",
+#endif /* HAVE_SIGINFO_T_SI_LOWER */
+		},
+#endif /* SEGV_STACKFLOW */
+#ifdef __SEGV_PSTKOVF
+		{ ARG_XLAT_KNOWN(0x4, "__SEGV_PSTKOVF") },
+#else
+		{ ARG_XLAT_KNOWN(0x4, "SEGV_PKUERR"), ""
+# ifdef HAVE_SIGINFO_T_SI_PKEY
+		  ", si_pkey=0"
+		},
+		{ ARG_XLAT_KNOWN(0x4, "SEGV_PKUERR"), ", si_pkey=1234567890" },
+		{ ARG_XLAT_KNOWN(0x4, "SEGV_PKUERR"), ", si_pkey=3141592653"
+# endif /* HAVE_SIGINFO_T_SI_PKEY */
+		},
+#endif /* __SEGV_PSTKOVF */
+		{ ARG_XLAT_KNOWN(0x5, "SEGV_ACCADI") },
+		{ ARG_XLAT_KNOWN(0x6, "SEGV_ADIDERR") },
+		{ ARG_XLAT_KNOWN(0x7, "SEGV_ADIPERR") },
+		{ ARG_XLAT_KNOWN(0x8, "SEGV_MTEAERR") },
+		{ ARG_XLAT_KNOWN(0x9, "SEGV_MTESERR") },
+		{ ARG_STR(0xa) },
+		{ ARG_STR(0x499602d2) },
+	};
+	uint32_t segv_pkey_vecs[] = { 0, 1234567890, 3141592653U };
+	struct {
+		void *lower;
+		void *upper;
+	} segv_bnd_vecs[] = {
+		{ 0, 0 },
+		{ 0, (void *) (uintptr_t) 0xdeadc0debeadfeedULL },
+		{ (void *) (uintptr_t) 0xfacecafebefeededULL, 0 },
+		{ (void *) (uintptr_t) 0xbeeffacecafedeadULL,
+		  (void *) (uintptr_t) 0xbadc0deddadfacedULL },
+	};
+	size_t segv_pkey_pos = 0;
+	size_t segv_bnd_pos = 0;
+
 	memset(sip, -1, sizeof(*sip));
 	sip->si_signo = SIGSEGV;
-	sip->si_code = SEGV_PKUERR;
 	sip->si_errno = 0;
 	sip->si_addr = (void *) (unsigned long) 0xfacefeeddeadbeefULL;
-	sip->si_pkey = 0xbadc0ded;
 
-	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
-	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
-	       ", si_code=" XLAT_FMT ", si_addr=%p, si_pkey=%u}) = %s\n",
-	       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
-	       XLAT_ARGS(SIGSEGV), XLAT_ARGS(SEGV_PKUERR),
-	       sip->si_addr, sip->si_pkey, errstr);
+	for (size_t i = 0; i < ARRAY_SIZE(segv_codes); i++) {
+		sip->si_code = segv_codes[i].val;
+
+		switch (sip->si_code) {
+		case 3: /* SEGV_BNDERR */
+#ifdef HAVE_SIGINFO_T_SI_LOWER
+			sip->si_lower = segv_bnd_vecs[segv_bnd_pos].lower;
+			sip->si_upper = segv_bnd_vecs[segv_bnd_pos].upper;
 #endif
+			segv_bnd_pos = (segv_bnd_pos + 1)
+				       % ARRAY_SIZE(segv_bnd_vecs);
+			break;
+		case 4: /* SEGV_PKUERR */
+#ifdef HAVE_SIGINFO_T_SI_PKEY
+			sip->si_pkey = segv_pkey_vecs[segv_pkey_pos];
+#endif
+			segv_pkey_pos = (segv_pkey_pos + 1)
+					% ARRAY_SIZE(segv_pkey_vecs);
+			break;
+		};
+
+		do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
+		printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
+		       ", si_code=%s, si_addr=%p%s}) = %s\n",
+		       XLAT_ARGS(PTRACE_SETSIGINFO), pid, bad_request,
+		       XLAT_ARGS(SIGSEGV), segv_codes[i].str,
+		       sip->si_addr, segv_codes[i].aux ?: "", errstr);
+	}
 
 #ifdef HAVE_SIGINFO_T_SI_SYSCALL
 	memset(sip, -1, sizeof(*sip));
