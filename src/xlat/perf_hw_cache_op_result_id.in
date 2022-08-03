@@ -1,3 +1,3 @@
-#sorted sort -k2,2n
+#value_indexed
 PERF_COUNT_HW_CACHE_RESULT_ACCESS 0
 PERF_COUNT_HW_CACHE_RESULT_MISS   1

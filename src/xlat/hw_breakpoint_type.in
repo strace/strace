@@ -1,4 +1,4 @@
-#sorted sort -k2,2n
+#value_indexed
 HW_BREAKPOINT_EMPTY 0
 HW_BREAKPOINT_R 1
 HW_BREAKPOINT_W 2

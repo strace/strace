@@ -1,4 +1,4 @@
-#sorted sort -k2,2n
+#value_indexed
 PERF_COUNT_HW_CPU_CYCLES               0
 PERF_COUNT_HW_INSTRUCTIONS             1
 PERF_COUNT_HW_CACHE_REFERENCES         2

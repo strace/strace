@@ -1,4 +1,4 @@
-#sorted sort -k2,2n
+#value_indexed
 PERF_TYPE_HARDWARE    0
 PERF_TYPE_SOFTWARE    1
 PERF_TYPE_TRACEPOINT  2
