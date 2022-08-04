@@ -520,6 +520,10 @@ prctl-sched-core-Xraw
 prctl-sched-core-Xverbose
 prctl-securebits
 prctl-set_vma
+prctl-sme
+prctl-sme-Xabbrev
+prctl-sme-Xraw
+prctl-sme-Xverbose
 prctl-sve
 prctl-syscall-user-dispatch
 prctl-tagged-addr

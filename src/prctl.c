@@ -26,6 +26,7 @@
 #include "xlat/pr_sched_core_pidtypes.h"
 #include "xlat/pr_set_mm.h"
 #include "xlat/pr_set_vma.h"
+#include "xlat/pr_sme_vl_flags.h"
 #include "xlat/pr_spec_cmds.h"
 #include "xlat/pr_spec_get_store_bypass_flags.h"
 #include "xlat/pr_spec_set_store_bypass_flags.h"
@@ -85,6 +86,42 @@ sprint_sve_val(kernel_ulong_t arg, bool aux)
 		return NULL;
 
 	const char *flags_str = sprintflags_ex("", pr_sve_vl_flags, flags, '\0',
+					       XLAT_STYLE_ABBREV);
+
+	if (!aux && flags && xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+	{
+		xsprintf(out, "%#" PRI_klx " /* %s%s%#" PRI_klx " */",
+			 arg, flags_str ?: "", flags_str ? "|" : "", vl);
+	} else {
+		xsprintf(out, "%s%s%#" PRI_klx,
+			 flags_str ?: "", flags_str ? "|" : "", vl);
+	}
+
+	return out;
+}
+
+static char *
+sprint_sme_val(kernel_ulong_t arg, bool aux)
+{
+	static char out[sizeof("0x /* PR_SME_SET_VL_ONEXEC|PR_SME_VL_INHERIT"
+			       "|0x|0x */") + sizeof(kernel_ulong_t) * 2 * 3];
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		if (aux)
+			return NULL;
+
+		xsprintf(out, "%#" PRI_klx, arg);
+
+		return out;
+	}
+
+	kernel_ulong_t vl = arg & PR_SME_VL_LEN_MASK;
+	kernel_ulong_t flags = arg & ~PR_SME_VL_LEN_MASK;
+
+	if (!flags && aux)
+		return NULL;
+
+	const char *flags_str = sprintflags_ex("", pr_sme_vl_flags, flags, '\0',
 					       XLAT_STYLE_ABBREV);
 
 	if (!aux && flags && xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
@@ -302,6 +339,24 @@ SYS_FUNC(prctl)
 		if (syserror(tcp))
 			return 0;
 		tcp->auxstr = sprint_tagged_addr_val(tcp->u_rval, true);
+
+		return RVAL_HEX | RVAL_STR;
+
+	case PR_SME_SET_VL:
+		if (entering(tcp)) {
+			tprint_arg_next();
+			tprints(sprint_sme_val(arg2, false));
+			return 0;
+		}
+		ATTRIBUTE_FALLTHROUGH;
+
+	case PR_SME_GET_VL:
+		if (entering(tcp))
+			break;
+		if (syserror(tcp) || tcp->u_rval == 0)
+			return 0;
+
+		tcp->auxstr = sprint_sme_val(tcp->u_rval, true);
 
 		return RVAL_HEX | RVAL_STR;
 

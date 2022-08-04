@@ -301,6 +301,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	prctl-set-ptracer-success-Xraw--pidns-translation \
 	prctl-set-ptracer-success-Xverbose \
 	prctl-set-ptracer-success-Xverbose--pidns-translation \
+	prctl-sme-success \
+	prctl-sme-success-Xabbrev \
+	prctl-sme-success-Xraw \
+	prctl-sme-success-Xverbose \
 	prctl-spec-inject \
 	prctl-tagged-addr-success \
 	prctl-tagged-addr-success-Xabbrev \

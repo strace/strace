@@ -730,6 +730,14 @@ prctl-set-ptracer-success-Xraw--pidns-translation	check_scno_tampering; test_pid
 prctl-set-ptracer-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS=0 -a42 -Xverbose
 prctl-set-ptracer-success-Xverbose--pidns-translation	check_scno_tampering; test_pidns -einject=prctl:when=256+:retval=0 -etrace=prctl -a48 "QUIRK:START-OF-TEST-OUTPUT:prctl(0xffffffff /* PR_??? */, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)" -Xverbose
 prctl-set_vma	+prctl.sh
+prctl-sme			+prctl.sh -a21
+prctl-sme-Xabbrev		+prctl.sh -a21 -Xabbrev
+prctl-sme-Xraw			+prctl.sh -a12 -Xraw
+prctl-sme-Xverbose		+prctl.sh -a32 -Xverbose
+prctl-sme-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba9000 0xdec0ded" -a21
+prctl-sme-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a21 -Xabbrev
+prctl-sme-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a12 -Xraw
+prctl-sme-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a32 -Xverbose
 prctl-spec-inject	+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 3 8 16 32 42" -a50
 prctl-sve		+prctl.sh -a21
 prctl-syscall-user-dispatch	+prctl.sh -a68
