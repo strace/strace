@@ -15,6 +15,7 @@ Noteworthy changes in release ?.?? (????-??-??)
     INET_DIAG_PROTOCOL, INET_DIAG_REQ_PROTOCOL, INET_DIAG_SHUTDOWN,
     INET_DIAG_SK_BPF_STORAGES, INET_DIAG_SOCKOPT, and INET_DIAG_ULP_INFO
     NETLINK_SOCK_DIAG netlink attributes.
+  * Enhanced decoding of prctl syscall.
   * Enhanced siginfo_t decoding.
   * Updated decoding of struct rtnl_link_stats64.
   * Updated lists of DEVCONF_*, FAN_MARK_*, GPIO_V2_LINE_FLAG_*, IORING_*,

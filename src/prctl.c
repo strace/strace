@@ -64,17 +64,37 @@ print_prctl_args(struct tcb *tcp, const unsigned int first)
 }
 
 static char *
-sprint_sve_val(kernel_ulong_t arg)
+sprint_sve_val(kernel_ulong_t arg, bool aux)
 {
-	static char out[sizeof("PR_SVE_SET_VL_ONEXEC|PR_SVE_VL_INHERIT|0x") +
-			sizeof(kernel_ulong_t) * 2];
+	static char out[sizeof("0x /* PR_SVE_SET_VL_ONEXEC|PR_SVE_VL_INHERIT"
+			       "|0x|0x */") + sizeof(kernel_ulong_t) * 2 * 3];
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW) {
+		if (aux)
+			return NULL;
+
+		xsprintf(out, "%#" PRI_klx, arg);
+
+		return out;
+	}
 
 	kernel_ulong_t vl = arg & PR_SVE_VL_LEN_MASK;
 	kernel_ulong_t flags = arg & ~PR_SVE_VL_LEN_MASK;
-	const char *flags_str = sprintflags("", pr_sve_vl_flags, flags);
 
-	xsprintf(out, "%s%s%#" PRI_klx,
-		 flags_str ?: "", flags_str ? "|" : "", vl);
+	if (!flags && aux)
+		return NULL;
+
+	const char *flags_str = sprintflags_ex("", pr_sve_vl_flags, flags, '\0',
+					       XLAT_STYLE_ABBREV);
+
+	if (!aux && flags && xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+	{
+		xsprintf(out, "%#" PRI_klx " /* %s%s%#" PRI_klx " */",
+			 arg, flags_str ?: "", flags_str ? "|" : "", vl);
+	} else {
+		xsprintf(out, "%s%s%#" PRI_klx,
+			 flags_str ?: "", flags_str ? "|" : "", vl);
+	}
 
 	return out;
 }
@@ -229,7 +249,7 @@ SYS_FUNC(prctl)
 	case PR_SVE_SET_VL:
 		if (entering(tcp)) {
 			tprint_arg_next();
-			tprints(sprint_sve_val(arg2));
+			tprints(sprint_sve_val(arg2, false));
 			return 0;
 		}
 		ATTRIBUTE_FALLTHROUGH;
@@ -240,9 +260,9 @@ SYS_FUNC(prctl)
 		if (syserror(tcp) || tcp->u_rval == 0)
 			return 0;
 
-		tcp->auxstr = sprint_sve_val(tcp->u_rval);
+		tcp->auxstr = sprint_sve_val(tcp->u_rval, true);
 
-		return RVAL_STR;
+		return RVAL_HEX | RVAL_STR;
 
 	case PR_GET_SPECULATION_CTRL:
 		if (entering(tcp)) {
