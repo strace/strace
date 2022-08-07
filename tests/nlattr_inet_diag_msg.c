@@ -150,28 +150,28 @@ static const struct {
 	  "{tcpm_family=AF_UNSPEC, tcpm_prefixlen=0, tcpm_keylen=0"
 	  ", tcpm_addr=\"\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00"
 	  "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\", tcpm_key=\"\"}" },
-	{ { AF_INET, 0x42, 1, { BE_LE(0xdeadface, 0xcefaedde) } },
+	{ { AF_INET, 0x42, 1, { BE_LE(0xdeadface, 0xcefaadde) } },
 	  "{tcpm_family=AF_INET, tcpm_prefixlen=66, tcpm_keylen=1"
-	  ", tcpm_addr=inet_addr(\"222.237.250.206\")"
+	  ", tcpm_addr=inet_addr(\"222.173.250.206\")"
 	  ", tcpm_key=\"\\x00\"}" },
 	{ { AF_INET6, 0xbe, 42,
 	    { BE_LE(0xdeadface, 0xcefaadde), BE_LE(0xcafe0000, 0xfeca),
-	      BE_LE(0xface, 0xcefa0000), BE_LE(0xbadc0ded, 0xed0cdcba) },
+	      BE_LE(0xface, 0xcefa0000), BE_LE(0xbadc0ded, 0xed0ddcba) },
 	    "OH HAI THAR\0\1\2\3\4\5\6\7\3779876543210abcdefghijklmnopqrstuv" },
 	  "{tcpm_family=AF_INET6, tcpm_prefixlen=190, tcpm_keylen=42"
-	  ", inet_pton(AF_INET6, \"dead:face:cafe::face:badc:ced\", &tcpm_addr)"
+	  ", inet_pton(AF_INET6, \"dead:face:cafe::face:badc:ded\", &tcpm_addr)"
 	  ", tcpm_key=\"\\x4f\\x48\\x20\\x48\\x41\\x49\\x20\\x54\\x48\\x41"
 	  "\\x52\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\xff\\x39\\x38\\x37"
 	  "\\x36\\x35\\x34\\x33\\x32\\x31\\x30\\x61\\x62\\x63\\x64\\x65\\x66"
 	  "\\x67\\x68\\x69\\x6a\\x6b\\x6c\"}" },
 	{ { 46, 0, 45067,
 	    { BE_LE(0xdeadface, 0xcefaadde), BE_LE(0xcafe0000, 0xfeca),
-	      BE_LE(0xface, 0xcefa0000), BE_LE(0xbadc0ded, 0xed0cdcba) },
+	      BE_LE(0xface, 0xcefa0000), BE_LE(0xbadc0ded, 0xed0ddcba) },
 	    "OH HAI THAR\0\1\2\3\4\5\6\7\3779876543210abcdefghijklmnopqrstuv"
 	    "xyz0123456789ABCDEFGHIJKLMNO" },
 	  "{tcpm_family=0x2e /* AF_??? */, tcpm_prefixlen=0, tcpm_keylen=45067"
 	  ", tcpm_addr=\"\\xde\\xad\\xfa\\xce\\xca\\xfe\\x00\\x00"
-	  "\\x00\\x00\\xfa\\xce\\xba\\xdc\\x0c\\xed\""
+	  "\\x00\\x00\\xfa\\xce\\xba\\xdc\\x0d\\xed\""
 	  ", tcpm_key=\"\\x4f\\x48\\x20\\x48\\x41\\x49\\x20\\x54\\x48\\x41"
 	  "\\x52\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\xff\\x39\\x38\\x37"
 	  "\\x36\\x35\\x34\\x33\\x32\\x31\\x30\\x61\\x62\\x63\\x64\\x65\\x66"
@@ -821,7 +821,7 @@ main(void)
 		{ 3, BE_LE("\x1e\xad", "\x78\xb5"),
 		  "{hdrincl=1, mc_loop=1, transparent=1, mc_all=1"
 		  ", bind_address_no_port=1, defer_connect=1"
-		  ", unused=0x16 /* bits 3..8 */}" },
+		  ", unused=" BE_LE("0xd", "0x16") " /* bits 3..8 */}" },
 		{ 4, "\xff\xff\x00\xff",
 		  "{recverr=1, is_icsk=1, freebind=1, hdrincl=1, mc_loop=1"
 		  ", transparent=1, mc_all=1, nodefrag=1"
