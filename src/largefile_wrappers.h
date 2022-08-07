@@ -2,7 +2,7 @@
  * Wrappers for handling discrepancies in LF64-themed syscalls availability and
  * necessity between various architectures and kernel versions.
  *
- * Copyright (c) 2012-2021 The strace developers.
+ * Copyright (c) 2012-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
