@@ -17,7 +17,8 @@ Noteworthy changes in release ?.?? (????-??-??)
     NETLINK_SOCK_DIAG netlink attributes.
   * Updated decoding of struct rtnl_link_stats64.
   * Updated lists of DEVCONF_*, FAN_MARK_*, GPIO_V2_LINE_FLAG_*, IORING_*,
-    KEXEC_*, LANDLOCK_*, NET_IPV4_CONF_*, NT_*, and UFFD_FEATURE_* constants.
+    KEXEC_*, LANDLOCK_*, NET_IPV4_CONF_*, NLM_F_*, NT_*,
+    and UFFD_FEATURE_* constants.
   * Updated lists of ioctl commands from Linux 5.19.
 
 * Bug fixes

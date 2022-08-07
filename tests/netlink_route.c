@@ -110,11 +110,11 @@ test_nlmsg_flags(const int fd)
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 
 	nlh.nlmsg_type = RTM_DELLINK;
-	nlh.nlmsg_flags = NLM_F_NONREC;
+	nlh.nlmsg_flags = NLM_F_NONREC | NLM_F_BULK;
 	rc = sendto(fd, &nlh, sizeof(nlh), MSG_DONTWAIT, NULL, 0);
 	printf("sendto(%d, {nlmsg_len=%u, nlmsg_type=RTM_DELLINK"
-	       ", nlmsg_flags=NLM_F_NONREC, nlmsg_seq=0, nlmsg_pid=0}"
-	       ", %u, MSG_DONTWAIT, NULL, 0) = %s\n",
+	       ", nlmsg_flags=NLM_F_NONREC|NLM_F_BULK, nlmsg_seq=0"
+	       ", nlmsg_pid=0}, %u, MSG_DONTWAIT, NULL, 0) = %s\n",
 	       fd, nlh.nlmsg_len, (unsigned) sizeof(nlh), sprintrc(rc));
 }
 
