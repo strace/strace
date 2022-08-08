@@ -51,9 +51,8 @@ static struct s {
 		} ts;
 		struct {
 			struct dm_target_msg target_msg;
-			char target_string[256];
 		} tm;
-		char string[256];
+		char string[256 + sizeof(struct dm_target_msg)];
 	} u;
 } s;
 
