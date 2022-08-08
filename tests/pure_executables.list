@@ -15,6 +15,10 @@ adjtimex
 aio
 aio_pgetevents
 alarm
+arch_prctl
+arch_prctl-Xabbrev
+arch_prctl-Xraw
+arch_prctl-Xverbose
 at_fdcwd-pathmax
 bpf
 bpf-v

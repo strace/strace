@@ -23,6 +23,14 @@ aio
 aio_pgetevents
 alarm
 answer
+arch_prctl
+arch_prctl-Xabbrev
+arch_prctl-Xraw
+arch_prctl-Xverbose
+arch_prctl-success
+arch_prctl-success-Xabbrev
+arch_prctl-success-Xraw
+arch_prctl-success-Xverbose
 at_fdcwd-pathmax
 attach-f-p
 attach-f-p-cmd

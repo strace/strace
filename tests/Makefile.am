@@ -99,6 +99,10 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	$(secontext_EXECUTABLES) \
 	_newselect-P \
 	answer \
+	arch_prctl-success \
+	arch_prctl-success-Xabbrev \
+	arch_prctl-success-Xraw \
+	arch_prctl-success-Xverbose \
 	attach-f-p \
 	attach-f-p-cmd \
 	attach-p-cmd-cmd \
@@ -633,6 +637,7 @@ EXTRA_DIST = \
 	GPL-2.0-or-later \
 	PTRACE_SEIZE.sh \
 	accept_compat.h \
+	arch_prctl.sh \
 	attach-p-cmd.h \
 	caps-abbrev.awk \
 	caps.awk \

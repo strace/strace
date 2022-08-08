@@ -20,6 +20,14 @@ adjtimex	-a15
 aio	-a14 -e trace=io_setup,io_submit,io_getevents,io_cancel,io_destroy
 aio_pgetevents	-e trace=io_pgetevents
 alarm	-a10
+arch_prctl			+arch_prctl.sh -a27
+arch_prctl-Xabbrev		+arch_prctl.sh -a27 -Xabbrev
+arch_prctl-Xraw			+arch_prctl.sh -a17 -Xraw
+arch_prctl-Xverbose		+arch_prctl.sh -a32 -Xverbose
+arch_prctl-success		+prctl-success.sh ARCH_PRCTL_INJECT_RETVALS="0 1 2 3 0x20 0xc0 0xdead 0x20000 0x40000 0x60000 0x687ff 0x97800 0x789abcde" -a27
+arch_prctl-success-Xabbrev	+prctl-success.sh ARCH_PRCTL_INJECT_RETVALS="0 1 2 3 0x20 0xc0 0xdead 0x20000 0x40000 0x60000 0x687ff 0x97800 0x789abcde" -a27 -Xabbrev
+arch_prctl-success-Xraw		+prctl-success.sh ARCH_PRCTL_INJECT_RETVALS="0 1 2 3 0x20 0xc0 0xdead 0x20000 0x40000 0x60000 0x687ff 0x97800 0x789abcde" -a17 -Xraw
+arch_prctl-success-Xverbose	+prctl-success.sh ARCH_PRCTL_INJECT_RETVALS="0 1 2 3 0x20 0xc0 0xdead 0x20000 0x40000 0x60000 0x687ff 0x97800 0x789abcde" -a32 -Xverbose
 at_fdcwd-pathmax	-a36 --trace=openat -y -P sample
 bpf	-a20
 bpf-obj_get_info_by_fd	-a20 -y -e trace=bpf

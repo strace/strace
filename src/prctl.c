@@ -637,6 +637,8 @@ SYS_FUNC(prctl)
 
 #if defined X86_64 || defined X32 || defined I386
 # include "xlat/archvals.h"
+# include "xlat/x86_xfeature_bits.h"
+# include "xlat/x86_xfeatures.h"
 
 SYS_FUNC(arch_prctl)
 {
@@ -657,6 +659,60 @@ SYS_FUNC(arch_prctl)
 
 	case ARCH_GET_CPUID: /* has no arguments */
 		return RVAL_DECODED;
+
+	case ARCH_GET_XCOMP_SUPP:
+	case ARCH_GET_XCOMP_PERM:
+	case ARCH_GET_XCOMP_GUEST_PERM:
+		if (entering(tcp)) {
+			tprint_arg_next();
+		} else {
+			uint64_t val;
+
+			if (umove_or_printaddr(tcp, addr, &val))
+				return 0;
+
+			/* XFEATURE_MASK_* macros are not publicly exposed */
+			tprint_indirect_begin();
+			printflags_ex(val, "XFEATURE_MASK_???",
+				xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW
+				      ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,
+				x86_xfeatures, NULL);
+			tprint_indirect_end();
+		}
+
+		return 0;
+
+	case ARCH_REQ_XCOMP_PERM:
+	case ARCH_REQ_XCOMP_GUEST_PERM:
+		if (entering(tcp)) {
+			/* XFEATURE_* enum is not publicly exposed */
+			tprint_arg_next();
+			printxvals_ex(addr, "XFEATURE_???",
+				xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW
+				      ? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,
+				x86_xfeature_bits, NULL);
+		} else {
+			if (tcp->u_rval <= 0)
+				return 0;
+
+			tcp->auxstr = sprintflags_ex("", x86_xfeatures,
+					(kernel_ulong_t) tcp->u_rval, '\0',
+					XLAT_STYLE_DEFAULT | SPFF_AUXSTR_MODE);
+
+			return RVAL_HEX | RVAL_STR;
+		}
+
+		return 0;
+
+	/* default handling: print arg2 in hexadecimal on entering */
+	case ARCH_SET_GS:
+	case ARCH_SET_FS:
+	case ARCH_SET_CPUID:
+	case ARCH_MAP_VDSO_X32:
+	case ARCH_MAP_VDSO_32:
+	case ARCH_MAP_VDSO_64:
+	default:
+		break;
 	}
 
 	tprint_arg_next();

@@ -12,8 +12,10 @@
 
 . "${srcdir=.}/scno_tampering.sh"
 
-: ${PRCTL_INJECT_START=256}
-: ${PRCTL_INJECT_RETVALS=42}
+: "${PRCTL_INJECT_START=256}"
+: "${PRCTL_INJECT_RETVALS=42}"
+: "${PRCTL_SYSCALL=prctl}"
+: "${PRCTL_MARKER_RE='prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)'}"
 
 check_prog sed
 
@@ -21,7 +23,16 @@ check_prog sed
 # at the beginning of the argument list.
 while [ "$#" -gt 0 ]; do
 	case "$1" in
-	PRCTL_INJECT_RETVALS=*) PRCTL_INJECT_RETVALS="${1#PRCTL_INJECT_RETVALS=}"; ;;
+	ARCH_PRCTL_INJECT_RETVALS=*)
+		PRCTL_INJECT_RETVALS="${1#ARCH_PRCTL_INJECT_RETVALS=}"
+		PRCTL_SYSCALL=arch_prctl
+		PRCTL_MARKER_RE='arch_prctl(0xffffffff\( \/\* ARCH_??? \*\/\)\?, 0xfffffffe)'
+		;;
+	PRCTL_INJECT_RETVALS=*)
+		PRCTL_INJECT_RETVALS="${1#PRCTL_INJECT_RETVALS=}"
+		PRCTL_SYSCALL=prctl
+		PRCTL_MARKER_RE='prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)'
+		;;
 	*) break; ;;
 	esac
 
@@ -48,9 +59,9 @@ for i in $(echo "$PRCTL_INJECT_RETVALS"); do
 		sed_match="-1 ${i#error=}"
 	fi
 
-	run_strace -a80 "$@" -e trace=prctl \
-		-e inject=prctl:"${inj_str}":when="${PRCTL_INJECT_START}+" \
+	run_strace -a80 "$@" -e trace="${PRCTL_SYSCALL}" \
+		-e inject="${PRCTL_SYSCALL}":"${inj_str}":when="${PRCTL_INJECT_START}+" \
 		"../$NAME" "${PRCTL_INJECT_START}" "${ret_val}" > "$EXP.$i"
-	sed '0,/^prctl(0xffffffff\( \/\* PR_??? \*\/\)\?, 0xfffffffe, 0xfffffffd, 0xfffffffc, 0xfffffffb)  *= '"${sed_match}"' /d' < "$LOG" > "$OUT.$i"
+	sed '0,/^'"${PRCTL_MARKER_RE}"'  *= '"${sed_match}"' /d' < "$LOG" > "$OUT.$i"
 	match_diff "$OUT.$i" "$EXP.$i"
 done
