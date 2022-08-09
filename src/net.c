@@ -691,14 +691,16 @@ print_get_ucred(struct tcb *const tcp, const kernel_ulong_t addr,
 
 static void
 print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
-		unsigned int len)
+		const unsigned int len)
 {
 	unsigned int err;
 
-	if (len > sizeof(err))
-		len = sizeof(err);
+	if (len < sizeof(err)) {
+		printstrn(tcp, addr, len);
+		return;
+	}
 
-	if (umoven_or_printaddr(tcp, addr, len, &err))
+	if (umove_or_printaddr(tcp, addr, &err))
 		return;
 
 	tprint_indirect_begin();
