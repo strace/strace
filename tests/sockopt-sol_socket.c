@@ -253,6 +253,8 @@ main(void)
 		printf("g%s", pfx_str);
 		if (rc < 0)
 			printf("%p", val);
+		else if (names[i].optsz)
+			print_quoted_hex(val, sizeof(*val) - 1);
 		else
 			print_quoted_memory(val, sizeof(*val) - 1);
 		printf(", [%d", (int) sizeof(*val) - 1);

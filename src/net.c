@@ -696,7 +696,7 @@ print_get_error(struct tcb *const tcp, const kernel_ulong_t addr,
 	unsigned int err;
 
 	if (len < sizeof(err)) {
-		printstrn(tcp, addr, len);
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return;
 	}
 
@@ -719,7 +719,7 @@ print_txrehash(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 		if (entering(tcp))
 			printaddr(addr);
 		else
-			printstrn(tcp, addr, len);
+			printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
 		return;
 	}
 
@@ -872,7 +872,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			if (rlen >= (int) sizeof(int))
 				printnum_int(tcp, addr, "%d");
 			else
-				printstrn(tcp, addr, rlen);
+				printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
 			return;
 		}
 		break;
