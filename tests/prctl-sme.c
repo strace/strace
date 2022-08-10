@@ -20,32 +20,42 @@
 # define INJ_STR ""
 #endif
 
+#ifndef EXT
+# define EXT SME
+#endif
+
+#define EXT_STR STRINGIFY_VAL(EXT)
+#define GLUE_(a_, b_, c_) a_ ## b_ ## c_
+#define GLUE(a_, b_, c_) GLUE_(a_, b_, c_)
+#define _(pfx_, sfx_) GLUE(pfx_, EXT, sfx_)
+
 #if !XLAT_RAW
 static void
 print_sme_vl_arg(kernel_ulong_t arg)
 {
-	kernel_ulong_t flags = arg & ~PR_SME_VL_LEN_MASK;
+	kernel_ulong_t flags = arg & ~_(PR_, _VL_LEN_MASK);
 
 	if (arg < 0x10000)
 		return;
 
 	printf(" (");
 
-	if (flags & PR_SME_SET_VL_ONEXEC)
-		printf("PR_SME_SET_VL_ONEXEC");
-	if (flags & PR_SME_VL_INHERIT) {
-		printf("%sPR_SME_VL_INHERIT",
-		       flags & PR_SME_SET_VL_ONEXEC ? "|" : "");
+	if (flags & _(PR_, _SET_VL_ONEXEC))
+		printf("PR_" EXT_STR "_SET_VL_ONEXEC");
+	if (flags & _(PR_, _VL_INHERIT)) {
+		printf("%sPR_" EXT_STR "_VL_INHERIT",
+		       flags & _(PR_, _SET_VL_ONEXEC) ? "|" : "");
 	}
 
-	kernel_ulong_t leftover = flags & ~(PR_SME_SET_VL_ONEXEC|PR_SME_VL_INHERIT);
+	kernel_ulong_t leftover =
+			flags & ~(_(PR_, _SET_VL_ONEXEC)|_(PR_, _VL_INHERIT));
 	if (leftover) {
 		printf("%s%#llx",
 		       leftover == flags ? "" : "|",
 		       (unsigned long long) leftover);
 	}
 
-	kernel_ulong_t lens = arg & PR_SME_VL_LEN_MASK;
+	kernel_ulong_t lens = arg & _(PR_, _VL_LEN_MASK);
 	printf("%s%#llx", flags ? "|" : "", (unsigned long long) lens);
 
 	printf(")");
@@ -94,10 +104,10 @@ main(int argc, char *argv[])
 		{ ARG_STR(0) },
 		{ ARG_STR(0xdead) },
 		{ ARG_XLAT_KNOWN(0x10000, "0x10000|0") },
-		{ ARG_XLAT_KNOWN(0x2ea57, "PR_SME_VL_INHERIT|0xea57") },
-		{ ARG_XLAT_KNOWN(0x40000, "PR_SME_SET_VL_ONEXEC|0") },
-		{ ARG_XLAT_KNOWN(0xfacefeed, "PR_SME_SET_VL_ONEXEC"
-					     "|PR_SME_VL_INHERIT"
+		{ ARG_XLAT_KNOWN(0x2ea57, "PR_" EXT_STR "_VL_INHERIT|0xea57") },
+		{ ARG_XLAT_KNOWN(0x40000, "PR_" EXT_STR "_SET_VL_ONEXEC|0") },
+		{ ARG_XLAT_KNOWN(0xfacefeed, "PR_" EXT_STR "_SET_VL_ONEXEC"
+					     "|PR_" EXT_STR "_VL_INHERIT"
 					     "|0xfac80000|0xfeed") },
 		{ ARG_XLAT_KNOWN(0xbad00000, "0xbad00000|0") },
 		{ ARG_XLAT_KNOWN(0xde90ded, "0xde90000|0xded") },
@@ -111,9 +121,10 @@ main(int argc, char *argv[])
 	};
 
 	for (i = 0; i < ARRAY_SIZE(args); i++) {
-		rc = syscall(__NR_prctl, PR_SME_SET_VL, args[i].val, 1, 2, 3);
+		rc = syscall(__NR_prctl, _(PR_, _SET_VL), args[i].val, 1, 2, 3);
 		errstr = sprintrc(rc);
-		printf("prctl(" XLAT_KNOWN(0x3f, "PR_SME_SET_VL") ", %s) = ",
+		printf("prctl(" XLAT_FMT ", %s) = ",
+		       XLAT_SEL(_(PR_, _SET_VL), "PR_" EXT_STR "_SET_VL"),
 		       args[i].str);
 		if (rc >= 0) {
 			printf("%#lx", rc);
@@ -126,9 +137,10 @@ main(int argc, char *argv[])
 		}
 	}
 
-	rc = syscall(__NR_prctl, PR_SME_GET_VL, 1, 2, 3, 4);
+	rc = syscall(__NR_prctl, _(PR_, _GET_VL), 1, 2, 3, 4);
 	errstr = sprintrc(rc);
-	printf("prctl(" XLAT_KNOWN(0x40, "PR_SME_GET_VL") ") = ");
+	printf("prctl(" XLAT_FMT ") = ",
+	       XLAT_SEL(_(PR_, _GET_VL), "PR_" EXT_STR "_GET_VL"));
 	if (rc >= 0) {
 		printf("%#lx", rc);
 #if !XLAT_RAW

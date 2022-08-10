@@ -529,6 +529,9 @@ prctl-sme-Xabbrev
 prctl-sme-Xraw
 prctl-sme-Xverbose
 prctl-sve
+prctl-sve-Xabbrev
+prctl-sve-Xraw
+prctl-sve-Xverbose
 prctl-syscall-user-dispatch
 prctl-tagged-addr
 prctl-tagged-addr-Xabbrev

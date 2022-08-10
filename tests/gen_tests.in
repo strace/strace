@@ -748,6 +748,13 @@ prctl-sme-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000
 prctl-sme-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a32 -Xverbose
 prctl-spec-inject	+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 3 8 16 32 42" -a50
 prctl-sve		+prctl.sh -a21
+prctl-sve-Xabbrev		+prctl.sh -a21 -Xabbrev
+prctl-sve-Xraw			+prctl.sh -a12 -Xraw
+prctl-sve-Xverbose		+prctl.sh -a32 -Xverbose
+prctl-sve-success		+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba9000 0xdec0ded" -a21
+prctl-sve-success-Xabbrev	+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a21 -Xabbrev
+prctl-sve-success-Xraw		+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a12 -Xraw
+prctl-sve-success-Xverbose	+prctl-success.sh PRCTL_INJECT_RETVALS="0 0xdead 0x10000 0x4ea57 0x20000 0xba90000 0xdec0ded" -a32 -Xverbose
 prctl-syscall-user-dispatch	+prctl.sh -a68
 prctl-tagged-addr		+prctl.sh -a43
 prctl-tagged-addr-Xabbrev	+prctl.sh -Xabbrev -a43
