@@ -197,8 +197,8 @@ fmt_str(char *dst, size_t dst_sz, uint32_t cmd, const char *s, const char *dflt)
 	if (s) {
 		snprintf(dst, dst_sz, XLAT_FMT, XLAT_SEL(cmd, s));
 	} else {
-		snprintf(dst, dst_sz, "%#x" NRAW(" /* ") "%s" NRAW(" */"),
-			 cmd, NRAW(dflt));
+		snprintf(dst, dst_sz, "%#x" NRAW(" /* %s */"),
+			 cmd NRAW(, dflt));
 	}
 }
 

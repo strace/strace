@@ -550,12 +550,13 @@ main(void)
 			} else {
 				printf("%#x%s",
 				       restrictions_data[i].op,
-				       NRAW(restrictions_data[i].op_str));
+				       XLAT_RAW ? ""
+						: restrictions_data[i].op_str);
 			}
 		} else {
 			printf("%#x%s /* op: %#x */",
 			       restrictions_data[i].opcode,
-			       NRAW(restrictions_data[i].opcode_str),
+			       XLAT_RAW ? "" : restrictions_data[i].opcode_str,
 			       restrictions_data[i].op);
 		}
 		printf("}], 1) = %s\n", errstr);
@@ -603,12 +604,14 @@ main(void)
 				} else {
 					printf("%#x%s",
 					       restrictions_data[i].op,
-					       NRAW(restrictions_data[i].op_str));
+					       XLAT_RAW ? ""
+						 : restrictions_data[i].op_str);
 				}
 			} else {
 				printf("%#x%s /* op: %#x */",
 				       restrictions_data[i].opcode,
-				       NRAW(restrictions_data[i].opcode_str),
+				       XLAT_RAW ? ""
+					     : restrictions_data[i].opcode_str,
 				       restrictions_data[i].op);
 			}
 
