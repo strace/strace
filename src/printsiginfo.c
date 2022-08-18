@@ -268,7 +268,8 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 #endif
 		case SIGIO: /* SIGPOLL */
 			switch (sip->si_code) {
-			case POLL_IN: case POLL_OUT: case POLL_MSG:
+			case POLL_IN:  case POLL_OUT: case POLL_MSG:
+			case POLL_ERR: case POLL_PRI: case POLL_HUP:
 				tprint_struct_next();
 				PRINT_FIELD_D(*sip, si_band);
 				tprint_struct_next();
