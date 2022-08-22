@@ -510,7 +510,7 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 
 	CHECK_SIZE_EX(hdr, last_decoded, size, "machine structure");
 
-	tprints("/* machine */ ");
+	tprints_pre_comment("machine");
 	tprint_struct_begin();
 	if (!abbrev(tcp)) {
 		if (hdr->infmflg1) { /* Reserved */
@@ -621,7 +621,7 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 
 	*mt = !!(hdr->infpflg1 & 0x80);
 
-	tprints("/* partition */ ");
+	tprints_pre_comment("partition");
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infpflg1);
 	if (!abbrev(tcp) && hdr->infpflg1)
@@ -807,7 +807,7 @@ print_sthyi_hypervisor(struct tcb *tcp, struct sthyi_hypervisor *hdr,
 
 	CHECK_SIZE_EX(hdr, last_decoded, size, "hypervisor %d structure", num);
 
-	tprintf("/* hypervisor %d */ ", num);
+	tprintf_pre_comment("hypervisor %d", num);
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infyflg1);
 	if (!abbrev(tcp) && hdr->infyflg1)
@@ -923,7 +923,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 {
 	CHECK_SIZE(hdr, size, "guest %d structure", num);
 
-	tprintf("/* guest %d */ ", num);
+	tprintf_pre_comment("guest %d", num);
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infgflg1);
 	if (!abbrev(tcp) && hdr->infgflg1)
@@ -1133,7 +1133,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	tprint_struct_begin();
 
 	/* Header */
-	tprints("/* header */ ");
+	tprints_pre_comment("header");
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infhflg1);
 

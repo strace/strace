@@ -1255,7 +1255,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 		ret = false;
 	} else {
 		prefix_fun();
-		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+		tprintf_pre_comment("bytes %u..%u", start_offs, total_len - 1);
 
 		print_quoted_string(str, size, style);
 
