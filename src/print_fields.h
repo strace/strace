@@ -145,6 +145,18 @@ tprint_comment_end(void)
 }
 
 static inline void
+tprint_pre_comment_begin(void)
+{
+	STRACE_PRINTS("/* ");
+}
+
+static inline void
+tprint_pre_comment_end(void)
+{
+	STRACE_PRINTS(" */ ");
+}
+
+static inline void
 tprint_indirect_begin(void)
 {
 	STRACE_PRINTS("[");

@@ -1689,6 +1689,8 @@ extern void tprintf(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints(const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints_comment(const char *str);
+extern void tprintf_pre_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
+extern void tprints_pre_comment(const char *str);
 
 /*
  * Staging output for status qualifier.

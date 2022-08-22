@@ -741,8 +741,11 @@ tprints(const char *str)
 void
 tprints_comment(const char *const str)
 {
-	if (str && *str)
-		tprintf(" /* %s */", str);
+	if (str && *str) {
+		tprint_comment_begin();
+		tprints(str);
+		tprint_comment_end();
+	}
 }
 
 void
@@ -756,6 +759,30 @@ tprintf_comment(const char *fmt, ...)
 	tprint_comment_begin();
 	tvprintf(fmt, args);
 	tprint_comment_end();
+	va_end(args);
+}
+
+void
+tprints_pre_comment(const char *const str)
+{
+	if (str && *str) {
+		tprint_pre_comment_begin();
+		tprints(str);
+		tprint_pre_comment_end();
+	}
+}
+
+void
+tprintf_pre_comment(const char *fmt, ...)
+{
+	if (!fmt || !*fmt)
+		return;
+
+	va_list args;
+	va_start(args, fmt);
+	tprint_pre_comment_begin();
+	tvprintf(fmt, args);
+	tprint_pre_comment_end();
 	va_end(args);
 }
 
