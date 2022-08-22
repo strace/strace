@@ -63,7 +63,7 @@
 	do {							\
 		if ((arg) & IPC_64) {				\
 			print_xlat(IPC_64);			\
-			tprints("|");				\
+			tprint_or();				\
 		}						\
 		printxval((flagset), (arg) & ~IPC_64, dflt);	\
 	} while (0)

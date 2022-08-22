@@ -40,10 +40,13 @@ SYS_FUNC(memfd_create)
 		printflags_ex(flags, "MFD_???", XLAT_STYLE_ABBREV,
 			      memfd_create_flags, NULL);
 
-	if (hugetlb_value)
-		tprintf("%s%u<<MFD_HUGE_SHIFT",
-			flags ? "|" : "",
-			hugetlb_value >> MFD_HUGE_SHIFT);
+	if (hugetlb_value) {
+		if (flags)
+			tprint_or();
+		PRINT_VAL_U(hugetlb_value >> MFD_HUGE_SHIFT);
+		tprint_shift();
+		print_xlat_abbrev(MFD_HUGE_SHIFT);
+	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();

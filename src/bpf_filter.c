@@ -43,7 +43,7 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 	case BPF_STX:
 		if (!extended) {
 			if (i) {
-				tprints("|");
+				tprint_or();
 				PRINT_VAL_X(i);
 				tprints_comment("BPF_???");
 			}
@@ -53,20 +53,20 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 
 	case BPF_LD:
 	case BPF_LDX:
-		tprints("|");
+		tprint_or();
 		printxvals(BPF_SIZE(code), "BPF_???",
 			   bpf_size, extended ? ebpf_size : NULL, NULL);
-		tprints("|");
+		tprint_or();
 		printxval(mode, BPF_MODE(code), "BPF_???");
 		break;
 
 	case BPF_MISC: /* BPF_ALU64 in eBPF */
 		if (!extended) {
-			tprints("|");
+			tprint_or();
 			printxval(bpf_miscop, BPF_MISCOP(code), "BPF_???");
 			i &= ~BPF_MISCOP(code);
 			if (i) {
-				tprints("|");
+				tprint_or();
 				PRINT_VAL_X(i);
 				tprints_comment("BPF_???");
 			}
@@ -75,31 +75,31 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 		ATTRIBUTE_FALLTHROUGH; /* extended == true */
 
 	case BPF_ALU:
-		tprints("|");
+		tprint_or();
 		printxval(bpf_src, BPF_SRC(code), "BPF_???");
-		tprints("|");
+		tprint_or();
 		printxvals(BPF_OP(code), "BPF_???",
 			   bpf_op_alu,
 			   extended ? ebpf_op_alu : NULL, NULL);
 		break;
 
 	case BPF_JMP:
-		tprints("|");
+		tprint_or();
 		printxval(bpf_src, BPF_SRC(code), "BPF_???");
-		tprints("|");
+		tprint_or();
 		printxvals(BPF_OP(code), "BPF_???",
 			   bpf_op_jmp, extended ? ebpf_op_jmp : NULL, NULL);
 		break;
 
 	case BPF_RET: /* Reserved in eBPF */
 		if (!extended) {
-			tprints("|");
+			tprint_or();
 			printxval(bpf_rval, BPF_RVAL(code), "BPF_???");
 			i &= ~BPF_RVAL(code);
 		}
 
 		if (i) {
-			tprints("|");
+			tprint_or();
 			PRINT_VAL_X(i);
 			tprints_comment("BPF_???");
 		}

@@ -24,7 +24,8 @@ SYS_FUNC(swapon)
 	/* swapflags */
 	if (flags) {
 		printflags(swap_flags, flags, "SWAP_FLAG_???");
-		tprintf("|%u", prio);
+		tprint_or();
+		PRINT_VAL_U(prio);
 	} else {
 		PRINT_VAL_U(prio);
 	}

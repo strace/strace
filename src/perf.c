@@ -159,7 +159,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprints_field_name("config");
 		if (attr->config >> 32) {
 			PRINT_VAL_X(attr->config >> 32);
-			tprints("<<32|");
+			tprint_shift();
+			PRINT_VAL_U(32);
+			tprint_or();
 		}
 		printxval(perf_hw_id, attr->config & PERF_HW_EVENT_MASK,
 			   "PERF_COUNT_HW_???");
@@ -190,19 +192,27 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprints_field_name("config");
 		if (attr->config >> 32){
 			PRINT_VAL_X(attr->config >> 32);
-			tprints("<<32|");
+			tprint_shift();
+			PRINT_VAL_U(32);
+			tprint_or();
 		}
 		if ((attr->config & PERF_HW_EVENT_MASK) >> 24) {
 			PRINT_VAL_X((attr->config & PERF_HW_EVENT_MASK) >> 24);
-			tprints("<<24|");
+			tprint_shift();
+			PRINT_VAL_U(24);
+			tprint_or();
 		}
 		printxval(perf_hw_cache_op_result_id,
 			  (attr->config >> 16) & 0xFF,
 			  "PERF_COUNT_HW_CACHE_RESULT_???");
-		tprints("<<16|");
+		tprint_shift();
+		PRINT_VAL_U(16);
+		tprint_or();
 		printxval(perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
 			   "PERF_COUNT_HW_CACHE_OP_???");
-		tprints("<<8|");
+		tprint_shift();
+		PRINT_VAL_U(8);
+		tprint_or();
 		printxval(perf_hw_cache_id, attr->config & 0xFF,
 			  "PERF_COUNT_HW_CACHE_???");
 		break;

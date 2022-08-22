@@ -47,14 +47,15 @@ SYS_FUNC(shmget)
 		printflags(shm_resource_flags, flags, NULL);
 
 	if (hugetlb_value) {
-		tprintf("%s%u<<",
-			flags ? "|" : "",
-			hugetlb_value >> SHM_HUGE_SHIFT);
+		if (flags)
+			tprint_or();
+		PRINT_VAL_U(hugetlb_value >> SHM_HUGE_SHIFT);
+		tprint_shift();
 		print_xlat_u(SHM_HUGE_SHIFT);
 	}
 
 	if (flags || hugetlb_value)
-		tprints("|");
+		tprint_or();
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);
 
 	return RVAL_DECODED;

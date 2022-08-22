@@ -44,7 +44,7 @@ SYS_FUNC(statx)
 			   NULL);
 		flags &= ~AT_STATX_SYNC_TYPE;
 		if (flags) {
-			tprints("|");
+			tprint_or();
 			printflags(at_flags, flags, NULL);
 		}
 		tprint_arg_next();
