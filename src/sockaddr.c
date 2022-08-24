@@ -617,7 +617,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 		tprint_comment_begin();
 
 	if (psm_name) {
-		tprints(psm_name);
+		print_xlat_ex(psm_he, psm_name, XLAT_STYLE_ABBREV);
 	} else if (psm_he >= L2CAP_PSM_LE_DYN_START
 	    && psm_he <= L2CAP_PSM_LE_DYN_END) {
 		print_xlat(L2CAP_PSM_LE_DYN_START);
@@ -657,7 +657,7 @@ print_bluetooth_l2_cid(uint16_t cid)
 		tprint_comment_begin();
 
 	if (cid_name) {
-		tprints(cid_name);
+		print_xlat_ex(cid_he, cid_name, XLAT_STYLE_ABBREV);
 	} else if (cid_he >= L2CAP_CID_DYN_START) {
 		print_xlat(L2CAP_CID_DYN_START);
 		tprint_plus();
