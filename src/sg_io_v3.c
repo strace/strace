@@ -21,6 +21,8 @@ typedef struct sg_io_hdr struct_sg_io_hdr;
 
 #include MPERS_DEFS
 
+#include "print_utils.h"
+
 #include "xlat/sg_io_info.h"
 
 #ifdef HAVE_SCSI_SG_H
@@ -55,7 +57,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprint_struct_begin();
 	tprints_field_name("interface_id");
-	tprints("'S'");
+	print_char('S', SCF_QUOTES);
 	tprint_struct_next();
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.dxfer_direction)) {
@@ -168,7 +170,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 {
 	tprint_struct_begin();
 	tprints_field_name("interface_id");
-	tprints("'S'");
+	print_char('S', SCF_QUOTES);
 	tprint_struct_next();
 	tprint_more_data_follows();
 	tprint_struct_end();

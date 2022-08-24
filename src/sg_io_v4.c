@@ -8,6 +8,7 @@
 
 #include "defs.h"
 #include <linux/bsg.h>
+#include "print_utils.h"
 #include "xlat/bsg_protocol.h"
 #include "xlat/bsg_subprotocol.h"
 #include "xlat/bsg_flags.h"
@@ -38,7 +39,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprint_struct_begin();
 	tprints_field_name("guard");
-	tprints("'Q'");
+	print_char('Q', SCF_QUOTES);
 	tprint_struct_next();
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.protocol)) {
