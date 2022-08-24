@@ -775,9 +775,9 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	if (umoven_or_printaddr(tcp, addr, len, &filter))
 		return;
 
-	tprints("~(");
+	tprints_arg_begin("~");
 	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
-	tprints(")");
+	tprint_arg_end();
 }
 
 static void
