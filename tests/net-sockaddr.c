@@ -691,9 +691,9 @@ check_l2(void)
 	int ret = connect(-1, l2, len);
 	pidns_print_leader();
 	printf("connect(-1, {sa_family=AF_BLUETOOTH"
-	       ", l2_psm=htobs(L2CAP_PSM_DYN_START + %hu)"
+	       ", l2_psm=htobs(L2CAP_PSM_DYN_START+%hu)"
 	       ", l2_bdaddr=%02x:%02x:%02x:%02x:%02x:%02x"
-	       ", l2_cid=htobs(L2CAP_CID_DYN_START + %hu)"
+	       ", l2_cid=htobs(L2CAP_CID_DYN_START+%hu)"
 # ifdef HAVE_STRUCT_SOCKADDR_L2_L2_BDADDR_TYPE
 	       ", l2_bdaddr_type=0xce /* BDADDR_??? */"
 # endif

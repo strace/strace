@@ -257,10 +257,15 @@ print_scrmap_array_member(struct tcb *tcp, void *elem_buf,
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return true;
 
-	if ((val & ~UNI_DIRECT_MASK) == UNI_DIRECT_BASE)
-		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprintf_comment : tprintf)("UNI_DIRECT_BASE+%#hx",
-						     val & UNI_DIRECT_MASK);
+	if ((val & ~UNI_DIRECT_MASK) == UNI_DIRECT_BASE) {
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprint_comment_begin();
+		print_xlat_abbrev(UNI_DIRECT_BASE);
+		tprint_plus();
+		PRINT_VAL_X(val & UNI_DIRECT_MASK);
+		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+			tprint_comment_end();
+	}
 
 	return true;
 }
