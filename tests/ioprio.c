@@ -44,7 +44,8 @@ main(void)
 
 # if !XLAT_RAW
 	static const char * const bogus_ioprio_str =
-		"IOPRIO_PRIO_VALUE(0x7d677 /* IOPRIO_CLASS_??? */, 7917)";
+		"IOPRIO_PRIO_VALUE(0x7d677" NVERB(" /* IOPRIO_CLASS_??? */")
+		", 7917)";
 # endif
 
 	long rc;
@@ -96,9 +97,9 @@ main(void)
 # endif
 	printf(", %d%s", pgid, pidns_pid2str(PT_PGID));
 # if XLAT_RAW
-	printf(", 8191)");
+	printf(", 0x1fff)");
 # elif XLAT_VERBOSE
-	printf(", 8191 /* IOPRIO_PRIO_VALUE(0 /* IOPRIO_CLASS_NONE */, 8191) */)");
+	printf(", 0x1fff /* IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191) */)");
 # else /* XLAT_ABBREV */
 	printf(", IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 8191))");
 # endif
@@ -108,11 +109,11 @@ main(void)
 	errstr = sprintrc(rc);
 	pidns_print_leader();
 # if XLAT_RAW
-	printf("ioprio_set(%#x, %d, %d) = %s\n",
+	printf("ioprio_set(%#x, %d, %#x) = %s\n",
 	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
 	       errstr);
 # elif XLAT_VERBOSE
-	printf("ioprio_set(%#x /* IOPRIO_WHO_??? */, %d, %d /* %s */) = %s\n",
+	printf("ioprio_set(%#x /* IOPRIO_WHO_??? */, %d, %#x /* %s */) = %s\n",
 	       (int) bogus_which, (int) bogus_who, (int) bogus_ioprio,
 	       bogus_ioprio_str, errstr);
 # else /* XLAT_ABBREV */

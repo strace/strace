@@ -43,10 +43,23 @@ print_ioprio(unsigned int ioprio)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
 
-	const char *str = sprint_ioprio(ioprio);
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprint_comment_begin();
 
-	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(str);
+	unsigned int class = IOPRIO_PRIO_CLASS(ioprio);
+	unsigned int data = IOPRIO_PRIO_DATA(ioprio);
+
+	tprints_arg_begin("IOPRIO_PRIO_VALUE");
+	printxval_ex(ioprio_class, class,
+		     xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
+			? NULL : "IOPRIO_CLASS_???",
+		     XLAT_STYLE_ABBREV);
+	tprint_arg_next();
+	PRINT_VAL_U(data);
+	tprint_arg_end();
+
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
+		tprint_comment_end();
 }
 
 static void
@@ -81,9 +94,7 @@ SYS_FUNC(ioprio_get)
 	} else {
 		if (syserror(tcp))
 			return 0;
-		if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
-			tcp->auxstr = NULL;
-		else
+		if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW)
 			tcp->auxstr = sprint_ioprio(tcp->u_rval);
 		return RVAL_STR;
 	}
@@ -100,14 +111,7 @@ SYS_FUNC(ioprio_set)
 	tprint_arg_next();
 
 	/* ioprio */
-	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		PRINT_VAL_D((int) tcp->u_arg[2]);
-
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
-		return RVAL_DECODED;
-
-	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(sprint_ioprio(tcp->u_arg[2]));
+	print_ioprio(tcp->u_arg[2]);
 
 	return RVAL_DECODED;
 }
