@@ -354,6 +354,33 @@ gen_header()
 		echo "st_CHECK_ENUMS_${name}" >&3
 	) >> "${output_m4}"
 
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		cat <<-EOF
+			#  ifndef XLAT_VAL_${i}
+			#   define XLAT_VAL_${i} 0
+			#  endif
+			#  ifdef XLAT_STR_${i}
+			#   define XLAT_STRSZ_${i} sizeof(XLAT_STR_${i})
+			#  else
+			#   define XLAT_STRSZ_${i} 0
+			#  endif
+		EOF
+	done
+
+	echo "#  define ${name}_flags_mask 0 \\"
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		echo "		| XLAT_VAL_${i} \\"
+	done
+	echo "/* end of ${name}_flags_mask definition */"
+
+	echo "#  define ${name}_flags_strsz_ 0 \\"
+	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
+		echo "		+ XLAT_STRSZ_${i} \\"
+	done
+	echo "/* end of ${name}_flags_strsz_ definition */"
+	echo "enum { ${name}_flags_strsz = ${name}_flags_strsz_ };"
+	echo "#  undef ${name}_flags_strsz_"
+
 	if [ -n "$in_defs" ]; then
 		:
 	elif [ -n "$in_mpers" ]; then
@@ -373,27 +400,9 @@ gen_header()
 			 .data = ${name}_xdata,
 			 .size = ARRAY_SIZE(${name}_xdata),
 			 .type = ${xlat_type},
+			 .flags_mask = ${name}_flags_mask,
+			 .flags_strsz = ${name}_flags_strsz,
 	EOF
-
-	echo " .flags_mask = 0"
-	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
-		cat <<-EOF
-			#  ifdef XLAT_VAL_${i}
-			  | XLAT_VAL_${i}
-			#  endif
-		EOF
-	done
-	echo "  ,"
-
-	echo " .flags_strsz = 0"
-	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
-		cat <<-EOF
-			#  ifdef XLAT_STR_${i}
-			  + sizeof(XLAT_STR_${i})
-			#  endif
-		EOF
-	done
-	echo "  ,"
 
 	cat <<-EOF
 		} };
@@ -404,6 +413,7 @@ gen_header()
 	for i in $(seq 0 "$((xlat_flag_cnt - 1))"); do
 		cat <<-EOF
 			#  undef XLAT_STR_${i}
+			#  undef XLAT_STRSZ_${i}
 			#  undef XLAT_VAL_${i}
 		EOF
 	done
