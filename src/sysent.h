@@ -8,11 +8,13 @@
 #ifndef STRACE_SYSENT_H
 # define STRACE_SYSENT_H
 
+struct tcb;
+
 typedef struct sysent {
 	unsigned nargs;
 	int	sys_flags;
 	int	sen;
-	int	(*sys_func)();
+	int	(*sys_func)(struct tcb *);
 	const char *sys_name;
 } struct_sysent;
 
