@@ -14,26 +14,50 @@
 #include <stdio.h>
 #include <unistd.h>
 
+static const char *errstr;
+
+static long
+k_setns(const int fd, const unsigned int flags)
+{
+	const kernel_ulong_t fill = (kernel_ulong_t) 0x0defaced00000000ULL;
+	const kernel_ulong_t bad  = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
+	const kernel_ulong_t arg1 = fill | (unsigned int) fd;
+	const kernel_ulong_t arg2 = fill | flags;
+	const long rc = syscall(__NR_setns,
+				arg1, arg2, bad, bad, bad, bad);
+	errstr = sprintrc(rc);
+	return rc;
+}
+
 int
 main(void)
 {
-	static const kernel_ulong_t bogus_fd =
-		(kernel_ulong_t) 0xfeedfacedeadc0deULL;
+	static const int bogus_fd = 0xdeadc0de;
 
 	static struct {
-		kernel_ulong_t val;
+		unsigned int val;
 		const char *str;
 	} nstypes[] = {
-		{ (kernel_ulong_t) 0xdefaced100000000ULL, "0" },
-		{ (kernel_ulong_t) 0xbadc0dedfeedfaceULL,
-			"0xfeedface /* CLONE_NEW??? */" },
-		{ (kernel_ulong_t) 0xca75f15702000000ULL, "CLONE_NEWCGROUP" },
+		{ 0, "0" },
+		{ 0x00000080U, "CLONE_NEWTIME" },
+		{ 0x00020000U, "CLONE_NEWNS" },
+		{ 0x02000000U, "CLONE_NEWCGROUP" },
+		{ 0x04000000U, "CLONE_NEWUTS" },
+		{ 0x08000000U, "CLONE_NEWIPC" },
+		{ 0x10000000U, "CLONE_NEWUSER" },
+		{ 0x20000000U, "CLONE_NEWPID" },
+		{ 0x40000000U, "CLONE_NEWNET" },
+		{ 0x81fdff7fU, "0x81fdff7f /* CLONE_NEW??? */" },
+		{ -1U,
+		  "CLONE_NEWTIME|CLONE_NEWNS|CLONE_NEWCGROUP|CLONE_NEWUTS|"
+		  "CLONE_NEWIPC|CLONE_NEWUSER|CLONE_NEWPID|CLONE_NEWNET|"
+		  "0x81fdff7f" },
 	};
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(nstypes); ++i) {
-		long rc = syscall(__NR_setns, bogus_fd, nstypes[i].val);
+		k_setns(bogus_fd, nstypes[i].val);
 		printf("setns(%d, %s) = %s\n",
-			(int) bogus_fd, nstypes[i].str, sprintrc(rc));
+		       bogus_fd, nstypes[i].str, errstr);
 	}
 
 	puts("+++ exited with 0 +++");

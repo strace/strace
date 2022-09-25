@@ -299,7 +299,7 @@ SYS_FUNC(setns)
 {
 	printfd(tcp, tcp->u_arg[0]);
 	tprint_arg_next();
-	printxval(setns_types, tcp->u_arg[1], "CLONE_NEW???");
+	printflags(setns_types, tcp->u_arg[1], "CLONE_NEW???");
 
 	return RVAL_DECODED;
 }
