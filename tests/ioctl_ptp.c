@@ -269,7 +269,7 @@ test_no_device(void)
 			       ", nsec=%u%s}",
 			       XLAT_SEL(c->val, c->str),
 			       perout_flags[i].is_phase ? "phase" : "start",
-			       perout->start.sec,
+			       (long long) perout->start.sec,
 			       i & 1 ? 1234567890 : 123456789,
 			       i & 2 ? ", reserved=0xa205b064" : "");
 			if (!perout_flags[i].is_phase) {
@@ -354,7 +354,7 @@ test_no_device(void)
 				     j++) {
 					printf("%s{sec=%lld, nsec=%u%s}",
 					       j ? ", " : ", ts=[",
-					       sysoff->ts[j].sec,
+					       (long long) sysoff->ts[j].sec,
 					       sysoff->ts[j].nsec,
 					       j & 1 ? ", reserved=0xdeadface"
 						     : "");
@@ -488,7 +488,8 @@ test_no_device(void)
 			       XLAT_SEL(c->val, c->str));
 			if (rc >= 0) {
 				printf("{device={sec=%lld, nsec=%u",
-				       ts_vecs[i].sec, ts_vecs[i].nsec);
+				       (long long) ts_vecs[i].sec,
+				       ts_vecs[i].nsec);
 				if (i & 1) {
 					printf(", reserved=%#x",
 					       ts_vecs[i].reserved);
@@ -496,7 +497,7 @@ test_no_device(void)
 				printf("}");
 				print_lltime(ts_vecs[i].sec, ts_vecs[i].nsec);
 				printf(", sys_realtime={sec=%lld, nsec=%u",
-				       ARR_ITEM(ts_vecs, i + 1).sec,
+				       (long long) ARR_ITEM(ts_vecs, i + 1).sec,
 				       ARR_ITEM(ts_vecs, i + 1).nsec);
 				if (!(i & 1)) {
 					printf(", reserved=%#x",
@@ -507,7 +508,7 @@ test_no_device(void)
 				print_lltime(ARR_ITEM(ts_vecs, i + 1).sec,
 					     ARR_ITEM(ts_vecs, i + 1).nsec);
 				printf(", sys_monoraw={sec=%lld, nsec=%u",
-				       ARR_ITEM(ts_vecs, i + 2).sec,
+				       (long long) ARR_ITEM(ts_vecs, i + 2).sec,
 				       ARR_ITEM(ts_vecs, i + 2).nsec);
 				if (i & 1) {
 					printf(", reserved=%#x",
@@ -580,7 +581,7 @@ test_no_device(void)
 					for (size_t k = 0; k < 3; k++) {
 						printf("%s{sec=%lld, nsec=%u",
 						       k ? ", " : "[",
-						       soext->ts[j][k].sec,
+						       (long long) soext->ts[j][k].sec,
 						       soext->ts[j][k].nsec);
 						if (soext->ts[j][k].reserved)
 							printf(", reserved=%#x",
