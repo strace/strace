@@ -1659,12 +1659,12 @@ check_compat_ptrace_req(const unsigned int req, const char *const s,
 	do_ptrace(req, pid, 0, 0);
 	printf("ptrace(%#x" NRAW(" /* ") "%s" NRAW(" */")
 	       ", %d, NULL, NULL) = %s\n",
-	       req, NRAW(s), pid, errstr);
+	       req, XLAT_RAW ? "" : s, pid, errstr);
 
 	do_ptrace(req, pid, 0xbadc0deddeadface, 0xfacefeeddecaffed);
 	printf("ptrace(%#x" NRAW(" /* ") "%s" NRAW(" */")
 	       ", %d, 0xbadc0deddeadface, 0xfacefeeddecaffed) = %s\n",
-	       req, NRAW(s), pid, errstr);
+	       req, XLAT_RAW ? "" : s, pid, errstr);
 }
 
 static void
