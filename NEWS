@@ -5,7 +5,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Enhanced decoding of PTP_* ioctl commands.
   * Updated decoding of setns syscall.
   * Updated lists of BPF_*, BTRFS_*, FAN_*, ETH_P_*, KVM_*, NDTPA_*,
-    and NT_* constants.
+    NT_*, and PERF_* constants.
 
 * Bug fixes
 

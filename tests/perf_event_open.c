@@ -532,15 +532,18 @@ main(void)
 	static const struct u64_val_str read_formats[] = {
 		{ ARG_STR(0) },
 		{ ARG_STR(PERF_FORMAT_TOTAL_TIME_ENABLED) },
-		{ 0xf, "PERF_FORMAT_TOTAL_TIME_ENABLED|"
+		{ 0x1f, "PERF_FORMAT_TOTAL_TIME_ENABLED|"
 			"PERF_FORMAT_TOTAL_TIME_RUNNING|"
-			"PERF_FORMAT_ID|PERF_FORMAT_GROUP" },
-		{ ARG_ULL_STR(0xdeadf157dec0ded0) " /* PERF_FORMAT_??? */" },
+			"PERF_FORMAT_ID|"
+			"PERF_FORMAT_GROUP|"
+			"PERF_FORMAT_LOST" },
+		{ ARG_ULL_STR(0xdeadf157dec0dee0) " /* PERF_FORMAT_??? */" },
 		{ 0xffffffffffffffffULL,
 			"PERF_FORMAT_TOTAL_TIME_ENABLED|"
 			"PERF_FORMAT_TOTAL_TIME_RUNNING|"
 			"PERF_FORMAT_ID|PERF_FORMAT_GROUP|"
-			"0xfffffffffffffff0" },
+			"PERF_FORMAT_LOST|"
+			"0xffffffffffffffe0" },
 	};
 	static const char *precise_ip_descs[] = {
 		"arbitrary skid",
