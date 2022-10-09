@@ -89,8 +89,8 @@ main(void)
 	};
 	static const struct strval flags[] = {
 		{ F8ILL_KULONG_MASK, "0" },
-		{ (kernel_ulong_t) 0xdec0deddefacec00ULL,
-			"0xefacec00"
+		{ (kernel_ulong_t) 0xdec0deddeface800ULL,
+			"0xeface800"
 #  if !XLAT_RAW
 			" /* FAN_MARK_??? */"
 #  endif
@@ -115,7 +115,8 @@ main(void)
 			"FAN_MARK_ADD|FAN_MARK_REMOVE|FAN_MARK_DONT_FOLLOW|"
 			"FAN_MARK_ONLYDIR|FAN_MARK_MOUNT|FAN_MARK_IGNORED_MASK|"
 			"FAN_MARK_IGNORED_SURV_MODIFY|FAN_MARK_FLUSH|"
-			"FAN_MARK_FILESYSTEM|FAN_MARK_EVICTABLE|0xdeadfc00"
+			"FAN_MARK_FILESYSTEM|FAN_MARK_EVICTABLE|"
+			"FAN_MARK_IGNORE|0xdeadf800"
 #  endif
 #  if XLAT_VERBOSE
 			" */"
