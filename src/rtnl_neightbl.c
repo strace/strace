@@ -69,7 +69,8 @@ static const nla_decoder_t ndt_parms_nla_decoders[] = {
 	[NDTPA_LOCKTIME]		= decode_nla_u64,
 	[NDTPA_QUEUE_LENBYTES]		= decode_nla_u32,
 	[NDTPA_MCAST_REPROBES]		= decode_nla_u32,
-	[NDTPA_PAD]			= NULL
+	[NDTPA_PAD]			= NULL,
+	[NDTPA_INTERVAL_PROBE_TIME_MS]	= decode_nla_u64,
 };
 
 static bool
