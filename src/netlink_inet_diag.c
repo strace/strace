@@ -572,6 +572,7 @@ static const nla_decoder_t diag_ulp_info_tls_nla_decoders[] = {
 	[TLS_INFO_TXCONF]	= decode_tls_config,
 	[TLS_INFO_RXCONF]	= decode_tls_config,
 	[TLS_INFO_ZC_RO_TX]	= NULL, /* flag nlattr, no payload */
+	[TLS_INFO_RX_NO_PAD]	= NULL, /* flag nlattr, no payload */
 };
 
 static bool
