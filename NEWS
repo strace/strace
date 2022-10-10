@@ -6,6 +6,7 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated decoding of setns syscall.
   * Updated lists of BPF_*, BTRFS_*, FAN_*, ETH_P_*, KVM_*, NDTPA_*,
     NT_*, PERF_*, and TLS_INFO_* constants.
+  * Updated lists of ioctl commands from Linux 6.0.
 
 * Bug fixes
 
