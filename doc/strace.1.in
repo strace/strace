@@ -1890,7 +1890,7 @@ to SVR4 and Solaris and wrote the
 automatic configuration support.  In 1995 he ported
 .B strace
 to Irix
-and tired of writing about himself in the third person.
+and became tired of writing about himself in the third person.
 .PP
 Beginning with 1996,
 .B strace
@@ -1909,7 +1909,7 @@ bi-architecture support for some of them, and received numerous additions and
 improvements in syscalls decoders on Linux;
 .B strace
 development migrated to
-.B git
+.B Git
 during that period.
 Since 2009,
 .B strace
