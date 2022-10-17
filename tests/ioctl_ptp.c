@@ -2,7 +2,7 @@
  * Check decoding of PTP_* commands of ioctl syscall.
  *
  * Copyright (c) 2018 Harsha Sharma <harshasharmaiitr@gmail.com>
- * Copyright (c) 2018-2021 The strace developers.
+ * Copyright (c) 2018-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later

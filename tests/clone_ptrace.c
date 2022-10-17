@@ -1,7 +1,7 @@
 /*
  * Check handling of CLONE_PTRACE'ed processes.
  *
- * Copyright (c) 2015-2020 The strace developers.
+ * Copyright (c) 2015-2022 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
