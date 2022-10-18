@@ -255,8 +255,8 @@ update_personality(struct tcb *tcp, unsigned int personality)
 
 	if (!is_number_in_set(QUIET_PERSONALITY, quiet_set)) {
 		printleader(tcp);
-		tprintf("[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, personality_names[personality]);
+		tprintf_string("[ Process PID=%d runs in %s mode. ]\n",
+			       tcp->pid, personality_names[personality]);
 		line_ended();
 	}
 
@@ -421,12 +421,12 @@ print_err(int64_t err, bool negated)
 	const char *str = err_name(negated ? -err : err);
 
 	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf(negated ? "%" PRId64 : "%" PRIu64, err);
+		tprintf_string(negated ? "%" PRId64 : "%" PRIu64, err);
 	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
-		? tprintf : tprintf_comment)("%s%s",
-					     negated ? "-" : "", str);
+		? tprintf_string : tprintf_comment)("%s%s",
+						    negated ? "-" : "", str);
 }
 
 static void
@@ -435,10 +435,10 @@ print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 	const char *u_error_str = err_name(u_error);
 
 	if (u_error_str)
-		tprintf("= %" PRI_kld " %s (%s)",
-			ret, u_error_str, strerror(u_error));
+		tprintf_string("= %" PRI_kld " %s (%s)",
+			       ret, u_error_str, strerror(u_error));
 	else
-		tprintf("= %" PRI_kld " (errno %lu)", ret, u_error);
+		tprintf_string("= %" PRI_kld " (errno %lu)", ret, u_error);
 }
 
 static long get_regs(struct tcb *);
@@ -753,7 +753,7 @@ print_syscall_resume(struct tcb *tcp)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		tprintf("<... %s resumed>", tcp_sysent(tcp)->sys_name);
+		tprintf_string("<... %s resumed>", tcp_sysent(tcp)->sys_name);
 	}
 }
 
@@ -836,7 +836,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		if (tcp->u_error)
 			print_err_ret(tcp->u_rval, tcp->u_error);
 		else
-			tprintf("= %#" PRI_klx, tcp->u_rval);
+			tprintf_string("= %#" PRI_klx, tcp->u_rval);
 
 		print_injected_note(tcp);
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
@@ -900,7 +900,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 		print_injected_note(tcp);
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf(" (%s)", tcp->auxstr);
+			tprintf_string(" (%s)", tcp->auxstr);
 	} else {
 		if (sys_res & RVAL_NONE)
 			tprints_string("= ?");
@@ -909,12 +909,12 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			case RVAL_HEX:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
-					tprintf("= %#x",
-						(unsigned int) tcp->u_rval);
+					tprintf_string("= %#x",
+						       (unsigned int) tcp->u_rval);
 				} else
 #endif
 				{
-					tprintf("= %#" PRI_klx, tcp->u_rval);
+					tprintf_string("= %#" PRI_klx, tcp->u_rval);
 				}
 				break;
 			case RVAL_OCTAL: {
@@ -931,12 +931,12 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			case RVAL_UDECIMAL:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
-					tprintf("= %u",
-						(unsigned int) tcp->u_rval);
+					tprintf_string("= %u",
+						       (unsigned int) tcp->u_rval);
 				} else
 #endif
 				{
-					tprintf("= %" PRI_klu, tcp->u_rval);
+					tprintf_string("= %" PRI_klu, tcp->u_rval);
 				}
 				break;
 			case RVAL_FD:
@@ -949,7 +949,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 					tprints_string("= ");
 					printfd(tcp, tcp->u_rval);
 				} else {
-					tprintf("= %" PRI_kld, tcp->u_rval);
+					tprintf_string("= %" PRI_kld, tcp->u_rval);
 				}
 				break;
 			case RVAL_TID:
@@ -973,7 +973,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			}
 		}
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf(" (%s)", tcp->auxstr);
+			tprintf_string(" (%s)", tcp->auxstr);
 		print_injected_note(tcp);
 	}
 	if (Tflag) {
@@ -982,8 +982,8 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		ts_sub(ts, ts, &tcp->etime);
 		PRINT_VAL_D(ts->tv_sec);
 		if (Tflag_width) {
-			tprintf(".%0*ld",
-				Tflag_width, (long) ts->tv_nsec / Tflag_scale);
+			tprintf_string(".%0*ld", Tflag_width,
+				       (long) ts->tv_nsec / Tflag_scale);
 		}
 		tprint_associated_info_end();
 	}

@@ -262,8 +262,8 @@ print_scrmap_array_member(struct tcb *tcp, void *elem_buf,
 
 	if ((val & ~UNI_DIRECT_MASK) == UNI_DIRECT_BASE)
 		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprintf_comment : tprintf)("UNI_DIRECT_BASE+%#hx",
-						     val & UNI_DIRECT_MASK);
+			? tprintf_comment : tprintf_string)("UNI_DIRECT_BASE+%#hx",
+							    val & UNI_DIRECT_MASK);
 
 	return true;
 }

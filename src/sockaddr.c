@@ -181,7 +181,7 @@ print_inet_addr(const int af,
 			if (var_name &&
 			    (xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV)) {
 				tprint_arg_next();
-				tprintf("&%s", var_name);
+				tprintf_string("&%s", var_name);
 			}
 			tprint_arg_end();
 

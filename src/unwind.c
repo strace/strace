@@ -111,19 +111,19 @@ print_call_cb(void *dummy,
 			cplus_demangle(symbol_name,
 				       DMGL_AUTO | DMGL_PARAMS);
 #endif
-		tprintf(STACK_ENTRY_SYMBOL_FMT(
+		tprintf_string(STACK_ENTRY_SYMBOL_FMT(
 #ifdef USE_DEMANGLE
-					       demangled_name ? demangled_name :
+						      demangled_name ? demangled_name :
 #endif
-					       symbol_name));
+						      symbol_name));
 #ifdef USE_DEMANGLE
 		free(demangled_name);
 #endif
 	}
 	else if (binary_filename)
-		tprintf(STACK_ENTRY_NOSYMBOL_FMT);
+		tprintf_string(STACK_ENTRY_NOSYMBOL_FMT);
 	else
-		tprintf(STACK_ENTRY_BUG_FMT, __func__);
+		tprintf_string(STACK_ENTRY_BUG_FMT, __func__);
 
 	line_ended();
 }
@@ -134,9 +134,9 @@ print_error_cb(void *dummy,
 	       unsigned long true_offset)
 {
 	if (true_offset)
-		tprintf(STACK_ENTRY_ERROR_WITH_OFFSET_FMT);
+		tprintf_string(STACK_ENTRY_ERROR_WITH_OFFSET_FMT);
 	else
-		tprintf(STACK_ENTRY_ERROR_FMT);
+		tprintf_string(STACK_ENTRY_ERROR_FMT);
 
 	line_ended();
 }

@@ -138,8 +138,8 @@ dumpiov_in_mmsghdr(struct tcb *const tcp, kernel_ulong_t addr)
 		fetched = fetch_struct_mmsghdr(tcp, addr, &mmsg);
 		if (!fetched)
 			break;
-		tprintf(" = %" PRI_klu " buffers in vector %u\n",
-			(kernel_ulong_t) mmsg.msg_hdr.msg_iovlen, i);
+		tprintf_string(" = %" PRI_klu " buffers in vector %u\n",
+			       (kernel_ulong_t) mmsg.msg_hdr.msg_iovlen, i);
 		dumpiov_upto(tcp, mmsg.msg_hdr.msg_iovlen,
 			     ptr_to_kulong(mmsg.msg_hdr.msg_iov),
 			     mmsg.msg_len);

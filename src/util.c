@@ -416,7 +416,7 @@ printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	if (umove_or_printaddr(tcp, addr, &num))			\
 		return false;						\
 	tprint_indirect_begin();					\
-	tprintf(fmt, num);						\
+	tprintf_string(fmt, num);					\
 	tprint_indirect_end();						\
 	return true;							\
 }
@@ -443,9 +443,9 @@ printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
 	if (umove_or_printaddr(tcp, addr, &pair))			\
 		return false;						\
 	tprint_array_begin();						\
-	tprintf(fmt, pair[0]);						\
+	tprintf_string(fmt, pair[0]);					\
 	tprint_array_next();						\
-	tprintf(fmt, pair[1]);						\
+	tprintf_string(fmt, pair[1]);					\
 	tprint_array_end();						\
 	return true;							\
 }
@@ -668,9 +668,9 @@ printdev(struct tcb *tcp, int fd, const char *path)
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
 		tprint_associated_info_begin();
-		tprintf("%s %u:%u",
-			S_ISBLK(st.st_mode)? "block" : "char",
-			major(st.st_rdev), minor(st.st_rdev));
+		tprintf_string("%s %u:%u",
+			       S_ISBLK(st.st_mode)? "block" : "char",
+			       major(st.st_rdev), minor(st.st_rdev));
 		tprint_associated_info_end();
 		tprint_associated_info_end();
 		return true;
@@ -1259,7 +1259,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 		ret = false;
 	} else {
 		prefix_fun();
-		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+		tprintf_string("/* bytes %u..%u */ ", start_offs, total_len - 1);
 
 		print_quoted_string(str, size, style);
 
@@ -1317,7 +1317,8 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 			data_size -= iov_len;
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
-			tprintf(" * %" PRI_klu " bytes in buffer %d\n", iov_len, i);
+			tprintf_string(" * %" PRI_klu " bytes in buffer %d\n",
+				       iov_len, i);
 			dumpstr(tcp, iov_iov_base(i), iov_len);
 		}
 	}
@@ -1416,12 +1417,12 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 				 * something already.
 				 */
 				if (i)
-					tprintf(" | <Cannot fetch %" PRI_klu
-						" byte%s from pid %d"
-						" @%#" PRI_klx ">\n",
-						fetch_size,
-						fetch_size == 1 ? "" : "s",
-						tcp->pid, addr + i);
+					tprintf_string(" | <Cannot fetch %" PRI_klu
+						       " byte%s from pid %d"
+						       " @%#" PRI_klx ">\n",
+						       fetch_size,
+						       fetch_size == 1 ? "" : "s",
+						       tcp->pid, addr + i);
 				return;
 			}
 			src = str;
@@ -1457,8 +1458,8 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 			src++;
 		} while (++i & DUMPSTR_BYTES_MASK);
 
-		tprintf(" | %0*" PRI_klx "  %s |\n",
-			offs_chars, i - DUMPSTR_WIDTH_BYTES, outbuf);
+		tprintf_string(" | %0*" PRI_klx "  %s |\n",
+			       offs_chars, i - DUMPSTR_WIDTH_BYTES, outbuf);
 	}
 }
 

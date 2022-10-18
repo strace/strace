@@ -35,18 +35,18 @@ printstatus(int status)
 	tprint_flags_begin();
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
-		tprintf("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
-			sprintsigname(sig & 0x7f),
-			sig & 0x80 ? " | 0x80" : "");
+		tprintf_string("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
+			       sprintsigname(sig & 0x7f),
+			       sig & 0x80 ? " | 0x80" : "");
 		status &= ~W_STOPCODE(sig);
 	} else if (WIFSIGNALED(status)) {
-		tprintf("{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
-			sprintsigname(WTERMSIG(status)),
-			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
+		tprintf_string("{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
+			       sprintsigname(WTERMSIG(status)),
+			       WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
 		status &= ~(W_EXITCODE(0, WTERMSIG(status)) | WCOREFLAG);
 	} else if (WIFEXITED(status)) {
-		tprintf("{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
-			WEXITSTATUS(status));
+		tprintf_string("{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
+			       WEXITSTATUS(status));
 		exited = 1;
 		status &= ~W_EXITCODE(WEXITSTATUS(status), 0);
 	}

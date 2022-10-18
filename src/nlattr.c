@@ -511,7 +511,7 @@ decode_nla_ ## name(struct tcb *const tcp,		\
 	if (len < sizeof(num))				\
 		return false;				\
 	if (!umove_or_printaddr(tcp, addr, &num))	\
-		tprintf(fmt, num);			\
+		tprintf_string(fmt, num);		\
 	return true;					\
 }
 

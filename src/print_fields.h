@@ -19,7 +19,7 @@
  * The printf-like function to use in header files
  * shared between strace and its tests.
  */
-#  define STRACE_PRINTF tprintf
+#  define STRACE_PRINTF tprintf_string
 
 # else /* !IN_STRACE */
 

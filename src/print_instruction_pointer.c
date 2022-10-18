@@ -14,9 +14,9 @@ print_instruction_pointer(struct tcb *tcp)
 
 	tprint_attribute_begin();
 	if (get_instruction_pointer(tcp, &ip)) {
-		tprintf(current_wordsize == 4
-			? "%08" PRI_klx
-			: "%016" PRI_klx, ip);
+		tprintf_string(current_wordsize == 4
+			       ? "%08" PRI_klx
+			       : "%016" PRI_klx, ip);
 	} else {
 		tprints_string(current_wordsize == 4
 			       ? "????????"

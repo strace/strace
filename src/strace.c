@@ -574,8 +574,8 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	 */
 	if (current_tcp && current_tcp->curcol != 0) {
 		tprint_space();
-		tprintf("<Cannot restart pid %d with ptrace(%s): %s>",
-			tcp->pid, ptrace_op_str(op), strerror(err));
+		tprintf_string("<Cannot restart pid %d with ptrace(%s): %s>",
+			       tcp->pid, ptrace_op_str(op), strerror(err));
 		tprint_newline();
 		line_ended();
 	}
@@ -714,7 +714,7 @@ tvprintf(const char *const fmt, va_list args)
 }
 
 void
-tprintf(const char *fmt, ...)
+tprintf_string(const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
@@ -744,7 +744,7 @@ void
 tprints_comment(const char *const str)
 {
 	if (str && *str)
-		tprintf(" /* %s */", str);
+		tprintf_string(" /* %s */", str);
 }
 
 void
@@ -838,12 +838,12 @@ printleader(struct tcb *tcp)
 
 		if (print_pid_pfx) {
 			if (len)
-				tprintf("%u", tcp->pid);
+				tprintf_string("%u", tcp->pid);
 			else
-				tprintf("%-5u", tcp->pid);
+				tprintf_string("%-5u", tcp->pid);
 		} else {
 			tprint_attribute_begin();
-			tprintf("pid %5u", tcp->pid);
+			tprintf_string("pid %5u", tcp->pid);
 		}
 
 		print_comm_str(tcp->comm, len);
@@ -868,10 +868,10 @@ printleader(struct tcb *tcp)
 		else
 			xsprintf(str, "%lld", (long long) local);
 		if (tflag_width)
-			tprintf("%s.%0*ld ", str, tflag_width,
-				(long) ts.tv_nsec / tflag_scale);
+			tprintf_string("%s.%0*ld ", str, tflag_width,
+				       (long) ts.tv_nsec / tflag_scale);
 		else
-			tprintf("%s ", str);
+			tprintf_string("%s ", str);
 	}
 
 	if (rflag) {
@@ -886,10 +886,11 @@ printleader(struct tcb *tcp)
 		ts_sub(&dts, &ts, &ots);
 		ots = ts;
 
-		tprintf("%s%6ld", tflag_format ? "(+" : "", (long) dts.tv_sec);
+		tprintf_string("%s%6ld",
+			       tflag_format ? "(+" : "", (long) dts.tv_sec);
 		if (rflag_width) {
-			tprintf(".%0*ld",
-				rflag_width, (long) dts.tv_nsec / rflag_scale);
+			tprintf_string(".%0*ld", rflag_width,
+				       (long) dts.tv_nsec / rflag_scale);
 		}
 		tprints_string(tflag_format ? ") " : " ");
 	}
@@ -3142,8 +3143,8 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	if (cflag != CFLAG_ONLY_STATS) {
 		if (!is_number_in_set(QUIET_THREAD_EXECVE, quiet_set)) {
 			printleader(tcp);
-			tprintf("+++ superseded by execve in pid %lu +++",
-				old_pid);
+			tprintf_string("+++ superseded by execve in pid %lu +++",
+				       old_pid);
 			tprint_newline();
 			line_ended();
 		}
@@ -3181,9 +3182,9 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
 		printleader(tcp);
-		tprintf("+++ killed by %s %s+++",
-			sprintsigname(WTERMSIG(status)),
-			WCOREDUMP(status) ? "(core dumped) " : "");
+		tprintf_string("+++ killed by %s %s+++",
+			       sprintsigname(WTERMSIG(status)),
+			       WCOREDUMP(status) ? "(core dumped) " : "");
 		tprint_newline();
 		line_ended();
 	}
@@ -3200,7 +3201,7 @@ print_exited(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS &&
 	    !is_number_in_set(QUIET_EXIT, quiet_set)) {
 		printleader(tcp);
-		tprintf("+++ exited with %d +++", WEXITSTATUS(status));
+		tprintf_string("+++ exited with %d +++", WEXITSTATUS(status));
 		tprint_newline();
 		line_ended();
 	}
@@ -3214,11 +3215,11 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 	    && is_number_in_set(sig, signal_set)) {
 		printleader(tcp);
 		if (si) {
-			tprintf("--- %s ", sprintsigname(sig));
+			tprintf_string("--- %s ", sprintsigname(sig));
 			printsiginfo(tcp, si);
 			tprints_string(" ---");
 		} else
-			tprintf("--- stopped by %s ---", sprintsigname(sig));
+			tprintf_string("--- stopped by %s ---", sprintsigname(sig));
 		tprint_newline();
 		line_ended();
 
