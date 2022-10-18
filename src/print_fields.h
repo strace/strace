@@ -278,6 +278,11 @@ tprints_arg_name_begin(const char *name)
 }
 
 static inline void
+tprint_arg_name_end(void)
+{
+}
+
+static inline void
 tprints_arg_begin(const char *name)
 {
 	STRACE_PRINTF("%s(", name);

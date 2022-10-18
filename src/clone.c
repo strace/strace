@@ -77,11 +77,13 @@ SYS_FUNC(clone)
 
 		tprints_arg_name_begin("child_stack");
 		printaddr(tcp->u_arg[ARG_STACK]);
+		tprint_arg_name_end();
 		tprint_arg_next();
 #ifdef ARG_STACKSIZE
 		if (ARG_STACKSIZE != -1) {
 			tprints_arg_name_begin("stack_size");
 			PRINT_VAL_X(tcp->u_arg[ARG_STACKSIZE]);
+			tprint_arg_name_end();
 			tprint_arg_next();
 		}
 #endif
@@ -97,6 +99,7 @@ SYS_FUNC(clone)
 		} else {
 			printsignal(sig);
 		}
+		tprint_arg_name_end();
 		/*
 		 * TODO on syscall entry:
 		 * We can clear CLONE_PTRACE here since it is an ancient hack
@@ -123,16 +126,19 @@ SYS_FUNC(clone)
 				printnum_pid(tcp, addr, PT_TID);
 			else
 				printnum_fd(tcp, addr);
+			tprint_arg_name_end();
 		}
 		if (flags & CLONE_SETTLS) {
 			tprint_arg_next();
 			tprints_arg_name_begin("tls");
 			print_tls_arg(tcp, tcp->u_arg[ARG_TLS]);
+			tprint_arg_name_end();
 		}
 		if (flags & (CLONE_CHILD_SETTID|CLONE_CHILD_CLEARTID)) {
 			tprint_arg_next();
 			tprints_arg_name_begin("child_tidptr");
 			printaddr(tcp->u_arg[ARG_CTID]);
+			tprint_arg_name_end();
 		}
 	}
 	return RVAL_TID;
