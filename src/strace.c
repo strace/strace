@@ -727,7 +727,7 @@ tprintf(const char *fmt, ...)
 #endif
 
 void
-tprints(const char *str)
+tprints_string(const char *str)
 {
 	if (current_tcp) {
 		int n = fputs_unlocked(str, current_tcp->outf);
@@ -822,7 +822,7 @@ printleader(struct tcb *tcp)
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
 			tprint_space();
-			tprints("<unfinished ...>");
+			tprints_string("<unfinished ...>");
 			tprint_newline();
 			printing_tcp->curcol = 0;
 		}
@@ -891,7 +891,7 @@ printleader(struct tcb *tcp)
 			tprintf(".%0*ld",
 				rflag_width, (long) dts.tv_nsec / rflag_scale);
 		}
-		tprints(tflag_format ? ") " : " ");
+		tprints_string(tflag_format ? ") " : " ");
 	}
 
 	if (nflag)
@@ -905,7 +905,7 @@ void
 tabto(void)
 {
 	if (current_tcp->curcol < acolumn)
-		tprints(acolumn_spaces + current_tcp->curcol);
+		tprints_string(acolumn_spaces + current_tcp->curcol);
 }
 
 /* Should be only called directly *after successful attach* to a tracee.
@@ -3216,7 +3216,7 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 		if (si) {
 			tprintf("--- %s ", sprintsigname(sig));
 			printsiginfo(tcp, si);
-			tprints(" ---");
+			tprints_string(" ---");
 		} else
 			tprintf("--- stopped by %s ---", sprintsigname(sig));
 		tprint_newline();
@@ -3267,7 +3267,7 @@ print_event_exit(struct tcb *tcp)
 	    && printing_tcp->curcol != 0) {
 		set_current_tcp(printing_tcp);
 		tprint_space();
-		tprints("<unfinished ...>");
+		tprints_string("<unfinished ...>");
 		tprint_newline();
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
@@ -3282,13 +3282,13 @@ print_event_exit(struct tcb *tcp)
 		 * on exiting syscall which is not going to happen.
 		 */
 		tprint_space();
-		tprints("<unfinished ...>");
+		tprints_string("<unfinished ...>");
 	}
 
 	printing_tcp = tcp;
-	tprints(") ");
+	tprints_string(") ");
 	tabto();
-	tprints("= ?");
+	tprints_string("= ?");
 	tprint_newline();
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = is_number_in_set(STATUS_UNFINISHED, status_set);

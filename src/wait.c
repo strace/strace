@@ -52,7 +52,7 @@ printstatus(int status)
 	}
 #ifdef WIFCONTINUED
 	else if (WIFCONTINUED(status)) {
-		tprints("{WIFCONTINUED(s)}");
+		tprints_string("{WIFCONTINUED(s)}");
 		status &= ~W_CONTINUED;
 	}
 #endif

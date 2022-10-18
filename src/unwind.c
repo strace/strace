@@ -249,7 +249,7 @@ queue_print(struct unwind_queue_t *queue)
 		tmp = call;
 		call = call->next;
 
-		tprints(tmp->output_line);
+		tprints_string(tmp->output_line);
 		line_ended();
 
 		if (tmp->output_line != asprintf_error_str)

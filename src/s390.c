@@ -510,7 +510,7 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 
 	CHECK_SIZE_EX(hdr, last_decoded, size, "machine structure");
 
-	tprints("/* machine */ ");
+	tprints_string("/* machine */ ");
 	tprint_struct_begin();
 	if (!abbrev(tcp)) {
 		if (hdr->infmflg1) { /* Reserved */
@@ -620,7 +620,7 @@ print_sthyi_partition(struct tcb *tcp, struct sthyi_partition *hdr,
 
 	*mt = !!(hdr->infpflg1 & 0x80);
 
-	tprints("/* partition */ ");
+	tprints_string("/* partition */ ");
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infpflg1);
 	if (!abbrev(tcp) && hdr->infpflg1)
@@ -786,7 +786,7 @@ print_funcs(const uint8_t funcs[8])
 			continue;
 
 		if (cont) {
-			tprints(", ");
+			tprints_string(", ");
 		} else {
 			tprint_comment_begin();
 			cont = true;
@@ -1132,7 +1132,7 @@ print_sthyi_buf(struct tcb *tcp, kernel_ulong_t ptr)
 	tprint_struct_begin();
 
 	/* Header */
-	tprints("/* header */ ");
+	tprints_string("/* header */ ");
 	tprint_struct_begin();
 	PRINT_FIELD_0X(*hdr, infhflg1);
 

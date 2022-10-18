@@ -119,7 +119,7 @@ print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen
 				    QUOTE_0_TERMINATED);
 		selinux_printfilecon(tcp, sa_un->sun_path);
 	} else {
-		tprints("@");
+		tprints_string("@");
 		print_quoted_string(sa_un->sun_path + 1, path_len - 1, 0);
 	}
 }
@@ -402,7 +402,7 @@ print_ax25_addr(const void /* ax25_address */ *addr_void)
 
 	const char *addr_str = ax25_addr2str(addr);
 
-	(xs == XLAT_STYLE_VERBOSE ? tprints_comment : tprints)(addr_str);
+	(xs == XLAT_STYLE_VERBOSE ? tprints_comment : tprints_string)(addr_str);
 }
 
 static bool
@@ -617,7 +617,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 		tprint_comment_begin();
 
 	if (psm_name) {
-		tprints(psm_name);
+		tprints_string(psm_name);
 	} else if (psm_he >= L2CAP_PSM_LE_DYN_START
 	    && psm_he <= L2CAP_PSM_LE_DYN_END) {
 		print_xlat(L2CAP_PSM_LE_DYN_START);
@@ -628,7 +628,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 		tprint_plus();
 		PRINT_VAL_U(psm_he - L2CAP_PSM_DYN_START);
 	} else {
-		tprints("L2CAP_PSM_???");
+		tprints_string("L2CAP_PSM_???");
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !psm_str)
@@ -657,13 +657,13 @@ print_bluetooth_l2_cid(uint16_t cid)
 		tprint_comment_begin();
 
 	if (cid_name) {
-		tprints(cid_name);
+		tprints_string(cid_name);
 	} else if (cid_he >= L2CAP_CID_DYN_START) {
 		print_xlat(L2CAP_CID_DYN_START);
 		tprint_plus();
 		PRINT_VAL_U(cid_he - L2CAP_CID_DYN_START);
 	} else {
-		tprints("L2CAP_CID_???");
+		tprints_string("L2CAP_CID_???");
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !cid_str)

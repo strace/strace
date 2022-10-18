@@ -13,7 +13,7 @@
 
 # ifdef IN_STRACE
 
-#  define STRACE_PRINTS(s_) tprints(s_)
+#  define STRACE_PRINTS(s_) tprints_string(s_)
 
 /*
  * The printf-like function to use in header files
@@ -672,8 +672,8 @@ tprints_arg_begin(const char *name)
 		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
 			tprint_comment_begin();				\
 		if (nr_prefix_)						\
-			tprints(nr_prefix_);				\
-		tprints(name);						\
+			tprints_string(nr_prefix_);			\
+		tprints_string(name);					\
 		if (!nr_prefix_ ||					\
 		    xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)	\
 			tprint_comment_end();				\

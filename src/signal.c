@@ -209,7 +209,7 @@ sprintsigmask_n(const char *prefix, const void *sig_mask, unsigned int bytes)
 	sprintsigmask_n((prefix), &(mask), sizeof(mask))
 
 #define tprintsigmask_val(mask) \
-	tprints(sprintsigmask_n("", &(mask), sizeof(mask)))
+	tprints_string(sprintsigmask_n("", &(mask), sizeof(mask)))
 
 static const char *
 sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
@@ -229,7 +229,7 @@ sprint_old_sigmask_val(const char *const prefix, const unsigned long mask)
 static void
 tprint_old_sigmask_val(const unsigned long mask)
 {
-	tprints(sprint_old_sigmask_val("", mask));
+	tprints_string(sprint_old_sigmask_val("", mask));
 }
 
 void
@@ -242,7 +242,7 @@ printsignal(int nr)
 	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(str);
+		? tprints_comment : tprints_string)(str);
 }
 
 static void
@@ -260,7 +260,7 @@ print_sigset_addr_len_limit(struct tcb *const tcp, const kernel_ulong_t addr,
 	int mask[NSIG_BYTES / sizeof(int)] = {};
 	if (umoven_or_printaddr(tcp, addr, len, mask))
 		return;
-	tprints(sprintsigmask_n("", mask, len));
+	tprints_string(sprintsigmask_n("", mask, len));
 }
 
 void
@@ -362,7 +362,7 @@ SYS_FUNC(sigaction)
 		int signo = tcp->u_arg[0];
 #if defined SPARC || defined SPARC64
 		if (signo < 0) {
-			tprints("-");
+			tprints_string("-");
 			signo = -signo;
 		}
 #endif
@@ -781,7 +781,7 @@ do_rt_sigtimedwait(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 			tprint_arg_next();
 
 			/* timeout */
-			tprints(get_tcb_priv_data(tcp));
+			tprints_string(get_tcb_priv_data(tcp));
 			tprint_arg_next();
 
 			/* sigsetsize */

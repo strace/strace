@@ -38,7 +38,7 @@ decode_request(struct tcb *const tcp, const kernel_ulong_t arg)
 
 	tprint_struct_begin();
 	tprints_field_name("guard");
-	tprints("'Q'");
+	tprints_string("'Q'");
 	tprint_struct_next();
 	if (umoven_or_printaddr(tcp, arg + skip_iid, sizeof(sg_io) - skip_iid,
 				&sg_io.protocol)) {

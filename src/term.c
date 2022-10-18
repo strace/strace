@@ -122,7 +122,7 @@ print_cc_char(bool *first, const unsigned char *data, const char *s,
 
 	tprint_array_index_begin();
 	if (s)
-		tprints(s);
+		tprints_string(s);
 	else
 		PRINT_VAL_U(idx);
 	tprint_array_index_equal();

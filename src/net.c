@@ -785,7 +785,7 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	if (popcount32(&data32, 1) > sizeof(data32) * 8 / 2) {
 		/* show those bits that are NOT in the set */
 		data32 = ~data32;
-		tprints("~");
+		tprints_string("~");
 	}
 
 	/* next_set_bit operates on current_wordsize words */

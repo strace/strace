@@ -761,13 +761,13 @@ static void
 print_injected_note(struct tcb *tcp)
 {
 	if (syscall_tampered(tcp) && syscall_tampered_poked(tcp))
-		tprints(" (INJECTED: args, retval)");
+		tprints_string(" (INJECTED: args, retval)");
 	else if (syscall_tampered_poked(tcp))
-		tprints(" (INJECTED: args)");
+		tprints_string(" (INJECTED: args)");
 	else if (syscall_tampered(tcp))
-		tprints(" (INJECTED)");
+		tprints_string(" (INJECTED)");
 	if (syscall_tampered_delayed(tcp))
-		tprints(" (DELAYED)");
+		tprints_string(" (DELAYED)");
 }
 
 int
@@ -794,7 +794,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		tprint_arg_end();
 		tprint_space();
 		tabto();
-		tprints("= ? <unavailable>");
+		tprints_string("= ? <unavailable>");
 		tprint_newline();
 		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 			bool publish = is_number_in_set(STATUS_UNAVAILABLE,
@@ -862,13 +862,13 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * The system call will be restarted with the same arguments
 			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
 			 */
-			tprints("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
+			tprints_string("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
 			break;
 		case ERESTARTNOINTR:
 			/* Rare. For example, fork() returns this if interrupted.
 			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
 			 */
-			tprints("= ? ERESTARTNOINTR (To be restarted)");
+			tprints_string("= ? ERESTARTNOINTR (To be restarted)");
 			break;
 		case ERESTARTNOHAND:
 			/* pause(), rt_sigsuspend() etc use this code.
@@ -878,7 +878,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * after SIG_IGN or SIG_DFL signal it will restart
 			 * (thus the name "restart only if has no handler").
 			 */
-			tprints("= ? ERESTARTNOHAND (To be restarted if no handler)");
+			tprints_string("= ? ERESTARTNOHAND (To be restarted if no handler)");
 			break;
 		case ERESTART_RESTARTBLOCK:
 			/* Syscalls like nanosleep(), poll() which can't be
@@ -892,7 +892,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * which in turn saves another such restart block,
 			 * old data is lost and restart becomes impossible)
 			 */
-			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
+			tprints_string("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
 			break;
 		default:
 			print_err_ret(tcp->u_rval, tcp->u_error);
@@ -903,7 +903,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			tprintf(" (%s)", tcp->auxstr);
 	} else {
 		if (sys_res & RVAL_NONE)
-			tprints("= ?");
+			tprints_string("= ?");
 		else {
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:
@@ -920,7 +920,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			case RVAL_OCTAL: {
 				unsigned long long mode =
 					zero_extend_signed_to_ull(tcp->u_rval);
-				tprints("= ");
+				tprints_string("= ");
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval))
 					mode = (unsigned int) mode;
@@ -946,7 +946,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				 */
 				if ((current_klongsize < sizeof(tcp->u_rval)) ||
 				    ((kernel_ulong_t) tcp->u_rval <= INT_MAX)) {
-					tprints("= ");
+					tprints_string("= ");
 					printfd(tcp, tcp->u_rval);
 				} else {
 					tprintf("= %" PRI_kld, tcp->u_rval);
@@ -962,7 +962,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				};
 #undef _
 
-				tprints("= ");
+				tprints_string("= ");
 				printpid(tcp, tcp->u_rval,
 					 types[(sys_res & RVAL_MASK) - RVAL_TID]);
 				break;

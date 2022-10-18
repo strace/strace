@@ -52,7 +52,7 @@ SYS_FUNC(memfd_create)
 		 * print_xlat_u is not used here because the whole thing
 		 * is potentially inside a comment already.
 		 */
-		tprints("MFD_HUGE_SHIFT");
+		tprints_string("MFD_HUGE_SHIFT");
 		tprint_shift_end();
 	}
 

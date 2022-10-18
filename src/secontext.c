@@ -227,7 +227,7 @@ print_context(char *secontext, char *expected)
 	ssize_t exp_len = parse_secontext(expected, &exp_str);
 
 	if (ctx_len != exp_len || strncmp(ctx_str, exp_str, ctx_len)) {
-		tprints("!!");
+		tprints_string("!!");
 		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
 	}
 

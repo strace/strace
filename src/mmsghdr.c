@@ -231,7 +231,7 @@ do_recvmmsg(struct tcb *const tcp, const print_obj_by_addr_fn print_ts,
 			tprint_arg_next();
 
 			/* timeout on entrance */
-			tprints(*(const char **) get_tcb_priv_data(tcp));
+			tprints_string(*(const char **) get_tcb_priv_data(tcp));
 		}
 		if (syserror(tcp))
 			return 0;

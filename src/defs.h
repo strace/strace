@@ -1686,7 +1686,7 @@ extern void printleader(struct tcb *);
 extern void line_ended(void);
 extern void tabto(void);
 extern void tprintf(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
-extern void tprints(const char *str);
+extern void tprints_string(const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints_comment(const char *str);
 

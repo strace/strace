@@ -47,7 +47,7 @@ sprint_xlat_val(uint64_t val, enum xlat_style style)
 static void
 print_xlat_val(uint64_t val, enum xlat_style style)
 {
-	tprints(sprint_xlat_val(val, style));
+	tprints_string(sprint_xlat_val(val, style));
 }
 
 static int
@@ -231,7 +231,7 @@ printxvals_ex(const uint64_t val, const char *dflt, enum xlat_style style,
 				print_xlat_val(val, style);
 				tprints_comment(str);
 			} else {
-				tprints(str);
+				tprints_string(str);
 			}
 
 			goto printxvals_ex_end;
@@ -441,7 +441,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 					tprint_flags_or();
 				else if (need_comment)
 					tprint_comment_begin();
-				tprints(xlat->data[idx].str);
+				tprints_string(xlat->data[idx].str);
 				flags &= ~v;
 			}
 			if (!flags)
@@ -486,7 +486,7 @@ print_xlat_ex(const uint64_t val, const char *str, uint32_t style)
 				print_xlat_val(val, style);
 				tprints_comment(str);
 			} else {
-				tprints(str);
+				tprints_string(str);
 			}
 			break;
 		}

@@ -564,7 +564,7 @@ print_uuid(const unsigned char *uuid)
 		'\0'
 	};
 
-	tprints(str);
+	tprints_string(str);
 }
 
 enum sock_proto
@@ -630,7 +630,7 @@ static void
 print_string_in_angle_brackets(const char *str)
 {
 	tprint_associated_info_begin();
-	tprints(str);
+	tprints_string(str);
 	tprint_associated_info_end();
 }
 
@@ -724,7 +724,7 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	pid_t pid = pidfd_get_pid(pid_of_fd, fd);
 	if (pid > 0) {
 		tprint_associated_info_begin();
-		tprints("pid:");
+		tprints_string("pid:");
 		/*
 		 * The pid translation is not needed because
 		 * the pid is in strace's namespace.
@@ -747,7 +747,7 @@ print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 	tprint_associated_info_end();
 
 	if (deleted)
-		tprints("(deleted)");
+		tprints_string("(deleted)");
 }
 
 void
@@ -1065,7 +1065,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	}
 
 	rc = string_quote(str, outstr, size, style, escape_chars);
-	tprints(outstr);
+	tprints_string(outstr);
 
 	if (((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 	     == (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0)) && rc) {
@@ -1218,7 +1218,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 		       || len > max_strlen);
 
-	tprints(outstr);
+	tprints_string(outstr);
 	if (ellipsis)
 		tprint_more_data_follows();
 

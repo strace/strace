@@ -90,7 +90,7 @@ print_mmap_flags(kernel_ulong_t flags)
 		 * print_xlat_u is not used here because the whole thing
 		 * is potentially inside a comment already.
 		 */
-		tprints("MAP_HUGE_SHIFT");
+		tprints_string("MAP_HUGE_SHIFT");
 		tprint_shift_end();
 	}
 
