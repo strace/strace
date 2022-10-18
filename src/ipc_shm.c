@@ -43,6 +43,7 @@ SYS_FUNC(shmget)
 	const unsigned int hugetlb_value = flags & mask;
 
 	flags &= ~mask;
+	tprint_flags_begin();
 	if (flags || !hugetlb_value)
 		printflags(shm_resource_flags, flags, NULL);
 
@@ -59,6 +60,7 @@ SYS_FUNC(shmget)
 	if (flags || hugetlb_value)
 		tprint_flags_or();
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);
+	tprint_flags_end();
 
 	return RVAL_DECODED;
 }

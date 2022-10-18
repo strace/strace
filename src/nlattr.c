@@ -53,6 +53,7 @@ print_nlattr(const struct nlattr *const nla,
 	PRINT_FIELD_U(*nla, nla_len);
 	tprint_struct_next();
 	tprints_field_name("nla_type");
+	tprint_flags_begin();
 	if (nla->nla_type & NLA_F_NESTED) {
 		print_xlat(NLA_F_NESTED);
 		tprint_flags_or();
@@ -62,6 +63,7 @@ print_nlattr(const struct nlattr *const nla,
 		tprint_flags_or();
 	}
 	printxval(table, nla->nla_type & NLA_TYPE_MASK, dflt);
+	tprint_flags_end();
 	tprint_struct_end();
 }
 
@@ -418,7 +420,9 @@ decode_nla_flags(struct tcb *const tcp,
 			data = opts->process_fn(data);
 		if (opts->fn_str)
 			tprints_arg_begin(opts->fn_str);
+		tprint_flags_begin();
 		printflags_ex(data, opts->dflt, opts->style, opts->xlat, NULL);
+		tprint_flags_end();
 		if (opts->fn_str)
 			tprint_arg_end();
 	}

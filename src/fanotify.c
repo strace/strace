@@ -23,12 +23,14 @@ SYS_FUNC(fanotify_init)
 	/* flags */
 	unsigned int flags = tcp->u_arg[0];
 
+	tprint_flags_begin();
 	printxval(fan_classes, flags & FAN_ALL_CLASS_BITS, "FAN_CLASS_???");
 	flags &= ~FAN_ALL_CLASS_BITS;
 	if (flags) {
 		tprint_flags_or();
 		printflags(fan_init_flags, flags, "FAN_???");
 	}
+	tprint_flags_end();
 	tprint_arg_next();
 
 	/* event_f_flags */

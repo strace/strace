@@ -87,11 +87,13 @@ SYS_FUNC(clone)
 #endif
 		tprints_arg_name("flags");
 		if (flags) {
+			tprint_flags_begin();
 			printflags64(clone_flags, flags, "CLONE_???");
 			if (sig) {
 				tprint_flags_or();
 				printsignal(sig);
 			}
+			tprint_flags_end();
 		} else {
 			printsignal(sig);
 		}
@@ -165,8 +167,10 @@ SYS_FUNC(clone3)
 
 		tprint_struct_begin();
 		tprints_field_name("flags");
+		tprint_flags_begin();
 		printflags_ex(arg.flags, "CLONE_???", XLAT_STYLE_DEFAULT,
 			      clone_flags, clone3_flags, NULL);
+		tprint_flags_end();
 
 		if (arg.flags & CLONE_PIDFD) {
 			tprint_struct_next();

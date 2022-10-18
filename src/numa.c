@@ -95,9 +95,11 @@ print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
+	tprint_flags_begin();
 	tprints(mode_str);
 	tprint_flags_or();
 	printflags_ex(flags, NULL, XLAT_STYLE_ABBREV, mpol_mode_flags, NULL);
+	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();

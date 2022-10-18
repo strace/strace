@@ -226,9 +226,19 @@ tprint_shift(void)
 }
 
 static inline void
+tprint_flags_begin(void)
+{
+}
+
+static inline void
 tprint_flags_or(void)
 {
 	STRACE_PRINTS("|");
+}
+
+static inline void
+tprint_flags_end(void)
+{
 }
 
 static inline void
@@ -408,11 +418,13 @@ tprints_arg_begin(const char *name)
 # define PRINT_FIELD_FLAGS_VERBOSE(where_, field_, xlat_, dflt_)	\
 	do {								\
 		tprints_field_name(#field_);				\
+		tprint_flags_begin();					\
 		printflags_ex(zero_extend_signed_to_ull((where_).field_), \
 			      (dflt_),					\
 			      xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW \
 				? XLAT_STYLE_RAW : XLAT_STYLE_VERBOSE,	\
-			      (xlat_), NULL);	\
+			      (xlat_), NULL);				\
+		tprint_flags_end();					\
 	} while (0)
 
 # define PRINT_FIELD_XVAL(where_, field_, xlat_, dflt_)			\

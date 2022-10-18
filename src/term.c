@@ -56,6 +56,7 @@ decode_oflag(uint64_t val)
 		{ term_oflags_ffdly,  FFDLY,  "FF?"  },
 	};
 
+	tprint_flags_begin();
 	for (unsigned int i = 0; i < ARRAY_SIZE(xlats); i++) {
 		printxval64(xlats[i].xl, val & xlats[i].mask, xlats[i].dfl);
 		tprint_flags_or();
@@ -64,11 +65,13 @@ decode_oflag(uint64_t val)
 	}
 
 	printflags64(term_oflags, val, NULL);
+	tprint_flags_end();
 }
 
 static void
 decode_cflag(uint64_t val)
 {
+	tprint_flags_begin();
 	printxval64(baud_options, val & CBAUD, "B???");
 	tprint_flags_or();
 
@@ -86,6 +89,7 @@ decode_cflag(uint64_t val)
 
 	val &= ~(CBAUD | CIBAUD | CSIZE);
 	printflags64(term_cflags, val, NULL);
+	tprint_flags_end();
 }
 
 static void

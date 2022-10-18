@@ -27,9 +27,11 @@ SYS_FUNC(msgget)
 	tprint_arg_next();
 
 	/* msgflg */
+	tprint_flags_begin();
 	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprint_flags_or();
 	print_numeric_umode_t(tcp->u_arg[1] & 0777);
+	tprint_flags_end();
 	return RVAL_DECODED;
 }
 

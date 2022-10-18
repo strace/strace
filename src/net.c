@@ -95,6 +95,7 @@ tprint_sock_type(unsigned int flags)
 {
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 
+	tprint_flags_begin();
 	if (str) {
 		print_xlat_ex(flags & SOCK_TYPE_MASK, str, XLAT_STYLE_DEFAULT);
 		flags &= ~SOCK_TYPE_MASK;
@@ -103,6 +104,7 @@ tprint_sock_type(unsigned int flags)
 		tprint_flags_or();
 	}
 	printflags(sock_type_flags, flags, "SOCK_???");
+	tprint_flags_end();
 }
 
 SYS_FUNC(socket)

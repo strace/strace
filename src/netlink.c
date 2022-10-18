@@ -178,6 +178,7 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 	const uint8_t subsys_id = (uint8_t) (type >> 8);
 	const uint8_t msg_type = (uint8_t) type;
 
+	tprint_flags_begin();
 	tprint_shift_begin();
 	printxval(xlat, subsys_id, dflt);
 	tprint_shift();
@@ -190,6 +191,7 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 			  msg_type, nf_nlmsg_types[subsys_id].dflt);
 	else
 		PRINT_VAL_X(msg_type);
+	tprint_flags_end();
 }
 
 typedef void (*nlmsg_types_decoder_t)(struct tcb *, const struct xlat *,
@@ -449,8 +451,10 @@ decode_nlmsg_flags(const uint16_t flags, const uint16_t type,
 	} else if (family < ARRAY_SIZE(nlmsg_flags) && nlmsg_flags[family])
 		table = nlmsg_flags[family](type);
 
+	tprint_flags_begin();
 	printflags_ex(flags, "NLM_F_???", XLAT_STYLE_DEFAULT,
 		      netlink_flags, table, NULL);
+	tprint_flags_end();
 }
 
 static void

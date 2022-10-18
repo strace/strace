@@ -36,6 +36,7 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 	const struct xlat *mode = extended ? ebpf_mode : bpf_mode;
 	uint16_t i = code & ~BPF_CLASS(code);
 
+	tprint_flags_begin();
 	printxval(extended ? ebpf_class : bpf_class, BPF_CLASS(code),
 		  "BPF_???");
 	switch (BPF_CLASS(code)) {
@@ -106,6 +107,7 @@ print_bpf_filter_code(const uint16_t code, bool extended)
 
 		break;
 	}
+	tprint_flags_end();
 }
 
 static void

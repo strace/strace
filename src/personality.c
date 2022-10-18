@@ -20,12 +20,14 @@ SYS_FUNC(personality)
 		if (0xffffffff == pers) {
 			PRINT_VAL_X(0xffffffff);
 		} else {
+			tprint_flags_begin();
 			printxval(personality_types, pers & PER_MASK, "PER_???");
 			pers &= ~PER_MASK;
 			if (pers) {
 				tprint_flags_or();
 				printflags(personality_flags, pers, NULL);
 			}
+			tprint_flags_end();
 		}
 		return 0;
 	}

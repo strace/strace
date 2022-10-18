@@ -107,6 +107,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 		tprint_arg_next();
 		if (!umove_or_printaddr(tcp, arg, &val)) {
 			tprint_indirect_begin();
+			tprint_flags_begin();
 			if (val & SG_SCSI_RESET_NO_ESCALATE) {
 				printxval(sg_scsi_reset,
 					  SG_SCSI_RESET_NO_ESCALATE, 0);
@@ -115,6 +116,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 			printxval(sg_scsi_reset,
 				  val & ~SG_SCSI_RESET_NO_ESCALATE,
 				  "SG_SCSI_RESET_???");
+			tprint_flags_end();
 			tprint_indirect_end();
 
 		}

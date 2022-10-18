@@ -503,6 +503,7 @@ print_v4l2_buffer_flags(uint32_t val)
 		return;
 	}
 
+	tprint_flags_begin();
 	if (flags) {
 		printflags(v4l2_buf_flags, flags, "V4L2_BUF_FLAG_???");
 		tprint_flags_or();
@@ -512,6 +513,7 @@ print_v4l2_buffer_flags(uint32_t val)
 	tprint_flags_or();
 	printxval(v4l2_buf_flags_ts_src, ts_src,
 		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
+	tprint_flags_end();
 }
 
 #define PRINT_FIELD_V4L2_BUFFER_FLAGS(where_, field_)		\
@@ -809,6 +811,7 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 		return;
 	}
 
+	tprint_flags_begin();
 	if (next_flags) {
 		uint32_t flags = cid & v4l2_control_query_flags->flags_mask;
 
@@ -824,6 +827,7 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 
 	if (id_name) {
 		print_xlat_ex(cid, id_name, XLAT_STYLE_DEFAULT);
+		tprint_flags_end();
 		return;
 	}
 
@@ -832,6 +836,7 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 
 	if (!class_str || (cid - class_id) >= 0x10000) {
 		print_xlat_ex(cid, "V4L2_CID_???", PXF_DEFAULT_STR);
+		tprint_flags_end();
 		return;
 	}
 
@@ -843,6 +848,7 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 
 	xsprintf(tmp_str, "%s+%#" PRIx64, class_str, cid - class_id);
 	print_xlat_ex(cid, tmp_str, XLAT_STYLE_DEFAULT);
+	tprint_flags_end();
 }
 
 #define PRINT_FIELD_V4L2_CID(where_, field_, next_)		\

@@ -32,6 +32,7 @@ printstatus(int status)
 	 * are no wait status constructors it will have to do.
 	 */
 	tprint_indirect_begin();
+	tprint_flags_begin();
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
 		tprintf("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
@@ -57,6 +58,7 @@ printstatus(int status)
 #endif
 	else {
 		PRINT_VAL_X(status);
+		tprint_flags_end();
 		tprint_indirect_end();
 		return 0;
 	}
@@ -77,6 +79,7 @@ printstatus(int status)
 			PRINT_VAL_X(status);
 		}
 	}
+	tprint_flags_end();
 	tprint_indirect_end();
 
 	return exited;

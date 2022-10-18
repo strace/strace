@@ -91,6 +91,7 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 	unsigned int freq = ticks && count ? KERNEL_PIT_TICK_RATE / count : 0;
 
 	tprint_arg_next();
+	tprint_flags_begin();
 	if (ticks) {
 		tprint_shift_begin();
 		PRINT_VAL_U(ticks);
@@ -100,6 +101,7 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 		tprint_flags_or();
 	}
 	PRINT_VAL_U(count);
+	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
 		if (freq)

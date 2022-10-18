@@ -111,6 +111,7 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		printaddr(uaddr2);
 
 		tprint_arg_next();
+		tprint_flags_begin();
 		if ((val3 >> 28) & FUTEX_OP_OPARG_SHIFT) {
 			tprint_shift_begin();
 			print_xlat(FUTEX_OP_OPARG_SHIFT);
@@ -142,6 +143,7 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		tprints_comment(comment);
 		tprint_flags_or();
 		PRINT_VAL_X(val3 & 0xfff);
+		tprint_flags_end();
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprint_arg_next();

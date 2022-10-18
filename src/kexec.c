@@ -75,12 +75,14 @@ SYS_FUNC(kexec_load)
 
 	/* flags */
 	kernel_ulong_t n = tcp->u_arg[3];
+	tprint_flags_begin();
 	printxval64(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
 	n &= ~(kernel_ulong_t) KEXEC_ARCH_MASK;
 	if (n) {
 		tprint_flags_or();
 		printflags64(kexec_load_flags, n, "KEXEC_???");
 	}
+	tprint_flags_end();
 
 	return RVAL_DECODED;
 }
