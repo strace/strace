@@ -272,7 +272,7 @@ tprints_field_name(const char *name)
 }
 
 static inline void
-tprints_arg_name(const char *name)
+tprints_arg_name_begin(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
 }
