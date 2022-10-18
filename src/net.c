@@ -103,7 +103,7 @@ tprint_sock_type(unsigned int flags)
 			return;
 		tprint_flags_or();
 	}
-	printflags(sock_type_flags, flags, "SOCK_???");
+	printflags_in(sock_type_flags, flags, "SOCK_???");
 	tprint_flags_end();
 }
 

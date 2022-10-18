@@ -25,7 +25,7 @@ SYS_FUNC(personality)
 			pers &= ~PER_MASK;
 			if (pers) {
 				tprint_flags_or();
-				printflags(personality_flags, pers, NULL);
+				printflags_in(personality_flags, pers, NULL);
 			}
 			tprint_flags_end();
 		}

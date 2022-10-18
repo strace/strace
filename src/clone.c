@@ -88,7 +88,7 @@ SYS_FUNC(clone)
 		tprints_arg_name("flags");
 		if (flags) {
 			tprint_flags_begin();
-			printflags64(clone_flags, flags, "CLONE_???");
+			printflags64_in(clone_flags, flags, "CLONE_???");
 			if (sig) {
 				tprint_flags_or();
 				printsignal(sig);

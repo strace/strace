@@ -45,7 +45,7 @@ SYS_FUNC(shmget)
 	flags &= ~mask;
 	tprint_flags_begin();
 	if (flags || !hugetlb_value)
-		printflags(shm_resource_flags, flags, NULL);
+		printflags_in(shm_resource_flags, flags, NULL);
 
 	if (hugetlb_value) {
 		if (flags)

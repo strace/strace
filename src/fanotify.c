@@ -28,7 +28,7 @@ SYS_FUNC(fanotify_init)
 	flags &= ~FAN_ALL_CLASS_BITS;
 	if (flags) {
 		tprint_flags_or();
-		printflags(fan_init_flags, flags, "FAN_???");
+		printflags_in(fan_init_flags, flags, "FAN_???");
 	}
 	tprint_flags_end();
 	tprint_arg_next();

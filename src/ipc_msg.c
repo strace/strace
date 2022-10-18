@@ -28,7 +28,7 @@ SYS_FUNC(msgget)
 
 	/* msgflg */
 	tprint_flags_begin();
-	if (printflags(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
+	if (printflags_in(resource_flags, tcp->u_arg[1] & ~0777, NULL) != 0)
 		tprint_flags_or();
 	print_numeric_umode_t(tcp->u_arg[1] & 0777);
 	tprint_flags_end();

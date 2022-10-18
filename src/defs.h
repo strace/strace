@@ -1548,15 +1548,15 @@ printstr(struct tcb *tcp, kernel_ulong_t addr)
 }
 
 static inline int
-printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
+printflags64_in(const struct xlat *x, uint64_t flags, const char *dflt)
 {
 	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
 }
 
 static inline int
-printflags(const struct xlat *x, unsigned int flags, const char *dflt)
+printflags_in(const struct xlat *x, unsigned int flags, const char *dflt)
 {
-	return printflags64(x, flags, dflt);
+	return printflags64_in(x, flags, dflt);
 }
 
 static inline int
@@ -2045,6 +2045,21 @@ ilog2_32(uint32_t val)
 # undef ILOG2_ITER_
 
 # include "print_fields.h"
+
+static inline int
+printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
+{
+	tprint_flags_begin();
+	int r = printflags64_in(x, flags, dflt);
+	tprint_flags_end();
+	return r;
+}
+
+static inline int
+printflags(const struct xlat *x, unsigned int flags, const char *dflt)
+{
+	return printflags64(x, flags, dflt);
+}
 
 /*
  * When u64 is interpreted by the kernel as an address, there is a difference

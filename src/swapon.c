@@ -24,7 +24,7 @@ SYS_FUNC(swapon)
 	/* swapflags */
 	tprint_flags_begin();
 	if (flags) {
-		printflags(swap_flags, flags, "SWAP_FLAG_???");
+		printflags_in(swap_flags, flags, "SWAP_FLAG_???");
 		tprint_flags_or();
 	}
 	PRINT_VAL_U(prio);

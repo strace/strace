@@ -505,7 +505,7 @@ print_v4l2_buffer_flags(uint32_t val)
 
 	tprint_flags_begin();
 	if (flags) {
-		printflags(v4l2_buf_flags, flags, "V4L2_BUF_FLAG_???");
+		printflags_in(v4l2_buf_flags, flags, "V4L2_BUF_FLAG_???");
 		tprint_flags_or();
 	}
 	printxval(v4l2_buf_flags_ts_type, ts_type,
@@ -816,8 +816,8 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 		uint32_t flags = cid & v4l2_control_query_flags->flags_mask;
 
 		if (flags) {
-			printflags(v4l2_control_query_flags, flags,
-				   "V4L2_CTRL_FLAG_NEXT_???");
+			printflags_in(v4l2_control_query_flags, flags,
+				      "V4L2_CTRL_FLAG_NEXT_???");
 			tprint_flags_or();
 			cid &= ~flags;
 		}
