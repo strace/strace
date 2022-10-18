@@ -119,9 +119,10 @@ print_cc_char(bool *first, const unsigned char *data, const char *s,
 		tprints(s);
 	else
 		PRINT_VAL_U(idx);
-	tprint_array_index_end();
+	tprint_array_index_equal();
 
 	PRINT_VAL_X(data[idx]);
+	tprint_array_index_end();
 }
 
 static void

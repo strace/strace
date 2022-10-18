@@ -1694,10 +1694,16 @@ print_array_ex(struct tcb *const tcp,
 					     xlat_style);
 			}
 
-			tprint_array_index_end();
+			tprint_array_index_equal();
 		}
 
-		if (!print_func(tcp, elem_buf, elem_size, opaque_data)) {
+		bool break_needed =
+			!print_func(tcp, elem_buf, elem_size, opaque_data);
+
+		if (flags & PAF_PRINT_INDICES)
+			tprint_array_index_end();
+
+		if (break_needed) {
 			cur = end_addr;
 			break;
 		}

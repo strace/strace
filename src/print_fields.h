@@ -97,9 +97,14 @@ tprint_array_index_begin(void)
 }
 
 static inline void
-tprint_array_index_end(void)
+tprint_array_index_equal(void)
 {
 	STRACE_PRINTS("]=");
+}
+
+static inline void
+tprint_array_index_end(void)
+{
 }
 
 static inline void
