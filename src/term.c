@@ -73,9 +73,11 @@ decode_cflag(uint64_t val)
 	tprint_flags_or();
 
 	if (val & CIBAUD) {
+		tprint_shift_begin();
 		printxval64(baud_options, (val & CIBAUD) >> IBSHIFT, "B???");
 		tprint_shift();
 		print_xlat(IBSHIFT);
+		tprint_shift_end();
 		tprint_flags_or();
 	}
 

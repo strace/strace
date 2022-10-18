@@ -49,9 +49,11 @@ SYS_FUNC(shmget)
 	if (hugetlb_value) {
 		if (flags)
 			tprint_flags_or();
+		tprint_shift_begin();
 		PRINT_VAL_U(hugetlb_value >> SHM_HUGE_SHIFT);
 		tprint_shift();
 		print_xlat_u(SHM_HUGE_SHIFT);
+		tprint_shift_end();
 	}
 
 	if (flags || hugetlb_value)

@@ -92,9 +92,11 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 
 	tprint_arg_next();
 	if (ticks) {
+		tprint_shift_begin();
 		PRINT_VAL_U(ticks);
 		tprint_shift();
 		PRINT_VAL_U(16);
+		tprint_shift_end();
 		tprint_flags_or();
 	}
 	PRINT_VAL_U(count);

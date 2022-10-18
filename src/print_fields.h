@@ -210,6 +210,16 @@ tprint_unavailable(void)
 }
 
 static inline void
+tprint_shift_begin(void)
+{
+}
+
+static inline void
+tprint_shift_end(void)
+{
+}
+
+static inline void
 tprint_shift(void)
 {
 	STRACE_PRINTS("<<");

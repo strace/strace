@@ -16,9 +16,11 @@ SYS_FUNC(ipc)
 	call &= 0xffff;
 
 	if (version) {
+		tprint_shift_begin();
 		PRINT_VAL_U(version);
 		tprint_shift();
 		PRINT_VAL_U(16);
+		tprint_shift_end();
 		tprint_flags_or();
 	}
 

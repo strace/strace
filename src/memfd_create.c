@@ -43,6 +43,7 @@ SYS_FUNC(memfd_create)
 	if (hugetlb_value) {
 		if (flags)
 			tprint_flags_or();
+		tprint_shift_begin();
 		PRINT_VAL_U(hugetlb_value >> MFD_HUGE_SHIFT);
 		tprint_shift();
 		/*
@@ -50,6 +51,7 @@ SYS_FUNC(memfd_create)
 		 * is potentially inside a comment already.
 		 */
 		tprints("MFD_HUGE_SHIFT");
+		tprint_shift_end();
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
