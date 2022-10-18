@@ -114,7 +114,7 @@ sprint_mac_addr(const uint8_t addr[], size_t size)
 void
 print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
 {
-	tprints(prefix);
+	tprints_string(prefix);
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV
 	    || size > MAX_ADDR_LEN)
 		print_quoted_string((const char *) addr, size,
@@ -123,7 +123,7 @@ print_mac_addr(const char *prefix, const uint8_t addr[], size_t size)
 	    || size > MAX_ADDR_LEN)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(sprint_mac_addr(addr, size));
+		? tprints_comment : tprints_string)(sprint_mac_addr(addr, size));
 }
 
 static const char *
@@ -139,7 +139,7 @@ void
 print_hwaddr(const char *prefix, const uint8_t addr[], size_t size,
 	     uint32_t devtype)
 {
-	tprints(prefix);
+	tprints_string(prefix);
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV
 	    || size > MAX_ADDR_LEN)
 		print_quoted_string((const char *) addr, size,
@@ -148,6 +148,6 @@ print_hwaddr(const char *prefix, const uint8_t addr[], size_t size,
 	    || size > MAX_ADDR_LEN)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(sprint_hwaddr(addr, size,
+		? tprints_comment : tprints_string)(sprint_hwaddr(addr, size,
 							   devtype));
 }

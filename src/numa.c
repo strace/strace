@@ -70,8 +70,8 @@ static void
 print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 {
 	const kernel_ulong_t flags_mask = MPOL_F_STATIC_NODES |
-					  MPOL_F_RELATIVE_NODES |
-					  MPOL_F_NUMA_BALANCING;
+		MPOL_F_RELATIVE_NODES |
+		MPOL_F_NUMA_BALANCING;
 	const kernel_ulong_t mode = mode_arg & ~flags_mask;
 	const unsigned int flags = mode_arg & flags_mask;
 
@@ -86,18 +86,22 @@ print_mode(struct tcb *const tcp, const kernel_ulong_t mode_arg)
 		return;
 	}
 
+	tprint_flags_begin();
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		PRINT_VAL_X(mode_arg);
 
-	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
+	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW){
+		tprint_flags_end();
 		return;
+	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
-	tprints(mode_str);
-	tprint_or();
+	tprints_string(mode_str);
+	tprint_flags_or();
 	printflags_ex(flags, NULL, XLAT_STYLE_ABBREV, mpol_mode_flags, NULL);
+	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();

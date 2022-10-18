@@ -105,7 +105,7 @@ sprint_char(char *buf, const unsigned char c, const enum sprint_char_flags f)
 		char buf[SPRINT_CHAR_BUFSZ];			\
 								\
 		sprint_char(buf, (c_), (flags_) | SCF_NUL);	\
-		tprints(buf);					\
+		tprints_string(buf);                             \
 	} while (0)
 
 #endif /* STRACE_PRINT_UTILS_H */

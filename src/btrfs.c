@@ -861,8 +861,9 @@ MPERS_PRINTER_DECL(int, btrfs_ioctl,
 
 			tprint_array_index_begin();
 			printxval_u(btrfs_dev_stats_values, i, NULL);
-			tprint_array_index_end();
+			tprint_array_index_equal();
 			PRINT_VAL_U(args.values[i]);
+			tprint_array_index_end();
 		}
 		tprint_array_end();
 		tprint_struct_end();

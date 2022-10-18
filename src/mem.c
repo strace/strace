@@ -4,7 +4,7 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
- *                    port by Greg Banks <gbanks@pocketpenguins.com>
+ *		      port by Greg Banks <gbanks@pocketpenguins.com>
  * Copyright (c) 1999-2021 The strace developers.
  * All rights reserved.
  *
@@ -56,6 +56,7 @@ SYS_FUNC(brk)
 static void
 print_mmap_flags(kernel_ulong_t flags)
 {
+	tprint_flags_begin();
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		PRINT_VAL_X(flags);
 
@@ -74,24 +75,27 @@ print_mmap_flags(kernel_ulong_t flags)
 
 	flags &= ~mask;
 	if (flags) {
-		tprint_or();
+		tprint_flags_or();
 		printflags_ex(flags, NULL, XLAT_STYLE_ABBREV,
 			      mmap_flags, NULL);
 	}
 
 	if (hugetlb_value) {
-		tprint_or();
+		tprint_flags_or();
+		tprint_shift_begin();
 		PRINT_VAL_U(hugetlb_value >> MAP_HUGE_SHIFT);
 		tprint_shift();
 		/*
 		 * print_xlat_u is not used here because the whole thing
 		 * is potentially inside a comment already.
 		 */
-		tprints("MAP_HUGE_SHIFT");
+		tprints_string("MAP_HUGE_SHIFT");
+		tprint_shift_end();
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
-                tprint_comment_end();
+		tprint_comment_end();
+	tprint_flags_end();
 }
 
 static void

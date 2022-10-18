@@ -15,14 +15,18 @@ SYS_FUNC(ipc)
 	unsigned int version = call >> 16;
 	call &= 0xffff;
 
+	tprint_flags_begin();
 	if (version) {
+		tprint_shift_begin();
 		PRINT_VAL_U(version);
 		tprint_shift();
 		PRINT_VAL_U(16);
-		tprint_or();
+		tprint_shift_end();
+		tprint_flags_or();
 	}
 
 	printxval_u(ipccalls, call, NULL);
+	tprint_flags_end();
 
 	for (unsigned int i = 1; i < n_args(tcp); ++i) {
 		tprint_arg_next();

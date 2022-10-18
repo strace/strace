@@ -133,7 +133,8 @@ print_timespec_t_utime(struct tcb *tcp, void *elem_buf, size_t elem_size,
 			break;
 
 		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprints_comment : tprints)(t->TIMESPEC_NSEC == UTIME_NOW
+
+                 ? tprints_comment : tprints_string)(t->TIMESPEC_NSEC == UTIME_NOW
 				? "UTIME_NOW" : "UTIME_OMIT");
 		break;
 	default:

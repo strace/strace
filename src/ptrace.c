@@ -4,10 +4,10 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
- *                     Linux for s390 port by D.J. Barrow
- *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
+ *		       Linux for s390 port by D.J. Barrow
+ *		      <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 2000 PocketPenguins Inc.  Linux for Hitachi SuperH
- *                    port by Greg Banks <gbanks@pocketpenguins.com>
+ *		      port by Greg Banks <gbanks@pocketpenguins.com>
  * Copyright (c) 1999-2021 The strace developers.
  *
  * All rights reserved.
@@ -73,7 +73,7 @@ print_user_offset_addr(const kernel_ulong_t addr)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
-	tprints(str);
+	tprints_string(str);
 	if (base_addr != addr) {
 		tprint_plus();
 		PRINT_VAL_U(addr - (kernel_ulong_t) base_addr);
@@ -160,15 +160,15 @@ decode_regset(struct tcb *const tcp, const strace_iovec *iov,
 	      const unsigned int nt)
 {
 	switch (nt) {
-		case NT_PRSTATUS:
-			decode_prstatus_regset(tcp, iov->iov_base, iov->iov_len);
-			break;
-		case NT_FPREGSET:
-			decode_fpregset(tcp, iov->iov_base, iov->iov_len);
-			break;
-		default:
-			printaddr(iov->iov_base);
-			break;
+	case NT_PRSTATUS:
+		decode_prstatus_regset(tcp, iov->iov_base, iov->iov_len);
+		break;
+	case NT_FPREGSET:
+		decode_fpregset(tcp, iov->iov_base, iov->iov_len);
+		break;
+	default:
+		printaddr(iov->iov_base);
+		break;
 	}
 }
 
@@ -279,8 +279,8 @@ decode_ptrace_entering(struct tcb *const tcp)
 		case COMPAT_PTRACE_SETHBPREGS:
 			printxvals_ex(request, "COMPAT_PTRACE_???",
 				      xlat_verbose(xlat_verbosity)
-					== XLAT_STYLE_RAW ? XLAT_STYLE_RAW
-							  : XLAT_STYLE_VERBOSE,
+				      == XLAT_STYLE_RAW ? XLAT_STYLE_RAW
+				      : XLAT_STYLE_VERBOSE,
 				      compat_ptrace_cmds, NULL);
 			tprint_arg_next();
 			printpid(tcp, pid, PT_TGID);
@@ -507,5 +507,5 @@ decode_ptrace_exiting(struct tcb *const tcp)
 SYS_FUNC(ptrace)
 {
 	return entering(tcp) ? decode_ptrace_entering(tcp)
-			     : decode_ptrace_exiting(tcp);
+		: decode_ptrace_exiting(tcp);
 }

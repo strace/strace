@@ -43,20 +43,24 @@ SYS_FUNC(shmget)
 	const unsigned int hugetlb_value = flags & mask;
 
 	flags &= ~mask;
+	tprint_flags_begin();
 	if (flags || !hugetlb_value)
-		printflags(shm_resource_flags, flags, NULL);
+		printflags_in(shm_resource_flags, flags, NULL);
 
 	if (hugetlb_value) {
 		if (flags)
-			tprint_or();
+			tprint_flags_or();
+		tprint_shift_begin();
 		PRINT_VAL_U(hugetlb_value >> SHM_HUGE_SHIFT);
 		tprint_shift();
 		print_xlat_u(SHM_HUGE_SHIFT);
+		tprint_shift_end();
 	}
 
 	if (flags || hugetlb_value)
-		tprint_or();
+		tprint_flags_or();
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);
+	tprint_flags_end();
 
 	return RVAL_DECODED;
 }
@@ -95,7 +99,7 @@ SYS_FUNC(shmat)
 			if (umoven(tcp, tcp->u_arg[2], current_wordsize, &u) < 0)
 				return RVAL_NONE;
 			tcp->u_rval = (sizeof(u.r32) == current_wordsize)
-				      ? u.r32 : u.r64;
+				? u.r32 : u.r64;
 		}
 		return RVAL_HEX;
 	}

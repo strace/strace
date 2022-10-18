@@ -95,14 +95,16 @@ tprint_sock_type(unsigned int flags)
 {
 	const char *str = xlookup(socktypes, flags & SOCK_TYPE_MASK);
 
+	tprint_flags_begin();
 	if (str) {
 		print_xlat_ex(flags & SOCK_TYPE_MASK, str, XLAT_STYLE_DEFAULT);
 		flags &= ~SOCK_TYPE_MASK;
 		if (!flags)
 			return;
-		tprint_or();
+		tprint_flags_or();
 	}
-	printflags(sock_type_flags, flags, "SOCK_???");
+	printflags_in(sock_type_flags, flags, "SOCK_???");
+	tprint_flags_end();
 }
 
 SYS_FUNC(socket)
@@ -783,7 +785,7 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	if (popcount32(&data32, 1) > sizeof(data32) * 8 / 2) {
 		/* show those bits that are NOT in the set */
 		data32 = ~data32;
-		tprints("~");
+		tprints_dummy("~"); // structured_output: TODO
 	}
 
 	/* next_set_bit operates on current_wordsize words */

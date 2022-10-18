@@ -178,16 +178,20 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 	const uint8_t subsys_id = (uint8_t) (type >> 8);
 	const uint8_t msg_type = (uint8_t) type;
 
+	tprint_flags_begin();
+	tprint_shift_begin();
 	printxval(xlat, subsys_id, dflt);
 
 	tprint_shift();
 	PRINT_VAL_U(8);
-	tprint_or();
+	tprint_shift_end();
+	tprint_flags_or();
 	if (subsys_id < ARRAY_SIZE(nf_nlmsg_types))
 		printxval(nf_nlmsg_types[subsys_id].xlat,
 			  msg_type, nf_nlmsg_types[subsys_id].dflt);
 	else
 		PRINT_VAL_X(msg_type);
+	tprint_flags_end();
 }
 
 typedef void (*nlmsg_types_decoder_t)(struct tcb *, const struct xlat *,
@@ -609,7 +613,7 @@ decode_payload(struct tcb *const tcp,
 	 * netlink payload decoding.
 	 */
 	if ((nlmsghdr->nlmsg_type >= NLMSG_MIN_TYPE
-	    || nlmsghdr->nlmsg_type == NLMSG_DONE)
+	     || nlmsghdr->nlmsg_type == NLMSG_DONE)
 	    && (unsigned int) family < ARRAY_SIZE(netlink_decoders)
 	    && netlink_decoders[family]
 	    && netlink_decoders[family](tcp, nlmsghdr, addr, len)) {
@@ -645,7 +649,7 @@ decode_nlmsghdr_with_payload(struct tcb *const tcp,
 	if (nlmsg_len > NLMSG_HDRLEN) {
 		tprint_array_next();
 		decode_payload(tcp, fd, family, nlmsghdr, addr + NLMSG_HDRLEN,
-						     nlmsg_len - NLMSG_HDRLEN);
+			       nlmsg_len - NLMSG_HDRLEN);
 		tprint_array_end();
 	}
 }

@@ -45,7 +45,7 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 		}
 
 		const kernel_ulong_t word = (wordsize == sizeof(cp.w32))
-					    ? (kernel_ulong_t) cp.w32 : cp.wl;
+			? (kernel_ulong_t) cp.w32 : cp.wl;
 		if (n == 0)
 			tprint_array_begin();
 		if (word == 0)
@@ -66,7 +66,7 @@ printargv(struct tcb *const tcp, kernel_ulong_t addr)
 
 static void
 printargc(struct tcb *const tcp, kernel_ulong_t addr)
-{
+{ /* Fabrice: TODO */
 	printaddr(addr);
 
 	if (!addr || !verbose(tcp))

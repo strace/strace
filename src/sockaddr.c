@@ -110,7 +110,7 @@ print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen
 {
 	const struct sockaddr_un *const sa_un = buf;
 	const int un_len = addrlen > (int) sizeof(*sa_un)
-			   ? (int) sizeof(*sa_un) : addrlen;
+		? (int) sizeof(*sa_un) : addrlen;
 	const int path_len = un_len - SIZEOF_SA_FAMILY;
 
 	tprints_field_name("sun_path");
@@ -119,7 +119,7 @@ print_sockaddr_data_un(struct tcb *tcp, const void *const buf, const int addrlen
 				    QUOTE_0_TERMINATED);
 		selinux_printfilecon(tcp, sa_un->sun_path);
 	} else {
-		tprints("@");
+		tprints_string("@");
 		print_quoted_string(sa_un->sun_path + 1, path_len - 1, 0);
 	}
 }
@@ -160,6 +160,9 @@ print_inet_addr(const int af,
 		break;
 	case AF_INET6:
 		if (inet_ntop(af, addr, buf, sizeof(buf))) {
+			if (structured_output && var_name)
+				tprints_field_name(var_name);
+
 			if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV) {
 				if (var_name)
 					tprints_field_name(var_name);
@@ -181,7 +184,7 @@ print_inet_addr(const int af,
 			if (var_name &&
 			    (xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV)) {
 				tprint_arg_next();
-				tprintf("&%s", var_name);
+				tprintf_string("&%s", var_name);
 			}
 			tprint_arg_end();
 
@@ -207,7 +210,7 @@ decode_inet_addr(struct tcb *const tcp,
 		 const char *const var_name)
 {
 	union {
-		struct in_addr  a4;
+		struct in_addr	a4;
 		struct in6_addr a6;
 	} addrbuf;
 	size_t size = 0;
@@ -260,6 +263,7 @@ print_sockaddr_data_in6(struct tcb *tcp, const void *const buf,
 	PRINT_FIELD_NET_PORT(*sa_in6, sin6_port);
 	tprint_struct_next();
 	tprints_field_name("sin6_flowinfo");
+
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
 		print_quoted_string((const char*) &sa_in6->sin6_flowinfo,
 				    sizeof(sa_in6->sin6_flowinfo),
@@ -402,7 +406,7 @@ print_ax25_addr(const void /* ax25_address */ *addr_void)
 
 	const char *addr_str = ax25_addr2str(addr);
 
-	(xs == XLAT_STYLE_VERBOSE ? tprints_comment : tprints)(addr_str);
+	(xs == XLAT_STYLE_VERBOSE ? tprints_comment : tprints_string)(addr_str);
 }
 
 static bool
@@ -421,7 +425,7 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 	const struct full_sockaddr_ax25 *const sax25 = buf;
 	size_t addrlen_us = MAX(addrlen, 0);
 	bool full = sax25->fsa_ax25.sax25_ndigis ||
-	(addrlen_us > sizeof(struct sockaddr_ax25));
+		(addrlen_us > sizeof(struct sockaddr_ax25));
 
 	if (full) {
 		tprints_field_name("fsa_ax25");
@@ -458,7 +462,7 @@ print_sockaddr_data_ax25(struct tcb *tcp, const void *const buf,
 
 digis_end:
 	if (addrlen_us > (has_digis * sizeof(sax25->fsa_digipeater[0])
-		       + sizeof(sax25->fsa_ax25))) {
+			  + sizeof(sax25->fsa_ax25))) {
 		tprint_struct_next();
 		tprint_more_data_follows();
 	}
@@ -603,7 +607,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 	const char *psm_name = xlookup(bluetooth_l2_psm, psm_he);
 	const bool psm_str = psm_name || (psm_he >= L2CAP_PSM_LE_DYN_START
 					  && psm_he <= L2CAP_PSM_LE_DYN_END)
-				      || (psm_he >= L2CAP_PSM_DYN_START);
+		|| (psm_he >= L2CAP_PSM_DYN_START);
 
 	tprints_arg_begin("htobs");
 
@@ -617,9 +621,9 @@ print_bluetooth_l2_psm(uint16_t psm)
 		tprint_comment_begin();
 
 	if (psm_name) {
-		tprints(psm_name);
+		tprints_string(psm_name);
 	} else if (psm_he >= L2CAP_PSM_LE_DYN_START
-	    && psm_he <= L2CAP_PSM_LE_DYN_END) {
+		   && psm_he <= L2CAP_PSM_LE_DYN_END) {
 		print_xlat(L2CAP_PSM_LE_DYN_START);
 		tprint_plus();
 		PRINT_VAL_U(psm_he - L2CAP_PSM_LE_DYN_START);
@@ -628,7 +632,7 @@ print_bluetooth_l2_psm(uint16_t psm)
 		tprint_plus();
 		PRINT_VAL_U(psm_he - L2CAP_PSM_DYN_START);
 	} else {
-		tprints("L2CAP_PSM_???");
+		tprints_string("L2CAP_PSM_???");
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !psm_str)
@@ -657,13 +661,13 @@ print_bluetooth_l2_cid(uint16_t cid)
 		tprint_comment_begin();
 
 	if (cid_name) {
-		tprints(cid_name);
+		tprints_string(cid_name);
 	} else if (cid_he >= L2CAP_CID_DYN_START) {
 		print_xlat(L2CAP_CID_DYN_START);
 		tprint_plus();
 		PRINT_VAL_U(cid_he - L2CAP_CID_DYN_START);
 	} else {
-		tprints("L2CAP_CID_???");
+		tprints_string("L2CAP_CID_???");
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE || !cid_str)
@@ -781,12 +785,12 @@ print_sockaddr_data_rxrpc(struct tcb *tcp, const void *const buf,
 	tprint_struct_begin();
 
 	const void *const transport_buf = (void *) &sa->transport
-					  + sizeof(sa->transport.family);
+		+ sizeof(sa->transport.family);
 	const int transport_len = MIN(sa->transport_len,
 				      len - offsetof(struct sockaddr_rxrpc,
 						     transport.family));
 	const int transport_rest = MAX(0, transport_len
-					  - (int) sizeof(sa->transport.family));
+				       - (int) sizeof(sa->transport.family));
 
 	/* Only AF_INET and AF_INET6 are supported as RxRPC transports */
 	switch (sa->transport.family) {
@@ -917,7 +921,7 @@ print_sockaddr_data_nfc(struct tcb *tcp, const void *const buf,
 			 "NFC_PROTO_???");
 
 	size_t sa_nfc_llcp_len = current_wordsize == 8 ? sizeof(sa_nfc->nfc_64)
-						       : sizeof(sa_nfc->nfc_32);
+		: sizeof(sa_nfc->nfc_32);
 	if ((uint32_t) addrlen < sa_nfc_llcp_len)
 	{
 		if ((uint32_t) addrlen > sizeof(struct sockaddr_nfc)) {
@@ -929,7 +933,7 @@ print_sockaddr_data_nfc(struct tcb *tcp, const void *const buf,
 	}
 
 	uint64_t snsz = current_wordsize == 8 ? sa_nfc->nfc_64.service_name_len
-					      : sa_nfc->nfc_32.service_name_len;
+		: sa_nfc->nfc_32.service_name_len;
 
 	tprint_struct_next();
 	PRINT_FIELD_XVAL_VERBOSE(sa_nfc->nfc_32, dsap, nfc_saps, NULL);

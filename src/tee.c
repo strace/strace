@@ -8,7 +8,7 @@
 #include "defs.h"
 #include <linux/tee.h>
 
-/* Not in UAPI.  */
+/* Not in UAPI.	 */
 struct tee_ioctl_shm_register_fd_data {
 	int64_t fd;
 	uint64_t size;
@@ -31,17 +31,17 @@ struct tee_ioctl_shm_register_fd_data {
 
 #define TEE_IOCTL_PARAM_SIZE(x) (sizeof(struct tee_ioctl_param) * (x))
 
-#define TEE_FETCH_BUF_DATA(buf_, arg_, params_) \
-	tee_fetch_buf_data(tcp, arg, &buf_, sizeof(arg_), \
-			   &arg_, offsetof(typeof(arg_), num_params), \
+#define TEE_FETCH_BUF_DATA(buf_, arg_, params_)				\
+	tee_fetch_buf_data(tcp, arg, &buf_, sizeof(arg_),		\
+			   &arg_, offsetof(typeof(arg_), num_params),	\
 			   params_)
 
 /* session id is printed as 0x%x in libteec */
-#define PRINT_FIELD_SESSION(where_, field_) \
+#define PRINT_FIELD_SESSION(where_, field_)	\
 	PRINT_FIELD_X(where_, field_)
 
 static void
-tee_print_buf(struct tee_ioctl_buf_data *buf)
+	tee_print_buf(struct tee_ioctl_buf_data *buf)
 {
 	tprint_struct_begin();
 	PRINT_FIELD_U(*buf, buf_len);
@@ -101,13 +101,15 @@ tee_print_param_fn(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data
 
 	tprint_struct_begin();
 	tprints_field_name("attr");
+	tprint_flags_begin();
 	printxval(tee_ioctl_param_attr_types,
 		    param->attr & ~TEE_IOCTL_PARAM_ATTR_META,
 		    "TEE_IOCTL_PARAM_ATTR_");
 	if (param->attr & TEE_IOCTL_PARAM_ATTR_META) {
-		tprint_or();
-		tprints("TEE_IOCTL_PARAM_ATTR_META");
+		tprint_flags_or();
+		tprints_string("TEE_IOCTL_PARAM_ATTR_META");
 	}
+	tprint_flags_end();
 
 	switch (param->attr) {
 	case TEE_IOCTL_PARAM_ATTR_TYPE_NONE:

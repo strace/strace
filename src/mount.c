@@ -53,13 +53,15 @@ SYS_FUNC(mount)
 	tprint_arg_next();
 
 	/* mountflags */
+	tprint_flags_begin();
 	if (old_magic) {
 		print_xlat(MS_MGC_VAL);
 		if (flags)
-			tprint_or();
+			tprint_flags_or();
 	}
 	if (flags || !old_magic)
-		printflags64(mount_flags, flags, "MS_???");
+		printflags64_in(mount_flags, flags, "MS_???");
+	tprint_flags_end();
 	tprint_arg_next();
 
 	/* data */

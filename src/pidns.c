@@ -554,6 +554,13 @@ printpid(struct tcb *tcp, int pid, enum pid_type type)
 }
 
 void
+printpid_field(const char* s, struct tcb *tcp, int pid, enum pid_type type)
+{
+  PRINT_VAL_D_FIELD(s, pid);
+  printpid_translation(tcp, pid, type);
+}
+
+void
 printpid_tgid_pgid(struct tcb *tcp, int pid)
 {
 	PRINT_VAL_D(pid);

@@ -42,6 +42,7 @@
 #include "delay.h"
 #include "wait.h"
 #include "secontext.h"
+#include "print_fields.h"
 
 /* In some libc, these aren't declared. Do it ourself: */
 extern char **environ;
@@ -70,7 +71,7 @@ cflag_t cflag = CFLAG_NONE;
 bool followfork;
 bool output_separately;
 unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
-				 | PTRACE_O_TRACEEXIT;
+	| PTRACE_O_TRACEEXIT;
 static const struct xlat_data xflag_str[] = {
 	{ HEXSTR_NONE,			"none" },
 	{ HEXSTR_NON_ASCII_CHARS,	"non-ascii-chars" },
@@ -97,10 +98,10 @@ static unsigned int version_verbosity;
 
 /* -I n */
 enum {
-	INTR_NOT_SET        = 0,
-	INTR_ANYWHERE       = 1, /* don't block/ignore any signals */
-	INTR_WHILE_WAIT     = 2, /* block fatal signals while decoding syscall. default */
-	INTR_NEVER          = 3, /* block fatal signals. default if '-o FILE PROG' */
+	INTR_NOT_SET	    = 0,
+	INTR_ANYWHERE	    = 1, /* don't block/ignore any signals */
+	INTR_WHILE_WAIT	    = 2, /* block fatal signals while decoding syscall. default */
+	INTR_NEVER	    = 3, /* block fatal signals. default if '-o FILE PROG' */
 	INTR_BLOCK_TSTP_TOO = 4, /* block fatal signals and SIGTSTP (^Z); default if -D */
 	NUM_INTR_OPTS
 };
@@ -109,7 +110,7 @@ static int opt_intr;
 #define interactive (opt_intr == INTR_WHILE_WAIT)
 
 enum {
-	DAEMONIZE_NONE        = 0,
+	DAEMONIZE_NONE	      = 0,
 	DAEMONIZE_GRANDCHILD  = 1,
 	DAEMONIZE_NEW_PGROUP  = 2,
 	DAEMONIZE_NEW_SESSION = 3,
@@ -167,9 +168,9 @@ static struct tcb *current_tcp;
 
 struct tcb_wait_data {
 	enum trace_event te; /**< Event passed to dispatch_event() */
-	int status;          /**< status, returned by wait4() */
+	int status;	     /**< status, returned by wait4() */
 	unsigned long msg;   /**< Value returned by PTRACE_GETEVENTMSG */
-	siginfo_t si;        /**< siginfo, returned by PTRACE_GETSIGINFO */
+	siginfo_t si;	     /**< siginfo, returned by PTRACE_GETSIGINFO */
 };
 
 static struct tcb **tcbtab;
@@ -178,7 +179,6 @@ static size_t tcbtabsize;
 
 static struct tcb_wait_data *tcb_wait_tab;
 static size_t tcb_wait_tab_size;
-
 
 #ifndef HAVE_PROGRAM_INVOCATION_NAME
 char *program_invocation_name;
@@ -198,6 +198,92 @@ static volatile int interrupted, restart_failed;
 
 static sigset_t timer_set;
 static void timer_sighandler(int);
+
+struct structured_output* structured_output = NULL ;
+
+struct structured_output ocaml_structured_output ;
+struct structured_output json_structured_output ;
+
+static void init_structured_outputs(void)
+{
+	struct structured_output *s;
+
+	s = &ocaml_structured_output ;
+	s->structured_output_NULL_VALUE	    =	  "NULL";
+	s->structured_output_NEWLINE	  =	 "\n";
+	s->structured_output_STRING_BEGIN =  "STRING ";
+	s->structured_output_STRING_END	    = "" ;
+	s->structured_output_PARTIAL_STRING_BEGIN =  "PARTIAL_STRING " ;
+	s->structured_output_PARTIAL_STRING_END	  =  "" ;
+	s->structured_output_ARRAY_BEGIN    = "ARRAY [" ;
+	s->structured_output_ARRAY_NEXT	 =    "; " ;
+	s->structured_output_ARRAY_END =      "]" ;
+	s->structured_output_FIELD_SET =      "\"%s\", " ;
+	s->structured_output_STRUCT_BEGIN =   "STRUCT [" ;
+	s->structured_output_STRUCT_NEXT =    "; " ;
+	s->structured_output_STRUCT_END =     "]" ;
+	s->structured_output_INT_BEGIN =      "INT (" ;
+	s->structured_output_INT_END =	      "L)" ;
+	s->structured_output_FLAGS_BEGIN =     "FLAGS [" ;
+	s->structured_output_FLAGS_NEXT =     "; " ;
+	s->structured_output_FLAGS_END =      "]" ;
+	s->structured_output_CALL_BEGIN =     "CALL ( \"%s\", [" ;
+	s->structured_output_CALL_ARG_NEXT =   ", " ;
+	s->structured_output_CALL_END =	       "])" ;
+	s->structured_output_COMMENT_BEGIN =   "(* " ;
+	s->structured_output_COMMENT_END =     " *)" ;
+	s->structured_output_ARG_NAME_BEGIN =  "ARG (\"%s\", " ;
+	s->structured_output_ARG_NAME_END =    ")" ;
+	s->structured_output_INDIRECT_BEGIN =  "INDIRECT [" ;
+	s->structured_output_INDIRECT_END =    "]" ;
+	s->structured_output_SHIFT_BEGIN =    "SHIFT (" ;
+	s->structured_output_SHIFT =    "," ;
+	s->structured_output_SHIFT_END =    ")" ;
+	s->structured_output_ARRAY_INDEX_BEGIN = "INDEX (" ;
+	s->structured_output_ARRAY_INDEX_EQUAL = "," ;
+	s->structured_output_ARRAY_INDEX_END   = ")" ;
+	s->structured_output_STRUCT_NEEDS_ENDING_NEXT = 1;
+	s->structured_output_ACCEPTS_COMMENTS = 1;
+	s->structured_output_ESCAPES_WITH_U_XXXX = 0;
+
+	s = &json_structured_output ;
+	s->structured_output_NULL_VALUE =     "null" ;
+	s->structured_output_NEWLINE	  =    "\n" ;
+	s->structured_output_STRING_BEGIN  =   "" ;
+	s->structured_output_STRING_END	   =   "" ;
+	s->structured_output_PARTIAL_STRING_BEGIN  =   "{ \"partial\": " ;
+	s->structured_output_PARTIAL_STRING_END	  =    "}" ;
+	s->structured_output_ARRAY_BEGIN =     "[" ;
+	s->structured_output_ARRAY_NEXT	  =    ", " ;
+	s->structured_output_ARRAY_END	   =   "]" ;
+	s->structured_output_FIELD_SET	  =    "\"%s\": " ;
+	s->structured_output_STRUCT_BEGIN  =   "{" ;
+	s->structured_output_STRUCT_NEXT   =   ", " ;
+	s->structured_output_STRUCT_END	   =   "}" ;
+	s->structured_output_INT_BEGIN	   =   "\"" ;
+	s->structured_output_INT_END	  =    "\"" ;
+	s->structured_output_FLAGS_BEGIN   =   "{ \"flags\": [" ;
+	s->structured_output_FLAGS_NEXT	   =   ", " ;
+	s->structured_output_FLAGS_END	   =   "]}" ;
+	s->structured_output_CALL_BEGIN	    =  "{ \"call\": \"%s\", \"args\": [" ;
+	s->structured_output_CALL_ARG_NEXT  =	", " ;
+	s->structured_output_CALL_END	   =	"]}" ;
+	s->structured_output_COMMENT_BEGIN  =	"/* " ;
+	s->structured_output_COMMENT_END    =	" */" ;
+	s->structured_output_ARG_NAME_BEGIN  =	"{ \"arg\": \"%s\", \"value\": " ;
+	s->structured_output_ARG_NAME_END   =	"}" ;
+	s->structured_output_INDIRECT_BEGIN =	"{ \"indirect\": [" ;
+	s->structured_output_INDIRECT_END  =	"]}" ;
+	s->structured_output_SHIFT_BEGIN =      "{ \"shift\": " ;
+	s->structured_output_SHIFT =            ", \"by\": " ;
+	s->structured_output_SHIFT_END =        "}" ;
+	s->structured_output_ARRAY_INDEX_BEGIN = "[" ;
+	s->structured_output_ARRAY_INDEX_EQUAL = ", " ;
+	s->structured_output_ARRAY_INDEX_END   = "]" ;
+	s->structured_output_STRUCT_NEEDS_ENDING_NEXT = 0;
+	s->structured_output_ACCEPTS_COMMENTS = 0;
+	s->structured_output_ESCAPES_WITH_U_XXXX = 1;
+}
 
 #ifndef HAVE_STRERROR
 
@@ -270,7 +356,7 @@ usage(void)
 # define K_OPT ""
 #endif
 #ifdef ENABLE_SECONTEXT
-# define SECONTEXT_OPT "              [--secontext[=FORMAT]]\n"
+# define SECONTEXT_OPT "	      [--secontext[=FORMAT]]\n"
 # define SECONTEXT_E_QUAL ", secontext"
 #else
 # define SECONTEXT_OPT ""
@@ -279,219 +365,221 @@ usage(void)
 
 	printf("\
 Usage: strace [-ACdffhi" K_OPT "qqrtttTvVwxxyyzZ] [-I N] [-b execve] [-e EXPR]...\n\
-              [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-O OVERHEAD]\n\
-              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n"\
-              SECONTEXT_OPT "\
-              { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
+	      [-a COLUMN] [-o FILE] [-s STRSIZE] [-X FORMAT] [-O OVERHEAD]\n\
+	      [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n"\
+	       SECONTEXT_OPT "\
+	      { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
    or: strace -c[dfwzZ] [-I N] [-b execve] [-e EXPR]... [-O OVERHEAD]\n\
-              [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
-              { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
+	      [-S SORTBY] [-P PATH]... [-p PID]... [-U COLUMNS] [--seccomp-bpf]\n\
+	      { -p PID | [-DDD] [-E VAR=VAL]... [-u USERNAME] PROG [ARGS] }\n\
 \n\
 General:\n\
-  -e EXPR        a qualifying expression: OPTION=[!]all or OPTION=[!]VAL1[,VAL2]...\n\
-     options:    trace, abbrev, verbose, raw, signal, read, write, fault,\n\
-                 inject, status, quiet, kvm, decode-fds" SECONTEXT_E_QUAL "\n\
+  -e EXPR	 a qualifying expression: OPTION=[!]all or OPTION=[!]VAL1[,VAL2]...\n\
+     options:	 trace, abbrev, verbose, raw, signal, read, write, fault,\n\
+		 inject, status, quiet, kvm, decode-fds" SECONTEXT_E_QUAL "\n\
 \n\
 Startup:\n\
   -E VAR=VAL, --env=VAR=VAL\n\
-                 put VAR=VAL in the environment for command\n\
+		 put VAR=VAL in the environment for command\n\
   -E VAR, --env=VAR\n\
-                 remove VAR from the environment for command\n\
+		 remove VAR from the environment for command\n\
   -p PID, --attach=PID\n\
-                 trace process with process id PID, may be repeated\n\
+		 trace process with process id PID, may be repeated\n\
   -u USERNAME, --user=USERNAME\n\
-                 run command as USERNAME handling setuid and/or setgid\n\
+		 run command as USERNAME handling setuid and/or setgid\n\
 \n\
 Tracing:\n\
   -b execve, --detach-on=execve\n\
-                 detach on execve syscall\n\
+		 detach on execve syscall\n\
   -D, --daemonize[=grandchild]\n\
-                 run tracer process as a grandchild, not as a parent\n\
+		 run tracer process as a grandchild, not as a parent\n\
   -DD, --daemonize=pgroup\n\
-                 run tracer process in a separate process group\n\
+		 run tracer process in a separate process group\n\
   -DDD, --daemonize=session\n\
-                 run tracer process in a separate session\n\
+		 run tracer process in a separate session\n\
   -f, --follow-forks\n\
-                 follow forks\n\
+		 follow forks\n\
   -ff, --follow-forks --output-separately\n\
-                 follow forks with output into separate files\n\
+		 follow forks with output into separate files\n\
   -I INTERRUPTIBLE, --interruptible=INTERRUPTIBLE\n\
      1, anywhere:   no signals are blocked\n\
      2, waiting:    fatal signals are blocked while decoding syscall (default)\n\
-     3, never:      fatal signals are always blocked (default if '-o FILE PROG')\n\
+     3, never:	    fatal signals are always blocked (default if '-o FILE PROG')\n\
      4, never_tstp: fatal signals and SIGTSTP (^Z) are always blocked\n\
-                    (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
+		    (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
 \n\
 Filtering:\n\
   -e trace=[!][?]{{SYSCALL|GROUP|all|/REGEX}[@64|@32|@x32]|none},\n\
    --trace=[!][?]{{SYSCALL|GROUP|all|/REGEX}[@64|@32|@x32]|none}\n\
-                 trace only specified syscalls.\n\
-     groups:     %%clock, %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
-                 %%memory, %%net, %%process, %%pure, %%signal, %%stat, %%%%stat,\n\
-                 %%statfs, %%%%statfs\n\
+		 trace only specified syscalls.\n\
+     groups:	 %%clock, %%creds, %%desc, %%file, %%fstat, %%fstatfs %%ipc, %%lstat,\n\
+		 %%memory, %%net, %%process, %%pure, %%signal, %%stat, %%%%stat,\n\
+		 %%statfs, %%%%statfs\n\
   -e signal=SET, --signal=SET\n\
-                 trace only the specified set of signals\n\
-                 print only the signals from SET\n\
+		 trace only the specified set of signals\n\
+		 print only the signals from SET\n\
   -e status=SET, --status=SET\n\
-                 print only system calls with the return statuses in SET\n\
-     statuses:   successful, failed, unfinished, unavailable, detached\n\
+		 print only system calls with the return statuses in SET\n\
+     statuses:	 successful, failed, unfinished, unavailable, detached\n\
   -P PATH, --trace-path=PATH\n\
-                 trace accesses to PATH\n\
+		 trace accesses to PATH\n\
   -z, --successful-only\n\
-                 print only syscalls that returned without an error code\n\
+		 print only syscalls that returned without an error code\n\
   -Z, --failed-only\n\
-                 print only syscalls that returned with an error code\n\
+		 print only syscalls that returned with an error code\n\
 \n\
 Output format:\n\
   -a COLUMN, --columns=COLUMN\n\
-                 alignment COLUMN for printing syscall results (default %d)\n\
+		 alignment COLUMN for printing syscall results (default %d)\n\
   -e abbrev=SET, --abbrev=SET\n\
-                 abbreviate output for the syscalls in SET\n\
+		 abbreviate output for the syscalls in SET\n\
   -e verbose=SET, --verbose=SET\n\
-                 dereference structures for the syscall in SET\n\
+		 dereference structures for the syscall in SET\n\
   -e raw=SET, --raw=SET\n\
-                 print undecoded arguments for the syscalls in SET\n\
+		 print undecoded arguments for the syscalls in SET\n\
   -e read=SET, --read=SET\n\
-                 dump the data read from the file descriptors in SET\n\
+		 dump the data read from the file descriptors in SET\n\
   -e write=SET, --write=SET\n\
-                 dump the data written to the file descriptors in SET\n\
+		 dump the data written to the file descriptors in SET\n\
   -e quiet=SET, --quiet=SET\n\
-                 suppress various informational messages\n\
-     messages:   attach, exit, path-resolution, personality, thread-execve\n\
+		 suppress various informational messages\n\
+     messages:	 attach, exit, path-resolution, personality, thread-execve\n\
   -e kvm=vcpu, --kvm=vcpu\n\
-                 print exit reason of kvm vcpu\n\
+		 print exit reason of kvm vcpu\n\
   -e decode-fds=SET, --decode-fds=SET\n\
-                 what kinds of file descriptor information details to decode\n\
-     details:    dev (device major/minor for block/char device files)\n\
-                 path (file path),\n\
-                 pidfd (associated PID for pidfds),\n\
-                 socket (protocol-specific information for socket descriptors)\n\
+		 what kinds of file descriptor information details to decode\n\
+     details:	 dev (device major/minor for block/char device files)\n\
+		 path (file path),\n\
+		 pidfd (associated PID for pidfds),\n\
+		 socket (protocol-specific information for socket descriptors)\n\
 "
 #ifdef ENABLE_SECONTEXT
-"\
+	       "\
   -e secontext=FORMAT, --secontext[=FORMAT]\n\
-                 print SELinux contexts in square brackets\n\
-     formats:    comma-separated list of all, full, mismatch, none\n\
-                 all: equivalent to full,mismatch\n\
-                 full: print the full context instead of the type only\n\
-                 mismatch: print expected context when actual is not matching\n\
-                 none: equivalent to not specifying the option at all\n\
+		 print SELinux contexts in square brackets\n\
+     formats:	 comma-separated list of all, full, mismatch, none\n\
+		 all: equivalent to full,mismatch\n\
+		 full: print the full context instead of the type only\n\
+		 mismatch: print expected context when actual is not matching\n\
+		 none: equivalent to not specifying the option at all\n\
 "
 #endif
-"\
+	       "\
   -i, --instruction-pointer\n\
-                 print instruction pointer at time of syscall\n\
+		 print instruction pointer at time of syscall\n\
 "
 #ifdef ENABLE_STACKTRACE
-"\
+	       "\
   -k, --stack-traces\n\
-                 obtain stack trace between each syscall\n\
+		 obtain stack trace between each syscall\n\
 "
 #endif
-"\
+	       "\
   -n, --syscall-number\n\
-                 print syscall number\n\
+		 print syscall number\n\
   -o FILE, --output=FILE\n\
-                 send trace output to FILE instead of stderr\n\
+		 send trace output to FILE instead of stderr\n\
   -A, --output-append-mode\n\
-                 open the file provided in the -o option in append mode\n\
+		 open the file provided in the -o option in append mode\n\
+  -B, --structured-output\n\
+		 output in a structured format, possibly binary\n\
   --output-separately\n\
-                 output into separate files (by appending pid to file names)\n\
+		 output into separate files (by appending pid to file names)\n\
   -q, --quiet=attach,personality\n\
-                 suppress messages about attaching, detaching, etc.\n\
+		 suppress messages about attaching, detaching, etc.\n\
   -qq, --quiet=attach,personality,exit\n\
-                 suppress messages about process exit status as well.\n\
+		 suppress messages about process exit status as well.\n\
   -qqq, --quiet=all\n\
-                 suppress all suppressible messages.\n\
+		 suppress all suppressible messages.\n\
   -r, --relative-timestamps[=PRECISION]\n\
-                 print relative timestamp\n\
-     precision:  one of s, ms, us, ns; default is microseconds\n\
+		 print relative timestamp\n\
+     precision:	 one of s, ms, us, ns; default is microseconds\n\
   -s STRSIZE, --string-limit=STRSIZE\n\
-                 limit length of print strings to STRSIZE chars (default %d)\n\
+		 limit length of print strings to STRSIZE chars (default %d)\n\
   --absolute-timestamps=[[format:]FORMAT[,[precision:]PRECISION]]\n\
-                 set the format of absolute timestamps\n\
-     format:     none, time, or unix; default is time\n\
-     precision:  one of s, ms, us, ns; default is seconds\n\
+		 set the format of absolute timestamps\n\
+     format:	 none, time, or unix; default is time\n\
+     precision:	 one of s, ms, us, ns; default is seconds\n\
   -t, --absolute-timestamps[=time]\n\
-                 print absolute timestamp\n\
+		 print absolute timestamp\n\
   -tt, --absolute-timestamps=[time,]us\n\
-                 print absolute timestamp with usecs\n\
+		 print absolute timestamp with usecs\n\
   -ttt, --absolute-timestamps=unix,us\n\
-                 print absolute UNIX time with usecs\n\
+		 print absolute UNIX time with usecs\n\
   -T, --syscall-times[=PRECISION]\n\
-                 print time spent in each syscall\n\
-     precision:  one of s, ms, us, ns; default is microseconds\n\
+		 print time spent in each syscall\n\
+     precision:	 one of s, ms, us, ns; default is microseconds\n\
   -v, --no-abbrev\n\
-                 verbose mode: print entities unabbreviated\n\
+		 verbose mode: print entities unabbreviated\n\
   --strings-in-hex=non-ascii-chars\n\
-                 use hex instead of octal in escape sequences\n\
+		 use hex instead of octal in escape sequences\n\
   -x, --strings-in-hex=non-ascii\n\
-                 print non-ASCII strings in hex\n\
+		 print non-ASCII strings in hex\n\
   -xx, --strings-in-hex[=all]\n\
-                 print all strings in hex\n\
+		 print all strings in hex\n\
   -X FORMAT, --const-print-style=FORMAT\n\
-                 set the FORMAT for printing of named constants and flags\n\
-     formats:    raw, abbrev, verbose\n\
+		 set the FORMAT for printing of named constants and flags\n\
+     formats:	 raw, abbrev, verbose\n\
   -y, --decode-fds[=path]\n\
-                 print paths associated with file descriptor arguments\n\
+		 print paths associated with file descriptor arguments\n\
   -yy, --decode-fds=all\n\
-                 print all available information associated with file\n\
-                 descriptors in addition to paths\n\
+		 print all available information associated with file\n\
+		 descriptors in addition to paths\n\
   --decode-pids=pidns\n\
-                 print PIDs in strace's namespace, too\n\
+		 print PIDs in strace's namespace, too\n\
   -Y, --decode-pids=comm\n\
-                 print command names associated with PIDs\n\
+		 print command names associated with PIDs\n\
 \n\
 Statistics:\n\
   -c, --summary-only\n\
-                 count time, calls, and errors for each syscall and report\n\
-                 summary\n\
-  -C, --summary  like -c, but also print the regular output\n\
+		 count time, calls, and errors for each syscall and report\n\
+		 summary\n\
+  -C, --summary	 like -c, but also print the regular output\n\
   -O OVERHEAD[UNIT], --summary-syscall-overhead=OVERHEAD[UNIT]\n\
-                 set overhead for tracing syscalls to OVERHEAD UNITs\n\
-     units:      one of s, ms, us, ns; default is microseconds\n\
+		 set overhead for tracing syscalls to OVERHEAD UNITs\n\
+     units:	 one of s, ms, us, ns; default is microseconds\n\
   -S SORTBY, --summary-sort-by=SORTBY\n\
-                 sort syscall counts by: time, min-time, max-time, avg-time,\n\
-                 calls, errors, name, nothing (default %s)\n\
+		 sort syscall counts by: time, min-time, max-time, avg-time,\n\
+		 calls, errors, name, nothing (default %s)\n\
   -U COLUMNS, --summary-columns=COLUMNS\n\
-                 show specific columns in the summary report: comma-separated\n\
-                 list of time-percent, total-time, min-time, max-time, \n\
-                 avg-time, calls, errors, name\n\
-                 (default time-percent,total-time,avg-time,calls,errors,name)\n\
+		 show specific columns in the summary report: comma-separated\n\
+		 list of time-percent, total-time, min-time, max-time, \n\
+		 avg-time, calls, errors, name\n\
+		 (default time-percent,total-time,avg-time,calls,errors,name)\n\
   -w, --summary-wall-clock\n\
-                 summarise syscall latency (default is system time)\n\
+		 summarise syscall latency (default is system time)\n\
 \n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
-            [:delay_enter=DELAY][:delay_exit=DELAY]\n\
-            [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
-            [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
-            [:when=WHEN],\n\
+	    [:delay_enter=DELAY][:delay_exit=DELAY]\n\
+	    [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
+	    [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
+	    [:when=WHEN],\n\
   --inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
-           [:delay_enter=DELAY][:delay_exit=DELAY]\n\
-           [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
-           [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
-           [:when=WHEN],\n\
-                 perform syscall tampering for the syscalls in SET\n\
-     delay:      microseconds or NUMBER{s|ms|us|ns}\n\
-     when:       FIRST[..LAST][+[STEP]]\n\
+	   [:delay_enter=DELAY][:delay_exit=DELAY]\n\
+	   [:poke_enter=@argN=DATAN,@argM=DATAM...]\n\
+	   [:poke_exit=@argN=DATAN,@argM=DATAM...]\n\
+	   [:when=WHEN],\n\
+		 perform syscall tampering for the syscalls in SET\n\
+     delay:	 microseconds or NUMBER{s|ms|us|ns}\n\
+     when:	 FIRST[..LAST][+[STEP]]\n\
   -e fault=SET[:error=ERRNO][:when=WHEN], --fault=SET[:error=ERRNO][:when=WHEN]\n\
-                 synonym for -e inject with default ERRNO set to ENOSYS.\n\
+		 synonym for -e inject with default ERRNO set to ENOSYS.\n\
 \n\
 Miscellaneous:\n\
-  -d, --debug    enable debug output to stderr\n\
-  -h, --help     print help message\n\
-  --seccomp-bpf  enable seccomp-bpf filtering\n\
+  -d, --debug	 enable debug output to stderr\n\
+  -h, --help	 print help message\n\
+  --seccomp-bpf	 enable seccomp-bpf filtering\n\
   --tips[=[[id:]ID][,[format:]FORMAT]]\n\
-                 show strace tips, tricks, and tweaks on exit\n\
-     id:         non-negative integer or random; default is random\n\
-     format:     none, compact, full; default is compact\n\
-  -V, --version  print version\n\
+		 show strace tips, tricks, and tweaks on exit\n\
+     id:	 non-negative integer or random; default is random\n\
+     format:	 none, compact, full; default is compact\n\
+  -V, --version	 print version\n\
 "
 /* ancient, no one should use it
--F -- attempt to follow vforks (deprecated, use -f)\n\
- */
-, DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
+   -F -- attempt to follow vforks (deprecated, use -f)\n\
+*/
+	       , DEFAULT_ACOLUMN, DEFAULT_STRLEN, DEFAULT_SORTBY);
 	exit(0);
 
 #undef K_OPT
@@ -525,7 +613,7 @@ ptrace_attach_or_seize(int pid, const char **ptrace_attach_cmd)
 	int r;
 	if (!use_seize)
 		return *ptrace_attach_cmd = "PTRACE_ATTACH",
-		       ptrace(PTRACE_ATTACH, pid, 0L, 0L);
+			ptrace(PTRACE_ATTACH, pid, 0L, 0L);
 	r = ptrace(PTRACE_SEIZE, pid, 0L, (unsigned long) ptrace_setoptions);
 	if (r)
 		return *ptrace_attach_cmd = "PTRACE_SEIZE", r;
@@ -566,7 +654,7 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	/*
 	 * Why curcol != 0? Otherwise sometimes we get this:
 	 *
-	 * 10252 kill(10253, SIGKILL)              = 0
+	 * 10252 kill(10253, SIGKILL)		   = 0
 	 *  <ptrace(SYSCALL,10252):No such process>10253 ...next decode...
 	 *
 	 * 10252 died after we retrieved syscall exit data,
@@ -574,7 +662,7 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	 */
 	if (current_tcp && current_tcp->curcol != 0) {
 		tprint_space();
-		tprintf("<Cannot restart pid %d with ptrace(%s): %s>",
+		tprintf_dummy("<Cannot restart pid %d with ptrace(%s): %s>",
 			tcp->pid, ptrace_op_str(op), strerror(err));
 		tprint_newline();
 		line_ended();
@@ -699,26 +787,57 @@ outf_perror(const struct tcb * const tcp)
 		perror_msg("%s", outfname);
 }
 
-ATTRIBUTE_FORMAT((printf, 1, 0))
-static void
-tvprintf(const char *const fmt, va_list args)
+uint8_t get_tcp_state(void){
+	return current_tcp->structured_state;
+}
+
+void set_tcp_state(uint8_t state){
+	if(state == TCP_STATE_COMMENT_BEGIN){
+		if(structured_output &&
+		    !structured_output->structured_output_ACCEPTS_COMMENTS){
+			current_tcp->structured_state =
+				state|TCP_STATE_COMMENTED_OUT;
+		} else {
+			current_tcp->structured_state =
+				state|TCP_STATE_COMMENTED;
+		}
+	} else
+		if(state == TCP_STATE_COMMENT_END){
+			current_tcp->structured_state = state &
+				~(TCP_STATE_COMMENTED|TCP_STATE_COMMENTED_OUT);
+		} else
+			if(current_tcp->structured_state
+			    & (TCP_STATE_COMMENTED|TCP_STATE_COMMENTED_OUT)){
+				/* do not modify state when commented */
+			} else
+				current_tcp->structured_state = state;
+}
+
+ATTRIBUTE_FORMAT((printf, 2, 0))
+void
+tvprintf(uint8_t state, const char *const fmt, va_list args)
 {
 	if (current_tcp) {
-		int n = vfprintf(current_tcp->outf, fmt, args);
-		if (n < 0) {
-			/* very unlikely due to vfprintf buffering */
-			outf_perror(current_tcp);
-		} else
-			current_tcp->curcol += n;
+		if(!(current_tcp->structured_state & TCP_STATE_COMMENTED_OUT)){
+			int n = vfprintf(current_tcp->outf, fmt, args);
+			if (n < 0) {
+				/* very unlikely due to vfprintf buffering */
+				outf_perror(current_tcp);
+			} else
+				current_tcp->curcol += n;
+		}
+		if(state) set_tcp_state(state);
 	}
 }
 
+
+
 void
-tprintf(const char *fmt, ...)
+tprintf_nodelim(uint8_t state, const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	tvprintf(fmt, args);
+	tvprintf(state, fmt, args);
 	va_end(args);
 }
 
@@ -727,24 +846,30 @@ tprintf(const char *fmt, ...)
 #endif
 
 void
-tprints(const char *str)
+tprints_nodelim(uint8_t state, const char *str)
 {
 	if (current_tcp) {
-		int n = fputs_unlocked(str, current_tcp->outf);
-		if (n >= 0) {
-			current_tcp->curcol += strlen(str);
-			return;
+		if(!(current_tcp->structured_state & TCP_STATE_COMMENTED_OUT)){
+			int n = fputs_unlocked(str, current_tcp->outf);
+			if (n >= 0) {
+				current_tcp->curcol += strlen(str);
+			} else {
+				/* very unlikely due to fputs_unlocked buffering */
+				outf_perror(current_tcp);
+			}
 		}
-		/* very unlikely due to fputs_unlocked buffering */
-		outf_perror(current_tcp);
+		if(state) set_tcp_state(state);
 	}
 }
 
 void
 tprints_comment(const char *const str)
 {
-	if (str && *str)
-		tprintf(" /* %s */", str);
+	if (str && *str){
+		tprint_comment_begin();
+		tprints_nodelim(TCP_STATE_DUMMY, str);
+		tprint_comment_end();
+	}
 }
 
 void
@@ -756,7 +881,7 @@ tprintf_comment(const char *fmt, ...)
 	va_list args;
 	va_start(args, fmt);
 	tprint_comment_begin();
-	tvprintf(fmt, args);
+	tvprintf(TCP_STATE_DUMMY, fmt, args);
 	tprint_comment_end();
 	va_end(args);
 }
@@ -773,6 +898,7 @@ line_ended(void)
 {
 	if (current_tcp) {
 		current_tcp->curcol = 0;
+		current_tcp->structured_state = TCP_STATE_DELIM;
 		flush_tcp_output(current_tcp);
 	}
 	if (printing_tcp) {
@@ -797,8 +923,10 @@ print_comm_str(const char *str, const size_t len)
 	if (!len)
 		return;
 	tprint_associated_info_begin();
+	tprints_field_set("pidstr");
 	print_quoted_string_ex(str, len,
 			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
+	tprint_field_end();
 	tprint_associated_info_end();
 }
 
@@ -821,8 +949,11 @@ printleader(struct tcb *tcp)
 			 * case 2: split log, we are the same tcb, but our last line
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
-			tprint_space();
-			tprints("<unfinished ...>");
+
+			tprints_dummy(" <");
+			tprint_unfinished(1);
+			tprints_dummy(" ...>");
+			tprint_syscall_end();
 			tprint_newline();
 			printing_tcp->curcol = 0;
 		}
@@ -832,18 +963,21 @@ printleader(struct tcb *tcp)
 	set_current_tcp(tcp);
 	current_tcp->curcol = 0;
 
+	tprint_syscall_begin();
+
 	if (print_pid_pfx || (nprocs > 1 && !outfname)) {
 		size_t len = is_number_in_set(DECODE_PID_COMM, decode_pid_set)
-			     ? strlen(tcp->comm) : 0;
+			? strlen(tcp->comm) : 0;
 
 		if (print_pid_pfx) {
 			if (len)
-				tprintf("%u", tcp->pid);
+				tprintf_field_int("pid", "%u", tcp->pid);
 			else
-				tprintf("%-5u", tcp->pid);
+				tprintf_field_int("pid", "%-5u", tcp->pid);
 		} else {
 			tprint_attribute_begin();
-			tprintf("pid %5u", tcp->pid);
+			tprints_dummy("pid ");
+			tprintf_field_int("pid", "%5u", tcp->pid);
 		}
 
 		print_comm_str(tcp->comm, len);
@@ -867,11 +1001,13 @@ printleader(struct tcb *tcp)
 			strftime(str, sizeof(str), tflag_format, tm);
 		else
 			xsprintf(str, "%lld", (long long) local);
-		if (tflag_width)
-			tprintf("%s.%0*ld ", str, tflag_width,
-				(long) ts.tv_nsec / tflag_scale);
-		else
-			tprintf("%s ", str);
+		tprints_field_string("time_str", str);
+		if (tflag_width){
+			tprints_dummy(".");
+			tprintf_field_int("time", "%0*ld", tflag_width,
+					  (long) ts.tv_nsec / tflag_scale);
+		}
+		tprint_space();
 	}
 
 	if (rflag) {
@@ -886,12 +1022,14 @@ printleader(struct tcb *tcp)
 		ts_sub(&dts, &ts, &ots);
 		ots = ts;
 
-		tprintf("%s%6ld", tflag_format ? "(+" : "", (long) dts.tv_sec);
+		tprints_dummy(tflag_format ? "(+" : "");
+		tprintf_field_int("time_sec", "%6ld", (long) dts.tv_sec);
 		if (rflag_width) {
-			tprintf(".%0*ld",
-				rflag_width, (long) dts.tv_nsec / rflag_scale);
+			tprints_dummy(".");
+			tprintf_field_int("time_nsec", "%0*ld",
+					  rflag_width, (long) dts.tv_nsec / rflag_scale);
 		}
-		tprints(tflag_format ? ") " : " ");
+		tprints_dummy(tflag_format ? ") " : " ");
 	}
 
 	if (nflag)
@@ -905,7 +1043,7 @@ void
 tabto(void)
 {
 	if (current_tcp->curcol < acolumn)
-		tprints(acolumn_spaces + current_tcp->curcol);
+		tprints_dummy(acolumn_spaces + current_tcp->curcol);
 }
 
 /* Should be only called directly *after successful attach* to a tracee.
@@ -1186,7 +1324,7 @@ detach(struct tcb *tcp)
 	/* Either process doesn't exist, or some weird error. */
 	goto drop;
 
- wait_loop:
+wait_loop:
 	/* We end up here in three cases:
 	 * 1. We sent PTRACE_INTERRUPT (use_seize case)
 	 * 2. We sent SIGSTOP (!use_seize)
@@ -1199,7 +1337,7 @@ detach(struct tcb *tcp)
 				continue;
 			/*
 			 * if (errno == ECHILD) break;
-			 * ^^^  WRONG! We expect this PID to exist,
+			 * ^^^	WRONG! We expect this PID to exist,
 			 * and want to emit a message otherwise:
 			 */
 			perror_func_msg("waitpid(%u)", tcp->pid);
@@ -1271,7 +1409,7 @@ detach(struct tcb *tcp)
 		}
 	}
 
- drop:
+drop:
 	if (!is_number_in_set(QUIET_ATTACH, quiet_set)
 	    && (tcp->flags & TCB_ATTACHED))
 		error_msg("Process %u detached", tcp->pid);
@@ -1675,8 +1813,8 @@ startup_child(char **argv, char **env)
 		perror_func_msg_and_die("fork");
 
 	if ((pid != 0 && daemonized_tracer)
-	 || (pid == 0 && !daemonized_tracer)
-	) {
+	    || (pid == 0 && !daemonized_tracer)
+		) {
 		/* We are to become the tracee. Two cases:
 		 * -D: we are parent
 		 * not -D: we are child
@@ -1721,9 +1859,9 @@ startup_child(char **argv, char **env)
 		}
 		tcp = alloctcb(pid);
 		after_successful_attach(tcp, TCB_SKIP_DETACH_ON_FIRST_EXEC
-					     | (NOMMU_SYSTEM ? 0
-						: (TCB_HIDE_LOG
-						   | post_attach_sigstop)));
+					| (NOMMU_SYSTEM ? 0
+					   : (TCB_HIDE_LOG
+					      | post_attach_sigstop)));
 	} else {
 		/* With -D, we are *child* here, the tracee is our parent. */
 		strace_child = strace_tracer_pid;
@@ -1872,7 +2010,7 @@ parse_interruptible_arg(const char *arg)
 	const struct xlat_data *intr_arg = find_xlat_val(intr_str, arg);
 
 	return intr_arg ? (int) intr_arg->val
-			: (int) string_to_uint_upto(arg, NUM_INTR_OPTS - 1);
+		: (int) string_to_uint_upto(arg, NUM_INTR_OPTS - 1);
 }
 
 static int
@@ -2101,7 +2239,7 @@ make_env(char **orig_env, char *const *env_changes, size_t env_change_count)
 	size_t new_env_count = 0;
 	size_t new_env_size;
 
-	/* Determining the environment variable count.  */
+	/* Determining the environment variable count.	*/
 	if (orig_env) {
 		for (; orig_env[new_env_count]; ++new_env_count)
 			;
@@ -2239,7 +2377,7 @@ init(int argc, char *argv[])
 #endif
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
+		"+a:Ab:B:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2271,6 +2409,7 @@ init(int argc, char *argv[])
 		{ "columns",		required_argument, 0, 'a' },
 		{ "output-append-mode",	no_argument,	   0, 'A' },
 		{ "detach-on",		required_argument, 0, 'b' },
+		{ "structured-output",	required_argument, 0, 'B' },
 		{ "summary-only",	no_argument,	   0, 'c' },
 		{ "summary",		no_argument,	   0, 'C' },
 		{ "debug",		no_argument,	   0, 'd' },
@@ -2280,9 +2419,9 @@ init(int argc, char *argv[])
 		{ "env",		required_argument, 0, 'E' },
 		{ "follow-forks",	no_argument,	   0, GETOPT_FOLLOWFORKS },
 		{ "output-separately",	no_argument,	   0,
-			GETOPT_OUTPUT_SEPARATELY },
+		  GETOPT_OUTPUT_SEPARATELY },
 		{ "help",		no_argument,	   0, 'h' },
-		{ "instruction-pointer", no_argument,      0, 'i' },
+		{ "instruction-pointer", no_argument,	   0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
 		{ "syscall-number",	no_argument,	   0, 'n' },
@@ -2303,7 +2442,7 @@ init(int argc, char *argv[])
 		{ "summary-wall-clock", no_argument,	   0, 'w' },
 		{ "strings-in-hex",	optional_argument, 0, GETOPT_HEX_STR },
 		{ "const-print-style",	required_argument, 0, 'X' },
-		{ "pidns-translation",	no_argument      , 0, GETOPT_PIDNS_TRANSLATION },
+		{ "pidns-translation",	no_argument	 , 0, GETOPT_PIDNS_TRANSLATION },
 		{ "successful-only",	no_argument,	   0, 'z' },
 		{ "failed-only",	no_argument,	   0, 'Z' },
 		{ "failing-only",	no_argument,	   0, 'Z' },
@@ -2350,8 +2489,21 @@ init(int argc, char *argv[])
 		case 'b':
 			if (strcmp(optarg, "execve") != 0)
 				error_msg_and_die("Syscall '%s' for -b isn't supported",
-					optarg);
+						  optarg);
 			detach_on_execve = 1;
+			break;
+		case 'B': /* <=> structured output */
+			init_structured_outputs();
+			if(optarg == NULL)
+				error_msg_and_die("Structured-output required: use either 'json' or 'ocaml'");
+			if (!strcmp(optarg, "ocaml")){
+				structured_output = &ocaml_structured_output ;
+			} else
+				if (!strcmp(optarg, "json")){
+					structured_output = &json_structured_output ;
+				} else {
+					error_msg_and_die("Unknown structured format '%s', use either 'json' or 'ocaml'", optarg);
+				}
 			break;
 		case 'c':
 			if (cflag == CFLAG_BOTH) {
@@ -2809,8 +2961,8 @@ init(int argc, char *argv[])
 
 	if (followfork)
 		ptrace_setoptions |= PTRACE_O_TRACECLONE |
-				     PTRACE_O_TRACEFORK |
-				     PTRACE_O_TRACEVFORK;
+			PTRACE_O_TRACEFORK |
+			PTRACE_O_TRACEVFORK;
 
 	if (seccomp_filtering)
 		check_seccomp_filter();
@@ -3008,8 +3160,8 @@ print_debug_info(const int pid, int status)
 	strcpy(buf, "???");
 	if (WIFSIGNALED(status))
 		xsprintf(buf, "WIFSIGNALED,%ssig=%s",
-				WCOREDUMP(status) ? "core," : "",
-				sprintsigname(WTERMSIG(status)));
+			 WCOREDUMP(status) ? "core," : "",
+			 sprintsigname(WTERMSIG(status)));
 	if (WIFEXITED(status))
 		xsprintf(buf, "WIFEXITED,exitcode=%u", WEXITSTATUS(status));
 	if (WIFSTOPPED(status))
@@ -3024,7 +3176,7 @@ print_debug_info(const int pid, int status)
 			[PTRACE_EVENT_VFORK_DONE] = "VFORK_DONE",
 			[PTRACE_EVENT_EXEC]  = "EXEC",
 			[PTRACE_EVENT_EXIT]  = "EXIT",
-			[PTRACE_EVENT_SECCOMP]  = "SECCOMP",
+			[PTRACE_EVENT_SECCOMP]	= "SECCOMP",
 			/* [PTRACE_EVENT_STOP (=128)] would make biggish array */
 		};
 		const char *e = "??";
@@ -3079,7 +3231,7 @@ maybe_allocate_tcb(const int pid, int status)
 
 /*
  * Under Linux, execve changes pid to thread leader's pid, and we see this
- * changed pid on EVENT_EXEC and later, execve sysexit.  Leader "disappears"
+ * changed pid on EVENT_EXEC and later, execve sysexit.	 Leader "disappears"
  * without exit notification.  Let user know that, drop leader's tcb, and fix
  * up pid in execve thread's tcb.  Effectively, execve thread's tcb replaces
  * leader's tcb.
@@ -3116,6 +3268,7 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 		 * Another case is demonstrated by
 		 * tests/maybe_switch_current_tcp.c
 		 */
+		/* Fabrice: TODO somehting ? */
 		fprintf(execve_thread->outf, " <pid changed to %d ...>\n", pid);
 		/*execve_thread->curcol = 0; - no need, see code below */
 	}
@@ -3142,8 +3295,11 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	if (cflag != CFLAG_ONLY_STATS) {
 		if (!is_number_in_set(QUIET_THREAD_EXECVE, quiet_set)) {
 			printleader(tcp);
-			tprintf("+++ superseded by execve in pid %lu +++",
+			tprintf_dummy("+++ superseded by execve in pid ",
 				old_pid);
+			tprintf_field_int("superseded-by-execve", "%lu", old_pid);
+			tprints_dummy(" +++");
+			tprint_syscall_end();
 			tprint_newline();
 			line_ended();
 		}
@@ -3181,9 +3337,14 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
 		printleader(tcp);
-		tprintf("+++ killed by %s %s+++",
-			sprintsigname(WTERMSIG(status)),
-			WCOREDUMP(status) ? "(core dumped) " : "");
+		tprints_dummy("+++ killed by ");
+		tprints_field_string("killed", sprintsigname(WTERMSIG(status)));
+		tprint_space();
+		tprints_field_string("with-core",
+				     WCOREDUMP(status) ? "(core dumped)" : "");
+		/* Warning: we add one space in the case of no core dumped */
+		tprints_dummy("+++");
+		tprint_syscall_end();
 		tprint_newline();
 		line_ended();
 	}
@@ -3200,7 +3361,10 @@ print_exited(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS &&
 	    !is_number_in_set(QUIET_EXIT, quiet_set)) {
 		printleader(tcp);
-		tprintf("+++ exited with %d +++", WEXITSTATUS(status));
+		tprints_dummy("+++ exited with ");
+		tprintf_field_int("exited", "%d", WEXITSTATUS(status));
+		tprints_dummy(" +++");
+		tprint_syscall_end();
 		tprint_newline();
 		line_ended();
 	}
@@ -3214,12 +3378,22 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 	    && is_number_in_set(sig, signal_set)) {
 		printleader(tcp);
 		if (si) {
-			tprintf("--- %s ", sprintsigname(sig));
+			tprints_dummy("--- ");
+			tprints_field_string("signal", sprintsigname(sig));
+			tprint_space();
+			tprints_field_set("siginfo");
 			printsiginfo(tcp, si);
-			tprints(" ---");
-		} else
-			tprintf("--- stopped by %s ---", sprintsigname(sig));
-		tprint_newline();
+			tprint_field_end();
+			tprints_dummy(" ---");
+			tprint_syscall_end();
+			tprint_newline();
+		} else {
+			tprints_dummy("--- stopped by ");
+			tprints_field_string("signal",sprintsigname(sig));
+			tprints_dummy(" ---");
+			tprint_syscall_end();
+			tprint_newline();
+		}
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
@@ -3267,7 +3441,10 @@ print_event_exit(struct tcb *tcp)
 	    && printing_tcp->curcol != 0) {
 		set_current_tcp(printing_tcp);
 		tprint_space();
-		tprints("<unfinished ...>");
+		tprints_dummy("<");
+		tprint_unfinished(1);
+		tprints_dummy(" ...>");
+		tprint_syscall_end();
 		tprint_newline();
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
@@ -3282,13 +3459,18 @@ print_event_exit(struct tcb *tcp)
 		 * on exiting syscall which is not going to happen.
 		 */
 		tprint_space();
-		tprints("<unfinished ...>");
+		tprints_dummy("<");
+		tprint_unfinished(0);
+		tprints_dummy(" ...>");
 	}
 
 	printing_tcp = tcp;
-	tprints(") ");
+	tprint_argspace_end();
+	tprint_space();
 	tabto();
-	tprints("= ?");
+	tprints_dummy("= ");
+	tprints_field_string("return", "?");
+	tprint_syscall_end();
 	tprint_newline();
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = is_number_in_set(STATUS_UNFINISHED, status_set);
@@ -3353,7 +3535,7 @@ next_event(void)
 
 	static struct tcb *extra_tcp;
 	static size_t wait_extra_data_idx;
-	/* Handle the extra tcb event.  */
+	/* Handle the extra tcb event.	*/
 	if (extra_tcp) {
 		tcp = extra_tcp;
 		extra_tcp = NULL;
@@ -3370,7 +3552,7 @@ next_event(void)
 	 * to exit before we see the first stop of the child,
 	 * and we are losing track of it:
 	 *  19923 clone(...) = 19924
-	 *  19923 exit_group(1)     = ?
+	 *  19923 exit_group(1)	    = ?
 	 *  19923 +++ exited with 1 +++
 	 * Exiting only when wait() returns ECHILD works better.
 	 */
@@ -3523,10 +3705,10 @@ next_event(void)
 					 * We can get ESRCH instead, you know...
 					 */
 					bool stopped = ptrace(PTRACE_GETSIGINFO,
-						pid, 0, &wd->si) < 0;
+							      pid, 0, &wd->si) < 0;
 
 					wd->te = stopped ? TE_GROUP_STOP
-							 : TE_SIGNAL_DELIVERY_STOP;
+						: TE_SIGNAL_DELIVERY_STOP;
 				}
 				break;
 			case PTRACE_EVENT_STOP:
@@ -3546,13 +3728,13 @@ next_event(void)
 				}
 				break;
 			case PTRACE_EVENT_EXEC:
-					/*
-					 * TODO: shouldn't we check for
-					 * errno == EINVAL here, too?
-					 * We can get ESRCH instead, you know...
-					 */
+				/*
+				 * TODO: shouldn't we check for
+				 * errno == EINVAL here, too?
+				 * We can get ESRCH instead, you know...
+				 */
 				if (ptrace(PTRACE_GETEVENTMSG, pid, NULL,
-				    &wd->msg) < 0)
+					   &wd->msg) < 0)
 					wd->msg = 0;
 
 				wd->te = TE_STOP_BEFORE_EXECVE;
@@ -3587,7 +3769,7 @@ next_event(void)
 		if (extra_tcp)
 			break;
 
-next_event_wait_next:
+	next_event_wait_next:
 		pid = wait4(-1, &status, __WALL | WNOHANG, (cflag ? &ru : NULL));
 		wait_errno = errno;
 		wait_nohang = true;
@@ -3711,26 +3893,26 @@ dispatch_event(const struct tcb_wait_data *wd)
 		if (has_seccomp_filter(current_tcp)) {
 			/*
 			 * Syscall and seccomp stops can happen in different
-			 * orders depending on kernel.  strace tests this in
+			 * orders depending on kernel.	strace tests this in
 			 * check_seccomp_order_tracer().
 			 *
 			 * Linux 3.5--4.7:
 			 * (seccomp-stop before syscall-entry-stop)
-			 *         +--> seccomp-stop ->-PTRACE_SYSCALL->-+
-			 *         |                                     |
-			 *     PTRACE_CONT                   syscall-entry-stop
-			 *         |                                     |
+			 *	   +--> seccomp-stop ->-PTRACE_SYSCALL->-+
+			 *	   |					 |
+			 *     PTRACE_CONT		     syscall-entry-stop
+			 *	   |					 |
 			 * syscall-exit-stop <---PTRACE_SYSCALL-----<----+
 			 *
 			 * Linux 4.8+:
 			 * (seccomp-stop after syscall-entry-stop)
-			 *                 syscall-entry-stop
+			 *		   syscall-entry-stop
 			 *
-			 *         +---->-----PTRACE_CONT---->----+
-			 *         |                              |
-			 *  syscall-exit-stop               seccomp-stop
-			 *         |                              |
-			 *         +----<----PTRACE_SYSCALL---<---+
+			 *	   +---->-----PTRACE_CONT---->----+
+			 *	   |				  |
+			 *  syscall-exit-stop		    seccomp-stop
+			 *	   |				  |
+			 *	   +----<----PTRACE_SYSCALL---<---+
 			 *
 			 * Note in Linux 4.8+, we restart in PTRACE_CONT
 			 * after syscall-exit to skip the syscall-entry-stop.
@@ -3886,7 +4068,7 @@ restart_delayed_tcbs(void)
 				if (!restart_delayed_tcb(tcp))
 					return false;
 			} else {
-				/* Check whether this tcb is the next.  */
+				/* Check whether this tcb is the next.	*/
 				if (!tcp_next ||
 				    ts_cmp(&tcp_next->delay_expiration_time,
 					   &tcp->delay_expiration_time) > 0) {
@@ -3953,7 +4135,7 @@ terminate(void)
 		GCOV_DUMP;
 		raise(exit_code);
 
-		/* Unblock the signal.  */
+		/* Unblock the signal.	*/
 		sigset_t mask;
 		sigemptyset(&mask);
 		sigaddset(&mask, exit_code);
@@ -3961,7 +4143,7 @@ terminate(void)
 		sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
 		/* Paranoia - what if this signal is not fatal?
-		   Exit with 128 + signo then.  */
+		   Exit with 128 + signo then.	*/
 		exit_code += 128;
 	}
 

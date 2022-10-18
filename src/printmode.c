@@ -32,7 +32,7 @@ print_symbolic_mode_t(const unsigned int mode)
 		return;
 
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
-		? tprintf : tprintf_comment)("%s%s%s%s%s%#03o",
+		? tprintf_string : tprintf_comment)("%s%s%s%s%s%#03o",
 			ifmt, ifmt[0] ? "|" : "",
 			(mode & S_ISUID) ? "S_ISUID|" : "",
 			(mode & S_ISGID) ? "S_ISGID|" : "",

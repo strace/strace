@@ -78,14 +78,16 @@ print_cap_header(struct tcb *const tcp, const kernel_ulong_t addr,
 static void
 print_cap_bits(const uint32_t lo, const uint32_t hi)
 {
+	tprint_flags_begin();
 	if (lo || !hi)
-		printflags(cap_mask0, lo, "CAP_???");
+		printflags_in(cap_mask0, lo, "CAP_???");
 
 	if (hi) {
 		if (lo)
-			tprint_or();
-		printflags(cap_mask1, hi, "CAP_???");
+			tprint_flags_or();
+		printflags_in(cap_mask1, hi, "CAP_???");
 	}
+	tprint_flags_end();
 }
 
 static void

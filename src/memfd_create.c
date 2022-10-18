@@ -21,6 +21,7 @@ SYS_FUNC(memfd_create)
 		    QUOTE_0_TERMINATED);
 	tprint_arg_next();
 
+	tprint_flags_begin();
 	unsigned int flags = tcp->u_arg[1];
 
 	if (!flags || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
@@ -42,15 +43,18 @@ SYS_FUNC(memfd_create)
 
 	if (hugetlb_value) {
 		if (flags)
-			tprint_or();
+			tprint_flags_or();
+		tprint_shift_begin();
 		PRINT_VAL_U(hugetlb_value >> MFD_HUGE_SHIFT);
 		tprint_shift();
 		/*
 		 * print_xlat_u is not used here because the whole thing
 		 * is potentially inside a comment already.
 		 */
-		tprints("MFD_HUGE_SHIFT");
+		tprints_string("MFD_HUGE_SHIFT");
+		tprint_shift_end();
 	}
+	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();
