@@ -1763,7 +1763,7 @@ print_abnormal_hi(const kernel_ulong_t val)
 			PRINT_VAL_X(hi);
 			tprint_shift();
 			PRINT_VAL_U(32);
-			tprint_or();
+			tprint_flags_or();
 		}
 	}
 }

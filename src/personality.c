@@ -23,7 +23,7 @@ SYS_FUNC(personality)
 			printxval(personality_types, pers & PER_MASK, "PER_???");
 			pers &= ~PER_MASK;
 			if (pers) {
-				tprint_or();
+				tprint_flags_or();
 				printflags(personality_flags, pers, NULL);
 			}
 		}

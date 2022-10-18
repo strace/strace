@@ -78,7 +78,7 @@ SYS_FUNC(kexec_load)
 	printxval64(kexec_arch_values, n & KEXEC_ARCH_MASK, "KEXEC_ARCH_???");
 	n &= ~(kernel_ulong_t) KEXEC_ARCH_MASK;
 	if (n) {
-		tprint_or();
+		tprint_flags_or();
 		printflags64(kexec_load_flags, n, "KEXEC_???");
 	}
 

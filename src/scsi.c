@@ -110,7 +110,7 @@ scsi_ioctl(struct tcb *const tcp, const unsigned int code,
 			if (val & SG_SCSI_RESET_NO_ESCALATE) {
 				printxval(sg_scsi_reset,
 					  SG_SCSI_RESET_NO_ESCALATE, 0);
-				tprint_or();
+				tprint_flags_or();
 			}
 			printxval(sg_scsi_reset,
 				  val & ~SG_SCSI_RESET_NO_ESCALATE,

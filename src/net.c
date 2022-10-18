@@ -100,7 +100,7 @@ tprint_sock_type(unsigned int flags)
 		flags &= ~SOCK_TYPE_MASK;
 		if (!flags)
 			return;
-		tprint_or();
+		tprint_flags_or();
 	}
 	printflags(sock_type_flags, flags, "SOCK_???");
 }

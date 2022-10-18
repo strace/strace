@@ -211,7 +211,7 @@ tprint_shift(void)
 }
 
 static inline void
-tprint_or(void)
+tprint_flags_or(void)
 {
 	STRACE_PRINTS("|");
 }

@@ -42,7 +42,7 @@ SYS_FUNC(memfd_create)
 
 	if (hugetlb_value) {
 		if (flags)
-			tprint_or();
+			tprint_flags_or();
 		PRINT_VAL_U(hugetlb_value >> MFD_HUGE_SHIFT);
 		tprint_shift();
 		/*

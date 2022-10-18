@@ -19,7 +19,7 @@ SYS_FUNC(ipc)
 		PRINT_VAL_U(version);
 		tprint_shift();
 		PRINT_VAL_U(16);
-		tprint_or();
+		tprint_flags_or();
 	}
 
 	printxval_u(ipccalls, call, NULL);

@@ -58,7 +58,7 @@ decode_oflag(uint64_t val)
 
 	for (unsigned int i = 0; i < ARRAY_SIZE(xlats); i++) {
 		printxval64(xlats[i].xl, val & xlats[i].mask, xlats[i].dfl);
-		tprint_or();
+		tprint_flags_or();
 
 		val &= ~xlats[i].mask;
 	}
@@ -70,17 +70,17 @@ static void
 decode_cflag(uint64_t val)
 {
 	printxval64(baud_options, val & CBAUD, "B???");
-	tprint_or();
+	tprint_flags_or();
 
 	if (val & CIBAUD) {
 		printxval64(baud_options, (val & CIBAUD) >> IBSHIFT, "B???");
 		tprint_shift();
 		print_xlat(IBSHIFT);
-		tprint_or();
+		tprint_flags_or();
 	}
 
 	printxval64(term_cflags_csize, val & CSIZE, "CS?");
-	tprint_or();
+	tprint_flags_or();
 
 	val &= ~(CBAUD | CIBAUD | CSIZE);
 	printflags64(term_cflags, val, NULL);

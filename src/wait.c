@@ -64,14 +64,14 @@ printstatus(int status)
 	if (status) {
 		unsigned int event = (unsigned int) status >> 16;
 		if (event) {
-			tprint_or();
+			tprint_flags_or();
 			printxval(ptrace_events, event, "PTRACE_EVENT_???");
 			tprint_shift();
 			PRINT_VAL_U(16);
 			status &= 0xffff;
 		}
 		if (status) {
-			tprint_or();
+			tprint_flags_or();
 			PRINT_VAL_X(status);
 		}
 	}

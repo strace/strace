@@ -74,13 +74,13 @@ print_mmap_flags(kernel_ulong_t flags)
 
 	flags &= ~mask;
 	if (flags) {
-		tprint_or();
+		tprint_flags_or();
 		printflags_ex(flags, NULL, XLAT_STYLE_ABBREV,
 			      mmap_flags, NULL);
 	}
 
 	if (hugetlb_value) {
-		tprint_or();
+		tprint_flags_or();
 		PRINT_VAL_U(hugetlb_value >> MAP_HUGE_SHIFT);
 		tprint_shift();
 		/*

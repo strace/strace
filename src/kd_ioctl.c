@@ -95,7 +95,7 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 		PRINT_VAL_U(ticks);
 		tprint_shift();
 		PRINT_VAL_U(16);
-		tprint_or();
+		tprint_flags_or();
 	}
 	PRINT_VAL_U(count);
 
