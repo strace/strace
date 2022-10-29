@@ -1,5 +1,5 @@
-Noteworthy changes in release ?.?? (????-??-??)
-===============================================
+Noteworthy changes in release 6.0 (2022-10-29)
+==============================================
 
 * Improvements
   * Enhanced decoding of PTP_* ioctl commands.
@@ -7,8 +7,6 @@ Noteworthy changes in release ?.?? (????-??-??)
   * Updated lists of BPF_*, BTRFS_*, FAN_*, ETH_P_*, KVM_*, NDTPA_*,
     NT_*, PERF_*, and TLS_INFO_* constants.
   * Updated lists of ioctl commands from Linux 6.0.
-
-* Bug fixes
 
 Noteworthy changes in release 5.19 (2022-08-12)
 ===============================================
