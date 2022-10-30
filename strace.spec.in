@@ -129,6 +129,9 @@ fi
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Sat Oct 29 2022 Dmitry V. Levin <ldv@strace.io> - 6.0-1
+- v5.19 -> v6.0.
+
 * Fri Aug 12 2022 Dmitry V. Levin <ldv@strace.io> - 5.19-1
 - v5.18 -> v5.19.
 
