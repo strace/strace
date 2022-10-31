@@ -56,7 +56,7 @@ SYS_FUNC(mount)
 	if (old_magic) {
 		print_xlat(MS_MGC_VAL);
 		if (flags)
-			tprints("|");
+			tprint_or();
 	}
 	if (flags || !old_magic)
 		printflags64(mount_flags, flags, "MS_???");

@@ -90,10 +90,13 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 	unsigned int freq = ticks && count ? KERNEL_PIT_TICK_RATE / count : 0;
 
 	tprint_arg_next();
-	if (ticks)
-		tprintf("%u<<16|%u", ticks, count);
-	else
+	if (ticks) {
+		tprintf("%u<<16", ticks);
+		tprint_or();
+		tprintf("%u", count);
+	} else {
 		PRINT_VAL_U(count);
+	}
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
 		if (freq)

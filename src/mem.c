@@ -74,14 +74,16 @@ print_mmap_flags(kernel_ulong_t flags)
 
 	flags &= ~mask;
 	if (flags) {
-		tprints("|");
+		tprint_or();
 		printflags_ex(flags, NULL, XLAT_STYLE_ABBREV,
 			      mmap_flags, NULL);
 	}
 
-	if (hugetlb_value)
-		tprintf("|%u<<MAP_HUGE_SHIFT",
+	if (hugetlb_value) {
+		tprint_or();
+		tprintf("%u<<MAP_HUGE_SHIFT",
 			hugetlb_value >> MAP_HUGE_SHIFT);
+	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
                 tprint_comment_end();

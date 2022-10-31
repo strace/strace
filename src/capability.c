@@ -83,7 +83,7 @@ print_cap_bits(const uint32_t lo, const uint32_t hi)
 
 	if (hi) {
 		if (lo)
-			tprints("|");
+			tprint_or();
 		printflags(cap_mask1, hi, "CAP_???");
 	}
 }

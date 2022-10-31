@@ -505,11 +505,11 @@ print_v4l2_buffer_flags(uint32_t val)
 
 	if (flags) {
 		printflags(v4l2_buf_flags, flags, "V4L2_BUF_FLAG_???");
-		tprints("|");
+		tprint_or();
 	}
 	printxval(v4l2_buf_flags_ts_type, ts_type,
 		  "V4L2_BUF_FLAG_TIMESTAMP_???");
-	tprints("|");
+	tprint_or();
 	printxval(v4l2_buf_flags_ts_src, ts_src,
 		  "V4L2_BUF_FLAG_TSTAMP_SRC_???");
 }
@@ -809,8 +809,7 @@ print_v4l2_cid(uint32_t cid, bool next_flags)
 		if (flags) {
 			printflags(v4l2_control_query_flags, flags,
 				   "V4L2_CTRL_FLAG_NEXT_???");
-			tprints("|");
-
+			tprint_or();
 			cid &= ~flags;
 		}
 	}

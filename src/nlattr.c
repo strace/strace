@@ -55,11 +55,11 @@ print_nlattr(const struct nlattr *const nla,
 	tprints_field_name("nla_type");
 	if (nla->nla_type & NLA_F_NESTED) {
 		print_xlat(NLA_F_NESTED);
-		tprints("|");
+		tprint_or();
 	}
 	if (nla->nla_type & NLA_F_NET_BYTEORDER) {
 		print_xlat(NLA_F_NET_BYTEORDER);
-		tprints("|");
+		tprint_or();
 	}
 	printxval(table, nla->nla_type & NLA_TYPE_MASK, dflt);
 	tprint_struct_end();

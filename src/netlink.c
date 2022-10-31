@@ -180,7 +180,8 @@ decode_nlmsg_type_netfilter(struct tcb *tcp, const struct xlat *const xlat,
 
 	printxval(xlat, subsys_id, dflt);
 
-	tprints("<<8|");
+	tprints("<<8");
+	tprint_or();
 	if (subsys_id < ARRAY_SIZE(nf_nlmsg_types))
 		printxval(nf_nlmsg_types[subsys_id].xlat,
 			  msg_type, nf_nlmsg_types[subsys_id].dflt);

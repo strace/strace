@@ -24,7 +24,7 @@ print_seccomp_filter_k(const struct bpf_filter_block *const fp)
 
 		printxval(seccomp_ret_action, action, "SECCOMP_RET_???");
 		if (data) {
-			tprints("|");
+			tprint_or();
 			PRINT_VAL_X(data);
 		}
 

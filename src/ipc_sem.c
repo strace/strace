@@ -113,7 +113,7 @@ SYS_FUNC(semget)
 
 	/* semflg */
 	if (printflags(resource_flags, tcp->u_arg[2] & ~0777, NULL) != 0)
-		tprints("|");
+		tprint_or();
 	print_numeric_umode_t(tcp->u_arg[2] & 0777);
 	return RVAL_DECODED;
 }

@@ -438,7 +438,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 				    && !flags)
 					PRINT_VAL_U(0);
 				if (n++)
-					tprints("|");
+					tprint_or();
 				else if (need_comment)
 					tprint_comment_begin();
 				tprints(xlat->data[idx].str);
@@ -452,7 +452,7 @@ printflags_ex(uint64_t flags, const char *dflt, enum xlat_style style,
 
 	if (n) {
 		if (flags) {
-			tprints("|");
+			tprint_or();
 			print_xlat_val(flags, style);
 			n++;
 		}

@@ -89,7 +89,7 @@ SYS_FUNC(clone)
 		if (flags) {
 			printflags64(clone_flags, flags, "CLONE_???");
 			if (sig) {
-				tprints("|");
+				tprint_or();
 				printsignal(sig);
 			}
 		} else {
