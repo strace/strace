@@ -49,8 +49,8 @@ SYS_FUNC(shmget)
 	if (hugetlb_value) {
 		if (flags)
 			tprint_or();
-		tprintf("%u<<",
-			hugetlb_value >> SHM_HUGE_SHIFT);
+		PRINT_VAL_U(hugetlb_value >> SHM_HUGE_SHIFT);
+		tprint_shift();
 		print_xlat_u(SHM_HUGE_SHIFT);
 	}
 

@@ -1756,7 +1756,9 @@ print_abnormal_hi(const kernel_ulong_t val)
 	if (current_klongsize > 4) {
 		const unsigned int hi = (unsigned int) ((uint64_t) val >> 32);
 		if (hi) {
-			tprintf("%#x<<32", hi);
+			PRINT_VAL_X(hi);
+			tprint_shift();
+			PRINT_VAL_U(32);
 			tprint_or();
 		}
 	}

@@ -17,7 +17,8 @@ SYS_FUNC(ipc)
 
 	if (version) {
 		PRINT_VAL_U(version);
-		tprints("<<16");
+		tprint_shift();
+		PRINT_VAL_U(16);
 		tprint_or();
 	}
 

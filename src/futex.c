@@ -113,20 +113,24 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		tprint_arg_next();
 		if ((val3 >> 28) & FUTEX_OP_OPARG_SHIFT) {
 			print_xlat(FUTEX_OP_OPARG_SHIFT);
-			tprints("<<28");
+			tprint_shift();
+			PRINT_VAL_U(28);
 			tprint_or();
 		}
 		comment = printxval(futexwakeops, (val3 >> 28) & 0x7, NULL)
 			? NULL : "FUTEX_OP_???";
-		tprints("<<28");
+		tprint_shift();
+		PRINT_VAL_U(28);
 		tprints_comment(comment);
 		tprint_or();
 		PRINT_VAL_X((val3 >> 12) & 0xfff);
-		tprints("<<12");
+		tprint_shift();
+		PRINT_VAL_U(12);
 		tprint_or();
 		comment = printxval(futexwakecmps, (val3 >> 24) & 0xf, NULL)
 			? NULL : "FUTEX_OP_CMP_???";
-		tprints("<<24");
+		tprint_shift();
+		PRINT_VAL_U(24);
 		tprints_comment(comment);
 		tprint_or();
 		PRINT_VAL_X(val3 & 0xfff);

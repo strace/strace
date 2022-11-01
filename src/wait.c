@@ -66,7 +66,8 @@ printstatus(int status)
 		if (event) {
 			tprint_or();
 			printxval(ptrace_events, event, "PTRACE_EVENT_???");
-			tprints("<<16");
+			tprint_shift();
+			PRINT_VAL_U(16);
 			status &= 0xffff;
 		}
 		if (status) {

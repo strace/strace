@@ -91,12 +91,12 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 
 	tprint_arg_next();
 	if (ticks) {
-		tprintf("%u<<16", ticks);
+		PRINT_VAL_U(ticks);
+		tprint_shift();
+		PRINT_VAL_U(16);
 		tprint_or();
-		tprintf("%u", count);
-	} else {
-		PRINT_VAL_U(count);
 	}
+	PRINT_VAL_U(count);
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
 		if (freq)

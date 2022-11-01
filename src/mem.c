@@ -81,8 +81,13 @@ print_mmap_flags(kernel_ulong_t flags)
 
 	if (hugetlb_value) {
 		tprint_or();
-		tprintf("%u<<MAP_HUGE_SHIFT",
-			hugetlb_value >> MAP_HUGE_SHIFT);
+		PRINT_VAL_U(hugetlb_value >> MAP_HUGE_SHIFT);
+		tprint_shift();
+		/*
+		 * print_xlat_u is not used here because the whole thing
+		 * is potentially inside a comment already.
+		 */
+		tprints("MAP_HUGE_SHIFT");
 	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
