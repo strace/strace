@@ -73,11 +73,11 @@ print_user_offset_addr(const kernel_ulong_t addr)
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_begin();
 
-	if (base_addr == addr)
-		tprints(str);
-	else
-		tprintf("%s + %" PRI_klu,
-			str, addr - (kernel_ulong_t) base_addr);
+	tprints(str);
+	if (base_addr != addr) {
+		tprint_plus();
+		PRINT_VAL_U(addr - (kernel_ulong_t) base_addr);
+	}
 
 	if (xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE)
 		tprint_comment_end();
