@@ -708,7 +708,13 @@ print_v4l2_streamparm(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : "} => {");
+		if (is_get) {
+			tprint_struct_next();
+		} else {
+			tprint_struct_end();
+			tprint_value_changed();
+			tprint_struct_begin();
+		}
 	}
 
 	if (s.type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
@@ -905,7 +911,13 @@ print_v4l2_tuner(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : "} => {");
+		if (is_get) {
+			tprint_struct_next();
+		} else {
+			tprint_struct_end();
+			tprint_value_changed();
+			tprint_struct_begin();
+		}
 	}
 
 	PRINT_FIELD_CSTRING(c, name);
@@ -1184,7 +1196,13 @@ print_v4l2_ext_controls(struct tcb *const tcp, const kernel_ulong_t arg,
 			tprint_struct_end();
 			return RVAL_IOCTL_DECODED;
 		}
-		tprints(is_get ? ", " : "} => {");
+		if (is_get) {
+			tprint_struct_next();
+		} else {
+			tprint_struct_end();
+			tprint_value_changed();
+			tprint_struct_begin();
+		}
 	}
 
 	tprints_field_name("controls");
