@@ -11,8 +11,9 @@ void
 print_syscall_number(struct tcb *tcp)
 {
 	if (tcp->true_scno != (kernel_ulong_t) -1) {
-		tprintf("[%4" PRI_klu "] ", tcp->true_scno);
+		tprintf("[%4" PRI_klu "]", tcp->true_scno);
 	} else {
-		tprints("[????] ");
+		tprints("[????]");
 	}
+	tprint_space();
 }

@@ -845,7 +845,7 @@ printleader(struct tcb *tcp)
 
 		if (!print_pid_pfx)
 			tprints("]");
-		tprints(" ");
+		tprint_space();
 	}
 
 	selinux_printpidcon(tcp);

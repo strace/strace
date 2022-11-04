@@ -792,7 +792,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	if (res != 1) {
 		/* There was error in one of prior ptrace ops */
 		tprint_arg_end();
-		tprints(" ");
+		tprint_space();
 		tabto();
 		tprints("= ? <unavailable>\n");
 		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
@@ -828,7 +828,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	}
 
 	tprint_arg_end();
-	tprints(" ");
+	tprint_space();
 	tabto();
 
 	if (raw(tcp)) {
