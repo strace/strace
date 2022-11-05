@@ -398,10 +398,10 @@ ioctl_decode(struct tcb *tcp)
 	case 's':
 		return sock_ioctl(tcp, code, arg);
 #endif
-#if defined(ALPHA) || defined(POWERPC)
+#if defined(ALPHA) || defined(POWERPC) || defined(SPARC) || defined(SPARC64)
 	case 't':
 		return term_ioctl(tcp, code, arg);
-#endif /* !ALPHA */
+#endif
 	case 0x89:
 		return sock_ioctl(tcp, code, arg);
 	case 0x94:
