@@ -416,6 +416,7 @@ ioctl_v4l2-v-Xabbrev	+ioctl.test -v -Xabbrev
 ioctl_v4l2-v-Xraw	+ioctl.test -v -Xraw
 ioctl_v4l2-v-Xverbose	+ioctl.test -v -Xverbose
 ioctl_watchdog	+ioctl.test
+ioctl_winsize	+ioctl.test
 ioperm	-a27
 iopl	-a8
 ioprio	-a18 -e trace=ioprio_get,ioprio_set

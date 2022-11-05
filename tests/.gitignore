@@ -398,6 +398,7 @@ ioctl_v4l2-v-Xabbrev
 ioctl_v4l2-v-Xraw
 ioctl_v4l2-v-Xverbose
 ioctl_watchdog
+ioctl_winsize
 ioperm
 iopl
 ioprio
