@@ -56,8 +56,8 @@ main(int argc, const char *argv[])
 		       XLAT_SEL(cmds[i].cmd, cmds[i].str),
 		       efault, errstr);
 
-#define VALID_FLAGS 0x1ff
-#define INVALID_FLAGS  0xfffffe00
+#define VALID_FLAGS 0xe1ff
+#define INVALID_FLAGS  0xffff1e00
 		*p_flags = INVALID_FLAGS;
 
 		if (cmds[i].on_enter) {
@@ -80,7 +80,10 @@ main(int argc, const char *argv[])
 					  "TIOCM_CTS|"
 					  "TIOCM_CAR|"
 					  "TIOCM_RNG|"
-					  "TIOCM_DSR"),
+					  "TIOCM_DSR|"
+					  "TIOCM_OUT1|"
+					  "TIOCM_OUT2|"
+					  "TIOCM_LOOP"),
 			       errstr);
 		} else if (cmds[i].on_exit) {
 			do_ioctl_ptr(cmds[i].cmd, p_flags);
