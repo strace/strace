@@ -99,7 +99,7 @@ tprint_array_index_begin(void)
 static inline void
 tprint_array_index_end(void)
 {
-	STRACE_PRINTS("] = ");
+	STRACE_PRINTS("]=");
 }
 
 static inline void

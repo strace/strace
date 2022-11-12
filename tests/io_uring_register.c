@@ -952,20 +952,20 @@ main(void)
 	sys_io_uring_register(fd_null, 19, arg_maxw_end - 1, 2);
 	printf("io_uring_register(%u<%s>, "
 	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS") ", [["
-	       XLAT_KNOWN(0, "IO_WQ_BOUND") "] = 3202329837, ... /* %p */]"
+	       XLAT_KNOWN(0, "IO_WQ_BOUND") "]=3202329837, ... /* %p */]"
 	       ", 2) = %s\n",
 	       fd_null, path_null, arg_maxw_end, errstr);
 
 	sys_io_uring_register(fd_null, 19, arg_maxw, 3);
 	printf("io_uring_register(%u<%s>, "
 	       XLAT_KNOWN(0x13, "IORING_REGISTER_IOWQ_MAX_WORKERS") ", "
-	       "[[" XLAT_KNOWN(0, "IO_WQ_BOUND") "] = 0, ["
-	       XLAT_KNOWN(1, "IO_WQ_UNBOUND") "] = 1, ["
-	       XLAT_UNKNOWN(2, "IO_WQ_???") "] = 3202329837] => "
+	       "[[" XLAT_KNOWN(0, "IO_WQ_BOUND") "]=0, ["
+	       XLAT_KNOWN(1, "IO_WQ_UNBOUND") "]=1, ["
+	       XLAT_UNKNOWN(2, "IO_WQ_???") "]=3202329837] => "
 #if RETVAL_INJECTED
-	       "[[" XLAT_KNOWN(0, "IO_WQ_BOUND") "] = 0, ["
-	       XLAT_KNOWN(1, "IO_WQ_UNBOUND") "] = 1, ["
-	       XLAT_UNKNOWN(2, "IO_WQ_???") "] = 3202329837]"
+	       "[[" XLAT_KNOWN(0, "IO_WQ_BOUND") "]=0, ["
+	       XLAT_KNOWN(1, "IO_WQ_UNBOUND") "]=1, ["
+	       XLAT_UNKNOWN(2, "IO_WQ_???") "]=3202329837]"
 #else
 	       "%p"
 #endif

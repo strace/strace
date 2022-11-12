@@ -16,9 +16,9 @@ static void
 print_arr_val(uint32_t *val, size_t idx, const char *idx_str)
 {
 	if (idx_str)
-		printf("[%s] = ", idx_str);
+		printf("[%s]=", idx_str);
 	else
-		printf("[%zu] = ", idx);
+		printf("[%zu]=", idx);
 
 	printf("%d", *val);
 }
@@ -27,9 +27,9 @@ static void
 print_arr_uval(uint64_t *val, size_t idx, const char *idx_str)
 {
 	if (idx_str)
-		printf("[%s] = ", idx_str);
+		printf("[%s]=", idx_str);
 	else
-		printf("[%zu] = ", idx);
+		printf("[%zu]=", idx);
 
 	printf("%" PRIu64, *val);
 }

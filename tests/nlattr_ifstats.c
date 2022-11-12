@@ -207,7 +207,7 @@ print_mcast_stats(struct br_mcast_stats *br_xst_mc)
 {
 #define PR_FIELD_(pfx_, field_) \
 	printf(pfx_ #field_ "=[[" XLAT_KNOWN(0, "BR_MCAST_DIR_RX")	\
-	       "] = %llu, [" XLAT_KNOWN(1, "BR_MCAST_DIR_TX") "] = %llu]", \
+	       "]=%llu, [" XLAT_KNOWN(1, "BR_MCAST_DIR_TX") "]=%llu]", \
 	       (unsigned long long) br_xst_mc->field_[0],		\
 	       (unsigned long long) br_xst_mc->field_[1])
 
@@ -363,8 +363,8 @@ check_xstats(const int fd, unsigned int cmd, const char *cmd_str)
 				     2 * NLA_HDRLEN + sizeof(br_xst_mc));
 
 #define FIELD_STR_(field_) \
-	#field_ "=[[" XLAT_KNOWN(0, "BR_MCAST_DIR_RX") "] = 0, [" \
-	XLAT_KNOWN(1, "BR_MCAST_DIR_TX") "] = 0]"
+	#field_ "=[[" XLAT_KNOWN(0, "BR_MCAST_DIR_RX") "]=0, [" \
+	XLAT_KNOWN(1, "BR_MCAST_DIR_TX") "]=0]"
 
 	memset(&br_xst_mc, 0, sizeof(br_xst_mc));
 	TEST_NESTED_NLATTR_OBJECT_EX_(fd, nlh_mc, hdrlen,

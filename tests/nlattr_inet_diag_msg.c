@@ -139,7 +139,7 @@ print_uint(const unsigned int *p, size_t i)
 	else
 		printf("[%s", sk_meminfo_strs[i]);
 
-	printf("] = %u", *p);
+	printf("]=%u", *p);
 }
 
 static const struct {

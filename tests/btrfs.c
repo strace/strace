@@ -1674,11 +1674,11 @@ btrfs_test_get_dev_stats_ioctl(void)
 
 			if (name) {
 				if (verbose_xlat)
-					printf("[%u /* %s */] = ", i, name);
+					printf("[%u /* %s */]=", i, name);
 				else
-					printf("[%s] = ", name);
+					printf("[%s]=", name);
 			} else {
-				printf("[%u] = ", i);
+				printf("[%u]=", i);
 			}
 
 			printf("%" PRI__u64, args.values[i]);
