@@ -12,7 +12,7 @@ VREPRINT /* Reprint-line character [ICANON].  */
 VDISCARD /* Discard character [IEXTEN].  */
 VWERASE  /* Word-erase character [ICANON].  */
 VLNEXT   /* Literal-next character [IEXTEN].  */
-VEOF     /* End-of-file character [ICANON].  */
-VEOL     /* End-of-line character [ICANON].  */
 VMIN     /* Minimum number of bytes read at once [!ICANON].  */
 VTIME    /* Time-out value (tenths of a second) [!ICANON].  */
+VEOF     /* End-of-file character [ICANON].  */
+VEOL     /* End-of-line character [ICANON].  */

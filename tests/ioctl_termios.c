@@ -234,7 +234,7 @@ static void
 print_termios_cc(const cc_t *ccs, size_t size, bool tios)
 {
 	static const char * const cc_tio_names[] = {
-#if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
+# if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
 		cc_def_(_VMIN),
 		cc_def_(_VTIME),
 		cc_def_(_VINTR),
@@ -245,7 +245,7 @@ print_termios_cc(const cc_t *ccs, size_t size, bool tios)
 		cc_def_(_VEOL),
 		cc_def_(_VEOL2),
 		cc_def_(_VSWTC),
-#endif
+# endif
 	};
 
 	static const char * const cc_tios_names[] = {
@@ -265,13 +265,13 @@ print_termios_cc(const cc_t *ccs, size_t size, bool tios)
 		cc_def_(VDISCARD),
 		cc_def_(VWERASE),
 		cc_def_(VLNEXT),
-#ifndef __sparc__ /* on sparc VMIN == VEOF and VTIME == VEOL */
+# ifndef __sparc__ /* on sparc VMIN == VEOF and VTIME == VEOL */
 		cc_def_(VEOF),
 		cc_def_(VEOL),
-#endif
-#ifdef VDSUSP
+# endif
+# ifdef VDSUSP
 		cc_def_(VDSUSP),
-#endif
+# endif
 	};
 
 	printf("c_cc=[");
@@ -279,18 +279,18 @@ print_termios_cc(const cc_t *ccs, size_t size, bool tios)
 	for (size_t i = 0; i < size; i++) {
 		bool has_name = tios ?
 			(i < ARRAY_SIZE(cc_tios_names)) && cc_tios_names[i] :
-#if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
+# if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
 			(i < ARRAY_SIZE(cc_tio_names)) && cc_tio_names[i];
-#else
+# else
 			false;
-#endif
+# endif
 		const char *name = has_name ?
 			(tios ? cc_tios_names : cc_tio_names)[i] : "";
 
 		if (has_name)
-			printf("%s[%s] = %#hhx", i ? ", " : "", name, ccs[i]);
+			printf("%s[%s]=%#hhx", i ? ", " : "", name, ccs[i]);
 		else
-			printf("%s[%zu] = %#hhx", i ? ", " : "", i, ccs[i]);
+			printf("%s[%zu]=%#hhx", i ? ", " : "", i, ccs[i]);
 	}
 
 	printf("]");
@@ -307,21 +307,18 @@ print_termios2(void *tios_ptr)
 	print_flags(tios->c_iflag, tios->c_oflag, tios->c_cflag, tios->c_lflag);
 	printf(", ");
 
-#if VERBOSE
+# if VERBOSE
 	printf("c_line=");
-	printxval(term_line_discs, tios->c_line, "N_???");
+	printxval(term_line_discs, zero_extend_signed_to_ull(tios->c_line),
+		  "N_???");
 	printf(", ");
-
-	if (!(tios->c_lflag & ICANON))
-		printf("c_cc[VMIN]=%hhu, c_cc[VTIME]=%u, ",
-		       tios->c_cc[VMIN], tios->c_cc[VTIME]);
 
 	print_termios_cc(tios->c_cc, sizeof(tios->c_cc), true);
 
 	printf(", c_ispeed=%u, c_ospeed=%u", tios->c_ispeed, tios->c_ospeed);
-#else /* !VERBOSE */
+# else /* !VERBOSE */
 	printf("...");
-#endif /* VERBOSE */
+# endif /* VERBOSE */
 
 	printf("}");
 }
@@ -338,12 +335,9 @@ print_termios(void *tios_ptr)
 
 #if VERBOSE
 	printf("c_line=");
-	printxval(term_line_discs, tios->c_line, "N_???");
+	printxval(term_line_discs, zero_extend_signed_to_ull(tios->c_line),
+		  "N_???");
 	printf(", ");
-
-	if (!(tios->c_lflag & ICANON))
-		printf("c_cc[VMIN]=%hhu, c_cc[VTIME]=%u, ",
-		       tios->c_cc[VMIN], tios->c_cc[VTIME]);
 
 	print_termios_cc(tios->c_cc, sizeof(tios->c_cc), true);
 
@@ -368,12 +362,8 @@ print_termio(void *tios_ptr)
 #if VERBOSE
 # if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
 	const bool alpha = true;
-	const unsigned vmin = _VMIN;
-	const unsigned vtime = _VTIME;
 # else
 	const bool alpha = false;
-	const unsigned vmin = VMIN;
-	const unsigned vtime = VTIME;
 # endif
 #endif /* VERBOSE */
 
@@ -384,15 +374,11 @@ print_termio(void *tios_ptr)
 
 #if VERBOSE
 	printf("c_line=");
-	printxval(term_line_discs, tios->c_line, "N_???");
+	printxval(term_line_discs, zero_extend_signed_to_ull(tios->c_line),
+		  "N_???");
 	printf(", ");
 
-	if (!(tios->c_lflag & ICANON))
-		printf("c_cc[%sVMIN]=%hhu, c_cc[%sVTIME]=%u, ",
-		       alpha ? "_" : "", tios->c_cc[vmin],
-		       alpha ? "_" : "", tios->c_cc[vtime]);
-
-	print_termios_cc(tios->c_cc, sizeof(tios->c_cc), !alpha);
+	print_termios_cc(tios->c_cc, MIN(NCC, sizeof(tios->c_cc)), !alpha);
 #else /* !VERBOSE */
 	printf("...");
 #endif /* VERBOSE */
@@ -463,37 +449,37 @@ setup_termios2(void *tios_ptr, int variant)
 
 		tios->c_iflag = IGNBRK|IUTF8|0xdead0000;
 		tios->c_oflag = NL0|CR2|XTABS|BS0|VT1|FF0|OPOST|ONLCR|OFILL|
-#ifdef PAGEOUT
+# ifdef PAGEOUT
 				PAGEOUT|
-#endif
+# endif
 				0xbad00000;
 		tios->c_cflag = B75
-#if defined IBSHIFT && defined CIBAUD
+# if defined IBSHIFT && defined CIBAUD
 			|(B57600<<IBSHIFT)
-#endif
+# endif
 			|CS6|CSTOPB|
-#ifdef CTVB
+# ifdef CTVB
 				CTVB|
-#endif
-#ifdef CMSPAR
+# endif
+# ifdef CMSPAR
 				CMSPAR|
-#endif
+# endif
 				0;
 		tios->c_lflag = ISIG|ECHOE|FLUSHO|
-#ifdef DEFECHO
+# ifdef DEFECHO
 				DEFECHO|
-#endif
-#if defined __alpha__ || defined __powerpc__ || defined __powerpc64__ || defined __sparc__
+# endif
+# if defined __alpha__ || defined __powerpc__ || defined __powerpc64__ || defined __sparc__
 				0xf0f0000
-#else
+# else
 				0xfee00000
-#endif
+# endif
 				;
 
 		tios->c_line = N_IRDA;
 
-		tios->c_cc[VTIME] = 160;
-		tios->c_cc[VMIN] = 137;
+		tios->c_cc[VTIME] = 0xa0;
+		tios->c_cc[VMIN] = 0x89;
 		tios->c_cc[VLNEXT] = 0xff;
 		tios->c_cc[VSWTC] = 0x2a;
 
@@ -502,88 +488,86 @@ setup_termios2(void *tios_ptr, int variant)
 
 		return "{c_iflag=IGNBRK|IUTF8|0xdead0000, "
 		       "c_oflag=NL0|CR2|"
-#ifdef __alpha__
-# if TAB3 == XTABS
+# ifdef __alpha__
+#  if TAB3 == XTABS
 		       "TAB3"
-# else
+#  else
 		       "TAB0"
-# endif
-#else /* !__alpha__ */
+#  endif
+# else /* !__alpha__ */
 		       "XTABS"
-#endif
+# endif
 		       "|BS0|VT1|FF0|OPOST|ONLCR|OFILL|"
-#ifdef PAGEOUT
+# ifdef PAGEOUT
 		       "PAGEOUT|"
-#endif
-#if defined __alpha__ && XTABS != TAB3
+# endif
+# if defined __alpha__ && XTABS != TAB3
 		       "0xbad40000, "
-#else
+# else
 		       "0xbad00000, "
-#endif
+# endif
 		       "c_cflag=B75"
-#if defined IBSHIFT && defined CIBAUD
+# if defined IBSHIFT && defined CIBAUD
 		       "|B57600<<IBSHIFT"
-#endif
+# endif
 		       "|CS6|CSTOPB"
-#ifdef CTVB
+# ifdef CTVB
 		       "|CTVB"
-#endif
-#ifdef CMSPAR
+# endif
+# ifdef CMSPAR
 		       "|CMSPAR"
-#endif
+# endif
 		       ", "
 		       "c_lflag=ISIG|ECHOE|FLUSHO|"
-#ifdef __sparc__
+# ifdef __sparc__
 		       "EXTPROC|"
-#endif
-#ifdef DEFECHO
+# endif
+# ifdef DEFECHO
 		       "DEFECHO|"
-#endif
-#if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
+# endif
+# if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
 		       "0xf0f0000, "
-#elif defined __sparc__
-		       "0xf0e0000, "
-#else
-		       "0xfee00000, "
-#endif
-#if VERBOSE
-		       "c_line=N_IRDA, "
-		       "c_cc[VMIN]=137, "
-		       "c_cc[VTIME]=160, "
-# if defined __alpha__
-		       "c_cc=[[VEOF] = 0, [VEOL] = 0, [VEOL2] = 0, "
-		       "[VERASE] = 0, [VWERASE] = 0, [VKILL] = 0, "
-		       "[VREPRINT] = 0x89, [VSWTC] = 0x2a, [VINTR] = 0, "
-		       "[VQUIT] = 0, [VSUSP] = 0, [11] = 0, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VLNEXT] = 0xff, [VDISCARD] = 0, "
-		       "[VMIN] = 0x89, [VTIME] = 0xa0, [18] = 0]"
-# elif defined __mips__
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VMIN] = 0, [VTIME] = 0xa0, "
-		       "[VEOL2] = 0x89, [VSWTC] = 0x2a, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VSUSP] = 0, [VDSUSP] = 0, "
-		       "[VREPRINT] = 0, [VDISCARD] = 0, [VWERASE] = 0, "
-		       "[VLNEXT] = 0xff, [VEOF = 0, [VEOL] = 0, [18] = 0, "
-		       "[19] = 0, [20] = 0, [21] = 0, [22] = 0]"
 # elif defined __sparc__
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0x89, [VEOL] = 0xa0, "
-		       "[VEOL2] = 0, [VSWTC] = 0x2a, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VSUSP] = 0, [VDSUSP] = 0, "
-		       "[VREPRINT] = 0, [VDISCARD] = 0, [VWERASE] = 0, "
-		       "[VLNEXT] = 0xff, [16] = 0, [17] = 0, [18] = 0]"
+		       "0xf0e0000, "
 # else
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0, [VTIME] = 0xa0, "
-		       "[VMIN] = 0x89, [VSWTC] = 0x2a, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VSUSP] = 0, [VEOL] = 0, [VREPRINT] = 0, "
-		       "[VDISCARD] = 0, [VWERASE] = 0, [VLNEXT] = 0xff, "
-		       "[VEOL2] = 0, [17] = 0, [18] = 0]"
-#endif
+		       "0xfee00000, "
+# endif
+# if VERBOSE
+		       "c_line=N_IRDA, "
+#  if defined __alpha__
+		       "c_cc=[[VEOF]=0, [VEOL]=0, [VEOL2]=0, "
+		       "[VERASE]=0, [VWERASE]=0, [VKILL]=0, "
+		       "[VREPRINT]=0x89, [VSWTC]=0x2a, [VINTR]=0, "
+		       "[VQUIT]=0, [VSUSP]=0, [11]=0, [VSTART]=0, "
+		       "[VSTOP]=0, [VLNEXT]=0xff, [VDISCARD]=0, "
+		       "[VMIN]=0x89, [VTIME]=0xa0, [18]=0]"
+#  elif defined __mips__
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
+		       "[VEOL2]=0, [VSWTC]=0x2a, [VSTART]=0, "
+		       "[VSTOP]=0, [VSUSP]=0, [11]=0, "
+		       "[VREPRINT]=0, [VDISCARD]=0, [VWERASE]=0, "
+		       "[VLNEXT]=0xff, [VEOF]=0, [VEOL]=0, [18]=0, "
+		       "[19]=0, [20]=0, [21]=0, [22]=0]"
+#  elif defined __sparc__
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
+		       "[VEOL2]=0, [VSWTC]=0x2a, [VSTART]=0, "
+		       "[VSTOP]=0, [VSUSP]=0, [VDSUSP]=0, "
+		       "[VREPRINT]=0, [VDISCARD]=0, [VWERASE]=0, "
+		       "[VLNEXT]=0xff, [16]=0, [17]=0, [18]=0]"
+#  else
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VEOF]=0, [VTIME]=0xa0, "
+		       "[VMIN]=0x89, [VSWTC]=0x2a, [VSTART]=0, "
+		       "[VSTOP]=0, [VSUSP]=0, [VEOL]=0, [VREPRINT]=0, "
+		       "[VDISCARD]=0, [VWERASE]=0, [VLNEXT]=0xff, "
+		       "[VEOL2]=0, [17]=0, [18]=0]"
+#  endif
 		       ", c_ispeed=3141592653, c_ospeed=2718281828"
-#else /* !VERBOSE */
+# else /* !VERBOSE */
 		       "..."
-#endif /* VERBOSE */
+# endif /* VERBOSE */
 		       "}";
 	}
 
@@ -639,17 +623,17 @@ setup_termios(void *tios_ptr, int variant)
 
 		tios->c_line = N_AX25;
 
-		tios->c_cc[VTIME] = 160;
-		tios->c_cc[VMIN] = 137;
+		tios->c_cc[VTIME] = 0xa0;
+		tios->c_cc[VMIN] = 0x89;
 		tios->c_cc[VLNEXT] = 0xff;
 		tios->c_cc[VSWTC] = 0x2a;
 
-# ifdef HAVE_STRUCT_TERMIOS_C_ISPEED
+#ifdef HAVE_STRUCT_TERMIOS_C_ISPEED
 		tios->c_ispeed = 3141592653U;
-# endif
-# ifdef HAVE_STRUCT_TERMIOS_C_OSPEED
+#endif
+#ifdef HAVE_STRUCT_TERMIOS_C_OSPEED
 		tios->c_ospeed = 2718281828U;
-# endif
+#endif
 
 		return "{c_iflag=IGNBRK|IUTF8|0xdead0000, "
 		       "c_oflag=NL0|CR2|"
@@ -699,45 +683,43 @@ setup_termios(void *tios_ptr, int variant)
 #endif
 #if VERBOSE
 		       "c_line=N_AX25, "
-		       "c_cc[VMIN]=137, "
-		       "c_cc[VTIME]=160, "
 # if defined __alpha__
-		       "c_cc=[[VEOF] = 0, [VEOL] = 0, [VEOL2] = 0, "
-		       "[VERASE] = 0, [VWERASE] = 0, [VKILL] = 0, "
-		       "[VREPRINT] = 0x89, [VSWTC] = 0x2a, [VINTR] = 0, "
-		       "[VQUIT] = 0, [VSUSP] = 0, [11] = 0, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VLNEXT] = 0xff, [VDISCARD] = 0, "
-		       "[VMIN] = 0x89, [VTIME] = 0xa0, [18] = 0]"
+		       "c_cc=[[VEOF]=0, [VEOL]=0, [VEOL2]=0, "
+		       "[VERASE]=0, [VWERASE]=0, [VKILL]=0, "
+		       "[VREPRINT]=0x89, [VSWTC]=0x2a, [VINTR]=0, "
+		       "[VQUIT]=0, [VSUSP]=0, [11]=0, [VSTART]=0, "
+		       "[VSTOP]=0, [VLNEXT]=0xff, [VDISCARD]=0, "
+		       "[VMIN]=0x89, [VTIME]=0xa0, [18]=0]"
 # elif defined __mips__
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VMIN] = 0, [VTIME] = 0xa0, "
-		       "[VEOL2] = 0x89, [VSWTC] = 0x2a, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VSUSP] = 0, [VDSUSP] = 0, "
-		       "[VREPRINT] = 0, [VDISCARD] = 0, [VWERASE] = 0, "
-		       "[VLNEXT] = 0xff, [VEOF] = 0, [VEOL] = 0, [18] = 0, "
-		       "[19] = 0, [20] = 0, [21] = 0, [22] = 0]"
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
+		       "[VEOL2]=0, [VSWTC]=0x2a, [VSTART]=0, "
+		       "[VSTOP]=0, [VSUSP]=0, [11]=0, "
+		       "[VREPRINT]=0, [VDISCARD]=0, [VWERASE]=0, "
+		       "[VLNEXT]=0xff, [VEOF]=0, [VEOL]=0, [18]=0, "
+		       "[19]=0, [20]=0, [21]=0, [22]=0]"
 # elif defined __powerpc__ || defined __powerpc64__
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0, [VMIN] = 0x89, "
-		       "[VEOL] = 0, [VTIME] = 0xa0, [VEOL2] = 0, "
-		       "[VSWTC] = 0x2a, [VWERASE] = 0, [VREPRINT] = 0, "
-		       "[VSUSP] = 0, [VSTART] = 0, [VSTOP] = 0, "
-		       "[VLNEXT] = 0xff, [VDISCARD] = 0, [17] = 0, [18] = 0]"
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VEOF]=0, [VMIN]=0x89, "
+		       "[VEOL]=0, [VTIME]=0xa0, [VEOL2]=0, "
+		       "[VSWTC]=0x2a, [VWERASE]=0, [VREPRINT]=0, "
+		       "[VSUSP]=0, [VSTART]=0, [VSTOP]=0, "
+		       "[VLNEXT]=0xff, [VDISCARD]=0, [17]=0, [18]=0]"
 # elif defined __sparc__
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0x89, [VEOL] = 0xa0, "
-		       "[VEOL2] = 0, [VSWTC] = 0x2a, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VSUSP] = 0, [VDSUSP] = 0, "
-		       "[VREPRINT] = 0, [VDISCARD] = 0, [VWERASE] = 0, "
-		       "[VLNEXT] = 0xff, [16] = 0]"
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
+		       "[VEOL2]=0, [VSWTC]=0x2a, [VSTART]=0, "
+		       "[VSTOP]=0, [VSUSP]=0, [VDSUSP]=0, "
+		       "[VREPRINT]=0, [VDISCARD]=0, [VWERASE]=0, "
+		       "[VLNEXT]=0xff, [16]=0]"
 # else
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0, [VTIME] = 0xa0, "
-		       "[VMIN] = 0x89, [VSWTC] = 0x2a, [VSTART] = 0, "
-		       "[VSTOP] = 0, [VSUSP] = 0, [VEOL] = 0, [VREPRINT] = 0, "
-		       "[VDISCARD] = 0, [VWERASE] = 0, [VLNEXT] = 0xff, "
-		       "[VEOL2] = 0, [17] = 0, [18] = 0]"
-#endif
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VEOF]=0, [VTIME]=0xa0, "
+		       "[VMIN]=0x89, [VSWTC]=0x2a, [VSTART]=0, "
+		       "[VSTOP]=0, [VSUSP]=0, [VEOL]=0, [VREPRINT]=0, "
+		       "[VDISCARD]=0, [VWERASE]=0, [VLNEXT]=0xff, "
+		       "[VEOL2]=0, [17]=0, [18]=0]"
+# endif
 # ifdef HAVE_STRUCT_TERMIOS_C_ISPEED
 		       ", c_ispeed=3141592653"
 # endif
@@ -787,12 +769,12 @@ setup_termio(void *tios_ptr, int variant)
 		tios->c_line = 234;
 
 #if defined __alpha__ || defined __powerpc__ || defined __powerpc64__
-		tios->c_cc[_VTIME] = 160;
-		tios->c_cc[_VMIN] = 137;
+		tios->c_cc[_VTIME] = 0xa0;
+		tios->c_cc[_VMIN] = 0x89;
 		tios->c_cc[_VSWTC] = 0x2a;
 #else
-		tios->c_cc[VTIME] = 160;
-		tios->c_cc[VMIN] = 137;
+		tios->c_cc[VTIME] = 0xa0;
+		tios->c_cc[VMIN] = 0x89;
 		tios->c_cc[VSWTC] = 0x2a;
 #endif
 
@@ -831,37 +813,27 @@ setup_termio(void *tios_ptr, int variant)
 #if VERBOSE
 		       "c_line=0xea /* N_??? */, "
 # if defined __alpha__
-		       "c_cc[_VMIN]=137, "
-		       "c_cc[_VTIME]=160, "
-		       "c_cc=[[_VEOF] = 0, [_VEOL] = 0, [_VEOL2] = 0, "
-		       "[_VERASE] = 0, [_VWERASE] = 0, [_VKILL] = 0, "
-		       "[_VREPRINT] = 0x89, [_VSWTC] = 0x2a]"
+		       "c_cc=[[_VEOF]=0, [_VEOL]=0, [_VEOL2]=0, "
+		       "[_VERASE]=0, [_VWERASE]=0, [_VKILL]=0, "
+		       "[_VREPRINT]=0x89, [_VSWTC]=0x2a]"
 # elif defined __mips__
-		       "c_cc[VMIN]=137, "
-		       "c_cc[VTIME]=160, "
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VMIN] = 0, [VTIME] = 0xa0, "
-		       "[VEOL2] = 0x89, [VSWTC] = 0x2a]"
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
+		       "[VEOL2]=0, [VSWTC]=0x2a]"
 # elif defined __powerpc__ || defined __powerpc64__
-		       "c_cc[_VMIN]=137, "
-		       "c_cc[_VTIME]=160, "
-		       "c_cc=[[_VINTR] = 0, [_VQUIT] = 0, [_VERASE] = 0, "
-		       "[_VKILL] = 0, [_VEOF] = 0, [_VMIN] = 0x89, "
-		       "[_VEOL] = 0, [_VTIME] = 0xa0, [_VEOL2] = 0, "
-		       "[_VSWTC] = 0x2a]"
+		       "c_cc=[[_VINTR]=0, [_VQUIT]=0, [_VERASE]=0, "
+		       "[_VKILL]=0, [_VEOF]=0, [_VMIN]=0x89, "
+		       "[_VEOL]=0, [_VTIME]=0xa0, [_VEOL2]=0, "
+		       "[_VSWTC]=0x2a]"
 # elif defined __sparc__
-		       "c_cc[VMIN]=137, "
-		       "c_cc[VTIME]=160, "
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0x89, [VEOL] = 0xa0, "
-		       "[VEOL2] = 0, [VSWTC] = 0x2a]"
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VMIN]=0x89, [VTIME]=0xa0, "
+		       "[VEOL2]=0, [VSWTC]=0x2a]"
 # else
-		       "c_cc[VMIN]=137, "
-		       "c_cc[VTIME]=160, "
-		       "c_cc=[[VINTR] = 0, [VQUIT] = 0, [VERASE] = 0, "
-		       "[VKILL] = 0, [VEOF] = 0, [VTIME] = 0xa0, "
-		       "[VMIN] = 0x89, [VSWTC] = 0x2a]"
-#endif
+		       "c_cc=[[VINTR]=0, [VQUIT]=0, [VERASE]=0, "
+		       "[VKILL]=0, [VEOF]=0, [VTIME]=0xa0, "
+		       "[VMIN]=0x89, [VSWTC]=0x2a]"
+# endif
 #else /* !VERBOSE */
 		       "..."
 #endif
@@ -963,9 +935,14 @@ main(void)
 		},
 	};
 
-	ret = syscall(__NR_openat, -100, "/dev/ptmx", O_RDWR|O_NOCTTY);
+	static const char ptmx[] = "/dev/ptmx";
+	/*
+	 * The libc function is not available because <linux/fcntl.h>
+	 * is included instead of <fcntl.h>.
+	 */
+	ret = syscall(__NR_openat, -100, ptmx, O_RDWR|O_NOCTTY);
 	if (ret < 0)
-		perror_msg_and_skip("open(\"/dev/ptmx\")");
+		perror_msg_and_skip("open: %s", ptmx);
 
 	for (size_t i = 0; i < ARRAY_SIZE(checks); i++) {
 		const char *last_arg_str = NULL;
