@@ -23,9 +23,14 @@ fail_with()
 		"strace -e inject=$* failed to handle an argument error properly"
 }
 
-for arg in 42 chdir \
-	   chdir:42 \!chdir:42 \
-	   chdir:42:when=7 \
+case "$STRACE_ARCH" in
+	ia64)	valid_scno=1068 ;;
+	*)	valid_scno=42 ;;
+esac
+
+for arg in $valid_scno chdir \
+	   chdir:$valid_scno \!chdir:$valid_scno \
+	   chdir:$valid_scno:when=7 \
 	   chdir:invalid \
 	   chdir:invalid:when=8 \
 	   chdir:error= \
@@ -89,7 +94,7 @@ for arg in 42 chdir \
 	   chdir:syscall=chdir \
 	   chdir:syscall=%file \
 	   chdir:syscall=-42 \
-	   chdir:syscall=42 \
+	   chdir:syscall=$valid_scno \
 	   chdir:syscall=gettid:syscall=gettid \
 	   chdir:when=. \
 	   chdir:when=.+ \

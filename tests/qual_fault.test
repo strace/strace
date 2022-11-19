@@ -83,8 +83,13 @@ check_fault_injection()
 	done
 }
 
+case "$STRACE_ARCH" in
+	ia64)	valid_scno=1068 ;;
+	*)	valid_scno=51 ;;
+esac
+
 for err in '' ENOSYS 22 einval; do
-	for fault in writev desc,51; do
+	for fault in writev desc,$valid_scno; do
 		check_fault_injection \
 			writev $fault "$err" '' '' '' 1 -efault=chdir
 		check_fault_injection \

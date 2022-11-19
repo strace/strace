@@ -4,6 +4,9 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Enhanced decoding of terminal ioctl commands.
 
+* Bug fixes
+  * Fixed injection tests on ia64.
+
 Noteworthy changes in release 6.0 (2022-10-29)
 ==============================================
 

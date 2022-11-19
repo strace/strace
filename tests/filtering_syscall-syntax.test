@@ -81,6 +81,11 @@ case "$STRACE_ARCH" in
 		;;
 esac
 
+case "$STRACE_ARCH" in
+	ia64)	valid_scno=1025 ;;
+	*)	valid_scno=1 ;;
+esac
+
 for arg in -1 -2 -3 -4 -5 \
 	   invalid_syscall_name \
 	   0x 0y \
@@ -96,12 +101,12 @@ for arg in -1 -2 -3 -4 -5 \
 	   ; do
 	check_syscall "$arg" "$arg"
 	check_syscall "$arg" "!$arg"
-	check_syscall "$arg" "1,$arg"
+	check_syscall "$arg" "$valid_scno,$arg"
 	check_syscall "$arg@$pers" "$arg@$pers"
 done
 
 for arg in '!chdir' none; do
-	check_syscall "$arg" "1,$arg"
+	check_syscall "$arg" "$valid_scno,$arg"
 done
 
 # invalid syscall, multiple syscalls
@@ -111,7 +116,7 @@ for arg in %desc \
 	   %process \
 	   %network \
 	   chdir \
-	   1 \
+	   $valid_scno \
 	   all \
 	   ?32767 \
 	   ?invalid \

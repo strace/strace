@@ -16,6 +16,11 @@ pattern_nonabbrev_verbose='execve("\.\./umovestr", \["\.\./umovestr"\], \[".*\"\
 pattern_nonverbose='execve("\.\./umovestr", 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
 pattern_raw='execve(0x[[:xdigit:]]*, 0x[[:xdigit:]]*, 0x[[:xdigit:]]*) = 0'
 
+case "$STRACE_ARCH" in
+	ia64)	valid_scno=1068 ;;
+	*)	valid_scno=42 ;;
+esac
+
 check_output_mismatch()
 {
 	local pattern
@@ -47,11 +52,11 @@ check_output_mismatch "$pattern_abbrev_verbose" -e trace=%process
 LC_ALL=C grep '^chdir' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-run_strace -e 42 ../umovestr
+run_strace -e $valid_scno ../umovestr
 LC_ALL=C grep '^[[:alnum:]_]*(' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
-run_strace -e/ -e42 ../umovestr
+run_strace -e/ -e$valid_scno ../umovestr
 LC_ALL=C grep '^[[:alnum:]_]*(' "$LOG" > /dev/null &&
 	dump_log_and_fail_with "$STRACE $args unexpected output"
 
@@ -62,7 +67,7 @@ for a in execve \!chdir /. all \!none \
 	check_execve_output_mismatch verbose "$a" "$pattern_abbrev_verbose"
 done
 
-for a in \!execve chdir 42 \!all none \
+for a in \!execve chdir $valid_scno \!all none \
 	 \!file \!process desc ipc memory network signal; do
 	check_execve_output_mismatch abbrev "$a" "$pattern_nonabbrev_verbose"
 	check_execve_output_mismatch raw "$a" "$pattern_abbrev_verbose"
