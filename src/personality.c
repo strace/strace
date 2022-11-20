@@ -18,7 +18,7 @@ SYS_FUNC(personality)
 	if (entering(tcp)) {
 		pers = tcp->u_arg[0];
 		if (0xffffffff == pers) {
-			tprints("0xffffffff");
+			PRINT_VAL_X(0xffffffff);
 		} else {
 			printxval(personality_types, pers & PER_MASK, "PER_???");
 			pers &= ~PER_MASK;
