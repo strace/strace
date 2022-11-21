@@ -13,11 +13,11 @@ static bool
 print_node(struct tcb *tcp, void *elem_buf, size_t elem_size, void *data)
 {
 	if (elem_size < sizeof(kernel_ulong_t)) {
-		tprintf("%#0*x", (int) elem_size * 2 + 2,
-			*(unsigned int *) elem_buf);
+		unsigned int val = *(unsigned int *) elem_buf;
+		PRINT_VAL_0X(val);
 	} else {
-		tprintf("%#0*" PRI_klx, (int) elem_size * 2 + 2,
-			*(kernel_ulong_t *) elem_buf);
+		kernel_ulong_t val = *(kernel_ulong_t *) elem_buf;
+		PRINT_VAL_0X(val);
 	}
 
 	return true;

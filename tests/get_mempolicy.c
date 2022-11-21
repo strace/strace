@@ -42,7 +42,7 @@ print_nodes(unsigned long maxnode)
 			fputs("...", stdout);
 			break;
 		}
-		printf("%#0*lx", (int) sizeof(*nodemask) * 2 + 2, nodemask[i]);
+		printf("%#0*lx", (int) sizeof(*nodemask) * 2, nodemask[i]);
 	}
 
 	printf("], %lu, NULL, 0) = 0\n", maxnode);
