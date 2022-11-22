@@ -60,12 +60,13 @@ print_group(struct tcb *const tcp,
 	    const size_t elem_size,
 	    void *const opaque_data)
 {
-	if (elem_size < sizeof(kernel_ulong_t))
-		tprintf("%#0*x", (int) elem_size * 2 + 2,
-			*(unsigned int *) elem_buf);
-	else
-		tprintf("%#0*" PRI_klx, (int) elem_size * 2 + 2,
-			*(kernel_ulong_t *) elem_buf);
+	if (elem_size < sizeof(kernel_ulong_t)) {
+		unsigned int val = *(unsigned int *) elem_buf;
+		PRINT_VAL_0X(val);
+	} else {
+		kernel_ulong_t val = *(kernel_ulong_t *) elem_buf;
+		PRINT_VAL_0X(val);
+	}
 
 	return true;
 }
