@@ -98,17 +98,13 @@ done
 wait
 
 %check
-is_x86=
-%ifarch %ix86
-is_x86=1
-%endif
-
-is_latest_fedora=
+width=$(echo __LONG_WIDTH__ |%__cc -E -P -)
+skip_32bit=0
 %if 0%{?fedora} >= 35 || 0%{?rhel} > 9
-is_latest_fedora=1
+skip_32bit=1
 %endif
 
-if [ "${is_x86}${is_latest_fedora}" != 11 ]; then
+if [ "${width}" != 32 ] || [ "${skip_32bit}" != 1 ]; then
 	%{buildroot}%{_bindir}/strace -V
 	%make_build -k check VERBOSE=1
 	echo 'BEGIN OF TEST SUITE INFORMATION'
