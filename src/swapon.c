@@ -25,10 +25,8 @@ SYS_FUNC(swapon)
 	if (flags) {
 		printflags(swap_flags, flags, "SWAP_FLAG_???");
 		tprint_or();
-		tprintf("%u", prio);
-	} else {
-		PRINT_VAL_U(prio);
 	}
+	PRINT_VAL_U(prio);
 
 	return RVAL_DECODED;
 }
