@@ -104,7 +104,7 @@ is_x86=1
 %endif
 
 is_latest_fedora=
-%if 0%{?fedora} >= 35
+%if 0%{?fedora} >= 35 || 0%{?rhel} > 9
 is_latest_fedora=1
 %endif
 
