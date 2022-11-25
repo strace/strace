@@ -398,7 +398,8 @@ ioctl_decode(struct tcb *tcp)
 	case 's':
 		return sock_ioctl(tcp, code, arg);
 #endif
-#if defined(ALPHA) || defined(POWERPC) || defined(SPARC) || defined(SPARC64)
+#if defined(ALPHA) || defined(MIPS) || defined(POWERPC) \
+ || defined(SPARC) || defined(SPARC64)
 	case 't':
 		return term_ioctl(tcp, code, arg);
 #endif
