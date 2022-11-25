@@ -491,7 +491,7 @@ decode_ebcdic(const char *ebcdic, char *ascii, size_t size)
 		if ((size_) > (hdr_size_) && \
 		    !is_filled(((char *) hdr_) + (hdr_size_), '\0', \
 		               (size_) - (hdr_size_))) { \
-			tprints(", "); \
+			tprint_struct_next(); \
 			print_quoted_string(((char *) hdr_) + (hdr_size_), \
 					    (size_) - (hdr_size_), \
 					    QUOTE_FORCE_HEX); \
@@ -515,12 +515,11 @@ print_sthyi_machine(struct tcb *tcp, struct sthyi_machine *hdr, uint16_t size,
 	if (!abbrev(tcp)) {
 		if (hdr->infmflg1) { /* Reserved */
 			PRINT_FIELD_0X(*hdr, infmflg1);
-			tprints(", ");
+			tprint_struct_next();
 		}
 		if (hdr->infmflg2) { /* Reserved */
-			tprint_struct_next();
 			PRINT_FIELD_0X(*hdr, infmflg2);
-			tprints(", ");
+			tprint_struct_next();
 		}
 	}
 
@@ -1102,7 +1101,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	do { \
 		if (hdr->inf ##l_## off && hdr->inf ##l_## off + \
 		    hdr->inf ##l_## len <= sizeof(data)) { \
-			tprints(", "); \
+			tprint_struct_next(); \
 			print_sthyi_ ##name_(tcp, (struct sthyi_ ##name_ *) \
 					     (data + hdr->inf ##l_## off), \
 					     hdr->inf ##l_## len, &mt); \
@@ -1113,7 +1112,7 @@ print_sthyi_guest(struct tcb *tcp, struct sthyi_guest *hdr, uint16_t size,
 	do { \
 		if (hdr->inf ##l_## off ##n_ && hdr->inf ##l_## off ##n_ + \
 		    hdr->inf ##l_## len ##n_ <= sizeof(data)) { \
-			tprints(", "); \
+			tprint_struct_next(); \
 			print_sthyi_ ##name_(tcp, (struct sthyi_ ##name_ *) \
 					     (data + hdr->inf ##l_## off ##n_), \
 					     hdr->inf ##l_## len ##n_, n_, mt); \
@@ -1271,7 +1270,7 @@ SYS_FUNC(s390_sthyi)
 	if (entering(tcp)) {
 		printxval64(s390_sthyi_function_codes, function_code,
 			    "STHYI_FC_???");
-		tprints(", ");
+		tprint_arg_next();
 	} else {
 		switch (function_code) {
 		case STHYI_FC_CP_IFL_CAP:
@@ -1282,9 +1281,11 @@ SYS_FUNC(s390_sthyi)
 			printaddr(resp_buffer_ptr);
 		}
 
-		tprints(", ");
+		tprint_arg_next();
 		printnum_int64(tcp, return_code_ptr, "%" PRIu64);
-		tprintf(", %#" PRI_klx, flags);
+
+		tprint_arg_next();
+		PRINT_VAL_X(flags);
 	}
 
 	return 0;
@@ -1356,13 +1357,13 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 	if (umove_or_printaddr(tcp, addr, &gsepl))
 		return;
 
-	tprints("[");
+	tprint_indirect_begin();
 	tprint_struct_begin();
 
 	if (!abbrev(tcp)) {
 		if (gsepl.pad1) {
 			PRINT_FIELD_0X(gsepl, pad1);
-			tprints(", ");
+			tprint_struct_next();
 		}
 
 		PRINT_FIELD_0X(gsepl, gs_eam);
@@ -1390,7 +1391,7 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 			PRINT_FIELD_0X(gsepl, pad2);
 		}
 
-		tprints(", ");
+		tprint_struct_next();
 	}
 
 	PRINT_FIELD_X(gsepl, gs_eha);
@@ -1410,7 +1411,7 @@ guard_storage_print_gsepl(struct tcb *tcp, uint64_t addr)
 	}
 
 	tprint_struct_end();
-	tprints("]");
+	tprint_indirect_end();
 }
 
 # define DIV_ROUND_UP(x,y) (((x) + ((y) - 1)) / (y))
@@ -1427,7 +1428,7 @@ guard_storage_print_gscb(struct tcb *tcp, kernel_ulong_t addr)
 
 	if (gscb.reserved) {
 		PRINT_FIELD_0X(gscb, reserved);
-		tprints(", ");
+		tprint_struct_next();
 	}
 
 	PRINT_FIELD_0X(gscb, gsd);
@@ -1470,12 +1471,12 @@ SYS_FUNC(s390_guarded_storage)
 		break;
 
 	case GS_SET_BC_CB:
-		tprints(", ");
+		tprint_arg_next();
 		guard_storage_print_gscb(tcp, gs_cb);
 		break;
 
 	default:
-		tprints(", ");
+		tprint_arg_next();
 		printaddr(gs_cb);
 	}
 
@@ -1497,7 +1498,7 @@ SYS_FUNC(s390_runtime_instr)
 	 */
 	switch (command) {
 	case S390_RUNTIME_INSTR_START:
-		tprints(", ");
+		tprint_arg_next();
 		printsignal(signum);
 		break;
 
@@ -1515,9 +1516,13 @@ SYS_FUNC(s390_pci_mmio_write)
 	kernel_ulong_t user_buf  = tcp->u_arg[1];
 	kernel_ulong_t length    = tcp->u_arg[2];
 
-	tprintf("%#" PRI_klx ", ", mmio_addr);
+	PRINT_VAL_X(mmio_addr);
+
+	tprint_arg_next();
 	printstr_ex(tcp, user_buf, length, QUOTE_FORCE_HEX);
-	tprintf(", %" PRI_klu, length);
+
+	tprint_arg_next();
+	PRINT_VAL_U(length);
 
 	return RVAL_DECODED;
 }
@@ -1529,14 +1534,16 @@ SYS_FUNC(s390_pci_mmio_read)
 	kernel_ulong_t length    = tcp->u_arg[2];
 
 	if (entering(tcp)) {
-		tprintf("%#" PRI_klx ", ", mmio_addr);
+		PRINT_VAL_X(mmio_addr);
+		tprint_arg_next();
 	} else {
 		if (!syserror(tcp))
 			printstr_ex(tcp, user_buf, length, QUOTE_FORCE_HEX);
 		else
 			printaddr(user_buf);
 
-		tprintf(", %" PRI_klu, length);
+		tprint_arg_next();
+		PRINT_VAL_U(length);
 	}
 
 	return 0;
