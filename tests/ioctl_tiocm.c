@@ -56,8 +56,13 @@ main(int argc, const char *argv[])
 		       XLAT_SEL(cmds[i].cmd, cmds[i].str),
 		       efault, errstr);
 
-#define VALID_FLAGS 0xe1ff
-#define INVALID_FLAGS  0xffff1e00
+#ifdef __mips__
+# define VALID_FLAGS 0xe777
+# define INVALID_FLAGS  0xffff1888
+#else
+# define VALID_FLAGS 0xe1ff
+# define INVALID_FLAGS  0xffff1e00
+#endif
 		*p_flags = INVALID_FLAGS;
 
 		if (cmds[i].on_enter) {
