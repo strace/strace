@@ -71,28 +71,23 @@ print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (!umoven_or_printaddr(tcp, addr, umove_size, cpu)) {
 		bool printed = false;
 
-		/*
-		 * XXX: this is a bitset printed as if it was an array,
-		 * should be fixed as soon as we decide on the right way
-		 * of printing such bitsets.
-		 */
-		tprint_array_begin();
+		tprint_bitset_begin();
 		for (int i = 0;; i++) {
 			i = next_set_bit(cpu, i, ncpu);
 			if (i < 0)
 				break;
 			if (printed)
-				tprint_array_next();
+				tprint_bitset_next();
 			else
 				printed = true;
 			PRINT_VAL_D(i);
 		}
 		if (size < len) {
 			if (printed)
-				tprint_array_next();
+				tprint_bitset_next();
 			tprint_more_data_follows();
 		}
-		tprint_array_end();
+		tprint_bitset_end();
 	}
 
 	free(cpu);

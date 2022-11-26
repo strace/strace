@@ -84,7 +84,7 @@ main(void)
 	for (i = 0, cpu = 0, sep = ""; i < (unsigned) ret_size * 8; ++i) {
 		if (CPU_ISSET_S(i, (unsigned) ret_size, cpuset)) {
 			printf("%s%u", sep, i);
-			sep = ", ";
+			sep = " ";
 			cpu = i;
 			if (first_cpu == -1U)
 				first_cpu = i;
@@ -136,7 +136,7 @@ main(void)
 	for (i = 0, sep = ""; i < (unsigned) ret_size * 8; ++i) {
 		if (CPU_ISSET_S(i, (unsigned) ret_size, cpuset)) {
 			printf("%s%u", sep, i);
-			sep = ", ";
+			sep = " ";
 		}
 	}
 	printf("]) = %s\n", errstr);
