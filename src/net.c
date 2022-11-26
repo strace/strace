@@ -758,7 +758,7 @@ print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 	tprint_struct_end();
 }
 
-#include "xlat/icmpfilterflags.h"
+#include "xlat/icmp_filter_flags.h"
 
 static void
 print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
@@ -775,9 +775,34 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	if (umoven_or_printaddr(tcp, addr, len, &filter))
 		return;
 
-	tprints("~(");
-	printflags(icmpfilterflags, ~filter.data, "ICMP_???");
-	tprints(")");
+	uint32_t data = filter.data;
+	static_assert(sizeof(filter.data) == sizeof(data),
+		      "struct icmp_filter.data is not 32-bit long");
+
+	uint32_t inverted_data;
+	uint32_t *p = &data;
+
+	/* check whether more than half of the bits are set */
+	if (popcount32(p, 1) > sizeof(*p) * 8 / 2) {
+		/* show those bits that are NOT in the set */
+		inverted_data = ~data;
+		p = &inverted_data;
+		tprints("~");
+	}
+
+	tprint_bitset_begin();
+	bool next = false;
+	for (int i = 0;; ++i) {
+		i = next_set_bit(p, i, sizeof(*p) * 8);
+		if (i < 0)
+			break;
+		if (next)
+			tprint_bitset_next();
+		else
+			next = true;
+		printxval(icmp_filter_flags, i, "ICMP_???");
+	}
+	tprint_bitset_end();
 }
 
 static void
