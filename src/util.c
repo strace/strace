@@ -629,9 +629,9 @@ getfdinode(struct tcb *tcp, int fd)
 static void
 print_string_in_angle_brackets(const char *str)
 {
-	tprints("<");
+	tprint_associated_info_begin();
 	tprints(str);
-	tprints(">");
+	tprint_associated_info_end();
 }
 
 static bool
@@ -663,13 +663,16 @@ printdev(struct tcb *tcp, int fd, const char *path)
 	switch (st.st_mode & S_IFMT) {
 	case S_IFBLK:
 	case S_IFCHR:
-		tprints("<");
+		tprint_associated_info_begin();
 		print_quoted_string_ex(path, strlen(path),
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
-		tprintf("<%s %u:%u>>",
+		tprint_associated_info_begin();
+		tprintf("%s %u:%u",
 			S_ISBLK(st.st_mode)? "block" : "char",
 			major(st.st_rdev), minor(st.st_rdev));
+		tprint_associated_info_end();
+		tprint_associated_info_end();
 		return true;
 	}
 
@@ -720,13 +723,14 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 
 	pid_t pid = pidfd_get_pid(pid_of_fd, fd);
 	if (pid > 0) {
-		tprints("<pid:");
+		tprint_associated_info_begin();
+		tprints("pid:");
 		/*
 		 * The pid translation is not needed because
 		 * the pid is in strace's namespace.
 		 */
 		printpid(NULL, pid, PT_TID);
-		tprints(">");
+		tprint_associated_info_end();
 	} else {
 		print_string_in_angle_brackets(path);
 	}
@@ -737,10 +741,10 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 static void
 print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 {
-	tprints("<");
+	tprint_associated_info_begin();
 	print_quoted_string_ex(str, strlen(str),
 			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
-	tprints(">");
+	tprint_associated_info_end();
 
 	if (deleted)
 		tprints("(deleted)");

@@ -977,13 +977,15 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		print_injected_note(tcp);
 	}
 	if (Tflag) {
+		tprint_space();
+		tprint_associated_info_begin();
 		ts_sub(ts, ts, &tcp->etime);
-		tprintf(" <%ld", (long) ts->tv_sec);
+		PRINT_VAL_D(ts->tv_sec);
 		if (Tflag_width) {
 			tprintf(".%0*ld",
 				Tflag_width, (long) ts->tv_nsec / Tflag_scale);
 		}
-		tprints(">");
+		tprint_associated_info_end();
 	}
 	tprint_newline();
 	dumpio(tcp);

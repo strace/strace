@@ -157,6 +157,18 @@ tprint_indirect_end(void)
 }
 
 static inline void
+tprint_associated_info_begin(void)
+{
+	STRACE_PRINTS("<");
+}
+
+static inline void
+tprint_associated_info_end(void)
+{
+	STRACE_PRINTS(">");
+}
+
+static inline void
 tprint_more_data_follows(void)
 {
 	STRACE_PRINTS("...");

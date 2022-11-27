@@ -796,10 +796,10 @@ print_comm_str(const char *str, const size_t len)
 {
 	if (!len)
 		return;
-	tprints("<");
+	tprint_associated_info_begin();
 	print_quoted_string_ex(str, len,
 			       QUOTE_OMIT_LEADING_TRAILING_QUOTES, "<>");
-	tprints(">");
+	tprint_associated_info_end();
 }
 
 void
