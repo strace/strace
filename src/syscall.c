@@ -1357,7 +1357,7 @@ const struct_sysent stub_sysent = {
 	.sys_flags = MEMORY_MAPPING_CHANGE,
 	.sen = SEN_printargs,
 	.sys_func = printargs,
-	.sys_name = "????",
+	.sys_name = "???",
 };
 
 /*
@@ -1366,7 +1366,7 @@ const struct_sysent stub_sysent = {
  *    out silently" code.
  * 1: ok, continue in syscall_entering_decode().
  * other: error, syscall_entering_decode() should print error indicator
- *    ("????" etc) and return an appropriate code.
+ *    ("???" etc) and return an appropriate code.
  */
 int
 get_scno(struct tcb *tcp)
@@ -1459,7 +1459,7 @@ static int get_syscall_result_regs(struct tcb *);
 /* Returns:
  * 1: ok, continue in syscall_exiting_trace().
  * -1: error, syscall_exiting_trace() should print error indicator
- *    ("????" etc) and bail out.
+ *    ("???" etc) and bail out.
  */
 static int
 get_syscall_result(struct tcb *tcp)

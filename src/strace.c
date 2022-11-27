@@ -842,13 +842,14 @@ printleader(struct tcb *tcp)
 			else
 				tprintf("%-5u", tcp->pid);
 		} else {
-			tprintf("[pid %5u", tcp->pid);
+			tprint_attribute_begin();
+			tprintf("pid %5u", tcp->pid);
 		}
 
 		print_comm_str(tcp->comm, len);
 
 		if (!print_pid_pfx)
-			tprints("]");
+			tprint_attribute_end();
 		tprint_space();
 	}
 

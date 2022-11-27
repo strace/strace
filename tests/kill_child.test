@@ -22,10 +22,10 @@ while :; do
 	# Printing of "<... SYSCALL resumed>" in strace.c:print_event_exit
 	# used to segfault when the syscall number had not been obtained
 	# on syscall entering.
-	grep -q '^[1-9][0-9]* <\.\.\. ???? resumed>) \+= ?$' "$LOG" && exit 0
+	grep -q '^[1-9][0-9]* <\.\.\. ??? resumed>) \+= ?$' "$LOG" && exit 0
 
 	s1="$(date +%s)"
 	if [ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ]; then
-		skip_ 'Unable to reproduce <... ???? resumed>'
+		skip_ 'Unable to reproduce <... ??? resumed>'
 	fi
 done

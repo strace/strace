@@ -2,9 +2,9 @@
  * Check for the corner case that previously lead to segfault
  * due to an attempt to access unitialised tcp->s_ent.
  *
- * 13994 ????( <unfinished ...>
+ * 13994 ???( <unfinished ...>
  * ...
- * 13994 <... ???? resumed>) = ?
+ * 13994 <... ??? resumed>) = ?
  *
  * Copyright (c) 2019 The strace developers.
  * All rights reserved.

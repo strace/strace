@@ -246,9 +246,9 @@ selinux_printfdcon(pid_t pid, int fd)
 		return;
 
 	tprint_space();
-	tprints("[");
+	tprint_attribute_begin();
 	print_context(ctx, exp);
-	tprints("]");
+	tprint_attribute_end();
 }
 
 void
@@ -261,9 +261,9 @@ selinux_printfilecon(struct tcb *tcp, const char *path)
 		return;
 
 	tprint_space();
-	tprints("[");
+	tprint_attribute_begin();
 	print_context(ctx, exp);
-	tprints("]");
+	tprint_attribute_end();
 }
 
 void
@@ -274,8 +274,8 @@ selinux_printpidcon(struct tcb *tcp)
 	if (selinux_getpidcon(tcp, &ctx) < 0)
 		return;
 
-	tprints("[");
+	tprint_attribute_begin();
 	print_context(ctx, NULL);
-	tprints("]");
+	tprint_attribute_end();
 	tprint_space();
 }
