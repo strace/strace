@@ -99,6 +99,68 @@ dm_decode_flags(const struct dm_ioctl *ioc)
 	PRINT_FIELD_FLAGS(*ioc, flags, dm_flags, "DM_???");
 }
 
+static bool
+dm_ioctl_has_params(const unsigned int code)
+{
+	switch (code) {
+	case DM_VERSION:
+	case DM_REMOVE_ALL:
+	case DM_DEV_CREATE:
+	case DM_DEV_REMOVE:
+	case DM_DEV_SUSPEND:
+	case DM_DEV_STATUS:
+	case DM_TABLE_CLEAR:
+	case DM_DEV_ARM_POLL:
+		return false;
+	}
+
+	return true;
+}
+
+static bool
+dm_decode_header(struct tcb *const tcp, const unsigned int code,
+		 const kernel_ulong_t arg, const struct dm_ioctl *const ioc)
+{
+	bool rc = false;
+
+	tprint_struct_begin();
+	/*
+	 * device mapper code uses %d in some places and %u in another, but
+	 * fields themselves are declared as __u32.
+	 */
+	PRINT_FIELD_U_ARRAY(*ioc, version);
+	/*
+	 * if we use a different version of ABI, do not attempt to decode
+	 * ioctl fields
+	 */
+	if (ioc->version[0] != DM_VERSION_MAJOR) {
+		tprints_comment("unsupported device mapper ABI version");
+		goto skip;
+	}
+
+	tprint_struct_next();
+	PRINT_FIELD_U(*ioc, data_size);
+
+	if (ioc->data_size < offsetof(struct dm_ioctl, data)) {
+		tprints_comment("data_size too small");
+		goto skip;
+	}
+
+	if (dm_ioctl_has_params(code)) {
+		tprint_struct_next();
+		PRINT_FIELD_U(*ioc, data_start);
+	}
+
+	dm_decode_device(code, ioc);
+	dm_decode_values(tcp, code, ioc);
+	dm_decode_flags(ioc);
+	rc = true;
+
+ skip:
+	tprint_struct_end();
+	return rc;
+}
+
 static void
 dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 			 const struct dm_ioctl *const ioc)
@@ -110,7 +172,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 
 	if (abbrev(tcp)) {
 		if (ioc->target_count) {
-			tprints(", ");
+			tprint_array_next();
 			tprint_more_data_follows();
 		}
 
@@ -118,7 +180,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 	}
 
 	for (uint32_t i = 0; i < ioc->target_count; ++i) {
-		tprints(", ");
+		tprint_array_next();
 
 		if (i && offset <= offset_end)
 			goto misplaced;
@@ -187,7 +249,7 @@ dm_decode_dm_target_deps(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (ioc->data_start == ioc->data_size)
 		return;
 
-	tprints(", ");
+	tprint_array_next();
 
 	if (abbrev(tcp)) {
 		tprint_more_data_follows();
@@ -245,13 +307,13 @@ dm_decode_dm_name_list(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	if (abbrev(tcp)) {
-		tprint_struct_next();
+		tprint_array_next();
 		tprint_more_data_follows();
 		return;
 	}
 
 	for (uint32_t count = 0;; ++count) {
-		tprints(", ");
+		tprint_array_next();
 
 		if (count && offset <= offset_end)
 			goto misplaced;
@@ -335,13 +397,13 @@ dm_decode_dm_target_versions(struct tcb *const tcp, const kernel_ulong_t addr,
 		return;
 
 	if (abbrev(tcp)) {
-		tprint_struct_next();
+		tprint_array_next();
 		tprint_more_data_follows();
 		return;
 	}
 
 	for (uint32_t count = 0;; ++count) {
-		tprints(", ");
+		tprint_array_next();
 
 		if (count && offset <= offset_end)
 			goto misplaced;
@@ -387,7 +449,7 @@ dm_decode_dm_target_msg(struct tcb *const tcp, const kernel_ulong_t addr,
 	if (ioc->data_start == ioc->data_size)
 		return;
 
-	tprints(", ");
+	tprint_array_next();
 
 	if (abbrev(tcp)) {
 		tprint_more_data_follows();
@@ -422,7 +484,7 @@ static void
 dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const struct dm_ioctl *const ioc)
 {
-	tprints(", ");
+	tprint_array_next();
 
 	if (abbrev(tcp)) {
 		tprint_more_data_follows();
@@ -432,31 +494,55 @@ dm_decode_string(struct tcb *const tcp, const kernel_ulong_t addr,
 	uint32_t offset = ioc->data_start;
 
 	if (offset <= ioc->data_size) {
+		tprint_struct_begin();
 		tprints_field_name("string");
 		printstr_ex(tcp, addr + offset, ioc->data_size - offset,
 			    QUOTE_0_TERMINATED);
+		tprint_struct_end();
 	} else {
 		tprint_unavailable();
 		tprints_comment("misplaced string");
 	}
 }
 
-static bool
-dm_ioctl_has_params(const unsigned int code)
+static void
+dm_decode_payload(struct tcb *const tcp, const unsigned int code,
+		  const kernel_ulong_t arg, const struct dm_ioctl *const ioc)
 {
 	switch (code) {
-	case DM_VERSION:
-	case DM_REMOVE_ALL:
-	case DM_DEV_CREATE:
-	case DM_DEV_REMOVE:
-	case DM_DEV_SUSPEND:
-	case DM_DEV_STATUS:
-	case DM_TABLE_CLEAR:
-	case DM_DEV_ARM_POLL:
-		return false;
+	case DM_DEV_WAIT:
+	case DM_TABLE_STATUS:
+		if (exiting(tcp) && !syserror(tcp))
+			dm_decode_dm_target_spec(tcp, arg, ioc);
+		break;
+	case DM_TABLE_LOAD:
+		if (entering(tcp))
+			dm_decode_dm_target_spec(tcp, arg, ioc);
+		break;
+	case DM_TABLE_DEPS:
+		if (exiting(tcp) && !syserror(tcp))
+			dm_decode_dm_target_deps(tcp, arg, ioc);
+		break;
+	case DM_LIST_DEVICES:
+		if (exiting(tcp) && !syserror(tcp))
+			dm_decode_dm_name_list(tcp, arg, ioc);
+		break;
+	case DM_LIST_VERSIONS:
+		if (exiting(tcp) && !syserror(tcp))
+			dm_decode_dm_target_versions(tcp, arg, ioc);
+		break;
+	case DM_TARGET_MSG:
+		if (entering(tcp))
+			dm_decode_dm_target_msg(tcp, arg, ioc);
+		else if (!syserror(tcp) && ioc->flags & DM_DATA_OUT_FLAG)
+			dm_decode_string(tcp, arg, ioc);
+		break;
+	case DM_DEV_RENAME:
+	case DM_DEV_SET_GEOMETRY:
+		if (entering(tcp))
+			dm_decode_string(tcp, arg, ioc);
+		break;
 	}
-
-	return true;
 }
 
 static int
@@ -510,81 +596,11 @@ dm_known_ioctl(struct tcb *const tcp, const unsigned int code,
 	else
 		tprint_value_changed();
 
-	tprint_struct_begin();
-	/*
-	 * device mapper code uses %d in some places and %u in another, but
-	 * fields themselves are declared as __u32.
-	 */
-	PRINT_FIELD_U_ARRAY(*ioc, version);
-	/*
-	 * if we use a different version of ABI, do not attempt to decode
-	 * ioctl fields
-	 */
-	if (ioc->version[0] != DM_VERSION_MAJOR) {
-		tprints_comment("unsupported device mapper ABI version");
-		goto skip;
-	}
+	tprint_array_begin();
+	if (dm_decode_header(tcp, code, arg, ioc))
+		dm_decode_payload(tcp, code, arg, ioc);
+	tprint_array_end();
 
-	tprint_struct_next();
-	PRINT_FIELD_U(*ioc, data_size);
-
-	if (ioc->data_size < offsetof(struct dm_ioctl, data)) {
-		tprints_comment("data_size too small");
-		goto skip;
-	}
-
-	if (dm_ioctl_has_params(code)) {
-		tprint_struct_next();
-		PRINT_FIELD_U(*ioc, data_start);
-	}
-
-	dm_decode_device(code, ioc);
-	dm_decode_values(tcp, code, ioc);
-	dm_decode_flags(ioc);
-
-	switch (code) {
-	case DM_DEV_WAIT:
-	case DM_TABLE_STATUS:
-		if (entering(tcp) || syserror(tcp))
-			break;
-		dm_decode_dm_target_spec(tcp, arg, ioc);
-		break;
-	case DM_TABLE_LOAD:
-		if (exiting(tcp))
-			break;
-		dm_decode_dm_target_spec(tcp, arg, ioc);
-		break;
-	case DM_TABLE_DEPS:
-		if (entering(tcp) || syserror(tcp))
-			break;
-		dm_decode_dm_target_deps(tcp, arg, ioc);
-		break;
-	case DM_LIST_DEVICES:
-		if (entering(tcp) || syserror(tcp))
-			break;
-		dm_decode_dm_name_list(tcp, arg, ioc);
-		break;
-	case DM_LIST_VERSIONS:
-		if (entering(tcp) || syserror(tcp))
-			break;
-		dm_decode_dm_target_versions(tcp, arg, ioc);
-		break;
-	case DM_TARGET_MSG:
-		if (entering(tcp))
-			dm_decode_dm_target_msg(tcp, arg, ioc);
-		else if (!syserror(tcp) && ioc->flags & DM_DATA_OUT_FLAG)
-			dm_decode_string(tcp, arg, ioc);
-		break;
-	case DM_DEV_RENAME:
-	case DM_DEV_SET_GEOMETRY:
-		if (exiting(tcp))
-			break;
-		dm_decode_string(tcp, arg, ioc);
-		break;
-	}
-
- skip:
-	tprint_struct_end();
 	return entering(tcp) ? 0 : RVAL_IOCTL_DECODED;
 }
 
