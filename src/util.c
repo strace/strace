@@ -402,7 +402,7 @@ void
 printaddr64(const uint64_t addr)
 {
 	if (!addr)
-		tprints("NULL");
+		tprint_null();
 	else
 		PRINT_VAL_X(addr);
 }
@@ -1110,7 +1110,7 @@ printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
 	int nul_seen;
 
 	if (!addr) {
-		tprints("NULL");
+		tprint_null();
 		return -1;
 	}
 
@@ -1164,7 +1164,7 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	int ellipsis;
 
 	if (!addr) {
-		tprints("NULL");
+		tprint_null();
 		return -1;
 	}
 	/* Allocate static buffers if they are not allocated yet. */
@@ -1620,7 +1620,7 @@ print_array_ex(struct tcb *const tcp,
 	       const char *index_dflt)
 {
 	if (!start_addr) {
-		tprints("NULL");
+		tprint_null();
 		return false;
 	}
 

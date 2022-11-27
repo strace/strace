@@ -205,6 +205,12 @@ tprint_space(void)
 }
 
 static inline void
+tprint_null(void)
+{
+	STRACE_PRINTS("NULL");
+}
+
+static inline void
 tprints_field_name(const char *name)
 {
 	STRACE_PRINTF("%s=", name);
