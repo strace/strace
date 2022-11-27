@@ -794,7 +794,8 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		tprint_arg_end();
 		tprint_space();
 		tabto();
-		tprints("= ? <unavailable>\n");
+		tprints("= ? <unavailable>");
+		tprint_newline();
 		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 			bool publish = is_number_in_set(STATUS_UNAVAILABLE,
 							status_set);
@@ -984,7 +985,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 		tprints(">");
 	}
-	tprints("\n");
+	tprint_newline();
 	dumpio(tcp);
 	line_ended();
 

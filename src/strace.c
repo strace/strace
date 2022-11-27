@@ -573,8 +573,10 @@ ptrace_restart(const unsigned int op, struct tcb *const tcp, unsigned int sig)
 	 * but before we tried to restart it. Log looks ugly.
 	 */
 	if (current_tcp && current_tcp->curcol != 0) {
-		tprintf(" <Cannot restart pid %d with ptrace(%s): %s>\n",
+		tprint_space();
+		tprintf("<Cannot restart pid %d with ptrace(%s): %s>",
 			tcp->pid, ptrace_op_str(op), strerror(err));
+		tprint_newline();
 		line_ended();
 	}
 	errno = err;
@@ -819,7 +821,9 @@ printleader(struct tcb *tcp)
 			 * case 2: split log, we are the same tcb, but our last line
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
-			tprints(" <unfinished ...>\n");
+			tprint_space();
+			tprints("<unfinished ...>");
+			tprint_newline();
 			printing_tcp->curcol = 0;
 		}
 	}
@@ -3137,8 +3141,9 @@ maybe_switch_tcbs(struct tcb *tcp, const int pid)
 	if (cflag != CFLAG_ONLY_STATS) {
 		if (!is_number_in_set(QUIET_THREAD_EXECVE, quiet_set)) {
 			printleader(tcp);
-			tprintf("+++ superseded by execve in pid %lu +++\n",
+			tprintf("+++ superseded by execve in pid %lu +++",
 				old_pid);
+			tprint_newline();
 			line_ended();
 		}
 		/*
@@ -3175,9 +3180,10 @@ print_signalled(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS
 	    && is_number_in_set(WTERMSIG(status), signal_set)) {
 		printleader(tcp);
-		tprintf("+++ killed by %s %s+++\n",
+		tprintf("+++ killed by %s %s+++",
 			sprintsigname(WTERMSIG(status)),
 			WCOREDUMP(status) ? "(core dumped) " : "");
+		tprint_newline();
 		line_ended();
 	}
 }
@@ -3193,7 +3199,8 @@ print_exited(struct tcb *tcp, const int pid, int status)
 	if (cflag != CFLAG_ONLY_STATS &&
 	    !is_number_in_set(QUIET_EXIT, quiet_set)) {
 		printleader(tcp);
-		tprintf("+++ exited with %d +++\n", WEXITSTATUS(status));
+		tprintf("+++ exited with %d +++", WEXITSTATUS(status));
+		tprint_newline();
 		line_ended();
 	}
 }
@@ -3208,9 +3215,10 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 		if (si) {
 			tprintf("--- %s ", sprintsigname(sig));
 			printsiginfo(tcp, si);
-			tprints(" ---\n");
+			tprints(" ---");
 		} else
-			tprintf("--- stopped by %s ---\n", sprintsigname(sig));
+			tprintf("--- stopped by %s ---", sprintsigname(sig));
+		tprint_newline();
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
@@ -3257,7 +3265,9 @@ print_event_exit(struct tcb *tcp)
 	if (!output_separately && printing_tcp && printing_tcp != tcp
 	    && printing_tcp->curcol != 0) {
 		set_current_tcp(printing_tcp);
-		tprints(" <unfinished ...>\n");
+		tprint_space();
+		tprints("<unfinished ...>");
+		tprint_newline();
 		flush_tcp_output(printing_tcp);
 		printing_tcp->curcol = 0;
 		set_current_tcp(tcp);
@@ -3270,13 +3280,15 @@ print_event_exit(struct tcb *tcp)
 		 * The decoder has probably decided to print something
 		 * on exiting syscall which is not going to happen.
 		 */
-		tprints(" <unfinished ...>");
+		tprint_space();
+		tprints("<unfinished ...>");
 	}
 
 	printing_tcp = tcp;
 	tprints(") ");
 	tabto();
-	tprints("= ?\n");
+	tprints("= ?");
+	tprint_newline();
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = is_number_in_set(STATUS_UNFINISHED, status_set);
 		strace_close_memstream(tcp, publish);
