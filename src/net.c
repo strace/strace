@@ -775,25 +775,31 @@ print_icmp_filter(struct tcb *const tcp, const kernel_ulong_t addr, int len)
 	if (umoven_or_printaddr(tcp, addr, len, &filter))
 		return;
 
-	uint32_t data = filter.data;
-	static_assert(sizeof(filter.data) == sizeof(data),
+	uint32_t data32 = filter.data;
+	static_assert(sizeof(filter.data) == sizeof(data32),
 		      "struct icmp_filter.data is not 32-bit long");
 
-	uint32_t inverted_data;
-	uint32_t *p = &data;
-
 	/* check whether more than half of the bits are set */
-	if (popcount32(p, 1) > sizeof(*p) * 8 / 2) {
+	if (popcount32(&data32, 1) > sizeof(data32) * 8 / 2) {
 		/* show those bits that are NOT in the set */
-		inverted_data = ~data;
-		p = &inverted_data;
+		data32 = ~data32;
 		tprints("~");
+	}
+
+	/* next_set_bit operates on current_wordsize words */
+	unsigned long data;
+	void *p;
+	if (current_wordsize > sizeof(data32)) {
+		data = data32;
+		p = &data;
+	} else {
+		p = &data32;
 	}
 
 	tprint_bitset_begin();
 	bool next = false;
 	for (int i = 0;; ++i) {
-		i = next_set_bit(p, i, sizeof(*p) * 8);
+		i = next_set_bit(p, i, sizeof(data32) * 8);
 		if (i < 0)
 			break;
 		if (next)
