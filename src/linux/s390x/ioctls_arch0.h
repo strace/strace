@@ -17,6 +17,7 @@
 { "asm/dasd.h", "BIODASDABORTIO", _IOC_NONE, 0x44f0, 0x00 },
 { "asm/dasd.h", "BIODASDALLOWIO", _IOC_NONE, 0x44f1, 0x00 },
 { "asm/dasd.h", "BIODASDCHECKFMT", _IOC_READ|_IOC_WRITE, 0x4402, 0x28 },
+{ "asm/dasd.h", "BIODASDCOPYPAIRSWAP", _IOC_WRITE, 0x4404, 0x68 },
 { "asm/dasd.h", "BIODASDDISABLE", _IOC_NONE, 0x4400, 0x00 },
 { "asm/dasd.h", "BIODASDENABLE", _IOC_NONE, 0x4401, 0x00 },
 { "asm/dasd.h", "BIODASDFMT", _IOC_WRITE, 0x4401, 0x10 },

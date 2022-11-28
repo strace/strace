@@ -3,6 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Enhanced decoding of terminal ioctl commands.
+  * Updated lists of ioctl commands from Linux 6.1.
 
 * Bug fixes
   * Fixed injection tests on ia64.
