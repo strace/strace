@@ -53,15 +53,17 @@ print_nlattr(const struct nlattr *const nla,
 	PRINT_FIELD_U(*nla, nla_len);
 	tprint_struct_next();
 	tprints_field_name("nla_type");
+	tprint_flags_begin();
 	if (nla->nla_type & NLA_F_NESTED) {
 		print_xlat(NLA_F_NESTED);
-		tprint_or();
+		tprint_flags_or();
 	}
 	if (nla->nla_type & NLA_F_NET_BYTEORDER) {
 		print_xlat(NLA_F_NET_BYTEORDER);
-		tprint_or();
+		tprint_flags_or();
 	}
 	printxval(table, nla->nla_type & NLA_TYPE_MASK, dflt);
+	tprint_flags_end();
 	tprint_struct_end();
 }
 
@@ -507,7 +509,7 @@ decode_nla_ ## name(struct tcb *const tcp,		\
 	if (len < sizeof(num))				\
 		return false;				\
 	if (!umove_or_printaddr(tcp, addr, &num))	\
-		tprintf(fmt, num);			\
+          tprintf_string(fmt, num);			\
 	return true;					\
 }
 

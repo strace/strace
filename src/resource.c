@@ -36,7 +36,7 @@ print_rlim64_t(uint64_t lim) {
 		return;
 
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-                ? tprints_comment : tprints)(str);
+                ? tprints_comment : tprints_string)(str);
 }
 
 static void
@@ -78,7 +78,7 @@ print_rlim32_t(uint32_t lim) {
 		return;
 
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-                ? tprints_comment : tprints)(str);
+                ? tprints_comment : tprints_string)(str);
 }
 
 static void

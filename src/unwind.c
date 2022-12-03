@@ -111,7 +111,7 @@ print_call_cb(void *dummy,
 			cplus_demangle(symbol_name,
 				       DMGL_AUTO | DMGL_PARAMS);
 #endif
-		tprintf(STACK_ENTRY_SYMBOL_FMT(
+		tprintf_dummy(STACK_ENTRY_SYMBOL_FMT(
 #ifdef USE_DEMANGLE
 					       demangled_name ? demangled_name :
 #endif
@@ -121,9 +121,9 @@ print_call_cb(void *dummy,
 #endif
 	}
 	else if (binary_filename)
-		tprintf(STACK_ENTRY_NOSYMBOL_FMT);
+		tprintf_dummy(STACK_ENTRY_NOSYMBOL_FMT);
 	else
-		tprintf(STACK_ENTRY_BUG_FMT, __func__);
+		tprintf_dummy(STACK_ENTRY_BUG_FMT, __func__);
 
 	line_ended();
 }
@@ -134,9 +134,9 @@ print_error_cb(void *dummy,
 	       unsigned long true_offset)
 {
 	if (true_offset)
-		tprintf(STACK_ENTRY_ERROR_WITH_OFFSET_FMT);
+		tprintf_dummy(STACK_ENTRY_ERROR_WITH_OFFSET_FMT);
 	else
-		tprintf(STACK_ENTRY_ERROR_FMT);
+		tprintf_dummy(STACK_ENTRY_ERROR_FMT);
 
 	line_ended();
 }
@@ -249,7 +249,7 @@ queue_print(struct unwind_queue_t *queue)
 		tmp = call;
 		call = call->next;
 
-		tprints(tmp->output_line);
+		tprints_dummy(tmp->output_line);
 		line_ended();
 
 		if (tmp->output_line != asprintf_error_str)

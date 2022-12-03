@@ -130,7 +130,7 @@ print_ifc_len(int len)
 	if (len > 0 && n * sizeof(struct_ifreq) == (unsigned int) len) {
 		tprint_comment_begin();
 		PRINT_VAL_U(n);
-		tprints(" * sizeof(struct ifreq)");
+		tprints_string(" * sizeof(struct ifreq)");
 		tprint_comment_end();
 	}
 

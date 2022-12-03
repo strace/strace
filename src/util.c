@@ -4,8 +4,8 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
- *                     Linux for s390 port by D.J. Barrow
- *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
+ *		       Linux for s390 port by D.J. Barrow
+ *		      <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 1999-2022 The strace developers.
  * All rights reserved.
  *
@@ -39,7 +39,7 @@ find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
 {
 	for (size_t i = 0; i < num_items; i++) {
 		if (!(flags & FXL_CASE_SENSITIVE ? strcmp
-						 : strcasecmp)(items[i].str, s))
+		      : strcasecmp)(items[i].str, s))
 			return items + i;
 	}
 
@@ -48,14 +48,14 @@ find_xlat_val_ex(const struct xlat_data * const items, const char * const s,
 
 uint64_t
 find_arg_val_(const char *arg, const struct xlat_data *strs, size_t strs_size,
-	       uint64_t default_val, uint64_t not_found)
+	      uint64_t default_val, uint64_t not_found)
 {
 	if (!arg)
 		return default_val;
 
 	const struct xlat_data *res = find_xlat_val_ex(strs, arg, strs_size, 0);
 
-	return  res ? res->val : not_found;
+	return	res ? res->val : not_found;
 }
 
 int
@@ -65,8 +65,8 @@ str2timescale_ex(const char *arg, int empty_dflt, int null_dflt,
 	static const struct xlat_data units[] = {
 		{ 1000000000U | (0ULL << 32), "s" },
 		{ 1000000U    | (3ULL << 32), "ms" },
-		{ 1000U       | (6ULL << 32), "us" },
-		{ 1U          | (9ULL << 32), "ns" },
+		{ 1000U	      | (6ULL << 32), "us" },
+		{ 1U	      | (9ULL << 32), "ns" },
 	};
 
 	if (!arg)
@@ -202,7 +202,7 @@ parse_ts(const char *s, struct timespec *t)
 			(ret_) += (pow_);	\
 		}				\
 	} while (0)				\
-	/* End of ILOG10_ITER_ */
+		/* End of ILOG10_ITER_ */
 
 /* Returns 0 for 0. */
 static int
@@ -211,10 +211,10 @@ ilog10(uint64_t val)
 	int ret = 0;
 
 	ILOG10_ITER_(val, 10000000000000000ULL, ret, 16);
-	ILOG10_ITER_(val, 100000000,            ret, 8);
-	ILOG10_ITER_(val, 10000,                ret, 4);
-	ILOG10_ITER_(val, 100,                  ret, 2);
-	ILOG10_ITER_(val, 10,                   ret, 1);
+	ILOG10_ITER_(val, 100000000,		ret, 8);
+	ILOG10_ITER_(val, 10000,		ret, 4);
+	ILOG10_ITER_(val, 100,			ret, 2);
+	ILOG10_ITER_(val, 10,			ret, 1);
 
 	return ret;
 }
@@ -346,19 +346,19 @@ getllval(struct tcb *tcp, unsigned long long *val, unsigned int arg_no)
 		arg_no++;
 	}
 #else /* SIZEOF_KERNEL_LONG_T == 4 */
-# if defined __ARM_EABI__	\
-  || defined LINUX_MIPSO32	\
-  || defined POWERPC		\
-  || defined XTENSA
+# if defined __ARM_EABI__			\
+	|| defined LINUX_MIPSO32		\
+	|| defined POWERPC			\
+	|| defined XTENSA
 	/* Align arg_no to the next even number. */
 	arg_no = (arg_no + 1) & 0xe;
 # elif defined SH
 	/*
 	 * The SH4 ABI does allow long longs in odd-numbered registers, but
 	 * does not allow them to be split between registers and memory - and
-	 * there are only four argument registers for normal functions.  As a
+	 * there are only four argument registers for normal functions.	 As a
 	 * result, pread, for example, takes an extra padding argument before
-	 * the offset.  This was changed late in the 2.4 series (around 2.4.20).
+	 * the offset.	This was changed late in the 2.4 series (around 2.4.20).
 	 */
 	if (arg_no == 3)
 		arg_no++;
@@ -407,59 +407,59 @@ printaddr64(const uint64_t addr)
 		PRINT_VAL_X(addr);
 }
 
-#define DEF_PRINTNUM(name, type) \
-bool									\
-printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
-		  const char *const fmt)				\
-{									\
-	type num;							\
-	if (umove_or_printaddr(tcp, addr, &num))			\
-		return false;						\
-	tprint_indirect_begin();					\
-	tprintf(fmt, num);						\
-	tprint_indirect_end();						\
-	return true;							\
-}
+#define DEF_PRINTNUM(name, type)					\
+	bool								\
+	printnum_ ## name(struct tcb *const tcp, const kernel_ulong_t addr, \
+			  const char *const fmt)			\
+	{								\
+		type num;						\
+		if (umove_or_printaddr(tcp, addr, &num))		\
+			return false;					\
+		tprint_indirect_begin();				\
+		tprintf_string(fmt, num);				\
+		tprint_indirect_end();					\
+		return true;						\
+	}
 
-#define DEF_PRINTNUM_ADDR(name, type) \
-bool									\
-printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr)	\
-{									\
-	type num;							\
-	if (umove_or_printaddr(tcp, addr, &num))			\
-		return false;						\
-	tprint_indirect_begin();					\
-	printaddr64(num);						\
-	tprint_indirect_end();						\
-	return true;							\
-}
+#define DEF_PRINTNUM_ADDR(name, type)					\
+	bool								\
+	printnum_addr_ ## name(struct tcb *tcp, const kernel_ulong_t addr) \
+	{								\
+		type num;						\
+		if (umove_or_printaddr(tcp, addr, &num))		\
+			return false;					\
+		tprint_indirect_begin();				\
+		printaddr64(num);					\
+		tprint_indirect_end();					\
+		return true;						\
+	}
 
-#define DEF_PRINTPAIR(name, type) \
-bool									\
-printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr,	\
-		   const char *const fmt)				\
-{									\
-	type pair[2];							\
-	if (umove_or_printaddr(tcp, addr, &pair))			\
-		return false;						\
-	tprint_array_begin();						\
-	tprintf(fmt, pair[0]);						\
-	tprint_array_next();						\
-	tprintf(fmt, pair[1]);						\
-	tprint_array_end();						\
-	return true;							\
-}
+#define DEF_PRINTPAIR(name, type)					\
+	bool								\
+	printpair_ ## name(struct tcb *const tcp, const kernel_ulong_t addr, \
+			   const char *const fmt)			\
+	{								\
+		type pair[2];						\
+		if (umove_or_printaddr(tcp, addr, &pair))		\
+			return false;					\
+		tprint_array_begin();					\
+		tprintf_string(fmt, pair[0]);				\
+		tprint_array_next();					\
+		tprintf_string(fmt, pair[1]);				\
+		tprint_array_end();					\
+		return true;						\
+	}
 
 DEF_PRINTNUM(int, int)
-DEF_PRINTNUM_ADDR(int, unsigned int)
-DEF_PRINTPAIR(int, int)
-DEF_PRINTNUM(short, short)
-DEF_PRINTNUM(int64, uint64_t)
-DEF_PRINTNUM_ADDR(int64, uint64_t)
-DEF_PRINTPAIR(int64, uint64_t)
+	DEF_PRINTNUM_ADDR(int, unsigned int)
+	DEF_PRINTPAIR(int, int)
+	DEF_PRINTNUM(short, short)
+	DEF_PRINTNUM(int64, uint64_t)
+	DEF_PRINTNUM_ADDR(int64, uint64_t)
+	DEF_PRINTPAIR(int64, uint64_t)
 
-bool
-printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
+	bool
+	printnum_fd(struct tcb *const tcp, const kernel_ulong_t addr)
 {
 	int fd;
 	if (umove_or_printaddr(tcp, addr, &fd))
@@ -564,7 +564,7 @@ print_uuid(const unsigned char *uuid)
 		'\0'
 	};
 
-	tprints(str);
+	tprints_string(str);
 }
 
 enum sock_proto
@@ -630,7 +630,7 @@ static void
 print_string_in_angle_brackets(const char *str)
 {
 	tprint_associated_info_begin();
-	tprints(str);
+	tprints_string(str);
 	tprint_associated_info_end();
 }
 
@@ -668,7 +668,7 @@ printdev(struct tcb *tcp, int fd, const char *path)
 				       QUOTE_OMIT_LEADING_TRAILING_QUOTES,
 				       "<>");
 		tprint_associated_info_begin();
-		tprintf("%s %u:%u",
+		tprintf_dummy("%s %u:%u",
 			S_ISBLK(st.st_mode)? "block" : "char",
 			major(st.st_rdev), minor(st.st_rdev));
 		tprint_associated_info_end();
@@ -724,7 +724,7 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	pid_t pid = pidfd_get_pid(pid_of_fd, fd);
 	if (pid > 0) {
 		tprint_associated_info_begin();
-		tprints("pid:");
+		tprints_dummy("pid:");
 		/*
 		 * The pid translation is not needed because
 		 * the pid is in strace's namespace.
@@ -747,18 +747,21 @@ print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 	tprint_associated_info_end();
 
 	if (deleted)
-		tprints("(deleted)");
+		tprints_dummy("(deleted)");
 }
 
 void
-printfd_pid(struct tcb *tcp, pid_t pid, int fd)
+printfd_pid(const char* field, struct tcb *tcp, pid_t pid, int fd)
 {
-	PRINT_VAL_D(fd);
-
 	char path[PATH_MAX + 1];
 	bool deleted;
 	if (pid > 0 && !number_set_array_is_empty(decode_fd_set, 0)
 	    && getfdpath_pid(pid, fd, path, sizeof(path), &deleted) >= 0) {
+
+		if(field != NULL) tprints_field_set(field);
+		if(structured_output) tprint_array_begin();
+		PRINT_VAL_D(fd);
+		if(structured_output) tprint_array_next();
 		if (is_number_in_set(DECODE_FD_SOCKET, decode_fd_set) &&
 		    printsocket(tcp, fd, path))
 			goto printed;
@@ -768,9 +771,21 @@ printfd_pid(struct tcb *tcp, pid_t pid, int fd)
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
 			goto printed;
-		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
+		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set)){
 			print_quoted_string_in_angle_brackets(path, deleted);
-printed:	;
+			goto printed;
+		}
+		if(structured_output) tprints_string("<unknown>");
+	printed:
+		if(structured_output) tprint_array_end();
+		if(field != NULL) tprint_field_end();
+		;
+	} else {
+		if(field != NULL){
+			PRINT_VAL_D_FIELD(field, fd);
+		} else {
+			PRINT_VAL_D(fd);
+		}
 	}
 
 	selinux_printfdcon(pid, fd);
@@ -780,7 +795,7 @@ void
 printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd)
 {
 	int strace_pid = translate_pid(tcp, pid, PT_TGID, NULL);
-	printfd_pid(tcp, strace_pid, fd);
+	printfd_pid(NULL, tcp, strace_pid, fd);
 }
 
 const char *
@@ -869,9 +884,9 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 	int usehex, c, eol;
 	bool printable;
 	enum xflag_opts xstyle = style & QUOTE_OVERWRITE_HEXSTR
-					? ((style & QUOTE_HEXSTR_MASK)
-					   >> QUOTE_HEXSTR_SHIFT)
-					: xflag;
+		? ((style & QUOTE_HEXSTR_MASK)
+		   >> QUOTE_HEXSTR_SHIFT)
+		: xflag;
 
 	if (style & QUOTE_0_TERMINATED)
 		eol = '\0';
@@ -917,9 +932,24 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			/* Check for NUL-terminated string. */
 			if (c == eol)
 				goto asciz_ended;
-			*s++ = '\\';
-			*s++ = 'x';
-			s = sprint_byte_hex(s, c);
+			if(structured_output){
+				if ( structured_output->
+				     structured_output_ESCAPES_WITH_U_XXXX){
+					*s++ = '\\';
+					*s++ = 'u';
+					*s++ = '0';
+					*s++ = '0';
+					s = sprint_byte_hex(s, c);
+				} else {
+					*s++ = '\\';
+					*s++ = 'x';
+					s = sprint_byte_hex(s, c);
+				}
+			} else {
+				*s++ = '\\';
+				*s++ = 'x';
+				s = sprint_byte_hex(s, c);
+			}
 		}
 
 		goto string_ended;
@@ -938,10 +968,6 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = '\\';
 			*s++ = c;
 			break;
-		case '\f':
-			*s++ = '\\';
-			*s++ = 'f';
-			break;
 		case '\n':
 			*s++ = '\\';
 			*s++ = 'n';
@@ -954,10 +980,20 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			*s++ = '\\';
 			*s++ = 't';
 			break;
+		case '\f':
+			if(! structured_output){
+				*s++ = '\\';
+				*s++ = 'f';
+				break;
+			}
+			__attribute__ ((fallthrough));
 		case '\v':
-			*s++ = '\\';
-			*s++ = 'v';
-			break;
+			if(!structured_output){
+				*s++ = '\\';
+				*s++ = 'v';
+				break;
+			}
+			__attribute__ ((fallthrough));
 		default:
 			printable = is_print(c);
 
@@ -967,24 +1003,38 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 			if (printable) {
 				*s++ = c;
 			} else {
-				if (xstyle == HEXSTR_NON_ASCII_CHARS) {
-					/* Print he\x */
-					*s++ = '\\';
-					*s++ = 'x';
-					s = sprint_byte_hex(s, c);
-				} else {
-					/* Print \octal */
-					*s++ = '\\';
-					s = sprint_byte_oct(s, c,
-							i + 1 < size
-							&& ustr[i + 1] >= '0'
-							&& ustr[i + 1] <= '7');
-				}
+				if(structured_output){
+					if ( structured_output->
+					     structured_output_ESCAPES_WITH_U_XXXX){
+						*s++ = '\\';
+						*s++ = 'u';
+						*s++ = '0';
+						*s++ = '0';
+						s = sprint_byte_hex(s, c);
+					} else {
+						*s++ = '\\';
+						*s++ = 'x';
+						s = sprint_byte_hex(s, c);
+					}
+				} else
+					if ( xstyle == HEXSTR_NON_ASCII_CHARS) {
+						/* Print he\x */
+						*s++ = '\\';
+						*s++ = 'x';
+						s = sprint_byte_hex(s, c);
+					} else {
+						/* Print \octal */
+						*s++ = '\\';
+						s = sprint_byte_oct(s, c,
+								    i + 1 < size
+								    && ustr[i + 1] >= '0'
+								    && ustr[i + 1] <= '7');
+					}
 			}
 		}
 	}
 
- string_ended:
+string_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 	if (style & QUOTE_EMIT_COMMENT)
@@ -1001,7 +1051,7 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
 
 	return 1;
 
- asciz_ended:
+asciz_ended:
 	if (!(style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
 		*s++ = '\"';
 	if (style & QUOTE_EMIT_COMMENT)
@@ -1031,12 +1081,16 @@ string_quote(const char *instr, char *outstr, const unsigned int size,
  */
 int
 print_quoted_string_ex(const char *str, unsigned int size,
-		       const unsigned int style, const char *escape_chars)
+		       unsigned int style, const char *escape_chars)
 {
 	char *buf;
 	char *outstr;
 	unsigned int alloc_size;
 	int rc;
+
+	if(structured_output &&
+	    (style & QUOTE_OMIT_LEADING_TRAILING_QUOTES))
+		style = style & ~QUOTE_OMIT_LEADING_TRAILING_QUOTES;
 
 	if (size && style & QUOTE_0_TERMINATED)
 		--size;
@@ -1065,7 +1119,7 @@ print_quoted_string_ex(const char *str, unsigned int size,
 	}
 
 	rc = string_quote(str, outstr, size, style, escape_chars);
-	tprints(outstr);
+	tprints_quoted_string(outstr);
 
 	if (((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
 	     == (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0)) && rc) {
@@ -1214,13 +1268,16 @@ printstr_ex(struct tcb *const tcp, const kernel_ulong_t addr,
 	 * or we were requested to print more than -s NUM chars)...
 	 */
 	ellipsis = string_quote(str, outstr, size, style, NULL)
-		   && len
-		   && ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
-		       || len > max_strlen);
+		&& len
+		&& ((style & (QUOTE_0_TERMINATED | QUOTE_EXPECT_TRAILING_0))
+		    || len > max_strlen);
 
-	tprints(outstr);
-	if (ellipsis)
+	if (ellipsis){
+		tprints_quoted_partial_string(outstr);
 		tprint_more_data_follows();
+	} else {
+		tprints_quoted_string(outstr);
+	}
 
 	return rc;
 }
@@ -1244,7 +1301,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 
 	if (!str) {
 		error_func_msg("memory exhausted when tried to allocate"
-                               " %u bytes", len);
+			       " %u bytes", len);
 		prefix_fun();
 		tprint_unavailable();
 		return true;
@@ -1259,7 +1316,7 @@ print_nonzero_bytes(struct tcb *const tcp,
 		ret = false;
 	} else {
 		prefix_fun();
-		tprintf("/* bytes %u..%u */ ", start_offs, total_len - 1);
+		tprintf_string("/* bytes %u..%u */ ", start_offs, total_len - 1);
 
 		print_quoted_string(str, size, style);
 
@@ -1281,12 +1338,12 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 		struct { uint64_t base; uint64_t len; } *iov64;
 	} iovu;
 # define iov iovu.iov64
-# define sizeof_iov \
+# define sizeof_iov							\
 	(current_wordsize == 4 ? (unsigned int) sizeof(*iovu.iov32)	\
-			       : (unsigned int) sizeof(*iovu.iov64))
-# define iov_iov_base(i) \
+	 : (unsigned int) sizeof(*iovu.iov64))
+# define iov_iov_base(i)						\
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].base : iovu.iov64[i].base)
-# define iov_iov_len(i) \
+# define iov_iov_len(i)							\
 	(current_wordsize == 4 ? (uint64_t) iovu.iov32[i].len : iovu.iov64[i].len)
 #else
 	struct iovec *iov;
@@ -1317,7 +1374,7 @@ dumpiov_upto(struct tcb *const tcp, const int len, const kernel_ulong_t addr,
 			data_size -= iov_len;
 			/* include the buffer number to make it easy to
 			 * match up the trace with the source */
-			tprintf(" * %" PRI_klu " bytes in buffer %d\n", iov_len, i);
+			tprintf_string(" * %" PRI_klu " bytes in buffer %d\n", iov_len, i);
 			dumpstr(tcp, iov_iov_base(i), iov_len);
 		}
 	}
@@ -1342,7 +1399,7 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 
 		/** Width of formatted dump in characters.  */
 		DUMPSTR_WIDTH_CHARS = DUMPSTR_WIDTH_BYTES +
-			sizeof("xx") * DUMPSTR_WIDTH_BYTES + DUMPSTR_GROUPS,
+		sizeof("xx") * DUMPSTR_WIDTH_BYTES + DUMPSTR_GROUPS,
 
 		DUMPSTR_GROUP_MASK = DUMPSTR_GROUP_BYTES - 1,
 		DUMPSTR_BYTES_MASK = DUMPSTR_WIDTH_BYTES - 1,
@@ -1416,12 +1473,12 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 				 * something already.
 				 */
 				if (i)
-					tprintf(" | <Cannot fetch %" PRI_klu
-						" byte%s from pid %d"
-						" @%#" PRI_klx ">\n",
-						fetch_size,
-						fetch_size == 1 ? "" : "s",
-						tcp->pid, addr + i);
+					tprintf_string(" | <Cannot fetch %" PRI_klu
+						       " byte%s from pid %d"
+						       " @%#" PRI_klx ">\n",
+						       fetch_size,
+						       fetch_size == 1 ? "" : "s",
+						       tcp->pid, addr + i);
 				return;
 			}
 			src = str;
@@ -1457,8 +1514,8 @@ dumpstr(struct tcb *const tcp, const kernel_ulong_t addr,
 			src++;
 		} while (++i & DUMPSTR_BYTES_MASK);
 
-		tprintf(" | %0*" PRI_klx "  %s |\n",
-			offs_chars, i - DUMPSTR_WIDTH_BYTES, outbuf);
+		tprintf_string(" | %0*" PRI_klx "  %s |\n",
+			       offs_chars, i - DUMPSTR_WIDTH_BYTES, outbuf);
 	}
 }
 
@@ -1467,8 +1524,8 @@ tfetch_mem64(struct tcb *const tcp, const uint64_t addr,
 	     const unsigned int len, void *const our_addr)
 {
 	return addr && verbose(tcp) &&
-	       (entering(tcp) || !syserror(tcp)) &&
-	       !umoven(tcp, addr, len, our_addr);
+		(entering(tcp) || !syserror(tcp)) &&
+		!umoven(tcp, addr, len, our_addr);
 }
 
 bool
@@ -1476,7 +1533,7 @@ tfetch_mem64_ignore_syserror(struct tcb *const tcp, const uint64_t addr,
 			     const unsigned int len, void *const our_addr)
 {
 	return addr && verbose(tcp) &&
-	       !umoven(tcp, addr, len, our_addr);
+		!umoven(tcp, addr, len, our_addr);
 }
 
 int
@@ -1507,7 +1564,7 @@ umoven_to_uint64_or_printaddr64(struct tcb *const tcp, const uint64_t addr,
 {
 	union {
 		uint64_t val;
-		uint8_t  bytes[sizeof(uint64_t)];
+		uint8_t	 bytes[sizeof(uint64_t)];
 	} data = { .val = 0 };
 	const size_t offs = is_bigendian ? sizeof(data) - len : 0;
 
@@ -1649,11 +1706,12 @@ print_array_ex(struct tcb *const tcp,
 
 	const kernel_ulong_t abbrev_end =
 		(abbrev(tcp) && max_strlen < nmemb) ?
-			start_addr + elem_size * max_strlen : end_addr;
+		start_addr + elem_size * max_strlen : end_addr;
 	kernel_ulong_t cur;
 	kernel_ulong_t idx = 0;
 	enum xlat_style xlat_style = flags & XLAT_STYLE_MASK;
 	bool truncated = false;
+	bool break_needed = false;
 
 	for (cur = start_addr; cur < end_addr; cur += elem_size, idx++) {
 		if (cur != start_addr)
@@ -1694,10 +1752,15 @@ print_array_ex(struct tcb *const tcp,
 					     xlat_style);
 			}
 
-			tprint_array_index_end();
+			tprint_array_index_equal();
 		}
 
-		if (!print_func(tcp, elem_buf, elem_size, opaque_data)) {
+		break_needed =
+			!print_func(tcp, elem_buf, elem_size, opaque_data);
+		if (flags & PAF_PRINT_INDICES) {
+			tprint_array_index_end();
+		}
+		if(break_needed){
 			cur = end_addr;
 			break;
 		}
@@ -1760,10 +1823,12 @@ print_abnormal_hi(const kernel_ulong_t val)
 	if (current_klongsize > 4) {
 		const unsigned int hi = (unsigned int) ((uint64_t) val >> 32);
 		if (hi) {
+			tprint_shift_begin();
 			PRINT_VAL_X(hi);
 			tprint_shift();
 			PRINT_VAL_U(32);
-			tprint_or();
+			tprint_shift_end();
+			tprint_flags_or();
 		}
 	}
 }

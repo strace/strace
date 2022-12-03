@@ -323,6 +323,8 @@ struct tcb {
 	struct unwind_queue_t *unwind_queue;
 # endif
 
+        uint8_t  structured_state;
+
 # define PROC_COMM_LEN 16
 	char comm[PROC_COMM_LEN];
 };
@@ -1212,12 +1214,19 @@ extern pid_t pidfd_get_pid(pid_t pid_of_fd, int fd);
  * Print file descriptor fd owned by process with ID pid (from the PID NS
  * of the tracer).
  */
-extern void printfd_pid(struct tcb *tcp, pid_t pid, int fd);
+extern void printfd_pid(const char* field,
+                        struct tcb *tcp, pid_t pid, int fd); /* util.c */
 
 static inline void
 printfd(struct tcb *tcp, int fd)
 {
-	printfd_pid(tcp, tcp->pid, fd);
+  printfd_pid(NULL, tcp, tcp->pid, fd);
+}
+
+static inline void
+printfd_field(const char* field, struct tcb *tcp, int fd)
+{
+  printfd_pid(field, tcp, tcp->pid, fd);
 }
 
 /**
@@ -1255,6 +1264,9 @@ extern void printfd_pid_tracee_ns(struct tcb *tcp, pid_t pid, int fd);
 
 /** Prints a PID specified in the tracee's PID namespace */
 extern void printpid(struct tcb *, int pid, enum pid_type type);
+extern void printpid_field(const char *s,
+                           struct tcb *,
+                           int pid, enum pid_type type); /* pidns.c */
 
 /**
  * Prints pid as a TGID if positive, and PGID if negative
@@ -1535,73 +1547,6 @@ extern void maybe_load_task_comm(struct tcb *tcp);
 /* Print the contents of /proc/$pid/comm. */
 extern void print_pid_comm(int pid);
 
-static inline int
-printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
-{
-	return printstr_ex(tcp, addr, len, 0);
-}
-
-static inline int
-printstr(struct tcb *tcp, kernel_ulong_t addr)
-{
-	return printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
-}
-
-static inline int
-printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
-{
-	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
-}
-
-static inline int
-printflags(const struct xlat *x, unsigned int flags, const char *dflt)
-{
-	return printflags64(x, flags, dflt);
-}
-
-static inline int
-printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
-{
-	return printxvals(val, dflt, x, NULL);
-}
-
-static inline int
-printxval(const struct xlat *x, const unsigned int val, const char *dflt)
-{
-	return printxvals(val, dflt, x, NULL);
-}
-
-static inline int
-printxval64_u(const struct xlat *x, const uint64_t val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
-}
-
-static inline int
-printxval_u(const struct xlat *x, const unsigned int val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
-}
-
-static inline int
-printxval64_d(const struct xlat *x, const int64_t val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
-}
-
-static inline int
-printxval_d(const struct xlat *x, const int val, const char *dflt)
-{
-	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
-}
-
-static inline void
-tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
-	   print_obj_by_addr_size_fn print_func)
-{
-	tprint_iov_upto(tcp, len, addr, -1, print_func, NULL);
-}
-
 # if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32
 extern bool print_timespec32_data_size(const void *arg, size_t size);
 extern bool print_timespec32_array_data_size(const void *arg,
@@ -1685,10 +1630,121 @@ extern struct tcb *printing_tcp;
 extern void printleader(struct tcb *);
 extern void line_ended(void);
 extern void tabto(void);
-extern void tprintf(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
-extern void tprints(const char *str);
+extern void tprintf_nodelim(uint8_t state, const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 2, 3));
+extern void tprints_nodelim(uint8_t state, const char *str);
 extern void tprintf_comment(const char *fmt, ...) ATTRIBUTE_FORMAT((printf, 1, 2));
 extern void tprints_comment(const char *str);
+
+#include <stdarg.h>
+
+extern void tvprintf(uint8_t state, const char *const fmt, va_list args) ATTRIBUTE_FORMAT((printf, 2, 0));
+
+/* defined in strace.c */
+extern struct structured_output* structured_output ;
+extern uint8_t get_tcp_state(void);
+extern void set_tcp_state(uint8_t state);
+
+
+
+/*
+ * Sign-extend an unsigned integer type to long long.
+ */
+# define sign_extend_unsigned_to_ll(v) \
+	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
+	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
+	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
+	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
+	 (long long) (v))
+
+
+# include "print_fields.h"
+
+
+
+static inline int
+printstrn(struct tcb *tcp, kernel_ulong_t addr, kernel_ulong_t len)
+{
+	return printstr_ex(tcp, addr, len, 0);
+}
+
+static inline int
+printstr(struct tcb *tcp, kernel_ulong_t addr)
+{
+	return printstr_ex(tcp, addr, -1, QUOTE_0_TERMINATED);
+}
+
+/* flags printer without structured output delimiters */
+static inline int
+printflags64_in(const struct xlat *x, uint64_t flags, const char *dflt)
+{
+	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
+}
+
+static inline int
+printflags_in(const struct xlat *x, unsigned int flags, const char *dflt)
+{
+	return printflags_ex(flags, dflt, XLAT_STYLE_DEFAULT, x, NULL);
+}
+
+/* flags printer with structured output delimiters */
+static inline int
+printflags64(const struct xlat *x, uint64_t flags, const char *dflt)
+{
+	tprint_flags_begin();
+	int r = printflags64_in(x, flags, dflt);
+	tprint_flags_end();
+	return r;
+}
+
+static inline int
+printflags(const struct xlat *x, unsigned int flags, const char *dflt)
+{
+	return printflags64(x, flags, dflt);
+}
+
+static inline int
+printxval64(const struct xlat *x, const uint64_t val, const char *dflt)
+{
+	return printxvals(val, dflt, x, NULL);
+}
+
+static inline int
+printxval(const struct xlat *x, const unsigned int val, const char *dflt)
+{
+	return printxvals(val, dflt, x, NULL);
+}
+
+static inline int
+printxval64_u(const struct xlat *x, const uint64_t val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
+}
+
+static inline int
+printxval_u(const struct xlat *x, const unsigned int val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_U, x, NULL);
+}
+
+static inline int
+printxval64_d(const struct xlat *x, const int64_t val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
+}
+
+static inline int
+printxval_d(const struct xlat *x, const int val, const char *dflt)
+{
+	return printxvals_ex(val, dflt, XLAT_STYLE_FMT_D, x, NULL);
+}
+
+static inline void
+tprint_iov(struct tcb *tcp, kernel_ulong_t len, kernel_ulong_t addr,
+	   print_obj_by_addr_size_fn print_func)
+{
+	tprint_iov_upto(tcp, len, addr, -1, print_func, NULL);
+}
+
 
 /*
  * Staging output for status qualifier.
@@ -1846,16 +1902,6 @@ truncate_kulong_to_current_klongsize(const kernel_ulong_t v)
 	 sizeof(v) == sizeof(int) ? (unsigned long long) (unsigned int) (v) : \
 	 sizeof(v) == sizeof(long) ? (unsigned long long) (unsigned long) (v) : \
 	 (unsigned long long) (v))
-
-/*
- * Sign-extend an unsigned integer type to long long.
- */
-# define sign_extend_unsigned_to_ll(v) \
-	(sizeof(v) == sizeof(char) ? (long long) (char) (v) : \
-	 sizeof(v) == sizeof(short) ? (long long) (short) (v) : \
-	 sizeof(v) == sizeof(int) ? (long long) (int) (v) : \
-	 sizeof(v) == sizeof(long) ? (long long) (long) (v) : \
-	 (long long) (v))
 
 /*
  * Computes the popcount of a vector of 32-bit values.
@@ -2043,8 +2089,6 @@ ilog2_32(uint32_t val)
 # endif
 
 # undef ILOG2_ITER_
-
-# include "print_fields.h"
 
 /*
  * When u64 is interpreted by the kernel as an address, there is a difference

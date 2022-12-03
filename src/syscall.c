@@ -4,8 +4,8 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-1999 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 1999 IBM Deutschland Entwicklung GmbH, IBM Corporation
- *                     Linux for s390 port by D.J. Barrow
- *                    <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
+ *		       Linux for s390 port by D.J. Barrow
+ *		      <barrow_dj@mail.yahoo.com,djbarrow@de.ibm.com>
  * Copyright (c) 1999-2022 The strace developers.
  * All rights reserved.
  *
@@ -255,8 +255,8 @@ update_personality(struct tcb *tcp, unsigned int personality)
 
 	if (!is_number_in_set(QUIET_PERSONALITY, quiet_set)) {
 		printleader(tcp);
-		tprintf("[ Process PID=%d runs in %s mode. ]\n",
-			tcp->pid, personality_names[personality]);
+		tprintf_string("[ Process PID=%d runs in %s mode. ]\n",
+			       tcp->pid, personality_names[personality]);
 		line_ended();
 	}
 
@@ -298,7 +298,7 @@ decode_socket_subcall(struct tcb *tcp)
 
 	for (unsigned int i = 0; i < nargs; ++i)
 		tcp->u_arg[i] = (sizeof(uint32_t) == current_wordsize)
-				? ((uint32_t *) (void *) buf)[i] : buf[i];
+			? ((uint32_t *) (void *) buf)[i] : buf[i];
 }
 #endif /* SYS_socket_subcall */
 
@@ -323,12 +323,12 @@ decode_ipc_subcall(struct tcb *tcp)
 	}
 
 	switch (call) {
-		case  1: case  2: case  3: case  4:
-		case 11: case 12: case 13: case 14:
-		case 21: case 22: case 23: case 24:
-			break;
-		default:
-			return;
+	case  1: case  2: case	3: case	 4:
+	case 11: case 12: case 13: case 14:
+	case 21: case 22: case 23: case 24:
+		break;
+	default:
+		return;
 	}
 
 	tcp->scno = SYS_ipc_subcall + call;
@@ -342,7 +342,7 @@ decode_ipc_subcall(struct tcb *tcp)
 #endif /* SYS_ipc_subcall */
 
 #ifdef SYS_syscall_subcall
-/* The implementation is architecture specific.  */
+/* The implementation is architecture specific.	 */
 static void decode_syscall_subcall(struct tcb *);
 #endif /* SYS_syscall_subcall */
 
@@ -421,11 +421,11 @@ print_err(int64_t err, bool negated)
 	const char *str = err_name(negated ? -err : err);
 
 	if (!str || xlat_verbose(xlat_verbosity) != XLAT_STYLE_ABBREV)
-		tprintf(negated ? "%" PRId64 : "%" PRIu64, err);
+		tprintf_string(negated ? "%" PRId64 : "%" PRIu64, err);
 	if (!str || xlat_verbose(xlat_verbosity) == XLAT_STYLE_RAW)
 		return;
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_ABBREV
-		? tprintf : tprintf_comment)("%s%s",
+	 ? tprintf_string : tprintf_comment)("%s%s",
 					     negated ? "-" : "", str);
 }
 
@@ -433,12 +433,19 @@ static void
 print_err_ret(kernel_ulong_t ret, unsigned long u_error)
 {
 	const char *u_error_str = err_name(u_error);
-
-	if (u_error_str)
-		tprintf("= %" PRI_kld " %s (%s)",
-			ret, u_error_str, strerror(u_error));
-	else
-		tprintf("= %" PRI_kld " (errno %lu)", ret, u_error);
+	tprints_dummy("= ");
+	tprintf_field_int("return", "%" PRI_kld, ret);
+	tprint_space();
+	if (u_error_str){
+		tprints_field_string("error", u_error_str);
+		tprints_dummy(" (");
+		tprints_field_string("strerror", strerror(u_error));
+		tprints_dummy(")");
+	} else {
+		tprints_dummy("(errno ");
+		tprintf_field_int("errno", "%lu", u_error);
+		tprints_dummy(")");
+	}
 }
 
 static long get_regs(struct tcb *);
@@ -464,7 +471,7 @@ static struct inject_opts *
 tcb_inject_opts(struct tcb *tcp)
 {
 	return (scno_in_range(tcp->scno) && tcp->inject_vec[current_personality])
-	       ? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
+		? &tcp->inject_vec[current_personality][tcp->scno] : NULL;
 }
 
 
@@ -583,7 +590,7 @@ syscall_entering_decode(struct tcb *tcp)
 		return res;
 	if (res != 1 || (res = get_syscall_args(tcp)) != 1) {
 		printleader(tcp);
-		tprints_arg_begin(tcp_sysent(tcp)->sys_name);
+		tprints_argspace_begin(tcp_sysent(tcp)->sys_name);
 		/*
 		 * " <unavailable>" will be added later by the code which
 		 * detects ptrace errors.
@@ -595,18 +602,18 @@ syscall_entering_decode(struct tcb *tcp)
 	if (tcp_sysent(tcp)->sen == SEN_syscall)
 		decode_syscall_subcall(tcp);
 #endif
-#if defined SYS_ipc_subcall	\
- || defined SYS_socket_subcall
+#if defined SYS_ipc_subcall			\
+	|| defined SYS_socket_subcall
 	switch (tcp_sysent(tcp)->sen) {
 # ifdef SYS_ipc_subcall
-		case SEN_ipc:
-			decode_ipc_subcall(tcp);
-			break;
+	case SEN_ipc:
+		decode_ipc_subcall(tcp);
+		break;
 # endif
 # ifdef SYS_socket_subcall
-		case SEN_socketcall:
-			decode_socket_subcall(tcp);
-			break;
+	case SEN_socketcall:
+		decode_socket_subcall(tcp);
+		break;
 # endif
 	}
 #endif
@@ -625,18 +632,18 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		tcp->qual_flg &= ~QUAL_INJECT;
 
 		switch (tcp_sysent(tcp)->sen) {
-			case SEN_execve:
-			case SEN_execveat:
-			case SEN_execv:
-				/*
-				 * First exec* syscall makes the log visible.
-				 */
-				tcp->flags &= ~TCB_HIDE_LOG;
-				/*
-				 * Check whether this exec* syscall succeeds.
-				 */
-				tcp->flags |= TCB_CHECK_EXEC_SYSCALL;
-				break;
+		case SEN_execve:
+		case SEN_execveat:
+		case SEN_execv:
+			/*
+			 * First exec* syscall makes the log visible.
+			 */
+			tcp->flags &= ~TCB_HIDE_LOG;
+			/*
+			 * Check whether this exec* syscall succeeds.
+			 */
+			tcp->flags |= TCB_CHECK_EXEC_SYSCALL;
+			break;
 		}
 	}
 
@@ -666,7 +673,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		strace_open_memstream(tcp);
 
 	printleader(tcp);
-	tprints_arg_begin(tcp_sysent(tcp)->sys_name);
+	tprints_argspace_begin(tcp_sysent(tcp)->sys_name);
 	int res = raw(tcp) ? printargs(tcp) : tcp_sysent(tcp)->sys_func(tcp);
 	fflush(tcp->outf);
 	return res;
@@ -753,7 +760,13 @@ print_syscall_resume(struct tcb *tcp)
 	    || (tcp->flags & TCB_REPRINT)) {
 		tcp->flags &= ~TCB_REPRINT;
 		printleader(tcp);
-		tprintf("<... %s resumed>", tcp_sysent(tcp)->sys_name);
+		if( structured_output ){
+			tprints_field_string("resumed", tcp_sysent(tcp)->sys_name);
+			tprints_field_set("args");
+			tprint_array_begin();
+		} else {
+			tprintf_string("<... %s resumed>", tcp_sysent(tcp)->sys_name);
+		}
 	}
 }
 
@@ -761,13 +774,13 @@ static void
 print_injected_note(struct tcb *tcp)
 {
 	if (syscall_tampered(tcp) && syscall_tampered_poked(tcp))
-		tprints(" (INJECTED: args, retval)");
+		tprints_string(" (INJECTED: args, retval)");
 	else if (syscall_tampered_poked(tcp))
-		tprints(" (INJECTED: args)");
+		tprints_string(" (INJECTED: args)");
 	else if (syscall_tampered(tcp))
-		tprints(" (INJECTED)");
+		tprints_string(" (INJECTED)");
 	if (syscall_tampered_delayed(tcp))
-		tprints(" (DELAYED)");
+		tprints_string(" (DELAYED)");
 }
 
 int
@@ -791,10 +804,13 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	tcp->s_prev_ent = NULL;
 	if (res != 1) {
 		/* There was error in one of prior ptrace ops */
-		tprint_arg_end();
+		tprint_argspace_end();
 		tprint_space();
 		tabto();
-		tprints("= ? <unavailable>");
+		tprints_dummy("= ? <");
+		tprints_field_string("return", "unavailable");
+		tprints_dummy(">");
+		tprint_syscall_end();
 		tprint_newline();
 		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 			bool publish = is_number_in_set(STATUS_UNAVAILABLE,
@@ -818,9 +834,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = syserror(tcp)
-			       && is_number_in_set(STATUS_FAILED, status_set);
+			&& is_number_in_set(STATUS_FAILED, status_set);
 		publish |= !syserror(tcp)
-			   && is_number_in_set(STATUS_SUCCESSFUL, status_set);
+			&& is_number_in_set(STATUS_SUCCESSFUL, status_set);
 		strace_close_memstream(tcp, publish);
 		if (!publish) {
 			line_ended();
@@ -828,47 +844,53 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 	}
 
-	tprint_arg_end();
+	tprint_argspace_end();
 	tprint_space();
 	tabto();
 
 	if (raw(tcp)) {
 		if (tcp->u_error)
 			print_err_ret(tcp->u_rval, tcp->u_error);
-		else
-			tprintf("= %#" PRI_klx, tcp->u_rval);
+		else{
+			tprints_dummy("= ");
+			tprintf_field_int("return", "%#" PRI_klx, tcp->u_rval);
+		}
 
 		print_injected_note(tcp);
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
 		switch (tcp->u_error) {
-		/* Blocked signals do not interrupt any syscalls.
-		 * In this case syscalls don't return ERESTARTfoo codes.
-		 *
-		 * Deadly signals set to SIG_DFL interrupt syscalls
-		 * and kill the process regardless of which of the codes below
-		 * is returned by the interrupted syscall.
-		 * In some cases, kernel forces a kernel-generated deadly
-		 * signal to be unblocked and set to SIG_DFL (and thus cause
-		 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
-		 * or SIGILL. (The alternative is to leave process spinning
-		 * forever on the faulty instruction - not useful).
-		 *
-		 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
-		 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
-		 * but kernel will always restart them.
-		 */
+			/* Blocked signals do not interrupt any syscalls.
+			 * In this case syscalls don't return ERESTARTfoo codes.
+			 *
+			 * Deadly signals set to SIG_DFL interrupt syscalls
+			 * and kill the process regardless of which of the codes below
+			 * is returned by the interrupted syscall.
+			 * In some cases, kernel forces a kernel-generated deadly
+			 * signal to be unblocked and set to SIG_DFL (and thus cause
+			 * death) if it is blocked or SIG_IGNed: for example, SIGSEGV
+			 * or SIGILL. (The alternative is to leave process spinning
+			 * forever on the faulty instruction - not useful).
+			 *
+			 * SIG_IGNed signals and non-deadly signals set to SIG_DFL
+			 * (for example, SIGCHLD, SIGWINCH) interrupt syscalls,
+			 * but kernel will always restart them.
+			 */
 		case ERESTARTSYS:
 			/* Most common type of signal-interrupted syscall exit code.
 			 * The system call will be restarted with the same arguments
 			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
 			 */
-			tprints("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
+			tprints_dummy("= ? ");
+			tprints_field_string("error", "ERESTARTSYS");
+			tprints_dummy(" (To be restarted if SA_RESTART is set)");
 			break;
 		case ERESTARTNOINTR:
 			/* Rare. For example, fork() returns this if interrupted.
 			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
 			 */
-			tprints("= ? ERESTARTNOINTR (To be restarted)");
+			tprints_dummy("= ? ");
+			tprints_field_string("error", "ERESTARTNOINTR");
+			tprints_dummy(" (To be restarted)");
 			break;
 		case ERESTARTNOHAND:
 			/* pause(), rt_sigsuspend() etc use this code.
@@ -878,7 +900,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * after SIG_IGN or SIG_DFL signal it will restart
 			 * (thus the name "restart only if has no handler").
 			 */
-			tprints("= ? ERESTARTNOHAND (To be restarted if no handler)");
+			tprints_dummy("= ? ");
+			tprints_field_string("error", "ERESTARTNOHAND");
+			tprints_dummy(" (To be restarted if no handler)");
 			break;
 		case ERESTART_RESTARTBLOCK:
 			/* Syscalls like nanosleep(), poll() which can't be
@@ -892,7 +916,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * which in turn saves another such restart block,
 			 * old data is lost and restart becomes impossible)
 			 */
-			tprints("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
+			tprints_dummy("= ? ");
+			tprints_field_string("error", "ERESTART_RESTARTBLOCK");
+			tprints_dummy(" (Interrupted by signal)");
 			break;
 		default:
 			print_err_ret(tcp->u_rval, tcp->u_error);
@@ -900,43 +926,51 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 		print_injected_note(tcp);
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf(" (%s)", tcp->auxstr);
+			tprintf_string(" (%s)", tcp->auxstr);
 	} else {
 		if (sys_res & RVAL_NONE)
-			tprints("= ?");
+			tprints_dummy("= ?");
 		else {
 			switch (sys_res & RVAL_MASK) {
 			case RVAL_HEX:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
-					tprintf("= %#x",
-						(unsigned int) tcp->u_rval);
+					tprintf_string("= %#x",
+						       (unsigned int) tcp->u_rval);
 				} else
 #endif
 				{
-					tprintf("= %#" PRI_klx, tcp->u_rval);
+					tprints_dummy("= ");
+					tprintf_field_int("return",
+							  "%#" PRI_klx, tcp->u_rval);
 				}
 				break;
 			case RVAL_OCTAL: {
 				unsigned long long mode =
 					zero_extend_signed_to_ull(tcp->u_rval);
-				tprints("= ");
+				tprints_dummy("= ");
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval))
 					mode = (unsigned int) mode;
 #endif
+				tprints_field_set("return");
 				print_numeric_ll_umode_t(mode);
+				tprint_field_end();
 				break;
 			}
 			case RVAL_UDECIMAL:
 #if ANY_WORDSIZE_LESS_THAN_KERNEL_LONG
 				if (current_klongsize < sizeof(tcp->u_rval)) {
-					tprintf("= %u",
-						(unsigned int) tcp->u_rval);
+					tprints_dummy("= ");
+					tprintf_field_int("return",
+							  "%u",
+							  (unsigned int) tcp->u_rval);
 				} else
 #endif
 				{
-					tprintf("= %" PRI_klu, tcp->u_rval);
+					tprints_dummy("= ");
+					tprintf_field_int("return",
+							  "%" PRI_klu, tcp->u_rval);
 				}
 				break;
 			case RVAL_FD:
@@ -946,10 +980,12 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				 */
 				if ((current_klongsize < sizeof(tcp->u_rval)) ||
 				    ((kernel_ulong_t) tcp->u_rval <= INT_MAX)) {
-					tprints("= ");
-					printfd(tcp, tcp->u_rval);
+					tprints_dummy("= ");
+					printfd_field("return", tcp, tcp->u_rval);
 				} else {
-					tprintf("= %" PRI_kld, tcp->u_rval);
+					tprints_dummy("= ");
+					tprintf_field_int("return",
+							  "%" PRI_kld, tcp->u_rval);
 				}
 				break;
 			case RVAL_TID:
@@ -962,9 +998,11 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				};
 #undef _
 
-				tprints("= ");
-				printpid(tcp, tcp->u_rval,
-					 types[(sys_res & RVAL_MASK) - RVAL_TID]);
+				tprints_dummy("= ");
+				printpid_field(
+					"return",
+					tcp, tcp->u_rval,
+					types[(sys_res & RVAL_MASK) - RVAL_TID]);
 				break;
 			}
 			default:
@@ -972,21 +1010,29 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				break;
 			}
 		}
-		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf(" (%s)", tcp->auxstr);
+		if ((sys_res & RVAL_STR) && tcp->auxstr){
+			if( structured_output ){
+				tprints_field_string("retstr", tcp->auxstr);
+			} else {
+				tprintf_dummy(" (%s)", tcp->auxstr);
+			}
+		}
 		print_injected_note(tcp);
 	}
 	if (Tflag) {
 		tprint_space();
 		tprint_associated_info_begin();
 		ts_sub(ts, ts, &tcp->etime);
-		PRINT_VAL_D(ts->tv_sec);
+		tprintf_field_int("secs", "%ld", (long) ts->tv_sec);
 		if (Tflag_width) {
-			tprintf(".%0*ld",
-				Tflag_width, (long) ts->tv_nsec / Tflag_scale);
+			tprints_dummy(".");
+			tprintf_field_int("nsecs", "%0*ld",
+					  Tflag_width,
+					  (long) ts->tv_nsec / Tflag_scale);
 		}
 		tprint_associated_info_end();
 	}
+	tprint_syscall_end();
 	tprint_newline();
 	dumpio(tcp);
 	line_ended();
@@ -1018,13 +1064,13 @@ bool
 is_erestart(struct tcb *tcp)
 {
 	switch (tcp->u_error) {
-		case ERESTARTSYS:
-		case ERESTARTNOINTR:
-		case ERESTARTNOHAND:
-		case ERESTART_RESTARTBLOCK:
-			return true;
-		default:
-			return false;
+	case ERESTARTSYS:
+	case ERESTARTNOINTR:
+	case ERESTARTNOHAND:
+	case ERESTART_RESTARTBLOCK:
+		return true;
+	default:
+		return false;
 	}
 }
 
@@ -1049,7 +1095,7 @@ static bool
 ptrace_syscall_info_is_valid(void)
 {
 	return ptrace_get_syscall_info_supported &&
-	       ptrace_sci.op <= PTRACE_SYSCALL_INFO_SECCOMP;
+		ptrace_sci.op <= PTRACE_SYSCALL_INFO_SECCOMP;
 }
 
 #define XLAT_MACROS_ONLY
@@ -1468,8 +1514,8 @@ get_syscall_result(struct tcb *tcp)
 		return -1;
 	get_error(tcp,
 		  (!(tcp_sysent(tcp)->sys_flags & SYSCALL_NEVER_FAILS)
-			|| syscall_tampered(tcp))
-                  && !syscall_tampered_nofail(tcp));
+		   || syscall_tampered(tcp))
+		  && !syscall_tampered_nofail(tcp));
 
 	return 1;
 }

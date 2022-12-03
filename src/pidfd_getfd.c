@@ -23,7 +23,7 @@ SYS_FUNC(pidfd_getfd)
 	/* targetfd */
 	pid_t target_pid = pidfd_get_pid(tcp->pid, pidfd);
 	if (target_pid > 0)
-		printfd_pid(tcp, target_pid, targetfd);
+          printfd_pid(NULL, tcp, target_pid, targetfd);
 	else
 		PRINT_VAL_D(targetfd);
 	tprint_arg_next();

@@ -24,7 +24,7 @@
 /**
  * @param secontext Pointer to security context string.
  * @param result    Stores pointer to the beginning of the part to print.
- * @return          Number of characters of the string to be printed.
+ * @return	    Number of characters of the string to be printed.
  */
 static size_t
 parse_secontext(char *secontext, char **result)
@@ -52,7 +52,7 @@ parse_secontext(char *secontext, char **result)
 	}
 
 	size_t len = end_pos ? (size_t) (end_pos - secontext)
-			     : strlen(secontext);
+		: strlen(secontext);
 
 	/* Strip terminating \n as these tend to be present sometimes */
 	while (len && secontext[len - 1] == '\n')
@@ -166,13 +166,13 @@ selinux_getfilecon(struct tcb *tcp, const char *path, char **secontext,
 
 	if (path[0] == '/')
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/root%s",
-			       proc_pid, path);
+			      proc_pid, path);
 	else if (tcp->last_dirfd == AT_FDCWD)
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/cwd/%s",
-			       proc_pid, path);
+			      proc_pid, path);
 	else if (tcp->last_dirfd >= 0 )
 		rc = snprintf(fname, sizeof(fname), "/proc/%u/fd/%u/%s",
-			       proc_pid, tcp->last_dirfd, path);
+			      proc_pid, tcp->last_dirfd, path);
 
 	if ((unsigned int) rc >= sizeof(fname))
 		return -1;
@@ -210,10 +210,10 @@ print_context(char *secontext, char *expected)
 		return;
 
 	unsigned int style = QUOTE_OMIT_LEADING_TRAILING_QUOTES
-			     | QUOTE_OVERWRITE_HEXSTR |
-			     (xflag == HEXSTR_NONE
-			      ? QUOTE_HEXSTR_NONE
-			      : QUOTE_HEXSTR_NON_ASCII_CHARS);
+		| QUOTE_OVERWRITE_HEXSTR |
+		(xflag == HEXSTR_NONE
+		 ? QUOTE_HEXSTR_NONE
+		 : QUOTE_HEXSTR_NON_ASCII_CHARS);
 
 	char *ctx_str;
 	ssize_t ctx_len = parse_secontext(secontext, &ctx_str);
@@ -227,7 +227,7 @@ print_context(char *secontext, char *expected)
 	ssize_t exp_len = parse_secontext(expected, &exp_str);
 
 	if (ctx_len != exp_len || strncmp(ctx_str, exp_str, ctx_len)) {
-		tprints("!!");
+		tprints_dummy("!!");
 		print_quoted_string_ex(exp_str, exp_len, style, "[]!");
 	}
 
@@ -246,9 +246,9 @@ selinux_printfdcon(pid_t pid, int fd)
 		return;
 
 	tprint_space();
-	tprint_attribute_begin();
+	tprint_array_begin();
 	print_context(ctx, exp);
-	tprint_attribute_end();
+	tprint_array_end();
 }
 
 void
@@ -261,9 +261,9 @@ selinux_printfilecon(struct tcb *tcp, const char *path)
 		return;
 
 	tprint_space();
-	tprint_attribute_begin();
+	tprint_array_begin();
 	print_context(ctx, exp);
-	tprint_attribute_end();
+	tprint_array_end();
 }
 
 void
@@ -274,8 +274,8 @@ selinux_printpidcon(struct tcb *tcp)
 	if (selinux_getpidcon(tcp, &ctx) < 0)
 		return;
 
-	tprint_attribute_begin();
+	tprint_array_begin();
 	print_context(ctx, NULL);
-	tprint_attribute_end();
+	tprint_array_end();
 	tprint_space();
 }

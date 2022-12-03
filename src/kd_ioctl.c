@@ -90,13 +90,17 @@ kd_mk_tone(struct tcb *const tcp, const unsigned int arg)
 	unsigned int freq = ticks && count ? KERNEL_PIT_TICK_RATE / count : 0;
 
 	tprint_arg_next();
+	tprint_flags_begin();
 	if (ticks) {
+		tprint_shift_begin();
 		PRINT_VAL_U(ticks);
 		tprint_shift();
 		PRINT_VAL_U(16);
-		tprint_or();
+		tprint_shift_end();
+		tprint_flags_or();
 	}
 	PRINT_VAL_U(count);
+	tprint_flags_end();
 
 	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
 		if (freq)
@@ -257,7 +261,7 @@ print_scrmap_array_member(struct tcb *tcp, void *elem_buf,
 
 	if ((val & ~UNI_DIRECT_MASK) == UNI_DIRECT_BASE)
 		(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-			? tprintf_comment : tprintf)("UNI_DIRECT_BASE+%#hx",
+		 ? tprintf_comment : tprintf_string)("UNI_DIRECT_BASE+%#hx",
 						     val & UNI_DIRECT_MASK);
 
 	return true;
@@ -316,7 +320,7 @@ kd_kbd_entry(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 {
 	static const struct xlat *xlat_tables[] = {
 		/* KT_LATIN */
-		[KT_FN]    = kd_key_fn_keys,
+		[KT_FN]	   = kd_key_fn_keys,
 		[KT_SPEC]  = kd_key_spec_keys,
 		[KT_PAD]   = kd_key_pad_keys,
 		[KT_DEAD]  = kd_key_dead_keys,
@@ -370,7 +374,7 @@ kd_kbd_entry(struct tcb *const tcp, const kernel_ulong_t arg, const bool get)
 
 	tprint_struct_next();
 	if (umove(tcp, arg + offsetof(struct kbentry, kb_value),
-			 &val.kb_value)) {
+		  &val.kb_value)) {
 		tprints_field_name("kb_value");
 		tprint_unavailable();
 		goto out;
@@ -452,7 +456,7 @@ kd_kbd_str_entry(struct tcb *const tcp, const kernel_ulong_t arg,
 
 	if (print_quoted_string((char *) val.kb_string,
 				MIN(max_strlen,
-				   (unsigned int) ret ?: sizeof(val.kb_string)),
+				    (unsigned int) ret ?: sizeof(val.kb_string)),
 				QUOTE_OMIT_TRAILING_0))
 		tprint_more_data_follows();
 
@@ -825,7 +829,7 @@ kd_ioctl(struct tcb *const tcp, const unsigned int code,
 	case PIO_CMAP:
 		return kd_cmap(tcp, arg, code == GIO_CMAP);
 
-	/* no arguments */
+		/* no arguments */
 	case KDENABIO:
 	case KDDISABIO:
 	case KDMAPDISP:

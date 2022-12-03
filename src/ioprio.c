@@ -46,7 +46,7 @@ print_ioprio(unsigned int ioprio)
 	const char *str = sprint_ioprio(ioprio);
 
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(str);
+		? tprints_comment : tprints_string)(str);
 }
 
 static void
@@ -105,7 +105,7 @@ SYS_FUNC(ioprio_set)
 		return RVAL_DECODED;
 
 	(xlat_verbose(xlat_verbosity) == XLAT_STYLE_VERBOSE
-		? tprints_comment : tprints)(sprint_ioprio(tcp->u_arg[2]));
+		? tprints_comment : tprints_string)(sprint_ioprio(tcp->u_arg[2]));
 
 	return RVAL_DECODED;
 }

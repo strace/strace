@@ -113,11 +113,11 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	 * offsetofend against size) in order to print fields as kernel sees
 	 * them.  This also should work great on big endian architectures.
 	 */
-#define STRACE_PERF_CHECK_FIELD(field_) \
-		do { \
-			if (offsetof(struct perf_event_attr, field_) >= size) \
-				goto print_perf_event_attr_out; \
-		} while (0)
+#define STRACE_PERF_CHECK_FIELD(field_)					\
+	do {								\
+		if (offsetof(struct perf_event_attr, field_) >= size)	\
+			goto print_perf_event_attr_out;			\
+	} while (0)
 
 	desc = get_tcb_priv_data(tcp);
 
@@ -127,7 +127,7 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 	/* The only error which expected to change size field currently */
 	if (tcp->u_error == E2BIG) {
 		if (umove(tcp, addr + offsetof(struct perf_event_attr, size),
-		    &new_size))
+			  &new_size))
 			use_new_size = -1;
 		else
 			use_new_size = 1;
@@ -157,14 +157,18 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 */
 		tprint_struct_next();
 		tprints_field_name("config");
+		tprint_flags_begin();
 		if (attr->config >> 32) {
+			tprint_shift_begin();
 			PRINT_VAL_X(attr->config >> 32);
 			tprint_shift();
 			PRINT_VAL_U(32);
-			tprint_or();
+			tprint_shift_end();
+			tprint_flags_or();
 		}
 		printxval(perf_hw_id, attr->config & PERF_HW_EVENT_MASK,
-			   "PERF_COUNT_HW_???");
+			  "PERF_COUNT_HW_???");
+		tprint_flags_end();
 		break;
 	case PERF_TYPE_SOFTWARE:
 		tprint_struct_next();
@@ -190,31 +194,41 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		 */
 		tprint_struct_next();
 		tprints_field_name("config");
+		tprint_flags_begin();
 		if (attr->config >> 32){
+			tprint_shift_begin();
 			PRINT_VAL_X(attr->config >> 32);
 			tprint_shift();
 			PRINT_VAL_U(32);
-			tprint_or();
+			tprint_shift_end();
+			tprint_flags_or();
 		}
 		if ((attr->config & PERF_HW_EVENT_MASK) >> 24) {
+			tprint_shift_begin();
 			PRINT_VAL_X((attr->config & PERF_HW_EVENT_MASK) >> 24);
 			tprint_shift();
 			PRINT_VAL_U(24);
-			tprint_or();
+			tprint_shift_end();
+			tprint_flags_or();
 		}
+		tprint_shift_begin();
 		printxval(perf_hw_cache_op_result_id,
 			  (attr->config >> 16) & 0xFF,
 			  "PERF_COUNT_HW_CACHE_RESULT_???");
 		tprint_shift();
 		PRINT_VAL_U(16);
-		tprint_or();
+		tprint_shift_end();
+		tprint_flags_or();
+		tprint_shift_begin();
 		printxval(perf_hw_cache_op_id, (attr->config >> 8) & 0xFF,
 			   "PERF_COUNT_HW_CACHE_OP_???");
 		tprint_shift();
 		PRINT_VAL_U(8);
-		tprint_or();
+		tprint_shift_end();
+		tprint_flags_or();
 		printxval(perf_hw_cache_id, attr->config & 0xFF,
 			  "PERF_COUNT_HW_CACHE_???");
+		tprint_flags_end();
 		break;
 	case PERF_TYPE_RAW:
 		/*
@@ -255,12 +269,12 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 			  "PERF_FORMAT_???");
 
 	/*** A shorthand for printing struct perf_event_attr bit flags */
-#define STRACE_PERF_PRINT_FLAG(flag_) \
-	do { \
-		if (!abbrev(tcp) || attr->flag_) { \
-			tprint_struct_next(); \
+#define STRACE_PERF_PRINT_FLAG(flag_)					\
+	do {								\
+		if (!abbrev(tcp) || attr->flag_) {			\
+			tprint_struct_next();				\
 			PRINT_FIELD_U_CAST(*attr, flag_, unsigned int); \
-		}  \
+		}							\
 	} while (0)
 
 	STRACE_PERF_PRINT_FLAG(disabled);
@@ -329,9 +343,9 @@ print_perf_event_attr(struct tcb *const tcp, const kernel_ulong_t addr)
 		tprint_struct_next();
 		PRINT_FIELD_XVAL(*attr, bp_type, hw_breakpoint_type,
 				 (attr->bp_type <=
-					(HW_BREAKPOINT_X | HW_BREAKPOINT_RW))
-						? "HW_BREAKPOINT_INVALID"
-						: "HW_BREAKPOINT_???");
+				  (HW_BREAKPOINT_X | HW_BREAKPOINT_RW))
+				 ? "HW_BREAKPOINT_INVALID"
+				 : "HW_BREAKPOINT_???");
 	}
 
 	if (attr->type == PERF_TYPE_BREAKPOINT) {

@@ -111,29 +111,39 @@ do_futex(struct tcb *const tcp, const print_obj_by_addr_fn print_ts)
 		printaddr(uaddr2);
 
 		tprint_arg_next();
+		tprint_flags_begin();
 		if ((val3 >> 28) & FUTEX_OP_OPARG_SHIFT) {
+			tprint_shift_begin();
 			print_xlat(FUTEX_OP_OPARG_SHIFT);
 			tprint_shift();
 			PRINT_VAL_U(28);
-			tprint_or();
+			tprint_shift_end();
+			tprint_flags_or();
 		}
+		tprint_shift_begin();
 		comment = printxval(futexwakeops, (val3 >> 28) & 0x7, NULL)
 			? NULL : "FUTEX_OP_???";
 		tprint_shift();
 		PRINT_VAL_U(28);
+		tprint_shift_end();
 		tprints_comment(comment);
-		tprint_or();
+		tprint_flags_or();
+		tprint_shift_begin();
 		PRINT_VAL_X((val3 >> 12) & 0xfff);
 		tprint_shift();
 		PRINT_VAL_U(12);
-		tprint_or();
+		tprint_shift_end();
+		tprint_flags_or();
+		tprint_shift_begin();
 		comment = printxval(futexwakecmps, (val3 >> 24) & 0xf, NULL)
 			? NULL : "FUTEX_OP_CMP_???";
 		tprint_shift();
 		PRINT_VAL_U(24);
+		tprint_shift_end();
 		tprints_comment(comment);
-		tprint_or();
+		tprint_flags_or();
 		PRINT_VAL_X(val3 & 0xfff);
+		tprint_flags_end();
 		break;
 	case FUTEX_WAIT_REQUEUE_PI:
 		tprint_arg_next();

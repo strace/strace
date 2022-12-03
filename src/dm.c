@@ -216,7 +216,7 @@ dm_decode_dm_target_spec(struct tcb *const tcp, const kernel_ulong_t addr,
 		tprint_struct_next();
 		tprints_field_name("string");
 		printstr_ex(tcp, addr + offset_end, ioc->data_size - offset_end,
-			     QUOTE_0_TERMINATED);
+			    QUOTE_0_TERMINATED);
 		tprint_struct_end();
 
 		if (entering(tcp))

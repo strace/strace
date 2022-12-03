@@ -17,16 +17,18 @@ SYS_FUNC(personality)
 
 	if (entering(tcp)) {
 		pers = tcp->u_arg[0];
+		tprint_flags_begin();
 		if (0xffffffff == pers) {
 			PRINT_VAL_X(0xffffffff);
 		} else {
 			printxval(personality_types, pers & PER_MASK, "PER_???");
 			pers &= ~PER_MASK;
 			if (pers) {
-				tprint_or();
-				printflags(personality_flags, pers, NULL);
+				tprint_flags_or();
+				printflags_in(personality_flags, pers, NULL);
 			}
 		}
+		tprint_flags_end();
 		return 0;
 	}
 

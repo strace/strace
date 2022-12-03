@@ -286,7 +286,7 @@ SYS_FUNC(prctl)
 	case PR_SVE_SET_VL:
 		if (entering(tcp)) {
 			tprint_arg_next();
-			tprints(sprint_sve_val(arg2, false));
+			tprints_string(sprint_sve_val(arg2, false));
 			return 0;
 		}
 		ATTRIBUTE_FALLTHROUGH;
@@ -327,7 +327,7 @@ SYS_FUNC(prctl)
 
 	case PR_SET_TAGGED_ADDR_CTRL:
 		tprint_arg_next();
-		tprints(sprint_tagged_addr_val(arg2, false));
+		tprints_string(sprint_tagged_addr_val(arg2, false));
 		print_prctl_args(tcp, 2);
 		return RVAL_DECODED;
 
@@ -345,7 +345,7 @@ SYS_FUNC(prctl)
 	case PR_SME_SET_VL:
 		if (entering(tcp)) {
 			tprint_arg_next();
-			tprints(sprint_sme_val(arg2, false));
+			tprints_string(sprint_sme_val(arg2, false));
 			return 0;
 		}
 		ATTRIBUTE_FALLTHROUGH;

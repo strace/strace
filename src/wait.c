@@ -34,24 +34,24 @@ printstatus(int status)
 	tprint_indirect_begin();
 	if (WIFSTOPPED(status)) {
 		int sig = WSTOPSIG(status);
-		tprintf("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
-			sprintsigname(sig & 0x7f),
-			sig & 0x80 ? " | 0x80" : "");
+		tprintf_string("{WIFSTOPPED(s) && WSTOPSIG(s) == %s%s}",
+			       sprintsigname(sig & 0x7f),
+			       sig & 0x80 ? " | 0x80" : "");
 		status &= ~W_STOPCODE(sig);
 	} else if (WIFSIGNALED(status)) {
-		tprintf("{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
-			sprintsigname(WTERMSIG(status)),
-			WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
+		tprintf_string("{WIFSIGNALED(s) && WTERMSIG(s) == %s%s}",
+			       sprintsigname(WTERMSIG(status)),
+			       WCOREDUMP(status) ? " && WCOREDUMP(s)" : "");
 		status &= ~(W_EXITCODE(0, WTERMSIG(status)) | WCOREFLAG);
 	} else if (WIFEXITED(status)) {
-		tprintf("{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
-			WEXITSTATUS(status));
+		tprintf_string("{WIFEXITED(s) && WEXITSTATUS(s) == %d}",
+			       WEXITSTATUS(status));
 		exited = 1;
 		status &= ~W_EXITCODE(WEXITSTATUS(status), 0);
 	}
 #ifdef WIFCONTINUED
 	else if (WIFCONTINUED(status)) {
-		tprints("{WIFCONTINUED(s)}");
+		tprints_string("{WIFCONTINUED(s)}");
 		status &= ~W_CONTINUED;
 	}
 #endif
@@ -64,14 +64,16 @@ printstatus(int status)
 	if (status) {
 		unsigned int event = (unsigned int) status >> 16;
 		if (event) {
-			tprint_or();
+			tprint_flags_or();
+			tprint_shift_begin();
 			printxval(ptrace_events, event, "PTRACE_EVENT_???");
 			tprint_shift();
 			PRINT_VAL_U(16);
+			tprint_shift_end();
 			status &= 0xffff;
 		}
 		if (status) {
-			tprint_or();
+			tprint_flags_or();
 			PRINT_VAL_X(status);
 		}
 	}
@@ -87,9 +89,13 @@ printwaitn(struct tcb *const tcp,
 	if (entering(tcp)) {
 		/* pid */
 		printpid_tgid_pgid(tcp, tcp->u_arg[0]);
-		tprint_arg_next();
+		if(!structured_output)
+			tprint_arg_next();
 	} else {
 		int status;
+
+		if(structured_output)
+			tprint_arg_next();
 
 		/* status */
 		if (tcp->u_rval == 0)

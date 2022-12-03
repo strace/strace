@@ -235,10 +235,16 @@ SYS_FUNC(sched_getattr)
 		 * as on other architectures.  For more details see
 		 * https://lists.strace.io/pipermail/strace-devel/2017-March/006085.html
 		 */
-		if (syserror(tcp))
+		if (syserror(tcp)){
+			tprint_flags_begin();
 			print_abnormal_hi(tcp->u_arg[2]);
+			PRINT_VAL_U(size);
+			tprint_flags_end();
+		} else
 #endif
-		PRINT_VAL_U(size);
+		{
+			PRINT_VAL_U(size);
+		}
 		tprint_arg_next();
 
 		/* flags */
