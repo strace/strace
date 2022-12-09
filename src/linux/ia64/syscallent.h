@@ -146,7 +146,7 @@
 [BASE_NR + 123] = { 3,	TD,		SEN(writev),			"writev"		},
 [BASE_NR + 124] = { 4,	TD,		SEN(pread),			"pread64"		},
 [BASE_NR + 125] = { 4,	TD,		SEN(pwrite),			"pwrite64"		},
-[BASE_NR + 126] = { 1,	0,		SEN(printargs),			"_sysctl"		},
+[BASE_NR + 126] = { 1,	0,		SEN(sysctl),			"_sysctl"		},
 [BASE_NR + 127] = { 6,	TD|TM|SI,	SEN(mmap),			"mmap"			},
 [BASE_NR + 128] = { 2,	TM|SI,		SEN(munmap),			"munmap"		},
 [BASE_NR + 129] = { 2,	TM,		SEN(mlock),			"mlock"			},
