@@ -742,6 +742,7 @@ symlinkat
 sync
 sync_file_range
 sync_file_range2
+sysctl
 sysinfo
 syslog
 tampering-notes
