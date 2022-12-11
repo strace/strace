@@ -351,7 +351,7 @@ main(void)
 		{ ARG_STR(0) NRAW(" /* ETH_P_??? */") },
 		{ ARG_XLAT_KNOWN(0x8, "ETH_P_PPP_MP") },
 		{ ARG_XLAT_KNOWN(0x800, "ETH_P_IP") },
-		{ ARG_STR(0xe) NRAW(" /* ETH_P_??? */") },
+		{ ARG_STR(0xf) NRAW(" /* ETH_P_??? */") },
 		{ ARG_STR(0xfb) NRAW(" /* ETH_P_??? */") },
 		{ ARG_XLAT_KNOWN(0xfbfb, "ETH_P_AF_IUCV") },
 		{ ARG_STR(0xffff) NRAW(" /* ETH_P_??? */") },
