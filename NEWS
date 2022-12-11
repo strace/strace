@@ -4,7 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Enhanced decoding of terminal ioctl commands.
   * Updated lists of ABS_*, BPF_*, BTRFS_*, COUNTER_*, ETH_P_*, IFLA_*,
-    KVM_*, MADV_*, NLMSGERR_*, and PERF_* constants.
+    KVM_*, MADV_*, NLMSGERR_*, PERF_*, and STATX_* constants.
   * Updated lists of ioctl commands from Linux 6.1.
 
 * Bug fixes
