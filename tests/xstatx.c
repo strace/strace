@@ -258,28 +258,44 @@ print_stat(const STRUCT_STAT *st)
 	printf(", stx_attributes=");
 	printflags(statx_attrs, st->stx_attributes, "STATX_ATTR_???");
 
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_nlink);
-	PRINT_FIELD_U32_UID(stx_uid);
-	PRINT_FIELD_U32_UID(stx_gid);
+	if (st->stx_mask & STATX_NLINK) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_nlink);
+	}
+	if (st->stx_mask & STATX_UID)
+		PRINT_FIELD_U32_UID(stx_uid);
+	if (st->stx_mask & STATX_GID)
+		PRINT_FIELD_U32_UID(stx_gid);
 
-	printf(", stx_mode=");
-	print_st_mode(st->stx_mode);
+	if (st->stx_mask & (STATX_TYPE|STATX_MODE)) {
+		printf(", stx_mode=");
+		print_st_mode(st->stx_mode);
+	}
 
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_ino);
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_size);
-	printf(", ");
-	PRINT_FIELD_U(*st, stx_blocks);
+	if (st->stx_mask & STATX_INO) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_ino);
+	}
+	if (st->stx_mask & STATX_SIZE) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_size);
+	}
+	if (st->stx_mask & STATX_BLOCKS) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_blocks);
+	}
 
 	printf(", stx_attributes_mask=");
 	printflags(statx_attrs, st->stx_attributes_mask, "STATX_ATTR_???");
 
-	PRINT_FIELD_TIME(stx_atime);
-	PRINT_FIELD_TIME(stx_btime);
-	PRINT_FIELD_TIME(stx_ctime);
-	PRINT_FIELD_TIME(stx_mtime);
+	if (st->stx_mask & STATX_ATIME)
+		PRINT_FIELD_TIME(stx_atime);
+	if (st->stx_mask & STATX_BTIME)
+		PRINT_FIELD_TIME(stx_btime);
+	if (st->stx_mask & STATX_CTIME)
+		PRINT_FIELD_TIME(stx_ctime);
+	if (st->stx_mask & STATX_MTIME)
+		PRINT_FIELD_TIME(stx_mtime);
 	printf(", ");
 	PRINT_FIELD_U(*st, stx_rdev_major);
 	printf(", ");
