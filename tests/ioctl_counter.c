@@ -84,19 +84,19 @@ main(void)
 		  ", event=" XLAT_KNOWN(0, "COUNTER_EVENT_OVERFLOW")
 		  ", channel=0}" },
 		{ { { COUNTER_COMPONENT_EXTENSION, COUNTER_SCOPE_COUNT,
-		      23, 42 }, COUNTER_EVENT_CHANGE_OF_STATE, 69 },
+		      23, 42 }, COUNTER_EVENT_CAPTURE, 69 },
 		  "{component="
 		  "{type=" XLAT_KNOWN(0x5, "COUNTER_COMPONENT_EXTENSION")
 		  ", scope=" XLAT_KNOWN(0x2, "COUNTER_SCOPE_COUNT")
 		  ", parent=23, id=42}"
-		  ", event=" XLAT_KNOWN(0x5, "COUNTER_EVENT_CHANGE_OF_STATE")
+		  ", event=" XLAT_KNOWN(0x6, "COUNTER_EVENT_CAPTURE")
 		  ", channel=69}" },
 		{ { { COUNTER_COMPONENT_EXTENSION + 1, COUNTER_SCOPE_COUNT + 1,
-		      142, 160 }, COUNTER_EVENT_CHANGE_OF_STATE + 1, 173 },
+		      142, 160 }, COUNTER_EVENT_CAPTURE + 1, 173 },
 		  "{component={type=" XLAT_UNKNOWN(0x6, "COUNTER_COMPONENT_???")
 		  ", scope=" XLAT_UNKNOWN(0x3, "COUNTER_SCOPE_???")
 		  ", parent=142, id=160}"
-		  ", event=" XLAT_UNKNOWN(0x6, "COUNTER_EVENT_???")
+		  ", event=" XLAT_UNKNOWN(0x7, "COUNTER_EVENT_???")
 		  ", channel=173}" },
 	};
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct counter_watch, watch);
