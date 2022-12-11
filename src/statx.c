@@ -140,6 +140,16 @@ SYS_FUNC(statx)
 			PRINT_FIELD_U(stx, stx_dev_major);
 			tprint_struct_next();
 			PRINT_FIELD_U(stx, stx_dev_minor);
+			if (stx.stx_mask & STATX_MNT_ID) {
+				tprint_struct_next();
+				PRINT_FIELD_X(stx, stx_mnt_id);
+			}
+			if (stx.stx_mask & STATX_DIOALIGN) {
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_dio_mem_align);
+				tprint_struct_next();
+				PRINT_FIELD_U(stx, stx_dio_offset_align);
+			}
 		} else {
 			tprint_struct_next();
 			tprint_more_data_follows();

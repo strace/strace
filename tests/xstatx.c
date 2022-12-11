@@ -304,6 +304,16 @@ print_stat(const STRUCT_STAT *st)
 	PRINT_FIELD_U(*st, stx_dev_major);
 	printf(", ");
 	PRINT_FIELD_U(*st, stx_dev_minor);
+	if (st->stx_mask & STATX_MNT_ID) {
+		printf(", ");
+		PRINT_FIELD_X(*st, stx_mnt_id);
+	}
+	if (st->stx_mask & STATX_DIOALIGN) {
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_dio_mem_align);
+		printf(", ");
+		PRINT_FIELD_U(*st, stx_dio_offset_align);
+	}
 	printf("}");
 }
 
