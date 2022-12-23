@@ -898,9 +898,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			print_err_ret(tcp->u_rval, tcp->u_error);
 			break;
 		}
-		print_injected_note(tcp);
 		if ((sys_res & RVAL_STR) && tcp->auxstr)
 			tprintf_string(" (%s)", tcp->auxstr);
+		print_injected_note(tcp);
 	} else {
 		if (sys_res & RVAL_NONE)
 			tprints_string("= ?");
