@@ -837,8 +837,6 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			print_err_ret(tcp->u_rval, tcp->u_error);
 		else
 			tprintf_string("= %#" PRI_klx, tcp->u_rval);
-
-		print_injected_note(tcp);
 	} else if (!(sys_res & RVAL_NONE) && tcp->u_error) {
 		switch (tcp->u_error) {
 		/* Blocked signals do not interrupt any syscalls.
@@ -898,9 +896,6 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			print_err_ret(tcp->u_rval, tcp->u_error);
 			break;
 		}
-		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf_string(" (%s)", tcp->auxstr);
-		print_injected_note(tcp);
 	} else {
 		if (sys_res & RVAL_NONE)
 			tprints_string("= ?");
@@ -972,10 +967,10 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 				break;
 			}
 		}
-		if ((sys_res & RVAL_STR) && tcp->auxstr)
-			tprintf_string(" (%s)", tcp->auxstr);
-		print_injected_note(tcp);
 	}
+	if ((sys_res & RVAL_STR) && tcp->auxstr)
+		tprintf_string(" (%s)", tcp->auxstr);
+	print_injected_note(tcp);
 	if (Tflag) {
 		tprint_space();
 		tprint_associated_info_begin();
