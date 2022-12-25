@@ -770,6 +770,12 @@ print_injected_note(struct tcb *tcp)
 		tprints_string(" (DELAYED)");
 }
 
+static void
+print_erestart(const char *err_short, const char *err_long)
+{
+	tprintf_string("= ? %s (%s)", err_short, err_long);
+}
+
 int
 syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 {
@@ -860,13 +866,13 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * The system call will be restarted with the same arguments
 			 * if SA_RESTART is set; otherwise, it will fail with EINTR.
 			 */
-			tprints_string("= ? ERESTARTSYS (To be restarted if SA_RESTART is set)");
+			print_erestart("ERESTARTSYS", "To be restarted if SA_RESTART is set");
 			break;
 		case ERESTARTNOINTR:
 			/* Rare. For example, fork() returns this if interrupted.
 			 * SA_RESTART is ignored (assumed set): the restart is unconditional.
 			 */
-			tprints_string("= ? ERESTARTNOINTR (To be restarted)");
+			print_erestart("ERESTARTNOINTR", "To be restarted");
 			break;
 		case ERESTARTNOHAND:
 			/* pause(), rt_sigsuspend() etc use this code.
@@ -876,7 +882,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * after SIG_IGN or SIG_DFL signal it will restart
 			 * (thus the name "restart only if has no handler").
 			 */
-			tprints_string("= ? ERESTARTNOHAND (To be restarted if no handler)");
+			print_erestart("ERESTARTNOHAND", "To be restarted if no handler");
 			break;
 		case ERESTART_RESTARTBLOCK:
 			/* Syscalls like nanosleep(), poll() which can't be
@@ -890,7 +896,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			 * which in turn saves another such restart block,
 			 * old data is lost and restart becomes impossible)
 			 */
-			tprints_string("= ? ERESTART_RESTARTBLOCK (Interrupted by signal)");
+			print_erestart("ERESTART_RESTARTBLOCK", "Interrupted by signal");
 			break;
 		default:
 			print_err_ret(tcp->u_rval, tcp->u_error);
