@@ -743,8 +743,11 @@ tprints_string(const char *str)
 void
 tprints_comment(const char *const str)
 {
-	if (str && *str)
-		tprintf_string(" /* %s */", str);
+	if (str && *str) {
+		tprint_comment_begin();
+		tprints_string(str);
+		tprint_comment_end();
+	}
 }
 
 void
