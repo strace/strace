@@ -376,6 +376,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	stack-fcall \
 	stack-fcall-attach \
 	stack-fcall-mangled \
+	status-detached-threads \
 	status-none-threads \
 	status-unfinished-threads \
 	strace--decode-pids-comm \
@@ -435,6 +436,7 @@ preadv_pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 pwritev_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
+status_detached_threads_LDADD = -lpthread $(LDADD)
 status_none_threads_LDADD = -lpthread $(LDADD)
 status_unfinished_threads_LDADD = -lpthread $(LDADD)
 threads_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
@@ -600,6 +602,7 @@ MISC_TESTS = \
 	sigblock.test \
 	sigign.test \
 	status-detached.test \
+	status-detached-threads.test \
 	status-none-threads.test \
 	status-unfinished-threads.test \
 	strace--tips.test \

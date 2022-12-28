@@ -3268,7 +3268,7 @@ print_event_exit(struct tcb *tcp)
 	}
 
 	if (!output_separately && printing_tcp && printing_tcp != tcp
-	    && printing_tcp->curcol != 0) {
+	    && printing_tcp->curcol != 0 && !printing_tcp->staged_output_data) {
 		set_current_tcp(printing_tcp);
 		tprint_space();
 		tprints_string("<unfinished ...>");

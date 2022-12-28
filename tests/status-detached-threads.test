@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# Check status=detached filtering when a non-leader thread invokes execve.
+#
+# Copyright (c) 2019-2022 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+# Check that PTRACE_EVENT_EXEC support in kernel is good enough.
+# The kernel before commit v3.1-rc1~308^2~7 reported 0 instead of old pid.
+require_min_kernel_version_or_skip 3.1
+
+run_strace_match_diff -f --status=detached --trace=execve,/sleep

@@ -1000,6 +1000,7 @@ stat64
 statfs
 statfs64
 status-all
+status-detached-threads
 status-failed
 status-failed-long
 status-failed-status
