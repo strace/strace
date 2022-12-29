@@ -815,15 +815,17 @@ printleader(struct tcb *tcp)
 		printing_tcp = tcp;
 
 	if (printing_tcp) {
-		set_current_tcp(printing_tcp);
-		if (!tcp->staged_output_data && printing_tcp->curcol != 0 &&
-		    (!output_separately || printing_tcp == tcp)) {
+		if (printing_tcp->curcol != 0 &&
+		    (printing_tcp == tcp ||
+		     (!output_separately &&
+		      !printing_tcp->staged_output_data))) {
 			/*
 			 * case 1: we have a shared log (i.e. not -ff), and last line
 			 * wasn't finished (same or different tcb, doesn't matter).
 			 * case 2: split log, we are the same tcb, but our last line
 			 * didn't finish ("SIGKILL nuked us after syscall entry" etc).
 			 */
+			set_current_tcp(printing_tcp);
 			tprint_space();
 			tprints_string("<unfinished ...>");
 			tprint_newline();

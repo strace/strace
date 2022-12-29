@@ -1010,6 +1010,7 @@ status-none-threads
 status-successful
 status-successful-long
 status-successful-status
+status-successful-threads
 status-unfinished
 status-unfinished-threads
 statx

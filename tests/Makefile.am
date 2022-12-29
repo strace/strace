@@ -378,6 +378,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	stack-fcall-mangled \
 	status-detached-threads \
 	status-none-threads \
+	status-successful-threads \
 	status-unfinished-threads \
 	strace--decode-pids-comm \
 	strace-Y-0123456789 \
@@ -438,6 +439,7 @@ stat64_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 statfs_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 status_detached_threads_LDADD = -lpthread $(LDADD)
 status_none_threads_LDADD = -lpthread $(LDADD)
+status_successful_threads_LDADD = -lpthread $(LDADD)
 status_unfinished_threads_LDADD = -lpthread $(LDADD)
 threads_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
 threads_execve__quiet_thread_execve_LDADD = -lpthread $(clock_LIBS) $(LDADD)
@@ -604,6 +606,7 @@ MISC_TESTS = \
 	status-detached.test \
 	status-detached-threads.test \
 	status-none-threads.test \
+	status-successful-threads.test \
 	status-unfinished-threads.test \
 	strace--tips.test \
 	strace--tips-full.test \
