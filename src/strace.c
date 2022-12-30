@@ -3291,7 +3291,6 @@ print_event_exit(struct tcb *tcp)
 		tprints_string("<unfinished ...>");
 	}
 
-	printing_tcp = tcp;
 	tprints_string(") ");
 	tabto();
 	tprints_string("= ?");

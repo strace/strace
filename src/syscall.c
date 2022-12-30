@@ -755,6 +755,7 @@ print_syscall_resume(struct tcb *tcp)
 		printleader(tcp);
 		tprintf_string("<... %s resumed>", tcp_sysent(tcp)->sys_name);
 	}
+	printing_tcp = tcp;
 }
 
 static void
@@ -792,7 +793,6 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	}
 
 	print_syscall_resume(tcp);
-	printing_tcp = tcp;
 
 	tcp->s_prev_ent = NULL;
 	if (res != 1) {
