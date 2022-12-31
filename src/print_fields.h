@@ -288,6 +288,36 @@ tprints_arg_begin(const char *name)
 	STRACE_PRINTF("%s(", name);
 }
 
+static inline void
+tprint_sysret_begin(void)
+{
+	STRACE_PRINTS("=");
+}
+
+static inline void
+tprints_sysret_next(const char *name)
+{
+	tprint_space();
+}
+
+static inline void
+tprints_sysret_string(const char *name, const char *str)
+{
+	tprints_sysret_next(name);
+	STRACE_PRINTF("(%s)", str);
+}
+
+static inline void
+tprint_sysret_pseudo_rval(void)
+{
+	STRACE_PRINTS("?");
+}
+
+static inline void
+tprint_sysret_end(void)
+{
+}
+
 # define PRINT_VAL_D(val_)	\
 	STRACE_PRINTF("%lld", sign_extend_unsigned_to_ll(val_))
 

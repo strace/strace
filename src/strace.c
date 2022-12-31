@@ -3293,7 +3293,10 @@ print_event_exit(struct tcb *tcp)
 
 	tprints_string(") ");
 	tabto();
-	tprints_string("= ?");
+	tprint_sysret_begin();
+	tprints_sysret_next("retval");
+	tprint_sysret_pseudo_rval();
+	tprint_sysret_end();
 	tprint_newline();
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
 		bool publish = is_number_in_set(STATUS_UNFINISHED, status_set);
