@@ -169,6 +169,7 @@ libstrace_a_SOURCES =	\
 	kernel_dirent.h	\
 	kernel_fcntl.h	\
 	kernel_rusage.h	\
+	kernel_time_types.h \
 	kernel_timespec.h \
 	kernel_timeval.h \
 	kernel_timex.h	\

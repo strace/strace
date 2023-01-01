@@ -10,14 +10,14 @@
 
 # include "arch_defs.h"
 
-typedef struct {
+typedef struct kernel_timespec64_t {
 	long long tv_sec;
 	long long tv_nsec;
 } kernel_timespec64_t;
 
 # if HAVE_ARCH_TIME32_SYSCALLS || HAVE_ARCH_TIMESPEC32
 
-typedef struct {
+typedef struct kernel_timespec32_t {
 	int tv_sec;
 	int tv_nsec;
 } kernel_timespec32_t;
