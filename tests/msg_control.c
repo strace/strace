@@ -20,11 +20,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#if defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL	\
- || defined HAVE_STRUCT___KERNEL_TIMESPEC
-# include <linux/time_types.h>
-#endif
-
+#include "kernel_time_types.h"
 #include "kernel_timeval.h"
 #include "kernel_old_timespec.h"
 
@@ -361,7 +357,6 @@ test_scm_timestamping_old(struct msghdr *const mh, void *const page)
 	       (unsigned long) len, rc, errno2name());
 }
 
-#ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
 static void
 test_scm_timestamp_new(struct msghdr *const mh, void *const page)
 {
@@ -408,9 +403,7 @@ test_scm_timestamp_new(struct msghdr *const mh, void *const page)
 	       (unsigned) cmsg->cmsg_len,
 	       (unsigned long) len, sprintrc(rc));
 }
-#endif /* HAVE_STRUCT___KERNEL_SOCK_TIMEVAL */
 
-#ifdef HAVE_STRUCT___KERNEL_TIMESPEC
 static void
 test_scm_timestampns_new(struct msghdr *const mh, void *const page)
 {
@@ -512,7 +505,6 @@ test_scm_timestamping_new(struct msghdr *const mh, void *const page)
 	       (unsigned) cmsg->cmsg_len,
 	       (unsigned long) len, sprintrc(rc));
 }
-#endif /* HAVE_STRUCT___KERNEL_TIMESPEC */
 
 static void
 print_security(const struct cmsghdr *const cmsg, const size_t cmsg_len)
@@ -662,13 +654,9 @@ test_sol_socket(struct msghdr *const mh, void *const page)
 	test_scm_timestamp_old(mh, page);
 	test_scm_timestampns_old(mh, page);
 	test_scm_timestamping_old(mh, page);
-#ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
 	test_scm_timestamp_new(mh, page);
-#endif
-#ifdef HAVE_STRUCT___KERNEL_TIMESPEC
 	test_scm_timestampns_new(mh, page);
 	test_scm_timestamping_new(mh, page);
-#endif
 
 	test_unknown_type(mh, page, ARG_STR(SOL_SOCKET), "SCM_???");
 }

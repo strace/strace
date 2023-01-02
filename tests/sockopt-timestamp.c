@@ -19,11 +19,7 @@
 # include <unistd.h>
 # include <sys/socket.h>
 
-# if defined HAVE_STRUCT___KERNEL_SOCK_TIMEVAL	\
-  || defined HAVE_STRUCT___KERNEL_TIMESPEC
-#  include <linux/time_types.h>
-# endif
-
+# include "kernel_time_types.h"
 # include "kernel_timeval.h"
 # include "kernel_old_timespec.h"
 
@@ -110,7 +106,6 @@ print_timestampns_old(const struct cmsghdr *c)
 	       (long long) ts.tv_sec, (long long) ts.tv_nsec);
 }
 
-# ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
 static void
 print_timestamp_new(const struct cmsghdr *c)
 {
@@ -129,9 +124,7 @@ print_timestamp_new(const struct cmsghdr *c)
 	printf("{tv_sec=%lld, tv_usec=%lld}",
 	       (long long) tv.tv_sec, (long long) tv.tv_usec);
 }
-# endif /* HAVE_STRUCT___KERNEL_SOCK_TIMEVAL */
 
-# ifdef HAVE_STRUCT___KERNEL_TIMESPEC
 static void
 print_timestampns_new(const struct cmsghdr *c)
 {
@@ -150,7 +143,6 @@ print_timestampns_new(const struct cmsghdr *c)
 	printf("{tv_sec=%lld, tv_nsec=%lld}",
 	       (long long) ts.tv_sec, (long long) ts.tv_nsec);
 }
-# endif /* HAVE_STRUCT___KERNEL_TIMESPEC */
 
 static unsigned int
 test_sockopt(int so_val, const char *str, void (*fun)(const struct cmsghdr *))
@@ -243,12 +235,8 @@ main(void)
 	} tests[] = {
 		{ SO_TIMESTAMP_OLD, "SO_TIMESTAMP_OLD", print_timestamp_old },
 		{ SO_TIMESTAMPNS_OLD, "SO_TIMESTAMPNS_OLD", print_timestampns_old },
-# ifdef HAVE_STRUCT___KERNEL_SOCK_TIMEVAL
 		{ SO_TIMESTAMP_NEW, "SO_TIMESTAMP_NEW", print_timestamp_new },
-# endif
-# ifdef HAVE_STRUCT___KERNEL_TIMESPEC
 		{ SO_TIMESTAMPNS_NEW, "SO_TIMESTAMPNS_NEW", print_timestampns_new },
-# endif
 	};
 	unsigned int tested = 0;
 	for (unsigned int i = 0; i < ARRAY_SIZE(tests); ++i)
