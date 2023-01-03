@@ -16,6 +16,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+
+#include "kernel_time_types.h"
+#define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
 
 #include <sys/stat.h>

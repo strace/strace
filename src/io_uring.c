@@ -8,6 +8,8 @@
 
 #include "defs.h"
 
+#include "kernel_time_types.h"
+#define UAPI_LINUX_IO_URING_H_SKIP_LINUX_TIME_TYPES_H
 #include <linux/io_uring.h>
 
 #include "xlat/uring_enter_flags.h"
