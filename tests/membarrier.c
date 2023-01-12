@@ -80,6 +80,16 @@ main(void)
 			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ|"
 			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_RSEQ";
 			break;
+		case 2|4|8|16|128|256|512:
+			text = "MEMBARRIER_CMD_GLOBAL_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_GLOBAL_EXPEDITED|"
+			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED|"
+			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED|"
+			       "MEMBARRIER_CMD_PRIVATE_EXPEDITED_RSEQ|"
+			       "MEMBARRIER_CMD_REGISTER_PRIVATE_EXPEDITED_RSEQ|"
+			       "MEMBARRIER_CMD_GET_REGISTRATIONS";
+			break;
+
 		default:
 			error_msg_and_fail("membarrier returned %#x, does"
 					   " the test have to be updated?", rc);
