@@ -897,7 +897,7 @@ main(void)
 		{ 0, "IFLA_BRPORT_UNSPEC" },
 		{ 24, "IFLA_BRPORT_FLUSH" },
 		{ 26, "IFLA_BRPORT_PAD" },
-		{ 40, "0x28 /* IFLA_BRPORT_??? */" },
+		{ 41, "0x29 /* IFLA_BRPORT_??? */" },
 		{ 2989, "0xbad /* IFLA_BRPORT_??? */" },
 	};
 
@@ -940,6 +940,7 @@ main(void)
 		{ ARG_STR(IFLA_BRPORT_MRP_RING_OPEN) },
 		{ ARG_STR(IFLA_BRPORT_MRP_IN_OPEN) },
 		{ ARG_STR(IFLA_BRPORT_LOCKED) },
+		{ ARG_STR(IFLA_BRPORT_MAB) },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u8_brport_attrs); k++) {

@@ -2,7 +2,9 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of ALG_* and BPF_* constants.
+  * Implemented decoding of IFLA_BRPORT_MAB and IFLA_DEVLINK_PORT
+    netlink attributes.
+  * Updated lists of ALG_*, BPF_*, and IFLA_* constants.
 
 Noteworthy changes in release 6.1 (2022-12-12)
 ==============================================
