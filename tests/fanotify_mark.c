@@ -51,12 +51,7 @@ do_call(kernel_ulong_t fd, kernel_ulong_t flags, const char *flags_str,
    || defined LINUX_MIPSN32
 		mask,
 #  else
-/* arch/parisc/kernel/sys_parisc32.c, commit ab8a261b */
-#   ifdef HPPA
-		LL_VAL_TO_PAIR((mask << 32) | (mask >> 32)),
-#   else
 		LL_VAL_TO_PAIR(mask),
-#   endif
 #  endif
 		dirfd, path);
 
