@@ -13,5 +13,5 @@
  * to return the error code of the failed syscall to userspace.
  * Workaround this by initializing %r28 ourselves.
  */
-#define ARCH_NEEDS_SET_ERROR_FOR_SCNO_TAMPERING 1
+#define ARCH_NEEDS_SET_ERROR_FOR_SCNO_TAMPERING 0
 #define PERSONALITY0_AUDIT_ARCH { AUDIT_ARCH_PARISC, 0 }
