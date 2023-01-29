@@ -14,6 +14,12 @@ typedef struct {
 	unsigned int	tramp[9];
 	siginfo_t	info;
 	ucontext_t	uc;
-} struct_rt_sigframe;
+} struct_rt_sigframe_old; /* when executed on stack */
+
+typedef struct {
+	unsigned int	tramp[2]; /* holds original return address */
+	siginfo_t	info;
+	ucontext_t	uc;
+} struct_rt_sigframe;	 /* when VDSO is used */
 
 #endif /* !STRACE_RT_SIGFRAME_H */
