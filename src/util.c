@@ -1105,7 +1105,7 @@ print_quoted_cstring(const char *str, unsigned int size)
  * Print path string specified by address `addr' and length `n'.
  * If path length exceeds `n', append `...' to the output.
  *
- * Returns the result of umovenstr.
+ * Returns the result of umovestr.
  */
 int
 printpathn(struct tcb *const tcp, const kernel_ulong_t addr, unsigned int n)
@@ -1152,7 +1152,7 @@ printpath(struct tcb *const tcp, const kernel_ulong_t addr)
  * Append `...' to the output if either the string length exceeds `max_strlen',
  * or QUOTE_0_TERMINATED bit is set and the string length exceeds `len'.
  *
- * Returns the result of umovenstr if style has QUOTE_0_TERMINATED,
+ * Returns the result of umovestr if style has QUOTE_0_TERMINATED,
  * or the result of umoven otherwise.
  */
 int
