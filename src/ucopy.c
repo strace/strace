@@ -432,7 +432,7 @@ umovestr(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
 			char *nul_addr = memchr(laddr, '\0', r);
 
 			if (nul_addr)
-				return (nul_addr - laddr) + 1;
+				return nread + (nul_addr - laddr) + 1;
 			addr += r;
 			laddr += r;
 			nread += r;
