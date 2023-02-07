@@ -359,6 +359,25 @@ check_kbdsent(unsigned int c, const char *s)
 		errno = saved_errno;
 		printf("}) = " RETVAL);
 	}
+
+	if (DEFAULT_STRLEN < sizeof(kbse->kb_string) &&
+	    (RETVAL_INJECTED || c == KDSKBSENT)) {
+		/*
+		 * Check how struct kbsentry.kb_string is printed when it
+		 * starts DEFAULT_STRLEN / 2 bytes before the page boundary.
+		 */
+		struct kbsentry *const k =
+			tail_alloc(get_page_size() +
+				   DEFAULT_STRLEN / 2 + sizeof(k->kb_func));
+		fill_memory_ex(k->kb_string, DEFAULT_STRLEN - 1, '0', 10);
+		k->kb_string[DEFAULT_STRLEN - 1] = '\0';
+
+		sys_ioctl(-1, c, (uintptr_t) k);
+		printf("ioctl(-1, " XLAT_FMT ", {kb_func="
+		       XLAT_KNOWN(0xff, "KVAL(K_UNDO)")
+		       ", kb_string=\"%s\"}) = " RETVAL,
+		       XLAT_SEL(c, s), k->kb_string);
+	}
 }
 
 /* KDGKBDIACR, KDSKBDIACR */
