@@ -321,6 +321,11 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
 /**
  * Decode arg parameter of the ioctl call.
  *
+ * @param finfo The target file descriptor related information.
+ *              finfo is NULL when
+ *              - ioctl_decode() is called in leaving stages, or
+ *              - the file descriptor is not valid (e.g. -1).
+ *
  * @return There are two flags of the return value important for the purposes of
  *         processing by SYS_FUNC(ioctl):
  *          - RVAL_IOCTL_DECODED: indicates that ioctl decoder code
@@ -346,7 +351,7 @@ f_ioctl(struct tcb *tcp, const unsigned int code, const kernel_ulong_t arg)
  *         and passes all other bits of ioctl_decode return value unchanged.
  */
 static int
-ioctl_decode(struct tcb *tcp)
+ioctl_decode(struct tcb *tcp, const struct finfo *finfo)
 {
 	const unsigned int code = tcp->u_arg[1];
 	const kernel_ulong_t arg = tcp->u_arg[2];
@@ -486,9 +491,9 @@ SYS_FUNC(ioctl)
 		if (xlat_verbosity == XLAT_STYLE_VERBOSE)
 			tprint_comment_end();
 
-		ret = ioctl_decode(tcp);
+		ret = ioctl_decode(tcp, finfo);
 	} else {
-		ret = ioctl_decode(tcp) | RVAL_DECODED;
+		ret = ioctl_decode(tcp, NULL) | RVAL_DECODED;
 	}
 
 	if (ret & RVAL_IOCTL_DECODED) {
