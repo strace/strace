@@ -1080,7 +1080,7 @@ main(int argc, char **argv)
 	};
 	static const struct strval32 ctrl_flags[] = {
 		{ ARG_STR(0) },
-		{ ARG_XLAT_KNOWN(0x7ff, "V4L2_CTRL_FLAG_DISABLED"
+		{ ARG_XLAT_KNOWN(0xfff, "V4L2_CTRL_FLAG_DISABLED"
 					"|V4L2_CTRL_FLAG_GRABBED"
 					"|V4L2_CTRL_FLAG_READ_ONLY"
 					"|V4L2_CTRL_FLAG_UPDATE"
@@ -1090,15 +1090,17 @@ main(int argc, char **argv)
 					"|V4L2_CTRL_FLAG_VOLATILE"
 					"|V4L2_CTRL_FLAG_HAS_PAYLOAD"
 					"|V4L2_CTRL_FLAG_EXECUTE_ON_WRITE"
-					"|V4L2_CTRL_FLAG_MODIFY_LAYOUT") },
+					"|V4L2_CTRL_FLAG_MODIFY_LAYOUT"
+					"|V4L2_CTRL_FLAG_DYNAMIC_ARRAY") },
 		{ ARG_XLAT_KNOWN(0xbeefface, "V4L2_CTRL_FLAG_GRABBED"
 					     "|V4L2_CTRL_FLAG_READ_ONLY"
 					     "|V4L2_CTRL_FLAG_UPDATE"
 					     "|V4L2_CTRL_FLAG_WRITE_ONLY"
 					     "|V4L2_CTRL_FLAG_VOLATILE"
 					     "|V4L2_CTRL_FLAG_EXECUTE_ON_WRITE"
-					     "|0xbeeff800") },
-		{ ARG_XLAT_UNKNOWN(0xfffff800, "V4L2_CTRL_FLAG_???") },
+					     "|V4L2_CTRL_FLAG_DYNAMIC_ARRAY"
+					     "|0xbeeff000") },
+		{ ARG_XLAT_UNKNOWN(0xfffff000, "V4L2_CTRL_FLAG_???") },
 	};
 	static const size_t qctrl_iters = MAX(MAX(ARRAY_SIZE(cids),
 						  ARRAY_SIZE(ctrl_types)),
