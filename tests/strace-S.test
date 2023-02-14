@@ -19,7 +19,7 @@ test_c()
 	sedexpr="$1"; shift
 
 	run_strace -c -w $sortby ../readv > /dev/null
-	sed -r -n -e "$sedexpr" < "$LOG" > "$OUT"
+	sed -E -n -e "$sedexpr" < "$LOG" > "$OUT"
 
 	[ -s "$OUT" ] ||
 		fail_ "$STRACE $args output mismatch"

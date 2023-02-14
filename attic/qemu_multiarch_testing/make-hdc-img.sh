@@ -17,7 +17,7 @@ cleanup()
 trap 'cleanup $?' EXIT
 trap 'cleanup 1' HUP PIPE INT QUIT TERM
 
-size=$(du -ks hdc.dir | sed -rn 's/^([0-9]+).*/\1/p')
+size=$(du -ks hdc.dir | sed -En 's/^([0-9]+).*/\1/p')
 [ "$size" -gt 0 ]
 
 rm -f hdc.img

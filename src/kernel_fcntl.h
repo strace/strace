@@ -19,7 +19,7 @@
 # define flock64 kernel_flock64
 
 /*
- * sed -rn 's/^#define[[:space:]]+([^[:space:]]+)[[:space:]].*$/# undef \1/p' \
+ * sed -En 's/^#define[[:space:]]+([^[:space:]]+)[[:space:]].*$/# undef \1/p' \
  *	include/uapi/asm-generic/fcntl.h
  */
 # undef O_ACCMODE

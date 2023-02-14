@@ -38,7 +38,7 @@ sed_slash_escape()
 # in the CONFIG_H variable).
 get_config_str()
 {
-	sed -r -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"([^"]*)".*/\1/p' \
+	sed -E -n 's/#define[[:space:]]*'"$1"'[[:space:]]*"([^"]*)".*/\1/p' \
 		"$CONFIG_H"
 }
 
@@ -50,7 +50,7 @@ get_config_str()
 get_config_option()
 {
 	local opt
-	opt=$(sed -r -n 's/#define[[:space:]]*'"$1"'[[:space:]]*([0-9]+)$/\1/p' \
+	opt=$(sed -E -n 's/#define[[:space:]]*'"$1"'[[:space:]]*([0-9]+)$/\1/p' \
 		"$CONFIG_H")
 	if [ -n "$opt" -a "$opt" -ne 0 ]; then
 		printf "%s" "$2"

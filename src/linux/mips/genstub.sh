@@ -11,5 +11,5 @@ dstdir="$1"; shift
 for n; do
 	in="$srcdir/syscallent-$n.h"
 	out="$dstdir/syscallent-$n-stub.h"
-	sed -r -n '/^#if/,/^#else/ {s/^([^{]*\{[^,]*,[^,]*,[[:space:]]*)[^,[:space:]]+,[[:space:]]*"([^"]+".*)/\1SEN(printargs), SYSCALL_NAME_PREFIX "\2/; s/^\[.*/&/p}' < "$in" > "$out"
+	sed -E -n '/^#if/,/^#else/ {s/^([^{]*\{[^,]*,[^,]*,[[:space:]]*)[^,[:space:]]+,[[:space:]]*"([^"]+".*)/\1SEN(printargs), SYSCALL_NAME_PREFIX "\2/; s/^\[.*/&/p}' < "$in" > "$out"
 done

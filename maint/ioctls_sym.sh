@@ -431,10 +431,10 @@ process_file()
 				i?86|x86_64*) list="$arm_list|$ppc_list|$s390_list" ;;
 				*) list="$arm_list|$ppc_list|$s390_list|$x86_list" ;;
 			esac
-			sed -r -i "/[[:space:]]($list)[[:space:]]/d" "$tmpdir"/header.out
+			sed -E -i "/[[:space:]]($list)[[:space:]]/d" "$tmpdir"/header.out
 			;;
 		*linux/v4l2-subdev.h)
-			sed -r -i '/[[:space:]]VIDIOC_SUBDEV_(DV_TIMINGS_CAP|ENUM_DV_TIMINGS|ENUMSTD|G_DV_TIMINGS|G_EDID|G_STD|QUERY_DV_TIMINGS|QUERYSTD|S_DV_TIMINGS|S_EDID|S_STD)[[:space:]]/d' \
+			sed -E -i '/[[:space:]]VIDIOC_SUBDEV_(DV_TIMINGS_CAP|ENUM_DV_TIMINGS|ENUMSTD|G_DV_TIMINGS|G_EDID|G_STD|QUERY_DV_TIMINGS|QUERYSTD|S_DV_TIMINGS|S_EDID|S_STD)[[:space:]]/d' \
 				"$tmpdir"/header.out
 			;;
 	esac
@@ -460,7 +460,7 @@ process_file()
 	$READELF --wide --debug-dump=info "$tmpdir"/printents.o \
 		> "$tmpdir"/debug-dump
 
-	sed -r -n '
+	sed -E -n '
 		/^[[:space:]]*<1>/,/^[[:space:]]*<1><[^>]+>: Abbrev Number: 0/!d
 		/^[[:space:]]*<[^>]*><[^>]*>: Abbrev Number: 0/d
 		s/^[[:space:]]*<[[:xdigit:]]+>[[:space:]]+//

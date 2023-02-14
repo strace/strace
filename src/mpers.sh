@@ -25,7 +25,7 @@ VAR_NAME='mpers_target_var'
 BITS_DIR="mpers-${ARCH_FLAG}"
 
 mkdir -p ${BITS_DIR}
-set -- $(sed -r -n \
+set -- $(sed -E -n \
 	's/^#[[:space:]]*include[[:space:]]+DEF_MPERS_TYPE\(([^)[:space:]]*)\)$/\1/p' \
 		"${PARSER_FILE}")
 for m_type; do
@@ -47,7 +47,7 @@ for m_type; do
 	sed -i -e '/DEF_MPERS_TYPE/d' "${f_c}"
 	$CC $CFLAGS $CC_ARCH_FLAG "${f_c}" -o "${f_o}"
 	$READELF --wide --debug-dump=info "${f_o}" > "${f_d1}"
-	sed -r -n '
+	sed -E -n '
 		/^[[:space:]]*<1>/,/^[[:space:]]*<1><[^>]+>: Abbrev Number: 0/!d
 		/^[[:space:]]*<[^>]*><[^>]*>: Abbrev Number: 0/d
 		s/^[[:space:]]*<[[:xdigit:]]+>[[:space:]]+//

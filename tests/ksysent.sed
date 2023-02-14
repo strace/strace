@@ -1,4 +1,4 @@
-#!/bin/sed -rnf
+#!/bin/sed -Enf
 #
 # Copyright (c) 2015-2019 The strace developers.
 # All rights reserved.
