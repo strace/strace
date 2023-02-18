@@ -152,9 +152,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	fsync-y \
 	get_process_reaper \
 	getpgrp--pidns-translation	\
-	getpid	\
 	getpid--pidns-translation	\
-	getppid	\
 	getsid--pidns-translation \
 	gettid \
 	gettid--pidns-translation \
