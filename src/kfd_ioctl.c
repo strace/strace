@@ -296,9 +296,9 @@ print_amdkfd_ioc_get_tile_config(struct tcb *const tcp,
 
 	/* entering */
 	tprint_struct_begin();
-	PRINT_FIELD_PTR(args, tile_config_ptr);
+	PRINT_FIELD_X(args, tile_config_ptr);
 	tprint_struct_next();
-	PRINT_FIELD_PTR(args, macro_tile_config_ptr);
+	PRINT_FIELD_X(args, macro_tile_config_ptr);
 	tprint_struct_next();
 	PRINT_FIELD_U(args, num_tile_configs);
 	tprint_struct_next();
@@ -344,7 +344,7 @@ print_amdkfd_ioc_get_process_apertures_new(struct tcb *const tcp,
 		return RVAL_IOCTL_DECODED;
 
 	tprint_struct_begin();
-	PRINT_FIELD_PTR(args, kfd_process_device_apertures_ptr); /* TODO: print array */
+	PRINT_FIELD_X(args, kfd_process_device_apertures_ptr); /* TODO: print array */
 	tprint_struct_next();
 	PRINT_FIELD_U(args, num_of_nodes);
 	tprint_struct_end();
@@ -453,7 +453,7 @@ print_amdkfd_ioc_map_memory_to_gpu(struct tcb *const tcp,
 	tprint_struct_begin();
 	PRINT_FIELD_X(args, handle);
 	tprint_struct_next();
-	PRINT_FIELD_PTR(args, device_ids_array_ptr);
+	PRINT_FIELD_X(args, device_ids_array_ptr);
 	tprint_struct_next();
 	PRINT_FIELD_U(args, n_devices);
 	tprint_struct_next();
@@ -489,7 +489,7 @@ print_amdkfd_ioc_unmap_memory_from_gpu(struct tcb *const tcp,
 	tprint_struct_begin();
 	PRINT_FIELD_X(args, handle);
 	tprint_struct_next();
-	PRINT_FIELD_PTR(args, device_ids_array_ptr);
+	PRINT_FIELD_X(args, device_ids_array_ptr);
 	tprint_struct_next();
 	PRINT_FIELD_U(args, n_devices);
 	tprint_struct_next();
