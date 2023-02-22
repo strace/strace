@@ -2,6 +2,8 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented collision resolution for overlapping ioctl commands
+    from tty and snd subsystems.
   * Implemented decoding of IFLA_BRPORT_MAB and IFLA_DEVLINK_PORT
     netlink attributes.
   * Updated lists of ALG_*, BPF_*, IFLA_*, KEY_*, KVM_*, LANDLOCK_*,
