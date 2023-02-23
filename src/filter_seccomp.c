@@ -679,14 +679,20 @@ dump_seccomp_bpf(void)
 void
 init_seccomp_filter(void)
 {
-	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0)
-		perror_func_msg_and_die("prctl(PR_SET_NO_NEW_PRIVS)");
-
 	if (debug_flag)
 		dump_seccomp_bpf();
 
-	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) < 0)
-		perror_func_msg_and_die("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
+	if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) == 0)
+		return;
+
+	if (errno == EACCES) {
+		if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0)
+			perror_func_msg_and_die("prctl(PR_SET_NO_NEW_PRIVS)");
+		if (prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &bpf_prog) == 0)
+			return;
+	}
+
+	perror_func_msg_and_die("prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER)");
 }
 
 int
