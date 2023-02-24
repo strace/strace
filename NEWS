@@ -10,6 +10,9 @@ Noteworthy changes in release ?.? (????-??-??)
     MEMBARRIER_*, NFT_*, NTF_*, and V4L2_* constants.
   * Updated lists of ioctl commands from Linux 6.2.
 
+* Bug fixes
+  * Fixed build on alpha architecture.
+
 Noteworthy changes in release 6.1 (2022-12-12)
 ==============================================
 

@@ -1836,7 +1836,7 @@ main(void)
 		{ ARG_XLAT_KNOWN(0x4, "TRAP_HWBKPT") },
 #endif
 		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
-#ifdef __alpha__
+#if defined __alpha__ && defined HAVE_SIGINFO_T_SI_TRAPNO
 		  ", si_trapno=0 /* GEN_??? */"
 		},
 		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"),
@@ -1847,7 +1847,7 @@ main(void)
 		  ", si_trapno=-26 /* GEN_??? */" },
 		{ ARG_XLAT_KNOWN(0x5, "TRAP_UNK"), ""
 		  ", si_trapno=-1234567890 /* GEN_??? */"
-#endif /* __alpha__ */
+#endif /* __alpha__ && HAVE_SIGINFO_T_SI_TRAPNO */
 		},
 		{ ARG_XLAT_KNOWN(0x6, "TRAP_PERF"), ""
 #ifdef HAVE_SIGINFO_T_SI_PERF_DATA
@@ -1917,7 +1917,7 @@ main(void)
 
 		switch (sip->si_code) {
 		case 5: /* TRAP_UNK */
-#ifdef __alpha__
+#if defined __alpha__ && defined HAVE_SIGINFO_T_SI_TRAPNO
 			sip->si_trapno = trap_unk_vecs[trap_unk_pos];
 #endif
 			trap_unk_pos = (trap_unk_pos + 1)
@@ -1981,7 +1981,7 @@ main(void)
 	do_ptrace(PTRACE_SETSIGINFO, pid, bad_request, (uintptr_t) sip);
 	printf("ptrace(" XLAT_FMT ", %d, %#lx, {si_signo=" XLAT_FMT_U
 	       ", si_code=" XLAT_FMT ", si_errno=" XLAT_FMT_U ", si_addr=%p"
-#ifdef __alpha__
+#if defined __alpha__ && defined HAVE_SIGINFO_T_SI_TRAPNO
 	       ", si_trapno=" XLAT_KNOWN(-7, "GEN_FLTINE")
 #endif
 	       "}) = %s\n",

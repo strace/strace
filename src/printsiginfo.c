@@ -168,7 +168,7 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SIGFPE:
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_addr);
-#ifdef ALPHA
+#if defined ALPHA && defined HAVE_SIGINFO_T_SI_TRAPNO
 			tprint_struct_next();
 			PRINT_FIELD_XVAL_D(*sip, si_trapno, alpha_trap_codes,
 					   "GEN_???");
@@ -214,15 +214,16 @@ print_si_info(struct tcb *tcp, const siginfo_t *sip)
 		case SIGTRAP:
 			tprint_struct_next();
 			PRINT_FIELD_PTR(*sip, si_addr);
-#if defined(ALPHA) || defined(HAVE_SIGINFO_T_SI_PERF_DATA)
+#if (defined ALPHA && defined HAVE_SIGINFO_T_SI_TRAPNO) \
+ || defined HAVE_SIGINFO_T_SI_PERF_DATA
 			switch (sip->si_code) {
-# ifdef ALPHA
+# if defined ALPHA && defined HAVE_SIGINFO_T_SI_TRAPNO
 			case TRAP_UNK:
 				tprint_struct_next();
 				PRINT_FIELD_XVAL_D(*sip, si_trapno,
 						   alpha_trap_codes, "GEN_???");
 				break;
-# endif /* ALPHA */
+# endif /* ALPHA && HAVE_SIGINFO_T_SI_TRAPNO */
 # ifdef HAVE_SIGINFO_T_SI_PERF_DATA
 			case TRAP_PERF:
 				tprint_struct_next();
