@@ -125,6 +125,9 @@ fi
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Sun Feb 26 2023 Dmitry V. Levin <ldv@strace.io> - 6.2-1
+- v6.1 -> v6.2.
+
 * Mon Dec 12 2022 Dmitry V. Levin <ldv@strace.io> - 6.1-1
 - v6.0 -> v6.1.
 
