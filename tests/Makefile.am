@@ -804,6 +804,13 @@ EXTRA_DIST = \
 	$(TESTS) \
 	# end of EXTRA_DIST
 
+if ENABLE_INSTALL_TESTS
+testslibexecdir = $(libexecdir)/strace/tests$(MPERS_NAME)
+testslibexec_PROGRAMS = $(check_PROGRAMS)
+testslibexec_DATA = $(check_DATA)
+testslibexec_SCRIPTS = $(check_SCRIPTS) $(TESTS)
+endif
+
 ksysent.h: $(srcdir)/ksysent.sed
 	echo '#include <asm/unistd.h>' | \
 		$(CPP) $(AM_CPPFLAGS) $(CPPFLAGS) -dM - > $@.t1

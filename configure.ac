@@ -797,6 +797,19 @@ m4_foreach([pers], [M32, MX32], dnl
 st_MPERS([m32], [aarch64|powerpc64|s390x|sparc64|tile|x32|x86_64])
 st_MPERS([mx32], [x86_64])
 
+AC_ARG_ENABLE([install-tests],
+	[AS_HELP_STRING([--enable-install-tests=yes|no],
+		[whether to install tests into libexec/strace,
+		 default is no.])],
+	[case "$enableval" in
+		yes|no) enable_install_tests="$enableval" ;;
+		*) AC_MSG_ERROR([bad value $enableval for enable-install-tests option.
+Valid options are: yes, no.])
+		;;
+	 esac],
+	[enable_install_tests=no])
+AM_CONDITIONAL([ENABLE_INSTALL_TESTS], [test x$enable_install_tests = xyes])
+
 AX_VALGRIND_DFLT([sgcheck], [off])
 AX_VALGRIND_CHECK
 
