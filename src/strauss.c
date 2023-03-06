@@ -57,7 +57,7 @@ static const char *strauss[] = {
 
 const size_t strauss_lines = ARRAY_SIZE(strauss);
 
-enum { MAX_TIP_LINES = 13 };
+enum { MAX_TIP_LINES = 14 };
 
 static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	{ "strace has an extensive manual page",
@@ -128,7 +128,7 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	{ "strace is about as old as the Linux kernel.",
 	  "It has been originally written for SunOS",
 	  "by Paul Kranenburg in 1991.  The support",
-	  "for all OSes except Linux was dropped"
+	  "for all OSes except Linux was dropped",
 	  "in 2012, though, in strace 4.7." },
 	{ "strace is able to decode netlink messages.",
 	  "It does so automatically for I/O performed",
@@ -285,8 +285,8 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	  "will trace all syscalls related to accessing",
 	  "and modifying process's user/group IDs",
 	  "and capability sets.  Other pre-defined",
-	  "syscall classes include %clock, %desc,"
-	  "%file, %ipc, %memory, %net, %process,"
+	  "syscall classes include %clock, %desc,",
+	  "%file, %ipc, %memory, %net, %process,",
 	  "and %signal." },
 	{ "Trying to figure out communication between",
 	  "tracees inside a different PID namespace",
