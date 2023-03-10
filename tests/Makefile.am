@@ -649,118 +649,83 @@ AM_TEST_LOG_FLAGS = STRACE_ARCH=$(ARCH) STRACE_NATIVE_ARCH=$(NATIVE_ARCH) \
 VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 
-EXTRA_DIST = \
-	COPYING \
-	GPL-2.0-or-later \
-	PTRACE_SEIZE.sh \
-	accept_compat.h \
+check_SCRIPTS = \
 	arch_prctl.sh \
-	attach-p-cmd.h \
-	caps-abbrev.awk \
-	caps.awk \
-	clock.in \
-	clock_adjtime-common.c \
-	clock_xettime-common.c \
-	count-f.expected \
-	cur_audit_arch.h \
-	eventfd.expected \
-	fadvise.h \
-	fcntl-common.c \
-	filter_seccomp.in \
 	filter_seccomp.sh \
-	filter-unavailable.expected \
-	fork--pidns-translation.awk \
-	fstatat.c \
-	fstatx.c \
-	gen_pure_executables.sh \
-	gen_tests.in \
-	gen_tests.sh \
-	getresugid.c \
 	init.sh \
-	init_delete_module.h \
 	ioctl-success.sh \
-	ioctl_kvm_run_common.c \
 	ipc.sh \
-	kernel_old_timespec.h \
-	kernel_old_timex.h \
-	ksysent.sed \
-	lstatx.c \
-	match.awk \
-	net.expected \
-	nlattr_ifla.h \
-	nlattr_ifla_af_inet6.h \
-	pipe.expected \
-	poke-range.expected \
-	poke-unaligned.expected \
 	prctl.sh \
 	prctl-success.sh \
 	print_scno_getcwd.sh \
-	print_user_desc.c \
-	printsignal.c \
-	printxval.c \
-	process_vm_readv_writev.c \
-	pselect6-common.c \
+	PTRACE_SEIZE.sh \
+	qualify_personality_all.sh \
+	qualify_personality.sh \
+	run.sh \
+	scno_tampering.sh \
+	strace-k-demangle.test \
+	strace-k-p.test \
+	strace-k.test \
+	syntax.sh \
+	# end of check_SCRIPTS
+
+check_DATA = \
+	COPYING \
+	GPL-2.0-or-later \
+	caps-abbrev.awk \
+	caps.awk \
+	clock.in \
+	count-f.expected \
+	eventfd.expected \
+	filter_seccomp.in \
+	filter-unavailable.expected \
+	fork--pidns-translation.awk \
+	match.awk \
+	net.expected \
+	pipe.expected \
+	poke-range.expected \
+	poke-unaligned.expected \
 	pure_executables.list \
 	qual_fault-exit_group.expected \
+	qualify_personality_empty.in \
 	qual_inject-error-signal.expected \
 	qual_inject-signal.expected \
-	qualify_personality.sh \
-	qualify_personality_all.sh \
-	qualify_personality_empty.in \
-	quotactl.h \
 	regex.in \
 	rt_sigaction.awk \
-	run.sh \
 	sched.in \
-	scno_tampering.sh \
-	semop-common.c \
-	semtimedop-common.c \
-	semtimedop-syscall.c \
-	setfsugid.c \
-	setresugid.c \
-	setreugid.c \
-	setugid.c \
 	sigaltstack.expected \
-	sockaddr_xlat.c \
-	sockname.c \
-	stack-fcall.h \
 	status-detached.expected \
-	strace--follow-forks-output-separately.expected \
-	strace--relative-timestamps.expected \
-	strace--relative-timestamps-s.expected \
-	strace--relative-timestamps-ms.expected \
-	strace--relative-timestamps-us.expected \
-	strace--relative-timestamps-ns.expected \
-	strace--syscall-times.expected \
-	strace--syscall-times-s.expected \
-	strace--syscall-times-ms.expected \
-	strace--syscall-times-us.expected \
-	strace--syscall-times-ns.expected \
-	strace--tips.exp \
 	strace-C.expected \
-	strace-D.expected \
 	strace-DDD.expected \
+	strace-D.expected \
 	strace-E.expected \
 	strace-E-unset.expected \
-	strace-T_upper.expected \
 	strace-ff.expected \
+	strace--follow-forks-output-separately.expected \
 	strace-k-demangle.expected \
-	strace-k-demangle.test \
-	strace-k-p.expected \
-	strace-k-p.test \
 	strace-k.expected \
-	strace-k.test \
+	strace-k-p.expected \
+	strace--relative-timestamps.expected \
+	strace--relative-timestamps-ms.expected \
+	strace--relative-timestamps-ns.expected \
+	strace--relative-timestamps-s.expected \
+	strace--relative-timestamps-us.expected \
 	strace-r.expected \
 	strace.supp \
+	strace--syscall-times.expected \
+	strace--syscall-times-ms.expected \
+	strace--syscall-times-ns.expected \
+	strace--syscall-times-s.expected \
+	strace--syscall-times-us.expected \
+	strace--tips.exp \
+	strace-T_upper.expected \
 	strauss_body.exp \
 	strauss_head.exp \
 	sun_path.expected \
-	syntax.sh \
-	time_enjoyment.h \
 	trace_clock.in \
 	trace_creds.in \
-	trace_fstat.in \
 	trace_fstatfs.in \
+	trace_fstat.in \
 	trace_lstat.in \
 	trace_personality_32.in \
 	trace_personality_64.in \
@@ -775,15 +740,56 @@ EXTRA_DIST = \
 	trace_personality_statfs_x32.in \
 	trace_personality_x32.in \
 	trace_question.in \
-	trace_stat.in \
-	trace_stat_like.in \
 	trace_statfs.in \
 	trace_statfs_like.in \
+	trace_stat.in \
+	trace_stat_like.in \
 	uio.expected \
-	umode_t.c \
 	umovestr.expected \
 	unix-pair-send-recv.expected \
 	unix-pair-sendto-recvfrom.expected \
+	# end of check_DATA
+
+EXTRA_DIST = \
+	gen_pure_executables.sh \
+	gen_tests.sh \
+	accept_compat.h \
+	attach-p-cmd.h \
+	clock_adjtime-common.c \
+	clock_xettime-common.c \
+	cur_audit_arch.h \
+	fadvise.h \
+	fcntl-common.c \
+	fstatat.c \
+	fstatx.c \
+	gen_tests.in \
+	getresugid.c \
+	init_delete_module.h \
+	ioctl_kvm_run_common.c \
+	kernel_old_timespec.h \
+	kernel_old_timex.h \
+	ksysent.sed \
+	lstatx.c \
+	nlattr_ifla.h \
+	nlattr_ifla_af_inet6.h \
+	print_user_desc.c \
+	printsignal.c \
+	printxval.c \
+	process_vm_readv_writev.c \
+	pselect6-common.c \
+	quotactl.h \
+	semop-common.c \
+	semtimedop-common.c \
+	semtimedop-syscall.c \
+	setfsugid.c \
+	setresugid.c \
+	setreugid.c \
+	setugid.c \
+	sockaddr_xlat.c \
+	sockname.c \
+	stack-fcall.h \
+	time_enjoyment.h \
+	umode_t.c \
 	xchownx.c \
 	xgetdents.c \
 	xgetrlimit.c \
@@ -793,7 +799,17 @@ EXTRA_DIST = \
 	xstatfsx.c \
 	xstatx.c \
 	xutimes.c \
-	$(TESTS)
+	$(check_DATA) \
+	$(check_SCRIPTS) \
+	$(TESTS) \
+	# end of EXTRA_DIST
+
+if ENABLE_INSTALL_TESTS
+testslibexecdir = $(libexecdir)/strace/tests$(MPERS_NAME)
+testslibexec_PROGRAMS = $(check_PROGRAMS)
+testslibexec_DATA = $(check_DATA)
+testslibexec_SCRIPTS = $(check_SCRIPTS) $(TESTS)
+endif
 
 ksysent.h: $(srcdir)/ksysent.sed
 	echo '#include <asm/unistd.h>' | \

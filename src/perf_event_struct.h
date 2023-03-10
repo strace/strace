@@ -94,6 +94,8 @@ struct perf_event_attr {
 	/* End of ver 6 - 120 bytes */
 	uint64_t sig_data;
 	/* End of ver 7 - 128 bytes */
+	uint64_t config3;
+	/* End of ver 8 - 136 bytes */
 };
 
 struct perf_event_query_bpf {
