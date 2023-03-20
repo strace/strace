@@ -379,6 +379,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	status-successful-threads \
 	status-unfinished-threads \
 	strace--decode-pids-comm \
+	strace--syscall-limit \
+	strace--syscall-limit-path \
+	strace--syscall-limit-status \
 	strace-Y-0123456789 \
 	strace-p-Y-p2 \
 	strace-p1-Y-p \
@@ -606,6 +609,7 @@ MISC_TESTS = \
 	status-none-threads.test \
 	status-successful-threads.test \
 	status-unfinished-threads.test \
+	strace--syscall-limit.test \
 	strace--tips.test \
 	strace--tips-full.test \
 	strace-C.test \

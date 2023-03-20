@@ -1006,6 +1006,8 @@ strace--strings-in-hex-all		--trace=chdir --strings-in-hex=all --columns=18
 strace--strings-in-hex-non-ascii	--trace=chdir --strings-in-hex=non-ascii --columns=12
 strace--strings-in-hex-non-ascii-chars	--trace=chdir --strings-in-hex=non-ascii-chars --columns=12
 strace--strings-in-hex-none		--trace=chdir --strings-in-hex=none --columns=12
+strace--syscall-limit-path	+strace--syscall-limit.test --trace=all --trace-path=invalid.dir
+strace--syscall-limit-status	+strace--syscall-limit.test --status=failed
 strace--syscall-times +strace-T_upper.test --syscall-times
 strace--syscall-times-ms +strace-T_upper.test --syscall-times=ms
 strace--syscall-times-ns +strace-T_upper.test --syscall-times=ns

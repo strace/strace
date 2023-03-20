@@ -1020,6 +1020,9 @@ strace--strings-in-hex-all
 strace--strings-in-hex-non-ascii
 strace--strings-in-hex-non-ascii-chars
 strace--strings-in-hex-none
+strace--syscall-limit
+strace--syscall-limit-path
+strace--syscall-limit-status
 strace-Y-0123456789
 strace-n
 strace-no-x
