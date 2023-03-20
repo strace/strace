@@ -849,6 +849,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 	}
 
+	if (syscall_limit != -1)
+		syscall_limit--;
+
 	tprint_arg_end();
 	tprint_space();
 	tabto();

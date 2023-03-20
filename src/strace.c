@@ -84,6 +84,7 @@ int Tflag_scale = 1000;
 int Tflag_width = 6;
 bool iflag;
 bool count_wallclock;
+long long syscall_limit = -1;
 static bool nflag;
 static int tflag_scale = 1000000000;
 static unsigned tflag_width = 0;
@@ -460,6 +461,10 @@ Statistics:\n\
                  (default time-percent,total-time,avg-time,calls,errors,name)\n\
   -w, --summary-wall-clock\n\
                  summarise syscall latency (default is system time)\n\
+\n\
+Stop condition:\n\
+  -l LIMIT, --syscall-limit=LIMIT\n\
+                 Detach all tracees after tracing LIMIT syscalls\n\
 \n\
 Tampering:\n\
   -e inject=SET[:error=ERRNO|:retval=VALUE][:signal=SIG][:syscall=SYSCALL]\n\
@@ -2245,7 +2250,7 @@ init(int argc, char *argv[])
 #endif
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
+		"+a:Ab:cCdDe:E:fFhiI:kl:no:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2291,6 +2296,7 @@ init(int argc, char *argv[])
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
+		{ "syscall-limit",	required_argument, 0, 'l' },
 		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
 		{ "summary-syscall-overhead", required_argument, 0, 'O' },
@@ -2431,6 +2437,11 @@ init(int argc, char *argv[])
 					  "option) are not supported by this "
 					  "build of strace");
 #endif
+			break;
+		case 'l':
+			syscall_limit = string_to_ulonglong(optarg);
+			if (syscall_limit <= 0)
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case 'n':
 			nflag = 1;
@@ -3352,6 +3363,13 @@ next_event(void)
 {
 	if (interrupted)
 		return NULL;
+
+	if (syscall_limit == 0) {
+		if (!is_number_in_set(QUIET_ATTACH, quiet_set))
+			error_msg("System call limit has been reached, detaching tracees");
+		strace_child = 0;
+		return NULL;
+	}
 
 	invalidate_umove_cache();
 

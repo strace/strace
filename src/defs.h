@@ -513,6 +513,7 @@ extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
+extern long long syscall_limit;
 
 struct path_set_item {
 	const char *path;
