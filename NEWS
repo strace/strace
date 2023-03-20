@@ -3,6 +3,8 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Updated lists of ioctl commands from Linux 6.3.
+  * Implemented -l/--syscall-limit option to automatically detach tracees
+    after capturing the specified number of syscalls.
 
 Noteworthy changes in release 6.2 (2023-02-26)
 ==============================================
