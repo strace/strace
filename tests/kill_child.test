@@ -25,7 +25,7 @@ while :; do
 	grep -q '^[1-9][0-9]* <\.\.\. ??? resumed>) \+= ?$' "$LOG" && exit 0
 
 	s1="$(date +%s)"
-	if [ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ]; then
+	if [ "$((s1-s0))" -gt "$((TIMEOUT_DURATION/2))" ]; then
 		skip_ 'Unable to reproduce <... ??? resumed>'
 	fi
 done

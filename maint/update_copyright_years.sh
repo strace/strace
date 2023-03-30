@@ -175,10 +175,10 @@ MAX_JOBS="$(getconf _NPROCESSORS_ONLN)"
 while [ -n "${1-}" ]; do
 	case "$1" in
 	"-v")
-		VERBOSE=$(($VERBOSE + 1))
+		VERBOSE=$((VERBOSE + 1))
 		;;
 	"-q")
-		VERBOSE=$(($VERBOSE - 1))
+		VERBOSE=$((VERBOSE - 1))
 		;;
 	"-h")
 		print_help

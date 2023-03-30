@@ -26,7 +26,7 @@ t_reg=
 while [ "$s" -le "$s1" ]; do
 	t="$(date +%T --date "@$s")"
 	[ -z "$t_reg" ] && t_reg="$t" || t_reg="$t_reg|$t"
-	s=$(($s + 1))
+	s=$((s + 1))
 done
 
 cat > "$EXP" << __EOF__

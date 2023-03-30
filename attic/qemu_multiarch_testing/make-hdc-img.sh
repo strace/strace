@@ -21,7 +21,7 @@ size=$(du -ks hdc.dir | sed -En 's/^([0-9]+).*/\1/p')
 [ "$size" -gt 0 ]
 
 rm -f hdc.img
-dd if=/dev/zero of=hdc.img count=1 bs=1024 seek=$(($size*2))
+dd if=/dev/zero of=hdc.img count=1 bs=1024 seek=$((size*2))
 mkfs.ext3 -q -F -b 1024 -i 4096 hdc.img
 tune2fs -c 0 -i 0 hdc.img
 mkdir hdc.img.dir

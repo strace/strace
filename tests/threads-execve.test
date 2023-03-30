@@ -33,7 +33,7 @@ while :; do
 	sed 1d < "$LOG" > "$OUT"
 	diff -- "$EXP" "$OUT" && exit 0
 	s1="$(date +%s)"
-	if [ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ]; then
+	if [ "$((s1-s0))" -gt "$((TIMEOUT_DURATION/2))" ]; then
 		fail_ "$STRACE $* output mismatch"
 	fi
 done

@@ -67,7 +67,7 @@ print_current_personality_designator()
 		if [ 'x32' = "$STRACE_NATIVE_ARCH" ]; then
 			echo x32
 		else
-			echo "$(($SIZEOF_LONG * 8))"
+			echo "$((SIZEOF_LONG * 8))"
 		fi
 	else
 		[ 4 -eq "$SIZEOF_LONG" ] ||
@@ -262,7 +262,7 @@ match_grep()
 			}
 			printf '#%d: %s\n' "$cnt" "$pattern"
 		}
-		cnt=$(($cnt + 1))
+		cnt=$((cnt + 1))
 	done < "$patterns" ||
 		fail_ "Error reading patterns from \"$patterns\""
 	test -z "$failed" || {
@@ -343,7 +343,7 @@ kernel_version_code()
 		v1="${1%%[!0-9]*}" && [ -n "$v1" ] || v1=0
 		v2="${2%%[!0-9]*}" && [ -n "$v2" ] || v2=0
 		v3="${3%%[!0-9]*}" && [ -n "$v3" ] || v3=0
-		echo "$(($v1 * 65536 + $v2 * 256 + $v3))"
+		echo "$((v1 * 65536 + v2 * 256 + v3))"
 	)
 }
 

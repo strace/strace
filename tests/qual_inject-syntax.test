@@ -10,7 +10,7 @@
 
 . "${srcdir=.}/init.sh"
 
-zeroes=; i=0; while [ $i -lt 2050 ]; do zeroes="0$zeroes"; i=$(($i+1)); done
+zeroes=; i=0; while [ $i -lt 2050 ]; do zeroes="0$zeroes"; i=$((i+1)); done
 
 #
 # F

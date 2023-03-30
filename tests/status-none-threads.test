@@ -38,7 +38,7 @@ while :; do
 	fi
 
 	s1="$(date +%s)"
-	[ "$(($s1-$s0))" -gt "$(($TIMEOUT_DURATION/2))" ] ||
+	[ "$((s1-s0))" -gt "$((TIMEOUT_DURATION/2))" ] ||
 		continue
 
 	[ "$rc" = 0 ] &&

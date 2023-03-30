@@ -29,7 +29,7 @@ aarch64|powerpc64|s390x|sparc64|tile)
 	supported_pers='64 32'
 	;;
 *)
-	supported_pers="$(($SIZEOF_LONG * 8))"
+	supported_pers="$((SIZEOF_LONG * 8))"
 	;;
 esac
 

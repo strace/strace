@@ -81,7 +81,7 @@ file -L /bin/sh
 gcc --version |head -1
 ld --version |head -1
 kver="$(printf '%%s\n%%s\n' '#include <linux/version.h>' 'LINUX_VERSION_CODE' | gcc -E -P -)"
-printf 'kernel-headers %%s.%%s.%%s\n' $(($kver/65536)) $(($kver/256%%256)) $(($kver%%256))
+printf 'kernel-headers %%s.%%s.%%s\n' $((kver/65536)) $((kver/256%%256)) $((kver%%256))
 echo 'END OF BUILD ENVIRONMENT INFORMATION'
 
 CFLAGS_FOR_BUILD="$RPM_OPT_FLAGS"; export CFLAGS_FOR_BUILD

@@ -24,7 +24,7 @@ s="$s0"
 t_reg=
 while [ "$s" -le "$s1" ]; do
 	[ -z "$t_reg" ] && t_reg="$s" || t_reg="$t_reg|$s"
-	s=$(($s + 1))
+	s=$((s + 1))
 done
 
 if [ x0 = "x${precision}" ]; then

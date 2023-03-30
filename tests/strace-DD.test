@@ -25,7 +25,7 @@ get_tracer_pid()
 
 run_prog ../sleep 0
 
-sleep_duration="$(($TIMEOUT_DURATION/2))"
+sleep_duration="$((TIMEOUT_DURATION/2))"
 
 test_D()
 {
@@ -49,7 +49,7 @@ test_D()
 	kill -$sig -$tracee_pid
 
 	wait $tracee_pid && rc=0 || rc=$?
-	[ "$rc" -eq $((128 + $sig)) ] ||
+	[ "$rc" -eq $((128 + sig)) ] ||
 		dump_log_and_fail_with \
 			"$* failed with unexpected exit status $rc"
 

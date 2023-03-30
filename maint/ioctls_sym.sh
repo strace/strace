@@ -478,7 +478,7 @@ while read f; do
 	(process_file "$f" < /dev/null)
 	[ $? -eq 0 ] || {
 		msg "$f: failed to process"
-		failed=$((1 + $failed))
+		failed=$((1 + failed))
 	}
 done < "$tmpdir"/headers.list
 
