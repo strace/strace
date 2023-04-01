@@ -2606,6 +2606,10 @@ init(int argc, char *argv[])
 	argc -= optind;
 
 	if (argc < 0 || (!nprocs && !argc)) {
+		if (show_tips != TIPS_NONE) {
+			print_totd();
+			exit(exit_code);
+		}
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
 

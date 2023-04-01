@@ -718,6 +718,7 @@ check_DATA = \
 	strace--syscall-times-s.expected \
 	strace--syscall-times-us.expected \
 	strace--tips.exp \
+	strace--tips-0.exp \
 	strace-T_upper.expected \
 	strauss_body.exp \
 	strauss_head.exp \

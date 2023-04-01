@@ -95,7 +95,7 @@ for opt in '--tips' \
 	   '--tips=format:compact --tips' \
 	   '--tips --tips=format:full,3,none,id:42,compact'
 do
-	check_h "must have PROG [ARGS] or -p PID" $opt
+	check_h "invalid -a argument: '-42'" $opt -a -42
 done
 
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$

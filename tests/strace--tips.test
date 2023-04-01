@@ -11,6 +11,11 @@ tips_fmt_opt=""
 [ 1 -ne "$TIPS_FULL" ] || tips_fmt_opt="--tips=full"
 
 
+# Check that simple "strace --tips=0" works as expected
+args='--tips=0'
+"$STRACE" $args 2> "${OUT}"
+match_diff "${OUT}" $srcdir/strace--tips-0.exp
+
 # Check that random tip is random
 "$STRACE" -qqq -enone --tips $tips_fmt_opt ../sleep 0 2> "${OUT}.r0"
 i=0
