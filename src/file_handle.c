@@ -124,5 +124,5 @@ SYS_FUNC(open_by_handle_at)
 	/* flags */
 	tprint_open_modes(tcp->u_arg[2]);
 
-	return RVAL_DECODED;
+	return RVAL_DECODED | RVAL_FD;
 }
