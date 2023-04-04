@@ -11,7 +11,7 @@ cleanup()
 	fi
 	mountpoint -q hdc.img.dir ||
 		rm -rf hdc.img.dir
-	exit $@
+	exit "$@"
 }
 
 trap 'cleanup $?' EXIT
