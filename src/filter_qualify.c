@@ -24,6 +24,7 @@ struct number_set *quiet_set;
 struct number_set *decode_fd_set;
 struct number_set *decode_pid_set;
 struct number_set *trace_set;
+struct number_set *trace_fd_set;
 
 bool quiet_set_updated = false;
 bool decode_fd_set_updated = false;
@@ -496,6 +497,15 @@ qualify_trace(const char *const str)
 }
 
 void
+qualify_trace_fd(const char *const str)
+{
+	if (!trace_fd_set)
+		trace_fd_set = alloc_number_set_array(1);
+	qualify_tokens(str, trace_fd_set, string_to_uint, "descriptor");
+	tracing_fds = true;
+}
+
+void
 qualify_abbrev(const char *const str)
 {
 	if (!abbrev_set)
@@ -655,6 +665,10 @@ static const struct qual_options {
 } qual_options[] = {
 	{ "trace",	qualify_trace	},
 	{ "t",		qualify_trace	},
+	{ "trace-fd",	qualify_trace_fd },
+	{ "trace-fds",	qualify_trace_fd },
+	{ "fd",		qualify_trace_fd },
+	{ "fds",	qualify_trace_fd },
 	{ "abbrev",	qualify_abbrev	},
 	{ "a",		qualify_abbrev	},
 	{ "verbose",	qualify_verbose	},

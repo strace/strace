@@ -280,6 +280,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	pidns-cache \
 	poll-P \
 	ppoll-P \
+	ppoll-e-trace-fds-23 \
+	ppoll-e-trace-fds-23-42 \
+	ppoll-e-trace-fds-not-9-42-P \
 	ppoll-v \
 	prctl-fp-mode \
 	prctl-pac-enabled-keys-success \
@@ -359,6 +362,9 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	segv_accerr \
 	segv_pkuerr \
 	select-P \
+	select-trace-fd-7 \
+	select-trace-fd-7-9 \
+	select-trace-fd-7-P \
 	set_ptracer_any \
 	set_sigblock \
 	set_sigign \

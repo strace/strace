@@ -84,6 +84,7 @@ int Tflag_scale = 1000;
 int Tflag_width = 6;
 bool iflag;
 bool count_wallclock;
+bool tracing_fds;
 long long syscall_limit = -1;
 static bool nflag;
 static int tflag_scale = 1000000000;
@@ -336,6 +337,8 @@ Filtering:\n\
   -e status=SET, --status=SET\n\
                  print only system calls with the return statuses in SET\n\
      statuses:   successful, failed, unfinished, unavailable, detached\n\
+  -e trace-fds=SET, --trace-fds=SET\n\
+                 trace operations on file descriptors from SET\n\
   -P PATH, --trace-path=PATH\n\
                  trace accesses to PATH\n\
   -z, --successful-only\n\
@@ -2263,6 +2266,7 @@ init(int argc, char *argv[])
 		GETOPT_TIPS,
 
 		GETOPT_QUAL_TRACE,
+		GETOPT_QUAL_TRACE_FD,
 		GETOPT_QUAL_ABBREV,
 		GETOPT_QUAL_VERBOSE,
 		GETOPT_QUAL_RAW,
@@ -2323,6 +2327,7 @@ init(int argc, char *argv[])
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
+		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
 		{ "abbrev",	required_argument, 0, GETOPT_QUAL_ABBREV },
 		{ "verbose",	required_argument, 0, GETOPT_QUAL_VERBOSE },
 		{ "raw",	required_argument, 0, GETOPT_QUAL_RAW },
@@ -2562,6 +2567,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_QUAL_TRACE:
 			qualify_trace(optarg);
+			break;
+		case GETOPT_QUAL_TRACE_FD:
+			qualify_trace_fd(optarg);
 			break;
 		case GETOPT_QUAL_ABBREV:
 			qualify_abbrev(optarg);
