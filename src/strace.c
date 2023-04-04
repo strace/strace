@@ -185,6 +185,7 @@ static size_t tcb_wait_tab_size;
 #ifndef HAVE_PROGRAM_INVOCATION_NAME
 char *program_invocation_name;
 #endif
+char *argv0; /* override argv[0] on execve */
 
 unsigned os_release; /* generated from uname()'s u.release */
 
@@ -1535,6 +1536,8 @@ exec_or_die(void)
 		  seccomp_filtering ? "enabled" : "disabled");
 	if (seccomp_filtering)
 		init_seccomp_filter();
+	if (argv0 && params->argv)
+		params->argv[0] = argv0;
 	execve(params->pathname, params->argv, params->env);
 	perror_msg_and_die("exec");
 }
@@ -2282,6 +2285,7 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_DECODE_FD,
 		GETOPT_QUAL_DECODE_PID,
 		GETOPT_QUAL_SECONTEXT,
+		GETOPT_ARGV0,
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -2346,6 +2350,7 @@ init(int argc, char *argv[])
 		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
 		{ "secontext",	optional_argument, 0, GETOPT_QUAL_SECONTEXT },
 
+		{ "argv0",	required_argument, 0, GETOPT_ARGV0 },
 		{ 0, 0, 0, 0 }
 	};
 
@@ -2610,6 +2615,9 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_QUAL_DECODE_PID:
 			qualify_decode_pid(optarg);
+			break;
+		case GETOPT_ARGV0:
+			argv0 = optarg;
 			break;
 		default:
 			error_msg_and_help(NULL);
