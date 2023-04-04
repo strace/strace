@@ -40,6 +40,7 @@
 # include "list.h"
 # include "macros.h"
 # include "mpers_type.h"
+# include "number_set.h"
 # include "string_to_uint.h"
 # include "sysent.h"
 # include "xmalloc.h"
@@ -513,6 +514,7 @@ extern int Tflag_scale;
 extern int Tflag_width;
 extern bool iflag;
 extern bool count_wallclock;
+extern bool tracing_fds;
 
 struct path_set_item {
 	const char *path;
@@ -798,7 +800,8 @@ extern const char *signame(const int);
 extern const char *sprintsigname(const int);
 
 extern void pathtrace_select_set(const char *, struct path_set *);
-extern bool pathtrace_match_set(struct tcb *, struct path_set *);
+extern bool pathtrace_match_set(struct tcb *, struct path_set *,
+				struct number_set *);
 
 static inline void
 pathtrace_select(const char *path)
@@ -809,7 +812,7 @@ pathtrace_select(const char *path)
 static inline bool
 pathtrace_match(struct tcb *tcp)
 {
-	return pathtrace_match_set(tcp, &global_path_set);
+	return pathtrace_match_set(tcp, &global_path_set, trace_fd_set);
 }
 
 /**
@@ -1401,6 +1404,7 @@ extern void print_affinitylist(struct tcb *const tcp, const kernel_ulong_t addr,
 
 extern void qualify(const char *);
 extern void qualify_trace(const char *);
+extern void qualify_trace_fd(const char *);
 extern void qualify_abbrev(const char *);
 extern void qualify_verbose(const char *);
 extern void qualify_raw(const char *);

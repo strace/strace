@@ -646,7 +646,8 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 		}
 	}
 
-	if (hide_log(tcp) || !traced(tcp) || (tracing_paths && !pathtrace_match(tcp))) {
+	if (hide_log(tcp) || !traced(tcp)
+	    || ((tracing_paths || tracing_fds) && !pathtrace_match(tcp))) {
 		tcp->flags |= TCB_FILTERED;
 		return 0;
 	}

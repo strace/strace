@@ -249,6 +249,7 @@ where
 .I qualifier
 is one of
 .BR trace " (or " t ),
+.BR trace\-fds " (or " trace\-fd " or " fd " or " fds ),
 .BR abbrev " (or " a ),
 .BR verbose " (or " v ),
 .BR raw " (or " x ),
@@ -645,6 +646,21 @@ about the user/kernel boundary if only a subset of system calls
 are being monitored.  The default is
 .BR trace = all .
 .TP
+\fB\-e\ trace\-fd\fR=\,\fIset\fR
+.TQ
+\fB\-e\ trace\-fds\fR=\,\fIset\fR
+.TQ
+\fB\-e\ fd\fR=\,\fIset\fR
+.TQ
+\fB\-e\ fds\fR=\,\fIset\fR
+.TQ
+\fB\-\-trace\-fds\fR=\,\fIset\fR
+Trace only the syscalls that operate
+on the specified subset of (non-negative) file descriptors.
+Note that usage of this option also filters out all the syscalls
+that do not operate on file descriptors at all.
+Applies in (inclusive) disjunction with the \fB\-\-trace\-path\fR option.
+.TP
 \fB\-e\ signal\fR=\,\fIset\fR
 .TQ
 \fB\-e\ signals\fR=\,\fIset\fR
@@ -725,6 +741,7 @@ Trace only system calls accessing
 Multiple
 .B \-P
 options can be used to specify several paths.
+Applies in (inclusive) disjunction with the \fB\-\-trace\-fds\fR option.
 .TP
 .B \-z
 .TQ

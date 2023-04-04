@@ -286,6 +286,13 @@ check_e "invalid decode-pids ''" -e decode-pids=
 check_e "invalid decode-pids 'chdir'" --decode-pids=chdir
 check_e "invalid decode-pids 'gettid'" -e decode-pid=comm,gettid
 
+check_h "must have PROG [ARGS] or -p PID" -e trace-fds=0
+check_h "must have PROG [ARGS] or -p PID" -e trace-fd=1,2,3
+check_h "must have PROG [ARGS] or -p PID" -e fd='!1'
+check_h "must have PROG [ARGS] or -p PID" -e fds='!0,2147483647'
+check_e "invalid descriptor '-1'" --trace-fds=-1
+check_e "invalid descriptor '2147483648'" --trace-fd=2147483648
+
 case "$STRACE_NATIVE_ARCH" in
 x86_64)
 	check_h "must have PROG [ARGS] or -p PID" -e trace=getcwd@64
