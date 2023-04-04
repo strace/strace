@@ -310,6 +310,23 @@ static const char *tips_tricks_tweaks[][MAX_TIP_LINES] = {
 	  "to hexadecimal numbers usage." },
 	{ "-Y option (an alias to --decode-pids=comm)",
 	  "shows comm string associated with the PID." },
+	{ "Historically, strace had a mis-feature",
+	  "of interpreting the \" (deleted)\" part",
+	  "of the proc/pid/fd symlinks as a part",
+	  "of the filename.  This peculiar behaviour",
+	  "ended with strace 5.19, which also enables",
+	  "path tracing to trace FDs associated",
+	  "with specific paths even after the paths",
+	  "are unlinked." },
+	{ "It seems that IA-64, POWER and s390 are",
+	  "the only architectures where it is possible",
+	  "for strace to account for syscall time",
+	  "properly by relying on the system time usage",
+	  "reported by the kernel: these are the only",
+	  "architectures that HAVE_VIRT_CPU_ACCOUNTING",
+	  "config option enabled and thusly account",
+	  "the CPU time on syscall entering and exiting",
+	  "instead of approximating it." },
 };
 
 static const char tip_top[] =
