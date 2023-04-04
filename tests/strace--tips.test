@@ -6,10 +6,15 @@
 : "${TIPS_FULL:=0}"
 RAND_TIPS=5
 MAX_TIPS=500
-
+IFS='
+'
 tips_fmt_opt=""
 [ 1 -ne "$TIPS_FULL" ] || tips_fmt_opt="--tips=full"
 
+grep_ere_escape()
+{
+	printf "%s" "$*" | sed 's/[].*&^$()|[\/]/\\&/g'
+}
 
 # Check that simple "strace --tips=0" works as expected
 args='--tips=0'
@@ -35,42 +40,44 @@ while [ "$i" -lt "$MAX_TIPS" ]; do
 
 	j=0
 	end_seen=0
-	cat $srcdir/strace--tips.exp | while read line; do
+	cat $srcdir/strace--tips.exp | while read -r line; do
 		j="$((j + 1))"
 		case "$j" in
-		1) pat='  ______________________________________________         '"$(sed_re_escape "$line")";;
-		2) pat=' /                                              \\        '"$(sed_re_escape "$line")";;
-		3) pat=' | .{44} |   '"$(sed_re_escape "$line")";;
-		4) pat=' | .{44} \   '"$(sed_re_escape "$line")";;
-		5) pat=' | .{44}  \  '"$(sed_re_escape "$line")";;
-		6) pat=' | .{44}  _\ '"$(sed_re_escape "$line")";;
-		7) pat=' | .{44} /   '"$(sed_re_escape "$line")";;
-		*) pat=' | .{44} |   '"$(sed_re_escape "$line")";;
+		1) pat='  ______________________________________________    '"$(grep_ere_escape "$line")";;
+		2) pat=' \/                                              \\   '"$(grep_ere_escape "$line")";;
+		3) pat=' \| .{44} \|   '"$(grep_ere_escape "$line")";;
+		4) pat=' \| .{44} \\   '"$(grep_ere_escape "$line")";;
+		5) pat=' \| .{44}  \\  '"$(grep_ere_escape "$line")";;
+		6) pat=' \| .{44}  _\\ '"$(grep_ere_escape "$line")";;
+		7) pat=' \| .{44} \/   '"$(grep_ere_escape "$line")";;
+		*) pat=' \| .{44} \|   '"$(grep_ere_escape "$line")";;
 		esac
-		end=' \______________________________________________/        '"$(sed_re_escape "$line")"
-		btm='                                                         '"$(sed_re_escape "$line")"
+		end=' \\______________________________________________\/   '"$(grep_ere_escape "$line")"
+		btm='                                                    '"$(grep_ere_escape "$line")"
 		s=$(tail -n"+$j" "${OUT}.${i}" | head -n1)
 
 		if [ 0 -ne "$end_seen" ]; then
-			printf '%s' "$s" | grep -Eq "$btm" || \
+			printf '%s' "$s" | grep -Exq "$btm" || \
 				fail_ "Can't match line $j of ${OUT}.${i}" \
 					"('$s') against '$btm'"
-		fi
-
-		printf '%s' "$s" | grep -Eqv "$pat" || continue
-		if [ 8 -lt "$j" ]; then
-			printf '%s' "$s" | grep -Eq "$end" || \
-				fail_ "Can't match line $j of ${OUT}.${i}" \
-					"('$s') against neither '$pat' nor '$end'"
-
 			if [ 0 -ne "$TIPS_FULL" ]; then
-				end_seen=1
+				continue
 			else
 				break
 			fi
-		else
-			fail_ "Can't match line $j of ${OUT}.${i} ('$s')" \
-				"against '$pat'"
+		fi
+
+		if ! printf '%s' "$s" | grep -Exq "$pat"; then
+			if [ 8 -lt "$j" ]; then
+				printf '%s' "$s" | grep -Exq "$end" || \
+					fail_ "Can't match line $j of ${OUT}.${i}" \
+						"('$s') against neither '$pat' nor '$end'"
+
+				end_seen=1
+			else
+				fail_ "Can't match line $j of ${OUT}.${i} ('$s')" \
+					"against '$pat'"
+			fi
 		fi
 	done
 
