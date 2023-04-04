@@ -369,9 +369,9 @@ print_totd(void)
 	for (i = 0; (i < MAX_TIP_LINES) && (tips_tricks_tweaks[id][i] ||
 					    (i < (ARRAY_SIZE(tip_right) - 1)));
 	     i++) {
-		fprintf(stderr, "%s%-*.*s%s%s\n",
+		fprintf(stderr, "%s%-*s%s%s\n",
 			tip_left[MIN(i + 1, ARRAY_SIZE(tip_left) - 1)],
-			w, w, tips_tricks_tweaks[id][i] ?: "",
+			w, tips_tricks_tweaks[id][i] ?: "",
 			tip_right[MIN(i + 1, ARRAY_SIZE(tip_right) - 1)],
 			strauss[MIN(3 + i, strauss_lines - 1)]);
 	}
