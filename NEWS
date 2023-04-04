@@ -8,6 +8,7 @@ Noteworthy changes in release ?.? (????-??-??)
     that operate on the specified set of file descriptors.
   * Implemented --syscall-limit option to automatically detach tracees
     after capturing the specified number of syscalls.
+  * Implemented --argv0 option to set argv[0] of the command being executed.
   * Implemented decoding of PR_GET_MDWE and PR_SET_MDWE operations of prctl
     syscall.
   * Implemented decoding of IP_LOCAL_PORT_RANGE socket option.

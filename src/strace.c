@@ -186,6 +186,8 @@ static size_t tcb_wait_tab_size;
 char *program_invocation_name;
 #endif
 
+char *argv0; /* override argv[0] on execve */
+
 unsigned os_release; /* generated from uname()'s u.release */
 
 static void detach(struct tcb *tcp);
@@ -303,6 +305,7 @@ Startup:\n\
                  trace process with process id PID, may be repeated\n\
   -u USERNAME, --user=USERNAME\n\
                  run command as USERNAME handling setuid and/or setgid\n\
+  --argv0=NAME   set PROG argv[0] to NAME\n\
 \n\
 Tracing:\n\
   -b execve, --detach-on=execve\n\
@@ -1675,6 +1678,8 @@ startup_child(char **argv, char **env)
 	params_for_tracee.run_euid = (statbuf.st_mode & S_ISUID) ? statbuf.st_uid : run_uid;
 	params_for_tracee.run_egid = (statbuf.st_mode & S_ISGID) ? statbuf.st_gid : run_gid;
 	params_for_tracee.argv = argv;
+	if (argv0)
+		params_for_tracee.argv[0] = argv0;
 	params_for_tracee.env = env;
 	/*
 	 * On NOMMU, can be safely freed only after execve in tracee.
@@ -2266,6 +2271,7 @@ init(int argc, char *argv[])
 		GETOPT_SYSCALL_LIMIT,
 		GETOPT_TS,
 		GETOPT_TIPS,
+		GETOPT_ARGV0,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
@@ -2327,6 +2333,7 @@ init(int argc, char *argv[])
 		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
+		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
@@ -2564,6 +2571,9 @@ init(int argc, char *argv[])
 			if (parse_tips_arg(optarg ?: ""))
 				error_opt_arg(c, lopt, optarg);
 			break;
+		case GETOPT_ARGV0:
+			argv0 = optarg;
+			break;
 		case GETOPT_QUAL_SECONTEXT:
 			qualify_secontext(optarg ? optarg : secontext_qual);
 			break;
@@ -2633,6 +2643,9 @@ init(int argc, char *argv[])
 		}
 		error_msg_and_help("must have PROG [ARGS] or -p PID");
 	}
+
+	if (!argc && argv0)
+		error_msg_and_help("PROG [ARGS] must be specified with --argv0");
 
 	if (daemonized_tracer_long) {
 		if (daemonized_tracer) {
