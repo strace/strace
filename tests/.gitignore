@@ -467,6 +467,7 @@ lchown
 lchown32
 libtests.a
 link
+link-P
 linkat
 list_sigaction_signum
 llseek
