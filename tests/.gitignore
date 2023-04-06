@@ -1045,6 +1045,7 @@ strace-xx
 swap
 sxetmask
 symlink
+symlink-P
 symlinkat
 sync
 sync_file_range

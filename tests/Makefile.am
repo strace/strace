@@ -389,6 +389,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	strace-Y-0123456789 \
 	strace-p-Y-p2 \
 	strace-p1-Y-p \
+	symlink-P \
 	syslog-success \
 	tgkill--pidns-translation \
 	threads-execve \
