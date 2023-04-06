@@ -1045,7 +1045,8 @@ strace-x	-e trace=chdir -x -a 12
 strace-xx	-e trace=chdir -xx -a 18
 swap	-a23 -e trace=swapon,swapoff
 sxetmask	-a11 -e trace=sgetmask,ssetmask
-symlink	-a34
+symlink		-a20
+symlink-P	-a32 -e trace=symlink -P "symlink.sample"
 symlinkat
 sync	-a7
 sync_file_range
