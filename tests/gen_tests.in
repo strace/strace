@@ -479,7 +479,8 @@ landlock_restrict_self -a29
 landlock_restrict_self-y -a29 -y -e trace=landlock_restrict_self 7>/dev/full
 lchown	-a30
 lchown32	-a32
-link
+link	-a17
+link-P	-a17 -e trace=link -P link_sample_old
 linkat
 linkat--secontext	--secontext -e trace=linkat
 linkat--secontext_full	--secontext=full -e trace=linkat

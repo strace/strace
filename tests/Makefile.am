@@ -249,6 +249,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ksysent \
 	landlock_create_ruleset-success \
 	landlock_create_ruleset-success-y \
+	link-P \
 	list_sigaction_signum \
 	localtime \
 	looping_threads \
