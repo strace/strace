@@ -914,7 +914,7 @@ str_strip_prefix_len(const char *str, const char *prefix, size_t prefix_len)
  * part.
  */
 # define QUOTE_HEXSTR_MASK			(0x3 << QUOTE_HEXSTR_SHIFT)
-static_assert((NUM_HEXSTR_OPTS - 1) <= (QUOTE_HEXSTR_MASK >> QUOTE_HEXSTR_SHIFT),
+_Static_assert((NUM_HEXSTR_OPTS - 1) <= (QUOTE_HEXSTR_MASK >> QUOTE_HEXSTR_SHIFT),
 	      "xflag options do not fit into QUOTE_HEXSTR_MASK");
 
 # define QUOTE_HEXSTR_NONE			(HEXSTR_NONE << QUOTE_HEXSTR_SHIFT)
@@ -2154,5 +2154,16 @@ print_big_u64_addr(const uint64_t addr)
 # ifndef IN_MPERS_BOOTSTRAP
 #  include "syscall.h"
 # endif
+
+#ifdef __ANDROID__
+/* pulled in by stdio.h, clash with bundled/linux/include/uapi/linux/fs.h */
+#undef RENAME_EXCHANGE
+#undef RENAME_WHITEOUT
+#undef RENAME_NOREPLACE
+
+/* defined in linux/in.h on android; shadowed by its bundled/... counterpart */
+typedef uint32_t in_addr_t;
+
+#endif
 
 #endif /* !STRACE_DEFS_H */
