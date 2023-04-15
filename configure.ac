@@ -811,7 +811,10 @@ m4_foreach([pers], [M32, MX32], dnl
 		        AC_SUBST(var[_FOR_]pers)])])
 
 st_MPERS([m32], [aarch64|powerpc64|s390x|sparc64|tile|x32|x86_64])
-st_MPERS([mx32], [x86_64])
+case $host_os in
+linux-android*) st_MPERS([mx32], [none]);;
+*) st_MPERS([mx32], [x86_64]) ;;
+esac
 
 AC_ARG_ENABLE([install-tests],
 	[AS_HELP_STRING([--enable-install-tests=yes|no],
