@@ -6,6 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     that operate on the specified set of file descriptors.
   * Implemented -l/--syscall-limit option to automatically detach tracees
     after capturing the specified number of syscalls.
+  * Updated lists of F_SEAL_* constants.
   * Updated lists of ioctl commands from Linux 6.3.
 
 Noteworthy changes in release 6.2 (2023-02-26)
