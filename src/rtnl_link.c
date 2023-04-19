@@ -212,6 +212,8 @@ static const nla_decoder_t ifla_brport_nla_decoders[] = {
 	[IFLA_BRPORT_MCAST_EHT_HOSTS_CNT]	= decode_nla_u32,
 	[IFLA_BRPORT_LOCKED]			= decode_nla_u8,
 	[IFLA_BRPORT_MAB]			= decode_nla_u8,
+	[IFLA_BRPORT_MCAST_N_GROUPS]		= decode_nla_u32,
+	[IFLA_BRPORT_MCAST_MAX_GROUPS]		= decode_nla_u32,
 };
 
 static bool
