@@ -1649,6 +1649,12 @@ Print the tip in its full glory.
 Default is
 .BR id:random,format:compact .
 .TP
+.B \-\-argv0=name
+Set argv[0] to
+.I name
+instead of using exec_path. Useful for strace of a particular tool
+from busybox and other multi-call executables which look at argv[0].
+.TP
 .B \-V
 .TQ
 .B \-\-version

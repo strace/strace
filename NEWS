@@ -17,6 +17,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of F_SEAL_*, IFLA_*, IORING_*, MFD_*, NFT_*, TCA_*,
     and V4L2_PIX_FMT_* constants.
   * Updated lists of ioctl commands from Linux 6.3.
+  * Option --argv0=name sets argv[0] instead of using exec_path.
 
 Noteworthy changes in release 6.2 (2023-02-26)
 ==============================================

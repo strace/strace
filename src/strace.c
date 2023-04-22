@@ -496,6 +496,7 @@ Miscellaneous:\n\
                  show strace tips, tricks, and tweaks on exit\n\
      id:         non-negative integer or random; default is random\n\
      format:     none, compact, full; default is compact\n\
+  --argv0=name   set argv[0] to name instead of exec_path\n\
   -V, --version  print version\n\
 "
 /* ancient, no one should use it
@@ -1536,8 +1537,6 @@ exec_or_die(void)
 		  seccomp_filtering ? "enabled" : "disabled");
 	if (seccomp_filtering)
 		init_seccomp_filter();
-	if (argv0 && params->argv)
-		params->argv[0] = argv0;
 	execve(params->pathname, params->argv, params->env);
 	perror_msg_and_die("exec");
 }
@@ -1678,6 +1677,8 @@ startup_child(char **argv, char **env)
 	params_for_tracee.run_euid = (statbuf.st_mode & S_ISUID) ? statbuf.st_uid : run_uid;
 	params_for_tracee.run_egid = (statbuf.st_mode & S_ISGID) ? statbuf.st_gid : run_gid;
 	params_for_tracee.argv = argv;
+	if (argv0)
+		params_for_tracee.argv[0] = argv0;
 	params_for_tracee.env = env;
 	/*
 	 * On NOMMU, can be safely freed only after execve in tracee.
@@ -2268,6 +2269,7 @@ init(int argc, char *argv[])
 		GETOPT_TS,
 		GETOPT_PIDNS_TRANSLATION,
 		GETOPT_TIPS,
+		GETOPT_ARGV0,
 
 		GETOPT_QUAL_TRACE,
 		GETOPT_QUAL_TRACE_FD,
@@ -2285,7 +2287,6 @@ init(int argc, char *argv[])
 		GETOPT_QUAL_DECODE_FD,
 		GETOPT_QUAL_DECODE_PID,
 		GETOPT_QUAL_SECONTEXT,
-		GETOPT_ARGV0,
 	};
 	static const struct option longopts[] = {
 		{ "columns",		required_argument, 0, 'a' },
@@ -2330,6 +2331,7 @@ init(int argc, char *argv[])
 		{ "failing-only",	no_argument,	   0, 'Z' },
 		{ "seccomp-bpf",	no_argument,	   0, GETOPT_SECCOMP },
 		{ "tips",		optional_argument, 0, GETOPT_TIPS },
+		{ "argv0",		required_argument, 0, GETOPT_ARGV0 },
 
 		{ "trace",	required_argument, 0, GETOPT_QUAL_TRACE },
 		{ "trace-fds",	required_argument, 0, GETOPT_QUAL_TRACE_FD },
@@ -2350,7 +2352,6 @@ init(int argc, char *argv[])
 		{ "decode-pids",required_argument, 0, GETOPT_QUAL_DECODE_PID },
 		{ "secontext",	optional_argument, 0, GETOPT_QUAL_SECONTEXT },
 
-		{ "argv0",	required_argument, 0, GETOPT_ARGV0 },
 		{ 0, 0, 0, 0 }
 	};
 
