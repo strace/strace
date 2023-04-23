@@ -9,7 +9,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of IFLA_BRPORT_MCAST_N_GROUPS,
     IFLA_BRPORT_MCAST_MAX_GROUPS, IFLA_GSO_IPV4_MAX_SIZE,
     and IFLA_GRO_IPV4_MAX_SIZE netlink attributes.
-  * Updated lists of F_SEAL_*, IFLA_*, IORING_*, IP_*, and MFD_* constants.
+  * Updated lists of F_SEAL_*, IFLA_*, IORING_*, IP_*, MFD_*, and NFT_*
+    constants.
   * Updated lists of ioctl commands from Linux 6.3.
 
 Noteworthy changes in release 6.2 (2023-02-26)
