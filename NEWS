@@ -8,9 +8,9 @@ Noteworthy changes in release ?.? (????-??-??)
     after capturing the specified number of syscalls.
   * Implemented decoding of IFLA_BRPORT_MCAST_N_GROUPS,
     IFLA_BRPORT_MCAST_MAX_GROUPS, IFLA_GSO_IPV4_MAX_SIZE,
-    and IFLA_GRO_IPV4_MAX_SIZE netlink attributes.
-  * Updated lists of F_SEAL_*, IFLA_*, IORING_*, IP_*, MFD_*, NFT_*, and PR_*
-    constants.
+    IFLA_GRO_IPV4_MAX_SIZE, and TCA_EXT_WARN_MSG netlink attributes.
+  * Updated lists of F_SEAL_*, IFLA_*, IORING_*, IP_*, MFD_*, NFT_*, PR_*,
+    and TCA_* constants.
   * Updated lists of ioctl commands from Linux 6.3.
 
 Noteworthy changes in release 6.2 (2023-02-26)
