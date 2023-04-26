@@ -10,7 +10,7 @@ Noteworthy changes in release ?.? (????-??-??)
     IFLA_BRPORT_MCAST_MAX_GROUPS, IFLA_GSO_IPV4_MAX_SIZE,
     IFLA_GRO_IPV4_MAX_SIZE, and TCA_EXT_WARN_MSG netlink attributes.
   * Updated lists of F_SEAL_*, IFLA_*, IORING_*, IP_*, MFD_*, NFT_*, PR_*,
-    and TCA_* constants.
+    TCA_*, and V4L2_PIX_FMT_* constants.
   * Updated lists of ioctl commands from Linux 6.3.
 
 Noteworthy changes in release 6.2 (2023-02-26)
