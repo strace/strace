@@ -8,8 +8,10 @@
  */
 
 #include "tests.h"
+#include "scno.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -60,10 +62,17 @@ test_chdir(int pid, bool print)
 static void
 test_rmdir(int pid, bool print)
 {
-	if (rmdir(invalid_path) == 0)
-		error_msg_and_fail("rmdir: %s", invalid_path);
+#ifndef AT_FDCWD
+# define AT_FDCWD -100
+#endif
+#ifndef AT_REMOVEDIR
+# define AT_REMOVEDIR 0x200
+#endif
+	if (syscall(__NR_unlinkat, AT_FDCWD, "invalid.dir", AT_REMOVEDIR) == 0)
+		error_msg_and_fail("unlinkat: %s", invalid_path);
 	if (print)
-		printf("%-5u rmdir(\"%s\") = %s\n", pid, invalid_path, sprintrc(-1));
+		printf("%-5u unlinkat(AT_FDCWD, \"%s\", AT_REMOVEDIR) = %s\n",
+		       pid, invalid_path, sprintrc(-1));
 }
 
 int

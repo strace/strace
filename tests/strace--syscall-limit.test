@@ -10,7 +10,7 @@
 . "${srcdir=.}/init.sh"
 
 prog_args="../$NAME"
-set -- --syscall-limit=3 --trace='chdir,rmdir' "$@"
+set -- --syscall-limit=3 --trace='chdir,unlinkat' "$@"
 
 run_prog > /dev/null
 echo 0 > exp_status
