@@ -567,7 +567,7 @@ print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr)
 {
 	struct io_uring_buf_reg arg;
 	CHECK_TYPE_SIZE(arg, 40);
-	CHECK_TYPE_SIZE(arg.pad, sizeof(uint16_t));
+	CHECK_TYPE_SIZE(arg.flags, sizeof(uint16_t));
 	CHECK_TYPE_SIZE(arg.resv, sizeof(uint64_t) * 3);
 
 	if (umove_or_printaddr(tcp, addr, &arg))
@@ -582,10 +582,8 @@ print_io_uring_buf_reg(struct tcb *tcp, const kernel_ulong_t addr)
 	tprint_struct_next();
 	PRINT_FIELD_U(arg, bgid);
 
-	if (arg.pad) {
-		tprint_struct_next();
-		PRINT_FIELD_X(arg, pad);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(arg, flags);
 
 	if (!IS_ARRAY_ZERO(arg.resv)) {
 		tprint_struct_next();

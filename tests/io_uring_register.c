@@ -1105,7 +1105,7 @@ main(void)
 			buf_reg->ring_addr = j & 2 ? (uintptr_t) buf_reg : 0;
 			buf_reg->ring_entries = j & 4 ? 3141592653 : 0;
 			buf_reg->bgid = j & 8 ? 42069 : 0;
-			buf_reg->pad = j & 16 ? 31337 : 0;
+			buf_reg->flags = j & 16 ? 31337 : 0;
 			buf_reg->resv[0] = j &  32 ? 0xbadc0deddeadfaceULL : 0;
 			buf_reg->resv[1] = j &  64 ? 0xdecaffedbeefdeadULL : 0;
 			buf_reg->resv[2] = j & 128 ? 0xbadc0dedfacefeedULL : 0;
@@ -1120,10 +1120,10 @@ main(void)
 				printf("%p", buf_reg);
 			else
 				printf("NULL");
-			printf(", ring_entries=%s, bgid=%s%s",
+			printf(", ring_entries=%s, bgid=%s, flags=%s",
 			       j & 4 ? "3141592653" : "0",
 			       j & 8 ? "42069" : "0",
-			       j & 16 ? ", pad=0x7a69" : "");
+			       j & 16 ? "0x7a69" : "0");
 			if (j & 0xe0) {
 				printf(", resv=[%s, %s, %s]",
 				       j &  32 ? "0xbadc0deddeadface" : "0",
