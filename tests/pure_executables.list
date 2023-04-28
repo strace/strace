@@ -270,6 +270,10 @@ ioprio
 ioprio-Xabbrev
 ioprio-Xraw
 ioprio-Xverbose
+ip_local_port_range
+ip_local_port_range-Xabbrev
+ip_local_port_range-Xraw
+ip_local_port_range-Xverbose
 ip_mreq
 ipc
 ipc_msg

@@ -417,6 +417,14 @@ ioprio--pidns-translation
 ioprio-Xabbrev
 ioprio-Xraw
 ioprio-Xverbose
+ip_local_port_range
+ip_local_port_range-Xabbrev
+ip_local_port_range-Xraw
+ip_local_port_range-Xverbose
+ip_local_port_range-success
+ip_local_port_range-success-Xabbrev
+ip_local_port_range-success-Xraw
+ip_local_port_range-success-Xverbose
 ip_mreq
 ipc
 ipc_msg

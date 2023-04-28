@@ -435,6 +435,14 @@ ioprio--pidns-translation	test_pidns -a18 -e trace=ioprio_get,ioprio_set
 ioprio-Xabbrev	-a18 -e trace=ioprio_get,ioprio_set -Xabbrev
 ioprio-Xraw	-a18 -e trace=ioprio_get,ioprio_set -Xraw
 ioprio-Xverbose	-a18 -e trace=ioprio_get,ioprio_set -Xverbose
+ip_local_port_range			-e trace=getsockopt,setsockopt -a50
+ip_local_port_range-Xabbrev		-e trace=getsockopt,setsockopt -Xabbrev -a50
+ip_local_port_range-Xraw		-e trace=getsockopt,setsockopt -Xraw -a30
+ip_local_port_range-Xverbose		-e trace=getsockopt,setsockopt -Xverbose -a69
+ip_local_port_range-success		-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -a50
+ip_local_port_range-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xabbrev -a50
+ip_local_port_range-success-Xraw	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a30
+ip_local_port_range-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose -a69
 ip_mreq	-e trace=setsockopt
 ipc	-a19
 ipc_msg	+ipc.sh -a26
