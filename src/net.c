@@ -734,6 +734,33 @@ print_txrehash(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 }
 
 static void
+print_port_range(struct tcb *const tcp, const kernel_ulong_t addr,
+		 const unsigned int len)
+{
+	unsigned int ports;
+
+	if (len != sizeof(ports)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &ports))
+		return;
+
+	tprint_indirect_begin();
+	PRINT_VAL_X(ports);
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW) {
+		unsigned short lo = ports & 0xffff;
+		unsigned short hi = ports >> 16;
+
+		if (ports && (!lo || !hi || lo <= hi))
+			tprintf_comment("%.0hu..%.0hu", lo, hi);
+	}
+	tprint_indirect_end();
+}
+
+
+static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
 {
@@ -906,6 +933,14 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 				printnum_int(tcp, addr, "%d");
 			else
 				printstr_ex(tcp, addr, rlen, QUOTE_FORCE_HEX);
+			return;
+		}
+		break;
+
+	case SOL_IP:
+		switch (name) {
+		case IP_LOCAL_PORT_RANGE:
+			print_port_range(tcp, addr, rlen);
 			return;
 		}
 		break;
@@ -1188,6 +1223,9 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case MCAST_JOIN_GROUP:
 		case MCAST_LEAVE_GROUP:
 			print_group_req(tcp, addr, len);
+			return;
+		case IP_LOCAL_PORT_RANGE:
+			print_port_range(tcp, addr, len);
 			return;
 		}
 		break;
