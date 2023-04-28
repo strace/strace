@@ -286,6 +286,7 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	ppoll-e-trace-fds-not-9-42-P \
 	ppoll-v \
 	prctl-fp-mode \
+	prctl-mdwe \
 	prctl-pac-enabled-keys-success \
 	prctl-pac-enabled-keys-success-Xabbrev \
 	prctl-pac-enabled-keys-success-Xraw \

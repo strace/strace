@@ -718,6 +718,7 @@ prctl-capbset
 prctl-dumpable
 prctl-fp-mode
 prctl-mce-kill
+prctl-mdwe
 prctl-name
 prctl-no-args
 prctl-pac-enabled-keys
