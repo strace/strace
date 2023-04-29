@@ -919,7 +919,7 @@ Decode various information associated with file descriptors.  The default is
 .I set
 can include the following elements:
 .RS
-.TP 8
+.TP 9
 .B path
 Print file paths.
 Also enables printing of tracee's current working directory when
@@ -934,6 +934,9 @@ Print character/block device numbers.
 .TQ
 .B pidfd
 Print PIDs associated with pidfd file descriptors.
+.TQ
+.B signalfd
+Print signal masks associated with signalfd file descriptors.
 .RE
 .TP
 \fB\-e\ decode\-pids\fR=\,\fIset\fR

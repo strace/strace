@@ -369,7 +369,8 @@ Output format:\n\
      details:    dev (device major/minor for block/char device files)\n\
                  path (file path),\n\
                  pidfd (associated PID for pidfds),\n\
-                 socket (protocol-specific information for socket descriptors)\n\
+                 socket (protocol-specific information for socket descriptors),\n\
+                 signalfd (signal masks for signalfds)\n\
 "
 #ifdef ENABLE_SECONTEXT
 "\

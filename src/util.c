@@ -790,6 +790,47 @@ printpidfd(pid_t pid_of_fd, int fd, const char *path)
 	return true;
 }
 
+static bool
+print_fdinfo_sigmask(const char *value, void *data)
+{
+#ifdef WORDS_BIGENDIAN
+	unsigned int pos_xor_mask = current_wordsize - 1;
+#else
+	unsigned int pos_xor_mask = 0;
+#endif
+	size_t sigset_size = strlen(value) / 2;
+	uint8_t *sigmask = xmalloc(sigset_size);
+
+	for (size_t i = 0; i < sigset_size; ++i) {
+		uint8_t byte;
+		if (sscanf(value + i * 2, "%02hhx", &byte) != 1) {
+			free(sigmask);
+			return false;
+		}
+		sigmask[(sigset_size - 1 - i) ^ pos_xor_mask] = byte;
+	}
+
+	tprint_associated_info_begin();
+	tprints_string(sprintsigmask_n("signalfd:", sigmask, sigset_size));
+	tprint_associated_info_end();
+
+	free(sigmask);
+	return true;
+}
+
+static bool
+printsignalfd(pid_t pid_of_fd, int fd, const char *path)
+{
+	static const char signalfd_path[] = "anon_inode:[signalfd]";
+	static const char sigmask_pfx[] = "sigmask:\t";
+
+	if (strcmp(path, signalfd_path))
+		return false;
+
+	return scan_fdinfo(pid_of_fd, fd, sigmask_pfx, sizeof(sigmask_pfx) - 1,
+			   print_fdinfo_sigmask, NULL);
+}
+
 static void
 print_quoted_string_in_angle_brackets(const char *str, const bool deleted)
 {
@@ -820,6 +861,9 @@ printfd_pid_with_finfo(struct tcb *tcp, pid_t pid, int fd, const struct finfo *f
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PIDFD, decode_fd_set) &&
 		    printpidfd(pid, fd, path))
+			goto printed;
+		if (is_number_in_set(DECODE_FD_SIGNALFD, decode_fd_set) &&
+		    printsignalfd(pid, fd, path))
 			goto printed;
 		if (is_number_in_set(DECODE_FD_PATH, decode_fd_set))
 			print_quoted_string_in_angle_brackets(path,

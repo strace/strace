@@ -960,7 +960,8 @@ siginfo	-e trace=none
 signal	-a25 -e signal=none -e trace='/^signal$'
 signal_receive	-a16 -e trace=kill
 signal_receive--pidns-translation	test_pidns -a16 -e trace=kill
-signalfd4
+signalfd4	-a32
+signalfd4-yy	--trace=signalfd4 -yy
 sigpending	-a15
 sigprocmask	-a34
 sigreturn	-esignal='!USR1'

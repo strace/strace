@@ -695,6 +695,7 @@ sigaltstack
 siginfo
 signal
 signalfd4
+signalfd4-yy
 sigpending
 sigprocmask
 sigreturn

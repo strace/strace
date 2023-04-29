@@ -982,6 +982,7 @@ signal
 signal_receive
 signal_receive--pidns-translation
 signalfd4
+signalfd4-yy
 sigpending
 sigprocmask
 sigreturn
