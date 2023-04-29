@@ -709,37 +709,59 @@ printdev(struct tcb *tcp, int fd, const char *path, const struct finfo *finfo)
 	return false;
 }
 
-pid_t
-pidfd_get_pid(pid_t pid_of_fd, int fd)
+typedef bool (*scan_fdinfo_fn)(const char *value, void *data);
+
+static bool
+scan_fdinfo(pid_t pid_of_fd, int fd, const char *search_pfx,
+	    size_t search_pfx_len, scan_fdinfo_fn fn, void *data)
 {
 	int proc_pid = 0;
 	translate_pid(NULL, pid_of_fd, PT_TID, &proc_pid);
 	if (!proc_pid)
-		return -1;
+		return false;
 
 	char fdi_path[sizeof("/proc/%u/fdinfo/%u") + 2 * sizeof(int) * 3];
 	xsprintf(fdi_path, "/proc/%u/fdinfo/%u", proc_pid, fd);
 
 	FILE *f = fopen_stream(fdi_path, "r");
 	if (!f)
-		return -1;
+		return false;
 
-	static const char pid_pfx[] = "Pid:\t";
 	char *line = NULL;
 	size_t sz = 0;
-	pid_t pid = -1;
-	while (getline(&line, &sz, f) > 0) {
-		const char *pos = STR_STRIP_PREFIX(line, pid_pfx);
-		if (pos == line)
-			continue;
+	bool result = false;
 
-		pid = string_to_uint_ex(pos, NULL, INT_MAX, "\n");
-		break;
+	while (getline(&line, &sz, f) > 0) {
+		const char *value =
+			str_strip_prefix_len(line, search_pfx, search_pfx_len);
+		if (value != line && fn(value, data)) {
+			result = true;
+			break;
+		}
 	}
 
 	free(line);
 	fclose(f);
 
+	return result;
+}
+
+static bool
+parse_fdinfo_pid(const char *value, void *data)
+{
+	pid_t *pid = data;
+	*pid = string_to_uint_ex(value, NULL, INT_MAX, "\n");
+	return true;
+}
+
+pid_t
+pidfd_get_pid(pid_t pid_of_fd, int fd)
+{
+	static const char pid_pfx[] = "Pid:\t";
+	pid_t pid = -1;
+
+	scan_fdinfo(pid_of_fd, fd, pid_pfx, sizeof(pid_pfx) - 1,
+		    parse_fdinfo_pid, &pid);
 	return pid;
 }
 
