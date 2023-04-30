@@ -497,7 +497,10 @@ linkat--secontext_mismatch	--secontext=mismatch -e trace=linkat
 lookup_dcookie	-a27
 lstat	-a31 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
 lstat64	-a32 --no-abbrev --trace-path=stat.sample --trace-path=/dev/full
-madvise	-a33
+madvise	-a31
+madvise-Xabbrev		--trace=madvise -a31 -Xabbrev
+madvise-Xraw		--trace=madvise -a23 -Xraw
+madvise-Xverbose	--trace=madvise -a40 -Xverbose
 maybe_switch_current_tcp	-a30 -f -e trace=execveat
 maybe_switch_current_tcp--quiet-thread-execve	-a30 -s48 -f -e trace=execveat --quiet=personality,thread-execve
 mbind

@@ -1,0 +1,16 @@
+#unconditional
+#nocheckval
+/*
+ * These values are used on hppa since v6.2-rc1~39^2~7
+ * and on other architectures since their introduction;
+ * see madvise_hppa_old_cmds for the old values.
+ */
+MADV_MERGEABLE		12
+MADV_UNMERGEABLE	13
+MADV_HUGEPAGE		14
+MADV_NOHUGEPAGE		15
+MADV_DONTDUMP		16
+MADV_DODUMP		17
+MADV_WIPEONFORK		18
+MADV_KEEPONFORK		19
+MADV_COLLAPSE		25
