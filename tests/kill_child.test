@@ -2,7 +2,7 @@
 #
 # Check whether repeated killing of just forked processes crashes strace.
 #
-# Copyright (c) 2019-2022 The strace developers.
+# Copyright (c) 2019-2023 The strace developers.
 # All rights reserved.
 #
 # SPDX-License-Identifier: GPL-2.0-or-later

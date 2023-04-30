@@ -1,7 +1,7 @@
 /*
  * Check decoding of prctl PR_SVE_SET_VL/PR_SVE_GET_VL operations.
  *
- * Copyright (c) 2021 The strace developers.
+ * Copyright (c) 2021-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
