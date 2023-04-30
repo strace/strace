@@ -115,7 +115,7 @@ process_file()
 	existing_notice_year=$(sed -n \
 		"/${existing_notice_re}/s//\\3/p" "$f")
 	# assume copyright notice is still relevant
-	if [ "$last_commit_year" = "$copyright_year" ]; then
+	if [ "$last_commit_year" -le "$copyright_year" ]; then
 		debug "Does not need update, skipping: $f"
 		return
 	else
