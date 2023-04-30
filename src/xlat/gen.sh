@@ -59,10 +59,11 @@ cond_def()
 		[ -n "$unconditional" ] ||
 			printf '%s\n' \
 				"#if defined($val) || (defined(HAVE_DECL_$val) && HAVE_DECL_$val)"
-		printf '%s\n' \
-			"DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE" \
-			"static_assert(($val) == ($def), \"$val != $def\");" \
-			"DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE"
+		[ -n "$nocheckval" ] ||
+			printf '%s\n' \
+				"DIAG_PUSH_IGNORE_TAUTOLOGICAL_COMPARE" \
+				"static_assert(($val) == ($def), \"$val != $def\");" \
+				"DIAG_POP_IGNORE_TAUTOLOGICAL_COMPARE"
 		[ -n "$unconditional" ] ||
 			printf '%s\n' \
 				"#else" \
@@ -141,17 +142,20 @@ print_xlat_pair()
 cond_xlat()
 {
 	echo "$1" | {
-		local val def m xlat
+		local val def m is_shift= xlat
 
 		read val def
 
 		m="${val%%|*}"
+		[ "${m}" = "${m#1<<}" ] || is_shift=1
 
-		if [ "${m}" = "${m#1<<}" ]; then
+		if [ -z "$is_shift$nocheckval" ]; then
 			xlat="$(print_xlat "${val}")"
-		else
+		elif [ -n "$is_shift" ]; then
 			m="${m#1<<}"
 			xlat="$(print_xlat_pair "1ULL<<${val#1<<}" "${val}" "$m")"
+		else
+			xlat="$(print_xlat_pair "${def}" "${val}" "$m")"
 		fi
 
 		if [ -z "${def}${unconditional}" ]; then
@@ -203,7 +207,7 @@ gen_header()
 
 	EOF
 
-	local unconditional= line
+	local unconditional= nocheckval= line
 	# 1st pass: output directives.
 	while read -r line; do
 		case "$line" in
@@ -219,6 +223,12 @@ gen_header()
 			;;
 		'#unconditional')
 			unconditional=1
+			;;
+		'#checkval')
+			nocheckval=
+			;;
+		'#nocheckval')
+			nocheckval=1
 			;;
 		'#val_type '*)
 			# to be processed during 2nd pass
@@ -301,7 +311,7 @@ gen_header()
 	echo "DIAG_PUSH_IGNORE_TAUTOLOGICAL_CONSTANT_COMPARE"
 	echo "static const struct xlat_data ${name}_xdata[] = {"
 
-	unconditional= val_type=
+	unconditional= nocheckval= val_type=
 	# 2nd pass: output everything.
 	while read -r line; do
 		case "$line" in
@@ -317,6 +327,12 @@ gen_header()
 			;;
 		'#unconditional')
 			unconditional=1
+			;;
+		'#checkval')
+			nocheckval=
+			;;
+		'#nocheckval')
+			nocheckval=1
 			;;
 		'#sorted'|'#sorted '*)
 			;;
