@@ -21,6 +21,18 @@
 #ifndef PRINT_VALID
 # define PRINT_VALID 1
 #endif
+#ifndef PRINT_INVALID
+# define PRINT_INVALID 1
+#endif
+#ifndef PRINT_STATS
+# define PRINT_STATS 0
+#endif
+#ifndef UNLINKAT_CNT
+# define UNLINKAT_CNT 1
+#endif
+#ifndef TOTAL_CNT
+# define TOTAL_CNT 3
+#endif
 
 static int
 write_status(const char *name, int value)
@@ -48,11 +60,13 @@ test_chdir(int pid, bool print)
 	if (print) {
 #if PRINT_VALID
 		printf("%-5u chdir(\"%s\") = 0\n", pid, valid_path);
-#else
+#else /* !PRINT_VALID */
 		if (chdir(invalid_path) == 0)
 			error_msg_and_fail("chdir: %s", invalid_path);
+# if PRINT_INVALID
 		printf("%-5u chdir(\"%s\") = %s\n", pid, invalid_path, sprintrc(-1));
-#endif
+# endif
+#endif /* PRINT_VALID */
 	} else {
 		if (chdir(invalid_path) == 0)
 			error_msg_and_fail("chdir: %s", invalid_path);
@@ -70,9 +84,11 @@ test_rmdir(int pid, bool print)
 #endif
 	if (syscall(__NR_unlinkat, AT_FDCWD, "invalid.dir", AT_REMOVEDIR) == 0)
 		error_msg_and_fail("unlinkat: %s", invalid_path);
+#if PRINT_INVALID
 	if (print)
 		printf("%-5u unlinkat(AT_FDCWD, \"%s\", AT_REMOVEDIR) = %s\n",
 		       pid, invalid_path, sprintrc(-1));
+#endif
 }
 
 int
@@ -93,9 +109,12 @@ main(void)
 		test_rmdir(pid, /* print */ true);
 		test_chdir(pid, /* print */ true);
 
-		/* the tracer is expected to detach at this point */
+		/*
+		 * the tracer is expected to detach at this point
+		 * if TOTAL_CNT < 4.
+		 */
 
-		test_rmdir(pid, /* print */ false);
+		test_rmdir(pid, /* print */ TOTAL_CNT > 3);
 
 		exit(0);
 	}
@@ -110,6 +129,21 @@ main(void)
 	/* the tracer is expected to detach at this point */
 
 	test_chdir(pid, /* print */ false);
+
+#if PRINT_STATS
+# if defined MPERS_IS_m32
+	printf("System call usage summary for 32 bit mode:\n");
+# endif
+# if defined MPERS_IS_mx32
+	printf("System call usage summary for x32 mode:\n");
+# endif
+	printf("%9s %s\n", "calls", "syscall");
+	printf("--------- ----------------\n");
+	printf("%9d %s\n", 2, "chdir");
+	printf("%9d %s\n", UNLINKAT_CNT, "unlinkat");
+	printf("--------- ----------------\n");
+	printf("%9d %s\n", TOTAL_CNT, "total");
+#endif /* PRINT_STATS */
 
 	return write_status("parent_status",
 			    WIFEXITED(status) ? WEXITSTATUS(status) : 1);

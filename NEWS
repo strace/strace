@@ -20,6 +20,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Bug fixes
   * Fixed build on hppa with uapi headers from Linux >= 6.2.
+  * Fixed -e status= filtering when -c option is in use.
 
 Noteworthy changes in release 6.2 (2023-02-26)
 ==============================================

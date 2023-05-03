@@ -392,8 +392,12 @@ check_PROGRAMS = $(PURE_EXECUTABLES) \
 	status-unfinished-threads \
 	strace--decode-pids-comm \
 	strace--syscall-limit \
+	strace--syscall-limit-c \
 	strace--syscall-limit-path \
 	strace--syscall-limit-status \
+	strace--syscall-limit-status-c \
+	strace--syscall-limit-status-summary \
+	strace--syscall-limit-summary \
 	strace-Y-0123456789 \
 	strace-p-Y-p2 \
 	strace-p1-Y-p \
