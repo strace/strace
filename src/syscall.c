@@ -796,46 +796,48 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	    inject_poke_exit(tcp))
 		tamper_with_syscall_exiting(tcp);
 
-	if (cflag) {
-		count_syscall(tcp, ts);
-		if (cflag == CFLAG_ONLY_STATS) {
-			return 0;
-		}
-	}
-
-	print_syscall_resume(tcp);
+	if (cflag != CFLAG_ONLY_STATS)
+		print_syscall_resume(tcp);
 
 	tcp->s_prev_ent = NULL;
 	if (res != 1) {
-		/* There was error in one of prior ptrace ops */
-		tprint_arg_end();
-		tprint_space();
-		tabto();
-		tprint_sysret_begin();
-		tprints_sysret_next("retval");
-		tprint_sysret_pseudo_rval();
-		tprints_sysret_next("return");
-		tprints_string("<unavailable>");
-		tprint_sysret_end();
-		tprint_newline();
-		if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
-			bool publish = is_number_in_set(STATUS_UNAVAILABLE,
-							status_set);
-			strace_close_memstream(tcp, publish);
+		/* There was an error in one of prior ptrace ops.  */
+		bool status_filtering =
+			!is_complete_set(status_set, NUMBER_OF_STATUSES);
+		bool publish = status_filtering
+			       ? is_number_in_set(STATUS_UNAVAILABLE, status_set)
+			       : true;
+		if (cflag && publish)
+			count_syscall(tcp, ts);
+		if (cflag != CFLAG_ONLY_STATS) {
+			tprint_arg_end();
+			tprint_space();
+			tabto();
+			tprint_sysret_begin();
+			tprints_sysret_next("retval");
+			tprint_sysret_pseudo_rval();
+			tprints_sysret_next("return");
+			tprints_string("<unavailable>");
+			tprint_sysret_end();
+			tprint_newline();
+			if (status_filtering)
+				strace_close_memstream(tcp, publish);
+			line_ended();
 		}
-		line_ended();
 		return res;
 	}
 	tcp->s_prev_ent = tcp->s_ent;
 
 	int sys_res = 0;
-	if (raw(tcp)) {
-		/* sys_res = printargs(tcp); - but it's nop on sysexit */
-	} else {
-		if (tcp->sys_func_rval & RVAL_DECODED)
-			sys_res = tcp->sys_func_rval;
-		else
-			sys_res = tcp_sysent(tcp)->sys_func(tcp);
+	if (cflag != CFLAG_ONLY_STATS) {
+		if (raw(tcp)) {
+			/* sys_res = printargs(tcp); - but it's nop on sysexit */
+		} else {
+			if (tcp->sys_func_rval & RVAL_DECODED)
+				sys_res = tcp->sys_func_rval;
+			else
+				sys_res = tcp_sysent(tcp)->sys_func(tcp);
+		}
 	}
 
 	if (!is_complete_set(status_set, NUMBER_OF_STATUSES)) {
@@ -843,15 +845,23 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 			       && is_number_in_set(STATUS_FAILED, status_set);
 		publish |= !syserror(tcp)
 			   && is_number_in_set(STATUS_SUCCESSFUL, status_set);
-		strace_close_memstream(tcp, publish);
+		if (cflag != CFLAG_ONLY_STATS)
+			strace_close_memstream(tcp, publish);
 		if (!publish) {
-			line_ended();
+			if (cflag != CFLAG_ONLY_STATS)
+				line_ended();
 			return 0;
 		}
 	}
 
 	if (syscall_limit != -1)
 		syscall_limit--;
+
+	if (cflag) {
+		count_syscall(tcp, ts);
+		if (cflag == CFLAG_ONLY_STATS)
+			return 0;
+	}
 
 	tprint_arg_end();
 	tprint_space();
