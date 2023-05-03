@@ -55,6 +55,7 @@ strace \- trace system calls and signals
 .OP \-X format
 .OP \-\-seccomp\-bpf
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
+.OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -77,6 +78,7 @@ strace \- trace system calls and signals
 .OP \-S sortby
 .OP \-U columns
 .OP \-\-seccomp\-bpf
+.OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
 .BR "" |
@@ -85,6 +87,9 @@ strace \- trace system calls and signals
 .OP -u username
 .IR command " [" args ]
 .BR "" }
+.YS
+.SY strace
+.B \-\-tips\fR[=\fIformat\fR]
 .YS
 .SH DESCRIPTION
 .IX "strace command" "" "\fLstrace\fR command"
