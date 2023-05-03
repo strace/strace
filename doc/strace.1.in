@@ -38,21 +38,21 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .SY strace
-.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyzZ
-.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyzZ
-.OP \-I n
+.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyYzZ
+.if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyYzZ
+.OP \-a column
 .OP \-b execve
 .OM \-e expr
+.OP \-I n
+.OP \-l limit
+.OP \-o file
 .OP \-O overhead
+.OM \-p pid
+.OM \-P path
+.OP \-s strsize
 .OP \-S sortby
 .OP \-U columns
-.OP \-a column
-.OP \-o file
-.OP \-s strsize
 .OP \-X format
-.OM \-P path
-.OM \-p pid
-.OP \-l limit
 .OP \-\-seccomp\-bpf
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
 .BR "" {
@@ -67,15 +67,15 @@ strace \- trace system calls and signals
 .SY strace
 .B \-c
 .OP \-dfwzZ
-.OP \-I n
 .OP \-b execve
 .OM \-e expr
+.OP \-I n
+.OP \-l limit
 .OP \-O overhead
+.OM \-p pid
+.OM \-P path
 .OP \-S sortby
 .OP \-U columns
-.OM \-P path
-.OM \-p pid
-.OP \-l limit
 .OP \-\-seccomp\-bpf
 .BR "" {
 .OR \-p pid
