@@ -1,5 +1,5 @@
 /*
- * Test -l/--syscall-limit options.
+ * Test --syscall-limit option.
  *
  * Copyright (c) 2023 The strace developers.
  * All rights reserved.

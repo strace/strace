@@ -44,7 +44,6 @@ strace \- trace system calls and signals
 .OP \-b execve
 .OM \-e expr
 .OP \-I n
-.OP \-l limit
 .OP \-o file
 .OP \-O overhead
 .OM \-p pid
@@ -54,6 +53,7 @@ strace \- trace system calls and signals
 .OP \-U columns
 .OP \-X format
 .OP \-\-seccomp\-bpf
+.OP \-\-syscall\-limit limit
 .if '@ENABLE_SECONTEXT_FALSE@'#' .OP \-\-secontext\fR[=\fIformat\fR]
 .OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
@@ -71,13 +71,13 @@ strace \- trace system calls and signals
 .OP \-b execve
 .OM \-e expr
 .OP \-I n
-.OP \-l limit
 .OP \-O overhead
 .OM \-p pid
 .OM \-P path
 .OP \-S sortby
 .OP \-U columns
 .OP \-\-seccomp\-bpf
+.OP \-\-syscall\-limit limit
 .OP \-\-tips\fR[=\fIformat\fR]
 .BR "" {
 .OR \-p pid
@@ -474,8 +474,6 @@ default if
 .BR \-D ).
 .RE
 .TP
-.BI "\-l " limit
-.TQ
 .BR "\-\-syscall\-limit" = \fIlimit\fR
 Detach all tracees when
 .I limit

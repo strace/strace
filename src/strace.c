@@ -467,7 +467,7 @@ Statistics:\n\
                  summarise syscall latency (default is system time)\n\
 \n\
 Stop condition:\n\
-  -l LIMIT, --syscall-limit=LIMIT\n\
+  --syscall-limit=LIMIT\n\
                  Detach all tracees after tracing LIMIT syscalls\n\
 \n\
 Tampering:\n\
@@ -2254,7 +2254,7 @@ init(int argc, char *argv[])
 #endif
 
 	static const char optstring[] =
-		"+a:Ab:cCdDe:E:fFhiI:kl:no:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
+		"+a:Ab:cCdDe:E:fFhiI:kno:O:p:P:qrs:S:tTu:U:vVwxX:yYzZ";
 
 	enum {
 		GETOPT_SECCOMP = 0x100,
@@ -2262,8 +2262,9 @@ init(int argc, char *argv[])
 		GETOPT_HEX_STR,
 		GETOPT_FOLLOWFORKS,
 		GETOPT_OUTPUT_SEPARATELY,
-		GETOPT_TS,
 		GETOPT_PIDNS_TRANSLATION,
+		GETOPT_SYSCALL_LIMIT,
+		GETOPT_TS,
 		GETOPT_TIPS,
 
 		GETOPT_QUAL_TRACE,
@@ -2301,7 +2302,7 @@ init(int argc, char *argv[])
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "stack-traces",	no_argument,	   0, 'k' },
-		{ "syscall-limit",	required_argument, 0, 'l' },
+		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
 		{ "summary-syscall-overhead", required_argument, 0, 'O' },
@@ -2444,11 +2445,6 @@ init(int argc, char *argv[])
 					  "build of strace");
 #endif
 			break;
-		case 'l':
-			syscall_limit = string_to_ulonglong(optarg);
-			if (syscall_limit <= 0)
-				error_opt_arg(c, lopt, optarg);
-			break;
 		case 'n':
 			nflag = 1;
 			break;
@@ -2558,6 +2554,11 @@ init(int argc, char *argv[])
 			break;
 		case GETOPT_SECCOMP:
 			seccomp_filtering = true;
+			break;
+		case GETOPT_SYSCALL_LIMIT:
+			syscall_limit = string_to_ulonglong(optarg);
+			if (syscall_limit <= 0)
+				error_opt_arg(c, lopt, optarg);
 			break;
 		case GETOPT_TIPS:
 			if (parse_tips_arg(optarg ?: ""))

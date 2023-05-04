@@ -1037,8 +1037,8 @@ strace--strings-in-hex-none		--trace=chdir --strings-in-hex=none --columns=12
 strace--syscall-limit-c		+strace--syscall-limit.test -c -S syscall -U calls
 strace--syscall-limit-path	+strace--syscall-limit.test --trace-path=invalid.dir
 strace--syscall-limit-status	+strace--syscall-limit.test --status=failed
-strace--syscall-limit-status-c	+strace--syscall-limit.test --status=failed -l 4 -c -S syscall -U calls
-strace--syscall-limit-status-summary	+strace--syscall-limit.test --status=failed -l 4 --summary -S syscall -U calls
+strace--syscall-limit-status-c	+strace--syscall-limit.test --status=failed --syscall-limit=4 -c -S syscall -U calls
+strace--syscall-limit-status-summary	+strace--syscall-limit.test --status=failed --syscall-limit=4 --summary -S syscall -U calls
 strace--syscall-limit-summary	+strace--syscall-limit.test -C -S syscall -U calls
 strace--syscall-times +strace-T_upper.test --syscall-times
 strace--syscall-times-ms +strace-T_upper.test --syscall-times=ms

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 #
-# Check -l/--syscall-limit option.
+# Check --syscall-limit option.
 #
 # Copyright (c) 2016-2023 The strace developers.
 # All rights reserved.

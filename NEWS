@@ -6,7 +6,7 @@ Noteworthy changes in release ?.? (????-??-??)
     associated with signalfd file descriptors.
   * Implemented -e trace-fds=set option for filtering only the syscalls
     that operate on the specified set of file descriptors.
-  * Implemented -l/--syscall-limit option to automatically detach tracees
+  * Implemented --syscall-limit option to automatically detach tracees
     after capturing the specified number of syscalls.
   * Implemented decoding of PR_GET_MDWE and PR_SET_MDWE operations of prctl
     syscall.

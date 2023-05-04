@@ -1,5 +1,5 @@
 /*
- * Test -l/--syscall-limit with --trace-path option.
+ * Test --syscall-limit option in combination with --trace-path option.
  *
  * Copyright (c) 2023 The strace developers.
  * All rights reserved.

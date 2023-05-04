@@ -1,5 +1,5 @@
 /*
- * Test -l/--syscall-limit with --status option.
+ * Test --syscall-limit option in combination with --status option.
  *
  * Copyright (c) 2023 The strace developers.
  * All rights reserved.
