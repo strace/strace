@@ -98,6 +98,7 @@ do
 	check_h "invalid -a argument: '-42'" $opt -a -42
 done
 
+check_h 'PROG [ARGS] must be specified with --argv0' --argv0=sample -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -D -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DD -p $$
 check_h 'PROG [ARGS] must be specified with -D/--daemonize' -DDD -p $$

@@ -1,0 +1,15 @@
+#!/bin/sh -efu
+#
+# Check decoding of --argv0 option.
+#
+# Copyright (c) 2023 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+args=
+run_prog ../fchdir > /dev/null
+run_strace --argv0=sample --trace=execve $args > /dev/null
+match_grep

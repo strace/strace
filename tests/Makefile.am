@@ -626,6 +626,7 @@ MISC_TESTS = \
 	status-none-threads.test \
 	status-successful-threads.test \
 	status-unfinished-threads.test \
+	strace--argv0.test \
 	strace--syscall-limit.test \
 	strace--tips.test \
 	strace--tips-full.test \
@@ -716,6 +717,7 @@ check_DATA = \
 	sched.in \
 	sigaltstack.expected \
 	status-detached.expected \
+	strace--argv0.expected \
 	strace-C.expected \
 	strace-DDD.expected \
 	strace-D.expected \
