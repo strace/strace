@@ -225,7 +225,6 @@ ioctl_hdio-v-Xabbrev
 ioctl_hdio-v-Xraw
 ioctl_hdio-v-Xverbose
 ioctl_inotify
-ioctl_lirc
 ioctl_kd
 ioctl_kd-Xabbrev
 ioctl_kd-Xraw
@@ -233,6 +232,7 @@ ioctl_kd-Xverbose
 ioctl_kvm_run
 ioctl_kvm_run-v
 ioctl_kvm_run_auxstr_vcpu
+ioctl_lirc
 ioctl_loop
 ioctl_mtd
 ioctl_nbd

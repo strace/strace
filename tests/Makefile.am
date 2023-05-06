@@ -519,13 +519,13 @@ DECODER_TESTS = \
 	eventfd.test \
 	execve-v.test \
 	execve.test \
-	fadvise64.test \
 	faccessat.test \
 	faccessat2.test \
+	fadvise64.test \
 	futex.test \
 	getuid.test \
-	int_0x80.test \
 	inotify_init-y.test \
+	int_0x80.test \
 	ioctl.test \
 	ioctl_block--pidns-translation.test \
 	ioctl_evdev-success.test \
@@ -579,8 +579,8 @@ MISC_TESTS = \
 	detach-sleeping.test \
 	detach-stopped.test \
 	fflush.test \
-	filter_seccomp-perf.test \
 	filter-unavailable.test \
+	filter_seccomp-perf.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
 	first_exec_failure.test \
@@ -598,10 +598,10 @@ MISC_TESTS = \
 	options-syntax.test \
 	pc.test \
 	pidns-cache.test \
-	poke.test \
 	poke-ptrace.test \
 	poke-range.test \
 	poke-unaligned.test \
+	poke.test \
 	printpath-umovestr-legacy.test \
 	printstrn-umoven-legacy.test \
 	qual_fault-syntax.test \
@@ -621,22 +621,22 @@ MISC_TESTS = \
 	restart_syscall.test \
 	sigblock.test \
 	sigign.test \
-	status-detached.test \
 	status-detached-threads.test \
+	status-detached.test \
 	status-none-threads.test \
 	status-successful-threads.test \
 	status-unfinished-threads.test \
 	strace--argv0.test \
 	strace--syscall-limit.test \
-	strace--tips.test \
 	strace--tips-full.test \
+	strace--tips.test \
 	strace-C.test \
 	strace-D.test \
 	strace-DD.test \
 	strace-DDD.test \
-	strace-E.test \
 	strace-E-override.test \
 	strace-E-unset.test \
+	strace-E.test \
 	strace-S.test \
 	strace-T_upper.test \
 	strace-V.test \
@@ -672,17 +672,17 @@ VALGRIND_FLAGS = --quiet
 VALGRIND_SUPPRESSIONS_FILES = $(abs_srcdir)/strace.supp
 
 check_SCRIPTS = \
+	PTRACE_SEIZE.sh \
 	arch_prctl.sh \
 	filter_seccomp.sh \
 	init.sh \
 	ioctl-success.sh \
 	ipc.sh \
-	prctl.sh \
 	prctl-success.sh \
+	prctl.sh \
 	print_scno_getcwd.sh \
-	PTRACE_SEIZE.sh \
-	qualify_personality_all.sh \
 	qualify_personality.sh \
+	qualify_personality_all.sh \
 	run.sh \
 	scno_tampering.sh \
 	strace-k-demangle.test \
@@ -699,8 +699,8 @@ check_DATA = \
 	clock.in \
 	count-f.expected \
 	eventfd.expected \
-	filter_seccomp.in \
 	filter-unavailable.expected \
+	filter_seccomp.in \
 	fork--pidns-translation.awk \
 	match.awk \
 	net.expected \
@@ -709,47 +709,47 @@ check_DATA = \
 	poke-unaligned.expected \
 	pure_executables.list \
 	qual_fault-exit_group.expected \
-	qualify_personality_empty.in \
 	qual_inject-error-signal.expected \
 	qual_inject-signal.expected \
+	qualify_personality_empty.in \
 	regex.in \
 	rt_sigaction.awk \
 	sched.in \
 	sigaltstack.expected \
 	status-detached.expected \
 	strace--argv0.expected \
-	strace-C.expected \
-	strace-DDD.expected \
-	strace-D.expected \
-	strace-E.expected \
-	strace-E-unset.expected \
-	strace-ff.expected \
 	strace--follow-forks-output-separately.expected \
-	strace-k-demangle.expected \
-	strace-k.expected \
-	strace-k-p.expected \
-	strace--relative-timestamps.expected \
 	strace--relative-timestamps-ms.expected \
 	strace--relative-timestamps-ns.expected \
 	strace--relative-timestamps-s.expected \
 	strace--relative-timestamps-us.expected \
-	strace-r.expected \
-	strace.supp \
-	strace--syscall-times.expected \
+	strace--relative-timestamps.expected \
 	strace--syscall-times-ms.expected \
 	strace--syscall-times-ns.expected \
 	strace--syscall-times-s.expected \
 	strace--syscall-times-us.expected \
-	strace--tips.exp \
+	strace--syscall-times.expected \
 	strace--tips-0.exp \
+	strace--tips.exp \
+	strace-C.expected \
+	strace-D.expected \
+	strace-DDD.expected \
+	strace-E-unset.expected \
+	strace-E.expected \
 	strace-T_upper.expected \
+	strace-ff.expected \
+	strace-k-demangle.expected \
+	strace-k-p.expected \
+	strace-k.expected \
+	strace-r.expected \
+	strace.supp \
 	strauss_body.exp \
 	strauss_head.exp \
 	sun_path.expected \
 	trace_clock.in \
 	trace_creds.in \
-	trace_fstatfs.in \
 	trace_fstat.in \
+	trace_fstatfs.in \
 	trace_lstat.in \
 	trace_personality_32.in \
 	trace_personality_64.in \
@@ -764,10 +764,10 @@ check_DATA = \
 	trace_personality_statfs_x32.in \
 	trace_personality_x32.in \
 	trace_question.in \
-	trace_statfs.in \
-	trace_statfs_like.in \
 	trace_stat.in \
 	trace_stat_like.in \
+	trace_statfs.in \
+	trace_statfs_like.in \
 	uio.expected \
 	umovestr.expected \
 	unix-pair-send-recv.expected \
@@ -775,8 +775,6 @@ check_DATA = \
 	# end of check_DATA
 
 EXTRA_DIST = \
-	gen_pure_executables.sh \
-	gen_tests.sh \
 	accept_compat.h \
 	attach-p-cmd.h \
 	clock_adjtime-common.c \
@@ -786,7 +784,9 @@ EXTRA_DIST = \
 	fcntl-common.c \
 	fstatat.c \
 	fstatx.c \
+	gen_pure_executables.sh \
 	gen_tests.in \
+	gen_tests.sh \
 	getresugid.c \
 	init_delete_module.h \
 	ioctl_kvm_run_common.c \
