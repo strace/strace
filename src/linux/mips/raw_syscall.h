@@ -12,17 +12,17 @@
 
 # include "kernel_types.h"
 
-#if __mips_isa_rev >= 6
-#define SYSCALL_CLOBBERLIST \
+# if __mips_isa_rev >= 6
+#  define SYSCALL_CLOBBERLIST \
 	"memory", "$1", "$3", "$8", "$9", \
 	"$10", "$11", "$12", "$13", "$14", "$15", \
 	"$24", "$25"
-#else
-#define SYSCALL_CLOBBERLIST \
+# else
+#  define SYSCALL_CLOBBERLIST \
 	"memory", "hi", "lo", "$1", "$3", "$8", "$9", \
 	"$10", "$11", "$12", "$13", "$14", "$15", \
 	"$24", "$25"
-#endif
+# endif
 
 static inline kernel_ulong_t
 raw_syscall_0(const kernel_ulong_t nr, kernel_ulong_t *err)

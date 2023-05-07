@@ -20,9 +20,9 @@
 # include <sys/signalfd.h>
 # include "kernel_fcntl.h"
 
-#ifndef SKIP_IF_PROC_IS_UNAVAILABLE
-# define SKIP_IF_PROC_IS_UNAVAILABLE
-#endif
+# ifndef SKIP_IF_PROC_IS_UNAVAILABLE
+#  define SKIP_IF_PROC_IS_UNAVAILABLE
+# endif
 
 int
 main(void)
@@ -39,28 +39,28 @@ main(void)
 
 	int fd = signalfd(-1, &mask, SFD_CLOEXEC | SFD_NONBLOCK);
 
-#ifdef PRINT_SIGNALFD
+# ifdef PRINT_SIGNALFD
 	if (fd == -1)
 		perror_msg_and_skip("signalfd");
-#endif
+# endif
 
 	printf("signalfd4(-1, [%s], %u, SFD_CLOEXEC|SFD_NONBLOCK) = %s",
 	       sigs1, size, sprintrc(fd));
-#ifdef PRINT_SIGNALFD
+# ifdef PRINT_SIGNALFD
 	printf("<signalfd:[%s]>\n", sigs1);
-#else
+# else
 	putchar('\n');
-#endif
+# endif
 
 	sigaddset(&mask, SIGCHLD);
 	fd = signalfd(fd, &mask, 0);
 
-#ifdef PRINT_SIGNALFD
+# ifdef PRINT_SIGNALFD
 	printf("signalfd4(%d<signalfd:[%s]>, [%s], %u, 0) = %s<signalfd:[%s]>\n",
 	       fd, sigs1, sigs2, size, sprintrc(fd), sigs2);
-#else
+# else
 	printf("signalfd4(%d, [%s], %u, 0) = %s\n", fd, sigs2, size, sprintrc(fd));
-#endif
+# endif
 
 	puts("+++ exited with 0 +++");
 	return 0;

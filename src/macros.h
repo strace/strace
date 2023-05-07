@@ -142,7 +142,7 @@ is_filled(const char *ptr, char fill, size_t size)
 		      "Unexpected size of " #type_ "(" #sz_ " expected)")
 
 /** Checks that ioctl code's size field contains the expected value. */
-#define CHECK_IOCTL_SIZE(ioc_, sz_) \
+# define CHECK_IOCTL_SIZE(ioc_, sz_) \
 	static_assert(_IOC_SIZE(ioc_) == (sz_), \
 		"Unexpected size field value in " #ioc_ " (" #sz_" expected)")
 

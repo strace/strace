@@ -8,7 +8,7 @@
  */
 
 #ifndef STRACE_STRAUSS_H
-#define STRACE_STRAUSS_H
+# define STRACE_STRAUSS_H
 
 enum { STRAUSS_START_VERBOSITY = 5 };
 

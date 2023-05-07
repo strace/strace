@@ -771,7 +771,7 @@ tprint_sysret_end(void)
 	} while (0)
 
 
-#define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
+# define MAYBE_PRINT_FIELD_LEN(print_prefix_, where_, field_,		\
 			len_, print_func_, ...)				\
 	do {								\
 		unsigned int start = offsetof(typeof(where_), field_);	\

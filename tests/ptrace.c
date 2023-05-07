@@ -2004,9 +2004,9 @@ main(void)
 		},
 #endif
 		{ ARG_XLAT_KNOWN(0x5, "BUS_MCEERR_AO"),
-# if !defined(BUS_OPFETCH) && defined(HAVE_SIGINFO_T_SI_ADDR_LSB)
+#if !defined(BUS_OPFETCH) && defined(HAVE_SIGINFO_T_SI_ADDR_LSB)
 		  ", si_addr_lsb=0xdead"
-# endif
+#endif
 		},
 		{ ARG_STR(0x6) },
 		{ ARG_STR(0x499602d2) },
@@ -2067,7 +2067,7 @@ main(void)
 		{ ARG_XLAT_KNOWN(0x3, "SEGV_BNDERR"),
 		  ", si_lower=0x" UP64BIT("beefface") "cafedead"
 		  ", si_upper=0x" UP64BIT("badc0ded") "dadfaced",
-#endif /* HAVE_SIGINFO_T_SI_LOWER */
+# endif /* HAVE_SIGINFO_T_SI_LOWER */
 		},
 #endif /* SEGV_STACKFLOW */
 #ifdef __SEGV_PSTKOVF

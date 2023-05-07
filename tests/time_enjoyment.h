@@ -1,11 +1,11 @@
 #ifndef STRACE_TESTS_TIME_ENJOYMENT_H
-#define STRACE_TESTS_TIME_ENJOYMENT_H
+# define STRACE_TESTS_TIME_ENJOYMENT_H
 
-#include <fcntl.h>
-#include <sched.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+# include <fcntl.h>
+# include <sched.h>
+# include <time.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 
 enum {
 	NUM_USER_ITERS_SQRT = 2000,
