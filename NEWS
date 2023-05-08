@@ -1,11 +1,11 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 6.3 (2023-05-08)
 ==============================================
 
 * Improvements
+  * Implemented --trace-fds=set option for filtering only the syscalls
+    that operate on the specified set of file descriptors.
   * Implemented --decode-fds=signalfd option for decoding of signal masks
     associated with signalfd file descriptors.
-  * Implemented -e trace-fds=set option for filtering only the syscalls
-    that operate on the specified set of file descriptors.
   * Implemented --syscall-limit option to automatically detach tracees
     after capturing the specified number of syscalls.
   * Implemented --argv0 option to set argv[0] of the command being executed.
@@ -21,7 +21,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Bug fixes
   * Fixed build on hppa with uapi headers from Linux >= 6.2.
-  * Fixed -e status= filtering when -c option is in use.
+  * Fixed --status filtering when -c option is in use.
 
 Noteworthy changes in release 6.2 (2023-02-26)
 ==============================================
