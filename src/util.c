@@ -220,6 +220,17 @@ ilog10(uint64_t val)
 }
 
 void
+print_ticks(uint64_t val, long freq, unsigned int precision)
+{
+	PRINT_VAL_U(val);
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
+	    && freq > 0 && val > 0) {
+		tprintf_comment("%" PRIu64 ".%0*" PRIu64 " s",
+				val / freq, precision, val % freq);
+	}
+}
+
+void
 print_clock_t(uint64_t val)
 {
 	static long clk_tck;
@@ -236,33 +247,7 @@ print_clock_t(uint64_t val)
 			frac_width = MIN(ilog10(clk_tck), 9);
 	}
 
-	PRINT_VAL_U(val);
-	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
-	    && clk_tck > 0 && val > 0) {
-		/*
-		 * This dance here is due to the fact that this calculation
-		 * may occasionally hit double precision limitations (52-bit
-		 * mantissa) with large values of val.
-		 */
-		char buf[sizeof(uint64_t) * 3 + sizeof("0.0 s")];
-		size_t offs = ilog10(val / clk_tck);
-		/*
-		 * This check is mostly to appease covscan, which thinks
-		 * that offs can go as high as 31 (it cannot), but since
-		 * there is no proper sanity checks against offs overrunning
-		 * buf down the code, it may as well be here.
-		 */
-		if (offs > (sizeof(buf) - sizeof("0.0 s")))
-			return;
-		int ret = snprintf(buf + offs, sizeof(buf) - offs, "%.*f s",
-				   frac_width,
-				   (double) (val % clk_tck) / clk_tck);
-		if (ret >= 0 && (unsigned) ret < sizeof(buf) - offs) {
-			snprintf(buf, offs + 2, "%" PRIu64, val / clk_tck);
-			buf[offs + 1] = '.';
-			tprints_comment(buf);
-		}
-	}
+	print_ticks(val, clk_tck, frac_width);
 }
 
 #if !defined HAVE_STPCPY
