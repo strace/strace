@@ -651,6 +651,9 @@ nlattr_smc_diag_msg		+netlink_sock_diag.test
 nlattr_tc_stats			+netlink_sock_diag.test
 nlattr_tca_stab			+netlink_sock_diag.test
 nlattr_tcamsg			+netlink_sock_diag.test
+nlattr_tcamsg-Xabbrev		+netlink_sock_diag.test -Xabbrev
+nlattr_tcamsg-Xraw		+netlink_sock_diag.test -Xraw
+nlattr_tcamsg-Xverbose		+netlink_sock_diag.test -Xverbose
 nlattr_tcmsg			+netlink_sock_diag.test
 nlattr_unix_diag_msg		+netlink_sock_diag.test
 old_mmap	-a11 -e trace=mmap
