@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented decoding of IFLA_BRPORT_NEIGH_VLAN_SUPPRESS netlink attribute.
   * Updated lists of BPF_* and MDBA_* constants.
 
 Noteworthy changes in release 6.3 (2023-05-08)
