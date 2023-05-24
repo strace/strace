@@ -47,7 +47,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x86_64-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       KHEADERS: torvalds/linux
@@ -63,7 +63,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x86_64-dw:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       STACKTRACE: libdw
@@ -78,7 +78,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x86_64-unwind:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       STACKTRACE: libunwind
@@ -93,7 +93,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86_64-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       KHEADERS: torvalds/linux
@@ -109,7 +109,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86_64-dw:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       STACKTRACE: libdw
@@ -124,7 +124,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86_64-unwind:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       STACKTRACE: libunwind
@@ -231,7 +231,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang14-x86_64-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-14
       KHEADERS: torvalds/linux
@@ -247,7 +247,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang14-x86_64-dw:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-14
       STACKTRACE: libdw
@@ -262,7 +262,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang14-x86_64-unwind:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-14
       STACKTRACE: libunwind
@@ -277,7 +277,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang13-x86_64-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-13
       KHEADERS: torvalds/linux
@@ -293,7 +293,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang13-x86_64-dw:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-13
       STACKTRACE: libdw
@@ -308,7 +308,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang13-x86_64-unwind:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-13
       STACKTRACE: libunwind
@@ -323,7 +323,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang12-x86_64-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-12
       KHEADERS: torvalds/linux
@@ -339,7 +339,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang12-x86_64-dw:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-12
       STACKTRACE: libdw
@@ -354,7 +354,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang12-x86_64-unwind:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-12
       STACKTRACE: libunwind
@@ -461,7 +461,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x32-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       KHEADERS: torvalds/linux
@@ -477,7 +477,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x32-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       STACKTRACE: no
@@ -492,7 +492,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x32-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       KHEADERS: torvalds/linux
@@ -508,7 +508,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x32-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       STACKTRACE: no
@@ -585,7 +585,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x86-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       KHEADERS: torvalds/linux
@@ -601,7 +601,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc12-x86-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-12
       STACKTRACE: no
@@ -616,7 +616,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       KHEADERS: torvalds/linux
@@ -632,7 +632,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x86-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: gcc-11
       STACKTRACE: no
@@ -694,7 +694,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang14-x86-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-14
       KHEADERS: torvalds/linux
@@ -710,7 +710,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang14-x86-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-14
       STACKTRACE: no
@@ -725,7 +725,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang13-x86-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-13
       KHEADERS: torvalds/linux
@@ -741,7 +741,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang13-x86-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-13
       STACKTRACE: no
@@ -756,7 +756,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang12-x86-kheaders:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-12
       KHEADERS: torvalds/linux
@@ -772,7 +772,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   clang12-x86-nostacktrace:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       CC: clang-12
       STACKTRACE: no
