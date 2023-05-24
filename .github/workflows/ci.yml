@@ -46,6 +46,52 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc13-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc13-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc13-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc12-x86_64-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -219,6 +265,52 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       CC: gcc
+      STACKTRACE: libunwind
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang15-x86_64-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-15
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang15-x86_64-dw:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-15
+      STACKTRACE: libdw
+      TARGET: x86_64
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang15-x86_64-unwind:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-15
       STACKTRACE: libunwind
       TARGET: x86_64
     steps:
@@ -460,6 +552,37 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc13-x32-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc13-x32-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      STACKTRACE: no
+      TARGET: x32
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc12-x32-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -584,6 +707,37 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
+  gcc13-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  gcc13-x86-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-13
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
   gcc12-x86-kheaders:
     runs-on: ubuntu-latest
     env:
@@ -682,6 +836,37 @@ jobs:
     env:
       CC: gcc
       KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang15-x86-kheaders:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-15
+      KHEADERS: torvalds/linux
+      STACKTRACE: no
+      TARGET: x86
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: install dependencies
+      run: ci/install-dependencies.sh
+    - name: build check
+      run: ci/run-build-and-tests.sh
+
+  clang15-x86-nostacktrace:
+    runs-on: ubuntu-latest
+    env:
+      CC: clang-15
       STACKTRACE: no
       TARGET: x86
     steps:
