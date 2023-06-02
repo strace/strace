@@ -218,6 +218,8 @@ libstrace_a_SOURCES =	\
 	netlink.c       \
 	netlink.h	\
 	netlink_crypto.c \
+	netlink_generic.c \
+	netlink_generic.h \
 	netlink_inet_diag.c \
 	netlink_kobject_uevent.c \
 	netlink_kobject_uevent.h \
