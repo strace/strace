@@ -397,10 +397,13 @@ print_struct_msghdr(struct tcb *tcp, const struct msghdr *msg,
 	tprints_field_name("msg_name");
 	const int family =
 		decode_sockaddr(tcp, ptr_to_kulong(msg->msg_name), msg_namelen);
-	const print_obj_by_addr_size_fn print_func =
-		(family == AF_NETLINK) ? iov_decode_netlink : iov_decode_str;
 	/* Assume that the descriptor is the 1st syscall argument. */
 	int fd = tcp->u_arg[0];
+	const enum sock_proto proto =
+		(family == -1) ? getfdproto(tcp, fd) : SOCK_PROTO_UNKNOWN;
+	const print_obj_by_addr_size_fn print_func =
+		(family == AF_NETLINK || proto == SOCK_PROTO_NETLINK)
+		? iov_decode_netlink : iov_decode_str;
 
 	tprint_struct_next();
 	tprints_field_name("msg_namelen");
