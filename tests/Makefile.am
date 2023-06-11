@@ -628,6 +628,7 @@ MISC_TESTS = \
 	status-unfinished-threads.test \
 	strace--argv0.test \
 	strace--syscall-limit.test \
+	strace--syscall-limit--seccomp-bpf.test \
 	strace--tips-full.test \
 	strace--tips.test \
 	strace-C.test \
@@ -724,6 +725,9 @@ check_DATA = \
 	strace--relative-timestamps-s.expected \
 	strace--relative-timestamps-us.expected \
 	strace--relative-timestamps.expected \
+	strace--syscall-limit--seccomp-bpf-1.expected \
+	strace--syscall-limit--seccomp-bpf-2.expected \
+	strace--syscall-limit--seccomp-bpf-3.expected \
 	strace--syscall-times-ms.expected \
 	strace--syscall-times-ns.expected \
 	strace--syscall-times-s.expected \

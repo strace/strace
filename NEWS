@@ -6,6 +6,9 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_*, KVM_*, MDBA_*, PACKET_*, PR_*, PTRACE_*, and UFFD_*
     constants.
 
+* Bug fixes
+  * Turn --seccomp-bpf off when --syscall-limit option is specified.
+
 Noteworthy changes in release 6.3 (2023-05-08)
 ==============================================
 
