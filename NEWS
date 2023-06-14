@@ -3,8 +3,8 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of IFLA_BRPORT_NEIGH_VLAN_SUPPRESS netlink attribute.
-  * Updated lists of BPF_*, KVM_*, MDBA_*, PACKET_*, PR_*, PTRACE_*, and UFFD_*
-    constants.
+  * Updated lists of BPF_*, KVM_*, MDBA_*, PACKET_*, PR_*, PTRACE_*, UFFD_*,
+    and V4L2_PIX_FMT_* constants.
   * Updated lists of ioctl commands from Linux 6.4.
 
 * Bug fixes
