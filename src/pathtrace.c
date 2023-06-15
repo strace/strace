@@ -415,47 +415,28 @@ pathtrace_match_set(struct tcb *tcp, struct path_set *set,
 		return false;
 	}
 
-	case SEN_accept4:
-	case SEN_accept:
 	case SEN_bpf:
 	case SEN_epoll_create:
 	case SEN_epoll_create1:
 	case SEN_eventfd2:
 	case SEN_eventfd:
 	case SEN_fanotify_init:
-	case SEN_fsmount:
 	case SEN_fsopen:
 	case SEN_inotify_init:
 	case SEN_inotify_init1:
-	case SEN_io_uring_enter:
-	case SEN_io_uring_register:
 	case SEN_io_uring_setup:
-	case SEN_landlock_add_rule:
 	case SEN_landlock_create_ruleset:
-	case SEN_landlock_restrict_self:
 	case SEN_memfd_create:
 	case SEN_memfd_secret:
-	case SEN_mq_getsetattr:
-	case SEN_mq_notify:
 	case SEN_mq_open:
-	case SEN_mq_timedreceive_time32:
-	case SEN_mq_timedreceive_time64:
-	case SEN_mq_timedsend_time32:
-	case SEN_mq_timedsend_time64:
 	case SEN_perf_event_open:
 	case SEN_pidfd_open:
 	case SEN_pipe:
 	case SEN_pipe2:
 	case SEN_printargs:
-	case SEN_signalfd4:
-	case SEN_signalfd:
 	case SEN_socket:
 	case SEN_socketpair:
 	case SEN_timerfd_create:
-	case SEN_timerfd_gettime32:
-	case SEN_timerfd_gettime64:
-	case SEN_timerfd_settime32:
-	case SEN_timerfd_settime64:
 	case SEN_userfaultfd:
 		/*
 		 * These have TRACE_FILE or TRACE_DESC or TRACE_NETWORK set,

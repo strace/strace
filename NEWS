@@ -9,6 +9,8 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Bug fixes
   * Turn --seccomp-bpf off when --syscall-limit option is specified.
+  * Fixed --trace-fds filtering support of syscalls taking file descriptor
+    arguments that do not normally have a path associated with them.
 
 Noteworthy changes in release 6.3 (2023-05-08)
 ==============================================
