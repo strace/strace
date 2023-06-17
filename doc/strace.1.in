@@ -1619,7 +1619,11 @@ This option has no effect unless
 .BR \-f / \-\-follow\-forks
 is also specified.
 .B \-\-seccomp\-bpf
-is also not applicable to processes attached using
+is not compatible with
+.B \-\-syscall\-limit
+and
+.BR \-b / \-\-detach\-on
+options.  It is also not applicable to processes attached using
 .BR \-p / \-\-attach
 option.  An attempt to enable system calls filtering using seccomp-bpf may
 fail for various reasons, e.g. there are too many system calls to filter,

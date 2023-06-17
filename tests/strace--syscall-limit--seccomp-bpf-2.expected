@@ -1,0 +1,3 @@
+strace: --seccomp-bpf is not enabled because it is not compatible with --syscall-limit
+strace: System call limit has been reached, detaching tracees
+strace: Process PID detached

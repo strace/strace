@@ -1,0 +1,2 @@
+strace: System call limit has been reached, detaching tracees
+strace: Process PID detached

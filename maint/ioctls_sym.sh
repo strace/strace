@@ -260,6 +260,7 @@ process_file()
 			echo 'struct omap3isp_stat_data_time32 {uint32_t dummy32[4]; uint16_t dummy16[3]; };'
 			;;
 		*linux/platform_data/cros_ec_chardev.h)
+			echo '#define DECLARE_FLEX_ARRAY(TYPE, NAME) __DECLARE_FLEX_ARRAY(TYPE, NAME)'
 			echo 'struct cros_ec_command {uint32_t dummy32[5]; uint8_t dummy8[0]; };'
 			;;
 		*linux/sonet.h)
@@ -418,6 +419,9 @@ process_file()
 		*linux/btrfs.h)
 			sed -i '/[[:space:]]BTRFS_IOC_[GS]ET_FSLABEL[[:space:]]/d' \
 				"$tmpdir"/header.out
+			;;
+		*linux/ext4.h)
+			sed -i "/[[:space:]]EXT4_IOC32_GROUP_ADD[[:space:]]/d" "$tmpdir"/header.out
 			;;
 		*linux/kvm.h)
 			arm_list='KVM_ARM_[A-Z_]+'

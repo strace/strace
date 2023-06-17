@@ -1,0 +1,72 @@
+#!/bin/sh -e
+#
+# Test --syscall-limit option in combination with --seccomp-bpf option.
+#
+# Copyright (c) 2016-2023 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+check_prog sed
+
+args=
+run_strace_redir()
+{
+	set -- --quiet=personality -f -eexecve "$@"
+	args="$*"
+	:> "$LOG" || fail_ "failed to write $LOG"
+	set +e
+	$STRACE -o "$LOG" "$@" > /dev/null 2> "$OUT"
+	rc=$?
+	set -e
+	LC_ALL=C sed 's/[^:]*strace: /strace: /; s/Process [1-9][0-9]* detached/Process PID detached/' \
+		< "$OUT" > "$EXP"
+	return $rc
+}
+
+run_strace_redir ../set_ptracer_any ../set_ptracer_any true ||
+	dump_log_and_fail_with "$STRACE $args failed with code $?"
+
+run_strace_redir ../set_ptracer_any ../set_ptracer_any false ||:
+[ $rc -eq 1 ] ||
+	dump_log_and_fail_with "$STRACE $args exited with unexpected code $rc"
+
+run_strace_redir --syscall-limit=2 \
+		../set_ptracer_any ../set_ptracer_any false ||
+	dump_log_and_fail_with "$STRACE $args failed with code $?"
+
+match_diff "$EXP" "$srcdir/$NAME-1.expected"
+
+run_strace_redir --seccomp-bpf --syscall-limit=2 \
+		../set_ptracer_any ../set_ptracer_any false ||
+	dump_log_and_fail_with "$STRACE $args failed with code $?"
+
+match_diff "$EXP" "$srcdir/$NAME-2.expected"
+
+run_prog ../set_ptracer_any ../set_ptracer_any touch sample > /dev/null
+rm sample
+
+run_strace_redir --seccomp-bpf --syscall-limit=2 $args ||
+	dump_log_and_fail_with "$STRACE $args failed with code $?"
+
+match_diff "$EXP" "$srcdir/$NAME-2.expected"
+
+LC_ALL=C sed -E 's/^[[:digit:]]+ +/PID /; s/, 0x[[:xdigit:]]+ \/\* [[:digit:]]+ vars \*\//, 0xHEX \/* NUM vars *\//' \
+	< "$LOG" > "$EXP"
+match_diff "$EXP" "$srcdir/$NAME-3.expected"
+
+# Do not wait forever, stop waiting
+# if the file won't appear after 10 iterations.
+attempt=1
+while [ "$attempt" -le 10 ] && [ ! -f sample ]; do
+	$SLEEP_A_BIT
+	attempt=$((attempt + 1))
+done
+
+[ -f sample ] ||
+	fail_ 'sample file did not appear'
+rm sample
+
+exit 0

@@ -2713,6 +2713,12 @@ init(int argc, char *argv[])
 		seccomp_filtering = false;
 	}
 
+	if (seccomp_filtering && syscall_limit > 0) {
+		error_msg("--seccomp-bpf is not enabled because"
+			  " it is not compatible with --syscall-limit");
+		seccomp_filtering = false;
+	}
+
 	if (followfork_short) {
 		if (followfork) {
 			error_msg_and_die("-f and --follow-forks cannot"
