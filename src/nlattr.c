@@ -548,3 +548,23 @@ decode_nla_xint(struct tcb *const tcp,
 
 	return false;
 }
+
+void
+nla_update_ctx_str(struct tcb *const tcp,
+		   const kernel_ulong_t addr, const unsigned int len,
+		   char *const str, const size_t sz)
+{
+	memset(str, '\0', sz);
+
+	if (len >= sz)
+		return;
+
+	if (umoven(tcp, addr, len, str) < 0 || strnlen(str, sz) > len) {
+		/*
+		 * If we haven't seen NUL or an error occurred, set str
+		 * to an empty string.
+		 */
+		str[0] = '\0';
+		return;
+	}
+}

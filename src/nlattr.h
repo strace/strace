@@ -148,4 +148,25 @@ extern void decode_nla_af_spec(struct tcb *const tcp,
 			       const struct af_spec_decoder_desc *descs,
 			       size_t desc_cnt);
 
+/*
+ * Common functions for *_KIND-style attribute hierarchies
+ *
+ * Some parts of netlink (notably, RTNL link and TC action) use a special
+ * nlattr to determine the semantics of the rest of the attributes (check out
+ * the handling of IFLA_INFO_KIND/IFLA_INFO_SLAVE_KIND/TCA_ACT_KIND for examples
+ * of such pattern);  strace handles that by storing the value of the *_KIND
+ * attribute in a "context" structure and then uses it to determine how
+ * the kind-specific attributes should be interpreted.
+ */
+
+/**
+ * Heper function for storing the *_KIND string in a parsing context.
+ * Checks that len does not the exceed storage size and that the NUL character
+ * is present.
+ */
+extern void nla_update_ctx_str(struct tcb *const tcp,
+			       const kernel_ulong_t addr,
+			       const unsigned int len,
+			       char *const str, const size_t sz);
+
 #endif /* !STRACE_NLATTR_H */
