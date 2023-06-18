@@ -785,7 +785,7 @@ test_ip_opts(struct msghdr *const mh, void *const page,
 	       len, rc, errno2name());
 }
 
-#ifdef IP_CHECKSUM
+#ifdef IP_RECVERR
 struct sock_ee {
 	uint32_t ee_errno;
 	uint8_t  ee_origin;
@@ -886,7 +886,7 @@ test_sol_ip(struct msghdr *const mh, void *const page)
 	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), DEFAULT_STRLEN - 1);
 	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), DEFAULT_STRLEN);
 	test_ip_opts(mh, page, ARG_STR(IP_RETOPTS), DEFAULT_STRLEN + 1);
-#ifdef IP_CHECKSUM
+#ifdef IP_RECVERR
 	test_ip_recverr(mh, page, ARG_STR(IP_RECVERR));
 #endif
 #ifdef IP_ORIGDSTADDR
