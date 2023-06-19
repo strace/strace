@@ -212,6 +212,17 @@ print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 	print_sockaddr(tcp, cmsg_data, addr_len);
 }
 
+static void
+print_cmsg_ip_protocol(struct tcb *tcp, const void *cmsg_data,
+		       const unsigned int data_len)
+{
+	const unsigned int *protocol = cmsg_data;
+
+	tprint_indirect_begin();
+	printxval(inet_protocols, *protocol, "IP_???");
+	tprint_indirect_end();
+}
+
 typedef void (* const cmsg_printer)(struct tcb *, const void *, unsigned int);
 
 static const struct {
@@ -236,6 +247,7 @@ static const struct {
 	[IP_RECVERR] = { print_cmsg_ip_recverr, sizeof(struct sock_ee) },
 	[IP_ORIGDSTADDR] = { print_cmsg_ip_origdstaddr, sizeof(struct sockaddr_in) },
 	[IP_CHECKSUM] = { print_cmsg_uint, sizeof(unsigned int) },
+	[IP_PROTOCOL] = { print_cmsg_ip_protocol, sizeof(unsigned int) },
 	[SCM_SECURITY] = { print_scm_security, 1 }
 };
 
