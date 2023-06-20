@@ -761,6 +761,26 @@ print_port_range(struct tcb *const tcp, const kernel_ulong_t addr,
 
 
 static void
+print_ip_protocol(struct tcb *const tcp, const kernel_ulong_t addr,
+		  const unsigned int len)
+{
+	unsigned int protocol;
+
+	if (len != sizeof(protocol)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &protocol))
+		return;
+
+	tprint_indirect_begin();
+	printxval(inet_protocols, protocol, "IPPROTO_???");
+	tprint_indirect_end();
+}
+
+
+static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
 {
@@ -941,6 +961,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		switch (name) {
 		case IP_LOCAL_PORT_RANGE:
 			print_port_range(tcp, addr, rlen);
+			return;
+		case IP_PROTOCOL:
+			print_ip_protocol(tcp, addr, rlen);
 			return;
 		}
 		break;
