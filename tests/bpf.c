@@ -1222,13 +1222,13 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 1 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 44,
+			.attach_type = 45,
 			.query_flags = 1,
 			.attach_flags = 3,
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, attach_flags),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=BPF_STRUCT_OPS"
+		       ", attach_type=BPF_NETFILTER"
 		       ", query_flags=BPF_F_QUERY_EFFECTIVE"
 		       ", attach_flags=BPF_F_ALLOW_OVERRIDE|BPF_F_ALLOW_MULTI"
 		       ", prog_ids=NULL, prog_cnt=0}",
@@ -1236,7 +1236,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 	{ /* 2 */
 		.data = { .BPF_PROG_QUERY_data = {
 			.target_fd = 3141592653U,
-			.attach_type = 45,
+			.attach_type = 46,
 			.query_flags = 0xfffffffe,
 			.attach_flags = 0xfffffff8,
 			.prog_ids = 0xffffffffffffffffULL,
@@ -1244,7 +1244,7 @@ static struct bpf_attr_check BPF_PROG_QUERY_checks[] = {
 		} },
 		.size = offsetofend(struct BPF_PROG_QUERY_struct, prog_cnt),
 		.str = "query={target_fd=-1153374643"
-		       ", attach_type=0x2d /* BPF_??? */"
+		       ", attach_type=0x2e /* BPF_??? */"
 		       ", query_flags=0xfffffffe /* BPF_F_QUERY_??? */"
 		       ", attach_flags=0xfffffff8 /* BPF_F_??? */"
 		       ", prog_ids="
