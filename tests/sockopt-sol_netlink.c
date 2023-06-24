@@ -94,7 +94,10 @@ main(void)
 			printf("%p", val);
 		else
 			printf("[%d]", *val);
-		printf(", [%d]) = %s\n", *len, errstr);
+		printf(", [%d", (int) sizeof(*val));
+		if ((int) sizeof(*val) != *len)
+			printf(" => %d", *len);
+		printf("]) = %s\n", errstr);
 
 		/* optlen larger than necessary - shortened */
 		*len = sizeof(*val) + 1;
@@ -150,8 +153,12 @@ main(void)
 		/* optval EFAULT - print address */
 		*len = sizeof(*val);
 		get_sockopt(fd, names[i].val, efault, len);
-		printf("getsockopt(%d, SOL_NETLINK, %s, %p, [%d]) = %s\n",
-		       fd, names[i].str, efault, *len, errstr);
+		printf("getsockopt(%d, SOL_NETLINK, %s, %p",
+		       fd, names[i].str, efault);
+		printf(", [%d", (int) sizeof(*val));
+		if ((int) sizeof(*val) != *len)
+			printf(" => %d", *len);
+		printf("]) = %s\n", errstr);
 
 		/* optlen EFAULT - print address */
 		get_sockopt(fd, names[i].val, val, len + 1);
