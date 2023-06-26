@@ -9,12 +9,12 @@
 
 #include "defs.h"
 
-# include <linux/ioctl.h>
-# include <linux/ptp_clock.h>
+#include <linux/ioctl.h>
+#include <linux/ptp_clock.h>
 
-# include "xlat/ptp_extts_flags.h"
-# include "xlat/ptp_perout_flags.h"
-# include "xlat/ptp_pin_funcs.h"
+#include "xlat/ptp_extts_flags.h"
+#include "xlat/ptp_perout_flags.h"
+#include "xlat/ptp_pin_funcs.h"
 
 static void
 print_ptp_clock_time(const struct ptp_clock_time *const p, bool rtc)
