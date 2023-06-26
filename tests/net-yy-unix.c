@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include <assert.h>
+#include <fcntl.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,8 +22,6 @@
 # include <sys/xattr.h>
 # include "xmalloc.h"
 #endif
-
-#include "accept_compat.h"
 
 #define TEST_SOCKET "net-yy-unix.socket"
 
@@ -112,12 +111,12 @@ main(void)
 	struct sockaddr * const accept_sa = tail_alloc(sizeof(addr));
 	memset(accept_sa, 0, sizeof(addr));
 	*len = sizeof(addr);
-	int accept_fd = do_accept(listen_fd, accept_sa, len);
+	int accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	unsigned long accept_inode = inode_of_sockfd(accept_fd);
-	printf("accept(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX}"
-	       ", [%d => %d]) = %d<%s:[%lu->%lu,\"%s\"]>\n",
+	printf("accept4(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX}"
+	       ", [%d => %d], SOCK_CLOEXEC) = %d<%s:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, sock_proto_name, listen_inode, TEST_SOCKET,
 	       (int) sizeof(addr), (int) *len,
 	       accept_fd, sock_proto_name, accept_inode, connect_inode,
@@ -191,14 +190,15 @@ main(void)
 
 	memset(accept_sa, 0, sizeof(addr));
 	*len = sizeof(addr);
-	accept_fd = do_accept(listen_fd, accept_sa, len);
+	accept_fd = accept4(listen_fd, accept_sa, len, O_CLOEXEC);
 	if (accept_fd < 0)
 		perror_msg_and_fail("accept");
 	accept_inode = inode_of_sockfd(accept_fd);
 	const char * const sun_path1 =
 		((struct sockaddr_un *) accept_sa)->sun_path + 1;
-	printf("accept(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
-	       ", sun_path=@\"%s\"}, [%d => %d]) = %d<%s:[%lu->%lu,\"%s\"]>\n",
+	printf("accept4(%d<%s:[%lu,\"%s\"]>, {sa_family=AF_UNIX"
+	       ", sun_path=@\"%s\"}, [%d => %d], SOCK_CLOEXEC)"
+	       " = %d<%s:[%lu->%lu,\"%s\"]>\n",
 	       listen_fd, sock_proto_name, listen_inode, TEST_SOCKET,
 	       sun_path1, (int) sizeof(addr), (int) *len,
 	       accept_fd, sock_proto_name, accept_inode, connect_inode,
