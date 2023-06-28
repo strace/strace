@@ -761,6 +761,26 @@ print_port_range(struct tcb *const tcp, const kernel_ulong_t addr,
 
 
 static void
+print_ip_protocol(struct tcb *const tcp, const kernel_ulong_t addr,
+		  const unsigned int len)
+{
+	unsigned int protocol;
+
+	if (len != sizeof(protocol)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &protocol))
+		return;
+
+	tprint_indirect_begin();
+	printxval(inet_protocols, protocol, "IPPROTO_???");
+	tprint_indirect_end();
+}
+
+
+static void
 print_tpacket_stats(struct tcb *const tcp, const kernel_ulong_t addr,
 		    unsigned int len)
 {
@@ -942,6 +962,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case IP_LOCAL_PORT_RANGE:
 			print_port_range(tcp, addr, rlen);
 			return;
+		case IP_PROTOCOL:
+			print_ip_protocol(tcp, addr, rlen);
+			return;
 		}
 		break;
 
@@ -1015,7 +1038,7 @@ SYS_FUNC(getsockopt)
 	} else {
 		ulen = get_tcb_priv_ulong(tcp);
 
-		if (syserror(tcp) || umove(tcp, tcp->u_arg[4], &rlen) < 0) {
+		if (umove(tcp, tcp->u_arg[4], &rlen) < 0) {
 			/* optval */
 			printaddr(tcp->u_arg[3]);
 			tprint_arg_next();
@@ -1023,6 +1046,19 @@ SYS_FUNC(getsockopt)
 			/* optlen */
 			tprint_indirect_begin();
 			PRINT_VAL_D(ulen);
+			tprint_indirect_end();
+		} else if (syserror(tcp)) {
+			/* optval */
+			printaddr(tcp->u_arg[3]);
+			tprint_arg_next();
+
+			/* optlen */
+			tprint_indirect_begin();
+			if (ulen != rlen) {
+				PRINT_VAL_D(ulen);
+				tprint_value_changed();
+			}
+			PRINT_VAL_D(rlen);
 			tprint_indirect_end();
 		} else {
 			/* optval */

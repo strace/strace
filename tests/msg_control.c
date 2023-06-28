@@ -26,6 +26,7 @@
 
 #include "xlat.h"
 #define XLAT_MACROS_ONLY
+#include "xlat/ip_cmsg_types.h"
 #include "xlat/sock_options.h"
 #include "xlat/scmvals.h"
 #undef XLAT_MACROS_ONLY
@@ -869,6 +870,34 @@ test_ip_origdstaddr(struct msghdr *const mh, void *const page,
 }
 #endif
 
+#ifdef IP_PROTOCOL
+static void
+test_ip_protocol(struct msghdr *const mh, void *const page,
+		 const int cmsg_type, const char *const cmsg_type_str)
+{
+	const unsigned int len = CMSG_SPACE(sizeof(int));
+	struct cmsghdr *const cmsg = get_cmsghdr(page, len);
+
+	cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+	cmsg->cmsg_level = SOL_IP;
+	cmsg->cmsg_type = cmsg_type;
+
+	unsigned int *u = (void *) CMSG_DATA(cmsg);
+	*u = IPPROTO_RAW;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = len;
+
+	int rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
+	       ", cmsg_level=SOL_IP, cmsg_type=%s, cmsg_data=[%s]}]"
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       (unsigned) cmsg->cmsg_len, cmsg_type_str, "IPPROTO_RAW", len,
+	       rc, errno2name());
+}
+#endif
+
 static void
 test_sol_ip(struct msghdr *const mh, void *const page)
 {
@@ -894,6 +923,9 @@ test_sol_ip(struct msghdr *const mh, void *const page)
 #endif
 #ifdef IP_CHECKSUM
 	test_ip_uint(mh, page, ARG_STR(IP_CHECKSUM));
+#endif
+#ifdef IP_PROTOCOL
+	test_ip_protocol(mh, page, ARG_STR(IP_PROTOCOL));
 #endif
 	test_scm_security(mh, CMSG_LEN(0), page, 0, CMSG_LEN(0),
 			  ARG_STR(SOL_IP));

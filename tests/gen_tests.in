@@ -444,6 +444,10 @@ ip_local_port_range-success-Xabbrev	-einject=getsockopt,setsockopt:retval=42 -et
 ip_local_port_range-success-Xraw	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xraw -a30
 ip_local_port_range-success-Xverbose	-einject=getsockopt,setsockopt:retval=42 -etrace=getsockopt,setsockopt -Xverbose -a69
 ip_mreq	-e trace=setsockopt
+ip_protocol		-einject=getsockopt:retval=42 -etrace=getsockopt -a52
+ip_protocol-Xabbrev	-einject=getsockopt:retval=42 -etrace=getsockopt -a52 -Xabbrev
+ip_protocol-Xraw	-einject=getsockopt:retval=42 -etrace=getsockopt -a36 -Xraw
+ip_protocol-Xverbose	-einject=getsockopt:retval=42 -etrace=getsockopt -a71 -Xverbose
 ipc	-a19
 ipc_msg	+ipc.sh -a26
 ipc_msg-Xabbrev	+ipc.sh -Xabbrev -a26

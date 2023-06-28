@@ -275,6 +275,10 @@ ip_local_port_range-Xabbrev
 ip_local_port_range-Xraw
 ip_local_port_range-Xverbose
 ip_mreq
+ip_protocol
+ip_protocol-Xabbrev
+ip_protocol-Xraw
+ip_protocol-Xverbose
 ipc
 ipc_msg
 ipc_msg-Xabbrev

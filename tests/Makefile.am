@@ -779,7 +779,6 @@ check_DATA = \
 	# end of check_DATA
 
 EXTRA_DIST = \
-	accept_compat.h \
 	attach-p-cmd.h \
 	clock_adjtime-common.c \
 	clock_xettime-common.c \

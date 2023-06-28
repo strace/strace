@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2021 The strace developers.
+ * Copyright (c) 2017-2023 The strace developers.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */

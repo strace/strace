@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2014 Stefan Sørensen <stefan.sorensen@spectralink.com>
  * Copyright (c) 2014-2015 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2014-2021 The strace developers.
+ * Copyright (c) 2014-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -9,12 +9,12 @@
 
 #include "defs.h"
 
-# include <linux/ioctl.h>
-# include <linux/ptp_clock.h>
+#include <linux/ioctl.h>
+#include <linux/ptp_clock.h>
 
-# include "xlat/ptp_extts_flags.h"
-# include "xlat/ptp_perout_flags.h"
-# include "xlat/ptp_pin_funcs.h"
+#include "xlat/ptp_extts_flags.h"
+#include "xlat/ptp_perout_flags.h"
+#include "xlat/ptp_pin_funcs.h"
 
 static void
 print_ptp_clock_time(const struct ptp_clock_time *const p, bool rtc)

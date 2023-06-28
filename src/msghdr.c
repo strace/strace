@@ -4,7 +4,7 @@
  * Copyright (c) 1993, 1994, 1995, 1996 Rick Sladkey <jrs@world.std.com>
  * Copyright (c) 1996-2000 Wichert Akkerman <wichert@cistron.nl>
  * Copyright (c) 2005-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -212,6 +212,17 @@ print_cmsg_ip_origdstaddr(struct tcb *tcp, const void *cmsg_data,
 	print_sockaddr(tcp, cmsg_data, addr_len);
 }
 
+static void
+print_cmsg_ip_protocol(struct tcb *tcp, const void *cmsg_data,
+		       const unsigned int data_len)
+{
+	const unsigned int *protocol = cmsg_data;
+
+	tprint_indirect_begin();
+	printxval(inet_protocols, *protocol, "IP_???");
+	tprint_indirect_end();
+}
+
 typedef void (* const cmsg_printer)(struct tcb *, const void *, unsigned int);
 
 static const struct {
@@ -236,6 +247,7 @@ static const struct {
 	[IP_RECVERR] = { print_cmsg_ip_recverr, sizeof(struct sock_ee) },
 	[IP_ORIGDSTADDR] = { print_cmsg_ip_origdstaddr, sizeof(struct sockaddr_in) },
 	[IP_CHECKSUM] = { print_cmsg_uint, sizeof(unsigned int) },
+	[IP_PROTOCOL] = { print_cmsg_ip_protocol, sizeof(unsigned int) },
 	[SCM_SECURITY] = { print_scm_security, 1 }
 };
 
