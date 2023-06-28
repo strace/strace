@@ -1487,10 +1487,13 @@ exec_or_die(void)
 
 	if (params->fd_to_close >= 0)
 		close(params->fd_to_close);
-	if (!daemonized_tracer && !use_seize) {
-		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
+
+	if (!daemonized_tracer) {
+		if (params->child_sa.sa_handler != SIG_DFL)
+			sigaction(SIGCHLD, &params->child_sa, NULL);
+
+		if (!use_seize && ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
 			perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
-		}
 	}
 
 	if (username != NULL) {
@@ -1529,10 +1532,9 @@ exec_or_die(void)
 		while (wait(NULL) < 0 && errno == EINTR)
 			;
 		alarm(0);
+		if (params->child_sa.sa_handler != SIG_DFL)
+			sigaction(SIGCHLD, &params->child_sa, NULL);
 	}
-
-	if (params_for_tracee.child_sa.sa_handler != SIG_DFL)
-		sigaction(SIGCHLD, &params_for_tracee.child_sa, NULL);
 
 	debug_msg("seccomp filter %s",
 		  seccomp_filtering ? "enabled" : "disabled");
