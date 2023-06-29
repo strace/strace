@@ -1510,10 +1510,7 @@ exec_or_die(void)
 		if (setreuid(run_uid, params->run_euid) < 0) {
 			perror_msg_and_die("setreuid");
 		}
-	} else if (geteuid() != 0)
-		if (setreuid(run_uid, run_uid) < 0) {
-			perror_msg_and_die("setreuid");
-		}
+	}
 
 	if (!daemonized_tracer) {
 		/*
