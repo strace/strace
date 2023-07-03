@@ -113,10 +113,9 @@ main(void)
 			       params->sq_off.array);
 			if (params->sq_off.resv1)
 				printf(", resv1=%#x", params->sq_off.resv1);
-			if (params->sq_off.resv2)
-				printf(", resv1=%#llx",
-				       (unsigned long long)
-						params->sq_off.resv2);
+			printf(", user_addr=%#llx",
+			       (unsigned long long)
+					params->sq_off.user_addr);
 
 			printf("}, cq_off={head=%u, tail=%u, ring_mask=%u"
 			       ", ring_entries=%u, overflow=%u, cqes=%u"
@@ -130,10 +129,9 @@ main(void)
 			       params->cq_off.flags);
 			if (params->cq_off.resv1)
 				printf(", resv1=%#x", params->cq_off.resv1);
-			if (params->cq_off.resv2)
-				printf(", resv2=%#llx",
-				       (unsigned long long)
-						params->cq_off.resv2);
+			printf(", user_addr=%#llx",
+			       (unsigned long long)
+					params->cq_off.user_addr);
 
 			printf("}}) = %ld<anon_inode:[io_uring]>\n", rc);
 		}

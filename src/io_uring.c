@@ -45,10 +45,8 @@ print_io_sqring_offsets(const struct io_sqring_offsets *const p)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv1);
 	}
-	if (p->resv2) {
-		tprint_struct_next();
-		PRINT_FIELD_X(*p, resv2);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, user_addr);
 	tprint_struct_end();
 }
 
@@ -73,10 +71,8 @@ print_io_cqring_offsets(const struct io_cqring_offsets *const p)
 		tprint_struct_next();
 		PRINT_FIELD_X(*p, resv1);
 	}
-	if (p->resv2) {
-		tprint_struct_next();
-		PRINT_FIELD_X(*p, resv2);
-	}
+	tprint_struct_next();
+	PRINT_FIELD_X(*p, user_addr);
 	tprint_struct_end();
 }
 
