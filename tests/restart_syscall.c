@@ -28,7 +28,8 @@ main(void)
 #else
 	const sigset_t set = {};
 	const struct sigaction act = { .sa_handler = SIG_IGN };
-	const struct itimerval itv = { .it_value.tv_usec = 111111 };
+	const struct itimerval itv = { .it_interval.tv_usec = 22222,
+				       .it_value.tv_usec = 11111 };
 	const struct timespec req = { .tv_nsec = 222222222 };
 	struct timespec rem = { 0xdefaced, 0xdefaced };
 
@@ -58,6 +59,9 @@ main(void)
 	       NANOSLEEP_CALL_RE,
 	       ALTERNATIVE_NANOSLEEP_REQ,
 	       NANOSLEEP_NAME_RE);
+
+	puts("!restart_syscall\\(<\\.\\.\\."
+	     " resuming interrupted restart_syscall \\.\\.\\.>\\) = .*");
 
 	puts("\\+\\+\\+ exited with 0 \\+\\+\\+");
 	return 0;
