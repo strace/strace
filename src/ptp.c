@@ -78,7 +78,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 	case PTP_CLOCK_GETCAPS:
 	case PTP_CLOCK_GETCAPS2: {
 		struct ptp_clock_caps caps;
-		CHECK_TYPE_SIZE(caps.rsv, sizeof(unsigned int) * 12);
+		CHECK_TYPE_SIZE(caps.rsv, sizeof(unsigned int) * 11);
 		CHECK_IOCTL_SIZE(PTP_CLOCK_GETCAPS, 80);
 		CHECK_IOCTL_SIZE(PTP_CLOCK_GETCAPS2, 80);
 
@@ -106,6 +106,8 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		PRINT_FIELD_D(caps, cross_timestamping);
 		tprint_struct_next();
 		PRINT_FIELD_D(caps, adjust_phase);
+		tprint_struct_next();
+		PRINT_FIELD_D(caps, max_phase_adj);
 		PRINT_RSV(caps, rsv);
 		tprint_struct_end();
 		break;
