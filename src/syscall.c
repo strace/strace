@@ -799,6 +799,9 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	if (cflag != CFLAG_ONLY_STATS)
 		print_syscall_resume(tcp);
 
+	const struct_sysent *prev_ent =
+			tcp_sysent(tcp)->sen == SEN_restart_syscall
+			? tcp->s_prev_ent : tcp->s_ent;
 	tcp->s_prev_ent = NULL;
 	if (res != 1) {
 		/* There was an error in one of prior ptrace ops.  */
@@ -826,7 +829,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 		}
 		return res;
 	}
-	tcp->s_prev_ent = tcp->s_ent;
+	tcp->s_prev_ent = prev_ent;
 
 	int sys_res = 0;
 	if (cflag != CFLAG_ONLY_STATS) {
