@@ -1466,6 +1466,15 @@ startup_attach(void)
 	}
 }
 
+static void
+maybe_init_seccomp_filter(void)
+{
+	debug_msg("seccomp filter %s",
+		  seccomp_filtering ? "enabled" : "disabled");
+	if (seccomp_filtering)
+		init_seccomp_filter();
+}
+
 /* Stack-o-phobic exec helper, in the hope to work around
  * NOMMU + "daemonized tracer" difficulty.
  */
@@ -1487,10 +1496,13 @@ exec_or_die(void)
 
 	if (params->fd_to_close >= 0)
 		close(params->fd_to_close);
-	if (!daemonized_tracer && !use_seize) {
-		if (ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0) {
+
+	if (!daemonized_tracer) {
+		if (params->child_sa.sa_handler != SIG_DFL)
+			sigaction(SIGCHLD, &params->child_sa, NULL);
+
+		if (!use_seize && ptrace(PTRACE_TRACEME, 0L, 0L, 0L) < 0)
 			perror_msg_and_die("ptrace(PTRACE_TRACEME, ...)");
-		}
 	}
 
 	if (username != NULL) {
@@ -1498,19 +1510,20 @@ exec_or_die(void)
 		 * It is important to set groups before we
 		 * lose privileges on setuid.
 		 */
-		if (initgroups(username, run_gid) < 0) {
+		if (initgroups(username, run_gid) < 0)
 			perror_msg_and_die("initgroups");
-		}
-		if (setregid(run_gid, params->run_egid) < 0) {
+		if (setregid(run_gid, params->run_egid) < 0)
 			perror_msg_and_die("setregid");
-		}
-		if (setreuid(run_uid, params->run_euid) < 0) {
+
+		/*
+		 * If there is a seccomp filter to be installed, this should
+		 * be done before CAP_SYS_ADMIN is dropped by setreuid.
+		 */
+		maybe_init_seccomp_filter();
+
+		if (setreuid(run_uid, params->run_euid) < 0)
 			perror_msg_and_die("setreuid");
-		}
-	} else if (geteuid() != 0)
-		if (setreuid(run_uid, run_uid) < 0) {
-			perror_msg_and_die("setreuid");
-		}
+	}
 
 	if (!daemonized_tracer) {
 		/*
@@ -1529,15 +1542,12 @@ exec_or_die(void)
 		while (wait(NULL) < 0 && errno == EINTR)
 			;
 		alarm(0);
+		if (params->child_sa.sa_handler != SIG_DFL)
+			sigaction(SIGCHLD, &params->child_sa, NULL);
 	}
 
-	if (params_for_tracee.child_sa.sa_handler != SIG_DFL)
-		sigaction(SIGCHLD, &params_for_tracee.child_sa, NULL);
-
-	debug_msg("seccomp filter %s",
-		  seccomp_filtering ? "enabled" : "disabled");
-	if (seccomp_filtering)
-		init_seccomp_filter();
+	if (!username)
+		maybe_init_seccomp_filter();
 	execve(params->pathname, params->argv, params->env);
 	perror_msg_and_die("exec");
 }
