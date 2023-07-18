@@ -949,6 +949,7 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_BUSY_POLL_BUDGET:
 		case SO_RESERVE_MEM:
 		case SO_RCVMARK:
+		case SO_PASSPIDFD:
 			if (rlen >= (int) sizeof(int))
 				printnum_int(tcp, addr, "%d");
 			else
@@ -1242,6 +1243,7 @@ print_setsockopt(struct tcb *const tcp, const unsigned int level,
 		case SO_BUSY_POLL_BUDGET:
 		case SO_RESERVE_MEM:
 		case SO_RCVMARK:
+		case SO_PASSPIDFD:
 			if (len < (int) sizeof(int))
 				printaddr(addr);
 			else
