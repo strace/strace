@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Implemented decoding of SO_PASSPIDFD socket option.
+  * Implemented decoding of SO_PASSPIDFD and SO_PEERPIDFD socket options.
 
 Noteworthy changes in release 6.4 (2023-06-26)
 ==============================================

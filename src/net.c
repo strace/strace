@@ -734,6 +734,25 @@ print_txrehash(struct tcb *const tcp, const kernel_ulong_t addr, const int len)
 }
 
 static void
+print_get_fd(struct tcb *const tcp, const kernel_ulong_t addr,
+	     const unsigned int len)
+{
+	int fd;
+
+	if (len < sizeof(fd)) {
+		printstr_ex(tcp, addr, len, QUOTE_FORCE_HEX);
+		return;
+	}
+
+	if (umove_or_printaddr(tcp, addr, &fd))
+		return;
+
+	tprint_indirect_begin();
+	printfd(tcp, fd);
+	tprint_indirect_end();
+}
+
+static void
 print_port_range(struct tcb *const tcp, const kernel_ulong_t addr,
 		 const unsigned int len)
 {
@@ -903,6 +922,9 @@ print_getsockopt(struct tcb *const tcp, const unsigned int level,
 			return;
 		case SO_TXREHASH:
 			print_txrehash(tcp, addr, rlen);
+			return;
+		case SO_PEERPIDFD:
+			print_get_fd(tcp, addr, rlen);
 			return;
 
 		/* All known int-like options */

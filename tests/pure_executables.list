@@ -716,6 +716,7 @@ so_peercred
 so_peercred-Xabbrev
 so_peercred-Xraw
 so_peercred-Xverbose
+so_peerpidfd
 sock_filter-v
 sock_filter-v-Xabbrev
 sock_filter-v-Xraw

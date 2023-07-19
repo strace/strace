@@ -983,6 +983,7 @@ so_peercred--pidns-translation	test_pidns -e trace=getsockopt
 so_peercred-Xabbrev	-e trace=getsockopt -Xabbrev
 so_peercred-Xraw	-e trace=getsockopt -Xraw -a39
 so_peercred-Xverbose	-e trace=getsockopt -Xverbose
+so_peerpidfd	--trace=getsockopt -y
 sock_filter-v	-v -e trace=getsockopt,setsockopt
 sock_filter-v-Xabbrev	-v -e trace=getsockopt,setsockopt -X abbrev
 sock_filter-v-Xraw	-a 37 -v -e trace=getsockopt,setsockopt -X raw

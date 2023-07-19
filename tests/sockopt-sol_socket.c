@@ -159,7 +159,8 @@ main(void)
 		{ ARG_STR(SO_TXREHASH), ARRSZ_PAIR(txrehash_vecs), sizeof(int) },
 		{ ARG_STR(SO_RCVMARK), .optsz = sizeof(int) },
 		{ ARG_STR(SO_PASSPIDFD), .optsz = sizeof(int) },
-		{ 77, NULL },
+		/* SO_PEERPIDFD - see so_peerpidfd test */
+		{ 78, NULL },
 		{ -1, NULL },
 	};
 
