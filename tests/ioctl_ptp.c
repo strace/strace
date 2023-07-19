@@ -151,7 +151,7 @@ test_no_device(void)
 		if (rc >= 0) {
 			printf("{max_adj=0, n_alarm=0, n_ext_ts=0, n_per_out=0"
 			       ", pps=0, n_pins=0, cross_timestamping=0"
-			       ", adjust_phase=0}");
+			       ", adjust_phase=0, max_phase_adj=0}");
 		} else {
 			printf("%p", caps);
 		}
@@ -166,7 +166,8 @@ test_no_device(void)
 			       ", pps=-2136948508, n_pins=-2136948507"
 			       ", cross_timestamping=-2136948506"
 			       ", adjust_phase=-2136948505"
-			       ", rsv=[0x80a0c0e8, 0x80a0c0e9, 0x80a0c0ea"
+			       ", max_phase_adj=-2136948504"
+			       ", rsv=[0x80a0c0e9, 0x80a0c0ea"
 			       ", 0x80a0c0eb, 0x80a0c0ec, 0x80a0c0ed"
 			       ", 0x80a0c0ee, 0x80a0c0ef, 0x80a0c0f0"
 			       ", 0x80a0c0f1, 0x80a0c0f2, 0x80a0c0f3]}");
