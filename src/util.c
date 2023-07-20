@@ -231,6 +231,19 @@ print_ticks(uint64_t val, long freq, unsigned int precision)
 }
 
 void
+print_ticks_d(int64_t val, long freq, unsigned int precision)
+{
+	PRINT_VAL_D(val);
+	/* freq > 1 to avoid special casing for val ==  */
+	if (xlat_verbose(xlat_verbosity) != XLAT_STYLE_RAW
+	    && freq > 1 && val != 0) {
+		tprintf_comment("%s%lld.%0*lld s",
+				val < 0 ? "-" : "", llabs(val / freq),
+				precision, llabs(val % freq));
+	}
+}
+
+void
 print_clock_t(uint64_t val)
 {
 	static long clk_tck;
