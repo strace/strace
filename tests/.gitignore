@@ -926,6 +926,8 @@ sched_xetparam--pidns-translation
 sched_xetscheduler
 sched_xetscheduler--pidns-translation
 sched_yield
+scm_pidfd
+scm_pidfd-success
 scm_rights
 scno.h
 seccomp-filter

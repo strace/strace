@@ -914,6 +914,8 @@ sched_xetparam--pidns-translation	test_pidns -a23 -e trace=sched_getparam,sched_
 sched_xetscheduler	-a22 -e trace=sched_getscheduler,sched_setscheduler
 sched_xetscheduler--pidns-translation	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler
 sched_yield	-a14
+scm_pidfd	--trace=recvmsg -y
+scm_pidfd-success	--inject=recvmsg:retval=1 --trace=recvmsg -y
 seccomp-filter	-e trace=seccomp
 seccomp-filter-v	-v -e trace=seccomp
 seccomp_get_action_avail	-e trace=seccomp
