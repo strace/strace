@@ -657,6 +657,7 @@ sched_xetattr
 sched_xetparam
 sched_xetscheduler
 sched_yield
+scm_credentials
 scm_pidfd
 scm_pidfd-success
 seccomp-filter

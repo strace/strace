@@ -926,6 +926,7 @@ sched_xetparam--pidns-translation
 sched_xetscheduler
 sched_xetscheduler--pidns-translation
 sched_yield
+scm_credentials
 scm_pidfd
 scm_pidfd-success
 scm_rights
