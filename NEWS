@@ -4,7 +4,7 @@ Noteworthy changes in release ?.? (????-??-??)
 * Improvements
   * Implemented decoding of SO_PASSPIDFD and SO_PEERPIDFD socket options.
   * Implemented decoding of SCM_PIDFD control messages.
-  * Updated lists of AT_*, BPF_*, IORING_*, KVM_*, MOVE_MOUNT_*, and NT_*
+  * Updated lists of AT_*, BPF_*, IORING_*, KVM_*, MOVE_MOUNT_*, NFT_*, and NT_*
     constants.
 
 Noteworthy changes in release 6.4 (2023-06-26)

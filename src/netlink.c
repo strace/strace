@@ -350,6 +350,7 @@ decode_nlmsg_flags_netfilter(const uint16_t type)
 		case NFT_MSG_GETOBJ_RESET:
 		case NFT_MSG_GETFLOWTABLE:
 		case NFT_MSG_GETRULE_RESET:
+		case NFT_MSG_GETSETELEM_RESET:
 			return netlink_get_flags;
 		case NFT_MSG_DELTABLE:
 		case NFT_MSG_DELCHAIN:
