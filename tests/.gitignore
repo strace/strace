@@ -49,6 +49,10 @@ bpf-success-v
 bpf-v
 brk
 btrfs
+cachestat
+cachestat-P
+cachestat-fd
+cachestat-success
 caps
 caps-abbrev
 chdir

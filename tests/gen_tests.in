@@ -38,6 +38,10 @@ bpf-success	-einject=bpf:retval=42 -etrace=bpf -a20
 bpf-success-v	-einject=bpf:retval=42 -etrace=bpf -a20 -v
 bpf-v	-a20 -v -e trace=bpf
 btrfs	+ioctl.test
+cachestat	-a29 -y 9>>/dev/full
+cachestat-P	-y --trace-path=/dev/full --trace=cachestat 9>>/dev/full
+cachestat-fd	-y --trace-fds=9 --trace=cachestat 9>>/dev/full
+cachestat-success -a29 --trace=cachestat --inject=cachestat:retval=42 9>>/dev/full
 chdir	-a10
 chmod	-a28
 chmod--secontext	-a28 -e secontext=!full,mismatch -e trace=chmod

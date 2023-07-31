@@ -24,6 +24,10 @@ bpf
 bpf-v
 brk
 btrfs
+cachestat
+cachestat-P
+cachestat-fd
+cachestat-success
 caps
 chdir
 chmod
