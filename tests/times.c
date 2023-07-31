@@ -69,7 +69,7 @@ main(void)
 		     : "memory", "cc", "r11", "cx");
 	if (llres > 0xfffffffffffff000)
 		return 77;
-#elif defined LINUX_MIPSN32
+#elif defined __s390__ || defined LINUX_MIPSN32
 	clock_t res = times(&tbuf);
 
 	if ((clock_t) -1 == res)
