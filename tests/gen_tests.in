@@ -163,6 +163,11 @@ fchmodat--secontext	--secontext -e trace=fchmodat
 fchmodat--secontext_full	--secontext=full -e trace=fchmodat
 fchmodat--secontext_full_mismatch	--secontext=full,mismatch -e trace=fchmodat
 fchmodat--secontext_mismatch	--secontext=mismatch -e trace=fchmodat
+fchmodat2
+fchmodat2--secontext	--secontext -e trace=fchmodat2
+fchmodat2--secontext_full	--secontext=full -e trace=fchmodat2
+fchmodat2--secontext_full_mismatch	--secontext=full,mismatch -e trace=fchmodat2
+fchmodat2--secontext_mismatch	--secontext=mismatch -e trace=fchmodat2
 fchown	-a16
 fchown32	-a18
 fchownat

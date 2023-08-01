@@ -105,6 +105,7 @@ fchdir
 fchmod
 fchmod-y
 fchmodat
+fchmodat2
 fchown
 fchown32
 fchownat
