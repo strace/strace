@@ -27,6 +27,7 @@
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
 #include "xlat/bpf_query_flags.h"
+#include "xlat/bpf_stats_type.h"
 #include "xlat/bpf_task_fd_type.h"
 #include "xlat/bpf_test_run_flags.h"
 #include "xlat/bpf_link_create_kprobe_multi_flags.h"
@@ -1543,6 +1544,16 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_GET_FD_BY_ID)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+BEGIN_BPF_CMD_DECODER(BPF_ENABLE_STATS)
+{
+	tprint_struct_begin();
+	tprints_field_name("enable_stats");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(attr, type, bpf_stats_type, "BPF_STATS_???");
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -1578,6 +1589,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_LINK_UPDATE),
 		BPF_CMD_ENTRY(BPF_LINK_GET_NEXT_ID),
 		BPF_CMD_ENTRY(BPF_LINK_GET_FD_BY_ID),
+		BPF_CMD_ENTRY(BPF_ENABLE_STATS),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

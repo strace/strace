@@ -446,4 +446,12 @@ struct BPF_LINK_GET_FD_BY_ID_struct {
 	sizeof(struct BPF_LINK_GET_FD_BY_ID_struct)
 # define expected_BPF_LINK_GET_FD_BY_ID_struct_size 4
 
+struct BPF_ENABLE_STATS_struct /* enable_stats */ {
+	uint32_t type;
+};
+
+# define BPF_ENABLE_STATS_struct_size \
+	sizeof(struct BPF_ENABLE_STATS_struct)
+# define expected_BPF_ENABLE_STATS_struct_size 4
+
 #endif /* !STRACE_BPF_ATTR_H */
