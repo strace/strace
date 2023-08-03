@@ -1554,6 +1554,18 @@ BEGIN_BPF_CMD_DECODER(BPF_ENABLE_STATS)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+BEGIN_BPF_CMD_DECODER(BPF_ITER_CREATE)
+{
+	tprint_struct_begin();
+	tprints_field_name("iter_create");
+	tprint_struct_begin();
+	PRINT_FIELD_FD(attr, link_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, flags);
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -1590,6 +1602,7 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_LINK_GET_NEXT_ID),
 		BPF_CMD_ENTRY(BPF_LINK_GET_FD_BY_ID),
 		BPF_CMD_ENTRY(BPF_ENABLE_STATS),
+		BPF_CMD_ENTRY(BPF_ITER_CREATE),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

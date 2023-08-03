@@ -454,4 +454,13 @@ struct BPF_ENABLE_STATS_struct /* enable_stats */ {
 	sizeof(struct BPF_ENABLE_STATS_struct)
 # define expected_BPF_ENABLE_STATS_struct_size 4
 
+struct BPF_ITER_CREATE_struct /* iter_create */ {
+	uint32_t link_fd;
+	uint32_t flags;
+};
+
+# define BPF_ITER_CREATE_struct_size \
+	sizeof(struct BPF_ITER_CREATE_struct)
+# define expected_BPF_ITER_CREATE_struct_size 8
+
 #endif /* !STRACE_BPF_ATTR_H */

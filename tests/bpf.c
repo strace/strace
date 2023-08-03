@@ -89,6 +89,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_LINK_UPDATE);
 	BPF_ATTR_DATA_FIELD(BPF_LINK_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_ENABLE_STATS);
+	BPF_ATTR_DATA_FIELD(BPF_ITER_CREATE);
 	char char_data[256];
 };
 
@@ -1844,6 +1845,25 @@ static const struct bpf_attr_check BPF_ENABLE_STATS_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_ITER_CREATE_checks[] = {
+	{
+		.data = { .BPF_ITER_CREATE_data = {
+			.link_fd = -1,
+			.flags = 0
+		} },
+		.size = offsetofend(struct BPF_ITER_CREATE_struct, flags),
+		.str = "iter_create={link_fd=-1, flags=0}"
+	},
+	{
+		.data = { .BPF_ITER_CREATE_data = {
+			.link_fd = -1,
+			.flags = -1U,
+		} },
+		.size = offsetofend(struct BPF_ITER_CREATE_struct, flags),
+		.str = "iter_create={link_fd=-1, flags=0xffffffff}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1888,6 +1908,7 @@ main(void)
 		CHK(BPF_LINK_GET_NEXT_ID),
 		CHK(BPF_LINK_GET_FD_BY_ID),
 		CHK(BPF_ENABLE_STATS),
+		CHK(BPF_ITER_CREATE),
 	};
 
 	page_size = get_page_size();
