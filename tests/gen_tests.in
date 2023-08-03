@@ -38,6 +38,10 @@ bpf-success	-einject=bpf:retval=42 -etrace=bpf -a20
 bpf-success-v	-einject=bpf:retval=42 -etrace=bpf -a20 -v
 bpf-v	-a20 -v -e trace=bpf
 btrfs	+ioctl.test
+cachestat	-a29 -y 9>>/dev/full
+cachestat-P	-y --trace-path=/dev/full --trace=cachestat 9>>/dev/full
+cachestat-fd	-y --trace-fds=9 --trace=cachestat 9>>/dev/full
+cachestat-success -a29 --trace=cachestat --inject=cachestat:retval=42 9>>/dev/full
 chdir	-a10
 chmod	-a28
 chmod--secontext	-a28 -e secontext=!full,mismatch -e trace=chmod
@@ -914,6 +918,9 @@ sched_xetparam--pidns-translation	test_pidns -a23 -e trace=sched_getparam,sched_
 sched_xetscheduler	-a22 -e trace=sched_getscheduler,sched_setscheduler
 sched_xetscheduler--pidns-translation	test_pidns -a22 -e trace=sched_getscheduler,sched_setscheduler
 sched_yield	-a14
+scm_credentials	--trace=recvmsg
+scm_pidfd	--trace=recvmsg -y
+scm_pidfd-success	--inject=recvmsg:retval=1 --trace=recvmsg -y
 seccomp-filter	-e trace=seccomp
 seccomp-filter-v	-v -e trace=seccomp
 seccomp_get_action_avail	-e trace=seccomp
@@ -983,6 +990,7 @@ so_peercred--pidns-translation	test_pidns -e trace=getsockopt
 so_peercred-Xabbrev	-e trace=getsockopt -Xabbrev
 so_peercred-Xraw	-e trace=getsockopt -Xraw -a39
 so_peercred-Xverbose	-e trace=getsockopt -Xverbose
+so_peerpidfd	--trace=getsockopt -y
 sock_filter-v	-v -e trace=getsockopt,setsockopt
 sock_filter-v-Xabbrev	-v -e trace=getsockopt,setsockopt -X abbrev
 sock_filter-v-Xraw	-a 37 -v -e trace=getsockopt,setsockopt -X raw

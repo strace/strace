@@ -49,6 +49,10 @@ bpf-success-v
 bpf-v
 brk
 btrfs
+cachestat
+cachestat-P
+cachestat-fd
+cachestat-success
 caps
 caps-abbrev
 chdir
@@ -926,6 +930,9 @@ sched_xetparam--pidns-translation
 sched_xetscheduler
 sched_xetscheduler--pidns-translation
 sched_yield
+scm_credentials
+scm_pidfd
+scm_pidfd-success
 scm_rights
 scno.h
 seccomp-filter
@@ -1005,6 +1012,7 @@ so_peercred--pidns-translation
 so_peercred-Xabbrev
 so_peercred-Xraw
 so_peercred-Xverbose
+so_peerpidfd
 sock_filter-v
 sock_filter-v-Xabbrev
 sock_filter-v-Xraw

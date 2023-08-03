@@ -72,6 +72,8 @@ libstrace_a_SOURCES =	\
 	bpf_sock_filter.c \
 	btrfs.c		\
 	cacheflush.c	\
+	cachestat.c	\
+	cachestat.h	\
 	capability.c	\
 	caps0.h		\
 	caps1.h		\

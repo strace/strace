@@ -74,6 +74,15 @@ print_scm_security(struct tcb *tcp, const void *cmsg_data,
 }
 
 static void
+print_scm_pidfd(struct tcb *tcp, const void *cmsg_data,
+		const unsigned int data_len)
+{
+	const int *fd = cmsg_data;
+
+	printfd(tcp, *fd);
+}
+
+static void
 print_scm_timestamp_old(struct tcb *tcp, const void *cmsg_data,
 			const unsigned int data_len)
 {
@@ -232,6 +241,7 @@ static const struct {
 	[SCM_RIGHTS] = { print_scm_rights, sizeof(int) },
 	[SCM_CREDENTIALS] = { print_scm_creds, sizeof(struct ucred) },
 	[SCM_SECURITY] = { print_scm_security, 1 },
+	[SCM_PIDFD] = { print_scm_pidfd, sizeof(int) },
 	[SO_TIMESTAMP_OLD] = { print_scm_timestamp_old, 1 },
 	[SO_TIMESTAMPNS_OLD] = { print_scm_timestampns_old, 1 },
 	[SO_TIMESTAMPING_OLD] = { print_scm_timestamping_old, 1 },

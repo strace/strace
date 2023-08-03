@@ -236,10 +236,10 @@ main(void)
 		{ (kernel_ulong_t) 0xdeadf15700000000ULL, "0" },
 		{ (kernel_ulong_t) 0xbadc0ded00001000ULL,
 			"AT_EMPTY_PATH" },
-		{ (kernel_ulong_t) 0xdeadc0deda7a1457ULL,
-			"AT_SYMLINK_FOLLOW|AT_EMPTY_PATH|0xda7a0057" },
-		{ (kernel_ulong_t) 0xdefaced1ffffebffULL,
-			"0xffffebff /* AT_??? */" },
+		{ (kernel_ulong_t) 0xdeadc0deda7a1657ULL,
+			"AT_HANDLE_FID|AT_SYMLINK_FOLLOW|AT_EMPTY_PATH|0xda7a0057" },
+		{ (kernel_ulong_t) 0xdefaced1ffffe9ffULL,
+			"0xffffe9ff /* AT_??? */" },
 	};
 	static const kernel_ulong_t mount_fds[] = {
 		(kernel_ulong_t) 0xdeadca5701234567ULL,

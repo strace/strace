@@ -567,3 +567,19 @@ SO_RCVMARK		16457
 #else
 SO_RCVMARK		75
 #endif
+
+#if defined __sparc__
+SO_PASSPIDFD		85
+#elif defined __hppa__
+SO_PASSPIDFD		16458
+#else
+SO_PASSPIDFD		76
+#endif
+
+#if defined __sparc__
+SO_PEERPIDFD		86
+#elif defined __hppa__
+SO_PEERPIDFD		16459
+#else
+SO_PEERPIDFD		77
+#endif
