@@ -463,4 +463,12 @@ struct BPF_ITER_CREATE_struct /* iter_create */ {
 	sizeof(struct BPF_ITER_CREATE_struct)
 # define expected_BPF_ITER_CREATE_struct_size 8
 
+struct BPF_LINK_DETACH_struct /* link_detach */ {
+	uint32_t link_fd;
+};
+
+# define BPF_LINK_DETACH_struct_size \
+	sizeof(struct BPF_LINK_DETACH_struct)
+# define expected_BPF_LINK_DETACH_struct_size 4
+
 #endif /* !STRACE_BPF_ATTR_H */

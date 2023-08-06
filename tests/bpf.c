@@ -90,6 +90,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_LINK_GET_FD_BY_ID);
 	BPF_ATTR_DATA_FIELD(BPF_ENABLE_STATS);
 	BPF_ATTR_DATA_FIELD(BPF_ITER_CREATE);
+	BPF_ATTR_DATA_FIELD(BPF_LINK_DETACH);
 	char char_data[256];
 };
 
@@ -1864,6 +1865,14 @@ static const struct bpf_attr_check BPF_ITER_CREATE_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_LINK_DETACH_checks[] = {
+	{
+		.data = { .BPF_LINK_DETACH_data = { .link_fd = -1 } },
+		.size = offsetofend(struct BPF_LINK_DETACH_struct, link_fd),
+		.str = "link_detach={link_fd=-1}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1909,6 +1918,7 @@ main(void)
 		CHK(BPF_LINK_GET_FD_BY_ID),
 		CHK(BPF_ENABLE_STATS),
 		CHK(BPF_ITER_CREATE),
+		CHK(BPF_LINK_DETACH),
 	};
 
 	page_size = get_page_size();
