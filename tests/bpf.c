@@ -91,6 +91,7 @@ union bpf_attr_data {
 	BPF_ATTR_DATA_FIELD(BPF_ENABLE_STATS);
 	BPF_ATTR_DATA_FIELD(BPF_ITER_CREATE);
 	BPF_ATTR_DATA_FIELD(BPF_LINK_DETACH);
+	BPF_ATTR_DATA_FIELD(BPF_PROG_BIND_MAP);
 	char char_data[256];
 };
 
@@ -1873,6 +1874,27 @@ static const struct bpf_attr_check BPF_LINK_DETACH_checks[] = {
 	}
 };
 
+static const struct bpf_attr_check BPF_PROG_BIND_MAP_checks[] = {
+	{
+		.data = { .BPF_PROG_BIND_MAP_data = {
+			.prog_fd = -1,
+			.map_fd = -2,
+			.flags = 0
+		} },
+		.size = offsetofend(struct BPF_PROG_BIND_MAP_struct, flags),
+		.str = "prog_bind_map={prog_fd=-1, map_fd=-2, flags=0}"
+	},
+	{
+		.data = { .BPF_PROG_BIND_MAP_data = {
+			.prog_fd = -1,
+			.map_fd = -2,
+			.flags = -1U,
+		} },
+		.size = offsetofend(struct BPF_PROG_BIND_MAP_struct, flags),
+		.str = "prog_bind_map={prog_fd=-1, map_fd=-2, flags=0xffffffff}"
+	}
+};
+
 
 #define CHK(cmd_) \
 	{ \
@@ -1919,6 +1941,7 @@ main(void)
 		CHK(BPF_ENABLE_STATS),
 		CHK(BPF_ITER_CREATE),
 		CHK(BPF_LINK_DETACH),
+		CHK(BPF_PROG_BIND_MAP),
 	};
 
 	page_size = get_page_size();

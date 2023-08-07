@@ -471,4 +471,14 @@ struct BPF_LINK_DETACH_struct /* link_detach */ {
 	sizeof(struct BPF_LINK_DETACH_struct)
 # define expected_BPF_LINK_DETACH_struct_size 4
 
+struct BPF_PROG_BIND_MAP_struct /* prog_bind_map */ {
+	uint32_t prog_fd;
+	uint32_t map_fd;
+	uint32_t flags;
+};
+
+# define BPF_PROG_BIND_MAP_struct_size \
+	sizeof(struct BPF_PROG_BIND_MAP_struct)
+# define expected_BPF_PROG_BIND_MAP_struct_size 12
+
 #endif /* !STRACE_BPF_ATTR_H */
