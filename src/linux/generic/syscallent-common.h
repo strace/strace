@@ -36,3 +36,4 @@
 [BASE_NR + 449] = { 5,	0,		SEN(futex_waitv),		"futex_waitv"	},
 [BASE_NR + 450] = { 4,	TM,		SEN(set_mempolicy_home_node),	"set_mempolicy_home_node"	},
 [BASE_NR + 451] = { 4,	TD,		SEN(cachestat),			"cachestat"	},
+[BASE_NR + 452] = { 4,	TD|TF,		SEN(fchmodat2),			"fchmodat2"	},
