@@ -17,6 +17,7 @@
 #include "bpf_attr.h"
 
 #include "xlat/bpf_commands.h"
+#include "xlat/bpf_file_flags.h"
 #include "xlat/bpf_file_mode_flags.h"
 #include "xlat/bpf_map_types.h"
 #include "xlat/bpf_map_flags.h"
@@ -444,7 +445,13 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 	if (len <= offsetof(struct BPF_OBJ_PIN_struct, file_flags))
 		break;
 	tprint_struct_next();
-	PRINT_FIELD_FLAGS(attr, file_flags, bpf_file_mode_flags, "BPF_F_???");
+	PRINT_FIELD_FLAGS(attr, file_flags, bpf_file_flags, "BPF_F_???");
+
+	/* path_fd field was added in Linux v6.5-rc1~163^2~215^2~9 */
+	if (len <= offsetof(struct BPF_OBJ_PIN_struct, path_fd))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_DIRFD(attr, path_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 

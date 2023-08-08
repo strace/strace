@@ -24,6 +24,7 @@
 
 #include "bpf_attr.h"
 #include "print_fields.h"
+#include "xmalloc.h"
 
 #include "xlat.h"
 #include "xlat/bpf_attach_type.h"
@@ -114,6 +115,7 @@ struct bpf_check {
 
 static const kernel_ulong_t long_bits = (kernel_ulong_t) 0xfacefeed00000000ULL;
 static const char *errstr;
+static const char *at_fdcwd_str;
 static const unsigned int sizeof_attr = sizeof(union bpf_attr_data);
 static unsigned int page_size;
 static unsigned long end_of_page;
@@ -842,6 +844,13 @@ init_BPF_OBJ_PIN_attr(struct bpf_attr_check *check, size_t idx)
 	attr->pathname = (uintptr_t) pathname;
 }
 
+static void
+init_BPF_OBJ_PIN_str(struct bpf_attr_check *check, size_t idx)
+{
+	check->str = xasprintf("pathname=NULL, bpf_fd=-1, file_flags=BPF_F_PATH_FD"
+			       ", path_fd=%s", at_fdcwd_str);
+}
+
 static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 	{
 		.data = { .BPF_OBJ_PIN_data = { .pathname = 0 } },
@@ -871,6 +880,16 @@ static struct bpf_attr_check BPF_OBJ_PIN_checks[] = {
 		.init_fn = init_BPF_OBJ_PIN_attr,
 		.str = "pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1"
 		       ", file_flags=BPF_F_RDONLY|BPF_F_WRONLY"
+	},
+	{
+		.data = { .BPF_OBJ_PIN_data = {
+			.pathname = 0,
+			.bpf_fd = -1,
+			.file_flags = 0x4000,
+			.path_fd = -100
+		} },
+		.size = offsetofend(struct BPF_OBJ_PIN_struct, path_fd),
+		.init_fn = init_BPF_OBJ_PIN_str,
 	}
 };
 
@@ -1946,6 +1965,13 @@ main(void)
 
 	page_size = get_page_size();
 	end_of_page = (unsigned long) tail_alloc(1) + 1;
+
+	at_fdcwd_str =
+#ifdef YFLAG
+		xasprintf("AT_FDCWD<%s>", get_fd_path(get_dir_fd(".")));
+#else
+		"AT_FDCWD";
+#endif
 
 	for (size_t i = 0; i < ARRAY_SIZE(checks); i++)
 		test_bpf(checks + i);

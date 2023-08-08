@@ -140,11 +140,12 @@ struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;
 	uint32_t bpf_fd;
 	uint32_t file_flags;
+	uint32_t path_fd;
 };
 
 # define BPF_OBJ_PIN_struct_size \
-	sizeof(struct BPF_OBJ_PIN_struct)
-# define expected_BPF_OBJ_PIN_struct_size 16
+	offsetofend(struct BPF_OBJ_PIN_struct, path_fd)
+# define expected_BPF_OBJ_PIN_struct_size 20
 
 # define BPF_OBJ_GET_struct BPF_OBJ_PIN_struct
 # define BPF_OBJ_GET_struct_size BPF_OBJ_PIN_struct_size

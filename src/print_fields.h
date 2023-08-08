@@ -679,6 +679,12 @@ tprint_sysret_end(void)
 		printfd((tcp_), (where_).field_);			\
 	} while (0)
 
+# define PRINT_FIELD_DIRFD(where_, field_, tcp_)			\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_dirfd((tcp_), (where_).field_);			\
+	} while (0)
+
 # define PRINT_FIELD_CHAR(where_, field_, flags_)		\
 	do {								\
 		tprints_field_name(#field_);				\
