@@ -72,7 +72,7 @@ main(void)
 	static const char *const USR2_CHLD_str =
 		(SIGUSR2 < SIGCHLD) ? "USR2 CHLD" : "CHLD USR2";
 	void *const efault = tail_alloc(1024) + 1024;
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, ts);
 	const unsigned int sigset_size = get_sigset_size();
 	void *const sigmask = tail_alloc(sigset_size);
 	struct pollfd *fds;

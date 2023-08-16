@@ -161,7 +161,7 @@ main(int argc, char *argv[])
 	uaddr[0] = 0x1deadead;
 	uaddr2[0] = 0xbadf00d;
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, tmout);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, tmout);
 	tmout->tv_sec = 123;
 	tmout->tv_nsec = 0xbadc0de;
 

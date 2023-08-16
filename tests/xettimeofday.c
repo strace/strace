@@ -8,6 +8,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_timeval.h"
 
 #ifdef __NR_gettimeofday
 
@@ -21,7 +22,7 @@
 int
 main(void)
 {
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timeval, tv);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timeval_t, tv);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct timezone, tz);
 
 	if (syscall(__NR_gettimeofday, tv, NULL))

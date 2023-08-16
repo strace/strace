@@ -25,7 +25,7 @@
 int
 recv_mmsg(const int fd, struct mmsghdr *const vec,
 	  const unsigned int vlen, const unsigned int flags,
-	  struct timespec *const timeout)
+	  kernel_old_timespec_t *const timeout)
 {
 	int rc = socketcall(__NR_recvmmsg, SC_recvmmsg,
 			    fd, (long) vec, vlen, flags, (long) timeout);

@@ -10,12 +10,13 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_timeval.h"
 
 #ifdef __NR_utimes
 
 # define TEST_SYSCALL_NR	__NR_utimes
 # define TEST_SYSCALL_STR	"utimes"
-# define TEST_STRUCT		struct timeval
+# define TEST_STRUCT		kernel_old_timeval_t
 # include "xutimes.c"
 
 #else
