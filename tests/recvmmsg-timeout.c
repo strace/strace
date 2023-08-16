@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "kernel_old_timespec.h"
 #include <stdio.h>
 
 #include "msghdr.h"
@@ -31,7 +32,7 @@ main(void)
 			.msg_iovlen = 1
 		}
 	};
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, ts);
 	ts->tv_sec = 0;
 	ts->tv_nsec = 12345678;
 

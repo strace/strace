@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_old_timespec.h"
 
 #ifdef __NR_clock_nanosleep
 
@@ -30,7 +31,7 @@ int
 main(void)
 {
 	struct {
-		struct timespec ts;
+		kernel_old_timespec_t ts;
 		uint32_t pad[2];
 	} req = {
 		.ts.tv_nsec = 0xc0de1,

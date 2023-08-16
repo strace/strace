@@ -7,6 +7,8 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_old_timespec.h"
+
 
 #ifdef __NR_sched_rr_get_interval
 
@@ -18,7 +20,7 @@
 int
 main(void)
 {
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, tp);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, tp);
 	long rc;
 
 	rc = syscall(__NR_sched_rr_get_interval, 0, NULL);

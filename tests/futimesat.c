@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_timeval.h"
 
 #ifdef __NR_futimesat
 
@@ -19,7 +20,7 @@
 # include <unistd.h>
 
 static void
-print_tv(const struct timeval *tv)
+print_tv(const kernel_old_timeval_t *tv)
 {
 	printf("{tv_sec=%lld, tv_usec=%llu}",
 	       (long long) tv->tv_sec,
@@ -52,7 +53,7 @@ main(void)
 
 	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
 	const kernel_ulong_t kfname = (uintptr_t) fname;
-	struct timeval *const tv = tail_alloc(sizeof(*tv) * 2);
+	kernel_old_timeval_t *const tv = tail_alloc(sizeof(*tv) * 2);
 
 	(void) close(0);
 

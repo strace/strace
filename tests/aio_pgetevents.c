@@ -11,6 +11,7 @@
 #include "tests.h"
 #include <unistd.h>
 #include "scno.h"
+#include "kernel_old_timespec.h"
 
 #ifdef __NR_io_pgetevents
 
@@ -92,7 +93,7 @@ main(void)
 	const unsigned int nr = ARRAY_SIZE(proto_cb);
 
 	const struct io_event *ev = tail_alloc(nr * sizeof(struct io_event));
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, ts);
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct __aio_sigset, ss);
 	TAIL_ALLOC_OBJECT_CONST_PTR(sigset_t, sigs);
 

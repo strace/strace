@@ -16,6 +16,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "scno.h"
+#include "kernel_old_timespec.h"
+
 
 #if defined __NR_utimensat && defined UTIME_NOW && defined UTIME_OMIT
 
@@ -60,7 +62,7 @@
 # endif
 
 static void
-print_ts(const struct timespec *ts)
+print_ts(const kernel_old_timespec_t *ts)
 {
 	printf("{tv_sec=%lld, tv_nsec=%llu}", (long long) ts->tv_sec,
 		zero_extend_signed_to_ull(ts->tv_nsec));
@@ -93,7 +95,7 @@ main(void)
 
 	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
 	const kernel_ulong_t kfname = (uintptr_t) fname;
-	struct timespec *const ts = tail_alloc(sizeof(*ts) * 2);
+	kernel_old_timespec_t *const ts = tail_alloc(sizeof(*ts) * 2);
 
 	(void) close(0);
 
