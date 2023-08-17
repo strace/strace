@@ -26,7 +26,7 @@ main(void)
 	time_t t = syscall(__NR_time, NULL);
 	if ((time_t) -1 == t)
 		perror_msg_and_skip("time");
-	printf("time(NULL) = %lld (", (long long) t);
+	printf("time(NULL) = %llu (", zero_extend_signed_to_ull((long) t));
 	print_time_t_nsec(t, 0, 0);
 	puts(")");
 
@@ -36,7 +36,7 @@ main(void)
 	t = syscall(__NR_time, p);
 	printf("time([%lld", (long long) *p);
 	print_time_t_nsec((time_t) *p, 0, 1),
-	printf("]) = %lld (", (long long) t);
+	printf("]) = %llu (", zero_extend_signed_to_ull((long) t));
 	print_time_t_nsec(t, 0, 0);
 	puts(")");
 
