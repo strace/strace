@@ -8,14 +8,16 @@
 
 #include "defs.h"
 
-#include DEF_MPERS_TYPE(time_t)
+typedef kernel_ulong_t kernel_time_t;
+
+#include DEF_MPERS_TYPE(kernel_time_t)
 
 #include MPERS_DEFS
 
 SYS_FUNC(time)
 {
 	if (exiting(tcp)) {
-		time_t t;
+		kernel_time_t t;
 
 		if (!umove_or_printaddr(tcp, tcp->u_arg[0], &t)) {
 			tprint_indirect_begin();
@@ -25,7 +27,7 @@ SYS_FUNC(time)
 		}
 
 		if (!syserror(tcp)) {
-			tcp->auxstr = sprinttime((time_t) tcp->u_rval);
+			tcp->auxstr = sprinttime((kernel_time_t) tcp->u_rval);
 
 			return RVAL_STR;
 		}
