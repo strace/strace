@@ -15,7 +15,7 @@ export LC_ALL=C
 
 r_define='^[[:space:]]*#[[:space:]]*define[[:space:]]\+'
 r_cmd_name='[A-Z][A-Z0-9_]*'
-r_io='\([A-Z]\+\)\?_S\?\(IO\|IOW\|IOR\|IOWR\|IOC\)'
+r_io='\([A-Z]\+\)\?_S\?\(IO\|IOW\|IOR\|IOWR\|IOC\|IOCTL\)'
 r_value='[[:space:]]\+'"$r_io"'[[:space:]]*([^)]'
 regexp="${r_define}${r_cmd_name}${r_value}"
 
