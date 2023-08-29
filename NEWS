@@ -10,6 +10,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated decoding of BPF_OBJ_PIN and BPF_OBJ_GET bpf syscall commands.
   * Updated lists of AT_*, BPF_*, IORING_*, KVM_*, MOVE_MOUNT_*, NFT_*, NT_*,
     PR_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 6.5.
 
 Noteworthy changes in release 6.4 (2023-06-26)
 ==============================================
