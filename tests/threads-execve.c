@@ -119,7 +119,7 @@ thread(void *arg)
 	if (read(fds[0], fds, sizeof(fds[0])))
 		perror_msg_and_fail("execve");
 
-	struct timespec ts = { .tv_nsec = 100000000 };
+	kernel_old_timespec_t ts = { .tv_nsec = 100000000 };
 	(void) syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &ts, NULL);
 
 	kernel_old_timespec_t ots = { .tv_nsec = 12345 };
@@ -169,7 +169,7 @@ main(int ac, char **av)
 	leader = getpid();
 
 	if (ac < 3) {
-		struct timespec ts = { .tv_nsec = 1 };
+		kernel_old_timespec_t ts = { .tv_nsec = 1 };
 		if (syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0, &ts, NULL))
 			perror_msg_and_skip("clock_nanosleep CLOCK_REALTIME");
 
