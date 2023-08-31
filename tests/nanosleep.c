@@ -87,7 +87,7 @@ main(void)
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts,
 	       errstr);
 
-	req.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	req.ts.tv_sec = (typeof(req.ts.tv_sec)) 0xcafef00ddeadbeefLL;
 	req.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	assert(k_nanosleep(&req.ts, &rem.ts) == -1);
 	printf("nanosleep({tv_sec=%lld, tv_nsec=%llu}, %p) = %s\n",

@@ -57,7 +57,7 @@ main(void)
 	       zero_extend_signed_to_ull(tv->tv_usec),
 	       tz->tz_minuteswest, tz->tz_dsttime, sprintrc(-1));
 
-	tv->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv->tv_sec = (typeof(tv->tv_sec)) 0xcafef00ddeadbeefLL;
 	tv->tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 	assert(syscall(__NR_settimeofday, tv, tz) == -1);
 	printf("settimeofday({tv_sec=%lld, tv_usec=%llu}"

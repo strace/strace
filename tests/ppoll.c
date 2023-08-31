@@ -105,7 +105,7 @@ main(void)
 	       sigset_size, errstr);
 # endif
 
-	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (long) 0xbadc0dedfacefeedL;
 	sys_ppoll(0, 0, (unsigned long) ts, 0, sigset_size);
 # if !PATH_TRACING_FD && !TRACING_FDS

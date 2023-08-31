@@ -148,7 +148,7 @@ main(void)
 	sigemptyset(sigs);
 	sigaddset(sigs, SIGSYS);
 
-	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	sys_io_pgetevents(bogus_ctx, 0, 0, 0, (uintptr_t) ts, (uintptr_t) ss);
 	printf("io_pgetevents(%#jx, 0, 0, NULL"

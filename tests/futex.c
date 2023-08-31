@@ -205,7 +205,7 @@ main(int argc, char *argv[])
 	       uaddr, VAL_PR, (long long) tmout->tv_sec,
 	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
 
-	tmout->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tmout->tv_sec = (typeof(tmout->tv_sec)) 0xcafef00ddeadbeefLL;
 	tmout->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	CHECK_FUTEX(uaddr, FUTEX_WAIT, VAL, tmout, uaddr2, VAL3,

@@ -103,7 +103,7 @@ main(void)
 		(long long) timeout->tv_sec,
 		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
-	timeout->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	timeout->tv_sec = (typeof(timeout->tv_sec)) 0xcafef00ddeadbeefLL;
 	timeout->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	assert(k_sigtimedwait(k_set, NULL, timeout, set_size) == -1);
 	tprintf("rt_sigtimedwait([], NULL, {tv_sec=%lld, tv_nsec=%llu}"

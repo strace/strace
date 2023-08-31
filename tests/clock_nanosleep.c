@@ -82,7 +82,7 @@ main(void)
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 
-	req.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	req.ts.tv_sec = (typeof(req.ts.tv_sec)) 0xcafef00ddeadbeefLL;
 	req.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	assert(syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0,
 		       &req.ts, &rem.ts) == -1);

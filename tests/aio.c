@@ -250,7 +250,7 @@ main(void)
 	       bogus_ctx, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
 
-	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	rc = syscall(__NR_io_getevents, bogus_ctx, 0, 0, 0, ts);
 	printf("io_getevents(%#lx, 0, 0, NULL"

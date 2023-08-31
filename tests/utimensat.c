@@ -152,7 +152,7 @@ main(void)
 
 	ts[0].tv_sec = -1;
 	ts[0].tv_nsec = 2000000000;
-	ts[1].tv_sec = (time_t) -0x100000001LL;
+	ts[1].tv_sec = (typeof(ts[1].tv_sec)) -0x100000001LL;
 	ts[1].tv_nsec = 2345678900U;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
@@ -164,7 +164,7 @@ main(void)
 
 	ts[0].tv_sec = 0;
 	ts[0].tv_nsec = 0;
-	ts[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts[1].tv_sec = (typeof(ts[1].tv_sec)) 0xcafef00ddeadbeefLL;
 	ts[1].tv_nsec = 0;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
@@ -176,7 +176,7 @@ main(void)
 
 	ts[0].tv_sec = 0xdeadbeefU;
 	ts[0].tv_nsec = 0xfacefeedU;
-	ts[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts[1].tv_sec = (typeof(ts[1].tv_sec)) 0xcafef00ddeadbeefLL;
 	ts[1].tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	k_utimensat(kfdcwd, kfname, (uintptr_t) ts, 0x100);
