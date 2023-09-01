@@ -2,6 +2,7 @@
  * Check silent decoding of sendmmsg and recvmmsg syscalls.
  *
  * Copyright (c) 2016-2021 Dmitry V. Levin <ldv@strace.io>
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
