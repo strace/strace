@@ -23,7 +23,7 @@ typedef kernel_ulong_t kernel_time_t;
 static kernel_long_t
 k_time(void *p)
 {
-#if defined __x86_64__ && defined __ILP32__
+# if defined __x86_64__ && defined __ILP32__
 	register long arg asm("rdi") = (uintptr_t) p;
 	kernel_long_t rc;
 	asm volatile("syscall\n\t"
@@ -35,11 +35,11 @@ k_time(void *p)
 		rc = (kernel_long_t) -1LL;
 	}
 	return rc;
-#else
+# else
 	const kernel_ulong_t arg = (uintptr_t) p;
 	const kernel_ulong_t bad = (kernel_ulong_t) 0xbadc0dedbadc0dedULL;
 	return syscall(__NR_time, arg, bad, bad, bad, bad, bad);
-#endif
+# endif
 }
 
 int

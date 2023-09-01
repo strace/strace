@@ -8,7 +8,7 @@
 #ifndef STRACE_CACHESTAT_H
 # define STRACE_CACHESTAT_H
 
-#include <stdint.h>
+# include <stdint.h>
 
 struct cachestat_range {
 	uint64_t off;
