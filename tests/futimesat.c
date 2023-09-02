@@ -2,7 +2,7 @@
  * Check decoding of futimesat syscall.
  *
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include "scno.h"
+#include "kernel_timeval.h"
 
 #ifdef __NR_futimesat
 
@@ -19,7 +20,7 @@
 # include <unistd.h>
 
 static void
-print_tv(const struct timeval *tv)
+print_tv(const kernel_old_timeval_t *tv)
 {
 	printf("{tv_sec=%lld, tv_usec=%llu}",
 	       (long long) tv->tv_sec,
@@ -52,7 +53,7 @@ main(void)
 
 	char *const fname = tail_memdup(proto_fname, sizeof(proto_fname));
 	const kernel_ulong_t kfname = (uintptr_t) fname;
-	struct timeval *const tv = tail_alloc(sizeof(*tv) * 2);
+	kernel_old_timeval_t *const tv = tail_alloc(sizeof(*tv) * 2);
 
 	(void) close(0);
 
@@ -98,7 +99,7 @@ main(void)
 
 	tv[0].tv_sec = 0xdeadbeefU;
 	tv[0].tv_usec = 0xfacefeedU;
-	tv[1].tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tv[1].tv_sec = (typeof(tv[1].tv_sec)) 0xcafef00ddeadbeefLL;
 	tv[1].tv_usec = (suseconds_t) 0xbadc0dedfacefeedLL;
 
 	k_futimesat(kfdcwd, kfname, (uintptr_t) tv);

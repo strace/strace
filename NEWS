@@ -1,12 +1,16 @@
-Noteworthy changes in release ?.? (????-??-??)
+Noteworthy changes in release 6.5 (2023-09-01)
 ==============================================
 
 * Improvements
   * Implemented decoding of cachestat and fchmodat2 syscalls.
   * Implemented decoding of SO_PASSPIDFD and SO_PEERPIDFD socket options.
   * Implemented decoding of SCM_PIDFD control messages.
+  * Implemented decoding of BPF_ENABLE_STATS, BPF_ITER_CREATE, BPF_LINK_DETACH,
+    and BPF_PROG_BIND_MAP bpf syscall commands.
+  * Updated decoding of BPF_OBJ_PIN and BPF_OBJ_GET bpf syscall commands.
   * Updated lists of AT_*, BPF_*, IORING_*, KVM_*, MOVE_MOUNT_*, NFT_*, NT_*,
     PR_*, and V4L2_* constants.
+  * Updated lists of ioctl commands from Linux 6.5.
 
 Noteworthy changes in release 6.4 (2023-06-26)
 ==============================================

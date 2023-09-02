@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2015-2017 Dmitry V. Levin <ldv@strace.io>
  * Copyright (c) 2017 Quentin Monnet <quentin.monnet@6wind.com>
- * Copyright (c) 2015-2022 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -17,6 +17,7 @@
 #include "bpf_attr.h"
 
 #include "xlat/bpf_commands.h"
+#include "xlat/bpf_file_flags.h"
 #include "xlat/bpf_file_mode_flags.h"
 #include "xlat/bpf_map_types.h"
 #include "xlat/bpf_map_flags.h"
@@ -27,6 +28,7 @@
 #include "xlat/bpf_attach_type.h"
 #include "xlat/bpf_attach_flags.h"
 #include "xlat/bpf_query_flags.h"
+#include "xlat/bpf_stats_type.h"
 #include "xlat/bpf_task_fd_type.h"
 #include "xlat/bpf_test_run_flags.h"
 #include "xlat/bpf_link_create_kprobe_multi_flags.h"
@@ -443,7 +445,13 @@ BEGIN_BPF_CMD_DECODER(BPF_OBJ_PIN)
 	if (len <= offsetof(struct BPF_OBJ_PIN_struct, file_flags))
 		break;
 	tprint_struct_next();
-	PRINT_FIELD_FLAGS(attr, file_flags, bpf_file_mode_flags, "BPF_F_???");
+	PRINT_FIELD_FLAGS(attr, file_flags, bpf_file_flags, "BPF_F_???");
+
+	/* path_fd field was added in Linux v6.5-rc1~163^2~215^2~9 */
+	if (len <= offsetof(struct BPF_OBJ_PIN_struct, path_fd))
+		break;
+	tprint_struct_next();
+	PRINT_FIELD_DIRFD(attr, path_fd, tcp);
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
@@ -1543,6 +1551,52 @@ BEGIN_BPF_CMD_DECODER(BPF_LINK_GET_FD_BY_ID)
 }
 END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
 
+BEGIN_BPF_CMD_DECODER(BPF_ENABLE_STATS)
+{
+	tprint_struct_begin();
+	tprints_field_name("enable_stats");
+	tprint_struct_begin();
+	PRINT_FIELD_XVAL(attr, type, bpf_stats_type, "BPF_STATS_???");
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
+BEGIN_BPF_CMD_DECODER(BPF_ITER_CREATE)
+{
+	tprint_struct_begin();
+	tprints_field_name("iter_create");
+	tprint_struct_begin();
+	PRINT_FIELD_FD(attr, link_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, flags);
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
+BEGIN_BPF_CMD_DECODER(BPF_LINK_DETACH)
+{
+	tprint_struct_begin();
+	tprints_field_name("link_detach");
+	tprint_struct_begin();
+	PRINT_FIELD_FD(attr, link_fd, tcp);
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED)
+
+BEGIN_BPF_CMD_DECODER(BPF_PROG_BIND_MAP)
+{
+	tprint_struct_begin();
+	tprints_field_name("prog_bind_map");
+	tprint_struct_begin();
+	PRINT_FIELD_FD(attr, prog_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_FD(attr, map_fd, tcp);
+	tprint_struct_next();
+	PRINT_FIELD_X(attr, flags);
+	tprint_struct_end();
+}
+END_BPF_CMD_DECODER(RVAL_DECODED | RVAL_FD)
+
 SYS_FUNC(bpf)
 {
 	static const bpf_cmd_decoder_t bpf_cmd_decoders[] = {
@@ -1578,6 +1632,10 @@ SYS_FUNC(bpf)
 		BPF_CMD_ENTRY(BPF_LINK_UPDATE),
 		BPF_CMD_ENTRY(BPF_LINK_GET_NEXT_ID),
 		BPF_CMD_ENTRY(BPF_LINK_GET_FD_BY_ID),
+		BPF_CMD_ENTRY(BPF_ENABLE_STATS),
+		BPF_CMD_ENTRY(BPF_ITER_CREATE),
+		BPF_CMD_ENTRY(BPF_LINK_DETACH),
+		BPF_CMD_ENTRY(BPF_PROG_BIND_MAP),
 	};
 
 	const unsigned int cmd = tcp->u_arg[0];

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -161,7 +161,7 @@ main(int argc, char *argv[])
 	uaddr[0] = 0x1deadead;
 	uaddr2[0] = 0xbadf00d;
 
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, tmout);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, tmout);
 	tmout->tv_sec = 123;
 	tmout->tv_nsec = 0xbadc0de;
 
@@ -205,7 +205,7 @@ main(int argc, char *argv[])
 	       uaddr, VAL_PR, (long long) tmout->tv_sec,
 	       zero_extend_signed_to_ull(tmout->tv_nsec), sprintrc(rc));
 
-	tmout->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	tmout->tv_sec = (typeof(tmout->tv_sec)) 0xcafef00ddeadbeefLL;
 	tmout->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	CHECK_FUTEX(uaddr, FUTEX_WAIT, VAL, tmout, uaddr2, VAL3,

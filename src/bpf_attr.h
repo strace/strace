@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2015-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2018-2022 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
@@ -140,11 +140,12 @@ struct BPF_OBJ_PIN_struct {
 	uint64_t ATTRIBUTE_ALIGNED(8) pathname;
 	uint32_t bpf_fd;
 	uint32_t file_flags;
+	uint32_t path_fd;
 };
 
 # define BPF_OBJ_PIN_struct_size \
-	sizeof(struct BPF_OBJ_PIN_struct)
-# define expected_BPF_OBJ_PIN_struct_size 16
+	offsetofend(struct BPF_OBJ_PIN_struct, path_fd)
+# define expected_BPF_OBJ_PIN_struct_size 20
 
 # define BPF_OBJ_GET_struct BPF_OBJ_PIN_struct
 # define BPF_OBJ_GET_struct_size BPF_OBJ_PIN_struct_size
@@ -445,5 +446,40 @@ struct BPF_LINK_GET_FD_BY_ID_struct {
 # define BPF_LINK_GET_FD_BY_ID_struct_size \
 	sizeof(struct BPF_LINK_GET_FD_BY_ID_struct)
 # define expected_BPF_LINK_GET_FD_BY_ID_struct_size 4
+
+struct BPF_ENABLE_STATS_struct /* enable_stats */ {
+	uint32_t type;
+};
+
+# define BPF_ENABLE_STATS_struct_size \
+	sizeof(struct BPF_ENABLE_STATS_struct)
+# define expected_BPF_ENABLE_STATS_struct_size 4
+
+struct BPF_ITER_CREATE_struct /* iter_create */ {
+	uint32_t link_fd;
+	uint32_t flags;
+};
+
+# define BPF_ITER_CREATE_struct_size \
+	sizeof(struct BPF_ITER_CREATE_struct)
+# define expected_BPF_ITER_CREATE_struct_size 8
+
+struct BPF_LINK_DETACH_struct /* link_detach */ {
+	uint32_t link_fd;
+};
+
+# define BPF_LINK_DETACH_struct_size \
+	sizeof(struct BPF_LINK_DETACH_struct)
+# define expected_BPF_LINK_DETACH_struct_size 4
+
+struct BPF_PROG_BIND_MAP_struct /* prog_bind_map */ {
+	uint32_t prog_fd;
+	uint32_t map_fd;
+	uint32_t flags;
+};
+
+# define BPF_PROG_BIND_MAP_struct_size \
+	sizeof(struct BPF_PROG_BIND_MAP_struct)
+# define expected_BPF_PROG_BIND_MAP_struct_size 12
 
 #endif /* !STRACE_BPF_ATTR_H */

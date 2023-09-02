@@ -2,7 +2,7 @@
  * This file is part of rt_sigtimedwait strace test.
  *
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -23,14 +23,14 @@
 
 static long
 k_sigtimedwait(const sigset_t *const set, siginfo_t *const info,
-	       const struct timespec *const timeout, const unsigned long size)
+	       const kernel_old_timespec_t *const timeout, const unsigned long size)
 {
 	return syscall(__NR_rt_sigtimedwait, set, info, timeout, size);
 }
 
 static void
 iterate(const char *const text, const void *set,
-	const struct timespec *const timeout, unsigned int size)
+	const kernel_old_timespec_t *const timeout, unsigned int size)
 {
 	for (;;) {
 		assert(k_sigtimedwait(set, NULL, timeout, size) == -1);
@@ -70,7 +70,7 @@ main(void)
 	tprintf("%s", "");
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(siginfo_t, info);
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, timeout);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, timeout);
 	timeout->tv_sec = 0;
 	timeout->tv_nsec = 42;
 
@@ -103,7 +103,7 @@ main(void)
 		(long long) timeout->tv_sec,
 		zero_extend_signed_to_ull(timeout->tv_nsec), set_size);
 
-	timeout->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	timeout->tv_sec = (typeof(timeout->tv_sec)) 0xcafef00ddeadbeefLL;
 	timeout->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	assert(k_sigtimedwait(k_set, NULL, timeout, set_size) == -1);
 	tprintf("rt_sigtimedwait([], NULL, {tv_sec=%lld, tv_nsec=%llu}"

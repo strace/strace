@@ -2,7 +2,7 @@
  * Check decoding of io_* syscalls.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -184,7 +184,7 @@ main(void)
 	const unsigned long lnr = (unsigned long) (0xdeadbeef00000000ULL | nr);
 
 	const struct io_event *ev = tail_alloc(nr * sizeof(struct io_event));
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, ts);
 
 	(void) close(0);
 	if (open("/dev/zero", O_RDONLY))
@@ -250,7 +250,7 @@ main(void)
 	       bogus_ctx, (long long) ts->tv_sec,
 	       zero_extend_signed_to_ull(ts->tv_nsec), sprintrc(rc));
 
-	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	rc = syscall(__NR_io_getevents, bogus_ctx, 0, 0, 0, ts);
 	printf("io_getevents(%#lx, 0, 0, NULL"

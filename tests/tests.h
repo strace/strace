@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -27,6 +27,7 @@
 # include <stdint.h>
 # include <sys/types.h>
 # include "kernel_types.h"
+# include "kernel_old_timespec.h"
 # include "gcc_compat.h"
 # include "macros.h"
 
@@ -407,8 +408,7 @@ void test_status_chdir(const char *dir, bool print_success, bool print_fail);
 
 /* Wrappers for recvmmsg and sendmmsg syscalls. */
 struct mmsghdr;
-struct timespec;
-int recv_mmsg(int, struct mmsghdr *, unsigned int, unsigned int, struct timespec *);
+int recv_mmsg(int, struct mmsghdr *, unsigned int, unsigned int, kernel_old_timespec_t *);
 int send_mmsg(int, struct mmsghdr *, unsigned int, unsigned int);
 
 /* Create a netlink socket. */

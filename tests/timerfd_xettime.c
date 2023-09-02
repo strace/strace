@@ -3,7 +3,7 @@
  * syscalls.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2021 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -34,7 +34,8 @@ main(void)
 
 	its_new->it_interval.tv_sec = 0xdeadbeefU;
 	its_new->it_interval.tv_nsec = 0xfacefeedU;
-	its_new->it_value.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	its_new->it_value.tv_sec =
+		(typeof(its_new->it_value.tv_sec)) 0xcafef00ddeadbeefLL;
 	its_new->it_value.tv_nsec = (long) 0xbadc0dedfacefeedLL;
 
 	long rc = syscall(__NR_timerfd_settime, 0, 0, its_new, its_old);

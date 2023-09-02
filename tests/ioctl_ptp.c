@@ -2,7 +2,7 @@
  * Check decoding of PTP_* commands of ioctl syscall.
  *
  * Copyright (c) 2018 Harsha Sharma <harshasharmaiitr@gmail.com>
- * Copyright (c) 2018-2022 The strace developers.
+ * Copyright (c) 2018-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -157,6 +157,24 @@ test_no_device(void)
 		}
 		printf(") = %s\n", errstr);
 
+		fill_memory32_ex(caps, sizeof(*caps), 1000000, 1);
+		rc = sys_ioctl(-1, c->val, (uintptr_t) caps);
+		printf("ioctl(-1, " XLAT_FMT ", ", XLAT_SEL(c->val, c->str));
+		if (rc >= 0) {
+			printf("{max_adj=1000000, n_alarm=1000000"
+			       ", n_ext_ts=1000000, n_per_out=1000000"
+			       ", pps=1000000, n_pins=1000000"
+			       ", cross_timestamping=1000000"
+			       ", adjust_phase=1000000, max_phase_adj=1000000"
+			       NRAW(" /* 0.001000000 s */")
+			       ", rsv=[0xf4240, 0xf4240, 0xf4240"
+			       ", 0xf4240, 0xf4240, 0xf4240, 0xf4240"
+			       ", 0xf4240, 0xf4240, 0xf4240, 0xf4240]}");
+		} else {
+			printf("%p", caps);
+		}
+		printf(") = %s\n", errstr);
+
 		fill_memory32(caps, sizeof(*caps));
 		rc = sys_ioctl(-1, c->val, (uintptr_t) caps);
 		printf("ioctl(-1, " XLAT_FMT ", ", XLAT_SEL(c->val, c->str));
@@ -167,6 +185,7 @@ test_no_device(void)
 			       ", cross_timestamping=-2136948506"
 			       ", adjust_phase=-2136948505"
 			       ", max_phase_adj=-2136948504"
+			       NRAW(" /* -2.136948504 s */")
 			       ", rsv=[0x80a0c0e9, 0x80a0c0ea"
 			       ", 0x80a0c0eb, 0x80a0c0ec, 0x80a0c0ed"
 			       ", 0x80a0c0ee, 0x80a0c0ef, 0x80a0c0f0"

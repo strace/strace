@@ -3,7 +3,7 @@
  * mq_unlink syscalls.
  *
  * Copyright (c) 2016 Eugene Syromyatnikov <evgsyr@gmail.com>
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -102,7 +102,7 @@ cleanup(void)
 }
 
 static void
-do_send(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
+do_send(int fd, char *msg, unsigned int msg_size, kernel_old_timespec_t *tmout,
 	bool cropped)
 {
 	long rc;
@@ -135,7 +135,7 @@ do_send(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
 }
 
 static void
-do_recv(int fd, char *msg, unsigned int msg_size, struct timespec *tmout,
+do_recv(int fd, char *msg, unsigned int msg_size, kernel_old_timespec_t *tmout,
 	bool cropped)
 {
 	long rc;
@@ -194,11 +194,11 @@ main(void)
 		(kernel_ulong_t) 0xbadc0dedda7a1057ULL;
 	static const kernel_ulong_t bogus_prio =
 		(kernel_ulong_t) 0xdec0ded1defaced3ULL;
-	static const struct timespec bogus_tmout_data = {
+	static const kernel_old_timespec_t bogus_tmout_data = {
 		.tv_sec = (time_t) 0xdeadfacebeeff00dLL,
 		.tv_nsec = (long) 0xfacefee1deadfeedLL,
 	};
-	static const struct timespec future_tmout_data = {
+	static const kernel_old_timespec_t future_tmout_data = {
 		.tv_sec = (time_t) 0x7ea1fade7e57faceLL,
 		.tv_nsec = 999999999,
 	};
@@ -215,9 +215,9 @@ main(void)
 		NUM_ATTRS);
 	char *msg = tail_alloc(MSG_SIZE);
 	TAIL_ALLOC_OBJECT_CONST_PTR(unsigned, bogus_prio_ptr);
-	struct timespec *bogus_tmout = tail_memdup(&bogus_tmout_data,
+	kernel_old_timespec_t *bogus_tmout = tail_memdup(&bogus_tmout_data,
 		sizeof(*bogus_tmout));
-	struct timespec *future_tmout = tail_memdup(&future_tmout_data,
+	kernel_old_timespec_t *future_tmout = tail_memdup(&future_tmout_data,
 		sizeof(*future_tmout));
 	struct_sigevent *bogus_sev = tail_memdup(&bogus_sev_data,
 		sizeof(*bogus_sev));

@@ -2,7 +2,7 @@
  * Check decoding of sched_getaffinity and sched_setaffinity syscalls.
  *
  * Copyright (c) 2016-2018 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2016-2022 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -105,11 +105,13 @@ main(void)
 	       pid, pid_str, ((char *) cpuset) + cpuset_size, sprintrc(rc));
 
 	static const uint8_t first_oob = BE_LE(SIZEOF_LONG == 4 ? 39 : 7, 56);
+	const unsigned int crop_size = 8;
+	cpu_set_t *crop_cpuset = tail_alloc(crop_size);
 	if (first_crop_cpu != -1U && first_crop_cpu < 56) {
-		CPU_ZERO_S(cpuset_size, cpuset);
-		CPU_SET_S(first_crop_cpu, cpuset_size, cpuset);
-		CPU_SET_S(first_oob, cpuset_size, cpuset);
-		if (setaffinity(pid, 7, cpuset))
+		CPU_ZERO_S(crop_size, crop_cpuset);
+		CPU_SET_S(first_crop_cpu, crop_size, crop_cpuset);
+		CPU_SET_S(first_oob, crop_size, crop_cpuset);
+		if (setaffinity(pid, crop_size - 1, crop_cpuset))
 			perror_msg_and_skip("sched_setaffinity()");
 		pidns_print_leader();
 		printf("sched_setaffinity(%d%s, 7, [%u]) = 0\n",

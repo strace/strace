@@ -72,7 +72,7 @@ main(void)
 	static const char *const USR2_CHLD_str =
 		(SIGUSR2 < SIGCHLD) ? "USR2 CHLD" : "CHLD USR2";
 	void *const efault = tail_alloc(1024) + 1024;
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, ts);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, ts);
 	const unsigned int sigset_size = get_sigset_size();
 	void *const sigmask = tail_alloc(sigset_size);
 	struct pollfd *fds;
@@ -105,7 +105,7 @@ main(void)
 	       sigset_size, errstr);
 # endif
 
-	ts->tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	ts->tv_sec = (typeof(ts->tv_sec)) 0xcafef00ddeadbeefLL;
 	ts->tv_nsec = (long) 0xbadc0dedfacefeedL;
 	sys_ppoll(0, 0, (unsigned long) ts, 0, sigset_size);
 # if !PATH_TRACING_FD && !TRACING_FDS

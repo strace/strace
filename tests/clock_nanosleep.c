@@ -2,7 +2,7 @@
  * Check decoding of clock_nanosleep and clock_gettime syscalls.
  *
  * Copyright (c) 2015-2016 Dmitry V. Levin <ldv@strace.io>
- * Copyright (c) 2015-2020 The strace developers.
+ * Copyright (c) 2015-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -30,7 +30,7 @@ int
 main(void)
 {
 	struct {
-		struct timespec ts;
+		kernel_old_timespec_t ts;
 		uint32_t pad[2];
 	} req = {
 		.ts.tv_nsec = 0xc0de1,
@@ -82,7 +82,7 @@ main(void)
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 
-	req.ts.tv_sec = (time_t) 0xcafef00ddeadbeefLL;
+	req.ts.tv_sec = (typeof(req.ts.tv_sec)) 0xcafef00ddeadbeefLL;
 	req.ts.tv_nsec = (long) 0xbadc0dedfacefeedLL;
 	assert(syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0,
 		       &req.ts, &rem.ts) == -1);
@@ -115,6 +115,12 @@ main(void)
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec));
 
+        /* If time_t is 32 bit, it is no longer possible to represent post-2038 times
+         * via the clock_nanosleep syscall so we should simply stop and exit.
+         * It is not a failure. */
+	if (sizeof(req.ts.tv_sec) < 8)
+		goto exit;
+
 	++req.ts.tv_sec;
 	rem.ts.tv_sec = 0xc0de4;
 	rem.ts.tv_nsec = 0xc0de5;
@@ -127,6 +133,7 @@ main(void)
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 	puts("--- SIGALRM {si_signo=SIGALRM, si_code=SI_KERNEL} ---");
 
+exit:
 	puts("+++ exited with 0 +++");
 	return 0;
 }

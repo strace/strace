@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <sys/select.h>
 
+#include "kernel_timeval.h"
+
 static const char *errstr;
 
 static long
@@ -89,8 +91,8 @@ main(void)
 		error_msg_and_fail("nfds[%d] > smallset_size[%d]\n",
 				   nfds, smallset_size);
 
-	struct timeval tv_in = { 0, 123 };
-	struct timeval *const tv = tail_memdup(&tv_in, sizeof(tv_in));
+	kernel_old_timeval_t tv_in = { 0, 123 };
+	kernel_old_timeval_t *const tv = tail_memdup(&tv_in, sizeof(tv_in));
 	const uintptr_t a_tv = (uintptr_t) tv;
 
 	TAIL_ALLOC_OBJECT_VAR_PTR(kernel_ulong_t, l_rs);

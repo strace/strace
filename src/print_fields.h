@@ -546,6 +546,18 @@ tprint_sysret_end(void)
 			PRINT_VAL_U((where_).field_);				\
 	} while (0)
 
+# define PRINT_FIELD_TICKS(where_, field_, freq_, precision_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_ticks((where_).field_, (freq_), (precision_));	\
+	} while (0)
+
+# define PRINT_FIELD_TICKS_D(where_, field_, freq_, precision_)		\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_ticks_d((where_).field_, (freq_), (precision_));	\
+	} while (0)
+
 # define PRINT_FIELD_CLOCK_T(where_, field_)				\
 	do {								\
 		tprints_field_name(#field_);				\
@@ -677,6 +689,12 @@ tprint_sysret_end(void)
 	do {								\
 		tprints_field_name(#field_);				\
 		printfd((tcp_), (where_).field_);			\
+	} while (0)
+
+# define PRINT_FIELD_DIRFD(where_, field_, tcp_)			\
+	do {								\
+		tprints_field_name(#field_);				\
+		print_dirfd((tcp_), (where_).field_);			\
 	} while (0)
 
 # define PRINT_FIELD_CHAR(where_, field_, flags_)		\

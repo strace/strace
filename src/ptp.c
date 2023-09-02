@@ -107,7 +107,7 @@ ptp_ioctl(struct tcb *const tcp, const unsigned int code,
 		tprint_struct_next();
 		PRINT_FIELD_D(caps, adjust_phase);
 		tprint_struct_next();
-		PRINT_FIELD_D(caps, max_phase_adj);
+		PRINT_FIELD_TICKS_D(caps, max_phase_adj, 1000000000, 9);
 		PRINT_RSV(caps, rsv);
 		tprint_struct_end();
 		break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
@@ -18,7 +18,7 @@
 int
 main(void)
 {
-	TAIL_ALLOC_OBJECT_CONST_PTR(struct timespec, tp);
+	TAIL_ALLOC_OBJECT_CONST_PTR(kernel_old_timespec_t, tp);
 	long rc;
 
 	rc = syscall(__NR_sched_rr_get_interval, 0, NULL);
