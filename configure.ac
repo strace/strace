@@ -567,7 +567,7 @@ saved_CPPFLAGS="$CPPFLAGS"
 
 AC_CACHE_CHECK([whether <linux/signal.h> can be used along with <signal.h>],
 	       [st_cv_linux_signal],
-	       [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+	       [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <signal.h>
 #include <linux/signal.h>]],[])],
 				  [st_cv_linux_signal=yes],
