@@ -274,8 +274,8 @@ AC_CACHE_CHECK(
 	[st_cv_use_bundled_headers],
 	[AS_IF([test $enable_bundled = check],
 	       [AC_COMPILE_IFELSE(
-			[AC_LANG_PROGRAM([#include <linux/version.h>
-#define USE_OS_HEADERS ((LINUX_VERSION_CODE >> 8) > (]linux_version_code[ >> 8) ? 1 : -1)],
+			[AC_LANG_PROGRAM([[#include <linux/version.h>
+#define USE_OS_HEADERS ((LINUX_VERSION_CODE >> 8) > (]]linux_version_code[[ >> 8) ? 1 : -1)]],
 					 [[int i[USE_OS_HEADERS];]]
 			 )
 			],
