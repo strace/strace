@@ -148,10 +148,9 @@ powerpc*)
 	karch=powerpc
 	karch_m32=powerpc
 	AC_DEFINE([POWERPC], 1, [Define for the PowerPC architecture.])
-	AC_TRY_COMPILE(
-[#ifndef __LP64__
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifndef __LP64__
 # error 32 bit
-#endif], [], arch=powerpc64, arch=powerpc)
+#endif]], [[]])], [arch=powerpc64], [arch=powerpc])
 	if test "$arch" = "powerpc64"; then
 		# $ac_cv_c_bigendian is defined by AC_C_BIGENDIAN
 		case "$ac_cv_c_bigendian" in
@@ -211,10 +210,9 @@ x86?64*)
 	karch_m32=x86
 	karch_mx32=x86
 	arch_m32=i386
-	AC_TRY_COMPILE(
-[#ifndef __ILP32__
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#ifndef __ILP32__
 # error not x32
-#endif], [], arch=x32, arch=x86_64)
+#endif]], [[]])], [arch=x32], [arch=x86_64])
 	if test "$arch" = "x86_64"; then
 		arch_mx32=x32
 		AC_DEFINE([X86_64], 1, [Define for the 64bit AMD x86-64 architecture.])
