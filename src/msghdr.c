@@ -266,6 +266,8 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 		     const void *cmsg_data, const unsigned int data_len)
 {
 	const unsigned int utype = cmsg_type;
+	bool cmsg_data_printed = false;
+
 	switch (cmsg_level) {
 	case SOL_SOCKET:
 		printxval(scmvals, cmsg_type, "SCM_???");
@@ -275,6 +277,7 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			tprint_struct_next();
 			tprints_field_name("cmsg_data");
 			cmsg_socket_printers[utype].printer(tcp, cmsg_data, data_len);
+			cmsg_data_printed = true;
 		}
 		break;
 	case SOL_IP:
@@ -285,10 +288,17 @@ print_cmsg_type_data(struct tcb *tcp, const int cmsg_level, const int cmsg_type,
 			tprint_struct_next();
 			tprints_field_name("cmsg_data");
 			cmsg_ip_printers[utype].printer(tcp, cmsg_data, data_len);
+			cmsg_data_printed = true;
 		}
 		break;
 	default:
 		PRINT_VAL_X(cmsg_type);
+	}
+
+	if (!cmsg_data_printed && data_len) {
+		tprint_struct_next();
+		tprints_field_name("cmsg_data");
+		print_quoted_string(cmsg_data, data_len, QUOTE_FORCE_HEX);
 	}
 }
 
