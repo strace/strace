@@ -19,8 +19,7 @@ main(void)
 	const unsigned long port = (unsigned long) 0xdeafbeefffffffffULL;
 
 	long rc = syscall(__NR_ioperm, port, 1, 0);
-	printf("ioperm(%#lx, %#lx, %d) = %ld %s (%m)\n",
-	       port, 1UL, 0, rc, errno2name());
+	printf("ioperm(%#lx, %#lx, %d) = %s\n", port, 1UL, 0, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

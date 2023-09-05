@@ -39,8 +39,7 @@ test_mincore(const unsigned int pages)
 	unsigned char *const vec = tail_alloc(pages);
 
 	mincore(addr, size, NULL);
-	printf("mincore(%p, %zu, NULL) = -1 %s (%m)\n",
-	       addr, size, errno2name());
+	printf("mincore(%p, %zu, NULL) = %s\n", addr, size, sprintrc(-1));
 
 	print_mincore(pages, addr, size, vec);
 	if (size)

@@ -31,8 +31,7 @@ main(void)
 		perror_msg_and_fail("mkdir: %s", sample);
 
 	long rc = syscall(__NR_oldumount, sample);
-	printf("%s(\"%s\") = %ld %s (%m)\n",
-	       TEST_SYSCALL_STR, sample, rc, errno2name());
+	printf("%s(\"%s\") = %s\n", TEST_SYSCALL_STR, sample, sprintrc(rc));
 
 	if (rmdir(sample))
 		perror_msg_and_fail("rmdir: %s", sample);

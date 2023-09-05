@@ -41,13 +41,13 @@ test_socketcall(const int i, const void *const addr)
 	long rc = syscall(__NR_socketcall, call, addr);
 
 	if (i < sc_min || i > sc_max) {
-		printf("socketcall(%d, %p) = %ld %s (%m)\n",
-		       (int) call, addr, rc, errno2name());
+		printf("socketcall(%d, %p) = %s\n",
+		       (int) call, addr, sprintrc(rc));
 	} else if (addr == efault) {
 		const char *const str = xlookup_uint(socketcalls, i);
 		assert(str);
-		printf("socketcall(%s, %p) = %ld %s (%m)\n",
-		       str, addr, rc, errno2name());
+		printf("socketcall(%s, %p) = %s\n",
+		       str, addr, sprintrc(rc));
 	}
 }
 int

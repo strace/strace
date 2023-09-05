@@ -225,7 +225,7 @@ main(void)
 	print_handle_data(handle->f_handle, handle->handle_bytes);
 	int rc = syscall(__NR_open_by_handle_at, -1, handle,
 		O_RDONLY | O_DIRECTORY);
-	printf("}, O_RDONLY|O_DIRECTORY) = %d %s (%m)\n", rc, errno2name());
+	printf("}, O_RDONLY|O_DIRECTORY) = %s\n", sprintrc(rc));
 
 #ifndef TEST_SECONTEXT
 	static const struct strval dirfds[] = {

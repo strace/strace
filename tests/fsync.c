@@ -19,7 +19,7 @@ main(void)
 	const long int fd = (long int) 0xdeadbeefffffffffULL;
 
 	long rc = syscall(__NR_fsync, fd);
-	printf("fsync(%d) = %ld %s (%m)\n", (int) fd, rc, errno2name());
+	printf("fsync(%d) = %s\n", (int) fd, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

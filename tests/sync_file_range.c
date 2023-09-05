@@ -27,11 +27,11 @@ main(void)
 	int rc = sync_file_range(fd, offset, nbytes, flags);
 	printf("%s(%d, %lld, %lld, SYNC_FILE_RANGE_WAIT_BEFORE"
 	       "|SYNC_FILE_RANGE_WRITE|SYNC_FILE_RANGE_WAIT_AFTER"
-	       "|0xfffffff8) = %d %s (%m)\n",
+	       "|0xfffffff8) = %s\n",
 	       "sync_file_range", fd,
 	       (long long) offset,
 	       (long long) nbytes,
-	       rc, errno2name());
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -17,7 +17,7 @@ int
 main(void)
 {
 	long rc = syscall(__NR_iopl, 4);
-	printf("iopl(4) = %ld %s (%m)\n", rc, errno2name());
+	printf("iopl(4) = %s\n", sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

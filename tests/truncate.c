@@ -27,8 +27,8 @@ main(void)
 	else
 		rc = syscall(__NR_truncate, fname, len);
 
-	printf("truncate(\"%s\", %llu) = %ld %s (%m)\n",
-	       qname, (unsigned long long) len, rc, errno2name());
+	printf("truncate(\"%s\", %llu) = %s\n",
+	       qname, (unsigned long long) len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

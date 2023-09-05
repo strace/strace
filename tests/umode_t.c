@@ -29,13 +29,13 @@ test_syscall(unsigned short mode)
 			  sample, lmode);
 
 	if (mode <= 07)
-		printf("%s(%s\"%s\", 00%d) = %ld %s (%m)\n",
+		printf("%s(%s\"%s\", 00%d) = %s\n",
 		       TEST_SYSCALL_STR, TEST_SYSCALL_PREFIX_STR,
-		       sample, (int) mode, rc, errno2name());
+		       sample, (int) mode, sprintrc(rc));
 	else
-		printf("%s(%s\"%s\", %#03ho) = %ld %s (%m)\n",
+		printf("%s(%s\"%s\", %#03ho) = %s\n",
 		       TEST_SYSCALL_STR, TEST_SYSCALL_PREFIX_STR,
-		       sample, mode, rc, errno2name());
+		       sample, mode, sprintrc(rc));
 }
 
 int

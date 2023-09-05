@@ -20,8 +20,8 @@ main(void)
 	const off_t len = 0xdefaceddeadbeefULL;
 
 	int rc = ftruncate(-1, len);
-	printf("ftruncate64(-1, %llu) = %d %s (%m)\n",
-	       (unsigned long long) len, rc, errno2name());
+	printf("ftruncate64(-1, %llu) = %s\n",
+	       (unsigned long long) len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

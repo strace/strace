@@ -28,10 +28,10 @@ main(void)
 
 	long rc = syscall(__NR_splice,
 			  fd_in, off_in, fd_out, off_out, len, flags);
-	printf("splice(%d, [%lld], %d, [%lld], %zu, %s) = %ld %s (%m)\n",
+	printf("splice(%d, [%lld], %d, [%lld], %zu, %s) = %s\n",
 	       (int) fd_in, *off_in, (int) fd_out, *off_out, len,
 	       "SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT",
-	       rc, errno2name());
+	       sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

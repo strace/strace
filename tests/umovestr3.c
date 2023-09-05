@@ -20,7 +20,7 @@ main(void)
 
 	for (; p <= efault; ++p) {
 		int rc = chdir(p);
-		printf("chdir(%p) = %d %s (%m)\n", p, rc, errno2name());
+		printf("chdir(%p) = %s\n", p, sprintrc(rc));
 	}
 
 	puts("+++ exited with 0 +++");

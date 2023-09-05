@@ -19,8 +19,7 @@ main(void)
 	static const char sample[] = "unlink_sample";
 
 	long rc = syscall(__NR_unlink, sample);
-	printf("unlink(\"%s\") = %ld %s (%m)\n",
-	       sample, rc, errno2name());
+	printf("unlink(\"%s\") = %s\n", sample, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

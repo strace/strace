@@ -17,8 +17,7 @@ int
 main(void)
 {
 	long rc = syscall(__NR_setdomainname, 0, 63);
-	printf("setdomainname(NULL, 63) = %ld %s (%m)\n",
-	       rc, errno2name());
+	printf("setdomainname(NULL, 63) = %s\n", sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

@@ -22,8 +22,8 @@ main(void)
 	const off_t len = 0xdefaceddeadbeefULL;
 
 	int rc = truncate(fname, len);
-	printf("truncate64(\"%s\", %llu) = %d %s (%m)\n",
-	       qname, (unsigned long long) len, rc, errno2name());
+	printf("truncate64(\"%s\", %llu) = %s\n",
+	       qname, (unsigned long long) len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

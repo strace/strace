@@ -42,12 +42,12 @@ main(void)
 	/* With a bad fd */
 	memset(api_struct, 0, sizeof(*api_struct));
 	rc = ioctl(-1, UFFDIO_API, api_struct);
-	printf("ioctl(-1, UFFDIO_API, {api=0, features=0}) = %d %s (%m)\n",
-	       rc, errno2name());
+	printf("ioctl(-1, UFFDIO_API, {api=0, features=0}) = %s\n",
+	       sprintrc(rc));
 	/* With a bad pointer */
 	rc = ioctl(fd, UFFDIO_API, NULL);
-	printf("ioctl(%d, UFFDIO_API, NULL) = %d %s (%m)\n",
-		fd, rc, errno2name());
+	printf("ioctl(%d, UFFDIO_API, NULL) = %s\n",
+		fd, sprintrc(rc));
 	/* Normal call */
 	api_struct->api = UFFD_API;
 	api_struct->features = 0;
@@ -88,11 +88,11 @@ main(void)
 
 	rc = ioctl(-1, UFFDIO_REGISTER, register_struct);
 	printf("ioctl(-1, UFFDIO_REGISTER, {range={start=0, len=0}, "
-	       "mode=0}) = %d %s (%m)\n", rc, errno2name());
+	       "mode=0}) = %s\n", sprintrc(rc));
 
 	rc = ioctl(fd, UFFDIO_REGISTER, NULL);
-	printf("ioctl(%d, UFFDIO_REGISTER, NULL) = %d %s (%m)\n",
-	       fd, rc, errno2name());
+	printf("ioctl(%d, UFFDIO_REGISTER, NULL) = %s\n",
+	       fd, sprintrc(rc));
 
 	register_struct->range.start = (uint64_t)(uintptr_t)area2;
 	register_struct->range.len = pagesize;
@@ -119,11 +119,11 @@ main(void)
 	memset(copy_struct, 0, sizeof(*copy_struct));
 	rc = ioctl(-1, UFFDIO_COPY, copy_struct);
 	printf("ioctl(-1, UFFDIO_COPY, {dst=0, src=0, len=0, mode=0"
-	       "}) = %d %s (%m)\n", rc, errno2name());
+	       "}) = %s\n", sprintrc(rc));
 
 	rc = ioctl(fd, UFFDIO_COPY, NULL);
-	printf("ioctl(%d, UFFDIO_COPY, NULL) = %d %s (%m)\n",
-	       fd, rc, errno2name());
+	printf("ioctl(%d, UFFDIO_COPY, NULL) = %s\n",
+	       fd, sprintrc(rc));
 
 	copy_struct->dst = (uint64_t)(uintptr_t)area2;
 	copy_struct->src = (uint64_t)(uintptr_t)area1;
@@ -148,11 +148,11 @@ main(void)
 	memset(zero_struct, 0, sizeof(*zero_struct));
 	rc = ioctl(-1, UFFDIO_ZEROPAGE, zero_struct);
 	printf("ioctl(-1, UFFDIO_ZEROPAGE, {range={start=0, len=0}, mode=0"
-	       "}) = %d %s (%m)\n", rc, errno2name());
+	       "}) = %s\n", sprintrc(rc));
 
 	rc = ioctl(fd, UFFDIO_ZEROPAGE, NULL);
-	printf("ioctl(%d, UFFDIO_ZEROPAGE, NULL) = %d %s (%m)\n",
-	       fd, rc, errno2name());
+	printf("ioctl(%d, UFFDIO_ZEROPAGE, NULL) = %s\n",
+	       fd, sprintrc(rc));
 
 	zero_struct->range.start = (uint64_t)(uintptr_t)area2;
 	zero_struct->range.len = pagesize;
@@ -167,12 +167,12 @@ main(void)
 	memset(range_struct, 0, sizeof(*range_struct));
 
 	rc = ioctl(-1, UFFDIO_WAKE, range_struct);
-	printf("ioctl(-1, UFFDIO_WAKE, {start=0, len=0}) = %d %s (%m)\n",
-	       rc, errno2name());
+	printf("ioctl(-1, UFFDIO_WAKE, {start=0, len=0}) = %s\n",
+	       sprintrc(rc));
 
 	rc = ioctl(fd, UFFDIO_WAKE, NULL);
-	printf("ioctl(%d, UFFDIO_WAKE, NULL) = %d %s (%m)\n",
-	       fd, rc, errno2name());
+	printf("ioctl(%d, UFFDIO_WAKE, NULL) = %s\n",
+	       fd, sprintrc(rc));
 
 	range_struct->start = (uint64_t)(uintptr_t)area2;
 	range_struct->len = pagesize;
@@ -184,12 +184,12 @@ main(void)
 	memset(range_struct, 0, sizeof(*range_struct));
 
 	rc = ioctl(-1, UFFDIO_UNREGISTER, range_struct);
-	printf("ioctl(-1, UFFDIO_UNREGISTER, {start=0, len=0}) = %d %s (%m)\n",
-	       rc, errno2name());
+	printf("ioctl(-1, UFFDIO_UNREGISTER, {start=0, len=0}) = %s\n",
+	       sprintrc(rc));
 
 	rc = ioctl(fd, UFFDIO_UNREGISTER, NULL);
-	printf("ioctl(%d, UFFDIO_UNREGISTER, NULL) = %d %s (%m)\n",
-	       fd, rc, errno2name());
+	printf("ioctl(%d, UFFDIO_UNREGISTER, NULL) = %s\n",
+	       fd, sprintrc(rc));
 
 	range_struct->start = (uint64_t)(uintptr_t)area2;
 	range_struct->len = pagesize;
