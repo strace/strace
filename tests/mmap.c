@@ -39,14 +39,14 @@ main(int ac, char **av)
 	(void) close(0);
 	(void) close(0);
 #if XLAT_RAW
-	printf("%s(NULL, 0, %#x, %#x, 0, 0) = -1 EBADF (%m)\n",
+	printf("%s(NULL, 0, %#x, %#x, 0, 0)" RVAL_EBADF,
 	       name, PROT_NONE, MAP_FILE);
 #elif XLAT_VERBOSE
-	printf("%s(NULL, 0, %#x /* PROT_NONE */, %#x /* MAP_FILE */, 0, 0) "
-	       "= -1 EBADF (%m)\n",
+	printf("%s(NULL, 0, %#x /* PROT_NONE */, %#x /* MAP_FILE */, 0, 0)"
+	       RVAL_EBADF,
 	       name, PROT_NONE, MAP_FILE);
 #else
-	printf("%s(NULL, 0, PROT_NONE, MAP_FILE, 0, 0) = -1 EBADF (%m)\n",
+	printf("%s(NULL, 0, PROT_NONE, MAP_FILE, 0, 0)" RVAL_EBADF,
 	       name);
 #endif
 	mmap(NULL, 0, PROT_NONE, MAP_FILE, 0, 0);

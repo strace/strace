@@ -30,9 +30,9 @@
 #endif
 
 #if RETVAL_INJECTED
-# define RETVAL "42 (INJECTED)\n"
+# define RETVAL " = 42 (INJECTED)\n"
 #else
-# define RETVAL "-1 EBADF (%m)\n"
+# define RETVAL RVAL_EBADF
 #endif
 
 #ifndef HAVE_STRUCT_KBDIACRUC
@@ -67,16 +67,16 @@ check_null_invalid(unsigned int c, const char *s)
 		p = tail_alloc(1);
 
 	sys_ioctl(-1, c, 0);
-	printf("ioctl(-1, " XLAT_FMT ", NULL) = " RETVAL, XLAT_SEL(c, s));
+	printf("ioctl(-1, " XLAT_FMT ", NULL)" RETVAL, XLAT_SEL(c, s));
 
 	if (F8ILL_KULONG_SUPPORTED) {
 		sys_ioctl(-1, c, F8ILL_KULONG_MASK);
-		printf("ioctl(-1, " XLAT_FMT ", NULL) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", NULL)" RETVAL,
 		       XLAT_SEL(c, s));
 	}
 
 	sys_ioctl(-1, c, (uintptr_t) p + 1);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL, XLAT_SEL(c, s), p + 1);
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL, XLAT_SEL(c, s), p + 1);
 }
 
 /* GIO_SCRNMAP, PIO_SCRNMAP */
@@ -93,11 +93,11 @@ check_scrnmap(unsigned int c, const char *s)
 	check_null_invalid(c, s);
 
 	sys_ioctl(-1, c, (uintptr_t) scrnmap + E_TABSZ - 31);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_SEL(c, s), scrnmap + E_TABSZ - 31);
 
 	sys_ioctl(-1, c, (uintptr_t) scrnmap + E_TABSZ - 32);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_SEL(c, s), scrnmap + E_TABSZ - 32);
 
 	rc = sys_ioctl(-1, c, (uintptr_t) scrnmap + E_TABSZ - 33);
@@ -110,7 +110,7 @@ check_scrnmap(unsigned int c, const char *s)
 		printf("%p", scrnmap + E_TABSZ - 33);
 	}
 	errno = saved_errno;
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 
 	rc = sys_ioctl(-1, c, (uintptr_t) scrnmap);
 	saved_errno = errno;
@@ -123,7 +123,7 @@ check_scrnmap(unsigned int c, const char *s)
 		printf("%p", scrnmap);
 	}
 	errno = saved_errno;
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 }
 
 /* KDGKBENT, KDSKBENT */
@@ -239,7 +239,7 @@ check_kbdent(unsigned int c, const char *s)
 	kbe->kb_value = 0xa8a8;
 	sys_ioctl(-1, c, (uintptr_t) kbe + 2);
 	printf("ioctl(-1, " XLAT_FMT ", {kb_table=%s, kb_index=168%s}"
-	       ") = " RETVAL,
+	       ")" RETVAL,
 	       XLAT_SEL(c, s), XLAT_STR(1<<KG_ALT|1<<KG_SHIFTR|1<<KG_CTRLR),
 	       RETVAL_INJECTED || c == KDSKBENT ? ", kb_value=???" : ""
 	       );
@@ -261,7 +261,7 @@ check_kbdent(unsigned int c, const char *s)
 			       kbval_vecs[i % ARRAY_SIZE(kbval_vecs)].str);
 		}
 		errno = saved_errno;
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 	}
 }
 
@@ -317,7 +317,7 @@ check_kbdsent(unsigned int c, const char *s)
 		}
 
 		errno = saved_errno;
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 	}
 
 	fill_memory_ex(kbse->kb_string, sizeof(kbse->kb_string), 0x80, 0x7f);
@@ -337,7 +337,7 @@ check_kbdsent(unsigned int c, const char *s)
 	}
 
 	errno = saved_errno;
-	printf("}) = " RETVAL);
+	printf("})" RETVAL);
 
 	for (size_t i = 0; i < ARRAY_SIZE(kbfn_vecs); i++) {
 		kbse->kb_func = kbfn_vecs[i].val;
@@ -358,7 +358,7 @@ check_kbdsent(unsigned int c, const char *s)
 		}
 
 		errno = saved_errno;
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 	}
 
 	if (DEFAULT_STRLEN < sizeof(kbse->kb_string) &&
@@ -376,7 +376,7 @@ check_kbdsent(unsigned int c, const char *s)
 		sys_ioctl(-1, c, (uintptr_t) k);
 		printf("ioctl(-1, " XLAT_FMT ", {kb_func="
 		       XLAT_KNOWN(0xff, "KVAL(K_UNDO)")
-		       ", kb_string=\"%s\"}) = " RETVAL,
+		       ", kb_string=\"%s\"})" RETVAL,
 		       XLAT_SEL(c, s), k->kb_string);
 	}
 }
@@ -423,7 +423,7 @@ check_diacr(unsigned int c, const char *s)
 			printf("%p", diacrs0);
 		}
 		errno = saved_errno;
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 
 	fill_memory_ex(diacrs1->kbdiacr, 4 * sizeof(struct kbdiacr), 40, 44);
@@ -446,7 +446,7 @@ check_diacr(unsigned int c, const char *s)
 			printf("%p", diacrs1);
 		}
 		errno = saved_errno;
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 
 	fill_memory_ex(diacrs2->kbdiacr, sizeof(diacrs2->kbdiacr), 40, 52);
@@ -476,7 +476,7 @@ check_diacr(unsigned int c, const char *s)
 			printf("%p", diacrs2);
 		}
 		errno = saved_errno;
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 
 	for (size_t i = 0; i< ARRAY_SIZE(diac_vecs); i++) {
@@ -499,7 +499,7 @@ check_diacr(unsigned int c, const char *s)
 		printf("%p", diacrs2);
 	}
 	errno = saved_errno;
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 }
 
 /* KDGETKEYCODE, KDSETKEYCODE */
@@ -517,7 +517,7 @@ check_xetkeycode(unsigned int c, const char *s)
 	check_null_invalid(c, s);
 
 	sys_ioctl(-1, c, (uintptr_t) tail_arg + 4);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_SEL(c, s), (char *) tail_arg + 4);
 
 	for (size_t i = 0; i < ARRAY_SIZE(args); i++) {
@@ -528,7 +528,7 @@ check_xetkeycode(unsigned int c, const char *s)
 		       XLAT_SEL(c, s), args[i].scancode, args[i].keycode);
 		if ((c == KDGETKEYCODE) && RETVAL_INJECTED)
 			printf(" => %#x", args[i].keycode);
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 	}
 }
 
@@ -547,7 +547,7 @@ check_kbdrep(unsigned int c, const char *s)
 	check_null_invalid(c, s);
 
 	sys_ioctl(-1, c, (uintptr_t) tail_arg + 4);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_SEL(c, s), (char *) tail_arg + 4);
 
 	for (size_t i = 0; i < ARRAY_SIZE(args); i++) {
@@ -559,7 +559,7 @@ check_kbdrep(unsigned int c, const char *s)
 			printf("%s {delay=%d, period=%d}",
 			       j ? " =>" : ",", args[i].delay, args[i].period);
 		}
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 }
 
@@ -575,11 +575,11 @@ check_font(unsigned int c, const char *s)
 	check_null_invalid(c, s);
 
 	sys_ioctl(-1, c, (uintptr_t) data_end - 31);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_SEL(c, s), data_end - 31);
 
 	sys_ioctl(-1, c, (uintptr_t) data_end - 32);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_SEL(c, s), data_end - 32);
 
 	bool ok = (DEFAULT_STRLEN == 32)
@@ -592,7 +592,7 @@ check_font(unsigned int c, const char *s)
 	} else {
 		printf("%p", data_end - 33);
 	}
-	printf("%s) = " RETVAL, ok ? "\"..." : "");
+	printf("%s)" RETVAL, ok ? "\"..." : "");
 
 	ok = (c != GIO_FONT) || RETVAL_INJECTED;
 	sys_ioctl(-1, c, (uintptr_t) data_end - 1025);
@@ -604,7 +604,7 @@ check_font(unsigned int c, const char *s)
 	} else {
 		printf("%p", data_end - 1025);
 	}
-	printf("%s) = " RETVAL, ok ? "\"..." : "");
+	printf("%s)" RETVAL, ok ? "\"..." : "");
 
 	sys_ioctl(-1, c, (uintptr_t) data);
 	printf("ioctl(-1, " XLAT_FMT ", %s", XLAT_SEL(c, s), ok ? "\"" : "");
@@ -614,7 +614,7 @@ check_font(unsigned int c, const char *s)
 	} else {
 		printf("%p", data);
 	}
-	printf("%s) = " RETVAL, ok ? "\"..." : "");
+	printf("%s)" RETVAL, ok ? "\"..." : "");
 }
 
 /* GIO_UNIMAP, PIO_UNIMAP */
@@ -633,7 +633,7 @@ check_unimap(unsigned int c, const char *s)
 	umd->entry_ct = 0xdead;
 	umd->entries = NULL;
 	sys_ioctl(-1, c, (uintptr_t) umd);
-	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=57005%s, entries=NULL}) = "
+	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=57005%s, entries=NULL})"
 	       RETVAL, XLAT_SEL(c, s), c == GIO_UNIMAP ? " => 57005" : "");
 
 	umd->entry_ct = 0;
@@ -645,11 +645,11 @@ check_unimap(unsigned int c, const char *s)
 		printf("%p", ups + 33);
 	else
 		printf("[]");
-	printf("}) = " RETVAL);
+	printf("})" RETVAL);
 
 	umd->entry_ct = 1;
 	sys_ioctl(-1, c, (uintptr_t) umd);
-	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=1%s, entries=%p}) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", {entry_ct=1%s, entries=%p})" RETVAL,
 	       XLAT_SEL(c, s), c == GIO_UNIMAP ? " => 1" : "", ups + 33);
 
 	for (unsigned int i = 0; i < 6; i++) {
@@ -662,7 +662,7 @@ check_unimap(unsigned int c, const char *s)
 		if (c == GIO_UNIMAP) {
 			printf(" => %u", 31 + (i + 1) / 2);
 #if !RETVAL_INJECTED
-			printf(", entries=%p}) = " RETVAL, ups + 2 - i / 2);
+			printf(", entries=%p})" RETVAL, ups + 2 - i / 2);
 			continue;
 #endif
 		}
@@ -687,7 +687,7 @@ check_unimap(unsigned int c, const char *s)
 		if (i > 3)
 			printf(", ...");
 #endif
-		printf("]}) = " RETVAL);
+		printf("]})" RETVAL);
 	}
 }
 
@@ -706,7 +706,7 @@ check_uniscrnmap(unsigned int c, const char *s)
 		printf("ioctl(-1, " XLAT_FMT ", ", XLAT_SEL(c, s));
 
 		if (c == GIO_UNISCRNMAP && !RETVAL_INJECTED) {
-			printf("%p) = " RETVAL, map + 224 - 112 * i);
+			printf("%p)" RETVAL, map + 224 - 112 * i);
 			continue;
 		}
 
@@ -730,7 +730,7 @@ check_uniscrnmap(unsigned int c, const char *s)
 				printf(" /* %p */", map + 256);
 		}
 
-		printf("]) = " RETVAL);
+		printf("])" RETVAL);
 	}
 }
 
@@ -752,7 +752,7 @@ check_fontx(unsigned int c, const char *s)
 	cfd->chardata = NULL;
 	sys_ioctl(-1, c, (uintptr_t) cfd);
 	printf("ioctl(-1, " XLAT_FMT
-	       ", {charcount=0, charheight=57005, chardata=NULL}%s) = " RETVAL,
+	       ", {charcount=0, charheight=57005, chardata=NULL}%s)" RETVAL,
 	       XLAT_SEL(c, s), RETVAL_INJECTED && (c == GIO_FONTX)
 		? " => {charcount=0, charheight=57005, chardata=NULL}" : "");
 
@@ -765,7 +765,7 @@ check_fontx(unsigned int c, const char *s)
 	if (c == GIO_FONTX)
 		printf(" => {charcount=0, charheight=57005, chardata=\"\"}");
 #endif
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 
 	cfd->chardata = data;
 	sys_ioctl(-1, c, (uintptr_t) cfd);
@@ -776,7 +776,7 @@ check_fontx(unsigned int c, const char *s)
 	if (c == GIO_FONTX)
 		printf(" => {charcount=0, charheight=57005, chardata=\"\"}");
 #endif
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 
 	for (size_t i = 0; i < ARRAY_SIZE(cnts); i++) {
 		char *p = data_end - MIN(2048, cnts[i] * 32);
@@ -805,7 +805,7 @@ check_fontx(unsigned int c, const char *s)
 			}
 		}
 #endif
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 
 		cfd->chardata = p;
 		sys_ioctl(-1, c, (uintptr_t) cfd);
@@ -830,7 +830,7 @@ check_fontx(unsigned int c, const char *s)
 			printf("}");
 		}
 #endif
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 }
 
@@ -854,7 +854,7 @@ check_cmap(unsigned int c, const char *s)
 	} else {
 		printf("%p", cmap + 1);
 	}
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 
 	sys_ioctl(-1, c, (uintptr_t) cmap);
 	printf("ioctl(-1, " XLAT_FMT ", ", XLAT_SEL(c, s));
@@ -870,7 +870,7 @@ check_cmap(unsigned int c, const char *s)
 	} else {
 		printf("%p", cmap);
 	}
-	printf(") = " RETVAL);
+	printf(")" RETVAL);
 }
 
 /* KDGKBDIACRUC, KDSKBDIACRUC */
@@ -901,7 +901,7 @@ check_diacruc(unsigned int c, const char *s)
 			printf("%p", diacrs0);
 		}
 		errno = saved_errno;
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 
 	fill_memory32(diacrs1->kbdiacruc, 4 * sizeof(struct kbdiacruc));
@@ -928,7 +928,7 @@ check_diacruc(unsigned int c, const char *s)
 			printf("%p", diacrs1);
 		}
 		errno = saved_errno;
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 
 	fill_memory32(diacrs2->kbdiacruc, sizeof(diacrs2->kbdiacruc));
@@ -958,7 +958,7 @@ check_diacruc(unsigned int c, const char *s)
 			printf("%p", diacrs2);
 		}
 		errno = saved_errno;
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 }
 
@@ -1015,7 +1015,7 @@ main(int argc, char *argv[])
 			printf("ioctl(-1, "
 			       NABBR("%#x") VERB(" /* ")
 			       NRAW("_IOC(%s, 0x4b, %#x, 0)") VERB(" */")
-			       ", %#lx) = " RETVAL,
+			       ", %#lx)" RETVAL,
 #if XLAT_RAW || XLAT_VERBOSE
 			       'K' << 8 | id,
 #endif
@@ -1029,24 +1029,24 @@ main(int argc, char *argv[])
 
 	/* KIOCSOUND */
 	sys_ioctl(-1, KIOCSOUND, 0);
-	printf("ioctl(-1, " XLAT_FMT ", 0" NRAW(" /* off */") ") = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", 0" NRAW(" /* off */") ")" RETVAL,
 	       XLAT_ARGS(KIOCSOUND));
 
 	sys_ioctl(-1, KIOCSOUND, 1);
 	printf("ioctl(-1, " XLAT_FMT ", 1" NRAW(" /* 1193182 Hz */")
-	       ") = " RETVAL, XLAT_ARGS(KIOCSOUND));
+	       ")" RETVAL, XLAT_ARGS(KIOCSOUND));
 
 	sys_ioctl(-1, KIOCSOUND, 440);
 	printf("ioctl(-1, " XLAT_FMT ", 440" NRAW(" /* 2711 Hz */")
-	       ") = " RETVAL, XLAT_ARGS(KIOCSOUND));
+	       ")" RETVAL, XLAT_ARGS(KIOCSOUND));
 
 	sys_ioctl(-1, KIOCSOUND, 1193182);
 	printf("ioctl(-1, " XLAT_FMT ", 1193182" NRAW(" /* 1 Hz */")
-	       ") = " RETVAL, XLAT_ARGS(KIOCSOUND));
+	       ")" RETVAL, XLAT_ARGS(KIOCSOUND));
 
 	sys_ioctl(-1, KIOCSOUND, 1193183);
 	printf("ioctl(-1, " XLAT_FMT ", 1193183" NRAW(" /* off */")
-	       ") = " RETVAL, XLAT_ARGS(KIOCSOUND));
+	       ")" RETVAL, XLAT_ARGS(KIOCSOUND));
 
 	sys_ioctl(-1, KIOCSOUND,
 		  (kernel_ulong_t) (0xbadc0ded00000000ULL | 2710));
@@ -1056,7 +1056,7 @@ main(int argc, char *argv[])
 #else
 	       ", 13464652297489353366" NRAW(" /* off */")
 #endif
-	       ") = " RETVAL, XLAT_ARGS(KIOCSOUND));
+	       ")" RETVAL, XLAT_ARGS(KIOCSOUND));
 
 	sys_ioctl(-1, KIOCSOUND, (kernel_ulong_t) 0xbadc0deddeadfaceULL);
 	printf("ioctl(-1, " XLAT_FMT
@@ -1065,37 +1065,37 @@ main(int argc, char *argv[])
 #else
 	       ", 3735943886"
 #endif
-	       NRAW(" /* off */") ") = " RETVAL, XLAT_ARGS(KIOCSOUND));
+	       NRAW(" /* off */") ")" RETVAL, XLAT_ARGS(KIOCSOUND));
 
 	/* KDMKTONE */
 	sys_ioctl(-1, KDMKTONE, 0);
-	printf("ioctl(-1, " XLAT_FMT ", 0" NRAW(" /* off */") ") = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", 0" NRAW(" /* off */") ")" RETVAL,
 	       XLAT_ARGS(KDMKTONE));
 
 	sys_ioctl(-1, KDMKTONE, 440);
-	printf("ioctl(-1, " XLAT_FMT ", 440" NRAW(" /* off */") ") = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", 440" NRAW(" /* off */") ")" RETVAL,
 	       XLAT_ARGS(KDMKTONE));
 
 	sys_ioctl(-1, KDMKTONE, 0xffff);
-	printf("ioctl(-1, " XLAT_FMT ", 65535" NRAW(" /* off */") ") = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", 65535" NRAW(" /* off */") ")" RETVAL,
 	       XLAT_ARGS(KDMKTONE));
 
 	sys_ioctl(-1, KDMKTONE, 0x10000);
 	printf("ioctl(-1, " XLAT_FMT ", 1<<16|0" NRAW(" /* off */")
-	       ") = " RETVAL, XLAT_ARGS(KDMKTONE));
+	       ")" RETVAL, XLAT_ARGS(KDMKTONE));
 
 	sys_ioctl(-1, KDMKTONE,
 		  (kernel_ulong_t) (0xbadc0ded00000000ULL | 0x10001));
 	printf("ioctl(-1, " XLAT_FMT ", 1<<16|1" NRAW(" /* 1193182 Hz, 1 ms */")
-	       ") = " RETVAL, XLAT_ARGS(KDMKTONE));
+	       ")" RETVAL, XLAT_ARGS(KDMKTONE));
 
 	sys_ioctl(-1, KDMKTONE, 0x1ffff);
 	printf("ioctl(-1, " XLAT_FMT ", 1<<16|65535" NRAW(" /* 18 Hz, 1 ms */")
-	       ") = " RETVAL, XLAT_ARGS(KDMKTONE));
+	       ")" RETVAL, XLAT_ARGS(KDMKTONE));
 
 	sys_ioctl(-1, KDMKTONE, (kernel_ulong_t) 0xbadc0deddeadfaceULL);
 	printf("ioctl(-1, " XLAT_FMT ", 57005<<16|64206"
-	       NRAW(" /* 18 Hz, 57005 ms */") ") = " RETVAL,
+	       NRAW(" /* 18 Hz, 57005 ms */") ")" RETVAL,
 	       XLAT_ARGS(KDMKTONE));
 
 
@@ -1117,10 +1117,10 @@ main(int argc, char *argv[])
 		*leds = led_vecs[i].val;
 		rc = sys_ioctl(-1, KDGETLED, (uintptr_t) leds);
 		if (rc >= 0) {
-			printf("ioctl(-1, " XLAT_FMT ", [%s]) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", [%s])" RETVAL,
 			       XLAT_ARGS(KDGETLED), led_vecs[i].str);
 		} else {
-			printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 			       XLAT_ARGS(KDGETLED), leds);
 		}
 	}
@@ -1129,12 +1129,12 @@ main(int argc, char *argv[])
 	/* KDSETLED */
 	for (size_t i = 0; i < ARRAY_SIZE(led_vecs); i++) {
 		sys_ioctl(-1, KDSETLED, led_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSETLED), led_vecs[i].str);
 	}
 
 	sys_ioctl(-1, KDSETLED, (kernel_ulong_t) 0xdeadc0defeedfaceULL);
-	printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 	       XLAT_ARGS(KDSETLED), XLAT_STR(LED_NUM|LED_CAP|0xc8));
 
 
@@ -1157,10 +1157,10 @@ main(int argc, char *argv[])
 		*kbt = kbt_vecs[i].val;
 		rc = sys_ioctl(-1, KDGKBTYPE, (uintptr_t) kbt);
 		if (rc >= 0) {
-			printf("ioctl(-1, " XLAT_FMT ", [%s]) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", [%s])" RETVAL,
 			       XLAT_ARGS(KDGKBTYPE), kbt_vecs[i].str);
 		} else {
-			printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 			       XLAT_ARGS(KDGKBTYPE), kbt);
 		}
 	}
@@ -1186,7 +1186,7 @@ main(int argc, char *argv[])
 
 	for (size_t i = 0; i < ARRAY_SIZE(iop_vecs); i++) {
 		sys_ioctl(-1, KDADDIO, iop_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDADDIO), iop_vecs[i].str);
 	}
 
@@ -1194,19 +1194,19 @@ main(int argc, char *argv[])
 	/* KDDELIO */
 	for (size_t i = 0; i < ARRAY_SIZE(iop_vecs); i++) {
 		sys_ioctl(-1, KDDELIO, iop_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDDELIO), iop_vecs[i].str);
 	}
 
 
 	/* KDENABIO */
 	sys_ioctl(-1, KDENABIO, (kernel_ulong_t) 0xbadc0deddeadface);
-	printf("ioctl(-1, " XLAT_FMT ") = " RETVAL, XLAT_ARGS(KDENABIO));
+	printf("ioctl(-1, " XLAT_FMT ")" RETVAL, XLAT_ARGS(KDENABIO));
 
 
 	/* KDDISABIO */
 	sys_ioctl(-1, KDDISABIO, (kernel_ulong_t) 0xbadc0deddeadface);
-	printf("ioctl(-1, " XLAT_FMT ") = " RETVAL, XLAT_ARGS(KDDISABIO));
+	printf("ioctl(-1, " XLAT_FMT ")" RETVAL, XLAT_ARGS(KDDISABIO));
 
 
 	/* KDSETMODE */
@@ -1221,7 +1221,7 @@ main(int argc, char *argv[])
 
 	for (size_t i = 0; i < ARRAY_SIZE(mode_vecs); i++) {
 		sys_ioctl(-1, KDSETMODE, mode_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSETMODE), mode_vecs[i].str);
 	}
 
@@ -1235,10 +1235,10 @@ main(int argc, char *argv[])
 		*mode = mode_vecs[i].val;
 		rc = sys_ioctl(-1, KDGETMODE, (uintptr_t) mode);
 		if (rc >= 0) {
-			printf("ioctl(-1, " XLAT_FMT ", [%s]) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", [%s])" RETVAL,
 			       XLAT_ARGS(KDGETMODE), mode_vecs[i].str);
 		} else {
-			printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 			       XLAT_ARGS(KDGETMODE), mode);
 		}
 	}
@@ -1246,12 +1246,12 @@ main(int argc, char *argv[])
 
 	/* KDMAPDISP */
 	sys_ioctl(-1, KDMAPDISP, (kernel_ulong_t) 0xbadc0deddeadface);
-	printf("ioctl(-1, " XLAT_FMT ") = " RETVAL, XLAT_ARGS(KDMAPDISP));
+	printf("ioctl(-1, " XLAT_FMT ")" RETVAL, XLAT_ARGS(KDMAPDISP));
 
 
 	/* KDUNMAPDISP */
 	sys_ioctl(-1, KDUNMAPDISP, (kernel_ulong_t) 0xbadc0deddeadface);
-	printf("ioctl(-1, " XLAT_FMT ") = " RETVAL, XLAT_ARGS(KDUNMAPDISP));
+	printf("ioctl(-1, " XLAT_FMT ")" RETVAL, XLAT_ARGS(KDUNMAPDISP));
 
 
 	/* GIO_SCRNMAP */
@@ -1279,10 +1279,10 @@ main(int argc, char *argv[])
 		*mode = kbmode_vecs[i].val;
 		rc = sys_ioctl(-1, KDGKBMODE, (uintptr_t) mode);
 		if (rc >= 0) {
-			printf("ioctl(-1, " XLAT_FMT ", [%s]) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", [%s])" RETVAL,
 			       XLAT_ARGS(KDGKBMODE), kbmode_vecs[i].str);
 		} else {
-			printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 			       XLAT_ARGS(KDGKBMODE), mode);
 		}
 	}
@@ -1291,7 +1291,7 @@ main(int argc, char *argv[])
 	/* KDSKBMODE */
 	for (size_t i = 0; i < ARRAY_SIZE(kbmode_vecs); i++) {
 		sys_ioctl(-1, KDSKBMODE, kbmode_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSKBMODE), kbmode_vecs[i].str);
 	}
 
@@ -1345,7 +1345,7 @@ main(int argc, char *argv[])
 
 	for (size_t i = 0; i < ARRAY_SIZE(sigaccept_vecs); i++) {
 		sys_ioctl(-1, KDSIGACCEPT, sigaccept_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSIGACCEPT), sigaccept_vecs[i].str);
 	}
 
@@ -1389,14 +1389,14 @@ main(int argc, char *argv[])
 #else
 		printf("%p", meta);
 #endif
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 	}
 
 
 	/* KDSKBMETA */
 	for (size_t i = 0; i < ARRAY_SIZE(meta_vecs); i++) {
 		sys_ioctl(-1, KDSKBMETA, meta_vecs[i].arg);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSKBMETA), meta_vecs[i].str);
 	}
 
@@ -1422,10 +1422,10 @@ main(int argc, char *argv[])
 		*kbleds = kbled_vecs[i].val;
 		rc = sys_ioctl(-1, KDGKBLED, (uintptr_t) kbleds);
 		if (rc >= 0) {
-			printf("ioctl(-1, " XLAT_FMT ", [%s]) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", [%s])" RETVAL,
 			       XLAT_ARGS(KDGKBLED), kbled_vecs[i].str);
 		} else {
-			printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+			printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 			       XLAT_ARGS(KDGKBLED), kbleds);
 		}
 	}
@@ -1434,7 +1434,7 @@ main(int argc, char *argv[])
 	/* KDSKBLED */
 	for (size_t i = 0; i < ARRAY_SIZE(kbled_vecs); i++) {
 		sys_ioctl(-1, KDSKBLED, kbled_vecs[i].val);
-		printf("ioctl(-1, " XLAT_FMT ", %s) = " RETVAL,
+		printf("ioctl(-1, " XLAT_FMT ", %s)" RETVAL,
 		       XLAT_ARGS(KDSKBLED), kbled_vecs[i].str);
 	}
 
@@ -1453,19 +1453,19 @@ main(int argc, char *argv[])
 	check_null_invalid(ARG_STR(PIO_UNIMAPCLR));
 
 	sys_ioctl(-1, PIO_UNIMAPCLR, (uintptr_t) umi + 2);
-	printf("ioctl(-1, " XLAT_FMT ", %p) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", %p)" RETVAL,
 	       XLAT_ARGS(PIO_UNIMAPCLR), (char *) umi + 2);
 
 	memset(umi, 0, sizeof(*umi));
 	sys_ioctl(-1, PIO_UNIMAPCLR, (uintptr_t) umi);
 	printf("ioctl(-1, " XLAT_FMT ", {advised_hashsize=0"
-	       ", advised_hashstep=0, advised_hashlevel=0}) = " RETVAL,
+	       ", advised_hashstep=0, advised_hashlevel=0})" RETVAL,
 	       XLAT_ARGS(PIO_UNIMAPCLR));
 
 	fill_memory16(umi, sizeof(*umi));
 	sys_ioctl(-1, PIO_UNIMAPCLR, (uintptr_t) umi);
 	printf("ioctl(-1, " XLAT_FMT ", {advised_hashsize=32960"
-	       ", advised_hashstep=32961, advised_hashlevel=32962}) = " RETVAL,
+	       ", advised_hashstep=32961, advised_hashlevel=32962})" RETVAL,
 	       XLAT_ARGS(PIO_UNIMAPCLR));
 
 
@@ -1487,7 +1487,7 @@ main(int argc, char *argv[])
 
 	/* PIO_FONTRESET */
 	sys_ioctl(-1, PIO_FONTRESET, (kernel_ulong_t) 0xbadc0deddeadface);
-	printf("ioctl(-1, " XLAT_FMT ") = " RETVAL, XLAT_ARGS(PIO_FONTRESET));
+	printf("ioctl(-1, " XLAT_FMT ")" RETVAL, XLAT_ARGS(PIO_FONTRESET));
 
 
 	/* GIO_CMAP */
@@ -1523,7 +1523,7 @@ main(int argc, char *argv[])
 	       " => {width=3134983661, height=4207856382, charcount=3672092141"
 	       ", data=NULL}"
 #endif
-	       ") = " RETVAL, XLAT_ARGS(KDFONTOP));
+	       ")" RETVAL, XLAT_ARGS(KDFONTOP));
 
 	cfo->op = 0xbeefface;
 	cfo->flags = 0x5a1ecafe;;
@@ -1538,7 +1538,7 @@ main(int argc, char *argv[])
 	       " => {width=3134983661, height=4207856382, charcount=3672092141"
 	       ", data=%p}"
 #endif
-	       ") = " RETVAL, XLAT_ARGS(KDFONTOP), cfo
+	       ")" RETVAL, XLAT_ARGS(KDFONTOP), cfo
 #if RETVAL_INJECTED
 	       , cfo
 #endif
@@ -1565,7 +1565,7 @@ main(int argc, char *argv[])
 			printf(" => {width=0, height=0, charcount=0"
 			       ", data=NULL}");
 		}
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 
 		cfo->data = cfo_data_end;
 		for (size_t j = 0; j < 2; j++) {
@@ -1586,7 +1586,7 @@ main(int argc, char *argv[])
 				       ", data=\"\"", j);
 			}
 #endif
-			printf("}) = " RETVAL);
+			printf("})" RETVAL);
 
 		}
 
@@ -1602,7 +1602,7 @@ main(int argc, char *argv[])
 			printf(" => {width=1, height=0, charcount=1, data=%p}",
 			       cfo_data_end - 31);
 		}
-		printf(") = " RETVAL);
+		printf(")" RETVAL);
 
 		cfo->data = cfo_data_end - 32;
 		sys_ioctl(-1, KDFONTOP, (uintptr_t) cfo);
@@ -1618,7 +1618,7 @@ main(int argc, char *argv[])
 			print_quoted_hex(cfo_data_end - 32, 32);
 
 		}
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 
 		cfo->charcount = 32;
 		cfo->data = cfo_data_end - 1023;
@@ -1643,7 +1643,7 @@ main(int argc, char *argv[])
 #endif
 
 		}
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 
 		cfo->data = cfo_data_end - 1024;
 		sys_ioctl(-1, KDFONTOP, (uintptr_t) cfo);
@@ -1665,7 +1665,7 @@ main(int argc, char *argv[])
 			printf("...");
 #endif
 		}
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 
 		cfo->charcount = 256;
 		cfo->data = cfo_data_end - 1025;
@@ -1685,7 +1685,7 @@ main(int argc, char *argv[])
 			printf("...");
 
 		}
-		printf("}) = " RETVAL);
+		printf("})" RETVAL);
 	}
 
 	cfo->op = 2;
@@ -1696,7 +1696,7 @@ main(int argc, char *argv[])
 #if RETVAL_INJECTED
 	       " => {width=1, height=0}"
 #endif
-	       ") = " RETVAL,
+	       ")" RETVAL,
 	       XLAT_ARGS(KDFONTOP), XLAT_ARGS(KD_FONT_OP_SET_DEFAULT));
 
 	cfo->data = cfo_data_end - 1;
@@ -1707,7 +1707,7 @@ main(int argc, char *argv[])
 #if RETVAL_INJECTED
 	       " => {width=1, height=0}"
 #endif
-	       ") = " RETVAL,
+	       ")" RETVAL,
 	       XLAT_ARGS(KDFONTOP), XLAT_ARGS(KD_FONT_OP_SET_DEFAULT));
 
 	cfo->data[0] = 'x';
@@ -1717,7 +1717,7 @@ main(int argc, char *argv[])
 #if RETVAL_INJECTED
 	       " => {width=1, height=0}"
 #endif
-	       ") = " RETVAL,
+	       ")" RETVAL,
 	       XLAT_ARGS(KDFONTOP), XLAT_ARGS(KD_FONT_OP_SET_DEFAULT),
 	       cfo_data_end - 1);
 
@@ -1735,7 +1735,7 @@ main(int argc, char *argv[])
 #if RETVAL_INJECTED
 		       " => {width=3405692655, height=3198664421}"
 #endif
-		       ") = " RETVAL,
+		       ")" RETVAL,
 		       XLAT_ARGS(KDFONTOP), XLAT_ARGS(KD_FONT_OP_SET_DEFAULT),
 		       j ? "..." : "");
 
@@ -1745,7 +1745,7 @@ main(int argc, char *argv[])
 	cfo->op = 3;
 	cfo->height = 0;
 	sys_ioctl(-1, KDFONTOP, (uintptr_t) cfo);
-	printf("ioctl(-1, " XLAT_FMT ", {op=" XLAT_FMT ", height=0}) = " RETVAL,
+	printf("ioctl(-1, " XLAT_FMT ", {op=" XLAT_FMT ", height=0})" RETVAL,
 	       XLAT_ARGS(KDFONTOP), XLAT_ARGS(KD_FONT_OP_COPY));
 
 

@@ -101,7 +101,7 @@ main(int argc, char **argv)
 	 */
 	pidns_print_leader();
 	errno = EBADF;
-	printf("ioctl(-1, " XLAT_FMT ", NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, " XLAT_FMT ", NULL)" RVAL_EBADF,
 	       XLAT_ARGS_U(SECCOMP_IOCTL_NOTIF_RECV));
 	fflush(NULL);
 	sys_ioctl(-1, SECCOMP_IOCTL_NOTIF_RECV, 0);

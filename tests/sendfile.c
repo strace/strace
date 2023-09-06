@@ -35,7 +35,7 @@ main(void)
 	assert(syscall(__NR_sendfile, 0, 1, NULL, page_size) == -1);
 	if (EBADF != errno)
 		perror_msg_and_skip("sendfile");
-	printf("sendfile(0, 1, NULL, %u) = -1 EBADF (%m)\n", page_size);
+	printf("sendfile(0, 1, NULL, %u)" RVAL_EBADF, page_size);
 
 	unsigned int file_size = 0;
 	socklen_t optlen = sizeof(file_size);

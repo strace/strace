@@ -189,7 +189,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 
 		errno = saved_errno;
 		printf(", field=" XLAT_FMT ", bytesperline=%u, sizeimage=%u"
-		       ", colorspace=" XLAT_FMT "}}) = -1 EBADF (%m)\n",
+		       ", colorspace=" XLAT_FMT "}})" RVAL_EBADF,
 		       XLAT_ARGS(V4L2_FIELD_NONE),
 		       f->fmt.pix.bytesperline,
 		       f->fmt.pix.sizeimage,
@@ -244,7 +244,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			);
 		}
 		errno = saved_errno;
-		printf("], num_planes=%u}}) = -1 EBADF (%m)\n",
+		printf("], num_planes=%u}})" RVAL_EBADF,
 		       f->fmt.pix_mp.num_planes);
 		break;
 	}
@@ -274,11 +274,9 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			printf(", ... /* %p */", f->fmt.win.clips + 2);
 		errno = saved_errno;
 		printf("], clipcount=%u, bitmap=%p"
-		       ", global_alpha=%#x"
-		       "}}) = -1 EBADF (%m)\n",
+		       ", global_alpha=%#x}})" RVAL_EBADF,
 		       f->fmt.win.clipcount, f->fmt.win.bitmap,
-		       f->fmt.win.global_alpha
-		       );
+		       f->fmt.win.global_alpha);
 		break;
 	case V4L2_BUF_TYPE_VBI_CAPTURE:
 	case V4L2_BUF_TYPE_VBI_OUTPUT:
@@ -307,8 +305,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 
 		errno = saved_errno;
 		printf(", start=[%d, %d], count=[%u, %u]"
-		       ", flags=" XLAT_FMT "}})"
-		       " = -1 EBADF (%m)\n",
+		       ", flags=" XLAT_FMT "}})" RVAL_EBADF,
 		       f->fmt.vbi.start[0], f->fmt.vbi.start[1],
 		       f->fmt.vbi.count[0], f->fmt.vbi.count[1],
 		       XLAT_ARGS(V4L2_VBI_INTERLACED));
@@ -339,7 +336,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 			printf("]");
 		}
 		errno = saved_errno;
-		printf("], io_size=%u}}) = -1 EBADF (%m)\n",
+		printf("], io_size=%u}})" RVAL_EBADF,
 		       f->fmt.sliced.io_size);
 		break;
 	}
@@ -368,7 +365,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #endif /* XLAT_RAW */
 
 		errno = saved_errno;
-		printf(", buffersize=%u}}) = -1 EBADF (%m)\n"
+		printf(", buffersize=%u}})" RVAL_EBADF
 		       , sizeof(f->fmt.sdr.buffersize == sizeof(uint32_t))
 			? f->fmt.sdr.buffersize : ((uint32_t *) &f->fmt.sdr)[1]
 		       );
@@ -397,7 +394,7 @@ dprint_ioctl_v4l2(struct v4l2_format *const f,
 #endif /* XLAT_RAW */
 
 		errno = saved_errno;
-		printf(", buffersize=%u}}) = -1 EBADF (%m)\n",
+		printf(", buffersize=%u}})" RVAL_EBADF,
 		       f->fmt.meta.buffersize);
 		break;
 	}
@@ -471,7 +468,7 @@ main(void)
 				ioctl(-1, ioc, 0);
 				printf("ioctl(-1, " NABBR("%#x") VERB(" /* ")
 				       NRAW("_IOC(%s, 0x56, %#x, %#zx)")
-				       VERB(" */") ", 0) = -1 EBADF (%m)\n"
+				       VERB(" */") ", 0)" RVAL_EBADF
 #if XLAT_RAW || XLAT_VERBOSE
 				       , ioc
 #endif
@@ -484,7 +481,7 @@ main(void)
 				      (unsigned long) 0xbadc0deddeadc0deULL);
 				printf("ioctl(-1, " NABBR("%#x") VERB(" /* ")
 				       NRAW("_IOC(%s, 0x56, %#x, %#zx)")
-				       VERB(" */") ", %#lx) = -1 EBADF (%m)\n",
+				       VERB(" */") ", %#lx)" RVAL_EBADF,
 #if XLAT_RAW || XLAT_VERBOSE
 				       ioc,
 #endif
@@ -565,28 +562,28 @@ main(void)
 
 	for (size_t i = 0; i < ARRAY_SIZE(unsupp_cmds); i++) {
 		ioctl(-1, unsupp_cmds[i].cmd, 0);
-		printf("ioctl(-1, " XLAT_FMT ", 0) = -1 EBADF (%m)\n",
+		printf("ioctl(-1, " XLAT_FMT ", 0)" RVAL_EBADF,
 		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str));
 
 		ioctl(-1, unsupp_cmds[i].cmd,
 		      (unsigned long) 0xbadc0deddeadc0deULL);
-		printf("ioctl(-1, " XLAT_FMT ", %#lx) = -1 EBADF (%m)\n",
+		printf("ioctl(-1, " XLAT_FMT ", %#lx)" RVAL_EBADF,
 		       XLAT_SEL(unsupp_cmds[i].cmd, unsupp_cmds[i].str),
 		       (unsigned long) 0xbadc0deddeadc0deULL);
 	}
 
 	/* VIDIOC_QUERYCAP */
 	ioctl(-1, VIDIOC_QUERYCAP, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYCAP));
 
 	ioctl(-1, VIDIOC_QUERYCAP, page);
-	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %p)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYCAP), page);
 
 	/* VIDIOC_ENUM_FMT */
 	ioctl(-1, VIDIOC_ENUM_FMT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUM_FMT));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_fmtdesc, p_fmtdesc);
@@ -594,71 +591,71 @@ main(void)
 	p_fmtdesc->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	ioctl(-1, VIDIOC_ENUM_FMT, p_fmtdesc);
 	printf("ioctl(-1, %s, {index=%u, type=" XLAT_FMT
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUM_FMT), p_fmtdesc->index,
 	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE));
 
 	/* VIDIOC_G_FMT */
 	ioctl(-1, VIDIOC_G_FMT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_format, p_format);
 
 	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE));
 	p_format->type = V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE));
 	p_format->type = V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY));
 	p_format->type = V4L2_BUF_TYPE_VIDEO_OVERLAY;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OVERLAY));
 
 	p_format->type = V4L2_BUF_TYPE_VBI_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_VBI_CAPTURE));
 	p_format->type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_SLICED_VBI_CAPTURE));
 	p_format->type = V4L2_BUF_TYPE_SDR_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_SDR_CAPTURE));
 	p_format->type = V4L2_BUF_TYPE_SDR_OUTPUT;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_SDR_OUTPUT));
 	p_format->type = V4L2_BUF_TYPE_META_CAPTURE;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_META_CAPTURE));
 	p_format->type = V4L2_BUF_TYPE_META_OUTPUT;
 	ioctl(-1, VIDIOC_G_FMT, p_format);
-	printf("ioctl(-1, %s, {type=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {type=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FMT),
 	       XLAT_ARGS(V4L2_BUF_TYPE_META_OUTPUT));
 	/* VIDIOC_S_FMT */
 	ioctl(-1, VIDIOC_S_FMT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_FMT));
 
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT);
@@ -699,7 +696,7 @@ main(void)
 	print_ioctl_v4l2(p_format, VIDIOC_S_FMT, V4L2_BUF_TYPE_META_OUTPUT);
 	/* VIDIOC_TRY_FMT */
 	ioctl(-1, VIDIOC_TRY_FMT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_TRY_FMT));
 
 	init_v4l2_format(p_format, V4L2_BUF_TYPE_VIDEO_OUTPUT);
@@ -742,12 +739,12 @@ main(void)
 		page_end - sizeof(*p_v4l2_format);
 	ioctl(-1, VIDIOC_TRY_FMT, p_v4l2_format);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_TRY_FMT), p_v4l2_format->type);
 
 	/* VIDIOC_REQBUFS */
 	ioctl(-1, VIDIOC_REQBUFS, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_REQBUFS));
 
 	struct v4l2_requestbuffers *const p_v4l2_requestbuffers =
@@ -756,7 +753,7 @@ main(void)
 	printf("ioctl(-1, %s, {type=%#x"
 	       NRAW(" /* V4L2_BUF_TYPE_??? */")
 	       ", memory=%#x" NRAW(" /* V4L2_MEMORY_??? */") ", count=%u})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_REQBUFS),
 	       p_v4l2_requestbuffers->type,
 	       p_v4l2_requestbuffers->memory,
@@ -764,57 +761,57 @@ main(void)
 
 	/* VIDIOC_QUERYBUF */
 	ioctl(-1, VIDIOC_QUERYBUF, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYBUF));
 
 	kernel_v4l2_buffer_t *const p_v4l2_buffer =
 		page_end - sizeof(*p_v4l2_buffer);
 	ioctl(-1, VIDIOC_QUERYBUF, p_v4l2_buffer);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
-	       ", index=%u}) = -1 EBADF (%m)\n",
+	       ", index=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYBUF),
 	       p_v4l2_buffer->type, p_v4l2_buffer->index);
 
 	/* VIDIOC_QBUF */
 	ioctl(-1, VIDIOC_QBUF, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QBUF));
 
 	ioctl(-1, VIDIOC_QBUF, p_v4l2_buffer);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
-	       ", index=%u}) = -1 EBADF (%m)\n",
+	       ", index=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QBUF),
 	       p_v4l2_buffer->type, p_v4l2_buffer->index);
 
 	/* VIDIOC_DQBUF */
 	ioctl(-1, VIDIOC_DQBUF, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_DQBUF));
 
 	ioctl(-1, VIDIOC_DQBUF, p_v4l2_buffer);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_DQBUF), p_v4l2_buffer->type);
 
 	/* VIDIOC_G_FBUF */
 	ioctl(-1, VIDIOC_G_FBUF, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FBUF));
 
 	ioctl(-1, VIDIOC_G_FBUF, page);
-	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %p)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_FBUF), page);
 
 	/* VIDIOC_S_FBUF */
 	ioctl(-1, VIDIOC_S_FBUF, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_FBUF));
 
 	struct v4l2_framebuffer *const p_v4l2_framebuffer =
 		page_end - sizeof(*p_v4l2_framebuffer);
 	ioctl(-1, VIDIOC_S_FBUF, p_v4l2_framebuffer);
 	printf("ioctl(-1, %s, {capability=%#x"
-	       ", flags=%#x, base=%p}) = -1 EBADF (%m)\n",
+	       ", flags=%#x, base=%p})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_FBUF),
 	       p_v4l2_framebuffer->capability,
 	       p_v4l2_framebuffer->flags,
@@ -822,45 +819,45 @@ main(void)
 
 	/* VIDIOC_STREAMON */
 	ioctl(-1, VIDIOC_STREAMON, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_STREAMON));
 
 	int *const p_int = page_end - sizeof(int);
 	ioctl(-1, VIDIOC_STREAMON, p_int);
 	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "])"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_STREAMON), *p_int);
 
 	/* VIDIOC_STREAMOFF */
 	ioctl(-1, VIDIOC_STREAMOFF, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_STREAMOFF));
 
 	ioctl(-1, VIDIOC_STREAMOFF, p_int);
 	printf("ioctl(-1, %s, [%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "])"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_STREAMOFF), *p_int);
 
 	/* VIDIOC_G_PARM */
 	ioctl(-1, VIDIOC_G_PARM, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_PARM));
 
 	struct v4l2_streamparm *const p_v4l2_streamparm =
 		page_end - sizeof(*p_v4l2_streamparm);
 	ioctl(-1, VIDIOC_G_PARM, p_v4l2_streamparm);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_PARM), p_v4l2_streamparm->type);
 
 	/* VIDIOC_S_PARM */
 	ioctl(-1, VIDIOC_S_PARM, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_PARM));
 
 	ioctl(-1, VIDIOC_S_PARM, p_v4l2_streamparm);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_PARM), p_v4l2_streamparm->type);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_streamparm, p_streamparm);
@@ -873,7 +870,7 @@ main(void)
 	printf("ioctl(-1, %s, {type=" XLAT_FMT
 	       ", parm.capture={capability=" XLAT_FMT
 	       ", capturemode=" XLAT_FMT ", timeperframe=%u/%u"
-	       ", extendedmode=%#x, readbuffers=%u}}) = -1 EBADF (%m)\n",
+	       ", extendedmode=%#x, readbuffers=%u}})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_CAPTURE),
 	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME), XLAT_ARGS(V4L2_MODE_HIGHQUALITY),
 	       p_streamparm->parm.capture.timeperframe.numerator,
@@ -885,7 +882,7 @@ main(void)
 	printf("ioctl(-1, %s, {type=" XLAT_FMT
 	       ", parm.output={capability=" XLAT_FMT
 	       ", outputmode=0, timeperframe=%u/%u"
-	       ", extendedmode=%#x, writebuffers=%u}}) = -1 EBADF (%m)\n",
+	       ", extendedmode=%#x, writebuffers=%u}})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_PARM), XLAT_ARGS(V4L2_BUF_TYPE_VIDEO_OUTPUT),
 	       XLAT_ARGS(V4L2_CAP_TIMEPERFRAME),
 	       p_streamparm->parm.output.timeperframe.numerator,
@@ -893,48 +890,48 @@ main(void)
 
 	/* VIDIOC_G_STD */
 	ioctl(-1, VIDIOC_G_STD, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_STD));
 
 	ioctl(-1, VIDIOC_G_STD, page);
-	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %p)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_STD), page);
 
 	/* VIDIOC_S_STD */
 	ioctl(-1, VIDIOC_S_STD, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_STD));
 
 	long long *const p_longlong = page_end - sizeof(*p_longlong);
 	ioctl(-1, VIDIOC_S_STD, p_longlong);
-	printf("ioctl(-1, %s, [%#llx]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%#llx])" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_STD), *p_longlong);
 
 	/* VIDIOC_ENUMSTD */
 	ioctl(-1, VIDIOC_ENUMSTD, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUMSTD));
 
 	struct v4l2_standard *const p_v4l2_standard =
 		page_end - sizeof(*p_v4l2_standard);
 	ioctl(-1, VIDIOC_ENUMSTD, p_v4l2_standard);
-	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {index=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUMSTD), p_v4l2_standard->index);
 
 	/* VIDIOC_ENUMINPUT */
 	ioctl(-1, VIDIOC_ENUMINPUT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUMINPUT));
 
 	struct v4l2_input *const p_v4l2_input =
 		page_end - sizeof(*p_v4l2_input);
 	ioctl(-1, VIDIOC_ENUMINPUT, p_v4l2_input);
-	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {index=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUMINPUT), p_v4l2_input->index);
 
 	/* VIDIOC_G_CTRL */
 	ioctl(-1, VIDIOC_G_CTRL, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_CTRL));
 
 	static const struct v4l2_control v4l2_control_vals[] = {
@@ -958,17 +955,17 @@ main(void)
 		page_end - sizeof(*p_v4l2_control);
 	ioctl(-1, VIDIOC_G_CTRL, p_v4l2_control);
 	printf("ioctl(-1, %s, {id=%#x" NRAW(" /* V4L2_CID_??? */")
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_CTRL), p_v4l2_control->id);
 
 	/* VIDIOC_S_CTRL */
 	ioctl(-1, VIDIOC_S_CTRL, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_CTRL));
 
 	ioctl(-1, VIDIOC_S_CTRL, p_v4l2_control);
 	printf("ioctl(-1, %s, {id=%#x" NRAW(" /* V4L2_CID_??? */")
-	       ", value=%d}) = -1 EBADF (%m)\n",
+	       ", value=%d})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_CTRL),
 	       p_v4l2_control->id, p_v4l2_control->value);
 
@@ -976,28 +973,28 @@ main(void)
 		struct v4l2_control v4l2_c = v4l2_control_vals[i];
 
 		ioctl(-1, VIDIOC_G_CTRL, &v4l2_c);
-		printf("ioctl(-1, %s, {id=%s}) = -1 EBADF (%m)\n",
+		printf("ioctl(-1, %s, {id=%s})" RVAL_EBADF,
 		       XLAT_STR(VIDIOC_G_CTRL), id_strs[i]);
 
 		ioctl(-1, VIDIOC_S_CTRL, &v4l2_c);
-		printf("ioctl(-1, %s, {id=%s, value=%d}) = -1 EBADF (%m)\n",
+		printf("ioctl(-1, %s, {id=%s, value=%d})" RVAL_EBADF,
 		       XLAT_STR(VIDIOC_S_CTRL), id_strs[i], v4l2_c.value);
 	}
 
 	/* VIDIOC_G_TUNER */
 	ioctl(-1, VIDIOC_G_TUNER, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_TUNER));
 
 	struct v4l2_tuner *const p_v4l2_tuner =
 		page_end - sizeof(*p_v4l2_tuner);
 	ioctl(-1, VIDIOC_G_TUNER, p_v4l2_tuner);
-	printf("ioctl(-1, %s, {index=%u}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {index=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_TUNER), p_v4l2_tuner->index);
 
 	/* VIDIOC_S_TUNER */
 	ioctl(-1, VIDIOC_S_TUNER, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_TUNER));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_tuner, p_tuner);
@@ -1016,7 +1013,7 @@ main(void)
 	       ", type=" XLAT_FMT ", capability=" XLAT_FMT
 	       ", rangelow=%u, rangehigh=%u"
 	       ", rxsubchans=" XLAT_FMT ", audmode=" XLAT_FMT
-	       ", signal=%d, afc=%d}) = -1 EBADF (%m)\n",
+	       ", signal=%d, afc=%d})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_TUNER), p_tuner->index,
 	       XLAT_ARGS(V4L2_TUNER_RADIO), XLAT_ARGS(V4L2_TUNER_CAP_LOW),
 	       p_tuner->rangelow, p_tuner->rangehigh,
@@ -1025,7 +1022,7 @@ main(void)
 
 	/* VIDIOC_QUERYCTRL */
 	ioctl(-1, VIDIOC_QUERYCTRL, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYCTRL));
 
 	struct v4l2_queryctrl *const p_v4l2_queryctrl =
@@ -1037,7 +1034,7 @@ main(void)
 #else
 	       XLAT_FMT "|%#x /* V4L2_CID_??? */"
 #endif
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYCTRL),
 #if XLAT_RAW
 	       p_v4l2_queryctrl->id
@@ -1050,59 +1047,59 @@ main(void)
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_queryctrl, p_queryctrl);
 	p_queryctrl->id = V4L2_CID_SATURATION;
 	ioctl(-1, VIDIOC_QUERYCTRL, p_queryctrl);
-	printf("ioctl(-1, %s, {id=" XLAT_FMT "}) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, {id=" XLAT_FMT "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERYCTRL), XLAT_ARGS(V4L2_CID_SATURATION));
 
 	/* VIDIOC_G_INPUT */
 	ioctl(-1, VIDIOC_G_INPUT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_INPUT));
 
 	ioctl(-1, VIDIOC_G_INPUT, page);
-	printf("ioctl(-1, %s, %p) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, %p)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_INPUT), page);
 
 	/* VIDIOC_S_INPUT */
 	ioctl(-1, VIDIOC_S_INPUT, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_INPUT));
 
 	ioctl(-1, VIDIOC_S_INPUT, p_int);
-	printf("ioctl(-1, %s, [%u]) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, [%u])" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_INPUT), *p_int);
 
 	/* VIDIOC_CROPCAP */
 	ioctl(-1, VIDIOC_CROPCAP, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_CROPCAP));
 
 	struct v4l2_cropcap *const p_v4l2_cropcap =
 		page_end - sizeof(*p_v4l2_cropcap);
 	ioctl(-1, VIDIOC_CROPCAP, p_v4l2_cropcap);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_CROPCAP), p_v4l2_cropcap->type);
 
 	/* VIDIOC_G_CROP */
 	ioctl(-1, VIDIOC_G_CROP, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_CROP));
 
 	struct v4l2_crop *const p_v4l2_crop =
 		page_end - sizeof(*p_v4l2_crop);
 	ioctl(-1, VIDIOC_G_CROP, p_v4l2_crop);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */") "})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_CROP), p_v4l2_crop->type);
 
 	/* VIDIOC_S_CROP */
 	ioctl(-1, VIDIOC_S_CROP, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_CROP));
 
 	ioctl(-1, VIDIOC_S_CROP, p_v4l2_crop);
 	printf("ioctl(-1, %s, {type=%#x" NRAW(" /* V4L2_BUF_TYPE_??? */")
-	       ", c={left=%d, top=%d, width=%u, height=%u}}) = -1 EBADF (%m)\n",
+	       ", c={left=%d, top=%d, width=%u, height=%u}})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_CROP),
 	       p_v4l2_crop->type,
 	       p_v4l2_crop->c.left,
@@ -1112,7 +1109,7 @@ main(void)
 
 	/* VIDIOC_S_EXT_CTRLS */
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_ext_controls, p_ext_controls);
@@ -1121,7 +1118,7 @@ main(void)
 	p_ext_controls->controls = (void *) -2UL;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_USER),
 	       p_ext_controls->count);
 
@@ -1129,7 +1126,7 @@ main(void)
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT
-	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       ", count=%u, controls=%p})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_DETECT),
 	       p_ext_controls->count, p_ext_controls->controls);
 
@@ -1138,7 +1135,7 @@ main(void)
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s"
 	       ", {ctrl_class=0x160000" NRAW(" /* V4L2_CTRL_CLASS_??? */")
-	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       ", count=%u, controls=%p})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS),
 	       p_ext_controls->count, p_ext_controls->controls);
 
@@ -1146,7 +1143,7 @@ main(void)
 	p_ext_controls->count = magic;
 	ioctl(-1, VIDIOC_S_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT
-	       ", count=%u, controls=%p}) = -1 EBADF (%m)\n",
+	       ", count=%u, controls=%p})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_CODEC),
 	       p_ext_controls->count, p_ext_controls->controls);
 
@@ -1168,7 +1165,7 @@ main(void)
 	       "]} => {controls="
 	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
 	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
-	       "], error_idx=%u}) = -1 EBADF (%m)\n",
+	       "], error_idx=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_CODEC),
 	       p_ext_controls->count, XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
@@ -1183,7 +1180,7 @@ main(void)
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls="
 	       "[{id=" XLAT_FMT ", size=0, value=%d, value64=%lld}"
 	       ", {id=" XLAT_FMT ", size=2, string=\"\\377\\377\"}"
-	       ", ... /* %p */]}) = -1 EBADF (%m)\n",
+	       ", ... /* %p */]})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_S_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_CODEC),
 	       p_ext_controls->count, XLAT_ARGS(V4L2_CID_BRIGHTNESS),
 	       p_ext_controls->controls[0].value,
@@ -1192,7 +1189,7 @@ main(void)
 
 	/* VIDIOC_TRY_EXT_CTRLS */
 	ioctl(-1, VIDIOC_TRY_EXT_CTRLS, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_TRY_EXT_CTRLS));
 
 	p_ext_controls->ctrl_class = V4L2_CTRL_CLASS_USER;
@@ -1200,24 +1197,24 @@ main(void)
 	p_ext_controls->controls = (void *) -2UL;
 	ioctl(-1, VIDIOC_TRY_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls=%p})"
-	       " = -1 EBADF (%m)\n",
+	       RVAL_EBADF,
 	       XLAT_STR(VIDIOC_TRY_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_USER),
 	       p_ext_controls->count, p_ext_controls->controls);
 
 	/* VIDIOC_G_EXT_CTRLS */
 	ioctl(-1, VIDIOC_G_EXT_CTRLS, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_EXT_CTRLS));
 
 	ioctl(-1, VIDIOC_G_EXT_CTRLS, p_ext_controls);
 	printf("ioctl(-1, %s, {ctrl_class=" XLAT_FMT ", count=%u, controls=%p"
-	       ", error_idx=%u}) = -1 EBADF (%m)\n",
+	       ", error_idx=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_G_EXT_CTRLS), XLAT_ARGS(V4L2_CTRL_CLASS_USER),
 	       p_ext_controls->count, p_ext_controls->controls,
 	       p_ext_controls->error_idx);
 
 	ioctl(-1, VIDIOC_ENUM_FRAMESIZES, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct v4l2_frmsizeenum, p_frmsizeenum);
@@ -1231,7 +1228,7 @@ main(void)
 #else /* !XLAT_RAW */
 	       "v4l2_fourcc('%c', '\\%c', '\\%c', '\\x%x')"
 #endif /* XLAT_RAW */
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUM_FRAMESIZES), p_frmsizeenum->index,
 #if XLAT_RAW
 	       cc[3], cc[2], cc[1], cc[0]
@@ -1241,7 +1238,7 @@ main(void)
 	       );
 
 	ioctl(-1, VIDIOC_ENUM_FRAMEINTERVALS, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS));
 
 	struct v4l2_frmivalenum *const p_v4l2_frmivalenum =
@@ -1253,7 +1250,7 @@ main(void)
 #else /* !XLAT_RAW */
 	       "v4l2_fourcc('\\x%x', '\\x%x', '\\x%x', '\\x%x')"
 #endif /* XLAT_RAW */
-	       ", width=%u, height=%u}) = -1 EBADF (%m)\n",
+	       ", width=%u, height=%u})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_ENUM_FRAMEINTERVALS), p_v4l2_frmivalenum->index,
 #if XLAT_RAW
 	       p_v4l2_frmivalenum->pixel_format,
@@ -1267,7 +1264,7 @@ main(void)
 	       p_v4l2_frmivalenum->height);
 
 	ioctl(-1, VIDIOC_CREATE_BUFS, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_CREATE_BUFS));
 
 	struct v4l2_create_buffers *const p_v4l2_create_buffers =
@@ -1275,14 +1272,14 @@ main(void)
 	ioctl(-1, VIDIOC_CREATE_BUFS, p_v4l2_create_buffers);
 	printf("ioctl(-1, %s, {count=%u, memory=%#x"
 	       NRAW(" /* V4L2_MEMORY_??? */") ", format={type=%#x"
-	       NRAW(" /* V4L2_BUF_TYPE_??? */") "}}) = -1 EBADF (%m)\n",
+	       NRAW(" /* V4L2_BUF_TYPE_??? */") "}})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_CREATE_BUFS),
 	       p_v4l2_create_buffers->count,
 	       p_v4l2_create_buffers->memory,
 	       p_v4l2_create_buffers->format.type);
 
 	ioctl(-1, VIDIOC_QUERY_EXT_CTRL, 0);
-	printf("ioctl(-1, %s, NULL) = -1 EBADF (%m)\n",
+	printf("ioctl(-1, %s, NULL)" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL));
 
 	struct v4l2_query_ext_ctrl *const p_v4l2_query_ext_ctrl =
@@ -1298,7 +1295,7 @@ main(void)
 	       NRAW("V4L2_CTRL_FLAG_NEXT_CTRL") VERB(" */")
 	       NRAW("|0x1b9a9998 /* V4L2_CID_??? */")
 #endif
-	       "}) = -1 EBADF (%m)\n",
+	       "})" RVAL_EBADF,
 	       XLAT_STR(VIDIOC_QUERY_EXT_CTRL));
 
 	puts("+++ exited with 0 +++");

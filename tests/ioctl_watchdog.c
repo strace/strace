@@ -18,8 +18,6 @@
 #include "xlat/watchdog_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
-#define RVAL_EBADF " = -1 EBADF (%m)\n"
-
 int
 main(void)
 {

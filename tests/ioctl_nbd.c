@@ -18,8 +18,6 @@
 #include "xlat/nbd_ioctl_flags.h"
 #undef XLAT_MACROS_ONLY
 
-#define RVAL_EBADF " = -1 EBADF (%m)\n"
-
 int
 main(void)
 {
