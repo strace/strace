@@ -47,13 +47,19 @@ get_cmsghdr(void *const page, const size_t len)
 static void
 print_fds(const struct cmsghdr *const cmsg, const size_t cmsg_len)
 {
-	size_t nfd = cmsg_len > CMSG_LEN(0)
-		     ? (cmsg_len - CMSG_LEN(0)) / sizeof(int) : 0;
-	if (!nfd)
+	if (cmsg_len <= CMSG_LEN(0))
 		return;
-
-	printf(", cmsg_data=[");
+	const size_t data_len = cmsg_len - CMSG_LEN(0);
+	size_t nfd = data_len / sizeof(int);
 	int *fdp = (int *) CMSG_DATA(cmsg);
+
+	printf(", cmsg_data=");
+	if (!nfd) {
+		print_quoted_hex(fdp, data_len);
+		return;
+	}
+
+	printf("[");
 	for (size_t i = 0; i < nfd; ++i) {
 		if (i)
 			printf(", ");
@@ -587,6 +593,26 @@ test_unknown_type(struct msghdr *const mh,
 	       ", 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_level_str, cmsg->cmsg_type,
 	       cmsg_type_str, (unsigned) mh->msg_controllen, rc, errno2name());
+
+	unsigned char sym = 'A';
+	cmsg = get_cmsghdr(page, CMSG_LEN(sizeof(sym)));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(sym));
+	cmsg->cmsg_level = cmsg_level;
+	cmsg->cmsg_type = 0xfacefeed;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = cmsg->cmsg_len;
+
+	memcpy(CMSG_DATA(cmsg), &sym, sizeof(sym));
+
+	rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u, cmsg_level=%s"
+	       ", cmsg_type=%#x /* %s */, cmsg_data=\"\\x%x\"}]"
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len, cmsg_level_str,
+	       cmsg->cmsg_type, cmsg_type_str,
+	       (unsigned) sym, (unsigned) mh->msg_controllen, sprintrc(rc));
 }
 
 static void
@@ -951,6 +977,26 @@ test_unknown_level(struct msghdr *const mh, void *const page)
 	       ", 0) = %d %s (%m)\n",
 	       (unsigned) cmsg->cmsg_len, "SOL_TCP", cmsg->cmsg_type,
 	       (unsigned) mh->msg_controllen, rc, errno2name());
+
+	unsigned char sym = 'A';
+	cmsg = get_cmsghdr(page, CMSG_LEN(sizeof(sym)));
+	cmsg->cmsg_len = CMSG_LEN(sizeof(sym));
+	cmsg->cmsg_level = SOL_TCP;
+	cmsg->cmsg_type = 0xdeadbeef;
+
+	mh->msg_control = cmsg;
+	mh->msg_controllen = cmsg->cmsg_len;
+
+	memcpy(CMSG_DATA(cmsg), &sym, sizeof(sym));
+
+	rc = sendmsg(-1, mh, 0);
+	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
+	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u, cmsg_level=%s"
+	       ", cmsg_type=%#x, cmsg_data=\"\\x%x\"}]"
+	       ", msg_controllen=%u, msg_flags=0}"
+	       ", 0) = %s\n",
+	       (unsigned) cmsg->cmsg_len, "SOL_TCP", cmsg->cmsg_type,
+	       (unsigned) sym, (unsigned) mh->msg_controllen, sprintrc(rc));
 }
 
 static void
