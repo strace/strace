@@ -25,7 +25,7 @@ main(void)
 {
 	syscall(__NR_timer_settime, 0xdefaced, TIMER_ABSTIME, NULL, NULL);
 	printf("timer_settime(%d, TIMER_ABSTIME, NULL, NULL)"
-	       " = -1 EINVAL (%m)\n", 0xdefaced);
+	       RVAL_EINVAL, 0xdefaced);
 
 	long rc;
 	int tid;

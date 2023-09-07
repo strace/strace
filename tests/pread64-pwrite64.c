@@ -145,7 +145,7 @@ main(void)
 	rc = pwrite(1, nil, 1, -3);
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1, returned %ld", rc);
-	tprintf("pwrite64(1, \"\\0\", 1, -3) = -1 EINVAL (%m)\n");
+	tprintf("pwrite64(1, \"\\0\", 1, -3)" RVAL_EINVAL);
 	dump_str(nil, 1);
 
 	rc = pwrite(1, w, w_len, 0);
@@ -170,7 +170,7 @@ main(void)
 	rc = pread(0, efault, 2, -7);
 	if (rc != -1)
 		perror_msg_and_fail("pread64: expected -1, returned %ld", rc);
-	tprintf("pread64(0, %p, 2, -7) = -1 EINVAL (%m)\n", efault);
+	tprintf("pread64(0, %p, 2, -7)" RVAL_EINVAL, efault);
 
 	rc = pread(0, r0, r0_len, 0);
 	if (rc != (int) r0_len)

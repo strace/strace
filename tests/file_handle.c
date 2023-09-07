@@ -189,7 +189,7 @@ main(void)
 	if (EINVAL != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0}, %p"
-	       ", AT_SYMLINK_FOLLOW|0x1) = -1 EINVAL (%m)\n",
+	       ", AT_SYMLINK_FOLLOW|0x1)" RVAL_EINVAL,
 	       my_secontext, "name_to_handle_at",
 	       path, path_secontext,
 	       &mount_id);

@@ -68,7 +68,7 @@ main(void)
 	for (; set_size; set_size >>= 1, k_set += set_size) {
 		if (!k_sigpending(k_set, set_size))
 			break;
-		tprintf("rt_sigpending(%p, %u) = -1 EINVAL (%m)\n",
+		tprintf("rt_sigpending(%p, %u)" RVAL_EINVAL,
 			k_set, set_size);
 	}
 	if (!set_size)

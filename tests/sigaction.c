@@ -118,7 +118,7 @@ main(void)
 	       (unsigned long) old_act + 2);
 
 	k_sigaction(addr, 0, 0);
-	printf("sigaction(%d, NULL, NULL) = -1 EINVAL (%m)\n", ADDR_INT);
+	printf("sigaction(%d, NULL, NULL)" RVAL_EINVAL, ADDR_INT);
 
 	memset(new_act, 0, sizeof(*new_act));
 

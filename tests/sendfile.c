@@ -78,7 +78,7 @@ main(void)
 
 	*p_off = (typeof(*p_off)) 0xcafef00dfacefeedULL;
 	assert(syscall(__NR_sendfile, sv[1], reg_in, p_off, 1) == -1);
-	printf("sendfile(%d, %d, [%llu], 1) = -1 EINVAL (%m)\n",
+	printf("sendfile(%d, %d, [%llu], 1)" RVAL_EINVAL,
 	       sv[1], reg_in, (unsigned long long) *p_off);
 
 	*p_off = 0xdefaced;

@@ -79,7 +79,7 @@ main(void)
 	*p_off = 0xcafef00dfacefeedULL;
 	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1) == -1);
 	printf("sendfile64(%d, %d, [14627392582579060461], 1)"
-		" = -1 EINVAL (%m)\n", sv[1], reg_in);
+		RVAL_EINVAL, sv[1], reg_in);
 
 	*p_off = 0xfacefeed;
 	assert(syscall(__NR_sendfile64, sv[1], reg_in, p_off, 1) == 0);

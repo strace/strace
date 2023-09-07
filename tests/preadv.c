@@ -64,16 +64,16 @@ main(void)
 
 	if (preadv(0, iov, 1, -1) != -1)
 		perror_msg_and_fail("preadv");
-	printf("preadv(0, [{iov_base=%p, iov_len=%zu}], 1, -1) = "
-	       "-1 EINVAL (%m)\n", iov->iov_base, iov->iov_len);
+	printf("preadv(0, [{iov_base=%p, iov_len=%zu}], 1, -1)"
+	       RVAL_EINVAL, iov->iov_base, iov->iov_len);
 
 	if (preadv(0, NULL, 1, -2) != -1)
 		perror_msg_and_fail("preadv");
-	printf("preadv(0, NULL, 1, -2) = -1 EINVAL (%m)\n");
+	printf("preadv(0, NULL, 1, -2)" RVAL_EINVAL);
 
 	if (preadv(0, iov, 0, -3) != -1)
 		perror_msg_and_fail("preadv");
-	printf("preadv(0, [], 0, -3) = -1 EINVAL (%m)\n");
+	printf("preadv(0, [], 0, -3)" RVAL_EINVAL);
 
 	int fd = create_tmpfile(O_RDWR);
 
