@@ -492,6 +492,7 @@ f8ill_ptr_to_kulong(const void *const ptr)
 # define NLMSG_ATTR(nlh, hdrlen) ((void *)(nlh) + NLMSG_SPACE(hdrlen))
 
 #define RVAL_EBADF " = -1 EBADF (%m)\n"
+#define RVAL_EFAULT " = -1 EFAULT (%m)\n"
 #define RVAL_EINVAL " = -1 EINVAL (%m)\n"
 
 #endif /* !STRACE_TESTS_H */

@@ -393,7 +393,7 @@ main(void)
 	print_cpuid_ioctl(vcpu_fd, vcpu_dev, "KVM_SET_CPUID2", cpuid);
 
 	ioctl(vcpu_fd, KVM_SET_CPUID2, NULL);
-	printf("ioctl(%d<%s>, KVM_SET_CPUID2, NULL) = -1 EFAULT (%m)\n",
+	printf("ioctl(%d<%s>, KVM_SET_CPUID2, NULL)" RVAL_EFAULT,
 	       vcpu_fd, vcpu_dev);
 
 	run_kvm(vcpu_fd, run, mmap_size, mem);

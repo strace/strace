@@ -56,7 +56,7 @@ main(void)
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
 		       NULL, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0, NULL, %p)"
-	       " = -1 EFAULT (%m)\n", &rem.ts);
+	       RVAL_EFAULT, &rem.ts);
 
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
 		       &req.ts, &rem.ts) == 0);

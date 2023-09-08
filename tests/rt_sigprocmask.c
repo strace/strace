@@ -133,12 +133,12 @@ main(void)
 
 	assert(k_sigprocmask(SIG_SETMASK, k_set + (set_size >> 1), NULL,
 			     set_size) == -1);
-	tprintf("rt_sigprocmask(SIG_SETMASK, %p, NULL, %u) = -1 EFAULT (%m)\n",
+	tprintf("rt_sigprocmask(SIG_SETMASK, %p, NULL, %u)" RVAL_EFAULT,
 		k_set + (set_size >> 1), set_size);
 
 	assert(k_sigprocmask(SIG_SETMASK, k_set, old_set + (set_size >> 1),
 			     set_size) == -1);
-	tprintf("rt_sigprocmask(SIG_SETMASK, %s, %p, %u) = -1 EFAULT (%m)\n",
+	tprintf("rt_sigprocmask(SIG_SETMASK, %s, %p, %u)" RVAL_EFAULT,
 		"[HUP INT QUIT ALRM TERM]",
 		old_set + (set_size >> 1), set_size);
 

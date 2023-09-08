@@ -28,7 +28,7 @@ iterate(const char *const text, unsigned int size, void *set)
 {
 	for (;;) {
 		if (k_sigpending(set, size)) {
-			tprintf("rt_sigpending(%p, %u) = -1 EFAULT (%m)\n",
+			tprintf("rt_sigpending(%p, %u)" RVAL_EFAULT,
 				set, size);
 			break;
 		}
@@ -79,7 +79,7 @@ main(void)
 
 	void *const efault = k_set + (set_size >> 1);
 	assert(k_sigpending(efault, set_size) == -1);
-	tprintf("rt_sigpending(%p, %u) = -1 EFAULT (%m)\n",
+	tprintf("rt_sigpending(%p, %u)" RVAL_EFAULT,
 		efault, set_size);
 
 	sigaddset(libc_set, SIGHUP);

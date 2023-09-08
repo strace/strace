@@ -140,7 +140,7 @@ main(void)
 	if (rc != -1)
 		perror_msg_and_fail("pwrite64: expected -1 EFAULT"
 				    ", returned %ld", rc);
-	tprintf("pwrite64(1, %p, 1, 0) = -1 EFAULT (%m)\n", efault);
+	tprintf("pwrite64(1, %p, 1, 0)" RVAL_EFAULT, efault);
 
 	rc = pwrite(1, nil, 1, -3);
 	if (rc != -1)
@@ -165,7 +165,7 @@ main(void)
 	rc = pread(0, efault, 1, 0);
 	if (rc != -1)
 		perror_msg_and_fail("pread64: expected -1, returned %ld", rc);
-	tprintf("pread64(0, %p, 1, 0) = -1 EFAULT (%m)\n", efault);
+	tprintf("pread64(0, %p, 1, 0)" RVAL_EFAULT, efault);
 
 	rc = pread(0, efault, 2, -7);
 	if (rc != -1)

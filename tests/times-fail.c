@@ -15,7 +15,7 @@ int
 main(void)
 {
 	assert(syscall(__NR_times, 0x42) == -1);
-	printf("times(0x42) = -1 EFAULT (%m)\n");
+	printf("times(0x42)" RVAL_EFAULT);
 	puts("+++ exited with 0 +++");
 
 	return 0;

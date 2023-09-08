@@ -59,7 +59,7 @@ main(void)
 	*p_off = 0;
 
 	assert(syscall(__NR_sendfile64, 0, 1, p, page_size) == -1);
-	printf("sendfile64(0, 1, %p, %u) = -1 EFAULT (%m)\n", p, page_size);
+	printf("sendfile64(0, 1, %p, %u)" RVAL_EFAULT, p, page_size);
 
 	assert(syscall(__NR_sendfile64, sv[1], reg_in, NULL, alen)
 	       == (long) alen);

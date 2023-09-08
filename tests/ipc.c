@@ -64,7 +64,7 @@ main(void)
 	int rc = ipc_call(0, SEMCTL, 0, 0, 0, (long) efault, 0);
 	if (rc != -1 || EFAULT != errno)
 		perror_msg_and_skip("ipc");
-	printf("semctl(0, 0, IPC_RMID, %p) = -1 EFAULT (%m)\n", efault);
+	printf("semctl(0, 0, IPC_RMID, %p)" RVAL_EFAULT, efault);
 
 	for (unsigned short call = 0; call <= 40; call += 10) {
 		ipc_call0(0, call);
