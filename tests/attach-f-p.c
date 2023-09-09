@@ -101,7 +101,7 @@ main(void)
 	pid_t pid = getpid();
 	assert(chdir(text_parent) == -1);
 
-	printf("%-5d chdir(\"%s\") = -1 ENOENT (%m)\n"
+	printf("%-5d chdir(\"%s\")" RVAL_ENOENT
 	       "%-5d +++ exited with 0 +++\n", pid, text_parent, pid);
 
 	return 0;

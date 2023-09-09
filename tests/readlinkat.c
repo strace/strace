@@ -32,7 +32,7 @@ main(void)
 	(void) unlink(fname);
 
 	long rc = syscall(__NR_readlinkat, -100, fname, buf, size);
-	printf("readlinkat(AT_FDCWD, \"%s\", %p, %u) = -1 ENOENT (%m)\n",
+	printf("readlinkat(AT_FDCWD, \"%s\", %p, %u)" RVAL_ENOENT,
 	       hex_fname, buf, size);
 
 	if (symlink(TARGET, fname))

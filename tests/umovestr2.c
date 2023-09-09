@@ -25,7 +25,7 @@ main(void)
 	char *envp[] = { addr, NULL };
 	execve("", argv, envp);
 
-	printf("execve(\"\", [], [\"%0*u\"]) = -1 ENOENT (%m)\n",
+	printf("execve(\"\", [], [\"%0*u\"])" RVAL_ENOENT,
 	       (int) str_len, 0);
 	puts("+++ exited with 0 +++");
 
