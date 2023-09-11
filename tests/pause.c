@@ -44,7 +44,7 @@ main(void)
 
 	syscall(__NR_pause);
 	if (errno == ENOSYS)
-		printf("pause() = -1 ENOSYS (%m)\n");
+		printf("pause()" RVAL_ENOSYS);
 	else
 		printf("pause() = ? ERESTARTNOHAND"
 		       " (To be restarted if no handler)\n");
