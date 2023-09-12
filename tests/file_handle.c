@@ -199,7 +199,7 @@ main(void)
 	if (EOVERFLOW != errno)
 		perror_msg_and_skip("name_to_handle_at");
 	printf("%s%s(AT_FDCWD, \"%s\"%s, {handle_bytes=0 => %u}"
-	       ", %p, AT_SYMLINK_FOLLOW) = -1 EOVERFLOW (%m)\n",
+	       ", %p, AT_SYMLINK_FOLLOW)" RVAL_EOVERFLOW,
 	       my_secontext, "name_to_handle_at",
 	       path, path_secontext,
 	       handle->handle_bytes, &mount_id);

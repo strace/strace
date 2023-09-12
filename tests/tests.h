@@ -497,5 +497,6 @@ f8ill_ptr_to_kulong(const void *const ptr)
 #define RVAL_EINVAL " = -1 EINVAL (%m)\n"
 #define RVAL_ENOENT " = -1 ENOENT (%m)\n"
 #define RVAL_ENOSYS " = -1 ENOSYS (%m)\n"
+#define RVAL_EOVERFLOW " = -1 EOVERFLOW (%m)\n"
 
 #endif /* !STRACE_TESTS_H */

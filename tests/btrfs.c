@@ -1045,7 +1045,7 @@ btrfs_test_search_ioctls(void)
 		btrfs_print_search_key(&args->key);
 		printf(", buf_size=%" PRIu64 "}", (uint64_t)args->buf_size);
 		ioctl(btrfs_test_dir_fd, BTRFS_IOC_TREE_SEARCH_V2, args);
-		printf(" => {buf_size=%" PRIu64 "}) = -1 EOVERFLOW (%m)\n",
+		printf(" => {buf_size=%" PRIu64 "})" RVAL_EOVERFLOW,
 			(uint64_t)args->buf_size);
 		free(args);
 	}
