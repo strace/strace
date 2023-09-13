@@ -376,7 +376,7 @@ main(void)
 
 	cpuid->nent = 0;
 	ioctl(kvm, KVM_GET_SUPPORTED_CPUID, cpuid);
-	printf("ioctl(%d<%s>, KVM_GET_SUPPORTED_CPUID, %p) = -1 E2BIG (%m)\n",
+	printf("ioctl(%d<%s>, KVM_GET_SUPPORTED_CPUID, %p)" RVAL_E2BIG,
 	       kvm, dev, cpuid);
 
 	cpuid->nent = cpuid_nent;
