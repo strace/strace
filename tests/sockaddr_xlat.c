@@ -1121,11 +1121,11 @@ check_xdp(void)
 		  ", sxdp_ifindex=" XLAT_KNOWN(1, IFINDEX_LO_STR)
 		  ", sxdp_queue_id=4207853295"
 		  ", sxdp_shared_umem_fd=7" FD7_PATH "}" },
-		{ { AF_XDP, .sxdp_flags = 0xbad0,
+		{ { AF_XDP, .sxdp_flags = 0xbae0,
 		    .sxdp_ifindex = 0xcafefade,
 		    .sxdp_queue_id = 0xba5ed,
 		    .sxdp_shared_umem_fd = 0xfeedbead },
-		  "{sa_family=" XLAT_KNOWN(0x2c, "AF_XDP") ", sxdp_flags=0xbad0"
+		  "{sa_family=" XLAT_KNOWN(0x2c, "AF_XDP") ", sxdp_flags=0xbae0"
 		  NRAW(" /* XDP_??? */") ", sxdp_ifindex=3405707998"
 		  ", sxdp_queue_id=763373, sxdp_shared_umem_fd=0xfeedbead}" },
 	};
