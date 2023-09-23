@@ -3,7 +3,7 @@ Noteworthy changes in release ?.? (????-??-??)
 
 * Improvements
   * Implemented decoding of IFLA_BRPORT_BACKUP_NHID netlink attribute.
-  * Updated lists of BPF_*, NT_*, SEGV_*, and XDP_* constants.
+  * Updated lists of BPF_*, IORING_*, NT_*, SEGV_*, and XDP_* constants.
 
 Noteworthy changes in release 6.5 (2023-09-01)
 ==============================================
