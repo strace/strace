@@ -48,11 +48,11 @@ main(void)
 	puts("sigpending([]) = 0");
 
 	k_sigpending((uintptr_t) (k_set + 1));
-	printf("sigpending(%p) = -1 EFAULT (%m)\n", k_set + 1);
+	printf("sigpending(%p)" RVAL_EFAULT, k_set + 1);
 
 	uintptr_t efault = sizeof(*k_set) / 2 + (uintptr_t) k_set;
 	k_sigpending(efault);
-	printf("sigpending(%#jx) = -1 EFAULT (%m)\n", (uintmax_t) efault);
+	printf("sigpending(%#jx)" RVAL_EFAULT, (uintmax_t) efault);
 
 	sigaddset(libc_set, SIGHUP);
 	if (sigprocmask(SIG_SETMASK, libc_set, NULL))

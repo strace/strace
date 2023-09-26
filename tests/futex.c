@@ -122,7 +122,7 @@ invalid_op(int *val, int op, uint32_t argmask, ...)
 	va_end(ap);
 
 	errno = saved_errno;
-	printf(") = -1 ENOSYS (%m)\n");
+	printf(")" RVAL_ENOSYS);
 }
 
 # define CHECK_INVALID_CLOCKRT(op, ...) \

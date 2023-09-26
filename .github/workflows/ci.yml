@@ -553,7 +553,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc13-x32-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-13
       KHEADERS: torvalds/linux
@@ -569,7 +569,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc13-x32-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-13
       STACKTRACE: no
@@ -583,39 +583,8 @@ jobs:
     - name: build check
       run: ci/run-build-and-tests.sh
 
-  gcc12-x32-kheaders:
-    runs-on: ubuntu-latest
-    env:
-      CC: gcc-12
-      KHEADERS: torvalds/linux
-      STACKTRACE: no
-      TARGET: x32
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
-  gcc12-x32-nostacktrace:
-    runs-on: ubuntu-latest
-    env:
-      CC: gcc-12
-      STACKTRACE: no
-      TARGET: x32
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: install dependencies
-      run: ci/install-dependencies.sh
-    - name: build check
-      run: ci/run-build-and-tests.sh
-
   gcc11-x32-kheaders:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-11
       KHEADERS: torvalds/linux
@@ -631,7 +600,7 @@ jobs:
       run: ci/run-build-and-tests.sh
 
   gcc11-x32-nostacktrace:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       CC: gcc-11
       STACKTRACE: no

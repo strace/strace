@@ -27,8 +27,8 @@ main(void)
 	long rc = syscall(__NR_renameat2,
 			  olddirfd, oldpath, newdirfd, newpath, 1);
 	printf("renameat2(%d, \"%s\", AT_FDCWD, \"%s\", RENAME_NOREPLACE)"
-	       " = %ld %s (%m)\n",
-	       (int) olddirfd, oldpath, newpath, rc, errno2name());
+	       " = %s\n",
+	       (int) olddirfd, oldpath, newpath, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

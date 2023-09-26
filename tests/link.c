@@ -34,32 +34,31 @@ main(void)
 
 	rc = syscall(__NR_link, NULL, NULL);
 # ifndef PATH_TRACING
-	printf("link(NULL, NULL) = %ld %s (%m)\n", rc, errno2name());
+	printf("link(NULL, NULL) = %s\n", sprintrc(rc));
 # endif
 
 	rc = syscall(__NR_link, short_1, NULL);
 # ifndef PATH_TRACING
-	printf("link(%p, NULL) = %ld %s (%m)\n",
-	       short_1, rc, errno2name());
+	printf("link(%p, NULL) = %s\n", short_1, sprintrc(rc));
 # endif
 
 	rc = syscall(__NR_link, NULL, sample_1);
-	printf("link(NULL, \"%s\") = %ld %s (%m)\n",
-	       sample_1_str, rc, errno2name());
+	printf("link(NULL, \"%s\") = %s\n",
+	       sample_1_str, sprintrc(rc));
 
 	rc = syscall(__NR_link, sample_1, short_2);
-	printf("link(\"%s\", %p) = %ld %s (%m)\n",
-	       sample_1_str, short_2, rc, errno2name());
+	printf("link(\"%s\", %p) = %s\n",
+	       sample_1_str, short_2, sprintrc(rc));
 
 	rc = syscall(__NR_link, short_1, sample_2);
 # ifndef PATH_TRACING
-	printf("link(%p, \"%s\") = %ld %s (%m)\n",
-	       short_1, sample_2_str, rc, errno2name());
+	printf("link(%p, \"%s\") = %s\n",
+	       short_1, sample_2_str, sprintrc(rc));
 # endif
 
 	rc = syscall(__NR_link, sample_1, sample_2);
-	printf("link(\"%s\", \"%s\") = %ld %s (%m)\n",
-	       sample_1_str, sample_2_str, rc, errno2name());
+	printf("link(\"%s\", \"%s\") = %s\n",
+	       sample_1_str, sample_2_str, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

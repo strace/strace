@@ -56,7 +56,7 @@ main(void)
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
 		       NULL, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0, NULL, %p)"
-	       " = -1 EFAULT (%m)\n", &rem.ts);
+	       RVAL_EFAULT, &rem.ts);
 
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
 		       &req.ts, &rem.ts) == 0);
@@ -69,7 +69,7 @@ main(void)
 	assert(syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0,
 		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_MONOTONIC, 0"
-	       ", {tv_sec=%lld, tv_nsec=%llu}, %p) = -1 EINVAL (%m)\n",
+	       ", {tv_sec=%lld, tv_nsec=%llu}, %p)" RVAL_EINVAL,
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 
@@ -78,7 +78,7 @@ main(void)
 	assert(syscall(__NR_clock_nanosleep, CLOCK_REALTIME, 0,
 		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_REALTIME, 0"
-	       ", {tv_sec=%lld, tv_nsec=%llu}, %p) = -1 EINVAL (%m)\n",
+	       ", {tv_sec=%lld, tv_nsec=%llu}, %p)" RVAL_EINVAL,
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 
@@ -87,7 +87,7 @@ main(void)
 	assert(syscall(__NR_clock_nanosleep, CLOCK_MONOTONIC, 0,
 		       &req.ts, &rem.ts) == -1);
 	printf("clock_nanosleep(CLOCK_MONOTONIC, 0"
-	       ", {tv_sec=%lld, tv_nsec=%llu}, %p) = -1 EINVAL (%m)\n",
+	       ", {tv_sec=%lld, tv_nsec=%llu}, %p)" RVAL_EINVAL,
 	       (long long) req.ts.tv_sec,
 	       zero_extend_signed_to_ull(req.ts.tv_nsec), &rem.ts);
 

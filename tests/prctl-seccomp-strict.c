@@ -24,13 +24,13 @@ main(void)
 
 	rc = prctl(PR_SET_SECCOMP, -1L, 1, 2, 3);
 	printf("prctl(PR_SET_SECCOMP, %#lx /* SECCOMP_MODE_??? */, 0x1, 0x2, 0x3)"
-	       " = %d %s (%m)\n", -1L, rc, errno2name());
+	       " = %s\n", -1L, sprintrc(rc));
 	fflush(stdout);
 
 	rc = prctl(PR_SET_SECCOMP, 1);
 	if (rc) {
 		printf("prctl(PR_SET_SECCOMP, SECCOMP_MODE_STRICT)"
-		       " = %d %s (%m)\n", rc, errno2name());
+		       " = %s\n", sprintrc(rc));
 		fflush(stdout);
 		rc = 0;
 	} else {

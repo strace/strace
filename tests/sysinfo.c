@@ -17,7 +17,7 @@ int
 main(void)
 {
 	sysinfo(NULL);
-	printf("sysinfo(NULL) = -1 EFAULT (%m)\n");
+	printf("sysinfo(NULL)" RVAL_EFAULT);
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct sysinfo, si);
 

@@ -15,7 +15,7 @@ int
 main(void)
 {
 	int rc = shutdown(-1, SHUT_RDWR);
-	printf("shutdown(-1, SHUT_RDWR) = %d %s (%m)\n", rc, errno2name());
+	printf("shutdown(-1, SHUT_RDWR) = %s\n", sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

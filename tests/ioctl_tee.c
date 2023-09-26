@@ -20,8 +20,6 @@
 #include "xlat.h"
 
 #define NUM_PARAMS 8
-#define RVAL_EBADF " = -1 EBADF (%m)\n"
-
 #define UUID_SIZE 16
 
 #ifndef TEE_IOCTL_SHM_MAPPED

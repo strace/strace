@@ -123,8 +123,8 @@ test_scm_rights1(struct msghdr *const mh,
 	}
 
 	errno = saved_errno;
-	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
-	       (unsigned long) msg_controllen, rc, errno2name());
+	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned long) msg_controllen, sprintrc(rc));
 }
 
 static void
@@ -185,8 +185,8 @@ test_scm_rights2(struct msghdr *const mh,
 	printf("]");
 
 	errno = saved_errno;
-	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
-	       (unsigned long) msg_controllen, rc, errno2name());
+	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned long) msg_controllen, sprintrc(rc));
 }
 
 static void
@@ -211,8 +211,8 @@ test_scm_rights3(struct msghdr *const mh, void *const page, const size_t nfds)
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS",
 	       (unsigned) cmsg->cmsg_len);
 	print_fds(cmsg, cmsg->cmsg_len);
-	printf("}], msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
-	       (unsigned long) len, rc, errno2name());
+	printf("}], msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned long) len, sprintrc(rc));
 }
 
 static void
@@ -238,10 +238,10 @@ test_scm_timestamp_old(struct msghdr *const mh, void *const page)
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMP_OLD"
 	       ", cmsg_data={tv_sec=%lld, tv_usec=%llu}}]"
-	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len,
 	       (long long) tv.tv_sec, zero_extend_signed_to_ull(tv.tv_usec),
-	       (unsigned long) len, rc, errno2name());
+	       (unsigned long) len, sprintrc(rc));
 
 	len = CMSG_SPACE(sizeof(tv) - sizeof(long));
 	cmsg = get_cmsghdr(page, len);
@@ -257,9 +257,9 @@ test_scm_timestamp_old(struct msghdr *const mh, void *const page)
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMP_OLD, cmsg_data=???}]"
-	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len,
-	       (unsigned long) len, rc, errno2name());
+	       (unsigned long) len, sprintrc(rc));
 }
 
 static void
@@ -285,10 +285,10 @@ test_scm_timestampns_old(struct msghdr *const mh, void *const page)
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPNS_OLD"
 	       ", cmsg_data={tv_sec=%lld, tv_nsec=%llu}}]"
-	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len,
 	       (long long) ts.tv_sec, zero_extend_signed_to_ull(ts.tv_nsec),
-	       (unsigned long) len, rc, errno2name());
+	       (unsigned long) len, sprintrc(rc));
 
 	len = CMSG_SPACE(sizeof(ts) - sizeof(long));
 	cmsg = get_cmsghdr(page, len);
@@ -305,9 +305,9 @@ test_scm_timestampns_old(struct msghdr *const mh, void *const page)
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPNS_OLD"
 	       ", cmsg_data=???}]"
-	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len,
-	       (unsigned long) len, rc, errno2name());
+	       (unsigned long) len, sprintrc(rc));
 }
 
 static void
@@ -335,14 +335,14 @@ test_scm_timestamping_old(struct msghdr *const mh, void *const page)
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_OLD"
 	       ", cmsg_data=[{tv_sec=%lld, tv_nsec=%llu}"
 	       ", {tv_sec=%lld, tv_nsec=%llu}, {tv_sec=%lld, tv_nsec=%llu}]}]"
-	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, (long long) ts[0].tv_sec,
 	       zero_extend_signed_to_ull(ts[0].tv_nsec),
 	       (long long) ts[1].tv_sec,
 	       zero_extend_signed_to_ull(ts[1].tv_nsec),
 	       (long long) ts[2].tv_sec,
 	       zero_extend_signed_to_ull(ts[2].tv_nsec),
-	       (unsigned long) len, rc, errno2name());
+	       (unsigned long) len, sprintrc(rc));
 
 	len = CMSG_SPACE(sizeof(ts) - sizeof(long));
 	cmsg = get_cmsghdr(page, len);
@@ -359,9 +359,9 @@ test_scm_timestamping_old(struct msghdr *const mh, void *const page)
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SO_TIMESTAMPING_OLD"
 	       ", cmsg_data=???}]"
-	       ", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len,
-	       (unsigned long) len, rc, errno2name());
+	       (unsigned long) len, sprintrc(rc));
 }
 
 static void
@@ -566,8 +566,8 @@ test_scm_security(struct msghdr *const mh,
 	printf("]");
 
 	errno = saved_errno;
-	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
-	       (unsigned long) msg_controllen, rc, errno2name());
+	printf(", msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned long) msg_controllen, sprintrc(rc));
 }
 
 static void
@@ -590,9 +590,9 @@ test_unknown_type(struct msghdr *const mh,
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u, cmsg_level=%s"
 	       ", cmsg_type=%#x /* %s */}], msg_controllen=%u, msg_flags=0}"
-	       ", 0) = %d %s (%m)\n",
+	       ", 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_level_str, cmsg->cmsg_type,
-	       cmsg_type_str, (unsigned) mh->msg_controllen, rc, errno2name());
+	       cmsg_type_str, (unsigned) mh->msg_controllen, sprintrc(rc));
 
 	unsigned char sym = 'A';
 	cmsg = get_cmsghdr(page, CMSG_LEN(sizeof(sym)));
@@ -713,9 +713,9 @@ test_ip_pktinfo(struct msghdr *const mh, void *const page,
 	       ", cmsg_type=%s, cmsg_data={ipi_ifindex=%s"
 	       ", ipi_spec_dst=inet_addr(\"%s\")"
 	       ", ipi_addr=inet_addr(\"%s\")}}]"
-	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str,
-	       IFINDEX_LO_STR, "1.2.3.4", "5.6.7.8", len, rc, errno2name());
+	       IFINDEX_LO_STR, "1.2.3.4", "5.6.7.8", len, sprintrc(rc));
 }
 
 static void
@@ -739,9 +739,9 @@ test_ip_uint(struct msghdr *const mh, void *const page,
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_IP, cmsg_type=%s, cmsg_data=[%u]}]"
-	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str, *u, len,
-	       rc, errno2name());
+	       sprintrc(rc));
 }
 
 static void
@@ -763,9 +763,9 @@ test_ip_uint8_t(struct msghdr *const mh, void *const page,
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_IP, cmsg_type=%s, cmsg_data=[%#x]}]"
-	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str,
-	       (unsigned) (uint8_t) 'A', len, rc, errno2name());
+	       (unsigned) (uint8_t) 'A', len, sprintrc(rc));
 }
 
 static void
@@ -808,8 +808,8 @@ test_ip_opts(struct msghdr *const mh, void *const page,
 	       ", cmsg_level=SOL_IP, cmsg_type=%s, cmsg_data=[",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str);
 	print_ip_opts(CMSG_DATA(cmsg), opts_len);
-	printf("]}], msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
-	       len, rc, errno2name());
+	printf("]}], msg_controllen=%u, msg_flags=0}, 0) = %s\n",
+	       len, sprintrc(rc));
 }
 
 #ifdef IP_RECVERR
@@ -856,12 +856,12 @@ test_ip_recverr(struct msghdr *const mh, void *const page,
 	       ", ee_type=%u, ee_code=%u, ee_info=%u, ee_data=%u"
 	       ", offender={sa_family=AF_INET, sin_port=htons(%hu)"
 	       ", sin_addr=inet_addr(\"127.0.0.1\")}}}]"
-	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str,
 	       e->ee_errno, e->ee_origin, e->ee_type,
 	       e->ee_code, e->ee_info, e->ee_data,
 	       ntohs(e->offender.sin_port),
-	       len, rc, errno2name());
+	       len, sprintrc(rc));
 }
 #endif
 
@@ -890,9 +890,9 @@ test_ip_origdstaddr(struct msghdr *const mh, void *const page,
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u, cmsg_level=SOL_IP"
 	       ", cmsg_type=%s, cmsg_data={sa_family=AF_INET"
 	       ", sin_port=htons(%hu), sin_addr=inet_addr(\"127.0.0.1\")}}]"
-	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str,
-	       ntohs(sin->sin_port), len, rc, errno2name());
+	       ntohs(sin->sin_port), len, sprintrc(rc));
 }
 #endif
 
@@ -918,9 +918,9 @@ test_ip_protocol(struct msghdr *const mh, void *const page,
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u"
 	       ", cmsg_level=SOL_IP, cmsg_type=%s, cmsg_data=[%s]}]"
-	       ", msg_controllen=%u, msg_flags=0}, 0) = %d %s (%m)\n",
+	       ", msg_controllen=%u, msg_flags=0}, 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, cmsg_type_str, "IPPROTO_RAW", len,
-	       rc, errno2name());
+	       sprintrc(rc));
 }
 #endif
 
@@ -974,9 +974,9 @@ test_unknown_level(struct msghdr *const mh, void *const page)
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=[{cmsg_len=%u, cmsg_level=%s"
 	       ", cmsg_type=%#x}], msg_controllen=%u, msg_flags=0}"
-	       ", 0) = %d %s (%m)\n",
+	       ", 0) = %s\n",
 	       (unsigned) cmsg->cmsg_len, "SOL_TCP", cmsg->cmsg_type,
-	       (unsigned) mh->msg_controllen, rc, errno2name());
+	       (unsigned) mh->msg_controllen, sprintrc(rc));
 
 	unsigned char sym = 'A';
 	cmsg = get_cmsghdr(page, CMSG_LEN(sizeof(sym)));
@@ -1028,22 +1028,22 @@ test_big_len(struct msghdr *const mh)
 	       ", cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS",
 	       (unsigned) cmsg->cmsg_len);
 	print_fds(cmsg, optmem_max);
-	printf("}, ...], msg_controllen=%lu, msg_flags=0}, 0) = %d %s (%m)\n",
-	       (unsigned long) len, rc, errno2name());
+	printf("}, ...], msg_controllen=%lu, msg_flags=0}, 0) = %s\n",
+	       (unsigned long) len, sprintrc(rc));
 }
 
 int main(int ac, const char **av)
 {
 	int rc = sendmsg(-1, 0, 0);
-	printf("sendmsg(-1, NULL, 0) = %d %s (%m)\n", rc, errno2name());
+	printf("sendmsg(-1, NULL, 0) = %s\n", sprintrc(rc));
 
 	TAIL_ALLOC_OBJECT_CONST_PTR(struct msghdr, mh);
 	memset(mh, 0, sizeof(*mh));
 	test_big_len(mh);
 
 	rc = sendmsg(-1, mh + 1, 0);
-	printf("sendmsg(-1, %p, 0) = %d %s (%m)\n",
-	       mh + 1, rc, errno2name());
+	printf("sendmsg(-1, %p, 0) = %s\n",
+	       mh + 1, sprintrc(rc));
 
 	void *page = tail_alloc(1024) + 1024;
 	mh->msg_control = page;
@@ -1051,8 +1051,8 @@ int main(int ac, const char **av)
 	rc = sendmsg(-1, mh, 0);
 	printf("sendmsg(-1, {msg_name=NULL, msg_namelen=0, msg_iov=NULL"
 	       ", msg_iovlen=0, msg_control=%p, msg_controllen=%u"
-	       ", msg_flags=0}, 0) = %d %s (%m)\n",
-	       page, (unsigned) CMSG_LEN(0), rc, errno2name());
+	       ", msg_flags=0}, 0) = %s\n",
+	       page, (unsigned) CMSG_LEN(0), sprintrc(rc));
 
 	test_sol_socket(mh, page);
 	test_sol_ip(mh, page);

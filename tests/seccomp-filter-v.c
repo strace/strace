@@ -84,19 +84,19 @@ main(void)
 	prog->len = 1;
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, prog);
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=1, filter=%p})"
-		" = -1 EFAULT (%m)\n", prog->filter);
+		RVAL_EFAULT, prog->filter);
 
 	prog->filter = filter +  ARRAY_SIZE(filter_c) - 1;
 	prog->len = 3;
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, prog);
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=%u"
-		", filter=[%s, ... /* %p */]}) = -1 EFAULT (%m)\n",
+		", filter=[%s, ... /* %p */]})" RVAL_EFAULT,
 		prog->len, kill_stmt_txt, filter +  ARRAY_SIZE(filter_c));
 
 	prog->len = 0;
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, 0, prog);
 	tprintf("seccomp(SECCOMP_SET_MODE_FILTER, 0, {len=0, filter=[]})"
-		" = -1 EINVAL (%m)\n");
+		RVAL_EINVAL);
 
 	for (unsigned int i = 0; i <= BPF_MAXINSNS; ++i) {
 		const struct sock_filter stmt =
@@ -147,7 +147,7 @@ main(void)
 	}
 	tprintf(", ...]})");
 	syscall(__NR_seccomp, SECCOMP_SET_MODE_FILTER, -1, prog);
-	tprintf(" = -1 EINVAL (%m)\n");
+	tprintf(RVAL_EINVAL);
 
 	prog->filter = filter;
 	prog->len = ARRAY_SIZE(filter_c);

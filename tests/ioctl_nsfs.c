@@ -27,13 +27,13 @@ static void
 test_no_namespace(void)
 {
 	ioctl(-1, NS_GET_USERNS);
-	printf("ioctl(-1, NS_GET_USERNS) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_USERNS)" RVAL_EBADF);
 	ioctl(-1, NS_GET_PARENT);
-	printf("ioctl(-1, NS_GET_PARENT) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_PARENT)" RVAL_EBADF);
 	ioctl(-1, NS_GET_NSTYPE);
-	printf("ioctl(-1, NS_GET_NSTYPE) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_NSTYPE)" RVAL_EBADF);
 	ioctl(-1, NS_GET_OWNER_UID, NULL);
-	printf("ioctl(-1, NS_GET_OWNER_UID, NULL) = -1 EBADF (%m)\n");
+	printf("ioctl(-1, NS_GET_OWNER_UID, NULL)" RVAL_EBADF);
 }
 
 static void

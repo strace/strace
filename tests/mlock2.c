@@ -22,7 +22,7 @@ main(void)
 
 	long rc = syscall(__NR_mlock2, addr, len, -1UL);
 	printf("mlock2(%#lx, %lu, MLOCK_ONFAULT|0xfffffffe)"
-	       " = %ld %s (%m)\n", addr, len, rc, errno2name());
+	       " = %s\n", addr, len, sprintrc(rc));
 
 	puts("+++ exited with 0 +++");
 	return 0;

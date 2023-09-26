@@ -64,7 +64,7 @@ main(void)
 
 		if (syscall(SYSCALL_NR, tests[i].r, tests[i].e)) {
 			if (!i && ENOSYS == errno) {
-				printf("%s(%u, %u) = -1 ENOSYS (%m)\n",
+				printf("%s(%u, %u)" RVAL_ENOSYS,
 				       SYSCALL_NAME, ugid, ugid);
 				break;
 			}

@@ -19,8 +19,6 @@
 #include "xlat/random_ioctl_cmds.h"
 #undef XLAT_MACROS_ONLY
 
-#define RVAL_EBADF " = -1 EBADF (%m)\n"
-
 int
 main(void)
 {
@@ -43,7 +41,8 @@ main(void)
 	ioctl(-1, RNDADDENTROPY, NULL);
 	printf("ioctl(-1, RNDADDENTROPY, NULL)" RVAL_EBADF);
 	ioctl(-1, RNDADDENTROPY, info);
-	printf("ioctl(-1, RNDADDENTROPY, {entropy_count=3, buf_size=8, buf=\"12345678\"})" RVAL_EBADF);
+	printf("ioctl(-1, RNDADDENTROPY, {entropy_count=3, buf_size=8"
+	       ", buf=\"12345678\"})" RVAL_EBADF);
 
 	ioctl(-1, RNDZAPENTCNT);
 	printf("ioctl(-1, FASTRPC_IOCTL_INIT_ATTACH or RNDZAPENTCNT)"

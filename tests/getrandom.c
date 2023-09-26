@@ -39,8 +39,8 @@ main(void)
 
 	if (syscall(__NR_getrandom, buf, sizeof(buf), 0x3003) != -1)
 		perror_msg_and_skip("getrandom");
-	printf("getrandom(%p, 4, GRND_NONBLOCK|GRND_RANDOM|0x3000) = "
-	       "-1 EINVAL (%m)\n", buf);
+	printf("getrandom(%p, 4, GRND_NONBLOCK|GRND_RANDOM|0x3000)"
+	       RVAL_EINVAL, buf);
 
 	puts("+++ exited with 0 +++");
 	return 0;

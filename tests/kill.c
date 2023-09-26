@@ -47,8 +47,8 @@ main(void)
 	const long big_sig = (long) 0xdeadbeefcafef00dULL;
 	rc = syscall(__NR_kill, big_pid, big_sig);
 	pidns_print_leader();
-	printf("kill(%d, %d) = %ld %s (%m)\n",
-	       (int) big_pid, (int) big_sig, rc, errno2name());
+	printf("kill(%d, %d) = %s\n",
+	       (int) big_pid, (int) big_sig, sprintrc(rc));
 
 	rc = syscall(__NR_kill, (long) 0xdefaced00000000ULL | pid, 0);
 	pidns_print_leader();

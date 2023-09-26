@@ -24,13 +24,13 @@ main(void)
 		 * Cannot use syscall because it takes long arguments.
 		 * Let's call lseek with hope it will invoke lseek syscall.
 		 */
-		long long rc = lseek(-1, offset, SEEK_SET);
-		printf("lseek(-1, %lld, SEEK_SET) = %lld %s (%m)\n",
-		       (long long) offset, rc, errno2name());
+		long rc = lseek(-1, offset, SEEK_SET);
+		printf("lseek(-1, %lld, SEEK_SET) = %s\n",
+		       (long long) offset, sprintrc(rc));
 	} else {
 		long rc = syscall(__NR_lseek, -1L, offset, SEEK_SET);
-		printf("lseek(-1, %ld, SEEK_SET) = %ld %s (%m)\n",
-		       (long) offset, rc, errno2name());
+		printf("lseek(-1, %ld, SEEK_SET) = %s\n",
+		       (long) offset, sprintrc(rc));
 	}
 
 	puts("+++ exited with 0 +++");
