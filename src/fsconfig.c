@@ -34,6 +34,7 @@ SYS_FUNC(fsconfig)
 			break;
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
+		case FSCONFIG_CMD_CREATE_EXCL:
 		default:
 			printaddr(key);
 			break;
@@ -58,6 +59,7 @@ SYS_FUNC(fsconfig)
 		case FSCONFIG_SET_FD:
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
+		case FSCONFIG_CMD_CREATE_EXCL:
 		default:
 			printaddr(value);
 			break;
@@ -77,6 +79,7 @@ SYS_FUNC(fsconfig)
 		case FSCONFIG_SET_BINARY:
 		case FSCONFIG_CMD_CREATE:
 		case FSCONFIG_CMD_RECONFIGURE:
+		case FSCONFIG_CMD_CREATE_EXCL:
 		default:
 			PRINT_VAL_D(aux);
 			break;
