@@ -179,6 +179,9 @@ print_dqfmt(long rc, void *ptr, void *arg)
 	case 4:
 		fmtstr = "QFMT_VFS_V1";
 		break;
+	case 5:
+		fmtstr = "QFMT_SHMEM";
+		break;
 	default:
 		printf("%#x /* QFMT_VFS_??? */]", *fmtval);
 		return;
