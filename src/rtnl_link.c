@@ -215,6 +215,7 @@ static const nla_decoder_t ifla_brport_nla_decoders[] = {
 	[IFLA_BRPORT_MCAST_N_GROUPS]		= decode_nla_u32,
 	[IFLA_BRPORT_MCAST_MAX_GROUPS]		= decode_nla_u32,
 	[IFLA_BRPORT_NEIGH_VLAN_SUPPRESS]	= decode_nla_u8,
+	[IFLA_BRPORT_BACKUP_NHID]		= decode_nla_u32,
 };
 
 static bool

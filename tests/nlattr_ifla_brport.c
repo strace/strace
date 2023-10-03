@@ -39,7 +39,7 @@ main(void)
 		{ ENUM_KNOWN(0, IFLA_BRPORT_UNSPEC) },
 		{ ENUM_KNOWN(0x18, IFLA_BRPORT_FLUSH) },
 		{ ENUM_KNOWN(0x1a, IFLA_BRPORT_PAD) },
-		{ ARG_XLAT_UNKNOWN(0x2c, "IFLA_BRPORT_???") },
+		{ ARG_XLAT_UNKNOWN(0x2d, "IFLA_BRPORT_???") },
 		{ ARG_XLAT_UNKNOWN(0xbad, "IFLA_BRPORT_???") },
 	};
 	for (size_t i = 0; i < ARRAY_SIZE(un_attrs); i++) {
@@ -126,6 +126,7 @@ main(void)
 		{ ENUM_KNOWN(0x26, IFLA_BRPORT_MCAST_EHT_HOSTS_CNT) },
 		{ ENUM_KNOWN(0x29, IFLA_BRPORT_MCAST_N_GROUPS) },
 		{ ENUM_KNOWN(0x2a, IFLA_BRPORT_MCAST_MAX_GROUPS) },
+		{ ENUM_KNOWN(0x2c, IFLA_BRPORT_BACKUP_NHID) },
 	};
 	void *nlh_u32 = midtail_alloc(NLMSG_SPACE(hdrlen),
 				     NLA_HDRLEN * 2 + sizeof(uint32_t));

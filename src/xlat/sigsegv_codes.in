@@ -9,3 +9,4 @@ SEGV_ADIDERR	6	/* sparc */
 SEGV_ADIPERR	7	/* sparc */
 SEGV_MTEAERR	8	/* arm64 */
 SEGV_MTESERR	9	/* arm64 */
+SEGV_CPERR	10	/* x86_64 */

@@ -1916,6 +1916,7 @@
 { "linux/seccomp.h", "SECCOMP_IOCTL_NOTIF_ID_VALID", _IOC_WRITE, 0x2102, 0x08 },
 { "linux/seccomp.h", "SECCOMP_IOCTL_NOTIF_RECV", _IOC_READ|_IOC_WRITE, 0x2100, 0x50 },
 { "linux/seccomp.h", "SECCOMP_IOCTL_NOTIF_SEND", _IOC_READ|_IOC_WRITE, 0x2101, 0x18 },
+{ "linux/seccomp.h", "SECCOMP_IOCTL_NOTIF_SET_FLAGS", _IOC_WRITE, 0x2104, 0x08 },
 { "linux/sed-opal.h", "IOC_OPAL_ACTIVATE_LSP", _IOC_WRITE, 0x70df, 0x118 },
 { "linux/sed-opal.h", "IOC_OPAL_ACTIVATE_USR", _IOC_WRITE, 0x70e1, 0x110 },
 { "linux/sed-opal.h", "IOC_OPAL_ADD_USR_TO_LR", _IOC_WRITE, 0x70e4, 0x118 },

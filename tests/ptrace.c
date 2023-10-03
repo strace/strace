@@ -2087,7 +2087,8 @@ main(void)
 		{ ARG_XLAT_KNOWN(0x7, "SEGV_ADIPERR") },
 		{ ARG_XLAT_KNOWN(0x8, "SEGV_MTEAERR") },
 		{ ARG_XLAT_KNOWN(0x9, "SEGV_MTESERR") },
-		{ ARG_STR(0xa) },
+		{ ARG_XLAT_KNOWN(0xa, "SEGV_CPERR") },
+		{ ARG_STR(0xb) },
 		{ ARG_STR(0x499602d2) },
 	};
 	uint32_t segv_pkey_vecs[] = { 0, 1234567890, 3141592653U };

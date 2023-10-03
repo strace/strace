@@ -47,13 +47,14 @@ main(void)
 		(kernel_ulong_t) 0xdec0ded1defaced2ULL;
 
 	static const struct strval flags[] = {
-		{ (kernel_ulong_t) 0xbadc0dedda7a1054ULL,
+		{ (kernel_ulong_t) 0xbadc0dedda7a1050ULL,
 			"0xda7a0000 /* KEXEC_ARCH_??? */|0xbadc0ded0000",
 			"0xda7a0000 /* KEXEC_ARCH_??? */|0x",
-			"1054 /* KEXEC_??? */" },
+			"1050 /* KEXEC_??? */" },
 		{ 0, "", "", "KEXEC_ARCH_DEFAULT" },
-		{ 0x2a0003, "", "",
-			"KEXEC_ARCH_SH|KEXEC_ON_CRASH|KEXEC_PRESERVE_CONTEXT" },
+		{ 0x2a0007, "", "",
+			"KEXEC_ARCH_SH|KEXEC_ON_CRASH|KEXEC_PRESERVE_CONTEXT"
+			"|KEXEC_UPDATE_ELFCOREHDR" },
 		{ 0xdead0000, "", "", "0xdead0000 /* KEXEC_ARCH_??? */" },
 	};
 

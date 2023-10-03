@@ -897,7 +897,7 @@ main(void)
 		{ 0, "IFLA_BRPORT_UNSPEC" },
 		{ 24, "IFLA_BRPORT_FLUSH" },
 		{ 26, "IFLA_BRPORT_PAD" },
-		{ 44, "0x2c /* IFLA_BRPORT_??? */" },
+		{ 45, "0x2d /* IFLA_BRPORT_??? */" },
 		{ 2989, "0xbad /* IFLA_BRPORT_??? */" },
 	};
 
@@ -995,6 +995,7 @@ main(void)
 		{ 38, "IFLA_BRPORT_MCAST_EHT_HOSTS_CNT" },
 		{ ARG_STR(IFLA_BRPORT_MCAST_N_GROUPS) },
 		{ ARG_STR(IFLA_BRPORT_MCAST_MAX_GROUPS) },
+		{ ARG_STR(IFLA_BRPORT_BACKUP_NHID) },
 	};
 
 	for (size_t k = 0; k < ARRAY_SIZE(u32_brport_attrs); k++) {
