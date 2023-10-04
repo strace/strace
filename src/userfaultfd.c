@@ -26,6 +26,7 @@ SYS_FUNC(userfaultfd)
 #include "xlat/uffd_copy_flags.h"
 #include "xlat/uffd_register_ioctl_flags.h"
 #include "xlat/uffd_register_mode_flags.h"
+#include "xlat/uffd_writeprotect_mode_flags.h"
 #include "xlat/uffd_zeropage_flags.h"
 
 static void
@@ -180,6 +181,24 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		}
 
 		tprint_struct_end();
+
+		break;
+	}
+
+	case UFFDIO_WRITEPROTECT: {
+		struct uffdio_writeprotect uwp;
+
+		tprint_arg_next();
+		if (!umove_or_printaddr(tcp, arg, &uwp)) {
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(uwp, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(uwp, mode,
+					  uffd_writeprotect_mode_flags,
+					  "UFFDIO_WRITEPROTECT_MODE_WP???");
+			tprint_struct_end();
+		}
 
 		break;
 	}

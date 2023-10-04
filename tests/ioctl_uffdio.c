@@ -196,6 +196,31 @@ main(void)
 	rc = ioctl(fd, UFFDIO_UNREGISTER, range_struct);
 	printf("ioctl(%d, UFFDIO_UNREGISTER, {start=%p, len=%#zx}) = %d\n",
 	       fd, area2, pagesize, rc);
+
+	/* ---- WRITEPROTECT ---- */
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_writeprotect, wp);
+
+	rc = ioctl(fd, UFFDIO_WRITEPROTECT, NULL);
+	printf("ioctl(%d, UFFDIO_WRITEPROTECT, NULL) = %s\n",
+	       fd, sprintrc(rc));
+
+	memset(wp, 0, sizeof(*wp));
+	wp->mode = UFFDIO_WRITEPROTECT_MODE_WP;
+
+	rc = ioctl(-1, UFFDIO_WRITEPROTECT, wp);
+	printf("ioctl(-1, UFFDIO_WRITEPROTECT, {range={start=0, len=0}"
+	       ", mode=UFFDIO_WRITEPROTECT_MODE_WP}) = %s\n",
+	       sprintrc(rc));
+
+	wp->range.start = (uint64_t)(uintptr_t)area2;
+	wp->range.len = pagesize;
+	wp->mode |= UFFDIO_WRITEPROTECT_MODE_DONTWAKE;
+	rc = ioctl(fd, UFFDIO_WRITEPROTECT, wp);
+	printf("ioctl(%d, UFFDIO_WRITEPROTECT, {range={start=%p, len=%#zx}"
+	       ", mode=UFFDIO_WRITEPROTECT_MODE_WP"
+	       "|UFFDIO_WRITEPROTECT_MODE_DONTWAKE}) = %s\n",
+	       fd, area2, pagesize, sprintrc(rc));
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }

@@ -5,6 +5,7 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of FSCONFIG_CMD_CREATE_EXCL fsconfig command.
   * Implemented decoding of IFLA_BRPORT_BACKUP_NHID netlink attribute.
   * Implemented decoding of SECCOMP_IOCTL_NOTIF_SET_FLAGS ioctl.
+  * Implemented decoding of UFFDIO_WRITEPROTECT ioctl.
   * Updated lists of BPF_*, DEVCONF_*, IORING_*, KEXEC_*, NT_*, QFMT_*, SEGV_*,
     UFFD_*, V4L2_*, and XDP_* constants.
 
