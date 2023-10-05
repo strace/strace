@@ -23,6 +23,7 @@ SYS_FUNC(userfaultfd)
 
 #include "xlat/uffd_api_features.h"
 #include "xlat/uffd_api_flags.h"
+#include "xlat/uffd_continue_mode_flags.h"
 #include "xlat/uffd_copy_flags.h"
 #include "xlat/uffd_register_ioctl_flags.h"
 #include "xlat/uffd_register_mode_flags.h"
@@ -199,6 +200,33 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 					  "UFFDIO_WRITEPROTECT_MODE_WP???");
 			tprint_struct_end();
 		}
+
+		break;
+	}
+
+	case UFFDIO_CONTINUE: {
+		struct uffdio_continue uc;
+
+		if (entering(tcp)) {
+			tprint_arg_next();
+			if (umove_or_printaddr(tcp, arg, &uc))
+				return RVAL_IOCTL_DECODED;
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(uc, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(uc, mode, uffd_continue_mode_flags,
+					  "UFFDIO_CONTINUE_MODE_???");
+
+			return 0;
+		}
+
+		if (!syserror(tcp) && !umove(tcp, arg, &uc)) {
+			tprint_struct_next();
+			PRINT_FIELD_U(uc, mapped);
+		}
+
+		tprint_struct_end();
 
 		break;
 	}

@@ -221,6 +221,30 @@ main(void)
 	       "|UFFDIO_WRITEPROTECT_MODE_DONTWAKE}) = %s\n",
 	       fd, area2, pagesize, sprintrc(rc));
 
+	/* ---- CONTINUE ---- */
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_continue, uc);
+	memset(uc, 0, sizeof(*uc));
+
+	rc = ioctl(fd, UFFDIO_CONTINUE, NULL);
+	printf("ioctl(%d, UFFDIO_CONTINUE, NULL) = %s\n",
+	       fd, sprintrc(rc));
+
+	rc = ioctl(-1, UFFDIO_CONTINUE, uc);
+	printf("ioctl(-1, UFFDIO_CONTINUE, {range={start=0, len=0}, mode=0})"
+	       " = %s\n", sprintrc(rc));
+
+	uc->range.start = (uint64_t)(uintptr_t)area2;
+	uc->range.len = pagesize;
+	uc->mode = UFFDIO_CONTINUE_MODE_DONTWAKE;
+	rc = ioctl(fd, UFFDIO_CONTINUE, uc);
+	const char *errstr = sprintrc(rc);
+	printf("ioctl(%d, UFFDIO_CONTINUE, {range={start=%p, len=%#zx}"
+	       ", mode=UFFDIO_CONTINUE_MODE_DONTWAKE",
+	       fd, area2, pagesize);
+	if (rc >= 0)
+		printf(", mapped=%llu", (unsigned long long)(uint64_t) uc->mapped);
+	printf("}) = %s\n", errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
