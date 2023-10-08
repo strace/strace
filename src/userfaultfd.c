@@ -25,6 +25,7 @@ SYS_FUNC(userfaultfd)
 #include "xlat/uffd_api_flags.h"
 #include "xlat/uffd_continue_mode_flags.h"
 #include "xlat/uffd_copy_flags.h"
+#include "xlat/uffd_poison_mode_flags.h"
 #include "xlat/uffd_register_ioctl_flags.h"
 #include "xlat/uffd_register_mode_flags.h"
 #include "xlat/uffd_writeprotect_mode_flags.h"
@@ -224,6 +225,33 @@ uffdio_ioctl(struct tcb *const tcp, const unsigned int code,
 		if (!syserror(tcp) && !umove(tcp, arg, &uc)) {
 			tprint_struct_next();
 			PRINT_FIELD_U(uc, mapped);
+		}
+
+		tprint_struct_end();
+
+		break;
+	}
+
+	case UFFDIO_POISON: {
+		struct uffdio_poison up;
+
+		if (entering(tcp)) {
+			tprint_arg_next();
+			if (umove_or_printaddr(tcp, arg, &up))
+				return RVAL_IOCTL_DECODED;
+			tprint_struct_begin();
+			PRINT_FIELD_OBJ_PTR(up, range,
+					    tprintf_uffdio_range);
+			tprint_struct_next();
+			PRINT_FIELD_FLAGS(up, mode, uffd_poison_mode_flags,
+					  "UFFDIO_POISON_MODE_???");
+
+			return 0;
+		}
+
+		if (!syserror(tcp) && !umove(tcp, arg, &up)) {
+			tprint_struct_next();
+			PRINT_FIELD_U(up, updated);
 		}
 
 		tprint_struct_end();

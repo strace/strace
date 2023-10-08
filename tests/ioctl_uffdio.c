@@ -245,6 +245,30 @@ main(void)
 		printf(", mapped=%llu", (unsigned long long)(uint64_t) uc->mapped);
 	printf("}) = %s\n", errstr);
 
+	/* ---- POISON ---- */
+	TAIL_ALLOC_OBJECT_CONST_PTR(struct uffdio_poison, up);
+	memset(up, 0, sizeof(*up));
+
+	rc = ioctl(fd, UFFDIO_POISON, NULL);
+	printf("ioctl(%d, UFFDIO_POISON, NULL) = %s\n",
+	       fd, sprintrc(rc));
+
+	rc = ioctl(-1, UFFDIO_POISON, up);
+	printf("ioctl(-1, UFFDIO_POISON, {range={start=0, len=0}, mode=0})"
+	       " = %s\n", sprintrc(rc));
+
+	up->range.start = (uint64_t)(uintptr_t)area2;
+	up->range.len = pagesize;
+	up->mode = UFFDIO_POISON_MODE_DONTWAKE;
+	rc = ioctl(fd, UFFDIO_POISON, up);
+	errstr = sprintrc(rc);
+	printf("ioctl(%d, UFFDIO_POISON, {range={start=%p, len=%#zx}"
+	       ", mode=UFFDIO_POISON_MODE_DONTWAKE",
+	       fd, area2, pagesize);
+	if (rc >= 0)
+		printf(", updated=%llu", (unsigned long long)(uint64_t) up->updated);
+	printf("}) = %s\n", errstr);
+
 	puts("+++ exited with 0 +++");
 	return 0;
 }
