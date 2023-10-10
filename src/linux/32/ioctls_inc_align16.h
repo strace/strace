@@ -2354,6 +2354,7 @@
 { "linux/userfaultfd.h", "UFFDIO_API", _IOC_READ|_IOC_WRITE, 0xaa3f, 0x18 },
 { "linux/userfaultfd.h", "UFFDIO_CONTINUE", _IOC_READ|_IOC_WRITE, 0xaa07, 0x20 },
 { "linux/userfaultfd.h", "UFFDIO_COPY", _IOC_READ|_IOC_WRITE, 0xaa03, 0x28 },
+{ "linux/userfaultfd.h", "UFFDIO_POISON", _IOC_READ|_IOC_WRITE, 0xaa08, 0x20 },
 { "linux/userfaultfd.h", "UFFDIO_REGISTER", _IOC_READ|_IOC_WRITE, 0xaa00, 0x20 },
 { "linux/userfaultfd.h", "UFFDIO_UNREGISTER", _IOC_READ, 0xaa01, 0x10 },
 { "linux/userfaultfd.h", "UFFDIO_WAKE", _IOC_READ, 0xaa02, 0x10 },

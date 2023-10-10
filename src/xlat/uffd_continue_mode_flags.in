@@ -1,0 +1,3 @@
+#unconditional
+#val_type uint64_t
+UFFDIO_CONTINUE_MODE_DONTWAKE
