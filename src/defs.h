@@ -550,7 +550,6 @@ extern bool stack_trace_enabled;
 # else
 #  define stack_trace_enabled 0
 # endif
-extern unsigned ptrace_setoptions;
 extern unsigned max_strlen;
 extern unsigned os_release;
 # undef KERNEL_VERSION

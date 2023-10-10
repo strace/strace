@@ -69,8 +69,8 @@ const unsigned int syscall_trap_sig = SIGTRAP | 0x80;
 cflag_t cflag = CFLAG_NONE;
 bool followfork;
 bool output_separately;
-unsigned int ptrace_setoptions = PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC
-				 | PTRACE_O_TRACEEXIT;
+static unsigned int ptrace_setoptions =
+	PTRACE_O_TRACESYSGOOD | PTRACE_O_TRACEEXEC | PTRACE_O_TRACEEXIT;
 static const struct xlat_data xflag_str[] = {
 	{ HEXSTR_NONE,			"none" },
 	{ HEXSTR_NON_ASCII_CHARS,	"non-ascii-chars" },
