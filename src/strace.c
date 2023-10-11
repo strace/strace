@@ -2748,9 +2748,12 @@ init(int argc, char *argv[])
 		seccomp_filtering = false;
 	}
 
-	if (seccomp_filtering && nprocs && (!argc || debug_flag))
+	if (seccomp_filtering && nprocs) {
 		error_msg("--seccomp-bpf is not enabled for processes"
 			  " attached with -p");
+		if (argc == 0)
+			seccomp_filtering = false;
+	}
 
 	if (optF) {
 		if (followfork) {
