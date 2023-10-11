@@ -2717,18 +2717,6 @@ init(int argc, char *argv[])
 		}
 	}
 
-	if (seccomp_filtering && detach_on_execve) {
-		error_msg("--seccomp-bpf is not enabled because"
-			  " it is not compatible with -b");
-		seccomp_filtering = false;
-	}
-
-	if (seccomp_filtering && syscall_limit > 0) {
-		error_msg("--seccomp-bpf is not enabled because"
-			  " it is not compatible with --syscall-limit");
-		seccomp_filtering = false;
-	}
-
 	if (followfork_short) {
 		if (followfork) {
 			error_msg_and_die("-f and --follow-forks cannot"
@@ -2742,16 +2730,27 @@ init(int argc, char *argv[])
 		}
 	}
 
-	if (seccomp_filtering) {
-		if (nprocs && (!argc || debug_flag))
-			error_msg("--seccomp-bpf is not enabled for processes"
-				  " attached with -p");
-		if (!followfork) {
-			error_msg("--seccomp-bpf cannot be used without "
-				  "-f/--follow-forks, disabling");
-			seccomp_filtering = false;
-		}
+	if (seccomp_filtering && !followfork) {
+		error_msg("--seccomp-bpf cannot be used without"
+			  " -f/--follow-forks, disabling");
+		seccomp_filtering = false;
 	}
+
+	if (seccomp_filtering && detach_on_execve) {
+		error_msg("--seccomp-bpf is not enabled because"
+			  " it is not compatible with -b");
+		seccomp_filtering = false;
+	}
+
+	if (seccomp_filtering && syscall_limit > 0) {
+		error_msg("--seccomp-bpf is not enabled because"
+			  " it is not compatible with --syscall-limit");
+		seccomp_filtering = false;
+	}
+
+	if (seccomp_filtering && nprocs && (!argc || debug_flag))
+		error_msg("--seccomp-bpf is not enabled for processes"
+			  " attached with -p");
 
 	if (optF) {
 		if (followfork) {
