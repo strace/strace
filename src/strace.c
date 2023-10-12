@@ -29,6 +29,7 @@
 #include <sys/prctl.h>
 
 #include "kill_save_errno.h"
+#include "exitkill.h"
 #include "filter_seccomp.h"
 #include "largefile_wrappers.h"
 #include "mmap_cache.h"
@@ -326,6 +327,7 @@ Tracing:\n\
      3, never:      fatal signals are always blocked (default if '-o FILE PROG')\n\
      4, never_tstp: fatal signals and SIGTSTP (^Z) are always blocked\n\
                     (useful to make 'strace -o FILE PROG' not stop on ^Z)\n\
+  --kill-on-exit kill all tracees if strace is killed\n\
 \n\
 Filtering:\n\
   -e trace=[!][?]{{SYSCALL|GROUP|all|/REGEX}[@64|@32|@x32]|none},\n\
@@ -2218,6 +2220,7 @@ init(int argc, char *argv[])
 	int tflag_short = 0;
 	bool columns_set = false;
 	bool sortby_set = false;
+	bool opt_kill_on_exit = false;
 
 	/*
 	 * We can initialise global_path_set only after tracing backend
@@ -2278,6 +2281,7 @@ init(int argc, char *argv[])
 		GETOPT_DAEMONIZE,
 		GETOPT_HEX_STR,
 		GETOPT_FOLLOWFORKS,
+		GETOPT_KILL_ON_EXIT,
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_PIDNS_TRANSLATION,
 		GETOPT_SYSCALL_LIMIT,
@@ -2319,6 +2323,7 @@ init(int argc, char *argv[])
 		{ "help",		no_argument,	   0, 'h' },
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
+		{ "kill-on-exit",	no_argument,	   0, GETOPT_KILL_ON_EXIT },
 		{ "stack-traces",	no_argument,	   0, 'k' },
 		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
@@ -2463,6 +2468,9 @@ init(int argc, char *argv[])
 					  "option) are not supported by this "
 					  "build of strace");
 #endif
+			break;
+		case GETOPT_KILL_ON_EXIT:
+			opt_kill_on_exit = true;
 			break;
 		case 'n':
 			nflag = 1;
@@ -2881,6 +2889,16 @@ init(int argc, char *argv[])
 	if (seccomp_filtering)
 		ptrace_setoptions |= PTRACE_O_TRACESECCOMP;
 
+	if (opt_kill_on_exit) {
+		if (nprocs)
+			error_msg_and_die("--kill-on-exit and -p/--attach"
+					  " are mutually exclusive options");
+		if (!is_exitkill_supported())
+			error_msg_and_die("PTRACE_O_EXITKILL is not supported"
+					  " by the kernel");
+		ptrace_setoptions |= PTRACE_O_EXITKILL;
+	}
+
 	debug_msg("ptrace_setoptions = %#x", ptrace_setoptions);
 	test_ptrace_seize();
 	test_ptrace_get_syscall_info();
@@ -3040,6 +3058,9 @@ pid2tcb(const int pid)
 static void
 cleanup(int fatal_sig)
 {
+	if (ptrace_setoptions & PTRACE_O_EXITKILL)
+		return;
+
 	if (!fatal_sig)
 		fatal_sig = SIGTERM;
 

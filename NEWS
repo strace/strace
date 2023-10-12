@@ -2,6 +2,9 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Implemented --kill-on-exit option that instructs the tracer to set
+    PTRACE_O_EXITKILL option to all tracee processes and not to detach them
+    on cleanup so they will not be left running after the tracer exit.
   * Implemented decoding of FSCONFIG_CMD_CREATE_EXCL fsconfig command.
   * Implemented decoding of IFLA_BRPORT_BACKUP_NHID netlink attribute.
   * Implemented decoding of SECCOMP_IOCTL_NOTIF_SET_FLAGS ioctl.

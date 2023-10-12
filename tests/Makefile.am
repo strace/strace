@@ -589,6 +589,7 @@ MISC_TESTS = \
 	gettid--pidns-translation.test \
 	inject-nf.test \
 	interactive_block.test \
+	kill-on-exit.test \
 	kill_child.test \
 	legacy_syscall_info.test \
 	localtime.test \
@@ -795,6 +796,7 @@ EXTRA_DIST = \
 	ioctl_kvm_run_common.c \
 	kernel_old_timespec.h \
 	kernel_old_timex.h \
+	kill-on-exit.sh \
 	ksysent.sed \
 	lstatx.c \
 	nlattr_ifla.h \
