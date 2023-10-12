@@ -1431,6 +1431,8 @@ startup_attach(void)
 						   " session");
 			break;
 		}
+
+		debug_msg("new tracer pid is %d", strace_tracer_pid);
 	}
 
 	for (unsigned int tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
