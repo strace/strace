@@ -2886,8 +2886,11 @@ init(int argc, char *argv[])
 
 	if (seccomp_filtering)
 		check_seccomp_filter();
-	if (seccomp_filtering)
+	if (seccomp_filtering) {
 		ptrace_setoptions |= PTRACE_O_TRACESECCOMP;
+		if (nprocs == 0 && is_exitkill_supported())
+			ptrace_setoptions |= PTRACE_O_EXITKILL;
+	}
 
 	if (opt_kill_on_exit) {
 		if (nprocs)

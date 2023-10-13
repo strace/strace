@@ -1644,6 +1644,13 @@ itself is being traced.
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
+When
+.B \-\-seccomp\-bpf
+is activated and
+.BR \-p / \-\-attach
+option is not used,
+.B \-\-kill\-on\-exit
+option is activated as well.
 .TP
 .BR \-\-tips [=[[ id: ] \fIid\fR ],[[ format: ] \fIformat\fR ]]
 Show strace tips, tricks, and tweaks before exit.
@@ -1915,7 +1922,11 @@ option).
 .LP
 Unless
 .B \-\-kill\-on\-exit
-option is used, traced processes which are descended from
+option is used (or
+.B \-\-seccomp\-bpf
+option is used in a way that implies
+.BR \-\-kill\-on\-exit ),
+traced processes which are descended from
 .I command
 may be left running after an interrupt signal
 .RB ( CTRL\-C ).

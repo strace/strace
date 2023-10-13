@@ -580,6 +580,7 @@ MISC_TESTS = \
 	detach-stopped.test \
 	fflush.test \
 	filter-unavailable.test \
+	filter_seccomp-exitkill.test \
 	filter_seccomp-perf.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
