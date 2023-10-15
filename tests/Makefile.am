@@ -648,6 +648,7 @@ MISC_TESTS = \
 	strace-log-merge-suffix.test \
 	strace-p-Y-p.test \
 	strace-r.test \
+	strace-self.test \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
