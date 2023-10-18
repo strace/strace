@@ -201,6 +201,8 @@ check_e "invalid quiet 'detach'" --quiet=detach -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q --quiet -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e q=none -p $$
 check_e '-q and -e quiet/--quiet cannot be provided simultaneously' -q -e silent=attach,personality -p $$
+check_e '--kill-on-exit and -p/--attach are mutually exclusive options' --kill-on-exit -p $$
+check_e '--kill-on-exit and -p/--attach are mutually exclusive options' --kill-on-exit -p $$ true
 
 check_h 'must have PROG [ARGS] or -p PID' -P .
 check_h 'must have PROG [ARGS] or -p PID' -P . -P..
@@ -343,6 +345,13 @@ if [ "$uid" -ge 0 ]; then
 	if [ "$uid" -eq 0 ]; then
 		umsg="Cannot find user ':nosuchuser:'"
 	else
+		if [ "$(fakeroot ../block_reset_run 15 id -u 2>&1)" = 0 ]; then
+			saved_STRACE=$STRACE
+			STRACE="fakeroot -- $STRACE"
+			umsg="Cannot find user ':nosuchuser:'"
+			check_e "$umsg" -u :nosuchuser: true
+			STRACE=$saved_STRACE
+		fi
 		umsg='You must be root to use the -u/--username option'
 	fi
 

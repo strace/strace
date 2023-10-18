@@ -580,6 +580,7 @@ MISC_TESTS = \
 	detach-stopped.test \
 	fflush.test \
 	filter-unavailable.test \
+	filter_seccomp-exitkill.test \
 	filter_seccomp-perf.test \
 	filtering_fd-syntax.test \
 	filtering_syscall-syntax.test \
@@ -589,6 +590,7 @@ MISC_TESTS = \
 	gettid--pidns-translation.test \
 	inject-nf.test \
 	interactive_block.test \
+	kill-on-exit.test \
 	kill_child.test \
 	legacy_syscall_info.test \
 	localtime.test \
@@ -646,6 +648,7 @@ MISC_TESTS = \
 	strace-log-merge-suffix.test \
 	strace-p-Y-p.test \
 	strace-r.test \
+	strace-self.test \
 	strace-t.test \
 	strace-tt.test \
 	strace-ttt.test \
@@ -795,6 +798,7 @@ EXTRA_DIST = \
 	ioctl_kvm_run_common.c \
 	kernel_old_timespec.h \
 	kernel_old_timex.h \
+	kill-on-exit.sh \
 	ksysent.sed \
 	lstatx.c \
 	nlattr_ifla.h \

@@ -489,6 +489,17 @@ number of syscalls have been captured. Syscalls filtered out via
 or
 .B \-\-status
 options are not considered when keeping track of the number of syscalls that are captured.
+.TP
+.B \-\-kill\-on\-exit
+Set
+.B PTRACE_O_EXITKILL
+ptrace option to all tracee processes (which send a SIGKILL signal to
+the tracee if the tracer exits) and do not detach them on cleanup so
+they will not be left running after the tracer exit.
+.B \-\-kill\-on\-exit
+is not compatible with
+.BR \-p / \-\-attach
+options.
 .SS Filtering
 .TP 12
 \fB\-e\ trace\fR=\,\fIsyscall_set\fR
@@ -1633,6 +1644,13 @@ itself is being traced.
 In cases when seccomp-bpf filter setup failed,
 .B strace
 proceeds as usual and stops traced processes on every system call.
+When
+.B \-\-seccomp\-bpf
+is activated and
+.BR \-p / \-\-attach
+option is not used,
+.B \-\-kill\-on\-exit
+option is activated as well.
 .TP
 .BR \-\-tips [=[[ id: ] \fIid\fR ],[[ format: ] \fIformat\fR ]]
 Show strace tips, tricks, and tweaks before exit.
@@ -1902,7 +1920,13 @@ A traced process runs slowly (but check out the
 .B \-\-seccomp\-bpf
 option).
 .LP
-Traced processes which are descended from
+Unless
+.B \-\-kill\-on\-exit
+option is used (or
+.B \-\-seccomp\-bpf
+option is used in a way that implies
+.BR \-\-kill\-on\-exit ),
+traced processes which are descended from
 .I command
 may be left running after an interrupt signal
 .RB ( CTRL\-C ).

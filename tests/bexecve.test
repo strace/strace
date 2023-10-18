@@ -35,7 +35,24 @@ if LC_ALL=C grep -E -v -x "$pattern_detached" "$LOG" > /dev/null; then
 	dump_log_and_fail_with "$STRACE $args: unexpected output"
 fi
 
-run_strace_redir --quiet=personality --seccomp-bpf -bexecve -enone ../set_ptracer_any false ||
+run_strace_redir --quiet=personality -bexecve -enone --kill-on-exit \
+	../set_ptracer_any echo ONE > "$OUT" ||
+	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
+
+LC_ALL=C grep -x "$pattern_detached" "$LOG" > /dev/null ||
+	dump_log_and_fail_with "$STRACE $args: output mismatch"
+
+if LC_ALL=C grep -E -v -x "$pattern_detached" "$LOG" > /dev/null; then
+	dump_log_and_fail_with "$STRACE $args: unexpected output"
+fi
+
+{
+	echo
+	echo ONE
+} > "$EXP"
+match_diff "$OUT" "$EXP"
+
+run_strace_redir --quiet=personality --seccomp-bpf -f -bexecve -enone ../set_ptracer_any false ||
 	dump_log_and_fail_with "$STRACE $args: unexpected exit status"
 
 pattern_seccomp='[^:]*strace: --seccomp-bpf is not enabled because it is not compatible with -b'

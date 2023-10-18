@@ -37,7 +37,7 @@ print_pidfd(int *p)
 	if (rc < 0)
 		printf("%p", p);
 	else
-		printf("%d%s", *p, pidfd_suffix);
+		printf("[%d%s]", *p, pidfd_suffix);
 }
 
 static void

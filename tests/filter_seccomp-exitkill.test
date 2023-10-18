@@ -1,0 +1,13 @@
+#!/bin/sh -efu
+#
+# Check that PTRACE_O_EXITKILL is set along with --seccomp-bpf.
+#
+# Copyright (c) 2023 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+. "${srcdir=.}/filter_seccomp.sh"
+kill_on_exit_option='--seccomp-bpf'
+. "${srcdir=.}/kill-on-exit.sh"

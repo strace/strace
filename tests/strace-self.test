@@ -1,0 +1,19 @@
+#!/bin/sh -efu
+#
+# Check how strace handles attempts to trace itself.
+#
+# Copyright (c) 2023 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/init.sh"
+
+rc=0
+sh -c "exec $STRACE -p \$\$" 2> "$LOG" || rc=$?
+[ "$rc" = 1 ] ||
+	fail_ "expected rc 1, got rc $rc"
+
+args=
+echo "$STRACE: I'm sorry, I can't let you do that, Dave." > "$EXP"
+match_diff "$LOG" "$EXP"
