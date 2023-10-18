@@ -498,6 +498,10 @@ madvise
 madvise-Xabbrev
 madvise-Xraw
 madvise-Xverbose
+map_shadow_stack
+map_shadow_stack-Xabbrev
+map_shadow_stack-Xraw
+map_shadow_stack-Xverbose
 maybe_switch_current_tcp
 maybe_switch_current_tcp--quiet-thread-execve
 mbind

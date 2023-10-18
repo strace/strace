@@ -197,6 +197,7 @@ libstrace_a_SOURCES =	\
 	loop.c		\
 	lseek.c		\
 	macros.h	\
+	map_shadow_stack.c \
 	mem.c		\
 	membarrier.c	\
 	memfd_create.c	\

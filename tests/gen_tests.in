@@ -514,6 +514,10 @@ madvise	-a31
 madvise-Xabbrev		--trace=madvise -a31 -Xabbrev
 madvise-Xraw		--trace=madvise -a23 -Xraw
 madvise-Xverbose	--trace=madvise -a40 -Xverbose
+map_shadow_stack	-a29
+map_shadow_stack-Xabbrev	--trace=map_shadow_stack -a29 -Xabbrev
+map_shadow_stack-Xraw		--trace=map_shadow_stack -a29 -Xraw
+map_shadow_stack-Xverbose	--trace=map_shadow_stack -a29 -Xverbose
 maybe_switch_current_tcp	-a30 -f -e trace=execveat
 maybe_switch_current_tcp--quiet-thread-execve	-a30 -s48 -f -e trace=execveat --quiet=personality,thread-execve
 mbind

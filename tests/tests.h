@@ -47,6 +47,8 @@
 
 
 # if XLAT_RAW
+#  define XLAT_name raw
+
 #  define XLAT_KNOWN(val_, str_) STRINGIFY_VAL(val_)
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_)
 
@@ -69,6 +71,8 @@
 #  define NRAW(...)
 #  define NVERB(...) __VA_ARGS__
 # elif XLAT_VERBOSE
+#  define XLAT_name verbose
+
 #  define XLAT_KNOWN(val_, str_) STRINGIFY_VAL(val_) " /* " str_ " */"
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
 
@@ -91,6 +95,8 @@
 #  define NRAW(...) __VA_ARGS__
 #  define NVERB(...)
 # else /* !XLAT_RAW && !XLAT_VERBOSE */
+#  define XLAT_name abbrev
+
 #  define XLAT_KNOWN(val_, str_) str_
 #  define XLAT_UNKNOWN(val_, dflt_) STRINGIFY_VAL(val_) " /* " dflt_ " */"
 
