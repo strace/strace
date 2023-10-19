@@ -1637,17 +1637,7 @@ startup_child(char **argv, char **env)
 	}
 	if (strchr(filename, '/')) {
 		strcpy(pathname, filename);
-	}
-#ifdef USE_DEBUGGING_EXEC
-	/*
-	 * Debuggers customarily check the current directory
-	 * first regardless of the path but doing that gives
-	 * security geeks a panic attack.
-	 */
-	else if (stat_file(filename, &statbuf) == 0)
-		strcpy(pathname, filename);
-#endif /* USE_DEBUGGING_EXEC */
-	else {
+	} else {
 		const char *path;
 		size_t m, n, len;
 
