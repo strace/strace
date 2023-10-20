@@ -1674,9 +1674,10 @@ startup_child(char **argv, char **env)
 		if (!path || !*path)
 			pathname[0] = '\0';
 	}
-	if (stat_file(pathname, &statbuf) < 0) {
-		perror_msg_and_die("Can't stat '%s'", filename);
-	}
+	if (filename && !*pathname)
+		error_msg_and_die("Cannot find executable '%s'", filename);
+	if (stat_file(pathname, &statbuf) < 0)
+		perror_msg_and_die("Cannot stat '%s'", pathname);
 
 	params_for_tracee.fd_to_close = (shared_log != stderr) ? fileno(shared_log) : -1;
 	params_for_tracee.run_euid = (statbuf.st_mode & S_ISUID) ? statbuf.st_uid : run_uid;
