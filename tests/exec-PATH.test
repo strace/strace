@@ -1,0 +1,42 @@
+#!/bin/sh -efu
+#
+# Check how strace handles $PATH.
+#
+# Copyright (c) 2023 Dmitry V. Levin <ldv@strace.io>
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+. "${srcdir=.}/syntax.sh"
+
+saved_STRACE=$STRACE
+
+check_path_e()
+{
+	local path pattern
+	pattern="$1"; shift
+	path="$1"; shift
+	STRACE="env PATH=$path $saved_STRACE"
+	check_e "$pattern" "$@"
+}
+
+check_path_diff()
+{
+	local path
+	path="$1"; shift
+	STRACE="env PATH=$path $saved_STRACE"
+
+	run_strace "$@" > "$EXP"
+	match_diff "$LOG" "$EXP"
+}
+
+check_path_e "Cannot find executable '.'" . .
+check_path_e "Cannot find executable '.'" : .
+check_path_e "Cannot find executable '.'" "$PATH" .
+
+check_path_e "Cannot stat './missing': No such file or directory" . ./missing
+
+run_prog ../status-none > /dev/null
+check_path_diff ..  --trace=none status-none
+check_path_diff :.. --trace=none status-none
+check_path_diff ..: --trace=none status-none

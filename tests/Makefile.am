@@ -578,6 +578,7 @@ MISC_TESTS = \
 	detach-running.test \
 	detach-sleeping.test \
 	detach-stopped.test \
+	exec-PATH.test \
 	fflush.test \
 	filter-unavailable.test \
 	filter_seccomp-exitkill.test \
