@@ -13,8 +13,8 @@ Noteworthy changes in release ?.? (????-??-??)
   * Implemented decoding of SECCOMP_IOCTL_NOTIF_SET_FLAGS ioctl.
   * Implemented decoding of UFFDIO_CONTINUE, UFFDIO_POISON, and
     UFFDIO_WRITEPROTECT ioctls.
-  * Updated lists of BPF_*, DEVCONF_*, IORING_*, KEXEC_*, NT_*, QFMT_*, SEGV_*,
-    UFFD_*, V4L2_*, and XDP_* constants.
+  * Updated lists of BPF_*, DEVCONF_*, IORING_*, KEXEC_*, MAP_*, NT_*, QFMT_*,
+    SEGV_*, UFFD_*, V4L2_*, and XDP_* constants.
   * Updated lists of ioctl commands from Linux 6.6.
 
 Noteworthy changes in release 6.5 (2023-09-01)

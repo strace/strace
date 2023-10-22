@@ -28,6 +28,12 @@ MAP_32BIT	0x40
 MAP_32BIT
 #endif
 
+#if defined __x86_64__ || defined __i386__
+MAP_ABOVE4G	0x80
+#else
+MAP_ABOVE4G
+#endif
+
 #if defined MAP_RENAME && MAP_RENAME == MAP_ANONYMOUS  /* MAP_RENAME is unusual */
 # ifndef STRACE_WORKAROUND_FOR_MAP_RENAME
 #  define STRACE_WORKAROUND_FOR_MAP_RENAME
