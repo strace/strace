@@ -1,7 +1,7 @@
 /*
  * Check decoding of sched_getparam and sched_setparam syscalls.
  *
- * Copyright (c) 2016-2021 The strace developers.
+ * Copyright (c) 2016-2023 The strace developers.
  * All rights reserved.
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
