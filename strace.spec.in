@@ -208,6 +208,9 @@ fi
 * @RPM_CHANGELOGTIME@ @PACKAGE_BUGREPORT@ - @PACKAGE_VERSION@-1
 - @PACKAGE_STRING@ snapshot.
 
+* Tue Oct 31 2023 Dmitry V. Levin <ldv@strace.io> - 6.6-1
+- v6.5 -> v6.6 (resolves: #2243631).
+
 * Fri Sep 01 2023 Dmitry V. Levin <ldv@strace.io> - 6.5-1
 - v6.4 -> v6.5.
 - Updated the SPDX license expression (by Eugene Syromyatnikov).
