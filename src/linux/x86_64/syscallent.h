@@ -342,4 +342,3 @@
 [334] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [335 ... 423] - reserved to sync up with other architectures */
 #include "syscallent-common.h"
-[453] = { 3,	TM,		SEN(map_shadow_stack),		"map_shadow_stack"	},

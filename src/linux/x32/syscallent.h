@@ -342,7 +342,6 @@
 [334] = { 4,	0,		SEN(rseq),			"rseq"			},
 /* [335 ... 423] - reserved to sync up with other architectures */
 #include "syscallent-common.h"
-[453] = { 3,	TM,		SEN(map_shadow_stack),		"map_shadow_stack"	},
 /*
  * x32-specific system call numbers start at 512 to avoid cache impact
  * for native 64-bit operation.

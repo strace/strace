@@ -37,3 +37,4 @@
 [BASE_NR + 450] = { 4,	TM,		SEN(set_mempolicy_home_node),	"set_mempolicy_home_node"	},
 [BASE_NR + 451] = { 4,	TD,		SEN(cachestat),			"cachestat"	},
 [BASE_NR + 452] = { 4,	TD|TF,		SEN(fchmodat2),			"fchmodat2"	},
+[BASE_NR + 453] = { 3,	TM,		SEN(map_shadow_stack),		"map_shadow_stack"	},
