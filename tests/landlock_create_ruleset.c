@@ -45,8 +45,7 @@
 static const char *errstr;
 
 static long
-sys_landlock_create_ruleset(struct landlock_ruleset_attr *attr,
-			    kernel_ulong_t size, unsigned int flags)
+sys_landlock_create_ruleset(void *attr, kernel_ulong_t size, unsigned int flags)
 
 {
 	static const kernel_ulong_t fill =
@@ -72,7 +71,7 @@ main(void)
 
 	SKIP_IF_PROC_IS_UNAVAILABLE;
 
-	TAIL_ALLOC_OBJECT_VAR_PTR(struct landlock_ruleset_attr, attr);
+	TAIL_ALLOC_OBJECT_VAR_PTR(uint64_t, handled_access_fs);
 	long rc;
 
 	/* All zeroes */
@@ -104,17 +103,18 @@ main(void)
 	       0xbadfacec, sprintrc(rc));
 
 	/* Bogus addr, size, flags */
-	rc = sys_landlock_create_ruleset(attr + 1, bogus_size, 0xbadcaffe);
+	rc = sys_landlock_create_ruleset(handled_access_fs + 1, bogus_size,
+					 0xbadcaffe);
 	printf("landlock_create_ruleset(%p, %llu"
 	       ", 0xbadcaffe /* LANDLOCK_CREATE_RULESET_??? */) = %s"
 	       INJ_FD_STR,
-	       attr + 1, (unsigned long long) bogus_size, errstr);
+	       handled_access_fs + 1, (unsigned long long) bogus_size, errstr);
 
 	/* Size is too small */
 	for (size_t i = 0; i < 8; i++) {
-		rc = sys_landlock_create_ruleset(attr, i, 0);
+		rc = sys_landlock_create_ruleset(handled_access_fs, i, 0);
 		printf("landlock_create_ruleset(%p, %zu, 0) = %s" INJ_FD_STR,
-		       attr, i, errstr);
+		       handled_access_fs, i, errstr);
 	}
 
 	/* Perform syscalls with valid attr ptr */
@@ -132,8 +132,9 @@ main(void)
 		for (size_t j = 0; j < ARRAY_SIZE(sizes); j++) {
 			const char *fd_str = FD_PATH;
 
-			attr->handled_access_fs = attr_vals[i].val;
-			rc = sys_landlock_create_ruleset(attr, sizes[j], 0);
+			*handled_access_fs = attr_vals[i].val;
+			rc = sys_landlock_create_ruleset(handled_access_fs,
+							 sizes[j], 0);
 
 #if DECODE_FD
 			/*
@@ -161,7 +162,7 @@ main(void)
 			printf("landlock_create_ruleset({handled_access_fs=%s"
 			       "%s}, %llu, 0) = %s%s" INJ_STR,
 			       attr_vals[i].str,
-			       sizes[j] > sizeof(*attr) ? ", ..." : "",
+			       sizes[j] > sizeof(*handled_access_fs) ? ", ..." : "",
 			       (unsigned long long) sizes[j],
 			       errstr, rc >= 0 ? fd_str : "");
 		}

@@ -18,20 +18,24 @@ print_landlock_ruleset_attr(struct tcb *tcp, const kernel_ulong_t addr,
 			    const kernel_ulong_t size)
 {
 	struct landlock_ruleset_attr attr;
+	const size_t min_attr_size =
+		offsetofend(typeof(attr), handled_access_fs);
+	const size_t max_attr_size =
+		offsetofend(typeof(attr), handled_access_fs);
 
-	if (size < offsetofend(typeof(attr), handled_access_fs)) {
+	if (size < min_attr_size) {
 		printaddr(addr);
 		return;
 	}
 
-	if (umoven_or_printaddr(tcp, addr, MIN(size, sizeof(attr)), &attr))
+	if (umoven_or_printaddr(tcp, addr, MIN(size, max_attr_size), &attr))
 		return;
 
 	tprint_struct_begin();
 	PRINT_FIELD_FLAGS(attr, handled_access_fs, landlock_ruleset_access_fs,
 			  "LANDLOCK_ACCESS_FS_???");
 
-	if (size > offsetofend(typeof(attr), handled_access_fs)) {
+	if (size > max_attr_size) {
 		tprint_arg_next();
 		tprint_more_data_follows();
 	}
