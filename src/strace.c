@@ -1674,7 +1674,7 @@ startup_child(char **argv, char **env)
 		if (!path || !*path)
 			pathname[0] = '\0';
 	}
-	if (filename && !*pathname)
+	if (!*pathname)
 		error_msg_and_die("Cannot find executable '%s'", filename);
 	if (stat_file(pathname, &statbuf) < 0)
 		perror_msg_and_die("Cannot stat '%s'", pathname);
@@ -3761,7 +3761,7 @@ dispatch_event(const struct tcb_wait_data *wd)
 		break;
 
 	case TE_SECCOMP:
-		if (!has_seccomp_filter(current_tcp)) {
+		if (current_tcp && !has_seccomp_filter(current_tcp)) {
 			/*
 			 * We don't know if forks/clones have a seccomp filter
 			 * when they are created, but we can detect it when we
@@ -3836,17 +3836,21 @@ dispatch_event(const struct tcb_wait_data *wd)
 
 	case TE_SIGNAL_DELIVERY_STOP:
 		restart_sig = WSTOPSIG(status);
-		print_stopped(current_tcp, &wd->si, restart_sig);
+		if (current_tcp)
+			print_stopped(current_tcp, &wd->si, restart_sig);
 		break;
 
 	case TE_SIGNALLED:
-		print_signalled(current_tcp, current_tcp->pid, status);
-		droptcb(current_tcp);
+		if (current_tcp) {
+			print_signalled(current_tcp, current_tcp->pid, status);
+			droptcb(current_tcp);
+		}
 		return true;
 
 	case TE_GROUP_STOP:
 		restart_sig = WSTOPSIG(status);
-		print_stopped(current_tcp, NULL, restart_sig);
+		if (current_tcp)
+			print_stopped(current_tcp, NULL, restart_sig);
 		if (use_seize) {
 			/*
 			 * This ends ptrace-stop, but does *not* end group-stop.
@@ -3860,8 +3864,10 @@ dispatch_event(const struct tcb_wait_data *wd)
 		break;
 
 	case TE_EXITED:
-		print_exited(current_tcp, current_tcp->pid, status);
-		droptcb(current_tcp);
+		if (current_tcp) {
+			print_exited(current_tcp, current_tcp->pid, status);
+			droptcb(current_tcp);
+		}
 		return true;
 
 	case TE_STOP_BEFORE_EXECVE:
@@ -3903,7 +3909,8 @@ dispatch_event(const struct tcb_wait_data *wd)
 		break;
 
 	case TE_STOP_BEFORE_EXIT:
-		print_event_exit(current_tcp);
+		if (current_tcp)
+			print_event_exit(current_tcp);
 		break;
 	}
 
@@ -3912,7 +3919,7 @@ dispatch_event(const struct tcb_wait_data *wd)
 		return false;
 
 	/* If the process is being delayed, do not ptrace_restart just yet */
-	if (syscall_delayed(current_tcp)) {
+	if (current_tcp && syscall_delayed(current_tcp)) {
 		if (current_tcp->delayed_wait_data)
 			error_func_msg("pid %d has delayed wait data set"
 				       " already", current_tcp->pid);
