@@ -2,6 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
+  * Updated lists of BPF_* constants.
 
 Noteworthy changes in release 6.6 (2023-10-31)
 ==============================================
