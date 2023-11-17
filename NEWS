@@ -2,7 +2,7 @@ Noteworthy changes in release ?.? (????-??-??)
 ==============================================
 
 * Improvements
-  * Updated lists of BPF_*, IORING_*, and KVM_* constants.
+  * Updated lists of BPF_*, IORING_*, KVM_*, and LANDLOCK_* constants.
 
 Noteworthy changes in release 6.6 (2023-10-31)
 ==============================================

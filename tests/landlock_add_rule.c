@@ -77,8 +77,8 @@ main(void)
 	       ", 0xfacebeef /* LANDLOCK_RULE_??? */, %p, 0x1) = %s\n",
 	       attr + 1, errstr);
 
-	sys_landlock_add_rule(1729, 2, attr + 1, 0xffffffff);
-	printf("landlock_add_rule(1729, 0x2 /* LANDLOCK_RULE_??? */, %p"
+	sys_landlock_add_rule(1729, 3, attr + 1, 0xffffffff);
+	printf("landlock_add_rule(1729, 0x3 /* LANDLOCK_RULE_??? */, %p"
 	       ", 0xffffffff) = %s\n",
 	       attr + 1, errstr);
 
@@ -90,10 +90,10 @@ main(void)
 	       attr + 1, errstr);
 
 	/* Short read */
-	sys_landlock_add_rule(RULESET_FD, LANDLOCK_RULE_PATH_BENEATH,
+	sys_landlock_add_rule(RULESET_FD, LANDLOCK_RULE_NET_PORT,
 			      (char *) attr + 4, 0);
 	printf("landlock_add_rule(" RULESET_FD_STR
-	       ", LANDLOCK_RULE_PATH_BENEATH, %p, 0) = %s\n",
+	       ", LANDLOCK_RULE_NET_PORT, %p, 0) = %s\n",
 	       (char *) attr + 4, errstr);
 
 	/* Valid attr ptr */
