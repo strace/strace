@@ -3168,6 +3168,8 @@ cleanup(int fatal_sig)
 	if (!fatal_sig)
 		fatal_sig = SIGTERM;
 
+	size_t num_to_wait = 0;
+
 	for (size_t i = 0; i < tcbtabsize; ++i) {
 		struct tcb *tcp = tcbtab[i];
 		if (!tcp->pid)
@@ -3177,7 +3179,48 @@ cleanup(int fatal_sig)
 			kill(tcp->pid, SIGCONT);
 			kill(tcp->pid, fatal_sig);
 		}
-		detach(tcp);
+		if (interrupt_or_stop(tcp))
+			++num_to_wait;
+		else
+			droptcb_verbose(tcp);
+	}
+
+	while (num_to_wait) {
+		int status;
+		pid_t pid = waitpid(-1, &status, __WALL);
+
+		if (pid < 0) {
+			if (errno == EINTR)
+				continue;
+			/* ECHILD is not expected */
+			perror_func_msg("waitpid(-1, __WALL)");
+			break;
+		}
+
+		if (pid == popen_pid) {
+			if (!WIFSTOPPED(status))
+				popen_pid = 0;
+			continue;
+		}
+
+		if (debug_flag)
+			print_debug_info(pid, status);
+
+		struct tcb *tcp = pid2tcb(pid);
+		if (!tcp) {
+			if (!is_number_in_set(QUIET_EXIT, quiet_set)) {
+				/*
+				 * This can happen if we inherited an unknown child.
+				 */
+				error_msg("Exit of unknown pid %u ignored", pid);
+			}
+			continue;
+		}
+
+		if (detach_interrupted_or_stopped(tcp, status)) {
+			droptcb_verbose(tcp);
+			--num_to_wait;
+		}
 	}
 }
 
