@@ -749,7 +749,7 @@ prctl-capbset		+prctl.sh -a21
 prctl-dumpable		+prctl.sh -a23
 prctl-fp-mode		+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 2 3 32 35" -a21
 prctl-mce-kill		+prctl.sh -a21
-prctl-mdwe		+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 2 3 2124532478" -a31
+prctl-mdwe		+prctl-success.sh PRCTL_INJECT_RETVALS="error=ENOTTY 0 1 2 3 2124532476" -a31
 prctl-name		+prctl.sh -a23
 prctl-no-args		+prctl.sh -a21
 prctl-pac-enabled-keys		+prctl.sh -a43
