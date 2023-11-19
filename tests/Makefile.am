@@ -473,9 +473,19 @@ uio_CPPFLAGS = $(AM_CPPFLAGS) -D_FILE_OFFSET_BITS=64
 
 stack_fcall_SOURCES = stack-fcall.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
+if USE_LIBDW
+if ACCEPT_GDWARF_ARANGES
+stack_fcall_CFLAGS = $(AM_CFLAGS) -gdwarf-aranges
+endif
+endif
 
 stack_fcall_attach_SOURCES = stack-fcall-attach.c \
 	stack-fcall-0.c stack-fcall-1.c stack-fcall-2.c stack-fcall-3.c
+if USE_LIBDW
+if ACCEPT_GDWARF_ARANGES
+stack_fcall_attach_CFLAGS = $(AM_CFLAGS) -gdwarf-aranges
+endif
+endif
 
 stack_fcall_mangled_SOURCES = stack-fcall-mangled.c \
 	stack-fcall-mangled-0.c stack-fcall-mangled-1.c \
