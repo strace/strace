@@ -268,7 +268,7 @@ update_personality(struct tcb *tcp, unsigned int personality)
 	}
 
 # if defined(ENABLE_STACKTRACE) && !defined(USE_LIBUNWIND)
-	if (stack_trace_enabled) {
+	if (stack_trace_mode) {
 		unwind_tcb_fin(tcp);
 		unwind_tcb_init(tcp);
 	}
@@ -662,7 +662,7 @@ syscall_entering_trace(struct tcb *tcp, unsigned int *sig)
 	}
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled &&
+	if (stack_trace_mode &&
 	    !check_exec_syscall(tcp) &&
 	    tcp_sysent(tcp)->sys_flags & STACKTRACE_CAPTURE_ON_ENTER) {
 		unwind_tcb_capture(tcp);
@@ -1026,7 +1026,7 @@ syscall_exiting_trace(struct tcb *tcp, struct timespec *ts, int res)
 	line_ended();
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
+	if (stack_trace_mode)
 		unwind_tcb_print(tcp);
 #endif
 	return 0;

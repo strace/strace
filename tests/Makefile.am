@@ -490,6 +490,9 @@ include gen_tests.am
 
 if ENABLE_STACKTRACE
 STACKTRACE_TESTS = strace-k.test strace-k-p.test
+if USE_LIBDW
+STACKTRACE_TESTS += strace-kk.test
+endif
 if USE_DEMANGLE
 STACKTRACE_TESTS += strace-k-demangle.test
 endif
@@ -693,6 +696,7 @@ check_SCRIPTS = \
 	strace-k-demangle.test \
 	strace-k-p.test \
 	strace-k.test \
+	strace-kk.test \
 	syntax.sh \
 	# end of check_SCRIPTS
 
@@ -749,6 +753,7 @@ check_DATA = \
 	strace-k-demangle.expected \
 	strace-k-p.expected \
 	strace-k.expected \
+	strace-kk.expected \
 	strace-r.expected \
 	strace.supp \
 	strauss_body.exp \

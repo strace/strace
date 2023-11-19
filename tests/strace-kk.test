@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Ensure that strace -kk works.
+#
+# Copyright (c) 2023 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+KOPT_SHORT=-kk
+KOPT_LONG=--stack-traces=source
+
+. "${srcdir=.}"/strace-k.test

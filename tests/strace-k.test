@@ -12,6 +12,8 @@
 . "${srcdir=.}/init.sh"
 
 : "${ATTACH_MODE=0}"
+: "${KOPT_SHORT=-k}"
+: "${KOPT_LONG=--stack-traces}"
 
 # strace -k is implemented using /proc/$pid/maps
 [ -f /proc/self/maps ] ||
@@ -43,13 +45,13 @@ if [ "x${ATTACH_MODE}" = "x1" ]; then
 			fail_ 'set_ptracer_any failed'
 	done
 
-	run_strace --trace=chdir --stack-trace --attach="$tracee_pid"
+	run_strace --trace=chdir ${KOPT_LONG} --attach="$tracee_pid"
 else
-	run_strace -e chdir -k $args
+	run_strace -e chdir ${KOPT_SHORT} $args
 fi
 
 expected="$srcdir/$NAME.expected"
-awk '
+awk_script_common='
 /^[^ ]/ {
 	if (out != "")
 		print out
@@ -68,12 +70,40 @@ awk '
 	}
 }
 
+'
+
+awk_script_symbol='
 /^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) / && !stop {
 	sym = gensub(/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) .*$/, "\\1", 1)
 	out = out " " sym
 	if (sym == "main")
 		stop = 1
-}' "$LOG" > "$OUT"
+}
+
+'
+
+awk_script_source='
+/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) \[0x[a-f0-9]+\] ([^:]+):([0-9]+)$/ && !stop {
+	sym = gensub(/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) .*$/, "\\1", 1)
+	if (sym == "main" || sym ~ /f[0-9]/) {
+		file = gensub(/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) \[0x[a-f0-9]+\] ([^:]+):([0-9]+)$/, "\\2", 1)
+		line = gensub(/^ >[^(]+\(([^+]+)\+0x[a-f0-9]+\) \[0x[a-f0-9]+\] ([^:]+):([0-9]+)$/, "\\3", 1)
+		sub(".*/", "", file)
+		out = out " " sym "<" file ":" line ">"
+		if (sym == "main")
+			stop = 1
+	}
+}
+
+'
+
+if [ "${KOPT_LONG}" = "--stack-traces" ]; then
+    awk_script="${awk_script_common}${awk_script_symbol}"
+else
+    awk_script="${awk_script_common}${awk_script_source}"
+fi
+
+awk "${awk_script}" "$LOG" > "$OUT"
 
 LC_ALL=C grep -E -x -f "$expected" < "$OUT" > /dev/null || {
 	cat >&2 <<__EOF__
