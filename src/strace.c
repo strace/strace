@@ -908,7 +908,7 @@ printleader(struct tcb *tcp)
 		clock_gettime(CLOCK_MONOTONIC, &ts);
 
 		static struct timespec ots;
-		if (ots.tv_sec == 0)
+		if (ots.tv_sec == 0 && ots.tv_nsec == 0)
 			ots = ts;
 
 		struct timespec dts;
