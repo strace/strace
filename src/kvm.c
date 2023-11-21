@@ -341,7 +341,9 @@ kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
 	debug_umoven = 'z';
 	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0) {
 		perror("umove");
-		fprintf(stderr, "LOOKHERE[%c]: failed in umove (in %s, %llx)\n", (char)debug_umoven, __FUNCTION__, (unsigned long long)info->mmap_addr);
+		fprintf(stderr, "LOOKHERE[%c]: current_wordsize %u < addr %lu\n", (char)debug_umoven, current_wordsize, sizeof(info->mmap_addr));
+		fprintf(stderr, "LOOKHERE[%c]: %lx & %lx\n", (char)debug_umoven, info->mmap_addr, ~(kernel_ulong_t) -1U);
+		fprintf(stderr, "LOOKHERE[%c]: failed in umove (in %s, %lx)\n", (char)debug_umoven, __FUNCTION__, (unsigned long)info->mmap_addr);
 		return;
 	}
 	debug_umoven = 0;
