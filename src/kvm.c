@@ -332,11 +332,15 @@ kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
 {
 	static struct kvm_run vcpu_run_struct;
 
-	if (info->mmap_len < sizeof(vcpu_run_struct))
+	if (info->mmap_len < sizeof(vcpu_run_struct)) {
+		fprintf(stderr, "LOOKHERE: mmap_len is too small %llu (in %s)\n", (unsigned long long)info->mmap_len, __FUNCTION__);
 		return;
+	}
 
-	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0)
+	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0) {
+		fprintf(stderr, "LOOKHERE: failed in umove (in %s)\n", __FUNCTION__);
 		return;
+	}
 
 	tcp->auxstr = xlookup(kvm_exit_reason, vcpu_run_struct.exit_reason);
 	if (!tcp->auxstr)
@@ -359,6 +363,10 @@ kvm_ioctl_decode_run(struct tcb *const tcp)
 		tcp->auxstr = NULL;
 		int fd = tcp->u_arg[0];
 		struct vcpu_info *info = vcpu_get_info(tcp, fd);
+
+		if (!info) {
+			fprintf(stderr, "LOOKHERE: info == null (fd: %d)\n", fd);
+		}
 
 		if (info) {
 			kvm_ioctl_run_attach_auxstr(tcp, info);
