@@ -215,7 +215,7 @@ $STRACE_EXE: -q and -e quiet/--quiet cannot be provided simultaneously" -q --qui
 for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg calls count error errors name syscall syscall_name syscall-name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
-	if [ "x$i" != xnone -a "x$i" != xnothing ]; then
+	if [ "$i" != none ] && [ "$i" != nothing ]; then
 		check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
 		check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
 	fi
