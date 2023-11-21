@@ -324,6 +324,7 @@ kvm_ioctl_decode_check_extension(struct tcb *const tcp, const unsigned int code,
 	return RVAL_IOCTL_DECODED;
 }
 
+extern int debug_umoven;
 # include "xlat/kvm_exit_reason.h"
 static void
 kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
@@ -337,10 +338,13 @@ kvm_ioctl_run_attach_auxstr(struct tcb *const tcp,
 		return;
 	}
 
+	debug_umoven = 'z';
 	if (umove(tcp, info->mmap_addr, &vcpu_run_struct) < 0) {
-		fprintf(stderr, "LOOKHERE: failed in umove (in %s)\n", __FUNCTION__);
+		perror("umove");
+		fprintf(stderr, "LOOKHERE[%c]: failed in umove (in %s, %llx)\n", (char)debug_umoven, __FUNCTION__, (unsigned long long)info->mmap_addr);
 		return;
 	}
+	debug_umoven = 0;
 
 	tcp->auxstr = xlookup(kvm_exit_reason, vcpu_run_struct.exit_reason);
 	if (!tcp->auxstr)

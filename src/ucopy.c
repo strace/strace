@@ -294,42 +294,54 @@ umoven_peekdata(const int pid, kernel_ulong_t addr, unsigned int len,
  * Copy `len' bytes of data from process `pid'
  * at address `addr' to our space at `our_addr'.
  */
+int debug_umoven = 0;
+
 int
 umoven(struct tcb *const tcp, kernel_ulong_t addr, unsigned int len,
        void *const our_addr)
 {
+	debug_umoven = 'a';
 	if (tracee_addr_is_invalid(addr))
 		return -1;
 
 	const int pid = tcp->pid;
 
+	debug_umoven = 'b';
 	if (process_vm_readv_not_supported)
 		return umoven_peekdata(pid, addr, len, our_addr);
+	debug_umoven = 'c';
 
 	int r = vm_read_mem(pid, our_addr, addr, len);
 	if ((unsigned int) r == len)
 		return 0;
+	debug_umoven = 'd';
 	if (r >= 0) {
 		error_func_msg("short read (%u < %u) @0x%" PRI_klx,
 			       (unsigned int) r, len, addr);
 		return -1;
 	}
+	debug_umoven = 'e';
 	switch (errno) {
 		case ENOSYS:
 		case EPERM:
 			/* try PTRACE_PEEKDATA */
+			debug_umoven = 'f';
 			return umoven_peekdata(pid, addr, len, our_addr);
 		case ESRCH:
 			/* the process is gone */
+			debug_umoven = 'g';
 			return -1;
 		case EFAULT: case EIO:
 			/* address space is inaccessible */
+			debug_umoven = 'h';
 			return -1;
 		default:
 			/* all the rest is strange and should be reported */
+			debug_umoven = 'j';
 			perror_func_msg("pid:%d @0x%" PRI_klx, pid, addr);
 			return -1;
 	}
+	debug_umoven = 'k';
 }
 
 /*
