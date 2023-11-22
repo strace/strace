@@ -51,7 +51,7 @@ extern char *optarg;
 
 #ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
-bool stack_trace_enabled;
+enum stack_trace_modes stack_trace_mode;
 #endif
 
 #define my_tkill(tid, sig) syscall(__NR_tkill, (tid), (sig))
@@ -270,7 +270,11 @@ static void
 usage(void)
 {
 #ifdef ENABLE_STACKTRACE
+# ifdef USE_LIBDW
+# define K_OPT "kk"
+# else
 # define K_OPT "k"
+# endif
 #else
 # define K_OPT ""
 #endif
@@ -394,9 +398,15 @@ Output format:\n\
 "
 #ifdef ENABLE_STACKTRACE
 "\
-  -k, --stack-traces\n\
+  -k, --stack-traces[=symbol]\n\
                  obtain stack trace between each syscall\n\
 "
+#ifdef USE_LIBDW
+"\
+  -kk, --stack-traces=source\n\
+                 obtain stack trace and source info between each syscall\n\
+"
+#endif
 #endif
 "\
   -n, --syscall-number\n\
@@ -944,7 +954,7 @@ after_successful_attach(struct tcb *tcp, const unsigned int flags)
 	}
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
+	if (stack_trace_mode)
 		unwind_tcb_init(tcp);
 #endif
 }
@@ -1096,7 +1106,7 @@ droptcb(struct tcb *tcp)
 	free_tcb_priv_data(tcp);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
+	if (stack_trace_mode)
 		unwind_tcb_fin(tcp);
 #endif
 
@@ -2276,6 +2286,7 @@ init(int argc, char *argv[])
 		GETOPT_OUTPUT_SEPARATELY,
 		GETOPT_PIDNS_TRANSLATION,
 		GETOPT_SYSCALL_LIMIT,
+		GETOPT_STACK,
 		GETOPT_TS,
 		GETOPT_TIPS,
 		GETOPT_ARGV0,
@@ -2315,7 +2326,7 @@ init(int argc, char *argv[])
 		{ "instruction-pointer", no_argument,      0, 'i' },
 		{ "interruptible",	required_argument, 0, 'I' },
 		{ "kill-on-exit",	no_argument,	   0, GETOPT_KILL_ON_EXIT },
-		{ "stack-traces",	no_argument,	   0, 'k' },
+		{ "stack-traces" ,	optional_argument, 0, GETOPT_STACK },
 		{ "syscall-limit",	required_argument, 0, GETOPT_SYSCALL_LIMIT },
 		{ "syscall-number",	no_argument,	   0, 'n' },
 		{ "output",		required_argument, 0, 'o' },
@@ -2453,12 +2464,51 @@ init(int argc, char *argv[])
 			break;
 		case 'k':
 #ifdef ENABLE_STACKTRACE
-			stack_trace_enabled = true;
+			switch (stack_trace_mode) {
+			case STACK_TRACE_OFF:
+				stack_trace_mode = STACK_TRACE_ON;
+				break;
+			case STACK_TRACE_ON:
+# ifdef USE_LIBDW
+				stack_trace_mode = STACK_TRACE_WITH_SRCINFO;
+# else
+				error_msg_and_die("Stack traces with "
+						  "source line information (-kk/"
+						  "--stack-traces=source option) "
+						  "are not supported by this "
+						  "build of strace");
+# endif	/* USE_LIBDW */
+				break;
+			default:
+				error_msg_and_die("Too many -k options");
+			}
 #else
 			error_msg_and_die("Stack traces (-k/--stack-traces "
 					  "option) are not supported by this "
 					  "build of strace");
-#endif
+#endif /* ENABLE_STACKTRACE */
+			break;
+		case GETOPT_STACK:
+#ifdef ENABLE_STACKTRACE
+			if (optarg == NULL || strcmp(optarg, "symbol") == 0)
+				stack_trace_mode = STACK_TRACE_ON;
+			else if (strcmp(optarg, "source") == 0) {
+# ifdef USE_LIBDW
+				stack_trace_mode = STACK_TRACE_WITH_SRCINFO;
+# else
+				error_msg_and_die("Stack traces with "
+						  "source line information "
+						  "(-kk/--stack-traces=source option) "
+						  "are not supported by this "
+						  "build of strace");
+# endif /* USE_LIBDW */
+			} else
+				error_opt_arg(c, lopt, optarg);
+#else
+			error_msg_and_die("Stack traces (-k/--stack-traces "
+					  "option) are not supported by this "
+					  "build of strace");
+#endif /* ENABLE_STACKTRACE */
 			break;
 		case GETOPT_KILL_ON_EXIT:
 			opt_kill_on_exit = true;
@@ -2791,7 +2841,7 @@ init(int argc, char *argv[])
 		if (iflag)
 			error_msg("-i/--instruction-pointer has no effect "
 				  "with -c/--summary-only");
-		if (stack_trace_enabled)
+		if (stack_trace_mode)
 			error_msg("-k/--stack-traces has no effect "
 				  "with -c/--summary-only");
 		if (nflag)
@@ -2847,8 +2897,8 @@ init(int argc, char *argv[])
 	set_sighandler(SIGCHLD, SIG_DFL, &params_for_tracee.child_sa);
 
 #ifdef ENABLE_STACKTRACE
-	if (stack_trace_enabled)
-		unwind_init();
+	if (stack_trace_mode)
+		unwind_init(stack_trace_mode == STACK_TRACE_WITH_SRCINFO);
 #endif
 
 	/* See if they want to run as another user. */
@@ -3302,7 +3352,7 @@ print_stopped(struct tcb *tcp, const siginfo_t *si, const unsigned int sig)
 		line_ended();
 
 #ifdef ENABLE_STACKTRACE
-		if (stack_trace_enabled)
+		if (stack_trace_mode)
 			unwind_tcb_print(tcp);
 #endif
 	}

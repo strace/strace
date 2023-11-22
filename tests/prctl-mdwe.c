@@ -51,9 +51,11 @@ main(int argc, char **argv)
 			{-1,         ""},
 			{0,          ""},
 			{1,          " (PR_MDWE_REFUSE_EXEC_GAIN)"},
-			{2,          ""},
-			{3,          " (PR_MDWE_REFUSE_EXEC_GAIN|0x2)"},
-			{0x7ea1cafe, ""},
+			{2,          " (PR_MDWE_NO_INHERIT)"},
+			{3,          " (PR_MDWE_REFUSE_EXEC_GAIN|PR_MDWE_NO_INHERIT)"},
+			{4,          ""},
+			{5,          " (PR_MDWE_REFUSE_EXEC_GAIN|0x4)"},
+			{0x7ea1cafc, ""},
 	};
 	static const struct {
 		kernel_ulong_t arg;
@@ -61,9 +63,11 @@ main(int argc, char **argv)
 	} set_strs[] = {
 			{0,          "0"},
 			{1,          "PR_MDWE_REFUSE_EXEC_GAIN"},
-			{2,          "0x2 /* PR_MDWE_??? */"},
-			{3,          "PR_MDWE_REFUSE_EXEC_GAIN|0x2"},
-			{0x7ea1cafe, "0x7ea1cafe /* PR_MDWE_??? */"}
+			{2,          "PR_MDWE_NO_INHERIT"},
+			{3,          "PR_MDWE_REFUSE_EXEC_GAIN|PR_MDWE_NO_INHERIT"},
+			{4,          "0x4 /* PR_MDWE_??? */"},
+			{5,          "PR_MDWE_REFUSE_EXEC_GAIN|0x4"},
+			{0x7ea1cafc, "0x7ea1cafc /* PR_MDWE_??? */"}
 	};
 
 	long rc;

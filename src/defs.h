@@ -544,11 +544,16 @@ enum xflag_opts {
 extern unsigned xflag;
 extern bool followfork;
 extern bool output_separately;
+enum stack_trace_modes {
+	STACK_TRACE_OFF,
+	STACK_TRACE_ON,
+	STACK_TRACE_WITH_SRCINFO,
+};
 # ifdef ENABLE_STACKTRACE
 /* if this is true do the stack trace for every system call */
-extern bool stack_trace_enabled;
+extern enum stack_trace_modes stack_trace_mode;
 # else
-#  define stack_trace_enabled 0
+#  define stack_trace_mode STACK_TRACE_OFF
 # endif
 extern unsigned max_strlen;
 extern unsigned os_release;
@@ -1560,7 +1565,7 @@ extern void print_ticks_d(int64_t val, long freq, unsigned int precision);
 extern void print_clock_t(uint64_t val);
 
 # ifdef ENABLE_STACKTRACE
-extern void unwind_init(void);
+extern void unwind_init(bool);
 extern void unwind_tcb_init(struct tcb *);
 extern void unwind_tcb_fin(struct tcb *);
 extern void unwind_tcb_print(struct tcb *);

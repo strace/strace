@@ -23,7 +23,13 @@ typedef void (*unwind_call_action_fn)(void *data,
 				      const char *binary_filename,
 				      const char *symbol_name,
 				      unwind_function_offset_t function_offset,
-				      unsigned long true_offset);
+				      unsigned long true_offset,
+				      /* source information:
+				       * source_filename can be NULL.
+				       * In that case, source_line is never referenced. */
+				      const char *source_filename,
+				      int source_line
+				      );
 typedef void (*unwind_error_action_fn)(void *data,
 				       const char *error,
 				       unsigned long true_offset);
@@ -32,7 +38,7 @@ struct unwind_unwinder_t {
 	const char *name;
 
 	/* Initialize the unwinder. */
-	void   (*init)(void);
+	void   (*init)(bool);
 
 	/* Make/destroy the context data attached to tcb. */
 	void * (*tcb_init)(struct tcb *);

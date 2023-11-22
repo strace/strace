@@ -1520,7 +1520,15 @@ btrfs_test_quota_ctl_ioctl(void)
 	args.cmd = 4;
 	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
 	printf("ioctl(-1, %s, "
-	       "{cmd=0x4 /* BTRFS_QUOTA_CTL_??? */})" RVAL_EBADF,
+	       "{cmd=%sBTRFS_QUOTA_CTL_ENABLE_SIMPLE_QUOTA%s})" RVAL_EBADF,
+	       ioc(BTRFS_IOC_QUOTA_CTL),
+	       verbose_xlat ? "0x4 /* " : "",
+	       verbose_xlat ? " */" : "");
+
+	args.cmd = 5;
+	ioctl(-1, BTRFS_IOC_QUOTA_CTL, &args);
+	printf("ioctl(-1, %s, "
+	       "{cmd=0x5 /* BTRFS_QUOTA_CTL_??? */})" RVAL_EBADF,
 	       ioc(BTRFS_IOC_QUOTA_CTL));
 }
 

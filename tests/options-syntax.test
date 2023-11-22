@@ -12,6 +12,8 @@
 
 compiled_with_secontext=$(get_config_option ENABLE_SECONTEXT "y")
 compiled_with_stacktrace="$(get_config_option ENABLE_STACKTRACE 1)"
+compiled_with_libunwind="$(get_config_option USE_LIBUNWIND 1)"
+compiled_with_libdw="$(get_config_option USE_LIBDW 1)"
 
 check_e "Invalid process id: '0'" -p 0
 check_e "Invalid process id: '0'" --attach=0
@@ -215,7 +217,7 @@ $STRACE_EXE: -q and -e quiet/--quiet cannot be provided simultaneously" -q --qui
 for i in time time_percent time-percent time_total time-total total_time total-time min_time min-time time_min time-min shortest max_time max-time time_max time-max longest avg_time avg-time time_avg time-avg calls count error errors name syscall syscall_name syscall-name none nothing; do
 	check_h "must have PROG [ARGS] or -p PID" -S "$i"
 	check_h "must have PROG [ARGS] or -p PID" --summary-sort-by="$i"
-	if [ "x$i" != xnone -a "x$i" != xnothing ]; then
+	if [ "$i" != none ] && [ "$i" != nothing ]; then
 		check_h "must have PROG [ARGS] or -p PID" -c -U "$i"
 		check_h "must have PROG [ARGS] or -p PID" --summary-only --summary-columns="$i"
 	fi
@@ -418,6 +420,15 @@ check_e_using_grep 'ptrace_setoptions = 0x[[:xdigit:]]+' --debug /
 if [ -z "$compiled_with_stacktrace" ]; then
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" -k
 	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces=symbol
+	check_e "Stack traces (-k/--stack-traces option) are not supported by this build of strace" --stack-traces=source
+else
+	if [ -n "$compiled_with_libunwind" ]; then
+		check_e "Stack traces with source line information (-kk/--stack-traces=source option) are not supported by this build of strace" -kk
+		check_e "Stack traces with source line information (-kk/--stack-traces=source option) are not supported by this build of strace" --stack-traces=source
+	elif [ -n "$compiled_with_libdw" ]; then
+		check_e "Too many -k options" -kkk
+	fi
 fi
 
 args='-p 2147483647'

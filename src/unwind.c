@@ -37,10 +37,10 @@ static void queue_print(struct unwind_queue_t *queue);
 static const char asprintf_error_str[] = "???";
 
 void
-unwind_init(void)
+unwind_init(bool with_srcinfo)
 {
 	if (unwinder.init)
-		unwinder.init();
+		unwinder.init(with_srcinfo);
 }
 
 void
@@ -82,6 +82,14 @@ unwind_tcb_fin(struct tcb *tcp)
  * /lib64/libc.so.6(__libc_start_main+0xed) [0x7fa2f8a5976d]
  * ./a.out() [0x400569]
  */
+#define STACK_ENTRY_SYMBOL_WITH_SRCINFO_FMT(SYM)\
+	" > %s(%s+0x%lx) [0x%lx] %s:%d\n",	\
+	binary_filename,			\
+	(SYM),					\
+	(unsigned long) function_offset,	\
+	true_offset,				\
+	source_filename,			\
+	source_line
 #define STACK_ENTRY_SYMBOL_FMT(SYM)		\
 	" > %s(%s+0x%lx) [0x%lx]\n",		\
 	binary_filename,			\
@@ -103,7 +111,9 @@ print_call_cb(void *dummy,
 	      const char *binary_filename,
 	      const char *symbol_name,
 	      unwind_function_offset_t function_offset,
-	      unsigned long true_offset)
+	      unsigned long true_offset,
+	      const char *source_filename,
+	      int source_line)
 {
 	if (symbol_name && (symbol_name[0] != '\0')) {
 #ifdef USE_DEMANGLE
@@ -111,7 +121,13 @@ print_call_cb(void *dummy,
 			cplus_demangle(symbol_name,
 				       DMGL_AUTO | DMGL_PARAMS);
 #endif
-		tprintf_string(STACK_ENTRY_SYMBOL_FMT(
+		source_filename
+			? tprintf_string(STACK_ENTRY_SYMBOL_WITH_SRCINFO_FMT(
+#ifdef USE_DEMANGLE
+						      demangled_name ? demangled_name :
+#endif
+						      symbol_name))
+			: tprintf_string(STACK_ENTRY_SYMBOL_FMT(
 #ifdef USE_DEMANGLE
 						      demangled_name ? demangled_name :
 #endif
@@ -146,6 +162,8 @@ sprint_call_or_error(const char *binary_filename,
 		     const char *symbol_name,
 		     unwind_function_offset_t function_offset,
 		     unsigned long true_offset,
+		     const char *source_filename,
+		     int source_line,
 		     const char *error)
 {
 	char *output_line = NULL;
@@ -157,8 +175,15 @@ sprint_call_or_error(const char *binary_filename,
 			cplus_demangle(symbol_name,
 				       DMGL_AUTO | DMGL_PARAMS);
 #endif
-		n = asprintf(&output_line,
-			     STACK_ENTRY_SYMBOL_FMT(
+		n = source_filename
+			? asprintf(&output_line,
+				   STACK_ENTRY_SYMBOL_WITH_SRCINFO_FMT(
+#ifdef USE_DEMANGLE
+						    demangled_name ? demangled_name :
+#endif
+						    symbol_name))
+			: asprintf(&output_line,
+				   STACK_ENTRY_SYMBOL_FMT(
 #ifdef USE_DEMANGLE
 						    demangled_name ? demangled_name :
 #endif
@@ -193,6 +218,8 @@ queue_put(struct unwind_queue_t *queue,
 	  const char *symbol_name,
 	  unwind_function_offset_t function_offset,
 	  unsigned long true_offset,
+	  const char *source_filename,
+	  int source_line,
 	  const char *error)
 {
 	struct call_t *call;
@@ -202,6 +229,8 @@ queue_put(struct unwind_queue_t *queue,
 						 symbol_name,
 						 function_offset,
 						 true_offset,
+						 source_filename,
+						 source_line,
 						 error);
 	call->next = NULL;
 
@@ -219,13 +248,17 @@ queue_put_call(void *queue,
 	       const char *binary_filename,
 	       const char *symbol_name,
 	       unwind_function_offset_t function_offset,
-	       unsigned long true_offset)
+	       unsigned long true_offset,
+	       const char *source_filename,
+	       int source_line)
 {
 	queue_put(queue,
 		  binary_filename,
 		  symbol_name,
 		  function_offset,
 		  true_offset,
+		  source_filename,
+		  source_line,
 		  NULL);
 }
 
@@ -234,7 +267,7 @@ queue_put_error(void *queue,
 		const char *error,
 		unsigned long ip)
 {
-	queue_put(queue, NULL, NULL, 0, ip, error);
+	queue_put(queue, NULL, NULL, 0, ip, NULL, 0, error);
 }
 
 static void

@@ -38,7 +38,11 @@
 strace \- trace system calls and signals
 .SH SYNOPSIS
 .SY strace
-.if '@ENABLE_STACKTRACE_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyYzZ
+.\" -kk option is available:
+.if '@ENABLE_STACKTRACE_FALSE@'#' .if '@USE_LIBDW_FALSE@'#' .OP \-ACdffhikkqqrtttTvVwxxyyYzZ
+.\" only -k option is available:
+.if '@ENABLE_STACKTRACE_FALSE@'#' .if '@USE_LIBUNWIND_FALSE@'#' .OP \-ACdffhikqqrtttTvVwxxyyYzZ
+.\" no -k option is available:
 .if '@ENABLE_STACKTRACE_TRUE@'#' .OP \-ACdffhiqqrtttTvVwxxyyYzZ
 .OP \-a column
 .OP \-b execve
@@ -996,9 +1000,16 @@ Print the syscall number.
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TP
 .if '@ENABLE_STACKTRACE_FALSE@'#' .B \-k
 .if '@ENABLE_STACKTRACE_FALSE@'#' .TQ
-.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces
+.if '@ENABLE_STACKTRACE_FALSE@'#' .B \-\-stack\-traces [= symbol ]
 .if '@ENABLE_STACKTRACE_FALSE@'#' Print the execution stack trace of the traced
 .if '@ENABLE_STACKTRACE_FALSE@'#' processes after each system call.
+.if '@USE_LIBDW_FALSE@'#' .TP
+.if '@USE_LIBDW_FALSE@'#' .B \-kk
+.if '@USE_LIBDW_FALSE@'#' .TQ
+.if '@USE_LIBDW_FALSE@'#' .B \-\-stack\-traces [= source ]
+.if '@USE_LIBDW_FALSE@'#' Print the execution stack trace and source code information of the traced
+.if '@USE_LIBDW_FALSE@'#' processes after each system call. This option expects the target program is compiled
+.if '@USE_LIBDW_FALSE@'#' with appropriate debug options: "\-g" (gcc), or "\-g \-gdwarf-aranges" (clang).
 .TP
 .BI "\-o " filename
 .TQ

@@ -70,6 +70,7 @@ EXTRA_DIST = \
 	linux/include/uapi/linux/mount.h \
 	linux/include/uapi/linux/mpls.h \
 	linux/include/uapi/linux/mptcp.h \
+	linux/include/uapi/linux/mptcp_pm.h \
 	linux/include/uapi/linux/mqueue.h \
 	linux/include/uapi/linux/mroute.h \
 	linux/include/uapi/linux/mroute6.h \

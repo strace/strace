@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Check strace --stack-traces=source for attached tracees.
+#
+# Copyright (c) 2020-2023 The strace developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+ATTACH_MODE=1
+KOPT_SHORT=-kk
+KOPT_LONG=--stack-traces=source
+test_prog=../stack-fcall-attach
+
+. "${srcdir=.}"/strace-k.test
