@@ -6,6 +6,10 @@ Noteworthy changes in release ?.? (????-??-??)
   * Updated lists of BPF_*, BTRFS_*, IORING_*, KVM_*, LANDLOCK_*, PR_*,
     and TCP_* constants.
 
+* Bug fixes
+  * Fix strace -r during the first second after booting to show correct relative
+    timestamps.
+
 Noteworthy changes in release 6.6 (2023-10-31)
 ==============================================
 

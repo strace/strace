@@ -21,7 +21,7 @@ struct vcpu_info {
 	struct vcpu_info *next;
 	int fd;
 	int cpuid;
-	long mmap_addr;
+	unsigned long mmap_addr;
 	unsigned long mmap_len;
 	bool resolved;
 };
