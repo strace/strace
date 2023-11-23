@@ -1033,7 +1033,7 @@ alloctcb(int pid)
 	if (nprocs == tcbtabsize)
 		expand_tcbtab();
 
-	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+	for (size_t i = 0; i < tcbtabsize; ++i) {
 		struct tcb *tcp = tcbtab[i];
 		if (!tcp->pid) {
 			memset(tcp, 0, sizeof(*tcp));
@@ -1447,7 +1447,7 @@ startup_attach(void)
 		debug_msg("new tracer pid is %d", strace_tracer_pid);
 	}
 
-	for (unsigned int tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
+	for (size_t tcbi = 0; tcbi < tcbtabsize; ++tcbi) {
 		tcp = tcbtab[tcbi];
 
 		if (!tcp->pid)
@@ -2761,7 +2761,7 @@ init(int argc, char *argv[])
 		 * of tcbs are not filled though tcbs are initialized.
 		 * We must fill the fields here.
 		 */
-		for (unsigned int i = 0; i < tcbtabsize; ++i) {
+		for (size_t i = 0; i < tcbtabsize; ++i) {
 			struct tcb *tcp = tcbtab[i];
 			if (tcp->comm[0] == 0)
 				maybe_load_task_comm(tcp);
@@ -3090,7 +3090,7 @@ pid2tcb(const int pid)
 	if (tcp && tcp->pid == pid)
 		return tcp;
 
-	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+	for (size_t i = 0; i < tcbtabsize; ++i) {
 		tcp = tcbtab[i];
 		if (tcp->pid == pid)
 			return *ptcp = tcp;
@@ -3108,7 +3108,7 @@ cleanup(int fatal_sig)
 	if (!fatal_sig)
 		fatal_sig = SIGTERM;
 
-	for (unsigned int i = 0; i < tcbtabsize; ++i) {
+	for (size_t i = 0; i < tcbtabsize; ++i) {
 		struct tcb *tcp = tcbtab[i];
 		if (!tcp->pid)
 			continue;
