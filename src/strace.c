@@ -3100,34 +3100,6 @@ pid2tcb(const int pid)
 }
 
 static void
-cleanup(int fatal_sig)
-{
-	if (ptrace_setoptions & PTRACE_O_EXITKILL)
-		return;
-
-	if (!fatal_sig)
-		fatal_sig = SIGTERM;
-
-	for (size_t i = 0; i < tcbtabsize; ++i) {
-		struct tcb *tcp = tcbtab[i];
-		if (!tcp->pid)
-			continue;
-		debug_func_msg("looking at pid %u", tcp->pid);
-		if (tcp->pid == strace_child) {
-			kill(tcp->pid, SIGCONT);
-			kill(tcp->pid, fatal_sig);
-		}
-		detach(tcp);
-	}
-}
-
-static void
-interrupt(int sig)
-{
-	interrupted = sig;
-}
-
-static void
 print_debug_info(const int pid, int status)
 {
 	const unsigned int event = (unsigned int) status >> 16;
@@ -3164,6 +3136,34 @@ print_debug_info(const int pid, int status)
 		xsprintf(evbuf, ",EVENT_%s (%u)", e, event);
 	}
 	error_msg("[wait(0x%06x) = %u] %s%s", status, pid, buf, evbuf);
+}
+
+static void
+cleanup(int fatal_sig)
+{
+	if (ptrace_setoptions & PTRACE_O_EXITKILL)
+		return;
+
+	if (!fatal_sig)
+		fatal_sig = SIGTERM;
+
+	for (size_t i = 0; i < tcbtabsize; ++i) {
+		struct tcb *tcp = tcbtab[i];
+		if (!tcp->pid)
+			continue;
+		debug_func_msg("looking at pid %u", tcp->pid);
+		if (tcp->pid == strace_child) {
+			kill(tcp->pid, SIGCONT);
+			kill(tcp->pid, fatal_sig);
+		}
+		detach(tcp);
+	}
+}
+
+static void
+interrupt(int sig)
+{
+	interrupted = sig;
 }
 
 static struct tcb *
