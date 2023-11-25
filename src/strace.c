@@ -1148,6 +1148,16 @@ droptcb(struct tcb *tcp)
 	memset(tcp, 0, sizeof(*tcp));
 }
 
+static void
+droptcb_verbose(struct tcb *tcp)
+{
+	if (!is_number_in_set(QUIET_ATTACH, quiet_set)
+	    && (tcp->flags & TCB_ATTACHED))
+		error_msg("Process %u detached", tcp->pid);
+
+	droptcb(tcp);
+}
+
 /* Detach traced process.
  * Never call DETACH twice on the same process as both unattached and
  * attached-unstopped processes give the same ESRCH.  For unattached process we
@@ -1302,11 +1312,7 @@ detach(struct tcb *tcp)
 	}
 
  drop:
-	if (!is_number_in_set(QUIET_ATTACH, quiet_set)
-	    && (tcp->flags & TCB_ATTACHED))
-		error_msg("Process %u detached", tcp->pid);
-
-	droptcb(tcp);
+	droptcb_verbose(tcp);
 }
 
 static void
