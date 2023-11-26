@@ -1158,17 +1158,10 @@ droptcb_verbose(struct tcb *tcp)
 	droptcb(tcp);
 }
 
-/* Detach traced process.
- * Never call DETACH twice on the same process as both unattached and
- * attached-unstopped processes give the same ESRCH.  For unattached process we
- * would SIGSTOP it and wait for its SIGSTOP notification forever.
- */
-static void
-detach(struct tcb *tcp)
+/* Returns true when the tracee has to be waited for. */
+static bool
+interrupt_or_stop(struct tcb *tcp)
 {
-	int error;
-	int status;
-
 	/*
 	 * Linux wrongly insists the child be stopped
 	 * before detaching.  Arghh.  We go through hoops
@@ -1176,24 +1169,24 @@ detach(struct tcb *tcp)
 	 */
 
 	if (!(tcp->flags & TCB_ATTACHED))
-		goto drop;
+		return false;
 
 	/* We attached but possibly didn't see the expected SIGSTOP.
 	 * We must catch exactly one as otherwise the detached process
 	 * would be left stopped (process state T).
 	 */
 	if (tcp->flags & TCB_IGNORE_ONE_SIGSTOP)
-		goto wait_loop;
+		return true;
 
-	error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
+	int error = ptrace(PTRACE_DETACH, tcp->pid, 0, 0);
 	if (!error) {
 		/* On a clear day, you can see forever. */
-		goto drop;
+		return false;
 	}
 	if (errno != ESRCH) {
 		/* Shouldn't happen. */
 		perror_func_msg("ptrace(PTRACE_DETACH,%u)", tcp->pid);
-		goto drop;
+		return false;
 	}
 	/* ESRCH: process is either not stopped or doesn't exist. */
 	if (my_tkill(tcp->pid, 0) < 0) {
@@ -1201,7 +1194,7 @@ detach(struct tcb *tcp)
 			/* Shouldn't happen. */
 			perror_func_msg("tkill(%u,0)", tcp->pid);
 		/* else: process doesn't exist. */
-		goto drop;
+		return false;
 	}
 	/* Process is not stopped, need to stop it. */
 	if (use_seize) {
@@ -1213,26 +1206,40 @@ detach(struct tcb *tcp)
 		 */
 		error = ptrace(PTRACE_INTERRUPT, tcp->pid, 0, 0);
 		if (!error)
-			goto wait_loop;
+			return true;
 		if (errno != ESRCH)
 			perror_func_msg("ptrace(PTRACE_INTERRUPT,%u)", tcp->pid);
 	} else {
 		error = my_tkill(tcp->pid, SIGSTOP);
 		if (!error)
-			goto wait_loop;
+			return true;
 		if (errno != ESRCH)
 			perror_func_msg("tkill(%u,SIGSTOP)", tcp->pid);
 	}
-	/* Either process doesn't exist, or some weird error. */
-	goto drop;
 
- wait_loop:
-	/* We end up here in three cases:
+	/* Either process doesn't exist, or some weird error. */
+	return false;
+}
+
+/* Detach traced process.
+ * Never call DETACH twice on the same process as both unattached and
+ * attached-unstopped processes give the same ESRCH.  For unattached process we
+ * would SIGSTOP it and wait for its SIGSTOP notification forever.
+ */
+static void
+detach(struct tcb *tcp)
+{
+	if (!interrupt_or_stop(tcp))
+		goto drop;
+
+	/*
+	 * We end up here in three cases:
 	 * 1. We sent PTRACE_INTERRUPT (use_seize case)
 	 * 2. We sent SIGSTOP (!use_seize)
 	 * 3. Attach SIGSTOP was already pending (TCB_IGNORE_ONE_SIGSTOP set)
 	 */
 	for (;;) {
+		int status;
 		unsigned int sig;
 		if (waitpid(tcp->pid, &status, __WALL) < 0) {
 			if (errno == EINTR)
